@@ -19,6 +19,8 @@ import { createRequire } from 'node:module';
 /* 주소에 박힌 HTML 기호(`&#038;`·`&amp;`)를 되돌리는 규칙은 앱과 같은 파일 하나다(source-link.js · 2026-10-03).
    안 되돌리면 `#038;…uid=392` 가 조각(fragment)이 되어 글 번호가 사라진다 — 서울대 학생처 3건 실측. */
 const { decodeUrlEntities } = createRequire(import.meta.url)('../source-link.js');
+/* 클릭형 게시판 규칙 표 한 곳(교내 소식 로봇과 같은 것) — 아래 ruleDetailCandidates 가 부른다 */
+import { NEWS_BOARD_RULES, ruleResolver } from './news-board-rules.mjs';
 
 /* 목록 주소 + 제목 표식(#n-…) — 이 형태는 '원문으로 못 간다'는 뜻이다 */
 export function isMarkerUrl(raw) {
@@ -451,11 +453,41 @@ export function detailCandidates(dom) {
    ②를 통째로 빠뜨렸다. 행에 `…/article/JANGHAKNOTICE/detail/26765625`라고 **적혀 있는데도**
    그걸 안 쓰고 매번 주소를 조립했고, 그래서 동국대 12건이 전부 떨어졌다.
    복구 로봇에는 처음부터 있던 규칙이다 — 규칙이 두 벌이면 반드시 이렇게 갈라진다. */
+/* 클릭형 게시판의 **확인된 규칙**으로 만든 후보 (2026-10-04 · 서울교대 원문 4건이 목록 표식으로 남은 원인).
+   서울교대 행은 `<a href="javascript:" data-id="54815">` 라 누르기 전엔 주소가 없고, 위의 조립(mkQuery·mkPath)은
+   `selectNttList.do` 를 고쳐 쓸 이름이 없어 아무것도 못 만든다(2026-10-03 — 목록 경로 그대로에 번호만 붙이지 않는다).
+   그런데 그 게시판의 글 주소 꼴(`selectNttInfo.do?mi=…&bbsId=…&nttSn=<data-id>`)은 2026-08-02 실제로 열어 확인해
+   교내 소식 규칙 표(news-board-rules.mjs NEWS_BOARD_RULES)에 이미 적혀 있다 — 🔴 **그 표를 그대로 부른다(베끼지 않는다).**
+   쓰는 것은 행의 글자(onclick·href·data-id)만 보고 주소를 내는 꼴(onclick·dataId)뿐이다 — 목록 표식(listOnly)·API(json·post)는 행 하나로 주소를 못 낸다.
+   🔴 학교를 모르는 자리라 **규칙이 낸 주소가 이 게시판과 같은 사이트일 때만** 쓴다(서울교대 규칙은 늘 snue.ac.kr 주소를 낸다).
+      그래도 짐작이 섞인 후보이므로 부르는 쪽이 늘 새 탭으로 열어 확인한다(사냥꾼·복구 로봇 verify · 브라우저 수집 verifyDetailUrl).
+   row.src 는 세 로봇이 `onclick|href|data-id(|data-seq)` 를 `|` 로 이은 글자다 — 규칙 함수(ruleResolver)가 읽는 속성 꼴로 되돌린다:
+   전체를 onclick 값으로(함수 인자 정규식이 onclick·href 어느 쪽 글자든 찾는다) · 숫자뿐인 조각을 data-id 로. */
+const RULE_KINDS = new Set(['onclick', 'dataId']);
+const hostOf = (u) => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return ''; } };
+export function ruleDetailCandidates({ row, listUrl }) {
+  const src = String((row && row.src) || '');
+  if (!src || !listUrl) return [];
+  const digits = src.split('|').map((x) => x.trim()).find((x) => /^\d{3,20}$/.test(x));
+  const attrs = `onclick="${src.replace(/"/g, "'")}"${digits ? ` data-id="${digits}"` : ''}`;
+  const host = hostOf(listUrl);
+  const out = [];
+  for (const rule of new Set(Object.values(NEWS_BOARD_RULES))) {
+    if (!RULE_KINDS.has(rule.kind)) continue;
+    const hit = ruleResolver(rule, listUrl)(attrs, (row && row.t) || '');
+    if (!hit || hostOf(hit.url) !== host || out.some((x) => x.url === hit.url)) continue;
+    out.push({ url: hit.url, id: String(hit.id) });
+  }
+  return out;
+}
+
 export function rowDetailCandidates({ row, listUrl, forms, landed, dom }) {
   const out = [];
   const add = (u) => { if (u && isDetailUrl(u, listUrl) && !out.includes(u)) out.push(u); };
   add(landed);
   add(row && row.abs);
+  /* 게시판이 실제로 쓰는 꼴(확인된 규칙)이 조립보다 앞이다 — 조립은 이름을 유추한 주소라 틀릴 수 있다 */
+  for (const r of ruleDetailCandidates({ row, listUrl })) add(r.url);
   for (const c of detailCandidates({
     ...(dom || {}),
     url: landed || listUrl,
@@ -466,7 +498,7 @@ export function rowDetailCandidates({ row, listUrl, forms, landed, dom }) {
   return out;
 }
 
-export default { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, titleFingerprint, sameTitle, rowMatchesTitle, detailCandidates, idsFromSource, looksLikeLoginWall, rowDetailCandidates };
+export default { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, titleFingerprint, sameTitle, rowMatchesTitle, detailCandidates, idsFromSource, looksLikeLoginWall, rowDetailCandidates, ruleDetailCandidates };
 
 /* ── 이 화면이 '목록'인가 '상세'인가 (2026-08-20 — 두 로봇에 있던 복사본을 여기로 합쳤다) ──
    제목이 화면에 보인다는 것만으로는 부족하다: **게시판 목록에도 그 제목이 있다.**

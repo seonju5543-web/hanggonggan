@@ -38,6 +38,19 @@ function postIdKey(raw) {
   }
   return '';
 }
+/* 목록 표식(#n-)에 담아 둔 게시판 글 번호(postId — 브라우저 수집이 확인된 규칙으로 행에서 읽은 것 · 2026-10-04).
+   표식 주소에는 번호가 없어 위 열쇠가 못 잡는다 — 가천 RE 2건·서울교대 4건이 진짜 주소 짝과 영영 안 합쳐진 이유(research 2026-10-04).
+   🔴 위 세 꼴의 **목록 쪽 주소**(selectNttList.do · subview.do · K2Web artclList.do)일 때만 — 그 세 게시판 체계는 글 번호가
+      사이트 전체에서 하나라 위 열쇠가 이미 '호스트 + 번호'로 묶는다. 다른 게시판의 번호는 게시판마다 겹칠 수 있어 묶지 않는다. */
+function markerPostIdKey(n) {
+  const raw = String((n && n.url) || '');
+  const pid = String((n && n.postId) || '').trim();
+  if (!pid || !/^\d{3,20}$/.test(pid) || !raw.includes('#n-')) return '';
+  let x;
+  try { x = new URL(raw.split('#')[0].replace(/&(?:amp|#0*38|#x0*26);/gi, '&')); } catch { return ''; }
+  if (!/\/selectNttList\.do$|\/subview\.do$|\/bbs\/[^/]+\/\d+\/artclList\.do$/.test(x.pathname)) return '';
+  return `pid:${x.host.replace(/^www\./, '')}:${pid}`;
+}
 
 // 글을 가리키지 않는(휘발성) 값들 — 정렬·페이지·검색어·권한·표시 개수 등
 const VOLATILE = new Set([
@@ -140,7 +153,7 @@ export function dedupeNotices(items, opts = {}) {
   const out = [];
   const idx = new Map(); // 열쇠 → out에서의 위치들 (먼저 온 것이 앞)
   for (const n of items || []) {
-    const pid = postIdKey(n.url);
+    const pid = postIdKey(n.url) || markerPostIdKey(n);
     const keys = [`u:${urlKey(n.url)}`, titleKey(n) ? `t:${titleKey(n)}` : null, pid || null].filter(Boolean);
     let hit;
     for (const k of keys) {

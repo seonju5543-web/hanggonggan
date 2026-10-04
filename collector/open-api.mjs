@@ -19,7 +19,7 @@
          node collector/open-api.mjs --dry-run  (받아서 리포트만 · 파일 안 바꿈)
    ============================================================ */
 import fs from 'node:fs';
-import { API_SOURCES, findRows, xmlItems, xmlTag, mapRows, mergeApi, sourceVerdict, splitLines } from './open-api-map.mjs';
+import { API_SOURCES, API_ID_FIELD, findRows, xmlItems, xmlTag, mapRows, mergeApi, sourceVerdict, splitLines } from './open-api-map.mjs';
 import { activityDetails, putActivityDetails } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { canonUrl } from './canon-url.mjs';
@@ -42,6 +42,18 @@ const portalKey = (() => { const k = (process.env.DATA_GO_KR_KEY || '').trim(); 
 const youthKey = (process.env.YOUTHCENTER_KEY || '').trim();
 /* 콘텐츠 열쇠가 정책 열쇠와 같은지 아직 모른다 — 대신 쓰지 않는다(다르면 매일 ❌ 가 뜬다 · 리뷰 M2). 같다면 시크릿 두 칸에 같은 값을 넣는다 */
 const youthContentKey = (process.env.YOUTHCENTER_CONTENT_KEY || '').trim();
+
+/* 원문 링크 확인 로봇이 '그 공고가 아니다'를 확정한 주소(data/link-check.json bad · 열쇠는 되푼 주소) — 주소 칸을 고를 때 다른 후보가 있으면 피한다
+   (open-api-map.mjs pickApiUrl · 2026-10-04). 파일이 없거나 깨져 있으면 빈 모음(로봇을 멈추지 않는다). */
+const BAD_URLS = (() => {
+  try { const d = JSON.parse(fs.readFileSync(new URL('../data/link-check.json', HERE), 'utf8')); return new Set(Object.keys((d && d.bad) || {})); } catch { return new Set(); }
+})();
+/* 실은 글마다 '어느 번호 · 어느 칸을 보고 무엇을 골랐나' 한 줄 — 원문이 틀렸다는 보고가 오면 이 줄로 칸을 가린다(주소는 공개 정보 · 값은 안 자른다) */
+const pickLines = (items, picks) => items.map((n) => {
+  const cs = (picks && picks.get(n.url)) || [];
+  const seen = cs.map((c) => `${c.field}=${c.url}(${c.rank}${c.bad ? '·확인 로봇이 문제로 확정' : ''})`).join(' · ') || '주소 칸 없음';
+  return `    - ${n.apiId ? `${n.apiId}` : '(번호 없음)'} · ${String(n.title).slice(0, 30)} → ${n.url} · 살핀 칸: ${seen}`;
+});
 
 class ApiError extends Error {}
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -187,15 +199,22 @@ if (process.argv.includes('--probe')) {
   const P = (n, size = 100) => [`청년정책 pageNum=${n} pageSize=${size}`, 'https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum: n, pageSize: size, rtnType: 'json' }];
   /* 쪽 하나씩 — 상태·걸린 시간·응답 머리만(열쇠 가림). 진단할 것이 바뀌면 이 목록만 고친다 */
   const tries = [
-    ['청년정책 1쪽', 'https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum: 1, pageSize: 10, rtnType: 'json' }],
-    ['청년콘텐츠 1쪽', 'https://www.youthcenter.go.kr/go/ythip/getContent', { apiKeyNm: youthContentKey, pageNum: 1, pageSize: 10, rtnType: 'json' }],
+    ['청년정책 1쪽', 'https://www.youthcenter.go.kr/go/ythip/getPlcy', { apiKeyNm: youthKey, pageNum: 1, pageSize: 10, rtnType: 'json' }, 'youthPolicy'],
+    ['청년콘텐츠 1쪽', 'https://www.youthcenter.go.kr/go/ythip/getContent', { apiKeyNm: youthContentKey, pageNum: 1, pageSize: 10, rtnType: 'json' }, 'youthContent'],
   ];
-  for (const [label, base, params] of tries) {
+  for (const [label, base, params, src] of tries) {
     const t0 = Date.now();
     try {
       const res = await fetch(`${base}?${new URLSearchParams(params)}`, { signal: AbortSignal.timeout(60000) });
       const text = await res.text();
       console.log(`[정찰] ${label} → HTTP ${res.status} · ${Date.now() - t0}ms · ${text.length}자 · ${hideKeys(text.replace(/\s+/g, ' ').slice(0, 300))}`);
+      /* 받은 행을 실제 규칙(mapRows)으로 돌려 실을 글의 번호(apiId)와 살핀 주소 칸을 찍는다 — 원문 주소가 어느 칸에서 왔는지 가리는 재료(2026-10-04) */
+      try {
+        const rows = findRows(JSON.parse(text), src === 'youthPolicy' ? 'plcyNm' : 'pstTtl') || [];
+        const m = mapRows(src, rows, { scholarship: KEYWORDS, today, bad: BAD_URLS });
+        console.log(`[정찰] ${label} · 번호 칸 ${API_ID_FIELD[src]} · 실을 글 ${m.items.length}/${rows.length}`);
+        pickLines(m.items, m.picks).forEach((l) => console.log(`[정찰] ${hideKeys(l)}`));
+      } catch (e) { console.log(`[정찰] ${label} · 행을 규칙으로 못 돌림: ${e.message}`); }
     } catch (e) {
       console.log(`[정찰] ${label} → 실패 ${e.name} · ${Date.now() - t0}ms`);
     }
@@ -211,7 +230,7 @@ for (const src of Object.keys(API_SOURCES)) {
   if (!HAS_KEY[src]) { results[src] = { ok: false }; lines.push(`- ⏸ **${name}** — 열쇠(${KEY_NAME[src]})가 없어 건너뜀 · 지난 글 그대로`); continue; }
   try {
     const rows = await FETCHERS[src]();
-    const { items, dropped, refs } = mapRows(src, rows, { scholarship: KEYWORDS, today });
+    const { items, dropped, refs, picks } = mapRows(src, rows, { scholarship: KEYWORDS, today, bad: BAD_URLS });
     const why = Object.entries(dropped).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v}`).join(' · ');
     const bad = sourceVerdict(rows, dropped);
     /* 상세는 **성공으로 칠 응답일 때만** 받는다 — 실패로 칠 응답에 15번 더 두드리지 않는다(2026-10-01 코드 리뷰) */
@@ -230,6 +249,8 @@ for (const src of Object.keys(API_SOURCES)) {
     /* 코드 칸(…Cd)의 실제 값 — 온통청년 정책의 결혼·소득·지역·학력 조건이 코드로 온다. 명세로 뜻을 확인하기 전엔 자격으로 안 쓴다(짐작 금지 · 2026-10-04) */
     if (rows[0]) { const cds = Object.keys(rows[0]).filter((k) => /Cd$/.test(k)); if (cds.length) lines.push(`  - 코드 칸 값(첫 세 행): ${cds.map((k) => `${k}=${rows.slice(0, 3).map((r) => String(r[k] ?? '').slice(0, 40)).join('|')}`).join(' · ')}`); }
     items.slice(0, 3).forEach((n) => lines.push(`  - ${n.kind} · ${n.title}${n.deadline ? ` (~${n.deadline})` : ''} — ${n.url}`));
+    /* 실은 글 전부의 번호(apiId · 칸 ${API_ID_FIELD[src]})와 살핀 주소 칸·점수(0 첫 화면·번호 없는 보기 화면 · 1 그 밖 · 2 글 번호 있음) — 2026-10-04 */
+    if (items.length) { lines.push(`  - 주소 고르기 (번호 칸 \`${API_ID_FIELD[src]}\` · 점수 2 글 번호 있음 · 1 그 밖 · 0 첫 화면·번호 없는 보기 화면):`); lines.push(...pickLines(items, picks)); }
   } catch (e) {
     results[src] = { ok: false };
     lines.push(`- ❌ **${name}** — ${hideKeys(e instanceof ApiError ? e.message : `로봇 오류: ${e?.stack || e}`)} · 지난 글 그대로 둠`);

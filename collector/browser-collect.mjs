@@ -10,7 +10,7 @@ import { publishBySchool, dropUnserved } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { isMenuEntry } from './clean-title.mjs';
-import { isDetailUrl, detailCandidates, sameTitle, idsFromSource, observeLanding } from './detail-url.mjs';
+import { isDetailUrl, rowDetailCandidates, ruleDetailCandidates, sameTitle, observeLanding } from './detail-url.mjs';
 /* 원문 주소 확인은 공용 판정 한 곳(link-landing.mjs judgeLanding) — 링크 사냥꾼·원문 링크 복구와 같은 것 (2026-10-03) */
 import { judgeLanding, stripRowTail } from './link-landing.mjs';
 import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from './harvest-budget.mjs';
@@ -284,7 +284,11 @@ async function loadPage(url, { attempts = 3, lines = report, retryClosed = 1 } =
               hiddenInputs: hidden,
             };
           }).catch(() => ({ hiddenInputs: {} }));
-          const cands = detailCandidates({ ...dom, url: detailPage.url(), listUrl: url, rowIds: idsFromSource(rowSrc) })
+          /* 후보는 두 복구 로봇과 **같은 함수**(rowDetailCandidates)로 만든다 (2026-10-04) — 이동한 주소 → 확인된 게시판 규칙
+             (서울교대 data-id → selectNttInfo.do?…&nttSn=) → 조립 순. 예전엔 여기만 detailCandidates 를 따로 불러 규칙 후보가 없었고,
+             서울교대 행은 늘 목록 표식이 됐다(research 2026-10-04 · 사냥꾼·복구 로봇도 같은 이유로 '주소를 못 만듦'). */
+          const rowRef = { src: rowSrc, t: title };
+          const cands = rowDetailCandidates({ row: rowRef, listUrl: url, landed: detailPage.url(), dom })
             .filter((c) => isDetailUrl(c, url) && !usedUrls.has(c));
           let recUrl = null;
           const proof = patternOk.get(url);
@@ -318,12 +322,17 @@ async function loadPage(url, { attempts = 3, lines = report, retryClosed = 1 } =
             if (!recUrl && unread) unreadCount.set(url, (unreadCount.get(url) || 0) + 1);
             else if (!recUrl && affirmed && affirmed === Math.min(2, cands.length)) patternOk.set(url, 'bad');
           }
+          /* 표식이 될 때도 **게시판의 글 번호**는 버리지 않는다 (2026-10-04) — 확인된 규칙이 행에서 읽은 번호(postId)를 함께 담으면
+             같은 글의 진짜 주소(selectNttInfo?nttSn=)가 다른 로봇에서 들어올 때 한 장으로 합쳐진다(url-key.mjs dedupeNotices).
+             규칙이 없는 행의 숫자(조회수·날짜일 수 있다)는 글 번호로 담지 않는다. */
+          let postId = '';
           if (!recUrl) {
             // 원문으로 바로 가는 주소를 못 찾았을 때만 목록 주소 + 표식 (앱이 정직하게 안내한다)
             recUrl = `${url}#n-${encodeURIComponent(title.slice(0, 40))}`; // 제목 기반 — 재실행 시 중복 방지
+            postId = (ruleDetailCandidates({ row: rowRef, listUrl: url })[0] || {}).id || '';
           }
           usedUrls.add(recUrl);
-          links.push({ title, url: recUrl });
+          links.push(postId ? { title, url: recUrl, postId } : { title, url: recUrl });
           /* 이 행이 '이미 수집한 공고'로 밝혀졌으면 지금 장부에 적어 둔다 — 안 적으면
              아래 상세 루프가 (이미 seen이라) 건드리지 않아 다음 실행에 또 누르게 된다.
              새로 수집되는 행은 상세 루프가 적는다(그쪽이 '진짜 저장됐다'는 확증). */
@@ -486,6 +495,7 @@ async function harvestTarget(t, report) {
         title: it.title, url: it.url, attachments, deadlineHint,
         school: t.school, campus: t.campus === '공통' ? '' : t.campus,
         foundAt: new Date().toISOString().slice(0, 10),
+        ...(it.postId ? { postId: it.postId } : {}),   // 목록 표식에 남긴 게시판 글 번호(위 클릭 채집) — 같은 글 합치기의 열쇠
       };
       seen[urlKey(it.url)] = rec.foundAt;
       /* 클릭형 게시판이면 '이 행은 처리했다'도 함께 적는다 — 다음 실행이 다시 누르지 않게.
