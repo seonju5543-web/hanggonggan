@@ -23,7 +23,8 @@ jobs:
       - name: ① 서버 상태 (/health)
         run: |
           echo "— 발송 서버 상태 —"
-          curl -sS --max-time 20 https://handaejang-push.seonju5543.workers.dev/health || echo "(접속 실패)"
+          curl -sS --max-time 20 https://handaejang-push.seonju5543.workers.dev/health \
+            || echo "::warning::발송 서버 /health 에 접속하지 못했습니다 — 아래 시험 발송 결과로 판정합니다."
           echo
 
       - name: ② 시험 발송 (/test)
@@ -37,8 +38,45 @@ jobs:
             exit 0
           fi
           echo "— 시험 발송 결과 —"
-          curl -sS --max-time 30 -X POST \
+          # 🔴 응답을 **읽어서** 판정한다 (2026-10-04 로봇·도구 점검). 옛 판은 찍기만 해서, 열쇠가 틀려 401({error:'unauthorized'})이
+          #    와도 · 한 대도 못 깨워도(woke 0) 초록불이었다 — '살아 있는지는 이 발송만이 증명'(CLAUDE.md)인데 그 증명이 거짓 초록이 된다.
+          #    판정은 지어내지 않고 server/push/worker.js 가 실제로 주는 칸(error · tried · woke · dropped)으로만 한다.
+          set +e
+          RESP=$(curl -sS --max-time 30 -X POST -w '\n%{http_code}' \
             -H "x-admin-key: $KEY" \
-            https://handaejang-push.seonju5543.workers.dev/test
-          echo
+            https://handaejang-push.seonju5543.workers.dev/test)
+          RC=$?
+          set -e
+          CODE=$(printf '%s' "$RESP" | tail -1)
+          JSON=$(printf '%s' "$RESP" | sed '$d')
+          echo "HTTP $CODE"; echo "$JSON"; echo
+          if [ "$RC" != "0" ] || [ "$CODE" != "200" ]; then
+            echo "::error::시험 발송이 실패했습니다 (curl rc=$RC · HTTP $CODE) — 열쇠(PUSH_ADMIN_KEY)가 Cloudflare ADMIN_KEY 와 같은지, 서버가 살아 있는지 보세요."
+            echo "❌ 시험 발송 실패 — HTTP $CODE" >> "$GITHUB_STEP_SUMMARY"; exit 1
+          fi
+          if ! printf '%s' "$JSON" | jq -e 'type == "object"' >/dev/null 2>&1; then
+            echo "::error::응답을 읽지 못했습니다(JSON 이 아님) — 판정할 수 없어 실패로 남깁니다(못 읽은 것을 정상으로 읽지 않는다)."
+            echo "❌ 시험 발송 — 응답을 읽지 못함" >> "$GITHUB_STEP_SUMMARY"; exit 1
+          fi
+          ERR=$(printf '%s' "$JSON" | jq -r '.error // empty')
+          TRIED=$(printf '%s' "$JSON" | jq -r '.tried // empty' 2>/dev/null || true)
+          WOKE=$(printf '%s' "$JSON" | jq -r '.woke // empty' 2>/dev/null || true)
+          DROPPED=$(printf '%s' "$JSON" | jq -r '.dropped // 0' 2>/dev/null || echo 0)
+          if [ -n "$ERR" ]; then
+            echo "::error::발송 서버가 오류를 돌려줬습니다: $ERR"
+            echo "❌ 시험 발송 — 서버 오류: $ERR" >> "$GITHUB_STEP_SUMMARY"; exit 1
+          fi
+          if ! [[ "$TRIED" =~ ^[0-9]+$ && "$WOKE" =~ ^[0-9]+$ ]]; then
+            echo "::error::응답에서 tried·woke 를 읽지 못했습니다 — 판정할 수 없어 실패로 남깁니다(못 읽은 것을 정상으로 읽지 않는다)."
+            echo "❌ 시험 발송 — 응답을 읽지 못함" >> "$GITHUB_STEP_SUMMARY"; exit 1
+          fi
+          if [ "$TRIED" -eq 0 ]; then
+            echo "::warning::등록된 폰이 없습니다 — 깨울 대상이 없어 발송하지 않았습니다(서버 자체는 응답함)."
+            echo "⚠️ 시험 발송 — 등록된 폰 0대 (tried 0)" >> "$GITHUB_STEP_SUMMARY"; exit 0
+          fi
+          if [ "$WOKE" -eq 0 ]; then
+            echo "::error::등록된 폰 ${TRIED}대 가운데 한 대도 못 깨웠습니다 (dropped ${DROPPED})."
+            echo "❌ 시험 발송 — ${TRIED}대 중 0대 깨움 (dropped ${DROPPED})" >> "$GITHUB_STEP_SUMMARY"; exit 1
+          fi
+          echo "✅ 시험 발송 — ${TRIED}대 중 ${WOKE}대 깨움 (dropped ${DROPPED} — 죽은 등록 정리는 정상)" | tee -a "$GITHUB_STEP_SUMMARY"
           echo "위 tried/woke가 등록된 폰 수와 같으면 정상입니다. dropped는 죽은 등록을 정리한 것(정상)."
