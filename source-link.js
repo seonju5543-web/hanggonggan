@@ -82,9 +82,15 @@ function linkShape(u) {
 const LINK_BAD = ['list', 'home', 'login', 'gone', 'other'];
 let LINK_CHECKS = {};
 let LINK_CHECKED_AT = '';
+let LINK_FIX_ROBOT = {};   // data/link-check.json 의 fix — 로봇이 열어 보고 확인한 원문(아래 ⑥)
+let LINK_FIX_HUMAN = {};   // data/link-fixes.json 의 fix — 관리자가 넣은 원문(아래 ⑥)
 function setLinkChecks(doc) {
   LINK_CHECKS = (doc && doc.bad && typeof doc.bad === 'object') ? doc.bad : {};
   LINK_CHECKED_AT = (doc && doc.updatedAt) || '';
+  LINK_FIX_ROBOT = (doc && doc.fix && typeof doc.fix === 'object') ? doc.fix : {};
+}
+function setLinkFixes(doc) {
+  LINK_FIX_HUMAN = (doc && doc.fix && typeof doc.fix === 'object') ? doc.fix : {};
 }
 function linkCheckFor(u) {
   const c = LINK_CHECKS[decodeUrlEntities(u)];
@@ -104,7 +110,8 @@ function linkUrlOf(item) {
   const it = item || {};
   return it.sourceUrl != null && it.sourceUrl !== '' ? it.sourceUrl : (it.url || '');
 }
-function linkKind(item) {
+/* 데이터에 실린 주소 그대로의 종류(바로잡기 전) */
+function rawLinkKind(item) {
   const it = item || {};
   if (it.program) return 'program';
   const url = linkUrlOf(it);
@@ -116,6 +123,71 @@ function linkKind(item) {
   if (c) return c.v;
   if (shape === 'home') return 'home';
   return 'page';
+}
+
+/* ── ⑥ 원문 바로잡기 (2026-10-04 · 개발자 지시 *"원문 공고 링크를 최대한 어떻게든 찾을 방법"* · *"관리자 페이지에 원문 공고를 추가할 칸"*) ──
+   데이터 파일은 로봇이 날마다 다시 만든다(실시간 공고·대외활동 API·층2 재단은 통째로) — 거기 고쳐 써 두면 다음 실행에 사라진다.
+   그래서 **바로잡은 원문은 따로 적고, 링크 이름을 정하는 이 한 곳이 읽는다**(화면·도우미·제출처가 전부 sourceLink 를 거친다).
+     · 사람: data/link-fixes.json `fix` — 관리자 화면 「원문 링크」가 적는다(tools/admin-apply.mjs linkFix · 쓰는 곳은 그 하나).
+             **늘 이긴다**(사람이 원문을 열어 보고 넣은 것) — 다만 로봇이 날마다 그 주소도 열어 보고 문제면 '(확인 필요)'로 말한다.
+     · 로봇: data/link-check.json `fix` — 원문 링크 확인 로봇이 후보 주소를 새 탭으로 열어 **그 공고·그 회차**임을 확인한 것만
+             (collector/link-candidates.mjs acceptCandidate · 쓰는 곳은 collector/link-check.mjs 하나).
+             🔴 지금 링크가 이미 그 공고로 가면(page) **쓰지 않는다** — 멀쩡한 링크를 로봇이 바꾸지 않는다(2026-10-03 순찰 사고의 교훈).
+   열쇠: `id:<공고 id>`(정식 등록 · 층2 `kosaf-<코드>`) 또는 `u:<지금 주소(되푼 것)>`(게시판 글·재단 글·대외활동·소식).
+   🔴 `round` 가 적힌 바로잡기는 그 공고의 마감(deadline·due)이 같을 때만 쓴다 — 층2 재단 코드는 해마다 그대로라
+      지난 회차 공고를 올해 공고로 보여 주면 가짜 공지다(운영 원칙 6). */
+function itemRound(item) {
+  const it = item || {};
+  return String(it.deadline || it.due || '');
+}
+function fixKeys(item) {
+  const it = item || {};
+  const keys = [];
+  if (it.id) keys.push(`id:${it.id}`);
+  /* 층2 재단·상시 제도는 id 로만 찾는다 — 재단 홈페이지 주소는 여러 장학금이 같이 쓴다(진도·전남 6개 코드 …).
+     u:<홈> 하나가 그 장학금들을 한 글로 보내고 회차 묶음도 건너뛰었다(리뷰 2026-10-04) */
+  if (it.sourceKind === 'kosaf' || it.program) return keys;
+  const raw = linkUrlOf(it);
+  if (raw) keys.push(`u:${decodeUrlEntities(raw)}`);
+  return keys;
+}
+/* 바로잡을 수 있는 주소인가 — 목록 표식·목록+번호·첫 화면 꼴·http(s) 아닌 것은 원문이 아니다 */
+function fixUrlUsable(u) {
+  const s = decodeUrlEntities(u);
+  if (!/^https?:\/\//i.test(s)) return false;
+  const shape = linkShape(s);
+  return shape === 'page' || shape === 'root';
+}
+function linkFixFor(item) {
+  const it = item || {};
+  if (it.program) return null;
+  const keys = fixKeys(it);
+  if (!keys.length) return null;
+  /* 층2는 회차(round)가 적힌 바로잡기만 — 회차 없는 것은 어느 해 공고인지 모른다(원칙 6) */
+  const fits = (e) => e && fixUrlUsable(e.url) && (e.round ? String(e.round) === itemRound(it) : it.sourceKind !== 'kosaf');
+  for (const k of keys) {
+    const e = LINK_FIX_HUMAN[k];
+    if (fits(e)) return { url: decodeUrlEntities(e.url), src: 'admin', at: e.at || '', key: k, title: e.title || '' };
+  }
+  if (rawLinkKind(it) === 'page') return null;
+  for (const k of keys) {
+    const e = LINK_FIX_ROBOT[k];
+    if (fits(e)) return { url: decodeUrlEntities(e.url), src: 'robot', at: e.at || '', key: k, title: e.title || '' };
+  }
+  return null;
+}
+/* 학생이 실제로 여는 주소 — 바로잡은 원문이 있으면 그것, 없으면 데이터 주소 */
+function effectiveLinkUrl(item) {
+  const f = linkFixFor(item);
+  return f ? f.url : linkUrlOf(item);
+}
+function linkKind(item) {
+  const it = item || {};
+  const f = linkFixFor(it);
+  if (!f) return rawLinkKind(it);
+  /* 바로잡은 원문도 로봇이 날마다 열어 본다 — 확정된 문제면 그대로 말한다 */
+  const c = linkCheckFor(f.url);
+  return c ? c.v : 'page';
 }
 /* 종류 → 보여 주는 갈래 넷 (화면 말투를 고르는 데만 쓴다) */
 function linkClass(kind) {
@@ -162,7 +234,7 @@ function sourceLink(item, surface) {
   const labels = SURFACE_LABELS[surface] || SURFACE_LABELS.detail;
   const kind = linkKind(it);
   const cls = linkClass(kind);
-  const raw = linkUrlOf(it);
+  const raw = effectiveLinkUrl(it);
   const href = kind === 'none' ? '' : decodeUrlEntities(raw);
   let label = '';
   if (cls === 'post') label = labels.page;
@@ -185,5 +257,6 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     decodeUrlEntities, linkShape, isListPlusId, setLinkChecks, linkCheckFor, linkKind, linkClass, sourceLink,
     markerTitleOf, SURFACE_LABELS, LINK_BAD, TROUBLE_CAUTION,
+    setLinkFixes, rawLinkKind, itemRound, fixKeys, fixUrlUsable, linkFixFor, effectiveLinkUrl,
   };
 }

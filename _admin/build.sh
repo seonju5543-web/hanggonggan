@@ -51,6 +51,11 @@ cp tools/edit-diff.mjs "$OUT/vendor/edit-diff.mjs"
 cp collector/activity-kind.mjs "$OUT/vendor/activity-kind.mjs"
 # 교내 소식 갈래 목록 (2026-09-30) — 관리자 「소식」 탭이 갈래 버튼을 그릴 때 쓴다 (베끼지 않는다)
 cp collector/news-kind.mjs "$OUT/vendor/news-kind.mjs"
+# 원문 링크 이름 한 곳 (2026-10-04) — 「할 일 › 원문 링크 손볼 것」이 학생이 지금 보는 이름을 앱과 **같은 함수**로 보여 준다.
+#   고전 스크립트(전역 함수)라 index.html 이 <script src> 로 싣는다 — entry-rules.js(가짜 module 을 만든다)보다 먼저.
+cp source-link.js "$OUT/vendor/source-link.js"
+# 관리자가 넣는 원문 주소를 받아도 되는가 — 저장소(tools/admin-apply.mjs linkFix)와 같은 파일 (2026-10-04)
+cp collector/link-fix.mjs "$OUT/vendor/link-fix.mjs"
 
 # 등록 규칙 — Node용 파일이라 브라우저에서 읽히도록 앞뒤만 감싼다.
 # (내용은 손대지 않는다. 규칙이 바뀌면 다음 빌드에 그대로 따라온다)

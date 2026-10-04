@@ -1,12 +1,14 @@
 /* 「원문 링크 정직성」 — robot 갈래: 원문 링크 확인 로봇 (collector/link-check-plan.mjs · link-check.mjs · link-check.yml)
    (2026-10-03 · 원문 대신 재단 홈페이지·게시판 목록이 열리던 사고 — 학생처럼 열어 보고 기록한 곳이 없었다)
    잰다:
-     ⓐ 모으기 — 앱이 받는 파일 다섯 묶음을 **전부** 보는가(표식·층2·숨긴 글은 세기만) · 열쇠는 되돌린 주소 · 제목이 있다
+     ⓐ 모으기 — 앱이 받는 파일 다섯 묶음을 **전부** 보는가(표식·층2·숨긴 글·마감 지난 활동은 세기만) · 열쇠는 되돌린 주소 · 제목이 있다
+        · (2026-10-04) 여는 주소는 학생이 실제로 여는 주소 — 바로잡은 원문(관리자 link-fixes · 로봇 link-check fix)이 있으면 그것 ·
+          층2는 바로잡은 원문이 있을 때만 여섯째 묶음으로
      ⓑ 순서 — 처음 보는 것 먼저 · 한 번 본 문제는 다른 날 다시 · 사이트마다 상한 · 같은 사이트 간격
      ⓒ 끝에서 끝까지 — 가짜 관측으로 로봇을 **실제로 돌려** 첫날은 안 알리고 둘째 날 확정되며, 공고가 뜨면 풀리고,
-        세 출력 말고는 **한 바이트도 안 바뀌는지**(이 로봇은 주소를 고치지 않는다 — 2026-10-03 순찰 사고)
+        네 출력(앱 장부 · 로봇 장부 · 후보 장부 · 리포트) 말고는 **한 바이트도 안 바뀌는지**(이 로봇은 주소를 고치지 않는다 — 2026-10-03 순찰 사고)
         · ⓒ-2 한 사이트에 한 번 본 문제가 넷 이상이어도 둘째 날 확정되는지(막힘 판정이 그것들을 지우지 않는다 · 리뷰 G6)
-     ⓓ 걸려 있는가 — 워크플로(시한·홀수 분 예약·세 파일 저장·넘어짐 알림) · 배포 동기화 · 라이브 점검 · 쓰기 자리
+     ⓓ 걸려 있는가 — 워크플로(시한·홀수 분 예약·네 파일 저장·넘어짐 알림) · 배포 동기화 · 라이브 점검 · 쓰기 자리
    🔴 실데이터 숫자를 박지 않는다(CLAUDE.md — 2026-10-01 관문이 선을 넘나들며 자동 등록을 되돌린 사고).
       ⓐ는 '데이터에 글이 있는 묶음은 대상에도 있다'를 **같은 파일을 따로 읽어** 대조한다. */
 import fs from 'node:fs';
@@ -25,7 +27,7 @@ const ENT = /&(?:amp|#0*38|#x0*26);/i;
       `&#038;` 로 남았고, `http://` 처럼 주소로 못 푸는 글자를 '주소'로 셌다(로봇은 둘 다 다르게 본다).
       그래서 로봇(source-link.js decodeUrlEntities·linkShape)과 같은 약속을 **따로 적는다**: 기호가 안 남을 때까지 세 번까지 풀고,
       new URL 이 못 읽는 글자는 '주소 없음'. 함수를 불러 쓰지 않는 것이 이 함수의 존재 이유다. */
-function independentCount(root) {
+function independentCount(root, today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10)) {
   const R = (rel) => path.join(root, rel);
   const j = (f) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return {}; } };
   const dirFiles = (d) => { try { return fs.readdirSync(R(d)).filter((f) => f.endsWith('.json') && f !== 'index.json').map((f) => path.join(R(d), f)); } catch { return []; } };
@@ -35,26 +37,71 @@ function independentCount(root) {
     return s;
   };
   const parses = (u) => { try { return !!new URL(u); } catch { return false; } };
-  const out = {}; const markers = {};
-  const add = (ds, list, urlKey) => {
+  /* (2026-10-04) 바로잡은 원문 — 앱(source-link.js ⑥)과 같은 약속을 **따로** 적는다:
+     사람 바로잡기는 늘 이기고, 로봇 바로잡기는 원래 주소가 원문(보통 주소·맨 도메인이고 확정 문제 아님)이 아닐 때만.
+     쓸 수 있는 바로잡기 주소 = http(s) · 표식 아님 · 목록+번호 아님 · 첫 화면 파일 아님 · round 가 있으면 그 공고의 마감과 같을 때만.
+     로봇 바로잡기가 쓰이는 중이고 원래 주소가 보통 주소면 원래 주소도 연다(풀리면 원래 주소로 돌아가야 하므로). */
+  const LISTID = /\/subview\.do\?(?:[^#]*&)?nttId=|\/selectNttList\.do\?[^#]*nttId=/i;
+  const BADV = ['list', 'home', 'login', 'gone', 'other'];
+  const ledger = j(R('data/link-check.json'));
+  const fixH = j(R('data/link-fixes.json')).fix || {};
+  const fixR = ledger.fix || {};
+  const badL = ledger.bad || {};
+  const homeFile = (x) => { const segs = x.pathname.split('/').filter(Boolean); return !x.search && segs.length > 0 && segs.length <= 2 && /^(index|main|default|home)(\.[a-z]{2,5})?$/i.test(segs[segs.length - 1]); };
+  const usable = (u) => {
+    const s = dec(u);
+    if (!/^https?:\/\//i.test(s) || /#n-/.test(s) || LISTID.test(s)) return false;
+    try { return !homeFile(new URL(s)); } catch { return false; }
+  };
+  const plainPage = (raw) => {   // 원래 주소가 보통 주소·맨 도메인인가(꼴만)
+    const s = dec(raw);
+    if (!/^https?:\/\//i.test(s) || /#n-/.test(s) || LISTID.test(s)) return false;
+    try { return !homeFile(new URL(s)); } catch { return false; }
+  };
+  const fixOf = (keys, round, rawIsPost) => {
+    const fits = (e) => e && usable(e.url) && (!e.round || String(e.round) === round);
+    for (const k of keys) if (fits(fixH[k])) return { url: dec(fixH[k].url), src: 'admin' };
+    if (rawIsPost) return null;
+    for (const k of keys) if (fits(fixR[k])) return { url: dec(fixR[k].url), src: 'robot' };
+    return null;
+  };
+  const out = {}; const markers = {}; const closed = {};
+  const add = (ds, list, urlKey, idOf = (it) => it.id) => {
     const s = new Set();
     for (const it of list) {
       if (it.hidden) continue;
-      const u = dec(it[urlKey]);
-      if (!/^https?:\/\//i.test(u)) continue;
-      if (/#n-/.test(u)) { markers[ds] = (markers[ds] || 0) + 1; continue; }
-      if (!parses(u)) continue;
-      s.add(u);
+      /* 화면이 여는 주소 — sourceUrl 이 있으면 그것, 없으면 url(앱 source-link.js 와 같은 약속) */
+      const raw = it.sourceUrl != null && it.sourceUrl !== '' ? it.sourceUrl : it[urlKey];
+      const keys = [...(idOf(it) ? [`id:${idOf(it)}`] : []), ...(raw ? [`u:${dec(raw)}`] : [])];
+      const rawIsPost = plainPage(raw) && !(badL[dec(raw)] && BADV.includes(badL[dec(raw)].v));
+      const f = fixOf(keys, String(it.deadline || it.due || ''), rawIsPost);
+      const urls = f ? [f.url, ...(f.src === 'robot' && plainPage(raw) ? [dec(raw)] : [])] : [dec(raw)];
+      for (const u of urls) {
+        if (!/^https?:\/\//i.test(u)) continue;
+        if (/#n-/.test(u)) { markers[ds] = (markers[ds] || 0) + 1; continue; }
+        if (!parses(u)) continue;
+        s.add(u);
+      }
     }
     out[ds] = s;
   };
   add('registered', (j(R('data/registered.json')).items || []).filter((x) => x.sourceKind !== 'kosaf'), 'sourceUrl');
   add('notices', dirFiles('data/notices').flatMap((f) => j(f).items || []), 'url');
   add('external', j(R('data/external.json')).items || [], 'url');
-  add('activities', j(R('data/activities.json')).items || [], 'url');
+  /* 마감이 지난 활동은 앱이 내린다(마감 다음 날까지만 — CLOSED_KEEP_DAYS 1 · 날짜로 못 읽는 마감도 앱에선 안 보인다) */
+  const cut = new Date(`${today}T00:00:00Z`); cut.setUTCDate(cut.getUTCDate() - 1);
+  const cutoff = cut.toISOString().slice(0, 10);
+  const shownAct = (it) => !it.deadline || (!Number.isNaN(Date.parse(`${it.deadline}T00:00:00`)) && String(it.deadline) >= cutoff);
+  const acts = j(R('data/activities.json')).items || [];
+  closed.activities = acts.filter((it) => it && it.url && !it.hidden && !shownAct(it)).length;
+  add('activities', acts.filter(shownAct), 'url');
   add('news', dirFiles('data/news').flatMap((f) => j(f).items || []), 'url');
+  /* 층2 — 바로잡은 원문(그 회차)이 있는 것만 연다 · 나머지는 세기만 */
   const kosaf = j(R('data/kosaf-open.json')).items || [];
-  return { out, markers, kosaf: [kosaf.length, kosaf.filter((i) => (i.files || []).length).length] };
+  const kFix = (k) => fixOf([`id:kosaf-${k.code}`, ...(k.home ? [`u:${dec(k.home)}`] : [])], String(k.due || ''), false);
+  out.kosaf = new Set(kosaf.map(kFix).filter(Boolean).map((f) => f.url).filter(parses));
+  const bare = kosaf.filter((k) => !kFix(k));
+  return { out, markers, closed, kosaf: [bare.length, bare.filter((i) => (i.files || []).length).length] };
 }
 
 /* 폴더 아래 파일 전부의 지문 — 로봇이 무엇을 바꿨는지 바이트로 잰다 */
@@ -92,7 +139,7 @@ export default async function gate(eq, ctx) {
   const g = P.gatherTargets(root);
   const ind = independentCount(ROOT);
   const mine = mineOf(g);
-  eq('ⓐ 앱이 받는 다섯 묶음(정식 등록·학교별 공고·재단·활동·학교별 소식)을 따로 읽은 주소를 로봇이 전부 연다(제목 없는 것만 뺀다)', gapOf(g, ind), []);
+  eq('ⓐ 앱이 받는 다섯 묶음(정식 등록·학교별 공고·재단·활동·학교별 소식) + 바로잡은 층2를 따로 읽은 주소를 로봇이 전부 연다(제목 없는 것만 뺀다 · 바로잡은 원문이 있으면 그 주소)', gapOf(g, ind), []);
   /* 따로 읽기가 로봇과 같은 뜻인지 — 까다로운 꼴을 가짜 자료로 (리뷰 G4 · 실데이터에 그런 글이 들어오는 날을 미리) */
   {
     const tmpA = fs.mkdtempSync(path.join(os.tmpdir(), 'link-check-gather-'));
@@ -112,14 +159,48 @@ export default async function gate(eq, ctx) {
       eq('  따로 읽기와 로봇 읽기가 까다로운 주소에서도 같은 뜻 — 두·세 겹 기호(`&amp;#038;`·`&amp;amp;amp;`)는 끝까지 풀고 · 못 푸는 주소는 「주소 없음」',
         [gapOf(gA, iA), [...iA.out.external].sort(), gA.skipped.noUrl.external || 0, [...iA.out.registered]],
         [[], ['https://x.test.kr/kb/?mod=document&uid=77', 'https://x.test.kr/kb/?mod=document&uid=78'], 2, ['https://x.test.kr/kb/?mod=document&uid=79']]);
+      /* (2026-10-04) 바로잡은 원문 · 마감 지난 활동 · 층2 — 학생이 실제로 여는 주소를 연다 */
+      const MK = 'https://m.test.kr/bbs/list.do#n-%ED%91%9C%EC%8B%9D';
+      const PG = 'https://m.test.kr/bbs/view.do?id=5';
+      fs.writeFileSync(path.join(tmpA, 'data/registered.json'), JSON.stringify({ items: [
+        { id: 'r-mark', name: '표식 정식 등록 2026 장학생 선발', sourceUrl: MK },
+        { id: 'r-page', name: '보통 정식 등록 2026 장학생 선발', boardTitle: '보통 정식 등록 2026 장학생 선발', sourceUrl: PG },
+        { id: 'r-bad', name: '확정 문제 정식 등록 2026 장학생 선발', boardTitle: '확정 문제 정식 등록 2026 장학생 선발', sourceUrl: 'https://m.test.kr/bbs/view.do?id=6' },
+      ] }));
+      fs.writeFileSync(path.join(tmpA, 'data/link-fixes.json'), JSON.stringify({ v: 1, fix: { 'id:r-page': { url: 'https://m.test.kr/bbs/view.do?id=55' } } }));
+      fs.writeFileSync(path.join(tmpA, 'data/link-check.json'), JSON.stringify({ v: 1, bad: { 'https://m.test.kr/bbs/view.do?id=6': { v: 'other', at: '2026-10-01' } }, fix: {
+        'id:r-mark': { url: 'https://m.test.kr/bbs/view.do?id=9', src: 'robot' },
+        'id:r-bad': { url: 'https://m.test.kr/bbs/view.do?id=66', src: 'robot' },
+        'id:kosaf-0001': { url: 'https://found.test.kr/bbs/view?no=3', src: 'robot', round: '2026-10-20' },
+        'id:kosaf-0002': { url: 'https://found2.test.kr/bbs/view?no=4', src: 'robot', round: '2025-10-20' },
+      } }));
+      fs.writeFileSync(path.join(tmpA, 'data/kosaf-open.json'), JSON.stringify({ items: [
+        { code: '0001', org: '표본재단', name: '장학생', due: '2026-10-20', home: 'https://found.test.kr', files: [{ name: '2026 표본재단 장학생 선발 공고.hwp' }] },
+        { code: '0002', org: '둘째재단', name: '장학생', due: '2026-10-20', home: 'https://found2.test.kr' },
+      ] }));
+      fs.writeFileSync(path.join(tmpA, 'data/activities.json'), JSON.stringify({ items: [
+        { title: '지난 공모전 2026 표본 모집', url: 'https://act.test.kr/v?id=1', deadline: '2026-09-01' },
+        { title: '열린 공모전 2026 표본 모집', url: 'https://act.test.kr/v?id=2', deadline: '2026-12-31' },
+        { title: '마감 모름 공모전 2026 표본 모집', url: 'https://act.test.kr/v?id=3' },
+      ] }));
+      const gB = P.gatherTargets(tmpA, { today: '2026-10-05' });
+      const iB = independentCount(tmpA, '2026-10-05');
+      const mineB = mineOf(gB);
+      eq('  바로잡은 원문 — 사람 것은 늘 · 로봇 것은 원래 주소가 원문이 아닐 때만(표식·확정 문제) · 확정 문제 원래 주소도 계속 연다 · 층2는 그 회차의 바로잡기만 · 마감 지난 활동은 안 연다 — 따로 읽기와 같다',
+        [gapOf(gB, iB), [...mineB.registered].sort(), [...mineB.kosaf], [...mineB.activities].sort(), gB.skipped.closed.activities, iB.closed.activities, [gB.skipped.kosaf.items, gB.skipped.kosaf.fixed], iB.kosaf],
+        [[], ['https://m.test.kr/bbs/view.do?id=55', 'https://m.test.kr/bbs/view.do?id=6', 'https://m.test.kr/bbs/view.do?id=66', 'https://m.test.kr/bbs/view.do?id=9'],
+          ['https://found.test.kr/bbs/view?no=3'], ['https://act.test.kr/v?id=2', 'https://act.test.kr/v?id=3'], 1, 1, [1, 1], [1, 0]]);
+      eq('  층2 대상의 제목은 공고문 파일 제목 + 앱 이름 · 묶음 이름은 kosaf', gB.targets.filter((t) => t.ds.includes('kosaf')).map((t) => [t.id, t.titles]),
+        [['kosaf-0001', ['2026 표본재단 장학생 선발 공고', '표본재단 장학생']]]);
     } finally {
       fs.rmSync(tmpA, { recursive: true, force: true });
     }
   }
-  eq('  다섯 묶음 모두 지금 열어 볼 링크가 있다 — 글이 있는 묶음은 하나도 빠지지 않는다(개수를 박지 않고 「모두 본다」를 잰다)',
+  eq('  묶음마다 열어 볼 링크가 있으면 로봇도 연다 — 글이 있는 묶음은 하나도 빠지지 않는다(개수를 박지 않고 「모두 본다」를 잰다)',
     P.DATASETS.filter((d) => ind.out[d].size > 0 && !(mine[d].size > 0)), []);
   eq('  목록 표식(#n-)은 열지 않고 센다 — 앱이 이미 「게시판 목록」이라 부른다', [g.targets.filter((t) => /#n-/.test(t.raw)).length, P.DATASETS.map((d) => g.skipped.marker[d] || 0)], [0, P.DATASETS.map((d) => ind.markers[d] || 0)]);
-  eq('  층2 재단 홈페이지는 열지 않고 센다(공고문 사본 수와 함께 · 열지 않는 것은 ⓒ가 잰다)', [g.skipped.kosaf.items, g.skipped.kosaf.withFiles], ind.kosaf);
+  eq('  층2 재단 홈페이지는 열지 않고 센다(공고문 사본 수와 함께 · 열지 않는 것은 ⓒ가 잰다 · 바로잡은 원문이 있는 것은 빼고) · 마감 지난 활동도 세기만',
+    [g.skipped.kosaf.items, g.skipped.kosaf.withFiles, g.skipped.closed.activities || 0], [...ind.kosaf, ind.closed.activities]);
   eq('  대상 주소에 HTML 기호(&amp;·&#038;)가 남아 있지 않다 — 장부 열쇠 = 앱이 찾는 열쇠', g.targets.filter((t) => ENT.test(t.url)).map((t) => t.url), []);
   eq('  대상마다 찾을 제목이 하나 이상 — 제목 없이 열면 「다른 화면」으로 몰린다', g.targets.filter((t) => !t.titles.length || !t.titles[0]).map((t) => t.url), []);
   eq('  같은 주소는 한 번만 연다(묶음만 합친다)', g.targets.length, new Set(g.targets.map((t) => t.url)).size);
@@ -224,7 +305,7 @@ export default async function gate(eq, ctx) {
     const ledger = () => JSON.parse(fs.readFileSync(path.join(tmp, 'data/link-check.json'), 'utf8'));
     const ledgerRaw = () => fs.readFileSync(path.join(tmp, 'data/link-check.json'), 'utf8');
     const state = () => JSON.parse(fs.readFileSync(path.join(tmp, 'collector/link-check-state.json'), 'utf8'));
-    const notOutputs = (rel) => rel === 'data/link-check.json' || rel === 'collector/link-check-state.json' || rel === 'collector/link-check-report.md' || rel === 'fake.json' || rel === 'gh-output.txt';
+    const notOutputs = (rel) => rel === 'data/link-check.json' || rel === 'collector/link-check-state.json' || rel === 'collector/link-candidates-state.json' || rel === 'collector/link-check-report.md' || rel === 'fake.json' || rel === 'gh-output.txt';
     const before = hashTree(tmp, notOutputs);
 
     const d1 = run('2026-10-04', false);
@@ -254,7 +335,7 @@ export default async function gate(eq, ctx) {
 
     const d3 = run('2026-10-06', true);
     eq('  공고가 뜨면 풀린다 — 앱 파일에서 빠진다(나머지는 그대로)', [d3.code, Object.keys(ledger().bad)], [0, [C, E, F].sort()]);
-    eq('🔴 세 출력(data/link-check.json · 로봇 장부 · 리포트) 말고는 한 바이트도 안 바뀐다 — 이 로봇은 주소를 고치지 않는다', changed(before, hashTree(tmp, notOutputs)), []);
+    eq('🔴 네 출력(data/link-check.json · 로봇 장부 · 후보 장부 · 리포트) 말고는 한 바이트도 안 바뀐다 — 이 로봇은 주소를 고치지 않는다', changed(before, hashTree(tmp, notOutputs)), []);
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
@@ -309,8 +390,8 @@ export default async function gate(eq, ctx) {
   eq('ⓓ 워크플로 — 이름 · 시한 · 홀수 분 예약 · 제 대기줄 · 인증서 묶음',
     [wfName.trim(), /timeout-minutes:\s*\d+/.test(wf), cron != null && Number(cron) % 2 === 1, /group:\s*link-check\s*$/m.test(wf), /NODE_EXTRA_CA_CERTS:\s*collector\/certs\/bundle\.pem/.test(wf)],
     ['원문 링크 확인 로봇', true, true, true, true]);
-  eq('  로봇이 쓰는 세 파일을 전부 저장한다(빠뜨리면 다음 재시도가 unstaged 로 죽는다 — 이슈 #79)',
-    ['data/link-check.json', 'collector/link-check-state.json', 'collector/link-check-report.md'].filter((f) => !adds.includes(f)), []);
+  eq('  로봇이 쓰는 네 파일을 전부 저장한다(빠뜨리면 다음 재시도가 unstaged 로 죽는다 — 이슈 #79)',
+    ['data/link-check.json', 'collector/link-check-state.json', 'collector/link-candidates-state.json', 'collector/link-check-report.md'].filter((f) => !adds.includes(f)), []);
   eq('  저장 직전 감사 · 실패하면 되돌림 · push 재시도는 --autostash · 넘어짐 알림은 failure()와 cancelled() 둘 다',
     [/node verify\/audit-data\.js/.test(wf), /git checkout -- data\/link-check\.json/.test(wf), /git pull --rebase --autostash/.test(wf) && !/git pull --rebase(?! --autostash)/.test(wf), /if: failure\(\) \|\| cancelled\(\)\n\s+uses: \.\/\.github\/actions\/robot-down/.test(wf)],
     [true, true, true, true]);
@@ -319,14 +400,17 @@ export default async function gate(eq, ctx) {
   const watched = (sync.match(/workflows:\s*\[([\s\S]*?)\]/) || [])[1] || '';
   eq('  배포 동기화가 이 로봇을 안다 — 모르면 확정 결과가 최대 12시간 앱에 안 나간다', !!wfName && watched.includes(`'${wfName.trim()}'`), true);
   const live = read('.github/workflows/check-live.yml');
-  eq('  라이브 점검이 앱이 받는 data/link-check.json 을 본다(칸 셋이라 개수가 아니라 건수·시각으로)', [/out\.push\('data\/link-check\.json'\)/.test(live), /const m = f === 'data\/link-check\.json' \? linkCheck : measure;/.test(live) && /m\(f\), m\('live\/' \+ f\)/.test(live)], [true, true]);
+  eq('  라이브 점검이 앱이 받는 data/link-check.json · data/link-fixes.json 을 본다(칸이 여럿이라 개수가 아니라 건수·시각으로)',
+    [/out\.push\('data\/link-check\.json'\)/.test(live), /out\.push\('data\/link-fixes\.json'\)/.test(live),
+      /const m = f === 'data\/link-check\.json' \? linkCheck : f === 'data\/link-fixes\.json' \? linkFixes : measure;/.test(live) && /m\(f\), m\('live\/' \+ f\)/.test(live)],
+    [true, true, true]);
 
   const strip = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/[^\n]*/g, '$1');
   const runner = strip(read('collector/link-check.mjs'));
   const plan = strip(read('collector/link-check-plan.mjs'));
-  eq('  🔴 로봇의 쓰기 자리는 save() 하나 · 세 파일만 허락 · 데이터 파일 이름이 코드에 없다',
+  eq('  🔴 로봇의 쓰기 자리는 save() 하나 · 네 파일만 허락 · 데이터 파일 이름이 코드에 없다',
     [(runner.match(/writeFileSync\(/g) || []).length, /function save\(file, text\) \{\n\s+if \(!OUTPUTS\.has\(file\)\) throw/.test(runner),
-      /const OUTPUTS = new Set\(\[STATE_FILE, LEDGER_FILE, REPORT_FILE\]\)/.test(runner),
+      /const OUTPUTS = new Set\(\[STATE_FILE, LEDGER_FILE, REPORT_FILE, CAND_STATE_FILE\]\)/.test(runner),
       /registered\.json|data\/notices|external\.json|activities\.json|data\/news|kosaf-open/.test(runner),
       /renameSync|copyFileSync|unlinkSync|rmSync|appendFileSync\((?!process\.env\.GITHUB_OUTPUT)/.test(runner)],
     [1, true, true, false, false]);

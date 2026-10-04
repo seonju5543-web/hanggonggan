@@ -1,0 +1,28 @@
+{
+ "v": 1,
+ "note": "관리자가 넣은 원문 공고 주소 — 관리자 화면 「원문 링크」가 적는다(tools/admin-apply.mjs linkFix). 앱은 source-link.js 가 읽는다. 열쇠: id:<공고 id> · u:<지금 주소>",
+ "updatedAt": "2026-10-04 14:11 KST",
+ "fix": {
+  "id:reg-khu-uiam": {
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322415",
+   "by": "Claude 세션 (개발자 전체 컨펌 2026-10-04)",
+   "at": "2026-10-04",
+   "title": "2026 의암 손병희 우수논문 장학생 선발 공고",
+   "note": "정찰 #47(2026-10-04)이 새 탭으로 열어 이 제목·첨부를 봄"
+  },
+  "id:reg-hi-jeongeup": {
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322469",
+   "by": "Claude 세션 (개발자 전체 컨펌 2026-10-04)",
+   "at": "2026-10-04",
+   "title": "2026년도 정읍시민장학재단 우수인재장학금 장학생 선발 안내",
+   "note": "진짜 브라우저 본문 사본(collector/extracted/browser-bodies.json · 2026-08-23)에 이 제목"
+  },
+  "id:reg-khu-intern": {
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322541",
+   "by": "Claude 세션 (개발자 전체 컨펌 2026-10-04)",
+   "at": "2026-10-04",
+   "title": "2026학년도 2학기 경희인턴(교내장학) 장학생 모집 공고",
+   "note": "본문 사본(collector/extracted/notices-text.json)에 이 제목"
+  }
+ }
+}

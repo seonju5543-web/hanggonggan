@@ -116,8 +116,34 @@ export function titleEvidence({ titles, docTitle, headings, text }) {
 
 const POST_MARK = /등록일|작성일|작성자|조회수|조회\s*\d|첨부|이전\s?글|다음\s?글|게시일/;
 
+/* ── 글 주소에서 목록으로 돌려보내짐 (2026-10-04 · 원문 후보 확인) ─────────────────────────────
+   서버가 없는 글·지난 글을 **목록으로 돌려보내면** 목록 화면에 그 제목이 한 줄로 보여 '본문에 그 제목'(post)이 될 수 있다.
+   후보 주소를 원문으로 올리기 전에 거르는 결정적 증거 둘 — 막힘으로는 생기지 않는다(hostGuard 가 지우지 않는다):
+     ① 글 파일(view·read·detail…)을 열었는데 목록 파일(list·artclList·selectNttList…)에 닿았다
+     ② 같은 경로인데 글 번호 칸(nttSn·idx·wr_id…)만 빠진 주소에 닿았다 */
+const VIEW_SEG = /^(?:[\w-]*(?:view|read|detail)[\w-]*|selectNttInfo)(?:\.[a-z]{2,6})?$/i;
+const LIST_SEG = /^[\w-]*list[\w-]*(?:\.[a-z]{2,6})?$/i;
+const POST_ID_KEY = /^(?:[\w-]*(?:id|no|seq|idx|sn|uid|num))$|^(?:wr_id|nttSn|nttNo|nttId|articleNo|bidx|b_idx|seqNo|bbsidx|boardSeq|pstSn|document_srl)$/i;
+const NOT_POST_ID = /^(?:page|pageno|pageindex|pagenum|currentpageno|rownum|menuno|menuid|siteid|key|mi|lang|cate[\w-]*|category[\w-]*)$/i;
+const DELETED_ALERT = /삭제(?:된|되었)|존재하지\s*않|없는\s*(?:게시|글|페이지)|게시물이\s*없|찾을\s*수\s*없/;
+export function listRedirect(requestedUrl, finalUrl) {
+  if (!requestedUrl || !finalUrl) return '';
+  let a; let b;
+  try { a = new URL(decodeUrlEntities(requestedUrl)); b = new URL(decodeUrlEntities(finalUrl)); } catch { return ''; }
+  if (a.href === b.href) return '';
+  const lastSeg = (u) => u.pathname.split('/').filter(Boolean).pop() || '';
+  if (VIEW_SEG.test(lastSeg(a)) && LIST_SEG.test(lastSeg(b))) return '글 주소에서 목록 주소로 돌려보내짐';
+  if (a.origin === b.origin && a.pathname === b.pathname) {
+    const dropped = [...a.searchParams].filter(([k, v]) => String(v).trim() !== '' && POST_ID_KEY.test(k) && !NOT_POST_ID.test(k) && !b.searchParams.has(k));
+    if (dropped.length) return `글 번호(${dropped.map(([k]) => k).join('·')})가 빠진 주소로 돌려보내짐`;
+  }
+  return '';
+}
+
 /* 한 번 열어 본 결과 → 판정.
-   obs = { requestedUrl, finalUrl, status, error, docTitle, headings, text, hasPassword, titles, otherTitles } */
+   돌려주는 것: { v, why, decisive?, ev } — ev 는 제목 증거의 세기('strong' 제목 자리 · 'weak' 본문 어딘가 · 'none').
+   원문 후보 확인(collector/link-candidates.mjs acceptCandidate)은 'strong' 만 원문으로 올린다 — 판정은 여기 한 곳이다.
+   obs = { requestedUrl, finalUrl, status, error, docTitle, headings, text, hasPassword, titles, otherTitles, dialog? } */
 export function judgeLanding(obs) {
   const o = obs || {};
   if (o.error) return { v: 'unread', why: `열기 실패: ${String(o.error).split('\n')[0].slice(0, 60)}` };
@@ -140,26 +166,30 @@ export function judgeLanding(obs) {
 
   /* 🔴 돌려보내진 증거가 제목보다 먼저다 (리뷰 LC-2) — 지워진 글·만료된 링크가 첫 화면으로 돌려보내지면 첫 화면의
      '최근 공지' 띠에 그 제목이 보여도 학생이 보는 것은 첫 화면이다. */
-  if (homeish(finShape) && !homeish(reqShape)) return { v: 'home', why: '사이트 첫 화면으로 돌려보내짐', decisive: true };
-  if (ev === 'strong') return { v: 'post', why: '제목 자리에 그 공고 제목' };
-  if (ev === 'weak') return listy ? { v: 'list', why: '제목은 보이나 다른 공고 제목이 여럿 함께 보임(목록)' } : { v: 'post', why: '본문에 그 공고 제목' };
+  if (homeish(finShape) && !homeish(reqShape)) return { v: 'home', why: '사이트 첫 화면으로 돌려보내짐', decisive: true, ev };
+  const toList = listRedirect(o.requestedUrl, o.finalUrl);
+  if (toList) return { v: 'list', why: toList, decisive: true, ev };
+  /* 알림창이 '지워진 글'이라고 말했다(로봇이 닫고 글자만 적어 둔 것 · obs.dialog) — 제목 자리에 그 제목이 없으면 열리지 않는 글이다 */
+  if (o.dialog && DELETED_ALERT.test(o.dialog) && ev !== 'strong') return { v: 'gone', why: `알림창 「${String(o.dialog).slice(0, 40)}」`, decisive: true, ev };
+  if (ev === 'strong') return { v: 'post', why: '제목 자리에 그 공고 제목', ev };
+  if (ev === 'weak') return listy ? { v: 'list', why: '제목은 보이나 다른 공고 제목이 여럿 함께 보임(목록)', ev } : { v: 'post', why: '본문에 그 공고 제목', ev };
 
   /* 여기부터는 제목이 안 보인다 */
   /* 로그인 화면은 대개 짧다 — 껍데기 판정보다 먼저 본다(리뷰 LC-5: 짧은 SSO 화면이 '판정 불가'로 사라졌다) */
-  if (o.hasPassword && looksLikeLoginWall(text, true)) return { v: 'login', why: '로그인 요구(제목이 안 보이고 비밀번호 칸)' };
-  if (compact.length < 300) return { v: 'unread', why: `본문이 안 그려짐(${compact.length}자 — 판정 불가)` };
-  if (looksLikeLoginWall(text, o.hasPassword)) return { v: 'login', why: '로그인 요구(제목이 안 보임)' };
-  if (listy) return { v: 'list', why: '다른 공고 제목만 여럿 보임(목록)' };
-  if (homeish(reqShape)) return { v: 'home', why: '사이트 첫 화면(제목이 안 보임)' };
+  if (o.hasPassword && looksLikeLoginWall(text, true)) return { v: 'login', why: '로그인 요구(제목이 안 보이고 비밀번호 칸)', ev };
+  if (compact.length < 300) return { v: 'unread', why: `본문이 안 그려짐(${compact.length}자 — 판정 불가)`, ev };
+  if (looksLikeLoginWall(text, o.hasPassword)) return { v: 'login', why: '로그인 요구(제목이 안 보임)', ev };
+  if (listy) return { v: 'list', why: '다른 공고 제목만 여럿 보임(목록)', ev };
+  if (homeish(reqShape)) return { v: 'home', why: '사이트 첫 화면(제목이 안 보임)', ev };
   if (!POST_MARK.test(text)) {
     return compact.length >= 1500
-      ? { v: 'other', why: '공고 화면이 아님(작성일·조회·첨부 표지가 없음)' }
-      : { v: 'unread', why: '글 표지도 제목도 없음(판정 불가)' };
+      ? { v: 'other', why: '공고 화면이 아님(작성일·조회·첨부 표지가 없음)', ev }
+      : { v: 'unread', why: '글 표지도 제목도 없음(판정 불가)', ev };
   }
   /* (리뷰 F2) 기대 제목이 **앱 이름뿐**(사람이 다듬은 `동산장학회 장학생 (이공계 새터민 대상)`)이면 게시판 제목과 글자가 달라
      '다른 글'을 단정할 근거가 없다 — 순찰이 같은 이유로 멀쩡한 주소를 덮던 사고를 확인 로봇이 되풀이하지 않게 판정 보류. */
-  if (o.titlesFromNameOnly) return { v: 'unread', why: '다른 글로 보이나 기대 제목이 앱 이름뿐(판정 보류)' };
-  return { v: 'other', why: '다른 글이 열림(제목 불일치)' };
+  if (o.titlesFromNameOnly) return { v: 'unread', why: '다른 글로 보이나 기대 제목이 앱 이름뿐(판정 보류)', ev };
+  return { v: 'other', why: '다른 글이 열림(제목 불일치)', ev };
 }
 
 /* 한 사이트에서 이번 실행의 '제목이 안 보이는' 문제가 절반을 넘으면(4건 이상) 우리가 막힌 것으로 본다.
@@ -215,4 +245,4 @@ export function publishBad(state, liveUrls) {
   return Object.fromEntries(Object.entries(bad).sort(([a], [b]) => (a < b ? -1 : 1)));
 }
 
-export default { VERDICTS, BAD, stripRowTail, expectTitles, headMatches, titleEvidence, judgeLanding, hostGuard, nextState, publishBad };
+export default { VERDICTS, BAD, stripRowTail, expectTitles, headMatches, titleEvidence, listRedirect, judgeLanding, hostGuard, nextState, publishBad };

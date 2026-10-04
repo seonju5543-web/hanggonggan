@@ -135,6 +135,18 @@ function serve() {
   /* 🔴 **일부러 못 읽게 만들 파일** — 맨 끝의 「못 읽은 파일」 절이 채운다.
      그 절이 없으면 늘 비어 있어 아무 영향이 없다(평소 검사는 그대로 돈다). */
   const FORCE_FAIL = new Set();
+  /* 원문 링크 손볼 것 (2026-10-04) — 실데이터는 목록 표식·확정 문제가 0건일 수 있다(그게 바라는 상태다).
+     그러면 이 절이 조용히 헛돈다 — 검사용으로 넷을 끼워 넣는다: 정식 등록 목록 표식 · 층2 재단 · 소식 목록 표식 · 로봇이 확정한 문제.
+     저장소 데이터는 건드리지 않는다. */
+  const LFX = {
+    regMark: 'https://example.ac.kr/bbs/list.do#n-%EA%B2%80%EC%82%AC%EC%9A%A9',
+    badUrl: 'https://example.ac.kr/view.do?seq=990',
+    newsMark: 'https://news.example.ac.kr/bbs/list.do#n-%EC%86%8C%EC%8B%9D',
+    newsFile: 'verify-linkfix-news.json',
+    due: new Date(Date.now() + 9 * 3600e3 + 20 * 86400e3).toISOString().slice(0, 10),
+    /* 층2 묶음은 마감 가까운 순 앞 30건만 그린다 — 검사용 재단은 오늘 마감으로 맨 앞에 둔다 */
+    kosafDue: new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10),
+  };
   await page.route('https://raw.githubusercontent.com/**', async (route) => {
     const u = new URL(route.request().url());
     const rel = u.pathname.startsWith(RAW_PREFIX)
@@ -144,6 +156,10 @@ function serve() {
     const f = path.join(ROOT, rel);
     /* 검사용 준비 카드(아래)의 그림은 저장소에 없다 — 404 가 콘솔 오류로 남지 않게 빈 그림으로 답한다 */
     if (rel.startsWith('insta/pub/verify-insta-1/')) return route.fulfill({ status: 200, contentType: 'image/jpeg', body: '' });
+    if (rel === `data/news/${LFX.newsFile}`) {
+      return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ school: '검사용대학교', items: [
+        { title: '검사용 소식 목록 표식', url: LFX.newsMark, school: '검사용대학교', campus: '', foundAt: '2026-10-03', postId: '77' }] }) });
+    }
     if (!f.startsWith(ROOT) || !fs.existsSync(f)) return route.fulfill({ status: 404, body: '' });
     let body = fs.readFileSync(f, 'utf8');
     /* 🔴 검수 대기가 0건이면 '컨펌 작업대'와 '다중 선택' 검사가 **조용히 사라진다**
@@ -190,6 +206,14 @@ function serve() {
           amount: '100만원', amountValue: 1000000, period: '접수 기간 원문 확인',
           sourceUrl: 'https://example.ac.kr/view.do?seq=953',
         });
+        /* 원문 링크 손볼 것 — 목록 표식 1 · 로봇이 확정한 문제 1 (마감·금액은 채워 다른 '적는 자리'에 끼지 않게) */
+        db2.items.push({
+          ...base, id: 'verify-linkfix-reg', name: '검사용 목록 표식 공고', amount: '100만원', amountValue: 1000000,
+          deadline: LFX.due, period: '접수 기간 원문 확인', sourceUrl: LFX.regMark, boardTitle: '검사용 목록 표식 공고',
+        }, {
+          ...base, id: 'verify-linkfix-bad', name: '검사용 확정 문제 공고', amount: '100만원', amountValue: 1000000,
+          deadline: LFX.due, period: '접수 기간 원문 확인', sourceUrl: LFX.badUrl,
+        });
         body = JSON.stringify(db2);
       }
       PAGE_ITEMS = JSON.parse(body).items;   // 화면이 실제로 받은 목록 — 아래 건수 비교는 전부 이걸 기준으로 한다
@@ -210,6 +234,22 @@ function serve() {
         body = JSON.stringify(db);
       }
       ACT_ITEMS = JSON.parse(body).items;
+    }
+    if (rel === 'data/kosaf-open.json') {
+      const db = JSON.parse(body);
+      db.items = (db.items || []).concat([{ code: 'verify0001', org: '검사용재단', name: '검사용 재단 장학금', kind: '기타', due: LFX.kosafDue,
+        home: 'https://verify-found.or.kr', fields: {}, files: [] }]);
+      body = JSON.stringify(db);
+    }
+    if (rel === 'data/link-check.json') {
+      const db = JSON.parse(body);
+      db.bad = { ...(db.bad || {}), [LFX.badUrl]: { v: 'other', at: '2026-10-03' } };
+      body = JSON.stringify(db);
+    }
+    if (rel === 'data/news/index.json') {
+      const db = JSON.parse(body);
+      db.files = { ...(db.files || {}), 검사용대학교: { file: LFX.newsFile, count: 1 } };
+      body = JSON.stringify(db);
     }
     if (rel === 'insta/seen.json') {
       const db = JSON.parse(body);
@@ -1992,6 +2032,73 @@ function serve() {
     await page.unroute('**/actions/workflows/**/dispatches');
     await page.click('.tab[data-tab="todo"]');
     await page.waitForSelector('#screen-todo:not([hidden])');
+  }
+
+  /* ══ 원문 링크 손볼 것 — 관리자가 진짜 원문 주소를 넣는다 (2026-10-04 · 개발자 지시 *"관리자 페이지에 원문 공고를 추가할 수 있는 칸"*) ══
+     보는 것: 펼치면 네 갈래(정식 등록 표식 · 층2 재단 · 소식 표식 · 확정 문제)가 학생이 지금 보는 이름과 함께 뜬다 ·
+     목록 표식 주소는 화면이 먼저 막는다 · 보통 글 주소는 모아 두고 · 반영 시트가 주소와 학생 이름의 전후를 보여 준다 ·
+     나가는 요청은 linkFix 와 그 공고·지금 주소·새 주소다. 저장소 쪽은 test-collector 「원문 링크 정직성」 admin 갈래가 잰다. */
+  {
+    await page.route('**/actions/workflows/**/runs**', (route) => route.fulfill({
+      status: 200, contentType: 'application/json',
+      body: JSON.stringify({ workflow_runs: [{ id: 11, status: 'completed', conclusion: 'success', created_at: new Date(Date.now() + 5000).toISOString(), html_url: 'https://example.invalid/run' }] }),
+    }));
+    await page.waitForFunction(() => !window.__admin.jobBusy(), null, { timeout: 30000 }).catch(() => {});
+    await page.click('.tab[data-tab="todo"]');
+    await page.waitForSelector('#screen-todo:not([hidden])');
+    ok(await page.locator('#screen-todo [data-lf-card]').count() === 1, '원문 링크 — 「할 일」에 「원문 링크 손볼 것」 카드가 있다');
+    await page.click('#todo-link-fix > summary');
+    await page.waitForSelector('#link-fix-slot [data-lf-group="marker"]', { timeout: 20000 }).catch(() => {});
+    const rowInfo = (key) => page.evaluate((k) => {
+      const r = [...document.querySelectorAll('#link-fix-slot [data-lf-row]')].find((x) => x.dataset.lfRow === k);
+      if (!r) return null;
+      const g = r.closest('[data-lf-group]');
+      return { group: g ? g.dataset.lfGroup : '', label: (r.querySelector('[data-lf-label]') || {}).textContent || '',
+        now: (r.querySelector('[data-lf-now]') || {}).getAttribute ? r.querySelector('[data-lf-now]').getAttribute('rel') : '' };
+    }, key);
+    const reg = await rowInfo('id:verify-linkfix-reg');
+    const kos = await rowInfo('id:kosaf-verify0001');
+    const nws = await rowInfo(`u:${LFX.newsMark}`);
+    const bad = await rowInfo('id:verify-linkfix-bad');
+    ok(reg && reg.group === 'marker' && /게시판 목록 ↗/.test(reg.label), '  정식 등록 목록 표식 — ① 묶음 · 학생이 지금 보는 이름(「게시판 목록 ↗」)', JSON.stringify(reg));
+    ok(kos && kos.group === 'kosaf' && /재단 홈페이지 ↗/.test(kos.label), '  층2 재단 — ④ 묶음 · 「재단 홈페이지 ↗」', JSON.stringify(kos));
+    ok(nws && nws.group === 'marker', '  교내 소식 목록 표식 — 학교별 소식 파일까지 읽어 ① 묶음에 든다', JSON.stringify(nws));
+    ok(bad && bad.group === 'bad' && /확인 필요/.test(bad.label), '  로봇이 확정한 문제 — ⑤ 묶음 · 「(확인 필요)」', JSON.stringify(bad));
+    ok(reg && /noreferrer/.test(reg.now || ''), '  「지금 링크 열기」는 학생처럼 리퍼러 없이 연다');
+    const regSel = '#link-fix-slot [data-lf-row="id:verify-linkfix-reg"]';
+    await page.fill(`${regSel} [data-lf-url]`, 'https://example.ac.kr/bbs/list.do#n-%EB%8B%A4%EB%A5%B8');
+    await page.click(`${regSel} [data-lf-stage]`);
+    await page.waitForTimeout(200);
+    const toastMark = (await page.textContent('#toast')) || '';
+    ok(/목록 표식/.test(toastMark) && await page.evaluate(() => window.__admin.linkFixStage().size) === 0,
+      '  목록 표식(#n-) 주소를 붙여 넣으면 화면이 막는다 — 모아 두지 않는다', toastMark);
+    const NEWURL = 'https://example.ac.kr/bbs/view.do?id=4242';
+    await page.fill(`${regSel} [data-lf-url]`, NEWURL);
+    await page.click(`${regSel} [data-lf-stage]`);
+    await page.waitForTimeout(200);
+    ok(await page.evaluate(() => window.__admin.linkFixStage().size) === 1 && await page.locator('#linkfix-bar:not([hidden])').count() === 1,
+      '  보통 글 주소는 모아 둔다 — 「원문 주소」 줄이 뜬다(공고 수정과 다른 장부)');
+    let lfSent = null;
+    await page.route('**/actions/workflows/**/dispatches', (route) => {
+      try { lfSent = JSON.parse(route.request().postData() || '{}'); } catch { lfSent = 'parse-fail'; }
+      route.fulfill({ status: 204, body: '' });
+    });
+    await page.click('#linkfix-bar [data-lf-flush]');
+    await page.waitForSelector('#sheet:not([hidden])');
+    const sheetTxt = (await page.textContent('#sheet')) || '';
+    ok(lfSent === null && sheetTxt.includes(LFX.regMark) && sheetTxt.includes(NEWURL) && /게시판 목록 ↗/.test(sheetTxt) && /원문 공고 ↗/.test(sheetTxt),
+      '  반영 전에 시트가 지금 주소 → 새 주소 · 학생 이름 「게시판 목록」 → 「원문 공고」를 보여 준다(아직 안 보냄)');
+    await page.click('#sheet [data-ask-go]');
+    await page.waitForTimeout(700);
+    const lp = (() => { try { return JSON.parse(lfSent?.inputs?.payload || '{}'); } catch { return {}; } })();
+    const f0 = (lp.fixes || [])[0] || {};
+    ok(lfSent?.inputs?.action === 'linkFix' && f0.ds === 'registered' && f0.id === 'verify-linkfix-reg' && f0.from === LFX.regMark && f0.url === NEWURL && !('by' in f0),
+      '  나가는 요청 = linkFix · 그 공고 · 지금 주소(from) · 새 주소 (누가는 저장소가 정한다 — 보내지 않는다)', JSON.stringify(lfSent?.inputs || null).slice(0, 200));
+    /* '반영 완료' 글자는 다시 읽기(loadAll) **전에** 뜬다 — 작업 잠금이 풀릴 때까지 기다려야 끝난 것이다 */
+    await page.waitForFunction(() => /반영 완료/.test(document.querySelector('#job-text')?.textContent || '') && !window.__admin.jobBusy(), null, { timeout: 30000 }).catch(() => {});
+    ok(await page.evaluate(() => window.__admin.linkFixStage().size) === 0, '  반영이 끝나면 모아 둔 것을 비운다');
+    await page.unroute('**/actions/workflows/**/dispatches');
+    await page.unroute('**/actions/workflows/**/runs**');
   }
 
   /* 콘솔 오류 */

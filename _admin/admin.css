@@ -318,6 +318,9 @@ a { color: var(--accent); }
 /* 날짜를 적는 칸 (F-4 열쇠 만료일 · 마감 적어 두기) — 날짜 칸과 단추가 한 줄 */
 .key-exp { display: flex; flex-wrap: wrap; gap: var(--space-8); align-items: center; }
 .key-exp input[type="date"] { min-height: 36px; }
+/* 원문 주소 넣기 (2026-10-04 · 할 일 › 원문 링크 손볼 것) — 주소 칸이 넓게, 좁은 화면에선 줄바꿈 */
+.lf-form input[type="url"] { flex: 1 1 22rem; min-width: 0; min-height: 36px; }
+.lf-form input[type="text"] { flex: 1 1 10rem; min-width: 0; min-height: 36px; }
 
 /* 이상 없는 항목은 카드로 자리를 먹지 않고 한 줄 띠로 접는다 */
 .allclear {

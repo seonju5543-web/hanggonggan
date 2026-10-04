@@ -69,6 +69,8 @@ jobs:
             // 원문 링크 확인 (2026-10-03): 로봇이 확정한 문제 링크 — 앱이 이것을 받아 링크 이름을 정직하게 바꾼다.
             //   안 나가면 앱은 확정된 목록·404 링크를 그대로 '원문 공고'라 부른다(404 여도 조용히 물러난다).
             out.push('data/link-check.json');
+            // 관리자가 넣은 원문 공고 주소 (2026-10-04): 앱이 이것을 받아 목록·홈 링크 대신 그 공고로 연다 — 안 나가면 넣어도 조용히 안 보인다.
+            out.push('data/link-fixes.json');
             // 학교 대표 사진 (2026-10-03): 글에 사진이 없을 때 앱이 받는 목록 + 그 첫 그림 하나 (바이트로 비교)
             try {
               const sp = JSON.parse(fs.readFileSync('assets/schools/photos.json', 'utf8'));
@@ -112,7 +114,9 @@ jobs:
           const cache = (p) => { try { return (fs.readFileSync(p, 'utf8').match(/const CACHE = '([^']+)'/) || [,'?'])[1]; } catch { return '?'; } };
           /* 원문 링크 확인 장부는 칸이 셋(updatedAt·v·bad)뿐이라 `count` 로 세면 늘 3 대 3 이다 —
              문제 건수 + 확인 시각으로 잰다(시각이 다르면 어제 결과가 안 나간 것이다). bad 칸이 없으면 '읽기실패'. */
-          const linkCheck = (p) => { try { const j = JSON.parse(fs.readFileSync(p, 'utf8')); return j && j.bad && typeof j.bad === 'object' ? `${Object.keys(j.bad).length}건@${String(j.updatedAt || '-').slice(0, 16)}` : '읽기실패'; } catch { return '읽기실패'; } };
+          const linkCheck = (p) => { try { const j = JSON.parse(fs.readFileSync(p, 'utf8')); return j && j.bad && typeof j.bad === 'object' ? `${Object.keys(j.bad).length}건+${Object.keys(j.fix || {}).length}@${String(j.updatedAt || '-').slice(0, 16)}` : '읽기실패'; } catch { return '읽기실패'; } };
+          // 관리자 바로잡기(data/link-fixes.json)는 bad 가 없고 fix 만 있다 — 건수·시각으로 비교(못 읽으면 '읽기실패' · 404 를 통과로 세지 않는다)
+          const linkFixes = (p) => { try { const j = JSON.parse(fs.readFileSync(p, 'utf8')); return j && j.fix && typeof j.fix === 'object' ? `${Object.keys(j.fix).length}건@${String(j.updatedAt || '-').slice(0, 16)}` : '읽기실패'; } catch { return '읽기실패'; } };
           const rows = [
             ['서비스워커 버전', cache('sw.js'), cache('live/sw.js')],
             ['실시간 공고(옛)', count('data/notices.json'), count('live/data/notices.json')],
@@ -126,12 +130,13 @@ jobs:
           for (const f of extra) {
             const label = f.startsWith('data/majors/') ? '학과(학교별)'
               : f === 'data/link-check.json' ? '원문 링크 확인'
+              : f === 'data/link-fixes.json' ? '원문 바로잡기'
               : f.startsWith('data/news/img/') ? '소식 사진'
               : f.startsWith('assets/schools/') ? (f.endsWith('.json') ? '학교 사진 목록' : '학교 사진')
               : f.startsWith('data/news/') ? (f.endsWith('index.json') ? '소식 색인' : '소식(학교별)')
               : f.endsWith('index.json') ? '공고 색인' : '공고(학교별)';
             const measure = f.endsWith('.webp') ? bytes : count;
-            const m = f === 'data/link-check.json' ? linkCheck : measure;   // 원문 링크 확인은 건수·시각으로(위 linkCheck)
+            const m = f === 'data/link-check.json' ? linkCheck : f === 'data/link-fixes.json' ? linkFixes : measure;   // 원문 링크 확인·바로잡기는 건수·시각으로(위 linkCheck·linkFixes)
             rows.push([`${label} ${f.split('/').pop()}`, m(f), m('live/' + f)]);
           }
           let bad = 0;

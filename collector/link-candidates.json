@@ -1,0 +1,90 @@
+{
+ "v": 1,
+ "note": "원문 후보 — 사람·Claude 세션이 '이 공고의 원문은 아마 이 주소'라고 적는 곳. 로봇(collector/link-check.mjs)은 읽기만 하고, 학생처럼 열어 그 공고·그 회차임을 확인한 것만 data/link-check.json fix 로 앱에 싣는다(판정 collector/link-candidates.mjs acceptCandidate). 줄 꼴: { target:{ds:registered|notices|news|external|activities|kosaf, key:<정식 등록 id | 층2 코드 | 지금 보이는 주소(표식 그대로) | 학교|제목>}, url:<글 주소> 또는 board:<게시판 목록 주소>, title?, source?(search|board|data|admin), query?, by:<누가>, addedAt:YYYY-MM-DD, note?, also?:[같은 공고문을 쓰는 층2 코드], trusted?:true(관리자가 열어 본 주소) }. 60일 지난 줄은 읽지 않는다. 기본 브랜치에 push 하면 후보만 확인하는 실행이 한 번 돈다.",
+ "items": [
+  {
+   "target": {
+    "ds": "news",
+    "key": "경희대학교|국제 [교수학습개발원] 국제C 학부생을 위한 학습컨설팅 신청 안내(10월)"
+   },
+   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323083",
+   "title": "국제 [교수학습개발원] 국제C 학부생을 위한 학습컨설팅 신청 안내(10월)",
+   "source": "data",
+   "by": "Claude 세션 (2026-10-04 원문 바로잡기)",
+   "addedAt": "2026-10-04",
+   "note": "목록 표식 글의 글 번호(postId)로 만든 GET 상세 — 정찰 #47 이 같은 꼴(boardId=323083)로 그 글이 열림을 봤다"
+  },
+  {
+   "target": {
+    "ds": "news",
+    "key": "경희대학교|공통 [교수학습개발원] AI시대 대학생의 학습 경험과 인식 설문조사 참여 안내"
+   },
+   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323188",
+   "title": "공통 [교수학습개발원] AI시대 대학생의 학습 경험과 인식 설문조사 참여 안내",
+   "source": "data",
+   "by": "Claude 세션 (2026-10-04 원문 바로잡기)",
+   "addedAt": "2026-10-04",
+   "note": "목록 표식 글의 글 번호(postId)로 만든 GET 상세 — 정찰 #47 이 같은 꼴(boardId=323083)로 그 글이 열림을 봤다"
+  },
+  {
+   "target": {
+    "ds": "news",
+    "key": "경희대학교|공통 [추천채용] [INVENI] 대표이사 비서 정규직 추천채용"
+   },
+   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323229",
+   "title": "공통 [추천채용] [INVENI] 대표이사 비서 정규직 추천채용",
+   "source": "data",
+   "by": "Claude 세션 (2026-10-04 원문 바로잡기)",
+   "addedAt": "2026-10-04",
+   "note": "목록 표식 글의 글 번호(postId)로 만든 GET 상세 — 정찰 #47 이 같은 꼴(boardId=323083)로 그 글이 열림을 봤다"
+  },
+  {
+   "target": {
+    "ds": "news",
+    "key": "경희대학교|국제 [(주)라엘코리아] 해외영업(일본) 전환형 인턴 추천채용"
+   },
+   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323222",
+   "title": "국제 [(주)라엘코리아] 해외영업(일본) 전환형 인턴 추천채용",
+   "source": "data",
+   "by": "Claude 세션 (2026-10-04 원문 바로잡기)",
+   "addedAt": "2026-10-04",
+   "note": "목록 표식 글의 글 번호(postId)로 만든 GET 상세 — 정찰 #47 이 같은 꼴(boardId=323083)로 그 글이 열림을 봤다"
+  },
+  {
+   "target": {
+    "ds": "news",
+    "key": "경희대학교|공통 [피보탈시스템즈코리아(주)] 반도체 엔지니어&오퍼레이터 추천채용"
+   },
+   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323221",
+   "title": "공통 [피보탈시스템즈코리아(주)] 반도체 엔지니어&오퍼레이터 추천채용",
+   "source": "data",
+   "by": "Claude 세션 (2026-10-04 원문 바로잡기)",
+   "addedAt": "2026-10-04",
+   "note": "목록 표식 글의 글 번호(postId)로 만든 GET 상세 — 정찰 #47 이 같은 꼴(boardId=323083)로 그 글이 열림을 봤다"
+  },
+  {
+   "target": {
+    "ds": "news",
+    "key": "경희대학교|공통 [추천채용] [새솔다이아몬드공업(주)] 해외영업(중국), 해외영업(미국) 부문 추천채용"
+   },
+   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323208",
+   "title": "공통 [추천채용] [새솔다이아몬드공업(주)] 해외영업(중국), 해외영업(미국) 부문 추천채용",
+   "source": "data",
+   "by": "Claude 세션 (2026-10-04 원문 바로잡기)",
+   "addedAt": "2026-10-04",
+   "note": "목록 표식 글의 글 번호(postId)로 만든 GET 상세 — 정찰 #47 이 같은 꼴(boardId=323083)로 그 글이 열림을 봤다"
+  },
+  {
+   "target": {
+    "ds": "notices",
+    "key": "가천대학교|[공지사항-비교과] [ArTechne] 2026 비교과 마일리지 장학제도 안내"
+   },
+   "url": "https://www.gachon.ac.kr/bbs/kor/743/125694/artclView.do",
+   "title": "[공지사항-비교과] [ArTechne] 2026 비교과 마일리지 장학제도 안내",
+   "source": "data",
+   "by": "Claude 세션 (2026-10-04 원문 바로잡기)",
+   "addedAt": "2026-10-04",
+   "note": "확신 낮음 — 글 번호 125694(수집 기록 subview.do?nttId=125694)와 ArTechne 게시판 743(웹 검색의 옛 마일리지 글)을 합친 주소. 로봇이 제목을 확인해야만 쓴다"
+  }
+ ]
+}

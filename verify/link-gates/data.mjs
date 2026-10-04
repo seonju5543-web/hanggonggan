@@ -29,11 +29,20 @@ export default async function gate(eq, ctx) {
     [r.warns.length, r.warns.some((w) => /HTML 기호.*snu/.test(w)), r.warns.some((w) => /글 번호만.*snue, gachon/.test(w)), r.warns.some((w) => /확정한 링크.*gone\(gone\)/.test(w))],
     [5, true, true, true]);
   eq('  깨끗한 자료면 경고 0', auditLinks([set('registered', [{ id: 'ok', sourceUrl: 'https://a.kr/view.do?id=3' }])], null).warns.length, 0);
+  {
+    /* 바로잡은 원문(관리자 data/link-fixes.json · 로봇 link-check fix)이 있는 글은 '고칠 일'이 아니다 — fixed 로만 센다 */
+    const items = [{ id: 'm1', sourceUrl: 'https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-x' }, { id: 'h1', url: 'https://www.jeju.go.kr/index.htm' }];
+    const r2 = auditLinks([set('registered', items)], { bad: {}, fix: { 'u:https://www.jeju.go.kr/index.htm': { url: 'https://www.jeju.go.kr/news/view.htm?id=7', at: '2026-10-04' } } },
+      { fix: { 'id:m1': { url: 'https://www.gachon.ac.kr/bbs/kor/475/125809/artclView.do', at: '2026-10-04', by: 't' } } });
+    eq('  바로잡은 원문이 있는 글은 경고하지 않고 fixed 로 센다(관리자 · 로봇 둘 다) — 끝나면 source-link 상태를 비운다',
+      [r2.counts.registered.fixed, r2.counts.registered.marker, r2.counts.registered.home, r2.warns.length, require('../../source-link.js').linkFixFor({ id: 'm1', sourceUrl: items[0].sourceUrl })],
+      [2, 0, 0, 0, null]);
+  }
 
   /* ② 배선 — 감사가 이 규칙을 부르고, 오류(errors)로는 올리지 않는다 */
   const audit = fs.readFileSync(new URL('verify/audit-data.js', ctx.root), 'utf8');
   eq('② audit-data.js 가 link-audit 의 경고를 warns 로만 싣는다(실데이터로 로봇 저장을 막지 않는다)',
-    [/require\('\.\/link-audit\.cjs'\)/.test(audit), /auditLinks\(sets, readJson\('data\/link-check\.json'\)\)\.warns\.forEach\(\(w\) => warns\.push\(w\)\)/.test(audit), /auditLinks[\s\S]{0,400}errors\.push/.test(audit.slice(audit.indexOf('link-audit.cjs')))],
+    [/require\('\.\/link-audit\.cjs'\)/.test(audit), /auditLinks\(sets, readJson\('data\/link-check\.json'\), readJson\('data\/link-fixes\.json'\)\)\.warns\.forEach\(\(w\) => warns\.push\(w\)\)/.test(audit), /auditLinks[\s\S]{0,400}errors\.push/.test(audit.slice(audit.indexOf('link-audit.cjs')))],
     [true, true, false]);
   eq('  앱이 보여 주는 다섯 묶음을 모두 훑는다(학교별 공고 파일 · 소식 파일 포함)',
     ['registered', 'notices(학교별)', 'external', 'activities', 'news'].every((ds) => audit.includes(`ds: '${ds}'`)), true);

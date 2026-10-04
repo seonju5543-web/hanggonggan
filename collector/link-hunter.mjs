@@ -53,11 +53,13 @@
    같은 것을 영원히 다시 두드리지 않기
    ─────────────────────────────────────────────────────────────────
    `collector/link-hunt.json`에 공고별로 시도 횟수와 마지막 사유를 남긴다.
-   · '목록에서 못 찾음'이 3회 쌓이면 → 게시판에서 내려간 공고로 보고 `gone` 처리.
-     더는 시도하지 않고, 리포트에 '내려간 공고'로 분류한다.
-   · '읽었는데 다른 화면'이 3회 쌓이면 → 사람이 봐야 하는 건으로 `stuck` 처리하고
-     리포트에 올린다(추측으로 아무 주소나 붙이지 않는다).
+   · 실패가 쌓일수록 간격을 늘려(1일→3일→7일→14일→30일) 계속 다시 찾는다 — 포기는 없다.
+   · 실패가 3회 쌓이고 **3단계(다른 게시판·사이트 검색)까지 못 찾은 날** 한 번 사람에게 알린다(`stuck` → 이슈).
+     (2026-10-04 · 이슈 #387 — 예전엔 1단계의 세 번째 실패에서 바로 세어, 같은 실행의 3단계가 찾아낸 공고로 이슈가 열렸다)
+   · '목록에서 못 찾음'이 3회 쌓여도 목록 끝까지 본 경우에만 '게시판에서 내려간 듯(likelyGone)'으로 적는다
+     (쪽수·시간 상한에서 멈췄으면 더 뒤에 있을 수 있다). 규칙은 link-hunt-rules.mjs 한 곳.
    · 네트워크로 못 읽은 것은 횟수에 세지 않는다 — 학교 서버 사정이지 공고 잘못이 아니다.
+   · 관리자가 원문 주소를 넣은 공고(data/link-fixes.json)는 대상에서 뺀다 — 표식을 바꾸면 관리자 주소가 화면에서 사라진다.
 
    실행: node collector/link-hunter.mjs [--dry]
          (워크플로 link-hunter.yml · collector/run-link-hunt.txt 를 고쳐 push해도 실행) */
@@ -80,6 +82,10 @@ import { dedupeNotices } from './url-key.mjs';
 /* 앱이 읽는 것은 학교별 파일이다 — 고친 주소를 거기까지 옮긴다(재발행이 아니라 그 자리만 고침).
    왜 재발행이면 안 되는지는 publish-notices.mjs 의 patchUrlsBySchool 첫머리에 있다. */
 import { patchUrlsBySchool } from './publish-notices.mjs';
+/* 장부 규칙(시도 기록 · 사람에게 알릴 때 · '내려간 듯')은 순수 함수 파일 하나 — 관문이 가짜 장부로 그대로 돌려 본다 (2026-10-04 · 이슈 #387) */
+import { recordAttempt, settleEscalation, listScanEnd } from './link-hunt-rules.mjs';
+/* 관리자가 이미 원문을 넣은 공고는 건드리지 않는다 (2026-10-04) — 표식을 바꾸면 관리자 열쇠(u:<표식>)가 안 맞아 그 주소가 화면에서 사라진다 */
+import { readLinkFixes, humanFixedBy } from './link-fixes-read.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const DRY = process.argv.includes('--dry');
@@ -163,9 +169,8 @@ watchdog.unref();
 /* 끈질김의 규칙 (2026-08-01 개발자 지시: "어떻게든 원문을 찾아서 올려둬라")
    실패해도 **영영 포기하지 않는다.** 다만 같은 것을 매일 두드리면 학교 서버에 무례하고
    시간도 낭비하므로, 실패가 쌓일수록 **간격을 늘려 가며 계속 시도한다.**
-   3회째에 사람에게 알리지만(이슈), 그 뒤로도 로봇은 계속 찾아본다. */
-const ESCALATE_AT = 3;                       // 이 횟수에서 사람에게 알린다 (중단이 아니다)
-const BACKOFF_DAYS = [0, 1, 1, 3, 7, 14, 30]; // 실패 n회 뒤 며칠 있다 다시 볼지 (마지막 값이 상한)
+   3회째에 사람에게 알리지만(이슈), 그 뒤로도 로봇은 계속 찾아본다.
+   (ESCALATE_AT·BACKOFF_DAYS 는 link-hunt-rules.mjs 에 있다 — 🔴 알림은 3단계까지 실패한 뒤에만 센다 · 2026-10-04) */
 const startedAt = Date.now();
 const outOfTime = () => Date.now() - startedAt > BUDGET_MS;
 
@@ -178,13 +183,21 @@ let state = { updatedAt: null, items: {} };
 try { state = JSON.parse(fs.readFileSync(statePath, 'utf8')); } catch { /* 첫 실행 */ }
 state.items = state.items || {};
 
-/* 사냥 대상 모으기 — 학교를 가리지 않는다 */
+/* 사냥 대상 모으기 — 학교를 가리지 않는다.
+   🔴 관리자가 이미 원문을 넣은 공고(data/link-fixes.json — 앱과 같은 판정 humanFixedBy)는 빼고 센다 (2026-10-04).
+      표식을 바꾸면 관리자 열쇠(u:<표식>)가 안 맞아 관리자가 넣은 주소가 학생 화면에서 소리 없이 사라진다. */
+const humanFixed = humanFixedBy(readLinkFixes(new URL('../data/link-fixes.json', HERE)));
+const heldByAdmin = [];
 const targets = [];
 for (const n of notices.items || []) {
-  if (isMarkerUrl(n.url)) targets.push({ ref: n, field: 'url', title: n.title, key: `n:${n.url}`, school: n.school });
+  if (!isMarkerUrl(n.url)) continue;
+  if (humanFixed(n)) { heldByAdmin.push(n.title); continue; }
+  targets.push({ ref: n, field: 'url', title: n.title, key: `n:${n.url}`, school: n.school });
 }
 for (const r of registered.items || []) {
-  if (isMarkerUrl(r.sourceUrl)) targets.push({ ref: r, field: 'sourceUrl', title: r.name, key: `r:${r.id}`, id: r.id, school: (r.eligibility || {}).schoolOnly });
+  if (!isMarkerUrl(r.sourceUrl)) continue;
+  if (humanFixed(r)) { heldByAdmin.push(r.name); continue; }
+  targets.push({ ref: r, field: 'sourceUrl', title: r.name, key: `r:${r.id}`, id: r.id, school: (r.eligibility || {}).schoolOnly });
 }
 /* 게시판에서 행을 찾을 때 쓰는 제목은 **게시판에 적힌 원래 제목**이어야 한다.
    앱에 보여주는 이름(r.name)은 사람이 다듬은 것이라("전문자격장학 (2026-2학기)")
@@ -229,6 +242,7 @@ function sameOriginTitles(url, exclude = []) {
 }
 
 const report0 = [];
+if (heldByAdmin.length) report0.push(`- 관리자가 원문 주소를 넣은 공고 ${heldByAdmin.length}건은 건드리지 않았습니다(관리자 화면 「원문 링크」)`);
 
 /* 되돌릴 때 쓸 '그 공고가 있던 게시판 목록 주소'를 찾는다.
    같은 호스트의 다른 공고가 이미 표식(#n-)을 달고 있으면 그 목록 주소를 쓰고,
@@ -335,7 +349,8 @@ for (const t of active) {
 }
 
 const report = [`## 🎯 링크 사냥꾼 리포트 (${new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 16).replace('T', ' ')} KST)`, ''];
-report.push(`사냥 대상 **${active.length}건** (게시판 ${boards.size}곳) · 포기 처리된 건 ${skipped.length}건`);
+/* 쉬는 건은 포기가 아니다 — 실패가 쌓여 간격을 두고 다시 찾을 날을 기다리는 것이다(2026-10-04 · 이슈 #387 의 '포기 처리된 건'은 틀린 말이었다) */
+report.push(`사냥 대상 **${active.length}건** (게시판 ${boards.size}곳) · 다음 시도 날을 기다리는 건 ${skipped.length}건`);
 report0.forEach((l) => report.push(l));
 report.push('');
 
@@ -426,6 +441,16 @@ async function scrapeForms(page) {
     fields: [...f.querySelectorAll('input,select')].map((i) => `${i.name}=${i.value}`).filter((x) => !x.startsWith('=')).slice(0, 16).join('&'),
   }))).catch(() => []);
 }
+/* 다음 묶음 단추('다음'·'›'·'»'·'next')가 화면에 있나 — 쪽 번호가 10개씩 묶인 게시판은 11쪽 번호가 안 보여도 목록의 끝이 아니다 */
+async function hasNextControl(page) {
+  /* 마지막 쪽에서도 꺼진 '다음' 단추를 그대로 두는 게시판이 있다 — 그때도 '더 있을 수 있음'으로 본다(내려갔다고 잘못 말하지 않는 쪽) */
+  return page.evaluate(() => [...document.querySelectorAll('a, button, [onclick]')].some((e) => {
+    const txt = (e.textContent || '').replace(/\s+/g, ' ').trim();
+    const meta = `${e.getAttribute('title') || ''} ${e.getAttribute('aria-label') || ''} ${typeof e.className === 'string' ? e.className : ''}`;
+    if (/이전|prev|처음|first/i.test(`${txt} ${meta}`)) return false;
+    return /^(다음|다음 ?페이지|다음 ?목록|다음 ?10|next|›|»|>|＞|>>|▶|▷)$/i.test(txt) || /next|다음/i.test(meta);
+  })).catch(() => false);
+}
 async function gotoPage(page, n) {
   return page.evaluate((num) => {
     const cands = [...document.querySelectorAll('a, button, [onclick]')].filter((e) => (e.textContent || '').trim() === String(num));
@@ -504,23 +529,12 @@ async function runPatrol() {
 
 report.push('## 1단계 · 사냥 (원문 공고가 안 열리는 링크 고치기 — 본업)');
 
-function record(t, outcome, why) {
+/* 장부 한 줄 고치기 — 규칙은 link-hunt-rules.mjs recordAttempt 한 곳.
+   🔴 여기서 사람에게 알릴 건(stuck)을 세지 않는다 — 3단계가 같은 실행에서 찾아낼 수 있다(이슈 #387). 세는 곳은 3단계 뒤 한 곳.
+   scan: '목록에서 못 찾음'일 때 목록을 끝까지 봤나('end') · 더 있을 수 있나('deep') — 'deep' 이면 '내려간 듯'으로 적지 않는다 */
+function record(t, outcome, why, scan) {
   const st = state.items[t.key] || { attempts: 0, title: String(t.title).slice(0, 80) };
-  st.lastTried = today;
-  st.lastWhy = why || '';
-  if (outcome === 'ok') { st.status = 'resolved'; st.resolvedUrl = t.ref[t.field]; st.attempts = 0; }
-  else if (outcome === 'net') { st.lastWhy = why; }          // 못 읽음은 횟수에 안 센다
-  else {
-    st.attempts = (st.attempts || 0) + 1;
-    // 다음에 언제 다시 볼지 — 실패가 쌓일수록 간격을 늘린다 (그래도 계속 본다)
-    const wait = BACKOFF_DAYS[Math.min(st.attempts, BACKOFF_DAYS.length - 1)];
-    const d = new Date(Date.now() + 9 * 3600000 + wait * 86400000);
-    st.nextTryAt = d.toISOString().slice(0, 10);
-    st.status = '';                                   // 영구 포기 상태를 두지 않는다
-    if (st.attempts === ESCALATE_AT) { st.escalated = true; stuck += 1; }  // 사람에게 한 번 알림
-    if (why === '목록에서 못 찾음' && st.attempts >= ESCALATE_AT) st.likelyGone = true;
-  }
-  state.items[t.key] = st;
+  state.items[t.key] = recordAttempt(st, outcome, why, { today, url: t.ref[t.field], scan });
 }
 
 for (const [listUrl, group] of boards) {
@@ -539,14 +553,17 @@ for (const [listUrl, group] of boards) {
   /* 페이지를 넘기며, 각 페이지에서 '이 페이지에 있는 대상'을 그 자리에서 처리한다.
      (행 번호는 페이지를 넘기면 달라지므로, 찾은 페이지에서 바로 눌러야 한다) */
   const remaining = new Map(group.map((t) => [t.key, t]));
+  /* 어디서 멈췄나 — '목록에서 못 찾음'이 '게시판에서 내려간 듯'의 근거가 되는 것은 목록 끝까지 봤을 때뿐이다(listScanEnd) */
+  let stop = 'max-pages'; let nextControl = false;
   for (let pageNo = 1; pageNo <= MAX_PAGES && remaining.size; pageNo += 1) {
+    if (outOfTime()) { stop = 'out-of-time'; break; }
     if (pageNo > 1) {
       const moved = await gotoPage(page, pageNo);
-      if (!moved) break;
+      if (!moved) { stop = 'no-next'; nextControl = await hasNextControl(page); break; }
       await page.waitForTimeout(3000);
     }
     let rows = await scrapeRows(page);
-    if (!rows.length) break;
+    if (!rows.length) { stop = 'no-rows'; break; }
 
     for (const t of [...remaining.values()]) {
       if (outOfTime()) break;
@@ -659,12 +676,16 @@ for (const [listUrl, group] of boards) {
       await new Promise((r) => setTimeout(r, 2500));
     }
   }
-  // 모든 페이지를 봐도 못 찾은 것 = 게시판에서 내려갔을 가능성
+  /* 본 쪽에서 못 찾은 것 — 목록 끝까지 봤으면 '내려갔을 수 있다', 쪽수·시간 상한에서 멈췄으면 '더 뒤에 있을 수 있다'.
+     🔴 (2026-10-04) 예전엔 어디서 멈췄든 3회면 likelyGone 을 붙였다 — 경희 7월 글 3건·가천 전체공지 글이 읽은 쪽 너머에 멀쩡히 있었다. */
+  const scan = listScanEnd({ stop, nextControl });
   for (const t of remaining.values()) {
+    /* 시간 상한으로 목록을 다 못 본 공고는 '못 찾음'이 아니라 '못 해 봄'이다 — 횟수에 세지 않는다(다음 실행이 다시 본다) */
+    if (stop === 'out-of-time') { record(t, 'net', '시간 상한 — 목록을 다 못 봄'); report.push(`  - ⏱ 시간 상한 — 다음 실행에서: ${huntTitle(t).slice(0, 46)}`); continue; }
     failed += 1;
-    record(t, 'bad', '목록에서 못 찾음');
+    record(t, 'bad', '목록에서 못 찾음', scan);
     const st = state.items[t.key];
-    report.push(`  - ⚠️ 목록에서 못 찾음 (${st.attempts}회째 · 계속 다시 찾습니다): ${huntTitle(t).slice(0, 46)}`);
+    report.push(`  - ⚠️ 목록에서 못 찾음 (${st.attempts}회째 · ${scan === 'end' ? '목록 끝까지 봄' : '읽은 쪽 너머에 있을 수 있음'} · 계속 다시 찾습니다): ${huntTitle(t).slice(0, 46)}`);
   }
   await page.close().catch(() => {});
   report.push('');
@@ -687,6 +708,7 @@ for (const [, group] of boards) {
   }
 }
 let extraFound = 0;
+const stage3Failed = new Set();   // 3단계까지 해 보고도 못 찾은 공고 — 사람에게 알릴 건은 여기서만 고른다(아래 settleEscalation)
 if (stillLost.length && !outOfTime()) {
   report.push('## 3단계 · 끈질기게 (다른 게시판 · 학교 사이트 검색)');
   report.push(`- 아직 못 찾은 ${stillLost.length}건에 대해 다른 방법을 시도합니다`);
@@ -769,12 +791,20 @@ if (stillLost.length && !outOfTime()) {
       record(t, 'ok');
       report.push(`  - ✅ 다른 경로에서 찾음: ${want.slice(0, 40)} → ${got.slice(0, 100)}`);
     } else {
+      stage3Failed.add(t.key);
       report.push(`  - ⚠️ 다른 경로에서도 못 찾음 (${tried.length}곳 시도): ${want.slice(0, 40)}`);
     }
     await new Promise((r) => setTimeout(r, 900));
   }
   report.push(`- 3단계 추가 확보: ${extraFound}건`);
   report.push('');
+}
+
+/* 사람에게 알릴 건 — **3단계까지 해 보고도 못 찾은 것**만, 실패가 ESCALATE_AT 회 쌓였을 때 한 번 (2026-10-04 · 이슈 #387).
+   예전엔 1단계가 세 번째 실패를 적는 순간 셌다 — 같은 실행의 3단계가 그 공고를 찾아냈는데도 '3회 못 찾은 공고 1건' 이슈가 열렸다.
+   시간이 모자라 3단계를 못 해 본 공고는 이번에 세지 않는다(다음 실행이 3단계까지 해 보고 센다). */
+for (const t of stillLost) {
+  if (stage3Failed.has(t.key) && settleEscalation(state.items[t.key])) stuck += 1;
 }
 
 /* 저장·리포트를 한 곳에 모아 둔다 — 정상 종료도, 넘어졌을 때도 **같은 길로** 저장한다.
