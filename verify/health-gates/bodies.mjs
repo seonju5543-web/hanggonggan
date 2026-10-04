@@ -18,6 +18,7 @@ import { fileURLToPath } from 'node:url';
 import { cleanEnv, stripYamlComments } from './gate.mjs';
 import { canonUrl } from '../../collector/canon-url.mjs';
 import { restingAfterOk, closedForStudents, orderTargets, ledgerEntry, newAttachments } from '../../collector/rescue-plan.mjs';
+import { slugOf, attSig, missWait, pickEligDocTargets } from '../../collector/elig-attach-plan.mjs';
 
 const kstToday = () => new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
 const shift = (day, n) => new Date(Date.parse(day) + n * 86400000).toISOString().slice(0, 10);
@@ -38,7 +39,7 @@ export function sandbox(root, prefix = 'hdj-bodies-') {
     dir, abs,
     write(rel, body) {
       fs.mkdirSync(path.dirname(abs(rel)), { recursive: true });
-      fs.writeFileSync(abs(rel), typeof body === 'string' ? body : `${JSON.stringify(body, null, 1)}\n`);
+      fs.writeFileSync(abs(rel), (typeof body === 'string' || Buffer.isBuffer(body)) ? body : `${JSON.stringify(body, null, 1)}\n`);
     },
     read(rel) { try { return fs.readFileSync(abs(rel), 'utf8'); } catch { return null; } },
     json(rel) { try { return JSON.parse(fs.readFileSync(abs(rel), 'utf8')); } catch { return null; } },
@@ -310,6 +311,94 @@ export default async function bodies(eq, ctx) {
         [/pip install[^\n]*paddleocr==[\d.]+[^\n]*\|\| true/.test(y), /pip install[^\n]*paddleocr==[\d.]+ \|\| echo "::warning::/.test(y),
           /paddle-ocr\.py[^\n]*\|\| true/.test(y), /paddle-ocr\.py collector\/act-files --budget-sec=\d+ \|\| echo "::warning::/.test(y)],
         [false, true, false, true]);
+    }
+  }
+  /* ── ③ 자격용 공고문 첨부 받기(deepfetch --elig-attach) — 받은 그대로인 공고는 다시 안 받는다 · 파생 글자 보존 (bodies-3·bodies-5) ── */
+  {
+    const today = '2026-10-04';
+    const now = new Date('2026-10-04T03:00:00Z');
+    const att = (n) => [{ name: `2026 장학생 선발 공고문 ${n}.hwp`, url: `https://f.example/${n}.hwp` }];
+    const items = [];
+    const index = {};
+    const onDisk = new Set();
+    for (let i = 1; i <= 6; i++) {   // 1~6 은 받은 그대로 — 색인·파일 있음 · 서명 같음
+      items.push({ id: `n${i}`, name: `공고 ${i}`, attachments: att(i), listedAt: today });
+      index[`n${i}`] = { slug: slugOf(`공고 ${i}`), files: [`elig-${i}.hwp`], sig: attSig(att(i)) };
+      onDisk.add(`elig-${i}.hwp`);
+    }
+    items.push({ id: 'n7', name: '공고 7', attachments: att(7), listedAt: today });                     // 처음
+    items.push({ id: 'n8', name: '공고 8', attachments: att(8), listedAt: today });                     // 처음
+    items.push({ id: 'n9', name: '공고 9', attachments: att(9), deadline: '2026-10-03' });             // 마감 어제
+    items.push({ id: 'n10', name: '공고 10', attachments: att('10-새판'), listedAt: today });            // 첨부 이름이 바뀜
+    index.n10 = { slug: slugOf('공고 10'), files: ['elig-10.hwp'], sig: attSig(att(10)) }; onDisk.add('elig-10.hwp');
+    items.push({ id: 'n11', name: '공고 11', attachments: att(11), listedAt: today });                   // 서명 칸 없는 옛 색인
+    index.n11 = { slug: slugOf('공고 11'), files: ['elig-11.hwp'] }; onDisk.add('elig-11.hwp');
+    items.push({ id: 'n12', name: '공고 12', attachments: att(12), listedAt: today });                   // 오늘 하나도 못 받음 — 쉰다
+    index.n12 = { slug: slugOf('공고 12'), files: [], tried: { sig: attSig(att(12)), at: today, miss: 1 } };
+    items.push({ id: 'n13', name: '공고 13', attachments: att(13), listedAt: today });                   // 사흘 전 못 받음 — 다시
+    index.n13 = { slug: slugOf('공고 13'), files: [], tried: { sig: attSig(att(13)), at: '2026-10-01', miss: 1 } };
+    items.push({ id: 'n14', name: '공고 14', attachments: att(14), listedAt: today, eligibilityLines: ['직전학기 평점평균 3.0 이상인 재학생'] });
+    const RL = (it) => it.eligibilityLines || [];
+    const plan = pickEligDocTargets(items, index, { today, now, fileExists: (f) => onDisk.has(f), requirementLines: RL, pickAtts: (it) => it.attachments, max: 6 });
+    eq('③ 받을 차례 — 처음 받는 것(7·8·13) → 첨부가 바뀐 것(10) · 받은 그대로(1~6)·마감 지남(9)·오늘 못 받아 쉬는 것(12)·자격 있는 것(14)은 없다',
+      plan.targets.map((t) => t.it.id), ['n7', 'n8', 'n13', 'n10']);
+    eq('  서명 칸 없는 옛 색인(11)은 다시 받지 않고 서명만 채운다 · 받은 그대로 센 수', [plan.sigOnly.map((s) => s.id), plan.kept], [['n11'], 7]);
+    eq('  하나도 못 받은 공고의 쉼 — 1·2·4·8·14일', [1, 2, 3, 4, 5, 9].map((m) => missWait(m)), [1, 2, 4, 8, 14, 14]);
+  }
+  {
+    const sb3 = sandbox(root, 'hdj-eligatt-');
+    try {
+      sb3.write('fake-fetch.mjs', `import fs from 'node:fs';
+globalThis.fetch = async (url) => {
+  if (process.env.FAKE_FETCH_LOG) fs.appendFileSync(process.env.FAKE_FETCH_LOG, String(url) + '\\n');
+  const body = Buffer.from(('fake ' + url + ' ').repeat(60));
+  return { ok: true, status: 200, headers: new Map(), arrayBuffer: async () => body.buffer.slice(body.byteOffset, body.byteOffset + body.length) };
+};
+`);
+      const today = kstToday();
+      const bytesOf = (u) => Buffer.from(`fake ${u} `.repeat(60));
+      const A = (k, ext = 'hwp') => [{ name: `2026 ${k} 장학생 선발 공고문.${ext}`, url: `https://f.example/${k}.${ext}` }];
+      const reg = { items: [
+        { id: 'S', name: '같은 공고', attachments: A('s'), listedAt: today },
+        { id: 'C', name: '바뀐 목록 같은 바이트', attachments: A('c', 'pdf'), listedAt: today },
+        { id: 'D', name: '바뀐 목록 다른 바이트', attachments: A('d', 'pdf'), listedAt: today },
+        { id: 'N', name: '처음 받는 공고', attachments: A('n'), listedAt: today },
+        { id: 'X', name: '마감 지난 공고', attachments: A('x'), deadline: shift(today, -1) },
+      ] };
+      sb3.write('data/registered.json', reg);
+      sb3.write('data/notices.json', { items: [] });
+      const fileOf = (name, ext) => `elig-${slugOf(name)}-1.${ext}`;
+      const fS = fileOf('같은 공고', 'hwp'), fC = fileOf('바뀐 목록 같은 바이트', 'pdf'), fD = fileOf('바뀐 목록 다른 바이트', 'pdf'), fN = fileOf('처음 받는 공고', 'hwp');
+      sb3.write(`collector/extracted/${fS}`, bytesOf('https://f.example/s.hwp'));
+      sb3.write(`collector/extracted/${fS}.body.txt`, '같은 공고 본문 글자');
+      sb3.write(`collector/extracted/${fC}`, bytesOf('https://f.example/c.pdf'));
+      sb3.write(`collector/extracted/${fC}.ocr.txt`, 'OCR 로 읽은 글자 — 바이트가 같으면 남아야 한다');
+      sb3.write(`collector/extracted/${fD}`, 'old bytes '.repeat(200));
+      sb3.write(`collector/extracted/${fD}.txt`, '옛 판의 글자 — 바이트가 바뀌면 지워야 한다');
+      sb3.write('collector/extracted/elig-docs.json', {
+        S: { slug: slugOf('같은 공고'), files: [fS], sig: attSig(A('s')) },
+        C: { slug: slugOf('바뀐 목록 같은 바이트'), files: [fC], sig: 'oldsignature' },
+        D: { slug: slugOf('바뀐 목록 다른 바이트'), files: [fD], sig: 'oldsignature' },
+      });
+      const log = sb3.abs('fetch.log');
+      const r1 = sb3.run('collector/deepfetch.mjs', ['--elig-attach'], { FAKE_FETCH_LOG: log }, 25000, ['--import', sb3.abs('fake-fetch.mjs')]);
+      const fetched = (sb3.read('fetch.log') || '').split('\n').filter(Boolean).map((u) => u.replace('https://f.example/', '')).sort();
+      const idx = sb3.json('collector/extracted/elig-docs.json') || {};
+      eq('③ 진짜 deepfetch --elig-attach — 받은 그대로(S)·마감 지남(X)은 안 받고, 첨부가 바뀐 것(C·D)과 처음(N)만 받는다',
+        [r1.status, fetched], [0, ['c.pdf', 'd.pdf', 'n.hwp']]);
+      eq('  🔴 받은 바이트가 같으면 파생 글자(.ocr.txt)를 지우지 않는다 · 다르면 그 파생만 지운다 · 다시 받지 않은 공고의 파생은 그대로 (bodies-5)',
+        [sb3.exists(`collector/extracted/${fC}.ocr.txt`), sb3.exists(`collector/extracted/${fD}.txt`), sb3.exists(`collector/extracted/${fS}.body.txt`),
+          sb3.read(`collector/extracted/${fD}`) === bytesOf('https://f.example/d.pdf').toString()],
+        [true, false, true, true]);
+      eq('  색인 — 받은 공고에 파일·서명·날짜 · 서명이 새 첨부 목록으로 · 마감 지난 공고는 색인에 없다',
+        [idx.N && idx.N.files, idx.N && idx.N.sig === attSig(A('n')), idx.C && idx.C.sig === attSig(A('c', 'pdf')), idx.N && idx.N.at === today, 'X' in idx],
+        [[fN], true, true, true, false]);
+      fs.rmSync(log, { force: true });
+      const r2 = sb3.run('collector/deepfetch.mjs', ['--elig-attach'], { FAKE_FETCH_LOG: log }, 25000, ['--import', sb3.abs('fake-fetch.mjs')]);
+      eq('  다음 실행은 아무것도 다시 받지 않는다(예전엔 매 실행 같은 공고를 다시 받으며 파생 글자를 지웠다)',
+        [r2.status, (sb3.read('fetch.log') || '').trim()], [0, '']);
+    } finally {
+      sb3.done();
     }
   }
 }

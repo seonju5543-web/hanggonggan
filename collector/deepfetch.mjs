@@ -8,6 +8,8 @@ import { isHtmlPayload } from './attachment-link.mjs';
 import { FETCH_HEADERS } from './http-headers.mjs';
 import { isNoticeDoc } from './attachment-text.mjs';
 import { canonUrl, normTitle, indexTexts, sourceFor, needsFetch } from './notice-source.mjs';
+/* 자격용 첨부 받기의 '무엇을 받을지'와 파일 이름 표식은 순수 함수 파일 한 곳에 — 이 파일은 불러오는 순간 수집을 시작해 관문이 못 부른다 */
+import { slugOf, pickEligDocTargets } from './elig-attach-plan.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const OUT = new URL('extracted/', HERE);
@@ -213,13 +215,8 @@ console.log(`done: ${texts.length} texts, ${fi} attachments`);
    '스키마화 대기'로 큐에 남아 있던 공고의 원본이 다음 수집 때 사라져, 다음 세션이 양식을
    만들 수 없었다(2026-07-30 발견 — 도레이·염곡·시립대 원본이 이렇게 유실됨).
    그래서 파일 이름에 공고별 표식을 넣고, 이번에 다시 받는 공고의 파일만 갈아끼운다. */
-/* 파일 이름에 넣는 공고별 표식. **양식 수집과 자격 수집이 같은 규칙을 써야** 한 공고의
-   첨부가 두 벌로 쌓이지 않고, 다시 받을 때 옛 파일이 제대로 갈아끼워진다. */
-function slugOf(title) {
-  let h = 0;
-  for (let i = 0; i < title.length; i++) h = (h * 31 + title.charCodeAt(i)) >>> 0;
-  return h.toString(36).slice(0, 6);
-}
+/* 파일 이름에 넣는 공고별 표식(slugOf)은 elig-attach-plan.mjs 에 있다 — 양식 수집과 자격 수집이 같은 규칙을 써야
+   한 공고의 첨부가 두 벌로 쌓이지 않고, 다시 받을 때 옛 파일이 제대로 갈아끼워진다. */
 
 async function downloadForms() {
   /* 표적은 '제목 앞부분'이라 짧으면 엉뚱한 공고까지 몽땅 걸린다.
@@ -291,8 +288,9 @@ async function downloadForms() {
      ① 스스로 예산(ELIG_BUDGET_MS) 안에 끝낸다 — 시간 초과는 강제 종료라 저장까지 죽는다
      ② 요청마다 시한(20초)을 건다 — 학교가 영영 답을 안 줘도 거기서 멈추지 않는다
      ③ 워크플로에서 timeout-minutes + continue-on-error 로 돈다
-   못 받은 것은 다음 실행이 마저 받는다. 자격을 읽은 공고는 대상에서 빠지므로
-   **같은 파일을 매일 다시 받는 일이 구조적으로 없다.** */
+   못 받은 것은 다음 실행이 마저 받는다.
+   ⚠️ 예전 주석은 '자격을 읽은 공고는 대상에서 빠지므로 같은 파일을 매일 다시 받는 일이 없다'고 했지만, 첨부로도 자격을
+      못 읽은 공고는 계속 대상이라 **매 실행 다시 받고 있었다**(2026-10-04 점검 bodies-3). 이제 받은 그대로인 공고는 건너뛴다(elig-attach-plan.mjs). */
 async function downloadEligDocs() {
   const { createRequire } = await import('node:module');
   const { requirementLines } = createRequire(import.meta.url)('../match-engine.js');
@@ -320,37 +318,38 @@ async function downloadEligDocs() {
      안 걸리므로 여기서 따로 통과시킨다. 무료로는 못 읽지만 AI가 그림째 읽는다.
      실측: 넘기려던 공고 7건 전부에 A4 포스터급 그림이 있었다(최대 5906×8268). */
   const IMG_EXT = /\.(png|jpe?g|gif|webp)$/i;
+  /* 공고 하나에서 고르는 첨부 — 공고문(이름 규칙) 또는 본문 그림, 앞 두 개 */
+  const pickAtts = (it) => (it.attachments || []).filter((a) => a.url && (
+    (OK_EXT.test(a.name || '') && isNoticeDoc(a.name)) || (a.bodyImage && IMG_EXT.test(a.name || '')))).slice(0, 2);
 
-  const targets = [];
-  for (const it of reg.items) {
-    if (it.program || requirementLines(it).length) continue;
-    const atts = (it.attachments || []).filter((a) => a.url && (
-      (OK_EXT.test(a.name || '') && isNoticeDoc(a.name)) || (a.bodyImage && IMG_EXT.test(a.name || ''))));
-    if (atts.length) targets.push({ it, atts: atts.slice(0, 2) });
-    if (targets.length >= MAX_NOTICES) break;
-  }
-  console.log(`자격용 공고문 첨부 대상 ${targets.length}건 (예산 ${Math.round(BUDGET_MS / 1000)}초)`);
-  if (!targets.length) return 0;
-
-  /* 파일 이름 표식은 **등록 공고 이름**으로 만든다 — 양식 수집은 수집 목록의 제목을 쓰므로
-     표식이 서로 달라, 아래 '다시 받는 것만 지우기'가 양식 원본을 건드리지 않는다. */
-  const refreshing = new Set(targets.map((t) => slugOf(t.it.name)));
-  for (const f of fs.readdirSync(OUT)) {
-    const m = f.match(/^elig-([a-z0-9]{1,6})-/);
-    if (m && refreshing.has(m[1])) fs.unlinkSync(new URL(f, OUT));
-  }
   const idxPath = new URL('elig-docs.json', OUT);
   let index = {};
   try { index = JSON.parse(fs.readFileSync(idxPath, 'utf8')); } catch { /* 첫 실행 */ }
-  for (const k of Object.keys(index)) if (refreshing.has(index[k].slug)) delete index[k];
+  const today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);   // 마감은 한국 날짜다
+  /* 🔴 **받은 그대로인 공고는 다시 받지 않는다** (2026-10-04 점검 bodies-3·5 — 규칙은 elig-attach-plan.mjs 머리말).
+     예전엔 앞에서 N건을 매 실행 다시 받으며 파생 글자(.txt·.ocr.txt)까지 지워, 뒤의 공고는 한 번도 안 받혔고 OCR 글자는 발췌 전에 사라졌다. */
+  const { targets, sigOnly, kept } = pickEligDocTargets(reg.items, index, {
+    today, fileExists: (f) => fs.existsSync(new URL(f, OUT)), requirementLines, pickAtts, max: MAX_NOTICES });
+  for (const s of sigOnly) index[s.id].sig = s.sig;   // 서명 칸 전의 옛 색인 — 서명만 채운다
+  console.log(`자격용 공고문 첨부 대상 ${targets.length}건 (받은 그대로라 건너뜀 ${kept}건 · 예산 ${Math.round(BUDGET_MS / 1000)}초)`);
+  if (!targets.length) {
+    if (sigOnly.length) fs.writeFileSync(idxPath, JSON.stringify(index, null, 1));
+    return 0;
+  }
 
   let got = 0;
-  for (const { it, atts } of targets) {
+  for (const { it, atts, sig } of targets) {
     if (Date.now() - startedAt > BUDGET_MS) { console.log('예산 도달 — 나머지는 다음 실행'); break; }
+    /* 파일 이름 표식은 **등록 공고 이름**으로 만든다 — 양식 수집은 수집 목록의 제목을 쓰므로
+       표식이 서로 달라, 아래 '바뀐 것만 지우기'가 양식 원본을 건드리지 않는다. */
     const slug = slugOf(it.name);
+    const prefix = `elig-${slug}-`;
+    const oldNames = fs.readdirSync(OUT).filter((f) => f.startsWith(prefix));   // 원본 + 파생 글자
+    const files = [];
+    let cut = false;
     let ai = 0;
     for (const a of atts) {
-      if (Date.now() - startedAt > BUDGET_MS) break;
+      if (Date.now() - startedAt > BUDGET_MS) { cut = true; break; }
       try {
         const res = await fetch(a.url, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(20000) });
         if (!res.ok) { console.log('elig doc fail', res.status, a.name); continue; }
@@ -366,9 +365,15 @@ async function downloadEligDocs() {
            파일은 멀쩡히 내려받아져 있는데(320KB·1.1MB…) 아무도 못 읽는 상태였다. */
         const ext = (a.name.match(/\.(hwp|hwpx|docx?|pdf|png|jpe?g|gif|webp)$/i) || [, 'bin'])[1].toLowerCase();
         const fname = `elig-${slug}-${ai}.${ext}`;
-        fs.writeFileSync(new URL(fname, OUT), buf);
-        (index[it.id] ||= { slug, files: [] }).files.push(fname);
-        console.log('elig doc ok:', it.id, a.name, buf.length);
+        /* 🔴 받은 바이트가 지금 파일과 같으면 파생 글자(.txt·.body.txt·.ocr.txt)를 지우지 않는다(bodies-5) — 다르면 그 파일의 파생만 지운다 */
+        const target = new URL(fname, OUT);
+        const same = fs.existsSync(target) && fs.readFileSync(target).equals(buf);
+        if (!same) {
+          for (const d of oldNames) if (d.startsWith(`${fname}.`)) fs.rmSync(new URL(d, OUT), { force: true });
+          fs.writeFileSync(target, buf);
+        }
+        files.push(fname);
+        console.log('elig doc ok:', it.id, a.name, buf.length, same ? '(그대로)' : '');
       /* 🔴 오류를 낱말 하나로 뭉개지 말 것 (2026-08-23). `e.name || e.message` 는
          Node fetch 의 연결 실패를 전부 `TypeError` 한 낱말로 줄여 버려, 조선대 공고문
          PDF가 왜 안 받아지는지 알 수 없었다. 진짜 원인은 `cause` 안에 들어 있다
@@ -378,6 +383,19 @@ async function downloadEligDocs() {
           .filter(Boolean).join(' · ').slice(0, 200);
         console.log('elig doc err', a.name, why);
       }
+    }
+    const prev = index[it.id];
+    const miss = (prev && prev.tried && prev.tried.sig === sig ? prev.tried.miss || 0 : 0) + 1;
+    if (files.length) {
+      /* 이번에 안 받은 옛 파일(번호가 줄었거나 확장자가 바뀐 것)과 그 파생 글자는 지운다 · 같은 표식을 쓰던 다른 공고의 색인은 뺀다(파일이 갈렸다) */
+      for (const f of oldNames) if (!files.some((x) => f === x || f.startsWith(`${x}.`))) fs.rmSync(new URL(f, OUT), { force: true });
+      for (const k of Object.keys(index)) if (k !== it.id && index[k].slug === slug) delete index[k];
+      /* 다 받았을 때만 서명을 적는다 — 일부만 받았으면(내려받기 실패·예산) 서명을 비워 다음 실행이 다시 받는다 */
+      index[it.id] = files.length === atts.length ? { slug, files, sig, at: today }
+        : { slug, files, sig: null, at: today, ...(cut ? {} : { tried: { sig, at: today, miss } }) };
+    } else if (!cut) {
+      /* 하나도 못 받았다 — 받아 둔 옛 파일·색인은 그대로 두고(그 글자는 아직 쓸 만하다) 쉬었다 다시 해 본다(elig-attach-plan missWait) */
+      index[it.id] = { ...(prev || { slug, files: [] }), tried: { sig, at: today, miss } };
     }
   }
   fs.writeFileSync(idxPath, JSON.stringify(index, null, 1));
