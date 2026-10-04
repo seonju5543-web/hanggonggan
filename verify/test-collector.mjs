@@ -7350,8 +7350,8 @@ console.log('\n■ 시작 화면 — 승인받은 컷 A 그대로인가 (2026-09
     /'--start-dur'/.test(mont) && !/setTimeout\([^)]*,\s*\d/.test(mont), true);
   eq('덮개가 열리는 순간에 시작한다 (whenBootOpen · boot:open)', /whenBootOpen\(/.test(mont) && /'boot:open'/.test(app), true);
   const bootJs = readText(new URL('boot.js', root));
-  eq("  boot.js 가 열림 단계에서 그 신호를 보낸다 ('boot-open' 바로 뒤)",
-    /classList\.add\('boot-open'\);[\s\S]{0,400}dispatchEvent\(new Event\('boot:open'\)\)/.test(bootJs), true);
+  eq("  boot.js 가 걷히기 시작할 때 그 신호를 보낸다 ('boot-fade' 바로 뒤)",
+    /classList\.add\('boot-fade'\);[\s\S]{0,400}dispatchEvent\(new Event\('boot:open'\)\)/.test(bootJs), true);
   eq('마지막 장면은 .last (멈춘 채 남는다 · 한 번 재생)', /'last' : 'run'/.test(mont), true);
   /* 🔴 되돌아와도 다시 돌지 않는다 — display:none 에서 다시 보이면 CSS 애니메이션이 처음부터 다시 돈다(실측) */
   eq('  다 돌면 멈춘 상태를 굳힌다 (start-done — 1단계에서 돌아와도 셋이 다시 돌지 않는다)',
@@ -7580,63 +7580,112 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
     [wordIn.dur, wordIn.delay], [useOf(bootMock, 'boot-in-word').dur, useOf(bootMock, 'boot-in-word').delay]);
   eq('시안의 도는 표시 지연이 앱과 같다', spinIn.delay, useOf(bootMock, 'boot-spin-in').delay);
 
-  /* ⑩ 🔴 부팅 화면의 **걷힘 움직임** (2026-09-11 개발자 지시 — 카카오웹툰 환영 화면 참고:
-     "한대장 또한 스플래시에서 다음과 같은 인터랙션이 있었으면 좋겠어").
-     페이드가 아니라 로고가 세로 막대로 접혔다가(.boot-fold) 그 자리에 뚫린 구멍이 커지며
-     앱이 열린다(.boot-open). 설계 문서 '걷힘 움직임' 절. 여기서 지키는 것은 다섯 —
-     값이 어긋나면 화면은 멀쩡해 보이면서 조용히 나빠지는 유형이라 글로만 두면 되돌아간다. */
+  /* ⑩ 🔴 부팅 화면의 **걷힘 움직임** — 페이드 (2026-10-04 개발자 결정: "둘 다 페이드로").
+     로고·글자가 살짝 커지며 흐려지고 덮개가 투명해지며 밑의 앱이 드러난다(.boot-fade).
+     (2026-09-11 의 접힘·구멍 걷힘을 대신한다.) 값이 어긋나면 화면은 멀쩡해 보이면서 조용히
+     나빠지는 유형이라 글로만 두면 되돌아간다. */
   const bootBlock = css.slice(css.indexOf('#boot {'), css.indexOf('.resume-card {'));
   const msVar = (text, name) => {
     const m = text.match(new RegExp('\\s' + name + ':\\s*([\\d.]+)(ms|s)\\b'));
     return m ? Number(m[1]) * (m[2] === 's' ? 1000 : 1) : NaN;
   };
-  const foldMs = msVar(bootBlock, '--boot-fold');
-  const holdMs = msVar(bootBlock, '--boot-hold');
-  const openMs = msVar(bootBlock, '--boot-open');
-  eq('걷힘에 접힘 단계가 있다 (--boot-fold)', Number.isFinite(foldMs) && foldMs > 0, true);
-  eq('접힌 막대에서 쉬는 시간이 CSS 에 있다 (--boot-hold — JS 에 숫자로 두면 합계에서 빠진다)',
-    Number.isFinite(holdMs) && holdMs >= 0, true);
-  eq('걷힘에 열림 단계가 있다 (--boot-open)', Number.isFinite(openMs) && openMs > 0, true);
-  /* ㉮ 바닥값(1초) **뒤에** 붙는 시간이라 길수록 그대로 앱이 느려 보인다 — 0.8초가 천장이다.
-     쉼까지 셋을 합쳐 잰다(2026-09-11 코드 리뷰: 쉼이 JS 에만 있어 합계에서 빠져 있었다). */
-  eq('접힘+쉼+열림이 0.8초를 넘지 않는다 (바닥값 뒤에 붙는 시간이라 그대로 느려 보인다)',
-    foldMs + holdMs + openMs <= 800, true, `${foldMs}+${holdMs}+${openMs}`);
-  /* ㉯ 접힘은 transition 이 아니라 keyframes — 등장 애니메이션(both)이 쥔 transform 은
-     transition 으로 안 이어진다(260ms 가 한 프레임에 툭 바뀌었다 · 녹화로 확인) */
-  eq('접힘은 keyframes 애니메이션이다 (transition 은 등장 애니메이션이 쥔 속성을 못 움직인다)',
-    /#boot\.boot-fold \.boot-logo\s*\{[^}]*animation:\s*boot-fold-logo/.test(bootBlock)
-      && /@keyframes boot-fold-logo/.test(bootBlock), true);
-  eq('걷힘에 infinite 가 없다', /boot-fold[^;]*infinite|boot-open[^;]*infinite/.test(bootBlock), false);
-  /* ㉰ 열림은 덮개에 뚫는 구멍이다 — 막대를 따로 흐리게 하면 '막대가 창이 된다'가 깨진다 */
-  eq('열림은 덮개의 구멍(clip-path polygon evenodd)이다',
-    /#boot\.boot-open\s*\{[^}]*clip-path:\s*polygon\(evenodd/.test(bootBlock), true);
-  eq('열림 단계에서 막대를 따로 흐리게 하지 않는다 (구멍이 막대까지 같이 잘라낸다)',
-    /#boot\.boot-open \.boot-logo\s*\{[^}]*opacity/.test(bootBlock), false);
-  /* ㉱ 걷히기 시작하면 도는 표시를 끈다 — 걷힘이 1.2초를 넘겨 표시가 스며 나오던 것(실측) */
+  const fadeMs = msVar(bootBlock, '--boot-fade');
+  eq('걷힘의 길이가 CSS 에 있다 (--boot-fade)', Number.isFinite(fadeMs) && fadeMs > 0, true);
+  /* ㉮ 바닥값 **뒤에** 붙는 시간이라 길수록 그대로 앱이 느려 보인다 — 옛 걷힘의 천장(0.8초)을 그대로 둔다 */
+  eq('걷힘이 0.8초를 넘지 않는다 (바닥값 뒤에 붙는 시간이라 그대로 느려 보인다)', fadeMs <= 800, true, String(fadeMs));
+  eq('옛 접힘·구멍 걷힘이 남아 있지 않다 (두 걷힘이 섞이면 한 화면이 두 번 닫힌다)',
+    /--boot-fold|--boot-open|boot-fold-logo|polygon\(evenodd/.test(bootBlock), false);
+  eq('걷힘은 덮개를 투명하게 한다 (#boot.boot-fade 에 opacity 0 + transition)',
+    /#boot\.boot-fade\s*\{[^}]*opacity:\s*0;[^}]*transition:\s*opacity var\(--boot-fade\)/.test(bootBlock), true);
+  /* ㉯ 로고·글자는 transition 이 아니라 keyframes — 등장 애니메이션(both)이 쥔 transform 은
+     transition 으로 안 이어진다(2026-09-11 녹화로 확인한 성질 · 260ms 가 한 프레임에 툭 바뀌었다) */
+  eq('로고·글자의 걷힘은 keyframes 애니메이션이다',
+    /#boot\.boot-fade \.boot-logo,\s*#boot\.boot-fade \.boot-word\s*\{\s*animation:\s*boot-fade-out/.test(bootBlock)
+      && /@keyframes boot-fade-out/.test(bootBlock), true);
+  eq('걷힘에 infinite 가 없다', /boot-fade[^;]*infinite/.test(bootBlock), false);
+  eq('투명해지는 동안 덮개가 터치를 먹지 않는다 (밑의 앱이 받는다)',
+    /#boot\.boot-fade\s*\{[^}]*pointer-events:\s*none/.test(bootBlock), true);
+  /* ㉰ 걷히기 시작하면 도는 표시를 끈다 — 앱이 제때 왔는데 기다리는 표시가 스며 나오는 모순 */
   eq('걷히기 시작하면 도는 표시를 끈다',
-    /#boot\.boot-fold \.boot-spin\s*\{[^}]*animation:\s*none;\s*opacity:\s*0/.test(bootBlock), true);
-  /* ㉲ boot.js 는 시간을 CSS 에서 **읽기만** 한다 — 숫자를 두 곳에 적으면 한쪽만 고쳐져 어긋난다 */
+    /#boot\.boot-fade \.boot-spin\s*\{[^}]*animation:\s*none;\s*opacity:\s*0/.test(bootBlock), true);
+  /* ㉱ boot.js 는 시간을 CSS 에서 **읽기만** 한다 — 숫자를 두 곳에 적으면 한쪽만 고쳐져 어긋난다 */
   const doneBody = bootJs2.slice(bootJs2.indexOf('window.bootDone'));
-  eq('boot.js 가 걷힘 시간을 CSS 에서 읽는다',
-    /--boot-fold/.test(doneBody) && /--boot-hold/.test(doneBody) && /--boot-open/.test(doneBody), true);
-  /* 두 번째 인자가 숫자로 **시작**하는 setTimeout 을 잡는다 — `}, 440)` · `, 60 + foldMs)` ·
-     `, 0.44 * 1000)` · `setTimeout(hide, 440)` 전부. `openMs + 20` 처럼 변수로 시작하면 통과. */
+  eq('boot.js 가 걷힘 시간을 CSS 에서 읽는다', /getPropertyValue\('--boot-fade'\)/.test(doneBody), true);
+  /* 두 번째 인자가 숫자로 **시작**하는 setTimeout 을 잡는다 — `}, 440)` · `, 60 + x)` · `, 0.44 * 1000)` 전부.
+     `fadeMs + 20` 처럼 변수로 시작하면 통과. */
   eq('boot.js 가 걷힘 시간을 숫자로 적어 두지 않는다 (setTimeout 두 번째 인자가 숫자로 시작하면 안 된다)',
     /,\s*\d[\d.]*\s*(?:\)|\*|\+|-)/.test(doneBody), false);
-  eq('boot.js 가 접힘·열림 두 단계를 차례로 켠다',
-    doneBody.indexOf("'boot-fold'") > 0 && doneBody.indexOf("'boot-open'") > doneBody.indexOf("'boot-fold'"), true);
-  /* ㉳ 움직임 줄이기 기기에서는 접지도 열지도 않는다 — 둘 다 0 이면 boot.js 도 곧바로 넘긴다 */
-  eq('움직임 줄이기에서 세 값을 0 으로 준다',
-    /#boot\s*\{\s*--boot-fold:\s*0ms;\s*--boot-hold:\s*0ms;\s*--boot-open:\s*0ms;/.test(reduce.slice(0, 900)), true);
-  eq('움직임 줄이기에서 구멍을 뚫지 않는다',
-    /#boot\.boot-fold,\s*#boot\.boot-open\s*\{\s*clip-path:\s*none/.test(reduce.slice(0, 900)), true);
-  /* ㉴ 시안과 갈라지지 않는다 — 값을 못 박지 않고 둘이 같은가만 잰다 */
-  eq('시안의 접힘 길이가 앱과 같다', msVar(bootMock, '--boot-fold'), foldMs);
-  eq('시안의 쉼 길이가 앱과 같다', msVar(bootMock, '--boot-hold'), holdMs);
-  eq('시안의 열림 길이가 앱과 같다', msVar(bootMock, '--boot-open'), openMs);
+  /* ㉲ 움직임 줄이기 기기에서는 흐리지 않고 곧바로 사라진다 — 0 이면 boot.js 도 곧바로 넘긴다 */
+  eq('움직임 줄이기에서 걷힘 길이를 0 으로 준다', /#boot\s*\{\s*--boot-fade:\s*0ms;/.test(reduce.slice(0, 900)), true);
+  /* ㉳ 시안과 갈라지지 않는다 — 값을 못 박지 않고 둘이 같은가만 잰다 */
+  eq('시안의 걷힘 길이가 앱과 같다', msVar(bootMock, '--boot-fade'), fadeMs);
   eq('시안의 스크립트도 시간을 CSS 에서 읽는다 (숫자를 박으면 CSS 를 고칠 때 어긋난다)',
-    /getPropertyValue\('--boot-fold'\)|ms\('--boot-fold'\)/.test(bootMock)
-      && !/,\s*\d[\d.]*\s*\+\s*\d/.test(bootMock.slice(bootMock.indexOf('<script>'))), true);
+    /ms\('--boot-fade'\)/.test(bootMock) && !/,\s*\d[\d.]*\s*\+\s*\d/.test(bootMock.slice(bootMock.indexOf('<script>'))), true);
+
+  /* ⑪ 🔴 **인트로** — 오늘 처음 열었거나 4시간 넘게 쉬었을 때만 (2026-10-04 개발자 승인 · 시안 A안).
+     학사모 선이 그려지고 금색 점이 맺힌 뒤 '한대장' 이 나타나고, 정지했다가 위의 페이드로 걷힌다. */
+  const gapMs = (() => {
+    const m = bootJs2.match(/BOOT_INTRO_GAP_MS\s*=\s*([\d\s*]+);/);
+    return m ? m[1].split('*').reduce((a, b) => a * Number(b.trim()), 1) : NaN;
+  })();
+  /* 🔴 '홈으로 간다'(이어보기 창)와 '인트로가 뜬다'가 같은 순간에 바뀌어야 한다 — 두 곳에 적은 값을 대조한다 */
+  eq('인트로 간격이 이어보기 창(resume.js RESUME_WINDOW_MS)과 같다', gapMs, R.RESUME_WINDOW_MS);
+  eq('인트로 판단이 이어보기 장부의 마지막 시각을 읽는다', /localStorage\.getItem\('handaejang\.resume'\)/.test(bootJs2), true);
+  eq('날짜가 바뀌어도 인트로다 (오늘 처음 연 것)', /toDateString\(\)\s*!==\s*new Date\(nowAt\)\.toDateString\(\)/.test(bootJs2), true);
+  eq('처음 켠 학생에게는 인트로를 보이지 않는다 (온보딩 정문 투어링이 먼저)', /if \(!first\)\s*\{[\s\S]{0,120}handaejang\.resume/.test(bootJs2), true);
+  /* 🔴 글꼴을 기다린 뒤에 돈다 — 안 기다리면 '한대장' 이 뜨기 전에 앱으로 넘어간다(2026-10-04 시안에서 지적) */
+  eq('인트로가 글꼴 준비를 기다린다 (document.fonts.load)', /document\.fonts\.load\([^)]*한대장/.test(bootJs2), true);
+  eq('  그래도 무한정 기다리지는 않는다 (천장)', /setTimeout\(runIntro,\s*BOOT_FONT_WAIT_MS\)/.test(bootJs2), true);
+  eq('  최소 노출 시간을 인트로가 실제로 돈 때부터 센다',
+    /BOOT_INTRO_SHOW_MS\s*-\s*\(Date\.now\(\)\s*-\s*introRunAt\)/.test(bootJs2), true);
+  const introShow = Number((bootJs2.match(/BOOT_INTRO_SHOW_MS\s*=\s*(\d+)/) || [])[1]);
+  const introMock = readText(new URL('../docs/designs/mockups/first-run/Intro.dc.html', import.meta.url));
+  /* 앱의 선택자 하나와 시안의 선택자 하나에서 같은 애니메이션의 길이·늦추기를 읽는다 */
+  const useSel = (text, sel) => {
+    const i = text.indexOf(sel);
+    if (i < 0) return { dur: NaN, delay: NaN, decl: '' };
+    const decl = (text.slice(i).match(/animation:[^;]*;/) || [''])[0];
+    const secs = [...decl.matchAll(/([\d.]+)s\b/g)].map((m) => Number(m[1]) * 1000);
+    return { dur: secs[0], delay: secs[1] || 0, decl };
+  };
+  const PAIRS = [
+    ['로고', '#boot.boot-intro.boot-intro-run .boot-logo {', '.m-run .m-logo {'],
+    ['첫 선', '.boot-logo path:nth-of-type(1) {', '.m-logo path:nth-of-type(1) {'],
+    ['둘째 선', '.boot-logo path:nth-of-type(2) {', '.m-logo path:nth-of-type(2) {'],
+    ['셋째 선', '.boot-logo path:nth-of-type(3) {', '.m-logo path:nth-of-type(3) {'],
+    ['금색 점', '#boot.boot-intro.boot-intro-run .boot-dot {', '.m-run .m-dot {'],
+    ['글자', '#boot.boot-intro.boot-intro-run .boot-word {', '.m-run .m-word {'],
+  ];
+  let introEnd = 0;
+  for (const [label, appSel, mockSel] of PAIRS) {
+    const a = useSel(bootBlock, appSel), m = useSel(introMock, mockSel);
+    eq(`인트로 ${label}의 움직임을 읽어 냈다`, Number.isFinite(a.dur), true);
+    eq(`  시안과 같은 길이·늦추기다 (${label})`, [a.dur, a.delay], [m.dur, m.delay]);
+    eq(`  한 번만 움직인다 (${label})`, /infinite/.test(a.decl), false);
+    introEnd = Math.max(introEnd, a.dur + a.delay);
+  }
+  /* ㉮ 다 나타난 뒤 고요한 정지가 남아야 한다 — 걷히는 순간까지 움직이면 급해 보인다(평소 부팅과 같은 이유) */
+  eq('인트로 움직임이 최소 노출 시간 안에 끝난다 (끝나고 정지가 남는다)', introEnd < introShow, true, `${introEnd} < ${introShow}`);
+  eq('인트로 최소 노출 시간이 시안과 같다', introShow, Number((introMock.match(/INTRO_SHOW_MS\s*=\s*(\d+)/) || [])[1]));
+  eq('인트로 전체(글꼴 천장 + 노출)가 시한(6초)보다 짧다',
+    Number((bootJs2.match(/BOOT_FONT_WAIT_MS\s*=\s*(\d+)/) || [])[1]) + introShow
+      < Number((bootJs2.match(/BOOT_TIMEOUT_MS\s*=\s*(\d+)/) || [])[1]), true);
+  /* 부팅 덮개 블록만, 주석을 걷어 내고 본다 — 주석에는 '왜 넣지 않는가'를 적느라 그 문구가 있다 */
+  const idxHtml = readText(new URL('../index.html', import.meta.url));
+  const bootHtml = idxHtml.slice(idxHtml.indexOf('<div id="boot">'), idxHtml.indexOf('id="boot-fail"')).replace(/<!--[\s\S]*?-->/g, '');
+  eq('부팅 덮개 블록을 읽어 냈다', bootHtml.includes('boot-word'), true);
+  eq('태그라인이 없다 (매일 보는 화면의 광고 · 2026-10-04 개발자 확인)', /한 번에 찾고|장학금은 끝까지/.test(bootHtml), false);
+  /* 🔴 인트로가 평소 지연보다 길어 도는 표시가 매번 스며 나왔다(2026-10-04 브라우저 확인) —
+     인트로 날의 표시는 '글꼴 천장 + 인트로 노출' 이 지난 뒤에야 나와야 한다 */
+  const introSpin = useSel(bootBlock, '#boot.boot-intro .boot-spin {');
+  const spinDelay = (() => { const d = introSpin.decl.split(',').find((x) => x.includes('boot-spin-in')) || '';
+    const secs = [...d.matchAll(/([\d.]+)s\b/g)].map((m) => Number(m[1]) * 1000); return secs[1]; })();
+  eq('인트로 날의 도는 표시는 인트로가 끝난 뒤에야 나온다 (앱이 제때 오면 못 본다)',
+    spinDelay > Number((bootJs2.match(/BOOT_FONT_WAIT_MS\s*=\s*(\d+)/) || [])[1]) + introShow, true, String(spinDelay));
+  eq('움직임 줄이기에서 인트로는 다 그려진 로고 한 장이다',
+    /#boot\.boot-intro \.boot-logo path, #boot\.boot-intro\.boot-intro-run \.boot-logo path \{ animation: none; stroke-dashoffset: 0; \}/.test(reduce.slice(0, 1400)), true);
+  eq('스크립트보다 그림이 먼저 나와도 평소 등장이 시작되지 않는다 (인트로 날 깜빡임 방지)',
+    /html:not\(\[data-boot\]\) \.boot-logo,\s*html:not\(\[data-boot\]\) \.boot-word \{ animation-play-state: paused; \}/.test(css), true);
 
   /* ⑧ 🔴 알림 딥링크는 **공고 목록이 올 때까지 기다린다** (2026-09-09 개발자 지적).
      한 번 보고 없으면 탐색 탭으로 보내던 것이 원인이었다 — 회선이 느린 폰에서는 늘 그랬다. */
