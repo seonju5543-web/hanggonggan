@@ -1,0 +1,32 @@
+# Pages 빌드 깨우기 (2026-10-05)
+#
+# 왜 있나: main 에 사람이 push 해도 GitHub Pages(브랜치 배포 방식)가 빌드를 **안 일으키는** 일이 하루에 두 번 났다
+#   (2026-10-04 22:18·22:49·23:34 · 10-05 새벽 — 오류 기록 없이 빌드 요청 자체가 없었다). 그동안 학생 앱은 옛 판이었다.
+#   빌드는 이미 났으면 한 번 더 지을 뿐이라(같은 판) 해가 없다 — 그래서 main 에 push 가 오면 늘 한 번 요청한다.
+# 확인: verify/check-deploy-sync.js 가 Pages 가 마지막으로 지은 커밋을 main 과 대조한다.
+name: Pages 빌드 깨우기
+
+on:
+  push:
+    branches: ['main']
+  workflow_dispatch:
+
+permissions:
+  pages: write
+  contents: read
+
+concurrency:
+  group: pages-kick
+  cancel-in-progress: true
+
+jobs:
+  kick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Pages 빌드 요청
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          sleep 20   # push 가 스스로 빌드를 일으켰으면 그것과 겹치지 않게 잠깐 기다린다
+          gh api -X POST "repos/${{ github.repository }}/pages/builds" -q .status || echo "요청 실패 — check-deploy-sync 가 다시 알려 준다"
