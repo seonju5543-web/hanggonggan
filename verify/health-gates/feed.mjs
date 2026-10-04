@@ -8,13 +8,15 @@
      ② 고아 파일(publishBySchool · app2-F4/collect-12) — 목록에 글이 없는 학교의 옛 파일은 빈 파일로 · 이미 빈 파일·못 읽는 파일·이름이 안 맞는 파일은 그대로
      ③ 화면 0건 학교(zeroFeedSchools · app2-F2/collect-06) — 리포트 머리 한 줄
      ④ 누락 감사(coverage-rules classifyMiss inLedger · collect-10) — 장부에만 남은 글을 '가진 것'으로 세지 않는다
+     ⑤ 사람이 돌리는 메우기 도구(collector/heal-feed.mjs · collect-01 복구) — 임시 git 저장소에서 사고 직전 커밋을 원천으로 그대로 돌린다
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
-import { stripComments } from './gate.mjs';
+import { cleanEnv, stripComments } from './gate.mjs';
 import { healFromLedger, publishBySchool, zeroFeedSchools, FEED_HEAL_SINCE } from '../../collector/publish-notices.mjs';
 import { dedupeNotices, urlKey, titleKey } from '../../collector/url-key.mjs';
 import { classifyMiss } from '../../collector/coverage-rules.mjs';
@@ -147,4 +149,40 @@ export default async function feed(eq, ctx) {
       [/\[\.\.\.notices, \.\.\.candidates\]/.test(src), /inLedger:/.test(src), /\.\.\/data\/notices\//.test(src), /bySchool\(candidates\)/.test(src)], [false, true, true, true]);
   }
 
+  /* ── ⑤ 사람이 돌리는 메우기 도구 — 임시 git 저장소에서 그대로 돌린다 ── */
+  {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-feed-tool-'));
+    const w = (rel, body) => { fs.mkdirSync(path.dirname(path.join(dir, rel)), { recursive: true }); fs.writeFileSync(path.join(dir, rel), JSON.stringify(body, null, 1)); };
+    const g = (...a) => spawnSync('git', a, { cwd: dir, encoding: 'utf8', env: cleanEnv() });
+    g('init', '-q'); g('config', 'user.email', 'gate@example.com'); g('config', 'user.name', 'gate'); g('config', 'commit.gpgsign', 'false');
+    const day = (d) => new Date(Date.now() - d * 86400000).toISOString().slice(0, 10);   // 도구는 지금 시각으로 60일을 잰다
+    const K = '경희대학교';
+    /* 사고 전 판에는 첨부·읽히는 마감 힌트가 있다 — 그냥 합치면 preferNotice 가 이 옛 판을 골라 고친 주소가 되돌아간다 */
+    const a = { school: K, title: '2026 표본 장학생 선발 안내', url: 'https://k.kr/v?no=1', foundAt: day(1),
+      attachments: [{ name: '신청서.hwp', url: 'https://k.kr/f/1' }], deadlineHint: '신청기간 : 10월 11일까지' };
+    const b = { school: K, title: '2026 표본 재단 장학생 모집', url: 'https://k.kr/v?no=2', foundAt: day(20) };
+    const fileK = `data/notices/${noticeFileKey(K)}.json`;
+    w('data/notices.json', { updatedAt: day(0), items: [a, b] }); w(fileK, { school: K, updatedAt: day(0), items: [a, b] });
+    g('add', '-A'); g('commit', '-qm', '사고 전');
+    const snap = g('rev-parse', 'HEAD').stdout.trim();
+    const a2 = { school: K, title: a.title, url: 'https://k.kr/v?no=1&fixed=1', foundAt: a.foundAt };   // 사고 뒤 링크 로봇이 고친 주소 — 메우기가 되돌리면 안 된다
+    w('data/notices.json', { updatedAt: day(0), items: [a2] }); w(fileK, { school: K, updatedAt: day(0), items: [a2] });
+    g('add', '-A'); g('commit', '-qm', '사고(잘림)');
+    const tool = fileURLToPath(new URL('collector/heal-feed.mjs', root));
+    const run = (...args) => spawnSync(process.execPath, [tool, ...args], { cwd: dir, encoding: 'utf8', env: cleanEnv() });
+    const dry = run('--dry', '--since=0000-00-00', `git:${snap}:data/notices/`);
+    const dryClean = g('status', '--porcelain').stdout.trim() === '';
+    const bad = run('--since=0000-00-00', 'git:없는커밋:data/notices.json');
+    const badClean = g('status', '--porcelain').stdout.trim() === '';
+    const r = run('--since=0000-00-00', `git:${snap}:data/notices/`, `git:${snap}:data/notices.json`);
+    const feedOut = JSON.parse(fs.readFileSync(path.join(dir, 'data/notices.json'), 'utf8')).items;
+    const fileOut = JSON.parse(fs.readFileSync(path.join(dir, fileK), 'utf8')).items;
+    eq('⑤ 메우기 도구 — --dry 와 못 읽는 원천은 아무것도 안 쓴다 · 사고 직전 커밋에서 빠진 글만 메운다',
+      [dry.status, dryClean, bad.status, badClean, r.status], [0, true, 1, true, 0]);
+    eq('  notices.json·학교별 파일 둘 다 · 고친 주소는 그대로 · 메운 글의 foundAt 은 원래 날짜',
+      [feedOut.map((n) => n.url), fileOut.map((n) => n.url), feedOut[1] && feedOut[1].foundAt], [[a2.url, b.url], [a2.url, b.url], b.foundAt]);
+    eq('  JSON.stringify(x, null, 1) 로 저장한다 (로봇과 같은 꼴)',
+      fs.readFileSync(path.join(dir, 'data/notices.json'), 'utf8') === JSON.stringify(JSON.parse(fs.readFileSync(path.join(dir, 'data/notices.json'), 'utf8')), null, 1), true);
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 }
