@@ -23,7 +23,8 @@
 import fs from 'node:fs';
 import { chromium } from 'playwright';
 import { createRequire } from 'node:module';
-import { looseCandidate, findMissing, classifyMiss, coverageOf, fingerprint, dedupeNear } from './coverage-rules.mjs';
+import { looseCandidate, findMissing, classifyMiss, coverageOf, fingerprint, dedupeNear, coverageSets } from './coverage-rules.mjs';
+import { readSchoolFiles } from './publish-notices.mjs';
 import { makeBudget, withDeadline, TIMED_OUT, rotateOrder, nextCursor } from './harvest-budget.mjs';
 import { pageCandidates, samePage } from './paginate.mjs';
 import { isMenuEntry } from './clean-title.mjs';
@@ -74,32 +75,14 @@ const list = order.map((i) => all[i]);
 /* ── 우리가 가진 공고 (읽기만 한다) ───────────────────────────────────────
    🔴 '가진 것' = **학생이 보는 것**(data/notices.json + 앱이 실제로 받는 학교별 파일 data/notices/*.json) + 정식 등록 (2026-10-04 점검 collect-10).
       예전엔 수집기의 후보 장부(candidates.json)까지 '가진 것'으로 세어, 피드에서 빠졌지만 장부에는 남은 글(9-30 병합 사고 215건)이
-      이 감사로 영영 안 보였다. 장부는 따로 두고 원인을 가를 때만 쓴다('수집했지만 피드에서 빠짐' · coverage-rules.mjs classifyMiss). */
+      이 감사로 영영 안 보였다. 목록을 가르는 것은 coverage-rules.mjs coverageSets **한 곳**이다(여기서 합치지 말 것 — 리뷰 R4 ·
+      관문 feed ④ 가 그 함수를 표본으로 잰다). 장부는 원인을 가를 때만 쓴다('수집했지만 피드에서 빠짐' · classifyMiss inLedger). */
 const notices = JSON.parse(fs.readFileSync(new URL('../data/notices.json', HERE), 'utf8')).items || [];
-const schoolFiles = [];
-try {
-  const dir = new URL('../data/notices/', HERE);
-  for (const f of fs.readdirSync(dir)) {
-    if (!/\.json$/.test(f) || f === 'index.json') continue;
-    try { schoolFiles.push(...(JSON.parse(fs.readFileSync(new URL(f, dir), 'utf8')).items || [])); } catch { /* 못 읽는 파일은 건너뛴다 */ }
-  }
-} catch { /* 폴더가 없으면 옛 파일만 본다 */ }
+const schoolFiles = readSchoolFiles();   // 수집기 메우기와 같은 읽기(publish-notices.mjs) — 못 읽는 파일은 건너뛴다
 let candidates = [];
 try { candidates = JSON.parse(fs.readFileSync(new URL('candidates.json', HERE), 'utf8')).items || []; } catch { /* 없어도 된다 */ }
 const registered = JSON.parse(fs.readFileSync(new URL('../data/registered.json', HERE), 'utf8')).items || [];
-const bySchool = (items) => {
-  const m = new Map();
-  for (const n of items) {
-    if (!n || !n.school) continue;
-    if (!m.has(n.school)) m.set(n.school, []);
-    m.get(n.school).push(n.title);
-  }
-  return m;
-};
-const oursBySchool = bySchool(notices.concat(schoolFiles));
-const ledgerBySchool = bySchool(candidates);
-/* 정식 등록 공고도 '우리가 가진 것'이다 — 피드에서 중복 제거로 빠져 있어도 누락이 아니다 */
-const regTitles = registered.map((r) => r.name || r.title).filter(Boolean);
+const have = coverageSets({ notices, schoolFiles, registered, ledger: candidates });
 
 const browser = await chromium.launch({ args: ['--no-sandbox'] });
 const ctx = await browser.newContext({
@@ -186,15 +169,13 @@ for (const t of list) {
 
     /* 같은 공고가 '제목만'과 '제목+조회수·작성일'로 두 번 세어지던 것을 합친다 */
     const boardTitles = dedupeNear([...pageOf.keys()]);
-    const ours = (oursBySchool.get(t.school) || []).concat(regTitles);
-    const missing = findMissing(boardTitles, ours);
+    const missing = findMissing(boardTitles, have.ours(t.school));
     const byCause = {};
-    const ledger = ledgerBySchool.get(t.school) || [];
     for (const m of missing) {
       const cause = classifyMiss(m, {
         keywords: HARVEST_KEYWORDS, isMenuEntry, isAttachmentEntry,
         page: pageOf.get(m), url: urlOf.get(m) || '',
-        inLedger: (title) => findMissing([title], ledger).length === 0,   // 같은 제목 맞추기 규칙(findMissing)을 그대로 쓴다
+        inLedger: (title) => have.inLedger(t.school, title),   // 같은 제목 맞추기 규칙(findMissing) — coverageSets 안
       });
       (byCause[cause] = byCause[cause] || []).push(m);
     }

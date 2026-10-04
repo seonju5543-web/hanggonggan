@@ -73,6 +73,31 @@ export function findMissing(boardTitles, ourTitles) {
   });
 }
 
+/* '우리가 가진 공고'와 '장부에만 있는 글'을 가르는 곳 — 누락 감사(audit-coverage.mjs)가 이 함수 하나로 만든다 (2026-10-04 점검 collect-10 · 리뷰 R4).
+   🔴 가진 것 = **학생이 보는 것**(notices.json + 앱이 실제로 받는 학교별 파일) + 정식 등록. 후보 장부(ledger)는 가진 것에 **섞지 않는다** —
+      섞으면 피드에서 빠졌지만 장부에는 남은 글(9-30 병합 사고 215건)이 이 감사로 영영 안 보인다. 장부는 inLedger 로 원인을 가를 때만 쓴다.
+   감사 스크립트에서 목록을 직접 합치지 말 것 — 그 자리는 관문이 원문 글자로만 잴 수 있어 같은 뜻의 다른 꼴(concat 등)을 못 잡는다.
+   반환: ours(학교) → 제목 목록 · inLedger(학교, 제목) → 장부에 같은 공고가 있나(같은 제목 맞추기 규칙 findMissing). */
+export function coverageSets({ notices = [], schoolFiles = [], registered = [], ledger = [] } = {}) {
+  const bySchool = (items) => {
+    const m = new Map();
+    for (const n of items || []) {
+      if (!n || !n.school || !n.title) continue;
+      if (!m.has(n.school)) m.set(n.school, []);
+      m.get(n.school).push(n.title);
+    }
+    return m;
+  };
+  const shown = bySchool([...(notices || []), ...(schoolFiles || [])]);
+  /* 정식 등록 공고도 '우리가 가진 것'이다 — 피드에서 중복 제거로 빠져 있어도 누락이 아니다 */
+  const regTitles = (registered || []).map((r) => r && (r.name || r.title)).filter(Boolean);
+  const kept = bySchool(ledger);
+  return {
+    ours: (school) => (shown.get(school) || []).concat(regTitles),
+    inLedger: (school, title) => kept.has(school) && findMissing([title], kept.get(school)).length === 0,
+  };
+}
+
 /* ── 게시판 부스러기 판정 (2026-08-17 첫 실행 결과로 추가) ──────────────────
    첫 감사에서 '원인 미상 60건'이 나왔는데, 실제로 보니 **37건이 게시판 옆 메뉴 덩어리,
    9건이 첨부 파일 이름**이었고 진짜 공고는 14건(중복 포함)뿐이었다.

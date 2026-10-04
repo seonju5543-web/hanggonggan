@@ -10,7 +10,8 @@
         ⓔ (리뷰 R2) 메운 글 주소의 HTML 기호(&#038;)는 앱과 같은 함수로 되돌린다 · ⓕ (리뷰 R3) 진짜 유실(restored)과 상한에 잘린 글(kept)을 따로 센다
      ② 고아 파일(publishBySchool · app2-F4/collect-12) — 목록에 글이 없는 학교의 옛 파일은 빈 파일로 · 이미 빈 파일·못 읽는 파일·이름이 안 맞는 파일은 그대로
      ③ 화면 0건 학교(zeroFeedSchools · app2-F2/collect-06) — 리포트 머리 한 줄
-     ④ 누락 감사(coverage-rules classifyMiss inLedger · collect-10) — 장부에만 남은 글을 '가진 것'으로 세지 않는다
+     ④ 누락 감사(coverage-rules coverageSets · classifyMiss inLedger · collect-10 · 리뷰 R4) — 장부에만 남은 글을 '가진 것'으로 세지 않는다
+        (가르는 곳은 순수 함수 하나 — 표본으로 잰다 · 감사 스크립트는 그 함수에 장부를 ledger 로만 넘긴다)
      ⑤ 사람이 돌리는 메우기 도구(collector/heal-feed.mjs · collect-01 복구) — 임시 git 저장소에서 사고 직전 커밋을 원천으로 그대로 돌린다
      ⑥ (리뷰 R5) 수집기가 notices.json 을 못 읽은 실행(빈 목록으로 시작)에도 학교별 파일의 글이 비지 않는다
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
@@ -23,7 +24,7 @@ import { createRequire } from 'node:module';
 import { cleanEnv, stripComments } from './gate.mjs';
 import { healFromLedger, publishBySchool, zeroFeedSchools, readSchoolFiles, dropUnserved, FEED_HEAL_SINCE } from '../../collector/publish-notices.mjs';
 import { dedupeNotices, capNotices, urlKey, titleKey } from '../../collector/url-key.mjs';
-import { classifyMiss } from '../../collector/coverage-rules.mjs';
+import { classifyMiss, coverageSets, findMissing } from '../../collector/coverage-rules.mjs';
 import { isAttachmentEntry } from '../../collector/attachment-link.mjs';
 
 const require = createRequire(import.meta.url);
@@ -216,9 +217,25 @@ export default async function feed(eq, ctx) {
     eq("④ 피드엔 없고 장부에만 있는 글은 '수집했지만 피드에서 빠짐' · 넘기지 않으면 예전처럼 '원인 미상'",
       [classifyMiss(T, { ...deps, inLedger: () => true }), classifyMiss(T, deps), classifyMiss(T, { ...deps, inLedger: () => false })],
       ['수집했지만 피드에서 빠짐', '원인 미상', '원인 미상']);
+    /* '가진 것'을 가르는 순수 함수 — 장부에만 있는 제목은 가진 것에 없고(누락으로 잡힌다) inLedger 로만 보인다 (리뷰 R4) */
+    const KH = '경희대학교';
+    const have = coverageSets({
+      notices: [{ school: KH, title: '2026 피드 장학생 선발 공고' }],
+      schoolFiles: [{ school: KH, title: '2026 학교별 파일에만 있는 장학 공고' }],
+      registered: [{ name: '2026 정식 등록 재단 장학금' }],
+      ledger: [{ school: KH, title: T }, { school: KH, title: '2026 피드 장학생 선발 공고' }],
+    });
+    eq("  coverageSets — 가진 것 = 피드 + 학교별 파일 + 정식 등록 · 장부에만 있는 글은 누락으로 잡히고 원인은 '수집했지만 피드에서 빠짐'",
+      [findMissing([T, '2026 피드 장학생 선발 공고', '2026 학교별 파일에만 있는 장학 공고', '2026 정식 등록 재단 장학금'], have.ours(KH)),
+        have.inLedger(KH, T), have.inLedger(KH, '2026 전혀 다른 장학 공고 선발'), have.inLedger('건국대학교', T),
+        classifyMiss(T, { ...deps, inLedger: (title) => have.inLedger(KH, title) })],
+      [[T], true, false, false, '수집했지만 피드에서 빠짐']);
     const src = stripComments(fs.readFileSync(new URL('collector/audit-coverage.mjs', root), 'utf8'));
-    eq('  감사의 \'가진 것\' = 학생이 보는 것(notices.json + 학교별 파일) · 장부는 inLedger 로만',
-      [/\[\.\.\.notices, \.\.\.candidates\]/.test(src), /inLedger:/.test(src), /\.\.\/data\/notices\//.test(src), /bySchool\(candidates\)/.test(src)], [false, true, true, true]);
+    const call = (src.match(/coverageSets\(\{([^}]*)\}\)/) || [])[1] || '';
+    eq('  감사 스크립트는 coverageSets 하나로 가르고 장부는 ledger 로만 넘긴다 (스크립트에서 목록을 합치지 않는다)',
+      [Boolean(call), (call.match(/candidates/g) || []).length, /\bledger:\s*candidates\b/.test(call), /findMissing\(boardTitles,\s*have\.ours\(t\.school\)\)/.test(src),
+        /inLedger:\s*\(title\)\s*=>\s*have\.inLedger\(t\.school,\s*title\)/.test(src), /readSchoolFiles\(\)/.test(src), /\bbySchool\(|\.concat\(schoolFiles|\.\.\.candidates/.test(src)],
+      [true, 1, true, true, true, true, false]);
   }
 
   /* ── ⑥ notices.json 을 못 읽은 실행 (리뷰 R5) — 수집기는 빈 목록으로 시작한다 ──
