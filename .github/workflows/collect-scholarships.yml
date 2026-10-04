@@ -353,9 +353,17 @@ jobs:
           last=$(gh issue list --repo "${{ github.repository }}" \
             --search '"장학공고 수집 리포트" in:title' --state open \
             --limit 1 --json number --jq '.[0].number' || true)
-          # 🔴 관문 결과로 가른다 (2026-10-04) — 관문이 빨간 날에도 '정상 실행'이라 적어 감사 실패가 묻혔다
+          # 🔴 관문 결과로 가른다 (2026-10-04) — 관문이 빨간 날에도 '정상 실행'이라 적어 감사 실패가 묻혔다.
+          #    다시 재니 통과(flaky)는 빨간불이 아니다 — 결과 이름(영문)을 그대로 적지 않고 쉬운 말로(리뷰 2026-10-04).
           if [ "${{ steps.audit.outcome }}" = "failure" ]; then
-            msg="🤖 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 수집은 정상 · **데이터 관문 빨간불**(되돌림: ${{ steps.guard.outputs.gate }}) — 새 공고 0건 · 아래 감사 실패 코멘트를 보세요."
+            case "${{ steps.guard.outputs.gate }}" in
+              flaky)          gate="데이터 관문은 처음에 빨갛다가 다시 재니 통과 — 되돌린 것 없음" ;;
+              reverted-auto)  gate="**데이터 관문 빨간불** — 새 자동 등록분을 되돌려 통과" ;;
+              reverted-files) gate="**데이터 관문 빨간불** — 파일을 직전 판으로 되돌려 통과(무엇인지는 아래 코멘트)" ;;
+              still-failing)  gate="**데이터 관문 빨간불** — 되돌려도 빨간불(이 실행은 빨간불로 끝납니다)" ;;
+              *)              gate="**데이터 관문 빨간불** — 되돌리기 도구가 결과를 남기지 못함" ;;
+            esac
+            msg="🤖 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 수집은 정상 · $gate — 새 공고 0건 · 아래 감사 실패 코멘트를 보세요."
           else
             msg="🤖 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 수집 로봇 정상 실행 — 새 공고 0건이라 새 리포트는 만들지 않았어요."
           fi
@@ -366,25 +374,27 @@ jobs:
       # 로봇이 어떤 단계에서든 실패하면 조용히 멈추지 않고 즉시 알린다
       # (2026-07-17~19 이틀간 8회 연속 실패를 아무도 몰랐던 사고의 재발 방지)
       # 🔴 제 리포트 이슈로 (2026-10-04) — '"수집 리포트"' 부분 일치는 더 최근의 브라우저형 리포트 이슈를 집어(#381 코멘트 9개 중 4개가 이 로봇 것)
-      #    어느 로봇의 실패인지도 안 적혀 있었다. 결과 문구는 gate-guard 의 결과(steps.guard.outputs.gate)로 가른다.
+      #    어느 로봇의 실패인지도 안 적혀 있었다. 무엇을 되돌렸는지는 gate-guard 의 단락(/tmp/gate-note.md)을 싣는다.
       - name: 🚨 데이터 감사 실패 알림
         if: steps.audit.outcome == 'failure'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          case "${{ steps.guard.outputs.gate }}" in
-            reverted-auto)  what="이번 실행의 새 자동 등록 ${{ steps.guard.outputs.removed }}건을 되돌리고 나머지 결과는 저장했습니다." ;;
-            reverted-files) what="이번 실행의 정식 등록 변경(자동 등록·발췌·범위 승격·교내 판정)을 저장하지 않았습니다 — 수집된 공고 자체는 실시간 피드에 그대로 있습니다." ;;
-            still-failing)  what="되돌린 뒤에도 관문이 빨갛습니다 — 이번 실행의 정식 등록 변경이 원인이 아니라서 사람이 봐야 합니다(새 이슈를 열었습니다)." ;;
-            flaky)          what="다시 재니 관문을 통과했습니다 — 처음 실패가 다시 나지 않았습니다(되돌린 것 없음)." ;;
-            *)              what="되돌리기 단계가 결과를 남기지 못했습니다 — 정식 등록·양식 파일을 직전 판으로 돌렸습니다." ;;
-          esac
+          # 무엇을 되돌렸는지는 gate-guard 의 단락(/tmp/gate-note.md — 실제로 되돌린 파일에서 만든다)을 그대로 싣는다(문구를 여기 베끼지 않는다).
+          # 결과(steps.guard.outputs.gate)가 비었으면 되돌리기 도구가 넘어져 아래 || 뒤가 파일을 직전 판으로 돌린 것이다.
+          {
+            echo "🤖 장학공고 수집 로봇: 🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **데이터 관문(감사) 실패**"
+            echo
+            if [ -n "${{ steps.guard.outputs.gate }}" ] && [ -s /tmp/gate-note.md ]; then cat /tmp/gate-note.md
+            else echo "> 되돌리기 도구가 결과를 남기지 못해 정식 등록·양식·양식 대기열 파일을 직전 판으로 돌렸습니다."; fi
+            echo
+            echo "실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '감사 실패 확인해줘'라고 지시하세요."
+          } > /tmp/audit-alert.md
           last=$(gh issue list --repo "${{ github.repository }}" \
             --search '"장학공고 수집 리포트" in:title' --state open \
             --limit 1 --json number --jq '.[0].number' || true)
           if [ -n "$last" ] && [ "$last" != "null" ]; then
-            gh issue comment "$last" --repo "${{ github.repository }}" \
-              --body "🤖 장학공고 수집 로봇: 🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **데이터 관문(감사) 실패** — $what 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '감사 실패 확인해줘'라고 지시하세요."
+            gh issue comment "$last" --repo "${{ github.repository }}" --body-file /tmp/audit-alert.md
           fi
 
       # cancelled()가 반드시 있어야 한다 (2026-08-04에 뚫린 구멍).
@@ -412,15 +422,23 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           {
-            echo "🤖 장학공고 수집 로봇: 데이터 관문이 빨간불이고, 이번 실행의 자동 등록분·정식 등록 변경을 되돌려도 통과하지 않습니다(무엇을 되돌렸는지는 아래 단락)."
+            echo "🤖 장학공고 수집 로봇: 🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 되돌리기 단계를 거친 뒤에도 데이터 관문이 빨갛습니다 — 무엇을 되돌렸는지는 아래 단락에 있습니다."
             echo
             cat /tmp/gate-note.md 2>/dev/null || true
             echo
             echo "실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '데이터 관문 빨간불 확인해줘'라고 지시하세요."
           } > /tmp/gate-issue.md
-          gh issue create --repo "${{ github.repository }}" \
-            --title "🚨 데이터 관문이 되돌린 뒤에도 빨간불 — 장학공고 수집 로봇 $(TZ=Asia/Seoul date +%Y-%m-%d)" \
-            --body-file /tmp/gate-issue.md \
-            --assignee "${{ github.repository_owner }}" || true
-          echo "::error::데이터 관문이 되돌린 뒤에도 빨간불입니다 — 이슈를 열었습니다."
+          # 원인이 기존 데이터면 실행마다 빨갛다 — 열린 같은 이슈가 있으면 코멘트(하루 최대 5개씩 쌓이지 않게 · 2026-10-04 리뷰). 로봇 이름은 본문 첫 줄에.
+          open=$(gh issue list --repo "${{ github.repository }}" \
+            --search '"데이터 관문이 되돌린 뒤에도 빨간불" in:title' --state open \
+            --limit 1 --json number --jq '.[0].number' || true)
+          if [ -n "$open" ] && [ "$open" != "null" ]; then
+            gh issue comment "$open" --repo "${{ github.repository }}" --body-file /tmp/gate-issue.md || true
+          else
+            gh issue create --repo "${{ github.repository }}" \
+              --title "🚨 데이터 관문이 되돌린 뒤에도 빨간불 — 장학공고 수집 로봇 $(TZ=Asia/Seoul date +%Y-%m-%d)" \
+              --body-file /tmp/gate-issue.md \
+              --assignee "${{ github.repository_owner }}" || true
+          fi
+          echo "::error::데이터 관문이 되돌린 뒤에도 빨간불입니다 — 이슈에 적었습니다."
           exit 1

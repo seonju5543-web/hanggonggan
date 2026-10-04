@@ -13,6 +13,8 @@
    결과(gate): reverted-auto(자동 등록분만 빼서 통과) · reverted-files(파일까지 되돌려 통과) ·
                still-failing(다 되돌려도 빨간불 — 이번 실행의 그 파일들이 원인이 아니다) · flaky(되돌릴 것 없이 다시 재니 통과).
    리포트(--report)의 '자동 등록 — N건 등록' 줄에 '시도 · ↩ 되돌림'을 붙이고 사람이 읽을 단락을 넣는다(이슈 본문에도 그대로 간다).
+   🔴 단락은 **실제로 되돌린 파일**에서 만든다(FILE_LABELS 한 곳) — 소식 로봇도 이 도구를 쓰는데 단락이 늘 '정식 등록'을 말해
+      소식 리포트에 사실과 반대인 문장이 들어갔다(2026-10-04 리뷰). 워크플로 알림도 이 단락(--note)을 그대로 싣는다(문구를 베끼지 말 것).
    $GITHUB_OUTPUT 에 gate=<결과> · removed=<뺀 자동 등록 수>. reverted-auto 이면 뺀 id 를 collector/auto-held.json 에 적는다
    (두 번 걸린 공고는 3일 쉰다 — auto-held.mjs).
    🔴 늘 exit 0 — 결과는 gate 로 말한다(빨간불은 워크플로의 마지막 단계가 낸다). 예상 못 한 예외만 exit 1(워크플로가 파일을 직접 되돌린다).
@@ -33,6 +35,20 @@ const QUEUE = 'collector/pending-forms.json';
 const HELD = 'collector/auto-held.json';
 const BIG = 256 * 1024 * 1024;
 const todayKst = () => new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+
+/* 되돌릴 수 있는 파일의 사람 이름 · 되돌리면 학생 화면·리포트에서 무엇이 달라지는가(after).
+   단락은 **실제로 되돌린 파일**만 말한다 — 표에 없는 파일은 경로를 그대로 적는다(지어내지 않는다). */
+export const FILE_LABELS = [
+  { path: 'data/registered.json', name: '정식 등록', after: '이 리포트의 자동 등록·승격 숫자는 시도한 것입니다(저장 안 됨)' },
+  { path: 'data/forms.json', name: '양식' },
+  { path: 'collector/pending-forms.json', name: '양식 대기열' },
+  { path: 'data/news', name: '교내 소식 발행분', after: '홈 「우리 학교 소식」은 이번 실행에 갱신되지 않습니다' },
+  { path: 'collector/seen-news.json', name: '소식 장부' },
+  { path: 'collector/news-thumbs.json', name: '소식 사진 장부' },
+  { path: 'collector/news-sources.json', name: '소식 출처 목록', after: '찾기 로봇이 이번에 고친 게시판 주소도 저장하지 않았습니다' },
+];
+const labelOf = (p) => FILE_LABELS.find((l) => l.path === p.replace(/\/+$/, '')) || { path: p, name: `\`${p}\`` };
+const names = (paths) => [...new Set(paths.map((p) => labelOf(p).name))].join('·');
 
 export function parseArgs(argv) {
   const o = { stages: [], report: '', note: '' };
@@ -83,35 +99,42 @@ export function revertAutoStage(cwd) {
   return removed;
 }
 
-/** 파일 단계 — HEAD 바이트 그대로. 바뀐 것이 있었는지 돌려준다. */
+/** 파일 단계 — HEAD 바이트 그대로. 실제로 되돌린 경로들을 돌려준다(바뀐 것이 없으면 빈 배열). */
 export function revertFilesStage(paths, cwd) {
-  let changed = false;
+  const done = [];
   for (const p of paths.map((x) => x.trim()).filter(Boolean)) {
     const abs = path.join(cwd, p);
     if (inHead(p, cwd)) {
       const dirty = git(['status', '--porcelain', '--', p], cwd).stdout.trim();
       if (!dirty) continue;
-      changed = true;
+      done.push(p);
       git(['checkout', 'HEAD', '--', p], cwd);
       if (fs.existsSync(abs) && fs.statSync(abs).isDirectory()) git(['clean', '-fdq', '--', p], cwd);
     } else if (fs.existsSync(abs)) {   // 이번 실행이 새로 만든 파일
-      changed = true;
+      done.push(p);
       fs.rmSync(abs, { recursive: true, force: true });
     }
   }
-  return changed;
+  return done;
 }
 
-/** 단계를 돌리고 결과를 정한다 — { status, removed, failing, reverted } */
+/** 단계를 돌리고 결과를 정한다 — { status, removed, failing, reverted, files, targets }
+    files = 실제로 HEAD 판으로 되돌린 파일 · targets = 되돌릴 수 있었던 것 전부('auto' 포함 — 단락이 '무엇이 안 바뀌었나'를 말할 때) */
 export function guard({ stages, gateCmd = DEFAULT_GATE, cwd = process.cwd(), today = todayKst() }) {
   let status = 'still-failing';
   let removed = [];
   let failing = [];
+  const files = [];
+  const targets = stages.flatMap((st) => (st === 'auto' ? ['auto'] : st.split(',').map((x) => x.trim()).filter(Boolean)));
   let reverted = false;     // 무엇이든 되돌렸는가
   let measured = false;     // 마지막으로 바꾼 뒤 관문을 쟀는가
   for (const st of stages) {
     let changed;
-    if (st === 'auto') { removed = revertAutoStage(cwd); changed = removed.length > 0; } else changed = revertFilesStage(st.split(','), cwd);
+    if (st === 'auto') { removed = revertAutoStage(cwd); changed = removed.length > 0; } else {
+      const done = revertFilesStage(st.split(','), cwd);
+      files.push(...done);
+      changed = done.length > 0;
+    }
     if (!changed) continue;   // 바뀐 것이 없으면 관문 결과도 그대로다 — 다시 재지 않는다(시간만 든다)
     reverted = true;
     const g = runGate(gateCmd, cwd);
@@ -132,17 +155,23 @@ export function guard({ stages, gateCmd = DEFAULT_GATE, cwd = process.cwd(), tod
     try { ledger = JSON.parse(fs.readFileSync(hp, 'utf8')); } catch { /* 첫 기록 */ }
     fs.writeFileSync(hp, `${JSON.stringify(recordReverts(ledger, removed.map((i) => i.id), today), null, 1)}\n`);
   }
-  return { status, removed, failing, reverted };
+  return { status, removed, failing, reverted, files, targets };
 }
 
-/** 사람이 읽을 단락 — 리포트와 이슈에 같은 말 */
-export function noteFor({ status, removed, failing }) {
+/** 사람이 읽을 단락 — 리포트와 이슈에 같은 말. 🔴 '무엇을 되돌렸나'는 실제로 되돌린 파일(files)·뺀 자동 등록(removed)에서만 만든다 */
+export function noteFor({ status, removed = [], failing = [], files = [], targets = [] }) {
   const ids = removed.map((i) => `\`${i.id}\``).join(' · ');
   const checks = failing.length ? `\n>\n> 걸린 검사: ${failing.map((f) => `「${f}」`).join(' · ')}` : '';
+  /* 되돌린 것 — '새 자동 등록 n건' · '정식 등록·양식 변경' (둘 다 받침으로 끝나 조사는 '을') */
+  const did = [removed.length ? `새 자동 등록 ${removed.length}건` : '', files.length ? `${names(files)} 변경` : ''].filter(Boolean).join('과 ');
+  const after = [...new Set(files.map((p) => labelOf(p).after).filter(Boolean))].join(' · ');
+  const could = [targets.includes('auto') ? '새 자동 등록분' : '', names(targets.filter((t) => t !== 'auto'))].filter(Boolean).join('·');
   const head = {
     'reverted-auto': `↩ **데이터 관문에 걸려 새 자동 등록 ${removed.length}건을 되돌렸습니다**${ids ? `(${ids})` : ''} — 같은 실행의 다른 결과는 저장합니다. 두 번 걸린 공고는 3일 쉬었다 다시 봅니다. 걸린 검사는 실행 로그의 「데이터 관문」 단계에 있습니다.`,
-    'reverted-files': '↩ **이번 실행의 정식 등록 변경(자동 등록·발췌·범위 승격·교내 판정)을 저장하지 않았습니다** — 이 리포트의 등록·승격 숫자는 시도한 것입니다. 수집된 공고 자체는 실시간 피드에 그대로 있습니다.',
-    'still-failing': '🚨 **되돌린 뒤에도 데이터 관문이 빨갛습니다** — 이번 실행의 정식 등록 변경을 되돌려도 통과하지 않았으니 기존 데이터나 이번 실행의 다른 파일을 사람이 봐야 합니다(실행을 빨간불로 끝내고 이슈를 엽니다).',
+    'reverted-files': `↩ **데이터 관문에 걸려 이번 실행의 ${did || '변경'}을 저장하지 않았습니다**(직전 판으로 되돌림)${after ? ` — ${after}` : ''}. 그 밖의 결과는 저장합니다.`,
+    'still-failing': did
+      ? `🚨 **되돌린 뒤에도 데이터 관문이 빨갛습니다** — 이번 실행의 ${did}을 되돌려도 통과하지 않았으니 기존 데이터나 이번 실행의 다른 파일을 사람이 봐야 합니다(실행을 빨간불로 끝냅니다).`
+      : `🚨 **데이터 관문이 빨갛습니다** — 되돌릴 수 있는 것(${could || '없음'})이 이번 실행에 바뀌지 않았는데도 빨가니 기존 데이터나 이번 실행의 다른 파일을 사람이 봐야 합니다(실행을 빨간불로 끝냅니다).`,
     flaky: 'ℹ **데이터 관문을 다시 재니 통과했습니다** — 처음 실패가 다시 나지 않았습니다(되돌린 것 없음). 실행 로그의 「데이터 관문」 단계를 보세요.',
   }[status];
   return `> ${head}${checks}`;
@@ -154,7 +183,9 @@ export function annotateReport(text, result) {
   const lines = String(text || '').split('\n');
   const i = lines.findIndex((l) => /^### 🤖 자동 등록 \(선조치후보고\) — \d+건 등록/.test(l));
   if (i < 0) return `${String(text || '').replace(/\s*$/, '')}\n\n${note}\n`;
-  if (result.reverted) lines[i] = lines[i].replace(/— (\d+)건 등록/, '— $1건 등록 시도 · ↩ 데이터 관문에 걸려 되돌림');
+  /* 새 자동 등록이 실제로 빠졌을 때만 — 뺀 것이 있거나 정식 등록 파일을 직전 판으로 되돌렸을 때(다른 파일만 되돌렸으면 등록은 저장된다) */
+  const undone = (result.removed || []).length > 0 || (result.files || []).includes(REG);
+  if (undone) lines[i] = lines[i].replace(/— (\d+)건 등록/, '— $1건 등록 시도 · ↩ 데이터 관문에 걸려 되돌림');
   lines.splice(i + 1, 0, '', note);
   return lines.join('\n');
 }

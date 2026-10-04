@@ -9,6 +9,7 @@
         읽는 곳 수를 파일별로 세어 늘면 빨간불 · 저장 전 관문이 없던 등록금·학과 갱신 로봇에 관문 · 등록금 표본.
      ④ 데이터 관문 되돌리기 — 되돌린 뒤 관문을 다시 재지 않아(revert-auto) 원인이 기존 항목이면 관문 실패 상태로 저장되고,
         링크 사냥꾼은 결과를 버리고도 초록불이었다. collector/gate-guard.mjs 를 임시 git 저장소 + 가짜 관문으로 잰다 · 워크플로 배선 · 쉬기 장부.
+        소식 로봇도 같은 도구를 쓴다 — 단락이 늘 '정식 등록'을 말해 소식 리포트에 사실과 반대인 문장이 들어갔다(리뷰) → 소식 단계 시나리오도 잰다.
      ⑤ 알림이 제 리포트로 간다 — '"수집 리포트" in:title' 부분 일치가 다른 로봇의 리포트 이슈를 집었다(#381).
      ⑥ 양식 대기열 고아 — 정식 등록에서 빠진 공고의 대기 항목(123건 중 71건)을 스키마화 로봇이 매 실행 정리한다.
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
@@ -20,6 +21,14 @@ import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
+
+/* 임시 폴더에서 돌리는 자식 프로세스의 환경 — GIT_DIR·GIT_WORK_TREE·GIT_INDEX_FILE 같은 GIT_* 가 남아 있으면(git 훅 안에서 관문을 돌릴 때)
+   임시 저장소의 git init·commit·checkout 이 **진짜 저장소**에 커밋·되돌리기를 한다(리뷰 2026-10-04) → 전부 지운다 */
+export const cleanEnv = (extra = {}) => {
+  const e = { ...process.env, ...extra };
+  for (const k of Object.keys(e)) if (/^GIT_/.test(k)) delete e[k];
+  return e;
+};
 
 /* 주석을 걷어낸 소스 — 주석에 남은 글자로 관문이 통과하지 않게 */
 export const stripComments = (s) => String(s).replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
@@ -54,7 +63,7 @@ function adminRun(root, files, action, payload) {
     dir,
     run(act = action, pay = payload) {
       const r = spawnSync(process.execPath, [fileURLToPath(new URL('tools/admin-apply.mjs', root))],
-        { cwd: dir, encoding: 'utf8', env: { ...process.env, ACTION: act, ACTOR: 'gate', PAYLOAD: JSON.stringify(pay) } });
+        { cwd: dir, encoding: 'utf8', env: cleanEnv({ ACTION: act, ACTOR: 'gate', PAYLOAD: JSON.stringify(pay) }) });
       return { status: r.status, out: `${r.stdout || ''}${r.stderr || ''}` };
     },
     read: (rel) => fs.readFileSync(path.join(dir, rel), 'utf8'),
@@ -202,18 +211,26 @@ export default async function gate(eq, ctx) {
     const J = (x) => `${JSON.stringify(x, null, 1)}\n`;
     /* 임시 git 저장소 — HEAD 판을 커밋하고, 이번 실행이 바꾼 것을 덮어쓴 뒤 gate-guard 를 진짜로 돌린다.
        가짜 관문: 정식 등록에 bad:true 항목이 있으면 ✕ 한 줄을 찍고 exit 1 */
-    const scenario = (head, work, extra = {}) => {
+    /* 가짜 관문은 정식 등록·소식 발행분(data/news/*.json)·소식 출처 목록 어디든 bad:true 항목이 있으면 ✕ */
+    const CHECK = [
+      "const fs = require('fs'); const rd = (f) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return {}; } };",
+      "const news = fs.existsSync('data/news') ? fs.readdirSync('data/news').filter((f) => f.endsWith('.json')).flatMap((f) => rd('data/news/' + f).items || []) : [];",
+      "const bad = [...(rd('data/registered.json').items || []), ...news, ...(rd('collector/news-sources.json').sources || [])].filter((i) => i && i.bad);",
+      "if (bad.length) { console.log('  ✕ 표본 관문 — bad 항목 ' + bad.map((i) => i.id).join(',')); process.exit(1); }",
+      "console.log('  ✓ 표본 관문'); process.exit(0);",
+    ].join('\n');
+    const scenario = (head, work, { stages = STAGES, extra = {} } = {}) => {
       const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-gate-guard-'));
       const w = (rel, body) => { fs.mkdirSync(path.dirname(path.join(dir, rel)), { recursive: true }); fs.writeFileSync(path.join(dir, rel), typeof body === 'string' ? body : J(body)); };
-      const g = (...a) => spawnSync('git', a, { cwd: dir, encoding: 'utf8' });
+      const g = (...a) => spawnSync('git', a, { cwd: dir, encoding: 'utf8', env: cleanEnv() });
       g('init', '-q'); g('config', 'user.email', 'gate@example.com'); g('config', 'user.name', 'gate'); g('config', 'commit.gpgsign', 'false');
-      w('check.cjs', "const r = require('./data/registered.json'); const bad = (r.items || []).filter((i) => i.bad);\nif (bad.length) { console.log('  ✕ 표본 관문 — bad 항목 ' + bad.map((i) => i.id).join(',')); process.exit(1); }\nconsole.log('  ✓ 표본 관문'); process.exit(0);\n");
+      w('check.cjs', `${CHECK}\n`);
       for (const [rel, body] of Object.entries(head)) w(rel, body);
       g('add', '-A'); g('commit', '-qm', 'head');
       for (const [rel, body] of Object.entries(work)) w(rel, body);
       const outFile = path.join(dir, '.gh-output');
-      const r = spawnSync(process.execPath, [guardPath, '--report', 'r.md', '--note', path.join(dir, 'note.md'), ...STAGES],
-        { cwd: dir, encoding: 'utf8', env: { ...process.env, GATE_CMD: 'node check.cjs', GITHUB_OUTPUT: outFile, ...extra } });
+      const r = spawnSync(process.execPath, [guardPath, '--report', 'r.md', '--note', path.join(dir, 'note.md'), ...stages],
+        { cwd: dir, encoding: 'utf8', env: cleanEnv({ GATE_CMD: 'node check.cjs', GITHUB_OUTPUT: outFile, ...extra }) });
       const read = (rel) => (fs.existsSync(path.join(dir, rel)) ? fs.readFileSync(path.join(dir, rel), 'utf8') : null);
       const out = Object.fromEntries((read('.gh-output') || '').split('\n').filter(Boolean).map((l) => l.split('=')));
       const res = { status: r.status, out, read, headReg: g('show', 'HEAD:data/registered.json').stdout };
@@ -241,21 +258,76 @@ export default async function gate(eq, ctx) {
       const S = scenario(HEAD, { 'data/registered.json': { items: [{ id: 'old', auto: true, v: 2, bad: true }, { id: 'n2', auto: true }] } });
       eq('④ ㉡ 기존 항목 수정이 원인 → 파일을 HEAD 바이트 그대로 되돌려 통과(reverted-files) · 쉬기 장부 없음',
         [S.status, S.out.gate, S.read('data/registered.json') === S.headReg, S.read('collector/auto-held.json')], [0, 'reverted-files', true, null]);
-      eq('  리포트 단락 — 정식 등록 변경을 저장하지 않았다고 말한다', /정식 등록 변경\(자동 등록·발췌·범위 승격·교내 판정\)을 저장하지 않았습니다/.test(S.read('r.md')), true);
+      const rep = S.read('r.md');
+      eq('  리포트 단락 — 되돌린 것(새 자동 등록 1건 · 정식 등록)만 말하고 등록 숫자는 시도였다고 · 안 바뀐 양식은 말하지 않는다',
+        [/이번 실행의 새 자동 등록 1건과 정식 등록 변경을 저장하지 않았습니다/.test(rep), /자동 등록·승격 숫자는 시도한 것입니다/.test(rep), /양식/.test(rep), /— 2건 등록 시도 · ↩ 데이터 관문에 걸려 되돌림/.test(rep)], [true, true, false, true]);
       S.done();
     }
-    /* ㉢ HEAD 자체가 빨강 → 되돌려도 빨강(still-failing) · 그래도 exit 0(빨간불은 워크플로 마지막 단계가 낸다) · 걸린 검사를 적는다 */
+    /* ㉢ HEAD 자체가 빨강 → 새 자동 등록분을 빼도 빨강(still-failing) · 그래도 exit 0(빨간불은 워크플로 마지막 단계가 낸다) · 걸린 검사를 적는다 ·
+       단락은 실제로 되돌린 것(새 자동 등록 1건)만 말한다 — 바이트가 그대로인 정식 등록 파일을 '되돌렸다'고 하지 않는다 */
     {
-      const S = scenario({ ...HEAD, 'data/registered.json': { items: [{ id: 'old', auto: true, bad: true }] } }, {});
-      eq('④ ㉢ 직전 판부터 빨강 → still-failing · exit 0 · GITHUB_OUTPUT · 단락에 걸린 검사',
-        [S.status, S.out.gate, /되돌린 뒤에도 데이터 관문이 빨갛습니다/.test(S.read('note.md')), /걸린 검사: 「표본 관문 — bad 항목 old」/.test(S.read('note.md'))], [0, 'still-failing', true, true]);
+      const S = scenario({ ...HEAD, 'data/registered.json': { items: [{ id: 'old', auto: true, bad: true }] } },
+        { 'data/registered.json': { items: [{ id: 'old', auto: true, bad: true }, { id: 'n3', auto: true }] } });
+      const note = S.read('note.md');
+      eq('④ ㉢ 직전 판부터 빨강 → still-failing · exit 0 · GITHUB_OUTPUT · 단락에 되돌린 것(새 자동 등록 1건)과 걸린 검사',
+        [S.status, S.out.gate, /되돌린 뒤에도 데이터 관문이 빨갛습니다\*\* — 이번 실행의 새 자동 등록 1건을 되돌려도/.test(note), /정식 등록 변경/.test(note), /걸린 검사: 「표본 관문 — bad 항목 old」/.test(note)],
+        [0, 'still-failing', true, false, true]);
       S.done();
     }
     /* 되돌릴 것 없이 다시 재니 통과 → flaky (still-failing 이라 하지 않는다) */
     {
       const S = scenario(HEAD, {});
-      eq('  되돌릴 것 없이 다시 재니 통과하면 flaky (빨간불·이슈를 내지 않는다)', [S.status, S.out.gate], [0, 'flaky']);
+      eq('  되돌릴 것 없이 다시 재니 통과하면 flaky (빨간불·이슈를 내지 않는다 · 리포트의 \'N건 등록\' 줄을 \'시도\'로 고치지 않는다)',
+        [S.status, S.out.gate, /— 2건 등록\n/.test(S.read('r.md')), /등록 시도/.test(S.read('r.md'))], [0, 'flaky', true, false]);
       S.done();
+    }
+    /* GIT_* 가 남은 환경(git 훅 안에서 관문을 돌릴 때)에서도 임시 저장소의 git 이 진짜 저장소를 건드리지 않는다 —
+       가짜 GIT_DIR 을 걸고 돌려 그 자리가 비어 있는지 본다(리뷰 2026-10-04 · 지금 그런 훅은 없다) */
+    {
+      const trap = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-gitdir-trap-'));
+      const had = Object.prototype.hasOwnProperty.call(process.env, 'GIT_DIR');
+      const saved = process.env.GIT_DIR;
+      process.env.GIT_DIR = path.join(trap, 'repo.git');
+      let gate1;
+      try {
+        const S = scenario(HEAD, { 'data/registered.json': { items: [{ id: 'old', auto: true, v: 1 }, { id: 'n5', auto: true, bad: true }] } });
+        gate1 = S.out.gate;
+        S.done();
+      } finally { if (had) process.env.GIT_DIR = saved; else delete process.env.GIT_DIR; }
+      eq('  GIT_DIR 이 걸린 환경에서도 임시 저장소에서만 돈다 (가짜 GIT_DIR 자리가 비어 있다 · 결과는 그대로)', [fs.existsSync(path.join(trap, 'repo.git')), gate1], [false, 'reverted-auto']);
+      fs.rmSync(trap, { recursive: true, force: true });
+    }
+    /* ㉥ 소식 로봇 단계(collect-news.yml 과 같은 꼴) — 단락은 실제로 되돌린 소식 파일을 말하고 '정식 등록'·'자동 등록'은 한 글자도 없다(리뷰 — 사실과 반대인 문장) */
+    {
+      const NEWS_STAGES = ['--stage', 'data/news,collector/seen-news.json,collector/news-thumbs.json', '--stage', 'collector/news-sources.json'];
+      const NH = { 'data/news/k.json': { school: '경희대학교', items: [{ id: 'p1' }] }, 'collector/seen-news.json': { seen: ['p1'] },
+        'collector/news-sources.json': { sources: [{ id: 's1', school: '경희대학교' }] }, 'r.md': '# 교내 소식 수집 리포트\n\n- 새 글 2건\n' };
+      const noScholar = (t) => !/정식 등록|자동 등록|등록·승격|실시간 피드/.test(t || '');
+      /* 새 글이 원인 → 소식 발행분·장부를 되돌려 통과 · 새로 생긴 학교 파일·사진 장부는 지운다 · 출처 목록 개선은 남는다 */
+      const A = scenario(NH, { 'data/news/k.json': { school: '경희대학교', items: [{ id: 'p1' }, { id: 'p2', bad: true }] }, 'data/news/s.json': { items: [{ id: 'p3' }] },
+        'collector/seen-news.json': { seen: ['p1', 'p2', 'p3'] }, 'collector/news-thumbs.json': { posts: {} }, 'collector/news-sources.json': { sources: [{ id: 's1', school: '경희대학교', rows: 9 }] } },
+      { stages: NEWS_STAGES });
+      const ra = A.read('r.md');
+      eq('④ ㉥ 소식 단계 — 새 글이 원인 → 소식 발행분·장부만 되돌려 통과 · 새 파일 지움 · 출처 개선은 남는다 · 단락은 소식만 말한다',
+        [A.status, A.out.gate, A.read('data/news/s.json'), A.read('collector/news-thumbs.json'), JSON.parse(A.read('collector/news-sources.json')).sources[0].rows,
+          noScholar(ra), /교내 소식 발행분·소식 장부·소식 사진 장부 변경을 저장하지 않았습니다/.test(ra), /「우리 학교 소식」은 이번 실행에 갱신되지 않습니다/.test(ra), /소식 출처 목록/.test(ra)],
+        [0, 'reverted-files', null, null, 9, true, true, true, false]);
+      A.done();
+      /* 출처 목록이 원인 → 발행분을 되돌려도 빨강 → 출처 목록까지 되돌려 통과 · 단락이 출처 목록도 말한다 */
+      const B = scenario(NH, { 'data/news/k.json': { school: '경희대학교', items: [{ id: 'p1' }, { id: 'p2' }] }, 'collector/news-sources.json': { sources: [{ id: 's1', school: '경희대학교', bad: true }] } },
+        { stages: NEWS_STAGES });
+      const rb = B.read('note.md');
+      eq('  출처 목록이 원인 → 발행분 다음 출처 목록까지 되돌려 통과 · 단락에 출처 목록 · 정식 등록 낱말 없음',
+        [B.out.gate, B.read('collector/news-sources.json') === J(NH['collector/news-sources.json']), /교내 소식 발행분·소식 출처 목록 변경을 저장하지 않았습니다/.test(rb), /게시판 주소도 저장하지 않았습니다/.test(rb), noScholar(rb)],
+        ['reverted-files', true, true, true, true]);
+      B.done();
+      /* 직전 판부터 빨강 · 이번 실행이 소식 파일을 안 바꿨다 → still-failing · '되돌린 뒤에도'가 아니라 '바뀌지 않았는데도' */
+      const C = scenario({ ...NH, 'data/news/k.json': { items: [{ id: 'p1', bad: true }] } }, {}, { stages: NEWS_STAGES });
+      const rc = C.read('note.md');
+      eq('  직전 판부터 빨강 · 바뀐 소식 파일 없음 → still-failing · 되돌릴 수 있던 것을 말하고 \'되돌린 뒤에도\'라 하지 않는다 · 정식 등록 낱말 없음',
+        [C.out.gate, /되돌릴 수 있는 것\(교내 소식 발행분·소식 장부·소식 사진 장부·소식 출처 목록\)이 이번 실행에 바뀌지 않았는데도/.test(rc), /되돌린 뒤에도/.test(rc), noScholar(rc)],
+        ['still-failing', true, false, true]);
+      C.done();
     }
     /* ㉤ 쉬기 장부 — 두 번 걸리면 마지막 날부터 3일 쉰다 · 정식 등록되면 지운다 */
     {
@@ -285,7 +357,7 @@ export default async function gate(eq, ctx) {
       const st = steps(lh).filter((s) => /steps\.audit\.outcome == 'failure'/.test(s) && /exit 1\s*$/.test(s.trimEnd()) && !/continue-on-error/.test(s));
       const cn = wfText('collect-news.yml');
       eq('④ 링크 사냥꾼 — 감사에 걸려 결과를 버리면 빨간불(continue-on-error 없는 exit 1) · 소식 로봇 — gate-guard + 끝내 빨가면 exit 1',
-        [st.length >= 1, /node collector\/gate-guard\.mjs --report collector\/news-report\.md --stage data\/news,/.test(cn), lastStepExit('collect-news.yml')], [true, true, true]);
+        [st.length >= 1, /node collector\/gate-guard\.mjs --report collector\/news-report\.md (--note \S+ )?--stage data\/news,/.test(cn), lastStepExit('collect-news.yml')], [true, true, true]);
     }
     const ar = stripComments(fs.readFileSync(new URL('collector/auto-register.mjs', root), 'utf8'));
     eq('④ 자동 등록이 쉬기 장부를 불러 쓴다 (isHeld · pruneRegistered — 베끼지 않는다)',
@@ -304,7 +376,7 @@ export default async function gate(eq, ctx) {
         w('data/notices.json', { items: [{ title: '2026학년도 2학기 표본재단 장학생 선발 안내', url: 'https://example.ac.kr/bbs/view.do?seq=777', school: '경희대학교', campus: '', foundAt: '2026-10-04' }] });
         w('data/registered.json', { items: [] }); w('data/forms.json', { templates: {} }); w('collector/report.md', '');
         if (ledger) w('collector/auto-held.json', ledger(dir));
-        const r = spawnSync(process.execPath, [path.join(dir, 'collector/auto-register.mjs')], { cwd: dir, encoding: 'utf8' });
+        const r = spawnSync(process.execPath, [path.join(dir, 'collector/auto-register.mjs')], { cwd: dir, encoding: 'utf8', env: cleanEnv() });
         const res = { status: r.status, ids: JSON.parse(fs.readFileSync(path.join(dir, 'data/registered.json'), 'utf8')).items.map((i) => i.id),
           report: fs.readFileSync(path.join(dir, 'collector/report.md'), 'utf8') };
         fs.rmSync(dir, { recursive: true, force: true });
@@ -328,8 +400,22 @@ export default async function gate(eq, ctx) {
     const cs = wf('collect-scholarships.yml');
     const auditAlert = cs.split(/\n(?= {6}- )/).find((s) => /name: 🚨 데이터 감사 실패 알림/.test(s)) || '';
     const zero = cs.split(/\n(?= {6}- )/).find((s) => /name: 0건 실행 알림/.test(s)) || '';
-    eq('  장학 감사 실패 알림은 제 리포트 · 로봇 이름 · 결과별 문구 / 0건 알림은 관문 결과로 가른다',
-      [/'"장학공고 수집 리포트" in:title'/.test(auditAlert), /🤖 장학공고 수집 로봇:/.test(auditAlert), /steps\.guard\.outputs\.gate/.test(auditAlert), /steps\.audit\.outcome/.test(zero)], [true, true, true, true]);
+    eq('  장학 감사 실패 알림은 제 리포트 · 로봇 이름 · 무엇을 되돌렸는지는 gate-guard 단락(문구 사본 없음) / 0건 알림은 관문 결과로 가른다',
+      [/'"장학공고 수집 리포트" in:title'/.test(auditAlert), /🤖 장학공고 수집 로봇:/.test(auditAlert), /cat \/tmp\/gate-note\.md/.test(auditAlert) && !/저장하지 않았습니다/.test(auditAlert), /steps\.audit\.outcome/.test(zero)], [true, true, true, true]);
+    eq('  0건 알림 — 다시 재니 통과(flaky)를 빨간불이라 하지 않고 결과 이름(영문)을 그대로 적지 않는다',
+      [/flaky\)\s+gate="데이터 관문은 처음에 빨갛다가 다시 재니 통과/.test(zero), /되돌림: \$\{\{ steps\.guard\.outputs\.gate \}\}/.test(zero)], [true, false]);
+    /* 끝내 빨간불 이슈는 열린 같은 이슈에 코멘트 — 원인이 기존 데이터면 실행마다(하루 최대 5번) 새 이슈가 쌓였다(리뷰) */
+    const dedupe = (f) => {
+      const st = wf(f).split(/\n(?= {6}- )/).find((x) => /steps\.guard\.outputs\.gate == 'still-failing'/.test(x)) || '';
+      return /--search '"데이터 관문이 되돌린 뒤에도 빨간불" in:title' --state open/.test(st) && /gh issue comment "\$open"/.test(st) && st.indexOf('gh issue comment') < st.indexOf('gh issue create');
+    };
+    eq('  끝내 빨간불 이슈 — 열린 같은 이슈가 있으면 코멘트 (장학·브라우저)', [dedupe('collect-scholarships.yml'), dedupe('browser-collect.yml')], [true, true]);
+    const cn = wf('collect-news.yml');
+    const newsIssue = cn.split(/\n(?= {6}- )/).find((x) => /name: 🚨 데이터 감사 실패 알림/.test(x)) || '';
+    eq('  소식 감사 실패 이슈 — 제목은 결과로 가르고(flaky 는 \'되돌린 것 없음\') · 본문은 gate-guard 단락 · 열린 같은 이슈엔 코멘트 · 되돌리기 단계가 단락을 남긴다',
+      [/flaky\)\s+result="다시 재니 통과\(되돌린 것 없음\)"/.test(newsIssue), /이번 발행분을 되돌렸습니다/.test(newsIssue), /cat \/tmp\/gate-note\.md/.test(newsIssue),
+        /--search '"교내 소식 데이터 감사 실패" in:title'/.test(newsIssue) && /gh issue comment "\$open"/.test(newsIssue), /gate-guard\.mjs --report collector\/news-report\.md --note \/tmp\/gate-note\.md/.test(cn)],
+      [true, false, true, true, true]);
     const bc = wf('browser-collect.yml');
     eq('  브라우저 알림 둘(감사 실패·실패/시간초과)은 브라우저형 리포트로', (bc.match(/'"브라우저형 수집 리포트" in:title'/g) || []).length, 2);
     eq('  사냥꾼은 장학공고 리포트로 (제 리포트 이슈가 없다)', /'"장학공고 수집 리포트" in:title'/.test(wf('link-hunter.yml')), true);

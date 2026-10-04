@@ -274,25 +274,27 @@ jobs:
 
       # 실패 시 즉시 알림 (조용한 중단 방지 — 2026-07-19 도입)
       # 🔴 제 리포트 이슈로 (2026-10-04) — '"수집 리포트"' 부분 일치는 장학공고 리포트 이슈와 섞였다(#381 코멘트 9개 중 이 로봇 것은 1개).
-      #    결과 문구는 gate-guard 의 결과(steps.guard.outputs.gate)로 가른다.
+      #    무엇을 되돌렸는지는 gate-guard 의 단락(/tmp/gate-note.md)을 싣는다.
       - name: 🚨 데이터 감사 실패 알림
         if: steps.audit.outcome == 'failure'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          case "${{ steps.guard.outputs.gate }}" in
-            reverted-auto)  what="이번 실행의 새 자동 등록 ${{ steps.guard.outputs.removed }}건을 되돌리고 나머지 결과는 저장했습니다." ;;
-            reverted-files) what="이번 실행의 정식 등록 변경(자동 등록·발췌·범위 승격·교내 판정)을 저장하지 않았습니다 — 수집된 공고 자체는 실시간 피드에 그대로 있습니다." ;;
-            still-failing)  what="되돌린 뒤에도 관문이 빨갛습니다 — 이번 실행의 정식 등록 변경이 원인이 아니라서 사람이 봐야 합니다(새 이슈를 열었습니다)." ;;
-            flaky)          what="다시 재니 관문을 통과했습니다 — 처음 실패가 다시 나지 않았습니다(되돌린 것 없음)." ;;
-            *)              what="되돌리기 단계가 결과를 남기지 못했습니다 — 정식 등록·양식 파일을 직전 판으로 돌렸습니다." ;;
-          esac
+          # 무엇을 되돌렸는지는 gate-guard 의 단락(/tmp/gate-note.md — 실제로 되돌린 파일에서 만든다)을 그대로 싣는다(문구를 여기 베끼지 않는다).
+          # 결과(steps.guard.outputs.gate)가 비었으면 되돌리기 도구가 넘어져 아래 || 뒤가 파일을 직전 판으로 돌린 것이다.
+          {
+            echo "🖥 브라우저형 수집 로봇: 🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **데이터 관문(감사) 실패**"
+            echo
+            if [ -n "${{ steps.guard.outputs.gate }}" ] && [ -s /tmp/gate-note.md ]; then cat /tmp/gate-note.md
+            else echo "> 되돌리기 도구가 결과를 남기지 못해 정식 등록·양식·양식 대기열 파일을 직전 판으로 돌렸습니다."; fi
+            echo
+            echo "실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '감사 실패 확인해줘'라고 지시하세요."
+          } > /tmp/audit-alert.md
           last=$(gh issue list --repo "${{ github.repository }}" \
             --search '"브라우저형 수집 리포트" in:title' --state open \
             --limit 1 --json number --jq '.[0].number' || true)
           if [ -n "$last" ] && [ "$last" != "null" ]; then
-            gh issue comment "$last" --repo "${{ github.repository }}" \
-              --body "🖥 브라우저형 수집 로봇: 🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **데이터 관문(감사) 실패** — $what 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '감사 실패 확인해줘'라고 지시하세요."
+            gh issue comment "$last" --repo "${{ github.repository }}" --body-file /tmp/audit-alert.md
           fi
 
       # cancelled() 필수 — 시간 상한을 넘긴 작업은 '실패'가 아니라 '취소'로 끝나서
@@ -321,15 +323,23 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           {
-            echo "🖥 브라우저형 수집 로봇: 데이터 관문이 빨간불이고, 이번 실행의 자동 등록분·정식 등록 변경을 되돌려도 통과하지 않습니다(무엇을 되돌렸는지는 아래 단락)."
+            echo "🖥 브라우저형 수집 로봇: 🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 되돌리기 단계를 거친 뒤에도 데이터 관문이 빨갛습니다 — 무엇을 되돌렸는지는 아래 단락에 있습니다."
             echo
             cat /tmp/gate-note.md 2>/dev/null || true
             echo
             echo "실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '데이터 관문 빨간불 확인해줘'라고 지시하세요."
           } > /tmp/gate-issue.md
-          gh issue create --repo "${{ github.repository }}" \
-            --title "🚨 데이터 관문이 되돌린 뒤에도 빨간불 — 브라우저형 수집 로봇 $(TZ=Asia/Seoul date +%Y-%m-%d)" \
-            --body-file /tmp/gate-issue.md \
-            --assignee "${{ github.repository_owner }}" || true
-          echo "::error::데이터 관문이 되돌린 뒤에도 빨간불입니다 — 이슈를 열었습니다."
+          # 원인이 기존 데이터면 실행마다 빨갛다 — 열린 같은 이슈가 있으면 코멘트(하루 최대 5개씩 쌓이지 않게 · 2026-10-04 리뷰). 로봇 이름은 본문 첫 줄에.
+          open=$(gh issue list --repo "${{ github.repository }}" \
+            --search '"데이터 관문이 되돌린 뒤에도 빨간불" in:title' --state open \
+            --limit 1 --json number --jq '.[0].number' || true)
+          if [ -n "$open" ] && [ "$open" != "null" ]; then
+            gh issue comment "$open" --repo "${{ github.repository }}" --body-file /tmp/gate-issue.md || true
+          else
+            gh issue create --repo "${{ github.repository }}" \
+              --title "🚨 데이터 관문이 되돌린 뒤에도 빨간불 — 브라우저형 수집 로봇 $(TZ=Asia/Seoul date +%Y-%m-%d)" \
+              --body-file /tmp/gate-issue.md \
+              --assignee "${{ github.repository_owner }}" || true
+          fi
+          echo "::error::데이터 관문이 되돌린 뒤에도 빨간불입니다 — 이슈에 적었습니다."
           exit 1
