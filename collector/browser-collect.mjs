@@ -8,7 +8,7 @@ import { urlKey, dedupeNotices, capNotices, clickRowKey } from './url-key.mjs';
 import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mjs';
 import { publishBySchool, dropUnserved } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
-import { isAttachmentEntry, linkAttachments } from './attachment-link.mjs';
+import { isAttachmentEntry, linkAttachments, stripSiteChrome } from './attachment-link.mjs';
 import { cleanTitle, isMenuEntry } from './clean-title.mjs';
 import { isDetailUrl, rowDetailCandidates, ruleDetailCandidates, sameTitle, observeLanding } from './detail-url.mjs';
 /* 원문 주소 확인은 공용 판정 한 곳(link-landing.mjs judgeLanding) — 링크 사냥꾼·원문 링크 복구와 같은 것 (2026-10-03) */
@@ -672,6 +672,8 @@ const beforeCap = notices.items;
    위 capNotices는 **폰이 통째로 받는 옛 파일**을 작게 유지하려는 것이고, 학교별 파일에는
    그 상한이 필요 없다(학생은 자기 학교 것만 받는다). 그래서 자르기 **전** 목록으로 발행한다 —
    순서가 바뀌면 학교별 파일도 16건으로 잘려 나눈 뜻이 사라진다. 경위는 collector/publish-notices.mjs */
+/* 게시판 공통 링크를 첨부에서 걷는다 — 정식 등록분과 함께 센다(attachment-link.mjs stripSiteChrome · 2026-10-05) */
+stripSiteChrome([beforeCap, (() => { try { return JSON.parse(fs.readFileSync(new URL('../data/registered.json', HERE), 'utf8')).items || []; } catch { return []; } })()]);
 publishBySchool(beforeCap);
 
 notices.items = capNotices(notices.items);

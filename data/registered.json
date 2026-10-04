@@ -473,22 +473,8 @@
    "noForm": "원본 공고·양식 확보 대기(deep-fetch 2026-07-15 예약) — 세부는 원문 확인",
    "attachments": [
     {
-     "name": "부설연구기관",
-     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
-    },
-    {
      "name": "본문이미지-1199x1692.jpg",
      "url": "https://www.kw.ac.kr/KWData/webeditor/2026/2026_07_14_155512.jpg",
-     "bodyImage": true
-    },
-    {
-     "name": "본문이미지-509x348.webp",
-     "url": "https://www.kw.ac.kr/ko/img/2025-wa-logo.webp?version=260303",
-     "bodyImage": true
-    },
-    {
-     "name": "본문이미지-402x414.png",
-     "url": "https://www.kw.ac.kr/ko/img/kw_chatbot_icon2.png?v=20251021",
      "bodyImage": true
     }
    ],
@@ -1128,10 +1114,6 @@
    "noForm": "검수 완료 2026-07-29 — 원문 첨부에 채울 신청서 양식 없음(있으면 다음 수집이 스키마화)",
    "attachments": [
     {
-     "name": "부설연구기관",
-     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
-    },
-    {
      "name": "Attachment20260728 2026년 5·18희망장학생 모집 공고문.hwp",
      "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=34947&ano=52964"
     },
@@ -1142,16 +1124,6 @@
     {
      "name": "본문이미지-3368x4768.jpg",
      "url": "https://www.kw.ac.kr/KWData/webeditor/2026/2026_07_29_125502.jpg",
-     "bodyImage": true
-    },
-    {
-     "name": "본문이미지-509x348.webp",
-     "url": "https://www.kw.ac.kr/ko/img/2025-wa-logo.webp?version=260303",
-     "bodyImage": true
-    },
-    {
-     "name": "본문이미지-402x414.png",
-     "url": "https://www.kw.ac.kr/ko/img/kw_chatbot_icon2.png?v=20251021",
      "bodyImage": true
     }
    ],
@@ -6049,11 +6021,6 @@
      "name": "본문이미지-614x700.jpg",
      "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/findUploadImg.do?fileNo=ee6558e3cb3b43528a76b6408624326d",
      "bodyImage": true
-    },
-    {
-     "name": "본문이미지-1638x1163.gif",
-     "url": "https://www.kookmin.ac.kr/content/05sub/style0005/images/common/webacc.gif",
-     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12427/view.do?currentPageNo=1",
@@ -6121,11 +6088,6 @@
     {
      "name": "본문이미지-838x1188.jpg",
      "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/findUploadImg.do?fileNo=eb23bf94ea2f41cf96e5564e02a9ca7d",
-     "bodyImage": true
-    },
-    {
-     "name": "본문이미지-1638x1163.gif",
-     "url": "https://www.kookmin.ac.kr/content/05sub/style0005/images/common/webacc.gif",
      "bodyImage": true
     }
    ],
@@ -6849,10 +6811,6 @@
      "url": "https://www.kmu.ac.kr/programs/common/com_fileViewer.jsp?parm_file_uid=125168"
     },
     {
-     "name": "캠퍼스 투어",
-     "url": "https://www.kmu.ac.kr/uni/main/download/sub01/keimyung_univ/index.html"
-    },
-    {
      "name": "본문이미지-1800x700.jpg",
      "url": "https://www.kmu.ac.kr/uni/main/img/layout2024/sub_visual04.jpg",
      "bodyImage": true
@@ -6890,18 +6848,6 @@
    "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "attachments": [
-    {
-     "name": "장학금 신청 주요 일정",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
-    },
-    {
-     "name": "장학금 규정 전문(2021. 10. 1.)",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
-    },
-    {
-     "name": "장학금 지침 전문(2026. 02. 04.)",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
-    },
     {
      "name": "1. 재난안전관리본부 국가근로장학생 지원서 및 자기소개서_성명.hwp",
      "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F57138&fname=DBB85CCB699F4C189BB6F430928FB0E4_.hwp&ogrfname=1.+%EC%9E%AC%EB%82%9C%EC%95%88%EC%A0%84%EA%B4%80%EB%A6%AC%EB%B3%B8%EB%B6%80+%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EC%83%9D+%EC%A7%80%EC%9B%90%EC%84%9C+%EB%B0%8F+%EC%9E%90%EA%B8%B0%EC%86%8C%EA%B0%9C%EC%84%9C_%EC%84%B1%EB%AA%85.hwp"
@@ -7054,11 +7000,6 @@
      "name": "본문이미지-785x1117.jpg",
      "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/findUploadImg.do?fileNo=d5ba21686ec544dba26a17064c30ef17",
      "bodyImage": true
-    },
-    {
-     "name": "본문이미지-1638x1163.gif",
-     "url": "https://www.kookmin.ac.kr/content/05sub/style0005/images/common/webacc.gif",
-     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12387/view.do?currentPageNo=1",
@@ -7117,11 +7058,6 @@
      "name": "본문이미지-779x1113.jpg",
      "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/findUploadImg.do?fileNo=26f7a5d8a9674826ae4098fbeedf6994",
      "bodyImage": true
-    },
-    {
-     "name": "본문이미지-1638x1163.gif",
-     "url": "https://www.kookmin.ac.kr/content/05sub/style0005/images/common/webacc.gif",
-     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12385/view.do?currentPageNo=1",
@@ -7164,11 +7100,6 @@
     {
      "name": "본문이미지-743x930.jpg",
      "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/findUploadImg.do?fileNo=7d0d77790f644b5685ad62d0dbc266e0",
-     "bodyImage": true
-    },
-    {
-     "name": "본문이미지-1638x1163.gif",
-     "url": "https://www.kookmin.ac.kr/content/05sub/style0005/images/common/webacc.gif",
      "bodyImage": true
     }
    ],
@@ -7962,10 +7893,6 @@
    "auto": true,
    "attachments": [
     {
-     "name": "대학정보공시",
-     "url": "http://www.academyinfo.go.kr/pubinfo/pubinfo0020/list.do?schlId=0000163&svyYr=2018&pageIdx=all&filePath=01&fileName=01&saveName=01"
-    },
-    {
      "name": "본문이미지-1191x1684.jpg",
      "url": "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoQTkgHARgOQIIGcBuBrAGgTwBUBDACQHlMARAcSoDNjyA6eAOwHMg",
      "bodyImage": true
@@ -8078,10 +8005,6 @@
    "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "attachments": [
-    {
-     "name": "대학정보공시",
-     "url": "http://www.academyinfo.go.kr/pubinfo/pubinfo0020/list.do?schlId=0000163&svyYr=2018&pageIdx=all&filePath=01&fileName=01&saveName=01"
-    },
     {
      "name": "본문이미지-800x1132.jpg",
      "url": "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoQTkgFAjgVwMoFlUBMCiAZATwBcApANwHkB7AawEsaBVAWwDoArABwHMg%20",
@@ -8229,18 +8152,6 @@
    "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "attachments": [
-    {
-     "name": "장학금 신청 주요 일정",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
-    },
-    {
-     "name": "장학금 규정 전문(2021. 10. 1.)",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
-    },
-    {
-     "name": "장학금 지침 전문(2026. 02. 04.)",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
-    },
     {
      "name": "2.조형도동문 장학생 선발 공고문.hwp",
      "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=592B624FC1BF4F50A7D7D37F78C65087_.hwp&ogrfname=2.%EC%A1%B0%ED%98%95%EB%8F%84%EB%8F%99%EB%AC%B8+%EC%9E%A5%ED%95%99%EC%83%9D+%EC%84%A0%EB%B0%9C+%EA%B3%B5%EA%B3%A0%EB%AC%B8.hwp"
@@ -9838,10 +9749,6 @@
     {
      "name": "2026년 성취(대) 장학생 선발계획 연장 공고.hwpx",
      "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367194&attachNo=353349"
-    },
-    {
-     "name": "대학정보공시",
-     "url": "http://www.academyinfo.go.kr/pubinfo/pubinfo0020/list.do?schlId=0000163&svyYr=2018&pageIdx=all&filePath=01&fileName=01&saveName=01"
     }
    ],
    "sourceUrl": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367194&article.offset=0&articleLimit=10",
@@ -9902,26 +9809,12 @@
    "auto": true,
    "attachments": [
     {
-     "name": "부설연구기관",
-     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
-    },
-    {
      "name": "Attachment2026년 성취(대) 장학생 선발계획 연장 공고.hwpx",
      "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35364&ano=53299"
     },
     {
      "name": "본문이미지-1080x1350.jpg",
      "url": "https://www.kw.ac.kr/KWData/webeditor/2026/2026_09_30_112652.jpg",
-     "bodyImage": true
-    },
-    {
-     "name": "본문이미지-509x348.webp",
-     "url": "https://www.kw.ac.kr/ko/img/2025-wa-logo.webp?version=260303",
-     "bodyImage": true
-    },
-    {
-     "name": "본문이미지-402x414.png",
-     "url": "https://www.kw.ac.kr/ko/img/kw_chatbot_icon2.png?v=20251021",
      "bodyImage": true
     }
    ],
@@ -10280,26 +10173,12 @@
    "auto": true,
    "attachments": [
     {
-     "name": "부설연구기관",
-     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
-    },
-    {
      "name": "Attachment20261002 2026년_든든_학업지원금_연장_공고문.pdf",
      "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35374&ano=53420"
     },
     {
      "name": "본문이미지-1024x1028.png",
      "url": "https://www.kw.ac.kr/KWData/webeditor/2026/2026_10_02_104304.png",
-     "bodyImage": true
-    },
-    {
-     "name": "본문이미지-509x348.webp",
-     "url": "https://www.kw.ac.kr/ko/img/2025-wa-logo.webp?version=260303",
-     "bodyImage": true
-    },
-    {
-     "name": "본문이미지-402x414.png",
-     "url": "https://www.kw.ac.kr/ko/img/kw_chatbot_icon2.png?v=20251021",
      "bodyImage": true
     }
    ],
@@ -10722,18 +10601,6 @@
    "noForm": "자동 등록(검수 전) 2026-10-04 — 양식 스키마화는 검수 후 진행",
    "auto": true,
    "attachments": [
-    {
-     "name": "장학금 신청 주요 일정",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
-    },
-    {
-     "name": "장학금 규정 전문(2021. 10. 1.)",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
-    },
-    {
-     "name": "장학금 지침 전문(2026. 02. 04.)",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
-    },
     {
      "name": "붙임 2026년 2학기 국가근로장학금 사전교육 자료.pdf",
      "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F57138&fname=88635FBBEC204913ACD6E7045F8744A7_.pdf&ogrfname=%EB%B6%99%EC%9E%84+2026%EB%85%84+2%ED%95%99%EA%B8%B0+%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EA%B8%88+%EC%82%AC%EC%A0%84%EA%B5%90%EC%9C%A1+%EC%9E%90%EB%A3%8C.pdf"

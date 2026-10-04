@@ -4739,6 +4739,25 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
     const cm = readText(new URL('../collector/collect.mjs', import.meta.url));
     eq('  일반 수집기는 detailAttachments 를 쓴다', /detailAttachments\(html, item\.url/.test(cm), true);
   }
+  /* 🔴 게시판 공통 링크는 첨부가 아니다 (2026-10-05 · 서울과기대 「장학금 규정·지침」 · 계명대 「캠퍼스 투어」 · 광운대 부서 메뉴 · 로고 그림 —
+     같은 사이트의 서로 다른 공고 3건 이상에 같은 주소로 붙으면 공통 링크다. 진짜 첨부는 글마다 번호가 달라 주소가 다르다) */
+  {
+    const AL = await import(new URL('../collector/attachment-link.mjs', import.meta.url));
+    const side = { name: '장학금 규정 전문', url: 'https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST.hwp' };
+    const own = (n) => ({ name: `공고문${n}.hwp`, url: `https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fname=${n}` });
+    const notices = [1, 2, 3].map((n) => ({ url: `https://www.seoultech.ac.kr/x?bidx=${n}`, attachments: [own(n), side] }));
+    const reg = [{ sourceUrl: 'https://www.seoultech.ac.kr/x?bidx=1', attachments: [own(1), side] }];   // 같은 글이 두 파일에 — 한 번으로 센다
+    const removed = AL.stripSiteChrome([notices, reg]);
+    eq('세 공고에 같은 주소로 붙은 게시판 공통 링크는 뺀다 · 글마다 다른 진짜 첨부는 남긴다',
+      [removed, notices.map((n) => n.attachments.length), reg[0].attachments.length], [4, [1, 1, 1], 1]);
+    const two = [1, 2].map((n) => ({ url: `https://a.ac.kr/x?n=${n}`, attachments: [{ name: '같은 신청서.hwp', url: 'https://a.ac.kr/f/1.hwp' }] }));
+    eq('  두 공고까지는 공통으로 보지 않는다(같은 사업을 두 글로 올린 경우)', [AL.stripSiteChrome([two]), two[0].attachments.length], [0, 1]);
+    eq('  화면 틀 글자가 그대로 남은 이름(`\' + fileItem.fileNm + \'`)은 첨부가 아니다',
+      AL.linkAttachments([{ title: "' + fileItem.fileNm + '", url: 'https://kep.kookmin.ac.kr/com/cmsv/FileCtr/fileDefaultDownload.do?fileNo=' }], 'https://kep.kookmin.ac.kr/x').length, 0);
+    for (const f of ['collect.mjs', 'browser-collect.mjs', 'auto-register.mjs']) {
+      eq(`  ${f} 가 저장 전에 stripSiteChrome 을 부른다`, /stripSiteChrome\(/.test(readText(new URL('../collector/' + f, import.meta.url))), true);
+    }
+  }
   eq('공고문은 읽을 대상', AT.isNoticeDoc('2026년 장학생 선발 공고문.hwp'), true);
   eq('  신청서는 읽지 않는다', AT.isNoticeDoc('장학금 신청서.hwp'), false);
   eq('  개인정보 동의서도 읽지 않는다', AT.isNoticeDoc('개인정보 수집·이용 동의서.hwp'), false);

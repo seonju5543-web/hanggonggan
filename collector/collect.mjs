@@ -15,7 +15,7 @@ import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mj
 import { publishBySchool, dropUnserved } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry } from './clean-title.mjs';
-import { isAttachmentEntry, detailAttachments } from './attachment-link.mjs';
+import { isAttachmentEntry, detailAttachments, stripSiteChrome } from './attachment-link.mjs';
 import { activityKind, activityField, notActivity, ACTIVITY_FIELDS } from './activity-kind.mjs';
 import { activityExcerpts, activityDetails, putActivityDetails, ACT_DETAILS_V, sanitizeBenefit } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
@@ -521,6 +521,9 @@ const beforeCap = notices.items;
       사냥꾼도 성공, 수집도 성공, 감사도 통과, 학생만 옛 주소를 누른다.
       2026-08-17 '학교별 파일이 19일 동안 저장되지 않았다' 사고와 같은 모양이다.
       관문: verify/test-collector.mjs '학교별 파일은 전체 목록으로 발행한다'. */
+/* 게시판 공통 링크(모든 글에 붙는 머리·옆 메뉴 링크)를 첨부에서 걷는다 — 정식 등록분과 함께 세야 지난 글도 걷힌다(attachment-link.mjs · 2026-10-05) */
+const chromeRegItems = (() => { try { return JSON.parse(fs.readFileSync(new URL('../data/registered.json', HERE), 'utf8')).items || []; } catch { return []; } })();
+stripSiteChrome([beforeCap, chromeRegItems]);
 publishBySchool(beforeCap);
 
 notices.items = capNotices(notices.items);
@@ -572,6 +575,7 @@ acts.updatedAt = notices.updatedAt;
 /* 분야 목록 원본을 함께 싣는다 (2026-10-04 · 프로필 「관심 분야」 칸) — 앱은 빌드가 없어 activity-kind.mjs 를 못 들여온다.
    앱에 목록을 따로 적으면 두 벌이 되어 수집기가 갈래를 늘려도 화면은 모른다(분야 칩과 같은 이유) */
 acts.fields = ACTIVITY_FIELDS;
+stripSiteChrome([acts.items]);   // 게시판 공통 링크 걷기(attachment-link.mjs) — 활동 글은 활동끼리 센다
 fs.writeFileSync(actsPath, JSON.stringify(acts, null, 1));
 
 /* ── 재단·지자체 공고 발행 — data/external.json (학교 피드와 섞지 않는다 · 규칙은 위와 같다) ── */
