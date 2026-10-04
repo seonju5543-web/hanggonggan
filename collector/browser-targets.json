@@ -44,10 +44,9 @@
    "school": "서울시립대학교",
    "campus": "",
    "candidates": [
-    "https://www.uos.ac.kr/korNotice/list.do?list_id=FA1",
-    "https://www.uos.ac.kr/korNotice/list.do?list_id=FA2"
+    "https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1"
    ],
-   "_note": "FA1이 장학공지(수집 실적 전부 여기), FA2는 학사공지라 장학 0건 — 2026-07-30 순서 교정"
+   "_note": "2026-10-04 장학공지가 별도 사이트로 옮겼다 — 본교 메뉴 「장학공지」 → scholarship.uos.ac.kr (화면 제목 「공지 및 정보 > 공지사항 > 장학」). 옛 FA1 은 이제 일반공지라 장학 0건이었다(FA2 학사공지). 행은 javascript:fnView(날짜, 번호) → GET view.do?brdDate=…&brdSeq=…&brdBbsseq=1 (눌러서 확인). SSO 익명 확인을 스크립트로 거쳐 보통 fetch 는 못 들어간다 — 브라우저 담당"
   },
   {
    "school": "중앙대학교",
@@ -127,10 +126,9 @@
    "school": "홍익대학교",
    "campus": "",
    "candidates": [
-    "https://www.hongik.ac.kr/kr/newscenter/notice.do",
-    "https://www.hongik.ac.kr/index.do"
+    "https://www.hongik.ac.kr/kr/education/notice-undergrad.do?mode=list&srCategoryId=24&srStartDt=&srEndDt=&srSearchKey=article_title&srSearchVal="
    ],
-   "_note": "일반 수집기가 2026-08-02 fetch 실패(TypeError). 원인 문구를 펴 보니 ENOTFOUND(내 샌드박스 기준)라 주소 자체 문제인지 환경 문제인지 아직 못 가린다 — 브라우저 로봇이 실제로 열어 보게 해서 판정한다. 브라우저로도 안 되면 개발자에게 주소 재확인 요청."
+   "_note": "2026-10-04 — 장학 탭(대학공지 srCategoryId=24)으로 바꿨다. 홍익은 STCLab 봇 차단이 헤드리스 브라우저만 막아 이 로봇은 0건이고, 일반 수집기(schools.json · collector 표식 없음)가 보통 fetch 로 읽는다. 여기 남긴 것은 브라우저 대상 수 관문 때문 — 같은 공고는 장부(seen)가 걸러 두 번 실리지 않는다"
   },
   {
    "school": "서울과학기술대학교",
