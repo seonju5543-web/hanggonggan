@@ -485,4 +485,41 @@ globalThis.fetch = async (url) => {
       }
     }
   }
+  /* ── ⑥ AI 자격 읽기 버튼(eligibility-fill.yml) — 대상 세 갈래를 다 세고, 0 이면 돈이 드는 단계만 건너뛴다 (bodies-10) ── */
+  {
+    const wf = readText('.github/workflows/eligibility-fill.yml');
+    const stepIf = (name) => {
+      const i = wf.indexOf(`- name: ${name}\n`);
+      if (i < 0) return null;
+      const m = wf.slice(i).match(/^- name: [^\n]*\n {8}if: ([^\n]*)/);
+      return m ? m[1] : '';
+    };
+    const PAID = ['SDK 설치', '첨부만 (공고문 PDF · 포스터 그림)', '공고 하나만', '시범 3건', '전수 169건', '대외활동 — 포스터·첨부·본문 AI 읽기'];
+    const FREE = ['공고문 첨부 받기 (무료)', '받은 첨부에서 글자 뽑기 (HWP 본문 · PDF)', '그림·스캔 첨부 글자 읽기 (OCR)', '첨부에서 자격 발췌 (무료)'];
+    eq('⑥ 돈이 드는 단계 여섯은 대상이 0건이면 건너뛴다 · 무료 단계 넷은 그대로 돈다(받은 뒤에 대상이 생길 수 있다)',
+      [PAID.map((n) => /steps\.preview\.outputs\.count != '0'/.test(stepIf(n) || '')), FREE.map((n) => stepIf(n) !== null && !/count/.test(stepIf(n)))],
+      [PAID.map(() => true), FREE.map(() => true)]);
+    /* 세는 줄을 워크플로에서 그대로 떼어 표본 출력에 돌린다 — 장학 본문 · 공고문 첨부 · 대외활동 세 줄의 합 */
+    const lines = (wf.match(/^ {10}s=\$\(sed[\s\S]*?^ {10}echo "count=[^\n]*$/m) || [''])[0];
+    const hasBash = spawnSync('bash', ['-c', 'echo BOK'], { encoding: 'utf8' });
+    if (!(hasBash.status === 0 && /BOK/.test(hasBash.stdout || ''))) {
+      console.log('  … ⑥ 세기 줄 실행 건너뜀 — 이 컴퓨터에 bash 가 없다. 클라우드 로봇에서는 실제로 돈다.');
+    } else {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-efill-'));
+      try {
+        const sample = path.join(dir, 'preview.txt'); const out = path.join(dir, 'out.txt');
+        const SAMPLE = '[elig-ai] 대상 5건 — 전수(--all)\n[elig-ai] 첨부로 읽을 수 있는 공고 3건 (포스터 그림 1 · 공고문 PDF 2)\n[activity-docs] AI 대상 7건 (자격 0줄 · 무료로 못 읽은 것)\n';
+        const count = (text) => {
+          fs.writeFileSync(sample, text); fs.writeFileSync(out, '');
+          spawnSync('bash', ['-c', lines.replace(/^ {10}/gm, '').split('/tmp/preview.txt').join(sample)], { encoding: 'utf8', env: cleanEnv({ GITHUB_OUTPUT: out }) });
+          return fs.readFileSync(out, 'utf8').trim();
+        };
+        eq('  대상 수 = 장학 본문 + 공고문 첨부 + 대외활동 (예전엔 첫 줄만 세어 첨부·대외활동만 있는 날 0 이었다)',
+          [count(SAMPLE), count('[elig-ai] 대상 0건 — 전수(--all)\n[elig-ai] 첨부로 읽을 수 있는 공고 2건 (포스터 그림 2 · 공고문 PDF 0)\n[activity-docs] AI 대상 0건\n'), count('')],
+          ['count=15', 'count=2', 'count=0']);
+      } finally {
+        fs.rmSync(dir, { recursive: true, force: true });
+      }
+    }
+  }
 }
