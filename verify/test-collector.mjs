@@ -8011,15 +8011,18 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   const exact = ME.fitDetail(sch(['미술학과 재학생']), prof('컴퓨터공학과', 'engineering'));
   eq('정확한 학과 이름은 여전히 미달을 낸다', exact.fails.length, 1);
 
-  /* 🔴 데이터 전수 — 대학원 전용 공고가 높은 적합도로 떠 있지 않은가 */
-  const reg = JSON.parse(readText(new URL('../data/registered.json', import.meta.url))).items;
-  const bad = reg.filter((it) => {
-    const ls = it.eligibilityLines || [];
-    if (!ls.some((t) => PR.gradTarget(t) === 'body')) return false;
-    if (ls.some((t) => PR.mentionsUndergrad(t))) return false;
-    return !ME.fitDetail(it, prof('컴퓨터공학과', 'engineering')).unread;
-  }).map((it) => it.id);
-  eq('등록 공고 전수 — 대학원 전용인데 점수가 매겨진 것이 없다', bad, []);
+  /* 🔴 대학원 전용 공고는 학부생에게 '적합'으로 뜨지 않는다 — **표본으로** 잰다 (2026-10-04).
+     예전엔 등록 공고 전수를 여기서 쟀다(실데이터 관문 — CLAUDE.md 가 금한 꼴). 10-04 로봇이 대학원 전용 공고 하나(일운과학기술재단)의
+     자격 줄을 채우자 이 줄이 빨개져 **수집 실행마다 그날 자동 등록분이 되돌려졌다**. 게다가 기대 값('자격 미확인')이 2026-09-12
+     개발자 결정('대학원 전용은 미달' — parse-requirements.js gradTarget 머리말)과 반대였다. 실데이터는 감사(audit-data.js)가 **경고**로 본다. */
+  const gradOnlySch = sch(['국내·외 석사과정 이상 재학생 (전공 무관)']);
+  const gradFd = ME.fitDetail(gradOnlySch, prof('컴퓨터공학과', 'engineering'));
+  eq('대학원 전용 공고(표본) — 학부생에게 미달(적합으로 뜨지 않는다)', [gradFd.fails.length > 0, gradFd.unread], [true, false]);
+  /* 학사를 석·박사와 나란히 적은 과정 이름은 학부도 대상이다 — 틀린 미달 금지(파안장학 2026-10-04 실측 꼴) */
+  const bothFd = ME.fitDetail(sch(['학사, 석사ㆍ박사과정에 재학 중인 학생']), prof('컴퓨터공학과', 'engineering'));
+  eq('「학사, 석사ㆍ박사과정에 재학 중인 학생」 — 학부생에게 미달이 아니다 · 「학사 학위 소지자」는 학부가 아니다',
+    [bothFd.fails.length, PR.mentionsUndergrad('학사, 석사ㆍ박사과정에 재학 중인 학생'), PR.mentionsUndergrad('대학원 학·석·박사 과정 재학생'), PR.mentionsUndergrad('학사 학위 소지자로서 대학원 진학 예정자')],
+    [0, true, true, false]);
 }
 
 /* ── 화면이 두 곳에서 다른 말을 하지 않는다 (2026-09-10 신설 · 코드 리뷰) ──────────
