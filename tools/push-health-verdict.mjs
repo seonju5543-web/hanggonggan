@@ -17,8 +17,10 @@
      outdated  `lastSlot` 칸이 아예 없음 — 새 서버 코드가 아직 배포되지 않았다
      stale     마지막으로 시작한 회차가 26시간보다 오래됨 — 두 회차(08:10·20:10) 연속 시작하지 않았다
                (06:17 확인의 정상 간격은 약 10시간 · 한 회차만 빠지면 약 22시간)
-     error     마지막 회차가 깨우기를 보냈는데(sent > 0) 푸시 서비스가 한 대도 받지 않았다(woke = 0)
+     error     마지막 회차가 **살아 있는 구독에** 깨우기를 보냈는데(sent − dropped > 0) 푸시 서비스가 한 대도 받지 않았다(woke = 0)
                — woke 는 '푸시 서비스가 받아 준 수'이지 폰에 닿은 수가 아니다. 원인은 단정하지 않는다
+               — 없어진 구독(404·410 → dropped)만 있던 회차는 경보가 아니다: 서버는 그런 구독을 sent 로 센 뒤 지우는데,
+                 이것은 폰을 바꾸거나 앱을 지운 뒤의 평범한 정리다(2026-10-04 리뷰 — {sent:1, dropped:1, woke:0} 이 다음 날 'VAPID 의심' 경보가 됐다)
      ok        그 밖
    경고(판정은 ok 그대로 · 로그에만): 등록 0대 · lastSlot 이 null(새 저장소 — 아직 한 회차도 시작 전)
 
@@ -61,8 +63,10 @@ export function verdict({ curlOk, code, json, now = Date.now() } = {}) {
     }
   }
   const r = j.lastRun;
-  if (r && Number(r.sent) > 0 && Number(r.woke) === 0) {
-    return out('error', `마지막 회차(${r.slot || '수동'})가 깨우기를 ${r.sent}건 보냈는데 푸시 서비스가 한 건도 받아 주지 않았습니다(woke=0 · 폰 도착 수가 아니라 푸시 서비스가 받은 수) — 서버 열쇠(VAPID)가 어긋났을 수 있으니 확인이 필요합니다`);
+  // 없어진 구독(dropped)은 sent 에 들어 있지만 받을 폰이 없었던 것이다 — 그것만 있던 회차는 정리 작업이지 경보가 아니다
+  const live = r ? Number(r.sent) - Number(r.dropped || 0) : 0;
+  if (r && live > 0 && Number(r.woke) === 0) {
+    return out('error', `마지막 회차(${r.slot || '수동'})가 등록된 폰 ${live}대에 깨우기를 보냈는데 푸시 서비스가 한 건도 받아 주지 않았습니다(woke=0 · 폰 도착 수가 아니라 푸시 서비스가 받은 수 · 없어진 구독 ${Number(r.dropped || 0)}건은 빼고 셈) — 서버 열쇠(VAPID)가 어긋났을 수 있으니 확인이 필요합니다`);
   }
   return out('ok', '');
 }

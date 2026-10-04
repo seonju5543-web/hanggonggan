@@ -140,6 +140,42 @@ export default async function gate(eq, ctx) {
     const h2 = await health(env3);
     eq('  마지막 회차보다 뒤의 포기 기록은 계속 lastError 로 보인다', [!!h2.lastError, h2.pastError || null], [true, null]);
 
+    /* ③ 발송 회차도 끝까지 돌면 결과가 남는다 (2026-10-04 리뷰 — 위 표본은 '알릴 거리 없음' 회차뿐이라
+       send 단계 끝의 finishRun 'sent' 를 옛 clearRun 으로 되돌려도 초록이었다) */
+    {
+      const pair = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify']);
+      const jwk = await crypto.subtle.exportKey('jwk', pair.privateKey);
+      const pub = Buffer.from(await crypto.subtle.exportKey('raw', pair.publicKey)).toString('base64url');
+      const env4 = { SUBS: fakeKV(), VAPID_JWK: JSON.stringify(jwk), VAPID_PUBLIC: pub };
+      await env4.SUBS.put('state:seen', JSON.stringify(['n:https://seed/0']));   // 첫 실행이 아니게(첫 실행은 새 글로 안 깨운다)
+      const ep = 'https://fcm.googleapis.com/fcm/send/sample';
+      await env4.SUBS.put(W.subKey(ep), JSON.stringify({ endpoint: ep, school: 'A대학교', campus: '' }));
+      let feed = [{ url: 'https://n/1', school: 'A대학교', title: '새 장학 안내' }];
+      let pushStatus = 201;
+      const pushes = [];
+      globalThis.fetch = async (u) => {
+        u = String(u);
+        if (u.endsWith('data/registered.json')) return new Response(JSON.stringify({ items: [] }));
+        if (u.endsWith('data/notices.json')) return new Response(JSON.stringify({ items: feed }));
+        pushes.push(u);                                                          // 데이터 주소가 아니면 푸시 서비스
+        return new Response('', { status: pushStatus });
+      };
+      const pick = (r) => r && { outcome: r.outcome, sent: r.sent, woke: r.woke, dropped: r.dropped, slot: r.slot };
+      await runSlot(env4, KST('2026-10-04T08:10:30'));
+      const s1 = await health(env4);
+      eq('③ 발송 회차(새 글 1 · 그 학교 구독 1)를 끝까지 돌리면 /health.lastRun 이 그 회차다 — 깨우기 1건 · 받아 줌 1건',
+        [pick(s1.lastRun), pushes, s1.step], [{ outcome: 'sent', sent: 1, woke: 1, dropped: 0, slot: '2026-10-04#08:10' }, [ep], 'idle']);
+      feed = [...feed, { url: 'https://n/2', school: 'A대학교', title: '또 새 장학' }];
+      pushStatus = 410;
+      await runSlot(env4, KST('2026-10-04T20:10:30'));
+      const s2 = await health(env4);
+      eq('  그 폰이 없어진 다음 회차(푸시 서비스 410) — lastRun {sent:1 · woke:0 · dropped:1} · 구독 기록은 지운다',
+        [pick(s2.lastRun), s2.subs], [{ outcome: 'sent', sent: 1, woke: 0, dropped: 1, slot: '2026-10-04#20:10' }, 0]);
+      const v2 = pushVerdict({ curlOk: true, code: 200, json: s2, now: KST('2026-10-05T06:17:00') });
+      eq('④ 그 /health 로 다음 날 06:17 매일 확인 — 없어진 구독만 있던 회차는 경보가 아니다(ok · 등록 0대 경고만)',
+        [v2.verdict, v2.warnings.length], ['ok', 1]);
+    }
+
     /* ④ 매일 확인의 판정 — 표본 */
     const NOW = KST('2026-10-04T06:17:00');
     const okJ = { ok: true, configured: true, step: 'idle', sent: 0, subs: 4, lastError: null, lastSlot: '2026-10-03#20:10', lastRun: { outcome: 'nothing', sent: 0, woke: 0 } };
@@ -150,6 +186,9 @@ export default async function gate(eq, ctx) {
     eq('  판정 — 깨우기를 보냈는데 한 건도 안 받음 error · HTTP 503 down · 연결 실패 down · 열쇠 없음 misconfig · 포기 기록 error · 저장소 못 읽음 error',
       [pv({ lastRun: { outcome: 'sent', sent: 3, woke: 0 } }), pv({}, { code: 503 }), pv({}, { curlOk: false, code: '000' }), pv({ configured: false }), pv({ lastError: { at: 1 } }), pv({ subs: -1 })],
       ['error', 'down', 'down', 'misconfig', 'error', 'error']);
+    eq('  판정 — 없어진 구독만 있던 회차 {sent:1 · dropped:1 · woke:0} ok · 살아 있는 구독이 남았는데 0건 {sent:3 · dropped:1 · woke:0} error',
+      [pv({ lastRun: { outcome: 'sent', sent: 1, dropped: 1, woke: 0 } }), pv({ lastRun: { outcome: 'sent', sent: 3, dropped: 1, woke: 0 } })],
+      ['ok', 'error']);
     const w0 = pushVerdict({ curlOk: true, code: 200, json: { ...okJ, lastSlot: null, subs: 0 }, now: NOW });
     eq('  새 저장소(lastSlot null)·등록 0대는 경고만 하고 ok', [w0.verdict, w0.warnings.length], ['ok', 2]);
     eq('  깨우기 실패 문구는 원인을 단정하지 않고 woke 가 도착 수가 아님을 적는다',
