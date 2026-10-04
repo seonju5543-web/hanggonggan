@@ -4649,6 +4649,33 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
   const mapping = extsOf(/const ext = \(a\.name\.match\(\/\\\.\(([^)]+)\)\$\/i\)/);
   const gap = wanted.filter((e) => !mapping.includes(e));
   eq(`받는 확장자 ${wanted.length}종이 모두 파일 이름 규칙에 있다`, gap.join(',') || '(없음)', '(없음)');
+  /* 🔴 첨부 받기 줄이 돈다 · 금액·마감만 빈 공고도 받는다 (2026-10-05 · UI-12 — 학생 화면 공고 27건이 한 번도 순서가 안 왔다) */
+  {
+    const ET = await import(new URL('../collector/elig-targets.mjs', import.meta.url));
+    const req = (it) => it.req || [];
+    const o = { requirementLines: req, docAtts: (it) => it.atts || [], live: (it) => !it.closed, max: 2 };
+    const doc = [{ name: '공고문.pdf', url: 'u' }];
+    const items = [
+      { id: 'A', atts: doc },                                                        // 어제 받아 봤다 — 쉰다
+      { id: 'B', atts: doc },                                                        // 한 번도 안 받았다
+      { id: 'C', atts: doc, req: ['재학생'], deadline: '2026-10-30' },              // 자격은 읽었지만 금액이 비었다
+      { id: 'D', atts: doc, closed: true },                                          // 학생에게 안 보인다
+      { id: 'E', atts: doc, req: ['재학생'], deadline: '2026-10-30', amountValue: 1000000 },   // 다 읽었다
+      { id: 'F', atts: doc },                                                        // 열흘 전에 받아 봤다
+    ];
+    const idx = { A: { at: '2026-10-04', files: [] }, F: { at: '2026-09-25', files: [] } };
+    eq('첨부 받기: 안 해 본 것부터 · 금액만 빈 공고도 · 최근에 해 본 것과 안 보이는 것은 건너뛴다',
+      ET.pickEligTargets(items, idx, '2026-10-05', o).map((t) => t.it.id), ['B', 'C']);
+    eq('  한도가 남으면 오래전에 해 본 것도', ET.pickEligTargets(items, idx, '2026-10-05', { ...o, max: 5 }).map((t) => t.it.id), ['B', 'C', 'F']);
+    eq('  deepfetch 가 이 고르기를 쓴다', /pickEligTargets\(/.test(eligFn), true);
+    eq('  시도한 날을 색인에 적는다(안 적으면 줄이 다시 멈춘다)', /\.at\s*=\s*today/.test(eligFn), true);
+    /* OCR 이 발췌·금액보다 뒤면 그 실행엔 못 읽고, 다음 실행의 첨부 받기가 .ocr.txt 를 지워 영영 못 읽는다 */
+    const cs = readText(new URL('../.github/workflows/collect-scholarships.yml', import.meta.url));
+    const at = (re) => cs.search(re);
+    eq('  수집 로봇: 첨부 받기 → OCR → 발췌 · 금액 순서',
+      [at(/deepfetch\.mjs --elig-attach/), at(/ocr-text\.py/), at(/extract-excerpts\.mjs --write/), at(/extract-amounts\.mjs --write/)]
+        .every((v, i, a) => v >= 0 && (i === 0 || a[i - 1] < v)), true);
+  }
   const AT = await import(new URL('../collector/attachment-text.mjs', import.meta.url));
   /* ① 신청서·동의서는 읽지 않는다 — 읽으면 개인정보 수집 항목이 자격 자리에 앉는다
         (2026-08-20에 실제로 3건이 그렇게 돼 통째로 되돌린 적이 있다) */
