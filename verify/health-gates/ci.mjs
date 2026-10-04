@@ -55,6 +55,14 @@ export function stepsOf(yml) {
 
 const read = (root, rel) => fs.readFileSync(new URL(rel, root), 'utf8');
 
+/* 함수 하나의 몸통(주석을 걷어 낸 것) — `async function 이름(` 부터 맨 앞 칸의 `}` 까지 */
+function fnBody(src, name) {
+  const i = src.indexOf(`async function ${name}(`);
+  const j = i < 0 ? -1 : src.indexOf('\n}\n', i);
+  if (j < 0) return '';
+  return src.slice(i, j + 2).replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+}
+
 /* 경보 단계의 셸 글을 **실제로 돌려** 본문을 받는다 — 글자 대조로는 갈래가 바뀌어도 모른다.
    🔴 진짜 gh 를 절대 부르지 않는다: 같은 이름의 셸 함수가 먼저 잡히고(함수가 실행 파일보다 앞선다),
       열쇠(GH_TOKEN·GITHUB_TOKEN)와 집 폴더를 넘기지 않는다 — 함수가 빠져도 이슈를 못 만든다. */
@@ -103,6 +111,18 @@ export default async function gate(eq, ctx) {
     [/require\('\.\/open-form-sample\.cjs'\)/.test(drv), /shouldPlantSample\(/.test(drv), /openFormSample\(/.test(drv),
       /if \(!ids\.length\) return/.test(drv), /delete copy\.eligibility|864e5/.test(drv)],
     [true, true, true, false, false]);
+  /* (2026-10-04 코드 리뷰) 위 글자 하나만 막으면 뜻이 같은 이른 반환(`if (ids.length === 0) return …` ·
+     `if (!ids.length) { return { id: null, ok: false }; }`)을 되살려도 초록불이다 — 그래서 **몸통을 잘라** 본다:
+     표본을 심기(shouldPlantSample) 전에 나오는 return 은 후보 거르기 콜백과 성공 return 둘뿐이어야 한다. */
+  const anyBody = fnBody(drv, 'driveAnyLiveForm');
+  const plantAt = anyBody.indexOf('shouldPlantSample(');
+  eq('  driveAnyLiveForm 몸통을 잘라 냈다(헛도는 검사가 아니다)', [anyBody.length > 500, plantAt > 0], [true, true]);
+  eq('  표본 심기 전에 나오는 return 은 후보 거르기 콜백 · 성공한 후보 둘뿐(실패로 빠져나가는 길이 없다)',
+    anyBody.slice(0, Math.max(plantAt, 0)).split('\n').filter((l) => /\breturn\b/.test(l)).map((l) => l.trim()),
+    ['return s && s.formId && FORM_TEMPLATES[s.formId];', 'if (r.ok) return r;']);
+  eq('  실패를 돌려주는 return 은 함수 맨 끝 하나 · `id: null` 로 돌려주는 길이 없다',
+    [[...anyBody.matchAll(/\breturn\s*\{[^}]*\bok:\s*false/g)].map((m) => m.index > plantAt), /return\s*\{\s*id:\s*null/.test(anyBody)],
+    [[true], false]);
 
   /* ── ② 화면 검사 워크플로 — 한 곳이 넘어져도 그물이 남는다 ── */
   const SAMPLE = [
