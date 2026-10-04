@@ -106,10 +106,12 @@ jobs:
         run: |
           node verify/test-collector.mjs
           node verify/audit-data.js
+      # 🔴 장부(rescue-ledger.json)도 함께 되돌린다 (2026-10-04 점검 bodies-12) — 본문 확보는 장부에 '확보한 날'로 남는데(이레 쉼),
+      #    본문만 되돌리고 장부를 남기면 그 공고를 이레 동안 아무도 안 연다. 대외활동 장부·리포트는 남긴다('해 봤다'와 진단 기록).
       - name: 관문에 걸리면 되돌린다
         if: steps.audit.outcome == 'failure'
         run: |
-          git checkout -- collector/extracted/browser-bodies.json data/registered.json || true
+          git checkout -- collector/extracted/browser-bodies.json data/registered.json collector/rescue-ledger.json || true
           echo "::error::재수집 결과가 감사를 통과하지 못했습니다. 되돌렸습니다."
           exit 1
 
@@ -143,8 +145,21 @@ jobs:
             echo "::notice::새로 확보한 본문이 없습니다."
           fi
 
+      # 🔴 재수집 단계가 끝까지 못 갔으면 작업을 실패로 남긴다 (2026-10-04 점검 bodies-2).
+      #    그 단계는 continue-on-error 라(아래 대외활동·관문·저장이 돌아야 한다) 단계 시한(11분)에 잘려도 작업은 '성공'이었다 —
+      #    run #53 은 장학 본문 0건인데 초록불이었고, 실패 알림도 안 갔고, 하트비트도 성공으로 셌다.
+      #    저장 **뒤**에 둔다(저장은 이미 끝났다) · 바로 아래 알림이 failure() 로 이슈를 만든다.
+      - name: 본문 재수집 단계가 끝까지 못 갔으면 실패로 남긴다
+        if: steps.rescue.outcome != 'success'
+        timeout-minutes: 1
+        run: |
+          echo "::error::본문 재수집 단계가 '${{ steps.rescue.outcome }}' 로 끝났습니다(단계 시한 11분에 잘렸거나 로봇이 넘어졌습니다). 그때까지 받은 것은 위에서 저장했습니다."
+          exit 1
+
       # 🔴 `if: failure()` 만 쓰면 안 된다 — 시간 초과는 '실패'가 아니라 '취소'라
       #    알림 단계까지 통째로 건너뛴다 (2026-08-04 사고).
+      # 🔴 저장소의 리포트가 **이번 실행 것**일 때만 붙인다 (2026-10-04 점검 bodies-7) — 리포트를 쓰기 전에 끊긴 실행이
+      #    9-30 판 리포트를 10-03 실패 이슈에 붙여, 실제로는 넷째 공고에서 멈춘 것을 '경희대 공고들이 4회째 본문 없음'처럼 읽게 했다.
       - name: 실패하면 이슈로 알린다
         if: failure() || cancelled()
         continue-on-error: true
@@ -152,11 +167,37 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            let body = '(리포트 없음)';
-            try { body = fs.readFileSync('collector/rescue-report.md', 'utf8').slice(0, 8000); } catch {}
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);   // 리포트의 '실행:' 은 한국 날짜다
+            let report = '';
+            try { report = fs.readFileSync('collector/rescue-report.md', 'utf8'); } catch {}
+            const day = (report.match(/^실행: (\d{4}-\d{2}-\d{2})/m) || [])[1];
+            const part = !report ? ['(리포트 없음 — 로봇이 리포트를 쓰기 전에 끊겼습니다)']
+              : day !== today ? [`이번 실행은 리포트를 쓰기 전에 끊겼습니다(저장소의 리포트는 ${day || '날짜 모름'} 판이라 붙이지 않았습니다).`]
+              : ['```', report.slice(0, 8000), '```'];
             await github.rest.issues.create({
               owner: context.repo.owner, repo: context.repo.repo,
               labels: ['rescue-bodies'],
-              title: `🚨 자격요건 로봇 (진짜 브라우저) 실패 — ${new Date().toISOString().slice(0, 10)}`,
-              body: ['재수집이 실패하거나 시간 초과로 취소됐습니다.', '', '```', body, '```'].join('\n'),
+              title: `🚨 자격요건 로봇 (진짜 브라우저) 실패 — ${today}`,
+              body: ['재수집이 실패하거나 시간 초과로 취소됐습니다.', `실행 로그: ${runUrl}`, '', ...part].join('\n'),
             });
+
+      # 끝까지 돈 실행은 옛 실패 이슈를 닫는다 (2026-10-04 점검 bodies-7 — 09-04·…·10-03 실패 이슈가 다 열려 있어 어느 것이 지금 일인지 알 수 없었다).
+      # 🔴 success() 일 때만 — 실패한 실행이 실패 이슈를 닫으면 안 된다. robot-heartbeat.yml '옛 경보를 닫는다'처럼 코멘트를 남기고 닫는다.
+      - name: 성공하면 옛 실패 이슈를 닫는다
+        if: success()
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const open = await github.paginate(github.rest.issues.listForRepo, {
+              owner: context.repo.owner, repo: context.repo.repo, labels: 'rescue-bodies', state: 'open', per_page: 100,
+            });
+            for (const is of open.filter((x) => !x.pull_request)) {
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: is.number,
+                body: `다음 실행(${runUrl})이 끝까지 돌아 닫습니다.` });
+              await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo, issue_number: is.number,
+                state: 'closed', state_reason: 'completed' });
+            }
