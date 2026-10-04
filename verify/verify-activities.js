@@ -225,12 +225,27 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
        auto 가 되어, 29px 알약에 얹은 44px 손가락 덧판이 줄 밖으로 나가자 줄이 세로로 3px
        스크롤됐다 — 옆으로 미는 손짓에 위아래로도 밀렸다. 안쪽 여백으로 자리를 만들어 고쳤다.
        ⚠️ 덧판을 키우거나 여백을 줄이면 **바로 되살아난다.** 가로 넘침은 그대로 있어야 한다. */
+    /* 🔴 2026-10-04 개발자 지시 "분야가 너무 길어 옆으로 넘겨야 해서 불편" — 옆으로 미는 줄을 걷고
+       **줄바꿈 + 접기**로 바꿨다. 그래서 이제 재는 성질은 '스크롤 상자가 아니다'이다. */
     const rowBox = await page.$eval('#activities-field-filters', (e) => ({
-      세로: e.scrollHeight - e.clientHeight, 가로축: getComputedStyle(e).overflowX }));
-    eq('③   분야 줄은 세로로 안 넘친다 (옆으로 밀 때 위아래로 안 밀린다)', rowBox.세로, 0);
-    /* ⚠️ '가로로 실제로 넘치는가'로 재지 말 것 — 픽스처는 칩이 둘셋뿐이라 안 넘친다.
-       재는 것은 **옆으로 미는 줄이라는 성질**이고, 세로 넘침 0 은 그 성질과 함께여야 뜻이 있다. */
-    eq('③   가로로 미는 줄은 그대로다 (세로만 막혔다)', rowBox.가로축, 'auto');
+      세로: e.scrollHeight - e.clientHeight, 가로: e.scrollWidth - e.clientWidth, 줄바꿈: getComputedStyle(e).flexWrap }));
+    eq('③   분야 줄은 세로로 안 넘친다 (위아래로 안 밀린다)', rowBox.세로, 0);
+    eq('③   분야 줄은 옆으로 밀지 않고 줄바꿈한다', [rowBox.가로, rowBox.줄바꿈], [0, 'wrap']);
+    /* 접기 — 픽스처는 분야가 둘뿐이라 칩 그리는 함수에 분야 열 개짜리 목록을 직접 준다 */
+    const fold = await page.evaluate(() => {
+      const fs = ['가', '나', '다', '라', '마', '바', '사', '아', '자', '차'];
+      const list = fs.flatMap((f, i) => Array(10 - i).fill({ field: f }));
+      const row = document.querySelector('#activities-field-filters');
+      const names = () => [...row.querySelectorAll('.filter-chip')].map((c) => c.textContent);
+      renderActivityFieldChips(list); const shut = names();
+      activitiesField = '차'; renderActivityFieldChips(list); const picked = names();
+      activitiesField = 'all'; activitiesFieldOpen = true; renderActivityFieldChips(list); const open = names();
+      activitiesFieldOpen = false; renderActivities();
+      return { shut, picked, open };
+    });
+    eq('③   분야가 많으면 많은 순 여섯 + 「+n」', fold.shut, ['분야 전체', '가', '나', '다', '라', '마', '바', '+4']);
+    eq('③   고른 분야는 접혀도 보인다', fold.picked, ['분야 전체', '가', '나', '다', '라', '마', '바', '차', '+3']);
+    eq('③   펼치면 전부 + 접기', fold.open, ['분야 전체', ...'가나다라마바사아자차'.split(''), '접기']);
     /* 알약은 작아도 **손가락 표적은 그대로** — 알약 위아래 바깥을 짚어도 그 칩이 잡혀야 한다 */
     eq('③   알약은 작지만 손가락 표적은 작아지지 않았다 (안 보이는 덧판)',
       await page.$eval('#activities-field-filters', (row) => {
