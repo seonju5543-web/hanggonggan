@@ -2472,8 +2472,24 @@ function loadNoticesIfSchoolChanged() {
   loadNotices();
 }
 
+/* 🔴 **부팅 덮개가 떠 있는 동안에는 다시 그리기를 모았다가 한 번에** (2026-10-04 개발자 지적:
+   "시안과 같이 스무스한 트랜지션이 필요한데 지금 현황은 중간에 끊기고 프로페셔널하지 못해").
+   실측(폰 정도 CPU · 4배 느리게): 앱을 열면 데이터 파일 일곱 개가 하나씩 도착할 때마다 홈을 통째로
+   다시 그렸다 — 한 번에 0.4~1.8초, 다 합쳐 6초. 그 사이 인트로(선 긋기)가 1.6초씩 멈췄다.
+   덮개 밑이라 학생은 그 중간 그림을 볼 일이 없다 → 모았다가 다 도착하면 한 번만 그린다(`bootHoldRelease`).
+   덮개가 걷힌 뒤(`boot:gone`)에는 무조건 풀린다 — 늦게 온 데이터가 영영 안 그려지는 일은 없다. */
+let bootHold = true;
+let bootHeld = false;
+function bootHoldRelease() {
+  if (!bootHold) return;
+  bootHold = false;
+  if (bootHeld) { bootHeld = false; rerenderVisible(); }
+}
+window.addEventListener('boot:gone', bootHoldRelease);
+
 function rerenderVisible() {
   if (!state.profile) return;
+  if (bootHold) { bootHeld = true; return; }
   if (!$('#screen-home').hidden) renderHome();
   if (!$('#screen-explore').hidden) renderExplore();
   if (!$('#screen-activities').hidden) renderActivities();
@@ -2643,11 +2659,11 @@ const HERO_TILES = [
     svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="3" width="19" height="25" rx="2.5" fill="#fff" stroke="#cfc6b6" stroke-width="1.2"/><path d="M9 9h11M9 13.5h11M9 18h7" stroke="#9db2d8" stroke-width="2" stroke-linecap="round"/><g transform="rotate(38 22 19)"><rect x="19.5" y="7" width="5" height="17" rx="1" fill="#f1b03b"/><rect x="19.5" y="7" width="5" height="3" fill="#e98c9b"/><path d="M19.5 24h5L22 28.5z" fill="#f2d7ae"/><path d="M21.3 27.1h1.4L22 28.5z" fill="#33231f"/></g></svg>' },
 ];
 function loadTuition() {
-  fetch('data/tuition.json', { cache: 'no-store' })
+  return fetch('data/tuition.json', { cache: 'no-store' })
     .then((r) => (r.ok ? r.json() : null))
     .then((d) => {
       tuitionTable = (d && d.schools) || {};
-      if (state.profile && !$('#screen-home').hidden) renderHome();
+      rerenderVisible();
     })
     .catch(() => { /* 오프라인 — 비율형은 미확인으로 둔다 */ });
 }
@@ -7609,16 +7625,12 @@ loadState();
 bindEvents();
 initOnboarding();
 loadLinkChecks();   // 원문 링크 확인 장부 — 링크를 그리는 목록들보다 먼저 띄운다(작다 · 없어도 조용하다)
-loadNotices();
-loadNews();
-loadActivities();
-loadExternal();
-loadRegistered();
-loadKosaf();
+/* 처음 받는 데이터 — 다 도착하면(`bootJobs`) 홈을 한 번 그리고 인트로를 돌린다(위 `bootHold` 머리말) */
+const bootJobs = [loadNotices(), loadNews(), loadActivities(), loadExternal(), loadRegistered(), loadKosaf()];
 /* 🔴 학과 목록은 **여기서 받지 않는다** (2026-09-26) — 209개교가 든 407KB 파일이었고
    쓰는 곳은 온보딩 자동추천 한 곳뿐이다. 학교가 정해질 때 그 학교 파일만 받는다
    (`loadMajorsFor` · 위 주석). */
-loadTuition();  // 학교별 등록금 — `수업료 100%` 비율형 공고를 원으로 바꾸는 데 쓴다
+bootJobs.push(loadTuition());  // 학교별 등록금 — `수업료 100%` 비율형 공고를 원으로 바꾸는 데 쓴다
 if (typeof loadFormTemplates === 'function') loadFormTemplates(); // 정식 등록 양식 최신화
 /* 🔴 두 손가락으로 화면이 커졌다 작아졌다 하던 것 (2026-09-01 개발자 지적).
    막는 곳이 셋이라 셋 다 있어야 한다 — 하나만 두면 어떤 폰에서는 그대로 커진다:
@@ -7638,10 +7650,10 @@ function refreshOpenScreen() {
   if (!$('#screen-my').hidden) renderMy();
   if (!$('#screen-settings').hidden) renderSettings();
 }
-walletRefresh().then(photoRefresh).then(() => {
+bootJobs.push(walletRefresh().then(photoRefresh).then(() => {
   refreshOpenScreen();
-  if (!$('#screen-home').hidden) renderHome();   // 홈 왼쪽 위 동그라미의 사진
-});
+  rerenderVisible();   // 홈 왼쪽 위 동그라미의 사진
+}));
 if (typeof notifyInit === 'function') {
   notifyInit().then(refreshOpenScreen).catch(() => {});
 }
@@ -7697,7 +7709,11 @@ else if (resumePlan.screen === 'onboarding') {
   }
 }
 /* 부팅 화면을 걷는다 — 화면이 정해진 바로 이 자리다 */
-if (typeof window.bootDone === 'function') window.bootDone();
+/* 🔴 덮개에는 '데이터가 다 와서 한 번 그렸다'는 약속을 건넨다 — 덮개는 그걸 기다렸다가(천장 있음) 인트로를 돌린다.
+   실패한 받기도 '끝'이다(오프라인 학생을 덮개 앞에 세워 두지 않는다). 덮개 파일이 없어도 그림은 그려진다. */
+const bootSettled = Promise.all(bootJobs.map((j) => Promise.resolve(j).catch(() => {}))).then(bootHoldRelease);
+if (typeof window.bootDone === 'function') window.bootDone(bootSettled);
+else bootHoldRelease();
 
 /* 앱이 숨는 순간에 본 시각·스크롤을 확실히 적어 둔다 (formProgressSave 머리말 참조) */
 document.addEventListener('visibilitychange', () => {

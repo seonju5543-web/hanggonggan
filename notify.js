@@ -338,16 +338,28 @@ function notifyConsentSheet() {
   });
 }
 
+/* 🔴 **부팅 덮개가 걷힌 뒤에** 부른다 (2026-10-04 — 켤 때마다 인트로). 덮개가 이미 없으면 곧바로.
+   덮개 밑에서 시계를 돌리면 ① 첫 알림 확인(자격 엔진 0.4초)이 인트로 한가운데에 떨어져 선 긋기가 멈추고
+   ② 알림 동의 시트가 덮개 밑에서 먼저 올라와, 페이드가 끝나는 순간 학생이 앱 대신 시트를 본다. */
+function notifyAfterBoot(fn) {
+  const boot = document.getElementById('boot');
+  if (!boot || boot.hidden) { fn(); return; }
+  let done = false;
+  const once = () => { if (done) return; done = true; fn(); };
+  window.addEventListener('boot:gone', once, { once: true });
+  setTimeout(once, 8000);   // 덮개가 끝내 안 걷히는 길(시한 화면)에서도 한 번은 부른다
+}
+
 /* 최초 1회만 자동으로 뜬다 — 이후에는 MY 화면에서만 켠다 */
 function notifyMaybeAskConsent(delay = 900) {
   if (!notifyReady || !notifyLedger) return;
   if (notifyLedger.askedAt) return;
   if (typeof state === 'undefined' || !state.profile) return;
-  setTimeout(() => {
+  notifyAfterBoot(() => setTimeout(() => {
     if (notifyLedger.askedAt) return;
     if (!$('#notify-sheet').hidden || !$('#detail-sheet').hidden) return; // 다른 시트가 떠 있으면 방해하지 않는다
     notifyConsentSheet();
-  }, delay);
+  }, delay));
 }
 
 /* ---------------- MY 화면의 알림 설정 ---------------- */
@@ -713,7 +725,10 @@ async function notifyInit() {
   notifyRenderBadge();
 
   // 데이터(공고·정식등록)가 도착할 시간을 준 뒤 첫 확인
-  setTimeout(() => { notifyCheck({ quiet: true }).then(() => notifyHandleLaunch()); }, 1200);
+  /* 🔴 **부팅 덮개가 걷힌 뒤에** (2026-10-04 — 인트로가 끊긴다는 개발자 지적의 마지막 0.4초).
+     이 확인은 공고 전부를 자격 엔진에 넣어 0.4초(폰 정도 CPU)를 쓰는데, 1.2초 시계가 정확히
+     인트로 한가운데에 떨어졌다. 덮개가 이미 없으면(boot.js 가 없거나 이미 걷힘) 예전 그대로 1.2초. */
+  setTimeout(() => notifyAfterBoot(() => { notifyCheck({ quiet: true }).then(() => notifyHandleLaunch()); }), 1200);
 
   // 앱을 열어 둔 동안 주기적으로 확인 (마감 임박은 시간이 지나며 발생한다)
   setInterval(() => { notifyCheck({ quiet: false }); }, NOTIFY_CHECK_INTERVAL);

@@ -1711,7 +1711,7 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
   eq('showScreen 이 그린다', /if \(name === 'activities'\) renderActivities\(\);/.test(app), true);
   eq('늦게 온 데이터로 다시 그린다 (rerenderVisible)', /if \(!\$\('#screen-activities'\)\.hidden\) renderActivities\(\);/.test(app), true);
   eq('당겨서 새로고침이 같이 받는다 (refreshAllData)', /const jobs = \[loadNotices\(\), [^\n]*loadActivities\(\)/.test(app), true);
-  eq('첫 실행에 받는다', /^loadActivities\(\);$/m.test(app), true);
+  eq('첫 실행에 받는다', /^const bootJobs = \[[^\n]*loadActivities\(\)/m.test(app), true);
   eq('못 받아 왔어도 빈 문서로 내려앉는다 (뼈대가 굳지 않게)', /liveActivities = d \|\| liveActivities \|\| \{ items: \[\], updatedAt: null \}/.test(app), true);
   eq('학교 범위는 엔진의 activityForProfile 한 곳', /activityForProfile\(n, p\)/.test(app) && !/function activityForProfile/.test(app), true);
   /* 2026-10-01 개발자 지시("장학금 탭이랑 똑같은 흐름") — 활동 카드는 게시판 글 카드가 아니라 **장학 카드와 같은 그림**이다.
@@ -1984,7 +1984,7 @@ console.log('\n■ 재단·지자체 게시판 (2026-09-26 · 노션 F-13 · 교
   const homeSlice = html.slice(html.indexOf('id="screen-home"'), html.indexOf('id="screen-explore"'));
   eq('홈에 구역이 있다 — 학교 게시판 구역 바로 아래', homeSlice.indexOf('id="live-notices"') > 0 && homeSlice.indexOf('id="live-notices"') < homeSlice.indexOf('id="external-notices"'), true);
   eq('renderHome 이 그린다', /\$\('#external-notices'\)\.innerHTML = externalNoticesHtml\(\);/.test(app), true);
-  eq('당겨서 새로고침·첫 실행이 받는다', /loadActivities\(\), loadExternal\(\)\]/.test(app) && /^loadExternal\(\);$/m.test(app), true);
+  eq('당겨서 새로고침·첫 실행이 받는다', /loadActivities\(\), loadExternal\(\)\]/.test(app) && /^const bootJobs = \[[^\n]*loadExternal\(\)/m.test(app), true);
   eq('못 받아 왔어도 빈 문서', /liveExternal = d \|\| liveExternal \|\| \{ items: \[\], updatedAt: null \}/.test(app), true);
   eq('카드는 한 벌 · 주최를 윗줄에 (마감을 읽은 글은 D-day 도) · 「공고」 를 겹쳐 적지 않는다(2026-10-04 · 구역 제목이 「…새 공고」)', /noticeCardHtml\(n, \{ org: n\.host, dday: n\.deadline \?/.test(app) && !/function externalCardHtml/.test(app), true);
   eq('등록된 주소는 뺀다 — 학교 구역과 같은 잣대(registeredUrlMatcher)', (app.match(/registeredUrlMatcher\(\)/g) || []).length >= 2, true);
@@ -2359,7 +2359,7 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   const homeSlice = html.slice(html.indexOf('id="screen-home"'), html.indexOf('id="screen-explore"'));
   eq('홈 첫 화면 띠 — 히어로(아이콘 네 칸) 다음 · 「나에게 맞는 장학금」 앞 · 옛 아래 구역(#school-news)은 없다 (2026-10-04 승인 시안 1안)', homeSlice.indexOf('class="hero-card"') > 0 && homeSlice.indexOf('class="hero-card"') < homeSlice.indexOf('id="home-news"') && homeSlice.indexOf('id="home-news"') < homeSlice.indexOf('id="home-deadline-list"') && !/id="school-news"/.test(html), true);
   eq('renderHome 이 그린다 · 소식이 없으면 구역째 숨긴다', /const newsHtml = homeNewsHtml\(\);\s*\$\('#home-news'\)\.innerHTML = newsHtml;\s*\$\('#home-news'\)\.hidden = !newsHtml;/.test(app), true);
-  eq('당겨서 새로고침·첫 실행이 받는다', /const jobs = \[loadNotices\(\), loadNews\(\),/.test(app) && /^loadNews\(\);$/m.test(app), true);
+  eq('당겨서 새로고침·첫 실행이 받는다', /const jobs = \[loadNotices\(\), loadNews\(\),/.test(app) && /^const bootJobs = \[[^\n]*loadNews\(\)/m.test(app), true);
   eq('학교가 정해지거나 바뀔 때 공고와 **같은 자리에서** 받는다', (app.match(/loadNewsIfSchoolChanged\(\);/g) || []).length, (app.match(/loadNoticesIfSchoolChanged\(\);/g) || []).length);
   eq('못 받아 왔어도 빈 문서 (뼈대가 굳지 않게)', /liveNews = d \|\| liveNews \|\| \{ items: \[\], updatedAt: null \}/.test(app), true);
   eq('옛 통짜 파일로 물러나는 길이 없다', /data\/news\.json/.test(app), false);
@@ -7317,7 +7317,7 @@ console.log('\n■ 첫 실행 화면 (2026-09-09)');
   eq('boot.js 에 시한이 있다 (갇히지 않는다)', /BOOT_TIMEOUT_MS/.test(bootJs), true);
   eq('boot.js 가 걷는 손잡이를 연다', /window\.bootDone/.test(bootJs), true);
   eq('app.js 가 화면을 정한 뒤 부팅 화면을 걷는다',
-    /window\.bootDone\(\)/.test(readText(new URL('app.js', root))), true);
+    /window\.bootDone\(bootSettled\)/.test(readText(new URL('app.js', root))), true);
 
   /* ③ 🔴 boot.js 는 **다른 스크립트보다 먼저** 실려야 한다. 뒤에 두면 그 사이가
      그대로 비고, 그게 이 파일이 없애려던 바로 그 틈이다. */
@@ -7608,74 +7608,91 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   eq('온보딩 갈무리가 id 없는 체크박스도 담는다', /check-list[\s\S]{0,200}checked/.test(appJs), true);
   eq('되살릴 때 캠퍼스 칸을 다시 그린다', /renderCampusChips\(campus\)/.test(appJs), true);
 
-  /* ⑥ 🔴 부팅 화면에 **바닥값**이 있어야 한다 (2026-09-09 개발자 지적:
-     "환영 화면이 나타났지만 사용자가 겨우 볼 수 있을 만큼 시간이 짧았어").
-     바닥값이 없으면 보이는 길이가 **앱 코드가 실리는 데 걸린 시간 그대로**라 기기마다
-     들쭉날쭉하고, 캐시가 데워진 폰에서는 깜빡이고 만다. */
+  /* ⑥ 🔴 부팅 화면을 **보여 주는 시간** — 켤 때마다 인트로 (2026-10-04 개발자 지시:
+     "선이 그려지는 에니메이션 -> 페이드아웃 효과 전체로 통일"). 인트로가 돌기 시작한 뒤 최소 시간을 지키고
+     걷는다 — 2026-09-09 의 1초 바닥값을 대신한다(인트로가 늘 그보다 길다). */
   const bootJs2 = readText(new URL('../boot.js', import.meta.url));
-  const minMs = Number((bootJs2.match(/BOOT_MIN_SHOW_MS\s*=\s*(\d+)/) || [])[1]);
-  eq('부팅 화면에 최소로 보여 주는 시간이 있다', minMs > 0, true);
-  eq('그 시간을 실제로 기다린다 (선언만 해 두지 않는다)',
-    /BOOT_MIN_SHOW_MS\s*-\s*sinceShown\(\)/.test(bootJs2), true);
-  eq('시한(6초)보다는 짧다', minMs < Number((bootJs2.match(/BOOT_TIMEOUT_MS\s*=\s*(\d+)/) || [])[1]), true);
-  /* 🔴 **시안에서 개발자가 보고 고른 값과 같아야 한다** — 갈라지면 승인받은 것과 다른 것이 나간다.
-     ⚠️ 750 을 못 박지 않는다(2026-09-09 코드 리뷰): 개발자가 나중에 값을 바꾸기로 하고 시안·앱을
-        **함께** 고치면, 못 박아 둔 검사가 '둘이 다르다'는 라벨로 빨간불을 낸다 — 없는 불일치를
-        있다고 말하는 것이라 다음 세션이 엉뚱한 곳을 뒤진다. 재는 것은 '둘이 같은가' 하나다. */
+  const introShow = Number((bootJs2.match(/BOOT_INTRO_SHOW_MS\s*=\s*(\d+)/) || [])[1]);
+  eq('인트로를 보여 주는 최소 시간이 있다', introShow > 0, true);
+  eq('그 시간을 실제로 기다린다 (인트로가 돈 뒤 그만큼 지나서 걷는다)',
+    /setTimeout\(fadeOut,\s*introSkip \? 0 : BOOT_INTRO_SHOW_MS\)/.test(bootJs2), true);
+  eq('옛 1초 바닥값이 남아 있지 않다 (둘이 섞이면 어느 쪽이 이기는지 모른다)', /BOOT_MIN_SHOW_MS|sinceShown/.test(bootJs2), false);
+  eq('시한(6초)보다는 짧다', introShow < Number((bootJs2.match(/BOOT_TIMEOUT_MS\s*=\s*(\d+)/) || [])[1]), true);
+  /* 🔴 **시안에서 개발자가 보고 고른 값과 같아야 한다** — 값을 못 박지 않고 둘이 같은가만 잰다(2026-09-09 코드 리뷰) */
   const mock = readText(new URL('../docs/designs/mockups/first-run/Main.dc.html', import.meta.url));
   const mockMs = Number((mock.match(/booting:\s*false\s*\}\);\s*resolve\(\);\s*\},\s*(\d+)\)/) || [])[1]);
   eq('시안에서 값을 읽어 냈다 (읽기 실패는 NaN 이라 조용히 통과하면 안 된다)', Number.isFinite(mockMs), true);
-  eq('시안이 쓰는 값과 앱이 쓰는 값이 같다', minMs, mockMs);
+  eq('시안(첫 실행 흐름)의 부팅 길이와 앱의 인트로 길이가 같다', introShow, mockMs);
 
-  /* ⑨ 🔴 부팅 화면의 **등장 움직임** (2026-09-09 개발자 지시: "로고나 글자가 애니메이션
-     형태로 나타난다. 하지만 앱의 신뢰성을 떨어뜨리지 않으면서도 깔끔해야 한다").
-     지키는 것은 그 두 조건을 옮긴 셋이다 — 셋 다 값이 어긋나면 조용히 나빠지는 유형이라
-     글로만 적어 두면 다음 세션이 되돌린다. */
+  /* ⑨ 🔴 부팅 화면의 **등장 = 인트로**, 그것도 **앱이 다 그려지고 손이 빈 뒤에** (2026-10-04 개발자 지적:
+     "시안과 같이 스무스한 트랜지션이 필요한데 지금 현황은 중간에 끊기고 프로페셔널하지 못해").
+     실측(4배 느린 CPU): 스크립트가 실리는 동안 돌린 인트로는 6초에 프레임 20장 · 1.6초씩 멈췄다 —
+     자격 엔진이 홈을 그리는 일과 선 긋기가 같은 줄(메인 스레드)을 쓴다. 그래서 순서를 지킨다. */
   const css = readText(new URL('../style.css', import.meta.url));
   const bootMock = readText(new URL('../docs/designs/mockups/first-run/Boot.dc.html', import.meta.url));
-  /* 이름으로 그 애니메이션이 쓰인 선언 한 줄을 집어 초 단위 값만 읽는다.
-     shorthand 는 앞의 시간이 길이, 뒤의 시간이 늦추기다. */
   const useOf = (text, name) => {
     const decl = (text.match(new RegExp('animation:[^;]*\\b' + name + '\\b[^;]*;')) || [''])[0];
     const seg = decl.split(',').find((s) => s.includes(name)) || '';
-    /* cubic-bezier 안의 숫자에는 s 가 안 붙으므로 여기서 걸리지 않는다 */
     const secs = [...seg.matchAll(/([\d.]+)s\b/g)].map((m) => Number(m[1]) * 1000);
     return { dur: secs[0], delay: secs[1] || 0, decl };
   };
-  const logoIn = useOf(css, 'boot-in-logo');
-  const wordIn = useOf(css, 'boot-in-word');
+  eq('켤 때마다 인트로다 (오늘 처음 · 4시간 같은 조건이 없다)', /BOOT_INTRO_GAP_MS|toDateString|handaejang\.resume/.test(bootJs2), false);
+  eq('인트로는 앱이 다 된 뒤에 돈다 (bootDone 이 손이 빌 때를 기다려 runIntro)',
+    /window\.bootDone = function[\s\S]{0,400}whenQuiet\(runIntro\)/.test(bootJs2), true);
+  eq('  스크립트가 실리는 동안에는 돌리지 않는다 (runIntro 를 부르는 곳이 그 하나뿐이다)',
+    (bootJs2.match(/runIntro\b/g) || []).length === 2 && !/setTimeout\(runIntro/.test(bootJs2), true);
+  const quietBody = bootJs2.slice(bootJs2.indexOf('function whenQuiet'), bootJs2.indexOf('function runIntro'));
+  eq('손이 빈 것을 프레임 간격으로 잰다 (iOS 사파리에는 longtask 가 없다)',
+    /requestAnimationFrame/.test(quietBody) && /BOOT_QUIET_GAP_MS/.test(quietBody) && /BOOT_QUIET_FRAMES/.test(quietBody), true);
+  eq('  손이 비고 글꼴도 준비돼야 돈다', /good >= BOOT_QUIET_FRAMES && fontReady/.test(quietBody), true);
+  eq('  그래도 무한정 기다리지 않는다 (천장)', /Date\.now\(\) - since > BOOT_QUIET_MAX_MS/.test(quietBody), true);
+  eq('인트로가 돌기 전에는 로고·글자가 보이지 않는다 (빈 덮개 · 시스템 스플래시와 이음매 없음)',
+    /\.boot-logo, \.boot-word \{ opacity: 0;/.test(css), true);
+  eq('움직이는 것은 따로 층을 받는다 (will-change — 앱이 일해도 투명도·크기·흐림은 끊기지 않게)',
+    /\.boot-logo, \.boot-word \{[^}]*will-change:\s*opacity, transform, filter/.test(css), true);
+  eq('옛 0.56초 등장이 남아 있지 않다 (두 등장이 섞이면 로고가 두 번 나타난다)', /boot-in-logo|boot-in-word/.test(css), false);
   const spinIn = useOf(css, 'boot-spin-in');
-  eq('로고에 등장 움직임이 있다', Number.isFinite(logoIn.dur), true);
-  eq('글자에 등장 움직임이 있다', Number.isFinite(wordIn.dur), true);
-
-  /* ㉮ **바닥값보다 일찍 끝난다.** 걷히는 순간까지 움직이고 있으면 급해 보인다 —
-     끝나고 고요한 시간이 남아야 '차분히 놓였다'로 읽힌다. */
-  eq('로고 등장이 최소 노출 시간 안에 끝난다', logoIn.dur + logoIn.delay < minMs, true);
-  eq('글자 등장이 최소 노출 시간 안에 끝난다', wordIn.dur + wordIn.delay < minMs, true);
-
-  /* ㉯ **한 번만 나타나고 멈춘다.** 로고·글자가 계속 움직이면 '들어왔다'가 아니라
-     '아직도 로딩 중'으로 읽힌다 — 그게 신뢰를 깎는 자리다. */
-  eq('로고가 계속 움직이지 않는다', /infinite/.test(logoIn.decl), false);
-  eq('글자가 계속 움직이지 않는다', /infinite/.test(wordIn.decl), false);
-
-  /* ㉰ 계속 도는 표시는 **바닥값이 지난 뒤에야** 나온다 — 앱이 제때 오면 학생은 못 본다.
-     처음부터 띄우면 빠른 기기에서도 매번 '기다리는 화면'이 된다. */
-  eq('도는 표시가 최소 노출 시간이 지난 뒤에 나타난다', spinIn.delay > minMs, true);
-
+  eq('도는 표시는 오래 걸릴 때만 나온다 (2초 넘게 앱이 안 올 때)', spinIn.delay >= 2000, true, String(spinIn.delay));
+  eq('인트로가 돌면 도는 표시를 끈다 (앱이 이미 왔다는 뜻)',
+    /#boot\.boot-intro-run \.boot-spin\s*\{\s*animation:\s*none;\s*opacity:\s*0/.test(css), true);
   /* 🔴 그 표시는 등장 애니메이션이 opacity 를 올리므로, 움직임을 줄인 기기에서
      `animation: none` 만 주면 **영영 안 보인다**(느린 기기에서 아무 표시도 없는 빈 화면). */
   const reduce = css.slice(css.indexOf('@media (prefers-reduced-motion: reduce)', css.indexOf('.boot-spin')));
-  eq('움직임을 줄인 기기에서 로고·글자 등장을 끈다',
-    /\.boot-logo,\s*\.boot-word\s*\{\s*animation:\s*none/.test(reduce.slice(0, 400)), true);
   eq('그때 도는 표시는 보이게 되돌린다 (안 그러면 영영 안 보인다)',
     /\.boot-spin\s*\{\s*animation:\s*none;\s*opacity:\s*1/.test(reduce.slice(0, 400)), true);
-
-  /* 🔴 시안과 앱이 갈라지지 않는다 — 값을 못 박지 않고 **둘이 같은가**만 잰다(위 ⑥과 같은 이유) */
-  eq('시안의 로고 등장이 앱과 같다',
-    [logoIn.dur, logoIn.delay], [useOf(bootMock, 'boot-in-logo').dur, useOf(bootMock, 'boot-in-logo').delay]);
-  eq('시안의 글자 등장이 앱과 같다',
-    [wordIn.dur, wordIn.delay], [useOf(bootMock, 'boot-in-word').dur, useOf(bootMock, 'boot-in-word').delay]);
-  eq('시안의 도는 표시 지연이 앱과 같다', spinIn.delay, useOf(bootMock, 'boot-spin-in').delay);
+  eq('움직임 줄이기에서 인트로는 다 그려진 로고 한 장이다',
+    /#boot \.boot-logo, #boot \.boot-word, #boot\.boot-intro-run \.boot-logo, #boot\.boot-intro-run \.boot-word \{ animation: none; opacity: 1; \}/.test(reduce.slice(0, 1400))
+      && /#boot \.boot-logo path, #boot\.boot-intro-run \.boot-logo path \{ animation: none; stroke-dashoffset: 0; \}/.test(reduce.slice(0, 1400)), true);
+  /* ⑨-2 🔴 **덮개 밑에서 홈을 일곱 번 다시 그리지 않는다** (2026-10-04 실측 — 인트로가 끊긴 진짜 원인).
+     데이터 파일이 하나 올 때마다 홈을 통째로 그려 0.4~1.8초씩 멈췄고, 파일이 오는 틈을 프레임 감지가
+     '한가하다'로 읽어 인트로를 그 한가운데에 시작했다. 고친 뒤(4배 느린 CPU): 인트로 1.7초에 프레임 100장 · 최악 간격 0.05초. */
+  const bootApp = readText(new URL('../app.js', import.meta.url));
+  const bootNotify = readText(new URL('../notify.js', import.meta.url));
+  eq('덮개가 떠 있는 동안 다시 그리기는 모아 둔다 (rerenderVisible 이 bootHold 를 본다)',
+    /function rerenderVisible\(\) \{\s*if \(!state\.profile\) return;\s*if \(bootHold\) \{ bootHeld = true; return; \}/.test(bootApp), true);
+  eq('  덮개가 걷히면 무조건 푼다 (늦게 온 데이터도 그려진다)', /addEventListener\('boot:gone', bootHoldRelease\)/.test(bootApp), true);
+  eq('  boot.js 가 덮개를 다 걷은 뒤 boot:gone 을 알린다',
+    /el\.hidden = true;[\s\S]{0,200}dispatchEvent\(new Event\('boot:gone'\)\)/.test(bootJs2), true);
+  const bootLoads = (bootApp.match(/const bootJobs = \[([^\]]*)\]/) || [])[1] || '';
+  eq('처음 받는 데이터가 전부 그 모음에 든다 (refreshAllData 의 로더 + 등록금 + 보관함)',
+    ['loadNotices', 'loadNews', 'loadActivities', 'loadExternal', 'loadRegistered', 'loadKosaf'].every((f) => bootLoads.includes(f + '()'))
+      && /bootJobs\.push\(loadTuition\(\)\)/.test(bootApp) && /bootJobs\.push\(walletRefresh\(\)/.test(bootApp), true);
+  eq('  그 모음을 지나는 곳은 전부 rerenderVisible 로 그린다 (renderHome 을 바로 부르면 모으기를 건너뛴다)',
+    !/tuitionTable = [^\n]*\n\s*if \(state\.profile && !\$\('#screen-home'\)\.hidden\) renderHome\(\)/.test(bootApp)
+      && /bootJobs\.push\(walletRefresh\(\)\.then\(photoRefresh\)\.then\(\(\) => \{\s*refreshOpenScreen\(\);\s*rerenderVisible\(\);/.test(bootApp), true);
+  eq('덮개에 \'다 와서 한 번 그렸다\'는 약속을 건넨다 (bootDone(bootSettled))',
+    /const bootSettled = Promise\.all\(bootJobs[^\n]*\.then\(bootHoldRelease\)/.test(bootApp) && /window\.bootDone\(bootSettled\)/.test(bootApp), true);
+  eq('  boot.js 는 그 약속을 기다린 뒤 프레임을 본다 (천장 있음)',
+    /settled\.then\(go, go\)/.test(bootJs2) && /setTimeout\(go, BOOT_SETTLE_MAX_MS\)/.test(bootJs2)
+      && /var go = function \(\) \{ if \(went\) return; went = true; whenQuiet\(runIntro\); \}/.test(bootJs2), true);
+  eq('  덮개 파일이 없어도 모으기는 풀린다', /if \(typeof window\.bootDone === 'function'\) window\.bootDone\(bootSettled\);\s*else bootHoldRelease\(\);/.test(bootApp), true);
+  eq('알림 쪽에 \'덮개가 걷힌 뒤\' 손잡이가 있다 (boot:gone · 덮개가 없으면 곧바로)',
+    /function notifyAfterBoot\(fn\) \{[\s\S]{0,200}boot\.hidden\) \{ fn\(\); return; \}[\s\S]{0,200}addEventListener\('boot:gone', once, \{ once: true \}\)/.test(bootNotify), true);
+  eq('  첫 알림 확인(자격 엔진 0.4초)은 그 뒤에 돈다 (1.2초 시계가 인트로 한가운데에 떨어졌다)',
+    /setTimeout\(\(\) => notifyAfterBoot\(\(\) => \{ notifyCheck\(\{ quiet: true \}\)/.test(bootNotify)
+      && !/setTimeout\(\(\) => \{ notifyCheck\(\{ quiet: true \}\)/.test(bootNotify), true);
+  eq('  알림 동의 시트도 그 뒤에 뜬다 (페이드가 끝나는 순간 앱 대신 시트가 보였다)',
+    /notifyAfterBoot\(\(\) => setTimeout\(\(\) => \{\s*if \(notifyLedger\.askedAt\) return;/.test(bootNotify), true);
 
   /* ⑩ 🔴 부팅 화면의 **걷힘 움직임** — 페이드 (2026-10-04 개발자 결정: "둘 다 페이드로").
      로고·글자가 살짝 커지며 흐려지고 덮개가 투명해지며 밑의 앱이 드러난다(.boot-fade).
@@ -7719,24 +7736,12 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   eq('시안의 스크립트도 시간을 CSS 에서 읽는다 (숫자를 박으면 CSS 를 고칠 때 어긋난다)',
     /ms\('--boot-fade'\)/.test(bootMock) && !/,\s*\d[\d.]*\s*\+\s*\d/.test(bootMock.slice(bootMock.indexOf('<script>'))), true);
 
-  /* ⑪ 🔴 **인트로** — 오늘 처음 열었거나 4시간 넘게 쉬었을 때만 (2026-10-04 개발자 승인 · 시안 A안).
+  /* ⑪ 🔴 **인트로의 움직임** (2026-10-04 개발자 승인 · 시안 A안 · 켤 때마다).
      학사모 선이 그려지고 금색 점이 맺힌 뒤 '한대장' 이 나타나고, 정지했다가 위의 페이드로 걷힌다. */
-  const gapMs = (() => {
-    const m = bootJs2.match(/BOOT_INTRO_GAP_MS\s*=\s*([\d\s*]+);/);
-    return m ? m[1].split('*').reduce((a, b) => a * Number(b.trim()), 1) : NaN;
-  })();
-  /* 🔴 '홈으로 간다'(이어보기 창)와 '인트로가 뜬다'가 같은 순간에 바뀌어야 한다 — 두 곳에 적은 값을 대조한다 */
-  eq('인트로 간격이 이어보기 창(resume.js RESUME_WINDOW_MS)과 같다', gapMs, R.RESUME_WINDOW_MS);
-  eq('인트로 판단이 이어보기 장부의 마지막 시각을 읽는다', /localStorage\.getItem\('handaejang\.resume'\)/.test(bootJs2), true);
-  eq('날짜가 바뀌어도 인트로다 (오늘 처음 연 것)', /toDateString\(\)\s*!==\s*new Date\(nowAt\)\.toDateString\(\)/.test(bootJs2), true);
-  eq('처음 켠 학생에게는 인트로를 보이지 않는다 (온보딩 정문 투어링이 먼저)', /if \(!first\)\s*\{[\s\S]{0,120}handaejang\.resume/.test(bootJs2), true);
-  /* 🔴 글꼴을 기다린 뒤에 돈다 — 안 기다리면 '한대장' 이 뜨기 전에 앱으로 넘어간다(2026-10-04 시안에서 지적) */
+  /* 🔴 글꼴을 기다린다 — 안 기다리면 '한대장' 이 뜨기 전에 움직임이 끝난다(2026-10-04 시안에서 지적) */
   eq('인트로가 글꼴 준비를 기다린다 (document.fonts.load)', /document\.fonts\.load\([^)]*한대장/.test(bootJs2), true);
-  eq('  그래도 무한정 기다리지는 않는다 (천장)', /setTimeout\(runIntro,\s*BOOT_FONT_WAIT_MS\)/.test(bootJs2), true);
-  eq('  최소 노출 시간을 인트로가 실제로 돈 때부터 센다',
-    /BOOT_INTRO_SHOW_MS\s*-\s*\(Date\.now\(\)\s*-\s*introRunAt\)/.test(bootJs2), true);
-  const introShow = Number((bootJs2.match(/BOOT_INTRO_SHOW_MS\s*=\s*(\d+)/) || [])[1]);
-  const introMock = readText(new URL('../docs/designs/mockups/first-run/Intro.dc.html', import.meta.url));
+  eq('  그래도 무한정 기다리지는 않는다 (천장)', /setTimeout\(markFont,\s*BOOT_FONT_WAIT_MS\)/.test(bootJs2), true);
+  const introMock = bootMock;
   /* 앱의 선택자 하나와 시안의 선택자 하나에서 같은 애니메이션의 길이·늦추기를 읽는다 */
   const useSel = (text, sel) => {
     const i = text.indexOf(sel);
@@ -7746,12 +7751,12 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
     return { dur: secs[0], delay: secs[1] || 0, decl };
   };
   const PAIRS = [
-    ['로고', '#boot.boot-intro.boot-intro-run .boot-logo {', '.m-run .m-logo {'],
+    ['로고', '#boot.boot-intro-run .boot-logo {', '.m-run .m-logo {'],
     ['첫 선', '.boot-logo path:nth-of-type(1) {', '.m-logo path:nth-of-type(1) {'],
     ['둘째 선', '.boot-logo path:nth-of-type(2) {', '.m-logo path:nth-of-type(2) {'],
     ['셋째 선', '.boot-logo path:nth-of-type(3) {', '.m-logo path:nth-of-type(3) {'],
-    ['금색 점', '#boot.boot-intro.boot-intro-run .boot-dot {', '.m-run .m-dot {'],
-    ['글자', '#boot.boot-intro.boot-intro-run .boot-word {', '.m-run .m-word {'],
+    ['금색 점', '#boot.boot-intro-run .boot-dot {', '.m-run .m-dot {'],
+    ['글자', '#boot.boot-intro-run .boot-word {', '.m-run .m-word {'],
   ];
   let introEnd = 0;
   for (const [label, appSel, mockSel] of PAIRS) {
@@ -7761,28 +7766,14 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
     eq(`  한 번만 움직인다 (${label})`, /infinite/.test(a.decl), false);
     introEnd = Math.max(introEnd, a.dur + a.delay);
   }
-  /* ㉮ 다 나타난 뒤 고요한 정지가 남아야 한다 — 걷히는 순간까지 움직이면 급해 보인다(평소 부팅과 같은 이유) */
+  /* ㉮ 다 나타난 뒤 고요한 정지가 남아야 한다 — 걷히는 순간까지 움직이면 급해 보인다 */
   eq('인트로 움직임이 최소 노출 시간 안에 끝난다 (끝나고 정지가 남는다)', introEnd < introShow, true, `${introEnd} < ${introShow}`);
   eq('인트로 최소 노출 시간이 시안과 같다', introShow, Number((introMock.match(/INTRO_SHOW_MS\s*=\s*(\d+)/) || [])[1]));
-  eq('인트로 전체(글꼴 천장 + 노출)가 시한(6초)보다 짧다',
-    Number((bootJs2.match(/BOOT_FONT_WAIT_MS\s*=\s*(\d+)/) || [])[1]) + introShow
-      < Number((bootJs2.match(/BOOT_TIMEOUT_MS\s*=\s*(\d+)/) || [])[1]), true);
   /* 부팅 덮개 블록만, 주석을 걷어 내고 본다 — 주석에는 '왜 넣지 않는가'를 적느라 그 문구가 있다 */
   const idxHtml = readText(new URL('../index.html', import.meta.url));
   const bootHtml = idxHtml.slice(idxHtml.indexOf('<div id="boot">'), idxHtml.indexOf('id="boot-fail"')).replace(/<!--[\s\S]*?-->/g, '');
   eq('부팅 덮개 블록을 읽어 냈다', bootHtml.includes('boot-word'), true);
   eq('태그라인이 없다 (매일 보는 화면의 광고 · 2026-10-04 개발자 확인)', /한 번에 찾고|장학금은 끝까지/.test(bootHtml), false);
-  /* 🔴 인트로가 평소 지연보다 길어 도는 표시가 매번 스며 나왔다(2026-10-04 브라우저 확인) —
-     인트로 날의 표시는 '글꼴 천장 + 인트로 노출' 이 지난 뒤에야 나와야 한다 */
-  const introSpin = useSel(bootBlock, '#boot.boot-intro .boot-spin {');
-  const spinDelay = (() => { const d = introSpin.decl.split(',').find((x) => x.includes('boot-spin-in')) || '';
-    const secs = [...d.matchAll(/([\d.]+)s\b/g)].map((m) => Number(m[1]) * 1000); return secs[1]; })();
-  eq('인트로 날의 도는 표시는 인트로가 끝난 뒤에야 나온다 (앱이 제때 오면 못 본다)',
-    spinDelay > Number((bootJs2.match(/BOOT_FONT_WAIT_MS\s*=\s*(\d+)/) || [])[1]) + introShow, true, String(spinDelay));
-  eq('움직임 줄이기에서 인트로는 다 그려진 로고 한 장이다',
-    /#boot\.boot-intro \.boot-logo path, #boot\.boot-intro\.boot-intro-run \.boot-logo path \{ animation: none; stroke-dashoffset: 0; \}/.test(reduce.slice(0, 1400)), true);
-  eq('스크립트보다 그림이 먼저 나와도 평소 등장이 시작되지 않는다 (인트로 날 깜빡임 방지)',
-    /html:not\(\[data-boot\]\) \.boot-logo,\s*html:not\(\[data-boot\]\) \.boot-word \{ animation-play-state: paused; \}/.test(css), true);
 
   /* ⑧ 🔴 알림 딥링크는 **공고 목록이 올 때까지 기다린다** (2026-09-09 개발자 지적).
      한 번 보고 없으면 탐색 탭으로 보내던 것이 원인이었다 — 회선이 느린 폰에서는 늘 그랬다. */
