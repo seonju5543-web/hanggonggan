@@ -154,6 +154,10 @@ function isAmountHead(line) {
   const dashLabel = t.split(/\s[-–—]\s/)[0];
   if (dashLabel !== t && isHead(dashLabel, AMOUNT_WORD)) return true;
   if (AMOUNT_NUMBERED.test(String(line || ''))) return true;
+  /* 괄호 이름표 `ㅇ (지 급 액) 1인 150만 원` — 공공기관 공고문 꼴(대전청년내일재단 HWPX · 2026-10-05 UI-12).
+     괄호 안이 **통째로** 금액 이름일 때만(`(선발인원)` 은 아니다) */
+  const paren = t.match(/^[(（]\s*((?:[가-힣]\s?){2,8})[)）]/);
+  if (paren && /^(지급액|지급금액|장학금액|지원금액|장학금|지원금|금액)$/.test(paren[1].replace(/\s/g, ''))) return true;
   return AMOUNT_BARE.test(t);
 }
 
