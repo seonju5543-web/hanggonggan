@@ -123,4 +123,13 @@ async function webfontBanner(page) {
   ].join('\n');
 }
 
-module.exports = { nextUntil, assertOwnServer, dismissNotify, webfontBanner };
+/* 🔴 **부팅 덮개가 걷히기를 기다린다** (2026-10-04 — 켤 때마다 인트로).
+   덮개는 첫 데이터가 다 와서 한 번 그린 뒤 인트로 1.7초 + 페이드 0.4초를 돌고 걷힌다. 그동안 덮개가
+   누르기를 가로채므로(학생에게는 '눌러서 건너뛰기'), 새로고침 뒤 바로 탭을 누르는 검사는 30초를 기다리다
+   그 사이 뜬 알림 동의 시트에 막혀 죽는다(verify-calendar·interactions 가 실제로 그랬다).
+   ⚠️ 시한을 넘겨도 던지지 않는다 — 덮개가 끝내 안 걷히는 판은 다음 동작이 제 이유로 실패한다. */
+async function bootGone(page, timeout = 10000) {
+  await page.waitForSelector('#boot', { state: 'hidden', timeout }).catch(() => {});
+}
+
+module.exports = { nextUntil, assertOwnServer, dismissNotify, webfontBanner, bootGone };
