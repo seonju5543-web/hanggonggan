@@ -7,7 +7,8 @@ import { isHtmlPayload } from './attachment-link.mjs';
    "수집기는 받는데 심층 수집은 못 받는" 어긋남이 생긴다 (2026-08-20 신설, 첫머리 주석 참조) */
 import { FETCH_HEADERS } from './http-headers.mjs';
 import { isNoticeDoc } from './attachment-text.mjs';
-import { canonUrl, normTitle, indexTexts, sourceFor, needsFetch } from './notice-source.mjs';
+import { canonUrl, normTitle, indexTexts, sourceFor, needsFetch, fillRetired, nextShells } from './notice-source.mjs';
+import { makeBudget } from './harvest-budget.mjs';
 /* 자격용 첨부 받기의 '무엇을 받을지'와 파일 이름 표식은 순수 함수 파일 한 곳에 — 이 파일은 불러오는 순간 수집을 시작해 관문이 못 부른다 */
 import { slugOf, pickEligDocTargets } from './elig-attach-plan.mjs';
 
@@ -116,7 +117,9 @@ for (const it of registered.items) {
    예산 안에서 도는 단계라 그냥 두면 정작 받아야 할 공고를 못 받는다.
    포기하는 게 아니다 — 심층 수집 본편(수동 실행)은 여전히 전부 다시 시도한다(link-hunter와 같은 방침). */
 const GIVE_UP_AFTER = 3;
-const tooManyFails = (src) => FILL && (src?.fails ?? 0) >= GIVE_UP_AFTER;
+/* 🔴 받기 실패뿐 아니라 **받아 왔지만 껍데기**인 것도 센다 (2026-10-04 점검 B8 · notice-source.mjs fillRetired 머리말) —
+   껍데기 110건이 매 실행 맨 앞 자리를 차지해 브라우저 수집의 이 단계가 시한(3분)에 잘렸다. 회전 차례는 두 수를 더해 정한다. */
+const tooManyFails = (src) => FILL && fillRetired(src, GIVE_UP_AFTER);
 
 const FILL_CAP = 120;
 /* 🔴 물러선 주소를 **영영 버리면 안 된다** (2026-08-20 수정).
@@ -134,7 +137,7 @@ const retired = [];
 let todo = [...wanted.values()]
   .filter((n) => {
     const src = prevIdx.byUrl.get(canonUrl(n.url));
-    if (tooManyFails(src)) { retired.push({ n, fails: src?.fails ?? 0 }); return false; }
+    if (tooManyFails(src)) { retired.push({ n, fails: (src?.fails ?? 0) + (src?.shells ?? 0) }); return false; }
     return !FILL || needsFetch(src, LIMIT);
   });
 if (FILL && todo.length > FILL_CAP) {
@@ -151,8 +154,21 @@ if (FILL && retired.length) {
 }
 console.log(`원문 수집 대상 ${todo.length}건 (수집 목록 ${notices.items.length} + 등록 공고 보충 ${extra}${FILL ? ', 증분 모드' : ''})`);
 
+/* 🔴 **받기 전체에 예산** (2026-10-04 점검 B8 · bodies-12) — 요청마다 시한(8·20초)만 있고 전체 예산이 없어, 증분 모드는 브라우저 수집
+   단계 시한(3분)에 잘려 그날 받은 것을 통째로 버렸고(실행 36803960541), 본편은 340여 건 × 최악 20초면 작업 시한(34분)을 넘길 수 있었다.
+   요청을 **시작하기 전마다** 본다 — 넘으면 멈추고 아래에서 지금까지를 저장한다(못 받은 것은 다음 실행이 받는다).
+   증분: 120초 + 마지막 요청 20초 + 재기·쓰기 < 브라우저 수집 단계 3분 · 일반 수집 단계 5분.
+   본편: 15분 + 첨부 원본(FORMS_BUDGET_MS 6분) + 글자 뽑기·OCR 4분·저장 < 심층 수집 작업 34분. */
+const FETCH_BUDGET_MS = FILL ? Number(process.env.FILL_BUDGET_MS || 120000) : Number(process.env.DEEPFETCH_BUDGET_MS || 15 * 60 * 1000);
+const budget = makeBudget(FETCH_BUDGET_MS);
 const fresh = new Map();
+let tried = 0;
 for (const n of todo) {
+  if (budget.expired()) {
+    console.log(`받기 예산(${Math.round(FETCH_BUDGET_MS / 1000)}초) 도달 — ${tried}/${todo.length}건에서 멈추고 지금까지를 저장한다 (나머지는 다음 실행)`);
+    break;
+  }
+  tried += 1;
   try {
     /* 증분 모드는 매일 수집 워크플로의 예산 안에서 돈다. 안 열리는 학교 하나가 20초씩 붙들면
        상한(120건)에 곱해져 예산을 다 먹고, 그러면 그 실행의 수집분이 통째로 버려진다
@@ -199,6 +215,17 @@ for (const v of prev) {
 let kept = out.size;
 for (const [k, v] of fresh) out.set(k, v);
 const texts = [...out.values()];
+/* 이번에 받은 것이 껍데기면 이어서 센다(shells) — 메뉴 걷기는 원문 전체가 있어야 해서 받은 뒤 색인을 한 번 더 잰다(B8 · 실측 0.4초).
+   브라우저가 그린 본문이 이기면(indexTexts better) 껍데기가 아니다. 0 이면 칸을 지운다(본문이 오면 처음부터 센다). */
+if (fresh.size) {
+  const nowIdx = indexTexts(texts, browserBodies);
+  let shellCount = 0;
+  for (const [k, v] of fresh) {
+    const s = nextShells(prevIdx.byUrl.get(k), nowIdx.byUrl.get(k) || v);
+    if (s) { v.shells = s; shellCount += 1; } else delete v.shells;
+  }
+  if (shellCount) console.log(`받았지만 본문 없는 껍데기 ${shellCount}건 (${GIVE_UP_AFTER}번 이어지면 물러서기 회전으로)`);
+}
 fs.writeFileSync(new URL('notices-text.json', OUT), JSON.stringify(texts, null, 1));
 console.log(`원문 저장 ${texts.length}건 (새로 받음 ${fresh.size} · 이전 것 보존 ${kept} · 버림 ${prev.length - kept})`);
 

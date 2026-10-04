@@ -19,6 +19,7 @@ import { cleanEnv, stripYamlComments } from './gate.mjs';
 import { canonUrl } from '../../collector/canon-url.mjs';
 import { restingAfterOk, closedForStudents, orderTargets, ledgerEntry, newAttachments } from '../../collector/rescue-plan.mjs';
 import { slugOf, attSig, missWait, pickEligDocTargets } from '../../collector/elig-attach-plan.mjs';
+import { fillRetired, nextShells } from '../../collector/notice-source.mjs';
 
 const kstToday = () => new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
 const shift = (day, n) => new Date(Date.parse(day) + n * 86400000).toISOString().slice(0, 10);
@@ -400,5 +401,58 @@ globalThis.fetch = async (url) => {
     } finally {
       sb3.done();
     }
+  }
+  /* ── ④ 원문 보충(deepfetch --fill) — 껍데기도 세어 물러서고, 받기 전체에 예산 (B8 · bodies-12 ①) ── */
+  {
+    eq('④ 물러서기 — 받기 실패 3번 또는 껍데기 3번 · 껍데기 2번은 아직',
+      [fillRetired({ fails: 3 }), fillRetired({ shells: 3 }), fillRetired({ shells: 2 }), fillRetired(undefined)], [true, true, false, false]);
+    eq('  껍데기 세기 — 메뉴뿐이면 하나 더 · 본문이 오면 0 · 받기 실패는 껍데기가 아니다(실패는 fails 가 센다)',
+      [nextShells({ shells: 2 }, { text: '메뉴', bodyChars: 10 }), nextShells({ shells: 2 }, { text: '본문 '.repeat(100), bodyChars: 300 }), nextShells({}, { text: 'FETCH_FAIL HTTP 500' })],
+      [3, 0, 0]);
+    const FAKE = `import fs from 'node:fs';
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+globalThis.fetch = async (url) => {
+  if (process.env.FAKE_FETCH_LOG) fs.appendFileSync(process.env.FAKE_FETCH_LOG, String(url) + '\\n');
+  await sleep(Number(process.env.FAKE_FETCH_DELAY || 0));
+  const shell = /shell|retired/.test(String(url));
+  const html = shell ? '<html><body><div>홈 로그인 메뉴</div></body></html>'
+    : '<html><body><p>' + '이 장학금은 국내 대학에 재학 중인 학부생을 대상으로 하며 직전 학기 성적과 가정 형편을 함께 심사합니다. '.repeat(4) + '</p></body></html>';
+  return { ok: true, status: 200, headers: new Map(), text: async () => html };
+};
+`;
+    const fillRun = (setup, env) => {
+      const sb = sandbox(root, 'hdj-fill-');
+      try {
+        sb.write('fake-fetch.mjs', FAKE);
+        sb.write('data/registered.json', { items: [] });
+        setup(sb);
+        const r = sb.run('collector/deepfetch.mjs', ['--fill'], { FAKE_FETCH_LOG: sb.abs('fetch.log'), ...env }, 25000, ['--import', sb.abs('fake-fetch.mjs')]);
+        const fetched = (sb.read('fetch.log') || '').split('\n').filter(Boolean).map((u) => u.replace('https://n.example/', ''));
+        const texts = sb.json('collector/extracted/notices-text.json') || [];
+        return { r, fetched, by: (k) => texts.find((t) => t.url === `https://n.example/${k}`) || null, n: texts.length };
+      } finally {
+        sb.done();
+      }
+    };
+    const menu = '홈\n로그인\n메뉴';
+    const one = fillRun((sb) => {
+      sb.write('data/notices.json', { items: ['shell-1', 'retired-1', 'body-1'].map((k) => ({ title: `${k} 장학 공고`, school: '표본대학교', url: `https://n.example/${k}`, foundAt: '2026-10-01' })) });
+      sb.write('collector/extracted/notices-text.json', [
+        { title: 'shell-1 장학 공고', url: 'https://n.example/shell-1', text: menu, cut: false, limit: 15000, shells: 2 },
+        { title: 'retired-1 장학 공고', url: 'https://n.example/retired-1', text: menu, cut: false, limit: 15000, shells: 3 },
+      ]);
+    }, { FILL_RETRY_SLOTS: '0' });
+    eq('④ 진짜 deepfetch --fill — 껍데기 3번인 주소는 물러서 안 받고(회전 0자리) · 껍데기 2번인 주소는 받아 3번으로 · 본문이 온 주소는 껍데기 칸 없음',
+      [one.r.status, [...one.fetched].sort(), one.by('shell-1') && one.by('shell-1').shells, one.by('body-1') && one.by('body-1').shells, one.by('retired-1') && one.by('retired-1').shells],
+      [0, ['body-1', 'shell-1'], 3, undefined, 3]);
+    const slow = fillRun((sb) => {
+      sb.write('data/notices.json', { items: Array.from({ length: 8 }, (_, i) => ({ title: `slow-${i} 장학 공고`, school: '표본대학교', url: `https://n.example/slow-${i}`, foundAt: '2026-10-01' })) });
+      sb.write('collector/extracted/notices-text.json', []);
+    }, { FILL_BUDGET_MS: '700', FAKE_FETCH_DELAY: '300' });
+    eq('  받기 예산 — 예산(0.7초)이 지나면 다음 요청을 시작하지 않고 그때까지 받은 것을 저장한다(8건 중 일부만 · 저장된 수 = 받은 수)',
+      [slow.r.status, slow.fetched.length >= 1 && slow.fetched.length <= 5, slow.n === slow.fetched.length], [0, true, true]);
+    const df = readText('.github/workflows/deep-fetch.yml');
+    eq('  심층 수집 워크플로는 제 대기줄(deep-fetch) — 수집 대기줄(collector)과 합치지 않는다',
+      [/^concurrency:\n {2}group: deep-fetch\n {2}cancel-in-progress: false/m.test(df), /group: collector\b/.test(stripYamlComments(df))], [true, false]);
   }
 }

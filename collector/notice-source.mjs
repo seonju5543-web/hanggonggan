@@ -183,3 +183,16 @@ export const needsFetch = (src, limit) => {
   if (limit === undefined) return true;
   return (src.limit ?? 5000) < limit;      // 옛 항목은 5,000자 한도였다
 };
+
+/* ── 증분 받기(deepfetch --fill)에서 물러설 주소 (2026-10-04 점검 B8) ──
+   예전엔 '받기 실패(fails)'만 셌다. 그런데 200 으로 받아 왔지만 **껍데기**(메뉴뿐 · 본문을 자바스크립트로 그리는 게시판)인 주소는
+   실패가 아니라 영영 안 세어져, 매 실행 120자리(FILL_CAP)의 맨 앞을 같은 껍데기 110건이 차지했다 — 그래서 단계 시한(3분)에 잘렸다.
+   껍데기도 이어서 세어(shells) 같은 문턱에서 물러서게 한다. 물러선 주소는 deepfetch 의 RETRY_SLOTS 회전으로 계속 다시 두드린다(영구 포기 없음).
+   이 두 함수만 더했다 — 위 함수들(발췌기·재수집·채점기가 같이 쓴다)의 동작은 그대로다. */
+export const fillRetired = (src, giveUp = 3) => (src?.fails ?? 0) >= giveUp || (src?.shells ?? 0) >= giveUp;
+/** 이번에 받은 원문(nowSrc — 메뉴 걷기를 다시 잰 것)이 받기 실패가 아닌데 본문이 없으면 지난 수(prevSrc.shells)에 하나 더, 아니면 0 */
+export const nextShells = (prevSrc, nowSrc) => {
+  const t = nowSrc && typeof nowSrc.text === 'string' ? nowSrc.text : '';
+  if (!t || /^FETCH_(FAIL|ERROR)/.test(t) || hasText(nowSrc)) return 0;
+  return (prevSrc?.shells ?? 0) + 1;
+};
