@@ -38,6 +38,7 @@ on:
 permissions:
   contents: write
   issues: write
+  actions: write       # 배포 뒤 화면 검사(verify-ui)를 깨우기 위해 (아래 '화면 검사 깨우기' 단계 · 2026-10-04)
 
 # deploy-sync·main-guard 와 **다른** 그룹. 같은 그룹에 넣으면 GitHub 이 대기 중인 오래된 실행을
 # 취소해 버려서, 사람이 누른 배포가 조용히 사라진다.
@@ -169,6 +170,23 @@ jobs:
             const a=x=>Array.isArray(x)?x:(x.items||[]);
             console.log('실시간 공고 '+a(n).length+'건 · 정식 등록 '+a(r).length+'건');"
           git log --oneline -5
+
+      # 🔴 배포한 내용으로 화면 검사를 깨운다 (2026-10-04 · 로봇·도구 점검).
+      #    이 워크플로가 올린 push 는 GitHub 규칙상 다른 워크플로를 깨우지 못해(위 머리말),
+      #    작업 브랜치 하나만 쓰는 세션의 배포는 화면 검사(verify-ui)가 **한 번도 안 돈 채** 앱에 나갈 수 있었다
+      #    (실측: 10-02 15:12Z → 10-03 08:06Z 사이 verify-ui 실행 0). 버튼 실행(workflow_dispatch)만은
+      #    이 열쇠(GITHUB_TOKEN)로도 새 실행을 만든다 — GitHub 이 허용하는 예외다.
+      #    기본 브랜치로 깨우는 이유: ① 빨간불 경보를 닫는 단계가 기본 브랜치에서만 돈다 ② main 은 방금 기본 브랜치를 합친 같은 내용이다.
+      #    ⚠️ 배포를 막지는 않는다(검사는 배포 뒤에 돈다) — 막을지는 개발자 결정 대기.
+      #    깨우기가 실패해도 배포는 이미 끝났으니 실패로 보이지 않게 continue-on-error.
+      - name: 화면 검사 깨우기 (배포한 내용으로)
+        if: steps.run.outputs.state == 'deployed'
+        continue-on-error: true
+        timeout-minutes: 3
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: gh workflow run verify-ui.yml --repo "$REPO" --ref claude/nice-heisenberg-WESq5
 
       # 조용히 멈추지 않는다. 알림이 쌓이지 않게 열려 있는 같은 이슈가 있으면 코멘트만 단다.
       - name: 🚨 배포 실패 알림
