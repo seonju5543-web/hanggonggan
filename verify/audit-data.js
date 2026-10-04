@@ -281,6 +281,22 @@ console.log(`감사 대상: 정식 등록 ${reg.items.length}건 · 양식 ${Obj
    ⚠️ '글자가 상한 줄'(잘린 조각)은 경고로만 둔다 — 부류가 틀린 게 아니라 수집 단계에서
    글자가 빠진 것이라 성격이 다르고, 버리면 **진짜 요건을 잃는다**
    (동국인재육성의 `…12학점 이상인 경우만 성적 인 (…)` 이 그렇다). */
+/* 대학원 전용 공고가 학부생에게 **적합으로** 뜨지 않는가 (2026-10-04 — test-collector 의 실데이터 관문을 여기 경고로 옮겼다).
+   🔴 오류로 두지 말 것: 관문에 있던 시절, 로봇이 대학원 전용 공고 하나의 자격 줄을 채운 날부터 수집 실행마다 자동 등록분이 되돌려졌다.
+   기대는 2026-09-12 개발자 결정대로 '미달'(fails) 또는 '자격 미확인' — '적합'(점수가 붙고 미달 아님)만 경고한다. 규칙 자체는 관문이 표본으로 잰다. */
+{
+  const ME = require('../match-engine.js');
+  const PR = require('../parse-requirements.js');
+  const ug = { name: 't', school: '경희대학교', campus: '서울캠퍼스', track: 'engineering', major: '컴퓨터공학과', year: 3, status: '재학', gpa: 4.0 };
+  const shown = reg.items.filter((it) => {
+    const ls = it.eligibilityLines || [];
+    if (!ls.some((t) => PR.gradTarget(t) === 'body') || ls.some((t) => PR.mentionsUndergrad(t))) return false;
+    const fd = ME.fitDetail(it, ug);
+    return !fd.unread && !fd.fails.length;
+  }).map((it) => it.id);
+  if (shown.length) warns.push(`registered — 대학원 전용으로 읽히는데 학부생에게 적합으로 뜨는 공고 ${shown.length}건: ${shown.slice(0, 5).join(', ')} (자격 줄·학위 축 확인)`);
+}
+
 {
   /* 화면으로 나가는 문과 **같은 함수**로 본다 — 감사가 제 규칙을 따로 두면
      "감사는 통과하는데 화면엔 잡음이 뜨는" 상태가 된다(이 저장소가 여러 번 겪은 유형). */
