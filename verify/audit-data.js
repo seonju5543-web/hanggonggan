@@ -387,6 +387,23 @@ try {
   warns.push(`폰이 받는 양을 재지 못했습니다: ${e.message.slice(0, 80)}`);
 }
 
+/* ── 출처 목록 — 대외활동·교내 소식 게시판 (2026-10-04 · 로봇·도구 점검) ──────────────────
+   관리자 화면이 고치는 설정 파일이라 규칙을 **두 길이 같이 지나는 이 감사**에 둔다 — 예전엔 test-collector 만 실데이터로 재서
+   관리자 저장은 통과하고 다음 로봇 실행의 데이터 관문이 빨개졌다. 규칙은 verify/source-rules.cjs 한 곳(관리자 저장소도 같은 함수로 먼저 거절).
+   🔴 오류다 — 파일을 못 읽으면 건너뛰지 않고 그것도 오류로 적는다(조용히 꺼지는 검사 금지). */
+{
+  const SR = require('./source-rules.cjs');
+  const readCfg = (rel) => JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
+  try {
+    const served = require('../match-engine.js').SERVED_SCHOOLS || [];
+    for (const p of SR.activitySourceProblems(readCfg('collector/activity-sources.json'), { served })) errors.push(`activity-sources — ${p.msg}`);
+  } catch (e) { errors.push(`activity-sources — 출처 목록을 읽지 못했습니다: ${e.message.slice(0, 80)}`); }
+  try {
+    const schools = (readCfg('collector/schools.json').schools || []).map((s) => s.school);
+    for (const p of SR.newsSourceProblems(readCfg('collector/news-sources.json'), { schools })) errors.push(`news-sources — ${p.msg}`);
+  } catch (e) { errors.push(`news-sources — 출처 목록을 읽지 못했습니다: ${e.message.slice(0, 80)}`); }
+}
+
 /* ── 원문 링크 (2026-10-03 · 원문 대신 재단 홈페이지·게시판 목록이 열리던 사고) ──────────
    앱이 보여 주는 링크 **전부**(정식 등록·실시간 공고 학교별 파일·재단·지자체·대외활동·소식)를 한 규칙으로 훑는다 —
    그전엔 정식 등록의 `#n-` 만 봤고 나머지 피드는 아무도 안 봤다. 규칙은 verify/link-audit.cjs 한 곳.

@@ -1690,7 +1690,10 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
   eq('  보관 칸과 되돌리는 법', Array.isArray(src.parked) && /되돌리려면/.test(src._parked || ''), true);
   /* 2026-09-29 개발자 지시 "어떻게 해서든 크롤링 출처를 찾아" — 주소를 안 적는 규칙에서 **근거와 함께 적는 규칙**으로 바뀌었다.
      주소마다 evidence(어디서 확인했나)가 있어야 한다 · 집계 사이트(링커리어·위비티·씽굿·캠퍼스픽·올콘·콘테스트코리아)는 출처가 아니다. */
-  eq('  주소가 있는 항목은 확인한 근거(evidence)를 적는다', src.sources.filter((x) => x.boardUrl).every((x) => typeof x.evidence === 'string' && x.evidence.length > 10), true);
+  /* 근거(evidence) 10자 넘게는 **실데이터 단정이 아니라 감사(audit-data)의 오류**로 옮겼다 (2026-10-04 · 로봇·도구 점검) —
+     관리자 저장 관문은 감사만 돌려, 여기서만 재면 저장은 통과하고 다음 로봇 실행이 빨개졌다. 규칙은 verify/source-rules.cjs 한 곳 · 표본은 health-gates/gate.mjs */
+  eq('  주소가 있는 항목의 근거(evidence)는 감사가 source-rules 로 본다 (관리자 저장소도 같은 함수)',
+    /SR\.activitySourceProblems\(/.test(readText(new URL('./audit-data.js', import.meta.url))) && /activitySourceProblems\(src, \{ served: SERVED_SCHOOLS, aggregator: AGGREGATOR_RE \}\)/.test(readText(new URL('../tools/admin-apply.mjs', import.meta.url))), true);
   eq('  집계 사이트는 출처에 넣지 않는다', src.sources.some((x) => /linkareer|wevity|thinkcontest|campuspick|all-con|contestkorea|thinkyou|allforyoung/i.test(x.boardUrl || '')), false);
   eq('  설명에 집계 사이트를 넣지 않는 이유가 적혀 있다', /집계 사이트/.test(src._comment || ''), true);
   const acts = JSON.parse(readText(new URL('../data/activities.json', import.meta.url)));
@@ -1781,7 +1784,7 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
       fs.writeFileSync(path.join(dir, 'data/forms.json'), JSON.stringify({ forms: {}, templates: {} }));
       fs.writeFileSync(path.join(dir, 'data/activities.json'), JSON.stringify({ updatedAt: '2026-09-28', items }, null, 1));
       fs.writeFileSync(path.join(dir, 'collector/activity-config.json'), JSON.stringify(seed.cfg || { hideUrls: [] }, null, 1));
-      fs.writeFileSync(path.join(dir, 'collector/activity-sources.json'), JSON.stringify(seed.src || { sources: [{ school: '경희대학교', campus: '공통', boardUrl: 'https://ex.ac.kr/board', evidence: 'x' }], parked: [] }, null, 1));
+      fs.writeFileSync(path.join(dir, 'collector/activity-sources.json'), JSON.stringify(seed.src || { sources: [{ school: '경희대학교', campus: '공통', boardUrl: 'https://ex.ac.kr/board', evidence: '표본 — 학교 누리집 메뉴에서 확인' }], parked: [] }, null, 1));
       const r = spawnSync(process.execPath, [script], { cwd: dir, encoding: 'utf8', env: { ...process.env, ACTION: action, ACTOR: 'gate', PAYLOAD: JSON.stringify(payload) } });
       const read = (f) => JSON.parse(readText(path.join(dir, f)));
       const out = { status: r.status, out: `${r.stdout || ''}${r.stderr || ''}`, acts: read('data/activities.json').items, cfg: read('collector/activity-config.json'), src: read('collector/activity-sources.json') };
@@ -1807,7 +1810,7 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
     eq('  같은 주소는 거부', runAct('activitySource', { op: 'add', source: { school: '경희대학교', boardUrl: 'https://ex.ac.kr/board' } }).status !== 0, true);
     const pk = runAct('activitySource', { op: 'park', boardUrl: 'https://ex.ac.kr/board' });
     eq('  보관은 지우지 않고 parked 로 옮긴다', [pk.status, pk.src.sources.length, pk.src.parked.length, pk.src.parked[0].boardUrl], [0, 0, 1, 'https://ex.ac.kr/board']);
-    const up = runAct('activitySource', { op: 'unpark', boardUrl: 'https://ex.ac.kr/board' }, { src: { sources: [], parked: [{ school: '경희대학교', boardUrl: 'https://ex.ac.kr/board' }] } });
+    const up = runAct('activitySource', { op: 'unpark', boardUrl: 'https://ex.ac.kr/board' }, { src: { sources: [], parked: [{ school: '경희대학교', boardUrl: 'https://ex.ac.kr/board', evidence: '표본 — 학교 누리집 메뉴에서 확인' }] } });
     eq('  되살리기는 sources 로 되돌린다', [up.status, up.src.sources.length, up.src.parked.length], [0, 1, 0]);
     /* 화면 배선 — 파일 셋을 읽고(readJson 규칙은 「못 읽은 파일」 절이 잰다), 워크플로가 셋을 저장하고, 로봇·앱이 hidden 을 지킨다 */
     const adminJs = readText(new URL('../_admin/admin.js', import.meta.url));
@@ -2052,9 +2055,11 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   const schoolsCfg = JSON.parse(readText(new URL('collector/schools.json', root)));
   const srcSchools = new Set([...src.sources, ...(src.parked || [])].map((s) => s.school));
   eq('출처(보관 포함)가 수집망 학교 전부를 덮는다 (schools.json)', schoolsCfg.schools.map((s) => s.school).filter((n) => !srcSchools.has(n)), []);
-  eq('  출처 학교는 전부 서비스 학교 · 게시판이 있는 줄은 학교 하나에 하나', src.sources.every((s) => schoolsCfg.schools.some((x) => x.school === s.school)) && new Set(src.sources.filter((s) => s.boardUrl).map((s) => s.school)).size === src.sources.filter((s) => s.boardUrl).length, true);
-  eq('  후보마다 근거(웹 검색 결과 URL)가 있다 — 주소를 지어내지 않았다', src.sources.every((s) => (s.candidates || []).every((c) => /^https?:\/\//.test(c.url) && typeof c.evidence === 'string' && c.evidence.length >= 10)), true);
-  eq('  boardUrl 이 있으면 로봇 확인(autoFound) 또는 사람의 근거(evidence)가 붙어 있다', src.sources.filter((s) => s.boardUrl).every((s) => (s.autoFound && s.autoFound.rows >= FN.MIN_ROWS && Array.isArray(s.autoFound.sample)) || (typeof s.evidence === 'string' && s.evidence.length > 10)), true);
+  /* 출처 학교·학교당 게시판 하나·후보 근거·boardUrl 근거는 감사(audit-data)의 오류로 옮겼다 (2026-10-04 · 위 활동 출처와 같은 이유 ·
+     관리자 park→add→unpark 로 한 학교에 둘이 되면 저장은 통과하고 소식 로봇이 빨개졌다). 규칙 verify/source-rules.cjs · 표본 health-gates/gate.mjs */
+  eq('  출처 규칙(학교·학교당 하나·근거)은 감사가 source-rules 로 본다 · 찾기 로봇의 문턱도 같은 파일',
+    /SR\.newsSourceProblems\(/.test(readText(new URL('verify/audit-data.js', root))) && /newsSourceProblems\(src, \{ schools:/.test(readText(new URL('tools/admin-apply.mjs', root)))
+    && FN.MIN_ROWS === createRequire(import.meta.url)('./source-rules.cjs').NEWS_MIN_ROWS, true);
   eq('  보관 칸과 되돌리는 법', Array.isArray(src.parked) && /되돌리려면/.test(src._parked || ''), true);
   /* ④ 로봇 배선 */
   const rn = readText(new URL('collector/collect-news.mjs', root));
@@ -2375,7 +2380,9 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
     fs.mkdirSync(path.join(dir, 'collector'), { recursive: true });
     const key = ME.noticeFileKey('경희대학교');
     fs.writeFileSync(path.join(dir, 'data/news/' + key + '.json'), JSON.stringify({ school: '경희대학교', updatedAt: '2026-09-30', items: [{ title: '검사용 수강신청 안내', url: 'https://k.ac.kr/n/1', kind: '학사', school: '경희대학교', campus: '', foundAt: '2026-09-30' }] }, null, 1));
-    fs.writeFileSync(path.join(dir, 'collector/news-sources.json'), JSON.stringify({ sources: [{ school: '경희대학교', campus: '공통', boardUrl: 'https://k.ac.kr/notice', evidence: '검사용' }, { school: '서울대학교', campus: '', boardUrl: null, candidates: [], probe: { checkedAt: '2026-09-30', tried: [] } }], parked: [] }, null, 1));
+    fs.writeFileSync(path.join(dir, 'collector/news-sources.json'), JSON.stringify({ sources: [{ school: '경희대학교', campus: '공통', boardUrl: 'https://k.ac.kr/notice', evidence: '검사용 — 학교 누리집 메뉴에서 확인' }, { school: '서울대학교', campus: '', boardUrl: null, candidates: [], probe: { checkedAt: '2026-09-30', tried: [] } }], parked: [] }, null, 1));
+    /* 저장소는 저장 전에 감사와 같은 출처 규칙(verify/source-rules.cjs)으로 본다 — 수집망 학교 목록이 있어야 한다 (2026-10-04) */
+    fs.writeFileSync(path.join(dir, 'collector/schools.json'), JSON.stringify({ schools: [{ school: '경희대학교' }, { school: '서울대학교' }] }, null, 1));
     fs.writeFileSync(path.join(dir, 'data/admin-log.json'), '{"items":[]}');
     fs.writeFileSync(path.join(dir, 'data/registered.json'), JSON.stringify({ items: [] }));   // admin-apply 는 시작하며 이 둘을 읽는다 (활동 관문과 같은 씨앗)
     fs.writeFileSync(path.join(dir, 'data/forms.json'), JSON.stringify({ forms: {}, templates: {} }));
@@ -6060,10 +6067,12 @@ console.log('\n■ 등록금 비율 환산 — 한 학기 기준인가 (2026-08-
 {
   const req = createRequire(import.meta.url);
   const PA = req('../parse-amount.js');
-  const T = req('../data/tuition.json').schools;
+  /* 🔴 표본 표 — data/tuition.json 을 읽지 않는다 (2026-10-04 · 로봇·도구 점검). 예전엔 실값(7269500)을 단정해
+     등록금 갱신 로봇이 한 번만 돌아도 모든 로봇의 데이터 관문이 빨개질 참이었다. 값은 2026-08-29 개발자가 확인한 외대 인문사회 1년치 */
+  const T = { '한국외국어대학교': { avg: 7791804, byField: { 인문사회: 7269500, 공학: 9101400 } } };
   const p = { school: '한국외국어대학교', track: 'humanities' };
   const yearly = (T['한국외국어대학교'].byField || {})['인문사회'];
-  eq('표에는 1년치가 들어 있다 (외대 인문사회)', yearly, 7269500);
+  eq('표에는 1년치가 들어 있다 (외대 인문사회 · 표본)', yearly, 7269500);
   const t = PA.tuitionFor(p, T);
   eq('tuitionFor 는 한 학기분을 준다', t, Math.round(yearly / 2));
   eq('  개발자가 말한 값과 맞는다 (한 학기 약 360만원)', t > 3300000 && t < 3900000, true);
@@ -6619,20 +6628,30 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
 {
   console.log('\n■ 화면 주장을 재는 도구 (verify/what-shows.mjs · 2026-08-29)');
   const { execFileSync } = await import('node:child_process');
+  /* 🔴 **표본 정식 등록 파일**로 돈다 (2026-10-04 · 로봇·도구 점검) — 예전엔 실데이터에서 '목록과 상세가 다른 공고'·'마감만 지난 공고'를
+     골랐고, 그런 공고가 없는 날엔 관문이 빨개질 참이었다(실데이터 단정 — CLAUDE.md '실데이터에 기댄 고정 검사를 관문에 두지 말 것').
+     표본이 두 경우를 늘 품는다 · 도구는 WHAT_SHOWS_REGISTERED 로 이 파일을 읽는다(앱 함수는 그대로 vm 에 싣는다). */
+  const wsReg = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-what-shows-')), 'registered.json');
+  const wsBase = { type: '교외', provider: '표본재단', amount: '100만원', amountValue: 1000000, summary: '표본', eligibility: {}, documents: ['신청서'], noForm: '표본', sourceUrl: 'https://example.ac.kr/notice/1' };
+  fs.writeFileSync(wsReg, JSON.stringify({ items: [
+    { ...wsBase, id: 'sample-many-lines', name: '표본 장학금 (자격 줄 일곱)', deadline: '2099-12-31',
+      eligibilityLines: ['대한민국 국적을 가진 자', '직전학기 평점 2.5 이상인 자', '직전학기 12학점 이상 이수한 자', '학부 재학생', '소득 8구간 이하인 자', '서울시에 거주하는 자', '2학년 이상 재학생'] },
+    { ...wsBase, id: 'sample-closed', name: '표본 장학금 (마감 지남)', deadline: '2020-01-31', eligibilityLines: ['직전학기 평점 2.5 이상인 자'] },
+  ] }));
   const run = (args) => {
     try {
       return execFileSync(process.execPath, ['verify/what-shows.mjs', ...args],
-        { cwd: fileURLToPath(new URL('..', import.meta.url)), encoding: 'utf8', timeout: 60000 });
+        { cwd: fileURLToPath(new URL('..', import.meta.url)), encoding: 'utf8', timeout: 60000, env: { ...process.env, WHAT_SHOWS_REGISTERED: wsReg } });
     } catch (e) { return String((e && (e.stdout || e.message)) || ''); }
   };
 
   /* 🔴 **실제로 돌려서** 앱과 같은 답을 내는지 본다 — 글자만 훑으면 빈 파일도 통과한다 */
-  const reg2 = JSON.parse(readText(new URL('../data/registered.json', import.meta.url)));
+  const reg2 = JSON.parse(readText(wsReg));
   const ME4 = createRequire(import.meta.url)('../match-engine.js');
   /* 목록(상한 5)과 상세(전부)의 줄 수가 **다른** 공고를 골라야 그날의 실수를 재현 검사할 수 있다 */
   const target = reg2.items.find((x) =>
     ME4.requirementLines(x, null, { all: true }).length > ME4.requirementLines(x, null).length);
-  eq('목록과 상세가 다른 공고가 실제로 있다 (이 검사의 전제)', !!target, true);
+  eq('목록과 상세가 다른 공고가 표본에 있다 (이 검사의 전제)', !!target, true);
   if (target) {
     const out = run([target.id]);
     const listN = Number((out.match(/목록 카드에 보이는 자격 줄 \((\d+)줄/) || [])[1]);
@@ -6677,7 +6696,7 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
     if (!ME4.requirementLines(x, null).length) return false;
     return ['eligible', 'selective'].includes(ME4.evaluate(x, WS_P).status);
   });
-  eq('  마감만 지난(자격은 통과) 공고를 실제로 골랐다 — 없으면 이 검사는 무의미하다', !!closed, true);
+  eq('  마감만 지난(자격은 통과) 공고를 표본에서 골랐다 — 없으면 이 검사는 무의미하다', !!closed, true);
   if (closed) {
     const out = run([closed.id]);
     eq('마감 지난 공고는 신청 버튼 잠김이라고 말한다', /신청 버튼 잠김/.test(out), true);
@@ -7936,7 +7955,8 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
     const forms = JSON.parse(readText(new URL('../data/forms.json', import.meta.url)));
     const notes = Object.values(forms.templates || forms).map((t) => t && t.photoNote).filter(Boolean);
     const nonPhoto = notes.filter((n) => !/사진/.test(n));
-    eq(`photoNote 에 사진 이야기가 아닌 안내가 실제로 있다 (지금 ${nonPhoto.length}건 — 0이면 위 관문의 뜻이 사라진다)`, nonPhoto.length > 0, true);
+    /* 실데이터는 재기만 한다(2026-10-04 · 로봇·도구 점검 — '있어야 한다' 단정은 데이터가 바뀌면 관문을 빨갛게 한다) */
+    console.log(`  ℹ photoNote 에 사진 이야기가 아닌 안내 지금 ${nonPhoto.length}건 — 0이면 위 관문의 뜻(사진란 가르기)이 쉬고 있다`);
   }
   eq('휴지통을 거쳐도 문서용 사본(dataUrl)이 따라간다 · 없으면 blob 에서 다시 만든다',
     /rec\.dataUrl \? \{ dataUrl: rec\.dataUrl \}/.test(appJs) && /rec\.dataUrl \|\| await blobToDataUrl\(rec\.blob\)/.test(appJs), true);
@@ -9383,8 +9403,13 @@ console.log('\n■ 관리자 쓰기 — 되돌릴 수 없는 일 앞의 안전�
     eq('시트가 안 바뀐 기간 문구를 같이 보내도 문구가 마감을 따라간다',
       dl.after.find((x) => x.id === 'reg-t0').period, '접수 기간 ~2026-12-31');
     /* ⓒ 사람이 문구를 **진짜로** 고치면 그쪽이 이긴다 (덮어쓰지 않는다) */
-    const own = run('edit', sheet('reg-t0', { amount: '등록금 전액 + 생활비', amountValue: 3000000 }), 3);
-    eq('  사람이 문구를 직접 고치면 그대로 둔다', own.after.find((x) => x.id === 'reg-t0').amount, '등록금 전액 + 생활비');
+    /* ⚠️ 문구에 숫자를 넣는다 (2026-10-04) — 숫자 없는 문구 + amountValue 는 등록 규칙 오류라 이제 저장소가 저장 전에 거절한다
+       (예전엔 저장한 뒤 감사가 묶음을 되돌렸다 — 바로 아래 검사가 그 길을 잰다) */
+    const own = run('edit', sheet('reg-t0', { amount: '등록금 전액 + 생활비 월 50만원', amountValue: 3000000 }), 3);
+    eq('  사람이 문구를 직접 고치면 그대로 둔다', own.after.find((x) => x.id === 'reg-t0').amount, '등록금 전액 + 생활비 월 50만원');
+    const bare = run('edit', sheet('reg-t0', { amount: '등록금 전액 + 생활비', amountValue: 3000000 }), 3);
+    eq('  숫자 없는 문구 + 금액은 저장 전에 거절한다 (감사와 같은 checkEntry — 묶음이 저장 뒤에 되돌려지지 않게)',
+      [bare.status !== 0, /금액 문구/.test(bare.out), bare.after.find((x) => x.id === 'reg-t0').amount], [true, true, '금액 원문 확인']);
     /* ⓓ 로봇이 읽어 둔 구조가 사람 값과 어긋나면 물러난다 — 합계는 amountSpec 을 먼저 본다 */
     const ratio = run('edit', sheet('reg-t1', { amountValue: 3000000 }), 3,
       (it) => { if (it.id === 'reg-t1') { it.amountSpec = { kind: 'ratio', ratio: 1, value: 0, raw: '등록금 전액' }; it.amountFrom = '공고 원문'; } });
@@ -9597,9 +9622,8 @@ console.log('■ 학교 장학 신청 포털 — 「학교 포털」이 어디�
   /* 실제로 그런 공고가 등록돼 있다 — 위 규칙이 가상의 걱정이 아니라는 증거(사라지면 알려 준다) */
   const regd = JSON.parse(readText(new URL('../data/registered.json', import.meta.url))).items || [];
   const scoped = regd.filter((i) => (i.eligibility || {}).schoolOnly);
-  eq('등록된 교내 게시 공고가 있다 (헛도는 검사가 아니다)', scoped.length > 0, true);
-  eq('  그중 교외·국가 공고가 실제로 섞여 있다 (제출처로 쓰면 안 되는 이유)',
-    scoped.filter((i) => /\[교외\]|\[국가/.test(i.name)).length > 0, true);
+  /* 실데이터는 재기만 한다(2026-10-04 · 로봇·도구 점검) — 규칙은 위 khu 표본이 잰다 */
+  console.log(`  ℹ 학교 한정 공고 지금 ${scoped.length}건 · 그중 교외·국가 표식 ${scoped.filter((i) => /\[교외\]|\[국가/.test(i.name)).length}건 (제출처로 포털을 쓰면 안 되는 이유)`);
 
   /* 표에 있는 학교의 공고는 전부 포털 한 줄을 받는다 — 학교별로 센다.
      🔴 전체를 한 번에 세면 그 학교 공고가 0건일 때 0 === 0 으로 조용히 통과한다. */
@@ -10047,16 +10071,24 @@ console.log('\n■ 마감일 감사 — 근거 없는 마감이 늘지 않는다
   eq('  달이 거꾸로 가면 해가 넘어간 것이다 (12.20 ~ 1.10)', DA.lastDateIn('접수 2026.12.20 ~ 1.10', '2026'), '2027-01-10');
   eq('  소수는 날짜가 아니다 (평점 3.5 ~ 4.5)', DA.lastDateIn('접수 ~ 2026. 9. 18.(금) 18:00 · 평점 3.5 ~ 4.5', '2026'), '2026-09-18');
   eq('  날짜가 없으면 null', DA.lastDateIn('접수 기간 원문 확인', '2026'), null);
-  /* ② 전수 — 톱니. 근거 없는 마감이 지금(4건)보다 늘면 빨간불.
-        줄이면 천장을 내릴 것 · 올리려면 그 마감이 어디서 왔는지 먼저 적을 것. */
+  /* ② 전수 — **숫자만 보인다** (2026-10-04 · 로봇·도구 점검). 예전엔 '근거 없는 마감 ≤3' 톱니였는데 실데이터가 정확히 3건으로
+        선 위에 서 있었다 — 로봇이 근거 문구 없는 마감 하나만 더 넣어도 10-01 사고(관문 빨간불 → 그날 자동 등록 되돌림)가 그대로 난다.
+        CLAUDE.md '실데이터에 기댄 고정 검사를 관문에 두지 말 것'. 근거 찾기 규칙은 위 ① 표본이 잰다 · 의심 목록은 `node verify/deadline-audit.mjs`.
+        '화면 문구의 끝 날짜 ↔ 마감'은 항목 하나의 불변식이라 감사(entry-rules checkEntry · 오류)로 옮겼다 — 아래 ③ 이 표본으로 잰다. */
   const rows = DA.auditDeadlines(new Date('2026-09-17T00:00:00'));
   const noEvidence = rows.filter((r) => r.flags.some((f) => /근거를 못 찾음/.test(f)));
-  eq(`근거 없는 마감이 3건을 넘지 않는다 (지금 ${noEvidence.length}건: ${noEvidence.map((r) => r.id).join(', ') || '없음'})`,
-    noEvidence.length <= 3, true);
-  const wrongLabel = rows.filter((r) => r.flags.some((f) => /화면 문구의 끝 날짜/.test(f)));
-  eq('화면 문구의 끝 날짜와 마감이 어긋난 공고가 없다', wrongLabel.map((r) => `${r.id} ${r.deadline} vs 문구 「${r.period}」`), []);
   const farAway = rows.filter((r) => r.flags.some((f) => /1년 넘게/.test(f)));
-  eq('등록일에서 1년 넘게 먼 마감이 없다', farAway.map((r) => r.id), []);
+  console.log(`  ℹ 근거 없는 마감 ${noEvidence.length}건${noEvidence.length ? ` (${noEvidence.map((r) => r.id).join(', ')})` : ''} · 등록일에서 1년 넘게 먼 마감 ${farAway.length}건 — 사람이 원문을 열어 볼 자리(빨간불 아님)`);
+  {
+    const { checkEntry } = createRequire(import.meta.url)('./entry-rules.cjs');
+    const base = { id: 't1', name: '표본 장학금', type: '교외', provider: '재단', amount: '100만원', summary: '-', eligibility: {}, documents: ['-'], sourceUrl: 'https://x.ac.kr/a', noForm: '표본' };
+    const lab = (o) => checkEntry({ ...base, ...o }).filter((p) => p.level === 'error' && /화면 문구의 끝 날짜/.test(p.msg)).length;
+    eq('화면 문구의 끝 날짜와 마감이 다르면 등록 규칙 오류 (감사·관리자 저장·자동 등록이 같은 checkEntry)',
+      [lab({ deadline: '2026-12-30', period: '신청 2026.7.6(월) ~ 8.31(월) 18:00' }), lab({ deadline: '2026-08-31', period: '신청 2026.7.6(월) ~ 8.31(월) 18:00' }),
+        lab({ deadline: '2026-08-31', period: '접수 기간 원문 확인' }), lab({ program: true, deadline: '2026-12-30', period: '~ 8.31' })], [1, 0, 0, 0]);
+    eq('  마감일 감사 도구는 그 규칙의 lastDateIn 을 불러 쓴다 (베끼지 않는다)',
+      /const \{ lastDateIn \} = require\('\.\/entry-rules\.cjs'\)/.test(readText(new URL('./deadline-audit.mjs', import.meta.url))) && !/^export function lastDateIn/m.test(readText(new URL('./deadline-audit.mjs', import.meta.url))), true);
+  }
   /* ③ 마감이 있는 공고는 전부 ISO 날짜이고 실제로 있는 날이다 — 틀린 꼴은 dday 가 NaN 을 낸다 */
   const badIso = rows.filter((r) => r.deadline && !(/^\d{4}-\d{2}-\d{2}$/.test(r.deadline) && !Number.isNaN(new Date(r.deadline + 'T00:00:00').getTime())));
   eq('마감은 전부 YYYY-MM-DD 이고 달력에 있는 날이다', badIso.map((r) => `${r.id} ${r.deadline}`), []);
@@ -10858,11 +10890,10 @@ return { submitChannelKind, submitChannelLabel };`)();
   eq('사람이 넣은 것은 경고까지만', lv({ applyEmail: 'a@b.ac.kr', applyEmailFrom: '관리자 2026-09-23' }), 'warn');
   eq('근거가 딴 주소면 오류', lv({ applyEmail: 'a@b.ac.kr', applyEmailSource: '접수주소 : zzz@c.ac.kr 로 제출', applyEmailFrom: '공고 원문' }), 'error');
 
-  /* ⑥ 실제 데이터 — 넣어 둔 주소가 전부 제 근거 문장 안에 있는가 */
+  /* ⑥ 실제 데이터 — '근거 문장 안에 주소' 는 위 ⑤ 의 checkEntry 규칙이 감사(audit-data · 오류)에서 전수로 잰다.
+     '0건이면 통로가 막힌 것'은 숫자만 보인다(2026-10-04 · 마지막 마감이 지나면 notStale 로 0건이 되는 실데이터 단정이었다) */
   const reg = JSON.parse(readText(new URL('../data/registered.json', import.meta.url)));
-  const mailed = reg.items.filter((x) => x.applyEmail);
-  eq('접수 메일 주소가 들어 있다 (0건이면 통로가 다시 막힌 것)', mailed.length > 0, true);
-  eq('전부 근거 문장을 달고 있다', mailed.filter((x) => !(x.applyEmailSource || '').includes(x.applyEmail)), []);
+  console.log(`  ℹ 접수 메일 주소가 든 공고 지금 ${reg.items.filter((x) => x.applyEmail).length}건 — 0이면 통로가 막혔는지 리포트를 볼 것`);
 }
 
 /* ── 🔴 포털 신청 — '어느 시스템'까지 읽는다 (2026-09-23 신설) ──
@@ -10943,13 +10974,17 @@ return { submitChannelKind, submitChannelLabel };`)();
   eq('그 클래스가 전부 style.css 에 있다',
     used.filter((c) => !new RegExp(`\\.${c}\\b`).test(css)), []);
 
-  /* ⑨ 실제 데이터 — HTML 기호가 학생 화면에 글자로 새지 않는가 (2026-09-11 사고와 같은 줄) */
+  /* ⑨ HTML 기호가 학생 화면에 글자로 새지 않는가 (2026-09-11 사고와 같은 줄) — 근거 문장 있음·HTML 기호 없음은 항목 하나의 불변식이라
+     감사(entry-rules checkEntry · 오류)로 옮겼다(2026-10-04 · 로봇·도구 점검). 여기서는 표본으로 그 규칙을 잰다 · 실데이터는 숫자만 */
+  {
+    const { checkEntry } = req('../verify/entry-rules.cjs');
+    const pb = { id: 't', name: '표본', sourceUrl: 'https://x.ac.kr/a', type: '교외', applyPortal: 'HUFS Ability', applyPortalFrom: '공고 원문' };
+    const errs = (o) => checkEntry({ ...pb, ...o }).filter((p) => p.level === 'error' && /포털 시스템|HTML 기호/.test(p.msg)).length;
+    eq('포털 근거 문장이 없으면 · HTML 기호가 남으면 등록 규칙 오류 (감사가 전수로 잰다)',
+      [errs({}), errs({ applyPortalSource: 'HUFS Ability &rarr; 장학 신청' }), errs({ applyPortalSource: 'HUFS Ability → 장학 신청' })], [1, 1, 0]);
+  }
   const reg = JSON.parse(readText(new URL('../data/registered.json', import.meta.url)));
-  const withPortal = reg.items.filter((x) => x.applyPortal);
-  eq('포털 시스템이 들어 있다 (0건이면 통로가 막힌 것)', withPortal.length > 0, true);
-  eq('전부 근거 문장을 달고 있다', withPortal.filter((x) => !x.applyPortalSource), []);
-  const ents = reg.items.filter((x) => /&[a-zA-Z#0-9]+;/.test(`${x.applyPortalSource || ''}${x.applyEmailSource || ''}`));
-  eq('근거 문장에 HTML 기호가 남아 있지 않다', ents.map((x) => x.id), []);
+  console.log(`  ℹ 포털 시스템이 든 공고 지금 ${reg.items.filter((x) => x.applyPortal).length}건 — 0이면 통로가 막혔는지 리포트를 볼 것`);
 }
 
 /* ── 🔴 기술 고문 요청서가 우리 전제와 어긋나지 않는다 (2026-09-23 신설) ──

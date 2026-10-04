@@ -44,6 +44,15 @@ jobs:
         timeout-minutes: 45
         run: node collector/fetch-tuition-field.mjs --write
 
+      # 🔴 데이터 관문 (2026-10-04 · 로봇·도구 점검) — 다른 로봇처럼 저장 **전에** 규칙 관문과 데이터 감사를 지난다.
+      #    예전엔 관문 없이 저장해, 이 파일이 다른 로봇 관문의 전제를 깨면 저장은 되고 **다음 수집 로봇의 데이터 관문이 빨개져**
+      #    그 실행 결과가 되돌려질 참이었다. 걸리면 저장 없이 빨간불(수동 실행이라 사람이 본다) — continue-on-error 를 달지 말 것.
+      - name: 데이터 관문 (수집기 규칙 테스트 + 데이터 감사)
+        timeout-minutes: 5
+        run: |
+          node verify/test-collector.mjs
+          node verify/audit-data.js
+
       - name: 저장
         run: |
           git config user.name "handaejang-bot"

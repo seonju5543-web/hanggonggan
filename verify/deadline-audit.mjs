@@ -63,28 +63,10 @@ function docsOf(it) {
   return out;
 }
 
-/* 문구에 적힌 **마지막 날짜** — `신청 2026.7.6(월) ~ 8.31(월) 18:00` 의 끝은 8.31 이다.
-   해가 안 적힌 끝 날짜는 앞의 해(없으면 마감의 해)를 빌린다 — dateFrom 과 같은 뜻. */
-export function lastDateIn(text, year) {
-  /* `모집 ~2026.8.5 · 선발 발표 8.26(수)` — 발표·지급 날짜는 마감이 아니다. 그 말 앞까지만 본다 */
-  const p = String(text || '').split(/발표|지급|공고일|게시/)[0];
-  /* ⚠️ 뒤에 소수점 자리가 더 오면 날짜가 아니다 — `평점 3.5 ~ 4.5` 를 3월 5일로 읽지 않는다 */
-  const re = /(?<!\d)(?:(20\d{2})\s?[-./년]\s?)?(\d{1,2})\s?[-./월]\s?(\d{1,2})(?![\d.]\d)(?!\d)/g;
-  let last = null, y = year, prevMo = 0;
-  for (const m of p.matchAll(re)) {
-    if (m[1]) y = m[1];
-    if (!y) continue;
-    const mo = Number(m[2]), da = Number(m[3]);
-    if (mo < 1 || mo > 12 || da < 1 || da > 31) continue;
-    /* 성적 이야기 속 소수(`평점 3.5 ~ 4.5`)는 날짜가 아니다 — 앞 10자에 성적 낱말이 있거나 뒤에 `점·이상` 이 붙는다 */
-    if (/평점|성적|학점|점수|GPA/i.test(p.slice(Math.max(0, m.index - 10), m.index)) || /^\s*(점|이상|이하|만점)/.test(p.slice(m.index + m[0].length))) continue;
-    /* 해가 안 적힌 채 달이 거꾸로 가면(`12.20 ~ 1.10`) 해가 넘어간 것이다(2026-09-17 코드 리뷰) */
-    if (!m[1] && prevMo && mo < prevMo) y = String(Number(y) + 1);
-    prevMo = mo;
-    last = `${y}-${String(mo).padStart(2, '0')}-${String(da).padStart(2, '0')}`;
-  }
-  return last;
-}
+/* 문구에 적힌 **마지막 날짜** — 규칙은 verify/entry-rules.cjs 한 곳(2026-10-04 옮김 · 감사·관리자 저장·자동 등록이 같은
+   '화면 문구 ↔ 마감' 규칙을 쓴다). 여기서는 불러 쓰고 그대로 내보낸다(관문이 DA.lastDateIn 으로 표본을 잰다). */
+const { lastDateIn } = require('./entry-rules.cjs');
+export { lastDateIn };
 /* 제목의 `(~9/10)`·`(9.11~9.28)` — auto-register 가 제목에서 읽는 마감의 근거 */
 function titleEnd(name, year) {
   const m = String(name || '').match(/[~∼〜～]\s?(\d{1,2})\s?[./]\s?(\d{1,2})\s?\)?/);

@@ -47,6 +47,8 @@ const idFromUrl = (prefix, raw) => {
 
 /* 등록 규칙은 로봇이 쓰는 그 파일 하나뿐이다 — 화면이 따로 판단하게 만들지 않는다 */
 const { checkEntry, RULES: ENTRY_RULES } = createRequire(import.meta.url)('../verify/entry-rules.cjs');
+/* 출처 목록 규칙도 감사(audit-data)가 쓰는 그 파일 하나 — 저장 전에 같은 규칙으로 먼저 거절해 화면이 사유를 말하게 한다 (2026-10-04) */
+const { activitySourceProblems, newsSourceProblems } = createRequire(import.meta.url)('../verify/source-rules.cjs');
 
 const REG = 'data/registered.json';
 const CFG = 'collector/auto-register-config.json';
@@ -99,6 +101,9 @@ const readJson = (p, dflt) => {
 const writeJson = (p, obj) => fs.writeFileSync(p, `${JSON.stringify(obj, null, 1)}\n`);
 const kstNow = () => new Date(Date.now() + 9 * 3600e3).toISOString().replace('T', ' ').slice(0, 16);
 const TODAY = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);   // KST 기준 날짜
+/* 출처 근거(evidence) — 사람이 적은 메모가 짧아도 **언제 누가**는 남긴다. 감사가 10자 넘게를 요구해서, 짧은 메모만 적으면
+   저장 뒤 다음 로봇 실행의 데이터 관문이 깨졌다(2026-10-01 소식 · 2026-10-04 활동에도 같은 구멍). 소식·활동 출처가 같이 쓴다. */
+const stampEvidence = (typed) => `${typed ? typed + ' · ' : ''}관리자 화면에서 등록 (${kstNow()} KST)`;
 
 /* 고칠 수 있는 항목만 — 이 목록에 없는 키는 무시한다 */
 const ALLOWED = new Set([
@@ -770,10 +775,19 @@ switch (action) {
     };
 
     const parts = [];
+    /* 🔴 고친 뒤 **새로 생긴 등록 규칙 오류**는 여기서 멈춘다 (2026-10-04 · 로봇·도구 점검) — 규칙은 감사와 같은 checkEntry.
+       예: 마감만 2026-12-30 으로 고치고 문구 「신청 … ~ 8.31」를 두면 화면이 두 날짜를 나란히 보인다. 예전엔 관리자 관문(감사)이
+       이 규칙을 몰라 저장됐고 다음 로봇 실행의 데이터 관문이 빨개졌다. 문구(period)를 같이 보내면 통과한다.
+       ⚠️ 원래 있던 오류는 막지 않는다 — 이 수정이 만든 것만(다른 사람 몫까지 이 버튼이 떠안지 않게). */
+    const formIdSet = new Set(Object.keys(readJson(FORMS, { templates: {} }).templates || {}));
+    const entryErrors = (it) => (checkEntry(it, { formIds: formIdSet }) || []).filter((p) => p.level === 'error').map((p) => p.msg);
     edits.forEach((e) => {
       const it = byId(e && e.id);
       if (!it) fail(`수정할 공고를 찾지 못했습니다: ${e && e.id}`);
+      const before = new Set(entryErrors(it));
       const changed = applyPatch(it, e.patch);
+      const fresh = entryErrors(it).filter((m) => !before.has(m));
+      if (fresh.length) fail(`${it.id} — ${fresh[0]}`);
       /* 바뀐 게 없는 건은 **묶음을 죽이지 않고 건너뛴다** — 여러 건을 보낼 때는
          그중 하나가 이미 같은 값인 일이 흔하다. 전부 그대로면 아래에서 멈춘다. */
       if (changed.length) parts.push(`${e.id} — ${changed.join(', ')}`);
@@ -884,6 +898,9 @@ switch (action) {
     const src = readJson(ACT_SRC, null);
     if (!src || !Array.isArray(src.sources)) fail(`${ACT_SRC} 를 읽지 못했습니다`);
     src.parked = Array.isArray(src.parked) ? src.parked : [];
+    /* 저장 전 확인 — 감사와 같은 규칙(verify/source-rules.cjs). 이 작업이 **새로 만든** 문제만 막는다(원래 있던 것은 감사가 따로 말한다) */
+    const actRules = () => activitySourceProblems(src, { served: SERVED_SCHOOLS, aggregator: AGGREGATOR_RE }).map((x) => x.msg);
+    const actBefore = new Set(actRules());
     if (op === 'add') {
       const s = payload.source || {};
       const url = String(s.boardUrl || '').trim();
@@ -895,7 +912,7 @@ switch (action) {
       if (!school && !host) fail('학교 이름이나 주최(host) 가운데 하나는 있어야 합니다');
       if (school && !SERVED_SCHOOLS.includes(school)) fail(`서비스하지 않는 학교입니다(match-engine.js SERVED_SCHOOLS): ${school}`);
       const row = { school, campus: school ? (s.campus || '공통') : '', boardUrl: url,
-        evidence: String(s.evidence || '').trim() || `관리자 화면에서 등록 (${kstNow()} KST)`, note: String(s.note || '').trim() || '관리자 화면에서 등록' };
+        evidence: stampEvidence(String(s.evidence || '').trim()), note: String(s.note || '').trim() || '관리자 화면에서 등록' };
       if (!school) row.host = host;
       src.sources.push(row);
       detail = `출처 추가 · ${school || host} → ${url}`;
@@ -912,6 +929,8 @@ switch (action) {
     } else {
       fail(`알 수 없는 출처 작업입니다: ${op}`);
     }
+    const actNew = actRules().filter((m) => !actBefore.has(m));
+    if (actNew.length) fail(`저장하면 데이터 관문에 걸립니다 — ${actNew[0]}`);
     writeJson(ACT_SRC, src);
     touched = true;
     break;
@@ -1026,6 +1045,9 @@ switch (action) {
     const src = readJson(NEWS_SRC, null);
     if (!src || !Array.isArray(src.sources)) fail(`${NEWS_SRC} 를 읽지 못했습니다`);
     src.parked = Array.isArray(src.parked) ? src.parked : [];
+    /* 저장 전 확인 — 감사와 같은 규칙(verify/source-rules.cjs) · 이 작업이 새로 만든 문제만 막는다 */
+    const newsRules = () => newsSourceProblems(src, { schools: (readJson(SCHOOLS, { schools: [] }).schools || []).map((x) => x.school) }).map((x) => x.msg);
+    const newsBefore = new Set(newsRules());
     if (op === 'add') {
       const s = payload.source || {};
       const url = String(s.boardUrl || '').trim();
@@ -1035,8 +1057,7 @@ switch (action) {
       if (!SERVED_SCHOOLS.includes(school)) fail(`서비스하지 않는 학교입니다(match-engine.js SERVED_SCHOOLS): ${school}`);
       if ([...src.sources, ...src.parked].some((x) => canonUrl(x.boardUrl || '') === canonUrl(url))) fail('이미 있는 게시판 주소입니다');
       /* 근거는 짧아도 **언제 누가**는 남는다 — 관문이 10자 이상을 요구한다(짧은 메모만 적으면 저장 뒤 관문이 깨진다 · 리뷰 2026-10-01) */
-      const typed = String(s.evidence || '').trim();
-      const evidence = `${typed ? typed + ' · ' : ''}관리자 화면에서 등록 (${kstNow()} KST)`;
+      const evidence = stampEvidence(String(s.evidence || '').trim());
       /* 학교 하나에 줄 하나 — 이미 게시판이 있는 학교는 거절한다(둘이면 리포트·건강 장부에서 이름이 겹쳐 한쪽 실패가 묻힌다). 바꾸려면 먼저 보관. */
       if (src.sources.some((x) => x.school === school && x.boardUrl)) fail(`${school} 은 이미 게시판이 있습니다 — 바꾸려면 그 줄을 먼저 보관하세요`);
       const row = src.sources.find((x) => x.school === school && !x.boardUrl);
@@ -1049,6 +1070,11 @@ switch (action) {
       const to = op === 'park' ? src.parked : src.sources;
       const i = from.findIndex((x) => canonUrl(x.boardUrl || '') === canonUrl(url));
       if (i < 0) fail(`그 주소의 출처가 없습니다: ${url}`);
+      /* 되살릴 때도 '학교 하나에 게시판 하나' — add 와 같은 거절(2026-10-04 · park → add → unpark 로 한 학교에 둘이 되면
+         감사는 몰랐고 다음 소식 로봇의 데이터 관문이 깨졌다) */
+      if (op === 'unpark' && from[i].boardUrl && src.sources.some((x) => x.school === from[i].school && x.boardUrl)) {
+        fail(`${from[i].school} 은 이미 게시판이 있습니다 — 되살리려면 지금 줄을 먼저 보관하세요`);
+      }
       const [row] = from.splice(i, 1);
       row[op === 'park' ? 'parkedAt' : 'unparkedAt'] = `${kstNow()} KST`;
       to.push(row);
@@ -1056,6 +1082,8 @@ switch (action) {
     } else {
       fail(`알 수 없는 출처 작업입니다: ${op}`);
     }
+    const newsNew = newsRules().filter((m) => !newsBefore.has(m));
+    if (newsNew.length) fail(`저장하면 데이터 관문에 걸립니다 — ${newsNew[0]}`);
     writeJson(NEWS_SRC, src);
     touched = true;
     break;

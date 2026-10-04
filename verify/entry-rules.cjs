@@ -23,6 +23,31 @@ const RULES = {
 
 const REQUIRED = ['id', 'name', 'type', 'provider', 'amount', 'summary', 'eligibility', 'documents', 'sourceUrl'];
 
+/* 문구에 적힌 **마지막 날짜** — `신청 2026.7.6(월) ~ 8.31(월) 18:00` 의 끝은 8.31 이다.
+   해가 안 적힌 끝 날짜는 앞의 해(없으면 마감의 해)를 빌린다 — dateFrom 과 같은 뜻.
+   (2026-10-04 · verify/deadline-audit.mjs 에서 옮겼다 — 아래 '화면 문구 ↔ 마감' 규칙이 감사·관리자 저장·자동 등록에서
+    같이 돌게. 마감일 감사 도구는 여기서 불러 쓴다 · 정규식뿐이라 관리자 화면(브라우저 감쌈)에서도 돈다) */
+function lastDateIn(text, year) {
+  /* `모집 ~2026.8.5 · 선발 발표 8.26(수)` — 발표·지급 날짜는 마감이 아니다. 그 말 앞까지만 본다 */
+  const p = String(text || '').split(/발표|지급|공고일|게시/)[0];
+  /* ⚠️ 뒤에 소수점 자리가 더 오면 날짜가 아니다 — `평점 3.5 ~ 4.5` 를 3월 5일로 읽지 않는다 */
+  const re = /(?<!\d)(?:(20\d{2})\s?[-./년]\s?)?(\d{1,2})\s?[-./월]\s?(\d{1,2})(?![\d.]\d)(?!\d)/g;
+  let last = null, y = year, prevMo = 0;
+  for (const m of p.matchAll(re)) {
+    if (m[1]) y = m[1];
+    if (!y) continue;
+    const mo = Number(m[2]), da = Number(m[3]);
+    if (mo < 1 || mo > 12 || da < 1 || da > 31) continue;
+    /* 성적 이야기 속 소수(`평점 3.5 ~ 4.5`)는 날짜가 아니다 — 앞 10자에 성적 낱말이 있거나 뒤에 `점·이상` 이 붙는다 */
+    if (/평점|성적|학점|점수|GPA/i.test(p.slice(Math.max(0, m.index - 10), m.index)) || /^\s*(점|이상|이하|만점)/.test(p.slice(m.index + m[0].length))) continue;
+    /* 해가 안 적힌 채 달이 거꾸로 가면(`12.20 ~ 1.10`) 해가 넘어간 것이다(2026-09-17 코드 리뷰) */
+    if (!m[1] && prevMo && mo < prevMo) y = String(Number(y) + 1);
+    prevMo = mo;
+    last = `${y}-${String(mo).padStart(2, '0')}-${String(da).padStart(2, '0')}`;
+  }
+  return last;
+}
+
 /* 항목 1건 검사 → [{level:'error'|'warn', msg}]
    opts.formIds: data/forms.json에 있는 양식 id 집합 (없으면 formId 존재 검사 생략) */
 function checkEntry(it, opts = {}) {
@@ -40,6 +65,14 @@ function checkEntry(it, opts = {}) {
   for (const f of REQUIRED) if (it[f] == null) err(`필수 필드 누락: ${f}`);
   if (it.deadline != null && !/^\d{4}-\d{2}-\d{2}$/.test(it.deadline)) err(`마감일 형식 오류: ${it.deadline}`);
   if (it.listedAt != null && !/^\d{4}-\d{2}-\d{2}$/.test(it.listedAt)) err(`listedAt 형식 오류: ${it.listedAt}`);
+  /* 🔴 **화면 문구(period)의 끝 날짜와 마감이 같아야 한다** (2026-10-04 · 로봇·도구 점검 — test-collector 의 실데이터 단정에서 옮김).
+     카드는 마감(D-n)과 문구를 나란히 보이므로 둘이 다르면 학생은 어느 날이 끝인지 모른다. 관리자가 마감만 고치고 문구를 두면
+     예전엔 관리자 관문(감사)은 통과하고 **다음 로봇 실행의 데이터 관문이 빨개져** 그 실행 결과가 되돌려졌다 — 이제 한 규칙이 두 길을 같이 막는다.
+     ⚠️ 상시 제도(program)는 뺀다 — 마감이 없는 제도다. 문구에 날짜가 없으면(`접수 기간 원문 확인`) 잴 것이 없다. */
+  if (!it.program && it.deadline && it.period && /^\d{4}-\d{2}-\d{2}$/.test(it.deadline)) {
+    const pe = lastDateIn(it.period, it.deadline.slice(0, 4));
+    if (pe && pe !== it.deadline) err(`화면 문구의 끝 날짜(${pe})와 마감(${it.deadline})이 다릅니다 — 문구(period)도 같이 고치세요: 「${String(it.period).slice(0, 40)}」`);
+  }
 
   // 지어낸 금액 — 금액 문구에 숫자가 없는데 합계에 들어갈 값이 있으면 추론이다 (원칙 8-1)
   if ((it.amountValue || 0) > 0 && !/\d/.test(it.amount || '')) {
@@ -136,6 +169,10 @@ function checkEntry(it, opts = {}) {
         + `— applyPortalSource 에 신청 방법이 적힌 공고 원문 한 줄을 남기세요`);
     }
   }
+  /* 근거 문장은 학생 화면에 그대로 나간다 — HTML 기호(`&rarr;`)가 남으면 글자로 샌다(2026-09-11 사고와 같은 줄 · 발췌기가 풀어 넣는다).
+     (2026-10-04 · test-collector 의 실데이터 단정에서 옮김 — 로봇이 넣는 칸이라 오류) */
+  const entity = `${it.applyPortalSource || ''} ${it.applyEmailSource || ''}`.match(/&[a-zA-Z#0-9]+;/);
+  if (entity) err(`접수 근거 문장에 HTML 기호(${entity[0]})가 남아 있습니다 — 학생 화면에 글자로 보입니다`);
 
   return out;
 }
@@ -222,4 +259,4 @@ const FIX_PLAN = {
   },
 };
 
-module.exports = { checkEntry, isDuplicatePair, programKey, sameProgram, RULES, FIX_PLAN };
+module.exports = { checkEntry, isDuplicatePair, programKey, sameProgram, lastDateIn, RULES, FIX_PLAN };

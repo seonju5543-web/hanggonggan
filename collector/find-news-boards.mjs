@@ -22,6 +22,7 @@ import { isAttachmentEntry } from './attachment-link.mjs';
 import { isNewsRow } from './news-kind.mjs';
 import { fetchBoard, netReason } from './fetch-board.mjs';
 import { makeBudget, withDeadline, TIMED_OUT } from './harvest-budget.mjs';
+import SOURCE_RULES from '../verify/source-rules.cjs';   // 출처 규칙 한 곳 — 감사·관리자 저장이 같은 문턱으로 boardUrl 을 잰다
 
 const HERE = new URL('.', import.meta.url);
 const SRC = new URL('news-sources.json', HERE);
@@ -30,7 +31,7 @@ const MAX = Number(process.env.FIND_NEWS_MAX || 50);
 const BUDGET_MS = Number(process.env.FIND_NEWS_MS || 360000);
 const PER_SCHOOL_MS = Number(process.env.FIND_NEWS_SCHOOL_MS || 75000);
 const RETRY_DAYS = Number(process.env.FIND_NEWS_RETRY_DAYS || 3);   // 후보는 싸고 게시판은 바뀐다 — 사흘마다 다시 본다 (14 → 3 · 2026-10-01)
-export const MIN_ROWS = 5;
+export const MIN_ROWS = SOURCE_RULES.NEWS_MIN_ROWS;
 
 /* 공지 글처럼 보이는 행 — 학교 사이트 안의 링크이고, 수집기와 **같은 눈**(news-kind.mjs isNewsRow · 옆 메뉴·파일·잡음 제외)으로 글이다.
    ⚠️ 장학·활동 낱말은 여기서 빼지 않는다 — '게시판인가'를 재는 자리라 글이면 다 센다(무엇을 실을지는 수집기가 가른다). */

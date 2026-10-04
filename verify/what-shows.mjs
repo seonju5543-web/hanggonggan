@@ -23,7 +23,9 @@ import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
 const ME = require('../match-engine.js');
-const reg = JSON.parse(fs.readFileSync(new URL('../data/registered.json', import.meta.url), 'utf8'));
+/* WHAT_SHOWS_REGISTERED — 관문 표본용(2026-10-04): 실데이터 대신 표본 정식 등록 파일로 돈다(test-collector 가 이 도구를 실제로 돌려 잴 때).
+   평소에는 쓰지 않는다 — 화면 이야기는 진짜 데이터로 한다. */
+const reg = JSON.parse(fs.readFileSync(process.env.WHAT_SHOWS_REGISTERED || new URL('../data/registered.json', import.meta.url), 'utf8'));
 
 const arg = (k, d) => {
   const hit = process.argv.find((a) => a.startsWith(`--${k}=`));
