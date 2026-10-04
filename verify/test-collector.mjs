@@ -1176,7 +1176,7 @@ console.log('\n■ 양식 변환 로봇의 두 스위치 — 유료를 끄려다
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'schem-'));
     fs.mkdirSync(path.join(dir, 'collector/extracted'), { recursive: true });
     fs.mkdirSync(path.join(dir, 'data'), { recursive: true });
-    for (const f of ['schematize-forms.mjs', 'schema-from-text.mjs', 'pdf-text.mjs', 'attachment-text.mjs', 'form-quality.mjs', 'form-coverage.mjs']) {
+    for (const f of ['schematize-forms.mjs', 'schema-from-text.mjs', 'pdf-text.mjs', 'attachment-text.mjs', 'form-quality.mjs', 'form-coverage.mjs', 'pending-queue.mjs']) {
       fs.copyFileSync(fileURLToPath(new URL(`collector/${f}`, root)), path.join(dir, 'collector', f));
     }
     fs.writeFileSync(path.join(dir, 'collector/schematize-config.json'), JSON.stringify(cfg));

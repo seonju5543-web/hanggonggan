@@ -24,6 +24,8 @@ import { schemaFromText } from './schema-from-text.mjs';
    다행히 지금 등록된 양식 48종에는 눈에 띄는 피해가 없었지만(의심 2건, 그마저
    원본의 빈칸 `___년 ___월 졸업`이었다), 앞으로 만들어질 양식은 막아야 한다. */
 import { attachmentText } from './attachment-text.mjs';
+/* 양식 대기열 고아 정리 — 규칙은 pending-queue.mjs 한 곳(데이터 관문 되돌리기 gate-guard 와 같다 · 2026-10-04) */
+import { pruneOrphans } from './pending-queue.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const OUT = new URL('extracted/', HERE);
@@ -284,6 +286,19 @@ const apiOn = cfg.apiEnabled === true;
 
 let queue;
 try { queue = JSON.parse(fs.readFileSync(queuePath, 'utf8')); } catch { log('대기 큐 없음'); process.exit(0); }
+/* 🔴 정식 등록을 대기열과 함께 **먼저** 읽는다 — 아래 '스키마화할 항목 없음' 조기 종료보다 앞에서 고아를 정리해야
+   할 일이 없는 날에도 대기열이 줄어든다 (2026-10-04 · 점검 때 123건 중 71건이 정식 등록에 없는 고아였다 —
+   마감+30일 정리·데이터 관문 되돌림·삭제로 빠진 공고. 다시 받지는 않지만 리포트의 '건너뜀'·'스키마화 대기' 숫자를 부풀렸다).
+   다시 등록되면 자동 등록이 대기열에 다시 넣는다(지워도 잃는 것이 없다). */
+const registered = JSON.parse(fs.readFileSync(registeredPath, 'utf8'));
+{
+  const { kept, dropped } = pruneOrphans(queue, new Set((registered.items || []).map((i) => i.id)));
+  if (dropped.length) {
+    queue.items = kept;
+    fs.writeFileSync(queuePath, JSON.stringify(queue, null, 1) + '\n');
+    report.push('', `🧹 양식 대기열 정리 ${dropped.length}건 — 정식 등록에서 빠진 공고(마감 지남·되돌림·삭제)의 대기 항목을 뺐어요.`);
+  }
+}
 
 /* 원본을 여러 번 시도해도 못 받은 공고를 리포트에 올린다 (2026-08-02 추가).
    여기서 알리지 않으면 감사는 경고만 남기고(실패가 아니라 메일도 안 온다) 그 공고는
@@ -311,7 +326,6 @@ try {
 } catch { log('원본 색인 없음 — 이번 실행에서 받은 첨부가 없습니다.'); finish(); process.exit(0); }
 
 const forms = JSON.parse(fs.readFileSync(formsPath, 'utf8'));
-const registered = JSON.parse(fs.readFileSync(registeredPath, 'utf8'));
 
 let client = null;
 async function getClient() {
