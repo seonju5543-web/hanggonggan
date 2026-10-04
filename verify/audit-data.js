@@ -226,6 +226,14 @@ for (const it of reg.items) {
    "조건을 말하는가"가 아니라 "제목·목록·표처럼 생겼는가". 같은 규칙을 쓰면
    필터의 눈으로 필터를 채점하는 셈이라 **새 유형을 영영 못 본다**(그게 이번 실패의 원인이었다).
    규칙 원본은 verify/eligibility-report.mjs 한 곳뿐이고 여기서는 실행만 한다. */
+/* 제목 꼬리 (2026-10-04) — 저장된 제목을 공용 청소(cleanTitle)에 다시 넣어 바뀌면 경고. 규칙 원본은 collector/clean-title.mjs 한 곳 ·
+   경고다(오류로 두면 낯선 게시판 하나가 로봇 저장 전체를 되돌린다). 같은 꼴이 쌓이면 청소 규칙을 넓힌다. */
+try {
+  const lines = require('child_process').execFileSync(process.execPath, [require('path').join(__dirname, 'title-tails.mjs')], { encoding: 'utf8' })
+    .split('\n').filter((l) => l.startsWith('✕'));
+  if (lines.length) warns.push(`제목 꼬리 ${lines.length}건 — 목록 부스러기(부서·날짜·조회수 등)가 남은 제목 (예: ${lines[0].slice(2, 120)}) · 저장하는 로봇이 cleanTitle 을 건너뛰었는지 보세요`);
+} catch (e) { warns.push(`제목 꼬리 검사를 돌리지 못했습니다: ${e.message.slice(0, 80)}`); }
+
 try {
   const out = require('child_process')
     .execFileSync(process.execPath, [require('path').join(__dirname, 'eligibility-report.mjs'), '--bad'],

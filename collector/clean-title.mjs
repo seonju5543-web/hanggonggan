@@ -55,20 +55,59 @@ export function isMenuEntry(t) {
   return MENU_NOISE.test(t) && !NOTICE_SIGNAL.test(t);   // 말꼬리가 메뉴풍이고 공고 신호도 없으면 메뉴
 }
 
+/* ── 목록 행 꼬리 (2026-10-04 개발자 지적 "세종이도만 봐도 이름·날짜·원인 모를 숫자가 제목에 붙어 있네 · 다 수정하고 재발 방지") ──
+   이름표 없이 줄 끝에 붙는 작성 부서·작성자·게시일·조회수(항공대 `… 선발 안내 학생지원팀 2026-05-11 1,664` · 국민대 `… 공고 2026.09.08 대전청년내일재단 황새롬`).
+   예전엔 확인 로봇의 대조(link-landing stripRowTail)에만 있고 **저장하는 제목에는 없었다** — 그래서 화면에 그대로 떴다. 이제 여기 한 곳이고 stripRowTail 은 이걸 부른다.
+   🔴 날짜 앞뒤의 낱말이 기간·안내 낱말이면 제목의 일부다(「셔틀 운행 2026.10.5 중단」 · board-links cutRowTail 과 같은 지킴 목록). */
+const DATE = '20\\d{2}[-./]\\d{1,2}[-./]\\d{1,2}\\.?';
+const KEEP_WORD = /^(?:까지|부터|마감|이후|이전|예정|안내|휴무|중단|시행|개최|접수|신청|모집|변경|연기|취소|발표|공고|선발|시작|종료|오픈)/;
+const WORD = '[가-힣A-Za-z·]{2,15}';
+const DEPT = /(?:팀|과|처|실|센터|본부|담당|관리자|사무국|지원단)$/;
+const ORG = /(?:재단|장학회|학회|진흥원|공단|협회)$/;
+function cutTail(t) {
+  let m;
+  /* ① 게시일 뒤 작성 부서·작성자 낱말 1~3개 (조회수가 붙어도) */
+  /*    🔴 낱말 중 하나는 부서·기관 꼴이어야 한다 — 「장학증서 수여식 안내 2026.09.10 대강당」 의 대강당은 장소다(제목) */
+  if ((m = t.match(new RegExp(`\\s+${DATE}((?:\\s+${WORD}){1,3})(?:\\s+[\\d,]+)?\\s*$`)))) {
+    const ws = m[1].trim().split(/\s+/);
+    if (!ws.some((w) => KEEP_WORD.test(w)) && ws.some((w) => DEPT.test(w) || ORG.test(w))) return t.slice(0, m.index);
+  }
+  /* ② 작성 부서 낱말 + 게시일 (+ 조회수) — 낱말을 떼는 것은 **조회수가 붙었거나 부서 꼴**일 때만(「문학공모전 2026.08.04」 의 문학공모전은 제목이다) */
+  if ((m = t.match(new RegExp(`\\s+(${WORD})\\s+${DATE}(\\s+[\\d,]+)?\\s*$`))) && !KEEP_WORD.test(m[1]) && (m[2] || DEPT.test(m[1]))) return t.slice(0, m.index);
+  /* ③ 게시일 (+ 조회수) 만 */
+  if ((m = t.match(new RegExp(`\\s+${DATE}(?:\\s+[\\d,]+)?\\s*$`)))) return t.slice(0, m.index);
+  return t;
+}
+
+function cleanOnce(t) {
+  const out = cleanCore(t);   // 문자 기호는 cleanTitle 이 맨 처음 한 번만 푼다(두 번 풀면 &amp;quot; 가 " 가 된다)
+  const cut = cutTail(out).replace(/\s+N\s*$/, '').replace(/[\s·\-–—:,|]+$/, '').trim();
+  return cut.replace(/\s/g, '').length >= 6 ? cut : out;   // 다 깎여 짧아지면 원래대로 — 제목을 잃는 것보다 꼬리가 남는 편이 낫다
+}
+/* 🔴 두 번 돌려도 같아야 한다 — 한 번 떼면 다음 꼬리가 드러난다(「… 장학···」 → 「… 장학」 → 분류 꼬리 「장학」).
+   감사(verify/title-tails.mjs)가 '저장된 제목을 다시 청소하면 바뀌는가'로 재므로, 여기서 멈출 때까지 돌린다. */
 export function cleanTitle(t) {
-  return decodeEntities(t || '')
+  let cur = cleanOnce(decodeEntities(t || ''));
+  for (let i = 0; i < 4; i += 1) { const next = cleanOnce(cur); if (next === cur) break; cur = next; }
+  return cur;
+}
+
+function cleanCore(t) {
+  return String(t || '')
     .replace(/^(공지\s*)+/, '')                        // "공지 공지 " 접두
-    .replace(/^\d{3,5}\s+/, '')                         // 목록 행 번호 "2653 "
+    .replace(/^(?!20[23]\d\s)\d{3,5}\s+/, '')            // 목록 행 번호 "2653 " — 🔴 맨 앞 연도(「2027 해동과학문화재단 …」)는 번호가 아니다 (2026-10-04)
     .replace(/\s*20\d{2}\.\d{1,2}\.\d{1,2}\.?\s*조회\s*\d+\s*$/, '') // 꼬리 "2026.07.08. 조회 136"
+    /* 조회수 앞에 홀로 붙은 분류 꼬리표(연세 「… 안내 새글 장학 조회수2 작성일…」)는 조회수와 함께 뗀다 — 🔴 제목 끝의 「공지」·「장학」을 아무 때나 떼지 않는다
+       (2026-10-04: 따로 떼던 규칙이 되풀이 청소에서 「… 0번째 공지」·「… 최종선발자 공지」 의 진짜 낱말을 먹었다) */
+    .replace(/(?:\s+(?:새글|신규게시글))?(?:\s+(?:장학|학사|일반|공지))?\s*조회수?\s*\d[\s\S]*$/, '')
     .replace(/\s*조회수\s*\d[\s\S]*$/, '')              // "조회수 868 작성일 …" — 뒤는 전부 목록 열
     .replace(/\s*조회\s*\d+[\s\S]*$/, '')
     .replace(/\s*작성일\s*20\d{2}\.[\s\S]*$/, '')
-    .replace(/\s*기간\s*20\d{2}\.[\s\S]*$/, '')
+    .replace(/\s*기간\s*[:：]?\s*20\d{2}[.\-][\s\S]*$/, '')   // `기간 : 2026.10.01 ~ 2026.10.31` (정책브리핑 목록)
     .replace(/신규게시글|Attachment|새글/g, '')
     // 구글 머티리얼 아이콘은 글자(check_circle·open_in_new…)로 그려져 제목에 딸려 온다.
     // 강원대에서 '맞춤장학 조회 check_circle'처럼 들어와 메뉴가 공고로 새던 것을 막는다 (2026-08-02).
     // 한글 공고 제목에 snake_case 영문이 들어갈 일은 없으므로 통째로 뗀다.
     .replace(/\b[a-z]{2,}(?:_[a-z]{2,})+\b/g, '')
-    .replace(/\s+(장학|학사|일반|공지)\s*$/, '')         // 잘라낸 뒤 홀로 남는 분류 꼬리표
     .replace(/\s+/g, ' ').trim();
 }
