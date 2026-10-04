@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-04",
+ "updatedAt": "2026-10-05",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -4873,9 +4873,9 @@
    "provider": "주관 기관 원문 확인",
    "amount": "850만원",
    "amountValue": 8500000,
-   "deadline": null,
+   "deadline": "2026-10-06",
    "listedAt": "2026-09-30",
-   "period": "접수 기간 원문 확인",
+   "period": "접수 기간 ~2026-10-06",
    "summary": "연세대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true
@@ -4938,7 +4938,8 @@
      "id": "notice:https://www.kookmin.ac.kr/user/kmuNews/notice/7/12327/view.do?currentpageno=1"
     }
    ],
-   "scopeFrom": "같은 사업이 경희대학교 게시판에도 올라옴(자동) — 경희대학교 게시판 https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322953"
+   "scopeFrom": "같은 사업이 경희대학교 게시판에도 올라옴(자동) — 경희대학교 게시판 https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322953",
+   "deadlineFrom": "관리자 2026-10-05"
   },
   {
    "id": "auto-bbssc58944063artclviewdo",
