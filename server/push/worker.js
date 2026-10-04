@@ -179,8 +179,9 @@ function summarize(reg, notices) {
       - 빌드 감시 경로가 `server/push/*` 라, 바깥 파일을 불러 쓰면 그 파일이 바뀌어도 워커가 다시 올라가지 않는다
         (화면은 새 규칙, 서버는 옛 규칙인 채로 조용히 갈라진다).
       - match-engine.js(약 126KB)를 싣는 값까지 무료 등급의 계산 시간(한 번에 10ms) 안에 들여야 한다 — 필요한 것은 몇 줄뿐이다.
-      그래서 **사본 + 관문 대조**로 지킨다: verify/health-gates/servers.mjs ⑥(titleSeenKey ↔ notify-rules 장부)·
-      ⑧(SHARED_BOARD_BRANCH·taggedSchool ↔ match-engine). 원본을 바꾸면 그 관문이 빨개져 여기도 같이 고치게 된다.
+      그래서 **사본 + 관문 대조**로 지킨다: verify/health-gates/servers.mjs ⑥(titleSeenKey ↔ notify-rules 장부 — 표본 제목으로 동작 대조)·
+      ⑧(SHARED_BOARD_BRANCH 는 값 · TITLE_CAMPUS 표와 taggedSchool 함수는 소스 글자 ↔ match-engine). 표·함수를 바꾸면 ⑧ 이,
+      titleSeenKey 의 빈칸 다듬기를 바꾸면 ⑥ 의 표본이 빨개져 여기도 같이 고치게 된다.
       ⚠️ SERVED_SCHOOLS 는 들이지 않는다(세 번째 사본이 된다) — 서비스 밖 학교 글은 수집 단계에서 이미 빠진다. */
 
 /* 공고 하나를 '본 것'으로 알아보는 두 번째 열쇠 — notify-rules.js 의 titleSeenKey 사본.

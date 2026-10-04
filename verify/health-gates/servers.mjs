@@ -107,6 +107,10 @@ export default async function gate(eq, ctx) {
     eq('② server/README.md 에 워커 폴더 넷이 모두 나오고 · 폐기된 HANDAEJANG_CONFIG 안내가 없다 · mail-worker 는 쓰지 않음으로',
       [workers.filter((d) => !sreadme.includes(`\`${d}/\``)), /HANDAEJANG_CONFIG/.test(sreadme), /mail-worker\.js[^\n]*쓰지 않음/.test(sreadme)],
       [[], false, true]);
+    const cfgNamed = [...sreadme.matchAll(/`([a-z]+-config\.js)`/g)].map((m) => m[1]);
+    eq('  안내가 적은 앱 쪽 설정 파일이 실제로 있다(apply 처럼 없는 스위치를 있다고 적지 않는다) · 사본 대조 관문을 실제로 대조하는 번호로만(옛 「⑥⑦⑧」 없음 · ⑧ 에 TITLE_CAMPUS)',
+      [cfgNamed.length >= 3, cfgNamed.filter((f) => !fs.existsSync(path.join(rootDir, f))), /⑥⑦⑧/.test(sreadme), /⑧[^\n]*TITLE_CAMPUS/.test(sreadme)],
+      [true, [], false, true]);
     eq('  server/apply/wrangler.toml — 발송 증빙이 Supabase apply_sends 에 남는다고 적는다(\'KV 를 붙인다\' 옛 안내 없음)',
       [/apply_sends/.test(readOpt('server/apply/wrangler.toml')), /KV 를 붙인다/.test(readOpt('server/apply/wrangler.toml'))], [true, false]);
 
@@ -269,12 +273,26 @@ export default async function gate(eq, ctx) {
     {
       const ME = require('../../match-engine.js');
       eq('⑧ 분교 표(SHARED_BOARD_BRANCH)가 match-engine 과 같다(사본 대조 — 원본을 바꾸면 여기가 빨개진다)', W.SHARED_BOARD_BRANCH || null, ME.SHARED_BOARD_BRANCH);
-      const tagTitles = ['[ERICA] 장학', '(에리카) 장학', ' [ erica ] 장학', '[서울] 장학', '( 서울 ) 장학', '[서울캠퍼스] 장학', '장학 [ERICA]', 'ERICA 장학'];
-      const tagDiff = ['한양대학교', '건국대학교'].flatMap((school) => tagTitles.map((title) => {
+      /* 제목 캠퍼스 표(TITLE_CAMPUS)는 내보내지 않는 이름이라 **소스 글자로** 대조한다 (2026-10-04 리뷰 —
+         한양·건국 제목 표본만 재던 때는 match-engine 에 홍익 [세종] 표식을 더해도 초록이었다 → 서버는 홍익 본교까지 깨운다) */
+      const block = (src, name) => {
+        const m = new RegExp(`\\bconst ${name} = \\{[\\s\\S]*?\\n\\};`).exec(stripComments(src));
+        return m ? m[0].replace(/\s+/g, ' ') : null;
+      };
+      const meSrc = read('match-engine.js');
+      const wSrc = read('server/push/worker.js');
+      const fnText = (f) => (typeof f === 'function' ? stripComments(f.toString()).replace(/\s+/g, ' ') : null);
+      eq('  제목 캠퍼스 표(TITLE_CAMPUS)와 taggedSchool 함수가 match-engine 과 글자까지 같다(소스 대조 — 표식 하나를 더해도 빨개진다)',
+        [!!block(meSrc, 'TITLE_CAMPUS'), block(wSrc, 'TITLE_CAMPUS') === block(meSrc, 'TITLE_CAMPUS'), !!fnText(ME.taggedSchool), fnText(W.taggedSchool) === fnText(ME.taggedSchool)],
+        [true, true, true, true]);
+      const mains = [...new Set(Object.values(ME.SHARED_BOARD_BRANCH))];
+      const tagTitles = ['[ERICA] 장학', '(에리카) 장학', ' [ erica ] 장학', '[서울] 장학', '( 서울 ) 장학', '[서울캠퍼스] 장학', '장학 [ERICA]', 'ERICA 장학',
+        '[세종] 장학', '(세종) 장학', '[글로컬] 장학', '[교외] 장학'];
+      const tagDiff = mains.flatMap((school) => tagTitles.map((title) => {
         const n = { school, title };
         return [school, title, typeof W.taggedSchool === 'function' ? W.taggedSchool(n) : '(없음)', ME.taggedSchool(n)];
       })).filter((r) => r[2] !== r[3]);
-      eq('  제목 캠퍼스 표식(taggedSchool)이 match-engine 과 같은 답을 낸다(표본 16개)', tagDiff, []);
+      eq(`  제목 캠퍼스 표식(taggedSchool)이 match-engine 과 같은 답을 낸다(본교 ${mains.length}곳 × 제목 ${tagTitles.length}개)`, tagDiff, []);
       const notices = [
         { url: 'u1', school: '한양대학교', title: '[ERICA] 장학 안내' },
         { url: 'u2', school: '한양대학교', title: '[서울] 장학 안내' },

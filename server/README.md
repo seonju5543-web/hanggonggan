@@ -2,7 +2,8 @@
 
 > 한대장 앱은 파일만 올려 두는 방식(GitHub Pages)이라 서버 없이도 돌아간다.
 > 이 폴더의 서버(Cloudflare Workers)는 **앱이 혼자 못 하는 일 하나씩**만 맡는다.
-> 켜고 끄는 스위치는 앱 쪽 설정 파일의 `endpoint` 한 칸이다 — 비어 있으면 앱은 그 서버로 요청을 한 건도 보내지 않는다.
+> 켜고 끄는 스위치는 push·chat·essay 는 앱 쪽 설정 파일(`push-config.js`·`chat-config.js`·`essay-config.js`)의 `endpoint` 한 칸이다 —
+> 비어 있으면 앱은 그 서버로 요청을 한 건도 보내지 않는다. apply 는 앱 쪽 설정 파일이 아직 없다 — 우리 도메인이 생긴 뒤 연결한다(`server/apply/README.md` ⓪).
 >
 > 🔴 여기에는 **지금 켜져 있는가**만 적는다. 등록된 폰 수 같은 숫자는 적지 않는다(적으면 반드시 낡는다) —
 >    푸시 서버의 숫자는 `/health` 에서, 매일 확인은 `.github/workflows/push-health.yml` 로그에서 본다.
@@ -22,5 +23,6 @@
   불러 쓸 때는 기본 가져오기(`import X from '../../파일.js'`)로 — Workers 에는 `node:module` 이 없어
   `createRequire` 꼴은 올리는 순간 넘어진다(관문 `verify/health-gates/servers.mjs` ①).
 - ⚠️ 푸시 서버는 예외로 공용 파일을 싣지 않고 필요한 규칙의 **사본**을 둔다 — 빌드 감시 경로가 `server/push/*` 라
-  바깥 파일이 바뀌어도 다시 올라가지 않기 때문이다. 사본은 관문(같은 파일 ⑥⑦⑧)이 원본과 대조한다.
+  바깥 파일이 바뀌어도 다시 올라가지 않기 때문이다. 사본은 관문(같은 파일)이 원본과 대조한다 —
+  ⑥ `titleSeenKey`(폰 장부와 표본 제목으로) · ⑧ 분교 표(`SHARED_BOARD_BRANCH`)·캠퍼스 표식(`TITLE_CAMPUS`·`taggedSchool` — 소스 글자로).
 - 서버마다 무료 등급의 한도(요청 한 번에 계산 10밀리초 · 바깥 요청 50건)를 넘지 않게 짰다 — 푸시 서버 머리말 참조.
