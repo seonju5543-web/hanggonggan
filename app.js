@@ -2960,6 +2960,8 @@ let activitiesField = 'all';
    수집기 관문(verify/test-collector 「못 가르면 null — 억지로 기타라고 적지 않는다」)이 그걸 지킨다.
    즉 학생에게 "분야를 아직 못 읽은 글"을 부르는 이름이 기타이고, 데이터가 기타라고 말하는 게 아니다. */
 const ACT_FIELD_ETC = '기타';
+const ACT_FIELD_FOLD = 6;          // 접었을 때 보이는 분야 수(분야 전체 · +n 제외) — 375px 에서 「+n」 까지 두 줄 · ponytail: 글자 폭을 안 재는 어림이라 분야 이름이 길어지면 셋째 줄로 샐 수 있다
+let activitiesFieldOpen = false;   // 「+n」 으로 펼쳤는가 — 종류 칩과 같이 저장하지 않는다
 let activitiesQuery = '';
 /* 정렬 둘 — 최근 수집순(기본) · 마감 임박순(마감을 읽은 글이 앞, 못 읽은 글은 뒤에 최근순) (2026-09-29 · 4차 리서치: 경쟁 앱의 기본 축) */
 let activitiesSort = 'recent';
@@ -3008,7 +3010,15 @@ function renderActivityFieldChips(list) {
   /* 🔴 첫 칩을 그냥 '전체'라 하지 않는다 — 윗줄(종류) 첫 칩도 '전체'라 두 개가 위아래로 겹쳐
      어느 쪽을 끄는 단추인지 안 읽힌다(화면으로 확인). */
   row.hidden = !fields.length;
-  row.innerHTML = ['all', ...fields].map((f) => `<button class="filter-chip${f === activitiesField ? ' active' : ''}" data-filter="${esc(f)}">${esc(f === 'all' ? '분야 전체' : f)}</button>`).join('');
+  /* 🔴 옆으로 밀지 않는다 (2026-10-04 개발자 지시 "분야가 너무 길어서 옆으로 넘겨야 해 불편") —
+     줄바꿈하고, 많은 순 ACT_FIELD_FOLD 개만 보인 뒤 「+n」 칩으로 펼친다(두 줄 안팎).
+     고른 칩은 접어도 늘 보인다 — 숨으면 무엇으로 걸렀는지 안 보인다. */
+  let shown = activitiesFieldOpen ? fields : fields.slice(0, ACT_FIELD_FOLD);
+  if (activitiesField !== 'all' && !shown.includes(activitiesField)) shown = [...shown, activitiesField];
+  const rest = fields.length - shown.length;
+  row.innerHTML = ['all', ...shown].map((f) => `<button class="filter-chip${f === activitiesField ? ' active' : ''}" data-filter="${esc(f)}">${esc(f === 'all' ? '분야 전체' : f)}</button>`).join('')
+    + (rest > 0 ? `<button class="filter-chip field-more" data-more="open" aria-label="분야 ${rest}개 더 보기">+${rest}</button>`
+      : activitiesFieldOpen && fields.length > ACT_FIELD_FOLD ? '<button class="filter-chip field-more" data-more="close">접기</button>' : '');
 }
 
 function renderActivities() {
@@ -6595,7 +6605,8 @@ function bindEvents() {
   $('#activities-field-filters').addEventListener('click', (e) => {
     const chip = e.target.closest('.filter-chip');
     if (!chip) return;
-    activitiesField = chip.dataset.filter;
+    if (chip.dataset.more) activitiesFieldOpen = chip.dataset.more === 'open';
+    else activitiesField = chip.dataset.filter;
     renderActivities();
   });
   /* 정렬 버튼은 탐색 화면과 한 벌로 묶었다 — 아래 '정렬 버튼' 블록(SORT_MENUS) 이 둘 다 배선한다 */
