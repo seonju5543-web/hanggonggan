@@ -506,7 +506,7 @@ function refreshProgressViews(id) {
   const wasOpen = !$('#detail-sheet').hidden;
   /* 🔴 **화면을 '바꾸지' 않고 '다시 그리기만' 한다** (2026-09-10 코드 리뷰에서 잡았다).
      예전에는 지금 화면을 `showScreen()` 으로 다시 열었는데, 그 함수는 마지막에 조건 없이
-     `window.scrollTo(0, o.scroll || 0)` 로 스크롤을 되돌린다. 그래서 신청 내역을 한참
+     `appScrollTo(o.scroll || 0)` 로 스크롤을 되돌린다. 그래서 신청 내역을 한참
      내려가 '선정'·'제출했다고 기록'을 누르면 **목록 맨 위로 튀었다**(실측 2527 → 0).
      학생은 방금 기록한 공고를 찾아 다시 끝까지 내려가야 하고, 여러 건을 이어서 기록할
      때마다 되풀이된다. 옆의 `deleteApps` 는 처음부터 렌더 함수만 부르고 있었다. */
@@ -1029,7 +1029,7 @@ function showScreen(name, opts) {
   const o = opts || {};
   /* 떠나기 전 화면의 스크롤을 먼저 갈무리한다 — 다음에 그 탭으로 돌아오면 여기서 이어진다 */
   if (typeof resumeSaveScroll === 'function' && currentScreen && currentScreen !== name) {
-    resumeSaveScroll(currentScreen, window.scrollY);
+    resumeSaveScroll(currentScreen, appScroller().scrollTop);
   }
   ['onboarding', 'home', 'explore', 'activities', 'applications', 'my', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'].forEach((n) => {
     $(`#screen-${n}`).hidden = n !== name;
@@ -1076,7 +1076,7 @@ function showScreen(name, opts) {
 
   /* 🔴 스크롤은 **그린 뒤에** 옮긴다 — 먼저 옮기면 아직 짧은 화면이라 그 자리가 없다.
      `opts.scroll` 은 이어보기가 되살릴 때만 온다(보통은 늘 맨 위로). */
-  window.scrollTo(0, o.scroll || 0);
+  appScrollTo(o.scroll || 0);   // 문서가 아니라 #app 이 굴러간다(interactions.js ⓪)
 
   if (typeof resumeSave === 'function' && name !== 'onboarding') resumeSave({ screen: name });
 }
@@ -1087,7 +1087,7 @@ function showScreen(name, opts) {
 function resumeMark() {
   if (typeof resumeSave !== 'function') return;
   if (!currentScreen || currentScreen === 'onboarding') { resumeSave({}); return; }
-  resumeSaveScroll(currentScreen, window.scrollY);
+  resumeSaveScroll(currentScreen, appScroller().scrollTop);
   /* 🔴 화면 이름도 **여기서 다시** 적는다 (2026-09-09 · 검사를 강화하다 드러났다).
      예전에는 시각과 스크롤만 찍었는데, 그러면 숨는 순간의 기록이 `showScreen` 이 앞서
      적어 둔 것에 얹혀야만 온전해진다 — 장부가 그 사이에 비었으면(초기화·저장 공간 정리)
@@ -1117,7 +1117,7 @@ function renderOnboardStep() {
   const back = $('#btn-onboard-back');
   if (back) back.hidden = onboardStep <= (onboardEditing ? 1 : 0);
   $('#onboard-bar').style.width = `${((onboardStep + 1) / ONBOARD_STEPS) * 100}%`;
-  window.scrollTo(0, 0);
+  appScrollTo(0);
   /* 시작 화면(0단계)이 보이면 정문 투어링을 준비한다 — 한 번만 돈다(startMontage 안의 표식) */
   if (onboardStep === 0 && !onboardEditing) startMontage();
 }
@@ -7052,6 +7052,22 @@ document.addEventListener('visibilitychange', () => {
   lastFgRefresh = Date.now();
   refreshAllData();
 });
+
+/* 🔴 문서가 밀려 있으면 제자리로 (2026-10-04 · 짝은 style.css `.app` 머리말 · interactions.js ⓪).
+   문서는 굴러가지 않게 막았지만, 아이폰은 입력 칸을 키보드 위로 보이려고 문서 자체를 밀어 올릴
+   수 있다 — 그 채로 키보드가 닫히면 하단 탭이 또 중간에 남는다(iOS 26 의 그 버그).
+   키보드가 닫히는 순간(화면 높이가 돌아올 때)과 입력 칸에서 손을 뗄 때 문서를 0 으로 되돌린다.
+   ⚠️ 입력 중에는 건드리지 않는다 — 그때 되돌리면 입력 칸이 키보드 밑으로 숨는다. */
+(function keepDocumentStill() {
+  const reset = () => {
+    const a = document.activeElement;
+    if (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) return;
+    const se = document.scrollingElement || document.documentElement;
+    if (se.scrollTop || se.scrollLeft) window.scrollTo(0, 0);
+  };
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', reset);
+  document.addEventListener('focusout', () => setTimeout(reset, 120));
+})();
 
 /* 당겨서 새로고침 (2026-09-09) — 짝은 interactions.js.
    🔴 **시트가 떠 있으면 시작하지 않는다.** 알림 동의 시트는 온보딩 2.9초 뒤에 떠서 화면을

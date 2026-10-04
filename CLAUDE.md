@@ -300,6 +300,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - **그려 놓고 센다** — 카드는 함수가 여럿이다(`schCard`·`liveNoticesHtml`). 값이 같아도 모양이 다를 수 있다(관리자 화면 · `verify-admin-shape.js`).
 - **서체 Pretendard 한 벌 · 작은 척도**(09-11 되돌림). 다시 바꾸자는 제안은 화면을 보여 주고 정한다. 파일 끝 카드 블록이 앞 규칙을 덮는다.
 - **디자인 토큰**: 원본 `style.css`, 관문 `ui-tone.mjs`(토큰 이탈 톱니 · 괄호 짝 · 병합 충돌 표식). 🔴 CSS 에 남은 충돌 표식·짝 없는 `}` 는 조용히 규칙을 삼킨다.
+- 🔴 **문서는 굴러가지 않는다 — `#app` 안쪽만 굴러간다**(2026-10-04 · iOS 26 이 문서 스크롤 중 하단 탭을 화면 중간에 그린다). 스크롤은 `appScroller`·`appScrollTo` 로(`window.scrollY` 는 늘 0) · 드라이버도 같다. 관문 `verify-interactions.js` UI-7 절.
 - **시트는 전부 아래로 쓸어 닫는다** — `enableSheetSwipe` 한 곳 · 판정은 `scrollableAtTop` · 회귀는 TouchEvent 로.
 - **설정 화면**: `#my-account`·`#my-notify` id 는 자리만 옮겼다(이름 바꾸지 말 것) · 약관은 앱 안 화면(`renderTerms` 가 `terms.html` 을 읽는다) · 휴지통 30일.
 - **첫 화면**: 감추지 않은 화면이 하나면 그게 첫 화면이 된다 · CSP 가 인라인·`onclick=` 을 막는다 · 저장은 `visibilitychange` 로(`beforeunload` 금지) ·

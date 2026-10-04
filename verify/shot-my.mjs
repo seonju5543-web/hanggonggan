@@ -67,7 +67,7 @@ const boxes = await page.evaluate(() => {
 console.log(JSON.stringify(boxes, null, 1));
 
 const card = await page.$('#screen-my');
-await page.evaluate(() => window.scrollTo(0, 0));
+await page.evaluate(() => appScrollTo(0));
 await page.screenshot({ path: `${import.meta.dirname}/shot-my.png`, clip: { x: 0, y: 0, width: 390, height: 560 } });
 
 /* MY 아래쪽 — 보관함과 '데이터 초기화' 사이 */

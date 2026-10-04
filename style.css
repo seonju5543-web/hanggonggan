@@ -159,6 +159,23 @@ body {
         아무것도 안 만진 학생이 매번 가려진 화면을 본다. */
   padding-bottom: 148px;   /* 내비 88 + 마스코트 56 + 숨 4 — 한 값으로 적는다(톱니가 px 개수를 센다) */
 }
+/* 🔴 **문서는 굴리지 않고 `#app` 안쪽만 굴린다** (2026-10-04 · 개발자 제보 스크린샷:
+   "위로 스크롤하니까 밑에 탭들이 위로 올라간다" — 하단 탭이 화면 한가운데에 떠 있었다).
+   iOS 26 사파리는 **문서가 굴러갈 때** 화면 바닥에 붙인(fixed) 요소를 엉뚱한 높이에 그린다
+   (애플 개발자 포럼 thread 800125·800798 — 키보드를 닫은 뒤 visualViewport.offsetTop 이
+   0 으로 안 돌아오는 경우 등). 브라우저 버그라 우리 코드로 고칠 수 없어 **문서가 아예 안
+   움직이게** 해서 비켜 간다 — 굴러가는 것은 `#app` 상자뿐이고, 하단 탭·시트·마스코트(전부
+   fixed)는 움직이지 않는 문서에 붙어 있으니 끌려가지 않는다.
+   ⚠️ 이제 `window.scrollY` 는 늘 0 이다 — 스크롤은 `appScroller()`(interactions.js)로 읽고 옮긴다.
+   ⚠️ `#app` 에 transform 을 걸지 말 것은 그대로다(interactions.js ① 머리말). */
+html, body { height: 100%; overflow: hidden; }
+.app {
+  height: 100vh;            /* dvh 를 모르는 옛 브라우저 */
+  height: 100dvh;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;   /* 끝에서 튕겨도 문서까지 번지지 않게 */
+  -webkit-overflow-scrolling: touch;
+}
 
 button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
 input, select {

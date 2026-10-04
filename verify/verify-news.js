@@ -129,7 +129,7 @@ const settle = async (page) => {
     eq('⑥ 바깥 주소로 그림을 부르지 않았다', await page.evaluate(() => performance.getEntriesByType('resource').some((r) => /evil\.example/.test(r.name))), false);
     eq('⑥ 홈에 사진 출처 줄이 없다 (설명 글 빼기 · 10-04)', await page.evaluate(() => [!!document.querySelector('#screen-home .news-photo-credit'), /위키미디어/.test(document.querySelector('#screen-home').textContent)]), [false, false]);
     eq('④ 페이지는 옆으로 밀리지 않는다 (띠만 넘어간다)', await page.evaluate(() => document.scrollingElement.scrollWidth <= window.innerWidth), true);
-    if (process.env.SHOT) { await page.$eval('#home-news .news-strip', (e) => { e.scrollLeft = 0; }); await page.evaluate(() => window.scrollTo(0, 0)); await page.waitForTimeout(300); await page.screenshot({ path: process.env.SHOT }); }
+    if (process.env.SHOT) { await page.$eval('#home-news .news-strip', (e) => { e.scrollLeft = 0; }); await page.evaluate(() => appScrollTo(0)); await page.waitForTimeout(300); await page.screenshot({ path: process.env.SHOT }); }
     /* ⑦ 전체 보기 — 시트 */
     await page.click('#home-news [data-news-all]'); await page.waitForTimeout(500);
     const sheet = await page.$eval('#detail-sheet', (e) => ({
