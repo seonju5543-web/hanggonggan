@@ -4924,6 +4924,13 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
   padding-bottom: var(--space-8);
   margin-bottom: var(--space-8);
 }
+/* 🔴 분야 줄은 **옆으로 밀지 않고 접는다** (2026-10-04 개발자 지시 "분야가 너무 길어 옆으로
+   넘겨야 해서 불편"). 분야가 열여섯까지 늘어 한 줄 스크롤로는 대부분이 화면 밖이었다.
+   줄바꿈 + app.js 가 많은 순 일곱만 보이고 「+n」 칩으로 펼친다(renderActivityFieldChips).
+   ⚠️ 윗줄 종류 칩(.filter-row 원본)의 '한 줄' 지시는 그대로다 — 이 줄에서만 바꾼다.
+   줄바꿈하면 가로 스크롤 상자가 아니므로 위 세로 넘침 문제도 생기지 않는다(overflow 를 되돌린다). */
+#activities-field-filters { flex-wrap: wrap; row-gap: var(--space-8); overflow: visible; }
+#activities-field-filters .field-more { color: var(--accent); border-style: dashed; }
 #activities-filters:has(+ #activities-field-filters:not([hidden])) { margin-bottom: 0; }
 #activities-field-filters .filter-chip { position: relative; }
 #activities-field-filters .filter-chip::after {

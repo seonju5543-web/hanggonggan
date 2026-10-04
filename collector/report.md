@@ -1,14 +1,14 @@
 ## 🤖 장학공고 수집 리포트 (2026-10-04)
 
-새로 발견한 공고: **9건** — 앱의 '실시간 공고'에는 즉시 표시되며(링크 연결만), 맞춤 매칭·양식 작성 지원 등록은 아래에서 컨펌해 주세요.
+새로 발견한 공고: **0건** — 앱의 '실시간 공고'에는 즉시 표시되며(링크 연결만), 맞춤 매칭·양식 작성 지원 등록은 아래에서 컨펌해 주세요.
 
 > 등록하는 곳 — 관리자 화면 → 컨펌 작업대: https://hanggonggan-admin.pages.dev/#review
 > 「수집됐지만 아직 등록 안 한 공고」에서 원문 ↗ 으로 확인한 뒤 **등록하기**를 누르면 그 자리에서 등록됩니다(제목·구분·마감일·금액·주관·요약). 대출·대학원 전용처럼 규칙에 걸리는 것은 눌러도 막히니 안심하고 눌러도 됩니다.
 > 다만 **첨부된 신청서 양식**과 **자격 요건 줄들**은 원문과 같은 구조로 옮겨야 해서 화면에서 못 합니다 — 그것까지 필요하면 채팅에 "이슈 #N 의 ○○ 양식·자격까지 등록해줘"라고 말씀해 주세요.
 
-⏱ 게시판 87곳을 5분 43초에 다 돌았습니다(예산 8분).
+⏱ 게시판 87곳을 3분 29초에 다 돌았습니다(예산 8분).
 
-⚠️ 정식 등록을 **학교별 파일로 나눌 때입니다.** 지금 한 학생이 남의 학교 공고로만 152KB 를 받습니다(학교 35곳 · 전국분 128KB 은 모두가 받아야 합니다). 실시간 공고·학과 목록과 같은 방식입니다 — 전국분 파일 하나 + 학교별 파일. 이름 규칙은 match-engine.js 에, 발행은 collector/publish-notices.mjs 를 본뜨면 됩니다 (왜 2026-09-26에는 미뤘는지: SESSIONS.md 「첫 화면에서 받는 양 절반으로」)
+⚠️ 정식 등록을 **학교별 파일로 나눌 때입니다.** 지금 한 학생이 남의 학교 공고로만 158KB 를 받습니다(학교 35곳 · 전국분 134KB 은 모두가 받아야 합니다). 실시간 공고·학과 목록과 같은 방식입니다 — 전국분 파일 하나 + 학교별 파일. 이름 규칙은 match-engine.js 에, 발행은 collector/publish-notices.mjs 를 본뜨면 됩니다 (왜 2026-09-26에는 미뤘는지: SESSIONS.md 「첫 화면에서 받는 양 절반으로」)
 
 ### 경희대학교
 상태: 🖥 브라우저 담당 게시판 — 일반 로봇은 건너뜀
@@ -18,30 +18,6 @@
 
 ### 서울대학교
 상태: ✅ 정상 (실공고 11건 감지)
-- [2026년 하반기 일운과학기술재단 장학생 선발 안내](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=392)
-- [(재)춘천인재육성장학재단 2026년 하반기 봄내장학생 선발 안내](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=391)
-  - ⏰ 신청기간: 2026. 9. 28.(월) ~ 10. 7.(수) [10일간] ❍ 접수처: 구분 접수처 애향장학금 주소지 읍면‧동 행정복지센터 온라인
-  - 📎 [2026년-하반기-봄내장학생-선발-공고게시용-QR.hwp](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=391&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file1)
-  - 📎 [자주-묻는-질문26년-하반기_봄내장학금.hwp](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=391&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file2)
-- [2026년 하반기 문주장학재단 주관 AI·ICT 분야 인재 장학생 선발 안내](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=390)
-  - 📎 [공고문2026년-하반기-문주장학재단-주관-AI-ICT-장학생-선발-공고문.pdf](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=390&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file1)
-  - 📎 [신청서식2026년-하반기-문주장학재단-주관-장학생-지원서식.hwp](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=390&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file2)
-- [2026년 고속도로장학재단 장학생 선발 안내](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=389)
-  - 📎 [2026년-고속도로-장학생-선발-안내문.hwp](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=389&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file1)
-- [2027학년도 제36기 미래에셋 해외교환 장학생 선발 안내](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=365)
-  - ⏰ 접수기간: 2026. 9. 30.(수) 10:00 ~ 10. 6.(화) 15:00 - 세부 선발일정 및 절차: 첨부된 선발요강 참고 ※ 변동 사
-  - 📎 [가.-공고-제36기-미래에셋-해외교환-장학생-선발-요강.pdf](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=365&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file1)
-  - 📎 [가.-별첨-부모-명의-개인정보-제공-및-활용-동의서-1.pdf](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=365&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file2)
-- [2026년 제29기 두을장학재단 장학생 선발 안내](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=364)
-  - 📎 [1.-제29기-두을장학생-선발요강.pdf](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=364&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file1)
-- [대전청년내일재단 2026년 하반기 인재육성(성취) 장학생 선발 안내](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=363)
-  - 📎 [2026년-성취대-장학생-선발계획-공고.hwp](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=363&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file1)
-- [2026년도 인천인재평생교육진흥원 하반기 장학생 선발 안내](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=362)
-- [2026년도 국가유산진흥원 전통 기·예능 분야 및 매장유산 관련 분야 우수 장학생 선발 안내](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=361)
-  - 📎 [1.2026년-국가유산진흥원-전통-기ㆍ예능분야-및-매장유산-분야-우수-장학생-선발-공고.hwp](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=361&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file1)
-  - 📎 [2.별첨1장학생-지원신청서-및-자기소개서양식.hwp](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=361&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file2)
-  - 📎 [3.별첨2장학생-후보자-추천서양식.hwp](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=361&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file3)
-  - 📎 [4.별첨3-개인정보-수집-이용-동의서.hwp](https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=361&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file4)
 
 ### 연세대학교
 상태: ✅ 정상 (실공고 26건 감지)
@@ -176,7 +152,7 @@
 - **정부24 공모전 대외활동·공모전** — ⛔ robots.txt 가 막아 둔 주소 — 읽지 않았습니다 (출처를 바꾸거나 보관하세요)
 - **온통청년 청년참여 프로그램 대외활동·공모전** — 🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요
 - **서울시 청년몽땅정보통 대외활동·공모전** — 🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요
-- **창업진흥원 K-Startup 대외활동·공모전** — ✅ 정상 (활동·공모전 3건 감지)
+- **창업진흥원 K-Startup 대외활동·공모전** — ✅ 정상 (활동·공모전 2건 감지)
 - **대한민국 정책브리핑 이벤트·공모 대외활동·공모전** — ✅ 정상 (활동·공모전 23건 감지)
 - **경기청년포털 대외활동·공모전** — ✅ 정상 (활동·공모전 3건 감지)
 - **KOICA 봉사단 대외활동·공모전** — 🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요
@@ -338,9 +314,9 @@
 - [학생지원팀] 2026년도 산학협동재단 국내 외국인 근로자 자녀 장학생 선발 신청 안내 ( — registered.json에 항목 없음
 
 
-### 🌐 범위 승격 (학교 한정 → 전국) — 1건
+### 🌐 범위 승격 (학교 한정 → 전국) — 0건
 원문(접수 이메일 도메인·"재단에 직접 제출"·다른 학교의 같은 사업)이 전국 사업이라고 말하는 것만 풀었어요. 학교 창구(장학팀·포털)로 내는 것은 그 학교 한정이 맞아 그대로 둡니다.
-- 🌐 `auto-202026091720eca1b0ed9a8c` 2026년 2학기 파안장학 선발 안내 — 본문 「우편접수」 (게시 동국대학교)
+- 이번 실행에서 원문 증거로 풀 수 있는 학교 한정 공고가 없었어요.
 ### 🏫 교내·교외 원문 판정 — 바뀐 것 0건 · 후보 2건 · 학교 제도 새로 배움 0건
 판정 근거는 항목의 kindEvidence(원문 글자)에 남아요. 후보는 관리자 화면에서 구분을 바꿔 주세요 — 되돌리면 그 이름은 다시 배우지 않아요.
 - 뒤집힌 판정 없음

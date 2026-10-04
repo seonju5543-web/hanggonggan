@@ -97,5 +97,57 @@
  "https://www.rda.go.kr/board/board.do?mode=view&prgId=nei_ancmttEntry&dataNo=100000812622": {
   "at": "2026-10-04",
   "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3520568": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3517342": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3523464": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://www.welchon.com/web/lay1/program/S1T31C447/eventNewView.do?menuIdx=&cIdx=evpr&bbsIdx=2214028": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://www.xn--ob0bv3xdjilia71ica881v.com/": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://www.dema.mil.kr/web/dema/info/notice/4/1012194/view.do": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://answer.moaform.com/answers/M1GLjZ": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://www.schoolkeepa.or.kr/cop/bbs/selectArticleDetail.do?nttId=1711&bbsId=BBSMSTR_000000000001": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://www.mois.go.kr/frt/bbs/type010/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000008&nttId=129837": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://www.instagram.com/p/DcxwHT5AYap/?hl=en&img_index=1": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://www.space-hackathon.kr/": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://k-knowledge.kr/ekp/pub/pn/pub.read.jsp?id=102": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140267&article.offset=0&articleLimit=10": {
+  "at": "2026-10-04",
+  "tries": 1
  }
 }

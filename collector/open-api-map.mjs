@@ -126,13 +126,15 @@ const excerpt = (label, text) => (text ? { label, text: clip(text) } : null);
 
 /* API 의 긴 글 칸(신청 대상·공고 내용 등)을 줄로 — 원문 줄바꿈·글머리(○ • - ※ 1.)에서 끊는다. 한 줄 240자 · 최대 8줄.
    🔴 문의처(전화·메일)가 든 줄은 싣지 않는다(activity-excerpts 의 규칙과 같다 — 그 함수를 거친다). */
+/* 칸을 비워 두는 대신 `해당없음` 을 적어 보내는 기관이 있다 — 자격 줄·제외 줄로 실으면 「해당없음」이 조건처럼 뜬다(2026-10-04) */
+const NOTHING = /^(?:해당\s*(?:사항\s*)?없음|없음|무|N\/?A)\.?$/i;
 export function splitLines(raw, max = 8) {
   const t = htmlToLines(String(raw ?? ''));
   const parts = t.split('\n').flatMap((l) => l.split(/\s(?=[○•◦▪■□◎※]\s?)|(?<=\S)\s(?=\d{1,2}[.)]\s)/))
     .map((l) => l.replace(/^[\s\-–·•○◦▪■□◎]+/, '').trim())
     .filter((l) => l.length >= 3 && /[가-힣A-Za-z]/.test(l))   // 3자 — `공무원`·`재직자` 같은 제외 대상이 한 낱말로 온다
     .map((l) => (l.length > 240 ? `${l.slice(0, 239)}…` : l));
-  return parts.filter((l) => !CONTACT.test(l)).slice(0, max);
+  return parts.filter((l) => !CONTACT.test(l) && !NOTHING.test(l)).slice(0, max);
 }
 const labeled = (label, raw) => {
   const l = splitLines(raw, 3);

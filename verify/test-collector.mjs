@@ -11378,12 +11378,24 @@ console.log('\n■ 대외활동 — 「혜택」에 섞인 조건은 자격으�
   const r1 = AX.splitBenefit(arko);
   eq('① 줄글 — `…를 대상으로 운영` · `지원조건은 …에 한하며` · `채용조건은 만 39세 이하` 는 전부 조건 · 혜택은 없다', [r1.benefit, r1.conditions.length], ['', 3]);
   const r2 = AX.splitBenefit('1. 사업기간: 동계 4주간 2. 사업대상: 대전에 거주하는 만 18세 이상 39세 이하 청년 3. 사업내용: 행정체험형 연수');
-  eq('  번호 목록 — 대상은 자격 · 기간은 버림 · 내용은 혜택', [r2.conditions, r2.benefit], [['사업대상: 대전에 거주하는 만 18세 이상 39세 이하 청년'], '사업내용: 행정체험형 연수']);
+  eq('  번호 목록 — 대상은 자격 · 기간은 버림 · 내용은 혜택(이름표 `사업내용:` 은 뗀다 — 남기면 카드에 그 이름표만 뜬다)', [r2.conditions, r2.benefit], [['사업대상: 대전에 거주하는 만 18세 이상 39세 이하 청년'], '행정체험형 연수']);
   const r3 = AX.splitBenefit('○ 지원대상 : 대학생봉사단 ○ 지원방법 : 사업비 지원 ○ 지원내용 : 교육 제공');
-  eq('  기호 목록 — 지원대상은 자격 · `지원방법` 같은 다른 이름표는 혜택도 조건도 아니다 · 지원내용만 혜택', [r3.conditions, r3.benefit], [['지원대상 : 대학생봉사단'], '지원내용 : 교육 제공']);
+  eq('  기호 목록 — 지원대상은 자격 · `지원방법` 같은 다른 이름표는 혜택도 조건도 아니다 · 지원내용만 혜택', [r3.conditions, r3.benefit], [['지원대상 : 대학생봉사단'], '교육 제공']);
   eq('  🔴 `청년 자격증 응시료 지원` 의 \'자격증\' 은 조건이 아니다(낱말 하나로 가르지 않는다)', AX.splitBenefit('○ 1인 연 1회, 최대 10만원 범위 자격증시험 응시료 지원 ※ 그 중 1건만 지원 가능').conditions, []);
   const it = { excerpts: [{ label: '모집기간', text: '상시' }, { label: '혜택', text: arko.slice(0, 159) + '…' }], eligibilityLines: [] };
   eq('② 이미 실린 글 — 혜택 칸을 떼고 조건을 자격 줄로(잘린 `…` 꼬리는 지운다)', [AX.sanitizeBenefit(it), it.excerpts.map((x) => x.label), it.eligibilityLines.length >= 2], [true, ['모집기간'], true]);
+  /* 2026-10-04 같은 날 둘째 손질 — 카드에 `사업내용`·`지원내용`·`창업어가와 후견인을 1`·`해당없음` 이 떴다 */
+  const lab = { excerpts: [{ label: '혜택', text: '지원내용 : - 국가기술자격증 취득 교육 - 포럼 참석' }] };
+  eq('④ 조건이 없어도 맨 앞 혜택 이름표는 뗀다 · 나머지 글자는 그대로', [AX.sanitizeBenefit(lab), lab.excerpts[0].text], [true, '국가기술자격증 취득 교육 - 포럼 참석']);
+  const keep = { excerpts: [{ label: '혜택', text: '○ 항공료 지원 ○ 숙박 지원' }] };
+  eq('  이름표가 없는 혜택은 손대지 않는다(○ 항목 구분을 살린다)', [AX.sanitizeBenefit(keep), keep.excerpts[0].text], [false, '○ 항공료 지원 ○ 숙박 지원']);
+  eq('  API 의 `해당없음` 은 자격·제외 줄이 아니다', [MAPX.splitLines('해당없음'), MAPX.splitLines('해당 사항 없음'), MAPX.splitLines('만 19세 이상')], [[], [], ['만 19세 이상']]);
+  {
+    const appB = readText(new URL('../app.js', import.meta.url));
+    const s0 = appB.indexOf('function benefitItems'), s1 = appB.indexOf('/* 제목 괄호 속 대상');
+    const bf = new Function('unent', `${appB.slice(s0, s1)}; return benefitShort;`)((x) => String(x));
+    eq('  카드 아랫줄 — `1:1 매칭` 의 콜론에서 자르지 않는다 · `이름 : 값` 은 이름', [bf('창업어가와 후견인을 1:1 매칭하여, 후견인의 교육 및 지도에 필요한 비용 지원 ㅇ 기술 지도'), bf('○ 맞춤형 정책상담 : 1시간 ○ 기념품 : 선착순')], ['', '맞춤형 정책상담 외 1']);
+  }
   const yp = MAPX.mapYouthPolicy({ plcyNm: '무대기술인턴십 지원', aplyUrlAddr: 'https://arko.or.kr/board/view/4053?cid=1', aplyYmd: '20270101 ~ 20270630', sprtTrgtAgeLmtYn: 'N', plcySprtCn: arko }, { scholarship: /장학/ }).item;
   eq('  API 로봇 — 잘리기 전 원문 전체로 가른다(`채용조건은 만 39세 이하 청년` 이 `…` 로 잘리지 않는다) · 혜택 칸 없음',
     [yp.excerpts.some((x) => x.label === '혜택'), yp.eligibilityLines.includes('채용조건은 만 39세 이하 청년')], [false, true]);
@@ -11411,8 +11423,18 @@ console.log('\n■ 자격요건 로봇 (진짜 브라우저) — 장학·대외�
   const bRead = (txt) => AD.eligFromFiles({ title: '청년 체인지메이커 아카데미 운영' }, ['k-B.txt'], () => txt, '/tmp', () => false);
   eq('  🔴 브라우저 본문도 글 제목 낱말이 있어야 그 글의 것(포털 첫 화면 메뉴 `장애인 복지정책` 이 자격으로 뽑혔다) · 있으면 「브라우저 본문」',
     [bRead('도청 메뉴\n○ 지원대상 : 장애인 복지정책'), (bRead('청년 체인지메이커 아카데미 운영\n○ 지원대상 : 도내 거주 청년') || {}).from], [null, '브라우저 본문']);
+  /* 🔴 장학 쪽(rescue-bodies)도 한 페이지 절대 시한 — 2026-10-04 첫 클라우드 실행: 시작 전 예산만 보다가 넷째 공고에서 10분 멈춰
+     단계 시한에 잘렸고 받은 3건까지 잃었다. 시한을 기다리고(withDeadline) 닫기는 기다리지 않는다. */
+  const rb = readText(new URL('../collector/rescue-bodies.mjs', import.meta.url));
+  eq('  🔴 장학 본문 재수집도 페이지마다 절대 시한 · 멈춘 페이지의 닫기는 기다리지 않는다',
+    [/await withDeadline\(read, PAGE_MS\) === TIMED_OUT/.test(rb), /\n  page\.close\(\)\.catch/.test(rb), !/await page\.close\(\)/.test(rb)], [true, true, true]);
   /* 워크플로 */
   const wf = readText(new URL('../.github/workflows/rescue-bodies.yml', import.meta.url));
+  /* 🔴 PaddleOCR 판 고정 — 판을 안 적으면 그날 최신(3.3.x)이 깔려 x86 클라우드에서 모든 그림이 오류(2026-10-04 · 맥은 ARM 이라 멀쩡했다) */
+  for (const f of ['rescue-bodies.yml', 'collect-scholarships.yml']) {
+    const y = readText(new URL('../.github/workflows/' + f, import.meta.url));
+    eq(`  🔴 ${f} — PaddleOCR 은 판을 고정해 깐다`, [...y.matchAll(/pip install[^\n]*paddle[^\n]*/g)].map((m) => /paddlepaddle==[\d.]+ paddleocr==[\d.]+/.test(m[0])), [true]);
+  }
   const caps = [...wf.matchAll(/^ {8}timeout-minutes: (\d+)/gm)].map((m) => Number(m[1]));
   const job = Number((wf.match(/^ {4}timeout-minutes: (\d+)/m) || [])[1]);
   const ia = wf.indexOf('activity-docs.mjs --fetch --browser'), io = wf.indexOf('paddle-ocr.py collector/act-files'), ip = wf.indexOf('activity-docs.mjs --apply --browser'), ig = wf.indexOf('- name: 데이터 관문');

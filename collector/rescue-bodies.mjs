@@ -30,6 +30,7 @@ import { chromium } from 'playwright';
 import { createRequire } from 'node:module';
 import { indexTexts, sourceFor, hasText, canonUrl, MIN_BODY } from './notice-source.mjs';
 import { makeStripper } from './page-boilerplate.mjs';
+import { withDeadline, TIMED_OUT } from './harvest-budget.mjs';
 
 const { requirementLines } = createRequire(import.meta.url)('../match-engine.js');
 const HERE = new URL('.', import.meta.url);
@@ -39,6 +40,7 @@ const reportPath = new URL('rescue-report.md', HERE);
 
 const WRITE = process.argv.includes('--write');
 const BUDGET_MS = Number(process.env.RESCUE_BUDGET_MS || 12 * 60 * 1000);
+const PAGE_MS = 60000;   // 한 페이지 절대 시한 — 아래 목록 돌기 참고
 const CAP = Number(process.env.RESCUE_CAP || 25);
 /* 한 공고를 이만큼 시도해도 본문이 안 나오면 잠시 쉰다. 영구 포기는 없다 —
    게시판이 고쳐지거나 우리 판정이 나아질 수 있다(링크 사냥꾼과 같은 원칙). */
@@ -142,10 +144,14 @@ for (const t of targets) {
   if (Date.now() - startedAt > BUDGET_MS) { log('시간 예산 도달 — 나머지는 다음 실행'); break; }
   done += 1;
   const key = canonUrl(t.url);
-  const page = await ctx.newPage();
   let text = '';
   let finalUrl = '';
-  try {
+  /* 🔴 **한 페이지에 절대 시한** (2026-10-04 · 자격요건 로봇 첫 클라우드 실행): 예산은 '시작 전'에만 봤다 —
+     넷째 공고에서 브라우저 호출 하나가 돌아오지 않아 10분을 서 있다가 단계 시한(11분)에 잘렸고,
+     saveAll 까지 못 가 **이미 받은 3건도 잃었다.** 시한이 지나면 그 페이지를 버리고 다음으로 간다
+     (harvest-budget withDeadline — 수집기와 같은 규칙). 예산 9분 + 시한 1분 < 단계 11분. */
+  const page = await ctx.newPage();
+  const read = (async () => { try {
     await page.goto(t.url, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await page.waitForTimeout(6000);           // 자바스크립트가 본문을 그릴 시간 (4초로는 모자란 학교가 있었다)
     finalUrl = page.url();      // 봇 차단은 최종 주소가 challenge 로 바뀌는 것으로 드러난다
@@ -224,9 +230,12 @@ for (const t of targets) {
     } catch { /* 첨부를 못 걷어도 본문 저장은 계속한다 */ }
   } catch (e) {
     report.push(`- ✕ ${t.it.name.slice(0, 40)} — 열지 못함: ${String(e.message).slice(0, 60)}`);
-  } finally {
-    await page.close().catch(() => {});
+  } })();
+  if (await withDeadline(read, PAGE_MS) === TIMED_OUT) {
+    report.push(`- ⏱ ${t.it.name.slice(0, 40)} — ${PAGE_MS / 1000}초 안에 안 열려 건너뜀`);
+    log(`⏱ ${t.it.name.slice(0, 30)} — 시한 초과`);
   }
+  page.close().catch(() => {});   // 기다리지 않는다 — 멈춘 페이지는 닫기도 멈출 수 있다
 
   /* 🔴 **봇 차단은 브라우저만 막는다 — 그럴 땐 일반 fetch로 물러선다** (2026-08-23 실측).
      홍익대는 브라우저로 열면 `cdn-botmanager.stclab.com/…/challenge`(제목 `Security
