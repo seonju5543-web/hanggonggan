@@ -1,0 +1,5 @@
+{
+ "v": 1,
+ "note": "원문 후보 — 사람·Claude 세션이 '이 공고의 원문은 아마 이 주소'라고 적는 곳. 로봇(collector/link-check.mjs)은 읽기만 하고, 학생처럼 열어 그 공고·그 회차임을 확인한 것만 data/link-check.json fix 로 앱에 싣는다(판정 collector/link-candidates.mjs acceptCandidate). 줄 꼴: { target:{ds:registered|notices|news|external|activities|kosaf, key:<정식 등록 id | 층2 코드 | 지금 보이는 주소(표식 그대로) | 학교|제목>}, url:<글 주소> 또는 board:<게시판 목록 주소>, title?, source?(search|board|data|admin), query?, by:<누가>, addedAt:YYYY-MM-DD, note?, also?:[같은 공고문을 쓰는 층2 코드], trusted?:true(관리자가 열어 본 주소) }. 60일 지난 줄은 읽지 않는다. 기본 브랜치에 push 하면 후보만 확인하는 실행이 한 번 돈다.",
+ "items": []
+}

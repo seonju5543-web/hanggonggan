@@ -8,13 +8,18 @@ name: 원문 링크 확인 로봇
 #   붙인 것(서버가 번호를 무시하고 목록을 준다)·재단 홈페이지·`&#038;` 로 글 번호가 잘린 주소가 전부
 #   '원문 공고 ↗' 로 나가고 있었다.
 #
-# 🔴 이 로봇은 **주소를 고치지 않는다** — 다른 날 두 번 같은 문제를 보면 data/link-check.json 에만 적고,
-#    앱(source-link.js)이 그 링크 이름을 정직하게 바꿔 보여 준다. 쓰는 파일은 셋뿐이다(아래 저장 단계).
+# 🔴 이 로봇은 **데이터 파일의 주소를 고치지 않는다** — 다른 날 두 번 같은 문제를 보면 data/link-check.json 에만 적고,
+#    앱(source-link.js)이 그 링크 이름을 정직하게 바꿔 보여 준다. 쓰는 파일은 넷뿐이다(아래 저장 단계).
 #    (2026-10-03 사고: 링크 사냥꾼 순찰이 잡티 섞인 제목으로 멀쩡한 링크 8건을 목록 표식으로 덮어썼다.)
 #
+# ⓪ 원문 후보 확인 (2026-10-04) — 위 일보다 먼저, 원문 후보(collector/link-candidates.json · 우리 기록의 같은 제목 글 ·
+#    층2 재단 장학금과 짝지은 재단 게시판 글)를 학생처럼 열어 그 공고·그 회차인 것만 data/link-check.json fix 에 싣는다
+#    (앱이 그 링크를 원문으로 연다 · collector/link-candidates.mjs). 후보 장부는 collector/link-candidates-state.json.
+#
 # 실행 방법
-#   · collector/run-link-check.txt 를 고쳐 기본 브랜치에 push (push-to-run — only:/max: 는 그 실행에만)
-#   · Actions 화면에서 수동 실행 (dry: 저장 안 함 · only: 사이트 하나)
+#   · collector/run-link-check.txt 를 고쳐 기본 브랜치에 push (push-to-run — only:/max:/mode: 는 그 실행에만)
+#   · collector/link-candidates.json 을 고쳐 기본 브랜치에 push — **후보만** 확인한다(모든 학교를 하루 두 번 두드리지 않게)
+#   · Actions 화면에서 수동 실행 (dry: 저장 안 함 · only: 사이트 하나 · mode: candidates 면 후보만)
 #   · 매일 18:47 KST — 수집 로봇들(07:19~15:41)이 학교를 두드리는 시간을 피해 저녁에
 
 on:
@@ -28,10 +33,15 @@ on:
         description: '사이트 하나만 (주소 조각 — 예: gachon.ac.kr)'
         type: string
         default: ''
+      mode:
+        description: "'candidates' 면 원문 후보만 확인 (비우면 후보 + 앱의 링크 전부)"
+        type: string
+        default: ''
   push:
     branches: ['claude/nice-heisenberg-WESq5']
     paths:
       - 'collector/run-link-check.txt'
+      - 'collector/link-candidates.json'
   schedule:
     # 18:47 KST — 홀수 분 · UTC 정각/자정 피함 · 다른 커밋 로봇과 같은 분이 아니다(관문 「예약 겹침」).
     # 매일 도는 이유: 문제는 '다른 날 두 번' 봐야 확정된다(collector/link-landing.mjs nextState).
@@ -74,8 +84,11 @@ jobs:
         env:
           LINK_CHECK_BUDGET_MS: '1200000'      # 20분 — 못 본 것은 다음 실행이 이어서 본다(오래 안 본 것부터)
           LINK_CHECK_ONLY: ${{ inputs.only }}
-          # push-to-run 파일의 only:/max: 는 그 파일을 고쳐 push 한 실행에만 — 매일 예약은 늘 전부를 본다
+          # push-to-run 파일의 only:/max:/mode: 는 그 파일을 고쳐 push 한 실행에만 — 매일 예약은 늘 전부를 본다
           LINK_CHECK_TXT: ${{ github.event_name == 'push' && '1' || '' }}
+          # 후보만 보는 실행: 수동 실행의 mode, 또는 이번 push 가 후보 파일을 고쳤을 때(새로 만든 것 포함)
+          LINK_CHECK_MODE: ${{ inputs.mode || ((github.event_name == 'push' && (contains(toJSON(github.event.commits.*.modified), 'collector/link-candidates.json') || contains(toJSON(github.event.commits.*.added), 'collector/link-candidates.json'))) && 'candidates' || '') }}
+          LINK_CHECK_CAND_BUDGET_MS: '300000'  # 5분 — 위 20분에서 쓴다
         run: node collector/link-check.mjs ${{ inputs.dry && '--dry' || '' }}
 
       # 데이터 관문 — 저장 직전. always() 인 이유: 로봇이 도중에 넘어져도 그때까지 본 것은 저장한다
@@ -90,6 +103,7 @@ jobs:
         if: always() && steps.audit.outcome == 'failure'
         run: |
           git checkout -- data/link-check.json collector/link-check-state.json 2>/dev/null || true
+          git checkout -- collector/link-candidates-state.json 2>/dev/null || rm -f collector/link-candidates-state.json
           # 되돌렸으면 반드시 말한다 — continue-on-error 라 초록불로 묻힌다(link-hunter 2026-09-05)
           echo "::error::데이터 감사에 걸려 이번 원문 링크 확인 결과를 저장하지 않았습니다."
 
@@ -98,12 +112,13 @@ jobs:
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # 🔴 로봇이 쓰는 파일은 이 셋뿐이고 전부 여기 있다(이슈 #79 규칙) — 데이터 파일의 주소는 건드리지 않는다
+          # 🔴 로봇이 쓰는 파일은 이 넷뿐이고 전부 여기 있다(이슈 #79 규칙) — 데이터 파일의 주소는 건드리지 않는다
           [ -f data/link-check.json ] && git add data/link-check.json
           [ -f collector/link-check-state.json ] && git add collector/link-check-state.json
+          [ -f collector/link-candidates-state.json ] && git add collector/link-candidates-state.json
           [ -f collector/link-check-report.md ] && git add collector/link-check-report.md
           if ! git diff --cached --quiet; then
-            git commit -m "원문 링크 확인 — 문제 확정 ${{ steps.check.outputs.confirmed || '?' }}건"
+            git commit -m "원문 링크 확인 — 문제 확정 ${{ steps.check.outputs.confirmed || '?' }}건 · 원문 바로잡기 ${{ steps.check.outputs.fixes || '?' }}건"
             pushed=0
             for i in 1 2 3; do
               if git push origin HEAD:${{ github.ref_name }}; then pushed=1; break; fi
@@ -121,8 +136,9 @@ jobs:
         run: cat collector/link-check-report.md 2>/dev/null || true
 
       # 새로 확정된 문제 링크를 사람에게 알린다 — 라벨로 이슈 하나에 모은다(제목 검색은 이모지·한글에서 놓친다)
-      - name: 🔗 새로 확정된 문제 링크 알림
-        if: always() && steps.audit.outcome == 'success' && steps.check.outputs.new_bad != '' && steps.check.outputs.new_bad != '0'
+      # 원문 후보 판정(원문으로 올림 · 사람 확인)도 같은 이슈에 — 관리자가 사람 확인 후보를 여기서 본다
+      - name: 🔗 새로 확정된 문제 링크 · 원문 후보 알림
+        if: always() && steps.audit.outcome == 'success' && ((steps.check.outputs.new_bad != '' && steps.check.outputs.new_bad != '0') || (steps.check.outputs.cand_verified != '' && steps.check.outputs.cand_verified != '0') || (steps.check.outputs.cand_suggest != '' && steps.check.outputs.cand_suggest != '0'))
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
@@ -130,8 +146,9 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           {
-            echo "🔗 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST — 학생이 누르면 그 공고가 아니라 다른 화면이 열리는 링크 **${{ steps.check.outputs.new_bad }}건**이 새로 확정됐습니다."
-            echo "앱은 이미 그 링크 이름을 바꿔 보여 줍니다(예: '게시판 목록에서 보기'). 원문 주소를 찾는 일은 링크 사냥꾼·사람 몫입니다."
+            echo "🔗 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST — 학생이 누르면 그 공고가 아니라 다른 화면이 열리는 링크 **${{ steps.check.outputs.new_bad || 0 }}건**이 새로 확정됐습니다."
+            echo "원문 후보: 원문으로 올림 **${{ steps.check.outputs.cand_verified || 0 }}건** · 사람 확인 **${{ steps.check.outputs.cand_suggest || 0 }}건** (리포트의 「원문 후보 확인」 절)."
+            echo "앱은 이미 문제 링크의 이름을 바꿔 보여 줍니다(예: '게시판 목록에서 보기'). 원문 주소 후보는 collector/link-candidates.json 에 적으면 로봇이 열어 확인합니다."
             echo
             head -c 60000 collector/link-check-report.md
             echo
@@ -155,6 +172,7 @@ jobs:
           path: |
             collector/link-check-report.md
             collector/link-check-state.json
+            collector/link-candidates-state.json
           retention-days: 7
           if-no-files-found: ignore
 
