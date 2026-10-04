@@ -4678,6 +4678,20 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
     eq('  한도가 남으면 오래전에 해 본 것도', ET.pickEligTargets(items, idx, '2026-10-05', { ...o, max: 5 }).map((t) => t.it.id), ['B', 'C', 'F']);
     eq('  deepfetch 가 이 고르기를 쓴다', /pickEligTargets\(/.test(eligFn), true);
     eq('  시도한 날을 색인에 적는다(안 적으면 줄이 다시 멈춘다)', /\.at\s*=\s*today/.test(eligFn), true);
+    /* 🔴 PaddleOCR 로 읽은 본문 그림이 **그 공고의 것인가** (2026-10-05 · 개발자 "paddle ocr 붙여") — 장학 제목의 흔한 낱말은 증거가 아니다 */
+    const G = await import(new URL('../collector/elig-ocr-guard.mjs', import.meta.url));
+    eq('장학 그림 OCR: 제목의 고유한 낱말이 그림에 있으면 그 공고의 것',
+      [G.ownsScholarshipImage('2026년 금신사랑장학생 선발 안내 (대학생)', '공통 2026년 금신사랑장학생 선발 안내'),
+       G.ownsScholarshipImage('2026년 하반기 문주장학재단 주관 AI·ICT 분야 장학생 모집', '[홍보] 2026 하반기 AI·ICT 인재 장학생 모집 안내')], [true, true]);
+    eq('  남의 배너는 \'장학생\' 이 겹쳐도 아니다', G.ownsScholarshipImage('제주도 내 공공임대주택에 입주한 가구 장학생 모집', '2026년 우양재단 동행장학생 모집 안내'), false);
+    eq('  제목 낱말의 꼬리(장학생·장학금·재단)를 떼고도 본다 — 「포스코비전장학생」 제목 · 그림엔 「포스코비전장학은」(진짜 포스터를 비울 뻔했다)',
+      G.ownsScholarshipImage('포스코비전장학은 올바른 품성을 갖춘 대학생이', '포스코청암재단 포스코비전장학생 (2026)'), true);
+    eq('  제목에 고유한 낱말이 없으면 가릴 수 없으니 남긴다', G.ownsScholarshipImage('장학생 모집 2026', '[교외장학] 2026 장학생 모집'), true);
+    const csP = readText(new URL('../.github/workflows/collect-scholarships.yml', import.meta.url));
+    const atP = (re) => csP.search(re);
+    eq('  수집 로봇: tesseract → PaddleOCR(공고문 첨부만) → 주인 확인 → 발췌',
+      [atP(/ocr-text\.py/), atP(/paddle-ocr\.py collector\/extracted --prefix=elig-/), atP(/node collector\/elig-ocr-guard\.mjs/), atP(/extract-excerpts\.mjs --write/)]
+        .every((v, i, a) => v >= 0 && (i === 0 || a[i - 1] < v)), true);
     /* OCR 이 발췌·금액보다 뒤면 그 실행엔 못 읽고, 다음 실행의 첨부 받기가 .ocr.txt 를 지워 영영 못 읽는다 */
     const cs = readText(new URL('../.github/workflows/collect-scholarships.yml', import.meta.url));
     const at = (re) => cs.search(re);
@@ -11670,7 +11684,7 @@ console.log('\n■ 자격요건 로봇 (진짜 브라우저) — 장학·대외�
   /* 🔴 PaddleOCR 판 고정 — 판을 안 적으면 그날 최신(3.3.x)이 깔려 x86 클라우드에서 모든 그림이 오류(2026-10-04 · 맥은 ARM 이라 멀쩡했다) */
   for (const f of ['rescue-bodies.yml', 'collect-scholarships.yml']) {
     const y = readText(new URL('../.github/workflows/' + f, import.meta.url));
-    eq(`  🔴 ${f} — PaddleOCR 은 판을 고정해 깐다`, [...y.matchAll(/pip install[^\n]*paddle[^\n]*/g)].map((m) => /paddlepaddle==[\d.]+ paddleocr==[\d.]+/.test(m[0])), [true]);
+    eq(`  🔴 ${f} — PaddleOCR 은 판을 고정해 깐다`, ((ms) => ms.length > 0 && ms.every((m) => /paddlepaddle==[\d.]+ paddleocr==[\d.]+/.test(m[0])))([...y.matchAll(/pip install[^\n]*paddle[^\n]*/g)]), true);   // 설치 줄이 여럿이어도(장학 포스터 · 대외활동) 전부
   }
   const caps = [...wf.matchAll(/^ {8}timeout-minutes: (\d+)/gm)].map((m) => Number(m[1]));
   const job = Number((wf.match(/^ {4}timeout-minutes: (\d+)/m) || [])[1]);
