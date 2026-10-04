@@ -1,0 +1,67 @@
+# ============================================================
+#  경보 이슈 한 곳 — 공용 액션 (2026-10-04 로봇·도구 점검 · 묶음 alerts)
+# ------------------------------------------------------------
+#  하는 일은 전부 tools/alert-issue.mjs 에 있다(머리말 참조). 여기는 입력을 환경 변수로 넘기는 껍데기뿐이다
+#  — 본문을 셸 글자에 끼워 넣지 않아 따옴표·역따옴표가 섞여도 깨지지 않는다.
+#    open    : 제목이 같은 열린 이슈에 댓글, 없으면 하나 만든다(같은 초 중복은 닫는다)
+#    resolve : 제목이 맞는 열린 이슈를 닫는다(회복)
+#  🔴 찾는 열쇠는 라벨이 아니라 **제목**이다(match: exact | prefix) — 라벨은 만들 때 붙이기만 한다.
+#  🔴 이 액션은 체크아웃된 저장소의 도구를 부른다 — 앞에 actions/checkout 이 있어야 한다(관문 alerts ⑥ S2).
+# ============================================================
+name: 경보 이슈 (한 곳)
+description: 로봇 경보를 제목이 같은 열린 이슈 하나에 모으고(댓글), 회복하면 닫는다
+inputs:
+  token:
+    description: GITHUB_TOKEN (issues write)
+    required: true
+  mode:
+    description: open | resolve
+    required: false
+    default: open
+  title:
+    description: 경보 제목 (찾는 열쇠 · 새로 만들 때의 제목)
+    required: true
+  match:
+    description: exact | prefix (prefix 면 시각이 붙은 옛 제목도 잡는다)
+    required: false
+    default: exact
+  label:
+    description: 새로 만들 때 붙일 라벨 (없으면 만든다)
+    required: false
+    default: ''
+  label-color:
+    description: 라벨 색
+    required: false
+    default: B60205
+  label-description:
+    description: 라벨 설명
+    required: false
+    default: ''
+  body:
+    description: 본문 (open 은 이슈·댓글 본문, resolve 는 닫는 댓글)
+    required: false
+    default: ''
+  body-file:
+    description: 본문 파일 (body 보다 우선)
+    required: false
+    default: ''
+  assignee:
+    description: 담당자 (빈칸·쉼표로 여럿 · 지정이 막히면 담당자 없이 다시 만든다)
+    required: false
+    default: ''
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        ALERT_MODE: ${{ inputs.mode }}
+        ALERT_TITLE: ${{ inputs.title }}
+        ALERT_MATCH: ${{ inputs.match }}
+        ALERT_LABEL: ${{ inputs.label }}
+        ALERT_LABEL_COLOR: ${{ inputs.label-color }}
+        ALERT_LABEL_DESCRIPTION: ${{ inputs.label-description }}
+        ALERT_BODY: ${{ inputs.body }}
+        ALERT_BODY_FILE: ${{ inputs.body-file }}
+        ALERT_ASSIGNEE: ${{ inputs.assignee }}
+      run: node "$GITHUB_ACTION_PATH/../../../tools/alert-issue.mjs"
