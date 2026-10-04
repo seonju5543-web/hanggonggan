@@ -31,6 +31,7 @@ import { createRequire } from 'node:module';
 import { indexTexts, sourceFor, hasText, canonUrl, MIN_BODY } from './notice-source.mjs';
 import { makeStripper } from './page-boilerplate.mjs';
 import { withDeadline, TIMED_OUT } from './harvest-budget.mjs';
+import { readLinkFixes, humanFixUrlBy } from './link-fixes-read.mjs';
 
 const { requirementLines } = createRequire(import.meta.url)('../match-engine.js');
 const HERE = new URL('.', import.meta.url);
@@ -135,6 +136,7 @@ const ctx = await browser.newContext({
   locale: 'ko-KR',
 });
 
+const fixUrl = humanFixUrlBy(readLinkFixes(new URL('../data/link-fixes.json', HERE)));
 const startedAt = Date.now();
 let got = 0, miss = 0, done = 0, gone = 0;
 for (const t of targets) {
@@ -146,13 +148,15 @@ for (const t of targets) {
   const key = canonUrl(t.url);
   let text = '';
   let finalUrl = '';
+  /* 관리자가 원문을 바로잡은 공고는 **그 주소**를 연다(앱이 학생에게 여는 주소와 같다) — 본문은 그대로 원래 주소 열쇠(t.url)에 둔다(발췌기가 그 열쇠로 찾는다) */
+  const openUrl = fixUrl(t.it) || t.url;
   /* 🔴 **한 페이지에 절대 시한** (2026-10-04 · 자격요건 로봇 첫 클라우드 실행): 예산은 '시작 전'에만 봤다 —
      넷째 공고에서 브라우저 호출 하나가 돌아오지 않아 10분을 서 있다가 단계 시한(11분)에 잘렸고,
      saveAll 까지 못 가 **이미 받은 3건도 잃었다.** 시한이 지나면 그 페이지를 버리고 다음으로 간다
      (harvest-budget withDeadline — 수집기와 같은 규칙). 예산 9분 + 시한 1분 < 단계 11분. */
   const page = await ctx.newPage();
   const read = (async () => { try {
-    await page.goto(t.url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.goto(openUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await page.waitForTimeout(6000);           // 자바스크립트가 본문을 그릴 시간 (4초로는 모자란 학교가 있었다)
     finalUrl = page.url();      // 봇 차단은 최종 주소가 challenge 로 바뀌는 것으로 드러난다
     /* 🔴 **줄바꿈을 없애면 안 된다** (2026-08-23 실측으로 배웠다).
@@ -247,7 +251,7 @@ for (const t of targets) {
   if (BOT_WALL.test(text) || BOT_WALL.test(String(finalUrl))) {
     report.push(`- 🤖 ${t.it.name.slice(0, 36)} — 브라우저가 봇 차단에 걸려 일반 내려받기로 물러섬`);
     try {
-      const res = await fetch(t.url, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(20000) });
+      const res = await fetch(openUrl, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(20000) });
       if (res.ok) {
         const html = await res.text();
         text = htmlToLines(html);   // HTML → 줄 글자는 html-text.mjs 한 곳 (2026-09-30)
