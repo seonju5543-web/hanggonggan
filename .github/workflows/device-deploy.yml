@@ -188,6 +188,48 @@ jobs:
           REPO: ${{ github.repository }}
         run: gh workflow run verify-ui.yml --repo "$REPO" --ref claude/nice-heisenberg-WESq5
 
+      # 🔴 배포가 됐으면 옛 '배포 실패' 경보를 닫는다 (2026-10-04 로봇·도구 점검 · 묶음 alerts).
+      #    아래 실패 알림은 열기·댓글만 해서, 그 뒤 손으로든 다음 배포로든 다 나간 작업의 🚨 가 09-14 부터 열려 있었다(#274 —
+      #    본문·댓글의 브랜치 다섯 모두 main 보다 앞선 커밋 0).
+      #    판정은 **사실 하나**로만 한다: 경보에 적힌 작업 브랜치가 전부 main 에 들어갔는가(compare main...브랜치 의 ahead_by == 0).
+      #    브랜치를 못 찾음(지워짐·404)·조회 실패·이름 '?' 는 '모름'이라 그 경보는 그대로 둔다 — 못 읽은 것을 '나갔다'로 읽지 않는다.
+      #    어느 브랜치에서 돌아도 같은 사실을 보므로 안전하다. 보강이라 실패해도 배포를 빨갛게 하지 않는다.
+      - name: 배포가 됐으면 옛 배포 실패 경보를 닫는다
+        if: steps.run.outputs.state == 'deployed' || steps.run.outputs.state == 'uptodate'
+        continue-on-error: true
+        timeout-minutes: 2
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -u
+          # 라벨이 아니라 **제목**으로 찾는다 — 라벨 붙이기가 막혀 라벨 없이 만들어진 옛 경보도 잡힌다(아래 실패 알림의 예비 명령).
+          for n in $(gh issue list --repo "$REPO" --state open --limit 500 \
+                       --json number,title --jq '.[] | select(.title | startswith("🚨 이 기기에서 배포 실패")) | .number'); do
+            text="$(gh issue view "$n" --repo "$REPO" --json body,comments --jq '[.body] + [.comments[].body] | join("\n")')" \
+              || { echo "#$n: 본문을 못 읽어 그대로 둡니다"; continue; }
+            branches="$(printf '%s\n' "$text" | grep -oE '작업 브랜치 `[^`]+`' | sed -E 's/^작업 브랜치 `//; s/`$//' | sort -u || true)"
+            if [ -z "$branches" ]; then echo "#$n: 브랜치 이름을 못 찾아 그대로 둡니다"; continue; fi
+            all=1; lines=""
+            while IFS= read -r b; do
+              [ -n "$b" ] || continue
+              ahead="$(gh api "repos/$REPO/compare/main...$b" --jq .ahead_by 2>/dev/null || true)"
+              case "$ahead" in
+                0) lines+="· \`$b\` — main 에 모두 들어갔습니다"$'\n' ;;
+                ''|*[!0-9]*) all=0; lines+="· \`$b\` — 확인하지 못했습니다(브랜치가 없거나 조회 실패)"$'\n' ;;
+                *) all=0; lines+="· \`$b\` — 아직 main 에 없는 커밋 ${ahead}개"$'\n' ;;
+              esac
+            done <<< "$branches"
+            printf '#%s\n%s' "$n" "$lines"
+            if [ "$all" = "1" ]; then
+              gh issue close "$n" --repo "$REPO" --reason completed \
+                --comment "✅ $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST — 이 경보에 적힌 작업 브랜치가 전부 앱(main)에 들어갔습니다. 자동으로 닫습니다."$'\n\n'"${lines}"$'\n'"확인한 실행: ${RUN_URL}"
+            else
+              echo "#$n: 아직 다 나가지 않았거나 확인하지 못해 그대로 둡니다"
+            fi
+          done
+
       # 조용히 멈추지 않는다. 알림이 쌓이지 않게 열려 있는 같은 이슈가 있으면 코멘트만 단다.
       - name: 🚨 배포 실패 알림
         # 🔴 cancelled() 를 함께 본다 — 시간 초과는 '실패'가 아니라 '취소'로 끝나서
