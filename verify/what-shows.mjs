@@ -125,6 +125,9 @@ const linkFn = (n) => vm.runInContext(n, linkCtx);
 const LEDGER = new URL('../data/link-check.json', import.meta.url);
 const ledger = fs.existsSync(LEDGER) ? JSON.parse(fs.readFileSync(LEDGER, 'utf8')) : null;
 linkFn('setLinkChecks')(ledger);
+/* 관리자가 넣은 원문(source-link.js ⑥) — 앱처럼 함께 넘긴다 */
+const FIXES = new URL('../data/link-fixes.json', import.meta.url);
+linkFn('setLinkFixes')(fs.existsSync(FIXES) ? JSON.parse(fs.readFileSync(FIXES, 'utf8')) : null);
 const htmlText = (h) => stripTags(h).replace(/&amp;/g, '&');
 const hrefIn = (h) => ((String(h).match(/\shref="([^"]*)"/) || [])[1] || '').replace(/&amp;/g, '&');
 const CLS_WORD = { post: '그 공고 하나로 가는 주소', list: '게시판 목록이 열린다', home: '사이트 첫 화면이 열린다', trouble: '로봇이 「그 공고가 아니었다」를 확정', none: '열 주소가 없다' };

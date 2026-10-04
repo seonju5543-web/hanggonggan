@@ -400,7 +400,7 @@ try {
     { ds: 'activities', items: (((readJson('data/activities.json') || {}).items) || []).filter((x) => !x.hidden), urlOf: (x) => x.url, idOf: byTitle },
     { ds: 'news', items: dirItems('data/news'), urlOf: (x) => x.url, idOf: byTitle },
   ];
-  auditLinks(sets, readJson('data/link-check.json')).warns.forEach((w) => warns.push(w));
+  auditLinks(sets, readJson('data/link-check.json'), readJson('data/link-fixes.json')).warns.forEach((w) => warns.push(w));
 } catch (e) {
   warns.push(`원문 링크를 훑지 못했습니다: ${e.message.slice(0, 80)}`);
 }

@@ -148,7 +148,9 @@ export default async function gate(eq, ctx) {
   eq('  링크 자리 다섯이 각자 제 화면 이름으로 sourceLink 를 부른다 (상세·금액·신청 내역·카드·활동)',
     Object.entries(calls).filter(([f, re]) => !re.test(stripComments(T.fn(f)))).map(([f]) => f), []);
   eq('  도우미(chat.js)·제출처(data.js officialChannel)도 같은 곳에서 받는다',
-    [/sourceLink\(n, 'chat'\)/.test(code['chat.js']), /sourceLink\(sch, 'detail'\)\.cls/.test(stripComments(taker(dataSrc, 'data.js').fn('officialChannel')))], [true, true]);
+    [/sourceLink\(n, 'chat'\)/.test(code['chat.js']), (() => { const oc = stripComments(taker(dataSrc, 'data.js').fn('officialChannel'));
+      /* 갈래(cls)와 주소(href) 둘 다 sourceLink 에서 — 바로잡은 원문(⑥)을 제출처도 쓴다(2026-10-04) */
+      return /const sl = typeof sourceLink === 'function' \? sourceLink\(sch, 'detail'\)/.test(oc) && /sl\.href/.test(oc) && /sl\.cls/.test(oc) && !/url: sch\.sourceUrl/.test(oc); })()], [true, true]);
   eq('  상세 시트·활동 시트·금액·신청 내역·첨부가 그 함수들을 실제로 쓴다',
     [/\$\{srcLink\}|srcLink,/.test(stripComments(T.fn('openDetail'))), /activityLinkHtml\(n\)/.test(stripComments(T.fn('openActivityDetail'))),
       /amountSourceLinkHtml\(sch\)/.test(stripComments(T.fn('amountDetailRow'))), /appLogLinkHtml\(sch\)/.test(code['app.js']),
@@ -167,7 +169,9 @@ export default async function gate(eq, ctx) {
   eq('  서비스워커 ASSETS 에 source-link.js 가 있다 (없으면 오프라인에서 카드·시트가 넘어진다)', /'source-link\.js'/.test(assets), true);
   eq('  ASSETS 에 장부(data/link-check.json)는 없다 (없을 수 있는 파일 — addAll 이 통째로 실패한다)', /link-check/.test(assets), false);
   const ll = stripComments(T.fn('loadLinkChecks'));
-  eq('  앱이 장부를 받아(no-store) setLinkChecks 로 넘긴다', /fetch\('data\/link-check\.json', \{ cache: 'no-store' \}\)/.test(ll) && /setLinkChecks\(/.test(ll), true);
+  eq('  앱이 장부와 관리자 바로잡기를 받아(no-store) setLinkChecks·setLinkFixes 로 넘긴다',
+    [/fetch\(path, \{ cache: 'no-store' \}\)/.test(ll), /getDoc\('data\/link-check\.json'\)/.test(ll), /getDoc\('data\/link-fixes\.json'\)/.test(ll), /setLinkChecks\(/.test(ll), /setLinkFixes\(/.test(ll)],
+    [true, true, true, true, true]);
   eq('  시작할 때·당겨서 새로고침할 때 둘 다 받는다', [/^loadLinkChecks\(\);/m.test(code['app.js']), /loadLinkChecks\(\)/.test(stripComments(T.fn('refreshAllData')))], [true, true]);
   eq('  정식 등록 그리기가 장부를 (잠깐) 기다린다 — 첫 그림부터 맞는 이름', /linkChecksWait\(\)/.test(stripComments(T.fn('loadRegistered'))), true);
   eq('  safeUrl 이 HTML 기호를 먼저 되돌린다 (원문·첨부·제출처가 한 자리에서 고쳐진다)', /u = decodeUrlEntities\(u\)/.test(stripComments(T.fn('safeUrl'))), true);

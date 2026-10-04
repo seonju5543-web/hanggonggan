@@ -319,7 +319,10 @@ export default async function gate(eq, ctx) {
   const watched = (sync.match(/workflows:\s*\[([\s\S]*?)\]/) || [])[1] || '';
   eq('  배포 동기화가 이 로봇을 안다 — 모르면 확정 결과가 최대 12시간 앱에 안 나간다', !!wfName && watched.includes(`'${wfName.trim()}'`), true);
   const live = read('.github/workflows/check-live.yml');
-  eq('  라이브 점검이 앱이 받는 data/link-check.json 을 본다(칸 셋이라 개수가 아니라 건수·시각으로)', [/out\.push\('data\/link-check\.json'\)/.test(live), /const m = f === 'data\/link-check\.json' \? linkCheck : measure;/.test(live) && /m\(f\), m\('live\/' \+ f\)/.test(live)], [true, true]);
+  eq('  라이브 점검이 앱이 받는 data/link-check.json · data/link-fixes.json 을 본다(칸이 여럿이라 개수가 아니라 건수·시각으로)',
+    [/out\.push\('data\/link-check\.json'\)/.test(live), /out\.push\('data\/link-fixes\.json'\)/.test(live),
+      /const m = f === 'data\/link-check\.json' \? linkCheck : f === 'data\/link-fixes\.json' \? linkFixes : measure;/.test(live) && /m\(f\), m\('live\/' \+ f\)/.test(live)],
+    [true, true, true]);
 
   const strip = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/[^\n]*/g, '$1');
   const runner = strip(read('collector/link-check.mjs'));

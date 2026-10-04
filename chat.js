@@ -654,7 +654,7 @@ function chatAiCandidates(q) {
       id: s.id, name: s.name, provider: s.provider, amount: s.amount,
       ...(s.amountNote ? { amountNote: s.amountNote } : {}),
       period: s.period, summary: s.summary, deadline: s.deadline || null,
-      sourceUrl: s.sourceUrl || null, quotes,
+      sourceUrl: (typeof effectiveLinkUrl === 'function' ? effectiveLinkUrl(s) : s.sourceUrl) || null, quotes,   // 바로잡은 원문이 있으면 그것(source-link.js ⑥)
     } };
   })
     /* 🔴 **인용할 원문이 있는 공고를 앞에 둔다.** 이 구조에서 AI가 하는 일은 '어느 공고의 어느

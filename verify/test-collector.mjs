@@ -11127,7 +11127,7 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
 
 console.log('\n■ 원문 링크 정직성 (2026-10-03 · 원문 대신 재단 홈페이지·게시판 목록이 열리던 사고)');
 /* 🔴 화면은 링크 이름을 source-link.js 한 곳에서만 받고, 로봇은 collector/link-landing.mjs 한 곳으로 판정한다.
-   갈래별 검사는 verify/link-gates/*.mjs (core · app · robot · producers · data) — verify/link-gates.mjs 가 차례로 부른다. */
+   갈래별 검사는 verify/link-gates/*.mjs (core · app · robot · producers · data · fixes) — verify/link-gates.mjs 가 차례로 부른다. */
 {
   const { runLinkGates } = await import('./link-gates.mjs');
   await runLinkGates(eq);

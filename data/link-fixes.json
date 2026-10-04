@@ -1,0 +1,6 @@
+{
+ "v": 1,
+ "note": "관리자가 넣은 원문 공고 주소 — 관리자 화면 「원문 링크」가 적는다(tools/admin-apply.mjs linkFix). 앱은 source-link.js 가 읽는다. 열쇠: id:<공고 id> · u:<지금 주소>",
+ "updatedAt": "",
+ "fix": {}
+}

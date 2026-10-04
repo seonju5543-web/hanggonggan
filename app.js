@@ -613,12 +613,15 @@ if (typeof sourceLink !== 'function') {
   g.decodeUrlEntities = g.decodeUrlEntities || ((u) => String(u == null ? '' : u).trim());
   g.linkShape = g.linkShape || (() => 'page');   // 자리표의 갈래는 늘 글(post)이라 목록 꼴을 물을 일이 없다 — 꼴 규칙은 source-link.js 한 곳
   g.setLinkChecks = g.setLinkChecks || (() => {});
+  g.setLinkFixes = g.setLinkFixes || (() => {});
+  g.effectiveLinkUrl = g.effectiveLinkUrl || ((item) => String((item && (item.sourceUrl || item.url)) || ''));
   g.sourceLink = (item) => ({ href: String((item && (item.sourceUrl || item.url)) || ''), kind: 'page', cls: 'post', label: '', hint: '', caution: '' });
   if (typeof document !== 'undefined' && document.createElement) {
     const s = document.createElement('script');
     s.src = 'source-link.js';
     s.onload = () => {
       try { if (typeof linkChecksDoc !== 'undefined') setLinkChecks(linkChecksDoc); } catch (e) { /* 장부 없음 */ }
+      try { if (typeof linkFixesDoc !== 'undefined') setLinkFixes(linkFixesDoc); } catch (e) { /* 바로잡기 없음 */ }
       try { rerenderVisible(); } catch (e) { /* 아직 첫 그림 전 — 첫 그림이 진짜 이름을 쓴다 */ }
     };
     (document.head || document.documentElement).appendChild(s);
@@ -2590,17 +2593,21 @@ function renderHomeUpdated() {
    🔴 정식 등록과 **나란히** 받는다 — 목록이 먼저 와도 장부를 잠깐(LINK_CHECK_WAIT_MS) 기다려 첫 그림부터 맞는 이름을 단다.
       장부는 작아서 보통 먼저 온다. 더 늦으면 기다리지 않고 그리고, 장부가 오면 다시 그린다(바뀐 것이 있을 때만). */
 let linkChecksDoc = null;
+let linkFixesDoc = null;   // data/link-fixes.json — 관리자가 넣은 원문(source-link.js ⑥ · 같은 규칙으로 받는다)
 let linkChecksJob = null;
 const LINK_CHECK_WAIT_MS = 800;
 function loadLinkChecks() {
-  linkChecksJob = fetch('data/link-check.json', { cache: 'no-store' })
+  const getDoc = (path) => fetch(path, { cache: 'no-store' })
     .then((r) => (r.ok ? r.json() : null), () => undefined)   // undefined = 네트워크 실패(받아 둔 것을 지킨다)
-    .catch(() => null)                                           // 깨진 JSON — 장부 없음으로
-    .then((d) => {
-      const before = JSON.stringify(linkChecksDoc);
+    .catch(() => null);                                          // 깨진 JSON — 장부 없음으로
+  linkChecksJob = Promise.all([getDoc('data/link-check.json'), getDoc('data/link-fixes.json')])
+    .then(([d, fx]) => {
+      const before = JSON.stringify([linkChecksDoc, linkFixesDoc]);
       if (d !== undefined) linkChecksDoc = d && d.bad && typeof d.bad === 'object' ? d : null;
+      if (fx !== undefined) linkFixesDoc = fx && fx.fix && typeof fx.fix === 'object' ? fx : null;
       setLinkChecks(linkChecksDoc);
-      if (JSON.stringify(linkChecksDoc) !== before) rerenderVisible();
+      setLinkFixes(linkFixesDoc);
+      if (JSON.stringify([linkChecksDoc, linkFixesDoc]) !== before) rerenderVisible();
     });
   return linkChecksJob;
 }
