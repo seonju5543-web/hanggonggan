@@ -1968,7 +1968,7 @@ console.log('\n■ 재단·지자체 게시판 (2026-09-26 · 노션 F-13 · 교
   eq('renderHome 이 그린다', /\$\('#external-notices'\)\.innerHTML = externalNoticesHtml\(\);/.test(app), true);
   eq('당겨서 새로고침·첫 실행이 받는다', /loadActivities\(\), loadExternal\(\)\]/.test(app) && /^loadExternal\(\);$/m.test(app), true);
   eq('못 받아 왔어도 빈 문서', /liveExternal = d \|\| liveExternal \|\| \{ items: \[\], updatedAt: null \}/.test(app), true);
-  eq('카드는 한 벌 · 주최를 윗줄에 (마감을 읽은 글은 D-day 도)', /noticeCardHtml\(n, \{ org: `\$\{n\.host\} 공고`, dday: n\.deadline \?/.test(app) && !/function externalCardHtml/.test(app), true);
+  eq('카드는 한 벌 · 주최를 윗줄에 (마감을 읽은 글은 D-day 도) · 「공고」 를 겹쳐 적지 않는다(2026-10-04 · 구역 제목이 「…새 공고」)', /noticeCardHtml\(n, \{ org: n\.host, dday: n\.deadline \?/.test(app) && !/function externalCardHtml/.test(app), true);
   eq('등록된 주소는 뺀다 — 학교 구역과 같은 잣대(registeredUrlMatcher)', (app.match(/registeredUrlMatcher\(\)/g) || []).length >= 2, true);
   eq('글이 없으면 구역이 비어 있다 (빈 문구를 둘 만들지 않는다)', /if \(!mine\.length\) return '';/.test(app.slice(app.indexOf('function externalNoticesHtml'))), true);
 }
@@ -3111,7 +3111,7 @@ console.log('\n■ 접수 기간 한 줄 (2026-09-12)');
     const appSrc = readText(new URL('../app.js', import.meta.url));
     const dh = readText(new URL('../collector/deadline-hint.mjs', import.meta.url));
     const reOf = (src) => (src.match(/const PARTIAL_ENTITY_END = (\/.+\/);/) || [])[1];
-    eq('  앱이 이미 실린 힌트 끝의 반쪽 기호를 떼고 보인다(같은 꼴 · 두 자리 모두)', [reOf(appSrc) === reOf(dh) && !!reOf(dh), (appSrc.match(/esc\(hintText\(n\.deadlineHint\)\)/g) || []).length, /esc\(unent\(n\.deadlineHint\)\)/.test(appSrc)], [true, 2, false]);
+    eq('  앱이 이미 실린 힌트 끝의 반쪽 기호를 떼고 보인다(같은 꼴 · 두 자리 모두)', [reOf(appSrc) === reOf(dh) && !!reOf(dh), (appSrc.match(/esc\(hint(?:Text|Short)\(n\.deadlineHint\)\)/g) || []).length, /esc\(unent\(n\.deadlineHint\)\)/.test(appSrc), /function hintShort\(s\) \{\n  let t = hintText\(s\)/.test(appSrc)], [true, 2, false, true]);   // 카드는 hintShort(2026-10-04 · 첫 항목만) — 그것도 hintText 로 시작한다
     /* 리뷰(10-03) — 여기서 hintText 를 따로 지어 재면 앱의 것이 바뀌어도 모른다 → 앱 소스의 그 줄들(ENTITIES·ENTITY_RE·unent·PARTIAL_ENTITY_END·hintText)을 떼어 실행한다 */
     const line = (re) => (appSrc.match(re) || [''])[0];
     const unentSrc = (() => { const at = appSrc.indexOf('function unent('); return at < 0 ? '' : appSrc.slice(at, appSrc.indexOf('\n}', at) + 2); })();

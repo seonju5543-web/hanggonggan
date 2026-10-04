@@ -103,10 +103,25 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
     eq('홈 — 재단·지자체 새 공고 구역이 학교 게시판 구역 아래에 뜬다',
       await page.$eval('#external-notices', (e) => e.querySelector('h3') && e.querySelector('h3').textContent.trim()), '재단·지자체 새 공고');
     eq('홈 — 카드 윗줄이 주최를 말한다 · 최근 수집 순',
-      await page.$$eval('#external-notices .notice-card .sch-org', (els) => els.map((e) => e.textContent.trim())), ['울진군장학재단 공고', '국가보훈부 공고']);
+      await page.$$eval('#external-notices .notice-card .sch-org', (els) => els.map((e) => e.textContent.trim())), ['울진군장학재단', '국가보훈부']);   // 2026-10-04 — 구역 제목이 「…새 공고」라 「공고」를 겹쳐 적지 않는다
     eq('홈 — 재단 글이 석 장 이하면 더보기 단추가 없다', await page.$('#external-more'), null);
     eq('홈 — 기간 한 줄은 원문 그대로',
       await page.$eval('#external-notices .notice-card .sch-provider', (e) => e.textContent.trim()), '신청기간 : 2026. 10. 2. ~ 10. 20.');
+    /* 2026-10-04 개발자 지시 — 회색 기간 줄은 첫 항목만(뒤 「ㅇ 접수방법」·「2. 신청방법」 은 떼고 · 날짜 「10. 7.」 은 항목 번호가 아니다) · 날짜 없으면 안 보인다 */
+    eq('홈 — 기간 줄은 첫 항목까지만 · 짝 잃은 괄호 이름표를 편다 · 날짜 없으면 비운다',
+      await page.evaluate(() => [hintShort('접수기한 ) ~ 10. 7.(수) 18시 ㅇ ( 접수방법 ) 모바일 설문조사 네이버폼 응'), hintShort('신청기간: 2026. 10. 6.(화) ~ 10. 23.(금) 2. 신청방법: 홈페이지 3. 접'), hintShort('마감 안내 공고문 참고')]),
+      ['접수기한 ~ 10. 7.(수) 18시', '신청기간: 2026. 10. 6.(화) ~ 10. 23.(금)', '']);
+    /* 홈 「나에게 맞는 대외활동·공모전」 — 장학금 구역 바로 밑 · 대외활동 탭과 같은 글 고르기 · 미달은 싣지 않는다 */
+    eq('홈 — 「나에게 맞는 대외활동·공모전」 이 「나에게 맞는 장학금」 바로 밑에 있다',
+      await page.evaluate(() => { const a = document.getElementById('home-activities'); let e = document.getElementById('home-deadline-more').nextElementSibling; return [a && a.querySelector('h3') && a.querySelector('h3').textContent.trim(), e === a]; }),
+      ['나에게 맞는 대외활동·공모전', true]);
+    eq('  대외활동 탭과 같은 판정으로 고른 글이고 미달은 없다',
+      await page.evaluate(() => { const mine = new Set(activitiesForMe().map((n) => n.url)); const cs = [...document.querySelectorAll('#home-activity-list [data-activity]')]; return [cs.length > 0, cs.every((c) => mine.has(c.dataset.activity)), cs.some((c) => /지원 자격 미달/.test(c.textContent))]; }),
+      [true, true, false]);
+    /* 프로필 관심 분야 칸 — 목록은 data/activities.json fields(수집기 ACTIVITY_FIELDS 원본)에서 · 고른 것은 다시 그려도 지킨다 */
+    eq('온보딩 관심 분야 칸은 데이터의 분야 목록으로 그리고 고른 것을 지킨다',
+      await page.evaluate(() => { const bak = liveActivities.fields; liveActivities.fields = { 공모전: ['영상·사진'], 대외활동: ['봉사'] }; fillInterestFields(['봉사']); fillInterestFields(); const r = [...document.querySelectorAll('#in-act-fields input')].map((c) => `${c.value}${c.checked ? '✓' : ''}`); liveActivities.fields = bak; return r; }),
+      ['영상·사진', '봉사✓']);
     const navs = await page.$$eval('#bottom-nav .nav-item', (b) => b.map((x) => x.dataset.nav));
     eq('① 아래 탭 다섯 — 대외활동은 장학금 다음', navs, ['home', 'explore', 'activities', 'applications', 'my']);
     await page.click('.nav-item[data-nav="activities"]');
@@ -320,7 +335,7 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
     eq('홈 — 재단 공고가 많아도 처음엔 석 장만 보인다 ("나에게 맞는 장학금"과 같은 수)', await n(), 3);
     eq('  아래에 더보기 단추가 있다', await btn(), '더보기');
     eq('  최근 수집 순 그대로 (앞 석 장)', await page.$$eval('#external-notices .notice-card .sch-org', (e) => e.map((x) => x.textContent.trim())),
-      ['재단1 공고', '재단2 공고', '재단3 공고']);
+      ['재단1', '재단2', '재단3']);
     await page.click('#external-more'); await page.waitForTimeout(200);
     eq('  한 번 누르면 열 장까지 편다', await n(), 10);
     await page.click('#external-more'); await page.waitForTimeout(200);

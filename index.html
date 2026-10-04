@@ -302,8 +302,30 @@
         </div>
       </div>
 
-      <!-- Step 5: 공통 서류 정보 -->
+      <!-- Step 5: 관심 대외활동·공모전 (2026-10-04 개발자 지시 "대외활동에 맞는 학적정보도 몇 개 추가 — 적합도·추천에 쓰도록").
+           전부 선택 사항이다 — 안 고르면 null(모름)이고 추천 차례만 안 바뀐다(자격 판정에는 쓰지 않는다 · 관심은 자격이 아니다).
+           🔴 분야 칸은 **빈 그릇**이다 — 목록 원본은 collector/activity-kind.mjs ACTIVITY_FIELDS 한 곳이고, 수집 로봇이
+              data/activities.json 의 fields 로 싣는다. app.js fillInterestFields 가 그걸로 채운다(여기 적으면 두 벌이 된다). -->
       <div class="onboard-step" data-step="5" hidden>
+        <div class="onboard-body">
+          <h2>관심 있는 대외활동·<br />공모전을 골라 주세요</h2>
+          <p class="onboard-sub">고르면 홈에서 먼저 추천합니다.<br />모두 선택 사항이에요.</p>
+          <span class="field-label">종류</span>
+          <div class="check-list check-grid" id="in-act-kinds">
+            <label class="check-item"><input type="checkbox" value="대외활동" /><span>대외활동</span></label>
+            <label class="check-item"><input type="checkbox" value="공모전" /><span>공모전</span></label>
+          </div>
+          <span class="field-label">분야</span>
+          <div class="check-list check-grid" id="in-act-fields"></div>
+        </div>
+        <div class="onboard-actions">
+        <button class="btn btn-onboard-cancel" data-onboard-cancel hidden>취소</button>
+          <button class="btn btn-primary btn-lg" data-next>다음</button>
+        </div>
+      </div>
+
+      <!-- Step 6: 공통 서류 정보 -->
+      <div class="onboard-step" data-step="6" hidden>
         <div class="onboard-body">
           <h2>서류에 자동으로 채울<br />기본 정보를 알려주세요</h2>
           <p class="onboard-sub">대부분의 장학금 신청서가 공통으로 요구하는 정보입니다.<br />모두 선택 사항이며 이 기기에만 저장됩니다.</p>
@@ -401,6 +423,10 @@
            다시 그리면 히어로 금액이 또 세어 올라가고 스크롤이 튄다. -->
       <button type="button" class="link-btn home-more" id="home-deadline-more"
               aria-controls="home-deadline-list" aria-expanded="false" hidden>더보기</button>
+
+      <!-- 나에게 맞는 대외활동·공모전 (2026-10-04 개발자 지시 "홈에도 나에게 맞는 장학금처럼 · 위치는 장학금 바로 밑").
+           app.js homeActivitiesHtml 이 대외활동 탭과 **같은 판정**(activitiesForMe · activityFit)과 장학 홈과 **같은 차례**(fitRank · homeScore)로 채운다. -->
+      <div id="home-activities"></div>
 
       <!-- 🔴 '신청 현황' 구획은 **신청내역 화면으로 옮겼다** (노션 UI-15 · 2026-09-12 개발자 지시:
            "홈의 신청 현황을 지우고 신청 내역 칸에 반영한다"). 같은 카드(appCard)를 두 화면이
