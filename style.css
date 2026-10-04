@@ -5109,7 +5109,8 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 /* 누르면 회색 판이 아니라 글자색이 바뀐다 (개발자가 정한 화면 결정) */
 .news-tile:active .news-tile-title { color: var(--accent); }
 .news-tile:focus-visible { outline: none; }
-.news-tile:focus-visible .news-tile-photo { box-shadow: var(--ring); }
+/* 띠는 옆으로 넘기는 상자라(overflow) 바깥 그림자가 잘린다 — 안쪽 선으로 (리뷰 10-04) */
+.news-tile:focus-visible .news-tile-photo { outline: 2px solid var(--accent); outline-offset: -2px; }
 /* 받는 중 — 같은 자리 같은 크기의 빈 칸(움직임 없음) */
 .news-tile.is-skel .news-tile-meta,
 .news-tile.is-skel .news-tile-title { background: var(--surface-2); border-radius: var(--radius-hair); color: transparent; }

@@ -2095,8 +2095,10 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
     const extras = src.sources.flatMap((x) => (x.extraBoards || []).map((e) => ({ ...e, school: x.school, main: x.boardUrl })));
     eq('  둘째 게시판은 첫 게시판이 있는 학교에만 · 주소와 근거(웹 검색 결과 + 정찰)가 있다 · 이름이 학교 안에서 하나', extras.length >= 3 && extras.every((e) => e.main && /^https:\/\//.test(e.boardUrl) && typeof e.label === 'string' && e.label && /웹 검색/.test(e.evidence || '') && /정찰/.test(e.evidence || '')) && new Set(extras.map((e) => `${e.school}#${e.label}`)).size === extras.length, true);
     eq('    로봇은 게시판 줄을 첫 게시판 + 둘째 게시판으로 펴고(board 이름) 규칙 열쇠는 newsRuleKey 하나 · 그 글에 board 를 단다', /\.map\(\(e\) => \(\{ school: s\.school, campus: s\.campus, boardUrl: e\.boardUrl, label: e\.label \|\| '둘째 게시판', board: e\.label \|\| '둘째 게시판', extra: true \}\)\)\]\);/.test(rn) && /if \(s\.board\) it\.board = s\.board;/.test(rn) && !/NEWS_BOARD_RULES\[s\.school\]/.test(rn), true);
+    eq('  분교 학생에게 본교 글의 학교 사진을 쓰지 않는다 (다른 캠퍼스 사진 · 출처도 안 맞음 · 리뷰 10-04) · 띠 차례는 모든 카드가 센다 · 갈아 끼운 사진도 초점 · 목록 표식 링크는 이름을 붙인다', [/const me = state\.profile && state\.profile\.school;\s*if \(me && n && n\.school !== me\) return null;/.test(readText(new URL('app.js', root))), /const sp = schoolPhotoFor\(n, turn\[n\.school\] = \(turn\[n\.school\] \?\? -1\) \+ 1\);\s*const spFocus/.test(readText(new URL('app.js', root))), /if \(ff && PHOTO_FOCUS_RE\.test\(ff\)\) img\.style\.objectPosition = ff;/.test(readText(new URL('app.js', root))), /link\.cls !== 'post' && link\.label \? link\.label : ''/.test(readText(new URL('app.js', root)))], [true, true, true, true]);
     eq('    썸네일 로봇도 글의 규칙을 같은 열쇠로 찾는다', /postContentRequest\(NEWS_BOARD_RULES\[newsRuleKey\(n\)\], n\)/.test(readText(new URL('collector/collect-news-thumbs.mjs', root))), true);
     eq('    열쇠 — 첫 게시판은 학교, 둘째는 학교#이름', [RB.newsRuleKey({ school: '서강대학교' }), RB.newsRuleKey({ school: '서강대학교', board: '행사특강' })], ['서강대학교', '서강대학교#행사특강']);
+    eq('    「학교#이름」 규칙은 글 번호가 첫 게시판과 같은 번호 공간이라고 밝힌다(sharedIds) — 열쇠가 「학교 + 글 번호」라 번호가 따로면 다른 글이 합쳐진다', Object.entries(RB.NEWS_BOARD_RULES).filter(([k, r]) => k.includes('#') && r.sharedIds !== true).map(([k]) => k), []);
     eq('    「학교#이름」 규칙은 그 이름의 둘째 게시판이 있어야 한다 (안 쓰이는 규칙 금지)', Object.keys(RB.NEWS_BOARD_RULES).filter((k) => k.includes('#') && !extras.some((e) => `${e.school}#${e.label}` === k)), []);
     /* 서강 행사특강 — 정찰 6차가 누른 주소 그대로 */
     eq('  서강 행사특강 — 정찰 6차가 첫 줄을 눌러 받은 상세 주소와 글자 하나까지 같다 · 본문 확인은 BbsData?pkId=', [RB.NEWS_BOARD_RULES['서강대학교#행사특강'].detail('551482'), RB.NEWS_BOARD_RULES['서강대학교#행사특강'].verifyApi.api(RB.NEWS_BOARD_RULES['서강대학교#행사특강'].verifyApi.idFrom(RB.NEWS_BOARD_RULES['서강대학교#행사특강'].detail('551482')))], ['https://www.sogang.ac.kr/ko/detail/551482?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event', 'https://www.sogang.ac.kr/api/api/v1/mainKo/BbsData?pkId=551482']);
@@ -2617,10 +2619,10 @@ console.log('\n■ 학교 대표 사진 (2026-10-03 개발자 지시 "썸네일�
     const safeUrl = (u) => u; const unent = (s) => s;
     ${/* 카드의 링크 이름은 source-link.js 한 곳(2026-10-03 원문 링크 정직성) — 흉내 내지 않고 진짜 파일을 싣는다 */ readText(new URL('source-link.js', root))}
     const NEWS_THUMB_RE = ${re('NEWS_THUMB_RE')}; const SCHOOL_PHOTO_RE = ${re('SCHOOL_PHOTO_RE')}; const PHOTO_FOCUS_RE = ${re('PHOTO_FOCUS_RE')};
-    let schoolPhotos = null;
+    let schoolPhotos = null; const state = { profile: null };
     ${cut('noticeCardHtml')}
     ${cut('schoolPhotoFor')}
-    return { noticeCardHtml, schoolPhotoFor, set: (d) => { schoolPhotos = d; } };`;
+    return { noticeCardHtml, schoolPhotoFor, set: (d) => { schoolPhotos = d; }, me: (school) => { state.profile = school ? { school } : null; } };`;
   const A = new Function(env)();
   const n = { title: '휴강 안내', url: 'https://k.ac.kr/n/1', school: '경희대학교', foundAt: '2026-10-03' };
   const good = { src: 'assets/schools/n1w4hprp-0123abcd.webp', focus: '50% 40%', credit: 'x · CC BY 3.0', page: 'https://commons.wikimedia.org/wiki/File:x.jpg' };
@@ -2636,6 +2638,12 @@ console.log('\n■ 학교 대표 사진 (2026-10-03 개발자 지시 "썸네일�
   /* 리뷰(10-03) — 글마다 해시로 고르니 이웃 카드가 같은 사진을 셋 연속으로 받았다(전북대 실측) → 사진 없는 카드의 차례로 돌린다 */
   const seq = [0, 1, 2, 3].map((k) => A.schoolPhotoFor({ ...n, url: `https://k.ac.kr/n/${k}` }, k).src);
   eq('    학교에 여러 장이면 차례대로 돌아 이웃이 겹치지 않는다 · 이상한 항목은 안 고른다 · 차례 없으면 첫 장 · 다른 학교는 없음', [seq, A.schoolPhotoFor(n).src, A.schoolPhotoFor({ ...n, school: '서울대학교' }, 1)], [['assets/schools/n1w4hprp-0123abcd.webp', 'assets/schools/n1w4hprp-89abcdef.webp', 'assets/schools/n1w4hprp-0123abcd.webp', 'assets/schools/n1w4hprp-89abcdef.webp'], 'assets/schools/n1w4hprp-0123abcd.webp', null]);
+  /* 분교 학생(본교 게시판 글을 같이 받는다)에게 본교 글의 학교 사진을 쓰지 않는다 — 다른 캠퍼스 사진이고 「사진 출처」(내 학교 사진만)와도 안 맞는다 (리뷰 10-04) */
+  A.me('한양대학교 ERICA캠퍼스');
+  const branch = A.schoolPhotoFor(n, 0);
+  A.me('경희대학교');
+  eq('    분교 학생에게는 본교 글의 학교 사진을 안 쓴다 · 내 학교 글이면 쓴다', [branch, !!A.schoolPhotoFor(n, 0)], [null, true]);
+  A.me(null);
   /* ③ 구역 — 글의 사진이 없을 때만 넘기고, 쓴 사진의 출처를 구역 아래에 (라이선스 표기 의무) */
   const sec = cut('schoolNewsHtml');
   eq('  시트 목록 — 글의 사진이 없을 때만 학교 사진(차례대로) · 🔴 출처 줄은 학생 화면에 없다(10-04 개발자 지시 "happy talk 이므로 빼")', [/const sp = n\.thumb && NEWS_THUMB_RE\.test\(n\.thumb\) \? null : schoolPhotoFor\(n, turn\[n\.school\] = \(turn\[n\.school\] \?\? -1\) \+ 1\);/.test(sec), /news-photo-credit|위키미디어/.test(sec + cut('homeNewsHtml'))], [true, false]);
@@ -2643,7 +2651,7 @@ console.log('\n■ 학교 대표 사진 (2026-10-03 개발자 지시 "썸네일�
   eq('    출처는 앱 권한 · 오픈소스 라이선스 화면 「사진 출처」 — 우리 학교 사진마다 작가·라이선스 · 공용 페이지 링크(공용 주소만)', [/<p class="perm-title">사진 출처<\/p>/.test(pc), /\$\{esc\(x\.credit\)\} · 위키미디어 공용/.test(pc), /commons\\\.wikimedia\\\.org/.test(pc), /<\/section>\$\{photoCreditsHtml\(\)\}`;/.test(app)], [true, true, true, true]);
   eq('    목록은 소식을 받을 때 같이 받는다(한 번) · 늦게 와도 다시 그린다', /get\('assets\/schools\/photos\.json'\)\.then\(\(d\) => \{ if \(d && d\.schools && !schoolPhotos\) \{ schoolPhotos = d; if \(liveNews\) rerenderVisible\(\); \} \}\);/.test(app), true);
   eq('    못 받은 그림(글의 사진·학교 사진 모두 img.notice-thumb)은 빼고 글자 카드로', /if \(!img \|\| !img\.classList \|\| !img\.classList\.contains\('notice-thumb'\)\) return;[\s\S]{0,200}?img\.remove\(\);\s*if \(card\) card\.classList\.remove\('has-thumb'\);/.test(app), true);
-  eq('    띠 카드 — 글의 사진을 못 받으면 학교 사진으로 한 번 갈아 끼우고, 그것도 못 받으면 사진만 뺀다(바탕색 칸)', /if \(img && img\.classList && img\.classList\.contains\('news-tile-img'\)\) \{\s*const fb = img\.getAttribute\('data-fallback'\);\s*img\.removeAttribute\('data-fallback'\);\s*if \(fb\) img\.src = fb; else img\.remove\(\);/.test(app) && /const fallback = own && sp && SCHOOL_PHOTO_RE\.test\(sp\.src \|\| ''\) \? sp\.src : '';/.test(app), true);
+  eq('    띠 카드 — 글의 사진을 못 받으면 학교 사진으로 한 번 갈아 끼우고, 그것도 못 받으면 사진만 뺀다(바탕색 칸)', /if \(img && img\.classList && img\.classList\.contains\('news-tile-img'\)\) \{\s*const fb = img\.getAttribute\('data-fallback'\);[\s\S]{0,160}?img\.removeAttribute\('data-fallback'\);[\s\S]{0,80}?if \(fb\) \{[^}]*img\.src = fb; \} else img\.remove\(\);/.test(app) && /const fallback = own && sp && SCHOOL_PHOTO_RE\.test\(sp\.src \|\| ''\) \? sp\.src : '';/.test(app), true);
   /* 리뷰(10-03) — 시작 화면 사진 셋에 번호판·택시·행인이 컸다. 72px 에선 안 보여도 640px 파일은 공개 주소 → 고른 기록의 crop 으로 파일에서 덜어 낸다 */
   eq('    잘라 낼 자리(crop 비율 → 픽셀 상자) · 틀린 값은 자르지 않음(null)', [SP.cropBox(1000, 750, [0, 0, 1, 0.78]), SP.cropBox(1000, 666, [0.23, 0, 0.77, 1]), SP.cropBox(1000, 750, [0.5, 0, 0.6, 1]), SP.cropBox(1000, 750, [0, 0, 1]), SP.cropBox(1000, 750, [0, 0, -1, 1])],
     [{ left: 0, top: 0, width: 1000, height: 585 }, { left: 230, top: 0, width: 770, height: 666 }, null, null, null]);

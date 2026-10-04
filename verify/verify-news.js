@@ -95,7 +95,7 @@ const tiles = (page) => page.$$eval('#home-news .news-tile', (els) => els.map((e
     title: t.textContent.trim(), meta: e.querySelector('.news-tile-meta').textContent.trim(), href: e.getAttribute('href'), target: e.getAttribute('target'),
     w: Math.round(e.getBoundingClientRect().width), box: [Math.round(box.width), Math.round(box.height)],
     img: img ? (img.getAttribute('src').match(/[^/]+$/) || [''])[0] : null, loaded: !!(img && img.complete && img.naturalWidth > 0),
-    lines: Math.round(t.getBoundingClientRect().height / 19), label: /학교\s*사진/.test(e.textContent),
+    lines: Math.round(t.getBoundingClientRect().height / 19), label: /학교\s*사진/.test(e.textContent), pos: img ? img.style.objectPosition : null,
   };
 }));
 /* 띠를 화면에 들이고 끝까지 넘겨 늦게 싣기(lazy) 사진까지 부른다 */
@@ -125,6 +125,7 @@ const settle = async (page) => {
     eq('④ 카드 148px · 사진 칸 148×104 · 제목은 두 줄까지', t.map((x) => [x.w, x.box, x.lines <= 2]), Array(4).fill([148, [148, 104], true]));
     eq('⑥ 사진 — 글의 사진 / 못 받은 글의 사진은 학교 사진으로 / 바깥 주소 글·사진 없는 글은 학교 사진 · 모두 그려짐 · 「학교 사진」 글자 없음',
       t.map((x) => [x.img, x.loaded, x.label]), [['aaaaaaaaaaaaaaaa.webp', true, false], ['n19cz03g-0123abcd.webp', true, false], ['n19cz03g-0123abcd.webp', true, false], ['n19cz03g-0123abcd.webp', true, false]]);
+    eq('⑥ 학교 사진은 고른 초점으로 — 글의 사진이 깨져 갈아 끼운 카드도 (리뷰 10-04)', t.map((x) => x.pos), ['', '50% 40%', '50% 40%', '50% 40%']);
     eq('⑥ 바깥 주소로 그림을 부르지 않았다', await page.evaluate(() => performance.getEntriesByType('resource').some((r) => /evil\.example/.test(r.name))), false);
     eq('⑥ 홈에 사진 출처 줄이 없다 (설명 글 빼기 · 10-04)', await page.evaluate(() => [!!document.querySelector('#screen-home .news-photo-credit'), /위키미디어/.test(document.querySelector('#screen-home').textContent)]), [false, false]);
     eq('④ 페이지는 옆으로 밀리지 않는다 (띠만 넘어간다)', await page.evaluate(() => document.scrollingElement.scrollWidth <= window.innerWidth), true);

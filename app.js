@@ -2940,6 +2940,10 @@ function noticeCardHtml(n, opts) {
    🔴 글마다 해시로 고르면 이웃이 겹친다 — 실측: 전북대 앞 다섯 장이 같은 사진 셋 연속(리뷰 10-03). 차례를 모르면(k 없음) 첫 장 */
 let schoolPhotos = null;   // assets/schools/photos.json — 못 받으면 null(그대로 글자 카드)
 function schoolPhotoFor(n, k) {
+  /* 🔴 내 학교 글에만 — 분교 학생(한양 ERICA·건국 글로컬·홍익 세종)은 본교 게시판 글을 같이 받는데, 본교 사진은 **다른 캠퍼스 사진**이고
+     출처(「사진 출처」 · 내 학교 사진만 적는다)도 안 맞는다(리뷰 10-04). 그 글은 글의 사진만, 없으면 바탕색 칸 */
+  const me = state.profile && state.profile.school;
+  if (me && n && n.school !== me) return null;
   const list = ((schoolPhotos && schoolPhotos.schools && schoolPhotos.schools[n.school]) || [])
     .filter((x) => x && SCHOOL_PHOTO_RE.test(x.src || ''));
   if (!list.length) return null;
@@ -3343,14 +3347,18 @@ function homeNewsHtml() {
   const turn = {};
   const tiles = mine.slice(0, NEWS_STRIP_N).map((n) => {
     const own = n.thumb && NEWS_THUMB_RE.test(n.thumb) ? n.thumb : '';
-    const sp = schoolPhotoFor(n, own ? 0 : (turn[n.school] = (turn[n.school] ?? -1) + 1));
+    /* 차례는 모든 카드가 센다 — 글의 사진이 깨져 학교 사진으로 바뀐 카드가 이웃과 같은 사진이 되지 않게(리뷰 10-04) */
+    const sp = schoolPhotoFor(n, turn[n.school] = (turn[n.school] ?? -1) + 1);
+    const spFocus = sp && PHOTO_FOCUS_RE.test(sp.focus || '') ? sp.focus : '';
     const src = own || (sp && sp.src) || '';
-    const focus = !own && sp && PHOTO_FOCUS_RE.test(sp.focus || '') ? sp.focus : '';
+    const focus = own ? '' : spFocus;
     const fallback = own && sp && SCHOOL_PHOTO_RE.test(sp.src || '') ? sp.src : '';
     const href = safeUrl(n.url);
-    const meta = [n.kind, newsDay(n)].filter(Boolean).join(' · ');
+    /* 링크 이름은 sourceLink 한 곳 — 글 화면이 아닌 링크(목록 표식 등)면 윗줄에 그 이름을 붙인다(시트 카드와 같은 말 · 리뷰 10-04) */
+    const link = sourceLink(n, 'card');
+    const meta = [n.kind, newsDay(n), link.cls !== 'post' && link.label ? link.label : ''].filter(Boolean).join(' · ');
     return `<a class="news-tile"${href ? ` href="${esc(href)}" target="_blank" rel="noopener"` : ''}>
-      <span class="news-tile-photo">${src ? `<img class="news-tile-img" src="${esc(src)}" alt="" loading="lazy" decoding="async" width="148" height="104"${focus ? ` style="object-position:${esc(focus)}"` : ''}${fallback ? ` data-fallback="${esc(fallback)}"` : ''} />` : ''}</span>
+      <span class="news-tile-photo">${src ? `<img class="news-tile-img" src="${esc(src)}" alt="" loading="lazy" decoding="async" width="148" height="104"${focus ? ` style="object-position:${esc(focus)}"` : ''}${fallback ? ` data-fallback="${esc(fallback)}"${spFocus ? ` data-fallback-focus="${esc(spFocus)}"` : ''}` : ''} />` : ''}</span>
       <span class="news-tile-meta">${esc(meta)}</span>
       <span class="news-tile-title">${esc(unent(n.title))}</span>
     </a>`;
@@ -6446,8 +6454,10 @@ function bindEvents() {
     /* 홈 띠 카드(2026-10-04): 글의 사진을 못 받으면 학교 사진으로 한 번 갈아 끼우고, 그것도 못 받으면 사진만 빼고 바탕색 칸으로 */
     if (img && img.classList && img.classList.contains('news-tile-img')) {
       const fb = img.getAttribute('data-fallback');
+      const ff = img.getAttribute('data-fallback-focus');
       img.removeAttribute('data-fallback');
-      if (fb) img.src = fb; else img.remove();
+      img.removeAttribute('data-fallback-focus');
+      if (fb) { if (ff && PHOTO_FOCUS_RE.test(ff)) img.style.objectPosition = ff; img.src = fb; } else img.remove();
       return;
     }
     /* 글의 사진·학교 사진 모두 img.notice-thumb 한 장이 썸네일 자리다 */
