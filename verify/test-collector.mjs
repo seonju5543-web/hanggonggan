@@ -1681,6 +1681,15 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
       [r.status, got.map((x) => x.title).sort(), (got.find((x) => x.title === '가') || {}).deadline, ((got.find((x) => x.title === '가') || {}).eligibilityLines || []).length],
       [0, ['가', '나', '다'], '2026-11-01', 1]);
   }
+  /* 🔴 저장 단계가 충돌로 죽어도 수집분은 남는다 (2026-10-04 run 37203460175 — 얹기 충돌에 그 자리에서 죽어 실행 결과가 통째로 사라졌다).
+     두 수집 로봇: 얹기 실패는 되돌리고 빠져나와 묶음을 만들고 · 실패 때만 실행 결과물로 올린다. */
+  for (const f of ['collect-scholarships.yml', 'browser-collect.yml']) {
+    const y = strip(readText(new URL(`../.github/workflows/${f}`, import.meta.url)));
+    eq(`  ${f}: 얹기 충돌은 되돌리고 묶음을 남겨 올린다`,
+      /if ! git pull --rebase --autostash origin "\$\{GITHUB_REF_NAME\}"; then\s*git rebase --abort/.test(y)
+        && /git bundle create unsaved\/unsaved\.bundle/.test(y)
+        && /if: failure\(\)\s*uses: actions\/upload-artifact@v4\s*with:\s*name: unsaved-[\s\S]{0,80}path: unsaved\//.test(y), true);
+  }
   /* ③ 출처 */
   const src = JSON.parse(readText(new URL('../collector/activity-sources.json', import.meta.url)));
   const served = createRequire(import.meta.url)('../match-engine.js').SERVED_SCHOOLS;   // 2026-09-29: 두 곳 → 44곳, 상수 한 곳에서 읽는다
