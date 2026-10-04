@@ -9,7 +9,7 @@ name: Pages 빌드 깨우기
 on:
   push:
     branches: ['main']
-  workflow_dispatch:
+  # 손으로 부르는 단추는 두지 않는다 — 빌드가 빠졌으면 check-deploy-sync 가 요청 명령을 그대로 보여 준다(관리자 화면 로봇 목록에 넣을 로봇이 아니다)
 
 permissions:
   pages: write
