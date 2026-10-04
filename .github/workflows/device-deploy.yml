@@ -95,6 +95,8 @@ jobs:
             echo "❌ '$SRC' 브랜치를 찾지 못했어요."
             echo "state=nobranch" >> "$GITHUB_OUTPUT"; exit 0
           fi
+          # 합치기 전 기본 브랜치 위치 — 이 배포가 insta/run-notify.txt 를 바꿨는지 아래 '인스타 수정본 알림 깨우기' 가 본다
+          echo "before=$(git rev-parse "origin/$BASE")" >> "$GITHUB_OUTPUT"
 
           # ── 표식 확인 (push 로 깨어났을 때만) ──────────────────────────
           # 표식 파일이 '지금 push 된 브랜치'를 가리킬 때만 배포한다. 다른 세션이 기본 브랜치를
@@ -187,6 +189,55 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
         run: gh workflow run verify-ui.yml --repo "$REPO" --ref claude/nice-heisenberg-WESq5
+
+      # 🔴 채팅에서 고친 인스타 카드의 알림을 깨운다 (2026-10-04 로봇·도구 점검 · 스킬 insta-revise 5-3).
+      #    작업 브랜치만 쓰는 세션은 insta/run-notify.txt 를 이 워크플로로 기본 브랜치에 올리는데, 이 워크플로의 push 는
+      #    다른 워크플로를 못 깨워(위 머리말) insta.yml 의 push 트리거가 **조용히 안 돌았다** — 수정본 알림이 개발자에게 안 갔다.
+      #    버튼 실행(workflow_dispatch)만은 이 열쇠로도 깨어난다(화면 검사 깨우기와 같은 예외). 기본 브랜치에 폴더가 올라간 **뒤**여야 한다
+      #    (insta.yml 이 거기서 insta/pub/<코드> 를 찾는다). 사람이 기본 브랜치에 직접 올린 표식은 insta.yml 의 push 트리거가 그대로 받는다 —
+      #    여기는 이 배포가 그 파일을 바꿨을 때만 깨우므로 두 번 울리지 않는다.
+      #    🔴 step 글자는 insta.yml 선택지와 한 글자도 다르면 안 된다(422 거절 — 관문 verify/health-gates/insta.mjs 가 대조한다).
+      - name: 인스타 수정본 알림 깨우기 (insta/run-notify.txt 가 바뀌었을 때)
+        id: instanotify
+        if: steps.run.outputs.state == 'deployed' || steps.run.outputs.state == 'uptodate'
+        continue-on-error: true
+        timeout-minutes: 3
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BASE: claude/nice-heisenberg-WESq5
+          BEFORE: ${{ steps.run.outputs.before }}
+        run: |
+          set -u
+          [ -n "$BEFORE" ] || { echo '배포 전 기본 브랜치 위치를 몰라 건너뜁니다.'; exit 0; }
+          git fetch origin "$BASE"
+          if [ -z "$(git diff --name-only "$BEFORE" "origin/$BASE" -- insta/run-notify.txt)" ]; then
+            echo '인스타 알림 표식(insta/run-notify.txt)은 이번 배포로 바뀌지 않았습니다.'; exit 0
+          fi
+          CODE="$(git show "origin/$BASE:insta/run-notify.txt" | sed -n 's/^code:[[:space:]]*//p' | head -1 | tr -d '\r' | sed 's/[[:space:]]*$//')"
+          if ! printf '%s' "$CODE" | grep -qE '^[A-Za-z0-9_-]+$'; then
+            echo "insta/run-notify.txt 의 code: 줄이 비었거나 공고 코드 꼴이 아닙니다('$CODE') — 알림을 깨우지 않습니다."; exit 0
+          fi
+          gh workflow run insta.yml --repo "$REPO" --ref "$BASE" -f step='알림 (준비된 카드를 다시 보낸다)' -f code="$CODE"
+          {
+            echo "📸 인스타 수정본 알림을 깨웠습니다 — 공고 \`$CODE\`"
+            echo "실행 목록: https://github.com/$REPO/actions/workflows/insta.yml"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # 깨우기가 넘어지면 수정본 알림이 안 간 것이다 — 배포는 끝났으니 배포 실패가 아니라 따로 이슈로 부른다(사람이 확인하고 닫는다).
+      - name: 🚨 인스타 수정본 알림을 못 깨웠다
+        if: steps.instanotify.outcome == 'failure'
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          title: 🚨 인스타 수정본 알림을 못 깨웠습니다
+          label: insta-fail
+          label-description: 인스타 게시 실패
+          body: |
+            「이 기기에서 배포」 가 insta/run-notify.txt 를 기본 브랜치에 올렸는데 「인스타 카드뉴스 게시」(알림)를 깨우지 못했습니다 — 수정본이 개발자에게 안 갔습니다.
+            Actions 「인스타 카드뉴스 게시」 를 단계 「알림 (준비된 카드를 다시 보낸다)」 와 run-notify.txt 의 code 로 직접 실행하세요.
+            실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       # 🔴 배포가 됐으면 옛 '배포 실패' 경보를 닫는다 (2026-10-04 로봇·도구 점검 · 묶음 alerts).
       #    아래 실패 알림은 열기·댓글만 해서, 그 뒤 손으로든 다음 배포로든 다 나간 작업의 🚨 가 09-14 부터 열려 있었다(#274 —

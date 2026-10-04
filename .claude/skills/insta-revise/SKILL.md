@@ -49,8 +49,11 @@ description: Use when a developer asks in chat to change an Instagram card that 
 1. `insta/run-notify.txt` 의 `code:` 줄에 코드, `at:` 줄에 지금 시각(같은 코드를 다시 보낼 때 push 가 '변경' 이 되게).
 2. 커밋에 담는 것: `insta/pub/<코드>/` · `insta/seen.json` · `insta/run-notify.txt` · (고쳤다면) 판형 파일.
    🔴 `insta/out/` · `node_modules` · `package.json` 은 담지 않는다.
-3. **기본 브랜치**(`claude/nice-heisenberg-WESq5`)에 닿아야 워크플로가 돈다. 작업 브랜치만 쓰는 세션이면
-   `deploy/run-deploy.txt` 의 `branch:` 줄로 「이 기기에서 배포」 를 태운다(CLAUDE.md 「휴대폰·웹 세션…」).
+3. **기본 브랜치**(`claude/nice-heisenberg-WESq5`)에 닿아야 워크플로가 돈다. 기본 브랜치에 직접 push 하면 그 push 가 알림을 깨운다.
+   작업 브랜치만 쓰는 세션이면 `deploy/run-deploy.txt` 의 `branch:` 줄로 「이 기기에서 배포」 를 태운다(CLAUDE.md 「휴대폰·웹 세션…」) —
+   🔴 그 길로 올린 push 는 다른 워크플로를 못 깨우므로 **「이 기기에서 배포」 가 알림까지 깨운다**(run-notify.txt 가 바뀌었을 때 ·
+   2026-10-04). 그 실행 요약의 「📸 인스타 수정본 알림을 깨웠습니다」 줄과 실행 주소를 확인해 개발자에게 준다.
+   깨우지 못했으면 「🚨 인스타 수정본 알림을 못 깨웠습니다」 이슈가 선다 — 그때는 Actions 「인스타 카드뉴스 게시」 를 알림 + code 로 직접 실행한다.
 4. 워크플로 「인스타 카드뉴스 게시」 가 그 폴더를 **다시 그리지 않고** 개발자 셋에게 이슈(담당자 지정)로,
    시크릿이 있으면 메일로도 보낸다. 실행 주소를 개발자에게 준다.
 
