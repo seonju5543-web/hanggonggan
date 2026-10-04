@@ -87,7 +87,7 @@ jobs:
           # push-to-run 파일의 only:/max:/mode: 는 그 파일을 고쳐 push 한 실행에만 — 매일 예약은 늘 전부를 본다
           LINK_CHECK_TXT: ${{ github.event_name == 'push' && '1' || '' }}
           # 후보만 보는 실행: 수동 실행의 mode, 또는 이번 push 가 후보 파일을 고쳤을 때(새로 만든 것 포함)
-          LINK_CHECK_MODE: ${{ inputs.mode || ((github.event_name == 'push' && (contains(toJSON(github.event.commits.*.modified), 'collector/link-candidates.json') || contains(toJSON(github.event.commits.*.added), 'collector/link-candidates.json'))) && 'candidates' || '') }}
+          LINK_CHECK_MODE: ${{ inputs.mode || ((github.event_name == 'push' && (contains(toJSON(github.event.commits.*.modified), 'collector/link-candidates.json') || contains(toJSON(github.event.commits.*.added), 'collector/link-candidates.json') || contains(toJSON(github.event.commits.*.removed), 'collector/link-candidates.json'))) && 'candidates' || '') }}
           LINK_CHECK_CAND_BUDGET_MS: '300000'  # 5분 — 위 20분에서 쓴다
         run: node collector/link-check.mjs ${{ inputs.dry && '--dry' || '' }}
 

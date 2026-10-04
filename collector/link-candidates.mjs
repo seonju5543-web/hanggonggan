@@ -105,6 +105,8 @@ function checkOne(raw, today) {
     if (shape === 'marker') return '게시판 목록 표식(#n-) — 원문 주소가 아님';
     if (shape === 'listid' || SL.isListPlusId(u)) return '목록 주소에 글 번호만 붙인 꼴(목록이 열림)';
     if (ds === 'kosaf' && (shape === 'home' || shape === 'root')) return '첫 화면 주소 — 층2는 이미 재단 홈페이지를 보여 준다';
+    /* 사이트 첫 화면은 원문이 아니다 — 대외활동만 공모전 전용 사이트(맨 도메인)가 곧 그 공모전일 수 있다(리뷰 2026-10-04: 재단 첫 화면이 「원문 공고」로 나갈 뻔) */
+    if (ds !== 'activities' && (shape === 'home' || shape === 'root')) return '사이트 첫 화면 주소 — 그 공고의 글 주소가 아님';
     if (!SL.fixUrlUsable(u)) return '원문으로 쓸 수 없는 주소 꼴';
   }
   const addedAt = str(raw.addedAt, 10);
@@ -200,8 +202,15 @@ export function dateShown(text, iso) {
   if (new RegExp(`${y}\\s*[.\\-/년]\\s*0?${m}\\s*[.\\-/월]\\s*0?${d}(?!\\d)`).test(s)) return true;
   if (new RegExp(`(?<![\\d.])${String(y).slice(2)}\\s*\\.\\s*0?${m}\\s*\\.\\s*0?${d}(?!\\d)`).test(s)) return true;
   const md = `(?<![\\d.])0?${m}\\s*(?:\\.|월)\\s*0?${d}(?!\\d)\\s*(?:일|\\.)?`;
-  if (new RegExp(`${md}\\s*(?:\\([월화수목금토일]\\)|부터|까지|[~〜])`).test(s)) return true;
-  return new RegExp(`[~〜][^~〜\\n]{0,40}?${md}`).test(s);
+  /* 연도 없는 짧은 꼴은 **바로 앞(40자 안)의 온전한 날짜**가 다른 해면 그 해의 날짜다 — 해마다 같은 날짜로 뽑는 재단의 작년 글이
+     「3. 15.(토)」만으로 통과했다(리뷰 2026-10-04 · '2025. 3. 2.(일) ~ 3. 15.(토)'). 「2025학년도」 같은 낱말은 날짜가 아니라 보지 않는다 */
+  const otherYearBefore = (i) => {
+    const full = [...s.slice(Math.max(0, i - 40), i).matchAll(/(?<!\d)(20\d{2})\s*[.\-/년]\s*\d{1,2}\s*[.\-/월]\s*\d{1,2}(?!\d)/g)];
+    return full.length > 0 && Number(full[full.length - 1][1]) !== y;
+  };
+  const shortHit = (re) => { for (const mm of s.matchAll(new RegExp(re, 'g'))) if (!otherYearBefore(mm.index)) return true; return false; };
+  if (shortHit(`${md}\\s*(?:\\([월화수목금토일]\\)|부터|까지|[~〜])`)) return true;
+  return shortHit(`[~〜][^~〜\\n]{0,40}?${md}`);
 }
 const RESULT_WORD = /결과|합격|선정자|명단|발표/;
 const yearsIn = (s) => (String(s || '').match(/(?<!\d)20\d{2}(?!\d)/g) || []).map(Number);
@@ -222,30 +231,54 @@ const seasonFits = (head, openIso) => {
   return mo >= 6 && mo <= 11 ? /하반기|2\s*학기|후기/.test(head) : /상반기|1\s*학기|전기/.test(head);
 };
 /* 회차 판정 — { s: 'ok'|'fail'|'none', why } */
-export function roundCheck({ round, deadline, expectTitles: want = [], head, text }) {
+/* 글 화면에 적힌 온전한 날짜들(2026.10.02 · 2026-10-02 · 2026년 10월 2일) */
+function fullDates(s) {
+  const out = [];
+  for (const m of String(s || '').matchAll(/(?<!\d)(20\d{2})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})(?!\d)/g)) {
+    const iso = `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
+    if (isoOk(iso)) out.push(iso);
+  }
+  return out;
+}
+/* 회차 판정 — { s: 'ok'|'fail'|'none', why }
+   🔴 own = **우리 공고의 제목만**(후보가 적어 온 제목은 넣지 않는다) — 결과 글 판정이 후보 제목의 「결과」 낱말로 꺼지던 것(리뷰 2026-10-04)
+   ref = 우리가 그 글을 본 날(게시일·수집일·등록일) — 마감도 연도도 없는 피드 글은 화면의 날짜가 그 무렵인지로 회차를 가린다 */
+export function roundCheck({ round, deadline, expectTitles: want = [], ownTitles, head, text, ref }) {
   const all = `${head || ''}\n${text || ''}`;
+  const own = ownTitles || want;
+  /* 결과·명단 발표 글 — 우리 공고 제목에 그 낱말이 없는데 열린 글 제목에 있으면 다른 글이다(층2만 보던 것을 모든 묶음에 · 리뷰 2026-10-04) */
+  const resultPost = RESULT_WORD.test(head || '') && !own.some((w) => RESULT_WORD.test(w));
   if (round && round.due) {
     const dueY = Number(round.due.slice(0, 4));
     const ys = yearsIn(head);
     const okYears = [dueY, dueY + 1].concat(Number(round.due.slice(5, 7)) <= 2 ? [dueY - 1] : []);
     if (ys.length && !ys.some((y) => okYears.includes(y))) return { s: 'fail', why: `다른 해 공고(${ys.join('·')}) — 이번 회차 마감 ${round.due}` };
-    if (RESULT_WORD.test(head || '') && !want.some((w) => RESULT_WORD.test(w))) return { s: 'fail', why: '결과·명단 발표 글' };
+    if (resultPost) return { s: 'fail', why: '결과·명단 발표 글' };
     const clash = seasonClash(head, round.open);
     if (clash) return { s: 'fail', why: clash };
+    /* 🔴 글이 스스로 말하는 마감이 다르면 먼저 거절 — 그 뒤에야 날짜가 보이는지 본다(날짜 보임이 다른 해 마감을 덮던 것 · 리뷰 2026-10-04) */
     const dl = extractDeadline(all);
-    if (dl === round.due || dateShown(all, round.due) || dateShown(all, round.open)) return { s: 'ok', why: '마감·접수 시작일이 보임' };
     if (dl && dl !== round.due) return { s: 'fail', why: `마감이 다름(글 ${dl} · 이번 회차 ${round.due})` };
+    if (dl === round.due || dateShown(all, round.due) || dateShown(all, round.open)) return { s: 'ok', why: '마감·접수 시작일이 보임' };
     return { s: 'none', why: '회차를 가릴 날짜가 안 보임' };
   }
-  const wantYears = [...new Set(want.flatMap(yearsIn))];
+  const wantYears = [...new Set(own.flatMap(yearsIn))];
   const ys = yearsIn(head);
   if (wantYears.length && ys.length && !ys.some((y) => wantYears.includes(y))) return { s: 'fail', why: `다른 해 글(${ys.join('·')})` };
+  if (resultPost) return { s: 'fail', why: '결과·명단 발표 글' };
   if (isoOk(deadline)) {
     const dl = extractDeadline(all);
-    if (dl === deadline || dateShown(all, deadline)) return { s: 'ok', why: '마감이 보임' };
     if (dl && dl !== deadline) return { s: 'fail', why: `마감이 다름(글 ${dl} · 우리 ${deadline})` };
+    if (dl === deadline || dateShown(all, deadline)) return { s: 'ok', why: '마감이 보임' };
   }
-  return { s: 'none', why: '' };
+  if (wantYears.length && ys.some((y) => wantYears.includes(y))) return { s: 'ok', why: '제목의 해가 같음' };
+  if (isoOk(ref)) {
+    const ds = fullDates(all);
+    const lo = addDays(ref, -150); const hi = addDays(ref, 30);
+    if (ds.some((x) => x >= lo && x <= hi)) return { s: 'ok', why: '글의 날짜가 우리가 본 무렵' };
+    if (ds.length) return { s: 'fail', why: `글의 날짜가 우리가 본 때(${ref})와 멂(${ds.slice(0, 2).join('·')}) — 다른 해의 같은 제목 글` };
+  }
+  return { s: 'none', why: '회차를 가릴 해·날짜가 안 보임' };
 }
 
 /* ── 사이트 ─────────────────────────────────────────────────────────
@@ -341,15 +374,22 @@ export function buildIndex(data) {
   const d = data || {};
   const schoolHosts = new Map();
   const hostSchool = new Map();
+  const hostSchools = new Map();
   for (const b of d.boards || []) {
     for (const u of b.urls || []) {
       if (!u || !/^https?:/i.test(u)) continue;
       const es = hostEntry(u);
       if (!schoolHosts.has(b.school)) schoolHosts.set(b.school, []);
       schoolHosts.get(b.school).push(...es);
-      for (const e of es) if (!hostSchool.has(e.host)) hostSchool.set(e.host, b.school);
+      for (const e of es) {
+        if (!hostSchool.has(e.host)) hostSchool.set(e.host, b.school);
+        if (!hostSchools.has(e.host)) hostSchools.set(e.host, new Set());
+        hostSchools.get(e.host).add(b.school);
+      }
     }
   }
+  /* 여러 학교·캠퍼스가 같이 쓰는 사이트(korea.ac.kr ↔ 세종 · yonsei.ac.kr ↔ 미래) — 거기서 온 후보는 사람이 본다(리뷰 2026-10-04) */
+  const sharedHosts = new Set([...hostSchools].filter(([, set]) => set.size > 1).map(([h]) => h));
   const schoolOfUrl = (u) => {
     const h = hostOf(u);
     for (const [host, school] of hostSchool) if (h === host || h.endsWith(`.${host}`)) return school;
@@ -359,6 +399,7 @@ export function buildIndex(data) {
   const byKey = new Map();
   const add = (t) => {
     t.fixKey = SL.fixKeys(t.appItem)[0] || '';
+    t.sharedHosts = sharedHosts;
     t.allowed = t.allowed.filter((a, i, arr) => arr.findIndex((b) => b.host === a.host && (b.prefix || '') === (a.prefix || '')) === i);
     targets.push(t);
     const k = `${t.ds}|${t.key}`;
@@ -590,7 +631,9 @@ export function acceptCandidate({ target, cand, obs, verdict, ctx = {} }) {
   /* 관리자가 열어 보고 넣은 후보 — 결정적 증거(404·401·첫 화면/목록으로 돌려보냄)만 막는다(재단 사이트는 클라우드를 자주 막는다) */
   if (c.trusted) {
     if (v.decisive && v.v !== 'post') return { status: 'rejected', why: `관리자 후보지만 ${V_WORD[v.v] || v.v}(${v.why})`, checks: { ...checks, L: 'fail' } };
-    return { status: 'verified', why: `관리자가 넣은 주소 — 로봇이 본 것: ${v.v === 'post' ? '그 공고' : (v.why || v.v)}`, checks: { ...checks, A: 'ok' } };
+    /* 너그러운 것은 **로봇이 못 연 경우(못 읽음·로그인 벽)뿐** — 다른 글·목록이 열렸으면 주소가 틀린 것이다(번호 오타 등 · 리뷰 2026-10-04).
+       열린 글이 보통 판정을 통과하면 아래 길로 그대로 간다 */
+    if (status !== 'rejected' && (v.v === 'unread' || v.v === 'login')) return { status: 'verified', why: `관리자가 넣은 주소 — 로봇은 못 엶(${v.why || v.v})`, checks: { ...checks, A: 'ok' } };
   }
   if (status === 'rejected') return { status, why, checks };
 
@@ -608,12 +651,19 @@ export function acceptCandidate({ target, cand, obs, verdict, ctx = {} }) {
   const want = judgeTitles(t, c);
   const headHit = heads.filter((h) => want.some((w) => headMatches(w, h)));
   const head = (headHit.length ? headHit : [o.docTitle || '']).join(' \n ');
+  /* 제목 자리에서 우리 제목을 **통째로** 못 찾았다 — 「제목」 칸의 앞 24자만 같은 이웃 글(같은 머리의 다른 재단 장학)일 수 있다(리뷰 2026-10-04) */
+  if (!headHit.length) soft('L', '제목 자리에서 우리 공고 제목을 통째로 찾지 못함(앞부분만 같을 수 있음)');
   const text = String(o.text || '');
   const allFp = titleFingerprint(`${heads.join(' ')} ${text}`);
 
   /* H 사이트 — 돌려보내졌으면 닿은 곳으로 */
   const where = o.finalUrl || c.url;
-  if (hostAllowed(where, t.allowed)) pass('H');
+  const whereShape = SL.linkShape(where);
+  if (t.ds !== 'activities' && (whereShape === 'home' || whereShape === 'root')) return { status: 'rejected', why: `사이트 첫 화면이 열림(${hostOf(where)})`, checks: { ...checks, L: 'fail' } };
+  const whereHost = hostOf(where);
+  if (hostAllowed(where, t.allowed) && whereHost !== hostOf(t.raw) && t.sharedHosts && [...t.sharedHosts].some((h) => whereHost === h || whereHost.endsWith(`.${h}`))) {
+    soft('H', `여러 학교·캠퍼스가 같이 쓰는 사이트(${whereHost}) — 다른 캠퍼스의 같은 제목 글일 수 있어 사람 확인`);
+  } else if (hostAllowed(where, t.allowed)) pass('H');
   else {
     const named = [t.orgCore, titleFingerprint(t.school || ''), titleFingerprint(t.org || '')].filter((x) => x && x.length >= 3);
     if (named.some((n) => heads.some((h) => titleFingerprint(h).includes(n)))) soft('H', `처음 보는 사이트(${hostOf(where)}) — 기관 이름은 보임 · 사람 확인`);
@@ -626,11 +676,13 @@ export function acceptCandidate({ target, cand, obs, verdict, ctx = {} }) {
   else pass('T');
 
   /* R 회차 */
-  const rc = roundCheck({ round: t.ds === 'kosaf' ? t.round : null, deadline: t.deadline, expectTitles: want, head, text });
+  const it0 = t.item || {};
+  const ref = String(it0.postedAt || it0.foundAt || it0.listedAt || '').slice(0, 10);
+  const rc = roundCheck({ round: t.ds === 'kosaf' ? t.round : null, deadline: t.deadline, expectTitles: want, ownTitles: t.titles, head, text, ref });
   if (rc.s === 'fail') reject('R', rc.why);
   else if (rc.s === 'ok') pass('R');
-  else if (t.ds === 'kosaf') soft('R', rc.why || '회차를 가릴 날짜가 안 보임');
-  else checks.R = 'n/a';
+  /* 회차를 가릴 해·마감·날짜가 하나도 없으면 사람에게 — 해마다 같은 제목으로 올라오는 글(국가근로·휴강 안내)이 있다(리뷰 2026-10-04) */
+  else soft('R', rc.why || '회차를 가릴 해·날짜가 안 보임');
 
   let alsoOk;
   if (t.ds === 'kosaf') {
@@ -643,7 +695,11 @@ export function acceptCandidate({ target, cand, obs, verdict, ctx = {} }) {
     if (t.orgCore && t.orgCore.length >= 2 && !allFp.includes(t.orgCore) && !(orgShort.length >= 4 && allFp.includes(orgShort)) && !attachHead) reject('X', '재단 이름이 화면에 없음');
     else pass('X');
     const mine = t.programCore && allFp.includes(t.programCore);
-    if (!(t.programCore && headFp.includes(t.programCore)) && (t.siblings || []).some((s) => s.length >= 2 && headFp.includes(s))) reject('P', '같은 재단의 다른 사업 글');
+    /* 형제 사업 이름이 우리 이름을 품으면(신입대학생 ⊃ 대학생) 형제 이름을 지운 뒤에도 우리 이름이 남아야 우리 글이다(리뷰 2026-10-04) */
+    const sibs = (t.siblings || []).filter((x) => x.length >= 2);
+    const headLeft = sibs.filter((x) => t.programCore && x.includes(t.programCore) && x !== t.programCore).reduce((acc, x) => acc.split(x).join(' '), headFp);
+    const oursInHead = !!(t.programCore && headLeft.includes(t.programCore));
+    if (!oursInHead && sibs.some((x) => headFp.includes(x))) reject('P', '같은 재단의 다른 사업 글');
     else if (mine || attachHead) pass('P');
     else if (!t.programCore && !(t.attachTitles || []).length) checks.P = 'n/a';
     else soft('P', '사업 이름이 화면에 안 보임');
@@ -701,6 +757,13 @@ export function nextCandState(prev, cand, res, today, extra = {}) {
 const SRC_RANK = { admin: 0, search: 1, board: 1, data: 1, twin: 2, match: 3 };
 export function publishFix(candState, index, { bad = {} } = {}) {
   const fix = {}; const dropped = [];
+  /* 주소 열쇠(u:)를 같이 쓰는 **다른** 글(같은 제목 표식의 다른 달 글 · 같은 첫 화면) — 한 글의 원문을 실으면 다른 글도 그 원문을 연다(리뷰 2026-10-04) */
+  const keyTitles = new Map();
+  for (const x of index.targets || []) {
+    if (!x.fixKey || !x.fixKey.startsWith('u:')) continue;
+    if (!keyTitles.has(x.fixKey)) keyTitles.set(x.fixKey, new Set());
+    keyTitles.get(x.fixKey).add(`${x.ds}|${titleFingerprint(x.titles[0] || '')}|${(x.item && (x.item.postId || x.item.foundAt)) || ''}`);
+  }
   const entries = Object.entries(candState || {}).filter(([, e]) => e && e.status === 'verified' && e.url)
     .sort(([, a], [, b]) => ((b.trusted ? 1 : 0) - (a.trusted ? 1 : 0)) || ((SRC_RANK[a.source] ?? 1) - (SRC_RANK[b.source] ?? 1)) || String(a.verifiedAt || '').localeCompare(String(b.verifiedAt || '')));
   SL.setLinkChecks({ bad });
@@ -718,8 +781,12 @@ export function publishFix(candState, index, { bad = {} } = {}) {
         const u = SL.decodeUrlEntities(e.url);
         if (!SL.fixUrlUsable(u)) { drop('원문으로 쓸 수 없는 주소 꼴'); continue; }
         if (bad[u]) { drop(`원문 링크 확인 로봇이 문제로 확정(${bad[u].v})`); continue; }
+        if ((keyTitles.get(t.fixKey) || new Set()).size > 1) { drop('같은 주소를 쓰는 다른 글이 있음 — 한 글의 원문으로 못 바꿈'); continue; }
         if (fix[t.fixKey]) continue;
-        fix[t.fixKey] = { url: u, at: e.verifiedAt || e.lastAt || '', src: 'robot', ...(t.titles[0] ? { title: t.titles[0] } : {}), ...(t.ds === 'kosaf' ? { round } : {}) };
+        /* 제목은 확인 때 열린 글과 맞춘 것(후보가 적어 온 제목 — 재단 글 짝짓기는 그 글 제목)을 먼저 — 날마다 다시 볼 때 같은 제목으로 잰다 */
+        /* 검색 결과 제목('search')은 증거일 뿐이라 쓰지 않는다 — 우리 기록·짝짓기·게시판 줄에서 온 제목만(확인 때 판정에 쓴 것과 같은 출처) */
+        const ftitle = (['match', 'twin', 'data', 'board'].includes(e.source) && e.title && String(e.title).trim()) || t.titles[0] || '';
+        fix[t.fixKey] = { url: u, at: e.verifiedAt || e.lastAt || '', src: 'robot', ...(ftitle ? { title: ftitle } : {}), ...(t.ds === 'kosaf' ? { round } : {}) };
       }
     }
   } finally {

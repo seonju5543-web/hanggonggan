@@ -318,4 +318,27 @@ export default async function gate(eq, ctx) {
     listNow, ['게시판 목록 ↗', true, true]);
   eq('  장부가 「열리지 않음」을 확정한 주소 — (확인 필요) + 로봇이 본 것 한 줄', goneNow, ['원문 공고(확인 필요) ↗', true, '공고 원문 보기(확인 필요) ↗']);
   eq('  장부를 비우면 예전 글자 그대로 (승인된 화면 — 보통 주소는 「원문 공고 ↗」)', textOf(F('sourceLinkHtml')(pageReg)), '원문 공고 ↗');
+
+  /* (d) 바로잡은 원문(⑥)이 있으면 **이름과 주소가 함께** 바뀐다 (리뷰 2026-10-04 — 카드·도우미가 이름은 link 에서, 주소는 n.url 에서 받아
+     「원문 보기 ↗」 를 누르면 목록이 열렸다). 그린 화면의 href 를 잰다 — 이름만 재면 이 사고를 못 본다 */
+  {
+    const MARK = 'https://fix.ac.kr/bbs/list.do#n-%ED%91%9C%EB%B3%B8';
+    const FIXED = 'https://fix.ac.kr/bbs/view.do?id=5';
+    const notice = { title: '표본 공고', url: MARK, school: '표본대학교', foundAt: '2026-10-04' };
+    const act = { title: '표본 활동', url: 'https://act.or.kr/index.htm', kind: '대외활동', foundAt: '2026-10-04' };
+    const reg = { id: 'gate-fix-reg', name: '표본 장학', sourceUrl: MARK, provider: '표본재단' };
+    F('setLinkFixes')({ fix: { [`u:${MARK}`]: { url: FIXED, by: 't', at: '2026-10-04' }, 'u:https://act.or.kr/index.htm': { url: 'https://act.or.kr/notice/view.do?id=9', by: 't', at: '2026-10-04' }, 'id:gate-fix-reg': { url: FIXED, by: 't', at: '2026-10-04' } } });
+    const card = F('noticeCardHtml')(notice, {});
+    const ah = F('activityLinkHtml')(act);
+    const got = [hrefsOf(card)[0], textOf(card).includes('원문 보기 ↗'), hrefsOf(ah)[0], hrefsOf(F('sourceLinkHtml')(reg))[0], hrefsOf(F('appLogLinkHtml')(reg))[0], hrefsOf(F('amountSourceLinkHtml')(reg))[0], F('officialChannel')(reg).url];
+    F('setLinkFixes')(null);
+    eq('(d) 바로잡은 원문 — 카드·활동·상세·신청 내역·금액·제출처가 이름과 함께 **주소도** 그 원문으로 연다', got,
+      [FIXED, true, 'https://act.or.kr/notice/view.do?id=9', FIXED, FIXED, FIXED, FIXED]);
+  }
+  /* 함수로 떼어 재기 어려운 자리(도우미 · 홈 사진 띠 · 제출처 열기 단추)는 글자로 — 링크 주소를 데이터 칸에서 바로 꺼내지 않는다 */
+  const appSrcD = read('app.js');
+  const chatSrcD = read('chat.js');
+  eq('  링크 주소를 데이터 칸(n.url · sch.sourceUrl)에서 바로 꺼내 여는 자리가 없다 — 도우미·홈 사진 띠·제출처 열기 단추 포함',
+    [(appSrcD.match(/safeUrl\((?:n|s|sch|it|item)\.(?:url|sourceUrl)\)/g) || []), /safeUrl\(ch\.url \|\| sch\.sourceUrl\)/.test(appSrcD), /safeUrl\(n\.url\)/.test(chatSrcD), /const url = chatSafe\(\(\) => safeUrl\(\(link && link\.href\) \|\| n\.url\), ''\);/.test(chatSrcD)],
+    [[], false, false, true]);
 }

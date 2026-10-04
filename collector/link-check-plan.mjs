@@ -130,14 +130,17 @@ export function gatherTargets(root, opts = {}) {
     const fix = item && item.hidden ? null : SL.linkFixFor(appItem);
     const raw = appItem.sourceUrl != null && appItem.sourceUrl !== '' ? appItem.sourceUrl : (appItem.url || '');
     if (!fix) { take(ds, raw, item, ref); return; }
-    take(ds, fix.url, item, { ...ref, fix: fix.src });
+    /* 바로잡은 원문의 제목(사람이 넣은 원문 제목 · 로봇이 확인 때 맞춘 글 제목)도 기대 제목에 — 확인 때보다 적은 제목으로 날마다 재면
+       로봇이 제가 확인한 원문을 '다른 글'로 버린다(리뷰 2026-10-04) */
+    take(ds, fix.url, fix.title ? { ...item, fixTitle: fix.title } : item, { ...ref, fix: fix.src });
     if (fix.src === 'robot' && ['page', 'root'].includes(linkShape(raw))) take(ds, raw, item, ref);
   };
   const take = (ds, raw, item, ref) => {
     if (item && item.hidden) { bump(skipped.hidden, ds); return; }
     const shape = linkShape(raw);
     if (shape === 'none') { bump(skipped.noUrl, ds); return; }
-    const titles = item && item.kosafTitles ? item.kosafTitles : expectTitles(item);
+    const titles = [...(item && item.kosafTitles ? item.kosafTitles : expectTitles(item))];
+    if (item && item.fixTitle && !titles.some((t) => titleFingerprint(t) === titleFingerprint(item.fixTitle))) titles.push(item.fixTitle);
     if (shape === 'marker') {
       bump(skipped.marker, ds);
       const u = decodeUrlEntities(raw);
@@ -148,7 +151,7 @@ export function gatherTargets(root, opts = {}) {
     const url = decodeUrlEntities(raw);
     const r = { ds, id: ref.id || '', title: titles[0], where: ref.where || '' };
     /* (리뷰 F2) 기대 제목이 정식 등록의 앱 이름(name)뿐인가 — 게시판 원제목(boardTitle)도 피드 제목도 없으면 판정기가 '다른 글'을 보류한다 */
-    const nameOnly = ds === 'kosaf' ? !!(item && item.nameOnly) : ds === 'registered' && !(item && item.boardTitle);
+    const nameOnly = item && item.fixTitle ? false : (ds === 'kosaf' ? !!(item && item.nameOnly) : ds === 'registered' && !(item && item.boardTitle));
     const had = byUrl.get(url);
     if (!had) {
       byUrl.set(url, { url, raw: String(raw), ds: [ds], id: r.id, title: titles[0], titles: [...titles], nameOnly, host: hostOf(url), origin: originOf(url), refs: [r] });

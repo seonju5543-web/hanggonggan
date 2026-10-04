@@ -550,7 +550,11 @@ function officialChannel(sch) {
   /* 바로잡은 원문(source-link.js ⑥ — 관리자·로봇)이 있으면 그 주소로 — 이 표의 주소를 따로 고르지 않는다 */
   const sl = typeof sourceLink === 'function' ? sourceLink(sch, 'detail') : null;
   const linkUrl = sl ? sl.href : sch.sourceUrl;
-  if (sch.sourceKind === 'kosaf' && !(sl && sl.cls === 'post')) {
+  /* '재단 홈페이지' 이름은 그 링크가 정말 재단 홈(데이터 주소 그대로)일 때만 — 바로잡은 원문이 로봇 확인에서 문제로 드러나면
+     그 주소는 홈페이지가 아니다(목록·다른 글) → 아래 일반 갈래가 목록·(확인 필요)로 정직하게 부른다(리뷰 2026-10-04) */
+  const fixedAway = !!(sl && typeof effectiveLinkUrl === 'function' && typeof decodeUrlEntities === 'function'
+    && sl.href && sl.href !== decodeUrlEntities(sch.sourceUrl || ''));
+  if (sch.sourceKind === 'kosaf' && !(sl && sl.cls === 'post') && !fixedAway) {
     if (!linkUrl) return { label: knownProvider ? sch.provider : '재단', guide };
     return { label: knownProvider ? `${sch.provider} (재단 홈페이지)` : '재단 홈페이지', url: linkUrl, guide };
   }

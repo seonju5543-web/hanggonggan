@@ -40,6 +40,8 @@ export function checkFixUrl(raw, opts = {}) {
   if (!url) return { url, errors: ['주소가 비어 있습니다'], warns };
   if (url.length > FIX_URL_MAX) errors.push(`주소가 너무 깁니다(${FIX_URL_MAX}자 넘음) — 주소 한 줄만 붙여 넣어 주세요`);
   if (/\s/.test(url)) errors.push('주소 안에 빈칸·줄바꿈이 있습니다 — 주소 한 줄만 붙여 넣어 주세요');
+  /* 보이지 않는 글자(메신저·웹에서 복사할 때 따라오는 U+200B 등) — 브라우저가 %E2%80%8B 로 바꿔 보내 다른 화면이 열린다(리뷰 2026-10-04) */
+  if (/\p{Cf}/u.test(url)) errors.push('주소에 보이지 않는 글자가 섞여 있습니다 — 주소창에서 다시 복사해 주세요');
   if (!/^https?:\/\//i.test(url)) {
     errors.push('http:// 또는 https:// 로 시작하는 주소여야 합니다');
     return { url, errors, warns };
@@ -47,6 +49,9 @@ export function checkFixUrl(raw, opts = {}) {
   let x = null;
   try { x = new URL(url); } catch (e) { errors.push('주소 꼴이 아닙니다 — 브라우저 주소창의 주소를 그대로 복사해 주세요'); return { url, errors, warns }; }
   if (!/\./.test(x.hostname)) errors.push('사이트 이름(도메인)이 이상합니다');
+  /* 주소 안의 아이디·비밀번호(name@host) — 'https://news.khu.ac.kr@다른사이트/…' 는 앞이 믿을 만해 보여도 뒤 사이트가 열리고,
+     진짜 비밀번호면 공개 저장소에 그대로 실린다(리뷰 2026-10-04) */
+  if (x.username || x.password) errors.push('주소에 아이디·비밀번호(@ 앞부분)가 들어 있습니다 — 그 글을 연 뒤 주소창의 주소를 넣어 주세요');
   const shape = L.linkShape(url);
   if (shape === 'marker') errors.push('게시판 목록 표식(#n-)이 붙은 주소입니다 — 목록이 아니라 그 글을 열고 주소창의 주소를 넣어 주세요');
   else if (shape === 'listid') errors.push('목록 주소에 글 번호만 붙인 꼴입니다(열면 목록이 뜹니다) — 그 글을 열고 주소창의 주소를 넣어 주세요');

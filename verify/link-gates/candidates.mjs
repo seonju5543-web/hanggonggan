@@ -145,6 +145,79 @@ export default async function gate(eq, ctx) {
   const pfBad = C.publishFix(st, idx, { bad: { [nCand.url]: { v: 'gone', at: '2026-10-03' } } });
   eq('  고친 주소가 확인 로봇의 확정 문제면 싣지 않는다', Object.keys(pfBad.fix), [`u:${SNUE_MARK}`]);
 
+  /* ── G7 리뷰 2026-10-04 — 틀린 글을 원문으로 받던 길 일곱(리뷰가 표본으로 재현한 꼴 그대로) ─────────────── */
+  {
+    const MK = 'https://www.p.ac.kr/bbs/list.do#n-x';
+    const D2 = {
+      registered: [{ id: 'reg-root', name: '표본재단 장학생 (2026)', boardTitle: '2026년 표본재단 대학생 장학생 선발 공고', sourceUrl: 'https://www.oofdn.or.kr/index.php' }],
+      notices: [
+        { school: '표본대학교', title: '[모집] 2026학년도 2학기 가나드림 장학생 모집', url: MK, foundAt: '2026-09-20' },
+        { school: '표본대학교', title: '도서관 열람실 운영시간 변경 안내', url: 'https://www.p.ac.kr/bbs/list.do#n-y', foundAt: '2026-10-01' },
+        { school: '고려대학교 세종캠퍼스', title: '2026학년도 2학기 국가근로장학생 추가 모집 안내', url: 'https://sejong.korea.ac.kr/bbs/list.do#n-z', foundAt: '2026-09-25' },
+      ],
+      news: [], activities: [], external: [],
+      kosaf: [
+        { code: '7770001', org: '(재)한빛장학회', name: '대학생 장학금', due: '2026-03-15', home: 'https://hanbit.or.kr', fields: { 신청기간: '○ 2026-03-02 ~ 2026-03-15' }, files: [{ name: '한빛장학회 대학생 장학생 선발 공고.hwp' }] },
+        { code: '8880111', org: '(재)누리장학회', name: '대학생 장학금', due: '2026-10-30', home: 'https://nuri.or.kr', fields: { 신청기간: '○ 2026-10-01 ~ 2026-10-30' }, files: [] },
+        { code: '8880222', org: '(재)누리장학회', name: '신입대학생 장학금', due: '2026-10-30', home: 'https://nuri.or.kr', fields: { 신청기간: '○ 2026-10-01 ~ 2026-10-30' }, files: [] },
+      ],
+      kosafTexts: {}, externalSources: [], pool: [],
+      boards: [{ school: '표본대학교', urls: ['https://www.p.ac.kr/bbs/list.do'] }, { school: '고려대학교', urls: ['https://www.korea.ac.kr/bbs/list.do'] }, { school: '고려대학교 세종캠퍼스', urls: ['https://sejong.korea.ac.kr/bbs/list.do'] }],
+    };
+    const ix = C.buildIndex(D2);
+    const T2 = (ds, key) => ix.find({ ds, key });
+    const acc = (t, c, obs, verdict) => C.acceptCandidate({ target: t, cand: c, obs, verdict: verdict || J.judgeLanding({ ...obs, requestedUrl: c.url, titles: C.judgeTitles(t, c), titlesFromNameOnly: !!t.nameOnly, otherTitles: [] }), ctx: { owners: ix.ownersOf(c.url) } });
+    const hb = T2('kosaf', '7770001');
+    const r1 = acc(hb, cand({ url: 'https://hanbit.or.kr/bbs/view.php?no=40' }), { status: 200, docTitle: '한빛장학회', headings: ['한빛장학회 대학생 장학생 선발 공고'], text: `한빛장학회 대학생 장학생 선발 공고\n신청기간: 2025. 3. 2.(일) ~ 3. 15.(토)\n작성일 2025.02.20 ${FILL}` });
+    eq('G7 ① 작년 글 — 「2025. 3. 2.(일) ~ 3. 15.(토)」 의 짧은 날짜는 2026-03-15 가 아니다 · 글이 말하는 마감이 다르면 먼저 거절', [r1.status, r1.checks.R], ['rejected', 'fail']);
+    eq('    짧은 날짜(연도 없음)는 바로 앞 온전한 날짜의 해를 따른다 — 다른 해면 그 날짜가 아니다 · 같은 해·「2025학년도」 같은 낱말은 그대로',
+      [C.dateShown('신청기간: 2025. 3. 2.(일) ~ 3. 15.(토)', '2026-03-15'), C.dateShown('신청기간: 2026. 3. 2.(일) ~ 3. 15.(토)', '2026-03-15'), C.dateShown('2025학년도 장학 · 접수 ~ 3. 15.(토)', '2026-03-15')], [false, true, true]);
+    const r2 = acc(T2('notices', MK), cand({ url: 'https://www.p.ac.kr/bbs/view.do?id=88', title: '[결과] 2026학년도 2학기 가나드림 장학생 모집 결과 안내', source: 'data' }),
+      { status: 200, docTitle: '표본대학교', headings: ['[결과] 2026학년도 2학기 가나드림 장학생 모집 결과 안내'], text: `[결과] 2026학년도 2학기 가나드림 장학생 모집 결과 안내 작성일 2026.10.01 ${FILL}` });
+    eq('  ② 결과 발표 글 — 층2 밖(실시간 공고)에서도 거절 · 후보가 적어 온 제목의 「결과」로 판정이 꺼지지 않는다', [r2.status, /결과/.test(r2.why)], ['rejected', true]);
+    eq('  ③ 사이트 첫 화면 주소는 대외활동 말고는 후보로도 안 받는다(재단 첫 화면이 「원문 공고」로 나갈 뻔)',
+      [C.loadCandidates({ items: [{ target: { ds: 'registered', key: 'reg-root' }, url: 'https://www.oofdn.or.kr/', by: 't', addedAt: '2026-10-04' }] }, { today: '2026-10-04' }).bad.length,
+        C.loadCandidates({ items: [{ target: { ds: 'activities', key: 'https://maicon.kr/' }, url: 'https://maicon.kr/', by: 't', addedAt: '2026-10-04' }] }, { today: '2026-10-04' }).ok.length], [1, 1]);
+    const sj = T2('notices', 'https://sejong.korea.ac.kr/bbs/list.do#n-z');
+    const SJT = '2026학년도 2학기 국가근로장학생 추가 모집 안내';
+    const r4 = acc(sj, cand({ url: 'https://www.korea.ac.kr/bbs/view.do?id=5' }), { status: 200, docTitle: '고려대학교', headings: [SJT], text: `${SJT} 작성일 2026.09.24 ${FILL}` });
+    eq('  ④ 여러 캠퍼스가 같이 쓰는 사이트(korea.ac.kr ↔ 세종)의 같은 제목 글은 사람 확인 — 다른 캠퍼스 공고일 수 있다', [r4.status, r4.checks.H], ['suggest', 'weak']);
+    const r5 = acc(T2('notices', MK), cand({ url: 'https://www.p.ac.kr/bbs/view.do?id=89', trusted: true }), { status: 200, docTitle: '표본대학교', headings: ['도서관 휴관 안내'], text: `도서관 휴관 안내 작성일 2026.09.20 ${FILL}` });
+    eq('  ⑤ 관리자 후보라도 다른 글이 열리면 원문이 아니다(너그러운 것은 못 연 경우뿐)', r5.status === 'verified', false);
+    /* 판정기가 「그 글」이라 본 뒤의 단계(P)를 잰다 — 층2 기대 제목이 재단+사업 이름뿐이면 판정기는 다른 글을 '못 읽음'으로 미루므로 착지는 주어 둔다 */
+    const r6 = acc(T2('kosaf', '8880111'), cand({ url: 'https://nuri.or.kr/bbs/view?no=3', title: '2026년 하반기 (재)누리장학회 신입대학생 장학생 선발 공고', source: 'match' }), { status: 200, docTitle: '누리장학회', headings: ['2026년 하반기 (재)누리장학회 신입대학생 장학생 선발 공고'], text: `(재)누리장학회 신입대학생 장학생 선발 공고 신청기간: 2026. 10. 1. ~ 10. 30.(금) ${FILL}` }, { v: 'post', ev: 'strong', why: '제목 자리' });
+    eq('  ⑥ 형제 사업 이름이 우리 이름을 품으면(신입대학생 ⊃ 대학생) 그 글은 형제 사업 것', [r6.status, r6.checks.P], ['rejected', 'fail']);
+    const r7 = acc(T2('notices', MK), cand({ url: 'https://www.p.ac.kr/bbs/view.do?id=90' }), { status: 200, docTitle: '표본대학교 장학공지', headings: ['표본대학교 장학공지'], text: `제목 [모집] 2026학년도 2학기 가나드림 장학생 모집 (OO재단) 작성일 2026.09.19 ${FILL}` }, { v: 'post', ev: 'strong', why: '제목 칸 앞부분' });
+    eq('  ⑦ 제목 자리에서 우리 제목을 통째로 못 찾으면(「제목」 칸 앞 24자만 같음) 사람 확인', [r7.status, r7.checks.L], ['suggest', 'weak']);
+    const hy = T2('notices', 'https://www.p.ac.kr/bbs/list.do#n-y');
+    const HY = '도서관 열람실 운영시간 변경 안내';
+    const r8 = acc(hy, cand({ url: 'https://www.p.ac.kr/bbs/view.do?id=10' }), { status: 200, docTitle: '표본대학교', headings: [HY], text: `${HY} 작성일 2024.03.02 ${FILL}` });
+    const r9 = acc(hy, cand({ url: 'https://www.p.ac.kr/bbs/view.do?id=91' }), { status: 200, docTitle: '표본대학교', headings: [HY], text: `${HY} ${FILL}` });
+    eq('  ⑧ 해·마감이 없는 제목(해마다 같은 이름으로 올라오는 안내) — 글 날짜가 우리가 본 때와 멀면 거절 · 날짜가 없으면 사람 확인', [r8.status, r9.status], ['rejected', 'suggest']);
+  }
+
+  /* G7 ⑨ 같은 주소 열쇠(u:)를 쓰는 다른 글이 있으면 로봇 바로잡기를 싣지 않는다 · ⑩ 날마다 다시 볼 때 바로잡기의 제목도 기대 제목 */
+  {
+    const MK = 'https://www.q.ac.kr/bbs/list.do#n-ceo';
+    const D3 = { registered: [], news: [], activities: [], external: [], kosaf: [], kosafTexts: {}, externalSources: [], pool: [], boards: [{ school: '표본대학교', urls: ['https://www.q.ac.kr/bbs/list.do'] }],
+      notices: [{ school: '표본대학교', title: 'CEO TALK SHOW 안내', url: MK, foundAt: '2026-09-02', postId: '11' }, { school: '표본대학교', title: 'CEO TALK SHOW 안내', url: MK, foundAt: '2026-10-01', postId: '12' }] };
+    const ix3 = C.buildIndex(D3);
+    const st = { c1: { ds: 'notices', key: MK, url: 'https://www.q.ac.kr/bbs/view.do?id=11', source: 'data', status: 'verified', verifiedAt: '2026-10-04' } };
+    const pf = C.publishFix(st, ix3, { bad: {} });
+    eq('G7 ⑨ 같은 표식 주소를 쓰는 다른 달의 같은 제목 글이 있으면 로봇 바로잡기를 싣지 않는다(다른 글도 그 원문을 연다)',
+      [Object.keys(pf.fix).length, pf.dropped.some((d) => /같은 주소를 쓰는 다른 글/.test(d.why))], [0, true]);
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fixtitle-'));
+    const W2 = (rel, doc) => { fs.mkdirSync(path.dirname(path.join(tmp, rel)), { recursive: true }); fs.writeFileSync(path.join(tmp, rel), JSON.stringify(doc, null, 1)); };
+    const RM = 'https://news.r.ac.kr/bbs/list.do#n-x';
+    W2('data/registered.json', { items: [{ id: 'reg-t', name: '표본 장학생 (2026)', sourceUrl: RM }] });
+    W2('data/link-fixes.json', { v: 1, fix: { 'id:reg-t': { url: 'https://news.r.ac.kr/bbs/view.do?boardId=5', by: 't', at: '2026-10-04', title: '2026 표본 우수논문 장학생 선발 공고' } } });
+    let gt = null;
+    try { gt = P.gatherTargets(tmp, { today: '2026-10-04' }); } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
+    const tg = gt && gt.targets.find((x) => x.url === 'https://news.r.ac.kr/bbs/view.do?boardId=5');
+    eq('  ⑩ 바로잡은 원문을 날마다 다시 볼 때 그 바로잡기의 원문 제목도 기대 제목 — 앱 이름뿐이라 미뤄지거나 다른 글로 버려지지 않는다',
+      [!!tg, tg && tg.titles.includes('2026 표본 우수논문 장학생 선발 공고'), tg && tg.nameOnly], [true, true, false]);
+  }
+
   /* ── G2 층2 짝짓기 ──────────────────────────────────────────────── */
   const eum = T('kosaf', '2000429013');
   const eumPosts = [

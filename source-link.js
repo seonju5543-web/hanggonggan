@@ -144,6 +144,9 @@ function fixKeys(item) {
   const it = item || {};
   const keys = [];
   if (it.id) keys.push(`id:${it.id}`);
+  /* 층2 재단·상시 제도는 id 로만 찾는다 — 재단 홈페이지 주소는 여러 장학금이 같이 쓴다(진도·전남 6개 코드 …).
+     u:<홈> 하나가 그 장학금들을 한 글로 보내고 회차 묶음도 건너뛰었다(리뷰 2026-10-04) */
+  if (it.sourceKind === 'kosaf' || it.program) return keys;
   const raw = linkUrlOf(it);
   if (raw) keys.push(`u:${decodeUrlEntities(raw)}`);
   return keys;
@@ -160,15 +163,16 @@ function linkFixFor(item) {
   if (it.program) return null;
   const keys = fixKeys(it);
   if (!keys.length) return null;
-  const fits = (e) => e && fixUrlUsable(e.url) && (!e.round || String(e.round) === itemRound(it));
+  /* 층2는 회차(round)가 적힌 바로잡기만 — 회차 없는 것은 어느 해 공고인지 모른다(원칙 6) */
+  const fits = (e) => e && fixUrlUsable(e.url) && (e.round ? String(e.round) === itemRound(it) : it.sourceKind !== 'kosaf');
   for (const k of keys) {
     const e = LINK_FIX_HUMAN[k];
-    if (fits(e)) return { url: decodeUrlEntities(e.url), src: 'admin', at: e.at || '', key: k };
+    if (fits(e)) return { url: decodeUrlEntities(e.url), src: 'admin', at: e.at || '', key: k, title: e.title || '' };
   }
   if (rawLinkKind(it) === 'page') return null;
   for (const k of keys) {
     const e = LINK_FIX_ROBOT[k];
-    if (fits(e)) return { url: decodeUrlEntities(e.url), src: 'robot', at: e.at || '', key: k };
+    if (fits(e)) return { url: decodeUrlEntities(e.url), src: 'robot', at: e.at || '', key: k, title: e.title || '' };
   }
   return null;
 }

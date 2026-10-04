@@ -36,6 +36,13 @@ export default async function gate(eq, ctx) {
   SL.setLinkChecks({ bad: {}, fix: { 'id:kosaf-0001': { url: 'https://found.or.kr/bbs/view?no=5', round: '2025-10-20' } } });
   eq('② 회차가 다른 바로잡기는 버린다 — 층2는 다시 「재단 홈페이지」', [label(kosaf), href(kosaf)], ['재단 홈페이지 ↗', 'https://found.or.kr']);
 
+  /* ②-1 층2는 제 코드(id:kosaf-…)와 회차로만 — 재단 홈페이지 주소(u:)는 여러 장학금이 같이 쓴다(리뷰 2026-10-04: u:<홈> 하나가 세 장학금을 한 글로) */
+  reset();
+  const act = { title: '같은 홈을 쓰는 활동', url: 'https://found.or.kr' };
+  SL.setLinkFixes({ fix: { 'u:https://found.or.kr': { url: 'https://found.or.kr/bbs/view?no=77', by: 't', at: '2026-10-04' }, 'id:kosaf-0001': { url: 'https://found.or.kr/bbs/view?no=6', by: 't', at: '2026-10-04' } } });
+  eq('②-1 층2는 u:<재단 홈> 바로잡기를 안 받고 · 회차 없는 id 바로잡기도 안 받는다(어느 해 공고인지 모른다) · 같은 홈의 활동은 u: 로 받는다',
+    [SL.fixKeys(kosaf), label(kosaf), href(act)], [['id:kosaf-0001'], '재단 홈페이지 ↗', 'https://found.or.kr/bbs/view?no=77']);
+
   /* ③ 사람이 이긴다 — 이미 원문인 링크도 관리자가 넣은 주소로 · 로봇 바로잡기보다 먼저 */
   reset();
   SL.setLinkChecks({ bad: {}, fix: { 'id:reg-m': { url: 'https://a.kr/bbs/view.do?id=9' } } });

@@ -694,6 +694,18 @@ switch (action) {
       mark('eligibilityExcludes', 'eligibilityExcludesFrom');
       mark('eligibilityPriority', 'eligibilityPriorityFrom');
       mark('eligibilityLines', 'eligibilityFrom');   // 이미 열려 있던 칸 — 지금은 매일 지워진다
+      /* 원문 주소를 고쳤는데 같은 공고에 예전 「원문 바로잡기」(data/link-fixes.json)가 있으면 그것이 늘 이겨 고친 주소가 앱에 안 나간다
+         (리뷰 2026-10-04) — 같은 커밋에서 그 바로잡기를 지우고 기록에 남긴다. 사람이 방금 넣은 주소가 새 원문이다 */
+      if (changed.includes('sourceUrl')) {
+        const lf = readJson(LINK_FIXES, null);
+        const fk = `id:${it.id}`;
+        if (lf && lf.fix && lf.fix[fk]) {
+          delete lf.fix[fk];
+          lf.updatedAt = `${kstNow()} KST`;
+          writeJson(LINK_FIXES, lf);
+          changed.push('원문 바로잡기 지움');
+        }
+      }
       /* 🔴 마감일은 **비울 때도 표식을 남긴다** (2026-09-16 · G-3 ②). 다른 칸은 비우면 로봇에게
          돌려주는 게 맞지만, 마감은 로봇이 **같은 줄을 다시 읽어 같은 값을 되채우므로** 사람이
          틀린 마감을 지운 조치가 다음 날 조용히 무효가 됐다. `관리자 <날짜> · 비움` 이 남아 있으면
@@ -1088,6 +1100,16 @@ switch (action) {
       if (chk.errors.length) fail(`${String(name).slice(0, 40)} — ${chk.errors.join(' · ')}`);
       const key = fixKeyFor(ds, it, SL);
       if (!key) fail(`${String(name).slice(0, 40)} — 장부 열쇠를 만들지 못했습니다`);
+      /* 주소 열쇠(u:)는 그 주소를 쓰는 **모든 글**에 걸린다 — 같은 주소(기관 첫 화면·같은 제목 표식)를 쓰는 다른 글이 있으면
+         한 글의 원문으로 바꿀 수 없다(그 글들이 남의 공고를 「원문」으로 연다 · 리뷰 2026-10-04) */
+      if (key.startsWith('u:')) {
+        const same = [];
+        for (const d2 of ['notices', 'news', 'external', 'activities']) {
+          const xs = cache[d2] || (cache[d2] = linkFixItems(d2));
+          for (const x of xs || []) if (x !== it && fixKeyFor(d2, x, SL) === key && String(x.title || '') !== String(it.title || '')) same.push(x.title || x.url);
+        }
+        if (same.length) fail(`${String(name).slice(0, 40)} — 같은 주소를 쓰는 다른 글이 ${same.length}건 있습니다(${String(same[0]).slice(0, 30)} …) — 한 글의 원문으로 바꿀 수 없습니다`);
+      }
       const entry = { url: chk.url, by: actor, at: TODAY };
       if (ds === 'kosaf') {
         /* 층2 재단 코드는 해마다 그대로다 — 이번 회차(마감)에만 묶는다. 마감을 모르면 묶을 수 없어 받지 않는다(지난 회차 공고를 올해 것으로 보이면 가짜 공지 · 원칙 6) */

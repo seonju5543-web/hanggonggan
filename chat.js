@@ -784,11 +784,13 @@ function chatAnswerHtml(a) {
 
   if (a.notices && a.notices.length) {
     parts.push(`<ul class="chat-notices">${a.notices.map((n) => {
-      const url = chatSafe(() => safeUrl(n.url), '');
+      /* 링크 꼬리와 주소는 source-link.js 한 곳(chat · 2026-10-03) — 보통 주소는 예전처럼 '↗' 하나,
+         게시판 목록·홈페이지·로봇이 문제를 확정한 주소는 무엇이 열리는지 괄호로 말한다 ·
+         🔴 주소도 같은 link 에서(바로잡은 원문이 있으면 그 주소 — n.url 로 열면 꼬리는 '↗' 인데 목록이 열린다 · 리뷰 2026-10-04) */
+      const link = chatSafe(() => sourceLink(n, 'chat'), null);
+      const url = chatSafe(() => safeUrl((link && link.href) || n.url), '');
       const title = chatEsc(n.title);
-      /* 링크 꼬리는 source-link.js 한 곳(chat · 2026-10-03) — 보통 주소는 예전처럼 '↗' 하나,
-         게시판 목록·홈페이지·로봇이 문제를 확정한 주소는 무엇이 열리는지 괄호로 말한다 */
-      const tail = chatSafe(() => sourceLink(n, 'chat').label, '↗') || '↗';
+      const tail = (link && link.label) || '↗';
       return url
         ? `<li><a href="${chatEsc(url)}" target="_blank" rel="noopener noreferrer">${title} ${chatEsc(tail)}</a></li>`
         : `<li>${title}</li>`;

@@ -627,6 +627,13 @@ if (typeof sourceLink !== 'function') {
     (document.head || document.documentElement).appendChild(s);
   }
 }
+/* 옛 source-link.js(캐시 · v221 — sourceLink 는 있는데 원문 바로잡기 ⑥ 이 없다)가 새 app.js 와 만나면 setLinkFixes 가 없어
+   장부를 받는 길이 통째로 던진다(리뷰 2026-10-04) — 빠진 것만 따로 메운다. 그 한 번은 바로잡기 없이 데이터 주소 그대로 연다 */
+{
+  const g = (typeof window !== 'undefined') ? window : globalThis;
+  if (typeof setLinkFixes !== 'function') g.setLinkFixes = () => {};
+  if (typeof effectiveLinkUrl !== 'function') g.effectiveLinkUrl = (item) => String((item && (item.sourceUrl || item.url)) || '');
+}
 
 /* 외부 링크 안전화 — http(s)·mailto만 허용한다. 수집 로봇이 받아 온 데이터가 오염되거나
    정식 등록에 오타가 있어도 javascript:·data: 같은 위험한 스킴이 href나 window.open으로
@@ -2889,8 +2896,9 @@ function noticeCardHtml(n, opts) {
   const o = opts || {};
   const thumb = o.thumb && NEWS_THUMB_RE.test(o.thumb) ? o.thumb : '';
   const link = sourceLink(n, 'card');
-  /* 안전하지 않은 주소면 href 를 아예 안 단다 — `href=""` 는 앱 자신을 다시 연다(첨부와 같은 사고 · 2026-10-03) */
-  const href = safeUrl(n.url);
+  /* 안전하지 않은 주소면 href 를 아예 안 단다 — `href=""` 는 앱 자신을 다시 연다(첨부와 같은 사고 · 2026-10-03)
+     🔴 주소도 이름과 같은 link 에서 — 바로잡은 원문(source-link.js ⑥)이 있으면 그 주소다. n.url 로 열면 이름은 「원문」인데 목록이 열린다(리뷰 2026-10-04) */
+  const href = safeUrl(link.href);
   const sp = !thumb && o.schoolPhoto && SCHOOL_PHOTO_RE.test(o.schoolPhoto.src || '') ? o.schoolPhoto : null;
   return `
     <a class="sch-card notice-card${thumb || sp ? ' has-thumb' : ''}"${href ? ` href="${esc(href)}" target="_blank" rel="noopener"` : ''}>
@@ -3360,9 +3368,10 @@ function homeNewsHtml() {
     const src = own || (sp && sp.src) || '';
     const focus = own ? '' : spFocus;
     const fallback = own && sp && SCHOOL_PHOTO_RE.test(sp.src || '') ? sp.src : '';
-    const href = safeUrl(n.url);
-    /* 링크 이름은 sourceLink 한 곳 — 글 화면이 아닌 링크(목록 표식 등)면 윗줄에 그 이름을 붙인다(시트 카드와 같은 말 · 리뷰 10-04) */
+    /* 링크 이름은 sourceLink 한 곳 — 글 화면이 아닌 링크(목록 표식 등)면 윗줄에 그 이름을 붙인다(시트 카드와 같은 말 · 리뷰 10-04) ·
+       주소도 같은 link 에서(바로잡은 원문이 있으면 그 주소 · 원문 바로잡기 리뷰 10-04) */
     const link = sourceLink(n, 'card');
+    const href = safeUrl(link.href);
     const meta = [n.kind, newsDay(n), link.cls !== 'post' && link.label ? link.label : ''].filter(Boolean).join(' · ');
     return `<a class="news-tile"${href ? ` href="${esc(href)}" target="_blank" rel="noopener"` : ''}>
       <span class="news-tile-photo">${src ? `<img class="news-tile-img" src="${esc(src)}" alt="" loading="lazy" decoding="async" width="148" height="104"${focus ? ` style="object-position:${esc(focus)}"` : ''}${fallback ? ` data-fallback="${esc(fallback)}"${spFocus ? ` data-fallback-focus="${esc(spFocus)}"` : ''}` : ''} />` : ''}</span>
@@ -4116,7 +4125,8 @@ function eligibilityRowsHtml(sch, result) {
        원문에서 '제한 없음'을 확인한 공고만 eligibilityVerified로 확신 문구를 낸다. */
     /* '아래 공고 원문'은 아래 링크가 **그 공고로 갈 때만** (2026-10-03 · 원문 링크 정직성) — 재단 홈페이지(층2)·게시판 목록·
        기관 첫 화면이면 '아래 링크'라고만 한다. 종류는 sourceLink 한 곳(활동 시트는 id 의 'act:' 뒤가 그 글 주소다 · activityAsSch). */
-    const below = sourceLink(sch.activity ? { url: String(sch.id || '').replace(/^act:/, '') } : sch, 'detail').cls === 'post' ? '아래 공고 원문' : '아래 링크';
+    const actUrl = String(sch.id || '').replace(/^act:/, '');
+    const below = sourceLink(sch.activity ? (activityItem(actUrl) || { url: actUrl }) : sch, 'detail').cls === 'post' ? '아래 공고 원문' : '아래 링크';   // 글 원본(id 포함)으로 — id 열쇠 바로잡기도 같이 본다
     reasonRows = sch.eligibilityVerified
       ? `<li class="r-ok">✓ 별도 자격 제한이 없는 공고입니다${result.status === 'selective' ? ' — 지원자 중 선발 심사로 결정됩니다' : ''}</li>`
       : `<li class="r-unk">? 지원 자격은 ${below}에서 확인해 주세요${result.status === 'selective' ? ' (지원자 중 선발 심사로 결정됩니다)' : ''}</li>`;
@@ -4348,7 +4358,7 @@ function openDetail(id) {
   const goBtn = $('#btn-go-submit');
   if (goBtn) goBtn.addEventListener('click', () => {
     copyText(buildSubmissionText(sch, app));
-    const url = safeUrl(ch.url || sch.sourceUrl);
+    const url = safeUrl(ch.url || effectiveLinkUrl(sch));   // 제출처 표가 없으면 원문 — 바로잡은 원문이 있으면 그 주소(source-link.js ⑥)
     if (url) window.open(url, '_blank', 'noopener');
   });
   if (app && app.formAns && formTplIdFor(sch)) {

@@ -37,7 +37,9 @@ export default async function gate(eq, ctx) {
       /집계 사이트/.test(errs('https://linkareer.com/activity/12345')),
       /kosaf\.go\.kr/.test(errs('https://www.kosaf.go.kr/ko/scholar.do?pg=x&id=3')),
       /같은 주소/.test(errs('https://a.kr/view.do?id=3', 'https://a.kr/view.do?id=3')),
-    ], Array(12).fill(true));
+      /아이디·비밀번호/.test(errs('https://news.khu.ac.kr@evil.example/view.do?id=1')),
+      /보이지 않는 글자/.test(errs('https://a.kr/view.do?id=1\u200b')),
+    ], Array(14).fill(true));
   const other = chk('https://b.or.kr/notice/view?no=5', 'https://a.kr/bbs/list.do#n-x');
   const root = chk('https://maicon.kr/', 'https://a.kr/bbs/list.do#n-x');
   eq('  경고(받되 한 번 더 확인) — 지금 링크와 다른 사이트 · 맨 도메인(공모전 전용 사이트만)',
@@ -139,6 +141,15 @@ export default async function gate(eq, ctx) {
   const un = run('linkUnfix', { keys: ['u:https://z.kr/a#n-y'] }, pre);
   eq('  linkUnfix — 열쇠만 뺀다 · 없는 열쇠면 거절',
     [un.status, Object.keys(un.doc.fix), un.changed, run('linkUnfix', { keys: ['id:none'] }, pre).status !== 0], [0, ['id:reg-m'], ['data/admin-log.json', 'data/link-fixes.json'], true]);
+
+  /* 리뷰 2026-10-04 — 같은 주소를 쓰는 다른 글이 있으면 u: 바로잡기를 받지 않는다 · 원문 주소를 「편집」으로 고치면 예전 바로잡기를 지운다 */
+  const twin = { 'data/notices/aaaa.json': { school: '가대학교', items: [{ title: '표본 피드 공고', url: FEED, school: '가대학교', campus: '' }, { title: '같은 주소의 다른 글', url: FEED, school: '가대학교', campus: '' }] } };
+  const sh2 = run('linkFix', { fixes: [{ ds: 'notices', from: FEED, url: 'https://f.ac.kr/b/view.do?no=7' }] }, twin);
+  eq('  같은 주소(u:)를 쓰는 다른 글이 있으면 거절 — 한 글의 원문으로 바꾸면 다른 글도 그 원문을 연다',
+    [sh2.status !== 0, /같은 주소를 쓰는 다른 글이 1건/.test(sh2.out), sh2.changed.length], [true, true, 0]);
+  const ed = run('edit', { edits: [{ id: 'reg-m', patch: { sourceUrl: 'https://a.kr/bbs/view.do?id=99' } }] }, pre);
+  eq('  「편집」으로 원문 주소를 고치면 같은 공고의 예전 바로잡기를 지운다(남겨 두면 그것이 늘 이겨 고친 주소가 안 나간다)',
+    [ed.status, Object.keys(ed.doc.fix).sort()], [0, ['u:https://z.kr/a#n-y']]);
 
   /* ⑤ 그 장부로 앱의 링크 이름 한 곳이 '원문 공고'라고 부른다 — 층2는 회차가 바뀌면 다시 재단 홈페이지 */
   const reset = () => { SL.setLinkChecks(null); SL.setLinkFixes(null); };

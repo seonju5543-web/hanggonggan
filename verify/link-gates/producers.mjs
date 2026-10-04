@@ -401,5 +401,14 @@ export default async function gate(eq, ctx = {}) {
     eq('  로봇은 link-check 의 확정 문제 주소를 넘기고, 실은 글마다 번호·살핀 칸을 리포트·정찰에 찍는다',
       [(robot.match(/mapRows\(src, rows, \{ scholarship: KEYWORDS, today, bad: BAD_URLS \}\)/g) || []).length === 2, /new URL\('\.\.\/data\/link-check\.json', HERE\)/.test(robot), (robot.match(/pickLines\(/g) || []).length >= 2 && /pickLines\(items, picks\)/.test(robot) && /pickLines\(m\.items, m\.picks\)/.test(robot)],
       [true, true, true]);
+    /* 리뷰 2026-10-04 — 주소가 바뀐 API 글이 숨김을 잃고 다시 뜨던 것 · 한 번 피한 문제 주소로 이틀 뒤 되돌아가던 것 */
+    const hid = O.mergeApi([{ id: 'api-youthPolicy-9', api: 'youthPolicy', url: 'https://a.go.kr/x?id=9', title: '표본 정책', foundAt: '2026-09-01', hidden: true, hiddenBy: '관리자 2026-09-20' }],
+      { youthPolicy: { ok: true, items: [{ id: 'api-youthPolicy-9', api: 'youthPolicy', url: 'https://b.go.kr/y?seq=9', title: '표본 정책' }] } }, { today: '2026-10-04', hideUrls: new Set() });
+    const collect = read('collector/collect.mjs');
+    eq('  같은 번호(id)의 글은 주소가 바뀌어도 숨김·관리자 표식·처음 본 날을 이어받고 · 수집 로봇은 관리자 숨김(hiddenBy)을 주소만 보고 풀지 않는다',
+      [hid.length, hid[0].url, hid[0].hidden, hid[0].hiddenBy, hid[0].foundAt, /else if \(n\.hidden && !n\.hiddenBy && !actHide\.has\(canonUrl\(n\.url\)\)\) delete n\.hidden;/.test(collect)],
+      [1, 'https://b.go.kr/y?seq=9', true, '관리자 2026-09-20', '2026-09-01', true]);
+    eq('  한 번 피한 문제 주소는 글에 적어 두고(avoidUrls) 다음 실행도 피한다 — 피하고 나면 확인 대상에서 빠져 장부에서도 풀리기 때문',
+      [/n\.avoidUrls = avoid/.test(robot), /for \(const u of \(n && n\.avoidUrls\) \|\| \[\]\) out\.add\(u\)/.test(robot)], [true, true]);
   }
 }

@@ -46,7 +46,12 @@ const youthContentKey = (process.env.YOUTHCENTER_CONTENT_KEY || '').trim();
 /* 원문 링크 확인 로봇이 '그 공고가 아니다'를 확정한 주소(data/link-check.json bad · 열쇠는 되푼 주소) — 주소 칸을 고를 때 다른 후보가 있으면 피한다
    (open-api-map.mjs pickApiUrl · 2026-10-04). 파일이 없거나 깨져 있으면 빈 모음(로봇을 멈추지 않는다). */
 const BAD_URLS = (() => {
-  try { const d = JSON.parse(fs.readFileSync(new URL('../data/link-check.json', HERE), 'utf8')); return new Set(Object.keys((d && d.bad) || {})); } catch { return new Set(); }
+  const out = new Set();
+  try { const d = JSON.parse(fs.readFileSync(new URL('../data/link-check.json', HERE), 'utf8')); for (const k of Object.keys((d && d.bad) || {})) out.add(k); } catch { /* 장부 없음 */ }
+  /* 한 번 피한 주소는 기억한다(실린 글의 avoidUrls) — 피하고 나면 그 주소가 확인 대상에서 빠져 장부(bad)에서도 빠지고,
+     다음 날 다시 그 주소를 골라 이틀 뒤에야 또 확정되는 되풀이가 생긴다(리뷰 2026-10-04) */
+  try { for (const n of (JSON.parse(fs.readFileSync(new URL('../data/activities.json', HERE), 'utf8')).items || [])) for (const u of (n && n.avoidUrls) || []) out.add(u); } catch { /* 처음 */ }
+  return out;
 })();
 /* 실은 글마다 '어느 번호 · 어느 칸을 보고 무엇을 골랐나' 한 줄 — 원문이 틀렸다는 보고가 오면 이 줄로 칸을 가린다(주소는 공개 정보 · 값은 안 자른다) */
 const pickLines = (items, picks) => items.map((n) => {
@@ -231,6 +236,8 @@ for (const src of Object.keys(API_SOURCES)) {
   try {
     const rows = await FETCHERS[src]();
     const { items, dropped, refs, picks } = mapRows(src, rows, { scholarship: KEYWORDS, today, bad: BAD_URLS });
+    /* 피한 주소를 글에 적어 둔다(위 BAD_URLS — 다음 실행도 피한다) */
+    for (const n of items) { const avoid = ((picks && picks.get(n.url)) || []).filter((c) => c.bad).map((c) => c.url); if (avoid.length) n.avoidUrls = avoid; }
     const why = Object.entries(dropped).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v}`).join(' · ');
     const bad = sourceVerdict(rows, dropped);
     /* 상세는 **성공으로 칠 응답일 때만** 받는다 — 실패로 칠 응답에 15번 더 두드리지 않는다(2026-10-01 코드 리뷰) */

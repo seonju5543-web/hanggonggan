@@ -404,16 +404,23 @@ export function mergeApi(prevItems, results, { today, hideUrls = new Set() }) {
   });
   /* 상세를 못 받은 날(1365 상세 한 건 실패 등)은 **어제 받은 상세를 이어받는다** — 안 그러면 하루 동안 자격·안내 칸이 빈다(2026-10-01 코드 리뷰) */
   const prevByUrl = new Map(prev.filter((n) => n && n.url).map((n) => [canonUrl(n.url), n]));
+  /* 같은 번호(id)의 어제 글 — API 글은 주소 칸 고르기가 바뀌면 주소가 달라진다. 숨김·처음 본 날·상세는 번호로도 이어받는다(리뷰 2026-10-04:
+     주소가 바뀌자 관리자가 숨긴 글이 다시 떴다) */
+  const prevById = new Map(prev.filter((n) => n && n.id).map((n) => [n.id, n]));
   const DETAIL_KEYS = ['eligibilityLines', 'eligibilityExcludes', 'eligibilityPriority', 'noticeLines'];
   const added = fresh.map((n) => {
     const k = canonUrl(n.url);
-    const old = prevByUrl.get(k);
+    const byId = n.id ? prevById.get(n.id) : null;
+    const old = prevByUrl.get(k) || byId;
     if (old && !DETAIL_KEYS.some((f) => (n[f] || []).length)) for (const f of DETAIL_KEYS) if ((old[f] || []).length) n = { ...n, [f]: old[f] };
-    const first = [firstSeen.get(k), firstSeen.get(titleKey(n))].filter(Boolean).sort()[0];
+    const first = [firstSeen.get(k), firstSeen.get(titleKey(n)), byId && byId.foundAt].filter(Boolean).sort()[0];
     /* excerptsAt: 수집 로봇의 '원문 다시 읽기'가 건너뛰게 · seenAt: 오늘도 API 가 줬다 —
        수집 로봇의 60일 삭제는 API 글엔 처음 본 날이 아니라 이 날로 잰다(오래 열린 정책이 61일째 '새 글'로 돌아오지 않게 · 리뷰 I3) */
     const out = { ...n, foundAt: first || today, seenAt: today, excerptsAt: today };
-    if (hideUrls.has(k)) out.hidden = true;
+    if (hideUrls.has(k) || (byId && (byId.hidden || hideUrls.has(canonUrl(byId.url || ''))))) {
+      out.hidden = true;
+      if (byId && byId.hiddenBy) out.hiddenBy = byId.hiddenBy;   // 관리자 숨김 표식도 — 수집 로봇이 주소로만 보고 풀지 않게(collect.mjs)
+    }
     for (const f of Object.keys(out)) if (out[f] === undefined) delete out[f];
     return out;
   });

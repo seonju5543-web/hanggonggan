@@ -539,7 +539,9 @@ acts.items = dedupeNotices(acts.items);
 acts.items = acts.items.filter((n) => !n.school).concat(dropUnserved(acts.items.filter((n) => n.school)));
 acts.items.sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')));
 acts.items = acts.items.slice(0, ACT_CAP);
-acts.items.forEach((n) => { if (actHide.has(canonUrl(n.url))) n.hidden = true; else if (n.hidden && !actHide.has(canonUrl(n.url))) delete n.hidden; });
+/* 관리자가 숨긴 표식(hiddenBy)이 있는 글은 주소가 바뀌어도 숨김을 지킨다 — 공공 API 글은 주소 칸 고르기가 바뀌면 주소가 달라진다(리뷰 2026-10-04 ·
+   번호로 이어받은 숨김을 여기서 풀면 숨긴 글이 다시 뜬다). 되살리기는 관리자 버튼이 hidden·hiddenBy 를 함께 지운다 */
+acts.items.forEach((n) => { if (actHide.has(canonUrl(n.url))) n.hidden = true; else if (n.hidden && !n.hiddenBy && !actHide.has(canonUrl(n.url))) delete n.hidden; });
 /* 소급(운영 원칙 7) — 발췌 없이 실린 글은 원문을 다시 읽어 마감·발췌·분야를 채운다 (2026-09-30 첫 실행의 26건이 그렇다 —
    글자를 한 줄로 뭉개 넘긴 사고 · html-text.mjs). 한 실행 최대 ACT_BACKFILL 건 · 예산 안에서만 · 읽은 글은 excerptsAt 을 적어 다시 안 읽는다
    (못 읽었어도 적는다 — 없는 이름표를 매일 다시 찾지 않는다). */
