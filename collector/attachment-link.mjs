@@ -45,3 +45,75 @@ export function isHtmlPayload(buf) {
   return head.startsWith('<!doctype html') || head.startsWith('<html') || head.includes('<meta charset')
       || /<head[\s>]/.test(head);
 }
+
+/* ── 게시판 내려받기 스크립트 → 진짜 내려받기 주소 (2026-10-05) ─────────────────────────
+   어떤 게시판은 첨부를 `javascript:downloadfile('…','…','…')` 처럼 **스크립트로** 내려준다. 그대로 담으면 앱은
+   주소가 아니라서 이름만 보이고(app.js attachmentLinkHtml) 학생은 신청서 양식을 못 받는다 — 실측 34건(서울과기대 22 ·
+   대전청년포털 7 · K-Startup 5 · 동국대는 다시 읽을 때 드러남). 함수의 정의를 원문 페이지에서 읽고, **세션 없는 새 브라우저에서 그 주소로 파일이
+   받아지는 것**까지 확인한 사이트만 여기 적는다. 함수 이름이 같아도 사이트가 다르면 모른다(호스트로 묶는다).
+   잘리거나 인자가 모자란 호출은 짐작하지 않는다(null — 앱은 이름만 보인다). */
+const safeDecode = (s) => { try { return decodeURIComponent(s); } catch { return s; } };
+const JS_DOWNLOAD_RULES = [
+  { host: /(^|\.)seoultech\.ac\.kr$/i,
+    /* 정의(공고 상세 HTML): function downloadfile(filePath, fileName, ogrfname) → POST /hcm/bbs/bbs_download.jsp {fpath,fname,ogrfname} — GET 으로도 받아진다 */
+    /* 원래 이름(셋째 인자)에 따옴표가 이스케이프 없이 그대로 온다(「웰로 'Wello' 앱」) — 셋째는 마지막 `' )` 까지 읽는다 */
+    call: /^javascript:\s*downloadfile\(\s*'([^']+)'\s*,\s*'([^']+)'\s*,\s*'(.*)'\s*\)\s*;?\s*$/i,
+    path: (m) => `/hcm/bbs/bbs_download.jsp?${new URLSearchParams({ fpath: m[1], fname: m[2], ogrfname: safeDecode(m[3]) })}` },
+  { host: /(^|\.)daejeonyouthportal\.kr$/i,
+    /* 정의(/js/dyp/comt/commonFn.js): fileDownLoad(atchFileId, fileSn) → window.open(contextPath + "/comt/fms/FileDown.do?atchFileId=…&fileSn=…") · contextPath = "" */
+    call: /^javascript:\s*(?:dypCommonFn\.fileManage\.)?fileDownLoad\(\s*'([^']+)'\s*,\s*'([^']*)'\s*\)/i,
+    path: (m) => `/comt/fms/FileDown.do?${new URLSearchParams({ atchFileId: m[1], fileSn: m[2] })}` },
+  { host: /(^|\.)dongguk\.edu$/i,
+    /* 정의(공고 상세 HTML): function downGO(file_nm, file_path, file_sys_nm){ location.href="/cmmn/fileDown.do?filename="+encodeURIComponent(file_nm)+"&filepath="+file_path+"&filerealname="+file_sys_nm }
+       이름 안의 따옴표는 `\'` 로 적혀 온다(「웰로 \'Wello\' 앱」) — 그래서 인자를 `\'` 를 건너 읽고 되돌린다 */
+    call: /^javascript:\s*downGO\(\s*'((?:\\'|[^'])*)'\s*,\s*'([^']+)'\s*,\s*'([^']+)'\s*\)/i,
+    path: (m) => `/cmmn/fileDown.do?filename=${encodeURIComponent(m[1].replace(/\\'/g, "'"))}&filepath=${m[2]}&filerealname=${m[3]}` },
+];
+
+/** `javascript:` 내려받기 호출을 진짜 주소로. 모르는 사이트·모양이면 null */
+export function resolveJsDownload(href, pageUrl) {
+  let host;
+  try { host = new URL(pageUrl).host; } catch { return null; }
+  for (const r of JS_DOWNLOAD_RULES) {
+    if (!r.host.test(host)) continue;
+    const m = String(href || '').trim().match(r.call);
+    if (m) return new URL(r.path(m), pageUrl).href;
+  }
+  return null;
+}
+
+/* 첨부로 볼 링크인가 — 확장자·내려받기 꼴 주소이거나 이름이 파일 이름일 때 */
+const ATTACH_EXT = /\.(hwp|hwpx|doc|docx|pdf|xls|xlsx)(\?|$)/i;
+/* 안내창·빈 스크립트는 첨부가 아니다(K-Startup: `javascript:alert('현재 작업중입니다.')` — 주석 속 옛 틀에 있었다) */
+const JS_NOT_DOWNLOAD = /^javascript:\s*(?:alert|void|;|$)/i;
+
+/** 공고 상세 HTML 에서 첨부 {name, url} — 일반 수집기(collect.mjs fetchDetail)가 쓴다.
+    🔴 ① `href="…"` 와 `href='…'` 를 따옴표 짝으로 읽는다 — `[^"']*` 로 읽으면 `javascript:downloadfile(` 에서 끊겼다(22건)
+    ② HTML 주석을 먼저 걷는다 — 화면에 없는 옛 첨부가 주워졌다 ③ 스크립트 호출은 resolveJsDownload 로 진짜 주소로 */
+export function detailAttachments(html, pageUrl, { decode = (s) => s, max = 8 } = {}) {
+  const src = String(html || '').replace(/<!--[\s\S]*?-->/g, ' ');
+  const out = new Map();
+  const re = /<a\b[^>]*?href\s*=\s*(?:"([^"]*)"|'([^']*)')[^>]*>([\s\S]*?)<\/a>/gi;
+  let m;
+  while ((m = re.exec(src)) !== null && out.size < max) {
+    const raw = decode((m[1] ?? m[2] ?? '').trim());
+    if (!raw || raw.startsWith('#') || JS_NOT_DOWNLOAD.test(raw)) continue;
+    const name = m[3].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    let url = /^javascript:/i.test(raw) ? resolveJsDownload(raw, pageUrl) || raw : null;
+    if (!url) { try { url = new URL(raw, pageUrl).href; } catch { continue; } }
+    const isFile = ATTACH_EXT.test(url) || ATTACH_EXT.test(name) || /mode=download|download\.do|fileDown|attach|bbs_download/i.test(url);
+    if (isFile && name.length >= 4 && name.length <= 120 && !out.has(url)) out.set(url, { name: name.slice(0, 100), url });
+  }
+  return [...out.values()];
+}
+
+/** 브라우저가 읽은 링크 [{title, url}] → 첨부 {name, url} — 브라우저 수집기의 두 길(상세 방문 · 클릭 수집)이 같이 쓴다.
+    화면에 그려진 링크라 주석 문제는 없다. 스크립트 호출만 진짜 주소로 바꾼다(resolveJsDownload). */
+export function linkAttachments(links, pageUrl, max = 6) {
+  return (links || [])
+    .map((l) => (/^javascript:/i.test(l.url || '') ? { ...l, url: resolveJsDownload(l.url, pageUrl) || l.url } : l))
+    .filter((l) => !JS_NOT_DOWNLOAD.test(l.url || ''))
+    .filter((l) => ATTACH_EXT.test(l.url) || /download|fileDown/i.test(l.url))
+    .filter((l) => l.title && l.title.length >= 4 && l.title.length <= 120)
+    .slice(0, max).map((l) => ({ name: l.title.slice(0, 100), url: l.url }));
+}

@@ -4702,6 +4702,43 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
   const AT = await import(new URL('../collector/attachment-text.mjs', import.meta.url));
   /* ① 신청서·동의서는 읽지 않는다 — 읽으면 개인정보 수집 항목이 자격 자리에 앉는다
         (2026-08-20에 실제로 3건이 그렇게 돼 통째로 되돌린 적이 있다) */
+  /* 🔴 게시판 내려받기 스크립트를 진짜 주소로 (2026-10-05 · 첨부 34건이 이름만 보이고 안 받아졌다 — 실측: 세션 없는 새 브라우저에서 아래 주소로 파일이 받아진다) */
+  {
+    const AL = await import(new URL('../collector/attachment-link.mjs', import.meta.url));
+    const st = 'https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&bnum=5233&bidx=896094';
+    eq('서울과기대 downloadfile(경로, 저장이름, 원래이름) → bbs_download.jsp',
+      AL.resolveJsDownload("javascript:downloadfile('/storage/www/bbs/5233','592B624FC1BF4F50A7D7D37F78C65087_.hwp','2.조형도동문 장학생 선발 공고문.hwp' )", st),
+      'https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=592B624FC1BF4F50A7D7D37F78C65087_.hwp&ogrfname=2.%EC%A1%B0%ED%98%95%EB%8F%84%EB%8F%99%EB%AC%B8+%EC%9E%A5%ED%95%99%EC%83%9D+%EC%84%A0%EB%B0%9C+%EA%B3%B5%EA%B3%A0%EB%AC%B8.hwp');
+    eq("  원래 이름 안에 따옴표가 그대로 있어도(「웰로 'Wello' 앱」 — 서울과기대는 이스케이프하지 않는다) 끝까지 읽는다",
+      AL.resolveJsDownload("javascript:downloadfile('/storage/www/bbs/5233','390EA3A32A694C878680B18505BDF879_.pdf','붙임3. 매뉴얼(웰로 'Wello' 앱).pdf' );", st),
+      new URL('https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?' + new URLSearchParams({ fpath: '/storage/www/bbs/5233', fname: '390EA3A32A694C878680B18505BDF879_.pdf', ogrfname: "붙임3. 매뉴얼(웰로 'Wello' 앱).pdf" })).href);
+    eq('대전청년포털 fileDownLoad(파일ID, 순번) → FileDown.do',
+      AL.resolveJsDownload("javascript:dypCommonFn.fileManage.fileDownLoad('FILE_000000000328512','0')", 'https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000239/articleView.do?searchSeq=16718'),
+      'https://www.daejeonyouthportal.kr/comt/fms/FileDown.do?atchFileId=FILE_000000000328512&fileSn=0');
+    eq("동국대 downGO(이름, 경로, 저장이름) → /cmmn/fileDown.do · 이름 속 \\' 도 푼다",
+      AL.resolveJsDownload("javascript:downGO('붙임3. 매뉴얼(웰로 \\'Wello\\' 앱).pdf','/files/article/JANGHAKNOTICE/26766011/','7C31D4C946AD470EA56798EB13ED3ACF.pdf');", 'https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766011'),
+      new URL('https://www.dongguk.edu/cmmn/fileDown.do?filename=' + encodeURIComponent("붙임3. 매뉴얼(웰로 'Wello' 앱).pdf") + '&filepath=/files/article/JANGHAKNOTICE/26766011/&filerealname=7C31D4C946AD470EA56798EB13ED3ACF.pdf').href);
+    eq('  규칙은 그 사이트에서만 — 다른 학교의 같은 이름 함수는 모른다', AL.resolveJsDownload("javascript:downloadfile('/a','b.hwp','c.hwp')", 'https://www.other.ac.kr/x'), null);
+    eq('  잘린 호출(`downloadfile(`)은 짐작하지 않는다', AL.resolveJsDownload('javascript:downloadfile(', st), null);
+    eq('상세 첨부: 큰따옴표 href 안의 작은따옴표에서 끊지 않는다 · 주석 속 옛 링크는 줍지 않는다 · 안내창(alert)은 첨부가 아니다',
+      AL.detailAttachments(`<a href="javascript:downloadfile('/storage/www/bbs/5233','A_.hwp','공고문.hwp' )">공고문.hwp</a>
+        <!-- <a href="javascript:alert('현재 작업중입니다.');" class="file_bg">(붙임) 옛 일정(21년 08월 2주차).hwp</a> -->
+        <a href="javascript:alert('현재 작업중입니다.');">(붙임) 신청서.hwp</a>
+        <a href="/files/form.pdf">신청 양식.pdf</a>`, st).map((a) => a.url),
+      ['https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=A_.hwp&ogrfname=%EA%B3%B5%EA%B3%A0%EB%AC%B8.hwp',
+       'https://www.seoultech.ac.kr/files/form.pdf']);
+  }
+  {
+    const AL = await import(new URL('../collector/attachment-link.mjs', import.meta.url));
+    eq('브라우저 링크 첨부: 스크립트는 진짜 주소로 · 안내창은 버린다',
+      AL.linkAttachments([{ title: '공고문.pdf', url: "javascript:dypCommonFn.fileManage.fileDownLoad('FILE_1','0')" },
+        { title: '(붙임) 일정.hwp', url: "javascript:alert('현재 작업중입니다.');" }], 'https://www.daejeonyouthportal.kr/board/x').map((a) => a.url),
+      ['https://www.daejeonyouthportal.kr/comt/fms/FileDown.do?atchFileId=FILE_1&fileSn=0']);
+    const bc = readText(new URL('../collector/browser-collect.mjs', import.meta.url));
+    eq('  브라우저 수집기의 두 길이 모두 linkAttachments 를 쓴다(걸러 내기가 두 벌이 되지 않게)', (bc.match(/linkAttachments\(/g) || []).length, 2);
+    const cm = readText(new URL('../collector/collect.mjs', import.meta.url));
+    eq('  일반 수집기는 detailAttachments 를 쓴다', /detailAttachments\(html, item\.url/.test(cm), true);
+  }
   eq('공고문은 읽을 대상', AT.isNoticeDoc('2026년 장학생 선발 공고문.hwp'), true);
   eq('  신청서는 읽지 않는다', AT.isNoticeDoc('장학금 신청서.hwp'), false);
   eq('  개인정보 동의서도 읽지 않는다', AT.isNoticeDoc('개인정보 수집·이용 동의서.hwp'), false);
