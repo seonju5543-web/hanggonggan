@@ -5887,7 +5887,20 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "2026학년도 AX미래장학금 신청서 양식.hwp",
+     "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30159&pageNo=1#;"
+    },
+    {
+     "name": "2026학년도 AX미래장학금 추천서 양식.hwp",
+     "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30159&pageNo=1#;"
+    },
+    {
+     "name": "2026학년도 AX미래장학금 결과보고서 양식.hwp",
+     "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30159&pageNo=1#;"
+    }
+   ],
    "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&page=2&nttId=30159",
    "sourceKind": "auto"
   },
@@ -6909,7 +6922,33 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "본문이미지-1002x551.png",
+     "url": "https://www.dongguk.edu/resources/images/site/main/120emblem.png",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-4646x6693.jpg",
+     "url": "https://www.dongguk.edu/cmmn/fileView?path=/ckeditor//JANGHAKNOTICE&physical=1789631687711.jpg&contentType=image",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-1080x1350.jpg",
+     "url": "https://www.dongguk.edu/cmmn/fileView?path=/ckeditor//JANGHAKNOTICE&physical=1787704151352.png&contentType=image",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-1080x1350.jpg",
+     "url": "https://www.dongguk.edu/cmmn/fileView?path=/ckeditor//JANGHAKNOTICE&physical=1789631795584.png&contentType=image",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-1080x1350.jpg",
+     "url": "https://www.dongguk.edu/cmmn/fileView?path=/ckeditor//JANGHAKNOTICE&physical=1787704219019.png&contentType=image",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765909",
    "sourceKind": "auto",
    "kindEvidence": [
@@ -6998,7 +7037,13 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "본문이미지-2382x3368.jpg",
+     "url": "https://www.dongguk.edu/cmmn/fileView?path=/ckeditor//JANGHAKNOTICE&physical=1789543469461.jpg&contentType=image",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766256",
    "sourceKind": "auto",
    "kindEvidence": [
@@ -7085,7 +7130,12 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "2026학년도 공과대학생 어학_전공 자격증 취득 장학금 신청 안내.pdf",
+     "url": "https://nano.pknu.ac.kr/boardDownload.do?no=8005574"
+    }
+   ],
    "sourceUrl": "https://nano.pknu.ac.kr/nano/2432?action=view&no=9994682",
    "sourceKind": "auto",
    "kindEvidence": [
@@ -7235,7 +7285,17 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "대학정보공시",
+     "url": "http://www.academyinfo.go.kr/pubinfo/pubinfo0020/list.do?schlId=0000163&svyYr=2018&pageIdx=all&filePath=01&fileName=01&saveName=01"
+    },
+    {
+     "name": "본문이미지-1191x1684.jpg",
+     "url": "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoQTkgHARgOQIIGcBuBrAGgTwBUBDACQHlMARAcSoDNjyA6eAOwHMg",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367130&article.offset=0&articleLimit=10",
    "sourceKind": "auto",
    "kindEvidence": [
@@ -7318,7 +7378,17 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "대학정보공시",
+     "url": "http://www.academyinfo.go.kr/pubinfo/pubinfo0020/list.do?schlId=0000163&svyYr=2018&pageIdx=all&filePath=01&fileName=01&saveName=01"
+    },
+    {
+     "name": "본문이미지-800x1132.jpg",
+     "url": "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoQTkgFAjgVwMoFlUBMCiAZATwBcApANwHkB7AawEsaBVAWwDoArABwHMg%20",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366829&article.offset=0&articleLimit=10",
    "sourceKind": "auto",
    "kindEvidence": [
@@ -7530,7 +7600,17 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "대학봉사장학금_신청서(양식)_(2026-2학기)_(공지용).xlsx",
+     "url": "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=DTy3hbJSf94SJw1tkNX8XG5ipNa6s86pfhwWEYAEDiw%3D&fs=1"
+    },
+    {
+     "name": "본문이미지-597x771.jpg",
+     "url": "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=XdeUBQ8Y6hww0MCfeBJ749gU4bhXZX6jvAJwUIRSyjHOi3J08B7Z3q8u9ibHeePgE2EaPrSwtdQa%0At5d2YtiwhZRZhSXezjEiNrQ%2BZVCldmY%3D",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjIlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
    "sourceKind": "auto",
    "kindEvidence": [
@@ -7798,6 +7878,11 @@
     {
      "name": "2026년 성취(대) 장학생 선발계획 연장 공고.hwpx",
      "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=376795&attachNo=334423"
+    },
+    {
+     "name": "본문이미지-1080x1350.jpg",
+     "url": "https://www.ajou.ac.kr/_attach/ajou/editor-image/2026/09/pImceZPuqqSDQImVpWVpCtMCiT.jpg",
+     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=376795&article.offset=0&articleLimit=10",
@@ -7831,7 +7916,17 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "총동아리연합회",
+     "url": "http://www.jbnudongari.com/file/"
+    },
+    {
+     "name": "본문이미지-1123x1587.jpg",
+     "url": "https://www.jbnu.ac.kr/common/file.do?file=ui5og410RuOuEWNOZWRvzCIk3PDsi0+EOKYiwQJsloAB5F81MTMjBWWYvLPjVxHcZFjrs5g/BdRa5ZjkToCOZQ==",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://www.jbnu.ac.kr/web/Board/217993/detailView.do?category=6",
    "sourceKind": "auto",
    "kindEvidence": [
@@ -7912,7 +8007,18 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "본문이미지-2399x3457.jpg",
+     "url": "https://www.catholic.ac.kr/_attach/cuk/editor-image/2026/09/HWGClQYEjyFBrIPQUccVSbjkIb.jpg",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-511x348.png",
+     "url": "https://www.catholic.ac.kr/_res/cuk/ko/img/main/cuk_webmark.png",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=275978&article.offset=0&articleLimit=10&srCategoryId=22",
    "sourceKind": "auto",
    "kindEvidence": [
@@ -8053,6 +8159,11 @@
     {
      "name": "2026년 성취(대) 장학생 선발계획 연장 공고.hwpx",
      "url": "https://kau.ac.kr/upfile/2026/09/28/20260928062726-3313.hwpx"
+    },
+    {
+     "name": "본문이미지-1191x1684.jpg",
+     "url": "https://kau.ac.kr/upfile/2026/09/28/20260928062716-9066.jpg",
+     "bodyImage": true
     }
    ],
    "sourceUrl": "https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=&mode=read&seq=11234",
@@ -8099,7 +8210,20 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-01 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "[공문] 2026년 우양재단 동행 장학 모집 협조 요청.hwp (다운로드 : 11회)",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=0c6797a234b08b8ba908c89f3f55b111&bbsId=1083"
+    },
+    {
+     "name": "[붙임1] 2026년 동행장학 홍보 포스터.jpg (다운로드 : 9회)",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=29df0f5abb5a9a6114328315d3bcc08b&bbsId=1083"
+    },
+    {
+     "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp (다운로드 : 11회)",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=ca127512499eb0e0ba00b24b184d8221&bbsId=1083"
+    }
+   ],
    "sourceUrl": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=55323",
    "sourceKind": "auto",
    "openDate": "2026-10-01",
@@ -8148,7 +8272,17 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-01 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "2026-2 경희목련장학 신청서_김쿠옹(학번).hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=c302843f935b4ab0a40df149ee3eb4ac&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "본문이미지-2479x3504.png",
+     "url": "https://www.khu.ac.kr/upload/cross/images/000067/[%EA%B3%B5%EA%B3%A0%EB%AC%B8]_2026-2%ED%95%99%EA%B8%B0_%EA%B2%BD%ED%9D%AC%EB%AA%A9%EB%A0%A8%EC%9E%A5%ED%95%99_%EC%8B%A0%EC%B2%AD_%EC%95%88%EB%82%B4(%EA%B3%B5%ED%86%B5)_v2_1.png",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323225",
    "sourceKind": "auto"
   },
@@ -8259,6 +8393,24 @@
     {
      "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp",
      "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=769228&attachNo=562610"
+    },
+    {
+     "name": "교수프로필",
+     "url": "https://www.smu.ac.kr/kor/edu/Profile.do"
+    },
+    {
+     "name": "웹 브라우저에서 바로보기",
+     "url": "https://www.smu.ac.kr/flexer/index.jsp?ftype=hwp&attachNo=562610"
+    },
+    {
+     "name": "본문이미지-3240x4050.jpg",
+     "url": "https://www.smu.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEYUgHAogTQLIDEAeBpAdgQwDkB1AVWwHEAJKgDQE8AzAcwDoAreZoA",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-509x348.png",
+     "url": "https://www.smu.ac.kr/_res/kor/img/common/img-footer-wa2026.png",
+     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=769228&article.offset=0&articleLimit=10",
@@ -8732,7 +8884,17 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-01 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "지원동기서.hwp",
+     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=31569&fSeq=1"
+    },
+    {
+     "name": "본문이미지-511x348.png",
+     "url": "https://www.uos.ac.kr/images/kor2021/main/ft_mk2_260126.png",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31569&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
    "sourceKind": "auto",
    "excerpts": [
@@ -8809,6 +8971,10 @@
     {
      "name": "2026년 성취(대) 장학생 선발계획 연장 공고.hwpx",
      "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367194&attachNo=353349"
+    },
+    {
+     "name": "대학정보공시",
+     "url": "http://www.academyinfo.go.kr/pubinfo/pubinfo0020/list.do?schlId=0000163&svyYr=2018&pageIdx=all&filePath=01&fileName=01&saveName=01"
     }
    ],
    "sourceUrl": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367194&article.offset=0&articleLimit=10",
@@ -8842,7 +9008,31 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-01 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "Attachment2026년 성취(대) 장학생 선발계획 연장 공고.hwpx",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35364&ano=53299"
+    },
+    {
+     "name": "본문이미지-1080x1350.jpg",
+     "url": "https://www.kw.ac.kr/KWData/webeditor/2026/2026_09_30_112652.jpg",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-509x348.webp",
+     "url": "https://www.kw.ac.kr/ko/img/2025-wa-logo.webp?version=260303",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-402x414.png",
+     "url": "https://www.kw.ac.kr/ko/img/kw_chatbot_icon2.png?v=20251021",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53299&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "sourceKind": "auto"
   },
@@ -9106,7 +9296,17 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-04 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "총동아리연합회",
+     "url": "http://www.jbnudongari.com/file/"
+    },
+    {
+     "name": "본문이미지-1024x1028.jpg",
+     "url": "https://www.jbnu.ac.kr/common/file.do?file=jkC7rimuS4SLGUV75ehwNiGuYgzZNR1DlCjrkloLIT/CdGtkeE/in5mUuKe21yZ214+O5/8HK+VyXi3q0dJAcg==",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://www.jbnu.ac.kr/web/Board/218051/detailView.do?pageIndex=1&category=6&menu=2377",
    "sourceKind": "auto"
   },
@@ -9138,7 +9338,31 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-04 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "Attachment20261002 2026년_든든_학업지원금_연장_공고문.pdf",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35374&ano=53420"
+    },
+    {
+     "name": "본문이미지-1024x1028.png",
+     "url": "https://www.kw.ac.kr/KWData/webeditor/2026/2026_10_02_104304.png",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-509x348.webp",
+     "url": "https://www.kw.ac.kr/ko/img/2025-wa-logo.webp?version=260303",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-402x414.png",
+     "url": "https://www.kw.ac.kr/ko/img/kw_chatbot_icon2.png?v=20251021",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53420&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "sourceKind": "auto"
   },
@@ -9215,6 +9439,11 @@
     {
      "name": "2026년 성취(대) 장학생 선발계획 공고.hwpx",
      "url": "https://kau.ac.kr/upfile/2026/09/08/20260908160013-2236.hwpx"
+    },
+    {
+     "name": "본문이미지-510x580.jpg",
+     "url": "https://kau.ac.kr/upfile/2026/09/08/20260908155933-3118.jpg",
+     "bodyImage": true
     }
    ],
    "sourceUrl": "https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=&mode=read&seq=11156",
@@ -9451,7 +9680,13 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-04 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "본문이미지-1080x1350.jpg",
+     "url": "https://www.kyonggi.ac.kr/DATA/bbs/1073/20260929044234229_I9jv.jpg",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do;jsessionid=3C71C54E330DDE56AC526288ABDAD27C?key=7520&bbsNo=1073&nttNo=626271&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888",
    "sourceKind": "auto"
   },
@@ -9483,7 +9718,38 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-04 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "붙임 2026년 2학기 국가근로장학금 사전교육 자료.pdf",
+     "url": "javascript:downloadfile('/storage/www/bbs/57138','88635FBBEC204913ACD6E7045F8744A7_.pdf','%EB%B6%99%EC%9E%84 2026%EB%85%84 2%ED%95%99%EA%B8%B0 %EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EA%B8%88 %EC%82%AC%EC%A0%84%EA%B5%90%EC%9C%A1 %EC%9E%90%EB%A3%8C.pdf' );"
+    },
+    {
+     "name": "2026학년도 2학기 국가근로 사전교육자료(요약서).hwp",
+     "url": "javascript:downloadfile('/storage/www/bbs/57138','B9FDED6CB8D448E9A9897CBFF7C08DEA_.hwp','2026%ED%95%99%EB%85%84%EB%8F%84 2%ED%95%99%EA%B8%B0 %EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C %EC%82%AC%EC%A0%84%EA%B5%90%EC%9C%A1%EC%9E%90%EB%A3%8C(%EC%9A%94%EC%95%BD%EC%84%9C).hwp' );"
+    },
+    {
+     "name": "본문이미지-1920x300.png",
+     "url": "https://www.seoultech.ac.kr/site/ko/2021/res/img/sub_title3444.png",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-509x348.png",
+     "url": "https://www.seoultech.ac.kr/site/ko/res/img/wa_logo.png",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=895210&qidx=57138&cate=0&allboard=true&nowpage=1",
    "sourceKind": "auto",
    "applyEmail": "janghak@seoultech.ac.kr",
