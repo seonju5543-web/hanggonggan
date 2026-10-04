@@ -2676,6 +2676,16 @@ function instaDday(due) {
   if (d < 0) return { cls: 'past', label: '마감 지남' };
   return { cls: d <= 3 ? 'near' : d <= 7 ? 'soon' : '', label: d === 0 ? '오늘 마감' : `D-${d}` };
 }
+/* 게시 버튼 대신 이유를 둘 줄인가 — 이유 한 줄 또는 null (2026-10-04 로봇·도구 점검).
+   그전엔 '마감 지남' 줄에도 게시 버튼이 같이 있었다. 🔴 짝: insta/publish.mjs 의 publishRefusal — 로봇이 올리기 전에
+   같은 판정으로 한 번 더 거절한다(화면은 버튼을 감출 뿐이다). ② 의 [2, 3, 4] 는 2026-10-04 전에 그린 판형 2·3·4번
+   폴더만 가리킨다(그림에 그린 날 기준 「마감 D-N」 이 박혔다 · 새로 그린 줄에는 dates: 'absolute' 가 있다). */
+function instaPublishBlock(p) {
+  if (!p || !p.due || Number.isNaN(Date.parse(`${p.due}T23:59:59+09:00`))) return null;
+  if (instaDday(p.due).cls === 'past') return '마감 지남 — 게시 안 함';
+  if (p.dates !== 'absolute' && [2, 3, 4].includes(Number(p.tplNo))) return '옛 카드(D-N) — 다시 그린 뒤 게시';
+  return null;
+}
 function instaGroups() {
   const seen = D.insta.seen || { posted: [], prepared: [] };
   const postedCodes = new Set((seen.posted || []).map((p) => p.code));
@@ -2701,8 +2711,10 @@ function instaPostRow(p, kind) {
     stat ? `<span>좋아요 ${stat.likes ?? '—'} · 댓글 ${stat.comments ?? '—'} · 저장 ${stat.saved ?? '—'} · 도달 ${stat.reach ?? '—'}</span>` : '',
   ].filter(Boolean).join('');
   const thumb = `<img class="ig-thumb" src="${raw(`insta/pub/${p.code}/1.jpg`)}" alt="" loading="lazy" width="54" height="68">`;
+  const block = kind === 'prepared' ? instaPublishBlock(p) : null;
   const acts = kind === 'prepared' ? `
-      <button class="btn btn-sm btn-primary" data-ig-publish="${esc(p.code)}">게시</button>
+      ${block ? `<span class="muted" data-ig-block="${esc(p.code)}">${esc(block)}</span>`
+    : `<button class="btn btn-sm btn-primary" data-ig-publish="${esc(p.code)}">게시</button>`}
       <button class="btn btn-sm" data-ig-view="${esc(p.code)}">카드 보기</button>
       <select class="ig-tpl" data-ig-tpl-for="${esc(p.code)}" aria-label="판형 바꾸기">
         ${tpls.map((t) => `<option value="${t.no}"${t.no === p.tplNo ? ' selected' : ''}>${t.no}번 ${esc(t.name)}</option>`).join('')}
@@ -2784,7 +2796,7 @@ function renderInsta() {
     <div class="cards">
       <div class="card ${prepared.length ? 'is-warn' : 'is-ok'}" data-stat><div class="v">${prepared.length}</div><div class="k">게시 대기</div><div class="d">개발자가 보고 올릴 차례인 카드</div></div>
       <div class="card" data-stat><div class="v">${posted.length}</div><div class="k">올린 게시물</div><div class="d">건너뜀 ${skipped.length}건</div></div>
-      <div class="card ${newC.length ? 'is-warn' : ''}" data-stat><div class="v">${newC.length}</div><div class="k">답 안 한 댓글</div><div class="d">${D.insta.comments.updatedAt ? `받아 온 시각 ${esc(String(D.insta.comments.updatedAt).slice(0, 16).replace('T', ' '))} UTC` : '아직 받아 온 적 없음'}</div></div>
+      <div class="card ${newC.length ? 'is-warn' : ''}" data-stat><div class="v">${newC.length}</div><div class="k">답 안 한 댓글</div><div class="d">${D.insta.comments.updatedAt ? `마지막 변화 ${esc(String(D.insta.comments.updatedAt).slice(0, 16).replace('T', ' '))} UTC` : '아직 받아 온 적 없음'}</div></div>
       <div class="card" data-stat><div class="v">${nf(st.account && st.account.followers)}</div><div class="k">팔로워${st.account && st.account.username ? ` · @${esc(st.account.username)}` : ''}</div><div class="d">${st.updatedAt ? `수확 ${esc(String(st.updatedAt).slice(0, 10))}` : '트랙션 수확 전'}</div></div>
       ${tokenCard}
     </div>
@@ -2886,7 +2898,8 @@ async function instaDispatch(file, inputs, label, note, danger = false, lines = 
       try {
         jobShow(`${label} — 요청을 보냈어요`);
         await dispatchWorkflow(file, inputs);
-        jobShow(`${label} — 로봇이 돌기 시작했습니다. 끝나면 새로고침으로 확인하세요`, 'ok',
+        // 깨우기는 '줄을 세운 것' 까지다 — 같은 공고의 앞선 작업이 돌고 있으면 기다린다(insta.yml 작업별 대기줄 · 2026-10-04)
+        jobShow(`${label} — 로봇에게 맡겼습니다. 앞선 작업이 있으면 차례를 기다립니다 — 1~2분 뒤 새로고침으로 확인하세요`, 'ok',
           `https://github.com/${OWNER}/${REPO}/actions/workflows/${file}`);
       } catch (err) { jobShow(err.message, 'bad'); }
     },
@@ -3252,6 +3265,8 @@ async function handleInstaClick(e) {
   let v;
   if ((v = q('data-ig-view')) !== null) { instaCardSheet(v); return true; }
   if ((v = q('data-ig-publish')) !== null) {
+    const block = instaPublishBlock(instaGroups().prepared.find((x) => x.code === v));
+    if (block) { jobShow(`게시하지 않습니다 — ${block}`, 'bad'); return true; }
     await instaDispatch(WF_INSTA, { step: INSTA_STEP.publish, code: v }, '인스타에 게시',
       '되돌릴 수 없습니다. 준비된 그 카드를 그대로 올립니다(다시 그리지 않습니다). 시크릿이 없으면 실패 이슈가 옵니다.', true, [{ t: nameOf(v), m: v }]);
     return true;

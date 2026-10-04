@@ -7,10 +7,13 @@
  *       node insta/ledger.mjs skip <코드> [--by=사람]      '건너뛰기' 로 (폴더는 남긴다 · 다시 준비하면 되살아난다)
  *       node insta/ledger.mjs failed <코드…>              못 그린 것을 적는다 — 🔴 안 적으면 같은 공고가 매 실행 1등으로
  *                                                          다시 뽑혀 나머지를 굶기고 실패 이슈만 쌓인다(코드 리뷰). 7일 뒤 다시 뜬다
+ *       node insta/ledger.mjs expire                        마감이 지난 카드(준비·건너뜀·실패)를 '만료' 로 바꾸고 그 폴더를 지운다
+ *                                                          (2026-10-04 · 규칙은 pick.mjs expireRows · 🔴 올린 것의 폴더는 절대 안 지운다
+ *                                                          — 관리자 「올림」 줄의 썸네일이 읽는다 · 마지막 줄 `expired=<건수>`)
  *       node insta/ledger.mjs show                          장부 요약
  */
-import { readFileSync, existsSync } from 'node:fs';
-import { readSeen, writeSeen, markPrepared } from './pick.mjs';
+import { readFileSync, existsSync, rmSync } from 'node:fs';
+import { readSeen, writeSeen, markPrepared, expireRows } from './pick.mjs';
 import { kstDay } from './graph.mjs';
 
 const ROOT = new URL('../', import.meta.url);
@@ -26,7 +29,7 @@ if (cmd === 'prepared') {
     if (!existsSync(f)) { console.error(`🚨 insta/pub/${c}/meta.json 이 없습니다 — 그리지 않은 것을 장부에 적을 수 없습니다.`); process.exit(1); }
     const m = JSON.parse(readFileSync(f, 'utf8'));
     markPrepared(seen, { code: c, org: m.org, name: m.name, due: m.due, school: m.school || null,
-      tplNo: m.tplNo, cards: m.cards, dir: `insta/pub/${c}`, at: m.at, status: 'prepared' });
+      tplNo: m.tplNo, cards: m.cards, dir: `insta/pub/${c}`, at: m.at, dates: m.dates || null, status: 'prepared' });   // dates — 관리자 화면이 옛 「마감 D-N」 카드를 가린다
   }
   writeSeen(seen);
   console.log(`장부: 준비 ${seen.prepared.filter((p) => p.status === 'prepared').length}건 · 건너뜀 ${seen.prepared.filter((p) => p.status === 'skipped').length}건 · 올림 ${seen.posted.length}건`);
@@ -46,10 +49,22 @@ if (cmd === 'prepared') {
   }
   writeSeen(seen);
   console.log(`못 그림: ${codes.join(' ')}`);
+} else if (cmd === 'expire') {
+  const posted = new Set(seen.posted.map((p) => p.code));
+  const gone = expireRows(seen, Date.now());
+  for (const c of gone) {
+    // 코드는 장부에서 왔다 — 폴더 이름으로 못 쓰는 글자면(../ 등) 지우지 않는다. 올린 것은 두 번 확인한다.
+    if (!/^[A-Za-z0-9_-]+$/.test(c) || posted.has(c)) continue;
+    rmSync(new URL(`insta/pub/${c}/`, ROOT), { recursive: true, force: true });
+    console.log(`  만료·정리: ${c}`);
+  }
+  if (gone.length) writeSeen(seen);
+  console.log(`마감 지나 정리 ${gone.length}건`);
+  console.log(`expired=${gone.length}`);
 } else if (cmd === 'show') {
   for (const p of seen.prepared) console.log(`  ${p.status.padEnd(8)} ${p.code}  ${p.org || ''} · ${p.name || ''}  판형 ${p.tplNo ?? '?'}번  ${p.at || ''}`);
   console.log(`  올림 ${seen.posted.length}건`);
 } else {
-  console.error('prepared | skip | failed | show');
+  console.error('prepared | skip | failed | expire | show');
   process.exit(1);
 }

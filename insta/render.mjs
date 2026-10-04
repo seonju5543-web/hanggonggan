@@ -120,10 +120,18 @@ const dday = (due, today) => {
   // 🔴 남은 날은 **달력 날짜 차이**다 — 9/11 에서 9/18 은 D-7 이지 D-8 이 아니다.
   //    시각 차를 반올림하면 하루씩 밀린다(23:59 마감이라 늘 0.99 가 붙는다).
   const day = (ms) => Date.parse(`${new Date(ms + 9 * 36e5).toISOString().slice(0, 10)}T00:00:00Z`);
-  return { state: 'open', d: Math.round((day(t) - day(+today)) / 864e5) };
+  return { state: 'open', d: Math.round((day(t) - day(+today)) / 864e5), due };
 };
-const ddayText = (x) => x.state === 'unknown' ? '기간 앱에서 확인'
-  : x.state === 'past' ? '마감 지남' : x.d === 0 ? '오늘 마감' : `마감 D-${x.d}`;
+/** 카드에 박는 마감 글자. 🔴 **상대 날짜(`마감 D-N`·`오늘 마감`)를 쓰지 말 것** — 그림은 굳는데
+ *  게시물은 피드에 남아 다음 날부터 거짓이 된다(표지 후킹과 같은 규칙 · insta/DESIGN.md).
+ *  2026-10-04 로봇·도구 점검: 판형 2·3·4 가 그린 날 기준 `마감 D-21` 을 박고 있었다 → 절대 날짜로.
+ *  그 전에 그린 2·3·4번 폴더는 publish.mjs 의 publishRefusal 이 게시를 막는다(meta.json `dates`). */
+const ddayText = (x) => {
+  if (x.state === 'unknown') return '기간 앱에서 확인';
+  if (x.state === 'past') return '마감 지남';
+  const [, mm, dd] = String(x.due || '').split('-');
+  return mm && dd ? `${Number(mm)}월 ${Number(dd)}일 마감` : '기간 앱에서 확인';
+};
 
 /** 배경 사진 — `insta/photos.json` (교내는 위키미디어, 교외는 Openverse).
  *  🔴 교내 공고는 그 학교 사진, 교외는 학교가 안 드러나는 사진을 쓴다.
@@ -864,7 +872,9 @@ if (RUN) {
     writeFileSync(join(pub, 'caption.txt'), cap + '\n');
     writeFileSync(join(pub, 'meta.json'), JSON.stringify(
       { code: s.code, org: s.org, name: s.name, due: s.due, school: s.school || null,
-        tpl: t.id, tplNo: t.no, seed, skin: t.skin ? skinName : null, font, cards: n, at: day }, null, 1) + '\n');
+        tpl: t.id, tplNo: t.no, seed, skin: t.skin ? skinName : null, font, cards: n, at: day,
+        // 🔴 그림 속 마감이 절대 날짜라는 표식 — 없으면(2026-10-04 전에 그린 2·3·4번) publish.mjs 가 게시를 거절한다
+        dates: 'absolute' }, null, 1) + '\n');
     console.log(`  게시용 — insta/pub/${s.code}/ (${tplLabel(t)} · ${n}장 + 캡션)`);
   }
   await browser.close();
