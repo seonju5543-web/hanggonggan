@@ -16,7 +16,8 @@
      --dry 는 숫자만 보이고 아무것도 쓰지 않는다.
    9-30 사고 복구: bash tools/robot-run.sh node collector/heal-feed.mjs --since=0000-00-00 git:ab897c3b:data/notices/ git:60ce385a:data/notices.json
 
-   하는 일(수집기 끝부분과 같은 차례): data/notices.json 읽기 → healFromLedger(메우기만 · 지금 글은 안 바꾼다 · foundAt 그대로)
+   하는 일(수집기 끝부분과 같은 차례): data/notices.json 읽기 → healFromLedger(메우기만 · 지금 글은 안 바꾼다 · foundAt 그대로 ·
+   같은 글이면 지금 학교별 파일의 판(그 주소)이 원천보다 먼저 — 원천은 링크 로봇이 고친 주소를 모른다 · 수집기와 같은 opts.current)
    → dropUnserved → publishBySchool(자르기 전 목록) → capNotices → updatedAt(KST) → JSON.stringify(…, null, 1).
    ⚠️ registered.json 은 건드리지 않는다. 끝나면 node verify/audit-data.js 로 확인하고 data/notices.json · data/notices/ 를 커밋한다.
    ⚠️ 불러오는 순간 실행된다 — 관문·다른 로봇에서 import 하지 말 것.
@@ -27,7 +28,7 @@ import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { capNotices } from './url-key.mjs';
 import { loadCandidates } from './candidates.mjs';
-import { healFromLedger, dropUnserved, publishBySchool, FEED_HEAL_SINCE } from './publish-notices.mjs';
+import { healFromLedger, dropUnserved, publishBySchool, readSchoolFiles, FEED_HEAL_SINCE } from './publish-notices.mjs';
 
 /* 데이터는 **지금 자리(저장소 맨 위)** 의 data/·collector/ 를 읽고 쓴다 — 관문이 임시 저장소에서 이 도구를 그대로 돌려 보게(관리자 저장소와 같은 방식) */
 const ROOT = process.cwd();
@@ -75,13 +76,14 @@ try {
 const noticesPath = path.join(ROOT, 'data/notices.json');
 const notices = JSON.parse(fs.readFileSync(noticesPath, 'utf8'));
 const before = notices.items || [];
-const healed = healFromLedger(before, pool, { since });
+const counts = {};
+const healed = healFromLedger(before, pool, { since, current: readSchoolFiles({ dir: pathToFileURL(path.join(ROOT, 'data', 'notices') + path.sep) }), counts });
 const had = new Set(before);
 const added = healed.filter((n) => !had.has(n));
 const by = {};
 for (const n of added) by[n.school] = (by[n.school] || 0) + 1;
 console.log(`원천 ${sources.length ? sources.join(' · ') : 'collector/candidates.json'} — 글 ${pool.length}건 · since ${since}`);
-console.log(`메울 글 ${added.length}건: ${Object.entries(by).sort((a, b) => b[1] - a[1]).map(([s, k]) => `${s} ${k}`).join(' · ') || '없음'}`);
+console.log(`메울 글 ${added.length}건(학교별 파일에도 없던 글 ${counts.restored} · notices.json 에만 없던 글 ${counts.kept}): ${Object.entries(by).sort((a, b) => b[1] - a[1]).map(([s, k]) => `${s} ${k}`).join(' · ') || '없음'}`);
 if (DRY) { console.log('--dry — 아무것도 쓰지 않았습니다.'); process.exit(0); }
 if (!added.length) { console.log('메울 글이 없어 아무것도 쓰지 않았습니다.'); process.exit(0); }
 

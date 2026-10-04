@@ -6,7 +6,7 @@ import { deadlineHintFrom } from './deadline-hint.mjs';
 import { chromium } from 'playwright';
 import { urlKey, dedupeNotices, capNotices, clickRowKey } from './url-key.mjs';
 import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mjs';
-import { publishBySchool, dropUnserved, healFromLedger } from './publish-notices.mjs';
+import { publishBySchool, dropUnserved, healFromLedger, readSchoolFiles } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { cleanTitle, isMenuEntry } from './clean-title.mjs';
@@ -661,14 +661,15 @@ notices.items = dedupeNotices(notices.items);
    (2026-08-17 실측 747건 유실). 경위는 collector/candidates.mjs 첫머리. */
 saveCandidates(mergeCandidates(loadCandidates().items, freshAll));
 
-/* 🔴 피드에서 빠진 글을 후보 장부에서 다시 싣는다 (2026-10-04 점검 collect-05) — 이미 본 글은 seen 때문에 위에서 다시 수집되지 않아
-   한 번 빠지면(9-30 병합기가 200건으로 자른 15개교 215건처럼) 영영 안 돌아왔다. 메우기만 하고 지금 글은 바꾸지 않는다 ·
+/* 🔴 피드에서 빠진 글을 다시 싣는다 (2026-10-04 점검 collect-05 · 리뷰 R1) — 이미 본 글은 seen 때문에 위에서 다시 수집되지 않아
+   한 번 빠지면(9-30 병합기가 200건으로 자른 15개교 215건처럼) 영영 안 돌아왔다. 원천은 **학생이 지금 보는 학교별 파일 먼저**(같은 글이면
+   그 판의 주소를 쓴다 — 장부는 링크 로봇이 고친 주소를 모른다), 그다음 후보 장부. 지금 글(notices.json)은 바꾸지 않는다 ·
    규칙·까닭은 publish-notices.mjs healFromLedger 한 곳. 🔴 두 수집기 모두에 둔다 — 한쪽만 두면 둘이 번갈아 학교별 파일을 다시 써서
-   되살린 글이 들쭉날쭉한다(관문 「로봇·도구 점검 관문」 feed). */
-const beforeHeal = notices.items.length;
-notices.items = healFromLedger(notices.items, loadCandidates().items);
-const healedCount = notices.items.length - beforeHeal;
-if (healedCount > 0) console.log(`후보 장부에서 notices.json 에 없던 글 ${healedCount}건을 메웠습니다`);
+   되살린 글이 들쭉날쭉한다(관문 「로봇·도구 점검 관문」 feed). 🔴 학교별 파일은 아래 publishBySchool 이 다시 쓰기 **전에** 읽는다. */
+const healCounts = {};
+notices.items = healFromLedger(notices.items, loadCandidates().items, { current: readSchoolFiles(), counts: healCounts });
+const healedCount = healCounts.restored;   // 학교별 파일에도 없던 글 = 진짜 유실 (상한에 잘렸다 다시 실린 글 healCounts.kept 는 세지 않는다 · 리뷰 R3)
+if (healCounts.restored || healCounts.kept) console.log(`피드 메우기: 학교별 파일에도 없던 글 ${healCounts.restored}건(후보 장부에서) · notices.json 에만 없던 글 ${healCounts.kept}건(학교별 파일 그대로)`);
 
 /* 🔴 서비스하지 않는 학교의 공고는 여기서 떨군다 (2026-09-05 개발자 지시).
    수집 대상은 이미 경희대·한국외대 둘뿐인데 **예전에 담긴 다른 학교 공고가 그대로 남아**
@@ -710,7 +711,7 @@ fs.writeFileSync(cursorPath, JSON.stringify(cursor, null, 1));
 
 report.push('---');
 report.push(`이번 실행 신규 수집: **${freshAll.length}건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.`);
-if (healedCount > 0) report.push(`🔁 data/notices.json 에 없던 글 ${healedCount}건을 후보 장부(collector/candidates.json)에서 메웠습니다 — 이미 본 글이라 수집으로는 안 돌아오는 글(notices.json 전체 상한에 잘린 글도 여기 셉니다)`);
+if (healedCount > 0) report.push(`🔁 학생 화면(학교별 파일)에서도 빠졌던 글 ${healedCount}건을 후보 장부(collector/candidates.json)에서 다시 실었습니다 — 이미 본 글이라 수집으로는 안 돌아오는 글입니다(notices.json 전체 상한에만 잘린 글은 세지 않습니다)`);
 report.push(`⏱ 소요 ${Math.round(budget.elapsed() / 60000)}분 / 예산 ${Math.round(BUDGET_MS / 60000)}분 · 학교 ${doneCount}/${cfg.targets.length}곳 처리`);
 if (skipped.length) {
   report.push(`⏱ **시간 예산으로 건너뛴 학교 ${skipped.length}곳**: ${skipped.join(' · ')}`);

@@ -42,6 +42,8 @@ import { titleKey, noticeUrlRank, dedupeNotices } from './url-key.mjs';
 import { KEEP_DAYS } from './candidates.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { cleanTitle } from './clean-title.mjs';
+/* 주소의 HTML 기호(`&#038;`·`&amp;`) 되돌리기 — 앱과 같은 파일 하나(source-link.js · 수집기 board-links.mjs·auto-register 도 이것). 베끼지 않는다. */
+const { decodeUrlEntities } = require('../source-link.js');
 
 /* 학교 하나가 가질 수 있는 공고 수. 전체 상한(capNotices)과 달리 **다른 학교에 밀려
    줄어들지 않는다** — 학생은 자기 파일만 받으므로 옆 학교가 바쁘든 말든 상관없다. */
@@ -65,7 +67,9 @@ export function splitBySchool(items, perSchool = PER_SCHOOL) {
 }
 
 /* 발행 — 학교별 파일 + 사람이 읽을 색인.
-   🔴 넘겨받는 것은 **그날 주운 글이 아니라 60일치를 쌓은 전체 목록**이다(수집기가 notices.json 에 누적한 것).
+   🔴 넘겨받는 것은 **그날 주운 글이 아니라 60일치를 쌓은 전체 목록**이다(수집기가 notices.json 에 누적한 것 + 발행 직전 healFromLedger 가
+      지금 학교별 파일·후보 장부에서 메운 것). 그래서 notices.json 을 못 읽은 실행(첫 실행·깨진 JSON — 수집기는 빈 목록으로 시작한다)에도
+      학교별 파일의 글은 메우기의 ① 원천으로 돌아와 여기서 비지 않는다(리뷰 R5 · 관문 feed ⑥).
       게시판 하나가 그날 접속에 실패해도 그 학교 글은 목록에 그대로 있다 — 그래서 목록에 글이 하나도 없는 학교는
       '오늘 못 읽은 학교'가 아니라 **그 학교 글이 목록에서 다 빠진 학교**다(60일 경과 · 서비스 제외 · 병합 사고 등 — 까닭은 여기서 모른다).
    🔴 그런 학교의 옛 파일은 **빈 파일로 다시 쓴다** (2026-10-04 점검 app2-F4 · collect-12). 예전 주석은 '접속 실패했을 뿐일 수 있어
@@ -124,26 +128,41 @@ export function dropUnserved(items, served = SERVED_SCHOOLS) {
   return (items || []).filter((n) => ok.has(n && n.school));
 }
 
-/* 🔴 **피드에서 빠진 글을 후보 장부에서 다시 싣는다** (2026-10-04 점검 collect-05 · collect-01).
+/* 🔴 **피드에서 빠진 글을 다시 싣는다 — 학생이 지금 보는 판 먼저, 그다음 후보 장부** (2026-10-04 점검 collect-05 · collect-01 · 리뷰 R1~R3·R5).
    수집기는 '이미 본 글인가'를 seen.json 으로만 묻고 '지금 피드에 있는가'는 묻지 않는다. 그래서 한 번 피드에서 빠진 글은
    **영영 돌아오지 않는다** — 9-30 병합기가 notices.json 을 200건으로 잘랐을 때(옛 slice(0,200)) 15개교 215건이 그렇게 사라졌고,
    seen.json 은 지우는 곳이 없어 다음 실행들도 '새 글 0건'이었다. 후보 장부(candidates.json)에는 그 글이 다 남아 있다.
 
-   하는 일: 장부에서 ① 서비스 학교 ② 60일(KEEP_DAYS) 안 ③ FEED_HEAL_SINCE 이후 수집 ④ 첨부 링크 아님 — 인 글을 골라
-   **지금 피드에 없는 것만** 덧붙인다. 낱말 그물(KEYWORDS)·메뉴 판정은 다시 걸지 않는다(피드에 남은 글에도 안 거는 규칙이라 갈라진다).
-   제목은 저장하는 로봇과 같은 청소(cleanTitle)를 거친다 — 장부에는 청소 전 제목이 남아 있다.
-
-   🔴 **메우기만 하고 바꾸지 않는다.** 그냥 합치면(dedupeNotices(피드 + 장부)) preferNotice 가 첨부·힌트가 있는 장부의 옛 판을 골라,
-      링크 로봇이 고친 지금 글의 주소가 옛 판으로 되돌아간다(실측 11건 · 서울교대 목록 표식 3건 포함). 그래서 같이 돌려
-      '새로 생긴 칸'만 가져오고, 지금 글은 같은 객체 그대로 둔다. 판정은 dedupeNotices 를 그대로 부른다(열쇠를 베끼지 않는다).
-   🔴 **다리 막기** — 장부 안의 두 변형(같은 주소·다른 제목)이 피드 글과 이어지면, 새 칸에 남은 판이 피드 글과 제목(또는 주소·글 번호)을
+   원천 둘 (앞이 이긴다):
+     ① opts.current — **학생이 지금 보는 판**(학교별 파일 data/notices/*.json · readSchoolFiles). 60일 · 첨부 · 서비스 밖만 건다(since 는 안 건다 —
+        since 는 장부의 8월 파킹분을 막는 것이고, 학교별 파일에는 그런 글이 없다). notices.json 전체 상한(capNotices · 학교당 40)에 잘린 글은
+        여기서 그대로 돌아온다 — 학교별 파일이 학교당 PER_SCHOOL(60)까지 담는 원래 설계대로.
+     ② ledger — 후보 장부. ① 의 규칙 + FEED_HEAL_SINCE 이후 수집분만.
+   🔴 **같은 글이면 ① 의 판(그 주소)을 쓴다** — 장부는 링크 로봇(link-hunter·resolve-detail-urls)도, 10-03 원문 링크 정직성 정리도
+      고치지 않아 **수집 당시 주소**를 들고 있다. 장부 판을 쓰면 상한에 잘렸다 다시 실리는 글마다 고친 주소가 옛 주소로 되돌아가고
+      (리뷰 R1 실측: 표식→진짜 주소로 고친 X 가 두 번째 실행에 #n- 표식으로 · 반대로 10-03 이 표식으로 바꾼 '다른 글 주소'가 되살아난다),
+      되돌아간 글은 notices.json 에 없어 patchUrlsBySchool 도 영영 못 고친다. 그래서 같은 글 무리 안에서는 '먼저 온 쪽'(① → ②)이 이기고
+      preferNotice(첨부·힌트 점수)는 장부 판끼리만 고른다. 무리는 dedupeNotices 가 실제로 합친 대로 따라간다(열쇠를 베끼지 않는다).
+   🔴 **지금 글(items = notices.json)은 바꾸지 않는다** — 그냥 합치면(dedupeNotices(피드 + 원천)) preferNotice 가 첨부·힌트가 있는 옛 판을 골라
+      지금 글의 주소가 되돌아간다(실측 11건 · 서울교대 목록 표식 3건 포함). 같이 돌려 '새로 생긴 칸'만 가져오고, 지금 글은 같은 객체 그대로 둔다.
+   🔴 **다리 막기** — 원천 안의 두 변형(같은 주소·다른 제목)이 피드 글과 이어지면, 새 칸에 남은 판이 피드 글과 제목(또는 주소·글 번호)을
       공유해 감사의 '실시간 공고에 중복'(오류 → 데이터 관문 빨간불 → 자동 등록 되돌림)이 된다. 새 칸 하나하나를 dedupeNotices 의 열쇠
       전부로 피드 글·앞서 받은 새 칸과 대 보고, 하나라도 겹치면 버린다.
+   다듬기 (새 칸에만 · 지금 글은 안 건드린다):
+     · 주소의 HTML 기호(`&#038;`·`&amp;`)를 되돌린다 — 앱과 같은 함수(source-link.js decodeUrlEntities · 수집기는 10-03부터 board-links.mjs 가
+       같은 함수로 되돌려 담는다). 안 되돌리면 `#038;…` 이 조각이 되어 글 번호가 잘린다(감사 경고 · 리뷰 R2 — 9-29 뒤 장부에 31건).
+       장부의 서울대 학자금대출 두 글(uid=316·323)이 그 예다 — 9-30 01:30 UTC 수집(run 36655403008)이 학교별 파일에 실었지만 같은 실행의
+       push 가 거절돼 병합기가 notices.json 을 다시 200건으로 잘랐고(로그 '[merge-json-union] 자동 병합 완료: data/notices.json' · 커밋 17d68637 —
+       서울대 notices.json 0건 · 학교별 파일 11건), 다음 수집(커밋 a847f2c5)이 그 notices.json 으로 학교별 파일을 2건으로 다시 썼다.
+       같은 사고의 두 번째 실행이라 피드에서 빼는 규칙이 따로 있는 것은 아니다(사고 직전 판 60ce385a·ab897c3b 에 없던 것은 그 뒤에 수집돼서다).
+     · 장부 제목은 저장하는 로봇과 같은 청소(cleanTitle)를 거친다 — 장부에는 청소 전 제목이 남아 있다. 학생이 보는 판의 제목은 그대로 둔다.
    ⚠️ foundAt 은 원래 날짜 그대로 둔다 — 오늘로 바꾸면 알림(notify-rules.js foundBeforeLastCheck)이 '새 공고'로 울리고 60일 수명도 늘어난다.
-   🔴 **피드에서 글을 빼는 규칙을 새로 만들면 여기 pool 거르기에도 같은 함수를 건다** — 안 걸면 이 메우기가 다음 실행에 그 글을 장부에서
-      되살린다(지금 피드에서 빼는 규칙은 60일 · 첨부 링크 · 서비스 밖 셋이고 셋 다 여기 걸려 있다).
+   🔴 **피드에서 글을 빼는 규칙을 새로 만들면 여기 거르기(take)에도 같은 함수를 건다** — 안 걸면 이 메우기가 다음 실행에 그 글을 학교별 파일이나
+      장부에서 되살린다(지금 피드에서 빼는 규칙은 60일 · 첨부 링크 · 서비스 밖 셋이고 셋 다 take 에 걸려 있다).
+   opts.counts(객체)를 넘기면 채운다: restored = 학교별 파일에도 없던 글(장부에서만 돌아온 것 — 진짜 유실 · 리포트 🔁) ·
+   kept = 학교별 파일에 있던 글(상한에 잘렸던 것 등 — 학생 화면에서 빠진 적 없음).
    반환: 새 배열(입력을 고치지 않는다). 새 칸이 없으면 dedupe 한 피드 그대로, 있으면 foundAt 내림차순 안정 정렬(병합기 mergeNotices 와 같은 차례). */
-/* 9-29 = 44개교 복원일. 그 전 수집분은 8월 30일 파킹으로 **일부러 뺀** 글이라 메우지 않는다(마감도 대부분 지났다).
+/* 9-29 = 44개교 복원일. 그 전 수집분은 8월 30일 파킹으로 **일부러 뺀** 글이라 장부에서 메우지 않는다(마감도 대부분 지났다).
    11-28 이후에는 60일 경계가 이 날을 넘으므로 저절로 뜻이 없어진다 — 다시 학교를 파킹할 일이 생기면 그때 이 날을 옮긴다. */
 export const FEED_HEAL_SINCE = '2026-09-29';
 
@@ -152,33 +171,72 @@ export function healFromLedger(items, ledger, opts = {}) {
   const keepDays = opts.keepDays ?? KEEP_DAYS;
   const since = opts.since ?? FEED_HEAL_SINCE;
   const ok = new Set(opts.served || SERVED_SCHOOLS);
+  const counts = opts.counts && typeof opts.counts === 'object' ? opts.counts : {};
+  counts.restored = 0; counts.kept = 0;
   const cutoff = new Date(today.getTime() - keepDays * 86400000).toISOString().slice(0, 10);
   const from = since > cutoff ? since : cutoff;
+  /* 피드에 실어도 되는 글인가(수집기가 피드에 거는 규칙 그대로) + 새 칸 다듬기. 고칠 것이 있으면 사본을 만든다(원천을 고치지 않는다). */
+  const take = (n, minDay, tidyTitle) => {
+    if (!n || !n.url || !n.school || !ok.has(n.school)) return null;
+    if (!(String(n.foundAt || '') >= minDay)) return null;
+    if (isAttachmentEntry(n)) return null;
+    const url = decodeUrlEntities(n.url);
+    const t = tidyTitle ? cleanTitle(n.title || '') : n.title;
+    const title = t || n.title;
+    return url !== n.url || title !== n.title ? { ...n, url, title } : n;
+  };
+  const shown = [];
+  for (const n of opts.current || []) { const x = take(n, cutoff, false); if (x) shown.push(x); }
   const pool = [];
-  for (const n of ledger || []) {
-    if (!n || !n.url || !n.school || !ok.has(n.school)) continue;
-    if (!(String(n.foundAt || '') >= from)) continue;
-    if (isAttachmentEntry(n)) continue;
-    const title = cleanTitle(n.title || '');
-    pool.push(title && title !== n.title ? { ...n, title } : n);
-  }
+  for (const n of ledger || []) { const x = take(n, from, true); if (x) pool.push(x); }
   const A = dedupeNotices(items || []);
-  if (!pool.length) return A;
-  /* 새 칸 = '피드를 먼저 넣고 장부를 이어 넣었을 때 피드 칸 뒤에 생긴 칸'. 앞 칸 수가 피드 길이와 같으려면 피드가 dedupe 를 다시 걸어도
+  if (!shown.length && !pool.length) return A;
+  /* 새 칸 = '피드를 먼저 넣고 원천(① → ②)을 이어 넣었을 때 피드 칸 뒤에 생긴 칸'. 앞 칸 수가 피드 길이와 같으려면 피드가 dedupe 를 다시 걸어도
      줄지 않아야 한다 — 드물게 줄면(같은 열쇠로 이어진 두 글) 줄지 않을 때까지 걸어 앞 칸 수를 맞춘다(지금 글은 A 그대로 쓴다). */
   let base = A;
   for (let again = dedupeNotices(base); again.length !== base.length; again = dedupeNotices(base)) base = again;
-  const fresh = dedupeNotices(base.concat(pool)).slice(base.length);
+  const seq = base.concat(shown, pool);
+  /* 무리 따라가기 — distinct 가 늘 거짓이면 합치는 결과는 넘기지 않은 것과 같고, 불릴 때마다 '이 글(n)이 이 칸(slot)에 합쳐진다'를 알려 준다.
+     칸 하나에 합쳐진 글들이 한 무리다(앞 글이 무리 번호를 물려준다). */
+  const groupOf = new Map();
+  seq.forEach((n, i) => { if (!groupOf.has(n)) groupOf.set(n, i); });
+  const merged = dedupeNotices(seq, { distinct: (slot, n) => { groupOf.set(n, groupOf.get(slot)); return false; } });
+  const fresh = merged.slice(base.length);
   if (!fresh.length) return A;
+  const shownSet = new Set(shown);
+  const firstShown = new Map();   // 무리 번호 → 그 무리의 첫 '학생이 보는 판'
+  for (const n of shown) { const g = groupOf.get(n); if (!firstShown.has(g)) firstShown.set(g, n); }
+  const picked = [];
+  const taken = new Set();
+  for (const s of fresh) {
+    const n = firstShown.get(groupOf.get(s)) || s;
+    if (!taken.has(n)) { taken.add(n); picked.push(n); }
+  }
   /* 다리 막기 — 새 칸을 피드 뒤에 붙여 dedupeNotices 를 한 번 더 돌리되, 합치지는 않고(distinct 가 늘 참) '어느 칸과 열쇠가 겹쳤나'만 본다.
      distinct 는 열쇠가 겹치는 칸마다 불리므로 주소·제목·글 번호 열쇠를 dedupe 와 똑같이 다 대 본다(열쇠 규칙을 여기 베끼지 않는다). */
   const feed = new Set(A);
-  const isNew = new Set(fresh);
+  const isNew = new Set(picked);
   const clash = new Set();
-  dedupeNotices(A.concat(fresh), { distinct: (slot, n) => { if (isNew.has(n) && (feed.has(slot) || isNew.has(slot))) clash.add(n); return true; } });
-  const gap = fresh.filter((n) => !clash.has(n));
+  dedupeNotices(A.concat(picked), { distinct: (slot, n) => { if (isNew.has(n) && slot !== n && (feed.has(slot) || isNew.has(slot))) clash.add(n); return true; } });
+  const gap = picked.filter((n) => !clash.has(n));
+  for (const n of gap) { if (shownSet.has(n)) counts.kept += 1; else counts.restored += 1; }
   if (!gap.length) return A;
   return A.concat(gap).sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')));
+}
+
+/* 학생이 지금 보는 판 — 학교별 파일 전부(색인 빼고)를 읽기만 한다. 못 읽는 파일은 건너뛴다.
+   수집기 둘·메우기 도구(heal-feed.mjs)가 healFromLedger 의 opts.current 로, 누락 감사(audit-coverage.mjs)가 '가진 것'으로 쓴다. */
+export function readSchoolFiles(opts = {}) {
+  const dir = opts.dir || new URL('../data/notices/', HERE);
+  let names = [];
+  try { names = fs.readdirSync(dir).filter((f) => /\.json$/.test(f) && f !== 'index.json'); } catch { return []; }
+  const out = [];
+  for (const f of names) {
+    let doc;
+    try { doc = JSON.parse(fs.readFileSync(new URL(f, dir), 'utf8')); } catch { continue; }
+    if (doc && Array.isArray(doc.items)) out.push(...doc.items);
+  }
+  return out;
 }
 
 /* 서비스 학교인데 넘겨받은 목록에 글이 하나도 없는 학교 (2026-10-04 점검 app2-F2) — 수집 리포트 머리에 한 줄로 적는다.
