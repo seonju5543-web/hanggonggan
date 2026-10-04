@@ -83,15 +83,23 @@ jobs:
         with:
           node-version: 20
       - run: npm init -y >/dev/null && npm i playwright-core@1 --no-audit --no-fund
-      - run: npx playwright@1 install --with-deps chromium
+      # 🔴 `id: browser` — 아래 화면 검사·전 여정은 **이 단계가 성공했을 때만** 돈다. 앞(내려받기·도구 설치)이 넘어져도
+      #    이 단계가 건너뛰어져 성공이 아니게 되므로, 조건 하나로 준비 단계 전부를 본다(브라우저 없이 드라이버가 다 빨개지는 소음을 막는다).
+      - id: browser
+        run: npx playwright@1 install --with-deps chromium
       - name: 브라우저 경로 찾기
         run: echo "CHROME_PATH=$(find ~/.cache/ms-playwright -name chrome -type f | head -1)" >> $GITHUB_ENV
 
+      # 🔴 **여기부터 경보 앞까지 모든 관문 단계에 `!cancelled()` 를 단다** (2026-10-04 코드 리뷰).
+      #    GitHub 은 한 단계가 실패하면 `if:` 없는 아래 단계를 **통째로 건너뛴다.** 화면 검사 단계에만 달면
+      #    이 값싼 관문 일곱 가운데 하나만 넘어져도 드라이버 전부와 전 여정이 또 한 번도 안 돈다 — 2026-10-04 에 막으려던 '그물 걷힘'과 같은 꼴이다.
+      #    관문 verify/health-gates/ci.mjs ②(test-collector 「로봇·도구 점검 관문」 이 부른다)가 이 구간의 `if:` 를 하나씩 잰다(새 단계를 더할 때도).
       # 🔴 순수 모듈 검사도 여기서 돌린다 (2026-08-29 코드 리뷰 지적).
       #    essay-playbook.yml 에도 있지만 그건 **주 1회 예약**이라, 제출 관문이 깨져도
       #    최대 일주일 뒤에 안다. 관문은 밀어 넣는 그 순간 막아야 한다.
       #    브라우저가 필요 없어 몇 초면 끝난다.
       - name: 제출 관문 판정 검사 (순수 모듈)
+        if: ${{ !cancelled() }}
         run: node verify/verify-essay-submit.mjs
 
       # 🔴 접수 대행 — 보내기 전 서버 재검증 (2026-09-25 · 고문 보고서 Q4).
@@ -99,6 +107,7 @@ jobs:
       #    자격을 조작한 신청서가 그대로 나가는 것. 지금은 mailto: 라 안 터지지만,
       #    Resend 를 켜는 순간 우리가 보내는 주체가 된다 — 그때 이 관문이 서 있어야 한다.
       - name: 접수 대행 재검증 관문 (순수 모듈)
+        if: ${{ !cancelled() }}
         run: node verify/verify-apply-guard.mjs
 
       # 🔴 아래 셋은 오랫동안 **어떤 워크플로에도 안 걸려 있었다**(2026-09-09 전수 조사에서 발견).
@@ -107,12 +116,15 @@ jobs:
       #    · push-server   — 발송 서버가 폰 주소·학교·캠퍼스 말고 아무것도 저장하지 않는가
       #    · form-snapshot — 질문을 줄여도 **문서는 한 글자도 안 바뀐다**는 증명 (운영 원칙 4)
       - name: 알림 규칙 관문 (순수 모듈)
+        if: ${{ !cancelled() }}
         run: node verify/verify-notify-rules.js
 
       - name: 푸시 발송 서버 관문
+        if: ${{ !cancelled() }}
         run: node verify/verify-push-server.mjs
 
       - name: 양식 문서 동일성 관문 (원칙 4)
+        if: ${{ !cancelled() }}
         run: node verify/form-snapshot.mjs
 
       # 🔴 인스타 카드 사실 관문 — 145건 전수. 브라우저가 필요 없다(파일·JSON 만 읽는다).
@@ -120,6 +132,7 @@ jobs:
       #    '모집 중'·저작자 표시 누락)을 잡는다. 규칙은 render.mjs 에서 **이름으로 떼어 온다** —
       #    베끼면 코드를 되돌려도 초록불로 남는다(실제로 그랬다).
       - name: 인스타 카드 사실 관문
+        if: ${{ !cancelled() }}
         run: node verify/verify-insta.js
 
       # 🔴 관리자 화면 빠진 이웃 — 브라우저가 필요 없다(파일만 읽는다). 몇 초면 끝난다.
@@ -128,12 +141,14 @@ jobs:
       #    이 단계가 부르는 build.sh 안에서 같은 관문이 돈다(규칙은 한 파일 — 베끼지 않는다).
       #    Cloudflare 빌드 때도 같은 것이 돌지만, 그건 배포 직전이라 여기서 먼저 잡는다.
       - name: 관리자 화면 빠진 이웃 관문
+        if: ${{ !cancelled() }}
         run: |
           bash _admin/build.sh
 
       # 드라이버마다 8123·8124 를 쓴다 (verify/README.md)
       - name: 로컬 서버 띄우기
         id: server
+        if: ${{ !cancelled() }}
         run: |
           python3 -m http.server 8123 >/dev/null 2>&1 &
           python3 -m http.server 8124 >/dev/null 2>&1 &
@@ -148,8 +163,12 @@ jobs:
       #    GitHub 기본 셸이 `bash -e` 라서 실패를 `||` 로 받아 모은 뒤 마지막에 한 번 실패시킨다.
       #    `timeout 300`: 가장 긴 드라이버가 76초(verify-settings · 성공 실행 실측). 매달린 하나가 30분 그릇을 다 먹으면
       #    '취소'로 끝나 경보가 안 뜬다 — 상한을 키우지 않고 드라이버마다 끊는다.
+      # 🔴 **앞의 값싼 관문이 넘어져도 돈다**(`!cancelled()` · 2026-10-04 코드 리뷰 — 조건이 없으면 일곱 가운데 하나만 빨개도
+      #    드라이버 전부와 전 여정이 통째로 건너뛰어졌다). 서버를 못 띄웠거나 브라우저를 못 깔았을 때만 건너뛴다 —
+      #    그때 경보는 '드라이버가 돌지 않았다'고 적는다(아래 경보의 DRIVERS).
       - name: 화면 검사 (관문)
         id: drivers
+        if: ${{ !cancelled() && steps.server.outcome == 'success' && steps.browser.outcome == 'success' }}
         run: |
           fails=""
           for f in verify-fit-badge.js verify-explore-sort.js verify-onboard-gaps.js \
@@ -238,9 +257,9 @@ jobs:
       #       아래를 통째로 건너뛰므로, 앞에 두면 이 2~3분짜리가 빨간불일 때 3초짜리 관문
       #       결과가 통째로 안 보인다 — 2026-09-03 에 ui-tone 을 맨 뒤로 옮긴 이유와 같다.
       #    🔴 앞 단계가 실패해도 돈다(`!cancelled()` — 2026-10-04 이전엔 이 조건이 없어 앞이 빨간 날 통째로 건너뛰었다).
-      #       서버를 못 띄웠으면 돌 까닭이 없어 그때만 건너뛴다.
+      #       서버를 못 띄웠거나 브라우저를 못 깔았으면 돌 까닭이 없어 그때만 건너뛴다(위 화면 검사와 같은 조건).
       - name: 전 여정 회귀 (drive.js)
-        if: ${{ !cancelled() && steps.server.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.server.outcome == 'success' && steps.browser.outcome == 'success' }}
         run: PORT=8123 node verify/drive.js
       - name: 🚨 화면 검사가 빨간불이다
         if: failure()
@@ -250,17 +269,29 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           BRANCH: ${{ github.ref_name }}
           FAILED: ${{ steps.drivers.outputs.failed }}
+          # 🔴 화면 검사 단계가 **돌았는지부터** 가른다 (2026-10-04 코드 리뷰). 실패 목록(FAILED)만 보면
+          #    단계가 건너뛰어진 날에도 목록이 비어 '실패한 드라이버: 없음'이라고 적혀, 하나도 안 돈 것을 다 통과한 것처럼 말했다
+          #    (CLAUDE.md 매 세션 5 — 확인 안 한 원인을 경고 문구에 단정하지 않는다). 관문 verify/health-gates/ci.mjs ② 가 세 갈래를 실제로 돌려 본다.
+          DRIVERS: ${{ steps.drivers.outcome }}
         run: |
           set -u
+          case "${DRIVERS:-}" in
+            success) drv="화면 검사 드라이버는 **전부 통과했습니다.** 빨간 단계는 그 밖(앞의 값싼 관문 · 말투·토큰 · 수집기 규칙 · 전 여정 등)에 있으니, 로그에서 빨간 표시가 붙은 단계를 찾으세요." ;;
+            failure)
+              if [ -n "${FAILED:-}" ]; then
+                drv="실패한 드라이버: ${FAILED}. 드라이버는 하나가 넘어져도 끝까지 돌았습니다. 다른 빨간 단계가 더 있을 수 있으니 로그도 보세요."
+              else
+                drv="화면 검사 단계가 실패했는데 실패한 드라이버 목록을 받지 못했습니다 — 로그에서 \`❌\` 가 붙은 줄과 빨간 단계를 찾으세요."
+              fi ;;
+            *) drv="화면 검사 드라이버와 전 여정(drive.js)이 **돌지 않았습니다** — 그 앞의 준비 단계(코드 내려받기 · 도구 설치 · 브라우저 설치 · 로컬 서버 띄우기) 가운데 하나가 실패했습니다. 로그에서 빨간 표시가 붙은 단계를 찾으세요." ;;
+          esac
           body="**앱 화면 검사(브라우저)가 빨간불입니다.** 화면이나 판정이 깨졌다는 뜻입니다.
 
           · 브랜치: \`${BRANCH}\`
           · 시각: $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST
           · 실행 로그: ${RUN_URL}
 
-          로그에서 \`❌\` 가 붙은 줄을 찾으면 어느 항목인지 바로 나옵니다.
-          실패한 드라이버: ${FAILED:-없음 — 말투·토큰·수집기 규칙·전 여정 단계를 보세요}.
-          드라이버는 하나가 넘어져도 끝까지 돌고, 뒤의 값싼 관문들도 같은 실행에서 돕니다.
+          ${drv}
 
           다음 Claude 세션에 \"화면 검사 빨간불 고쳐줘\" 라고 지시하세요.
 
