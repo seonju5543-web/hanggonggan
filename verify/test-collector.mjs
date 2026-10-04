@@ -1823,6 +1823,16 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
     eq('  빈 파일은 전부 연다', rb.allowedByRules(rb.parseRobots(''), '/anything'), true);
     eq('  파일을 못 받으면 읽어도 된다고 본다 (없는 것과 막힌 것은 다르다)', await rb.robotsAllows('https://none.invalid/x', async () => { throw new Error('ENOTFOUND'); }), true);
     eq('  Disallow: / 는 전부 막는다', await rb.robotsAllows('https://blocked.invalid/x', async () => ({ ok: true, headers: { get: () => 'text/plain' }, text: async () => 'User-agent: *\nDisallow: /' })), false);
+    /* 🔴 별표(*)는 '아무 글자'다 — 첫 별표에서 잘라 앞부분만 보면 `Disallow: /*down*` 이 `Disallow: /` 가 되어 사이트 전체를 막은 것으로 읽었다
+       (2026-10-04 · 인천유스톡톡·콘텐츠진흥원·한국외대 두 게시판이 ⛔ 였다 — 실제로 막은 것은 내려받기·관리 화면뿐). 판단은 경로+물음표 뒤까지로, 끝의 `$` 는 끝. */
+    const incheon = rb.parseRobots('User-agent: Googlebot\nDisallow: /search/\n\nUser-agent: *\nDisallow: /*down*\nDisallow: /*Down*');
+    const hufs = rb.parseRobots('User-agent: *\nDisallow: /*/*Mngr\nDisallow: /bbs/*/*/*/artclView.do\nDisallow: /*/*/subview.do?enc=*\nDisallow: /bbs/*');
+    const gov = rb.parseRobots('User-agent: *\nDisallow: /\nAllow: /portal/main \nAllow: /$');
+    eq('  🔴 별표는 아무 글자 — 인천 `/*down*` 은 게시판을 막지 않고 내려받기만 막는다',
+      [rb.allowedByRules(incheon, '/bbs/bbsMsgList.do?bcd=notice'), rb.allowedByRules(incheon, '/bbs/fileDownload.do?id=1'), rb.allowedByRules(rb.parseRobots('User-agent: *\nDisallow: /*/FileDown.do'), '/kocca/pims/list.do?menuNo=204104')], [true, false, true]);
+    eq('  한국외대 — 목록 화면은 열리고 관리 화면·enc 화면·/bbs/ 는 막힌다',
+      [rb.allowedByRules(hufs, '/student/12769/subview.do'), rb.allowedByRules(hufs, '/hufs/11302/subview.do'), rb.allowedByRules(hufs, '/hufs/11302/subview.do?enc=Zm5'), rb.allowedByRules(hufs, '/bbs/hufs/1/2/artclView.do'), rb.allowedByRules(hufs, '/a/bMngr')], [true, true, false, false, false]);
+    eq('  정부24 — 정말 다 막았다(`Disallow: /`) · Allow 와 `$` 끝 표시', [rb.allowedByRules(gov, '/portal/cnstexhb'), rb.allowedByRules(gov, '/portal/main'), rb.allowedByRules(gov, '/'), rb.allowedByRules(gov, '/x')], [false, true, true, false]);
     /* 배선 */
     eq('로봇 — 활동·재단 게시판만 robots.txt 를 묻는다 (학교 게시판은 그대로)', /if \(\(isAct \|\| isExt\) && !\(await robotsAllows\(s\.boardUrl\)\)\)/.test(cm), true);
     eq('  활동 글에 발췌·마감·분야를 싣는다', /const ex = activityExcerpts\(detail\.text\);[\s\S]*?it\.deadline = ex\.deadline;[\s\S]*?it\.excerpts = ex\.excerpts;[\s\S]*?activityField\(it\.title, it\.kind\)/.test(cm), true);
