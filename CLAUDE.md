@@ -60,6 +60,7 @@
 - **링크 이름은 `source-link.js` 한 곳**(`sourceLink` — 상세·금액·신청 내역·카드·활동·도우미·제출처). 주소 글자로 '원문'을 정하지 말 것 — 목록 표식·목록+번호(`isListPlusId`)·홈페이지 꼴·로봇 확정만 이름을 바꾸고, 보통 주소의 글자는 승인된 그대로다.
 - **원문 링크 확인 로봇** `collector/link-check.mjs`(매일 · 판정은 `collector/link-landing.mjs` 한 곳 · 학생처럼 새 탭) — 🔴 **주소를 고치지 않는다.** 다른 날 두 번 같은 문제여야 `data/link-check.json` 에 싣는다(앱이 받는다). 제목 먼저·로그인 벽은 나중 · 다른 글 제목을 반드시 넘긴다.
 - 🔴 **고치는 로봇은 멀쩡한 주소를 표식으로 덮어쓰지 않는다**(2026-10-03 순찰이 잡티 제목으로 5건을 덮었다 → 순찰 끔). 병합 순위 `preferNotice`: 진짜 주소 > 목록 표식 > 목록+번호.
+- **원문 바로잡기**(2026-10-04 · `source-link.js` ⑥ · 데이터는 로봇이 날마다 다시 만들어 거기 고쳐 쓰면 사라진다): 사람 `data/link-fixes.json`(관리자 「원문 링크 손볼 것」 → `tools/admin-apply.mjs` `linkFix` · 늘 이긴다) · 로봇 `data/link-check.json` `fix`(후보 `collector/link-candidates.json` 을 학생처럼 열어 `acceptCandidate` 를 통과한 것만 · 지금 링크가 이미 그 공고면 안 쓴다). 열쇠 `id:`·`u:` · 회차(`round`)는 층2만. 관문 같은 절 fixes·candidates·admin.
 - 데이터 감사는 다섯 묶음의 링크를 **경고만**(`verify/link-audit.cjs`) · 화면의 링크는 `verify/what-shows.mjs` 링크 줄로 말한다. 관문 「원문 링크 정직성」 · 설계 `docs/designs/source-links.md`.
 
 ## 관리자 업무 = 노션 백로그 (정본은 노션 하나)
