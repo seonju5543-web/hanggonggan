@@ -35,6 +35,7 @@
   --accent-soft: rgba(138, 106, 31, 0.10);
   --accent-line: rgba(138, 106, 31, 0.26);
   --gold:        #b8912f;   /* 마스코트 학사모 — 그림 안의 색이라 따로 둔다 */
+  --gold-soft:   #d9b56a;   /* 시작 화면 학사모 인트로의 점(.boot-dot) — 그림 안의 색 · 2026-10-04 토큰으로(ui-tone 천장) */
 
   /* 뜻을 가진 색만 남기고 전부 채도를 낮췄다 (원래는 형광에 가까웠다) */
   --green:      #3d6b47;  --green-weak:  #e9efe8;
@@ -3762,7 +3763,7 @@ html:not([data-boot]) .boot-word { animation-play-state: paused; }
    - 태그라인은 없다(매일 보는 화면의 광고가 된다 · 2026-10-04 개발자 확인).
    - 점의 작은 되튐(1.25배)은 승인받은 시안 그대로다 — 위 등장 규칙 ③의 예외로 개발자가 골랐다.
    🔴 시간은 시안 `docs/designs/mockups/first-run/Intro.dc.html` 과 같아야 한다 — 관문이 대조한다. */
-.boot-dot { fill: #d9b56a; opacity: 0; transform-box: fill-box; transform-origin: 50% 50%; }
+.boot-dot { fill: var(--gold-soft); opacity: 0; transform-box: fill-box; transform-origin: 50% 50%; }
 #boot.boot-intro .boot-logo,
 #boot.boot-intro .boot-word { animation: none; opacity: 0; }
 #boot.boot-intro.boot-intro-run .boot-logo { animation: boot-intro-logo 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s both; }
