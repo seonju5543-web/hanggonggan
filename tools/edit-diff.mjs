@@ -233,12 +233,16 @@ function prepDocRow(item, patch) {
  *     것과 저장된 것이 다르다(관문 '화면이 예고한 바뀌는 칸'이 그 어긋남을 잡는다).
  *  규칙은 로봇(extract-excerpts putDeadline)과 같다: 문구가 없으면 `접수 ~날짜`, '원문 확인'
  *  자리에는 `~날짜`. 마감을 비우면 방금 지운 그 날짜가 든 문구를 '원문 확인'으로 되돌린다.
- *  사람이 적은 날짜는 짐작이 아니므로 학생 문구에 넣어도 원칙 8-1 에 어긋나지 않는다. */
+ *  사람이 적은 날짜는 짐작이 아니므로 학생 문구에 넣어도 원칙 8-1 에 어긋나지 않는다.
+ *  마감을 **바꾸면** 옛 마감이 든 `~옛날짜` 자리도 새 날짜로 바꾼다(비울 때 규칙의 짝 · 2026-10-04 리뷰) — 로봇·자동 등록 문구는
+ *  늘 `접수 ~YYYY-MM-DD` 꼴이라, 이것이 없으면 마감만 고친 저장이 등록 규칙('화면 문구의 끝 날짜 = 마감')에 걸려 거절됐다.
+ *  사람이 쓴 문구(`~ 8.31(월)` 같은 꼴)는 짐작해 고치지 않는다 — 그때는 저장소가 사유를 말하고 문구를 같이 고치게 한다. */
 export function periodAfterDeadline(period, deadline, oldDeadline) {
   const p = period || '';
   if (deadline) {
     if (!p) return `접수 ~${deadline}`;
     if (/원문\s*확인/.test(p)) return p.replace(/원문\s*확인/, `~${deadline}`);
+    if (oldDeadline && oldDeadline !== deadline && p.includes(`~${oldDeadline}`)) return p.replace(`~${oldDeadline}`, `~${deadline}`);
     return p;
   }
   if (oldDeadline && p.includes(`~${oldDeadline}`)) return '접수 기간 원문 확인';

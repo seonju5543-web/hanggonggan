@@ -177,6 +177,15 @@ export default async function gate(eq, ctx) {
       eq('② ⓒ 마감만 고치고 문구를 두면 저장 전에 거절(파일 그대로 · 이유를 말한다) · 문구를 같이 고치면 저장',
         [r1.status !== 0, /화면 문구의 끝 날짜/.test(r1.out), after1 === before, r2.status, it2.deadline, it2.period],
         [true, true, true, 0, '2026-12-30', '신청 2026.7.6(월) ~ 12.30(수) 18:00']);
+      /* 자동 등록분의 문구는 늘 `접수 ~YYYY-MM-DD` — 마감만 고쳐도 문구가 따라가 저장된다(리뷰 2026-10-04 · 흔한 관리자 작업이 '문구도 손으로'가 됐었다) */
+      const E3 = adminRun(root, { ...files, 'data/registered.json': { items: [{ ...regBase, period: '접수 ~2026-08-31' }] } });
+      const r3 = E3.run('edit', { edits: [{ id: 't1', patch: { deadline: '2026-12-30' } }] });
+      const it3 = JSON.parse(E3.read('data/registered.json')).items[0];
+      E3.done();
+      const { periodAfterDeadline: pad } = await import(new URL('tools/edit-diff.mjs', root));
+      eq('  자동 등록 꼴(접수 ~옛 마감)은 마감만 고쳐도 문구가 따라가 저장 · 사람 꼴 문구·같은 날짜는 짐작해 고치지 않는다 (화면 미리보기도 같은 함수)',
+        [r3.status, it3.period, pad('접수 ~2026-08-31', '2026-12-30', '2026-08-31'), pad('신청 2026.7.6(월) ~ 8.31(월) 18:00', '2026-12-30', '2026-08-31'), pad('접수 ~2026-08-31', '2026-08-31', '2026-08-31'), pad('2차 ~2026-10-01', '2026-12-30', '2026-08-31')],
+        [0, '접수 ~2026-12-30', '접수 ~2026-12-30', '신청 2026.7.6(월) ~ 8.31(월) 18:00', '접수 ~2026-08-31', '2차 ~2026-10-01']);
     }
   }
 
