@@ -1,24 +1,146 @@
 {
  "school": "서울대학교",
- "updatedAt": "2026-10-03",
+ "updatedAt": "2026-10-04",
  "items": [
   {
-   "title": "2026년도 인천인재평생교육진흥원 하반기 장학생 선발 안내",
-   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&pageIndex=3&uid=362",
+   "title": "2026년 하반기 일운과학기술재단 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=392",
    "attachments": [],
    "deadlineHint": null,
    "school": "서울대학교",
    "campus": "",
-   "foundAt": "2026-09-30"
+   "foundAt": "2026-10-04"
+  },
+  {
+   "title": "(재)춘천인재육성장학재단 2026년 하반기 봄내장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=391",
+   "attachments": [
+    {
+     "name": "2026년-하반기-봄내장학생-선발-공고게시용-QR.hwp",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=391&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file1"
+    },
+    {
+     "name": "자주-묻는-질문26년-하반기_봄내장학금.hwp",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=391&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file2"
+    }
+   ],
+   "deadlineHint": "신청기간: 2026. 9. 28.(월) ~ 10. 7.(수) [10일간] ❍ 접수처: 구분 접수처 애향장학금 주소지 읍면‧동 행정복지센터 온라인",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-04"
+  },
+  {
+   "title": "2026년 하반기 문주장학재단 주관 AI·ICT 분야 인재 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=390",
+   "attachments": [
+    {
+     "name": "공고문2026년-하반기-문주장학재단-주관-AI-ICT-장학생-선발-공고문.pdf",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=390&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file1"
+    },
+    {
+     "name": "신청서식2026년-하반기-문주장학재단-주관-장학생-지원서식.hwp",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=390&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file2"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-04"
+  },
+  {
+   "title": "2026년 고속도로장학재단 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=389",
+   "attachments": [
+    {
+     "name": "2026년-고속도로-장학생-선발-안내문.hwp",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=389&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file1"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-04"
+  },
+  {
+   "title": "2027학년도 제36기 미래에셋 해외교환 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=365",
+   "attachments": [
+    {
+     "name": "가.-공고-제36기-미래에셋-해외교환-장학생-선발-요강.pdf",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=365&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file1"
+    },
+    {
+     "name": "가.-별첨-부모-명의-개인정보-제공-및-활용-동의서-1.pdf",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=365&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file2"
+    }
+   ],
+   "deadlineHint": "접수기간: 2026. 9. 30.(수) 10:00 ~ 10. 6.(화) 15:00 - 세부 선발일정 및 절차: 첨부된 선발요강 참고 ※ 변동 사",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-04"
+  },
+  {
+   "title": "2026년 제29기 두을장학재단 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=364",
+   "attachments": [
+    {
+     "name": "1.-제29기-두을장학생-선발요강.pdf",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=364&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file1"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-04"
+  },
+  {
+   "title": "대전청년내일재단 2026년 하반기 인재육성(성취) 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=363",
+   "attachments": [
+    {
+     "name": "2026년-성취대-장학생-선발계획-공고.hwp",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=363&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file1"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-04"
+  },
+  {
+   "title": "2026년도 인천인재평생교육진흥원 하반기 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=362",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-10-04"
   },
   {
    "title": "2026년도 국가유산진흥원 전통 기·예능 분야 및 매장유산 관련 분야 우수 장학생 선발 안내",
-   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&pageIndex=3&uid=361",
-   "attachments": [],
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=361",
+   "attachments": [
+    {
+     "name": "1.2026년-국가유산진흥원-전통-기ㆍ예능분야-및-매장유산-분야-우수-장학생-선발-공고.hwp",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=361&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file1"
+    },
+    {
+     "name": "2.별첨1장학생-지원신청서-및-자기소개서양식.hwp",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=361&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file2"
+    },
+    {
+     "name": "3.별첨2장학생-후보자-추천서양식.hwp",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=361&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file3"
+    },
+    {
+     "name": "4.별첨3-개인정보-수집-이용-동의서.hwp",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=361&action=kboard_file_download&kboard-file-download-nonce=ba1a5749b1&file=file4"
+    }
+   ],
    "deadlineHint": null,
    "school": "서울대학교",
    "campus": "",
-   "foundAt": "2026-09-30"
+   "foundAt": "2026-10-04"
   }
  ]
 }

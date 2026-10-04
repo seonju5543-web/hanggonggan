@@ -6,7 +6,7 @@
    "home": "https://www.yonsei.ac.kr/wj/",
    "evidence": "연세대 미래캠퍼스(원주) 공식 사이트 경로(wj = 원주) — 로봇이 열어 확인",
    "probe": {
-    "checkedAt": "2026-10-03",
+    "checkedAt": "2026-10-04",
     "why": "홈페이지 못 엶 (HTTP 404)",
     "best": null
    }
@@ -16,7 +16,7 @@
    "home": "https://sejong.korea.ac.kr/",
    "evidence": "고려대 세종캠퍼스 공식 도메인 — 로봇이 열어 확인",
    "probe": {
-    "checkedAt": "2026-10-03",
+    "checkedAt": "2026-10-04",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://sejong.korea.ac.kr/",
@@ -30,7 +30,7 @@
    "home": "https://wise.dongguk.ac.kr/",
    "evidence": "동국대 WISE캠퍼스 공식 도메인 — 로봇이 열어 확인",
    "probe": {
-    "checkedAt": "2026-10-03",
+    "checkedAt": "2026-10-04",
     "why": "최고 12건 ((홈))",
     "best": {
      "url": "https://wise.dongguk.ac.kr/main",

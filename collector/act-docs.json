@@ -1,8 +1,4 @@
 {
- "https://arko.or.kr/board/view/4053?cid=1811182": {
-  "at": "2026-10-03",
-  "tries": 1
- },
  "https://www.youthcenter.go.kr/bbs03View/48/10811": {
   "at": "2026-10-03",
   "tries": 1
@@ -28,10 +24,6 @@
   "tries": 1
  },
  "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000239/articleView.do": {
-  "at": "2026-10-03",
-  "tries": 1
- },
- "https://www.jeju.go.kr/index.htm": {
   "at": "2026-10-03",
   "tries": 1
  },
@@ -61,5 +53,49 @@
  },
  "_common": [
   "b82639305744c749"
- ]
+ ],
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3522927": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://www.knou.ac.kr/bbs/knou/51/816545/artclView.do": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521608": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://www.yonkang.org/kr/news/645": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://www.niied.go.kr/web/main/nid/niied_board/5871": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://www.bai.go.kr/bai/etc/popupzone/detail?ppId=120": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://blog.naver.com/mopaspr/224399694473?trackingCode=blog_bloghome_searchlist": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://asanmirae.or.kr:449/main/index.php?m_cd=17&b_id=20260804102775189": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://www.msit.go.kr/bbs/view.do?sCode=user&mId=307&mPid=208&bbsSeqNo=94&nttSeqNo=3187433": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://www.xn--299alkwa683hrtfsfp2mn8g3zd53kbtag2cdzeds0aqoj3nl9jq.com/": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://www.rda.go.kr/board/board.do?mode=view&prgId=nei_ancmttEntry&dataNo=100000812622": {
+  "at": "2026-10-04",
+  "tries": 1
+ }
 }
