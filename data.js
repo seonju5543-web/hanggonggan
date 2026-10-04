@@ -547,15 +547,22 @@ function officialChannel(sch) {
      🔴 2026-10-03 — '재단 공고의 접수 방법' 도 뺐다. 이 이름은 '최종 제출처: <a>이름</a>' 처럼 **링크 글자**로 쓰이는데,
         누르면 재단 공고가 아니라 재단 홈페이지 첫 화면이 열린다(개발자 보고 P0 *"원문 공고를 누르면 재단 페이지 전체가"*).
         링크가 여는 화면을 그대로 말한다. 주소가 없으면 재단 이름만(지어낸 길을 말하지 않는다). */
-  if (sch.sourceKind === 'kosaf') {
-    if (!sch.sourceUrl) return { label: knownProvider ? sch.provider : '재단', guide };
-    return { label: knownProvider ? `${sch.provider} (재단 홈페이지)` : '재단 홈페이지', url: sch.sourceUrl, guide };
+  /* 바로잡은 원문(source-link.js ⑥ — 관리자·로봇)이 있으면 그 주소로 — 이 표의 주소를 따로 고르지 않는다 */
+  const sl = typeof sourceLink === 'function' ? sourceLink(sch, 'detail') : null;
+  const linkUrl = sl ? sl.href : sch.sourceUrl;
+  /* '재단 홈페이지' 이름은 그 링크가 정말 재단 홈(데이터 주소 그대로)일 때만 — 바로잡은 원문이 로봇 확인에서 문제로 드러나면
+     그 주소는 홈페이지가 아니다(목록·다른 글) → 아래 일반 갈래가 목록·(확인 필요)로 정직하게 부른다(리뷰 2026-10-04) */
+  const fixedAway = !!(sl && typeof effectiveLinkUrl === 'function' && typeof decodeUrlEntities === 'function'
+    && sl.href && sl.href !== decodeUrlEntities(sch.sourceUrl || ''));
+  if (sch.sourceKind === 'kosaf' && !(sl && sl.cls === 'post') && !fixedAway) {
+    if (!linkUrl) return { label: knownProvider ? sch.provider : '재단', guide };
+    return { label: knownProvider ? `${sch.provider} (재단 홈페이지)` : '재단 홈페이지', url: linkUrl, guide };
   }
-  if (sch.sourceUrl) {
+  if (linkUrl) {
     /* 🔴 링크 종류는 source-link.js 의 sourceLink 한 곳에서 받는다(2026-10-03) — 주소 글자로 여기서 다시 판정하지 않는다.
        보통 주소(post)는 예전 글자 그대로 · 게시판 목록은 목록이라고 · 홈페이지는 홈페이지라고 · 로봇이 '그 공고가 아니었다'를
        확정한 주소는 (확인 필요). ⚠️ source-link.js 를 못 실은 곳(이 파일만 싣는 Node 검사)에서는 예전처럼 보통 주소로 본다. */
-    const cls = typeof sourceLink === 'function' ? sourceLink(sch, 'detail').cls : 'post';
+    const cls = sl ? sl.cls : 'post';
     const name = (what) => (knownProvider ? `${sch.provider} (${what})` : what);
     /* 🔴 이름은 **명사**로 — 'OO에서 공식 제출을 마치셨나요?'·'최종 제출처: OO' 처럼 문장 안에 들어간다(리뷰 APP-3 ·
        '…찾기에서 공식 제출을' 이 됐다). 할 일(제목으로 찾기)은 링크 옆 안내 문장(sourceLink hint)이 말한다. */
@@ -563,7 +570,7 @@ function officialChannel(sch) {
       : cls === 'home' ? name('홈페이지')
       : cls === 'trouble' ? name('원문 공고의 접수 방법 · 주소 확인 필요')   // 괄호를 쓰지 않는다 — '최종 제출처(…)가 표시됩니다' 안에서 괄호가 겹친다(화면 실측)
       : name('원문 공고의 접수 방법');
-    return { label, url: sch.sourceUrl, guide };
+    return { label, url: linkUrl, guide };
   }
   return { label: knownProvider ? `${sch.provider} 장학공지 (학교 포털)` : '원문 공고의 접수 방법',
     guide: SUBMIT_GUIDES.campus };

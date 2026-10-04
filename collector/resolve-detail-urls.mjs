@@ -26,6 +26,8 @@ import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, rowMatches
 import { judgeLanding, expectTitles, stripRowTail } from './link-landing.mjs';
 /* 앱이 읽는 학교별 파일까지 고친 주소를 옮긴다 (2026-09-05) */
 import { patchUrlsBySchool } from './publish-notices.mjs';
+/* 관리자가 이미 원문을 넣은 공고는 건드리지 않는다 (2026-10-04 · 링크 사냥꾼과 같은 판정 한 곳) */
+import { readLinkFixes, humanFixedBy } from './link-fixes-read.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const DRY = process.argv.includes('--dry');
@@ -73,13 +75,21 @@ const siteTitles = (url, exclude = []) => otherTitlesOnSite(url, [...(notices.it
 const liveRowsByOrigin = new Map();
 const originOf = (u) => { try { return new URL(u).origin; } catch { return ''; } };
 
-/* 고쳐야 할 항목 모으기 — 두 파일을 같은 방식으로 다룬다 */
+/* 고쳐야 할 항목 모으기 — 두 파일을 같은 방식으로 다룬다.
+   🔴 관리자가 이미 원문 주소를 넣은 공고(data/link-fixes.json)는 뺀다 (2026-10-04) — 이 로봇이 표식을 바꾸면 관리자 열쇠(u:<표식>)가
+      안 맞아 관리자가 넣은 주소가 학생 화면에서 소리 없이 사라진다. 판정은 앱과 같은 함수(link-fixes-read.mjs humanFixedBy). */
+const humanFixed = humanFixedBy(readLinkFixes(new URL('../data/link-fixes.json', HERE)));
+let heldByAdmin = 0;
 const targets = [];
 for (const n of notices.items || []) {
-  if (isMarkerUrl(n.url)) targets.push({ kind: 'notice', ref: n, urlField: 'url', title: n.title, url: n.url });
+  if (!isMarkerUrl(n.url)) continue;
+  if (humanFixed(n)) { heldByAdmin += 1; continue; }
+  targets.push({ kind: 'notice', ref: n, urlField: 'url', title: n.title, url: n.url });
 }
 for (const r of registered.items || []) {
-  if (isMarkerUrl(r.sourceUrl)) targets.push({ kind: 'registered', ref: r, urlField: 'sourceUrl', title: r.name, url: r.sourceUrl, id: r.id });
+  if (!isMarkerUrl(r.sourceUrl)) continue;
+  if (humanFixed(r)) { heldByAdmin += 1; continue; }
+  targets.push({ kind: 'registered', ref: r, urlField: 'sourceUrl', title: r.name, url: r.sourceUrl, id: r.id });
 }
 
 /* 게시판별로 묶는다 — 게시판 하나를 한 번만 열기 위해 */
@@ -108,6 +118,7 @@ for (const t of targets) {
 const report = [`## 🔗 원문 링크 복구 리포트 (${new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 16).replace('T', ' ')} KST)`, ''];
 report.push(`판: 7차(게시판 폼으로 원문 주소 조립) · 커밋 ${process.env.GITHUB_SHA ? process.env.GITHUB_SHA.slice(0, 7) : 'local'}`);
 report.push(`고칠 대상: **${targets.length}건** (실시간 공고 ${targets.filter((t) => t.kind === 'notice').length} · 정식 등록 ${targets.filter((t) => t.kind === 'registered').length}) · 게시판 ${boards.size}곳`);
+if (heldByAdmin) report.push(`- 관리자가 원문 주소를 넣은 공고 ${heldByAdmin}건은 건드리지 않았습니다(관리자 화면 「원문 링크」)`);
 report.push('');
 
 if (!targets.length) {

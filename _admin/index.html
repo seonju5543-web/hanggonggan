@@ -110,6 +110,12 @@
       <button class="btn btn-sm btn-primary" data-act="flush">한꺼번에 반영</button>
       <button class="btn btn-sm" data-act="flush-drop">버리기</button>
     </div>
+    <!-- 모아 둔 원문 주소 (2026-10-04) — 공고 수정과 **다른 장부**라 따로 보낸다(저장소 작업 linkFix · 고치는 파일 data/link-fixes.json) -->
+    <div id="linkfix-bar" class="pending-bar" role="status" aria-live="polite" hidden>
+      <span id="linkfix-text"></span>
+      <button class="btn btn-sm btn-primary" data-lf-flush>원문 주소 반영</button>
+      <button class="btn btn-sm" data-lf-drop>버리기</button>
+    </div>
 
     <!-- 작업 진행 표시 (변경 요청 → 검사 → 반영).
          **헤더 안에 둔다** — 밖에 두고 각자 sticky를 걸면 스크롤할 때 이 띠가 탭 줄을 덮는다. -->
@@ -149,6 +155,8 @@
 
 <!-- 앱1과 공유하는 원본 코드 (build.sh가 복사 — 규칙을 두 벌로 두지 않기 위해) -->
 <script src="vendor/apply-channel.js"></script>
+<!-- 원문 링크 이름 한 곳 (2026-10-04) — data.js(제출처)·admin.js(원문 링크 손볼 것)가 부른다. entry-rules.js 의 가짜 module 보다 먼저 -->
+<script src="vendor/source-link.js"></script>
 <script src="vendor/data.js"></script>
 <script src="vendor/form-plan.js"></script>
 <script src="vendor/forms.js"></script>

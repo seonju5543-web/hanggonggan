@@ -13,18 +13,25 @@ const L = require('../source-link.js');
 const URL_ENTITY = /&(?:amp|#0*38|#x0*26);/i;
 
 /* sets: [{ ds, items, urlOf(item), idOf(item) }] · checks: data/link-check.json 문서(없으면 null)
-   → { warns: [문장], counts } */
-function auditLinks(sets, checks) {
+   · fixes: data/link-fixes.json 문서(관리자가 넣은 원문 · 없으면 null)
+   → { warns: [문장], counts }
+   바로잡은 원문(source-link.js ⑥ — 관리자 또는 로봇 확인)이 있는 글은 '고칠 일'에서 빼고 fixed 로만 센다.
+   판정은 source-link.js 의 linkFixFor 한 곳(베끼지 않는다) — 끝나면 모듈 상태를 비운다. */
+function auditLinks(sets, checks, fixes) {
   const warns = [];
   const counts = {};
   const bad = (checks && checks.bad) || {};
+  L.setLinkChecks(checks || null);
+  L.setLinkFixes(fixes || null);
+  try {
   for (const s of sets || []) {
-    const c = { total: 0, marker: 0, home: 0, entity: 0, listPlusId: 0, scriptAttach: 0, confirmedBad: 0 };
+    const c = { total: 0, marker: 0, home: 0, entity: 0, listPlusId: 0, scriptAttach: 0, confirmedBad: 0, fixed: 0 };
     const ex = { home: [], entity: [], listPlusId: [], scriptAttach: [], confirmedBad: [] };
     for (const it of s.items || []) {
       const raw = s.urlOf(it) || '';
       if (!raw) continue;
       c.total += 1;
+      if (L.linkFixFor({ id: it.id, sourceUrl: raw, deadline: it.deadline || it.due || '' })) { c.fixed += 1; continue; }
       const shape = L.linkShape(raw);
       if (shape === 'marker') c.marker += 1;
       if (shape === 'home' && it.sourceKind !== 'kosaf') { c.home += 1; ex.home.push(s.idOf(it)); }
@@ -44,6 +51,7 @@ function auditLinks(sets, checks) {
     if (c.scriptAttach) warns.push(`${s.ds} — 첨부가 javascript: 내려받기 스크립트인 공고 ${c.scriptAttach}건 — 앱은 링크 없이 이름만 보입니다: ${eg(ex.scriptAttach)}`);
     if (c.confirmedBad) warns.push(`${s.ds} — 원문 링크 확인 로봇이 '그 공고가 아니다'를 확정한 링크 ${c.confirmedBad}건 — 앱은 (확인 필요)·게시판 목록 등으로 부릅니다: ${eg(ex.confirmedBad)}`);
   }
+  } finally { L.setLinkChecks(null); L.setLinkFixes(null); }
   return { warns, counts };
 }
 

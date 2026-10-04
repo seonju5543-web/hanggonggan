@@ -1384,11 +1384,11 @@ console.log('\n■ 수집망 복원 (2026-09-29 · 2026-08-30 좁힘을 되돌�
   /* 앱·알림·발행이 같이 쓰는 상수 — schools.json 과 같아야 한다 (자세한 대조는 「화면이 보여 주는 학교 = 로봇이 수집하는 학교」) */
   const served = createRequire(import.meta.url)('../match-engine.js').SERVED_SCHOOLS;
   eq('앱 상수 SERVED_SCHOOLS 도 44곳 전부다', REVIVED.filter((n) => !served.includes(n)), []);
-  /* 서비스한다고 적었는데 아무 로봇도 안 읽는 학교 — 학생은 빈 피드를 본다. 지금은 게시판 주소가 없는 분교 셋뿐이고(개발자가 주소를 줘야 한다),
-     넷째가 조용히 생기면 여기서 잡는다(리뷰 2026-09-30). */
+  /* 서비스한다고 적었는데 아무 로봇도 안 읽는 학교 — 학생은 빈 피드를 본다. 주소 없던 분교 셋은 2026-10-04 에 주소를 찾아 넣었다
+     (아래 「낡은 게시판 주소 고침」) — 이제 하나라도 조용히 생기면 여기서 잡는다(리뷰 2026-09-30). */
   const browserSet = new Set(bt.targets.map((x) => x.school));
   const unread = [...new Set(sc.schools.filter((x) => !x.boardUrl && !browserSet.has(x.school)).map((x) => x.school))].sort();
-  eq('아무 로봇도 안 읽는 서비스 학교는 주소 없는 분교 셋뿐이다', unread, ['고려대학교 세종캠퍼스', '동국대학교 WISE캠퍼스', '연세대학교 미래캠퍼스']);
+  eq('모든 서비스 학교를 어느 로봇인가가 읽는다', unread, []);
   /* 보관 자리의 규칙은 그대로 — 키가 사라지면 다음에 뺄 때 주소를 잃는다 */
   const parked = (o) => (Array.isArray(o.parked) ? o.parked : []);
   eq('보관 배열이 남아 있다 (비어 있어도 된다)', Array.isArray(sc.parked) && Array.isArray(bt.parked), true);
@@ -2063,8 +2063,21 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   /* 7차 실행·1차 정찰 반영 (2026-10-01) — 경희 목록 표식 · 줄 전체를 감싼 링크의 제목 꼬리 · 오래된 고정 공지 · 합격자 공고 */
   const khList = 'https://www.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200316';
   const khRows = RB.datedRowsFor('경희대학교', '<table>' + ['[KOICA] 몽골 관광인력 역량강화 프로젝트 봉사단 모집', '나눔바자회 자원봉사자 모집 안내', '2026학년도 2학기 수강신청 안내', '도서관 열람실 운영시간 변경 안내', '법정의무교육 이수 안내'].map((t, i) => `<tr><td><a href="javascript:view('32322${i}','');"><span>공통</span> ${t}</a></td><td>2026-10-0${i + 1}</td></tr>`).join('') + '</table>', khList);
-  eq('  경희 listOnly — 글 주소가 없어 목록 주소 + #n-제목 (앱이 「게시판 목록 ↗」 로 적는다) · 글 번호(postId)를 같이 든다', [khRows.length, khRows[0] && khRows[0].url, khRows[0] && khRows[0].postId], [5, khList + '#n-' + encodeURIComponent('공통 [KOICA] 몽골 관광인력 역량강화 프로젝트 봉사단 모집'), '323220']);
-  eq('    listOnly 는 상세 확인을 건너뛴다 (상세가 없다) · 나머지 규칙은 한다', [RB.needsDetailCheck(RB.NEWS_BOARD_RULES['경희대학교']), RB.needsDetailCheck(RB.NEWS_BOARD_RULES['동국대학교']), RB.needsDetailCheck(undefined)], [false, true, false]);
+  /* 2026-10-04 정찰(probe-links #47): 경희 GET 상세 view.do?menuNo=…&boardId=<번호> 가 로그인 없이 그 글을 연다 → listOnly(목록 표식)에서 onclick 으로 */
+  eq('  경희 — 행의 글 번호로 GET 상세 주소(목록 주소의 list.do → view.do · menuNo 그대로) · 글 번호(postId)를 같이 든다', [khRows.length, khRows[0] && khRows[0].url, khRows[0] && khRows[0].postId], [5, 'https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323220', '323220']);
+  eq('    목록 주소에 menuNo 가 없거나 list.do 꼴이 아니면 상세를 짓지 않는다 (짐작하지 않는다)', [RB.NEWS_BOARD_RULES['경희대학교'].detail('1', 'https://www.khu.ac.kr/kor/notice/list.do?category=GENERAL'), RB.NEWS_BOARD_RULES['경희대학교'].detail('1', 'https://www.khu.ac.kr/kor/user/bbs/BMSR00040/index.do?menuNo=200316')], [null, null]);
+  {
+    /* listOnly 꼴 자체는 남는다(글 하나의 GET 주소가 없는 게시판) — 지금 그 꼴의 학교가 없어 가짜 규칙으로 잰다 */
+    const LO = { kind: 'listOnly', fn: /\bview\(\s*['"](\d+)['"]/, detail: (id, b, t) => RB.markerUrl(b, t), evidence: '관문용' };
+    const loRows = BL.extractDatedRows('<table>' + ['[KOICA] 몽골 관광인력 역량강화 프로젝트 봉사단 모집', '나눔바자회 자원봉사자 모집 안내', '2026학년도 2학기 수강신청 안내'].map((t, i) => `<tr><td><a href="javascript:view('32322${i}','');"><span>공통</span> ${t}</a></td><td>2026-10-0${i + 1}</td></tr>`).join('') + '</table>', khList, { resolve: RB.ruleResolver(LO, khList) });
+    eq('    listOnly 는 목록 주소 + #n-제목 (앱이 「게시판 목록 ↗」 로 적는다) · 글 번호를 같이 든다', [loRows[0] && loRows[0].url, loRows[0] && loRows[0].postId], [khList + '#n-' + encodeURIComponent('공통 [KOICA] 몽골 관광인력 역량강화 프로젝트 봉사단 모집'), '323220']);
+    eq('    listOnly 는 상세 확인을 건너뛴다 (상세가 없다) · 나머지 규칙(경희 GET 포함)은 한다', [RB.needsDetailCheck(LO), RB.needsDetailCheck(RB.NEWS_BOARD_RULES['경희대학교']), RB.needsDetailCheck(RB.NEWS_BOARD_RULES['동국대학교']), RB.needsDetailCheck(undefined)], [false, true, true, false]);
+    /* 정찰이 본 경희 상세 화면의 생김새(제목 칸 · 분류 꼬리표 · 이전글/다음글) — 수집기의 첫 글 확인이 통과해야 한다 */
+    const khDetail = `<div class="board02"><div class="row clearfix"><div class="txtWine label">제목</div><div class="tit"><span class="txtBox01 common"> 공통 </span><p class="txt06"> [KOICA] 몽골 관광인력 역량강화 프로젝트 봉사단 모집</p></div><div class="dateBox"><span class="date rightBar">2026-10-01</span><span class="hits">조회수 168</span></div></div><div class="row contents">본문</div><ul class="otherList"><li><div class="label">이전글</div><a href="javascript:view('323219','');"><p class="txt06">나눔바자회 자원봉사자 모집 안내</p></a></li><li><div class="label">다음글</div><a href="javascript:view('323221','');"><p class="txt06">2026학년도 2학기 수강신청 안내</p></a></li></ul></div>`;
+    const khFetch = async (u) => ({ ok: true, status: 200, url: u, text: async () => khDetail });
+    eq('    경희 상세 화면(정찰 생김새)이면 첫 글 확인을 통과한다 · 목록으로 되돌아오면 실패', [(await RB.verifyRuleDetail(khRows[0], { rule: RB.NEWS_BOARD_RULES['경희대학교'], boardUrl: khList, others: khRows.map((r) => r.title), fetch: khFetch })).ok,
+      (await RB.verifyRuleDetail(khRows[0], { rule: RB.NEWS_BOARD_RULES['경희대학교'], boardUrl: khList, others: khRows.map((r) => r.title), fetch: async () => ({ ok: true, status: 200, url: khList, text: async () => khDetail }) })).ok], [true, false]);
+  }
   eq('    두 로봇이 needsDetailCheck 로 가른다', /needsDetailCheck\(rule\) && fresh\.length/.test(rn) && /needsDetailCheck\(NEWS_BOARD_RULES\[s\.school\]\)/.test(fn), true);
   /* 리뷰 2026-10-02: 날짜 뒤 낱말 목록으로 가르면 목록에 없는 낱말(「중단」)에서 제목이 잘렸다 — 이제 **그 줄의 게시일과 같은 날짜** 뒤에 작성자 한 낱말·조회수만 올 때만 자른다 */
   const CT = [['양산지역 학생통학버스 운행 시간표 변경 안내 2026.09.17. 임준택', '2026-09-17'], ['2026-2학기 비교과 교육과정 안내 2026.09.02. 한정 조회 1128', '2026-09-02'], ['2026.10.2 하교 셔틀버스 노선 임시 변경 안내', '2026-10-02'],
@@ -9426,7 +9439,7 @@ console.log('\n■ 관리자 쓰기 — 되돌릴 수 없는 일 앞의 안전�
      목록이 바뀌면 사람이 '이 동작도 공고 목록을 고치는가'를 한 번 본다. */
   eq('공고 목록을 안 고치는 동작 목록이 그대로다',
     cases.filter((c) => !writes.includes(c)).sort(),
-    ['activityHide', 'activityKind', 'activitySource', 'activityUnhide', 'addBoard', 'autoRegister', 'formQueue', 'newsHide', 'newsKind', 'newsSource', 'newsThumbOff', 'newsThumbOn', 'newsUnhide', 'unblock']);
+    ['activityHide', 'activityKind', 'activitySource', 'activityUnhide', 'addBoard', 'autoRegister', 'formQueue', 'linkFix', 'linkUnfix', 'newsHide', 'newsKind', 'newsSource', 'newsThumbOff', 'newsThumbOn', 'newsUnhide', 'unblock']);
 }
 
 console.log('\n■ 못 읽은 파일의 숫자를 화면이 단정하지 않는다');
@@ -11227,7 +11240,7 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
 
 console.log('\n■ 원문 링크 정직성 (2026-10-03 · 원문 대신 재단 홈페이지·게시판 목록이 열리던 사고)');
 /* 🔴 화면은 링크 이름을 source-link.js 한 곳에서만 받고, 로봇은 collector/link-landing.mjs 한 곳으로 판정한다.
-   갈래별 검사는 verify/link-gates/*.mjs (core · app · robot · producers · data) — verify/link-gates.mjs 가 차례로 부른다. */
+   갈래별 검사는 verify/link-gates/*.mjs (core · app · robot · producers · data · fixes · candidates · admin) — verify/link-gates.mjs 가 차례로 부른다. */
 {
   const { runLinkGates } = await import('./link-gates.mjs');
   await runLinkGates(eq);
@@ -11438,6 +11451,40 @@ console.log('\n■ 대외활동 — 「혜택」에 섞인 조건은 자격으�
   eq('  수집 로봇이 발행 때 모든 글에 매번', /acts\.items\.forEach\(sanitizeBenefit\)/.test(readText(new URL('../collector/collect.mjs', import.meta.url))), true);
   const fd = MEX.fitDetail({ eligibilityLines: r1.conditions, eligibility: {} }, { birthYear: new Date().getFullYear() - 22, status: '재학' });
   eq('③ 🔴 틀린 안심 금지 — `공연단체에 한하며`·`공연단체를 대상으로` 줄도 요건으로 센다(학생 개인에게 95% 가 떴다)', [fd.total, fd.met, fd.unknown >= 2], [3, 1, true]);   // 퍼센트가 아니라 met/total 로 잰다(관문 「적합도 상수」)
+}
+
+console.log('\n■ 낡은 게시판 주소 고침 (2026-10-04 개발자 "주소 낡은 거부터 다 고쳐") — 404 는 차단이 아니라 이사였다');
+{
+  /* 404 넷의 원인은 사이트가 주소를 옮긴 것(같은 도구로 같은 사이트의 다른 화면은 200) · 분교 둘은 첫 화면이 meta refresh 껍데기라 찾기 로봇이 메뉴를 못 봤다 */
+  const FB = await import('../collector/find-boards.mjs');
+  eq('① 찾기 로봇이 「site move」 껍데기를 같은 사이트 안에서만 따라간다',
+    [FB.metaRefreshTarget('<meta http-equiv="refresh" content="0;url=/koreaSejong/index.do">', 'https://sejong.korea.ac.kr/'),
+     FB.metaRefreshTarget('<meta http-equiv="refresh" content="0;url=https://evil.example/">', 'https://sejong.korea.ac.kr/'),
+     FB.metaRefreshTarget('<html><body>메뉴</body></html>', 'https://sejong.korea.ac.kr/')],
+    ['https://sejong.korea.ac.kr/koreaSejong/index.do', null, null]);
+  /* collect.mjs 는 불러오는 순간 수집을 시작하므로 규칙 표만 떼어 실행한다(행 읽기 식은 rowsByRule 과 같은 것) */
+  const csrc = readText(new URL('../collector/collect.mjs', import.meta.url));
+  const { NEWS_BOARD_RULES } = await import('../collector/news-board-rules.mjs');
+  const RULES = new Function('NEWS_BOARD_RULES', `return ${csrc.slice(csrc.indexOf('const BOARD_RULES = {') + 'const BOARD_RULES = '.length, csrc.indexOf('\n};', csrc.indexOf('const BOARD_RULES = {')) + 2)};`)(NEWS_BOARD_RULES);
+  const rows = (rule, html, boardUrl) => [...html.matchAll(/<a\b[^>]*onclick\s*=\s*(["'])((?:(?!\1)[\s\S])*)\1[^>]*>([\s\S]*?)<\/a>/gi)].map((m) => {
+    const hit = m[2].match(rule.fn) || []; const id = hit[1];
+    const inner = rule.titleIn ? ((m[3].match(rule.titleIn) || [])[1] ?? m[3]) : m[3];
+    return id ? { title: inner.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), url: rule.detail(id, boardUrl, hit) } : null;
+  }).filter(Boolean);
+  eq('② 청년재단 — 번호 둘(글·게시판)로 재단 첫 화면과 같은 상세 주소 · 제목 칸만(번호·날짜·조회수 빼고)',
+    rows(RULES['청년재단'], `<a class="v2-board-list__row" href="javascript:void(0)" onclick="fn_detail('10053','BBSMSTR_000000000367')"> <span> 807 </span> <strong> 2026년 청년다다름사업 참여수기 공모전 안내 </strong> <span>2026.09.21</span> <span>37</span> </a>`, 'https://kyf.or.kr/user/board.do?boardType=notice'),
+    [{ title: '2026년 청년다다름사업 참여수기 공모전 안내', url: 'https://kyf.or.kr/user/boardDetail.do?boardType=notice&bbsId=BBSMSTR_000000000367&nttNo=10053' }]);
+  eq('③ 동국 WISE — 교내 소식 규칙을 불러 쓴다(베끼지 않는다) · 제목 칸만',
+    [/'동국대학교 WISE캠퍼스': \{ \.\.\.NEWS_BOARD_RULES\['동국대학교 WISE캠퍼스'\]/.test(csrc),
+     rows(RULES['동국대학교 WISE캠퍼스'], `<a href="#none" onclick="goDetail(520676);"> <div class="mark"><span class="num">619</span></div> <div class="top"> <em>교외장학(지자체, 사설/기타)</em> <p class="tit"> 대전청년내일재단 2026년 장학생 선발 안내 </p> <div class="info"> <span>2026.09.28.</span> <span>양문수</span> <span>조회 171</span> </div> </div> </a>`, 'https://wise.dongguk.ac.kr/article/servicenotice/list')],
+    [true, [{ title: '대전청년내일재단 2026년 장학생 선발 안내', url: 'https://wise.dongguk.ac.kr/article/servicenotice/detail/520676' }]]);
+  eq('  학교 없는 전국 출처는 주최 이름으로 규칙을 찾는다 · 전북(한 번호) 규칙은 그대로', [/BOARD_RULES\[s\.school \|\| s\.host\]/.test(csrc), rows(RULES['전북대학교'], `<a href="javascript:;" onclick="pf_DetailMove('215647')">장학생 선발 공고 안내</a>`, 'x')[0].url], [true, 'https://www.jbnu.ac.kr/web/Board/215647/detailView.do?category=6']);
+  const SCH = JSON.parse(readText(new URL('../collector/schools.json', import.meta.url)));
+  const ACTSRC = JSON.parse(readText(new URL('../collector/activity-sources.json', import.meta.url)));
+  eq('④ 404 주소는 출처에서 빠지고 보관됐다 · 분교 셋은 주소가 있다',
+    [ACTSRC.sources.some((x) => /boardList\.do\?bbsId=BBSMSTR_000000000367|khu\.ac\.kr\/kor\/notice\/list\.do/.test(x.boardUrl)), ACTSRC.parked.filter((x) => /boardList\.do\?bbsId=BBSMSTR_000000000367|khu\.ac\.kr\/kor\/notice\/list\.do/.test(x.boardUrl)).length,
+     ['연세대학교 미래캠퍼스', '고려대학교 세종캠퍼스', '동국대학교 WISE캠퍼스'].map((n) => !!(SCH.schools.find((x) => x.school === n) || {}).boardUrl)],
+    [false, 2, [true, true, true]]);
 }
 
 console.log('\n■ 자격요건 로봇 (진짜 브라우저) — 장학·대외활동 (2026-10-04 개발자 "진짜 브라우저로 열어야 되는 공고는 다 이걸로 · 시간초과 등 오류 안 나게")');

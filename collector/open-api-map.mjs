@@ -25,7 +25,7 @@ import { canonUrl } from './canon-url.mjs';
 import { titleKey } from './url-key.mjs';
 import { createRequire } from 'node:module';
 /* 주소 꼴(홈페이지인가)은 앱과 같은 파일 하나(source-link.js linkShape)로 본다 (2026-10-03 · 원문 링크 정직성) */
-const { linkShape } = createRequire(import.meta.url)('../source-link.js');
+const { linkShape, decodeUrlEntities } = createRequire(import.meta.url)('../source-link.js');
 
 /* 출처마다 싣는 최대 글 수 — 넷 합쳐 55. 활동 파일 상한(collect.mjs ACT_CAP 200)을 API 글이 먹어
    게시판 글이 밀려나지 않게(밀려난 게시판 글은 장부 때문에 다시 안 온다 · 리뷰 M1) */
@@ -49,7 +49,53 @@ const clip = (v) => {
       이제 앱과 같은 판정(linkShape — 뿌리 · 물음표 없는 index/main/default/home 파일 = 'home')을 쓴다. */
 export const specific = (u) => linkShape(u) === 'page';
 const httpOf = (...cands) => cands.map((u) => String(u ?? '').trim()).filter((u) => /^https?:\/\/\S+$/i.test(u));
-const httpUrl = (...cands) => httpOf(...cands).find(specific) || null;
+
+/* ── 주소 칸 고르기 (2026-10-04 · 원문 링크 정직성 — research-api-activities 「A」) ─────────────────────
+   예전엔 '그 공고 하나를 가리키는 꼴(specific)'인 **첫** 칸을 썼다. 그런데 기관이 칸마다 다른 주소를 넣는다 —
+   신청 칸엔 기관 메뉴 화면, 참고 칸엔 그 공고 글(번호가 붙은 주소)이 오는 식이다. 대전 청년 행정체험연수는 번호 없는
+   `articleView.do` 만 있어 열면 목록으로 돌려보내졌다(link-check 실측). 그래서 칸마다 점수를 매겨 가장 높은 것을 쓴다:
+     0 — 첫 화면·뿌리·빈 칸(specific 아님) · 물음표 없는 보기 화면(`…/articleView.do` — 무슨 글인지 모르는 주소)
+     2 — 글 번호가 든 주소: 물음표 뒤 글 번호 칸(idx·seq·nttId·cid·wr_id·searchSeq …) 또는 경로에 세 자리 이상 숫자 조각
+     1 — 그 밖
+   같은 점수면 칸 순서(API 명세의 순서 — 신청 주소가 먼저).
+   🔴 원문 링크 확인 로봇이 '그 공고가 아니다'를 **확정한** 주소(data/link-check.json bad — 부르는 쪽이 넘긴다)는 다른 후보가 있으면 고르지 않는다.
+      후보가 그것뿐이면 그대로 둔다(앱이 '(확인 필요)'로 말한다 — 주소를 지어내지 않는다). */
+const ID_QUERY = /^(?:idx|seq|no|sn|nttId|nttSn|nttNo|dataId|bizId|articleNo|article_no|articleId|poly_seq|cid|wr_id|searchSeq|pbancSn|pbanc_sn|progrmRegistNo|plcyNo|pstSn|bbsSeq|boardSeq|board_seq|postId|uid|document_srl|bidx|b_idx)$/i;
+const BARE_VIEW = /(?:view|detail|read)[\w-]*\.(?:do|jsp|php|aspx?|action)$/i;
+export function urlRank(u) {
+  const s = decodeUrlEntities(u);
+  if (!specific(s)) return 0;
+  let x;
+  try { x = new URL(s); } catch { return 0; }
+  const hasQuery = !!x.search && x.search !== '?';
+  if (!hasQuery && BARE_VIEW.test(x.pathname)) return 0;
+  for (const [k, v] of x.searchParams) if (ID_QUERY.test(k) && /\d{2,}/.test(v)) return 2;
+  if (/\/\d{3,}(?:\/|$)/.test(x.pathname)) return 2;
+  return 1;
+}
+/* fields: [[칸 이름, 값], …] (명세 순서) · bad: 확정된 문제 주소 열쇠 모음(Set — 되푼 주소) →
+   { url(고른 것 · specific 아니면 null), considered: [{ field, url, rank, bad }] } */
+export function pickApiUrl(fields, { bad } = {}) {
+  const considered = [];
+  for (const [field, raw] of fields) {
+    const u = String(raw ?? '').trim();
+    if (!/^https?:\/\/\S+$/i.test(u)) continue;
+    considered.push({ field, url: u, rank: urlRank(u), bad: !!(bad && bad.has(decodeUrlEntities(u))) });
+  }
+  const page = considered.filter((c) => specific(c.url));
+  const fine = page.filter((c) => !c.bad);
+  const pool = fine.length ? fine : page;
+  const best = pool.reduce((a, c) => (!a || c.rank > a.rank ? c : a), null);
+  return { url: best ? best.url : null, considered };
+}
+/* 공공 API 글의 **바뀌지 않는 번호** (2026-10-04) — 주소는 날마다 다른 칸에서 올 수 있지만 이 번호는 그 공고에 붙어 있다.
+   관리자가 바로잡은 원문(data/link-fixes.json)이 `id:api-<출처>-<번호>` 로 이 글을 가리킬 수 있게 한다(주소가 바뀌어도 안 끊긴다).
+   칸 이름은 open-api-report.md 「첫 행 칸」 실측(2026-10-02~04): K-Startup pbanc_sn · 1365 progrmRegistNo · 청년정책 plcyNo · 청년콘텐츠 pstSn */
+export const API_ID_FIELD = { kstartup: 'pbanc_sn', vol1365: 'progrmRegistNo', youthPolicy: 'plcyNo', youthContent: 'pstSn' };
+const apiIdOf = (source, r) => {
+  const v = String((r && r[API_ID_FIELD[source]]) ?? '').trim();
+  return /^[\w-]{1,40}$/.test(v) ? v : '';
+};
 
 /* 'yyyyMMdd'·'yyyy-MM-dd'·'yyyy.MM.dd' 의 첫 날짜 → 'YYYY-MM-DD' (아니면 null) */
 export function ymd(raw) {
@@ -98,7 +144,7 @@ const labeled = (label, raw) => {
 };
 
 /* 같은 모양의 글 하나 — 학교가 빈 전국 글(앱이 모든 학생에게 보인다) */
-function item({ title, url, kind, field, deadline, host, excerpts, api, details }) {
+function item({ title, url, kind, field, deadline, host, excerpts, api, details, apiId }) {
   /* 카드 윗줄에 주최가 이미 나온다 — 같은 이름을 발췌 '주최'로 또 적지 않는다 (리뷰 M4) */
   const h = clip(host);
   excerpts = (excerpts || []).filter((x) => x && !(x.label === '주최' && x.text === h));
@@ -115,6 +161,8 @@ function item({ title, url, kind, field, deadline, host, excerpts, api, details 
     campus: '',
     host: h,
     api,
+    /* 바뀌지 않는 번호 · 글 id(관리자 바로잡기의 열쇠 `id:` — 위 API_ID_FIELD). 번호가 없는 행은 둘 다 안 만든다 */
+    ...(apiId ? { apiId, id: `api-${api}-${apiId}` } : {}),
     /* 자격·제외·우선 선발·원문 안내 — 앱이 장학과 같은 엔진으로 적합도를 낸다(2026-10-01). 없으면 칸을 안 만든다 */
     ...putActivityDetails({}, details || {}),
   };
@@ -122,14 +170,16 @@ function item({ title, url, kind, field, deadline, host, excerpts, api, details 
 
 /* 각 map 은 { item } 또는 { drop: '이유' } 를 돌려준다 — 리포트가 버린 이유를 센다 */
 
-export function mapKstartup(r, { scholarship } = {}) {
+export function mapKstartup(r, { scholarship, bad } = {}) {
   const title = r.biz_pbanc_nm || r.intg_pbanc_biz_nm;
   if (!title) return { drop: '제목 없음' };
   const kind = activityKind(title, { scholarship });
   if (!kind) return { drop: '공모전·대외활동 아님(지원사업 등)' };
-  const url = httpUrl(r.detl_pg_url, r.biz_aply_url, r.biz_gdnc_url);
+  const pick = pickApiUrl([['detl_pg_url', r.detl_pg_url], ['biz_aply_url', r.biz_aply_url], ['biz_gdnc_url', r.biz_gdnc_url]], { bad });
+  const url = pick.url;
   if (!url) return { drop: '원문 주소 없음' };
-  return { item: item({
+  return { pick, item: item({
+    apiId: apiIdOf('kstartup', r),
     title, url, kind,
     deadline: ymd(r.pbanc_rcpt_end_dt),
     host: r.pbanc_ntrp_nm || '창업진흥원 K-Startup',
@@ -156,14 +206,16 @@ export function mapKstartup(r, { scholarship } = {}) {
 
 /* 1365 는 동네 봉사 일감이 대부분이라 **대학생·청년을 부른 글만** 싣는다(대학생 탭에 동네 일감이 쏟아지지 않게) */
 const STUDENT = /대학생|대학교|청년|서포터즈|봉사단/;
-export function map1365(r) {
+export function map1365(r, { bad } = {}) {
   const title = r.progrmSj;
   if (!title) return { drop: '제목 없음' };
   if (String(r.adultPosblAt || 'Y').toUpperCase() === 'N') return { drop: '성인 참여 불가' };
   if (!STUDENT.test(title)) return { drop: '대학생·청년 대상 아님' };
-  const url = httpUrl(r.url);
+  const pick = pickApiUrl([['url', r.url]], { bad });
+  const url = pick.url;
   if (!url) return { drop: '원문 주소 없음' };
-  return { item: item({
+  return { pick, item: item({
+    apiId: apiIdOf('vol1365', r),
     title, url, kind: '대외활동', field: '봉사',
     deadline: ymd(r.noticeEndde),
     host: r.nanmmbyNm || r.mnnstNm || '1365 자원봉사포털',
@@ -176,7 +228,7 @@ export function map1365(r) {
   }), ref: r.progrmRegistNo || null };   // 상세 내용(progrmCn)은 목록에 없어 로봇이 이 번호로 따로 받는다(vol1365Details)
 }
 
-export function mapYouthPolicy(r, { scholarship } = {}) {
+export function mapYouthPolicy(r, { scholarship, bad } = {}) {
   const title = r.plcyNm;
   if (!title) return { drop: '제목 없음' };
   const kind = activityKind(title, { scholarship });
@@ -186,7 +238,9 @@ export function mapYouthPolicy(r, { scholarship } = {}) {
         I1 때는 앱이 모든 주소를 '원문에서 신청하기 ↗' 라 불러서 버리는 것만이 정직했다. 이제 앱은 주소 꼴을 보고
         기관 첫 화면을 '주최 측 홈페이지 ↗' 로 부른다(source-link.js) — 정책 내용(대상·혜택·기간)은 API 원문이라 살릴 값이 있다.
         주소를 비워 싣지는 않는다: 감사·합치기가 주소로 같은 글을 가려(빈 주소끼리는 전부 '중복') 그날 결과가 통째로 되돌려진다. */
-  const url = httpUrl(r.aplyUrlAddr, r.refUrlAddr1, r.refUrlAddr2) || httpOf(r.aplyUrlAddr, r.refUrlAddr1, r.refUrlAddr2)[0] || null;
+  /* 세 칸 중 점수가 가장 높은 주소(위 pickApiUrl — 2026-10-04 · 예전엔 '그 정책 꼴인 첫 칸') */
+  const pick = pickApiUrl([['aplyUrlAddr', r.aplyUrlAddr], ['refUrlAddr1', r.refUrlAddr1], ['refUrlAddr2', r.refUrlAddr2]], { bad });
+  const url = pick.url || httpOf(r.aplyUrlAddr, r.refUrlAddr1, r.refUrlAddr2)[0] || null;
   if (!url) return { drop: '원문 주소 없음' };
   const note = specific(url) ? undefined : '원문 주소 없음 — 기관 홈페이지로 실음(앱은 「주최 측 홈페이지」로 안내)';
   const always = String(r.aplyPrdSeCd || '') === '0057002';   // 신청기간 구분: 상시
@@ -195,7 +249,8 @@ export function mapYouthPolicy(r, { scholarship } = {}) {
   /* 판정 엔진이 읽는 나이 줄 — 범위면 '만 19세 ~ 만 34세', 위만 있으면 '만 34세 이하'(parse-requirements parseAge) */
   const ageLine = age ? (min && max ? `만 ${min}세 ~ 만 ${max}세` : (max ? `만 ${max}세 이하` : null)) : null;
   const benefitPart = splitBenefit(r.plcySprtCn);   // 잘리기 전 원문 전체로 가른다
-  return { item: item({
+  return { pick, item: item({
+    apiId: apiIdOf('youthPolicy', r),
     title, url, kind,
     deadline: always ? null : lastDate(r.aplyYmd),
     host: r.sprvsnInstCdNm || r.operInstCdNm || '온통청년',
@@ -216,7 +271,7 @@ export function mapYouthPolicy(r, { scholarship } = {}) {
 }
 
 /* 청년콘텐츠는 소식 글이 섞여 있다 — 판정되는 글만, 60일 안에 올라온 것만(옛 글이 '새 글'로 뜨지 않게) */
-export function mapYouthContent(r, { scholarship, today } = {}) {
+export function mapYouthContent(r, { scholarship, today, bad } = {}) {
   const title = r.pstTtl;
   if (!title) return { drop: '제목 없음' };
   /* 종류 — 제목 판정이 먼저, 못 하면 **게시판 스스로 단 분류**(pstSeNm '대외활동')를 쓴다(1365 가 출처 자체로 봉사인 것과 같은 이치 · 2026-10-02) */
@@ -227,11 +282,13 @@ export function mapYouthContent(r, { scholarship, today } = {}) {
   /* 🔴 pstUrlAddr 는 **전부 null** 로 온다(2026-10-02 정찰 실측 10/10). 청년참여 프로그램 게시판(bbsSn 48)의 글 주소는
      `https://www.youthcenter.go.kr/bbs03View/48/{pstSn}` 이다 — 같은 날 10811·10806 두 글을 실제로 열어 API 제목과 같은 글이 뜨는 것을 확인했다.
      확인한 게시판(48)만 만든다. 다른 게시판은 확인 전이라 주소를 짓지 않고 버린다(원문 링크는 그 공고 하나로 · 짐작 금지). */
-  const url = httpUrl(r.pstUrlAddr)
+  const pick = pickApiUrl([['pstUrlAddr', r.pstUrlAddr]], { bad });
+  const url = pick.url
     || (String(r.bbsSn) === '48' && /^\d+$/.test(String(r.pstSn || '')) ? `https://www.youthcenter.go.kr/bbs03View/48/${r.pstSn}` : null);
   if (!url) return { drop: '원문 주소 없음' };
   const ex = activityExcerpts(htmlToLines(r.pstWholCn));
-  return { item: item({
+  return { pick, item: item({
+    apiId: apiIdOf('youthContent', r),
     title, url, kind,
     deadline: ex.deadline,
     host: r.pstSeNm ? `온통청년 ${r.pstSeNm}` : '온통청년',
@@ -275,34 +332,36 @@ export function xmlItems(xml) {
 export const xmlTag = (xml, tag) => (String(xml || '').match(new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`)) || [])[1]?.trim() || null;
 
 /* 한 출처의 행들 → 실을 글 + 버린 이유 집계. 마감 지난 글은 싣지 않는다. 마감 가까운 순으로 상한까지. */
-export function mapRows(source, rows, { scholarship, today }) {
+export function mapRows(source, rows, { scholarship, today, bad }) {
   const dropped = {};
   const noted = {};         // 싣긴 했지만 알릴 사유 — 지금은 '원문 주소가 기관 홈페이지뿐'(청년정책 · 2026-10-03)
   const items = [];
   const seen = new Set();
   const refs = new Map();   // 글 주소 → 상세를 따로 받을 번호(1365) — 글에는 싣지 않는다
+  const picks = new Map();  // 글 주소 → 살핀 주소 칸과 점수(리포트용 · 글에는 싣지 않는다)
   for (const r of rows) {
-    const { item: it, drop, ref, note } = MAPPERS[source](r, { scholarship, today });
+    const { item: it, drop, ref, note, pick } = MAPPERS[source](r, { scholarship, today, bad });
     if (drop) { dropped[drop] = (dropped[drop] || 0) + 1; continue; }
     if (it.deadline && it.deadline < today) { dropped['마감 지남'] = (dropped['마감 지남'] || 0) + 1; continue; }
     /* 같은 글 — 주소로도, 제목으로도(수집 로봇의 dedupeNotices 가 학교·캠퍼스·제목으로 합친다 ·
        1365 엔 센터마다 같은 제목이 흔해 여기서 안 합치면 매일 늘었다 줄었다 한다 · 리뷰 I2).
        기관 홈페이지 주소가 겹친 것은 같은 글이 아니라 **같은 기관의 다른 정책**이다 — 이유를 따로 센다(감사가 주소로 중복을 보므로 하나만 싣는다) */
-    const k = canonUrl(it.url), tk = titleKey(it);
-    if (seen.has(k) || (tk && seen.has(tk))) {
+    const k = canonUrl(it.url), tk = titleKey(it), ik = it.id ? `id:${it.id}` : '';
+    if (seen.has(k) || (tk && seen.has(tk)) || (ik && seen.has(ik))) {
       const why = !specific(it.url) && seen.has(k) ? '같은 기관 홈페이지(원문 주소 없음)' : '같은 글';
       dropped[why] = (dropped[why] || 0) + 1;
       continue;
     }
-    seen.add(k); if (tk) seen.add(tk);
+    seen.add(k); if (tk) seen.add(tk); if (ik) seen.add(ik);   // 같은 번호(apiId)도 같은 글 — 관리자 바로잡기 열쇠(id:)가 둘을 가리키지 않게
     if (ref) refs.set(it.url, ref);
+    if (pick) picks.set(it.url, pick.considered);
     if (note) noted[note] = (noted[note] || 0) + 1;
     items.push(it);
   }
   items.sort((a, b) => String(a.deadline || '9999').localeCompare(String(b.deadline || '9999')));
   const cap = API_SOURCES[source].cap;
   if (items.length > cap) dropped[`상한 ${cap}건 초과`] = items.length - cap;
-  return { items: items.slice(0, cap), dropped, refs, noted };
+  return { items: items.slice(0, cap), dropped, refs, noted, picks };
 }
 
 /* 받아 온 결과를 '성공'으로 쳐도 되는가 — 아니면 이유(문자열). 🔴 성공으로 치면 그 출처의 지난 글이 이번 글로 **바뀐다**.
@@ -347,16 +406,23 @@ export function mergeApi(prevItems, results, { today, hideUrls = new Set() }) {
   });
   /* 상세를 못 받은 날(1365 상세 한 건 실패 등)은 **어제 받은 상세를 이어받는다** — 안 그러면 하루 동안 자격·안내 칸이 빈다(2026-10-01 코드 리뷰) */
   const prevByUrl = new Map(prev.filter((n) => n && n.url).map((n) => [canonUrl(n.url), n]));
+  /* 같은 번호(id)의 어제 글 — API 글은 주소 칸 고르기가 바뀌면 주소가 달라진다. 숨김·처음 본 날·상세는 번호로도 이어받는다(리뷰 2026-10-04:
+     주소가 바뀌자 관리자가 숨긴 글이 다시 떴다) */
+  const prevById = new Map(prev.filter((n) => n && n.id).map((n) => [n.id, n]));
   const DETAIL_KEYS = ['eligibilityLines', 'eligibilityExcludes', 'eligibilityPriority', 'noticeLines'];
   const added = fresh.map((n) => {
     const k = canonUrl(n.url);
-    const old = prevByUrl.get(k);
+    const byId = n.id ? prevById.get(n.id) : null;
+    const old = prevByUrl.get(k) || byId;
     if (old && !DETAIL_KEYS.some((f) => (n[f] || []).length)) for (const f of DETAIL_KEYS) if ((old[f] || []).length) n = { ...n, [f]: old[f] };
-    const first = [firstSeen.get(k), firstSeen.get(titleKey(n))].filter(Boolean).sort()[0];
+    const first = [firstSeen.get(k), firstSeen.get(titleKey(n)), byId && byId.foundAt].filter(Boolean).sort()[0];
     /* excerptsAt: 수집 로봇의 '원문 다시 읽기'가 건너뛰게 · seenAt: 오늘도 API 가 줬다 —
        수집 로봇의 60일 삭제는 API 글엔 처음 본 날이 아니라 이 날로 잰다(오래 열린 정책이 61일째 '새 글'로 돌아오지 않게 · 리뷰 I3) */
     const out = { ...n, foundAt: first || today, seenAt: today, excerptsAt: today };
-    if (hideUrls.has(k)) out.hidden = true;
+    if (hideUrls.has(k) || (byId && (byId.hidden || hideUrls.has(canonUrl(byId.url || ''))))) {
+      out.hidden = true;
+      if (byId && byId.hiddenBy) out.hiddenBy = byId.hiddenBy;   // 관리자 숨김 표식도 — 수집 로봇이 주소로만 보고 풀지 않게(collect.mjs)
+    }
     for (const f of Object.keys(out)) if (out[f] === undefined) delete out[f];
     return out;
   });
