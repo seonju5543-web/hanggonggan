@@ -46,7 +46,7 @@ export function closableReadyIssues(issues, seen, today) {
       const p = prep.get(c);
       if (posted.has(c) || (p && p.status === 'posted')) n.올림 += 1;
       else if (p && p.status === 'skipped') n.건너뜀 += 1;
-      else if (p && p.status === 'prepared') n.마감 += 1;
+      else if (p && (p.status === 'prepared' || p.status === 'expired')) n.마감 += 1;   // expired = 마감이 지나 정리됨(ledger.mjs expire)
       else n.그밖 += 1;
     }
     out.push({ number: i.number, reason: Object.entries(n).filter(([, v]) => v).map(([k, v]) => `${k} ${v}`).join(' · ') });
