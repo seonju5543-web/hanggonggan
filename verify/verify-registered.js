@@ -37,7 +37,6 @@ async function driveAnyLiveForm(page) {
       const s = (typeof registeredList !== 'undefined' ? registeredList : []).find((x) => x.id === id);
       return s && s.formId && FORM_TEMPLATES[s.formId];
     }));
-  if (!ids.length) return { id: null, ok: false };
   const tried = [];
   for (const id of ids) {
     /* 🔴 **예외도 '다음 후보'다** (2026-09-15 코드 리뷰). `return` 으로 넘어가는 길은
@@ -55,13 +54,19 @@ async function driveAnyLiveForm(page) {
      검사가 '데이터 탓'으로 빨간불이 되고, verify-ui 는 set -e 라 **뒤의 드라이버 전부가 안 돌았다**(CLAUDE.md: 실데이터에 기댄 고정 검사 금지).
      잰 것은 '질문 → 문서 생성' 길이므로, 화면에 있는 진짜 양식 공고 하나를 그대로 복사해 마감만 20일 뒤로 바꾼 표본을 같은 목록에 넣고
      같은 손(driveOneForm)으로 몬다. 실제 후보가 하나라도 열려 있으면 여기까지 오지 않는다. 잠김 말고 다른 이유로 실패했으면 표본을 쓰지 않는다. */
-  if (ids.length && tried.every((t) => /\(신청 버튼 잠김\)$/.test(t))) {
+  /* 🔴 **이 학생에게 보이는 양식 공고가 아예 없을 때도 같다** (2026-10-04 · 이슈 #390). 마감 전 양식 공고가 셋뿐인데
+     하나는 다른 학교 한정(외대) · 둘은 마감일이 없어 60일 규칙으로 목록에서 내려가 성균관대 학생에겐 한 장도 안 보였다 —
+     데이터 탓 빨간불이 다시 뒤 드라이버 전부를 막았다. 그때는 **등록된 진짜 양식 공고 하나**(어느 학교든)를 복사해 학교 범위를 풀고
+     마감만 20일 뒤로 바꾼 표본으로 같은 길을 몬다(잰 것은 여전히 '질문 → 문서 생성' — 양식·질문·문서는 진짜 그대로). */
+  if (!ids.length || tried.every((t) => /\(신청 버튼 잠김\)$/.test(t))) {
     const fx = await page.evaluate((srcIds) => {
-      const src = registeredList.find((x) => srcIds.includes(x.id));
+      const src = registeredList.find((x) => srcIds.includes(x.id))
+        || registeredList.find((x) => x.formId && typeof FORM_TEMPLATES !== 'undefined' && FORM_TEMPLATES[x.formId]);
       if (!src) return null;
       const copy = JSON.parse(JSON.stringify(src));
       copy.id = 'gate-open-form';
       copy.deadline = new Date(Date.now() + 20 * 864e5).toISOString().slice(0, 10);
+      if (copy.eligibility) { delete copy.eligibility.schoolOnly; delete copy.eligibility.campusOnly; delete copy.eligibility.schoolsAny; }
       registeredList.push(copy);
       renderExplore();
       return src.id;
@@ -69,7 +74,7 @@ async function driveAnyLiveForm(page) {
     if (fx) {
       await page.waitForTimeout(400);
       const r = await driveOneForm(page, 'gate-open-form').catch((e) => ({ id: 'gate-open-form', ok: false, why: String(e.message || e).split('\n')[0].slice(0, 80) }));
-      console.log(`  (실제 후보 ${tried.join(', ')} 가 모두 마감 — ${fx} 의 양식을 그대로 쓴 마감 전 표본으로 구동)`);
+      console.log(`  (${ids.length ? `실제 후보 ${tried.join(', ')} 가 모두 마감` : '이 학생에게 보이는 양식 공고가 없음'} — ${fx} 의 양식을 그대로 쓴 마감 전 표본으로 구동)`);
       if (r.ok) return { id: `gate-open-form(←${fx})`, ok: true };
       tried.push(`gate-open-form←${fx}(${r.why})`);
     }

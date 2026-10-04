@@ -107,6 +107,12 @@
    "by": "claude",
    "action": "addBoard",
    "detail": "고려대학교 세종캠퍼스  → https://sejong.korea.ac.kr/koreaSejong/7906/subview.do"
+  },
+  {
+   "at": "2026-10-04 19:06 KST",
+   "by": "Claude 세션 (개발자 전체 컨펌 2026-10-04)",
+   "action": "linkFix",
+   "detail": "원문 주소 1건 — 넣음 일반공지 10/2(금) 교외장학재단 제출용 총장 직인  → https://www.yonsei.ac.kr/bbs/sc/58/944246/artclView.do"
   }
  ]
 }
