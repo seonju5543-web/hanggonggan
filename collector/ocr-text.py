@@ -236,8 +236,12 @@ def candidates(root):
             if low.endswith(IMAGE_EXT):
                 yield path, 'image'
             elif is_pdf(path):
-                if os.path.exists(path + '.txt'):
-                    continue            # 글자층이 있는 PDF 는 pdf-text.py 가 이미 뽑았다
+                # 글자층이 있는 PDF 는 pdf-text.py 가 이미 뽑았다(양식·층2 사본은 그 글자를 쓴다).
+                # 🔴 다만 **자격용 공고문(elig-*)은 쪽 그림으로 읽는다** (2026-10-04 점검 bodies-6) — 자격 경로는 글자층(.pdf.txt)을
+                #    쓰지 않기로 했다(attachment-text.mjs 2026-08-20 결정 · `3년 이상` → `년이상` 처럼 숫자가 빠진다). 그래서 글자층이 있는
+                #    자격용 PDF 는 무료 경로 어디에서도 안 읽히고 있었다. 결과는 여전히 .ocr.txt 로만 · 품질 관문·장부는 그대로.
+                if os.path.exists(path + '.txt') and not name.startswith('elig-'):
+                    continue
                 yield path, 'pdf'
 
 

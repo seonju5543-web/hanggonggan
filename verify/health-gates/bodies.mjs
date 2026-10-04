@@ -455,4 +455,34 @@ globalThis.fetch = async (url) => {
     eq('  심층 수집 워크플로는 제 대기줄(deep-fetch) — 수집 대기줄(collector)과 합치지 않는다',
       [/^concurrency:\n {2}group: deep-fetch\n {2}cancel-in-progress: false/m.test(df), /group: collector\b/.test(stripYamlComments(df))], [true, false]);
   }
+  /* ── ⑤ OCR — 글자층이 있어도 자격용 공고문 PDF 는 쪽 그림으로 읽는다 (bodies-6) ──
+     자격 경로는 글자층(.pdf.txt)을 쓰지 않는다(2026-08-20 결정) — 그런데 OCR 은 '글자층이 있으면 이미 뽑았다'며 건너뛰어
+     자격용 PDF 가 무료 경로 어디에서도 안 읽혔다. 양식(form-*)·층2 사본은 예전처럼 글자층을 쓴다. */
+  {
+    const probe = spawnSync('python3', ['-c', 'print("PYOK")'], { encoding: 'utf8' });
+    if (!(probe.status === 0 && /PYOK/.test(probe.stdout || ''))) {
+      console.log('  … ⑤ OCR 후보 검사 건너뜀 — 이 컴퓨터에 파이썬이 없다(윈도우의 python3 는 스토어 껍데기). 클라우드 로봇에서는 실제로 돈다.');
+    } else {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-ocrcand-'));
+      try {
+        for (const f of ['elig-a-1.pdf', 'form-b-1.pdf', 'plain-c.pdf']) {
+          fs.writeFileSync(path.join(dir, f), '%PDF-1.4\n표본');
+          fs.writeFileSync(path.join(dir, `${f}.txt`), '글자층');
+        }
+        fs.writeFileSync(path.join(dir, 'elig-d-1.pdf'), '%PDF-1.4\n글자층 없는 스캔');
+        const code = ['import importlib.util, json, os, sys',
+          "spec = importlib.util.spec_from_file_location('ocrtext', sys.argv[1])",
+          'm = importlib.util.module_from_spec(spec)', 'spec.loader.exec_module(m)',
+          'print(json.dumps(sorted([os.path.basename(p), k] for p, k in m.candidates(sys.argv[2]))))'].join('\n');
+        const r = spawnSync('python3', ['-c', code, fileURLToPath(new URL('collector/ocr-text.py', root)), dir],
+          { encoding: 'utf8', env: cleanEnv({ PYTHONDONTWRITEBYTECODE: '1' }) });
+        let got = null;
+        try { got = JSON.parse((r.stdout || '').trim().split('\n').pop()); } catch { got = (r.stderr || r.stdout || '').slice(-200); }
+        eq('⑤ OCR 후보 — 자격용 공고문 PDF 는 글자층이 있어도 읽는다 · 양식·그 밖의 PDF 는 글자층이 있으면 건너뛴다 · 글자층 없는 PDF 는 예전처럼 읽는다',
+          got, [['elig-a-1.pdf', 'pdf'], ['elig-d-1.pdf', 'pdf']]);
+      } finally {
+        fs.rmSync(dir, { recursive: true, force: true });
+      }
+    }
+  }
 }
