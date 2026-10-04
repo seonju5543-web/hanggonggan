@@ -3,8 +3,8 @@
  "seeds": [
   {
    "school": "연세대학교 미래캠퍼스",
-   "home": "https://www.yonsei.ac.kr/wj/",
-   "evidence": "연세대 미래캠퍼스(원주) 공식 사이트 경로(wj = 원주) — 로봇이 열어 확인",
+   "home": "https://mirae.yonsei.ac.kr/",
+   "evidence": "2026-10-04 연세대 본교 첫 화면 메뉴 「미래캠퍼스」 링크 — 옛 www.yonsei.ac.kr/wj/ 는 404",
    "probe": {
     "checkedAt": "2026-10-04",
     "why": "홈페이지 못 엶 (HTTP 404)",

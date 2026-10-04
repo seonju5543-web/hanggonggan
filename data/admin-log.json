@@ -71,6 +71,42 @@
    "by": "Claude 세션 (개발자 전체 컨펌 2026-10-04)",
    "action": "linkFix",
    "detail": "원문 주소 3건 — 넣음 의암 손병희 우수논문 장학생 (2026) → https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322415 · 넣음 정읍시민장학재단 우수인재장학금 (2026) → https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322469 · 넣음 경희인턴(교내장학) 장학생 (2026-2학기) → https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322541"
+  },
+  {
+   "at": "2026-10-04 18:41 KST",
+   "by": "claude",
+   "action": "activitySource",
+   "detail": "출처 보관 · 청년재단 · https://kyf.or.kr/user/boardList.do?bbsId=BBSMSTR_000000000367"
+  },
+  {
+   "at": "2026-10-04 18:41 KST",
+   "by": "claude",
+   "action": "activitySource",
+   "detail": "출처 추가 · 청년재단 → https://kyf.or.kr/user/board.do?boardType=notice"
+  },
+  {
+   "at": "2026-10-04 18:42 KST",
+   "by": "claude",
+   "action": "activitySource",
+   "detail": "출처 보관 · 경희대학교 · https://khu.ac.kr/kor/notice/list.do?page=1&condition=all&category=GENERAL"
+  },
+  {
+   "at": "2026-10-04 18:43 KST",
+   "by": "claude",
+   "action": "addBoard",
+   "detail": "연세대학교 미래캠퍼스  → https://mirae.yonsei.ac.kr/bbs/wj/104/artclList.do?findClSeq=100"
+  },
+  {
+   "at": "2026-10-04 18:44 KST",
+   "by": "claude",
+   "action": "addBoard",
+   "detail": "동국대학교 WISE캠퍼스  → https://wise.dongguk.ac.kr/article/servicenotice/list"
+  },
+  {
+   "at": "2026-10-04 18:44 KST",
+   "by": "claude",
+   "action": "addBoard",
+   "detail": "고려대학교 세종캠퍼스  → https://sejong.korea.ac.kr/koreaSejong/7906/subview.do"
   }
  ]
 }

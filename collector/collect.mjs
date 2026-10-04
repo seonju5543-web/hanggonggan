@@ -24,6 +24,7 @@ import { extractLinks, stripSessionId, hrefText } from './board-links.mjs';
 import { tidyExternal, dropReason as externalDropReason } from './external-clean.mjs';
 import { canonUrl } from './canon-url.mjs';
 import { fetchBoard, netReason } from './fetch-board.mjs';
+import { NEWS_BOARD_RULES } from './news-board-rules.mjs';
 import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from './harvest-budget.mjs';
 
 const HERE = new URL('.', import.meta.url);
@@ -174,6 +175,20 @@ const BOARD_RULES = {
     fn: /pf_DetailMove\(\s*['"](\d+)['"]/,
     detail: (id) => `https://www.jbnu.ac.kr/web/Board/${id}/detailView.do?category=6`,
   },
+  /* 청년재단(전국 · 대외활동 출처 · 학교가 없어 주최 이름으로 찾는다): 행이 <a onclick="fn_detail('10053','BBSMSTR_000000000367')">.
+     옛 주소(boardList.do?bbsId=…367)는 2026-10-04 에 404 — 지금 목록은 사이트 메뉴 「공지사항」의 board.do?boardType=notice.
+     상세 주소는 짐작이 아니라 **재단 첫 화면이 실제로 거는 링크 꼴**(boardDetail.do?boardType=notice&bbsId=…&nttNo=…)이고,
+     열어서 그 글 제목이 뜨고 옆 글 제목은 안 뜨는 것을 확인했다(nttNo 10053 · 2026-10-04). */
+  '청년재단': {
+    kind: 'onclick',
+    fn: /fn_detail\(\s*['"](\d+)['"]\s*,\s*['"](BBSMSTR_\d+)['"]/,
+    titleIn: /<strong[^>]*>([\s\S]*?)<\/strong>/,   // <a> 가 줄 전체 — <span>807</span><strong>제목</strong><span>날짜</span><span>조회</span>
+    detail: (id, _board, hit) => `https://kyf.or.kr/user/boardDetail.do?boardType=notice&bbsId=${hit[2]}&nttNo=${id}`,
+  },
+  /* 동국 WISE: 「장학/봉사」 게시판(/article/servicenotice/list · 2026-10-04 사이트 메뉴에서) 행이 goDetail(번호).
+     교내 소식 로봇이 이미 확인해 쓰는 규칙을 **그대로 불러 쓴다**(베끼지 않는다) — /article/<게시판>/detail/<번호> ·
+     페이지의 goDetail 이 그 주소로 폼을 보내고, GET 으로 열어 그 글 제목을 확인했다(520676). */
+  '동국대학교 WISE캠퍼스': { ...NEWS_BOARD_RULES['동국대학교 WISE캠퍼스'], titleIn: /<p class="tit">([\s\S]*?)<\/p>/ },   // <a> 가 줄 전체(번호·분류·제목·날짜·작성자·조회)
 };
 
 /* stripSessionId 도 board-links.mjs 로 옮겼다 (2026-09-26) */
@@ -208,8 +223,10 @@ async function rowsByRule(rule, boardUrl) {
     // 따옴표 종류를 역참조로 맞춘다 — onclick="pf_DetailMove('215647')"처럼
     // 큰따옴표 안에 작은따옴표가 들어 있어 [^"']로는 거기서 끊긴다(전북대에서 실제로 겪음)
     return [...html.matchAll(/<a\b[^>]*onclick\s*=\s*(["'])((?:(?!\1)[\s\S])*)\1[^>]*>([\s\S]*?)<\/a>/gi)].map((m) => {
-      const id = (m[2].match(rule.fn) || [])[1];
-      return id ? { title: m[3].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), url: rule.detail(id) } : null;
+      const hit = m[2].match(rule.fn) || [];
+      const id = hit[1];
+      const inner = rule.titleIn ? ((m[3].match(rule.titleIn) || [])[1] ?? m[3]) : m[3];   // 링크가 줄 전체(번호·날짜·조회수)를 감싸면 제목 칸만
+      return id ? { title: inner.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), url: rule.detail(id, boardUrl, hit) } : null;   // hit: 번호가 둘인 게시판(청년재단 nttNo·bbsId) · 둘째 인자는 소식 규칙과 같은 꼴(게시판 주소)
     }).filter((x) => x && x.title);
   }
   // dataId — 목록 HTML에서 번호와 제목을 짝지어 뽑는다
@@ -310,7 +327,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
     return;
   }
   try {
-    const rule = BOARD_RULES[s.school];
+    const rule = BOARD_RULES[s.school || s.host];   // 학교 없는 전국 출처는 주최 이름으로
     let rawLinks;
     if (rule) {
       rawLinks = await rowsByRule(rule, s.boardUrl);   // 링크가 아닌 행을 쓰는 게시판

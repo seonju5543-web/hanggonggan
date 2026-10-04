@@ -65,10 +65,19 @@ export function pickMenuLinks(links, home, max = 6) {
   return out.sort((a, b) => a.rank - b.rank).slice(0, max);
 }
 
-async function get(url, ms = 15000) {
+/* 「site move」 껍데기(<meta http-equiv="refresh" content="0;url=…">)는 브라우저처럼 **같은 사이트 안에서 한 번** 따라간다 (2026-10-04) —
+   고려 세종·연세 미래의 첫 화면이 이 꼴이라 메뉴를 하나도 못 보고 '최고 0건'으로 끝났다(차단이 아니었다). */
+export function metaRefreshTarget(html, base) {
+  const m = String(html || '').match(/<meta[^>]+http-equiv=["']?refresh["']?[^>]*content=["']\s*\d+\s*;\s*url=([^"'>\s]+)/i);
+  if (!m) return null;
+  try { const u = new URL(m[1], base); return u.hostname === new URL(base).hostname ? u.href : null; } catch { return null; }
+}
+async function get(url, ms = 15000, hop = 0) {
   const res = await fetch(url, { redirect: 'follow', headers: FETCH_HEADERS, signal: AbortSignal.timeout(ms) });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return { html: await res.text(), url: res.url || url };
+  const html = await res.text();
+  const next = hop === 0 && html.length < 3000 ? metaRefreshTarget(html, res.url || url) : null;
+  return next ? get(next, ms, 1) : { html, url: res.url || url };
 }
 
 const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);

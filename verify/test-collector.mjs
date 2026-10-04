@@ -1384,11 +1384,11 @@ console.log('\n■ 수집망 복원 (2026-09-29 · 2026-08-30 좁힘을 되돌�
   /* 앱·알림·발행이 같이 쓰는 상수 — schools.json 과 같아야 한다 (자세한 대조는 「화면이 보여 주는 학교 = 로봇이 수집하는 학교」) */
   const served = createRequire(import.meta.url)('../match-engine.js').SERVED_SCHOOLS;
   eq('앱 상수 SERVED_SCHOOLS 도 44곳 전부다', REVIVED.filter((n) => !served.includes(n)), []);
-  /* 서비스한다고 적었는데 아무 로봇도 안 읽는 학교 — 학생은 빈 피드를 본다. 지금은 게시판 주소가 없는 분교 셋뿐이고(개발자가 주소를 줘야 한다),
-     넷째가 조용히 생기면 여기서 잡는다(리뷰 2026-09-30). */
+  /* 서비스한다고 적었는데 아무 로봇도 안 읽는 학교 — 학생은 빈 피드를 본다. 주소 없던 분교 셋은 2026-10-04 에 주소를 찾아 넣었다
+     (아래 「낡은 게시판 주소 고침」) — 이제 하나라도 조용히 생기면 여기서 잡는다(리뷰 2026-09-30). */
   const browserSet = new Set(bt.targets.map((x) => x.school));
   const unread = [...new Set(sc.schools.filter((x) => !x.boardUrl && !browserSet.has(x.school)).map((x) => x.school))].sort();
-  eq('아무 로봇도 안 읽는 서비스 학교는 주소 없는 분교 셋뿐이다', unread, ['고려대학교 세종캠퍼스', '동국대학교 WISE캠퍼스', '연세대학교 미래캠퍼스']);
+  eq('모든 서비스 학교를 어느 로봇인가가 읽는다', unread, []);
   /* 보관 자리의 규칙은 그대로 — 키가 사라지면 다음에 뺄 때 주소를 잃는다 */
   const parked = (o) => (Array.isArray(o.parked) ? o.parked : []);
   eq('보관 배열이 남아 있다 (비어 있어도 된다)', Array.isArray(sc.parked) && Array.isArray(bt.parked), true);
@@ -11402,6 +11402,40 @@ console.log('\n■ 대외활동 — 「혜택」에 섞인 조건은 자격으�
   eq('  수집 로봇이 발행 때 모든 글에 매번', /acts\.items\.forEach\(sanitizeBenefit\)/.test(readText(new URL('../collector/collect.mjs', import.meta.url))), true);
   const fd = MEX.fitDetail({ eligibilityLines: r1.conditions, eligibility: {} }, { birthYear: new Date().getFullYear() - 22, status: '재학' });
   eq('③ 🔴 틀린 안심 금지 — `공연단체에 한하며`·`공연단체를 대상으로` 줄도 요건으로 센다(학생 개인에게 95% 가 떴다)', [fd.total, fd.met, fd.unknown >= 2], [3, 1, true]);   // 퍼센트가 아니라 met/total 로 잰다(관문 「적합도 상수」)
+}
+
+console.log('\n■ 낡은 게시판 주소 고침 (2026-10-04 개발자 "주소 낡은 거부터 다 고쳐") — 404 는 차단이 아니라 이사였다');
+{
+  /* 404 넷의 원인은 사이트가 주소를 옮긴 것(같은 도구로 같은 사이트의 다른 화면은 200) · 분교 둘은 첫 화면이 meta refresh 껍데기라 찾기 로봇이 메뉴를 못 봤다 */
+  const FB = await import('../collector/find-boards.mjs');
+  eq('① 찾기 로봇이 「site move」 껍데기를 같은 사이트 안에서만 따라간다',
+    [FB.metaRefreshTarget('<meta http-equiv="refresh" content="0;url=/koreaSejong/index.do">', 'https://sejong.korea.ac.kr/'),
+     FB.metaRefreshTarget('<meta http-equiv="refresh" content="0;url=https://evil.example/">', 'https://sejong.korea.ac.kr/'),
+     FB.metaRefreshTarget('<html><body>메뉴</body></html>', 'https://sejong.korea.ac.kr/')],
+    ['https://sejong.korea.ac.kr/koreaSejong/index.do', null, null]);
+  /* collect.mjs 는 불러오는 순간 수집을 시작하므로 규칙 표만 떼어 실행한다(행 읽기 식은 rowsByRule 과 같은 것) */
+  const csrc = readText(new URL('../collector/collect.mjs', import.meta.url));
+  const { NEWS_BOARD_RULES } = await import('../collector/news-board-rules.mjs');
+  const RULES = new Function('NEWS_BOARD_RULES', `return ${csrc.slice(csrc.indexOf('const BOARD_RULES = {') + 'const BOARD_RULES = '.length, csrc.indexOf('\n};', csrc.indexOf('const BOARD_RULES = {')) + 2)};`)(NEWS_BOARD_RULES);
+  const rows = (rule, html, boardUrl) => [...html.matchAll(/<a\b[^>]*onclick\s*=\s*(["'])((?:(?!\1)[\s\S])*)\1[^>]*>([\s\S]*?)<\/a>/gi)].map((m) => {
+    const hit = m[2].match(rule.fn) || []; const id = hit[1];
+    const inner = rule.titleIn ? ((m[3].match(rule.titleIn) || [])[1] ?? m[3]) : m[3];
+    return id ? { title: inner.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), url: rule.detail(id, boardUrl, hit) } : null;
+  }).filter(Boolean);
+  eq('② 청년재단 — 번호 둘(글·게시판)로 재단 첫 화면과 같은 상세 주소 · 제목 칸만(번호·날짜·조회수 빼고)',
+    rows(RULES['청년재단'], `<a class="v2-board-list__row" href="javascript:void(0)" onclick="fn_detail('10053','BBSMSTR_000000000367')"> <span> 807 </span> <strong> 2026년 청년다다름사업 참여수기 공모전 안내 </strong> <span>2026.09.21</span> <span>37</span> </a>`, 'https://kyf.or.kr/user/board.do?boardType=notice'),
+    [{ title: '2026년 청년다다름사업 참여수기 공모전 안내', url: 'https://kyf.or.kr/user/boardDetail.do?boardType=notice&bbsId=BBSMSTR_000000000367&nttNo=10053' }]);
+  eq('③ 동국 WISE — 교내 소식 규칙을 불러 쓴다(베끼지 않는다) · 제목 칸만',
+    [/'동국대학교 WISE캠퍼스': \{ \.\.\.NEWS_BOARD_RULES\['동국대학교 WISE캠퍼스'\]/.test(csrc),
+     rows(RULES['동국대학교 WISE캠퍼스'], `<a href="#none" onclick="goDetail(520676);"> <div class="mark"><span class="num">619</span></div> <div class="top"> <em>교외장학(지자체, 사설/기타)</em> <p class="tit"> 대전청년내일재단 2026년 장학생 선발 안내 </p> <div class="info"> <span>2026.09.28.</span> <span>양문수</span> <span>조회 171</span> </div> </div> </a>`, 'https://wise.dongguk.ac.kr/article/servicenotice/list')],
+    [true, [{ title: '대전청년내일재단 2026년 장학생 선발 안내', url: 'https://wise.dongguk.ac.kr/article/servicenotice/detail/520676' }]]);
+  eq('  학교 없는 전국 출처는 주최 이름으로 규칙을 찾는다 · 전북(한 번호) 규칙은 그대로', [/BOARD_RULES\[s\.school \|\| s\.host\]/.test(csrc), rows(RULES['전북대학교'], `<a href="javascript:;" onclick="pf_DetailMove('215647')">장학생 선발 공고 안내</a>`, 'x')[0].url], [true, 'https://www.jbnu.ac.kr/web/Board/215647/detailView.do?category=6']);
+  const SCH = JSON.parse(readText(new URL('../collector/schools.json', import.meta.url)));
+  const ACTSRC = JSON.parse(readText(new URL('../collector/activity-sources.json', import.meta.url)));
+  eq('④ 404 주소는 출처에서 빠지고 보관됐다 · 분교 셋은 주소가 있다',
+    [ACTSRC.sources.some((x) => /boardList\.do\?bbsId=BBSMSTR_000000000367|khu\.ac\.kr\/kor\/notice\/list\.do/.test(x.boardUrl)), ACTSRC.parked.filter((x) => /boardList\.do\?bbsId=BBSMSTR_000000000367|khu\.ac\.kr\/kor\/notice\/list\.do/.test(x.boardUrl)).length,
+     ['연세대학교 미래캠퍼스', '고려대학교 세종캠퍼스', '동국대학교 WISE캠퍼스'].map((n) => !!(SCH.schools.find((x) => x.school === n) || {}).boardUrl)],
+    [false, 2, [true, true, true]]);
 }
 
 console.log('\n■ 자격요건 로봇 (진짜 브라우저) — 장학·대외활동 (2026-10-04 개발자 "진짜 브라우저로 열어야 되는 공고는 다 이걸로 · 시간초과 등 오류 안 나게")');
