@@ -8,7 +8,9 @@ import { cleanTitle } from '../collector/clean-title.mjs';
 const root = new URL('../', import.meta.url);
 const rel = (p) => new URL(p, root);
 const files = ['data/registered.json', 'data/notices.json', 'data/activities.json', 'data/external.json',
-  ...fs.readdirSync(rel('data/notices')).filter((f) => f !== 'index.json' && f.endsWith('.json')).map((f) => `data/notices/${f}`)];
+  ...fs.readdirSync(rel('data/notices')).filter((f) => f !== 'index.json' && f.endsWith('.json')).map((f) => `data/notices/${f}`),
+  /* 교내 소식도 (2026-10-05 — 빠져 있어 「… 2026.10.03 교무팀 박성구」 꼬리가 화면에 남았다) */
+  ...fs.readdirSync(rel('data/news')).filter((f) => f !== 'index.json' && f.endsWith('.json')).map((f) => `data/news/${f}`)];
 for (const f of files) {
   let d; try { d = JSON.parse(fs.readFileSync(rel(f), 'utf8')); } catch { continue; }
   const items = Array.isArray(d) ? d : (d.items || d.notices || []);

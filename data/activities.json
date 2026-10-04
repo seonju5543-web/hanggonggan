@@ -2329,7 +2329,9 @@
    "campus": "",
    "host": "두산연강재단",
    "foundAt": "2026-10-01",
-   "detailsV": 3
+   "detailsV": 3,
+   "hidden": true,
+   "hiddenBy": "관리자 2026-10-05"
   },
   {
    "title": "제15회 한국어능력시험(TOPIK) 쓰기 채점자 양성 워크숍 참가자 모집 공고",

@@ -259,64 +259,52 @@
   "name": "공통 [공통] 2026학년도 2학기 점프장학 신청 안내_09.22(화)~10.9(금)"
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323199&menuno=200318": {
-  "tries": 1,
-  "at": "2026-09-30",
+  "tries": 2,
+  "at": "2026-10-04",
   "minBody": 100,
   "name": "공통 2026년도 하반기 (재)논산시장학회 학업장려 장학생 선발 안내"
  },
  "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?articleno=375940": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-10-04",
   "minBody": 100,
   "name": "[공지] 2026학년도 2학기 퇴직교직원자녀장학 신청 안내(~2026.10.02.(금) 까지)"
  },
  "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?articleno=375827": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-10-04",
   "minBody": 100,
   "name": "[공지] 2026학년도 2학기 가족장학 신청 안내(~2026.10.02.(금) 까지)"
  },
  "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?articleno=375935": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-10-04",
   "minBody": 100,
   "name": "[대청교] 2026학년도 2학기 대학생 청소년교육지원장학 멘토 추가 모집 안내"
  },
  "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?articleno=375792": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-10-04",
   "minBody": 100,
   "name": "[교외장학] 2026학년도 2학기 아주대학교 총동문회 동문장학생 선발 공고"
  },
  "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12427/view.do?currentpageno=1": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-10-04",
   "minBody": 100,
   "name": "2026년 대전청년내일재단 성취(대) 장학생 선발계획 연장 공고"
  },
  "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12373/view.do?currentpageno=1": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-10-04",
   "minBody": 100,
   "name": "2026년 JW이종호재단 기초과학자 장학생 선발 안내"
  },
  "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?bbs_seq=30196&board_category_no=11&board_seq=4&contents_no=5&menu_id=100&p_tab_no=5&site_no=2": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-10-04",
   "minBody": 100,
   "name": "2026-2학기 CAU 미래설계장학금 장학생 모집 공고"
- },
- "https://www.cau.ac.kr/cms/FR_CON/view.do?contents_no=5&menu_id=100&nttid=30176&p_tab_no=5": {
-  "tries": 1,
-  "at": "2026-10-04",
-  "minBody": 100,
-  "name": "2026학년도 2학기 장애학생지원센터(서울) 블루메이트(국가근로 장학생) 모집 공고"
- },
- "https://www.cau.ac.kr/cms/FR_CON/view.do?contents_no=5&menu_id=100&nttid=30159&p_tab_no=5": {
-  "tries": 1,
-  "at": "2026-10-04",
-  "minBody": 100,
-  "name": "2026학년도 AX미래장학금 장학생 선발 공고"
  },
  "https://www.cau.ac.kr/cms/FR_CON/view.do?contents_no=5&menu_id=100&nttid=30154&p_tab_no=5": {
   "tries": 1,
@@ -341,5 +329,83 @@
   "at": "2026-10-04",
   "minBody": 100,
   "name": "등록금외지원 2026년 하반기 인재육성 장학생 선발 계획 공고 2026.09.08 대전청년내일재단 황새롬"
+ },
+ "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765909": {
+  "tries": 1,
+  "at": "2026-10-04",
+  "minBody": 100,
+  "name": "[기한 연장]2026-2학기 고졸 후학습자 장학사업(희망사다리 Ⅱ유형) 신규장학생 선발 안내(~9/30(수)"
+ },
+ "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766256": {
+  "tries": 1,
+  "at": "2026-10-04",
+  "minBody": 100,
+  "name": "[홍보] 2026 하반기 AI·ICT 인재 장학생 모집 안내"
+ },
+ "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?articleno=366829": {
+  "tries": 1,
+  "at": "2026-10-04",
+  "minBody": 100,
+  "name": "[학부] 2026년 제29기 두을장학생 선발 안내"
+ },
+ "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjIlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg==": {
+  "tries": 1,
+  "at": "2026-10-04",
+  "minBody": 100,
+  "name": "[교내-10/22] 2026학년도 2학기 대학봉사장학금 신청 안내"
+ },
+ "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?articleno=376795": {
+  "tries": 1,
+  "at": "2026-10-04",
+  "minBody": 100,
+  "name": "[교외장학] 2026년 하반기 대전청년내일재단 성취 장학생(대학생) 모집 연장"
+ },
+ "https://www.jbnu.ac.kr/web/Board/217993/detailView.do?category=6": {
+  "tries": 1,
+  "at": "2026-10-04",
+  "minBody": 100,
+  "name": "2026년 전북특별자치도 토박이장학생 선발 안내"
+ },
+ "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323225&menuno=200318": {
+  "tries": 1,
+  "at": "2026-10-04",
+  "minBody": 100,
+  "name": "공통 [공통] 2026학년도 2학기 경희목련장학 신청 안내_10.02(금)~10.25(일)"
+ },
+ "https://www.smu.ac.kr/kor/life/notice.do?articleno=769228": {
+  "tries": 1,
+  "at": "2026-10-04",
+  "minBody": 100,
+  "name": "2026년 우양재단 동행장학생 모집 안내"
+ },
+ "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?articleno=367194": {
+  "tries": 1,
+  "at": "2026-10-04",
+  "minBody": 100,
+  "name": "[학부] [대전청년내일재단] 2026년 하반기 인재육성 성취(대) 장학생 선발 안내(기간 연장)"
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp?boardmode=view&duid=53299&tpage=1": {
+  "tries": 1,
+  "at": "2026-10-04",
+  "minBody": 100,
+  "name": "[등록/장학] [대전광역시] 2026년 하반기 인재육성(성취) 장학생 선발 안내(기간연장)"
+ },
+ "https://www.jbnu.ac.kr/web/Board/218051/detailView.do?category=6&menu=2377": {
+  "tries": 1,
+  "at": "2026-10-04",
+  "minBody": 100,
+  "name": "(재)hy사회복재단 2026년 든든 학업지원 장학생 선발 안내"
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp?boardmode=view&duid=53420&tpage=1": {
+  "tries": 1,
+  "at": "2026-10-04",
+  "minBody": 100,
+  "name": "[등록/장학] 2026년 든든 학업지원금 선발 안내"
+ },
+ "https://www.kyonggi.ac.kr/www/selectBbsNttView.do;jsessionid=3C71C54E330DDE56AC526288ABDAD27C?bbsno=1073&key=7520&nttno=626271&searchkrwd=장학&sf.pnos=1073&sf.pnos=888": {
+  "tries": 1,
+  "at": "2026-10-04",
+  "minBody": 100,
+  "name": "[입학에서 취업까지] [대전청년내일재단] 2026년 성취(대) 장학생 선발 안내 ( ~ 2026.10.08."
  }
 }

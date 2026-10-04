@@ -68,7 +68,7 @@ function cutTail(t) {
   let m;
   /* ① 게시일 뒤 작성 부서·작성자 낱말 1~3개 (조회수가 붙어도) */
   /*    🔴 낱말 중 하나는 부서·기관 꼴이어야 한다 — 「장학증서 수여식 안내 2026.09.10 대강당」 의 대강당은 장소다(제목) */
-  if ((m = t.match(new RegExp(`\\s+${DATE}((?:\\s+${WORD}){1,3})(?:\\s+[\\d,]+)?\\s*$`)))) {
+  if ((m = t.match(new RegExp(`\\s+${DATE}((?:\\s+${WORD}){1,4})(?:\\s+[\\d,]+)?\\s*$`)))) {
     const ws = m[1].trim().split(/\s+/);
     if (!ws.some((w) => KEEP_WORD.test(w)) && ws.some((w) => DEPT.test(w) || ORG.test(w))) return t.slice(0, m.index);
   }

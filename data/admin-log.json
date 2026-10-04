@@ -131,6 +131,18 @@
    "by": "Claude 세션",
    "action": "linkFix",
    "detail": "원문 주소 10건 — 넣음 2026학년도 2학기 장애학생지원센터(서울) 블루메이트 → https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30176&pageNo=1 · 넣음 2026학년도 AX미래장학금 장학생 선발 공고 → https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30159&pageNo=1 · 넣음 2026학년도 2학기 4·19선양재단 나라사랑 4·19 → https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30154&pageNo=1 · 넣음 2026-2학기 중소기업 "
+  },
+  {
+   "at": "2026-10-05 00:10 KST",
+   "by": "Claude 세션",
+   "action": "activityHide",
+   "detail": "숨김 1건 (숨긴 주소 1개)"
+  },
+  {
+   "at": "2026-10-05 00:44 KST",
+   "by": "조세현",
+   "action": "edit",
+   "detail": "auto-bbssc58944066artclviewdo — deadline, period"
   }
  ]
 }
