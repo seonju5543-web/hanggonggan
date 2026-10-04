@@ -259,6 +259,27 @@ jobs:
             --user "$MAIL_USER:$MAIL_PASS" --mail-from "$MAIL_USER" $RCPT --upload-file /tmp/mail.txt
           echo "✅ 메일을 보냈습니다 — $(sed -n 's/^To: //p' /tmp/mail.txt)"
 
+      # 🔴 쓸모없어진 준비 이슈를 닫는다 (2026-10-04 로봇·도구 점검 · insta/ready-issues.mjs).
+      #    준비 이슈는 「올리거나 건너뛰면 저절로 닫힙니다」라고 약속하는데, 옛 판은 이슈 안 카드가 1건 이하일 때만 닫고
+      #    마감 지난 카드는 아무도 안 봐서, 올릴 카드가 하나도 없는 이슈가 열린 채 쌓였다(10-04 · 8건).
+      #    담긴 카드가 전부 올렸거나·건너뛰었거나·마감이 지났을 때만 닫는다(장부에 없는 카드는 모름 → 둔다).
+      #    🔴 아무것도 올리지 않는다 — 게시는 사람만 누른다.
+      - name: 쓸모없어진 준비 이슈 닫기
+        if: ${{ always() }}
+        continue-on-error: true
+        timeout-minutes: 2
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh issue list --repo "$REPO" --label insta-ready --state open --limit 300 --json number,body > /tmp/ready.json
+          node insta/ready-issues.mjs closable /tmp/ready.json > /tmp/closable.tsv
+          while IFS=$'\t' read -r n why; do
+            [ -n "$n" ] || continue
+            gh issue close "$n" --repo "$REPO" --comment "담긴 카드가 모두 올렸거나 건너뛰었거나 마감이 지났습니다 — 게시할 것이 없어 닫습니다. ($why · 자동)"
+            echo "닫음 #$n ($why)"
+          done < /tmp/closable.tsv
+
       - name: 못 그린 공고가 있으면 시끄럽게
         if: ${{ steps.draw.outputs.bad != '' }}
         env:
@@ -344,7 +365,10 @@ jobs:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
         run: node insta/publish.mjs --code="${{ inputs.code }}" --publish
 
-      # 이 공고만 담긴 준비 이슈는 닫고, 여러 건이 담긴 이슈에는 코멘트만 남긴다.
+      # 남은 카드(올릴 수 있는 것)가 없으면 준비 이슈를 닫고, 있으면 코멘트만 남긴다.
+      # 🔴 '남은 카드'는 insta/ready-issues.mjs 한 곳이 장부로 센다(올림·건너뜀·마감 지남은 뺀다 · 2026-10-04) —
+      #    옛 판은 이슈 안 카드 수(1건 이하)만 봐서, 나머지가 마감 지났거나 건너뛴 이슈가 영영 안 닫혔다.
+      #    장부(seen.json)는 바로 앞 단계가 이미 고쳤다. 세지 못하면(빈 값) 닫지 않고 코멘트만 단다.
       - name: 준비 이슈 정리
         env:
           GH_TOKEN: ${{ github.token }}
@@ -352,9 +376,9 @@ jobs:
           CODE: ${{ inputs.code }}
         run: |
           for n in $(gh issue list --repo "$REPO" --label insta-ready --state open --json number,body --jq ".[] | select(.body | contains(\"<!-- insta-code: $CODE -->\")) | .number"); do
-            CNT=$(gh issue view "$n" --repo "$REPO" --json body --jq .body | grep -c '<!-- insta-code: ')
-            if [ "$CNT" -le 1 ]; then gh issue close "$n" --repo "$REPO" --comment "올렸습니다 ($CODE) — 자동으로 닫습니다.";
-            else gh issue comment "$n" --repo "$REPO" --body "올렸습니다 — $CODE"; fi
+            LIVE=$(gh issue view "$n" --repo "$REPO" --json body --jq .body | node insta/ready-issues.mjs live-in-body || true)
+            if [ "${LIVE:-1}" = "0" ]; then gh issue close "$n" --repo "$REPO" --comment "올렸습니다 ($CODE) — 남은 카드가 없어 자동으로 닫습니다.";
+            else gh issue comment "$n" --repo "$REPO" --body "올렸습니다 — $CODE (남은 카드 ${LIVE:-?}건)"; fi
           done
 
       # 🔴 올린 것을 기억 못 하면 내일 같은 공고를 다시 올린다(이슈 #75 유형).
@@ -421,11 +445,28 @@ jobs:
             git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE"; sleep 5; }
             [ "$i" = 3 ] && { echo '🚨 기본 브랜치에 못 올렸습니다'; exit 1; }
           done
+          # 남은 카드 수는 insta/ready-issues.mjs 한 곳(위 게시 작업과 같다) — 장부는 바로 위에서 고쳤다
           for n in $(gh issue list --repo "$REPO" --label insta-ready --state open --json number,body --jq ".[] | select(.body | contains(\"<!-- insta-code: $CODE -->\")) | .number"); do
-            CNT=$(gh issue view "$n" --repo "$REPO" --json body --jq .body | grep -c '<!-- insta-code: ')
-            if [ "$CNT" -le 1 ]; then gh issue close "$n" --repo "$REPO" --comment "건너뛰기로 정했습니다 ($CODE · $ACTOR).";
-            else gh issue comment "$n" --repo "$REPO" --body "건너뛰기 — $CODE ($ACTOR)"; fi
+            LIVE=$(gh issue view "$n" --repo "$REPO" --json body --jq .body | node insta/ready-issues.mjs live-in-body || true)
+            if [ "${LIVE:-1}" = "0" ]; then gh issue close "$n" --repo "$REPO" --comment "건너뛰기로 정했습니다 ($CODE · $ACTOR) — 남은 카드가 없어 자동으로 닫습니다.";
+            else gh issue comment "$n" --repo "$REPO" --body "건너뛰기 — $CODE ($ACTOR) (남은 카드 ${LIVE:-?}건)"; fi
           done
       - name: 실패하면 시끄럽게
         if: ${{ failure() || cancelled() }}
         run: echo '🚨 건너뛰기 기록에 실패했습니다.' >> "$GITHUB_STEP_SUMMARY"
+      # 🔴 요약 한 줄은 아무도 안 본다 — 이슈로 부른다 (2026-10-04 로봇·도구 점검).
+      #    넘어짐 알림(robot-down)이 아니라 경보 한 곳의 따로 제목을 쓴다: 건너뛰기는 사람이 누른 일이라, 같은 워크플로의
+      #    다른 작업(매일 준비)이 성공했다고 하트비트가 닫으면 '기록이 안 됐다'는 사실이 사라진다. 사람이 확인하고 닫는다.
+      - name: 🚨 건너뛰기 실패 이슈
+        if: ${{ failure() || cancelled() }}
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          title: 🚨 인스타 건너뛰기 기록에 실패했습니다
+          label: insta-fail
+          label-description: 인스타 게시 실패
+          body: |
+            공고 `${{ inputs.code }}` 의 건너뛰기를 장부에 적지 못했습니다(누른 사람 ${{ github.actor }}). 장부에 안 적히면 그 카드는 '준비됨'으로 남습니다.
+            실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            관리자 화면 › 인스타 에서 건너뛰기를 다시 누르거나 Claude 세션에 '인스타 건너뛰기 실패 확인해줘'라고 지시하세요.

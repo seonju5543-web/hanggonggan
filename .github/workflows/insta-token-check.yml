@@ -117,3 +117,11 @@ jobs:
       - name: 확인 자체가 실패하면
         if: ${{ failure() || cancelled() }}
         run: echo '🚨 토큰 확인이 실패했습니다 — 확인 못 한 것을 「괜찮다」로 읽지 마세요.' >> "$GITHUB_STEP_SUMMARY"
+      # 🔴 요약 한 줄은 아무도 안 본다 — 넘어짐 알림 한 벌(robot-down)로 이슈를 연다 (2026-10-04 로봇·도구 점검).
+      #    회복하면 하트비트가 닫는다.
+      - name: 🚨 로봇이 넘어졌다
+        if: ${{ failure() || cancelled() }}
+        uses: ./.github/actions/robot-down
+        with:
+          robot: 인스타 토큰 확인
+          token: ${{ github.token }}
