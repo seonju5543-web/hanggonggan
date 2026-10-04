@@ -113,6 +113,12 @@
    "by": "Claude 세션 (개발자 전체 컨펌 2026-10-04)",
    "action": "linkFix",
    "detail": "원문 주소 1건 — 넣음 일반공지 10/2(금) 교외장학재단 제출용 총장 직인  → https://www.yonsei.ac.kr/bbs/sc/58/944246/artclView.do"
+  },
+  {
+   "at": "2026-10-04 19:43 KST",
+   "by": "Claude 세션 (개발자 전체 컨펌 2026-10-04)",
+   "action": "linkFix",
+   "detail": "원문 주소 2건 — 넣음 [공통] └ RE:(생활비)2027학년도 (재)미래인재 → https://www.gachon.ac.kr/bbs/kor/478/125809/artclView.do · 넣음 [공통] └ RE:(생활비)2026-2학기 (주)아이오 → https://www.gachon.ac.kr/bbs/kor/478/125811/artclView.do"
   }
  ]
 }
