@@ -92,8 +92,8 @@ jobs:
           pip install olefile --quiet
           python3 collector/hwp-bodytext.py collector/act-files || true
           sudo apt-get install -y -qq poppler-utils
-          pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3   # 🔴 판 고정 — 3.3.x 는 x86 CPU 에서 첫 그림부터 ConvertPirAttribute2RuntimeAttribute 오류(2026-10-04 첫 클라우드 실행 · PaddleOCR discussions 17350)
-          python3 collector/paddle-ocr.py collector/act-files --budget-sec=240 || true
+          pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3 || echo "::warning::PaddleOCR 설치 실패 — 아래 읽기가 엔진 없음으로 적고 HWP·본문으로만 계속"   # 🔴 실패를 삼키지도, 경고 없이 떼지도 말 것 — 떼면 같은 단계의 --apply 가 bash -e 에 끊겨 HWP 로 읽은 자격까지 버려진다(2026-10-04 점검 gaps-02) · 🔴 판 고정 — 3.3.x 는 x86 CPU 에서 첫 그림부터 ConvertPirAttribute2RuntimeAttribute 오류(2026-10-04 첫 클라우드 실행 · PaddleOCR discussions 17350)
+          python3 collector/paddle-ocr.py collector/act-files --budget-sec=240 || echo "::warning::PaddleOCR 실패 — 자격 읽기는 HWP·본문으로만 계속(엔진 고장이면 그 글의 기회는 --apply 가 되돌린다)"
       - name: 대외활동 — 자격 고르기 (자기 장부에만)
         timeout-minutes: 2
         continue-on-error: true

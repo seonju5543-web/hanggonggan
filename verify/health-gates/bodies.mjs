@@ -202,4 +202,114 @@ export default async function bodies(eq, ctx) {
     eq('  관문에 걸려 되돌릴 때 장부(rescue-ledger.json)도 되돌린다 — 본문은 되돌려지고 확보 기록만 남으면 이레 동안 아무도 안 연다 (bodies-12 ③)',
       /git checkout -- [^\n]*collector\/rescue-ledger\.json/.test(revert), true);
   }
+
+  /* ── ② PaddleOCR 엔진 고장을 소리 내고 기회를 되돌린다 (gaps-02) ──
+     ⓐ paddle-ocr.py 를 가짜 paddleocr·PIL 로 진짜 돌린다: 모든 그림이 같은 오류 → 종료 코드 2 + ::warning:: + 상태 파일 ·
+        잘 읽으면 0 · 설치가 안 돼 불러오지도 못하면 그것도 엔진 고장
+     ⓑ activity-docs: 장부 판이 바뀌면 자격 못 찾은 칸을 한 번 비운다(migrateOcrTries) · OCR 실패 파일 때문에 못 읽은 글은 기회를 되돌린다(rollbackOcrTries)
+        · --apply 를 임시 폴더에서 진짜 돌려 무료 모드 장부(act-docs.json)에 되돌림이 저장되고 같은 결과로 두 번 되돌리지 않는다
+     ⓒ 두 워크플로가 실패를 `|| true` 로 삼키지 않는다(설치·읽기 둘 다 ::warning::) */
+  {
+    const probe = spawnSync('python3', ['-c', 'print("PYOK")'], { encoding: 'utf8' });
+    if (!(probe.status === 0 && /PYOK/.test(probe.stdout || ''))) {
+      console.log('  … ② ⓐ PaddleOCR 행동 검사 건너뜀 — 이 컴퓨터에 파이썬이 없다(윈도우의 python3 는 스토어 껍데기). 클라우드 로봇에서는 실제로 돈다.');
+    } else {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-paddle-'));
+      try {
+        const files = path.join(dir, 'files'); const fakes = path.join(dir, 'fakes');
+        fs.mkdirSync(files); fs.mkdirSync(path.join(fakes, 'PIL'), { recursive: true });
+        fs.writeFileSync(path.join(fakes, 'paddleocr.py'), [
+          'import os', "mode = os.environ.get('FAKE_PADDLE', 'ok')",
+          "if mode == 'noimport':", "    raise ImportError('fake: paddleocr 설치 안 됨')",
+          'class PaddleOCR:', '    def __init__(self, **kw):', '        pass', '    def predict(self, p):',
+          "        if mode == 'broken':", "            raise RuntimeError('(Unimplemented) ConvertPirAttribute2RuntimeAttribute not support [pir::ArrayAttribute<pir::DoubleAttribute>]')",
+          "        return [{'rec_texts': ['모집대상 : 도내 거주 청년'], 'rec_scores': [0.95], 'rec_boxes': [[0, 0, 200, 20]]}]", ''].join('\n'));
+        fs.writeFileSync(path.join(fakes, 'PIL', '__init__.py'), '');
+        fs.writeFileSync(path.join(fakes, 'PIL', 'Image.py'), [
+          'import builtins', 'class _Im:', '    def convert(self, m):', '        return self', '    def thumbnail(self, s):', '        pass',
+          '    def save(self, p, quality=None):', "        builtins.open(p, 'wb').write(b'x')", 'def open(p):', '    return _Im()', ''].join('\n'));
+        for (const f of ['a.jpg', 'b.png']) fs.writeFileSync(path.join(files, f), 'x');
+        const script = fileURLToPath(new URL('collector/paddle-ocr.py', root));
+        const runPy = (mode) => spawnSync('python3', [script, files, '--budget-sec=30'],
+          { encoding: 'utf8', env: cleanEnv({ PYTHONPATH: fakes, PYTHONDONTWRITEBYTECODE: '1', FAKE_PADDLE: mode }) });
+        const status = () => { try { return JSON.parse(fs.readFileSync(path.join(files, 'paddle-status.json'), 'utf8')); } catch { return null; } };
+        const r1 = runPy('broken'); const s1 = status() || {};
+        eq('② ⓐ 모든 그림이 같은 엔진 오류 — 종료 코드 2 · ::warning:: 한 줄 · 상태 파일에 고장 표시와 실패 파일 (예전엔 \'끝 — 0장\' 에 초록불)',
+          [r1.status, /::warning::PaddleOCR 엔진 오류 — 2개 모두 실패: \(Unimplemented\) ConvertPir/.test(r1.stdout || ''), s1.engineFailed, s1.failed], [2, true, true, ['a.jpg', 'b.png']]);
+        const r2 = runPy('ok'); const s2 = status() || {};
+        eq('  잘 읽으면 종료 코드 0 · 고장 표시 없음 · 그림마다 .ocr.txt',
+          [r2.status, s2.engineFailed, s2.ok, fs.existsSync(path.join(files, 'a.jpg.ocr.txt'))], [0, false, ['a.jpg', 'b.png'], true]);
+        for (const f of ['a.jpg', 'b.png']) fs.rmSync(path.join(files, `${f}.ocr.txt`));
+        const r3 = runPy('noimport'); const s3 = status() || {};
+        eq('  설치가 안 돼 불러오지도 못하면 그것도 엔진 고장(종료 코드 2 · 읽을 그림 전부 실패로)',
+          [r3.status, s3.engineFailed, s3.failed, /ImportError/.test(s3.error || '')], [2, true, ['a.jpg', 'b.png'], true]);
+      } finally {
+        fs.rmSync(dir, { recursive: true, force: true });
+      }
+    }
+  }
+  const prevLib = process.env.ACTIVITY_DOCS_AS_LIB;
+  process.env.ACTIVITY_DOCS_AS_LIB = '1';   // 본편이 돌지 않게(불러오는 순간 data/activities.json 을 고친다)
+  const AD = await import('../../collector/activity-docs.mjs');
+  if (prevLib === undefined) delete process.env.ACTIVITY_DOCS_AS_LIB; else process.env.ACTIVITY_DOCS_AS_LIB = prevLib;
+  {
+    const led = { 'https://a': { at: '2026-10-03', tries: 1 }, 'https://b': { at: '2026-10-03', tries: 1, lines: ['x'] }, _common: ['h'] };
+    const n1 = AD.migrateOcrTries(led);
+    const snap = JSON.stringify(led);
+    const n2 = AD.migrateOcrTries(led);
+    eq('② ⓑ 장부 판이 바뀌면 자격 못 찾은 칸만 한 번 비운다 — 찾은 칸·공통 그림은 남는다 · 판을 적어 두 번째는 그대로',
+      [n1, 'https://a' in led, !!led['https://b'], led._common, typeof led._ocrV, n2, JSON.stringify(led) === snap], [1, false, true, ['h'], 'string', 0, true]);
+    const L2 = { u1: { at: '2026-10-04', tries: 1 }, u2: { at: '2026-10-04', tries: 1 }, u3: { at: '2026-10-04', tries: 1 }, u4: { at: '2026-10-04', tries: 0 } };
+    const back = AD.rollbackOcrTries(L2, { u1: ['k1-0i.jpg'], u2: ['k2-0i.jpg'], u3: ['k3-1.hwp'], u4: ['k4-0i.jpg'] },
+      { failed: ['k1-0i.jpg', 'k2-0i.jpg', 'k4-0i.jpg'] }, new Set(['u2']));
+    eq('  OCR 이 실패한 파일 때문에 자격을 못 찾은 글만 기회를 되돌린다 — 자격을 찾은 글·실패 파일이 없는 글은 그대로 · 0 아래로 안 간다 · 날짜는 그대로',
+      [back, L2.u1.tries, L2.u2.tries, L2.u3.tries, L2.u4.tries, L2.u1.at], [['u1'], 0, 1, 1, 0, '2026-10-04']);
+  }
+  {
+    const sb2 = sandbox(root, 'hdj-actdocs-');
+    try {
+      const u1 = 'https://act.example/post/1'; const u2 = 'https://act.example/post/2';
+      const k = (u) => u.split('/').pop();
+      /* 발췌 규칙 파일(extract-excerpts.mjs)이 불러오는 순간 이 둘을 읽는다 — 빈 표본 */
+      sb2.write('collector/extracted/notices-text.json', []);
+      sb2.write('data/registered.json', { items: [] });
+      sb2.write('data/activities.json', { items: [
+        { title: '청년 체인지메이커 아카데미 운영', url: u1 }, { title: '청년 체인지메이커 아카데미 2기 운영', url: u2 }] });
+      sb2.write('collector/act-files/manifest.json', { [u1]: [`p${k(u1)}-0.jpg`], [u2]: [`p${k(u2)}-0.jpg`] });
+      sb2.write(`collector/act-files/p${k(u2)}-0.jpg`, 'x');
+      sb2.write(`collector/act-files/p${k(u2)}-0.jpg.ocr.txt`, '청년 체인지메이커 아카데미\n모집대상 : 도내 거주 청년 누구나\n');
+      sb2.write(`collector/act-files/p${k(u1)}-0.jpg`, 'x');
+      sb2.write('collector/act-files/paddle-status.json', { engineFailed: false, ok: [`p${k(u2)}-0.jpg`], failed: [`p${k(u1)}-0.jpg`], error: 'x' });
+      sb2.write('collector/act-docs.json', { [u1]: { at: '2026-10-04', tries: 2 }, [u2]: { at: '2026-10-04', tries: 1 }, _ocrV: 'x' });
+      const a1 = sb2.run('collector/activity-docs.mjs', ['--apply'], {});
+      const after1 = sb2.json('collector/act-docs.json') || {};
+      const a2 = sb2.run('collector/activity-docs.mjs', ['--apply'], {});
+      const after2 = sb2.json('collector/act-docs.json') || {};
+      const acts = sb2.json('data/activities.json') || { items: [] };
+      eq('  --apply 를 진짜 돌리면 — OCR 실패 글(1)의 기회가 무료 장부에 되돌려 저장되고(2→1), 자격을 찾은 글(2)은 그대로 · 상태에 적용 표시 · 두 번째 실행은 또 안 되돌린다',
+        [a1.status, after1[u1] && after1[u1].tries, after1[u2] && after1[u2].tries, (sb2.json('collector/act-files/paddle-status.json') || {}).applied,
+          a2.status, after2[u1] && after2[u1].tries, (acts.items[1].eligibilityLines || []).length > 0],
+        [0, 1, 1, true, 0, 1, true]);
+      /* 받기(--fetch) 단계의 '피드에서 빠진 글은 장부에서 뺀다'가 판 표시(_ocrV)를 지우면 다음 실행이 또 판이 바뀐 줄 알고 장부를 통째로 비운다 —
+         자격이 다 있는 표본이라 아무것도 받지 않는다(망 없이 돈다) */
+      const cur = {}; AD.migrateOcrTries(cur);
+      sb2.write('data/activities.json', { items: [{ title: '표본', url: u1, eligibilityLines: ['대학생'] }] });
+      sb2.write('collector/act-docs.json', { [u1]: { at: '2026-10-04', tries: 1 }, 'https://gone.example/x': { at: '2026-10-01', tries: 1 }, _common: ['h'], _ocrV: cur._ocrV });
+      const f1 = sb2.run('collector/activity-docs.mjs', ['--fetch'], {});
+      const afterF = sb2.json('collector/act-docs.json') || {};
+      eq('  받기 단계 — 피드에서 빠진 글 칸은 지우고 · 판 표시·공통 그림 칸은 남긴다 · 같은 판이면 장부를 비우지 않는다',
+        [f1.status, 'https://gone.example/x' in afterF, afterF._ocrV === cur._ocrV, !!afterF._common, !!afterF[u1]], [0, false, true, true, true]);
+    } finally {
+      sb2.done();
+    }
+  }
+  {
+    for (const f of ['collect-scholarships.yml', 'rescue-bodies.yml']) {
+      const y = stripYamlComments(readText(`.github/workflows/${f}`));
+      eq(`② ⓒ ${f} — PaddleOCR 설치·읽기 실패를 \`|| true\` 로 삼키지 않는다(경고를 남기고, 같은 단계의 --apply 는 계속)`,
+        [/pip install[^\n]*paddleocr==[\d.]+[^\n]*\|\| true/.test(y), /pip install[^\n]*paddleocr==[\d.]+ \|\| echo "::warning::/.test(y),
+          /paddle-ocr\.py[^\n]*\|\| true/.test(y), /paddle-ocr\.py collector\/act-files --budget-sec=\d+ \|\| echo "::warning::/.test(y)],
+        [false, true, false, true]);
+    }
+  }
 }
