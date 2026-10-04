@@ -78,7 +78,9 @@ export function linkItemOf(ds, item) {
 }
 
 /** 바로잡기 장부(data/link-fixes.json fix)의 열쇠 — source-link.js fixKeys 가 찾는 것과 같은 글자.
- *  정식 등록·층2 = `id:<공고 id>`(층2는 `kosaf-<코드>`) · 피드 넷 = `u:<지금 주소(되푼 것)>`. 못 만들면 '' */
+ *  정식 등록·층2 = `id:<공고 id>`(층2는 `kosaf-<코드>`) · 피드 넷 = `u:<지금 주소(되푼 것)>`. 못 만들면 ''
+ *  피드 글이라도 제 id 가 있으면 id: 로 — 공공 API 글(`api-<출처>-<번호>`)은 주소가 날마다 바뀔 수 있어
+ *  u: 열쇠는 하루 만에 '대상 없음'이 된다(원문 확인 로봇 publishFix 도 fixKeys 의 첫 열쇠 = id: 를 쓴다). */
 export function fixKeyFor(ds, item, L) {
   const it = item || {};
   if (ds === 'registered') return it.id ? `id:${it.id}` : '';
@@ -86,6 +88,7 @@ export function fixKeyFor(ds, item, L) {
     const id = it.code ? `kosaf-${it.code}` : (String(it.id || '').startsWith('kosaf-') ? it.id : '');
     return id ? `id:${id}` : '';
   }
+  if (typeof it.id === 'string' && it.id) return `id:${it.id}`;
   const raw = it.sourceUrl != null && it.sourceUrl !== '' ? it.sourceUrl : (it.url || '');
   if (!raw || !L || typeof L.decodeUrlEntities !== 'function') return '';
   return `u:${L.decodeUrlEntities(raw)}`;

@@ -52,6 +52,12 @@ export default async function gate(eq, ctx) {
     [LF.fixKeyFor('registered', { id: 'r1', sourceUrl: 'https://a.kr' }, SL), LF.fixKeyFor('kosaf', kraw, SL), LF.fixKeyFor('news', feed, SL),
       SL.fixKeys(LF.linkItemOf('kosaf', kraw)).includes(LF.fixKeyFor('kosaf', kraw, SL)), SL.fixKeys(feed).includes(LF.fixKeyFor('news', feed, SL))],
     ['id:r1', 'id:kosaf-0001', 'u:https://a.kr/x.do?m=1&id=2', true, true]);
+  {
+    /* 공공 API 글은 제 id 가 있다(api-<출처>-<번호> · 주소는 날마다 바뀔 수 있다) — 열쇠는 id: 로, 앱도 그 열쇠를 먼저 찾는다 */
+    const api = { id: 'api-youthPolicy-202601', apiId: '202601', title: '표본 정책', url: 'https://youth.kr/a?x=1' };
+    eq('  피드 글이라도 제 id 가 있으면 id: 열쇠 — 주소가 바뀌어도 바로잡기가 남는다(앱 fixKeys 첫 열쇠와 같다)',
+      [LF.fixKeyFor('activities', api, SL), SL.fixKeys(api)[0]], ['id:api-youthPolicy-202601', 'id:api-youthPolicy-202601']);
+  }
   eq('  층2 모양은 앱(kosafAsScholarships)과 같은 칸 — id · sourceKind · 재단 홈 · 마감 = due',
     (({ id, sourceKind, sourceUrl, deadline }) => [id, sourceKind, sourceUrl, deadline])(LF.linkItemOf('kosaf', kraw)), ['kosaf-0001', 'kosaf', 'https://found.or.kr', '2026-11-30']);
   const appJs = fs.readFileSync(new URL('app.js', ctx.root), 'utf8');
