@@ -380,6 +380,15 @@ eq('숫자 표기(&#40;)를 되돌린다',
 eq('부등호(&lt; &gt;)를 되돌린다',
   cleanTitle('2학기 &lt;이원길 장학금&gt; 선발'), '2학기 <이원길 장학금> 선발');
 eq('&amp;를 마지막에 풀어 이중 해제가 안 생긴다', cleanTitle('A &amp;quot; B'), 'A &quot; B');
+/* 목록 행 꼬리 (2026-10-04 개발자 지적 "세종이도만 봐도 이름·날짜·원인 모를 숫자가 제목에 붙어 있네 · 다 수정하고 재발 방지") */
+eq('제목 꼬리 — 부서 + 게시일 + 조회수(항공대 · 세종이도)', cleanTitle('세종연구원 2026년도 세종이도인재장학금 장학생 선발 안내 학생지원팀 2026-05-11 1,664'), '세종연구원 2026년도 세종이도인재장학금 장학생 선발 안내');
+eq('  게시일 + 부서·작성자(국민대)', cleanTitle('2026년 하반기 인재육성 장학생 선발 계획 공고 2026.09.08 대전청년내일재단 황새롬'), '2026년 하반기 인재육성 장학생 선발 계획 공고');
+eq('  행 번호 + 게시일 + 조회(동국) · 「공지 공지」', [cleanTitle('2726 [홍보] 2027년도 대산농촌재단 장학생 선발 안내 2026.10.01. 조회 44'), cleanTitle('공지 공지 2026-2학기 동국리더장학 신청 안내 2026.09.17. 조회 1640')], ['[홍보] 2027년도 대산농촌재단 장학생 선발 안내', '2026-2학기 동국리더장학 신청 안내']);
+eq('  `기간 : …` 꼬리(정책브리핑) · 끝의 N', [cleanTitle('[감사원] 2026년 국민제안 감사 아이디어 공모 기간 : 2026.10.01 ~ 2026.10.31'), cleanTitle('RE:(생활비)2026-2학기 장학생 선발결과 안내 N')], ['[감사원] 2026년 국민제안 감사 아이디어 공모', 'RE:(생활비)2026-2학기 장학생 선발결과 안내']);
+eq('  🔴 제목인 것은 남긴다 — 행사 날짜+기간 낱말 · 날짜 앞 낱말(부서 꼴 아님) · 맨 앞 연도', [cleanTitle('셔틀 운행 안내 2026.10.5 중단'), cleanTitle('아산시청소년 문학공모전 2026.08.04'), cleanTitle('2027 해동과학문화재단 장학생 모집')], ['셔틀 운행 안내 2026.10.5 중단', '아산시청소년 문학공모전', '2027 해동과학문화재단 장학생 모집']);
+eq('  두 번 돌려도 같다(감사 title-tails 가 이걸로 잰다)', cleanTitle(cleanTitle('[(재)인천인재평생교육진흥원] 2026년도 하반기 장학···')), cleanTitle('[(재)인천인재평생교육진흥원] 2026년도 하반기 장학···'));
+eq('  브라우저 수집기도 저장하는 제목을 청소한다(이 로봇만 안 거쳐 「공지 공지 … 조회 1640」 이 떴다)', /title: cleanTitle\(it\.title\)/.test(readText(new URL('../collector/browser-collect.mjs', import.meta.url))), true);
+eq('  감사가 저장된 제목을 다시 청소해 본다(규칙은 베끼지 않고 실행만)', [/title-tails\.mjs/.test(readText(new URL('./audit-data.js', import.meta.url))), /from '\.\.\/collector\/clean-title\.mjs'/.test(readText(new URL('./title-tails.mjs', import.meta.url)))], [true, true]);
 
 /* 게시판 옆 메뉴 — 실공고로 잡으면 앱에 '학자금 대출' 같은 빈 카드가 뜬다 */
 ['학자금 대출', '장학금 주요사항', '외국인장학금', '장학 및 대출', '신입생장학금',
@@ -1654,6 +1663,24 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
   eq('워크플로가 활동 파일 한 쌍을 저장한다', /git add data\/activities\.json/.test(wf) && /git add collector\/seen-activities\.json/.test(wf), true);
   const ga = readText(new URL('../.gitattributes', import.meta.url));
   eq('두 파일은 합집합으로 자동 병합', /data\/activities\.json\s+merge=jsonunion/.test(ga) && /collector\/seen-activities\.json\s+merge=jsonunion/.test(ga), true);
+  /* 🔴 적어 두기만 하고 병합기에 규칙이 없으면 조용히 물러난다 (2026-10-04 — 이 줄이 9-25부터 초록이었는데 병합기엔 activities 규칙이 없어,
+     사람이 activities.json 을 고친 사이 수집 로봇의 저장이 충돌로 실패하고 그 실행 결과가 통째로 버려졌다). 그래서 **진짜로 돌려 본다**. */
+  {
+    const mjs = readText(new URL('../tools/merge-json-union.mjs', import.meta.url));
+    const rx = [...mjs.matchAll(/match: (\/.*?\/), merge/g)].map((m) => new Function(`return ${m[1]}`)());
+    const declared = [...ga.matchAll(/^(\S+)\s+merge=jsonunion/gm)].map((m) => m[1].replace('*', 'x'));
+    eq('  합집합이라 적은 파일마다 병합기에 규칙이 있다', declared.filter((f) => !rx.some((r) => r.test(f))), []);
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-act-merge-'));
+    const w = (n, items) => { fs.writeFileSync(path.join(dir, n), JSON.stringify({ updatedAt: '2026-10-04', items }, null, 1)); return path.join(dir, n); };
+    const base = w('b.json', []);
+    const ours = w('o.json', [{ url: 'https://a.kr/1', title: '가', eligibilityLines: ['만 19세 이상'] }, { url: 'https://a.kr/2', title: '나' }]);
+    const theirs = w('t.json', [{ url: 'https://a.kr/1', title: '가', deadline: '2026-11-01' }, { url: 'https://a.kr/3', title: '다' }]);
+    const r = spawnSync(process.execPath, [fileURLToPath(new URL('../tools/merge-json-union.mjs', import.meta.url)), base, ours, theirs, 'data/activities.json'], { encoding: 'utf8' });
+    const got = JSON.parse(readText(ours)).items;
+    eq('  대외활동 파일을 실제로 합친다 — 같은 글은 칸을 합치고 · 양쪽 새 글은 다 남긴다',
+      [r.status, got.map((x) => x.title).sort(), (got.find((x) => x.title === '가') || {}).deadline, ((got.find((x) => x.title === '가') || {}).eligibilityLines || []).length],
+      [0, ['가', '나', '다'], '2026-11-01', 1]);
+  }
   /* ③ 출처 */
   const src = JSON.parse(readText(new URL('../collector/activity-sources.json', import.meta.url)));
   const served = createRequire(import.meta.url)('../match-engine.js').SERVED_SCHOOLS;   // 2026-09-29: 두 곳 → 44곳, 상수 한 곳에서 읽는다
@@ -1959,7 +1986,7 @@ console.log('\n■ 재단·지자체 게시판 (2026-09-26 · 노션 F-13 · 교
   eq('renderHome 이 그린다', /\$\('#external-notices'\)\.innerHTML = externalNoticesHtml\(\);/.test(app), true);
   eq('당겨서 새로고침·첫 실행이 받는다', /loadActivities\(\), loadExternal\(\)\]/.test(app) && /^loadExternal\(\);$/m.test(app), true);
   eq('못 받아 왔어도 빈 문서', /liveExternal = d \|\| liveExternal \|\| \{ items: \[\], updatedAt: null \}/.test(app), true);
-  eq('카드는 한 벌 · 주최를 윗줄에 (마감을 읽은 글은 D-day 도)', /noticeCardHtml\(n, \{ org: `\$\{n\.host\} 공고`, dday: n\.deadline \?/.test(app) && !/function externalCardHtml/.test(app), true);
+  eq('카드는 한 벌 · 주최를 윗줄에 (마감을 읽은 글은 D-day 도) · 「공고」 를 겹쳐 적지 않는다(2026-10-04 · 구역 제목이 「…새 공고」)', /noticeCardHtml\(n, \{ org: n\.host, dday: n\.deadline \?/.test(app) && !/function externalCardHtml/.test(app), true);
   eq('등록된 주소는 뺀다 — 학교 구역과 같은 잣대(registeredUrlMatcher)', (app.match(/registeredUrlMatcher\(\)/g) || []).length >= 2, true);
   eq('글이 없으면 구역이 비어 있다 (빈 문구를 둘 만들지 않는다)', /if \(!mine\.length\) return '';/.test(app.slice(app.indexOf('function externalNoticesHtml'))), true);
 }
@@ -3102,7 +3129,7 @@ console.log('\n■ 접수 기간 한 줄 (2026-09-12)');
     const appSrc = readText(new URL('../app.js', import.meta.url));
     const dh = readText(new URL('../collector/deadline-hint.mjs', import.meta.url));
     const reOf = (src) => (src.match(/const PARTIAL_ENTITY_END = (\/.+\/);/) || [])[1];
-    eq('  앱이 이미 실린 힌트 끝의 반쪽 기호를 떼고 보인다(같은 꼴 · 두 자리 모두)', [reOf(appSrc) === reOf(dh) && !!reOf(dh), (appSrc.match(/esc\(hintText\(n\.deadlineHint\)\)/g) || []).length, /esc\(unent\(n\.deadlineHint\)\)/.test(appSrc)], [true, 2, false]);
+    eq('  앱이 이미 실린 힌트 끝의 반쪽 기호를 떼고 보인다(같은 꼴 · 두 자리 모두)', [reOf(appSrc) === reOf(dh) && !!reOf(dh), (appSrc.match(/esc\(hint(?:Text|Short)\(n\.deadlineHint\)\)/g) || []).length, /esc\(unent\(n\.deadlineHint\)\)/.test(appSrc), /function hintShort\(s\) \{\n  let t = hintText\(s\)/.test(appSrc)], [true, 2, false, true]);   // 카드는 hintShort(2026-10-04 · 첫 항목만) — 그것도 hintText 로 시작한다
     /* 리뷰(10-03) — 여기서 hintText 를 따로 지어 재면 앱의 것이 바뀌어도 모른다 → 앱 소스의 그 줄들(ENTITIES·ENTITY_RE·unent·PARTIAL_ENTITY_END·hintText)을 떼어 실행한다 */
     const line = (re) => (appSrc.match(re) || [''])[0];
     const unentSrc = (() => { const at = appSrc.indexOf('function unent('); return at < 0 ? '' : appSrc.slice(at, appSrc.indexOf('\n}', at) + 2); })();
@@ -11528,6 +11555,15 @@ console.log('\n■ 자격요건 로봇 (진짜 브라우저) — 장학·대외�
   const rb = readText(new URL('../collector/rescue-bodies.mjs', import.meta.url));
   eq('  🔴 장학 본문 재수집도 페이지마다 절대 시한 · 멈춘 페이지의 닫기는 기다리지 않는다',
     [/await withDeadline\(read, PAGE_MS\) === TIMED_OUT/.test(rb), /\n  page\.close\(\)\.catch/.test(rb), !/await page\.close\(\)/.test(rb)], [true, true, true]);
+  /* 관리자가 원문을 바로잡은 공고는 본문 로봇도 그 주소를 연다 (2026-10-04 · 중앙대 view.do?…nttId= 가 「점검 중」 — 바로잡아도 로봇은 옛 주소만 열었다) */
+  {
+    const LFR = await import('../collector/link-fixes-read.mjs');
+    const it = { id: 'auto-x', sourceUrl: 'https://www.cau.ac.kr/cms/FR_CON/view.do?nttId=1' };
+    const fixed = LFR.humanFixUrlBy({ fix: { 'id:auto-x': { url: 'https://www.cau.ac.kr/cms/FR_CON/BoardView.do?BBS_SEQ=1&pageNo=1', at: '2026-10-04' } } });
+    eq('  🔴 본문 로봇은 관리자가 바로잡은 주소를 연다(앱과 같은 판정) · 바로잡지 않은 공고는 그대로 · 본문은 원래 주소 열쇠에',
+      [fixed(it), fixed({ id: 'other', sourceUrl: 'https://a.ac.kr/v?id=2' }), /const openUrl = fixUrl\(t\.it\) \|\| t\.url;/.test(rb), /page\.goto\(openUrl,/.test(rb), /bodies\[t\.url\] = entry/.test(rb)],
+      ['https://www.cau.ac.kr/cms/FR_CON/BoardView.do?BBS_SEQ=1&pageNo=1', null, true, true, true]);
+  }
   /* 워크플로 */
   const wf = readText(new URL('../.github/workflows/rescue-bodies.yml', import.meta.url));
   /* 🔴 PaddleOCR 판 고정 — 판을 안 적으면 그날 최신(3.3.x)이 깔려 x86 클라우드에서 모든 그림이 오류(2026-10-04 · 맥은 ARM 이라 멀쩡했다) */

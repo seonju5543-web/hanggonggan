@@ -1,7 +1,7 @@
 {
  "v": 1,
  "note": "관리자가 넣은 원문 공고 주소 — 관리자 화면 「원문 링크」가 적는다(tools/admin-apply.mjs linkFix). 앱은 source-link.js 가 읽는다. 열쇠: id:<공고 id> · u:<지금 주소>",
- "updatedAt": "2026-10-04 19:43 KST",
+ "updatedAt": "2026-10-04 22:43 KST",
  "fix": {
   "id:reg-khu-uiam": {
    "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322415",
@@ -44,6 +44,66 @@
    "at": "2026-10-04",
    "title": "[장학공지] RE:(생활비)2026-2학기 (주)아이오알코리아 장학생 선발결과 안내",
    "note": "같은 글이 [장학공지] 머리말로 이미 실려 있고 원문 링크 확인 로봇이 그 주소를 열어 그 글로 확인(2026-10-04) — 이 표식은 같은 글의 둘째 사본"
+  },
+  "id:auto-nuid100nttid30176ptabno5": {
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30176&pageNo=1",
+   "by": "Claude 세션",
+   "at": "2026-10-04",
+   "note": "중앙대 view.do?…nttId= 주소가 「점검 중」 화면 — 같은 번호의 BoardView(BBS_SEQ) 는 학교 API(BoardViewData.do)가 그 글 제목을 돌려준다(2026-10-04 확인)"
+  },
+  "id:auto-nuid100nttid30159ptabno5": {
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30159&pageNo=1",
+   "by": "Claude 세션",
+   "at": "2026-10-04",
+   "note": "중앙대 view.do?…nttId= 주소가 「점검 중」 화면 — 같은 번호의 BoardView(BBS_SEQ) 는 학교 API(BoardViewData.do)가 그 글 제목을 돌려준다(2026-10-04 확인)"
+  },
+  "id:auto-nuid100nttid30154ptabno5": {
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30154&pageNo=1",
+   "by": "Claude 세션",
+   "at": "2026-10-04",
+   "note": "중앙대 view.do?…nttId= 주소가 「점검 중」 화면 — 같은 번호의 BoardView(BBS_SEQ) 는 학교 API(BoardViewData.do)가 그 글 제목을 돌려준다(2026-10-04 확인)"
+  },
+  "id:auto-nuid100nttid30130ptabno5": {
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30130&pageNo=1",
+   "by": "Claude 세션",
+   "at": "2026-10-04",
+   "note": "중앙대 view.do?…nttId= 주소가 「점검 중」 화면 — 같은 번호의 BoardView(BBS_SEQ) 는 학교 API(BoardViewData.do)가 그 글 제목을 돌려준다(2026-10-04 확인)"
+  },
+  "u:https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&page=2&nttId=30203": {
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30203&pageNo=1",
+   "by": "Claude 세션",
+   "at": "2026-10-04",
+   "note": "중앙대 view.do?…nttId= 주소가 「점검 중」 화면 — 같은 번호의 BoardView(BBS_SEQ)(2026-10-04 확인)"
+  },
+  "u:https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&pageNo=2&nttId=30183": {
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30183&pageNo=1",
+   "by": "Claude 세션",
+   "at": "2026-10-04",
+   "note": "중앙대 view.do?…nttId= 주소가 「점검 중」 화면 — 같은 번호의 BoardView(BBS_SEQ)(2026-10-04 확인)"
+  },
+  "u:https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&page=2&nttId=30157": {
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30157&pageNo=1",
+   "by": "Claude 세션",
+   "at": "2026-10-04",
+   "note": "중앙대 view.do?…nttId= 주소가 「점검 중」 화면 — 같은 번호의 BoardView(BBS_SEQ)(2026-10-04 확인)"
+  },
+  "u:https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&page=2&nttId=30146": {
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30146&pageNo=1",
+   "by": "Claude 세션",
+   "at": "2026-10-04",
+   "note": "중앙대 view.do?…nttId= 주소가 「점검 중」 화면 — 같은 번호의 BoardView(BBS_SEQ)(2026-10-04 확인)"
+  },
+  "u:https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&page=2&nttId=30134": {
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30134&pageNo=1",
+   "by": "Claude 세션",
+   "at": "2026-10-04",
+   "note": "중앙대 view.do?…nttId= 주소가 「점검 중」 화면 — 같은 번호의 BoardView(BBS_SEQ)(2026-10-04 확인)"
+  },
+  "u:https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&page=2&nttId=30131": {
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30131&pageNo=1",
+   "by": "Claude 세션",
+   "at": "2026-10-04",
+   "note": "중앙대 view.do?…nttId= 주소가 「점검 중」 화면 — 같은 번호의 BoardView(BBS_SEQ)(2026-10-04 확인)"
   }
  }
 }

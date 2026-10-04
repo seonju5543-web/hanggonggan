@@ -23,10 +23,10 @@ on:
   workflow_dispatch:
     inputs:
       cap:
-        description: '이번 실행에서 최대 몇 건까지 받을까 (기본 25)'
+        description: '이번 실행에서 최대 몇 건까지 받을까 (기본 50)'
         type: string
         required: false
-        default: '25'
+        default: '50'
   schedule:
     # 05:23 KST — 링크 사냥(06:37)·일반 수집(07:41)·브라우저 수집(08:07) 앞이고
     # 충분히 떨어져 있다. 같은 학교를 연달아 두드리면 서버가 막는다(동국대 사례).
@@ -73,7 +73,7 @@ jobs:
         continue-on-error: true      # 여기서 무슨 일이 생겨도 아래 저장·리포트는 나간다
         env:
           RESCUE_BUDGET_MS: '540000'   # 9분(2026-10-04 12→9 · 대외활동 단계 몫) — 못 끝낸 것은 다음 실행이 이어서 한다
-          RESCUE_CAP: ${{ inputs.cap || '25' }}
+          RESCUE_CAP: ${{ inputs.cap || '50' }}   # 25→50 (2026-10-04 실측: 25건에 약 5분 · 예산 9분) — 예산이 먼저 멈추고 한 페이지 60초 시한이 있어 넘치지 않는다
         run: node collector/rescue-bodies.mjs --write
 
       # 데이터 관문은 저장 직전에 둔다 (이슈 #79의 교훈)

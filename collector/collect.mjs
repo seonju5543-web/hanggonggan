@@ -16,7 +16,7 @@ import { publishBySchool, dropUnserved } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry } from './clean-title.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
-import { activityKind, activityField, notActivity } from './activity-kind.mjs';
+import { activityKind, activityField, notActivity, ACTIVITY_FIELDS } from './activity-kind.mjs';
 import { activityExcerpts, activityDetails, putActivityDetails, ACT_DETAILS_V, sanitizeBenefit } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { robotsAllows } from './robots.mjs';
@@ -583,6 +583,9 @@ for (const it of acts.items) {
   actBackfilled += 1;
 }
 acts.updatedAt = notices.updatedAt;
+/* 분야 목록 원본을 함께 싣는다 (2026-10-04 · 프로필 「관심 분야」 칸) — 앱은 빌드가 없어 activity-kind.mjs 를 못 들여온다.
+   앱에 목록을 따로 적으면 두 벌이 되어 수집기가 갈래를 늘려도 화면은 모른다(분야 칩과 같은 이유) */
+acts.fields = ACTIVITY_FIELDS;
 fs.writeFileSync(actsPath, JSON.stringify(acts, null, 1));
 
 /* ── 재단·지자체 공고 발행 — data/external.json (학교 피드와 섞지 않는다 · 규칙은 위와 같다) ── */

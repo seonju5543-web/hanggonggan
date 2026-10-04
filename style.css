@@ -5144,3 +5144,10 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 .news-tile.is-skel .news-tile-meta,
 .news-tile.is-skel .news-tile-title { background: var(--surface-2); border-radius: var(--radius-hair); color: transparent; }
 .news-tile.is-skel .news-tile-meta { width: 40%; }
+
+/* 온보딩 「관심 대외활동·공모전」 (2026-10-04) — 분야가 열여섯이라 한 줄에 둘씩 작게 놓는다.
+   보통 체크 칸(.check-item)의 모양·선택 색은 그대로 두고 크기만 이 묶음 안에서 줄인다. */
+.check-list.check-grid { grid-template-columns: 1fr 1fr; gap: var(--space-8); }
+.check-grid .check-item { padding: var(--space-12); gap: var(--space-8); font-size: var(--t-sm); }
+.check-grid .check-item input { width: 20px; height: 20px; }
+.onboard-step[data-step="5"] .field-label { display: block; margin: var(--space-16) 0 var(--space-8); }

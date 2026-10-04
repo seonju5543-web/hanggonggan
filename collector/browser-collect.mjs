@@ -9,7 +9,7 @@ import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mj
 import { publishBySchool, dropUnserved } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
-import { isMenuEntry } from './clean-title.mjs';
+import { cleanTitle, isMenuEntry } from './clean-title.mjs';
 import { isDetailUrl, rowDetailCandidates, ruleDetailCandidates, sameTitle, observeLanding } from './detail-url.mjs';
 /* 원문 주소 확인은 공용 판정 한 곳(link-landing.mjs judgeLanding) — 링크 사냥꾼·원문 링크 복구와 같은 것 (2026-10-03) */
 import { judgeLanding, stripRowTail } from './link-landing.mjs';
@@ -492,7 +492,9 @@ async function harvestTarget(t, report) {
       }
       }
       const rec = {
-        title: it.title, url: it.url, attachments, deadlineHint,
+        /* 🔴 저장하는 제목은 공용 청소(cleanTitle)를 거친다 (2026-10-04) — 이 로봇만 안 거쳐서 「공지 공지 … 2026.09.17. 조회 1640」 이 화면에 떴다.
+           메뉴 판정(위)은 원래 글자로 한다 — 날짜가 '공고 신호'라 먼저 떼면 진짜 공고가 메뉴로 빠진다. */
+        title: cleanTitle(it.title), url: it.url, attachments, deadlineHint,
         school: t.school, campus: t.campus === '공통' ? '' : t.campus,
         foundAt: new Date().toISOString().slice(0, 10),
         ...(it.postId ? { postId: it.postId } : {}),   // 목록 표식에 남긴 게시판 글 번호(위 클릭 채집) — 같은 글 합치기의 열쇠

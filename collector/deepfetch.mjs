@@ -299,7 +299,9 @@ async function downloadEligDocs() {
   const reg = JSON.parse(fs.readFileSync(new URL('../data/registered.json', HERE), 'utf8'));
 
   const BUDGET_MS = Number(process.env.ELIG_BUDGET_MS || 150 * 1000);   // 2.5분
-  const MAX_NOTICES = 6;
+  /* 6 → 30 (2026-10-04 실측: 6건에 16초 · 예산 150초의 1할) — 한도가 예산보다 한참 작아 첨부만 있는 공고가 줄을 섰다.
+     건수 한도를 올려도 넘치지 않는다 — 위 예산이 건마다 먼저 본다(넘으면 '다음 실행') · 파일 하나는 20초 시한 */
+  const MAX_NOTICES = 30;
   const MAX_BYTES = 8 * 1024 * 1024;
   const startedAt = Date.now();
   /* PDF도 받는다 (2026-08-23 변경 — 예전엔 제외했다).

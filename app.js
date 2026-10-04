@@ -602,6 +602,20 @@ function unent(s) {
 /* 이미 저장된 기간 한 줄의 끝에 반쯤 잘린 기호(`16:00 &n`)가 남은 것 — 로봇은 이제 기호를 풀고 자르지만(collector/deadline-hint.mjs) 실린 글에 남아 있다(소급 · 관문이 같은 꼴을 대조) */
 const PARTIAL_ENTITY_END = /&(?:[a-z]{1,7}|#\d{0,6}|#x[0-9a-f]{0,5})?$/;
 const hintText = (s) => unent(s).replace(PARTIAL_ENTITY_END, '').trim();
+/* 카드 회색 줄 — 기간 한 마디만 (2026-10-04 개발자 지적 "재단·지자체 새 공고 회색 글씨가 못생겼다").
+   로봇이 주운 기간 문장(deadlineHint)은 원문 한 토막이라 뒤 항목(ㅇ 접수방법 · 2. 신청방법)까지 딸려 와 글자 중간에서 잘렸다
+   (「접수기한 ) ~ 10. 7.(수) 18시 ㅇ ( 접수방법 ) 모바일 … 응」). 첫 항목만 남기고 원문의 괄호 이름표를 펴고, 날짜가 없으면 안 보인다.
+   🔴 지우고 다듬기만 한다 — 글자를 지어내지 않는다(원칙 8-1). 원문 전체는 상세·원문 링크가 그대로 보여 준다. */
+function hintShort(s) {
+  let t = hintText(s)
+    .replace(/^\s*([가-힣]{2,8})\s*\)\s*/, '$1 ')                   // 앞이 잘려 짝 잃은 괄호 이름표 「접수기한 )」
+    .replace(/[(（]\s*([가-힣]{2,8})\s*[)）]/g, '$1');                  // 「( 접수방법 )」
+  t = t.split(/\s(?=[ㅇ○◯●■□\u25AA•※\u25B6]\s|\d{1,2}[.)]\s*[가-힣])/)[0];      // 다음 항목(「ㅇ 접수방법」·「2. 신청방법」) 앞에서 끊는다 — 날짜 「10. 7.」 은 항목 번호가 아니다
+  t = t.replace(/\s+/g, ' ').trim();   // 글자는 원문 그대로(「신청기간 :」 의 띄어쓰기도) — 검사 드라이버가 잠근다
+  if (!/\d/.test(t)) return '';                                            // 날짜가 없으면 기간 줄이 아니다
+  if (t.length > 44) { const cut = t.slice(0, 44); t = `${cut.slice(0, Math.max(cut.lastIndexOf(' '), 20)).trim()}…`; }
+  return t;
+}
 
 /* 🔴 서비스워커 엇갈림 대비 — source-link.js 가 안 실려 있을 때 (2026-10-03 리뷰 APP-1 · 실제 서비스워커로 재현).
    새 app.js 가 **옛 index.html**(캐시 — 첫 요청이 3.5초를 넘기면 서비스워커가 캐시를 내준다)과 만나면 source-link.js 태그가 없어
@@ -1110,7 +1124,7 @@ function resumeMark() {
 let onboardStep = 0;
 /* 프로필을 **고치러** 들어왔나 (처음 가입이 아니라) — 취소 버튼을 띄울지 정한다 */
 let onboardEditing = false;
-const ONBOARD_STEPS = 6;   /* 2026-08-27 — '지금 받고 있는 장학금'(이중수혜) 단계 추가 */
+const ONBOARD_STEPS = 7;   /* 2026-08-27 — '지금 받고 있는 장학금'(이중수혜) 단계 추가 · 2026-10-04 — '관심 대외활동·공모전' 단계 추가 */
 
 function renderOnboardStep() {
   /* 고치러 들어온 경우에만 취소를 보여 준다 — 처음 가입하는 사람에게는 취소할 것이 없다 */
@@ -1241,6 +1255,8 @@ function initOnboarding() {
       if ($('#in-schol-none')) $('#in-schol-none').checked = p.scholarships.length === 0;
     }
     $('#in-sensitive-ok').checked = !!(state.consent && state.consent.sensitive);
+    $$('#in-act-kinds input').forEach((cb) => (cb.checked = (p.interestKinds || []).includes(cb.value)));
+    fillInterestFields(p.interestFields || []);
   } else {
     setChip('#in-track', 'humanities');
     setChip('#in-year', '1');
@@ -1325,6 +1341,7 @@ function onboardRestore(snap) {
     if (el.type === 'checkbox' || el.type === 'radio') el.checked = !!snap.fields[id];
     else el.value = snap.fields[id];
   });
+  fillInterestFields((snap.boxes || {})['in-act-fields'] || []);   // 관심 분야 칸은 데이터로 그리는 칸 — 먼저 그려 둬야 아래가 체크할 자리가 있다
   Object.keys(snap.boxes || {}).forEach((gid) => {
     const on = snap.boxes[gid] || [];
     $$(`#${gid} input[type="checkbox"]`).forEach((c) => { c.checked = on.indexOf(c.value) >= 0; });
@@ -1357,6 +1374,21 @@ function onboardProgressSave() {
     if ($('#screen-onboarding').hidden) return;   /* 이미 끝났으면 안 적는다 */
     resumeSave({ onboard: onboardSnapshot() });
   }, 500);
+}
+
+/* 관심 분야 칸 — 수집 로봇이 data/activities.json 에 싣는 fields(ACTIVITY_FIELDS 원본)로 만든다 (2026-10-04).
+   목록이 아직 안 왔으면 실린 글들의 분야로 · 그것도 없으면 빈 칸(loadActivities 가 받은 뒤 다시 부른다).
+   🔴 다시 그려도 **고른 것은 지킨다** — 받아 오기가 늦게 끝나 칸을 다시 그리면 학생이 고른 게 사라진다. */
+let interestPending = [];   // 목록이 오기 전에 정해진 선택(프로필·이어보기) — 칸이 아직 없어도 잃지 않게
+function fillInterestFields(selected) {
+  const box = $('#in-act-fields');
+  if (!box) return;
+  if (selected) interestPending = selected;
+  const keep = new Set(selected || (box.querySelector('input') ? $$('#in-act-fields input:checked').map((c) => c.value) : interestPending));
+  const src = liveActivities && liveActivities.fields;
+  const list = src ? [...new Set(Object.values(src).flat())]
+    : [...new Set(((liveActivities && liveActivities.items) || []).map((n) => n.field).filter(Boolean))];
+  box.innerHTML = list.map((f) => `<label class="check-item"><input type="checkbox" value="${esc(f)}"${keep.has(f) ? ' checked' : ''} /><span>${esc(f)}</span></label>`).join('');
 }
 
 function collectProfile() {
@@ -1397,6 +1429,9 @@ function collectProfile() {
       : (() => { const v = $$('#in-scholarships input:checked').map((c) => c.value); return v.length ? v : null; })(),
     cert: $('#in-cert').checked,
     exchange: $('#in-exchange').checked,
+    /* 관심 대외활동·공모전 (2026-10-04) — 추천 차례에만 쓴다(자격 판정 아님). 안 골랐으면 null = 모름(빈 배열과 다르다 — 빈 배열을 만들 길은 없다) */
+    interestKinds: (() => { const v = $$('#in-act-kinds input:checked').map((c) => c.value); return v.length ? v : null; })(),
+    interestFields: (() => { const v = $$('#in-act-fields input:checked').map((c) => c.value); return v.length ? v : null; })(),
     /* 🔴 온보딩 화면에 칸이 없는 값(현주소·긴급연락처·보호자·성별·주민등록번호)은
        신청서를 채우다 학생이 알려 준 것이라, 여기서 통째로 새로 만들면 **사라진다.**
        프로필을 한 번 수정할 때마다 그동안 배운 것을 잃게 되므로 반드시 이어 붙인다. */
@@ -1791,6 +1826,7 @@ function renderHome() {
      ✅ 그중 학교가 제목에 `[교내]` 라고 **직접 적어 둔 글**만 '교내' 칸 꼬리에도 함께 뜬다
         (`boardNoticesInSchool` · 같은 날 개발자 지적). 여기서는 전부 그대로 나온다.
      ⚠️ 검색은 안 건다 — 홈에는 검색창이 없다(탐색에 있던 시절의 이유가 사라졌다). */
+  $('#home-activities').innerHTML = homeActivitiesHtml();
   $('#live-notices').innerHTML = liveNoticesHtml();
   /* 우리 학교 소식 — 홈 첫 화면 사진 카드 띠 (2026-10-04 승인 시안 1안 · 아이콘 네 칸 밑) · 없으면 구역째 숨긴다 */
   const newsHtml = homeNewsHtml();
@@ -2938,7 +2974,7 @@ function noticeCardHtml(n, opts) {
       <p class="sch-name">${esc(unent(n.title))}</p>
       ${/* 원문 발췌 줄 (2026-09-29 · 활동 글) — 이름표 : 원문 문장. 발췌가 있으면 기간 한 줄은 겹쳐 적지 않는다 */ ''}
       ${(o.excerpts || []).map((x) => `<p class="sch-provider">${esc(x.label)} · ${esc(unent(x.text))}</p>`).join('')}
-      ${!(o.excerpts || []).length && n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? `<p class="sch-provider">${esc(hintText(n.deadlineHint))}</p>` : ''}
+      ${!(o.excerpts || []).length && n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) && hintShort(n.deadlineHint) ? `<p class="sch-provider">${esc(hintShort(n.deadlineHint))}</p>` : ''}
       ${/* 링크 이름은 sourceLink 한 곳(card) — 목록·홈페이지·로봇이 확인한 문제 주소는 '원문'이라 부르지 않는다 (2026-10-03) */ ''}
       <p class="sch-provider">${(n.attachments || []).length ? `첨부 ${(n.attachments || []).length}개 · ` : ''}${esc(n.foundAt || '')} 수집${link.label ? ` · ${esc(link.label)}` : ''}</p>
       ${/* 그 글의 사진 썸네일 (2026-10-03 개발자 지시 — 학교 글의 실제 사진). 소식 카드만 opts.thumb 로 넘긴다 · 제목이 이미 글자로 있어 alt 는 비운다(읽기 도구가 두 번 읽지 않게).
@@ -2994,6 +3030,7 @@ function loadActivities() {
     .then((d) => {
       liveActivities = d || liveActivities || { items: [], updatedAt: null };
       refreshActivitySnaps();
+      fillInterestFields();   // 온보딩 관심 분야 칸 — 목록이 이제 왔다(고른 것은 지킨다)
       rerenderVisible();
     });
 }
@@ -3277,6 +3314,26 @@ function externalNoticesForMe() {
       화면이 없다** — 그래서 10장에서 멈추지 않고 끝까지 편다(멈추면 나머지 글이 앱에서 사라진다).
    다 펴면 '접기'. 누를 때 이 구역만 다시 그린다(renderHome 을 부르면 히어로 금액이 또 세어 올라간다). */
 let externalShown = HOME_DEADLINE_TOP;
+/* 홈 「나에게 맞는 대외활동·공모전」 (2026-10-04 개발자 지시 — 장학금 구역 바로 밑).
+   🔴 판정·차례를 새로 만들지 않는다 — 글 고르기는 대외활동 탭과 같은 activitiesForMe · activityFit,
+      차례는 장학 홈과 같은 fitRank(미달·미확인은 아래) → homeScore(적합도 − 남은 날). 미달은 아예 싣지 않는다(장학 홈과 같다).
+   관심(프로필 interestKinds·interestFields · 같은 날 추가)은 **같은 판정 단계 안에서만** 앞으로 — 관심이 자격을 이기지 않는다. */
+const HOME_ACT_TOP = 3;
+function homeActivitiesHtml() {
+  if (!liveActivities || !state.profile) return '';   // 아직 오는 중 — '없다'고 말하지 않는다
+  const p = state.profile;
+  const likes = (n) => ((p.interestFields || []).includes(n.field) ? 2 : 0) + ((p.interestKinds || []).includes(n.kind) ? 1 : 0);
+  const ms = activitiesForMe()
+    .filter((n) => !n.deadline || dday(n.deadline).days >= 0)
+    .map((n) => ({ ...activityFit(n), n }))
+    .filter((m) => fitVerdict(m.fit, m.fd) !== 'no')
+    .sort((a, b) => fitRank(a) - fitRank(b) || likes(b.n) - likes(a.n) || homeScore(b) - homeScore(a) || byDeadline(a, b))
+    .slice(0, HOME_ACT_TOP);
+  if (!ms.length) return '';
+  return `<div class="section-head"><h3>나에게 맞는 대외활동·공모전</h3><button type="button" class="link-btn" data-go="activities">전체 보기</button></div>`
+    + `<div class="card-list" id="home-activity-list">${ms.map((m) => activityCardHtml(m.n)).join('')}</div>`;
+}
+
 function externalNoticesHtml() {
   const mine = externalNoticesForMe();
   if (!mine.length) return '';
@@ -3288,7 +3345,7 @@ function externalNoticesHtml() {
   return `<div class="section-head" style="margin-top:4px"><h3>재단·지자체 새 공고</h3>
     <span class="link-btn">${liveExternal.updatedAt ? esc(liveExternal.updatedAt) + ' 갱신' : ''}</span></div>`
     + `<div class="card-list" id="external-list">`
-    + mine.slice(0, shown).map((n) => noticeCardHtml(n, { org: `${n.host} 공고`, dday: n.deadline ? { label: ddayWords(dday(n.deadline)), urgent: dday(n.deadline).days >= 0 && dday(n.deadline).days <= 7 } : null })).join('')
+    + mine.slice(0, shown).map((n) => noticeCardHtml(n, { org: n.host, dday: n.deadline ? { label: ddayWords(dday(n.deadline)), urgent: dday(n.deadline).days >= 0 && dday(n.deadline).days <= 7 } : null })).join('')
     + `</div>${more}<div style="margin-bottom:18px"></div>`;
 }
 

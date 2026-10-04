@@ -39,3 +39,20 @@ export function humanFixedBy(doc) {
     }
   };
 }
+
+/* 장부 → (공고) => 관리자가 바로잡은 주소(없으면 null) — **본문을 받으러 가는 로봇**용 (2026-10-04 · rescue-bodies).
+   중앙대 view.do?…nttId= 처럼 저장된 주소가 「점검 중」 화면이 된 공고를 관리자가 BoardView 로 바로잡아도, 본문 로봇은
+   저장된 주소만 열어 매번 같은 「점검 중」 을 받았다. 판정은 위 humanFixedBy 와 같은 함수(linkFixFor · src admin). */
+export function humanFixUrlBy(doc) {
+  const fix = (doc && doc.fix) || {};
+  if (!Object.keys(fix).length) return () => null;
+  return (item) => {
+    SL.setLinkFixes({ fix });
+    try {
+      const f = SL.linkFixFor(item || {});
+      return f && f.src === 'admin' ? f.url : null;
+    } finally {
+      SL.setLinkFixes(null);
+    }
+  };
+}

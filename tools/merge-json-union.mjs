@@ -91,6 +91,26 @@ function mergeSchoolNotices(ours, theirs, opts = {}) {
 
 /* 이미 본 공고 장부: 주소 → 처음 본 날짜. 합치되 **더 이른 날짜**를 남긴다.
    (늦은 날짜를 남기면 '아직 새 공고'로 오해해 같은 공고를 다시 담을 수 있다) */
+/* 🔴 대외활동·재단 피드 (2026-10-04 — .gitattributes 에는 2026-09-25·26 부터 jsonunion 이라 적혀 있었는데 **여기 규칙이 없어**
+   「규칙 없는 파일이라 자동 병합하지 않음」 으로 물러났다. 그날 사람이 activities.json 을 고친 사이 수집 로봇이 저장하려다 충돌해
+   그 실행의 결과(첨부·발췌·새 글)가 **통째로** 버려졌다).
+   글은 주소(urlKey)로 짝짓고 · 양쪽에 있는 글은 칸을 합친다(같은 칸은 theirs — rebase 때 다시 얹는 쪽이 방금 실행한 로봇이다) ·
+   한쪽에만 있는 글은 남긴다(로봇이 지운 지난 글이 되살아나도 다음 실행이 같은 규칙으로 다시 지운다 — 새 글을 잃는 것보다 낫다).
+   나머지 칸(fields 등)은 theirs 를 덮어 쓰고 updatedAt 은 늦은 쪽. */
+function mergeFeedByUrl(ours, theirs) {
+  const a = Array.isArray(ours?.items) ? ours.items : [];
+  const b = Array.isArray(theirs?.items) ? theirs.items : [];
+  const out = new Map();
+  for (const it of a) if (it && it.url) out.set(urlKey(it.url), it);
+  for (const it of b) {
+    if (!it || !it.url) continue;
+    const k = urlKey(it.url);
+    out.set(k, out.has(k) ? { ...out.get(k), ...it } : it);
+  }
+  const updatedAt = [ours?.updatedAt, theirs?.updatedAt].filter(Boolean).sort().pop();
+  return { ...(ours || {}), ...(theirs || {}), updatedAt, items: [...out.values()] };
+}
+
 function mergeSeen(ours, theirs) {
   const out = { ...(theirs || {}) };
   for (const [url, when] of Object.entries(ours || {})) {
@@ -227,6 +247,8 @@ const RULES = [
   { match: /(^|\/)news-thumbs\.json$/, merge: mergeThumbLedger },
   { match: /(^|\/)news-health\.json$/, merge: mergeHealth },
   { match: /(^|\/)notices\.json$/, merge: mergeNotices },
+  { match: /(^|\/)data\/(?:activities|external)\.json$/, merge: mergeFeedByUrl },
+  { match: /(^|\/)collector\/seen-(?:activities|external)\.json$/, merge: mergeSeen },
   { match: /(^|\/)link-hunt\.json$/, merge: mergeLinkHunt },
   { match: /(^|\/)seen\.json$/, merge: mergeSeen },
   { match: /(^|\/)pending-forms\.json$/, merge: mergePendingForms },
