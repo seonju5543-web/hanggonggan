@@ -55,7 +55,24 @@ const DATA = {
   'insta/comments.json': readJson('insta/comments.json'),
   'insta/token-seen.json': readJson('insta/token-seen.json'),
   'insta/samples/index.json': readJson('insta/samples/index.json'),
+  /* 원문 링크 손볼 것 (2026-10-04) — 「할 일」이 펼칠 때 읽는 것: 두 장부 · 층2 재단 · 재단·지자체 글 · 학교별 실시간 공고 · 학교별 소식.
+     ⚠️ 수집 기록(collector/candidates.json · 1.6MB)은 담지 않는다 — 미리보기에선 「수집 기록에서 찾기」가 못 읽었다고 말한다. */
+  'data/link-check.json': readJson('data/link-check.json'),
+  'data/link-fixes.json': readJson('data/link-fixes.json'),
+  'data/kosaf-open.json': readJson('data/kosaf-open.json'),
+  'data/external.json': readJson('data/external.json'),
+  'data/notices/index.json': readJson('data/notices/index.json'),
+  'data/news/index.json': readJson('data/news/index.json'),
+  'collector/news-sources.json': readJson('collector/news-sources.json'),
+  'collector/news-config.json': readJson('collector/news-config.json'),
 };
+/* 학교별 파일은 색인이 가리키는 것만 (이름을 박지 않는다) */
+for (const dir of ['data/notices', 'data/news']) {
+  const idx = DATA[`${dir}/index.json`];
+  for (const v of Object.values((idx && idx.files) || {})) {
+    if (v && v.file) DATA[`${dir}/${v.file}`] = readJson(`${dir}/${v.file}`);
+  }
+}
 
 const css = read('_admin/admin.css');
 const adminJs = read('_admin/admin.js');
@@ -138,6 +155,9 @@ const VENDOR_SRC = {
   'canon-url.mjs': 'collector/canon-url.mjs',
   'page-boilerplate.mjs': 'collector/page-boilerplate.mjs',
   'edit-diff.mjs': 'tools/edit-diff.mjs',        // 관리자 수정 전후 대조 규칙 (2026-09-14)
+  'activity-kind.mjs': 'collector/activity-kind.mjs',   // 대외활동·공모전 종류 (2026-09-29)
+  'news-kind.mjs': 'collector/news-kind.mjs',           // 교내 소식 갈래 (2026-09-30)
+  'link-fix.mjs': 'collector/link-fix.mjs',             // 관리자가 넣는 원문 주소 규칙 (2026-10-04)
 };
 const wantedVendor = [...adminJs.matchAll(/from\s+['"]\.\/vendor\/([^'"]+)['"]/g)].map((m) => m[1]);
 const unknownVendor = wantedVendor.filter((n) => !VENDOR_SRC[n]);
@@ -213,6 +233,7 @@ const nReg = (reg && reg.items ? reg.items.length : 0);
 const VENDOR = {
   /* 🔴 data.js 가 전역으로 부르는 이웃 — 빠뜨리면 미리보기에서만 채널 판정이 '모름'으로 떨어진다 */
   'vendor/apply-channel.js': () => read('apply-channel.js'),
+  'vendor/source-link.js': () => read('source-link.js'),   // 원문 링크 이름 한 곳 (2026-10-04)
   'vendor/data.js': () => read('data.js'),
   'vendor/forms.js': () => read('forms.js'),
   'vendor/form-plan.js': () => read('form-plan.js'),

@@ -9367,7 +9367,7 @@ console.log('\n■ 관리자 쓰기 — 되돌릴 수 없는 일 앞의 안전�
      목록이 바뀌면 사람이 '이 동작도 공고 목록을 고치는가'를 한 번 본다. */
   eq('공고 목록을 안 고치는 동작 목록이 그대로다',
     cases.filter((c) => !writes.includes(c)).sort(),
-    ['activityHide', 'activityKind', 'activitySource', 'activityUnhide', 'addBoard', 'autoRegister', 'formQueue', 'newsHide', 'newsKind', 'newsSource', 'newsThumbOff', 'newsThumbOn', 'newsUnhide', 'unblock']);
+    ['activityHide', 'activityKind', 'activitySource', 'activityUnhide', 'addBoard', 'autoRegister', 'formQueue', 'linkFix', 'linkUnfix', 'newsHide', 'newsKind', 'newsSource', 'newsThumbOff', 'newsThumbOn', 'newsUnhide', 'unblock']);
 }
 
 console.log('\n■ 못 읽은 파일의 숫자를 화면이 단정하지 않는다');
