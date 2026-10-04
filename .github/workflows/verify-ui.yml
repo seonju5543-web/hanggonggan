@@ -133,6 +133,7 @@ jobs:
 
       # 드라이버마다 8123·8124 를 쓴다 (verify/README.md)
       - name: 로컬 서버 띄우기
+        id: server
         run: |
           python3 -m http.server 8123 >/dev/null 2>&1 &
           python3 -m http.server 8124 >/dev/null 2>&1 &
@@ -141,9 +142,16 @@ jobs:
       # ── 관문: 전부 통과해야 한다 (2026-08-29에 7개를 고쳐 모두 초록불로 만들었다) ──
       # 🔴 여기서 실패하면 화면이 깨진 것이다. 넘기지 말 것 —
       #    "나중에 보자"로 두면 정확히 그렇게 7개가 썩었다.
+      # 🔴 **하나가 넘어져도 끝까지 돈다** (2026-10-04 · 이슈 #389·#390). 예전엔 `set -e` + 맨몸 `node` 라
+      #    verify-registered 하나가 데이터 탓으로 넘어지자 뒤 드라이버 22개와 아래 단계 셋이 **통째로 안 돌았고**,
+      #    그 사이 들어온 토큰 위반(ui-tone)이 한 번도 안 보였다. `set -e` 만 지우면 아무것도 안 바뀐다 —
+      #    GitHub 기본 셸이 `bash -e` 라서 실패를 `||` 로 받아 모은 뒤 마지막에 한 번 실패시킨다.
+      #    `timeout 300`: 가장 긴 드라이버가 76초(verify-settings · 성공 실행 실측). 매달린 하나가 30분 그릇을 다 먹으면
+      #    '취소'로 끝나 경보가 안 뜬다 — 상한을 키우지 않고 드라이버마다 끊는다.
       - name: 화면 검사 (관문)
+        id: drivers
         run: |
-          set -e
+          fails=""
           for f in verify-fit-badge.js verify-explore-sort.js verify-onboard-gaps.js \
                    verify-registered.js verify-chat.js verify-apps-manage.js \
                    verify-supabase.js verify-essay-ui.js verify-forms-data.js \
@@ -155,8 +163,10 @@ jobs:
                    verify-apply-prep.js verify-activities.js verify-news.js \
                    verify-region-city.js; do
             echo "── $f"
-            node "verify/$f"
+            timeout 300 node "verify/$f" || { echo "❌ $f"; fails="$fails $f"; }
           done
+          echo "failed=${fails# }" >> "$GITHUB_OUTPUT"
+          if [ -n "$fails" ]; then echo "❌ 실패한 드라이버:$fails"; exit 1; fi
 
 
       # 화면의 말투·토큰이 되돌아가지 않는지 (2026-08-31 신설 — 브라우저 없이 몇 초).
@@ -169,7 +179,9 @@ jobs:
       #    ⚠️ 검사를 무르게 한 것이 아니다. 여기서 실패하면 작업 전체가 여전히 빨간불이고,
       #       다만 **화면 검사 결과도 함께 보인다.** 앞에 두면 둘 중 하나만 보인다.
       #    ⚠️ 다시 앞으로 옮기지 말 것 — 옮기는 순간 뒤 단계가 또 통째로 사라진다.
+      #    🔴 앞 단계가 실패해도 돈다(`!cancelled()` — 2026-10-04 이전엔 이 조건이 없어 화면 검사가 빨간 날 통째로 건너뛰었다).
       - name: 말투·토큰 관문
+        if: ${{ !cancelled() }}
         run: node verify/ui-tone.mjs
 
       # 수집기·관리자 규칙 관문 (2026-09-14 신설) — 브라우저가 필요 없어 3초면 끝난다.
@@ -185,7 +197,9 @@ jobs:
       #
       # 🔴 **맨 끝에 둔다** — 말투·토큰 관문과 같은 이유다. 앞에 두면 여기서 걸린 날
       #    브라우저 검사 20개가 통째로 안 돌아 그물이 걷힌 줄 아무도 모른다.
+      #    🔴 앞 단계가 실패해도 돈다(`!cancelled()` — 2026-10-04 이전엔 이 조건이 없어 앞이 빨간 날 통째로 건너뛰었다).
       - name: 수집기·관리자 규칙 관문 (브라우저 불필요)
+        if: ${{ !cancelled() }}
         # DOC_GATES: CLAUDE.md 부피·참조 대조는 **여기(코드 검사)와 로컬에서만** 실패시킨다.
         #   수집 로봇도 이 파일을 데이터 관문으로 돌리는데, 거기서 문서 오타가 실패하면
         #   그날 자동 등록분이 되돌려진다 — 문서 문제로 수집이 멈추면 안 된다(2026-09-23).
@@ -223,7 +237,10 @@ jobs:
       #    🔴 **값싼 관문(말투·토큰·수집기 규칙) 뒤에 둔다.** GitHub 은 한 단계가 실패하면
       #       아래를 통째로 건너뛰므로, 앞에 두면 이 2~3분짜리가 빨간불일 때 3초짜리 관문
       #       결과가 통째로 안 보인다 — 2026-09-03 에 ui-tone 을 맨 뒤로 옮긴 이유와 같다.
+      #    🔴 앞 단계가 실패해도 돈다(`!cancelled()` — 2026-10-04 이전엔 이 조건이 없어 앞이 빨간 날 통째로 건너뛰었다).
+      #       서버를 못 띄웠으면 돌 까닭이 없어 그때만 건너뛴다.
       - name: 전 여정 회귀 (drive.js)
+        if: ${{ !cancelled() && steps.server.outcome == 'success' }}
         run: PORT=8123 node verify/drive.js
       - name: 🚨 화면 검사가 빨간불이다
         if: failure()
@@ -232,6 +249,7 @@ jobs:
           REPO: ${{ github.repository }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           BRANCH: ${{ github.ref_name }}
+          FAILED: ${{ steps.drivers.outputs.failed }}
         run: |
           set -u
           body="**앱 화면 검사(브라우저)가 빨간불입니다.** 화면이나 판정이 깨졌다는 뜻입니다.
@@ -241,8 +259,8 @@ jobs:
           · 실행 로그: ${RUN_URL}
 
           로그에서 \`❌\` 가 붙은 줄을 찾으면 어느 항목인지 바로 나옵니다.
-          한 드라이버가 넘어지면 \`set -e\` 로 **그 뒤 드라이버는 안 돕니다** — 고친 뒤
-          다시 돌리면 그때 다음 것이 드러날 수 있습니다.
+          실패한 드라이버: ${FAILED:-없음 — 말투·토큰·수집기 규칙·전 여정 단계를 보세요}.
+          드라이버는 하나가 넘어져도 끝까지 돌고, 뒤의 값싼 관문들도 같은 실행에서 돕니다.
 
           다음 Claude 세션에 \"화면 검사 빨간불 고쳐줘\" 라고 지시하세요.
 
