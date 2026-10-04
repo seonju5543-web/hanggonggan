@@ -10,6 +10,7 @@ import { publishBySchool, dropUnserved, healFromLedger, readSchoolFiles } from '
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { cleanTitle, isMenuEntry } from './clean-title.mjs';
+import { browserBodyEntry, clickBodyEntry } from './html-text.mjs';
 import { isDetailUrl, rowDetailCandidates, ruleDetailCandidates, sameTitle, observeLanding } from './detail-url.mjs';
 /* 원문 주소 확인은 공용 판정 한 곳(link-landing.mjs judgeLanding) — 링크 사냥꾼·원문 링크 복구와 같은 것 (2026-10-03) */
 import { judgeLanding, stripRowTail } from './link-landing.mjs';
@@ -247,6 +248,7 @@ async function loadPage(url, { attempts = 3, lines = report, retryClosed = 1 } =
         try {
           const els = await page.$$(CLICKABLE);
           if (!els[idx]) continue;
+          const beforeHtml = await page.content().catch(() => '');   // 눌러서 화면이 바뀌었는지 보려고(아래 본문 저장)
           const popupP = ctx.waitForEvent('page', { timeout: 3500 }).catch(() => null);
           const navP = page.waitForNavigation({ timeout: 5000 }).catch(() => null);
           await els[idx].click({ timeout: 4000 });
@@ -338,7 +340,11 @@ async function loadPage(url, { attempts = 3, lines = report, retryClosed = 1 } =
              새로 수집되는 행은 상세 루프가 적는다(그쪽이 '진짜 저장됐다'는 확증). */
           const known = seen[urlKey(recUrl)] || seen[recUrl];
           if (known) seen[clickRowKey(url, title)] = known;
-          clickDetails[title] = { deadlineHint: deadlineHintFrom(dText), attachments: atts };
+          /* 🔴 상세 화면 글자도 본문으로 남긴다 (2026-10-04 점검 B7) — 클릭형 게시판은 아래 상세 방문을 건너뛰어(cd) 본문이 한 번도 저장되지
+             않았다(고려·부산·가천 0건). 추가 페이지 열기 0회. 남의 글을 붙이지 않게 clickBodyEntry 가 '열렸나·이 제목이 있나·목록 아닌가'를 본다. */
+          const opened = !!popup || page.url() !== url || (!!beforeHtml && dHtml !== beforeHtml);
+          const body = clickBodyEntry({ title, html: dHtml, otherTitles: boardRowTitles, opened, at: todayStr });
+          clickDetails[title] = { deadlineHint: deadlineHintFrom(dText), attachments: atts, ...(body ? { body } : {}) };
           if (popup) await popup.close().catch(() => {});
           else if (page.url() !== url) await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 }).catch(() => {});
           else { await page.goBack({ waitUntil: 'domcontentloaded', timeout: 10000 }).catch(() => {}); }
@@ -464,6 +470,7 @@ async function harvestTarget(t, report) {
       if (cd) {
         deadlineHint = cd.deadlineHint;
         attachments = cd.attachments || [];
+        if (cd.body) bodies[it.url] = { ...cd.body };   // 클릭 때 채집한 본문(위 clickBodyEntry) — 표식 주소(#n-)여도 canonUrl 이 그 공고로 잇는다
       } else if (Date.now() - detailStart > detailBudgetMs || budget.expired()) {
       // 예산 초과 — 마감·첨부 없이 목록 정보만으로 담는다 (공고를 놓치는 것보다 낫다)
       if (di === 1 || !detailSkipped) report.push(`  - (상세 방문 예산 초과 — ${di}/${fresh.length}건부터 목록 정보만)`);
@@ -479,10 +486,11 @@ async function harvestTarget(t, report) {
            받아 오는 것은 `L o a d i n g . . .` 껍데기뿐이고, 그 학교 공고는 자격도 마감도
            영영 못 읽었다. 그런데 **이 줄에 이미 브라우저가 그린 진짜 본문이 들어 있다** —
            마감·첨부만 뽑고 버리고 있었을 뿐이다. 저장은 추가 페이지 열기가 0회라
-           시간 예산에 아무 영향이 없다(이 저장소가 세 번 데인 자리라 일부러 확인했다). */
-        if (text.replace(/[^가-힣]/g, '').length >= 120) {
-          bodies[it.url] = { title: it.title, text: text.trim().slice(0, 15000), at: todayStr, via: 'browser' };
-        }
+           시간 예산에 아무 영향이 없다(이 저장소가 세 번 데인 자리라 일부러 확인했다).
+           🔴 저장하는 글자는 **줄을 살린 것**(html-text.mjs browserBodyEntry — 2026-10-04 점검 B7). 위 `text` 는 한 줄로 뭉갠 것이라
+              본문으로 저장하면 발췌기가 200자 넘는 줄을 문장으로 보고 건너뛴다(본문 169건 중 93건이 한 줄이었다). 마감 단서는 예전대로 `text`. */
+        const body = browserBodyEntry({ title: it.title, html: d.html, at: todayStr });
+        if (body) bodies[it.url] = { ...body };
         deadlineHint = deadlineHintFrom(text);
         attachments = d.links
           .filter((l) => /\.(hwp|hwpx|doc|docx|pdf|xls|xlsx)(\?|$)/i.test(l.url) || /download|fileDown/i.test(l.url))

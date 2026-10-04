@@ -8,6 +8,13 @@
            본문 확보는 장부에서 지우지 않고 날짜를 적는다
         ⓒ 워크플로(rescue-bodies.yml): 재수집 단계가 끝까지 못 가면 작업을 실패로(bodies-2) · 실패 알림은 오늘 리포트만 붙이고
            실행 로그 주소를 단다 · 성공하면 옛 실패 이슈를 닫는다(bodies-7) · 관문에 걸려 되돌릴 때 장부도 되돌린다(bodies-12 ③)
+     ② PaddleOCR 엔진 고장(gaps-02) — paddle-ocr.py 를 가짜 paddleocr·PIL 로 진짜 돌려 종료 코드 2·::warning::·상태 파일 ·
+        activity-docs 의 장부 판 이동·기회 되돌리기(--apply·--fetch 를 임시 폴더에서 진짜로) · 두 워크플로가 실패를 삼키지 않는다
+     ③ 자격용 공고문 첨부(deepfetch --elig-attach · bodies-3·5) — 받은 그대로는 다시 안 받는다 · 파생 글자 보존 (가짜 fetch 로 진짜 실행)
+     ④ 원문 보충(deepfetch --fill · B8 · bodies-12 ①) — 껍데기도 세어 물러선다 · 받기 예산 · 심층 수집 대기줄 (가짜 fetch 로 진짜 실행)
+     ⑤ OCR(ocr-text.py · bodies-6) — 글자층이 있어도 자격용 PDF 는 쪽 그림으로
+     ⑥ AI 자격 읽기 버튼(eligibility-fill.yml · bodies-10) — 대상 세 갈래 합 · 0 이면 돈이 드는 단계만 건너뛴다 (세기 줄을 bash 로 진짜 실행)
+     ⑦ 브라우저 수집(browser-collect.mjs · B7) — 클릭형 게시판 상세 글자도 본문으로(남의 글 막기 셋) · 저장하는 본문은 줄을 살린 것
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말).
       로봇을 돌릴 때는 저장소 파일을 임시 폴더로 **복사**해 그 안에서만 돌린다(진짜 장부·데이터를 건드리지 않는다). */
 import fs from 'node:fs';
@@ -15,7 +22,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { cleanEnv, stripYamlComments } from './gate.mjs';
+import { cleanEnv, stripComments, stripYamlComments } from './gate.mjs';
+import { browserBodyEntry, clickBodyEntry } from '../../collector/html-text.mjs';
 import { canonUrl } from '../../collector/canon-url.mjs';
 import { restingAfterOk, closedForStudents, orderTargets, ledgerEntry, newAttachments } from '../../collector/rescue-plan.mjs';
 import { slugOf, attSig, missWait, pickEligDocTargets } from '../../collector/elig-attach-plan.mjs';
@@ -521,5 +529,32 @@ globalThis.fetch = async (url) => {
         fs.rmSync(dir, { recursive: true, force: true });
       }
     }
+  }
+  /* ── ⑦ 브라우저 수집 — 클릭형 게시판의 상세 글자도 본문으로 · 저장하는 본문은 줄을 살린 것 (B7) ── */
+  {
+    const P = '<p>이 장학금은 국내 대학에 재학 중인 학부생을 대상으로 하며 직전 학기 성적과 가정 형편을 함께 심사합니다.</p>';
+    const page = (title, extra = '') => `<nav>홈 로그인 사이트맵</nav><h3>${title}</h3>${P}${P}${P}<p>둘째 문단 — 신청 서류는 누리집에서 내려받습니다.</p>${extra}`;
+    const e = browserBodyEntry({ title: '표본', html: page('2026학년도 2학기 교내장학금 신청 안내'), at: '2026-10-04' });
+    eq('⑦ 상세 화면 → 본문 한 칸 — 줄을 살린다(여러 줄) · 표식 browser · 한글 120자 미만이면 본문으로 치지 않는다',
+      [e && e.text.split('\n').length >= 3, e && e.via, e && e.at, browserBodyEntry({ title: 't', html: '<p>짧은 안내 한 줄뿐인 화면입니다</p>', at: 'x' })],
+      [true, 'browser', '2026-10-04', null]);
+    const row = '공지 [장학] 2026학년도 2학기 교내장학금 신청 안내 2026.09.17. 조회 1640';
+    const others = ['2026학년도 2학기 국가근로장학생 추가 모집 안내', '2026 미래에셋 해외교환 장학생 선발 공고', '2026학년도 2학기 가족장학 신청 안내 공지', '고속도로 장학재단 2026 장학생 모집'];
+    const cb = (o) => clickBodyEntry({ title: row, otherTitles: others, at: '2026-10-04', opened: true, ...o });
+    const prevNext = `<p>이전글 ${others[0]}</p><p>다음글 ${others[1]}</p>`;
+    const listy = others.map((t) => `<li>${t}</li>`).join('');
+    eq('  클릭으로 연 화면을 그 행의 본문으로 — 상세가 열렸고 이 행 제목이 있으면(이전글·다음글 둘은 괜찮다) 남긴다 · 행 꼬리(공지·날짜·조회)는 뗀 제목',
+      [!!cb({ html: page('2026학년도 2학기 교내장학금 신청 안내', prevNext) }), (cb({ html: page('2026학년도 2학기 교내장학금 신청 안내') }) || {}).title],
+      [true, '[장학] 2026학년도 2학기 교내장학금 신청 안내']);
+    eq('  🔴 남의 글을 붙이지 않는다 — 안 열렸으면 · 이 행 제목이 화면에 없으면 · 다른 행 제목이 셋 이상 보이면(아직 목록 화면) 남기지 않는다',
+      [cb({ html: page('2026학년도 2학기 교내장학금 신청 안내'), opened: false }), cb({ html: page('2026 미래에셋 해외교환 장학생 선발 공고') }),
+        cb({ html: page('2026학년도 2학기 교내장학금 신청 안내', listy) })],
+      [null, null, null]);
+    const bc = stripComments(readText('collector/browser-collect.mjs'));
+    const cdBlock = (bc.match(/if \(cd\) \{[\s\S]*?\} else if/) || [''])[0];
+    eq('  브라우저 수집기 배선 — 상세 방문과 클릭 두 길이 같은 함수 · 클릭 때 남긴 본문을 상세 루프가 저장(cd) · 뭉갠 글자로 본문을 만들지 않는다',
+      [(bc.match(/browserBodyEntry\(/g) || []).length >= 1 && (bc.match(/clickBodyEntry\(/g) || []).length >= 1,
+        /clickDetails\[title\] = \{[^\n]*body/.test(bc), /bodies\[it\.url\] =/.test(cdBlock), /bodies\[it\.url\] = \{ title: it\.title, text: text/.test(bc)],
+      [true, true, true, false]);
   }
 }
