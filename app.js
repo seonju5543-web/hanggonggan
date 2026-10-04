@@ -1782,8 +1782,10 @@ function renderHome() {
         (`boardNoticesInSchool` · 같은 날 개발자 지적). 여기서는 전부 그대로 나온다.
      ⚠️ 검색은 안 건다 — 홈에는 검색창이 없다(탐색에 있던 시절의 이유가 사라졌다). */
   $('#live-notices').innerHTML = liveNoticesHtml();
-  /* 교내 소식 (2026-09-30) — 학교 게시판 공고 구역 바로 아래. 재단·지자체보다 위(우리 학교 것끼리) */
-  $('#school-news').innerHTML = schoolNewsHtml();
+  /* 우리 학교 소식 — 홈 첫 화면 사진 카드 띠 (2026-10-04 승인 시안 1안 · 아이콘 네 칸 밑) · 없으면 구역째 숨긴다 */
+  const newsHtml = homeNewsHtml();
+  $('#home-news').innerHTML = newsHtml;
+  $('#home-news').hidden = !newsHtml;
   /* 재단·지자체 새 공고 (2026-09-26 · 교외 확대) — 학교 게시판 구역 아래, 글이 있을 때만 */
   $('#external-notices').innerHTML = externalNoticesHtml();
 
@@ -3270,8 +3272,7 @@ function externalNoticesHtml() {
 let liveNews = null;
 let newsFilesLoaded = null;   // 마지막으로 **성공적으로** 받은 파일 목록 (loadNotices 와 같은 규칙 — 받기 전에 적지 않는다)
 let newsFilesWanted = '';
-let newsOpen = false;         // '더보기'를 눌러 편 상태 — 다시 그려도 유지
-const NEWS_HOME_TOP = 5;      // 홈에 펴 두는 장 수 · 나머지는 더보기
+const NEWS_STRIP_N = 4;       // 홈 첫 화면 띠에 놓는 장 수 (2026-10-04 승인 시안 1안 · 네 장) · 나머지는 「전체 보기」 시트
 
 function loadNews() {
   const p = state.profile;
@@ -3311,36 +3312,65 @@ function schoolNewsForMe() {
     .sort((a, b) => String(b.postedAt || b.foundAt || '').localeCompare(String(a.postedAt || a.foundAt || '')));
 }
 
-/* 홈 「우리 학교 소식」 — 학교 게시판 공고 구역 바로 아래. 앞 NEWS_HOME_TOP 장만 펴고 나머지는 더보기(장 수는 이 상수 하나). */
+/* 「우리 학교 소식」 전부 — 홈 띠의 「전체 보기」 시트 안 목록 (2026-10-04 · 옛 홈 아래 구역의 카드 그대로).
+   글의 사진이 없는 카드는 학교 대표 사진(차례대로 돌려 이웃끼리 다른 사진). 🔴 사진 출처 줄은 여기 두지 않는다 —
+   개발자 지시(10-03 "학교 사진에 대한 설명은 사용자가 읽지 않는 happy talk 이므로 빼")로 설정 › 앱 권한 · 오픈소스 라이선스 의 「사진 출처」로 옮겼다(renderPerms). */
 function schoolNewsHtml() {
+  const mine = schoolNewsForMe();
+  if (!mine.length) return `<p class="empty">아직 새 소식이 없어요</p>`;
+  const turn = {};
+  return `<div class="card-list">${mine.map((n) => {
+    const sp = n.thumb && NEWS_THUMB_RE.test(n.thumb) ? null : schoolPhotoFor(n, turn[n.school] = (turn[n.school] ?? -1) + 1);
+    return noticeCardHtml(n, { org: `${n.school} 공지${n.kind ? ' · ' + n.kind : ''}`, excerpts: n.postedAt ? [{ label: '게시', text: n.postedAt }] : [], thumb: n.thumb, schoolPhoto: sp });
+  }).join('')}</div>`;
+}
+
+/* 날짜 짧게 — 띠 카드 윗줄의 'MM.DD' (게시일, 없으면 수집일) */
+const newsDay = (n) => { const m = String(n.postedAt || n.foundAt || '').match(/^\d{4}-(\d{2})-(\d{2})/); return m ? `${m[1]}.${m[2]}` : ''; };
+
+/* 홈 첫 화면 「우리 학교 소식」 띠 (2026-10-04 개발자 승인 시안 1안 「사진 카드 띠」).
+   최근 NEWS_STRIP_N 장 — 사진(위) · 갈래·날짜(작은 회색) · 제목 두 줄. 누르면 그 글의 원문(카드와 같은 safeUrl).
+   사진은 글의 사진 → 없으면 학교 대표 사진(차례대로) → 둘 다 없으면 바탕색 칸(사진을 지어내지 않는다).
+   글의 사진을 못 받으면 학교 사진으로 갈아 끼운다(data-fallback · bindEvents 의 error 잡이).
+   받는 중엔 뼈대 세 장 · 소식이 없으면 '' (구역째 숨긴다 — 첫 화면에 빈 안내를 두지 않는다). */
+function homeNewsHtml() {
   const p = state.profile;
   if (!p) return '';
-  const head = `<div class="section-head" style="margin-top:4px"><h3>우리 학교 소식</h3>
-    <span class="link-btn">${liveNews && liveNews.updatedAt ? esc(liveNews.updatedAt) + ' 갱신' : '매일 갱신'}</span></div>`;
-  if (!liveNews) return head + (typeof skeletonRows === 'function' ? skeletonRows(2) : '');
+  const head = (all) => `<div class="section-head home-news-head"><h3>우리 학교 소식</h3>${all ? '<button type="button" class="link-btn home-news-all" data-news-all>전체 보기</button>' : ''}</div>`;
+  if (!liveNews) return head(false) + `<div class="news-strip" aria-busy="true">${'<span class="news-tile is-skel"><span class="news-tile-photo"></span><span class="news-tile-meta">&nbsp;</span><span class="news-tile-title">&nbsp;</span></span>'.repeat(3)}</div>`;
   const mine = schoolNewsForMe();
-  if (!mine.length) {
-    return head + `<p class="empty" style="margin-bottom:16px">아직 ${esc(p.school)} 공지 게시판 연결 전이거나 새 소식이 없어요</p>`;
-  }
-  const shown = newsOpen ? mine : mine.slice(0, NEWS_HOME_TOP);
-  const more = mine.length > NEWS_HOME_TOP;
-  /* 글의 사진이 없는 카드는 학교 대표 사진으로 (2026-10-03) — 쓴 사진의 출처를 구역 아래에 한 번씩(위키미디어 열린 라이선스의 표기 의무) */
-  const used = [];
-  const turn = {};   // 학교마다 사진 없는 카드의 차례 — 이웃 카드끼리 다른 사진
-  const cards = shown.map((n) => {
-    const sp = n.thumb && NEWS_THUMB_RE.test(n.thumb) ? null : schoolPhotoFor(n, turn[n.school] = (turn[n.school] ?? -1) + 1);
-    if (sp && !used.includes(sp)) used.push(sp);
-    return noticeCardHtml(n, { org: `${n.school} 공지${n.kind ? ' · ' + n.kind : ''}`, excerpts: n.postedAt ? [{ label: '게시', text: n.postedAt }] : [], thumb: n.thumb, schoolPhoto: sp });
+  if (!mine.length) return '';
+  const turn = {};
+  const tiles = mine.slice(0, NEWS_STRIP_N).map((n) => {
+    const own = n.thumb && NEWS_THUMB_RE.test(n.thumb) ? n.thumb : '';
+    const sp = schoolPhotoFor(n, own ? 0 : (turn[n.school] = (turn[n.school] ?? -1) + 1));
+    const src = own || (sp && sp.src) || '';
+    const focus = !own && sp && PHOTO_FOCUS_RE.test(sp.focus || '') ? sp.focus : '';
+    const fallback = own && sp && SCHOOL_PHOTO_RE.test(sp.src || '') ? sp.src : '';
+    const href = safeUrl(n.url);
+    const meta = [n.kind, newsDay(n)].filter(Boolean).join(' · ');
+    return `<a class="news-tile"${href ? ` href="${esc(href)}" target="_blank" rel="noopener"` : ''}>
+      <span class="news-tile-photo">${src ? `<img class="news-tile-img" src="${esc(src)}" alt="" loading="lazy" decoding="async" width="148" height="104"${focus ? ` style="object-position:${esc(focus)}"` : ''}${fallback ? ` data-fallback="${esc(fallback)}"` : ''} />` : ''}</span>
+      <span class="news-tile-meta">${esc(meta)}</span>
+      <span class="news-tile-title">${esc(unent(n.title))}</span>
+    </a>`;
   }).join('');
-  const credit = used.length
-    ? `<p class="news-photo-credit">학교 사진 · ${used.map((x) => (/^https:\/\/commons\.wikimedia\.org\//.test(x.page || '')
-      ? `<a href="${esc(x.page)}" target="_blank" rel="noopener">${esc(x.credit)}</a>` : esc(x.credit))).join(' · ')} · 위키미디어 공용</p>`
-    : '';
-  return head + `<div class="card-list" style="margin-bottom:${more || credit ? 6 : 18}px">`
-    + cards
-    + `</div>`
-    + credit
-    + (more ? `<button type="button" class="link-btn home-more" data-news-more aria-expanded="${newsOpen ? 'true' : 'false'}" style="margin-bottom:18px">${newsOpen ? '접기' : `더보기 (${mine.length - NEWS_HOME_TOP})`}</button>` : '');
+  return head(true) + `<div class="news-strip">${tiles}</div>`;
+}
+
+/* 「전체 보기」 — 학교 소식 전부를 시트로 (시트 그릇은 #detail-sheet 하나 · openSheetShell) */
+function openNewsSheet() {
+  const p = state.profile;
+  if (!p) return;
+  sheetBack = null;   // 돌아갈 곳이 없다 — 내리면 닫힌다
+  $('#detail-sheet').innerHTML = `
+    <div class="sheet-handle"></div>
+    <div class="sheet-body">
+      <h3 class="sheet-title">우리 학교 소식</h3>
+      <p class="sheet-provider">${esc(p.school || '')} 공지 게시판${liveNews && liveNews.updatedAt ? ` · ${esc(liveNews.updatedAt)} 갱신` : ''}</p>
+      ${schoolNewsHtml()}
+    </div>`;
+  openSheetShell();
 }
 
 /* ---------------- 제출: 복사 · 파일 공유 ---------------- */
@@ -6099,6 +6129,31 @@ function renderPerms() {
           </div>
           <a class="perm-link" href="${esc(url)}" target="_blank" rel="noopener">원문 ↗</a>
         </div>`).join('')}
+    </section>${photoCreditsHtml()}`;
+  /* 학교 사진 목록을 아직 안 받았으면 받아서 다시 그린다(소식을 받을 때 같이 받는 작은 파일) */
+  if (!schoolPhotos && state.profile && state.profile.school) {
+    fetch('assets/schools/photos.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null)
+      .then((d) => { if (d && d.schools && !schoolPhotos) { schoolPhotos = d; if (currentScreen === 'perms') renderPerms(); } });
+  }
+}
+
+/* 사진 출처 (2026-10-04) — 홈 소식 카드에 쓰는 우리 학교 대표 사진의 작가·라이선스. 위키미디어 공용 CC BY·BY-SA 는 출처를 적어야 한다.
+   개발자 지시(10-03 "학교 사진에 대한 설명은 … happy talk 이므로 빼")로 홈 구역 아래 출처 줄을 여기로 옮겼다 — 학생 화면에는 사진만. */
+function photoCreditsHtml() {
+  const p = state.profile;
+  const list = ((schoolPhotos && schoolPhotos.schools && p && schoolPhotos.schools[p.school]) || []).filter((x) => x && x.credit);
+  if (!list.length) return '';
+  return `
+    <section class="perm-sec">
+      <p class="perm-title">사진 출처</p>
+      ${list.map((x) => `
+        <div class="perm-state">
+          <div>
+            <p class="perm-name">${esc(p.school)}</p>
+            <p class="perm-value">${esc(x.credit)} · 위키미디어 공용</p>
+          </div>
+          ${/^https:\/\/commons\.wikimedia\.org\//.test(x.page || '') ? `<a class="perm-link" href="${esc(x.page)}" target="_blank" rel="noopener">원문 ↗</a>` : ''}
+        </div>`).join('')}
     </section>`;
 }
 
@@ -6388,22 +6443,24 @@ function bindEvents() {
      error 는 거품이 일지 않아 잡는 단계(capture)로 문서에서 받는다 — CSP(script-src 'self')가 onerror= 를 막는다. */
   document.addEventListener('error', (e) => {
     const img = e.target;
+    /* 홈 띠 카드(2026-10-04): 글의 사진을 못 받으면 학교 사진으로 한 번 갈아 끼우고, 그것도 못 받으면 사진만 빼고 바탕색 칸으로 */
+    if (img && img.classList && img.classList.contains('news-tile-img')) {
+      const fb = img.getAttribute('data-fallback');
+      img.removeAttribute('data-fallback');
+      if (fb) img.src = fb; else img.remove();
+      return;
+    }
     /* 글의 사진·학교 사진 모두 img.notice-thumb 한 장이 썸네일 자리다 */
     if (!img || !img.classList || !img.classList.contains('notice-thumb')) return;
     const card = img.closest('.has-thumb');
-    const section = img.closest('#school-news');
     img.remove();
     if (card) card.classList.remove('has-thumb');
-    /* 학교 사진이 하나도 안 남으면 출처 줄도 뺀다 — 안 보이는 사진의 출처만 덩그러니 남지 않게(리뷰 10-03) */
-    if (section && !section.querySelector('.notice-thumb-school')) { const c = section.querySelector('.news-photo-credit'); if (c) c.remove(); }
   }, true);
-  /* 교내 소식 더보기 (2026-09-30) — 구역은 통째로 다시 그려지므로 그릇(#school-news)에 위임한다. 히어로는 안 건드린다. */
-  const newsBox = $('#school-news');
+  /* 우리 학교 소식 「전체 보기」 (2026-10-04) — 띠는 통째로 다시 그려지므로 그릇(#home-news)에 위임한다 */
+  const newsBox = $('#home-news');
   if (newsBox) newsBox.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-news-more]');
-    if (!btn) return;
-    newsOpen = !newsOpen;
-    newsBox.innerHTML = schoolNewsHtml();
+    if (!e.target.closest('[data-news-all]')) return;
+    openNewsSheet();
   });
   /* 취소 — 고치던 것을 버리고 있던 화면으로 돌아간다.
      🔴 저장하지 않는다: collectProfile() 을 부르지 않으므로 입력칸에 친 값은 버려지고

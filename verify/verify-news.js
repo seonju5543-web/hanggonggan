@@ -1,13 +1,15 @@
-/* 교내 소식 — 홈 「우리 학교 소식」 구역 (2026-09-30 · 개발자 지시 "사용자들 학교에 맞춘 교내 뉴스") — 진짜 브라우저로 누른다.
+/* 교내 소식 — 홈 첫 화면 「우리 학교 소식」 사진 카드 띠 (2026-10-04 개발자 승인 시안 1안) + 「전체 보기」 시트 — 진짜 브라우저로 누른다.
+   (2026-09-30 첫 구역은 홈 아래쪽 목록이었다 — 2026-10-04 띠로 옮기며 그 구역 #school-news 는 뺐다)
    무엇을 재나
-     ① 홈에 「우리 학교 소식」 구역이 학교 게시판 구역 아래·재단 구역 위에 뜬다
-     ② 학교 범위 — 내 학교 글만 (본교 파일에 섞인 다른 캠퍼스 표식 글은 안 보인다) · 숨긴 글은 안 보인다 · 최근 수집 순
-     ③ 카드 윗줄이 「학교 공지 · 갈래」를 말한다 · 갈래 없는 글은 「학교 공지」만 · 메타 줄은 수집일 + 원문 보기
-     ④ 앞 다섯 장 + 더보기(남은 수) → 누르면 전부 → 접기
-     ⑤ 받아오기가 실패해도 뼈대가 아니라 '없어요' 로 내려앉는다 · 페이지 오류 없음
-     ⑥ 썸네일 (2026-10-03) — 사진이 있는 글만 오른쪽에 72px 정사각 사진 · 제목과 겹치지 않는다 · 못 받은 사진은 빼고 글자 카드로 ·
-        로봇 이름 꼴이 아닌 값(바깥 주소)은 그리지 않는다 · 사진 없는 카드는 예전 그대로(그림 없음)
-   데이터는 **가짜 응답**으로 준다(page.route) — 실제 data/news/ 는 첫 수집 전 비어 있을 수 있고, 화면 규칙은 데이터가 있을 때 재야 한다.
+     ① 자리 — 아이콘 네 칸(히어로) 바로 밑 · 「나에게 맞는 장학금」 위 · 제목 「우리 학교 소식」 · 「전체 보기」
+     ② 학교 범위 — 내 학교 글만 · 숨긴 글은 안 보인다 · 최근 순 · 띠에는 네 장
+     ③ 카드 윗줄은 「갈래 · MM.DD」(갈래 없으면 날짜만) · 제목은 두 줄까지 · 누르면 그 글(새 탭)
+     ④ 크기 — 카드 148px · 사진 148×104 · 띠만 옆으로 넘어가고 페이지는 옆으로 안 밀린다
+     ⑤ 받아오기가 실패하면 구역째 숨는다(뼈대가 굳지 않는다) · 페이지 오류 없음
+     ⑥ 사진 — 글의 사진 → 없거나 못 받으면 학교 대표 사진 → 그것도 없으면 바탕색 칸 · 바깥 주소는 그리지 않는다
+        · 사진 위 「학교 사진」 글자도, 홈의 출처 줄도 없다(10-03·10-04 개발자 지시) · 출처는 앱 권한 · 오픈소스 라이선스 화면의 「사진 출처」
+     ⑦ 「전체 보기」 — 시트에 전부(숨긴 글·남의 학교 글 제외) · 카드는 옛 소식 카드 그대로(72px 썸네일) · 출처 줄 없음
+   데이터는 **가짜 응답**으로 준다(page.route) — 실제 data/news/ 는 비어 있을 수 있고, 화면 규칙은 데이터가 있을 때 재야 한다.
    파일 이름은 app.js 가 쓰는 규칙(match-engine newsFilesForProfile)으로 만든다(베끼지 않는다).
 
    🔴 **PORT= 를 반드시 준다** (8123 은 남의 워크트리일 수 있다 — CLAUDE.md 매 세션 2).
@@ -84,22 +86,24 @@ async function fresh(browser, mode) {
   return { page, errors };
 }
 
-const cards = (page) => page.$$eval('#school-news .notice-card', (els) => els.map((e) => ({
-  name: e.querySelector('.sch-name').textContent.trim(),
-  org: e.querySelector('.sch-org').textContent.trim(),
-  meta: [...e.querySelectorAll('.sch-provider')].pop().textContent.trim(),
-})));
-
-/* 카드마다 썸네일 자리 — 글의 사진·학교 사진 모두 img.notice-thumb 한 장(학교 사진은 notice-thumb-school 클래스).
-   label = 카드 안 어디에든 「학교 사진」 글자가 있는가 — 2026-10-03 개발자 지시로 뺐다("학교사진에 '학교사진' 이라는 디스크립션 빼") */
-const thumbs = (page) => page.$$eval('#school-news .notice-card', (els) => els.slice(0, 5).map((e) => {
-  const img = e.querySelector('img.notice-thumb');
-  const name = e.querySelector('.sch-name').getBoundingClientRect();
-  const r = img && img.getBoundingClientRect();
-  return { has: e.classList.contains('has-thumb'), img: !!img, school: !!(img && img.classList.contains('notice-thumb-school')), loaded: !!(img && img.complete && img.naturalWidth > 0), w: r ? Math.round(r.width) : 0, h: r ? Math.round(r.height) : 0,
-    right: !!(r && r.left >= name.right - 1), alt: img ? img.getAttribute('alt') : null, label: /학교\s*사진/.test(e.textContent) };
+/* 띠 카드 — 사진 칸·사진·윗줄·제목·크기 */
+const tiles = (page) => page.$$eval('#home-news .news-tile', (els) => els.map((e) => {
+  const box = e.querySelector('.news-tile-photo').getBoundingClientRect();
+  const img = e.querySelector('img.news-tile-img');
+  const t = e.querySelector('.news-tile-title');
+  return {
+    title: t.textContent.trim(), meta: e.querySelector('.news-tile-meta').textContent.trim(), href: e.getAttribute('href'), target: e.getAttribute('target'),
+    w: Math.round(e.getBoundingClientRect().width), box: [Math.round(box.width), Math.round(box.height)],
+    img: img ? (img.getAttribute('src').match(/[^/]+$/) || [''])[0] : null, loaded: !!(img && img.complete && img.naturalWidth > 0),
+    lines: Math.round(t.getBoundingClientRect().height / 19), label: /학교\s*사진/.test(e.textContent),
+  };
 }));
-const settle = async (page) => { await page.$eval('#school-news', (e) => e.scrollIntoView()); await page.waitForTimeout(1200); };
+/* 띠를 화면에 들이고 끝까지 넘겨 늦게 싣기(lazy) 사진까지 부른다 */
+const settle = async (page) => {
+  await page.$eval('#home-news', (e) => e.scrollIntoView());
+  await page.$eval('#home-news .news-strip', (e) => { e.scrollLeft = e.scrollWidth; });
+  await page.waitForTimeout(1200);
+};
 
 (async () => {
   await assertOwnServer(PORT);
@@ -108,46 +112,54 @@ const settle = async (page) => { await page.$eval('#school-news', (e) => e.scrol
   /* ── 정상 응답 ── */
   {
     const { page, errors } = await fresh(browser, 'ok');
-    eq('① 구역 제목', await page.$eval('#school-news h3', (h) => h.textContent.trim()), '우리 학교 소식');
-    eq('① 자리 — 학교 게시판 구역 아래 · 재단 구역 위', await page.$$eval('#live-notices, #school-news, #external-notices', (els) => els.map((e) => e.id)), ['live-notices', 'school-news', 'external-notices']);
-    eq('① 갱신 날짜를 말한다', await page.$eval('#school-news .section-head .link-btn', (e) => e.textContent.trim()), '2026-09-30 갱신');
-    let seen = await cards(page);
-    eq('④ 앞 다섯 장만', seen.length, 5);
-    eq('② 내 학교 글만 · 숨긴 글 제외 · 최근 수집 순', seen.map((c) => c.name), ['2026학년도 2학기 수강정정 안내', '도서관 열람실 운영시간 변경', '총장 담화문', '2026 외대 가을 축제 안내', '학생지원팀 조교 모집']);
-    eq('③ 윗줄은 「학교 공지 · 갈래」', seen[0].org, '한국외국어대학교 공지 · 학사');
-    eq('③ 갈래 없는 글은 「학교 공지」만', seen[2].org, '한국외국어대학교 공지');
-    eq('③ 메타 줄은 수집일 + 원문 보기 (첨부·마감 없음)', seen[0].meta, '2026-09-30 수집 · 원문 보기 ↗');
-    eq('④ 더보기 단추에 남은 수', await page.$eval('#school-news [data-news-more]', (b) => b.textContent.trim()), '더보기 (2)');
-    await page.click('#school-news [data-news-more]'); await page.waitForTimeout(200);
-    seen = await cards(page);
-    eq('④ 누르면 전부 (숨긴 글·남의 학교 글은 여전히 없다)', seen.map((c) => c.name).slice(5), ['기숙사 동계 입사 안내', '졸업 사정 결과 확인 안내']);
-    eq('④ 단추는 「접기」', await page.$eval('#school-news [data-news-more]', (b) => b.textContent.trim()), '접기');
-    await page.click('#school-news [data-news-more]'); await page.waitForTimeout(200);
-    eq('④ 접으면 다시 다섯', (await cards(page)).length, 5);
-    /* ⑥ 썸네일 — 구역을 화면에 들인 뒤(늦게 싣기 loading=lazy) 잰다 */
-    await page.$eval('#school-news', (e) => e.scrollIntoView());
-    await page.waitForTimeout(1200);
-    const shot = await thumbs(page);
-    eq('⑥ 사진 있는 글 — 오른쪽 72px 정사각 · 실제로 그려짐 · 제목과 안 겹침 · alt 비움 · 학교 사진 아님', shot[0], { has: true, img: true, school: false, loaded: true, w: 72, h: 72, right: true, alt: '', label: false });
-    eq('⑥ 사진 파일을 못 받은 글은 그림을 빼고 글자 카드로', shot[1], { has: false, img: false, school: false, loaded: false, w: 0, h: 0, right: false, alt: null, label: false });
-    /* ⑦ 학교 대표 사진 — 글의 사진이 없는 글(바깥 주소였던 글 포함)은 학교 사진 · 같은 자리·같은 크기 · 사진 위 「학교 사진」 글자는 없다(10-03 개발자 지시) */
-    eq('⑦ 사진 없는 글 — 학교 사진이 같은 자리에 72px · 실제로 그려짐 · 「학교 사진」 글자 없음', shot.slice(2), Array(3).fill({ has: true, img: true, school: true, loaded: true, w: 72, h: 72, right: true, alt: '', label: false }));
-    eq('⑦ 구역 아래 출처 한 줄 (공용 페이지 링크)', await page.$eval('#school-news .news-photo-credit', (e) => [e.textContent.trim(), e.querySelector('a') && e.querySelector('a').href]), ['학교 사진 · 테스트 작가 · CC BY 3.0 · 위키미디어 공용', 'https://commons.wikimedia.org/wiki/File:Test.jpg']);
+    eq('① 구역 제목 · 전체 보기', await page.$eval('#home-news', (e) => [e.querySelector('h3').textContent.trim(), e.querySelector('[data-news-all]').textContent.trim(), e.hidden]), ['우리 학교 소식', '전체 보기', false]);
+    eq('① 자리 — 히어로(아이콘 네 칸) 다음 · 「나에게 맞는 장학금」 앞 · 옛 아래 구역(#school-news)은 없다', await page.evaluate(() => {
+      const hero = document.querySelector('.hero-card'); const news = document.querySelector('#home-news'); const list = document.querySelector('#home-deadline-list');
+      return [!!(hero.compareDocumentPosition(news) & Node.DOCUMENT_POSITION_FOLLOWING), !!(news.compareDocumentPosition(list) & Node.DOCUMENT_POSITION_FOLLOWING), !!document.querySelector('#school-news')];
+    }), [true, true, false]);
+    await settle(page);
+    const t = await tiles(page);
+    eq('② 띠에는 네 장 · 내 학교 글만 · 숨긴 글 제외 · 최근 순', t.map((x) => x.title), ['2026학년도 2학기 수강정정 안내', '도서관 열람실 운영시간 변경', '총장 담화문', '2026 외대 가을 축제 안내']);
+    eq('③ 윗줄은 「갈래 · MM.DD」 · 갈래 없으면 날짜만', t.map((x) => x.meta), ['학사 · 09.30', '생활 · 09.30', '09.29', '행사 · 09.29']);
+    eq('③ 누르면 그 글 (새 탭)', [t[0].href, t[0].target], ['https://www.hufs.ac.kr/n/1', '_blank']);
+    eq('④ 카드 148px · 사진 칸 148×104 · 제목은 두 줄까지', t.map((x) => [x.w, x.box, x.lines <= 2]), Array(4).fill([148, [148, 104], true]));
+    eq('⑥ 사진 — 글의 사진 / 못 받은 글의 사진은 학교 사진으로 / 바깥 주소 글·사진 없는 글은 학교 사진 · 모두 그려짐 · 「학교 사진」 글자 없음',
+      t.map((x) => [x.img, x.loaded, x.label]), [['aaaaaaaaaaaaaaaa.webp', true, false], ['n19cz03g-0123abcd.webp', true, false], ['n19cz03g-0123abcd.webp', true, false], ['n19cz03g-0123abcd.webp', true, false]]);
     eq('⑥ 바깥 주소로 그림을 부르지 않았다', await page.evaluate(() => performance.getEntriesByType('resource').some((r) => /evil\.example/.test(r.name))), false);
-    if (process.env.SHOT) await page.$eval('#school-news', (e) => e.scrollIntoView()).then(() => page.locator('#school-news').screenshot({ path: process.env.SHOT }));
+    eq('⑥ 홈에 사진 출처 줄이 없다 (설명 글 빼기 · 10-04)', await page.evaluate(() => [!!document.querySelector('#screen-home .news-photo-credit'), /위키미디어/.test(document.querySelector('#screen-home').textContent)]), [false, false]);
+    eq('④ 페이지는 옆으로 밀리지 않는다 (띠만 넘어간다)', await page.evaluate(() => document.scrollingElement.scrollWidth <= window.innerWidth), true);
+    if (process.env.SHOT) { await page.$eval('#home-news .news-strip', (e) => { e.scrollLeft = 0; }); await page.evaluate(() => window.scrollTo(0, 0)); await page.waitForTimeout(300); await page.screenshot({ path: process.env.SHOT }); }
+    /* ⑦ 전체 보기 — 시트 */
+    await page.click('#home-news [data-news-all]'); await page.waitForTimeout(500);
+    const sheet = await page.$eval('#detail-sheet', (e) => ({
+      open: !e.hidden, title: e.querySelector('.sheet-title').textContent.trim(),
+      names: [...e.querySelectorAll('.notice-card .sch-name')].map((x) => x.textContent.trim()),
+      org: e.querySelector('.notice-card .sch-org').textContent.trim(),
+      thumbs: [...e.querySelectorAll('.notice-card')].slice(0, 5).map((c) => !!c.querySelector('img.notice-thumb')),
+      credit: !!e.querySelector('.news-photo-credit') || /위키미디어/.test(e.textContent),
+    }));
+    eq('⑦ 시트 — 제목 · 전부(숨긴 글·남의 학교 글 제외) · 윗줄 「학교 공지 · 갈래」 · 출처 줄 없음', [sheet.open, sheet.title, sheet.names, sheet.org, sheet.credit],
+      [true, '우리 학교 소식', ['2026학년도 2학기 수강정정 안내', '도서관 열람실 운영시간 변경', '총장 담화문', '2026 외대 가을 축제 안내', '학생지원팀 조교 모집', '기숙사 동계 입사 안내', '졸업 사정 결과 확인 안내'], '한국외국어대학교 공지 · 학사', false]);
+    await page.waitForTimeout(1200);
+    eq('⑦ 시트 카드 사진 — 글의 사진 · (못 받은 것은 빠짐) · 학교 사진', await page.$$eval('#detail-sheet .notice-card', (els) => els.slice(0, 4).map((c) => { const i = c.querySelector('img.notice-thumb'); return i ? [Math.round(i.getBoundingClientRect().width), i.classList.contains('notice-thumb-school')] : null; })),
+      [[72, false], null, [72, true], [72, true]]);
+    /* 사진 출처 — 앱 권한 · 오픈소스 라이선스 화면 */
+    await page.evaluate(() => { closeSheet(); showScreen('perms'); }); await page.waitForTimeout(800);
+    eq('⑥ 사진 출처는 앱 권한 · 오픈소스 라이선스 화면에 (작가·라이선스 · 공용 페이지 링크)', await page.$$eval('#perms-body .perm-sec', (secs) => {
+      const sec = secs.find((x) => x.querySelector('.perm-title').textContent.trim() === '사진 출처');
+      return sec ? [sec.querySelector('.perm-value').textContent.trim(), sec.querySelector('a').href] : null;
+    }), ['테스트 작가 · CC BY 3.0 · 위키미디어 공용', 'https://commons.wikimedia.org/wiki/File:Test.jpg']);
     eq('⑤ 페이지 오류 없음', errors, []);
     await page.context().close();
   }
 
-  /* ── 학교 사진 목록을 못 받음 / 그림을 못 받음 — 글자 카드로 돌아가고 출처 줄이 홀로 남지 않는다 ── */
+  /* ── 학교 사진 목록을 못 받음 / 그림을 못 받음 — 사진 칸은 바탕색으로 남고 글의 사진은 그대로 ── */
   for (const mode of ['nophotos', 'photo404']) {
     const { page, errors } = await fresh(browser, mode);
     await settle(page);
-    const shot = await thumbs(page);
-    eq(`⑦ ${mode === 'nophotos' ? '목록을 못 받으면' : '그림을 못 받으면'} 사진 없는 글은 글자 카드`, shot.slice(2).map((c) => [c.has, c.img]), Array(3).fill([false, false]));
-    eq(`⑦ ${mode} — 글의 사진은 그대로`, [shot[0].img, shot[0].loaded], [true, true]);
-    eq(`⑦ ${mode} — 보이는 학교 사진이 없으면 출처 줄도 없다`, await page.$('#school-news .news-photo-credit'), null);
-    eq(`⑦ ${mode} — 페이지 오류 없음`, errors, []);
+    const t = await tiles(page);
+    eq(`⑥ ${mode === 'nophotos' ? '목록을 못 받으면' : '그림을 못 받으면'} — 글의 사진은 그대로 · 나머지는 사진 없이 같은 크기 칸`, t.map((x) => [x.img, x.box]), [['aaaaaaaaaaaaaaaa.webp', [148, 104]], [null, [148, 104]], [null, [148, 104]], [null, [148, 104]]]);
+    eq(`⑥ ${mode} — 페이지 오류 없음`, errors, []);
     await page.context().close();
   }
 
@@ -155,12 +167,12 @@ const settle = async (page) => { await page.$eval('#school-news', (e) => e.scrol
   {
     const { page, errors } = await fresh(browser, 'fail');
     await page.waitForTimeout(500);
-    eq('⑤ 실패해도 뼈대가 아니라 "없어요"', await page.$eval('#school-news', (e) => e.textContent.includes('없어요') && !e.querySelector('.skel, .skeleton')), true);
+    eq('⑤ 실패하면 구역째 숨는다 (뼈대가 굳지 않는다)', await page.$eval('#home-news', (e) => [e.hidden, !!e.querySelector('.is-skel')]), [true, false]);
     eq('⑤ 페이지 오류 없음', errors, []);
     await page.context().close();
   }
 
   await browser.close();
-  console.log(fail ? `\n✕ ${fail}건 실패` : '\n✓ 교내 소식 구역 검사 통과');
+  console.log(fail ? `\n✕ ${fail}건 실패` : '\n✓ 교내 소식 띠 검사 통과');
   process.exit(fail ? 1 : 0);
 })().catch((e) => { console.error(e); process.exit(1); });

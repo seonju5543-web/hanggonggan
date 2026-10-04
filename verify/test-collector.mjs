@@ -2305,15 +2305,15 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   const html = readText(new URL('index.html', root));
   const app = readText(new URL('app.js', root));
   const homeSlice = html.slice(html.indexOf('id="screen-home"'), html.indexOf('id="screen-explore"'));
-  eq('홈에 구역이 있다 — 학교 게시판 구역 아래 · 재단·지자체 위', homeSlice.indexOf('id="live-notices"') > 0 && homeSlice.indexOf('id="live-notices"') < homeSlice.indexOf('id="school-news"') && homeSlice.indexOf('id="school-news"') < homeSlice.indexOf('id="external-notices"'), true);
-  eq('renderHome 이 그린다', /\$\('#school-news'\)\.innerHTML = schoolNewsHtml\(\);/.test(app), true);
+  eq('홈 첫 화면 띠 — 히어로(아이콘 네 칸) 다음 · 「나에게 맞는 장학금」 앞 · 옛 아래 구역(#school-news)은 없다 (2026-10-04 승인 시안 1안)', homeSlice.indexOf('class="hero-card"') > 0 && homeSlice.indexOf('class="hero-card"') < homeSlice.indexOf('id="home-news"') && homeSlice.indexOf('id="home-news"') < homeSlice.indexOf('id="home-deadline-list"') && !/id="school-news"/.test(html), true);
+  eq('renderHome 이 그린다 · 소식이 없으면 구역째 숨긴다', /const newsHtml = homeNewsHtml\(\);\s*\$\('#home-news'\)\.innerHTML = newsHtml;\s*\$\('#home-news'\)\.hidden = !newsHtml;/.test(app), true);
   eq('당겨서 새로고침·첫 실행이 받는다', /const jobs = \[loadNotices\(\), loadNews\(\),/.test(app) && /^loadNews\(\);$/m.test(app), true);
   eq('학교가 정해지거나 바뀔 때 공고와 **같은 자리에서** 받는다', (app.match(/loadNewsIfSchoolChanged\(\);/g) || []).length, (app.match(/loadNoticesIfSchoolChanged\(\);/g) || []).length);
   eq('못 받아 왔어도 빈 문서 (뼈대가 굳지 않게)', /liveNews = d \|\| liveNews \|\| \{ items: \[\], updatedAt: null \}/.test(app), true);
   eq('옛 통짜 파일로 물러나는 길이 없다', /data\/news\.json/.test(app), false);
   eq('학교 범위는 엔진의 noticeForProfile 한 곳 · 숨긴 글 제외', /\.filter\(\(n\) => n && n\.url && n\.title && !n\.hidden && noticeForProfile\(n, p\)\)/.test(app), true);
   eq('카드는 한 벌 — 윗줄만 「학교 공지 · 갈래」 · 게시일은 줄에서 읽은 것만 한 줄', /noticeCardHtml\(n, \{ org: `\$\{n\.school\} 공지\$\{n\.kind \? ' · ' \+ n\.kind : ''\}`, excerpts: n\.postedAt \? \[\{ label: '게시', text: n\.postedAt \}\] : \[\], thumb: n\.thumb, schoolPhoto: sp \}\)/.test(app) && !/function newsCardHtml/.test(app), true);
-  eq('더보기 — 장 수는 상수 하나 · 그릇에 위임', /const NEWS_HOME_TOP = \d+;/.test(app) && /newsBox\.addEventListener\('click'/.test(app) && /data-news-more/.test(app), true);
+  eq('띠는 네 장(상수 하나) · 「전체 보기」는 그릇에 위임해 시트로 전부 · 옛 더보기 없음', /const NEWS_STRIP_N = 4;/.test(app) && /mine\.slice\(0, NEWS_STRIP_N\)/.test(app) && /newsBox\.addEventListener\('click', \(e\) => \{\s*if \(!e\.target\.closest\('\[data-news-all\]'\)\) return;\s*openNewsSheet\(\);/.test(app) && /\$\{schoolNewsHtml\(\)\}/.test(app) && !/data-news-more|NEWS_HOME_TOP/.test(app), true);
   const ui = strip(readText(new URL('.github/workflows/verify-ui.yml', root)));
   eq('브라우저 드라이버가 관문에 걸려 있다', /verify-news\.js/.test(ui), true);
   /* ⑧ 관리자 — 저장소를 실제로 돌려 본다 */
@@ -2507,7 +2507,7 @@ console.log('\n■ 교내 소식 썸네일 (2026-10-03 개발자 지시 "실제 
   /* ⑧ 카드 — 소식만 opts.thumb 로 · 다른 카드(실시간 공고·재단)는 그림을 안 넘긴다 · 못 받으면 그림을 빼는 error 잡이(CSP 가 onerror= 를 막는다) */
   eq('  카드 — 로봇 꼴일 때만 그림 · 소식 카드만 넘긴다 · 못 받은 그림은 빼고 글자 카드로', /const thumb = o\.thumb && NEWS_THUMB_RE\.test\(o\.thumb\) \? o\.thumb : '';/.test(app) && (app.match(/thumb: n\.thumb/g) || []).length === 1
     && /document\.addEventListener\('error', \(e\) => \{[\s\S]{0,600}?notice-thumb[\s\S]{0,600}?\}, true\);/.test(app) && /class="notice-thumb" src="\$\{esc\(thumb\)\}" alt="" loading="lazy"/.test(app), true);
-  eq('    브라우저 드라이버가 썸네일을 잰다 (그려짐·72px·겹침 없음·못 받으면 뺌·바깥 주소 안 부름)', /⑥ 사진 있는 글/.test(readText(new URL('verify/verify-news.js', root))) && /⑥ 바깥 주소로 그림을 부르지 않았다/.test(readText(new URL('verify/verify-news.js', root))), true);
+  eq('    브라우저 드라이버가 썸네일을 잰다 (띠 사진·학교 사진으로 갈아 끼움·시트 72px·바깥 주소 안 부름)', /⑥ 사진 — 글의 사진/.test(readText(new URL('verify/verify-news.js', root))) && /⑦ 시트 카드 사진/.test(readText(new URL('verify/verify-news.js', root))) && /⑥ 바깥 주소로 그림을 부르지 않았다/.test(readText(new URL('verify/verify-news.js', root))), true);
   /* ⑨ 워크플로 — 수집 다음·감사 앞 보강 단계 · sharp 설치를 삼키지 않는다 · 장부 되돌리기를 따로 · 저장 */
   const wf = readText(new URL('.github/workflows/collect-news.yml', root));
   const iRun = wf.indexOf('node collector/collect-news.mjs'); const iThumb = wf.indexOf('node collector/collect-news-thumbs.mjs'); const iAudit = wf.indexOf('node verify/audit-data.js');
@@ -2638,15 +2638,17 @@ console.log('\n■ 학교 대표 사진 (2026-10-03 개발자 지시 "썸네일�
   eq('    학교에 여러 장이면 차례대로 돌아 이웃이 겹치지 않는다 · 이상한 항목은 안 고른다 · 차례 없으면 첫 장 · 다른 학교는 없음', [seq, A.schoolPhotoFor(n).src, A.schoolPhotoFor({ ...n, school: '서울대학교' }, 1)], [['assets/schools/n1w4hprp-0123abcd.webp', 'assets/schools/n1w4hprp-89abcdef.webp', 'assets/schools/n1w4hprp-0123abcd.webp', 'assets/schools/n1w4hprp-89abcdef.webp'], 'assets/schools/n1w4hprp-0123abcd.webp', null]);
   /* ③ 구역 — 글의 사진이 없을 때만 넘기고, 쓴 사진의 출처를 구역 아래에 (라이선스 표기 의무) */
   const sec = cut('schoolNewsHtml');
-  eq('  구역 — 글의 사진이 없을 때만 학교 사진 · 쓴 사진마다 출처 줄(공용 페이지 링크) · 위키미디어 공용', [/const sp = n\.thumb && NEWS_THUMB_RE\.test\(n\.thumb\) \? null : schoolPhotoFor\(n, turn\[n\.school\] = \(turn\[n\.school\] \?\? -1\) \+ 1\);/.test(sec), /class="news-photo-credit">학교 사진 · /.test(sec), /· 위키미디어 공용<\/p>/.test(sec), /commons\\\.wikimedia\\\.org/.test(sec)], [true, true, true, true]);
+  eq('  시트 목록 — 글의 사진이 없을 때만 학교 사진(차례대로) · 🔴 출처 줄은 학생 화면에 없다(10-04 개발자 지시 "happy talk 이므로 빼")', [/const sp = n\.thumb && NEWS_THUMB_RE\.test\(n\.thumb\) \? null : schoolPhotoFor\(n, turn\[n\.school\] = \(turn\[n\.school\] \?\? -1\) \+ 1\);/.test(sec), /news-photo-credit|위키미디어/.test(sec + cut('homeNewsHtml'))], [true, false]);
+  const pc = cut('photoCreditsHtml');
+  eq('    출처는 앱 권한 · 오픈소스 라이선스 화면 「사진 출처」 — 우리 학교 사진마다 작가·라이선스 · 공용 페이지 링크(공용 주소만)', [/<p class="perm-title">사진 출처<\/p>/.test(pc), /\$\{esc\(x\.credit\)\} · 위키미디어 공용/.test(pc), /commons\\\.wikimedia\\\.org/.test(pc), /<\/section>\$\{photoCreditsHtml\(\)\}`;/.test(app)], [true, true, true, true]);
   eq('    목록은 소식을 받을 때 같이 받는다(한 번) · 늦게 와도 다시 그린다', /get\('assets\/schools\/photos\.json'\)\.then\(\(d\) => \{ if \(d && d\.schools && !schoolPhotos\) \{ schoolPhotos = d; if \(liveNews\) rerenderVisible\(\); \} \}\);/.test(app), true);
   eq('    못 받은 그림(글의 사진·학교 사진 모두 img.notice-thumb)은 빼고 글자 카드로', /if \(!img \|\| !img\.classList \|\| !img\.classList\.contains\('notice-thumb'\)\) return;[\s\S]{0,200}?img\.remove\(\);\s*if \(card\) card\.classList\.remove\('has-thumb'\);/.test(app), true);
-  eq('    학교 사진이 하나도 안 남으면 출처 줄도 뺀다(리뷰 10-03)', /if \(section && !section\.querySelector\('\.notice-thumb-school'\)\) \{ const c = section\.querySelector\('\.news-photo-credit'\); if \(c\) c\.remove\(\); \}/.test(app), true);
+  eq('    띠 카드 — 글의 사진을 못 받으면 학교 사진으로 한 번 갈아 끼우고, 그것도 못 받으면 사진만 뺀다(바탕색 칸)', /if \(img && img\.classList && img\.classList\.contains\('news-tile-img'\)\) \{\s*const fb = img\.getAttribute\('data-fallback'\);\s*img\.removeAttribute\('data-fallback'\);\s*if \(fb\) img\.src = fb; else img\.remove\(\);/.test(app) && /const fallback = own && sp && SCHOOL_PHOTO_RE\.test\(sp\.src \|\| ''\) \? sp\.src : '';/.test(app), true);
   /* 리뷰(10-03) — 시작 화면 사진 셋에 번호판·택시·행인이 컸다. 72px 에선 안 보여도 640px 파일은 공개 주소 → 고른 기록의 crop 으로 파일에서 덜어 낸다 */
   eq('    잘라 낼 자리(crop 비율 → 픽셀 상자) · 틀린 값은 자르지 않음(null)', [SP.cropBox(1000, 750, [0, 0, 1, 0.78]), SP.cropBox(1000, 666, [0.23, 0, 0.77, 1]), SP.cropBox(1000, 750, [0.5, 0, 0.6, 1]), SP.cropBox(1000, 750, [0, 0, 1]), SP.cropBox(1000, 750, [0, 0, -1, 1])],
     [{ left: 0, top: 0, width: 1000, height: 585 }, { left: 230, top: 0, width: 770, height: 666 }, null, null, null]);
   eq('    만드는 도구가 crop 을 쓴다 · 틀리면 문제로 알린다', /if \(p\.crop\) \{[\s\S]{0,200}?cropBox\(width, height, p\.crop\)[\s\S]{0,200}?problems\.push/.test(readText(new URL('tools/build-school-photos.mjs', root))), true);
-  eq('    출처 줄의 모양이 있다 · 「학교 사진」 표시 모양(thumb-tag)은 없다', [/\.news-photo-credit \{/.test(css), /thumb-tag/.test(css + app)], [true, false]);
+  eq('    홈 출처 줄 모양은 걷었다 · 「학교 사진」 표시 모양(thumb-tag)도 없다', [/\.news-photo-credit \{/.test(css), /thumb-tag/.test(css + app)], [false, false]);
   /* ④ 만드는 도구 — 바이트 해시 이름 · 쓰지 않는 그림 정리 · 라이선스 거름 */
   const tool = readText(new URL('tools/build-school-photos.mjs', root));
   eq('  만드는 도구 — 바이트 해시 이름(서비스워커 캐시 우선) · 안 쓰는 그림 지움 · 라이선스 거름 · 학교당 3장', [/const name = `\$\{key\}-\$\{crypto\.createHash\('sha1'\)\.update\(buf\)\.digest\('hex'\)\.slice\(0, 8\)\}\.webp`;/.test(tool), /if \(!keep\.has\(f\)\) fs\.unlinkSync/.test(tool), /!OK_LICENSE\.test\(meta\.license \|\| ''\) \|\| \/NC\|ND\/\.test\(meta\.license\)/.test(tool), /list\.slice\(0, 3\)/.test(tool)], [true, true, true, true]);

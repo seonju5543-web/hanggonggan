@@ -9,7 +9,7 @@
 
    🔴 파일 이름에 바이트 해시를 넣는다 — 서비스워커가 그림을 캐시 우선으로 들어 같은 이름을 다시 쓰면 옛 그림이 남는다(소식 썸네일과 같은 규칙).
    🔴 라이선스는 CC0 · CC BY · CC BY-SA · 퍼블릭 도메인만(NC·ND 는 받는 로봇이 이미 버린다 — 여기서 한 번 더 막는다).
-      BY·BY-SA 는 표기 의무라 photos.json 의 credit 을 앱이 구역 아래에 적는다(관문이 대조).
+      BY·BY-SA 는 표기 의무라 photos.json 의 credit 을 앱이 앱 권한 · 오픈소스 라이선스 화면 「사진 출처」에 적는다(관문이 대조 · 2026-10-04 홈 구역 아래에서 옮김).
    실행: node tools/build-school-photos.mjs   (sharp 가 필요하다 — npm i --no-save sharp) */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -73,7 +73,7 @@ async function main() {
   }
   fs.mkdirSync(OUT, { recursive: true });
   const out = {
-    note: '소식 카드에 그 글의 사진이 없을 때 대신 보이는 학교 대표 사진 (2026-10-03). 만드는 곳 tools/build-school-photos.mjs · 고른 기록 docs/designs/assets/gates/school-photo-picks.json · 사진은 위키미디어 공용의 열린 라이선스 — credit 을 구역 아래에 적는다.',
+    note: '소식 카드에 그 글의 사진이 없을 때 대신 보이는 학교 대표 사진 (2026-10-03). 만드는 곳 tools/build-school-photos.mjs · 고른 기록 docs/designs/assets/gates/school-photo-picks.json · 사진은 위키미디어 공용의 열린 라이선스 — credit 은 앱 권한 · 오픈소스 라이선스 화면 「사진 출처」에 적는다.',
     schools: {},
   };
   const keep = new Set(['photos.json']);
