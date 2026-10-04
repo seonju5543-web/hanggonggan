@@ -255,4 +255,151 @@ export default async function gate(eq, ctx = {}) {
     fs.rmSync(dir, { recursive: true, force: true });
     eq('⑨ 학교별 파일 고치기는 진짜 주소를 목록 표식으로 덮지 않고(항공대 실측 꼴) · 표식은 진짜 주소로 고친다', [r.fixed, got], [1, [REAL, REAL2]]);
   }
+
+  /* ── ⑩ 확인된 게시판 규칙으로 후보를 만든다 — 서울교대 data-id 행 (2026-10-04 · 원문 4건이 목록 표식으로 남은 원인) ─────────
+     행이 `<a href="javascript:" data-id="54815">` 라 조립(mkQuery)은 `selectNttList.do` 에 고쳐 쓸 이름이 없어 아무것도 못 만들었다.
+     글 주소 꼴은 교내 소식 규칙 표(news-board-rules.mjs)에 이미 있다 — 세 로봇이 같은 함수(rowDetailCandidates)로 그 표를 부른다. */
+  {
+    const SNUE = 'https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083';
+    const WANT = 'https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54815';
+    /* 세 로봇의 행 글자 꼴: 사냥꾼·브라우저 수집 `onclick|href|data-id` · 복구 로봇은 뒤에 `|data-seq` 하나 더 */
+    const got = ['|javascript:|54815', '|javascript:|54815|'].map((src) => D.rowDetailCandidates({ row: { src, abs: 'javascript:', t: '2026 표본 장학 안내' }, listUrl: SNUE }));
+    eq('⑩ data-id 행 → selectNttInfo.do?…&nttSn=<번호> 가 첫 후보(세 로봇의 행 글자 꼴 모두)', got.map((c) => c[0]), [WANT, WANT]);
+    eq('  규칙이 낸 번호도 돌려준다(목록 표식에 글 번호로 남긴다)', D.ruleDetailCandidates({ row: { src: '|javascript:|54815' }, listUrl: SNUE }), [{ url: WANT, id: '54815' }]);
+    eq('  다른 사이트의 data-id 행에는 서울교대 주소를 만들지 않는다(규칙은 같은 사이트일 때만)',
+      ['https://www.gachon.ac.kr/bbs/kor/475/artclList.do', 'https://www.other.ac.kr/na/ntt/selectNttList.do?mi=3004&bbsId=1083'].map((l) => D.ruleDetailCandidates({ row: { src: '|javascript:|54815' }, listUrl: l })), [[], []]);
+    eq('  목록 주소에 mi·bbsId 가 없으면 만들지 않는다(짐작하지 않는다)', D.ruleDetailCandidates({ row: { src: '|javascript:|54815' }, listUrl: 'https://www.snue.ac.kr/snue/na/ntt/selectNttList.do' }), []);
+    const du = code(read('collector/detail-url.mjs'));
+    eq('  규칙 표는 news-board-rules.mjs 것을 부른다 — detail-url.mjs 에 selectNttInfo 주소 꼴 사본이 없다',
+      [/import \{[^}]*\bNEWS_BOARD_RULES\b[^}]*\bruleResolver\b[^}]*\} from '\.\/news-board-rules\.mjs'/.test(du), /selectNttInfo/.test(du)], [true, false]);
+    eq('  브라우저 수집도 같은 함수로 후보를 만든다(따로 detailCandidates 를 부르지 않는다)',
+      [/rowDetailCandidates\(\{ row: rowRef, listUrl: url, landed: detailPage\.url\(\), dom \}\)/.test(bc), /\bdetailCandidates\(/.test(bc.replace(/rowDetailCandidates|ruleDetailCandidates/g, ''))], [true, false]);
+    eq('  표식이 될 때 규칙이 읽은 글 번호(postId)를 함께 담는다',
+      /postId = \(ruleDetailCandidates\(\{ row: rowRef, listUrl: url \}\)\[0\] \|\| \{\}\)\.id/.test(bc) && /links\.push\(postId \? \{ title, url: recUrl, postId \}/.test(bc) && /it\.postId \? \{ postId: it\.postId \}/.test(bc), true);
+    /* 같은 글 합치기 — 표식 + 글 번호가 진짜 주소 짝과 한 장이 된다(가천 RE·서울교대 실측 꼴) */
+    const { dedupeNotices } = await import('../../collector/url-key.mjs');
+    const mk = (list, extra) => ({ school: '서울교육대학교', title: '[장학] 표본 장학생 선발 안내', url: `${list}#n-%ED%91%9C%EB%B3%B8`, ...extra });
+    const real = { school: '서울교육대학교', title: '표본 장학생 선발 공고(2차)', url: WANT };
+    eq('  목록 표식 + 글 번호 = 진짜 주소 짝과 합쳐지고 진짜 주소가 남는다 · 번호가 없으면 예전처럼 둘',
+      [dedupeNotices([mk(SNUE, { postId: '54815' }), real]).map((n) => n.url), dedupeNotices([mk(SNUE), real]).length], [[WANT], 2]);
+    eq('  글 번호가 사이트 전체에서 하나인 세 체계(selectNtt·subview·K2Web artclList)만 — 다른 게시판 표식의 번호로는 안 합친다',
+      dedupeNotices([mk('https://www.snue.ac.kr/bbs/list.do?b=1', { postId: '54815' }), real]).length, 2);
+  }
+
+  /* ── ⑪ 링크 사냥꾼 장부 — 이슈 #387 거짓 알림 · 깊은 글을 '내려간 듯'이라 하지 않기 (2026-10-04) ─────────────────── */
+  {
+    const H = await import('../../collector/link-hunt-rules.mjs');
+    const day = { today: '2026-10-04', nowMs: Date.parse('2026-10-04T00:00:00Z') };
+    let st = { attempts: 0 };
+    for (let i = 0; i < H.ESCALATE_AT; i += 1) st = H.recordAttempt(st, 'bad', '주소를 못 만듦', day);
+    eq('⑪ 세 번째 실패를 적는 것만으로는 알림 표식이 서지 않는다(3단계가 아직 남았다)', [st.attempts, !!st.escalated], [3, false]);
+    const found3 = H.recordAttempt({ ...st }, 'ok', '', { ...day, url: 'https://x.kr/bbs/view.do?id=1' });
+    eq('  같은 실행의 3단계가 찾으면 알리지 않는다(이슈 #387 꼴) · 못 찾으면 그때 한 번만',
+      [H.settleEscalation(found3), H.settleEscalation(st), H.settleEscalation(st)], [false, true, false]);
+    eq('  찾으면 알림·내려감 표식을 걷는다(다시 표식이 되면 처음부터 센다)', [found3.status, found3.escalated, found3.likelyGone, found3.attempts], ['resolved', undefined, undefined, 0]);
+    eq('  학교 서버에 못 닿은 것(net)은 횟수에 안 센다', H.recordAttempt({ attempts: 2 }, 'net', 'Timeout', day).attempts, 2);
+    let deep = { attempts: 0 }; let end = { attempts: 0 };
+    for (let i = 0; i < 4; i += 1) {
+      deep = H.recordAttempt(deep, 'bad', '목록에서 못 찾음', { ...day, scan: H.listScanEnd({ stop: 'max-pages' }) });
+      end = H.recordAttempt(end, 'bad', '목록에서 못 찾음', { ...day, scan: H.listScanEnd({ stop: 'no-next' }) });
+    }
+    eq('  쪽수 상한에서 멈춘 \'못 찾음\'은 4회여도 \'내려간 듯\'이 아니다 · 목록 끝까지 봤으면 그렇다', [!!deep.likelyGone, !!end.likelyGone], [false, true]);
+    eq('  예전에 붙은 \'내려간 듯\'도 끝까지 못 본 회차가 걷는다',
+      !!H.recordAttempt({ attempts: 5, likelyGone: true }, 'bad', '목록에서 못 찾음', { ...day, scan: 'deep' }).likelyGone, false);
+    eq('  목록 끝 판정 — 다음 쪽 번호가 없고 다음 묶음 단추도 없을 때만 끝 · 시간·쪽수 상한·빈 쪽은 더 있을 수 있음',
+      [['no-next', false], ['no-next', true], ['max-pages', false], ['out-of-time', false], ['no-rows', false]].map(([stop, nextControl]) => H.listScanEnd({ stop, nextControl })),
+      ['end', 'deep', 'deep', 'deep', 'deep']);
+    /* 사냥꾼 배선 — 불러오면 브라우저가 뜨므로 글자로 */
+    const recBody = fnBody(lhc, 'function record(');
+    const stage3At = lhc.indexOf('report.push(`- 3단계 추가 확보');
+    const stuckAt = [...lhc.matchAll(/\bstuck \+= 1\b/g)].map((m) => m.index);
+    eq('  사냥꾼은 장부 규칙 파일을 쓰고, 알릴 건은 3단계 뒤 한 곳에서만 센다(3단계에서 못 찾은 것만)',
+      [/import \{[^}]*\brecordAttempt\b[^}]*\bsettleEscalation\b[^}]*\} from '\.\/link-hunt-rules\.mjs'/.test(lhc), /recordAttempt\(/.test(recBody), /stuck/.test(recBody),
+        stuckAt.length, stage3At > 0 && stuckAt.every((i) => i > stage3At), /stage3Failed\.has\(t\.key\) && settleEscalation\(/.test(lhc), /stage3Failed\.add\(t\.key\)/.test(lhc)],
+      [true, true, false, 1, true, true, true]);
+    eq('  \'목록에서 못 찾음\'에 목록을 어디까지 봤는지(listScanEnd)를 넘긴다', /record\(t, 'bad', '목록에서 못 찾음', scan\)/.test(lhc) && /const scan = listScanEnd\(\{ stop, nextControl \}\)/.test(lhc), true);
+    eq('  리포트에 \'포기\'라는 말이 없다 — 쉬는 건은 다음 시도 날을 기다리는 것이다', /포기 처리된 건/.test(lhc), false);
+  }
+
+  /* ── ⑫ 관리자가 원문을 넣은 공고는 고치는 로봇이 건드리지 않는다 (2026-10-04) ─────────────────────
+     로봇이 표식을 바꾸면 관리자 열쇠(u:<표식>)가 안 맞아 관리자 주소가 화면에서 사라진다. 판정은 앱과 같은 함수(source-link.js). */
+  {
+    const F = await import('../../collector/link-fixes-read.mjs');
+    const os = await import('node:os');
+    const path = await import('node:path');
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'link-fixes-'));
+    const MARK = 'https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-%ED%91%9C%EB%B3%B8';
+    fs.writeFileSync(path.join(dir, 'ok.json'), JSON.stringify({ v: 1, fix: {
+      'id:reg-a': { url: 'https://a.kr/bbs/view.do?id=8', by: 't', at: '2026-10-04' },
+      [`u:${MARK}`]: { url: 'https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54815', by: 't', at: '2026-10-04' },
+      'id:reg-list': { url: 'https://a.kr/bbs/list.do#n-x', by: 't' },
+      'id:kosaf-1': { url: 'https://f.or.kr/bbs/view?no=5', round: '2025-10-20', by: 't' },
+    } }, null, 1));
+    fs.writeFileSync(path.join(dir, 'bad.json'), '{ 깨진');
+    fs.writeFileSync(path.join(dir, 'arr.json'), JSON.stringify({ fix: [1, 2] }));
+    const fileUrl = (f) => new URL(`file://${path.join(dir, f)}`);
+    const human = F.humanFixedBy(F.readLinkFixes(fileUrl('ok.json')));
+    eq('⑫ 정식 등록(id:)·피드 글(u:<지금 주소> — 데이터에 &amp; 가 박혀 있어도) 은 관리자 것으로 본다',
+      [human({ id: 'reg-a', sourceUrl: 'https://a.kr/bbs/list.do#n-y', name: 'x' }), human({ title: 'x', url: MARK.replace(/&/g, '&amp;') })], [true, true]);
+    eq('  앱이 안 쓰는 바로잡기(목록 꼴 주소 · 지난 회차)·없는 열쇠는 관리자 것이 아니다(로봇이 계속 찾는다)',
+      [human({ id: 'reg-list', sourceUrl: 'https://a.kr/bbs/list.do#n-y' }), human({ id: 'kosaf-1', sourceKind: 'kosaf', sourceUrl: 'https://f.or.kr', due: '2026-10-20' }), human({ id: 'reg-z', sourceUrl: 'https://a.kr/bbs/list.do#n-z' })],
+      [false, false, false]);
+    eq('  장부가 없거나 깨져 있어도 던지지 않고 \'없음\' — 로봇을 멈추지 않는다',
+      ['없는.json', 'bad.json', 'arr.json'].map((f) => { const d = F.readLinkFixes(fileUrl(f)); return [Object.keys(d.fix).length, F.humanFixedBy(d)({ id: 'reg-a' })]; }), [[0, false], [0, false], [0, false]]);
+    const SL = (await import('node:module')).createRequire(import.meta.url)('../../source-link.js');
+    eq('  판정 뒤 앱 판정 모듈의 장부를 비운다(다른 판정에 새지 않는다)', SL.linkFixFor({ id: 'reg-a', sourceUrl: 'https://a.kr/bbs/list.do#n-y' }), null);
+    SL.setLinkChecks({ bad: {}, fix: { 'id:reg-r': { url: 'https://a.kr/bbs/view.do?id=4', src: 'robot' } } });
+    eq('  로봇 바로잡기(link-check fix)는 사람 것이 아니다 — 로봇이 찾은 원문은 사냥꾼이 더 좋은 것으로 바꿔도 된다',
+      human({ id: 'reg-r', sourceUrl: 'https://a.kr/bbs/list.do#n-r' }), false);
+    SL.setLinkChecks(null);
+    fs.rmSync(dir, { recursive: true, force: true });
+    for (const [name, src] of [['링크 사냥꾼', lhc], ['원문 링크 복구', rdc]]) {
+      const pushes = [...src.matchAll(/targets\.push\(/g)].map((m) => m.index);
+      const skipAt = [...src.matchAll(/if \(humanFixed\((n|r)\)\) \{/g)].map((m) => m.index);
+      eq(`  ${name} 는 그 판정을 가져다 쓰고, 대상에 넣기 **전에** 두 파일(실시간 공고·정식 등록) 모두 거른다`,
+        [/import \{[^}]*\breadLinkFixes\b[^}]*\bhumanFixedBy\b[^}]*\} from '\.\/link-fixes-read\.mjs'/.test(src), /readLinkFixes\(new URL\('\.\.\/data\/link-fixes\.json', HERE\)\)/.test(src),
+          pushes.length, skipAt.length, skipAt.length === 2 && pushes.length === 2 && skipAt[0] < pushes[0] && skipAt[1] < pushes[1] && skipAt[1] > pushes[0]],
+        [true, true, 2, 2, true]);
+    }
+  }
+
+  /* ── ⑬ 공공 API — 주소 칸 고르기 · 확정된 문제 주소 피하기 · 바뀌지 않는 번호 (2026-10-04) ─────────────────────── */
+  {
+    eq('⑬ 주소 점수 — 첫 화면·뿌리·번호 없는 보기 화면 0 · 그 밖 1 · 글 번호(물음표 칸·경로 숫자) 2',
+      ['https://www.jeju.go.kr/index.htm', 'https://www.mois.go.kr/', 'https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000239/articleView.do',
+        'https://nysc.or.kr/nysc/', 'https://www.daejeonyouthportal.kr/content/CT_000000000070/cntPage.do?commonMenuNo=79_92',
+        'https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41', 'https://arko.or.kr/board/view/4053?cid=1811182',
+        'https://www.youthcenter.go.kr/bbs03View/48/10811', 'https://www.ch2030youth.kr/bbs/board.php?bo_table=notice&amp;wr_id=654'].map(O.urlRank),
+      [0, 0, 0, 1, 1, 2, 2, 2, 2]);
+    const opt = { scholarship: /장학|학자금/, today: '2026-10-04' };
+    const pol = { plcyNo: '20260101005400110001', plcyNm: '청년 정책 서포터즈 모집', aplyYmd: '20261001 ~ 20261130', aplyPrdSeCd: '0057001', sprvsnInstCdNm: '표본시청',
+      aplyUrlAddr: 'https://www.pyo.go.kr/youth/', refUrlAddr1: 'https://www.pyo.go.kr/board/articleView.do', refUrlAddr2: 'https://www.pyo.go.kr/board/view.do?idx=5501&menu=3' };
+    eq('  글 번호가 든 칸을 첫 칸(기관 폴더)·번호 없는 보기 화면보다 먼저 고른다(예전엔 꼴이 맞는 첫 칸)',
+      O.mapYouthPolicy(pol, opt).item.url, 'https://www.pyo.go.kr/board/view.do?idx=5501&menu=3');
+    const KS_URL = 'https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&amp;pbancSn=179246';
+    eq('  확인 로봇이 문제로 확정한 주소(link-check bad · 되푼 열쇠)는 다른 후보가 있으면 피한다 · 그것뿐이면 그대로 둔다(지어내지 않는다)',
+      [O.mapYouthPolicy(pol, { ...opt, bad: new Set(['https://www.pyo.go.kr/board/view.do?idx=5501&menu=3']) }).item.url,
+        O.mapKstartup({ biz_pbanc_nm: '2026 대학생 창업 아이디어 경진대회', pbanc_rcpt_end_dt: '20261020', detl_pg_url: KS_URL, pbanc_sn: 179246 },
+          { ...opt, bad: new Set([KS_URL.replace('&amp;', '&')]) })?.item?.url],
+      ['https://www.pyo.go.kr/youth/', KS_URL]);
+    const pk = O.pickApiUrl([['a', 'https://x.go.kr/'], ['b', 'https://x.go.kr/bbs/view.do?seq=12345']]);
+    eq('  살핀 칸을 모두 돌려준다(리포트가 칸·점수를 찍는다)', [pk.url, pk.considered.map((c) => `${c.field}:${c.rank}`)], ['https://x.go.kr/bbs/view.do?seq=12345', ['a:0', 'b:2']]);
+    /* 바뀌지 않는 번호 — 두 번 받아도 같은 id(관리자 바로잡기 열쇠 id: 가 안 끊긴다) */
+    const k = { biz_pbanc_nm: '2026 대학생 창업 아이디어 경진대회', pbanc_rcpt_end_dt: '20261020', detl_pg_url: 'https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179246', pbanc_sn: 179246 };
+    const v = { progrmSj: '대학생 교육봉사단 모집', url: 'https://www.1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3523464', noticeEndde: '20261015', progrmRegistNo: '3523464', adultPosblAt: 'Y' };
+    const c = { pstTtl: '2026 청년 기자단 모집', pstUrlAddr: null, bbsSn: '48', pstSn: '10811', frstRegDt: '2026-09-25 10:00:00', pstSeNm: '청년참여 프로그램', pstWholCn: '<p>모집기간 : 2026. 9. 25. ~ 2026. 10. 12.</p>' };
+    const ids = () => [O.mapKstartup(k, opt).item, O.map1365(v, opt).item, O.mapYouthPolicy(pol, opt).item, O.mapYouthContent(c, opt).item].map((n) => [n.apiId, n.id]);
+    eq('  번호 칸(pbanc_sn·progrmRegistNo·plcyNo·pstSn) → apiId 와 id `api-<출처>-<번호>`',
+      ids(), [['179246', 'api-kstartup-179246'], ['3523464', 'api-vol1365-3523464'], ['20260101005400110001', 'api-youthPolicy-20260101005400110001'], ['10811', 'api-youthContent-10811']]);
+    const run1 = O.mergeApi([], { youthPolicy: { ok: true, items: [O.mapYouthPolicy(pol, opt).item] } }, { today: '2026-10-03' });
+    const run2 = O.mergeApi(run1, { youthPolicy: { ok: true, items: [O.mapYouthPolicy({ ...pol, refUrlAddr2: 'https://www.pyo.go.kr/board/view.do?idx=5502&menu=3' }, opt).item] } }, { today: '2026-10-04' });
+    eq('  다음 날 주소가 바뀌어 와도 id 는 그대로(이틀 실행)', [run1.map((n) => n.id), run2.map((n) => n.id), run2[0].url], [['api-youthPolicy-20260101005400110001'], ['api-youthPolicy-20260101005400110001'], 'https://www.pyo.go.kr/board/view.do?idx=5502&menu=3']);
+    eq('  번호 칸이 없는 행은 id 를 만들지 않는다 · 같은 번호 두 행은 하나만 싣는다',
+      [O.mapKstartup({ ...k, pbanc_sn: undefined }, opt).item.id, O.mapRows('youthPolicy', [pol, { ...pol, plcyNm: '청년 정책 서포터즈 2기 모집', refUrlAddr2: 'https://www.pyo.go.kr/board/view.do?idx=7777' }], opt).items.length],
+      [undefined, 1]);
+    const robot = code(read('collector/open-api.mjs'));
+    eq('  로봇은 link-check 의 확정 문제 주소를 넘기고, 실은 글마다 번호·살핀 칸을 리포트·정찰에 찍는다',
+      [(robot.match(/mapRows\(src, rows, \{ scholarship: KEYWORDS, today, bad: BAD_URLS \}\)/g) || []).length === 2, /new URL\('\.\.\/data\/link-check\.json', HERE\)/.test(robot), (robot.match(/pickLines\(/g) || []).length >= 2 && /pickLines\(items, picks\)/.test(robot) && /pickLines\(m\.items, m\.picks\)/.test(robot)],
+      [true, true, true]);
+  }
 }
