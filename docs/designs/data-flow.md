@@ -124,4 +124,5 @@ main → 사람이 직접 고치면 main-guard.yml 이 기본 브랜치로 되�
 | ② 관문 | 로봇이 도는데 결과가 안 남는다 | `node verify/audit-data.js` — 실패 상태면 저장을 건너뛴다 |
 | ③ 배포 | 저장소엔 있는데 앱에 없다 | `node verify/check-deploy-sync.js` · device-deploy 의 `branch:` 줄 |
 | ④ 폰 | 앱에 옛 데이터 | sw 는 네트워크 우선이라 보통 아님 → 실제 배포를 `check-live.yml` 로그로 확인 |
-| 알림 | 안 온다 | KV 의 등록 수는 '살아 있는 폰 수'가 아니다 — `push-check.yml` 발송만이 증명 |
+| 알림 | 안 온다 | KV 의 등록 수는 '살아 있는 폰 수'가 아니다 — `push-check.yml` 발송만이 증명 · 예약 회차가 도는지는 `push-health.yml` 이 서버 상태 응답의 `lastSlot`·`lastRun` 으로 매일 본다 |
+| 로그인 | 로그인·이어쓰기 실패 (게스트 사용은 그대로) | `supabase-health.yml` 경보 이슈 · Supabase 대시보드에서 일시정지 여부 |
