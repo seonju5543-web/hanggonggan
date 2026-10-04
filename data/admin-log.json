@@ -65,6 +65,42 @@
    "by": "Claude (이선주 세션 · 원문 링크 복구)",
    "action": "edit",
    "detail": "10건 — auto-kuk2351202780artclviewdo — sourceUrl / auto-notiphpcodes1301seq11120 — sourceUrl / auto-notiphpcodes1301seq11234 — sourceUrl / auto-notiphpcodes1301seq11207 — sourceUrl / auto-o2432actionviewno9994682 — sourceUrl / auto-0ec82aced95admoddocument — sourceUrl / auto-bsid1083mi3004nttid55323 — sourceUrl / auto-7986subviewdonttid125659 — sourceUrl / auto-7986subviewdonttid125837 — sourceUrl / auto-onttid000100000000003863 — sourceUrl"
+  },
+  {
+   "at": "2026-10-04 18:41 KST",
+   "by": "claude",
+   "action": "activitySource",
+   "detail": "출처 보관 · 청년재단 · https://kyf.or.kr/user/boardList.do?bbsId=BBSMSTR_000000000367"
+  },
+  {
+   "at": "2026-10-04 18:41 KST",
+   "by": "claude",
+   "action": "activitySource",
+   "detail": "출처 추가 · 청년재단 → https://kyf.or.kr/user/board.do?boardType=notice"
+  },
+  {
+   "at": "2026-10-04 18:42 KST",
+   "by": "claude",
+   "action": "activitySource",
+   "detail": "출처 보관 · 경희대학교 · https://khu.ac.kr/kor/notice/list.do?page=1&condition=all&category=GENERAL"
+  },
+  {
+   "at": "2026-10-04 18:43 KST",
+   "by": "claude",
+   "action": "addBoard",
+   "detail": "연세대학교 미래캠퍼스  → https://mirae.yonsei.ac.kr/bbs/wj/104/artclList.do?findClSeq=100"
+  },
+  {
+   "at": "2026-10-04 18:44 KST",
+   "by": "claude",
+   "action": "addBoard",
+   "detail": "동국대학교 WISE캠퍼스  → https://wise.dongguk.ac.kr/article/servicenotice/list"
+  },
+  {
+   "at": "2026-10-04 18:44 KST",
+   "by": "claude",
+   "action": "addBoard",
+   "detail": "고려대학교 세종캠퍼스  → https://sejong.korea.ac.kr/koreaSejong/7906/subview.do"
   }
  ]
 }
