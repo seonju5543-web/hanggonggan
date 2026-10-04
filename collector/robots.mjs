@@ -29,9 +29,13 @@ export function parseRobots(txt) {
   return { disallow: star.flatMap((g) => g.disallow), allow: star.flatMap((g) => g.allow) };
 }
 
+/* 규칙 하나 → 정규식. `*` 는 아무 글자(0개 이상) · 끝의 `$` 는 '여기서 끝' · 나머지는 앞부분 일치 (구글 해석과 같다).
+   🔴 첫 별표에서 잘라 앞부분만 보던 옛 방식은 `Disallow: /*down*` 을 `Disallow: /` 로 읽어 사이트 전체를 막았다(2026-10-04 · 출처 넷이 ⛔). */
+const ruleRe = (r) => new RegExp('^' + r.replace(/\$$/, '').replace(/[.+?^{}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + (r.endsWith('$') ? '$' : ''));
+/** pathname 은 경로 + 물음표 뒤(`/a/subview.do?enc=…`) — robots.txt 규칙은 물음표 뒤까지 본다 */
 export function allowedByRules(rules, pathname) {
   const p = pathname || '/';
-  const hit = (list) => list.filter((r) => p.startsWith(r.replace(/\*.*$/, ''))).sort((a, b) => b.length - a.length)[0] || '';
+  const hit = (list) => list.filter((r) => ruleRe(r).test(p)).sort((a, b) => b.length - a.length)[0] || '';
   const d = hit(rules.disallow); const a = hit(rules.allow);
   if (!d) return true;
   return a.length >= d.length;
@@ -49,5 +53,5 @@ export async function robotsAllows(url, fetchImpl = fetch) {
     cache.set(u.origin, rules);
   }
   const rules = cache.get(u.origin);
-  return rules ? allowedByRules(rules, u.pathname) : true;
+  return rules ? allowedByRules(rules, u.pathname + u.search) : true;
 }

@@ -27,8 +27,8 @@
   {
    "school": "연세대학교 미래캠퍼스",
    "campus": "",
-   "boardUrl": null,
-   "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
+   "boardUrl": "https://mirae.yonsei.ac.kr/bbs/wj/104/artclList.do?findClSeq=100",
+   "note": "2026-10-04 확인 — 연세대 본교 첫 화면 메뉴 「미래캠퍼스」 → mirae.yonsei.ac.kr · 그 사이트 「공지사항」(/wj/1415/subview.do)의 「장학」 탭이 jf_searchArtcl(findClSeq, 100) 으로 /bbs/wj/104/artclList.do 를 연다(신촌 sc/58 ?findClSeq=257 과 같은 게시판 엔진). 열어 보니 17줄 중 장학 글 · 상세(artclView) 보통 링크 · 형제장학금 글 열어 제목 확인"
   },
   {
    "school": "고려대학교",
@@ -39,8 +39,8 @@
   {
    "school": "고려대학교 세종캠퍼스",
    "campus": "",
-   "boardUrl": null,
-   "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
+   "boardUrl": "https://sejong.korea.ac.kr/koreaSejong/7906/subview.do",
+   "note": "2026-10-04 확인 — sejong.korea.ac.kr 첫 화면은 meta refresh 로 /koreaSejong/index.do 로 넘긴다(찾기 로봇이 이걸 안 따라가 0건이었다) · 그 메뉴 「장학공지」 → /koreaSejong/7906/subview.do · 행은 보통 링크(/bbs/koreaSejong/659/<번호>/artclView.do) · 미래로장학금 2차 글 열어 제목 확인"
   },
   {
    "school": "서강대학교",
@@ -68,8 +68,8 @@
   {
    "school": "서울시립대학교",
    "campus": "",
-   "boardUrl": "https://www.uos.ac.kr/korNotice/list.do?list_id=FA1",
-   "note": "FA1=장학공지 (FA2는 학사공지라 장학 0건이었음 — 2026-07-30 교정). 목록을 스크립트로 그려 브라우저형 수집기가 주력",
+   "boardUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1",
+   "note": "2026-10-04 장학공지가 scholarship.uos.ac.kr 로 옮겼다(본교 메뉴 「장학공지」 링크 · 옛 korNotice FA1 은 일반공지가 됐다). SSO 익명 확인을 스크립트로 거쳐 브라우저형 수집기가 맡는다",
    "collector": "browser"
   },
   {
@@ -87,14 +87,14 @@
   {
    "school": "동국대학교 WISE캠퍼스",
    "campus": "",
-   "boardUrl": null,
-   "note": "자동 탐색 실패(봇 차단·동적 페이지 추정) — 개발자가 장학공지 주소 제공 필요"
+   "boardUrl": "https://wise.dongguk.ac.kr/article/servicenotice/list",
+   "note": "2026-10-04 확인 — wise.dongguk.ac.kr 메뉴 「장학/봉사」 → /article/servicenotice/list (교내장학·교외장학·국가장학·봉사 분류 · 행은 goDetail(번호) → collect.mjs BOARD_RULES 가 교내 소식 규칙을 불러 쓴다 · /article/servicenotice/detail/520676 GET 으로 그 글 제목 확인)"
   },
   {
    "school": "홍익대학교",
    "campus": "",
-   "boardUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do",
-   "collector": "browser"
+   "boardUrl": "https://www.hongik.ac.kr/kr/education/notice-undergrad.do?mode=list&srCategoryId=24&srStartDt=&srEndDt=&srSearchKey=article_title&srSearchVal=",
+   "note": "2026-10-04 — 사이트 메뉴 「대학공지 › 장학」(srCategoryId=24). 옛 주소(뉴스센터 공지 전체)는 장학 탭이 아니었고, 브라우저 담당이었는데 홍익은 STCLab 봇 차단이 헤드리스 브라우저만 막아 0건이었다. 보통 fetch 로는 목록 행이 보통 링크로 온다(우양재단 동행장학생 글 열어 제목 확인) → 일반 수집기가 맡는다"
   },
   {
    "school": "숙명여자대학교",

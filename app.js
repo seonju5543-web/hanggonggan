@@ -613,16 +613,26 @@ if (typeof sourceLink !== 'function') {
   g.decodeUrlEntities = g.decodeUrlEntities || ((u) => String(u == null ? '' : u).trim());
   g.linkShape = g.linkShape || (() => 'page');   // 자리표의 갈래는 늘 글(post)이라 목록 꼴을 물을 일이 없다 — 꼴 규칙은 source-link.js 한 곳
   g.setLinkChecks = g.setLinkChecks || (() => {});
+  g.setLinkFixes = g.setLinkFixes || (() => {});
+  g.effectiveLinkUrl = g.effectiveLinkUrl || ((item) => String((item && (item.sourceUrl || item.url)) || ''));
   g.sourceLink = (item) => ({ href: String((item && (item.sourceUrl || item.url)) || ''), kind: 'page', cls: 'post', label: '', hint: '', caution: '' });
   if (typeof document !== 'undefined' && document.createElement) {
     const s = document.createElement('script');
     s.src = 'source-link.js';
     s.onload = () => {
       try { if (typeof linkChecksDoc !== 'undefined') setLinkChecks(linkChecksDoc); } catch (e) { /* 장부 없음 */ }
+      try { if (typeof linkFixesDoc !== 'undefined') setLinkFixes(linkFixesDoc); } catch (e) { /* 바로잡기 없음 */ }
       try { rerenderVisible(); } catch (e) { /* 아직 첫 그림 전 — 첫 그림이 진짜 이름을 쓴다 */ }
     };
     (document.head || document.documentElement).appendChild(s);
   }
+}
+/* 옛 source-link.js(캐시 · v221 — sourceLink 는 있는데 원문 바로잡기 ⑥ 이 없다)가 새 app.js 와 만나면 setLinkFixes 가 없어
+   장부를 받는 길이 통째로 던진다(리뷰 2026-10-04) — 빠진 것만 따로 메운다. 그 한 번은 바로잡기 없이 데이터 주소 그대로 연다 */
+{
+  const g = (typeof window !== 'undefined') ? window : globalThis;
+  if (typeof setLinkFixes !== 'function') g.setLinkFixes = () => {};
+  if (typeof effectiveLinkUrl !== 'function') g.effectiveLinkUrl = (item) => String((item && (item.sourceUrl || item.url)) || '');
 }
 
 /* 외부 링크 안전화 — http(s)·mailto만 허용한다. 수집 로봇이 받아 온 데이터가 오염되거나
@@ -1182,11 +1192,11 @@ function startMontage() {
     });
 }
 
-/* 부팅 덮개에 구멍이 뚫리기 시작하는 순간(boot.js 가 'boot:open' 을 보낸다)에 부른다.
+/* 부팅 덮개가 걷히기 시작하는 순간(boot.js 가 페이드를 켜며 'boot:open' 을 보낸다)에 부른다.
    덮개가 없거나(검사 픽스처) 이미 걷혔으면 곧바로 부른다. */
 function whenBootOpen(fn) {
   const boot = document.getElementById('boot');
-  if (!boot || boot.hidden || boot.classList.contains('boot-open')) { fn(); return; }
+  if (!boot || boot.hidden || boot.classList.contains('boot-fade')) { fn(); return; }
   window.addEventListener('boot:open', fn, { once: true });
 }
 
@@ -2592,17 +2602,21 @@ function renderHomeUpdated() {
    🔴 정식 등록과 **나란히** 받는다 — 목록이 먼저 와도 장부를 잠깐(LINK_CHECK_WAIT_MS) 기다려 첫 그림부터 맞는 이름을 단다.
       장부는 작아서 보통 먼저 온다. 더 늦으면 기다리지 않고 그리고, 장부가 오면 다시 그린다(바뀐 것이 있을 때만). */
 let linkChecksDoc = null;
+let linkFixesDoc = null;   // data/link-fixes.json — 관리자가 넣은 원문(source-link.js ⑥ · 같은 규칙으로 받는다)
 let linkChecksJob = null;
 const LINK_CHECK_WAIT_MS = 800;
 function loadLinkChecks() {
-  linkChecksJob = fetch('data/link-check.json', { cache: 'no-store' })
+  const getDoc = (path) => fetch(path, { cache: 'no-store' })
     .then((r) => (r.ok ? r.json() : null), () => undefined)   // undefined = 네트워크 실패(받아 둔 것을 지킨다)
-    .catch(() => null)                                           // 깨진 JSON — 장부 없음으로
-    .then((d) => {
-      const before = JSON.stringify(linkChecksDoc);
+    .catch(() => null);                                          // 깨진 JSON — 장부 없음으로
+  linkChecksJob = Promise.all([getDoc('data/link-check.json'), getDoc('data/link-fixes.json')])
+    .then(([d, fx]) => {
+      const before = JSON.stringify([linkChecksDoc, linkFixesDoc]);
       if (d !== undefined) linkChecksDoc = d && d.bad && typeof d.bad === 'object' ? d : null;
+      if (fx !== undefined) linkFixesDoc = fx && fx.fix && typeof fx.fix === 'object' ? fx : null;
       setLinkChecks(linkChecksDoc);
-      if (JSON.stringify(linkChecksDoc) !== before) rerenderVisible();
+      setLinkFixes(linkFixesDoc);
+      if (JSON.stringify([linkChecksDoc, linkFixesDoc]) !== before) rerenderVisible();
     });
   return linkChecksJob;
 }
@@ -2882,8 +2896,9 @@ function noticeCardHtml(n, opts) {
   const o = opts || {};
   const thumb = o.thumb && NEWS_THUMB_RE.test(o.thumb) ? o.thumb : '';
   const link = sourceLink(n, 'card');
-  /* 안전하지 않은 주소면 href 를 아예 안 단다 — `href=""` 는 앱 자신을 다시 연다(첨부와 같은 사고 · 2026-10-03) */
-  const href = safeUrl(n.url);
+  /* 안전하지 않은 주소면 href 를 아예 안 단다 — `href=""` 는 앱 자신을 다시 연다(첨부와 같은 사고 · 2026-10-03)
+     🔴 주소도 이름과 같은 link 에서 — 바로잡은 원문(source-link.js ⑥)이 있으면 그 주소다. n.url 로 열면 이름은 「원문」인데 목록이 열린다(리뷰 2026-10-04) */
+  const href = safeUrl(link.href);
   const sp = !thumb && o.schoolPhoto && SCHOOL_PHOTO_RE.test(o.schoolPhoto.src || '') ? o.schoolPhoto : null;
   return `
     <a class="sch-card notice-card${thumb || sp ? ' has-thumb' : ''}"${href ? ` href="${esc(href)}" target="_blank" rel="noopener"` : ''}>
@@ -3105,7 +3120,7 @@ function benefitShort(text) {
   const t = unent(String(text || '')).trim();
   if (t && t.length <= 20) return t;
   const items = benefitItems(t);
-  const label = (items[0] || '').split(/\s*[·:：]\s*/)[0].trim();
+  const label = (items[0] || '').split(/\s*(?:·|[:：](?!\d))\s*/)[0].trim();   // `1:1 매칭` 의 콜론은 이름표가 아니다
   if (!label || label.length > 16) return '';
   return items.length > 1 ? `${label} 외 ${items.length - 1}` : label;
 }
@@ -3363,9 +3378,10 @@ function homeNewsHtml() {
     const src = own || (sp && sp.src) || '';
     const focus = own ? '' : spFocus;
     const fallback = own && sp && SCHOOL_PHOTO_RE.test(sp.src || '') ? sp.src : '';
-    const href = safeUrl(n.url);
-    /* 링크 이름은 sourceLink 한 곳 — 글 화면이 아닌 링크(목록 표식 등)면 윗줄에 그 이름을 붙인다(시트 카드와 같은 말 · 리뷰 10-04) */
+    /* 링크 이름은 sourceLink 한 곳 — 글 화면이 아닌 링크(목록 표식 등)면 윗줄에 그 이름을 붙인다(시트 카드와 같은 말 · 리뷰 10-04) ·
+       주소도 같은 link 에서(바로잡은 원문이 있으면 그 주소 · 원문 바로잡기 리뷰 10-04) */
     const link = sourceLink(n, 'card');
+    const href = safeUrl(link.href);
     const meta = [n.kind, newsDay(n), link.cls !== 'post' && link.label ? link.label : ''].filter(Boolean).join(' · ');
     return `<a class="news-tile"${href ? ` href="${esc(href)}" target="_blank" rel="noopener"` : ''}>
       <span class="news-tile-photo">${src ? `<img class="news-tile-img" src="${esc(src)}" alt="" loading="lazy" decoding="async" width="148" height="104"${focus ? ` style="object-position:${esc(focus)}"` : ''}${fallback ? ` data-fallback="${esc(fallback)}"${spFocus ? ` data-fallback-focus="${esc(spFocus)}"` : ''}` : ''} />` : ''}</span>
@@ -4119,7 +4135,8 @@ function eligibilityRowsHtml(sch, result) {
        원문에서 '제한 없음'을 확인한 공고만 eligibilityVerified로 확신 문구를 낸다. */
     /* '아래 공고 원문'은 아래 링크가 **그 공고로 갈 때만** (2026-10-03 · 원문 링크 정직성) — 재단 홈페이지(층2)·게시판 목록·
        기관 첫 화면이면 '아래 링크'라고만 한다. 종류는 sourceLink 한 곳(활동 시트는 id 의 'act:' 뒤가 그 글 주소다 · activityAsSch). */
-    const below = sourceLink(sch.activity ? { url: String(sch.id || '').replace(/^act:/, '') } : sch, 'detail').cls === 'post' ? '아래 공고 원문' : '아래 링크';
+    const actUrl = String(sch.id || '').replace(/^act:/, '');
+    const below = sourceLink(sch.activity ? (activityItem(actUrl) || { url: actUrl }) : sch, 'detail').cls === 'post' ? '아래 공고 원문' : '아래 링크';   // 글 원본(id 포함)으로 — id 열쇠 바로잡기도 같이 본다
     reasonRows = sch.eligibilityVerified
       ? `<li class="r-ok">✓ 별도 자격 제한이 없는 공고입니다${result.status === 'selective' ? ' — 지원자 중 선발 심사로 결정됩니다' : ''}</li>`
       : `<li class="r-unk">? 지원 자격은 ${below}에서 확인해 주세요${result.status === 'selective' ? ' (지원자 중 선발 심사로 결정됩니다)' : ''}</li>`;
@@ -4351,7 +4368,7 @@ function openDetail(id) {
   const goBtn = $('#btn-go-submit');
   if (goBtn) goBtn.addEventListener('click', () => {
     copyText(buildSubmissionText(sch, app));
-    const url = safeUrl(ch.url || sch.sourceUrl);
+    const url = safeUrl(ch.url || effectiveLinkUrl(sch));   // 제출처 표가 없으면 원문 — 바로잡은 원문이 있으면 그 주소(source-link.js ⑥)
     if (url) window.open(url, '_blank', 'noopener');
   });
   if (app && app.formAns && formTplIdFor(sch)) {

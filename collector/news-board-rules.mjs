@@ -17,7 +17,7 @@
      kind 'json'    — 목록을 화면이 아니라 API 로 받는 게시판(서강 SPA · 정찰 2026-10-01 이 화면이 부른 요청에서 열쇠를 읽었다). link:'list' 면 글 주소 대신 목록 표식.
      kind 'post'    — 목록을 POST API 로 받는 게시판(중앙 · 정찰이 본문까지 적었다). 응답 HTML 을 같은 눈(날짜 줄)으로 읽고 onclick 번호로 상세를 만든다.
                       상세 본문도 스크립트가 API 로 받는 곳(중앙·서강)은 확인(verifyApi)도 그 API 로 한다.
-     kind 'listOnly' — 글 하나의 GET 주소가 **없는** 게시판(경희: 누르면 POST 로 view.do · 정찰 2026-10-01). 제목+게시일은 싣되 링크는
+     kind 'listOnly' — 글 하나의 GET 주소가 **없는** 게시판(옛 경희: 누르면 POST 로 view.do · 정찰 2026-10-01 → 10-04 정찰로 GET 상세를 찾아 onclick 으로 옮김). 제목+게시일은 싣되 링크는
                        목록 주소 + `#n-제목` 표식으로 둔다 — 앱이 「게시판 목록 ↗」 로 정직하게 적는다(source-link.js — 앱의 링크 이름 규칙 한 곳 · 장학 공고와 같은 관례).
                        상세가 없으니 verifyRuleDetail 은 건너뛴다(목록 자체를 방금 읽었다).
    글 줄 뽑기는 board-links.mjs extractDatedRows 그대로(날짜 붙은 줄 · 되풀이되는 주소 꼴)이고, 링크를 푸는 눈만 바꾼다(resolve).
@@ -45,13 +45,21 @@ export function markerUrl(boardUrl, title) {
 }
 
 export const NEWS_BOARD_RULES = {
-  /* 경희대: 행이 <a href="javascript:view('323229','')">. 정찰(2026-10-01 probe-links)에서 눌러 보니 POST 로 …/BMSR00040/view.do 가 열리고
-     주소에 번호가 없다 — 글 하나로 가는 GET 주소를 만들 수 없다(짐작하지 않는다). 목록 주소 + #n-제목 표식만 둔다. */
+  /* 경희대: 행이 <a href="javascript:view('323229','')">. 누르면 POST 로 …/BMSR00040/view.do 가 열리고 주소에 번호가 없다(정찰 2026-10-01) —
+     그래서 처음엔 목록 표식(listOnly)만 두었다. 2026-10-04 정찰(probe-links 47번째 실행)이 **GET** …/BMSR00040/view.do?menuNo=200316&boardId=323083 을
+     로그인 없는 새 탭으로 열어 그 글(「[교수학습개발원] 국제C 학부생을 위한 학습컨설팅 신청 안내(10월)」 · 제목 칸 · 이전글/다음글)을 봤다 —
+     같은 게시판 소프트웨어인 news.khu.ac.kr(장학 200318)도 같은 날 같은 꼴로 그 글이 열렸다. 주소는 목록 주소의 list.do 를 view.do 로 · menuNo 는 목록 주소의 것.
+     그래도 로봇은 매번 첫 글의 상세를 열어 제목을 확인한다(verifyRuleDetail) — 안 맞으면 그 실행은 싣지 않는다(옛 글은 그대로). */
   '경희대학교': {
-    kind: 'listOnly',
+    kind: 'onclick',
     fn: /\bview\(\s*['"](\d+)['"]/,
-    detail: (id, boardUrl, title) => markerUrl(boardUrl, title),
-    evidence: '정찰 2026-10-01: 행은 href="javascript:view(번호)" · 첫 줄을 누르면 POST 로 /kor/user/bbs/BMSR00040/view.do (주소에 번호 없음) → 글 하나의 주소가 없어 목록 표식(#n-)으로만',
+    detail: (id, boardUrl) => {
+      let menu = '';
+      try { menu = new URL(boardUrl).searchParams.get('menuNo') || ''; } catch { /* 목록 주소가 없으면 만들지 않는다 */ }
+      if (!menu || !/\/list\.do(?:[?#]|$)/.test(String(boardUrl))) return null;
+      return String(boardUrl).replace(/\/list\.do(?:[?#].*)?$/, '/view.do') + `?menuNo=${menu}&boardId=${id}`;
+    },
+    evidence: '정찰 2026-10-04(probe-links #47): GET /kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323083 이 로그인 없이 그 글(제목 칸 · 이전글/다음글)을 연다 · news.khu.ac.kr 200318 boardId=322415 도 같은 꼴로 그 글 · 2026-10-01 정찰은 행을 눌렀을 때 POST 라 번호가 안 보였다',
   },
   /* 서울시립대: 목록은 SSO 익명 확인을 거쳐야 글이 온다(정찰 2026-10-01: list.do → sso_index → … → list.do?…&identified=anonymous& 가 최종 주소 · 로봇은 그 최종 주소를 후보로 둔다).
      행은 <a href="javascript:fnView('1', '31583')"> 이고 첫 줄을 누르면 아래 주소(seq 만 다름)가 열렸다 — 그 주소를 그대로 옮긴다. */

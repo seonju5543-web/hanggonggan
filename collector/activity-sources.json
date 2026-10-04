@@ -18,13 +18,6 @@
   {
    "school": "경희대학교",
    "campus": "공통",
-   "boardUrl": "https://khu.ac.kr/kor/notice/list.do?page=1&condition=all&category=GENERAL",
-   "evidence": "웹 검색 2026-09-29: \"경희대학교 공지사항 — 카테고리 GENERAL(일반) · 인권센터 공모전 등 모집 공고 포함\"",
-   "note": "본교 일반 공지 — 상세는 detail.do?seq= 형태. 목록이 스크립트로 그려지면 🟡 가 뜬다 → browser-targets 로 옮긴다"
-  },
-  {
-   "school": "경희대학교",
-   "campus": "공통",
    "boardUrl": "https://isss.khu.ac.kr/globalcenter/user/bbs/BMSR00040/list.do?menuNo=7900041",
    "evidence": "웹 검색 2026-09-29: \"취업/경력 · Job/Career — 글로벌교육지원팀(국제처)\" · 카카오스타일 글로벌 뷰티 서포터즈 모집 글이 여기 있었다",
    "note": "국제처 글로벌교육지원팀 「취업/경력」 게시판 — 장학 게시판(news.khu.ac.kr BMSR00040)과 같은 게시판 엔진"
@@ -115,13 +108,6 @@
   },
   {
    "school": "",
-   "host": "청년재단",
-   "boardUrl": "https://kyf.or.kr/user/boardList.do?bbsId=BBSMSTR_000000000367",
-   "evidence": "웹 검색 2026-09-29: \"2024년 청년재단 서포터즈 청년Z 모집 공고 — kyf.or.kr/user/boardDetail.do?bbsId=BBSMSTR_000000000367\"",
-   "note": "상세 주소에서 목록 이름(boardList.do)을 유추했다 — 첫 리포트에서 ⚠️ 면 주소를 확인한다"
-  },
-  {
-   "school": "",
    "host": "부산청년플랫폼",
    "boardUrl": "https://young.busan.go.kr/jprog/list.nm",
    "evidence": "웹 검색 2026-09-29(3차): \"총 - : 부산청년플랫폼 — young.busan.go.kr/jprog/list.nm\" · 청년 프로그램 목록 · 청정넷 청년위원 모집",
@@ -161,8 +147,33 @@
    "boardUrl": "https://youth.gyeongnam.go.kr/",
    "evidence": "웹 검색 2026-09-29(3차): \"경상남도 청년정보플랫폼 — youth.gyeongnam.go.kr\"",
    "note": "홈 화면의 링크만 읽는다 — 목록 주소는 첫 리포트 뒤 보정"
+  },
+  {
+   "school": "",
+   "campus": "",
+   "boardUrl": "https://kyf.or.kr/user/board.do?boardType=notice",
+   "evidence": "2026-10-04 재단 첫 화면 메뉴 「공지사항」 → /user/board.do?boardType=notice (200 · 공모전·참여청년 모집 글이 행으로 보임: 「2026년 청년다다름사업 참여수기 공모전 안내」 등). 옛 주소 boardList.do?bbsId=…367 은 404",
+   "note": "행이 fn_detail(번호, 게시판) 클릭이라 collect.mjs BOARD_RULES[청년재단] 이 읽는다",
+   "host": "청년재단"
   }
  ],
  "_parked": "쓰지 않게 된 게시판은 지우지 말고 여기로 옮긴다(schools.json 의 parked 와 같은 규칙 — 주소를 알아내는 데 든 시간을 버리지 않는다). 되돌리려면 항목을 위 sources 로 옮기면 된다.",
- "parked": []
+ "parked": [
+  {
+   "school": "",
+   "host": "청년재단",
+   "boardUrl": "https://kyf.or.kr/user/boardList.do?bbsId=BBSMSTR_000000000367",
+   "evidence": "웹 검색 2026-09-29: \"2024년 청년재단 서포터즈 청년Z 모집 공고 — kyf.or.kr/user/boardDetail.do?bbsId=BBSMSTR_000000000367\"",
+   "note": "상세 주소에서 목록 이름(boardList.do)을 유추했다 — 첫 리포트에서 ⚠️ 면 주소를 확인한다",
+   "parkedAt": "2026-10-04 18:41 KST"
+  },
+  {
+   "school": "경희대학교",
+   "campus": "공통",
+   "boardUrl": "https://khu.ac.kr/kor/notice/list.do?page=1&condition=all&category=GENERAL",
+   "evidence": "웹 검색 2026-09-29: \"경희대학교 공지사항 — 카테고리 GENERAL(일반) · 인권센터 공모전 등 모집 공고 포함\"",
+   "note": "본교 일반 공지 — 상세는 detail.do?seq= 형태. 목록이 스크립트로 그려지면 🟡 가 뜬다 → browser-targets 로 옮긴다",
+   "parkedAt": "2026-10-04 18:42 KST"
+  }
+ ]
 }

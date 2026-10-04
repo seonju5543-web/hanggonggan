@@ -1384,11 +1384,11 @@ console.log('\n■ 수집망 복원 (2026-09-29 · 2026-08-30 좁힘을 되돌�
   /* 앱·알림·발행이 같이 쓰는 상수 — schools.json 과 같아야 한다 (자세한 대조는 「화면이 보여 주는 학교 = 로봇이 수집하는 학교」) */
   const served = createRequire(import.meta.url)('../match-engine.js').SERVED_SCHOOLS;
   eq('앱 상수 SERVED_SCHOOLS 도 44곳 전부다', REVIVED.filter((n) => !served.includes(n)), []);
-  /* 서비스한다고 적었는데 아무 로봇도 안 읽는 학교 — 학생은 빈 피드를 본다. 지금은 게시판 주소가 없는 분교 셋뿐이고(개발자가 주소를 줘야 한다),
-     넷째가 조용히 생기면 여기서 잡는다(리뷰 2026-09-30). */
+  /* 서비스한다고 적었는데 아무 로봇도 안 읽는 학교 — 학생은 빈 피드를 본다. 주소 없던 분교 셋은 2026-10-04 에 주소를 찾아 넣었다
+     (아래 「낡은 게시판 주소 고침」) — 이제 하나라도 조용히 생기면 여기서 잡는다(리뷰 2026-09-30). */
   const browserSet = new Set(bt.targets.map((x) => x.school));
   const unread = [...new Set(sc.schools.filter((x) => !x.boardUrl && !browserSet.has(x.school)).map((x) => x.school))].sort();
-  eq('아무 로봇도 안 읽는 서비스 학교는 주소 없는 분교 셋뿐이다', unread, ['고려대학교 세종캠퍼스', '동국대학교 WISE캠퍼스', '연세대학교 미래캠퍼스']);
+  eq('모든 서비스 학교를 어느 로봇인가가 읽는다', unread, []);
   /* 보관 자리의 규칙은 그대로 — 키가 사라지면 다음에 뺄 때 주소를 잃는다 */
   const parked = (o) => (Array.isArray(o.parked) ? o.parked : []);
   eq('보관 배열이 남아 있다 (비어 있어도 된다)', Array.isArray(sc.parked) && Array.isArray(bt.parked), true);
@@ -1823,6 +1823,16 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
     eq('  빈 파일은 전부 연다', rb.allowedByRules(rb.parseRobots(''), '/anything'), true);
     eq('  파일을 못 받으면 읽어도 된다고 본다 (없는 것과 막힌 것은 다르다)', await rb.robotsAllows('https://none.invalid/x', async () => { throw new Error('ENOTFOUND'); }), true);
     eq('  Disallow: / 는 전부 막는다', await rb.robotsAllows('https://blocked.invalid/x', async () => ({ ok: true, headers: { get: () => 'text/plain' }, text: async () => 'User-agent: *\nDisallow: /' })), false);
+    /* 🔴 별표(*)는 '아무 글자'다 — 첫 별표에서 잘라 앞부분만 보면 `Disallow: /*down*` 이 `Disallow: /` 가 되어 사이트 전체를 막은 것으로 읽었다
+       (2026-10-04 · 인천유스톡톡·콘텐츠진흥원·한국외대 두 게시판이 ⛔ 였다 — 실제로 막은 것은 내려받기·관리 화면뿐). 판단은 경로+물음표 뒤까지로, 끝의 `$` 는 끝. */
+    const incheon = rb.parseRobots('User-agent: Googlebot\nDisallow: /search/\n\nUser-agent: *\nDisallow: /*down*\nDisallow: /*Down*');
+    const hufs = rb.parseRobots('User-agent: *\nDisallow: /*/*Mngr\nDisallow: /bbs/*/*/*/artclView.do\nDisallow: /*/*/subview.do?enc=*\nDisallow: /bbs/*');
+    const gov = rb.parseRobots('User-agent: *\nDisallow: /\nAllow: /portal/main \nAllow: /$');
+    eq('  🔴 별표는 아무 글자 — 인천 `/*down*` 은 게시판을 막지 않고 내려받기만 막는다',
+      [rb.allowedByRules(incheon, '/bbs/bbsMsgList.do?bcd=notice'), rb.allowedByRules(incheon, '/bbs/fileDownload.do?id=1'), rb.allowedByRules(rb.parseRobots('User-agent: *\nDisallow: /*/FileDown.do'), '/kocca/pims/list.do?menuNo=204104')], [true, false, true]);
+    eq('  한국외대 — 목록 화면은 열리고 관리 화면·enc 화면·/bbs/ 는 막힌다',
+      [rb.allowedByRules(hufs, '/student/12769/subview.do'), rb.allowedByRules(hufs, '/hufs/11302/subview.do'), rb.allowedByRules(hufs, '/hufs/11302/subview.do?enc=Zm5'), rb.allowedByRules(hufs, '/bbs/hufs/1/2/artclView.do'), rb.allowedByRules(hufs, '/a/bMngr')], [true, true, false, false, false]);
+    eq('  정부24 — 정말 다 막았다(`Disallow: /`) · Allow 와 `$` 끝 표시', [rb.allowedByRules(gov, '/portal/cnstexhb'), rb.allowedByRules(gov, '/portal/main'), rb.allowedByRules(gov, '/'), rb.allowedByRules(gov, '/x')], [false, true, true, false]);
     /* 배선 */
     eq('로봇 — 활동·재단 게시판만 robots.txt 를 묻는다 (학교 게시판은 그대로)', /if \(\(isAct \|\| isExt\) && !\(await robotsAllows\(s\.boardUrl\)\)\)/.test(cm), true);
     eq('  활동 글에 발췌·마감·분야를 싣는다', /const ex = activityExcerpts\(detail\.text\);[\s\S]*?it\.deadline = ex\.deadline;[\s\S]*?it\.excerpts = ex\.excerpts;[\s\S]*?activityField\(it\.title, it\.kind\)/.test(cm), true);
@@ -2063,8 +2073,21 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   /* 7차 실행·1차 정찰 반영 (2026-10-01) — 경희 목록 표식 · 줄 전체를 감싼 링크의 제목 꼬리 · 오래된 고정 공지 · 합격자 공고 */
   const khList = 'https://www.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200316';
   const khRows = RB.datedRowsFor('경희대학교', '<table>' + ['[KOICA] 몽골 관광인력 역량강화 프로젝트 봉사단 모집', '나눔바자회 자원봉사자 모집 안내', '2026학년도 2학기 수강신청 안내', '도서관 열람실 운영시간 변경 안내', '법정의무교육 이수 안내'].map((t, i) => `<tr><td><a href="javascript:view('32322${i}','');"><span>공통</span> ${t}</a></td><td>2026-10-0${i + 1}</td></tr>`).join('') + '</table>', khList);
-  eq('  경희 listOnly — 글 주소가 없어 목록 주소 + #n-제목 (앱이 「게시판 목록 ↗」 로 적는다) · 글 번호(postId)를 같이 든다', [khRows.length, khRows[0] && khRows[0].url, khRows[0] && khRows[0].postId], [5, khList + '#n-' + encodeURIComponent('공통 [KOICA] 몽골 관광인력 역량강화 프로젝트 봉사단 모집'), '323220']);
-  eq('    listOnly 는 상세 확인을 건너뛴다 (상세가 없다) · 나머지 규칙은 한다', [RB.needsDetailCheck(RB.NEWS_BOARD_RULES['경희대학교']), RB.needsDetailCheck(RB.NEWS_BOARD_RULES['동국대학교']), RB.needsDetailCheck(undefined)], [false, true, false]);
+  /* 2026-10-04 정찰(probe-links #47): 경희 GET 상세 view.do?menuNo=…&boardId=<번호> 가 로그인 없이 그 글을 연다 → listOnly(목록 표식)에서 onclick 으로 */
+  eq('  경희 — 행의 글 번호로 GET 상세 주소(목록 주소의 list.do → view.do · menuNo 그대로) · 글 번호(postId)를 같이 든다', [khRows.length, khRows[0] && khRows[0].url, khRows[0] && khRows[0].postId], [5, 'https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323220', '323220']);
+  eq('    목록 주소에 menuNo 가 없거나 list.do 꼴이 아니면 상세를 짓지 않는다 (짐작하지 않는다)', [RB.NEWS_BOARD_RULES['경희대학교'].detail('1', 'https://www.khu.ac.kr/kor/notice/list.do?category=GENERAL'), RB.NEWS_BOARD_RULES['경희대학교'].detail('1', 'https://www.khu.ac.kr/kor/user/bbs/BMSR00040/index.do?menuNo=200316')], [null, null]);
+  {
+    /* listOnly 꼴 자체는 남는다(글 하나의 GET 주소가 없는 게시판) — 지금 그 꼴의 학교가 없어 가짜 규칙으로 잰다 */
+    const LO = { kind: 'listOnly', fn: /\bview\(\s*['"](\d+)['"]/, detail: (id, b, t) => RB.markerUrl(b, t), evidence: '관문용' };
+    const loRows = BL.extractDatedRows('<table>' + ['[KOICA] 몽골 관광인력 역량강화 프로젝트 봉사단 모집', '나눔바자회 자원봉사자 모집 안내', '2026학년도 2학기 수강신청 안내'].map((t, i) => `<tr><td><a href="javascript:view('32322${i}','');"><span>공통</span> ${t}</a></td><td>2026-10-0${i + 1}</td></tr>`).join('') + '</table>', khList, { resolve: RB.ruleResolver(LO, khList) });
+    eq('    listOnly 는 목록 주소 + #n-제목 (앱이 「게시판 목록 ↗」 로 적는다) · 글 번호를 같이 든다', [loRows[0] && loRows[0].url, loRows[0] && loRows[0].postId], [khList + '#n-' + encodeURIComponent('공통 [KOICA] 몽골 관광인력 역량강화 프로젝트 봉사단 모집'), '323220']);
+    eq('    listOnly 는 상세 확인을 건너뛴다 (상세가 없다) · 나머지 규칙(경희 GET 포함)은 한다', [RB.needsDetailCheck(LO), RB.needsDetailCheck(RB.NEWS_BOARD_RULES['경희대학교']), RB.needsDetailCheck(RB.NEWS_BOARD_RULES['동국대학교']), RB.needsDetailCheck(undefined)], [false, true, true, false]);
+    /* 정찰이 본 경희 상세 화면의 생김새(제목 칸 · 분류 꼬리표 · 이전글/다음글) — 수집기의 첫 글 확인이 통과해야 한다 */
+    const khDetail = `<div class="board02"><div class="row clearfix"><div class="txtWine label">제목</div><div class="tit"><span class="txtBox01 common"> 공통 </span><p class="txt06"> [KOICA] 몽골 관광인력 역량강화 프로젝트 봉사단 모집</p></div><div class="dateBox"><span class="date rightBar">2026-10-01</span><span class="hits">조회수 168</span></div></div><div class="row contents">본문</div><ul class="otherList"><li><div class="label">이전글</div><a href="javascript:view('323219','');"><p class="txt06">나눔바자회 자원봉사자 모집 안내</p></a></li><li><div class="label">다음글</div><a href="javascript:view('323221','');"><p class="txt06">2026학년도 2학기 수강신청 안내</p></a></li></ul></div>`;
+    const khFetch = async (u) => ({ ok: true, status: 200, url: u, text: async () => khDetail });
+    eq('    경희 상세 화면(정찰 생김새)이면 첫 글 확인을 통과한다 · 목록으로 되돌아오면 실패', [(await RB.verifyRuleDetail(khRows[0], { rule: RB.NEWS_BOARD_RULES['경희대학교'], boardUrl: khList, others: khRows.map((r) => r.title), fetch: khFetch })).ok,
+      (await RB.verifyRuleDetail(khRows[0], { rule: RB.NEWS_BOARD_RULES['경희대학교'], boardUrl: khList, others: khRows.map((r) => r.title), fetch: async () => ({ ok: true, status: 200, url: khList, text: async () => khDetail }) })).ok], [true, false]);
+  }
   eq('    두 로봇이 needsDetailCheck 로 가른다', /needsDetailCheck\(rule\) && fresh\.length/.test(rn) && /needsDetailCheck\(NEWS_BOARD_RULES\[s\.school\]\)/.test(fn), true);
   /* 리뷰 2026-10-02: 날짜 뒤 낱말 목록으로 가르면 목록에 없는 낱말(「중단」)에서 제목이 잘렸다 — 이제 **그 줄의 게시일과 같은 날짜** 뒤에 작성자 한 낱말·조회수만 올 때만 자른다 */
   const CT = [['양산지역 학생통학버스 운행 시간표 변경 안내 2026.09.17. 임준택', '2026-09-17'], ['2026-2학기 비교과 교육과정 안내 2026.09.02. 한정 조회 1128', '2026-09-02'], ['2026.10.2 하교 셔틀버스 노선 임시 변경 안내', '2026-10-02'],
@@ -7350,8 +7373,8 @@ console.log('\n■ 시작 화면 — 승인받은 컷 A 그대로인가 (2026-09
     /'--start-dur'/.test(mont) && !/setTimeout\([^)]*,\s*\d/.test(mont), true);
   eq('덮개가 열리는 순간에 시작한다 (whenBootOpen · boot:open)', /whenBootOpen\(/.test(mont) && /'boot:open'/.test(app), true);
   const bootJs = readText(new URL('boot.js', root));
-  eq("  boot.js 가 열림 단계에서 그 신호를 보낸다 ('boot-open' 바로 뒤)",
-    /classList\.add\('boot-open'\);[\s\S]{0,400}dispatchEvent\(new Event\('boot:open'\)\)/.test(bootJs), true);
+  eq("  boot.js 가 걷히기 시작할 때 그 신호를 보낸다 ('boot-fade' 바로 뒤)",
+    /classList\.add\('boot-fade'\);[\s\S]{0,400}dispatchEvent\(new Event\('boot:open'\)\)/.test(bootJs), true);
   eq('마지막 장면은 .last (멈춘 채 남는다 · 한 번 재생)', /'last' : 'run'/.test(mont), true);
   /* 🔴 되돌아와도 다시 돌지 않는다 — display:none 에서 다시 보이면 CSS 애니메이션이 처음부터 다시 돈다(실측) */
   eq('  다 돌면 멈춘 상태를 굳힌다 (start-done — 1단계에서 돌아와도 셋이 다시 돌지 않는다)',
@@ -7580,63 +7603,112 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
     [wordIn.dur, wordIn.delay], [useOf(bootMock, 'boot-in-word').dur, useOf(bootMock, 'boot-in-word').delay]);
   eq('시안의 도는 표시 지연이 앱과 같다', spinIn.delay, useOf(bootMock, 'boot-spin-in').delay);
 
-  /* ⑩ 🔴 부팅 화면의 **걷힘 움직임** (2026-09-11 개발자 지시 — 카카오웹툰 환영 화면 참고:
-     "한대장 또한 스플래시에서 다음과 같은 인터랙션이 있었으면 좋겠어").
-     페이드가 아니라 로고가 세로 막대로 접혔다가(.boot-fold) 그 자리에 뚫린 구멍이 커지며
-     앱이 열린다(.boot-open). 설계 문서 '걷힘 움직임' 절. 여기서 지키는 것은 다섯 —
-     값이 어긋나면 화면은 멀쩡해 보이면서 조용히 나빠지는 유형이라 글로만 두면 되돌아간다. */
+  /* ⑩ 🔴 부팅 화면의 **걷힘 움직임** — 페이드 (2026-10-04 개발자 결정: "둘 다 페이드로").
+     로고·글자가 살짝 커지며 흐려지고 덮개가 투명해지며 밑의 앱이 드러난다(.boot-fade).
+     (2026-09-11 의 접힘·구멍 걷힘을 대신한다.) 값이 어긋나면 화면은 멀쩡해 보이면서 조용히
+     나빠지는 유형이라 글로만 두면 되돌아간다. */
   const bootBlock = css.slice(css.indexOf('#boot {'), css.indexOf('.resume-card {'));
   const msVar = (text, name) => {
     const m = text.match(new RegExp('\\s' + name + ':\\s*([\\d.]+)(ms|s)\\b'));
     return m ? Number(m[1]) * (m[2] === 's' ? 1000 : 1) : NaN;
   };
-  const foldMs = msVar(bootBlock, '--boot-fold');
-  const holdMs = msVar(bootBlock, '--boot-hold');
-  const openMs = msVar(bootBlock, '--boot-open');
-  eq('걷힘에 접힘 단계가 있다 (--boot-fold)', Number.isFinite(foldMs) && foldMs > 0, true);
-  eq('접힌 막대에서 쉬는 시간이 CSS 에 있다 (--boot-hold — JS 에 숫자로 두면 합계에서 빠진다)',
-    Number.isFinite(holdMs) && holdMs >= 0, true);
-  eq('걷힘에 열림 단계가 있다 (--boot-open)', Number.isFinite(openMs) && openMs > 0, true);
-  /* ㉮ 바닥값(1초) **뒤에** 붙는 시간이라 길수록 그대로 앱이 느려 보인다 — 0.8초가 천장이다.
-     쉼까지 셋을 합쳐 잰다(2026-09-11 코드 리뷰: 쉼이 JS 에만 있어 합계에서 빠져 있었다). */
-  eq('접힘+쉼+열림이 0.8초를 넘지 않는다 (바닥값 뒤에 붙는 시간이라 그대로 느려 보인다)',
-    foldMs + holdMs + openMs <= 800, true, `${foldMs}+${holdMs}+${openMs}`);
-  /* ㉯ 접힘은 transition 이 아니라 keyframes — 등장 애니메이션(both)이 쥔 transform 은
-     transition 으로 안 이어진다(260ms 가 한 프레임에 툭 바뀌었다 · 녹화로 확인) */
-  eq('접힘은 keyframes 애니메이션이다 (transition 은 등장 애니메이션이 쥔 속성을 못 움직인다)',
-    /#boot\.boot-fold \.boot-logo\s*\{[^}]*animation:\s*boot-fold-logo/.test(bootBlock)
-      && /@keyframes boot-fold-logo/.test(bootBlock), true);
-  eq('걷힘에 infinite 가 없다', /boot-fold[^;]*infinite|boot-open[^;]*infinite/.test(bootBlock), false);
-  /* ㉰ 열림은 덮개에 뚫는 구멍이다 — 막대를 따로 흐리게 하면 '막대가 창이 된다'가 깨진다 */
-  eq('열림은 덮개의 구멍(clip-path polygon evenodd)이다',
-    /#boot\.boot-open\s*\{[^}]*clip-path:\s*polygon\(evenodd/.test(bootBlock), true);
-  eq('열림 단계에서 막대를 따로 흐리게 하지 않는다 (구멍이 막대까지 같이 잘라낸다)',
-    /#boot\.boot-open \.boot-logo\s*\{[^}]*opacity/.test(bootBlock), false);
-  /* ㉱ 걷히기 시작하면 도는 표시를 끈다 — 걷힘이 1.2초를 넘겨 표시가 스며 나오던 것(실측) */
+  const fadeMs = msVar(bootBlock, '--boot-fade');
+  eq('걷힘의 길이가 CSS 에 있다 (--boot-fade)', Number.isFinite(fadeMs) && fadeMs > 0, true);
+  /* ㉮ 바닥값 **뒤에** 붙는 시간이라 길수록 그대로 앱이 느려 보인다 — 옛 걷힘의 천장(0.8초)을 그대로 둔다 */
+  eq('걷힘이 0.8초를 넘지 않는다 (바닥값 뒤에 붙는 시간이라 그대로 느려 보인다)', fadeMs <= 800, true, String(fadeMs));
+  eq('옛 접힘·구멍 걷힘이 남아 있지 않다 (두 걷힘이 섞이면 한 화면이 두 번 닫힌다)',
+    /--boot-fold|--boot-open|boot-fold-logo|polygon\(evenodd/.test(bootBlock), false);
+  eq('걷힘은 덮개를 투명하게 한다 (#boot.boot-fade 에 opacity 0 + transition)',
+    /#boot\.boot-fade\s*\{[^}]*opacity:\s*0;[^}]*transition:\s*opacity var\(--boot-fade\)/.test(bootBlock), true);
+  /* ㉯ 로고·글자는 transition 이 아니라 keyframes — 등장 애니메이션(both)이 쥔 transform 은
+     transition 으로 안 이어진다(2026-09-11 녹화로 확인한 성질 · 260ms 가 한 프레임에 툭 바뀌었다) */
+  eq('로고·글자의 걷힘은 keyframes 애니메이션이다',
+    /#boot\.boot-fade \.boot-logo,\s*#boot\.boot-fade \.boot-word\s*\{\s*animation:\s*boot-fade-out/.test(bootBlock)
+      && /@keyframes boot-fade-out/.test(bootBlock), true);
+  eq('걷힘에 infinite 가 없다', /boot-fade[^;]*infinite/.test(bootBlock), false);
+  eq('투명해지는 동안 덮개가 터치를 먹지 않는다 (밑의 앱이 받는다)',
+    /#boot\.boot-fade\s*\{[^}]*pointer-events:\s*none/.test(bootBlock), true);
+  /* ㉰ 걷히기 시작하면 도는 표시를 끈다 — 앱이 제때 왔는데 기다리는 표시가 스며 나오는 모순 */
   eq('걷히기 시작하면 도는 표시를 끈다',
-    /#boot\.boot-fold \.boot-spin\s*\{[^}]*animation:\s*none;\s*opacity:\s*0/.test(bootBlock), true);
-  /* ㉲ boot.js 는 시간을 CSS 에서 **읽기만** 한다 — 숫자를 두 곳에 적으면 한쪽만 고쳐져 어긋난다 */
+    /#boot\.boot-fade \.boot-spin\s*\{[^}]*animation:\s*none;\s*opacity:\s*0/.test(bootBlock), true);
+  /* ㉱ boot.js 는 시간을 CSS 에서 **읽기만** 한다 — 숫자를 두 곳에 적으면 한쪽만 고쳐져 어긋난다 */
   const doneBody = bootJs2.slice(bootJs2.indexOf('window.bootDone'));
-  eq('boot.js 가 걷힘 시간을 CSS 에서 읽는다',
-    /--boot-fold/.test(doneBody) && /--boot-hold/.test(doneBody) && /--boot-open/.test(doneBody), true);
-  /* 두 번째 인자가 숫자로 **시작**하는 setTimeout 을 잡는다 — `}, 440)` · `, 60 + foldMs)` ·
-     `, 0.44 * 1000)` · `setTimeout(hide, 440)` 전부. `openMs + 20` 처럼 변수로 시작하면 통과. */
+  eq('boot.js 가 걷힘 시간을 CSS 에서 읽는다', /getPropertyValue\('--boot-fade'\)/.test(doneBody), true);
+  /* 두 번째 인자가 숫자로 **시작**하는 setTimeout 을 잡는다 — `}, 440)` · `, 60 + x)` · `, 0.44 * 1000)` 전부.
+     `fadeMs + 20` 처럼 변수로 시작하면 통과. */
   eq('boot.js 가 걷힘 시간을 숫자로 적어 두지 않는다 (setTimeout 두 번째 인자가 숫자로 시작하면 안 된다)',
     /,\s*\d[\d.]*\s*(?:\)|\*|\+|-)/.test(doneBody), false);
-  eq('boot.js 가 접힘·열림 두 단계를 차례로 켠다',
-    doneBody.indexOf("'boot-fold'") > 0 && doneBody.indexOf("'boot-open'") > doneBody.indexOf("'boot-fold'"), true);
-  /* ㉳ 움직임 줄이기 기기에서는 접지도 열지도 않는다 — 둘 다 0 이면 boot.js 도 곧바로 넘긴다 */
-  eq('움직임 줄이기에서 세 값을 0 으로 준다',
-    /#boot\s*\{\s*--boot-fold:\s*0ms;\s*--boot-hold:\s*0ms;\s*--boot-open:\s*0ms;/.test(reduce.slice(0, 900)), true);
-  eq('움직임 줄이기에서 구멍을 뚫지 않는다',
-    /#boot\.boot-fold,\s*#boot\.boot-open\s*\{\s*clip-path:\s*none/.test(reduce.slice(0, 900)), true);
-  /* ㉴ 시안과 갈라지지 않는다 — 값을 못 박지 않고 둘이 같은가만 잰다 */
-  eq('시안의 접힘 길이가 앱과 같다', msVar(bootMock, '--boot-fold'), foldMs);
-  eq('시안의 쉼 길이가 앱과 같다', msVar(bootMock, '--boot-hold'), holdMs);
-  eq('시안의 열림 길이가 앱과 같다', msVar(bootMock, '--boot-open'), openMs);
+  /* ㉲ 움직임 줄이기 기기에서는 흐리지 않고 곧바로 사라진다 — 0 이면 boot.js 도 곧바로 넘긴다 */
+  eq('움직임 줄이기에서 걷힘 길이를 0 으로 준다', /#boot\s*\{\s*--boot-fade:\s*0ms;/.test(reduce.slice(0, 900)), true);
+  /* ㉳ 시안과 갈라지지 않는다 — 값을 못 박지 않고 둘이 같은가만 잰다 */
+  eq('시안의 걷힘 길이가 앱과 같다', msVar(bootMock, '--boot-fade'), fadeMs);
   eq('시안의 스크립트도 시간을 CSS 에서 읽는다 (숫자를 박으면 CSS 를 고칠 때 어긋난다)',
-    /getPropertyValue\('--boot-fold'\)|ms\('--boot-fold'\)/.test(bootMock)
-      && !/,\s*\d[\d.]*\s*\+\s*\d/.test(bootMock.slice(bootMock.indexOf('<script>'))), true);
+    /ms\('--boot-fade'\)/.test(bootMock) && !/,\s*\d[\d.]*\s*\+\s*\d/.test(bootMock.slice(bootMock.indexOf('<script>'))), true);
+
+  /* ⑪ 🔴 **인트로** — 오늘 처음 열었거나 4시간 넘게 쉬었을 때만 (2026-10-04 개발자 승인 · 시안 A안).
+     학사모 선이 그려지고 금색 점이 맺힌 뒤 '한대장' 이 나타나고, 정지했다가 위의 페이드로 걷힌다. */
+  const gapMs = (() => {
+    const m = bootJs2.match(/BOOT_INTRO_GAP_MS\s*=\s*([\d\s*]+);/);
+    return m ? m[1].split('*').reduce((a, b) => a * Number(b.trim()), 1) : NaN;
+  })();
+  /* 🔴 '홈으로 간다'(이어보기 창)와 '인트로가 뜬다'가 같은 순간에 바뀌어야 한다 — 두 곳에 적은 값을 대조한다 */
+  eq('인트로 간격이 이어보기 창(resume.js RESUME_WINDOW_MS)과 같다', gapMs, R.RESUME_WINDOW_MS);
+  eq('인트로 판단이 이어보기 장부의 마지막 시각을 읽는다', /localStorage\.getItem\('handaejang\.resume'\)/.test(bootJs2), true);
+  eq('날짜가 바뀌어도 인트로다 (오늘 처음 연 것)', /toDateString\(\)\s*!==\s*new Date\(nowAt\)\.toDateString\(\)/.test(bootJs2), true);
+  eq('처음 켠 학생에게는 인트로를 보이지 않는다 (온보딩 정문 투어링이 먼저)', /if \(!first\)\s*\{[\s\S]{0,120}handaejang\.resume/.test(bootJs2), true);
+  /* 🔴 글꼴을 기다린 뒤에 돈다 — 안 기다리면 '한대장' 이 뜨기 전에 앱으로 넘어간다(2026-10-04 시안에서 지적) */
+  eq('인트로가 글꼴 준비를 기다린다 (document.fonts.load)', /document\.fonts\.load\([^)]*한대장/.test(bootJs2), true);
+  eq('  그래도 무한정 기다리지는 않는다 (천장)', /setTimeout\(runIntro,\s*BOOT_FONT_WAIT_MS\)/.test(bootJs2), true);
+  eq('  최소 노출 시간을 인트로가 실제로 돈 때부터 센다',
+    /BOOT_INTRO_SHOW_MS\s*-\s*\(Date\.now\(\)\s*-\s*introRunAt\)/.test(bootJs2), true);
+  const introShow = Number((bootJs2.match(/BOOT_INTRO_SHOW_MS\s*=\s*(\d+)/) || [])[1]);
+  const introMock = readText(new URL('../docs/designs/mockups/first-run/Intro.dc.html', import.meta.url));
+  /* 앱의 선택자 하나와 시안의 선택자 하나에서 같은 애니메이션의 길이·늦추기를 읽는다 */
+  const useSel = (text, sel) => {
+    const i = text.indexOf(sel);
+    if (i < 0) return { dur: NaN, delay: NaN, decl: '' };
+    const decl = (text.slice(i).match(/animation:[^;]*;/) || [''])[0];
+    const secs = [...decl.matchAll(/([\d.]+)s\b/g)].map((m) => Number(m[1]) * 1000);
+    return { dur: secs[0], delay: secs[1] || 0, decl };
+  };
+  const PAIRS = [
+    ['로고', '#boot.boot-intro.boot-intro-run .boot-logo {', '.m-run .m-logo {'],
+    ['첫 선', '.boot-logo path:nth-of-type(1) {', '.m-logo path:nth-of-type(1) {'],
+    ['둘째 선', '.boot-logo path:nth-of-type(2) {', '.m-logo path:nth-of-type(2) {'],
+    ['셋째 선', '.boot-logo path:nth-of-type(3) {', '.m-logo path:nth-of-type(3) {'],
+    ['금색 점', '#boot.boot-intro.boot-intro-run .boot-dot {', '.m-run .m-dot {'],
+    ['글자', '#boot.boot-intro.boot-intro-run .boot-word {', '.m-run .m-word {'],
+  ];
+  let introEnd = 0;
+  for (const [label, appSel, mockSel] of PAIRS) {
+    const a = useSel(bootBlock, appSel), m = useSel(introMock, mockSel);
+    eq(`인트로 ${label}의 움직임을 읽어 냈다`, Number.isFinite(a.dur), true);
+    eq(`  시안과 같은 길이·늦추기다 (${label})`, [a.dur, a.delay], [m.dur, m.delay]);
+    eq(`  한 번만 움직인다 (${label})`, /infinite/.test(a.decl), false);
+    introEnd = Math.max(introEnd, a.dur + a.delay);
+  }
+  /* ㉮ 다 나타난 뒤 고요한 정지가 남아야 한다 — 걷히는 순간까지 움직이면 급해 보인다(평소 부팅과 같은 이유) */
+  eq('인트로 움직임이 최소 노출 시간 안에 끝난다 (끝나고 정지가 남는다)', introEnd < introShow, true, `${introEnd} < ${introShow}`);
+  eq('인트로 최소 노출 시간이 시안과 같다', introShow, Number((introMock.match(/INTRO_SHOW_MS\s*=\s*(\d+)/) || [])[1]));
+  eq('인트로 전체(글꼴 천장 + 노출)가 시한(6초)보다 짧다',
+    Number((bootJs2.match(/BOOT_FONT_WAIT_MS\s*=\s*(\d+)/) || [])[1]) + introShow
+      < Number((bootJs2.match(/BOOT_TIMEOUT_MS\s*=\s*(\d+)/) || [])[1]), true);
+  /* 부팅 덮개 블록만, 주석을 걷어 내고 본다 — 주석에는 '왜 넣지 않는가'를 적느라 그 문구가 있다 */
+  const idxHtml = readText(new URL('../index.html', import.meta.url));
+  const bootHtml = idxHtml.slice(idxHtml.indexOf('<div id="boot">'), idxHtml.indexOf('id="boot-fail"')).replace(/<!--[\s\S]*?-->/g, '');
+  eq('부팅 덮개 블록을 읽어 냈다', bootHtml.includes('boot-word'), true);
+  eq('태그라인이 없다 (매일 보는 화면의 광고 · 2026-10-04 개발자 확인)', /한 번에 찾고|장학금은 끝까지/.test(bootHtml), false);
+  /* 🔴 인트로가 평소 지연보다 길어 도는 표시가 매번 스며 나왔다(2026-10-04 브라우저 확인) —
+     인트로 날의 표시는 '글꼴 천장 + 인트로 노출' 이 지난 뒤에야 나와야 한다 */
+  const introSpin = useSel(bootBlock, '#boot.boot-intro .boot-spin {');
+  const spinDelay = (() => { const d = introSpin.decl.split(',').find((x) => x.includes('boot-spin-in')) || '';
+    const secs = [...d.matchAll(/([\d.]+)s\b/g)].map((m) => Number(m[1]) * 1000); return secs[1]; })();
+  eq('인트로 날의 도는 표시는 인트로가 끝난 뒤에야 나온다 (앱이 제때 오면 못 본다)',
+    spinDelay > Number((bootJs2.match(/BOOT_FONT_WAIT_MS\s*=\s*(\d+)/) || [])[1]) + introShow, true, String(spinDelay));
+  eq('움직임 줄이기에서 인트로는 다 그려진 로고 한 장이다',
+    /#boot\.boot-intro \.boot-logo path, #boot\.boot-intro\.boot-intro-run \.boot-logo path \{ animation: none; stroke-dashoffset: 0; \}/.test(reduce.slice(0, 1400)), true);
+  eq('스크립트보다 그림이 먼저 나와도 평소 등장이 시작되지 않는다 (인트로 날 깜빡임 방지)',
+    /html:not\(\[data-boot\]\) \.boot-logo,\s*html:not\(\[data-boot\]\) \.boot-word \{ animation-play-state: paused; \}/.test(css), true);
 
   /* ⑧ 🔴 알림 딥링크는 **공고 목록이 올 때까지 기다린다** (2026-09-09 개발자 지적).
      한 번 보고 없으면 탐색 탭으로 보내던 것이 원인이었다 — 회선이 느린 폰에서는 늘 그랬다. */
@@ -9377,7 +9449,7 @@ console.log('\n■ 관리자 쓰기 — 되돌릴 수 없는 일 앞의 안전�
      목록이 바뀌면 사람이 '이 동작도 공고 목록을 고치는가'를 한 번 본다. */
   eq('공고 목록을 안 고치는 동작 목록이 그대로다',
     cases.filter((c) => !writes.includes(c)).sort(),
-    ['activityHide', 'activityKind', 'activitySource', 'activityUnhide', 'addBoard', 'autoRegister', 'formQueue', 'newsHide', 'newsKind', 'newsSource', 'newsThumbOff', 'newsThumbOn', 'newsUnhide', 'unblock']);
+    ['activityHide', 'activityKind', 'activitySource', 'activityUnhide', 'addBoard', 'autoRegister', 'formQueue', 'linkFix', 'linkUnfix', 'newsHide', 'newsKind', 'newsSource', 'newsThumbOff', 'newsThumbOn', 'newsUnhide', 'unblock']);
 }
 
 console.log('\n■ 못 읽은 파일의 숫자를 화면이 단정하지 않는다');
@@ -11178,7 +11250,7 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
 
 console.log('\n■ 원문 링크 정직성 (2026-10-03 · 원문 대신 재단 홈페이지·게시판 목록이 열리던 사고)');
 /* 🔴 화면은 링크 이름을 source-link.js 한 곳에서만 받고, 로봇은 collector/link-landing.mjs 한 곳으로 판정한다.
-   갈래별 검사는 verify/link-gates/*.mjs (core · app · robot · producers · data) — verify/link-gates.mjs 가 차례로 부른다. */
+   갈래별 검사는 verify/link-gates/*.mjs (core · app · robot · producers · data · fixes · candidates · admin) — verify/link-gates.mjs 가 차례로 부른다. */
 {
   const { runLinkGates } = await import('./link-gates.mjs');
   await runLinkGates(eq);
@@ -11372,18 +11444,64 @@ console.log('\n■ 대외활동 — 「혜택」에 섞인 조건은 자격으�
   const r1 = AX.splitBenefit(arko);
   eq('① 줄글 — `…를 대상으로 운영` · `지원조건은 …에 한하며` · `채용조건은 만 39세 이하` 는 전부 조건 · 혜택은 없다', [r1.benefit, r1.conditions.length], ['', 3]);
   const r2 = AX.splitBenefit('1. 사업기간: 동계 4주간 2. 사업대상: 대전에 거주하는 만 18세 이상 39세 이하 청년 3. 사업내용: 행정체험형 연수');
-  eq('  번호 목록 — 대상은 자격 · 기간은 버림 · 내용은 혜택', [r2.conditions, r2.benefit], [['사업대상: 대전에 거주하는 만 18세 이상 39세 이하 청년'], '사업내용: 행정체험형 연수']);
+  eq('  번호 목록 — 대상은 자격 · 기간은 버림 · 내용은 혜택(이름표 `사업내용:` 은 뗀다 — 남기면 카드에 그 이름표만 뜬다)', [r2.conditions, r2.benefit], [['사업대상: 대전에 거주하는 만 18세 이상 39세 이하 청년'], '행정체험형 연수']);
   const r3 = AX.splitBenefit('○ 지원대상 : 대학생봉사단 ○ 지원방법 : 사업비 지원 ○ 지원내용 : 교육 제공');
-  eq('  기호 목록 — 지원대상은 자격 · `지원방법` 같은 다른 이름표는 혜택도 조건도 아니다 · 지원내용만 혜택', [r3.conditions, r3.benefit], [['지원대상 : 대학생봉사단'], '지원내용 : 교육 제공']);
+  eq('  기호 목록 — 지원대상은 자격 · `지원방법` 같은 다른 이름표는 혜택도 조건도 아니다 · 지원내용만 혜택', [r3.conditions, r3.benefit], [['지원대상 : 대학생봉사단'], '교육 제공']);
   eq('  🔴 `청년 자격증 응시료 지원` 의 \'자격증\' 은 조건이 아니다(낱말 하나로 가르지 않는다)', AX.splitBenefit('○ 1인 연 1회, 최대 10만원 범위 자격증시험 응시료 지원 ※ 그 중 1건만 지원 가능').conditions, []);
   const it = { excerpts: [{ label: '모집기간', text: '상시' }, { label: '혜택', text: arko.slice(0, 159) + '…' }], eligibilityLines: [] };
   eq('② 이미 실린 글 — 혜택 칸을 떼고 조건을 자격 줄로(잘린 `…` 꼬리는 지운다)', [AX.sanitizeBenefit(it), it.excerpts.map((x) => x.label), it.eligibilityLines.length >= 2], [true, ['모집기간'], true]);
+  /* 2026-10-04 같은 날 둘째 손질 — 카드에 `사업내용`·`지원내용`·`창업어가와 후견인을 1`·`해당없음` 이 떴다 */
+  const lab = { excerpts: [{ label: '혜택', text: '지원내용 : - 국가기술자격증 취득 교육 - 포럼 참석' }] };
+  eq('④ 조건이 없어도 맨 앞 혜택 이름표는 뗀다 · 나머지 글자는 그대로', [AX.sanitizeBenefit(lab), lab.excerpts[0].text], [true, '국가기술자격증 취득 교육 - 포럼 참석']);
+  const keep = { excerpts: [{ label: '혜택', text: '○ 항공료 지원 ○ 숙박 지원' }] };
+  eq('  이름표가 없는 혜택은 손대지 않는다(○ 항목 구분을 살린다)', [AX.sanitizeBenefit(keep), keep.excerpts[0].text], [false, '○ 항공료 지원 ○ 숙박 지원']);
+  eq('  API 의 `해당없음` 은 자격·제외 줄이 아니다', [MAPX.splitLines('해당없음'), MAPX.splitLines('해당 사항 없음'), MAPX.splitLines('만 19세 이상')], [[], [], ['만 19세 이상']]);
+  {
+    const appB = readText(new URL('../app.js', import.meta.url));
+    const s0 = appB.indexOf('function benefitItems'), s1 = appB.indexOf('/* 제목 괄호 속 대상');
+    const bf = new Function('unent', `${appB.slice(s0, s1)}; return benefitShort;`)((x) => String(x));
+    eq('  카드 아랫줄 — `1:1 매칭` 의 콜론에서 자르지 않는다 · `이름 : 값` 은 이름', [bf('창업어가와 후견인을 1:1 매칭하여, 후견인의 교육 및 지도에 필요한 비용 지원 ㅇ 기술 지도'), bf('○ 맞춤형 정책상담 : 1시간 ○ 기념품 : 선착순')], ['', '맞춤형 정책상담 외 1']);
+  }
   const yp = MAPX.mapYouthPolicy({ plcyNm: '무대기술인턴십 지원', aplyUrlAddr: 'https://arko.or.kr/board/view/4053?cid=1', aplyYmd: '20270101 ~ 20270630', sprtTrgtAgeLmtYn: 'N', plcySprtCn: arko }, { scholarship: /장학/ }).item;
   eq('  API 로봇 — 잘리기 전 원문 전체로 가른다(`채용조건은 만 39세 이하 청년` 이 `…` 로 잘리지 않는다) · 혜택 칸 없음',
     [yp.excerpts.some((x) => x.label === '혜택'), yp.eligibilityLines.includes('채용조건은 만 39세 이하 청년')], [false, true]);
   eq('  수집 로봇이 발행 때 모든 글에 매번', /acts\.items\.forEach\(sanitizeBenefit\)/.test(readText(new URL('../collector/collect.mjs', import.meta.url))), true);
   const fd = MEX.fitDetail({ eligibilityLines: r1.conditions, eligibility: {} }, { birthYear: new Date().getFullYear() - 22, status: '재학' });
   eq('③ 🔴 틀린 안심 금지 — `공연단체에 한하며`·`공연단체를 대상으로` 줄도 요건으로 센다(학생 개인에게 95% 가 떴다)', [fd.total, fd.met, fd.unknown >= 2], [3, 1, true]);   // 퍼센트가 아니라 met/total 로 잰다(관문 「적합도 상수」)
+}
+
+console.log('\n■ 낡은 게시판 주소 고침 (2026-10-04 개발자 "주소 낡은 거부터 다 고쳐") — 404 는 차단이 아니라 이사였다');
+{
+  /* 404 넷의 원인은 사이트가 주소를 옮긴 것(같은 도구로 같은 사이트의 다른 화면은 200) · 분교 둘은 첫 화면이 meta refresh 껍데기라 찾기 로봇이 메뉴를 못 봤다 */
+  const FB = await import('../collector/find-boards.mjs');
+  eq('① 찾기 로봇이 「site move」 껍데기를 같은 사이트 안에서만 따라간다',
+    [FB.metaRefreshTarget('<meta http-equiv="refresh" content="0;url=/koreaSejong/index.do">', 'https://sejong.korea.ac.kr/'),
+     FB.metaRefreshTarget('<meta http-equiv="refresh" content="0;url=https://evil.example/">', 'https://sejong.korea.ac.kr/'),
+     FB.metaRefreshTarget('<html><body>메뉴</body></html>', 'https://sejong.korea.ac.kr/')],
+    ['https://sejong.korea.ac.kr/koreaSejong/index.do', null, null]);
+  /* collect.mjs 는 불러오는 순간 수집을 시작하므로 규칙 표만 떼어 실행한다(행 읽기 식은 rowsByRule 과 같은 것) */
+  const csrc = readText(new URL('../collector/collect.mjs', import.meta.url));
+  const { NEWS_BOARD_RULES } = await import('../collector/news-board-rules.mjs');
+  const RULES = new Function('NEWS_BOARD_RULES', `return ${csrc.slice(csrc.indexOf('const BOARD_RULES = {') + 'const BOARD_RULES = '.length, csrc.indexOf('\n};', csrc.indexOf('const BOARD_RULES = {')) + 2)};`)(NEWS_BOARD_RULES);
+  const rows = (rule, html, boardUrl) => [...html.matchAll(/<a\b[^>]*onclick\s*=\s*(["'])((?:(?!\1)[\s\S])*)\1[^>]*>([\s\S]*?)<\/a>/gi)].map((m) => {
+    const hit = m[2].match(rule.fn) || []; const id = hit[1];
+    const inner = rule.titleIn ? ((m[3].match(rule.titleIn) || [])[1] ?? m[3]) : m[3];
+    return id ? { title: inner.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), url: rule.detail(id, boardUrl, hit) } : null;
+  }).filter(Boolean);
+  eq('② 청년재단 — 번호 둘(글·게시판)로 재단 첫 화면과 같은 상세 주소 · 제목 칸만(번호·날짜·조회수 빼고)',
+    rows(RULES['청년재단'], `<a class="v2-board-list__row" href="javascript:void(0)" onclick="fn_detail('10053','BBSMSTR_000000000367')"> <span> 807 </span> <strong> 2026년 청년다다름사업 참여수기 공모전 안내 </strong> <span>2026.09.21</span> <span>37</span> </a>`, 'https://kyf.or.kr/user/board.do?boardType=notice'),
+    [{ title: '2026년 청년다다름사업 참여수기 공모전 안내', url: 'https://kyf.or.kr/user/boardDetail.do?boardType=notice&bbsId=BBSMSTR_000000000367&nttNo=10053' }]);
+  eq('③ 동국 WISE — 교내 소식 규칙을 불러 쓴다(베끼지 않는다) · 제목 칸만',
+    [/'동국대학교 WISE캠퍼스': \{ \.\.\.NEWS_BOARD_RULES\['동국대학교 WISE캠퍼스'\]/.test(csrc),
+     rows(RULES['동국대학교 WISE캠퍼스'], `<a href="#none" onclick="goDetail(520676);"> <div class="mark"><span class="num">619</span></div> <div class="top"> <em>교외장학(지자체, 사설/기타)</em> <p class="tit"> 대전청년내일재단 2026년 장학생 선발 안내 </p> <div class="info"> <span>2026.09.28.</span> <span>양문수</span> <span>조회 171</span> </div> </div> </a>`, 'https://wise.dongguk.ac.kr/article/servicenotice/list')],
+    [true, [{ title: '대전청년내일재단 2026년 장학생 선발 안내', url: 'https://wise.dongguk.ac.kr/article/servicenotice/detail/520676' }]]);
+  eq('  학교 없는 전국 출처는 주최 이름으로 규칙을 찾는다 · 전북(한 번호) 규칙은 그대로', [/BOARD_RULES\[s\.school \|\| s\.host\]/.test(csrc), rows(RULES['전북대학교'], `<a href="javascript:;" onclick="pf_DetailMove('215647')">장학생 선발 공고 안내</a>`, 'x')[0].url], [true, 'https://www.jbnu.ac.kr/web/Board/215647/detailView.do?category=6']);
+  const SCH = JSON.parse(readText(new URL('../collector/schools.json', import.meta.url)));
+  const ACTSRC = JSON.parse(readText(new URL('../collector/activity-sources.json', import.meta.url)));
+  eq('④ 404 주소는 출처에서 빠지고 보관됐다 · 분교 셋은 주소가 있다',
+    [ACTSRC.sources.some((x) => /boardList\.do\?bbsId=BBSMSTR_000000000367|khu\.ac\.kr\/kor\/notice\/list\.do/.test(x.boardUrl)), ACTSRC.parked.filter((x) => /boardList\.do\?bbsId=BBSMSTR_000000000367|khu\.ac\.kr\/kor\/notice\/list\.do/.test(x.boardUrl)).length,
+     ['연세대학교 미래캠퍼스', '고려대학교 세종캠퍼스', '동국대학교 WISE캠퍼스'].map((n) => !!(SCH.schools.find((x) => x.school === n) || {}).boardUrl)],
+    [false, 2, [true, true, true]]);
 }
 
 console.log('\n■ 자격요건 로봇 (진짜 브라우저) — 장학·대외활동 (2026-10-04 개발자 "진짜 브라우저로 열어야 되는 공고는 다 이걸로 · 시간초과 등 오류 안 나게")');
@@ -11405,8 +11523,18 @@ console.log('\n■ 자격요건 로봇 (진짜 브라우저) — 장학·대외�
   const bRead = (txt) => AD.eligFromFiles({ title: '청년 체인지메이커 아카데미 운영' }, ['k-B.txt'], () => txt, '/tmp', () => false);
   eq('  🔴 브라우저 본문도 글 제목 낱말이 있어야 그 글의 것(포털 첫 화면 메뉴 `장애인 복지정책` 이 자격으로 뽑혔다) · 있으면 「브라우저 본문」',
     [bRead('도청 메뉴\n○ 지원대상 : 장애인 복지정책'), (bRead('청년 체인지메이커 아카데미 운영\n○ 지원대상 : 도내 거주 청년') || {}).from], [null, '브라우저 본문']);
+  /* 🔴 장학 쪽(rescue-bodies)도 한 페이지 절대 시한 — 2026-10-04 첫 클라우드 실행: 시작 전 예산만 보다가 넷째 공고에서 10분 멈춰
+     단계 시한에 잘렸고 받은 3건까지 잃었다. 시한을 기다리고(withDeadline) 닫기는 기다리지 않는다. */
+  const rb = readText(new URL('../collector/rescue-bodies.mjs', import.meta.url));
+  eq('  🔴 장학 본문 재수집도 페이지마다 절대 시한 · 멈춘 페이지의 닫기는 기다리지 않는다',
+    [/await withDeadline\(read, PAGE_MS\) === TIMED_OUT/.test(rb), /\n  page\.close\(\)\.catch/.test(rb), !/await page\.close\(\)/.test(rb)], [true, true, true]);
   /* 워크플로 */
   const wf = readText(new URL('../.github/workflows/rescue-bodies.yml', import.meta.url));
+  /* 🔴 PaddleOCR 판 고정 — 판을 안 적으면 그날 최신(3.3.x)이 깔려 x86 클라우드에서 모든 그림이 오류(2026-10-04 · 맥은 ARM 이라 멀쩡했다) */
+  for (const f of ['rescue-bodies.yml', 'collect-scholarships.yml']) {
+    const y = readText(new URL('../.github/workflows/' + f, import.meta.url));
+    eq(`  🔴 ${f} — PaddleOCR 은 판을 고정해 깐다`, [...y.matchAll(/pip install[^\n]*paddle[^\n]*/g)].map((m) => /paddlepaddle==[\d.]+ paddleocr==[\d.]+/.test(m[0])), [true]);
+  }
   const caps = [...wf.matchAll(/^ {8}timeout-minutes: (\d+)/gm)].map((m) => Number(m[1]));
   const job = Number((wf.match(/^ {4}timeout-minutes: (\d+)/m) || [])[1]);
   const ia = wf.indexOf('activity-docs.mjs --fetch --browser'), io = wf.indexOf('paddle-ocr.py collector/act-files'), ip = wf.indexOf('activity-docs.mjs --apply --browser'), ig = wf.indexOf('- name: 데이터 관문');

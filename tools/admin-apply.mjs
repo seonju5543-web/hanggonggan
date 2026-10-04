@@ -25,6 +25,7 @@ import { periodAfterDeadline, amountAfterValue } from './edit-diff.mjs';
 import { newsPostKey } from '../collector/news-board-rules.mjs';   // 소식 숨김 열쇠 한 곳 (수집 로봇의 newsHidden 과 같다)
 import { thumbKey, isThumbPath } from '../collector/news-thumb.mjs';   // 소식 썸네일 열쇠·꼴 한 곳 (썸네일 로봇과 같다)
 import { urlKey } from '../collector/url-key.mjs';
+import { AGGREGATOR_RE, checkFixUrl, fixKeyFor, linkItemOf, FIX_DATASETS, FIX_TEXT_MAX } from '../collector/link-fix.mjs';   // 원문 바로잡기 받아도 되는가 — 관리자 화면과 같은 파일
 
 /* 저장소 뿌리. 데이터 파일은 지금까지처럼 **작업 폴더 기준**으로 읽고 쓰지만(워크플로가
    저장소 안에서 돈다), 아래 '저장된 공고 원문'은 이 파일 기준으로 읽는다 — 검사도 같은 원문을
@@ -45,7 +46,7 @@ const idFromUrl = (prefix, raw) => {
 };
 
 /* 등록 규칙은 로봇이 쓰는 그 파일 하나뿐이다 — 화면이 따로 판단하게 만들지 않는다 */
-const { checkEntry } = createRequire(import.meta.url)('../verify/entry-rules.cjs');
+const { checkEntry, RULES: ENTRY_RULES } = createRequire(import.meta.url)('../verify/entry-rules.cjs');
 
 const REG = 'data/registered.json';
 const CFG = 'collector/auto-register-config.json';
@@ -280,6 +281,34 @@ function guardBulkRemove(targetIds) {
   }
   return { before, willRemove };
 }
+
+/* ── 원문 바로잡기 (2026-10-04 · 개발자 지시 *"정확하게 표시되지 않는 부분에 대해서는 관리자 페이지에 원문 공고를 추가할 수 있는 칸"*) ──
+   🔴 **장부에만 적는다** — data/link-fixes.json 의 fix. 데이터 파일의 sourceUrl·url 은 고치지 않는다:
+      실시간 공고·소식·대외활동 API·층2 재단은 로봇이 날마다 통째로 다시 만들어 고쳐 써도 다음 실행에 사라진다.
+      앱은 source-link.js ⑥(setLinkFixes)이 이 장부를 읽어 학생이 여는 주소와 링크 이름을 정한다.
+   🔴 이 장부를 쓰는 곳은 여기 하나다(로봇 몫은 data/link-check.json fix — 둘을 섞지 않는다). */
+const LINK_FIXES = 'data/link-fixes.json';
+const LINK_FIX_MAX = 50;   // 한 번에 받는 건수 — 화면은 '적어 두기'로 모아 한 번에 보낸다
+const SL = createRequire(import.meta.url)('../source-link.js');
+const cleanText = (v) => String(v == null ? '' : v).replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, FIX_TEXT_MAX);
+/* 묶음 하나의 지금 데이터 — 못 읽으면 null(없는 것으로 치고 넘어가지 않는다) */
+function linkFixItems(ds) {
+  const items = (p) => { const d = readJson(p, null); return d && Array.isArray(d.items) ? d.items : null; };
+  if (ds === 'registered') return reg.items;
+  if (ds === 'kosaf') return items('data/kosaf-open.json');
+  if (ds === 'external') return items('data/external.json');
+  if (ds === 'activities') return items(ACTS);
+  if (ds === 'news') return newsFiles().flatMap((f) => f.doc.items);
+  if (ds === 'notices') {
+    /* 폰은 학교별 파일만 받는다(옛 통짜 notices.json 은 로봇 장부) — 학생이 보는 글은 여기 있다 */
+    let names = [];
+    try { names = fs.readdirSync('data/notices').filter((f) => /\.json$/.test(f) && f !== 'index.json'); } catch { return null; }
+    return names.flatMap((f) => items(`data/notices/${f}`) || []);
+  }
+  return null;
+}
+/* 데이터에 실린 주소 그대로(학생이 지금 여는 것 — 바로잡기 전) */
+const linkRawOf = (ds, it) => (ds === 'kosaf' ? (it.home || '') : (it.sourceUrl != null && it.sourceUrl !== '' ? it.sourceUrl : (it.url || '')));
 
 let detail = '';
 let touched = false;
@@ -665,6 +694,18 @@ switch (action) {
       mark('eligibilityExcludes', 'eligibilityExcludesFrom');
       mark('eligibilityPriority', 'eligibilityPriorityFrom');
       mark('eligibilityLines', 'eligibilityFrom');   // 이미 열려 있던 칸 — 지금은 매일 지워진다
+      /* 원문 주소를 고쳤는데 같은 공고에 예전 「원문 바로잡기」(data/link-fixes.json)가 있으면 그것이 늘 이겨 고친 주소가 앱에 안 나간다
+         (리뷰 2026-10-04) — 같은 커밋에서 그 바로잡기를 지우고 기록에 남긴다. 사람이 방금 넣은 주소가 새 원문이다 */
+      if (changed.includes('sourceUrl')) {
+        const lf = readJson(LINK_FIXES, null);
+        const fk = `id:${it.id}`;
+        if (lf && lf.fix && lf.fix[fk]) {
+          delete lf.fix[fk];
+          lf.updatedAt = `${kstNow()} KST`;
+          writeJson(LINK_FIXES, lf);
+          changed.push('원문 바로잡기 지움');
+        }
+      }
       /* 🔴 마감일은 **비울 때도 표식을 남긴다** (2026-09-16 · G-3 ②). 다른 칸은 비우면 로봇에게
          돌려주는 게 맞지만, 마감은 로봇이 **같은 줄을 다시 읽어 같은 값을 되채우므로** 사람이
          틀린 마감을 지운 조치가 다음 날 조용히 무효가 됐다. `관리자 <날짜> · 비움` 이 남아 있으면
@@ -847,7 +888,7 @@ switch (action) {
       const s = payload.source || {};
       const url = String(s.boardUrl || '').trim();
       if (!/^https?:\/\//i.test(url)) fail(`게시판 주소는 http(s)로 시작해야 합니다: ${url}`);
-      if (/linkareer|wevity|thinkcontest|campuspick|all-con|contestkorea|thinkyou|allforyoung/i.test(url)) fail('집계 사이트는 출처로 넣지 않습니다 — 주최의 제 게시판을 넣어 주세요');
+      if (AGGREGATOR_RE.test(url)) fail('집계 사이트는 출처로 넣지 않습니다 — 주최의 제 게시판을 넣어 주세요');
       if ([...src.sources, ...src.parked].some((x) => canonUrl(x.boardUrl || '') === canonUrl(url))) fail('이미 있는 게시판 주소입니다');
       const school = String(s.school || '').trim();
       const host = String(s.host || '').trim();
@@ -1016,6 +1057,98 @@ switch (action) {
       fail(`알 수 없는 출처 작업입니다: ${op}`);
     }
     writeJson(NEWS_SRC, src);
+    touched = true;
+    break;
+  }
+
+  /* ── 원문 바로잡기 — 관리자가 원문 공고 주소를 넣는다 (2026-10-04) ─────────────────────
+     payload = { fixes: [{ ds, id?(정식 등록·층2) | code?(층2), from(화면이 본 지금 주소), url, title?, note? }], force? }
+     🔴 누가(by)는 요청 본문이 아니라 워크플로의 ACTOR 에서 · 회차(round)는 층2만, 요청이 아니라 **지금 데이터의 마감(due)**에서.
+     🔴 화면이 본 주소(from)와 지금 데이터의 주소가 다르면 멈춘다 — 그 사이 로봇이 주소를 바꿨으면 사람이 본 판이 아니다
+        (기기 사이 덮어쓰기와 같은 규칙 · docs/designs/sync-overwrite.md). force 는 정식 등록·층2 에만 뜻이 있다. */
+  case 'linkFix': {
+    const fixes = Array.isArray(payload.fixes) ? payload.fixes : [];
+    if (!fixes.length) fail('넣을 원문 주소가 없습니다');
+    if (fixes.length > LINK_FIX_MAX) fail(`한 번에 ${LINK_FIX_MAX}건까지만 받습니다 (받은 것: ${fixes.length}건)`);
+    const doc = readJson(LINK_FIXES, null) || { v: 1, fix: {} };
+    if (!doc.fix || typeof doc.fix !== 'object' || Array.isArray(doc.fix)) doc.fix = {};
+    const cache = {};
+    const done = [];
+    for (const fx of fixes) {
+      const ds = String((fx && fx.ds) || '');
+      if (!FIX_DATASETS.includes(ds)) fail(`모르는 묶음입니다: ${ds} (받는 것: ${FIX_DATASETS.join('·')})`);
+      const items = cache[ds] || (cache[ds] = linkFixItems(ds));
+      if (!items) fail(`${ds} 데이터를 읽지 못했습니다`);
+      const from = SL.decodeUrlEntities(fx.from || '');
+      let it = null;
+      if (ds === 'registered') {
+        it = items.find((x) => x.id === fx.id);
+        if (!it) fail(`정식 등록에 그 공고가 없습니다: ${fx.id}`);
+      } else if (ds === 'kosaf') {
+        const code = String(fx.code || String(fx.id || '').replace(/^kosaf-/, ''));
+        it = items.find((x) => String(x.code) === code);
+        if (!it) fail(`층2 재단 목록에 그 공고가 없습니다: ${code}`);
+      } else {
+        if (!from) fail('바로잡을 글의 지금 주소(from)가 없습니다');
+        it = items.find((x) => SL.decodeUrlEntities(linkRawOf(ds, x)) === from);
+        if (!it) fail(`지금 데이터에서 그 글을 찾지 못했습니다(${from}) — 그 사이 로봇이 주소를 바꿨거나 글이 내려갔습니다. 화면을 새로 고쳐 다시 넣어 주세요`);
+      }
+      const current = SL.decodeUrlEntities(linkRawOf(ds, it));
+      if (current !== from && !payload.force) fail(`그 사이 로봇이 주소를 바꿨습니다: 현재 ${current || '(주소 없음)'} — 화면을 새로 고쳐 다시 확인해 주세요`);
+      const name = it.name || it.title || it.id || it.code || '';
+      const chk = checkFixUrl(fx.url, { from: current, L: SL, downloadRe: ENTRY_RULES.DOWNLOAD_URL });
+      if (chk.errors.length) fail(`${String(name).slice(0, 40)} — ${chk.errors.join(' · ')}`);
+      const key = fixKeyFor(ds, it, SL);
+      if (!key) fail(`${String(name).slice(0, 40)} — 장부 열쇠를 만들지 못했습니다`);
+      /* 주소 열쇠(u:)는 그 주소를 쓰는 **모든 글**에 걸린다 — 같은 주소(기관 첫 화면·같은 제목 표식)를 쓰는 다른 글이 있으면
+         한 글의 원문으로 바꿀 수 없다(그 글들이 남의 공고를 「원문」으로 연다 · 리뷰 2026-10-04) */
+      if (key.startsWith('u:')) {
+        const same = [];
+        for (const d2 of ['notices', 'news', 'external', 'activities']) {
+          const xs = cache[d2] || (cache[d2] = linkFixItems(d2));
+          for (const x of xs || []) if (x !== it && fixKeyFor(d2, x, SL) === key && String(x.title || '') !== String(it.title || '')) same.push(x.title || x.url);
+        }
+        if (same.length) fail(`${String(name).slice(0, 40)} — 같은 주소를 쓰는 다른 글이 ${same.length}건 있습니다(${String(same[0]).slice(0, 30)} …) — 한 글의 원문으로 바꿀 수 없습니다`);
+      }
+      const entry = { url: chk.url, by: actor, at: TODAY };
+      if (ds === 'kosaf') {
+        /* 층2 재단 코드는 해마다 그대로다 — 이번 회차(마감)에만 묶는다. 마감을 모르면 묶을 수 없어 받지 않는다(지난 회차 공고를 올해 것으로 보이면 가짜 공지 · 원칙 6) */
+        if (!it.due) fail(`${String(name).slice(0, 40)} — 마감일이 없는 재단 공고는 회차를 묶을 수 없어 받지 않습니다(마감이 실린 뒤 넣어 주세요)`);
+        entry.round = String(it.due);
+      }
+      const title = cleanText(fx.title);
+      const note = cleanText(fx.note);
+      if (title) entry.title = title;
+      if (note) entry.note = note;
+      const was = doc.fix[key];
+      doc.fix[key] = entry;
+      /* 넣은 것이 앱에서 실제로 쓰이는가 — 같은 규칙(source-link.js)으로 한 번 재 본다. 안 쓰이면 넣는 뜻이 없다 */
+      SL.setLinkChecks(null); SL.setLinkFixes(doc);
+      const got = SL.linkFixFor(linkItemOf(ds, it));
+      SL.setLinkFixes(null);
+      if (!got || got.src !== 'admin' || got.url !== chk.url) fail(`${String(name).slice(0, 40)} — 넣은 주소를 앱이 쓰지 않습니다(열쇠 ${key})`);
+      done.push(`${was ? '고침' : '넣음'} ${String(name).slice(0, 30)} → ${chk.url}${chk.warns.length ? ` (확인: ${chk.warns.length})` : ''}`);
+    }
+    doc.v = doc.v || 1;
+    doc.updatedAt = `${kstNow()} KST`;
+    writeJson(LINK_FIXES, doc);
+    detail = `원문 주소 ${done.length}건 — ${done.join(' · ')}`.slice(0, 600);
+    touched = true;
+    break;
+  }
+
+  /* ── 원문 바로잡기 지우기 — 장부에서 열쇠를 뺀다(학생 링크는 데이터 주소로 돌아간다) ── */
+  case 'linkUnfix': {
+    const keys = (Array.isArray(payload.keys) ? payload.keys : []).map((k) => String(k || '')).filter((k) => /^(id|u):\S/.test(k));
+    if (!keys.length) fail('지울 열쇠가 없습니다 (id:… 또는 u:…)');
+    const doc = readJson(LINK_FIXES, null);
+    if (!doc || !doc.fix || typeof doc.fix !== 'object') fail(`${LINK_FIXES} 를 읽지 못했습니다`);
+    const gone = keys.filter((k) => Object.prototype.hasOwnProperty.call(doc.fix, k));
+    if (!gone.length) fail('장부에 그 열쇠가 없습니다 — 이미 지워졌을 수 있습니다');
+    gone.forEach((k) => { delete doc.fix[k]; });
+    doc.updatedAt = `${kstNow()} KST`;
+    writeJson(LINK_FIXES, doc);
+    detail = `원문 주소 지움 ${gone.length}건 — ${gone.join(' · ')}`.slice(0, 600);
     touched = true;
     break;
   }

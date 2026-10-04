@@ -40,7 +40,7 @@
 
 ### ⚠️ 바로 이어서 해야 하는 설정 — 빌드 감시 경로
 
-**Settings → Build → Build watch paths** 의 *Include paths* 에 아래 여섯 줄을 넣으세요.
+**Settings → Build → Build watch paths** 의 *Include paths* 에 아래 줄을 전부 넣으세요.
 
 ```
 _admin/*
@@ -50,7 +50,13 @@ forms.js
 verify/entry-rules.cjs
 collector/url-key.mjs
 collector/activity-kind.mjs
+source-link.js
+collector/link-fix.mjs
 ```
+
+⚠️ `source-link.js`·`collector/link-fix.mjs` 는 2026-10-04에 더해졌습니다 — 「할 일 › 원문 링크 손볼 것」이
+학생이 지금 보는 링크 이름(source-link.js)과 넣을 수 있는 주소 규칙(link-fix.mjs)을 앱·저장소와 **같은 파일**로 씁니다.
+빠뜨리면 그 두 파일만 고친 날 관리자 화면이 옛 규칙으로 주소를 받습니다.
 
 ⚠️ `apply-channel.js` 는 2026-09-21에 더해졌습니다 — `data.js` 의 접수 채널 판정이 이 파일을
 부르므로, 빠뜨리면 이 파일만 고친 날 관리자 화면이 **옛 판정을 그대로** 씁니다.

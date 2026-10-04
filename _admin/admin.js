@@ -10,7 +10,7 @@
    ③ 열쇠가 없으면 아무것도 그리지 않는다 — 열쇠는 GitHub에 실제로 확인한다.
    ============================================================ */
 
-import { urlKey } from './vendor/url-key.mjs';
+import { urlKey, normTitle } from './vendor/url-key.mjs';
 /* 저장된 공고 원문을 등록 공고와 잇는 규칙 — 🔴 베끼지 않는다.
    로봇·발췌기·감사가 같은 파일을 쓴다(collector/notice-source.mjs). */
 import { indexTexts, sourceFor, hasText, isCut, looksLikeErrorPage } from './vendor/notice-source.mjs';
@@ -25,6 +25,9 @@ import { diffPatch, showValue, wonText } from './vendor/edit-diff.mjs';
 import { ACTIVITY_KINDS } from './vendor/activity-kind.mjs';
 /* 교내 소식 갈래 (2026-09-30) — collector/news-kind.mjs 의 것 그대로 (베끼지 않는다) */
 import { NEWS_KINDS } from './vendor/news-kind.mjs';
+/* 관리자가 넣는 원문 주소를 받아도 되는가 · 장부 열쇠 · 집계 사이트 (2026-10-04) — 저장소(tools/admin-apply.mjs linkFix)와 **같은 파일**.
+   주소 꼴 규칙 자체는 vendor/source-link.js(고전 스크립트 · 전역 함수)에 있고, 여기서 linkRules() 로 넘긴다 — 베끼지 않는다. */
+import { checkFixUrl, fixKeyFor, linkItemOf, AGGREGATOR_RE, FIX_DATASET_LABEL, FIX_TEXT_MAX } from './vendor/link-fix.mjs';
 
 /* ---------------- 설정 ---------------- */
 const OWNER = 'seonju5543-web';
@@ -71,6 +74,17 @@ const $ = (s, r = document) => r.querySelector(s);
    단가만 남기고 곱한다: 2,229원 / 169건 ≈ 건당 13원. */
 const AI_WON_PER_ITEM = 13;
 const aiCost = (n) => (n * AI_WON_PER_ITEM).toLocaleString('ko-KR');
+
+/* 원문 링크 이름 한 곳(vendor/source-link.js — 고전 스크립트라 전역 함수다). 못 실었으면 null — 화면은 '규칙을 못 읽었다'고 말한다 */
+function linkRules() {
+  const w = window;
+  if (typeof w.sourceLink !== 'function' || typeof w.setLinkFixes !== 'function') return null;
+  return {
+    sourceLink: w.sourceLink, setLinkChecks: w.setLinkChecks, setLinkFixes: w.setLinkFixes, linkFixFor: w.linkFixFor,
+    linkCheckFor: w.linkCheckFor, linkShape: w.linkShape, decodeUrlEntities: w.decodeUrlEntities, fixUrlUsable: w.fixUrlUsable,
+    fixKeys: w.fixKeys, markerTitleOf: w.markerTitleOf,
+  };
+}
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const byId = (id) => document.getElementById(id);
 
@@ -167,6 +181,8 @@ const D = {
   activities: [], actUpdatedAt: '', actSources: { sources: [], parked: [] }, actCfg: { hideUrls: [] },
   /* 교내 소식 (2026-09-30) — 출처·숨김 설정·학교별 파일 색인 (글은 학교를 골라 그때 받는다 — 44개 파일을 다 받지 않는다) */
   newsSources: { sources: [], parked: [] }, newsCfg: { hideUrls: [] }, newsIndex: { files: {} },
+  /* 원문 링크 (2026-10-04) — 로봇이 열어 보고 확정한 문제(bad)·로봇이 찾은 원문(fix) · 관리자가 넣은 원문(fix). 둘 다 작다 */
+  linkCheck: { bad: {} }, linkFixes: { v: 1, fix: {} },
   failed: [],   // 읽지 못한 파일 — 비어 있지 않으면 화면 숫자를 믿으면 안 된다
 };
 
@@ -219,7 +235,7 @@ async function readText(path) {
 async function loadAll() {
   D.failed = [];        // 매번 새로 센다 — 지난번 실패가 남아 있으면 안 된다
   reportCache = {};     // 로봇을 돌린 뒤 옛 리포트가 보이던 문제(A5)
-  const [reg, notices, forms, health, schools, targets, linkHunt, pending, autoCfg, log, acts, actSrc, actCfg, newsSrc, newsCfg, newsIdx] =
+  const [reg, notices, forms, health, schools, targets, linkHunt, pending, autoCfg, log, acts, actSrc, actCfg, newsSrc, newsCfg, newsIdx, linkCheck, linkFixes] =
     await Promise.all([
       readJson('data/registered.json', { items: [] }),
       readJson('data/notices.json', { items: [] }),
@@ -237,6 +253,8 @@ async function loadAll() {
       readJson('collector/news-sources.json', { sources: [], parked: [] }),
       readJson('collector/news-config.json', { hideUrls: [] }),
       readJson('data/news/index.json', { files: {} }),
+      readJson('data/link-check.json', { bad: {} }),
+      readJson('data/link-fixes.json', { v: 1, fix: {} }),
     ]);
 
   D.reg = reg.items || [];
@@ -257,6 +275,13 @@ async function loadAll() {
   D.newsSources = { sources: newsSrc.sources || [], parked: newsSrc.parked || [] };
   D.newsCfg = newsCfg || { hideUrls: [] };
   D.newsIndex = newsIdx && newsIdx.files ? newsIdx : { files: {} };
+  D.linkCheck = linkCheck && typeof linkCheck.bad === 'object' ? linkCheck : { bad: {} };
+  D.linkFixes = linkFixes && linkFixes.fix && typeof linkFixes.fix === 'object' ? linkFixes : { v: 1, fix: {} };
+  /* 학생 앱과 같은 장부로 링크 이름을 정한다(source-link.js 상태는 이 화면 하나뿐이다 — data.js 제출처도 같이 본다) */
+  const LR = linkRules();
+  if (LR) { LR.setLinkChecks(D.linkCheck); LR.setLinkFixes(D.linkFixes); }
+  LF.state = 'idle';   // 펼친 「원문 링크 손볼 것」은 다음에 열 때 새로 읽는다(반영 뒤 옛 학교별 파일로 그리지 않게)
+  LF.promise = null;
 
   /* 인스타 — stats·comments·token-seen·samples 는 **아직 없을 수 있는** 파일이라(계정 연결 전·견본 전)
      404 를 '못 읽음' 경고로 세지 않는다. seen·templates 는 저장소에 늘 있으니 실패하면 경고에 든다. */
@@ -625,6 +650,7 @@ function renderAll() {
   renderDataFail();
   pendingPrune();          // 데이터를 다시 읽었으면 사라진 공고의 수정을 먼저 뺀다
   renderPendingBar();
+  renderLinkFixBar();
   renderCounts();
   renderScreen(current);
   const dep = byId('deploy-state');
@@ -694,6 +720,7 @@ function renderTodo() {
     { n: dead.length, tone: 'is-warn', k: '원문 링크 실패 기록',
       d: '학생이 원문 보기를 눌렀을 때 안 열리는 주소입니다',
       btn: '<button class="btn btn-sm" data-go="todo">아래에서 보기</button>' },
+    linkFixCard(),
     { n: fails.length, tone: 'is-bad', k: '수집 실패 중인 학교',
       d: '이 학교 공고가 앱1에 들어오지 않고 있습니다',
       btn: '<button class="btn btn-sm" data-go="robots">수집망 보기</button>' },
@@ -719,6 +746,8 @@ function renderTodo() {
   /* 🔴 `<details>` 가 펼쳐져 있었는지는 **살아 있는 DOM 에서** 읽는다 — 이벤트로만 기억하면
      다시 그릴 때 접힌다(`.filters-more` 에서 이미 겪은 유형). innerHTML 을 덮기 전에 읽는다. */
   const scanWasOpen = !!(byId('todo-src-scan') && byId('todo-src-scan').open);
+  const lfWasOpen = !!(byId('todo-link-fix') && byId('todo-link-fix').open);
+  const lfN = linkFixTodo().length;
 
   byId('screen-todo').innerHTML = `
     <div class="sec-head" data-screen-title>
@@ -750,6 +779,13 @@ function renderTodo() {
       <div id="src-scan-slot"><p class="muted">펼치면 저장된 공고 원문을 읽어 옵니다.</p></div>
     </details>
 
+    <!-- 원문 링크 손볼 것 (2026-10-04) — 펼칠 때만 학교별 공고·소식·층2 재단 목록을 받는다 -->
+    <details id="todo-link-fix" data-link-fix${lfWasOpen ? ' open' : ''}>
+      <summary>원문 링크 손볼 것 — 학생이 「원문 공고」를 눌러도 그 글이 안 열리는 링크
+        <span id="lf-summary-n">${lfN}</span>건${LF.state === 'ready' ? '' : '(정식 등록·대외활동만 센 것)'} · 진짜 원문 주소를 넣는 자리</summary>
+      <div id="link-fix-slot"><p class="muted">펼치면 학교별 실시간 공고·소식·층2 재단 목록을 읽어 옵니다.</p></div>
+    </details>
+
     <!-- 데이터 품질을 여기로 흡수한다 — '지금 뭐가 잘못됐나' 는 곧 '오늘 할 일' 이다.
          🔴 베끼지 않고 renderQuality 를 그대로 부른다(같은 숫자·같은 묶음). -->
     <div id="todo-quality-slot"></div>
@@ -770,6 +806,26 @@ function renderTodo() {
     det.addEventListener('toggle', () => { if (det.open) openSrcScan(); });
     if (det.open) openSrcScan();
   }
+  const lfDet = byId('todo-link-fix');
+  if (lfDet) {
+    lfDet.addEventListener('toggle', () => { if (lfDet.open) openLinkFix(); });
+    if (lfDet.open) openLinkFix();
+  }
+}
+
+/** 「할 일」의 원문 링크 카드 — 펼치기 전에는 정식 등록·대외활동만 센다(나머지는 펼칠 때 받는다).
+ *  🔴 다 안 셌는데 0 이면 '정상'으로 접지 않는다 — 층2 재단·학교별 공고를 아직 안 봤을 뿐이다(모르는 것을 정상이라 하지 않는다). */
+function linkFixCard() {
+  const n = linkFixTodo().length;
+  const all = LF.state === 'ready';
+  return {
+    n: all ? n : Math.max(n, 1), tone: 'is-warn', k: '원문 링크 손볼 것',
+    v: `<span data-lf-card-n>${all || n ? n : '?'}</span>`,
+    d: all ? '학생이 「원문 공고」를 눌러도 그 글이 아니라 목록·첫 화면·재단 홈페이지가 열리는 링크입니다. 진짜 원문 주소를 넣을 수 있습니다.'
+      : '정식 등록·대외활동만 센 숫자입니다 — 아래를 펼치면 층2 재단·학교별 실시간 공고·소식까지 셉니다.',
+    btn: '<button class="btn btn-sm" data-lf-card>아래에서 넣기</button>',
+    okD: '목록·첫 화면·재단 홈페이지로 가는 링크가 없습니다',
+  };
 }
 
 /* ============================================================
@@ -967,6 +1023,411 @@ function bindAmountFill(root = byId('screen-todo')) {
       if (fresh) { line.replaceWith(fresh); bindAmountFill(fresh); }
     }
   }));
+}
+
+/* ============================================================
+   원문 링크 손볼 것 — 관리자가 진짜 원문 공고 주소를 넣는 자리 (2026-10-04 · 개발자 지시
+   *"정확하게 표시되지 않는 부분에 대해서는 관리자 페이지에 원문 공고를 추가할 수 있는 칸을 제작"*)
+   ------------------------------------------------------------
+   학생이 「원문 공고」를 눌러도 그 글이 아니라 게시판 목록·사이트 첫 화면·재단 홈페이지가 열리는 링크를 모아,
+   사람이 그 글을 찾아 **주소창의 주소**를 넣는다.
+   🔴 넣은 주소는 데이터 파일이 아니라 장부(data/link-fixes.json)에 간다 — 데이터 주소는 로봇이 날마다 다시 만든다.
+      앱의 링크 이름 한 곳(source-link.js ⑥)이 그 장부를 먼저 읽는다. 여기 보이는 「학생이 지금 보는 링크」도 같은 함수다.
+   🔴 화면은 주소를 **짐작하지 않는다** — 힌트는 우리 자료(다른 수집 묶음·수집 기록)에 실제로 있는 주소뿐이고,
+      사람이 열어 보고 '이 주소로'를 누른다(원칙 8-1). 받아도 되는 꼴은 저장소와 같은 파일(vendor/link-fix.mjs)이 정한다.
+   🔴 펼칠 때만 읽는다 — 학교별 실시간 공고·소식 파일이 수십 개라 첫 화면에서 받지 않는다(todo-src-scan 과 같은 방식).
+   ============================================================ */
+const LF = {
+  state: 'idle', promise: null, failed: [],
+  sets: { kosaf: [], notices: [], news: [], external: [] },
+  titleIdx: null,          // 제목(normTitle) → 우리 자료에 실제로 있는 글 주소들
+  cand: 'idle',            // 수집 기록(collector/candidates.json) — 누를 때만 받는다 (받으면 배열)
+  kosafOpen: false,
+};
+const LINK_FIX_STAGE = new Map();   // 장부 열쇠 → { ds, id?, code?, from, url, title, note, name, before, after, warns }
+const LF_GROUPS = [
+  { key: 'marker', title: '① 게시판 목록 표식(#n-) — 학생에게 목록이 열립니다', d: '로봇이 글 주소를 못 찾아 목록 주소에 제목만 붙여 둔 것입니다. 목록에서 그 제목을 눌러 열린 글의 주소를 넣어 주세요.' },
+  { key: 'listid', title: '② 목록 주소에 글 번호만 붙인 꼴 — 학생에게 목록이 열립니다', d: '서버가 번호를 무시하고 목록을 줍니다. 그 글을 열어 주소창의 주소를 넣어 주세요.' },
+  { key: 'home', title: '③ 사이트 첫 화면(홈페이지) 꼴', d: '첫 화면(index·main) 주소입니다. 그 공고 글의 주소를 넣어 주세요.' },
+  { key: 'kosaf', title: '④ 재단 홈페이지 — 층2(한국장학재단에 등록된 재단 장학금)', d: '한국장학재단 상세는 새 탭에서 열리지 않아 재단 홈페이지만 보입니다. 재단 게시판에서 이번 회차 공고를 찾아 넣으면 그 회차(마감일)에만 쓰입니다.' },
+  { key: 'bad', title: '⑤ 로봇이 열어 보고 문제를 확정한 링크', d: '원문 링크 확인 로봇이 다른 날 두 번 같은 문제를 봤습니다(목록·첫 화면·로그인·열리지 않음·다른 글). 학생에게는 「(확인 필요)」로 보입니다.' },
+];
+
+function lfDeadline(e) { return e.ds === 'kosaf' ? (e.raw.due || '') : (e.raw.deadline || ''); }
+function lfPast(e) { const d = lfDeadline(e); return !!d && d < TODAY; }
+/* 묶음 하나 = 학생 화면에 링크가 그려지는 데이터. 숨긴 활동·소식은 학생에게 안 보이므로 뺀다(원문 링크 확인 로봇과 같다) */
+function lfEntries() {
+  const LR = linkRules();
+  if (!LR) return [];
+  const out = [];
+  const seen = new Set();   // 같은 열쇠는 한 줄 — 여러 캠퍼스가 같은 게시판을 쓰면 학교별 파일에 같은 글이 겹친다
+  /* 정식 등록된 글은 실시간 공고 피드에서 앱이 빼고 보인다(registeredUrlMatcher) — 여기서도 정식 등록 줄 하나로만 */
+  const regUrls = new Set(D.reg.map((x) => (x.sourceUrl ? urlKey(x.sourceUrl) : '')).filter(Boolean));
+  const add = (ds, rawItem) => {
+    if (!rawItem || rawItem.hidden) return;
+    const item = linkItemOf(ds, rawItem);
+    const rawUrl = ds === 'kosaf' ? (rawItem.home || '') : (item.sourceUrl != null && item.sourceUrl !== '' ? item.sourceUrl : (item.url || ''));
+    if (ds === 'notices' && rawUrl && regUrls.has(urlKey(rawUrl))) return;
+    const key = fixKeyFor(ds, rawItem, LR);
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    out.push({ ds, raw: rawItem, item, rawUrl, key,
+      title: String(rawItem.name || rawItem.title || rawItem.code || ''),
+      where: ds === 'kosaf' ? (rawItem.org || '') : (rawItem.school || rawItem.host || rawItem.provider || '') });
+  };
+  D.reg.forEach((x) => add('registered', x));
+  D.activities.forEach((x) => add('activities', x));
+  if (LF.state === 'ready') {
+    LF.sets.kosaf.forEach((x) => add('kosaf', x));
+    LF.sets.notices.forEach((x) => add('notices', x));
+    LF.sets.news.forEach((x) => add('news', x));
+    LF.sets.external.forEach((x) => add('external', x));
+  }
+  return out;
+}
+/* 어느 묶음에 드는가 — null 이면 손볼 것이 아니다(보통 글 · 로봇이 원문을 찾아 고친 것). 'fixed' = 사람이 넣은 원문이 쓰이는 중 */
+function lfGroupOf(e, LR) {
+  const fx = LR.linkFixFor(e.item);
+  if (fx && fx.src === 'admin') return 'fixed';
+  if (fx) return null;
+  if (e.ds === 'kosaf') return 'kosaf';
+  const shape = LR.linkShape(e.rawUrl);
+  if (shape === 'marker' || shape === 'listid' || shape === 'home') return shape;
+  if (LR.linkCheckFor(e.rawUrl)) return 'bad';
+  return null;
+}
+/* 「할 일」 카드 숫자 — 마감이 지난 것은 학생 화면에 없어 세지 않는다 */
+function linkFixTodo() {
+  const LR = linkRules();
+  if (!LR) return [];
+  return lfEntries().filter((e) => !lfPast(e)).filter((e) => { const g = lfGroupOf(e, LR); return g && g !== 'fixed'; });
+}
+
+/* 펼칠 때 읽는다 — 층2 재단 · 재단·지자체 글 · 학교별 실시간 공고 · 학교별 소식(색인이 가리키는 파일만).
+   🔴 못 읽은 파일은 **못 읽었다고** 적는다(빈 목록으로 두면 '손볼 것 0건'으로 보인다). 실패는 위 경고 띠(D.failed)에도 같이 든다. */
+async function ensureLinkFixData() {
+  if (LF.state === 'ready') return LF.state;
+  if (LF.promise) return LF.promise;
+  LF.state = 'loading';
+  LF.promise = (async () => {
+    LF.failed = [];
+    const read = async (p, fb) => { const n = D.failed.length; const v = await readJson(p, fb); if (D.failed.length > n) LF.failed.push(p); return v; };
+    const items = (d) => (d && Array.isArray(d.items) ? d.items : []);
+    const [kosaf, external, nIdx] = await Promise.all([
+      read('data/kosaf-open.json', { items: [] }),
+      read('data/external.json', { items: [] }),
+      read('data/notices/index.json', { files: {} }),
+    ]);
+    const fileList = (idx, dir) => Object.values((idx && idx.files) || {}).map((v) => v && v.file)
+      .filter((f) => /^[\w.-]+\.json$/.test(f || '')).map((f) => `${dir}/${f}`);
+    const [nFiles, wFiles] = await Promise.all([
+      Promise.all(fileList(nIdx, 'data/notices').map((p) => read(p, { items: [] }))),
+      Promise.all(fileList(D.newsIndex, 'data/news').map((p) => read(p, { items: [] }))),
+    ]);
+    LF.sets = { kosaf: items(kosaf), external: items(external), notices: nFiles.flatMap(items), news: wFiles.flatMap(items) };
+    LF.titleIdx = null;
+    LF.state = 'ready';
+    LF.promise = null;
+    return LF.state;
+  })();
+  return LF.promise;
+}
+
+/* 힌트 — **우리 자료에 실제로 있는** 같은 제목 글의 주소(지어내지 않는다). 사람이 열어 보고 고른다 */
+function lfAddHint(map, title, url, from) {
+  const LR = linkRules();
+  const t = normTitle(title || '');
+  if (!LR || !t || t.length < 6 || !url) return;
+  const u = LR.decodeUrlEntities(url);
+  if (LR.linkShape(u) !== 'page' || !LR.fixUrlUsable(u)) return;
+  if (!map.has(t)) map.set(t, new Map());
+  if (!map.get(t).has(u)) map.get(t).set(u, from);
+}
+function lfTitleIdx() {
+  if (LF.titleIdx) return LF.titleIdx;
+  const m = new Map();
+  D.reg.forEach((x) => lfAddHint(m, x.boardTitle || x.name, x.sourceUrl, '정식 등록'));
+  D.notices.forEach((x) => lfAddHint(m, x.title, x.url, '수집 장부'));
+  LF.sets.notices.forEach((x) => lfAddHint(m, x.title, x.url, '실시간 공고'));
+  LF.sets.news.forEach((x) => lfAddHint(m, x.title, x.url, '교내 소식'));
+  LF.sets.external.forEach((x) => lfAddHint(m, x.title, x.url, '재단·지자체 글'));
+  D.activities.forEach((x) => lfAddHint(m, x.title, x.url, '대외활동'));
+  if (Array.isArray(LF.cand)) LF.cand.forEach((x) => lfAddHint(m, x.title, x.url, '수집 기록'));
+  LF.titleIdx = m;
+  return m;
+}
+const hostOfUrl = (u) => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return ''; } };
+function lfHints(e) {
+  const LR = linkRules();
+  const out = new Map();
+  const skip = LR.decodeUrlEntities(e.rawUrl);
+  const put = (u, from) => { if (u && u !== skip && !out.has(u) && out.size < 4) out.set(u, from); };
+  const titles = [LR.markerTitleOf(e.rawUrl), e.raw.boardTitle, e.title].filter(Boolean);
+  const idx = lfTitleIdx();
+  titles.forEach((t) => { const hit = idx.get(normTitle(t)); if (hit) hit.forEach((from, u) => put(u, from)); });
+  (e.raw.alsoPostedAt || []).forEach((a) => { if (a && a.url && LR.linkShape(a.url) === 'page') put(LR.decodeUrlEntities(a.url), `${a.school || '다른 학교'} 게시`); });
+  if (e.ds === 'kosaf') {
+    /* 층2 — 같은 재단 사이트의 글(재단·지자체 게시판 수집분) · 같은 재단의 정식 등록 공고 */
+    const h = hostOfUrl(e.raw.home || '');
+    if (h) LF.sets.external.forEach((x) => { if (hostOfUrl(x.url) === h && LR.linkShape(x.url) === 'page') put(LR.decodeUrlEntities(x.url), `같은 사이트 글: ${String(x.title || '').slice(0, 30)}`); });
+    const org = String(e.raw.org || '').trim();
+    if (org.length >= 3) D.reg.forEach((x) => { if (String(x.provider || '').includes(org) && LR.linkShape(x.sourceUrl) === 'page') put(LR.decodeUrlEntities(x.sourceUrl), `같은 재단 정식 등록: ${String(x.name || '').slice(0, 30)}`); });
+  }
+  return [...out.entries()];
+}
+
+function lfLabelNow(e) {
+  const LR = linkRules();
+  const l = LR.sourceLink(e.item, 'detail');
+  return { label: l.label || '(링크 없음)', caution: l.caution || '', hint: l.hint || '' };
+}
+function lfDdayHtml(dl) {
+  const d = dday(dl);
+  if (d == null) return '<span class="dd none">마감일 없음</span>';
+  if (d < 0) return `<span class="dd none">마감 ${-d}일 지남</span>`;
+  return `<span class="dd${d <= 3 ? ' near' : d <= 7 ? ' soon' : ''}">${d === 0 ? 'D-DAY' : `D-${d}`}</span>`;
+}
+function lfRowHtml(e) {
+  const LR = linkRules();
+  const st = LINK_FIX_STAGE.get(e.key);
+  const now = lfLabelNow(e);
+  const open = safeUrl(LR.decodeUrlEntities(e.rawUrl));
+  const dl = lfDeadline(e);
+  const files = e.ds === 'kosaf' ? (e.raw.files || []).filter((f) => /^data\/kosaf-files\//.test(f.path || '')) : [];
+  const hints = lfHints(e);
+  const noRound = e.ds === 'kosaf' && !e.raw.due;
+  return `
+    <div class="row" data-row data-noclick data-lf-row="${esc(e.key)}" style="cursor:default">
+      <div>
+        <div class="t" data-row-title>${esc(e.title || e.key)}</div>
+        <div class="m"><span class="pill info">${esc(FIX_DATASET_LABEL[e.ds] || e.ds)}</span>${e.where ? `<span>${esc(e.where)}</span>` : ''}${dl ? `<span>마감 ${esc(dl)}</span>` : ''}</div>
+        <div class="scope-count" data-lf-label>학생이 지금 보는 링크: 「${esc(now.label)}」${now.hint ? ` · 목록에서 찾을 제목: ${esc(now.hint)}` : ''}${now.caution ? ` — ${esc(now.caution)}` : ''}</div>
+        <div class="btn-row" style="margin-top:var(--space-4)">
+          ${open ? `<a class="btn btn-sm" href="${esc(open)}" target="_blank" rel="noreferrer noopener" data-lf-now>지금 링크 열기 ↗</a>` : '<span class="muted">지금 링크 없음</span>'}
+          ${files.map((f) => `<a class="btn btn-sm" href="${esc(raw(f.path))}" target="_blank" rel="noreferrer noopener">공고문 사본: ${esc(String(f.name || '').slice(0, 28))} ↗</a>`).join('')}
+        </div>
+        ${hints.length ? `<div class="hint" data-lf-hints>우리 자료에 있는 같은 제목·같은 사이트 글(열어 보고 맞으면 고르세요):
+          ${hints.map(([u, from]) => `<div><a href="${esc(safeUrl(u))}" target="_blank" rel="noreferrer noopener">${esc(u.length > 90 ? `${u.slice(0, 90)}…` : u)}</a> <span class="muted">${esc(from)}</span>
+            <button class="btn btn-sm" data-lf-use="${esc(u)}">이 주소로</button></div>`).join('')}</div>` : ''}
+        ${noRound ? '<div class="scope-count">마감일이 없는 재단 공고는 회차를 묶을 수 없어 넣을 수 없습니다 — 마감이 실린 뒤 넣어 주세요.</div>' : `
+        <div class="key-exp lf-form" style="margin-top:var(--space-4)">
+          <input type="url" data-lf-url value="${esc(st ? st.url : '')}" placeholder="https://… (그 글을 열고 주소창의 주소)" maxlength="600" aria-label="${esc(e.title)} 원문 공고 주소" />
+          <input type="text" data-lf-title value="${esc(st ? st.title : '')}" placeholder="원문 제목 (선택)" maxlength="${FIX_TEXT_MAX}" aria-label="원문 제목" />
+          <input type="text" data-lf-note value="${esc(st ? st.note : '')}" placeholder="메모 (선택)" maxlength="${FIX_TEXT_MAX}" aria-label="메모" />
+          <button class="btn btn-sm" data-lf-open>붙여 넣은 주소 새 탭으로 열기 ↗</button>
+          <button class="btn btn-sm${st ? '' : ' btn-primary'}" data-lf-stage>${st ? '고치기' : '적어 두기'}</button>
+        </div>`}
+      </div>
+      <div></div>
+      <div>${st ? '<span class="pill good">모아 둠</span>' : lfDdayHtml(dl)}</div>
+    </div>`;
+}
+
+/* ⑥ 넣어 둔 주소 — 장부의 열쇠마다: 쓰이는 중 / 안 쓰임(회차가 바뀜 등) / 대상 없음(글이 내려감 · 주소가 바뀜) */
+function lfFixedRows(all, LR) {
+  const fix = (D.linkFixes && D.linkFixes.fix) || {};
+  return Object.keys(fix).map((key) => {
+    const ent = fix[key] || {};
+    const target = all.find((e) => LR.fixKeys(e.item).includes(key));
+    let status = 'none';
+    if (target) {
+      const got = LR.linkFixFor(target.item);
+      status = got && got.src === 'admin' && got.key === key ? 'applied' : 'unused';
+    }
+    return { key, ent, target, status, bad: LR.linkCheckFor(ent.url || '') };
+  });
+}
+function lfFixedRowHtml(r) {
+  const st = { applied: ['good', '쓰이는 중'], unused: ['warn', '안 쓰임 — 회차(마감)가 바뀌었거나 쓸 수 없는 주소'], none: ['warn', '대상 없음 — 글이 내려갔거나 주소가 바뀌었습니다'] }[r.status];
+  return `
+    <div class="row" data-row data-noclick data-lf-fixed="${esc(r.key)}" data-lf-status="${esc(r.status)}" style="cursor:default">
+      <div>
+        <div class="t" data-row-title>${esc(r.target ? r.target.title : (r.ent.title || r.key))}</div>
+        <div class="m">${r.target ? `<span class="pill info">${esc(FIX_DATASET_LABEL[r.target.ds] || r.target.ds)}</span>` : ''}<span class="mono">${esc(r.key.length > 70 ? `${r.key.slice(0, 70)}…` : r.key)}</span><span>${esc(r.ent.by || '')} ${esc(r.ent.at || '')}</span>${r.ent.round ? `<span>회차 ${esc(r.ent.round)}</span>` : ''}</div>
+        <div class="scope-count">넣은 주소: <a href="${esc(safeUrl(r.ent.url))}" target="_blank" rel="noreferrer noopener">${esc(r.ent.url || '')}</a>${r.ent.note ? ` · 메모: ${esc(r.ent.note)}` : ''}</div>
+        ${r.bad ? `<div class="scope-count">원문 링크 확인 로봇이 이 주소도 문제로 확정했습니다(${esc(r.bad.v)} · ${esc(r.bad.at || '')}) — 학생에게는 「(확인 필요)」로 보입니다.</div>` : ''}
+      </div>
+      <div class="btn-row"><button class="btn btn-sm danger" data-lf-unfix="${esc(r.key)}">지우기</button></div>
+      <div><span class="pill ${st[0]}">${esc(st[1])}</span></div>
+    </div>`;
+}
+
+function linkFixSlotHtml() {
+  const LR = linkRules();
+  if (!LR) return '<p class="empty" data-lf-fail>원문 링크 규칙 파일(vendor/source-link.js)을 싣지 못했습니다 — 화면을 새로 고쳐 주세요.</p>';
+  if (LF.state !== 'ready') return '<p class="muted">학교별 공고·소식·재단 목록을 읽는 중…</p>';
+  const all = lfEntries();
+  const byGroup = {};
+  let robotFixed = 0;
+  all.filter((e) => !lfPast(e)).forEach((e) => {
+    const g = lfGroupOf(e, LR);
+    if (!g) { const fx = LR.linkFixFor(e.item); if (fx && fx.src === 'robot') robotFixed += 1; return; }
+    (byGroup[g] = byGroup[g] || []).push(e);
+  });
+  (byGroup.kosaf || []).sort((a, b) => String(a.raw.due || '9999').localeCompare(String(b.raw.due || '9999')));
+  const fixedRows = lfFixedRows(all, LR);
+  const grp = (g) => {
+    const list = byGroup[g.key] || [];
+    const body = `<p class="muted">${esc(g.d)}</p>
+      <div class="rows" data-rows>${list.slice(0, shown(`lf-${g.key}`, 30)).map(lfRowHtml).join('')}</div>${moreBtn(`lf-${g.key}`, list.length, 30)}`;
+    if (g.key === 'kosaf') {
+      return `<details class="pgroup" data-lf-group="kosaf" data-lf-kosaf${LF.kosafOpen ? ' open' : ''}><summary><b>${esc(g.title)}</b> <span class="pill">${list.length}건</span> <span class="muted">마감 가까운 순 · 펼쳐서 보기</span></summary>${list.length ? body : '<p class="muted">없습니다.</p>'}</details>`;
+    }
+    return `<div class="pgroup" data-lf-group="${esc(g.key)}"><div class="sec-head"><h2>${esc(g.title)} <span class="pill">${list.length}건</span></h2></div>${list.length ? body : '<p class="muted">없습니다.</p>'}</div>`;
+  };
+  return `
+    ${LF.failed.length ? `<p class="empty" data-lf-fail>읽지 못한 파일 ${LF.failed.length}개 — 아래 숫자는 그만큼 빠졌을 수 있습니다: ${LF.failed.map((p) => `<code class="mono">${esc(p)}</code>`).join(' ')}</p>` : ''}
+    <p class="muted" data-lf-note><b>넣은 주소는 장부(data/link-fixes.json)에만 저장됩니다</b> — 로봇이 데이터를 다시 만들어도 사라지지 않고,
+      학생 앱은 다음 배포부터 그 주소를 「원문 공고」로 엽니다. 원문 링크 확인 로봇이 날마다 그 주소도 열어 보고, 문제면 「(확인 필요)」로 바꿔 말합니다.
+      ${robotFixed ? `로봇이 원문을 찾아 이미 고친 ${robotFixed}건은 뺐습니다.` : ''}</p>
+    <div class="btn-row"><button class="btn btn-sm" data-lf-cand${LF.cand === 'loading' || Array.isArray(LF.cand) ? ' disabled' : ''}>${Array.isArray(LF.cand) ? '수집 기록 힌트 반영됨' : LF.cand === 'failed' ? '수집 기록을 못 읽었습니다 — 다시 시도' : '수집 기록에서도 같은 제목 찾기'}</button>
+      <span class="muted">수집 기록(collector/candidates.json · 큰 파일)은 누를 때만 받습니다.</span></div>
+    ${LF_GROUPS.map(grp).join('')}
+    <div class="pgroup" data-lf-group="fixed"><div class="sec-head"><h2>⑥ 넣어 둔 주소 <span class="pill">${fixedRows.length}건</span></h2></div>
+      <p class="muted">대상 없음·안 쓰임인 줄은 지워도 됩니다. 지우면 학생 링크는 데이터에 실린 주소로 돌아갑니다.</p>
+      ${fixedRows.length ? `<div class="rows" data-rows>${fixedRows.map(lfFixedRowHtml).join('')}</div>` : '<p class="muted">아직 없습니다.</p>'}</div>`;
+}
+
+function lfRenderSlot() {
+  const slot = byId('link-fix-slot');
+  if (slot) slot.innerHTML = linkFixSlotHtml();
+  const kd = slot && slot.querySelector('[data-lf-kosaf]');
+  if (kd) kd.addEventListener('toggle', () => { LF.kosafOpen = kd.open; });
+  /* 다 읽은 뒤의 숫자로 카드·제목을 고친다(층2·소식까지 센 것) */
+  const n = String(linkFixTodo().length);
+  const sum = byId('lf-summary-n');
+  if (sum) sum.textContent = n;
+  const card = document.querySelector('[data-lf-card-n]');
+  if (card) card.textContent = n;
+}
+async function openLinkFix() {
+  lfRenderSlot();
+  await ensureLinkFixData();
+  lfRenderSlot();
+}
+
+/* 모아 둔 원문 주소 줄 — 공고 수정(pending-bar)과 다른 장부라 따로 보낸다 */
+function renderLinkFixBar() {
+  const bar = byId('linkfix-bar');
+  if (!bar) return;
+  const n = LINK_FIX_STAGE.size;
+  bar.hidden = n === 0;
+  if (n) byId('linkfix-text').textContent = `원문 주소 ${n}건을 모아 뒀습니다 — 아직 저장되지 않았습니다`;
+  measureHead();
+}
+/* 한 줄만 다시 그린다 — 다른 줄에 쳐 두고 아직 안 누른 주소를 잃지 않게(마감·금액 적기와 같은 이유) */
+function lfRedrawRow(key) {
+  const line = document.querySelector(`[data-lf-row="${CSS.escape(key)}"]`);
+  const e = lfEntries().find((x) => x.key === key);
+  if (!line || !e) return;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = lfRowHtml(e);
+  if (tmp.firstElementChild) line.replaceWith(tmp.firstElementChild);
+}
+/* 넣으면 학생 이름표가 어떻게 바뀌는가 — 앱과 같은 함수로, 장부에 이 한 줄을 더한 채 잰다(재고 나면 원래 장부로) */
+function lfLabelAfter(e, url) {
+  const LR = linkRules();
+  const add = { url, ...(e.ds === 'kosaf' ? { round: String(e.raw.due || '') } : {}) };
+  LR.setLinkFixes({ fix: { ...((D.linkFixes && D.linkFixes.fix) || {}), [e.key]: add } });
+  try { return LR.sourceLink(e.item, 'detail').label || '(링크 없음)'; } finally { LR.setLinkFixes(D.linkFixes); }
+}
+
+/* 화면 안 위임 — bindGlobal 의 클릭 처리에서 부른다. 처리했으면 true. */
+async function handleLinkFixClick(ev) {
+  const t = ev.target;
+  if (t.closest('[data-lf-card]')) {
+    const det = byId('todo-link-fix');
+    if (det) { det.open = true; det.scrollIntoView({ block: 'start' }); }
+    return true;
+  }
+  if (t.closest('[data-lf-flush]')) { await flushLinkFixes(); return true; }
+  if (t.closest('[data-lf-drop]')) {
+    LINK_FIX_STAGE.clear(); renderLinkFixBar(); toast('모아 둔 원문 주소를 버렸습니다');
+    if (LF.state === 'ready') lfRenderSlot();
+    return true;
+  }
+  if (t.closest('[data-lf-cand]')) {
+    if (LF.cand === 'loading' || Array.isArray(LF.cand)) return true;
+    LF.cand = 'loading';
+    const n = D.failed.length;
+    const d = await readJson('collector/candidates.json', null);
+    LF.cand = D.failed.length > n || !d ? 'failed' : (Array.isArray(d.items) ? d.items : []);
+    LF.titleIdx = null;
+    if (LF.state === 'ready') lfRenderSlot();
+    toast(Array.isArray(LF.cand) ? `수집 기록 ${LF.cand.length}건을 힌트에 더했습니다` : '수집 기록을 읽지 못했습니다');
+    return true;
+  }
+  const unfix = t.closest('[data-lf-unfix]');
+  if (unfix) {
+    const key = unfix.dataset.lfUnfix;
+    const ent = ((D.linkFixes && D.linkFixes.fix) || {})[key] || {};
+    askSheet({
+      title: '넣어 둔 원문 주소를 지웁니다',
+      note: '지우면 학생 링크는 데이터에 실린 주소로 돌아갑니다(목록·홈페이지면 다시 그렇게 보입니다).',
+      lines: [{ t: key, m: `넣은 주소: ${ent.url || ''}` }],
+      goLabel: '지우기', danger: true,
+      run: () => applyAction('linkUnfix', { keys: [key] }, '원문 주소 지우기'),
+    });
+    return true;
+  }
+  const row = t.closest('[data-lf-row]');
+  if (!row) return false;
+  const key = row.dataset.lfRow;
+  const inp = row.querySelector('[data-lf-url]');
+  const use = t.closest('[data-lf-use]');
+  if (use) { if (inp) { inp.value = use.dataset.lfUse; inp.focus(); } return true; }
+  if (t.closest('[data-lf-open]')) {
+    const u = safeUrl(((inp && inp.value) || '').trim());
+    if (!/^https?:/i.test(u)) { toast('먼저 주소를 붙여 넣어 주세요'); return true; }
+    window.open(u, '_blank', 'noopener,noreferrer');
+    return true;
+  }
+  if (t.closest('[data-lf-stage]')) {
+    const LR = linkRules();
+    const e = lfEntries().find((x) => x.key === key);
+    if (!LR || !e) { toast('이 글을 지금 목록에서 찾지 못했습니다 — 다시 읽어 주세요'); return true; }
+    if (e.ds === 'kosaf' && !e.raw.due) { toast('마감일이 없는 재단 공고는 넣을 수 없습니다'); return true; }
+    const val = (sel) => ((row.querySelector(sel) || {}).value || '').trim();
+    const chk = checkFixUrl(val('[data-lf-url]'), { from: e.rawUrl, L: LR, downloadRe: RULES.DOWNLOAD_URL });
+    if (chk.errors.length) { toast(chk.errors[0]); return true; }
+    LINK_FIX_STAGE.set(key, {
+      ds: e.ds, ...(e.ds === 'registered' ? { id: e.raw.id } : {}), ...(e.ds === 'kosaf' ? { code: e.raw.code } : {}),
+      from: LR.decodeUrlEntities(e.rawUrl), url: chk.url,
+      title: val('[data-lf-title]').slice(0, FIX_TEXT_MAX), note: val('[data-lf-note]').slice(0, FIX_TEXT_MAX),
+      name: e.title, dsLabel: FIX_DATASET_LABEL[e.ds] || e.ds, before: lfLabelNow(e).label, after: lfLabelAfter(e, chk.url), warns: chk.warns,
+    });
+    renderLinkFixBar();
+    toast(chk.warns.length ? `모아 뒀습니다 — 확인: ${chk.warns[0]}` : "모아 뒀습니다 — 위 '원문 주소 반영' 을 누르면 저장됩니다");
+    lfRedrawRow(key);
+    return true;
+  }
+  return false;
+}
+
+/* 반영 — 무엇이 무엇으로 바뀌는지(주소 · 학생이 보는 이름 · 확인할 것) 보여 주고 한 번 더 묻는다 */
+async function flushLinkFixes() {
+  if (!LINK_FIX_STAGE.size) { toast('모아 둔 원문 주소가 없습니다'); return false; }
+  const rows = [...LINK_FIX_STAGE.entries()];
+  askSheet({
+    title: `원문 주소 ${rows.length}건을 넣습니다`,
+    note: '학생 앱은 다음 배포부터 새 주소를 엽니다. 데이터 파일의 주소는 그대로 두고 장부에만 적습니다. 다른 사이트·첫 화면 주소는 한 번 더 열어 확인해 주세요.',
+    lines: rows.map(([key, s]) => ({
+      t: s.name || key,
+      /* 주소는 자르지 않고 통째로 보인다(전후 표는 긴 값을 줄인다 — 주소는 끝 글자가 글 번호라 잘리면 확인이 안 된다) */
+      m: `${s.dsLabel} · 지금 주소: ${s.from || '(없음)'} → 새 주소: ${s.url}${s.warns.length ? ` · 확인: ${s.warns.join(' / ')}` : ''}`,
+      diff: [{ key: 'label', label: '학생이 보는 이름', before: s.before, after: s.after }],
+    })),
+    goLabel: `${rows.length}건 반영`,
+    run: async () => {
+      const fixes = rows.map(([, s]) => ({ ds: s.ds, ...(s.id ? { id: s.id } : {}), ...(s.code ? { code: s.code } : {}), from: s.from, url: s.url,
+        ...(s.title ? { title: s.title } : {}), ...(s.note ? { note: s.note } : {}) }));
+      const okDone = await applyAction('linkFix', { fixes }, `원문 주소 ${fixes.length}건`);
+      if (okDone) LINK_FIX_STAGE.clear();
+      renderLinkFixBar();
+      return okDone;
+    },
+  });
+  return true;
 }
 
 /** 「할 일」의 관리자 열쇠 카드 (F-4). `n` 이 1이면 카드로 올라오고 0이면 아래 정상 띠로 접힌다. */
@@ -2586,7 +3047,7 @@ async function handleActivityClick(e) {
     const source = { school: val('school'), host: val('host'), boardUrl: val('boardUrl'), evidence: val('evidence') };
     if (!/^https?:\/\//i.test(source.boardUrl)) { toast('게시판 주소는 http(s)로 시작해야 해요'); return true; }
     if (!source.school && !source.host) { toast('전국 글이면 주최·운영 기관을 적어 주세요'); return true; }
-    if (/linkareer|wevity|thinkcontest|campuspick|all-con|contestkorea|thinkyou|allforyoung/i.test(source.boardUrl)) { toast('집계 사이트는 출처로 넣지 않아요 — 주최의 제 게시판을 넣어 주세요'); return true; }
+    if (AGGREGATOR_RE.test(source.boardUrl)) { toast('집계 사이트는 출처로 넣지 않아요 — 주최의 제 게시판을 넣어 주세요'); return true; }
     await applyAction('activitySource', { op: 'add', source }, '출처 추가');
     return true;
   }
@@ -3907,6 +4368,7 @@ function bindGlobal() {
     if (await handleInstaClick(e)) return;   // 인스타 화면의 버튼 (2026-09-12)
     if (await handleActivityClick(e)) return;   // 대외활동·공모전 화면의 버튼 (2026-09-29)
     if (await handleNewsClick(e)) return;   // 교내 소식 화면의 버튼 (2026-09-30)
+    if (await handleLinkFixClick(e)) return;   // 「할 일 › 원문 링크 손볼 것」·모아 둔 원문 주소 줄 (2026-10-04)
 
     /* 모아 둔 수정 — 이 버튼은 **머리줄에 있어 시트 밖**이다.
        🔴 시트 핸들러(#sheet)에 두면 영영 안 눌린다(만들면서 실제로 그렇게 만들었다가 잡았다). */
@@ -4437,7 +4899,9 @@ async function enter(key, remember, expires = '') {
     /* 반영 전 전후 대조·C2 (2026-09-14) — 검사가 **화면이 센 것**과 저장소 계산을 대 볼 수 있게.
        🔴 검사용 창구일 뿐 화면 동작은 여기 없다(규칙을 두 벌로 만들지 않는다). */
     pendingMap: () => PENDING_EDITS, flushPlan, goNationwide, scopeWideItems, noEligItems, scopeCount, noDeadlineItems,
-    robots: () => ROBOTS, jobBusy: () => jobBusy };
+    robots: () => ROBOTS, jobBusy: () => jobBusy,
+    /* 원문 링크 손볼 것 (2026-10-04) — 검사가 화면이 모아 둔 것·센 것을 본다 */
+    linkFixStage: () => LINK_FIX_STAGE, linkFixTodo, lfState: () => LF.state };
 }
 
 function boot() {
