@@ -1,6 +1,6 @@
 {
  "school": "강원대학교",
- "updatedAt": "2026-10-03",
+ "updatedAt": "2026-10-04",
  "items": [
   {
    "title": "강원대학교 총동창회 「강대인 봄내길 걷기대회」 참가 안내",
@@ -229,7 +229,8 @@
    "kind": "행사",
    "school": "강원대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "thumb": "data/news/img/e812afcbf10a1b07.webp"
   },
   {
    "title": "[강릉,원주]2026학년도 2학기 분할납부 안내(2차납부)",

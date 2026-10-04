@@ -1,6 +1,6 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-10-03",
+ "updatedAt": "2026-10-04",
  "items": [
   {
    "title": "[(주)소노케어랩] 의료기기 하드웨어 개발 담당자 채용 공고",
@@ -195,7 +195,8 @@
    "postedAt": "2026-09-23",
    "school": "성균관대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "thumb": "data/news/img/6cef926f3b6dcfd9.webp"
   },
   {
    "title": "성균관대 화학공학과 행정조교 모집(~10/6)",

@@ -1,8 +1,20 @@
 {
  "note": "학교별 교내 소식 파일 색인 (data/news/). 앱은 match-engine.js newsFileFor(noticeFileKey) 로 자기 학교 파일을 바로 받는다 — 옛 통짜 파일로 물러나는 길은 없다. check-live.yml 이 이 색인의 학교 전부를 확인한다.",
- "updatedAt": "2026-10-03",
+ "updatedAt": "2026-10-04",
  "schools": 43,
  "files": {
+  "이화여자대학교": {
+   "file": "n1tk2q9m.json",
+   "count": 19
+  },
+  "서울과학기술대학교": {
+   "file": "n14kv35j.json",
+   "count": 12
+  },
+  "서울교육대학교": {
+   "file": "n18ebv4b.json",
+   "count": 10
+  },
   "부산대학교": {
    "file": "n13zozby.json",
    "count": 14
@@ -30,10 +42,6 @@
   "인하대학교": {
    "file": "nkeh7pq.json",
    "count": 14
-  },
-  "서울과학기술대학교": {
-   "file": "n14kv35j.json",
-   "count": 11
   },
   "충북대학교": {
    "file": "n16l2078.json",
@@ -78,10 +86,6 @@
   "조선대학교": {
    "file": "n1qr99q6.json",
    "count": 15
-  },
-  "이화여자대학교": {
-   "file": "n1tk2q9m.json",
-   "count": 19
   },
   "한국방송통신대학교": {
    "file": "n1uf7bji.json",
@@ -143,10 +147,6 @@
    "file": "n12kfbyt.json",
    "count": 6
   },
-  "서울교육대학교": {
-   "file": "n18ebv4b.json",
-   "count": 9
-  },
   "숙명여자대학교": {
    "file": "n1a4mxa4.json",
    "count": 9
@@ -173,7 +173,7 @@
   },
   "가천대학교": {
    "file": "nzzc8bm.json",
-   "count": 8
+   "count": 7
   }
  }
 }

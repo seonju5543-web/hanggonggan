@@ -1,6 +1,6 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-10-03",
+ "updatedAt": "2026-10-04",
  "items": [
   {
    "title": "[국제학생] 2026 외국인 태권도 경연축제 참가 안내",
@@ -87,7 +87,8 @@
    "postedAt": "2026-09-11",
    "school": "광운대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "thumb": "data/news/img/e8eb41bf3b57e2de.webp"
   },
   {
    "title": "[일반] [서울특별시] 2026년 서울시 빅데이터 캠퍼스 전문교육 과정 안내(10월)",
@@ -264,7 +265,8 @@
    "postedAt": "2026-09-15",
    "school": "광운대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "thumb": "data/news/img/37412651230c08b3.webp"
   },
   {
    "title": "[학생] 2027학년도 일학습병행 학생 설명회",
@@ -273,7 +275,8 @@
    "kind": "행사",
    "school": "광운대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "thumb": "data/news/img/7c6156a8d5e16810.webp"
   },
   {
    "title": "[학사] 2026학년도 2학기 학부 수강과목 포기 안내",

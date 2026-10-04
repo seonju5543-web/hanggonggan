@@ -1,6 +1,6 @@
 {
  "school": "고려대학교",
- "updatedAt": "2026-10-03",
+ "updatedAt": "2026-10-04",
  "items": [
   {
    "title": "★ 한국어센터 '한국어 주간' Festival에 초대합니다! ★",
@@ -20,7 +20,8 @@
    "kind": "채용",
    "school": "고려대학교",
    "campus": "",
-   "foundAt": "2026-10-03"
+   "foundAt": "2026-10-03",
+   "thumb": "data/news/img/f1a3c5da0e7eec5b.webp"
   },
   {
    "title": "[임상간호대학원] 2027학년도 전기 신입생(석사) 모집",

@@ -1,108 +1,106 @@
 {
  "school": "이화여자대학교",
- "updatedAt": "2026-10-03",
+ "updatedAt": "2026-10-04",
  "items": [
   {
-   "title": "[학부] 2026학년도 제2학기 마이크로전공 신청 및 취소 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=366952&article.offset=0&articleLimit=10&no=394",
-   "postedAt": "2026-09-16",
-   "school": "이화여자대학교",
-   "campus": "",
-   "foundAt": "2026-10-02"
-  },
-  {
-   "title": "[학부] 2026학년도 제2학기 부.복수전공 신청 및 취소 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=366944&article.offset=0&articleLimit=10&no=394",
-   "postedAt": "2026-09-16",
-   "kind": "학사",
-   "school": "이화여자대학교",
-   "campus": "",
-   "foundAt": "2026-10-02"
-  },
-  {
-   "title": "[학부] 2026년도 제 13회 동교인재상(東喬人材賞) 선발 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367234&article.offset=0&articleLimit=10&no=392",
-   "postedAt": "2026-10-02",
-   "school": "이화여자대학교",
-   "campus": "",
-   "foundAt": "2026-10-02"
-  },
-  {
-   "title": "[국제대학원] 2026-2학기 A급 대학원생 학생조교 모집 (~10/11)",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367224&article.offset=0&articleLimit=10&no=388",
-   "postedAt": "2026-10-02",
-   "kind": "채용",
-   "school": "이화여자대학교",
-   "campus": "",
-   "foundAt": "2026-10-02"
-  },
-  {
-   "title": "[공사/일반경쟁]E-House 204동 냉난방기(EHP) 교체 공사",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367217&article.offset=0&articleLimit=10&no=385",
-   "postedAt": "2026-10-01",
-   "school": "이화여자대학교",
-   "campus": "",
-   "foundAt": "2026-10-02"
-  },
-  {
-   "title": "[일반대학원] 2027학년도 제1학기 일반대학원 재입학 및 논문제출자격재부여 신청안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367215&article.offset=0&articleLimit=10&no=384",
-   "postedAt": "2026-10-01",
-   "school": "이화여자대학교",
-   "campus": "",
-   "foundAt": "2026-10-02"
-  },
-  {
    "title": "[학부] 2026학년도 제2학기 영어 및 정보인증제 신청 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367207&article.offset=0&articleLimit=10&no=390",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367207&article.offset=0&articleLimit=10&no=387",
    "postedAt": "2026-10-01",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-04"
   },
   {
    "title": "[학부] 2027학년도 제1학기 학부 재입학, 학부 졸업논문등제출자격재부여 신청안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367199&article.offset=0&articleLimit=10&no=390",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367199&article.offset=0&articleLimit=10&no=387",
    "postedAt": "2026-10-01",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-04"
   },
   {
    "title": "2027학년도 전기 일반대학원 입학전형 원서접수 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367186&article.offset=0&articleLimit=10&no=390",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367186&article.offset=0&articleLimit=10&no=387",
    "postedAt": "2026-09-30",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-04"
   },
   {
    "title": "[교목실] 2026-2학기 이화감사페스티벌 참가 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367125&article.offset=0&articleLimit=10&no=390",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367125&article.offset=0&articleLimit=10&no=387",
    "postedAt": "2026-09-28",
    "kind": "행사",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-10-02",
-   "thumb": "data/news/img/6356f94820550c1d.webp"
+   "foundAt": "2026-10-04"
   },
   {
    "title": "2026학년도 제2학기 교양과목 중간시험 시간표 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367123&article.offset=0&articleLimit=10&no=390",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367123&article.offset=0&articleLimit=10&no=387",
    "postedAt": "2026-09-28",
    "kind": "학사",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-04"
+  },
+  {
+   "title": "[학부] 2026학년도 제2학기 마이크로전공 신청 및 취소 안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=366952&article.offset=0&articleLimit=10&no=387",
+   "postedAt": "2026-09-16",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-04"
+  },
+  {
+   "title": "[학부] 2026학년도 제2학기 부.복수전공 신청 및 취소 안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=366944&article.offset=0&articleLimit=10&no=387",
+   "postedAt": "2026-09-16",
+   "kind": "학사",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-04"
   },
   {
    "title": "[학생군사교육단] '26년 후반기 이화여자대학교 ROTC(학군단) 모집",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=366640&article.offset=0&articleLimit=10&no=390",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=366640&article.offset=0&articleLimit=10&no=387",
    "postedAt": "2026-09-01",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-10-02",
-   "thumb": "data/news/img/f548160bd7b8fad9.webp"
+   "foundAt": "2026-10-04"
+  },
+  {
+   "title": "[학부] 2026년도 제 13회 동교인재상(東喬人材賞) 선발 안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367234&article.offset=0&articleLimit=10&no=385",
+   "postedAt": "2026-10-02",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-04"
+  },
+  {
+   "title": "[국제대학원] 2026-2학기 A급 대학원생 학생조교 모집 (~10/11)",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367224&article.offset=0&articleLimit=10&no=381",
+   "postedAt": "2026-10-02",
+   "kind": "채용",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-04"
+  },
+  {
+   "title": "[공사/일반경쟁]E-House 204동 냉난방기(EHP) 교체 공사",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367217&article.offset=0&articleLimit=10&no=378",
+   "postedAt": "2026-10-01",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-04"
+  },
+  {
+   "title": "[일반대학원] 2027학년도 제1학기 일반대학원 재입학 및 논문제출자격재부여 신청안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367215&article.offset=0&articleLimit=10&no=377",
+   "postedAt": "2026-10-01",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-04"
   },
   {
    "title": "[TELOS트랙] 2026학년도 2학기 TELOS트랙 신청 안내(~10/2)",
