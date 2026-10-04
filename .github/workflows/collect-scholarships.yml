@@ -41,7 +41,7 @@ jobs:
     # 2026-09-29 수집망 2 → 44개교 복원: 「게시판 수집」 단계에 자체 상한 10분(예산 8분 + 마무리 2분)이 생겨
     # 단계 합 4+10+6+5+1+4+3+3+4 = 40 → 상한 44. ⚠️ 상한을 키우는 것으로 때우지 말 것 — 단계가 오래 걸리면
     # 그 단계의 예산(HARVEST_BUDGET_MS)을 줄이고, 상한은 그 합을 담는 그릇으로만 쓴다(8/2~3 사고의 교훈).
-    timeout-minutes: 56   # 2026-10-03 대외활동 첨부·포스터 단계 9분(PaddleOCR 설치 포함) → 단계 합 51 + 여유 5 (2026-09-30 판정 로봇 2분 → 42+3)
+    timeout-minutes: 59   # 2026-10-04 관문 다시 재기 3분(gate-guard — 새 단계의 몫) → 단계 합 54 + 여유 5 (2026-10-03 대외활동 첨부·포스터 9분 → 51+5 · 2026-09-30 판정 로봇 2분 → 42+3)
     steps:
       - uses: actions/checkout@v4
         with:
@@ -235,12 +235,17 @@ jobs:
         run: |
           node verify/test-collector.mjs
           node verify/audit-data.js
+      # 🔴 되돌리고 **관문을 다시 잰다** (2026-10-04 · 로봇·도구 점검 — 로직은 collector/gate-guard.mjs 한 곳).
+      #    예전엔 새 자동 등록분만 빼고 끝나, 원인이 기존 항목 수정(발췌 등)이면 아무것도 못 한 채 아래 저장 단계가 관문 실패 상태의
+      #    정식 등록 파일을 커밋했다. 이제 ① 새 자동 등록분 → 다시 재기 → ② 정식 등록·양식·대기열을 HEAD 판으로 → 다시 재기.
+      #    결과는 steps.guard.outputs.gate(reverted-auto · reverted-files · still-failing · flaky) — still-failing 이면 맨 끝 단계가 빨간불 + 이슈.
+      #    상한 3분 = 관문 최대 두 번(로컬 실측 ~25초씩) + 여유. 넘어지면 정식 등록 파일만이라도 HEAD 판으로(|| 뒤).
       - name: 감사 실패 시 자동 등록분 되돌리기
+        id: guard
         if: steps.audit.outcome == 'failure'
+        timeout-minutes: 3
         run: |
-          # 파일 전체가 아니라 '이번 실행이 새로 자동 등록한 공고'만 골라서 뺀다
-          # (같은 실행의 원문 발췌 갱신 같은 정상 작업까지 버리지 않도록)
-          node collector/revert-auto.mjs || git checkout -- data/registered.json
+          node collector/gate-guard.mjs --report collector/report.md --note /tmp/gate-note.md --stage auto --stage data/registered.json,data/forms.json,collector/pending-forms.json || git checkout -- data/registered.json data/forms.json collector/pending-forms.json
 
       - name: 수집 상태 저장 (중복 방지 기록)
         run: |
@@ -285,6 +290,7 @@ jobs:
           [ -f collector/collect-cursor.json ] && git add collector/collect-cursor.json
           [ -f collector/health.json ] && git add collector/health.json
           [ -f collector/pending-forms.json ] && git add collector/pending-forms.json
+          [ -f collector/auto-held.json ] && git add collector/auto-held.json   # 관문에 걸린 자동 등록 쉬기 장부 (2026-10-04 · gate-guard·auto-register)
           [ -d collector/extracted ] && git add collector/extracted
           # 리포트 본문도 저장한다 — 이슈에만 올리고 파일을 커밋하지 않아서, 관리자 화면의
           # '일반 수집 리포트' 버튼이 늘 "리포트 파일이 아직 없습니다"였다 (2026-08-12 수리).
@@ -347,24 +353,38 @@ jobs:
           last=$(gh issue list --repo "${{ github.repository }}" \
             --search '"장학공고 수집 리포트" in:title' --state open \
             --limit 1 --json number --jq '.[0].number' || true)
+          # 🔴 관문 결과로 가른다 (2026-10-04) — 관문이 빨간 날에도 '정상 실행'이라 적어 감사 실패가 묻혔다
+          if [ "${{ steps.audit.outcome }}" = "failure" ]; then
+            msg="🤖 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 수집은 정상 · **데이터 관문 빨간불**(되돌림: ${{ steps.guard.outputs.gate }}) — 새 공고 0건 · 아래 감사 실패 코멘트를 보세요."
+          else
+            msg="🤖 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 수집 로봇 정상 실행 — 새 공고 0건이라 새 리포트는 만들지 않았어요."
+          fi
           if [ -n "$last" ] && [ "$last" != "null" ]; then
-            gh issue comment "$last" --repo "${{ github.repository }}" \
-              --body "🤖 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 수집 로봇 정상 실행 — 새 공고 0건이라 새 리포트는 만들지 않았어요."
+            gh issue comment "$last" --repo "${{ github.repository }}" --body "$msg"
           fi
 
       # 로봇이 어떤 단계에서든 실패하면 조용히 멈추지 않고 즉시 알린다
       # (2026-07-17~19 이틀간 8회 연속 실패를 아무도 몰랐던 사고의 재발 방지)
+      # 🔴 제 리포트 이슈로 (2026-10-04) — '"수집 리포트"' 부분 일치는 더 최근의 브라우저형 리포트 이슈를 집어(#381 코멘트 9개 중 4개가 이 로봇 것)
+      #    어느 로봇의 실패인지도 안 적혀 있었다. 결과 문구는 gate-guard 의 결과(steps.guard.outputs.gate)로 가른다.
       - name: 🚨 데이터 감사 실패 알림
         if: steps.audit.outcome == 'failure'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          case "${{ steps.guard.outputs.gate }}" in
+            reverted-auto)  what="이번 실행의 새 자동 등록 ${{ steps.guard.outputs.removed }}건을 되돌리고 나머지 결과는 저장했습니다." ;;
+            reverted-files) what="이번 실행의 정식 등록 변경(자동 등록·발췌·범위 승격·교내 판정)을 저장하지 않았습니다 — 수집된 공고 자체는 실시간 피드에 그대로 있습니다." ;;
+            still-failing)  what="되돌린 뒤에도 관문이 빨갛습니다 — 이번 실행의 정식 등록 변경이 원인이 아니라서 사람이 봐야 합니다(새 이슈를 열었습니다)." ;;
+            flaky)          what="다시 재니 관문을 통과했습니다 — 처음 실패가 다시 나지 않았습니다(되돌린 것 없음)." ;;
+            *)              what="되돌리기 단계가 결과를 남기지 못했습니다 — 정식 등록·양식 파일을 직전 판으로 돌렸습니다." ;;
+          esac
           last=$(gh issue list --repo "${{ github.repository }}" \
-            --search '"수집 리포트" in:title' --state open \
+            --search '"장학공고 수집 리포트" in:title' --state open \
             --limit 1 --json number --jq '.[0].number' || true)
           if [ -n "$last" ] && [ "$last" != "null" ]; then
             gh issue comment "$last" --repo "${{ github.repository }}" \
-              --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **데이터 감사 실패 — 이번 자동 등록분은 되돌렸습니다.** 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · 수집된 공고 자체는 실시간 피드에 그대로 남아 있어요. Claude 세션에 '감사 실패 확인해줘'라고 지시하세요."
+              --body "🤖 장학공고 수집 로봇: 🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **데이터 관문(감사) 실패** — $what 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '감사 실패 확인해줘'라고 지시하세요."
           fi
 
       # cancelled()가 반드시 있어야 한다 (2026-08-04에 뚫린 구멍).
@@ -383,3 +403,24 @@ jobs:
             gh issue comment "$last" --repo "${{ github.repository }}" \
               --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **수집 로봇이 끝까지 못 갔어요** (실패 또는 시간 초과로 취소) — 이번 수집분은 저장되지 않았습니다. 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · 관리자 화면 → 로봇 (https://hanggonggan-admin.pages.dev/#robots) 에서 「일반 수집 로봇」의 **지금 실행**을 **한 번** 눌러 보세요 — 학교 서버가 잠깐 늦은 것이면 이것으로 끝납니다. 그래도 또 넘어지면 Claude 세션에 '로봇 실패 확인해줘'라고 지시하세요."
           fi
+
+      # 🔴 되돌린 뒤에도 관문이 빨가면 초록불로 끝내지 않는다 (2026-10-04 · 로봇·도구 점검).
+      #    failure()·cancelled() 알림 **뒤**에 둔다 — 앞에 두면 그 알림이 '이번 수집분은 저장되지 않았습니다'라는 틀린 말을 붙인다(저장은 됐다).
+      - name: 🚨 관문이 끝내 빨간불 (되돌린 뒤에도)
+        if: steps.guard.outputs.gate == 'still-failing'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "🤖 장학공고 수집 로봇: 데이터 관문이 빨간불이고, 이번 실행의 자동 등록분·정식 등록 변경을 되돌려도 통과하지 않습니다(무엇을 되돌렸는지는 아래 단락)."
+            echo
+            cat /tmp/gate-note.md 2>/dev/null || true
+            echo
+            echo "실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '데이터 관문 빨간불 확인해줘'라고 지시하세요."
+          } > /tmp/gate-issue.md
+          gh issue create --repo "${{ github.repository }}" \
+            --title "🚨 데이터 관문이 되돌린 뒤에도 빨간불 — 장학공고 수집 로봇 $(TZ=Asia/Seoul date +%Y-%m-%d)" \
+            --body-file /tmp/gate-issue.md \
+            --assignee "${{ github.repository_owner }}" || true
+          echo "::error::데이터 관문이 되돌린 뒤에도 빨간불입니다 — 이슈를 열었습니다."
+          exit 1

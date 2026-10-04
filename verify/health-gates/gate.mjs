@@ -7,6 +7,10 @@
         빨개졌다**. 규칙을 감사가 쓰는 한 곳(verify/source-rules.cjs · entry-rules checkEntry)으로 옮기고 저장소가 저장 전에 같은 함수로 거절한다.
      ③ 실데이터 단정 톱니 — test-collector 가 실데이터를 읽어 단정하면 로봇이 데이터를 바꾸는 순간 관문이 빨개진다(10-01·10-04 사고).
         읽는 곳 수를 파일별로 세어 늘면 빨간불 · 저장 전 관문이 없던 등록금·학과 갱신 로봇에 관문 · 등록금 표본.
+     ④ 데이터 관문 되돌리기 — 되돌린 뒤 관문을 다시 재지 않아(revert-auto) 원인이 기존 항목이면 관문 실패 상태로 저장되고,
+        링크 사냥꾼은 결과를 버리고도 초록불이었다. collector/gate-guard.mjs 를 임시 git 저장소 + 가짜 관문으로 잰다 · 워크플로 배선 · 쉬기 장부.
+     ⑤ 알림이 제 리포트로 간다 — '"수집 리포트" in:title' 부분 일치가 다른 로봇의 리포트 이슈를 집었다(#381).
+     ⑥ 양식 대기열 고아 — 정식 등록에서 빠진 공고의 대기 항목(123건 중 71건)을 스키마화 로봇이 매 실행 정리한다.
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
 import os from 'node:os';
@@ -189,5 +193,159 @@ export default async function gate(eq, ctx) {
     const T = { '한국외국어대학교': { avg: 7791804, byField: { 인문사회: 7269500 } } };
     eq('③ 등록금 표본 — 표의 1년치를 한 학기로 (외대 인문사회 7,269,500 → 3,634,750 · 실데이터를 읽지 않는다)',
       [PA.tuitionFor({ school: '한국외국어대학교', track: 'humanities' }, T), PA.tuitionSource({ school: '한국외국어대학교', track: 'humanities' }, T)], [3634750, 'field']);
+  }
+
+  /* ── ④ 데이터 관문 되돌리기 ── */
+  {
+    const guardPath = fileURLToPath(new URL('collector/gate-guard.mjs', root));
+    const STAGES = ['--stage', 'auto', '--stage', 'data/registered.json,data/forms.json,collector/pending-forms.json'];
+    const J = (x) => `${JSON.stringify(x, null, 1)}\n`;
+    /* 임시 git 저장소 — HEAD 판을 커밋하고, 이번 실행이 바꾼 것을 덮어쓴 뒤 gate-guard 를 진짜로 돌린다.
+       가짜 관문: 정식 등록에 bad:true 항목이 있으면 ✕ 한 줄을 찍고 exit 1 */
+    const scenario = (head, work, extra = {}) => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-gate-guard-'));
+      const w = (rel, body) => { fs.mkdirSync(path.dirname(path.join(dir, rel)), { recursive: true }); fs.writeFileSync(path.join(dir, rel), typeof body === 'string' ? body : J(body)); };
+      const g = (...a) => spawnSync('git', a, { cwd: dir, encoding: 'utf8' });
+      g('init', '-q'); g('config', 'user.email', 'gate@example.com'); g('config', 'user.name', 'gate'); g('config', 'commit.gpgsign', 'false');
+      w('check.cjs', "const r = require('./data/registered.json'); const bad = (r.items || []).filter((i) => i.bad);\nif (bad.length) { console.log('  ✕ 표본 관문 — bad 항목 ' + bad.map((i) => i.id).join(',')); process.exit(1); }\nconsole.log('  ✓ 표본 관문'); process.exit(0);\n");
+      for (const [rel, body] of Object.entries(head)) w(rel, body);
+      g('add', '-A'); g('commit', '-qm', 'head');
+      for (const [rel, body] of Object.entries(work)) w(rel, body);
+      const outFile = path.join(dir, '.gh-output');
+      const r = spawnSync(process.execPath, [guardPath, '--report', 'r.md', '--note', path.join(dir, 'note.md'), ...STAGES],
+        { cwd: dir, encoding: 'utf8', env: { ...process.env, GATE_CMD: 'node check.cjs', GITHUB_OUTPUT: outFile, ...extra } });
+      const read = (rel) => (fs.existsSync(path.join(dir, rel)) ? fs.readFileSync(path.join(dir, rel), 'utf8') : null);
+      const out = Object.fromEntries((read('.gh-output') || '').split('\n').filter(Boolean).map((l) => l.split('=')));
+      const res = { status: r.status, out, read, headReg: g('show', 'HEAD:data/registered.json').stdout };
+      return { ...res, done: () => fs.rmSync(dir, { recursive: true, force: true }) };
+    };
+    const HEAD = { 'data/registered.json': { items: [{ id: 'old', auto: true, v: 1 }] }, 'data/forms.json': { templates: {} },
+      'collector/pending-forms.json': { items: [{ id: 'old', fetched: true }] }, 'r.md': '# 리포트\n\n### 🤖 자동 등록 (선조치후보고) — 2건 등록\n\n- 표본\n' };
+    /* ㉠ 새 자동 등록분이 원인 → 그것만 빼고 통과 · 기존 항목 개선(v:2)은 남는다 · 대기열에서도 빠진다 · 쉬기 장부에 적힌다 */
+    {
+      const S = scenario(HEAD, { 'data/registered.json': { items: [{ id: 'old', auto: true, v: 2 }, { id: 'n1', auto: true, bad: true }, { id: 'n9', auto: true }] },
+        'collector/pending-forms.json': { items: [{ id: 'old', fetched: true }, { id: 'n1' }, { id: 'n9' }] } });
+      const reg = JSON.parse(S.read('data/registered.json'));
+      const held = JSON.parse(S.read('collector/auto-held.json') || '{"items":[]}');
+      const rep = S.read('r.md');
+      eq('④ ㉠ 새 자동 등록분이 원인 → 그것만 빼고 통과(reverted-auto) · 기존 항목 개선은 남는다 · 대기열·쉬기 장부',
+        [S.status, S.out.gate, S.out.removed, reg.items.map((i) => `${i.id}:${i.v || ''}`), JSON.parse(S.read('collector/pending-forms.json')).items.map((i) => i.id), held.items.map((i) => `${i.id}:${i.reverts}`).sort()],
+        [0, 'reverted-auto', '2', ['old:2'], ['old'], ['n1:1', 'n9:1']]);
+      eq('  ㉣ 리포트의 \'N건 등록\' 줄에 되돌림 표시 + 사람이 읽을 단락 (이슈 본문에도 그대로 간다)',
+        [/— 2건 등록 시도 · ↩ 데이터 관문에 걸려 되돌림/.test(rep), /새 자동 등록 2건을 되돌렸습니다/.test(rep), rep.indexOf('되돌렸습니다') > rep.indexOf('### 🤖')], [true, true, true]);
+      eq('  저장 형식은 로봇과 같다 (JSON.stringify(x, null, 1) + 끝 개행)', S.read('data/registered.json'), J(reg));
+      S.done();
+    }
+    /* ㉡ 기존 항목 수정이 원인 → 새 자동 등록분을 빼도 빨강 → 정식 등록 파일을 HEAD 바이트로 → 통과(reverted-files) · 쉬기 장부에 안 적는다 */
+    {
+      const S = scenario(HEAD, { 'data/registered.json': { items: [{ id: 'old', auto: true, v: 2, bad: true }, { id: 'n2', auto: true }] } });
+      eq('④ ㉡ 기존 항목 수정이 원인 → 파일을 HEAD 바이트 그대로 되돌려 통과(reverted-files) · 쉬기 장부 없음',
+        [S.status, S.out.gate, S.read('data/registered.json') === S.headReg, S.read('collector/auto-held.json')], [0, 'reverted-files', true, null]);
+      eq('  리포트 단락 — 정식 등록 변경을 저장하지 않았다고 말한다', /정식 등록 변경\(자동 등록·발췌·범위 승격·교내 판정\)을 저장하지 않았습니다/.test(S.read('r.md')), true);
+      S.done();
+    }
+    /* ㉢ HEAD 자체가 빨강 → 되돌려도 빨강(still-failing) · 그래도 exit 0(빨간불은 워크플로 마지막 단계가 낸다) · 걸린 검사를 적는다 */
+    {
+      const S = scenario({ ...HEAD, 'data/registered.json': { items: [{ id: 'old', auto: true, bad: true }] } }, {});
+      eq('④ ㉢ 직전 판부터 빨강 → still-failing · exit 0 · GITHUB_OUTPUT · 단락에 걸린 검사',
+        [S.status, S.out.gate, /되돌린 뒤에도 데이터 관문이 빨갛습니다/.test(S.read('note.md')), /걸린 검사: 「표본 관문 — bad 항목 old」/.test(S.read('note.md'))], [0, 'still-failing', true, true]);
+      S.done();
+    }
+    /* 되돌릴 것 없이 다시 재니 통과 → flaky (still-failing 이라 하지 않는다) */
+    {
+      const S = scenario(HEAD, {});
+      eq('  되돌릴 것 없이 다시 재니 통과하면 flaky (빨간불·이슈를 내지 않는다)', [S.status, S.out.gate], [0, 'flaky']);
+      S.done();
+    }
+    /* ㉤ 쉬기 장부 — 두 번 걸리면 마지막 날부터 3일 쉰다 · 정식 등록되면 지운다 */
+    {
+      const H = await import(new URL('collector/auto-held.mjs', root));
+      let L = H.recordReverts(null, ['x'], '2026-10-01');
+      const once = H.isHeld(L, 'x', '2026-10-01');
+      L = H.recordReverts(L, ['x'], '2026-10-02');
+      eq('④ ㉤ 쉬기 장부 — 한 번은 안 쉼 · 두 번이면 그날~2일 뒤 쉼 · 3일·4일 뒤 다시 봄 · 등록되면 지움',
+        [once, H.isHeld(L, 'x', '2026-10-02'), H.isHeld(L, 'x', '2026-10-04'), H.isHeld(L, 'x', '2026-10-05'), H.isHeld(L, 'x', '2026-10-06'), H.pruneRegistered(L, new Set(['x'])).ledger.items.length],
+        [false, true, true, false, false, 0]);
+    }
+    /* 워크플로 배선 (주석 걷고) */
+    const wfText = (f) => stripYamlComments(fs.readFileSync(new URL(`.github/workflows/${f}`, root), 'utf8'));
+    const steps = (t) => t.split(/\n(?= {6}- )/);
+    const stepWith = (t, re) => steps(t).find((s) => re.test(s)) || '';
+    const lastStepExit = (f) => {
+      const t = wfText(f);
+      const st = stepWith(t, /steps\.guard\.outputs\.gate == 'still-failing'/);
+      const fail = t.indexOf("failure() || cancelled()");
+      return !!st && /exit 1\s*$/.test(st.trimEnd()) && !/continue-on-error/.test(st) && fail > 0 && t.indexOf(st) > fail;
+    };
+    eq('④ 장학·브라우저 수집 — gate-guard 로 되돌리고(리포트 단락) · 끝내 빨가면 실패 알림 뒤에서 exit 1',
+      ['collect-scholarships.yml', 'browser-collect.yml'].map((f) => [/node collector\/gate-guard\.mjs --report collector\/(browser-)?report\.md/.test(wfText(f)), /id: guard/.test(stepWith(wfText(f), /gate-guard\.mjs/)), lastStepExit(f), /git add collector\/auto-held\.json/.test(wfText(f))]),
+      [[true, true, true, true], [true, true, true, true]]);
+    {
+      const lh = wfText('link-hunter.yml');
+      const st = steps(lh).filter((s) => /steps\.audit\.outcome == 'failure'/.test(s) && /exit 1\s*$/.test(s.trimEnd()) && !/continue-on-error/.test(s));
+      const cn = wfText('collect-news.yml');
+      eq('④ 링크 사냥꾼 — 감사에 걸려 결과를 버리면 빨간불(continue-on-error 없는 exit 1) · 소식 로봇 — gate-guard + 끝내 빨가면 exit 1',
+        [st.length >= 1, /node collector\/gate-guard\.mjs --report collector\/news-report\.md --stage data\/news,/.test(cn), lastStepExit('collect-news.yml')], [true, true, true]);
+    }
+    const ar = stripComments(fs.readFileSync(new URL('collector/auto-register.mjs', root), 'utf8'));
+    eq('④ 자동 등록이 쉬기 장부를 불러 쓴다 (isHeld · pruneRegistered — 베끼지 않는다)',
+      /import \{ isHeld, pruneRegistered \} from '\.\/auto-held\.mjs'/.test(ar), true);
+    /* 자동 등록을 사본 저장소에서 **진짜로** 돌린다(불러오는 순간 실행되는 파일이라 import 하지 않는다 — test-collector 의 사본 꼴).
+       같은 공고가 장부에 두 번 걸려 있으면 등록하지 않고 컨펌 대기에 이유를 남긴다 · 장부가 없으면(대조군) 등록한다 */
+    {
+      const runAreg = (ledger) => {
+        const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-gate-areg-'));
+        for (const d of ['collector', 'verify', 'data']) fs.mkdirSync(path.join(dir, d), { recursive: true });
+        for (const f of fs.readdirSync(fileURLToPath(root))) if (f.endsWith('.js')) fs.copyFileSync(fileURLToPath(new URL(f, root)), path.join(dir, f));
+        for (const f of fs.readdirSync(fileURLToPath(new URL('collector/', root)))) if (f.endsWith('.mjs')) fs.copyFileSync(fileURLToPath(new URL(`collector/${f}`, root)), path.join(dir, 'collector', f));
+        for (const f of fs.readdirSync(fileURLToPath(new URL('verify/', root)))) if (f.endsWith('.cjs')) fs.copyFileSync(fileURLToPath(new URL(`verify/${f}`, root)), path.join(dir, 'verify', f));
+        const w = (rel, body) => fs.writeFileSync(path.join(dir, rel), typeof body === 'string' ? body : J(body));
+        w('collector/auto-register-config.json', { enabled: true, schools: [], maxPerRun: 8, blockIds: [], blockUrls: [] });
+        w('data/notices.json', { items: [{ title: '2026학년도 2학기 표본재단 장학생 선발 안내', url: 'https://example.ac.kr/bbs/view.do?seq=777', school: '경희대학교', campus: '', foundAt: '2026-10-04' }] });
+        w('data/registered.json', { items: [] }); w('data/forms.json', { templates: {} }); w('collector/report.md', '');
+        if (ledger) w('collector/auto-held.json', ledger(dir));
+        const r = spawnSync(process.execPath, [path.join(dir, 'collector/auto-register.mjs')], { cwd: dir, encoding: 'utf8' });
+        const res = { status: r.status, ids: JSON.parse(fs.readFileSync(path.join(dir, 'data/registered.json'), 'utf8')).items.map((i) => i.id),
+          report: fs.readFileSync(path.join(dir, 'collector/report.md'), 'utf8') };
+        fs.rmSync(dir, { recursive: true, force: true });
+        return res;
+      };
+      const free = runAreg(null);
+      const today = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+      const held = runAreg(() => ({ items: free.ids.map((id) => ({ id, reverts: 2, lastAt: today })) }));
+      eq('④ 자동 등록 — 장부 없으면 등록(대조군) · 두 번 걸린 공고는 등록하지 않고 컨펌 대기에 이유를 남긴다',
+        [free.status, free.ids.length, held.status, held.ids, /데이터 관문에 2번 걸려 되돌린 공고 — 3일 쉬었다 다시 봅니다/.test(held.report)], [0, 1, 0, [], true]);
+    }
+    eq('  옛 이름(revert-auto)은 gate-guard 의 auto 단계만 부르는 얇은 입구다 (로직 사본 없음)',
+      /import \{ main \} from '\.\/gate-guard\.mjs'/.test(fs.readFileSync(new URL('collector/revert-auto.mjs', root), 'utf8')) && !/knownIds|execSync/.test(stripComments(fs.readFileSync(new URL('collector/revert-auto.mjs', root), 'utf8'))), true);
+  }
+
+  /* ── ⑤ 알림이 제 리포트로 간다 ── */
+  {
+    const wf = (f) => stripYamlComments(fs.readFileSync(new URL(`.github/workflows/${f}`, root), 'utf8'));
+    eq('⑤ 장학·브라우저·사냥꾼 워크플로에 맨 \'"수집 리포트" in:title\' 검색이 없다 (다른 로봇의 리포트 이슈를 집는다)',
+      ['collect-scholarships.yml', 'browser-collect.yml', 'link-hunter.yml'].filter((f) => /'"수집 리포트" in:title'/.test(wf(f))), []);
+    const cs = wf('collect-scholarships.yml');
+    const auditAlert = cs.split(/\n(?= {6}- )/).find((s) => /name: 🚨 데이터 감사 실패 알림/.test(s)) || '';
+    const zero = cs.split(/\n(?= {6}- )/).find((s) => /name: 0건 실행 알림/.test(s)) || '';
+    eq('  장학 감사 실패 알림은 제 리포트 · 로봇 이름 · 결과별 문구 / 0건 알림은 관문 결과로 가른다',
+      [/'"장학공고 수집 리포트" in:title'/.test(auditAlert), /🤖 장학공고 수집 로봇:/.test(auditAlert), /steps\.guard\.outputs\.gate/.test(auditAlert), /steps\.audit\.outcome/.test(zero)], [true, true, true, true]);
+    const bc = wf('browser-collect.yml');
+    eq('  브라우저 알림 둘(감사 실패·실패/시간초과)은 브라우저형 리포트로', (bc.match(/'"브라우저형 수집 리포트" in:title'/g) || []).length, 2);
+    eq('  사냥꾼은 장학공고 리포트로 (제 리포트 이슈가 없다)', /'"장학공고 수집 리포트" in:title'/.test(wf('link-hunter.yml')), true);
+  }
+
+  /* ── ⑥ 양식 대기열 고아 ── */
+  {
+    const PQ = await import(new URL('collector/pending-queue.mjs', root));
+    const q = { items: [{ id: 'a', fetched: true, tries: 2 }, { id: 'b', retired: true }, { id: 'c' }] };
+    const r = PQ.pruneOrphans(q, new Set(['a']));
+    eq('⑥ 정식 등록에 없는 대기 항목을 뺀다 — 남는 항목 칸은 그대로 · 원본 큐는 안 바꾼다',
+      [r.kept, r.dropped.map((x) => x.id), q.items.length], [[{ id: 'a', fetched: true, tries: 2 }], ['b', 'c'], 3]);
+    const sf = stripComments(fs.readFileSync(new URL('collector/schematize-forms.mjs', root), 'utf8'));
+    const iCall = sf.indexOf('pruneOrphans(queue');
+    eq('  스키마화 로봇이 pending-queue 를 불러 \'스키마화할 항목 없음\' 조기 종료보다 앞에서 정리한다',
+      [/import \{ pruneOrphans \} from '\.\/pending-queue\.mjs'/.test(sf), iCall > 0 && iCall < sf.indexOf("log('스키마화할 항목 없음')")], [true, true]);
+    eq('  되돌리기(gate-guard)도 같은 함수로 대기열을 정리한다', /import \{ pruneOrphans \} from '\.\/pending-queue\.mjs'/.test(fs.readFileSync(new URL('collector/gate-guard.mjs', root), 'utf8')), true);
   }
 }

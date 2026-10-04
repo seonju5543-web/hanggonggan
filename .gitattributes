@@ -70,6 +70,9 @@ collector/own-programs.json          merge=jsonunion
 collector/kind-candidates.json       merge=ours
 collector/portal-candidates.json     merge=ours
 collector/school-board-seeds.json    merge=ours
+# 데이터 관문에 걸린 자동 등록 쉬기 장부 (2026-10-04 · gate-guard·auto-register 가 같은 대기줄에서 쓴다) — 부딪히면 내 것.
+# 한쪽 기록을 잃어도 그 공고가 한 번 더 등록됐다 되돌려질 뿐이다(규칙 없이 충돌하면 저장 단계가 통째로 실패한다).
+collector/auto-held.json             merge=ours
 
 # ── 교내 소식 (2026-09-30) — 학교별 파일·장부는 합집합, 색인·커서·리포트는 내 것 (공고 파일과 같은 취급) ──
 data/news/*.json             merge=jsonunion

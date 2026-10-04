@@ -21,6 +21,8 @@ const { checkEntry, isDuplicatePair, sameProgram } = createRequire(import.meta.u
 import { classifyKind, schoolDomain } from './kind-evidence.mjs';
 import { loadSchoolNames, schoolTokens } from './school-names.mjs';
 import { mergeInto } from './registered-merge.mjs';
+/* 데이터 관문에 거듭 걸린 공고는 3일 쉰다 — 장부 규칙은 auto-held.mjs 한 곳(되돌리는 gate-guard 와 같은 파일 · 2026-10-04) */
+import { isHeld, pruneRegistered } from './auto-held.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfgPath = new URL('auto-register-config.json', HERE);
@@ -268,6 +270,15 @@ if (!cfg.enabled) {
      2026-08-30 개발자 지시로 경희대·한국외대 둘로 좁혔고(수집은 그대로, 등록만 — 자격 진단·양식을 붙이는 사람 손이 드는 층),
      2026-09-29 개발자 지시("정식 등록도 44곳으로 넓혀")로 다시 비웠다. 경위·부작용은 설정 파일의 `_schools`. */
   const onlySchools = new Set(cfg.schools || []);
+  /* 관문에 걸려 되돌린 공고 장부 — 정식 등록에 들어간 id 는 지운다(관문을 지났다). 장부는 gate-guard 가 처음 만든다(없으면 빈 장부) */
+  const heldPath = new URL('auto-held.json', HERE);
+  let heldLedger = null;
+  try { heldLedger = JSON.parse(fs.readFileSync(heldPath, 'utf8')); } catch { /* 아직 없음 */ }
+  if (heldLedger) {
+    const pr = pruneRegistered(heldLedger, new Set(registered.items.map((i) => i.id)));
+    heldLedger = pr.ledger;
+    if (pr.removed) fs.writeFileSync(heldPath, `${JSON.stringify(heldLedger, null, 1)}\n`);
+  }
   let outOfScope = 0;
   let unseen = 0; // 한 실행 상한에 걸려 **아예 안 본** 공고 — 거른 것과 섞으면 숫자가 거짓말을 한다
   for (const n of notices.items || []) {
@@ -309,6 +320,13 @@ if (!cfg.enabled) {
     /* 사람이 한 번 '이건 아니다'라고 뺀 공고는 다시 등록하지 않는다.
        위 되돌리기와 같은 이유로 주소도 함께 본다 — 지우기만 하면 다음 실행에 또 들어온다. */
     if (blockedIds.has(id) || blockedUrls.has(cu)) { skipped.set('사람이 막아 둔 공고(blockIds/blockUrls)', (skipped.get('사람이 막아 둔 공고(blockIds/blockUrls)') || 0) + 1); continue; }
+    /* 데이터 관문에 두 번 걸려 되돌린 공고는 마지막으로 걸린 날부터 3일 쉰다 — 같은 공고가 실행마다 '등록 → 관문 빨간불 → 되돌림'을
+       되풀이하지 않게(10-03~04 실측 8건). 상한(maxPerRun)을 먹지 않고, 조용히 빠지지 않게 컨펌 대기에 이유를 남긴다. */
+    if (heldLedger && isHeld(heldLedger, id, TODAY)) {
+      const times = (heldLedger.items.find((x) => x.id === id) || {}).reverts || 2;
+      held.push({ n, why: `데이터 관문에 ${times}번 걸려 되돌린 공고 — 3일 쉬었다 다시 봅니다` });
+      continue;
+    }
     const title = cleanTitle(n.title).slice(0, 70);
     const entry = {
       id,

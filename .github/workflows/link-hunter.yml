@@ -126,8 +126,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           echo "::error::데이터 감사에 걸려 이번 사냥 결과를 통째로 되돌렸습니다 — 찾아낸 원문 주소가 저장되지 않았습니다."
+          # 사냥꾼은 제 리포트 이슈가 없다 — 원문 주소는 정식 등록 쪽 일이라 장학공고 리포트 이슈에 붙인다(2026-10-04 · '"수집 리포트"' 부분 일치는 브라우저형 리포트와 섞였다)
           last=$(gh issue list --repo "${{ github.repository }}" \
-            --search '"수집 리포트" in:title' --state open \
+            --search '"장학공고 수집 리포트" in:title' --state open \
             --limit 1 --json number --jq '.[0].number' || true)
           if [ -n "$last" ] && [ "$last" != "null" ]; then
             gh issue comment "$last" --repo "${{ github.repository }}" \
@@ -196,3 +197,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           echo "::warning::링크 사냥꾼 실행 실패 — ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+      # 🔴 사냥 결과를 버렸으면 빨간불로 끝낸다 (2026-10-04 · 로봇·도구 점검). 위 '되돌렸음을 알린다'는 continue-on-error 라
+      #    작업이 초록불로 끝났다 — 이슈 #381 의 '결과 전량 폐기' 4회가 전부 초록불이었고 하트비트의 '마지막 성공'에도 안 잡혔다.
+      #    맨 끝에 둔다(업로드·실패 알림 뒤) — 리포트는 남기고 실행만 빨갛게. continue-on-error 를 달지 말 것.
+      - name: 🚨 감사에 걸려 결과를 버렸다 (빨간불)
+        if: always() && steps.audit.outcome == 'failure'
+        run: |
+          echo "::error::링크 사냥꾼 — 데이터 관문(감사)에 걸려 이번 사냥 결과를 저장하지 않았습니다. 실행을 빨간불로 끝냅니다."
+          exit 1
