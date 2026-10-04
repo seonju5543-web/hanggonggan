@@ -320,13 +320,25 @@ export function eachLabeledValue(text, accept, read) {
   if (!text) return null;
   const lines = String(text).split(/\n+/).map((l) => unent(l).replace(/[ \t　]+/g, ' ').trim()).filter(Boolean);
   const ctxYear = soleYear(text);
-  for (const l of lines) {
+  for (let k = 0; k < lines.length; k += 1) {
+    const l = lines[k];
     if (l.length > 200) continue;
     const i = l.search(/[:：]/);
-    if (i < 0) continue;                            // 이름표에 매단다 — 콜론이 없으면 안 읽는다
-    const label = shHead(l.slice(0, i));            // 기호·번호 떼기는 section-head.js 한 곳
+    let label, value;
+    if (i >= 0) {
+      label = shHead(l.slice(0, i));                // 기호·번호 떼기는 section-head.js 한 곳
+      value = l.slice(i + 1);
+    } else {
+      /* 콜론 없는 줄 — 표 칸이 줄로 갈라진 꼴(`접수기한` ↵ `2026.10.26.(월) 23:59 까지` · 2026-10-05 G-3).
+         줄 전체가 이름표(기간·기한·마감·일시·일정·발표로 끝나는 짧은 말)이고 **바로 다음 줄이 날짜로
+         시작**할 때만 잇는다 — 문장(`신청기간을 꼭 확인하세요`)·다음 절 제목은 잇지 않는다. */
+      label = shHead(l);
+      const next = lines[k + 1] || '';
+      if (label.length > 15 || !/(기\s?간|기\s?한|마\s?감(일시?)?|일\s?시|일\s?정|발\s?표(일자?|예정일)?)$/.test(label)
+        || !/^[^0-9가-힣]{0,3}(\d{2,4}\s?[.\-/년]\s?)?\d{1,2}\s?[.\-/월]\s?\d{1,2}/.test(next)) continue;
+      value = next;
+    }
     if (label.length > 30) continue;                // 이름표는 짧다. 길면 문장이다
-    const value = l.slice(i + 1);
     if (!accept(label, value)) continue;
     const got = read(value, ctxYear);
     if (got) return got;
