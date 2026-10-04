@@ -196,3 +196,16 @@ export const nextShells = (prevSrc, nowSrc) => {
   if (!t || /^FETCH_(FAIL|ERROR)/.test(t) || hasText(nowSrc)) return 0;
   return (prevSrc?.shells ?? 0) + 1;
 };
+/** 이번 받기 뒤 그 주소에 남길 물러서기 수 { fails, shells } (0 이면 칸을 지운다).
+    before — notices-text.json 의 **원래 항목**. 🔴 색인(indexTexts)에서 꺼내지 말 것 — 원래 항목이 껍데기면 색인은 브라우저 본문을
+             대신 얹고, 거기엔 이 두 칸이 없다. 그 브라우저 본문도 껍데기인 주소는 수가 영영 1에 머물러 물러서지 않았다(2026-10-04 리뷰 R1 ·
+             실데이터 needsFetch 111건 중 21건).
+    got    — 이번에 받은 그대로(받기 실패면 FETCH_FAIL/FETCH_ERROR 글자) · nowSrc — 받은 뒤 다시 잰 색인 항목(브라우저 본문이 이기면 그것).
+    받기 실패면 fails 하나 더 · 껍데기면 shells 하나 더 — **상대 수는 이어 둔다**(번갈아 나도 문턱에 닿게 · 리뷰 R6) · 본문이 오면 둘 다 0. */
+export const fillCounts = (before, got, nowSrc) => {
+  const fails = before?.fails ?? 0;
+  const shells = before?.shells ?? 0;
+  if (/^FETCH_(FAIL|ERROR)/.test(String(got?.text || ''))) return { fails: fails + 1, shells };
+  const s = nextShells(before, nowSrc || got);
+  return s ? { fails, shells: s } : { fails: 0, shells: 0 };
+};

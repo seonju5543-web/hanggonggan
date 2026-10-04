@@ -7,7 +7,7 @@ import { isHtmlPayload } from './attachment-link.mjs';
    "수집기는 받는데 심층 수집은 못 받는" 어긋남이 생긴다 (2026-08-20 신설, 첫머리 주석 참조) */
 import { FETCH_HEADERS } from './http-headers.mjs';
 import { isNoticeDoc } from './attachment-text.mjs';
-import { canonUrl, normTitle, indexTexts, sourceFor, needsFetch, fillRetired, nextShells } from './notice-source.mjs';
+import { canonUrl, normTitle, indexTexts, sourceFor, needsFetch, fillRetired, fillCounts } from './notice-source.mjs';
 import { makeBudget } from './harvest-budget.mjs';
 /* 자격용 첨부 받기의 '무엇을 받을지'와 파일 이름 표식은 순수 함수 파일 한 곳에 — 이 파일은 불러오는 순간 수집을 시작해 관문이 못 부른다 */
 import { slugOf, pickEligDocTargets } from './elig-attach-plan.mjs';
@@ -88,6 +88,9 @@ try { prev = JSON.parse(fs.readFileSync(new URL('notices-text.json', OUT), 'utf8
 let browserBodies = {};
 try { browserBodies = JSON.parse(fs.readFileSync(new URL('browser-bodies.json', OUT), 'utf8')); } catch { /* 아직 없음 */ }
 const prevIdx = indexTexts(prev, browserBodies);
+/* 물러서기 수(fails·shells)는 **원래 항목**에서 읽는다 (2026-10-04 리뷰 R1 · notice-source.mjs fillCounts 머리말) — prevIdx 는 원래 항목이
+   껍데기면 브라우저 본문을 대신 얹어 그 자리엔 두 칸이 없다. '읽을 본문이 있나'는 그대로 prevIdx 로 본다(브라우저 본문도 본문이다). */
+const prevRaw = new Map(prev.filter((v) => v && v.url).map((v) => [canonUrl(v.url), v]));
 
 let registered = { items: [] };
 try { registered = JSON.parse(fs.readFileSync(new URL('../data/registered.json', HERE), 'utf8')); } catch { /* 없어도 진행 */ }
@@ -136,9 +139,11 @@ const RETRY_SLOTS = Number(process.env.FILL_RETRY_SLOTS || 4);
 const retired = [];
 let todo = [...wanted.values()]
   .filter((n) => {
-    const src = prevIdx.byUrl.get(canonUrl(n.url));
-    if (tooManyFails(src)) { retired.push({ n, fails: (src?.fails ?? 0) + (src?.shells ?? 0) }); return false; }
-    return !FILL || needsFetch(src, LIMIT);
+    const k = canonUrl(n.url);
+    if (FILL && !needsFetch(prevIdx.byUrl.get(k), LIMIT)) return false;   // 읽을 본문이 있으면(브라우저 본문 포함) 받지도 물러서지도 않는다
+    const raw = prevRaw.get(k);
+    if (tooManyFails(raw)) { retired.push({ n, fails: (raw?.fails ?? 0) + (raw?.shells ?? 0) }); return false; }
+    return true;
   });
 if (FILL && todo.length > FILL_CAP) {
   console.log(`보충 대상 ${todo.length}건 중 ${FILL_CAP}건만 이번에 받는다 (나머지는 다음 실행)`);
@@ -186,14 +191,13 @@ for (const n of todo) {
          받는 무한 반복**이 됐다(2026-08-03, 두 번째 실행이 또 120건을 받아서 발견).
          false를 명시해야 '이건 온전히 받은 것'이라고 다음 실행이 알 수 있다. */
       entry = { text: full.slice(0, LIMIT), cut: full.length > LIMIT, limit: LIMIT };
-    } else entry = { text: `FETCH_FAIL HTTP ${res.status}`, fails: (prevIdx.byUrl.get(canonUrl(n.url))?.fails ?? 0) + 1 };
+    } else entry = { text: `FETCH_FAIL HTTP ${res.status}` };   // 실패 수는 아래(fillCounts)에서 원래 항목으로 센다
     fresh.set(canonUrl(n.url), { title: n.title, school: n.school, campus: n.campus, url: n.url,
       attachments: n.attachments || [], foundAt: n.foundAt, ...entry });
     console.log('text ok:', n.title.slice(0, 40));
   } catch (e) {
     fresh.set(canonUrl(n.url), { title: n.title, school: n.school, url: n.url,
-      text: 'FETCH_ERROR ' + (e.name || e.message),
-      fails: (prevIdx.byUrl.get(canonUrl(n.url))?.fails ?? 0) + 1 });
+      text: 'FETCH_ERROR ' + (e.name || e.message) });
   }
 }
 
@@ -215,14 +219,17 @@ for (const v of prev) {
 let kept = out.size;
 for (const [k, v] of fresh) out.set(k, v);
 const texts = [...out.values()];
-/* 이번에 받은 것이 껍데기면 이어서 센다(shells) — 메뉴 걷기는 원문 전체가 있어야 해서 받은 뒤 색인을 한 번 더 잰다(B8 · 실측 0.4초).
-   브라우저가 그린 본문이 이기면(indexTexts better) 껍데기가 아니다. 0 이면 칸을 지운다(본문이 오면 처음부터 센다). */
+/* 이번에 받은 것의 물러서기 수 — 받기 실패면 fails, 껍데기면 shells 를 하나 더(상대 수는 이어 둔다 · 리뷰 R6). 메뉴 걷기는 원문 전체가
+   있어야 해서 받은 뒤 색인을 한 번 더 잰다(B8 · 실측 0.4초). 브라우저가 그린 본문이 이기면(indexTexts better) 껍데기가 아니다.
+   지난 수는 원래 항목(prevRaw)에서 읽는다(리뷰 R1). 0 이면 칸을 지운다(본문이 오면 처음부터 센다). */
 if (fresh.size) {
   const nowIdx = indexTexts(texts, browserBodies);
   let shellCount = 0;
   for (const [k, v] of fresh) {
-    const s = nextShells(prevIdx.byUrl.get(k), nowIdx.byUrl.get(k) || v);
-    if (s) { v.shells = s; shellCount += 1; } else delete v.shells;
+    const c = fillCounts(prevRaw.get(k), v, nowIdx.byUrl.get(k) || v);
+    if (c.fails) v.fails = c.fails; else delete v.fails;
+    if (c.shells) v.shells = c.shells; else delete v.shells;
+    if (c.shells && !/^FETCH_(FAIL|ERROR)/.test(v.text)) shellCount += 1;
   }
   if (shellCount) console.log(`받았지만 본문 없는 껍데기 ${shellCount}건 (${GIVE_UP_AFTER}번 이어지면 물러서기 회전으로)`);
 }
