@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-05",
+ "updatedAt": "2026-10-04",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -863,7 +863,7 @@
    "name": "[글로벌][교외]2026-2학기 염곡문화재단 장학생 선발 안내(~8/3)",
    "type": "교외",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
+   "amount": "등록금 전액",
    "amountValue": 0,
    "deadline": "2026-08-03",
    "period": "접수 ~2026-08-03",
@@ -2531,15 +2531,6 @@
    ],
    "eligibilityFrom": "AI(공고 포스터 그림)",
    "eligibilityReviewed": false,
-   "amountSpec": {
-    "kind": "ratio",
-    "value": 0,
-    "ratio": 1,
-    "min": 0,
-    "max": 0,
-    "raw": "장학금액 중소·중견기업 : 수혜 학기 등록금 전액 대기업·비영리기관 : 수혜 학기 등록금 50%"
-   },
-   "amountFrom": "공고 원문",
    "deadlineFrom": "공고문 이미지 2026-09-15 · 신청기간 '26. 9. 1.(화) 09시 ~ 9. 18.(금) 18시",
    "kindEvidence": [
     "교내 증거 없음 — 기본값"
@@ -3269,7 +3260,7 @@
    "boardTitle": "[서울][교외]2026년 2학기 故구종서 장학금 장학생 모집 안내(~9/23)",
    "type": "교외",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
+   "amount": "등록금 전액",
    "amountValue": 0,
    "deadline": "2026-09-23",
    "period": "접수 ~2026-09-23",
@@ -3578,8 +3569,8 @@
    "boardTitle": "공통 2026년 하반기 (재)춘천인재육성장학재단 봄내장학생 선발 안내",
    "type": "교외",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "100만원",
+   "amountValue": 1000000,
    "deadline": "2026-10-07",
    "listedAt": "2026-09-19",
    "period": "접수 기간 ~2026-10-07",
@@ -3701,7 +3692,16 @@
      "url": "https://www.gachon.ac.kr/bbs/kor/478/125417/artclView.do",
      "id": "notice:https://www.gachon.ac.kr/bbs/kor/478/125417/artclView.do"
     }
-   ]
+   ],
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 1000000,
+    "ratio": 0,
+    "min": 1000000,
+    "max": 1000000,
+    "raw": "❍ 장 학 금: 고등학생 50만 원, 대학생 최대 100만 원 * 원격대학장학생: 최대 50만원, 세인트존스대학교장학생: 500만원"
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-ent2431267001artclviewdo",
@@ -3774,7 +3774,7 @@
    "boardTitle": "[서울]2026년 대학생 청소년 AI교육지원장학금 대학생 멘토 모집 안내(~10/30)",
    "type": "교외",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
+   "amount": "시급 18,000원",
    "amountValue": 0,
    "deadline": "2026-10-30",
    "deadlineFrom": "게시판 요약 · ~ 2026. 10. 30",
@@ -3839,8 +3839,8 @@
    "boardTitle": "공통 2026년 (재)경주시장학회 장학생 선발 안내",
    "type": "교외",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "200만원",
+   "amountValue": 2000000,
    "deadline": null,
    "listedAt": "2026-09-20",
    "period": "접수 기간 원문 확인",
@@ -3890,7 +3890,16 @@
     "제목의 바깥 기관 낱말 「경주시장학」"
    ],
    "kindConfidence": "high",
-   "kindFrom": "로봇(원문) 2026-10-01"
+   "kindFrom": "로봇(원문) 2026-10-01",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 2000000,
+    "ratio": 0,
+    "min": 2000000,
+    "max": 2000000,
+    "raw": "□ 장학금액 - 1인당 200만원 □ 신청자격(일반전형) (1세대 1인 신청) + 공고일 현재 1년 이상 경주시 관내 거주자(부모 또는 학생) ㆍ 현재 대학 재학생으로 직전학기 성적 평점 3.0점 이상인 자 ㆍ 총장, 학장 또는 학과장이 추천한 자 의중수혜가 가능하지만, 타 기관 또는 학교에서 장학금을 지급받은 경우 해당기관에 중복지원 가능여부를 문의하신 "
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-oardid323054menuno200318",
@@ -4823,8 +4832,8 @@
    "boardTitle": "2026년도 하반기 봄내장학생 선발 안내",
    "type": "교외",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "100만원",
+   "amountValue": 1000000,
    "deadline": "2026-10-07",
    "deadlineFrom": "게시판 요약 · ~ 10. 7",
    "period": "접수 ~2026-10-07",
@@ -4863,7 +4872,16 @@
     "교내 증거 없음 — 기본값"
    ],
    "kindConfidence": "low",
-   "kindFrom": "로봇(원문) 2026-10-01"
+   "kindFrom": "로봇(원문) 2026-10-01",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 1000000,
+    "ratio": 0,
+    "min": 1000000,
+    "max": 1000000,
+    "raw": "7. 장학금 고등학생 50만 원, 대학생 최대 100만 원 * 원격대학장학생: 최대 50만원, 세인트존스대학교장학생: 500만원 8. 신청자(본인 또는 보호자)의 보통예금계좌로 이체 9. 선발결과 및 지급시기 2026. 5월 중 (선발된 자 개별연락)"
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-bbssc58944066artclviewdo",
@@ -5844,7 +5862,7 @@
    "boardTitle": "2026학년도 2학기 장애학생지원센터(서울) 블루메이트(국가근로 장학생) 모집 공고",
    "type": "교외",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
+   "amount": "시급 12,790원",
    "amountValue": 0,
    "deadline": null,
    "listedAt": "2026-09-30",
@@ -5863,7 +5881,16 @@
    "auto": true,
    "attachments": [],
    "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&page=2&nttId=30176",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "amountSpec": {
+    "kind": "hourly",
+    "value": 0,
+    "ratio": 0,
+    "min": 0,
+    "max": 0,
+    "raw": "■ 장학금액 : 시간당 12,790원 ■ 근로시간 - 주 20시간 이내 근로 허용 - 대필 도우미의 경우 근로 특성상 수업 시간 내 활동 가능 (장애학생과 동일 수업 수강생 활동 가능) - 근무 중 중도 사직을 불허하므로 장기해외연수 또는 휴학 예정자 신청 불가 (중도 사직 시, 별도의 제제 조치가 있을 수 있음)"
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-nuid100nttid30159ptabno5",
@@ -5871,8 +5898,8 @@
    "boardTitle": "2026학년도 AX미래장학금 장학생 선발 공고",
    "type": "교외",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "200만원",
+   "amountValue": 2000000,
    "deadline": null,
    "listedAt": "2026-09-30",
    "period": "접수 기간 원문 확인",
@@ -5903,7 +5930,16 @@
     }
    ],
    "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&page=2&nttId=30159",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 2000000,
+    "ratio": 0,
+    "min": 2000000,
+    "max": 2000000,
+    "raw": "2. 장학금액: 1인당 최대 200만원 (한 학기 기준, 생활비성 장학금) 구분"
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-archgbn0searchordersort0",
@@ -6201,7 +6237,7 @@
    "boardTitle": "[교내-10/30] 2026학년도 2학기 소망장학금 신청 안내",
    "type": "교내",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
+   "amount": "등록금 50%",
    "amountValue": 0,
    "deadline": "2026-10-30",
    "deadlineFrom": "게시판 요약 · ~ 2026. 10. 30",
@@ -6368,7 +6404,7 @@
    "boardTitle": "2026-2학기 의과대학 81학번 후배 사랑 장학생 선발 공고",
    "type": "교외",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
+   "amount": "등록금 전액",
    "amountValue": 0,
    "deadline": "2026-10-05",
    "listedAt": "2026-09-30",
@@ -6407,7 +6443,16 @@
     "교내 증거 없음 — 기본값"
    ],
    "kindConfidence": "low",
-   "kindFrom": "로봇(원문) 2026-10-01"
+   "kindFrom": "로봇(원문) 2026-10-01",
+   "amountSpec": {
+    "kind": "ratio",
+    "value": 0,
+    "ratio": 1,
+    "min": 0,
+    "max": 0,
+    "raw": "4. 장학금액 (1 인당 ) : 등록금액 ( 본 장학금은 생활비성 장학금으로 등록금 범위 초과하여 지급 가능 )"
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-2387viewdocurrentpageno1",
@@ -6777,15 +6822,6 @@
     "신청방법: 한국장학재단 홈페이지(www.kosaf.go.kr)에서 학생 본인이 직접 신청"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
-   "amountSpec": {
-    "kind": "ratio",
-    "value": 0,
-    "ratio": 1,
-    "min": 0,
-    "max": 0,
-    "raw": "나. 지원내용: 수혜횟수 범위 내 정규학기 및 초과학기 등록금 지원 ○ 현 재직기업의 유형 및 규모에 따라 등록금 차등 지원 - 중소·중견기업: 등록금 전액 - 대기업·비영리기관: 등록금 50%"
-   },
-   "amountFrom": "공고 원문",
    "kindEvidence": [
     "교내 증거 없음 — 기본값"
    ],
@@ -7194,15 +7230,6 @@
     "■ 관련 문의 : 한국장학재단 1800-0499 학생지원과 02-3408-4355"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
-   "amountSpec": {
-    "kind": "ratio",
-    "value": 0,
-    "ratio": 1,
-    "min": 0,
-    "max": 0,
-    "raw": "■ 지원내용 : 등록금 전액 ( 단 , 대기업 및 비영리법인 , 비사업자는 50% 지원 ) ※ 선발된 장학생은 향후 계속장학생으로 장학금 지원 예정 ※ 계속장학생이란 기존 선발된 장학생 중 계속해서 장학생 자격을 유지하는 자이며 , 매학기 보증보험가입하여 조회동의 진행 및 성적 , 자격요건 충족 시 장학금 수혜가능 ."
-   },
-   "amountFrom": "공고 원문",
    "kindEvidence": [
     "교내 증거 없음 — 기본값"
    ],
@@ -7438,15 +7465,6 @@
     "신청기간 : 2026.09.29.(화 ) 09:00 ~ 10.15.(목 ) 18:00 <17 일간 >"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
-   "amountSpec": {
-    "kind": "ratio",
-    "value": 0,
-    "ratio": 1,
-    "min": 0,
-    "max": 0,
-    "raw": "2. 장학금액 : 장애의 정도가 심한 장애인 – 수업료 전액 장애의 정도가 심하지 않은 장애인 – 수업료의 2/3 ※ 다른 등록금성 장학금을 포함하여 수업료 범위 내에서 지급하며, 이미 수업료 전액을 장학금으로 지원받는 학생은 신청할 수 없습니다."
-   },
-   "amountFrom": "공고 원문",
    "exclusivity": {
     "kind": "allowed",
     "scope": "unspecified",
@@ -8139,8 +8157,8 @@
    "boardTitle": "2026년 하반기 인재육성 성취(대) 장학생 선발 안내",
    "type": "교외",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "150만원",
+   "amountValue": 1500000,
    "deadline": "2026-10-08",
    "listedAt": "2026-09-30",
    "period": "접수 기간 ~2026-10-08",
@@ -8181,7 +8199,16 @@
     "교내 증거 없음 — 기본값"
    ],
    "kindConfidence": "low",
-   "kindFrom": "로봇(원문) 2026-10-01"
+   "kindFrom": "로봇(원문) 2026-10-01",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 1500000,
+    "ratio": 0,
+    "min": 1500000,
+    "max": 1500000,
+    "raw": "나 . 선발인원 : 468 명 ( 대전 지역 소재 대학 374 명 , 타지역 소재 대학 94 명 ) / 1 인 150 만 원"
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-bsid1083mi3004nttid55323",
@@ -8685,8 +8712,8 @@
    "kindConfidence": "high",
    "kindFrom": "로봇(원문) 2026-10-01",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "300만원",
+   "amountValue": 3000000,
    "deadline": "2026-10-07",
    "deadlineFrom": "게시판 요약 · ~2026.10.07",
    "period": "접수 ~2026-10-07",
@@ -8727,7 +8754,18 @@
     "제출 서류 → 2026년 10월 이후 발급한 서류만 인정함",
     "2) GLS 신청 관련 문의: 학생지원팀 (skkujanghak@skku.edu)"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 3000000,
+    "ratio": 0,
+    "min": 3000000,
+    "max": 3000000,
+    "raw": "나. 지원 규모 및 성격 : 3,000,000원(한 학기), 등록금성 다. 선발인원 : 0명 (재단 내부 심사에 따른 선발인원 추후 확정) 라. 선발절차 : 서류접수(~10.07 오후 1시) → 대상자 발표(11월 중) → 장학증서 수여식(12월 중 예정) ※ 상기 일정은 재단의 일정으로 내부 사정에 의해 변경될 수 있음 ※ 최종 장학생으로 선정될 경우, "
+   },
+   "amountFrom": "공고 원문",
+   "sameAs": "송화재단",
+   "sameAsFrom": "자동"
   },
   {
    "id": "auto-2445viewdocurrentpageno1",
@@ -9419,8 +9457,8 @@
    "kindConfidence": "low",
    "kindFrom": "로봇(원문) 2026-10-04",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "150만원",
+   "amountValue": 1500000,
    "deadline": "2026-09-23",
    "listedAt": "2026-10-04",
    "period": "접수 기간 ~2026-09-23",
@@ -9456,7 +9494,16 @@
     "신청방법 : 대전청년포털 ( https://daejeonyouthportal.kr) 온라인 신청",
     "기타문의 : 대전청년내일재단 인재육성팀 ( ☎ 042-719-8451~2)"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 1500000,
+    "ratio": 0,
+    "min": 1500000,
+    "max": 1500000,
+    "raw": "나 . 선발인원 : 468 명 ( 대전 소재 대학 374 명 , 타지역 소재 대학 94 명 ) / 1 인 150 만 원"
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-notiphpcodes1301seq10681",

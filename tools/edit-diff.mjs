@@ -254,7 +254,14 @@ export function wonText(n) {
     ? `${(v / 10000).toLocaleString('ko-KR')}만원`
     : `${v.toLocaleString('ko-KR')}원`;
 }
+/* 등록금 비율·시급도 원문 그대로 짧게 (2026-10-05 · UI-12) — 읽어 두고 카드에 '금액 원문 확인' 이라 적던 10건.
+   시급은 원문 근거 줄(raw)의 숫자만 쓴다 — 못 찾으면 '' (부르는 쪽이 문구를 그대로 둔다). */
 export function amountText(a) {
+  if (a && a.kind === 'ratio') return a.ratio === 1 ? '등록금 전액' : `등록금 ${Math.round(a.ratio * 100)}%`;
+  if (a && a.kind === 'hourly') {
+    const m = String(a.raw || '').match(/(?:시급|시간당)\s*([\d,]+)\s*원|([\d,]+)\s*원\s*\/\s*(?:시간|시|h)/i);
+    return m ? `시급 ${m[1] || m[2]}원` : '';
+  }
   return a && a.kind === 'range' ? `${wonText(a.min)} ~ ${wonText(a.max)}` : wonText(a && a.value);
 }
 

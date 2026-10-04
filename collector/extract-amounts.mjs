@@ -228,7 +228,12 @@ for (const it of items) {
       || ((it.amountSpec || Number(it.amountValue) > 0) && it.amountFrom !== OWN_AMOUNT);
 
     if (humanAmount) keptHuman += 1;
-    else if (a.kind === 'unknown') { delete it.amountSpec; delete it.amountFrom; }
+    else if (a.kind === 'unknown') {
+      /* 로봇이 적은 비율·시급 문구는 근거와 함께 걷는다 — 남기면 '갈리는 비율'로 비운 공고가 카드엔 '등록금 전액'이다 */
+      const prev = it.amountSpec;
+      if (prev && (prev.kind === 'ratio' || prev.kind === 'hourly') && it.amount === amountText(prev)) it.amount = '금액 원문 확인';
+      delete it.amountSpec; delete it.amountFrom;
+    }
     else { it.amountSpec = a; it.amountFrom = OWN_AMOUNT; wrote++; }
 
     /* 🔴 amountValue 는 남겨 둔다 — 앱·챗봇·관리자 화면이 아직 이걸 읽는다.
@@ -243,6 +248,12 @@ for (const it of items) {
          ⚠️ 이미 숫자가 든 문구는 건드리지 않는다. 사람이 손으로 다듬어 넣은 것
             (`등록금 + 영농정착 지원` 같은)을 맨 숫자로 덮으면 뜻이 사라진다. */
       if (!/\d/.test(String(it.amount || ''))) it.amount = amountText(a);
+    }
+    /* 등록금 비율·시급은 원으로 못 바꾸지만(amountValue 0) 카드 문구는 원문대로 적는다 (2026-10-05 · UI-12) —
+       읽어 두고 '금액 원문 확인' 이라 적으면 학생에겐 못 읽은 것과 같다. 빈 칸·'원문 확인' 문구만 고친다. */
+    if (!humanAmount && (a.kind === 'ratio' || a.kind === 'hourly')) {
+      const t = amountText(a);
+      if (t && (!it.amount || /원문\s*확인/.test(it.amount))) it.amount = t;
     }
 
     /* 이중수혜도 같은 규칙 — 사람이 넣은 것은 그대로 둔다.
