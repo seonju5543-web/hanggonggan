@@ -3105,7 +3105,7 @@ function benefitShort(text) {
   const t = unent(String(text || '')).trim();
   if (t && t.length <= 20) return t;
   const items = benefitItems(t);
-  const label = (items[0] || '').split(/\s*[·:：]\s*/)[0].trim();
+  const label = (items[0] || '').split(/\s*(?:·|[:：](?!\d))\s*/)[0].trim();   // `1:1 매칭` 의 콜론은 이름표가 아니다
   if (!label || label.length > 16) return '';
   return items.length > 1 ? `${label} 외 ${items.length - 1}` : label;
 }

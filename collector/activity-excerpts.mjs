@@ -190,7 +190,7 @@ export function splitBenefit(text) {
       const lab = m[1].replace(/\s/g, '');
       if (COND_LABEL.test(lab)) { conditions.push(it); continue; }
       if (PERIOD_ITEM.test(lab)) continue;
-      if (BENEFIT_LABEL.test(lab)) { benefit.push(it); continue; }
+      if (BENEFIT_LABEL.test(lab)) { benefit.push(m[2].replace(/^[-–]\s*/, '')); continue; }   // 이름표(`지원내용 :`)는 뗀다 — 남기면 카드에 `사업내용` 만 뜬다(2026-10-04)
       continue;   // `운영방법 :`·`수행기관 :` 같은 다른 이름표는 혜택도 조건도 아니다
     }
     for (const sen of it.split(/(?<=다\.)\s+|(?<=[.。])\s+(?=[가-힣])/)) {
@@ -207,7 +207,13 @@ export function sanitizeBenefit(it) {
   const i = ex.findIndex((x) => x.label === '혜택');
   if (i < 0) return false;
   const { benefit, conditions } = splitBenefit(ex[i].text);
-  if (!conditions.length) return false;
+  /* 조건이 없어도 **맨 앞 혜택 이름표만** 있으면 뗀다(`사업내용: …`·`지원내용 : - …`) — 그 밖엔 원문 그대로 둔다(○ 항목 구분을 살린다) */
+  const head = String(ex[i].text).match(/^([가-힣\s]{2,12})\s*[:：]\s*[-–]?\s*/);
+  if (!conditions.length) {
+    if (!head || !BENEFIT_LABEL.test(head[1].replace(/\s/g, '')) || COND_LABEL.test(head[1].replace(/\s/g, ''))) return false;
+    ex[i] = { label: '혜택', text: ex[i].text.slice(head[0].length) };
+    return true;
+  }
   if (benefit) ex[i] = { label: '혜택', text: benefit.length > 160 ? `${benefit.slice(0, 159)}…` : benefit }; else ex.splice(i, 1);
   const lines = it.eligibilityLines || [];
   for (const c of conditions) if (!lines.some((l) => String(l).includes(c.slice(0, 20)) || c.includes(String(l)))) lines.push(c);
