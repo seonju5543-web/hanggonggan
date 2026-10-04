@@ -99,7 +99,8 @@
    "kind": "생활",
    "school": "전북대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-02",
+   "thumb": "data/news/img/96819ba1a54ed812.webp"
   },
   {
    "title": "[교육생 모집] SQL 개발자(SQLD) 자격 취득 과정(2차)",
@@ -107,7 +108,8 @@
    "postedAt": "2026-10-01",
    "school": "전북대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-02",
+   "thumb": "data/news/img/a26cb51a9612dada.webp"
   },
   {
    "title": "[교육생 모집] 데이터분석 준전문가(ADsP) 자격 취득 과정(2차)",

@@ -421,14 +421,14 @@ const PROFILE = {
   /* 더보기 — **다시 그리지 않고 편다**(히어로 금액이 또 세어 올라가면 안 된다).
      🔴 클릭을 page.click 으로 하면 Playwright 가 버튼을 화면 안으로 스크롤해서
         '스크롤이 튀었다'로 잘못 읽힌다. 눌리는 것만 보려면 요소에 직접 건다. */
-  const before = await page.evaluate(() => ({ y: window.scrollY, won: $('#hero-amount').textContent }));
+  const before = await page.evaluate(() => ({ y: appScroller().scrollTop, won: $('#hero-amount').textContent }));
   await page.$eval('#home-deadline-more', (b) => b.click());
   await page.waitForTimeout(250);
   const open = await page.evaluate(() => ({
     보임: [...document.querySelectorAll('#home-deadline-list > *')].filter((e) => e.offsetParent !== null).length,
     글자: $('#home-deadline-more').textContent.trim(),
     aria: $('#home-deadline-more').getAttribute('aria-expanded'),
-    y: window.scrollY, won: $('#hero-amount').textContent,
+    y: appScroller().scrollTop, won: $('#hero-amount').textContent,
   }));
   eq('더보기를 누르면 나머지가 펴진다', open.보임 > 3, true);
   eq('그때 버튼은 접기가 된다', [open.글자, open.aria], ['접기', 'true']);

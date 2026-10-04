@@ -394,7 +394,7 @@ const eq = (label, got, want) => {
     eq('본문을 베껴 두지 않고 terms.html 에서 읽어 온다',
       await page.$eval('#terms-body', (e) => /제1조/.test(e.textContent)), true);
     /* 따라다니는 머리줄 — 끝까지 내려도 나가기가 화면에 남아 있어야 한다 */
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.evaluate(() => appScrollTo(appScroller().scrollHeight));
     await page.waitForTimeout(350);
     eq('맨 아래까지 내려도 나가기 화살표가 화면에 있다',
       await page.evaluate(() => {
@@ -593,14 +593,14 @@ const eq = (label, got, want) => {
     eq('그 화살표가 떠났던 자리(설정)로 간다 — 홈이 아니다',
       await t.$eval('.legal-header .sub-back', (e) => e.getAttribute('href')), './?screen=settings');
     /* 🔴 길게 내려도 나가기가 남아 있어야 한다 — 읽다 중간에 나갈 수 있게 (개발자 지시) */
-    await t.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await t.evaluate(() => { const a = document.getElementById('app'); a.scrollTop = a.scrollHeight; });
     await t.waitForTimeout(300);
     eq('맨 아래까지 내려도 나가기 화살표가 화면에 남아 있다',
       await t.evaluate(() => {
         const r = document.querySelector('.legal-header .sub-back').getBoundingClientRect();
         return r.top >= 0 && r.bottom <= window.innerHeight;
       }), true);
-    await t.evaluate(() => window.scrollTo(0, 0));
+    await t.evaluate(() => { document.getElementById('app').scrollTop = 0; });
     await t.waitForTimeout(200);
     eq('맨 아래 되돌아가기 버튼은 없앴다', await t.$$eval('.legal-actions', (e) => e.length), 0);
     eq('제목이 화면 밖으로 나가지 않는다',
@@ -814,7 +814,7 @@ const eq = (label, got, want) => {
       const mk = (type, y) => { const t = new Touch({ identifier: 1, target: el, clientX: 215, clientY: y });
         el.dispatchEvent(new TouchEvent(type, { bubbles: true, cancelable: true,
           touches: type === 'touchend' ? [] : [t], targetTouches: type === 'touchend' ? [] : [t], changedTouches: [t] })); };
-      window.scrollTo(0, 0);
+      appScrollTo(0);
       mk('touchstart', 200); mk('touchmove', 240); mk('touchmove', 300);
       const 당기는중 = scr.style.transform;
       mk('touchend', 300);
@@ -914,7 +914,7 @@ const eq = (label, got, want) => {
     /* ⚠️ '남색이 아니다' 로 재면 무슨 색이 되든 통과한다 — **빨강인지**를 본다 */
     eq('🔴 탈퇴는 눌러도 빨강 그대로다 (경고가 사라지면 안 된다)', 탈퇴.글자, RED);
 
-    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.evaluate(() => appScrollTo(0));
     await page.waitForTimeout(200);
     await page.click('#btn-open-faq');
     await page.waitForSelector('#screen-faq:not([hidden])');

@@ -83,6 +83,22 @@ function skeletonRows(n) {
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
+   ⓪ 굴러가는 상자 한 곳 (2026-10-04)
+
+   🔴 **문서는 굴러가지 않는다 — `#app` 안쪽만 굴러간다**(style.css `.app` 높이·overflow 머리말).
+      iOS 26 사파리가 문서가 굴러갈 때 하단 탭을 화면 중간에 그리는 버그를 비켜 가려고 바꿨다.
+      그래서 `window.scrollY` 는 늘 0 이고 `window.scrollTo` 는 아무것도 안 옮긴다 —
+      스크롤을 읽거나 옮기는 곳은 전부 이 둘을 부른다(베끼지 말 것). */
+function appScroller(doc) {
+  var d = doc || (typeof document !== 'undefined' ? document : null);
+  return (d && d.getElementById('app')) || (d && (d.scrollingElement || d.documentElement)) || null;
+}
+function appScrollTo(y, doc) {
+  var el = appScroller(doc);
+  if (el) el.scrollTop = y || 0;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
    ① 당겨서 새로고침
 
    🔴 **`.app` 을 옮기면 안 된다.** 하단 탭·시트·떠 있는 도우미 단추는 전부 `#app` **안**에
@@ -162,7 +178,8 @@ function installPullToRefresh(opts) {
   function onStart(e) {
     if (busy || isBlocked()) return;
     if (!e.touches || e.touches.length !== 1) return;          // 두 손가락은 확대·이동이다
-    if ((window.scrollY || window.pageYOffset || 0) > 0) return; // 맨 위에서만 시작한다
+    var sc = appScroller(doc);
+    if ((sc ? sc.scrollTop : 0) > 0) return;                   // 맨 위에서만 시작한다(문서가 아니라 #app)
     var t = e.target;
     /* 🔴 **끌어서 옮기는 마스코트(도우미 단추)에서 시작한 손짓은 우리 것이 아니다**
        (2026-09-09 코드 리뷰가 잡았다). 그 단추는 pointer 이벤트로 자기 위치를 옮기는데,
@@ -238,7 +255,7 @@ function installPullToRefresh(opts) {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     skeletonRows,
-    haptic, popEl, installPullToRefresh,
+    haptic, popEl, installPullToRefresh, appScroller, appScrollTo,
     PTR_TRIGGER_PX, PTR_MAX_PX, PTR_MIN_SPIN_MS, POP_CLEAR_MS,
   };
 }

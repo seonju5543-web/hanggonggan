@@ -1,5 +1,5 @@
 {
- "note": "소식 카드에 그 글의 사진이 없을 때 대신 보이는 학교 대표 사진 (2026-10-03). 만드는 곳 tools/build-school-photos.mjs · 고른 기록 docs/designs/assets/gates/school-photo-picks.json · 사진은 위키미디어 공용의 열린 라이선스 — credit 을 구역 아래에 적는다.",
+ "note": "소식 카드에 그 글의 사진이 없을 때 대신 보이는 학교 대표 사진 (2026-10-03). 만드는 곳 tools/build-school-photos.mjs · 고른 기록 docs/designs/assets/gates/school-photo-picks.json · 사진은 위키미디어 공용의 열린 라이선스 — credit 은 앱 권한 · 오픈소스 라이선스 화면 「사진 출처」에 적는다.",
  "schools": {
   "숭실대학교": [
    {
@@ -371,6 +371,22 @@
     "credit": "Sadopaul · CC BY 4.0",
     "page": "https://commons.wikimedia.org/wiki/File%3A%EA%B0%95%EC%9B%90%EB%8C%80%ED%95%99%EA%B5%90_60%EC%A3%BC%EB%85%84_%EA%B8%B0%EB%85%90%EA%B4%80.jpg",
     "what": "강원대학교 60주년 기념관 건물 정면"
+   }
+  ],
+  "고려대학교 세종캠퍼스": [
+   {
+    "src": "assets/schools/n1ch7t87-29f4d60c.webp",
+    "focus": "55% 40%",
+    "credit": "rijuve · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AKus13.jpg",
+    "what": "석조 외벽의 세종캠퍼스 본관 건물 — 아래 주차된 차는 잘라 냄"
+   },
+   {
+    "src": "assets/schools/n1ch7t87-0f1a9797.webp",
+    "focus": "45% 50%",
+    "credit": "rijuve · CC BY 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EA%B3%A0%EB%A0%A4%EB%8C%80%ED%95%99%EA%B5%90_%EC%84%B8%EC%A2%85%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%A4%91%EC%95%99%EA%B4%91%EC%9E%A5.jpg",
+    "what": "세종캠퍼스 중앙광장 — 벽돌 길과 단풍 든 가로수, 벤치, 멀리 강의동"
    }
   ],
   "서울대학교": [

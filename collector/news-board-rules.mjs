@@ -169,6 +169,9 @@ export const NEWS_BOARD_RULES = {
     api: 'https://www.sogang.ac.kr/api/api/v1/mainKo/BbsData/boardList?pageNum=1&pageSize=30&bbsConfigFk=142',
     detail: (id) => `https://www.sogang.ac.kr/ko/detail/${id}?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event`,
     verifyApi: { idFrom: (url) => (String(url).match(/\/ko\/detail\/(\d+)/) || [])[1], api: (id) => `https://www.sogang.ac.kr/api/api/v1/mainKo/BbsData?pkId=${id}` },
+    /* 🔴 둘째 게시판 규칙은 글 번호가 **첫 게시판과 같은 번호 공간**일 때만 둔다 — 같은 글 알아보기·숨김·썸네일 열쇠가 모두 「학교 + 글 번호」라서
+       번호가 게시판마다 따로 매겨지면 다른 글이 한 글로 합쳐지고 새 글이 '이미 본 글'로 빠진다(리뷰 10-04). 서강 pkId 는 사이트 전체 번호(BbsData?pkId= 하나로 어느 게시판 글이든 열린다) */
+    sharedIds: true,
     evidence: '정찰 6차 2026-10-03: /ko/story/notification-event 화면이 GET /api/api/v1/mainKo/BbsData/boardList?…&bbsConfigFk=142 (JSON 글 배열 · pkId·title·regDate) 를 불렀다 · 첫 줄을 누르니 /ko/detail/551482?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event · 그 화면이 GET …/BbsData?pkId=551482 로 본문을 받았다',
   },
 };

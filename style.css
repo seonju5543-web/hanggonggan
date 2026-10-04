@@ -159,6 +159,23 @@ body {
         아무것도 안 만진 학생이 매번 가려진 화면을 본다. */
   padding-bottom: 148px;   /* 내비 88 + 마스코트 56 + 숨 4 — 한 값으로 적는다(톱니가 px 개수를 센다) */
 }
+/* 🔴 **문서는 굴리지 않고 `#app` 안쪽만 굴린다** (2026-10-04 · 개발자 제보 스크린샷:
+   "위로 스크롤하니까 밑에 탭들이 위로 올라간다" — 하단 탭이 화면 한가운데에 떠 있었다).
+   iOS 26 사파리는 **문서가 굴러갈 때** 화면 바닥에 붙인(fixed) 요소를 엉뚱한 높이에 그린다
+   (애플 개발자 포럼 thread 800125·800798 — 키보드를 닫은 뒤 visualViewport.offsetTop 이
+   0 으로 안 돌아오는 경우 등). 브라우저 버그라 우리 코드로 고칠 수 없어 **문서가 아예 안
+   움직이게** 해서 비켜 간다 — 굴러가는 것은 `#app` 상자뿐이고, 하단 탭·시트·마스코트(전부
+   fixed)는 움직이지 않는 문서에 붙어 있으니 끌려가지 않는다.
+   ⚠️ 이제 `window.scrollY` 는 늘 0 이다 — 스크롤은 `appScroller()`(interactions.js)로 읽고 옮긴다.
+   ⚠️ `#app` 에 transform 을 걸지 말 것은 그대로다(interactions.js ① 머리말). */
+html, body { height: 100%; overflow: hidden; }
+.app {
+  height: 100vh;            /* dvh 를 모르는 옛 브라우저 */
+  height: 100dvh;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;   /* 끝에서 튕겨도 문서까지 번지지 않게 */
+  -webkit-overflow-scrolling: touch;
+}
 
 button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
 input, select {
@@ -5052,6 +5069,66 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 }
 /* 학교 대표 사진 (2026-10-03 개발자 지시 — 글에 사진이 없을 때) — 글의 사진과 같은 img.notice-thumb 한 장이라 위 규칙(72px · cover)을 그대로 쓴다.
    사진 위 「학교 사진」 표시는 같은 날 개발자 지시로 뺐다("학교사진에 '학교사진' 이라는 디스크립션 빼"). */
-/* 출처 한 줄 — 위키미디어 열린 라이선스(CC BY · BY-SA)의 표기 의무. 구역 맨 아래 작게, 누르면 사진의 공용 페이지 */
-.news-photo-credit { margin: 0 0 var(--space-12); font-size: var(--t-2xs); line-height: 1.5; color: var(--text-sub); }
-.news-photo-credit a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+/* 사진 출처(작가·라이선스)는 홈 구역 아래가 아니라 설정 › 앱 권한 · 오픈소스 라이선스 「사진 출처」에 있다 (2026-10-04 개발자 지시 — 학생 화면엔 사진만) */
+
+/* ---------------- 홈 「우리 학교 소식」 사진 카드 띠 (2026-10-04 개발자 승인 시안 1안) ----------------
+   아이콘 네 칸 밑 · 카드 148px(사진 148×104 · 13px 둥근 모서리) · 갈래·날짜 작은 회색 · 제목 두 줄 · 옆으로 넘긴다.
+   띠는 화면 여백(20px) 밖까지 끝에서 끝으로 넘기고, 첫 카드는 여백에 맞춘다(시안 그대로). */
+.home-news { display: flex; flex-direction: column; gap: var(--space-12); margin-bottom: var(--sp-3); }
+.home-news .section-head.home-news-head { display: flex; justify-content: space-between; align-items: baseline; margin: 0; border-top: 0; }
+.home-news .home-news-head h3 { color: var(--text); }
+.home-news .home-news-all { color: var(--accent); font-size: var(--t-sm); font-weight: 550; }
+.news-strip {
+  display: flex;
+  gap: var(--space-12);
+  overflow-x: auto;
+  margin: 0 calc(-1 * var(--space-20));
+  padding: 0 var(--space-20) var(--space-4);
+  scroll-padding-inline: var(--space-20);
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.news-strip::-webkit-scrollbar { display: none; }
+.news-tile {
+  flex: none;
+  width: 148px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  color: var(--text);
+  text-decoration: none;
+  scroll-snap-align: start;
+}
+.news-tile-photo {
+  display: block;
+  width: 148px;
+  height: 104px;
+  margin-bottom: var(--space-6);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--surface-2);
+}
+.news-tile-img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.news-tile-meta { font-size: var(--t-xs); font-weight: 600; color: var(--text-sub); font-variant-numeric: tabular-nums; min-height: 1.4em; }
+.news-tile-title {
+  font-size: var(--t-sm);
+  font-weight: 600;
+  line-height: 19px;
+  height: 38px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+/* 누르면 회색 판이 아니라 글자색이 바뀐다 (개발자가 정한 화면 결정) */
+.news-tile:active .news-tile-title { color: var(--accent); }
+.news-tile:focus-visible { outline: none; }
+/* 띠는 옆으로 넘기는 상자라(overflow) 바깥 그림자가 잘린다 — 안쪽 선으로 (리뷰 10-04) */
+.news-tile:focus-visible .news-tile-photo { outline: 2px solid var(--accent); outline-offset: -2px; }
+/* 받는 중 — 같은 자리 같은 크기의 빈 칸(움직임 없음) */
+.news-tile.is-skel .news-tile-meta,
+.news-tile.is-skel .news-tile-title { background: var(--surface-2); border-radius: var(--radius-hair); color: transparent; }
+.news-tile.is-skel .news-tile-meta { width: 40%; }
