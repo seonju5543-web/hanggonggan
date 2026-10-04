@@ -9,6 +9,8 @@ name: 로그인 서버 상태 확인 (Supabase)
 #
 # 판정은 한 곳(tools/supabase-health.mjs · 관문 verify/health-gates/servers.mjs ⑨):
 #   ok · misconfig(열쇠 거절 401/403) · down(그 밖·연결 실패 — 3번 물어도 안 될 때만) · off(설정이 비어 로그인이 꺼짐)
+#   🔴 설정 파일을 못 읽으면(문법 오류·충돌 표식 등) 판정을 내지 않고 확인 단계가 실패한다 → 맨 아래 robot-down.
+#      'off' 로 두면 아래 '닫는다' 단계가 열린 경보를 닫아 감시가 조용히 꺼진다(2026-10-04 리뷰).
 # 🔴 공개 열쇠만 쓴다(service_role 아님 · 시크릿 불필요). 데이터는 읽지도 쓰지도 않는다(/auth/v1/health 만).
 # ⚠️ 이 확인은 감시(알림)다 — 이 요청이 Supabase 휴면을 막아 주는지는 확인하지 않았다.
 #

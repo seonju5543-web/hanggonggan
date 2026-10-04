@@ -13,12 +13,14 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 import path from 'node:path';
+import os from 'node:os';
+import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { stepsOf } from './ci.mjs';
 import { actionBeforeCheckout, codeOf } from './alerts.mjs';
 import { verdict as pushVerdict, slotTime } from '../../tools/push-health-verdict.mjs';
-import { readSupabaseConfig, verdict as sbVerdict, probe as sbProbe } from '../../tools/supabase-health.mjs';
+import { readSupabaseConfig, verdict as sbVerdict, probe as sbProbe, run as sbRun } from '../../tools/supabase-health.mjs';
 
 const require = createRequire(import.meta.url);
 
@@ -319,10 +321,33 @@ export default async function gate(eq, ctx) {
     }
 
     /* ── ⑨ 로그인 서버(Supabase) 매일 확인 ── */
-    eq('⑨ 설정 읽기 — 주소·열쇠가 있으면 그 값(끝 / 는 뗀다) · 비었으면 null(= 꺼짐) · 글자가 깨졌으면 null',
-      [readSupabaseConfig("const SUPABASE_CONFIG = { url: 'https://abc.supabase.co/', anonKey: 'sb_publishable_x', providers: [] };\nfunction supabaseConfigured() {}\nif (typeof module !== 'undefined' && module.exports) module.exports = { SUPABASE_CONFIG };"),
-        readSupabaseConfig("const SUPABASE_CONFIG = { url: '', anonKey: '' };"), readSupabaseConfig('const SUPABASE_CONFIG = {')],
-      [{ url: 'https://abc.supabase.co', anonKey: 'sb_publishable_x' }, null, null]);
+    const SB_GOOD = "const SUPABASE_CONFIG = { url: 'https://abc.supabase.co/', anonKey: 'sb_publishable_x', providers: [] };\nfunction supabaseConfigured() {}\nif (typeof module !== 'undefined' && module.exports) module.exports = { SUPABASE_CONFIG };";
+    const SB_EMPTY = "const SUPABASE_CONFIG = { url: '', anonKey: '' };";
+    const SB_BROKEN = ['const SUPABASE_CONFIG = {', "<<<<<<< HEAD\nconst SUPABASE_CONFIG = { url: 'https://a.supabase.co', anonKey: 'k' };\n=======\n>>>>>>> x",
+      "window.HANDAEJANG = 1;\nconst SUPABASE_CONFIG = { url: 'https://a.supabase.co', anonKey: 'k' };", "const OTHER = { url: 'https://a.supabase.co', anonKey: 'k' };"];
+    const throws = (src) => { try { readSupabaseConfig(src); return '안 던짐'; } catch (e) { return '던짐'; } };
+    eq('⑨ 설정 읽기 — 주소·열쇠가 있으면 그 값(끝 / 는 뗀다) · 비었으면 null(= 꺼짐) · 못 읽으면(문법 오류·충돌 표식·맨 위 window·이름 없음) 던진다(꺼짐과 가른다)',
+      [readSupabaseConfig(SB_GOOD), readSupabaseConfig(SB_EMPTY), SB_BROKEN.map(throws)],
+      [{ url: 'https://abc.supabase.co', anonKey: 'sb_publishable_x' }, null, ['던짐', '던짐', '던짐', '던짐']]);
+    {
+      const stub = async () => ({ verdict: 'ok', why: '' });
+      eq('  명령줄 본체 — 정상 설정은 묻고(ok · 0) · 빈 설정은 off(0) · 못 읽는 설정은 판정 없이 실패(1 — off 로 두면 워크플로가 경보를 닫는다)',
+        await Promise.all([SB_GOOD, SB_EMPTY, SB_BROKEN[0]].map(async (src) => (({ verdict, exit }) => [verdict, exit])(await sbRun(src, { probeImpl: stub })))),
+        [['ok', 0], ['off', 0], [null, 1]]);
+      const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'sb-health-'));
+      try {
+        const cli = (text) => {
+          const f = path.join(tmp, 'cfg.js'); const out = path.join(tmp, 'out.txt');
+          fs.writeFileSync(f, text); fs.writeFileSync(out, '');
+          const r = spawnSync(process.execPath, [path.join(rootDir, 'tools/supabase-health.mjs')], {
+            env: { ...process.env, SUPABASE_CONFIG_FILE: f, GITHUB_OUTPUT: out }, encoding: 'utf8', timeout: 20000,
+          });
+          return [r.status, fs.readFileSync(out, 'utf8')];
+        };
+        eq('  명령줄 전체(표본 파일 · 인터넷 없음) — 빈 설정은 종료 0 · verdict=off · 깨진 설정은 종료 1 · 판정을 적지 않는다',
+          [cli(SB_EMPTY), cli(SB_BROKEN[1])], [[0, 'verdict=off\nwhy=\n'], [1, '']]);
+      } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
+    }
     eq('  판정 — 200 ok · 401 misconfig · 403 misconfig · 540 down · 연결 실패 down',
       [sbVerdict({ ok: true, code: 200 }), sbVerdict({ ok: true, code: 401 }), sbVerdict({ ok: true, code: 403 }), sbVerdict({ ok: true, code: 540 }), sbVerdict({ ok: false, code: 0 })].map((v) => v.verdict),
       ['ok', 'misconfig', 'misconfig', 'down', 'down']);
@@ -346,9 +371,9 @@ export default async function gate(eq, ctx) {
     eq('  supabase-health.yml — 예약은 홀수 분(0 아님) · 작업 시한 · 로컬 액션보다 체크아웃이 앞 · 판정 도구를 부른다',
       [!!sbw, cronMin % 2 === 1, /^ {4}timeout-minutes: \d+/m.test(sbw), actionBeforeCheckout(sbw), sbSteps.some((s) => /node tools\/supabase-health\.mjs/.test(s.run || ''))],
       [true, true, true, [], true]);
-    eq('  이상(down·misconfig)이면 경보 한 곳(open) · 정상·꺼짐이면 닫는다(resolve · 같은 제목) · 넘어지면 robot-down',
+    eq('  이상(down·misconfig)이면 경보 한 곳(open) · 정상·꺼짐이면 닫는다(resolve · 같은 제목) · 넘어지면(확인 단계 실패 포함) robot-down',
       [/'down'/.test(openStep.if || '') && /'misconfig'/.test(openStep.if || ''), withOf(openStep, 'title'), /'ok'/.test(closeStep.if || '') && /'off'/.test(closeStep.if || ''), withOf(closeStep, 'title'),
-        sbSteps.some((s) => /cancelled\(\)/.test(s.if || '') && /robot-down/.test(s.uses || ''))],
+        sbSteps.some((s) => /cancelled\(\)/.test(s.if || '') && /steps\.probe\.outcome != 'success'/.test(s.if || '') && /robot-down/.test(s.uses || ''))],
       [true, '🚨 로그인 서버(Supabase) 이상', true, '🚨 로그인 서버(Supabase) 이상', true]);
     eq('  설계 문서 「어디가 끊기면」 표에 로그인 줄이 있다', /\|\s*로그인\s*\|[^\n]*`supabase-health\.yml`/.test(readOpt('docs/designs/data-flow.md')), true);
 
