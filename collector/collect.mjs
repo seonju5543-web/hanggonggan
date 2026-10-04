@@ -12,7 +12,7 @@ import { deadlineHintFrom } from './deadline-hint.mjs';
 import { FETCH_HEADERS } from './http-headers.mjs';
 import { urlKey, dedupeNotices, capNotices } from './url-key.mjs';
 import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mjs';
-import { publishBySchool, dropUnserved } from './publish-notices.mjs';
+import { publishBySchool, dropUnserved, healFromLedger, zeroFeedSchools } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry } from './clean-title.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
@@ -507,6 +507,15 @@ notices.items = dedupeNotices(notices.items);
    (2026-08-17 실측 747건 유실). 경위는 collector/candidates.mjs 첫머리. */
 saveCandidates(mergeCandidates(loadCandidates().items, freshAll));
 
+/* 🔴 피드에서 빠진 글을 후보 장부에서 다시 싣는다 (2026-10-04 점검 collect-05) — 이미 본 글은 seen 때문에 위에서 다시 수집되지 않아
+   한 번 빠지면(9-30 병합기가 200건으로 자른 15개교 215건처럼) 영영 안 돌아왔다. 메우기만 하고 지금 글은 바꾸지 않는다 ·
+   규칙·까닭은 publish-notices.mjs healFromLedger 한 곳. 🔴 두 수집기 모두에 둔다 — 한쪽만 두면 둘이 번갈아 학교별 파일을 다시 써서
+   되살린 글이 들쭉날쭉한다(관문 「로봇·도구 점검 관문」 feed). */
+const beforeHeal = notices.items.length;
+notices.items = healFromLedger(notices.items, loadCandidates().items);
+const healedCount = notices.items.length - beforeHeal;
+if (healedCount > 0) console.log(`후보 장부에서 notices.json 에 없던 글 ${healedCount}건을 메웠습니다`);
+
 /* 🔴 서비스하지 않는 학교의 공고는 여기서 떨군다 (2026-09-05 개발자 지시).
    수집 대상은 이미 경희대·한국외대 둘뿐인데 **예전에 담긴 다른 학교 공고가 그대로 남아**
    (200건 중 173건) 로봇들이 그걸 붙들고 일하고 있었다. ⚠️ '상한을 차지해 새 공고를
@@ -536,6 +545,9 @@ const beforeCap = notices.items;
       2026-08-17 '학교별 파일이 19일 동안 저장되지 않았다' 사고와 같은 모양이다.
       관문: verify/test-collector.mjs '학교별 파일은 전체 목록으로 발행한다'. */
 publishBySchool(beforeCap);
+/* 서비스 학교인데 학생 화면 실시간 공고가 0건인 학교 — 리포트 머리에 한 줄로 (2026-10-04 점검 app2-F2 · publish-notices.mjs zeroFeedSchools).
+   학교별 상태 줄은 '✅ 정상'인데 화면은 0건인 학교(한양 — 감지한 글이 전부 전에 본 글)·주소 없는 분교가 조용히 남아 있었다. */
+const zeroFeed = zeroFeedSchools(beforeCap);
 
 notices.items = capNotices(notices.items);
 notices.updatedAt = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
@@ -632,6 +644,23 @@ if (skippedByBudget.length) {
   lines.push(`  → 이번에 본 게시판 ${doneCount}/${boards.length}곳 · 다음 실행은 **${boards[cursor.next] ? boardLabel(boards[cursor.next]) : '처음'}**부터 시작합니다.`, '');
 } else {
   lines.push(`⏱ 게시판 ${doneCount}곳을 ${humanMs(budget.elapsed())}에 다 돌았습니다(예산 ${humanMs(BUDGET_MS)}).`, '');
+}
+/* 피드 메우기·화면 0건 학교 (2026-10-04 점검 collect-05 · app2-F2) — 까닭은 그 학교 게시판의 이번 상태 줄에서만 고른다(짐작해 적지 않는다) */
+if (healedCount > 0) lines.push(`🔁 data/notices.json 에 없던 글 ${healedCount}건을 후보 장부(collector/candidates.json)에서 메웠습니다 — 이미 본 글이라 수집으로는 안 돌아오는 글(notices.json 전체 상한에 잘린 글도 여기 셉니다)`, '');
+if (zeroFeed.length) {
+  const schoolOfBoard = new Map(boards.filter((s) => s.role === 'scholarship').map((s) => [boardLabel(s), s.school]));
+  const zeroWhy = (school) => {
+    const rs = results.filter((r) => schoolOfBoard.get(r.name) === school);
+    if (!rs.length) return '이번 일반 수집 기록 없음';
+    return rs.map((r) => {
+      if (/게시판 주소 미설정/.test(r.status)) return '게시판 주소 없음';
+      if (/브라우저 담당/.test(r.status)) return '브라우저 담당 — browser-report 참조';
+      const m = r.status.match(/실공고 (\d+)건 감지/);
+      if (m && !(r.items || []).length) return `게시판 ${m[1]}건 감지 · 모두 전에 본 글`;
+      return r.status.slice(0, 60);
+    }).join(' / ');
+  };
+  lines.push(`🙋 서비스 학교인데 앱 실시간 공고 0건 ${zeroFeed.length}곳: ${zeroFeed.map((s) => `${s}(${zeroWhy(s)})`).join(' · ')}`, '');
 }
 
 /* 🔴 **학교가 늘면 '정식 등록도 학교별로 나눌 때'라고 여기서 말한다** (2026-09-26 개발자 지시:
