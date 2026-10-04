@@ -135,25 +135,62 @@ export const NEWS_BOARD_RULES = {
     detail: (id, boardUrl) => { let q = ''; try { q = new URL(boardUrl).search || ''; } catch { /* 목록 주소가 없으면 꼬리 없음 */ } return `https://www.jbnu.ac.kr/web/Board/${id}/detailView.do${q}`; },
     evidence: '길 /web/Board/<번호>/detailView.do 는 페이지의 pf_DetailMove 함수(폼 action)를 그대로 읽은 것(2026-08-02 · collect.mjs BOARD_RULES). 그날 실제로 연 주소는 장학 목록의 꼬리 ?category=6 이 붙은 것이라, 꼬리는 **그 목록 주소의 것**을 그대로 옮긴다(공지 전체 sub01 은 꼬리 없음). 이 꼴이 공지 게시판에도 맞는지는 로봇이 매번 verifyRuleDetail 로 연다',
   },
+  /* 경북대 학사공지: 행이 <a href="javascript:doRead('stu_812', 'top', '11790921912463');">. 정찰 6차(2026-10-03)에서 첫 줄을 링크로 누르니
+     stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11790921912463&menu_idx=42&bbs_cde=stu_812 이 열렸다 —
+     doRead 의 세 값(게시판·구분·글 번호)이 그 주소의 bbs_cde·note_div·bltn_no 로 **그대로** 갔다. 그 꼴을 값만 바꿔 쓴다(menu_idx 는 목록 주소의 것).
+     ⚠️ 정찰이 누른 첫 줄은 상단 고정(note_div=top)이었다 — 보통 줄의 구분 값으로도 열리는지는 아직 아무도 안 눌러 봤다 →
+        verifyLast: 로봇이 첫 글과 **마지막 글**(보통 줄)을 둘 다 열어 본다. 하나라도 그 글 화면이 아니면 이 게시판은 싣지 않는다. */
+  '경북대학교': {
+    kind: 'onclick',
+    fn: /doRead\(\s*['"](?<bbs>[\w-]+)['"]\s*,\s*['"](?<note>\w*)['"]\s*,\s*['"](?<id>\d+)['"]\s*\)/,
+    detail: (id, boardUrl, title, g = {}) => {
+      let menu = null; try { const u = new URL(boardUrl); if (u.origin + u.pathname === 'https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdList.action') menu = u.searchParams.get('menu_idx'); } catch { /* 목록 주소가 아니면 만들지 않는다 */ }
+      if (!menu || !g.bbs) return null;
+      return `https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=${encodeURIComponent(g.note || '')}&bltn_no=${id}&menu_idx=${encodeURIComponent(menu)}&bbs_cde=${encodeURIComponent(g.bbs)}`;
+    },
+    verifyLast: true,
+    evidence: '정찰 6차 2026-10-03: 행 href="javascript:doRead(\'stu_812\', \'top\', \'11790921912463\');" · 첫 줄을 링크로 누르니 → https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11790921912463&menu_idx=42&bbs_cde=stu_812 (그 글 화면 · 로그인 요구 없음)',
+  },
+  /* 서강대 둘째 게시판 「서강 Story > 행사특강」(열쇠 '학교#이름' — collect-news.mjs 의 extraBoards). 첫 게시판(공지사항 · 열쇠 3)은 6월 30일 뒤 새 글이 드물다.
+     정찰 6차(2026-10-03): 화면이 GET …/BbsData/boardList?pageNum=1&pageSize=16&bbsConfigFk=142&… 를 불렀고(글 1,378개 · 10월 1일 글까지),
+     첫 줄을 누르니 /ko/detail/551482?bbsConfigFk=142&namepage=StoryNotificationEvent&text=…&title=…&redirect=/ko/story/notification-event 로 갔다(551482 = API 의 pkId).
+     본문은 첫 게시판과 같은 GET …/BbsData?pkId=<번호> 가 받았다 — 번호는 사이트 전체 번호라 첫 게시판 글과 겹치지 않는다(같은 열쇠 BbsData 하나). */
+  '서강대학교#행사특강': {
+    kind: 'json',
+    page: 'https://www.sogang.ac.kr/ko/story/notification-event',
+    api: 'https://www.sogang.ac.kr/api/api/v1/mainKo/BbsData/boardList?pageNum=1&pageSize=30&bbsConfigFk=142',
+    detail: (id) => `https://www.sogang.ac.kr/ko/detail/${id}?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event`,
+    verifyApi: { idFrom: (url) => (String(url).match(/\/ko\/detail\/(\d+)/) || [])[1], api: (id) => `https://www.sogang.ac.kr/api/api/v1/mainKo/BbsData?pkId=${id}` },
+    /* 🔴 둘째 게시판 규칙은 글 번호가 **첫 게시판과 같은 번호 공간**일 때만 둔다 — 같은 글 알아보기·숨김·썸네일 열쇠가 모두 「학교 + 글 번호」라서
+       번호가 게시판마다 따로 매겨지면 다른 글이 한 글로 합쳐지고 새 글이 '이미 본 글'로 빠진다(리뷰 10-04). 서강 pkId 는 사이트 전체 번호(BbsData?pkId= 하나로 어느 게시판 글이든 열린다) */
+    sharedIds: true,
+    evidence: '정찰 6차 2026-10-03: /ko/story/notification-event 화면이 GET /api/api/v1/mainKo/BbsData/boardList?…&bbsConfigFk=142 (JSON 글 배열 · pkId·title·regDate) 를 불렀다 · 첫 줄을 누르니 /ko/detail/551482?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event · 그 화면이 GET …/BbsData?pkId=551482 로 본문을 받았다',
+  },
 };
+
+/* 규칙 열쇠 — 첫 게시판은 학교 이름, 둘째 게시판(news-sources.json extraBoards)은 '학교#게시판 이름'.
+   수집 로봇의 게시판 줄({ school, board })과 실린 글({ school, board })이 같은 함수로 열쇠를 만든다(썸네일 로봇이 글의 본문 API 를 찾을 때). */
+export const newsRuleKey = (x) => (x && x.board ? `${x.school}#${x.board}` : (x && x.school) || '');
 
 /* 규칙 하나 → <a …> 의 속성 글자를 받아 { url, id }(못 풀면 null)를 돌려주는 함수. extractDatedRows 의 resolve 옵션에 넘긴다. */
 export function ruleResolver(rule, boardUrl) {
   if (!rule) return null;
   return (attrs, title) => {
-    let id = null;
+    let id = null; let groups = {};
     if (rule.kind === 'onclick' || rule.kind === 'listOnly' || rule.kind === 'post') {
       /* onclick="goDetail(1)" 도, href="javascript:view('1','')" 도 — 두 속성의 값을 모두 본다 */
       for (const m of attrs.matchAll(/\b(?:onclick|href)\s*=\s*(["'])((?:(?!\1)[\s\S])*)\1/gi)) {
-        id = (m[2].match(rule.fn) || [])[1];
-        if (id) break;
+        const hit = m[2].match(rule.fn);
+        /* 값이 여럿인 함수(경북 doRead(게시판, 구분, 번호))는 이름 붙은 묶음으로 — 글 번호는 (?<id>…), 나머지는 detail 의 넷째 인자로 */
+        id = hit ? ((hit.groups && hit.groups.id) || hit[1]) : null;
+        if (id) { groups = (hit && hit.groups) || {}; break; }
       }
     } else if (rule.kind === 'dataId') {
       id = (attrs.match(/data-id\s*=\s*["'](\d+)["']/i) || [])[1];
     }
     if (!id) return null;
     let url = null;
-    try { url = rule.detail(id, boardUrl, title) || null; } catch { url = null; }
+    try { url = rule.detail(id, boardUrl, title, groups) || null; } catch { url = null; }
     return url ? { url, id } : null;   // id = 게시판의 글 번호 (postId — 같은 글 알아보기)
   };
 }

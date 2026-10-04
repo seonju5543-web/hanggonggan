@@ -1,5 +1,5 @@
 {
- "note": "소식 카드에 그 글의 사진이 없을 때 대신 보이는 학교 대표 사진 (2026-10-03). 만드는 곳 tools/build-school-photos.mjs · 고른 기록 docs/designs/assets/gates/school-photo-picks.json · 사진은 위키미디어 공용의 열린 라이선스 — credit 을 구역 아래에 적는다.",
+ "note": "소식 카드에 그 글의 사진이 없을 때 대신 보이는 학교 대표 사진 (2026-10-03). 만드는 곳 tools/build-school-photos.mjs · 고른 기록 docs/designs/assets/gates/school-photo-picks.json · 사진은 위키미디어 공용의 열린 라이선스 — credit 은 앱 권한 · 오픈소스 라이선스 화면 「사진 출처」에 적는다.",
  "schools": {
   "숭실대학교": [
    {
@@ -264,6 +264,129 @@
     "credit": "Piotrus · CC BY-SA 3.0",
     "page": "https://commons.wikimedia.org/wiki/File%3AHanyang_University_008.JPG",
     "what": "초록 지붕 본관과 파란 하늘 — 시작 화면 사진에서 앞쪽 행인들을 잘라 냄"
+   }
+  ],
+  "연세대학교 미래캠퍼스": [
+   {
+    "src": "assets/schools/n1if6uwu-21d2e09d.webp",
+    "focus": "50% 60%",
+    "credit": "Youngjin · CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AYonsei_University_Mirae_Campus_main_entrance_01.jpg",
+    "what": "미래캠퍼스 정문 — 양쪽 돌기둥 사이로 은행나무 가로수 길이 산 쪽으로 곧게 뻗음"
+   },
+   {
+    "src": "assets/schools/n1if6uwu-528b2e52.webp",
+    "focus": "35% 55%",
+    "credit": "Youngjin · CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AYonsei_University_Mirae_Campus_03.jpg",
+    "what": "'YONSEI UNIVERSITY' 글자가 붙은 벽돌 건물과 캠퍼스 큰길, 가로수"
+   }
+  ],
+  "명지대학교": [
+   {
+    "src": "assets/schools/ntyl0r5-aa28da8d.webp",
+    "focus": "45% 45%",
+    "credit": "Chu · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A20100831_myongji_university.jpg",
+    "what": "언덕길 위 본관 건물과 나무들 — 아래쪽 차·사람은 잘라 냄"
+   }
+  ],
+  "국민대학교": [
+   {
+    "src": "assets/schools/n1tasrsl-c42b0471.webp",
+    "focus": "65% 45%",
+    "credit": "hyolee2 · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AKookmin_Univ_10.JPG",
+    "what": "정문 앞 언덕길과 소나무 숲 위로 보이는 캠퍼스 건물, 맑은 하늘 — 아래쪽 차는 잘라 냄"
+   }
+  ],
+  "가톨릭대학교": [
+   {
+    "src": "assets/schools/n174lvh5-364e6408.webp",
+    "focus": "45% 45%",
+    "credit": "YSMoon · CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EA%B0%80%ED%86%A8%EB%A6%AD%EB%8C%80%ED%95%99%EA%B5%90_%EA%B5%90%ED%9A%8C%EC%9D%8C%EC%95%85%EB%8C%80%ED%95%99%EC%9B%90_%EC%B5%9C%EC%96%91%EC%97%85%ED%99%80.jpg",
+    "what": "'가톨릭대학교' 글자가 붙은 붉은 벽돌 건물과 흰 목련"
+   },
+   {
+    "src": "assets/schools/n174lvh5-ea0bc277.webp",
+    "focus": "55% 50%",
+    "credit": "hyolee2 · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3ACatholic_University_of_Korea_Medical_College_.JPG",
+    "what": "'가톨릭대학교' 간판이 달린 흰 건물과 앞뜰 정원 — 아래 차는 잘라 냄"
+   }
+  ],
+  "한국항공대학교": [
+   {
+    "src": "assets/schools/n1as48ix-b143cb9a.webp",
+    "focus": "40% 60%",
+    "credit": "Kaupr · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AKAU_main_building.jpg",
+    "what": "유리창 본관과 원통형 건물 앞 분수 광장"
+   },
+   {
+    "src": "assets/schools/n1as48ix-4c343d48.webp",
+    "focus": "40% 50%",
+    "credit": "Kaupr · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AKAU_60th_anniversary.jpg",
+    "what": "파란 하늘 아래 유리 건물에 걸린 60주년 현수막"
+   }
+  ],
+  "경기대학교": [
+   {
+    "src": "assets/schools/ntxxf09-ca3ff296.webp",
+    "focus": "50% 55%",
+    "credit": "경기대예술 · CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A1%EC%A7%84%EB%A6%AC.jpg",
+    "what": "수원캠퍼스 강의동을 위에서 본 모습 — 앞뜰 잔디와 단풍, 멀리 도시"
+   },
+   {
+    "src": "assets/schools/ntxxf09-de42f1d8.webp",
+    "focus": "40% 45%",
+    "credit": "경기대예술 · CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EA%B2%BD%EA%B8%B0%EB%8C%80%ED%95%99%EA%B5%90_%EC%88%98%EC%9B%90%EC%BA%A0%ED%8D%BC%EC%8A%A4_1%EA%B0%95%EC%9D%98%EB%8F%99_(%EC%A7%84%EB%A6%AC%EA%B4%80).jpg",
+    "what": "수원캠퍼스 1강의동(진리관)과 소나무, 파란 하늘 — 아래 주차된 차는 잘라 냄"
+   }
+  ],
+  "서울교육대학교": [
+   {
+    "src": "assets/schools/n18ebv4b-42837c1b.webp",
+    "focus": "55% 50%",
+    "credit": "Yeji · CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EC%97%B0%EA%B5%AC%EA%B0%95%EC%9D%98%EB%8F%99.jpg",
+    "what": "벽돌 연구강의동 입구와 노랗게 물든 단풍나무"
+   },
+   {
+    "src": "assets/schools/n18ebv4b-8afdf3bb.webp",
+    "focus": "50% 50%",
+    "credit": "Nanunnuri · CC BY-SA 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EC%84%9C%EC%9A%B8%EA%B5%90%EB%8C%80%EC%9A%B4%EB%8F%99%EC%9E%A5.JPG",
+    "what": "단풍 든 나무로 둘러싸인 운동장 잔디"
+   }
+  ],
+  "강원대학교": [
+   {
+    "src": "assets/schools/nlzhvsh-fc12f088.webp",
+    "focus": "50% 45%",
+    "credit": "Sadopaul · CC BY 4.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EA%B0%95%EC%9B%90%EB%8C%80%ED%95%99%EA%B5%90_60%EC%A3%BC%EB%85%84_%EA%B8%B0%EB%85%90%EA%B4%80.jpg",
+    "what": "강원대학교 60주년 기념관 건물 정면"
+   }
+  ],
+  "고려대학교 세종캠퍼스": [
+   {
+    "src": "assets/schools/n1ch7t87-29f4d60c.webp",
+    "focus": "55% 40%",
+    "credit": "rijuve · CC BY-SA 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3AKus13.jpg",
+    "what": "석조 외벽의 세종캠퍼스 본관 건물 — 아래 주차된 차는 잘라 냄"
+   },
+   {
+    "src": "assets/schools/n1ch7t87-0f1a9797.webp",
+    "focus": "45% 50%",
+    "credit": "rijuve · CC BY 3.0",
+    "page": "https://commons.wikimedia.org/wiki/File%3A%EA%B3%A0%EB%A0%A4%EB%8C%80%ED%95%99%EA%B5%90_%EC%84%B8%EC%A2%85%EC%BA%A0%ED%8D%BC%EC%8A%A4_%EC%A4%91%EC%95%99%EA%B4%91%EC%9E%A5.jpg",
+    "what": "세종캠퍼스 중앙광장 — 벽돌 길과 단풍 든 가로수, 벤치, 멀리 강의동"
    }
   ],
   "서울대학교": [

@@ -1,7 +1,16 @@
 {
  "school": "서울과학기술대학교",
- "updatedAt": "2026-10-03",
+ "updatedAt": "2026-10-04",
  "items": [
+  {
+   "title": "[홍보실]학교 공식 마스코트 '테크뇽'세계관 고도화 아이디어 공모전 수상작 발표",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896116&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-10-01",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-10-04",
+   "thumb": "data/news/img/36248fd565055fcc.webp"
+  },
   {
    "title": "[이벤트 종료 소진완료] 꾹! 도장 찍고 선물 GET! 공릉동 소상공인 스탬프 투어",
    "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896180&qidx=4691&cate=10&allboard=false&nowpage=1",
@@ -9,7 +18,7 @@
    "school": "서울과학기술대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "thumb": "data/news/img/bb39e482c49f03a5.webp"
+   "thumb": "data/news/img/be754b3f9bfd31cc.webp"
   },
   {
    "title": "[예비군연대] 학생예비군 2학기 정기 공지사항",
@@ -45,7 +54,7 @@
    "school": "서울과학기술대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/5bf93921c0592f26.webp"
+   "thumb": "data/news/img/fc582635b3dda170.webp"
   },
   {
    "title": "[메이커장비교육] 3D프린터 장비교육",
@@ -54,7 +63,7 @@
    "school": "서울과학기술대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/c6c0de1a3034a7b3.webp"
+   "thumb": "data/news/img/7a6aaee7c6212481.webp"
   },
   {
    "title": "글로벌 플레이그라운드 오픈 알림(개소식 26. 10. 1. 16시)",

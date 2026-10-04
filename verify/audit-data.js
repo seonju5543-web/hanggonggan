@@ -158,7 +158,7 @@ try {
   const files = fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => /\.json$/.test(f) && f !== 'index.json') : [];
   /* 썸네일 (2026-10-03) — 로봇이 만든 해시 이름(collector/news-thumb.mjs THUMB_RE 사본 · 관문 대조) · 파일이 있다 · 크기 상한 */
   const THUMB_RE = /^data\/news\/img\/[0-9a-f]{16}\.webp$/;
-  const THUMB_MAX = 60 * 1024;
+  const THUMB_MAX = 90 * 1024;   // collector/news-thumb.mjs THUMB_MAX_BYTES 와 같게 (360px · 2026-10-03)
   let dup = 0; let badKind = 0; let badSchool = 0; let badDate = 0; let badUrl = 0; let badThumb = 0; let missThumb = 0; let bigThumb = 0;
   for (const f of files) {
     const doc = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
@@ -184,7 +184,7 @@ try {
   /* 파일이 없는 썸네일은 **경고**다 (리뷰 12차) — 병합(합집합)이 로봇이 지운 그림의 칸을 되살릴 수 있고, 오류로 두면 그 사이 관리자·로봇 저장이 전부 막힌다.
      앱은 못 받은 그림을 빼고 글자 카드로 그리고(error 잡이), 다음 썸네일 단계가 칸을 다시 맞춘다. */
   if (missThumb) warns.push(`news — 썸네일 파일이 없는 글 ${missThumb}건 (다음 썸네일 단계가 칸을 맞춘다 · collector/collect-news-thumbs.mjs)`);
-  if (bigThumb) errors.push(`news — ${THUMB_MAX / 1024}KB 를 넘는 썸네일 ${bigThumb}건 (240px WebP 로 줄인 것만 싣는다)`);
+  if (bigThumb) errors.push(`news — ${THUMB_MAX / 1024}KB 를 넘는 썸네일 ${bigThumb}건 (360px WebP 로 줄인 것만 싣는다)`);
   if (dup) errors.push(`news — 교내 소식 파일 안에 중복 ${dup}건 (수집기 중복 제거가 동작하지 않았습니다)`);
   if (badKind) errors.push(`news — 갈래가 ${NEWS_KINDS.join('·')} 밖인 글 ${badKind}건 (판정은 collector/news-kind.mjs 한 곳)`);
   if (badSchool) errors.push(`news — 파일의 학교와 다르거나 서비스하지 않는 학교의 글 ${badSchool}건 (match-engine.js SERVED_SCHOOLS)`);
@@ -281,6 +281,22 @@ console.log(`감사 대상: 정식 등록 ${reg.items.length}건 · 양식 ${Obj
    ⚠️ '글자가 상한 줄'(잘린 조각)은 경고로만 둔다 — 부류가 틀린 게 아니라 수집 단계에서
    글자가 빠진 것이라 성격이 다르고, 버리면 **진짜 요건을 잃는다**
    (동국인재육성의 `…12학점 이상인 경우만 성적 인 (…)` 이 그렇다). */
+/* 대학원 전용 공고가 학부생에게 **적합으로** 뜨지 않는가 (2026-10-04 — test-collector 의 실데이터 관문을 여기 경고로 옮겼다).
+   🔴 오류로 두지 말 것: 관문에 있던 시절, 로봇이 대학원 전용 공고 하나의 자격 줄을 채운 날부터 수집 실행마다 자동 등록분이 되돌려졌다.
+   기대는 2026-09-12 개발자 결정대로 '미달'(fails) 또는 '자격 미확인' — '적합'(점수가 붙고 미달 아님)만 경고한다. 규칙 자체는 관문이 표본으로 잰다. */
+{
+  const ME = require('../match-engine.js');
+  const PR = require('../parse-requirements.js');
+  const ug = { name: 't', school: '경희대학교', campus: '서울캠퍼스', track: 'engineering', major: '컴퓨터공학과', year: 3, status: '재학', gpa: 4.0 };
+  const shown = reg.items.filter((it) => {
+    const ls = it.eligibilityLines || [];
+    if (!ls.some((t) => PR.gradTarget(t) === 'body') || ls.some((t) => PR.mentionsUndergrad(t))) return false;
+    const fd = ME.fitDetail(it, ug);
+    return !fd.unread && !fd.fails.length;
+  }).map((it) => it.id);
+  if (shown.length) warns.push(`registered — 대학원 전용으로 읽히는데 학부생에게 적합으로 뜨는 공고 ${shown.length}건: ${shown.slice(0, 5).join(', ')} (자격 줄·학위 축 확인)`);
+}
+
 {
   /* 화면으로 나가는 문과 **같은 함수**로 본다 — 감사가 제 규칙을 따로 두면
      "감사는 통과하는데 화면엔 잡음이 뜨는" 상태가 된다(이 저장소가 여러 번 겪은 유형). */

@@ -63,3 +63,22 @@ export function isNewsRow(row, opts = {}) {
   if (opts.activityKind && opts.activityKind(t, { scholarship: opts.scholarship })) return false;
   return true;
 }
+
+/* 학교마다 가장 최근 소식 n 건 — 수집일·게시일 기한이 지나도 남긴다 (2026-10-03 개발자 지시 "소식이 0건인 학교는 없어").
+   글이 드문 게시판(서강 공지사항: 6월 30일 뒤 새 글 없음)은 기한이 다 지나면 홈 첫 화면 띠가 비었다.
+   🔴 오래된 고정 공지를 새로 데려오는 길이 아니다 — 수집 때 게시일 기한(60일)은 그대로라, 여기 남는 것은 **실렸던** 글뿐이다.
+   숨긴 글은 세지 않는다 · 순서는 게시일(없으면 수집일) 최근 순 · 돌려주는 것은 남길 글 객체의 Set */
+export function newsFloor(items, n = 4) {
+  const bySchool = new Map();
+  for (const it of items) {
+    if (!it || it.hidden || !it.school) continue;
+    if (!bySchool.has(it.school)) bySchool.set(it.school, []);
+    bySchool.get(it.school).push(it);
+  }
+  const keep = new Set();
+  for (const list of bySchool.values()) {
+    list.sort((a, b) => String(b.postedAt || b.foundAt || '').localeCompare(String(a.postedAt || a.foundAt || '')));
+    for (const it of list.slice(0, n)) keep.add(it);
+  }
+  return keep;
+}

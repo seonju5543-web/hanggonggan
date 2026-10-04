@@ -1,7 +1,57 @@
 {
  "school": "고려대학교 세종캠퍼스",
- "updatedAt": "2026-10-03",
+ "updatedAt": "2026-10-04",
  "items": [
+  {
+   "title": "[세종앵커사업단] 2026 랜선으로 만나는 릴레이 글로벌 취·창업 톡톡톡(talk) 모집",
+   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/656/273103/artclView.do",
+   "postedAt": "2026-09-23",
+   "school": "고려대학교 세종캠퍼스",
+   "campus": "",
+   "board": "학사공지",
+   "foundAt": "2026-10-04"
+  },
+  {
+   "title": "[학부] 2027년도 제1학기 복수전공전형 시행 안내",
+   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/656/272747/artclView.do",
+   "postedAt": "2026-09-11",
+   "kind": "학사",
+   "school": "고려대학교 세종캠퍼스",
+   "campus": "",
+   "board": "학사공지",
+   "foundAt": "2026-10-04",
+   "thumb": "data/news/img/343daf2bf013dac1.webp"
+  },
+  {
+   "title": "[학부] 2026학년도 2학기 세종캠퍼스 학부 폐강과목",
+   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/656/272717/artclView.do",
+   "postedAt": "2026-09-10",
+   "kind": "학사",
+   "school": "고려대학교 세종캠퍼스",
+   "campus": "",
+   "board": "학사공지",
+   "foundAt": "2026-10-04"
+  },
+  {
+   "title": "[학부] 2026학년도 2학기 조기졸업 신청 안내",
+   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/656/272181/artclView.do",
+   "postedAt": "2026-08-31",
+   "kind": "학사",
+   "school": "고려대학교 세종캠퍼스",
+   "campus": "",
+   "board": "학사공지",
+   "foundAt": "2026-10-04"
+  },
+  {
+   "title": "2026-2학기 대학(원) 신(편)입생 학생증 신청 안내",
+   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/656/271940/artclView.do",
+   "postedAt": "2026-08-21",
+   "kind": "학사",
+   "school": "고려대학교 세종캠퍼스",
+   "campus": "",
+   "board": "학사공지",
+   "foundAt": "2026-10-04"
+  },
   {
    "title": "[세종] 휘트니스센터 10월 종일 회원권 2차 온라인 접수 안내",
    "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/664/273087/artclView.do",

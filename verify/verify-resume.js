@@ -128,7 +128,7 @@ async function openWith(ctx, resume) {
   await dismissNotify(page);
   await page.click('.nav-item[data-nav="explore"]');
   await page.waitForTimeout(600);
-  await page.evaluate(() => window.scrollTo(0, 300));
+  await page.evaluate(() => appScrollTo(300));
   await page.waitForTimeout(400);
   /* 🔴 **`visibilitychange` 를 그냥 쏘면 아무 일도 안 난다** (2026-09-09 코드 리뷰):
      앱의 처리는 `document.visibilityState === 'hidden'` 일 때만 도는데, 이벤트만 쏘면
@@ -149,7 +149,7 @@ async function openWith(ctx, resume) {
   await page.reload({ waitUntil: 'networkidle' });
   await page.waitForTimeout(1200);
   ok('탐색 탭에서 나갔다 오면 탐색 탭이다', (await shown(page)) === 'explore', await shown(page));
-  const y = await page.evaluate(() => window.scrollY);
+  const y = await page.evaluate(() => appScroller().scrollTop);
   ok('보던 자리로 돌아온다 (0이 아니다)', y > 50, `scrollY=${y}`);
 
   /* 홈으로 옮겨 두고 다시 열면 홈이어야 한다 — 스크롤이 남의 화면에 안 붙는지 함께 본다 */
@@ -158,7 +158,7 @@ async function openWith(ctx, resume) {
   await page.reload({ waitUntil: 'networkidle' });
   await page.waitForTimeout(1200);
   ok('홈으로 옮겨 두면 홈이다', (await shown(page)) === 'home', await shown(page));
-  ok('홈의 스크롤이 탐색 탭 것을 물려받지 않는다', (await page.evaluate(() => window.scrollY)) < 50);
+  ok('홈의 스크롤이 탐색 탭 것을 물려받지 않는다', (await page.evaluate(() => appScroller().scrollTop)) < 50);
 
   /* ── ④⑤ 창을 넘겨도 쓰던 신청서는 안 버린다 ───────────────────────
      실제 공고 id 를 앱에서 고른다(박지 않는다). 양식이 붙은 등록 공고 하나면 된다. */

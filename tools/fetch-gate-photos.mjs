@@ -69,7 +69,13 @@ for (const s of [
   { name: '연세대학교 미래캠퍼스', must: /Yonsei.*(?:Mirae|Wonju)|(?:Mirae|Wonju).*Yonsei|연세대.*(?:미래|원주)/i, not: /Hospital|병원|Severance|세브란스|Station|역|logo|로고|Museum|박물관/i,
     q: ['Yonsei University Mirae Campus', 'Yonsei University Wonju Campus', '연세대학교 미래캠퍼스', '연세대학교 원주캠퍼스', 'Yonsei Wonju', 'Yonsei University Wonju lake', '연세대학교 원주 매지호'] },
   { name: '고려대학교 세종캠퍼스', must: /Korea University.*Sejong|Sejong.*Korea University|고려대.*세종|Korea Univ.*Sejong/i, not: /Hospital|병원|Station|역|logo|로고/i,
-    q: ['Korea University Sejong Campus', '고려대학교 세종캠퍼스', 'Korea University Sejong', '고려대 세종', 'Korea University Jochiwon'] },
+    q: ['Korea University Sejong Campus', '고려대학교 세종캠퍼스', 'Korea University Sejong', '고려대 세종', 'Korea University Jochiwon'],
+    /* 3차까지 후보 0장 — 웹 검색 2026-10-04 'commons.wikimedia.org File Korea University Sejong Campus' 결과 URL
+       https://commons.wikimedia.org/wiki/Category:Korea_University_Sejong_Campus (분류 · 파일 4개) 를 직접 읽는다 */
+    cats: ['Korea University Sejong Campus'],
+    /* 9차: 그 분류의 4장 + 위키데이터 대표 1장을 받고도 0장 — 위키백과의 「고려대학교 세종캠퍼스 중앙광장.jpg」가 800×600 이라 폭 900 거름에 걸린 것으로 보인다
+       (확인 못 함 — 이번 실행이 거른 이유를 로그에 적는다). 앱은 가로 640px 사본만 쓰므로 이 학교만 640 까지 받는다 */
+    minWidth: 640 },
   { name: '동국대학교 WISE캠퍼스', must: /Dongguk.*(?:Gyeongju|WISE)|(?:Gyeongju|WISE).*Dongguk|동국대.*(?:경주|WISE)/i, not: /Hospital|병원|Station|역|logo|로고/i,
     q: ['Dongguk University Gyeongju Campus', 'Dongguk University WISE', '동국대학교 경주캠퍼스', '동국대학교 WISE캠퍼스', 'Dongguk University Gyeongju', '동국대 경주'] },
   { name: '명지대학교', must: /Myong ?ji|명지대/i, not: /College|전문대|High School|고등학교|중학교|초등|Hospital|병원|Station|역|logo|로고|Bus|버스|Post ?office|우체국|Festival|축제/i,
@@ -141,14 +147,14 @@ function pick(pages, school, opts = {}) {
   const out = [];
   for (const p of pages) {
     const ii = p.imageinfo?.[0]; if (!ii) continue;
-    if (!/^image\/(jpeg|png)$/.test(ii.mime)) continue;
-    if ((ii.width || 0) < MIN_WIDTH) continue;
+    if (!/^image\/(jpeg|png)$/.test(ii.mime)) { if (opts.why) opts.why.push(`${p.title} 형식 ${ii.mime}`); continue; }
+    if ((ii.width || 0) < ((school && school.minWidth) || MIN_WIDTH)) { if (opts.why) opts.why.push(`${p.title} 폭 ${ii.width}`); continue; }
     /* 제목에 학교 이름이 없으면 낱말 대조가 우연히 맞은 것이다 — 버린다 */
     /* 학교의 위키미디어 분류·위키데이터 대표 사진에서 온 파일은 분류 자체가 근거라 제목 이름표를 묻지 않는다(not 은 그대로 — 로고·역·병원 거름) */
-    if (school && ((!opts.skipMust && !school.must.test(p.title)) || (school.not && school.not.test(p.title)))) continue;
+    if (school && ((!opts.skipMust && !school.must.test(p.title)) || (school.not && school.not.test(p.title)))) { if (opts.why) opts.why.push(`${p.title} 이름 거름`); continue; }
     const md = ii.extmetadata || {};
     const lic = (md.LicenseShortName?.value || '').trim();
-    if (!OK_LICENSE.test(lic) || BAD_LICENSE.test(lic)) continue;
+    if (!OK_LICENSE.test(lic) || BAD_LICENSE.test(lic)) { if (opts.why) opts.why.push(`${p.title} 라이선스 ${lic || '없음'}`); continue; }
     const strip = (s) => String(s || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
     out.push({
       title: p.title, pageUrl: `https://commons.wikimedia.org/wiki/${encodeURIComponent(p.title.replace(/ /g, '_'))}`,
@@ -192,14 +198,17 @@ async function categoryFiles(cat, depth = 1) {
 async function wikidataCandidates(s) {
   const found = await getJson(`https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&language=ko&uselang=ko&type=item&limit=5&search=${encodeURIComponent(s.name)}`);
   const hit = (found.search || []).find((x) => x.label === s.name);   // 이름이 정확히 같은 항목만 — 비슷한 이름(분교·전문대)을 데려오지 않는다
-  if (!hit) return { files: [], note: '위키데이터에 같은 이름 항목 없음' };
+  /* 사람이 근거와 함께 적은 위키미디어 분류(s.cats) — 위키데이터 항목이 없거나 분류(P373)를 안 적어 둔 학교 */
+  const handCats = [];
+  for (const c of s.cats || []) handCats.push(...await categoryFiles(c));
+  if (!hit) return { files: handCats, note: `위키데이터에 같은 이름 항목 없음 · 손으로 적은 분류 ${(s.cats || []).join(',') || '없음'} ${handCats.length}` };
   const ent = (await getJson(`https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&props=claims&ids=${hit.id}`)).entities[hit.id];
   const vals = (pid) => ((ent.claims || {})[pid] || []).map((c) => c.mainsnak?.datavalue?.value).filter((v) => typeof v === 'string');
   const direct = ['P18', 'P4291', 'P3451', 'P8592'].flatMap(vals).map((f) => `File:${f}`);
   const cats = vals('P373');
   const inCat = [];
   for (const c of cats) inCat.push(...await categoryFiles(c));
-  return { files: [...new Set([...direct, ...inCat])], note: `${hit.id} · 대표 ${direct.length} · 분류 ${cats.join(',') || '없음'} ${inCat.length}` };
+  return { files: [...new Set([...direct, ...inCat, ...handCats])], note: `${hit.id} · 대표 ${direct.length} · 분류 ${cats.join(',') || '없음'} ${inCat.length} · 손 분류 ${handCats.length}` };
 }
 const OV_LIC = { by: 'CC BY', 'by-sa': 'CC BY-SA', cc0: 'CC0', pdm: 'Public domain' };
 async function openverseCandidates(s) {
@@ -259,7 +268,9 @@ for (const s of SCHOOLS) {
     try {
       const wd = await wikidataCandidates(s);
       console.log(`  · ${s.name} 위키데이터: ${wd.note}`);
-      if (wd.files.length) for (const c of pick(await commonsFiles(wd.files), s, { skipMust: true })) if (!seen.has(c.title)) { seen.add(c.title); cands.push({ ...c, via: 'wikidata' }); }
+      const why = [];
+      if (wd.files.length) for (const c of pick(await commonsFiles(wd.files), s, { skipMust: true, why })) if (!seen.has(c.title)) { seen.add(c.title); cands.push({ ...c, via: 'wikidata' }); }
+      if (why.length) console.log(`  · ${s.name} 위키데이터 후보 중 거른 것: ${why.slice(0, 8).join(' · ')}`);
     } catch (e) { console.log(`  ! ${s.name} 위키데이터: ${e.message}`); }
   }
   if (SOURCES.includes('openverse')) {

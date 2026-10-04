@@ -1,6 +1,6 @@
 {
  "school": "강원대학교",
- "updatedAt": "2026-10-03",
+ "updatedAt": "2026-10-04",
  "items": [
   {
    "title": "강원대학교 총동창회 「강대인 봄내길 걷기대회」 참가 안내",
@@ -9,7 +9,7 @@
    "school": "강원대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "thumb": "data/news/img/a665d214d29be3d8.webp"
+   "thumb": "data/news/img/4b18be5754f8315a.webp"
   },
   {
    "title": "[생활협동조합] 크누테리아 한식 메뉴 재개 안내",
@@ -18,7 +18,7 @@
    "school": "강원대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/93b1194146a3ee51.webp"
+   "thumb": "data/news/img/f93fbda6eb55955a.webp"
   },
   {
    "title": "[생활협동조합] 백록관식당 주간식단표(2026.10.05.~09)",
@@ -43,7 +43,7 @@
    "school": "강원대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/afa8e85750855f51.webp"
+   "thumb": "data/news/img/2efb01e90848a1b1.webp"
   },
   {
    "title": "학생 무료 건강검진 안내",
@@ -78,7 +78,7 @@
    "school": "강원대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/9ebba265f50afe05.webp"
+   "thumb": "data/news/img/4fb29a687972f9b4.webp"
   },
   {
    "title": "평생교육원 2026 산림기술자 전문교육 모집 안내",
@@ -229,7 +229,8 @@
    "kind": "행사",
    "school": "강원대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "thumb": "data/news/img/e812afcbf10a1b07.webp"
   },
   {
    "title": "[강릉,원주]2026학년도 2학기 분할납부 안내(2차납부)",

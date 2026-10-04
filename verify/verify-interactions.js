@@ -254,7 +254,7 @@ async function seed(page) {
   const navBefore = await page.$eval('#bottom-nav', (e) => e.getBoundingClientRect().top);
   /* 🔴 여기서 화면을 탭하지 말 것 — 카드를 눌러 **상세 시트가 열리고**, 그러면
      당겨서 새로고침이 (올바르게) 막혀 검사가 스스로 빨간불을 만든다. 실제로 그랬다. */
-  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.evaluate(() => appScrollTo(0));
   await dismissNotify(page);                       // 그새 다시 떴을 수 있다
   const dragged = await page.evaluate(async () => {
     const send = (type, y) => {
@@ -297,7 +297,7 @@ async function seed(page) {
         changedTouches: [t], bubbles: true, cancelable: true,
       }));
     };
-    window.scrollTo(0, 0);
+    appScrollTo(0);
     /* 🔴 순서가 이 검사의 전부다 — 되돌리기 타이머(300ms)가 **두 번째 당김이 아직 손가락을
        붙이고 있는 동안** 터져야 버그가 드러난다. 두 번째를 먼저 끝내 버리면 아무 일도
        안 일어나서 검사가 조용히 통과한다(처음에 그렇게 만들었다가 red-green 에서 걸렸다). */
@@ -319,7 +319,7 @@ async function seed(page) {
   const fabDrag = await page.evaluate(async () => {
     const fab = document.querySelector('.chat-fab, #btn-chat-fab');
     if (!fab) return { skipped: true };
-    window.scrollTo(0, 0);
+    appScrollTo(0);
     const send = (type, y) => {
       const t = new Touch({ identifier: 13, target: fab, clientX: 320, clientY: y });
       fab.dispatchEvent(new TouchEvent(type, {
@@ -353,7 +353,7 @@ async function seed(page) {
     const sheet = document.querySelector('#detail-sheet');
     const back = document.querySelector('#sheet-backdrop');
     sheet.hidden = false; back.hidden = false;
-    window.scrollTo(0, 0);
+    appScrollTo(0);
     const send = (type, y) => {
       const t = new Touch({ identifier: 2, target: document.body, clientX: 195, clientY: y });
       document.dispatchEvent(new TouchEvent(type, {
@@ -453,9 +453,9 @@ async function seed(page) {
        이 절이 오래 빨간불이던 진짜 원인이 이것이다 — **더 안 움직일 때까지** 내린다. */
     await page.evaluate(async () => {
       let last = -1;
-      for (let i = 0; i < 8 && Math.round(scrollY) !== last; i++) {
-        last = Math.round(scrollY);
-        window.scrollTo(0, document.body.scrollHeight);
+      for (let i = 0; i < 8 && Math.round(appScroller().scrollTop) !== last; i++) {
+        last = Math.round(appScroller().scrollTop);
+        appScrollTo(appScroller().scrollHeight);
         await new Promise((r) => setTimeout(r, 250));
       }
     });
@@ -468,6 +468,19 @@ async function seed(page) {
         .map((e) => (e.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 22));
     });
     ok(`${label} — 바닥까지 내려도 가려진 줄이 없다`, covered.length === 0, JSON.stringify(covered));
+    /* 🔴 **문서는 굴러가지 않는다 — #app 만 굴러간다** (2026-10-04 · 개발자 제보: 아이폰에서
+       끝까지 올려 밀었더니 하단 탭이 화면 한가운데로 떠올랐다). iOS 26 사파리는 문서가 굴러갈 때
+       fixed 요소를 엉뚱한 높이에 그린다 — 크롬에선 그 버그가 재현되지 않으므로, 비켜 가는
+       **조건**(문서 스크롤 0 · 실제로 굴러간 것은 #app)과 탭이 바닥에 붙어 있는지를 잰다. */
+    const still = await page.evaluate(() => {
+      const nav = document.querySelector('#bottom-nav').getBoundingClientRect();
+      return { docY: document.scrollingElement.scrollTop, appY: appScroller().scrollTop,
+        docTall: document.scrollingElement.scrollHeight > innerHeight + 1,
+        appTall: appScroller().scrollHeight > appScroller().clientHeight + 1, navGap: Math.round(innerHeight - nav.bottom) };
+    });
+    ok(`${label} — 바닥까지 내려도 문서는 그대로다 (굴러간 것은 #app)`,
+      still.docY === 0 && !still.docTall && (!still.appTall || still.appY > 0), JSON.stringify(still));
+    ok(`${label} — 하단 탭이 화면 바닥에 붙어 있다`, still.navGap === 0, JSON.stringify(still));
   }
   await page.click('.nav-item[data-nav="home"]'); await page.waitForTimeout(300);
 

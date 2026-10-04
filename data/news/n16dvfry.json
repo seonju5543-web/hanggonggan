@@ -1,6 +1,6 @@
 {
  "school": "아주대학교",
- "updatedAt": "2026-10-03",
+ "updatedAt": "2026-10-04",
  "items": [
   {
    "title": "[공지] [학부/학사과정] 2026학년도 전기(2027년 2월) 조기졸업 신청 안내",
@@ -46,7 +46,7 @@
    "school": "아주대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "thumb": "data/news/img/0c54f4822f375b6d.webp"
+   "thumb": "data/news/img/3cfb93f9dcf208d2.webp"
   },
   {
    "title": "[아르바이트] 10월 10일(토) ~ 10월 11일(일) 제580회 토익 정기시험",
@@ -63,7 +63,7 @@
    "school": "아주대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "thumb": "data/news/img/59aa48b9fa28994a.webp"
+   "thumb": "data/news/img/390a5ea3d820f510.webp"
   },
   {
    "title": "[중앙도서관] 2026년 대학도서관 이용자 만족도 조사 참여 안내",
@@ -73,7 +73,7 @@
    "school": "아주대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "thumb": "data/news/img/17030dbf3b3a4fed.webp"
+   "thumb": "data/news/img/b6263217b563b89b.webp"
   },
   {
    "title": "[다산학부대학] 2026-2학기 교양과목 중간고사 대학원생 감독자 모집",
@@ -118,7 +118,8 @@
    "postedAt": "2026-08-20",
    "school": "아주대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "thumb": "data/news/img/5265f5d2a8cdc495.webp"
   },
   {
    "title": "[공지] [학부/학사과정] ★필독★ 출석(전자출결, 공결, 취업계 등) 관련 안내",
@@ -134,7 +135,8 @@
    "postedAt": "2026-10-01",
    "school": "아주대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "thumb": "data/news/img/751dd342a3cbb11a.webp"
   },
   {
    "title": "아주대학보사 수습기자 정기모집 (~10/10까지)",

@@ -252,6 +252,144 @@
     "what": "초록 지붕 본관과 파란 하늘 — 시작 화면 사진에서 앞쪽 행인들을 잘라 냄",
     "by": "review-crop"
    }
+  ],
+  "연세대학교 미래캠퍼스": [
+   {
+    "file": "n1if6uwu-3.jpg",
+    "focusSquare": "50% 60%",
+    "what": "미래캠퍼스 정문 — 양쪽 돌기둥 사이로 은행나무 가로수 길이 산 쪽으로 곧게 뻗음",
+    "by": "review"
+   },
+   {
+    "file": "n1if6uwu-1.jpg",
+    "focusSquare": "35% 55%",
+    "what": "'YONSEI UNIVERSITY' 글자가 붙은 벽돌 건물과 캠퍼스 큰길, 가로수",
+    "by": "review"
+   }
+  ],
+  "명지대학교": [
+   {
+    "file": "ntyl0r5-2.jpg",
+    "focusSquare": "45% 45%",
+    "crop": [
+     0,
+     0,
+     1,
+     0.76
+    ],
+    "what": "언덕길 위 본관 건물과 나무들 — 아래쪽 차·사람은 잘라 냄",
+    "by": "review-crop"
+   }
+  ],
+  "국민대학교": [
+   {
+    "file": "n1tasrsl-1.jpg",
+    "focusSquare": "65% 45%",
+    "crop": [
+     0,
+     0,
+     1,
+     0.8
+    ],
+    "what": "정문 앞 언덕길과 소나무 숲 위로 보이는 캠퍼스 건물, 맑은 하늘 — 아래쪽 차는 잘라 냄",
+    "by": "review-crop"
+   }
+  ],
+  "가톨릭대학교": [
+   {
+    "file": "n174lvh5-3.jpg",
+    "focusSquare": "45% 45%",
+    "what": "'가톨릭대학교' 글자가 붙은 붉은 벽돌 건물과 흰 목련",
+    "by": "review"
+   },
+   {
+    "file": "n174lvh5-2.jpg",
+    "focusSquare": "55% 50%",
+    "crop": [
+     0,
+     0,
+     1,
+     0.9
+    ],
+    "what": "'가톨릭대학교' 간판이 달린 흰 건물과 앞뜰 정원 — 아래 차는 잘라 냄",
+    "by": "review-crop"
+   }
+  ],
+  "한국항공대학교": [
+   {
+    "file": "n1as48ix-1.jpg",
+    "focusSquare": "40% 60%",
+    "what": "유리창 본관과 원통형 건물 앞 분수 광장",
+    "by": "review"
+   },
+   {
+    "file": "n1as48ix-2.jpg",
+    "focusSquare": "40% 50%",
+    "what": "파란 하늘 아래 유리 건물에 걸린 60주년 현수막",
+    "by": "review"
+   }
+  ],
+  "경기대학교": [
+   {
+    "file": "ntxxf09-13.jpg",
+    "focusSquare": "50% 55%",
+    "what": "수원캠퍼스 강의동을 위에서 본 모습 — 앞뜰 잔디와 단풍, 멀리 도시",
+    "by": "review"
+   },
+   {
+    "file": "ntxxf09-2.jpg",
+    "focusSquare": "40% 45%",
+    "crop": [
+     0,
+     0,
+     1,
+     0.8
+    ],
+    "what": "수원캠퍼스 1강의동(진리관)과 소나무, 파란 하늘 — 아래 주차된 차는 잘라 냄",
+    "by": "review-crop"
+   }
+  ],
+  "서울교육대학교": [
+   {
+    "file": "n18ebv4b-4.jpg",
+    "focusSquare": "55% 50%",
+    "what": "벽돌 연구강의동 입구와 노랗게 물든 단풍나무",
+    "by": "review"
+   },
+   {
+    "file": "n18ebv4b-3.jpg",
+    "focusSquare": "50% 50%",
+    "what": "단풍 든 나무로 둘러싸인 운동장 잔디",
+    "by": "review"
+   }
+  ],
+  "강원대학교": [
+   {
+    "file": "nlzhvsh-1.jpg",
+    "focusSquare": "50% 45%",
+    "what": "강원대학교 60주년 기념관 건물 정면",
+    "by": "review"
+   }
+  ],
+  "고려대학교 세종캠퍼스": [
+   {
+    "file": "n1ch7t87-3.jpg",
+    "focusSquare": "55% 40%",
+    "crop": [
+     0,
+     0,
+     1,
+     0.86
+    ],
+    "what": "석조 외벽의 세종캠퍼스 본관 건물 — 아래 주차된 차는 잘라 냄",
+    "by": "review-crop"
+   },
+   {
+    "file": "n1ch7t87-1.jpg",
+    "focusSquare": "45% 50%",
+    "what": "세종캠퍼스 중앙광장 — 벽돌 길과 단풍 든 가로수, 벤치, 멀리 강의동",
+    "by": "review"
+   }
   ]
  }
 }

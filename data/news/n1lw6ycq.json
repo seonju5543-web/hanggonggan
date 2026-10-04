@@ -1,6 +1,6 @@
 {
  "school": "고려대학교",
- "updatedAt": "2026-10-03",
+ "updatedAt": "2026-10-04",
  "items": [
   {
    "title": "★ 한국어센터 '한국어 주간' Festival에 초대합니다! ★",
@@ -10,7 +10,7 @@
    "school": "고려대학교",
    "campus": "",
    "foundAt": "2026-10-03",
-   "thumb": "data/news/img/7022ce3743b35a70.webp"
+   "thumb": "data/news/img/85018deb12017ffd.webp"
   },
   {
    "title": "[원격교육센터] AI튜터(AI조교) 교수자 교육 안내 및 2026-2학기 시범운영 추가 참여 교과목 모집",
@@ -20,7 +20,8 @@
    "kind": "채용",
    "school": "고려대학교",
    "campus": "",
-   "foundAt": "2026-10-03"
+   "foundAt": "2026-10-03",
+   "thumb": "data/news/img/90c704bf8ce4f4ec.webp"
   },
   {
    "title": "[임상간호대학원] 2027학년도 전기 신입생(석사) 모집",
@@ -30,7 +31,7 @@
    "school": "고려대학교",
    "campus": "",
    "foundAt": "2026-10-03",
-   "thumb": "data/news/img/96fcaad2d86e6e79.webp"
+   "thumb": "data/news/img/a9fbed4fcc63788b.webp"
   },
   {
    "title": "★ Talk To Me In Korean 선현우 대표 토크 콘서트에 초청합니다 ★",
@@ -41,7 +42,7 @@
    "school": "고려대학교",
    "campus": "",
    "foundAt": "2026-10-03",
-   "thumb": "data/news/img/76e0cc9080e328e0.webp"
+   "thumb": "data/news/img/0d161182309354a1.webp"
   },
   {
    "title": "[에너지환경대학원(그린스쿨)] 2027학년도 전기 신입생 모집 안내",

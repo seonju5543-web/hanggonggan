@@ -1,6 +1,6 @@
 {
  "school": "전북대학교",
- "updatedAt": "2026-10-03",
+ "updatedAt": "2026-10-04",
  "items": [
   {
    "title": "[KOICA] MOU(학점인정) 체결 대학 홍보 캠페인 안내 10/7(수)",
@@ -10,7 +10,8 @@
    "school": "전북대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "postId": "218081"
+   "postId": "218081",
+   "thumb": "data/news/img/f0cc1081024d115a.webp"
   },
   {
    "title": "[D-5] [파란사다리] 2026 동계 JBNU 파란사다리 해외 파견프로그램 추가 선발 안내",
@@ -19,7 +20,8 @@
    "school": "전북대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "postId": "218078"
+   "postId": "218078",
+   "thumb": "data/news/img/3f0ce662b7af43e2.webp"
   },
   {
    "title": "[중앙도서관] 「미술로 읽어본다」 전시 안내",
@@ -29,7 +31,8 @@
    "school": "전북대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "postId": "218049"
+   "postId": "218049",
+   "thumb": "data/news/img/e07b35af5f768ecd.webp"
   },
   {
    "title": "[언어교육부] 10월 외국어 강좌 안내/토익,토익스피킹 시험 할인 안내 (강의계획서 붙임 참조)",
@@ -39,7 +42,8 @@
    "school": "전북대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "postId": "218048"
+   "postId": "218048",
+   "thumb": "data/news/img/646e2fe2fd2f2126.webp"
   },
   {
    "title": "[언어교육부] 10월 24일(토) 모의토익 실시 안내",
@@ -58,7 +62,8 @@
    "school": "전북대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "postId": "218044"
+   "postId": "218044",
+   "thumb": "data/news/img/e755b47236510494.webp"
   },
   {
    "title": "[예비군] 2026년도 예비군훈련 2차 훈련 공고",
@@ -94,7 +99,8 @@
    "kind": "생활",
    "school": "전북대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-02",
+   "thumb": "data/news/img/96819ba1a54ed812.webp"
   },
   {
    "title": "[교육생 모집] SQL 개발자(SQLD) 자격 취득 과정(2차)",
@@ -102,7 +108,8 @@
    "postedAt": "2026-10-01",
    "school": "전북대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-02",
+   "thumb": "data/news/img/a26cb51a9612dada.webp"
   },
   {
    "title": "[교육생 모집] 데이터분석 준전문가(ADsP) 자격 취득 과정(2차)",

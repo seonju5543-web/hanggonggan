@@ -1,6 +1,6 @@
 {
  "school": "상명대학교",
- "updatedAt": "2026-10-03",
+ "updatedAt": "2026-10-04",
  "items": [
   {
    "title": "서울시여성가족재단과 MOU 체결... 안전한 대학문화 조성 위해 ‘맞손’",
@@ -9,7 +9,7 @@
    "school": "상명대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "thumb": "data/news/img/57bc2c898d398408.webp"
+   "thumb": "data/news/img/f04e52127f471c3b.webp"
   },
   {
    "title": "경영대학원 피트니스 MBA, 중국 차이나핏 대표단과 간담회 시행",
@@ -19,7 +19,7 @@
    "school": "상명대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/67ef4436702c4ccb.webp"
+   "thumb": "data/news/img/e4379579175baa07.webp"
   },
   {
    "title": "「2026 천안 유니브시티 페스티벌」 참여… 대학생 주도 문화예술 콘텐츠 선보여",
@@ -29,7 +29,7 @@
    "school": "상명대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/4f52216db77f9cca.webp"
+   "thumb": "data/news/img/d36fb7697c4075e4.webp"
   },
   {
    "title": "2027학년도 신입학 수시모집 최종 경쟁률 12.97대 1",
@@ -38,7 +38,7 @@
    "school": "상명대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/3956a74e8bcfa63d.webp"
+   "thumb": "data/news/img/6dbfdda5b37295ed.webp"
   },
   {
    "title": "제주도지사와 간담회 진행... 지역 연계형 사업 협력 기반 마련",
@@ -76,7 +76,8 @@
    "postedAt": "2026-09-16",
    "school": "상명대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "thumb": "data/news/img/af1c4ad60569d9ed.webp"
   },
   {
    "title": "상명대박물관, ‘네오아트 포’ 2026 특별전시회 「다름을 잇는 예술, 함께 만드는 미래」 개막행사 성료",

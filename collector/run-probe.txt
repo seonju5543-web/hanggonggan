@@ -3,6 +3,20 @@
 # checkUrl:  이 주소를 로그인 없는 새 탭에서 열어 그대로 보고 (로그인 벽인지 포함)
 # findBoard: <시작 주소> | <눌러 들어갈 글자 > 글자>
 
+# 2026-10-04 — 원문 링크 바로잡기 (개발자 지시 *"원문 공고 링크를 최대한 어떻게든 찾을 방법"*). 맨 앞에 둔다(정찰 예산 11분 — 뒤 줄은 잘릴 수 있다).
+#   우리 파일(수집 기록·본문 사본·git 기록)에 **이미 있던** 진짜 주소들이 지금 그 글을 여는지 · 주소 틀(경희 소식 GET · 온통청년 정책 · 1365 www)이 맞는지.
+#   경희 소식(www.khu.ac.kr 200316)은 눌러 열면 POST 라 목록 표식뿐 — 같은 게시판 소프트웨어의 news.khu.ac.kr 은 GET 상세가 열린다.
+checkUrl: https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323083
+checkUrl: https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322415
+checkUrl: https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54815
+checkUrl: https://www.kookmin.ac.kr/user/kmuNews/notice/7/12307/view.do?currentPageNo=1
+checkUrl: https://www.yonsei.ac.kr/bbs/sc/58/944246/artclView.do
+checkUrl: https://www.youthcenter.go.kr/youthPolicy/ythPlcyTotalSearch/ythPlcyDetail/20250123005400110393
+checkUrl: https://www.1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3523464
+checkUrl: https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3523464
+checkUrl: https://www.daejeonyouthportal.kr/content/CT_000000000070/cntPage.do?commonMenuNo=79_92&dpmSectionFst=2&dpmSectionScd=10
+checkUrl: https://www.inje.go.kr/portal/field-info/scholarship?articleSeq=247129
+
 # 2026-08-29 — 개발자 지시: 한국장학재단 통합검색의 **상세 화면**에 무엇이 있는지 확인.
 #   목록(기관명·장학금명·모집마감일)은 이미 받아 봤다(1,869건). 문제는 상세다 —
 #   개발자는 "한 번 더 클릭하면 자격요건 등 상세내역이 나온다"고 했는데,

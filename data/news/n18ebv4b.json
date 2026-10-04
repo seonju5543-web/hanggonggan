@@ -1,7 +1,16 @@
 {
  "school": "서울교육대학교",
- "updatedAt": "2026-10-03",
+ "updatedAt": "2026-10-04",
  "items": [
+  {
+   "title": "언제나 반짝이는 우리들의 캠퍼스 - 2026 서울교대 사진 공모전 수상작 안내",
+   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=1309&bbsId=1082&nttSn=55328",
+   "postedAt": "2026-10-01",
+   "postId": "55328",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-04"
+  },
   {
    "title": "[통일부] 제25기 평화통일민주교육위원 추가 위촉 신청 안내(10월 05일까지 날···",
    "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=1309&bbsId=1082&nttSn=55101",
@@ -28,7 +37,7 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "postId": "55324",
-   "thumb": "data/news/img/176becc49c2b1499.webp"
+   "thumb": "data/news/img/38a97bd1dbc26da2.webp"
   },
   {
    "title": "제2회 전국 초등 예비교사 체조대회 안내",
@@ -56,7 +65,7 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "postId": "55189",
-   "thumb": "data/news/img/5e5f9ced943cc136.webp"
+   "thumb": "data/news/img/7433b7f4b60477dc.webp"
   },
   {
    "title": "2026년 10월 각군 현역병 모집일정 안내",
@@ -76,7 +85,7 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "postId": "55077",
-   "thumb": "data/news/img/46ee5157f95fe011.webp"
+   "thumb": "data/news/img/d1fd66e213bddf79.webp"
   },
   {
    "title": "[평생교육원] 복지원예사 양성과정 수강생 모집",

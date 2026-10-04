@@ -22,8 +22,10 @@ import { urlKey } from './url-key.mjs';
 export const THUMB_DIR = 'data/news/img';
 export const THUMB_RE = /^data\/news\/img\/[0-9a-f]{16}\.webp$/;
 export const thumbName = (buf) => `${THUMB_DIR}/${createHash('sha1').update(buf).digest('hex').slice(0, 16)}.webp`;
-export const THUMB_SIDE = 240;              // 정사각 240px — 카드의 72px 칸을 화면 밀도 3배까지 또렷하게
-export const THUMB_MAX_BYTES = 60 * 1024;   // 감사가 넘으면 막는다 (WebP 240px 는 보통 10~25KB)
+/* 정사각 360px (2026-10-03 · 홈 첫 화면 소식 띠 — 카드 사진이 148×104 로 커져 240px 은 화면 밀도 2배에서도 흐렸다).
+   옛 240px 사진은 지우지 않고 두었다가 새 사진을 받으면 바꾼다(planQueue 의 '키우기' 줄 · 장부 side) — 받는 동안 카드가 비지 않게. */
+export const THUMB_SIDE = 360;
+export const THUMB_MAX_BYTES = 90 * 1024;   // 감사가 넘으면 막는다 (WebP 360px 는 보통 20~45KB)
 export const IMG_MAX_BYTES = 8 * 1024 * 1024;
 export const MIN_W = 160;
 export const MIN_H = 100;
@@ -264,22 +266,33 @@ export function planQueue(items, ledger, opts = {}) {
   const today = opts.today; const per = opts.perSchool ?? 6;
   const noThumb = opts.noThumb || new Set(); const exists = opts.fileExists || (() => true);
   const want = [];
+  const grow = [];   // 키우기 — 옛 크기(side 없음 = 240)로 받은 사진을 지금 크기로 다시 받는다 · 새 글 다음 차례 · 실패하면 옛 사진을 그대로 둔다
   for (const n of items) {
     if (!n || !n.url || !n.school || n.hidden) continue;
     const k = thumbKey(n);
     if (optedOut(n, noThumb)) continue;
     const e = ledger.posts[k];
-    if (e && e.file && exists(e.file)) continue;
+    if (e && e.file && exists(e.file)) {
+      if ((e.side || 240) < THUMB_SIDE && !(e.growAt && today && dayDiff(e.growAt, today) < RETRY_DAYS) && (e.growTries || 0) < MAX_TRIES) grow.push(n);
+      continue;
+    }
     if (e && e.none) continue;
     if (e && e.err && ((e.tries || 1) >= MAX_TRIES || (today && dayDiff(e.at, today) < RETRY_DAYS))) continue;
     want.push(n);
   }
   want.sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')) || String(b.postedAt || '').localeCompare(String(a.postedAt || '')));
-  const bySchool = new Map();
-  for (const n of want) { if (!bySchool.has(n.school)) bySchool.set(n.school, []); const l = bySchool.get(n.school); if (l.length < per) l.push(n); }
-  const lanes = [...bySchool.values()]; const out = [];
-  for (let i = 0; lanes.some((l) => i < l.length); i += 1) for (const l of lanes) if (i < l.length) out.push(l[i]);
-  return out;
+  const roundRobin = (list) => {
+    const bySchool = new Map();
+    for (const n of list) { if (!bySchool.has(n.school)) bySchool.set(n.school, []); const l = bySchool.get(n.school); if (l.length < per) l.push(n); }
+    const lanes = [...bySchool.values()]; const out = [];
+    for (let i = 0; lanes.some((l) => i < l.length); i += 1) for (const l of lanes) if (i < l.length) out.push(l[i]);
+    return out;
+  };
+  grow.sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')) || String(b.postedAt || '').localeCompare(String(a.postedAt || '')));
+  const out = roundRobin(want);
+  /* 키우기는 새 글 뒤에 — 학교마다 새 글과 합쳐 per 를 넘지 않게(한 학교를 몰아치지 않는 규칙 그대로) */
+  const used = new Map(); for (const n of out) used.set(n.school, (used.get(n.school) || 0) + 1);
+  return out.concat(roundRobin(grow.filter((n) => (used.get(n.school) || 0) < per)).filter((n) => { const c = (used.get(n.school) || 0); if (c >= per) return false; used.set(n.school, c + 1); return true; }).map((n) => ({ ...n, grow: true })));
 }
 
 /* 글 화면에서 본 그림 주소를 학교별로 센다 — 두 글 이상에서 보면 공통 그림 */

@@ -8,7 +8,7 @@
    하는 일:
      ① 실린 글(data/news/*.json) 가운데 사진을 아직 안 찾아본 글을 새 글부터, 학교마다 돌아가며(perSchool) 연다 — 장부 collector/news-thumbs.json
      ② 글 화면(또는 규칙의 본문 API)에서 후보를 고르고(news-thumb.mjs imageCandidates) 받아서 진짜 사진인지 본다(sniffImage·photoProblem)
-     ③ 240px 정사각 WebP 로 줄여 data/news/img/<해시>.webp 에 쓴다(sharp — 워크플로가 이 단계에서만 설치)
+     ③ 360px 정사각 WebP 로 줄여 data/news/img/<해시>.webp 에 쓴다(sharp — 워크플로가 이 단계에서만 설치)
      ④ 장부를 실린 글 전부에 다시 입히고(applyThumbs · 소급), 아무 글도 안 쓰는 그림 파일은 지운다
      ⑤ 학교별로 몇 장이 붙었고 왜 못 붙었는지 리포트(collector/news-thumbs-report.md) — "대부분 사진이 있다"를 숫자로 본다
    🔴 학교 사진의 저작권은 학교에 있다 — 작게 줄인 썸네일만 두고, 카드는 원문으로 이어지며, 글이 피드에서 빠지면 파일도 지운다(④).
@@ -19,7 +19,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fetchBoard, netReason } from './fetch-board.mjs';
 import { FETCH_HEADERS } from './http-headers.mjs';
-import { NEWS_BOARD_RULES, postContentRequest } from './news-board-rules.mjs';
+import { NEWS_BOARD_RULES, newsRuleKey, postContentRequest } from './news-board-rules.mjs';
 import { withDeadline, TIMED_OUT } from './harvest-budget.mjs';
 import * as T from './news-thumb.mjs';
 
@@ -73,7 +73,7 @@ async function getImage(src, referer) {
   return { buf };
 }
 
-/* 240px 정사각 WebP 로 줄이고, 원래 그림이 QR 코드처럼 생겼는지 함께 잰다 (T.monoParts · T.looksLikeQr — 섞지 않고 160px 로 줄여 잰다) */
+/* THUMB_SIDE(360px) 정사각 WebP 로 줄이고, 원래 그림이 QR 코드처럼 생겼는지 함께 잰다 (T.monoParts · T.looksLikeQr — 섞지 않고 160px 로 줄여 잰다) */
 async function shrink(buf) {
   const make = (q) => sharp(buf, { animated: false, limitInputPixels: 60e6 }).rotate()
     .resize(T.THUMB_SIDE, T.THUMB_SIDE, { fit: 'cover', position: sharp.strategy.attention }).webp({ quality: q }).toBuffer();
@@ -87,7 +87,7 @@ async function shrink(buf) {
 
 /* 글 하나 — { file, src, from } · { none } · { err } 를 돌려준다. ctx.dead 면 파일을 쓰지 않는다(시한 뒤 늦게 끝난 일) */
 async function thumbFor(n, ctx) {
-  const req = postContentRequest(NEWS_BOARD_RULES[n.school], n);
+  const req = postContentRequest(NEWS_BOARD_RULES[newsRuleKey(n)], n);   // 둘째 게시판 글(board)은 그 게시판의 규칙
   if (!req) return { none: '글 화면이 없음 (목록에서 바로 여는 게시판)' };
   let res;
   try { res = await fetchBoard(req.url, { ...req.opts, tries: 1, firstMs: 12000 }); } catch (e) { return { err: `글 열기 실패 (${netReason(e)})` }; }
@@ -179,7 +179,14 @@ if (sharp && MODE !== 'off') {
     if (r === TIMED_OUT) ctx.dead = true;
     const out = r === TIMED_OUT ? { err: `${Math.round(ITEM_HARD_MS / 1000)}초 안에 못 끝냄` } : r;
     const prev = ledger.posts[key];
-    ledger.posts[key] = out.file ? { at: today, school: n.school, file: out.file, src: out.src, from: out.from, v: RULES_V }
+    /* 키우기(옛 240px 사진을 360px 로)에 실패하면 **옛 사진을 그대로 둔다** — 없음·실패로 덮으면 카드의 사진이 사라진다. 다음 시도는 하루 뒤 · 세 번까지 */
+    if (n.grow && !out.file && prev && prev.file) {
+      ledger.posts[key] = { ...prev, growAt: today, growTries: (prev.growTries || 0) + 1 };
+      runLog.push({ school: n.school, title: n.title, result: '↔️ 키우기 보류', note: `옛 사진 그대로 — ${out.none || out.err}` });
+      done += 1;
+      return;
+    }
+    ledger.posts[key] = out.file ? { at: today, school: n.school, file: out.file, src: out.src, from: out.from, v: RULES_V, side: T.THUMB_SIDE }
       : out.none ? { at: today, school: n.school, none: out.none }
       : { at: today, school: n.school, err: out.err, tries: ((prev && prev.err && prev.tries) || 0) + 1 };
     runLog.push({ school: n.school, title: n.title, result: out.file ? `✅ ${out.from}` : out.none ? '— 없음' : '⚠️ 실패', note: out.file ? `${out.note} · ${out.file} ← ${String(out.src).slice(0, 120)}` : (out.none || out.err) });
