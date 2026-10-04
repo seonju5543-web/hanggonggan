@@ -11398,8 +11398,18 @@ console.log('\n■ 자격요건 로봇 (진짜 브라우저) — 장학·대외�
   const bRead = (txt) => AD.eligFromFiles({ title: '청년 체인지메이커 아카데미 운영' }, ['k-B.txt'], () => txt, '/tmp', () => false);
   eq('  🔴 브라우저 본문도 글 제목 낱말이 있어야 그 글의 것(포털 첫 화면 메뉴 `장애인 복지정책` 이 자격으로 뽑혔다) · 있으면 「브라우저 본문」',
     [bRead('도청 메뉴\n○ 지원대상 : 장애인 복지정책'), (bRead('청년 체인지메이커 아카데미 운영\n○ 지원대상 : 도내 거주 청년') || {}).from], [null, '브라우저 본문']);
+  /* 🔴 장학 쪽(rescue-bodies)도 한 페이지 절대 시한 — 2026-10-04 첫 클라우드 실행: 시작 전 예산만 보다가 넷째 공고에서 10분 멈춰
+     단계 시한에 잘렸고 받은 3건까지 잃었다. 시한을 기다리고(withDeadline) 닫기는 기다리지 않는다. */
+  const rb = readText(new URL('../collector/rescue-bodies.mjs', import.meta.url));
+  eq('  🔴 장학 본문 재수집도 페이지마다 절대 시한 · 멈춘 페이지의 닫기는 기다리지 않는다',
+    [/await withDeadline\(read, PAGE_MS\) === TIMED_OUT/.test(rb), /\n  page\.close\(\)\.catch/.test(rb), !/await page\.close\(\)/.test(rb)], [true, true, true]);
   /* 워크플로 */
   const wf = readText(new URL('../.github/workflows/rescue-bodies.yml', import.meta.url));
+  /* 🔴 PaddleOCR 판 고정 — 판을 안 적으면 그날 최신(3.3.x)이 깔려 x86 클라우드에서 모든 그림이 오류(2026-10-04 · 맥은 ARM 이라 멀쩡했다) */
+  for (const f of ['rescue-bodies.yml', 'collect-scholarships.yml']) {
+    const y = readText(new URL('../.github/workflows/' + f, import.meta.url));
+    eq(`  🔴 ${f} — PaddleOCR 은 판을 고정해 깐다`, [...y.matchAll(/pip install[^\n]*paddle[^\n]*/g)].map((m) => /paddlepaddle==[\d.]+ paddleocr==[\d.]+/.test(m[0])), [true]);
+  }
   const caps = [...wf.matchAll(/^ {8}timeout-minutes: (\d+)/gm)].map((m) => Number(m[1]));
   const job = Number((wf.match(/^ {4}timeout-minutes: (\d+)/m) || [])[1]);
   const ia = wf.indexOf('activity-docs.mjs --fetch --browser'), io = wf.indexOf('paddle-ocr.py collector/act-files'), ip = wf.indexOf('activity-docs.mjs --apply --browser'), ig = wf.indexOf('- name: 데이터 관문');
