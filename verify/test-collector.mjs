@@ -1824,7 +1824,8 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
     eq('  파일을 못 받으면 읽어도 된다고 본다 (없는 것과 막힌 것은 다르다)', await rb.robotsAllows('https://none.invalid/x', async () => { throw new Error('ENOTFOUND'); }), true);
     eq('  Disallow: / 는 전부 막는다', await rb.robotsAllows('https://blocked.invalid/x', async () => ({ ok: true, headers: { get: () => 'text/plain' }, text: async () => 'User-agent: *\nDisallow: /' })), false);
     /* 배선 */
-    eq('로봇 — 활동·재단 게시판만 robots.txt 를 묻는다 (학교 게시판은 그대로)', /if \(\(isAct \|\| isExt\) && !\(await robotsAllows\(s\.boardUrl\)\)\)/.test(cm), true);
+    eq('로봇 — 재단 게시판과 학교 없는 활동 출처만 robots.txt 를 묻는다 (학교 게시판은 장학·활동 모두 그대로 — 2026-09-30 외대 활동 두 곳이 ⛔ 로 막혔다)',
+      /if \(\(isExt \|\| \(isAct && !s\.school\)\) && !\(await robotsAllows\(s\.boardUrl\)\)\)/.test(cm), true);
     eq('  활동 글에 발췌·마감·분야를 싣는다', /const ex = activityExcerpts\(detail\.text\);[\s\S]*?it\.deadline = ex\.deadline;[\s\S]*?it\.excerpts = ex\.excerpts;[\s\S]*?activityField\(it\.title, it\.kind\)/.test(cm), true);
     eq('  재단 공고도 마감일을 같은 규칙으로', /const exd = activityExcerpts\(detail\.text\);/.test(cm), true);
     /* 2026-09-30 첫 실행 사고 — 상세 글자를 한 줄로 뭉개 넘겨 26건 전부 마감·발췌 0건. 줄을 살리는 변환은 html-text.mjs 한 곳. */
@@ -11436,6 +11437,50 @@ console.log('\n■ 자격요건 로봇 (진짜 브라우저) — 장학·대외�
   const ow = readText(new URL('../.github/workflows/open-api.yml', import.meta.url));
   eq('③ 공공 API — 다시 묻기 전 10초·40초 쉰다 · 실패 원인 코드를 적는다 · 하루 두 번(백업)',
     [/await sleep\(\[10000, 40000\]\[i\]\)/.test(oa), /last\?\.cause/.test(oa), (ow.match(/- cron:/g) || []).length], [true, true, 2]);
+}
+
+console.log('\n■ 실시간 공고 장부 복구 (2026-09-30 · 10-03 — 병합기 상한에 잘린 장부를 옛 커밋에서 되살린다 · tools/restore-notices.mjs)');
+{
+  /* 왜 있나 — 저장 단계 충돌 때 합집합 병합기의 '전체 200건' 상한이 장부를 460 → 200건(09-30) · 339 → 200건(10-03)으로 잘랐다.
+     잘린 글은 seen.json 에 '봤다'로 남아 다시 담기지 않으므로 옛 커밋에서 되살리는 도구가 필요하다. 아래는 그 도구가
+     ① 지금 장부를 건드리지 않고 없는 글만 더하는지 ② 같은 글이면 고쳐 둔(지금) 주소가 이기는지 ③ 수집기 규칙(60일·첨부·서비스 학교)을
+     그대로 쓰는지 ④ 거르기(60일·첨부)가 중복 제거보다 **앞**인지 — 가짜 자료로 잰다(리뷰 2026-10-04: 뒤에 두면 같은 글의 옛 판이 주소 순위로
+     지금 판을 이긴 뒤 걸러져 지금 글까지 사라졌다). 되돌려 보기: 중복 제거를 거르기 앞으로 옮기면 ④가, cutoff 를 빼면 ③이,
+     올드를 앞에 붙이면 '순위가 같을 때' 줄이 빨간불. ②는 순서가 아니라 주소 순위(noticeUrlRank)가 정한다. */
+  const { mergeLedgers } = await import('../tools/restore-notices.mjs');
+  const today = new Date('2026-10-04T00:00:00Z');
+  const cur = [
+    { school: '경희대학교', campus: '공통', title: '2026-2학기 A 재단 장학생 선발 안내', url: 'https://x.ac.kr/view?id=1', foundAt: '2026-10-02' },
+    { school: '경희대학교', campus: '공통', title: '2026-2학기 B 재단 장학생 선발 안내', url: 'https://x.ac.kr/view?id=2', foundAt: '2026-10-01' },
+  ];
+  const old = [
+    { school: '경희대학교', campus: '공통', title: '2026-2학기 A 재단 장학생 선발 안내', url: 'https://x.ac.kr/list#n-A', foundAt: '2026-09-30' },        // 같은 글 · 옛 목록 표식 주소
+    { school: '경희대학교', campus: '공통', title: '2026-2학기 C 재단 장학생 선발 안내', url: 'https://x.ac.kr/view?id=3', foundAt: '2026-09-30' },       // 되살릴 글
+    { school: '경희대학교', campus: '공통', title: '2026-1학기 D 재단 장학생 선발 안내', url: 'https://x.ac.kr/view?id=4', foundAt: '2026-07-01' },       // 60일 지남
+    { school: '경희대학교', campus: '공통', title: '안내문.pdf', url: 'https://x.ac.kr/download.do?f=1', foundAt: '2026-09-30' }, // 첨부 항목
+    { school: '없는대학교', campus: '공통', title: '2026-2학기 E 재단 장학생 선발 안내', url: 'https://y.ac.kr/view?id=5', foundAt: '2026-09-30' },       // 서비스하지 않는 학교
+  ];
+  /* 제목은 진짜 공고처럼 — 'A 장학' 같은 짧은 제목은 isAttachmentEntry 가 '빈 제목'(6자 미만)으로 보고 버린다(수집기와 같은 규칙) */
+  const out = mergeLedgers(cur, [old], { today });
+  eq('지금 장부의 글은 그대로 · 없는 글만 더한다 · 새 글이 앞', out.map((n) => (n.title.match(/ ([A-E]) 재단/) || [])[1]), ['A', 'B', 'C']);
+  eq('  같은 글은 주소 순위가 나은(지금) 판이 남는다 — 옛 목록 표식으로 되돌리지 않는다', out[0] && out[0].url, 'https://x.ac.kr/view?id=1');
+  /* 순위가 같은 두 판(둘 다 보통 주소) — 앞에 둔 지금 장부가 이긴다 (올드를 앞에 붙이면 빨간불) */
+  const tie = mergeLedgers([{ ...cur[0], url: 'https://x.ac.kr/view?id=11' }], [[{ ...cur[0], url: 'https://x.ac.kr/view?id=99', foundAt: '2026-09-30' }]], { today });
+  eq('  순위가 같을 때는 지금 장부(앞)가 이긴다', tie.map((n) => n.url), ['https://x.ac.kr/view?id=11']);
+  /* ④ 거르기가 중복 제거보다 앞 — 60일 지난 옛 판·첨부 주소 옛 판이 지금 글을 삼키지 못한다 (리뷰 2026-10-04 재현 두 건) */
+  const markerCur = [{ ...cur[0], url: 'https://x.ac.kr/list#n-A' }];
+  eq('  60일 지난 옛 판이 (주소 순위가 나아도) 지금 글을 삼켜 사라지게 하지 않는다', mergeLedgers(markerCur, [[{ ...cur[0], url: 'https://x.ac.kr/view?id=1', foundAt: '2026-07-01' }]], { today }).map((n) => n.url), ['https://x.ac.kr/list#n-A']);
+  eq('  첨부 주소 옛 판도 마찬가지', mergeLedgers(markerCur, [[{ ...cur[0], url: 'https://x.ac.kr/download.do?f=1', foundAt: '2026-09-30' }]], { today }).map((n) => n.url), ['https://x.ac.kr/list#n-A']);
+  eq('  60일 지난 글·첨부 항목·서비스하지 않는 학교는 되살리지 않는다 (수집기와 같은 규칙)', out.some((n) => /D 재단|pdf|E 재단/.test(n.title)), false);
+  eq('  옛 장부가 비어도 지금 장부는 그대로', mergeLedgers(cur, [[]], { today }).map((n) => (n.title.match(/ ([A-E]) 재단/) || [])[1]), ['A', 'B']);
+  const rt = readText(new URL('../tools/restore-notices.mjs', import.meta.url));
+  eq('  규칙은 수집기 것을 불러 쓴다(베끼지 않는다) · 학교별 파일은 자르기 전 목록 · 불러오는 순간 실행되지 않는다',
+    [/import \{ dedupeNotices, capNotices \} from '\.\.\/collector\/url-key\.mjs'/.test(rt),
+      /import \{ publishBySchool, dropUnserved \} from '\.\.\/collector\/publish-notices\.mjs'/.test(rt),
+      /import \{ isAttachmentEntry \} from '\.\.\/collector\/attachment-link\.mjs'/.test(rt),
+      rt.indexOf('publishBySchool(items)') > 0 && rt.indexOf('publishBySchool(items)') < rt.indexOf('notices.items = capNotices(items)'),
+      /import\.meta\.url === pathToFileURL\(process\.argv\[1\]\)\.href/.test(rt)],
+    [true, true, true, true, true]);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

@@ -156,7 +156,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - 🔴 뒤처진 브랜치에 '따라잡기' push 금지 — `paths:` 만 있는 로봇이 그 브랜치에서 돌아 기록장이 갈라진다. 남의 브랜치는 main 으로만 전달.
 - 다른 워크트리가 쓰는 브랜치로 빨리 감기만 할 땐 `git push origin origin/main:refs/heads/<브랜치>`.
 - 협업 충돌: 로봇 기록장은 `.gitattributes` + `tools/merge-json-union.mjs` 가 자동 합집합(클론마다 `bash tools/setup-collab.sh` — 세션 훅이 실행).
-  `registered.json`·`forms.json` 은 **일부러 뺐다**('삭제'가 뜻을 가진다). 누가 한 작업인지는 작성자가 아니라 **브랜치**로 본다.
+  `registered.json`·`forms.json` 은 **일부러 뺐다**('삭제'가 뜻을 가진다). 누가 한 작업인지는 작성자가 아니라 **브랜치**로 본다. 🔴 병합기가 장부를 잘랐으면(09-30 460→200 · 10-03 339→200 — 잘린 글은 seen 에 남아 다시 안 담긴다) `node tools/restore-notices.mjs <커밋>` 으로 되살린다. 관문 「실시간 공고 장부 복구」.
 
 ## 아키텍처 (정적 파일 · 빌드 없음)
 

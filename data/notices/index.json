@@ -1,7 +1,7 @@
 {
  "note": "학교별 실시간 공고 파일 색인. 앱은 noticeFileKey 로 자기 파일을 바로 찾아가고, 그 파일이 없을 때 옛 data/notices.json 을 받을지 말지를 이 색인으로 판단한다(match-engine.js noticeFallbackNeeded). 사람이 어느 파일이 어느 학교인지 보는 데도 쓴다.",
  "updatedAt": "2026-10-04",
- "schools": 36,
+ "schools": 39,
  "files": {
   "서울대학교": {
    "file": "nsgh1oi.json",
@@ -17,11 +17,11 @@
   },
   "가천대학교": {
    "file": "nzzc8bm.json",
-   "count": 20
+   "count": 36
   },
   "성균관대학교": {
    "file": "n1x6ubj9.json",
-   "count": 4
+   "count": 11
   },
   "아주대학교": {
    "file": "n16dvfry.json",
@@ -49,23 +49,23 @@
   },
   "영남대학교": {
    "file": "n12kfbyt.json",
-   "count": 1
+   "count": 16
   },
   "전북대학교": {
    "file": "ncuyr4z.json",
-   "count": 3
+   "count": 13
   },
   "경희대학교": {
    "file": "n1w4hprp.json",
-   "count": 3
+   "count": 29
   },
   "계명대학교": {
    "file": "n1nel147.json",
-   "count": 40
+   "count": 41
   },
   "광운대학교": {
    "file": "n6xhy7d.json",
-   "count": 5
+   "count": 12
   },
   "국민대학교": {
    "file": "n1tasrsl.json",
@@ -77,7 +77,7 @@
   },
   "경북대학교": {
    "file": "nf097dk.json",
-   "count": 3
+   "count": 6
   },
   "강원대학교": {
    "file": "nlzhvsh.json",
@@ -89,11 +89,11 @@
   },
   "명지대학교": {
    "file": "ntyl0r5.json",
-   "count": 1
+   "count": 10
   },
   "건국대학교": {
    "file": "nmpm6i7.json",
-   "count": 1
+   "count": 24
   },
   "동국대학교": {
    "file": "n1or8oiw.json",
@@ -109,15 +109,15 @@
   },
   "한국외국어대학교": {
    "file": "n19cz03g.json",
-   "count": 3
+   "count": 39
   },
   "연세대학교": {
    "file": "nz3ew5y.json",
-   "count": 8
+   "count": 25
   },
   "전남대학교": {
    "file": "nwqmwga.json",
-   "count": 2
+   "count": 19
   },
   "서울시립대학교": {
    "file": "n1au199v.json",
@@ -125,11 +125,11 @@
   },
   "서울과학기술대학교": {
    "file": "n14kv35j.json",
-   "count": 17
+   "count": 39
   },
   "조선대학교": {
    "file": "n1qr99q6.json",
-   "count": 1
+   "count": 6
   },
   "부경대학교": {
    "file": "n1nesasz.json",
@@ -146,6 +146,18 @@
   "한국항공대학교": {
    "file": "n1as48ix.json",
    "count": 19
+  },
+  "한국방송통신대학교": {
+   "file": "n1uf7bji.json",
+   "count": 4
+  },
+  "충남대학교": {
+   "file": "nl1xm19.json",
+   "count": 8
+  },
+  "충북대학교": {
+   "file": "n16l2078.json",
+   "count": 6
   }
  }
 }

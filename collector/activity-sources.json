@@ -38,13 +38,6 @@
   },
   {
    "school": "",
-   "host": "정부24 공모전",
-   "boardUrl": "https://www.gov.kr/portal/cnstexhb",
-   "evidence": "웹 검색 2026-09-29: \"공모전 — 정부24(gov.kr/portal/cnstexhb)\" · 부처·공공기관 공모전 통합 목록 · 글 주소는 /portal/cnstexhb/<번호> · pageIndex 로 넘긴다",
-   "note": "정부 부처·공공기관 공모전의 원문 게시처 — 집계 사이트들이 그대로 싣는 출처"
-  },
-  {
-   "school": "",
    "host": "온통청년 청년참여 프로그램",
    "boardUrl": "https://www.youthcenter.go.kr/bbs03List/48",
    "evidence": "웹 검색 2026-09-29: \"청년참여 프로그램 < 청년소식 — 온통청년(youthcenter.go.kr/bbs03View/48/…)\" · 한국고용정보원 운영",
@@ -94,13 +87,6 @@
   },
   {
    "school": "",
-   "host": "한국콘텐츠진흥원",
-   "boardUrl": "https://www.kocca.kr/kocca/pims/list.do?menuNo=204104",
-   "evidence": "웹 검색 2026-09-29: \"지원공고 < 알림마당 < 한국콘텐츠진흥원\" · APEC AI 영상 콘텐츠 공모전 등",
-   "note": "콘텐츠 분야 공모전·참가자 모집"
-  },
-  {
-   "school": "",
    "host": "문화포털 문화지원사업",
    "boardUrl": "https://www.culture.go.kr/portal/cltBnf/cltSup/list.do?menuNo=200104",
    "evidence": "웹 검색 2026-09-29: \"문화지원사업(목록) — 문화포털\" · 문체부 전 분야 공모정보 520건",
@@ -126,13 +112,6 @@
    "boardUrl": "https://young.busan.go.kr/jprog/list.nm",
    "evidence": "웹 검색 2026-09-29(3차): \"총 - : 부산청년플랫폼 — young.busan.go.kr/jprog/list.nm\" · 청년 프로그램 목록 · 청정넷 청년위원 모집",
    "note": "부산권 학교(수집망 44개교)용"
-  },
-  {
-   "school": "",
-   "host": "인천유스톡톡 청년포털",
-   "boardUrl": "https://youth.incheon.go.kr/bbs/bbsMsgList.do?bcd=notice",
-   "evidence": "웹 검색 2026-09-29(3차): \"공지사항 — 인천유스톡톡(youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=…&bcd=notice)\" · 부트캠프·역량강화 모집 공지",
-   "note": "상세 주소(bbsMsgDetail.do)에서 목록(bbsMsgList.do)을 유추했다 — 첫 리포트에서 ⚠️ 면 주소를 확인한다"
   },
   {
    "school": "",
@@ -164,5 +143,33 @@
   }
  ],
  "_parked": "쓰지 않게 된 게시판은 지우지 말고 여기로 옮긴다(schools.json 의 parked 와 같은 규칙 — 주소를 알아내는 데 든 시간을 버리지 않는다). 되돌리려면 항목을 위 sources 로 옮기면 된다.",
- "parked": []
+ "parked": [
+  {
+   "school": "",
+   "host": "정부24 공모전",
+   "boardUrl": "https://www.gov.kr/portal/cnstexhb",
+   "evidence": "웹 검색 2026-09-29: \"공모전 — 정부24(gov.kr/portal/cnstexhb)\" · 부처·공공기관 공모전 통합 목록 · 글 주소는 /portal/cnstexhb/<번호> · pageIndex 로 넘긴다",
+   "note": "정부 부처·공공기관 공모전의 원문 게시처 — 집계 사이트들이 그대로 싣는 출처",
+   "parkedAt": "2026-10-04 18:33 KST",
+   "parkedWhy": "robots.txt 가 이 길을 막는다(Disallow) — 2026-10-03 08:40 · 12:09 · 10-04 02:11 · 08:56 리포트 4회 연속 ⛔. 막힌 곳을 긁지 않는다(2026-09-29 규칙). 사이트가 robots 를 바꾸거나 열린 다른 게시판(또는 공공 API)을 찾으면 sources 로 되돌린다."
+  },
+  {
+   "school": "",
+   "host": "한국콘텐츠진흥원",
+   "boardUrl": "https://www.kocca.kr/kocca/pims/list.do?menuNo=204104",
+   "evidence": "웹 검색 2026-09-29: \"지원공고 < 알림마당 < 한국콘텐츠진흥원\" · APEC AI 영상 콘텐츠 공모전 등",
+   "note": "콘텐츠 분야 공모전·참가자 모집",
+   "parkedAt": "2026-10-04 18:33 KST",
+   "parkedWhy": "robots.txt 가 이 길을 막는다(Disallow) — 2026-10-03 08:40 · 12:09 · 10-04 02:11 · 08:56 리포트 4회 연속 ⛔. 막힌 곳을 긁지 않는다(2026-09-29 규칙). 사이트가 robots 를 바꾸거나 열린 다른 게시판(또는 공공 API)을 찾으면 sources 로 되돌린다."
+  },
+  {
+   "school": "",
+   "host": "인천유스톡톡 청년포털",
+   "boardUrl": "https://youth.incheon.go.kr/bbs/bbsMsgList.do?bcd=notice",
+   "evidence": "웹 검색 2026-09-29(3차): \"공지사항 — 인천유스톡톡(youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=…&bcd=notice)\" · 부트캠프·역량강화 모집 공지",
+   "note": "상세 주소(bbsMsgDetail.do)에서 목록(bbsMsgList.do)을 유추했다 — 첫 리포트에서 ⚠️ 면 주소를 확인한다",
+   "parkedAt": "2026-10-04 18:33 KST",
+   "parkedWhy": "robots.txt 가 이 길을 막는다(Disallow) — 2026-10-03 08:40 · 12:09 · 10-04 02:11 · 08:56 리포트 4회 연속 ⛔. 막힌 곳을 긁지 않는다(2026-09-29 규칙). 사이트가 robots 를 바꾸거나 열린 다른 게시판(또는 공공 API)을 찾으면 sources 로 되돌린다."
+  }
+ ]
 }

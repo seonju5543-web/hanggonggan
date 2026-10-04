@@ -423,22 +423,6 @@
    }
   },
   {
-   "host": "한진해운장학재단",
-   "home": "http://www.hjsfoundation.or.kr/",
-   "boardUrl": "http://www.hjsfoundation.or.kr/",
-   "seed": "kosaf-open",
-   "autoFound": {
-    "date": "2026-09-30",
-    "signals": 5,
-    "menu": "(홈)",
-    "sample": [
-     "2026년 하반기 장학생 신청서 마감 안내(26.9.30 기준) 26.09.09 -->",
-     "2026년 하반기 장학생 선발계획 공고 26.08.28 -->",
-     "**필독** 제출 방법 상세 안내 : 지방세 세목별 과세증명서(2006년 하반기 장학생 지원 시) 26.08.28 -->"
-    ]
-   }
-  },
-  {
    "host": "한국야쿠르트 사회복지재단",
    "home": "http://www.kyswf.or.kr/",
    "boardUrl": null,
@@ -934,13 +918,6 @@
    }
   },
   {
-   "host": "한국고등교육재단",
-   "home": "https://www.kfas.or.kr/",
-   "boardUrl": "https://www.kfas.or.kr/bbs/board.php?bo_table=kfas_whats_new",
-   "seed": "web-search",
-   "evidence": "웹 검색 2026-09-29: \"모집 요강 — kfas.or.kr/bbs/board.php?bo_table=kfas_whats_new&wr_id=87\" · 해외유학후보장학생"
-  },
-  {
    "host": "한국장학재단 공지",
    "home": "https://www.kosaf.go.kr/",
    "boardUrl": "https://www.kosaf.go.kr/ko/notice.do",
@@ -994,5 +971,33 @@
   }
  ],
  "_parked": "쓰지 않게 된 곳은 지우지 말고 여기로 옮긴다(schools.json 의 parked 와 같은 규칙). 되돌리려면 항목을 위 sources 로 옮기면 된다.",
- "parked": []
+ "parked": [
+  {
+   "host": "한진해운장학재단",
+   "home": "http://www.hjsfoundation.or.kr/",
+   "boardUrl": "http://www.hjsfoundation.or.kr/",
+   "seed": "kosaf-open",
+   "autoFound": {
+    "date": "2026-09-30",
+    "signals": 5,
+    "menu": "(홈)",
+    "sample": [
+     "2026년 하반기 장학생 신청서 마감 안내(26.9.30 기준) 26.09.09 -->",
+     "2026년 하반기 장학생 선발계획 공고 26.08.28 -->",
+     "**필독** 제출 방법 상세 안내 : 지방세 세목별 과세증명서(2006년 하반기 장학생 지원 시) 26.08.28 -->"
+    ]
+   },
+   "parkedAt": "2026-10-04 18:33 KST",
+   "parkedWhy": "robots.txt 가 이 길을 막는다(Disallow) — 2026-10-03 08:40 · 12:09 · 10-04 02:11 · 08:56 리포트 4회 연속 ⛔. 막힌 곳을 긁지 않는다(2026-09-29 규칙). 사이트가 robots 를 바꾸거나 열린 다른 게시판(또는 공공 API)을 찾으면 sources 로 되돌린다."
+  },
+  {
+   "host": "한국고등교육재단",
+   "home": "https://www.kfas.or.kr/",
+   "boardUrl": "https://www.kfas.or.kr/bbs/board.php?bo_table=kfas_whats_new",
+   "seed": "web-search",
+   "evidence": "웹 검색 2026-09-29: \"모집 요강 — kfas.or.kr/bbs/board.php?bo_table=kfas_whats_new&wr_id=87\" · 해외유학후보장학생",
+   "parkedAt": "2026-10-04 18:33 KST",
+   "parkedWhy": "robots.txt 가 이 길을 막는다(Disallow) — 2026-10-03 08:40 · 12:09 · 10-04 02:11 · 08:56 리포트 4회 연속 ⛔. 막힌 곳을 긁지 않는다(2026-09-29 규칙). 사이트가 robots 를 바꾸거나 열린 다른 게시판(또는 공공 API)을 찾으면 sources 로 되돌린다."
+  }
+ ]
 }
