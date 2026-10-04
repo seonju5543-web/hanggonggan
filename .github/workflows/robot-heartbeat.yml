@@ -89,6 +89,19 @@ jobs:
               --comment "✅ $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 예약 로봇이 모두 정상 간격으로 돌고 있습니다."
           done
 
+      # 🔴 다시 선 로봇의 넘어짐 경보를 닫는다 (2026-10-04 로봇·도구 점검 · 묶음 alerts).
+      #    `.github/actions/robot-down` 은 열기·댓글만 한다 — 22분 뒤 같은 로봇이 성공했는데도 #386 이 열린 채 남았다.
+      #    워크플로 아홉 곳마다 '성공하면 닫기'를 붙이지 않고 여기서 한 번에 본다: 그 로봇의 마지막 성공이
+      #    **경보를 낸 실행보다 뒤에 시작됐을 때만** 닫는다(못 읽으면 그대로 둔다 · collector/robot-heartbeat.mjs 머리말).
+      #    보강이라 실패해도 하트비트 판정을 빨갛게 하지 않는다.
+      - name: 다시 선 로봇의 넘어짐 경보를 닫는다
+        if: ${{ !cancelled() }}
+        timeout-minutes: 2
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node collector/robot-heartbeat.mjs --close-recovered
+
       # 자기 자신이 넘어진 것도 알린다 (감시자를 감시하는 자리는 여기가 마지막이다)
       - name: 🚨 로봇이 넘어졌다
         if: failure() || cancelled()

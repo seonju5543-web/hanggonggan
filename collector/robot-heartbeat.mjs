@@ -17,13 +17,22 @@
 
    같은 계열: collector/health.json 이 학교별 `lastOk` 로 하는 일과 똑같다.
 
+   다시 선 로봇의 넘어짐 경보 닫기 (2026-10-04 로봇·도구 점검 · 묶음 alerts)
+     `.github/actions/robot-down` 은 열기·댓글만 하고 닫는 길이 없었다 — 22분 뒤 같은 로봇이 성공했는데도
+     「🚨 로봇이 넘어졌어요」(#386)가 열린 채 남았다. 워크플로 아홉 곳마다 '성공하면 닫기' 단계를 붙이는 대신
+     여기서 한 번에 본다: 워크플로 파일에서 robot-down 의 robot 이름을 읽고(robotNamesOf), 그 워크플로의
+     마지막 성공 실행이 **경보를 낸 실행보다 뒤에 시작됐을 때만** 닫는다(robotDownVerdicts).
+     🔴 못 읽음을 괜찮음으로 읽지 않는다 — 성공 기록·댓글을 못 읽으면 닫지 않는다.
+
    실행:  node collector/robot-heartbeat.mjs            (사람이 눈으로)
           node collector/robot-heartbeat.mjs --json     (워크플로가 읽는 형태)
+          node collector/robot-heartbeat.mjs --close-recovered   (다시 선 로봇의 넘어짐 경보를 닫는다)
    필요:  GH_TOKEN(또는 GITHUB_TOKEN) · GITHUB_REPOSITORY. 없으면 계산만 하고 조회는 건너뛴다.
    ============================================================ */
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { restClient, kstStamp } from '../tools/alert-issue.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const WF_DIR = path.join(HERE, '..', '.github', 'workflows');
@@ -122,7 +131,8 @@ async function lastSuccessAt(repo, file, token) {
   if (!r.ok) return { error: `${r.status}` };
   const j = await r.json();
   const run = (j.workflow_runs || [])[0];
-  return run ? { at: run.updated_at || run.created_at } : { at: null };
+  /* runId·startedAt 은 넘어짐 경보 닫기(--close-recovered)가 쓴다 — 경보를 낸 실행보다 뒤에 시작한 성공인가 */
+  return run ? { at: run.updated_at || run.created_at, runId: run.id || null, startedAt: run.run_started_at || run.created_at || null } : { at: null };
 }
 
 /* 🔴 **경보 전에 한 번 더 다른 길로 묻는다** (2026-09-30).
@@ -162,9 +172,113 @@ export function isStale(everyHours, lastIso, nowMs) {
   return age > everyHours * STALE_FACTOR;
 }
 
+/* ── 다시 선 로봇의 넘어짐 경보 닫기 ───────────────────────────────── */
+export const ROBOT_DOWN_PREFIX = '🚨 로봇이 넘어졌어요 — ';
+
+/** 워크플로 글에서 `uses: ./.github/actions/robot-down` 단계의 `robot:` 이름들 (주석 줄은 안 본다) */
+export function robotNamesOf(yml) {
+  const lines = String(yml).replace(/\r/g, '').split('\n');
+  const names = [];
+  for (let i = 0; i < lines.length; i += 1) {
+    if (/^\s*#/.test(lines[i]) || !/uses:\s*\.\/\.github\/actions\/robot-down\b/.test(lines[i])) continue;
+    /* 단계의 처음(`- `)을 거슬러 찾고, 다음 단계(같은 들여쓰기의 `- `)나 더 얕은 줄이 나올 때까지 robot: 을 본다 */
+    let start = i;
+    while (start > 0 && !/^\s*- /.test(lines[start])) start -= 1;
+    const indent = (/^(\s*)- /.exec(lines[start]) || [, ''])[1].length;
+    for (let j = start; j < lines.length; j += 1) {
+      const l = lines[j];
+      if (/^\s*#/.test(l)) continue;
+      if (j > start && l.trim()) {
+        const lead = l.length - l.trimStart().length;
+        if (lead < indent || (lead === indent && /^\s*- /.test(l))) break;
+      }
+      const m = /^\s*robot:\s*(.+?)\s*$/.exec(l);
+      if (m) { names.push(m[1].replace(/^(['"])(.*)\1$/, '$2')); break; }
+    }
+  }
+  return names;
+}
+
+/** 글 속의 마지막 실행 번호(…/actions/runs/123) — 경보 댓글이 어느 실행에서 왔는가 */
+export function lastRunIdIn(text) {
+  const all = [...String(text || '').matchAll(/\/actions\/runs\/(\d+)/g)];
+  return all.length ? Number(all[all.length - 1][1]) : null;
+}
+
+/** 열린 넘어짐 경보마다 닫을지(close) 둘지(keep) 정한다 (순수 함수)
+    issues: [{ number, title, createdAt, lastBotCommentAt?, lastAlertRunId? }]
+    okByRobot: { 로봇 이름: { runId, startedAt } | null }  — 그 로봇 워크플로의 마지막 성공 실행 (못 읽으면 null)
+    닫는 조건(둘 중 하나): ① 성공 실행 번호가 경보를 낸 실행 번호보다 크다(뒤에 시작된 실행)
+                          ② 성공 실행이 시작한 시각이 마지막 경보(이슈 생성·봇 댓글 중 늦은 것)보다 늦다
+    🔴 경보를 낸 바로 그 실행이 초록으로 끝난 경우(단계 실패를 continue-on-error 로 넘김)는 닫지 않는다 —
+       번호가 같고 시작이 경보보다 앞이다. 성공 뒤에 다시 넘어져 봇 댓글이 달렸으면 그 댓글이 기준이다. */
+export function robotDownVerdicts(issues, okByRobot = {}) {
+  const out = [];
+  for (const i of issues || []) {
+    const title = String((i && i.title) || '');
+    if (!title.startsWith(ROBOT_DOWN_PREFIX)) continue;
+    const robot = title.slice(ROBOT_DOWN_PREFIX.length).trim();
+    const ok = okByRobot[robot];
+    const alertAt = Math.max(Date.parse(i.createdAt) || 0, Date.parse(i.lastBotCommentAt) || 0);
+    if (!ok || (!ok.runId && !ok.startedAt)) { out.push({ number: i.number, robot, verdict: 'keep', why: '마지막 성공을 못 읽음' }); continue; }
+    if (!alertAt) { out.push({ number: i.number, robot, verdict: 'keep', why: '경보 시각을 못 읽음' }); continue; }
+    const byRun = !!(ok.runId && i.lastAlertRunId && Number(ok.runId) > Number(i.lastAlertRunId));
+    const byTime = !!(ok.startedAt && Date.parse(ok.startedAt) > alertAt);
+    out.push(byRun || byTime
+      ? { number: i.number, robot, verdict: 'close', why: byRun ? '경보 뒤에 시작한 실행이 성공' : '경보 뒤에 시작해 성공', ok }
+      : { number: i.number, robot, verdict: 'keep', why: '경보 뒤 성공이 아직 없음' });
+  }
+  return out;
+}
+
+export function robotFilesByName(dir = WF_DIR) {
+  const by = {};
+  for (const f of fs.readdirSync(dir).filter((n) => n.endsWith('.yml'))) {
+    for (const name of robotNamesOf(fs.readFileSync(path.join(dir, f), 'utf8'))) (by[name] ||= []).push(f);
+  }
+  return by;
+}
+
+async function closeRecovered(repo, token) {
+  if (!repo || !token) { console.log('GH_TOKEN·GITHUB_REPOSITORY 가 없어 넘어짐 경보를 보지 않았습니다.'); return; }
+  const api = restClient({ repo, token });
+  const downs = (await api.openIssues()).filter((i) => String(i.title || '').startsWith(ROBOT_DOWN_PREFIX));
+  if (!downs.length) { console.log('열린 넘어짐 경보가 없습니다.'); return; }
+  const files = robotFilesByName();
+  const okByRobot = {};
+  for (const robot of new Set(downs.map((i) => String(i.title).slice(ROBOT_DOWN_PREFIX.length).trim()))) {
+    const fl = files[robot];
+    if (!fl || !fl.length) { okByRobot[robot] = null; continue; }   // 워크플로에서 그 이름을 못 찾음 — 모름
+    /* 같은 이름이 여러 파일에 있으면 **가장 오래된 성공**으로 — 어느 파일이 넘어졌는지 모르므로 보수적으로 */
+    const got = [];
+    for (const f of fl) got.push(await lastSuccessAt(repo, f, token).catch((e) => ({ error: e.message })));
+    okByRobot[robot] = got.some((g) => g.error || !g.runId) ? null : {
+      runId: Math.min(...got.map((g) => Number(g.runId))),
+      startedAt: got.map((g) => g.startedAt).filter(Boolean).sort()[0] || null,
+    };
+  }
+  const issues = [];
+  for (const i of downs) {
+    try {
+      const bots = (await api.comments(i.number)).filter((c) => c.user && c.user.type === 'Bot');
+      const last = bots[bots.length - 1];
+      issues.push({ number: i.number, title: i.title, createdAt: i.created_at, lastBotCommentAt: last ? last.created_at : null, lastAlertRunId: lastRunIdIn(last ? last.body : i.body) });
+    } catch (e) { console.log(`· #${i.number} 댓글을 못 읽어 그대로 둡니다 — ${e.message}`); }
+  }
+  for (const v of robotDownVerdicts(issues, okByRobot)) {
+    if (v.verdict !== 'close') { console.log(`· 그대로 둠 #${v.number} ${v.robot} — ${v.why}`); continue; }
+    const runUrl = `https://github.com/${repo}/actions/runs/${v.ok.runId}`;
+    try {
+      await api.close(v.number, `✅ ${kstStamp()} KST — **${v.robot}** 이 다시 끝까지 돌았습니다(${v.why} · ${runUrl}). 넘어짐 경보를 닫습니다. 다시 넘어지면 새로 알립니다. (로봇 하트비트 · 자동)`, 'completed');
+      console.log(`✅ 닫음 #${v.number} ${v.robot}`);
+    } catch (e) { console.log(`· #${v.number} 를 닫지 못했습니다 — ${e.message}`); }
+  }
+}
+
 async function main() {
   const repo = process.env.GITHUB_REPOSITORY;
   const token = process.env.GH_TOKEN || process.env.GITHUB_TOKEN;
+  if (process.argv.includes('--close-recovered')) { await closeRecovered(repo, token); return; }
   const asJson = process.argv.includes('--json');
   const now = Date.now();
   const rows = [];
