@@ -4610,6 +4610,10 @@
     {
      "name": "붙임1 서울C_2026-2 점프장학_단과대학별 운영 계획안_수정.pdf",
      "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=2d7dd1a444c6453aa5d16f647c5253f3&fileSn=4&bbsId=BMSR00040"
+    },
+    {
+     "name": "붙임1 서울C_2026-2 점프장학_단과대학별 운영 계획안_수정_20261001.pdf",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=2d7dd1a444c6453aa5d16f647c5253f3&fileSn=4&bbsId=BMSR00040"
     }
    ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323148",
@@ -6089,6 +6093,11 @@
      "name": "본문이미지-838x1188.jpg",
      "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/findUploadImg.do?fileNo=eb23bf94ea2f41cf96e5564e02a9ca7d",
      "bodyImage": true
+    },
+    {
+     "name": "본문이미지-1638x1163.gif",
+     "url": "https://www.kookmin.ac.kr/content/05sub/style0005/images/common/webacc.gif",
+     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12373/view.do?currentPageNo=1",
@@ -6487,7 +6496,12 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "419선양재단 장학금 신청서.hwp",
+     "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30154&pageNo=1#;"
+    }
+   ],
    "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&page=2&nttId=30154",
    "sourceKind": "auto"
   },
@@ -6514,7 +6528,16 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "2026년 2학기 중소기업 취업연계 장학사업(Ⅰ유형) 업무처리기준(안).pdf",
+     "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30130&pageNo=1#;"
+    },
+    {
+     "name": "희망사다리1유형 장학신청 매뉴얼.pdf",
+     "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30130&pageNo=1#;"
+    }
+   ],
    "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&page=2&nttId=30130",
    "sourceKind": "auto"
   },
@@ -6814,6 +6837,10 @@
      "name": "본문이미지-1800x700.jpg",
      "url": "https://www.kmu.ac.kr/uni/main/img/layout2024/sub_visual04.jpg",
      "bodyImage": true
+    },
+    {
+     "name": "캠퍼스 투어",
+     "url": "https://www.kmu.ac.kr/uni/main/download/sub01/keimyung_univ/index.html"
     }
    ],
    "sourceUrl": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271062&pageOrder=0&cmd=2&parm_bod_uid=271062&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
@@ -7000,6 +7027,11 @@
      "name": "본문이미지-785x1117.jpg",
      "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/findUploadImg.do?fileNo=d5ba21686ec544dba26a17064c30ef17",
      "bodyImage": true
+    },
+    {
+     "name": "본문이미지-1638x1163.gif",
+     "url": "https://www.kookmin.ac.kr/content/05sub/style0005/images/common/webacc.gif",
+     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12387/view.do?currentPageNo=1",
@@ -7057,6 +7089,11 @@
     {
      "name": "본문이미지-779x1113.jpg",
      "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/findUploadImg.do?fileNo=26f7a5d8a9674826ae4098fbeedf6994",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-1638x1163.gif",
+     "url": "https://www.kookmin.ac.kr/content/05sub/style0005/images/common/webacc.gif",
      "bodyImage": true
     }
    ],
@@ -8009,6 +8046,10 @@
      "name": "본문이미지-800x1132.jpg",
      "url": "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoQTkgFAjgVwMoFlUBMCiAZATwBcApANwHkB7AawEsaBVAWwDoArABwHMg%20",
      "bodyImage": true
+    },
+    {
+     "name": "대학정보공시",
+     "url": "http://www.academyinfo.go.kr/pubinfo/pubinfo0020/list.do?schlId=0000163&svyYr=2018&pageIdx=all&filePath=01&fileName=01&saveName=01"
     }
    ],
    "sourceUrl": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366829&article.offset=0&articleLimit=10",
@@ -8937,6 +8978,18 @@
     },
     {
      "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp (다운로드 : 11회)",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=ca127512499eb0e0ba00b24b184d8221&bbsId=1083"
+    },
+    {
+     "name": "[공문] 2026년 우양재단 동행 장학 모집 협조 요청.hwp (다운로드 : 12회)",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=0c6797a234b08b8ba908c89f3f55b111&bbsId=1083"
+    },
+    {
+     "name": "[붙임1] 2026년 동행장학 홍보 포스터.jpg (다운로드 : 10회)",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=29df0f5abb5a9a6114328315d3bcc08b&bbsId=1083"
+    },
+    {
+     "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp (다운로드 : 12회)",
      "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=ca127512499eb0e0ba00b24b184d8221&bbsId=1083"
     }
    ],
@@ -10608,6 +10661,28 @@
     {
      "name": "2026학년도 2학기 국가근로 사전교육자료(요약서).hwp",
      "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F57138&fname=B9FDED6CB8D448E9A9897CBFF7C08DEA_.hwp&ogrfname=2026%ED%95%99%EB%85%84%EB%8F%84+2%ED%95%99%EA%B8%B0+%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C+%EC%82%AC%EC%A0%84%EA%B5%90%EC%9C%A1%EC%9E%90%EB%A3%8C%28%EC%9A%94%EC%95%BD%EC%84%9C%29.hwp"
+    },
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "본문이미지-1920x300.png",
+     "url": "https://www.seoultech.ac.kr/site/ko/2021/res/img/sub_title3444.png",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-509x348.png",
+     "url": "https://www.seoultech.ac.kr/site/ko/res/img/wa_logo.png",
+     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=895210&qidx=57138&cate=0&allboard=true&nowpage=1",
