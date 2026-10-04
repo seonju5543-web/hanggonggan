@@ -23,9 +23,11 @@
 
    🔴 **막는 쪽으로 닫힌다(fail-closed).** 공고를 못 찾거나·접수 주소가 없거나·마감이
       지났거나·자격이 미달이면 **안 보낸다.** 판단이 안 서면 보내지 않는 쪽이다.
+   🔴 **기본 가져오기(`import ME from`)로 싣는다 — `createRequire`·`node:module` 금지** (2026-10-04 로봇·도구 점검).
+      Cloudflare Workers 에는 `node:module` 이 없어 그 꼴로는 올리는 순간 넘어진다(wrangler dev 실측 'No such module').
+      `server/essay/draft-guard.mjs` 가 같은 함정을 이미 피한 길(cf3df58a)과 같다 · 관문 verify/health-gates/servers.mjs ①.
    ========================================================================== */
-import { createRequire as _cr } from 'node:module';
-const ME = _cr(import.meta.url)('../../match-engine.js');
+import ME from '../../match-engine.js';
 
 /** 자격 판정이 '보내도 된다'로 인정하는 값. 🔴 `unknown` 은 넣지 않는다 —
  *  우리가 자격을 못 읽은 공고까지 대신 보내면 앱이 확인해 준 척이 된다. */
