@@ -119,9 +119,13 @@ export function looksLikeAttachmentName(title) {
 
    ⚠️ 순서가 중요하다. 메뉴 덩어리를 '키워드 밖'으로 세면 "키워드를 넓히면 되겠구나"라는
    **틀린 결론**으로 이어진다. 그래서 부스러기를 먼저 걷어낸 뒤 규칙을 따진다. */
+/* deps.inLedger(제목) (2026-10-04 점검 collect-10) — '학생이 보는 것'(피드·학교별 파일)에는 없는데 수집기의 후보 장부에는 있는 글.
+   예전엔 장부를 '가진 것'에 섞어 세어, 9-30 병합 사고처럼 **피드에서 빠졌지만 장부에는 남은 글**(215건)이 이 감사로 영영 안 보였다.
+   장부 글은 수집 당시 수집기 규칙을 통과한 것이라 첨부·메뉴 판정보다 먼저 온다. 넘기지 않으면 예전과 똑같다. */
 export function classifyMiss(title, deps) {
-  const { keywords, isMenuEntry, isAttachmentEntry, page, url } = deps;
+  const { keywords, isMenuEntry, isAttachmentEntry, page, url, inLedger } = deps;
   const t = String(title || '').replace(/\s+/g, ' ').trim();
+  if (inLedger && inLedger(t)) return '수집했지만 피드에서 빠짐';
   if (looksLikeAttachmentName(t)) return '첨부 파일 이름 (공고 아님)';
   if (isAttachmentEntry && isAttachmentEntry({ title: t, url: url || '' })) return '첨부 링크 (공고 아님)';
   if (looksLikeBoardChrome(t)) return '게시판 메뉴·설명문 (공고 아님)';

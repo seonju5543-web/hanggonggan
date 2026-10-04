@@ -7,6 +7,7 @@
         ⓒ 두 수집기 모두 saveCandidates 줄 뒤 · dropUnserved 앞에서 부른다
      ② 고아 파일(publishBySchool · app2-F4/collect-12) — 목록에 글이 없는 학교의 옛 파일은 빈 파일로 · 이미 빈 파일·못 읽는 파일·이름이 안 맞는 파일은 그대로
      ③ 화면 0건 학교(zeroFeedSchools · app2-F2/collect-06) — 리포트 머리 한 줄
+     ④ 누락 감사(coverage-rules classifyMiss inLedger · collect-10) — 장부에만 남은 글을 '가진 것'으로 세지 않는다
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
 import os from 'node:os';
@@ -16,6 +17,7 @@ import { createRequire } from 'node:module';
 import { stripComments } from './gate.mjs';
 import { healFromLedger, publishBySchool, zeroFeedSchools, FEED_HEAL_SINCE } from '../../collector/publish-notices.mjs';
 import { dedupeNotices, urlKey, titleKey } from '../../collector/url-key.mjs';
+import { classifyMiss } from '../../collector/coverage-rules.mjs';
 
 const require = createRequire(import.meta.url);
 const { noticeFileKey } = require('../../match-engine.js');
@@ -131,6 +133,18 @@ export default async function feed(eq, ctx) {
     const zAt = src.indexOf('zeroFeedSchools(beforeCap)');
     eq('  수집 리포트가 발행 목록으로 재고 머리에 한 줄 적는다 (까닭은 게시판 상태 줄에서)',
       [pubAt > 0 && zAt > pubAt, /lines\.push\(`🙋 서비스 학교인데 앱 실시간 공고 0건 \$\{zeroFeed\.length\}곳/.test(src), /게시판 주소 미설정/.test(src)], [true, true, true]);
+  }
+
+  /* ── ④ 누락 감사 — 장부에만 남은 글 ── */
+  {
+    const deps = { keywords: /장학/, isMenuEntry: () => false, isAttachmentEntry: () => false, page: 1 };
+    const T = '2026학년도 2학기 성적우수장학금 선발 공고';
+    eq("④ 피드엔 없고 장부에만 있는 글은 '수집했지만 피드에서 빠짐' · 넘기지 않으면 예전처럼 '원인 미상'",
+      [classifyMiss(T, { ...deps, inLedger: () => true }), classifyMiss(T, deps), classifyMiss(T, { ...deps, inLedger: () => false })],
+      ['수집했지만 피드에서 빠짐', '원인 미상', '원인 미상']);
+    const src = stripComments(fs.readFileSync(new URL('collector/audit-coverage.mjs', root), 'utf8'));
+    eq('  감사의 \'가진 것\' = 학생이 보는 것(notices.json + 학교별 파일) · 장부는 inLedger 로만',
+      [/\[\.\.\.notices, \.\.\.candidates\]/.test(src), /inLedger:/.test(src), /\.\.\/data\/notices\//.test(src), /bySchool\(candidates\)/.test(src)], [false, true, true, true]);
   }
 
 }

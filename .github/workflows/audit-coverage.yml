@@ -4,7 +4,7 @@ name: 공고 누락 감사
 # 로봇은 자기가 읽은 것만 알아서 스스로는 누락을 셀 수 없다 — 그래서 바깥에서 대조한다.
 on:
   schedule:
-    - cron: '23 21 * * 1'    # 매주 월요일 06:23 KST (수집 예약과 겹치지 않는 홀수 분)
+    - cron: '23 21 * * 1'    # 매주 화요일 06:23 KST = UTC 월요일 21:23 (수집 예약과 겹치지 않는 홀수 분)
   workflow_dispatch:
   push:
     branches: ['claude/nice-heisenberg-WESq5']

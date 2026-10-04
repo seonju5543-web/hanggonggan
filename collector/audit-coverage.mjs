@@ -18,7 +18,7 @@
         (동국대 '못 읽음 ≠ 다른 글' 교훈과 같은 계열).
 
    실행: node collector/audit-coverage.mjs
-   설정: AUDIT_BUDGET_MS(기본 20분) · AUDIT_PAGES(기본 3) · AUDIT_ONLY=학교이름
+   설정: AUDIT_BUDGET_MS(기본 35분) · AUDIT_PAGES(기본 3) · AUDIT_ONLY=학교이름
    ============================================================ */
 import fs from 'node:fs';
 import { chromium } from 'playwright';
@@ -71,17 +71,33 @@ try { cur = JSON.parse(fs.readFileSync(curPath, 'utf8')); } catch { /* 첫 실�
 const order = rotateOrder(all.length, cur.next || 0);
 const list = order.map((i) => all[i]);
 
-/* ── 우리가 가진 공고 (읽기만 한다) ─────────────────────────────────────── */
+/* ── 우리가 가진 공고 (읽기만 한다) ───────────────────────────────────────
+   🔴 '가진 것' = **학생이 보는 것**(data/notices.json + 앱이 실제로 받는 학교별 파일 data/notices/*.json) + 정식 등록 (2026-10-04 점검 collect-10).
+      예전엔 수집기의 후보 장부(candidates.json)까지 '가진 것'으로 세어, 피드에서 빠졌지만 장부에는 남은 글(9-30 병합 사고 215건)이
+      이 감사로 영영 안 보였다. 장부는 따로 두고 원인을 가를 때만 쓴다('수집했지만 피드에서 빠짐' · coverage-rules.mjs classifyMiss). */
 const notices = JSON.parse(fs.readFileSync(new URL('../data/notices.json', HERE), 'utf8')).items || [];
+const schoolFiles = [];
+try {
+  const dir = new URL('../data/notices/', HERE);
+  for (const f of fs.readdirSync(dir)) {
+    if (!/\.json$/.test(f) || f === 'index.json') continue;
+    try { schoolFiles.push(...(JSON.parse(fs.readFileSync(new URL(f, dir), 'utf8')).items || [])); } catch { /* 못 읽는 파일은 건너뛴다 */ }
+  }
+} catch { /* 폴더가 없으면 옛 파일만 본다 */ }
 let candidates = [];
 try { candidates = JSON.parse(fs.readFileSync(new URL('candidates.json', HERE), 'utf8')).items || []; } catch { /* 없어도 된다 */ }
 const registered = JSON.parse(fs.readFileSync(new URL('../data/registered.json', HERE), 'utf8')).items || [];
-const oursBySchool = new Map();
-for (const n of [...notices, ...candidates]) {
-  if (!n || !n.school) continue;
-  if (!oursBySchool.has(n.school)) oursBySchool.set(n.school, []);
-  oursBySchool.get(n.school).push(n.title);
-}
+const bySchool = (items) => {
+  const m = new Map();
+  for (const n of items) {
+    if (!n || !n.school) continue;
+    if (!m.has(n.school)) m.set(n.school, []);
+    m.get(n.school).push(n.title);
+  }
+  return m;
+};
+const oursBySchool = bySchool(notices.concat(schoolFiles));
+const ledgerBySchool = bySchool(candidates);
 /* 정식 등록 공고도 '우리가 가진 것'이다 — 피드에서 중복 제거로 빠져 있어도 누락이 아니다 */
 const regTitles = registered.map((r) => r.name || r.title).filter(Boolean);
 
@@ -173,10 +189,12 @@ for (const t of list) {
     const ours = (oursBySchool.get(t.school) || []).concat(regTitles);
     const missing = findMissing(boardTitles, ours);
     const byCause = {};
+    const ledger = ledgerBySchool.get(t.school) || [];
     for (const m of missing) {
       const cause = classifyMiss(m, {
         keywords: HARVEST_KEYWORDS, isMenuEntry, isAttachmentEntry,
         page: pageOf.get(m), url: urlOf.get(m) || '',
+        inLedger: (title) => findMissing([title], ledger).length === 0,   // 같은 제목 맞추기 규칙(findMissing)을 그대로 쓴다
       });
       (byCause[cause] = byCause[cause] || []).push(m);
     }
@@ -211,7 +229,7 @@ if (totalBoard) L.push(`- 전체 인식 비율 **${Math.round(((totalBoard - tot
 L.push('');
 L.push('### 누락 원인별 (많은 순)');
 Object.entries(causeTotal).sort((a, b) => b[1] - a[1]).forEach(([c, n]) => {
-  const mark = c === '원인 미상' ? '🚨' : '·';
+  const mark = c === '원인 미상' ? '🚨' : (c === '수집했지만 피드에서 빠짐' ? '⚠️' : '·');   // 빠짐 — 수집기의 장부 메우기(healFromLedger)가 FEED_HEAL_SINCE 이후 수집분은 다음 실행에 메운다
   L.push(`- ${mark} **${c}** ${n}건`);
 });
 if (!Object.keys(causeTotal).length) L.push('- 누락 없음');
