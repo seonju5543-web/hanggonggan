@@ -299,14 +299,32 @@ jobs:
               if git push; then pushed=1; break; fi
               # --autostash: 저장 목록에 안 든 파일이 남아 있어도 재시도가 죽지 않게 (2026-08-02).
               # 이게 없으면 "cannot pull with rebase: You have unstaged changes"로 실행 전체가 날아간다.
-              git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+              # 🔴 얹다가 충돌하면(규칙 없는 파일 등) 여기서 바로 죽지 않고 되돌린 뒤 빠져나간다 —
+              #    죽으면 아래 '못 넣은 수집분 보관'이 안 돌아 그 실행 결과가 통째로 사라진다 (2026-10-04 run 37203460175)
+              if ! git pull --rebase --autostash origin "${GITHUB_REF_NAME}"; then
+                git rebase --abort || true
+                echo "::error::기본 브랜치에 얹다가 충돌 — 재시도해도 같은 충돌이라 멈춘다"
+                break
+              fi
             done
             # 3번 다 실패하면 조용히 넘어가지 않는다 — 빨간불로 죽고 아래 실패 알림이 이슈에 붙는다
             if [ "$pushed" != "1" ]; then
-              echo "::error::수집 데이터 push 실패 — 3회 재시도 모두 실패. 이번 수집분이 저장되지 않았습니다."
+              echo "::error::수집 데이터 push 실패(충돌 또는 3회 재시도 실패) — 이번 수집분은 기본 브랜치에 안 들어갔다. 실행 결과물 unsaved-<실행 번호> 에 묶음으로 남긴다."
+              # 수집분을 묶음(bundle)으로 남긴다 → 아래 단계가 실행 결과물(artifact)로 올린다.
+              # 되살리기: 받은 파일로 `git fetch unsaved.bundle && git cherry-pick FETCH_HEAD` (충돌은 사람이 고른다)
+              mkdir -p unsaved && git bundle create unsaved/unsaved.bundle HEAD~1..HEAD HEAD || true
               exit 1
             fi
           fi
+
+      - name: 못 넣은 수집분 보관 (저장 실패 때만)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsaved-${{ github.run_id }}
+          path: unsaved/
+          retention-days: 14
+          if-no-files-found: ignore
 
       - name: 컨펌용 리포트 이슈 생성
         # 수집 스텝이 값을 못 남긴 경우('')엔 리포트를 만들지 않는다 — 건수 없는 빈 이슈 방지
