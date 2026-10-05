@@ -19,7 +19,7 @@ import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry, retitleItems } from './clean-title.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { activityKind, activityField, notActivity, ACTIVITY_FIELDS } from './activity-kind.mjs';
-import { activityExcerpts, activityDetails, putActivityDetails, ACT_DETAILS_V, sanitizeBenefit } from './activity-excerpts.mjs';
+import { activityExcerpts, activityDetails, putActivityDetails, ACT_DETAILS_V, sanitizeBenefit, sanitizeElig } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { robotsAllows } from './robots.mjs';
 import { extractLinks, stripSessionId, hrefText } from './board-links.mjs';
@@ -601,6 +601,7 @@ acts.items = acts.items.filter((n) => ((n.api && n.seenAt) || n.foundAt || '9999
 acts.items = acts.items.filter((n) => !isAttachmentEntry(n));
 acts.items = acts.items.filter((n) => !notActivity(n.title));   // 결과·보도·지난 해 글은 모집 글이 아니다 — 이미 실린 글에도 소급(2026-10-04 · activity-kind.mjs)
 acts.items.forEach(sanitizeBenefit);   // 「혜택」에 섞인 조건은 자격 줄로 — 출처(본문·API)와 상관없이 매번 모든 글에(2026-10-04 · activity-excerpts.mjs splitBenefit)
+acts.items.forEach(sanitizeElig);   // 자격 줄 거름(여러 갈래 나이·개인정보 안내문)을 실린 글 전부에 매번 — 소급(2026-10-05 점검 api-06 · activity-excerpts.mjs eligLineOk)
 acts.items.forEach((n) => bodyReader.heal(n));   // 껍데기에서 시작한 기간 힌트 소급(위 '껍데기를 걷은 본문' 단락)
 acts.items = dedupeNotices(acts.items);
 acts.items = acts.items.filter((n) => !n.school).concat(dropUnserved(acts.items.filter((n) => n.school)));

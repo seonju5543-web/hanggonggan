@@ -8,6 +8,8 @@
      ③ 합집합 병합기 (app2-F7): .gitattributes 에 merge=jsonunion 이라 적은 파일마다 **병합기를 진짜로 돌려** 규칙이 있는지 본다 ·
         활동 피드는 학교 없는 글을 상한으로 자르지 않는다 · 재단 피드는 합친 뒤 발행 거름을 다시 건다(로봇이 뺀 지난 글을 되살리지 않는다) ·
         seen-activities 는 이른 날짜
+     ④ 활동 자격 (api-06): 납작한 표의 `대상연령 : 만 20세 이상 ~ 만 39세 이하, 만 40세 이상` 이 범위 하나로 읽혀 45세가 미달(틀린 미달) ·
+        개인정보 처리 안내문이 자격 자리에 — activity-excerpts.mjs eligLineOk 한 곳 · 실린 글 sanitizeElig · 브라우저 장부 mergeBrowserResults
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
 import os from 'node:os';
@@ -18,6 +20,7 @@ import { stripComments, cleanEnv } from './gate.mjs';
 import { sandbox } from './bodies.mjs';
 import { clearFuturePosted, newsFloor } from '../../collector/news-kind.mjs';
 import { dropReason as extDropReason, fillDeadlineFromHint, tidyExternal } from '../../collector/external-clean.mjs';
+import { activityDetails, eligLineOk, sanitizeElig } from '../../collector/activity-excerpts.mjs';
 
 const src = (root, rel) => stripComments(fs.readFileSync(new URL(rel, root), 'utf8'));
 /* a 가 b 보다 앞에 있다(둘 다 있어야 참) */
@@ -137,5 +140,52 @@ export default async function qfeeds(eq, ctx) {
       eq('  seen-activities — 같은 열쇠는 이른 날짜를 남긴다(늦은 날짜면 같은 글을 새 글로 다시 담는다)',
         [seen.status, seen.out], [0, { 'https://x/1': '2026-10-01', 'https://x/2': '2026-10-04' }]);
     } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+  }
+
+  /* ── ④ 활동 자격 — 여러 갈래 나이·개인정보 안내문 ── */
+  {
+    const T = '2026년 테스트 교육 참가자 모집 공고';
+    const body = (age) => [T, '대상', '대학생, 일반인', '대상연령', age].join('\n');
+    const many = activityDetails(body('만 20세 이상 ~ 만 39세 이하, 만 40세 이상'), T).eligibilityLines;
+    const one = activityDetails(body('만 19세 이상 ~ 만 34세 이하'), T).eligibilityLines;
+    eq('④ 납작한 표의 여러 갈래 나이 줄은 자격 줄로 쓰지 않는다(틀린 미달) · 대상 줄은 남는다 · 갈래 하나면 남는다(대조)',
+      [many.some((l) => /대상연령/.test(l)), many.includes('대상 : 대학생, 일반인'), one.some((l) => /대상연령 : 만 19세 이상 ~ 만 34세 이하/.test(l))], [false, true, true]);
+    const PRIV = '신청 시 요청하는 정보(개인정보포함)는 사업운영기관에서 관리되오니 이점 반드시 유의하여 주시기 바랍니다.';
+    const AGES = '대상연령 : 만 20세 이상 ~ 만 39세 이하, 만 40세 이상';
+    eq('  eligLineOk — 개인정보 안내문·여러 갈래 나이는 아니다 · 자격 이름표 줄·갈래 하나 나이는 맞다',
+      [eligLineOk(PRIV), eligLineOk(AGES), eligLineOk('참가자격 : 만 19~34세 대한민국 국민'), eligLineOk('○ 연령 : 만 19세 이상')], [false, false, true, true]);
+    /* 이미 실린 글 — 발행 때 같은 거름 · 사람이 넣은 줄은 그대로 · 비면 칸과 출처 표식을 지운다 */
+    const a = { eligibilityLines: [PRIV, AGES, '대상 : 대학생'], eligibilityFrom: '브라우저 본문' };
+    const b = { eligibilityLines: [PRIV], eligibilityFrom: '브라우저 본문' };
+    const c = { eligibilityLines: [AGES], eligibilityFrom: '관리자 2026-10-05' };
+    eq('  sanitizeElig — 실린 글을 거른다 · 비면 칸·출처 표식을 지운다 · 관리자 줄은 건드리지 않는다',
+      [sanitizeElig(a), a.eligibilityLines, sanitizeElig(b), 'eligibilityLines' in b, 'eligibilityFrom' in b, sanitizeElig(c), c.eligibilityLines],
+      [true, ['대상 : 대학생'], true, false, false, false, [AGES]]);
+    /* 브라우저 장부에 이미 적힌 옛 줄도 합칠 때 거른다 — 남는 줄이 없으면 합치지 않는다 */
+    const prevLib = process.env.ACTIVITY_DOCS_AS_LIB;
+    process.env.ACTIVITY_DOCS_AS_LIB = '1';   // 본편이 돌지 않게(불러오는 순간 data/activities.json 을 고친다)
+    const AD = await import('../../collector/activity-docs.mjs');
+    if (prevLib === undefined) delete process.env.ACTIVITY_DOCS_AS_LIB; else process.env.ACTIVITY_DOCS_AS_LIB = prevLib;
+    const acts = { items: [{ url: 'u', title: 't' }, { url: 'v', title: 's' }] };
+    const got = AD.mergeBrowserResults(acts, { u: { lines: [PRIV, AGES, '대상 : 대학생'], from: '브라우저 본문' }, v: { lines: [PRIV], from: '브라우저 본문' } });
+    eq('  mergeBrowserResults — 장부의 옛 줄도 거른다 · 다 걸러지면 합치지 않는다',
+      [got, acts.items[0].eligibilityLines, 'eligibilityLines' in acts.items[1]], [1, ['대상 : 대학생'], false]);
+    eq('  수집 로봇이 발행 때 실린 글 전부에 sanitizeElig 를 건다', /acts\.items\.forEach\(sanitizeElig\)/.test(collectSrc), true);
+
+    /* 소급 도구 — 활동 피드도 같은 함수로 */
+    const sb = sandbox(root, 'hdj-qfeeds-refilter-act-');
+    try {
+      sb.write('tools/refilter-feeds.mjs', fs.readFileSync(new URL('tools/refilter-feeds.mjs', root)));
+      sb.write('collector/extracted/notices-text.json', []);
+      sb.write('data/registered.json', { items: [] });
+      sb.write('data/external.json', JSON.stringify({ updatedAt: '2026-10-01', items: [] }, null, 1));
+      const ACTS = { updatedAt: '2026-10-01', items: [{ url: 'https://k.example/1', title: 't', eligibilityLines: [AGES, '대상 : 대학생'] }, { url: 'https://k.example/2', title: 's', eligibilityLines: ['대상 : 청년'] }] };
+      sb.write('data/activities.json', JSON.stringify(ACTS, null, 1));
+      const w = sb.run('tools/refilter-feeds.mjs', ['--write']);
+      const out = sb.json('data/activities.json');
+      eq('  [소급 도구] 활동 피드 자격 줄도 같은 거름 · 로봇과 같은 저장 꼴',
+        [w.status, (out?.items || []).map((n) => n.eligibilityLines), sb.read('data/activities.json') === JSON.stringify(out, null, 1)],
+        [0, [['대상 : 대학생'], ['대상 : 청년']], true]);
+    } finally { sb.done(); }
   }
 }

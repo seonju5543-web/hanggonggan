@@ -134,6 +134,36 @@ function qualifyLines(t) {
   if (!q.length) q = [...new Set(t.split('\n').map((l) => l.trim()).filter((l) => l.length >= 4 && l.length <= 60 && OPEN_LINE.test(l) && !NOT_OPEN.test(l)))].slice(0, 2);
   return q;
 }
+/* 자격 줄로 쓰지 않는 줄 — 한 곳 (2026-10-05 점검 api-06). 본문·요강·첨부·브라우저 네 길이 모두 activityDetails 를 지나고,
+   이미 실린 글은 sanitizeElig · 브라우저 장부는 mergeBrowserResults 가 같은 함수로 거른다.
+   (a) 여러 갈래 나이 — K-Startup 「SaaS 전환지원센터 …」 표의 `대상연령 : 만 20세 이상 ~ 만 39세 이하, 만 40세 이상` 이 범위 하나로 읽혀
+       45세가 미달이 됐다(원문은 40세 이상도 받는다 — 틀린 미달). API 매퍼(open-api-map.mjs 대상 연령)와 같은 뜻 — 여러 갈래 나이는 자격 줄로 쓰지 않는다.
+   (b) 개인정보 처리 안내문 — `신청 시 요청하는 정보(개인정보포함)는 … 유의하여 주시기 바랍니다.` 가 자격 자리에 앉았다.
+       대상·자격·요건 이름표가 있는 줄은 남긴다. ⚠️ `개인정보 수집·이용에 동의한 자` 같은 형식 조건도 빠지지만 판정이 원래 못 재는 줄이다. */
+const AGE_LABEL = /^\s*[^:：]{0,6}?(?:대상\s*)?(?:연령|나이)\s*[:：]\s*(.+)$/;
+export function eligLineOk(line) {
+  const l = String(line || '');
+  const age = l.match(AGE_LABEL);
+  if (age && age[1].split(/[,，]/).filter((x) => /세/.test(x)).length >= 2) return false;
+  if (/개인정보/.test(l) && /유의|관리되|처리|수집|이용|동의/.test(l) && !/(?:대상|자격|요건)\s*[:：]/.test(l)) return false;
+  return true;
+}
+/** 이미 실린 활동 글의 자격 줄에 같은 거름을 다시 건다 — 비면 칸을 지운다 · 바뀌면 true (수집 로봇 발행 때 모든 글에 · 원칙 7 소급).
+    사람(관리자 표식)이 넣은 줄은 건드리지 않는다. */
+export function sanitizeElig(it) {
+  if (!it || /^관리자/.test(it.eligibilityFrom || '')) return false;
+  let changed = false;
+  for (const k of ['eligibilityLines', 'eligibilityExcludes']) {
+    if (!Array.isArray(it[k])) continue;
+    const kept = it[k].filter(eligLineOk);
+    if (kept.length === it[k].length) continue;
+    changed = true;
+    if (kept.length) it[k] = kept; else delete it[k];
+  }
+  if (changed && !(it.eligibilityLines && it.eligibilityLines.length)) { delete it.eligibilityFrom; delete it.eligibilityReviewed; }
+  return changed;
+}
+
 export function activityDetails(text, title) {
   const t = labelColon(String(text || ''));
   if (!t.trim()) return { eligibilityLines: [], eligibilityExcludes: [], eligibilityPriority: [], noticeLines: [] };
@@ -161,8 +191,8 @@ export function activityDetails(text, title) {
   if (!qual.length) qual = proseLines(body);
   if (!qual.length && body !== t) qual = proseLines(t);
   return {
-    eligibilityLines: noContact(qual),
-    eligibilityExcludes: noContact(extractExcludeLines(t)),
+    eligibilityLines: noContact(qual).filter(eligLineOk),
+    eligibilityExcludes: noContact(extractExcludeLines(t)).filter(eligLineOk),
     eligibilityPriority: noContact(extractPriorityLines(t)),
     noticeLines: noContact(extractFrom(t)).slice(0, 8),
   };
