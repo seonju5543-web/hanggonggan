@@ -16,6 +16,9 @@
         껍데기 줄 · 다른 공고 제목 줄 · 「이전글」 뒤 두 줄 · 날짜 줄 앞 줄을 걷는다 · 불러오기만 하면 파일을 쓰지 않는다
      ⑦ 포털 후보는 원문에서 이름을 찾는다 (app1-11): 예전엔 이미 아는 시스템(applyPortal)만 모아 새 시스템을 영영 못 찾았다(결과 0건) —
         신청을 말하는 원문 줄에서 이름 꼴을 읽고(출력·다운로드·문의 줄은 버림) · 학교 고유 이름 + 근거 2건만 표 후보 · 불러오기만 하면 안 쓴다
+     ⑧ 양식이 붙은 열린 공고 수 · 옛 양식 후보 (app1-03 ③ · app1-08 ①): 열린 공고 86건 중 학생이 앱에서 양식을 여는 것이 1건뿐이어도 리포트가 조용했다 —
+        양식 로봇이 매 실행 숫자를 싣고 0~1건이면 🚨 · 쓰지 않는 옛 양식 중 같은 사업으로 보이는 것을 **후보로만**(자동으로 잇지 않는다 · 개발자 결정) ·
+        **진짜 schematize-forms.mjs 를 임시 폴더에서 돌린다**
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말).
       로봇을 돌릴 때는 저장소 코드를 임시 폴더로 **복사**해 그 안의 표본만 읽고 쓴다(bodies.mjs sandbox). */
 import fs from 'node:fs';
@@ -354,5 +357,66 @@ export default async function qnotice(eq, ctx) {
     eq('  찾아 넣은 고유 이름은 앱 판정이 신청 시스템으로 읽는다 (결과 보는 줄은 아니다)',
       [judgePortalLine(TEXT.a)?.system, judgePortalLine('ㅇ 신청방법 : ON 국민 - 포털 - 학생서비스 - 장학정보 - 장학신청')?.system, judgePortalLine('다 . 선발확인 : KUPID 로그인 후 확인')?.ok],
       ['KUPID', 'ON 국민', false]);
+  }
+
+  /* ── ⑧ 양식이 붙은 열린 공고 수 · 옛 양식 후보 (app1-03 ③ · app1-08 ①) ── */
+  {
+    const T = '2026-10-05';
+    const NOW = Date.parse('2026-10-05T03:00:00Z');
+    const items = [
+      { id: 'a', name: '공통 2026년도 세종연구원 세종이도인재장학금 장학생 모집 안내', deadline: '2026-10-20' },
+      { id: 'b', name: '2026 미래 인재육성 장학생 선발 안내', deadline: '2026-10-20' },   // 붙여 쓰면 「미래인재」가 되지만 다른 사업
+      { id: 'c', name: '[빅데이터혁신융합대학사업단] 2026학년도 2학기 성과형 장학금(자격증) 신청 안내', listedAt: '2026-09-20' },   // 마감 모름 · 등록 60일 안
+      { id: 'd', name: '2026 AI 멘토 장학생 모집', deadline: '2026-10-30', formId: 'used-form' },
+      { id: 'e', name: '지난 회차 세종연구원 장학금 공고', deadline: '2026-09-01' },   // 마감 지남 — 세지 않는다
+      { id: 'f', name: '오래된 세종연구원 장학금 공고', listedAt: '2026-07-01' },       // 마감 모름 · 등록 60일 지남 — 앱도 숨긴다
+      { id: 'g', name: '경영경제전문도서관 국가근로장학생 추가 모집', deadline: '2026-10-20' },   // 근로장학은 학교마다 제 서식
+      { id: 'h', name: '없는 양식을 가리키는 공고', deadline: '2026-10-20', formId: 'gone-form' },
+    ];
+    const templates = {
+      'used-form': { title: 'AI 멘토 활동계획서' },
+      'sejong-ido-apply': { title: '세종연구원 장학금 지원 신청서 외 3종' },
+      'uos-cert': { title: '성과형 장학금(자격증) 신청서' },
+      'mirae-apply': { title: '(재)미래인재 장학금 신청서' },   // 「미래 인재육성」(b)과 붙여 쓴 글자로만 겹친다
+      'mju-workstudy': { title: '2026-2학기 학기중 교내 국가근로장학생 지원서' },
+      'ihanae': { title: '장 학 금 지 급 원 서' },
+    };
+    const FR = await import('../../collector/form-reach.mjs');
+    eq('⑧ 열린 공고 = 마감 전 · 마감 모름이면 등록 60일 안(앱과 같은 notStale) · 양식은 forms.json 에 실제로 있는 것만 센다',
+      FR.formReach(items, templates, T, NOW), { open: 6, withForm: 1, ids: ['d'] });
+    eq('  옛 양식 후보 — 사업 낱말이 공고 이름 낱말에 들어 있는 짝만 · 붙여 쓴 글자로는 안 잇는다 · 근로장학·이름 없는 서식은 안 잇는다 · 쓰는 양식·닫힌 공고는 빼고',
+      FR.oldFormCandidates(items, templates, T, NOW).map((c) => `${c.id}↔${c.formId}`), ['a↔sejong-ido-apply', 'c↔uos-cert']);
+    const rep = FR.formReachReport(items, templates, T, NOW, { apiOn: false }).join('\n');
+    const rep2 = FR.formReachReport(items.map((i) => (i.id === 'a' ? { ...i, formId: 'sejong-ido-apply' } : i)), templates, T, NOW).join('\n');
+    eq('  리포트 — 숫자 줄 · 0~1건이면 🚨 + 유료 변환 스위치 상태 · 후보는 「자동으로 잇지 않아요」와 함께 · 2건이면 🚨 없음',
+      [/### 📝 앱에서 바로 쓰는 양식 — 열린 공고 6건 중 1건/.test(rep), /🚨 \*\*양식이 붙은 열린 공고가 1건뿐이에요/.test(rep), /apiEnabled\)은 지금 꺼져 있어요/.test(rep),
+        /같은 사업의 옛 양식 후보 2건/.test(rep) && /자동으로 잇지 않아요/.test(rep), /열린 공고 6건 중 2건/.test(rep2) && !/🚨/.test(rep2)],
+      [true, true, true, true, true]);
+
+    /* 진짜 양식 로봇을 사본 저장소에서 — 할 일이 없는 날(대기열 비어 있음)에도 숫자 단락이 리포트에 실린다 */
+    const sb = sandbox(root, 'hdj-qnotice-reach-');
+    try {
+      sb.write('verify/entry-rules.cjs', fs.readFileSync(new URL('verify/entry-rules.cjs', root), 'utf8'));
+      const today = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+      const shift = (n) => new Date(Date.parse(today) + n * 86400000).toISOString().slice(0, 10);
+      sb.write('collector/schematize-config.json', { enabled: true, apiEnabled: false });
+      sb.write('collector/pending-forms.json', { items: [] });
+      sb.write('data/registered.json', { items: [
+        { id: 'r1', name: '2026 세종연구원 세종이도인재장학금 장학생 모집', deadline: shift(10) },
+        { id: 'r2', name: '2026 표본재단 장학생 모집', deadline: shift(10), formId: 'f-used' },
+        { id: 'r3', name: '지난 표본 장학 공고', deadline: shift(-10) },
+      ] });
+      sb.write('data/forms.json', { templates: { 'f-used': { title: '표본재단 장학금 신청서' }, 'sejong-ido-apply': { title: '세종연구원 장학금 지원 신청서 외 3종' } } });
+      sb.write('r.md', '');
+      const r = sb.run('collector/schematize-forms.mjs', ['r.md'], { ANTHROPIC_API_KEY: '' });
+      const out = sb.read('r.md') || '';
+      eq('  [양식 로봇 실행] 할 일 없는 날에도 숫자 단락 · 옛 양식 후보가 리포트에 실린다 (불러오기 실패 ⚠️ 없음)',
+        [r.status, /### 📝 앱에서 바로 쓰는 양식 — 열린 공고 2건 중 1건/.test(out), /`r1`[^\n]*↔ 양식 `sejong-ido-apply`/.test(out), /세지 못했어요/.test(out)],
+        [0, true, true, false]);
+    } finally { sb.done?.(); }
+    const sf = stripComments(fs.readFileSync(new URL('collector/schematize-forms.mjs', root), 'utf8'));
+    eq('  양식 로봇 배선 — form-reach.mjs 를 불러 쓰고(베끼지 않는다) · 마지막(finish)에 이번 실행 판으로 센다',
+      [/await import\('\.\/form-reach\.mjs'\)/.test(sf), /function finish\(\) \{[\s\S]*?formReachReport\(reachItems, reachTemplates/.test(sf), /reachTemplates = forms\.templates/.test(sf)],
+      [true, true, true]);
   }
 }
