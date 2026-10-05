@@ -24,10 +24,20 @@
       발행은 `collector/publish-majors.mjs` · 이름 규칙은 `match-engine.js majorsFileFor`.
    ============================================================ */
 import fs from 'node:fs';
-import { publishMajorsBySchool } from './publish-majors.mjs';
+import { createRequire } from 'node:module';
+import { publishMajorsBySchool, missingServed, campusNameSuspects } from './publish-majors.mjs';
+import { loadSchoolNames } from './school-names.mjs';
 
 const KEY = process.env.CAREERNET_API_KEY;
-if (!KEY) { console.error('CAREERNET_API_KEY가 없습니다 — 아무것도 하지 않고 종료합니다.'); process.exit(0); }
+/* 🔴 Actions 에서 열쇠가 없으면 빨간불이다 (2026-10-05 점검) — 옛 판은 어디서나 exit 0 이라 워크플로가 '변경 없음' 초록불로
+   끝났고, 시크릿이 실제로 있는지는 실행으로 한 번도 증명되지 않았다. 로컬 실행만 조용히 끝낸다. 열쇠 값은 찍지 않는다.
+   이 검사는 네트워크 호출보다 앞에 있어야 한다(관문이 열쇠 없이 이 파일을 실제로 돌려 본다). */
+if (!KEY) {
+  const ci = process.env.GITHUB_ACTIONS === 'true';
+  console.error(ci ? '::error::CAREERNET_API_KEY 가 없습니다 — 저장소 Secret 을 확인하세요 (학과 목록을 갱신하지 못했습니다)'
+    : 'CAREERNET_API_KEY가 없습니다 — 아무것도 하지 않고 종료합니다.');
+  process.exit(ci ? 1 : 0);
+}
 
 const HERE = new URL('.', import.meta.url);
 const OUT_PATH = new URL('../data/majors.json', HERE);
@@ -77,15 +87,25 @@ console.log(`학과 목록 ${uniq.length}건 — 상세를 하나씩 받습니�
 if (uniq.length < 100) { console.error('목록이 비정상적으로 적습니다 — 저장하지 않고 종료'); process.exit(1); }
 
 const bySchool = new Map();      // 학교명 → Set(학과명)
+/* 진단용 — (커리어넷 원래 학교 이름, campus_nm) 짝마다 학과 이름들. 분교가 무슨 이름·번호로 오는지 리포트에 남긴다
+   (2026-10-05 점검 · 연세 미래 학과 파일이 없는데 커리어넷 이름을 확인하지 못했다 — 짐작해 넣지 않고 증거를 모은다). */
+const byRawCampus = new Map();   // '원래이름\t캠퍼스' → Set(학과명)
+const squash = (s) => String(s).replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/\s+/g, ' ').trim();
 let done = 0, failed = 0;
 for (const seq of uniq) {
   try {
     const xml = await api({ svcCode: 'MAJOR_VIEW', majorSeq: seq });
     // 개설대학 블록: area → schoolURL → campus_nm → majorName → schoolName 순서로 온다(실측)
-    const blocks = xml.matchAll(/<campus_nm>[\s\S]*?<majorName>([\s\S]*?)<\/majorName>\s*<schoolName>([\s\S]*?)<\/schoolName>/g);
-    for (const [, majorRaw, schoolRaw] of blocks) {
+    // campus_nm 값도 잡는다(진단용) — 학과·학교 짝을 잡는 범위는 옛 정규식과 같다(campus_nm 여는 꼬리표부터 schoolName 까지)
+    const blocks = xml.matchAll(/<campus_nm>([\s\S]*?)<\/campus_nm>[\s\S]*?<majorName>([\s\S]*?)<\/majorName>\s*<schoolName>([\s\S]*?)<\/schoolName>/g);
+    for (const [, campusRaw, majorRaw, schoolRaw] of blocks) {
       const school = normalizeSchool(schoolRaw);
       const major = majorRaw.replace(/\s+/g, ' ').trim();
+      if (major) {
+        const k = `${squash(schoolRaw)}\t${squash(campusRaw)}`;
+        if (!byRawCampus.has(k)) byRawCampus.set(k, new Set());
+        byRawCampus.get(k).add(major);
+      }
       if (!school || !major) continue;
       if (!bySchool.has(school)) bySchool.set(school, new Set());
       bySchool.get(school).add(major);
@@ -119,6 +139,45 @@ const out = {
       .map(([k, v]) => [k, [...v].sort((a, b) => a.localeCompare(b, 'ko'))]),
   ),
 };
+
+/* ── 실행 진단 (2026-10-05 점검 · 리포트 + ::warning — 관문이 아니다) ── */
+const ME = createRequire(import.meta.url)('../match-engine.js');
+const names = loadSchoolNames(new URL('../data.js', HERE));
+const pairs = [...byRawCampus.entries()].map(([k, set]) => { const [school, campus] = k.split('\t'); return { school, campus, n: set.size }; });
+const suspects = campusNameSuspects(pairs, names.unis, { normalize: normalizeSchool, alias: names.alias });
+const appSchools = Object.keys(out.bySchool).length;
+const writeReport = (missing, skipped, verdict) => {
+  const md = [
+    `# 학과 목록 갱신 리포트 — ${out.updatedAt}`,
+    '',
+    `- 판정: ${verdict}`,
+    `- 커리어넷 학교 ${bySchool.size}곳 · 앱 학교 ${appSchools}곳 · 학과 목록 ${uniq.length}건 · 상세 실패 ${failed}건`,
+    '',
+    '## 서비스 학교인데 이번에 학과 파일을 못 만들었다',
+    '이 학교 학생은 학과 자동추천이 전국 공통 목록으로 물러난다(화면에는 아무 표시가 없다).',
+    ...(missing ? (missing.length ? missing.map((s) => `- ${s}`) : ['- 없음']) : ['- (저장하지 않아 재지 않음)']),
+    '',
+    '## 분교 이름 후보 (사람이 확인 — 이름을 짐작해 넣지 말 것)',
+    '원래 이름이 그 글자 그대로 분교면 collector/majors.mjs BRANCH_MAP 에 한 줄 · 캠퍼스 번호로 오면 근거 주석과 함께 번호 표를 둔다.',
+    ...(suspects.length ? suspects.map((s) => `- ${s}`) : ['- 없음']),
+    '',
+    '## 앱 이름으로 못 맞춰 건너뛴 이름',
+    ...(skipped && skipped.length ? skipped.map((s) => `- ${s}`) : ['- 없음']),
+    '',
+  ].join('\n');
+  fs.writeFileSync(new URL('majors-report.md', HERE), md);
+};
+for (const s of suspects) console.log(`분교 이름 후보: ${s}`);
+
+/* 저장 안전장치 둘째 — 정규식·응답 꼴이 바뀌어 학교 짝이 틀어지면 학과 목록 전체가 엉뚱해진다.
+   08-06판은 앱 학교 209곳이었다. 크게 모자라면 덮어쓰지 않는다(바닥값 — 실제로 줄었다면 사람이 확인하고 낮춘다). */
+const MIN_APP_SCHOOLS = 150;
+if (appSchools < MIN_APP_SCHOOLS) {
+  writeReport(null, null, `저장 안 함 — 앱 학교가 ${appSchools}곳뿐 (바닥 ${MIN_APP_SCHOOLS})`);
+  console.error(`::error::앱 학교가 ${appSchools}곳뿐입니다(바닥 ${MIN_APP_SCHOOLS}) — 응답 꼴이 바뀌었을 수 있어 저장하지 않습니다`);
+  process.exit(1);
+}
+
 fs.writeFileSync(OUT_PATH, JSON.stringify(out, null, 1) + '\n');
 /* 🔴 **앱이 받는 것은 이쪽이다** — 이 줄을 빼면 앱은 새 학과를 영영 못 본다(그리고 조용하다:
    파일이 없으면 전국 공통 목록으로 물러나므로 화면상 아무 일도 안 일어난 것처럼 보인다). */
@@ -126,3 +185,10 @@ const pub = publishMajorsBySchool(out.bySchool, { updatedAt: out.updatedAt });
 const majors = Object.values(out.bySchool).reduce((a, v) => a + v.length, 0);
 console.log(`저장 완료: 학교 ${bySchool.size}곳 · 학과 항목 ${majors}건 · 상세 실패 ${failed}건`);
 console.log(`  → data/majors.json (사람용) · data/majors/ 학교별 ${pub.schools}개 파일 (앱이 받는 것)`);
+/* 🔴 서비스 학교가 빠지면 소리를 낸다 — 관문이 아니라 경고다(실데이터를 관문에 두면 수집 로봇이 결과를 버린다) */
+/* 발행은 옛 파일을 지우지 않으므로 '이번에 못 만들었다'와 '파일이 아예 없다'를 갈라 적는다(확인한 것만 말한다) */
+const missing = missingServed(pub.published, ME.SERVED_SCHOOLS)
+  .map((s) => `${s} (${fs.existsSync(new URL(`../${ME.majorsFileFor(s)}`, HERE)) ? '이번에 못 만듦 · 옛 파일이 남아 있다' : '파일 없음 — 학생 화면은 전국 공통 목록'})`);
+for (const s of missing) console.log(`::warning::서비스 학교인데 이번 실행에서 학과 파일을 못 만들었다 — ${s}`);
+writeReport(missing, pub.skipped, missing.length ? `저장함 · 서비스 학교 ${missing.length}곳 학과 파일 못 만듦` : '저장함');
+console.log(`  → collector/majors-report.md (서비스 학교 빠짐 ${missing.length}곳 · 분교 이름 후보 ${suspects.length}줄)`);

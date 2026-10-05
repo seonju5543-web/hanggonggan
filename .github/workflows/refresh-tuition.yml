@@ -11,9 +11,13 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
+# 🔴 수집 로봇과 다른 대기줄 (2026-10-05 · 옛 판은 group: collector) — 같은 줄이면 이 로봇(최대 55분)이 기다리거나 도는 동안
+#    줄에 선 예약 수집·관리자 버튼 실행이 취소될 수 있다(GitHub 은 한 줄에 대기 실행을 하나만 남긴다). 이 로봇이 쓰는 파일
+#    (data/tuition.json)은 다른 로봇이 안 쓴다 · 저장 충돌은 아래 pull --rebase 재시도가 받는다.
 concurrency:
-  group: collector
+  group: refresh-tuition
   cancel-in-progress: false
 
 jobs:
@@ -24,10 +28,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # 🔴 대기줄(collector)에서 기다린 뒤에는 **지금 브랜치 끝**에서 시작한다 (2026-09-30).
-          #    기본값(GITHUB_SHA)은 큐에 들어간 시점에 굳어서, 앞 로봇이 저장한 커밋 위로 rebase 하다
-          #    규칙 없는 장부에서 충돌 → 3회 실패 → 그 실행의 수집분이 통째로 버려졌다(브라우저 19곳 17분치).
-          ref: ${{ github.ref_name }}
+          # 🔴 기본 브랜치의 **지금 끝**에서 시작하고 그 브랜치에만 저장한다 (kosaf-fetch 와 같은 꼴 · 2026-10-05).
+          #    기본값(GITHUB_SHA)은 실행이 생긴 시점에 굳어서 앞 로봇이 저장한 커밋 위로 rebase 하다 충돌할 수 있다(2026-09-30 사고) —
+          #    브랜치 이름으로 받으면 체크아웃 시점의 끝이다. 어느 브랜치에서 깨워도 읽는 곳과 저장하는 곳이 같다.
+          ref: claude/nice-heisenberg-WESq5
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -56,3 +60,11 @@ jobs:
             sleep 5
           done
           echo "::error::push 3회 실패"; exit 1
+
+      # 🔴 시간 초과는 '실패'가 아니라 '취소'라 둘 다 본다 (2026-08-04 사고) · 회복하면 하트비트가 닫는다.
+      - name: 🚨 로봇이 넘어졌다
+        if: failure() || cancelled()
+        uses: ./.github/actions/robot-down
+        with:
+          robot: 등록금 갱신
+          token: ${{ github.token }}

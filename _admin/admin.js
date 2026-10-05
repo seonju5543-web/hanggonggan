@@ -485,8 +485,10 @@ async function dispatchWorkflow(file, inputs) {
       (실측: collect-scholarships 30733839394·30733987559 가 작업 0개로 취소 · 그때는 실패 알림 단계도 안 돈다).
       그래서 줄에 기다리는 실행이 있으면 버튼이 보내지 않는다(2026-10-04 로봇·도구 점검 admin-F4).
    🔴 로봇이 이 줄에 새로 들어오면 여기에도 더한다 — 관문(로봇·도구 점검 관문 admin)이 워크플로 파일과 대조한다.
-   ⚠️ 줄 자체를 따로 떼지 않는다 — registered.json 은 병합 규칙이 없어 로봇과 동시에 저장하면 로봇 수집분이 버려진다. */
-const COLLECTOR_QUEUE = ['collect-scholarships.yml', 'browser-collect.yml', 'open-api.yml', 'refresh-majors.yml', 'refresh-tuition.yml', 'admin-apply.yml'];
+   ⚠️ 줄 자체를 따로 떼지 않는다 — registered.json 은 병합 규칙이 없어 로봇과 동시에 저장하면 로봇 수집분이 버려진다.
+   학과 목록·등록금 갱신(refresh-majors·refresh-tuition)은 2026-10-05 제 줄로 옮겼다 — registered.json 을 안 쓰고, 이 줄에서 55분씩
+   기다리는 동안 줄에 선 예약 수집·이 화면의 조정이 취소될 수 있었다(로봇·도구 점검 refresh QUEUE-01). */
+const COLLECTOR_QUEUE = ['collect-scholarships.yml', 'browser-collect.yml', 'open-api.yml', 'admin-apply.yml'];
 const runFile = (run) => String((run && run.path) || '').split('@')[0].split('/').pop();
 /* 아직 시작하지 않은 실행의 상태 — 줄 서기(동시 실행 제한)·러너 기다림·승인 기다림 */
 const RUN_WAITING = new Set(['queued', 'pending', 'waiting', 'requested']);
@@ -2696,7 +2698,7 @@ const ROBOTS = [
   { f: 'search-index.yml', n: '검색용 요약 만들기', d: '도우미가 읽을 공고별 낱말 요약을 다시 만듭니다', when: '매일 07:37' },
   { f: 'audit-coverage.yml', n: '공고 누락 감사', d: '게시판에 있는데 못 담은 공고가 있는지 대조합니다', when: '매주 월 06:23' },
   { f: 'refresh-tuition.yml', n: '등록금 갱신', d: '학교별·계열별 등록금을 다시 받습니다 (25분쯤 걸립니다)', when: '수동' },
-  { f: 'refresh-majors.yml', n: '학과 목록 갱신', d: '커리어넷에서 학교별 개설 학과를 다시 받습니다', when: '수동' },
+  { f: 'refresh-majors.yml', n: '학과 목록 갱신', d: '커리어넷에서 학교별 개설 학과를 다시 받습니다', when: '2·8월 20일 06:29' },
   { f: 'deploy-sync.yml', n: '배포 동기화', d: '지금 내용을 학생 앱으로 내보냅니다', when: '수집 후 자동' },
   { f: 'check-live.yml', n: '실제 앱 반영 확인', d: '학생 앱이 저장소와 같은지 대조합니다', when: '매일 13:11' },
   { f: 'verify-ui.yml', n: '앱 화면 검사', d: '학생 앱과 이 관리자 화면을 브라우저로 열어 검사합니다 (25분쯤)', when: '수동' },

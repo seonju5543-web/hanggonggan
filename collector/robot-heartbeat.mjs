@@ -255,8 +255,10 @@ export function mergeLastOk(got) {
 }
 /** 회복을 셀 실행 종류 (순수 함수) — 예약이 있는 워크플로는 **예약 실행의 성공만** 센다.
     수동 실행은 모의·부분 실행일 수 있다(링크 사냥꾼 dry · 인스타 댓글 reply · 원문 링크 확인 only/candidates) — 그 성공은 '다시 끝까지 돌았다'가 아니다(리뷰 2026-10-05).
-    예약이 없는 워크플로(push·수동만)는 거를 수 없어 모든 성공을 센다 — 닫는 글도 '성공한 실행이 있다'까지만 말한다. */
-export const successEventFor = (yml) => (cronsOf(yml).length ? 'schedule' : null);
+    예약이 없는 워크플로(push·수동만)는 거를 수 없어 모든 성공을 센다 — 닫는 글도 '성공한 실행이 있다'까지만 말한다.
+    ⚠️ 달 칸이 있는 예약(반년에 한 번 — 학과 목록 갱신 2·8월)만 있는 워크플로도 거르지 않는다(2026-10-05 · 묶음 refresh):
+       예약 성공만 세면 수동으로 고쳐 다시 돌려도 다음 2월·8월까지 경보가 열린 채 남는다 · 하트비트도 그런 예약은 판정하지 않는다(runsPerWeek null). */
+export const successEventFor = (yml) => (cronsOf(yml).some((c) => runsPerWeek(c) != null) ? 'schedule' : null);
 
 export function robotFilesByName(dir = WF_DIR) {
   const by = {};
