@@ -139,11 +139,13 @@ export default async function browser(eq, ctx) {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-browser-merge-'));
     try {
       const w = (n, body) => { const f = path.join(tmp, n); fs.writeFileSync(f, `${JSON.stringify(body, null, 1)}\n`); return f; };
-      const ours = w('ours.json', { A: { fails: 1, lastOk: '2026-10-01', browserFails: 3, browserWhy: '게시판을 열지 못함' } });
-      const theirs = w('theirs.json', { A: { fails: 0, lastOk: '2026-10-04', browserFails: 0 } });
+      /* 최근 성공(lastOk) 쪽 판이 브라우저 횟수는 더 크다 — 그 판을 통째로 고르면 3, 작은 쪽이면 1 */
+      const ours = w('ours.json', { A: { fails: 0, lastOk: '2026-10-04', browserFails: 3, browserWhy: '게시판을 열지 못함' }, B: { fails: 0, lastOk: '2026-10-04' } });
+      const theirs = w('theirs.json', { A: { fails: 1, lastOk: '2026-10-01', browserFails: 1 }, B: { fails: 0, lastOk: '2026-10-01', browserFails: 2 } });
       const r = spawnSync(process.execPath, [fileURLToPath(new URL('tools/merge-json-union.mjs', root)), w('base.json', {}), ours, theirs, 'collector/health.json'], { encoding: 'utf8' });
       const m = JSON.parse(fs.readFileSync(ours, 'utf8'));
-      eq('  병합기(health.json) — browserFails 도 작은 쪽', [r.status, m.A.fails, m.A.browserFails, m.A.lastOk], [0, 0, 0, '2026-10-04']);
+      eq('  병합기(health.json) — browserFails 도 작은 쪽 · 한쪽 판에만 있으면 그 값',
+        [r.status, m.A.fails, m.A.browserFails, m.A.lastOk, m.B.browserFails], [0, 0, 1, '2026-10-04', 2]);
     } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 
     /* 배선(글자) — 로봇이 규칙 한 곳을 부르고, 옛 판정 줄이 없고, 0건 날 알림이 있다 */
