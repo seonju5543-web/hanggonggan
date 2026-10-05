@@ -18,7 +18,7 @@ import { NEWS_BOARD_RULES, newsRuleKey, rowsForBoard, verifyRuleDetail, needsDet
 import { urlKey, dedupeNotices, rekeyLedger } from './url-key.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { activityKind } from './activity-kind.mjs';
-import { newsKind, isNewsRow, newsFloor, clearFuturePosted } from './news-kind.mjs';
+import { newsKind, isNewsRow, newsFloor, clearFuturePosted, pruneSeen, SEEN_KEEP_DAYS } from './news-kind.mjs';
 import { fetchBoard, netReason } from './fetch-board.mjs';
 import { publishBySchool, dropUnserved } from './publish-notices.mjs';
 import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from './harvest-budget.mjs';
@@ -86,6 +86,10 @@ const results = [];
 const freshAll = [];
 const postIdByUrl = new Map();   // 이번에 본 글의 주소 열쇠 → 글 번호 (10차 전에 실린 글에도 번호를 달아 준다 · 발행 때 씀)
 const srcByUrl = new Map();      // 이번에 본 글의 주소 열쇠 → 게시판 열쇠 (출처에서 뺀 게시판의 글을 발행 때 걷는다 · news-board-rules.mjs dropRetiredBoards)
+/* 장부 정리(pruneSeen)용 — 이번에 목록에서 다시 본 글의 열쇠(지우지 않는다) · 이번에 목록을 읽은 게시판(호스트·학교 — 그 게시판의 열쇠만 지운다) */
+const touched = new Set();
+const readOk = new Set();
+const hostOf = (u) => { try { return new URL(u).host; } catch { return ''; } };
 /* 학교 하나에 게시판이 둘일 수 있다 (2026-10-03 · 서울대 일반공지는 장학 글이 많아 소식 2건 · 고려 세종 3건 → 학사공지를 더한다).
    둘째 게시판은 출처 줄의 extraBoards[{ boardUrl, label, evidence }] — 학교 규칙(NEWS_BOARD_RULES[학교])은 **첫 게시판에만** 맞는다.
    둘째 게시판의 규칙 열쇠는 '학교#이름'(newsRuleKey · 서강 행사특강) · 규칙이 없으면 보통 날짜 줄로 읽는다. 그 게시판 글에는 board(이름)를 달아
@@ -132,6 +136,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
     /* 이미 본 글 — 주소 열쇠 또는 **게시판의 글 번호**(postId). 목록 표식(#n-제목) 주소는 제목을 다듬는 규칙이 바뀌면 달라져
        같은 글이 새 글로 다시 실렸다(경희 6건 두 번 · 리뷰 2026-10-02). 글 번호가 있으면 그것이 열쇠다. */
     const postKey = (i) => (i.postId ? `post:${s.school}:${i.postId}` : '');
+    for (const i of onSite) { touched.add(urlKey(i.url)); if (i.postId) touched.add(postKey(i)); }
     /* 이미 본 글에도 글 번호 장부를 채운다 (검증 2026-10-02: 10차 전에 본 글은 번호가 없어, 제목이 바뀌면 다시 두 번 실렸다).
        🔴 한 주소에 글 번호가 **하나뿐일 때만** 옮긴다 — 같은 제목의 글 둘(목록 표식 주소가 같다)이면 옛 장부가 어느 글 것인지 모른다(재검증 2026-10-02). */
     const idsByUrl = new Map();
@@ -175,6 +180,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
       freshAll.push(it);
     }
     if (ctx.dead) return;
+    if (onSite.length) { readOk.add(hostOf(s.boardUrl)); readOk.add(`post:${s.school}`); }   // 목록을 읽었다 — 이 게시판의 오래된 열쇠는 정리해도 된다
     results.push({
       name,
       status: items.length ? `✅ 정상 (공지 글 ${items.length}건 감지 · 새 글 ${fresh.length})`
@@ -223,7 +229,6 @@ for (const idx of order) {
 cursor.next = nextCursor(boards.length, cursor.next || 0, doneCount);
 cursor.updatedAt = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 16).replace('T', ' ');
 fs.writeFileSync(cursorPath, JSON.stringify(cursor, null, 1));
-fs.writeFileSync(seenPath, JSON.stringify(seen, null, 1));
 
 /* 발행 — 새 글 + 실려 있던 글 → 보관 기한 → 중복 → 서비스 학교 → 숨김 표식 → 최근 수집 순 → 학교별 파일 */
 const cutoff = new Date(Date.now() - NEWS_KEEP_DAYS * 86400000).toISOString().slice(0, 10);
@@ -267,6 +272,16 @@ const pub = publishBySchool(all, {
   }
 }
 
+/* 장부 저장 — 발행 뒤에 정리하고 쓴다 (2026-10-05 점검 news-13 · news-kind.mjs pruneSeen 한 곳).
+   지금 실린 글(바닥 4건으로 오래 남는 글 포함)과 이번에 목록에서 다시 본 글의 열쇠는 남긴다 — 지우면 그 글이 '새 글'로 다시 올라온다.
+   이번에 목록을 못 읽은 게시판의 열쇠는 지우지 않는다. 발행 중에 넘어지면 이번 장부가 안 남지만 다음 실행의 발행 중복 제거가 합친다. */
+for (const n of all) { touched.add(urlKey(n.url)); if (n.postId) touched.add(`post:${n.school}:${n.postId}`); }
+const seenPruned = pruneSeen(seen, todayStr(), {
+  keepDays: SEEN_KEEP_DAYS, keep: touched,
+  canDrop: (k) => (k.startsWith('post:') ? readOk.has(k.split(':').slice(0, 2).join(':')) : readOk.has(hostOf(k))),
+});
+fs.writeFileSync(seenPath, JSON.stringify(seen, null, 1));
+
 /* 연속 실패 감시 — 장학 수집기와 같은 규칙(3회 연속이면 주소가 바뀐 것). 장부는 제 것(news-health.json — health.json 은 prune-health 가 schools.json 이름으로 고아를 지운다) */
 const chronic = [];
 for (const r of results) {
@@ -288,6 +303,7 @@ const lines = [
   `## 🗞 교내 소식 수집 리포트 (${todayStr()})`, '',
   `새 글 **${freshAll.length}건** → 앱 홈 「우리 학교 소식」 (학교별 파일 data/news/ · ${pub.schools}개교 · 게시판 아는 학교 ${known}/${mains.length}${boards.length > mains.length ? ` · 둘째 게시판 ${boards.length - mains.length}곳` : ''})`, '',
 ];
+if (seenPruned) lines.push(`ℹ️ 소식 장부에서 ${SEEN_KEEP_DAYS}일 넘게 안 보인 글 열쇠 ${seenPruned}개를 정리했습니다 (collector/seen-news.json)`, '');
 if (futureCleared) lines.push(`ℹ️ 오늘보다 뒤인 게시일 ${futureCleared}건은 게시일이 아니라 비웠습니다 (제목 안 기한 날짜 등 · 수집일로 정렬)`, '');
 if (zeroSchools.length) lines.push(`### 🙋 소식이 0건인 학교 ${zeroSchools.length}곳 — 출처를 찾아야 합니다 (모든 학교는 소식이 있다)`, ...zeroSchools.map((n) => `- ${n}`), '');
 if (skippedByBudget.length) {

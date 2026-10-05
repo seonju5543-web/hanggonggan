@@ -79,6 +79,23 @@ export function clearFuturePosted(items, today) {
   return n;
 }
 
+/* 소식 장부(seen-news.json) 정리 (2026-10-05 점검 news-13) — 지우는 코드가 없어 하루 70~80 열쇠씩 자랐다(한 해면 약 3만 · 3MB · 하루 두 번 커밋·병합).
+   수집일(값 · KST)이 today − keepDays 보다 앞이고 keep 에 없는 열쇠만 지운다. 지운 개수를 돌려준다.
+   🔴 keepDays 는 게시일 상한(소식 로봇 NEWS_POSTED_MAX_DAYS 60)보다 길게 — 짧으면 아직 목록 첫 쪽에 있는 옛 글이 '새 글'로 다시 실린다.
+   keep: 지금 실린 글(newsFloor 로 오래 남는 글)·이번에 목록에서 다시 본 글의 열쇠 — 지우면 그 글이 새 글로 다시 올라온다.
+   canDrop(열쇠): 지워도 되는 열쇠인가 — 소식 로봇은 '이번에 목록을 읽은 게시판의 열쇠'만 허락한다(못 읽은 게시판의 날짜 없는 고정 글을 잊지 않게). */
+export const SEEN_KEEP_DAYS = 90;
+export function pruneSeen(seen, today, { keepDays = SEEN_KEEP_DAYS, keep = new Set(), canDrop = () => true } = {}) {
+  const cut = new Date(Date.parse(`${today}T00:00:00Z`) - keepDays * 86400000).toISOString().slice(0, 10);
+  let n = 0;
+  for (const [k, v] of Object.entries(seen || {})) {
+    if (typeof v !== 'string' || v >= cut || keep.has(k) || !canDrop(k)) continue;
+    delete seen[k];
+    n++;
+  }
+  return n;
+}
+
 /* 학교마다 가장 최근 소식 n 건 — 수집일·게시일 기한이 지나도 남긴다 (2026-10-03 개발자 지시 "소식이 0건인 학교는 없어").
    글이 드문 게시판(서강 공지사항: 6월 30일 뒤 새 글 없음)은 기한이 다 지나면 홈 첫 화면 띠가 비었다.
    🔴 오래된 고정 공지를 새로 데려오는 길이 아니다 — 수집 때 게시일 기한(60일)은 그대로라, 여기 남는 것은 **실렸던** 글뿐이다.

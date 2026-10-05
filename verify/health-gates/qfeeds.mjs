@@ -14,16 +14,19 @@
         새 글에 게시판 열쇠(src) · 이번에 본 글은 열쇠를 고쳐 단다 · 지금 출처에 없는 게시판의 글은 발행에서 뺀다(news-board-rules.mjs dropRetiredBoards) ·
         진짜 소식 로봇을 임시 폴더에서 예산 0(게시판을 안 두드린다)으로 돌려 발행만 잰다
      ⑥ 합격·선발 결과 글 (news-12): 「최종 합격자 알림」·「선발 결과 안내」·「선정 결과」·「최종 결과 발표」 6건이 소식으로 실렸다 — news-kind.mjs NOT_NEWS
+     ⑦ 소식 장부 정리 (news-13): seen-news.json 이 지우는 곳 없이 하루 70~80 열쇠씩 자랐다 — news-kind.mjs pruneSeen(90일 · 실린 글·다시 본 글 · 읽은 게시판만) ·
+        진짜 소식 로봇을 이 컴퓨터 안의 가짜 게시판(127.0.0.1)으로 돌려 ⑤ 의 열쇠 달기와 같이 잰다
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import http from 'node:http';
+import { spawnSync, spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { stripComments, cleanEnv } from './gate.mjs';
 import { sandbox } from './bodies.mjs';
-import { clearFuturePosted, newsFloor, isNewsRow } from '../../collector/news-kind.mjs';
+import { clearFuturePosted, newsFloor, isNewsRow, pruneSeen, SEEN_KEEP_DAYS } from '../../collector/news-kind.mjs';
 import { activityKind } from '../../collector/activity-kind.mjs';
 import { isAttachmentEntry } from '../../collector/attachment-link.mjs';
 import { dropReason as extDropReason, fillDeadlineFromHint, tidyExternal } from '../../collector/external-clean.mjs';
@@ -263,5 +266,59 @@ export default async function qfeeds(eq, ctx) {
     eq('  경기 일정 및 결과 · 검사 결과 안내 · 담화문은 싣는다 (결과 안내 전반을 막지 않는다)',
       ['[체육지원팀] 아이스하키부 경기 일정 및 결과 안내', '2026학년도 2학기 교직 적성 및 인성검사(1차) 결과 안내', '총장 담화문'].map(row), [true, true, true]);
     eq('  KEYWORDS 를 수집기 소스에서 읽었다(장학 그물)', K.test('국가장학금 신청'), true);
+  }
+
+  /* ── ⑦ 소식 장부 정리 ── */
+  {
+    const seen = { a: '2026-06-01', b: '2026-06-01', c: '2026-09-30', 'post:가대학교:1': '2026-06-01' };
+    const n = pruneSeen(seen, '2026-10-04', { keep: new Set(['b']), canDrop: (k) => !k.startsWith('post:') });
+    eq('⑦ 90일 넘게 지난 열쇠만 지운다 · 지금 실린 글/이번에 본 글(keep)·지울 수 없는 게시판의 열쇠(canDrop)는 남긴다',
+      [n, Object.keys(seen).sort()], [1, ['b', 'c', 'post:가대학교:1']]);
+    const postedMax = Number((newsSrc.match(/NEWS_POSTED_MAX_DAYS = Number\(process\.env\.NEWS_POSTED_MAX_DAYS \|\| (\d+)\)/) || [])[1]);
+    eq(`  장부 기한(${SEEN_KEEP_DAYS}일)은 게시일 상한(${postedMax}일)보다 길다 — 짧으면 목록 첫 쪽의 옛 글이 새 글로 다시 실린다`, SEEN_KEEP_DAYS > postedMax && postedMax > 0, true);
+    eq('  소식 로봇은 발행 뒤에 장부를 정리해 쓴다 (실린 글·이번에 본 글은 keep)',
+      before(newsSrc, 'publishBySchool(all', 'pruneSeen(seen, todayStr()') && before(newsSrc, 'pruneSeen(seen, todayStr()', 'fs.writeFileSync(seenPath') && /keep: touched/.test(newsSrc), true);
+
+    /* 진짜 소식 로봇을 임시 폴더에서 — 이 컴퓨터 안의 가짜 게시판(127.0.0.1)만 읽는다(학교 사이트를 두드리지 않는다).
+       ⑤ 의 새 글 열쇠 · 다시 본 글의 열쇠 고쳐 달기와 ⑦ 의 장부 정리(읽은 게시판의 열쇠만)를 한 번에 잰다 */
+    const kst = (d = 0) => new Date(Date.now() + 9 * 3600000 - d * 86400000).toISOString().slice(0, 10);
+    const dot = (d) => kst(d).replace(/-/g, '.');
+    const rows = [[11, '2학기 수강신청 정정 안내', 1], [12, '도서관 열람실 운영시간 변경 안내', 2], [13, '기숙사 동계 입사 일정 안내', 3]];
+    const html = `<html><body><ul class="board">${rows.map(([no, t, d]) => `<li><a href="/view?no=${no}">${t}</a> <span class="date">${dot(d)}</span></li>`).join('')}</ul></body></html>`;
+    const srv = http.createServer((q, r) => { r.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); r.end(/^\/notice\/list/.test(q.url) ? html : '<html></html>'); });
+    await new Promise((res) => srv.listen(0, '127.0.0.1', res));
+    const base = `http://127.0.0.1:${srv.address().port}`;
+    const sb = sandbox(root, 'hdj-qfeeds-news2-');
+    try {
+      const SCHOOL = '서울대학교';
+      const key = require('../../match-engine.js').noticeFileKey(SCHOOL);
+      const BOARD = `${base}/notice/list`;
+      const OLD = `${base}/photo/list`;
+      sb.write('collector/news-sources.json', { sources: [{ school: SCHOOL, campus: '', boardUrl: BOARD }] });
+      sb.write('collector/news-config.json', {});
+      sb.write('collector/seen-news.json', {
+        [`${base}/view?no=11`]: '2026-01-01', [`${base}/old?no=1`]: '2026-01-01', 'https://other.example.ac.kr/x?no=9': '2026-01-01', [`post:${SCHOOL}:77`]: '2026-01-01',
+      });
+      sb.write(`data/news/${key}.json`, { school: SCHOOL, updatedAt: kst(1), items: [
+        { school: SCHOOL, campus: '', url: `${base}/view?no=11`, title: '2학기 수강신청 정정 안내', src: boardKey(OLD), foundAt: kst(1) },
+        { school: SCHOOL, campus: '', url: `${base}/view?no=5`, title: '포토뉴스 합동소방훈련 실시', src: boardKey(OLD), foundAt: kst(1) },
+      ] });
+      const r = await new Promise((res) => {
+        const p = spawn(process.execPath, [sb.abs('collector/collect-news.mjs')], { cwd: sb.dir, env: cleanEnv({ NEWS_BUDGET_MS: '60000', NEWS_BOARD_HARD_MS: '20000' }) });
+        let out = '';
+        p.stdout.on('data', (d) => { out += d; }); p.stderr.on('data', (d) => { out += d; });
+        const t = setTimeout(() => p.kill('SIGKILL'), 40000);
+        p.on('close', (code) => { clearTimeout(t); res({ status: code, out }); });
+      });
+      const doc = sb.json(`data/news/${key}.json`);
+      const items = (doc?.items || []).map((n) => [n.url.replace(base, ''), n.src === boardKey(BOARD)]).sort();
+      const led = sb.json('collector/seen-news.json') || {};
+      eq('  [소식 로봇 · 가짜 게시판] 새 글 둘에 지금 게시판 열쇠 · 다시 본 글은 열쇠를 고쳐 달고 남고 · 뺀 게시판 글은 빠진다',
+        [r.status, items], [0, [['/view?no=11', true], ['/view?no=12', true], ['/view?no=13', true]]]);
+      eq('  [소식 로봇 · 가짜 게시판] 장부 — 읽은 게시판의 오래된 열쇠(주소·글 번호)만 지우고 못 읽은 게시판의 열쇠·다시 본 글의 열쇠는 남긴다',
+        [`${base}/old?no=1` in led, `post:${SCHOOL}:77` in led, 'https://other.example.ac.kr/x?no=9' in led, `${base}/view?no=11` in led, `${base}/view?no=12` in led],
+        [false, false, true, true, true]);
+      if (r.status !== 0) console.log(r.out.slice(-1200));
+    } finally { sb.done(); srv.close(); }
   }
 }
