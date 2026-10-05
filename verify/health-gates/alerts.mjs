@@ -77,8 +77,16 @@ export function actionBeforeCheckout(yml) {
 }
 
 const REACH = /uses:\s*\.\/\.github\/actions\/(?:robot-down|alert-issue)\b|tools\/alert-issue\.mjs|gh issue (?:create|comment)\b|issues\.(?:create|createComment)\(/;
-const onFailure = (cond) => /\b(?:failure|cancelled)\(\)/.test(String(cond || '').replace(/!\s*(?:failure|cancelled)\(\)/g, ''));
-/** S3 — `if:` 에 failure()·cancelled() 가 있는데 사람에게 닿지 않는 단계(같은 조건의 뒤 단계가 대신 닿으면 통과) */
+/** 조건이 반응하는 실패 갈래 — failure()·cancelled() 중 무엇이 들어 있나(`!cancelled()` 처럼 부정한 것은 뺀다) */
+export const failKinds = (cond) => {
+  const c = String(cond || '').replace(/!\s*(?:failure|cancelled)\(\)/g, '');
+  return ['failure', 'cancelled'].filter((k) => new RegExp(`\\b${k}\\(\\)`).test(c));
+};
+const onFailure = (cond) => failKinds(cond).length > 0;
+/** S3 — `if:` 에 failure()·cancelled() 가 있는데 사람에게 닿지 않는 단계.
+    같은 job 의 **뒤** 단계 가운데 그 갈래를 모두 덮는 단계(failure() 면 failure(), cancelled() 면 cancelled() 를 보는 단계)가
+    사람에게 닿으면 통과 — 실패 때만 결과물을 올리는 단계(2026-10-04 기본 브랜치 '못 넣은 수집분 보관' · if: failure())처럼
+    알림이 아닌 실패 단계가 있다. 조건 글자가 같을 것까지 요구하면 그런 단계가 들어오는 순간 관문이 헛빨간불을 낸다. */
 export function silentFailureSteps(yml) {
   const bad = [];
   for (const j of jobsOf(yml)) {
@@ -86,7 +94,8 @@ export function silentFailureSteps(yml) {
     steps.forEach((s, k) => {
       if (!onFailure(s.if)) return;
       if (REACH.test(s.raw)) return;
-      if (steps.slice(k + 1).some((t) => t.if === s.if && REACH.test(t.raw))) return;
+      const need = failKinds(s.if);
+      if (steps.slice(k + 1).some((t) => REACH.test(t.raw) && need.every((x) => failKinds(t.if).includes(x)))) return;
       bad.push(`${j.name}: ${s.name || s.id || s.uses || '(이름 없음)'}`);
     });
   }
@@ -256,6 +265,14 @@ export default async function gate(eq, ctx) {
       silentFailureSteps("jobs:\n  a:\n    steps:\n      - name: s\n        if: failure()\n        run: echo x\n      - name: t\n        if: failure()\n        uses: ./.github/actions/alert-issue\n"),
       silentFailureSteps("jobs:\n  a:\n    steps:\n      - name: s\n        if: ${{ !cancelled() }}\n        run: echo x\n")],
     [['a: s'], [], []]);
+  /* 실패 때만 결과물을 올리는 단계(알림이 아님) 뒤에 더 넓은 조건의 넘어짐 알림이 있으면 통과 — 2026-10-04 기본 브랜치 수집 로봇 둘이
+     '못 넣은 수집분 보관'(if: failure() · upload-artifact)을 더했다. 조건 글자가 같을 것까지 요구하면 합치는 순간 모든 로봇의 데이터 관문이 빨개진다.
+     반대로 뒤 알림이 cancelled() 를 안 보면(시간 초과) 그 갈래는 여전히 잡는다 · 알림이 **앞**에 있으면 안 닿는다(실패 뒤에 안 돈다). */
+  eq('  S3 표본 — 실패 때만 결과물 올리기 + 뒤의 넓은 넘어짐 알림 → 통과 · 뒤 알림이 cancelled() 를 안 덮음 → 잡는다 · 알림이 앞에 있음 → 잡는다',
+    [silentFailureSteps("jobs:\n  collect:\n    steps:\n      - name: 못 넣은 수집분 보관 (저장 실패 때만)\n        if: failure()\n        uses: actions/upload-artifact@v4\n      - name: 리포트\n        if: github.event_name == 'workflow_dispatch'\n        run: gh issue create --title r\n      - name: 🚨 로봇이 넘어졌다\n        if: failure() || cancelled()\n        uses: ./.github/actions/robot-down\n"),
+      silentFailureSteps("jobs:\n  a:\n    steps:\n      - name: s\n        if: ${{ failure() || cancelled() }}\n        run: echo x >> \"$GITHUB_STEP_SUMMARY\"\n      - name: t\n        if: failure()\n        uses: ./.github/actions/robot-down\n"),
+      silentFailureSteps("jobs:\n  a:\n    steps:\n      - name: t\n        if: failure() || cancelled()\n        uses: ./.github/actions/robot-down\n      - name: s\n        if: failure()\n        run: echo x\n")],
+    [[], ['a: s'], ['a: s']]);
   eq('  S3 모든 워크플로 — failure()·cancelled() 단계는 이슈(robot-down·alert-issue·gh issue·issues.create)로 사람에게 닿는다(요약 한 줄·::warning 만이면 실패)',
     wfs.flatMap((f) => silentFailureSteps(wf(f)).map((s) => `${f} ${s}`)), []);
   eq('  S4 경보를 여는 워크플로는 이슈 쓰기 권한(issues: write)을 적어 둔다 — 없으면 경보가 403 으로 넘어진다',
