@@ -21,8 +21,9 @@
      `.github/actions/robot-down` 은 열기·댓글만 하고 닫는 길이 없었다 — 22분 뒤 같은 로봇이 성공했는데도
      「🚨 로봇이 넘어졌어요」(#386)가 열린 채 남았다. 워크플로 아홉 곳마다 '성공하면 닫기' 단계를 붙이는 대신
      여기서 한 번에 본다: 워크플로 파일에서 robot-down 의 robot 이름을 읽고(robotNamesOf), 그 워크플로의
-     마지막 성공 실행이 **경보를 낸 실행보다 뒤에 시작됐을 때만** 닫는다(robotDownVerdicts).
-     🔴 못 읽음을 괜찮음으로 읽지 않는다 — 성공 기록·댓글을 못 읽으면 닫지 않는다.
+     마지막 성공 실행이 **경보 뒤에 시작했거나, 경보를 낸 실행보다 뒤에 생겨 경보 뒤에 끝났을 때만** 닫는다(robotDownVerdicts).
+     예약이 있는 워크플로는 **예약 실행의 성공만** 센다(successEventFor — 수동 실행은 모의·부분 실행일 수 있다 · 2026-10-05 리뷰).
+     🔴 못 읽음을 괜찮음으로 읽지 않는다 — 성공 기록·댓글을 못 읽으면 닫지 않는다(mergeLastOk).
 
    실행:  node collector/robot-heartbeat.mjs            (사람이 눈으로)
           node collector/robot-heartbeat.mjs --json     (워크플로가 읽는 형태)
@@ -122,17 +123,20 @@ export function scheduledWorkflows(dir = WF_DIR) {
     .filter((w) => w.crons.length);
 }
 
-async function lastSuccessAt(repo, file, token) {
+async function lastSuccessAt(repo, file, token, event = null) {
   const url = `https://api.github.com/repos/${repo}/actions/workflows/${file}/runs`
-    + '?status=success&per_page=1';
+    + '?status=success&per_page=1' + (event ? `&event=${encodeURIComponent(event)}` : '');
   const r = await fetch(url, {
     headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' },
   });
   if (!r.ok) return { error: `${r.status}` };
   const j = await r.json();
   const run = (j.workflow_runs || [])[0];
-  /* runId·startedAt 은 넘어짐 경보 닫기(--close-recovered)가 쓴다 — 경보를 낸 실행보다 뒤에 시작한 성공인가 */
-  return run ? { at: run.updated_at || run.created_at, runId: run.id || null, startedAt: run.run_started_at || run.created_at || null } : { at: null };
+  /* runId·startedAt·endedAt·event 는 넘어짐 경보 닫기(--close-recovered)가 쓴다 — 경보 뒤에 시작했거나 경보 뒤에 끝난 성공인가 */
+  return run ? {
+    at: run.updated_at || run.created_at, runId: run.id || null, startedAt: run.run_started_at || run.created_at || null,
+    endedAt: run.updated_at || null, event: run.event || null,
+  } : { at: null };
 }
 
 /* 🔴 **경보 전에 한 번 더 다른 길로 묻는다** (2026-09-30).
@@ -208,8 +212,10 @@ export function lastRunIdIn(text) {
 /** 열린 넘어짐 경보마다 닫을지(close) 둘지(keep) 정한다 (순수 함수)
     issues: [{ number, title, createdAt, lastBotCommentAt?, lastAlertRunId? }]
     okByRobot: { 로봇 이름: { runId, startedAt } | null }  — 그 로봇 워크플로의 마지막 성공 실행 (못 읽으면 null)
-    닫는 조건(둘 중 하나): ① 성공 실행 번호가 경보를 낸 실행 번호보다 크다(뒤에 시작된 실행)
+    닫는 조건(둘 중 하나): ① 성공 실행 번호가 경보를 낸 실행 번호보다 크고(뒤에 생긴 실행) **그 성공이 마지막 경보보다 뒤에 끝났다**
                           ② 성공 실행이 시작한 시각이 마지막 경보(이슈 생성·봇 댓글 중 늦은 것)보다 늦다
+    🔴 ① 의 '뒤에 끝났다'(리뷰 2026-10-05) — 대기줄 없는 워크플로에서 수동·예약 실행이 겹치면 번호가 큰 실행이 경보를 낸 실행이
+       넘어지기 **전에** 이미 성공으로 끝날 수 있다. 그 성공은 넘어진 뒤의 회복이 아니다(끝난 시각을 모르면 닫지 않는다).
     🔴 경보를 낸 바로 그 실행이 초록으로 끝난 경우(단계 실패를 continue-on-error 로 넘김)는 닫지 않는다 —
        번호가 같고 시작이 경보보다 앞이다. 성공 뒤에 다시 넘어져 봇 댓글이 달렸으면 그 댓글이 기준이다. */
 export function robotDownVerdicts(issues, okByRobot = {}) {
@@ -222,14 +228,34 @@ export function robotDownVerdicts(issues, okByRobot = {}) {
     const alertAt = Math.max(Date.parse(i.createdAt) || 0, Date.parse(i.lastBotCommentAt) || 0);
     if (!ok || (!ok.runId && !ok.startedAt)) { out.push({ number: i.number, robot, verdict: 'keep', why: '마지막 성공을 못 읽음' }); continue; }
     if (!alertAt) { out.push({ number: i.number, robot, verdict: 'keep', why: '경보 시각을 못 읽음' }); continue; }
-    const byRun = !!(ok.runId && i.lastAlertRunId && Number(ok.runId) > Number(i.lastAlertRunId));
+    const byRun = !!(ok.runId && i.lastAlertRunId && Number(ok.runId) > Number(i.lastAlertRunId)
+      && ok.endedAt && Date.parse(ok.endedAt) > alertAt);
     const byTime = !!(ok.startedAt && Date.parse(ok.startedAt) > alertAt);
     out.push(byRun || byTime
-      ? { number: i.number, robot, verdict: 'close', why: byRun ? '경보 뒤에 시작한 실행이 성공' : '경보 뒤에 시작해 성공', ok }
+      ? { number: i.number, robot, verdict: 'close', why: byTime ? '경보 뒤에 시작해 성공' : '경보를 낸 실행보다 뒤에 생긴 실행이 경보 뒤에 성공으로 끝남', ok }
       : { number: i.number, robot, verdict: 'keep', why: '경보 뒤 성공이 아직 없음' });
   }
   return out;
 }
+
+/** 같은 로봇 이름을 쓰는 워크플로 파일들의 마지막 성공을 하나로 (순수 함수)
+    🔴 하나라도 못 읽거나(오류·성공 기록 없음) 비었으면 **모름(null)** — 못 읽음을 괜찮음으로 읽지 않는다.
+    여럿이면 가장 오래된 것(어느 파일이 넘어졌는지 모르므로 보수적으로) · 예약 실행만 봤는지(event)도 넘긴다. */
+export function mergeLastOk(got) {
+  const list = got || [];
+  if (!list.length || list.some((g) => !g || g.error || !g.runId)) return null;
+  const earliest = (k) => list.map((g) => g[k]).filter(Boolean).sort()[0] || null;
+  return {
+    runId: Math.min(...list.map((g) => Number(g.runId))),
+    startedAt: earliest('startedAt'),
+    endedAt: list.some((g) => !g.endedAt) ? null : earliest('endedAt'),
+    scheduledOnly: list.every((g) => g.event === 'schedule'),
+  };
+}
+/** 회복을 셀 실행 종류 (순수 함수) — 예약이 있는 워크플로는 **예약 실행의 성공만** 센다.
+    수동 실행은 모의·부분 실행일 수 있다(링크 사냥꾼 dry · 인스타 댓글 reply · 원문 링크 확인 only/candidates) — 그 성공은 '다시 끝까지 돌았다'가 아니다(리뷰 2026-10-05).
+    예약이 없는 워크플로(push·수동만)는 거를 수 없어 모든 성공을 센다 — 닫는 글도 '성공한 실행이 있다'까지만 말한다. */
+export const successEventFor = (yml) => (cronsOf(yml).length ? 'schedule' : null);
 
 export function robotFilesByName(dir = WF_DIR) {
   const by = {};
@@ -251,11 +277,11 @@ async function closeRecovered(repo, token) {
     if (!fl || !fl.length) { okByRobot[robot] = null; continue; }   // 워크플로에서 그 이름을 못 찾음 — 모름
     /* 같은 이름이 여러 파일에 있으면 **가장 오래된 성공**으로 — 어느 파일이 넘어졌는지 모르므로 보수적으로 */
     const got = [];
-    for (const f of fl) got.push(await lastSuccessAt(repo, f, token).catch((e) => ({ error: e.message })));
-    okByRobot[robot] = got.some((g) => g.error || !g.runId) ? null : {
-      runId: Math.min(...got.map((g) => Number(g.runId))),
-      startedAt: got.map((g) => g.startedAt).filter(Boolean).sort()[0] || null,
-    };
+    for (const f of fl) {
+      const ev = successEventFor(fs.readFileSync(path.join(WF_DIR, f), 'utf8'));
+      got.push(await lastSuccessAt(repo, f, token, ev).catch((e) => ({ error: e.message })));
+    }
+    okByRobot[robot] = mergeLastOk(got);
   }
   const issues = [];
   for (const i of downs) {
@@ -269,7 +295,9 @@ async function closeRecovered(repo, token) {
     if (v.verdict !== 'close') { console.log(`· 그대로 둠 #${v.number} ${v.robot} — ${v.why}`); continue; }
     const runUrl = `https://github.com/${repo}/actions/runs/${v.ok.runId}`;
     try {
-      await api.close(v.number, `✅ ${kstStamp()} KST — **${v.robot}** 이 다시 끝까지 돌았습니다(${v.why} · ${runUrl}). 넘어짐 경보를 닫습니다. 다시 넘어지면 새로 알립니다. (로봇 하트비트 · 자동)`, 'completed');
+      /* 확인한 것만 적는다 — 예약 실행의 성공이면 '예약 실행이 끝까지 돌았다', 거를 수 없던 워크플로면 '성공한 실행이 있다'까지만 */
+      const what = v.ok.scheduledOnly ? '예약 실행이 경보 뒤에 끝까지 돌았습니다' : '경보 뒤에 성공한 실행이 있습니다(모의·부분 실행일 수도 있습니다)';
+      await api.close(v.number, `✅ ${kstStamp()} KST — **${v.robot}** — ${what}(${v.why} · ${runUrl}). 넘어짐 경보를 닫습니다. 다시 넘어지면 새로 알립니다. (로봇 하트비트 · 자동)`, 'completed');
       console.log(`✅ 닫음 #${v.number} ${v.robot}`);
     } catch (e) { console.log(`· #${v.number} 를 닫지 못했습니다 — ${e.message}`); }
   }

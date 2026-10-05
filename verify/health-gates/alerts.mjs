@@ -18,7 +18,7 @@ import { createRequire } from 'node:module';
 import { stepsOf } from './ci.mjs';
 import { planAlert, runAlert, titleMatches, fitBody, BODY_LIMIT } from '../../tools/alert-issue.mjs';
 import { pickToClose, REPORT_RULES } from '../../tools/report-retention.mjs';
-import { robotNamesOf, robotDownVerdicts, lastRunIdIn, ROBOT_DOWN_PREFIX } from '../../collector/robot-heartbeat.mjs';
+import { robotNamesOf, robotDownVerdicts, lastRunIdIn, mergeLastOk, successEventFor, ROBOT_DOWN_PREFIX } from '../../collector/robot-heartbeat.mjs';
 import { codesIn, liveCodes, closableReadyIssues } from '../../insta/ready-issues.mjs';
 
 const require = createRequire(import.meta.url);
@@ -294,14 +294,37 @@ export default async function gate(eq, ctx) {
   const T = `${ROBOT_DOWN_PREFIX}원문 링크 복구 로봇`;
   const iss = (o) => ({ number: 386, title: T, createdAt: '2026-10-03T17:36:00Z', lastBotCommentAt: null, lastAlertRunId: 37141082198, ...o });
   const v = (o, ok) => robotDownVerdicts([iss(o)], { '원문 링크 복구 로봇': ok })[0].verdict;
-  eq('  경보 17:36 → 17:40 에 시작한 실행이 17:58 성공 → 닫는다(#386)', v({}, { runId: 37141332557, startedAt: '2026-10-03T17:40:00Z' }), 'close');
+  eq('  경보 17:36 → 17:40 에 시작한 실행이 17:58 성공 → 닫는다(#386)', v({}, { runId: 37141332557, startedAt: '2026-10-03T17:40:00Z', endedAt: '2026-10-03T17:58:00Z' }), 'close');
   eq('  성공이 경보보다 앞(17:00 시작) → 둔다', v({}, { runId: 37141000000, startedAt: '2026-10-03T17:00:00Z' }), 'keep');
   eq('  성공 뒤 17:59 에 다시 넘어진 봇 댓글 → 둔다', v({ lastBotCommentAt: '2026-10-03T17:59:00Z', lastAlertRunId: 37141399999 }, { runId: 37141332557, startedAt: '2026-10-03T17:40:00Z' }), 'keep');
   eq('  성공 정보를 못 읽음 → 둔다(못 읽음을 괜찮음으로 읽지 않는다)', [v({}, null), v({}, { runId: null, startedAt: null })], ['keep', 'keep']);
   eq('  경보를 낸 **바로 그 실행**이 초록으로 끝난 것(단계 실패를 넘김)은 닫지 않는다',
     v({ createdAt: '2026-10-03T17:50:00Z', lastAlertRunId: 37141332557 }, { runId: 37141332557, startedAt: '2026-10-03T17:40:00Z' }), 'keep');
-  eq('  경보 뒤에 생긴 실행(번호가 더 큼)이 성공 — 취소된 앞 실행의 헛경보도 닫는다', v({ createdAt: '2026-10-03T17:41:00Z' }, { runId: 37141332557, startedAt: '2026-10-03T17:40:00Z' }), 'close');
+  eq('  경보 뒤에 생긴 실행(번호가 더 큼)이 경보 뒤에 성공으로 끝남 — 취소된 앞 실행의 헛경보도 닫는다', v({ createdAt: '2026-10-03T17:41:00Z' }, { runId: 37141332557, startedAt: '2026-10-03T17:40:00Z', endedAt: '2026-10-03T17:58:00Z' }), 'close');
+  /* 리뷰 2026-10-05 — 번호가 크기만 하면 닫던 판: 경보 10:00(실행 100) · 실행 150 이 09:00 시작 09:30 성공(넘어지기 전에 이미 끝남) → 닫았다 */
+  eq('  번호가 더 큰 성공이라도 경보 **전에** 끝났으면 둔다(대기줄 없는 워크플로의 겹친 실행) · 끝난 시각을 모르면 둔다',
+    [v({ createdAt: '2026-10-03T10:00:00Z', lastAlertRunId: 100 }, { runId: 150, startedAt: '2026-10-03T09:00:00Z', endedAt: '2026-10-03T09:30:00Z' }),
+      v({ createdAt: '2026-10-03T10:00:00Z', lastAlertRunId: 100 }, { runId: 150, startedAt: '2026-10-03T09:00:00Z' }),
+      v({ createdAt: '2026-10-03T10:00:00Z', lastAlertRunId: 100 }, { runId: 150, startedAt: '2026-10-03T09:00:00Z', endedAt: '2026-10-03T10:20:00Z' })],
+    ['keep', 'keep', 'close']);
+  /* 같은 로봇 이름을 쓰는 파일 여럿의 성공을 하나로 — 하나라도 못 읽으면 모름(null) · 가장 오래된 것 · 예약 실행만 봤는가 */
+  const okA = { runId: 300, startedAt: '2026-10-03T03:00:00Z', endedAt: '2026-10-03T03:10:00Z', event: 'schedule' };
+  const okB = { runId: 200, startedAt: '2026-10-03T02:00:00Z', endedAt: '2026-10-03T02:30:00Z', event: 'schedule' };
+  eq('  mergeLastOk — 하나라도 못 읽음(오류·성공 기록 없음)·빈 목록은 모름 · 둘 다 읽으면 가장 오래된 성공 · 예약 실행만이면 그렇다고 적는다',
+    [mergeLastOk([okA, { error: '502' }]), mergeLastOk([okA, { at: null }]), mergeLastOk([]), mergeLastOk([okA, okB]), mergeLastOk([okA, { ...okB, event: 'push' }]).scheduledOnly, mergeLastOk([okA, { ...okB, endedAt: null }]).endedAt],
+    [null, null, null, { runId: 200, startedAt: '2026-10-03T02:00:00Z', endedAt: '2026-10-03T02:30:00Z', scheduledOnly: true }, false, null]);
+  eq('  successEventFor — 예약이 있는 워크플로는 예약 실행의 성공만 센다(수동 실행은 모의·부분일 수 있다) · 예약이 없으면 거르지 않는다',
+    [successEventFor("on:\n  schedule:\n    - cron: '17 3 * * *'\n  workflow_dispatch:\n"), successEventFor('on:\n  push:\n  workflow_dispatch:\n')], ['schedule', null]);
   eq('  넘어짐 경보가 아닌 이슈는 판정하지 않는다', robotDownVerdicts([{ number: 1, title: '🚨 앱 반영 점검 실패', createdAt: '2026-10-01T00:00:00Z' }], {}), []);
+  {
+    /* 실제로 묶는 곳 — 닫기 실행부가 예약 실행만 묻고(successEventFor → event=…) 여러 파일의 답을 mergeLastOk 하나로 합친다(손으로 다시 짜지 않는다) */
+    const hb = fs.readFileSync(new URL('collector/robot-heartbeat.mjs', root), 'utf8');
+    const cr = hb.slice(hb.indexOf('async function closeRecovered('), hb.indexOf('async function main('));
+    eq('  닫기 실행부 — 예약 실행만 묻고(event) · 답은 mergeLastOk 로 합치고 · 닫는 글은 확인한 만큼만(예약 실행 / 성공한 실행이 있다)',
+      [/const ev = successEventFor\(/.test(cr), /await lastSuccessAt\(repo, f, token, ev\)/.test(cr), /okByRobot\[robot\] = mergeLastOk\(got\);/.test(cr),
+        /'\?status=success&per_page=1' \+ \(event \? `&event=\$\{encodeURIComponent\(event\)\}` : ''\)/.test(hb), /v\.ok\.scheduledOnly \?/.test(cr)],
+      [true, true, true, true, true]);
+  }
   const hbYml = wf('robot-heartbeat.yml');
   const closeStep = stepsOf(hbYml).find((s) => /--close-recovered/.test(s.run || ''));
   eqWf('  하트비트 워크플로가 닫기 단계를 돌린다(보강 — 시한 · 실패해도 판정은 그대로)', closeStep ? [closeStep['timeout-minutes'], closeStep['continue-on-error']] : null, ['2', 'true']);
