@@ -16,6 +16,7 @@
      ⑥ 합격·선발 결과 글 (news-12): 「최종 합격자 알림」·「선발 결과 안내」·「선정 결과」·「최종 결과 발표」 6건이 소식으로 실렸다 — news-kind.mjs NOT_NEWS
      ⑦ 소식 장부 정리 (news-13): seen-news.json 이 지우는 곳 없이 하루 70~80 열쇠씩 자랐다 — news-kind.mjs pruneSeen(90일 · 실린 글·다시 본 글 · 읽은 게시판만) ·
         진짜 소식 로봇을 이 컴퓨터 안의 가짜 게시판(127.0.0.1)으로 돌려 ⑤ 의 열쇠 달기와 같이 잰다
+     ⑧ 재단 게시판 찾기 로봇의 실패 이유 (api-10): '홈페이지 못 엶 (fetch failed)' 28곳이 무엇 때문인지 몰랐다 — fetch-board.mjs netReason 을 불러 쓴다
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
 import os from 'node:os';
@@ -33,6 +34,7 @@ import { dropReason as extDropReason, fillDeadlineFromHint, tidyExternal } from 
 import { activityDetails, eligLineOk, sanitizeElig } from '../../collector/activity-excerpts.mjs';
 import { boardKey, dropRetiredBoards } from '../../collector/news-board-rules.mjs';
 import { urlKey } from '../../collector/url-key.mjs';
+import { netReason } from '../../collector/fetch-board.mjs';
 
 const require = createRequire(import.meta.url);
 const src = (root, rel) => stripComments(fs.readFileSync(new URL(rel, root), 'utf8'));
@@ -320,5 +322,26 @@ export default async function qfeeds(eq, ctx) {
         [false, false, true, true, true]);
       if (r.status !== 0) console.log(r.out.slice(-1200));
     } finally { sb.done(); srv.close(); }
+  }
+
+  /* ── ⑧ 찾기 로봇은 실패 원인 코드를 적는다 ── */
+  {
+    const fb = src(root, 'collector/find-boards.mjs');
+    eq('⑧ 재단 게시판 찾기 로봇이 fetch-board.mjs 의 netReason 을 불러 쓴다 · 옛 꼴(e.message || e.name)이 없다',
+      [/import \{ netReason \} from '\.\/fetch-board\.mjs'/.test(fb), /못 엶 \(\$\{e\.message/.test(fb), (fb.match(/못 엶 \(\$\{netReason\(e\)\}\)/g) || []).length], [true, false, 2]);
+    const e = new TypeError('fetch failed'); e.cause = { code: 'UND_ERR_CONNECT_TIMEOUT' };
+    eq('  netReason — fetch failed 의 원인 코드를 편다', /UND_ERR_CONNECT_TIMEOUT/.test(netReason(e)), true);
+    /* 진짜 찾기 로봇을 임시 폴더에서 — 이 컴퓨터의 닫힌 포트를 홈페이지로 주면 연결 거절 코드가 probe.why 에 적힌다(밖으로 나가지 않는다) */
+    const tmp = http.createServer();
+    await new Promise((res) => tmp.listen(0, '127.0.0.1', res));
+    const port = tmp.address().port;
+    await new Promise((res) => tmp.close(res));
+    const sb = sandbox(root, 'hdj-qfeeds-find-');
+    try {
+      sb.write('collector/external-sources.json', { sources: [{ host: '가재단', home: `http://127.0.0.1:${port}/`, boardUrl: '' }] });
+      const r = sb.run('collector/find-boards.mjs', [], { FIND_BOARDS_MS: '20000' }, 30000);
+      const why = sb.json('collector/external-sources.json')?.sources?.[0]?.probe?.why || '';
+      eq('  [찾기 로봇 실행] 홈페이지를 못 열면 원인 코드(ECONNREFUSED)를 적는다 — \'fetch failed\' 만 적지 않는다', [r.status, /ECONNREFUSED/.test(why), why !== '홈페이지 못 엶 (fetch failed)'], [0, true, true]);
+    } finally { sb.done(); }
   }
 }

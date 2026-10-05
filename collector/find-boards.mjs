@@ -22,6 +22,8 @@ import { FETCH_HEADERS } from './http-headers.mjs';
 import { extractLinks } from './board-links.mjs';
 import { isMenuEntry } from './clean-title.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
+/* 실패 이유는 fetch-board.mjs netReason 한 곳 — 'fetch failed' 뭉뚱그림 대신 원인 코드(이름 못 찾음·연결 시한·인증서)를 적는다 (2026-10-05 점검 api-10 · 베끼지 않는다) */
+import { netReason } from './fetch-board.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const SRC = new URL('external-sources.json', HERE);
@@ -108,7 +110,7 @@ async function main() {
       }
       why = best ? `최고 ${best.signals}건 (${best.menu})` : '후보 없음';
     } catch (e) {
-      why = `홈페이지 못 엶 (${e.message || e.name})`;
+      why = `홈페이지 못 엶 (${netReason(e)})`;
     }
     if (best && best.signals >= MIN_SIGNALS) {
       s.boardUrl = best.url;
@@ -142,7 +144,7 @@ async function main() {
         }
         for (const c of cands) { const sc = scoreBoardPage(c.links); if (!best || sc.signals > best.signals) best = { url: c.url, menu: c.title, ...sc }; }
         why = best ? `최고 ${best.signals}건 (${best.menu})` : '후보 없음';
-      } catch (e) { why = `홈페이지 못 엶 (${e.message || e.name})`; }
+      } catch (e) { why = `홈페이지 못 엶 (${netReason(e)})`; }
       x.probe = { checkedAt: today, why, best: best ? { url: best.url, signals: best.signals, sample: best.sample } : null };
       lines.push(best && best.signals >= MIN_SIGNALS
         ? `- 🟢 **${x.school}** 후보: ${best.url} (${best.menu} · 공고 ${best.signals}건 · 예: ${best.sample.join(' / ')}) → 관리자 「게시판 주소 추가」로 넣어 주세요`
