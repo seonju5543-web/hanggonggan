@@ -221,6 +221,12 @@ export default async function links(eq, ctx) {
       const c1 = qb.json(CFGP) || {};
       eq('① [관리자 차단 풀기] 옛 id 를 풀어도 꼬리표 id 로 따로 막은 글의 주소는 남는다 · 옛 id 로 막았던 주소는 풀린다 (짝 기록 없는 설정)',
         [u1.status, c1.blockIds, c1.blockUrls], [0, [tagX], [X]]);
+      /* 남은 차단 id 의 짝(blockPairs) 주소도 남긴다 — 손 큐레이션 id(reg-)처럼 주소에서 계산되지 않는 id 가 같은 게시판 글을 막고 있을 때 */
+      qb.write(CFGP, { enabled: true, schools: [], maxPerRun: 8, blockIds: [L, 'reg-sample-sogang'], blockUrls: [SGU(550536), SGU(551777)], blockPairs: { 'reg-sample-sogang': SGU(551777) } });
+      const u0 = admin('unblock', { ids: [L] });
+      const c0 = qb.json(CFGP) || {};
+      eq('① [관리자 차단 풀기] 옛 id 를 풀어도 남은 차단 id 의 짝으로 적힌 주소는 남는다',
+        [u0.status, c0.blockIds, c0.blockUrls, c0.blockPairs], [0, ['reg-sample-sogang'], [SGU(551777)], { 'reg-sample-sogang': SGU(551777) }]);
       /* (ㄴ) 관리자 길 그대로 — 꼬리표 등록분을 되돌림 → 옛 id 차단 풀기 → 자동 등록 실행 */
       qb.write('data/registered.json', { items: [
         { id: tagX, name: '[교외] 미래표본장학회 장학생 선발 안내', boardTitle: '[교외] 미래표본장학회 장학생 선발 안내', type: '교외', provider: '주관 기관 원문 확인',
