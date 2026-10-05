@@ -3,7 +3,8 @@
    "썸네일이 없는 공고들에 대해서는 각 학교의 가장 예쁜 사진들(각 학교의 대표성을 띄울 수 있는 사진들)로 대체").
 
    재료: docs/designs/assets/gates/ — 위키미디어 공용의 열린 라이선스 사진(tools/fetch-gate-photos.mjs 가 받은 후보).
-   고른 기록: docs/designs/assets/gates/school-photo-picks.json — 학교마다 눈으로 보고 고른 사진(최대 3장)과 자를 자리.
+   고른 기록: docs/designs/assets/gates/school-photo-picks.json — 학교마다 눈으로 보고 고른 사진(최대 3장)과 자를 자리 ·
+     🔴 원본 제목(title — manifest 의 그 파일 title 그대로)을 같이 적는다. 없거나 지금 manifest 와 다르면 만들지 않는다(pickProblems).
      시작 화면 14곳은 이미 승인받은 그 사진(manifest.picks)을 그대로 쓴다.
    만드는 것: assets/schools/<학교키>-<바이트 해시 8자>.webp (가로 640px) + assets/schools/photos.json (앱이 받는 목록·출처 줄).
 
@@ -58,6 +59,47 @@ export function creditLine(f) {
   return `${cleanAuthor(f.author) || '작가 미상'} · ${f.license}`;
 }
 
+/* ── 고른 사진이 아직 그 사진인가 (2026-10-05 점검 · refresh GATE-02) ─────────────────────────
+   🔴 파일 이름(<학교키>-<번호>.jpg)은 **다시 받으면 다른 사진이 된다** — 받는 도구가 후보를 받은 순서로 번호를 매긴다.
+      실측(10-03 재수집 #6→#7): n1mo5fbn-2.jpg 가 '광나루안전체험관 유학생 안전교육' → 'Sejong University Gate' 로 바뀌는 등 9개 이름의 뜻이 바뀌었다.
+      이름만 보고 만들면 사람이 고른 적 없는 사진(사람·번호판을 덜어 내려던 crop 이 엉뚱한 사진에)이 공개 주소(640px)로 나간다.
+   그래서 고른 기록에 **원본 제목(title)** 을 같이 적고, 만들 때 지금 manifest 의 제목과 대조한다. 틀리면 그 사진을 내보내지 않는다
+   (틀린 사진보다 빠진 사진이 낫다 — 빠지면 그 학교 소식 카드는 글자 카드로 남는다). */
+/** 위키미디어 공용 페이지 주소 → 원본 제목 ('…/wiki/File%3AX_Y.jpg' → 'File:X Y.jpg') · 주소가 아니면 '' */
+export function titleFromPage(url) {
+  const m = /\/wiki\/([^?#]+)/.exec(String(url || ''));
+  if (!m) return '';
+  let t;
+  try { t = decodeURIComponent(m[1]); } catch { t = m[1]; }
+  return t.replace(/_/g, ' ');
+}
+/** 고른 기록의 문제 문장들 — chosen = {학교: [pick…]} · files = Map(파일 이름 → manifest 항목) */
+export function pickProblems(chosen, files) {
+  const out = [];
+  for (const [school, list] of Object.entries(chosen || {})) {
+    for (const p of list || []) {
+      const meta = files.get(p.file);
+      if (!meta) { out.push(`${school}: ${p.file} 가 manifest 에 없다`); continue; }
+      if (!p.title) { out.push(`${school}: ${p.file} 고른 기록에 원본 제목(title)이 없다`); continue; }
+      if (meta.title !== p.title) out.push(`${school}: ${p.file} 가 지금은 다른 사진이다 (고른 것 ${p.title} · 지금 ${meta.title}) — 다시 받은 뒤 다시 골라야 한다`);
+    }
+  }
+  return out;
+}
+/** 시작 화면 사진(tools/gate-reel/build-app-gates.mjs)의 같은 대조 — 승인된 목록(assets/gates/gates.json)과 **같은 파일 이름**인데
+    공용 페이지 주소가 달라졌으면 다시 받은 뒤 다른 사진이 된 것이다. 파일 이름이 바뀐 것은 사람이 새로 고른 것이라 묻지 않는다.
+    rows = [{id, name, file, page}] (이번에 만들 줄) · prev = 승인된 목록(없으면 첫 빌드) · accept = 사람이 새 사진을 받아들인 학교 id */
+export function startScreenChanged(rows, prev, accept = new Set()) {
+  if (!Array.isArray(prev)) return [];
+  const out = [];
+  for (const r of rows || []) {
+    const old = prev.find((g) => g.id === r.id);
+    if (!old || old.file !== r.file || !old.page || old.page === r.page || accept.has(r.id)) continue;
+    out.push(`${r.name}: ${r.file} (승인 ${titleFromPage(old.page) || old.page} · 지금 ${titleFromPage(r.page) || r.page || '주소 없음'})`);
+  }
+  return out;
+}
+
 async function main() {
   const sharp = (await import('sharp')).default;
   const manifest = JSON.parse(fs.readFileSync(path.join(SRC, 'manifest.json'), 'utf8'));
@@ -66,10 +108,11 @@ async function main() {
   const files = new Map();
   for (const s of manifest.schools || []) for (const f of s.files || []) files.set(f.file, { ...f, school: s.name });
   const gatesApp = JSON.parse(fs.readFileSync(path.join(ROOT, 'assets/gates/gates.json'), 'utf8'));
-  /* 시작 화면 14곳 — 승인받은 그 한 장(manifest.picks)을 쓴다. 고른 기록에 그 학교가 따로 있으면 그것이 이긴다 */
+  /* 시작 화면 14곳 — 승인받은 그 한 장(manifest.picks)을 쓴다. 고른 기록에 그 학교가 따로 있으면 그것이 이긴다.
+     원본 제목은 assets/gates/gates.json 의 page(승인 당시 공용 페이지 주소)에서 읽는다 — 다시 받아 다른 사진이 됐으면 대조에서 걸린다 */
   for (const g of gatesApp) {
     if (chosen[g.name]) continue;
-    chosen[g.name] = [{ file: g.file, focusSquare: g.focus || '50% 50%', what: '시작 화면 사진(승인)' }];
+    chosen[g.name] = [{ file: g.file, focusSquare: g.focus || '50% 50%', what: '시작 화면 사진(승인)', title: titleFromPage(g.page) }];
   }
   fs.mkdirSync(OUT, { recursive: true });
   const out = {
@@ -83,8 +126,10 @@ async function main() {
     const key = ME.noticeFileKey(school);
     const entries = [];
     for (const p of list.slice(0, 3)) {
+      /* 🔴 원본 제목 대조 — 고른 뒤 다시 받아 다른 사진이 된 이름은 만들지 않는다(문제로 알리고 끝에 실패) */
+      const why = pickProblems({ [school]: [p] }, files);
+      if (why.length) { problems.push(...why); continue; }
       const meta = files.get(p.file);
-      if (!meta) { problems.push(`${school}: ${p.file} 가 manifest 에 없다`); continue; }
       if (!OK_LICENSE.test(meta.license || '') || /NC|ND/.test(meta.license)) { problems.push(`${school}: ${p.file} 라이선스 ${meta.license}`); continue; }
       const src = path.join(SRC, p.file);
       if (!fs.existsSync(src)) { problems.push(`${school}: ${p.file} 파일 없음`); continue; }

@@ -2,7 +2,7 @@
    지난 리포트 이슈 정리 규칙 한 곳 (2026-10-04 로봇·도구 점검 · 묶음 alerts)
    ------------------------------------------------------------
    .github/workflows/close-old-reports.yml 이 부른다. 옛 판은 워크플로 안 jq 에 '🤖 장학공고'·'🖥 브라우저형' 두 종류만
-   적혀 있어, 그 뒤에 생긴 리포트(🗞 교내 소식 · 📘 작성 규칙 학습 · ✅ 자격 · 🔍 누락 감사 · 🔍 게시판 정찰)는
+   적혀 있어, 그 뒤에 생긴 리포트(🗞 교내 소식 · 📘 작성 규칙 학습 · ✅ 자격 · 🔍 누락 감사 · 🔍 게시판 정찰 — 그 도구는 2026-10-05 지웠다)는
    **영영 안 닫혔다**(10-04 열린 이슈 186건).
    규칙: 유형마다 최신 keep 건은 남기고, 나머지 가운데 days 일보다 오래된 것만 고른다.
      · 수집 리포트 셋은 3건을 남긴다 — 수집 로봇의 '새 공고 0건' 알림이 댓글을 달 열린 리포트가 필요하다.
@@ -22,7 +22,7 @@ export const REPORT_RULES = [
   { kind: 'essay', re: /^📘 작성 규칙 학습/, keep: 1 },
   { kind: 'elig', re: /^✅ 자격/, keep: 1 },
   { kind: 'coverage', re: /^🔍 공고 누락 감사/, keep: 1 },
-  { kind: 'probe', re: /^🔍 게시판 후보 정찰 리포트/, keep: 1 },
+  /* '🔍 게시판 후보 정찰 리포트'는 뺐다 — 그 도구(probe-boards.yml · collector/probe.mjs)를 2026-10-05 지웠다(같은 일은 find-boards·probe-links 가 한다) */
 ];
 
 export const ruleFor = (title) => REPORT_RULES.find((r) => r.re.test(String(title ?? '').trim())) || null;

@@ -35,6 +35,7 @@
  * 실행: update-progress.yml 의 `notion` 작업(push 때만).
  */
 import { execSync } from 'node:child_process';
+import { pushBranchLabel, refsByCommit, patchWithRetry, PUSH_SCAN } from './notion-branch.mjs';
 
 const MAX_TEXT = 1900;   // 노션 rich_text 한 조각 상한은 2000자
 const LOG_LINES = 8;
@@ -161,7 +162,8 @@ let basis = '';
 let picked = [];
 /* ⚠️ 셸에 넣기 전에 **40자리 16진수인지 본다** — `github.event.before` 는 우리가 만든
    값이 아니고, 아래 git 호출은 셸을 거친다. 아닌 값은 근거로 쓰지 않는다(빈 문자열 포함). */
-if (/^[0-9a-f]{40}$/.test(before) && !/^0+$/.test(before) && sh(`git cat-file -e ${before}^{commit}`).ok) {
+const beforeOk = /^[0-9a-f]{40}$/.test(before) && !/^0+$/.test(before) && sh(`git cat-file -e ${before}^{commit}`).ok;
+if (beforeOk) {
   const n = Number(sh(`git rev-list --count --no-merges ${before}..HEAD`).out || '-1');
   if (n >= 0 && n <= PUSH_MAX) {
     picked = commitsIn(`${before}..HEAD`, LOG_LINES);
@@ -250,10 +252,20 @@ function fitLines(text, max) {
   return kept.join('\n') || text.slice(0, max);
 }
 
+/* '브랜치' 칸 — 이 실행의 ref 가 아니라 **이 커밋을 올린 작업 브랜치** (2026-10-05 · ops-12 · tools/notion-branch.mjs 머리말).
+   세 곳 push 에서 대기줄에 마지막으로 남는 실행은 대개 main 이라 ref 를 그대로 적으면 칸이 늘 'main' 이었다.
+   main 에 올린 것이 병합 커밋이면 HEAD 를 그대로 가리키는 작업 브랜치가 없다 → 이 push 가 올린 커밋을 첫 부모 쪽으로 따라간다
+   (push 직전 판을 모르면 HEAD 하나만). checkout 의 fetch-depth: 0 이 원격 브랜치를 전부 받아 둔다. 못 읽으면 칸을 쓰지 않는다. */
+const headSha = sh('git rev-parse HEAD');
+const firstParents = beforeOk ? sh(`git rev-list --first-parent -n ${PUSH_SCAN} ${before}..HEAD`) : { ok: false, out: '' };
+const pushedCommits = firstParents.ok && firstParents.out ? firstParents.out.split('\n').map((l) => l.trim()).filter(Boolean)
+  : headSha.ok ? [headSha.out] : [];
+const refsRaw = sh("git for-each-ref --format='%(objectname) %(refname)' refs/remotes/origin");
+const label = pushBranchLabel({ ref, commits: pushedCommits, refsAt: refsRaw.ok ? refsByCommit(refsRaw.out) : null });
 const props = {
-  '브랜치': { rich_text: [{ text: { content: ref.slice(0, 200) || '(모름)' } }] },
   '갱신': { rich_text: [{ text: { content: new Date(Date.now() + 9 * 3600 * 1000).toISOString().replace('T', ' ').slice(0, 16) + ' KST' } }] },
 };
+if (label) props['브랜치'] = { rich_text: [{ text: { content: label.slice(0, 200) } }] };
 if (log.ok && log.out) {
   props['최근 커밋'] = { rich_text: [{ text: { content: fitLines(log.out, MAX_TEXT) } }] };
 } else {
@@ -281,18 +293,26 @@ if (process.argv.includes('--dry')) {
   console.log(`[시험] ${who.name} (${actor}) → ${who.page}`);
   for (const [k, v] of Object.entries(props)) console.log(`  ${k}: ${v.rich_text[0].text.content.replace(/\n/g, '\n' + ' '.repeat(k.length + 4))}`);
   if (!props['지금 하는 일']) console.log('  지금 하는 일: (못 읽어서 그대로 둠)');
+  if (!props['브랜치']) console.log('  브랜치: (못 읽어서 그대로 둠)');
   process.exit(0);
 }
 
-const res = await fetch(`https://api.notion.com/v1/pages/${who.page}`, {
-  method: 'PATCH',
-  headers: {
-    Authorization: `Bearer ${token}`,
-    'Notion-Version': '2022-06-28',
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({ properties: props }),
-});
+/* 노션이 잠깐 넘어진 것(429·5xx·연결 실패)은 쉬었다 다시 보낸다(3초·8초 · ops-12) — 2026-10-01 500 한 번에 빨간불로 끝났다. */
+let res;
+try {
+  res = await patchWithRetry(fetch, `https://api.notion.com/v1/pages/${who.page}`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Notion-Version': '2022-06-28',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ properties: props }),
+  });
+} catch (e) {
+  console.error(`✕ ${who.name}: 노션에 닿지 못했습니다 (세 번 시도) — ${e.message}`);
+  process.exit(1);
+}
 
 if (!res.ok) {
   /* 🔴 조용히 넘어가지 않는다 — 열쇠 만료·공유 해제는 '갱신' 칸이 멈춘 것으로만 보여
@@ -302,4 +322,4 @@ if (!res.ok) {
   console.error('  노션 통합에 「한대장」 페이지가 공유돼 있는지, NOTION_TOKEN 이 살아 있는지 확인하세요.');
   process.exit(1);
 }
-console.log(`✓ ${who.name} — ${ref}`);
+console.log(`✓ ${who.name} — ${label || '(브랜치 칸 그대로 둠)'} (ref: ${ref})`);

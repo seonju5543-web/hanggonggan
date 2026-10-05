@@ -15,6 +15,7 @@
 import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const OUT = process.argv[2] || 'docs/designs/assets/gates';
 const PER_SCHOOL = Number(process.env.PER_SCHOOL || 5);
@@ -174,13 +175,29 @@ function pick(pages, school, opts = {}) {
 const SOURCES = (process.env.SOURCES || '').split(',').map((x) => x.trim()).filter(Boolean);
 async function getJson(url) {
   const res = await fetch(url, { headers: { 'User-Agent': UA, Accept: 'application/json' } });
-  if (!res.ok) throw new Error(`${res.status} ${url}`);
+  if (!res.ok) { const e = new Error(`${res.status} ${url}`); e.status = res.status; throw e; }
   return res.json();
+}
+/* 제목 묶음 — 위키미디어 API 는 한 번에 제목 50개까지 받지만, 묶음을 **주소(GET)** 에 싣기 때문에 글자 수가 먼저 걸린다 (2026-10-05 점검 · refresh GATE-01).
+   실측(10-03 실행): 강원대 분류의 한글 제목 40개를 한 주소에 묶자 414(주소가 너무 김)로 61장 중 1장만 받았다.
+   그래서 개수(maxN)와 인코딩한 글자 수(maxChars) 둘 다로 끊는다. 제목 하나가 혼자 넘으면 혼자 한 묶음 · 순서·중복은 그대로. */
+export function titleChunks(titles, maxChars = 6000, maxN = 40) {
+  const out = [];
+  let cur = [];
+  let size = 0;
+  for (const t of titles || []) {
+    const add = encodeURIComponent(String(t)).length + (cur.length ? encodeURIComponent('|').length : 0);
+    if (cur.length && (cur.length >= maxN || size + add > maxChars)) { out.push(cur); cur = []; size = 0; }
+    size += cur.length ? add : encodeURIComponent(String(t)).length;
+    cur.push(t);
+  }
+  if (cur.length) out.push(cur);
+  return out;
 }
 async function commonsFiles(titles) {
   const out = [];
-  for (let i = 0; i < titles.length; i += 40) {
-    const data = await api({ action: 'query', titles: titles.slice(i, i + 40).join('|'), prop: 'imageinfo', iiprop: 'url|extmetadata|size|mime', iiurlwidth: THUMB_WIDTH });
+  for (const chunk of titleChunks(titles)) {
+    const data = await api({ action: 'query', titles: chunk.join('|'), prop: 'imageinfo', iiprop: 'url|extmetadata|size|mime', iiurlwidth: THUMB_WIDTH });
     out.push(...Object.values(data.query?.pages || {}));
   }
   return out;
@@ -211,9 +228,20 @@ async function wikidataCandidates(s) {
   return { files: [...new Set([...direct, ...inCat, ...handCats])], note: `${hit.id} · 대표 ${direct.length} · 분류 ${cats.join(',') || '없음'} ${inCat.length} · 손 분류 ${handCats.length}` };
 }
 const OV_LIC = { by: 'CC BY', 'by-sa': 'CC BY-SA', cc0: 'CC0', pdm: 'Public domain' };
+/* Openverse 가 401·403 으로 거절하면 남은 학교는 묻지 않는다 (2026-10-05 점검 · refresh GATE-01) — 10-03 실행에서 9개교 모두 401 이었다.
+   원인은 확인하지 못했다(샌드박스에서 닿지 않음 · 익명 요청 거절일 수도, Actions 주소 차단일 수도 있다). 실행 끝에 한 줄만 남긴다.
+   인증 열쇠(OAuth)를 붙이는 것은 사람이 정할 일이라 여기서 하지 않는다. */
+let openverseOff = 0;
 async function openverseCandidates(s) {
+  if (openverseOff) return [];
   const q = s.q.find((x) => /^[A-Za-z]/.test(x)) || s.name;
-  const data = await getJson(`https://api.openverse.org/v1/images/?q=${encodeURIComponent(q)}&license=by,by-sa,cc0,pdm&page_size=30&mature=false`);
+  let data;
+  try {
+    data = await getJson(`https://api.openverse.org/v1/images/?q=${encodeURIComponent(q)}&license=by,by-sa,cc0,pdm&page_size=30&mature=false`);
+  } catch (e) {
+    if (e.status === 401 || e.status === 403) { openverseOff = e.status; return []; }
+    throw e;
+  }
   const out = [];
   for (const r of data.results || []) {
     const text = `${r.title || ''} ${(r.tags || []).map((t) => t.name).join(' ')}`;
@@ -241,56 +269,84 @@ async function download(url, file) {
   fs.writeFileSync(file, buf);
 }
 
-fs.mkdirSync(OUT, { recursive: true });
-/* ONLY=snu,cau 이면 그 학교만 다시 받고 나머지 학교의 사진·기록은 그대로 둔다 (저장소가 매 실행 18MB 씩 불지 않게) */
-const only = (process.env.ONLY || '').split(',').map((s) => s.trim()).filter(Boolean);
-const targets = only.length ? SCHOOLS.filter((s) => only.includes(s.id)) : SCHOOLS;
-/* FRESH=1 이면 지난 실행의 사진을 먼저 비운다 — 안 비우면 걸러 낸 엉뚱한 사진이 폴더에 남는다 (ONLY 면 그 학교 것만) */
-if (process.env.FRESH === '1') for (const f of fs.readdirSync(OUT)) if (/\.(jpe?g|png)$/i.test(f) && targets.some((s) => f.startsWith(s.id + '-'))) fs.unlinkSync(path.join(OUT, f));
-const prevPath = path.join(OUT, 'manifest.json');
-const prev = fs.existsSync(prevPath) ? JSON.parse(fs.readFileSync(prevPath, 'utf8')) : null;
-const manifest = { fetchedAt: new Date().toISOString(), source: 'Wikimedia Commons (API search, namespace 6)', rule: 'CC0 · CC BY · CC BY-SA · PD 만 · NC/ND 제외 · 폭 900px 이상', schools: [] };
-/* 사람이 고른 기록(picks — 시작 화면 14장 · build-app-gates.mjs 가 읽는다)과 걸러 낸 기록(pruned)은 다시 받아도 잇는다 — 안 이으면 다음 빌드가 사진 0장이 된다 */
-for (const k of ['pruned', 'picks']) if (prev && prev[k] !== undefined) manifest[k] = prev[k];
-let total = 0;
-for (const s of SCHOOLS) {
-  if (!targets.includes(s)) { const kept = prev?.schools?.find((p) => p.id === s.id); if (kept) manifest.schools.push(kept); continue; }
-  const seen = new Set(); const cands = [];
-  for (const q of s.q) {
-    try {
-      for (const c of pick(await search(q), s)) { if (!seen.has(c.title)) { seen.add(c.title); cands.push({ ...c, query: q }); } }
-    } catch (e) { console.log(`  ! ${s.name} "${q}": ${e.message}`); }
-    if (cands.length >= PER_SCHOOL * 2) break;
+/* 고른 기록이 있는 학교를 다시 받으면 같은 파일 이름이 다른 사진이 될 수 있다 (2026-10-05 점검 · refresh GATE-02) — 막지는 않고 미리 알린다.
+   빌드(tools/build-school-photos.mjs · tools/gate-reel/build-app-gates.mjs)가 원본 제목 대조로 멈추므로 다시 골라야 한다.
+   picks = school-photo-picks.json 의 schools · manifestPicks = manifest.picks(시작 화면 파일 이름들) → [{ name, files }] */
+export function pickedFilesFor(targets, picks, manifestPicks) {
+  const out = [];
+  for (const s of targets || []) {
+    const files = [...new Set([
+      ...((picks || {})[s.name] || []).map((p) => p.file),
+      ...(manifestPicks || []).filter((f) => String(f).startsWith(`${s.id}-`)),
+    ].filter(Boolean))];
+    if (files.length) out.push({ name: s.name, files });
   }
-  for (const c of cands) c.via = c.via || 'search';
-  /* 3차 출처 — 검색 후보 뒤에 붙인다(같은 파일은 한 번) */
-  if (SOURCES.includes('wikidata')) {
-    try {
-      const wd = await wikidataCandidates(s);
-      console.log(`  · ${s.name} 위키데이터: ${wd.note}`);
-      const why = [];
-      if (wd.files.length) for (const c of pick(await commonsFiles(wd.files), s, { skipMust: true, why })) if (!seen.has(c.title)) { seen.add(c.title); cands.push({ ...c, via: 'wikidata' }); }
-      if (why.length) console.log(`  · ${s.name} 위키데이터 후보 중 거른 것: ${why.slice(0, 8).join(' · ')}`);
-    } catch (e) { console.log(`  ! ${s.name} 위키데이터: ${e.message}`); }
-  }
-  if (SOURCES.includes('openverse')) {
-    try {
-      for (const c of await openverseCandidates(s)) if (!seen.has(c.pageUrl)) { seen.add(c.pageUrl); cands.push({ ...c, via: 'openverse' }); }
-    } catch (e) { console.log(`  ! ${s.name} Openverse: ${e.message}`); }
-  }
-  const chosen = cands.slice(0, PER_SCHOOL);
-  const files = [];
-  for (let i = 0; i < chosen.length; i++) {
-    const c = chosen[i];
-    const ext = /png/i.test(c.thumb) ? 'png' : 'jpg';
-    const file = `${s.id}-${i + 1}.${ext}`;
-    try { await download(c.thumb, path.join(OUT, file)); files.push({ file, ...c }); total++; }
-    catch (e) { console.log(`  ! ${s.name} ${c.title}: ${e.message}`); }
-  }
-  manifest.schools.push({ id: s.id, name: s.name, candidates: cands.length, files });
-  console.log(`${s.name}: 후보 ${cands.length} · 받음 ${files.length}` + files.map((f) => `\n   · ${f.file}  ${f.license}${f.shareAlike ? ' (SA)' : ''}  [${f.via}] ${f.title}`).join(''));
+  return out;
 }
-const empty = manifest.schools.filter((m) => !(m.files || []).length).map((m) => m.name);
-if (empty.length) console.log(`\n⚠️ 사진이 한 장도 없는 학교 ${empty.length}곳 — ${empty.join(' · ')} (위키미디어에 열린 라이선스 사진이 없거나 이름표가 파일 제목에 없다)`);
-fs.writeFileSync(path.join(OUT, 'manifest.json'), JSON.stringify(manifest, null, 1) + '\n');
-console.log(`\n합계 ${total}장 → ${OUT}/manifest.json`);
+
+/* ── 실행부 — 불러오기만 하면 아무것도 하지 않는다(관문이 순수 함수를 불러도 위키미디어를 두드리지 않게 · 2026-10-05) ── */
+async function main() {
+  fs.mkdirSync(OUT, { recursive: true });
+  /* ONLY=snu,cau 이면 그 학교만 다시 받고 나머지 학교의 사진·기록은 그대로 둔다 (저장소가 매 실행 18MB 씩 불지 않게) */
+  const only = (process.env.ONLY || '').split(',').map((s) => s.trim()).filter(Boolean);
+  const targets = only.length ? SCHOOLS.filter((s) => only.includes(s.id)) : SCHOOLS;
+  const prevPath = path.join(OUT, 'manifest.json');
+  const prev = fs.existsSync(prevPath) ? JSON.parse(fs.readFileSync(prevPath, 'utf8')) : null;
+  /* FRESH=1 이면 지난 실행의 사진을 먼저 비운다 — 안 비우면 걸러 낸 엉뚱한 사진이 폴더에 남는다 (ONLY 면 그 학교 것만) */
+  if (process.env.FRESH === '1') {
+    const picksPath = path.join(OUT, 'school-photo-picks.json');
+    const picks = fs.existsSync(picksPath) ? (JSON.parse(fs.readFileSync(picksPath, 'utf8')).schools || {}) : {};
+    for (const w of pickedFilesFor(targets, picks, prev && prev.picks)) {
+      console.log(`⚠️ 고른 기록이 있는 학교를 다시 받습니다 — ${w.name}: ${w.files.join(', ')} · 빌드가 제목 대조로 멈추니 다시 골라야 합니다`);
+    }
+    for (const f of fs.readdirSync(OUT)) if (/\.(jpe?g|png)$/i.test(f) && targets.some((s) => f.startsWith(s.id + '-'))) fs.unlinkSync(path.join(OUT, f));
+  }
+  const manifest = { fetchedAt: new Date().toISOString(), source: 'Wikimedia Commons (API search, namespace 6)', rule: 'CC0 · CC BY · CC BY-SA · PD 만 · NC/ND 제외 · 폭 900px 이상', schools: [] };
+  /* 사람이 고른 기록(picks — 시작 화면 14장 · build-app-gates.mjs 가 읽는다)과 걸러 낸 기록(pruned)은 다시 받아도 잇는다 — 안 이으면 다음 빌드가 사진 0장이 된다 */
+  for (const k of ['pruned', 'picks']) if (prev && prev[k] !== undefined) manifest[k] = prev[k];
+  let total = 0;
+  for (const s of SCHOOLS) {
+    if (!targets.includes(s)) { const kept = prev?.schools?.find((p) => p.id === s.id); if (kept) manifest.schools.push(kept); continue; }
+    const seen = new Set(); const cands = [];
+    for (const q of s.q) {
+      try {
+        for (const c of pick(await search(q), s)) { if (!seen.has(c.title)) { seen.add(c.title); cands.push({ ...c, query: q }); } }
+      } catch (e) { console.log(`  ! ${s.name} "${q}": ${e.message}`); }
+      if (cands.length >= PER_SCHOOL * 2) break;
+    }
+    for (const c of cands) c.via = c.via || 'search';
+    /* 3차 출처 — 검색 후보 뒤에 붙인다(같은 파일은 한 번) */
+    if (SOURCES.includes('wikidata')) {
+      try {
+        const wd = await wikidataCandidates(s);
+        console.log(`  · ${s.name} 위키데이터: ${wd.note}`);
+        const why = [];
+        if (wd.files.length) for (const c of pick(await commonsFiles(wd.files), s, { skipMust: true, why })) if (!seen.has(c.title)) { seen.add(c.title); cands.push({ ...c, via: 'wikidata' }); }
+        if (why.length) console.log(`  · ${s.name} 위키데이터 후보 중 거른 것: ${why.slice(0, 8).join(' · ')}`);
+      } catch (e) { console.log(`  ! ${s.name} 위키데이터: ${e.message}`); }
+    }
+    if (SOURCES.includes('openverse') && !openverseOff) {
+      try {
+        for (const c of await openverseCandidates(s)) if (!seen.has(c.pageUrl)) { seen.add(c.pageUrl); cands.push({ ...c, via: 'openverse' }); }
+      } catch (e) { console.log(`  ! ${s.name} Openverse: ${e.message}`); }
+    }
+    const chosen = cands.slice(0, PER_SCHOOL);
+    const files = [];
+    for (let i = 0; i < chosen.length; i++) {
+      const c = chosen[i];
+      const ext = /png/i.test(c.thumb) ? 'png' : 'jpg';
+      const file = `${s.id}-${i + 1}.${ext}`;
+      try { await download(c.thumb, path.join(OUT, file)); files.push({ file, ...c }); total++; }
+      catch (e) { console.log(`  ! ${s.name} ${c.title}: ${e.message}`); }
+    }
+    manifest.schools.push({ id: s.id, name: s.name, candidates: cands.length, files });
+    console.log(`${s.name}: 후보 ${cands.length} · 받음 ${files.length}` + files.map((f) => `\n   · ${f.file}  ${f.license}${f.shareAlike ? ' (SA)' : ''}  [${f.via}] ${f.title}`).join(''));
+  }
+  const empty = manifest.schools.filter((m) => !(m.files || []).length).map((m) => m.name);
+  if (empty.length) console.log(`\n⚠️ 사진이 한 장도 없는 학교 ${empty.length}곳 — ${empty.join(' · ')} (위키미디어에 열린 라이선스 사진이 없거나 이름표가 파일 제목에 없다)`);
+  fs.writeFileSync(path.join(OUT, 'manifest.json'), JSON.stringify(manifest, null, 1) + '\n');
+  console.log(`\n합계 ${total}장 → ${OUT}/manifest.json`);
+  if (openverseOff) console.log(`Openverse 출처 꺼짐 (HTTP ${openverseOff} — 원인 미확인: 익명 요청 거절 또는 Actions 주소 차단일 수 있음)`);
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();

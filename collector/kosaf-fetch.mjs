@@ -37,10 +37,19 @@ const arg = (k, d) => {
 const MAX = Number(arg('max', 0));
 const WRITE = process.argv.includes('--write');
 const LIST_ONLY = process.argv.includes('--list-only');
+/* 상세 한 건이 걸릴 수 있는 최악의 시간 — 새 상세를 시작하기 전에 이만큼은 남아 있어야 한다 (2026-10-05 점검 · refresh KOSAF-02).
+   근거: kosaf-session.mjs tryFetch 30초 × 3번 + 다시 걸기 전 대기 5초 + 10초 = 105초, 상세 사이 쉼 0.25초 → 2분.
+   옛 판은 '예산이 다 됐나'만 물어 15분 끝자락에 시작한 상세가 단계 상한(20분)까지 갈 수 있었다. */
+const DETAIL_WORST_MS = 2 * 60000;
 
 /* 🔴 포털과 말하는 규칙(쿠키·토큰·form2·첨부 Referer)은 **`kosaf-session.mjs` 한 곳**에 있다.
    여기 베껴 두면 첨부 로봇·정찰과 갈라져, 한쪽만 고친 날 조용히 껍데기를 받게 된다. */
 const S = createSession();
+/* 예산 안에 스스로 끝낸다. 다 못 받아도 목록과 이어받은 상세는 저장된다 —
+   상한을 넘겨 강제 종료되면 그 실행의 결과가 통째로 사라진다.
+   🔴 시계는 **목록을 받기 전에** 켠다 (2026-10-05) — 옛 판은 목록 185쪽(약 2분)을 받은 뒤에 켜서 그 시간이 예산 밖이었다
+      (실행 세 번 연속 수확 단계 17분 · 단계 상한 20분까지 여유 3분). */
+const budget = makeBudget(Number(arg('budget-min', 15)) * 60000);
 
 /* 상세 한 건 — 칸(자격 20칸)과 **첨부 링크**를 같이 돌려준다.
    🔴 첨부를 여기서 버리면 안 된다: parseDetailFields 는 strip() 으로 태그를 지우는데
@@ -65,6 +74,12 @@ let rows = parseList(firstHtml);
 const last = Math.max(...[...firstHtml.matchAll(/fn_page\('(\d+)'\)/g)].map((m) => Number(m[1])), 1);
 console.log(`목록: 마지막 쪽 ${last} · 1쪽 ${rows.length}건`);
 for (let p = 2; p <= last; p += 1) {
+  /* 목록을 예산 안에 다 못 받으면 저장하지 않고 실패로 끝낸다 — 반쪽 목록은 어차피 관문(kosaf-check)이 막고,
+     단계 상한에 강제 종료(취소)되기 전에 끝내야 넘어짐 알림이 이 까닭을 담아 간다. */
+  if (budget.expired()) {
+    console.error(`✕ 목록을 예산 안에 다 못 받았습니다 (${p - 1}/${last}쪽) — 저장하지 않습니다`);
+    process.exit(1);
+  }
   rows = rows.concat(parseList(await S.page(p)));
   if (p % 40 === 0) console.log(`  …${p}/${last}쪽 (${rows.length}건)`);
   await new Promise((r) => setTimeout(r, 200));
@@ -118,12 +133,10 @@ if (!LIST_ONLY) {
     console.log(`대상 지정: ${target.length}/${want.length}건`);
   }
   if (MAX) target = target.slice(0, MAX);
-  /* 예산 안에 스스로 끝낸다. 다 못 받아도 목록과 이어받은 상세는 저장된다 —
-     상한을 넘겨 강제 종료되면 그 실행의 결과가 통째로 사라진다. */
-  const budget = makeBudget(Number(arg('budget-min', 15)) * 60000);
+  /* 예산 시계(budget)는 맨 위에서 목록보다 먼저 켰다 · 새 상세는 최악 시간(DETAIL_WORST_MS)이 남았을 때만 시작한다 */
   let ranOut = 0;
   for (const [i, r] of target.entries()) {
-    if (budget.expired()) { ranOut = target.length - i; break; }
+    if (!budget.hasRoom(DETAIL_WORST_MS)) { ranOut = target.length - i; break; }
     let d = null;
     try { d = await detail(r.code); } catch { d = null; }
     if (d) { r.detail = d.fields; if (d.files.length) r.files = d.files; got += 1; }
