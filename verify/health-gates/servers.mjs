@@ -16,7 +16,11 @@
      ⑥(e) 수집일 규칙의 '이틀'이 폰과 대조되지 않았다(하루·이틀 반으로 바꿔도 초록) → 경계 표본을 양쪽에 돌린다.
      ⑥(f)(g) 배포 직후 첫 회차(옛 장부) · 회차 한가운데 배포(옛 꼴 요약).
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부는 읽지 않는다. 코드 파일(server/·sw.js·엔진)은 코드라 읽는다.
-   🔴 Date.now·fetch 는 바꿔 끼운 뒤 finally 로 되돌린다. */
+   🔴 Date.now·fetch 는 바꿔 끼운 뒤 finally 로 되돌린다.
+   🔴 **문서 글자**(server/README.md · apply/wrangler.toml 주석 · 설계 문서 data-flow.md)를 재는 줄은 로봇 워크플로에서 어긋나도
+      경고만 한다(2026-10-05 리뷰 — test-collector 는 수집 로봇의 데이터 관문이라 빨간불이면 그 실행의 자동 등록분이 되돌려진다 ·
+      CLAUDE.md 문서 관문·alerts 묶음과 같은 잣대 softEq). 로컬과 화면 검사(verify-ui.yml · DOC_GATES=1)에서는 그대로 실패한다.
+      코드(가져오기·판정 함수·워크플로 구조)는 어디서나 실패한다. */
 import fs from 'node:fs';
 import vm from 'node:vm';
 import path from 'node:path';
@@ -25,7 +29,7 @@ import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { stepsOf } from './ci.mjs';
-import { actionBeforeCheckout, codeOf } from './alerts.mjs';
+import { actionBeforeCheckout, codeOf, softEq } from './alerts.mjs';
 import { verdict as pushVerdict, slotTime } from '../../tools/push-health-verdict.mjs';
 import { readSupabaseConfig, verdict as sbVerdict, probe as sbProbe, run as sbRun } from '../../tools/supabase-health.mjs';
 
@@ -89,6 +93,10 @@ export default async function gate(eq, ctx) {
   const realNow = Date.now;
   const realFetch = globalThis.fetch;
   const at = (ms) => { Date.now = () => ms; };
+  /* 문서 글자 관문의 엄격함 — test-collector 문서 관문(DOC_GATES)·alerts 묶음과 같은 잣대(로컬이거나 DOC_GATES=1 이면 엄격) */
+  const DOC_GATES = ctx.docGates ?? (!process.env.GITHUB_ACTIONS || process.env.DOC_GATES === '1');
+  const eqDoc = softEq(eq, DOC_GATES);
+  if (!DOC_GATES) console.log('  (로봇 워크플로 — 문서 글자 관문(②·⑨ 설계 문서)은 어긋나도 경고만 · verify-ui.yml 과 로컬에서는 실패)');
 
   try {
     /* ── ① 서버 워커가 Workers 에서 못 싣는 모듈을 부르지 않는다 ── */
@@ -113,14 +121,14 @@ export default async function gate(eq, ctx) {
 
     /* ── ② 서버 폴더 안내가 지금 모습이다 ── */
     const sreadme = readOpt('server/README.md');
-    eq('② server/README.md 에 워커 폴더 넷이 모두 나오고 · 폐기된 HANDAEJANG_CONFIG 안내가 없다 · mail-worker 는 쓰지 않음으로',
+    eqDoc('② server/README.md 에 워커 폴더 넷이 모두 나오고 · 폐기된 HANDAEJANG_CONFIG 안내가 없다 · mail-worker 는 쓰지 않음으로',
       [workers.filter((d) => !sreadme.includes(`\`${d}/\``)), /HANDAEJANG_CONFIG/.test(sreadme), /mail-worker\.js[^\n]*쓰지 않음/.test(sreadme)],
       [[], false, true]);
     const cfgNamed = [...sreadme.matchAll(/`([a-z]+-config\.js)`/g)].map((m) => m[1]);
-    eq('  안내가 적은 앱 쪽 설정 파일이 실제로 있다(apply 처럼 없는 스위치를 있다고 적지 않는다) · 사본 대조 관문을 실제로 대조하는 번호로만(옛 「⑥⑦⑧」 없음 · ⑧ 에 TITLE_CAMPUS)',
+    eqDoc('  안내가 적은 앱 쪽 설정 파일이 실제로 있다(apply 처럼 없는 스위치를 있다고 적지 않는다) · 사본 대조 관문을 실제로 대조하는 번호로만(옛 「⑥⑦⑧」 없음 · ⑧ 에 TITLE_CAMPUS)',
       [cfgNamed.length >= 3, cfgNamed.filter((f) => !fs.existsSync(path.join(rootDir, f))), /⑥⑦⑧/.test(sreadme), /⑧[^\n]*TITLE_CAMPUS/.test(sreadme)],
       [true, [], false, true]);
-    eq('  server/apply/wrangler.toml — 발송 증빙이 Supabase apply_sends 에 남는다고 적는다(\'KV 를 붙인다\' 옛 안내 없음)',
+    eqDoc('  server/apply/wrangler.toml — 발송 증빙이 Supabase apply_sends 에 남는다고 적는다(\'KV 를 붙인다\' 옛 안내 없음)',
       [/apply_sends/.test(readOpt('server/apply/wrangler.toml')), /KV 를 붙인다/.test(readOpt('server/apply/wrangler.toml'))], [true, false]);
 
     /* ── 푸시 워커 (③~⑧) ── */
@@ -474,7 +482,7 @@ export default async function gate(eq, ctx) {
       [/'down'/.test(openStep.if || '') && /'misconfig'/.test(openStep.if || ''), withOf(openStep, 'title'), /'ok'/.test(closeStep.if || '') && /'off'/.test(closeStep.if || ''), withOf(closeStep, 'title'),
         sbSteps.some((s) => /cancelled\(\)/.test(s.if || '') && /steps\.probe\.outcome != 'success'/.test(s.if || '') && /robot-down/.test(s.uses || ''))],
       [true, '🚨 로그인 서버(Supabase) 이상', true, '🚨 로그인 서버(Supabase) 이상', true]);
-    eq('  설계 문서 「어디가 끊기면」 표에 로그인 줄이 있다', /\|\s*로그인\s*\|[^\n]*`supabase-health\.yml`/.test(readOpt('docs/designs/data-flow.md')), true);
+    eqDoc('  설계 문서 「어디가 끊기면」 표에 로그인 줄이 있다', /\|\s*로그인\s*\|[^\n]*`supabase-health\.yml`/.test(readOpt('docs/designs/data-flow.md')), true);
 
     /* ── ⑩ 서비스워커 — 규칙 파일이 안 실려도 푸시를 받으면 알림 1건 ── */
     const swSrc = read('sw.js');
