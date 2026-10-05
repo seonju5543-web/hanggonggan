@@ -399,6 +399,51 @@
    "excerptsAt": "2026-10-05"
   },
   {
+   "title": "[스포츠재활 연구실] 만성 발목 불안정성 대상 발목 재활운동 연구 참여자 모집",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140343&article.offset=0&articleLimit=10",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    }
+   ],
+   "deadlineHint": null,
+   "eligibilityLines": [
+    "1. 모집대상",
+    "- 만 19세 이상 성인으로 최소 1회 이상 발목의 접질림으로 발목 외측 인대 부상 병력이 있는 경우",
+    "- 최근 6개월 이내 최소 2회 이상 발목 관절의 ‘휘청거림’ 경험이 있는 경우",
+    "\"발목의 휘청거림\"은 일시적으로 발목을 통제할 수 없는 불안정성이나 발목이 접질리는 느낌",
+    "- 발목의 반복적인 접질림 때문에 일상생활 및 스포츠 활동에 어려움이 있는 경우"
+   ],
+   "detailsV": 3,
+   "excerptsAt": "2026-10-05",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-05"
+  },
+  {
+   "title": "2026 신라문화제 자원봉사자 모집",
+   "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520720",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": null,
+   "deadline": "2026-10-08",
+   "detailsV": 3,
+   "field": "봉사",
+   "excerptsAt": "2026-10-05",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-05",
+   "eligibilityLines": [
+    "지원 자격:지구촌시민의식과글로벌 리더십을함양하고",
+    "사회적가치를실현하기위해사랑과희망나늄을실천하는",
+    "봉사활동에 동참하기를희망하는동국대학교 WS캠퍼스",
+    "dongguk 참사람사회공헌센터"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)"
+  },
+  {
    "title": "2026학년도 2학기 대학생 청소년교육지원사업 멘토 모집 안내",
    "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/273112/artclView.do",
    "kind": "대외활동",
@@ -655,7 +700,11 @@
    "excerptsAt": "2026-10-05",
    "school": "한국외국어대학교",
    "campus": "",
-   "foundAt": "2026-10-05"
+   "foundAt": "2026-10-05",
+   "eligibilityLines": [
+    "중·고등학생,학교 밖 청소년"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)"
   },
   {
    "title": "[모집공고] 「시장·고객 발굴(Market to Tech) 프로그램」 참가자 모집",
@@ -3555,7 +3604,26 @@
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
    "foundAt": "2026-09-30",
-   "detailsV": 3
+   "detailsV": 3,
+   "eligibilityLines": [
+    "참가대상 : 공모주제",
+    "공모내용",
+    "제출자료",
+    "가상공간 만들기",
+    "초등학생",
+    "(개인 또는 2인 이하 팀)",
+    "내가 만드는 초록빛 건축물, 그린리모델링 세상!",
+    "가상공간 플랫폼(마인크래프트·로블록스 등)을 활용한 나만의 ‘그린리모델링 건축물’ 만들기",
+    "작품 소개영상(3분 이내), 스크린샷 6장, 작품설명서, 가상공간 접속 URL",
+    "AI 42초 영화제",
+    "만 19세 일반국민",
+    "(개인 또는 2인 이하 팀)",
+    "단 42초로 보여주는 그린리모델링의 놀라운 변화!",
+    "그린리모델링의 가치와 의미를 담은 AI 활용 영상",
+    "참가대상 : 만 5세 이상 미취학 아동 및 초등학생",
+    "참가대상 : 대한민국 소재 대학 재학생·휴학생 및 대학원생"
+   ],
+   "eligibilityFrom": "요강 페이지"
   },
   {
    "title": "[외교부] 2026년 국제개발협력 청년공모전",
@@ -3780,7 +3848,12 @@
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
    "foundAt": "2026-09-30",
-   "detailsV": 3
+   "detailsV": 3,
+   "eligibilityLines": [
+    "참가자격 : 예비창업자 및 중소기업 공고일 기준 에너지 분야 창업 아이디어를 보유한 예비창업자 또는 창업 후 5년 이내 창업기업",
+    "대상 : 1팀"
+   ],
+   "eligibilityFrom": "요강 페이지"
   },
   {
    "title": "[해양수산부] 제8회 어도사진·숏폼 공모전",
@@ -3821,7 +3894,19 @@
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
    "foundAt": "2026-09-30",
-   "detailsV": 3
+   "detailsV": 3,
+   "eligibilityLines": [
+    "● 응모 자격",
+    "- 국내외 대학 학부생ㆍ대학원생(휴학생 가능) 및 국가방첩에 관심이 있는 일반인",
+    "※ 대한민국 국적자일 것",
+    "※ 개인ㆍ팀 참가 가능하며 팀 참가시 대표자 포함 최대 4인 구성",
+    "※ 1인당 접수작품 제한 없음, 논문ㆍ아이디어 부문 중복 접수 가능",
+    "※ 공모전 과거 수상자도 참여가 가능하나, 반드시 새로운 작품으로만 제출",
+    "※ 작품은 국내외에서 발표되지 아니한 순수 창작물이어야 하며, 타 공모전 수상작ㆍ기제출작은 응모할 수 없음",
+    "※ 국가정보원 주관 타 공모전 참가자도 지원 가능",
+    "● 응모 주제"
+   ],
+   "eligibilityFrom": "공고문 첨부"
   },
   {
    "title": "[금융위원회] 2026 제9회 핀테크 아이디어 공모전",
@@ -5745,31 +5830,6 @@
     "*기존 공모기간 중 제출된 참여작은 일부 가산점을 부여하여 심사할 예정",
     "* 참여작 상황에 따라, 시상자 수가 변경될 수 있음"
    ]
-  },
-  {
-   "title": "[외부] [한국보건복지인재원] 2026년 10월 국제협력세미나(아카데미) 교육 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53390&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": null,
-   "field": "해외·교류",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-09-30",
-   "excerptsAt": "2026-10-05",
-   "detailsV": 3
-  },
-  {
-   "title": "[일반] [교육부] 2026년도 학생 대상 안전한 개인정보보호 사례 공모전(기간연장 ~10월11일)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=52896&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "kind": "공모전",
-   "attachments": [],
-   "deadlineHint": null,
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-09-30",
-   "excerptsAt": "2026-10-05",
-   "detailsV": 3
   }
  ],
  "fields": {

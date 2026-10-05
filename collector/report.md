@@ -1,14 +1,14 @@
 ## 🤖 장학공고 수집 리포트 (2026-10-05)
 
-새로 발견한 공고: **43건** — 앱의 '실시간 공고'에는 즉시 표시되며(링크 연결만), 맞춤 매칭·양식 작성 지원 등록은 아래에서 컨펌해 주세요.
+새로 발견한 공고: **13건** — 앱의 '실시간 공고'에는 즉시 표시되며(링크 연결만), 맞춤 매칭·양식 작성 지원 등록은 아래에서 컨펌해 주세요.
 
 > 등록하는 곳 — 관리자 화면 → 컨펌 작업대: https://hanggonggan-admin.pages.dev/#review
 > 「수집됐지만 아직 등록 안 한 공고」에서 원문 ↗ 으로 확인한 뒤 **등록하기**를 누르면 그 자리에서 등록됩니다(제목·구분·마감일·금액·주관·요약). 대출·대학원 전용처럼 규칙에 걸리는 것은 눌러도 막히니 안심하고 눌러도 됩니다.
 > 다만 **첨부된 신청서 양식**과 **자격 요건 줄들**은 원문과 같은 구조로 옮겨야 해서 화면에서 못 합니다 — 그것까지 필요하면 채팅에 "이슈 #N 의 ○○ 양식·자격까지 등록해줘"라고 말씀해 주세요.
 
-⏱ 게시판 86곳을 7분 5초에 다 돌았습니다(예산 8분).
+⏱ 게시판 86곳을 4분 22초에 다 돌았습니다(예산 8분).
 
-⚠️ 정식 등록을 **학교별 파일로 나눌 때입니다.** 지금 한 학생이 남의 학교 공고로만 223KB 를 받습니다(학교 36곳 · 전국분 146KB 은 모두가 받아야 합니다). 실시간 공고·학과 목록과 같은 방식입니다 — 전국분 파일 하나 + 학교별 파일. 이름 규칙은 match-engine.js 에, 발행은 collector/publish-notices.mjs 를 본뜨면 됩니다 (왜 2026-09-26에는 미뤘는지: SESSIONS.md 「첫 화면에서 받는 양 절반으로」)
+⚠️ 정식 등록을 **학교별 파일로 나눌 때입니다.** 지금 한 학생이 남의 학교 공고로만 247KB 를 받습니다(학교 39곳 · 전국분 151KB 은 모두가 받아야 합니다). 실시간 공고·학과 목록과 같은 방식입니다 — 전국분 파일 하나 + 학교별 파일. 이름 규칙은 match-engine.js 에, 발행은 collector/publish-notices.mjs 를 본뜨면 됩니다 (왜 2026-09-26에는 미뤘는지: SESSIONS.md 「첫 화면에서 받는 양 절반으로」)
 
 ### 경희대학교
 상태: 🖥 브라우저 담당 게시판 — 일반 로봇은 건너뜀
@@ -24,78 +24,55 @@
 
 ### 연세대학교 미래캠퍼스
 상태: ✅ 정상 (실공고 41건 감지)
-- [일반공지 학자금 지원구간 개편 안내 신촌/국제](https://mirae.yonsei.ac.kr/bbs/wj/104/944211/artclView.do)
-- [일반공지 [한국장학재단] 가구원 정보제공 동의 안내 신촌/국제](https://mirae.yonsei.ac.kr/bbs/wj/104/944061/artclView.do)
-  - 📎 [붙임3. 가구원 정보제공 동의 매뉴얼(웰로 &#039;Wello&#039; 앱).pdf](https://mirae.yonsei.ac.kr/bbs/wj/104/1014558/download.do)
-  - 📎 [붙임2. 가구원 정보제공 동의 매뉴얼(홈페이지 모바일앱).pdf](https://mirae.yonsei.ac.kr/bbs/wj/104/1014559/download.do)
-- [일반공지 [국가] 학자금 지원구간 개편 안내 신촌/국제](https://mirae.yonsei.ac.kr/bbs/wj/104/943965/artclView.do)
-- [일반공지 2026년 장학금 부정수급 자진신고 캠페인 안내 신촌/국제](https://mirae.yonsei.ac.kr/bbs/wj/104/943935/artclView.do)
-- [일반공지 [한국장학재단] 2026학년도 2학기 주거안정장학금 장학생서약서 및 지급요청서 작성 안내 신촌/국제](https://mirae.yonsei.ac.kr/bbs/wj/104/943888/artclView.do)
-  - ⏰ 제출기한: 26. 11. 30.(월)까지 나. 26년 11월 지급요청서 제출기한: 26. 12. 31.(목)까지 다. 26년 12월 지급요청서
-- [일반공지 [한국장학재단] 2026학년도 2학기 주거안정장학금 우선지원 및 지원제외 기준 안내 신촌/국제](https://mirae.yonsei.ac.kr/bbs/wj/104/943887/artclView.do)
-- [일반공지 2026학년도 2학기 학자금대출 신청 안내(~11/17) 신촌/국제](https://mirae.yonsei.ac.kr/bbs/wj/104/943554/artclView.do)
-- [[교내] 2026학년도 2학기 형제장학금 신청 안내(~10/23)](https://mirae.yonsei.ac.kr/bbs/wj/104/944259/artclView.do)
-  - ⏰ 신청기간 : 2026. 10. 2.(금) ~ 23.(금) 오후 5시까지 (기한엄수 및 신청기간 이후 제출 불가) 5. 신청방법 : 학생복지처 홈
-  - 📎 [형제장학금 신청서.hwp](https://mirae.yonsei.ac.kr/bbs/wj/104/1014875/download.do)
-- [[국가] 희망사다리 장학생 대상 대전 일자리 박람회 홍보 요청(10/13)](https://mirae.yonsei.ac.kr/bbs/wj/104/944250/artclView.do)
-- [[교외] 2026년도 하반기 재단법인 논산시장학회 장학생 선발 공고(~10/30)](https://mirae.yonsei.ac.kr/bbs/wj/104/944245/artclView.do)
-  - ⏰ 접수기간 : 2026년 9월 28일(월) ~ 2026년 10월 30일(금) ※ 시 홈페이지, 읍·면·동 단체회의 등 홍보 ❍ 신청·접수방법 ①
-  - 📎 [2026년도 하반기 재단법인 논산시장학회 장학생 신청 서식.hwp](https://mirae.yonsei.ac.kr/bbs/wj/104/1014859/download.do)
-  - 📎 [2026년도 하반기 재단법인 논산시장학회 장학생 선발 공고문(발췌본).hwp](https://mirae.yonsei.ac.kr/bbs/wj/104/1014860/download.do)
-- [[교외] (재)춘천인재육성장학재단 2026년 하반기 봄내장학생 선발 (~10/7)](https://mirae.yonsei.ac.kr/bbs/wj/104/944188/artclView.do)
-  - ⏰ 접수기간: 2026. 9. 28.(월) ~ 10. 7.(수) ※ 이번학기(26년 2학기) 등록금 자부담금 없는 경우(전액 면제자) 신청불가 2.
-  - 📎 [2026년 하반기 봄내장학생 선발 공고(게시용-QR).hwp](https://mirae.yonsei.ac.kr/bbs/wj/104/1014757/download.do)
-  - 📎 [자주 묻는 질문(26년 하반기)_봄내장학금.hwp](https://mirae.yonsei.ac.kr/bbs/wj/104/1014758/download.do)
-- [[교외] 2026년 고속도로 장학생 선발 안내(~10/11)](https://mirae.yonsei.ac.kr/bbs/wj/104/944154/artclView.do)
-  - ⏰ 접수기간 : 2026. 9. 14.(월) ～ 10. 11.(일) * 우편접수 시 접수 마감일 소인분까지 유효 4. 제출 서류 [공 통] o 고속
-  - 📎 [2026년 고속도로 장학생 선발 안내문.pdf](https://mirae.yonsei.ac.kr/bbs/wj/104/1014719/download.do)
-- [[교외] 2026년도 (재)광산장학회 장학생 선발 공고(~9/18)](https://mirae.yonsei.ac.kr/bbs/wj/104/944151/artclView.do)
-  - ⏰ 신청기간 26. 9. 24.(월) ~ 9. 18.(금) 4. 신청자격 공고일(2026. 8. 24.) 기준 광산구에 주민등록을 두고 1년 이상
-  - 📎 [[본문]_2026년도_(재)광산장학회_장학생_선발_공고_(1).pdf](https://mirae.yonsei.ac.kr/bbs/wj/104/1014714/download.do)
-  - 📎 [2026년도_(재)광산장학회_장학생_신청서_및_구비서류_서식_(1).pdf](https://mirae.yonsei.ac.kr/bbs/wj/104/1014715/download.do)
-  - 📎 [(공고)2026년도_(재)광산장학회_장학생_선발계획_공고_(1).pdf](https://mirae.yonsei.ac.kr/bbs/wj/104/1014716/download.do)
-- [[교외] 2026년 「강원·세종건설·신디자인랩」브랜드장학금 하반기 장학생 선발(~10/8)](https://mirae.yonsei.ac.kr/bbs/wj/104/944143/artclView.do)
-  - 📎 [강원인재원 공고 제2026-44호 2026년 「강원·세종건설·신디자인랩」 브랜드장학금 선발공고문.pdf](https://mirae.yonsei.ac.kr/bbs/wj/104/1014705/download.do)
-  - 📎 [붙임 3. 2026년 「강원·세종건설·신디자인랩」 브랜드장학금 탐방계획서 1부.hwp](https://mirae.yonsei.ac.kr/bbs/wj/104/1014706/download.do)
-  - 📎 [붙임 2. 2026년 「강원·세종건설·신디자인랩」 브랜드장학금 신청서 1부.hwp](https://mirae.yonsei.ac.kr/bbs/wj/104/1014707/download.do)
-  - 📎 [붙임 4. 개인정보 수집 및 이용동의서 1부.hwp](https://mirae.yonsei.ac.kr/bbs/wj/104/1014708/download.do)
-  - 📎 [붙임 5. 홍보포스터 1부.png](https://mirae.yonsei.ac.kr/bbs/wj/104/1014709/download.do)
-- [일반공지 학자금 지원구간 개편 안내 신촌/국제](https://mirae.yonsei.ac.kr/bbs/wj/104/944211/artclView.do)
-- [일반공지 [한국장학재단] 가구원 정보제공 동의 안내 신촌/국제](https://mirae.yonsei.ac.kr/bbs/wj/104/944061/artclView.do)
-  - 📎 [붙임3. 가구원 정보제공 동의 매뉴얼(웰로 &#039;Wello&#039; 앱).pdf](https://mirae.yonsei.ac.kr/bbs/wj/104/1014558/download.do)
-  - 📎 [붙임2. 가구원 정보제공 동의 매뉴얼(홈페이지 모바일앱).pdf](https://mirae.yonsei.ac.kr/bbs/wj/104/1014559/download.do)
-- [일반공지 [국가] 학자금 지원구간 개편 안내 신촌/국제](https://mirae.yonsei.ac.kr/bbs/wj/104/943965/artclView.do)
-- [일반공지 2026년 장학금 부정수급 자진신고 캠페인 안내 신촌/국제](https://mirae.yonsei.ac.kr/bbs/wj/104/943935/artclView.do)
-- [일반공지 [한국장학재단] 2026학년도 2학기 주거안정장학금 장학생서약서 및 지급요청서 작성 안내 신촌/국제](https://mirae.yonsei.ac.kr/bbs/wj/104/943888/artclView.do)
-  - ⏰ 제출기한: 26. 11. 30.(월)까지 나. 26년 11월 지급요청서 제출기한: 26. 12. 31.(목)까지 다. 26년 12월 지급요청서
-- [일반공지 [한국장학재단] 2026학년도 2학기 주거안정장학금 우선지원 및 지원제외 기준 안내 신촌/국제](https://mirae.yonsei.ac.kr/bbs/wj/104/943887/artclView.do)
+- [[교외] [대전청년내일재단] 2026년 하반기 인재육성(성취) 장학생 선발(~10/8)(기간 연장)](https://mirae.yonsei.ac.kr/bbs/wj/104/944141/artclView.do)
+  - ⏰ 신청기간: 2026. 9. 1.(화) ~ 10. 8.(목) 17:00까지 라. 신청방법: 대전청년포털(https://daejeonyouthpor
+  - 📎 [2026년 성취(대) 장학생 선발계획 연장 공고.hwp](https://mirae.yonsei.ac.kr/bbs/wj/104/1014861/download.do)
+- [[교외] 2026년 상반기분 통영시 대학생 학자금 이자 지원 공고(~9/23)](https://mirae.yonsei.ac.kr/bbs/wj/104/944083/artclView.do)
+  - ⏰ 신청기간: 2026. 9. 2.(수) ~ 9. 23.(수) 17:00 나. 신청방법: 전자 우편, 방문, 등기우편 접수(팩스 불가) 1) 전자
+  - 📎 [통영시_2026년 상반기분 통영시 대학생 학자금 이자 지원 공고(안).hwp](https://mirae.yonsei.ac.kr/bbs/wj/104/1014580/download.do)
+- [[교외] 2026년도 국가유산진흥원 전통 기·예능 분야 및 매장유산 관련 분야 우수 장학생 선발 공고 (~9/30)](https://mirae.yonsei.ac.kr/bbs/wj/104/944082/artclView.do)
+  - 📎 [국가유산_[별첨3]_개인정보_수집_이용_동의서.hwp](https://mirae.yonsei.ac.kr/bbs/wj/104/1014576/download.do)
+  - 📎 [국가유산_[별첨1]장학생_지원신청서_및_자기소개서(양식).hwp](https://mirae.yonsei.ac.kr/bbs/wj/104/1014577/download.do)
+  - 📎 [국가유산_[별첨2]장학생_후보자_추천서(양식).hwp](https://mirae.yonsei.ac.kr/bbs/wj/104/1014578/download.do)
+  - 📎 [국가유산_2026년_국가유산진흥원_전통_기ㆍ예능분야_및_매장유산_분야_우수_장학생_선발_공고.hwp](https://mirae.yonsei.ac.kr/bbs/wj/104/1014579/download.do)
+- [[교외] 익산시 대학(원)생 학자금 대출이자 지원 신청(~9/18)](https://mirae.yonsei.ac.kr/bbs/wj/104/944026/artclView.do)
+  - 📎 [익산_[안내문]2026년 하반기 익산시 대학생 학자금 대출이자 지원 신청.hwp](https://mirae.yonsei.ac.kr/bbs/wj/104/1014520/download.do)
+  - 📎 [익산_[공고문]2026년 하반기 익산시 대학(원)생 학자금 이자지원 신청자 접수 공고.hwp](https://mirae.yonsei.ac.kr/bbs/wj/104/1014521/download.do)
+- [[교외] 2026년 2학기 푸른등대 기부장학금(~9/10)](https://mirae.yonsei.ac.kr/bbs/wj/104/944024/artclView.do)
+  - 📎 [2._2026년_2학기_푸른등대_기부장학금_신규장학생_선발_내용_요약표.pdf](https://mirae.yonsei.ac.kr/bbs/wj/104/1014517/download.do)
+  - 📎 [1._2026년_2학기_푸른등대_기부장학금_사업_계획서_및_업무처리기준.pdf](https://mirae.yonsei.ac.kr/bbs/wj/104/1014518/download.do)
+- [[교외] 2027-2028 스위스 정부초청 장학생 선발 안내(~11/10)](https://mirae.yonsei.ac.kr/bbs/wj/104/944023/artclView.do)
+  - ⏰ 지원 기간:2026. 8. 20.(목)~11.10.(화) 마. 제출서류 등 세부사항: https://www.sbfi.admin.ch/schola
+  - 📎 [Swiss_Government_Excellence_Scholarships_2027~2028.pdf](https://mirae.yonsei.ac.kr/bbs/wj/104/1014515/download.do)
+  - 📎 [2027-2028_스위스_정부초청_장학생_선발_안내_(1).hwp](https://mirae.yonsei.ac.kr/bbs/wj/104/1014516/download.do)
+- [[교외] 2026년 강원인재원「생활비 장학금」장학생 선발 공고(~9/28)](https://mirae.yonsei.ac.kr/bbs/wj/104/944022/artclView.do)
+  - ⏰ 신청기간) 9월 1일(화) 09:00 ~ 9월 28일(금) 18:00까지 ▶ (신청방법) 강원인재원 홈페이지(http://injae.gwd.go
+  - 📎 [2026년 「생활비 장학금」 장학생 선발 정정 공고문.pdf](https://mirae.yonsei.ac.kr/bbs/wj/104/1014590/download.do)
+- [[교외] 2026년도 하반기 달서인재육성장학재단 장학생 선발 안내(~9/28)](https://mirae.yonsei.ac.kr/bbs/wj/104/944020/artclView.do)
+  - ⏰ 접수기간 2026년 8월 31일(월) ~ 9월 28일(월) 18:00까지 4. 접수방법 및 접수처 성적우수·특기 분야 접수방법: 방문 또는 등기
+  - 📎 [(재)달서인재육성장학재단_2026년도_하반기_장학생_선발_안내.pdf](https://mirae.yonsei.ac.kr/bbs/wj/104/1014512/download.do)
+  - 📎 [2026년도_하반기_장학생_선발_신청서식_달서.pdf](https://mirae.yonsei.ac.kr/bbs/wj/104/1014513/download.do)
+- [[교외] 2026년 2학기 선원가족 장학생 모집 안내(~10/23)](https://mirae.yonsei.ac.kr/bbs/wj/104/944019/artclView.do)
+  - ⏰ 신청기간 2026년 9월 1일(화) ~ 10월 23일(금) 3. 장학금 지원금액 고등학생: 120만원 대학생: 본인 부담액 기준 최대 350만원
+  - 📎 [2026년_2학기_선원가족장학사업_선발요강.pdf](https://mirae.yonsei.ac.kr/bbs/wj/104/1014509/download.do)
+  - 📎 [2026년_2학기_선원가족_장학사업_안내.pdf](https://mirae.yonsei.ac.kr/bbs/wj/104/1014510/download.do)
+  - 📎 [2026년_2학기_선원가족장학사업_홍보_요청.pdf](https://mirae.yonsei.ac.kr/bbs/wj/104/1014511/download.do)
+- [[교외] 2026년 하반기 울산연구원 장학생 선발계획(~9/23)](https://mirae.yonsei.ac.kr/bbs/wj/104/944018/artclView.do)
+  - ⏰ 신청기간 : 2026. 9. 16.(수) 10:00 ~ 9. 23.(금) 18:00까지 ○ 신청방법 : 온라인 신청 후 서류 메일 제출 ※ 온라
+  - 📎 [2026년_하반기_장학생_선발계획_공고.pdf](https://mirae.yonsei.ac.kr/bbs/wj/104/1014507/download.do)
+  - 📎 [『2026년도_하반기_울산연구원_장학생_선발_공고』_홍보_협조_요청.pdf](https://mirae.yonsei.ac.kr/bbs/wj/104/1014508/download.do)
+- [[교외] 2026년도 익산사랑 장학생 선발(~9/9)](https://mirae.yonsei.ac.kr/bbs/wj/104/944017/artclView.do)
+  - ⏰ 접수기간 : 2026. 9. 3.(목) ∼ 9. 9.(수) 18:00까지 4. 접 수 처 : 익산사랑장학재단 가. 방문접수 : 익산시청 7층 익
+  - 📎 [2026년도 익산사랑 장학생 선발 공고문.hwp](https://mirae.yonsei.ac.kr/bbs/wj/104/1014505/download.do)
+  - 📎 [2026년도 익산사랑 장학생 선발개요.hwp](https://mirae.yonsei.ac.kr/bbs/wj/104/1014506/download.do)
+- [[한국장학재단] 2026학년도 2학기 중소기업취업연계장학금(희망사다리1유형) 신청 안내](https://mirae.yonsei.ac.kr/bbs/wj/104/943952/artclView.do)
+- [[한국장학재단] 2026학년도 2학기 고졸 후학습자 장학금(희망사다리2유형) 신청 안내](https://mirae.yonsei.ac.kr/bbs/wj/104/943948/artclView.do)
 
 ### 고려대학교
 상태: ⚙️ 게시판 주소 미설정 (개발자가 준 장학금공지 주소(korea.ac.kr/ko/568/subview.do)는 목록 행이 href="#1" + jf_view() 클릭 스크립트라 일반 fetch로는 링크가 하나도 안 나온다(2026-08-02 확인 — 옛 주소 scholarship.korea.ac.kr도 안내 홈페이지라 0건이었다). 동국대·경희대와 같은 클릭형이라 browser-targets.json으로 옮겼다)
 
 ### 고려대학교 세종캠퍼스
 상태: ✅ 정상 (실공고 9건 감지)
-- [☆★KU SEJONG 장학 포탈 OPEN 안내☆★](https://sejong.korea.ac.kr/bbs/koreaSejong/659/272842/artclView.do)
-- [[교내]2026학년도 2학기 미래로장학금 2차 신청 안내(학부)](https://sejong.korea.ac.kr/bbs/koreaSejong/659/273296/artclView.do)
-  - ⏰ 신청 기간 및 방법 가. 신청기간: 2026. 10. 1.(목) 10:00 ~ 10. 30.(금) 16:00 1) 마감시간 전까지 신청서 작성
-- [[교내]2026학년도 2학기 교내장학금 안내(학부)](https://sejong.korea.ac.kr/bbs/koreaSejong/659/273290/artclView.do)
-  - ⏰ 신청 기간 및 방법 가. 신청 기간: 2026. 10. 1.(목) 10:00 ~ 10. 30.(금) 16:00 1) 마감시간 전까지 신청서 작성
-- [[공지]2026학년도 2학기 장학금 수혜계좌 등록 안내](https://sejong.korea.ac.kr/bbs/koreaSejong/659/273234/artclView.do)
-- [2026년도 하반기 재단법인 논산시장학회 장학생 선발 공고](https://sejong.korea.ac.kr/bbs/koreaSejong/659/273231/artclView.do)
-  - ⏰ 접수기간 : 2026 년 9 월 28 일 ( 월 ) ~ 2026 년 10 월 30 일 ( 금 ) ※ 시 홈페이지 , 읍 · 면 · 동 단체회의
-  - 📎 [2026년도 하반기 재단법인 논산시장학회 장학생 선발 공고문.hwpx.hwp](https://sejong.korea.ac.kr/bbs/koreaSejong/659/182816/download.do)
-- [『(재)춘천인재육성장학재단』 2026년도 하반기 봄내장학생 선발공고](https://sejong.korea.ac.kr/bbs/koreaSejong/659/273125/artclView.do)
-  - ⏰ 신청기간 : 2026. 9. 28.( 월 ) ~ 10. 7.( 수 ) [10 일간 ] ❍ 접 수 처 : 애향장학금 신청 → 주소지 읍면 ‧ 동
-  - 📎 [2026년 하반기 봄내장학생 선발 공고(게시용-QR).hwp](https://sejong.korea.ac.kr/bbs/koreaSejong/659/182730/download.do)
-  - 📎 [자주 묻는 질문(26년 하반기)_봄내장학금.hwp](https://sejong.korea.ac.kr/bbs/koreaSejong/659/182731/download.do)
-- [2026학년도 2학기 고졸 후학습자 장학금 신청 안내(기한연장)](https://sejong.korea.ac.kr/bbs/koreaSejong/659/272997/artclView.do)
-  - 📎 [2-1. 카드뉴스(일정수정).png](https://sejong.korea.ac.kr/bbs/koreaSejong/659/182652/download.do)
-  - 📎 [1. 26년 2학기 2차 고졸 후학습자 장학금(일정수정).jpg](https://sejong.korea.ac.kr/bbs/koreaSejong/659/182653/download.do)
-  - 📎 [2-2. 카드뉴스(일정수정).png](https://sejong.korea.ac.kr/bbs/koreaSejong/659/182654/download.do)
-- [2026년 고속도로 장학생 선발 공지](https://sejong.korea.ac.kr/bbs/koreaSejong/659/272832/artclView.do)
-  - ⏰ 접수기간: 2026.9.14.(월)~10.11.(금) * 우편접수 시 접수 마감일 소인분까지 유효 5. 제출서류 [공통] 고속도로 장학금 신청서
-- [[재]포항시장학회 2026년도 대학교 장학생 선발 계획](https://sejong.korea.ac.kr/bbs/koreaSejong/659/272831/artclView.do)
-  - ⏰ 접수기간 : 2026.8.24.(월) 09:00 ~ 2026.9.22.(화) 18:00 5. 선발발표 - 2026년 11월 예정(개별통보) 6.
 
 ### 서강대학교
 상태: ✅ 정상 (실공고 25건 감지)
@@ -119,36 +96,10 @@
 상태: 🖥 브라우저 담당 게시판 — 일반 로봇은 건너뜀
 
 ### 동국대학교 WISE캠퍼스
-상태: ✅ 정상 (실공고 6건 감지)
-- [대전청년내일재단 2026년 장학생 선발 안내(대상: 대전광역시에 주소를 둔 2학년 이상 재학생 /~10.8.)](https://wise.dongguk.ac.kr/article/servicenotice/detail/520676)
-  - 📎 [2026년 성취(대) 장학생 선발계획 연장 공고 (1).hwp](javascript:downGO('2026년 성취(대) 장학생 선발계획 연장 공고 (1).hwp','/files/article/servicenotice/520676/','1F72406C83434750B60FF4FE8018473B.hwp');)
-- [2026년도 하반기 재단법인 논산시장학회 장학생 선발 안내(대상: 논산시 주민 및 자녀, ~10.30.(금))](https://wise.dongguk.ac.kr/article/servicenotice/detail/520666)
-  - ⏰ 접수기간 : 2026 년 9 월 28 일 ( 월 ) ~ 2026 년 10 월 30 일 ( 금 ) ※ 시 홈페이지 , 읍 · 면 · 동 단체회의
-  - 📎 [2026년도 하반기 재단법인 논산시장학회 장학생 선발 공고문(발췌본).hwp](javascript:downGO('2026년도 하반기 재단법인 논산시장학회 장학생 선발 공고문(발췌본).hwp','/files/article/servicenotice/520666/','3E2574E315854ED892E5C1D90CFC9EAC.hwp');)
-  - 📎 [2026년도 하반기 재단법인 논산시장학회 장학생 신청 서식.hwp](javascript:downGO('2026년도 하반기 재단법인 논산시장학회 장학생 신청 서식.hwp','/files/article/servicenotice/520666/','3C2C7E4527F047DA9836E20E4F343D60.hwp');)
-- [[한국장학재단] 2026학년도 2학기 고졸 후학습자 장학금 신청 안내](https://wise.dongguk.ac.kr/article/servicenotice/detail/520613)
-- [「2026 상반기 AI·ICT 인재 장학생 모집」 안내(대상: 서울시 서초구에 주소지를 둔 재학생)](https://wise.dongguk.ac.kr/article/servicenotice/detail/520607)
-  - 📎 [(신청서식)2026년_하반기_문주장학재단_주관_장학생_지원서식.hwp](javascript:downGO('(신청서식)2026년_하반기_문주장학재단_주관_장학생_지원서식.hwp','/files/article/servicenotice/520607/','063C30D7C486457CA7D757198AD374E6.hwp');)
-  - 📎 [(공고문)2026년_하반기_문주장학재단_주관_AI_ICT_장학생_선발_공고문.pdf](javascript:downGO('(공고문)2026년_하반기_문주장학재단_주관_AI_ICT_장학생_선발_공고문.pdf','/files/article/servicenotice/520607/','F201A662E8C1437EB71F30828C2E394E.pdf');)
-- [(재)춘천인재육성장학재단 2026년 하반기 봄내장학생 선발 안내(대상: 춘천시 시민 또는 그 자녀)](https://wise.dongguk.ac.kr/article/servicenotice/detail/520602)
-  - ⏰ 신청기간: 9.28.(월)~10.7.(수) 2. 선발기준(공통): 주민등록 주소지가 1년 이상 춘천시에 등록된 시민 또는 그 자녀로서 2026-
-  - 📎 [자주 묻는 질문(26년 하반기)_봄내장학금.hwp](javascript:downGO('자주 묻는 질문(26년 하반기)_봄내장학금.hwp','/files/article/servicenotice/520602/','686E24E397BB492D91F8962D322AEAA9.hwp');)
-  - 📎 [2026년 하반기 봄내장학생 선발 공고(게시용-QR).hwp](javascript:downGO('2026년 하반기 봄내장학생 선발 공고(게시용-QR).hwp','/files/article/servicenotice/520602/','2030EE6002FF498BAFFD8B16B67B1E08.hwp');)
-- [2026-2학기 지역미래불자육성장학(은암장학회) 장학생 선발 안내](https://wise.dongguk.ac.kr/article/servicenotice/detail/520598)
-  - ⏰ 신청기간 : 09.17.(목 ) ~ 09.29.(화) 23:59 까지(기한 엄수) 나 . 신청서류 : 장학신청서(개인정보동의서, 장학금수여식 참
-  - 📎 [지역미래불자육성장학 장학금신청서.hwp](javascript:downGO('지역미래불자육성장학 장학금신청서.hwp','/files/article/servicenotice/520598/','A76DF2F87D69402FA736B956B28A788F.hwp');)
+상태: ✅ 정상 (실공고 5건 감지)
 
 ### 홍익대학교
 상태: ✅ 정상 (실공고 7건 감지)
-- [[우양재단] 2026년 우양재단 동행장학생 모집](https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158704&noCat=501)
-- [[대전광역시] 2026년 하반기 성취장학생 선발 연장](https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158449&noCat=501)
-- [[논산시] 2026년도 하반기 (재)논산시장학회 학업장려 장학생 선발](https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158448&noCat=501)
-- [[춘천시] 2026년도 하반기 봄내장학생 선발공고](https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158446&noCat=501)
-- [[서초구] 2026년 하반기 문주장학재단 AI·ICT 분야 인재 장학생 선발계획 공고](https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158439&noCat=501)
-- [2026년 하반기 익산시 대학생 학자금 대출이자 지원 신청](https://www.hongik.ac.kr/kr/education/notice-undergrad.do?mode=view&articleNo=157133&article.offset=0&articleLimit=10&srCategoryId=24&srSearchKey=article_title&noCat=24)
-  - 📎 [2026년 하반기 익산시 대학생 학자금 대출이자 지원 신청.zip](https://www.hongik.ac.kr/kr/education/notice-undergrad.do?mode=download&articleNo=157133&attachNo=91675)
-- [2026년 상반기분 통영시 대학생 학자금 이자 지원 공고](https://www.hongik.ac.kr/kr/education/notice-undergrad.do?mode=view&articleNo=157131&article.offset=0&articleLimit=10&srCategoryId=24&srSearchKey=article_title&noCat=24)
-  - 📎 [통영시대학생학자금이자지원공고(안).zip](https://www.hongik.ac.kr/kr/education/notice-undergrad.do?mode=download&articleNo=157131&attachNo=91674)
 
 ### 숙명여자대학교
 상태: ✅ 정상 (실공고 9건 감지)
@@ -170,7 +121,6 @@
 
 ### 국민대학교
 상태: ✅ 정상 (실공고 17건 감지)
-- [2027 대산농촌재단 장학생 선발 안내](https://www.kookmin.ac.kr/user/kmuNews/notice/7/12450/view.do?currentPageNo=1)
 
 ### 숭실대학교
 상태: ✅ 정상 (실공고 14건 감지)
@@ -179,7 +129,7 @@
 상태: ✅ 정상 (실공고 10건 감지)
 
 ### 이화여자대학교
-상태: ⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
+상태: ✅ 정상 (실공고 11건 감지)
 
 ### 인하대학교
 상태: ✅ 정상 (실공고 45건 감지)
@@ -235,32 +185,19 @@
 ### 강원대학교
 상태: ✅ 정상 (실공고 12건 감지)
 
-### 🎯 대외활동·공모전 새 글 23건 → 앱 '대외활동' 탭 (data/activities.json · 200건 게재 중)
-- 🔁 전에 실린 글 6건의 원문을 다시 읽어 마감·발췌를 채웠습니다 (남은 0건은 다음 실행에)
-- **고려대학교 세종캠퍼스 (장학 게시판에서 발견)** — ✅
-  - [대외활동] [2026학년도 2학기 대학생 청소년교육지원사업 멘토 모집 안내](https://sejong.korea.ac.kr/bbs/koreaSejong/659/273112/artclView.do) — ⏰ 신청기간 및 방법 1) 기간 : 2026년 9월 24일 ~ 9월 30일 2) 방법 (홈페이지 신청 방법) 재단홈페이지(http://www.kos
+### 🎯 대외활동·공모전 새 글 2건 → 앱 '대외활동' 탭 (data/activities.json · 200건 게재 중)
+- **성균관대학교 (장학 게시판에서 발견)** — ✅
+  - [대외활동] [[스포츠재활 연구실] 만성 발목 불안정성 대상 발목 재활운동 연구 참여자 모집](https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140343&article.offset=0&articleLimit=10)
 - **동국대학교 WISE캠퍼스 (장학 게시판에서 발견)** — ✅
-  - [대외활동] [[교내봉사] 10.06.(화) 학교기획 지역사회 연계봉사 자원봉사자 모집 (석장동 환경정화 플로깅)](https://wise.dongguk.ac.kr/article/servicenotice/detail/520680)
-  - [대외활동] [제14회 신라소리축제 에밀레전 자원봉사자 모집](https://wise.dongguk.ac.kr/article/servicenotice/detail/520622)
-- **홍익대학교 (장학 게시판에서 발견)** — ✅
-  - [대외활동] [[대한산업보건협회] 산재 노동자 자녀 성장지원사업 참여자 모집](https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=157237&noCat=501)
+  - [대외활동] [2026 신라문화제 자원봉사자 모집](https://wise.dongguk.ac.kr/article/servicenotice/detail/520720)
 - **한국외국어대학교 대외활동·공모전 「학생활동」** — ✅ 정상 (활동·공모전 8건 감지)
-  - [공모전] [[한국산업식품클러스터진흥원] 2026년 식품데이터 캡스톤 경진대회](https://dep.hufs.ac.kr/bbs/student/2436/268006/artclView.do)
-  - [공모전] [[숭실대학교] 제2회 전국대학생 AI시스템트레이딩 경진대회 모집](https://dep.hufs.ac.kr/bbs/student/2436/267837/artclView.do)
-  - [대외활동] [[서울시립대학교] 서울 정책지원관 양성 프로그램 모집](https://dep.hufs.ac.kr/bbs/student/2436/267541/artclView.do)
-  - [대외활동] [[롯데지주] 롯데 밸유 for ESG 5기 대학생 봉사단 모집](https://dep.hufs.ac.kr/bbs/student/2436/267213/artclView.do)
-  - [대외활동] [[재단법인 통일과나눔] 2026 통일과나눔 세미나, 시드니대학교 연구팀 「북한의 뇌물, 사](https://dep.hufs.ac.kr/bbs/student/2436/267199/artclView.do)
-  - [대외활동] [[글로벌발전연구원] KOICA 프로젝트 봉사단 9기 모집](https://dep.hufs.ac.kr/bbs/student/2436/267191/artclView.do)
-  - [대외활동] [[세종특별자치시] 2026년 한글런 자원봉사자 모집](https://dep.hufs.ac.kr/bbs/student/2436/267176/artclView.do)
-  - [대외활동] [[청소년재단] 학습멘토링 대학생 멘토 모집](https://dep.hufs.ac.kr/bbs/student/2436/267169/artclView.do)
 - **한국외국어대학교 대외활동·공모전 「진로·취업」** — 🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요
 - **경희대학교 대외활동·공모전 「취업/경력」** — 🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요
 - **경희대학교 대외활동·공모전 「사회진출 프로그램 공지」** — 🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요
 - **정부24 공모전 대외활동·공모전** — ⛔ robots.txt 가 막아 둔 주소 — 읽지 않았습니다 (출처를 바꾸거나 보관하세요)
 - **온통청년 청년참여 프로그램 대외활동·공모전** — 🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요
 - **서울시 청년몽땅정보통 대외활동·공모전** — 🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요
-- **창업진흥원 K-Startup 대외활동·공모전** — ✅ 정상 (활동·공모전 3건 감지)
-  - [대외활동] [2026 옥천군 로컬 크리에이터 아카데미](https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179354) — ⏰ 접수기간 2026-09-21 ~ 2026-10-05 13:00 주관기관명 주식회사 렛츠 대상 대학생, 일반인, 대학, 연구기관, 일반기업, 1인
+- **창업진흥원 K-Startup 대외활동·공모전** — ✅ 정상 (활동·공모전 2건 감지)
 - **대한민국 정책브리핑 이벤트·공모 대외활동·공모전** — ✅ 정상 (활동·공모전 23건 감지)
 - **경기청년포털 대외활동·공모전** — ✅ 정상 (활동·공모전 3건 감지)
 - **KOICA 봉사단 대외활동·공모전** — 🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요
@@ -270,36 +207,19 @@
 - **서울문화포털 공모소식 대외활동·공모전** — ✅ 정상 (활동·공모전 12건 감지)
 - **부산청년플랫폼 대외활동·공모전** — ✅ 정상 (활동·공모전 1건 감지)
 - **인천유스톡톡 청년포털 대외활동·공모전** — ✅ 정상 (활동·공모전 8건 감지)
-  - [대외활동] [인하공업전문대학 청년도약 인재양성 부트캠프 운](https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=519&bcd=notice)
-  - [대외활동] [2026년 미래차 청년도약 인재양성 부트캠프 교육생 모집](https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=518&bcd=notice)
-  - [대외활동] [2026 청년주간행사(연수청년 힐링데이)](https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=514&bcd=notice)
-  - [대외활동] [미추홀구 『청년 취업컨설팅』 참여자 모집 안내](https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=510&bcd=notice)
-  - [대외활동] [제1차「청년세대 성별균형 공개형 공론장」청년 참여자 모집](https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=508&bcd=notice) — ⏰ 모집기간) 2026.8.13.(목) ~ 2026.8.23(일) ○ (신청방법) 네이버 폼을 통한 온라인 신청 ○ (모집대상) 만 19세~39세
-  - [대외활동] [2026년 1인가구 행복 동행사업 청년 1인가구 지원사업 [다채로움] 참여자 모집](https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=507&bcd=notice)
-  - [대외활동] [2026년 여름에 만나는 평화 북크닉 참여자 모집 안내](https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=506&bcd=notice)
-  - [대외활동] [2026 제19회 국제기구 진출 아카데미 개최 안내](https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=505&bcd=notice)
 - **대전청년포털 대외활동·공모전** — ✅ 정상 (활동·공모전 8건 감지)
-- **울산청년정책플랫폼 U-PAGE 대외활동·공모전** — ⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
+- **울산청년정책플랫폼 U-PAGE 대외활동·공모전** — ✅ 정상 (활동·공모전 1건 감지)
 - **광주청년통합플랫폼 대외활동·공모전** — 🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요
 - **경남청년정보플랫폼 대외활동·공모전** — ✅ 정상 (활동·공모전 1건 감지)
 - **청년재단 대외활동·공모전** — ✅ 정상 (활동·공모전 2건 감지)
-  - [공모전] [2026년 청년다다름사업 참여수기 공모전 안내](https://kyf.or.kr/user/boardDetail.do?boardType=notice&bbsId=BBSMSTR_000000000367&nttNo=10053)
-  - [공모전] [2026년 청년다다름사업 청년 밥상 로그 공모전 안내](https://kyf.or.kr/user/boardDetail.do?boardType=notice&bbsId=BBSMSTR_000000000367&nttNo=10054)
 
-### 🏛 재단·지자체 새 공고 6건 → 홈 '재단·지자체 새 공고' (data/external.json · 52건 게재 중 · 게시판 아는 곳 20/77)
-> 걸러 낸 글: 결과·행정 글 2건 (collector/external-clean.mjs)
+### 🏛 재단·지자체 새 공고 0건 → 홈 '재단·지자체 새 공고' (data/external.json · 52건 게재 중 · 게시판 아는 곳 20/77)
 - **재단법인 김해시미래인재장학재단** — ✅ 정상 (장학 공고 11건 감지)
 - **재단법인 상주시장학회** — ✅ 정상 (장학 공고 3건 감지)
 - **재단법인 삼원장학재단** — ✅ 정상 (장학 공고 24건 감지)
 - **한진해운장학재단** — ✅ 정상 (장학 공고 5건 감지)
-  - [2026년 하반기 장학생 신청서 마감 안내(26.9.30 기준) 26.09.09 -->](http://www.hjsfoundation.or.kr/bbs_shop/read.htm?board_code=notice&idx=1697584&cate_sub_idx=0)
-  - [2026년 하반기 장학생 선발계획 공고 26.08.28 -->](http://www.hjsfoundation.or.kr/bbs_shop/read.htm?board_code=notice&idx=1691255&cate_sub_idx=0) — ⏰ 접수기간: 2026.9.7(월) 09:00 ~ 9.30(수) 17:00(장학재단 우편 도착분에 한함) o 접 수 처: 장학재단 사무국 o 접수방
-  - [**필독** 제출 방법 상세 안내 : 지방세 세목별 과세증명서(2006년 하반기 장학생 지원 시) 26.08.28 -->](http://www.hjsfoundation.or.kr/bbs_shop/read.htm?board_code=notice&idx=1691245&cate_sub_idx=0)
-  - [2026년 상반기 장학생 선발결과 발표 26.05.19 -->](http://www.hjsfoundation.or.kr/bbs_shop/read.htm?board_code=notice&idx=1645504&cate_sub_idx=0)
-  - [한진해운 장학재단 2025년 재무결산 공익법인 공시 자료 26.04.29 -->](http://www.hjsfoundation.or.kr/bbs_shop/read.htm?board_code=notice&idx=1640844&cate_sub_idx=0)
 - **(재)송파구 인재육성 장학재단** — ✅ 정상 (장학 공고 16건 감지)
 - **파안장학문화재단법인** — ✅ 정상 (장학 공고 25건 감지)
-  - [1 2026-1(전기) 파안장학문화재단법인, 총장추천 장학생 신청서와 첨부서류 양식을 안내... 2026-1(전기) 파안장학문화재단법인이 대학 측에 직접 추천을 요청하는 총장추천 장학생 지원자가 제출할 신청서와 첨부서류 양식을 ...](https://paan.or.kr/sub/sub02_01.php?boardid=notice&mode=view&idx=43&sk=&sw=&offset=&category=)
 - **메디힐장학재단** — ✅ 정상 (장학 공고 9건 감지)
 - **(재)고속도로장학재단** — ✅ 정상 (장학 공고 4건 감지)
 - **아산시미래장학회** — ✅ 정상 (장학 공고 10건 감지)
@@ -337,47 +257,41 @@
 
 ---
 ⚙️ 설정: `collector/schools.json` · `collector/activity-sources.json` · `collector/external-sources.json` · 발행: `data/notices.json` · `data/activities.json` · `data/external.json` · 로봇: `collector/collect.mjs`
-**🧩 양식 원본 자동 확보 예약 7건** (그중 4건은 전에 등록됐는데 신청서 첨부가 나중에 붙은 공고) — 원본은 이 실행에서 바로 내려받고, 같은 실행의 무료 변환기가 앱 양식으로 옮겨요(못 옮긴 것은 리포트 '보류'에 남아요).
+**⏳ 스키마화 대기 중 87건** (원본 확보됨 — collector/pending-forms.json)
 
-**⏳ 스키마화 대기 중 84건** (원본 확보됨 — collector/pending-forms.json)
-
-### 🤖 자동 등록 (선조치후보고) — 5건 등록
+### 🤖 자동 등록 (선조치후보고) — 1건 등록
 
 자동 등록분은 앱에 **자동 등록 · 검수 전** 배지로 표시돼요. 잘못 등록된 건이 있으면 채팅으로 알려주시거나 `collector/auto-register-config.json`의 `blockIds`에 id를 넣어주세요.
 
-- `auto-bswj104944259artclviewdo` [[교내] 2026학년도 2학기 형제장학금 신청 안내(~10/23)](https://mirae.yonsei.ac.kr/bbs/wj/104/944259/artclView.do) · 마감 2026-10-23 · 연세대학교 미래캠퍼스
-- `auto-bswj104944143artclviewdo` [[교외] 2026년 「강원·세종건설·신디자인랩」브랜드장학금 하반기 장학생 선발(~10/8)](https://mirae.yonsei.ac.kr/bbs/wj/104/944143/artclView.do) · 마감 2026-10-08 · 연세대학교 미래캠퍼스
-- `auto-jong659273296artclviewdo` [[교내]2026학년도 2학기 미래로장학금 2차 신청 안내(학부)](https://sejong.korea.ac.kr/bbs/koreaSejong/659/273296/artclView.do) · 마감 2026-10-30 · 고려대학교 세종캠퍼스
-- `auto-ervicenoticedetail520607` [「2026 상반기 AI·ICT 인재 장학생 모집」 안내(대상: 서울시 서초구에 주소지를 둔 재학생)](https://wise.dongguk.ac.kr/article/servicenotice/detail/520607) · 동국대학교 WISE캠퍼스
-- `auto-oarticleno158449nocat501` [[대전광역시] 2026년 하반기 성취장학생 선발 연장](https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158449&noCat=501) · 홍익대학교
+- `auto-bswj104944019artclviewdo` [[교외] 2026년 2학기 선원가족 장학생 모집 안내(~10/23)](https://mirae.yonsei.ac.kr/bbs/wj/104/944019/artclView.do) · 마감 2026-10-23 · 연세대학교 미래캠퍼스
 
-**컨펌 대기 (자동 기준 미달 80건)** — 장학 신호는 있지만 선발·모집 신호가 약해요:
-- 일반공지 [한국장학재단] 가구원 정보제공 동의 안내 신촌/국제 (선발·모집·신청 신호 없음 — 개발자 컨펌 대기)
-- 일반공지 2026년 장학금 부정수급 자진신고 캠페인 안내 신촌/국제 (선발·모집·신청 신호 없음 — 개발자 컨펌 대기)
-- 일반공지 [한국장학재단] 2026학년도 2학기 주거안정장학금 장학생서약서 및 지급요청서 작성 안내 신촌/국제 (선발·모집·신청 신호 없음 — 개발자 컨펌 대기)
-- 일반공지 [한국장학재단] 2026학년도 2학기 주거안정장학금 우선지원 및 지원제외 기준 안내 신촌/국제 (선발·모집·신청 신호 없음 — 개발자 컨펌 대기)
-- ☆★KU SEJONG 장학 포탈 OPEN 안내☆★ (선발·모집·신청 신호 없음 — 개발자 컨펌 대기)
-- [교내]2026학년도 2학기 교내장학금 안내(학부) (선발·모집·신청 신호 없음 — 개발자 컨펌 대기)
-- [우양재단] 2026년 우양재단 동행장학생 모집 (타교 등록분과 동일 사업([우양재단] 2026년 동행 장학생 모집 () — 접수분 여부 컨펌 대기)
-- [춘천시] 2026년도 하반기 봄내장학생 선발공고 (타교 등록분과 동일 사업(2026년도 하반기 봄내장학생 선발 안내) — 접수분 여부 컨펌 대기)
-- 2027 대산농촌재단 장학생 선발 안내 (2027년 이후 사업으로 보임 — 개발자 컨펌 대기)
-- 2027학년도 제36기 미래에셋 해외교환 장학생 선발 안내 (2027년 이후 사업으로 보임 — 개발자 컨펌 대기)
+**컨펌 대기 (자동 기준 미달 93건)** — 장학 신호는 있지만 선발·모집 신호가 약해요:
+- [교외] [대전청년내일재단] 2026년 하반기 인재육성(성취) 장학생 선발(~10/8)(기간 연장) (타교 등록분과 동일 사업([등록/장학] [대전광역시] 2026년 하반) — 접수분 여부 컨펌 대기)
+- [교외] 2026년도 국가유산진흥원 전통 기·예능 분야 및 매장유산 관련 분야 우수 장학생 선발 공고 (~9 (타교 등록분과 동일 사업(2026년도 국가유산진흥원 전통 기·예능 분) — 승격 불가(사람 지정·교내·마감 경과) 컨펌 대기)
+- [교외] 2027-2028 스위스 정부초청 장학생 선발 안내(~11/10) (2027년 이후 사업으로 보임 — 개발자 컨펌 대기)
+- [한국장학재단] 2026학년도 2학기 중소기업취업연계장학금(희망사다리1유형) 신청 안내 (타교 등록분과 동일 사업([학부-국가장학] 2026학년도 2학기 중소) — 승격 불가(사람 지정·교내·마감 경과) 컨펌 대기)
+- [교내/안내] 2026학년도 2학기 교내장학 지급.. (타교 등록분과 동일 사업(2026학년도 2학기 교내장학금 신청 안내) — 접수분 여부 컨펌 대기)
+- [서울시립대학교 장학팀] 27년 1학기 직장체험인.. (선발·모집·신청 신호 없음 — 개발자 컨펌 대기)
+- [근로] 2026학년도 2학기 직장체험인턴장학생 .. (선발·모집·신청 신호 없음 — 개발자 컨펌 대기)
+- [홍보] 2024 장학금이 필요하십니까? (장학제.. (선발·모집·신청 신호 없음 — 개발자 컨펌 대기)
+- [홍보] 장학 홍보 채널 가입 안내(카카오톡 플러.. (선발·모집·신청 신호 없음 — 개발자 컨펌 대기)
+- [교외] 2026년 우양재단 동행 장학생 모집 안.. (타교 등록분과 동일 사업(2026년 우양재단 동행장학생 모집 안내) — 접수분 여부 컨펌 대기)
 
-**거른 공고 297건 — 이유별**
+**거른 공고 321건 — 이유별**
 
-- 이미 등록(원문 동일) · 80건
-- 이미 전국(동일 사업) · 48건
-- 이미 등록(동일 사업) · 42건
-- 이미 등록(같은 id) · 20건
-- 마감 경과 · 15건
+- 이미 등록(원문 동일) · 91건
+- 이미 전국(동일 사업) · 51건
+- 이미 등록(동일 사업) · 48건
+- 이미 등록(같은 id) · 19건
+- 마감 경과 · 17건
 - 행정 안내(신청 공고 아님) · 13건
+- '장학' 신호 없음 · 12건
 - 사람이 막아 둔 공고(blockIds/blockUrls) · 12건
-- '장학' 신호 없음 · 11건
+- 학자금 대출·융자(장학금 아님) · 11건
 - 이미 등록(동일 사업)논산시장학회 ) · 11건
-- 학자금 대출·융자(장학금 아님) · 10건
 - 이미 등록(동일 사업)포항시장학회) · 10건
+- 국가장학금 상시 제도 — 앱 내 카드로 이미 안내 · 7건
 - 행사·연수·설명회(신청형 장학 아님) · 7건
-- 국가장학금 상시 제도 — 앱 내 카드로 이미 안내 · 6건
 - 이미 등록(동일 사업)춘천인재육성장학) · 3건
 - 이미 등록(동일 사업)대전청년내) · 2건
 - 이미 등록(동일 사업)) · 2건
@@ -388,7 +302,7 @@
 - 학부생 대상 아님(대학원 등) · 1건
 
 
-### 🚨 양식 원본을 못 받고 있는 공고 12건 (3회 이상 시도)
+### 🚨 양식 원본을 못 받고 있는 공고 16건 (3회 이상 시도)
 
 자동으로는 더 못 가져옵니다. 첨부 주소가 바뀌었거나 로그인이 필요한 경우예요.
 이 공고들은 앱에서 양식 작성이 안 되고 원본 다운로드 안내만 나갑니다.
@@ -439,9 +353,9 @@
 - [학생지원팀] 2026년도 산학협동재단 국내 외국인 근로자 자녀 장학생 선발 신청 안내 ( — registered.json에 항목 없음
 
 
-### 🌐 범위 승격 (학교 한정 → 전국) — 1건
+### 🌐 범위 승격 (학교 한정 → 전국) — 0건
 원문(접수 이메일 도메인·"재단에 직접 제출"·다른 학교의 같은 사업)이 전국 사업이라고 말하는 것만 풀었어요. 학교 창구(장학팀·포털)로 내는 것은 그 학교 한정이 맞아 그대로 둡니다.
-- 🌐 `auto-2373viewdocurrentpageno1` 2026년 JW이종호재단 기초과학자 장학생 선발 안내 — 접수 이메일 도메인 jwhealthcare.com (학교 밖) (게시 국민대학교)
+- 이번 실행에서 원문 증거로 풀 수 있는 학교 한정 공고가 없었어요.
 ### 🏫 교내·교외 원문 판정 — 바뀐 것 0건 · 후보 2건 · 학교 제도 새로 배움 0건
 판정 근거는 항목의 kindEvidence(원문 글자)에 남아요. 후보는 관리자 화면에서 구분을 바꿔 주세요 — 되돌리면 그 이름은 다시 배우지 않아요.
 - 뒤집힌 판정 없음
