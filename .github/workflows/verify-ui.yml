@@ -66,6 +66,10 @@ on:
       - 'tools/report-retention.mjs'
       - 'tools/app-fetch-files.cjs'
       - '.github/actions/**'
+      # 🔴 워크플로만 고친 커밋에도 돈다 (2026-10-05 리뷰). 「로봇·도구 점검 관문」(alerts S1~S4 · 각 로봇 절)은 워크플로 **글자**를 잰다.
+      #    여기 없으면 그 위반을 처음 보는 곳이 수집 로봇의 데이터 관문이 된다 — 그쪽은 경고만 하므로(로봇 결과를 되돌리지 않게)
+      #    엄격하게 실패시키는 곳은 이 검사 하나다. 로봇은 워크플로 파일을 커밋하지 않아 수집 커밋마다 돌지는 않는다.
+      - '.github/workflows/**'
   workflow_dispatch:
 
 permissions:
