@@ -7192,6 +7192,30 @@
    "nextTryAt": "2026-10-05",
    "status": "resolved",
    "resolvedUrl": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54793"
+  },
+  "n:https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%5B%EA%B5%90%EC%99%B8%5D%202026%EB%85%84%20%EC%9A%B0%EC%96%91%EC%9E%AC%EB%8B%A8%20%EB%8F%99%ED%96%89%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88..": {
+   "attempts": 1,
+   "title": "[교외] 2026년 우양재단 동행 장학생 모집 안..",
+   "lastTried": "2026-10-05",
+   "lastWhy": "목록에서 못 찾음",
+   "nextTryAt": "2026-10-06",
+   "status": ""
+  },
+  "n:https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%5B%EA%B5%90%EC%99%B8%5D%20%EC%A0%9C29%EA%B8%B0%20%EB%91%90%EC%9D%84%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C": {
+   "attempts": 1,
+   "title": "[교외] 제29기 두을장학생 선발",
+   "lastTried": "2026-10-05",
+   "lastWhy": "목록에서 못 찾음",
+   "nextTryAt": "2026-10-06",
+   "status": ""
+  },
+  "n:https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%EB%AF%B8%EB%9E%98%EC%97%90%EC%85%8B%20%ED%95%B4%EC%99%B8%EA%B5%90%ED%99%98%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%20%EB%B0%8F%20%ED%99%8D%EB%B3%B4": {
+   "attempts": 1,
+   "title": "미래에셋 해외교환 장학생 선발 안내 및 홍보",
+   "lastTried": "2026-10-05",
+   "lastWhy": "목록에서 못 찾음",
+   "nextTryAt": "2026-10-06",
+   "status": ""
   }
  }
 }
