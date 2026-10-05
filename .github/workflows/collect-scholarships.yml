@@ -269,6 +269,8 @@ jobs:
           [ -f collector/find-boards-report.md ] && git add collector/find-boards-report.md
           [ -f data/external.json ] && git add data/external.json
           [ -f collector/seen-external.json ] && git add collector/seen-external.json
+          # 대외활동·재단 출처의 연속 실패 장부 (2026-10-05 점검 collect-08 · collector/source-health.mjs) — 빠지면 매 실행 0 부터 세어 🙋 가 영영 안 뜬다
+          [ -f collector/source-health.json ] && git add collector/source-health.json
           # 🔴 학교별 공고 파일 — 앱이 **실제로 읽는 것은 이쪽**이다(data/notices.json 은
           #    학교별 파일이 아직 없는 학교를 위한 뒷길). 수집기는 매 실행 이 폴더를 새로
           #    쓰는데 여기에 없어서 **한 번도 저장되지 않았다** — 2026-08-17 에 폴더를

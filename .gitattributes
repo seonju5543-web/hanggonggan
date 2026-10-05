@@ -19,6 +19,8 @@ collector/seen-activities.json merge=jsonunion
 # 재단·지자체 공고 (2026-09-26)
 data/external.json           merge=jsonunion
 collector/seen-external.json merge=jsonunion
+# 대외활동·재단 출처의 연속 실패 장부 (2026-10-05 · collector/source-health.mjs) — health.json 과 같은 모양이라 같은 병합기(최근 성공 쪽 · 실패 수는 작은 쪽)
+collector/source-health.json merge=jsonunion
 
 # ── 매 실행 새로 쓰이는 리포트: 내 쪽을 남긴다(다음 수집이 어차피 덮어쓴다) ──
 # ⚠️ 리포트를 쓰는 로봇을 새로 만들면 **여기에 반드시 한 줄 추가할 것**.
