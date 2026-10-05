@@ -1683,18 +1683,14 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
   }
   /* ③ 출처 */
   const src = JSON.parse(readText(new URL('../collector/activity-sources.json', import.meta.url)));
-  const served = createRequire(import.meta.url)('../match-engine.js').SERVED_SCHOOLS;   // 2026-09-29: 두 곳 → 44곳, 상수 한 곳에서 읽는다
-  eq('전용 게시판 출처는 서비스 학교 안 (전국 글은 학교를 비우고 host 를 적는다)',
-    (src.sources || []).every((x) => (x.school === '' ? !!x.host : served.includes(x.school))), true);
-  eq('  항목마다 boardUrl 칸이 있다 (null 이면 로봇이 "주소 미설정"으로 리포트한다)', (src.sources || []).length > 0 && src.sources.every((x) => 'boardUrl' in x), true);
   eq('  보관 칸과 되돌리는 법', Array.isArray(src.parked) && /되돌리려면/.test(src._parked || ''), true);
   /* 2026-09-29 개발자 지시 "어떻게 해서든 크롤링 출처를 찾아" — 주소를 안 적는 규칙에서 **근거와 함께 적는 규칙**으로 바뀌었다.
      주소마다 evidence(어디서 확인했나)가 있어야 한다 · 집계 사이트(링커리어·위비티·씽굿·캠퍼스픽·올콘·콘테스트코리아)는 출처가 아니다. */
-  /* 근거(evidence) 10자 넘게는 **실데이터 단정이 아니라 감사(audit-data)의 오류**로 옮겼다 (2026-10-04 · 로봇·도구 점검) —
-     관리자 저장 관문은 감사만 돌려, 여기서만 재면 저장은 통과하고 다음 로봇 실행이 빨개졌다. 규칙은 verify/source-rules.cjs 한 곳 · 표본은 health-gates/gate.mjs */
-  eq('  주소가 있는 항목의 근거(evidence)는 감사가 source-rules 로 본다 (관리자 저장소도 같은 함수)',
-    /SR\.activitySourceProblems\(/.test(readText(new URL('./audit-data.js', import.meta.url))) && /activitySourceProblems\(src, \{ served: SERVED_SCHOOLS, aggregator: AGGREGATOR_RE \}\)/.test(readText(new URL('../tools/admin-apply.mjs', import.meta.url))), true);
-  eq('  집계 사이트는 출처에 넣지 않는다', src.sources.some((x) => /linkareer|wevity|thinkcontest|campuspick|all-con|contestkorea|thinkyou|allforyoung/i.test(x.boardUrl || '')), false);
+  /* 서비스 학교 안 · boardUrl 칸 · 근거(evidence) 10자 넘게 · 집계 사이트 아님은 **실데이터 단정이 아니라 감사(audit-data)의 오류**로 옮겼다
+     (2026-10-04 · 로봇·도구 점검) — 관리자 저장 관문은 감사만 돌려, 여기서만 재면 저장은 통과하고 다음 로봇 실행이 빨개졌다.
+     규칙은 verify/source-rules.cjs 한 곳(집계 사이트 정규식은 collector/link-fix.mjs 한 곳) · 표본과 '감사가 오류로 넣는가'는 health-gates/gate.mjs ② */
+  eq('  출처 규칙(학교·주소 칸·근거·집계 사이트)은 감사가 source-rules 로 **오류**에 넣는다 (관리자 저장소도 같은 함수)',
+    /errors\.push\(\.\.\.SR\.auditSourceFiles\(readCfg, \{ served, aggregator \}\)\)/.test(readText(new URL('./audit-data.js', import.meta.url))) && /activitySourceProblems\(src, \{ served: SERVED_SCHOOLS, aggregator: AGGREGATOR_RE \}\)/.test(readText(new URL('../tools/admin-apply.mjs', import.meta.url))), true);
   eq('  설명에 집계 사이트를 넣지 않는 이유가 적혀 있다', /집계 사이트/.test(src._comment || ''), true);
   const acts = JSON.parse(readText(new URL('../data/activities.json', import.meta.url)));
   eq('발행 파일 모양 {updatedAt, items[]}', 'updatedAt' in acts && Array.isArray(acts.items), true);
@@ -2058,7 +2054,7 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   /* 출처 학교·학교당 게시판 하나·후보 근거·boardUrl 근거는 감사(audit-data)의 오류로 옮겼다 (2026-10-04 · 위 활동 출처와 같은 이유 ·
      관리자 park→add→unpark 로 한 학교에 둘이 되면 저장은 통과하고 소식 로봇이 빨개졌다). 규칙 verify/source-rules.cjs · 표본 health-gates/gate.mjs */
   eq('  출처 규칙(학교·학교당 하나·근거)은 감사가 source-rules 로 본다 · 찾기 로봇의 문턱도 같은 파일',
-    /SR\.newsSourceProblems\(/.test(readText(new URL('verify/audit-data.js', root))) && /newsSourceProblems\(src, \{ schools:/.test(readText(new URL('tools/admin-apply.mjs', root)))
+    /errors\.push\(\.\.\.SR\.auditSourceFiles\(readCfg, \{ served, aggregator \}\)\)/.test(readText(new URL('verify/audit-data.js', root))) && /newsSourceProblems\(src, \{ schools:/.test(readText(new URL('tools/admin-apply.mjs', root)))
     && FN.MIN_ROWS === createRequire(import.meta.url)('./source-rules.cjs').NEWS_MIN_ROWS, true);
   eq('  보관 칸과 되돌리는 법', Array.isArray(src.parked) && /되돌리려면/.test(src._parked || ''), true);
   /* ④ 로봇 배선 */

@@ -5,6 +5,7 @@
      ② 관리자 저장 = 로봇 관문 — 관리자 저장 관문(admin-apply.yml)은 감사(audit-data) 하나만 돌려, test-collector 만 아는 규칙
         (활동 출처 근거 10자 · 소식 출처 학교당 하나 · 화면 문구 끝 날짜 = 마감)을 어긴 저장이 통과하고 **다음 로봇 실행의 데이터 관문이
         빨개졌다**. 규칙을 감사가 쓰는 한 곳(verify/source-rules.cjs · entry-rules checkEntry)으로 옮기고 저장소가 저장 전에 같은 함수로 거절한다.
+        감사의 일은 auditSourceFiles 하나 — 표본으로 돌리고, 감사가 그 결과를 경고로 낮추지 않았는지도 본다(리뷰: errors→warns 로 바꿔도 조용했다).
      ③ 실데이터 단정 톱니 — test-collector 가 실데이터를 읽어 단정하면 로봇이 데이터를 바꾸는 순간 관문이 빨개진다(10-01·10-04 사고).
         읽는 곳 수를 파일별로 세어 늘면 빨간불 · 저장 전 관문이 없던 등록금·학과 갱신 로봇에 관문 · 등록금 표본.
      ④ 데이터 관문 되돌리기 — 되돌린 뒤 관문을 다시 재지 않아(revert-auto) 원인이 기존 항목이면 관문 실패 상태로 저장되고,
@@ -109,12 +110,39 @@ export default async function gate(eq, ctx) {
         ER.lastDateIn('접수 ~9/18', '2026'), ER.lastDateIn('접수 2026.12.20 ~ 1.10', '2026'),
         ER.lastDateIn('접수 ~ 2026. 9. 18.(금) 18:00 · 평점 3.5 ~ 4.5', '2026'), ER.lastDateIn('접수 기간 원문 확인', '2026')],
       ['2026-08-31', '2026-08-05', '2026-09-18', '2027-01-10', '2026-09-18', null]);
-    eq('  감사가 출처 규칙(source-rules)을 오류로 · 마감일 감사 도구는 lastDateIn 을 불러 쓴다 · 찾기 로봇 문턱도 같은 파일',
-      [/SR\.activitySourceProblems\(/.test(stripComments(fs.readFileSync(new URL('verify/audit-data.js', root), 'utf8'))),
-        /SR\.newsSourceProblems\(/.test(stripComments(fs.readFileSync(new URL('verify/audit-data.js', root), 'utf8'))),
+    /* 감사가 출처 규칙을 **오류로** 넣는가 — 예전엔 `SR.…Problems(` 를 부르는지만 봐서, 감사의 errors.push 를 warns.push 로 바꿔도
+       이 관문·test-collector 가 둘 다 초록이었다(리뷰 2026-10-04 실측). 그러면 로봇 길(찾기 로봇이 news-sources.json 을 고칠 때)을
+       막는 곳이 하나도 없다. 그래서 감사의 일은 source-rules 의 auditSourceFiles 하나로 모으고 ⓔ 그 함수를 표본으로 돌리고
+       ⓕ 감사가 그 결과를 **errors 에만** 넣는지(그리고 집계 사이트 정규식을 link-fix.mjs 에서 받아 넘기는지) 주석 걷은 소스로 본다. */
+    const audSrc = stripComments(fs.readFileSync(new URL('verify/audit-data.js', root), 'utf8'));
+    const calls = audSrc.match(/[^\n]*auditSourceFiles\([^\n]*/g) || [];
+    eq('② ⓕ 감사가 출처 규칙 결과를 **오류(errors)로만** 넣는다 · 집계 사이트 정규식은 link-fix.mjs 에서 받아 넘긴다 · 마감일 감사 도구는 lastDateIn 을 불러 쓴다 · 찾기 로봇 문턱도 같은 파일',
+      [calls.length, calls.every((l) => /^\s*errors\.push\(\.\.\.SR\.auditSourceFiles\(readCfg, \{ served, aggregator \}\)\);\s*$/.test(l)),
+        /aggregator = require\('\.\.\/collector\/link-fix\.mjs'\)\.AGGREGATOR_RE/.test(audSrc),
         /const \{ lastDateIn \} = require\('\.\/entry-rules\.cjs'\)/.test(fs.readFileSync(new URL('verify/deadline-audit.mjs', root), 'utf8')),
         /MIN_ROWS = SOURCE_RULES\.NEWS_MIN_ROWS/.test(fs.readFileSync(new URL('collector/find-news-boards.mjs', root), 'utf8'))],
-      [true, true, true, true]);
+      [1, true, true, true, true]);
+    /* ⓔ 감사가 부르는 함수를 표본 파일로 돌린다 — 실데이터를 읽지 않는다 */
+    {
+      const { AGGREGATOR_RE } = await import(new URL('collector/link-fix.mjs', root));
+      const okAct = { sources: [{ school: '경희대학교', campus: '공통', boardUrl: 'https://ex.ac.kr/board', evidence: '표본 — 학교 누리집 메뉴에서 확인' }, { school: '', host: '표본재단', boardUrl: null }], parked: [] };
+      const okNews = { sources: [{ school: '경희대학교', campus: '공통', boardUrl: 'https://k.ac.kr/notice', evidence: '표본 — 학교 누리집 메뉴에서 확인' }], parked: [] };
+      const sch = { schools: [{ school: '경희대학교' }] };
+      const reader = (files) => (rel) => { if (!(rel in files)) throw new Error(`없음: ${rel}`); return files[rel]; };
+      const run = (files, opts = { served, aggregator: AGGREGATOR_RE }) => SR.auditSourceFiles(reader(files), opts);
+      const base = { 'collector/activity-sources.json': okAct, 'collector/news-sources.json': okNews, 'collector/schools.json': sch };
+      const hit = (errs, re) => errs.some((m) => re.test(m));
+      const badAct = run({ ...base, 'collector/activity-sources.json': { sources: [
+        { school: '경희대학교', boardUrl: 'https://ex.ac.kr/b2', evidence: '학교 공지 확인' },
+        { school: '', host: '표본', boardUrl: 'https://linkareer.com/list/activity', evidence: '표본 — 주최가 올린 게시판이 아닌 것' },
+        { school: '없는대학교', boardUrl: null }] } });
+      const badNews = run({ ...base, 'collector/news-sources.json': { sources: [okNews.sources[0], { school: '경희대학교', boardUrl: 'https://k.ac.kr/two', evidence: '표본 — 학교 누리집 메뉴에서 확인' }] } });
+      eq('② ⓔ 감사 함수(auditSourceFiles) 표본 — 멀쩡하면 0건 · 짧은 근거·집계 사이트·서비스 밖 학교 · 한 학교 게시판 둘 · 못 읽음 · 집계 규칙 못 받음은 전부 오류',
+        [run(base), hit(badAct, /10자 넘게/), hit(badAct, /집계 사이트는 출처가 아닙니다/), hit(badAct, /없는대학교 — 서비스하지 않는 학교/), hit(badNews, /게시판이 있는 줄이 2개/),
+          hit(run({ 'collector/schools.json': sch, 'collector/news-sources.json': okNews }), /activity-sources — 출처 목록을 읽지 못했습니다/),
+          hit(run(base, { served }), /집계 사이트 규칙.*받지 못해/)],
+        [[], true, true, true, true, true, true]);
+    }
 
     /* ⓐ 활동 출처 — 짧은 근거에도 날짜 도장이 붙어 감사 규칙을 넘는다 */
     {
