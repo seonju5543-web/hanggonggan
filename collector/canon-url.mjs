@@ -99,17 +99,22 @@ export function idHash(cu) {
      · 그 id 가 막혀 있지만 이번 묶음에서 여러 주소가 같은 id 를 받고(ambiguous) 이 주소는 막은 주소(blockedCanons)가 아니면 → 꼬리표 id
        (사람은 **그 한 글**을 막았다 — 막은 글은 주소로 계속 막힌다)
      · 그 밖에는 옛 id 그대로(이미 저장된 id·막은 id 가 하나도 안 바뀐다)
-   holderCanon(id) 은 그 id 의 등록분 주소(canonUrl)를, 없으면 null 을 돌려준다(주소 없는 등록분은 '' — 겹친 것으로 본다). */
+   holderCanon(id) 은 그 id 의 등록분 주소(canonUrl)를, 없으면 null 을 돌려준다(주소 없는 등록분은 '' — 겹친 것으로 본다).
+   🔴 꼬리표 id 는 **고정되지 않는다** — 그 옛 id 를 쥔 등록분이 있느냐에 따라 같은 글이 어느 날은 꼬리표 id, 어느 날은 옛 id 를 받는다.
+   그래서 막음·쉬기는 **두 꼴을 다 본다**: blockedTagged = 이 주소의 꼬리표 꼴(`tagged`)이 막혀 있다(꼬리표는 주소마다 달라 남의 글을 막지 않는다).
+   리뷰 R1(2026-10-05): 꼬리표 id 로 되돌린 글이, 옛 id 차단을 푼 뒤 옛 id 를 받아 다시 등록됐다. */
 export function registerId(prefix, raw, { holderCanon = () => null, blockedIds = new Set(), blockedCanons = new Set(), ambiguous = () => false } = {}) {
   const legacy = idFromUrl(prefix, raw);
   const cu = canonUrl(raw);
   const tagged = `${legacy}-${idHash(cu)}`;
   const amb = !!ambiguous(legacy);
   const blockedByLegacy = blockedIds.has(legacy) && !amb;
+  const blockedTagged = blockedIds.has(tagged);
+  const out = (id) => ({ id, legacy, tagged, blockedByLegacy, blockedTagged });
   const held = holderCanon(legacy);
-  if (held !== null && held !== undefined && held !== cu) return { id: tagged, legacy, blockedByLegacy };
-  if (blockedIds.has(legacy) && amb && !blockedCanons.has(cu)) return { id: tagged, legacy, blockedByLegacy };
-  return { id: legacy, legacy, blockedByLegacy };
+  if (held !== null && held !== undefined && held !== cu) return out(tagged);
+  if (blockedIds.has(legacy) && amb && !blockedCanons.has(cu)) return out(tagged);
+  return out(legacy);
 }
 
 export default canonUrl;

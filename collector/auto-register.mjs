@@ -388,12 +388,15 @@ if (!cfg.enabled) {
     if (holders.some((i) => i.id === id)) { skipped.set('이미 등록(꼬리표 id 까지 겹침)', (skipped.get('이미 등록(꼬리표 id 까지 겹침)') || 0) + 1); continue; }
     /* 사람이 한 번 '이건 아니다'라고 뺀 공고는 다시 등록하지 않는다.
        위 되돌리기와 같은 이유로 주소도 함께 본다 — 지우기만 하면 다음 실행에 또 들어온다.
-       옛 id 로 막힌 것(blockedByLegacy)도 막는다 — 막은 주소 기록이 있는 겹친 id 만 그 주소로 좁힌다(registerId). */
-    if (blockedIds.has(id) || blockedUrls.has(cu) || rid.blockedByLegacy) { skipped.set('사람이 막아 둔 공고(blockIds/blockUrls)', (skipped.get('사람이 막아 둔 공고(blockIds/blockUrls)') || 0) + 1); continue; }
+       옛 id 로 막힌 것(blockedByLegacy)도 막는다 — 막은 주소 기록이 있는 겹친 id 만 그 주소로 좁힌다(registerId).
+       꼬리표 꼴로 막힌 것(blockedTagged)도 막는다 — 꼬리표 id 는 고정되지 않아 오늘은 옛 id 를 받을 수 있다(리뷰 R1 · registerId 머리말). */
+    if (blockedIds.has(id) || blockedUrls.has(cu) || rid.blockedByLegacy || rid.blockedTagged) { skipped.set('사람이 막아 둔 공고(blockIds/blockUrls)', (skipped.get('사람이 막아 둔 공고(blockIds/blockUrls)') || 0) + 1); continue; }
     /* 데이터 관문에 두 번 걸려 되돌린 공고는 마지막으로 걸린 날부터 3일 쉰다 — 같은 공고가 실행마다 '등록 → 관문 빨간불 → 되돌림'을
        되풀이하지 않게(10-03~04 실측 8건). 상한(maxPerRun)을 먹지 않고, 조용히 빠지지 않게 컨펌 대기에 이유를 남긴다. */
-    if (heldLedger && isHeld(heldLedger, id, TODAY)) {
-      const times = (heldLedger.items.find((x) => x.id === id) || {}).reverts || 2;
+    /* 쉬는 장부도 꼬리표 꼴을 함께 본다 — 꼬리표 id 로 되돌린 글이 오늘 옛 id 를 받아도 쉰다(위 막음과 같은 이유 · 꼬리표는 주소마다 다르다) */
+    const heldId = heldLedger && [id, rid.tagged].find((x) => isHeld(heldLedger, x, TODAY));
+    if (heldId) {
+      const times = (heldLedger.items.find((x) => x.id === heldId) || {}).reverts || 2;
       gateHeld.push({ n, why: `데이터 관문에 ${times}번 걸려 되돌린 공고 — 3일 쉬었다 다시 봅니다` });
       continue;
     }

@@ -28,6 +28,10 @@ import { recordAttempt, escalationLines, pruneHuntState } from '../../collector/
 const KGU = (ntt, sess = '') => `https://www.kyonggi.ac.kr/www/selectBbsNttView.do${sess}?key=7520&bbsNo=1073&nttNo=${ntt}&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888`;
 /* 서강대 꼴 — 끝이 namepage=ScholarshipNotice */
 const SGU = (n) => `https://www.sogang.ac.kr/ko/detail/${n}?bbsConfigFk=141&namepage=ScholarshipNotice`;
+/* 강원대 꼴 — 끝이 searchGbn·searchOrder(옛 id 'auto-archgbn0searchordersort0') */
+const KNU = (n) => `https://wwwk.kangwon.example.ac.kr/www/selectBbsNttView.do?bbsNo=81&nttNo=${n}&key=277&searchGbn=0&searchOrder=sort0`;
+/* 게시판 공통값(category·slug)이 끝을 차지하는 꼴 — 글 번호(bbsidx)가 달라도 옛 id 가 같다 */
+const SSU = (n) => `https://scatch.ssu.example.ac.kr/bbs/view?bbsidx=${n}&category=jang&slug=notice-board`;
 
 /* 저장소 코드를 임시 폴더로 복사 — 자동 등록은 verify/*.cjs(등록 규칙)도 부른다 */
 function repoSandbox(root, prefix) {
@@ -107,6 +111,12 @@ export default async function links(eq, ctx) {
     eq('① 막힌 id 를 여러 글이 받으면 막은 주소만 막는다(서강대 551052 는 풀림 · 550536 은 옛 id 그대로 → 주소·id 로 막힘) · 글이 하나뿐이면 예전처럼 막는다',
       [amb.blockedByLegacy, amb.id !== amb.legacy, blockedIds.has(amb.id), ambBlocked.id, ambBlocked.blockedByLegacy, single.blockedByLegacy, single.id],
       [false, true, false, 'auto-amepagescholarshipnotice', false, true, 'auto-amepagescholarshipnotice']);
+    /* 꼬리표 id 는 '그 옛 id 를 쥔 등록분이 있을 때만' 붙어 고정되지 않는다 — 꼬리표 꼴로 막은 글이 다음 실행에 옛 id 를 받아도 막혀야 한다(리뷰 R1) */
+    const tagOnly = new Set([`${idFromUrl('auto-', SGU(551052))}-${idHash(canonUrl(SGU(551052)))}`]);
+    const tb = registerId('auto-', SGU(551052), { blockedIds: tagOnly });
+    eq('① 꼬리표 꼴로 막은 글은 옛 id 를 받는 날에도 막힌다(blockedTagged) · 같은 게시판의 다른 글은 안 막힌다 · 꼬리표 값을 돌려준다',
+      [tb.id, tb.blockedTagged, tb.tagged === [...tagOnly][0], registerId('auto-', SGU(551490), { blockedIds: tagOnly }).blockedTagged],
+      ['auto-amepagescholarshipnotice', true, true, false]);
 
     /* 진짜 자동 등록을 사본 저장소에서 — 불러오는 순간 실행되는 파일이라 import 하지 않는다 */
     const sb = repoSandbox(root, 'hdj-links-areg-');
@@ -115,7 +125,11 @@ export default async function links(eq, ctx) {
       const shift = (n) => new Date(Date.parse(today) + n * 86400000).toISOString().slice(0, 10);
       const KMU = (uid) => `https://www.kmu.example.ac.kr/uni/main/page.jsp?pageNo=1&cmd=2&parm_bod_uid=${uid}&srchVoteType=-1&srchEnable=1&mnu_uid=145&`;
       const ID_ONLY = 'auto-' + canonUrl(KMU(1)).replace(/[^a-z0-9]/gi, '').slice(-24).toLowerCase();
-      sb.write('collector/auto-register-config.json', { enabled: true, schools: [], maxPerRun: 8, blockIds: ['auto-amepagescholarshipnotice', ID_ONLY, 'auto-notiphpcodes1301seq10871'], blockUrls: [SGU(550536)] });
+      const tagKnu = (n) => `${idFromUrl('auto-', KNU(n))}-${idHash(canonUrl(KNU(n)))}`;
+      sb.write('collector/auto-register-config.json', { enabled: true, schools: [], maxPerRun: 8, blockIds: ['auto-amepagescholarshipnotice', ID_ONLY, 'auto-notiphpcodes1301seq10871', tagKnu(9101)], blockUrls: [SGU(550536)] });
+      /* 꼬리표 꼴로 쉬는 글(데이터 관문 쉬기) — 이번 실행엔 옛 id 를 받는다(그 옛 id 를 쥔 등록분이 없다) */
+      sb.write('collector/auto-held.json', { items: [{ id: tagKnu(9103), reverts: 2, lastAt: today }] });
+      const T_SSU = '[교외] 2026학년도 2학기 표본별빛장학회 장학생 선발 안내';
       const N = (title, url, school) => ({ title, url, school, foundAt: today, bodyDeadline: shift(20), bodyDeadlineText: `신청기간 : ~ ${shift(20)}` });
       sb.write('data/notices.json', { items: [
         N('2026학년도 2학기 표본재단 장학생 선발 안내', A, '경기대학교'),
@@ -127,10 +141,18 @@ export default async function links(eq, ctx) {
         N('[교외] 2026학년도 2학기 표본시민장학재단 장학생 선발', KMU(270575), '계명대학교'),
         N('2026학년도 산학표본재단 장학생 선발 안내', 'https://kau.example.ac.kr/kaulife/scholnoti.php?code=s1301&mode=read&seq=10871', '한국항공대학교'),
         N('[국가근로] 2026학년도 2학기 국가근로장학생 최종선발자 공지', 'https://dsu.example.ac.kr/bbs/view.do?seq=90001', '표본대학교'),
+        N('[교외] 표본달빛장학재단 2026년 장학생 선발 안내', KNU(9103), '강원대학교'),
+        N('[교외] 표본꽃길장학재단 2026년 장학생 선발 안내', KNU(9101), '강원대학교'),
+        N('[교외] 표본들녘장학회 2026년 장학생 선발 안내', KNU(9102), '강원대학교'),
+        N(T_SSU, SSU(302), '숭실대학교'),
       ] });
       sb.write('data/registered.json', { items: [
         { id: idFromUrl('auto-', A), name: '2026학년도 2학기 표본재단 장학생 선발 안내', boardTitle: '2026학년도 2학기 표본재단 장학생 선발 안내', type: '교외', provider: '주관 기관 원문 확인',
           amount: '금액 원문 확인', amountValue: 0, auto: true, deadline: shift(20), period: `접수 ~${shift(20)}`, sourceUrl: A, eligibility: { selective: true, schoolOnly: '경기대학교' },
+          summary: '표본', documents: ['원문 확인'], noForm: '표본' },
+        /* 같은 글이 다른 주소로 다시 온다(표식이 진짜 주소로 풀린 것 등) — 등록명은 원제목과 딴판이라 이름 대조(isDuplicatePair)는 못 잡는다 */
+        { id: idFromUrl('auto-', SSU(301)), name: '표본 학업 지원 사업', boardTitle: T_SSU, type: '교외', provider: '주관 기관 원문 확인',
+          amount: '금액 원문 확인', amountValue: 0, auto: true, deadline: shift(20), period: `접수 ~${shift(20)}`, sourceUrl: SSU(301), eligibility: { selective: true, schoolOnly: '숭실대학교' },
           summary: '표본', documents: ['원문 확인'], noForm: '표본' },
       ] });
       sb.write('data/forms.json', { templates: {} });
@@ -152,6 +174,11 @@ export default async function links(eq, ctx) {
         [false, false, true, false]);
       eq('① [자동 등록 실행] 뽑고 난 뒤의 공지(「최종선발자 공지」)는 등록하지 않는다 — id 가 풀리며 드러난 계명대 실례',
         reg.items.some((i) => /최종선발자/.test(i.name || '')), false);
+      eq('① [자동 등록 실행] 꼬리표 꼴로 막은 글(강원 9101)·쉬는 글(9103)은 옛 id 를 받는 날에도 막히고 쉰다 · 같은 게시판의 다른 글(9102)은 등록 (리뷰 R1)',
+        [!!byUrl[KNU(9101)], !!byUrl[KNU(9103)], !!byUrl[KNU(9102)], /데이터 관문 쉬기 1건/.test(report)], [false, false, true, true]);
+      eq('① [자동 등록 실행] 같은 학교·같은 원제목의 등록분이 쥔 id 를 주소만 다른 글이 받으면 다시 등록하지 않는다(숭실 표본) · 리포트에 \'같은 글 · 주소만 다름\' (리뷰 R2)',
+        [idFromUrl('auto-', SSU(301)) === idFromUrl('auto-', SSU(302)), !!byUrl[SSU(302)], reg.items.filter((i) => i.boardTitle === T_SSU).length, /- 이미 등록\(같은 글 · 주소만 다름\) · 1건/.test(report)],
+        [true, false, 1, true]);
     } finally { sb.done(); }
 
     /* 관리자 등록 — 같은 게시판의 둘째 글도 등록된다(예전엔 '같은 id가 이미 있습니다') · 꼬리표 id 로 막은 것도 id 로 풀린다 */
@@ -174,6 +201,49 @@ export default async function links(eq, ctx) {
         [r1.status, ids.includes(admA), ids.includes(tagged), r2.status, (ab.json('collector/auto-register-config.json') || {}).blockIds],
         [0, true, true, 0, []]);
     } finally { ab.done(); }
+
+    /* 차단 풀기와 꼬리표 id (리뷰 R1) — 옛 id 를 풀 때 그 옛 id 로 계산되는 막은 주소를 전부 지우면, 같은 게시판에서 꼬리표 id 로 따로 막은 글의 주소까지
+       지워진다. 꼬리표 id 는 고정되지 않아(그 옛 id 를 쥔 등록분이 없으면 옛 id) 그 글이 다시 등록됐다 — 사람이 막은 공고는 다시 등록하지 않는다(원칙 2) */
+    const qb = repoSandbox(root, 'hdj-links-unblock-');
+    try {
+      const vdir = fileURLToPath(new URL('tools/', root));
+      for (const f of fs.readdirSync(vdir)) if (/\.(mjs|cjs|js)$/.test(f)) qb.write(`tools/${f}`, fs.readFileSync(path.join(vdir, f), 'utf8'));
+      const X = SGU(551052); const L = idFromUrl('auto-', X); const tagX = `${L}-${idHash(canonUrl(X))}`;
+      const CFGP = 'collector/auto-register-config.json';
+      const admin = (ACTION, payload) => qb.run('tools/admin-apply.mjs', [], { ACTION, ACTOR: 'gate', PAYLOAD: JSON.stringify(payload) });
+      qb.write('data/forms.json', { templates: {} });
+      /* (ㄱ) 짝 기록(blockPairs) 없는 설정 — 지금 실데이터 꼴 */
+      qb.write('data/registered.json', { items: [] });
+      qb.write(CFGP, { enabled: true, schools: [], maxPerRun: 8, blockIds: [L, tagX], blockUrls: [SGU(550536), X] });
+      const u1 = admin('unblock', { ids: [L] });
+      const c1 = qb.json(CFGP) || {};
+      eq('① [관리자 차단 풀기] 옛 id 를 풀어도 꼬리표 id 로 따로 막은 글의 주소는 남는다 · 옛 id 로 막았던 주소는 풀린다 (짝 기록 없는 설정)',
+        [u1.status, c1.blockIds, c1.blockUrls], [0, [tagX], [X]]);
+      /* (ㄴ) 관리자 길 그대로 — 꼬리표 등록분을 되돌림 → 옛 id 차단 풀기 → 자동 등록 실행 */
+      qb.write('data/registered.json', { items: [
+        { id: tagX, name: '[교외] 미래표본장학회 장학생 선발 안내', boardTitle: '[교외] 미래표본장학회 장학생 선발 안내', type: '교외', provider: '주관 기관 원문 확인',
+          amount: '금액 원문 확인', amountValue: 0, auto: true, deadline: '2026-12-31', period: '접수 ~2026-12-31', sourceUrl: X, eligibility: { selective: true, schoolOnly: '서강대학교' },
+          summary: '표본', documents: ['원문 확인'], noForm: '표본' },
+      ] });
+      qb.write(CFGP, { enabled: true, schools: [], maxPerRun: 8, blockIds: [L], blockUrls: [SGU(550536)] });
+      const rv = admin('revert', { ids: [tagX], expect: 1 });
+      const ub = admin('unblock', { ids: [L] });
+      const c2 = qb.json(CFGP) || {};
+      const today = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+      const due = new Date(Date.parse(today) + 20 * 86400000).toISOString().slice(0, 10);
+      const N = (title, url) => ({ title, url, school: '서강대학교', foundAt: today, bodyDeadline: due, bodyDeadlineText: `신청기간 : ~ ${due}` });
+      qb.write('data/notices.json', { items: [
+        N('[교외] 미래표본장학회 장학생 선발 안내', X),
+        N('[교외] 해동표본재단 장학생 선발 안내', SGU(551490)),
+        N('[교외] 다시 열린 표본 장학생 선발 안내', SGU(550536)),
+      ] });
+      qb.write('collector/report.md', '');
+      const run = qb.run('collector/auto-register.mjs');
+      const urls = new Set(((qb.json('data/registered.json') || {}).items || []).map((i) => i.sourceUrl));
+      eq('① [되돌림 → 옛 id 차단 풀기 → 자동 등록] 꼬리표 등록분으로 되돌린 글(551052)은 다시 등록되지 않는다 · 사람이 푼 글(550536)과 다른 글(551490)은 등록',
+        [rv.status, ub.status, c2.blockIds, (c2.blockUrls || []).map(canonUrl), run.status, urls.has(X), urls.has(SGU(550536)), urls.has(SGU(551490)), run.status ? run.out.slice(-300) : ''],
+        [0, 0, [tagX], [canonUrl(X)], 0, false, true, true, '']);
+    } finally { qb.done(); }
 
     const ar = stripComments(fs.readFileSync(new URL('collector/auto-register.mjs', root), 'utf8'));
     const aa = stripComments(fs.readFileSync(new URL('tools/admin-apply.mjs', root), 'utf8'));
