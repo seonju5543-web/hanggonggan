@@ -75,8 +75,10 @@ jobs:
     timeout-minutes: 40          # 🔴 없으면 GitHub 기본값 6시간까지 매달린다 (6건 × ~40초 + 설치 + Pages 대기)
     # 코드를 준 준비(이 판형으로 다시 그리기)는 그 공고의 줄 — 같은 공고의 게시·건너뛰기와 차례를 지킨다.
     # 코드 없는 자동·버튼 준비끼리는 한 줄(기다리던 것이 밀려 취소돼도 같은 일을 하는 다음 실행이 있다).
+    # 🔴 사람이 run-notify.txt 를 올린 알림(push)은 push 마다 제 줄 — 자동 준비 줄에 넣으면 기다리던 알림이 다음 자동 준비에
+    #    밀려 **조용히 취소된다**(push 에는 inputs 가 없어 코드로 줄을 못 나눈다 · 2026-10-05). 알림은 그리지 않고, 겹쳐 돈 정리분 저장은 장부 병합 규칙이 합친다.
     concurrency:
-      group: ${{ inputs.code && format('insta-code-{0}', inputs.code) || 'insta-prepare' }}
+      group: ${{ inputs.code && format('insta-code-{0}', inputs.code) || github.event_name == 'push' && format('insta-push-{0}', github.sha) || 'insta-prepare' }}
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4

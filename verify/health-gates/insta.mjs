@@ -105,7 +105,13 @@ export default async function gate(eq, ctx) {
   const adm = read(root, '_admin/admin.js');
   const box = { jobs: [], sent: [] };
   const D = { insta: { templates: [], stats: { posts: [] }, seen: { posted: [], prepared: [] } } };
-  const vctx = vm.createContext({ D, Date, Math, Number, String, JSON, Set, Map, console,
+  /* 화면의 '지금' 을 고정한다 — 마감 다음 날 06:00 KST (반올림이면 -0.25 → -0 이라 '오늘 마감' 으로 읽히던 자리 · 2026-10-05) */
+  const ADMIN_NOW = Date.parse('2026-10-04T06:00:00+09:00');
+  class FixedDate extends Date {
+    constructor(...a) { if (a.length) super(...a); else super(ADMIN_NOW); }
+    static now() { return ADMIN_NOW; }
+  }
+  const vctx = vm.createContext({ D, Date: FixedDate, Math, Number, String, JSON, Set, Map, console,
     esc: (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])),
     raw: (p) => `raw/${p}`, safeUrl: (u) => u, jobShow: (m, kind) => box.jobs.push([m, kind]),
     instaDispatch: async (...a) => { box.sent.push(a[1]); }, INSTA_STEP: { publish: '게시 (준비된 것을 올린다)' }, WF_INSTA: 'insta.yml',
@@ -116,11 +122,14 @@ export default async function gate(eq, ctx) {
     { code: 'O', status: 'prepared', due: '2099-12-31', tplNo: 2 },
     { code: 'N', status: 'prepared', due: '2099-12-31', tplNo: 2, dates: 'absolute' },
     { code: 'Q', status: 'prepared', due: '2099-12-31', tplNo: 1 },
+    { code: 'Y', status: 'prepared', due: '2026-10-03', tplNo: 1, dates: 'absolute' },   // 어제 마감 · 지금 06:00 — 6시간 지났다
+    { code: 'T', status: 'prepared', due: '2026-10-04', tplNo: 1, dates: 'absolute' },   // 오늘 마감 — 아직 올릴 수 있다
   ];
   D.insta.seen.prepared = rows;
-  eq('①-d 관리자 줄 — 마감 지난 줄·옛 2번 줄에는 게시 버튼이 없고 이유를 둔다 · 미래+absolute·1번 줄에는 있다',
-    rows.map((r) => [r.code, /data-ig-publish=/.test(vctx.instaPostRow(r, 'prepared')), /data-ig-block=/.test(vctx.instaPostRow(r, 'prepared'))]),
-    [['P', false, true], ['O', false, true], ['N', true, false], ['Q', true, false]]);
+  eq('①-d 관리자 줄 — 마감 지난 줄(다음 날 아침 포함)·옛 2번 줄에는 게시 버튼이 없고 이유를 둔다 · 미래+absolute·1번·오늘 마감 줄에는 있다 (로봇의 publishRefusal 과 같은 잣대)',
+    rows.map((r) => [r.code, /data-ig-publish=/.test(vctx.instaPostRow(r, 'prepared')), /data-ig-block=/.test(vctx.instaPostRow(r, 'prepared')),
+      P.publishRefusal(r, ADMIN_NOW) !== null]),
+    [['P', false, true, true], ['O', false, true, true], ['N', true, false, false], ['Q', true, false, false], ['Y', false, true, true], ['T', true, false, false]]);
   const click = async (code) => {
     box.jobs.length = 0; box.sent.length = 0;
     await vctx.handleInstaClick({ target: { closest: (sel) => (sel === '[data-ig-publish]' ? { getAttribute: () => code } : null) } });
@@ -188,10 +197,32 @@ export default async function gate(eq, ctx) {
 
   /* ── ④ 대기줄은 작업마다 · 인스타 장부 병합 규칙(올림 기록을 안 버린다) ── */
   const conc = (t) => (/^ {4}concurrency:\n {6}group: (.+)\n {6}cancel-in-progress: false$/m.exec(t || '') || [])[1] || null;
-  eq('④-a 워크플로 단위 대기줄 없음 · 게시·건너뛰기는 공고별 줄 · 준비는 코드가 있으면 그 공고 줄, 없으면 insta-prepare',
-    [/^concurrency:/m.test(wf), conc(jobs.publish), conc(jobs.skip), conc(jobs.prepare)],
-    [false, "${{ format('insta-code-{0}', inputs.code) }}", "${{ format('insta-code-{0}', inputs.code) }}",
-      "${{ inputs.code && format('insta-code-{0}', inputs.code) || 'insta-prepare' }}"]);
+  /* 대기줄 이름 식을 실제로 셈해 본다 — GitHub 식의 &&·|| 는 빈 글자·null 을 거짓으로 보는 JS 와 같다(format·== 만 바꿔 끼운다) */
+  const groupOf = (expr, ctx) => {
+    const body = (/^\$\{\{\s*([\s\S]*?)\s*\}\}$/.exec(expr || '') || [])[1];
+    if (!body) return `(식이 아님: ${expr})`;
+    const js = body.replace(/==/g, '===').replace(/'([^']*)'/g, (_, t) => JSON.stringify(t));
+    try {
+      return Function('inputs', 'github', 'format', `return (${js});`)(ctx.inputs || {}, ctx.github || {},
+        (f, ...a) => String(f).replace(/\{(\d+)\}/g, (_, i) => String(a[Number(i)] ?? '')));
+    } catch (e) { return `(셈 못 함: ${e.message})`; }
+  };
+  const runs = {
+    '게시 X': { inputs: { step: '게시', code: 'X' }, github: { event_name: 'workflow_dispatch' } },
+    '건너뛰기 X': { inputs: { step: '건너뛰기', code: 'X' }, github: { event_name: 'workflow_dispatch' } },
+    '다시 그리기 X': { inputs: { step: '준비', code: 'X' }, github: { event_name: 'workflow_dispatch' } },
+    '알림 X(배포가 깨움)': { inputs: { step: '알림', code: 'X' }, github: { event_name: 'workflow_dispatch' } },
+    '알림 push 1': { github: { event_name: 'push', sha: 's1' } },
+    '알림 push 2': { github: { event_name: 'push', sha: 's2' } },
+    '수집 뒤 자동': { github: { event_name: 'workflow_run', sha: 's3' } },
+    '예약': { github: { event_name: 'schedule', sha: 's4' } },
+    '준비 버튼(코드 없음)': { inputs: { step: '준비', code: '' }, github: { event_name: 'workflow_dispatch' } },
+  };
+  const lane = (name) => groupOf(conc(jobs[/^게시/.test(name) ? 'publish' : /^건너뛰기/.test(name) ? 'skip' : 'prepare']), runs[name]);
+  eq('④-a 워크플로 단위 대기줄 없음 · 대기줄을 셈해 보면 — 같은 공고의 게시·건너뛰기·다시 그리기·알림은 한 줄, 사람이 올린 알림(push)은 push 마다 제 줄(자동 준비에 밀려 취소되지 않게), 자동·예약·버튼 준비만 insta-prepare',
+    [/^concurrency:/m.test(wf), Object.keys(runs).map((n) => `${n} → ${lane(n)}`)],
+    [false, ['게시 X → insta-code-X', '건너뛰기 X → insta-code-X', '다시 그리기 X → insta-code-X', '알림 X(배포가 깨움) → insta-code-X',
+      '알림 push 1 → insta-push-s1', '알림 push 2 → insta-push-s2', '수집 뒤 자동 → insta-prepare', '예약 → insta-prepare', '준비 버튼(코드 없음) → insta-prepare']]);
   const merge = (O, A, B) => {
     const dir = tmp('merge');
     try {
