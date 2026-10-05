@@ -48,15 +48,23 @@ echo "■ ① 클라우드에서 로봇이 도는지 확인"
 if command -v gh >/dev/null 2>&1; then
   # 상태마다 따로 묻는다 — '최근 30개'만 보면 그보다 앞서 줄 선 실행을 놓친다.
   # 🔴 하나라도 못 물으면(로그인 안 됨·네트워크) '비어 있음'이라고 하지 않는다 — 못 잰 것은 통과가 아니다.
+  # 🔴 실패 원인을 짐작해 적지 않는다(로그인·네트워크·옛 gh 판이 상태 이름을 모름 …) — 실패한 상태 이름과 gh 가 낸 첫 줄을 그대로 보인다.
   RUNNING=""
   ASK_FAIL=0
+  FAIL_ST=""
+  FAIL_MSG=""
+  ERR_FILE=$(mktemp)
   for st in in_progress queued waiting pending requested; do
-    if ! OUT=$(gh run list --status "$st" -L 100 --json workflowName -q '.[].workflowName' 2>/dev/null); then ASK_FAIL=1; break; fi
+    if ! OUT=$(gh run list --status "$st" -L 100 --json workflowName -q '.[].workflowName' 2>"$ERR_FILE"); then
+      ASK_FAIL=1; FAIL_ST=$st; FAIL_MSG=$(grep -m1 . "$ERR_FILE" || true); break
+    fi
     [ -n "$OUT" ] && RUNNING="${RUNNING}${OUT}"$'\n'
   done
+  rm -f "$ERR_FILE"
   if [ "$ASK_FAIL" = "1" ]; then
-    echo "⚠️ 클라우드 상태를 확인하지 못했습니다 (gh 로그인·네트워크를 확인하세요) — 겹칠 수 있습니다."
-    [ "$FORCE" = "1" ] || { echo "   (gh auth login 뒤 다시 · 그래도 돌리려면 ROBOT_RUN_FORCE=1)"; exit 1; }
+    echo "⚠️ 클라우드 상태를 확인하지 못했습니다 — 겹칠 수 있습니다."
+    echo "   gh run list --status $FAIL_ST 가 실패했습니다: ${FAIL_MSG:-(gh 가 오류 문구를 남기지 않았습니다)}"
+    [ "$FORCE" = "1" ] || { echo "   (위 문구를 보고 고친 뒤 다시 · 그래도 돌리려면 ROBOT_RUN_FORCE=1)"; exit 1; }
     echo "   ROBOT_RUN_FORCE=1 — 확인 없이 진행합니다."
   else
     BUSY=""

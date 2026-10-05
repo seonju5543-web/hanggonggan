@@ -219,6 +219,51 @@ export default async function gate(eq, ctx) {
       eq('⑤ gaps-04 dataRobotNames — data/·collector/ 를 git add 하는 워크플로만(따옴표 뗌 · 정렬) · 저장 안 하는 것·주석 속 git add·assets 는 빠진다',
         DR.dataRobotNames(dir), ['가 로봇 (괄호 · 점)', '나']);
     } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+    /* 동작 — 임시 저장소에 겉옷·목록 도구·표본 워크플로를 두고 **가짜 gh** 로 실제로 돌린다 (리뷰 R3).
+       글자 대조만으로는 `OUT=$(gh … || true)` 로 되돌려 gh 실패가 다시 '없음 ✅' 이 되는 것을 못 잡았다. 실데이터·진짜 gh 는 쓰지 않는다. */
+    if (spawnSync('bash', ['-c', 'true']).status !== 0) {
+      eqCode('  bash 를 못 찾아 robot-run.sh 를 돌려 보지 못했다(못 잰 것은 통과가 아니다)', false, true);
+    } else {
+      const R = tmpRepo('ops-robotrun-');
+      try {
+        R.git('init', '-q', '-b', 'work');
+        R.put('tools/robot-run.sh', read(root, 'tools/robot-run.sh'));
+        R.put('tools/data-robots.mjs', read(root, 'tools/data-robots.mjs'));
+        R.put('.github/workflows/a.yml', 'name: 가 로봇 (괄호 · 점)\njobs:\n  a:\n    steps:\n      - run: git add data/registered.json\n');
+        R.put('.github/workflows/c.yml', 'name: 다른 로봇\njobs:\n  a:\n    steps:\n      - run: echo 저장 안 함\n');
+        R.put('fakebin/gh', [
+          '#!/usr/bin/env bash',
+          'st=""; while [ $# -gt 0 ]; do [ "$1" = "--status" ] && st=$2; shift; done',
+          'case "$FAKE_GH" in',
+          '  fail) echo "가짜 gh: HTTP 401 열쇠 거절" >&2; exit 1 ;;',
+          '  fail-last) [ "$st" = requested ] && { echo "가짜 gh: 모르는 상태 이름 requested" >&2; exit 1; } ;;',
+          '  busy) [ "$st" = queued ] && echo "가 로봇 (괄호 · 점)" ;;',
+          '  other) [ "$st" = in_progress ] && echo "다른 로봇" ;;',
+          'esac',
+          'exit 0', ''].join('\n'));
+        fs.chmodSync(path.join(R.dir, 'fakebin/gh'), 0o755);
+        R.git('add', '-A'); R.git('commit', '-qm', '씨앗');
+        const run = (mode) => {
+          const r = spawnSync('bash', [path.join(R.dir, 'tools/robot-run.sh'), 'true'], { cwd: R.dir, encoding: 'utf8', timeout: 60000,
+            env: { ...R.env, PATH: `${path.join(R.dir, 'fakebin')}${path.delimiter}${process.env.PATH}`, FAKE_GH: mode, ROBOT_RUN_FORCE: '0' } });
+          const out = (r.stdout || '') + (r.stderr || '');
+          return { status: r.status, out, ran: out.includes('■ ③ 로봇 실행: true'), calm: /도는 데이터 로봇 없음 ✅/.test(out) };
+        };
+        const fail = run('fail'), failLast = run('fail-last'), busy = run('busy'), other = run('other');
+        eq('  동작(가짜 gh) — gh 가 실패하면 멈춘다(1) · 못 확인했다고 말하고 실패한 상태 이름과 gh 의 문구를 그대로 보인다 · 없음 ✅ 이라고 하지 않는다 · 로봇을 안 돌린다',
+          [fail.status, /⚠️ 클라우드 상태를 확인하지 못했습니다/.test(fail.out), /--status in_progress 가 실패했습니다: 가짜 gh: HTTP 401 열쇠 거절/.test(fail.out), fail.calm, fail.ran],
+          [1, true, true, false, false]);
+        eq('  동작(가짜 gh) — 마지막 상태(requested)만 실패해도 멈춘다(상태 다섯을 다 묻는다)',
+          [failLast.status, /--status requested 가 실패했습니다: 가짜 gh: 모르는 상태 이름 requested/.test(failLast.out), failLast.calm, failLast.ran], [1, true, false, false]);
+        eq('  동작(가짜 gh) — 데이터 로봇이 줄 서 있으면 ⛔ 로 멈춘다(괄호·가운뎃점 이름을 글자 그대로 맞춘다) · 다른 로봇만 돌면 없음 ✅ 뒤 로봇을 돌린다(0)',
+          [busy.status, /⛔ 지금 클라우드에서 돌거나 줄 선 데이터 로봇/.test(busy.out), busy.out.includes('· 가 로봇 (괄호 · 점)'), busy.ran, other.status, other.calm, other.ran],
+          [1, true, true, false, 0, true, true]);
+        R.git('rm', '-q', '.github/workflows/a.yml'); R.git('commit', '-qm', '데이터 로봇 없음');
+        const none = run('other');
+        eq('  동작 — 데이터 로봇 목록이 비면 ⛔ 로 멈춘다(1 · 어느 로봇과 겹치는지 못 가른다)',
+          [none.status, /⛔ 데이터 로봇 목록을 못 읽었습니다/.test(none.out), none.ran], [1, true, false]);
+      } finally { R.done(); }
+    }
     const sh = read(root, 'tools/robot-run.sh').split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
     eqCode('  robot-run.sh — 손 목록(DATA_ROBOTS=) 없음 · tools/data-robots.mjs 를 부른다 · 상태마다 --status 로 묻는다 · 이름은 grep -Fx 로 · gh 실패를 비어 있음 ✅ 으로 말하지 않는다',
       [/DATA_ROBOTS='/.test(sh), /node tools\/data-robots\.mjs/.test(sh), /gh run list --status "\$st"/.test(sh), /grep -Fx -f/.test(sh), /비어 있음 ✅/.test(sh), /--limit 30/.test(sh)],
