@@ -38,6 +38,20 @@ import { restClient, kstStamp } from '../tools/alert-issue.mjs';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const WF_DIR = path.join(HERE, '..', '.github', 'workflows');
 export const STALE_FACTOR = 3;
+/* 🔴 문턱의 **바닥값 12시간** (2026-10-05 로봇·도구 점검 · ops-10).
+   예약 시각은 목표일 뿐이다 — 2026-10-04 실측: 3시간마다 도는 인스타 댓글은 09-12 뒤 22일에 91회(하루 약 4회 · 예정 8회)였고
+   가장 긴 틈이 9.7시간(10-01 00:40Z→10:21Z)이라 3배 문턱(9시간)을 넘었다 → 하트비트가 그 틈에 돌면 헛경보.
+   그래서 짧은 간격 로봇은 3배 대신 12시간을 넘어야 '조용하다'로 본다(하루 1회 이상 로봇은 3배 그대로). */
+export const STALE_MIN_HOURS = 12;
+/** 경보 문턱(시간) — 기대 간격 × 3, 단 12시간보다 짧지 않게 (판정 안 하는 로봇은 null) */
+export function staleAfterHours(h) { return h == null ? null : Math.max(h * STALE_FACTOR, STALE_MIN_HOURS); }
+/* 🔴 **기본 브랜치(와 main)의 성공만 센다** (2026-10-05 · ops-11).
+   옛 워크플로 파일(브랜치 거름 없음)이 남은 작업 브랜치의 push 실행도 '성공'으로 셌다 — 실례: 원문 링크 복구 로봇이
+   10-03 claude/source-link-integrity 에서 push 로 성공(run 37118783324)했는데 그 실행은 기본 브랜치의 일을 하지 않았다
+   (로봇은 기본 브랜치에만 저장한다). 이벤트(예약만)로는 거르지 않는다 — push·workflow_run·수동 실행도 같은 일을 하고,
+   예약 성공이 0건인 로봇(원문 링크 확인)이 바로 '성공 기록 없음' 헛경보가 된다. main 은 main-guard(main push)·main 에서 돌린
+   수동 실행이 같은 일을 하므로 두 번째 길(recentSuccessAt)에서 같이 센다. */
+export const BASE_BRANCH = 'claude/nice-heisenberg-WESq5';
 
 /* cron 다섯 칸에서 '몇 시간에 한 번 도는가'를 읽는다.
 
@@ -125,7 +139,8 @@ export function scheduledWorkflows(dir = WF_DIR) {
 
 async function lastSuccessAt(repo, file, token, event = null) {
   const url = `https://api.github.com/repos/${repo}/actions/workflows/${file}/runs`
-    + '?status=success&per_page=1' + (event ? `&event=${encodeURIComponent(event)}` : '');
+    + '?status=success&per_page=1' + (event ? `&event=${encodeURIComponent(event)}` : '')
+    + `&branch=${encodeURIComponent(BASE_BRANCH)}`;   // 기본 브랜치의 성공만 (ops-11 — 작업 브랜치의 옛 워크플로 실행은 그 일을 하지 않았다)
   const r = await fetch(url, {
     headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' },
   });
@@ -146,10 +161,11 @@ async function lastSuccessAt(repo, file, token, event = null) {
    그래서 원인을 짐작해 고치지 않고, 경보를 올리기 **직전에만** 거르기 없이 최근 실행 목록을
    받아 가장 늦은 성공을 직접 찾는다. 둘 중 **늦은 쪽**을 쓴다 — 한쪽이 옛 답을 줘도 경보가 서지 않고,
    정말 조용하면 두 길 모두 옛 시각이라 경보는 그대로 선다. */
-export function latestSuccessIso(runs) {
+export function latestSuccessIso(runs, { branches } = {}) {
   let best = null;
   for (const r of runs || []) {
     if (r.conclusion !== 'success') continue;
+    if (branches && !branches.includes(r.head_branch)) continue;   // 주어지면 그 브랜치의 실행만 (ops-11)
     const at = r.updated_at || r.created_at;
     if (at && (!best || Date.parse(at) > Date.parse(best))) best = at;
   }
@@ -166,14 +182,14 @@ async function recentSuccessAt(repo, file, token) {
     headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' },
   });
   if (!r.ok) return null;                          // 못 읽으면 첫 답을 그대로 쓴다
-  return latestSuccessIso((await r.json()).workflow_runs);
+  return latestSuccessIso((await r.json()).workflow_runs, { branches: [BASE_BRANCH, 'main'] });
 }
 
 export function isStale(everyHours, lastIso, nowMs) {
   if (everyHours == null) return false;
   if (!lastIso) return true;                       // 성공 기록이 아예 없다
   const age = (nowMs - Date.parse(lastIso)) / 3600000;
-  return age > everyHours * STALE_FACTOR;
+  return age > staleAfterHours(everyHours);
 }
 
 /* ── 다시 선 로봇의 넘어짐 경보 닫기 ───────────────────────────────── */
@@ -338,7 +354,7 @@ async function main() {
   const stale = rows.filter((r) => r.stale);
   if (asJson) { console.log(JSON.stringify({ rows, stale }, null, 1)); return; }
 
-  console.log(`예약 로봇 ${rows.length}대 · 문턱 = 기대 간격 × ${STALE_FACTOR}`);
+  console.log(`예약 로봇 ${rows.length}대 · 문턱 = 기대 간격 × ${STALE_FACTOR} (최소 ${STALE_MIN_HOURS}시간) · 기본 브랜치·main 의 성공만 셈`);
   for (const r of rows.sort((a, b) => (b.ageHours || 1e9) - (a.ageHours || 1e9))) {
     const mark = r.stale ? '🚨' : (r.error ? '· ' : '✓ ');
     const every = everyWords(r.everyHours);
