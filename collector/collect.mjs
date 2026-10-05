@@ -16,7 +16,7 @@ import { urlKey, dedupeNotices, capNotices, rekeyLedger } from './url-key.mjs';
 import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mjs';
 import { publishBySchool, dropUnserved, healFromLedger, readSchoolFiles, zeroFeedSchools, zeroFeedWhy } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
-import { cleanTitle, isMenuEntry } from './clean-title.mjs';
+import { cleanTitle, isMenuEntry, retitleItems } from './clean-title.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { activityKind, activityField, notActivity, ACTIVITY_FIELDS } from './activity-kind.mjs';
 import { activityExcerpts, activityDetails, putActivityDetails, ACT_DETAILS_V, sanitizeBenefit } from './activity-excerpts.mjs';
@@ -560,7 +560,9 @@ if (healCounts.restored || healCounts.kept) console.log(`피드 메우기: 학�
   }
 }
 
-/* 실린 글 전부에 — 껍데기 힌트 소급 · 본문 마감 채우기 (위 '껍데기를 걷은 본문' 단락 · 학교별 파일 발행 전에) */
+/* 실린 글 전부에 — 지금 제목 청소 소급(clean-title.mjs retitleItems · 주소는 그대로) · 껍데기 힌트 소급 · 본문 마감 채우기
+   (위 '껍데기를 걷은 본문' 단락 · 학교별 파일 발행 전에 — 피드 메우기로 되살린 글까지) */
+retitleItems(notices.items);
 for (const n of notices.items) { bodyReader.heal(n); bodyReader.fill(n); }
 console.log(`껍데기를 걷은 본문: 기간 힌트 ${bodyReader.counts.hints}건을 다시 읽음 · 본문 마감 ${bodyReader.counts.bodyDeadlines}건을 새로 읽음 (껍데기를 아는 호스트 ${bodyReader.chrome.size}곳)`);
 
@@ -592,7 +594,7 @@ fs.writeFileSync(noticesPath, JSON.stringify(notices, null, 1));
 /* ── 대외활동·공모전 발행 — data/activities.json (notices.json 과 섞지 않는다) ──
    장학 피드와 같은 규칙: 60일 지나면 지운다 · 첨부 링크 걷어낸다 · 같은 글은 하나 · 상한.
    학교 글은 서비스 학교(dropUnserved)만, 학교가 빈 전국 글은 그대로 둔다(모든 학생에게 보인다). */
-acts.items = freshActs.concat(acts.items || []);
+acts.items = retitleItems(freshActs.concat(acts.items || []));   // 실린 글에도 지금 제목 청소(원칙 7 소급 · 주소는 그대로 · 2026-10-05)
 /* 공공 API 글(n.api)은 처음 본 날이 아니라 **API 가 마지막으로 준 날(seenAt)**로 잰다 — 몇 달 열린 정책이 61일째 지워졌다가
    다음 날 '새 글'로 맨 위에 돌아오지 않게. 닫힌 글은 API 로봇이 뺀다(collector/open-api-map.mjs mergeApi). */
 acts.items = acts.items.filter((n) => ((n.api && n.seenAt) || n.foundAt || '9999') >= cutoff);
@@ -637,7 +639,7 @@ acts.fields = ACTIVITY_FIELDS;
 fs.writeFileSync(actsPath, JSON.stringify(acts, null, 1));
 
 /* ── 재단·지자체 공고 발행 — data/external.json (학교 피드와 섞지 않는다 · 규칙은 위와 같다) ── */
-ext.items = freshExt.concat(ext.items || []);
+ext.items = retitleItems(freshExt.concat(ext.items || []));   // 실린 글에도 지금 제목 청소(원칙 7 소급 · 주소는 그대로 · 2026-10-05)
 ext.items = ext.items.filter((n) => (n.foundAt || '9999') >= cutoff);
 ext.items = ext.items.filter((n) => !isAttachmentEntry(n));
 ext.items = dedupeNotices(ext.items);

@@ -92,6 +92,14 @@ export function cleanTitle(t) {
   return cur;
 }
 
+/* 실려 있던 글 제목에 지금 청소를 다시 입힌다 — 원칙 7 소급 (2026-10-05 리뷰 · 장학·대외활동·재단 피드 발행 단계 collect.mjs).
+   예전엔 소식만(board-links retitleStored) 소급돼, 청소 규칙이 바뀌면(「첨부파일 있음」·폭 없는 공백) 장학 피드에 실린 글은 60일 동안 옛 제목 그대로였다.
+   🔴 제목만 고친다 — 주소·글 번호는 그대로(목록 표식 #n- 주소를 다시 만들면 같은 글이 두 번 실렸다 · 2026-10-02). 청소는 멈출 때까지 돌아 두 번 입혀도 같다. */
+export function retitleItems(items) {
+  for (const n of items || []) if (n && typeof n.title === 'string') n.title = cleanTitle(n.title);
+  return items;
+}
+
 function cleanCore(t) {
   return String(t || '')
     /* 폭 없는 공백(U+200B·U+FEFF)은 보이지 않는데 제목 앞뒤에 붙어 와 같은 글을 다른 제목으로 만든다 (2026-10-05 점검 news-7 · 항공대·계명대 소식) */

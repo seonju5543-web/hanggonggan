@@ -30,7 +30,7 @@ import { createRequire } from 'node:module';
 import { sandbox } from './bodies.mjs';
 import { cleanEnv, stripComments } from './gate.mjs';
 import { judgeLine, findApplyEmail, staleApplyEmail } from '../../collector/apply-email.mjs';
-import { cleanTitle } from '../../collector/clean-title.mjs';
+import { cleanTitle, retitleItems } from '../../collector/clean-title.mjs';
 import { deadlineHintFrom, hintWithoutChrome, isChromeHint } from '../../collector/deadline-hint.mjs';
 import { boilerMulti, boilerFor } from '../../collector/page-boilerplate.mjs';
 import { parseDeadline, bodyDeadlineFrom, makeBodyReader } from '../../collector/notice-deadline.mjs';
@@ -166,7 +166,16 @@ export default async function qnotice(eq, ctx) {
         keepNoText.deadlineHint, keepWithText.deadlineHint, r.counts.hints],
       ['신청기간 : 2026. 1', '신청기간 : 2026. 9', null, true, NORMAL, NORMAL, 3]);
 
+    /* 실려 있던 장학·활동·재단 글도 발행 때 지금 청소를 입힌다(원칙 7 소급 · 리뷰 2026-10-05 — 예전엔 소식만 소급됐다) · 주소는 그대로 */
+    const stored = [{ title: '2026학년도 2학기 등록금 납부 안내 첨부파일 있음', url: 'https://a.example/1#n-x' }, { title: KEEP[0], url: 'https://a.example/2' }, { url: 'https://a.example/3' }];
+    retitleItems(stored);
+    eq('  실린 글 소급(retitleItems) — 제목만 지금 청소로 · 이미 깨끗한 제목·제목 없는 글은 그대로 · 주소는 그대로',
+      [stored.map((n) => n.title), stored.map((n) => n.url)], [['2026학년도 2학기 등록금 납부 안내', KEEP[0], undefined], ['https://a.example/1#n-x', 'https://a.example/2', 'https://a.example/3']]);
     const col = stripComments(fs.readFileSync(new URL('collector/collect.mjs', root), 'utf8'));
+    eq('  수집기 배선 — 실린 장학 글(피드 메우기 뒤 · 학교별 파일 발행 전) · 활동 · 재단 글에 retitleItems',
+      [/retitleItems\(notices\.items\);\s*for \(const n of notices\.items\) \{ bodyReader\.heal\(n\);[\s\S]*publishBySchool\(beforeCap\)/.test(col) && col.indexOf('retitleItems(notices.items)') > col.indexOf('healFromLedger('),
+        /acts\.items = retitleItems\(freshActs\.concat\(acts\.items \|\| \[\]\)\);/.test(col), /ext\.items = retitleItems\(freshExt\.concat\(ext\.items \|\| \[\]\)\);/.test(col)],
+      [true, true, true]);
     eq('  수집기 배선 — 이번 실행 상세 글자를 모으고 · 읽개를 만들고 · 새 글(장학·활동·재단)과 실린 글 전부(장학·활동·재단)에 건다',
       [(col.match(/runBodies\.set\(it, detail\.text\)/g) || []).length, /makeBodyReader\(\{[\s\S]*?run: runBodies/.test(col),
         /for \(const it of freshAll\) \{ bodyReader\.heal\(it, true\); bodyReader\.fill\(it\); \}/.test(col), /freshActs\.concat\(freshExt\)\) bodyReader\.heal\(it, true\)/.test(col),
