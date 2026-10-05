@@ -42,6 +42,12 @@ import { portalNameCandidates, portalCandidates } from '../../collector/portal-c
 const require = createRequire(import.meta.url);
 const J = (x) => `${JSON.stringify(x, null, 1)}\n`;
 
+/* 같은 사업(푸른등대 K-원전) 세 학교 글 — 실데이터 제목 그대로(세종대 등록분과 부산대 글은 사업 열쇠가 달라 이름 대조로만 같은 사업이 된다) */
+const KWON = {
+  sejong: '푸른등대 한국수력원자력 K-원전 신규장학생 선발안내',
+  busan: '2026년 푸른등대 한국수력원자력 K-원전 장학금 신규 장학생 선발 안내',
+  dongguk: '[홍보] 2026년 푸른등대 한국수력원자력 K-원전 장학금 신규장학생 선발 안내',
+};
 /* 가짜 항공대 — 쪽마다 같은 머리 배너(교수 채용)와 메뉴 줄 + 서로 다른 본문 기간 줄 (2026-10-04 실측 꼴) */
 const KAU = 'https://kau.example.ac.kr/web/pages/gc32172b.do?siteFlag=www&bbsFlag=View&bbsId=0119&nttId=';
 /* 배너가 두 줄로 갈라져 그려지는 판 — 이름표가 줄 머리에 오면 날짜 판독기(extractDeadline)도 배너 날짜를 읽는다 */
@@ -197,6 +203,18 @@ export default async function qnotice(eq, ctx) {
         registeredAfterDeadline({ ...L, alsoPostedAt: [{ school: 'x' }] }), registeredAfterDeadline({ ...L, deadline: '2026-10-04' }), registeredAfterDeadline({ ...L, auto: false })],
       [true, false, false, false, false, false]);
 
+    /* 지난 회차 장부 — 순수 함수(collector/past-rounds.mjs) */
+    {
+      const PR = await import('../../collector/past-rounds.mjs');
+      const late = { id: 'auto-a', name: KWON.sejong, deadline: '2026-09-28', sourceUrl: 'https://s.example/a', eligibility: { schoolOnly: '세종대학교' } };
+      let L = PR.recordPastRounds(null, [late], '2026-10-05');
+      L = PR.recordPastRounds(L, [late], '2026-10-06');
+      eq('  지난 회차 장부 — 같은 id 는 한 줄(뺀 날만 새로) · 판정은 부르는 쪽이 넘긴 것 그대로 · 60일 지난 줄만 지운다',
+        [L.items.length, L.items[0].droppedAt, L.items[0].school, PR.pastRoundOf(L, (x) => x.name === KWON.sejong)?.id, PR.pastRoundOf(L, () => false),
+          PR.prunePastRounds(L, '2026-12-05').removed, PR.prunePastRounds(L, '2026-12-06').removed],
+        [1, '2026-10-06', '세종대학교', 'auto-a', null, 0, 1]);
+    }
+
     /* 진짜 자동 등록을 사본 저장소에서 — 불러오는 순간 실행되는 파일이라 import 하지 않는다 */
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-qnotice-areg-'));
     try {
@@ -215,12 +233,18 @@ export default async function qnotice(eq, ctx) {
         { title: '2026 미래표본장학회 장학생 선발 안내', url: U(501), school: '한국항공대학교', foundAt: today, bodyDeadline: shift(20), bodyDeadlineText: `2. 신청기간 : ${shift(1)} ~ ${shift(20)}` },
         /* 브라우저 수집 워크플로 꼴 — 수집기가 본문 마감을 안 채운 채 온 글. 저장된 원문(가짜 항공대 3쪽)에서 자동 등록이 채워 거른다(9/23 마감) */
         { title: KAU_PAGES[2].title, url: KAU_PAGES[2].url, school: '한국항공대학교', foundAt: today },
+        /* 늦은 등록분(세종대 K-원전)과 같은 사업의 다른 학교 글 둘 — 마감을 못 읽은 채 온다(실데이터 재현 꼴 · 리뷰 2026-10-05).
+           빼기 전에는 세종대 등록분이 짝이 되어 컨펌 대기였는데, 빼고 나니 부산대 글이 새로 등록되고 동국대 글이 그것을 전국으로 승격했다 */
+        { title: KWON.busan, url: 'https://onestop.pusan.example.ac.kr/page?seq=700', school: '부산대학교', foundAt: today },
+        { title: KWON.dongguk, url: 'https://www.dongguk.example.edu/article/detail/26766277', school: '동국대학교', foundAt: today },
       ] });
       w('collector/extracted/notices-text.json', KAU_PAGES);   // 실제 파일과 같은 꼴(배열 — 발췌기가 불러올 때 배열로 읽는다)
       w('data/registered.json', { items: [
         { id: 'auto-late', name: '2026년 2학기 청년창업농장학금 신청 안내', type: '교외', provider: '주관 기관 원문 확인', amount: '금액 원문 확인', amountValue: 0, auto: true,
           listedAt: shift(-1), deadline: shift(-90), deadlineFrom: '공고 원문', period: `접수 기간 ~${shift(-90)}`, sourceUrl: U(10681), eligibility: { schoolOnly: '한국항공대학교' } },
         { id: 'auto-human', name: '사람이 고친 표본 장학', type: '교외', auto: true, listedAt: shift(-1), deadline: shift(-90), deadlineFrom: '관리자 2026-10-04', sourceUrl: U(9), eligibility: {} },
+        { id: 'auto-kwon-sejong', name: KWON.sejong, type: '교외', provider: '주관 기관 원문 확인', amount: '금액 원문 확인', amountValue: 0, auto: true,
+          listedAt: shift(-6), deadline: shift(-8), deadlineFrom: '공고 원문', period: `접수 기간 ~${shift(-8)}`, sourceUrl: 'https://board.sejong.example.ac.kr/notice?articleNo=893809', eligibility: { schoolOnly: '세종대학교' } },
       ] });
       w('data/forms.json', { templates: {} }); w('collector/report.md', '');
       const run = spawnSync(process.execPath, [path.join(dir, 'collector/auto-register.mjs')], { cwd: dir, encoding: 'utf8', env: cleanEnv() });
@@ -230,7 +254,23 @@ export default async function qnotice(eq, ctx) {
       const by = Object.fromEntries(reg.items.map((i) => [i.sourceUrl, i]));
       eq('  [자동 등록 실행] 끝까지 돈다', [run.status, run.status ? `${run.stdout}${run.stderr}`.slice(-400) : ''], [0, '']);
       eq('  [자동 등록 실행] 등록 뒤 마감이 지나 있던 로봇 등록분은 빼고 · 사람 표식은 둔다 · 리포트에 되돌림',
-        [!!by[U(10681)], !!by[U(9)], /등록 뒤 원문에서 마감 경과 확인 — 되돌림 1건/.test(report)], [false, true, true]);
+        [!!by[U(10681)], !!by[U(9)], /등록 뒤 원문에서 마감 경과 확인 — 되돌림 2건/.test(report)], [false, true, true]);
+      /* 🔴 뺀 등록분이 막던 같은 사업 글 — 빼도 계속 막는다(같은 실행) · 다른 학교 글에 남의 마감을 적지 않는다 · 원인은 단정하지 않고 마감 출처를 적는다 */
+      const kwonIn = (items) => items.filter((i) => /k-?원전/i.test(i.name || '')).map((i) => `${(i.eligibility || {}).schoolOnly || '전국'}`);
+      const past = JSON.parse(fs.readFileSync(path.join(dir, 'collector/past-rounds.json'), 'utf8'));
+      eq('  [자동 등록 실행] 🔴 뺀 등록분과 같은 사업의 다른 학교 글은 등록·승격하지 않고 \'지난 회차 — 컨펌 대기\'로 · 다른 학교 글에 마감을 적지 않는다',
+        [kwonIn(reg.items), (report.match(/같은 사업의 지난 회차\(세종대학교 등록분 · 마감 [\d-]+\) — 새 회차인지 컨펌 대기/g) || []).length, /전국으로 승격/.test(report),
+          nts.filter((n) => /k-?원전/i.test(n.title) && n.bodyDeadline).length],
+        [[], 2, false, 0]);
+      eq('  [자동 등록 실행] 지난 회차 장부에 뺀 두 건 · 리포트는 원인을 단정하지 않고 마감 출처를 적는다',
+        [past.items.map((x) => x.id).sort(), /마감 출처: 공고 원문/.test(report), /본문에만 기간이 적혀/.test(report)], [['auto-kwon-sejong', 'auto-late'], true, false]);
+      /* 다음 실행 — 등록 목록에서는 빠졌어도 장부가 막는다 · 뺀 글 자신은 '마감 경과'로 거른다 */
+      fs.writeFileSync(path.join(dir, 'collector/report.md'), '');
+      const run2 = spawnSync(process.execPath, [path.join(dir, 'collector/auto-register.mjs')], { cwd: dir, encoding: 'utf8', env: cleanEnv() });
+      const reg2 = JSON.parse(fs.readFileSync(path.join(dir, 'data/registered.json'), 'utf8'));
+      const report2 = fs.readFileSync(path.join(dir, 'collector/report.md'), 'utf8');
+      eq('  [다음 실행] 장부가 계속 막는다 — 같은 사업 글 둘은 컨펌 대기 · 뺀 글 자신(주소 같음)은 다시 등록하지 않는다',
+        [run2.status, kwonIn(reg2.items), (report2.match(/같은 사업의 지난 회차/g) || []).length, reg2.items.some((i) => i.sourceUrl === U(10681))], [0, [], 2, false]);
       eq('  [자동 등록 실행] 뺀 글에 마감을 적어 두어 같은 실행에도 다시 등록하지 않는다',
         [nts.find((n) => n.url === U(10681))?.bodyDeadline, reg.items.filter((i) => i.sourceUrl === U(10681)).length], [shift(-90), 0]);
       eq('  [자동 등록 실행] 본문 마감이 지난 글은 등록하지 않는다 · 열린 글은 그 마감과 근거 문구로 등록한다',
@@ -255,6 +295,12 @@ export default async function qnotice(eq, ctx) {
     const ar = stripComments(fs.readFileSync(new URL('collector/auto-register.mjs', root), 'utf8'));
     eq('  자동 등록 배선 — 마감 규칙은 notice-deadline.mjs · 되돌림 판정은 entry-rules registeredAfterDeadline (베끼지 않는다)',
       [/from '\.\/notice-deadline\.mjs'/.test(ar), /\bregisteredAfterDeadline\b[^}]*\} = createRequire/.test(ar), /function parseDeadline|const okDate/.test(ar)], [true, true, false]);
+    const wfOf = (f) => fs.readFileSync(new URL(`.github/workflows/${f}`, root), 'utf8');
+    eq('  지난 회차 장부 배선 — 규칙은 past-rounds.mjs 를 불러 쓰고 · 두 수집 워크플로가 장부를 저장한다 · 병합 규칙이 있다',
+      [/import \{ recordPastRounds, prunePastRounds, pastRoundOf \} from '\.\/past-rounds\.mjs'/.test(ar),
+        ['collect-scholarships.yml', 'browser-collect.yml'].map((f) => /\[ -f collector\/past-rounds\.json \] && git add collector\/past-rounds\.json/.test(wfOf(f))),
+        /^collector\/past-rounds\.json\s+merge=ours/m.test(fs.readFileSync(new URL('.gitattributes', root), 'utf8'))],
+      [true, [true, true], true]);
   }
 
   /* ── ④ 범위 승격은 마감 전만 ── */

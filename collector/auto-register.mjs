@@ -25,6 +25,8 @@ import { mergeInto, openOn, deadlineQuote } from './registered-merge.mjs';
 import { parseDeadline as parseNoticeDeadline, makeBodyReader, corporaFrom } from './notice-deadline.mjs';
 /* 데이터 관문에 거듭 걸린 공고는 3일 쉰다 — 장부 규칙은 auto-held.mjs 한 곳(되돌리는 gate-guard 와 같은 파일 · 2026-10-04) */
 import { isHeld, pruneRegistered } from './auto-held.mjs';
+/* 등록 뒤 마감 경과로 뺀 등록분의 사업(지난 회차) 장부 — 규칙은 past-rounds.mjs 한 곳(2026-10-05 리뷰 · 빼고 나면 같은 사업의 다른 학교 글을 막던 짝이 사라졌다) */
+import { recordPastRounds, prunePastRounds, pastRoundOf } from './past-rounds.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfgPath = new URL('auto-register-config.json', HERE);
@@ -124,7 +126,7 @@ const ACTION = /(선발|모집|신청|추천|접수)/;
    로 남겨 감사(verify/deadline-audit.mjs)가 그 문구를 근거로 센다. 달력에 없는 날은 마감이 아니다(okDate · 2026-09-19). */
 const parseDeadline = (n) => parseNoticeDeadline(n, TODAY);
 
-function classify(n, regUrlSet, regItems, batchSeen) {
+function classify(n, regUrlSet, regItems, batchSeen, pastRounds) {
   const t = n.title || '';
   const cu = canonUrl(decodeUrlEntities(n.url));
   const nt = normTitle(t);
@@ -175,6 +177,18 @@ function classify(n, regUrlSet, regItems, batchSeen) {
      🔴 **양쪽에 똑같이 적용한다.** 옛 규칙은 등록명에만 썼는데, 그러면 공고 쪽 꼬리표가 그대로
         남아 `고졸후학습자(희망사다리2유형) 장학금 신청(~9/17)` 이 같은 학교 등록분과 안 맞는다. */
   const bare = (s) => (s || '').replace(/\([^)]*(\d|접수)[^)]*\)/g, '');
+  /* 🔴 등록 뒤 마감 경과로 뺀 등록분과 **같은 사업**이면 새로 등록하지 않는다 (2026-10-05 리뷰 · 장부 past-rounds.mjs).
+     빼기 전에는 그 등록분이 짝(twin)이 되어 같은 사업 글이 '승격 불가(마감 경과) 컨펌 대기'로 걸렸다 — 빼고 나니 같은 실행에서 다른 학교 글이
+     마감 없이 등록되고 셋째 학교 글이 그것을 전국으로 승격해, 지난 회차가 44개교 전체에 '마감' 카드로 남았다(세종대 K-원전 실례).
+     뺀 글 자신(같은 주소)은 마감 경과로 거른다. 다른 학교 글에 남의 마감을 적지 않는다 — 학교마다 접수 마감이 다를 수 있어 사람이 본다. */
+  /* '같은 사업' 판정은 아래 짝(twin)·비슷한 등록분(similars)과 **같은 셋** — 사업 열쇠 · 이름 대조(꼬리표 뗀 이름) · 재단 이름 */
+  const past = pastRoundOf(pastRounds, (i) => sameProgram({ name: title }, { name: i.name })
+    || isDuplicatePair({ name: bare(title), eligibility: {} }, { name: bare(i.name), eligibility: {} })
+    || !!(fk && (i.name || '').includes(fk)));
+  if (past) {
+    if (past.url && past.url === cu) return { verdict: 'skip', why: '마감 경과(등록 뒤 원문에서 확인)' };
+    return { verdict: 'hold', why: `같은 사업의 지난 회차(${past.school || '전국'} 등록분 · 마감 ${past.deadline || '원문 확인'}) — 새 회차인지 컨펌 대기` };
+  }
   /* 🔴 학교가 달라도 **같은 사업**이면 새로 등록하지 않고 기존 등록분을 전국으로 승격한다 (2026-09-30 · F-5 재발에서).
      열쇠는 verify/entry-rules.cjs programKey — 대괄호·연도·꼬리말을 뗀 알맹이. 재게시(같은 학교)는 아래 isDuplicatePair 가 잡는다. */
   const twin = regItems.find((i) => schoolOf(i) !== n.school && sameProgram({ name: title }, { name: i.name }));
@@ -258,6 +272,19 @@ if (!cfg.enabled) {
       }
     }
   }
+  /* 뺀 등록분의 사업을 '지난 회차' 장부에 적는다(위 classify 의 pastRoundOf) — 이번 실행부터 · 60일 지난 줄은 지운다.
+     장부가 없고 뺄 것도 없으면 만들지 않는다. */
+  const pastPath = new URL('past-rounds.json', HERE);
+  let pastLedger = null;
+  try { pastLedger = JSON.parse(fs.readFileSync(pastPath, 'utf8')); } catch { /* 아직 없음 */ }
+  let pastPruned = 0;
+  if (pastLedger || lateDropped.length) {
+    const pr = prunePastRounds(pastLedger, TODAY);
+    pastPruned = pr.removed;
+    const next = recordPastRounds(pr.ledger, lateDropped, TODAY);
+    if (!pastLedger || pr.removed || lateDropped.length) fs.writeFileSync(pastPath, `${JSON.stringify(next, null, 1)}\n`);
+    pastLedger = next;
+  }
 
   /* 본문 마감이 아직 없는 글은 저장된 원문에서 채운다 (2026-10-05 점검 collect-07 ②) — 수집기(collect.mjs)는 제 실행 글과 실린 글을 채우지만,
      브라우저 수집 워크플로는 이 로봇을 브라우저 수집기 바로 뒤에 돌려 그 실행에 새로 실린 글이 본문 마감 없이 여기 온다(그러면 끝난 공고가
@@ -297,7 +324,7 @@ if (!cfg.enabled) {
   for (const n of notices.items || []) {
     if (added.length >= (cfg.maxPerRun || 8)) { unseen += 1; continue; }
     if (onlySchools.size && n.school && !onlySchools.has(n.school)) { outOfScope += 1; continue; }
-    const r = classify(n, regUrlSet, registered.items, batchSeen);
+    const r = classify(n, regUrlSet, registered.items, batchSeen, pastLedger);
     const nUrl = decodeUrlEntities(n.url);   // 담는 원문 주소 — `&#038;` 를 되돌린 것 (위 import 주석)
     if (r.verdict === 'promote' || r.verdict === 'absorb') {
       /* 기존 등록분을 전국으로(promote) 또는 이미 전국인 등록분에 게시 학교만 더한다(absorb) — 합치는 규칙은 registered-merge.mjs 한 곳
@@ -472,10 +499,13 @@ if (!cfg.enabled) {
 
   report.push('', `### 🤖 자동 등록 (선조치후보고) — ${added.length}건 등록${removed ? ` · ${removed}건 제거(blockIds)` : ''}`);
   if (lateDropped.length) {
-    report.push('', `**등록 뒤 원문에서 마감 경과 확인 — 되돌림 ${lateDropped.length}건** — 등록할 때 이미 마감이 지나 있던 로봇 등록분이에요(본문에만 기간이 적혀 있었어요). 다시 등록되지 않게 그 공고에 원문 마감을 적어 뒀어요:`);
-    for (const e of lateDropped.slice(0, 20)) report.push(`- \`${e.id}\` ${(e.name || '').slice(0, 40)} · 마감 ${e.deadline} · 등록 ${e.listedAt}`);
+    /* 🔴 원인을 하나로 단정하지 않는다(CLAUDE.md 매 세션 5 · 리뷰 2026-10-05) — 마감은 본문에서도 공고문 첨부에서도 읽혔을 수 있고,
+       제목·요약의 날짜를 못 읽었던 것일 수도 있다. 항목마다 마감 출처 표식(deadlineFrom)을 그대로 적는다. */
+    report.push('', `**등록 뒤 원문에서 마감 경과 확인 — 되돌림 ${lateDropped.length}건** — 나중에 읽은 마감이 등록한 날보다 앞이었던 로봇 등록분이에요. 다시 등록되지 않게 그 공고에 마감을 적어 뒀고, 같은 사업의 다른 학교 글도 60일 동안 새로 등록하지 않고 컨펌 대기로 내려요(장부 \`collector/past-rounds.json\`):`);
+    for (const e of lateDropped.slice(0, 20)) report.push(`- \`${e.id}\` ${(e.name || '').slice(0, 40)} · 마감 ${e.deadline} · 등록 ${e.listedAt} · 마감 출처: ${String(e.deadlineFrom || '기록 없음').slice(0, 50)}`);
     if (lateDropped.length > 20) report.push(`- … 외 ${lateDropped.length - 20}건`);
   }
+  if (pastPruned) report.push('', `지난 회차 장부에서 60일 지난 줄 ${pastPruned}건을 지웠어요 — 그 사업 글은 다시 보통 규칙으로 봅니다.`);
   /* 🔴 좁힌 것을 **말없이** 하지 않는다 — 리포트에 안 적으면 다음 세션이
      "로봇이 갑자기 아무것도 안 등록한다"고 없는 버그를 쫓는다. */
   if (onlySchools.size) {
