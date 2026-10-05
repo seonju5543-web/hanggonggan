@@ -7189,6 +7189,11 @@
      "name": "본문이미지-785x1117.jpg",
      "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/findUploadImg.do?fileNo=d5ba21686ec544dba26a17064c30ef17",
      "bodyImage": true
+    },
+    {
+     "name": "본문이미지-1638x1163.gif",
+     "url": "https://www.kookmin.ac.kr/content/05sub/style0005/images/common/webacc.gif",
+     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12387/view.do?currentPageNo=1",
@@ -7246,6 +7251,11 @@
     {
      "name": "본문이미지-779x1113.jpg",
      "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/findUploadImg.do?fileNo=26f7a5d8a9674826ae4098fbeedf6994",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-1638x1163.gif",
+     "url": "https://www.kookmin.ac.kr/content/05sub/style0005/images/common/webacc.gif",
      "bodyImage": true
     }
    ],
@@ -9142,6 +9152,18 @@
     },
     {
      "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp (다운로드 : 12회)",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=ca127512499eb0e0ba00b24b184d8221&bbsId=1083"
+    },
+    {
+     "name": "[공문] 2026년 우양재단 동행 장학 모집 협조 요청.hwp (다운로드 : 14회)",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=0c6797a234b08b8ba908c89f3f55b111&bbsId=1083"
+    },
+    {
+     "name": "[붙임1] 2026년 동행장학 홍보 포스터.jpg (다운로드 : 13회)",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=29df0f5abb5a9a6114328315d3bcc08b&bbsId=1083"
+    },
+    {
+     "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp (다운로드 : 15회)",
      "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=ca127512499eb0e0ba00b24b184d8221&bbsId=1083"
     }
    ],
@@ -11057,6 +11079,16 @@
     {
      "name": "(공고문)2026년_하반기_문주장학재단_주관_AI_ICT_장학생_선발_공고문.pdf",
      "url": "javascript:downGO('(공고문)2026년_하반기_문주장학재단_주관_AI_ICT_장학생_선발_공고문.pdf','/files/article/servicenotice/520607/','F201A662E8C1437EB71F30828C2E394E.pdf');"
+    },
+    {
+     "name": "본문이미지-1588x2245.jpg",
+     "url": "https://wise.dongguk.ac.kr/cmmn/fileView?path=/ckeditor//servicenotice&physical=1789696402518.jpg",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-982x734.png",
+     "url": "https://mindlogic-chatapi-public.s3.ap-northeast-2.amazonaws.com/university/dongguk_icon_image.png",
+     "bodyImage": true
     }
    ],
    "sourceUrl": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520607",

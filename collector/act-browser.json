@@ -209,5 +209,162 @@
   ],
   "excludes": [],
   "from": "브라우저 본문"
+ },
+ "https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=514&bcd=notice": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://kyf.or.kr/user/boardDetail.do?boardType=notice&bbsId=BBSMSTR_000000000367&nttNo=10054": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://wise.dongguk.ac.kr/article/servicenotice/detail/520680": {
+  "at": "2026-10-05",
+  "tries": 1,
+  "lines": [
+   "장애학생지원",
+   "장애인 복지시설"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://wise.dongguk.ac.kr/article/servicenotice/detail/520622": {
+  "at": "2026-10-05",
+  "tries": 1,
+  "lines": [
+   "장애학생지원",
+   "장애인 복지시설"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/267199/artclView.do": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/267176/artclView.do": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://www.knou.ac.kr/bbs/knou/51/816423/artclView.do": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://www.nongsaro.go.kr/portal/ps/psz/psza/contentSub.ps?menuId=PS02485&bbsId=10&pageIndex=1&pageSize=10&cntntsNo=53&nttSeCode=&searchType=title&searchText=": {
+  "at": "2026-10-05",
+  "tries": 1,
+  "lines": [
+   "대상 : 박명건(전라남도)",
+   "대상 : 신진섭(충청남도)",
+   "대상 : 김미정(강원도)",
+   "대상 : 홍여신(전남 강진)"
+  ],
+  "excludes": [],
+  "from": "요강 페이지"
+ },
+ "https://www.kogl.or.kr/contest/contestMain.do": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://link.mods.go.kr/view/board/expAndNoticeView?post_no=223": {
+  "at": "2026-10-05",
+  "tries": 1,
+  "lines": [
+   "참가자격 : 공공기관, 민간기관, 교육·연구기관·단체 및 개인",
+   "(누구나 참가가능)",
+   "공모일정",
+   "①작품접수 2026.9.1.(월) ~9.30. (화)",
+   "②수상작발표2026년 12월"
+  ],
+  "excludes": [],
+  "from": "공고문 첨부(OCR)"
+ },
+ "https://maicon.kr/": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://www.keli.kr/home/ko/proj/146/evnt/mng/detail.do?evntSn=136&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://fintech.or.kr/web/expo/idea.do?menu_id=10300": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=176858": {
+  "at": "2026-10-05",
+  "tries": 1,
+  "lines": [
+   "신청대상 : ㅁ 은퇴(예정) 또는 경력 단절 체육인 중 전·현직 선수, 지도자, 심판으로 창업 의지가 있는 자",
+   "* 체육인 복지법 제2조에 해당하는 체육인",
+   "ㅁ 체육인 기준",
+   "- 선수 : ｢국민체육진흥법｣에 따른 경기단체에 선수로 등록된 기간이 총 5년 이상이면서 연속하여 3년 이상 등록된 적이 있는 사람 중 아래 대회 에 출전한 경력이 있는 사람",
+   "- 지도자 : ｢국민체육진흥법｣에 따른 경기단체에 지도자로 등록된 기간이 총 5년 이상인 사람 중 아래 대회 에 출전한 선수를 지도한 경력이 있는 사람",
+   "- 심판 : ｢국민체육진흥법｣에 따른 경기단체에 심판으로 등록된 기간이 총 5년 이상이면서 아래 대회 에서 매년 1회 이상 3년 동안 활동한 경력이 있는 사람",
+   "* 대회 : 올림픽, 패럴림픽, 데플림픽, 아시아경기대회, 국제경기연맹 주관 세계선수권대회, 세계대학경기대회, 전국(장애인)체육대회",
+   "** 다만, 학생선수는 체육인에서 제외하되, 국가대표로 확정된 이력이 있는 경우에 한해 체육인으로 인정",
+   "대상연령 : 전체"
+  ],
+  "excludes": [
+   "ㅁ 지원불가 대상",
+   "ㅇ 정부지원사업 참여 제한 제재조치를 받고 있는 자",
+   "* 선정 후 지원불가 대상에 해당되는 경우 선정 취소 가능",
+   "신청 시 요청하는 정보(개인정보포함)는 사업운영기관에서 관리되오니 이점 반드시 유의하여 주시기 바랍니다."
+  ],
+  "from": "브라우저 본문"
+ },
+ "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=178200": {
+  "at": "2026-10-05",
+  "tries": 1,
+  "lines": [
+   "신청대상 : 바이오·메디컬 분야 기업 / 기술이전 및 사업화를 희망하는 기업",
+   "대상연령 : 만 20세 이상 ~ 만 39세 이하, 만 40세 이상",
+   "대상 : 일반기업, 1인 창조기업"
+  ],
+  "excludes": [
+   "※ 지원 제외 대상",
+   "- 본 사업에 신청한 내용과 동일한 내용으로 정부, 지자체 또는 유관기관의 지원을 받은 경우",
+   "- 기업 또는 사업 책임자(대표자 포함)가 정부 지원 사업 참여 제한 대상인 경우",
+   "- 신청일 기준 국세 또는 지방세를 미납한 경우",
+   "- 신청일 기준 휴·폐업 중이거나 자본잠식 상태인 기업",
+   "- 동국대학교 BMC창업보육센터장이 참여를 제한할 정당한 사유가 있다고 인정하는 자 또는 기업"
+  ],
+  "from": "브라우저 본문"
+ },
+ "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000251/articleView.do?searchSeq=16639&commonMenuNo=180_35": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000242/articleView.do?searchSeq=15729&commonMenuNo=506_533": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000242/articleView.do?searchSeq=14869&commonMenuNo=506_533": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000274/articleView.do?commonMenuNo=180_191&searchSeq=16721": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000274/articleView.do?commonMenuNo=180_191&searchSeq=16720": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://youth.gyeongnam.go.kr/youth/board.es?mid=a10501020000&bid=0006&list_no=6876&act=view": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179225": {
+  "at": "2026-10-05",
+  "tries": 1,
+  "lines": [
+   "신청대상 : ○ 초기 스타트업 대표 및 임직원",
+   "○ 재무관리 역량을 강화하고자 하는 예비·초기 창업자",
+   "신청 시 요청하는 정보(개인정보포함)는 사업운영기관에서 관리되오니 이점 반드시 유의하여 주시기 바랍니다.",
+   "대상연령 : 전체"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
  }
 }

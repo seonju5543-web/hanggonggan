@@ -319,8 +319,8 @@
   "name": "등록금외지원 2026년 하반기 인재육성 장학생 선발 계획 공고 2026.09.08 대전청년내일재단 황새롬"
  },
  "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765909": {
-  "tries": 2,
-  "at": "2026-10-05",
+  "tries": 3,
+  "at": "2026-10-06",
   "minBody": 100,
   "name": "[기한 연장]2026-2학기 고졸 후학습자 장학사업(희망사다리 Ⅱ유형) 신규장학생 선발 안내(~9/30(수)"
  },
@@ -331,8 +331,8 @@
   "name": "[홍보] 2026 하반기 AI·ICT 인재 장학생 모집 안내"
  },
  "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?articleno=366829": {
-  "tries": 2,
-  "at": "2026-10-05",
+  "tries": 3,
+  "at": "2026-10-06",
   "minBody": 100,
   "name": "[학부] 2026년 제29기 두을장학생 선발 안내"
  },
@@ -395,5 +395,11 @@
   "at": "2026-10-04",
   "minBody": 100,
   "name": "[입학에서 취업까지] [대전청년내일재단] 2026년 성취(대) 장학생 선발 안내 ( ~ 2026.10.08."
+ },
+ "https://www.hongik.ac.kr/kr/newscenter/notice.do?articleno=158449&nocat=501": {
+  "tries": 1,
+  "at": "2026-10-06",
+  "minBody": 100,
+  "name": "[대전광역시] 2026년 하반기 성취장학생 선발 연장"
  }
 }
