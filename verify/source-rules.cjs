@@ -7,8 +7,8 @@
    그래서 '관리자가 고치는 데이터의 불변식'은 두 길(로봇·관리자)이 같이 지나는 감사(verify/audit-data.js · 오류)에 두고,
    관리자 저장소(tools/admin-apply.mjs)가 저장 **전에** 같은 함수로 먼저 거절해 화면이 사유를 말하게 한다.
 
-   🔴 파일을 읽지 않는다(순수 함수) — 부르는 쪽이 읽어서 넘긴다. 규칙을 베끼지 말고 이 파일을 불러 쓴다.
-   반환: [{ msg }] — 비면 통과. */
+   🔴 파일을 읽지 않는다(순수 함수) — 부르는 쪽이 읽어서 넘긴다(auditSourceFiles 는 읽는 함수를 받는다). 규칙을 베끼지 말고 이 파일을 불러 쓴다.
+   반환: …Problems 는 [{ msg }] · auditSourceFiles 는 감사 오류 문장 [string] — 비면 통과. */
 
 /* 근거(evidence)는 '어디서 확인했나'를 적는 칸 — 10자 넘게(날짜 도장 하나로도 넘는다) */
 const EVIDENCE_MIN = 10;
@@ -67,4 +67,27 @@ function newsSourceProblems(src, opts = {}) {
   return out;
 }
 
-module.exports = { activitySourceProblems, newsSourceProblems, evidenceOk, EVIDENCE_MIN, NEWS_MIN_ROWS };
+/** 감사(verify/audit-data.js)가 부르는 한 곳 — 두 출처 파일을 재서 **오류 문장**을 돌려준다(빈 배열 = 통과).
+ *  감사는 이 결과를 그대로 errors 에 넣기만 한다 — 관문(health-gates/gate.mjs ②)이 표본으로 이 함수를 돌리고,
+ *  감사가 결과를 경고(warns)로 낮추지 않았는지도 본다(리뷰 2026-10-04: errors → warns 로 바꿔도 관문이 조용했다).
+ *  read(rel) — 부르는 쪽이 준다(이 파일은 파일을 읽지 않는다). 못 읽으면 그것도 오류(조용히 꺼지는 검사 금지).
+ *  opts.served — 서비스 학교 이름 목록 · opts.aggregator — 집계 사이트 정규식(collector/link-fix.mjs AGGREGATOR_RE · 한 곳).
+ *  🔴 집계 사이트 정규식을 못 받으면 그것도 오류 — 규칙 하나가 조용히 빠지지 않게. */
+function auditSourceFiles(read, opts = {}) {
+  const errors = [];
+  const why = (e) => String((e && e.message) || e).slice(0, 80);
+  if (!(opts.aggregator instanceof RegExp)) {
+    errors.push('activity-sources — 집계 사이트 규칙(collector/link-fix.mjs AGGREGATOR_RE)을 받지 못해 그 검사를 못 했습니다(감사 경고에 이유)');
+  }
+  try {
+    const src = read('collector/activity-sources.json');
+    for (const p of activitySourceProblems(src, { served: opts.served, aggregator: opts.aggregator })) errors.push(`activity-sources — ${p.msg}`);
+  } catch (e) { errors.push(`activity-sources — 출처 목록을 읽지 못했습니다: ${why(e)}`); }
+  try {
+    const schools = ((read('collector/schools.json') || {}).schools || []).map((s) => s.school);
+    for (const p of newsSourceProblems(read('collector/news-sources.json'), { schools })) errors.push(`news-sources — ${p.msg}`);
+  } catch (e) { errors.push(`news-sources — 출처 목록을 읽지 못했습니다: ${why(e)}`); }
+  return errors;
+}
+
+module.exports = { activitySourceProblems, newsSourceProblems, auditSourceFiles, evidenceOk, EVIDENCE_MIN, NEWS_MIN_ROWS };
