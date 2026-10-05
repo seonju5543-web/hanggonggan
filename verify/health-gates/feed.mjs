@@ -313,7 +313,10 @@ export default async function feed(eq, ctx) {
     g('add', '-A'); g('commit', '-qm', '사고 전');
     const snap = g('rev-parse', 'HEAD').stdout.trim();
     const a2 = { school: K, title: a.title, url: 'https://k.kr/v?no=1&fixed=1', foundAt: a.foundAt };   // 사고 뒤 링크 로봇이 고친 주소 — 메우기가 되돌리면 안 된다
-    w('data/notices.json', { updatedAt: day(0), items: [a2] }); w(fileK, { school: K, updatedAt: day(0), items: [a2] });
+    /* 지금 notices.json 에 남은 60일 밖 글·첨부 링크 — 수집기는 메우기 전에 거른다(리뷰 2026-10-05 R6: 도구는 안 걸러 학교별 파일에 다시 실었다) */
+    const stale = { school: K, title: '2026 표본 오래된 장학 안내', url: 'https://k.kr/v?no=3', foundAt: day(70) };
+    const attach = { school: K, title: '장학 신청서.hwp', url: 'https://k.kr/download.do?attachNo=4', foundAt: day(2) };
+    w('data/notices.json', { updatedAt: day(0), items: [a2, attach, stale] }); w(fileK, { school: K, updatedAt: day(0), items: [a2] });
     g('add', '-A'); g('commit', '-qm', '사고(잘림)');
     const tool = fileURLToPath(new URL('collector/heal-feed.mjs', root));
     const run = (...args) => spawnSync(process.execPath, [tool, ...args], { cwd: dir, encoding: 'utf8', env: cleanEnv() });
@@ -326,8 +329,27 @@ export default async function feed(eq, ctx) {
     const fileOut = JSON.parse(fs.readFileSync(path.join(dir, fileK), 'utf8')).items;
     eq('⑤ 메우기 도구 — --dry 와 못 읽는 원천은 아무것도 안 쓴다 · 사고 직전 커밋에서 빠진 글만 메운다',
       [dry.status, dryClean, bad.status, badClean, r.status], [0, true, 1, true, 0]);
-    eq('  notices.json·학교별 파일 둘 다 · 고친 주소는 그대로 · 메운 글의 foundAt 은 원래 날짜',
+    eq('  notices.json·학교별 파일 둘 다 · 고친 주소는 그대로 · 메운 글의 foundAt 은 원래 날짜 · 수집기처럼 60일 밖 글·첨부 링크는 거른다',
       [feedOut.map((n) => n.url), fileOut.map((n) => n.url), feedOut[1] && feedOut[1].foundAt], [[a2.url, b.url], [a2.url, b.url], b.foundAt]);
+    /* '수집기 끝부분과 같은 함수·같은 차례'를 글자로 대조 — 피드를 바꾸는 함수(url-key · publish-notices · attachment-link 가 내보내는 이름)
+       호출의 첫 등장 차례. 두 수집기의 공통 차례에 단계가 더해지면(예: 기본 브랜치의 게시판 공통 링크 걷기) 여기가 빨개져 도구도 같이 고치게 한다. */
+    const vocab = new Set([...Object.keys(await import('../../collector/url-key.mjs')), ...Object.keys(await import('../../collector/publish-notices.mjs')),
+      ...Object.keys(await import('../../collector/attachment-link.mjs'))]);
+    const callsIn = (s) => { const out = []; for (const m of s.matchAll(/\b([A-Za-z_]\w*)\s*\(/g)) if (vocab.has(m[1]) && !out.includes(m[1])) out.push(m[1]); return out; };
+    const tailOf = (f) => {
+      const s = stripComments(fs.readFileSync(new URL(f, root), 'utf8'));
+      const from = s.indexOf('notices.items = freshAll.concat(notices.items || [])');
+      const to = s.indexOf('fs.writeFileSync(noticesPath', from);
+      return from > 0 && to > from ? callsIn(s.slice(from, to)) : [];
+    };
+    const cTail = tailOf('collector/collect.mjs');
+    const bTail = tailOf('collector/browser-collect.mjs');
+    const common = cTail.filter((x) => bTail.includes(x));
+    const toolSrc = stripComments(fs.readFileSync(new URL('collector/heal-feed.mjs', root), 'utf8'));
+    const toolSeq = callsIn(toolSrc.slice(toolSrc.indexOf('const notices = JSON.parse(')));
+    eq('  🔴 도구의 차례 = 두 수집기 \'앱 발행\' 단락의 공통 차례 (같은 함수 · 같은 차례 — 새 글 얹기만 없다)',
+      [common.length >= 6 && common.includes('healFromLedger') && common.includes('publishBySchool'), bTail.filter((x) => cTail.includes(x)).join() === common.join(), toolSeq],
+      [true, true, common]);
     eq('  JSON.stringify(x, null, 1) 로 저장한다 (로봇과 같은 꼴)',
       fs.readFileSync(path.join(dir, 'data/notices.json'), 'utf8') === JSON.stringify(JSON.parse(fs.readFileSync(path.join(dir, 'data/notices.json'), 'utf8')), null, 1), true);
     fs.rmSync(dir, { recursive: true, force: true });
