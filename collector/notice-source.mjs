@@ -25,6 +25,22 @@ export const normTitle = (t) => (t || '')
   .replace(/[\s·ㆍ()~〜.,'"“”‘’!⭐★]/g, '')
   .toLowerCase();
 
+/* 말뭉치의 다른 공고 제목을 담은 줄인가 — 게시판의 '이전글·다음글'·옆 목록 줄은 **다른 공고의 제목**이다.
+   본문 분량 재기(아래 indexTexts measure)와 도우미 검색 요약(build-search-index.mjs)이 같이 쓴다 — 베끼지 말 것 (2026-10-05 점검 app1-05).
+   담았는가로 보는 이유: 목록에 저장된 제목은 `공통 [공통] 두을장학재단 …` 처럼 분류 낱말이 앞에 붙어 화면의 줄과 글자가 다르다. */
+export function makeTitleLine(corpus) {
+  const titles = [];
+  for (const v of corpus || []) {
+    const t = v && v.title ? normTitle(v.title) : '';
+    if (t.length >= 10) titles.push(t);
+  }
+  return (line) => {
+    const n = normTitle(line);
+    if (n.length < 10) return false;
+    return titles.some((t) => t.includes(n) || n.includes(t));
+  };
+}
+
 /* 저장된 원문 배열을 주소·제목 두 갈래로 색인한다 */
 export function indexTexts(texts, browserBodies) {
   const byUrl = new Map();
@@ -46,16 +62,7 @@ export function indexTexts(texts, browserBodies) {
      저장된 원문 전체의 제목을 모아 두고, 그 제목을 담은 줄은 본문으로 세지 않는다
      (자기 제목 줄도 같이 빠진다 — 제목은 본문이 아니다). 담았는가로 보는 이유: 목록에 저장된
      제목은 `공통 [공통] 두을장학재단 …` 처럼 분류 낱말이 앞에 붙어 화면의 줄과 글자가 다르다. */
-  const titles = [];
-  for (const v of corpus) {
-    const t = v && v.title ? normTitle(v.title) : '';
-    if (t.length >= 10) titles.push(t);
-  }
-  const isTitleLine = (line) => {
-    const n = normTitle(line);
-    if (n.length < 10) return false;
-    return titles.some((t) => t.includes(n) || n.includes(t));
-  };
+  const isTitleLine = makeTitleLine(corpus);
   const measure = (v) => {
     if (!v || typeof v.text !== 'string') return v;
     /* 🔴 저장된 값이 있어도 **다시 잰다** (2026-09-15). 수집 로봇이 이 칸을 파일에 함께 저장하는데,

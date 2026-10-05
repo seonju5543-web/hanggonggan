@@ -16,16 +16,23 @@
    ② **이미 앱이 갖고 있는 낱말은 뺀다.** 이름·주관기관·요약·발췌는 앱이 이미
       들고 있어 또 담으면 파일만 커진다. 그래서 '원문에만 있는 낱말'만 남긴다.
 
-   실행: node collector/build-search-index.mjs
+   🔴 원문은 **껍데기를 걷고** 읽는다 (2026-10-05 점검 app1-05) — 요약 98건 중 7건에 메뉴 낱말(스킵네비게이션·주메뉴바로가기·로그아웃·
+      학생포탈·eclass)이 들어가, '취업'·'학생포탈' 같은 질문에 엉뚱한 공고가 섞였다(도우미는 요약에 낱말이 있으면 점수를 준다).
+      걷는 것: 같은 호스트 여러 쪽에 똑같이 나오는 줄(page-boilerplate · 일반·브라우저 원문을 따로 배워 합친다) · 다른 공고 제목을 담은 줄
+      (notice-source.mjs makeTitleLine — 본문 분량 재기와 같은 함수) · 「이전글·다음글」 줄과 그 뒤 두 줄 · 바로 다음 줄이 날짜만 있는 줄(옆 목록 위젯).
+
+   실행: node collector/build-search-index.mjs   (불러오기만 하면 아무것도 쓰지 않는다 — 관문이 buildSearchIndex 를 표본으로 잰다)
    ============================================================ */
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { indexTexts, sourceFor, hasText, looksLikeErrorPage } from './notice-source.mjs';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { indexTexts, sourceFor, hasText, looksLikeErrorPage, makeTitleLine } from './notice-source.mjs';
+import { makeStripperMulti } from './page-boilerplate.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const REG = path.join(ROOT, 'data/registered.json');
 const TEXTS = path.join(ROOT, 'collector/extracted/notices-text.json');
+const BROWSER = path.join(ROOT, 'collector/extracted/browser-bodies.json');
 const OUT = path.join(ROOT, 'data/search-index.json');
 
 /* 한 공고가 차지할 수 있는 글자 수 상한.
@@ -56,25 +63,53 @@ function words(text) {
   return out;
 }
 
-function main() {
-  const reg = JSON.parse(fs.readFileSync(REG, 'utf8'));
-  const items = reg.items || [];
-  let texts = {};
-  try { texts = JSON.parse(fs.readFileSync(TEXTS, 'utf8')); } catch (e) { /* 원문이 없으면 빈 파일이 나온다 */ }
-  const idx = indexTexts(texts);
+/* 껍데기를 걷은 본문 — 위 머리말의 넷. 순수 함수(파일을 읽지도 쓰지도 않는다) */
+const PREV_NEXT = /(이전\s?글|다음\s?글)/;
+const DATE_ONLY = /^20\d{2}\s*[.\-/]\s*\d{1,2}\s*[.\-/]\s*\d{1,2}\.?$/;
+export function bodyForIndex(text, { strip, url, isTitleLine }) {
+  const body = strip ? strip(url || '', String(text || ''), { fallback: false }) : String(text || '');
+  const lines = body.split('\n').map((l) => l.trim()).filter(Boolean);
+  const drop = new Set();
+  for (let i = 0; i < lines.length; i += 1) {
+    if (PREV_NEXT.test(lines[i])) { drop.add(i); drop.add(i + 1); drop.add(i + 2); }
+    if (DATE_ONLY.test(lines[i + 1] || '') && !DATE_ONLY.test(lines[i])) { drop.add(i); drop.add(i + 1); }
+  }
+  return lines.filter((l, i) => !drop.has(i) && !(isTitleLine && isTitleLine(l))).join('\n');
+}
+
+/**
+ * 등록 항목 + 저장된 원문 → { 항목 id: 찾기용 낱말 } (그리고 셈). 파일을 쓰지 않는다.
+ * @param {object[]} items          data/registered.json items
+ * @param {object|object[]} texts   collector/extracted/notices-text.json
+ * @param {object} browserBodies    collector/extracted/browser-bodies.json (주소 → { text, title })
+ */
+export function buildSearchIndex(items, texts, browserBodies) {
+  const idx = indexTexts(texts || {}, browserBodies || {});
+  const general = Object.values(texts || {});
+  const browserList = Object.entries(browserBodies || {}).map(([url, v]) => (v && v.text ? { url, ...v } : null)).filter(Boolean);
+  const strip = makeStripperMulti([general, browserList]);
+  const isTitleLine = makeTitleLine([...general, ...browserList]);
+  const cleanOf = new Map();
+  const bodyOf = (item) => {
+    if (cleanOf.has(item.id)) return cleanOf.get(item.id);
+    const src = sourceFor(item, idx);
+    const v = !hasText(src) || looksLikeErrorPage(src.text) ? null : bodyForIndex(src.text, { strip, url: src.url, isTitleLine });
+    cleanOf.set(item.id, v);
+    return v;
+  };
 
   /* 🔴 1차: 어떤 낱말이 '여러 공고에 다 나오는가'를 먼저 센다.
      저장된 원문에는 공고 내용뿐 아니라 **게시판 페이지의 껍데기**가 섞여 있다
      (로그인 · 사이트맵 · 본문 바로가기 · 입학 · 취업 …). 그대로 담으면
      "취업" 한 마디에 그 학교 공고가 전부 걸려 **검색이 오히려 나빠진다.**
      껍데기는 같은 학교의 모든 글에 똑같이 나오므로, **여러 공고에 공통으로 나오는 낱말을
-     빼는 것**만으로 이름을 하나하나 적지 않고도 걸러진다. */
+     빼는 것**으로 이름을 하나하나 적지 않고도 걸러진다(위 bodyForIndex 가 먼저 줄 단위로 걷는다 — 등록이 적은 학교는 이것만으로 안 걸러졌다). */
   const docFreq = new Map();
   const bodies = new Map();
-  for (const item of items) {
-    const src = sourceFor(item, idx);
-    if (!hasText(src) || looksLikeErrorPage(src.text)) continue;
-    const ws = words(src.text);
+  for (const item of items || []) {
+    const text = bodyOf(item);
+    if (text == null) continue;
+    const ws = words(text);
     bodies.set(item.id, ws);
     new Set(ws).forEach((w) => docFreq.set(w, (docFreq.get(w) || 0) + 1));
   }
@@ -88,9 +123,8 @@ function main() {
 
   const out = {};
   let withText = 0, bytes = 0;
-  for (const item of items) {
-    const src = sourceFor(item, idx);
-    if (!hasText(src) || looksLikeErrorPage(src.text)) continue;   // 오류 화면은 원문이 아니다
+  for (const item of items || []) {
+    if (bodyOf(item) == null) continue;   // 원문이 없거나 오류 화면은 원문이 아니다
     withText++;
 
     /* 앱이 이미 들고 있는 낱말은 뺀다 — 또 담으면 파일만 커진다 */
@@ -114,15 +148,27 @@ function main() {
     out[item.id] = blob;
     bytes += blob.length;
   }
+  return { items: out, withText, common: [...docFreq.values()].filter((n) => n > tooCommon).length };
+}
 
-  const doc = { updatedAt: new Date().toISOString().slice(0, 10), items: out };
+function main() {
+  const reg = JSON.parse(fs.readFileSync(REG, 'utf8'));
+  const items = reg.items || [];
+  let texts = {};
+  try { texts = JSON.parse(fs.readFileSync(TEXTS, 'utf8')); } catch (e) { /* 원문이 없으면 빈 파일이 나온다 */ }
+  let browserBodies = {};
+  try { browserBodies = JSON.parse(fs.readFileSync(BROWSER, 'utf8')); } catch (e) { /* 아직 없음 */ }
+  const built = buildSearchIndex(items, texts, browserBodies);
+
+  const doc = { updatedAt: new Date().toISOString().slice(0, 10), items: built.items };
   fs.writeFileSync(OUT, JSON.stringify(doc));
   const kb = (fs.statSync(OUT).size / 1024).toFixed(1);
-  console.log(`검색용 요약: 등록 ${items.length}건 · 원문 있는 것 ${withText}건 · 담은 것 ${Object.keys(out).length}건 · ${kb}KB`);
-  console.log(`  (여러 공고에 공통으로 나와 뺀 낱말 ${[...docFreq.values()].filter((n) => n > tooCommon).length}개 — 게시판 껍데기)`);
+  console.log(`검색용 요약: 등록 ${items.length}건 · 원문 있는 것 ${built.withText}건 · 담은 것 ${Object.keys(built.items).length}건 · ${kb}KB`);
+  console.log(`  (여러 공고에 공통으로 나와 뺀 낱말 ${built.common}개 — 게시판 껍데기)`);
   if (fs.statSync(OUT).size > TOTAL_BUDGET * 1.2) {
     console.log('⚠️ 파일이 예산보다 큽니다 — PER_ITEM을 줄이세요 (학생 폰이 내려받는 파일입니다)');
   }
 }
 
-main();
+/* 직접 실행할 때만 쓴다(search-index.yml 의 `node collector/build-search-index.mjs`) — 불러오는 순간 data/search-index.json 을 덮어쓰던 것을 막는다 */
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) main();

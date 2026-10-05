@@ -12,6 +12,8 @@
      ④ 범위 승격은 마감 전만 (collect-14): 지난 등록분을 전국으로 풀거나 지난 회차가 새 회차를 흡수하지 않는다(openOn 한 곳)
      ⑤ 소식 제목의 행 꼬리·번호 (news-7): 영남 「9 2026학년도 …」 행 번호는 **게시판 단위로만**(80%) 뗀다(한 제목만 보고 떼면 「3 대 3 농구대회」가 깨진다) ·
         항공대 꼴(<a> 안에 제목·부서·날짜·조회수) · 실려 있던 글도 발행 때 같은 청소(retitleStored · 주소·글 번호는 그대로)
+     ⑥ 도우미 검색 재료에 메뉴·남의 제목이 없다 (app1-05): 요약 7건에 메뉴 낱말(로그아웃·학생포탈·eclass)이 들어가 엉뚱한 공고가 섞였다 —
+        껍데기 줄 · 다른 공고 제목 줄 · 「이전글」 뒤 두 줄 · 날짜 줄 앞 줄을 걷는다 · 불러오기만 하면 파일을 쓰지 않는다
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말).
       로봇을 돌릴 때는 저장소 코드를 임시 폴더로 **복사**해 그 안의 표본만 읽고 쓴다(bodies.mjs sandbox). */
 import fs from 'node:fs';
@@ -29,6 +31,7 @@ import { boilerMulti, boilerFor } from '../../collector/page-boilerplate.mjs';
 import { parseDeadline, bodyDeadlineFrom, makeBodyReader } from '../../collector/notice-deadline.mjs';
 import { openOn } from '../../collector/registered-merge.mjs';
 import { extractDatedRows, dropRowNumbers, retitleStored } from '../../collector/board-links.mjs';
+import { buildSearchIndex } from '../../collector/build-search-index.mjs';
 
 const require = createRequire(import.meta.url);
 const J = (x) => `${JSON.stringify(x, null, 1)}\n`;
@@ -282,5 +285,36 @@ export default async function qnotice(eq, ctx) {
     const cn = stripComments(fs.readFileSync(new URL('collector/collect-news.mjs', root), 'utf8'));
     eq('  소식 로봇 배선 — 실려 있던 글에만(새 글과 섞기 전) retitleStored · 같은 글 합치기보다 먼저',
       /freshAll\.concat\(retitleStored\(loadPublished\(\)\)\)[\s\S]*collapseSamePost\(all\)/.test(cn), true);
+  }
+
+  /* ── ⑥ 도우미 검색 재료에 메뉴·남의 제목이 없다 ── */
+  {
+    const H = 'https://hdj.example.ac.kr/bbs/view?no=';
+    const MENU = ['스킵네비게이션', '주메뉴바로가기', '로그아웃', '학생포탈 eclass', '대학공지'];
+    const FILL = ['지원 대상은 국내 대학에 재학 중인 학부생으로서 직전 학기 성적이 평균 이상인 학생입니다.',
+      '선발된 학생에게는 한 학기 등록금 전액과 생활비를 함께 지원하며 학업 계획서를 심사합니다.',
+      '신청 서류는 재단 누리집에서 내려받아 작성한 뒤 기한 안에 전자우편으로 제출하시기 바랍니다.'];   // 본문 분량(한글 MIN_BODY)을 넘긴다
+    /* 본문 줄은 쪽마다 글자가 달라야 한다 — 같으면 그 줄도 껍데기로 배운다(그러면 본문 분량이 모자라 '원문 없음'이 된다) */
+    /* 걸러야 할 줄을 본문 **앞**에 둔다 — 뒤에 두면 한 공고 글자 상한(PER_ITEM)에 먼저 잘려, 규칙을 빼도 낱말이 안 들어와 관문이 헛돈다(만들면서 그랬다) */
+    const page = (no, title, extra) => ({ url: `${H}${no}`, title, text: [...MENU, title, ...extra, ...FILL.map((l) => `${l} (${'가나다라'[no - 1]}반)`)].join('\n') });
+    /* 같은 호스트 4쪽 — 정식 등록은 그중 둘뿐이라 '여러 공고에 나오는 낱말 빼기'(두 건 문턱)만으로는 메뉴 낱말이 안 걸러진다(실제 학교 다수가 이 꼴) */
+    const texts = [
+      page(1, '2026 표본 장학생 선발 안내 하나', ['본문 줄 2026 수달문화재단 장학생 선발 안내 참고', '특이 요건 도토리숲기금 추천서 필수', '부엉이복지회 장학금 수혜자 발표', '2026.08.03', '이전글', '2026 너구리재단 하반기 장학생 모집 안내', '첨부파일 없음']),
+      page(2, '2026 표본 장학생 선발 안내 둘', ['특이 요건 다람쥐숲기금 면접 필수']),
+      page(3, '2026 청설모재단 장학생 선발 안내', ['특이 요건 청설모 지원']),
+      page(4, '2026 수달문화재단 장학생 선발 안내', ['특이 요건 수달 지원']),
+    ];
+    const items = [{ id: 'q1', name: '2026 표본 장학생 선발 안내 하나', sourceUrl: `${H}1` }, { id: 'q2', name: '2026 표본 장학생 선발 안내 둘', sourceUrl: `${H}2` }];
+    const out = buildSearchIndex(items, texts, {}).items;
+    const has = (id, w) => String(out[id] || '').split(' ').includes(w);
+    eq('⑥ 검색 재료 — 제 고유 낱말은 있다', [has('q1', '도토리숲기금'), has('q2', '다람쥐숲기금')], [true, true]);
+    eq('  메뉴 낱말(껍데기 줄)이 없다', ['로그아웃', '학생포탈', 'eclass', '스킵네비게이션'].filter((w) => has('q1', w) || has('q2', w)), []);
+    eq('  「이전글」 뒤 남의 제목 · 말뭉치의 다른 공고 제목 줄 · 날짜 줄 앞 목록 줄의 낱말이 없다',
+      ['너구리재단', '수달문화재단', '부엉이복지회'].filter((w) => has('q1', w)), []);
+    const src = stripComments(fs.readFileSync(new URL('collector/build-search-index.mjs', root), 'utf8'));
+    const fn = (src.match(/export function buildSearchIndex\([\s\S]*?\n\}/) || [''])[0];
+    eq('  불러오기만 하면 쓰지 않는다 — 본편은 직접 실행할 때만 · 함수는 파일을 안 쓴다 · 읽기 재료는 notice-source makeTitleLine(베끼지 않는다)',
+      [/if \(process\.argv\[1\] && import\.meta\.url === pathToFileURL\(path\.resolve\(process\.argv\[1\]\)\)\.href\) main\(\);\s*$/.test(src), !!fn && !/writeFileSync|readFileSync/.test(fn),
+        /import \{[^}]*makeTitleLine[^}]*\} from '\.\/notice-source\.mjs'/.test(src)], [true, true, true]);
   }
 }
