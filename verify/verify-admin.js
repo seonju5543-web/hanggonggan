@@ -945,6 +945,7 @@ function serve() {
       const st = new URL(route.request().url()).searchParams.get('status');
       const runs = (queueMode === 'pending' && st === 'pending') ? [qRun]
         : (queueMode === 'running' && st === 'in_progress') ? [{ ...qRun, status: 'in_progress' }] : [];
+      if (queueMode === 'broken') return route.fulfill({ status: 500, contentType: 'application/json', body: '{}' });
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ total_count: runs.length, workflow_runs: runs }) });
     };
     await page.route(isQueueUrl, onQueue);
@@ -970,6 +971,14 @@ function serve() {
     ok(nSent === 1, '  실행 중인 로봇만 있으면 보낸다 (실행 중인 것은 취소되지 않는다)', `보낸 횟수 ${nSent}`);
     ok(/수집 로봇이 끝나면 이어서 반영/.test(tR), '  그때는 「수집 로봇이 끝나면 이어서 반영됩니다」', tR.slice(0, 90));
     await idle();
+    /* 줄을 읽지 못하면 막지 않는다 — 다만 확인했다고 말하지 않는다(확인 안 한 것을 단정하지 않는다) */
+    queueMode = 'broken';
+    nSent = 0;
+    await confirmOne();
+    await page.waitForTimeout(500);
+    const tU = await jobText();
+    ok(nSent === 1 && /줄 상태를 확인하지 못했습니다/.test(tU), '  줄을 읽지 못하면(500) 막지 않고 보내되 「줄 상태를 확인하지 못했습니다」라고 덧붙인다', `보낸 횟수 ${nSent} · ${tU.slice(0, 70)}`);
+    await idle();
     queueMode = 'empty';
 
     /* 줄 서는 동안은 '반영 중'이 아니라 '줄 서는 중'이라고 말한다 */
@@ -990,13 +999,22 @@ function serve() {
 
     /* F9 — 실패를 단계 결과로 가른다(예전엔 무엇이든 '검사를 통과하지 못해 되돌렸습니다') */
     let failMode = 'apply';
-    const failRun = () => ({ id: 31, status: 'completed', conclusion: failMode === 'early' ? 'cancelled' : 'failure', created_at: qAt(), html_url: 'https://example.invalid/run31' });
+    const failRun = () => ({ id: 31, status: 'completed', conclusion: (failMode === 'early' || failMode === 'midsave') ? 'cancelled' : 'failure', created_at: qAt(), html_url: 'https://example.invalid/run31' });
+    /* 단계 결과 표본 — 입력 거절(apply·noann) · 감사 실패(audit) · 저장 도중 취소(midsave) */
+    const stepsFor = (mode) => (mode === 'audit' ? [
+      { name: '요청 내용 적용', status: 'completed', conclusion: 'success', number: 5 }, { name: '데이터 감사', status: 'completed', conclusion: 'success', number: 6 },
+      { name: '감사 실패 — 변경을 통째로 되돌림', status: 'completed', conclusion: 'success', number: 7 }, { name: '저장', status: 'completed', conclusion: 'skipped', number: 9 },
+      { name: '감사 실패를 실패로 끝낸다', status: 'completed', conclusion: 'failure', number: 10 }]
+      : mode === 'midsave' ? [
+        { name: '요청 내용 적용', status: 'completed', conclusion: 'success', number: 5 }, { name: '데이터 감사', status: 'completed', conclusion: 'success', number: 6 },
+        { name: '저장', status: 'completed', conclusion: 'cancelled', number: 9 }]
+        : [{ name: '요청 내용 적용', status: 'completed', conclusion: 'failure', number: 5 }, { name: '데이터 감사', status: 'completed', conclusion: 'skipped', number: 6 },
+          { name: '저장', status: 'completed', conclusion: 'skipped', number: 8 }, { name: '🚨 실패 알림', status: 'completed', conclusion: 'success', number: 10 }]);
     const onFailRuns = (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ workflow_runs: [failRun()] }) });
     const onJobs = (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(failMode === 'early' ? { total_count: 0, jobs: [] } : { total_count: 1, jobs: [{
-      id: 501, status: 'completed', conclusion: 'failure', html_url: 'https://example.invalid/job501',
+      id: 501, status: 'completed', conclusion: failMode === 'midsave' ? 'cancelled' : 'failure', html_url: 'https://example.invalid/job501',
       check_run_url: 'https://api.github.com/repos/seonju5543-web/hanggonggan/check-runs/501',
-      steps: [{ name: '요청 내용 적용', status: 'completed', conclusion: 'failure', number: 5 }, { name: '데이터 감사', status: 'completed', conclusion: 'skipped', number: 6 },
-        { name: '저장', status: 'completed', conclusion: 'skipped', number: 8 }, { name: '🚨 실패 알림', status: 'completed', conclusion: 'success', number: 10 }] }] }) });
+      steps: stepsFor(failMode) }] }) });
     const onAnn = (route) => (failMode === 'apply'
       ? route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([
         { message: '관리자 조정 실패 — 한 번에 6건을 지우는 요청입니다(지금 164건). 실수로 목록을 통째로 지우는 것을 막으려고 지울 건수를 숫자로 한 번 더 받습니다 — 받은 값: 없음', annotation_level: 'failure' },
@@ -1022,7 +1040,11 @@ function serve() {
       '  사유를 못 읽으면(권한 없음 403) 지어내지 않고 「실행 기록에서」로 끝낸다', tB.slice(0, 100));
     const tC = await failCase('early');
     ok(/시작 전에 취소/.test(tC) && /바뀌지 않았습니다/.test(tC), '  작업이 0개인 취소는 「시작 전에 취소됐습니다」', tC.slice(0, 100));
-    ok(!(await page.evaluate(() => window.__admin.jobBusy())), '  세 경우 모두 작업 잠금이 풀린다');
+    const tD = await failCase('audit');
+    ok(/데이터 감사를 통과하지 못해/.test(tD) && !/요청을 받지 않았습니다/.test(tD), '  감사가 걸렸으면 「데이터 감사를 통과하지 못해 되돌렸습니다」', tD.slice(0, 100));
+    const tE = await failCase('midsave');
+    ok(/저장됐는지는 확인하지 못했습니다/.test(tE) && !/바뀌지 않았습니다/.test(tE), '  저장 도중에 멈췄으면 저장 여부를 단정하지 않는다 (「바뀌지 않았습니다」라고 하지 않는다)', tE.slice(0, 100));
+    ok(!(await page.evaluate(() => window.__admin.jobBusy())), '  다섯 경우 모두 작업 잠금이 풀린다');
     await page.unroute('**/actions/workflows/**/runs**', onFailRuns);
     await page.unroute(isJobs, onJobs);
     await page.unroute(isAnn, onAnn);

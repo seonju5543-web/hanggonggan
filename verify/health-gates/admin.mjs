@@ -9,18 +9,19 @@
         (F3·F12 — 미리보기 vendor 목록·워크플로 작업 목록 어긋남 — 은 다른 세션이 고쳤다. 다시 어긋나지 않게 같이 잰다.)
      F9 실패는 무엇이든 '검사를 통과하지 못해 되돌렸습니다'였다(대부분은 감사가 아니라 입력 거절) → 단계 결과로 가른다.
      F10 버튼 길이 08-09 이후 Actions 에서 한 번도 안 돌았다 → 저장하지 않는 시험 실행(dry_run) 스위치.
-   🔴 늘 도는 것은 표본(needsBulkExpect 고정 예시)뿐이다. 관리자 도구 파일끼리의 대조(정적 대조·경보 셸)는
-      로컬과 verify-ui.yml(DOC_GATES=1)에서만 잰다 — 이 관문은 test-collector 를 거쳐 **수집 로봇의 데이터 관문**으로도
-      돌아서, 관리자 도구 목록이 어긋난 것이 그날 자동 등록분을 되돌리면 안 된다(verify/verify-admin-vendor.js 머리말과 같은 이유).
+   🔴 어디서나 엄격한 것은 표본(needsBulkExpect 고정 예시)뿐이다. 관리자 도구 파일끼리의 대조(정적 대조·경보 셸)는
+      로봇 워크플로에서는 어긋나도 **경고만** 한다(softEq — alerts·servers·insta 묶음과 같은 잣대) — 이 관문은 test-collector 를 거쳐
+      **수집 로봇의 데이터 관문**으로도 돌아서, 관리자 도구 목록이 어긋난 것이 그날 자동 등록분을 되돌리면 안 된다
+      (verify/verify-admin-vendor.js 머리말과 같은 이유). 로컬과 화면 검사(verify-ui.yml · DOC_GATES=1)에서는 그대로 실패한다.
    🔴 data/·collector 장부는 읽지 않는다. 화면 동작은 verify/verify-admin.js(브라우저)가 잰다. */
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { stepsOf } from './ci.mjs';
+import { softEq } from './alerts.mjs';
 
-const read = (root, rel) => fs.readFileSync(new URL(rel, root), 'utf8');
-const STRICT = !process.env.GITHUB_ACTIONS || process.env.DOC_GATES === '1';
+const read = (root, rel) => fs.readFileSync(new URL(rel, root), 'utf8').replace(/\r/g, '');
 
 /* 글로브 → 정규식 (`*` 는 `/` 를 안 넘는다 · `**` 는 넘는다 — test-collector 「CI 감시 범위」와 같은 해석) */
 const globRe = (g) => new RegExp(`^${g.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*\*/g, '\u0000').replace(/\*/g, '[^/]*').replace(/\u0000/g, '.*')}$`);
@@ -29,7 +30,7 @@ const globRe = (g) => new RegExp(`^${g.replace(/[.+^${}()|[\]\\]/g, '\\$&').repl
 export function buildSources(sh) {
   const out = [];
   for (const m of String(sh).matchAll(/^\s*cp\s+(.+)$/gm)) {
-    const toks = m[1].trim().split(/\s+/);
+    const toks = m[1].trim().split(/\s+/).filter((t) => !t.startsWith('-'));   // cp -r 같은 선택지는 원본이 아니다
     const dest = toks.pop().replace(/^"|"$/g, '');
     toks.forEach((src) => out.push({ src, dest }));
   }
@@ -84,15 +85,30 @@ export default async function gate(eq, ctx) {
   eq('F1 needsBulkExpect — (6건, 152건)=예 · (5, 152)=아니요 · (2, 5)=예(10% 초과) · (3, 50)=아니요 · (1, 9)=예(한 건도 작은 목록이면)',
     [[6, 152], [5, 152], [2, 5], [3, 50], [1, 9]].map(([w, b]) => ED.needsBulkExpect(w, b)), [true, false, true, false, true]);
 
-  if (!STRICT) {
-    console.log('    (로봇 워크플로 — 관리자 도구 파일 대조 건너뜀 · 로컬과 verify-ui.yml 에서만 잰다)');
-    return;
-  }
+  /* 관리자 도구 파일 대조의 엄격함 — test-collector 문서 관문(DOC_GATES)·다른 묶음과 같은 잣대(로컬이거나 DOC_GATES=1 이면 엄격) */
+  const DOC_GATES = ctx.docGates ?? (!process.env.GITHUB_ACTIONS || process.env.DOC_GATES === '1');
+  if (!DOC_GATES) console.log('  (로봇 워크플로 — 관리자 도구 파일 대조는 어긋나도 경고만 · verify-ui.yml 과 로컬에서는 실패)');
+  eq = softEq(eq, DOC_GATES);
 
   const adminJs = read(root, '_admin/admin.js');
   const applyMjs = read(root, 'tools/admin-apply.mjs');
   const ay = read(root, '.github/workflows/admin-apply.yml');
   const steps = stepsOf(ay);
+
+  /* ── 관리자 화면이 모듈로 읽히는가 (2026-10-05 · admin 재시도에서 실제로 겪음) ──
+     🔴 `node --check _admin/admin.js` 는 **틀린 파일도 통과시킨다** — 확장자가 .js 라 모듈로 재지 않고 넘어간다.
+        이번에 실패 문구 표(STEP)가 같은 파일의 STEP(50)과 이름이 겹쳐 '이미 선언됨'으로 **화면 전체가 안 떴는데** 그 검사는 초록이었다.
+        그래서 .mjs 이름의 사본으로 모듈 문법을 잰다(실행하지 않는다 — --check 는 읽기만 한다). */
+  {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'admin-syntax-'));
+    try {
+      const copy = path.join(dir, 'admin.mjs');
+      fs.writeFileSync(copy, adminJs);
+      const r = spawnSync(process.execPath, ['--check', copy], { encoding: 'utf8', timeout: 20000 });
+      eq('관리자 화면(_admin/admin.js)이 모듈 문법으로 읽힌다 (같은 이름을 두 번 선언하면 화면 전체가 안 뜬다)',
+        r.status === 0 ? 'ok' : String(r.stderr || r.error || '').split('\n').find((l) => /Error/.test(l)) || `종료 ${r.status}`, 'ok');
+    } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+  }
 
   /* ── F1 배선 — 문턱은 edit-diff 한 곳 · 화면이 숫자를 실어 보낸다 ── */
   const goAt = adminJs.indexOf("closest('[data-bulk-go]')");
@@ -150,9 +166,9 @@ export default async function gate(eq, ctx) {
 
   /* ── F9 — 화면이 가르는 단계 이름이 워크플로에 글자 그대로 있다 · 🚨 본문이 단계 결과로 갈린다 ── */
   const stepNames = new Set(steps.map((s) => s.name).filter(Boolean));
-  const stepBlock = ((/^const STEP = \{([\s\S]*?)\n\};/m.exec(adminJs)) || [])[1] || '';
+  const stepBlock = ((/^const APPLY_STEP = \{([\s\S]*?)\n\};/m.exec(adminJs)) || [])[1] || '';
   const names = [...stepBlock.matchAll(/^\s*\w+:\s*'([^']+)'/gm)].map((m) => m[1]);
-  eq('F9 화면(admin.js STEP)이 가르는 단계 이름이 admin-apply.yml 의 name: 에 모두 있다 (없는 것)',
+  eq('F9 화면(admin.js APPLY_STEP)이 가르는 단계 이름이 admin-apply.yml 의 name: 에 모두 있다 (없는 것)',
     [names.length >= 3, names.filter((n) => !stepNames.has(n))], [true, []]);
   const alarm = steps.find((s) => /실패 알림/.test(s.name || ''));
   eq('  🚨 단계가 단계 결과를 받는다 — apply·audit·save outcome · 저장 단계에 id: save',
