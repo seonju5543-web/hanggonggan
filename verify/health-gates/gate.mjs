@@ -12,7 +12,7 @@
      ④ 데이터 관문 되돌리기 — 되돌린 뒤 관문을 다시 재지 않아(revert-auto) 원인이 기존 항목이면 관문 실패 상태로 저장되고,
         링크 사냥꾼은 결과를 버리고도 초록불이었다. collector/gate-guard.mjs 를 임시 git 저장소 + 가짜 관문으로 잰다 · 워크플로 배선 · 쉬기 장부.
         소식 로봇도 같은 도구를 쓴다 — 단락이 늘 '정식 등록'을 말해 소식 리포트에 사실과 반대인 문장이 들어갔다(리뷰) → 소식 단계 시나리오도 잰다.
-     ⑤ 알림이 제 리포트로 간다 — '"수집 리포트" in:title' 부분 일치가 다른 로봇의 리포트 이슈를 집었다(#381).
+     ⑤ 알림이 제 리포트로 간다 — '"수집 리포트" in:title' 부분 일치가 다른 로봇의 리포트 이슈를 집었다(#381) · 워크플로 전부를 본다.
      ⑥ 양식 대기열 고아 — 정식 등록에서 빠진 공고의 대기 항목(123건 중 71건)을 스키마화 로봇이 매 실행 정리한다.
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
@@ -492,8 +492,11 @@ export default async function gate(eq, ctx) {
   /* ── ⑤ 알림이 제 리포트로 간다 ── */
   {
     const wf = (f) => stripYamlComments(fs.readFileSync(new URL(`.github/workflows/${f}`, root), 'utf8'));
-    eq('⑤ 장학·브라우저·사냥꾼 워크플로에 맨 \'"수집 리포트" in:title\' 검색이 없다 (다른 로봇의 리포트 이슈를 집는다)',
-      ['collect-scholarships.yml', 'browser-collect.yml', 'link-hunter.yml'].filter((f) => /'"수집 리포트" in:title'/.test(wf(f))), []);
+    /* 셋만 보다가 심층 수집(deep-fetch.yml)의 실패 알림이 그대로 남았다(리뷰 2026-10-04) → 워크플로 **전부**를 본다 */
+    const allWf = fs.readdirSync(fileURLToPath(new URL('.github/workflows/', root))).filter((f) => /\.ya?ml$/.test(f));
+    eq('⑤ 어느 워크플로에도 맨 \'"수집 리포트" in:title\' 검색이 없다 (부분 일치라 다른 로봇의 리포트 이슈를 집는다 · 워크플로 전부)',
+      [allWf.length > 10, allWf.filter((f) => /["']"수집 리포트" in:title["']/.test(wf(f)))], [true, []]);
+    eq('  심층 수집 실패 알림은 장학공고 리포트로 (양식 원본은 정식 등록 쪽 일)', /'"장학공고 수집 리포트" in:title'/.test(wf('deep-fetch.yml')), true);
     const cs = wf('collect-scholarships.yml');
     const auditAlert = cs.split(/\n(?= {6}- )/).find((s) => /name: 🚨 데이터 감사 실패 알림/.test(s)) || '';
     const zero = cs.split(/\n(?= {6}- )/).find((s) => /name: 0건 실행 알림/.test(s)) || '';
