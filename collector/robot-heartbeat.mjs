@@ -211,7 +211,8 @@ export function lastRunIdIn(text) {
 
 /** 열린 넘어짐 경보마다 닫을지(close) 둘지(keep) 정한다 (순수 함수)
     issues: [{ number, title, createdAt, lastBotCommentAt?, lastAlertRunId? }]
-    okByRobot: { 로봇 이름: { runId, startedAt } | null }  — 그 로봇 워크플로의 마지막 성공 실행 (못 읽으면 null)
+    okByRobot: { 로봇 이름: { runId, startedAt, endedAt?, scheduledOnly? } | null }  — 그 로봇 워크플로의 마지막 성공 실행 (mergeLastOk · 못 읽으면 null)
+    (endedAt 은 실행의 updated_at — 끝난 실행에서는 끝난 시각이다)
     닫는 조건(둘 중 하나): ① 성공 실행 번호가 경보를 낸 실행 번호보다 크고(뒤에 생긴 실행) **그 성공이 마지막 경보보다 뒤에 끝났다**
                           ② 성공 실행이 시작한 시각이 마지막 경보(이슈 생성·봇 댓글 중 늦은 것)보다 늦다
     🔴 ① 의 '뒤에 끝났다'(리뷰 2026-10-05) — 대기줄 없는 워크플로에서 수동·예약 실행이 겹치면 번호가 큰 실행이 경보를 낸 실행이
