@@ -34,22 +34,48 @@ FORCE=${ROBOT_RUN_FORCE:-0}
 
 [ $# -ge 1 ] || { echo "쓰는 법: bash tools/robot-run.sh node collector/link-hunter.mjs"; exit 2; }
 
-# 데이터를 고치는 로봇들. 이 중 하나라도 돌고 있으면 로컬 실행을 미룬다.
-# (pages 배포·잠금 확인처럼 데이터를 안 건드리는 것은 여기 없다 — 넣으면 늘 막힌다)
-DATA_ROBOTS='장학공고 수집 로봇|브라우저형 수집 로봇|링크 사냥꾼|원문 링크 복구 로봇|공고 원문 심층 수집|검색용 요약 만들기|관리자 조정|학과 목록 갱신'
+# 데이터를 고치는 로봇들. 이 중 하나라도 돌거나 줄 서 있으면 로컬 실행을 미룬다.
+# 🔴 손으로 적지 않는다 — 워크플로 파일에서 `git add data/…|collector/…` 하는 것의 name: 을 읽는다(tools/data-robots.mjs).
+#    손 목록(8개)이 낡아 data/registered.json 을 쓰는 자격요건 로봇·자격요건 매칭이 빠져 있었다(2026-10-05 로봇·도구 점검 · gaps-04).
+#    (pages 배포·잠금 확인처럼 데이터를 안 건드리는 것은 걸리지 않는다 — 넣으면 늘 막힌다)
+NAMES=$(node tools/data-robots.mjs 2>/dev/null || true)
+if [ -z "$NAMES" ]; then
+  echo "⛔ 데이터 로봇 목록을 못 읽었습니다 (node tools/data-robots.mjs) — 어느 로봇과 겹치는지 가를 수 없습니다."
+  [ "$FORCE" = "1" ] || { echo "   (그래도 돌리려면 ROBOT_RUN_FORCE=1)"; exit 1; }
+fi
 
 echo "■ ① 클라우드에서 로봇이 도는지 확인"
 if command -v gh >/dev/null 2>&1; then
-  BUSY=$(gh run list --limit 30 --json status,name \
-    -q '.[] | select(.status=="in_progress" or .status=="queued") | .name' 2>/dev/null \
-    | grep -E "$DATA_ROBOTS" || true)
-  if [ -n "$BUSY" ]; then
-    echo "⛔ 지금 클라우드에서 도는 로봇이 있습니다 — 끝난 뒤에 돌리세요:"
-    echo "$BUSY" | sed 's/^/     · /'
-    [ "$FORCE" = "1" ] || { echo "   (그래도 돌리려면 ROBOT_RUN_FORCE=1)"; exit 1; }
-    echo "   ROBOT_RUN_FORCE=1 — 겹침을 알고도 진행합니다."
+  # 상태마다 따로 묻는다 — '최근 30개'만 보면 그보다 앞서 줄 선 실행을 놓친다.
+  # 🔴 하나라도 못 물으면(로그인 안 됨·네트워크) '비어 있음'이라고 하지 않는다 — 못 잰 것은 통과가 아니다.
+  RUNNING=""
+  ASK_FAIL=0
+  for st in in_progress queued waiting pending requested; do
+    if ! OUT=$(gh run list --status "$st" -L 100 --json workflowName -q '.[].workflowName' 2>/dev/null); then ASK_FAIL=1; break; fi
+    [ -n "$OUT" ] && RUNNING="${RUNNING}${OUT}"$'\n'
+  done
+  if [ "$ASK_FAIL" = "1" ]; then
+    echo "⚠️ 클라우드 상태를 확인하지 못했습니다 (gh 로그인·네트워크를 확인하세요) — 겹칠 수 있습니다."
+    [ "$FORCE" = "1" ] || { echo "   (gh auth login 뒤 다시 · 그래도 돌리려면 ROBOT_RUN_FORCE=1)"; exit 1; }
+    echo "   ROBOT_RUN_FORCE=1 — 확인 없이 진행합니다."
   else
-    echo "   비어 있음 ✅"
+    BUSY=""
+    if [ -n "$NAMES" ] && [ -n "$RUNNING" ]; then
+      # 이름에 괄호·가운뎃점이 있어 정규식(-E)으로 대조하면 안 된다 — 글자 그대로(-F) 줄 전체(-x).
+      # 프로세스 치환 대신 임시 파일(Windows Git Bash 에서도 돈다).
+      NAMES_FILE=$(mktemp)
+      printf '%s\n' "$NAMES" > "$NAMES_FILE"
+      BUSY=$(printf '%s' "$RUNNING" | grep -Fx -f "$NAMES_FILE" | sort -u || true)
+      rm -f "$NAMES_FILE"
+    fi
+    if [ -n "$BUSY" ]; then
+      echo "⛔ 지금 클라우드에서 돌거나 줄 선 데이터 로봇이 있습니다 — 끝난 뒤에 돌리세요:"
+      echo "$BUSY" | sed 's/^/     · /'
+      [ "$FORCE" = "1" ] || { echo "   (그래도 돌리려면 ROBOT_RUN_FORCE=1)"; exit 1; }
+      echo "   ROBOT_RUN_FORCE=1 — 겹침을 알고도 진행합니다."
+    else
+      echo "   도는 데이터 로봇 없음 ✅ (데이터 로봇 $(printf '%s\n' "$NAMES" | grep -c .)종을 봄)"
+    fi
   fi
 else
   echo "   ⚠️ gh가 없어 확인을 건너뜁니다 (겹칠 수 있습니다)"
