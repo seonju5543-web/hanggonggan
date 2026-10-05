@@ -10534,7 +10534,7 @@ console.log('\n■ 실시간 공고 → 장학금 탭 (자동 등록 판정 · 2
   /* ④ 마감 — `(~ 9. 18)` 처럼 띄어 쓴 꼴은 읽고, **달력에 없는 날은 비운다**
      규칙은 2026-10-05 collector/notice-deadline.mjs 로 옮겼다(점검 collect-07 · 본문 마감을 먼저 본다) — 로봇이 그것을 불러 쓰는지도 본다 */
   eq('  자동 등록은 게시판 글 마감을 notice-deadline.mjs 에서 불러 쓴다',
-    /import \{ parseDeadline as parseNoticeDeadline \} from '\.\/notice-deadline\.mjs'/.test(src) && !/function parseDeadline\(/.test(src), true);
+    /import \{ parseDeadline as parseNoticeDeadline\b[^}]*\} from '\.\/notice-deadline\.mjs'/.test(src) && !/function parseDeadline\(/.test(src), true);
   const dlSrc = readText(new URL('../collector/notice-deadline.mjs', import.meta.url));
   const mDl = dlSrc.match(/hay\.match\((\/~\\s\*.*?\/)\);/);
   eq('연도 없는 마감 규칙을 찾았다', !!mDl, true);

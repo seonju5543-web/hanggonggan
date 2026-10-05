@@ -200,7 +200,7 @@ export default async function qnotice(eq, ctx) {
     /* 진짜 자동 등록을 사본 저장소에서 — 불러오는 순간 실행되는 파일이라 import 하지 않는다 */
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-qnotice-areg-'));
     try {
-      for (const d of ['collector', 'verify', 'data']) fs.mkdirSync(path.join(dir, d), { recursive: true });
+      for (const d of ['collector/extracted', 'verify', 'data']) fs.mkdirSync(path.join(dir, d), { recursive: true });
       for (const f of fs.readdirSync(fileURLToPath(root))) if (f.endsWith('.js')) fs.copyFileSync(fileURLToPath(new URL(f, root)), path.join(dir, f));
       for (const f of fs.readdirSync(fileURLToPath(new URL('collector/', root)))) if (f.endsWith('.mjs')) fs.copyFileSync(fileURLToPath(new URL(`collector/${f}`, root)), path.join(dir, 'collector', f));
       for (const f of fs.readdirSync(fileURLToPath(new URL('verify/', root)))) if (f.endsWith('.cjs')) fs.copyFileSync(fileURLToPath(new URL(`verify/${f}`, root)), path.join(dir, 'verify', f));
@@ -213,7 +213,10 @@ export default async function qnotice(eq, ctx) {
         { title: '2026년 2학기 청년창업농장학금 신청 안내', url: U(10681), school: '한국항공대학교', foundAt: shift(-1) },   // 이미 잘못 등록된 글 — 본문 마감 없음
         { title: '2026 표본재단 장학생 선발 안내', url: U(500), school: '한국항공대학교', foundAt: today, bodyDeadline: shift(-3), bodyDeadlineText: `신청기간 : ~ ${shift(-3)}` },
         { title: '2026 미래표본장학회 장학생 선발 안내', url: U(501), school: '한국항공대학교', foundAt: today, bodyDeadline: shift(20), bodyDeadlineText: `2. 신청기간 : ${shift(1)} ~ ${shift(20)}` },
+        /* 브라우저 수집 워크플로 꼴 — 수집기가 본문 마감을 안 채운 채 온 글. 저장된 원문(가짜 항공대 3쪽)에서 자동 등록이 채워 거른다(9/23 마감) */
+        { title: KAU_PAGES[2].title, url: KAU_PAGES[2].url, school: '한국항공대학교', foundAt: today },
       ] });
+      w('collector/extracted/notices-text.json', KAU_PAGES);   // 실제 파일과 같은 꼴(배열 — 발췌기가 불러올 때 배열로 읽는다)
       w('data/registered.json', { items: [
         { id: 'auto-late', name: '2026년 2학기 청년창업농장학금 신청 안내', type: '교외', provider: '주관 기관 원문 확인', amount: '금액 원문 확인', amountValue: 0, auto: true,
           listedAt: shift(-1), deadline: shift(-90), deadlineFrom: '공고 원문', period: `접수 기간 ~${shift(-90)}`, sourceUrl: U(10681), eligibility: { schoolOnly: '한국항공대학교' } },
@@ -232,10 +235,26 @@ export default async function qnotice(eq, ctx) {
         [nts.find((n) => n.url === U(10681))?.bodyDeadline, reg.items.filter((i) => i.sourceUrl === U(10681)).length], [shift(-90), 0]);
       eq('  [자동 등록 실행] 본문 마감이 지난 글은 등록하지 않는다 · 열린 글은 그 마감과 근거 문구로 등록한다',
         [!!by[U(500)], by[U(501)]?.deadline, by[U(501)]?.deadlineFrom], [false, shift(20), `공고 원문 · 2. 신청기간 : ${shift(1)} ~ ${shift(20)}`]);
+      eq('  [자동 등록 실행] 수집기가 본문 마감을 안 채운 글(브라우저 수집 꼴)도 저장된 원문(껍데기 걷고)에서 채워 끝난 공고를 거른다',
+        [!!by[KAU_PAGES[2].url], nts.find((n) => n.url === KAU_PAGES[2].url)?.bodyDeadline], [false, '2026-09-23']);
     } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+    /* 본문 마감 두 칸은 로봇 장부에만 — 폰이 받는 학교별 파일에는 싣지 않는다(앱은 안 쓰는 칸 · 파일이 1할쯤 커졌다) */
+    {
+      const { publishBySchool } = await import('../../collector/publish-notices.mjs');
+      const pdir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-qnotice-pub-'));
+      try {
+        const n = { title: '2026 표본 장학생 선발', url: 'https://kau.example.ac.kr/bbs/view.do?seq=1', school: '한국항공대학교', foundAt: '2026-10-04',
+          deadlineHint: '신청기간 : 2026. 10. 1. ~ 10. 20.', bodyDeadline: '2026-10-20', bodyDeadlineText: '2. 신청기간 : 2026. 10. 1. ~ 10. 20.' };
+        publishBySchool([n], { dir: new URL(`file://${pdir}/`) });
+        const f = fs.readdirSync(pdir).find((x) => x !== 'index.json');
+        const got = f ? JSON.parse(fs.readFileSync(path.join(pdir, f), 'utf8')).items[0] : null;
+        eq('  본문 마감 두 칸은 장부에만 — 학교별 파일(폰이 받는 것)에는 빼고 · 다른 칸·장부의 글은 그대로',
+          [got && 'bodyDeadline' in got, got && 'bodyDeadlineText' in got, got?.deadlineHint, n.bodyDeadline], [false, false, n.deadlineHint, '2026-10-20']);
+      } finally { fs.rmSync(pdir, { recursive: true, force: true }); }
+    }
     const ar = stripComments(fs.readFileSync(new URL('collector/auto-register.mjs', root), 'utf8'));
     eq('  자동 등록 배선 — 마감 규칙은 notice-deadline.mjs · 되돌림 판정은 entry-rules registeredAfterDeadline (베끼지 않는다)',
-      [/from '\.\/notice-deadline\.mjs'/.test(ar), /registeredAfterDeadline \} = createRequire/.test(ar), /function parseDeadline|const okDate/.test(ar)], [true, true, false]);
+      [/from '\.\/notice-deadline\.mjs'/.test(ar), /\bregisteredAfterDeadline\b[^}]*\} = createRequire/.test(ar), /function parseDeadline|const okDate/.test(ar)], [true, true, false]);
   }
 
   /* ── ④ 범위 승격은 마감 전만 ── */

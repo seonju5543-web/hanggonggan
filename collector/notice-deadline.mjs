@@ -81,6 +81,15 @@ export function bodyDeadlineFrom(lines, boiler, extract, lastDateIn) {
   return null;
 }
 
+/** 저장된 두 원문 파일(notices-text.json · browser-bodies.json 의 내용) → makeBodyReader 의 stored·browser.
+ *  수집기와 자동 등록이 같은 모양으로 넘기게 한 곳에 둔다(파일은 부르는 쪽이 읽는다 — 이 파일은 읽고 쓰지 않는다). */
+export function corporaFrom(noticesText, browserBodies) {
+  return {
+    stored: Object.values(noticesText || {}),
+    browser: Object.entries(browserBodies || {}).map(([url, v]) => (v && v.text ? { url, text: v.text } : null)).filter(Boolean),
+  };
+}
+
 /**
  * 수집기 발행 단계가 쓰는 '껍데기를 걷은 본문' 읽개 — 저장된 원문(notices-text.json) · 브라우저 원문(browser-bodies.json) ·
  * 이번 실행에 받은 상세 화면(run: 글 객체 → 줄 글자)으로 호스트별 껍데기 줄을 배운다(말뭉치별로 따로 배워 합친다 · page-boilerplate).

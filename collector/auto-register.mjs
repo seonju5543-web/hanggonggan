@@ -16,13 +16,13 @@ import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { cleanTitle } from './clean-title.mjs';
 // 등록 규칙은 감사 도구와 같은 파일을 쓴다 (verify/entry-rules.cjs) — 규칙이 갈라지지 않게
-const { checkEntry, isDuplicatePair, sameProgram, registeredAfterDeadline } = createRequire(import.meta.url)('../verify/entry-rules.cjs');
+const { checkEntry, isDuplicatePair, sameProgram, registeredAfterDeadline, lastDateIn } = createRequire(import.meta.url)('../verify/entry-rules.cjs');
 /* 교내·교외 증거 판정 + 학교 이름표 + 합치기 — 규칙은 각자 한 곳 (2026-09-30 · 베끼지 않는다) */
 import { classifyKind, schoolDomain } from './kind-evidence.mjs';
 import { loadSchoolNames, schoolTokens } from './school-names.mjs';
 import { mergeInto, openOn, deadlineQuote } from './registered-merge.mjs';
 /* 게시판 글의 마감(본문 마감 → 제목·게시판 요약)은 notice-deadline.mjs 한 곳 — 이 파일은 불러오는 순간 실행되어 관문이 표본으로 못 잰다(2026-10-05) */
-import { parseDeadline as parseNoticeDeadline } from './notice-deadline.mjs';
+import { parseDeadline as parseNoticeDeadline, makeBodyReader, corporaFrom } from './notice-deadline.mjs';
 /* 데이터 관문에 거듭 걸린 공고는 3일 쉰다 — 장부 규칙은 auto-held.mjs 한 곳(되돌리는 gate-guard 와 같은 파일 · 2026-10-04) */
 import { isHeld, pruneRegistered } from './auto-held.mjs';
 
@@ -258,6 +258,25 @@ if (!cfg.enabled) {
       }
     }
   }
+
+  /* 본문 마감이 아직 없는 글은 저장된 원문에서 채운다 (2026-10-05 점검 collect-07 ②) — 수집기(collect.mjs)는 제 실행 글과 실린 글을 채우지만,
+     브라우저 수집 워크플로는 이 로봇을 브라우저 수집기 바로 뒤에 돌려 그 실행에 새로 실린 글이 본문 마감 없이 여기 온다(그러면 끝난 공고가
+     마감 없이 등록됐다가 발췌기에서 지난 마감을 받는다). 규칙은 notice-deadline.mjs makeBodyReader 한 곳 — 껍데기를 모르는 호스트는 읽지 않는다.
+     판독기(activity-excerpts → extract-excerpts)는 불러올 때 원문 파일을 읽으므로 **못 불러오면 건너뛴다**(그 경우 예전처럼 제목·요약만 본다). */
+  try {
+    const { activityExcerpts } = await import('./activity-excerpts.mjs');
+    const readJsonOr = (u, d) => { try { return JSON.parse(fs.readFileSync(u, 'utf8')); } catch { return d; } };
+    const reader = makeBodyReader({
+      ...corporaFrom(readJsonOr(new URL('extracted/notices-text.json', HERE), {}), readJsonOr(new URL('extracted/browser-bodies.json', HERE), {})),
+      extract: (t) => activityExcerpts(t).deadline,
+      lastDateIn,
+    });
+    for (const n of notices.items || []) reader.fill(n);
+    if (reader.counts.bodyDeadlines) {
+      noticesTouched = true;
+      console.log(`본문 마감을 저장된 원문에서 새로 읽은 글 ${reader.counts.bodyDeadlines}건`);
+    }
+  } catch (e) { console.log(`본문 마감 채우기를 건너뜀 — ${String((e && e.message) || e).slice(0, 160)}`); }
 
   /* 등록 대상 학교 좁히기 — 설정의 `schools`. 빈 배열이면 제한 없음(수집 학교 전부).
      2026-08-30 개발자 지시로 경희대·한국외대 둘로 좁혔고(수집은 그대로, 등록만 — 자격 진단·양식을 붙이는 사람 손이 드는 층),

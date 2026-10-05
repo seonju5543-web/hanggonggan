@@ -308,6 +308,17 @@ export function patchUrlsBySchool(items, opts = {}) {
   return { files: touched, fixed };
 }
 
+/* 로봇 장부(data/notices.json)에만 두는 칸 — 폰이 받는 학교별 파일에는 싣지 않는다 (2026-10-05 점검 collect-07).
+   본문 마감(bodyDeadline)과 그 근거 줄(bodyDeadlineText · 최대 200자)은 자동 등록이 '이미 끝난 공고'를 거르려고 읽는 칸이고
+   앱은 쓰지 않는다 — 그대로 실으면 학교별 파일이 평균 1할쯤 커진다(실측 39개 파일 285KB 에 27KB). 장부의 글에는 그대로 남는다. */
+export const LEDGER_ONLY_KEYS = ['bodyDeadline', 'bodyDeadlineText'];
+export const forPhone = (n) => {
+  if (!n || !LEDGER_ONLY_KEYS.some((k) => k in n)) return n;
+  const o = { ...n };
+  for (const k of LEDGER_ONLY_KEYS) delete o[k];
+  return o;
+};
+
 export function publishBySchool(items, opts = {}) {
   const dir = opts.dir || new URL('../data/notices/', HERE);
   const perSchool = opts.perSchool ?? PER_SCHOOL;
@@ -320,7 +331,7 @@ export function publishBySchool(items, opts = {}) {
   for (const [school, list] of groups) {
     const key = noticeFileKey(school);
     index[school] = { file: `${key}.json`, count: list.length };
-    fs.writeFileSync(new URL(`${key}.json`, dir), JSON.stringify({ school, updatedAt, items: list }, null, 1));
+    fs.writeFileSync(new URL(`${key}.json`, dir), JSON.stringify({ school, updatedAt, items: list.map(forPhone) }, null, 1));
   }
   /* 목록에 글이 없는 학교의 옛 파일 → 빈 파일 (이유는 이 함수 위 주석). 그 학교의 파일인지는 이름 규칙(noticeFileKey) 한 곳으로 확인한다 —
      같은 폴더에 다른 파일이 생겨도 건드리지 않게. 못 읽는 파일·이미 빈 파일은 그대로 둔다. 색인에는 지금처럼 글이 있는 학교만 싣는다. */

@@ -10,7 +10,7 @@
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { deadlineHintFrom } from './deadline-hint.mjs';
-import { makeBodyReader } from './notice-deadline.mjs';
+import { makeBodyReader, corporaFrom } from './notice-deadline.mjs';
 import { FETCH_HEADERS } from './http-headers.mjs';
 import { urlKey, dedupeNotices, capNotices, rekeyLedger } from './url-key.mjs';
 import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mjs';
@@ -513,8 +513,7 @@ fs.writeFileSync(pagePath, JSON.stringify(pageMemo, null, 1));
    🔴 껍데기를 모르는 호스트(저장된 쪽 3쪽 미만)는 손대지 않는다 — 배너 날짜가 모든 글의 마감이 되는 것이 '마감 모름'보다 나쁘다. */
 const readJsonOr = (u, d) => { try { return JSON.parse(fs.readFileSync(u, 'utf8')); } catch { return d; } };
 const bodyReader = makeBodyReader({
-  stored: Object.values(readJsonOr(new URL('extracted/notices-text.json', HERE), {}) || {}),
-  browser: Object.entries(readJsonOr(new URL('extracted/browser-bodies.json', HERE), {}) || {}).map(([url, v]) => (v && v.text ? { url, text: v.text } : null)).filter(Boolean),
+  ...corporaFrom(readJsonOr(new URL('extracted/notices-text.json', HERE), {}), readJsonOr(new URL('extracted/browser-bodies.json', HERE), {})),
   run: runBodies,
   extract: (t) => activityExcerpts(t).deadline,
   lastDateIn: createRequire(import.meta.url)('../verify/entry-rules.cjs').lastDateIn,
