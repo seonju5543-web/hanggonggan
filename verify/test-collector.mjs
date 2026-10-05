@@ -149,7 +149,7 @@ console.log('■ 뺀 공고를 주소로 막는다 (id는 주소에서 파생돼
   /* 🔴 조건만 본다 — 줄 전체를 대조하면 뒤에 집계 한 줄을 더하는 것만으로 빨간불이 된다
      (2026-09-19에 실제로 그랬다). 지켜야 하는 것은 '막힌 id·주소면 등록하지 않는다' 하나다. */
   eq('새로 등록할 때도 막힌 주소는 건너뛴다',
-    /if \(blockedIds\.has\(id\) \|\| blockedUrls\.has\(cu\)\)[^\n]*continue;/.test(ar), true);
+    /if \(blockedIds\.has\(id\) \|\| blockedUrls\.has\(cu\)( \|\| rid\.blocked(ByLegacy|Tagged))*\)[^\n]*continue;/.test(ar), true);   // 2026-10-05 links-new-1: 옛 id·꼬리표 꼴로 막힌 것도(registerId)
   const cfg = JSON.parse(readText(new URL('../collector/auto-register-config.json', import.meta.url)));
   eq('막은 목록이 주소로도 채워져 있다', (cfg.blockUrls || []).length > 0, true);
 }
@@ -1587,9 +1587,11 @@ console.log('\n■ 장학금 판정 자동화 · 범위 승격 (2026-09-30)');
   const ar = readText(new URL('collector/auto-register.mjs', root));
   eq('자동 등록이 다른 학교의 같은 사업을 전국으로 승격한다 (verdict promote)', /sameProgram\(/.test(ar) && /verdict: 'promote'/.test(ar) && /mergeInto\(r\.twin/.test(ar), true);
   eq('  이미 전국인 등록분과 같은 사업은 흡수(absorb) — 다시 학교 한정으로 등록하지 않는다 (세 번째 학교 구멍)', /schoolOf\(i\) !== n\.school && sameProgram/.test(ar) && !/schoolOf\(i\) && schoolOf\(i\) !== n\.school/.test(ar) && /verdict: 'absorb'/.test(ar) && /r\.verdict === 'absorb'/.test(ar), true);
-  eq('  승격은 로봇 등록·교외·사람 미지정·마감 전 등록분만 (아니면 hold)', /twin\.auto && twin\.type === '교외' && !\/\^관리자\/\.test\(twin\.scopeFrom/.test(ar) && /twin\.deadline < TODAY/.test(ar), true);
+  /* 판정(로봇 등록·교외·사람 미지정·마감 전)은 registered-merge.mjs promotableOn 한 곳 — 표본은 관문 「로봇·도구 점검 관문」 qnotice ④ (2026-10-05) */
+  const rmSrc = readText(new URL('collector/registered-merge.mjs', root));
+  eq('  승격은 로봇 등록·교외·사람 미지정·마감 전 등록분만 (아니면 hold)', /const promotable = promotableOn\(twin, TODAY\)/.test(ar) && /it\.auto && it\.type === '교외' && !\/\^관리자\/\.test\(it\.scopeFrom/.test(rmSrc) && /openOn\(it, today\)/.test(rmSrc), true);
   const sp = readText(new URL('collector/scope-promote.mjs', root));
-  eq('  범위 승격 로봇도 전국 등록분이 흡수한다(isNationalAbsorber) · 여러 학교만 받는 공고는 그 학교가 목록에 있을 때만', /export function isNationalAbsorber\(it, school\)/.test(sp) && /absorbed/.test(sp) && /domainMatches\(/.test(sp) && /schoolsAny\.some/.test(sp) && /schoolsAny/.test(ar) && /split\('\|'\)\[0\] === n\.school/.test(ar), true);
+  eq('  범위 승격 로봇도 전국 등록분이 흡수한다(isNationalAbsorber) · 여러 학교만 받는 공고는 그 학교가 목록에 있을 때만', /export function isNationalAbsorber\(it, school\)/.test(sp) && /absorbsOn\(it, school, TODAY\)/.test(sp) && /absorbed/.test(sp) && /domainMatches\(/.test(sp) && /schoolsAny\.some/.test(rmSrc) && /schoolsAny/.test(ar) && /split\('\|'\)\[0\] === n\.school/.test(ar), true);
   /* 리뷰 3차 — 리포트 파일은 부르는 쪽이 준다(브라우저 수집은 browser-report.md 만 커밋한다) */
   for (const f of ['collector/scope-promote.mjs', 'collector/kind-classify.mjs', 'collector/portal-candidates.mjs']) {
     eq(`  ${f} 가 리포트 파일 이름을 인자로 받는다`, /process\.argv\.slice\(2\)\.find/.test(readText(new URL(f, root))), true);
@@ -1659,10 +1661,11 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
   eq('활동 글을 장학 피드(freshAll)에 넣지 않는다', /freshActs\.push\(it\)/.test(cm) && !/freshAll\.push\(it\);\s*\n\s*\}\s*\n\s*if \(isAct\)/.test(cm), true);
   eq('활동 파일도 60일·중복·서비스 학교·상한 규칙을 지킨다',
     /* 2026-10-01 — 공공 API 글만 seenAt(API 가 마지막으로 준 날)으로 잰다 · 게시판 글은 그대로 foundAt (「공공 API 로봇」 I3) */
-    /acts\.items = acts\.items\.filter\(\(n\) => \(\(n\.api && n\.seenAt\) \|\| n\.foundAt \|\| '9999'\) >= cutoff\)/.test(cm)
+    /* 2026-10-05 — 그 날짜(seenAt || foundAt)는 open-api-map.mjs actKeepDate 한 곳 · 상한도 같은 날짜로 고른다(capActivities · 점검 api-11) */
+    /acts\.items = acts\.items\.filter\(\(n\) => \(actKeepDate\(n\) \|\| '9999'\) >= cutoff\)/.test(cm)
     && /acts\.items = dedupeNotices\(acts\.items\)/.test(cm)
     && /dropUnserved\(acts\.items\.filter\(\(n\) => n\.school\)\)/.test(cm)
-    && /acts\.items = acts\.items\.slice\(0, ACT_CAP\)/.test(cm), true);
+    && /acts\.items = capActivities\(acts\.items, ACT_CAP\)/.test(cm), true);
   /* 🔴 블록 안에서 끝나야 한다 — 예전 [\s\S]*?continue; 는 파일 어디의 continue 에나 맞아 관문이 빈 채였다(2026-10-01 수리 · 코드는 return 으로 게시판을 마친다) */
   eq('전용 게시판은 장학 피드에 담지 않는다 (actResults 에 담고 return)', /if \(isAct\) \{\s*actResults\.push\(\{\s*name,[\s\S]{0,400}?items: freshA,\s*\}\);\s*return;/.test(cm), true);
   const strip = (t) => t.split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
@@ -1944,10 +1947,9 @@ console.log('\n■ 재단·지자체 글 다듬기 (collector/external-clean.mjs
   const cm = readText(new URL('../collector/collect.mjs', import.meta.url));
   eq('수집 로봇이 발행할 때 전체 글에 다듬기·거르기를 건다',
     /ext\.items = ext\.items\.map\(tidyExternal\)\.filter\(\(n\) => \{\s*const why = externalDropReason\(n, notices\.updatedAt\)/.test(cm), true);
-  /* 실데이터 — 지금 저장된 파일에 다시 걸어도 걸러질 것이 없어야 한다(발행 결과가 규칙을 따른다) */
-  const ext = JSON.parse(readText(new URL('../data/external.json', import.meta.url)));
-  const leftover = (ext.items || []).map(tidyExternal).filter((n) => extDropReason(n, ext.updatedAt || today));
-  eq(`  저장된 data/external.json 이 이미 걸러져 있다 (${(ext.items || []).length}건)`, leftover.map((n) => n.title), []);
+  /* 실데이터('저장된 data/external.json 이 이미 걸러져 있다')는 verify/audit-data.js **경고**로 옮겼다 (2026-10-05 점검 collect-09) —
+     거름 규칙(마감 지남)을 더하는 순간 지금 데이터 때문에 이 관문이 빨개져, 이 관문을 데이터 관문으로 쓰는 소식·장학 로봇이 제 결과를 버린다
+     (CLAUDE.md '실데이터에 기댄 고정 검사를 관문에 두지 말 것'). 규칙은 위 표본과 health-gates/qfeeds.mjs 가 잰다. */
 }
 
 console.log('\n■ 재단·지자체 게시판 (2026-09-26 · 노션 F-13 · 교외 확대)');
@@ -8030,11 +8032,12 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   const parts = [
     appJs.match(/const bareOrg = .*\n/),
     appJs.match(/const orgBase = .*\n/),
+    appJs.match(/const providerUnknown = .*\n/),
     appJs.match(/function cardTitle\(sch\) \{[\s\S]*?\n\}\n/),
     appJs.match(/function cleanCardTitle\(name\) \{[\s\S]*?\n\}\n/),
     appJs.match(/function cardOrgLine\(sch\) \{[\s\S]*?\n\}\n/),
   ];
-  eq('cardTitle · cleanCardTitle · cardOrgLine 을 app.js 에서 떼어 냈다', parts.every(Boolean), true);
+  eq('cardTitle · cleanCardTitle · cardOrgLine(+ providerUnknown) 을 app.js 에서 떼어 냈다', parts.every(Boolean), true);
   const src = appJs.slice(appJs.indexOf('const TD_DAY ='), appJs.indexOf('/* notStale(오래된 공고 숨김)')) + parts.map((m) => (m ? m[0] : '')).join('\n');   // 카드 제목 날짜 규칙 한 곳(2026-10-05)
   const [cardTitle, cardOrgLine] = ['cardTitle', 'cardOrgLine'].map((n) => new Function(`${src}\nreturn ${n};`)());
   const t = (name, provider) => cardTitle({ name, provider });
@@ -8061,9 +8064,12 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   eq('  제목에 없으면 예전처럼 붙인다',
     cardOrgLine({ type: '교외', provider: '한국장학재단', name: '대학생 청소년교육지원장학금(대청교) 멘토' }),
     '교외 · 한국장학재단');
-  eq('  기관명을 못 읽은 공고도 예전 그대로',
+  /* 🔴 기관명을 못 읽은 공고는 윗줄에 '모름' 표시를 붙이지 않는다 (2026-10-05 점검 app1-09 · 2026-09-17 지시
+     "앱 내부 사정은 학생 화면에 안 적는다" — 제출처·지원서 초안·도우미는 이미 숨겼고 카드 윗줄만 새고 있었다) */
+  eq('  기관명을 못 읽은 공고는 교내/교외만 (「주관 기관 원문 확인」을 윗줄에 안 쓴다)',
     cardOrgLine({ type: '교외', provider: '주관 기관 원문 확인', name: '2026년 코나아이 소상공인 장학생 모집' }),
-    '교외 · 주관 기관 원문 확인');
+    '교외');
+  eq('    「미확인」 표시도 같다', cardOrgLine({ type: '교외', provider: '주관 기관 미확인', name: '2026년 어느 장학생 모집' }), '교외');
   eq('  provider 가 비면 교내/교외만', cardOrgLine({ type: '교내', provider: '', name: '가족장학금' }), '교내');
   /* 🔴 기관명 칸의 꼬리 괄호(접수처 표기)를 떼고 대조한다 — 안 떼면 통째로 겹치는데도 못 알아본다
      (2026-09-21 코드 리뷰 · 실측 3건: 가송재단 · 양천장학회 · 미래의동반자재단) */
@@ -10260,7 +10266,8 @@ console.log('\n■ 마감일 감사 — 근거 없는 마감이 늘지 않는다
   eq('마감은 전부 YYYY-MM-DD 이고 달력에 있는 날이다', badIso.map((r) => `${r.id} ${r.deadline}`), []);
   /* ④ 자동 등록이 제목·요약에서 읽은 마감은 그 문구를 표식에 남긴다 — 근거 없는 마감이 더 생기지 않게 */
   const ar = readText(new URL('../collector/auto-register.mjs', import.meta.url));
-  eq('자동 등록이 마감을 읽으면 그 문구를 deadlineFrom 에 남긴다', /deadlineFrom: `게시판 요약 · \$\{/.test(ar), true);
+  /* 2026-10-05 — 본문 마감(notice-deadline.mjs · 출처 '공고 원문')도 같은 꼴로 남긴다: `<출처> · <문구>` (출처가 없으면 '게시판 요약') */
+  eq('자동 등록이 마감을 읽으면 그 문구를 deadlineFrom 에 남긴다', /deadlineFrom: `\$\{r\.deadlineSrc \|\| '게시판 요약'\} · \$\{r\.deadlineText\}`/.test(ar), true);
 }
 
 /* ── 2026-09-17 · OCR — 그림·스캔 첨부 글자 읽기 (개발자 지시 "직접 할 수 있으면 사용") ──
@@ -10689,15 +10696,19 @@ console.log('\n■ 실시간 공고 → 장학금 탭 (자동 등록 판정 · 2
     /사람이 막아 둔 공고/.test(src) && /이미 등록\(같은 id\)/.test(src), true);
   eq('  상한에 걸려 안 본 공고는 거른 것과 따로 적는다', /unseen/.test(src) && /보지 않았어요/.test(src), true);
 
-  /* ④ 마감 — `(~ 9. 18)` 처럼 띄어 쓴 꼴은 읽고, **달력에 없는 날은 비운다** */
-  const mDl = src.match(/hay\.match\((\/~\\s\*.*?\/)\);/);
+  /* ④ 마감 — `(~ 9. 18)` 처럼 띄어 쓴 꼴은 읽고, **달력에 없는 날은 비운다**
+     규칙은 2026-10-05 collector/notice-deadline.mjs 로 옮겼다(점검 collect-07 · 본문 마감을 먼저 본다) — 로봇이 그것을 불러 쓰는지도 본다 */
+  eq('  자동 등록은 게시판 글 마감을 notice-deadline.mjs 에서 불러 쓴다',
+    /import \{ parseDeadline as parseNoticeDeadline\b[^}]*\} from '\.\/notice-deadline\.mjs'/.test(src) && !/function parseDeadline\(/.test(src), true);
+  const dlSrc = readText(new URL('../collector/notice-deadline.mjs', import.meta.url));
+  const mDl = dlSrc.match(/hay\.match\((\/~\\s\*.*?\/)\);/);
   eq('연도 없는 마감 규칙을 찾았다', !!mDl, true);
   if (mDl) eq('  점 뒤에 빈칸이 있어도 마감으로 읽는다', eval(mDl[1]).test('여성동문회 장학금 장학생 모집 (~ 9. 17)'), true);
   {
     /* 🔴 2자리 연도 `~ 26. 9. 10.` 을 **달 26일**로 읽던 것(실측 16건). 그 `2026-26-09` 는
        글자 비교라 마감 경과를 통과하고, entry-rules 의 날짜 꼴 검사도 통과하며, 앱에서
        `Invalid Date` 가 돼 카드에 `D-NaN` 이 뜨고 **영영 안 사라진다**. */
-    const mOk = src.match(/const okDate = ([\s\S]*?\n\};)/);
+    const mOk = dlSrc.match(/const okDate = ([\s\S]*?\n\};)/);
     eq('로봇에 날짜 실재 검사(okDate)가 있다', !!mOk, true);
     if (mOk) {
       const okDate = eval(`(${mOk[1].replace(/;\s*$/, '')})`);
@@ -10708,7 +10719,7 @@ console.log('\n■ 실시간 공고 → 장학금 탭 (자동 등록 판정 · 2
     /* 🔴 함수가 있는 것만 보면 **호출을 지워도 초록**이다 (만들면서 실제로 그랬다).
        마감을 내놓는 두 갈래(4자리 연도 · 연도 없는 꼴)가 둘 다 이 검사를 거쳐야 한다. */
     eq('  마감을 내놓는 두 갈래가 모두 그 검사를 거친다',
-      (src.match(/const iso = okDate\(/g) || []).length, 2);
+      (dlSrc.match(/const iso = okDate\(/g) || []).length, 2);
   }
 }
 
@@ -10852,7 +10863,7 @@ console.log('\n■ 모르는 접수 방법을 단정하지 않는다 (2026-09-21
   const built = new Function(`${acSrc}
 ${dataSrc.match(/const SUBMIT_CHANNEL_LABEL = \{[\s\S]*?\};/)[0]}
 ${[ 'isFormAttachment', 'hasFormAttachment', 'hasPortalEvidence', 'submitChannelKind', 'submitChannelLabel' ].map(grabFn).join('\n')}
-return { submitChannelKind, submitChannelLabel };`)();
+return { submitChannelKind, submitChannelLabel, hasPortalName };`)();
   const kind = built.submitChannelKind;
   const label = built.submitChannelLabel;
 
@@ -10880,11 +10891,14 @@ return { submitChannelKind, submitChannelLabel };`)();
      (발췌는 14칸 상한이라 신청방법 줄이 자주 밀려난다 — 실측 원문 15건 vs 발췌 1건).
      ⚠️ 이 검사의 이빨은 그대로다: **어느 쪽이든 근거가 있어야** 포털이라고 부를 수 있고,
         `applyPortalSource` 는 그 안에 **시스템 이름이 실제로 들어 있어야** 근거로 친다. */
-  const PORTAL_WORDS = /종합정보시스템|HUFS\s?Ability|학사정보시스템|학생지원시스템|포털|인포\s?21|INFO\s?21/i;
+  /* 🔴 근거 낱말은 apply-channel.js hasPortalName 한 곳 — 시스템 표(PORTAL_SYSTEMS) + 흔한 이름(포털·포탈·…정보시스템) (2026-10-05 리뷰).
+     여기 손으로 적은 목록에 '포탈'·KUPID 가 없어서, 표에 KUPID 를 넣은 뒤 다음 수집의 발췌기가 채울 고려대 원문
+     「포탈(KUPID) - 학사행정 - …」을 근거 없음으로 세어 데이터 관문이 빨개질 참이었다(그날 자동 등록이 통째로 되돌려진다). */
+  const hasPortalName = built.hasPortalName;
   const baseless = claimed.filter((it) => {
     const t = [].concat(it.documents || [], it.excerpts || []).join(' ');
-    if (PORTAL_WORDS.test(t)) return false;
-    return !(it.applyPortalSource && PORTAL_WORDS.test(it.applyPortalSource));
+    if (hasPortalName(t)) return false;
+    return !(it.applyPortalSource && hasPortalName(it.applyPortalSource));
   });
   eq('등록 데이터에 근거 없는 포털 단정이 없다', baseless.length, 0);
 }
@@ -11359,7 +11373,9 @@ console.log('\n■ 공공 API 로봇 (2026-10-01)');
   eq('I2 같은 제목의 게시판 글도 API 글이 대신한다', M.mergeApi([{ ...board, title: k1.title, url: 'https://board/9' }], { kstartup: { ok: true, items: [k1] } }, { today }).length, 1);
   const cmSrc = readText(new URL('../collector/collect.mjs', import.meta.url));
   eq('I3 API 글엔 seenAt 이 붙고, 수집 로봇의 60일 삭제는 API 글을 seenAt 으로 잰다',
-    [M.mergeApi([], { kstartup: { ok: true, items: [k1] } }, { today })[0].seenAt, /\(\(n\.api && n\.seenAt\) \|\| n\.foundAt \|\| '9999'\) >= cutoff/.test(cmSrc)], [today, true]);
+    /* 2026-10-05 — 그 날짜는 open-api-map.mjs actKeepDate 한 곳(수집 로봇의 60일 거름·상한이 같이 쓴다 · 점검 api-11) */
+    [M.mergeApi([], { kstartup: { ok: true, items: [k1] } }, { today })[0].seenAt, /\(actKeepDate\(n\) \|\| '9999'\) >= cutoff/.test(cmSrc)
+      && M.actKeepDate({ api: 'kstartup', seenAt: today, foundAt: '2026-01-01' }) === today && M.actKeepDate({ foundAt: '2026-01-01', seenAt: today }) === '2026-01-01'], [today, true]);
   eq('M3 신청기간 여러 구간은 날짜 모양으로 잇는다(\\N 이 카드에 안 보인다)', p1.excerpts.find((x) => x.label === '모집기간').text, '2026-01-01 ~ 2026-03-31 · 2026-09-01 ~ 2026-11-30');
   eq('M4 주최가 카드 윗줄(host)과 같으면 발췌로 또 적지 않는다', k1.excerpts.some((x) => x.label === '주최'), false);
   /* 로봇·워크플로 배선 */

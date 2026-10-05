@@ -27,8 +27,10 @@ const NAV_ONLY = /^(?:공지사항|일반\s*공지|학사\s*공지|전체\s*공�
 /* 게시판 둘레의 길잡이 글귀 — 글이 아니다. 낱말을 늘릴 때는 관문의 「싣는다」 예시(「총장 담화문」)가 살아 있는지 같이 본다. */
 const NAV_PHRASE = /오시는\s*길|찾아오시는|사이트맵|캠퍼스\s*맵|개인정보|이용약관|로그인|회원\s*가입|바로가기|홈페이지$|학사일정$|조직도|연혁|인사말|총장실$|대학소개|전화번호|이메일\s*무단|저작권|모바일\s*(?:버전|앱)|영문\s*(?:홈|사이트)|english$/i;
 
-/* 실을 글이 아니다 — 게시판 껍데기·결과 발표·정정 같은 잡음. '결과'는 학생에게 뉴스가 아니라 이미 뽑힌 사람의 안내다. */
-const NOT_NEWS = /^RSS\b|RSS\s*2\.0|메인으로\s*이동|개인정보\s*처리\s*방침|\[제\d+-\d+호\]|(?:물품|기자재|컴퓨터|장비|태블릿|소모품)[^\n]{0,30}(?:구입|구매)|구매\s*(?:공고|입찰)|합격자\s*(?:발표|명단|공지|공고)|선정\s*(?:결과|자)\s*(?:발표|안내|공지)|최종\s*(?:합격|선정)\s*발표|정정\s*공고|재공고|입찰|낙찰|계약\s*(?:공고|체결)|견적|사업자\s*선정|용역\s*(?:공고|입찰)|개찰|수의계약/;
+/* 실을 글이 아니다 — 게시판 껍데기·결과 발표·정정 같은 잡음. '결과'는 학생에게 뉴스가 아니라 이미 뽑힌 사람의 안내다.
+   2026-10-05 점검 news-12 — 「최종 합격자 알림/안내」·「선발 결과 안내」·「선정 결과」(뒤 동사 없이)·「최종 결과 발표」가 빠져 6건이 실렸다.
+   🔴 '결과 안내' 전반은 넣지 않는다 — 「경기 일정 및 결과 안내」·「인성검사(1차) 결과 안내」는 학생 소식이다(관문 health-gates/qfeeds.mjs ⑥). */
+const NOT_NEWS = /^RSS\b|RSS\s*2\.0|메인으로\s*이동|개인정보\s*처리\s*방침|\[제\d+-\d+호\]|(?:물품|기자재|컴퓨터|장비|태블릿|소모품)[^\n]{0,30}(?:구입|구매)|구매\s*(?:공고|입찰)|합격자\s*(?:발표|명단|공지|공고|알림|안내)|(?:선발|선정)\s*결과|선정\s*자\s*(?:발표|안내|공지)|최종\s*(?:합격|선정|결과)\s*발표|정정\s*공고|재공고|입찰|낙찰|계약\s*(?:공고|체결)|견적|사업자\s*선정|용역\s*(?:공고|입찰)|개찰|수의계약/;
 
 /* 갈래 — 순서가 규칙이다. 학사가 먼저(‘수강신청 설명회’는 행사보다 학사다), 채용은 행사보다 뒤(‘채용 설명회’는 행사). */
 const KIND_RE = [
@@ -62,6 +64,36 @@ export function isNewsRow(row, opts = {}) {
   if (opts.scholarship && opts.scholarship.test(t)) return false;
   if (opts.activityKind && opts.activityKind(t, { scholarship: opts.scholarship })) return false;
   return true;
+}
+
+/* 오늘보다 뒤인 게시일은 게시일이 아니다 — 칸을 지운다 (2026-10-05 점검 news-1).
+   아주대 「어학졸업인증 …(~2027.1.22)」·방송대 2027-01-01 이 게시일로 실려, 앱이 게시일 순으로 그리는 홈 소식 띠 맨 앞에 몇 달씩 붙어 있었다
+   (newsFloor 가 최근 4건을 기한과 상관없이 남기므로 30일 기한으로도 안 빠진다). board-links.mjs 는 **새로 읽는 줄**에만 '앞날은 비운다'를 걸어
+   규칙형 게시판·옛 글에는 소급되지 않았다 → 발행이 새 글·실린 글 구분 없이 한 곳에서 거른다(newsFloor 앞).
+   글자·제목은 바꾸지 않는다(지어내지 않는다 — 비운다). 같은 날은 남긴다. today 는 로봇의 KST 날짜(YYYY-MM-DD) · 돌려주는 것은 지운 개수 */
+export function clearFuturePosted(items, today) {
+  let n = 0;
+  for (const it of items || []) {
+    if (it && it.postedAt && String(it.postedAt) > String(today)) { delete it.postedAt; n++; }
+  }
+  return n;
+}
+
+/* 소식 장부(seen-news.json) 정리 (2026-10-05 점검 news-13) — 지우는 코드가 없어 하루 70~80 열쇠씩 자랐다(한 해면 약 3만 · 3MB · 하루 두 번 커밋·병합).
+   수집일(값 · KST)이 today − keepDays 보다 앞이고 keep 에 없는 열쇠만 지운다. 지운 개수를 돌려준다.
+   🔴 keepDays 는 게시일 상한(소식 로봇 NEWS_POSTED_MAX_DAYS 60)보다 길게 — 짧으면 아직 목록 첫 쪽에 있는 옛 글이 '새 글'로 다시 실린다.
+   keep: 지금 실린 글(newsFloor 로 오래 남는 글)·이번에 목록에서 다시 본 글의 열쇠 — 지우면 그 글이 새 글로 다시 올라온다.
+   canDrop(열쇠): 지워도 되는 열쇠인가 — 소식 로봇은 '이번에 목록을 읽은 게시판의 열쇠'만 허락한다(못 읽은 게시판의 날짜 없는 고정 글을 잊지 않게). */
+export const SEEN_KEEP_DAYS = 90;
+export function pruneSeen(seen, today, { keepDays = SEEN_KEEP_DAYS, keep = new Set(), canDrop = () => true } = {}) {
+  const cut = new Date(Date.parse(`${today}T00:00:00Z`) - keepDays * 86400000).toISOString().slice(0, 10);
+  let n = 0;
+  for (const [k, v] of Object.entries(seen || {})) {
+    if (typeof v !== 'string' || v >= cut || keep.has(k) || !canDrop(k)) continue;
+    delete seen[k];
+    n++;
+  }
+  return n;
 }
 
 /* 학교마다 가장 최근 소식 n 건 — 수집일·게시일 기한이 지나도 남긴다 (2026-10-03 개발자 지시 "소식이 0건인 학교는 없어").

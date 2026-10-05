@@ -29,13 +29,34 @@ const { linkShape, decodeUrlEntities } = createRequire(import.meta.url)('../sour
 
 /* 출처마다 싣는 최대 글 수 — 넷 합쳐 55. 활동 파일 상한(collect.mjs ACT_CAP 200)을 API 글이 먹어
    게시판 글이 밀려나지 않게(밀려난 게시판 글은 장부 때문에 다시 안 온다 · 리뷰 M1) */
+/* host — 같은 서버(열쇠·속도 제한을 같이 쓴다)끼리 묶는 이름. 묶음끼리는 **동시에**, 묶음 안은 차례대로 받는다(runSourceGroups · 2026-10-05 점검 api-08).
+   공공데이터포털이 끊긴 날 그 재시도 쉼(10·40초)이 6분 예산 하나를 먹어 멀쩡한 온통청년까지 ❌ 가 될 수 있었다. */
 export const API_SOURCES = {
-  kstartup: { name: 'K-Startup 사업공고', cap: 15 },
-  vol1365: { name: '1365 봉사참여정보', cap: 15 },
-  /* 순서 = 받는 순서. 청년콘텐츠(작은 3쪽)를 청년정책(33쪽 · 쪽 사이 2.5초)보다 **먼저** — 6분 예산을 청년정책이 다 쓰면 멀쩡한 콘텐츠가 매일 ❌ 가 된다(2026-10-02 리뷰) */
-  youthContent: { name: '온통청년 청년콘텐츠', cap: 10 },
-  youthPolicy: { name: '온통청년 청년정책', cap: 15 },
+  kstartup: { name: 'K-Startup 사업공고', cap: 15, host: 'data.go.kr' },
+  vol1365: { name: '1365 봉사참여정보', cap: 15, host: 'data.go.kr' },
+  /* 순서 = 받는 순서(묶음 안). 청년콘텐츠(작은 3쪽)를 청년정책(33쪽 · 쪽 사이 2.5초)보다 **먼저** — 6분 예산을 청년정책이 다 쓰면 멀쩡한 콘텐츠가 매일 ❌ 가 된다(2026-10-02 리뷰) */
+  youthContent: { name: '온통청년 청년콘텐츠', cap: 10, host: 'youthcenter' },
+  youthPolicy: { name: '온통청년 청년정책', cap: 15, host: 'youthcenter' },
 };
+
+/** 출처를 서버 묶음별로 돌린다 — 묶음끼리는 동시에(Promise.all), 묶음 안은 order 순서대로 차례로.
+    돌려주는 것은 **order 순서**의 결과 배열(끝난 순서가 아니다 — mergeApi 는 넣은 순서로 '먼저 온 출처가 이긴다'를 정한다).
+    run 이 던지면 그 출처만 { error } 로 남기고 다른 출처는 계속한다. */
+export async function runSourceGroups(order, hostOf, run) {
+  const groups = new Map();
+  for (const src of order) {
+    const h = (hostOf && hostOf(src)) || src;
+    if (!groups.has(h)) groups.set(h, []);
+    groups.get(h).push(src);
+  }
+  const out = new Map();
+  await Promise.all([...groups.values()].map(async (list) => {
+    for (const src of list) {
+      try { out.set(src, await run(src)); } catch (error) { out.set(src, { error }); }
+    }
+  }));
+  return order.map((src) => out.get(src));
+}
 
 const MAX_LEN = 160;
 const clip = (v) => {
@@ -380,6 +401,19 @@ export function sourceVerdict(rows, dropped) {
    · 못 받은 출처(열쇠 없음·오류): 지난 글을 **그대로 둔다**.
    · 게시판에서 주운 같은 글(주소가 같다)은 API 글이 대신한다 — 칸이 채워진 쪽이 이긴다(external-sources.md §8-1). 처음 본 날은 이어받는다.
    · 관리자가 숨긴 주소는 hidden 표식(collect.mjs 와 같은 규칙). */
+/* 활동 글이 '아직 살아 있는' 날 — 공공 API 글은 API 가 마지막으로 준 날(seenAt), 게시판 글은 처음 본 날(foundAt).
+   수집 로봇의 60일 거름과 상한(capActivities)이 **같은 값**을 쓴다 (2026-10-05 점검 api-11) */
+export const actKeepDate = (n) => (n && ((n.api && n.seenAt) || n.foundAt)) || '';
+/* 활동 피드 상한 — actKeepDate 가 늦은 cap 건만 남기되 **넘겨받은 순서**(foundAt 내림차순 · 화면의 '새 글' 순서)는 그대로 둔다.
+   예전엔 foundAt 순으로 잘라, 몇 달 열린 API 글(foundAt 옛날 · seenAt 오늘)이 상한에서 잘렸다가 다음 API 실행에 처음 본 날을
+   못 찾고(mergeApi firstSeen 은 이전 파일에서만 찾는다) 오늘 수집한 '새 글'로 맨 위에 다시 올라왔다(리뷰 I3 의 깜빡임). */
+export function capActivities(items, cap) {
+  const list = Array.isArray(items) ? items : [];
+  if (list.length <= cap) return list;
+  const keep = new Set([...list].sort((a, b) => String(actKeepDate(b)).localeCompare(String(actKeepDate(a)))).slice(0, cap));
+  return list.filter((n) => keep.has(n));
+}
+
 export function mergeApi(prevItems, results, { today, hideUrls = new Set() }) {
   const prev = Array.isArray(prevItems) ? prevItems : [];
   /* 출처끼리도 같은 글은 하나 — 먼저 온 출처가 이긴다(안 합치면 감사가 '중복'으로 그날 결과를 통째로 버린다 · 리뷰 I1) */

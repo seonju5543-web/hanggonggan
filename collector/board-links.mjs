@@ -184,6 +184,38 @@ const rowLinks = (seg, base, postedAt, resolve) => {
 /* 두 눈을 합친다 (5차 실행 실측 · 2026-10-01): ① 블록 눈(<tr>·<li>·<dl>·<dd>·<article> 안에 날짜) — 표 게시판에 강하다(서울대·연세·국민·인하·방송대…)
    ② 토막 눈(날짜 토큰 앞 SEG_MAX 자) — div·dt/dd 로 그린 목록에 강하다(성균관·광운·한양·명지). 한쪽만 쓰면 다른 쪽 학교가 0행이 된다.
    후보 묶음마다 주소 꼴을 세고, 되풀이되는 꼴(MIN_SHAPE 이상)만 글 — 메뉴 덩어리는 꼴이 한 번씩이라 떨어진다. */
+/* ── 목록 행 번호 (2026-10-05 점검 news-7 · 영남 소식 「9 2026학년도 2학기 중간시험 …」 6건) ──
+   번호 칸이 링크 안에 들어 있는 게시판은 제목 앞에 행 번호가 붙는다. clean-title.mjs 는 3~5자리 번호만 떼는데(한 제목만 보고 1~2자리를 떼면
+   「3 대 3 농구대회」가 깨진다) 이 게시판은 한 자리다. 그래서 **게시판 단위로만** 뗀다 — 행이 3개 이상이고 80% 이상이 `숫자 + 빈칸` 으로
+   시작할 때 그 행들에서만. 맨 앞 연도(19xx·20xx + 빈칸)는 번호가 아니다. 떼고 남는 글자가 너무 짧으면 그대로 둔다. 행을 그대로 고쳐 돌려준다. */
+const ROW_NO = /^(?!(?:19|20)\d{2}\s)\d{1,4}\s+(?=\S)/;
+export function dropRowNumbers(rows) {
+  const list = rows || [];
+  const hits = list.filter((r) => r && ROW_NO.test(String(r.title || '')));
+  if (list.length < 3 || hits.length / list.length < 0.8) return list;
+  for (const r of hits) {
+    const t = String(r.title).replace(ROW_NO, '');
+    if (t.replace(/\s/g, '').length >= 4) r.title = t;
+  }
+  return list;
+}
+
+/* 이미 실린 글 제목에 같은 청소를 입힌다(원칙 7 소급 · 소식 로봇 발행 단계) — 공용 제목 청소(cleanTitle)와 행 번호 떼기를 **게시판별로**
+   (학교 + 목록 주소 — 주소의 물음표·# 앞). 🔴 제목만 고친다 — 주소·글 번호는 건드리지 않는다(목록 표식 #n- 주소를 다시 만들면 같은 글이 두 번 실렸다 ·
+   2026-10-02 · news-board-rules.mjs collapseSamePost). 새 글은 이미 같은 청소를 거쳐 오므로 **실려 있던 글만** 넘길 것(섞으면 80% 문턱이 흐려진다). */
+export function retitleStored(items) {
+  const groups = new Map();
+  for (const n of items || []) {
+    if (!n || typeof n.title !== 'string') continue;
+    n.title = cleanTitle(n.title);
+    const k = `${n.school || ''}|${String(n.url || '').split(/[?#]/)[0]}`;
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(n);
+  }
+  for (const g of groups.values()) dropRowNumbers(g);
+  return items;
+}
+
 export function extractDatedRows(html, base, opts = {}) {
   const src = String(html || '');
   const resolve = typeof opts.resolve === 'function' ? opts.resolve : null;   // 클릭형 게시판의 링크 눈 (news-board-rules.mjs)
@@ -232,5 +264,5 @@ export function extractDatedRows(html, base, opts = {}) {
     if (!had) out.set(keyOf(best), { title: best.title, url: best.url, postedAt: best.postedAt || undefined, ...(best.postId ? { postId: best.postId } : {}) });
     else if (!had.postedAt && best.postedAt) had.postedAt = best.postedAt;   // 기간 토막이 먼저 본 글에 게시일 토막의 날짜를 채운다
   }
-  return [...out.values()];
+  return dropRowNumbers([...out.values()]);   // 행 번호는 게시판 단위로만 뗀다(위 dropRowNumbers)
 }

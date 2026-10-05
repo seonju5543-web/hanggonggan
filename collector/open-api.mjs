@@ -19,7 +19,7 @@
          node collector/open-api.mjs --dry-run  (받아서 리포트만 · 파일 안 바꿈)
    ============================================================ */
 import fs from 'node:fs';
-import { API_SOURCES, API_ID_FIELD, findRows, xmlItems, xmlTag, mapRows, mergeApi, sourceVerdict, splitLines } from './open-api-map.mjs';
+import { API_SOURCES, API_ID_FIELD, findRows, xmlItems, xmlTag, mapRows, mergeApi, sourceVerdict, splitLines, runSourceGroups } from './open-api-map.mjs';
 import { activityDetails, putActivityDetails } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { canonUrl } from './canon-url.mjs';
@@ -227,12 +227,17 @@ if (process.argv.includes('--probe')) {
   process.exit(0);
 }
 
-/* ── 돌리기 ── */
+/* ── 돌리기 ──
+   출처 하나를 받는 일(runSource)은 결과와 리포트 줄을 **돌려준다**(공유 배열에 바로 넣지 않는다) — 서버 묶음별로 동시에 돌기 때문이다
+   (open-api-map.mjs runSourceGroups · 2026-10-05 점검 api-08). 🔴 결과는 API_SOURCES 순서대로 채운다 — mergeApi 는 results 에 넣은 순서로
+   '먼저 온 출처가 이긴다'를 정하므로, 끝난 순서대로 넣으면 같은 글의 승자가 실행마다 달라진다. */
 const results = {};
 const lines = [`## 🛰 공공 API 로봇 리포트 (${today})`, ''];
-for (const src of Object.keys(API_SOURCES)) {
+async function runSource(src) {
+  const out = [];
+  let result = { ok: false };
   const name = API_SOURCES[src].name;
-  if (!HAS_KEY[src]) { results[src] = { ok: false }; lines.push(`- ⏸ **${name}** — 열쇠(${KEY_NAME[src]})가 없어 건너뜀 · 지난 글 그대로`); continue; }
+  if (!HAS_KEY[src]) { out.push(`- ⏸ **${name}** — 열쇠(${KEY_NAME[src]})가 없어 건너뜀 · 지난 글 그대로`); return { result: { ok: false }, lines: out }; }
   try {
     const rows = await FETCHERS[src]();
     const { items, dropped, refs, picks } = mapRows(src, rows, { scholarship: KEYWORDS, today, bad: BAD_URLS });
@@ -243,26 +248,39 @@ for (const src of Object.keys(API_SOURCES)) {
     /* 상세는 **성공으로 칠 응답일 때만** 받는다 — 실패로 칠 응답에 15번 더 두드리지 않는다(2026-10-01 코드 리뷰) */
     const detailNote = !bad && src === 'vol1365' && items.length ? ` · 상세 내용 ${await vol1365Details(items, refs)}/${items.length}건` : '';
     if (bad) {   // 🔴 성공으로 치지 않는다 — 치면 지난 글이 조용히 지워진다 (리뷰 C1)
-      results[src] = { ok: false };
-      lines.push(`- ❌ **${name}** — ${bad} · 지난 글 그대로 둠${why ? ` · 버림: ${why}` : ''}`);
+      result = { ok: false };
+      out.push(`- ❌ **${name}** — ${bad} · 지난 글 그대로 둠${why ? ` · 버림: ${why}` : ''}`);
     } else {
-      results[src] = { ok: true, items };
-      lines.push(`- ✅ **${name}** — 받은 행 ${rows.length} · 실은 글 **${items.length}**${detailNote}${why ? ` · 버림: ${why}` : ''}`);
+      result = { ok: true, items };
+      out.push(`- ✅ **${name}** — 받은 행 ${rows.length} · 실은 글 **${items.length}**${detailNote}${why ? ` · 버림: ${why}` : ''}`);
       /* 자격 줄을 읽은 글 수 — 적합도 배지가 붙는 글이다. 0 이면 응답 칸이 바뀌었는지 본다 */
-      lines.push(`  - 자격 줄 있는 글 ${items.filter((n) => (n.eligibilityLines || []).length).length}/${items.length} · 원문 안내 있는 글 ${items.filter((n) => (n.noticeLines || []).length).length}/${items.length}`);
+      out.push(`  - 자격 줄 있는 글 ${items.filter((n) => (n.eligibilityLines || []).length).length}/${items.length} · 원문 안내 있는 글 ${items.filter((n) => (n.noticeLines || []).length).length}/${items.length}`);
     }
     /* 첫 행의 칸 이름 — 명세와 실제가 다르면 여기서 바로 보인다(값은 안 적는다 · 담당자 연락처 등이 섞여 있다) */
-    if (rows[0]) lines.push(`  - 첫 행 칸: \`${Object.keys(rows[0]).join(', ')}\``);
+    if (rows[0]) out.push(`  - 첫 행 칸: \`${Object.keys(rows[0]).join(', ')}\``);
     /* 코드 칸(…Cd)의 실제 값 — 온통청년 정책의 결혼·소득·지역·학력 조건이 코드로 온다. 명세로 뜻을 확인하기 전엔 자격으로 안 쓴다(짐작 금지 · 2026-10-04) */
-    if (rows[0]) { const cds = Object.keys(rows[0]).filter((k) => /Cd$/.test(k)); if (cds.length) lines.push(`  - 코드 칸 값(첫 세 행): ${cds.map((k) => `${k}=${rows.slice(0, 3).map((r) => String(r[k] ?? '').slice(0, 40)).join('|')}`).join(' · ')}`); }
-    items.slice(0, 3).forEach((n) => lines.push(`  - ${n.kind} · ${n.title}${n.deadline ? ` (~${n.deadline})` : ''} — ${n.url}`));
+    if (rows[0]) { const cds = Object.keys(rows[0]).filter((k) => /Cd$/.test(k)); if (cds.length) out.push(`  - 코드 칸 값(첫 세 행): ${cds.map((k) => `${k}=${rows.slice(0, 3).map((r) => String(r[k] ?? '').slice(0, 40)).join('|')}`).join(' · ')}`); }
+    items.slice(0, 3).forEach((n) => out.push(`  - ${n.kind} · ${n.title}${n.deadline ? ` (~${n.deadline})` : ''} — ${n.url}`));
     /* 실은 글 전부의 번호(apiId · 칸 ${API_ID_FIELD[src]})와 살핀 주소 칸·점수(0 첫 화면·번호 없는 보기 화면 · 1 그 밖 · 2 글 번호 있음) — 2026-10-04 */
-    if (items.length) { lines.push(`  - 주소 고르기 (번호 칸 \`${API_ID_FIELD[src]}\` · 점수 2 글 번호 있음 · 1 그 밖 · 0 첫 화면·번호 없는 보기 화면):`); lines.push(...pickLines(items, picks)); }
+    if (items.length) { out.push(`  - 주소 고르기 (번호 칸 \`${API_ID_FIELD[src]}\` · 점수 2 글 번호 있음 · 1 그 밖 · 0 첫 화면·번호 없는 보기 화면):`); out.push(...pickLines(items, picks)); }
   } catch (e) {
-    results[src] = { ok: false };
-    lines.push(`- ❌ **${name}** — ${hideKeys(e instanceof ApiError ? e.message : `로봇 오류: ${e?.stack || e}`)} · 지난 글 그대로 둠`);
+    result = { ok: false };
+    out.push(`- ❌ **${name}** — ${hideKeys(e instanceof ApiError ? e.message : `로봇 오류: ${e?.stack || e}`)} · 지난 글 그대로 둠`);
   }
+  return { result, lines: out };
 }
+const order = Object.keys(API_SOURCES);
+const outs = await runSourceGroups(order, (src) => API_SOURCES[src].host, runSource);
+order.forEach((src, i) => {
+  const o = outs[i] || {};
+  if (o.error || !o.result) {   // runSource 는 스스로 오류를 받아 적는다 — 여기 오는 것은 로봇 자체의 넘어짐
+    results[src] = { ok: false };
+    lines.push(`- ❌ **${API_SOURCES[src].name}** — ${hideKeys(`로봇 오류: ${o.error?.stack || o.error || '결과 없음'}`)} · 지난 글 그대로 둠`);
+    return;
+  }
+  results[src] = o.result;
+  lines.push(...o.lines);
+});
 
 let prev = { updatedAt: today, items: [] };
 try { prev = JSON.parse(fs.readFileSync(ACTS, 'utf8')); } catch { /* 처음 */ }

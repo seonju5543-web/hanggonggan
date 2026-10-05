@@ -59,7 +59,11 @@ export function canonUrl(raw) {
     keep.sort();                       // 순서가 바뀌어도 같은 글로 본다
     // 클릭형 게시판(경희 등)은 목록 주소+제목 표식(#n-…)이 글의 정체성이다 — 떼면 서로 뭉개진다
     const marker = u.hash && u.hash.startsWith('#n-') ? u.hash : '';
-    return u.origin + u.pathname + (keep.length ? '?' + keep.join('&') : '') + marker;
+    /* 경로에 박힌 세션 표식(`View.do;jsessionid=…`)은 글과 무관하다 — 접속마다 값이 달라 같은 글이 다른 주소가 됐다(경기대 2026-10-05 · links-7).
+       떼는 규칙의 원본은 board-links.mjs stripSessionId — 이 파일은 관리자 화면이 브라우저 모듈로 싣고 import 가 없어야 해서 한 줄만 옮겨 둔다
+       (관문 「로봇·도구 점검 관문」 links ② 가 두 규칙이 같은 답을 내는지 대조한다).
+       ⚠️ 끝 24자 id 공식: 세션은 물음표 앞이라 뒤에 쿼리가 24자 넘게 붙은 주소는 id 가 그대로다 — 2026-10-05 등록·차단·피드 주소 539개 실측 변화 0. */
+    return u.origin + u.pathname.replace(/;jsessionid=[^/?#]*/i, '') + (keep.length ? '?' + keep.join('&') : '') + marker;
   } catch { return (raw || '').split('#')[0]; }
 }
 
@@ -73,6 +77,44 @@ export function canonUrl(raw) {
    고쳐야 한다면 blockUrls 처럼 주소로 막는 쪽을 먼저 세우고 옮길 것. */
 export function idFromUrl(prefix, raw) {
   return prefix + canonUrl(raw).replace(/[^a-z0-9]/gi, '').slice(-24).toLowerCase();
+}
+
+/* 주소 꼬리표 — 정규화한 주소의 짧은 지문(FNV-1a 32비트 → 36진 7자). 같은 주소면 늘 같은 값 */
+export function idHash(cu) {
+  let h = 0x811c9dc5;
+  for (const ch of String(cu || '')) {
+    h ^= ch.codePointAt(0);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h.toString(36).padStart(7, '0');
+}
+
+/* 🔴 **새로 등록할 id — 겹치면 꼬리표를 단다** (2026-10-05 점검 links-new-1 · 위 공식은 그대로).
+   idFromUrl 은 정렬한 주소의 **끝 24자**라, 글 번호가 앞에 오고 게시판 공통값(searchKrwd·sf.pnos·srchVoteType·namepage…)이
+   끝을 차지하는 게시판에서는 **그 게시판의 모든 글이 같은 id** 를 받는다(경기·계명·서강·강원·숭실·중앙 등 9개교 · 실측 70여 건).
+   그래서 한 글이 등록되면 나머지가 '이미 등록(같은 id)'으로, 사람이 한 글을 막으면 나머지가 '사람이 막아 둔 공고'로 **조용히** 빠졌다 —
+   위 2026-08-14 사고(한 건 등록 → 나머지 전부 중복)가 id 단계에서 다시 난 것이다.
+   공식을 바꾸면 저장된 id·blockIds 가 전부 어긋나므로, **겹칠 때만** `<옛 id>-<주소 꼬리표>` 를 준다:
+     · 그 id 를 이미 다른 주소의 등록분이 쓰고 있으면(holderCanon) → 꼬리표 id
+     · 그 id 가 막혀 있지만 이번 묶음에서 여러 주소가 같은 id 를 받고(ambiguous) 이 주소는 막은 주소(blockedCanons)가 아니면 → 꼬리표 id
+       (사람은 **그 한 글**을 막았다 — 막은 글은 주소로 계속 막힌다)
+     · 그 밖에는 옛 id 그대로(이미 저장된 id·막은 id 가 하나도 안 바뀐다)
+   holderCanon(id) 은 그 id 의 등록분 주소(canonUrl)를, 없으면 null 을 돌려준다(주소 없는 등록분은 '' — 겹친 것으로 본다).
+   🔴 꼬리표 id 는 **고정되지 않는다** — 그 옛 id 를 쥔 등록분이 있느냐에 따라 같은 글이 어느 날은 꼬리표 id, 어느 날은 옛 id 를 받는다.
+   그래서 막음·쉬기는 **두 꼴을 다 본다**: blockedTagged = 이 주소의 꼬리표 꼴(`tagged`)이 막혀 있다(꼬리표는 주소마다 달라 남의 글을 막지 않는다).
+   리뷰 R1(2026-10-05): 꼬리표 id 로 되돌린 글이, 옛 id 차단을 푼 뒤 옛 id 를 받아 다시 등록됐다. */
+export function registerId(prefix, raw, { holderCanon = () => null, blockedIds = new Set(), blockedCanons = new Set(), ambiguous = () => false } = {}) {
+  const legacy = idFromUrl(prefix, raw);
+  const cu = canonUrl(raw);
+  const tagged = `${legacy}-${idHash(cu)}`;
+  const amb = !!ambiguous(legacy);
+  const blockedByLegacy = blockedIds.has(legacy) && !amb;
+  const blockedTagged = blockedIds.has(tagged);
+  const out = (id) => ({ id, legacy, tagged, blockedByLegacy, blockedTagged });
+  const held = holderCanon(legacy);
+  if (held !== null && held !== undefined && held !== cu) return out(tagged);
+  if (blockedIds.has(legacy) && amb && !blockedCanons.has(cu)) return out(tagged);
+  return out(legacy);
 }
 
 export default canonUrl;

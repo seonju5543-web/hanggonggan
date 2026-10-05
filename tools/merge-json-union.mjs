@@ -42,6 +42,8 @@ import { PER_SCHOOL } from '../collector/publish-notices.mjs';
 import { mergeCandidates } from '../collector/candidates.mjs';
 import { urlKey } from '../collector/url-key.mjs';
 import { newsDistinct } from '../collector/news-board-rules.mjs';   // 소식 '다른 글' 잣대 한 곳 (발행과 같다)
+/* 재단·지자체 글 거름은 수집 로봇의 발행과 같은 것(순수 모듈 — 불러도 아무것도 실행하지 않는다) */
+import { tidyExternal, dropReason as externalDropReason } from '../collector/external-clean.mjs';
 
 const [, , oursBase, oursPath, theirsPath, filePath = ''] = process.argv;
 
@@ -109,6 +111,15 @@ function mergeFeedByUrl(ours, theirs) {
   }
   const updatedAt = [ours?.updatedAt, theirs?.updatedAt].filter(Boolean).sort().pop();
   return { ...(ours || {}), ...(theirs || {}), updatedAt, items: [...out.values()] };
+}
+
+/* 재단·지자체 피드는 합친 뒤 발행 거름을 **다시** 건다 (2026-10-05 점검 app2-F7) — 위 합집합은 로봇이 뺀 글(마감 지남·[마감] 표식·옛 글)을
+   되살린다. 예전엔 '다음 실행이 다시 지운다'로 넘겼지만 그동안 홈 「재단·지자체 새 공고」에 지난 글이 다시 뜬다.
+   규칙은 external-clean.mjs 한 곳(collect.mjs 발행과 같은 함수) · 날짜는 합친 updatedAt(늦은 쪽 — 로봇이 거른 날). 날짜를 모르면 거르지 않는다. */
+function mergeExternal(ours, theirs) {
+  const m = mergeFeedByUrl(ours, theirs);
+  if (!m.updatedAt) return m;
+  return { ...m, items: m.items.map(tidyExternal).filter((n) => !externalDropReason(n, m.updatedAt)) };
 }
 
 function mergeSeen(ours, theirs) {
@@ -291,7 +302,8 @@ const RULES = [
   { match: /(^|\/)news-thumbs\.json$/, merge: mergeThumbLedger },
   { match: /(^|\/)news-health\.json$/, merge: mergeHealth },
   { match: /(^|\/)notices\.json$/, merge: mergeNotices },
-  { match: /(^|\/)data\/(?:activities|external)\.json$/, merge: mergeFeedByUrl },
+  { match: /(^|\/)data\/activities\.json$/, merge: mergeFeedByUrl },
+  { match: /(^|\/)data\/external\.json$/, merge: mergeExternal },
   { match: /(^|\/)collector\/seen-(?:activities|external)\.json$/, merge: mergeSeen },
   { match: /(^|\/)link-hunt\.json$/, merge: mergeLinkHunt },
   { match: /(^|\/)seen\.json$/, merge: mergeSeen },

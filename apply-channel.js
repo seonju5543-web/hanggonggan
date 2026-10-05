@@ -137,7 +137,23 @@ const PORTAL_SYSTEMS = [
   ['HUFS Ability', /HUFS\s?Ability|허프스\s?어빌리티/i],
   ['종합정보시스템', /종합정보시스템/],
   ['인포21', /인포\s?21|INFO\s?21/i],
+  /* 2026-10-05 점검 app1-11 — 포털 후보 로봇(collector/portal-candidates.mjs)이 원문에서 찾은 **학교 고유 이름 · 근거 2건 이상**
+     (고려대 3건 「포털(KUPID) → 학사 → 등록·장학 → … → 장학금 신청」).
+     주소는 정찰로 확인하기 전이라 data.js 표에 이름만 둔다. 흔한 이름(포탈·학사정보시스템)은 열쇠로 쓰지 않는다 — 다른 학교 공고까지 묶인다.
+     ⚠️ 국민대 「ON 국민」은 넣지 않았다(리뷰 2026-10-05) — 근거 3건 중 2건이 '등록 뒤 마감 경과'로 빠지는 등록분이라 남는 근거가 1건뿐이다.
+        포털 후보 리포트에만 둔다 — 근거가 다시 2건 이상이 되면 그때 같은 열쇠 글자로 이 표와 data.js 표에 함께 넣는다. */
+  ['KUPID', /KUPID/i],
 ];
+
+/* 이 글자에 학교 신청 시스템 이름이 있는가 — 시스템 표(위 PORTAL_SYSTEMS)의 이름 + 여러 학교에 흔한 이름(포털·포탈·…정보시스템).
+   데이터 검사(test-collector 「등록 데이터에 근거 없는 포털 단정이 없다」)가 '포털이라고 부를 근거'로 쓴다(2026-10-05 리뷰).
+   🔴 낱말 목록을 검사 쪽에 따로 적지 말 것 — 표에 새 이름(KUPID)을 넣자 그 검사가 원문 「포탈(KUPID) - 학사행정 - …」을 근거 없음으로 세어
+      다음 수집의 데이터 관문이 빨개질 참이었다(손으로 적은 목록에 '포탈'·KUPID 가 없었다). 표를 그대로 불러 쓰면 표가 늘 때 같이 는다. */
+const PORTAL_COMMON = /포[털탈]|학사정보시스템|학생지원시스템/;
+function hasPortalName(text) {
+  const t = String(text || '');
+  return PORTAL_COMMON.test(t) || PORTAL_SYSTEMS.some(([, re]) => re.test(t));
+}
 
 /** 한 줄이 '이 시스템으로 낸다'고 말하는가 — 근거를 통째로 돌려준다. */
 function judgePortalLine(line) {
@@ -172,5 +188,6 @@ function findApplyPortal(text) {
    🔴 베끼지 말 것 — 사본이 생기는 순간 이 파일 첫머리의 오탐 ①②가 한쪽에서 되살아난다. */
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { classifyChannels, METHOD_LINE, NOT_EVIDENCE,
-                     findApplyPortal, judgePortalLine, PORTAL_SYSTEMS };
+                     findApplyPortal, judgePortalLine, PORTAL_SYSTEMS, hasPortalName,
+                     PORTAL_SUBMIT, PORTAL_NOT_SUBMIT };   // 포털 후보 로봇(collector/portal-candidates.mjs)이 같은 '내는 줄' 판정을 쓴다 (2026-10-05)
 }

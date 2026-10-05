@@ -66,6 +66,37 @@ export function deadlineHintFrom(text) {
   return null;
 }
 
+/* ── 학교 홈페이지 껍데기(머리 배너·메뉴)의 기간 줄 (2026-10-05 점검 collect-04) ──
+   항공대 글 19건 전부의 힌트가 `접수기간 : 2026.10.15.(목) 13:30까지 …` 로 같았다 — 매 쪽 머리에 도는 **교수 채용 배너**
+   (`모집대상 : 정년 및 비정년트랙 / 접수기간 : …`)가 본문보다 먼저 나와 첫 이름표로 잡혔다. 각 글의 진짜 기간 줄은 그 아래에 있다.
+   껍데기 줄(같은 호스트 여러 쪽에 똑같이 나오는 줄 · page-boilerplate.mjs buildBoilerplate)을 **부르는 쪽이 넘긴다** —
+   🔴 이 파일에 import 를 더하지 말 것: url-key.cjs 가 이 소스를 new Function 으로 평가하고 관리자 화면이 복사해 쓴다(2026-09-12 감사 전멸).
+   🔴 '여러 글이 같은 힌트면 버린다'는 빈도 규칙을 쓰지 말 것 — 진짜로 같은 기간인 다른 공고가 있다(국민 2건·서강 3건 실측). */
+const sqHint = (s) => unentHint(unentHint(String(s || ''))).replace(/\s+/g, ' ').trim();
+
+/** 껍데기 줄(boiler · Set)을 뺀 본문 줄로 기간 한 줄. 껍데기를 모르면(빈 Set) 예전과 같다. */
+export function hintWithoutChrome(lines, boiler) {
+  const arr = (Array.isArray(lines) ? lines : String(lines || '').split(/\n+/)).map((l) => String(l).trim()).filter(Boolean);
+  const kept = boiler && boiler.size ? arr.filter((l) => !boiler.has(l)) : arr;
+  return deadlineHintFrom(kept.join(' '));
+}
+
+/** 저장된 힌트가 껍데기 줄에서 시작했는가 — 힌트 머리가 껍데기 줄 안에 있고, 그 줄의 남은 꼬리가 힌트와 이어지면 참 */
+export function isChromeHint(hint, boiler) {
+  if (!hint || !boiler || !boiler.size) return false;
+  const h = sqHint(hint);
+  const head = h.slice(0, 12);
+  if (head.length < 6) return false;
+  for (const raw of boiler) {
+    const l = sqHint(raw);
+    const at = l.indexOf(head);
+    if (at < 0) continue;
+    const rest = l.slice(at);
+    if (h.startsWith(rest) || rest.startsWith(h.slice(0, 30).trim())) return true;
+  }
+  return false;
+}
+
 /** 저장된 힌트가 지금 기준을 통과하는가 — 옛 데이터 청소·검사에 쓴다 */
 export function looksLikeHint(hint) {
   const t = String(hint || '').trim();

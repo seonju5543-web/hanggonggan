@@ -34,7 +34,7 @@ import { fileURLToPath } from 'node:url';
 import { FETCH_HEADERS } from './http-headers.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { attachmentText, isOcrSource, isNoticeDoc } from './attachment-text.mjs';
-import { activityDetails } from './activity-excerpts.mjs';
+import { activityDetails, eligLineOk } from './activity-excerpts.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const ACTS = fileURLToPath(new URL('../data/activities.json', HERE));
@@ -402,14 +402,18 @@ function applyPhase(acts) {
   return got;
 }
 
-/** 자격요건 로봇이 장부에 적어 둔 결과를 활동 글에 합친다 — 수집 로봇(무료 모드 --apply)만 부른다. 아직 자격이 없는 글에만 */
+/** 자격요건 로봇이 장부에 적어 둔 결과를 활동 글에 합친다 — 수집 로봇(무료 모드 --apply)만 부른다. 아직 자격이 없는 글에만.
+    장부에 이미 적힌 옛 줄도 지금 거름(activity-excerpts.mjs eligLineOk — 여러 갈래 나이·개인정보 안내문)을 지나야 한다 —
+    안 그러면 발행이 걷은 줄을 다음 실행이 장부에서 다시 붙여 자격 칸이 비었다 찼다 한다. 남는 줄이 없으면 합치지 않는다 (2026-10-05 점검 api-06) */
 export function mergeBrowserResults(acts, bled = readJson(BROWSER_LEDGER, {})) {
   let got = 0;
   for (const n of acts.items) {
     const r = bled[n.url];
-    if (!r || !r.lines || !r.lines.length || !needsElig(n)) continue;
-    n.eligibilityLines = r.lines;
-    if (r.excludes && r.excludes.length) n.eligibilityExcludes = r.excludes;
+    const lines = ((r && r.lines) || []).filter(eligLineOk);
+    if (!lines.length || !needsElig(n)) continue;
+    n.eligibilityLines = lines;
+    const excludes = (r.excludes || []).filter(eligLineOk);
+    if (excludes.length) n.eligibilityExcludes = excludes;
     n.eligibilityFrom = r.from;
     got += 1;
   }

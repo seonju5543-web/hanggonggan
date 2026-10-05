@@ -48,6 +48,11 @@ const COMPLEX_LAYOUT = /시간표|원고지|주\s*간\s*계\s*획|월\s*\|?\s*�
 
 import { checkFormQuality } from './form-quality.mjs';
 import { checkFormCoverage } from './form-coverage.mjs';
+/* 양식이 붙은 열린 공고 수 · 옛 양식 후보 — 리포트 단락 한 곳(2026-10-05 점검 app1-03·app1-08 · 실행 코드 없는 파일).
+   ⚠️ 못 불러와도 양식 변환은 그대로 한다 — 리포트 단락 하나 때문에 변환 로봇이 멈추면 안 된다. 대신 리포트에 ⚠️ 줄을 남긴다(조용히 빠지지 않게). */
+let formReachReport = null;
+let formReachLoadError = '';
+try { ({ formReachReport } = await import('./form-reach.mjs')); } catch (e) { formReachLoadError = String((e && e.message) || e).slice(0, 160); }
 
 const cfgPath = new URL('schematize-config.json', HERE);
 let cfg = { enabled: true, apiEnabled: false, maxApiCallsPerRun: 2, minTextChars: 400, maxManualChars: 6000, alwaysApiIds: [], neverApiIds: [] };
@@ -265,7 +270,20 @@ function slug(name) {
 
 /* ---------- 실행 ---------- */
 const report = [];
+/* 🔴 **양식이 붙은 열린 공고 수를 매 실행 리포트에 싣는다** (2026-10-05 점검 app1-03·app1-08) — 예전엔 '이번 실행에 만든 것'만 말해서
+   열린 공고 86건 중 학생이 앱에서 양식을 열 수 있는 것이 1건뿐인 날이 이어져도 아무도 몰랐다. 0~1건이면 🚨 로 띄우고,
+   쓰지 않는 옛 양식 중 같은 사업으로 보이는 것을 후보로만 적는다(자동으로 잇지 않는다 · 개발자 결정). 계산은 form-reach.mjs 한 곳.
+   마지막(finish)에 계산한다 — 이번 실행이 양식을 붙였으면 그 판으로 센다. 정식 등록을 읽기 전에 끝나는 길은 싣지 않는다. */
+let reachItems = null;
+let reachTemplates = null;
 function finish() {
+  if (reachItems) {
+    try {
+      if (!formReachReport) throw new Error(`form-reach.mjs 를 못 불러왔어요 — ${formReachLoadError}`);
+      const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+      report.push(...formReachReport(reachItems, reachTemplates || {}, today, Date.now(), { apiOn: cfg.apiEnabled === true }));
+    } catch (e) { report.push('', `⚠️ 양식이 붙은 열린 공고 수를 세지 못했어요: ${String((e && e.message) || e).slice(0, 200)}`); }
+  }
   if (report.length) fs.appendFileSync(reportPath, '\n' + report.join('\n') + '\n');
 }
 
@@ -291,6 +309,8 @@ try { queue = JSON.parse(fs.readFileSync(queuePath, 'utf8')); } catch { log('대
    마감+30일 정리·데이터 관문 되돌림·삭제로 빠진 공고. 다시 받지는 않지만 리포트의 '건너뜀'·'스키마화 대기' 숫자를 부풀렸다).
    다시 등록되면 자동 등록이 대기열에 다시 넣는다(지워도 잃는 것이 없다). */
 const registered = JSON.parse(fs.readFileSync(registeredPath, 'utf8'));
+reachItems = registered.items || [];
+try { reachTemplates = JSON.parse(fs.readFileSync(formsPath, 'utf8')).templates || {}; } catch { reachTemplates = {}; }
 {
   const { kept, dropped } = pruneOrphans(queue, new Set((registered.items || []).map((i) => i.id)));
   if (dropped.length) {
@@ -326,6 +346,7 @@ try {
 } catch { log('원본 색인 없음 — 이번 실행에서 받은 첨부가 없습니다.'); finish(); process.exit(0); }
 
 const forms = JSON.parse(fs.readFileSync(formsPath, 'utf8'));
+reachTemplates = forms.templates || {};   // 이번 실행이 더하는 양식까지 센다(위 finish 의 양식 도달 단락)
 
 let client = null;
 async function getClient() {

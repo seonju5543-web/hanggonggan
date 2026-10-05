@@ -3,7 +3,7 @@
    ③ 대표 1종(삼일)은 UI로 질문→문서 생성까지 ④ 명지 프로필로 고시장학금 양식 확인 */
 const { chromium } = require('playwright-core');
 const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
-const { nextUntil, assertOwnServer } = require('./onboard-helper.js');
+const { nextUntil, assertOwnServer, dismissNotify } = require('./onboard-helper.js');
 
 const NEW_KEYS = ['samil-apply', 'bogun-study-apply', 'bogun-multi-apply', 'sanhak-foreign-apply', 'mju-gosi-apply'];
 
@@ -14,9 +14,30 @@ const REG = require('../data/registered.json');
 /* 🔴 KST 로 읽는다 — 그냥 toISOString 은 **UTC** 라 새벽에 하루 어긋나고,
    그날 마감인 공고가 '아직 안 지났다'로 분류된다(verify-explore-sort 가 그래서 빨간불이었다). */
 const TODAY = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+/* 🔴 표본 공고를 드라이버가 직접 심는다 (2026-10-05 리뷰 · verify-forms-data 와 같은 방식 — 응답을 가로채 얹는다).
+   8-30 정식 등록 정리 뒤 samil-apply·mju-gosi-apply 를 단 공고가 0건이라 ③④ UI 구간이 늘 '건너뜀'으로 **조용히** 넘어갔다 —
+   양식 스키마는 forms.json 에 그대로 있으니, 그 양식을 단 마감 전 표본 공고를 얹어 질문 → 문서 생성까지 늘 돈다.
+   살아 있는 실제 접수분이 있으면 그것을 먼저 쓴다(아래 pickTarget). 표본은 이 드라이버의 화면에만 있다(데이터 파일은 안 고친다). */
+const AHEAD = new Date(Date.now() + 9 * 3600e3 + 30 * 86400e3).toISOString().slice(0, 10);
+const fixture = (formId, school, name) => ({
+  id: `fixture-${formId}`, name, type: '교외', provider: '검증용 표본 재단', amount: '금액 원문 확인', amountValue: 0,
+  deadline: AHEAD, period: `접수 ~${AHEAD}`, summary: '검증 드라이버가 심은 표본 공고', eligibility: { schoolOnly: school },
+  documents: ['신청서'], duplicable: true, formId, sourceUrl: `https://example.ac.kr/fixture/${formId}`, attachments: [],
+});
+const FIXTURES = {
+  'samil-apply': fixture('samil-apply', '성균관대학교', '재단법인 삼일장학회 장학생 선발 (검증용 표본)'),
+  'mju-gosi-apply': fixture('mju-gosi-apply', '명지대학교', '고시장학금 신청 (검증용 표본)'),
+};
+async function seedFixtures(page) {
+  await page.route('**/data/registered.json', async (route) => {
+    const j = await (await route.fetch()).json();
+    for (const f of Object.values(FIXTURES)) if (!j.items.some((i) => i.id === f.id)) j.items.push(f);
+    await route.fulfill({ json: j });
+  });
+}
 function pickTarget(formId) {
   const live = REG.items.filter((i) => i.formId === formId && (!i.deadline || i.deadline >= TODAY));
-  if (!live.length) return null;
+  if (!live.length) return FIXTURES[formId];
   // 학교 한정 공고여야 온보딩 학교를 정해 구동할 수 있다
   return live.find((i) => (i.eligibility || {}).schoolOnly) || live[0];
 }
@@ -106,17 +127,18 @@ async function onboard(page, school, major) {
   }, NEW_KEYS);
   for (const [k, v] of Object.entries(smoke)) console.log(' ', k, JSON.stringify(v));
 
-  // ③ 삼일장학회: UI로 질문→문서 생성 (마감 안 지난 접수분을 자동으로 골라 구동)
+  // ③ 삼일장학회: UI로 질문→문서 생성 (마감 안 지난 접수분 — 없으면 드라이버가 심은 표본으로 · 늘 돈다)
+  const docChecks = {};
   const samilTarget = pickTarget('samil-apply');
-  if (!samilTarget) {
-    console.log('삼일 UI 구동 건너뜀 — samil-apply를 쓰는 공고가 전부 마감됨 (양식 자체는 ②에서 검증됨)');
-  } else {
+  {
   console.log('삼일 UI 구동 대상:', samilTarget.id, '|', samilTarget.name.slice(0, 40));
   const samilPage = await browser.newPage({ viewport: { width: 390, height: 844 } });
   samilPage.on('pageerror', (e) => errors.push('PAGEERROR-SAMIL: ' + e.message));
   samilPage.on('dialog', async (d) => { await d.accept(); });
+  await seedFixtures(samilPage);
   await samilPage.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   await onboard(samilPage, SCHOOL_ALIAS[samilTarget.eligibility.schoolOnly] || samilTarget.eligibility.schoolOnly, '컴퓨터공학부');
+  await dismissNotify(samilPage);   // 온보딩 뒤 2.9초에 뜨는 알림 동의 시트가 탐색 카드 클릭을 가로챈다(verify-forms-data 와 같은 도우미)
   {
     const page = samilPage; // 아래 단언들은 기존 그대로 재사용
   await page.click('.nav-item[data-nav="explore"]');
@@ -138,24 +160,24 @@ async function onboard(page, school, major) {
   await page.click('#btn-ff-generate');
   await page.waitForSelector('.form-doc', { timeout: 8000 });
   const doc = await page.$eval('.form-doc', (el) => el.textContent);
-  console.log('삼일 문서 — 제목:', doc.includes('재단법인 삼일장학회 장학금 지원 신청서'),
-    '| ☑ 희망:', doc.includes('☑ 희망(希望)삼일장학생'),
-    '| ☑ 참석:', doc.includes('☑ 참  석'),
-    '| 서약문:', doc.includes('선발 취소 등 어떤 조치에도 이의를 제기치 않겠습니다'));
+  docChecks.samil = { 제목: doc.includes('재단법인 삼일장학회 장학금 지원 신청서'), 희망: doc.includes('☑ 희망(希望)삼일장학생'),
+    참석: doc.includes('☑ 참  석'), 서약문: doc.includes('선발 취소 등 어떤 조치에도 이의를 제기치 않겠습니다') };
+  console.log('삼일 문서 —', JSON.stringify(docChecks.samil));
   await page.screenshot({ path: `${__dirname}/shot-40-samil-doc.png` });
   }
   }
 
-  // ④ 명지 프로필 → 고시장학금 양식 (마감 안 지난 접수분이 있을 때만)
+  // ④ 명지 프로필 → 고시장학금 양식 (마감 안 지난 접수분 — 없으면 드라이버가 심은 표본으로 · 늘 돈다)
   const gosiTarget = pickTarget('mju-gosi-apply');
-  if (!gosiTarget) {
-    console.log('명지 고시 UI 구동 건너뜀 — mju-gosi-apply를 쓰는 공고가 마감됨 (양식 자체는 ②에서 검증됨)');
-  } else {
+  {
+  console.log('명지 고시 UI 구동 대상:', gosiTarget.id, '|', gosiTarget.name.slice(0, 40));
   const page2 = await browser.newPage({ viewport: { width: 390, height: 844 } });
   page2.on('pageerror', (e) => errors.push('PAGEERROR2: ' + e.message));
   page2.on('dialog', async (d) => { await d.accept(); });
+  await seedFixtures(page2);
   await page2.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
   await onboard(page2, SCHOOL_ALIAS[gosiTarget.eligibility.schoolOnly] || gosiTarget.eligibility.schoolOnly, '융합소프트웨어학부');
+  await dismissNotify(page2);
   await page2.click('.nav-item[data-nav="explore"]');
   await page2.waitForTimeout(600);
   await page2.click(`#explore-list [data-detail="${gosiTarget.id}"]`);
@@ -167,15 +189,17 @@ async function onboard(page, school, major) {
   await page2.click('#btn-ff-generate');
   await page2.waitForSelector('.form-doc', { timeout: 8000 });
   const doc2 = await page2.$eval('.form-doc', (el) => el.textContent);
-  console.log('명지 고시 문서 — 제목:', doc2.includes('고시장학금  신청서'),
-    '| 제1호 서식:', doc2.includes('(제 1 호 서식)'),
-    '| 제한기준 명시:', doc2.includes('직전학기 평균평점 2.5 이상'),
-    '| 서약문:', doc2.includes('명지대학교 장학금규정에 따라'));
+  docChecks.gosi = { 제목: doc2.includes('고시장학금  신청서'), 제1호서식: doc2.includes('(제 1 호 서식)'),
+    제한기준: doc2.includes('직전학기 평균평점 2.5 이상'), 서약문: doc2.includes('명지대학교 장학금규정에 따라') };
+  console.log('명지 고시 문서 —', JSON.stringify(docChecks.gosi));
   await page2.screenshot({ path: `${__dirname}/shot-41-mjugosi-doc.png` });
   }
 
   console.log('ERRORS:', errors.length ? errors.join(' ; ') : 'none');
   await browser.close();
-  const bad = Object.values(smoke).some((v) => v.error) || keys.length !== NEW_KEYS.length;
+  /* 문서 내용도 실패로 센다 — 예전엔 줄만 찍고 종료 코드에 안 넣어, 문서가 틀려도 초록이었다 */
+  const docBad = ['samil', 'gosi'].filter((k) => !docChecks[k] || Object.values(docChecks[k]).some((v) => !v));
+  if (docBad.length) console.log('✕ 문서 내용이 원본 양식과 다름:', docBad.join(', '));
+  const bad = Object.values(smoke).some((v) => v.error) || keys.length !== NEW_KEYS.length || docBad.length;
   if (bad) process.exit(1);
 })().catch((e) => { console.error('FAIL', e.message); process.exit(1); });

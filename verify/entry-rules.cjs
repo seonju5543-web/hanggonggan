@@ -48,6 +48,16 @@ function lastDateIn(text, year) {
   return last;
 }
 
+/* ── 등록할 때 이미 끝나 있던 로봇 등록분 (2026-10-05 점검 collect-07) ──
+   자동 등록은 제목·게시판 요약만 보고 마감을 정했고 본문 마감은 몇 분 뒤 발췌기가 채웠다 — 그래서 본문에만 기간이 적힌 글이
+   마감 없이(listedAt 을 달고) 등록됐다가 **등록일보다 앞선 마감**을 받았다(10-04 항공대 「청년창업농장학금」 5월 게시·마감 7/6).
+   그런 항목은 학생에게 30일 동안 '마감' 카드로만 보인다. 자동 등록이 실행 앞부분에서 빼고(collector/auto-register.mjs) 감사는 경고로 센다.
+   🔴 사람이 손댄 것(마감 표식 AI·관리자 · 양식을 붙인 것 · 여러 학교 근거를 합친 것)은 빼지 않는다. */
+function registeredAfterDeadline(it) {
+  return !!(it && it.auto && it.listedAt && it.deadline && it.deadline < it.listedAt
+    && !/^(AI|관리자)/.test(it.deadlineFrom || '') && !it.formId && !(it.alsoPostedAt || []).length);
+}
+
 /* 항목 1건 검사 → [{level:'error'|'warn', msg}]
    opts.formIds: data/forms.json에 있는 양식 id 집합 (없으면 formId 존재 검사 생략) */
 function checkEntry(it, opts = {}) {
@@ -65,6 +75,8 @@ function checkEntry(it, opts = {}) {
   for (const f of REQUIRED) if (it[f] == null) err(`필수 필드 누락: ${f}`);
   if (it.deadline != null && !/^\d{4}-\d{2}-\d{2}$/.test(it.deadline)) err(`마감일 형식 오류: ${it.deadline}`);
   if (it.listedAt != null && !/^\d{4}-\d{2}-\d{2}$/.test(it.listedAt)) err(`listedAt 형식 오류: ${it.listedAt}`);
+  /* 경고까지만 — 오류로 두면 자동 등록이 멈춘다(되돌리기가 매 실행 still-failing). 빼는 것은 자동 등록이 한다 */
+  if (registeredAfterDeadline(it)) warn(`등록할 때 이미 마감이 지나 있던 로봇 등록분 — 마감 ${it.deadline} · 등록 ${it.listedAt} (다음 자동 등록 실행이 뺍니다)`);
   /* 🔴 **화면 문구(period)의 끝 날짜와 마감이 같아야 한다** (2026-10-04 · 로봇·도구 점검 — test-collector 의 실데이터 단정에서 옮김).
      카드는 마감(D-n)과 문구를 나란히 보이므로 둘이 다르면 학생은 어느 날이 끝인지 모른다. 관리자가 마감만 고치고 문구를 두면
      예전엔 관리자 관문(감사)은 통과하고 **다음 로봇 실행의 데이터 관문이 빨개져** 그 실행 결과가 되돌려졌다 — 이제 한 규칙이 두 길을 같이 막는다.
@@ -260,4 +272,4 @@ const FIX_PLAN = {
   },
 };
 
-module.exports = { checkEntry, isDuplicatePair, programKey, sameProgram, lastDateIn, RULES, FIX_PLAN };
+module.exports = { checkEntry, isDuplicatePair, programKey, sameProgram, lastDateIn, registeredAfterDeadline, RULES, FIX_PLAN };

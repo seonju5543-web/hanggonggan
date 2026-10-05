@@ -221,6 +221,7 @@ jobs:
           [ -f collector/health.json ] && git add collector/health.json
           [ -f collector/pending-forms.json ] && git add collector/pending-forms.json
           [ -f collector/auto-held.json ] && git add collector/auto-held.json   # 관문에 걸린 자동 등록 쉬기 장부 (2026-10-04 · gate-guard·auto-register)
+          [ -f collector/past-rounds.json ] && git add collector/past-rounds.json   # 지난 회차 장부 — 등록 뒤 마감 경과로 뺀 등록분의 사업 (2026-10-05 · auto-register)
           [ -d collector/extracted ] && git add collector/extracted
           true  # 위 선택 파일이 없어도 저장 단계는 계속된다 (2026-07-19 8회 연속 실패 원인 수정)
           if ! git diff --cached --quiet; then

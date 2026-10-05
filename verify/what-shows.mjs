@@ -90,11 +90,11 @@ function takeConst(name) {
   return m[0];
 }
 /* 의존 순서대로 — dday 는 todayStart 를, fitBadgeHtml 은 fitTone·fitVerdict 를,
-   cardOrgLine 은 cardTitle·bareOrg·orgBase 를 쓴다 */
+   cardOrgLine 은 cardTitle·bareOrg·orgBase·providerUnknown 을 쓴다 */
 const NEED = ['todayStart', 'dday', 'fitTone', 'fitVerdict', 'fitBadgeHtml', 'applyLock',
   'cleanCardTitle', 'cardTitle', 'cardOrgLine'];
 const ctx = vm.createContext({ Date, Math, Number, String, JSON, console });
-vm.runInContext([...['bareOrg', 'orgBase', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G'].map(takeConst), ...['isDateBit', 'splitTitleDates'].map(takeFn), ...NEED.map(takeFn)].join('\n\n'),   // 카드 제목 날짜 규칙(2026-10-05)
+vm.runInContext([...['bareOrg', 'orgBase', 'providerUnknown', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G'].map(takeConst), ...['isDateBit', 'splitTitleDates'].map(takeFn), ...NEED.map(takeFn)].join('\n\n'),   // 카드 제목 날짜 규칙(2026-10-05) · 기관명 모름 판정(providerUnknown)
   ctx, { filename: 'app.js(발췌)' });
 const appFn = (n) => vm.runInContext(n, ctx);
 const stripTags = (h) => String(h).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();

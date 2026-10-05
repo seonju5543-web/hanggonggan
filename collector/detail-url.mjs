@@ -21,6 +21,15 @@ import { createRequire } from 'node:module';
 const { decodeUrlEntities } = createRequire(import.meta.url)('../source-link.js');
 /* 클릭형 게시판 규칙 표 한 곳(교내 소식 로봇과 같은 것) — 아래 ruleDetailCandidates 가 부른다 */
 import { NEWS_BOARD_RULES, ruleResolver } from './news-board-rules.mjs';
+/* 세션 표식(;jsessionid=…) 떼기 — 수집기와 같은 규칙 한 곳(board-links.mjs) */
+import { stripSessionId } from './board-links.mjs';
+
+/* 🔴 **저장하는 원문 주소는 씻어서 담는다** (2026-10-05 점검 links-7) — HTML 기호를 되돌리고(source-link.js) 세션 표식을 뗀다(board-links.mjs).
+   경기대 글 둘과 정식 등록 하나가 `View.do;jsessionid=…` 째로 담겨, 세션만 다른 같은 글이 주소 열쇠로 다른 글이 됐다(같은 공고가 홈에 두 번 뜰 수 있다).
+   후보(rowDetailCandidates)도 이 함수로 씻는다 — 새 탭 확인도 학생이 여는 주소 그대로 한다. 사냥꾼·복구 로봇·브라우저 수집이 저장할 때 부른다. */
+export function cleanStoredUrl(u) {
+  return stripSessionId(decodeUrlEntities(String(u == null ? '' : u)));
+}
 
 /* 목록 주소 + 제목 표식(#n-…) — 이 형태는 '원문으로 못 간다'는 뜻이다 */
 export function isMarkerUrl(raw) {
@@ -80,7 +89,6 @@ const VIEW_MODE_KEY = /^(?:mode|md|bbsmode|boardmode|p_p_mode|action|act|amode|s
 const VIEW_MODE_VAL = /^(?:v|view|read|detail|show|commonview|document)$/i;
 /* 글 번호 이름 — ID_PARAMS(조립에도 쓰는 목록)와 따로 둔다: 여기 더한 이름으로 주소를 **만들지는** 않는다 */
 const POST_ID = /^(?:nttNo|parm_bod_uid|document_srl|board_seq|bbsidx|pstSn|articleId|(?:[\w-]*_)?entryId)$/i;
-const SESSION_IN_PATH = /;jsessionid=[^/?#]*/i;
 /* 글 번호처럼 생긴 값 — 숫자 셋 이상(페이지 번호 1·2 와 가른다) */
 const idValue = (v) => /^\d{3,20}$/.test(String(v || '').trim()) || (looksLikeId(v) && (String(v).match(/\d/g) || []).length >= 3);
 /* base64 로 감싼 글 주소·글 번호 (K2Web enc · 경북 mv_data) — 풀어서 글 화면 경로나 글 번호가 있으면 글이다 */
@@ -107,7 +115,7 @@ export function isDetailUrl(raw, listUrl) {
   if (!s || !/^https?:/i.test(s)) return false;
   if (isMarkerUrl(s)) return false;
   let u;
-  try { u = new URL(s.replace(SESSION_IN_PATH, '')); } catch { return false; }
+  try { u = new URL(stripSessionId(s)); } catch { return false; }
 
   // 목록 주소와 사실상 같으면 상세가 아니다 (해시·빈 쿼리 차이는 무시)
   if (listUrl) {
@@ -483,7 +491,7 @@ export function ruleDetailCandidates({ row, listUrl }) {
 
 export function rowDetailCandidates({ row, listUrl, forms, landed, dom }) {
   const out = [];
-  const add = (u) => { if (u && isDetailUrl(u, listUrl) && !out.includes(u)) out.push(u); };
+  const add = (raw) => { const u = raw ? cleanStoredUrl(raw) : ''; if (u && isDetailUrl(u, listUrl) && !out.includes(u)) out.push(u); };   // 씻은 주소로(cleanStoredUrl)
   add(landed);
   add(row && row.abs);
   /* 게시판이 실제로 쓰는 꼴(확인된 규칙)이 조립보다 앞이다 — 조립은 이름을 유추한 주소라 틀릴 수 있다 */
@@ -498,7 +506,7 @@ export function rowDetailCandidates({ row, listUrl, forms, landed, dom }) {
   return out;
 }
 
-export default { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, titleFingerprint, sameTitle, rowMatchesTitle, detailCandidates, idsFromSource, looksLikeLoginWall, rowDetailCandidates, ruleDetailCandidates };
+export default { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, titleFingerprint, sameTitle, rowMatchesTitle, detailCandidates, idsFromSource, looksLikeLoginWall, rowDetailCandidates, ruleDetailCandidates, cleanStoredUrl };
 
 /* ── 이 화면이 '목록'인가 '상세'인가 (2026-08-20 — 두 로봇에 있던 복사본을 여기로 합쳤다) ──
    제목이 화면에 보인다는 것만으로는 부족하다: **게시판 목록에도 그 제목이 있다.**

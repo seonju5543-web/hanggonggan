@@ -81,8 +81,11 @@ jobs:
         continue-on-error: true
         env:
           NEWS_THUMB_BUDGET_MS: '150000'
+        # 🔴 sharp 판 고정 (2026-10-05 점검 news-11) — 판 없이 받으면 새 판이 Node 20 을 빼는 날 이 단계가 아무 변경 없이 깨지고,
+        #    continue-on-error 라 썸네일이 조용히 멈춘다. 0.x 에서 @0.35 는 0.35.x 만 받는다 · node-version 을 올릴 때 같이 올린다
+        #    (gate-photos.yml 은 sharp@0.33 — 같은 관례).
         run: |
-          npm i sharp --no-audit --no-fund --silent
+          npm i sharp@0.35 --no-audit --no-fund --silent
           node collector/collect-news-thumbs.mjs
 
       # 데이터 관문 — 저장 직전. 규칙을 어기면 이번 실행의 소식 파일을 되돌리고 알린다(장학 수집과 같은 규칙).

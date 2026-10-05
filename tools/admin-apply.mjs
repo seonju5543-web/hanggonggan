@@ -404,16 +404,32 @@ switch (action) {
           `reg-`(손 큐레이션 18건)·`adm-`(화면이 만든 것)은 절대 안 맞았다. */
     const paired = new Set(ids.map((x) => (cfg.blockPairs || {})[x]).filter(Boolean).map(canonUrl));
     const prefixOf = (x) => (String(x).match(/^[a-z]+-/) || ['auto-'])[0];
-    const derived = (u) => ids.some((x) => x === idFromUrl(prefixOf(x), u));
+    /* 겹쳐서 꼬리표를 단 id(`<옛 id>-<주소 꼬리표>` · canon-url.mjs registerId)도 그 주소에서 나온 것이다 */
+    const tagOf = (u) => (typeof canon.idHash === 'function' ? canon.idHash(canonUrl(u)) : '');
+    const derived = (u) => ids.some((x) => x === idFromUrl(prefixOf(x), u) || x === `${idFromUrl(prefixOf(x), u)}-${tagOf(u)}`);
+    /* 🔴 **다른 차단 id 가 아직 막는 글의 주소는 남긴다** (리뷰 R1 · 2026-10-05).
+       옛 id(끝 24자)는 같은 게시판의 여러 글이 함께 받는다 — 옛 id 하나를 풀며 그 옛 id 로 계산되는 주소를 전부 지우면,
+       같은 게시판에서 **꼬리표 id 로 따로 막은 글**의 주소까지 지워진다. 꼬리표 id 는 고정되지 않아(그 옛 id 를 쥔 등록분이 없으면 옛 id)
+       그 글이 다음 실행에 다시 등록됐다. 남은 차단 id 가 그 주소의 꼬리표 꼴이거나, 남은 차단 id 의 짝(blockPairs)이면 지우지 않는다.
+       사람이 주소를 직접 풀라고 한 것(urls)은 그대로 푼다. */
+    const remaining = new Set(cfg.blockIds);
+    const keptPairs = new Set(Object.entries(cfg.blockPairs || {}).filter(([k, u]) => u && remaining.has(k)).map(([, u]) => canonUrl(u)));
+    const stillBlocked = (u) => keptPairs.has(canonUrl(u))
+      || (tagOf(u) !== '' && [...remaining].some((r) => r === `${idFromUrl(prefixOf(r), u)}-${tagOf(u)}`));
+    let kept = 0;
     cfg.blockUrls = (cfg.blockUrls || []).filter((u) => {
       const cu = canonUrl(u);
-      return !wantUrl.has(cu) && !paired.has(cu) && !derived(u);
+      if (wantUrl.has(cu)) return false;
+      if (!paired.has(cu) && !derived(u)) return true;
+      if (stillBlocked(u)) { kept += 1; return true; }
+      return false;
     });
     if (cfg.blockPairs) ids.forEach((x) => { delete cfg.blockPairs[x]; });
     const gone = (bI - cfg.blockIds.length) + (bU - cfg.blockUrls.length);
     if (!gone) fail('차단 목록에서 그 대상을 찾지 못했습니다');
     writeJson(CFG, cfg);
-    detail = `차단 해제 ${gone}줄 (id ${bI - cfg.blockIds.length}·주소 ${bU - cfg.blockUrls.length})`;
+    detail = `차단 해제 ${gone}줄 (id ${bI - cfg.blockIds.length}·주소 ${bU - cfg.blockUrls.length})`
+      + (kept ? ` · 다른 차단 id 가 아직 막고 있는 글의 주소 ${kept}건은 남김` : '');
     touched = true;
     break;
   }
@@ -451,8 +467,11 @@ switch (action) {
     if (dup) fail(`이미 등록된 공고입니다 (${dup.id})`);
 
     /* 🔴 파생식은 공용 원본(`collector/canon-url.mjs`)만 쓴다 — 로봇과 갈라지면
-       차단 목록과 중복 판정이 동시에 어긋난다 */
-    const id = idFromUrl('adm-', url);
+       차단 목록과 중복 판정이 동시에 어긋난다.
+       옛 id(끝 24자)가 게시판 공통값이라 같은 게시판의 다른 글이 같은 id 를 받으면 꼬리표 id 를 준다(registerId · 2026-10-05 점검 links-new-1 —
+       예전엔 '같은 id가 이미 있습니다'로 그 게시판의 둘째 글부터 등록할 수 없었다). 같은 주소 중복은 위에서 이미 막는다. */
+    if (typeof canon.registerId !== 'function') fail('collector/canon-url.mjs 에 registerId 가 없습니다 — 공용 규칙 파일이 옛 판입니다 (같이 배포돼야 합니다)');
+    const { id } = canon.registerId('adm-', url, { holderCanon: (l) => { const it = byId(l); return it ? canonUrl(it.sourceUrl || '') : null; } });
     if (byId(id)) fail(`같은 id가 이미 있습니다 (${id})`);
 
     const school = String(n.school || '').trim();

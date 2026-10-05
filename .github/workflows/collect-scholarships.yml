@@ -315,6 +315,7 @@ jobs:
           [ -f collector/health.json ] && git add collector/health.json
           [ -f collector/pending-forms.json ] && git add collector/pending-forms.json
           [ -f collector/auto-held.json ] && git add collector/auto-held.json   # 관문에 걸린 자동 등록 쉬기 장부 (2026-10-04 · gate-guard·auto-register)
+          [ -f collector/past-rounds.json ] && git add collector/past-rounds.json   # 지난 회차 장부 — 등록 뒤 마감 경과로 뺀 등록분의 사업 (2026-10-05 · auto-register)
           [ -d collector/extracted ] && git add collector/extracted
           # 리포트 본문도 저장한다 — 이슈에만 올리고 파일을 커밋하지 않아서, 관리자 화면의
           # '일반 수집 리포트' 버튼이 늘 "리포트 파일이 아직 없습니다"였다 (2026-08-12 수리).
