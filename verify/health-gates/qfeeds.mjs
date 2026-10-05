@@ -21,6 +21,7 @@
      ⑩ 소식 썸네일 sharp 판 고정 (news-11) — collect-news.yml
      ⑪ 공공 API 서버 묶음 (api-08): 공공데이터포털 장애의 재시도 쉼이 6분 예산 하나를 먹어 멀쩡한 온통청년까지 ❌ 가 될 수 있었다 —
         서버 묶음끼리 동시에 · 묶음 안 차례 · 결과는 API_SOURCES 순서(open-api-map.mjs runSourceGroups) · 진짜 로봇을 열쇠 없이 임시 폴더에서
+     ⑫ robots.txt 를 누가 묻나 (api-13 · 지금 정책 유지): 대외활동·재단 출처는 학교 사이트라도 지키고 학교 장학·소식 게시판은 묻지 않는다 — 머리말과 배선이 같은지
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
 import os from 'node:os';
@@ -406,5 +407,15 @@ export default async function qfeeds(eq, ctx) {
       eq('  [공공 API 로봇 실행] 열쇠 없으면 넷 다 건너뛰고 · 리포트 줄은 API_SOURCES 순서 · 미리보기는 파일을 안 쓴다',
         [r.status, names, sb.exists('data/activities.json') || sb.exists('collector/open-api-report.md')], [0, Object.values(API_SOURCES).map((x) => x.name), false]);
     } finally { sb.done(); }
+  }
+
+  /* ── ⑫ robots.txt 를 누가 묻나 (정책 유지 — 갈림을 잠근다) ── */
+  {
+    const rb = fs.readFileSync(new URL('collector/robots.mjs', root), 'utf8');
+    const head = rb.slice(0, rb.indexOf('*/'));   // 첫 주석(머리말)만
+    eq('⑫ robots.mjs 머리말에 정책이 적혀 있다 — 대외활동·재단 출처는 학교 사이트라도 지키고 · 학교 장학·소식 게시판은 묻지 않는다',
+      [/대외활동·재단 출처는 학교 사이트에 있어도/.test(head), /장학 게시판/.test(head) && /소식 게시판/.test(head) && /묻지 않는다/.test(head)], [true, true]);
+    eq('  배선이 정책과 같다 — 장학 수집기는 활동·재단 출처만 묻고(역할로 가른다) · 소식 로봇은 묻지 않는다',
+      [/if \(\(isAct \|\| isExt\) && !\(await robotsAllows\(s\.boardUrl\)\)\)/.test(collectSrc), /robotsAllows|robots\.mjs/.test(newsSrc)], [true, false]);
   }
 }
