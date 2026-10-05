@@ -26,15 +26,15 @@ jobs:
     # ② 계열 수확이 전량 2,711쪽 · 약 25분이다(서버가 초당 ~1.9쪽으로 막는다).
     timeout-minutes: 55
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           # 🔴 기본 브랜치의 **지금 끝**에서 시작하고 그 브랜치에만 저장한다 (kosaf-fetch 와 같은 꼴 · 2026-10-05).
           #    기본값(GITHUB_SHA)은 실행이 생긴 시점에 굳어서 앞 로봇이 저장한 커밋 위로 rebase 하다 충돌할 수 있다(2026-09-30 사고) —
           #    브랜치 이름으로 받으면 체크아웃 시점의 끝이다. 어느 브랜치에서 깨워도 읽는 곳과 저장하는 곳이 같다.
           ref: claude/nice-heisenberg-WESq5
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
 
       - name: 등록금 수확
         env:

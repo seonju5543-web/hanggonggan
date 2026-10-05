@@ -37,7 +37,7 @@ jobs:
     steps:
       # 🔴 체크아웃이 먼저다 — 판정 도구(tools/)·경보 액션(.github/actions/)이 저장소 파일이다(관문 alerts ⑥ S2).
       #    맨 위 폴더의 파일(supabase-config.js)은 sparse 체크아웃에서도 늘 같이 받는다.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           sparse-checkout: |
             .github/actions

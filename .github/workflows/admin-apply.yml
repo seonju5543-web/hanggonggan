@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           # 🔴 대기줄(collector)에서 기다린 뒤에는 **지금 브랜치 끝**에서 시작한다 (2026-09-30).
           #    기본값(GITHUB_SHA)은 큐에 들어간 시점에 굳어서, 앞 로봇이 저장한 커밋 위로 rebase 하다
@@ -59,9 +59,9 @@ jobs:
       - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
         run: bash tools/setup-collab.sh
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
 
       - name: 요청 내용 적용
         id: apply

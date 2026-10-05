@@ -53,7 +53,7 @@ jobs:
       cancel-in-progress: true
     steps:
       - name: Checkout pushed ref
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: 노션 「작업 현황」 갱신

@@ -55,12 +55,12 @@ jobs:
     # 재수집 예산 12분 + 브라우저 설치·검증·저장. 상한은 예산의 그릇이지 '넉넉히'가 아니다.
     timeout-minutes: 50   # 크롬 설치 5 + 장학 11 + 활동 받기 8 + 글자 읽기 8 + 고르기 2 + 관문 5 + 저장 3 = 42 · 체크아웃·알림 여유 8 (2026-10-04)
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           # 로봇은 자기가 읽은 브랜치(= 기본 브랜치)에만 저장한다. 배포는 deploy-sync의 몫.
           ref: 'claude/nice-heisenberg-WESq5'
-      - uses: actions/setup-node@v4
-        with: { node-version: '20' }
+      - uses: actions/setup-node@v5
+        with: { node-version: '22' }
       - name: 진짜 크롬 설치
         timeout-minutes: 5
         run: |
@@ -148,7 +148,7 @@ jobs:
       - name: 실패하면 이슈로 알린다
         if: failure() || cancelled()
         continue-on-error: true
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const fs = require('fs');

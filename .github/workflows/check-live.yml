@@ -21,7 +21,7 @@ jobs:
     # 시한이 없으면 GitHub 기본값 **6시간**이다 (2026-09-06 신설). 하는 일은 주소 몇 개를 열어 보는 것뿐이다.
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: main
 

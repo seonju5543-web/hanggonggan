@@ -57,7 +57,7 @@ jobs:
     # 매달리면 **다음 배포가 줄을 선다** — 앱이 그 시간만큼 갱신되지 않는다.
     steps:
       - name: main 체크아웃
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: main
           fetch-depth: 0

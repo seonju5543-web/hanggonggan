@@ -55,14 +55,14 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: 기본 브랜치 체크아웃
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: claude/nice-heisenberg-WESq5
           fetch-depth: 0        # 병합 판단에 전체 이력이 필요하다
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
 
       # 로봇 기록장(공고 목록·본 공고 장부)이 양쪽에서 달라졌을 때 자동으로 합쳐 준다.
       # 이게 없으면 아래 병합이 사소한 데이터 차이로도 멈춘다 (COLLAB.md 참조).

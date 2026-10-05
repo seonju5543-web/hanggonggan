@@ -29,7 +29,7 @@ jobs:
     #    다시 받아 커밋했다(GitHub 은 강제 push 에서 바뀐 파일을 못 가려 paths 를 무시한다).
     if: ${{ !github.event.forced }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       # 🔴 표식 파일의 branch 줄과 push 된 브랜치가 같을 때만 돈다 (deploy/run-deploy.txt 와 같은 안전장치).
       #    이 파일은 기본 브랜치를 타고 모든 작업 브랜치로 퍼지므로, 남이 기본 브랜치를 병합해 받는 것만으로
       #    그 사람 브랜치에서 사진 수집이 돌아 커밋이 남는다(로봇 기록장이 옆 브랜치에서 갈라진다).
@@ -43,7 +43,7 @@ jobs:
           else
             echo "run=yes" >> "$GITHUB_OUTPUT"
           fi
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         if: steps.mark.outputs.run == 'yes'
         with:
           node-version: '22'

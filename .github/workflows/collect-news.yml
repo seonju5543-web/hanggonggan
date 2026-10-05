@@ -39,16 +39,16 @@ jobs:
     # (경보 짝 넷은 2026-10-04 로봇·도구 점검에서 더했다 — 경보는 이슈 하나에 모이고 회복하면 닫힌다 · tools/alert-issue.mjs)
     timeout-minutes: 39
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ github.ref_name }}   # 대기줄에서 기다린 뒤에는 지금 브랜치 끝에서 시작한다 (collect-scholarships 와 같은 이유)
 
       - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
         run: bash tools/setup-collab.sh
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
 
       # 게시판 찾기 (보강 — 실패해도 수집은 나간다). 수집 **앞**에 두어 이번에 찾은 게시판을 같은 실행이 바로 읽는다.
       # 첫 실행은 44곳을 다 보므로 넉넉히(50곳 · 5분). 다음부터는 boardUrl 이 비고 14일 지난 학교만 본다.
