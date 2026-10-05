@@ -5,9 +5,16 @@
      ② 재단 새 공고 — 마감 지난 글 (collect-09 · api-01 · app2-F6): 송파 상반기 06-24·음성 09-18 이 몇 달 떠 있었다 —
         마감 다음 날까지만(CLOSED_KEEP_DAYS 와 같은 뜻) · 제목 머리 [마감] 표식 · 마감 칸 없는 옛 글은 원문 기간 줄에서 같은 판독기로 채운다 ·
         소급 도구(tools/refilter-feeds.mjs)는 임시 폴더에서 진짜로 돌린다
+     ③ 합집합 병합기 (app2-F7): .gitattributes 에 merge=jsonunion 이라 적은 파일마다 **병합기를 진짜로 돌려** 규칙이 있는지 본다 ·
+        활동 피드는 학교 없는 글을 상한으로 자르지 않는다 · 재단 피드는 합친 뒤 발행 거름을 다시 건다(로봇이 뺀 지난 글을 되살리지 않는다) ·
+        seen-activities 는 이른 날짜
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
-import { stripComments } from './gate.mjs';
+import os from 'node:os';
+import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { stripComments, cleanEnv } from './gate.mjs';
 import { sandbox } from './bodies.mjs';
 import { clearFuturePosted, newsFloor } from '../../collector/news-kind.mjs';
 import { dropReason as extDropReason, fillDeadlineFromHint, tidyExternal } from '../../collector/external-clean.mjs';
@@ -90,5 +97,45 @@ export default async function qfeeds(eq, ctx) {
         [dry.status, unchanged, w.status, (out?.items || []).map((n) => n.url.slice(-1)), sb.read('data/external.json') === JSON.stringify(out, null, 1)],
         [0, true, 0, ['4'], true]);
     } finally { sb.done(); }
+  }
+
+  /* ── ③ 합집합 병합기 ── */
+  {
+    const merger = fileURLToPath(new URL('tools/merge-json-union.mjs', root));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-qfeeds-merge-'));
+    /* 병합 도구가 불리는 꼴 그대로: base ours theirs <경로> — ours 에 결과를 쓴다 */
+    const merge = (rel, base, ours, theirs) => {
+      const f = (n, x) => { const p = path.join(dir, n); fs.writeFileSync(p, JSON.stringify(x, null, 1)); return p; };
+      const o = f('o.json', ours);
+      const r = spawnSync(process.execPath, [merger, f('b.json', base), o, f('t.json', theirs), rel], { encoding: 'utf8', env: cleanEnv() });
+      let out = null;
+      try { out = JSON.parse(fs.readFileSync(o, 'utf8')); } catch { /* 못 읽음 */ }
+      return { status: r.status, err: r.stderr || '', out };
+    };
+    try {
+      const ga = fs.readFileSync(new URL('.gitattributes', root), 'utf8');
+      const declared = [...ga.matchAll(/^(\S+)\s+merge=jsonunion\b/gm)].map((m) => m[1].replace(/\*/g, 'x'));
+      const bad = declared.map((rel) => [rel, merge(rel, {}, {}, {})]).filter(([, r]) => r.status !== 0 || /규칙 없는 파일/.test(r.err))
+        .map(([rel, r]) => `${rel} (종료 ${r.status})`);
+      eq(`③ 합집합이라 적은 파일(${declared.length}개)마다 병합기를 돌리면 합친다 — 규칙 없는 파일이 없다`, [declared.length >= 10, bad], [true, []]);
+
+      const nat = (side, n) => Array.from({ length: n }, (_, i) => ({ url: `https://act.example.kr/${side}/${i}`, title: `${side} 글 ${i}`, foundAt: `2026-10-0${1 + (i % 3)}` }));
+      const acts = merge('data/activities.json', {}, { updatedAt: '2026-10-03', items: nat('a', 60) }, { updatedAt: '2026-10-04', items: nat('b', 60) });
+      eq('  활동 피드 — 학교 없는 전국 글 60+60 을 합치면 120 (학교 열쇠 하나로 묶여 40건에 잘리지 않는다) · 날짜는 늦은 쪽',
+        [acts.status, (acts.out?.items || []).length, acts.out?.updatedAt], [0, 120, '2026-10-04']);
+
+      const ext = merge('data/external.json', {},
+        { updatedAt: '2026-10-03', items: [{ url: 'https://e.example.or.kr/1', title: '하반기 장학생 선발 공고', host: '가재단', deadline: '2026-10-30' }] },
+        { updatedAt: '2026-10-04', items: [
+          { url: 'https://e.example.or.kr/2', title: '군민평생 장학생 선발 공고', host: '나장학회', deadline: '2026-09-18' },
+          { url: 'https://e.example.or.kr/3', title: "[마감] '주거 장학금' 대상자 모집", host: '다재단' },
+        ] });
+      eq('  재단 피드 — 합친 뒤 발행 거름을 다시 건다: 마감 지난 글·[마감] 표식 글은 되살아나지 않고 열린 글은 남는다',
+        [ext.status, (ext.out?.items || []).map((n) => n.url.slice(-1))], [0, ['1']]);
+
+      const seen = merge('collector/seen-activities.json', {}, { 'https://x/1': '2026-10-01' }, { 'https://x/1': '2026-10-03', 'https://x/2': '2026-10-04' });
+      eq('  seen-activities — 같은 열쇠는 이른 날짜를 남긴다(늦은 날짜면 같은 글을 새 글로 다시 담는다)',
+        [seen.status, seen.out], [0, { 'https://x/1': '2026-10-01', 'https://x/2': '2026-10-04' }]);
+    } finally { fs.rmSync(dir, { recursive: true, force: true }); }
   }
 }
