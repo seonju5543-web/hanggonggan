@@ -777,7 +777,12 @@ function fromDocs(it, extract, texts = docTexts(it)) {
 }
 /** 한 공고의 첨부 글자를 **한 번만** 뽑아 두는 게으른 상자 — 마감·접수 시작·발표가 나눠 쓴다. */
 function docsOnce(it) { let memo; return () => (memo ??= docTexts(it)); }
-export function deadlineFromDocs(it, texts) { return fromDocs(it, extractDeadline, texts); }
+/* 🔴 제목이 '연장'인데 첨부 글에 '연장'이 없으면 그 첨부는 **연장 전 원래 공고문**이다 — 그 마감은 지난 기간이라
+   읽지 않는다 (2026-10-05 · UI-12 · 상명대 「…(기간 연장)」 첨부가 원래 공고문이라 10.8 까지 열린 공고가 9.23 으로 닫힐 뻔했다) */
+export function deadlineFromDocs(it, texts) {
+  const extended = /연장/.test(`${it.name || ''} ${it.boardTitle || ''}`);
+  return fromDocs(it, (t) => (extended && !/연장/.test(t) ? null : extractDeadline(t)), texts);
+}
 export function openDateFromDocs(it, texts) { return fromDocs(it, extractOpenDate, texts); }
 export function announceFromDocs(it, texts) { return fromDocs(it, extractAnnounce, texts); }
 /* 접수 메일 주소도 같은 골격을 탄다 — 경희대는 본문이 '첨부파일 확인'으로 끝나

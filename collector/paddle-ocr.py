@@ -83,11 +83,13 @@ def main():
     args = [a for a in sys.argv[1:] if not a.startswith('--')]
     budget = next((int(a.split('=')[1]) for a in sys.argv[1:] if a.startswith('--budget-sec=')), 150)
     folder = args[0] if args else 'collector/act-files'
+    # --prefix=elig- : 장학 공고문 첨부만 (collector/extracted 에는 신청서 양식 form-* 도 섞여 있다 · 2026-10-05 UI-12)
+    prefix = next((a.split('=', 1)[1] for a in sys.argv[1:] if a.startswith('--prefix=')), '')
     if not os.path.isdir(folder):
         print(f'{folder} 없음 — 건너뜁니다')
         return 0
     todo = sorted(f for f in os.listdir(folder)
-                  if f.lower().endswith(IMAGE_EXT + ('.pdf',)) and not os.path.exists(os.path.join(folder, f + '.ocr.txt')))
+                  if f.startswith(prefix) and f.lower().endswith(IMAGE_EXT + ('.pdf',)) and not os.path.exists(os.path.join(folder, f + '.ocr.txt')))
     if not todo:
         write_status(folder, False, [], [])
         print('읽을 그림 없음')

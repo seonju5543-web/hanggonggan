@@ -1,7 +1,16 @@
 {
  "school": "아주대학교",
- "updatedAt": "2026-10-04",
+ "updatedAt": "2026-10-05",
  "items": [
+  {
+   "title": "내일 잊지말고 파란색 꼭👖🧢...파란학기제 10주년 이벤트 드레스코드 BLUE-💙",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=376987&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-05",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-05",
+   "thumb": "data/news/img/a9f6e96ddac07f5b.webp"
+  },
   {
    "title": "[공지] [학부/학사과정] 2026학년도 전기(2027년 2월) 조기졸업 신청 안내",
    "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=374471&article.offset=0&articleLimit=10",
@@ -101,7 +110,7 @@
    "school": "아주대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "thumb": "data/news/img/a86de82a90123d9a.webp"
+   "thumb": "data/news/img/f1f03636125c8dcc.webp"
   },
   {
    "title": "[공지] [학부] 어학졸업인증(2027년 2월 졸업)을 위한 공인어학 성적 등록 및 제출 안내 (~2027.1.22)",
@@ -119,7 +128,7 @@
    "school": "아주대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/5265f5d2a8cdc495.webp"
+   "thumb": "data/news/img/886da95c7ee83214.webp"
   },
   {
    "title": "[공지] [학부/학사과정] ★필독★ 출석(전자출결, 공결, 취업계 등) 관련 안내",
@@ -164,7 +173,7 @@
    "school": "아주대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/70331ce7bc212fbc.webp"
+   "thumb": "data/news/img/a7fcfb39e43e027c.webp"
   },
   {
    "title": "💡 U-Chance 10월 퀴즈대회 OPEN!💡",
@@ -172,7 +181,8 @@
    "postedAt": "2026-10-01",
    "school": "아주대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "thumb": "data/news/img/10edf970314424bc.webp"
   }
  ]
 }

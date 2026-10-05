@@ -19,7 +19,8 @@
    하는 일(수집기 끝부분의 '앱 발행' 단락과 같은 함수·같은 차례 — 새 글 얹기만 없다): data/notices.json 읽기 → 60일 · 첨부 링크 거르기
    → dedupeNotices → healFromLedger(메우기만 · 지금 글은 안 바꾼다 · foundAt 그대로 · 학교별 파일 상한 안에 드는 것만 ·
    같은 글이면 지금 학교별 파일의 판(그 주소)이 원천보다 먼저 — 원천은 링크 로봇이 고친 주소를 모른다 · 수집기와 같은 opts.current)
-   → dropUnserved → publishBySchool(자르기 전 목록) → capNotices → updatedAt(KST) → JSON.stringify(…, null, 1).
+   → dropUnserved → stripSiteChrome(게시판 공통 링크 걷기 · 정식 등록분과 함께 센다 — 읽기만 하고 registered.json 은 안 쓴다)
+   → publishBySchool(자르기 전 목록) → capNotices → updatedAt(KST) → JSON.stringify(…, null, 1).
    🔴 수집기 끝부분에 단계를 더하거나 빼면 여기도 같이 — 관문 「로봇·도구 점검 관문」 feed ⑤ 가 두 수집기의 공통 차례와 이 파일의 차례를 대조한다.
    ⚠️ registered.json 은 건드리지 않는다. 끝나면 node verify/audit-data.js 로 확인하고 data/notices.json · data/notices/ 를 커밋한다.
    ⚠️ 불러오는 순간 실행된다 — 관문·다른 로봇에서 import 하지 말 것.
@@ -30,7 +31,7 @@ import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { capNotices, dedupeNotices } from './url-key.mjs';
 import { loadCandidates, KEEP_DAYS } from './candidates.mjs';
-import { isAttachmentEntry } from './attachment-link.mjs';
+import { isAttachmentEntry, stripSiteChrome } from './attachment-link.mjs';
 import { healFromLedger, dropUnserved, publishBySchool, readSchoolFiles, FEED_HEAL_SINCE } from './publish-notices.mjs';
 
 /* 데이터는 **지금 자리(저장소 맨 위)** 의 data/·collector/ 를 읽고 쓴다 — 관문이 임시 저장소에서 이 도구를 그대로 돌려 보게(관리자 저장소와 같은 방식) */
@@ -95,6 +96,9 @@ if (DRY) { console.log('--dry — 아무것도 쓰지 않았습니다.'); proces
 if (!added.length) { console.log('메울 글이 없어 아무것도 쓰지 않았습니다.'); process.exit(0); }
 
 const beforeCap = dropUnserved(healed);
+/* 게시판 공통 링크를 첨부에서 걷는다 — 두 수집기와 같은 자리·같은 셈(정식 등록분과 함께 · attachment-link.mjs · 2026-10-05 기본 브랜치).
+   메운 글은 후보 장부의 옛 첨부를 그대로 들고 오므로 여기서 안 걷으면 다음 수집 실행까지 메뉴·규정 링크가 첨부로 보인다 */
+stripSiteChrome([beforeCap, (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'data/registered.json'), 'utf8')).items || []; } catch { return []; } })()]);
 const pub = publishBySchool(beforeCap, { dir: pathToFileURL(path.join(ROOT, 'data', 'notices') + path.sep) });
 notices.items = capNotices(beforeCap);
 notices.updatedAt = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);

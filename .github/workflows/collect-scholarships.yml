@@ -41,7 +41,7 @@ jobs:
     # 2026-09-29 수집망 2 → 44개교 복원: 「게시판 수집」 단계에 자체 상한 10분(예산 8분 + 마무리 2분)이 생겨
     # 단계 합 4+10+6+5+1+4+3+3+4 = 40 → 상한 44. ⚠️ 상한을 키우는 것으로 때우지 말 것 — 단계가 오래 걸리면
     # 그 단계의 예산(HARVEST_BUDGET_MS)을 줄이고, 상한은 그 합을 담는 그릇으로만 쓴다(8/2~3 사고의 교훈).
-    timeout-minutes: 59   # 2026-10-04 관문 다시 재기 3분(gate-guard — 새 단계의 몫) → 단계 합 54 + 여유 5 (2026-10-03 대외활동 첨부·포스터 9분 → 51+5 · 2026-09-30 판정 로봇 2분 → 42+3)
+    timeout-minutes: 66   # 단계 합 61 + 여유 5 — 2026-10-05 장학 포스터 PaddleOCR 단계 7분 + 2026-10-04 관문 다시 재기 3분(gate-guard) (2026-10-03 대외활동 첨부·포스터 9분 → 51+5 · 2026-09-30 판정 로봇 2분 → 42+3)
     steps:
       - uses: actions/checkout@v4
         with:
@@ -162,6 +162,48 @@ jobs:
           pip install olefile --quiet || true
           python3 collector/hwp-bodytext.py || true
 
+      # PDF 글자 뽑기 (2026-09-05) — 첨부 293개 중 HWP 138개만 읽히고 있었다.
+      # PDF 94개(262만 자)가 잠들어 있었고 그 안에 자격·금액·작성 규정이 들어 있다.
+      # 🔴 위 '양식 확보' 단계 **안에** 넣으면 그 단계의 예산(6분)을 먹어 뒤따르는
+      #    스키마화가 통째로 안 돈다(2026-08-04 사고와 같은 구조). 그래서 자기 단계로 둔다.
+      # 🔴 OCR **앞**에 둔다 (2026-10-05 병합) — ocr-text.py 는 '글자층이 있는 PDF 는 pdf-text 가 이미 뽑았다'(.txt 가 있으면 건너뜀)로
+      #    양식·층2 PDF 를 거른다. OCR 이 발췌 앞으로 올라가며 이 단계보다 앞서게 되자, 이번 실행에 새로 받은 양식 PDF 를 OCR 이 먼저
+      #    쪽 그림으로 읽느라 예산(150초)을 썼다. 목록 갱신(apt-get update)도 여기 한 번만 한다.
+      - name: PDF 글자 뽑기
+        timeout-minutes: 3
+        continue-on-error: true
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+          python3 collector/pdf-text.py
+
+      # 그림·스캔 첨부 글자 읽기 (OCR · 2026-09-17 개발자 지시 "직접 할 수 있으면 사용") — 무료 tesseract.
+      # 🔴 발췌·금액 **앞**에 둔다 (2026-10-05 · UI-12) — 뒤에 있으면 그 실행의 발췌·금액은 OCR 글자를 못 보고, 다음 실행의
+      #    첨부 받기가 같은 공고를 다시 받으며 .ocr.txt 를 지워 **영영 못 읽었다**(첨부 받기 → OCR → 발췌 순서 · 관문 「첨부 받기」).
+      #    지금 첨부 받기는 받은 바이트가 같으면 .ocr.txt 를 지우지 않는다(deepfetch.mjs · 점검 bodies-5) — 순서는 새로 받은 첨부를 그 실행에 읽기 위한 것.
+      # 품질 관문(한글 비율)을 넘은 것만 .ocr.txt 로 남기고, 장부(ocr-ledger.json)가 같은 파일을 다시 안 읽는다.
+      # 🔴 `|| true` 로 설치 실패를 삼키지 말 것 — '매번 0개 + 초록불'(pdf-text 와 같은 규칙 · test-collector 관문).
+      - name: 그림·스캔 첨부 글자 읽기 (OCR)
+        timeout-minutes: 4
+        continue-on-error: true
+        run: |
+          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-kor poppler-utils
+          python3 collector/ocr-text.py --budget-sec=150
+
+      # 장학 포스터는 PaddleOCR (2026-10-05 개발자 지시 "paddle ocr 붙여") — tesseract 가 관문을 못 넘긴 디자인 포스터를 읽는다
+      # (대외활동과 같은 도구 · 판 고정도 같다). 공고문 첨부(elig-*)만 · tesseract 가 남긴 .ocr.txt 는 건너뛴다(paddle-ocr.py).
+      # 🔴 읽은 뒤 **그 공고의 그림인가**를 본다(elig-ocr-guard.mjs) — 본문 그림에는 사이트 배너·다른 장학금 홍보물이 섞여 온다.
+      # 발췌·금액 **앞**이어야 그 실행에서 읽힌다(위 OCR 단계와 같은 이유). 보강 규칙: 자기 상한 + continue-on-error.
+      - name: 장학 포스터 글자 읽기 (PaddleOCR · 보강)
+        timeout-minutes: 7
+        continue-on-error: true
+        run: |
+          # 🔴 설치·읽기 실패를 `|| true` 로 삼키지 않는다(아래 대외활동 단계와 같은 규칙 · 2026-10-04 점검 gaps-02) — 엔진 고장은 경고로 남기고,
+          #    bash -e 에 끊기지 않아 주인 확인(tesseract 가 읽은 그림 글자도 본다)은 늘 돈다
+          pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3 || echo "::warning::PaddleOCR 설치 실패 — 장학 포스터 읽기는 건너뛰고 주인 확인은 계속"
+          python3 collector/paddle-ocr.py collector/extracted --prefix=elig- --budget-sec=180 || echo "::warning::PaddleOCR 실패(엔진 고장이면 종료 코드 2) — 주인 확인은 계속"
+          node collector/elig-ocr-guard.mjs
+
       - name: 공고 원문 발췌 갱신 (정직 원칙 — 추론 대신 원문 그대로)
         run: node collector/extract-excerpts.mjs --write
 
@@ -190,30 +232,6 @@ jobs:
           node collector/kind-classify.mjs || echo "kind-classify 실패 — 다음 줄은 계속"
           node collector/portal-candidates.mjs || echo "portal-candidates 실패"
 
-      # 데이터 관문 (2026-07-30 도입): 로봇이 바꾼 데이터가 규칙을 어기면 저장하지 않고 되돌린다.
-      # 잘못된 공고가 앱에 하루라도 노출되는 일을 막는 장치 — 사람이 감사를 기억해서 돌릴 필요가 없다.
-      # 위치 규칙 (2026-08-01): 관문은 **저장 직전**에 둔다. 예전엔 양식 스키마화보다 앞에 있어서
-      # 스키마화가 만든 잘못된 연결이 그 실행에서는 안 잡히고 다음 날 실행에서 터졌다(이슈 #79).
-      # PDF 글자 뽑기 (2026-09-05) — 첨부 293개 중 HWP 138개만 읽히고 있었다.
-      # PDF 94개(262만 자)가 잠들어 있었고 그 안에 자격·금액·작성 규정이 들어 있다.
-      # 🔴 위 '양식 확보' 단계 **안에** 넣으면 그 단계의 예산(6분)을 먹어 뒤따르는
-      #    스키마화가 통째로 안 돈다(2026-08-04 사고와 같은 구조). 그래서 자기 단계로 둔다.
-      - name: PDF 글자 뽑기
-        timeout-minutes: 3
-        continue-on-error: true
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq poppler-utils
-          python3 collector/pdf-text.py
-      # 그림·스캔 첨부 글자 읽기 (OCR · 2026-09-17 개발자 지시 "직접 할 수 있으면 사용") — 무료 tesseract.
-      # 품질 관문(한글 비율)을 넘은 것만 .ocr.txt 로 남기고, 장부(ocr-ledger.json)가 같은 파일을 다시 안 읽는다.
-      # 🔴 `|| true` 로 설치 실패를 삼키지 말 것 — '매번 0개 + 초록불'(pdf-text 와 같은 규칙 · test-collector 관문).
-      - name: 그림·스캔 첨부 글자 읽기 (OCR)
-        timeout-minutes: 4
-        continue-on-error: true
-        run: |
-          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-kor poppler-utils
-          python3 collector/ocr-text.py --budget-sec=150
       # 대외활동·공모전 — 본문에 자격이 없는 글의 첨부·포스터를 무료로 읽는다 (2026-10-03 개발자 지시 "무료로 최대한 땜빵").
       # 받은 파일은 collector/act-files/(.gitignore) — 한 단계 안에서 받고(①) HWP·OCR 글자를 뽑고 자격을 고른다(②). 커밋은 장부 act-docs.json 만.
       # 유료 AI(③)는 여기서 안 돈다 — 「자격요건 매칭 · AI 자격 읽기」 버튼에서만. 보강 단계 규칙: 자기 상한 + continue-on-error.
@@ -229,6 +247,10 @@ jobs:
           pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3 || echo "::warning::PaddleOCR 설치 실패 — 아래 읽기가 엔진 없음으로 적고 HWP·본문으로만 계속"   # 🔴 실패를 삼키지도, 경고 없이 떼지도 말 것 — 떼면 같은 단계의 --apply 가 bash -e 에 끊겨 HWP 로 읽은 자격까지 버려진다(2026-10-04 점검 gaps-02) · 🔴 판 고정 — 3.3.x 는 x86 CPU 에서 첫 그림부터 ConvertPirAttribute2RuntimeAttribute 오류(2026-10-04 첫 클라우드 실행 · PaddleOCR discussions 17350)
           python3 collector/paddle-ocr.py collector/act-files --budget-sec=180 || echo "::warning::PaddleOCR 실패 — 자격 읽기는 HWP·본문으로만 계속(엔진 고장이면 그 글의 기회는 --apply 가 되돌린다)"
           node collector/activity-docs.mjs --apply
+      # 데이터 관문 (2026-07-30 도입): 로봇이 바꾼 데이터가 규칙을 어기면 저장하지 않고 되돌린다.
+      # 잘못된 공고가 앱에 하루라도 노출되는 일을 막는 장치 — 사람이 감사를 기억해서 돌릴 필요가 없다.
+      # 위치 규칙 (2026-08-01): 관문은 **저장 직전**에 둔다. 예전엔 양식 스키마화보다 앞에 있어서
+      # 스키마화가 만든 잘못된 연결이 그 실행에서는 안 잡히고 다음 날 실행에서 터졌다(이슈 #79).
       - name: 데이터 관문 (수집기 규칙 테스트 + 데이터 감사)
         id: audit
         continue-on-error: true
@@ -307,14 +329,32 @@ jobs:
               if git push; then pushed=1; break; fi
               # --autostash: 저장 목록에 안 든 파일이 남아 있어도 재시도가 죽지 않게 (2026-08-02).
               # 이게 없으면 "cannot pull with rebase: You have unstaged changes"로 실행 전체가 날아간다.
-              git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+              # 🔴 얹다가 충돌하면(규칙 없는 파일 등) 여기서 바로 죽지 않고 되돌린 뒤 빠져나간다 —
+              #    죽으면 아래 '못 넣은 수집분 보관'이 안 돌아 그 실행 결과가 통째로 사라진다 (2026-10-04 run 37203460175)
+              if ! git pull --rebase --autostash origin "${GITHUB_REF_NAME}"; then
+                git rebase --abort || true
+                echo "::error::기본 브랜치에 얹다가 충돌 — 재시도해도 같은 충돌이라 멈춘다"
+                break
+              fi
             done
             # 3번 다 실패하면 조용히 넘어가지 않는다 — 빨간불로 죽고 아래 실패 알림이 이슈에 붙는다
             if [ "$pushed" != "1" ]; then
-              echo "::error::수집 데이터 push 실패 — 3회 재시도 모두 실패. 이번 수집분이 저장되지 않았습니다."
+              echo "::error::수집 데이터 push 실패(충돌 또는 3회 재시도 실패) — 이번 수집분은 기본 브랜치에 안 들어갔다. 실행 결과물 unsaved-<실행 번호> 에 묶음으로 남긴다."
+              # 수집분을 묶음(bundle)으로 남긴다 → 아래 단계가 실행 결과물(artifact)로 올린다.
+              # 되살리기: 받은 파일로 `git fetch unsaved.bundle && git cherry-pick FETCH_HEAD` (충돌은 사람이 고른다)
+              mkdir -p unsaved && git bundle create unsaved/unsaved.bundle HEAD~1..HEAD HEAD || true
               exit 1
             fi
           fi
+
+      - name: 못 넣은 수집분 보관 (저장 실패 때만)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsaved-${{ github.run_id }}
+          path: unsaved/
+          retention-days: 14
+          if-no-files-found: ignore
 
       - name: 컨펌용 리포트 이슈 생성
         # 수집 스텝이 값을 못 남긴 경우('')엔 리포트를 만들지 않는다 — 건수 없는 빈 이슈 방지

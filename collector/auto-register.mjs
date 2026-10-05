@@ -23,6 +23,7 @@ import { loadSchoolNames, schoolTokens } from './school-names.mjs';
 import { mergeInto } from './registered-merge.mjs';
 /* 데이터 관문에 거듭 걸린 공고는 3일 쉰다 — 장부 규칙은 auto-held.mjs 한 곳(되돌리는 gate-guard 와 같은 파일 · 2026-10-04) */
 import { isHeld, pruneRegistered } from './auto-held.mjs';
+import { stripSiteChrome } from './attachment-link.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfgPath = new URL('auto-register-config.json', HERE);
@@ -406,7 +407,10 @@ if (!cfg.enabled) {
     added.push(entry);
   }
 
-  if (added.length || removed || promoted.length) {
+  /* 게시판 공통 링크를 정식 등록 첨부에서도 걷는다 — 장부와 함께 세야 등록 뒤에 드러난 것도 걷힌다(attachment-link.mjs · 2026-10-05).
+     장부(notices)는 여기서 저장하지 않는다 — 장부는 수집 로봇이 같은 규칙으로 걷는다 */
+  const chromeRemoved = stripSiteChrome([registered.items, notices.items || []]);
+  if (added.length || removed || promoted.length || chromeRemoved) {
     registered.updatedAt = TODAY;
     fs.writeFileSync(registeredPath, JSON.stringify(registered, null, 1) + '\n');
   }

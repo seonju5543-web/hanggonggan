@@ -329,7 +329,7 @@ class Component extends DCLogic {
   boot(resolve) {
     if (this.timer) clearTimeout(this.timer);
     this.setState({ open: true, booting: true });
-    this.timer = setTimeout(() => { this.setState({ booting: false }); resolve(); }, 1000);
+    this.timer = setTimeout(() => { this.setState({ booting: false }); resolve(); }, 1700);   // = boot.js BOOT_INTRO_SHOW_MS (켤 때마다 인트로 · 관문이 대조)
   }
 
   openAfter(minutes, label) {

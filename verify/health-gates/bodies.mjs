@@ -10,7 +10,7 @@
            실행 로그 주소를 단다 · 성공하면 옛 실패 이슈를 닫는다(bodies-7) · 관문에 걸려 되돌릴 때 장부도 되돌린다(bodies-12 ③)
      ② PaddleOCR 엔진 고장(gaps-02) — paddle-ocr.py 를 가짜 paddleocr·PIL 로 진짜 돌려 종료 코드 2·::warning::·상태 파일 ·
         activity-docs 의 장부 판 이동·기회 되돌리기(--apply·--fetch 를 임시 폴더에서 진짜로) · 두 워크플로가 실패를 삼키지 않는다
-     ③ 자격용 공고문 첨부(deepfetch --elig-attach · bodies-3·5) — 받은 그대로는 다시 안 받는다 · 파생 글자 보존 (가짜 fetch 로 진짜 실행)
+     ③ 자격용 공고문 첨부(deepfetch --elig-attach · bodies-3·5) — 줄이 돈다(고르기는 기본 브랜치 elig-targets.mjs) · 미리 몽땅 지우지 않고 바이트가 같으면 파생 글자 보존 (가짜 fetch 로 진짜 실행)
      ④ 원문 보충(deepfetch --fill · B8 · bodies-12 ①) — 껍데기도 세어 물러선다 · 받기 예산 · 심층 수집 대기줄 (가짜 fetch 로 진짜 실행)
      ⑤ OCR(ocr-text.py · bodies-6) — 글자층이 있어도 자격용 PDF 는 쪽 그림으로
      ⑥ AI 자격 읽기 버튼(eligibility-fill.yml · bodies-10) — 대상 세 갈래 합 · 0 이면 돈이 드는 단계만 건너뛴다 (세기 줄을 bash 로 진짜 실행)
@@ -26,7 +26,7 @@ import { cleanEnv, stripComments, stripYamlComments } from './gate.mjs';
 import { browserBodyEntry, clickBodyEntry } from '../../collector/html-text.mjs';
 import { canonUrl } from '../../collector/canon-url.mjs';
 import { restingAfterOk, closedForStudents, orderTargets, ledgerEntry, newAttachments, pruneLedger } from '../../collector/rescue-plan.mjs';
-import { slugOf, attSig, missWait, pickEligDocTargets } from '../../collector/elig-attach-plan.mjs';
+import { pickEligTargets } from '../../collector/elig-targets.mjs';
 import { fillRetired, nextShells, fillCounts } from '../../collector/notice-source.mjs';
 
 const kstToday = () => new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
@@ -397,98 +397,149 @@ export default async function bodies(eq, ctx) {
     }
   }
   {
-    for (const f of ['collect-scholarships.yml', 'rescue-bodies.yml']) {
-      const y = stripYamlComments(readText(`.github/workflows/${f}`));
-      eq(`② ⓒ ${f} — PaddleOCR 설치·읽기 실패를 \`|| true\` 로 삼키지 않는다(경고를 남기고, 같은 단계의 --apply 는 계속)`,
-        [/pip install[^\n]*paddleocr==[\d.]+[^\n]*\|\| true/.test(y), /pip install[^\n]*paddleocr==[\d.]+ \|\| echo "::warning::/.test(y),
-          /paddle-ocr\.py[^\n]*\|\| true/.test(y), /paddle-ocr\.py collector\/act-files --budget-sec=\d+ \|\| echo "::warning::/.test(y)],
-        [false, true, false, true]);
+    /* PaddleOCR 을 까는·부르는 줄 **전부**를 본다(2026-10-05 병합 — 기본 브랜치가 장학 포스터 단계를 새로 달며 `|| true` 로 삼키고 설치 줄은
+       경고 없이 두었다: 설치가 실패하면 bash -e 에 끊겨 같은 단계의 주인 확인이 안 돌았다). 파일 목록을 박지 않고 워크플로 전부에서 찾는다. */
+    const pins = new Map();
+    const wfDir = new URL('.github/workflows/', root);
+    for (const f of fs.readdirSync(wfDir).filter((x) => x.endsWith('.yml')).sort()) {
+      const lines = stripYamlComments(readText(`.github/workflows/${f}`)).split('\n');
+      const installs = lines.filter((l) => /pip install[^\n]*paddleocr/.test(l));
+      const runs = lines.filter((l) => /python3 collector\/paddle-ocr\.py/.test(l));
+      if (!installs.length && !runs.length) continue;
+      for (const l of installs) {
+        const pin = (l.match(/paddlepaddle==[\d.]+ paddleocr==[\d.]+/) || ['(판 고정 없음)'])[0];
+        pins.set(pin, [...(pins.get(pin) || []), f]);
+      }
+      eq(`② ⓒ ${f} — PaddleOCR 설치 ${installs.length}줄·읽기 ${runs.length}줄 전부 실패를 \`|| true\` 로 삼키지도, 경고 없이 bash -e 에 끊기지도 않는다(경고를 남기고 같은 단계 다음 줄은 계속 · gaps-02)`,
+        [...installs, ...runs].filter((l) => /\|\| true/.test(l) || !/\|\| echo "::warning::/.test(l)).map((l) => l.trim().slice(0, 70)), []);
     }
+    eq(`  PaddleOCR 판 고정은 모든 워크플로·단계가 한 벌 — 두 판이 섞이면 뒤 단계가 다른 판을 다시 깐다(단계가 여럿이라 설치 줄도 여럿 · 지금: ${[...pins.keys()].join(' / ')})`,
+      pins.size === 1 && !pins.has('(판 고정 없음)'), true);
+    /* 읽은 결과(paddle-status.json)는 읽는 폴더에 남는다 — 장학 포스터 단계는 collector/extracted 를 읽는데, 수집 저장 단계가 그 폴더를 통째로
+       add 하므로 무시 규칙이 없으면 매 실행 커밋된다(2026-10-05 병합). 부르는 폴더를 워크플로에서 뽑아 git 에 직접 묻는다. */
+    const folders = [...new Set(fs.readdirSync(wfDir).filter((x) => x.endsWith('.yml'))
+      .flatMap((f) => [...stripYamlComments(readText(`.github/workflows/${f}`)).matchAll(/python3 collector\/paddle-ocr\.py (\S+)/g)].map((m) => m[1])))].sort();
+    const notIgnored = folders.filter((d) => spawnSync('git', ['check-ignore', '-q', `${d}/paddle-status.json`], { cwd: fileURLToPath(root) }).status !== 0);
+    eq(`  PaddleOCR 결과 파일(paddle-status.json)은 읽는 폴더(${folders.join(' · ')}) 어디서든 커밋되지 않는다`, notIgnored, []);
   }
-  /* ── ③ 자격용 공고문 첨부 받기(deepfetch --elig-attach) — 받은 그대로인 공고는 다시 안 받는다 · 파생 글자 보존 (bodies-3·bodies-5) ── */
+  {
+    /* ② ⓓ 라이브러리 표식이 새지 않는다 — 대외활동 로봇(activity-docs.mjs)을 함수만 쓰려고 불러오는 모듈은 표식(ACTIVITY_DOCS_AS_LIB)을 되돌려야 한다.
+       2026-10-05 병합: 장학 그림 주인 확인(elig-ocr-guard.mjs)이 표식을 남겨, 그것을 먼저 불러온 test-collector 가 띄운 activity-docs.mjs --apply·--fetch
+       자식이 본편을 안 돌고 0 으로 끝났다(②ⓑ 가 헛잼 → 빨간불 · 수집 로봇의 데이터 관문도 같은 길). 자식 프로세스에서 불러 보고 표식을 본다. */
+    const leaks = [], seen = [];
+    for (const f of fs.readdirSync(new URL('collector/', root)).filter((x) => x.endsWith('.mjs')).sort()) {
+      const src = readText(`collector/${f}`);
+      if (f === 'activity-docs.mjs' || !/import\(\s*['"]\.\/activity-docs\.mjs['"]\s*\)/.test(src) || !/ACTIVITY_DOCS_AS_LIB\s*=/.test(src)) continue;
+      if (!/^export /m.test(src)) continue;   // 불러다 쓰는 모듈만(실행 전용 파일은 프로세스가 곧 끝난다)
+      seen.push(f);
+      const r = spawnSync(process.execPath, ['--input-type=module', '-e',
+        `await import(${JSON.stringify(new URL(`collector/${f}`, root).href)}); console.log('AS_LIB=' + (process.env.ACTIVITY_DOCS_AS_LIB ?? '없음'));`],
+        { encoding: 'utf8', timeout: 20000, env: cleanEnv() });
+      const got = ((r.stdout || '').match(/AS_LIB=(\S+)/) || [])[1] || `(실행 실패 ${String(r.stderr || '').slice(-120)})`;
+      if (got !== '없음') leaks.push(`${f}: ${got}`);
+    }
+    eq(`② ⓓ 대외활동 로봇을 함수로만 불러오는 모듈(${seen.join(' · ') || '없음'})은 라이브러리 표식(ACTIVITY_DOCS_AS_LIB)을 되돌린다 — 남기면 같은 프로세스가 띄우는 로봇 자식이 헛돈다`,
+      [seen.length > 0, leaks], [true, []]);
+    const prev = process.env.ACTIVITY_DOCS_AS_LIB;
+    process.env.ACTIVITY_DOCS_AS_LIB = '1';
+    const kept = [cleanEnv().ACTIVITY_DOCS_AS_LIB, cleanEnv({ ACTIVITY_DOCS_AS_LIB: '1' }).ACTIVITY_DOCS_AS_LIB];
+    if (prev === undefined) delete process.env.ACTIVITY_DOCS_AS_LIB; else process.env.ACTIVITY_DOCS_AS_LIB = prev;
+    eq('  관문이 띄우는 자식 환경(cleanEnv)은 표식을 물려주지 않는다 · 일부러 넘기면 남긴다', kept, [undefined, '1']);
+  }
+  /* ── ③ 자격용 공고문 첨부 받기(deepfetch --elig-attach) — 줄이 돌고(앞의 몇 건이 자리를 차지하지 않는다) · 다시 받아도 파생 글자 보존 (bodies-3·bodies-5) ──
+     고르기는 기본 브랜치의 elig-targets.mjs pickEligTargets 한 곳(2026-10-05 · 시도한 날 `at` · 사흘 쉼 · 안 해 본 것 → 오래된 것).
+     점검 수리(elig-attach-plan.mjs 의 '받은 그대로면 건너뛰기')는 병합 때 걷었다 — 같은 일을 하는 고르기가 둘이 되지 않게(2026-10-05).
+     남은 점검 수리는 deepfetch 의 '갈아끼우기': 미리 몽땅 지우지 않는다 · 받은 바이트가 같으면 파생 글자를 지우지 않는다 · 못 받으면 옛 파일 그대로. */
   {
     const today = '2026-10-04';
-    const now = new Date('2026-10-04T03:00:00Z');
-    const att = (n) => [{ name: `2026 장학생 선발 공고문 ${n}.hwp`, url: `https://f.example/${n}.hwp` }];
+    const att = [{ name: '2026 장학생 선발 공고문.hwp', url: 'https://f.example/x.hwp' }];
     const items = [];
     const index = {};
-    const onDisk = new Set();
-    for (let i = 1; i <= 6; i++) {   // 1~6 은 받은 그대로 — 색인·파일 있음 · 서명 같음
-      items.push({ id: `n${i}`, name: `공고 ${i}`, attachments: att(i), listedAt: today });
-      index[`n${i}`] = { slug: slugOf(`공고 ${i}`), files: [`elig-${i}.hwp`], sig: attSig(att(i)) };
-      onDisk.add(`elig-${i}.hwp`);
+    for (let i = 1; i <= 6; i++) {   // 1~6 은 어제 받아 봤다(자격은 여전히 못 읽음) — 예전엔 매 실행 이 여섯이 앞자리를 다 차지했다
+      items.push({ id: `n${i}`, attachments: att });
+      index[`n${i}`] = { slug: `s${i}`, files: [`elig-s${i}-1.hwp`], at: shift(today, -1) };
     }
-    items.push({ id: 'n7', name: '공고 7', attachments: att(7), listedAt: today });                     // 처음
-    items.push({ id: 'n8', name: '공고 8', attachments: att(8), listedAt: today });                     // 처음
-    items.push({ id: 'n9', name: '공고 9', attachments: att(9), deadline: '2026-10-03' });             // 마감 어제
-    items.push({ id: 'n10', name: '공고 10', attachments: att('10-새판'), listedAt: today });            // 첨부 이름이 바뀜
-    index.n10 = { slug: slugOf('공고 10'), files: ['elig-10.hwp'], sig: attSig(att(10)) }; onDisk.add('elig-10.hwp');
-    items.push({ id: 'n11', name: '공고 11', attachments: att(11), listedAt: today });                   // 서명 칸 없는 옛 색인
-    index.n11 = { slug: slugOf('공고 11'), files: ['elig-11.hwp'] }; onDisk.add('elig-11.hwp');
-    items.push({ id: 'n12', name: '공고 12', attachments: att(12), listedAt: today });                   // 오늘 하나도 못 받음 — 쉰다
-    index.n12 = { slug: slugOf('공고 12'), files: [], tried: { sig: attSig(att(12)), at: today, miss: 1 } };
-    items.push({ id: 'n13', name: '공고 13', attachments: att(13), listedAt: today });                   // 사흘 전 못 받음 — 다시
-    index.n13 = { slug: slugOf('공고 13'), files: [], tried: { sig: attSig(att(13)), at: '2026-10-01', miss: 1 } };
-    items.push({ id: 'n14', name: '공고 14', attachments: att(14), listedAt: today, eligibilityLines: ['직전학기 평점평균 3.0 이상인 재학생'] });
-    const RL = (it) => it.eligibilityLines || [];
-    const plan = pickEligDocTargets(items, index, { today, now, fileExists: (f) => onDisk.has(f), requirementLines: RL, pickAtts: (it) => it.attachments, max: 6 });
-    eq('③ 받을 차례 — 처음 받는 것(7·8·13) → 첨부가 바뀐 것(10) · 받은 그대로(1~6)·마감 지남(9)·오늘 못 받아 쉬는 것(12)·자격 있는 것(14)은 없다',
-      plan.targets.map((t) => t.it.id), ['n7', 'n8', 'n13', 'n10']);
-    eq('  서명 칸 없는 옛 색인(11)은 다시 받지 않고 서명만 채운다 · 받은 그대로 센 수', [plan.sigOnly.map((s) => s.id), plan.kept], [['n11'], 7]);
-    eq('  하나도 못 받은 공고의 쉼 — 1·2·4·8·14일', [1, 2, 3, 4, 5, 9].map((m) => missWait(m)), [1, 2, 4, 8, 14, 14]);
+    items.push({ id: 'n7', attachments: att }, { id: 'n8', attachments: att });                                      // 처음
+    items.push({ id: 'n13', attachments: att }); index.n13 = { slug: 's13', files: [], at: shift(today, -10) };        // 열흘 전에 해 봤다
+    items.push({ id: 'n14', attachments: att, eligibilityLines: ['재학생'], deadline: '2026-10-30', amountValue: 1000000 });   // 다 읽었다
+    items.push({ id: 'n15', attachments: att, eligibilityLines: ['재학생'], deadline: '2026-10-30' });               // 자격만 읽고 금액이 비었다
+    const o = { requirementLines: (it) => it.eligibilityLines || [], docAtts: (it) => it.attachments, live: () => true, max: 6 };
+    eq('③ 받을 차례 — 처음(7·8·15) → 오래전에 해 본 것(13) · 어제 해 본 1~6 은 쉬고(앞자리를 차지하지 않는다) · 다 읽은 것(14)은 없다 (bodies-3)',
+      pickEligTargets(items, index, today, o).map((t) => t.it.id), ['n7', 'n8', 'n15', 'n13']);
   }
   {
-    const sb3 = sandbox(root, 'hdj-eligatt-');
-    try {
-      sb3.write('fake-fetch.mjs', `import fs from 'node:fs';
+    const FAKE = `import fs from 'node:fs';
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 globalThis.fetch = async (url) => {
-  if (process.env.FAKE_FETCH_LOG) fs.appendFileSync(process.env.FAKE_FETCH_LOG, String(url) + '\\n');
-  const body = Buffer.from(('fake ' + url + ' ').repeat(60));
+  url = String(url);
+  if (process.env.FAKE_FETCH_LOG) fs.appendFileSync(process.env.FAKE_FETCH_LOG, url + '\\n');
+  await sleep(Number(process.env.FAKE_FETCH_DELAY || 0));
+  if (process.env.FAKE_FAIL && new RegExp(process.env.FAKE_FAIL).test(url)) return { ok: false, status: 404, headers: new Map() };
+  const tag = process.env.FAKE_NEW && new RegExp(process.env.FAKE_NEW).test(url) ? 'new ' : 'fake ';
+  const body = Buffer.from((tag + url + ' ').repeat(60));
   return { ok: true, status: 200, headers: new Map(), arrayBuffer: async () => body.buffer.slice(body.byteOffset, body.byteOffset + body.length) };
 };
-`);
-      const today = kstToday();
-      const bytesOf = (u) => Buffer.from(`fake ${u} `.repeat(60));
-      const A = (k, ext = 'hwp') => [{ name: `2026 ${k} 장학생 선발 공고문.${ext}`, url: `https://f.example/${k}.${ext}` }];
+`;
+    const today = kstToday();
+    const A = (k, ext = 'hwp') => [{ name: `2026 ${k} 장학생 선발 공고문.${ext}`, url: `https://f.example/${k}.${ext}` }];
+    const run = (sb, env = {}) => {
+      sb.write('fetch.log', '');
+      const r = sb.run('collector/deepfetch.mjs', ['--elig-attach'], { FAKE_FETCH_LOG: sb.abs('fetch.log'), ...env }, 25000, ['--import', sb.abs('fake-fetch.mjs')]);
+      const fetched = (sb.read('fetch.log') || '').split('\n').filter(Boolean).map((u) => u.replace('https://f.example/', '')).sort();
+      return { status: r.status, fetched, out: r.out, idx: sb.json('collector/extracted/elig-docs.json') || {} };
+    };
+    const ex = (sb, f) => sb.exists(`collector/extracted/${f}`);
+    const sb3 = sandbox(root, 'hdj-eligatt-');
+    try {
+      sb3.write('fake-fetch.mjs', FAKE);
+      sb3.write('data/notices.json', { items: [] });
       const reg = { items: [
-        { id: 'S', name: '같은 공고', attachments: A('s'), listedAt: today },
-        { id: 'C', name: '바뀐 목록 같은 바이트', attachments: A('c', 'pdf'), listedAt: today },
-        { id: 'D', name: '바뀐 목록 다른 바이트', attachments: A('d', 'pdf'), listedAt: today },
-        { id: 'N', name: '처음 받는 공고', attachments: A('n'), listedAt: today },
+        { id: 'S', name: '오늘 받아 본 공고', attachments: A('s'), listedAt: today },
+        { id: 'C', name: '쉼이 끝난 공고 같은 바이트', attachments: A('c', 'pdf'), listedAt: today },
+        { id: 'D', name: '쉼이 끝난 공고 다른 바이트', attachments: A('d', 'pdf'), listedAt: today },
+        { id: 'F', name: '쉼이 끝났는데 못 받는 공고', attachments: A('f'), listedAt: today },
         { id: 'X', name: '마감 지난 공고', attachments: A('x'), deadline: shift(today, -1) },
       ] };
       sb3.write('data/registered.json', reg);
-      sb3.write('data/notices.json', { items: [] });
-      const fileOf = (name, ext) => `elig-${slugOf(name)}-1.${ext}`;
-      const fS = fileOf('같은 공고', 'hwp'), fC = fileOf('바뀐 목록 같은 바이트', 'pdf'), fD = fileOf('바뀐 목록 다른 바이트', 'pdf'), fN = fileOf('처음 받는 공고', 'hwp');
-      sb3.write(`collector/extracted/${fS}`, bytesOf('https://f.example/s.hwp'));
-      sb3.write(`collector/extracted/${fS}.body.txt`, '같은 공고 본문 글자');
-      sb3.write(`collector/extracted/${fC}`, bytesOf('https://f.example/c.pdf'));
+      /* 준비 — 한 번 받아 색인·파일을 만든다(파일 이름 표식은 로봇이 정한 것을 색인에서 읽는다 — 규칙을 베끼지 않는다) */
+      const r0 = run(sb3);
+      const f0 = (id) => ((r0.idx[id] || {}).files || [])[0];
+      const [fS, fC, fD, fF] = ['S', 'C', 'D', 'F'].map(f0);
+      eq('③ 진짜 deepfetch --elig-attach (준비) — 처음 보는 공고는 받고 마감 지난 공고(X)는 안 받는다 · 시도한 날을 적는다',
+        [r0.status, r0.fetched, 'X' in r0.idx, ['S', 'C', 'D', 'F'].every((k) => r0.idx[k] && r0.idx[k].at === today && r0.idx[k].files.length === 1)],
+        [0, ['c.pdf', 'd.pdf', 'f.hwp', 's.hwp'], false, true]);
+      /* 지난번에 받아 OCR·본문 글자까지 뽑아 둔 상태로 만들고, S 만 오늘 해 본 것으로 둔다 */
+      const idx0 = sb3.json('collector/extracted/elig-docs.json');
+      for (const k of ['C', 'D', 'F']) idx0[k].at = shift(today, -5);
+      sb3.write('collector/extracted/elig-docs.json', idx0);
+      sb3.write(`collector/extracted/${fS}.body.txt`, '오늘 받아 둔 공고의 본문 글자');
       sb3.write(`collector/extracted/${fC}.ocr.txt`, 'OCR 로 읽은 글자 — 바이트가 같으면 남아야 한다');
-      sb3.write(`collector/extracted/${fD}`, 'old bytes '.repeat(200));
       sb3.write(`collector/extracted/${fD}.txt`, '옛 판의 글자 — 바이트가 바뀌면 지워야 한다');
-      sb3.write('collector/extracted/elig-docs.json', {
-        S: { slug: slugOf('같은 공고'), files: [fS], sig: attSig(A('s')) },
-        C: { slug: slugOf('바뀐 목록 같은 바이트'), files: [fC], sig: 'oldsignature' },
-        D: { slug: slugOf('바뀐 목록 다른 바이트'), files: [fD], sig: 'oldsignature' },
-      });
-      const log = sb3.abs('fetch.log');
-      const r1 = sb3.run('collector/deepfetch.mjs', ['--elig-attach'], { FAKE_FETCH_LOG: log }, 25000, ['--import', sb3.abs('fake-fetch.mjs')]);
-      const fetched = (sb3.read('fetch.log') || '').split('\n').filter(Boolean).map((u) => u.replace('https://f.example/', '')).sort();
-      const idx = sb3.json('collector/extracted/elig-docs.json') || {};
-      eq('③ 진짜 deepfetch --elig-attach — 받은 그대로(S)·마감 지남(X)은 안 받고, 첨부가 바뀐 것(C·D)과 처음(N)만 받는다',
-        [r1.status, fetched], [0, ['c.pdf', 'd.pdf', 'n.hwp']]);
-      eq('  🔴 받은 바이트가 같으면 파생 글자(.ocr.txt)를 지우지 않는다 · 다르면 그 파생만 지운다 · 다시 받지 않은 공고의 파생은 그대로 (bodies-5)',
-        [sb3.exists(`collector/extracted/${fC}.ocr.txt`), sb3.exists(`collector/extracted/${fD}.txt`), sb3.exists(`collector/extracted/${fS}.body.txt`),
-          sb3.read(`collector/extracted/${fD}`) === bytesOf('https://f.example/d.pdf').toString()],
+      sb3.write(`collector/extracted/${fF}.ocr.txt`, '못 받는 날에도 남아야 하는 지난 글자');
+      reg.items.push({ id: 'N', name: '처음 받는 공고', attachments: A('n'), listedAt: today });
+      sb3.write('data/registered.json', reg);
+      const r1 = run(sb3, { FAKE_NEW: '/d\\.pdf$', FAKE_FAIL: '/f\\.hwp$' });
+      eq('③ 진짜 deepfetch --elig-attach — 오늘 해 본 것(S)·마감 지남(X)은 안 받고, 쉼이 끝난 것(C·D·F)과 처음(N)만 받는다',
+        [r1.status, r1.fetched], [0, ['c.pdf', 'd.pdf', 'f.hwp', 'n.hwp']]);
+      eq('  🔴 다시 받은 바이트가 같으면 파생 글자(.ocr.txt)를 지우지 않는다 · 다르면 그 파생만 지우고 원본을 바꾼다 · 안 받은 공고의 파생은 그대로 (bodies-5)',
+        [ex(sb3, `${fC}.ocr.txt`), ex(sb3, `${fD}.txt`), sb3.read(`collector/extracted/${fD}`) === 'new https://f.example/d.pdf '.repeat(60), ex(sb3, `${fS}.body.txt`)],
         [true, false, true, true]);
-      eq('  색인 — 받은 공고에 파일·서명·날짜 · 서명이 새 첨부 목록으로 · 마감 지난 공고는 색인에 없다',
-        [idx.N && idx.N.files, idx.N && idx.N.sig === attSig(A('n')), idx.C && idx.C.sig === attSig(A('c', 'pdf')), idx.N && idx.N.at === today, 'X' in idx],
-        [[fN], true, true, true, false]);
-      fs.rmSync(log, { force: true });
-      const r2 = sb3.run('collector/deepfetch.mjs', ['--elig-attach'], { FAKE_FETCH_LOG: log }, 25000, ['--import', sb3.abs('fake-fetch.mjs')]);
-      eq('  다음 실행은 아무것도 다시 받지 않는다(예전엔 매 실행 같은 공고를 다시 받으며 파생 글자를 지웠다)',
-        [r2.status, (sb3.read('fetch.log') || '').trim()], [0, '']);
+      eq('  하나도 못 받은 공고(F)는 받아 둔 파일·글자·색인 파일 목록을 그대로 두고 시도한 날만 오늘로(줄은 돈다)',
+        [ex(sb3, fF), ex(sb3, `${fF}.ocr.txt`), r1.idx.F && r1.idx.F.files, r1.idx.F && r1.idx.F.at], [true, true, [fF], today]);
+      eq('  색인 — 처음 받은 공고에 파일·날짜 · 마감 지난 공고는 색인에 없다',
+        [r1.idx.N && r1.idx.N.files.length, r1.idx.N && r1.idx.N.at, 'X' in r1.idx], [1, today, false]);
+      const r2 = run(sb3);
+      eq('  같은 날 다음 실행은 아무것도 다시 받지 않는다(시도한 날이 적혀 쉰다 — 예전엔 매 실행 같은 공고를 다시 받으며 파생 글자를 지웠다)',
+        [r2.status, r2.fetched], [0, []]);
+      /* 예산에 잘린 실행 — 차례가 안 온 공고의 원본·파생 글자를 미리 지우지 않는다(예전엔 대상 전부를 받기 전에 몽땅 지워,
+         잘린 공고는 원본도 OCR 글자도 없이 다음 실행까지 갔다) */
+      const idx2 = sb3.json('collector/extracted/elig-docs.json');
+      idx2.C.at = shift(today, -6); idx2.F.at = shift(today, -5);
+      sb3.write('collector/extracted/elig-docs.json', idx2);
+      const r3 = run(sb3, { ELIG_BUDGET_MS: '300', FAKE_FETCH_DELAY: '700' });
+      eq('  🔴 예산에 잘리면 차례가 안 온 공고(F)의 원본·OCR 글자·색인은 그대로 · 시도한 날도 안 바뀐다(다음 실행이 먼저 받는다)',
+        [r3.status, r3.fetched, ex(sb3, fF), ex(sb3, `${fF}.ocr.txt`), r3.idx.F && r3.idx.F.files, r3.idx.F && r3.idx.F.at, ex(sb3, `${fC}.ocr.txt`)],
+        [0, ['c.pdf'], true, true, [fF], shift(today, -5), true]);
     } finally {
       sb3.done();
     }
@@ -612,6 +663,22 @@ globalThis.fetch = async (url) => {
         fs.rmSync(dir, { recursive: true, force: true });
       }
     }
+  }
+  {
+    /* ⑤ 의 '양식·그 밖의 PDF 는 글자층이 있으면 건너뛴다'는 **글자층을 먼저 뽑아 둔 뒤**에만 맞다 — OCR 을 돌리는 워크플로마다 PDF 글자 뽑기(pdf-text.py)가
+       OCR(ocr-text.py)보다 앞에 있어야 한다. 2026-10-05 병합: 기본 브랜치가 OCR 을 발췌 앞으로 올리며 PDF 글자 뽑기보다 앞서게 되어, 새로 받은 양식 PDF 를
+       OCR 이 먼저 쪽 그림으로 읽느라 예산(150초)을 썼고 목록 갱신(apt-get update)도 두 번 돌았다. */
+    const wfDir = new URL('.github/workflows/', root);
+    const bad = [];
+    for (const f of fs.readdirSync(wfDir).filter((x) => x.endsWith('.yml')).sort()) {
+      const y = stripYamlComments(readText(`.github/workflows/${f}`));
+      const io = y.indexOf('python3 collector/ocr-text.py');
+      if (io < 0) continue;
+      const ip = y.indexOf('python3 collector/pdf-text.py');
+      const upd = (y.match(/apt-get update/g) || []).length;
+      if (ip < 0 || ip > io || upd !== 1) bad.push(`${f}(PDF ${ip < 0 ? '없음' : ip > io ? 'OCR 뒤' : '앞'} · 목록 갱신 ${upd}번)`);
+    }
+    eq('⑤ OCR 을 돌리는 워크플로 전부 — PDF 글자 뽑기가 OCR 보다 앞 · 목록 갱신(apt-get update)은 한 번', bad, []);
   }
   /* ── ⑥ AI 자격 읽기 버튼(eligibility-fill.yml) — 대상 세 갈래를 다 세고, 0 이면 돈이 드는 단계만 건너뛴다 (bodies-10) ── */
   {

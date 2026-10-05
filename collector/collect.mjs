@@ -15,7 +15,7 @@ import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mj
 import { publishBySchool, dropUnserved, healFromLedger, readSchoolFiles, zeroFeedSchools, zeroFeedWhy } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry } from './clean-title.mjs';
-import { isAttachmentEntry } from './attachment-link.mjs';
+import { isAttachmentEntry, detailAttachments, stripSiteChrome } from './attachment-link.mjs';
 import { activityKind, activityField, notActivity, ACTIVITY_FIELDS } from './activity-kind.mjs';
 import { activityExcerpts, activityDetails, putActivityDetails, ACT_DETAILS_V, sanitizeBenefit } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
@@ -126,29 +126,15 @@ async function fetchDetail(item) {
     if (!res.ok) return { attachments: [], deadlineHint: null };
     const html = await res.text();
     const links = extractLinks(html, item.url);
-    // 첨부: 확장자 링크 + 다운로드성 링크
-    const attachments = [];
-    const re = /<a\b[^>]*href\s*=\s*["']([^"'#][^"']*)["'][^>]*>([\s\S]*?)<\/a>/gi;
-    let m;
-    while ((m = re.exec(html)) !== null) {
-      const name = m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-      let url;
-      // `&#038;`·`&amp;` 를 주소로 풀기 전에 되돌린다 — 안 하면 `#038;…` 이 조각이 되어 첨부 번호가 사라진다 (board-links.mjs hrefText · 2026-10-03)
-      try { url = new URL(hrefText(m[1]), item.url).href; } catch { continue; }
-      const isFile = ATTACH_RE.test(url) || ATTACH_RE.test(name) || /mode=download|download\.do|fileDown|attach/i.test(url);
-      if (isFile && name && name.length >= 4 && name.length <= 120) {
-        attachments.push({ name: name.slice(0, 100), url });
-      }
-      if (attachments.length >= 8) break;
-    }
+    /* 첨부는 attachment-link.mjs detailAttachments 한 곳 (2026-10-05) — 따옴표 짝 · 주석 걷기 · 내려받기 스크립트 → 진짜 주소.
+       `&#038;`·`&amp;` 는 주소로 풀기 전에 되돌린다(board-links.mjs hrefText · 2026-10-03) */
+    const attachments = detailAttachments(html, item.url, { decode: hrefText });
     const text = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
 
-    const uniq = new Map();
-    attachments.forEach((a) => { if (!uniq.has(a.url)) uniq.set(a.url, a); });
     /* 본문 글자도 돌려준다 (2026-09-29) — 활동 글은 여기서 모집기간·자격·혜택을 원문 그대로 발췌한다(activity-excerpts.mjs).
        🔴 **줄을 살린 글자**(htmlToLines)여야 한다 — 위의 text 는 한 줄로 뭉갠 것이라 발췌기가 200자 넘는 줄로 보고 통째로 건너뛴다
        (2026-09-30 첫 실행 · 26건 전부 마감 0건). 마감 단서 한 줄(deadlineHint)은 예전대로 뭉갠 글자에서 읽는다. */
-    return { attachments: [...uniq.values()], deadlineHint: deadlineHintFrom(text), text: htmlToLines(html) };
+    return { attachments, deadlineHint: deadlineHintFrom(text), text: htmlToLines(html) };
   } catch {
     return { attachments: [], deadlineHint: null, text: '' };
   }
@@ -552,6 +538,9 @@ const beforeCap = notices.items;
       사냥꾼도 성공, 수집도 성공, 감사도 통과, 학생만 옛 주소를 누른다.
       2026-08-17 '학교별 파일이 19일 동안 저장되지 않았다' 사고와 같은 모양이다.
       관문: verify/test-collector.mjs '학교별 파일은 전체 목록으로 발행한다'. */
+/* 게시판 공통 링크(모든 글에 붙는 머리·옆 메뉴 링크)를 첨부에서 걷는다 — 정식 등록분과 함께 세야 지난 글도 걷힌다(attachment-link.mjs · 2026-10-05) */
+const chromeRegItems = (() => { try { return JSON.parse(fs.readFileSync(new URL('../data/registered.json', HERE), 'utf8')).items || []; } catch { return []; } })();
+stripSiteChrome([beforeCap, chromeRegItems]);
 publishBySchool(beforeCap);
 /* 서비스 학교인데 학생 화면 실시간 공고가 0건인 학교 — 리포트 머리에 한 줄로 (2026-10-04 점검 app2-F2 · publish-notices.mjs zeroFeedSchools).
    학교별 상태 줄은 '✅ 정상'인데 화면은 0건인 학교(한양 — 감지한 글이 전부 전에 본 글)·주소 없는 분교가 조용히 남아 있었다. */
@@ -606,6 +595,7 @@ acts.updatedAt = notices.updatedAt;
 /* 분야 목록 원본을 함께 싣는다 (2026-10-04 · 프로필 「관심 분야」 칸) — 앱은 빌드가 없어 activity-kind.mjs 를 못 들여온다.
    앱에 목록을 따로 적으면 두 벌이 되어 수집기가 갈래를 늘려도 화면은 모른다(분야 칩과 같은 이유) */
 acts.fields = ACTIVITY_FIELDS;
+stripSiteChrome([acts.items]);   // 게시판 공통 링크 걷기(attachment-link.mjs) — 활동 글은 활동끼리 센다
 fs.writeFileSync(actsPath, JSON.stringify(acts, null, 1));
 
 /* ── 재단·지자체 공고 발행 — data/external.json (학교 피드와 섞지 않는다 · 규칙은 위와 같다) ── */

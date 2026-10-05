@@ -30,6 +30,9 @@ docs/advisor/fonts/
 
 # 대외활동 첨부·포스터 — 한 실행 안에서 받고 읽고 버린다(커밋하면 글 15건에 8MB · collector/activity-docs.mjs)
 collector/act-files/
+# PaddleOCR 이번 실행 결과(paddle-ocr.py · 읽는 곳은 대외활동 --apply 하나) — 장학 포스터 단계가 collector/extracted 에도 남긴다.
+# 수집 저장 단계가 그 폴더를 통째로 add 하므로, 빼지 않으면 매 실행 커밋된다(2026-10-05 병합)
+collector/extracted/paddle-status.json
 
 # 통째로 바꿔 끼우기(collector/write-atomic.mjs)의 임시 파일 — 쓰는 도중 끊기면 남는다(다음 저장이 덮어쓴다) · 커밋하지 않는다
 collector/**/*.tmp

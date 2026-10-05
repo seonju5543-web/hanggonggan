@@ -29,6 +29,9 @@ const require = createRequire(import.meta.url);
 export const cleanEnv = (extra = {}) => {
   const e = { ...process.env, ...extra };
   for (const k of Object.keys(e)) if (/^GIT_/.test(k)) delete e[k];
+  /* 로봇을 라이브러리로만 불러오는 표식(ACTIVITY_DOCS_AS_LIB)은 물려주지 않는다 — 물려받은 activity-docs.mjs 자식은 본편을 안 돌고 0 으로 끝나
+     관문이 헛잰다(2026-10-05 병합: test-collector 가 앞 절에서 불러온 elig-ocr-guard.mjs 가 표식을 남겨 bodies ②ⓑ 둘이 빨갰다). 일부러 넘길 때만 남긴다 */
+  if (!Object.prototype.hasOwnProperty.call(extra, 'ACTIVITY_DOCS_AS_LIB')) delete e.ACTIVITY_DOCS_AS_LIB;
   return e;
 };
 

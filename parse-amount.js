@@ -52,10 +52,25 @@ var WON_PATTERNS = [
 ];
 
 /* 등록금 비율 — `전액`은 100%, `반액`은 50%로 읽는다(원문이 그 뜻으로 쓴다). */
-var RATIO_RE = /(등록금|수업료)\s*(의)?\s*(전액|반액|절반|(\d{1,3})\s*%)|(전액)\s*(면제|감면|지원)/;
+/* `등록금액의 50%` 처럼 `액` 이 붙어도 같다 (2026-10-05 · UI-12) — 갈래 번호가 바뀌지 않게 비포획 */
+var RATIO_RE = /(등록금|수업료)(?:\s*액)?\s*(의)?\s*(전액|반액|절반|(\d{1,3})\s*%)|(전액)\s*(면제|감면|지원)/;
+/* 금액 이름표의 값이 **통째로** `등록금액` 이면 등록금 전액이다(`4. 장학금액 (1 인당) : 등록금액 (…)` · 의대
+   81학번 후배 사랑 · 2026-10-05 UI-12). 괄호 풀이를 뗀 값 전체가 그 낱말일 때만 —
+   `등록금액 범위 내`·`등록금액 이내` 는 얼마인지 모르는 말이라 안 받는다. */
+var TUITION_WHOLE = /^(등록금|수업료)\s*(액|상당액|해당액|전액)$/;
+/* 대상별로 금액이 갈린 줄(`고등학생 50만 원, 대학생 최대 100만 원` · 봄내장학생)은 **대학생 몫**을 쓴다 —
+   이 앱의 학생은 전부 대학생이고 원문이 그 몫을 따로 적었다. 학교급이 섞인 줄에서만 고른다. */
+var LOWER_SCHOOL = /(초등학생|중학생|고등학생|고교생|중·고등학생)/;
+var COLLEGE_SEG = /(^|[^가-힣])대학생/;
+/* 인원 줄에 붙은 1인당 금액(`선발인원 : 468 명 (…) / 1 인 150 만 원` · 대전청년내일재단 성취) —
+   금액 머리글이 없는 공고에서만, 이 이름표 줄의 1인당 조각만 읽는다 */
+var HEADCOUNT_LABEL = /^[^:：]{0,8}(선발|모집|지원|지급)\s?(예정\s?)?인원\s*[:：]/;
+/* `지원 규모` 머리글은 사업 전체일 수 있다 — 인원이 같이 적혔거나 1인당 없이 천만원을 넘으면 예산으로 본다 */
+var SCALE_HEAD = /규\s?모/;
+var SCALE_MAX_WON = 10000000;   // ponytail: 1인 1천만원 초과 장학금도 있다 — 그때는 1인당 표시가 있어야 읽힌다
 /* `시급 12,790원` 뿐 아니라 `10,320원/시간`·`12,790원/h` 도 시급형이다 —
    국가근로·교내근로 공고가 대부분 뒤쪽 꼴로 적는다(2026-08-27 전수 조사). */
-var HOURLY_RE = /(시급|시간당)\s*[\d,]+\s*원|[\d,]+\s*원\s*\/\s*(시간|시|h|H)|활동\s*시간\s*기준|시간\s*단위/;
+var HOURLY_RE = /(시급|시간당)\s*[:：]?\s*[\d,]+\s*원|[\d,]+\s*원\s*\/\s*(시간|시|h|H)|활동\s*시간\s*기준|시간\s*단위/;
 
 /* 금액이 아닌 숫자를 금액으로 읽지 않기 위한 최소선.
    5만원 미만은 대개 수수료·보험료·서류 부수라 금액으로 보지 않는다. */
@@ -95,6 +110,8 @@ var PERSON_RE = /(1\s*인\s*당|인\s*당|(^|[^0-9])1\s*인|(^|[^0-9])1\s*명|�
 /* `선발 예정인원 및 지급금액 : 311명, 421,000천원` — 인원과 금액을 **한 이름표**로 묶은 줄도 예산이다
    (울산연구원 본문 줄 · 2026-09-17 병합 때 두 세션의 규칙을 하나로 합치며 남긴 것). */
 var TOTAL_TABLE = /(^|[\s.·:])계\s*[\d,]+\s*\S{0,3}명|(금액|장학금|지원금)\s*계(\s|$)|합\s*계|소\s*계|총\s*계|인원\s*(및|·|,)\s*(지급\s*)?금액/;
+/* ⚠️ 맨 `총 + 숫자` 를 넣지 말 것 (2026-10-05 · UI-12 에서 넣었다가 뺐다) — 원문의 `총` 은 대개 횟수·인원·1인 총합이다:
+   `최대 1,000,000원 … 총 2회 지급` · `1,000,000원, 총 5명` · `생활비 연간 총 800만원` 이 전부 지워졌다(저장분 대조 5건). */
 var TOTAL_RE  = /(총\s*장학금액|장학금\s*총액|총\s*상금|총상금|총\s*예산|예산\s*총|총\s*지원\s*규모|총\s*규모|총\s*사업|사업비|총액|단체)/;
 
 /* 한 줄 안에 총액과 1인당이 같이 있으면(`총상금 3천만원, 1인당 200만원`) 조각으로 갈라
@@ -190,10 +207,35 @@ function amountBlock(lines, maxLines) {
  * @returns {{kind:string, value:number, ratio:number, min:number, max:number, raw:string}}
  *   kind 가 'unknown' 이면 value 0 — **비우는 것이 실패가 아니고 지어내는 것이 실패다.**
  */
+/* 대상별 금액 줄에서 대학생 몫 (위 LOWER_SCHOOL 주석) */
+function collegeTierWon(blockLines) {
+  var arr = blockLines || [];
+  for (var i = 0; i < arr.length; i++) {
+    var line = String(arr[i]);
+    if (!LOWER_SCHOOL.test(line)) continue;
+    var segs = line.split(/,(?!\d{3})|·|\/|;/);
+    for (var j = 0; j < segs.length; j++) {
+      if (COLLEGE_SEG.test(segs[j]) && !LOWER_SCHOOL.test(segs[j])) { var v = wonIn(segs[j]); if (v) return v; }
+    }
+  }
+  return 0;
+}
+
 function amountFrom(lines) {
   var none = { kind: 'unknown', value: 0, ratio: 0, min: 0, max: 0, raw: '' };
   var blk = amountBlock(lines);
-  if (!blk) return none;
+  if (!blk) {
+    /* 금액 머리글이 없으면 인원 줄의 1인당 조각만 본다 (위 HEADCOUNT_LABEL 주석) */
+    var arr = lines || [];
+    for (var h = 0; h < arr.length; h++) {
+      var hl = String(arr[h]);
+      if (!HEADCOUNT_LABEL.test(hl.replace(/^[\s\-•·○●■□▶▷❍◎ㅇ*※]*\s*(?:[가-힣]\s*\.\s*|\d+\s*[.)]\s*)?/, ''))) continue;
+      if (TOTAL_RE.test(hl) || TOTAL_TABLE.test(hl)) continue;
+      var hw = perPersonWon([hl]);
+      if (hw) return { kind: 'fixed', value: hw, ratio: 0, min: hw, max: hw, raw: hl.trim().slice(0, 200) };
+    }
+    return none;
+  }
   var body = blk.lines.join(' ');
 
   /* 비율형이 먼저다. `등록금 전액`에는 숫자가 없어서 금액 읽기로는 0이 나오고,
@@ -201,8 +243,18 @@ function amountFrom(lines) {
      그래서 '절대액이 있으면 절대액, 없으면 비율'로 가른다. */
   /* 1인당 표시가 있으면 그게 이긴다 (위 PERSON_RE 주석 참조) */
   var perWon = perPersonWon(blk.lines);
-  var won = perWon || wonIn(body);
+  var won = perWon || collegeTierWon(blk.lines) || wonIn(body);
   var ratio = ratioIn(body);
+  if (!won && !ratio) {
+    var headVal = String(blk.head).split(/[:：]/).slice(1).join(':').replace(/[(（][^)）]*[)）]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (TUITION_WHOLE.test(headVal)) ratio = 1;
+  }
+  /* `지원 규모` 머리글은 인원이 같이 있거나 1인당 없이 큰 금액이면 예산이다 (위 SCALE_HEAD 주석) */
+  /* 인원은 머리글 **그 줄**에서만 본다 — 다음 절(`다. 선발인원 : 0명`)이 절에 딸려 와도 예산 신호가 아니다(송화재단) */
+  if (!perWon && SCALE_HEAD.test(String(blk.head).split(/[:：]/)[0])
+      && (/\d\s*명/.test(String(blk.head)) || won > SCALE_MAX_WON)) {
+    return { kind: 'unknown', value: 0, ratio: 0, min: 0, max: 0, raw: body.slice(0, 200) };
+  }
 
   if (HOURLY_RE.test(body) && !won) {
     return { kind: 'hourly', value: 0, ratio: 0, min: 0, max: 0, raw: body.slice(0, 200) };
@@ -228,6 +280,16 @@ function amountFrom(lines) {
   }
 
   if (ratio) {
+    /* 🔴 대상별로 비율이 갈리면(`중소기업 : 등록금 전액 / 대기업 : 등록금 50%`·`수업료 전액 … 수업료의 2/3`)
+       하나로 못 적는다 — 첫 비율(대개 전액)을 쓰면 덜 받는 학생에게 과장이다(2026-10-05 · UI-12 · 등록 4건).
+       절 안의 비율 표기를 전부 모아 값이 둘 이상이면 모른다고 답한다. */
+    var seenRatio = {}, kinds = 0;
+    var RATIO_ALL = /전액|반액|절반|(\d{1,3})\s*%|의\s*(\d)\s*\/\s*(\d)/g, rm;
+    while ((rm = RATIO_ALL.exec(body))) {
+      var rv = rm[1] ? Math.min(100, paNum(rm[1])) / 100 : rm[2] ? paNum(rm[2]) / paNum(rm[3]) : /전액/.test(rm[0]) ? 1 : 0.5;
+      if (!seenRatio[rv]) { seenRatio[rv] = 1; kinds++; }
+    }
+    if (kinds > 1) return { kind: 'unknown', value: 0, ratio: 0, min: 0, max: 0, raw: body.slice(0, 200) };
     return { kind: 'ratio', value: 0, ratio: ratio, min: 0, max: 0, raw: body.slice(0, 200) };
   }
   return { kind: 'unknown', value: 0, ratio: 0, min: 0, max: 0, raw: body.slice(0, 200) };

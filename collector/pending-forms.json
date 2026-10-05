@@ -1045,6 +1045,70 @@
    "added": "2026-10-04",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-bswj104944259artclviewdo",
+   "name": "[교내] 2026학년도 2학기 형제장학금 신청 안내(~10/23)",
+   "target": "2026학년도 2학기 형제장학금 신청 안내(~10/23",
+   "added": "2026-10-05",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-bswj104944143artclviewdo",
+   "name": "[교외] 2026년 「강원·세종건설·신디자인랩」브랜드장학금 하반기 장학생 선발(~10/8)",
+   "target": "2026년 「강원·세종건설·신디자인랩」브랜드장학금 하반",
+   "added": "2026-10-05",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-ervicenoticedetail520607",
+   "name": "「2026 상반기 AI·ICT 인재 장학생 모집」 안내(대상: 서울시 서초구에 주소지를 둔 재학생)",
+   "target": "「2026 상반기 AI·ICT 인재 장학생 모집」 안내",
+   "added": "2026-10-05",
+   "fetched": false,
+   "schematized": false,
+   "tries": 4,
+   "lastTryAt": "2026-10-05"
+  },
+  {
+   "id": "auto-nuid100nttid30154ptabno5",
+   "name": "2026학년도 2학기 4·19선양재단 나라사랑 4·19 민주장학생 선발 공고",
+   "target": "2026학년도 2학기 4·19선양재단 나라사랑 4·19",
+   "added": "2026-10-05",
+   "fetched": false,
+   "schematized": false,
+   "tries": 4,
+   "lastTryAt": "2026-10-05"
+  },
+  {
+   "id": "auto-onttid000100000000003862",
+   "name": "[교내-10/22] 2026학년도 2학기 대학봉사장학금 신청 안내",
+   "target": "2026학년도 2학기 대학봉사장학금 신청 안내",
+   "added": "2026-10-05",
+   "fetched": false,
+   "schematized": false,
+   "tries": 4,
+   "lastTryAt": "2026-10-05"
+  },
+  {
+   "id": "auto-bsid1083mi3004nttid55323",
+   "name": "[우양재단] 2026년 동행 장학생 모집 (가족 돌봄 청년 대상, ~10/18)",
+   "target": "2026년 동행 장학생 모집 (가족 돌봄 청년 대상, ",
+   "added": "2026-10-05",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-oardid323225menuno200318",
+   "name": "공통 [공통] 2026학년도 2학기 경희목련장학 신청 안내_10.02(금)~10.25(일)",
+   "target": "공통 [공통] 2026학년도 2학기 경희목련장학 신청 ",
+   "added": "2026-10-05",
+   "fetched": false,
+   "schematized": false,
+   "tries": 4,
+   "lastTryAt": "2026-10-05"
   }
  ]
 }

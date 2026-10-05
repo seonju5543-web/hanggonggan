@@ -9,8 +9,6 @@ import { FETCH_HEADERS } from './http-headers.mjs';
 import { isNoticeDoc } from './attachment-text.mjs';
 import { canonUrl, normTitle, indexTexts, sourceFor, needsFetch, fillRetired, fillCounts } from './notice-source.mjs';
 import { makeBudget } from './harvest-budget.mjs';
-/* 자격용 첨부 받기의 '무엇을 받을지'와 파일 이름 표식은 순수 함수 파일 한 곳에 — 이 파일은 불러오는 순간 수집을 시작해 관문이 못 부른다 */
-import { slugOf, pickEligDocTargets } from './elig-attach-plan.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const OUT = new URL('extracted/', HERE);
@@ -249,8 +247,13 @@ console.log(`done: ${texts.length} texts, ${fi} attachments`);
    '스키마화 대기'로 큐에 남아 있던 공고의 원본이 다음 수집 때 사라져, 다음 세션이 양식을
    만들 수 없었다(2026-07-30 발견 — 도레이·염곡·시립대 원본이 이렇게 유실됨).
    그래서 파일 이름에 공고별 표식을 넣고, 이번에 다시 받는 공고의 파일만 갈아끼운다. */
-/* 파일 이름에 넣는 공고별 표식(slugOf)은 elig-attach-plan.mjs 에 있다 — 양식 수집과 자격 수집이 같은 규칙을 써야
-   한 공고의 첨부가 두 벌로 쌓이지 않고, 다시 받을 때 옛 파일이 제대로 갈아끼워진다. */
+/* 파일 이름에 넣는 공고별 표식. **양식 수집과 자격 수집이 같은 규칙을 써야** 한 공고의
+   첨부가 두 벌로 쌓이지 않고, 다시 받을 때 옛 파일이 제대로 갈아끼워진다. */
+function slugOf(title) {
+  let h = 0;
+  for (let i = 0; i < title.length; i++) h = (h * 31 + title.charCodeAt(i)) >>> 0;
+  return h.toString(36).slice(0, 6);
+}
 
 async function downloadForms() {
   /* 표적은 '제목 앞부분'이라 짧으면 엉뚱한 공고까지 몽땅 걸린다.
@@ -324,7 +327,9 @@ async function downloadForms() {
      ③ 워크플로에서 timeout-minutes + continue-on-error 로 돈다
    못 받은 것은 다음 실행이 마저 받는다.
    ⚠️ 예전 주석은 '자격을 읽은 공고는 대상에서 빠지므로 같은 파일을 매일 다시 받는 일이 없다'고 했지만, 첨부로도 자격을
-      못 읽은 공고는 계속 대상이라 **매 실행 다시 받고 있었다**(2026-10-04 점검 bodies-3). 이제 받은 그대로인 공고는 건너뛴다(elig-attach-plan.mjs). */
+      못 읽은 공고는 계속 대상이라 **매 실행 다시 받고 있었다**(2026-10-04 점검 bodies-3). 고르기는 이제 줄이 돈다(elig-targets.mjs ·
+      시도한 날 `at` · 사흘 쉼). 쉼이 끝나 같은 첨부를 다시 받을 때는 **받은 바이트가 같으면 파생 글자(.txt·.body.txt·.ocr.txt)를
+      지우지 않는다**(bodies-5 · 아래 '갈아끼우기') — 미리 몽땅 지우면 예산에 잘린 공고는 원본·OCR 글자를 잃은 채 다음 실행까지 간다. */
 async function downloadEligDocs() {
   const { createRequire } = await import('node:module');
   const { requirementLines } = createRequire(import.meta.url)('../match-engine.js');
@@ -352,31 +357,35 @@ async function downloadEligDocs() {
      안 걸리므로 여기서 따로 통과시킨다. 무료로는 못 읽지만 AI가 그림째 읽는다.
      실측: 넘기려던 공고 7건 전부에 A4 포스터급 그림이 있었다(최대 5906×8268). */
   const IMG_EXT = /\.(png|jpe?g|gif|webp)$/i;
-  /* 공고 하나에서 고르는 첨부 — 공고문(이름 규칙) 또는 본문 그림, 앞 두 개 */
-  const pickAtts = (it) => (it.attachments || []).filter((a) => a.url && (
-    (OK_EXT.test(a.name || '') && isNoticeDoc(a.name)) || (a.bodyImage && IMG_EXT.test(a.name || '')))).slice(0, 2);
 
+  /* 고르기는 elig-targets.mjs 한 곳 (2026-10-05 · UI-12) — 줄이 돈다(시도한 날 `at`) · 금액·마감만 빈 공고도 · 안 보이는 공고는 안 받는다 */
+  const { pickEligTargets } = await import('./elig-targets.mjs');
+  /* '학생 화면에 아직 있나'는 자격요건 로봇과 같은 판정 한 곳(rescue-plan.mjs closedForStudents — 마감(한국 날짜) 전 · notStale) — 2026-10-05 병합 때
+     여기 따로 적혀 있던 같은 식을 이것으로 바꿨다(둘이 갈라지면 한 로봇은 받고 다른 로봇은 안 여는 공고가 생긴다) */
+  const { closedForStudents } = await import('./rescue-plan.mjs');
+  const today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);   // 마감은 한국 날짜다 (점검 bodies-3)
   const idxPath = new URL('elig-docs.json', OUT);
   let index = {};
   try { index = JSON.parse(fs.readFileSync(idxPath, 'utf8')); } catch { /* 첫 실행 */ }
-  const today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);   // 마감은 한국 날짜다
-  /* 🔴 **받은 그대로인 공고는 다시 받지 않는다** (2026-10-04 점검 bodies-3·5 — 규칙은 elig-attach-plan.mjs 머리말).
-     예전엔 앞에서 N건을 매 실행 다시 받으며 파생 글자(.txt·.ocr.txt)까지 지워, 뒤의 공고는 한 번도 안 받혔고 OCR 글자는 발췌 전에 사라졌다. */
-  const { targets, sigOnly, kept } = pickEligDocTargets(reg.items, index, {
-    today, fileExists: (f) => fs.existsSync(new URL(f, OUT)), requirementLines, pickAtts, max: MAX_NOTICES });
-  for (const s of sigOnly) index[s.id].sig = s.sig;   // 서명 칸 전의 옛 색인 — 서명만 채운다
-  console.log(`자격용 공고문 첨부 대상 ${targets.length}건 (받은 그대로라 건너뜀 ${kept}건 · 예산 ${Math.round(BUDGET_MS / 1000)}초)`);
-  if (!targets.length) {
-    if (sigOnly.length) fs.writeFileSync(idxPath, JSON.stringify(index, null, 1));
-    return 0;
-  }
+  const targets = pickEligTargets(reg.items, index, today, {
+    requirementLines,
+    live: (it) => !closedForStudents(it, today),
+    docAtts: (it) => (it.attachments || []).filter((a) => a.url && (
+      (OK_EXT.test(a.name || '') && isNoticeDoc(a.name)) || (a.bodyImage && IMG_EXT.test(a.name || '')))).slice(0, 2),
+    max: MAX_NOTICES,
+  });
+  console.log(`자격용 공고문 첨부 대상 ${targets.length}건 (예산 ${Math.round(BUDGET_MS / 1000)}초)`);
+  if (!targets.length) return 0;
 
   let got = 0;
-  for (const { it, atts, sig } of targets) {
+  for (const { it, atts } of targets) {
     if (Date.now() - startedAt > BUDGET_MS) { console.log('예산 도달 — 나머지는 다음 실행'); break; }
     /* 파일 이름 표식은 **등록 공고 이름**으로 만든다 — 양식 수집은 수집 목록의 제목을 쓰므로
        표식이 서로 달라, 아래 '바뀐 것만 지우기'가 양식 원본을 건드리지 않는다. */
     const slug = slugOf(it.name);
+    /* 시도한 날을 먼저 적는다 — 하나도 못 받아도 적어야 다음 실행이 다른 공고로 넘어간다(elig-targets.mjs 주석 ①) */
+    (index[it.id] ||= { slug, files: [] }).at = today;
+    /* 🔴 옛 파일은 미리 지우지 않는다 — 이 공고를 다 받은 뒤 바뀐 것만 갈아끼운다 (2026-10-04 점검 bodies-3·5) */
     const prefix = `elig-${slug}-`;
     const oldNames = fs.readdirSync(OUT).filter((f) => f.startsWith(prefix));   // 원본 + 파생 글자
     const files = [];
@@ -418,19 +427,17 @@ async function downloadEligDocs() {
         console.log('elig doc err', a.name, why);
       }
     }
-    const prev = index[it.id];
-    const miss = (prev && prev.tried && prev.tried.sig === sig ? prev.tried.miss || 0 : 0) + 1;
-    if (files.length) {
+    if (files.length && !cut) {
       /* 이번에 안 받은 옛 파일(번호가 줄었거나 확장자가 바뀐 것)과 그 파생 글자는 지운다 · 같은 표식을 쓰던 다른 공고의 색인은 뺀다(파일이 갈렸다) */
       for (const f of oldNames) if (!files.some((x) => f === x || f.startsWith(`${x}.`))) fs.rmSync(new URL(f, OUT), { force: true });
       for (const k of Object.keys(index)) if (k !== it.id && index[k].slug === slug) delete index[k];
-      /* 다 받았을 때만 서명을 적는다 — 일부만 받았으면(내려받기 실패·예산) 서명을 비워 다음 실행이 다시 받는다 */
-      index[it.id] = files.length === atts.length ? { slug, files, sig, at: today }
-        : { slug, files, sig: null, at: today, ...(cut ? {} : { tried: { sig, at: today, miss } }) };
-    } else if (!cut) {
-      /* 하나도 못 받았다 — 받아 둔 옛 파일·색인은 그대로 두고(그 글자는 아직 쓸 만하다) 쉬었다 다시 해 본다(elig-attach-plan missWait) */
-      index[it.id] = { ...(prev || { slug, files: [] }), tried: { sig, at: today, miss } };
+      index[it.id] = { ...index[it.id], slug, files };
+    } else if (files.length) {
+      /* 예산에 잘려 일부만 받았다 — 아직 다시 못 받은 옛 파일은 지우지 않고 색인에도 남긴다(다음 차례에 마저 갈아끼운다) */
+      const old = (index[it.id].files || []).filter((f) => !files.includes(f) && fs.existsSync(new URL(f, OUT)));
+      index[it.id] = { ...index[it.id], slug, files: [...files, ...old] };
     }
+    /* 하나도 못 받았으면 받아 둔 옛 파일·색인의 files 는 그대로 둔다(그 글자는 아직 쓸 만하다) — 시도한 날(at)만 바뀌어 줄은 돈다 */
   }
   fs.writeFileSync(idxPath, JSON.stringify(index, null, 1));
   return got;

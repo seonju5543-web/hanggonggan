@@ -78,7 +78,13 @@ export function actionBeforeCheckout(yml) {
 
 const REACH = /uses:\s*\.\/\.github\/actions\/(?:robot-down|alert-issue)\b|tools\/alert-issue\.mjs|gh issue (?:create|comment)\b|issues\.(?:create|createComment)\(/;
 const onFailure = (cond) => /\b(?:failure|cancelled)\(\)/.test(String(cond || '').replace(/!\s*(?:failure|cancelled)\(\)/g, ''));
-/** S3 — `if:` 에 failure()·cancelled() 가 있는데 사람에게 닿지 않는 단계(같은 조건의 뒤 단계가 대신 닿으면 통과) */
+/* 조건 t 가 조건 s 를 덮는가 — 같은 글자이거나, t 가 `&&` 없이 `||` 로만 이어졌고 s 의 갈래(||)를 전부 갖는다(더 넓다).
+   `failure()` 뒤의 `failure() || cancelled()` 경보는 덮는다 · `failure() && …` 처럼 좁힌 경보는 덮지 않는다 */
+const disjuncts = (c) => String(c || '').replace(/^\$\{\{\s*|\s*\}\}$/g, '').split('||').map((x) => x.trim()).filter(Boolean);
+const covers = (t, s) => t === s || (!/&&/.test(String(t || '')) && !/&&/.test(String(s || '')) && disjuncts(s).every((d) => disjuncts(t).includes(d)));
+/** S3 — `if:` 에 failure()·cancelled() 가 있는데 사람에게 닿지 않는 단계(같거나 더 넓은 조건의 뒤 단계가 대신 닿으면 통과 —
+    2026-10-05 병합: 기본 브랜치의 「못 넣은 수집분 보관」(failure() · 실행 결과물 올리기)은 경보가 아니라 보관이고, 사람에게는 뒤의
+    failure() || cancelled() 알림이 닿는다) */
 export function silentFailureSteps(yml) {
   const bad = [];
   for (const j of jobsOf(yml)) {
@@ -86,7 +92,7 @@ export function silentFailureSteps(yml) {
     steps.forEach((s, k) => {
       if (!onFailure(s.if)) return;
       if (REACH.test(s.raw)) return;
-      if (steps.slice(k + 1).some((t) => t.if === s.if && REACH.test(t.raw))) return;
+      if (steps.slice(k + 1).some((t) => covers(t.if, s.if) && REACH.test(t.raw))) return;
       bad.push(`${j.name}: ${s.name || s.id || s.uses || '(이름 없음)'}`);
     });
   }
@@ -251,11 +257,14 @@ export default async function gate(eq, ctx) {
   eq('  S2 표본 — 체크아웃 없이 로컬 액션 → 잡는다', [actionBeforeCheckout('jobs:\n  a:\n    steps:\n      - run: x\n      - uses: ./.github/actions/robot-down\n  b:\n    steps:\n      - uses: actions/checkout@v4\n      - uses: ./.github/actions/alert-issue\n')], [['a']]);
   eq('  S2 모든 워크플로 — 로컬 액션(./.github/actions/…)보다 앞에 actions/checkout 이 있다(job 마다)',
     wfs.map((f) => [f, actionBeforeCheckout(wf(f))]).filter(([, b]) => b.length).map(([f, b]) => `${f}: ${b.join(',')}`), []);
-  eq('  S3 표본 — 요약 한 줄뿐인 실패 단계 → 잡는다 · 같은 조건의 뒤 단계가 이슈로 닿으면 통과 · !cancelled() 는 실패 조건이 아니다',
+  eq('  S3 표본 — 요약 한 줄뿐인 실패 단계 → 잡는다 · 같은 조건의 뒤 단계가 이슈로 닿으면 통과 · !cancelled() 는 실패 조건이 아니다 · 더 넓은 조건(|| 를 더한)의 뒤 경보는 덮고 · 더 좁은 조건(취소를 뺀 · && 로 좁힌)은 못 덮는다',
     [silentFailureSteps("jobs:\n  a:\n    steps:\n      - name: s\n        if: ${{ failure() || cancelled() }}\n        run: echo x >> \"$GITHUB_STEP_SUMMARY\"\n"),
       silentFailureSteps("jobs:\n  a:\n    steps:\n      - name: s\n        if: failure()\n        run: echo x\n      - name: t\n        if: failure()\n        uses: ./.github/actions/alert-issue\n"),
-      silentFailureSteps("jobs:\n  a:\n    steps:\n      - name: s\n        if: ${{ !cancelled() }}\n        run: echo x\n")],
-    [['a: s'], [], []]);
+      silentFailureSteps("jobs:\n  a:\n    steps:\n      - name: s\n        if: ${{ !cancelled() }}\n        run: echo x\n"),
+      silentFailureSteps("jobs:\n  a:\n    steps:\n      - name: keep\n        if: failure()\n        uses: actions/upload-artifact@v4\n      - name: t\n        if: failure() || cancelled() || steps.run.outcome == 'failure'\n        run: gh issue comment 1 --body x\n"),
+      silentFailureSteps("jobs:\n  a:\n    steps:\n      - name: keep\n        if: failure() || cancelled()\n        run: echo x\n      - name: t\n        if: failure()\n        run: gh issue comment 1 --body x\n"),
+      silentFailureSteps("jobs:\n  a:\n    steps:\n      - name: keep\n        if: failure()\n        run: echo x\n      - name: t\n        if: failure() && steps.audit.outcome == 'failure'\n        run: gh issue comment 1 --body x\n")],
+    [['a: s'], [], [], [], ['a: keep'], ['a: keep']]);
   eq('  S3 모든 워크플로 — failure()·cancelled() 단계는 이슈(robot-down·alert-issue·gh issue·issues.create)로 사람에게 닿는다(요약 한 줄·::warning 만이면 실패)',
     wfs.flatMap((f) => silentFailureSteps(wf(f)).map((s) => `${f} ${s}`)), []);
   eq('  S4 경보를 여는 워크플로는 이슈 쓰기 권한(issues: write)을 적어 둔다 — 없으면 경보가 403 으로 넘어진다',
