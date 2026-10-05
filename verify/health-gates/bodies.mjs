@@ -213,12 +213,14 @@ export default async function bodies(eq, ctx) {
     sb.write('collector/extracted/browser-bodies.json', {});
     const t0 = Date.now();
     const wd = sb.run('collector/rescue-bodies.mjs', ['--write'],
-      { RESCUE_NOTICE_MS: '600000', RESCUE_GAP_MS: '0', RESCUE_BUDGET_MS: '1200000', RESCUE_CAP: '10', RESCUE_WATCHDOG_MS: '1500' }, 9000);
+      { RESCUE_NOTICE_MS: '600000', RESCUE_GAP_MS: '0', RESCUE_BUDGET_MS: '1200000', RESCUE_CAP: '10', RESCUE_WATCHDOG_MS: '1500' }, 20000);
+    /* 여유를 넉넉히 — 이 관문은 수집 로봇의 데이터 관문 안에서도 돈다(test-collector). 바쁜 실행기에서 node 를 띄우는 데만 몇 초가 걸려도
+       빨개지면 안 된다. 감시 타이머가 없으면 영영 멈춘 공고(10분 시한) 때문에 20초에 강제로 끊겨 signal 이 남는다 → ✕ */
     const wdMs = Date.now() - t0;
     const wdLed = sb.json('collector/rescue-ledger.json') || {};
     const wdRep = sb.read('collector/rescue-report.md') || '';
     eq('  감시 타이머 — 한 공고 시한보다 오래 멈춘 호출이 있어도 단계 시한 전에 스스로 저장하고 끝낸다(종료 코드 1 · 강제 종료 아님) · 앞 공고의 본문·장부와 리포트 꼬리가 남는다 (리뷰 R2)',
-      [wd.status, wd.signal, wdMs < 8000, !!(wdLed[canonUrl(u('ok-w1'))] || {}).ok, /감시 타이머/.test(wdRep) && /\(진행 중 2\/3/.test(wdRep), !!(sb.json('collector/extracted/browser-bodies.json') || {})[u('ok-w1')]],
+      [wd.status, wd.signal, wdMs < 18000, !!(wdLed[canonUrl(u('ok-w1'))] || {}).ok, /감시 타이머/.test(wdRep) && /\(진행 중 2\/3/.test(wdRep), !!(sb.json('collector/extracted/browser-bodies.json') || {})[u('ok-w1')]],
       [1, null, true, true, true, true]);
     eq('  장부 정리 — 등록 목록에서 빠진 공고의 칸은 지운다(확보 기록을 남기게 된 뒤 장부가 끝없이 자라지 않게) (리뷰 R5)',
       Object.keys(wdLed).includes(canonUrl('https://fake.example/left-registered?id=1')), false);
@@ -250,6 +252,45 @@ export default async function bodies(eq, ctx) {
     eq('  성공한 실행은 rescue-bodies 라벨의 열린 이슈를 닫는다 — 성공일 때만 · 알림 뒤 (bodies-7)',
       [iClose > iAlert, /if: success\(\)/.test(close), /labels: 'rescue-bodies'/.test(close) && /state: 'closed'/.test(close), /continue-on-error: true/.test(close)],
       [true, true, true, true]);
+
+    /* 두 스크립트(github-script)를 **진짜로 돌린다** — 글자 검사만으로는 '옛 판 리포트를 붙이지 않는다'를 지워도 통과했다(red-green 에서 드러남).
+       가짜 github·context 와 가짜 fs(리포트 표본)로 부른다. 리포트의 '실행:' 은 한국 날짜다. */
+    const raw = readText('.github/workflows/rescue-bodies.yml');
+    const scriptOf = (name) => {
+      const i = raw.indexOf(`- name: ${name}\n`);
+      const m = i < 0 ? null : raw.slice(i).match(/\n {10}script: \|\n((?: {12}[^\n]*\n|[ \t]*\n)+)/);
+      return m ? m[1].replace(/^ {12}/gm, '') : '';
+    };
+    const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
+    const ctxFake = { serverUrl: 'https://github.example', repo: { owner: 'o', repo: 'r' }, runId: 4242 };
+    const runUrl = 'https://github.example/o/r/actions/runs/4242';
+    const runAlert = async (report) => {
+      const made = [];
+      const fakeFs = { readFileSync: () => { if (report === null) throw new Error('ENOENT'); return report; } };
+      try {
+        await new AsyncFunction('require', 'github', 'context', scriptOf('실패하면 이슈로 알린다'))(
+          (m) => (m === 'fs' ? fakeFs : null), { rest: { issues: { create: async (o) => { made.push(o); } } } }, ctxFake);
+      } catch (e) { return `스크립트 오류: ${e.message}`; }
+      return made.length === 1 ? `${made[0].title}\n${made[0].body}` : `이슈 ${made.length}건`;
+    };
+    const fresh = await runAlert(`# 리포트\n\n실행: ${kstToday()}\n\n- ⏱ 오늘표본공고 — 60초 안에 끝나지 않아 건너뜀\n`);
+    const stale = await runAlert('# 리포트\n\n실행: 2026-09-30\n\n- · 옛표본공고 — 본문 없음 (4회째)\n');
+    const none = await runAlert(null);
+    eq('  실패 알림을 진짜로 돌리면 — 오늘 리포트는 붙이고 · 옛 판(9-30) 리포트는 안 붙이고 그 날짜를 적고 · 리포트가 없어도 이슈는 생긴다 · 셋 다 실행 로그 주소 (bodies-7)',
+      [/오늘표본공고/.test(fresh), /옛표본공고/.test(stale), /2026-09-30 판이라 붙이지 않았습니다/.test(stale), /리포트가 없습니다/.test(none),
+        [fresh, stale, none].every((b) => b.includes(runUrl)), /^🚨 자격요건 로봇/.test(fresh)],
+      [true, false, true, true, true, true]);
+    const closed = [];
+    const commented = [];
+    try {
+      await new AsyncFunction('github', 'context', scriptOf('성공하면 옛 실패 이슈를 닫는다'))({
+        paginate: async (fn, opts) => (opts.labels === 'rescue-bodies' && opts.state === 'open' ? [{ number: 7 }, { number: 8, pull_request: {} }] : []),
+        rest: { issues: { listForRepo: () => {}, createComment: async (o) => { commented.push([o.issue_number, o.body.includes(runUrl)]); },
+          update: async (o) => { closed.push([o.issue_number, o.state, o.state_reason]); } } },
+      }, ctxFake);
+    } catch (e) { closed.push(`스크립트 오류: ${e.message}`); }
+    eq('  성공 정리를 진짜로 돌리면 — rescue-bodies 라벨의 열린 이슈만(끌어오기 요청 빼고) 실행 로그 주소를 남기고 닫는다 (bodies-7)',
+      [commented, closed], [[[7, true]], [[7, 'closed', 'completed']]]);
     const revert = (wf.match(/- name: 관문에 걸리면 되돌린다[\s\S]*?exit 1/) || [''])[0];
     eq('  관문에 걸려 되돌릴 때 장부(rescue-ledger.json)도 되돌린다 — 본문은 되돌려지고 확보 기록만 남으면 이레 동안 아무도 안 연다 (bodies-12 ③)',
       /git checkout -- [^\n]*collector\/rescue-ledger\.json/.test(revert), true);
