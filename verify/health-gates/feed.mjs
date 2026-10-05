@@ -88,6 +88,13 @@ export default async function feed(eq, ctx) {
       wide.map((n) => n.foundAt), ['2026-10-01', '2026-09-30', '2026-08-20']);
     eq('  기본 since = 44개교 복원일', FEED_HEAL_SINCE, '2026-09-29');
     eq('  메울 것이 없으면 피드 그대로', healFromLedger([A], [A2], { today: TODAY, served: SERVED }).map((n) => n === A), [true]);
+    /* 차례 — 장부가 오래된 글 먼저여도 결과는 foundAt 내림차순(리뷰 2026-10-05 R2: wide 표본은 장부가 이미 최신순이라 정렬을 지워도 초록이었다).
+       정렬이 없으면 메운 글이 맨 뒤에 붙어 capNotices(학교당 40)가 더 최근 글을 자르고, 앱은 파일 차례대로 그려 맨 아래에 보인다. */
+    const Aold = { school: '경희대학교', title: '2026 차례 표본 지금 글', url: 'https://k.kr/view?id=31', foundAt: '2026-09-25' };
+    const Cold = { school: '건국대학교', title: '2026 차례 표본 오래된 글', url: 'https://kk.kr/v?no=32', foundAt: '2026-08-20' };
+    const Bnew = { school: '건국대학교', title: '2026 차례 표본 새 글', url: 'https://kk.kr/v?no=33', foundAt: '2026-09-30' };
+    eq('  🔴 장부 차례가 [오래된 글, 새 글]이어도 결과는 foundAt 내림차순 (메운 글이 맨 뒤에 붙지 않는다)',
+      healFromLedger([Aold], [Cold, Bnew], { today: TODAY, served: SERVED, since: '0000-00-00' }).map((n) => n.foundAt), ['2026-09-30', '2026-09-25', '2026-08-20']);
     /* 제목은 저장하는 로봇과 같은 청소(cleanTitle)를 거친다 — 장부에는 청소 전 제목이 남아 있다 */
     const dirty = { school: '건국대학교', title: '2026학년도 2학기 성적우수 장학생 선발 안내 학생지원팀 2026-09-30 조회 738', url: 'https://kk.kr/v?no=9', foundAt: '2026-10-02' };
     const cleaned = healFromLedger([], [dirty], { today: TODAY, served: SERVED });
@@ -173,6 +180,32 @@ export default async function feed(eq, ctx) {
       [out.map((n) => n.url).sort(), L.url.includes('&#038;'), shownE.url.includes('&amp;')],
       [['https://s.kr/notice/?mod=document&category1=%EC%9E%A5%ED%95%99&uid=316', 'https://s.kr/notice/?mod=document&uid=323', 'https://s.kr/notice/?mod=document&uid=400'], true, true]);
     eq('① ⓕ 학교별 파일에도 없던 글(restored) · 학교별 파일에 있던 글(kept)을 따로 센다', counts, { restored: 2, kept: 1 });
+  }
+
+  /* ── ① ⓖ 학교별 파일 상한 (리뷰 2026-10-05 R1) ──
+     한 학교 장부 65건(60일 안 · FEED_HEAL_SINCE 뒤) · notices.json 40건(최신). 발행은 학교당 PER_SCHOOL(60)에서 자르는데 메우기가 그걸 모르면
+     1회차에 25건을 '다시 실었다'고 세지만 파일에 드는 것은 20건이고, 2·3회차에도 같은 5건을 매번 '다시 실었다'고 센다(리포트 🔁 거짓). */
+  {
+    const dir = pathToFileURL(fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-feed-perschool-')) + path.sep);
+    const K = '경희대학교';
+    const L = Array.from({ length: 65 }, (_, i) => ({ school: K, title: `2026 상한 표본 장학 공고 ${i + 1}호 선발 안내`, url: `https://k.kr/v?no=${1000 + i}`,
+      foundAt: new Date(TODAY.getTime() - Math.floor(i / 11) * 86400000).toISOString().slice(0, 10) }));   // 10-04 … 09-29 (최신이 앞)
+    const notices0 = L.slice(0, 40).map((n) => ({ ...n }));
+    publishBySchool(notices0, { dir, today: TODAY });
+    const urlsOf = () => (fileItems(dir, K) || []).map((n) => n.url);
+    const before = new Set(urlsOf());
+    const run1 = collectorTail({ dir, today: TODAY, served: SERVED, notices: notices0, ledger: L });
+    const addedToFile = urlsOf().filter((u) => !before.has(u)).length;
+    const run2 = collectorTail({ dir, today: TODAY, served: SERVED, notices: run1.notices, ledger: L });
+    const after2 = urlsOf();
+    const run3 = collectorTail({ dir, today: TODAY, served: SERVED, notices: run2.notices, ledger: L });
+    eq('① ⓖ 🔴 1회차 restored = 학교별 파일에 실제로 더해진 수 (상한 60 밖으로 밀리는 장부 글은 싣지도 세지도 않는다)',
+      [run1.counts.restored, addedToFile, urlsOf().length], [20, 20, 60]);
+    eq('  2·3회차는 restored 0 — 같은 글을 매 실행 \'다시 실었다\'고 세지 않는다 · 파일은 그대로 60건',
+      [run2.counts, run3.counts, after2.length, urlsOf().join() === after2.join()], [{ restored: 0, kept: 20 }, { restored: 0, kept: 20 }, 60, true]);
+    eq('  상한은 발행과 같은 값을 쓴다 (opts.perSchool 로 바꾸면 그만큼만)',
+      [healFromLedger(notices0, L, { today: TODAY, served: SERVED }).length, healFromLedger(notices0, L, { today: TODAY, served: SERVED, perSchool: 45 }).length], [60, 45]);
+    fs.rmSync(dir, { recursive: true, force: true });
   }
 
   /* ── ② 고아 파일 → 빈 파일 ── */
