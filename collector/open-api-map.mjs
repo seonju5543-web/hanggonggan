@@ -29,13 +29,34 @@ const { linkShape, decodeUrlEntities } = createRequire(import.meta.url)('../sour
 
 /* 출처마다 싣는 최대 글 수 — 넷 합쳐 55. 활동 파일 상한(collect.mjs ACT_CAP 200)을 API 글이 먹어
    게시판 글이 밀려나지 않게(밀려난 게시판 글은 장부 때문에 다시 안 온다 · 리뷰 M1) */
+/* host — 같은 서버(열쇠·속도 제한을 같이 쓴다)끼리 묶는 이름. 묶음끼리는 **동시에**, 묶음 안은 차례대로 받는다(runSourceGroups · 2026-10-05 점검 api-08).
+   공공데이터포털이 끊긴 날 그 재시도 쉼(10·40초)이 6분 예산 하나를 먹어 멀쩡한 온통청년까지 ❌ 가 될 수 있었다. */
 export const API_SOURCES = {
-  kstartup: { name: 'K-Startup 사업공고', cap: 15 },
-  vol1365: { name: '1365 봉사참여정보', cap: 15 },
-  /* 순서 = 받는 순서. 청년콘텐츠(작은 3쪽)를 청년정책(33쪽 · 쪽 사이 2.5초)보다 **먼저** — 6분 예산을 청년정책이 다 쓰면 멀쩡한 콘텐츠가 매일 ❌ 가 된다(2026-10-02 리뷰) */
-  youthContent: { name: '온통청년 청년콘텐츠', cap: 10 },
-  youthPolicy: { name: '온통청년 청년정책', cap: 15 },
+  kstartup: { name: 'K-Startup 사업공고', cap: 15, host: 'data.go.kr' },
+  vol1365: { name: '1365 봉사참여정보', cap: 15, host: 'data.go.kr' },
+  /* 순서 = 받는 순서(묶음 안). 청년콘텐츠(작은 3쪽)를 청년정책(33쪽 · 쪽 사이 2.5초)보다 **먼저** — 6분 예산을 청년정책이 다 쓰면 멀쩡한 콘텐츠가 매일 ❌ 가 된다(2026-10-02 리뷰) */
+  youthContent: { name: '온통청년 청년콘텐츠', cap: 10, host: 'youthcenter' },
+  youthPolicy: { name: '온통청년 청년정책', cap: 15, host: 'youthcenter' },
 };
+
+/** 출처를 서버 묶음별로 돌린다 — 묶음끼리는 동시에(Promise.all), 묶음 안은 order 순서대로 차례로.
+    돌려주는 것은 **order 순서**의 결과 배열(끝난 순서가 아니다 — mergeApi 는 넣은 순서로 '먼저 온 출처가 이긴다'를 정한다).
+    run 이 던지면 그 출처만 { error } 로 남기고 다른 출처는 계속한다. */
+export async function runSourceGroups(order, hostOf, run) {
+  const groups = new Map();
+  for (const src of order) {
+    const h = (hostOf && hostOf(src)) || src;
+    if (!groups.has(h)) groups.set(h, []);
+    groups.get(h).push(src);
+  }
+  const out = new Map();
+  await Promise.all([...groups.values()].map(async (list) => {
+    for (const src of list) {
+      try { out.set(src, await run(src)); } catch (error) { out.set(src, { error }); }
+    }
+  }));
+  return order.map((src) => out.get(src));
+}
 
 const MAX_LEN = 160;
 const clip = (v) => {

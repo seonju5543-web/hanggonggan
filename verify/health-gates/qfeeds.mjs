@@ -19,6 +19,8 @@
      ⑧ 재단 게시판 찾기 로봇의 실패 이유 (api-10): '홈페이지 못 엶 (fetch failed)' 28곳이 무엇 때문인지 몰랐다 — fetch-board.mjs netReason 을 불러 쓴다
      ⑨ 활동 상한 (api-11): foundAt 순으로 잘라 오래 열린 API 글이 잘렸다 '새 글'로 돌아올 수 있었다 — open-api-map.mjs actKeepDate · capActivities
      ⑩ 소식 썸네일 sharp 판 고정 (news-11) — collect-news.yml
+     ⑪ 공공 API 서버 묶음 (api-08): 공공데이터포털 장애의 재시도 쉼이 6분 예산 하나를 먹어 멀쩡한 온통청년까지 ❌ 가 될 수 있었다 —
+        서버 묶음끼리 동시에 · 묶음 안 차례 · 결과는 API_SOURCES 순서(open-api-map.mjs runSourceGroups) · 진짜 로봇을 열쇠 없이 임시 폴더에서
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
 import os from 'node:os';
@@ -37,7 +39,7 @@ import { activityDetails, eligLineOk, sanitizeElig } from '../../collector/activ
 import { boardKey, dropRetiredBoards } from '../../collector/news-board-rules.mjs';
 import { urlKey } from '../../collector/url-key.mjs';
 import { netReason } from '../../collector/fetch-board.mjs';
-import { actKeepDate, capActivities } from '../../collector/open-api-map.mjs';
+import { actKeepDate, capActivities, runSourceGroups, API_SOURCES } from '../../collector/open-api-map.mjs';
 
 const require = createRequire(import.meta.url);
 const src = (root, rel) => stripComments(fs.readFileSync(new URL(rel, root), 'utf8'));
@@ -371,5 +373,38 @@ export default async function qfeeds(eq, ctx) {
     const wf = stripYamlComments(fs.readFileSync(new URL('.github/workflows/collect-news.yml', root), 'utf8'));
     eq('⑩ 소식 썸네일 단계가 sharp 를 판을 정해 받는다 (판 없이 받으면 새 판이 Node 20 을 빼는 날 썸네일이 조용히 멈춘다)',
       [/npm i sharp@\d/.test(wf), /npm i sharp(?![@\w-])/.test(wf)], [true, false]);
+  }
+
+  /* ── ⑪ 포털 장애가 온통청년 예산을 먹지 않는다 ── */
+  {
+    const order = ['kstartup', 'vol1365', 'youthContent', 'youthPolicy'];
+    const host = { kstartup: 'data.go.kr', vol1365: 'data.go.kr', youthContent: 'youthcenter', youthPolicy: 'youthcenter' };
+    const t0 = Date.now();
+    const doneAt = {};
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    const run = async (src) => {
+      if (host[src] === 'data.go.kr') { await wait(150); doneAt[src] = Date.now() - t0; throw new Error(`${src} 포털 장애`); }
+      await wait(10); doneAt[src] = Date.now() - t0; return { result: { ok: true }, lines: [src] };
+    };
+    const outs = await runSourceGroups(order, (s) => host[s], run);
+    eq('⑪ 서버 묶음끼리는 동시에 — 포털이 150ms 씩 붙잡혀도 온통청년 둘이 포털 첫째보다 먼저 끝난다',
+      Math.max(doneAt.youthContent, doneAt.youthPolicy) < doneAt.kstartup, true);
+    eq('  돌려주는 순서는 order 그대로(끝난 순서가 아니다) · 던진 출처만 error · 묶음 안은 차례(1365 는 K-Startup 뒤)',
+      [outs.map((o) => (o.error ? 'error' : o.lines[0])), doneAt.vol1365 >= doneAt.kstartup + 100], [['error', 'error', 'youthContent', 'youthPolicy'], true]);
+    eq('  API_SOURCES 출처마다 서버 묶음(host)이 있다 · 청년콘텐츠가 청년정책보다 먼저(같은 묶음 안 차례)',
+      [Object.values(API_SOURCES).every((x) => x.host), Object.keys(API_SOURCES).indexOf('youthContent') < Object.keys(API_SOURCES).indexOf('youthPolicy')], [true, true]);
+    const oa = src(root, 'collector/open-api.mjs');
+    eq('  공공 API 로봇이 runSourceGroups 로 돌고 · 결과·리포트 줄을 API_SOURCES 순서로 채운다',
+      [/await runSourceGroups\(order, \(src\) => API_SOURCES\[src\]\.host, runSource\)/.test(oa), /order\.forEach\(\(src, i\) => \{[\s\S]{0,600}results\[src\] = o\.result;\s*lines\.push\(\.\.\.o\.lines\);/.test(oa)], [true, true]);
+    /* 진짜 로봇을 임시 폴더에서 — 열쇠가 없으면 네 출처 모두 건너뛰고(밖으로 안 나간다) 리포트 줄은 API_SOURCES 순서 */
+    const sb = sandbox(root, 'hdj-qfeeds-api-');
+    try {
+      sb.write('collector/extracted/notices-text.json', []);
+      sb.write('data/registered.json', { items: [] });
+      const r = sb.run('collector/open-api.mjs', ['--dry-run'], { DATA_GO_KR_KEY: '', YOUTHCENTER_KEY: '', YOUTHCENTER_CONTENT_KEY: '' });
+      const names = [...r.out.matchAll(/^- ⏸ \*\*(.+?)\*\*/gm)].map((m) => m[1]);
+      eq('  [공공 API 로봇 실행] 열쇠 없으면 넷 다 건너뛰고 · 리포트 줄은 API_SOURCES 순서 · 미리보기는 파일을 안 쓴다',
+        [r.status, names, sb.exists('data/activities.json') || sb.exists('collector/open-api-report.md')], [0, Object.values(API_SOURCES).map((x) => x.name), false]);
+    } finally { sb.done(); }
   }
 }
