@@ -83,7 +83,7 @@ import { dedupeNotices } from './url-key.mjs';
    왜 재발행이면 안 되는지는 publish-notices.mjs 의 patchUrlsBySchool 첫머리에 있다. */
 import { patchUrlsBySchool } from './publish-notices.mjs';
 /* 장부 규칙(시도 기록 · 사람에게 알릴 때 · '내려간 듯')은 순수 함수 파일 하나 — 관문이 가짜 장부로 그대로 돌려 본다 (2026-10-04 · 이슈 #387) */
-import { recordAttempt, settleEscalation, listScanEnd, escalationLines, pruneHuntState } from './link-hunt-rules.mjs';
+import { recordAttempt, settleEscalation, listScanEnd, escalationLines, pruneHuntState, boardUnreachableWhy } from './link-hunt-rules.mjs';
 /* 관리자가 이미 원문을 넣은 공고는 건드리지 않는다 (2026-10-04) — 표식을 바꾸면 관리자 열쇠(u:<표식>)가 안 맞아 그 주소가 화면에서 사라진다 */
 import { readLinkFixes, humanFixedBy } from './link-fixes-read.mjs';
 
@@ -553,7 +553,7 @@ for (const [listUrl, group] of boards) {
   }
   if (!opened) {
     /* 게시판이 안 열리면 그 게시판 대상 전부를 내일로 미룬다(못 읽음 — 횟수에는 안 센다 · links-14). 안 적으면 실행마다 같은 게시판을 세 번씩 다시 두드린다 */
-    for (const t of group) record(t, 'net', `게시판 열기 실패: ${openErr}`);
+    for (const t of group) record(t, 'net', boardUnreachableWhy(openErr));   // 문구는 한 곳 — 관리자 「죽은 링크」에 안 걸리게(원인 단정 금지)
     report.push(`- ⏭ 이 게시판의 대상 ${group.length}건은 내일 다시 봅니다(횟수에는 안 셉니다)`);
     await page.close().catch(() => {}); report.push(''); continue;
   }

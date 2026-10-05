@@ -2,10 +2,12 @@
    잰다:
      ① 자동 등록 id 겹침 (links-new-1): id 공식(정렬한 주소의 끝 24자)이 게시판 공통값을 잡는 게시판에서 그 게시판 글이 전부 같은 id 를 받아
         한 글이 등록되면 나머지가 '이미 등록(같은 id)', 사람이 한 글을 막으면 나머지가 '사람이 막아 둔 공고'로 **조용히** 빠졌다(9개교 70여 건) —
-        공식은 그대로 두고 겹칠 때만 꼬리표 id(canon-url.mjs registerId 한 곳) · **진짜 auto-register.mjs·admin-apply.mjs 를 임시 폴더에서 돌린다**
+        공식은 그대로 두고 겹칠 때만 꼬리표 id(canon-url.mjs registerId 한 곳) · **진짜 auto-register.mjs·admin-apply.mjs 를 임시 폴더에서 돌린다** ·
+        꼬리표 id 는 고정되지 않아 막음·쉬기는 두 꼴을 다 보고 · 옛 id 차단 풀기가 꼬리표 id 로 따로 막은 글을 풀지 않는다(리뷰 R1) · 같은 글 · 주소만 다름(리뷰 R2)
      ② 경로의 세션 표식 (links-7): 경기대 글이 `View.do;jsessionid=…` 째로 담겨 세션만 다른 같은 글이 다른 글이 됐다 — canonUrl·urlKey 가 떼고
         (원본 규칙 board-links.mjs stripSessionId 와 같은 답인지 대조) · 합칠 때 세션 없는 판이 남고 · 로봇들이 씻은 주소(detail-url.mjs cleanStoredUrl)로 확인·저장
-     ③ 못 닿은 표적은 내일 (links-14): 시간 초과·게시판 안 열림이 nextTryAt 을 안 남겨 하루 다섯 번 같은 학교를 두드렸다(link-hunt-rules.mjs recordAttempt)
+     ③ 못 닿은 표적은 내일 (links-14): 시간 초과·게시판 안 열림이 nextTryAt 을 안 남겨 하루 다섯 번 같은 학교를 두드렸다(link-hunt-rules.mjs recordAttempt) ·
+        게시판을 못 연 표적의 장부 문구가 관리자 「죽은 링크」에 걸리지 않는다(boardUnreachableWhy — 원인을 단정하지 않는다 · 리뷰 R3)
      ④ 사냥꾼 리포트 (links-2): 3단계가 찾은 공고도 '아직 못 찾음'에 남았다 · 이슈 본문에 어느 공고인지 없었다(escalationLines)
      ⑤ 사냥꾼 장부 정리 (links-9): link-hunt.json 1,404줄 중 956줄이 데이터에 없는 공고였다(pruneHuntState)
      ⑥ 복구 로봇 바깥 시계 · 예약 주석 요일 (links-15): 매달리면 고친 것을 잃는다 — **진짜 resolve-detail-urls.mjs 를 가짜 브라우저로 임시 폴더에서** ·
@@ -22,7 +24,7 @@ import { canonUrl, idFromUrl, idHash, registerId } from '../../collector/canon-u
 import { urlKey, noticeUrlRank, preferNotice } from '../../collector/url-key.mjs';
 import { stripSessionId } from '../../collector/board-links.mjs';
 import { rowDetailCandidates, cleanStoredUrl } from '../../collector/detail-url.mjs';
-import { recordAttempt, escalationLines, pruneHuntState } from '../../collector/link-hunt-rules.mjs';
+import { recordAttempt, escalationLines, pruneHuntState, boardUnreachableWhy } from '../../collector/link-hunt-rules.mjs';
 
 /* 경기대 eGov 게시판 꼴 — 글 번호(nttNo)는 가운데, 끝은 게시판 공통값(searchKrwd·sf.pnos) */
 const KGU = (ntt, sess = '') => `https://www.kyonggi.ac.kr/www/selectBbsNttView.do${sess}?key=7520&bbsNo=1073&nttNo=${ntt}&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888`;
@@ -299,6 +301,15 @@ export default async function links(eq, ctx) {
       [/for \(const t of group\) record\(t, 'net'/.test(failBranch), /record\(t, 'net', '시간 상한[^']*', undefined, \{ defer: false \}\)/.test(lh),
         /recordAttempt\(st, outcome, why, \{[^}]*\.\.\.opts \}\)/.test(lh)],
       [true, true, true]);
+    /* 관리자 화면 「죽은 링크」의 거름(_admin/admin.js deadLinks)을 그 파일에서 읽어 와 대조한다 — 브라우저 파일이라 불러올 수 없다(리뷰 R3) */
+    const adm = fs.readFileSync(new URL('_admin/admin.js', root), 'utf8');
+    const deadSrc = (adm.match(/function deadLinks\(\) \{[\s\S]*?\.filter\(\(\[, v\]\) => v && v\.lastWhy && \/(.+?)\/\.test\(v\.lastWhy\)\)/) || [])[1];
+    const deadRe = deadSrc ? new RegExp(deadSrc) : null;
+    const errs = ['page.goto: Timeout 30000ms exceeded.', 'page.goto: net::ERR_CONNECTION_REFUSED at https://a.example.ac.kr/list.do', 'page.goto: net::ERR_HTTP_RESPONSE_CODE_FAILURE at https://a.example.ac.kr/', ''];
+    eq('③ 게시판을 못 연 표적의 장부 문구는 관리자 「죽은 링크」 거름에 안 걸린다(원인을 단정하지 않는다) · 거름은 살아 있다(HTTP 404·옛 문구 \'게시판 열기 실패\'는 걸린다) · 사냥꾼이 그 문구를 쓴다',
+      [!!deadRe, errs.map((e) => !!deadRe && deadRe.test(boardUnreachableWhy(e))), !!deadRe && deadRe.test('HTTP 404'), !!deadRe && deadRe.test('게시판 열기 실패: Timeout'),
+        /record\(t, 'net', boardUnreachableWhy\(openErr\)\)/.test(failBranch), boardUnreachableWhy('a\nb'), boardUnreachableWhy('')],
+      [true, errs.map(() => false), true, true, true, '게시판을 못 엶 — 내일 다시 봄 (a)', '게시판을 못 엶 — 내일 다시 봄']);
   }
 
   /* ── ④ 사냥꾼 리포트 — 아직 못 찾은 수 · 이번에 알리는 공고 ── */

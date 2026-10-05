@@ -67,6 +67,15 @@ export function settleEscalation(st) {
   return true;
 }
 
+/* 게시판이 안 열려 미룬 표적의 장부 문구 (리뷰 2026-10-05 · links-14 뒷손질) — 관리자 화면 「죽은 링크」(_admin/admin.js deadLinks)는
+   lastWhy 의 'HTTP 4xx·5xx'·'실패'·'없음' 낱말로 줄을 고른다. '게시판 열기 실패'로 적으면 학교 서버가 잠깐 안 열린 것만으로 그 게시판의 표적 전부가
+   '죽은 링크'로 올라와 다음에 열릴 때까지 남았다 — 확인 안 한 원인을 단정하는 셈이다(CLAUDE.md 매 세션 5). 그래서 '못 엶'(있었던 일)과 '내일 다시'만 적고,
+   원인은 단정하지 않고 받은 오류 글자를 괄호에 그대로 둔다(관문 「로봇·도구 점검 관문」 links ③ 이 deadLinks 의 거름과 대조한다). */
+export function boardUnreachableWhy(err) {
+  const e = String(err || '').split('\n')[0].slice(0, 70);
+  return `게시판을 못 엶 — 내일 다시 봄${e ? ` (${e})` : ''}`;
+}
+
 /* 이번에 처음 사람에게 알리는 공고 줄 (2026-10-05 점검 links-2) — 이슈 본문은 리포트 전체라, 이 절이 없으면 이슈 제목의 'n건'이
    어느 공고인지 본문에서 찾을 수 없었다(#387). 사냥꾼이 리포트 머리말 바로 뒤에 넣는다. 빈 목록이면 [](절을 안 찍는다).
    list: [{ title, key, attempts, lastWhy, likelyGone }] */
