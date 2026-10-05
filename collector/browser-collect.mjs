@@ -11,7 +11,7 @@ import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { cleanTitle, isMenuEntry } from './clean-title.mjs';
 import { browserBodyEntry, clickBodyEntry } from './html-text.mjs';
-import { isDetailUrl, rowDetailCandidates, ruleDetailCandidates, sameTitle, observeLanding } from './detail-url.mjs';
+import { isDetailUrl, rowDetailCandidates, ruleDetailCandidates, sameTitle, observeLanding, cleanStoredUrl } from './detail-url.mjs';
 /* 원문 주소 확인은 공용 판정 한 곳(link-landing.mjs judgeLanding) — 링크 사냥꾼·원문 링크 복구와 같은 것 (2026-10-03) */
 import { judgeLanding, stripRowTail } from './link-landing.mjs';
 import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from './harvest-budget.mjs';
@@ -433,6 +433,8 @@ async function harvestTarget(t, report) {
     const morePages = await readMorePages(url, r.links, report);
     const allLinks = morePages.length ? r.links.concat(morePages) : r.links;
     const items = allLinks
+      /* 담는 주소는 씻어서 — 경로의 세션 표식(;jsessionid=)·HTML 기호를 뗀다(일반 수집기 extractLinks 와 같은 결과 · 2026-10-05 점검 links-7 경기대) */
+      .map((l) => ({ ...l, url: cleanStoredUrl(l.url) }))
       .filter((l) => l.title.length >= 6 && l.title.length <= 140 && /^https?:/.test(l.url))
       // 메뉴 제외 — 일반 수집기와 같은 모듈을 써서 판정이 갈라지지 않게 한다
       .filter((l) => KEYWORDS.test(l.title) && !isMenuEntry(l.title))

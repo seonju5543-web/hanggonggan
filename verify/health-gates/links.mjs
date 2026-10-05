@@ -7,9 +7,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 import { stripComments } from './gate.mjs';
 import { sandbox } from './bodies.mjs';
 import { canonUrl, idFromUrl, idHash, registerId } from '../../collector/canon-url.mjs';
+import { urlKey, noticeUrlRank, preferNotice } from '../../collector/url-key.mjs';
+import { stripSessionId } from '../../collector/board-links.mjs';
+import { rowDetailCandidates, cleanStoredUrl } from '../../collector/detail-url.mjs';
 
 /* 경기대 eGov 게시판 꼴 — 글 번호(nttNo)는 가운데, 끝은 게시판 공통값(searchKrwd·sf.pnos) */
 const KGU = (ntt, sess = '') => `https://www.kyonggi.ac.kr/www/selectBbsNttView.do${sess}?key=7520&bbsNo=1073&nttNo=${ntt}&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888`;
@@ -122,5 +126,37 @@ export default async function links(eq, ctx) {
     const aa = stripComments(fs.readFileSync(new URL('tools/admin-apply.mjs', root), 'utf8'));
     eq('① 배선 — 자동 등록·관리자 등록이 같은 registerId 를 부른다 · id 하나만 보고 거르는 옛 판정이 없다',
       [/registerId\('auto-'/.test(ar), /registered\.items\.some\(\(i\) => i\.id === id\)/.test(ar), /canon\.registerId\('adm-'/.test(aa)], [true, false, true]);
+  }
+
+  /* ── ② 경로의 세션 표식 ── */
+  {
+    const S1 = KGU(626377, ';jsessionid=AAA111.node1'); const S2 = KGU(626377, ';jsessionid=BBB222'); const S0 = KGU(626377);
+    const UC = createRequire(import.meta.url)('../../collector/url-key.cjs');
+    eq('② 세션만 다른 두 주소와 세션 없는 주소는 같은 글 — canonUrl · urlKey(ESM·cjs 다리) 모두',
+      [new Set([S1, S2, S0].map(canonUrl)).size, new Set([S1, S2, S0].map(urlKey)).size, new Set([S1, S2, S0].map((u) => UC.urlKey(u))).size, urlKey(S1) === UC.urlKey(S1)],
+      [1, 1, 1, true]);
+    const samples = [S1, 'https://cbnu.example.ac.kr/board/view.do;JSESSIONID=x9?seq=12', 'https://a.example.ac.kr/bbs/read.jsp;jsessionid=Q', `https://a.example.ac.kr/list.do;jsessionid=Z?menu=1#n-${encodeURIComponent('장학 공고')}`];
+    eq('② 옮겨 둔 두 줄(canon-url·url-key)이 원본 규칙(board-links.mjs stripSessionId)과 같은 답을 낸다',
+      samples.map((u) => [canonUrl(u) === canonUrl(stripSessionId(u)), urlKey(u) === urlKey(stripSessionId(u)), /jsessionid/i.test(canonUrl(u) + urlKey(u))]),
+      samples.map(() => [true, true, false]));
+    eq('② 세션 판은 순위가 낮다 — 합칠 때 세션 없는 판이 남는다(순서를 바꿔도) · 목록 표식보다는 앞',
+      [noticeUrlRank(S1) > noticeUrlRank(S0), noticeUrlRank(S1) < noticeUrlRank(`${S0}#n-x`), preferNotice({ url: S1 }, { url: S0 }).url, preferNotice({ url: S0 }, { url: S1 }).url],
+      [true, true, S0, S0]);
+    const cands = rowDetailCandidates({ row: { abs: S1, t: '표본', src: '' }, listUrl: 'https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073' });
+    eq('② 사냥꾼·복구·브라우저 수집의 후보는 씻은 주소다 — 새 탭 확인도 학생이 여는 주소로',
+      [cands.length > 0, cands.some((c) => /jsessionid/i.test(c)), cleanStoredUrl(`${S0.replace(/&/g, '&amp;')}`) === S0, cleanStoredUrl(S1)], [true, false, true, S0]);
+    eq('② id 공식은 세션이 있어도 그대로(경기대 표본)', [idFromUrl('auto-', S1), idFromUrl('auto-', S0)], ['auto-hkrwdsfpnos1073sfpnos888', 'auto-hkrwdsfpnos1073sfpnos888']);
+    const lh = stripComments(fs.readFileSync(new URL('collector/link-hunter.mjs', root), 'utf8'));
+    const rs = stripComments(fs.readFileSync(new URL('collector/resolve-detail-urls.mjs', root), 'utf8'));
+    const bc = stripComments(fs.readFileSync(new URL('collector/browser-collect.mjs', root), 'utf8'));
+    /* 저장 줄 자체는 '확인을 통과한 변수'(url·got·found)만 받는다(관문 「원문 링크 정직성」 producers ①) — 그 변수가 **씻은 주소에서만** 채워지는지 본다:
+       1단계 url = 후보(rowDetailCandidates — 위에서 씻은 것을 확인) · 3단계 got = cleanStoredUrl 로 씻어 확인한 cu · 복구 found = 후보 또는 클릭 뒤 more(씻음) */
+    const gotSets = [...lh.matchAll(/\bgot = ([^;]+);/g)].map((m) => m[1].trim());
+    const cuSets = [...lh.matchAll(/const cu = ([^;]+);/g)].map((m) => m[1].trim());
+    eq('② 사냥꾼 3단계는 씻은 주소(cu)로 확인하고 그것을 담는다 · 복구 로봇의 클릭 뒤 후보도 씻는다 · 브라우저 수집은 행 주소를 씻어 담는다',
+      [gotSets.length >= 2 && gotSets.every((x) => x === 'cu' || x === 'null'), cuSets.length >= 2 && cuSets.every((x) => /^cleanStoredUrl\((row|hit)\.u\)$/.test(x)),
+        /detailCandidates\(\{[^}]*\}\)\s*\.map\(cleanStoredUrl\)/.test(rs),
+        /allLinks\s*\.map\(\(l\) => \(\{ \.\.\.l, url: cleanStoredUrl\(l\.url\) \}\)\)/.test(bc)],
+      [true, true, true, true]);
   }
 }

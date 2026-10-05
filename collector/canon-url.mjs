@@ -59,7 +59,11 @@ export function canonUrl(raw) {
     keep.sort();                       // 순서가 바뀌어도 같은 글로 본다
     // 클릭형 게시판(경희 등)은 목록 주소+제목 표식(#n-…)이 글의 정체성이다 — 떼면 서로 뭉개진다
     const marker = u.hash && u.hash.startsWith('#n-') ? u.hash : '';
-    return u.origin + u.pathname + (keep.length ? '?' + keep.join('&') : '') + marker;
+    /* 경로에 박힌 세션 표식(`View.do;jsessionid=…`)은 글과 무관하다 — 접속마다 값이 달라 같은 글이 다른 주소가 됐다(경기대 2026-10-05 · links-7).
+       떼는 규칙의 원본은 board-links.mjs stripSessionId — 이 파일은 관리자 화면이 브라우저 모듈로 싣고 import 가 없어야 해서 한 줄만 옮겨 둔다
+       (관문 「로봇·도구 점검 관문」 links ② 가 두 규칙이 같은 답을 내는지 대조한다).
+       ⚠️ 끝 24자 id 공식: 세션은 물음표 앞이라 뒤에 쿼리가 24자 넘게 붙은 주소는 id 가 그대로다 — 2026-10-05 등록·차단·피드 주소 539개 실측 변화 0. */
+    return u.origin + u.pathname.replace(/;jsessionid=[^/?#]*/i, '') + (keep.length ? '?' + keep.join('&') : '') + marker;
   } catch { return (raw || '').split('#')[0]; }
 }
 

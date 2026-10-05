@@ -66,7 +66,7 @@
 import fs from 'node:fs';
 import { chromium } from 'playwright';
 import { cleanTitle } from './clean-title.mjs';
-import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, rowMatchesTitle, rowByCore, rowDetailCandidates, observeLanding, otherTitlesOnSite } from './detail-url.mjs';
+import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, rowMatchesTitle, rowByCore, rowDetailCandidates, observeLanding, otherTitlesOnSite, cleanStoredUrl } from './detail-url.mjs';
 /* 🔴 '이 주소를 열면 그 공고가 뜨는가'는 **공용 판정 한 곳**(link-landing.mjs judgeLanding)으로 본다 (2026-10-03).
    예전 verify() 는 제 규칙을 따로 들고 있다가 ① 로그인 벽을 제목보다 먼저 봐서 머리의 회원 로그인 상자 때문에
    멀쩡한 전북·부경 공고를 떨어뜨렸고 ② 목록 판정에 빈 목록을 받아 진짜 목록을 통과시켰다.
@@ -655,7 +655,7 @@ for (const [listUrl, group] of boards) {
       rows = await scrapeRows(page);
 
       if (url) {
-        if (!DRY) { t.ref[t.field] = url; rememberBoardTitle(t, rowText); }
+        if (!DRY) { t.ref[t.field] = url; rememberBoardTitle(t, rowText); }   // url 은 씻은 후보(rowDetailCandidates → cleanStoredUrl · links-7)
         found += 1;
         record(t, 'ok');
         report.push(`  - ✅ ${want.slice(0, 42)} → ${url.slice(0, 104)}`);
@@ -770,8 +770,9 @@ if (stillLost.length && !outOfTime()) {
         if (row) {
           /* 🔴 다른 글 제목을 넘긴다 — 예전엔 `verify(row.u, want, [])` 라 목록 화면도 통과했다 (2026-10-03) */
           const boardOthers = rows.map((r) => stripRowTail(r.t)).filter((x) => x && !sameTitle(want, x)).slice(0, 40);
-          const v = await verify(row.u, [want, row.t, ...expectTitles(t.ref)], boardOthers.concat(siteOthers));
-          if (v.ok) { got = row.u; gotText = row.t; }
+          const cu = cleanStoredUrl(row.u);   // 학생이 열 주소(세션 표식 뗀 것)로 확인하고 그대로 담는다 (links-7)
+          const v = await verify(cu, [want, row.t, ...expectTitles(t.ref)], boardOthers.concat(siteOthers));
+          if (v.ok) { got = cu; gotText = row.t; }
         }
       } catch { /* 다음 후보 */ } finally { await p.close().catch(() => {}); }
       if (got) break;
@@ -781,12 +782,13 @@ if (stillLost.length && !outOfTime()) {
       tried.push(`${origin} (사이트 검색)`);
       const hit = await siteSearch(origin, want);
       if (hit) {
-        const v = await verify(hit.u, [want, hit.t, ...expectTitles(t.ref)], hit.others.concat(siteOthers));
-        if (v.ok) { got = hit.u; gotText = hit.t; }
+        const cu = cleanStoredUrl(hit.u);
+        const v = await verify(cu, [want, hit.t, ...expectTitles(t.ref)], hit.others.concat(siteOthers));
+        if (v.ok) { got = cu; gotText = hit.t; }
       }
     }
     if (got) {
-      if (!DRY) { t.ref[t.field] = got; rememberBoardTitle(t, gotText); }
+      if (!DRY) { t.ref[t.field] = got; rememberBoardTitle(t, gotText); }   // got 은 씻어서 확인한 주소(위 cu · links-7)
       extraFound += 1; found += 1;
       record(t, 'ok');
       report.push(`  - ✅ 다른 경로에서 찾음: ${want.slice(0, 40)} → ${got.slice(0, 100)}`);

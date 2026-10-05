@@ -21,6 +21,7 @@ import { looksLikeHint } from './deadline-hint.mjs';
       그래서 정규식 한 줄만 옮겨 두고, 관문 「원문 링크 정직성」 core ⑥ 이 두 줄이 **글자까지 같은지** 대조한다. */
 const LIST_PLUS_ID_RE = /\/subview\.do\?(?:[^#]*&)?nttId=|\/selectNttList\.do\?[^#]*nttId=/i;
 const URL_AMP_ANY = /&(?:amp|#0*38|#x0*26);/i;   // source-link.js decodeUrlEntities 가 되돌리는 기호(사본 — 관리자 화면 때문)
+const SESSION_IN_PATH = /;jsessionid=[^/?#]*/i;   // board-links.mjs stripSessionId 와 같은 꼴(사본 — import 를 더할 수 없다 · 관문 links ② 대조)
 const isListPlusId = (u) => LIST_PLUS_ID_RE.test(String(u || '').replace(/&(?:amp|#0*38|#x0*26);/gi, '&'));
 /* 같은 게시판 글 번호 (2026-10-03 리뷰 F4) — 목록+번호 꼴(가천 subview.do?nttId=125843 · 서울교대 selectNttList?nttId=)과
    그 글의 진짜 주소(가천 /bbs/kor/478/125843/artclView.do · 서울교대 selectNttInfo?nttSn=)는 제목 머리말이 달라([장학공지]/[공통])
@@ -70,6 +71,9 @@ export function urlKey(raw) {
   const hashIdx = u.indexOf('#');
   const hash = hashIdx >= 0 ? u.slice(hashIdx) : '';
   if (hashIdx >= 0) u = u.slice(0, hashIdx);
+  /* 경로에 박힌 세션 표식(`View.do;jsessionid=…`)은 글과 무관하다 — 접속마다 값이 달라 같은 글이 다른 열쇠가 됐다(경기대 2026-10-05 · links-7).
+     원본 규칙은 board-links.mjs stripSessionId — 이 파일은 import 를 더할 수 없어(아래 rekeyKey 주석) 한 줄만 옮겨 둔다(관문 links ② 가 대조). */
+  u = u.replace(SESSION_IN_PATH, '');
   const qIdx = u.indexOf('?');
   if (qIdx < 0) return u + hash;
   const base = u.slice(0, qIdx);
@@ -152,13 +156,14 @@ export function rekeyLedger(obj) {
   return add.size;
 }
 
-/* 주소 하나의 순위(작을수록 낫다) — 진짜 주소 0 · HTML 기호가 남은 주소 1 · 목록 표식 2 · 목록 주소+번호 3.
+/* 주소 하나의 순위(작을수록 낫다) — 진짜 주소 0 · HTML 기호·세션 표식이 남은 주소 1 · 목록 표식 2 · 목록 주소+번호 3.
    병합(preferNotice)과 학교별 파일 고치기(publish-notices.mjs patchUrlsBySchool)가 같이 쓴다 — 🔴 순위를 낮추는 쪽으로는 고치지 않는다. */
 export function noticeUrlRank(url) {
   const u = String(url || '');
   if (u.includes('#n-')) return 2;
   if (isListPlusId(u)) return 3;
-  return URL_AMP_ANY.test(u) ? 1 : 0;
+  /* 세션 표식이 박힌 주소도 HTML 기호 꼴처럼 1 — 같은 글의 세션 없는 판이 이긴다(경기대 2026-10-05 · links-7) */
+  return URL_AMP_ANY.test(u) || SESSION_IN_PATH.test(u) ? 1 : 0;
 }
 
 /* 두 항목 중 사용자에게 더 나은 쪽 — 공고로 바로 가는 진짜 주소를 남긴다

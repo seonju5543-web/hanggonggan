@@ -20,7 +20,7 @@
    실행: node collector/resolve-detail-urls.mjs [--dry]  (워크플로 resolve-detail-urls.yml) */
 import fs from 'node:fs';
 import { chromium } from 'playwright';
-import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, rowMatchesTitle, detailCandidates, idsFromSource, rowDetailCandidates, observeLanding, otherTitlesOnSite } from './detail-url.mjs';
+import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, rowMatchesTitle, detailCandidates, idsFromSource, rowDetailCandidates, observeLanding, otherTitlesOnSite, cleanStoredUrl } from './detail-url.mjs';
 /* '이 주소를 열면 그 공고가 뜨는가'는 공용 판정 한 곳(link-landing.mjs) — 링크 사냥꾼·브라우저 수집과 같은 것 (2026-10-03).
    예전 verifyCandidate 는 로그인 벽을 제목보다 먼저 봐서 머리의 회원 로그인 상자 하나로 멀쩡한 공고를 떨어뜨렸다. */
 import { judgeLanding, expectTitles, stripRowTail } from './link-landing.mjs';
@@ -357,6 +357,7 @@ for (const [listUrl, group] of boards) {
         else { await navP; await page.waitForTimeout(2500); }
         const dom = await readDom(detail, listUrl);
         const more = detailCandidates({ ...dom, rowIds: idsFromSource(row.src), forms: boardForms })
+          .map(cleanStoredUrl)   // 확인·저장은 씻은 주소로(세션 표식·HTML 기호 · links-7)
           .filter((c) => isDetailUrl(c, listUrl) && !cands.includes(c));
         for (const c of more) {
           cands.push(c);
@@ -377,7 +378,7 @@ for (const [listUrl, group] of boards) {
 
     if (found) {
       resolvedMap[t.url] = found;
-      if (!DRY) t.ref[t.urlField] = found;
+      if (!DRY) t.ref[t.urlField] = found;   // found 는 씻은 후보에서만 온다(rowDetailCandidates · 클릭 뒤 more — 둘 다 cleanStoredUrl · links-7)
       fixed += 1;
       report.push(`  - ✅ ${want.slice(0, 44)} → ${found.slice(0, 110)}`);
     } else {
