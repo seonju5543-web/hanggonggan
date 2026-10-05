@@ -91,6 +91,17 @@ export default async function gate(eq, ctx) {
         [aheadAssets.out, diverged.out].every((o) => o.includes(`HEAD:${BASE}`))],
       [true, true]);
     eq('  뒤처졌으면 먼저 main 을 합치라고 적는다', /⓪[^\n]*git merge origin\/main/.test(diverged.out), true);
+    /* 리뷰 R1 — push 마다 따로 합치라고 하면 세 곳이 세 커밋이 된다 → ⓪ 에서 둘 다 합치고 ①②③ 은 같은 HEAD (뒤처지지 않았어도 ⓪ 을 적는다 — 기본 브랜치는 봇이 늘 움직인다) */
+    const steps = (o) => {
+      const L = o.split('\n');
+      const zero = L.find((l) => /^\s*⓪/.test(l)) || '';
+      const pushes = L.filter((l) => /^\s*[①②③]/.test(l));
+      return [zero.includes(`git merge origin/${BASE}`) && zero.includes('git merge origin/main') && L.indexOf(zero) < L.indexOf(pushes[0]),
+        pushes.length, pushes.some((l) => /git merge|git fetch/.test(l)), pushes.map((l) => (l.match(/git push origin (\S+)/) || [])[1])];
+    };
+    eq('  해결 안내 — ⓪ 에서 기본 브랜치·main 을 먼저 합치고 ①②③ 은 같은 HEAD 를 올린다(push 사이에 합치기 없음 · 뒤처지지 않은 경우도)',
+      [steps(aheadAssets.out), steps(diverged.out)],
+      [[true, 3, false, ['HEAD', `HEAD:${BASE}`, 'HEAD:main']], [true, 3, false, ['HEAD', `HEAD:${BASE}`, 'HEAD:main']]]);
   }
 
   /* ── ② ops-10 하트비트 문턱 바닥값 · ③ ops-11 기본 브랜치·main 의 성공만 ── */

@@ -170,13 +170,16 @@ for (const f of ['data/notices.json', 'data/activities.json', 'data/registered.j
 }
 if (counted.length) console.log(`\n내 작업이 바꾼 건수:\n${counted.join('\n')}`);
 
-/* 🔴 main 하나에만 올리라고 권하지 않는다 — 기본 브랜치를 건너뛰면 로봇이 옛 판에서 돌고 다음 배포 동기화가 부딪힌다(CLAUDE.md 「브랜치 · 배포」). */
+/* 🔴 main 하나에만 올리라고 권하지 않는다 — 기본 브랜치를 건너뛰면 로봇이 옛 판에서 돌고 다음 배포 동기화가 부딪힌다(CLAUDE.md 「브랜치 · 배포」).
+   🔴 합치기는 ⓪ 한 번에 먼저 하고 ①②③ 은 **같은 HEAD** 를 올린다(2026-10-05 코드 리뷰) — push 마다 따로 합치면 세 곳이 세 커밋이 되어
+      main 에는 작업 브랜치가 가리키지 않는 병합 커밋이 올라간다(노션 「작업 현황」 '브랜치' 칸이 작업 브랜치를 알아보기 어려워진다). */
 console.log(`
-해결 — CLAUDE.md 「브랜치 · 배포」 대로 세 곳에 같은 내용을 올립니다 (기본 브랜치를 건너뛰고 main 에만 올리지 마세요):${behind !== '0' ? `
-  ⓪ main 이 ${behind}커밋 앞서 있으니 먼저:  git fetch origin && git merge origin/main` : ''}
+해결 — CLAUDE.md 「브랜치 · 배포」 대로 세 곳에 같은 커밋을 올립니다 (기본 브랜치를 건너뛰고 main 에만 올리지 마세요):
+  ⓪ 먼저 둘 다 합칩니다:  git fetch origin && git merge origin/${BASE} && git merge origin/main${behind !== '0' ? `   (main 이 ${behind}커밋 앞서 있습니다)` : ''}
   ① 작업 브랜치:  git push origin HEAD
-  ② 기본 브랜치:  git fetch origin && git merge origin/${BASE} 뒤  git push origin HEAD:${BASE}
-  ③ 앱(main):     git fetch origin && git merge origin/main 뒤  git push origin HEAD:main   (GitHub Pages 가 자동 배포)
+  ② 기본 브랜치:  git push origin HEAD:${BASE}
+  ③ 앱(main):     git push origin HEAD:main   (GitHub Pages 가 자동 배포)
+  push 가 거절되면(그사이 로봇이 커밋했다) ⓪ 부터 다시 하고 ①②③ 을 다시 올립니다 — push 사이에 따로 합치면 세 곳이 서로 다른 커밋이 됩니다.
   휴대폰·웹 세션(작업 브랜치 하나만 쓰는 세션)은 deploy/run-deploy.txt 의 branch: 줄에 브랜치 이름을 적어 push 하세요.
 (로봇 수집분은 '배포 동기화' 워크플로가 자동으로 올리므로 보통 이 검사는 통과합니다.)`);
 process.exit(1);
