@@ -31,7 +31,7 @@ const SITE = process.env.INSTA_PUBLIC_BASE || 'https://seonju5543-web.github.io/
 
 /** 🔴 기다림의 길이를 **한 곳에** 모은다 — 시험에서 0으로 줄여 쓴다(실제 값으로 시험하면 몇 분 걸린다).
  *  그래서 시험이 진짜 코드를 돌리면서도 빨리 끝난다(규칙을 베껴 재는 시험은 원본이 바뀌어도 통과한다). */
-export const WAITS = { liveTries: 20, liveGapMs: 15000, readyTries: 30, readyGapMs: 4000, pubTries: 5, pubGapMs: 15000 };
+export const WAITS = { liveTries: 20, liveGapMs: 15000, readyTries: 30, readyGapMs: 4000, pubTries: 5, pubGapMs: 15000, permalinkMs: 30000 };
 
 const arg = (k, d) => {
   const a = process.argv.find((x) => x.startsWith(`--${k}=`));
@@ -199,10 +199,18 @@ export async function publish({ dir, images, caption, live, f = fetch, waits = W
   // ⚠️ 결과 칸 쓰기가 넘어지면 올라간 글이 '실패' 로 보이고 장부에도 안 적힌다 — 쓰기 실패는 삼킨다.
   const one = (v) => String(v ?? '').replace(/[\r\n]/g, '');
   const note = (k, v) => { if (outFile) try { appendFileSync(outFile, `${k}=${one(v)}\n`); } catch { /* 결과 칸은 거들 뿐 */ } };
-  // 🔴 올라간 **즉시** media 를 먼저 남긴다 — 아래 주소 묻기는 시한이 없어, 거기서 멈춰 작업 시한에 취소되면
-  //    실패 알림이 '안 올라갔다' 고 읽어 「게시가 실패했습니다」 → 다시 누르면 두 번 올라간다(2026-10-05 재검증).
+  // 🔴 올라간 **즉시** media 를 먼저 남긴다 — 그 뒤(주소 묻기·장부 쓰기) 어디서든 멈추거나 작업이 끊기면 실패 알림이 '안 올라갔다' 고 읽어
+  //    「게시가 실패했습니다」 → 다시 누르면 두 번 올라간다(2026-10-05 재검증). media 가 남아 있으면 「올린 기록 저장」 이 그 번호로 장부에 적는다.
   note('media', mediaId);
-  const { permalink } = await graph(mediaId, { fields: 'permalink' }, 'GET', f).catch(() => ({}));
+  // 🔴 게시물 주소 묻기에는 시한을 둔다(리뷰 2026-10-05) — 여기서 멈추면 아래 명령줄이 장부에 올림 기록을 못 적고, 관리자 화면에 게시 버튼이
+  //    그대로 남는다. 넘으면 주소 없이 돌아간다(장부에는 media 로 적힌다 · 주소는 인스타 앱에서 본다). 요청도 끊어 연결이 프로세스를 붙잡지 않게.
+  const ms = waits.permalinkMs ?? WAITS.permalinkMs;
+  let timer;
+  const cut = (u, o = {}) => f(u, { ...o, signal: AbortSignal.timeout(ms) });
+  const { permalink } = await Promise.race([
+    graph(mediaId, { fields: 'permalink' }, 'GET', cut).catch(() => ({})),
+    new Promise((res) => { timer = setTimeout(() => { log(`  게시물 주소를 ${Math.round(ms / 1000)}초 안에 못 받았습니다 — 주소 없이 기록합니다.`); res({}); }, ms); }),
+  ]).finally(() => clearTimeout(timer));
   note('permalink', permalink);
   log(`  ✅ 게시 완료 ${mediaId}${permalink ? ` — ${permalink}` : ''}`);
   return { mediaId, permalink: permalink || null, dir };
@@ -251,14 +259,10 @@ if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file:').hre
     .catch((e) => { console.error(`\n🚨 ${e.message}`); process.exit(1); });
   if (out) {
     // 🔴 올린 것을 기억하지 못하면 내일 같은 공고를 새 공고로 다시 올린다(이슈 #75 유형).
-    const { readSeen, writeSeen } = await import('./pick.mjs');
-    const { kstDay } = await import('./render.mjs');
+    //    한 줄 모양·준비 줄 '올림' 표시는 pick.mjs recordPosted 한 곳(워크플로 「올린 기록 저장」 의 ledger.mjs posted 와 같다 · KST 날짜).
+    const { readSeen, writeSeen, recordPosted } = await import('./pick.mjs');
     const seen = readSeen();
-    seen.posted.push({ code: meta.code, org: meta.org, name: meta.name, tplNo: meta.tplNo ?? null,
-      at: kstDay(), media: out.mediaId, permalink: out.permalink });   // 🔴 KST — UTC 면 새벽에 어제로 찍힌다
-    // 준비 장부의 줄도 '올림' 으로 — 관리자 화면이 두 장부를 같이 본다.
-    const pr = seen.prepared.find((p) => p.code === meta.code);
-    if (pr) { pr.status = 'posted'; pr.postedAt = kstDay(); }
+    recordPosted(seen, { code: meta.code, org: meta.org, name: meta.name, tplNo: meta.tplNo, media: out.mediaId, permalink: out.permalink });
     writeSeen(seen);
     say(`  seen.json 에 기록 — 지금까지 ${seen.posted.length}건`);
   }
