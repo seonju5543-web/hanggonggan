@@ -20,7 +20,7 @@ const { checkEntry, isDuplicatePair, sameProgram, registeredAfterDeadline, lastD
 /* 교내·교외 증거 판정 + 학교 이름표 + 합치기 — 규칙은 각자 한 곳 (2026-09-30 · 베끼지 않는다) */
 import { classifyKind, schoolDomain } from './kind-evidence.mjs';
 import { loadSchoolNames, schoolTokens } from './school-names.mjs';
-import { mergeInto, openOn, deadlineQuote } from './registered-merge.mjs';
+import { mergeInto, openOn, promotableOn, deadlineQuote } from './registered-merge.mjs';
 /* 게시판 글의 마감(본문 마감 → 제목·게시판 요약)은 notice-deadline.mjs 한 곳 — 이 파일은 불러오는 순간 실행되어 관문이 표본으로 못 잰다(2026-10-05) */
 import { parseDeadline as parseNoticeDeadline, makeBodyReader, corporaFrom } from './notice-deadline.mjs';
 /* 데이터 관문에 거듭 걸린 공고는 3일 쉰다 — 장부 규칙은 auto-held.mjs 한 곳(되돌리는 gate-guard 와 같은 파일 · 2026-10-04) */
@@ -202,8 +202,9 @@ function classify(n, regUrlSet, regItems, batchSeen, pastRounds) {
       if (any && !any.some((x) => String(x).split('|')[0] === n.school)) return { verdict: 'hold', why: `타교 등록분과 동일 사업(${(twin.name || '').slice(0, 24)}) — 받는 학교 목록에 ${n.school} 없음 · 컨펌 대기` };
       return { verdict: 'absorb', why: '이미 전국(동일 사업)', twin };
     }
-    /* 승격은 **로봇이 등록한 교외 · 사람이 범위를 정하지 않은 · 마감 안 지난** 등록분만 — 나머지는 사람이 본다(리뷰 3차) */
-    const promotable = twin.auto && twin.type === '교외' && !/^관리자/.test(twin.scopeFrom || '') && openOn(twin, TODAY);
+    /* 승격은 **로봇이 등록한 교외 · 사람이 범위를 정하지 않은 · 마감 안 지난** 등록분만 — 나머지는 사람이 본다(리뷰 3차).
+       판정은 registered-merge.mjs promotableOn 한 곳(승격 로봇과 같다 · 2026-10-05) */
+    const promotable = promotableOn(twin, TODAY);
     if (!promotable) return { verdict: 'hold', why: `타교 등록분과 동일 사업(${(twin.name || '').slice(0, 24)}) — 승격 불가(사람 지정·교내·마감 경과) 컨펌 대기` };
     return { verdict: 'promote', why: `다른 학교(${schoolOf(twin)}) 등록분과 같은 사업 → 전국으로 승격`, twin };
   }

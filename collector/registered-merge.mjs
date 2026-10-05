@@ -20,6 +20,24 @@ export function deadlineQuote(drop) {
    마감을 모르면 열린 것으로 본다. 🔴 관리자 merge 는 사람이 정하므로 이 조건을 쓰지 않는다(mergeInto 는 그대로). */
 export const openOn = (it, today) => !(it && it.deadline) || it.deadline >= today;
 
+/* 로봇이 범위를 움직여도 되는 등록분 — 로봇 등록 · 교외 · 사람이 범위를 정하지 않음(scopeFrom '관리자 …') · 마감 전.
+   승격 로봇(scope-promote)과 자동 등록(auto-register)의 판정을 **한 곳**에 둔다(2026-10-05 리뷰) — 두 파일은 불러오는 순간 실행되어
+   관문이 표본으로 못 잰다(글자로만 보던 관문은 판정 안의 openOn 을 무력화해도 초록이었다). */
+const robotScoped = (it, today) => !!(it && it.auto && it.type === '교외' && !/^관리자/.test(it.scopeFrom || '') && openOn(it, today));
+
+/** 승격 후보 — 위 조건 + 학교 한정(schoolOnly) */
+export function promotableOn(it, today) {
+  return robotScoped(it, today) && !!((it.eligibility || {}).schoolOnly);
+}
+
+/** 이미 전국인 로봇 등록분이 school 게시판의 같은 사업 글을 흡수해도 되는가 — 위 조건 + 학교 한정 없음 ·
+ *  여러 학교만 받는 공고(schoolsAny · "학교" 또는 "학교|캠퍼스")는 그 학교가 목록에 있을 때만(푸른등대 K-원전 13개교가 이 꼴) */
+export function absorbsOn(it, school, today) {
+  const e = (it && it.eligibility) || {};
+  if (!robotScoped(it, today) || e.schoolOnly) return false;
+  return !e.schoolsAny || !school || e.schoolsAny.some((x) => String(x).split('|')[0] === school);
+}
+
 export function mergeInto(keep, drop, { reason = '' } = {}) {
   const ke = keep.eligibility || {};
   const de = drop.eligibility || {};

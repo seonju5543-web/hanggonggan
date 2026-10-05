@@ -1587,9 +1587,11 @@ console.log('\n■ 장학금 판정 자동화 · 범위 승격 (2026-09-30)');
   const ar = readText(new URL('collector/auto-register.mjs', root));
   eq('자동 등록이 다른 학교의 같은 사업을 전국으로 승격한다 (verdict promote)', /sameProgram\(/.test(ar) && /verdict: 'promote'/.test(ar) && /mergeInto\(r\.twin/.test(ar), true);
   eq('  이미 전국인 등록분과 같은 사업은 흡수(absorb) — 다시 학교 한정으로 등록하지 않는다 (세 번째 학교 구멍)', /schoolOf\(i\) !== n\.school && sameProgram/.test(ar) && !/schoolOf\(i\) && schoolOf\(i\) !== n\.school/.test(ar) && /verdict: 'absorb'/.test(ar) && /r\.verdict === 'absorb'/.test(ar), true);
-  eq('  승격은 로봇 등록·교외·사람 미지정·마감 전 등록분만 (아니면 hold)', /twin\.auto && twin\.type === '교외' && !\/\^관리자\/\.test\(twin\.scopeFrom/.test(ar) && /openOn\(twin, TODAY\)/.test(ar), true);   // 마감 전 판정은 registered-merge.mjs openOn 한 곳(2026-10-05 점검 collect-14)
+  /* 판정(로봇 등록·교외·사람 미지정·마감 전)은 registered-merge.mjs promotableOn 한 곳 — 표본은 관문 「로봇·도구 점검 관문」 qnotice ④ (2026-10-05) */
+  const rmSrc = readText(new URL('collector/registered-merge.mjs', root));
+  eq('  승격은 로봇 등록·교외·사람 미지정·마감 전 등록분만 (아니면 hold)', /const promotable = promotableOn\(twin, TODAY\)/.test(ar) && /it\.auto && it\.type === '교외' && !\/\^관리자\/\.test\(it\.scopeFrom/.test(rmSrc) && /openOn\(it, today\)/.test(rmSrc), true);
   const sp = readText(new URL('collector/scope-promote.mjs', root));
-  eq('  범위 승격 로봇도 전국 등록분이 흡수한다(isNationalAbsorber) · 여러 학교만 받는 공고는 그 학교가 목록에 있을 때만', /export function isNationalAbsorber\(it, school\)/.test(sp) && /absorbed/.test(sp) && /domainMatches\(/.test(sp) && /schoolsAny\.some/.test(sp) && /schoolsAny/.test(ar) && /split\('\|'\)\[0\] === n\.school/.test(ar), true);
+  eq('  범위 승격 로봇도 전국 등록분이 흡수한다(isNationalAbsorber) · 여러 학교만 받는 공고는 그 학교가 목록에 있을 때만', /export function isNationalAbsorber\(it, school\)/.test(sp) && /absorbsOn\(it, school, TODAY\)/.test(sp) && /absorbed/.test(sp) && /domainMatches\(/.test(sp) && /schoolsAny\.some/.test(rmSrc) && /schoolsAny/.test(ar) && /split\('\|'\)\[0\] === n\.school/.test(ar), true);
   /* 리뷰 3차 — 리포트 파일은 부르는 쪽이 준다(브라우저 수집은 browser-report.md 만 커밋한다) */
   for (const f of ['collector/scope-promote.mjs', 'collector/kind-classify.mjs', 'collector/portal-candidates.mjs']) {
     eq(`  ${f} 가 리포트 파일 이름을 인자로 받는다`, /process\.argv\.slice\(2\)\.find/.test(readText(new URL(f, root))), true);

@@ -34,7 +34,7 @@ import { cleanTitle } from '../../collector/clean-title.mjs';
 import { deadlineHintFrom, hintWithoutChrome, isChromeHint } from '../../collector/deadline-hint.mjs';
 import { boilerMulti, boilerFor } from '../../collector/page-boilerplate.mjs';
 import { parseDeadline, bodyDeadlineFrom, makeBodyReader } from '../../collector/notice-deadline.mjs';
-import { openOn } from '../../collector/registered-merge.mjs';
+import { openOn, promotableOn, absorbsOn } from '../../collector/registered-merge.mjs';
 import { extractDatedRows, dropRowNumbers, retitleStored } from '../../collector/board-links.mjs';
 import { buildSearchIndex } from '../../collector/build-search-index.mjs';
 import { portalNameCandidates, portalCandidates } from '../../collector/portal-candidates.mjs';
@@ -156,10 +156,15 @@ export default async function qnotice(eq, ctx) {
     const old1 = { url: KAU_PAGES[0].url, deadlineHint: bannerHint };
     const gone = { url: `${KAU}99999`, deadlineHint: bannerHint };
     const other = { url: 'https://other.example.ac.kr/v?id=1', deadlineHint: bannerHint };
-    r.heal(fresh, true); r.heal(old1); r.heal(gone); r.heal(other);
-    eq('  발행 단계 — 이번 실행 글 · 실린 글 · 원문 없는 글 · 껍데기 모르는 호스트',
-      [(fresh.deadlineHint || '').slice(0, 14), (old1.deadlineHint || '').slice(0, 14), gone.deadlineHint, other.deadlineHint === bannerHint, r.counts.hints],
-      ['신청기간 : 2026. 1', '신청기간 : 2026. 9', null, true, 3]);
+    /* 🔴 '실린 글은 힌트가 껍데기에서 시작했을 때만' — 같은 호스트의 정상 힌트는 원문이 있든 없든 그대로(리뷰 2026-10-05: 이 '만'을 지워도 초록이던 표본) */
+    const NORMAL = '신청기간 : 2026. 9. 1. ~ 9. 30. (사람이 고친 힌트)';
+    const keepNoText = { url: `${KAU}88888`, deadlineHint: NORMAL };
+    const keepWithText = { url: KAU_PAGES[1].url, deadlineHint: NORMAL };
+    r.heal(fresh, true); r.heal(old1); r.heal(gone); r.heal(other); r.heal(keepNoText); r.heal(keepWithText);
+    eq('  발행 단계 — 이번 실행 글 · 실린 글 · 원문 없는 글 · 껍데기 모르는 호스트 · 같은 호스트의 정상 힌트(원문 없음 · 원문 있음)는 그대로',
+      [(fresh.deadlineHint || '').slice(0, 14), (old1.deadlineHint || '').slice(0, 14), gone.deadlineHint, other.deadlineHint === bannerHint,
+        keepNoText.deadlineHint, keepWithText.deadlineHint, r.counts.hints],
+      ['신청기간 : 2026. 1', '신청기간 : 2026. 9', null, true, NORMAL, NORMAL, 3]);
 
     const col = stripComments(fs.readFileSync(new URL('collector/collect.mjs', root), 'utf8'));
     eq('  수집기 배선 — 이번 실행 상세 글자를 모으고 · 읽개를 만들고 · 새 글(장학·활동·재단)과 실린 글 전부(장학·활동·재단)에 건다',
@@ -308,15 +313,31 @@ export default async function qnotice(eq, ctx) {
     eq('④ openOn — 마감 모름은 열림 · 지난 것은 닫힘 · 오늘·뒤는 열림',
       [openOn({}, '2026-10-04'), openOn({ deadline: '2026-09-18' }, '2026-10-04'), openOn({ deadline: '2026-10-04' }, '2026-10-04'), openOn({ deadline: '2026-10-30' }, '2026-10-04')],
       [true, false, true, true]);
+    /* 판정은 registered-merge.mjs 한 곳(실행 코드 없음)이라 표본으로 잰다 — 예전엔 승격 로봇 안에 있어 글자로만 봤고,
+       판정 안의 openOn 을 무력화(`openOn(it, TODAY) || true`)해도 관문이 초록이었다(리뷰 2026-10-05 red-green) */
+    const T = '2026-10-04';
+    const robot = (extra = {}) => ({ auto: true, type: '교외', eligibility: { schoolOnly: '부산대학교' }, deadline: '2026-10-30', ...extra });
+    eq('  승격 후보(promotableOn) — 로봇·교외·학교 한정·마감 전만 · 지난 마감·사람 범위·교내·사람 등록·전국은 아니다',
+      [promotableOn(robot(), T), promotableOn(robot({ deadline: undefined }), T), promotableOn(robot({ deadline: '2026-09-18' }), T),
+        promotableOn(robot({ scopeFrom: '관리자 2026-10-01' }), T), promotableOn(robot({ type: '교내' }), T), promotableOn(robot({ auto: false }), T),
+        promotableOn(robot({ eligibility: {} }), T)],
+      [true, true, false, false, false, false, false]);
+    const nat = (extra = {}) => ({ auto: true, type: '교외', eligibility: {}, deadline: '2026-10-30', ...extra });
+    eq('  흡수(absorbsOn) — 마감 전 전국 로봇 등록분만 · 지난 회차는 흡수하지 않는다 · 여러 학교만 받는 공고는 그 학교가 목록에 있을 때만',
+      [absorbsOn(nat(), '동국대학교', T), absorbsOn(nat({ deadline: '2026-09-28' }), '동국대학교', T), absorbsOn(nat({ eligibility: { schoolOnly: 'x' } }), '동국대학교', T),
+        absorbsOn(nat({ eligibility: { schoolsAny: ['부산대학교', '경희대학교|국제캠퍼스(용인)'] } }), '경희대학교', T),
+        absorbsOn(nat({ eligibility: { schoolsAny: ['부산대학교'] } }), '동국대학교', T), absorbsOn(nat({ scopeFrom: '관리자 2026-10-01' }), '동국대학교', T)],
+      [true, false, false, true, false, false]);
     const sp = stripComments(fs.readFileSync(new URL('collector/scope-promote.mjs', root), 'utf8'));
     const fnBody = (src, name) => (src.match(new RegExp(`export function ${name}\\([\\s\\S]*?\\n\\}`)) || [''])[0];
     const ar = stripComments(fs.readFileSync(new URL('collector/auto-register.mjs', root), 'utf8'));
     const twinPart = (ar.match(/if \(twin\) \{[\s\S]*?\n {2}\}/) || [''])[0];
-    eq('  배선 — 승격 로봇 후보·흡수 쪽 둘 다 · 자동 등록 흡수·승격 두 갈래 모두 openOn (registered-merge.mjs 한 곳)',
-      [/openOn\(it, TODAY\)/.test(fnBody(sp, 'isCandidate')), /openOn\(it, TODAY\)/.test(fnBody(sp, 'isNationalAbsorber')),
-        /if \(!schoolOf\(twin\)\) \{\s*if \(!openOn\(twin, TODAY\)\)/.test(twinPart), /promotable = [^\n]*openOn\(twin, TODAY\)/.test(twinPart),
-        /import \{[^}]*\bopenOn\b[^}]*\} from '\.\/registered-merge\.mjs'/.test(sp), /import \{[^}]*\bopenOn\b[^}]*\} from '\.\/registered-merge\.mjs'/.test(ar)],
-      [true, true, true, true, true, true]);
+    eq('  배선 — 승격 로봇 후보·흡수 쪽이 그 판정을 오늘 날짜로 부르고 · 자동 등록 흡수(openOn)·승격(promotableOn) 두 갈래 (registered-merge.mjs 한 곳 · 베끼지 않는다)',
+      [/return promotableOn\(it, TODAY\);/.test(fnBody(sp, 'isCandidate')), /return absorbsOn\(it, school, TODAY\);/.test(fnBody(sp, 'isNationalAbsorber')),
+        /if \(!schoolOf\(twin\)\) \{\s*if \(!openOn\(twin, TODAY\)\)/.test(twinPart), /const promotable = promotableOn\(twin, TODAY\);/.test(twinPart),
+        /import \{[^}]*\bpromotableOn\b[^}]*\babsorbsOn\b[^}]*\} from '\.\/registered-merge\.mjs'/.test(sp), /import \{[^}]*\bopenOn\b[^}]*\bpromotableOn\b[^}]*\} from '\.\/registered-merge\.mjs'/.test(ar),
+        /twin\.auto && twin\.type|it\.auto && it\.type/.test(sp + ar)],
+      [true, true, true, true, true, true, false]);
   }
 
   /* ── ⑤ 소식 제목의 행 꼬리·번호 ── */
