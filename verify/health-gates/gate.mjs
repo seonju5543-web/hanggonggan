@@ -421,9 +421,9 @@ export default async function gate(eq, ctx) {
     eq('  끝내 빨간불 이슈 — 열린 같은 이슈가 있으면 코멘트 (장학·브라우저)', [dedupe('collect-scholarships.yml'), dedupe('browser-collect.yml')], [true, true]);
     const cn = wf('collect-news.yml');
     const newsIssue = cn.split(/\n(?= {6}- )/).find((x) => /name: 🚨 데이터 감사 실패 알림/.test(x)) || '';
-    eq('  소식 감사 실패 이슈 — 제목은 결과로 가르고(flaky 는 \'되돌린 것 없음\') · 본문은 gate-guard 단락 · 열린 같은 이슈엔 코멘트 · 되돌리기 단계가 단락을 남긴다',
+    eq('  소식 감사 실패 이슈 — 제목은 결과로 가르고(flaky 는 \'되돌린 것 없음\') · 본문은 gate-guard 단락 · 열린 같은 이슈엔 코멘트(공용 tools/alert-issue.mjs — 제목 앞글자로 찾아 날짜 붙은 옛 이슈도) · 되돌리기 단계가 단락을 남긴다',
       [/flaky\)\s+result="다시 재니 통과\(되돌린 것 없음\)"/.test(newsIssue), /이번 발행분을 되돌렸습니다/.test(newsIssue), /cat \/tmp\/gate-note\.md/.test(newsIssue),
-        /--search '"교내 소식 데이터 감사 실패" in:title'/.test(newsIssue) && /gh issue comment "\$open"/.test(newsIssue), /gate-guard\.mjs --report collector\/news-report\.md --note \/tmp\/gate-note\.md/.test(cn)],
+        /node tools\/alert-issue\.mjs --mode open --match prefix/.test(newsIssue) && /--title "🚨 교내 소식 데이터 감사 실패"/.test(newsIssue), /gate-guard\.mjs --report collector\/news-report\.md --note \/tmp\/gate-note\.md/.test(cn)],
       [true, false, true, true, true]);
     const bc = wf('browser-collect.yml');
     eq('  브라우저 알림 둘(감사 실패·실패/시간초과)은 브라우저형 리포트로', (bc.match(/'"브라우저형 수집 리포트" in:title'/g) || []).length, 2);
