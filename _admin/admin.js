@@ -509,7 +509,8 @@ async function collectorQueueState() {
 }
 
 /* 방금 띄운 실행을 찾아 끝날 때까지 지켜본다.
-   줄을 서 있는 동안(시작 전)은 15초 간격·최대 60분 — 앞선 로봇이 10~15분 돈다. 시작한 뒤에는 지금처럼 약 6분. */
+   줄을 서 있는 동안(시작 전)은 최대 60분 — 앞선 로봇이 10~15분 돈다. 러너를 잠깐 기다리는 보통 실행도 '대기'로 보이므로
+   처음 30초는 4초 간격, 그 뒤는 15초 간격으로 본다. 시작한 뒤에는 지금처럼 약 6분. */
 async function waitForRun(file, sinceISO) {
   const url = `${API}/repos/${OWNER}/${REPO}/actions/workflows/${file}/runs?per_page=5`;
   let polls = 0;            // 줄 밖(아직 안 보임·실행 중)에서 센 횟수 — 최대 90회(약 6분)
@@ -522,7 +523,8 @@ async function waitForRun(file, sinceISO) {
       if (Date.now() - queuedAt > 60 * 60e3) return null;
     } else if (polls >= 90) return null;
     else polls += 1;
-    await new Promise((res) => setTimeout(res, inQueue ? 15000 : (polls <= 5 ? 2000 : 4000)));
+    const gap = inQueue ? (Date.now() - queuedAt > 30e3 ? 15000 : 4000) : (polls <= 5 ? 2000 : 4000);
+    await new Promise((res) => setTimeout(res, gap));
     try {
       const r = await fetch(url, { headers: ghHeaders() });
       if (!r.ok) continue;
@@ -539,9 +541,10 @@ async function waitForRun(file, sinceISO) {
 
 /* 실패를 갈래로 말한다 (2026-10-04 로봇·도구 점검 admin-F9) — 예전엔 무엇이든 '검사를 통과하지 못해 되돌렸습니다'였다.
    대부분의 실패는 감사가 아니라 저장소의 입력 거절이다(tools/admin-apply.mjs fail() — 예: 많이 지울 때 건수 확인).
+   ⚠️ 이름이 APPLY_STEP 인 까닭 — 이 파일에 목록 한 번에 보일 줄 수 STEP(50)이 이미 있다(같은 이름이면 화면 전체가 안 뜬다).
    🔴 실행의 작업·단계 결과와, 읽을 수 있으면 저장소가 남긴 거절 문장(annotation)으로만 말한다 — 짐작하지 않는다.
    🔴 단계 이름은 .github/workflows/admin-apply.yml 의 name: 과 글자까지 같아야 한다(관문이 대조한다). */
-const STEP = {
+const APPLY_STEP = {
   apply: '요청 내용 적용',
   auditRevert: '감사 실패 — 변경을 통째로 되돌림',
   auditFail: '감사 실패를 실패로 끝낸다',
@@ -581,17 +584,21 @@ async function runFailureText(run) {
   const steps = Array.isArray(job.steps) ? job.steps : [];
   const step = (name) => steps.find((x) => x && x.name === name) || null;
   const is = (name, c) => !!step(name) && step(name).conclusion === c;
-  if (is(STEP.apply, 'failure')) {
+  if (is(APPLY_STEP.apply, 'failure')) {
+    /* 거절 문장이 있을 때만 '받지 않았다'고 말한다 — 없으면 도구가 넘어진 것일 수도 있다(단정하지 않는다).
+       어느 쪽이든 저장 단계 전이라 데이터는 그대로다(앞 단계가 실패하면 뒤 단계는 건너뛴다). */
     const why = await rejectReason(job);
-    return why ? `저장소가 요청을 받지 않았습니다: ${why} — ${UNCHANGED}` : `저장소가 요청을 받지 않았습니다 — ${UNCHANGED}. ${LOG}`;
+    return why ? `저장소가 요청을 받지 않았습니다: ${why} — ${UNCHANGED}`
+      : `「${APPLY_STEP.apply}」 단계에서 멈췄습니다 — 저장 전이라 ${UNCHANGED}. ${LOG}`;
   }
-  if (is(STEP.auditFail, 'failure') || is(STEP.auditRevert, 'success')) return `데이터 감사를 통과하지 못해 되돌렸습니다 — ${UNCHANGED}. ${LOG}`;
-  if (is(STEP.save, 'failure')) return `저장(push)에 실패했습니다 — ${UNCHANGED}. ${LOG}`;
+  if (is(APPLY_STEP.auditFail, 'failure') || is(APPLY_STEP.auditRevert, 'success')) return `데이터 감사를 통과하지 못해 되돌렸습니다 — ${UNCHANGED}. ${LOG}`;
+  if (is(APPLY_STEP.save, 'failure')) return `저장(push)에 실패했습니다 — ${UNCHANGED}. ${LOG}`;
   if (concl === 'cancelled' || concl === 'timed_out' || job.conclusion === 'cancelled') {
-    const sv = step(STEP.save);
-    const where = is(STEP.save, 'success') ? '저장은 끝났습니다'
-      : (sv && sv.status !== 'queued' && sv.conclusion !== 'skipped' && sv.conclusion != null)
-        ? '저장 도중에 멈춰 저장됐는지 확인하지 못했습니다' : `저장 단계 전에 멈춰 ${UNCHANGED}`;
+    /* 저장 단계의 결과로만 말한다 — 건너뜀·아직 대기면 안 돈 것, 그 밖(취소·단계 목록 없음)은 모른다고 말한다 */
+    const sv = step(APPLY_STEP.save);
+    const where = is(APPLY_STEP.save, 'success') ? '저장은 끝났습니다'
+      : (sv && (sv.conclusion === 'skipped' || sv.status === 'queued' || sv.status === 'pending'))
+        ? `저장 단계 전에 멈춰 ${UNCHANGED}` : '저장됐는지는 확인하지 못했습니다';
     return `실행이 도중에 멈췄습니다(시간 상한 10분 또는 취소) — ${where}. ${LOG}`;
   }
   const failed = steps.find((x) => x && x.conclusion === 'failure');
@@ -4888,7 +4895,8 @@ function bindGlobal() {
       /* 시트에 보여 준 목록 그대로 보낸다(selRows) — 보여 준 것과 보내는 것이 갈라지지 않게 */
       const ids = selRows().map((it) => it.id);
       const ex = bulkExpectState();
-      if (ex.need && !ex.ok) { toast(`지울 건수(${ids.length})를 숫자로 정확히 적어 주세요`); return; }
+      /* 적은 숫자는 지금 보낼 건수와도 맞아야 한다 — 시트를 연 뒤 목록이 다시 읽혀 건수가 바뀌었으면 보내지 않는다 */
+      if (ex.need && (!ex.ok || ex.n !== ids.length)) { toast(`지울 건수(${ids.length})를 숫자로 정확히 적어 주세요`); return; }
       closeSheet();
       selClear();
       await applyAction(kind, ex.need ? { ids, expect: ex.n } : { ids }, `${BULK[kind].label} ${ids.length}건`);

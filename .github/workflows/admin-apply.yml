@@ -164,7 +164,8 @@ jobs:
           existing=$(gh issue list --repo "$REPO" --state open --label "$LABEL" \
                        --json number --jq '.[0].number // empty' 2>/dev/null || echo "")
           if [ "$APPLY" = "failure" ]; then
-            why="「요청 내용 적용」 단계에서 저장소가 요청을 받지 않았습니다(요청 내용 확인에서 거절) — 데이터는 **바뀌지 않았습니다**."
+            # 거절인지 도구가 넘어진 것인지는 실행 기록의 '관리자 조정 실패 — …' 줄이 말한다 — 여기서 단정하지 않는다
+            why="「요청 내용 적용」 단계에서 멈췄습니다 — 저장 전이라 데이터는 **바뀌지 않았습니다**. 저장소가 요청을 거절했으면 실행 기록에 「관리자 조정 실패 — …」 줄로 사유가 있습니다."
           elif [ "$AUDIT" = "failure" ]; then
             why="데이터 감사를 통과하지 못해 되돌렸습니다 — 데이터는 **바뀌지 않았습니다**."
           elif [ "$SAVE" = "failure" ]; then
