@@ -18,7 +18,7 @@ import { canonUrl } from './canon-url.mjs';
 import { makeStripperMulti } from './page-boilerplate.mjs';   // 메뉴·푸터 껍데기를 걷어낸 본문만 읽는다 — 메뉴의 '발전기금'·'포털'이 증거로 세어졌다(첫 시험)
 import { classifyKind, SCHOOL_APPLY_RE, domainMatches, domainForSchool } from './kind-evidence.mjs';
 import { loadSchoolNames, schoolTokens } from './school-names.mjs';
-import { mergeInto } from './registered-merge.mjs';
+import { mergeInto, openOn } from './registered-merge.mjs';
 const { sameProgram } = createRequire(import.meta.url)('../verify/entry-rules.cjs');
 
 const HERE = new URL('.', import.meta.url);
@@ -41,15 +41,17 @@ const names = loadSchoolNames(new URL('../data.js', HERE));
 const browserTargets = (() => { try { return JSON.parse(fs.readFileSync(new URL('browser-targets.json', HERE), 'utf8')).targets || []; } catch { return []; } })();
 const domainOf = (school) => domainForSchool(school, schools, browserTargets);
 
-/* 이 항목이 '학교 한정 · 교외 · 로봇 등록' 인가 — 승격 후보의 조건 */
+/* 이 항목이 '학교 한정 · 교외 · 로봇 등록 · 마감 전' 인가 — 승격 후보의 조건.
+   🔴 마감 전만 (2026-10-05 점검 collect-14) — 지난 등록분을 풀면 44개교 모든 학생에게 '마감' 카드로 30일 보인다(부산대 희망사다리·동국대 파안 실례).
+   합치는 두 쪽(③ 같은 사업) 모두 이 조건을 탄다. 판정은 registered-merge.mjs openOn 한 곳 */
 export function isCandidate(it) {
   const e = it.eligibility || {};
-  return !!(it.auto && it.type === '교외' && e.schoolOnly && !/^관리자/.test(it.scopeFrom || ''));
+  return !!(it.auto && it.type === '교외' && e.schoolOnly && !/^관리자/.test(it.scopeFrom || '') && openOn(it, TODAY));
 }
 /* 이미 전국인 로봇 등록분 — 같은 사업의 학교 한정 글을 **흡수**한다(범위는 그대로 · 게시 학교만 근거에 더한다 · 리뷰 3차 2026-09-30) */
 export function isNationalAbsorber(it, school) {
   const e = it.eligibility || {};
-  if (!(it.auto && it.type === '교외' && !e.schoolOnly && !/^관리자/.test(it.scopeFrom || ''))) return false;
+  if (!(it.auto && it.type === '교외' && !e.schoolOnly && !/^관리자/.test(it.scopeFrom || '') && openOn(it, TODAY))) return false;
   /* 여러 학교만 받는 공고(schoolsAny · "학교" 또는 "학교|캠퍼스")는 그 학교가 목록에 있을 때만 — 푸른등대 K-원전(13개교) 이 이 꼴 */
   return !e.schoolsAny || !school || e.schoolsAny.some((x) => String(x).split('|')[0] === school);
 }

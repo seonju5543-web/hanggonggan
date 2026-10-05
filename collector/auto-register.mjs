@@ -16,11 +16,13 @@ import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { cleanTitle } from './clean-title.mjs';
 // 등록 규칙은 감사 도구와 같은 파일을 쓴다 (verify/entry-rules.cjs) — 규칙이 갈라지지 않게
-const { checkEntry, isDuplicatePair, sameProgram } = createRequire(import.meta.url)('../verify/entry-rules.cjs');
+const { checkEntry, isDuplicatePair, sameProgram, registeredAfterDeadline } = createRequire(import.meta.url)('../verify/entry-rules.cjs');
 /* 교내·교외 증거 판정 + 학교 이름표 + 합치기 — 규칙은 각자 한 곳 (2026-09-30 · 베끼지 않는다) */
 import { classifyKind, schoolDomain } from './kind-evidence.mjs';
 import { loadSchoolNames, schoolTokens } from './school-names.mjs';
-import { mergeInto } from './registered-merge.mjs';
+import { mergeInto, openOn, deadlineQuote } from './registered-merge.mjs';
+/* 게시판 글의 마감(본문 마감 → 제목·게시판 요약)은 notice-deadline.mjs 한 곳 — 이 파일은 불러오는 순간 실행되어 관문이 표본으로 못 잰다(2026-10-05) */
+import { parseDeadline as parseNoticeDeadline } from './notice-deadline.mjs';
 /* 데이터 관문에 거듭 걸린 공고는 3일 쉰다 — 장부 규칙은 auto-held.mjs 한 곳(되돌리는 gate-guard 와 같은 파일 · 2026-10-04) */
 import { isHeld, pruneRegistered } from './auto-held.mjs';
 
@@ -117,44 +119,10 @@ const FUTURE_PLAN = /202[7-9](?![\d])[^\d]*(학년도|년).*(유학|연수|입�
 const POSITIVE = /장학/;
 const ACTION = /(선발|모집|신청|추천|접수)/;
 
-/* 마감 후보 추출 — 명확한 것만 (YYYY.M.D / ~M/D는 연도 불명이라 제외)
-   돌려주는 것은 `{ date, text }` — text 는 **실제로 맞춘 문구**다(2026-09-17 · 노션 G-3).
-   🔴 왜 문구까지 남기나: 게시판 요약(deadlineHint)은 저장되지 않아, 여기서 읽은 마감은 나중에
-      **근거를 대조할 길이 없었다**(verify/deadline-audit.mjs 가 4건을 '근거 없음'으로 잡았다).
-      등록할 때 `deadlineFrom: '게시판 요약 · <문구>'` 로 남기면 감사가 그 문구를 근거로 센다. */
-/* 🔴 **달력에 없는 날은 마감이 아니다 — 못 믿으면 비운다** (2026-09-19 코드 리뷰가 잡았다).
-   위 규칙이 빈칸을 받게 되면서 2자리 연도 `~ 26. 9. 10.` 이 **달 26일**로 읽혔고(실측 16건),
-   그 `2026-26-09` 는 ① 글자 비교라 `< 오늘` 이 거짓이라 **마감 경과 거르기를 통과**하고
-   ② `entry-rules` 의 `^\d{4}-\d{2}-\d{2}$` 도 통과하며 ③ 앱의 `dday()` 에서 `Invalid Date` 가 돼
-   카드에 **`D-NaN`** 이 뜨고 지난 날로도 안 넘어가 **영영 안 사라진다**.
-   ⚠️ 2자리 연도를 알아맞혀 고쳐 주지 말 것 — 여기서 비우면 `listedAt` 이 붙어 60일 뒤 감춰진다. */
-const okDate = (y, mo, d) => {
-  const iso = `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-  const t = new Date(`${iso}T00:00:00Z`);
-  return !Number.isNaN(t.getTime()) && t.toISOString().slice(0, 10) === iso ? iso : null;
-};
-
-function parseDeadline(n) {
-  const hay = `${n.title} ${n.deadlineHint || ''}`;
-  const m = hay.match(/~\s*(\d{4})[.\-\/\s]+(\d{1,2})[.\-\/\s]+(\d{1,2})/) ||
-            // 한글 날짜 "~2026년 7월 31일" (도레이재단 공고가 이 형태라 마감이 비어 있었다 — 2026-07-30 추가)
-            hay.match(/~\s*(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/) ||
-            hay.match(/(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일\s*[^\d]{0,8}(까지|마감)/) ||
-            hay.match(/(\d{4})[.\-\/\s]+(\d{1,2})[.\-\/\s]+(\d{1,2})\s*[^\d]{0,6}(까지|마감)/);
-  if (m) {
-    const iso = okDate(m[1], m[2], m[3]);
-    if (iso) return { date: iso, text: m[0].trim() };
-  }
-  /* 연도 없는 "~7.03"·"~7/19" — 올해로 해석 (마감 경과 거르기용)
-     🔴 점 뒤 빈칸을 받는다 — 게시판은 `(~ 9. 18)` 처럼 띄어 쓴다. 안 받으면 마감을 못 읽어
-        **끝난 공고가 '접수 기간 원문 확인' 을 달고 60일 동안 탭에 남는다**(2026-09-19 실측 3건). */
-  const m2 = hay.match(/~\s*(\d{1,2})\s*[.\/]\s*(\d{1,2})/);
-  if (m2) {
-    const iso = okDate(TODAY.slice(0, 4), m2[1], m2[2]);
-    if (iso) return { date: iso, text: m2[0].trim() };
-  }
-  return null;
-}
+/* 마감 후보 추출 — 규칙은 collector/notice-deadline.mjs parseDeadline 한 곳(2026-10-05 옮김 · 본문 마감을 먼저 본다).
+   돌려주는 것은 `{ date, text, from }` — text 는 **실제로 맞춘 문구**다(2026-09-17 · 노션 G-3). 등록할 때 `deadlineFrom: '<from> · <문구>'`
+   로 남겨 감사(verify/deadline-audit.mjs)가 그 문구를 근거로 센다. 달력에 없는 날은 마감이 아니다(okDate · 2026-09-19). */
+const parseDeadline = (n) => parseNoticeDeadline(n, TODAY);
 
 function classify(n, regUrlSet, regItems, batchSeen) {
   const t = n.title || '';
@@ -213,12 +181,15 @@ function classify(n, regUrlSet, regItems, batchSeen) {
   if (twin) {
     /* 이미 전국인 등록분(schoolOnly 없음)과 같은 사업 — 새로 등록하지 않고 게시 학교만 근거에 더한다(리뷰 3차 · 세 번째 학교 구멍) */
     if (!schoolOf(twin)) {
+      /* 🔴 마감이 지난 전국 등록분은 흡수하지 않는다 (2026-10-05 점검 collect-14) — 사업 열쇠(programKey)는 연도·학기를 떼므로
+         지난 회차가 다음 학기 같은 사업 글을 삼켜 새 회차가 등록되지 않을 수 있다. 새 회차인지는 사람이 본다. 판정은 registered-merge.mjs openOn 한 곳 */
+      if (!openOn(twin, TODAY)) return { verdict: 'hold', why: `같은 사업의 지난 회차(마감 ${twin.deadline}) — 새 회차인지 컨펌 대기` };
       const any = (twin.eligibility || {}).schoolsAny;
       if (any && !any.some((x) => String(x).split('|')[0] === n.school)) return { verdict: 'hold', why: `타교 등록분과 동일 사업(${(twin.name || '').slice(0, 24)}) — 받는 학교 목록에 ${n.school} 없음 · 컨펌 대기` };
       return { verdict: 'absorb', why: '이미 전국(동일 사업)', twin };
     }
     /* 승격은 **로봇이 등록한 교외 · 사람이 범위를 정하지 않은 · 마감 안 지난** 등록분만 — 나머지는 사람이 본다(리뷰 3차) */
-    const promotable = twin.auto && twin.type === '교외' && !/^관리자/.test(twin.scopeFrom || '') && !(twin.deadline && twin.deadline < TODAY);
+    const promotable = twin.auto && twin.type === '교외' && !/^관리자/.test(twin.scopeFrom || '') && openOn(twin, TODAY);
     if (!promotable) return { verdict: 'hold', why: `타교 등록분과 동일 사업(${(twin.name || '').slice(0, 24)}) — 승격 불가(사람 지정·교내·마감 경과) 컨펌 대기` };
     return { verdict: 'promote', why: `다른 학교(${schoolOf(twin)}) 등록분과 같은 사업 → 전국으로 승격`, twin };
   }
@@ -235,7 +206,7 @@ function classify(n, regUrlSet, regItems, batchSeen) {
   if (!ACTION.test(t)) return { verdict: 'hold', why: '선발·모집·신청 신호 없음 — 개발자 컨펌 대기' };
   const dl = parseDeadline(n);
   if (dl && dl.date < TODAY) return { verdict: 'skip', why: `마감 경과(${dl.date})` };
-  return { verdict: 'register', deadline: dl ? dl.date : null, deadlineText: dl ? dl.text : null };
+  return { verdict: 'register', deadline: dl ? dl.date : null, deadlineText: dl ? dl.text : null, deadlineSrc: dl ? dl.from : null };
 }
 
 /* ---------- 실행 ---------- */
@@ -267,6 +238,26 @@ if (!cfg.enabled) {
   registered.items = registered.items.filter((i) => !(i.auto
     && (blockedIds.has(i.id) || blockedUrls.has(canonUrl(i.sourceUrl || '')))));
   const removed = before - registered.items.length;
+
+  /* 🔴 등록할 때 이미 끝나 있던 로봇 등록분은 뺀다 (2026-10-05 점검 collect-07 · 판정은 verify/entry-rules.cjs registeredAfterDeadline 한 곳 — 감사와 같다).
+     본문에만 기간이 적힌 글이 마감 없이 등록됐다가 몇 분 뒤 발췌기에서 지난 마감을 받았다 — 학생에게는 30일 동안 '마감' 카드뿐이다.
+     다시 등록되지 않게 그 글(실시간 공고)에 본문 마감을 적어 둔다(아래 classify 가 '마감 경과'로 거른다 · 수집기가 이미 적었으면 그대로).
+     사람이 손댄 것(마감 표식 AI·관리자 · 양식 · 여러 학교 근거)은 빼지 않는다. */
+  const lateDropped = registered.items.filter((i) => registeredAfterDeadline(i));
+  let noticesTouched = false;
+  if (lateDropped.length) {
+    const lateIds = new Set(lateDropped.map((i) => i.id));
+    registered.items = registered.items.filter((i) => !lateIds.has(i.id));
+    const noticeByKey = new Map((notices.items || []).map((n) => [canonUrl(decodeUrlEntities(n.url)), n]));
+    for (const it of lateDropped) {
+      const n = noticeByKey.get(canonUrl(decodeUrlEntities(it.sourceUrl || '')));
+      if (n && !n.bodyDeadline) {
+        n.bodyDeadline = it.deadline;
+        n.bodyDeadlineText = deadlineQuote(it) || `등록 뒤 원문에서 읽은 마감 ${it.deadline}`;
+        noticesTouched = true;
+      }
+    }
+  }
 
   /* 등록 대상 학교 좁히기 — 설정의 `schools`. 빈 배열이면 제한 없음(수집 학교 전부).
      2026-08-30 개발자 지시로 경희대·한국외대 둘로 좁혔고(수집은 그대로, 등록만 — 자격 진단·양식을 붙이는 사람 손이 드는 층),
@@ -376,7 +367,7 @@ if (!cfg.enabled) {
       deadline: r.deadline || null,
       // 마감을 읽었으면 **어느 문구에서 읽었는지** 남긴다 — 게시판 요약은 저장되지 않아 이 줄이
       // 유일한 근거다(verify/deadline-audit.mjs 가 이 문구를 근거로 센다 · 2026-09-17 노션 G-3)
-      ...(r.deadline && r.deadlineText ? { deadlineFrom: `게시판 요약 · ${r.deadlineText}` } : {}),
+      ...(r.deadline && r.deadlineText ? { deadlineFrom: `${r.deadlineSrc || '게시판 요약'} · ${r.deadlineText}` } : {}),
       // 마감을 못 읽은 공고는 등록일을 남긴다 — 앱이 등록 후 60일이 지나면 자동으로 감춘다
       // (마감이 없으면 목록에서 영영 안 사라지던 문제, 2026-07-30 교정)
       ...(r.deadline ? {} : { listedAt: TODAY }),
@@ -406,10 +397,12 @@ if (!cfg.enabled) {
     added.push(entry);
   }
 
-  if (added.length || removed || promoted.length) {
+  if (added.length || removed || promoted.length || lateDropped.length) {
     registered.updatedAt = TODAY;
     fs.writeFileSync(registeredPath, JSON.stringify(registered, null, 1) + '\n');
   }
+  /* 뺀 등록분의 마감을 실시간 공고에 적어 둔 것 — 수집기와 같은 형식으로 저장한다(다음 수집이 그대로 이어 싣는다) */
+  if (noticesTouched) fs.writeFileSync(noticesPath, JSON.stringify(notices, null, 1));
 
   // 스키마화 대기 큐: 신청서 첨부가 있는 자동 등록분은 워크플로가 곧바로 원본을
   // 내려받고(pending-forms.json → deepfetch), 다음 Claude 세션이 스키마화한다.
@@ -459,6 +452,11 @@ if (!cfg.enabled) {
   if (waiting) report.push('', `**⏳ 스키마화 대기 중 ${waiting}건** (원본 확보됨 — collector/pending-forms.json)`);
 
   report.push('', `### 🤖 자동 등록 (선조치후보고) — ${added.length}건 등록${removed ? ` · ${removed}건 제거(blockIds)` : ''}`);
+  if (lateDropped.length) {
+    report.push('', `**등록 뒤 원문에서 마감 경과 확인 — 되돌림 ${lateDropped.length}건** — 등록할 때 이미 마감이 지나 있던 로봇 등록분이에요(본문에만 기간이 적혀 있었어요). 다시 등록되지 않게 그 공고에 원문 마감을 적어 뒀어요:`);
+    for (const e of lateDropped.slice(0, 20)) report.push(`- \`${e.id}\` ${(e.name || '').slice(0, 40)} · 마감 ${e.deadline} · 등록 ${e.listedAt}`);
+    if (lateDropped.length > 20) report.push(`- … 외 ${lateDropped.length - 20}건`);
+  }
   /* 🔴 좁힌 것을 **말없이** 하지 않는다 — 리포트에 안 적으면 다음 세션이
      "로봇이 갑자기 아무것도 안 등록한다"고 없는 버그를 쫓는다. */
   if (onlySchools.size) {

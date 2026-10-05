@@ -3,10 +3,45 @@
      ① 메일 접수 — 예외·서류 전용 (app1-04): '오류 발생 시에만' 쓰는 예비 메일·'신청은 다른 곳 · 메일은 서류만' 줄은 접수처가 아니다
         (고려대 송화재단 · 연세대 신문고 실례 — 큰 '접수 메일 열기' 버튼이 학생을 예비 메일함으로 보냈다) ·
         이미 들어간 로봇 값도 매 실행 다시 묻는다(staleApplyEmail) · **진짜 extract-excerpts.mjs 를 임시 폴더에서 돌려** 지워지는지 본다
+     ② 게시판 행 꼬리 · 배너 기간 (collect-04): 제목 꼬리(부서·게시일·조회수 · 「첨부파일 있음」 · 폭 없는 공백)는 공용 cleanTitle 한 곳 ·
+        항공대 머리 배너(교수 채용 `접수기간 : 2026.10.15.(목) 13:30까지`)가 19건 전부의 기간 힌트가 되던 것 — 같은 호스트 여러 쪽에 똑같이 나오는
+        줄(껍데기)을 걷고 읽는다(deadline-hint.mjs hintWithoutChrome · isChromeHint · notice-deadline.mjs makeBodyReader) · 수집기 배선
+     ③ 자동 등록 — 원문 마감을 먼저 본다 (collect-07): 본문에만 기간이 적힌 글이 마감 없이 등록됐다가 몇 분 뒤 지난 마감을 받았다(항공대 2건 ·
+        등록 뒤 마감 경과 20건) — 본문 마감(bodyDeadline · 껍데기를 모르면 읽지 않는다)을 먼저 보고, 이미 그렇게 들어간 로봇 등록분은 빼고
+        그 글에 마감을 적어 다시 등록되지 않게 한다 · **진짜 auto-register.mjs 를 임시 폴더에서 돌린다**
+     ④ 범위 승격은 마감 전만 (collect-14): 지난 등록분을 전국으로 풀거나 지난 회차가 새 회차를 흡수하지 않는다(openOn 한 곳)
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말).
       로봇을 돌릴 때는 저장소 코드를 임시 폴더로 **복사**해 그 안의 표본만 읽고 쓴다(bodies.mjs sandbox). */
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 import { sandbox } from './bodies.mjs';
+import { cleanEnv, stripComments } from './gate.mjs';
 import { judgeLine, findApplyEmail, staleApplyEmail } from '../../collector/apply-email.mjs';
+import { cleanTitle } from '../../collector/clean-title.mjs';
+import { deadlineHintFrom, hintWithoutChrome, isChromeHint } from '../../collector/deadline-hint.mjs';
+import { boilerMulti, boilerFor } from '../../collector/page-boilerplate.mjs';
+import { parseDeadline, bodyDeadlineFrom, makeBodyReader } from '../../collector/notice-deadline.mjs';
+import { openOn } from '../../collector/registered-merge.mjs';
+
+const require = createRequire(import.meta.url);
+const J = (x) => `${JSON.stringify(x, null, 1)}\n`;
+
+/* 가짜 항공대 — 쪽마다 같은 머리 배너(교수 채용)와 메뉴 줄 + 서로 다른 본문 기간 줄 (2026-10-04 실측 꼴) */
+const KAU = 'https://kau.example.ac.kr/web/pages/gc32172b.do?siteFlag=www&bbsFlag=View&bbsId=0119&nttId=';
+/* 배너가 두 줄로 갈라져 그려지는 판 — 이름표가 줄 머리에 오면 날짜 판독기(extractDeadline)도 배너 날짜를 읽는다 */
+const BANNER = ['모집대상 : 정년 및 비정년트랙', '접수기간 : 2026.10.15.(목) 13:30까지'];
+const CHROME = ['통합검색', '2027학년도 1학기 전임교원 채용', ...BANNER, '2026 동계 어학연수 (Advanced Language Program)모집 안내 자세히', '주메뉴 바로가기', '대학소개', '입학안내', '개인정보처리방침'];
+const kauPage = (no, title, body) => ({ url: `${KAU}${no}`, title, text: [...CHROME, title, ...body, '목록'].join('\n') });
+const KAU_PAGES = [
+  kauPage(11234, '2026 대전청년 내일 장학생 선발 안내', ['가. 지원 대상 : 대전시 거주 대학생', '나. 신청기간 : 2026. 9. 1.( 화 ) ~ 10. 8.( 목 ) 17:00 까지 ( 기간 연장 )', '라. 신청방법 : 대전청년포털']),
+  kauPage(10681, '2026년 2학기 청년창업농장학금 신청 안내', ['1) 지원 대상 : 영농 창업 희망 재학생', '2) 신청 기간 : 2026. 6. 1. ( 월 ) ~ 7. 6. (월 )']),
+  kauPage(11156, '2026년 하반기 인재육성(성취) 장학생 선발 안내', ['1. 선발 대상 : 재학생', '2. 접수 기간 : 2026. 9. 8. ( 화 ) ~ 9. 23. ( 수 )']),
+];
+const linesOf = (p) => p.text.split('\n');
 
 export default async function qnotice(eq, ctx) {
   const root = ctx.root;
@@ -71,5 +106,139 @@ export default async function qnotice(eq, ctx) {
       eq('  [발췌기 실행] 같은 본문의 정상 줄이 있으면 새 규칙으로 다시 찾는다', by.t2?.applyEmail, 'ga@sample.com');
       eq('  [발췌기 실행] 사람이 넣은 값은 그대로', by.t3?.applyEmail, 'scholarship@korea.ac.kr');
     } finally { sb.done?.(); }
+  }
+
+  /* ── ② 게시판 행 꼬리 · 배너 기간 ── */
+  {
+    eq('② 제목 행 꼬리(부서 · 게시일 · 조회수)는 뗀다',
+      ['2026년 하반기 인재육성 성취(대) 장학생 선발 안내 학생지원팀 2026-09-28 142', '2026학년도 2학기 교내장학금 신청 안내 학생지원팀 2026-09-02 1,076',
+        '2026-2 전공페스타 한마당행사 운영 안내 드림디자인칼리지 2026-09-22 2,065'].map(cleanTitle),
+      ['2026년 하반기 인재육성 성취(대) 장학생 선발 안내', '2026학년도 2학기 교내장학금 신청 안내', '2026-2 전공페스타 한마당행사 운영 안내']);
+    eq('  목록 열 「첨부파일 있음」·폭 없는 공백을 뗀다 (서울대·항공대·계명대 소식)',
+      [cleanTitle('2026학년도 2학기 등록금 납부 안내 첨부파일 있음'), cleanTitle('​대학 캠퍼스 방송 촬영 안내 총무팀 2026-09-30 128'), cleanTitle('제122회 <대학원생 콜로키움>에 초대합니다. ​')],
+      ['2026학년도 2학기 등록금 납부 안내', '대학 캠퍼스 방송 촬영 안내', '제122회 <대학원생 콜로키움>에 초대합니다.']);
+    const KEEP = ['셔틀 운행 2026-10-05 중단 안내', '서류 마감 2026-10-02 18시', '리포트 집중지도(1차) 참가자 발표(*첨부파일 필독)',
+      '제 36기 미래에셋 해외교환 장학생 선발 안내 2026.09.01.(화)~2026.10.06.(화)', '2026 동계 어학연수 (Advanced Language Program) 모집 안내'];
+    eq('  제목 속 날짜·첨부 낱말·맨 앞 연도는 남긴다', KEEP.map(cleanTitle), KEEP);
+    eq('  두 번 돌려도 같다', KEEP.concat('2026학년도 2학기 등록금 납부 안내 첨부파일 있음').map((t) => cleanTitle(cleanTitle(t)) === cleanTitle(t)), Array(6).fill(true));
+
+    const set = boilerFor(boilerMulti([KAU_PAGES]), KAU_PAGES[0].url);
+    eq('  (대조군) 껍데기를 안 걷으면 세 쪽 모두 배너가 힌트다', KAU_PAGES.map((p) => /^접수기간 : 2026\.10\.15/.test(deadlineHintFrom(p.text.replace(/\n/g, ' ')) || '')), [true, true, true]);
+    eq('  껍데기 줄(배너·메뉴)을 걷으면 각 쪽의 본문 기간 줄이 힌트다',
+      KAU_PAGES.map((p) => (hintWithoutChrome(linesOf(p), set) || '').slice(0, 14)), ['신청기간 : 2026. 9', '신청 기간 : 2026. ', '접수 기간 : 2026. ']);
+    const bannerHint = deadlineHintFrom(KAU_PAGES[0].text.replace(/\n/g, ' '));
+    eq('  배너에서 시작한 힌트는 껍데기 힌트다 · 본문 힌트는 아니다 · 껍데기를 모르면 아니다',
+      [isChromeHint(bannerHint, set), isChromeHint(hintWithoutChrome(linesOf(KAU_PAGES[0]), set), set), isChromeHint(bannerHint, new Set())], [true, false, false]);
+
+    /* 발행 단계의 읽개 — 실린 글(배너 힌트)은 저장된 원문으로 다시 읽고 · 원문 없는 글은 비우고 · 이번 실행 글은 늘 걷고 · 껍데기를 모르는 호스트는 그대로 */
+    const run = new Map();
+    const fresh = { url: `${KAU}11300`, title: '2026 표본 장학생 선발', deadlineHint: bannerHint };
+    run.set(fresh, [...CHROME, '2026 표본 장학생 선발', '신청기간 : 2026. 10. 1. ~ 10. 20.'].join('\n'));
+    const r = makeBodyReader({ stored: KAU_PAGES, run, extract: () => null });
+    const old1 = { url: KAU_PAGES[0].url, deadlineHint: bannerHint };
+    const gone = { url: `${KAU}99999`, deadlineHint: bannerHint };
+    const other = { url: 'https://other.example.ac.kr/v?id=1', deadlineHint: bannerHint };
+    r.heal(fresh, true); r.heal(old1); r.heal(gone); r.heal(other);
+    eq('  발행 단계 — 이번 실행 글 · 실린 글 · 원문 없는 글 · 껍데기 모르는 호스트',
+      [(fresh.deadlineHint || '').slice(0, 14), (old1.deadlineHint || '').slice(0, 14), gone.deadlineHint, other.deadlineHint === bannerHint, r.counts.hints],
+      ['신청기간 : 2026. 1', '신청기간 : 2026. 9', null, true, 3]);
+
+    const col = stripComments(fs.readFileSync(new URL('collector/collect.mjs', root), 'utf8'));
+    eq('  수집기 배선 — 이번 실행 상세 글자를 모으고 · 읽개를 만들고 · 새 글(장학·활동·재단)과 실린 글 전부(장학·활동·재단)에 건다',
+      [(col.match(/runBodies\.set\(it, detail\.text\)/g) || []).length, /makeBodyReader\(\{[\s\S]*?run: runBodies/.test(col),
+        /for \(const it of freshAll\) \{ bodyReader\.heal\(it, true\); bodyReader\.fill\(it\); \}/.test(col), /freshActs\.concat\(freshExt\)\) bodyReader\.heal\(it, true\)/.test(col),
+        /for \(const n of notices\.items\) \{ bodyReader\.heal\(n\); bodyReader\.fill\(n\); \}[\s\S]*publishBySchool\(beforeCap\)/.test(col),
+        /acts\.items\.forEach\(\(n\) => bodyReader\.heal\(n\)\)/.test(col), /ext\.items\.forEach\(\(n\) => bodyReader\.heal\(n\)\)/.test(col)],
+      [3, true, true, true, true, true, true]);
+    /* url-key.cjs 가 이 소스를 new Function 으로 평가한다(2026-09-12 감사 전멸 자리) — import 를 더하면 여기서 터진다 */
+    eq('  deadline-hint.mjs 는 아무것도 불러오지 않는다 · url-key.cjs 다리가 그대로 돈다',
+      [/^import /m.test(fs.readFileSync(new URL('collector/deadline-hint.mjs', root), 'utf8')), typeof require('../../collector/url-key.cjs').deadlineHintFrom], [false, 'function']);
+  }
+
+  /* ── ③ 자동 등록 — 원문 마감을 먼저 본다 ── */
+  {
+    const { lastDateIn, registeredAfterDeadline } = require('../entry-rules.cjs');
+    let setLib = false;
+    if (!process.env.EXCERPTS_AS_LIB) { process.env.EXCERPTS_AS_LIB = '1'; setLib = true; }
+    const { activityExcerpts } = await import('../../collector/activity-excerpts.mjs');
+    if (setLib) delete process.env.EXCERPTS_AS_LIB;
+    const extract = (t) => activityExcerpts(t).deadline;
+    const T = '2026-10-04';
+    eq('③ 본문 마감(근거 문구와 함께)을 먼저 본다 — 제목·요약에 기간이 없는 청년창업농장학금',
+      parseDeadline({ title: '2026년 2학기 청년창업농장학금 신청 안내', deadlineHint: null, bodyDeadline: '2026-07-06', bodyDeadlineText: '2) 신청 기간 : 2026. 6. 1. ( 월 ) ~ 7. 6. (월 )' }, T),
+      { date: '2026-07-06', text: '2) 신청 기간 : 2026. 6. 1. ( 월 ) ~ 7. 6. (월 )', from: '공고 원문' });
+    eq('  본문 마감이 없으면 예전처럼 제목 (~9/17) 에서 · 근거 문구 없는 본문 마감·달력에 없는 날은 쓰지 않는다',
+      [parseDeadline({ title: '고졸후학습자 장학금 신청(~9/17)' }, T)?.date, parseDeadline({ title: '고졸후학습자 장학금 신청(~9/17)', bodyDeadline: '2026-07-06' }, T)?.date,
+        parseDeadline({ title: '장학생 선발', bodyDeadline: '2026-02-31', bodyDeadlineText: '2026. 2. 31' }, T)],
+      ['2026-09-17', '2026-09-17', null]);
+    const set = boilerFor(boilerMulti([KAU_PAGES]), KAU_PAGES[1].url);
+    const got = bodyDeadlineFrom(KAU_PAGES[1].text, set, extract, lastDateIn);
+    eq('  껍데기를 걷은 본문에서 장학과 같은 판독기로 — 날짜와 그 날짜를 내는 원문 한 줄', [got?.date, lastDateIn(got?.text || '', '2026') === got?.date], ['2026-07-06', true]);
+    /* 배너만 남은 쪽(본문 기간 줄 없음)을 껍데기를 안 걷고 읽으면 배너 날짜가 나온다 — 그래서 껍데기를 모르면 읽지 않는다 */
+    const bannerOnly = KAU_PAGES[0].text.split('\n').filter((l) => !/신청기간/.test(l)).join('\n');
+    eq('  🔴 껍데기를 모르는 호스트는 읽지 않는다 — 배너 날짜(10-15)가 모든 글의 마감이 되는 것을 막는다',
+      [bodyDeadlineFrom(KAU_PAGES[1].text, undefined, extract, lastDateIn), bodyDeadlineFrom(KAU_PAGES[1].text, new Set(), extract, lastDateIn), extract(bannerOnly), bodyDeadlineFrom(bannerOnly, set, extract, lastDateIn)],
+      [null, null, '2026-10-15', null]);
+    const L = { auto: true, listedAt: '2026-10-04', deadline: '2026-07-06', deadlineFrom: '공고 원문' };
+    eq('  등록할 때 이미 끝나 있던 로봇 등록분 — 사람 표식·양식·여러 학교 근거·제때 등록·사람 등록은 빼지 않는다',
+      [registeredAfterDeadline(L), registeredAfterDeadline({ ...L, deadlineFrom: '관리자 2026-10-04' }), registeredAfterDeadline({ ...L, formId: 'f1' }),
+        registeredAfterDeadline({ ...L, alsoPostedAt: [{ school: 'x' }] }), registeredAfterDeadline({ ...L, deadline: '2026-10-04' }), registeredAfterDeadline({ ...L, auto: false })],
+      [true, false, false, false, false, false]);
+
+    /* 진짜 자동 등록을 사본 저장소에서 — 불러오는 순간 실행되는 파일이라 import 하지 않는다 */
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-qnotice-areg-'));
+    try {
+      for (const d of ['collector', 'verify', 'data']) fs.mkdirSync(path.join(dir, d), { recursive: true });
+      for (const f of fs.readdirSync(fileURLToPath(root))) if (f.endsWith('.js')) fs.copyFileSync(fileURLToPath(new URL(f, root)), path.join(dir, f));
+      for (const f of fs.readdirSync(fileURLToPath(new URL('collector/', root)))) if (f.endsWith('.mjs')) fs.copyFileSync(fileURLToPath(new URL(`collector/${f}`, root)), path.join(dir, 'collector', f));
+      for (const f of fs.readdirSync(fileURLToPath(new URL('verify/', root)))) if (f.endsWith('.cjs')) fs.copyFileSync(fileURLToPath(new URL(`verify/${f}`, root)), path.join(dir, 'verify', f));
+      const w = (rel, body) => fs.writeFileSync(path.join(dir, rel), typeof body === 'string' ? body : J(body));
+      const today = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+      const shift = (n) => new Date(Date.parse(today) + n * 86400000).toISOString().slice(0, 10);
+      const U = (n) => `https://kau.example.ac.kr/bbs/view.do?seq=${n}`;
+      w('collector/auto-register-config.json', { enabled: true, schools: [], maxPerRun: 8, blockIds: [], blockUrls: [] });
+      w('data/notices.json', { items: [
+        { title: '2026년 2학기 청년창업농장학금 신청 안내', url: U(10681), school: '한국항공대학교', foundAt: shift(-1) },   // 이미 잘못 등록된 글 — 본문 마감 없음
+        { title: '2026 표본재단 장학생 선발 안내', url: U(500), school: '한국항공대학교', foundAt: today, bodyDeadline: shift(-3), bodyDeadlineText: `신청기간 : ~ ${shift(-3)}` },
+        { title: '2026 미래표본장학회 장학생 선발 안내', url: U(501), school: '한국항공대학교', foundAt: today, bodyDeadline: shift(20), bodyDeadlineText: `2. 신청기간 : ${shift(1)} ~ ${shift(20)}` },
+      ] });
+      w('data/registered.json', { items: [
+        { id: 'auto-late', name: '2026년 2학기 청년창업농장학금 신청 안내', type: '교외', provider: '주관 기관 원문 확인', amount: '금액 원문 확인', amountValue: 0, auto: true,
+          listedAt: shift(-1), deadline: shift(-90), deadlineFrom: '공고 원문', period: `접수 기간 ~${shift(-90)}`, sourceUrl: U(10681), eligibility: { schoolOnly: '한국항공대학교' } },
+        { id: 'auto-human', name: '사람이 고친 표본 장학', type: '교외', auto: true, listedAt: shift(-1), deadline: shift(-90), deadlineFrom: '관리자 2026-10-04', sourceUrl: U(9), eligibility: {} },
+      ] });
+      w('data/forms.json', { templates: {} }); w('collector/report.md', '');
+      const run = spawnSync(process.execPath, [path.join(dir, 'collector/auto-register.mjs')], { cwd: dir, encoding: 'utf8', env: cleanEnv() });
+      const reg = JSON.parse(fs.readFileSync(path.join(dir, 'data/registered.json'), 'utf8'));
+      const nts = JSON.parse(fs.readFileSync(path.join(dir, 'data/notices.json'), 'utf8')).items;
+      const report = fs.readFileSync(path.join(dir, 'collector/report.md'), 'utf8');
+      const by = Object.fromEntries(reg.items.map((i) => [i.sourceUrl, i]));
+      eq('  [자동 등록 실행] 끝까지 돈다', [run.status, run.status ? `${run.stdout}${run.stderr}`.slice(-400) : ''], [0, '']);
+      eq('  [자동 등록 실행] 등록 뒤 마감이 지나 있던 로봇 등록분은 빼고 · 사람 표식은 둔다 · 리포트에 되돌림',
+        [!!by[U(10681)], !!by[U(9)], /등록 뒤 원문에서 마감 경과 확인 — 되돌림 1건/.test(report)], [false, true, true]);
+      eq('  [자동 등록 실행] 뺀 글에 마감을 적어 두어 같은 실행에도 다시 등록하지 않는다',
+        [nts.find((n) => n.url === U(10681))?.bodyDeadline, reg.items.filter((i) => i.sourceUrl === U(10681)).length], [shift(-90), 0]);
+      eq('  [자동 등록 실행] 본문 마감이 지난 글은 등록하지 않는다 · 열린 글은 그 마감과 근거 문구로 등록한다',
+        [!!by[U(500)], by[U(501)]?.deadline, by[U(501)]?.deadlineFrom], [false, shift(20), `공고 원문 · 2. 신청기간 : ${shift(1)} ~ ${shift(20)}`]);
+    } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+    const ar = stripComments(fs.readFileSync(new URL('collector/auto-register.mjs', root), 'utf8'));
+    eq('  자동 등록 배선 — 마감 규칙은 notice-deadline.mjs · 되돌림 판정은 entry-rules registeredAfterDeadline (베끼지 않는다)',
+      [/from '\.\/notice-deadline\.mjs'/.test(ar), /registeredAfterDeadline \} = createRequire/.test(ar), /function parseDeadline|const okDate/.test(ar)], [true, true, false]);
+  }
+
+  /* ── ④ 범위 승격은 마감 전만 ── */
+  {
+    eq('④ openOn — 마감 모름은 열림 · 지난 것은 닫힘 · 오늘·뒤는 열림',
+      [openOn({}, '2026-10-04'), openOn({ deadline: '2026-09-18' }, '2026-10-04'), openOn({ deadline: '2026-10-04' }, '2026-10-04'), openOn({ deadline: '2026-10-30' }, '2026-10-04')],
+      [true, false, true, true]);
+    const sp = stripComments(fs.readFileSync(new URL('collector/scope-promote.mjs', root), 'utf8'));
+    const fnBody = (src, name) => (src.match(new RegExp(`export function ${name}\\([\\s\\S]*?\\n\\}`)) || [''])[0];
+    const ar = stripComments(fs.readFileSync(new URL('collector/auto-register.mjs', root), 'utf8'));
+    const twinPart = (ar.match(/if \(twin\) \{[\s\S]*?\n {2}\}/) || [''])[0];
+    eq('  배선 — 승격 로봇 후보·흡수 쪽 둘 다 · 자동 등록 흡수·승격 두 갈래 모두 openOn (registered-merge.mjs 한 곳)',
+      [/openOn\(it, TODAY\)/.test(fnBody(sp, 'isCandidate')), /openOn\(it, TODAY\)/.test(fnBody(sp, 'isNationalAbsorber')),
+        /if \(!schoolOf\(twin\)\) \{\s*if \(!openOn\(twin, TODAY\)\)/.test(twinPart), /promotable = [^\n]*openOn\(twin, TODAY\)/.test(twinPart),
+        /import \{[^}]*\bopenOn\b[^}]*\} from '\.\/registered-merge\.mjs'/.test(sp), /import \{[^}]*\bopenOn\b[^}]*\} from '\.\/registered-merge\.mjs'/.test(ar)],
+      [true, true, true, true, true, true]);
   }
 }

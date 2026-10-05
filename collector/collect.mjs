@@ -8,7 +8,9 @@
    4) 컨펌용 리포트 이슈 생성 (양식 스키마화·정식 등록은 개발자 컨펌 후)
    ============================================================ */
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
 import { deadlineHintFrom } from './deadline-hint.mjs';
+import { makeBodyReader } from './notice-deadline.mjs';
 import { FETCH_HEADERS } from './http-headers.mjs';
 import { urlKey, dedupeNotices, capNotices, rekeyLedger } from './url-key.mjs';
 import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mjs';
@@ -290,6 +292,8 @@ async function readMorePages(boardUrl, firstRows, readPage, ctx = { dead: false 
 
 const results = [];
 const freshAll = [];
+/* 이번 실행에 받은 상세 화면 줄 글자 — 글 객체 → 글자 (저장하지 않는다 · 아래 '껍데기를 걷은 본문' 단락이 쓴다 · 2026-10-05 점검 collect-04·07) */
+const runBodies = new Map();
 /* 대외활동·공모전 — 전용 게시판의 상태와 이번에 새로 주운 글. 장학 results 와 분리해 두는 이유:
    health.json(연속 실패 장부)은 prune-health.mjs 가 schools.json 이름으로 고아를 지우므로
    전용 게시판을 거기 섞으면 매 실행 지워진다. 전용 게시판 상태는 리포트에만 적는다. */
@@ -364,6 +368,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
       for (const it of freshA) {
         if (ctx.dead) return;
         const detail = await fetchDetail(it);
+        if (detail.text) runBodies.set(it, detail.text);
         it.attachments = detail.attachments;
         it.deadlineHint = detail.deadlineHint;
         /* 원문 발췌 (2026-09-29) — 모집기간→마감일(장학과 같은 규칙) · 활동기간·대상·혜택·주최·인원은 원문 문장 그대로. 없으면 비운다 */
@@ -404,6 +409,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
       for (const it of freshE) {
         if (ctx.dead) return;
         const detail = await fetchDetail(it);
+        if (detail.text) runBodies.set(it, detail.text);
         it.attachments = detail.attachments;
         it.deadlineHint = detail.deadlineHint;
         const exd = activityExcerpts(detail.text);   // 재단 공고도 마감일은 같은 규칙으로 읽는다 (발췌 줄은 장학 카드가 아니라 안 싣는다)
@@ -439,6 +445,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
     for (const it of fresh) {
       if (ctx.dead) return;
       const detail = await fetchDetail(it);
+      if (detail.text) runBodies.set(it, detail.text);   // 껍데기를 걷은 기간 힌트·본문 마감은 아래 발행 단계에서(이번 실행의 같은 호스트 글까지 배운 뒤)
       it.attachments = detail.attachments;
       it.deadlineHint = detail.deadlineHint;
       it.school = s.school;
@@ -498,6 +505,23 @@ fs.writeFileSync(seenActPath, JSON.stringify(seenAct, null, 1));
 fs.writeFileSync(seenExtPath, JSON.stringify(seenExt, null, 1));
 fs.writeFileSync(pagePath, JSON.stringify(pageMemo, null, 1));
 
+/* ── 학교 홈페이지 껍데기를 걷은 본문 (2026-10-05 점검 collect-04·07 · 규칙은 notice-deadline.mjs makeBodyReader 한 곳) ──
+   ① 기간 힌트: 항공대 글 19건의 힌트가 전부 머리 배너(교수 채용 `접수기간 : 2026.10.15.(목) 13:30까지`)였다 — 같은 호스트 여러 쪽에
+      똑같이 나오는 줄을 걷고 다시 읽는다. 이번 실행 글은 늘 · 실린 글은 힌트가 껍데기에서 시작했을 때만(원칙 7 소급 · 원문이 없으면 비운다).
+   ② 본문 마감(bodyDeadline): 자동 등록이 '이미 끝난 공고'를 등록하지 않게 — 본문에만 기간이 적힌 글이 마감 없이 등록됐다가 몇 분 뒤
+      발췌기에서 지난 마감을 받았다(10-04 항공대 2건 · 등록 뒤 마감 경과 20건). 판독기는 장학·활동과 같은 것(activityExcerpts → extractDeadline).
+   🔴 껍데기를 모르는 호스트(저장된 쪽 3쪽 미만)는 손대지 않는다 — 배너 날짜가 모든 글의 마감이 되는 것이 '마감 모름'보다 나쁘다. */
+const readJsonOr = (u, d) => { try { return JSON.parse(fs.readFileSync(u, 'utf8')); } catch { return d; } };
+const bodyReader = makeBodyReader({
+  stored: Object.values(readJsonOr(new URL('extracted/notices-text.json', HERE), {}) || {}),
+  browser: Object.entries(readJsonOr(new URL('extracted/browser-bodies.json', HERE), {}) || {}).map(([url, v]) => (v && v.text ? { url, text: v.text } : null)).filter(Boolean),
+  run: runBodies,
+  extract: (t) => activityExcerpts(t).deadline,
+  lastDateIn: createRequire(import.meta.url)('../verify/entry-rules.cjs').lastDateIn,
+});
+for (const it of freshAll) { bodyReader.heal(it, true); bodyReader.fill(it); }
+for (const it of freshActs.concat(freshExt)) bodyReader.heal(it, true);
+
 /* 앱 발행: 최신 공고를 학교별로 병합, 학교당 최대 15건·전체 200건 유지 */
 notices.items = freshAll.concat(notices.items || []);
 /* 수집일로부터 60일 지난 공고는 자동 삭제 (마감 공고 정리) */
@@ -537,6 +561,10 @@ if (healCounts.restored || healCounts.kept) console.log(`피드 메우기: 학�
   }
 }
 
+/* 실린 글 전부에 — 껍데기 힌트 소급 · 본문 마감 채우기 (위 '껍데기를 걷은 본문' 단락 · 학교별 파일 발행 전에) */
+for (const n of notices.items) { bodyReader.heal(n); bodyReader.fill(n); }
+console.log(`껍데기를 걷은 본문: 기간 힌트 ${bodyReader.counts.hints}건을 다시 읽음 · 본문 마감 ${bodyReader.counts.bodyDeadlines}건을 새로 읽음 (껍데기를 아는 호스트 ${bodyReader.chrome.size}곳)`);
+
 const beforeCap = notices.items;
 /* 학교별 파일도 함께 발행한다 (2026-08-17) — 앱은 이쪽을 읽는다.
    위 capNotices는 **폰이 통째로 받는 옛 파일**을 작게 유지하려는 것이고, 학교별 파일에는
@@ -572,6 +600,7 @@ acts.items = acts.items.filter((n) => ((n.api && n.seenAt) || n.foundAt || '9999
 acts.items = acts.items.filter((n) => !isAttachmentEntry(n));
 acts.items = acts.items.filter((n) => !notActivity(n.title));   // 결과·보도·지난 해 글은 모집 글이 아니다 — 이미 실린 글에도 소급(2026-10-04 · activity-kind.mjs)
 acts.items.forEach(sanitizeBenefit);   // 「혜택」에 섞인 조건은 자격 줄로 — 출처(본문·API)와 상관없이 매번 모든 글에(2026-10-04 · activity-excerpts.mjs splitBenefit)
+acts.items.forEach((n) => bodyReader.heal(n));   // 껍데기에서 시작한 기간 힌트 소급(위 '껍데기를 걷은 본문' 단락)
 acts.items = dedupeNotices(acts.items);
 acts.items = acts.items.filter((n) => !n.school).concat(dropUnserved(acts.items.filter((n) => n.school)));
 acts.items.sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')));
@@ -614,6 +643,7 @@ ext.items = ext.items.filter((n) => (n.foundAt || '9999') >= cutoff);
 ext.items = ext.items.filter((n) => !isAttachmentEntry(n));
 ext.items = dedupeNotices(ext.items);
 ext.items = ext.items.filter((n) => !n.school && n.host);   // 학교 글은 여기 오지 않는다 · 주최 없는 글도 싣지 않는다
+ext.items.forEach((n) => bodyReader.heal(n));   // 껍데기에서 시작한 기간 힌트 소급(위 '껍데기를 걷은 본문' 단락)
 /* 제목 부스러기(번호·게시일·미리보기·주석)를 떼고, 옛 글·결과 발표·재단 메뉴를 거른다 (2026-10-01 개발자 지시).
    🔴 **매 실행 전체에** 건다 — 이 파일은 합집합 병합이라 병합이 되살린 글도 여기서 다시 걸러진다. 규칙은 external-clean.mjs 한 곳. */
 const extDropped = {};

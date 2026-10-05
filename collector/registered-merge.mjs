@@ -14,6 +14,12 @@ export function deadlineQuote(drop) {
   return cands.find((t) => !/원문\s*확인/.test(t) && hit.test(t)) || null;
 }
 
+/* 마감 전인가 — 로봇의 범위 승격·흡수(scope-promote · auto-register)는 **마감 전 등록분끼리만** 한다 (2026-10-05 점검 collect-14).
+   지난 등록분을 전국으로 풀면 44개교 모든 학생에게 30일 동안 '마감' 카드로 보이고(부산대 희망사다리·동국대 파안 실례),
+   지난 회차가 다음 학기 같은 사업 글을 흡수하면 새 회차가 등록되지 않는다(사업 열쇠는 연도를 뗀다).
+   마감을 모르면 열린 것으로 본다. 🔴 관리자 merge 는 사람이 정하므로 이 조건을 쓰지 않는다(mergeInto 는 그대로). */
+export const openOn = (it, today) => !(it && it.deadline) || it.deadline >= today;
+
 export function mergeInto(keep, drop, { reason = '' } = {}) {
   const ke = keep.eligibility || {};
   const de = drop.eligibility || {};

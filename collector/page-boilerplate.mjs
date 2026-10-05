@@ -77,7 +77,7 @@ export function makeStripper(texts, opts) {
    있는데, 47쪽을 한 통에 넣으면 11/47 = 23% 라 문턱(40%)에 못 미쳐 메뉴로 안 잡히고,
    그 두 줄(한글 60자)이 본문 분량에 들어가 껍데기가 '본문 있음'으로 통과했다.
    말뭉치별로 배운 메뉴 목록을 호스트마다 합집합으로 합친다 — 어느 쪽 모양이든 걷어낸다. */
-export function makeStripperMulti(corpora, opts) {
+export function boilerMulti(corpora, opts) {
   const merged = new Map();
   for (const texts of corpora || []) {
     for (const [h, set] of buildBoilerplate(texts, opts)) {
@@ -85,5 +85,11 @@ export function makeStripperMulti(corpora, opts) {
       for (const l of set) merged.get(h).add(l);
     }
   }
+  return merged;
+}
+export function makeStripperMulti(corpora, opts) {
+  const merged = boilerMulti(corpora, opts);
   return (url, text, stripOpts) => stripBoilerplate(text, merged.get(hostOf(url)), stripOpts);
 }
+/* 주소 → 그 호스트의 껍데기 줄 Set (모르면 undefined) — 줄 목록을 직접 쓰는 곳(수집기의 기간 힌트 · deadline-hint.mjs hintWithoutChrome)이 쓴다 */
+export const boilerFor = (boiler, url) => (boiler && boiler.get(hostOf(url))) || undefined;

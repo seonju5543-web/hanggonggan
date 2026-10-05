@@ -1587,7 +1587,7 @@ console.log('\n■ 장학금 판정 자동화 · 범위 승격 (2026-09-30)');
   const ar = readText(new URL('collector/auto-register.mjs', root));
   eq('자동 등록이 다른 학교의 같은 사업을 전국으로 승격한다 (verdict promote)', /sameProgram\(/.test(ar) && /verdict: 'promote'/.test(ar) && /mergeInto\(r\.twin/.test(ar), true);
   eq('  이미 전국인 등록분과 같은 사업은 흡수(absorb) — 다시 학교 한정으로 등록하지 않는다 (세 번째 학교 구멍)', /schoolOf\(i\) !== n\.school && sameProgram/.test(ar) && !/schoolOf\(i\) && schoolOf\(i\) !== n\.school/.test(ar) && /verdict: 'absorb'/.test(ar) && /r\.verdict === 'absorb'/.test(ar), true);
-  eq('  승격은 로봇 등록·교외·사람 미지정·마감 전 등록분만 (아니면 hold)', /twin\.auto && twin\.type === '교외' && !\/\^관리자\/\.test\(twin\.scopeFrom/.test(ar) && /twin\.deadline < TODAY/.test(ar), true);
+  eq('  승격은 로봇 등록·교외·사람 미지정·마감 전 등록분만 (아니면 hold)', /twin\.auto && twin\.type === '교외' && !\/\^관리자\/\.test\(twin\.scopeFrom/.test(ar) && /openOn\(twin, TODAY\)/.test(ar), true);   // 마감 전 판정은 registered-merge.mjs openOn 한 곳(2026-10-05 점검 collect-14)
   const sp = readText(new URL('collector/scope-promote.mjs', root));
   eq('  범위 승격 로봇도 전국 등록분이 흡수한다(isNationalAbsorber) · 여러 학교만 받는 공고는 그 학교가 목록에 있을 때만', /export function isNationalAbsorber\(it, school\)/.test(sp) && /absorbed/.test(sp) && /domainMatches\(/.test(sp) && /schoolsAny\.some/.test(sp) && /schoolsAny/.test(ar) && /split\('\|'\)\[0\] === n\.school/.test(ar), true);
   /* 리뷰 3차 — 리포트 파일은 부르는 쪽이 준다(브라우저 수집은 browser-report.md 만 커밋한다) */
@@ -10097,7 +10097,8 @@ console.log('\n■ 마감일 감사 — 근거 없는 마감이 늘지 않는다
   eq('마감은 전부 YYYY-MM-DD 이고 달력에 있는 날이다', badIso.map((r) => `${r.id} ${r.deadline}`), []);
   /* ④ 자동 등록이 제목·요약에서 읽은 마감은 그 문구를 표식에 남긴다 — 근거 없는 마감이 더 생기지 않게 */
   const ar = readText(new URL('../collector/auto-register.mjs', import.meta.url));
-  eq('자동 등록이 마감을 읽으면 그 문구를 deadlineFrom 에 남긴다', /deadlineFrom: `게시판 요약 · \$\{/.test(ar), true);
+  /* 2026-10-05 — 본문 마감(notice-deadline.mjs · 출처 '공고 원문')도 같은 꼴로 남긴다: `<출처> · <문구>` (출처가 없으면 '게시판 요약') */
+  eq('자동 등록이 마감을 읽으면 그 문구를 deadlineFrom 에 남긴다', /deadlineFrom: `\$\{r\.deadlineSrc \|\| '게시판 요약'\} · \$\{r\.deadlineText\}`/.test(ar), true);
 }
 
 /* ── 2026-09-17 · OCR — 그림·스캔 첨부 글자 읽기 (개발자 지시 "직접 할 수 있으면 사용") ──
@@ -10526,15 +10527,19 @@ console.log('\n■ 실시간 공고 → 장학금 탭 (자동 등록 판정 · 2
     /사람이 막아 둔 공고/.test(src) && /이미 등록\(같은 id\)/.test(src), true);
   eq('  상한에 걸려 안 본 공고는 거른 것과 따로 적는다', /unseen/.test(src) && /보지 않았어요/.test(src), true);
 
-  /* ④ 마감 — `(~ 9. 18)` 처럼 띄어 쓴 꼴은 읽고, **달력에 없는 날은 비운다** */
-  const mDl = src.match(/hay\.match\((\/~\\s\*.*?\/)\);/);
+  /* ④ 마감 — `(~ 9. 18)` 처럼 띄어 쓴 꼴은 읽고, **달력에 없는 날은 비운다**
+     규칙은 2026-10-05 collector/notice-deadline.mjs 로 옮겼다(점검 collect-07 · 본문 마감을 먼저 본다) — 로봇이 그것을 불러 쓰는지도 본다 */
+  eq('  자동 등록은 게시판 글 마감을 notice-deadline.mjs 에서 불러 쓴다',
+    /import \{ parseDeadline as parseNoticeDeadline \} from '\.\/notice-deadline\.mjs'/.test(src) && !/function parseDeadline\(/.test(src), true);
+  const dlSrc = readText(new URL('../collector/notice-deadline.mjs', import.meta.url));
+  const mDl = dlSrc.match(/hay\.match\((\/~\\s\*.*?\/)\);/);
   eq('연도 없는 마감 규칙을 찾았다', !!mDl, true);
   if (mDl) eq('  점 뒤에 빈칸이 있어도 마감으로 읽는다', eval(mDl[1]).test('여성동문회 장학금 장학생 모집 (~ 9. 17)'), true);
   {
     /* 🔴 2자리 연도 `~ 26. 9. 10.` 을 **달 26일**로 읽던 것(실측 16건). 그 `2026-26-09` 는
        글자 비교라 마감 경과를 통과하고, entry-rules 의 날짜 꼴 검사도 통과하며, 앱에서
        `Invalid Date` 가 돼 카드에 `D-NaN` 이 뜨고 **영영 안 사라진다**. */
-    const mOk = src.match(/const okDate = ([\s\S]*?\n\};)/);
+    const mOk = dlSrc.match(/const okDate = ([\s\S]*?\n\};)/);
     eq('로봇에 날짜 실재 검사(okDate)가 있다', !!mOk, true);
     if (mOk) {
       const okDate = eval(`(${mOk[1].replace(/;\s*$/, '')})`);
@@ -10545,7 +10550,7 @@ console.log('\n■ 실시간 공고 → 장학금 탭 (자동 등록 판정 · 2
     /* 🔴 함수가 있는 것만 보면 **호출을 지워도 초록**이다 (만들면서 실제로 그랬다).
        마감을 내놓는 두 갈래(4자리 연도 · 연도 없는 꼴)가 둘 다 이 검사를 거쳐야 한다. */
     eq('  마감을 내놓는 두 갈래가 모두 그 검사를 거친다',
-      (src.match(/const iso = okDate\(/g) || []).length, 2);
+      (dlSrc.match(/const iso = okDate\(/g) || []).length, 2);
   }
 }
 
