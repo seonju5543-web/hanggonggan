@@ -13,7 +13,7 @@
    ============================================================ */
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
-import { sameSite } from './board-links.mjs';
+import { sameSite, retitleStored } from './board-links.mjs';
 import { NEWS_BOARD_RULES, newsRuleKey, rowsForBoard, verifyRuleDetail, needsDetailCheck, fetchesOwnList, collapseSamePost, newsHidden, newsDistinct } from './news-board-rules.mjs';   // 클릭형 게시판 규칙 한 곳 (찾기 로봇과 같은 것)
 import { urlKey, dedupeNotices, rekeyLedger } from './url-key.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
@@ -224,7 +224,9 @@ fs.writeFileSync(seenPath, JSON.stringify(seen, null, 1));
 
 /* 발행 — 새 글 + 실려 있던 글 → 보관 기한 → 중복 → 서비스 학교 → 숨김 표식 → 최근 수집 순 → 학교별 파일 */
 const cutoff = new Date(Date.now() - NEWS_KEEP_DAYS * 86400000).toISOString().slice(0, 10);
-let all = freshAll.concat(loadPublished());
+/* 실려 있던 글 제목에도 지금 청소를 입힌다(원칙 7 소급 · 2026-10-05 점검 news-7 — 항공대 「… 학생지원팀 2026-10-02 26」 · 영남 「9 2026학년도 …」 ·
+   서울대 「… 첨부파일 있음」). 규칙은 board-links.mjs retitleStored 한 곳 · 제목만 고친다(주소·글 번호 그대로) · 새 글과 섞기 전에 */
+let all = freshAll.concat(retitleStored(loadPublished()));
 all = all.filter((n) => n && n.url && n.school);
 all = all.filter((n) => !isAttachmentEntry(n));
 /* 소급(원칙 7) — 실을지 규칙(news-kind)이 바뀌면 이미 실린 글도 같은 잣대로 다시 거른다. 2차 실행 뒤 메뉴·바닥글 잡음을 이것으로 걷었다. */

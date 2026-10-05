@@ -10,6 +10,8 @@
         등록 뒤 마감 경과 20건) — 본문 마감(bodyDeadline · 껍데기를 모르면 읽지 않는다)을 먼저 보고, 이미 그렇게 들어간 로봇 등록분은 빼고
         그 글에 마감을 적어 다시 등록되지 않게 한다 · **진짜 auto-register.mjs 를 임시 폴더에서 돌린다**
      ④ 범위 승격은 마감 전만 (collect-14): 지난 등록분을 전국으로 풀거나 지난 회차가 새 회차를 흡수하지 않는다(openOn 한 곳)
+     ⑤ 소식 제목의 행 꼬리·번호 (news-7): 영남 「9 2026학년도 …」 행 번호는 **게시판 단위로만**(80%) 뗀다(한 제목만 보고 떼면 「3 대 3 농구대회」가 깨진다) ·
+        항공대 꼴(<a> 안에 제목·부서·날짜·조회수) · 실려 있던 글도 발행 때 같은 청소(retitleStored · 주소·글 번호는 그대로)
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말).
       로봇을 돌릴 때는 저장소 코드를 임시 폴더로 **복사**해 그 안의 표본만 읽고 쓴다(bodies.mjs sandbox). */
 import fs from 'node:fs';
@@ -26,6 +28,7 @@ import { deadlineHintFrom, hintWithoutChrome, isChromeHint } from '../../collect
 import { boilerMulti, boilerFor } from '../../collector/page-boilerplate.mjs';
 import { parseDeadline, bodyDeadlineFrom, makeBodyReader } from '../../collector/notice-deadline.mjs';
 import { openOn } from '../../collector/registered-merge.mjs';
+import { extractDatedRows, dropRowNumbers, retitleStored } from '../../collector/board-links.mjs';
 
 const require = createRequire(import.meta.url);
 const J = (x) => `${JSON.stringify(x, null, 1)}\n`;
@@ -240,5 +243,44 @@ export default async function qnotice(eq, ctx) {
         /if \(!schoolOf\(twin\)\) \{\s*if \(!openOn\(twin, TODAY\)\)/.test(twinPart), /promotable = [^\n]*openOn\(twin, TODAY\)/.test(twinPart),
         /import \{[^}]*\bopenOn\b[^}]*\} from '\.\/registered-merge\.mjs'/.test(sp), /import \{[^}]*\bopenOn\b[^}]*\} from '\.\/registered-merge\.mjs'/.test(ar)],
       [true, true, true, true, true, true]);
+  }
+
+  /* ── ⑤ 소식 제목의 행 꼬리·번호 ── */
+  {
+    const BASE = 'https://www.yu.example.ac.kr/main/bachelor/bachelor-guide.do';
+    const row = (no, title, date, extra = '') => `<tr><td class="num">${extra}</td><td class="title"><a href="${BASE}?mode=view&articleNo=${no}">${title}</a></td><td>관리자</td><td>${date}</td></tr>`;
+    const list = (rows) => `<html><body><table><tbody>${rows.join('')}</tbody></table></body></html>`;
+    const numbered = extractDatedRows(list([
+      row(901, '9 2026학년도 2학기 중간시험 실시 안내', '2026-10-02'), row(902, '8 2026학년도 전기 조기졸업 신청 안내', '2026-10-01'),
+      row(903, '7 2026-2학기 강의실 변경 안내', '2026-09-30'), row(904, '6 2026학년도 2학기 중간강의평가 실시 안내', '2026-09-29')]), BASE);
+    eq('⑤ 번호 칸이 링크 안에 든 게시판 — 행 번호를 뗀다 (영남 꼴)', numbered.map((r) => r.title),
+      ['2026학년도 2학기 중간시험 실시 안내', '2026학년도 전기 조기졸업 신청 안내', '2026-2학기 강의실 변경 안내', '2026학년도 2학기 중간강의평가 실시 안내']);
+    const single = extractDatedRows(list([
+      row(911, '3 대 3 농구대회 참가 안내', '2026-10-02'), row(912, '2026학년도 2학기 중간시험 실시 안내', '2026-10-01'),
+      row(913, '2026-2학기 강의실 변경 안내', '2026-09-30'), row(914, '중간강의평가 실시 안내', '2026-09-29')]), BASE);
+    eq('  번호가 한 행에만 있으면 제목의 일부다 — 그대로', single.map((r) => r.title)[0], '3 대 3 농구대회 참가 안내');
+    const kau = extractDatedRows(list([
+      row(921, '[의료지원실] 시험기간 비타민 데이 안내 학생지원팀 2026-10-02 26', '2026-10-02'), row(922, '대학 캠퍼스 방송 촬영 안내 총무팀 2026-09-30 128', '2026-09-30'),
+      row(923, '2026학년도 비교과 프로그램 통합 사전 요구조사 실시 안내 미래교육혁신원 2026-09-30 118', '2026-09-30'), row(924, '2026-2 전공페스타 한마당행사 운영 안내 드림디자인칼리지 2026-09-22 2,065', '2026-09-22')]), BASE);
+    eq('  링크가 행 전체를 감싼 게시판 — 부서·게시일·조회수를 뗀다 (항공대 꼴)', kau.map((r) => r.title),
+      ['[의료지원실] 시험기간 비타민 데이 안내', '대학 캠퍼스 방송 촬영 안내', '2026학년도 비교과 프로그램 통합 사전 요구조사 실시 안내', '2026-2 전공페스타 한마당행사 운영 안내']);
+    eq('  맨 앞 연도는 번호가 아니다 (모든 행이 「2026 …」이어도)',
+      dropRowNumbers(['2026 동계 어학연수 안내', '2026 하계 계절학기 안내', '2026 장학 안내'].map((title) => ({ title }))).map((r) => r.title),
+      ['2026 동계 어학연수 안내', '2026 하계 계절학기 안내', '2026 장학 안내']);
+    /* 실려 있던 글 — 영남 6건 꼴 · 다른 게시판의 한 건은 그 게시판끼리만 센다 · 주소·글 번호는 그대로 */
+    const stored = ['9 2026학년도 2학기 중간시험 실시 및 부정행위자 처리 기준 안내', '8 2026학년도 2학기 교양, 교직, 일반선택 중간시험 시간표 안내(주간, 야간)',
+      '7 2026학년도 전기(27년2월) 조기졸업 신청 안내', '6 2026-2학기 정보전산원 수업 강의실 변경 안내 및 협조 요청 (9월28일부터)',
+      '5 2026학년도 2학기 중간강의평가 실시 안내', '4 2026학년도 2학기 졸업예정자(최종학기) 조기취업 공인출석 안내']
+      .map((title, i) => ({ school: '영남대학교', title, url: `${BASE}?mode=view&articleNo=2318${i}`, postId: `2318${i}` }));
+    const other = { school: '영남대학교', title: '3 대 3 농구대회 참가 안내', url: 'https://www.yu.example.ac.kr/main/campus/notice.do?mode=view&no=1' };
+    const kauStored = { school: '한국항공대학교', title: '\u200b대학 캠퍼스 방송 촬영 안내 총무팀 2026-09-30 128', url: 'https://kau.example.ac.kr/bbs/list#n-x', postId: '77' };
+    const urls = stored.concat(other, kauStored).map((n) => [n.url, n.postId]);
+    retitleStored(stored.concat(other, kauStored));
+    eq('  실려 있던 글 — 게시판별로 번호를 떼고 · 다른 게시판 한 건은 그대로 · 꼬리·폭 없는 공백도 · 주소·글 번호 그대로',
+      [stored.every((n) => !/^\d{1,4}\s/.test(n.title)), other.title, kauStored.title, JSON.stringify(stored.concat(other, kauStored).map((n) => [n.url, n.postId])) === JSON.stringify(urls)],
+      [true, '3 대 3 농구대회 참가 안내', '대학 캠퍼스 방송 촬영 안내', true]);
+    const cn = stripComments(fs.readFileSync(new URL('collector/collect-news.mjs', root), 'utf8'));
+    eq('  소식 로봇 배선 — 실려 있던 글에만(새 글과 섞기 전) retitleStored · 같은 글 합치기보다 먼저',
+      /freshAll\.concat\(retitleStored\(loadPublished\(\)\)\)[\s\S]*collapseSamePost\(all\)/.test(cn), true);
   }
 }
