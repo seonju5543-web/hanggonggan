@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-04T15:19:38.326Z",
+ "updatedAt": "2026-10-05T19:10:51.133Z",
  "v": 1,
  "bad": {
   "https://2026grchallenge.com/": {
@@ -30,6 +30,14 @@
    "v": "other",
    "at": "2026-10-05"
   },
+  "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000": {
+   "v": "other",
+   "at": "2026-10-06"
+  },
+  "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=95279&article.offset=0&articleLimit=10": {
+   "v": "other",
+   "at": "2026-10-06"
+  },
   "https://www.usspc.or.kr/": {
    "v": "home",
    "at": "2026-10-05"
@@ -37,13 +45,16 @@
   "https://www.welchon.com/web/lay1/program/S1T31C447/eventNewView.do?menuIdx=&cIdx=evpr&bbsIdx=2214028": {
    "v": "login",
    "at": "2026-10-05"
-  },
-  "https://www.yonkang.org/kr/news/645": {
-   "v": "other",
-   "at": "2026-10-05"
   }
  },
  "fix": {
+  "id:kosaf-2000429013": {
+   "url": "https://scholarship.eumseong.go.kr/www/selectBbsNttView.do?key=33&bbsNo=3&nttNo=792",
+   "at": "2026-10-06",
+   "src": "robot",
+   "title": "2026년 전입장학금 지원 공고",
+   "round": "2026-11-30"
+  },
   "u:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD-%EB%B9%84%EA%B5%90%EA%B3%BC%5D%20%5BArTechne%5D%202026%20%EB%B9%84%EA%B5%90%EA%B3%BC%20%EB%A7%88%EC%9D%BC%EB%A6%AC%EC%A7%80%20%EC%9E%A5%ED%95%99%EC%A0%9C%EB%8F%84": {
    "url": "https://www.gachon.ac.kr/bbs/kor/743/125694/artclView.do",
    "at": "2026-10-04",
@@ -97,36 +108,6 @@
    "at": "2026-10-04",
    "src": "robot",
    "title": "국제 [(주)라엘코리아] 해외영업(일본) 전환형 인턴 추천채용"
-  },
-  "u:https://www.kookmin.ac.kr/user/kmuNews/notice/7/index.do#n-%EB%93%B1%EB%A1%9D%EA%B8%88%EC%A7%80%EC%9B%90%2B%EB%93%B1%EB%A1%9D%EA%B8%88%EC%99%B8%EC%A7%80%EC%9B%90%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%EC%A4%91%EC%86%8C%EA%B8%B0%EC%97%85%20%EC%B7%A8%EC%97%85%EC%97%B0%EA%B3%84%20%EC%9E%A5%ED%95%99%EC%82%AC%EC%97%85(%ED%9D%AC%EB%A7%9D": {
-   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12307/view.do?currentPageNo=1",
-   "at": "2026-10-04",
-   "src": "robot",
-   "title": "등록금지원+등록금외지원 2026년 2학기 중소기업 취업연계 장학사업(희망사다리Ⅰ유형, 취업지원형) 신규장학생 모집(~9/18 18:00까지) 2026.08.31 현장실습지원센터 전소영"
-  },
-  "u:https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-%5B%ED%86%B5%EC%98%81%EC%8B%9C%5D%202026%EB%85%84%20%EC%83%81%EB%B0%98%EA%B8%B0%EB%B6%84%20%ED%86%B5%EC%98%81%EC%8B%9C%20%ED%95%99%EC%9E%90%EA%B8%88%20%EC%9D%B4%EC%9E%90%20%EC%A7%80%EC%9B%90%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4": {
-   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54815",
-   "at": "2026-10-04",
-   "src": "robot",
-   "title": "[통영시] 2026년 상반기분 통영시 학자금 이자 지원 신청 안내"
-  },
-  "u:https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-%E3%80%8C2026%EB%85%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20%EC%9D%B5%EC%82%B0%EC%8B%9C%20%EB%8C%80%ED%95%99%EC%83%9D%20%ED%95%99%EC%9E%90%EA%B8%88%20%EC%9D%B4%EC%9E%90%20%EC%A7%80%EC%9B%90%20%EC%82%AC%EC%97%85%E3%80%8D%EC%95%88%EB%82%B4": {
-   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54775",
-   "at": "2026-10-04",
-   "src": "robot",
-   "title": "「2026년 하반기 익산시 대학생 학자금 이자 지원 사업」안내"
-  },
-  "u:https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-2026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B2%B0%EA%B3%BC%20%EB%B0%8F%202%EC%B0%A8%20%EC%B6%94%EA%B0%80%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4": {
-   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54747",
-   "at": "2026-10-04",
-   "src": "robot",
-   "title": "2026학년도 2학기 국가근로장학생 선발 결과 및 2차 추가 선발 안내"
-  },
-  "u:https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-2026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EC%83%9D%20%ED%9D%AC%EB%A7%9D%EA%B7%BC%EB%A1%9C%EC%A7%80%202%EC%B0%A8%20%EC%8B%A0%EC%B2%AD%EA%B8%B0%EA%B0%84%20%EC%95%88%EB%82%B4": {
-   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54793",
-   "at": "2026-10-04",
-   "src": "robot",
-   "title": "2026학년도 2학기 국가근로장학생 희망근로지 2차 신청기간 안내"
   }
  }
 }

@@ -7,16 +7,23 @@
   "by": "로봇(재단 게시판 글과 짝 — 마감 같음 +2 · 공고문 파일 제목 +2 · 사업 이름 +1 · 마감 해 +1 · 장학 낱말 +1)",
   "title": "2026년 전입장학금 지원 공고",
   "firstAt": "2026-10-05",
-  "lastAt": "2026-10-05",
-  "tries": 1,
-  "status": "pending",
-  "why": "못 엶(열기 실패: page.goto: Timeout 20000ms exceeded.) — 다시 봅니다",
+  "lastAt": "2026-10-06",
+  "tries": 2,
+  "status": "verified",
+  "why": "그 재단·그 사업·이번 회차 공고로 확인",
   "checks": {
    "C": "ok",
-   "L": "unread"
+   "L": "ok",
+   "H": "ok",
+   "T": "ok",
+   "R": "ok",
+   "X": "ok",
+   "P": "ok"
   },
   "round": "2026-11-30",
-  "nextAt": "2026-10-06"
+  "decidedAt": "2026-10-06",
+  "verifiedAt": "2026-10-06",
+  "also": []
  },
  "kosaf|2000436005|https://asanmirae.or.kr:449/main/index.php?m_cd=32&b_id=20260714107548723": {
   "ds": "kosaf",
