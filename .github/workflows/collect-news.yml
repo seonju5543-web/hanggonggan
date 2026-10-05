@@ -10,6 +10,11 @@ on:
     - cron: '19 22 * * *'   # 매일 07:19 KST
     - cron: '19 4 * * *'    # 매일 13:19 KST
   workflow_dispatch:
+    inputs:
+      report:
+        description: '리포트 이슈를 남긴다(확인용) — 비우면 사람 손이 필요할 때만'
+        type: boolean
+        default: false
   push:
     branches: ['claude/nice-heisenberg-WESq5']
     paths:
@@ -30,8 +35,9 @@ jobs:
     env:
       NODE_EXTRA_CA_CERTS: collector/certs/bundle.pem   # 계명대처럼 중간 인증서를 안 보내는 학교 (collector/certs/README.md)
     # 상한 = 단계 상한의 합 + 여유 3 (관문 test-collector 「교내 소식」이 대소관계를 잰다 · 상한을 키워 때우지 말 것).
-    # 찾기 7 + 수집 6 + 썸네일 5 + 알림 1 + 관문 5 + 되돌리기 1 + 감사 알림 1 + 저장 3 + 리포트 1 + 알림 1 = 31 → 35
-    timeout-minutes: 35
+    # 찾기 7 + 수집 6 + 썸네일 5 + 수집 알림·닫기 2 + 사진 알림·닫기 2 + 관문 5 + 되돌리기 1 + 감사 알림·닫기 2 + 저장 3 + 리포트 1 + 넘어짐 알림 1 = 35 → 39
+    # (경보 짝 넷은 2026-10-04 로봇·도구 점검에서 더했다 — 경보는 이슈 하나에 모이고 회복하면 닫힌다 · tools/alert-issue.mjs)
+    timeout-minutes: 39
     steps:
       - uses: actions/checkout@v4
         with:
@@ -69,6 +75,7 @@ jobs:
       # 그림 도구 sharp 는 이 단계에서만 설치한다(설치 실패는 삼키지 않는다 — 단계가 실패로 남고 소식 저장은 그대로 간다).
       # 상한 5 = 자체 예산 2.5분 + 글 하나 시한 30초 + 설치·정리 여유.
       - name: 교내 소식 썸네일 (보강 — 실패해도 수집분은 나간다)
+        id: thumbs
         timeout-minutes: 5
         continue-on-error: true
         env:
@@ -77,19 +84,64 @@ jobs:
           npm i sharp --no-audit --no-fund --silent
           node collector/collect-news-thumbs.mjs
 
-      - name: 🚨 수집 단계 실패 알림 (최근 리포트 이슈에 코멘트)
+      # 🔴 단계 경보는 이슈 **하나**에 모으고 회복하면 닫는다 (2026-10-04 로봇·도구 점검 · tools/alert-issue.mjs).
+      #    옛 판은 '열린 최신 소식 리포트'에 댓글만 달아, 받을 리포트가 없는 날엔 **조용했다**.
+      #    넘어짐 알림(robot-down)과 따로 둔다 — 단계 실패는 continue-on-error 라 작업은 초록으로 끝나 '로봇이 넘어졌다'와 뜻이 다르다.
+      #    그래서 제목·라벨을 따로 쓰고, 그 단계가 다시 끝까지 가면 바로 아래 짝 단계가 닫는다.
+      - name: 🚨 수집 단계 실패 알림
         if: steps.run.outcome != 'success'
         timeout-minutes: 1
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          last=$(gh issue list --repo "${{ github.repository }}" \
-            --search '"교내 소식 수집 리포트" in:title' --state open \
-            --limit 1 --json number --jq '.[0].number' || true)
-          if [ -n "$last" ] && [ "$last" != "null" ]; then
-            gh issue comment "$last" --repo "${{ github.repository }}" \
-              --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **소식 수집 단계가 ${{ steps.run.outcome }} 로 끝났습니다** (상한 6분에 잘렸거나 로봇이 죽었습니다). 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '소식 수집 실패 확인해줘'라고 지시하세요."
-          fi
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          title: 🚨 교내 소식 로봇 — 수집 단계가 끝까지 못 갔어요
+          label: news-step
+          label-description: 교내 소식 로봇의 단계가 끝까지 못 감
+          body: |
+            소식 수집 단계가 **${{ steps.run.outcome }}** 로 끝났습니다(상한 6분에 잘렸거나 로봇이 넘어졌을 수 있습니다 — 원인은 실행 로그에서 확인하세요).
+            실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            Claude 세션에 '소식 수집 실패 확인해줘'라고 지시하세요. 다음 실행에서 수집 단계가 끝까지 가면 이 이슈는 저절로 닫힙니다.
+      - name: 수집 단계가 다시 끝까지 가면 옛 경보를 닫는다
+        if: steps.run.outcome == 'success'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          title: 🚨 교내 소식 로봇 — 수집 단계가 끝까지 못 갔어요
+          body: |
+            ✅ 소식 수집 단계가 다시 끝까지 갔습니다 — 자동으로 닫습니다.
+            실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      # 사진(썸네일) 단계도 결과를 본다 — 보강이라 넘어져도 작업은 초록이라, 이게 없으면 사진이 멈춘 것을 아무도 모른다.
+      - name: 🚨 사진(썸네일) 단계 실패 알림
+        if: steps.thumbs.outcome == 'failure'
+        timeout-minutes: 1
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          title: 🚨 교내 소식 로봇 — 사진(썸네일) 단계 실패
+          label: news-step
+          label-description: 교내 소식 로봇의 단계가 끝까지 못 감
+          body: |
+            소식 사진(썸네일) 단계가 실패했습니다. 소식 글은 그대로 나가지만 새 글의 사진이 붙지 않습니다.
+            실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            다음 실행에서 사진 단계가 성공하면 이 이슈는 저절로 닫힙니다.
+      - name: 사진 단계가 다시 성공하면 옛 경보를 닫는다
+        if: steps.thumbs.outcome == 'success'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          title: 🚨 교내 소식 로봇 — 사진(썸네일) 단계 실패
+          body: |
+            ✅ 소식 사진(썸네일) 단계가 다시 성공했습니다 — 자동으로 닫습니다.
+            실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       # 데이터 관문 — 저장 직전. 규칙을 어기면 이번 실행의 소식 파일을 되돌리고 알린다(장학 수집과 같은 규칙).
       - name: 데이터 관문 (수집기 규칙 테스트 + 데이터 감사)
@@ -109,17 +161,36 @@ jobs:
           git checkout -- collector/news-thumbs.json 2>/dev/null || rm -f collector/news-thumbs.json
           git clean -fdq data/news || true
 
-      # 감사 실패는 조용히 넘어가지 않는다 — 되돌리기만 하고 끝나면 홈 구역이 **소리 없이 멈춘다**(리뷰 2026-10-01). 이슈를 새로 연다(첫 실행엔 댓글 달 이슈가 없다).
-      - name: 🚨 데이터 감사 실패 알림 (이슈 생성)
+      # 감사 실패는 조용히 넘어가지 않는다 — 되돌리기만 하고 끝나면 홈 구역이 **소리 없이 멈춘다**(리뷰 2026-10-01).
+      # 🔴 이슈 **하나**에 모은다 (2026-10-04) — 옛 판은 날짜 붙은 제목으로 실패할 때마다 새 이슈를 만들었다(하루 2회 + 수동).
+      #    다시 통과하면 아래 짝 단계가 닫는다.
+      - name: 🚨 데이터 감사 실패 알림
         if: steps.audit.outcome == 'failure'
         timeout-minutes: 1
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh issue create --repo "${{ github.repository }}" \
-            --title "🚨 교내 소식 데이터 감사 실패 $(TZ=Asia/Seoul date +%Y-%m-%d) — 이번 발행분을 되돌렸습니다" \
-            --body "소식 수집은 됐지만 관문(test-collector·audit-data)을 통과하지 못해 data/news 를 되돌렸습니다. 고칠 때까지 홈 「우리 학교 소식」이 갱신되지 않습니다. 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '소식 감사 실패 확인해줘'라고 지시하세요." \
-            --assignee "${{ github.repository_owner }}"
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          title: 🚨 교내 소식 데이터 감사 실패 — 이번 발행분을 되돌렸습니다
+          label: news-audit
+          label-description: 교내 소식 데이터 감사 실패
+          assignee: ${{ github.repository_owner }}
+          body: |
+            소식 수집은 됐지만 관문(test-collector·audit-data)을 통과하지 못해 data/news 를 되돌렸습니다. 고칠 때까지 홈 「우리 학교 소식」이 갱신되지 않습니다.
+            실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            Claude 세션에 '소식 감사 실패 확인해줘'라고 지시하세요. 다음 실행에서 감사를 통과하면 이 이슈는 저절로 닫힙니다.
+      - name: 감사가 다시 통과하면 옛 경보를 닫는다
+        if: steps.audit.outcome == 'success'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          title: 🚨 교내 소식 데이터 감사 실패 — 이번 발행분을 되돌렸습니다
+          body: |
+            ✅ 교내 소식 데이터 감사가 다시 통과했습니다 — 이번 발행분은 저장됩니다. 자동으로 닫습니다.
+            실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - name: 수집 상태 저장 (중복 방지 기록)
         timeout-minutes: 3
@@ -151,31 +222,34 @@ jobs:
           fi
 
       # 리포트 이슈는 **사람 손이 필요할 때만** 만든다(연속 실패·글을 못 읽는 게시판·찾기 로봇이 못 찾은 학교) — 매일 새 이슈는 소음이다.
-      # 수동 실행 때는 늘 만든다(첫 실행 확인용).
+      # 🔴 수동 실행만으로는 열지 않는다 (2026-10-04) — 옛 판은 버튼을 누를 때마다 담당자 지정 이슈를 새로 만들어
+      #    열린 소식 리포트가 20건이 됐다(그중 다수가 '새 글 0건'). 확인이 필요하면 버튼의 「리포트 이슈를 남긴다」를 켠다
+      #    (세션은 실행 로그·collector/news-report.md 로 본다). 같은 날 리포트는 한 이슈에 댓글로 모인다(제목에 건수를 넣지 않는다).
       - name: 리포트 이슈 (사람 손이 필요할 때만)
-        if: github.event_name == 'workflow_dispatch' || steps.run.outputs.needs_human == '1'
+        if: steps.run.outputs.needs_human == '1' || inputs.report
         timeout-minutes: 1
         env:
           GH_TOKEN: ${{ github.token }}
+          NEW_COUNT: ${{ steps.run.outputs.new_count }}
+          NEEDS_HUMAN: ${{ steps.run.outputs.needs_human }}
+          OWNER: ${{ github.repository_owner }}
         run: |
-          { cat collector/news-report.md; echo; echo '---'; echo; [ -f collector/find-news-boards-report.md ] && cat collector/find-news-boards-report.md; } > /tmp/news-issue.md || true
+          {
+            printf '🗞 %s KST — 새 글 %s건 · 사람 손 필요: %s\n\n' "$(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')" "${NEW_COUNT:-?}" "$([ "$NEEDS_HUMAN" = 1 ] && echo 예 || echo '아니요(확인용 실행)')"
+            cat collector/news-report.md; echo; echo '---'; echo; [ -f collector/find-news-boards-report.md ] && cat collector/find-news-boards-report.md
+          } > /tmp/news-issue.md || true
           if [ "$(wc -c < /tmp/news-issue.md)" -gt 60000 ]; then head -c 60000 /tmp/news-issue.md > /tmp/news-cut.md; printf '\n\n> ⚠️ 리포트가 길어 잘렸습니다 — 전문은 collector/news-report.md\n' >> /tmp/news-cut.md; mv /tmp/news-cut.md /tmp/news-issue.md; fi
-          gh issue create \
-            --title "🗞 교내 소식 수집 리포트 $(TZ=Asia/Seoul date +%Y-%m-%d) (새 글 ${{ steps.run.outputs.new_count }}건)" \
-            --body-file /tmp/news-issue.md \
-            --repo "${{ github.repository }}" \
-            --assignee "${{ github.repository_owner }}"
+          node tools/alert-issue.mjs --mode open --match exact \
+            --title "🗞 교내 소식 수집 리포트 $(TZ=Asia/Seoul date +%Y-%m-%d)" \
+            --label news-report --label-color 0E8A16 --label-description '교내 소식 수집 리포트(사람 손이 필요할 때)' \
+            --assignee "$OWNER" --body-file /tmp/news-issue.md
 
-      - name: 🚨 실패·시간초과 알림 (최근 리포트 이슈에 코멘트)
+      # 🔴 넘어짐 알림 한 벌(robot-down)로 (2026-10-04) — 옛 판은 열린 소식 리포트에 댓글만 달아, 리포트가 없으면 조용했다.
+      #    회복하면 하트비트가 닫는다.
+      - name: 🚨 실패·시간초과 알림
         if: failure() || cancelled()
         timeout-minutes: 1
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          last=$(gh issue list --repo "${{ github.repository }}" \
-            --search '"교내 소식 수집 리포트" in:title' --state open \
-            --limit 1 --json number --jq '.[0].number' || true)
-          if [ -n "$last" ] && [ "$last" != "null" ]; then
-            gh issue comment "$last" --repo "${{ github.repository }}" \
-              --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **교내 소식 로봇이 끝까지 못 갔어요** (실패 또는 시간 초과) — 이번 수집분은 저장되지 않았습니다. 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          fi
+        uses: ./.github/actions/robot-down
+        with:
+          robot: 교내 소식 수집 로봇
+          token: ${{ github.token }}

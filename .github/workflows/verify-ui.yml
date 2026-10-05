@@ -60,6 +60,12 @@ on:
       - 'server/push/**'     # 푸시 발송 서버 (verify-push-server.mjs)
       - 'insta/**'           # 인스타 카드 (verify-insta.js)
       - '.github/workflows/verify-ui.yml'
+      # 🔴 경보 한 곳(2026-10-04 로봇·도구 점검) — 경보 도구·리포트 정리 규칙·앱이 받는 파일 목록과 공용 액션.
+      #    여기 없으면 그 파일만 고친 커밋에서 관문(test-collector 「로봇·도구 점검 관문」 alerts)이 한 번도 안 돈다.
+      - 'tools/alert-issue.mjs'
+      - 'tools/report-retention.mjs'
+      - 'tools/app-fetch-files.cjs'
+      - '.github/actions/**'
   workflow_dispatch:
 
 permissions:
@@ -83,15 +89,23 @@ jobs:
         with:
           node-version: 20
       - run: npm init -y >/dev/null && npm i playwright-core@1 --no-audit --no-fund
-      - run: npx playwright@1 install --with-deps chromium
+      # 🔴 `id: browser` — 아래 화면 검사·전 여정은 **이 단계가 성공했을 때만** 돈다. 앞(내려받기·도구 설치)이 넘어져도
+      #    이 단계가 건너뛰어져 성공이 아니게 되므로, 조건 하나로 준비 단계 전부를 본다(브라우저 없이 드라이버가 다 빨개지는 소음을 막는다).
+      - id: browser
+        run: npx playwright@1 install --with-deps chromium
       - name: 브라우저 경로 찾기
         run: echo "CHROME_PATH=$(find ~/.cache/ms-playwright -name chrome -type f | head -1)" >> $GITHUB_ENV
 
+      # 🔴 **여기부터 경보 앞까지 모든 관문 단계에 `!cancelled()` 를 단다** (2026-10-04 코드 리뷰).
+      #    GitHub 은 한 단계가 실패하면 `if:` 없는 아래 단계를 **통째로 건너뛴다.** 화면 검사 단계에만 달면
+      #    이 값싼 관문 일곱 가운데 하나만 넘어져도 드라이버 전부와 전 여정이 또 한 번도 안 돈다 — 2026-10-04 에 막으려던 '그물 걷힘'과 같은 꼴이다.
+      #    관문 verify/health-gates/ci.mjs ②(test-collector 「로봇·도구 점검 관문」 이 부른다)가 이 구간의 `if:` 를 하나씩 잰다(새 단계를 더할 때도).
       # 🔴 순수 모듈 검사도 여기서 돌린다 (2026-08-29 코드 리뷰 지적).
       #    essay-playbook.yml 에도 있지만 그건 **주 1회 예약**이라, 제출 관문이 깨져도
       #    최대 일주일 뒤에 안다. 관문은 밀어 넣는 그 순간 막아야 한다.
       #    브라우저가 필요 없어 몇 초면 끝난다.
       - name: 제출 관문 판정 검사 (순수 모듈)
+        if: ${{ !cancelled() }}
         run: node verify/verify-essay-submit.mjs
 
       # 🔴 접수 대행 — 보내기 전 서버 재검증 (2026-09-25 · 고문 보고서 Q4).
@@ -99,6 +113,7 @@ jobs:
       #    자격을 조작한 신청서가 그대로 나가는 것. 지금은 mailto: 라 안 터지지만,
       #    Resend 를 켜는 순간 우리가 보내는 주체가 된다 — 그때 이 관문이 서 있어야 한다.
       - name: 접수 대행 재검증 관문 (순수 모듈)
+        if: ${{ !cancelled() }}
         run: node verify/verify-apply-guard.mjs
 
       # 🔴 아래 셋은 오랫동안 **어떤 워크플로에도 안 걸려 있었다**(2026-09-09 전수 조사에서 발견).
@@ -107,12 +122,15 @@ jobs:
       #    · push-server   — 발송 서버가 폰 주소·학교·캠퍼스 말고 아무것도 저장하지 않는가
       #    · form-snapshot — 질문을 줄여도 **문서는 한 글자도 안 바뀐다**는 증명 (운영 원칙 4)
       - name: 알림 규칙 관문 (순수 모듈)
+        if: ${{ !cancelled() }}
         run: node verify/verify-notify-rules.js
 
       - name: 푸시 발송 서버 관문
+        if: ${{ !cancelled() }}
         run: node verify/verify-push-server.mjs
 
       - name: 양식 문서 동일성 관문 (원칙 4)
+        if: ${{ !cancelled() }}
         run: node verify/form-snapshot.mjs
 
       # 🔴 인스타 카드 사실 관문 — 145건 전수. 브라우저가 필요 없다(파일·JSON 만 읽는다).
@@ -120,6 +138,7 @@ jobs:
       #    '모집 중'·저작자 표시 누락)을 잡는다. 규칙은 render.mjs 에서 **이름으로 떼어 온다** —
       #    베끼면 코드를 되돌려도 초록불로 남는다(실제로 그랬다).
       - name: 인스타 카드 사실 관문
+        if: ${{ !cancelled() }}
         run: node verify/verify-insta.js
 
       # 🔴 관리자 화면 빠진 이웃 — 브라우저가 필요 없다(파일만 읽는다). 몇 초면 끝난다.
@@ -128,11 +147,14 @@ jobs:
       #    이 단계가 부르는 build.sh 안에서 같은 관문이 돈다(규칙은 한 파일 — 베끼지 않는다).
       #    Cloudflare 빌드 때도 같은 것이 돌지만, 그건 배포 직전이라 여기서 먼저 잡는다.
       - name: 관리자 화면 빠진 이웃 관문
+        if: ${{ !cancelled() }}
         run: |
           bash _admin/build.sh
 
       # 드라이버마다 8123·8124 를 쓴다 (verify/README.md)
       - name: 로컬 서버 띄우기
+        id: server
+        if: ${{ !cancelled() }}
         run: |
           python3 -m http.server 8123 >/dev/null 2>&1 &
           python3 -m http.server 8124 >/dev/null 2>&1 &
@@ -141,9 +163,20 @@ jobs:
       # ── 관문: 전부 통과해야 한다 (2026-08-29에 7개를 고쳐 모두 초록불로 만들었다) ──
       # 🔴 여기서 실패하면 화면이 깨진 것이다. 넘기지 말 것 —
       #    "나중에 보자"로 두면 정확히 그렇게 7개가 썩었다.
+      # 🔴 **하나가 넘어져도 끝까지 돈다** (2026-10-04 · 이슈 #389·#390). 예전엔 `set -e` + 맨몸 `node` 라
+      #    verify-registered 하나가 데이터 탓으로 넘어지자 뒤 드라이버 22개와 아래 단계 셋이 **통째로 안 돌았고**,
+      #    그 사이 들어온 토큰 위반(ui-tone)이 한 번도 안 보였다. `set -e` 만 지우면 아무것도 안 바뀐다 —
+      #    GitHub 기본 셸이 `bash -e` 라서 실패를 `||` 로 받아 모은 뒤 마지막에 한 번 실패시킨다.
+      #    `timeout 300`: 가장 긴 드라이버가 76초(verify-settings · 성공 실행 실측). 매달린 하나가 30분 그릇을 다 먹으면
+      #    '취소'로 끝나 경보가 안 뜬다 — 상한을 키우지 않고 드라이버마다 끊는다.
+      # 🔴 **앞의 값싼 관문이 넘어져도 돈다**(`!cancelled()` · 2026-10-04 코드 리뷰 — 조건이 없으면 일곱 가운데 하나만 빨개도
+      #    드라이버 전부와 전 여정이 통째로 건너뛰어졌다). 서버를 못 띄웠거나 브라우저를 못 깔았을 때만 건너뛴다 —
+      #    그때 경보는 '드라이버가 돌지 않았다'고 적는다(아래 경보의 DRIVERS).
       - name: 화면 검사 (관문)
+        id: drivers
+        if: ${{ !cancelled() && steps.server.outcome == 'success' && steps.browser.outcome == 'success' }}
         run: |
-          set -e
+          fails=""
           for f in verify-fit-badge.js verify-explore-sort.js verify-onboard-gaps.js \
                    verify-registered.js verify-chat.js verify-apps-manage.js \
                    verify-supabase.js verify-essay-ui.js verify-forms-data.js \
@@ -155,8 +188,10 @@ jobs:
                    verify-apply-prep.js verify-activities.js verify-news.js \
                    verify-region-city.js; do
             echo "── $f"
-            node "verify/$f"
+            timeout 300 node "verify/$f" || { echo "❌ $f"; fails="$fails $f"; }
           done
+          echo "failed=${fails# }" >> "$GITHUB_OUTPUT"
+          if [ -n "$fails" ]; then echo "❌ 실패한 드라이버:$fails"; exit 1; fi
 
 
       # 화면의 말투·토큰이 되돌아가지 않는지 (2026-08-31 신설 — 브라우저 없이 몇 초).
@@ -169,7 +204,9 @@ jobs:
       #    ⚠️ 검사를 무르게 한 것이 아니다. 여기서 실패하면 작업 전체가 여전히 빨간불이고,
       #       다만 **화면 검사 결과도 함께 보인다.** 앞에 두면 둘 중 하나만 보인다.
       #    ⚠️ 다시 앞으로 옮기지 말 것 — 옮기는 순간 뒤 단계가 또 통째로 사라진다.
+      #    🔴 앞 단계가 실패해도 돈다(`!cancelled()` — 2026-10-04 이전엔 이 조건이 없어 화면 검사가 빨간 날 통째로 건너뛰었다).
       - name: 말투·토큰 관문
+        if: ${{ !cancelled() }}
         run: node verify/ui-tone.mjs
 
       # 수집기·관리자 규칙 관문 (2026-09-14 신설) — 브라우저가 필요 없어 3초면 끝난다.
@@ -185,7 +222,9 @@ jobs:
       #
       # 🔴 **맨 끝에 둔다** — 말투·토큰 관문과 같은 이유다. 앞에 두면 여기서 걸린 날
       #    브라우저 검사 20개가 통째로 안 돌아 그물이 걷힌 줄 아무도 모른다.
+      #    🔴 앞 단계가 실패해도 돈다(`!cancelled()` — 2026-10-04 이전엔 이 조건이 없어 앞이 빨간 날 통째로 건너뛰었다).
       - name: 수집기·관리자 규칙 관문 (브라우저 불필요)
+        if: ${{ !cancelled() }}
         # DOC_GATES: CLAUDE.md 부피·참조 대조는 **여기(코드 검사)와 로컬에서만** 실패시킨다.
         #   수집 로봇도 이 파일을 데이터 관문으로 돌리는데, 거기서 문서 오타가 실패하면
         #   그날 자동 등록분이 되돌려진다 — 문서 문제로 수집이 멈추면 안 된다(2026-09-23).
@@ -202,9 +241,9 @@ jobs:
       #    그 원인에는 아직 관문이 없다." 그 자리를 메운다.
       #   수집 로봇은 실패하면 🚨 이슈를 남긴다. 화면 검사만 조용했다.
       #
-      # 🔴 라벨로 중복을 막는다 — 제목 검색은 이모지·한글에서 놓친다(2026-07-31).
-      #    `.github/actions/robot-down` 이 같은 이유로 라벨을 쓴다. 열린 이슈가 있으면
-      #    코멘트만 단다 — 매 push 마다 새 이슈를 만들면 일주일이면 알림을 무시하게 된다.
+      # 🔴 열린 경보가 있으면 코멘트만 단다 — 매 push 마다 새 이슈를 만들면 일주일이면 알림을 무시하게 된다.
+      #    찾기·만들기는 아래 경보 한 곳(tools/alert-issue.mjs · 2026-10-04)이 열린 이슈 목록의 **제목 글자**로 한다
+      #    (옛 판의 라벨 찾기는 같은 초 두 실행이 둘 다 '없음'을 봐 중복을 만들었다 · GitHub 검색은 이모지·한글에서 놓친다 — 2026-07-31).
       #
       # ⚠️ **여기서는 `cancelled()` 를 일부러 안 본다** — 이 저장소의 다른 로봇과 다르다.
       #    다른 로봇은 예약(cron)이라 취소 = 시간 초과지만, 이 워크플로는
@@ -223,42 +262,68 @@ jobs:
       #    🔴 **값싼 관문(말투·토큰·수집기 규칙) 뒤에 둔다.** GitHub 은 한 단계가 실패하면
       #       아래를 통째로 건너뛰므로, 앞에 두면 이 2~3분짜리가 빨간불일 때 3초짜리 관문
       #       결과가 통째로 안 보인다 — 2026-09-03 에 ui-tone 을 맨 뒤로 옮긴 이유와 같다.
+      #    🔴 앞 단계가 실패해도 돈다(`!cancelled()` — 2026-10-04 이전엔 이 조건이 없어 앞이 빨간 날 통째로 건너뛰었다).
+      #       서버를 못 띄웠거나 브라우저를 못 깔았으면 돌 까닭이 없어 그때만 건너뛴다(위 화면 검사와 같은 조건).
       - name: 전 여정 회귀 (drive.js)
+        if: ${{ !cancelled() && steps.server.outcome == 'success' && steps.browser.outcome == 'success' }}
         run: PORT=8123 node verify/drive.js
       - name: 🚨 화면 검사가 빨간불이다
+        id: alarm
         if: failure()
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           BRANCH: ${{ github.ref_name }}
+          FAILED: ${{ steps.drivers.outputs.failed }}
+          # 🔴 화면 검사 단계가 **돌았는지부터** 가른다 (2026-10-04 코드 리뷰). 실패 목록(FAILED)만 보면
+          #    단계가 건너뛰어진 날에도 목록이 비어 '실패한 드라이버: 없음'이라고 적혀, 하나도 안 돈 것을 다 통과한 것처럼 말했다
+          #    (CLAUDE.md 매 세션 5 — 확인 안 한 원인을 경고 문구에 단정하지 않는다). 관문 verify/health-gates/ci.mjs ② 가 세 갈래를 실제로 돌려 본다.
+          DRIVERS: ${{ steps.drivers.outcome }}
         run: |
           set -u
+          case "${DRIVERS:-}" in
+            success) drv="화면 검사 드라이버는 **전부 통과했습니다.** 빨간 단계는 그 밖(앞의 값싼 관문 · 말투·토큰 · 수집기 규칙 · 전 여정 등)에 있으니, 로그에서 빨간 표시가 붙은 단계를 찾으세요." ;;
+            failure)
+              if [ -n "${FAILED:-}" ]; then
+                drv="실패한 드라이버: ${FAILED}. 드라이버는 하나가 넘어져도 끝까지 돌았습니다. 다른 빨간 단계가 더 있을 수 있으니 로그도 보세요."
+              else
+                drv="화면 검사 단계가 실패했는데 실패한 드라이버 목록을 받지 못했습니다 — 로그에서 \`❌\` 가 붙은 줄과 빨간 단계를 찾으세요."
+              fi ;;
+            *) drv="화면 검사 드라이버와 전 여정(drive.js)이 **돌지 않았습니다** — 그 앞의 준비 단계(코드 내려받기 · 도구 설치 · 브라우저 설치 · 로컬 서버 띄우기) 가운데 하나가 실패했습니다. 로그에서 빨간 표시가 붙은 단계를 찾으세요." ;;
+          esac
           body="**앱 화면 검사(브라우저)가 빨간불입니다.** 화면이나 판정이 깨졌다는 뜻입니다.
 
           · 브랜치: \`${BRANCH}\`
           · 시각: $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST
           · 실행 로그: ${RUN_URL}
 
-          로그에서 \`❌\` 가 붙은 줄을 찾으면 어느 항목인지 바로 나옵니다.
-          한 드라이버가 넘어지면 \`set -e\` 로 **그 뒤 드라이버는 안 돕니다** — 고친 뒤
-          다시 돌리면 그때 다음 것이 드러날 수 있습니다.
+          ${drv}
 
           다음 Claude 세션에 \"화면 검사 빨간불 고쳐줘\" 라고 지시하세요.
 
           ---
           _Generated by [Claude Code](https://claude.ai/code)_"
-          gh label create ui-gate --repo "$REPO" --color B60205 \
-            --description "앱 화면 검사(verify-ui)가 빨간불" 2>/dev/null || true
-          n=$(gh issue list --repo "$REPO" --label ui-gate --state open \
-                --limit 1 --json number --jq '.[0].number' 2>/dev/null || true)
-          if [ -n "$n" ] && [ "$n" != "null" ]; then
-            gh issue comment "$n" --repo "$REPO" --body "$body"
-          else
-            gh issue create --repo "$REPO" --label ui-gate \
-              --title "🚨 앱 화면 검사가 빨간불입니다 ($(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST)" \
-              --body "$body"
+          # 본문은 로그에도 찍고(사람이 실행 화면에서 바로 본다) 다음 단계(경보 한 곳)로 넘긴다.
+          printf '%s\n' "$body"
+          if [ -n "${GITHUB_OUTPUT:-}" ]; then
+            { echo 'body<<__UI_ALARM_BODY__'; printf '%s\n' "$body"; echo '__UI_ALARM_BODY__'; } >> "$GITHUB_OUTPUT"
           fi
+      # 🔴 경보는 이슈 **하나**에 모은다 (2026-10-04 로봇·도구 점검 · tools/alert-issue.mjs).
+      #    옛 판은 '라벨로 열린 것 찾기 → 없으면 만들기'라, 기본 브랜치와 main 두 실행(대기줄이 ref 마다 따로)이 같은 초에 둘 다
+      #    '없음'을 보고 둘을 만들었다(#389·#390 · 09-30 #321·#322). 도구는 만든 뒤 다시 보아 큰 번호를 닫는다.
+      #    제목 앞머리(prefix)로 찾아 옛 시각 붙은 제목도 이어진다. 여는 것은 아무 브랜치에서나(놓치는 쪽이 더 나쁘다).
+      - name: 🚨 화면 검사 경보 이슈 (한 곳에 모은다)
+        if: failure()
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          match: prefix
+          title: 🚨 앱 화면 검사가 빨간불입니다
+          label: ui-gate
+          label-description: 앱 화면 검사(verify-ui)가 빨간불
+          body: ${{ steps.alarm.outputs.body }}
 
       # 다시 초록불이면 스스로 닫는다 (admin-lock-check 와 같은 방식).
       # 🔴 '취소'는 닫는 근거가 못 된다 — 못 읽은 것을 '해결됐다'로 읽으면 경보가 조용히 사라진다.

@@ -70,43 +70,47 @@ jobs:
           fi
 
       # 결과를 이슈로 — '원인 미상'이 있을 때만. 없으면 조용히 끝낸다(정상 세션에 소음 0).
+      # 🔴 이슈 **하나**에 모은다 (2026-10-04 로봇·도구 점검). 옛 판은 라벨 coverage-audit 이 저장소에 없어 gh 가 실패 →
+      #    예비 명령이 라벨 없는 이슈를 매주 새로 만들었다(열린 🔍 10건). 제목은 고정(같은 제목이어야 댓글로 모인다),
+      #    날짜·건수는 본문 첫 줄에. 옛 날짜 붙은 🔍 는 리포트 정리(tools/report-retention.mjs · 최신 1건)가 닫는다.
+      - name: 결과 이슈 내용 만들기 (원인 미상이 있을 때만)
+        if: steps.run.outcome == 'success' && steps.run.outputs.unknown != '' && steps.run.outputs.unknown != '0'
+        timeout-minutes: 1
+        env:
+          UNKNOWN: ${{ steps.run.outputs.unknown }}
+        run: |
+          {
+            printf '🔍 %s KST — 원인 미상 **%s건**\n\n' "$(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')" "$UNKNOWN"
+            cat collector/coverage-report.md
+          } > /tmp/cov.md
+          LIMIT=60000
+          if [ "$(wc -c < /tmp/cov.md)" -gt "$LIMIT" ]; then
+            head -c "$LIMIT" /tmp/cov.md > /tmp/cut.md
+            printf '\n\n---\n> ⚠️ 리포트가 길어 잘렸습니다. 전문은 `collector/coverage-report.md`.\n' >> /tmp/cut.md
+            mv /tmp/cut.md /tmp/cov.md
+          fi
       - name: 결과 이슈 (원인 미상이 있을 때만)
         if: steps.run.outcome == 'success' && steps.run.outputs.unknown != '' && steps.run.outputs.unknown != '0'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          BODY=collector/coverage-report.md
-          LIMIT=60000
-          if [ "$(wc -c < "$BODY")" -gt "$LIMIT" ]; then
-            head -c "$LIMIT" "$BODY" > /tmp/cut.md
-            printf '\n\n---\n> ⚠️ 리포트가 길어 잘렸습니다. 전문은 `collector/coverage-report.md`.\n' >> /tmp/cut.md
-            BODY=/tmp/cut.md
-          fi
-          gh issue create \
-            --title "🔍 공고 누락 감사 $(TZ=Asia/Seoul date +%Y-%m-%d) (원인 미상 ${{ steps.run.outputs.unknown }}건)" \
-            --body-file "$BODY" \
-            --repo "${{ github.repository }}" \
-            --label "coverage-audit" \
-            --assignee "${{ github.repository_owner }}" \
-            --assignee "Se-Hyeon-Jo" || \
-          gh issue create \
-            --title "🔍 공고 누락 감사 $(TZ=Asia/Seoul date +%Y-%m-%d) (원인 미상 ${{ steps.run.outputs.unknown }}건)" \
-            --body-file "$BODY" --repo "${{ github.repository }}"
+        timeout-minutes: 2
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          match: exact
+          title: 🔍 공고 누락 감사 — 원인 미상 공고
+          label: coverage-audit
+          label-color: 5319E7
+          label-description: 공고 누락 감사 결과(원인 미상)
+          assignee: ${{ github.repository_owner }} Se-Hyeon-Jo
+          body-file: /tmp/cov.md
 
       # cancelled()까지 봐야 한다 — 상한을 넘긴 작업은 '실패'가 아니라 '취소'로 끝나서
       # failure()만 보면 알림을 건너뛴다 (2026-08-04에 실제로 뚫린 구멍).
+      # 🔴 넘어짐 알림 한 벌(robot-down)로 (2026-10-04) — 옛 판은 없는 라벨로 `gh issue create … || true` 라
+      #    **이슈가 아예 안 만들어졌다**(조용한 실패). 감사 단계만 넘어져 작업이 초록이어도 이 조건으로 알린다.
       - name: 🚨 감사가 끝까지 못 갔을 때
         if: failure() || cancelled() || steps.run.outcome == 'failure'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          {
-            printf '감사 로봇이 끝까지 못 갔습니다(실패 또는 시간 초과).\n\n'
-            printf '실행 로그: %s\n\n' "$RUN_URL"
-            printf '수집 로봇에는 영향이 없습니다 — 감사는 데이터를 고치지 않습니다.\n'
-          } > /tmp/audit-fail.md
-          gh issue create \
-            --title "🚨 공고 누락 감사 실패 $(TZ=Asia/Seoul date +%Y-%m-%d)" \
-            --body-file /tmp/audit-fail.md \
-            --repo "${{ github.repository }}" --label "coverage-audit" || true
+        uses: ./.github/actions/robot-down
+        with:
+          robot: 공고 누락 감사
+          token: ${{ github.token }}

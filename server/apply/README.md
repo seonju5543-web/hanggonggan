@@ -87,6 +87,11 @@ cd server/apply && npx wrangler deploy
 ```
 열쇠나 발신 도메인이 없으면 워커가 **503 으로 거절한다**(보내는 척하지 않는다).
 
+⚠️ 이 워커는 앱과 같은 판정 파일(`match-engine.js`)을 **배포할 때 묶어 싣는다** — 그 파일이 바뀌면
+이 워커를 다시 올려야 서버의 자격 판정이 앱과 같아진다(손으로 배포하는 동안은 사람이 기억해야 한다).
+불러 쓰는 꼴은 기본 가져오기(`import ME from '../../match-engine.js'`)여야 한다 — Workers 에는
+`node:module` 이 없다(관문 `verify/health-gates/servers.mjs` ①).
+
 ## ⑤ 바운스·도착 알림 (웹훅)
 
 1. Resend → **Webhooks** → 주소: `https://handaejang-apply.<계정>.workers.dev/resend-hook`

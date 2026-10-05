@@ -24,6 +24,7 @@ const { essayAskFor, essayKindOf, essayTargetChars, essayStage, TRACK_SPEND, DOC
 /* countPlan 은 내보내지 않는다 — planFormQuestions 가 plan.counts 에 넣어 주는 값이
    화면·감사가 실제로 쓰는 값이라 그것을 본다. */
 const { planFormQuestions, formBudgetReport, FORM_LIMITS } = require('../form-plan.js');
+const { unknownStoryFields } = require('./essay-unknown-fields.cjs');
 const T = JSON.parse(fs.readFileSync(fileURLToPath(new URL('../data/forms.json', import.meta.url)), 'utf8')).templates;
 
 let pass = 0, fail = 0;
@@ -49,9 +50,10 @@ ok(storyFields.length > 0, `서술형(story) 칸 ${storyFields.length}개`);
   ok(noAsk.length === 0, '① 모든 서술형 칸에 키워드 질문이 2개 이상 배정된다',
     noAsk.slice(0, 3).map((x) => `${x.form}/${x.f.id}`).join(', '));
 
-  const generic = storyFields.filter(({ f }) => essayAskFor(f).kind === 'generic');
+  /* 규칙은 verify/essay-unknown-fields.cjs 한 곳 — 데이터 감사(audit-data.js)가 같은 함수로 양식을 고친 그날 경고한다(2026-10-04) */
+  const generic = unknownStoryFields(T);
   ok(generic.length === 0, '① 종류를 못 알아본 칸이 없다 (generic 0)',
-    generic.slice(0, 5).map((x) => String(x.f.label).replace(/\s+/g, ' ')).join(' / '));
+    generic.slice(0, 5).map((x) => x.label).join(' / '));
 }
 {
   /* 키워드 질문의 절반 이상은 **눌러서 고르는 것**이어야 한다 —

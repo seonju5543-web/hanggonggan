@@ -15,6 +15,10 @@ name: 푸시 서버 상태 확인 (발송 없음)
 #    시험 발송(`/test`)은 등록된 **모든 학생 폰에 실제 알림이 뜨는 일**이라,
 #    사람이 `push-check` 를 직접 누를 때만 일어나야 한다. 여기서 부르면 안 된다.
 #
+# 🔴 2026-10-04 — 서버가 '살아 있다'만 보던 것을 '예약 회차가 돌고 있다'까지 본다(로봇·도구 점검 · 묶음 servers).
+#    서버 /health 의 lastSlot(마지막으로 시작한 회차)·lastRun(마지막으로 끝까지 돈 회차)을 판정 도구
+#    tools/push-health-verdict.mjs 가 읽는다 — 두 회차 연속 안 돌았으면 stale, 새 코드가 안 올라갔으면 outdated.
+#
 # ⚠️ `/health` 의 `subs` 는 **등록 기록 수이지 살아 있는 폰 수가 아니다**(worker.js 주석).
 #    폰 쪽에서 구독이 죽어도 기록은 남아 있다가 다음 발송 때 404 로 정리된다.
 #    "실제로 받는지"는 여전히 `push-check` 의 시험 발송으로만 증명된다.
@@ -40,6 +44,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      # 🔴 체크아웃이 먼저다 — 넘어짐 알림(로컬 액션 robot-down)과 그 경보 도구(tools/alert-issue.mjs)가 저장소 파일이라,
+      #    없으면 넘어진 날 알림까지 'Can't find action.yml' 로 넘어진다(관문 alerts ⑥ S2). 필요한 두 폴더만 받는다.
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github/actions
+            tools
+
       - name: /health 읽기
         id: probe
         env:
@@ -53,29 +65,12 @@ jobs:
           JSON=$(printf '%s' "$BODY" | sed '$d')
           echo "— 응답 —"; echo "HTTP $CODE"; echo "$JSON"
 
-          # 판정은 지어내지 않고 worker.js 가 실제로 주는 칸으로만 한다:
-          #   ok · configured · step · sent · subs · lastError
-          VERDICT=ok; WHY=""
-          if [ "$CURL_RC" != "0" ] || [ "$CODE" != "200" ]; then
-            VERDICT=down; WHY="서버가 응답하지 않습니다 (curl rc=$CURL_RC · HTTP $CODE)"
-          else
-            CONF=$(printf '%s' "$JSON" | jq -r '.configured // empty')
-            LERR=$(printf '%s' "$JSON" | jq -r '.lastError // empty')
-            SUBS=$(printf '%s' "$JSON" | jq -r '.subs // empty')
-            if [ "$CONF" != "true" ]; then
-              VERDICT=misconfig; WHY="VAPID 키가 서버에 없습니다 (configured=false) — 푸시가 실제로는 안 나갑니다"
-            elif [ -n "$LERR" ]; then
-              VERDICT=error; WHY="서버에 마지막 오류 기록이 남아 있습니다: $LERR"
-            elif [ "$SUBS" = "-1" ]; then
-              VERDICT=error; WHY="등록 저장소(KV)를 읽지 못했습니다 (subs=-1)"
-            fi
-            # subs=0 은 오류가 아니라 '알릴 대상이 없음'이다 — 이슈로 만들지 않고 로그에만 적는다
-            [ "$SUBS" = "0" ] && echo "⚠️ 등록된 폰이 0대입니다 (오류는 아니지만 알림이 갈 곳이 없습니다)"
-          fi
-          echo "verdict=$VERDICT" >> "$GITHUB_OUTPUT"
-          echo "why=$WHY"        >> "$GITHUB_OUTPUT"
+          # 판정은 한 곳(tools/push-health-verdict.mjs · 관문 verify/health-gates/servers.mjs ④)에서 한다 —
+          #   down · misconfig · error(lastError·subs=-1) · outdated(lastSlot 칸 없음) · stale(두 회차 연속 안 돎) ·
+          #   error(깨우기를 보냈는데 푸시 서비스가 한 건도 안 받음) · ok. 등록 0대·lastSlot null 은 경고만.
+          #   verdict·why 는 이 도구가 GITHUB_OUTPUT 에 적는다.
+          HEALTH_RC="$CURL_RC" HEALTH_CODE="$CODE" HEALTH_BODY="$JSON" node tools/push-health-verdict.mjs
           { echo "json<<EOJ"; echo "$JSON"; echo "EOJ"; } >> "$GITHUB_OUTPUT"
-          echo "판정: $VERDICT ${WHY:+— $WHY}"
 
       - name: 🚨 이상이면 이슈로 알린다
         if: steps.probe.outputs.verdict != 'ok'

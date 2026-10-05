@@ -8,9 +8,13 @@ name: 오래된 수집 리포트 닫기
 # 절대 건드리지 않는 것
 #   · 🚨 경보 · 🔧 링크 사냥꾼 '못 찾은 공고' 등 **리포트가 아닌 모든 이슈**
 #   · **사람이 코멘트를 단 리포트** — 개발자가 컨펌을 지시한 기록이라 가치가 있다
-#   · 각 유형의 **최신 3건** — 수집 로봇이 '새 공고 0건' 알림을 남길 곳이 필요하다
+#   · 각 유형의 **최신 몇 건** — 수집 로봇이 '새 공고 0건' 알림을 남길 곳이 필요하다
 #     (`collect-scholarships.yml`의 '0건 실행 알림'이 열린 리포트를 찾아 코멘트한다.
 #      전부 닫으면 그 알림이 조용히 사라진다 — 로봇은 guard가 있어 실패하진 않는다)
+#   🔴 어떤 리포트를 몇 건 남기는지는 **tools/report-retention.mjs 의 규칙 표 한 곳**에 있다 (2026-10-04).
+#      옛 판은 여기 jq 에 🤖·🖥 두 종류만 적혀 있어 뒤에 생긴 🗞 교내 소식·📘 작성 규칙·✅ 자격·🔍 누락 감사·
+#      🔍 게시판 정찰 리포트가 영영 안 닫혔다(10-04 열린 이슈 186건). 경보·사냥꾼·인스타(🚨·🔧·📸·🛰·🎨)는
+#      그 표에 아예 없다 — 각자 회복하면 닫는 길이 따로 있다(관문 「로봇·도구 점검 관문」 alerts ②).
 #
 # 실행: Actions 탭 → 이 워크플로 → Run workflow · 자동: 매주 월요일 15:40 KST
 
@@ -37,36 +41,34 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      # 🔴 체크아웃이 먼저다 — 규칙 표(tools/report-retention.mjs)와 넘어짐 알림(로컬 액션 robot-down)이 저장소 파일이다.
+      #    없으면 넘어진 날 알림까지 'Can't find action.yml' 로 넘어진다(2026-10-03 다른 워크플로에서 실측 · 관문 alerts ⑥ S2).
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
       - name: 오래된 리포트만 골라 닫는다
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           DAYS: ${{ inputs.days || '14' }}
           DRY: ${{ inputs.dry_run || 'false' }}
-          KEEP: '3'
         run: |
           set -euo pipefail
-          cutoff=$(date -u -d "-${DAYS} days" +%Y-%m-%dT%H:%M:%SZ)
-          echo "기준: $cutoff 이전에 만들어진 리포트 · 유형별 최신 ${KEEP}건은 남김"
+          echo "기준: ${DAYS}일 이전에 만들어진 리포트 · 유형별 최신 몇 건은 남김(규칙 표 tools/report-retention.mjs)"
           echo "모드: $([ "$DRY" = "true" ] && echo '목록만 보기' || echo '실제로 닫음')"
           echo
 
-          gh issue list --repo "$REPO" --state open --limit 300 \
+          # 🔴 상한 1000 — 300 이면 열린 이슈가 그보다 많은 날 오래된 리포트가 목록에서 빠져 영영 안 닫힌다(10-04 이미 186건)
+          gh issue list --repo "$REPO" --state open --limit 1000 \
             --json number,title,createdAt > /tmp/open.json
           echo "열린 이슈 $(jq length /tmp/open.json)건"
 
-          # 리포트만 고른다. 제목 접두사로 유형을 가른다 —
-          # 🚨(경보)·🔧(사냥꾼)은 여기 안 걸린다.
-          jq -r --arg cut "$cutoff" '
-            [ .[] | select(.title | test("^(🤖 장학공고 수집 리포트|🖥 브라우저형 수집 리포트)")) ]
-            | group_by(if (.title|startswith("🤖")) then "general" else "browser" end)
-            | map(sort_by(.createdAt) | reverse)
-            | .[] | .['"$KEEP"':] // []
-            | .[] | select(.createdAt < $cut) | "\(.number)\t\(.title)"
-          ' /tmp/open.json > /tmp/cand.tsv || true
+          # 리포트만 고른다 — 유형·남길 건수는 규칙 표 한 곳. 🚨(경보)·🔧(사냥꾼)·📸(인스타)는 표에 없어 안 걸린다.
+          node tools/report-retention.mjs /tmp/open.json --days "$DAYS" > /tmp/cand.tsv
 
           n=$(wc -l < /tmp/cand.tsv | tr -d ' ')
-          echo "닫기 후보 ${n}건 (오래됐고 최신 ${KEEP}건에도 없는 리포트)"
+          echo "닫기 후보 ${n}건 (오래됐고 유형별 최신 건에도 없는 리포트)"
           echo
 
           closed=0; kept=0
@@ -96,7 +98,7 @@ jobs:
 
           echo
           echo "결과: $([ "$DRY" = "true" ] && echo '닫을 것' || echo '닫음') ${closed}건 · 사람 코멘트가 있어 남김 ${kept}건"
-          echo "남은 열린 이슈: $(gh issue list --repo "$REPO" --state open --limit 300 --json number --jq length)건"
+          echo "남은 열린 이슈: $(gh issue list --repo "$REPO" --state open --limit 1000 --json number --jq length)건"
 
       # 🔴 실행 알림 (2026-09-06 신설) — 결과 알림과 다른 것이다.
       #    결과 알림: "보러 갔더니 상태가 이상하더라"  · 실행 알림: "보러 가다가 내가 넘어졌다"

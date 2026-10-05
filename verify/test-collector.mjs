@@ -11461,6 +11461,13 @@ console.log('\n■ 원문 링크 정직성 (2026-10-03 · 원문 대신 재단 �
   await runLinkGates(eq);
 }
 
+console.log('\n■ 로봇·도구 점검 관문 (2026-10-04 대대적 점검 — 고친 것이 다시 깨지면 빨간불)');
+/* 묶음별 검사는 verify/health-gates/*.mjs — verify/health-gates.mjs 가 차례로 부른다. 표본만 잰다(실데이터 단정 금지). */
+{
+  const { runHealthGates } = await import('./health-gates.mjs');
+  await runHealthGates(eq);
+}
+
 console.log('\n■ 대외활동·공모전 — 활동 글의 자격 읽기 (2026-10-03 · 개발자 "왜 대외활동 공모전은 자격 미확인이야 죄다")');
 {
   /* 왜 있나 — 활동 188건 중 122건이 자격 0줄이었다(실측). 원문엔 있었다: 활동만 쓰는 절 제목(공모자격·교육대상) ·
