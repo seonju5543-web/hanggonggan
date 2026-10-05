@@ -40,13 +40,13 @@ jobs:
     # 로봇 자체 예산 6분(요청 20초 · 청년콘텐츠 45초 × 3회 · 넘겨도 1분 반 안) + 준비·감사·저장 여유
     timeout-minutes: 12
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
         with:
           # 대기줄에서 기다린 뒤에는 지금 브랜치 끝에서 시작한다(앞 로봇의 저장 위로 rebase 충돌 방지)
           ref: ${{ github.ref_name }}
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
 
       - name: 공공 API 받기
         env:

@@ -34,14 +34,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
         with:
           ref: claude/nice-heisenberg-WESq5   # 로봇은 자기가 읽은 브랜치에만 저장한다 (배포는 deploy-sync가)
       - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
         run: bash tools/setup-collab.sh
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
 
       - name: 검색용 요약 만들기
         run: node collector/build-search-index.mjs

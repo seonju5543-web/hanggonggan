@@ -43,7 +43,7 @@ jobs:
     # 그 단계의 예산(HARVEST_BUDGET_MS)을 줄이고, 상한은 그 합을 담는 그릇으로만 쓴다(8/2~3 사고의 교훈).
     timeout-minutes: 63   # 2026-10-05 장학 포스터 PaddleOCR 단계 7분 → 2026-10-03 대외활동 첨부·포스터 단계 9분(PaddleOCR 설치 포함) → 단계 합 51 + 여유 5 (2026-09-30 판정 로봇 2분 → 42+3)
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
         with:
           # 🔴 대기줄(collector)에서 기다린 뒤에는 **지금 브랜치 끝**에서 시작한다 (2026-09-30).
           #    기본값(GITHUB_SHA)은 큐에 들어간 시점에 굳어서, 앞 로봇이 저장한 커밋 위로 rebase 하다
@@ -53,9 +53,9 @@ jobs:
       - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
         run: bash tools/setup-collab.sh
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
 
       # 재단·지자체 장학 게시판 찾기 (2026-09-26 · 노션 F-13) — 교외 공고 확대. 수집 **앞**에 두어
       # 이번에 찾은 게시판을 같은 실행이 바로 읽는다. 보강 단계 규칙: 자기 상한 + continue-on-error.

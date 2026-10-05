@@ -139,7 +139,7 @@ export default async function gate(eq, ctx) {
     eqWf('ⓔ 학과·등록금 로봇은 수집 대기줄(collector)이 아닌 제 줄에 선다 (줄 이름 · 서로 다름)',
       [groups.map((g) => g && g !== 'collector'), new Set(groups).size], [[true, true], 2]);
     eqWf('  체크아웃은 기본 브랜치 끝(ref: claude/nice-heisenberg-WESq5)',
-      ys.map((y) => ((/- uses: actions\/checkout@v\d+\n\s+with:\n(?:\s+#[^\n]*\n)*\s+ref: (\S+)/.exec(y)) || [])[1] || ''),
+      ys.map((y) => ((/- uses: actions\/checkout@v4\n\s+with:\n(?:\s+#[^\n]*\n)*\s+ref: (\S+)/.exec(y)) || [])[1] || ''),
       ['claude/nice-heisenberg-WESq5', 'claude/nice-heisenberg-WESq5']);
     eqWf('  넘어짐 알림(robot-down · failure() || cancelled())이 있고 이슈 권한(issues: write)이 있다',
       ys.map((y) => [jobsOf(y).some((j) => coversDown(stepsOf(j.text))), /^permissions:\n(?:\s+[a-z-]+:\s*\w+\n)*?\s+issues:\s*write/m.test(codeOf(y))]),

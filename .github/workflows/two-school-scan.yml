@@ -29,13 +29,13 @@ jobs:
     # 상한 = 각 단계 예산의 합을 담는 그릇 (조사 20 + 준비·저장 8)
     timeout-minutes: 36
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
         with:
           ref: claude/external-expert-consultation-questions-o8bik7
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
       - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
 

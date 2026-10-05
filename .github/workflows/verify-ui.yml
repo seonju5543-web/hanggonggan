@@ -89,10 +89,10 @@ jobs:
     #    🔴 그릇을 키워 때우지 않는다 — 오래 걸리는 두 단계가 **스스로 끝낸다**(화면 검사 루프 예산 20분 · 전 여정 5분 · 2026-10-04).
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
       - run: npm init -y >/dev/null && npm i playwright-core@1 --no-audit --no-fund
       # 🔴 `id: browser` — 아래 화면 검사·전 여정은 **이 단계가 성공했을 때만** 돈다. 앞(내려받기·도구 설치)이 넘어져도
       #    이 단계가 건너뛰어져 성공이 아니게 되므로, 조건 하나로 준비 단계 전부를 본다(브라우저 없이 드라이버가 다 빨개지는 소음을 막는다).

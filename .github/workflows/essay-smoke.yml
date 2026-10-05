@@ -44,8 +44,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with: { node-version: '22' }
 
       # ① 돈 쓰기 전에 안전장치부터. 여기서 실패하면 API를 아예 부르지 않는다.

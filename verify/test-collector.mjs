@@ -1474,7 +1474,7 @@ console.log('\n■ 로봇 대기줄 — 옛 커밋에서 시작하지 않는다 
   const stale = queued.filter((f) => {
     const y = readText(new URL(f, wfDir));
     /* 체크아웃 단계 바로 다음 with 블록에 ref 가 있어야 한다 — 다른 단계의 ref 를 세면 통과해 버린다 */
-    return !/- uses: actions\/checkout@v\d+\n\s+with:\n(?:\s+#[^\n]*\n)*\s+ref: \$\{\{ github\.ref_name \}\}/.test(y);   // 판 번호는 보지 않는다(2026-10-05 Node 24 판으로 올림)
+    return !/- uses: actions\/checkout@v4\n\s+with:\n(?:\s+#[^\n]*\n)*\s+ref: \$\{\{ github\.ref_name \}\}/.test(y);
   });
   eq('  전부 지금 브랜치 끝(ref: github.ref_name)에서 시작한다', stale, []);
   /* 🔴 체크아웃 단계에 with: 가 둘이면 GitHub 이 파일 전체를 「잘못된 워크플로」로 거절한다 — 2026-09-30 실제로 다섯 파일이

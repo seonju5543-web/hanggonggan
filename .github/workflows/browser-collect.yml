@@ -43,7 +43,7 @@ jobs:
     #    담는 그릇으로만 쓴다. verify/test-collector.mjs가 이 대소관계를 검사한다.
     timeout-minutes: 50   # 단계 합 46 + 준비·저장 여유 3 (2026-09-17 OCR 4분 · 2026-09-30 판정 로봇 2분 추가)
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
         with:
           # 🔴 대기줄(collector)에서 기다린 뒤에는 **지금 브랜치 끝**에서 시작한다 (2026-09-30).
           #    기본값(GITHUB_SHA)은 큐에 들어간 시점에 굳어서, 앞 로봇이 저장한 커밋 위로 rebase 하다
@@ -52,9 +52,9 @@ jobs:
 
       - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
         run: bash tools/setup-collab.sh
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
       - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
       # 안전망 (2026-08-05) — 스크립트는 22분 예산에 맞춰 스스로 끝내야 하지만,

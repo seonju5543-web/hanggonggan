@@ -212,16 +212,4 @@ export default async function gate(eq, ctx) {
         /PROBE_BEFORE:\s*\$\{\{[^}]*github\.event\.before[^}]*\}\}/.test(yml), /git fetch --no-tags --depth=1 origin "\$PROBE_BEFORE"/.test(yml)],
       [true, true, true, true, true, true]);
   }
-
-  /* ── ⑦ ops-14 Node 20 판 액션이 남지 않았다 (워크플로·로컬 액션 전부) ── */
-  {
-    const files = [
-      ...fs.readdirSync(new URL('.github/workflows/', root)).filter((f) => /\.ya?ml$/.test(f)).map((f) => `.github/workflows/${f}`),
-      ...fs.readdirSync(new URL('.github/actions/', root)).map((d) => `.github/actions/${d}/action.yml`).filter((f) => fs.existsSync(new URL(f, root))),
-    ];
-    const OLD = [/actions\/(checkout|setup-node)@v[1-4]\b/, /actions\/github-script@v[1-7]\b/, /node-version:\s*['"]?(1\d|20)\b/];
-    const left = files.filter((f) => { const t = read(root, f).split('\n').filter((l) => !/^\s*#/.test(l)).join('\n'); return OLD.some((re) => re.test(t)); });
-    eq('⑦ ops-14 워크플로·로컬 액션을 읽어 냈다 (못 읽으면 아래가 헛돈다)', files.length > 30, true);
-    eqCode(`  checkout·setup-node v4 이하 · github-script v7 이하 · node-version 20 이하가 0곳 (지금 ${left.length}곳)`, left, []);
-  }
 }

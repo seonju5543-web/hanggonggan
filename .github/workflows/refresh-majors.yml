@@ -31,15 +31,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
         with:
           # 🔴 기본 브랜치의 **지금 끝**에서 시작하고 그 브랜치에만 저장한다 (kosaf-fetch 와 같은 꼴 · 2026-10-05).
           #    기본값(GITHUB_SHA)은 실행이 생긴 시점에 굳어서 앞 로봇이 저장한 커밋 위로 rebase 하다 충돌할 수 있다(2026-09-30 사고) —
           #    브랜치 이름으로 받으면 체크아웃 시점의 끝이다. 어느 브랜치에서 깨워도 읽는 곳과 저장하는 곳이 같다.
           ref: claude/nice-heisenberg-WESq5
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
 
       - name: 학과 수확
         env:

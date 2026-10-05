@@ -26,12 +26,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
         with:
           ref: claude/nice-heisenberg-WESq5
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
       # 🔴 shell: bash = `bash -eo pipefail` (2026-10-04) — 기본 셸(bash -e)은 pipefail 이 없어 `node … | tee` 에서
       #    node 가 넘어져도(🚨 수확 실패) tee 가 0 을 돌려 단계가 초록이었다(실측 rc=0). 그러면 실패 알림도 안 돈다.
       - name: 수확

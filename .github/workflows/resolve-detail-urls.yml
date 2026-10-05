@@ -55,12 +55,12 @@ jobs:
     # 학교를 더 붙일수록 '한 곳이 안 열려 멈추는' 확률도 같이 오른다.
     timeout-minutes: 40   # 복구 예산 25분 + 설치·검증
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
       - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
         run: bash tools/setup-collab.sh
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
       - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
 

@@ -68,14 +68,14 @@ jobs:
     # 로봇 예산 20분 + 매달렸을 때의 워치독 1분 반 + 브라우저 설치·감사·저장
     timeout-minutes: 35
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
       - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
         run: bash tools/setup-collab.sh
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
       - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
 

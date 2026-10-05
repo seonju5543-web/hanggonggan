@@ -47,12 +47,12 @@ jobs:
     # 주소 10곳 × 넉넉히 30초 = 5분. 감사·저장까지 담는 그릇으로 15분.
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
         with:
           # 🔴 작업이 시작되는 시점의 **브랜치 끝**에서 시작한다 (2026-09-30 · 수집 로봇과 같은 규칙).
           #    기본값(GITHUB_SHA)은 큐에 들어간 시점에 굳어서, 기다리는 사이 다른 로봇이 저장한 커밋 위로 rebase 하다 충돌할 수 있다.
           ref: ${{ github.ref_name }}
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v4
         with: { node-version: '22' }
 
       - name: 규칙 검사 (돈 0 · 인터넷 불필요)
@@ -123,7 +123,7 @@ jobs:
       #    실패 실행은 아무것도 닫지 않는다. 지난 리포트 정리(tools/report-retention.mjs · 📘 최신 1건)가 안전망이다.
       - name: 결과 리포트 이슈
         if: always() && (github.event_name == 'workflow_dispatch' || failure() || cancelled() || steps.save.outputs.changed == '1')
-        uses: actions/github-script@v8
+        uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');

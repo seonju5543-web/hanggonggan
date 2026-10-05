@@ -29,15 +29,15 @@ jobs:
     env:
       PROBE_BEFORE: ${{ github.event_name == 'push' && github.event.before || '' }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
       # 기본 fetch-depth 1 이면 push 직전 판이 없다 — 그 커밋 하나만 받아 둔다(못 받으면 정찰이 전부 열고 리포트에 그렇게 적는다)
       - name: push 직전 판 받기 (새 줄 가리기용)
         if: env.PROBE_BEFORE != ''
         timeout-minutes: 2
         run: git fetch --no-tags --depth=1 origin "$PROBE_BEFORE" || true
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
       - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
       - run: node collector/probe-links.mjs

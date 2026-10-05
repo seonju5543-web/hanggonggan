@@ -62,13 +62,13 @@ jobs:
     # 전수 169건 × 약 5초 = 15분. 준비·감사·저장까지 담는 그릇으로 30분.
     timeout-minutes: 44   # 대외활동 AI 단계 10분 추가 (2026-10-03) · OCR 단계 4분 추가 (2026-09-17)
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
         with:
           # 🔴 작업이 시작되는 시점의 **브랜치 끝**에서 시작한다 (2026-09-30 · 수집 로봇과 같은 규칙).
           #    기본값(GITHUB_SHA)은 큐에 들어간 시점에 굳어서, 기다리는 사이 다른 로봇이 저장한 커밋 위로 rebase 하다 충돌할 수 있다.
           ref: ${{ github.ref_name }}
-      - uses: actions/setup-node@v5
-        with: { node-version: '22' }
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
 
       # ① 돈 쓰기 전에 안전장치부터. 가짜 응답으로 '지어냄이 정말 막히는가'를 확인한다.
       #    여기서 실패하면 API를 아예 부르지 않는다.
@@ -250,7 +250,7 @@ jobs:
       - name: 결과 리포트 이슈
         if: always() && inputs.mode != '미리보기만'
         continue-on-error: true
-        uses: actions/github-script@v8
+        uses: actions/github-script@v7
         env:
           RESULT: ${{ job.status }}
         with:
