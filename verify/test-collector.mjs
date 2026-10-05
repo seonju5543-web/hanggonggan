@@ -149,7 +149,7 @@ console.log('■ 뺀 공고를 주소로 막는다 (id는 주소에서 파생돼
   /* 🔴 조건만 본다 — 줄 전체를 대조하면 뒤에 집계 한 줄을 더하는 것만으로 빨간불이 된다
      (2026-09-19에 실제로 그랬다). 지켜야 하는 것은 '막힌 id·주소면 등록하지 않는다' 하나다. */
   eq('새로 등록할 때도 막힌 주소는 건너뛴다',
-    /if \(blockedIds\.has\(id\) \|\| blockedUrls\.has\(cu\)\)[^\n]*continue;/.test(ar), true);
+    /if \(blockedIds\.has\(id\) \|\| blockedUrls\.has\(cu\)( \|\| rid\.blockedByLegacy)?\)[^\n]*continue;/.test(ar), true);   // 2026-10-05 links-new-1: 옛 id 로 막힌 것도(registerId)
   const cfg = JSON.parse(readText(new URL('../collector/auto-register-config.json', import.meta.url)));
   eq('막은 목록이 주소로도 채워져 있다', (cfg.blockUrls || []).length > 0, true);
 }

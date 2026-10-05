@@ -65,7 +65,7 @@ const TODAY = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
    같은 함수를 써야 '이미 등록된 공고를 로봇이 다시 등록하는' 일이 안 생긴다.
    이 파일은 불러오는 즉시 실행되므로 남이 여기서 가져갈 수 없어 따로 뺐다. */
 export { canonUrl } from './canon-url.mjs';
-import { canonUrl, idFromUrl } from './canon-url.mjs';
+import { canonUrl, idFromUrl, registerId } from './canon-url.mjs';
 /* 🔴 원문 주소는 **HTML 기호를 되돌려** 담는다 (2026-10-03 · 원문 링크 정직성) — 게시판이 `&#038;` 로 내보낸 주소를
    그대로 담으면 브라우저가 `#038;…` 을 조각으로 읽어 글 번호가 사라진다(서울대 학생처 3건 실측: 공고 대신 메뉴 화면).
    되돌리는 규칙은 앱과 같은 파일(source-link.js) 하나다. '이미 등록됐나'를 묻는 열쇠도 되돌린 주소로 만든다 —
@@ -105,8 +105,9 @@ const NOT_UNDERGRAD = /대학원생?\s|석사|박사|수련의|졸업(생|자)\s
    `희망근로지 신청`(이미 뽑힌 학생이 근무지를 고르는 것) 같은 글은 **`신청`·`선발` 이 들어 있어서
    ACTION 관문을 그냥 통과한다** — 실측(collector/candidates.json 2,058건)으로 이 줄이 없으면
    그런 행정 공지 열둘이 학생 화면에 장학금 카드로 나갔다.
-   ⚠️ `선발 알림` 은 넣지 않았다 — `선발 안내`(진짜 모집 공고)와 글자가 너무 가깝다. */
-const ADMIN_NOTICE = /(^|\s)AWARDS?\b|award-news|졸업생[^\n]{0,20}(선발|수상|선정)|수상\s*소식|선정되었|선발되었|출근부|지급\s*안내|지급일|계좌\s*등록|서류\s*보완|유의사항\s*안내|중복지원|반환|환수|추천서\s*(총장|직인)|안내\s*및\s*FAQ|결과\s*(발표|안내|확인)|결과발표|선발\s*결과|확인\s*방법|포기\s*(신청|서)|희망\s*근로지|이중\s*선발|선발자\s*(공고|안내|명단)|필수사항|(^|\s|└)RE:/;
+   ⚠️ `선발 알림` 은 넣지 않았다 — `선발 안내`(진짜 모집 공고)와 글자가 너무 가깝다.
+   `선발자 공지` 는 2026-10-05 에 더했다(links-new-1 — id 가 겹쳐 가려져 있던 계명대 `국가근로장학생 최종선발자 공지` 가 풀리며 드러났다). */
+const ADMIN_NOTICE = /(^|\s)AWARDS?\b|award-news|졸업생[^\n]{0,20}(선발|수상|선정)|수상\s*소식|선정되었|선발되었|출근부|지급\s*안내|지급일|계좌\s*등록|서류\s*보완|유의사항\s*안내|중복지원|반환|환수|추천서\s*(총장|직인)|안내\s*및\s*FAQ|결과\s*(발표|안내|확인)|결과발표|선발\s*결과|확인\s*방법|포기\s*(신청|서)|희망\s*근로지|이중\s*선발|선발자\s*(공고|안내|명단|공지)|필수사항|(^|\s|└)RE:/;
 const FUTURE_PLAN = /202[7-9](?![\d])[^\d]*(학년도|년).*(유학|연수|입학|신입학)|신입학|입학전형/;
 /* 🔴 `장학생|장학금` 두 낱말만 보면 **학교 교내 장학금 이름을 통째로 놓친다** (2026-09-19 개발자 지적
    — "우리 학교 게시판 교내 공고가 장학금 탭에 안 올라온다"). 교내 장학은 이름이 `장학` 으로 끝난다:
@@ -322,6 +323,26 @@ if (!cfg.enabled) {
   }
   let outOfScope = 0;
   let unseen = 0; // 한 실행 상한에 걸려 **아예 안 본** 공고 — 거른 것과 섞으면 숫자가 거짓말을 한다
+  /* 🔴 id 가 겹치는 게시판 (2026-10-05 점검 links-new-1) — 옛 id(끝 24자)가 게시판 공통값이라 그 게시판의 글이 전부 같은 id 를 받았다
+     (경기·계명·서강 등 9개교 70여 건이 '이미 등록(같은 id)'·'사람이 막아 둔 공고'로 조용히 빠졌다). 겹칠 때만 꼬리표 id — 규칙은 canon-url.mjs registerId 한 곳.
+     막힌 id 를 이번 묶음의 여러 주소가 받고 **사람이 막은 주소가 기록돼 있으면**(blockUrls) 그 주소만 막는다. 막은 주소 기록이 없으면 어느 글을
+     막았는지 몰라 예전처럼 전부 막고 리포트에 적는다. */
+  const legacyCanons = new Map();
+  for (const n of notices.items || []) {
+    const u = decodeUrlEntities(n.url || '');
+    if (!u) continue;
+    const l = idFromUrl('auto-', u);
+    if (!legacyCanons.has(l)) legacyCanons.set(l, new Set());
+    legacyCanons.get(l).add(canonUrl(u));
+  }
+  const blockedUrlIds = new Set((cfg.blockUrls || []).map((u) => idFromUrl('auto-', u)));
+  const manyUnder = (l) => ((legacyCanons.get(l) || new Set()).size >= 2);
+  const ambiguous = (l) => manyUnder(l) && blockedUrlIds.has(l);
+  const holderCanon = (l) => {
+    const it = registered.items.find((i) => i.id === l);   // 이번 실행에 등록한 것도 본다
+    return it ? canonUrl(decodeUrlEntities(it.sourceUrl || '')) : null;
+  };
+  const sharedBlocks = [...blockedIds].filter((l) => manyUnder(l)).map((l) => ({ id: l, n: legacyCanons.get(l).size, byUrl: blockedUrlIds.has(l) }));
   for (const n of notices.items || []) {
     if (added.length >= (cfg.maxPerRun || 8)) { unseen += 1; continue; }
     if (onlySchools.size && n.school && !onlySchools.has(n.school)) { outOfScope += 1; continue; }
@@ -354,13 +375,21 @@ if (!cfg.enabled) {
     const atts = (n.attachments || [])
       .filter((a) => /신청서|지원서|신청양식|원서|서식|양식|동의서|서약서|추천서|공고/.test(a.name) && /\.(hwp|hwpx|doc|docx|pdf|zip|xlsx?)(\?|$)?/i.test(a.name + a.url))
       .slice(0, 6);
-    // 🔴 공식은 canon-url.mjs 하나 — 베끼면 관리자 화면의 register 와 갈라진다(2026-08-14 부경대 유형)
-    const id = idFromUrl('auto-', nUrl);
-    // 아래 두 갈래도 집계에 넣는다 — 여기서 빠져나가면 다시 '조용한 탈락'이 된다
-    if (registered.items.some((i) => i.id === id)) { skipped.set('이미 등록(같은 id)', (skipped.get('이미 등록(같은 id)') || 0) + 1); continue; }
+    // 🔴 공식은 canon-url.mjs 하나 — 베끼면 관리자 화면의 register 와 갈라진다(2026-08-14 부경대 유형) · 겹치면 꼬리표 id(registerId · 위 legacyCanons 주석)
+    const rid = registerId('auto-', nUrl, { holderCanon, blockedIds, blockedCanons: blockedUrls, ambiguous });
+    const id = rid.id;
+    // 아래 갈래도 집계에 넣는다 — 여기서 빠져나가면 다시 '조용한 탈락'이 된다
+    /* 같은 id(옛 id·꼬리표 id)를 쓰는 등록분이 **같은 학교 · 같은 제목**이면 같은 글이다(표식 주소가 진짜 주소로 풀린 것 등) — 다시 등록하지 않는다 */
+    const holders = registered.items.filter((i) => i.id === rid.legacy || i.id === id);
+    const sameSchool = (i) => (((i.eligibility || {}).schoolOnly) || n.school) === n.school;
+    if (holders.some((i) => sameSchool(i) && normTitle(i.boardTitle || i.name || '') === normTitle(n.title || ''))) {
+      skipped.set('이미 등록(같은 글 · 주소만 다름)', (skipped.get('이미 등록(같은 글 · 주소만 다름)') || 0) + 1); continue;
+    }
+    if (holders.some((i) => i.id === id)) { skipped.set('이미 등록(꼬리표 id 까지 겹침)', (skipped.get('이미 등록(꼬리표 id 까지 겹침)') || 0) + 1); continue; }
     /* 사람이 한 번 '이건 아니다'라고 뺀 공고는 다시 등록하지 않는다.
-       위 되돌리기와 같은 이유로 주소도 함께 본다 — 지우기만 하면 다음 실행에 또 들어온다. */
-    if (blockedIds.has(id) || blockedUrls.has(cu)) { skipped.set('사람이 막아 둔 공고(blockIds/blockUrls)', (skipped.get('사람이 막아 둔 공고(blockIds/blockUrls)') || 0) + 1); continue; }
+       위 되돌리기와 같은 이유로 주소도 함께 본다 — 지우기만 하면 다음 실행에 또 들어온다.
+       옛 id 로 막힌 것(blockedByLegacy)도 막는다 — 막은 주소 기록이 있는 겹친 id 만 그 주소로 좁힌다(registerId). */
+    if (blockedIds.has(id) || blockedUrls.has(cu) || rid.blockedByLegacy) { skipped.set('사람이 막아 둔 공고(blockIds/blockUrls)', (skipped.get('사람이 막아 둔 공고(blockIds/blockUrls)') || 0) + 1); continue; }
     /* 데이터 관문에 두 번 걸려 되돌린 공고는 마지막으로 걸린 날부터 3일 쉰다 — 같은 공고가 실행마다 '등록 → 관문 빨간불 → 되돌림'을
        되풀이하지 않게(10-03~04 실측 8건). 상한(maxPerRun)을 먹지 않고, 조용히 빠지지 않게 컨펌 대기에 이유를 남긴다. */
     if (heldLedger && isHeld(heldLedger, id, TODAY)) {
@@ -534,6 +563,12 @@ if (!cfg.enabled) {
     report.push('', `**데이터 관문 쉬기 ${gateHeld.length}건** — 데이터 관문에 두 번 걸려 되돌린 공고라 마지막으로 걸린 날부터 3일 자동 등록을 쉬어요. 같은 실행에 함께 들어온 다른 공고 때문에 같이 되돌려졌을 수도 있어요(장부 \`collector/auto-held.json\`):`);
     for (const h of gateHeld.slice(0, 10)) report.push(`- ${h.n.title.slice(0, 60)} (${h.why})`);
     if (gateHeld.length > 10) report.push(`- … 외 ${gateHeld.length - 10}건`);
+  }
+  /* 막은 id 하나가 이번 묶음의 여러 공고에 걸린 것 — 막은 주소가 기록돼 있으면 그 주소만 막고, 없으면 예전처럼 전부 막는다(어느 글을 막았는지 모른다) */
+  for (const b of sharedBlocks) {
+    report.push('', b.byUrl
+      ? `⚠️ 차단 id 하나가 여러 공고에 걸림 — 주소(blockUrls)로만 막음: \`${b.id}\` ${b.n}건`
+      : `⚠️ 차단 id 하나가 여러 공고에 걸렸는데 막은 주소 기록이 없어 전부 막았어요(사람 확인 — 막을 글의 주소를 blockUrls 에): \`${b.id}\` ${b.n}건`);
   }
   if (skipped.size) {
     const total = [...skipped.values()].reduce((a, b) => a + b, 0);

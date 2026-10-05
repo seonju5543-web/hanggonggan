@@ -404,7 +404,8 @@ switch (action) {
           `reg-`(손 큐레이션 18건)·`adm-`(화면이 만든 것)은 절대 안 맞았다. */
     const paired = new Set(ids.map((x) => (cfg.blockPairs || {})[x]).filter(Boolean).map(canonUrl));
     const prefixOf = (x) => (String(x).match(/^[a-z]+-/) || ['auto-'])[0];
-    const derived = (u) => ids.some((x) => x === idFromUrl(prefixOf(x), u));
+    /* 겹쳐서 꼬리표를 단 id(`<옛 id>-<주소 꼬리표>` · canon-url.mjs registerId)도 그 주소에서 나온 것이다 */
+    const derived = (u) => ids.some((x) => x === idFromUrl(prefixOf(x), u) || x === `${idFromUrl(prefixOf(x), u)}-${canon.idHash(canonUrl(u))}`);
     cfg.blockUrls = (cfg.blockUrls || []).filter((u) => {
       const cu = canonUrl(u);
       return !wantUrl.has(cu) && !paired.has(cu) && !derived(u);
@@ -451,8 +452,11 @@ switch (action) {
     if (dup) fail(`이미 등록된 공고입니다 (${dup.id})`);
 
     /* 🔴 파생식은 공용 원본(`collector/canon-url.mjs`)만 쓴다 — 로봇과 갈라지면
-       차단 목록과 중복 판정이 동시에 어긋난다 */
-    const id = idFromUrl('adm-', url);
+       차단 목록과 중복 판정이 동시에 어긋난다.
+       옛 id(끝 24자)가 게시판 공통값이라 같은 게시판의 다른 글이 같은 id 를 받으면 꼬리표 id 를 준다(registerId · 2026-10-05 점검 links-new-1 —
+       예전엔 '같은 id가 이미 있습니다'로 그 게시판의 둘째 글부터 등록할 수 없었다). 같은 주소 중복은 위에서 이미 막는다. */
+    if (typeof canon.registerId !== 'function') fail('collector/canon-url.mjs 에 registerId 가 없습니다 — 공용 규칙 파일이 옛 판입니다 (같이 배포돼야 합니다)');
+    const { id } = canon.registerId('adm-', url, { holderCanon: (l) => { const it = byId(l); return it ? canonUrl(it.sourceUrl || '') : null; } });
     if (byId(id)) fail(`같은 id가 이미 있습니다 (${id})`);
 
     const school = String(n.school || '').trim();

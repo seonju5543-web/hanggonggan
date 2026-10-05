@@ -75,4 +75,37 @@ export function idFromUrl(prefix, raw) {
   return prefix + canonUrl(raw).replace(/[^a-z0-9]/gi, '').slice(-24).toLowerCase();
 }
 
+/* 주소 꼬리표 — 정규화한 주소의 짧은 지문(FNV-1a 32비트 → 36진 7자). 같은 주소면 늘 같은 값 */
+export function idHash(cu) {
+  let h = 0x811c9dc5;
+  for (const ch of String(cu || '')) {
+    h ^= ch.codePointAt(0);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h.toString(36).padStart(7, '0');
+}
+
+/* 🔴 **새로 등록할 id — 겹치면 꼬리표를 단다** (2026-10-05 점검 links-new-1 · 위 공식은 그대로).
+   idFromUrl 은 정렬한 주소의 **끝 24자**라, 글 번호가 앞에 오고 게시판 공통값(searchKrwd·sf.pnos·srchVoteType·namepage…)이
+   끝을 차지하는 게시판에서는 **그 게시판의 모든 글이 같은 id** 를 받는다(경기·계명·서강·강원·숭실·중앙 등 9개교 · 실측 70여 건).
+   그래서 한 글이 등록되면 나머지가 '이미 등록(같은 id)'으로, 사람이 한 글을 막으면 나머지가 '사람이 막아 둔 공고'로 **조용히** 빠졌다 —
+   위 2026-08-14 사고(한 건 등록 → 나머지 전부 중복)가 id 단계에서 다시 난 것이다.
+   공식을 바꾸면 저장된 id·blockIds 가 전부 어긋나므로, **겹칠 때만** `<옛 id>-<주소 꼬리표>` 를 준다:
+     · 그 id 를 이미 다른 주소의 등록분이 쓰고 있으면(holderCanon) → 꼬리표 id
+     · 그 id 가 막혀 있지만 이번 묶음에서 여러 주소가 같은 id 를 받고(ambiguous) 이 주소는 막은 주소(blockedCanons)가 아니면 → 꼬리표 id
+       (사람은 **그 한 글**을 막았다 — 막은 글은 주소로 계속 막힌다)
+     · 그 밖에는 옛 id 그대로(이미 저장된 id·막은 id 가 하나도 안 바뀐다)
+   holderCanon(id) 은 그 id 의 등록분 주소(canonUrl)를, 없으면 null 을 돌려준다(주소 없는 등록분은 '' — 겹친 것으로 본다). */
+export function registerId(prefix, raw, { holderCanon = () => null, blockedIds = new Set(), blockedCanons = new Set(), ambiguous = () => false } = {}) {
+  const legacy = idFromUrl(prefix, raw);
+  const cu = canonUrl(raw);
+  const tagged = `${legacy}-${idHash(cu)}`;
+  const amb = !!ambiguous(legacy);
+  const blockedByLegacy = blockedIds.has(legacy) && !amb;
+  const held = holderCanon(legacy);
+  if (held !== null && held !== undefined && held !== cu) return { id: tagged, legacy, blockedByLegacy };
+  if (blockedIds.has(legacy) && amb && !blockedCanons.has(cu)) return { id: tagged, legacy, blockedByLegacy };
+  return { id: legacy, legacy, blockedByLegacy };
+}
+
 export default canonUrl;
