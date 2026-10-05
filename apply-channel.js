@@ -137,6 +137,11 @@ const PORTAL_SYSTEMS = [
   ['HUFS Ability', /HUFS\s?Ability|허프스\s?어빌리티/i],
   ['종합정보시스템', /종합정보시스템/],
   ['인포21', /인포\s?21|INFO\s?21/i],
+  /* 2026-10-05 점검 app1-11 — 포털 후보 로봇(collector/portal-candidates.mjs)이 원문에서 찾은 **학교 고유 이름 · 근거 2건 이상**
+     (고려대 3건 「포털(KUPID) → 학사 → 등록·장학 → … → 장학금 신청」 · 국민대 3건 「ON 국민 - 포털 - 학생서비스 - 장학정보 - 장학신청」).
+     주소는 정찰로 확인하기 전이라 data.js 표에 이름만 둔다. 흔한 이름(포탈·학사정보시스템)은 열쇠로 쓰지 않는다 — 다른 학교 공고까지 묶인다. */
+  ['KUPID', /KUPID/i],
+  ['ON 국민', /(?<![A-Za-z])ON\s?국민/],
 ];
 
 /** 한 줄이 '이 시스템으로 낸다'고 말하는가 — 근거를 통째로 돌려준다. */
@@ -172,5 +177,6 @@ function findApplyPortal(text) {
    🔴 베끼지 말 것 — 사본이 생기는 순간 이 파일 첫머리의 오탐 ①②가 한쪽에서 되살아난다. */
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { classifyChannels, METHOD_LINE, NOT_EVIDENCE,
-                     findApplyPortal, judgePortalLine, PORTAL_SYSTEMS };
+                     findApplyPortal, judgePortalLine, PORTAL_SYSTEMS,
+                     PORTAL_SUBMIT, PORTAL_NOT_SUBMIT };   // 포털 후보 로봇(collector/portal-candidates.mjs)이 같은 '내는 줄' 판정을 쓴다 (2026-10-05)
 }

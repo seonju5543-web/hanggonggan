@@ -14,6 +14,8 @@
         항공대 꼴(<a> 안에 제목·부서·날짜·조회수) · 실려 있던 글도 발행 때 같은 청소(retitleStored · 주소·글 번호는 그대로)
      ⑥ 도우미 검색 재료에 메뉴·남의 제목이 없다 (app1-05): 요약 7건에 메뉴 낱말(로그아웃·학생포탈·eclass)이 들어가 엉뚱한 공고가 섞였다 —
         껍데기 줄 · 다른 공고 제목 줄 · 「이전글」 뒤 두 줄 · 날짜 줄 앞 줄을 걷는다 · 불러오기만 하면 파일을 쓰지 않는다
+     ⑦ 포털 후보는 원문에서 이름을 찾는다 (app1-11): 예전엔 이미 아는 시스템(applyPortal)만 모아 새 시스템을 영영 못 찾았다(결과 0건) —
+        신청을 말하는 원문 줄에서 이름 꼴을 읽고(출력·다운로드·문의 줄은 버림) · 학교 고유 이름 + 근거 2건만 표 후보 · 불러오기만 하면 안 쓴다
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말).
       로봇을 돌릴 때는 저장소 코드를 임시 폴더로 **복사**해 그 안의 표본만 읽고 쓴다(bodies.mjs sandbox). */
 import fs from 'node:fs';
@@ -32,6 +34,7 @@ import { parseDeadline, bodyDeadlineFrom, makeBodyReader } from '../../collector
 import { openOn } from '../../collector/registered-merge.mjs';
 import { extractDatedRows, dropRowNumbers, retitleStored } from '../../collector/board-links.mjs';
 import { buildSearchIndex } from '../../collector/build-search-index.mjs';
+import { portalNameCandidates, portalCandidates } from '../../collector/portal-candidates.mjs';
 
 const require = createRequire(import.meta.url);
 const J = (x) => `${JSON.stringify(x, null, 1)}\n`;
@@ -316,5 +319,40 @@ export default async function qnotice(eq, ctx) {
     eq('  불러오기만 하면 쓰지 않는다 — 본편은 직접 실행할 때만 · 함수는 파일을 안 쓴다 · 읽기 재료는 notice-source makeTitleLine(베끼지 않는다)',
       [/if \(process\.argv\[1\] && import\.meta\.url === pathToFileURL\(path\.resolve\(process\.argv\[1\]\)\)\.href\) main\(\);\s*$/.test(src), !!fn && !/writeFileSync|readFileSync/.test(fn),
         /import \{[^}]*makeTitleLine[^}]*\} from '\.\/notice-source\.mjs'/.test(src)], [true, true, true]);
+  }
+
+  /* ── ⑦ 포털 후보는 원문에서 이름을 찾는다 ── */
+  {
+    const names = (l) => portalNameCandidates([l]).map((c) => c.name);
+    eq('⑦ 신청 길 줄에서 시스템 이름을 읽는다 (고려대·국민대 원문)',
+      [names('가. 포털(KUPID) → 학사 → 등록·장학 → 장학(일반) → 장학금 신청'), names('ㅇ 신청방법 : ON 국민 - 포털 - 학생서비스 - 장학정보 - 장학신청'),
+        names('★ 서울캠퍼스 학부생이 있는 경우 : 서울캠퍼스 학부생이 학사정보시스템에서 신청')],
+      [['KUPID'], ['ON 국민'], ['학사정보시스템']]);
+    /* 이름 꼴은 맞지만 내는 줄이 아닌 것 — 양식 받는 곳 · 결과 보는 곳 · 문의처 · 출력(인하대 원문) · 내는 행위 없음 */
+    eq('  내는 줄이 아니면 읽지 않는다 — 내려받기 · 결과 확인 · 문의 · 출력 · 내는 행위 없음',
+      [names('장학금 신청서는 포털(KUPID) → 서식자료실에서 다운로드'), names('선발확인 : 포털(KUPID) → 장학 → 신청내역 확인'), names('문의 : 포털(KUPID) 장학 신청 관련 학생지원팀'),
+        names('가. 장학금수혜신청서 ( 인하대학교 포털시스템에서 출력 ) 1 부'), names('학생지원팀 KUPID 공지 참고')],
+      [[], [], [], [], []]);
+    const TEXT = {
+      a: '가. 포털(KUPID) → 학사 → 등록·장학 → 장학(일반) → 장학금 신청', b: '가. 포탈(KUPID) - 학사행정 - 등록/장학 - 장학금신청 - "소망장학금" 신청',
+      c: '서울캠퍼스 학부생이 학사정보시스템에서 신청', d: '학부생은 학사정보시스템에서 신청', e: '6. 신청방법 : 온라인 신청 (HUFS Ability) → 로그인 → 장학신청',
+    };
+    const items = [
+      { id: 'a', eligibility: { schoolOnly: '고려대학교' } }, { id: 'b', eligibility: { schoolOnly: '고려대학교' } },
+      { id: 'c', eligibility: { schoolOnly: '건국대학교' } }, { id: 'd', eligibility: { schoolOnly: '표본대학교' } }, { id: 'e', eligibility: { schoolOnly: '한국외국어대학교' } },
+    ];
+    const got = portalCandidates(items, (it) => TEXT[it.id], { knownSystems: new Set(['HUFS Ability']) });
+    const by = Object.fromEntries(got.map((c) => [c.school, c]));
+    eq('  학교 고유 이름 + 근거 2건만 표 후보 · 여러 학교에 나오는 흔한 이름은 아니다 · 이미 표에 있는 이름은 뺀다',
+      [by['고려대학교']?.best.system, by['고려대학교']?.best.count, by['고려대학교']?.unique, by['건국대학교']?.unique, by['한국외국어대학교']], ['KUPID', 2, true, false, undefined]);
+    const src = stripComments(fs.readFileSync(new URL('collector/portal-candidates.mjs', root), 'utf8'));
+    eq('  불러오기만 하면 쓰지 않는다 — 본편은 직접 실행할 때만 · 내는 줄 판정은 apply-channel.js 것을 불러 쓴다',
+      [/if \(process\.argv\[1\] && import\.meta\.url === pathToFileURL\(path\.resolve\(process\.argv\[1\]\)\)\.href\) main\(\);\s*$/.test(src),
+        /const AC = createRequire\(import\.meta\.url\)\('\.\.\/apply-channel\.js'\)/.test(src) && /const PORTAL_SUBMIT = AC\.PORTAL_SUBMIT;/.test(src), /const PORTAL_SUBMIT\s*=\s*\//.test(src)],
+      [true, true, false]);
+    const { judgePortalLine } = require('../../apply-channel.js');
+    eq('  찾아 넣은 고유 이름은 앱 판정이 신청 시스템으로 읽는다 (결과 보는 줄은 아니다)',
+      [judgePortalLine(TEXT.a)?.system, judgePortalLine('ㅇ 신청방법 : ON 국민 - 포털 - 학생서비스 - 장학정보 - 장학신청')?.system, judgePortalLine('다 . 선발확인 : KUPID 로그인 후 확인')?.ok],
+      ['KUPID', 'ON 국민', false]);
   }
 }

@@ -415,6 +415,9 @@ const PORTAL_SYSTEM_INFO = {
   '인포21': { label: '경희대학교 인포21', url: 'https://info21.khu.ac.kr',
               verifiedTitle: '경희대학교 인포21', verifiedAt: '2026-09-14' },
   '종합정보시스템': { label: '종합정보시스템', url: '' },   // 주소 미확인 — 지어내지 않는다
+  /* 2026-10-05 — 원문에서 찾은 학교 고유 이름(apply-channel.js PORTAL_SYSTEMS 와 같은 열쇠). 주소는 정찰로 제목을 확인한 뒤에만 */
+  'KUPID': { label: '고려대학교 KUPID', url: '' },
+  'ON 국민': { label: '국민대학교 ON국민', url: '' },
 };
 function portalSystemInfo(sch) {
   return PORTAL_SYSTEM_INFO[(sch || {}).applyPortal] || null;
