@@ -255,6 +255,9 @@ export default async function gate(eq, ctx) {
     [/node "\$tool" --mode open --match exact --title "\$title"/.test(rd), /--label robot-down/.test(rd), /gh issue create --repo "\$REPO" --label robot-down/.test(rd),
       rd.includes('title="🚨 로봇이 넘어졌어요 — ${ROBOT}"'), ROBOT_DOWN_PREFIX === '🚨 로봇이 넘어졌어요 — '],
     [true, true, true, true, true]);
+  /* 리뷰 2026-10-05 — 도구가 성공하면 그 자리에서 끝난다(exit 0). 빠지면 옛 gh 길까지 돌아 같은 경보에 댓글이 두 번 달리거나 새 이슈가 하나 더 선다 */
+  eqWf('  robot-down — 경보 도구가 성공하면 그 자리에서 끝난다(옛 gh 길은 도구가 실패했을 때만)',
+    /--label robot-down --label-color B60205 --label-description "[^"\n]*"; then\n\s*exit 0\n\s*fi\n\s*echo "::warning::/.test(rd), true);
   const ai = read(root, '.github/actions/alert-issue/action.yml');
   eqWf('  공용 액션 alert-issue 는 도구 한 곳을 부르고 본문은 환경 변수로 넘긴다(셸 글자에 끼우지 않는다)',
     [/run: node "\$GITHUB_ACTION_PATH\/\.\.\/\.\.\/\.\.\/tools\/alert-issue\.mjs"/.test(ai), /ALERT_BODY: \$\{\{ inputs\.body \}\}/.test(ai), /\$\{\{ inputs\.body \}\}/.test((/run:[^\n]*/.exec(ai) || [''])[0])],
@@ -344,6 +347,11 @@ export default async function gate(eq, ctx) {
     [true, true, true]);
   eqWf('  어긋나면 3분 뒤 main 을 다시 받아 한 번 더 본다(Pages 배포 중 헛경보)',
     [/sleep 180/.test(chk.run || ''), /git fetch -q origin main && git checkout -q --detach FETCH_HEAD/.test(chk.run || ''), /for try in 1 2/.test(chk.run || '')], [true, true, true]);
+  /* 리뷰 2026-10-05 — 실제로 묶는 줄: 같으면 다시 보지 않고 멈춘다 · 고리 **뒤**에 마지막 회차 값을 진짜 출력으로 옮긴다
+     (빠지면 bad 가 비어 매일 헛경보가 서고 같아져도 닫히지 않는다 · break 가 무조건이면 다시 보기가 사라진다) */
+  eqWf('  다시 보기 — 같아지면(bad=0) 그때만 멈추고 · 고리 뒤에 마지막 회차 출력을 진짜 출력으로 옮긴다',
+    [/bad=\$\(sed -n 's\/\^bad=\/\/p' \/tmp\/try\.out \| tail -1\)\n\s*\[ "\$bad" = "0" \] && break\n\s*done\n\s*cat \/tmp\/try\.out >> "\$GITHUB_OUTPUT"/.test(chk.run || ''),
+      (/\n\s*break\s*\n/.test(chk.run || ''))], [true, false]);
   const liveAlarm = liveSteps.find((s) => s.name === '🚨 어긋남 알림') || {};
   const liveOk = liveSteps.find((s) => /alert-issue/.test(s.uses || '') && with_(s, 'mode') === 'resolve') || {};
   eqWf('  어긋남은 경보 한 곳(prefix · live-check) · 같아지면 닫는다 · 맨몸 gh issue create 없음',
@@ -365,8 +373,10 @@ export default async function gate(eq, ctx) {
   const ij = Object.fromEntries(jobsOf(insta).map((j) => [j.name, stepsOf(j.text)]));
   eqWf('  insta.yml — 게시·건너뛰기의 정리는 살아 있는 카드 수로(옛 「1건 이하」 규칙 없음) · 준비 끝에 쓸모없어진 이슈 닫기',
     [(insta.match(/node insta\/ready-issues\.mjs live-in-body/g) || []).length, /grep -c '<!-- insta-code: '/.test(codeOf(insta)),
-      (ij.prepare || []).some((s) => /node insta\/ready-issues\.mjs closable/.test(s.run || '') && s['continue-on-error'] === 'true' && /timeout-minutes/.test(s.raw))],
-    [2, false, true]);
+      (ij.prepare || []).some((s) => /node insta\/ready-issues\.mjs closable/.test(s.run || '') && s['continue-on-error'] === 'true' && /timeout-minutes/.test(s.raw)),
+      /* 리뷰 2026-10-05 — 남은 카드를 세지 못하면(빈 값) '남아 있음'(1)으로 읽는다 · 0 일 때만 닫는다(게시·건너뛰기 둘 다) */
+      (codeOf(insta).match(/if \[ "\$\{LIVE:-1\}" = "0" \]; then gh issue close /g) || []).length, /\$\{LIVE:-0\}/.test(codeOf(insta))],
+    [2, false, true, 2, false]);
 
   /* ── ⑥ 전역 — 모든 워크플로 ── */
   eq('⑥ S1 표본 — gh 로 없는 라벨을 붙이면 잡는다 · 같은 파일에서 만들면(변수 포함) 통과',
@@ -477,8 +487,10 @@ export default async function gate(eq, ctx) {
   const dd = stepsOf(wf('device-deploy.yml'));
   const ddClose = dd.find((s) => /compare\/main\.\.\./.test(s.run || '')) || {};
   eqWf('  device-deploy — 배포됐으면(deployed·uptodate) 옛 배포 실패 경보를 브랜치가 전부 main 에 들어갔을 때만 닫는다(모름은 둔다)',
-    [/state == 'deployed'/.test(ddClose.if || '') && /state == 'uptodate'/.test(ddClose.if || ''), /ahead_by/.test(ddClose.run || ''), ddClose['continue-on-error'], /timeout-minutes/.test(ddClose.raw || '')],
-    [true, true, 'true', true]);
+    [/state == 'deployed'/.test(ddClose.if || '') && /state == 'uptodate'/.test(ddClose.if || ''), /ahead_by/.test(ddClose.run || ''), ddClose['continue-on-error'], /timeout-minutes/.test(ddClose.raw || ''),
+      /* 리뷰 2026-10-05 — 실제로 묶는 줄: 0 만 '들어갔다' · 빈 값·숫자 아님(404·조회 실패)은 모름(all=0) · 다 들어갔을 때만 닫는다 */
+      /\n\s*0\) lines\+=/.test(ddClose.run || ''), /\n\s*''\|\*\[!0-9\]\*\) all=0;/.test(ddClose.run || ''), /if \[ "\$all" = "1" \]; then\n\s*gh issue close/.test(ddClose.run || '')],
+    [true, true, 'true', true, true, true, true]);
   const es = stepsOf(wf('essay-playbook.yml'));
   const esRep = es.find((s) => s.name === '결과 리포트 이슈') || {};
   eqWf('  essay-playbook — 시간 초과(취소)에도 리포트 · 새 리포트가 옛 📘 를 넘겨받아 닫고 · 성공하면 🚨 를 닫는다 · 실패는 robot-down',
@@ -505,6 +517,14 @@ export default async function gate(eq, ctx) {
       /open=1; preview=open/.test(probe), /\*\)\n\s*echo "[^"\n]*미리보기 주소 없음[^"\n]*판정에서 제외"/.test(probe),
       probe.indexOf('PREVIEW_URL=') > 0 && probe.indexOf('PREVIEW_URL=') < probe.indexOf('verdict=open')],
     [true, true, true, true, true]);
+
+  {
+    /* 리뷰 2026-10-05 — 미리보기 블록은 '열렸다'(open=1)만 판정에 보탠다. 잠김 셈(sure·total)을 건드리면 없는 미리보기가 매일 '판정 불가'를 낸다 */
+    const pv = probe.slice(probe.indexOf('preview=""'), probe.indexOf('echo "preview=$preview"'));
+    eqWf('  admin-lock-check — 미리보기 블록은 잠김 셈(sure·total)을 건드리지 않고 · 열렸을 때만 open=1 · 없는 미리보기 갈래는 알리기만',
+      [pv.length > 0, /\b(?:sure|total)=/.test(pv), (pv.match(/open=1/g) || []).length, /\*\)\n\s*echo "[^"\n]*미리보기 주소 없음[^"\n]*판정에서 제외"\n\s*;;/.test(pv)],
+      [true, false, 1, true]);
+  }
 
   /* ── ⑫ 링크 사냥꾼 · 공고 누락 감사 — 이슈 하나에 모은다 · 실패가 사람에게 닿는다 ── */
   const lh = stepsOf(wf('link-hunter.yml'));
