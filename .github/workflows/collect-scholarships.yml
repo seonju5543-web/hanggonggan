@@ -367,6 +367,12 @@ jobs:
           else
             msg="🤖 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 수집 로봇 정상 실행 — 새 공고 0건이라 새 리포트는 만들지 않았어요."
           fi
+          # 피드 메우기(🔁)·화면 0건 학교(🙋) 줄은 0건 날에도 붙인다 (2026-10-05 리뷰) — 리포트 이슈는 새 공고가 있는 날만 생겨,
+          # 피드가 비어 '새 공고 0건'이 이어지는 날(9-30 사고 뒤처럼)에 이 두 줄이 report.md 에만 남고 아무에게도 안 닿았다.
+          feedlines=$(grep -E '^(🔁|🙋) ' collector/report.md 2>/dev/null || true)
+          if [ -n "$feedlines" ]; then
+            msg="$msg"$'\n\n'"$feedlines"
+          fi
           if [ -n "$last" ] && [ "$last" != "null" ]; then
             gh issue comment "$last" --repo "${{ github.repository }}" --body "$msg"
           fi

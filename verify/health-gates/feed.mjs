@@ -21,7 +21,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
-import { cleanEnv, stripComments } from './gate.mjs';
+import { cleanEnv, stripComments, stripYamlComments } from './gate.mjs';
 import { healFromLedger, publishBySchool, zeroFeedSchools, zeroFeedWhy, readSchoolFiles, dropUnserved, FEED_HEAL_SINCE } from '../../collector/publish-notices.mjs';
 import { dedupeNotices, capNotices, urlKey, titleKey } from '../../collector/url-key.mjs';
 import { classifyMiss, coverageSets, findMissing } from '../../collector/coverage-rules.mjs';
@@ -242,6 +242,15 @@ export default async function feed(eq, ctx) {
     eq('  수집 리포트가 발행 목록으로 재고 머리에 한 줄 적는다 (까닭은 zeroFeedWhy 하나 · 브라우저 학교인지 같이 넘긴다)',
       [pubAt > 0 && zAt > pubAt, /lines\.push\(`🙋 서비스 학교인데 앱 실시간 공고 0건 \$\{zeroFeed\.length\}곳/.test(src),
         /zeroFeedWhy\(results\.filter\([^;]*\{\s*browser:\s*browserSchools\.has\(school\)\s*\}\)/.test(src)], [true, true, true]);
+    /* 0건 날에도 사람에게 닿는다 (리뷰 2026-10-05 R5) — 리포트 이슈는 새 공고가 있는 날만 생기고, 0건 날엔 코멘트 한 줄뿐이었다.
+       코멘트 단계가 report.md 의 🔁·🙋 줄(줄 맨 앞)을 집어 코멘트에 붙이는가 · 수집기가 그 줄을 줄 맨 앞에 쓰는가 */
+    const cs = stripYamlComments(fs.readFileSync(new URL('.github/workflows/collect-scholarships.yml', root), 'utf8'));
+    const zeroStep = cs.split(/\n(?= {6}- )/).find((s) => /name: 0건 실행 알림/.test(s)) || '';
+    const grepAt = zeroStep.search(/feedlines=\$\(grep -E '\^\(🔁\|🙋\) ' collector\/report\.md/);
+    const addAt = zeroStep.search(/msg="\$msg"\$'\\n\\n'"\$feedlines"/);
+    const sendAt = zeroStep.indexOf('gh issue comment "$last"');
+    eq('  🔴 0건 날 코멘트에도 report.md 의 🔁·🙋 줄을 붙인다 (보내기 전에) · 수집기는 두 줄을 줄 맨 앞에 쓴다',
+      [grepAt > 0, addAt > grepAt, sendAt > addAt, /lines\.push\(`🔁 /.test(src), /lines\.push\(`🙋 /.test(src)], [true, true, true, true, true]);
     /* 까닭은 그 학교 게시판의 이번 상태 줄에서만 — 상태 줄 글자는 collect.mjs harvestBoard 의 꼴 그대로 */
     const unset = { status: '⚙️ 게시판 주소 미설정 (행이 클릭형이라 browser-targets.json 이 담당)', items: [] };
     const seenAll = { status: '✅ 정상 (실공고 15건 감지)', items: [] };
