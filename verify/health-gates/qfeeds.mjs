@@ -10,18 +10,24 @@
         seen-activities 는 이른 날짜
      ④ 활동 자격 (api-06): 납작한 표의 `대상연령 : 만 20세 이상 ~ 만 39세 이하, 만 40세 이상` 이 범위 하나로 읽혀 45세가 미달(틀린 미달) ·
         개인정보 처리 안내문이 자격 자리에 — activity-excerpts.mjs eligLineOk 한 곳 · 실린 글 sanitizeElig · 브라우저 장부 mergeBrowserResults
+     ⑤ 뺀 게시판의 소식 (news-4): 경북 boardUrl 을 포토뉴스 → 학사공지로 바꾼 뒤 포토뉴스 글이 바닥 4건 자리에 남았다 —
+        새 글에 게시판 열쇠(src) · 이번에 본 글은 열쇠를 고쳐 단다 · 지금 출처에 없는 게시판의 글은 발행에서 뺀다(news-board-rules.mjs dropRetiredBoards)
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 import { stripComments, cleanEnv } from './gate.mjs';
 import { sandbox } from './bodies.mjs';
 import { clearFuturePosted, newsFloor } from '../../collector/news-kind.mjs';
 import { dropReason as extDropReason, fillDeadlineFromHint, tidyExternal } from '../../collector/external-clean.mjs';
 import { activityDetails, eligLineOk, sanitizeElig } from '../../collector/activity-excerpts.mjs';
+import { boardKey, dropRetiredBoards } from '../../collector/news-board-rules.mjs';
+import { urlKey } from '../../collector/url-key.mjs';
 
+const require = createRequire(import.meta.url);
 const src = (root, rel) => stripComments(fs.readFileSync(new URL(rel, root), 'utf8'));
 /* a 가 b 보다 앞에 있다(둘 다 있어야 참) */
 const before = (s, a, b) => { const i = s.indexOf(a); const j = s.indexOf(b); return i >= 0 && j >= 0 && i < j; };
@@ -186,6 +192,53 @@ export default async function qfeeds(eq, ctx) {
       eq('  [소급 도구] 활동 피드 자격 줄도 같은 거름 · 로봇과 같은 저장 꼴',
         [w.status, (out?.items || []).map((n) => n.eligibilityLines), sb.read('data/activities.json') === JSON.stringify(out, null, 1)],
         [0, [['대상 : 대학생'], ['대상 : 청년']], true]);
+    } finally { sb.done(); }
+  }
+
+  /* ── ⑤ 출처에서 뺀 게시판의 글은 다음 발행에서 빠진다 ── */
+  {
+    const A = 'https://ga.example.ac.kr/photo/list.do';
+    const B = 'https://ga.example.ac.kr/notice/list.do';
+    const live = new Map([['가대학교', new Set([boardKey(B)])]]);
+    const items = [
+      { school: '가대학교', url: 'https://ga.example.ac.kr/photo/view.do?no=1', title: '옛 게시판 글', src: boardKey(A) },
+      { school: '가대학교', url: 'https://ga.example.ac.kr/notice/view.do?no=2', title: '지금 게시판 글', src: boardKey(B) },
+      { school: '가대학교', url: 'https://ga.example.ac.kr/x/view.do?no=3', title: '열쇠 없는 옛 글' },
+      { school: '가대학교', url: 'https://ga.example.ac.kr/photo/view.do?no=4', title: '두 게시판에 걸친 글', src: boardKey(A) },
+    ];
+    const seenNow = new Map([[urlKey('https://ga.example.ac.kr/photo/view.do?no=4'), boardKey(B)]]);
+    const out = dropRetiredBoards(items, live, seenNow);
+    eq('⑤ 옛 게시판 글은 빠진다 · 지금 게시판 글·열쇠 없는 옛 글은 남는다 · 이번에 지금 게시판 목록에서 다시 본 글은 열쇠를 고쳐 달고 남는다',
+      [out.map((n) => n.title), items[3].src === boardKey(B)], [['지금 게시판 글', '열쇠 없는 옛 글', '두 게시판에 걸친 글'], true]);
+    eq('  열쇠는 주소 대신 8자 · 주소 같음 규칙(canonUrl)을 따른다', [boardKey(B).length, boardKey(B) === boardKey(`${B}#top`)], [8, true]);
+    eq('  소식 로봇 — 새 글에 열쇠를 달고 · 이번에 본 글은 열쇠를 고쳐 적고 · 발행에서 dropUnserved 뒤 · newsFloor 앞에 거른다',
+      [/it\.src = boardKey\(s\.boardUrl\)/.test(newsSrc), /srcByUrl\.set\(urlKey\(i\.url\), boardKey\(s\.boardUrl\)\)/.test(newsSrc),
+        before(newsSrc, 'all = dropUnserved(all)', 'dropRetiredBoards(all, liveBoards, srcByUrl)') && before(newsSrc, 'dropRetiredBoards(all, liveBoards, srcByUrl)', 'newsFloor(all')],
+      [true, true, true]);
+
+    /* 진짜 소식 로봇을 임시 폴더에서 — 예산 0 이라 게시판을 하나도 두드리지 않고 발행만 돈다(인터넷 없음).
+       실려 있던 글: 뺀 게시판(A) 글 · 지금 게시판(B) 글 · 열쇠 없는 옛 글(앞날 게시일) */
+    const sb = sandbox(root, 'hdj-qfeeds-news-');
+    try {
+      const SCHOOL = '경북대학교';
+      const key = require('../../match-engine.js').noticeFileKey(SCHOOL);
+      const today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
+      const KA = 'https://www.knu.example.ac.kr/photo/list.do';
+      const KB = 'https://www.knu.example.ac.kr/notice/list.do';
+      sb.write('collector/news-sources.json', { sources: [{ school: SCHOOL, campus: '', boardUrl: KB }] });
+      sb.write('collector/news-config.json', {});
+      sb.write(`data/news/${key}.json`, { school: SCHOOL, updatedAt: today, items: [
+        { school: SCHOOL, campus: '', url: 'https://www.knu.example.ac.kr/photo/view.do?no=1', title: '포토뉴스 합동소방훈련 실시', src: boardKey(KA), foundAt: today },
+        { school: SCHOOL, campus: '', url: 'https://www.knu.example.ac.kr/notice/view.do?no=2', title: '2학기 수강신청 정정 안내', src: boardKey(KB), foundAt: today },
+        { school: SCHOOL, campus: '', url: 'https://www.knu.example.ac.kr/x/view.do?no=3', title: '도서관 열람실 운영시간 변경 안내', foundAt: today, postedAt: '2099-01-22' },
+      ] });
+      const r = sb.run('collector/collect-news.mjs', [], { NEWS_BUDGET_MS: '0' });
+      const doc = sb.json(`data/news/${key}.json`);
+      const by = Object.fromEntries((doc?.items || []).map((n) => [n.url.slice(-1), n]));
+      eq('  [소식 로봇 실행] 게시판을 안 두드리고 끝난다 · 뺀 게시판 글은 빠지고 지금 게시판·열쇠 없는 글은 남는다 · 앞날 게시일은 비운다',
+        [r.status, Object.keys(by).sort(), by['3'] ? ('postedAt' in by['3']) : 'missing', /오늘보다 뒤인 게시일 1건/.test(sb.read('collector/news-report.md') || '')],
+        [0, ['2', '3'], false, true]);
+      if (r.status !== 0) console.log(r.out.slice(-800));
     } finally { sb.done(); }
   }
 }

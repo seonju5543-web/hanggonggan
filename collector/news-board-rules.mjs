@@ -26,6 +26,8 @@
 import { extractDatedRows } from './board-links.mjs';
 import { fetchBoard } from './fetch-board.mjs';
 import { canonUrl } from './canon-url.mjs';
+import { urlKey } from './url-key.mjs';
+import crypto from 'node:crypto';
 
 /* 동국대 두 캠퍼스: 목록 주소 …/article/<게시판>/list → 상세 …/article/<게시판>/detail/<번호>.
    근거: 찾기 로봇(2026-10-01)이 사이트 안 링크를 따라 /article/GENERALNOTICES/detail/26766449 · wise …/generalnotice/detail/520707 을
@@ -414,4 +416,23 @@ export function newsHidden(n, cfg = {}) {
   if (n.postId && /#n-/.test(String(n.url || ''))) return false;
   const u = canonUrl(n.url);
   return (cfg.hideUrls || []).some((x) => canonUrl(x) === u);
+}
+
+/* ── 글이 어느 게시판에서 왔나 (2026-10-05 점검 news-4) ──
+   경북대 boardUrl 을 포토뉴스에서 학사공지로 바꿨는데(b444b603) 포토뉴스 글 5건이 그대로 남아 홈 소식 띠 2·3번째를 차지했다 —
+   발행은 글의 출처 게시판을 몰라 출처 설정이 바뀌어도 옛 글을 걸러낼 수 없었고, newsFloor(최근 4건)가 기한과 상관없이 남겼다.
+   수집 로봇이 새 글에 게시판 열쇠(src)를 달고, 이번에 목록에서 다시 본 글은 그 게시판으로 열쇠를 고쳐 단다(같은 글이 주소만 바뀐 게시판에 그대로면 산다).
+   열쇠는 주소 대신 8자 해시 — 폰이 받는 학교별 파일을 키우지 않는다 · 주소 같음은 canonUrl 한 곳. 앱은 이 칸을 읽지 않는다. */
+export const boardKey = (url) => crypto.createHash('sha1').update(canonUrl(String(url || ''))).digest('hex').slice(0, 8);
+/** 지금 출처에 없는 게시판의 글을 뺀다 — liveBySchool: 학교 → 지금 게시판 열쇠 Set(boardUrl + extraBoards) · srcByUrl: urlKey → 이번 실행에 본 게시판 열쇠.
+    src 가 없는 옛 글은 판단하지 않고 남긴다(어느 게시판 글인지 모른다 — 짐작해 빼지 않는다). 남길 글의 새 배열을 돌려준다 */
+export function dropRetiredBoards(items, liveBySchool, srcByUrl = new Map()) {
+  const out = [];
+  for (const n of items || []) {
+    const now = srcByUrl.get(urlKey(n.url));
+    if (now) n.src = now;
+    if (n.src && !((liveBySchool.get(n.school) || new Set()).has(n.src))) continue;
+    out.push(n);
+  }
+  return out;
 }

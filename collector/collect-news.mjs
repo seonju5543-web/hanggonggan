@@ -14,7 +14,7 @@
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { sameSite, retitleStored } from './board-links.mjs';
-import { NEWS_BOARD_RULES, newsRuleKey, rowsForBoard, verifyRuleDetail, needsDetailCheck, fetchesOwnList, collapseSamePost, newsHidden, newsDistinct } from './news-board-rules.mjs';   // 클릭형 게시판 규칙 한 곳 (찾기 로봇과 같은 것)
+import { NEWS_BOARD_RULES, newsRuleKey, rowsForBoard, verifyRuleDetail, needsDetailCheck, fetchesOwnList, collapseSamePost, newsHidden, newsDistinct, boardKey, dropRetiredBoards } from './news-board-rules.mjs';   // 클릭형 게시판 규칙 한 곳 (찾기 로봇과 같은 것)
 import { urlKey, dedupeNotices, rekeyLedger } from './url-key.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { activityKind } from './activity-kind.mjs';
@@ -85,6 +85,7 @@ function loadPublished() {
 const results = [];
 const freshAll = [];
 const postIdByUrl = new Map();   // 이번에 본 글의 주소 열쇠 → 글 번호 (10차 전에 실린 글에도 번호를 달아 준다 · 발행 때 씀)
+const srcByUrl = new Map();      // 이번에 본 글의 주소 열쇠 → 게시판 열쇠 (출처에서 뺀 게시판의 글을 발행 때 걷는다 · news-board-rules.mjs dropRetiredBoards)
 /* 학교 하나에 게시판이 둘일 수 있다 (2026-10-03 · 서울대 일반공지는 장학 글이 많아 소식 2건 · 고려 세종 3건 → 학사공지를 더한다).
    둘째 게시판은 출처 줄의 extraBoards[{ boardUrl, label, evidence }] — 학교 규칙(NEWS_BOARD_RULES[학교])은 **첫 게시판에만** 맞는다.
    둘째 게시판의 규칙 열쇠는 '학교#이름'(newsRuleKey · 서강 행사특강) · 규칙이 없으면 보통 날짜 줄로 읽는다. 그 게시판 글에는 board(이름)를 달아
@@ -127,6 +128,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
     const onSite = rawLinks.filter((i) => sameSite(i.url, s.boardUrl));
     const recent = onSite.filter((i) => !i.postedAt || i.postedAt >= postedCutoff());   // 오래된 고정 공지 제외 (게시일을 아는 글만 잰다)
     const items = recent.filter((i) => isNewsRow(i, { scholarship: KEYWORDS, activityKind, isAttachmentEntry }));
+    for (const i of items) srcByUrl.set(urlKey(i.url), boardKey(s.boardUrl));   // 이미 실린 글도 이번에 본 게시판으로 열쇠를 고쳐 단다
     /* 이미 본 글 — 주소 열쇠 또는 **게시판의 글 번호**(postId). 목록 표식(#n-제목) 주소는 제목을 다듬는 규칙이 바뀌면 달라져
        같은 글이 새 글로 다시 실렸다(경희 6건 두 번 · 리뷰 2026-10-02). 글 번호가 있으면 그것이 열쇠다. */
     const postKey = (i) => (i.postId ? `post:${s.school}:${i.postId}` : '');
@@ -166,6 +168,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
       it.school = s.school;
       it.campus = s.campus === '공통' ? '' : (s.campus || '');
       if (s.board) it.board = s.board;   // 둘째 게시판 글 — 썸네일 로봇이 newsRuleKey 로 같은 규칙을 찾는다
+      it.src = boardKey(s.boardUrl);     // 어느 게시판 글인가 — 출처에서 그 게시판을 빼면 다음 발행에서 빠진다(점검 news-4)
       it.foundAt = todayStr();
       seen[urlKey(it.url)] = it.foundAt;
       if (it.postId) seen[postKey(it)] = it.foundAt;
@@ -235,6 +238,13 @@ for (const n of all) if (!n.postId && postIdByUrl.has(urlKey(n.url))) n.postId =
 all = collapseSamePost(all);   // 같은 글이 제목 다듬기 차이로 두 번 실린 것을 합친다 (글 번호 · 목록 표식 제목의 분류 꼬리표 · 소급)
 all = dedupeNotices(all, { distinct: newsDistinct });   // 글 번호가 다르면 같은 주소(목록 표식)라도 다른 글
 all = dropUnserved(all);
+/* 출처에서 뺀(바꾼) 게시판의 글은 뺀다 — 경북 포토뉴스 → 학사공지로 바꾼 뒤 포토뉴스 글이 바닥 4건 자리를 차지했다(점검 news-4).
+   지금 게시판 = 출처 줄의 boardUrl + extraBoards(boards 목록 그대로). 열쇠 없는 옛 글은 판단하지 않는다. newsFloor 앞이라 빠진 글이 바닥 자리를 먹지 않는다 */
+{
+  const liveBoards = new Map();
+  for (const b of boards) if (b.boardUrl) { if (!liveBoards.has(b.school)) liveBoards.set(b.school, new Set()); liveBoards.get(b.school).add(boardKey(b.boardUrl)); }
+  all = dropRetiredBoards(all, liveBoards, srcByUrl);
+}
 for (const n of all) { if (newsHidden(n, hideCfg)) { n.hidden = true; } else if (n.hidden && !n.hiddenBy) { delete n.hidden; } }
 /* 앞날 게시일은 비운다 — 바닥 4건·보관 기한·학교별 파일이 모두 정리된 값을 보게 (news-kind.mjs clearFuturePosted 한 곳 · 2026-10-05 점검 news-1 · KST 날짜) */
 const futureCleared = clearFuturePosted(all, todayStr());
