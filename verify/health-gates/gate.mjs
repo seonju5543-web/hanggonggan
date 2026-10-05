@@ -5,12 +5,14 @@
      ② 관리자 저장 = 로봇 관문 — 관리자 저장 관문(admin-apply.yml)은 감사(audit-data) 하나만 돌려, test-collector 만 아는 규칙
         (활동 출처 근거 10자 · 소식 출처 학교당 하나 · 화면 문구 끝 날짜 = 마감)을 어긴 저장이 통과하고 **다음 로봇 실행의 데이터 관문이
         빨개졌다**. 규칙을 감사가 쓰는 한 곳(verify/source-rules.cjs · entry-rules checkEntry)으로 옮기고 저장소가 저장 전에 같은 함수로 거절한다.
+        감사의 일은 auditSourceFiles 하나 — 표본으로 돌리고, 감사가 그 결과를 경고로 낮추지 않았는지도 본다(리뷰: errors→warns 로 바꿔도 조용했다).
      ③ 실데이터 단정 톱니 — test-collector 가 실데이터를 읽어 단정하면 로봇이 데이터를 바꾸는 순간 관문이 빨개진다(10-01·10-04 사고).
-        읽는 곳 수를 파일별로 세어 늘면 빨간불 · 저장 전 관문이 없던 등록금·학과 갱신 로봇에 관문 · 등록금 표본.
+        읽는 곳 수를 파일별로 세어 늘면 빨간불(ROOT 기준 path.join·readFileSync 꼴 포함) · 도구가 대신 읽는 호출(TOOL_READS_ALLOW)도 ·
+        저장 전 관문이 없던 등록금·학과 갱신 로봇에 관문 · 등록금 표본.
      ④ 데이터 관문 되돌리기 — 되돌린 뒤 관문을 다시 재지 않아(revert-auto) 원인이 기존 항목이면 관문 실패 상태로 저장되고,
         링크 사냥꾼은 결과를 버리고도 초록불이었다. collector/gate-guard.mjs 를 임시 git 저장소 + 가짜 관문으로 잰다 · 워크플로 배선 · 쉬기 장부.
         소식 로봇도 같은 도구를 쓴다 — 단락이 늘 '정식 등록'을 말해 소식 리포트에 사실과 반대인 문장이 들어갔다(리뷰) → 소식 단계 시나리오도 잰다.
-     ⑤ 알림이 제 리포트로 간다 — '"수집 리포트" in:title' 부분 일치가 다른 로봇의 리포트 이슈를 집었다(#381).
+     ⑤ 알림이 제 리포트로 간다 — '"수집 리포트" in:title' 부분 일치가 다른 로봇의 리포트 이슈를 집었다(#381) · 워크플로 전부를 본다.
      ⑥ 양식 대기열 고아 — 정식 등록에서 빠진 공고의 대기 항목(123건 중 71건)을 스키마화 로봇이 매 실행 정리한다.
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
@@ -35,13 +37,39 @@ export const stripComments = (s) => String(s).replace(/\/\*[\s\S]*?\*\//g, '').r
 export const stripYamlComments = (s) => String(s).replace(/^\s*#.*$/gm, '');
 
 /* test-collector 소스에서 **실데이터를 읽는 곳**을 파일별로 센다 — `new URL('../data/…')`·`require('../data/…')`·
-   `createRequire(…)('../data/…')` 와 로봇·관리자가 쓰는 설정·장부 json. 임시 폴더 표본(path.join(dir, 'data/…'))은 세지 않는다. */
+   `createRequire(…)('../data/…')`·`readFileSync('data/…')`·`path.join(ROOT|root|__dirname…, 'data/…')`(조각으로 나눠 적은
+   `path.join(ROOT, 'data', 'x.json')` 포함) 와 로봇·관리자가 쓰는 설정·장부 json.
+   임시 폴더 표본(`path.join(dir, 'data/…')` — 저장소 뿌리 이름이 아닌 것)은 세지 않는다.
+   (리뷰 2026-10-04: `fs.readFileSync(path.join(ROOT, 'data/registered.json'))` 꼴은 세지 않아 톱니를 조용히 비켜 갈 수 있었다) */
 const CFG_FILES = 'news-sources|activity-sources|external-sources|schools|own-programs|pending-forms|news-config|activity-config';
+const ROOT_NAMES = String.raw`(?:ROOT|root|REPO|repo|repoRoot|__dirname|HERE|process\.cwd\(\))`;
 export function realDataReads(src) {
-  const re = new RegExp(String.raw`(?:new URL|req(?:uire)?|\))\(\s*['\x60](?:\.\./)?(data/[^'\x60]*|collector/(?:${CFG_FILES})\.json)['\x60]`, 'g');
+  const target = String.raw`['\x60](?:\.{1,2}/)?(data/[^'\x60]*|collector/(?:${CFG_FILES})\.json)['\x60]`;
+  const res = [
+    new RegExp(String.raw`(?:new URL|req(?:uire)?|\)|readFileSync|readText)\(\s*${target}`, 'g'),
+    new RegExp(String.raw`path\.(?:join|resolve)\(\s*${ROOT_NAMES}\s*,\s*(?:['\x60]\.\.['\x60]\s*,\s*)?${target}`, 'g'),
+  ];
   const n = {};
-  for (const m of stripComments(src).matchAll(re)) n[m[1]] = (n[m[1]] || 0) + 1;
+  const add = (k) => { n[k] = (n[k] || 0) + 1; };
+  const code = stripComments(src);
+  for (const re of res) for (const m of code.matchAll(re)) add(m[1]);
+  /* 조각으로 나눠 적은 꼴 — path.join(ROOT, 'data', 'registered.json') */
+  const seg = new RegExp(String.raw`path\.(?:join|resolve)\(\s*${ROOT_NAMES}\s*,\s*(?:['\x60]\.\.['\x60]\s*,\s*)?['\x60](data|collector)['\x60]\s*,\s*['\x60]([^'\x60]+)['\x60]`, 'g');
+  for (const m of code.matchAll(seg)) {
+    const k = `${m[1]}/${m[2]}`;
+    if (m[1] === 'data' || new RegExp(String.raw`^collector/(?:${CFG_FILES})\.json$`).test(k)) add(k);
+  }
   return n;
+}
+/* 불러온 **도구가 대신** 실데이터를 읽는 곳 — 정규식으로는 안 보인다(예: deadline-audit 의 auditDeadlines() 가 registered.json 을 읽고,
+   그 결과로 '마감은 전부 YYYY-MM-DD' 실데이터 단정이 남아 있다). 호출 수를 세어 늘면 ✕ · 다음 점검에서 줄일 목록이다.
+   🔴 늘리지 말 것 — 표본 파일을 넘기는 꼴(what-shows 의 WHAT_SHOWS_REGISTERED 처럼)로 바꾸고 줄인다. */
+export const TOOL_READS_ALLOW = {
+  'auditDeadlines(': { reads: 'data/registered.json (verify/deadline-audit.mjs)', allow: 1 },
+};
+export function toolDataReads(src) {
+  const code = stripComments(src);
+  return Object.fromEntries(Object.keys(TOOL_READS_ALLOW).map((k) => [k, code.split(k).length - 1]));
 }
 /* 허용 개수(2026-10-04 1단계 정리 뒤 실측). 🔴 늘리지 말 것 — 실데이터의 항목 불변식은 verify/audit-data.js(entry-rules·source-rules)로,
    개수·'있어야 한다'는 표본 단정 + `ℹ` 숫자 보이기로. 줄었으면 이 표도 줄인다(다음 점검에서 남은 것을 줄인다). */
@@ -109,12 +137,39 @@ export default async function gate(eq, ctx) {
         ER.lastDateIn('접수 ~9/18', '2026'), ER.lastDateIn('접수 2026.12.20 ~ 1.10', '2026'),
         ER.lastDateIn('접수 ~ 2026. 9. 18.(금) 18:00 · 평점 3.5 ~ 4.5', '2026'), ER.lastDateIn('접수 기간 원문 확인', '2026')],
       ['2026-08-31', '2026-08-05', '2026-09-18', '2027-01-10', '2026-09-18', null]);
-    eq('  감사가 출처 규칙(source-rules)을 오류로 · 마감일 감사 도구는 lastDateIn 을 불러 쓴다 · 찾기 로봇 문턱도 같은 파일',
-      [/SR\.activitySourceProblems\(/.test(stripComments(fs.readFileSync(new URL('verify/audit-data.js', root), 'utf8'))),
-        /SR\.newsSourceProblems\(/.test(stripComments(fs.readFileSync(new URL('verify/audit-data.js', root), 'utf8'))),
+    /* 감사가 출처 규칙을 **오류로** 넣는가 — 예전엔 `SR.…Problems(` 를 부르는지만 봐서, 감사의 errors.push 를 warns.push 로 바꿔도
+       이 관문·test-collector 가 둘 다 초록이었다(리뷰 2026-10-04 실측). 그러면 로봇 길(찾기 로봇이 news-sources.json 을 고칠 때)을
+       막는 곳이 하나도 없다. 그래서 감사의 일은 source-rules 의 auditSourceFiles 하나로 모으고 ⓔ 그 함수를 표본으로 돌리고
+       ⓕ 감사가 그 결과를 **errors 에만** 넣는지(그리고 집계 사이트 정규식을 link-fix.mjs 에서 받아 넘기는지) 주석 걷은 소스로 본다. */
+    const audSrc = stripComments(fs.readFileSync(new URL('verify/audit-data.js', root), 'utf8'));
+    const calls = audSrc.match(/[^\n]*auditSourceFiles\([^\n]*/g) || [];
+    eq('② ⓕ 감사가 출처 규칙 결과를 **오류(errors)로만** 넣는다 · 집계 사이트 정규식은 link-fix.mjs 에서 받아 넘긴다 · 마감일 감사 도구는 lastDateIn 을 불러 쓴다 · 찾기 로봇 문턱도 같은 파일',
+      [calls.length, calls.every((l) => /^\s*errors\.push\(\.\.\.SR\.auditSourceFiles\(readCfg, \{ served, aggregator \}\)\);\s*$/.test(l)),
+        /aggregator = require\('\.\.\/collector\/link-fix\.mjs'\)\.AGGREGATOR_RE/.test(audSrc),
         /const \{ lastDateIn \} = require\('\.\/entry-rules\.cjs'\)/.test(fs.readFileSync(new URL('verify/deadline-audit.mjs', root), 'utf8')),
         /MIN_ROWS = SOURCE_RULES\.NEWS_MIN_ROWS/.test(fs.readFileSync(new URL('collector/find-news-boards.mjs', root), 'utf8'))],
-      [true, true, true, true]);
+      [1, true, true, true, true]);
+    /* ⓔ 감사가 부르는 함수를 표본 파일로 돌린다 — 실데이터를 읽지 않는다 */
+    {
+      const { AGGREGATOR_RE } = await import(new URL('collector/link-fix.mjs', root));
+      const okAct = { sources: [{ school: '경희대학교', campus: '공통', boardUrl: 'https://ex.ac.kr/board', evidence: '표본 — 학교 누리집 메뉴에서 확인' }, { school: '', host: '표본재단', boardUrl: null }], parked: [] };
+      const okNews = { sources: [{ school: '경희대학교', campus: '공통', boardUrl: 'https://k.ac.kr/notice', evidence: '표본 — 학교 누리집 메뉴에서 확인' }], parked: [] };
+      const sch = { schools: [{ school: '경희대학교' }] };
+      const reader = (files) => (rel) => { if (!(rel in files)) throw new Error(`없음: ${rel}`); return files[rel]; };
+      const run = (files, opts = { served, aggregator: AGGREGATOR_RE }) => SR.auditSourceFiles(reader(files), opts);
+      const base = { 'collector/activity-sources.json': okAct, 'collector/news-sources.json': okNews, 'collector/schools.json': sch };
+      const hit = (errs, re) => errs.some((m) => re.test(m));
+      const badAct = run({ ...base, 'collector/activity-sources.json': { sources: [
+        { school: '경희대학교', boardUrl: 'https://ex.ac.kr/b2', evidence: '학교 공지 확인' },
+        { school: '', host: '표본', boardUrl: 'https://linkareer.com/list/activity', evidence: '표본 — 주최가 올린 게시판이 아닌 것' },
+        { school: '없는대학교', boardUrl: null }] } });
+      const badNews = run({ ...base, 'collector/news-sources.json': { sources: [okNews.sources[0], { school: '경희대학교', boardUrl: 'https://k.ac.kr/two', evidence: '표본 — 학교 누리집 메뉴에서 확인' }] } });
+      eq('② ⓔ 감사 함수(auditSourceFiles) 표본 — 멀쩡하면 0건 · 짧은 근거·집계 사이트·서비스 밖 학교 · 한 학교 게시판 둘 · 못 읽음 · 집계 규칙 못 받음은 전부 오류',
+        [run(base), hit(badAct, /10자 넘게/), hit(badAct, /집계 사이트는 출처가 아닙니다/), hit(badAct, /없는대학교 — 서비스하지 않는 학교/), hit(badNews, /게시판이 있는 줄이 2개/),
+          hit(run({ 'collector/schools.json': sch, 'collector/news-sources.json': okNews }), /activity-sources — 출처 목록을 읽지 못했습니다/),
+          hit(run(base, { served }), /집계 사이트 규칙.*받지 못해/)],
+        [[], true, true, true, true, true, true]);
+    }
 
     /* ⓐ 활동 출처 — 짧은 근거에도 날짜 도장이 붙어 감사 규칙을 넘는다 */
     {
@@ -197,7 +252,18 @@ export default async function gate(eq, ctx) {
     eq('③ test-collector 의 실데이터 읽기가 늘지 않았다 (늘었으면 그 단정은 audit-data.js 로 · 개수·있음은 표본 + ℹ — CLAUDE.md)', over, []);
     const under = Object.entries(REAL_READ_ALLOW).filter(([f, n]) => (now[f] || 0) < n).map(([f, n]) => `${f} ${n}→${now[f] || 0}`);
     if (under.length) console.log(`  ℹ 실데이터 읽기가 줄었다 — 허용 표(REAL_READ_ALLOW)도 줄이세요: ${under.join(' · ')}`);
-    eq('  톱니가 헛돌지 않는다 — 표본 한 줄을 더하면 센다', realDataReads(`${tc}\nJSON.parse(readText(new URL('../data/registered.json', import.meta.url)));`)['data/registered.json'], (now['data/registered.json'] || 0) + 1);
+    const plus = (line) => (realDataReads(`${tc}\n${line}`)['data/registered.json'] || 0) - (now['data/registered.json'] || 0);
+    eq('  톱니가 헛돌지 않는다 — 읽는 꼴마다 표본 한 줄을 더하면 센다(new URL · ROOT 기준 path.join · 조각 path.join · 상대 경로 readFileSync) · 임시 폴더 표본은 안 센다',
+      [plus("JSON.parse(readText(new URL('../data/registered.json', import.meta.url)));"), plus("fs.readFileSync(path.join(ROOT, 'data/registered.json'), 'utf8');"),
+        plus("fs.readFileSync(path.join(__dirname, '..', 'data', 'registered.json'), 'utf8');"), plus("fs.readFileSync('data/registered.json', 'utf8');"),
+        plus("fs.writeFileSync(path.join(dir, 'data/registered.json'), '{}');")],
+      [1, 1, 1, 1, 0]);
+    const tools = toolDataReads(tc);
+    const toolOver = Object.entries(tools).filter(([k, n]) => n > TOOL_READS_ALLOW[k].allow).map(([k, n]) => `${k} ${TOOL_READS_ALLOW[k].allow}→${n} (${TOOL_READS_ALLOW[k].reads})`);
+    eq('③ 도구가 대신 실데이터를 읽는 호출도 늘지 않았다 (TOOL_READS_ALLOW — 다음 점검에서 줄일 목록)', toolOver, []);
+    const toolUnder = Object.entries(tools).filter(([k, n]) => n < TOOL_READS_ALLOW[k].allow).map(([k, n]) => `${k} ${TOOL_READS_ALLOW[k].allow}→${n}`);
+    if (toolUnder.length) console.log(`  ℹ 도구가 대신 읽는 호출이 줄었다 — 표(TOOL_READS_ALLOW)도 줄이세요: ${toolUnder.join(' · ')}`);
+    eq('  (도구 호출 톱니도 헛돌지 않는다 — 한 줄 더하면 센다)', toolDataReads(`${tc}\nDA.auditDeadlines(new Date());`)['auditDeadlines('], (tools['auditDeadlines('] || 0) + 1);
     /* 등록금·학과 갱신 로봇도 저장 전에 데이터 관문을 지난다 — 관문 단계에 continue-on-error 가 없고 git commit 보다 앞 */
     const gated = (wf) => {
       const y = stripYamlComments(fs.readFileSync(new URL(`.github/workflows/${wf}`, root), 'utf8'));
@@ -260,6 +326,19 @@ export default async function gate(eq, ctx) {
       eq('  ㉣ 리포트의 \'N건 등록\' 줄에 되돌림 표시 + 사람이 읽을 단락 (이슈 본문에도 그대로 간다)',
         [/— 2건 등록 시도 · ↩ 데이터 관문에 걸려 되돌림/.test(rep), /새 자동 등록 2건을 되돌렸습니다/.test(rep), rep.indexOf('되돌렸습니다') > rep.indexOf('### 🤖')], [true, true, true]);
       eq('  저장 형식은 로봇과 같다 (JSON.stringify(x, null, 1) + 끝 개행)', S.read('data/registered.json'), J(reg));
+      S.done();
+    }
+    /* ㉣ 제목이 둘인 리포트 — 게시판 수집 단계가 잘리면 리포트에 지난 실행의 제목이 남고 자동 등록이 이번 제목을 끝에 덧붙인다.
+       고치는 것은 **마지막**(이번 실행) 제목 하나 — 지난 실행의 'N건 등록'을 되돌림이라 하지 않는다(리뷰 2026-10-04 재현) */
+    {
+      const S = scenario({ ...HEAD, 'r.md': '# 리포트\n\n### 🤖 자동 등록 (선조치후보고) — 8건 등록\n\n- 지난 실행\n' },
+        { 'data/registered.json': { items: [{ id: 'old', auto: true, v: 1 }, { id: 'n7', auto: true, bad: true }] },
+          'r.md': '# 리포트\n\n### 🤖 자동 등록 (선조치후보고) — 8건 등록\n\n- 지난 실행\n\n### 🤖 자동 등록 (선조치후보고) — 1건 등록\n\n- 이번 실행\n' });
+      const rep = S.read('r.md');
+      eq('  ㉣ 제목이 둘인 리포트(지난 실행 제목이 남음)는 마지막 제목만 \'시도 · 되돌림\' · 단락은 그 아래',
+        [S.out.gate, /— 8건 등록\n/.test(rep), /— 8건 등록 시도/.test(rep), /— 1건 등록 시도 · ↩ 데이터 관문에 걸려 되돌림/.test(rep),
+          rep.indexOf('새 자동 등록 1건을 되돌렸습니다') > rep.indexOf('— 1건 등록 시도'), rep.indexOf('새 자동 등록 1건을 되돌렸습니다') > rep.indexOf('- 지난 실행')],
+        ['reverted-auto', true, false, true, true, true]);
       S.done();
     }
     /* ㉡ 기존 항목 수정이 원인 → 새 자동 등록분을 빼도 빨강 → 정식 등록 파일을 HEAD 바이트로 → 통과(reverted-files) · 쉬기 장부에 안 적는다 */
@@ -347,6 +426,11 @@ export default async function gate(eq, ctx) {
       eq('④ ㉤ 쉬기 장부 — 한 번은 안 쉼 · 두 번이면 그날~2일 뒤 쉼 · 3일·4일 뒤 다시 봄 · 등록되면 지움',
         [once, H.isHeld(L, 'x', '2026-10-02'), H.isHeld(L, 'x', '2026-10-04'), H.isHeld(L, 'x', '2026-10-05'), H.isHeld(L, 'x', '2026-10-06'), H.pruneRegistered(L, new Set(['x'])).ledger.items.length],
         [false, true, true, false, false, 0]);
+      /* 끝내 등록되지 않는 공고(마감 지남·사람이 막음)가 영영 남지 않게 — 마지막으로 걸린 지 30일 넘은 줄은 지운다(리뷰 2026-10-04) */
+      const old = { items: [{ id: 'a', reverts: 2, lastAt: '2026-09-01' }, { id: 'b', reverts: 2, lastAt: '2026-09-02' }, { id: 'c', reverts: 1, lastAt: '2026-10-01' }] };
+      const pr = H.pruneRegistered(old, new Set(['c']), '2026-10-02');
+      eq('  쉬기 장부 — 정식 등록된 줄과 30일 넘게 지난 줄을 지운다(30일째는 남김) · 날짜를 안 주면 지난 줄은 그대로',
+        [pr.ledger.items.map((x) => x.id), pr.removed, pr.stale, H.pruneRegistered(old, new Set()).ledger.items.length], [['b'], 2, 1, 3]);
     }
     /* 워크플로 배선 (주석 걷고) */
     const wfText = (f) => stripYamlComments(fs.readFileSync(new URL(`.github/workflows/${f}`, root), 'utf8'));
@@ -387,15 +471,19 @@ export default async function gate(eq, ctx) {
         if (ledger) w('collector/auto-held.json', ledger(dir));
         const r = spawnSync(process.execPath, [path.join(dir, 'collector/auto-register.mjs')], { cwd: dir, encoding: 'utf8', env: cleanEnv() });
         const res = { status: r.status, ids: JSON.parse(fs.readFileSync(path.join(dir, 'data/registered.json'), 'utf8')).items.map((i) => i.id),
-          report: fs.readFileSync(path.join(dir, 'collector/report.md'), 'utf8') };
+          report: fs.readFileSync(path.join(dir, 'collector/report.md'), 'utf8'),
+          ledger: fs.existsSync(path.join(dir, 'collector/auto-held.json')) ? JSON.parse(fs.readFileSync(path.join(dir, 'collector/auto-held.json'), 'utf8')) : null };
         fs.rmSync(dir, { recursive: true, force: true });
         return res;
       };
       const free = runAreg(null);
       const today = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
-      const held = runAreg(() => ({ items: free.ids.map((id) => ({ id, reverts: 2, lastAt: today })) }));
-      eq('④ 자동 등록 — 장부 없으면 등록(대조군) · 두 번 걸린 공고는 등록하지 않고 컨펌 대기에 이유를 남긴다',
-        [free.status, free.ids.length, held.status, held.ids, /데이터 관문에 2번 걸려 되돌린 공고 — 3일 쉬었다 다시 봅니다/.test(held.report)], [0, 1, 0, [], true]);
+      const held = runAreg(() => ({ items: [...free.ids.map((id) => ({ id, reverts: 2, lastAt: today })), { id: 'auto-gone', reverts: 2, lastAt: '2020-01-01' }] }));
+      const group = held.report.slice(held.report.indexOf('**데이터 관문 쉬기'));
+      eq('④ 자동 등록 — 장부 없으면 등록(대조군) · 두 번 걸린 공고는 등록하지 않고 \'데이터 관문 쉬기\' 묶음에 이유를 남긴다(신호가 약하다는 묶음이 아니다) · 30일 넘은 장부 줄은 지운다',
+        [free.status, free.ids.length, held.status, held.ids, /\*\*데이터 관문 쉬기 1건\*\*/.test(held.report), /데이터 관문에 2번 걸려 되돌린 공고 — 3일 쉬었다 다시 봅니다/.test(group),
+          /함께 들어온 다른 공고 때문에 같이 되돌려졌을 수도/.test(group), /자동 기준 미달/.test(held.report), (held.ledger.items || []).map((x) => x.id)],
+        [0, 1, 0, [], true, true, true, false, free.ids]);
     }
     eq('  옛 이름(revert-auto)은 gate-guard 의 auto 단계만 부르는 얇은 입구다 (로직 사본 없음)',
       /import \{ main \} from '\.\/gate-guard\.mjs'/.test(fs.readFileSync(new URL('collector/revert-auto.mjs', root), 'utf8')) && !/knownIds|execSync/.test(stripComments(fs.readFileSync(new URL('collector/revert-auto.mjs', root), 'utf8'))), true);
@@ -404,8 +492,11 @@ export default async function gate(eq, ctx) {
   /* ── ⑤ 알림이 제 리포트로 간다 ── */
   {
     const wf = (f) => stripYamlComments(fs.readFileSync(new URL(`.github/workflows/${f}`, root), 'utf8'));
-    eq('⑤ 장학·브라우저·사냥꾼 워크플로에 맨 \'"수집 리포트" in:title\' 검색이 없다 (다른 로봇의 리포트 이슈를 집는다)',
-      ['collect-scholarships.yml', 'browser-collect.yml', 'link-hunter.yml'].filter((f) => /'"수집 리포트" in:title'/.test(wf(f))), []);
+    /* 셋만 보다가 심층 수집(deep-fetch.yml)의 실패 알림이 그대로 남았다(리뷰 2026-10-04) → 워크플로 **전부**를 본다 */
+    const allWf = fs.readdirSync(fileURLToPath(new URL('.github/workflows/', root))).filter((f) => /\.ya?ml$/.test(f));
+    eq('⑤ 어느 워크플로에도 맨 \'"수집 리포트" in:title\' 검색이 없다 (부분 일치라 다른 로봇의 리포트 이슈를 집는다 · 워크플로 전부)',
+      [allWf.length > 10, allWf.filter((f) => /["']"수집 리포트" in:title["']/.test(wf(f)))], [true, []]);
+    eq('  심층 수집 실패 알림은 장학공고 리포트로 (양식 원본은 정식 등록 쪽 일)', /'"장학공고 수집 리포트" in:title'/.test(wf('deep-fetch.yml')), true);
     const cs = wf('collect-scholarships.yml');
     const auditAlert = cs.split(/\n(?= {6}- )/).find((s) => /name: 🚨 데이터 감사 실패 알림/.test(s)) || '';
     const zero = cs.split(/\n(?= {6}- )/).find((s) => /name: 0건 실행 알림/.test(s)) || '';
@@ -426,7 +517,8 @@ export default async function gate(eq, ctx) {
         /node tools\/alert-issue\.mjs --mode open --match prefix/.test(newsIssue) && /--title "🚨 교내 소식 데이터 감사 실패"/.test(newsIssue), /gate-guard\.mjs --report collector\/news-report\.md --note \/tmp\/gate-note\.md/.test(cn)],
       [true, false, true, true, true]);
     const bc = wf('browser-collect.yml');
-    eq('  브라우저 알림 둘(감사 실패·실패/시간초과)은 브라우저형 리포트로', (bc.match(/'"브라우저형 수집 리포트" in:title'/g) || []).length, 2);
+    /* 2026-10-05 browser 묶음 B4 — 셋째 알림(여러 번 연속 공고를 못 읽은 학교 · 0건 날)도 같은 제 리포트 이슈로 */
+    eq('  브라우저 알림 셋(감사 실패·실패/시간초과·연속으로 못 읽은 학교)은 브라우저형 리포트로', (bc.match(/'"브라우저형 수집 리포트" in:title'/g) || []).length, 3);
     eq('  사냥꾼은 장학공고 리포트로 (제 리포트 이슈가 없다)', /'"장학공고 수집 리포트" in:title'/.test(wf('link-hunter.yml')), true);
   }
 

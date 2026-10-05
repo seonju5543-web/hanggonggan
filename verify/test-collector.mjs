@@ -1386,7 +1386,14 @@ console.log('\n■ 수집망 복원 (2026-09-29 · 2026-08-30 좁힘을 되돌�
     '연세대학교 미래캠퍼스', '고려대학교 세종캠퍼스', '동국대학교 WISE캠퍼스'];   // 분교는 별개 학교 (data.js UNIVERSITIES)
   eq('일반 수집에 경희대·한국외대가 있다', ['경희대학교', '한국외국어대학교'].filter((n) => !uniq(sc.schools).includes(n)), []);
   eq('일반 수집에 2026-08-30 에 뺐던 학교가 전부 돌아왔다', REVIVED.filter((n) => !uniq(sc.schools).includes(n)), []);
-  eq('브라우저 수집도 두 곳 이상이다 (17곳을 되살렸다)', bt.targets.length >= 19, true);
+  /* 되살린 19곳을 버리지 않았다 — 보관(parked)으로 옮긴 곳도 센다 (2026-10-05 점검 B5·B10: 일반 로봇이 정상인데 브라우저가 0건·멈춤이던
+     서울대·서강·숙명·가천·홍익을 보관으로 옮겼다 — schools.json _collector 규칙). 지운 것만 빨간불이다. */
+  eq('브라우저 수집도 두 곳 이상이다 (17곳을 되살렸다 · 보관으로 옮긴 곳 포함)', bt.targets.length + (Array.isArray(bt.parked) ? bt.parked.length : 0) >= 19, true);
+  eq('  브라우저 보관(parked) 학교는 일반 로봇이 읽는다 (schools.json 에 주소가 있고 collector:"browser" 가 아니다)',
+    (bt.parked || []).filter((p) => !sc.schools.some((x) => x.school === p.school && x.boardUrl && x.collector !== 'browser')).map((p) => p.school), []);
+  /* 후보 주소에 학교 첫 화면을 두지 않는다 (2026-10-05 점검 B10) — 첫 화면의 '장학' 낱말 링크(수상 소식 등)를 공고로 긁는다(숙명 실측) */
+  const homePage = (u) => { try { return ['/', '/index.do', '/kr/index.do', '/main', '/main.do', '/index.html', '/index.jsp'].includes(new URL(u).pathname.replace(/\/+$/, '') || '/'); } catch { return false; } };
+  eq('  브라우저 후보 주소는 학교 첫 화면이 아니다', bt.targets.flatMap((t) => (t.candidates || []).filter(homePage).map((u) => `${t.school} ${u}`)), []);
   eq('브라우저 수집 학교는 일반 수집 학교의 부분집합이다 (앱 상수가 schools.json 만 보므로)',
     uniq(bt.targets).filter((n) => !uniq(sc.schools).includes(n)), []);
   eq('  항목마다 게시판 주소 칸이 있다', sc.schools.every((x) => 'boardUrl' in x), true);
@@ -1683,18 +1690,14 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
   }
   /* ③ 출처 */
   const src = JSON.parse(readText(new URL('../collector/activity-sources.json', import.meta.url)));
-  const served = createRequire(import.meta.url)('../match-engine.js').SERVED_SCHOOLS;   // 2026-09-29: 두 곳 → 44곳, 상수 한 곳에서 읽는다
-  eq('전용 게시판 출처는 서비스 학교 안 (전국 글은 학교를 비우고 host 를 적는다)',
-    (src.sources || []).every((x) => (x.school === '' ? !!x.host : served.includes(x.school))), true);
-  eq('  항목마다 boardUrl 칸이 있다 (null 이면 로봇이 "주소 미설정"으로 리포트한다)', (src.sources || []).length > 0 && src.sources.every((x) => 'boardUrl' in x), true);
   eq('  보관 칸과 되돌리는 법', Array.isArray(src.parked) && /되돌리려면/.test(src._parked || ''), true);
   /* 2026-09-29 개발자 지시 "어떻게 해서든 크롤링 출처를 찾아" — 주소를 안 적는 규칙에서 **근거와 함께 적는 규칙**으로 바뀌었다.
      주소마다 evidence(어디서 확인했나)가 있어야 한다 · 집계 사이트(링커리어·위비티·씽굿·캠퍼스픽·올콘·콘테스트코리아)는 출처가 아니다. */
-  /* 근거(evidence) 10자 넘게는 **실데이터 단정이 아니라 감사(audit-data)의 오류**로 옮겼다 (2026-10-04 · 로봇·도구 점검) —
-     관리자 저장 관문은 감사만 돌려, 여기서만 재면 저장은 통과하고 다음 로봇 실행이 빨개졌다. 규칙은 verify/source-rules.cjs 한 곳 · 표본은 health-gates/gate.mjs */
-  eq('  주소가 있는 항목의 근거(evidence)는 감사가 source-rules 로 본다 (관리자 저장소도 같은 함수)',
-    /SR\.activitySourceProblems\(/.test(readText(new URL('./audit-data.js', import.meta.url))) && /activitySourceProblems\(src, \{ served: SERVED_SCHOOLS, aggregator: AGGREGATOR_RE \}\)/.test(readText(new URL('../tools/admin-apply.mjs', import.meta.url))), true);
-  eq('  집계 사이트는 출처에 넣지 않는다', src.sources.some((x) => /linkareer|wevity|thinkcontest|campuspick|all-con|contestkorea|thinkyou|allforyoung/i.test(x.boardUrl || '')), false);
+  /* 서비스 학교 안 · boardUrl 칸 · 근거(evidence) 10자 넘게 · 집계 사이트 아님은 **실데이터 단정이 아니라 감사(audit-data)의 오류**로 옮겼다
+     (2026-10-04 · 로봇·도구 점검) — 관리자 저장 관문은 감사만 돌려, 여기서만 재면 저장은 통과하고 다음 로봇 실행이 빨개졌다.
+     규칙은 verify/source-rules.cjs 한 곳(집계 사이트 정규식은 collector/link-fix.mjs 한 곳) · 표본과 '감사가 오류로 넣는가'는 health-gates/gate.mjs ② */
+  eq('  출처 규칙(학교·주소 칸·근거·집계 사이트)은 감사가 source-rules 로 **오류**에 넣는다 (관리자 저장소도 같은 함수)',
+    /errors\.push\(\.\.\.SR\.auditSourceFiles\(readCfg, \{ served, aggregator \}\)\)/.test(readText(new URL('./audit-data.js', import.meta.url))) && /activitySourceProblems\(src, \{ served: SERVED_SCHOOLS, aggregator: AGGREGATOR_RE \}\)/.test(readText(new URL('../tools/admin-apply.mjs', import.meta.url))), true);
   eq('  설명에 집계 사이트를 넣지 않는 이유가 적혀 있다', /집계 사이트/.test(src._comment || ''), true);
   const acts = JSON.parse(readText(new URL('../data/activities.json', import.meta.url)));
   eq('발행 파일 모양 {updatedAt, items[]}', 'updatedAt' in acts && Array.isArray(acts.items), true);
@@ -2058,7 +2061,7 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   /* 출처 학교·학교당 게시판 하나·후보 근거·boardUrl 근거는 감사(audit-data)의 오류로 옮겼다 (2026-10-04 · 위 활동 출처와 같은 이유 ·
      관리자 park→add→unpark 로 한 학교에 둘이 되면 저장은 통과하고 소식 로봇이 빨개졌다). 규칙 verify/source-rules.cjs · 표본 health-gates/gate.mjs */
   eq('  출처 규칙(학교·학교당 하나·근거)은 감사가 source-rules 로 본다 · 찾기 로봇의 문턱도 같은 파일',
-    /SR\.newsSourceProblems\(/.test(readText(new URL('verify/audit-data.js', root))) && /newsSourceProblems\(src, \{ schools:/.test(readText(new URL('tools/admin-apply.mjs', root)))
+    /errors\.push\(\.\.\.SR\.auditSourceFiles\(readCfg, \{ served, aggregator \}\)\)/.test(readText(new URL('verify/audit-data.js', root))) && /newsSourceProblems\(src, \{ schools:/.test(readText(new URL('tools/admin-apply.mjs', root)))
     && FN.MIN_ROWS === createRequire(import.meta.url)('./source-rules.cjs').NEWS_MIN_ROWS, true);
   eq('  보관 칸과 되돌리는 법', Array.isArray(src.parked) && /되돌리려면/.test(src._parked || ''), true);
   /* ④ 로봇 배선 */
@@ -10626,7 +10629,8 @@ console.log('\n■ 학교가 스스로 운영하는 장학 제도 (2026-09-20)')
     eq('교외로 남아 있으면 감사가 짚는다', hits({ ...base, type: '교외' }, { noticeKind }).length, 1);
     /* ⚠️ **오류가 아니라 경고여야 한다** — 오류면 사람이 관리자 화면에서 교외로 고치는 순간
        감사가 영영 실패하고 수집 워크플로가 매일 되돌리기를 돌려 자동 등록이 통째로 멈춘다
-       (revert-auto 는 기존 항목을 못 고친다). 사람 판단을 기계가 잠그면 안 된다. */
+       (되돌리기 gate-guard 가 이번 실행의 파일을 직전 판으로 되돌려도 원인이 기존 데이터라 매 실행 still-failing).
+       사람 판단을 기계가 잠그면 안 된다. */
     eq('  경고다 (오류로 두면 사람이 고친 값이 파이프라인을 잠근다)',
       hits({ ...base, type: '교외' }, { noticeKind })[0].level, 'warn');
     eq('  교내면 조용하다', hits({ ...base, type: '교내' }, { noticeKind }).length, 0);

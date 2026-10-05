@@ -30,3 +30,7 @@ docs/advisor/fonts/
 
 # 대외활동 첨부·포스터 — 한 실행 안에서 받고 읽고 버린다(커밋하면 글 15건에 8MB · collector/activity-docs.mjs)
 collector/act-files/
+
+# 통째로 바꿔 끼우기(collector/write-atomic.mjs)의 임시 파일 — 쓰는 도중 끊기면 남는다(다음 저장이 덮어쓴다) · 커밋하지 않는다
+collector/**/*.tmp
+data/**/*.tmp

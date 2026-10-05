@@ -226,8 +226,8 @@ jobs:
           pip install olefile --quiet
           python3 collector/hwp-bodytext.py collector/act-files || true   # 실패해도 아래 읽기는 돈다(그 글의 무료 기회 두 번 중 하나를 날리지 않게)
           sudo apt-get install -y -qq poppler-utils   # PDF 공고문을 쪽 그림으로(pdftoppm) — 서울문화포털 글은 자격이 PDF 에만 있다
-          pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3   # 🔴 판 고정 — 3.3.x 는 x86 CPU 에서 첫 그림부터 ConvertPirAttribute2RuntimeAttribute 오류(2026-10-04 첫 클라우드 실행 · PaddleOCR discussions 17350)
-          python3 collector/paddle-ocr.py collector/act-files --budget-sec=180 || true
+          pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3 || echo "::warning::PaddleOCR 설치 실패 — 아래 읽기가 엔진 없음으로 적고 HWP·본문으로만 계속"   # 🔴 실패를 삼키지도, 경고 없이 떼지도 말 것 — 떼면 같은 단계의 --apply 가 bash -e 에 끊겨 HWP 로 읽은 자격까지 버려진다(2026-10-04 점검 gaps-02) · 🔴 판 고정 — 3.3.x 는 x86 CPU 에서 첫 그림부터 ConvertPirAttribute2RuntimeAttribute 오류(2026-10-04 첫 클라우드 실행 · PaddleOCR discussions 17350)
+          python3 collector/paddle-ocr.py collector/act-files --budget-sec=180 || echo "::warning::PaddleOCR 실패 — 자격 읽기는 HWP·본문으로만 계속(엔진 고장이면 그 글의 기회는 --apply 가 되돌린다)"
           node collector/activity-docs.mjs --apply
       - name: 데이터 관문 (수집기 규칙 테스트 + 데이터 감사)
         id: audit
@@ -269,6 +269,8 @@ jobs:
           [ -f collector/find-boards-report.md ] && git add collector/find-boards-report.md
           [ -f data/external.json ] && git add data/external.json
           [ -f collector/seen-external.json ] && git add collector/seen-external.json
+          # 대외활동·재단 출처의 연속 실패 장부 (2026-10-05 점검 collect-08 · collector/source-health.mjs) — 빠지면 매 실행 0 부터 세어 🙋 가 영영 안 뜬다
+          [ -f collector/source-health.json ] && git add collector/source-health.json
           # 🔴 학교별 공고 파일 — 앱이 **실제로 읽는 것은 이쪽**이다(data/notices.json 은
           #    학교별 파일이 아직 없는 학교를 위한 뒷길). 수집기는 매 실행 이 폴더를 새로
           #    쓰는데 여기에 없어서 **한 번도 저장되지 않았다** — 2026-08-17 에 폴더를
@@ -366,6 +368,12 @@ jobs:
             msg="🤖 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 수집은 정상 · $gate — 새 공고 0건 · 아래 감사 실패 코멘트를 보세요."
           else
             msg="🤖 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 수집 로봇 정상 실행 — 새 공고 0건이라 새 리포트는 만들지 않았어요."
+          fi
+          # 피드 메우기(🔁)·화면 0건 학교(🙋) 줄은 0건 날에도 붙인다 (2026-10-05 리뷰) — 리포트 이슈는 새 공고가 있는 날만 생겨,
+          # 피드가 비어 '새 공고 0건'이 이어지는 날(9-30 사고 뒤처럼)에 이 두 줄이 report.md 에만 남고 아무에게도 안 닿았다.
+          feedlines=$(grep -E '^(🔁|🙋) ' collector/report.md 2>/dev/null || true)
+          if [ -n "$feedlines" ]; then
+            msg="$msg"$'\n\n'"$feedlines"
           fi
           if [ -n "$last" ] && [ "$last" != "null" ]; then
             gh issue comment "$last" --repo "${{ github.repository }}" --body "$msg"

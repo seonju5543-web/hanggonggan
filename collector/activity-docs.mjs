@@ -264,10 +264,46 @@ export function dueFree(entry, today) {
   return (Date.parse(today) - Date.parse(entry.at)) >= RETRY_DAYS * 86400000;
 }
 
+/* ── OCR 엔진이 고장 난 동안 깎인 무료 기회 (2026-10-04 점검 gaps-02) ──
+   10-03·10-04 첫 클라우드 실행들은 PaddleOCR 이 모든 그림에서 같은 오류로 '0장'이었는데(판 고정 전) 장부는 그 시도를 한 번으로 셌다.
+   글마다 두 번뿐인 기회(MAX_TRIES)라, 두 번째도 고장 난 엔진에 걸리면 그 글은 무료 경로에서 영영 빠진다. */
+const LEDGER_V = 'paddle-pin-2026-10-04';   // 장부 판 — 바꾸면 다음 실행이 자격 못 찾은 칸을 한 번 비운다
+/** 장부 판이 다르면 자격을 못 찾은 칸(lines 없음)을 한 번 비운다 — 비운 글은 다음 실행에 바로 다시 해 본다(dueFree(undefined)=true).
+    `_` 로 시작하는 칸(_common 공통 그림 · _ocrV 판)은 남긴다. 몇 칸을 비웠는지 돌려준다. */
+export function migrateOcrTries(ledger, v = LEDGER_V) {
+  if (!ledger || ledger._ocrV === v) return 0;
+  let n = 0;
+  for (const k of Object.keys(ledger)) {
+    if (k.startsWith('_') || (ledger[k] && ledger[k].lines)) continue;
+    delete ledger[k];
+    n += 1;
+  }
+  ledger._ocrV = v;
+  return n;
+}
+/** 이번 실행의 OCR 이 실패한 파일(paddle-ocr.py 의 paddle-status.json failed) 때문에 자격을 못 찾은 글은 그 시도를 세지 않는다 —
+    tries 를 1 되돌린다(날짜는 그대로 — 엔진이 계속 고장이면 매 실행 같은 글을 다시 받지 않게). 되돌린 주소 목록을 돌려준다. */
+export function rollbackOcrTries(ledger, manifest, status, found = new Set()) {
+  const failed = new Set((status && status.failed) || []);
+  const back = [];
+  if (!failed.size) return back;
+  for (const [url, files] of Object.entries(manifest || {})) {
+    if (found.has(url) || !(files || []).some((f) => failed.has(f))) continue;
+    const e = ledger[url];
+    if (!e || !(e.tries > 0)) continue;
+    e.tries -= 1;
+    back.push(url);
+  }
+  return back;
+}
+const PADDLE_STATUS = path.join(DIR, 'paddle-status.json');
+
 /* ── ① 받기 ── */
 async function fetchPhase(acts) {
   fs.mkdirSync(DIR, { recursive: true });
   const ledger = readJson(LEDGER, {});
+  const cleared = migrateOcrTries(ledger);   // 엔진 고장 동안 깎인 기회 — 판이 바뀐 첫 실행에 한 번(위 머리말)
+  if (cleared) log(`장부 판 갱신 — 자격 못 찾은 ${cleared}칸을 비워 다시 해 본다(OCR 엔진 고장 동안 깎인 기회)`);
   const manifest = readJson(MANIFEST, {});
   const plainTried = BROWSER ? readJson(PLAIN_LEDGER, {}) : {};
   const today = new Date().toISOString().slice(0, 10);
@@ -290,7 +326,7 @@ async function fetchPhase(acts) {
   }
   /* 피드에서 빠진 글은 장부에서도 뺀다 */
   const live = new Set(acts.items.map((n) => n.url));
-  for (const u of Object.keys(ledger)) if (u !== '_common' && !live.has(u)) delete ledger[u];
+  for (const u of Object.keys(ledger)) if (!u.startsWith('_') && !live.has(u)) delete ledger[u];   // `_` 칸(_common·_ocrV)은 장부 자체의 것
   /* 이번 실행에서 공통으로 드러난 그림은 먼저 받아 둔 글에서도 지운다 */
   for (const [h, u] of owners) if (common.has(h) && manifest[u]) manifest[u] = manifest[u].filter((f) => !f.startsWith(`${keyOf(u)}-`) || fileHash(path.join(DIR, f)) !== h);
   ledger._common = [...common].slice(-200);
@@ -336,16 +372,29 @@ function applyPhase(acts) {
   let got = 0;
   /* 브라우저 모드는 결과를 제 장부에만 — data/activities.json 은 수집 로봇 몫(위 ④) */
   const bled = BROWSER ? readJson(BROWSER_LEDGER, {}) : null;
+  const found = new Set();
   for (const n of acts.items) {
     const files = manifest[n.url];
     if (!files || !files.length || !needsElig(n)) continue;
     const d = eligFromFiles(n, files);
     if (!d) continue;
+    found.add(n.url);
     if (BROWSER) { bled[n.url] = { ...(bled[n.url] || {}), lines: d.eligibilityLines, excludes: d.eligibilityExcludes, from: d.from }; got += 1; continue; }
     n.eligibilityLines = d.eligibilityLines;
     if (d.eligibilityExcludes.length) n.eligibilityExcludes = d.eligibilityExcludes;
     n.eligibilityFrom = d.from;
     got += 1;
+  }
+  /* OCR 이 실패한 파일 때문에 못 읽은 글은 그 시도를 세지 않는다(위 rollbackOcrTries) — 같은 결과로 두 번 되돌리지 않게 표시해 둔다 */
+  const status = readJson(PADDLE_STATUS, null);
+  if (status && !status.applied) {
+    const led = BROWSER ? bled : readJson(PLAIN_LEDGER, {});
+    const back = rollbackOcrTries(led, manifest, status, found);
+    if (back.length) {
+      log(`OCR 이 실패한 파일 때문에 못 읽은 글 ${back.length}건 — 무료 기회를 되돌림${status.engineFailed ? ' (엔진 고장)' : ''}`);
+      if (!BROWSER) fs.writeFileSync(PLAIN_LEDGER, JSON.stringify(led, null, 1) + '\n');
+    }
+    fs.writeFileSync(PADDLE_STATUS, JSON.stringify({ ...status, applied: true }, null, 1));
   }
   if (BROWSER) fs.writeFileSync(BROWSER_LEDGER, JSON.stringify(bled, null, 1) + '\n');
   else got += mergeBrowserResults(acts);

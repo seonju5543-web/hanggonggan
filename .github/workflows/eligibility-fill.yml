@@ -82,14 +82,20 @@ jobs:
         run: |
           node collector/eligibility-ai.mjs --all | tee /tmp/preview.txt
           node collector/activity-docs.mjs --ai | tee -a /tmp/preview.txt   # 대외활동 대상 수 (꺼진 채 세기만 — 돈 0)
-          n=$(sed -n 's/.*대상 \([0-9]*\)건.*/\1/p' /tmp/preview.txt | head -1)
-          echo "count=${n:-0}" >> "$GITHUB_OUTPUT"
+          # 🔴 세 숫자를 다 센다 (2026-10-04 점검 bodies-10) — 예전엔 첫 줄(장학 본문 대상)만 세어, 첨부·대외활동 대상만 있는 날은 0 으로 보였다
+          s=$(sed -n 's/.*대상 \([0-9]*\)건 — 전수.*/\1/p' /tmp/preview.txt | head -1)
+          d=$(sed -n 's/.*첨부로 읽을 수 있는 공고 \([0-9]*\)건.*/\1/p' /tmp/preview.txt | head -1)
+          a=$(sed -n 's/.*AI 대상 \([0-9]*\)건.*/\1/p' /tmp/preview.txt | head -1)
+          echo "대상 — 장학 본문 ${s:-0}건 · 공고문 첨부 ${d:-0}건 · 대외활동 ${a:-0}건"
+          echo "count=$(( ${s:-0} + ${d:-0} + ${a:-0} ))" >> "$GITHUB_OUTPUT"
 
-      - name: 대상이 0건이면 여기서 끝
+      # 🔴 예전 이름은 '여기서 끝'이었지만 단계 안의 exit 0 일 뿐이라 아래 유료 단계가 그대로 돌았다(점검 bodies-10).
+      #    이제 돈이 드는 단계마다 count != '0' 을 본다. 무료 단계(첨부 받기·글자 뽑기·OCR·발췌)는 그대로 돈다 — 새 대상을 만들 수 있고,
+      #    미리보기의 0 은 받기 전 숫자다.
+      - name: 대상이 0건이면 유료 단계는 건너뛴다
         if: steps.preview.outputs.count == '0'
         run: |
-          echo "::notice::AI로 읽을 대상이 없습니다 — 원문이 없거나 이미 다 읽었습니다."
-          exit 0
+          echo "::notice::AI로 읽을 대상이 없습니다 — 원문이 없거나 이미 다 읽었습니다. 돈이 드는 단계는 건너뜁니다."
 
       # 🔴 무료로 읽을 수 있는 것을 먼저 읽는다 — 이 저장소의 방식이다(양식 스키마화와 같은 순서).
       #    본문이 "붙임 참조"뿐인 공고는 공고문 첨부(HWP·PDF)에 자격이 있다. 받아서 발췌하면
@@ -102,7 +108,8 @@ jobs:
 
       # 🔴 받은 첨부에서 글자를 뽑는 단계가 여기 없었다 (2026-09-15 실측 · 노션 F-9).
       #    deepfetch --elig-attach 는 다시 받는 공고의 `elig-<슬러그>-*` 를 **파생 .txt 까지** 지우고
-      #    원본만 새로 놓는다. 그런데 이 워크플로에는 글자를 다시 뽑는 단계가 없어, 2026-09-15 실행이
+      #    원본만 새로 놓는다(2026-10-04 점검 bodies-5 부터는 받은 바이트가 바뀐 파일의 파생만 지운다 — 처음 받은 파일·바뀐 파일은
+      #    여전히 글자를 새로 뽑아야 하므로 이 단계는 그대로 둔다). 그런데 이 워크플로에는 글자를 다시 뽑는 단계가 없어, 2026-09-15 실행이
       #    울산연구원 공고문 HWP 의 본문 글자(20KB)와 PDF 글자를 **지운 채로 커밋**했다 — 다음 날
       #    수집 로봇이 뽑을 때까지 무료 경로(발췌기·금액 로봇)는 그 첨부를 읽을 수 없었다.
       #    deep-fetch.yml 과 같은 단계다. 관문: test-collector '첨부를 받는 로봇이 전부 본문 추출기를…'.
@@ -135,7 +142,7 @@ jobs:
         run: node collector/extract-excerpts.mjs --write
 
       - name: SDK 설치
-        if: inputs.mode != '미리보기만'
+        if: inputs.mode != '미리보기만' && steps.preview.outputs.count != '0'
         # sharp 는 큰 포스터를 줄이는 데 쓴다 — API 는 한 변 8,000픽셀까지만 받는데
         # 학교 포스터는 인쇄용 원본을 그대로 올려 이 한계를 자주 넘는다(실측 5906×8268).
         run: npm i @anthropic-ai/sdk sharp --no-audit --no-fund --silent
@@ -146,14 +153,14 @@ jobs:
       # 본문이 '붙임 참조'뿐이고 내용이 공고문 PDF·포스터 그림에만 있는 공고들.
       # 지정 실행을 여러 번 띄우면 서로의 registered.json 을 덮어쓰므로 한 번에 돈다.
       - name: 첨부만 (공고문 PDF · 포스터 그림)
-        if: inputs.mode == '첨부만'
+        if: inputs.mode == '첨부만' && steps.preview.outputs.count != '0'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ELIG_AI_ENABLE: '1'
         run: node collector/eligibility-ai.mjs --docs-only --write | tee /tmp/trial.txt
 
       - name: 공고 하나만
-        if: inputs.mode == '공고 하나만'
+        if: inputs.mode == '공고 하나만' && steps.preview.outputs.count != '0'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ELIG_AI_ENABLE: '1'
@@ -161,7 +168,7 @@ jobs:
         run: node collector/eligibility-ai.mjs --only="$ONLY_ID" --write | tee /tmp/trial.txt
 
       - name: 시범 3건
-        if: inputs.mode == '전부' || inputs.mode == '시범 3건만'
+        if: (inputs.mode == '전부' || inputs.mode == '시범 3건만') && steps.preview.outputs.count != '0'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ELIG_AI_ENABLE: '1'
@@ -184,7 +191,7 @@ jobs:
 
       # ④ 전수 — 소넷 기준 2,229원(2026-08-23 실측). 처음 한 번뿐이다.
       - name: 전수 169건
-        if: inputs.mode == '전부'
+        if: inputs.mode == '전부' && steps.preview.outputs.count != '0'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ELIG_AI_ENABLE: '1'
@@ -195,7 +202,7 @@ jobs:
       # 대외활동·공모전 (2026-10-03 개발자 지시 "api 잔액 채우고 딸깍 하면 실행") — 무료로 못 읽은 글의 포스터·PDF·본문을 AI 에게.
       # 지어냄을 막는 관문은 장학과 같다(eligibility-ai.mjs verifyPdfLines·verifyPick). 한 실행 최대 40건(ACT_AI_MAX).
       - name: 대외활동 — 포스터·첨부·본문 AI 읽기
-        if: inputs.mode == '전부' || inputs.mode == '대외활동만'
+        if: (inputs.mode == '전부' || inputs.mode == '대외활동만') && steps.preview.outputs.count != '0'
         continue-on-error: true
         timeout-minutes: 10
         env:

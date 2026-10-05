@@ -403,18 +403,19 @@ try {
 /* ── 출처 목록 — 대외활동·교내 소식 게시판 (2026-10-04 · 로봇·도구 점검) ──────────────────
    관리자 화면이 고치는 설정 파일이라 규칙을 **두 길이 같이 지나는 이 감사**에 둔다 — 예전엔 test-collector 만 실데이터로 재서
    관리자 저장은 통과하고 다음 로봇 실행의 데이터 관문이 빨개졌다. 규칙은 verify/source-rules.cjs 한 곳(관리자 저장소도 같은 함수로 먼저 거절).
-   🔴 오류다 — 파일을 못 읽으면 건너뛰지 않고 그것도 오류로 적는다(조용히 꺼지는 검사 금지). */
+   🔴 오류다 — 파일을 못 읽으면 건너뛰지 않고 그것도 오류로 적는다(조용히 꺼지는 검사 금지).
+   🔴 결과는 **그대로 errors 에** — 경고로 낮추면 로봇 길(찾기 로봇이 news-sources.json 을 고칠 때)을 막는 곳이 없어진다.
+      관문 health-gates/gate.mjs ② 가 아래 줄(결과를 errors 에 펼쳐 넣는 줄)의 꼴을 주석을 걷고 본다.
+   집계 사이트 정규식은 collector/link-fix.mjs 한 곳(관리자 화면·저장소와 같은 것) — ES 모듈을 require 로 부른다(Node 20.19+ ·
+   위 초안 위험 관문과 같은 길). 못 부르면 이유는 경고에, '그 검사를 못 했다'는 오류는 auditSourceFiles 가 낸다. */
 {
   const SR = require('./source-rules.cjs');
   const readCfg = (rel) => JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
-  try {
-    const served = require('../match-engine.js').SERVED_SCHOOLS || [];
-    for (const p of SR.activitySourceProblems(readCfg('collector/activity-sources.json'), { served })) errors.push(`activity-sources — ${p.msg}`);
-  } catch (e) { errors.push(`activity-sources — 출처 목록을 읽지 못했습니다: ${e.message.slice(0, 80)}`); }
-  try {
-    const schools = (readCfg('collector/schools.json').schools || []).map((s) => s.school);
-    for (const p of SR.newsSourceProblems(readCfg('collector/news-sources.json'), { schools })) errors.push(`news-sources — ${p.msg}`);
-  } catch (e) { errors.push(`news-sources — 출처 목록을 읽지 못했습니다: ${e.message.slice(0, 80)}`); }
+  let served = [];
+  try { served = require('../match-engine.js').SERVED_SCHOOLS || []; } catch (e) { errors.push(`activity-sources — 서비스 학교 목록(match-engine.js)을 읽지 못했습니다: ${e.message.slice(0, 80)}`); }
+  let aggregator = null;
+  try { aggregator = require('../collector/link-fix.mjs').AGGREGATOR_RE; } catch (e) { warns.push(`집계 사이트 규칙(collector/link-fix.mjs)을 불러오지 못했습니다: ${e.message.slice(0, 80)}`); }
+  errors.push(...SR.auditSourceFiles(readCfg, { served, aggregator }));
 }
 
 /* ── 원문 링크 (2026-10-03 · 원문 대신 재단 홈페이지·게시판 목록이 열리던 사고) ──────────

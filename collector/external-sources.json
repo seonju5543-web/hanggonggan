@@ -934,13 +934,6 @@
    }
   },
   {
-   "host": "한국고등교육재단",
-   "home": "https://www.kfas.or.kr/",
-   "boardUrl": "https://www.kfas.or.kr/bbs/board.php?bo_table=kfas_whats_new",
-   "seed": "web-search",
-   "evidence": "웹 검색 2026-09-29: \"모집 요강 — kfas.or.kr/bbs/board.php?bo_table=kfas_whats_new&wr_id=87\" · 해외유학후보장학생"
-  },
-  {
    "host": "한국장학재단 공지",
    "home": "https://www.kosaf.go.kr/",
    "boardUrl": "https://www.kosaf.go.kr/ko/notice.do",
@@ -994,5 +987,15 @@
   }
  ],
  "_parked": "쓰지 않게 된 곳은 지우지 말고 여기로 옮긴다(schools.json 의 parked 와 같은 규칙). 되돌리려면 항목을 위 sources 로 옮기면 된다.",
- "parked": []
+ "parked": [
+  {
+   "host": "한국고등교육재단",
+   "home": "https://www.kfas.or.kr/",
+   "boardUrl": "https://www.kfas.or.kr/bbs/board.php?bo_table=kfas_whats_new",
+   "seed": "web-search",
+   "evidence": "웹 검색 2026-09-29: \"모집 요강 — kfas.or.kr/bbs/board.php?bo_table=kfas_whats_new&wr_id=87\" · 해외유학후보장학생",
+   "parkedAt": "2026-10-05",
+   "_why": "2026-10-05 점검(api-09 · 결정: robots.txt 정책은 그대로 지킨다) — 수집 리포트(10-05)에서 ⛔ robots.txt 가 막아 둔 주소라 읽지 않았다. robots.mjs 별표 해석을 고친(10-04) 뒤에도 그대로라 보관한다. 되돌리려면 robots.txt 가 이 게시판을 열었는지 확인한 뒤 sources 로 옮긴다."
+  }
+ ]
 }

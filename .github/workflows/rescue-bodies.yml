@@ -74,6 +74,8 @@ jobs:
         env:
           RESCUE_BUDGET_MS: '540000'   # 9분(2026-10-04 12→9 · 대외활동 단계 몫) — 못 끝낸 것은 다음 실행이 이어서 한다
           RESCUE_CAP: ${{ inputs.cap || '50' }}   # 25→50 (2026-10-04 실측: 25건에 약 5분 · 예산 9분) — 예산이 먼저 멈추고 한 페이지 60초 시한이 있어 넘치지 않는다
+          # 감시 타이머(RESCUE_WATCHDOG_MS)는 따로 안 적는다 — 로봇이 예산 + 한 공고 시한 + 30초 = 10분 30초로 잡아 이 단계 시한(11분) 전에
+          # 스스로 저장하고 종료 코드 1 로 끝낸다(2026-10-04 리뷰 R2 · 고아 node 가 관문·저장 단계와 같은 때에 파일을 고치지 않게)
         run: node collector/rescue-bodies.mjs --write
 
       # 데이터 관문은 저장 직전에 둔다 (이슈 #79의 교훈)
@@ -92,8 +94,8 @@ jobs:
           pip install olefile --quiet
           python3 collector/hwp-bodytext.py collector/act-files || true
           sudo apt-get install -y -qq poppler-utils
-          pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3   # 🔴 판 고정 — 3.3.x 는 x86 CPU 에서 첫 그림부터 ConvertPirAttribute2RuntimeAttribute 오류(2026-10-04 첫 클라우드 실행 · PaddleOCR discussions 17350)
-          python3 collector/paddle-ocr.py collector/act-files --budget-sec=240 || true
+          pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3 || echo "::warning::PaddleOCR 설치 실패 — 아래 읽기가 엔진 없음으로 적고 HWP·본문으로만 계속"   # 🔴 실패를 삼키지도, 경고 없이 떼지도 말 것 — 떼면 같은 단계의 --apply 가 bash -e 에 끊겨 HWP 로 읽은 자격까지 버려진다(2026-10-04 점검 gaps-02) · 🔴 판 고정 — 3.3.x 는 x86 CPU 에서 첫 그림부터 ConvertPirAttribute2RuntimeAttribute 오류(2026-10-04 첫 클라우드 실행 · PaddleOCR discussions 17350)
+          python3 collector/paddle-ocr.py collector/act-files --budget-sec=240 || echo "::warning::PaddleOCR 실패 — 자격 읽기는 HWP·본문으로만 계속(엔진 고장이면 그 글의 기회는 --apply 가 되돌린다)"
       - name: 대외활동 — 자격 고르기 (자기 장부에만)
         timeout-minutes: 2
         continue-on-error: true
@@ -106,10 +108,12 @@ jobs:
         run: |
           node verify/test-collector.mjs
           node verify/audit-data.js
+      # 🔴 장부(rescue-ledger.json)도 함께 되돌린다 (2026-10-04 점검 bodies-12) — 본문 확보는 장부에 '확보한 날'로 남는데(이레 쉼),
+      #    본문만 되돌리고 장부를 남기면 그 공고를 이레 동안 아무도 안 연다. 대외활동 장부·리포트는 남긴다('해 봤다'와 진단 기록).
       - name: 관문에 걸리면 되돌린다
         if: steps.audit.outcome == 'failure'
         run: |
-          git checkout -- collector/extracted/browser-bodies.json data/registered.json || true
+          git checkout -- collector/extracted/browser-bodies.json data/registered.json collector/rescue-ledger.json || true
           echo "::error::재수집 결과가 감사를 통과하지 못했습니다. 되돌렸습니다."
           exit 1
 
@@ -143,8 +147,22 @@ jobs:
             echo "::notice::새로 확보한 본문이 없습니다."
           fi
 
+      # 🔴 재수집 단계가 끝까지 못 갔으면 작업을 실패로 남긴다 (2026-10-04 점검 bodies-2).
+      #    그 단계는 continue-on-error 라(아래 대외활동·관문·저장이 돌아야 한다) 단계 시한(11분)에 잘려도 작업은 '성공'이었다 —
+      #    run #53 은 장학 본문 0건인데 초록불이었고, 실패 알림도 안 갔고, 하트비트도 성공으로 셌다.
+      #    저장 **뒤**에 둔다(저장은 이미 끝났다) · 바로 아래 알림이 failure() 로 이슈를 만든다.
+      - name: 본문 재수집 단계가 끝까지 못 갔으면 실패로 남긴다
+        if: steps.rescue.outcome != 'success'
+        timeout-minutes: 1
+        run: |
+          echo "::error::본문 재수집 단계가 '${{ steps.rescue.outcome }}' 로 끝났습니다 — 감시 타이머에 멈췄거나 · 단계 시한(11분)에 잘렸거나 · 로봇이 넘어졌을 수 있습니다(어느 것인지는 위 단계 로그에). 그때까지 받은 것은 위에서 저장했습니다."
+          exit 1
+
       # 🔴 `if: failure()` 만 쓰면 안 된다 — 시간 초과는 '실패'가 아니라 '취소'라
       #    알림 단계까지 통째로 건너뛴다 (2026-08-04 사고).
+      # 🔴 저장소의 리포트가 **이번 실행 것**일 때만 붙인다 (2026-10-04 점검 bodies-7) — 리포트를 쓰기 전에 끊긴 실행이
+      #    9-30 판 리포트를 10-03 실패 이슈에 붙여, 실제로는 넷째 공고에서 멈춘 것을 '경희대 공고들이 4회째 본문 없음'처럼 읽게 했다.
+      # 🔴 원인을 단정하지 않는다 (리뷰 R3 · CLAUDE.md 매 세션 5) — 크롬 설치가 실패하면 재수집 단계는 돌지도 않는다. 갈래는 '예'로 열어 두고 로그로 보낸다.
       - name: 실패하면 이슈로 알린다
         if: failure() || cancelled()
         continue-on-error: true
@@ -152,11 +170,39 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            let body = '(리포트 없음)';
-            try { body = fs.readFileSync('collector/rescue-report.md', 'utf8').slice(0, 8000); } catch {}
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);   // 리포트의 '실행:' 은 한국 날짜다
+            let report = '';
+            try { report = fs.readFileSync('collector/rescue-report.md', 'utf8'); } catch {}
+            const day = (report.match(/^실행: (\d{4}-\d{2}-\d{2})/m) || [])[1];
+            const none = '재수집 단계가 리포트를 쓰기 전에 끊겼거나 돌지 않았습니다 — 실행 로그를 보세요';
+            const part = !report ? [`(이번 실행의 리포트가 없습니다 — ${none})`]
+              : day !== today ? [`(이번 실행의 리포트가 없습니다 — ${none}. 저장소의 리포트는 ${day || '날짜 모름'} 판이라 붙이지 않았습니다)`]
+              : ['```', report.slice(0, 8000), '```'];
             await github.rest.issues.create({
               owner: context.repo.owner, repo: context.repo.repo,
               labels: ['rescue-bodies'],
-              title: `🚨 자격요건 로봇 (진짜 브라우저) 실패 — ${new Date().toISOString().slice(0, 10)}`,
-              body: ['재수집이 실패하거나 시간 초과로 취소됐습니다.', '', '```', body, '```'].join('\n'),
+              title: `🚨 자격요건 로봇 (진짜 브라우저) 실패 — ${today}`,
+              body: ['자격요건 로봇이 끝까지 성공하지 못했습니다. 예: 진짜 크롬 설치 실패 · 재수집 단계가 감시 타이머에 멈춤·시한에 잘림·넘어짐 · 데이터 관문 · 저장 실패 · 작업 시한 취소 등 — 어느 것인지는 실행 로그에 있습니다.',
+                `실행 로그: ${runUrl}`, '', ...part].join('\n'),
             });
+
+      # 끝까지 돈 실행은 옛 실패 이슈를 닫는다 (2026-10-04 점검 bodies-7 — 09-04·…·10-03 실패 이슈가 다 열려 있어 어느 것이 지금 일인지 알 수 없었다).
+      # 🔴 success() 일 때만 — 실패한 실행이 실패 이슈를 닫으면 안 된다. robot-heartbeat.yml '옛 경보를 닫는다'처럼 코멘트를 남기고 닫는다.
+      - name: 성공하면 옛 실패 이슈를 닫는다
+        if: success()
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const open = await github.paginate(github.rest.issues.listForRepo, {
+              owner: context.repo.owner, repo: context.repo.repo, labels: 'rescue-bodies', state: 'open', per_page: 100,
+            });
+            for (const is of open.filter((x) => !x.pull_request)) {
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: is.number,
+                body: `다음 실행(${runUrl})이 끝까지 돌아 닫습니다.` });
+              await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo, issue_number: is.number,
+                state: 'closed', state_reason: 'completed' });
+            }

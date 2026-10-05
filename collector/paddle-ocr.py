@@ -16,7 +16,13 @@
 # 예산 안에서 스스로 끝낸다(--budget-sec) · 이미 읽은 그림(.ocr.txt 있음)은 건너뛴다.
 #
 # PDF 공고문도 읽는다 — 쪽을 그림으로 바꿔(pdftoppm · poppler-utils) 같은 모델로(2026-10-03 · 서울문화포털 글은 자격이 「[공고문] ….pdf」 에만 있다).
+# 🔴 엔진이 통째로 고장 나면 **소리 낸다** (2026-10-04 점검 gaps-02) — 첫 클라우드 실행들에서 모든 그림이 같은 오류
+#   (ConvertPirAttribute2RuntimeAttribute)로 '끝 — 0장'이었는데 워크플로의 `|| true` 가 삼켜 초록불이었고, 그 사이 글마다
+#   두 번뿐인 무료 기회(activity-docs.mjs MAX_TRIES)가 하나씩 깎였다. 그래서 ① 읽을 파일이 있었는데 하나도 못 읽고 실패가 있으면
+#   ::warning:: 을 찍고 종료 코드 2 ② 결과를 폴더의 paddle-status.json 에 남긴다 { engineFailed, ok:[파일], failed:[파일], error } —
+#   activity-docs.mjs --apply 가 이걸 읽어, OCR 이 실패한 파일 때문에 자격을 못 찾은 글의 기회를 되돌려 준다.
 # 실행: python3 collector/paddle-ocr.py collector/act-files --budget-sec=150
+import json
 import os
 import sys
 import time
@@ -52,28 +58,56 @@ def lines_of(result):
     return [' '.join(t for _, t in sorted(r['parts'])) for r in rows]
 
 
+STATUS = 'paddle-status.json'   # 이번 실행 결과 — activity-docs.mjs --apply 가 읽는다(머리말 🔴)
+
+
+def write_status(folder, engine_failed, ok, failed, error=''):
+    try:
+        with open(os.path.join(folder, STATUS), 'w', encoding='utf-8') as out:
+            json.dump({'engineFailed': engine_failed, 'ok': ok, 'failed': failed, 'error': error[:200]},
+                      out, ensure_ascii=False, indent=1)
+    except OSError:
+        pass
+
+
+def engine_broken(ok, failed):
+    """읽을 파일이 있었는데 하나도 못 읽었고 실패가 있다 = 엔진 고장이다(그림 탓이 아니다)."""
+    return bool(failed) and not ok
+
+
+def warn_engine(failed, error):
+    print(f'::warning::PaddleOCR 엔진 오류 — {len(failed)}개 모두 실패: {error[:80]}')
+
+
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith('--')]
     budget = next((int(a.split('=')[1]) for a in sys.argv[1:] if a.startswith('--budget-sec=')), 150)
     folder = args[0] if args else 'collector/act-files'
     if not os.path.isdir(folder):
         print(f'{folder} 없음 — 건너뜁니다')
-        return
+        return 0
     todo = sorted(f for f in os.listdir(folder)
                   if f.lower().endswith(IMAGE_EXT + ('.pdf',)) and not os.path.exists(os.path.join(folder, f + '.ocr.txt')))
     if not todo:
+        write_status(folder, False, [], [])
         print('읽을 그림 없음')
-        return
+        return 0
     deadline = time.time() + budget
     os.environ.setdefault('PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK', 'True')
-    from paddleocr import PaddleOCR
-    from PIL import Image
-    ocr = PaddleOCR(text_detection_model_name='PP-OCRv5_mobile_det', text_recognition_model_name='korean_PP-OCRv5_mobile_rec',
-                    use_doc_orientation_classify=False, use_doc_unwarping=False, use_textline_orientation=False)
-    done = 0
+    try:
+        from paddleocr import PaddleOCR
+        from PIL import Image
+        ocr = PaddleOCR(text_detection_model_name='PP-OCRv5_mobile_det', text_recognition_model_name='korean_PP-OCRv5_mobile_rec',
+                        use_doc_orientation_classify=False, use_doc_unwarping=False, use_textline_orientation=False)
+    except Exception as e:  # 설치 실패·모델을 못 받음 — 엔진이 없다(그림 탓이 아니다)
+        err = f'{type(e).__name__}: {e}'
+        write_status(folder, True, [], todo, err)
+        warn_engine(todo, err)
+        return 2
+    ok, failed, first_err = [], [], ''
     for f in todo:
         if time.time() > deadline:
-            print(f'예산 바닥 — {done}/{len(todo)}장 읽음 · 나머지는 다음 실행')
+            print(f'예산 바닥 — {len(ok)}/{len(todo)}장 읽음 · 나머지는 다음 실행')
             break
         path = os.path.join(folder, f)
         try:
@@ -94,13 +128,21 @@ def main():
                 lines += lines_of(ocr.predict(tmp))
         except Exception as e:  # 그림 하나가 깨져도 나머지는 읽는다
             print(f'✕ {f} — {str(e)[:120]}')
+            failed.append(f)
+            first_err = first_err or str(e)
             continue
         with open(path + '.ocr.txt', 'w', encoding='utf-8') as out:
             out.write('\n'.join(lines) + '\n')
-        done += 1
+        ok.append(f)
         print(f'✓ {f} — {len(lines)}줄')
-    print(f'끝 — {done}장')
+    print(f'끝 — {len(ok)}장')
+    broken = engine_broken(ok, failed)
+    write_status(folder, broken, ok, failed, first_err)
+    if broken:
+        warn_engine(failed, first_err)
+        return 2
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

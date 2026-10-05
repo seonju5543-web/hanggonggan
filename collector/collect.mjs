@@ -10,9 +10,9 @@
 import fs from 'node:fs';
 import { deadlineHintFrom } from './deadline-hint.mjs';
 import { FETCH_HEADERS } from './http-headers.mjs';
-import { urlKey, dedupeNotices, capNotices } from './url-key.mjs';
+import { urlKey, dedupeNotices, capNotices, rekeyLedger } from './url-key.mjs';
 import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mjs';
-import { publishBySchool, dropUnserved, healFromLedger, readSchoolFiles, zeroFeedSchools } from './publish-notices.mjs';
+import { publishBySchool, dropUnserved, healFromLedger, readSchoolFiles, zeroFeedSchools, zeroFeedWhy } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry } from './clean-title.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
@@ -25,11 +25,13 @@ import { tidyExternal, dropReason as externalDropReason } from './external-clean
 import { canonUrl } from './canon-url.mjs';
 import { fetchBoard, netReason } from './fetch-board.mjs';
 import { NEWS_BOARD_RULES } from './news-board-rules.mjs';
+import { updateSourceHealth, staleSourcesLine } from './source-health.mjs';
 import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from './harvest-budget.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfg = JSON.parse(fs.readFileSync(new URL('schools.json', HERE), 'utf8'));
-/* 브라우저 로봇도 읽는 학교 — 🟡 이 반복되면 담당을 옮기라고 리포트에 적기 위해서만 읽는다(수집 대상은 안 바꾼다) */
+/* 브라우저 로봇도 읽는 학교 — 리포트에 적기 위해서만 읽는다(수집 대상은 안 바꾼다): 🟡 이 반복되면 담당을 옮기라고 · 화면 0건 학교의 까닭을
+   '게시판 주소 없음'이라 잘못 적지 않게(schools.json 주소가 비어도 브라우저 로봇이 읽는 학교 · publish-notices.mjs zeroFeedWhy) */
 const browserSchools = new Set((() => { try { return JSON.parse(fs.readFileSync(new URL('browser-targets.json', HERE), 'utf8')).targets.map((t) => t.school); } catch { return []; } })());
 
 /* ── 시간 예산 · 학교별 절대 시한 · 순서 회전 (2026-09-29 신설 — 수집망을 2 → 44개교로 되살리면서) ──
@@ -57,6 +59,7 @@ try { cursor = JSON.parse(fs.readFileSync(cursorPath, 'utf8')); } catch { /* 첫
 const seenPath = new URL('seen.json', HERE);
 let seen = {};
 try { seen = JSON.parse(fs.readFileSync(seenPath, 'utf8')); } catch { /* 첫 실행 */ }
+rekeyLedger(seen);   // 열쇠 규칙(urlKey)이 바뀌었으면 옛 열쇠를 새 열쇠로 잇는다 — 안 하면 그 게시판 글이 통째로 다시 '새 글' (2026-10-05 점검 B6)
 
 const noticesPath = new URL('../data/notices.json', HERE);
 let notices = { updatedAt: null, items: [] };
@@ -78,6 +81,7 @@ try { actCfg = JSON.parse(fs.readFileSync(actCfgPath, 'utf8')); } catch { /* 설
 const seenActPath = new URL('seen-activities.json', HERE);
 let seenAct = {};
 try { seenAct = JSON.parse(fs.readFileSync(seenActPath, 'utf8')); } catch { /* 첫 실행 */ }
+rekeyLedger(seenAct);   // 같은 열쇠 규칙(urlKey)으로 적는 장부 — 위 seen 과 같은 이유
 const actsPath = new URL('../data/activities.json', HERE);
 let acts = { updatedAt: null, items: [] };
 try { acts = JSON.parse(fs.readFileSync(actsPath, 'utf8')); } catch { /* 첫 실행 */ }
@@ -99,6 +103,7 @@ try { extCfg = JSON.parse(fs.readFileSync(extCfgPath, 'utf8')); } catch { /* 설
 const seenExtPath = new URL('seen-external.json', HERE);
 let seenExt = {};
 try { seenExt = JSON.parse(fs.readFileSync(seenExtPath, 'utf8')); } catch { /* 첫 실행 */ }
+rekeyLedger(seenExt);   // 같은 열쇠 규칙(urlKey)으로 적는 장부 — 위 seen 과 같은 이유
 const extPath = new URL('../data/external.json', HERE);
 let ext = { updatedAt: null, items: [] };
 try { ext = JSON.parse(fs.readFileSync(extPath, 'utf8')); } catch { /* 첫 실행 */ }
@@ -323,7 +328,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
   /* 공공·재단 게시판은 robots.txt 가 막은 길이면 읽지 않는다 (2026-09-29 · 4차 리서치 — 접근 제한을 깨고 긁는 것은 불법행위가 될 수 있다).
      학교 게시판(role scholarship)은 지금까지처럼 읽는다. 파일이 없거나 못 받으면 읽어도 된다고 본다(robots.mjs). */
   if ((isAct || isExt) && !(await robotsAllows(s.boardUrl))) {
-    bucket.push({ name, status: '⛔ robots.txt 가 막아 둔 주소 — 읽지 않았습니다 (출처를 바꾸거나 보관하세요)', items: [] });
+    bucket.push({ name, key: s.boardUrl, status: '⛔ robots.txt 가 막아 둔 주소 — 읽지 않았습니다 (출처를 바꾸거나 보관하세요)', items: [] });
     return;
   }
   try {
@@ -335,7 +340,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
       const res = await fetchBoard(s.boardUrl);
       if (ctx.dead) return;   // 시한을 넘겨 버려진 게시판 — 리포트·장부를 더 건드리지 않는다
       if (!res.ok) {
-        bucket.push({ name, status: `⚠️ 접속 실패 (HTTP ${res.status}) — 주소 수정 필요`, items: [] });   // 활동·재단 게시판도 제 표에 (리뷰 2026-09-29)
+        bucket.push({ name, key: s.boardUrl, status: `⚠️ 접속 실패 (HTTP ${res.status}) — 주소 수정 필요`, items: [] });   // 활동·재단 게시판도 제 표에 (리뷰 2026-09-29)
         return;
       }
       rawLinks = extractLinks(await res.text(), s.boardUrl);
@@ -381,6 +386,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
       if (isAct) {
         actResults.push({
           name,
+          key: s.boardUrl,   // 연속 실패 장부(source-health.json)의 열쇠 — 이름은 리포트용이라 바뀔 수 있다
           status: actItems.length ? `✅ 정상 (활동·공모전 ${actItems.length}건 감지)` : '🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요',
           items: freshA,
         });
@@ -412,6 +418,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
       if (ctx.dead) return;
       extResults.push({
         name,
+        key: s.boardUrl,
         status: extItems.length ? `✅ 정상 (장학 공고 ${extItems.length}건 감지)` : '🟡 접속은 되지만 장학 공고를 찾지 못함 — 게시판이 맞는지 확인 필요',
         items: freshE,
       });
@@ -452,7 +459,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
     if (ctx.dead) return;
     // 이유를 그대로 적는다 — ENOTFOUND면 주소가 없는 것이고, TIMEOUT이면 학교가 느린 것이라
     // 해야 할 일이 정반대다. 'TypeError'만 적으면 둘을 구분할 수 없다.
-    bucket.push({ name, status: `⚠️ 오류 (${netReason(e)}) — 주소 확인 필요`, items: [] });
+    bucket.push({ name, key: s.boardUrl, status: `⚠️ 오류 (${netReason(e)}) — 주소 확인 필요`, items: [] });
   }
 }
 
@@ -468,7 +475,7 @@ for (const idx of order) {
      예산 끝에 집은 게시판은 시한(BOARD_HARD_MS)까지 더 돌 수 있으므로 그만큼은 단계 상한이 품는다(리뷰 2026-09-29 · 2026-09-30 조정). */
   if (!budget.hasRoom(MIN_ROOM_MS)) {
     skippedByBudget.push(name);
-    bucketOf(s).push({ name, status: `⏰ 시간 예산(${humanMs(BUDGET_MS)}) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다`, items: [] });
+    bucketOf(s).push({ name, key: s.boardUrl, status: `⏰ 시간 예산(${humanMs(BUDGET_MS)}) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다`, items: [] });
     continue;
   }
   const t0 = Date.now();
@@ -477,7 +484,7 @@ for (const idx of order) {
   const r = await withDeadline(harvestBoard(s, ctx), BOARD_HARD_MS);
   if (r === TIMED_OUT) {
     ctx.dead = true;   // 아직 도는 작업은 결과를 버린다 — 저장이 끝난 뒤 장부·리포트에 끼어들지 못하게
-    bucketOf(s).push({ name, status: `⛔ 응답이 멈춰 ${humanMs(BOARD_HARD_MS)}에서 강제 중단 — 여기까지 주운 공고만 저장합니다`, items: [] });
+    bucketOf(s).push({ name, key: s.boardUrl, status: `⛔ 응답이 멈춰 ${humanMs(BOARD_HARD_MS)}에서 강제 중단 — 여기까지 주운 공고만 저장합니다`, items: [] });
   }
   console.log(`[${Math.round(budget.elapsed() / 1000)}s] ◀ ${name} (${Math.round((Date.now() - t0) / 1000)}초)`);
   doneCount++;
@@ -620,6 +627,15 @@ ext.items = ext.items.slice(0, EXT_CAP);
 ext.updatedAt = notices.updatedAt;
 fs.writeFileSync(extPath, JSON.stringify(ext, null, 1));
 
+/* 대외활동·재단 출처의 연속 실패 장부 (2026-10-05 점검 collect-08 · 규칙은 source-health.mjs 한 곳) — 이 출처들은 health.json 에 넣을 수 없어
+   (prune-health 가 학교 이름이 아닌 열쇠를 지운다) 그동안 '몇 번째 못 읽나'를 아무도 안 셌다. 열쇠는 게시판 주소. 이틀(6회) 넘게 글이 안 들어오면 리포트 머리 🙋 */
+const sourceHealthPath = new URL('source-health.json', HERE);
+let sourceHealth = {};
+try { sourceHealth = JSON.parse(fs.readFileSync(sourceHealthPath, 'utf8')); } catch { /* 첫 실행 */ }
+const { stale: staleSources } = updateSourceHealth(sourceHealth, actResults.concat(extResults).filter((r) => r.key), notices.updatedAt,
+  { live: boards.filter((s) => s.role !== 'scholarship' && s.boardUrl).map((s) => s.boardUrl) });
+fs.writeFileSync(new URL('source-health.json', HERE), JSON.stringify(sourceHealth, null, 1));
+
 /* 컨펌 리포트 */
 const newCount = freshAll.length;
 const today = notices.updatedAt;
@@ -650,19 +666,11 @@ if (skippedByBudget.length) {
 if (healedCount > 0) lines.push(`🔁 학생 화면(학교별 파일)에서도 빠졌던 글 ${healedCount}건을 후보 장부(collector/candidates.json)에서 다시 실었습니다 — 이미 본 글이라 수집으로는 안 돌아오는 글입니다(notices.json 전체 상한에만 잘린 글은 세지 않습니다)`, '');
 if (zeroFeed.length) {
   const schoolOfBoard = new Map(boards.filter((s) => s.role === 'scholarship').map((s) => [boardLabel(s), s.school]));
-  const zeroWhy = (school) => {
-    const rs = results.filter((r) => schoolOfBoard.get(r.name) === school);
-    if (!rs.length) return '이번 일반 수집 기록 없음';
-    return rs.map((r) => {
-      if (/게시판 주소 미설정/.test(r.status)) return '게시판 주소 없음';
-      if (/브라우저 담당/.test(r.status)) return '브라우저 담당 — browser-report 참조';
-      const m = r.status.match(/실공고 (\d+)건 감지/);
-      if (m && !(r.items || []).length) return `게시판 ${m[1]}건 감지 · 모두 전에 본 글`;
-      return r.status.slice(0, 60);
-    }).join(' / ');
-  };
+  const zeroWhy = (school) => zeroFeedWhy(results.filter((r) => schoolOfBoard.get(r.name) === school), { browser: browserSchools.has(school) });
   lines.push(`🙋 서비스 학교인데 앱 실시간 공고 0건 ${zeroFeed.length}곳: ${zeroFeed.map((s) => `${s}(${zeroWhy(s)})`).join(' · ')}`, '');
 }
+/* 이틀 넘게 글이 안 들어오는 대외활동·재단 출처 — 머리에 한 줄(🙋 로 시작해 0건 날 코멘트에도 실린다 · 꼬리의 상태 줄은 이슈 한도에서 잘린다) */
+if (staleSources.length) lines.push(staleSourcesLine(staleSources), '');
 
 /* 🔴 **학교가 늘면 '정식 등록도 학교별로 나눌 때'라고 여기서 말한다** (2026-09-26 개발자 지시:
    *"학교 늘리면 그때 다시 학교별로 나누라고 얘기해줘"*).
@@ -702,7 +710,10 @@ for (const r of results) {
    그래서 일반 수집기 담당 학교(홍익대)가 며칠째 '⚠️ 오류' 한 줄로 조용히 빠져 있어도
    아무도 몰랐다. 한 번 실패는 학교가 잠깐 느린 것이라 저절로 복구되지만,
    **연속 실패는 주소가 바뀐 것**이라 사람이 손을 대야 한다 — 그 구분을 여기서도 한다.
-   장부는 브라우저 수집기와 같은 health.json을 쓴다(학교 이름이 열쇠라 섞이지 않는다). */
+   장부는 브라우저 수집기와 같은 health.json을 쓴다. ⚠️ 두 로봇이 같이 보는 학교는 **같은 줄의 fails 를 같이 쓴다**(학교 이름이 열쇠라
+   섞인다 — 예전 주석의 '섞이지 않는다'는 틀렸다: 서울대는 브라우저가 멈춰 +1, 이 로봇이 ✅ 로 0 → 브라우저 쪽 연속 실패가 3에 영영 안 닿았다).
+   그래서 브라우저 쪽 연속 횟수는 제 칸(browserFails · browserWhy — collector/browser-health.mjs)에 센다. 이 로봇은 fails·lastOk 만 고친다
+   (아래 h 객체의 다른 칸은 건드리지 않는다 · 2026-10-05 점검 B4). */
 const healthPath = new URL('health.json', HERE);
 let health = {};
 try { health = JSON.parse(fs.readFileSync(healthPath, 'utf8')); } catch { /* 첫 실행 */ }

@@ -15,7 +15,7 @@ import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { sameSite } from './board-links.mjs';
 import { NEWS_BOARD_RULES, newsRuleKey, rowsForBoard, verifyRuleDetail, needsDetailCheck, fetchesOwnList, collapseSamePost, newsHidden, newsDistinct } from './news-board-rules.mjs';   // 클릭형 게시판 규칙 한 곳 (찾기 로봇과 같은 것)
-import { urlKey, dedupeNotices } from './url-key.mjs';
+import { urlKey, dedupeNotices, rekeyLedger } from './url-key.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { activityKind } from './activity-kind.mjs';
 import { newsKind, isNewsRow, newsFloor } from './news-kind.mjs';
@@ -52,6 +52,7 @@ try { cursor = JSON.parse(fs.readFileSync(cursorPath, 'utf8')); } catch { /* 첫
 const seenPath = new URL('seen-news.json', HERE);
 let seen = {};
 try { seen = JSON.parse(fs.readFileSync(seenPath, 'utf8')); } catch { /* 첫 실행 */ }
+rekeyLedger(seen);   // 열쇠 규칙(urlKey)이 바뀌었으면 옛 열쇠를 새 열쇠로 잇는다 — 'post:' 열쇠는 그대로 (2026-10-05 점검 B6)
 const healthPath = new URL('news-health.json', HERE);
 let health = {};
 try { health = JSON.parse(fs.readFileSync(healthPath, 'utf8')); } catch { /* 첫 실행 */ }

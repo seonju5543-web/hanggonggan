@@ -57,6 +57,10 @@ const VOLATILE = new Set([
   'sort', 'pageIndex', 'page', 'searchCnd', 'searchWrd', 'cate_id',
   'viewAuth', 'writeAuth', 'board_list_num', 'lpageCount', 'identified',
   'offset', 'rowNum', 'startPage', 'listNo', 'searchKey', 'searchValue',
+  /* 계명대 page.jsp 의 목록 상태 값 (2026-10-05 점검 B6) — pageRef 는 '그때 목록 첫 글의 번호'라 새 글이 올라올 때마다 바뀌어
+     목록 40건이 통째로 '새 글'로 다시 들어왔다(09-30 → 10-02 · 39건 수집일이 덮였다). 글은 parm_bod_uid 가 가리킨다.
+     🔴 canon-url.mjs 의 VOLATILE 에도 같은 이름을 넣는다(두 목록 같은 뜻) · 옛 열쇠로 적힌 장부는 rekeyLedger 가 잇는다. */
+  'pageRef', 'pagePrvNxt', 'pageOrder',
 ]);
 
 export function urlKey(raw) {
@@ -115,6 +119,37 @@ export function clickRowKey(listUrl, title) {
   const t = normTitle(title);
   if (!t) return '';
   return `click:${urlKey(listUrl)}|${t.slice(0, 80)}`;
+}
+
+/* 열쇠 규칙(위 VOLATILE)이 바뀐 뒤 **옛 열쇠로 적힌 장부를 새 열쇠로 잇는다** (2026-10-05 점검 B6).
+   안 이으면 규칙을 바꾼 첫 실행에 그 게시판 글 전부가 한 번 더 '새 글'이 된다(계명 40건 · 소식 20건 실측).
+   열쇠 꼴 셋만 본다 — 맨 주소(seen·seen-news·seen-activities·seen-external) · 'click:<목록>|<제목>'(클릭 장부 · 목록 쪽만 다시) ·
+   'url:<주소>'(소식 썸네일 장부 news-thumb.mjs thumbKey). 그 밖('post:…' 등)은 그대로.
+   새 열쇠가 **없을 때만** 같은 값을 넣는다 · 여러 옛 열쇠가 한 새 열쇠로 모이면 가장 이른 날짜(글자 비교 · 날짜가 아닌 값은 먼저 온 것).
+   옛 열쇠는 지우지 않는다(합집합 병합기가 다른 판에서 되살린다 · 남아도 해가 없다) · 더한 수를 돌려준다 · 두 번 불러도 같다.
+   🔴 새 import 를 더하지 말 것 — url-key.cjs 다리가 이 소스를 그대로 평가한다. */
+export function rekeyKey(k) {
+  const s = String(k || '');
+  const pre = (s.match(/^(click:|url:)(?=https?:\/\/)/) || [''])[0];
+  const rest = s.slice(pre.length);
+  if (!/^https?:\/\//.test(rest)) return s;
+  if (pre === 'click:') {
+    const bar = rest.indexOf('|');
+    return bar < 0 ? s : `click:${urlKey(rest.slice(0, bar))}${rest.slice(bar)}`;
+  }
+  return pre + urlKey(rest);
+}
+export function rekeyLedger(obj) {
+  if (!obj || typeof obj !== 'object') return 0;
+  const add = new Map();
+  for (const [k, v] of Object.entries(obj)) {
+    const nk = rekeyKey(k);
+    if (nk === k || Object.prototype.hasOwnProperty.call(obj, nk)) continue;
+    const prev = add.get(nk);
+    if (prev === undefined || (typeof v === 'string' && typeof prev === 'string' && v < prev)) add.set(nk, v);
+  }
+  for (const [nk, v] of add) obj[nk] = v && typeof v === 'object' && !Array.isArray(v) ? { ...v } : v;   // 썸네일 장부 칸은 객체 — 두 열쇠가 한 객체를 같이 쥐지 않게
+  return add.size;
 }
 
 /* 주소 하나의 순위(작을수록 낫다) — 진짜 주소 0 · HTML 기호가 남은 주소 1 · 목록 표식 2 · 목록 주소+번호 3.

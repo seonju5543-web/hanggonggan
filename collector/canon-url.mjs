@@ -40,7 +40,9 @@
 
 /* 글과 무관한 값 — 정렬·페이지·검색어·표시 방식. 이것만 버린다.
    `url-key.mjs`의 VOLATILE과 같은 뜻이어야 한다(둘이 갈라지면 판정이 어긋난다). */
-const VOLATILE = /^(sort|pageindex|page|pageno|pageunit|nowpage|mode|bbsmode|do|article\.offset|articlelimit|searchcnd|searchwrd|searchkey|searchvalue|searchtype|searchtitle|search_item|search_order|order_list|list_scale|cate_id|viewauth|writeauth|board_list_num|lpagecount|identified|offset|rownum|startpage|listno|allboard|jsessionid)$/i;
+const VOLATILE = /^(sort|pageindex|page|pageno|pageunit|nowpage|mode|bbsmode|do|article\.offset|articlelimit|searchcnd|searchwrd|searchkey|searchvalue|searchtype|searchtitle|search_item|search_order|order_list|list_scale|cate_id|viewauth|writeauth|board_list_num|lpagecount|identified|offset|rownum|startpage|listno|allboard|jsessionid|pageref|pageprvnxt|pageorder)$/i;
+/* ↑ 끝의 셋(pageref·pageprvnxt·pageorder · 2026-10-05 점검 B6)은 계명대 page.jsp 의 목록 상태 값 — url-key.mjs 와 같은 날 같은 이름을 넣었다.
+   ⚠️ idFromUrl(끝 24글자)은 바뀌지 않는다: 정렬 뒤 이 이름들은 가운데에 오고 끝은 srch* 값이다(계명 등록분 실측 변화 0). */
 
 /* 아직 남아 있는 이름 목록 — 이제는 '무엇을 남길까'가 아니라 **글 번호가 확실히 하나는
    잡혔는지** 확인하는 용도로만 쓴다. 다른 곳에서 import해 쓰고 있어 그대로 둔다. */

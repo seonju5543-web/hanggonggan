@@ -22,6 +22,7 @@ import { FETCH_HEADERS } from './http-headers.mjs';
 import { NEWS_BOARD_RULES, newsRuleKey, postContentRequest } from './news-board-rules.mjs';
 import { withDeadline, TIMED_OUT } from './harvest-budget.mjs';
 import * as T from './news-thumb.mjs';
+import { rekeyKey } from './url-key.mjs';
 
 /* NEWS_THUMB_ROOT·NEWS_THUMB_OFFLINE 는 관문용 — 임시 폴더에서 받기(①~③) 없이 소급·정리(④⑤)만 돌려 본다 */
 const ROOT = process.env.NEWS_THUMB_ROOT || fileURLToPath(new URL('..', import.meta.url));
@@ -49,8 +50,18 @@ for (const f of (fs.existsSync(NEWS_DIR) ? fs.readdirSync(NEWS_DIR) : []).filter
 const items = docs.flatMap((d) => d.doc.items);
 const ledger = Object.assign(T.emptyLedger(), readJson(LEDGER_PATH, {}));
 ledger.posts ||= {}; ledger.srcSeen ||= {}; ledger.commonFiles ||= {};
+/* 주소 열쇠 규칙(url-key.mjs urlKey)이 바뀌면 'url:' 열쇠를 새 열쇠로 **옮긴다** (2026-10-05 점검 B6) — 안 옮기면 그 글을 다시 열고,
+   그림 주소 셈(srcSeen)에 옛·새 열쇠가 나란히 들어가 제 사진이 '두 글이 본 공통 그림'으로 막힌다. 수집 장부(seen)와 달리 옛 열쇠를
+   남기지 않는다 — 남기면 같은 사진을 쥔 '다른 글'로 보여 fileTwins 가 공통 그림으로 막는다. 열쇠 규칙은 rekeyKey 한 곳. */
+for (const k of Object.keys(ledger.posts)) {
+  const nk = rekeyKey(k);
+  if (nk === k) continue;
+  if (!ledger.posts[nk]) ledger.posts[nk] = ledger.posts[k];
+  delete ledger.posts[k];
+}
+for (const m of Object.values(ledger.srcSeen)) for (const [src, keys] of Object.entries(m || {})) m[src] = [...new Set((keys || []).map(rekeyKey))];
 const cfg = readJson(CFG_PATH, {});
-const noThumb = new Set(Array.isArray(cfg.noThumb) ? cfg.noThumb : []);
+const noThumb = new Set((Array.isArray(cfg.noThumb) ? cfg.noThumb : []).map(rekeyKey));   // 관리자 「사진 빼기」 열쇠도 같은 규칙으로 (옛 'url:' 열쇠가 새 글 열쇠와 어긋나지 않게)
 /* 전체 스위치 news-config.json "thumbs" — on(기본) · dry(받아서 장부·그림만 두고 **카드에는 안 붙인다** — 처음 켤 때 사람이 그림을 먼저 본다) ·
    off(받지 않고 카드의 사진을 모두 뗀다 · 그림 파일도 지운다 — 틀린 사진이 쏟아질 때 한 번에 끄는 길) */
 const MODE = ['on', 'dry', 'off'].includes(cfg.thumbs) ? cfg.thumbs : 'on';

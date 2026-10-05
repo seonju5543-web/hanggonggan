@@ -158,7 +158,9 @@ function mergeHealth(ours, theirs) {
     if (!o) { out[school] = t; continue; }
     const newer = String(t.lastOk || '') >= String(o.lastOk || '') ? t : o;
     const older = newer === t ? o : t;
-    out[school] = { ...older, ...newer, fails: Math.min(o.fails ?? 0, t.fails ?? 0) };
+    /* 브라우저 쪽 연속 횟수(browserFails · 2026-10-05 collector/browser-health.mjs)도 같은 이유로 작은 쪽 — 한쪽 판에만 있으면 그 값 */
+    const bf = [o.browserFails, t.browserFails].filter((x) => typeof x === 'number');
+    out[school] = { ...older, ...newer, fails: Math.min(o.fails ?? 0, t.fails ?? 0), ...(bf.length ? { browserFails: Math.min(...bf) } : {}) };
   }
   return out;
 }
@@ -288,6 +290,8 @@ const RULES = [
   { match: /(^|\/)seen\.json$/, merge: mergeSeen },
   { match: /(^|\/)pending-forms\.json$/, merge: mergePendingForms },
   { match: /(^|\/)health\.json$/, merge: mergeHealth },
+  /* 대외활동·재단 출처의 연속 실패 장부 (2026-10-05 · collector/source-health.mjs) — 열쇠가 게시판 주소일 뿐 health.json 과 같은 모양 */
+  { match: /(^|\/)source-health\.json$/, merge: mergeHealth },
 ];
 
 function main() {

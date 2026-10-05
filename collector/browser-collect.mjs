@@ -4,16 +4,19 @@
 import fs from 'node:fs';
 import { deadlineHintFrom } from './deadline-hint.mjs';
 import { chromium } from 'playwright';
-import { urlKey, dedupeNotices, capNotices, clickRowKey } from './url-key.mjs';
+import { urlKey, dedupeNotices, capNotices, clickRowKey, rekeyLedger } from './url-key.mjs';
 import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mjs';
 import { publishBySchool, dropUnserved, healFromLedger, readSchoolFiles } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { cleanTitle, isMenuEntry } from './clean-title.mjs';
+import { browserBodyEntry, clickBodyEntry } from './html-text.mjs';
 import { isDetailUrl, rowDetailCandidates, ruleDetailCandidates, sameTitle, observeLanding } from './detail-url.mjs';
 /* 원문 주소 확인은 공용 판정 한 곳(link-landing.mjs judgeLanding) — 링크 사냥꾼·원문 링크 복구와 같은 것 (2026-10-03) */
 import { judgeLanding, stripRowTail } from './link-landing.mjs';
 import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from './harvest-budget.mjs';
+/* 학교별 결과 → 건강 장부 규칙 한 곳 (2026-10-05 점검 B4 — 열렸지만 장학 0건·예산 건너뜀·일반 로봇과 같이 쓰는 장부) */
+import { targetOutcome, applyBrowserHealth, chronicList } from './browser-health.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfg = JSON.parse(fs.readFileSync(new URL('browser-targets.json', HERE), 'utf8'));
@@ -56,6 +59,7 @@ try { cursor = JSON.parse(fs.readFileSync(cursorPath, 'utf8')); } catch { /* 첫
 const seenPath = new URL('seen.json', HERE);
 let seen = {};
 try { seen = JSON.parse(fs.readFileSync(seenPath, 'utf8')); } catch { /* 첫 실행 */ }
+rekeyLedger(seen);   // 열쇠 규칙(urlKey)이 바뀌었으면 옛 열쇠를 새 열쇠로 잇는다 — 안 하면 그 게시판 글이 통째로 다시 '새 글' (2026-10-05 점검 B6)
 
 const noticesPath = new URL('../data/notices.json', HERE);
 /* 브라우저가 그린 상세 본문 — 자바스크립트로 그리는 게시판(서강·부산·건국·명지)은
@@ -247,6 +251,7 @@ async function loadPage(url, { attempts = 3, lines = report, retryClosed = 1 } =
         try {
           const els = await page.$$(CLICKABLE);
           if (!els[idx]) continue;
+          const beforeHtml = await page.content().catch(() => '');   // 눌러서 화면이 바뀌었는지 보려고(아래 본문 저장)
           const popupP = ctx.waitForEvent('page', { timeout: 3500 }).catch(() => null);
           const navP = page.waitForNavigation({ timeout: 5000 }).catch(() => null);
           await els[idx].click({ timeout: 4000 });
@@ -338,7 +343,11 @@ async function loadPage(url, { attempts = 3, lines = report, retryClosed = 1 } =
              새로 수집되는 행은 상세 루프가 적는다(그쪽이 '진짜 저장됐다'는 확증). */
           const known = seen[urlKey(recUrl)] || seen[recUrl];
           if (known) seen[clickRowKey(url, title)] = known;
-          clickDetails[title] = { deadlineHint: deadlineHintFrom(dText), attachments: atts };
+          /* 🔴 상세 화면 글자도 본문으로 남긴다 (2026-10-04 점검 B7) — 클릭형 게시판은 아래 상세 방문을 건너뛰어(cd) 본문이 한 번도 저장되지
+             않았다(고려·부산·가천 0건). 추가 페이지 열기 0회. 남의 글을 붙이지 않게 clickBodyEntry 가 '열렸나·이 제목이 있나·목록 아닌가'를 본다. */
+          const opened = !!popup || page.url() !== url || (!!beforeHtml && dHtml !== beforeHtml);
+          const body = clickBodyEntry({ title, html: dHtml, otherTitles: boardRowTitles, opened, at: todayStr });
+          clickDetails[title] = { deadlineHint: deadlineHintFrom(dText), attachments: atts, ...(body ? { body } : {}) };
           if (popup) await popup.close().catch(() => {});
           else if (page.url() !== url) await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 }).catch(() => {});
           else { await page.goBack({ waitUntil: 'domcontentloaded', timeout: 10000 }).catch(() => {}); }
@@ -410,9 +419,11 @@ const report = [`## 🖥 브라우저형 수집 리포트 (${new Date(Date.now()
 const freshAll = [];
 
 async function harvestTarget(t, report) {
-  let harvested = false;
   let loadedAny = false; // 후보 주소 중 하나라도 열렸는지 (전부 실패 = 그 학교 이번 실행 누락)
-  for (const url of t.candidates) {
+  /* 후보 주소 하나라도 '읽혔나' — 장학 공고를 알아봤거나, 이미 아는 공고라 건너뛴 행이 있으면 읽은 것이다 (2026-10-05 점검 B4).
+     열리기만 하고 장학 공고를 하나도 못 알아본 학교는 건강 장부에 '열렸지만 장학 공고 0건'으로 센다(browser-health.mjs). */
+  let worked = false;
+  for (const [ci, url] of t.candidates.entries()) {
     // 전역 예산이 다 됐으면 남은 후보 주소는 포기 — 여기서 멈춰야 저장 단계까지 갈 수 있다
     if (budget.expired()) { report.push('- ⏱ 시간 예산 초과 — 남은 후보 주소 건너뜀'); break; }
     const r = await loadPage(url, { lines: report });
@@ -444,9 +455,16 @@ async function harvestTarget(t, report) {
         .map((l) => [l.title, l])).values()].slice(0, 10);
       sample.forEach((s) => report.push(`  - (본 링크) ${s.title.slice(0, 66)}`));
     }
-    if (!uniq.length || harvested) continue;
+    /* 🔴 읽힌 주소가 나오면 남은 후보는 **열지 않는다** (2026-10-05 점검 B10) — 예전엔 수집한 뒤에도 남은 후보를 다 열고(목록·2페이지)
+       읽은 것을 버렸다: 시간만 쓰고, 숙명은 둘째 후보(학교 첫 화면)에서 수상 소식을 '장학'으로 긁어 피드에 실었다.
+       읽히지 않은 후보(0건·오류)만 다음 후보로 넘어간다. 읽혔다 = 장학 공고를 알아봤거나 아는 공고라 건너뛴 행이 있다(B4 의 worked 와 같은 조건). */
+    const read = uniq.length > 0 || r.clickSkipped > 0;
+    if (!read) continue;
+    worked = true;
+    const left = t.candidates.length - 1 - ci;
+    if (left > 0) report.push(`  - ⏭ 남은 후보 ${left}곳은 열지 않음(앞 주소에서 읽었다)`);
+    if (!uniq.length) break;
 
-    harvested = true;
     const fresh = uniq.filter((i) => !seen[i.url] && !seen[urlKey(i.url)]).slice(0, 40);
     /* 상세 방문은 학교당 최대 40건 × 최대 30초라 **한 학교가 20분을 먹을 수 있었다**
        (2026-08-03 시간초과의 가장 큰 원인 — 클릭 채집에만 예산이 있고 여기엔 없었다).
@@ -464,6 +482,7 @@ async function harvestTarget(t, report) {
       if (cd) {
         deadlineHint = cd.deadlineHint;
         attachments = cd.attachments || [];
+        if (cd.body) bodies[it.url] = { ...cd.body };   // 클릭 때 채집한 본문(위 clickBodyEntry) — 표식 주소(#n-)여도 canonUrl 이 그 공고로 잇는다
       } else if (Date.now() - detailStart > detailBudgetMs || budget.expired()) {
       // 예산 초과 — 마감·첨부 없이 목록 정보만으로 담는다 (공고를 놓치는 것보다 낫다)
       if (di === 1 || !detailSkipped) report.push(`  - (상세 방문 예산 초과 — ${di}/${fresh.length}건부터 목록 정보만)`);
@@ -479,10 +498,11 @@ async function harvestTarget(t, report) {
            받아 오는 것은 `L o a d i n g . . .` 껍데기뿐이고, 그 학교 공고는 자격도 마감도
            영영 못 읽었다. 그런데 **이 줄에 이미 브라우저가 그린 진짜 본문이 들어 있다** —
            마감·첨부만 뽑고 버리고 있었을 뿐이다. 저장은 추가 페이지 열기가 0회라
-           시간 예산에 아무 영향이 없다(이 저장소가 세 번 데인 자리라 일부러 확인했다). */
-        if (text.replace(/[^가-힣]/g, '').length >= 120) {
-          bodies[it.url] = { title: it.title, text: text.trim().slice(0, 15000), at: todayStr, via: 'browser' };
-        }
+           시간 예산에 아무 영향이 없다(이 저장소가 세 번 데인 자리라 일부러 확인했다).
+           🔴 저장하는 글자는 **줄을 살린 것**(html-text.mjs browserBodyEntry — 2026-10-04 점검 B7). 위 `text` 는 한 줄로 뭉갠 것이라
+              본문으로 저장하면 발췌기가 200자 넘는 줄을 문장으로 보고 건너뛴다(본문 169건 중 93건이 한 줄이었다). 마감 단서는 예전대로 `text`. */
+        const body = browserBodyEntry({ title: it.title, html: d.html, at: todayStr });
+        if (body) bodies[it.url] = { ...body };
         deadlineHint = deadlineHintFrom(text);
         attachments = d.links
           .filter((l) => /\.(hwp|hwpx|doc|docx|pdf|xls|xlsx)(\?|$)/i.test(l.url) || /download|fileDown/i.test(l.url))
@@ -506,8 +526,9 @@ async function harvestTarget(t, report) {
       freshAll.push(rec);
       report.push(`  - [수집] ${it.title.slice(0, 70)}`);
     }
+    break;   // 읽힌 주소에서 다 담았다 — 남은 후보는 열지 않는다(위 B10)
   }
-  return loadedAny;
+  return { loadedAny, worked };
 }
 
 /* 학교를 몇 곳씩 **동시에** 본다 (2026-08-01).
@@ -534,6 +555,8 @@ const failedTargets = [];
 const targetLines = cfg.targets.map(() => []);   // 학교별 리포트 줄 (원래 순서대로 되돌리려고)
 const skipped = [];
 const hung = [];                                 // 절대 시한에 걸려 강제로 끊은 학교 (2026-08-17)
+const emptyTargets = [];                         // 열렸지만 장학 공고를 하나도 못 알아본 학교 — 재시도하지 않는다(다시 열어도 같다 · 2026-10-05 B4)
+const outcomes = new Map();                      // 학교 이름 → 이번 실행 결과(browser-health.mjs targetOutcome) — 재시도가 덮어쓴다
 /* 시간을 사람 말로 — 450,000을 '8분'으로 반올림하면 리포트가 사실과 어긋난다(실제 7분 30초) */
 const humanMs = (ms) => {
   const s = Math.round(ms / 1000);
@@ -550,6 +573,7 @@ async function harvestWithDeadline(t, lines, name, label = '') {
   const tag = label ? `${label} ${name}` : name;
   console.log(`[${Math.round(budget.elapsed() / 1000)}s] ▶ ${tag}`);
   let ok = false;
+  let worked = false;
   let stalled = false;
   try {
     const r = await withDeadline(harvestTarget(t, lines), TARGET_HARD_MS);
@@ -557,7 +581,8 @@ async function harvestWithDeadline(t, lines, name, label = '') {
       stalled = true;
       lines.push(`- ⛔ 응답이 멈춰 ${humanMs(TARGET_HARD_MS)}에서 강제 중단 — 여기까지 채집한 공고만 저장합니다`);
     } else {
-      ok = r;
+      ok = r.loadedAny;
+      worked = r.worked;
     }
   } catch (e) {
     /* 학교 하나가 예기치 못하게 터져도 실행 전체를 끌고 가면 안 된다 —
@@ -565,9 +590,9 @@ async function harvestWithDeadline(t, lines, name, label = '') {
     lines.push(`- ❌ 예기치 못한 오류(${(e && e.message ? e.message : String(e)).split('\n')[0].slice(0, 80)})`);
   }
   const took = Math.round((Date.now() - t0) / 1000);
-  const verdict = stalled ? '⛔ 응답 멈춤(강제 중단)' : (ok ? '수집' : '실패');
+  const verdict = stalled ? '⛔ 응답 멈춤(강제 중단)' : (ok ? (worked ? '수집' : '열렸지만 장학 0건') : '실패');
   console.log(`[${Math.round(budget.elapsed() / 1000)}s] ◀ ${tag} — ${verdict} (${took}초)`);
-  return { ok, stalled };
+  return { ok, worked, stalled };
 }
 
 /* 이번 실행은 커서 자리부터 시작한다 — 예산에 걸려 잘리는 학교가 매번 같지 않도록 */
@@ -582,6 +607,7 @@ await runPool(order, async (idx) => {
      30초 남았는데 시작하면 어차피 중간에 잘리고 저장 단계도 못 간다 */
   if (!budget.hasRoom(MIN_PER_TARGET_MS)) {
     skipped.push(name);
+    outcomes.set(name, targetOutcome({ skipped: true }));
     lines.push(`### ${name}`, '- ⏱ 시간 예산 초과 — 이번 실행은 건너뜀 (다음 실행이 여기서부터 시작)', '');
     return;
   }
@@ -590,11 +616,13 @@ await runPool(order, async (idx) => {
      리포트는 저장 단계에서야 커밋되므로, 작업이 취소되면 **아무 흔적도 안 남는다**.
      8/5 05:52 실행이 33분을 쓰고 취소됐을 때 로그가 통째로 비어 있어서 어느 학교가
      시간을 먹었는지 알 수 없었다. 실행 로그는 취소돼도 남으므로 여기에 찍어 둔다. */
-  const { ok, stalled } = await harvestWithDeadline(t, lines, name);
+  const { ok, worked, stalled } = await harvestWithDeadline(t, lines, name);
+  outcomes.set(name, targetOutcome({ loadedAny: ok, worked, stalled }));
   /* 멈춘 학교는 **재시도하지 않는다** — 답을 안 주는 서버를 한 번 더 두드려 봐야 시한을
      또 한 번 통째로 쓸 뿐이다. 8/16 08:29 실행이 정확히 그 재시도에서 하루치를 잃었다. */
   if (stalled) hung.push(name);
   else if (!ok) failedTargets.push({ t, name });
+  else if (!worked) emptyTargets.push(name);
   doneCount += 1;
   lines.push('');
 }, PARALLEL);
@@ -627,19 +655,19 @@ if (failedTargets.length && failedTargets.length <= Math.max(1, Math.floor(cfg.t
        절대 시한도 본 수집과 **같은 장치**를 쓴다 — 2026-08-16 08:29 실행은 학교 17곳을
        7분 50초에 다 돌고도 이 재시도(가천대)가 멈춰 18분을 서 있다 강제 종료됐고,
        다 모아 둔 하루치가 통째로 버려졌다. 덤으로 붙는 일이 본 수집을 죽이면 안 된다. */
-    const { ok, stalled } = await harvestWithDeadline(f.t, lines, f.name, '(재시도)');
+    const { ok, worked, stalled } = await harvestWithDeadline(f.t, lines, f.name, '(재시도)');
+    outcomes.set(f.name, targetOutcome({ loadedAny: ok, worked, stalled }));   // 재시도 결과가 이번 실행의 결과다
     if (stalled) hung.push(f.name);
     else if (!ok) stillFailed.push(f.name);
+    else if (!worked) emptyTargets.push(f.name);
     lines.push('');
   }, PARALLEL);
   retryLines.forEach((lines) => lines.forEach((l) => report.push(l)));
 } else if (failedTargets.length && !budget.hasRoom(MIN_PER_TARGET_MS)) {
   report.push('### 🔁 실패 학교 재시도 — ⏱ 시간 예산이 없어 생략 (다음 실행에서 다시 시도)', '');
 }
-/* 멈춘 학교도 '이번 실행에 못 받아온 학교'다 — health.json에 실패로 기록해야
-   연속 3회부터 "주소가 바뀐 것 같다"는 경고가 뜬다. 재시도 분기가 stillFailed를
-   비우고 다시 채우므로, 합치는 것은 그 분기가 끝난 **뒤**여야 한다. */
-stillFailed.push(...hung);
+/* 멈춘 학교도 '이번 실행에 못 받아온 학교'다 — 건강 장부에는 학교별 결과(outcomes · 재시도가 덮어쓴다)로 적는다(아래 applyBrowserHealth).
+   stillFailed 는 이제 리포트의 '접속 실패' 줄에만 쓴다 — 멈춘 학교는 제 줄(⛔)이 따로 있다. */
 
 /* 브라우저 닫기에도 시한을 둔다 — 멈춘 페이지를 안고 있으면 여기서 또 멈출 수 있고,
    그러면 바로 아래 저장을 못 해 지금까지 모은 것이 다시 전부 버려진다. */
@@ -717,44 +745,49 @@ if (skipped.length) {
   report.push(`⏱ **시간 예산으로 건너뛴 학교 ${skipped.length}곳**: ${skipped.join(' · ')}`);
   report.push(`  → 다음 실행은 **${cfg.targets[cursor.next] ? (cfg.targets[cursor.next].school) : '처음'}**부터 시작합니다(하루 2회 실행이라 모든 학교가 하루 안에 한 번은 돕니다).`);
 }
+/* 🔴 원인을 단정하지 않는다 (2026-10-05 점검 B5·B11) — 예전 문구 '학교 서버가 연결만 열어 두고 답을 주지 않아'는 확인한 적 없는 원인이었고
+   (서울대는 같은 시각 일반 로봇이 같은 게시판을 정상으로 읽었다), '약 12시간 뒤'는 예약 간격(실제 약 7·17시간)과 달랐다. 본 것만 적는다. */
 if (hung.length) {
-  report.push(`⛔ **응답이 멈춰 강제로 끊은 학교 ${hung.length}곳**: ${hung.join(' · ')} — 학교 서버가 연결만 열어 두고 답을 주지 않아 ${humanMs(TARGET_HARD_MS)}에서 끊었어요. 끊지 않으면 로봇이 그 자리에 멈춰 서고, 강제 종료되면서 **그날 수집분 전체가 버려집니다**(2026-08-15~17에 3회 연속 그렇게 됐어요). 다음 실행(약 12시간 뒤)에 다시 시도합니다.`);
+  report.push(`⛔ **정한 시한 안에 다 못 읽어 끊은 학교 ${hung.length}곳**: ${hung.join(' · ')} — 정한 시한(${humanMs(TARGET_HARD_MS)}) 안에 이 학교를 다 읽지 못해 끊었어요(어디서 멈췄는지는 실행 로그의 ▶/◀ 줄). 끊지 않으면 로봇이 그 자리에 멈춰 서고, 강제 종료되면서 **그날 수집분 전체가 버려집니다**(2026-08-15~17에 3회 연속 그렇게 됐어요). 다음 예약 실행에 다시 시도합니다.`);
+}
+if (emptyTargets.length) {
+  const names = [...new Set(emptyTargets)];
+  report.push(`⚪ **열렸지만 장학 공고를 하나도 못 알아본 학교 ${names.length}곳**: ${names.join(' · ')} — 게시판 화면은 열렸는데 장학 공고로 보이는 줄이 없었어요(무엇을 봤는지는 위 학교 줄의 '본 링크'·'본 글자').`);
 }
 /* 접속 자체가 안 된 학교는 요약에 따로 적는다 — 리포트 중간의 ❌ 한 줄은 놓치기 쉬웠다.
    (재시도까지 실패해도 다음 실행에서 다시 수집되므로 공고가 영구히 사라지지는 않는다)
 
-   그리고 '몇 번 연속 실패했는지'를 기록해 둔다. 한 번 실패는 학교 서버가 잠깐 느린 것이라
-   다음 실행에서 저절로 복구되지만, 연속으로 실패하면 게시판 주소가 바뀐 것이므로
-   사람이 손을 대야 한다. 이 구분이 없어서 시립대가 며칠씩 조용히 빠져 있었다 (2026-07-30). */
+   그리고 '몇 번 연속 실패했는지'를 기록해 둔다. 한 번 실패는 대개 다음 실행에서 저절로 복구되지만,
+   연속으로 못 읽으면 사람이 손을 대야 한다(주소가 바뀌었는지·봇 차단인지는 정찰로 확인 — 짐작해 적지 않는다).
+   이 구분이 없어서 시립대가 며칠씩 조용히 빠져 있었다 (2026-07-30). */
 const healthPath = new URL('health.json', HERE);
 let health = {};
 try { health = JSON.parse(fs.readFileSync(healthPath, 'utf8')); } catch { /* 첫 실행 */ }
 const runDate = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
-const chronic = [];
-for (const t of cfg.targets) {
+/* 🔴 학교별 결과로 적는다 (2026-10-05 점검 B4 · 규칙은 browser-health.mjs 한 곳) — 예산으로 건너뛴 학교는 건드리지 않고(lastOk 를 오늘로 찍지 않는다),
+   열렸지만 장학 0건인 학교는 실패로 센다. 연속 횟수는 제 칸(browserFails)에 — 일반 로봇이 같은 학교의 fails 를 매 실행 0 으로 되돌려서
+   예전엔 브라우저 쪽 연속 실패가 영영 3에 닿지 않았다. */
+const { chronic } = applyBrowserHealth(health, cfg.targets.map((t) => {
   const name = t.campus && t.campus !== '공통' ? `${t.school} ${t.campus}` : t.school;
-  const h = health[name] || { fails: 0, lastOk: null };
-  if (stillFailed.includes(name)) {
-    h.fails += 1;
-    if (h.fails >= 3) chronic.push(`${name}(${h.fails}회 연속)`);
-  } else {
-    h.fails = 0; h.lastOk = runDate;
-  }
-  health[name] = h;
-}
+  return { name, outcome: outcomes.get(name) || 'skipped' };   // 결과가 없으면(돌지 않았으면) 건드리지 않는다
+}), runDate);
 fs.writeFileSync(healthPath, JSON.stringify(health, null, 1));
 
 if (stillFailed.length) {
   report.push('');
-  report.push(`⚠️ **이번 실행에 접속 실패한 학교: ${stillFailed.join(', ')}** — 학교 서버가 응답하지 않아 이번 회차만 건너뛰었어요. 다음 실행(약 12시간 뒤)에 자동으로 다시 수집합니다.`);
+  report.push(`⚠️ **이번 실행에 접속 실패한 학교: ${stillFailed.join(', ')}** — 게시판을 열지 못했어요(오류 문구는 위 학교 줄). 이번 회차만 건너뛰고 다음 예약 실행에 자동으로 다시 수집합니다.`);
 }
+/* 연속으로 못 읽은 학교는 **리포트 머리**에 (제목 줄 바로 아래) — 꼬리는 이슈 한도(60,000바이트)에서 잘리고, 새 공고가 0건인 날은 리포트 이슈가
+   안 생겨 이 줄이 파일에만 남았다. 그날은 워크플로가 chronic 출력으로 최근 리포트 이슈에 코멘트한다(browser-collect.yml). */
 if (chronic.length) {
-  report.push('');
-  report.push(`🚨 **여러 번 연속 실패한 학교: ${chronic.join(', ')}** — 일시 장애가 아니라 게시판 주소가 바뀌었을 가능성이 큽니다. 해당 학교 학생에게 새 공고가 나가지 않고 있으니 주소 확인이 필요해요(Claude 세션에 "○○대 게시판 주소 확인해줘"라고 지시하면 정찰 도구로 후보를 찾아드려요).`);
+  report.splice(2, 0, `🚨 **여러 번 연속 공고를 못 읽은 학교**: ${chronicList(chronic)} — 게시판 주소 확인이 필요해요(정찰: collector/run-probe.txt). 일반 로봇이 같은 학교를 정상으로 읽고 있으면 browser-targets.json 의 보관(parked)으로 옮기면 됩니다(schools.json _collector 규칙).`, '');
 }
 fs.writeFileSync(new URL('browser-report.md', HERE), report.join('\n'));
 console.log(`browser-collect: ${freshAll.length} new items`);
-if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `new_count=${freshAll.length}\n`);
+if (process.env.GITHUB_OUTPUT) {
+  fs.appendFileSync(process.env.GITHUB_OUTPUT, `new_count=${freshAll.length}\n`);
+  fs.appendFileSync(process.env.GITHUB_OUTPUT, `chronic=${chronicList(chronic).replace(/[\r\n]+/g, ' ')}\n`);   // 한 줄 — 비면 알림 단계가 돌지 않는다
+}
 
 /* 여기서 명시적으로 끝낸다 (2026-08-17).
    강제로 끊은 학교의 브라우저 작업은 **버렸을 뿐 아직 돌고 있을 수 있다**. 그것이 붙잡고

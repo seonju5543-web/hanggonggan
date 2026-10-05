@@ -7,7 +7,10 @@ import { isHtmlPayload } from './attachment-link.mjs';
    "수집기는 받는데 심층 수집은 못 받는" 어긋남이 생긴다 (2026-08-20 신설, 첫머리 주석 참조) */
 import { FETCH_HEADERS } from './http-headers.mjs';
 import { isNoticeDoc } from './attachment-text.mjs';
-import { canonUrl, normTitle, indexTexts, sourceFor, needsFetch } from './notice-source.mjs';
+import { canonUrl, normTitle, indexTexts, sourceFor, needsFetch, fillRetired, fillCounts } from './notice-source.mjs';
+import { makeBudget } from './harvest-budget.mjs';
+/* 자격용 첨부 받기의 '무엇을 받을지'와 파일 이름 표식은 순수 함수 파일 한 곳에 — 이 파일은 불러오는 순간 수집을 시작해 관문이 못 부른다 */
+import { slugOf, pickEligDocTargets } from './elig-attach-plan.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const OUT = new URL('extracted/', HERE);
@@ -85,6 +88,9 @@ try { prev = JSON.parse(fs.readFileSync(new URL('notices-text.json', OUT), 'utf8
 let browserBodies = {};
 try { browserBodies = JSON.parse(fs.readFileSync(new URL('browser-bodies.json', OUT), 'utf8')); } catch { /* 아직 없음 */ }
 const prevIdx = indexTexts(prev, browserBodies);
+/* 물러서기 수(fails·shells)는 **원래 항목**에서 읽는다 (2026-10-04 리뷰 R1 · notice-source.mjs fillCounts 머리말) — prevIdx 는 원래 항목이
+   껍데기면 브라우저 본문을 대신 얹어 그 자리엔 두 칸이 없다. '읽을 본문이 있나'는 그대로 prevIdx 로 본다(브라우저 본문도 본문이다). */
+const prevRaw = new Map(prev.filter((v) => v && v.url).map((v) => [canonUrl(v.url), v]));
 
 let registered = { items: [] };
 try { registered = JSON.parse(fs.readFileSync(new URL('../data/registered.json', HERE), 'utf8')); } catch { /* 없어도 진행 */ }
@@ -114,7 +120,9 @@ for (const it of registered.items) {
    예산 안에서 도는 단계라 그냥 두면 정작 받아야 할 공고를 못 받는다.
    포기하는 게 아니다 — 심층 수집 본편(수동 실행)은 여전히 전부 다시 시도한다(link-hunter와 같은 방침). */
 const GIVE_UP_AFTER = 3;
-const tooManyFails = (src) => FILL && (src?.fails ?? 0) >= GIVE_UP_AFTER;
+/* 🔴 받기 실패뿐 아니라 **받아 왔지만 껍데기**인 것도 센다 (2026-10-04 점검 B8 · notice-source.mjs fillRetired 머리말) —
+   껍데기 110건이 매 실행 맨 앞 자리를 차지해 브라우저 수집의 이 단계가 시한(3분)에 잘렸다. 회전 차례는 두 수를 더해 정한다. */
+const tooManyFails = (src) => FILL && fillRetired(src, GIVE_UP_AFTER);
 
 const FILL_CAP = 120;
 /* 🔴 물러선 주소를 **영영 버리면 안 된다** (2026-08-20 수정).
@@ -131,9 +139,11 @@ const RETRY_SLOTS = Number(process.env.FILL_RETRY_SLOTS || 4);
 const retired = [];
 let todo = [...wanted.values()]
   .filter((n) => {
-    const src = prevIdx.byUrl.get(canonUrl(n.url));
-    if (tooManyFails(src)) { retired.push({ n, fails: src?.fails ?? 0 }); return false; }
-    return !FILL || needsFetch(src, LIMIT);
+    const k = canonUrl(n.url);
+    if (FILL && !needsFetch(prevIdx.byUrl.get(k), LIMIT)) return false;   // 읽을 본문이 있으면(브라우저 본문 포함) 받지도 물러서지도 않는다
+    const raw = prevRaw.get(k);
+    if (tooManyFails(raw)) { retired.push({ n, fails: (raw?.fails ?? 0) + (raw?.shells ?? 0) }); return false; }
+    return true;
   });
 if (FILL && todo.length > FILL_CAP) {
   console.log(`보충 대상 ${todo.length}건 중 ${FILL_CAP}건만 이번에 받는다 (나머지는 다음 실행)`);
@@ -149,8 +159,21 @@ if (FILL && retired.length) {
 }
 console.log(`원문 수집 대상 ${todo.length}건 (수집 목록 ${notices.items.length} + 등록 공고 보충 ${extra}${FILL ? ', 증분 모드' : ''})`);
 
+/* 🔴 **받기 전체에 예산** (2026-10-04 점검 B8 · bodies-12) — 요청마다 시한(8·20초)만 있고 전체 예산이 없어, 증분 모드는 브라우저 수집
+   단계 시한(3분)에 잘려 그날 받은 것을 통째로 버렸고(실행 36803960541), 본편은 340여 건 × 최악 20초면 작업 시한(34분)을 넘길 수 있었다.
+   요청을 **시작하기 전마다** 본다 — 넘으면 멈추고 아래에서 지금까지를 저장한다(못 받은 것은 다음 실행이 받는다).
+   증분: 120초 + 마지막 요청 20초 + 재기·쓰기 < 브라우저 수집 단계 3분 · 일반 수집 단계 5분.
+   본편: 15분 + 첨부 원본(FORMS_BUDGET_MS 6분) + 글자 뽑기·OCR 4분·저장 < 심층 수집 작업 34분. */
+const FETCH_BUDGET_MS = FILL ? Number(process.env.FILL_BUDGET_MS || 120000) : Number(process.env.DEEPFETCH_BUDGET_MS || 15 * 60 * 1000);
+const budget = makeBudget(FETCH_BUDGET_MS);
 const fresh = new Map();
+let tried = 0;
 for (const n of todo) {
+  if (budget.expired()) {
+    console.log(`받기 예산(${Math.round(FETCH_BUDGET_MS / 1000)}초) 도달 — ${tried}/${todo.length}건에서 멈추고 지금까지를 저장한다 (나머지는 다음 실행)`);
+    break;
+  }
+  tried += 1;
   try {
     /* 증분 모드는 매일 수집 워크플로의 예산 안에서 돈다. 안 열리는 학교 하나가 20초씩 붙들면
        상한(120건)에 곱해져 예산을 다 먹고, 그러면 그 실행의 수집분이 통째로 버려진다
@@ -168,14 +191,13 @@ for (const n of todo) {
          받는 무한 반복**이 됐다(2026-08-03, 두 번째 실행이 또 120건을 받아서 발견).
          false를 명시해야 '이건 온전히 받은 것'이라고 다음 실행이 알 수 있다. */
       entry = { text: full.slice(0, LIMIT), cut: full.length > LIMIT, limit: LIMIT };
-    } else entry = { text: `FETCH_FAIL HTTP ${res.status}`, fails: (prevIdx.byUrl.get(canonUrl(n.url))?.fails ?? 0) + 1 };
+    } else entry = { text: `FETCH_FAIL HTTP ${res.status}` };   // 실패 수는 아래(fillCounts)에서 원래 항목으로 센다
     fresh.set(canonUrl(n.url), { title: n.title, school: n.school, campus: n.campus, url: n.url,
       attachments: n.attachments || [], foundAt: n.foundAt, ...entry });
     console.log('text ok:', n.title.slice(0, 40));
   } catch (e) {
     fresh.set(canonUrl(n.url), { title: n.title, school: n.school, url: n.url,
-      text: 'FETCH_ERROR ' + (e.name || e.message),
-      fails: (prevIdx.byUrl.get(canonUrl(n.url))?.fails ?? 0) + 1 });
+      text: 'FETCH_ERROR ' + (e.name || e.message) });
   }
 }
 
@@ -197,6 +219,20 @@ for (const v of prev) {
 let kept = out.size;
 for (const [k, v] of fresh) out.set(k, v);
 const texts = [...out.values()];
+/* 이번에 받은 것의 물러서기 수 — 받기 실패면 fails, 껍데기면 shells 를 하나 더(상대 수는 이어 둔다 · 리뷰 R6). 메뉴 걷기는 원문 전체가
+   있어야 해서 받은 뒤 색인을 한 번 더 잰다(B8 · 실측 0.4초). 브라우저가 그린 본문이 이기면(indexTexts better) 껍데기가 아니다.
+   지난 수는 원래 항목(prevRaw)에서 읽는다(리뷰 R1). 0 이면 칸을 지운다(본문이 오면 처음부터 센다). */
+if (fresh.size) {
+  const nowIdx = indexTexts(texts, browserBodies);
+  let shellCount = 0;
+  for (const [k, v] of fresh) {
+    const c = fillCounts(prevRaw.get(k), v, nowIdx.byUrl.get(k) || v);
+    if (c.fails) v.fails = c.fails; else delete v.fails;
+    if (c.shells) v.shells = c.shells; else delete v.shells;
+    if (c.shells && !/^FETCH_(FAIL|ERROR)/.test(v.text)) shellCount += 1;
+  }
+  if (shellCount) console.log(`받았지만 본문 없는 껍데기 ${shellCount}건 (${GIVE_UP_AFTER}번 이어지면 물러서기 회전으로)`);
+}
 fs.writeFileSync(new URL('notices-text.json', OUT), JSON.stringify(texts, null, 1));
 console.log(`원문 저장 ${texts.length}건 (새로 받음 ${fresh.size} · 이전 것 보존 ${kept} · 버림 ${prev.length - kept})`);
 
@@ -213,13 +249,8 @@ console.log(`done: ${texts.length} texts, ${fi} attachments`);
    '스키마화 대기'로 큐에 남아 있던 공고의 원본이 다음 수집 때 사라져, 다음 세션이 양식을
    만들 수 없었다(2026-07-30 발견 — 도레이·염곡·시립대 원본이 이렇게 유실됨).
    그래서 파일 이름에 공고별 표식을 넣고, 이번에 다시 받는 공고의 파일만 갈아끼운다. */
-/* 파일 이름에 넣는 공고별 표식. **양식 수집과 자격 수집이 같은 규칙을 써야** 한 공고의
-   첨부가 두 벌로 쌓이지 않고, 다시 받을 때 옛 파일이 제대로 갈아끼워진다. */
-function slugOf(title) {
-  let h = 0;
-  for (let i = 0; i < title.length; i++) h = (h * 31 + title.charCodeAt(i)) >>> 0;
-  return h.toString(36).slice(0, 6);
-}
+/* 파일 이름에 넣는 공고별 표식(slugOf)은 elig-attach-plan.mjs 에 있다 — 양식 수집과 자격 수집이 같은 규칙을 써야
+   한 공고의 첨부가 두 벌로 쌓이지 않고, 다시 받을 때 옛 파일이 제대로 갈아끼워진다. */
 
 async function downloadForms() {
   /* 표적은 '제목 앞부분'이라 짧으면 엉뚱한 공고까지 몽땅 걸린다.
@@ -291,8 +322,9 @@ async function downloadForms() {
      ① 스스로 예산(ELIG_BUDGET_MS) 안에 끝낸다 — 시간 초과는 강제 종료라 저장까지 죽는다
      ② 요청마다 시한(20초)을 건다 — 학교가 영영 답을 안 줘도 거기서 멈추지 않는다
      ③ 워크플로에서 timeout-minutes + continue-on-error 로 돈다
-   못 받은 것은 다음 실행이 마저 받는다. 자격을 읽은 공고는 대상에서 빠지므로
-   **같은 파일을 매일 다시 받는 일이 구조적으로 없다.** */
+   못 받은 것은 다음 실행이 마저 받는다.
+   ⚠️ 예전 주석은 '자격을 읽은 공고는 대상에서 빠지므로 같은 파일을 매일 다시 받는 일이 없다'고 했지만, 첨부로도 자격을
+      못 읽은 공고는 계속 대상이라 **매 실행 다시 받고 있었다**(2026-10-04 점검 bodies-3). 이제 받은 그대로인 공고는 건너뛴다(elig-attach-plan.mjs). */
 async function downloadEligDocs() {
   const { createRequire } = await import('node:module');
   const { requirementLines } = createRequire(import.meta.url)('../match-engine.js');
@@ -320,37 +352,38 @@ async function downloadEligDocs() {
      안 걸리므로 여기서 따로 통과시킨다. 무료로는 못 읽지만 AI가 그림째 읽는다.
      실측: 넘기려던 공고 7건 전부에 A4 포스터급 그림이 있었다(최대 5906×8268). */
   const IMG_EXT = /\.(png|jpe?g|gif|webp)$/i;
+  /* 공고 하나에서 고르는 첨부 — 공고문(이름 규칙) 또는 본문 그림, 앞 두 개 */
+  const pickAtts = (it) => (it.attachments || []).filter((a) => a.url && (
+    (OK_EXT.test(a.name || '') && isNoticeDoc(a.name)) || (a.bodyImage && IMG_EXT.test(a.name || '')))).slice(0, 2);
 
-  const targets = [];
-  for (const it of reg.items) {
-    if (it.program || requirementLines(it).length) continue;
-    const atts = (it.attachments || []).filter((a) => a.url && (
-      (OK_EXT.test(a.name || '') && isNoticeDoc(a.name)) || (a.bodyImage && IMG_EXT.test(a.name || ''))));
-    if (atts.length) targets.push({ it, atts: atts.slice(0, 2) });
-    if (targets.length >= MAX_NOTICES) break;
-  }
-  console.log(`자격용 공고문 첨부 대상 ${targets.length}건 (예산 ${Math.round(BUDGET_MS / 1000)}초)`);
-  if (!targets.length) return 0;
-
-  /* 파일 이름 표식은 **등록 공고 이름**으로 만든다 — 양식 수집은 수집 목록의 제목을 쓰므로
-     표식이 서로 달라, 아래 '다시 받는 것만 지우기'가 양식 원본을 건드리지 않는다. */
-  const refreshing = new Set(targets.map((t) => slugOf(t.it.name)));
-  for (const f of fs.readdirSync(OUT)) {
-    const m = f.match(/^elig-([a-z0-9]{1,6})-/);
-    if (m && refreshing.has(m[1])) fs.unlinkSync(new URL(f, OUT));
-  }
   const idxPath = new URL('elig-docs.json', OUT);
   let index = {};
   try { index = JSON.parse(fs.readFileSync(idxPath, 'utf8')); } catch { /* 첫 실행 */ }
-  for (const k of Object.keys(index)) if (refreshing.has(index[k].slug)) delete index[k];
+  const today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);   // 마감은 한국 날짜다
+  /* 🔴 **받은 그대로인 공고는 다시 받지 않는다** (2026-10-04 점검 bodies-3·5 — 규칙은 elig-attach-plan.mjs 머리말).
+     예전엔 앞에서 N건을 매 실행 다시 받으며 파생 글자(.txt·.ocr.txt)까지 지워, 뒤의 공고는 한 번도 안 받혔고 OCR 글자는 발췌 전에 사라졌다. */
+  const { targets, sigOnly, kept } = pickEligDocTargets(reg.items, index, {
+    today, fileExists: (f) => fs.existsSync(new URL(f, OUT)), requirementLines, pickAtts, max: MAX_NOTICES });
+  for (const s of sigOnly) index[s.id].sig = s.sig;   // 서명 칸 전의 옛 색인 — 서명만 채운다
+  console.log(`자격용 공고문 첨부 대상 ${targets.length}건 (받은 그대로라 건너뜀 ${kept}건 · 예산 ${Math.round(BUDGET_MS / 1000)}초)`);
+  if (!targets.length) {
+    if (sigOnly.length) fs.writeFileSync(idxPath, JSON.stringify(index, null, 1));
+    return 0;
+  }
 
   let got = 0;
-  for (const { it, atts } of targets) {
+  for (const { it, atts, sig } of targets) {
     if (Date.now() - startedAt > BUDGET_MS) { console.log('예산 도달 — 나머지는 다음 실행'); break; }
+    /* 파일 이름 표식은 **등록 공고 이름**으로 만든다 — 양식 수집은 수집 목록의 제목을 쓰므로
+       표식이 서로 달라, 아래 '바뀐 것만 지우기'가 양식 원본을 건드리지 않는다. */
     const slug = slugOf(it.name);
+    const prefix = `elig-${slug}-`;
+    const oldNames = fs.readdirSync(OUT).filter((f) => f.startsWith(prefix));   // 원본 + 파생 글자
+    const files = [];
+    let cut = false;
     let ai = 0;
     for (const a of atts) {
-      if (Date.now() - startedAt > BUDGET_MS) break;
+      if (Date.now() - startedAt > BUDGET_MS) { cut = true; break; }
       try {
         const res = await fetch(a.url, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(20000) });
         if (!res.ok) { console.log('elig doc fail', res.status, a.name); continue; }
@@ -366,9 +399,15 @@ async function downloadEligDocs() {
            파일은 멀쩡히 내려받아져 있는데(320KB·1.1MB…) 아무도 못 읽는 상태였다. */
         const ext = (a.name.match(/\.(hwp|hwpx|docx?|pdf|png|jpe?g|gif|webp)$/i) || [, 'bin'])[1].toLowerCase();
         const fname = `elig-${slug}-${ai}.${ext}`;
-        fs.writeFileSync(new URL(fname, OUT), buf);
-        (index[it.id] ||= { slug, files: [] }).files.push(fname);
-        console.log('elig doc ok:', it.id, a.name, buf.length);
+        /* 🔴 받은 바이트가 지금 파일과 같으면 파생 글자(.txt·.body.txt·.ocr.txt)를 지우지 않는다(bodies-5) — 다르면 그 파일의 파생만 지운다 */
+        const target = new URL(fname, OUT);
+        const same = fs.existsSync(target) && fs.readFileSync(target).equals(buf);
+        if (!same) {
+          for (const d of oldNames) if (d.startsWith(`${fname}.`)) fs.rmSync(new URL(d, OUT), { force: true });
+          fs.writeFileSync(target, buf);
+        }
+        files.push(fname);
+        console.log('elig doc ok:', it.id, a.name, buf.length, same ? '(그대로)' : '');
       /* 🔴 오류를 낱말 하나로 뭉개지 말 것 (2026-08-23). `e.name || e.message` 는
          Node fetch 의 연결 실패를 전부 `TypeError` 한 낱말로 줄여 버려, 조선대 공고문
          PDF가 왜 안 받아지는지 알 수 없었다. 진짜 원인은 `cause` 안에 들어 있다
@@ -378,6 +417,19 @@ async function downloadEligDocs() {
           .filter(Boolean).join(' · ').slice(0, 200);
         console.log('elig doc err', a.name, why);
       }
+    }
+    const prev = index[it.id];
+    const miss = (prev && prev.tried && prev.tried.sig === sig ? prev.tried.miss || 0 : 0) + 1;
+    if (files.length) {
+      /* 이번에 안 받은 옛 파일(번호가 줄었거나 확장자가 바뀐 것)과 그 파생 글자는 지운다 · 같은 표식을 쓰던 다른 공고의 색인은 뺀다(파일이 갈렸다) */
+      for (const f of oldNames) if (!files.some((x) => f === x || f.startsWith(`${x}.`))) fs.rmSync(new URL(f, OUT), { force: true });
+      for (const k of Object.keys(index)) if (k !== it.id && index[k].slug === slug) delete index[k];
+      /* 다 받았을 때만 서명을 적는다 — 일부만 받았으면(내려받기 실패·예산) 서명을 비워 다음 실행이 다시 받는다 */
+      index[it.id] = files.length === atts.length ? { slug, files, sig, at: today }
+        : { slug, files, sig: null, at: today, ...(cut ? {} : { tried: { sig, at: today, miss } }) };
+    } else if (!cut) {
+      /* 하나도 못 받았다 — 받아 둔 옛 파일·색인은 그대로 두고(그 글자는 아직 쓸 만하다) 쉬었다 다시 해 본다(elig-attach-plan missWait) */
+      index[it.id] = { ...(prev || { slug, files: [] }), tried: { sig, at: today, miss } };
     }
   }
   fs.writeFileSync(idxPath, JSON.stringify(index, null, 1));

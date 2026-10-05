@@ -53,6 +53,18 @@ export function schoolDomain(boardUrl) {
   } catch { return ''; }
 }
 
+/* 학교의 도메인 — 수집 설정에서 읽는다 (2026-10-05 점검 collect-16 · 판정 로봇 둘이 각자 갖던 사본을 하나로).
+   schools.json 에 그 학교 게시판 주소가 있으면 그것, 없으면(고려·중앙·부산·계명 — 클릭형이라 브라우저 로봇만 읽는다) browser-targets.json
+   targets 의 같은 학교 첫 후보 주소. 둘 다 없으면 ''. 보관(parked) 주소는 보지 않는다 — 쓰지 않게 된 게시판이다.
+   예전엔 schools.json 만 봐서 그 네 학교는 '' 가 되어 학교 이메일 신호(emailIsSchool)를 영영 못 썼다(교내 high 가 mid 에 머물렀다).
+   🔴 순수 함수 — 부르는 쪽이 두 설정의 배열을 넘긴다. */
+export function domainForSchool(school, schools = [], targets = []) {
+  const row = (schools || []).find((x) => x && x.school === school && x.boardUrl);
+  if (row) return schoolDomain(row.boardUrl);
+  const t = (targets || []).find((x) => x && x.school === school && (x.candidates || []).length);
+  return t ? schoolDomain(t.candidates[0]) : '';
+}
+
 /* 제목에 이 학교의 이름표가 있나 — 정식 이름·별칭·짧은 꼴 가운데 하나 (school-names.mjs schoolTokens) */
 export function hasSchoolToken(title, tokens) {
   const t = String(title || '');
