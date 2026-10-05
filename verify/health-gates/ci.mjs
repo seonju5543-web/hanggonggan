@@ -5,6 +5,7 @@
         통째로 안 돌았다 — 그 사이 들어온 토큰 위반(ui-tone 천장 75→76)이 CI 에 한 번도 안 보였다.
    잰다:
      ① 양식 표본 — 표본을 언제·무엇으로 심는가(verify/open-form-sample.cjs · 드라이버와 같은 함수) + 드라이버 배선
+        (배선은 driveAnyLiveForm 몸통을 가짜 page·driveOneForm 으로 **실제로 돌려** 잰다 — `ids.length && …` 로 감싸는 10-04 꼴을 글자로는 못 잡았다)
      ② 화면 검사 워크플로 — 한 곳이 넘어져도 그물이 남는다(실패를 모아 끝에 한 번 · 브라우저 경로 뒤 **모든** 관문 단계 !cancelled() ·
         화면 검사·전 여정은 서버·브라우저 준비가 됐을 때만 · 경보는 failure() 그대로 · 경보 본문은 화면 검사가 돌았는지부터 가른다 — 셸 글을 실제로 돌려 본다)
         · 드라이버 루프도 **셸 글을 실제로 돌린다**(가짜 node·timeout) — 실패를 모으는가 · 20분 예산을 넘으면 남은 이름을 넘기고 실패로 끝나는가
@@ -17,6 +18,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import vm from 'node:vm';
 import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 
@@ -57,12 +59,52 @@ export function stepsOf(yml) {
 
 const read = (root, rel) => fs.readFileSync(new URL(rel, root), 'utf8');
 
-/* 함수 하나의 몸통(주석을 걷어 낸 것) — `async function 이름(` 부터 맨 앞 칸의 `}` 까지 */
-function fnBody(src, name) {
+/* 함수 하나의 원문 — `async function 이름(` 부터 맨 앞 칸의 `}` 까지 */
+function fnSource(src, name) {
   const i = src.indexOf(`async function ${name}(`);
   const j = i < 0 ? -1 : src.indexOf('\n}\n', i);
-  if (j < 0) return '';
-  return src.slice(i, j + 2).replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+  return j < 0 ? '' : src.slice(i, j + 2);
+}
+/* 같은 몸통에서 주석을 걷어 낸 것(줄 세기용) */
+function fnBody(src, name) {
+  return fnSource(src, name).replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+}
+
+/* 드라이버의 driveAnyLiveForm 을 **실제로 돌린다** — 브라우저 없이.
+   page.evaluate 에 넘긴 함수는 vm 안에서 돈다(앱 전역 document·registeredList·FORM_TEMPLATES·renderExplore 를 가짜로 둔다).
+   driveOneForm 은 시나리오가 정한 결과를 돌려주는 가짜 · 표본 고르기는 진짜(open-form-sample.cjs) · console 은 조용히.
+   🔴 드라이버가 page 의 새 기능을 쓰기 시작하면 여기서 빨개진다 — 그때 가짜 page 에 더한다(검사를 무르게 하지 말 것). */
+async function runDriveAny(src, { visible, list, tpl, outcome }) {
+  const code = fnSource(src, 'driveAnyLiveForm');
+  if (!code) return { error: 'driveAnyLiveForm 을 못 찾음' };
+  const st = { visible: [...visible], list: JSON.parse(JSON.stringify(list)), calls: [], rendered: 0 };
+  const sandbox = vm.createContext({
+    document: { querySelectorAll: (sel) => (sel === '#explore-list [data-detail]' ? st.visible.map((id) => ({ dataset: { detail: id } })) : []) },
+    registeredList: st.list,
+    FORM_TEMPLATES: tpl,
+    renderExplore: () => { st.rendered += 1; st.visible = st.list.map((x) => x.id); },
+  });
+  const page = {
+    click: async () => {},
+    waitForTimeout: async () => {},
+    keyboard: { press: async () => {} },
+    evaluate: async (fn, arg) => vm.runInContext(`(${fn})(${arg === undefined ? '' : JSON.stringify(arg)})`, sandbox, { timeout: 2000 }),
+  };
+  const driveOneForm = async (_page, id) => {
+    st.calls.push(id);
+    const r = outcome(id);
+    if (r instanceof Error) throw r;
+    return { id, ...r };
+  };
+  const quiet = { log() {}, warn() {}, error() {} };
+  try {
+    const fn = new Function('driveOneForm', 'shouldPlantSample', 'openFormSample', 'console', `${code}\nreturn driveAnyLiveForm;`)(
+      driveOneForm, shouldPlantSample, openFormSample, quiet);
+    const r = await fn(page);
+    return { ok: !!(r && r.ok), id: r && r.id, calls: st.calls, planted: st.list.some((x) => x && x.id === 'gate-open-form'), rendered: st.rendered };
+  } catch (e) {
+    return { error: String((e && e.message) || e).slice(0, 100), calls: st.calls };
+  }
 }
 
 /* 화면 검사 단계의 셸 글을 **실제로 돌린다** — GitHub 의 기본 셸과 같은 `bash -eo pipefail`.
@@ -150,6 +192,28 @@ export default async function gate(eq, ctx) {
   eq('  실패를 돌려주는 return 은 함수 맨 끝 하나 · `id: null` 로 돌려주는 길이 없다',
     [[...anyBody.matchAll(/\breturn\s*\{[^}]*\bok:\s*false/g)].map((m) => m.index > plantAt), /return\s*\{\s*id:\s*null/.test(anyBody)],
     [[true], false]);
+  /* (2026-10-04 코드 리뷰 2차) 위 줄 세기는 return 꼴만 본다 — 조건을 `if (ids.length && shouldPlantSample(ids, tried)) {` 로 감싸
+     10-04 사고를 그대로 되살려도 · `if (!ids.length) throw …` 를 넣어도 초록불이었다(실측). 그래서 몸통을 **실제로 돌려** 잰다. */
+  const TPL = { f1: { sections: [] } };
+  const A = { id: 'a', formId: 'f1', eligibility: { schoolOnly: '성균관대학교' } };
+  const B = { id: 'b', formId: 'f1', eligibility: {} };
+  const H = { id: 'hufs-only', formId: 'f1', eligibility: { schoolOnly: '한국외국어대학교' } };
+  const LOCKED = { ok: false, why: '신청 버튼 잠김' };
+  const s0 = await runDriveAny(drv, { visible: [], list: [H], tpl: TPL, outcome: (id) => (id === 'gate-open-form' ? { ok: true } : LOCKED) });
+  eq('  (돌려 봄) 보이는 양식 공고가 0장(#390): 다른 학교 양식 공고를 복사한 표본을 심고 · 목록을 다시 그리고 · 그 표본을 몬다',
+    [s0.error || null, s0.ok, s0.id, s0.calls, s0.planted, s0.rendered], [null, true, 'gate-open-form(←hufs-only)', ['gate-open-form'], true, 1]);
+  const s1 = await runDriveAny(drv, { visible: ['a'], list: [A], tpl: TPL, outcome: (id) => (id === 'gate-open-form' ? { ok: true } : LOCKED) });
+  eq('  (돌려 봄) 보이는 후보가 전부 마감(#383): 후보를 먼저 몰고 · 잠겼으면 표본으로',
+    [s1.error || null, s1.ok, s1.id, s1.calls], [null, true, 'gate-open-form(←a)', ['a', 'gate-open-form']]);
+  const s2 = await runDriveAny(drv, { visible: ['a', 'b'], list: [A, B], tpl: TPL, outcome: (id) => (id === 'a' ? LOCKED : id === 'b' ? { ok: false, why: '문서가 비었다' } : { ok: true }) });
+  eq('  (돌려 봄) 잠김 말고 다른 이유로 실패한 후보가 있으면 표본을 심지 않고 실패로 남긴다(진짜 고장을 덮지 않는다)',
+    [s2.error || null, s2.ok, s2.calls, s2.planted], [null, false, ['a', 'b'], false]);
+  const s3 = await runDriveAny(drv, { visible: ['a', 'b'], list: [A, B], tpl: TPL, outcome: (id) => (id === 'a' ? new Error('Timeout 8000ms exceeded') : { ok: true }) });
+  eq('  (돌려 봄) 첫 후보가 예외로 넘어져도 다음 후보를 몬다 · 성공하면 표본을 심지 않는다',
+    [s3.error || null, s3.ok, s3.id, s3.calls, s3.planted], [null, true, 'b', ['a', 'b'], false]);
+  const s4 = await runDriveAny(drv, { visible: [], list: [{ id: 'plain', eligibility: {} }], tpl: {}, outcome: () => ({ ok: true }) });
+  eq('  (돌려 봄) 쓸 양식이 하나도 없으면 아무것도 몰지 않고 실패로 남긴다(빨간불을 지우지 않는다)',
+    [s4.error || null, s4.ok, s4.calls, s4.planted, /표본 없음/.test(s4.id || '')], [null, false, [], false, true]);
 
   /* ── ② 화면 검사 워크플로 — 한 곳이 넘어져도 그물이 남는다 ── */
   const SAMPLE = [
