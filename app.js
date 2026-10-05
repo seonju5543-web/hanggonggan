@@ -384,8 +384,10 @@ function cardTitle(sch) {
 /* 카드 맨 윗줄의 `교외 · 기관명`. 🔴 **제목이 이미 기관명을 담고 있으면 기관명을 뺀다** —
    안 빼면 `교외 · 해석정해영선생장학문화재단` 바로 밑에 `해석정해영선생장학문화재단 해석미술장학생`
    이 와서 같은 이름을 두 번 읽게 된다(2026-09-10에 개발자가 짚은 바로 그 모습).
-   ⚠️ 지우기만 한다 — 아무 글자도 더하지 않는다. 기관명을 못 읽은 공고(`주관 기관 원문 확인`)는
-      제목에 그 글자가 없으니 예전처럼 그대로 뜬다.
+   ⚠️ 지우기만 한다 — 아무 글자도 더하지 않는다.
+   🔴 기관명을 못 읽은 공고(`주관 기관 원문 확인` · 로봇이 적는 '모름' 표시)는 **윗줄에 기관 칸을 안 붙인다** — `교외` 만 (2026-10-05 점검 app1-09).
+      예전엔 `교외 · 주관 기관 원문 확인` 이 그대로 떠 정식 등록 대부분의 카드 윗줄이 앱 내부 사정을 말했다 — 제출처(data.js knownProvider)·
+      지원서 초안(provLead)·도우미는 이미 숨기는 글자다(2026-09-17 지시 "앱 내부 사정은 학생 화면에 안 적는다"). 판정은 아래 `providerUnknown` 한 곳.
 
    🔴 **'카드에 딱 한 번' 을 보장하지는 못한다** (2026-09-21 코드 리뷰가 잡았다 · 실측 5건).
       `한국외대 총동문회` ↔ `총동문회 장학금` 처럼 **이름이 일부만 겹치는** 짝은 그대로 둔다 —
@@ -396,9 +398,11 @@ const bareOrg = (t) => String(t || '').replace(/^(재단법인|사단법인|학�
 /* 기관명 칸에 붙은 꼬리 괄호를 뗀다 — `(재)가송재단 (한국외대 접수)` 의 접수처 표기.
    안 떼면 제목이 `(재)가송재단 장학생 (한국외대 접수, 2026-2학기)` 인데도 겹침을 못 알아본다(실측 3건). */
 const orgBase = (t) => String(t || '').replace(/\s*\([^)]*\)\s*$/, '').trim();
+/* 주관 기관 칸이 비었거나 '모름' 표시(`주관 기관 원문 확인`·`미확인` — auto-register PROVIDER_UNKNOWN)인가 — 카드 윗줄·지원서 초안이 같이 쓴다 */
+const providerUnknown = (v) => !String(v || '').trim() || /원문 확인|미확인/.test(String(v));
 function cardOrgLine(sch) {
   const prov = String(sch.provider || '').trim();
-  if (!prov) return String(sch.type || '');
+  if (providerUnknown(prov)) return String(sch.type || '');
   const title = cardTitle(sch);
   /* ⚠️ `bareOrg(title)` 로도 대조하지 않는다 — 앞머리를 떼는 것은 **없던 조각을 만들지 못하므로**
      `title.includes` 가 이미 하는 일이다(리뷰가 죽은 코드로 짚었고 실측으로도 0건이었다). */
@@ -2137,7 +2141,7 @@ function personLine(p) {
    앱이 모르는 것은 **빼고 쓴다** — 지어내지도, 앱 내부 사정을 학생 글에 흘리지도 않는다. */
 const provLead = (sch) => {
   const v = String((sch && sch.provider) || '').trim();
-  return !v || /원문 확인|미확인/.test(v) ? '' : v + '의 ';
+  return providerUnknown(v) ? '' : v + '의 ';   // '모름' 판정은 카드 윗줄과 같은 providerUnknown 한 곳
 };
 
 function generateEssay(def, sch, p, ans, extra) {

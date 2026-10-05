@@ -7878,11 +7878,12 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   const parts = [
     appJs.match(/const bareOrg = .*\n/),
     appJs.match(/const orgBase = .*\n/),
+    appJs.match(/const providerUnknown = .*\n/),
     appJs.match(/function cardTitle\(sch\) \{[\s\S]*?\n\}\n/),
     appJs.match(/function cleanCardTitle\(name\) \{[\s\S]*?\n\}\n/),
     appJs.match(/function cardOrgLine\(sch\) \{[\s\S]*?\n\}\n/),
   ];
-  eq('cardTitle · cleanCardTitle · cardOrgLine 을 app.js 에서 떼어 냈다', parts.every(Boolean), true);
+  eq('cardTitle · cleanCardTitle · cardOrgLine(+ providerUnknown) 을 app.js 에서 떼어 냈다', parts.every(Boolean), true);
   const src = parts.map((m) => (m ? m[0] : '')).join('\n');
   const [cardTitle, cardOrgLine] = ['cardTitle', 'cardOrgLine'].map((n) => new Function(`${src}\nreturn ${n};`)());
   const t = (name, provider) => cardTitle({ name, provider });
@@ -7909,9 +7910,12 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   eq('  제목에 없으면 예전처럼 붙인다',
     cardOrgLine({ type: '교외', provider: '한국장학재단', name: '대학생 청소년교육지원장학금(대청교) 멘토' }),
     '교외 · 한국장학재단');
-  eq('  기관명을 못 읽은 공고도 예전 그대로',
+  /* 🔴 기관명을 못 읽은 공고는 윗줄에 '모름' 표시를 붙이지 않는다 (2026-10-05 점검 app1-09 · 2026-09-17 지시
+     "앱 내부 사정은 학생 화면에 안 적는다" — 제출처·지원서 초안·도우미는 이미 숨겼고 카드 윗줄만 새고 있었다) */
+  eq('  기관명을 못 읽은 공고는 교내/교외만 (「주관 기관 원문 확인」을 윗줄에 안 쓴다)',
     cardOrgLine({ type: '교외', provider: '주관 기관 원문 확인', name: '2026년 코나아이 소상공인 장학생 모집' }),
-    '교외 · 주관 기관 원문 확인');
+    '교외');
+  eq('    「미확인」 표시도 같다', cardOrgLine({ type: '교외', provider: '주관 기관 미확인', name: '2026년 어느 장학생 모집' }), '교외');
   eq('  provider 가 비면 교내/교외만', cardOrgLine({ type: '교내', provider: '', name: '가족장학금' }), '교내');
   /* 🔴 기관명 칸의 꼬리 괄호(접수처 표기)를 떼고 대조한다 — 안 떼면 통째로 겹치는데도 못 알아본다
      (2026-09-21 코드 리뷰 · 실측 3건: 가송재단 · 양천장학회 · 미래의동반자재단) */
