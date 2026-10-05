@@ -131,13 +131,16 @@ export default async function gate(eq, ctx) {
   const queue = (((/const COLLECTOR_QUEUE = \[([^\]]*)\]/.exec(adminJs)) || [])[1] || '').match(/'([^']+)'/g) || [];
   eq('F4 관리자 화면 COLLECTOR_QUEUE == concurrency group 이 정확히 collector 인 워크플로 (로봇이 줄에 새로 들어오면 화면 목록도 — 둘 다 비면 못 읽은 것)',
     [queue.map((x) => x.slice(1, -1)).sort(), inCollector.length > 1], [inCollector, true]);
-  eq('  보내기 전에 줄을 본다 — applyAction 이 dispatch 앞에서 collectorQueueState 를 부른다',
-    (() => {
-      const a = adminJs.indexOf('async function applyAction(');
-      const seg = adminJs.slice(a, adminJs.indexOf('\n}\n', a));
-      const q = seg.indexOf('collectorQueueState()');
-      return q > 0 && q < seg.indexOf('dispatchWorkflow(');
-    })(), true);
+  /* 함수 몸통에서 줄 확인이 보내기보다 먼저 오는가 — 관리자 조정(applyAction)과 로봇 '지금 실행'(reallyRun) 둘 다 */
+  const checksFirst = (fn) => {
+    const a = adminJs.indexOf(`async function ${fn}(`);
+    if (a < 0) return false;
+    const seg = adminJs.slice(a, adminJs.indexOf('\n}\n', a));
+    const q = seg.indexOf('collectorQueueState()');
+    return q > 0 && q < seg.indexOf('dispatchWorkflow(');
+  };
+  eq('  보내기 전에 줄을 본다 — 관리자 조정(applyAction)·로봇 지금 실행(reallyRun)이 dispatch 앞에서 collectorQueueState 를 부른다',
+    [checksFirst('applyAction'), checksFirst('reallyRun')], [true, true]);
 
   /* ── F6 ⓐ README 감시 목록 ⊇ build.sh 원본 ── */
   const sh = read(root, '_admin/build.sh');

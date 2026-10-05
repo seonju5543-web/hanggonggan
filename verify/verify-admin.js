@@ -963,6 +963,16 @@ function serve() {
     ok(nSent === 0, 'F4 같은 줄에 기다리는 수집 로봇 실행이 있으면 요청을 보내지 않는다', `보낸 횟수 ${nSent}`);
     ok(/줄을 서 있어요/.test(tQ) && /다시 눌러/.test(tQ), '  「줄을 서 있어요 … 다시 눌러 주세요」라고 알린다', tQ.slice(0, 90));
     ok(await idle(), '  작업 잠금이 풀린다');
+    /* 로봇 「지금 실행」도 같은 줄의 로봇이면 같은 확인 — 손으로 깨운 수집 로봇이 줄에서 기다리던 다른 실행을 취소시키지 않게 */
+    nSent = 0;
+    await page.click('.tab[data-tab="robots"]');
+    await page.waitForSelector('#screen-robots:not([hidden])');
+    await page.click('#screen-robots [data-run="collect-scholarships.yml"]');
+    await page.waitForSelector('#sheet:not([hidden]) [data-ask-go]');
+    await page.click('#sheet [data-ask-go]');
+    await page.waitForTimeout(700);
+    const tRb = await jobText();
+    ok(nSent === 0 && /줄을 서 있어요/.test(tRb), '  로봇 「지금 실행」(일반 수집 로봇)도 같은 줄에 기다리는 실행이 있으면 보내지 않는다', `보낸 횟수 ${nSent} · ${tRb.slice(0, 60)}`);
     queueMode = 'running';
     nSent = 0;
     await confirmOne();

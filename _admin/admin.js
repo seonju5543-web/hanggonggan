@@ -508,6 +508,12 @@ async function collectorQueueState() {
   }
 }
 
+/* 줄에 기다리는 실행이 있어 보내지 않을 때의 말 — 관리자 조정·로봇 '지금 실행' 이 같은 문장을 쓴다 */
+function queueBlockedText(label, waiting) {
+  return `${label} — 보내지 않았어요. 같은 줄에 「${waiting.name || runFile(waiting)}」 실행 하나가 줄을 서 있어요. `
+    + '지금 보내면 그 실행이 시작도 전에 취소될 수 있습니다 — 그 실행이 시작된 뒤 다시 눌러 주세요';
+}
+
 /* 방금 띄운 실행을 찾아 끝날 때까지 지켜본다.
    줄을 서 있는 동안(시작 전)은 최대 60분 — 앞선 로봇이 10~15분 돈다. 러너를 잠깐 기다리는 보통 실행도 '대기'로 보이므로
    처음 30초는 4초 간격, 그 뒤는 15초 간격으로 본다. 시작한 뒤에는 지금처럼 약 6분. */
@@ -613,8 +619,7 @@ async function applyAction(action, payload, label) {
     /* 보내기 전에 줄을 본다 — 기다리는 실행이 있으면 이 요청이 그것을 취소시킬 수 있다(admin-F4) */
     const q = await collectorQueueState();
     if (q.waiting) {
-      jobShow(`${label} — 보내지 않았어요. 같은 줄에 「${q.waiting.name || runFile(q.waiting)}」 실행 하나가 줄을 서 있어요. `
-        + '지금 보내면 그 실행이 시작도 전에 취소될 수 있습니다 — 그 실행이 시작된 뒤 다시 눌러 주세요', 'bad', q.waiting.html_url || '');
+      jobShow(queueBlockedText(label, q.waiting), 'bad', q.waiting.html_url || '');
       return false;
     }
     const since = new Date(Date.now() - 15000).toISOString();
@@ -5010,6 +5015,12 @@ async function runCollector(file, label, inputs = {}, extraLines = []) {
 
 async function reallyRun(file, label, inputs = {}) {
   try {
+    /* 수집 대기줄(collector)의 로봇을 손으로 깨울 때도 보내기 전에 줄을 본다 — 관리자 조정과 같은 까닭(admin-F4):
+       새 실행이 줄에서 기다리던 다른 로봇 실행을 시작도 전에 취소시킨다. 읽지 못하면 막지 않는다. */
+    if (COLLECTOR_QUEUE.includes(file)) {
+      const q = await collectorQueueState();
+      if (q.waiting) { jobShow(queueBlockedText(label, q.waiting), 'bad', q.waiting.html_url || ''); return; }
+    }
     jobShow(`${label} 실행을 요청했어요`);
     await dispatchWorkflow(file, inputs);
     jobShow(`${label}을 실행했습니다. 끝나면 새로고침으로 결과를 확인하세요`, 'ok',
