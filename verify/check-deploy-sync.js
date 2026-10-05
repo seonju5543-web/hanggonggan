@@ -6,10 +6,17 @@
  * 어제 것이 그대로 보인다(실제로 7/30~7/31 수집분이 이 상태였다). 이 검사가 그걸 잡는다.
  *
  * 실행: node verify/check-deploy-sync.js        (인터넷 필요 — git fetch)
- * 종료 코드: 0 = 앱에 다 반영됨 / 1 = 아직 배포 안 된 변경 있음
+ * 종료 코드: 0 = 내 쪽에만 있고 main 에 없는 앱 변경이 없음 / 1 = 있음(아직 배포 안 됨)
+ *
+ * 🔴 비교는 **갈라진 뒤 내 쪽에만 생긴 앱 변경**(세 점 `origin/main...HEAD`)으로 한다 (2026-10-05 로봇·도구 점검 · ops-09).
+ *    두 점(`origin/main..HEAD`)은 두 판의 차이 전부라 **main 만 앞선 것**(배포 동기화 로봇이 하루 수십 번 main 을 움직인다)도
+ *    ❌ 로 냈고 `git push origin HEAD:main` 을 권했다(하면 거절된다) → 세션 점검이 거의 늘 거짓 ❌ → 사람이 경고를 무시하게 된다.
+ *    main 만 앞선 것은 (참고)로만 말한다. 앱이 받는 그림 묶음(assets/ — 정문·학교 사진 목록)도 앱 파일이다.
  */
 const { execSync } = require('node:child_process');
 const fs = require('node:fs');
+
+const BASE = 'claude/nice-heisenberg-WESq5';   // 기본 브랜치 — 로봇이 커밋하고 예약 실행이 도는 곳 (check-collab.js 와 같은 값)
 
 const sh = (cmd, allowFail = false) => {
   try { return execSync(cmd, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim(); }
@@ -53,7 +60,7 @@ try {
   const sync = fs.readFileSync('.github/workflows/deploy-sync.yml', 'utf8');
   const watched = (sync.match(/workflows:\s*\[([\s\S]*?)\]/) || [])[1] || '';
   for (const f of fs.readdirSync('.github/workflows')) {
-    if (!/\.ya?ml$/.test(f) || /deploy-sync|main-guard|update-progress|check-live|probe-boards|fetch-page/.test(f)) continue;
+    if (!/\.ya?ml$/.test(f) || /deploy-sync|main-guard|update-progress|check-live|fetch-page/.test(f)) continue;
     const y = fs.readFileSync(`.github/workflows/${f}`, 'utf8');
     /* 앱이 받는 데이터를 커밋하는 워크플로만 대상.
        🔴 **파일 이름을 하나씩 적지 않는다** (2026-09-26). 예전에는 `notices|registered` 둘만
@@ -78,7 +85,8 @@ if (!syncBad) console.log('✅ 배포 동기화가 데이터 로봇 전부를 �
 const APP_PATHS = (() => {
   const path = require('node:path');
   const root = path.join(__dirname, '..');
-  const fixed = ['index.html', 'style.css', 'sw.js', 'manifest.json', 'terms.html', 'data', 'icons'];
+  /* assets — 앱이 받는 정문 사진·학교 대표 사진 목록(app.js 의 assets/gates/gates.json · assets/schools/photos.json)과 그 그림 (ops-09) */
+  const fixed = ['index.html', 'style.css', 'sw.js', 'manifest.json', 'terms.html', 'data', 'icons', 'assets'];
   try {
     const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
     const scripts = [...html.matchAll(/src="([a-z0-9.-]+\.js)"/g)].map((m) => m[1]);
@@ -96,10 +104,22 @@ if (!hasMain) {
 }
 
 const head = sh('git rev-parse --short HEAD');
-const diff = sh(`git diff --stat origin/main..HEAD -- ${APP_PATHS.join(' ')}`, true);
+/* 갈라진 자리(공통 조상)를 먼저 찾는다 — 얕은 클론이면 없다. 그때는 '같음'이라고 말하지 않는다(못 잰 것은 통과가 아니다). */
+const mergeBase = sh('git merge-base origin/main HEAD', true);
+if (!mergeBase) {
+  console.log(`현재 브랜치: ${sh('git rev-parse --abbrev-ref HEAD', true)} (${head})`);
+  console.log('⚠️  main 과 공통 조상을 못 찾아 비교하지 못했습니다 (얕은 클론일 수 있어요) — git fetch --unshallow 뒤 다시 돌리세요.');
+  process.exit(0);
+}
+/* 세 점(...) = 공통 조상 → 내 작업본: **내 쪽에서 바뀐** 앱 파일만. 그중 지금 main 과 글자가 같은 것(같은 내용이 다른 커밋으로 이미 main 에 감)은 뺀다. */
+const changed = sh(`git diff --name-only origin/main...HEAD -- ${APP_PATHS.join(' ')}`, true).split('\n').filter(Boolean);
+const sameAsMain = (f) => { try { execSync(`git diff --quiet origin/main HEAD -- "${f}"`, { stdio: 'ignore' }); return true; } catch { return false; } };
+const mineOnly = changed.filter((f) => !sameAsMain(f));
+const diff = mineOnly.length ? (sh(`git diff --stat origin/main...HEAD -- ${mineOnly.map((f) => `"${f}"`).join(' ')}`, true) || mineOnly.join('\n')) : '';
+const ahead = sh('git rev-list --count origin/main..HEAD', true) || '0';
 const behind = sh('git rev-list --count HEAD..origin/main', true) || '0';
 
-console.log(`현재 브랜치: ${sh('git rev-parse --abbrev-ref HEAD')} (${head})`);
+console.log(`현재 브랜치: ${sh('git rev-parse --abbrev-ref HEAD')} (${head}) · main 보다 앞선 커밋 ${ahead}개 · 뒤처진 커밋 ${behind}개`);
 console.log(`배포 브랜치: main (${sh('git rev-parse --short origin/main')})`);
 
 /* 🔴 main 에 있다 ≠ 학생 앱에 나갔다 (2026-10-04 — main push 셋이 Pages 빌드를 하나도 안 일으켜 홈 새 구역이 두 시간 넘게 안 떴는데
@@ -122,15 +142,16 @@ if (!diff) {
     console.log(pg.status === 'building' ? '   지금 짓는 중이면 1~2분 뒤 다시 보세요.' : `   빌드가 안 일어났습니다. 이렇게 요청하세요:\n   gh api -X POST repos/${pg.repo}/pages/builds`);
     process.exit(1);
   }
-  console.log('\n✅ 앱 파일 기준으로 main과 같음 — 지금 내용이 사용자 앱에 반영되는 상태입니다.' + (pg.skip ? ` (Pages 빌드 확인은 건너뜀 — ${pg.skip})` : ` (Pages 빌드 ${pg.commit} 확인)`));
-  if (behind !== '0') console.log(`   (참고: main에만 있는 커밋 ${behind}개 — 앱 파일 외 변경이라 화면에는 영향 없음)`);
+  console.log('\n✅ 내 쪽에만 있는 앱 변경 없음 — 지금 작업분의 앱 파일은 main(앱)에 들어가 있습니다.' + (pg.skip ? ` (Pages 빌드 확인은 건너뜀 — ${pg.skip})` : ` (Pages 빌드 ${pg.commit} 확인)`));
+  if (behind !== '0') console.log(`   (참고) main 에만 있는 커밋 ${behind}개 — 앱은 이미 그 내용을 보여 줍니다 · 작업본을 맞추려면 git fetch origin && git merge origin/main`);
   process.exit(0);
 }
 
-console.log('\n❌ 아직 앱에 배포되지 않은 변경이 있습니다 (사용자는 이 내용을 볼 수 없어요):\n');
+console.log('\n❌ 내 쪽에만 있고 main(앱)에 없는 앱 파일 변경이 있습니다 (학생은 이 내용을 볼 수 없어요):\n');
 console.log(diff);
 
-/* 사람이 바로 이해할 수 있게 데이터 건수 차이도 보여준다 */
+/* 사람이 바로 이해할 수 있게 데이터 건수 차이도 보여준다 — **갈라진 자리 → 작업본**으로 잰다(내 작업이 바꾼 건수).
+   origin/main 과 견주면 그사이 로봇이 main 에 더한 공고 수가 섞여 '내가 지웠다'처럼 보인다. */
 const count = (ref, file) => {
   try {
     const raw = ref === null
@@ -141,15 +162,21 @@ const count = (ref, file) => {
     return arr.length;
   } catch { return null; }
 };
+const counted = [];
 for (const f of ['data/notices.json', 'data/activities.json', 'data/registered.json', 'data/forms.json']) {
-  const now = count(null, f), live = count('origin/main', f);
-  if (now !== null && live !== null && now !== live) {
-    console.log(`  · ${f}: 앱(main) ${live}건 → 작업본 ${now}건 (${now - live > 0 ? '+' : ''}${now - live})`);
-  }
+  if (!mineOnly.includes(f)) continue;
+  const now = count(null, f), was = count(mergeBase, f);
+  if (now !== null && was !== null && now !== was) counted.push(`  · ${f}: ${was}건 → 작업본 ${now}건 (${now - was > 0 ? '+' : ''}${now - was})`);
 }
+if (counted.length) console.log(`\n내 작업이 바꾼 건수:\n${counted.join('\n')}`);
 
+/* 🔴 main 하나에만 올리라고 권하지 않는다 — 기본 브랜치를 건너뛰면 로봇이 옛 판에서 돌고 다음 배포 동기화가 부딪힌다(CLAUDE.md 「브랜치 · 배포」). */
 console.log(`
-해결: 아래로 main에 올리면 GitHub Pages가 자동 배포하고, 설치된 앱도 재설치 없이 반영됩니다.
-  git push origin HEAD:main
+해결 — CLAUDE.md 「브랜치 · 배포」 대로 세 곳에 같은 내용을 올립니다 (기본 브랜치를 건너뛰고 main 에만 올리지 마세요):${behind !== '0' ? `
+  ⓪ main 이 ${behind}커밋 앞서 있으니 먼저:  git fetch origin && git merge origin/main` : ''}
+  ① 작업 브랜치:  git push origin HEAD
+  ② 기본 브랜치:  git fetch origin && git merge origin/${BASE} 뒤  git push origin HEAD:${BASE}
+  ③ 앱(main):     git fetch origin && git merge origin/main 뒤  git push origin HEAD:main   (GitHub Pages 가 자동 배포)
+  휴대폰·웹 세션(작업 브랜치 하나만 쓰는 세션)은 deploy/run-deploy.txt 의 branch: 줄에 브랜치 이름을 적어 push 하세요.
 (로봇 수집분은 '배포 동기화' 워크플로가 자동으로 올리므로 보통 이 검사는 통과합니다.)`);
 process.exit(1);
