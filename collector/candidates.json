@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-10-05",
- "count": 2105,
+ "count": 2108,
  "items": [
   {
    "title": "일반공지 2026학년도 2학기 학자금대출 신청 안내(~11/17) 신촌/국제",
@@ -471,10 +471,28 @@
    "foundAt": "2026-10-05"
   },
   {
+   "title": "[교외/신청] 2026년 고속도로 장학생 선발",
+   "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%5B%EA%B5%90%EC%99%B8%2F%EC%8B%A0%EC%B2%AD%5D%202026%EB%85%84%20%EA%B3%A0%EC%86%8D%EB%8F%84%EB%A1%9C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서울시립대학교",
+   "campus": "",
+   "foundAt": "2026-10-05"
+  },
+  {
    "title": "[교외/신청] 2026년 인송장학생 선발(음악학과..",
    "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%5B%EA%B5%90%EC%99%B8%2F%EC%8B%A0%EC%B2%AD%5D%202026%EB%85%84%20%EC%9D%B8%EC%86%A1%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C(%EC%9D%8C%EC%95%85%ED%95%99%EA%B3%BC..",
    "attachments": [],
    "deadlineHint": "제출기한 : 10월 15일(목) 17시까지 - 제출방법 : 서식 작성 후 메일 제출(scholarship@uos.ac.kr) - 메일제목 : (",
+   "school": "서울시립대학교",
+   "campus": "",
+   "foundAt": "2026-10-05"
+  },
+  {
+   "title": "[교외/신청] 2026년 2학기 대하장학회 석박사..",
+   "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%5B%EA%B5%90%EC%99%B8%2F%EC%8B%A0%EC%B2%AD%5D%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%EB%8C%80%ED%95%98%EC%9E%A5%ED%95%99%ED%9A%8C%20%EC%84%9D%EB%B0%95%EC%82%AC..",
+   "attachments": [],
+   "deadlineHint": null,
    "school": "서울시립대학교",
    "campus": "",
    "foundAt": "2026-10-05"
@@ -672,6 +690,20 @@
    "title": "[국가/신청] ★2026-2학기 국가장학금 2차 ..",
    "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260812&brdSeq=2&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
    "attachments": [],
+   "deadlineHint": null,
+   "school": "서울시립대학교",
+   "campus": "",
+   "foundAt": "2026-10-05"
+  },
+  {
+   "title": "2026-2학기 주거안정장학금 우선 지원 및 지급..",
+   "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260824&brdSeq=6&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
+   "attachments": [
+    {
+     "name": "2026학년도 주거안정장학금 우선지원 및 지급 제외 기준.pdf",
+     "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260824&brdSeq=6&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&#n-2026%ED%95%99%EB%85%84%EB%8F%84%20%EC%A3%BC%EA%B1%B0%EC%95%88%EC%A0%95%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%9A%B0%EC%84%A0%EC%A7%80%EC%9B%90%20%EB%B0%8F%20%EC%A7%80%EA%B8%89%20%EC%A0%9C%EC%99%B8%20%EA%B8%B0%EC%A4%80.pdf"
+    }
+   ],
    "deadlineHint": null,
    "school": "서울시립대학교",
    "campus": "",
