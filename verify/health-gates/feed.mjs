@@ -9,7 +9,7 @@
            주소로 되돌아가지 않는다(고친 주소 X · 10-03 이 표식으로 바꾼 Y) · 수집기 끝부분과 같은 차례로 두 번·세 번 돌려 잰다
         ⓔ (리뷰 R2) 메운 글 주소의 HTML 기호(&#038;)는 앱과 같은 함수로 되돌린다 · ⓕ (리뷰 R3) 진짜 유실(restored)과 상한에 잘린 글(kept)을 따로 센다
      ② 고아 파일(publishBySchool · app2-F4/collect-12) — 목록에 글이 없는 학교의 옛 파일은 빈 파일로 · 이미 빈 파일·못 읽는 파일·이름이 안 맞는 파일은 그대로
-     ③ 화면 0건 학교(zeroFeedSchools · app2-F2/collect-06) — 리포트 머리 한 줄
+     ③ 화면 0건 학교(zeroFeedSchools · zeroFeedWhy · app2-F2/collect-06) — 리포트 머리 한 줄 · 까닭은 이번 상태 줄에서만(브라우저 학교를 '주소 없음'이라 적지 않는다)
      ④ 누락 감사(coverage-rules coverageSets · classifyMiss inLedger · collect-10 · 리뷰 R4) — 장부에만 남은 글을 '가진 것'으로 세지 않는다
         (가르는 곳은 순수 함수 하나 — 표본으로 잰다 · 감사 스크립트는 그 함수에 장부를 ledger 로만 넘긴다)
      ⑤ 사람이 돌리는 메우기 도구(collector/heal-feed.mjs · collect-01 복구) — 임시 git 저장소에서 사고 직전 커밋을 원천으로 그대로 돌린다
@@ -21,8 +21,8 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
-import { cleanEnv, stripComments } from './gate.mjs';
-import { healFromLedger, publishBySchool, zeroFeedSchools, readSchoolFiles, dropUnserved, FEED_HEAL_SINCE } from '../../collector/publish-notices.mjs';
+import { cleanEnv, stripComments, stripYamlComments } from './gate.mjs';
+import { healFromLedger, publishBySchool, zeroFeedSchools, zeroFeedWhy, readSchoolFiles, dropUnserved, FEED_HEAL_SINCE } from '../../collector/publish-notices.mjs';
 import { dedupeNotices, capNotices, urlKey, titleKey } from '../../collector/url-key.mjs';
 import { classifyMiss, coverageSets, findMissing } from '../../collector/coverage-rules.mjs';
 import { isAttachmentEntry } from '../../collector/attachment-link.mjs';
@@ -88,6 +88,13 @@ export default async function feed(eq, ctx) {
       wide.map((n) => n.foundAt), ['2026-10-01', '2026-09-30', '2026-08-20']);
     eq('  기본 since = 44개교 복원일', FEED_HEAL_SINCE, '2026-09-29');
     eq('  메울 것이 없으면 피드 그대로', healFromLedger([A], [A2], { today: TODAY, served: SERVED }).map((n) => n === A), [true]);
+    /* 차례 — 장부가 오래된 글 먼저여도 결과는 foundAt 내림차순(리뷰 2026-10-05 R2: wide 표본은 장부가 이미 최신순이라 정렬을 지워도 초록이었다).
+       정렬이 없으면 메운 글이 맨 뒤에 붙어 capNotices(학교당 40)가 더 최근 글을 자르고, 앱은 파일 차례대로 그려 맨 아래에 보인다. */
+    const Aold = { school: '경희대학교', title: '2026 차례 표본 지금 글', url: 'https://k.kr/view?id=31', foundAt: '2026-09-25' };
+    const Cold = { school: '건국대학교', title: '2026 차례 표본 오래된 글', url: 'https://kk.kr/v?no=32', foundAt: '2026-08-20' };
+    const Bnew = { school: '건국대학교', title: '2026 차례 표본 새 글', url: 'https://kk.kr/v?no=33', foundAt: '2026-09-30' };
+    eq('  🔴 장부 차례가 [오래된 글, 새 글]이어도 결과는 foundAt 내림차순 (메운 글이 맨 뒤에 붙지 않는다)',
+      healFromLedger([Aold], [Cold, Bnew], { today: TODAY, served: SERVED, since: '0000-00-00' }).map((n) => n.foundAt), ['2026-09-30', '2026-09-25', '2026-08-20']);
     /* 제목은 저장하는 로봇과 같은 청소(cleanTitle)를 거친다 — 장부에는 청소 전 제목이 남아 있다 */
     const dirty = { school: '건국대학교', title: '2026학년도 2학기 성적우수 장학생 선발 안내 학생지원팀 2026-09-30 조회 738', url: 'https://kk.kr/v?no=9', foundAt: '2026-10-02' };
     const cleaned = healFromLedger([], [dirty], { today: TODAY, served: SERVED });
@@ -175,6 +182,32 @@ export default async function feed(eq, ctx) {
     eq('① ⓕ 학교별 파일에도 없던 글(restored) · 학교별 파일에 있던 글(kept)을 따로 센다', counts, { restored: 2, kept: 1 });
   }
 
+  /* ── ① ⓖ 학교별 파일 상한 (리뷰 2026-10-05 R1) ──
+     한 학교 장부 65건(60일 안 · FEED_HEAL_SINCE 뒤) · notices.json 40건(최신). 발행은 학교당 PER_SCHOOL(60)에서 자르는데 메우기가 그걸 모르면
+     1회차에 25건을 '다시 실었다'고 세지만 파일에 드는 것은 20건이고, 2·3회차에도 같은 5건을 매번 '다시 실었다'고 센다(리포트 🔁 거짓). */
+  {
+    const dir = pathToFileURL(fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-feed-perschool-')) + path.sep);
+    const K = '경희대학교';
+    const L = Array.from({ length: 65 }, (_, i) => ({ school: K, title: `2026 상한 표본 장학 공고 ${i + 1}호 선발 안내`, url: `https://k.kr/v?no=${1000 + i}`,
+      foundAt: new Date(TODAY.getTime() - Math.floor(i / 11) * 86400000).toISOString().slice(0, 10) }));   // 10-04 … 09-29 (최신이 앞)
+    const notices0 = L.slice(0, 40).map((n) => ({ ...n }));
+    publishBySchool(notices0, { dir, today: TODAY });
+    const urlsOf = () => (fileItems(dir, K) || []).map((n) => n.url);
+    const before = new Set(urlsOf());
+    const run1 = collectorTail({ dir, today: TODAY, served: SERVED, notices: notices0, ledger: L });
+    const addedToFile = urlsOf().filter((u) => !before.has(u)).length;
+    const run2 = collectorTail({ dir, today: TODAY, served: SERVED, notices: run1.notices, ledger: L });
+    const after2 = urlsOf();
+    const run3 = collectorTail({ dir, today: TODAY, served: SERVED, notices: run2.notices, ledger: L });
+    eq('① ⓖ 🔴 1회차 restored = 학교별 파일에 실제로 더해진 수 (상한 60 밖으로 밀리는 장부 글은 싣지도 세지도 않는다)',
+      [run1.counts.restored, addedToFile, urlsOf().length], [20, 20, 60]);
+    eq('  2·3회차는 restored 0 — 같은 글을 매 실행 \'다시 실었다\'고 세지 않는다 · 파일은 그대로 60건',
+      [run2.counts, run3.counts, after2.length, urlsOf().join() === after2.join()], [{ restored: 0, kept: 20 }, { restored: 0, kept: 20 }, 60, true]);
+    eq('  상한은 발행과 같은 값을 쓴다 (opts.perSchool 로 바꾸면 그만큼만)',
+      [healFromLedger(notices0, L, { today: TODAY, served: SERVED }).length, healFromLedger(notices0, L, { today: TODAY, served: SERVED, perSchool: 45 }).length], [60, 45]);
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+
   /* ── ② 고아 파일 → 빈 파일 ── */
   {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-feed-orphan-'));
@@ -206,8 +239,29 @@ export default async function feed(eq, ctx) {
     const src = stripComments(fs.readFileSync(new URL('collector/collect.mjs', root), 'utf8'));
     const pubAt = src.indexOf('publishBySchool(beforeCap)');
     const zAt = src.indexOf('zeroFeedSchools(beforeCap)');
-    eq('  수집 리포트가 발행 목록으로 재고 머리에 한 줄 적는다 (까닭은 게시판 상태 줄에서)',
-      [pubAt > 0 && zAt > pubAt, /lines\.push\(`🙋 서비스 학교인데 앱 실시간 공고 0건 \$\{zeroFeed\.length\}곳/.test(src), /게시판 주소 미설정/.test(src)], [true, true, true]);
+    eq('  수집 리포트가 발행 목록으로 재고 머리에 한 줄 적는다 (까닭은 zeroFeedWhy 하나 · 브라우저 학교인지 같이 넘긴다)',
+      [pubAt > 0 && zAt > pubAt, /lines\.push\(`🙋 서비스 학교인데 앱 실시간 공고 0건 \$\{zeroFeed\.length\}곳/.test(src),
+        /zeroFeedWhy\(results\.filter\([^;]*\{\s*browser:\s*browserSchools\.has\(school\)\s*\}\)/.test(src)], [true, true, true]);
+    /* 0건 날에도 사람에게 닿는다 (리뷰 2026-10-05 R5) — 리포트 이슈는 새 공고가 있는 날만 생기고, 0건 날엔 코멘트 한 줄뿐이었다.
+       코멘트 단계가 report.md 의 🔁·🙋 줄(줄 맨 앞)을 집어 코멘트에 붙이는가 · 수집기가 그 줄을 줄 맨 앞에 쓰는가 */
+    const cs = stripYamlComments(fs.readFileSync(new URL('.github/workflows/collect-scholarships.yml', root), 'utf8'));
+    const zeroStep = cs.split(/\n(?= {6}- )/).find((s) => /name: 0건 실행 알림/.test(s)) || '';
+    const grepAt = zeroStep.search(/feedlines=\$\(grep -E '\^\(🔁\|🙋\) ' collector\/report\.md/);
+    const addAt = zeroStep.search(/msg="\$msg"\$'\\n\\n'"\$feedlines"/);
+    const sendAt = zeroStep.indexOf('gh issue comment "$last"');
+    eq('  🔴 0건 날 코멘트에도 report.md 의 🔁·🙋 줄을 붙인다 (보내기 전에) · 수집기는 두 줄을 줄 맨 앞에 쓴다',
+      [grepAt > 0, addAt > grepAt, sendAt > addAt, /lines\.push\(`🔁 /.test(src), /lines\.push\(`🙋 /.test(src)], [true, true, true, true, true]);
+    /* 까닭은 그 학교 게시판의 이번 상태 줄에서만 — 상태 줄 글자는 collect.mjs harvestBoard 의 꼴 그대로 */
+    const unset = { status: '⚙️ 게시판 주소 미설정 (행이 클릭형이라 browser-targets.json 이 담당)', items: [] };
+    const seenAll = { status: '✅ 정상 (실공고 15건 감지)', items: [] };
+    const fresh1 = { status: '✅ 정상 (실공고 3건 감지)', items: [{ title: '새 글' }] };
+    eq("  zeroFeedWhy — 🔴 schools.json 주소가 비어도 브라우저 로봇이 읽는 학교는 '게시판 주소 없음'이라 적지 않는다 (고려·중앙·부산·계명)",
+      [zeroFeedWhy([unset], { browser: true }), zeroFeedWhy([unset]), zeroFeedWhy([], { browser: true }), zeroFeedWhy([])],
+      ['브라우저 로봇이 읽는 학교 — browser-report 참조', '게시판 주소 없음', '브라우저 로봇이 읽는 학교 — browser-report 참조', '이번 일반 수집 기록 없음']);
+    eq('  감지한 글이 모두 전에 본 글 · 브라우저 담당 줄 · 그 밖의 상태 줄은 그대로 · 같은 까닭은 한 번만',
+      [zeroFeedWhy([seenAll]), zeroFeedWhy([{ status: '🖥 브라우저 담당 게시판 — 일반 로봇은 건너뜀', items: [] }]),
+        zeroFeedWhy([{ status: '⚠️ 오류 (시간 초과) — 주소 확인 필요', items: [] }]), zeroFeedWhy([seenAll, seenAll]), zeroFeedWhy([fresh1])],
+      ['게시판 15건 감지 · 모두 전에 본 글', '브라우저 로봇이 읽는 학교 — browser-report 참조', '⚠️ 오류 (시간 초과) — 주소 확인 필요', '게시판 15건 감지 · 모두 전에 본 글', '✅ 정상 (실공고 3건 감지)']);
   }
 
   /* ── ④ 누락 감사 — 장부에만 남은 글 ── */
@@ -268,7 +322,10 @@ export default async function feed(eq, ctx) {
     g('add', '-A'); g('commit', '-qm', '사고 전');
     const snap = g('rev-parse', 'HEAD').stdout.trim();
     const a2 = { school: K, title: a.title, url: 'https://k.kr/v?no=1&fixed=1', foundAt: a.foundAt };   // 사고 뒤 링크 로봇이 고친 주소 — 메우기가 되돌리면 안 된다
-    w('data/notices.json', { updatedAt: day(0), items: [a2] }); w(fileK, { school: K, updatedAt: day(0), items: [a2] });
+    /* 지금 notices.json 에 남은 60일 밖 글·첨부 링크 — 수집기는 메우기 전에 거른다(리뷰 2026-10-05 R6: 도구는 안 걸러 학교별 파일에 다시 실었다) */
+    const stale = { school: K, title: '2026 표본 오래된 장학 안내', url: 'https://k.kr/v?no=3', foundAt: day(70) };
+    const attach = { school: K, title: '장학 신청서.hwp', url: 'https://k.kr/download.do?attachNo=4', foundAt: day(2) };
+    w('data/notices.json', { updatedAt: day(0), items: [a2, attach, stale] }); w(fileK, { school: K, updatedAt: day(0), items: [a2] });
     g('add', '-A'); g('commit', '-qm', '사고(잘림)');
     const tool = fileURLToPath(new URL('collector/heal-feed.mjs', root));
     const run = (...args) => spawnSync(process.execPath, [tool, ...args], { cwd: dir, encoding: 'utf8', env: cleanEnv() });
@@ -281,8 +338,27 @@ export default async function feed(eq, ctx) {
     const fileOut = JSON.parse(fs.readFileSync(path.join(dir, fileK), 'utf8')).items;
     eq('⑤ 메우기 도구 — --dry 와 못 읽는 원천은 아무것도 안 쓴다 · 사고 직전 커밋에서 빠진 글만 메운다',
       [dry.status, dryClean, bad.status, badClean, r.status], [0, true, 1, true, 0]);
-    eq('  notices.json·학교별 파일 둘 다 · 고친 주소는 그대로 · 메운 글의 foundAt 은 원래 날짜',
+    eq('  notices.json·학교별 파일 둘 다 · 고친 주소는 그대로 · 메운 글의 foundAt 은 원래 날짜 · 수집기처럼 60일 밖 글·첨부 링크는 거른다',
       [feedOut.map((n) => n.url), fileOut.map((n) => n.url), feedOut[1] && feedOut[1].foundAt], [[a2.url, b.url], [a2.url, b.url], b.foundAt]);
+    /* '수집기 끝부분과 같은 함수·같은 차례'를 글자로 대조 — 피드를 바꾸는 함수(url-key · publish-notices · attachment-link 가 내보내는 이름)
+       호출의 첫 등장 차례. 두 수집기의 공통 차례에 단계가 더해지면(예: 기본 브랜치의 게시판 공통 링크 걷기) 여기가 빨개져 도구도 같이 고치게 한다. */
+    const vocab = new Set([...Object.keys(await import('../../collector/url-key.mjs')), ...Object.keys(await import('../../collector/publish-notices.mjs')),
+      ...Object.keys(await import('../../collector/attachment-link.mjs'))]);
+    const callsIn = (s) => { const out = []; for (const m of s.matchAll(/\b([A-Za-z_]\w*)\s*\(/g)) if (vocab.has(m[1]) && !out.includes(m[1])) out.push(m[1]); return out; };
+    const tailOf = (f) => {
+      const s = stripComments(fs.readFileSync(new URL(f, root), 'utf8'));
+      const from = s.indexOf('notices.items = freshAll.concat(notices.items || [])');
+      const to = s.indexOf('fs.writeFileSync(noticesPath', from);
+      return from > 0 && to > from ? callsIn(s.slice(from, to)) : [];
+    };
+    const cTail = tailOf('collector/collect.mjs');
+    const bTail = tailOf('collector/browser-collect.mjs');
+    const common = cTail.filter((x) => bTail.includes(x));
+    const toolSrc = stripComments(fs.readFileSync(new URL('collector/heal-feed.mjs', root), 'utf8'));
+    const toolSeq = callsIn(toolSrc.slice(toolSrc.indexOf('const notices = JSON.parse(')));
+    eq('  🔴 도구의 차례 = 두 수집기 \'앱 발행\' 단락의 공통 차례 (같은 함수 · 같은 차례 — 새 글 얹기만 없다)',
+      [common.length >= 6 && common.includes('healFromLedger') && common.includes('publishBySchool'), bTail.filter((x) => cTail.includes(x)).join() === common.join(), toolSeq],
+      [true, true, common]);
     eq('  JSON.stringify(x, null, 1) 로 저장한다 (로봇과 같은 꼴)',
       fs.readFileSync(path.join(dir, 'data/notices.json'), 'utf8') === JSON.stringify(JSON.parse(fs.readFileSync(path.join(dir, 'data/notices.json'), 'utf8')), null, 1), true);
     fs.rmSync(dir, { recursive: true, force: true });

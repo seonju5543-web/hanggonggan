@@ -126,7 +126,8 @@ function checkEntry(it, opts = {}) {
 
      ⚠️ **오류가 아니라 경고다.** 오류로 두면 사람이 관리자 화면에서 '교외'로 고치는 순간
         감사가 영영 실패하고, 그러면 수집 워크플로가 매일 되돌리기를 돌려 **자동 등록이 통째로
-        멈춘다**(revert-auto 는 기존 항목을 못 고친다). 사람 판단을 기계가 잠그면 안 된다.
+        멈춘다** — 되돌리기(collector/gate-guard.mjs)가 이번 실행의 새 등록분·정식 등록 파일을 직전 판으로
+        되돌려도 원인이 기존 데이터라 매 실행 still-failing(빨간불)로 끝난다. 사람 판단을 기계가 잠그면 안 된다.
      ⚠️ 학교를 모르는 전국 등록분은 건너뛴다 — 표가 학교별이라 적용할 수 없다. */
   const ownSchool = (it.eligibility || {}).schoolOnly || '';
   if (opts.noticeKind && ownSchool && it.type !== '교내'

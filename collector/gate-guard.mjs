@@ -126,8 +126,7 @@ export function guard({ stages, gateCmd = DEFAULT_GATE, cwd = process.cwd(), tod
   let failing = [];
   const files = [];
   const targets = stages.flatMap((st) => (st === 'auto' ? ['auto'] : st.split(',').map((x) => x.trim()).filter(Boolean)));
-  let reverted = false;     // 무엇이든 되돌렸는가
-  let measured = false;     // 마지막으로 바꾼 뒤 관문을 쟀는가
+  let reverted = false;     // 무엇이든 되돌렸는가 — 되돌릴 때마다 바로 관문을 재므로 '되돌렸다 = 쟀다'
   for (const st of stages) {
     let changed;
     if (st === 'auto') { removed = revertAutoStage(cwd); changed = removed.length > 0; } else {
@@ -138,14 +137,14 @@ export function guard({ stages, gateCmd = DEFAULT_GATE, cwd = process.cwd(), tod
     if (!changed) continue;   // 바뀐 것이 없으면 관문 결과도 그대로다 — 다시 재지 않는다(시간만 든다)
     reverted = true;
     const g = runGate(gateCmd, cwd);
-    measured = true;
     if (g.ok) { status = st === 'auto' ? 'reverted-auto' : 'reverted-files'; failing = []; break; }
     failing = g.failing;
   }
-  /* 아무것도 못 되돌렸거나 마지막 상태를 안 쟀으면 한 번 잰다 — 걸린 검사 이름을 이슈에 적으려고(그리고 재현되는지) */
-  if (status === 'still-failing' && !measured) {
+  /* 아무것도 못 되돌렸으면(= 한 번도 안 쟀으면) 한 번 잰다 — 걸린 검사 이름을 이슈에 적으려고(그리고 재현되는지).
+     여기서 통과하면 되돌린 것 없이 통과한 것이라 flaky 다(되돌렸다면 위 고리에서 이미 쟀다). */
+  if (!reverted) {
     const g = runGate(gateCmd, cwd);
-    if (g.ok) status = reverted ? 'reverted-files' : 'flaky';
+    if (g.ok) status = 'flaky';
     failing = g.ok ? [] : g.failing;
   }
   if (status === 'reverted-auto' && removed.length) {
@@ -177,11 +176,14 @@ export function noteFor({ status, removed = [], failing = [], files = [], target
   return `> ${head}${checks}`;
 }
 
-/** 리포트에 단락을 넣는다 — '자동 등록 — N건 등록' 줄 바로 아래(없으면 파일 끝) */
+/** 리포트에 단락을 넣는다 — **마지막** '자동 등록 — N건 등록' 줄 바로 아래(없으면 파일 끝).
+    🔴 마지막 것이어야 한다 — 수집기는 리포트를 실행이 **끝날 때만** 새로 쓴다. 게시판 수집 단계가 시간 상한에 잘리거나 넘어지면
+       (continue-on-error 라 뒤 단계는 돈다) 리포트에 지난 실행의 제목이 남고, 자동 등록은 그 뒤에 이번 제목을 **덧붙인다**.
+       첫 제목을 고치면 지난 실행의 'N건 등록'을 '되돌림'으로 바꾸고 이번 것은 그대로 둔다(리뷰 2026-10-04 재현). */
 export function annotateReport(text, result) {
   const note = noteFor(result);
   const lines = String(text || '').split('\n');
-  const i = lines.findIndex((l) => /^### 🤖 자동 등록 \(선조치후보고\) — \d+건 등록/.test(l));
+  const i = lines.findLastIndex((l) => /^### 🤖 자동 등록 \(선조치후보고\) — \d+건 등록/.test(l));
   if (i < 0) return `${String(text || '').replace(/\s*$/, '')}\n\n${note}\n`;
   /* 새 자동 등록이 실제로 빠졌을 때만 — 뺀 것이 있거나 정식 등록 파일을 직전 판으로 되돌렸을 때(다른 파일만 되돌렸으면 등록은 저장된다) */
   const undone = (result.removed || []).length > 0 || (result.files || []).includes(REG);

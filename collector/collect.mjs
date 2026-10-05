@@ -12,7 +12,7 @@ import { deadlineHintFrom } from './deadline-hint.mjs';
 import { FETCH_HEADERS } from './http-headers.mjs';
 import { urlKey, dedupeNotices, capNotices } from './url-key.mjs';
 import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mjs';
-import { publishBySchool, dropUnserved, healFromLedger, readSchoolFiles, zeroFeedSchools } from './publish-notices.mjs';
+import { publishBySchool, dropUnserved, healFromLedger, readSchoolFiles, zeroFeedSchools, zeroFeedWhy } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry } from './clean-title.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
@@ -29,7 +29,8 @@ import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from './
 
 const HERE = new URL('.', import.meta.url);
 const cfg = JSON.parse(fs.readFileSync(new URL('schools.json', HERE), 'utf8'));
-/* 브라우저 로봇도 읽는 학교 — 🟡 이 반복되면 담당을 옮기라고 리포트에 적기 위해서만 읽는다(수집 대상은 안 바꾼다) */
+/* 브라우저 로봇도 읽는 학교 — 리포트에 적기 위해서만 읽는다(수집 대상은 안 바꾼다): 🟡 이 반복되면 담당을 옮기라고 · 화면 0건 학교의 까닭을
+   '게시판 주소 없음'이라 잘못 적지 않게(schools.json 주소가 비어도 브라우저 로봇이 읽는 학교 · publish-notices.mjs zeroFeedWhy) */
 const browserSchools = new Set((() => { try { return JSON.parse(fs.readFileSync(new URL('browser-targets.json', HERE), 'utf8')).targets.map((t) => t.school); } catch { return []; } })());
 
 /* ── 시간 예산 · 학교별 절대 시한 · 순서 회전 (2026-09-29 신설 — 수집망을 2 → 44개교로 되살리면서) ──
@@ -650,17 +651,7 @@ if (skippedByBudget.length) {
 if (healedCount > 0) lines.push(`🔁 학생 화면(학교별 파일)에서도 빠졌던 글 ${healedCount}건을 후보 장부(collector/candidates.json)에서 다시 실었습니다 — 이미 본 글이라 수집으로는 안 돌아오는 글입니다(notices.json 전체 상한에만 잘린 글은 세지 않습니다)`, '');
 if (zeroFeed.length) {
   const schoolOfBoard = new Map(boards.filter((s) => s.role === 'scholarship').map((s) => [boardLabel(s), s.school]));
-  const zeroWhy = (school) => {
-    const rs = results.filter((r) => schoolOfBoard.get(r.name) === school);
-    if (!rs.length) return '이번 일반 수집 기록 없음';
-    return rs.map((r) => {
-      if (/게시판 주소 미설정/.test(r.status)) return '게시판 주소 없음';
-      if (/브라우저 담당/.test(r.status)) return '브라우저 담당 — browser-report 참조';
-      const m = r.status.match(/실공고 (\d+)건 감지/);
-      if (m && !(r.items || []).length) return `게시판 ${m[1]}건 감지 · 모두 전에 본 글`;
-      return r.status.slice(0, 60);
-    }).join(' / ');
-  };
+  const zeroWhy = (school) => zeroFeedWhy(results.filter((r) => schoolOfBoard.get(r.name) === school), { browser: browserSchools.has(school) });
   lines.push(`🙋 서비스 학교인데 앱 실시간 공고 0건 ${zeroFeed.length}곳: ${zeroFeed.map((s) => `${s}(${zeroWhy(s)})`).join(' · ')}`, '');
 }
 

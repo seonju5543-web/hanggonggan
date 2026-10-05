@@ -159,9 +159,12 @@ export function dropUnserved(items, served = SERVED_SCHOOLS) {
    ⚠️ foundAt 은 원래 날짜 그대로 둔다 — 오늘로 바꾸면 알림(notify-rules.js foundBeforeLastCheck)이 '새 공고'로 울리고 60일 수명도 늘어난다.
    🔴 **피드에서 글을 빼는 규칙을 새로 만들면 여기 거르기(take)에도 같은 함수를 건다** — 안 걸면 이 메우기가 다음 실행에 그 글을 학교별 파일이나
       장부에서 되살린다(지금 피드에서 빼는 규칙은 60일 · 첨부 링크 · 서비스 밖 셋이고 셋 다 take 에 걸려 있다).
-   opts.counts(객체)를 넘기면 채운다: restored = 학교별 파일에도 없던 글(장부에서만 돌아온 것 — 진짜 유실 · 리포트 🔁) ·
+   🔴 새 칸은 **학교별 파일에 실제로 들어갈 것만** 싣는다 — 정렬한 뒤 학교당 opts.perSchool(기본 PER_SCHOOL · 발행과 같은 값)을 넘쳐 발행에서
+      잘릴 새 칸은 버린다(splitBySchool 을 그대로 불러 미리 잘라 본다). 지금 글은 넘쳐도 그대로 둔다(발행이 자른다).
+   opts.counts(객체)를 넘기면 채운다(학교별 파일에 들어가는 새 칸만 센다): restored = 학교별 파일에도 없던 글(장부에서만 돌아온 것 — 진짜 유실 · 리포트 🔁) ·
    kept = 학교별 파일에 있던 글(상한에 잘렸던 것 등 — 학생 화면에서 빠진 적 없음).
-   반환: 새 배열(입력을 고치지 않는다). 새 칸이 없으면 dedupe 한 피드 그대로, 있으면 foundAt 내림차순 안정 정렬(병합기 mergeNotices 와 같은 차례). */
+   반환: 새 배열(입력을 고치지 않는다). 새 칸이 없으면 dedupe 한 피드 그대로, 있으면 foundAt 내림차순 안정 정렬(병합기 mergeNotices 와 같은 차례 —
+   앱은 파일 차례대로 그리고, 발행·capNotices 는 이 차례로 앞에서부터 남긴다). */
 /* 9-29 = 44개교 복원일. 그 전 수집분은 8월 30일 파킹으로 **일부러 뺀** 글이라 장부에서 메우지 않는다(마감도 대부분 지났다).
    11-28 이후에는 60일 경계가 이 날을 넘으므로 저절로 뜻이 없어진다 — 다시 학교를 파킹할 일이 생기면 그때 이 날을 옮긴다. */
 export const FEED_HEAL_SINCE = '2026-09-29';
@@ -170,6 +173,7 @@ export function healFromLedger(items, ledger, opts = {}) {
   const today = opts.today || new Date();
   const keepDays = opts.keepDays ?? KEEP_DAYS;
   const since = opts.since ?? FEED_HEAL_SINCE;
+  const perSchool = opts.perSchool ?? PER_SCHOOL;   // 발행(publishBySchool)과 같은 값 — 수집기는 둘 다 기본값으로 부른다
   const ok = new Set(opts.served || SERVED_SCHOOLS);
   const counts = opts.counts && typeof opts.counts === 'object' ? opts.counts : {};
   counts.restored = 0; counts.kept = 0;
@@ -218,10 +222,19 @@ export function healFromLedger(items, ledger, opts = {}) {
   const isNew = new Set(picked);
   const clash = new Set();
   dedupeNotices(A.concat(picked), { distinct: (slot, n) => { if (isNew.has(n) && slot !== n && (feed.has(slot) || isNew.has(slot))) clash.add(n); return true; } });
-  const gap = picked.filter((n) => !clash.has(n));
+  const unclashed = picked.filter((n) => !clash.has(n));
+  if (!unclashed.length) return A;
+  const sorted = A.concat(unclashed).sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')));
+  /* 🔴 학교별 파일 상한 — 발행(publishBySchool → splitBySchool)은 이 차례 그대로 학교당 perSchool 건에서 자른다. 그 밖으로 밀리는 새 칸은
+     싣지도 세지도 않는다(같은 함수·같은 값으로 미리 잘라 본다). 안 그러면 60일 안 장부 글이 상한보다 많은 학교에서 같은 글이 매 실행
+     '다시 실었다'(restored)로 세이고 곧바로 잘려, 리포트 🔁 가 학생 화면에 없는 변화를 적는다(리뷰 2026-10-05 실측: 기본 브랜치 데이터를
+     FEED_HEAL_SINCE 가 안 걸리는 11-28 뒤 모양으로 돌리면 매 실행 152건 · 그 152건 모두 학교별 파일에 없음). 지금 글(A)은 넘쳐도 그대로 둔다. */
+  const fits = new Set([...splitBySchool(sorted, perSchool).values()].flat());
+  const cut = new Set(unclashed.filter((n) => !fits.has(n)));
+  const gap = unclashed.filter((n) => !cut.has(n));
   for (const n of gap) { if (shownSet.has(n)) counts.kept += 1; else counts.restored += 1; }
   if (!gap.length) return A;
-  return A.concat(gap).sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')));
+  return cut.size ? sorted.filter((n) => !cut.has(n)) : sorted;
 }
 
 /* 학생이 지금 보는 판 — 학교별 파일 전부(색인 빼고)를 읽기만 한다. 못 읽는 파일은 건너뛴다.
@@ -245,6 +258,24 @@ export function readSchoolFiles(opts = {}) {
 export function zeroFeedSchools(items, served = SERVED_SCHOOLS) {
   const has = new Set((items || []).map((n) => n && n.school).filter(Boolean));
   return (served || []).filter((s) => !has.has(s));
+}
+
+/* 그 0건 학교의 까닭 — 그 학교 게시판의 **이번 상태 줄**(collect.mjs results 의 { status, items })에서만 고른다. 짐작해 적지 않는다.
+   🔴 opts.browser = 브라우저 로봇이 읽는 학교인가(browser-targets.json). 고려·중앙·부산·계명은 schools.json 주소가 비어 일반 로봇의 상태 줄이
+      '⚙️ 게시판 주소 미설정'이지만 게시판은 브라우저 로봇이 읽는다 — 그대로 '게시판 주소 없음'이라 적으면 틀린 까닭이 된다(2026-10-05 · CLAUDE.md 매 세션 5).
+   같은 까닭이 게시판 여럿에서 나오면 한 번만 적는다. */
+export function zeroFeedWhy(rows, opts = {}) {
+  const BROWSER = '브라우저 로봇이 읽는 학교 — browser-report 참조';
+  const list = (rows || []).filter(Boolean);
+  if (!list.length) return opts.browser ? BROWSER : '이번 일반 수집 기록 없음';
+  return [...new Set(list.map((r) => {
+    const st = String(r.status || '');
+    if (/브라우저 담당/.test(st) || (opts.browser && /게시판 주소 미설정/.test(st))) return BROWSER;
+    if (/게시판 주소 미설정/.test(st)) return '게시판 주소 없음';
+    const m = st.match(/실공고 (\d+)건 감지/);
+    if (m && !(r.items || []).length) return `게시판 ${m[1]}건 감지 · 모두 전에 본 글`;
+    return st.slice(0, 60);
+  }))].join(' / ');
 }
 
 export function patchUrlsBySchool(items, opts = {}) {
