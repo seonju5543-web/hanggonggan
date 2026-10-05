@@ -335,3 +335,15 @@ export function diffPatch(item, patch) {
   }
   return rows;
 }
+
+/* ── 많이 지울 때 지울 건수를 숫자로 한 번 더 받는 문턱 — 한 곳 (2026-10-04 로봇·도구 점검 admin-F1) ──
+   🔴 저장소(tools/admin-apply.mjs guardBulkRemove)와 화면(_admin/admin.js 일괄 처리 시트)이 **같은 함수**를 본다.
+      예전엔 문턱이 저장소에만 있어, 화면은 6건 이상을 고르면 숫자 칸 없이 보냈고 저장소가 '받은 값: 없음'으로
+      늘 거절했다(한 건도 안 지워진 채 멈췄다 — 안전한 쪽 실패지만 버튼이 쓸모없었다).
+   willRemove = 실제로 지워질 건수 · before = 지금 목록 건수. 이보다 많이(BULK_MIN) 지우거나 목록의 10%(BULK_RATIO)를
+   넘게 지우면 사람이 숫자를 적어야 한다 — 숫자는 화면이 미리 채우지 않는다(사람이 적는 것이 이 관문의 뜻이다). */
+export const BULK_MIN = 5;
+export const BULK_RATIO = 0.1;
+export function needsBulkExpect(willRemove, before) {
+  return willRemove > BULK_MIN || willRemove > before * BULK_RATIO;
+}

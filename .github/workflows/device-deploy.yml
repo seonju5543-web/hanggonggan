@@ -209,7 +209,9 @@ jobs:
           BEFORE: ${{ steps.run.outputs.before }}
         run: |
           set -u
-          [ -n "$BEFORE" ] || { echo '배포 전 기본 브랜치 위치를 몰라 건너뜁니다.'; exit 0; }
+          # 배포됐는데(deployed·uptodate) 합치기 전 위치가 비었으면 위 run 단계의 before= 줄이 빠진 것이다 — 조용히 넘기면 수정본 알림이
+          # 영영 안 간다. 실패로 끝내 아래 🚨 이슈를 태운다(리뷰 2026-10-05 · 관문이 before= 가 첫 git merge 보다 앞인지도 본다).
+          [ -n "$BEFORE" ] || { echo '🚨 배포 전 기본 브랜치 위치(before)를 몰라 인스타 알림 표식이 바뀌었는지 알 수 없습니다 — run 단계의 before= 줄을 보세요.'; exit 1; }
           git fetch origin "$BASE"
           if [ -z "$(git diff --name-only "$BEFORE" "origin/$BASE" -- insta/run-notify.txt)" ]; then
             echo '인스타 알림 표식(insta/run-notify.txt)은 이번 배포로 바뀌지 않았습니다.'; exit 0

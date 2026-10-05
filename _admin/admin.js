@@ -20,7 +20,7 @@ import { makeStripper } from './vendor/page-boilerplate.mjs';
 /* 관리자 수정 한 건이 '무엇을 바꾸는가' 를 정하는 규칙 — 🔴 베끼지 않는다.
    저장소(tools/admin-apply.mjs)가 실제로 넣는 값과 **같은 파일**로 계산해야
    '반영 전 전후 대조' 가 거짓말을 하지 않는다(화면은 '1,2' 를 보내고 저장소는 [1,2] 로 넣는다). */
-import { diffPatch, showValue, wonText } from './vendor/edit-diff.mjs';
+import { diffPatch, showValue, wonText, needsBulkExpect } from './vendor/edit-diff.mjs';
 /* 대외활동·공모전 종류 두 가지 — 🔴 베끼지 않는다. 로봇(collect.mjs)·관문이 같은 파일을 본다 (2026-09-29). */
 import { ACTIVITY_KINDS } from './vendor/activity-kind.mjs';
 /* 교내 소식 갈래 (2026-09-30) — collector/news-kind.mjs 의 것 그대로 (베끼지 않는다) */
@@ -480,31 +480,151 @@ async function dispatchWorkflow(file, inputs) {
   }
 }
 
-/* 방금 띄운 실행을 찾아 끝날 때까지 지켜본다 */
+/* 관리자 조정과 **같은 대기줄**(concurrency group: collector)에 서는 워크플로 — `.github/workflows/` 를 뗀 파일 이름.
+   🔴 GitHub 대기줄은 '기다리는 실행 하나'만 남긴다 — 새로 온 실행이 기다리던 실행을 **시작도 전에 취소**한다
+      (실측: collect-scholarships 30733839394·30733987559 가 작업 0개로 취소 · 그때는 실패 알림 단계도 안 돈다).
+      그래서 줄에 기다리는 실행이 있으면 버튼이 보내지 않는다(2026-10-04 로봇·도구 점검 admin-F4).
+   🔴 로봇이 이 줄에 새로 들어오면 여기에도 더한다 — 관문(로봇·도구 점검 관문 admin)이 워크플로 파일과 대조한다.
+   ⚠️ 줄 자체를 따로 떼지 않는다 — registered.json 은 병합 규칙이 없어 로봇과 동시에 저장하면 로봇 수집분이 버려진다. */
+const COLLECTOR_QUEUE = ['collect-scholarships.yml', 'browser-collect.yml', 'open-api.yml', 'refresh-majors.yml', 'refresh-tuition.yml', 'admin-apply.yml'];
+const runFile = (run) => String((run && run.path) || '').split('@')[0].split('/').pop();
+/* 아직 시작하지 않은 실행의 상태 — 줄 서기(동시 실행 제한)·러너 기다림·승인 기다림 */
+const RUN_WAITING = new Set(['queued', 'pending', 'waiting', 'requested']);
+
+/* 같은 줄의 실행 — { waiting, running, unknown }. 읽지 못하면 unknown(막지 않고 '확인하지 못했다'고 말한다) */
+async function collectorQueueState() {
+  const ask = async (status) => {
+    const r = await fetch(`${API}/repos/${OWNER}/${REPO}/actions/runs?status=${status}&per_page=30`, { headers: ghHeaders() });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const d = await r.json();
+    if (!d || !Array.isArray(d.workflow_runs)) throw new Error('형식');
+    return d.workflow_runs.filter((x) => COLLECTOR_QUEUE.includes(runFile(x)));
+  };
+  try {
+    const [queued, pending, running] = await Promise.all([ask('queued'), ask('pending'), ask('in_progress')]);
+    return { waiting: queued.concat(pending)[0] || null, running: running[0] || null, unknown: false };
+  } catch (e) {
+    return { waiting: null, running: null, unknown: true };
+  }
+}
+
+/* 줄에 기다리는 실행이 있어 보내지 않을 때의 말 — 관리자 조정·로봇 '지금 실행' 이 같은 문장을 쓴다 */
+function queueBlockedText(label, waiting) {
+  return `${label} — 보내지 않았어요. 같은 줄에 「${waiting.name || runFile(waiting)}」 실행 하나가 줄을 서 있어요. `
+    + '지금 보내면 그 실행이 시작도 전에 취소될 수 있습니다 — 그 실행이 시작된 뒤 다시 눌러 주세요';
+}
+
+/* 방금 띄운 실행을 찾아 끝날 때까지 지켜본다.
+   줄을 서 있는 동안(시작 전)은 최대 60분 — 앞선 로봇이 10~15분 돈다. 러너를 잠깐 기다리는 보통 실행도 '대기'로 보이므로
+   처음 30초는 4초 간격, 그 뒤는 15초 간격으로 본다. 시작한 뒤에는 지금처럼 약 6분. */
 async function waitForRun(file, sinceISO) {
   const url = `${API}/repos/${OWNER}/${REPO}/actions/workflows/${file}/runs?per_page=5`;
-  for (let i = 0; i < 90; i += 1) {                 // 최대 약 6분
-    await new Promise((res) => setTimeout(res, i < 5 ? 2000 : 4000));
+  let polls = 0;            // 줄 밖(아직 안 보임·실행 중)에서 센 횟수 — 최대 90회(약 6분)
+  let queuedAt = 0;         // 줄 서기를 처음 본 시각
+  let last = null;
+  for (;;) {
+    const inQueue = !!(last && RUN_WAITING.has(last.status));
+    if (inQueue) {
+      queuedAt = queuedAt || Date.now();
+      if (Date.now() - queuedAt > 60 * 60e3) return null;
+    } else if (polls >= 90) return null;
+    else polls += 1;
+    const gap = inQueue ? (Date.now() - queuedAt > 30e3 ? 15000 : 4000) : (polls <= 5 ? 2000 : 4000);
+    await new Promise((res) => setTimeout(res, gap));
     try {
       const r = await fetch(url, { headers: ghHeaders() });
       if (!r.ok) continue;
       const d = await r.json();
       const run = (d.workflow_runs || []).find((x) => new Date(x.created_at) >= new Date(sinceISO));
       if (!run) continue;
+      last = run;
       if (run.status === 'completed') return run;
-      jobShow('반영 중… 검사와 저장이 진행되고 있어요', '', run.html_url);
+      if (RUN_WAITING.has(run.status)) jobShow('줄 서는 중 — 실행이 아직 시작되지 않았어요. 시작되면 이어서 검사하고 저장합니다', '', run.html_url);
+      else jobShow('반영 중… 검사와 저장이 진행되고 있어요', '', run.html_url);
     } catch (e) { /* 잠깐 실패는 넘어간다 */ }
   }
-  return null;
+}
+
+/* 실패를 갈래로 말한다 (2026-10-04 로봇·도구 점검 admin-F9) — 예전엔 무엇이든 '검사를 통과하지 못해 되돌렸습니다'였다.
+   대부분의 실패는 감사가 아니라 저장소의 입력 거절이다(tools/admin-apply.mjs fail() — 예: 많이 지울 때 건수 확인).
+   ⚠️ 이름이 APPLY_STEP 인 까닭 — 이 파일에 목록 한 번에 보일 줄 수 STEP(50)이 이미 있다(같은 이름이면 화면 전체가 안 뜬다).
+   🔴 실행의 작업·단계 결과와, 읽을 수 있으면 저장소가 남긴 거절 문장(annotation)으로만 말한다 — 짐작하지 않는다.
+   🔴 단계 이름은 .github/workflows/admin-apply.yml 의 name: 과 글자까지 같아야 한다(관문이 대조한다). */
+const APPLY_STEP = {
+  apply: '요청 내용 적용',
+  auditRevert: '감사 실패 — 변경을 통째로 되돌림',
+  auditFail: '감사 실패를 실패로 끝낸다',
+  save: '저장',
+};
+const UNCHANGED = '데이터는 바뀌지 않았습니다';
+
+/* 저장소가 남긴 거절 문장 — '관리자 조정 실패 — …' 로 시작하는 annotation. 못 읽으면 '' (지어내지 않는다) */
+async function rejectReason(job) {
+  const m = /\/check-runs\/(\d+)$/.exec(String((job && job.check_run_url) || ''));
+  if (!m) return '';
+  try {
+    const r = await fetch(`${API}/repos/${OWNER}/${REPO}/check-runs/${m[1]}/annotations`, { headers: ghHeaders() });
+    if (!r.ok) return '';
+    const list = await r.json();
+    if (!Array.isArray(list)) return '';
+    const a = list.find((x) => /^관리자 조정 실패 — /.test(String((x && x.message) || '')));
+    return a ? String(a.message).replace(/^관리자 조정 실패 — /, '').slice(0, 400) : '';
+  } catch (e) { return ''; }
+}
+
+async function runFailureText(run) {
+  const LOG = '사유 원문은 실행 기록에서 확인하세요';
+  let jobs = null;
+  try {
+    const r = await fetch(`${API}/repos/${OWNER}/${REPO}/actions/runs/${run.id}/jobs`, { headers: ghHeaders() });
+    if (r.ok) { const d = await r.json(); if (d && Array.isArray(d.jobs)) jobs = d.jobs; }
+  } catch (e) { /* 아래에서 '읽지 못했다'고 말한다 */ }
+  const concl = run.conclusion || '알 수 없음';
+  if (!jobs) return `실행이 끝났지만 성공하지 못했습니다(${concl}) — 어느 단계인지 읽지 못했습니다. ${LOG}`;
+  if (!jobs.length) {
+    return concl === 'cancelled'
+      ? `시작 전에 취소됐습니다 — 같은 줄의 다른 로봇 실행에 밀렸을 수 있습니다. ${UNCHANGED}. 다시 눌러 주세요`
+      : `실행이 시작되지 못하고 끝났습니다(${concl}). ${UNCHANGED}. ${LOG}`;
+  }
+  const job = jobs[0];
+  const steps = Array.isArray(job.steps) ? job.steps : [];
+  const step = (name) => steps.find((x) => x && x.name === name) || null;
+  const is = (name, c) => !!step(name) && step(name).conclusion === c;
+  if (is(APPLY_STEP.apply, 'failure')) {
+    /* 거절 문장이 있을 때만 '받지 않았다'고 말한다 — 없으면 도구가 넘어진 것일 수도 있다(단정하지 않는다).
+       어느 쪽이든 저장 단계 전이라 데이터는 그대로다(앞 단계가 실패하면 뒤 단계는 건너뛴다). */
+    const why = await rejectReason(job);
+    return why ? `저장소가 요청을 받지 않았습니다: ${why} — ${UNCHANGED}`
+      : `「${APPLY_STEP.apply}」 단계에서 멈췄습니다 — 저장 전이라 ${UNCHANGED}. ${LOG}`;
+  }
+  if (is(APPLY_STEP.auditFail, 'failure') || is(APPLY_STEP.auditRevert, 'success')) return `데이터 감사를 통과하지 못해 되돌렸습니다 — ${UNCHANGED}. ${LOG}`;
+  if (is(APPLY_STEP.save, 'failure')) return `저장(push)에 실패했습니다 — ${UNCHANGED}. ${LOG}`;
+  if (concl === 'cancelled' || concl === 'timed_out' || job.conclusion === 'cancelled') {
+    /* 저장 단계의 결과로만 말한다 — 건너뜀·아직 대기면 안 돈 것, 그 밖(취소·단계 목록 없음)은 모른다고 말한다 */
+    const sv = step(APPLY_STEP.save);
+    const where = is(APPLY_STEP.save, 'success') ? '저장은 끝났습니다'
+      : (sv && (sv.conclusion === 'skipped' || sv.status === 'queued' || sv.status === 'pending'))
+        ? `저장 단계 전에 멈춰 ${UNCHANGED}` : '저장됐는지는 확인하지 못했습니다';
+    return `실행이 도중에 멈췄습니다(시간 상한 10분 또는 취소) — ${where}. ${LOG}`;
+  }
+  const failed = steps.find((x) => x && x.conclusion === 'failure');
+  return failed ? `실행이 「${failed.name}」 단계에서 실패했습니다. ${LOG}` : `실행이 성공하지 못했습니다(${concl}). ${LOG}`;
 }
 
 /* 관리자 조정 1건 — 요청 → 검사 → 반영까지 지켜보고 화면을 다시 읽는다 */
 async function applyAction(action, payload, label) {
   if (jobBusy) { toast('앞선 작업이 아직 끝나지 않았어요'); return false; }
   jobBusy = true;
-  const since = new Date(Date.now() - 15000).toISOString();
   try {
-    jobShow(`${label} — 요청을 보냈어요`);
+    /* 보내기 전에 줄을 본다 — 기다리는 실행이 있으면 이 요청이 그것을 취소시킬 수 있다(admin-F4) */
+    const q = await collectorQueueState();
+    if (q.waiting) {
+      jobShow(queueBlockedText(label, q.waiting), 'bad', q.waiting.html_url || '');
+      return false;
+    }
+    const since = new Date(Date.now() - 15000).toISOString();
+    const note = q.unknown ? ' · 줄 상태를 확인하지 못했습니다' : (q.running ? ' · 수집 로봇이 끝나면 이어서 반영됩니다' : '');
+    jobShow(`${label} — 요청을 보냈어요${note}`);
     await dispatchWorkflow(WF_ADMIN, { action, payload: JSON.stringify(payload) });
     const run = await waitForRun(WF_ADMIN, since);
     if (!run) {
@@ -517,7 +637,7 @@ async function applyAction(action, payload, label) {
       await loadAll(); renderAll();
       return true;
     }
-    jobShow(`${label} — 검사를 통과하지 못해 되돌렸습니다. 실행 기록에서 사유를 확인하세요`, 'bad', run.html_url);
+    jobShow(`${label} — ${await runFailureText(run)}`, 'bad', run.html_url);
     return false;
   } catch (e) {
     jobShow(e.message || '요청에 실패했습니다', 'bad');
@@ -1899,11 +2019,31 @@ const BULK = {
     note: '등록에서 지웁니다. 차단은 하지 않으므로 로봇이 다시 등록할 수 있습니다.' },
 };
 
+/* 많이 지울 때 — 지울 건수를 사람이 숫자로 한 번 더 적는 칸 (2026-10-04 로봇·도구 점검 admin-F1).
+   🔴 문턱은 저장소와 **같은 함수**(vendor/edit-diff.mjs needsBulkExpect)다. 예전엔 저장소에만 있어 화면이 숫자 없이
+      보냈고, 6건 이상 되돌리기·삭제는 저장소가 '받은 값: 없음'으로 늘 거절했다.
+   ⚠️ 숫자를 화면이 미리 채우지 않는다 — 사람이 적는 것이 이 관문의 뜻이다. 맞는 숫자를 적어야 실행 버튼이 풀린다. */
+const EXPECT_KINDS = new Set(['revert', 'remove']);
+function bulkExpectHtml(n) {
+  return `<div class="field">
+      <label for="bulk-expect">실수로 목록을 통째로 지우는 것을 막으려고 지울 건수를 숫자로 한 번 더 받습니다 — ${esc(n)}을(를) 적어 주세요</label>
+      <input id="bulk-expect" type="number" inputmode="numeric" min="1" step="1" autocomplete="off" data-bulk-expect="${esc(n)}" />
+    </div>`;
+}
+/* 시트에 숫자 칸이 있으면 적은 값이 맞는지 — { need:false } · { need:true, ok, n } */
+function bulkExpectState() {
+  const el = byId('sheet').querySelector('[data-bulk-expect]');
+  if (!el) return { need: false };
+  const n = Number(el.value);
+  return { need: true, ok: el.value.trim() !== '' && Number.isInteger(n) && n === Number(el.dataset.bulkExpect), n };
+}
+
 async function bulkAction(kind) {
   const meta = BULK[kind];
   if (!meta) return;
   const items = selRows();
   if (!items.length) { toast('선택된 공고가 없습니다'); return; }
+  const askN = EXPECT_KINDS.has(kind) && needsBulkExpect(items.length, D.reg.length);
 
   openSheet(`
     <div class="sheet-head">
@@ -1911,9 +2051,10 @@ async function bulkAction(kind) {
       <button class="sheet-close" data-close aria-label="닫기">×</button>
     </div>
     <p class="muted">${esc(meta.note)}</p>
+    ${askN ? bulkExpectHtml(items.length) : ''}
     <div class="rows" data-rows>${items.map((it) => rowHtml(it)).join('')}</div>
     <div class="btn-row sheet-foot">
-      <button class="btn ${meta.danger ? 'danger' : 'btn-primary'}" data-bulk-go="${esc(kind)}">
+      <button class="btn ${meta.danger ? 'danger' : 'btn-primary'}" data-bulk-go="${esc(kind)}"${askN ? ' disabled aria-disabled="true"' : ''}>
         ${esc(items.length)}건 ${esc(meta.label)}
       </button>
       <button class="btn" data-close>취소</button>
@@ -1956,7 +2097,7 @@ function diffRowsHtml(diff) {
 /* `lines[].diff` 를 주면 그 줄 밑에 전후 표가 붙는다. `blocked` 면 실행 버튼이 잠긴다.
    ⚠️ 되돌릴 수 없는 6종(merge·autoRegister·formQueue·unlinkForm·revert·remove)의 문구는
       그대로다 — 이 변경은 줄에 칸 하나를 **더하는 것**이지 기존 모양을 바꾸는 게 아니다. */
-function askSheet({ title, note, lines = [], goLabel, danger = false, blocked = false, run }) {
+function askSheet({ title, note, lines = [], goLabel, danger = false, blocked = false, expectN = 0, run }) {
   pendingGo = blocked ? null : run;
   openSheet(`
     <div class="sheet-head">
@@ -1964,6 +2105,7 @@ function askSheet({ title, note, lines = [], goLabel, danger = false, blocked = 
       <button class="sheet-close" data-close aria-label="닫기">×</button>
     </div>
     ${note ? `<p class="muted">${esc(note)}</p>` : ''}
+    ${expectN ? bulkExpectHtml(expectN) : ''}
     ${lines.length ? `<div class="rows" data-rows>${lines.map((l) => `
       <div class="row" data-row data-noclick style="cursor:default">
         <div><div class="t" data-row-title>${esc(l.t)}</div>
@@ -1973,7 +2115,7 @@ function askSheet({ title, note, lines = [], goLabel, danger = false, blocked = 
       </div>`).join('')}</div>` : ''}
     <div class="btn-row sheet-foot">
       <button class="btn ${danger ? 'danger' : 'btn-primary'}" data-ask-go
-        ${blocked ? 'disabled aria-disabled="true"' : ''}>${esc(goLabel)}</button>
+        ${blocked || expectN ? 'disabled aria-disabled="true"' : ''}>${esc(goLabel)}</button>
       <button class="btn" data-close>취소</button>
     </div>`);
 }
@@ -2671,9 +2813,12 @@ function instaTplName(no) {
 }
 function instaDday(due) {
   if (!due) return { cls: '', label: '마감 원문 확인' };
-  const d = Math.round((Date.parse(`${due}T23:59:59+09:00`) - Date.now()) / 864e5);
-  if (Number.isNaN(d)) return { cls: '', label: '마감 원문 확인' };
-  if (d < 0) return { cls: 'past', label: '마감 지남' };
+  const t = Date.parse(`${due}T23:59:59+09:00`);
+  if (Number.isNaN(t)) return { cls: '', label: '마감 원문 확인' };
+  /* 🔴 지났는지는 시각으로 바로 본다 — 날 수를 반올림해 보면 마감 다음 날 낮 12시 전까지 -0 이 '오늘 마감' 으로 읽혀
+     게시 버튼이 다시 떴다(2026-10-05 · 로봇 쪽 publishRefusal 은 시각으로 거절한다 — 화면과 로봇이 같은 잣대) */
+  if (t < Date.now()) return { cls: 'past', label: '마감 지남' };
+  const d = Math.round((t - Date.now()) / 864e5);
   return { cls: d <= 3 ? 'near' : d <= 7 ? 'soon' : '', label: d === 0 ? '오늘 마감' : `D-${d}` };
 }
 /* 게시 버튼 대신 이유를 둘 줄인가 — 이유 한 줄 또는 null (2026-10-04 로봇·도구 점검).
@@ -2682,7 +2827,7 @@ function instaDday(due) {
    폴더만 가리킨다(그림에 그린 날 기준 「마감 D-N」 이 박혔다 · 새로 그린 줄에는 dates: 'absolute' 가 있다). */
 function instaPublishBlock(p) {
   if (!p || !p.due || Number.isNaN(Date.parse(`${p.due}T23:59:59+09:00`))) return null;
-  if (instaDday(p.due).cls === 'past') return '마감 지남 — 게시 안 함';
+  if (instaDday(p.due).cls === 'past') return '마감 지남 — 게시 안 함';   // 마감일 23:59:59 KST 를 넘었다(publishRefusal 과 같은 잣대)
   if (p.dates !== 'absolute' && [2, 3, 4].includes(Number(p.tplNo))) return '옛 카드(D-N) — 다시 그린 뒤 게시';
   return null;
 }
@@ -4707,16 +4852,28 @@ function bindGlobal() {
     qTimer = setTimeout(() => { F.q = v; rerender('list'); }, 250);
   });
 
+  /* 많이 지울 때의 숫자 칸 — 맞는 숫자를 적어야 실행 버튼이 풀린다 (admin-F1) */
+  byId('sheet').addEventListener('input', (e) => {
+    if (!e.target.matches || !e.target.matches('[data-bulk-expect]')) return;
+    const go = byId('sheet').querySelector('[data-bulk-go], [data-ask-go]');
+    if (!go) return;
+    const { ok } = bulkExpectState();
+    go.disabled = !ok;
+    if (ok) go.removeAttribute('aria-disabled'); else go.setAttribute('aria-disabled', 'true');
+  });
+
   /* 시트 */
   byId('sheet').addEventListener('click', async (e) => {
     if (e.target.closest('[data-close]')) { closeSheet(); return; }
 
     /* 확인 시트의 '실행' — 담아 둔 일을 여기서 꺼내 돌린다 */
     if (e.target.closest('[data-ask-go]')) {
+      const ex = bulkExpectState();
+      if (ex.need && !ex.ok) { toast('지울 건수를 숫자로 정확히 적어 주세요'); return; }
       const go = pendingGo;
       pendingGo = null;
       closeSheet();
-      if (go) await go();
+      if (go) await go(ex.need ? ex.n : undefined);
       return;
     }
 
@@ -4740,10 +4897,14 @@ function bindGlobal() {
     const bg = e.target.closest('[data-bulk-go]');
     if (bg) {
       const kind = bg.dataset.bulkGo;
-      const ids = [...SEL];
+      /* 시트에 보여 준 목록 그대로 보낸다(selRows) — 보여 준 것과 보내는 것이 갈라지지 않게 */
+      const ids = selRows().map((it) => it.id);
+      const ex = bulkExpectState();
+      /* 적은 숫자는 지금 보낼 건수와도 맞아야 한다 — 시트를 연 뒤 목록이 다시 읽혀 건수가 바뀌었으면 보내지 않는다 */
+      if (ex.need && (!ex.ok || ex.n !== ids.length)) { toast(`지울 건수(${ids.length})를 숫자로 정확히 적어 주세요`); return; }
       closeSheet();
       selClear();
-      await applyAction(kind, { ids }, `${BULK[kind].label} ${ids.length}건`);
+      await applyAction(kind, ex.need ? { ids, expect: ex.n } : { ids }, `${BULK[kind].label} ${ids.length}건`);
       return;
     }
 
@@ -4787,21 +4948,21 @@ function bindGlobal() {
     if (kind === 'confirm') {
       closeSheet();
       await applyAction('confirm', { ids: [id] }, '컨펌');
-    } else if (kind === 'revert') {
+    } else if (kind === 'revert' || kind === 'remove') {
       const it = D.reg.find((x) => x.id === id);
-      askSheet({
-        title: '등록에서 빼고 재등록 차단', danger: true, goLabel: '되돌리기',
+      /* 한 건이라도 목록이 10건 미만이면 저장소 문턱(10%)에 걸린다 — 같은 함수로 보고 그때만 숫자를 받는다 */
+      const expectN = needsBulkExpect(1, D.reg.length) ? 1 : 0;
+      const withExpect = (n) => (n === undefined ? { ids: [id] } : { ids: [id], expect: n });
+      askSheet(kind === 'revert' ? {
+        title: '등록에서 빼고 재등록 차단', danger: true, goLabel: '되돌리기', expectN,
         note: '등록에서 빠지고, 수집 로봇이 다시 등록하지 않도록 차단 목록에 올라갑니다.',
         lines: [{ t: it ? it.name : id, m: id }],
-        run: () => applyAction('revert', { ids: [id] }, '되돌리기'),
-      });
-    } else if (kind === 'remove') {
-      const it = D.reg.find((x) => x.id === id);
-      askSheet({
-        title: '등록 삭제', danger: true, goLabel: '삭제',
+        run: (n) => applyAction('revert', withExpect(n), '되돌리기'),
+      } : {
+        title: '등록 삭제', danger: true, goLabel: '삭제', expectN,
         note: '등록에서 지웁니다. 차단은 하지 않으므로 로봇이 다시 등록할 수 있습니다.',
         lines: [{ t: it ? it.name : id, m: id }],
-        run: () => applyAction('remove', { ids: [id] }, '등록 삭제'),
+        run: (n) => applyAction('remove', withExpect(n), '등록 삭제'),
       });
     }
   });
@@ -4854,6 +5015,12 @@ async function runCollector(file, label, inputs = {}, extraLines = []) {
 
 async function reallyRun(file, label, inputs = {}) {
   try {
+    /* 수집 대기줄(collector)의 로봇을 손으로 깨울 때도 보내기 전에 줄을 본다 — 관리자 조정과 같은 까닭(admin-F4):
+       새 실행이 줄에서 기다리던 다른 로봇 실행을 시작도 전에 취소시킨다. 읽지 못하면 막지 않는다. */
+    if (COLLECTOR_QUEUE.includes(file)) {
+      const q = await collectorQueueState();
+      if (q.waiting) { jobShow(queueBlockedText(label, q.waiting), 'bad', q.waiting.html_url || ''); return; }
+    }
     jobShow(`${label} 실행을 요청했어요`);
     await dispatchWorkflow(file, inputs);
     jobShow(`${label}을 실행했습니다. 끝나면 새로고침으로 결과를 확인하세요`, 'ok',

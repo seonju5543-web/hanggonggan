@@ -232,7 +232,10 @@ photo 는 큰 파란 워드마크, chat 은 큰 흰 말풍선, note 는 손글�
 
 제외: 이미 올린 것(`insta/seen.json`) · 마감 없음/지남 · 금액 `※ 기관확인필요`.
 장부 준비 줄의 상태 — `prepared` 준비 · `skipped` 건너뜀 · `failed` 못 그림(7일 뒤 다시) · `posted` 올림 ·
-`expired` 올리기 전에 마감이 지나 폴더를 지운 것(`ledger.mjs expire` · 2026-10-04). 재단이 마감을 미뤄 지금 공고의 마감이 더 늦으면 다시 뽑힌다.
+`expired` 올리기 전에 마감이 지나 폴더를 지운 것(`ledger.mjs expire` · 2026-10-04). 재단이 마감을 미뤄 지금 공고의 마감이 더 늦으면 다시 뽑힌다 —
+단 사람이 「건너뛰기」 로 정했던 카드(`expiredFrom: "skipped"`)는 다시 뽑지 않는다(되살리려면 관리자 화면 「이 판형으로 다시 그리기」).
+장부 줄 모양·정리·올림 기록은 `pick.mjs` 한 곳(`preparedRow` · `expireAndClean` · `recordPosted`) — `ledger.mjs`·`revise.mjs`·`publish.mjs` 가 불러 쓴다.
+올리기 단계가 올린 뒤 멈춰도 워크플로 「올린 기록 저장」 이 media 번호로 `ledger.mjs posted` 를 불러 올림 기록을 남긴다(2026-10-05).
 🔴 못 고르는 이유를 **세어서 돌려준다** — "왜 오늘 올릴 게 없지" 를 다시 조사하지 않게.
 
 `node insta/pick.mjs --list` 로 상위 12개를 점수·근거와 함께 본다.

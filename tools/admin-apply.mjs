@@ -21,7 +21,7 @@ import { createRequire } from 'node:module';
 import * as canon from '../collector/canon-url.mjs';
 import { indexTexts, sourceFor, hasText } from '../collector/notice-source.mjs';
 import { attachmentText, readable } from '../collector/attachment-text.mjs';
-import { periodAfterDeadline, amountAfterValue } from './edit-diff.mjs';
+import { periodAfterDeadline, amountAfterValue, needsBulkExpect } from './edit-diff.mjs';
 import { newsPostKey } from '../collector/news-board-rules.mjs';   // 소식 숨김 열쇠 한 곳 (수집 로봇의 newsHidden 과 같다)
 import { thumbKey, isThumbPath } from '../collector/news-thumb.mjs';   // 소식 썸네일 열쇠·꼴 한 곳 (썸네일 로봇과 같다)
 import { urlKey } from '../collector/url-key.mjs';
@@ -271,14 +271,14 @@ const ids = Array.isArray(payload.ids) ? payload.ids : (payload.id ? [payload.id
    🔴 이 관문을 감사로 옮기지 말 것 — 같은 감사를 **수집 워크플로가 관문으로** 쓰므로,
       감사가 실패하면 그날 수집분 저장이 통째로 멈춘다(로봇이 차단 목록을 반영해 지우는
       정상 삭제까지 걸린다). */
-const BULK_MIN = 5;         // 이보다 많이 지우거나
-const BULK_RATIO = 0.1;     // 지금 목록의 10%를 넘게 지우면 → 지울 건수를 숫자로 한 번 더 받는다
+/* 문턱(5건 초과 또는 목록의 10% 초과)은 edit-diff.mjs needsBulkExpect 한 곳 — 화면의 숫자 칸도 같은 함수로 뜬다
+   (2026-10-04 점검 admin-F1: 문턱이 여기에만 있어 화면이 숫자를 안 실어 보내 6건 이상은 늘 거절됐다). */
 function guardBulkRemove(targetIds) {
   const before = reg.items.length;
   /* 🔴 요청한 id 개수가 아니라 **실제로 지워질 건수**와 대조한다 — 없는 id 가 섞였으면 둘이
      다르고, 그때는 멈추는 것이 맞다(사람이 생각한 것과 다른 일이 벌어지고 있다는 뜻이다). */
   const willRemove = reg.items.filter((x) => targetIds.includes(x.id)).length;
-  if (!(willRemove > BULK_MIN || willRemove > before * BULK_RATIO)) return { before, willRemove };
+  if (!needsBulkExpect(willRemove, before)) return { before, willRemove };
   const expect = Number(payload.expect);
   if (!Number.isInteger(expect) || expect !== willRemove) {
     fail(`한 번에 ${willRemove}건을 지우는 요청입니다(지금 ${before}건). 실수로 목록을 통째로 지우는 것을 막으려고 `

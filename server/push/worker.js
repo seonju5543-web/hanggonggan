@@ -153,10 +153,9 @@ function ymd(ts) {
 
 /* 공고 데이터에서 '깨울지 판단하는 데 필요한 것'만 남긴다.
    원본은 수십만 글자라 그대로 들고 다니면 계산 시간 제한에 걸린다(파일 첫머리 설명 참조).
-   - schools  : 여러 학교만 받는 공고(eligibility.schoolsAny — '학교' 또는 '학교|캠퍼스')의 학교 이름들.
-                없으면 null. 학교 한정(schoolOnly)도 여러 학교(schools)도 없을 때만 전국 공고다.
-   - foundAt  : 실시간 공고가 처음 수집된 날 — 지난 판정보다 이틀 넘게 앞선 글은 이미 본 글이다(아래).
-   - campus   : 게시판이 캠퍼스를 적어 준 글 — 적혀 있으면 분교까지 넓히지 않는다(wakeSchoolsForNotice). */
+   - reg.schools : 여러 학교만 받는 공고(eligibility.schoolsAny — '학교' 또는 '학교|캠퍼스')의 학교 이름들.
+                   없으면 null. 학교 한정(schoolOnly)도 여러 학교(schools)도 없을 때만 전국 공고다.
+   - notices     : noticeMini 꼴 — 제목 다듬기·날짜 읽기·분교 판정 같은 **글자 일은 여기서 끝낸다**(아래 noticeMini). */
 function summarize(reg, notices) {
   return {
     reg: ((reg && reg.items) || [])
@@ -170,7 +169,7 @@ function summarize(reg, notices) {
       }),
     notices: ((notices && notices.items) || [])
       .filter((n) => n && n.url && n.school)
-      .map((n) => ({ url: n.url, school: n.school, title: n.title || '', campus: n.campus || '', foundAt: n.foundAt || '' })),
+      .map(noticeMini),
   };
 }
 
@@ -189,6 +188,14 @@ function summarize(reg, notices) {
    폰은 학교+제목 열쇠로 '본 공고'라 알리지 않는데 서버가 주소만 보면 그 학교를 깨워 빈 알림('새 장학 소식')이 뜬다
    (2026-10-04 08:10 회차 실측: 깨운 9개교 전부가 주소만 바뀐 글 46건). */
 const titleSeenKey = (n) => 't:' + (n.school || '') + '|' + String(n.title || '').replace(/\s+/g, '');
+/* titleSeenKey 와 **같은 답**을 싸게 — 공고 400여 건마다 도는 자리다(noticeMini). 위 정규식은 새로 뜬 실행 환경에서
+   한 건에 수 마이크로초라 400건이면 약 2ms(Node 실측)다. 제목의 빈칸이 보통 빈칸(' ')뿐이면 그것만 지우면 같은 답이고,
+   탭·NBSP·전각 빈칸 같은 다른 빈칸이 있을 때만 위 사본을 부른다. 같은 답인지는 관문 ⑥(c)가 \s 의 모든 글자로 잰다. */
+const OTHER_WS = /[^\S ]/;
+const titleSeenKeyFast = (n) => {
+  const t = String(n.title || '');
+  return OTHER_WS.test(t) ? titleSeenKey(n) : 't:' + (n.school || '') + '|' + t.replaceAll(' ', '');
+};
 
 /* 본교와 게시판을 함께 쓰는 분교 → 본교 (match-engine.js 의 SHARED_BOARD_BRANCH 사본) */
 const SHARED_BOARD_BRANCH = {
@@ -212,23 +219,61 @@ function taggedSchool(n) {
    제목이 캠퍼스를 밝히지 않았고 게시판도 캠퍼스를 안 적었으면, 그 게시판을 같이 쓰는 분교 학생에게도 보인다.
    (예전에는 n.school 하나만 깨워 한양 ERICA·건국 글로컬·홍익 세종 학생은 제 학교 새 글로도 안 깨워졌다.) */
 function wakeSchoolsForNotice(n) {
-  const tagged = taggedSchool(n);
+  // 표에 없는 학교(거의 모든 글)는 표를 훑지 않는다 — 공고 400여 건마다 도는 자리라 계산 시간을 아낀다
+  const tagged = TITLE_CAMPUS[n.school] ? taggedSchool(n) : null;
   const school = tagged || n.school;
-  const out = [school];
-  if (!tagged && !n.campus) {
-    for (const [branch, main] of Object.entries(SHARED_BOARD_BRANCH)) if (main === school) out.push(branch);
-  }
-  return out;
+  const branches = !tagged && !n.campus && BRANCHES_OF[school];
+  return branches ? [school, ...branches] : [school];
+}
+/* 본교 → 게시판을 같이 쓰는 분교들 (SHARED_BOARD_BRANCH 를 뒤집은 것 · 한 번만 만든다) */
+const BRANCHES_OF = {};
+for (const [branch, main] of Object.entries(SHARED_BOARD_BRANCH)) (BRANCHES_OF[main] = BRANCHES_OF[main] || []).push(branch);
+
+/* 수집일(foundAt)의 날짜 부분 → 밀리초 · 없거나 못 읽으면 null (폰 foundBeforeLastCheck 와 같은 읽기 — 날짜 10글자만) */
+const foundDay = (foundAt) => {
+  const t = foundAt ? Date.parse(String(foundAt).slice(0, 10)) : NaN;
+  return isNaN(t) ? null : t;
+};
+/* 지난 판정보다 이틀 넘게 앞서 수집된 글은 그때 이미 피드에 있었다 — 폰의 foundBeforeLastCheck 와 같은 규칙
+   (발행 지연 최대 반나절 + 날짜 경계 하루 여유). planAt 은 지난 회차가 판정을 마친 시각(state:planAt).
+   이틀은 폰과 대조한다 — 관문 verify/health-gates/servers.mjs ⑥(e)가 같은 경계 표본을 폰 규칙과 이 판정에 함께 돌린다. */
+const foundBeforePlan = (found, planAt) => found != null && !!planAt && found + 2 * 864e5 <= planAt;
+
+/* 실시간 공고 하나 → plan 이 쓸 꼴 (2026-10-05 리뷰 — 계산 시간).
+   🔴 글자 일(제목 빈칸 다듬기·수집일 읽기·대출 낱말·분교 판정)은 **notices 걸음에서** 끝낸다.
+      plan 걸음은 장부 4000개를 읽고 쓰는 것만으로 무료 등급 10ms 의 절반을 쓰는데, 같은 걸음에서 공고 400여 건의
+      글자 일까지 하면 새로 뜬 실행 환경의 첫 부르기가 Node 실측 약 9ms 까지 올라 한도에 닿았다.
+   - tk    : 학교+제목 열쇠(titleSeenKey)
+   - found : 수집일의 날짜(밀리초) — 없으면 칸이 없다
+   - loan  : 대출·융자 글이면 1 (깨우지 않는다) — 아니면 칸이 없다
+   - wake  : 깨울 학교가 [그 학교] 하나가 아닐 때만(분교까지 · 제목이 캠퍼스를 밝힘) — wakeSchoolsForNotice */
+function noticeMini(n) {
+  const m = { url: n.url, school: n.school, tk: titleSeenKeyFast(n) };
+  const found = foundDay(n.foundAt);
+  if (found != null) m.found = found;
+  if (/대출|융자/.test(n.title || '')) m.loan = 1;
+  const wake = wakeSchoolsForNotice(n);
+  if (wake.length !== 1 || wake[0] !== n.school) m.wake = wake;
+  return m;
 }
 
-/* 지난 판정보다 이틀 넘게 앞서 수집된 글은 그때 이미 피드에 있었다 — 폰의 foundBeforeLastCheck 와 같은 규칙
-   (발행 지연 최대 반나절 + 날짜 경계 하루 여유). planAt 은 지난 회차가 판정을 마친 시각(state:planAt). */
-const foundBeforePlan = (n, planAt) => {
-  const t = n.foundAt ? Date.parse(String(n.foundAt).slice(0, 10)) : NaN;
-  return !!planAt && !isNaN(t) && t + 2 * 864e5 <= planAt;
-};
-
 const SEEN_MAX = 4000;   // '본 공고' 장부 상한
+
+/* '본 공고' 장부 (2026-10-05 리뷰 — 계산 시간).
+   열쇠를 **줄바꿈으로 이은 글자**로 둔다(state:seenLines). 예전 꼴(state:seen · JSON 배열)보다 읽고 쓰는 값이 싸다 —
+   새로 뜬 실행 환경에서 plan 걸음 첫 부르기가 Node 실측 중앙값으로 약 0.8ms 줄었다(4000개 · 학교+제목 열쇠가 섞인 장부).
+   학교+제목 열쇠는 빈칸(줄바꿈 포함)을 모두 지운 것이라 줄바꿈이 없다. 주소·공고 번호에 줄바꿈이 섞이면 그 열쇠만 두 줄로
+   갈라져 못 알아보고, 그 글은 학교+제목 열쇠로 알아본다(2026-10-05 데이터에는 줄바꿈이 든 주소·번호가 없었다).
+   🔴 옛 열쇠(state:seen)는 **읽기만 하고 쓰지 않는다** — 새 장부가 아직 없을 때(이 판이 올라간 뒤 첫 회차) 한 번 읽는다.
+      옛 코드로 되돌려도 그 코드가 읽는 state:seen 이 그대로 JSON 이라 넘어지지 않는다(되돌리기 전에 state:seen 을 지우면
+      첫 실행처럼 조용히 다시 채운다 — server/push/README.md). */
+const SEEN_KEY = 'state:seenLines';
+async function readSeen(env) {
+  const lines = await env.SUBS.get(SEEN_KEY);
+  if (lines !== null) return lines ? lines.split('\n') : [];
+  const old = await env.SUBS.get('state:seen');
+  try { return old ? JSON.parse(old) : []; } catch (e) { return []; }
+}
 
 function fetchData(env, path) {
   const origin = env.APP_ORIGIN || 'https://seonju5543-web.github.io/hanggonggan';
@@ -250,10 +295,18 @@ async function schoolsToWake(env, mini) {
 
   const today = ymd(Date.now());
   const tomorrow = ymd(Date.now() + 86400000);
-  const seenRaw = await env.SUBS.get('state:seen');
-  const seen = new Set(seenRaw ? JSON.parse(seenRaw) : []);
+  const seen = new Set(await readSeen(env));
+  const first = seen.size === 0;         // 첫 실행(장부가 빔) — 새 공고 사유는 세지 않고 장부만 채운다
   const planAt = Number(await env.SUBS.get('state:planAt')) || 0;   // 지난 회차가 판정을 마친 시각
-  const present = new Set();             // 이번 데이터에 있는 공고의 열쇠 — 장부를 자를 때 끝까지 남긴다
+  /* 옛 장부 — 장부는 있는데 지난 판정 시각이 없다 = 이 판(학교+제목 열쇠·수집일 규칙)이 올라간 뒤 첫 회차다.
+     옛 코드는 주소 열쇠(n:)만 적었으므로, 그 사이 주소만 바뀐 같은 글이 모두 '새 글'로 보인다(10-04 08:10 회차가
+     그런 글 46건으로 9개교를 깨웠다). 그래서 이 한 회차만 실시간 공고의 새 글 사유를 세지 않고 열쇠만 채운다
+     (2026-10-05 리뷰). 마감 사유와 정식 등록의 새 공고(공고 번호는 주소처럼 바뀌지 않는다)는 그대로 깨운다. */
+  const legacy = !first && !planAt;
+  /* 이번 데이터에 있는 열쇠는 장부 **끝으로 옮긴다**(지우고 다시 넣기) — 그러면 앞쪽에는 데이터에 없는 옛 열쇠만 남아
+     자를 때 앞에서부터 버리면 된다(아래). 열쇠를 넣는 순간 같은 회차의 뒤 글에도 '본 것'이 된다 — 폰도 같은 회차 안에서
+     같은 학교+제목 글을 한 번만 센다(notify-rules 가 돌면서 적는다). */
+  const touch = (k) => { seen.delete(k); seen.add(k); };
 
   const wakeAll = { value: false };      // 전국 대상 사건이면 모두 깨운다
   const schools = new Set();
@@ -261,7 +314,7 @@ async function schoolsToWake(env, mini) {
 
   for (const s of (mini.reg || [])) {
     const isNew = !seen.has(s.id);
-    present.add(s.id);
+    touch(s.id);
 
     const dl = s.deadline;
     const dueSoon = dl === today || dl === tomorrow;
@@ -270,9 +323,9 @@ async function schoolsToWake(env, mini) {
        전국 마감 공고가 있는 날마다 20:10 에 모든 구독자에게. 첫 실행(장부가 빔)에도 마감은 깨운다. */
     const dueKey = 'due:' + s.id + ':' + today;
     const dueFresh = dueSoon && !seen.has(dueKey);
-    if (dueSoon) present.add(dueKey);
+    if (dueSoon) touch(dueKey);
     // 첫 실행(장부가 비어 있음)은 '전부 새 공고'가 되므로 새 공고 사유는 세지 않는다
-    const countNew = seen.size > 0 && isNew && (!dl || dl >= today);
+    const countNew = !first && isNew && (!dl || dl >= today);
 
     if (!countNew && !dueFresh) continue;
     if (s.school) schools.add(s.school);                                   // 한 학교 한정
@@ -281,24 +334,25 @@ async function schoolsToWake(env, mini) {
     reasons.push(`${s.id}:${countNew ? 'new' : ''}${dueFresh ? 'due' : ''}`);
   }
 
-  for (const n of (mini.notices || [])) {
+  for (let n of (mini.notices || [])) {
+    if (n.tk == null) n = noticeMini(n);           // 이 판이 올라가기 전에 notices 걸음을 마친 회차의 옛 꼴(제목이 있다)
     const k = 'n:' + n.url;
-    const tk = titleSeenKey(n);
     // 본 공고 = 주소가 같거나 · 학교+제목이 같거나 · 지난 판정보다 이틀 넘게 앞서 수집됐거나 (폰과 같은 셋)
-    const wasSeen = seen.has(k) || seen.has(tk) || foundBeforePlan(n, planAt);
-    present.add(k);
-    present.add(tk);
-    if (wasSeen) continue;
-    if (seen.size === 0) continue;                 // 첫 실행은 조용히 장부만 채운다
-    if (/대출|융자/.test(n.title || '')) continue;  // 장학금이 아닌 것은 깨우지 않는다
-    for (const x of wakeSchoolsForNotice(n)) schools.add(x);
+    const wasSeen = seen.has(k) || seen.has(n.tk) || foundBeforePlan(n.found, planAt);
+    touch(k);
+    touch(n.tk);
+    if (wasSeen || first || legacy) continue;      // 첫 실행·옛 장부 회차는 조용히 장부만 채운다
+    if (n.loan) continue;                          // 대출·융자는 장학금이 아니다 — 깨우지 않는다
+    for (const x of (n.wake || [n.school])) schools.add(x);
     reasons.push(`notice:${n.school}`);
   }
 
   /* 장부가 무한정 커지지 않게 자른다 — 🔴 **데이터에 없는 옛 열쇠부터** 자른다.
-     예전엔 넣은 순서대로 뒤 4000개만 남겨, 오래 실려 있는 공고의 열쇠가 먼저 잘려 다시 '새 공고'가 됐다. */
-  const keep = Array.from(seen).filter((x) => !present.has(x)).concat(Array.from(present));
-  await env.SUBS.put('state:seen', JSON.stringify(keep.slice(-SEEN_MAX)));
+     예전엔 넣은 순서대로 뒤 4000개만 남겨, 오래 실려 있는 공고의 열쇠가 먼저 잘려 다시 '새 공고'가 됐다.
+     지금 데이터의 열쇠는 위에서 끝으로 옮겼으므로 앞에서부터 넘친 수만큼만 버린다(한 번 훑기 · 넘치지 않으면 손대지 않는다). */
+  let over = seen.size - SEEN_MAX;
+  if (over > 0) for (const k of seen) { seen.delete(k); if (--over <= 0) break; }
+  await env.SUBS.put(SEEN_KEY, Array.from(seen).join('\n'));
   await env.SUBS.put('state:planAt', String(Date.now()));
   return { schools, wakeAll: wakeAll.value, reasons };
 }
@@ -319,9 +373,11 @@ const clearRun = async (env) => {
 /* 회차가 **끝까지** 돌았으면 그 결과를 남기고 정리한다 (2026-10-04 로봇·도구 점검).
    예전엔 결과(깨운 수 등)를 버려 /health 로는 '회차가 돌았는지'조차 알 수 없었다 — 예약이 안 돌거나
    KV 쓰기가 실패해도 매일 확인(push-health)은 초록이었다. 회차당 KV 쓰기 1건(하루 2건)이 는다.
-   포기(같은 걸음 5회 실패)는 여기로 오지 않는다 — 그때는 지금처럼 state:lastError 만 남긴다. */
+   포기(같은 걸음 5회 실패)는 여기로 오지 않는다 — 그때는 지금처럼 state:lastError 만 남긴다.
+   깨우기를 보낸 회차는 state:lastSentRun 에도 남긴다(2026-10-05 리뷰) — 매일 확인(06:17)이 보는 lastRun 은 대개 전날 20:10
+   회차라, 그 회차가 '알릴 거리 없음'이면 08:10 회차의 '보냈는데 한 대도 안 받음'이 덮여 그날 놓쳤다. 발송 회차에서만 KV 쓰기 1건이 는다. */
 const finishRun = async (env, run, outcome) => {
-  await env.SUBS.put('state:lastRun', JSON.stringify({
+  const rec = JSON.stringify({
     slot: run.slot || null,                 // 예약 회차면 'YYYY-MM-DD#HH:MM'(KST) · 수동 /run 은 null
     startedAt: run.startedAt || null,
     finishedAt: Date.now(),
@@ -331,7 +387,9 @@ const finishRun = async (env, run, outcome) => {
     sent: run.sent || 0,                    // 깨우기를 시도한 수
     schools: (run.schools || []).length,
     wakeAll: !!run.wakeAll,
-  }));
+  });
+  await env.SUBS.put('state:lastRun', rec);
+  if (outcome === 'sent') await env.SUBS.put('state:lastSentRun', rec);
   await clearRun(env);
 };
 
@@ -487,9 +545,10 @@ export default {
 
     if (url.pathname === '/health') {
       const run = await getRun(env);
-      let lastError = null; let lastRun = null;
+      let lastError = null; let lastRun = null; let lastSentRun = null;
       try { lastError = JSON.parse((await env.SUBS.get('state:lastError')) || 'null'); } catch (e) { lastError = null; }
       try { lastRun = JSON.parse((await env.SUBS.get('state:lastRun')) || 'null'); } catch (e) { lastRun = null; }
+      try { lastSentRun = JSON.parse((await env.SUBS.get('state:lastSentRun')) || 'null'); } catch (e) { lastSentRun = null; }
       /* 마지막으로 **시작한** 예약 회차('YYYY-MM-DD#HH:MM' KST) — 매일 확인이 '예약이 돌고 있는가'를 이걸로 본다.
          새 KV 면 null 이다. */
       const lastSlot = (await env.SUBS.get('state:slot')) || null;
@@ -515,6 +574,7 @@ export default {
         pastError: recovered ? lastError : null, // 포기한 적이 있지만 그 뒤 회차가 끝까지 돌아 회복한 기록
         lastSlot,                            // 마지막으로 시작한 예약 회차 (KST)
         lastRun,                             // 마지막으로 끝까지 돈 회차의 결과 (finishRun)
+        lastSentRun,                         // 마지막으로 깨우기를 끝까지 보낸 회차 (outcome 'sent' · 없으면 null)
       }, 200, cors);
     }
 
@@ -569,5 +629,5 @@ export default {
 /* 테스트에서 부분만 떼어 쓰기 위한 내보내기 (Worker 동작에는 영향 없음) */
 export {
   isPushEndpoint, schoolsToWake, ymd, subKey, tick, dueSlot, summarize,
-  titleSeenKey, taggedSchool, wakeSchoolsForNotice, SHARED_BOARD_BRANCH,
+  titleSeenKey, titleSeenKeyFast, taggedSchool, wakeSchoolsForNotice, SHARED_BOARD_BRANCH, noticeMini, readSeen,
 };

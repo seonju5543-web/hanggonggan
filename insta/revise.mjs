@@ -18,7 +18,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { readSeen, writeSeen, markPrepared } from './pick.mjs';
+import { readSeen, writeSeen, markPrepared, preparedRow } from './pick.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -44,10 +44,10 @@ const r = spawnSync('node', cmd, { stdio: 'inherit', cwd: ROOT });
 if (r.status !== 0) { console.error(`\n🚨 다시 그리기 실패 (종료 ${r.status}) — 위 메시지를 보세요. 장부는 안 건드렸습니다.`); process.exit(r.status || 1); }
 
 // 장부 — 고친 것도 '준비됨' 이다(건너뛰기였다면 되살아난다). 게시 여부는 posted 가 따로 안다.
+// 줄 모양은 pick.mjs preparedRow 한 곳(ledger.mjs prepared 와 같다 · dates 까지 — 빠지면 관리자 화면이 '옛 카드' 로 막는다).
 const meta = JSON.parse(readFileSync(metaFile, 'utf8'));
 const seen = readSeen();
-markPrepared(seen, { code, org: meta.org, name: meta.name, due: meta.due, school: meta.school || null, tplNo: meta.tplNo, cards: meta.cards,
-  dir: `insta/pub/${code}`, at: meta.at, revisedAt: meta.at, dates: meta.dates || null, status: 'prepared' });
+markPrepared(seen, preparedRow(code, meta, { revisedAt: meta.at }));
 writeSeen(seen);
 
 if (!args.includes('--no-preview')) {
