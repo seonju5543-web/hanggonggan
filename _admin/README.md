@@ -47,12 +47,25 @@ _admin/*
 data.js
 apply-channel.js
 forms.js
+form-plan.js
+source-link.js
 verify/entry-rules.cjs
 collector/url-key.mjs
+collector/deadline-hint.mjs
+collector/notice-source.mjs
+collector/canon-url.mjs
+collector/page-boilerplate.mjs
 collector/activity-kind.mjs
-source-link.js
+collector/news-kind.mjs
 collector/link-fix.mjs
+tools/edit-diff.mjs
 ```
+
+이 목록은 `_admin/build.sh` 가 관리자 화면으로 옮기는 원본 **전부**입니다. 관문(로봇·도구 점검 관문 admin)이
+build.sh 와 대조합니다 — 새 원본을 vendor 로 옮기면 여기에도 더하라고 빨간불이 켜집니다.
+⚠️ 2026-10-04 점검 때 일곱 줄(`form-plan.js`·`collector/deadline-hint.mjs`·`collector/notice-source.mjs`·`collector/canon-url.mjs`·
+`collector/page-boilerplate.mjs`·`collector/news-kind.mjs`·`tools/edit-diff.mjs`)이 빠져 있었습니다 — Cloudflare 설정에도 더해 주세요.
+`collector/**` 처럼 넓히지 마세요(로봇 커밋마다 다시 만들어 무료 한도를 며칠에 씁니다 — 아래 '왜 필요한가').
 
 ⚠️ `source-link.js`·`collector/link-fix.mjs` 는 2026-10-04에 더해졌습니다 — 「할 일 › 원문 링크 손볼 것」이
 학생이 지금 보는 링크 이름(source-link.js)과 넣을 수 있는 주소 규칙(link-fix.mjs)을 앱·저장소와 **같은 파일**로 씁니다.

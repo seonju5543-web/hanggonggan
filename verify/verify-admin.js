@@ -165,11 +165,15 @@ function serve() {
     /* 🔴 검수 대기가 0건이면 '컨펌 작업대'와 '다중 선택' 검사가 **조용히 사라진다**
        (2026-08-14에 실제로 그렇게 됐다 — 밀린 105건을 전부 검수하자 두 항목이 실패했다).
        검수 대기 0건은 우리가 바라는 상태이므로, 그때도 그 기능이 살아 있는지는 확인해야 한다.
-       그래서 **검사용 대기 공고 2건을 끼워 넣는다.** 저장소 데이터는 건드리지 않는다. */
+       그래서 **검사용 대기 공고를 끼워 넣는다.** 저장소 데이터는 건드리지 않는다.
+       🔴 마감 전 대기 공고가 **6건**이 되게 채운다(2026-10-04 로봇·도구 점검 admin-F1) — 「많이 지울 때 숫자 확인」 검사가
+          6건을 골라야 하는데, 실데이터 건수에 기대면 검수를 다 끝낸 날 조용히 사라진다(위와 같은 유형). */
     if (rel === 'data/registered.json') {
       const db = JSON.parse(body);
-      if (!db.items.some((x) => x.auto)) {
-        for (const n of [1, 2]) db.items.push({
+      const todayF = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+      const openAuto = db.items.filter((x) => x.auto && !(x.deadline && x.deadline < todayF)).length;
+      if (openAuto < 6) {
+        for (let n = 1; n <= 6 - openAuto; n += 1) db.items.push({
           id: `verify-pending-${n}`, name: `검사용 대기 공고 ${n}`, type: '교외',
           provider: '검사용', amount: '금액 원문 확인', amountValue: 0,
           /* 마감을 가깝게 둔다 — '마감 임박만 고르기'가 실제로 여러 건을 잡는지 봐야 하므로 */
@@ -856,6 +860,176 @@ function serve() {
   await page.waitForFunction(() => /반영 완료/.test(document.querySelector('#job-text')?.textContent || ''),
     null, { timeout: 20000 });
   await page.unroute('**/actions/workflows/**/dispatches');
+
+  /* ⑦-2 버튼 길이 끝까지 가는가 (2026-10-04 로봇·도구 점검 · 관문 verify/health-gates/admin.mjs 와 짝).
+     보내는 요청·결과 읽기를 전부 가로챈다(진짜 실행은 시키지 않는다). 위 fakeRun(성공)이 결과 읽기의 기본값이다.
+     🔴 가로채기를 풀 때는 **이 절의 처리기만** 푼다(unroute 에 처리기를 넘긴다) — 주소만 넘기면 위 fakeRun 까지 풀린다. */
+  {
+    const { needsBulkExpect } = await import(require('node:url').pathToFileURL(path.join(ROOT, 'tools/edit-diff.mjs')).href);
+    const listN = (PAGE_ITEMS || []).length;
+    const idle = () => page.waitForFunction(() => !window.__admin.jobBusy(), null, { timeout: 30000 }).then(() => true, () => false);
+    const jobText = () => page.evaluate(() => document.querySelector('#job-text')?.textContent || '');
+    let sent = null;
+    let nSent = 0;
+    const onDispatch = (route) => {
+      nSent += 1;
+      try { sent = JSON.parse(route.request().postData() || '{}'); } catch { sent = 'parse-fail'; }
+      route.fulfill({ status: 204, body: '' });
+    };
+    const payloadOf = () => { try { return JSON.parse(sent?.inputs?.payload || '{}'); } catch { return {}; } };
+    await page.route('**/actions/workflows/**/dispatches', onDispatch);
+    const review = async () => {
+      await page.click('.tab[data-tab="review"]');
+      await page.waitForSelector('#screen-review:not([hidden])');
+      await page.locator('[data-sel="none"]').first().click();
+      await page.waitForTimeout(150);
+    };
+    const pickN = async (n) => {
+      const picks = page.locator('#screen-review [data-row] input[data-pick]');
+      const have = await picks.count();
+      for (let i = 0; i < Math.min(n, have); i += 1) await picks.nth(i).check();
+      await page.waitForTimeout(120);
+      return have;
+    };
+
+    /* F1 — 6건 되돌리기: 지울 건수를 숫자로 한 번 더 받는다(저장소 문턱과 같은 함수) */
+    await idle();
+    await review();
+    const have = await pickN(6);
+    ok(have >= 6, 'F1 많이 지우기 검사 표본 — 컨펌 작업대에 고를 줄이 6개 이상 (모자라면 표본 부족 — 조용히 건너뛰지 않는다)', `${have}줄`);
+    ok(needsBulkExpect(6, listN), '  (표본 확인) 6건 되돌리기는 저장소 문턱에 걸린다', `목록 ${listN}건`);
+    await page.click('[data-selbar] [data-sel="revert"]');
+    await page.waitForSelector('#sheet:not([hidden])');
+    const field = page.locator('#sheet [data-bulk-expect]');
+    const go = page.locator('#sheet [data-bulk-go]');
+    const hasField = (await field.count()) === 1;
+    ok(hasField, 'F1 6건 되돌리기 시트에 지울 건수 숫자 칸이 있다');
+    ok(await go.isDisabled(), '  숫자를 적기 전에는 실행 버튼이 잠겨 있다');
+    if (hasField) {
+      ok((await field.inputValue()) === '', '  숫자를 화면이 미리 채우지 않는다');
+      await field.fill('5');
+      ok(await go.isDisabled(), '  틀린 숫자(5)를 적으면 계속 잠겨 있다');
+      await field.fill('6');
+      ok(!(await go.isDisabled()), '  맞는 숫자(6)를 적으면 풀린다');
+    }
+    sent = null;
+    if (!(await go.isDisabled())) await go.click();
+    else await page.click('#sheet [data-close]');
+    await page.waitForTimeout(700);
+    const p6 = payloadOf();
+    ok(sent?.inputs?.action === 'revert' && p6.expect === 6 && Array.isArray(p6.ids) && p6.ids.length === 6,
+      '  보내는 요청에 지울 건수(expect 6)와 id 6개가 실린다', JSON.stringify({ action: sent?.inputs?.action, expect: p6.expect, ids: p6.ids && p6.ids.length }));
+    await idle();
+
+    /* 작은 삭제(2건)는 — 문턱 함수가 아니라고 하면 숫자를 묻지 않는다 */
+    await review();
+    await pickN(2);
+    await page.click('[data-selbar] [data-sel="remove"]');
+    await page.waitForSelector('#sheet:not([hidden])');
+    const want2 = needsBulkExpect(2, listN);
+    ok(((await field.count()) === 1) === want2, `  2건 삭제는 ${want2 ? '목록이 작아 숫자를 묻는다' : '숫자를 묻지 않는다'} (문턱은 저장소와 같은 함수)`, `목록 ${listN}건`);
+    sent = null;
+    if (!want2 && !(await go.isDisabled())) {
+      await go.click();
+      await page.waitForTimeout(700);
+      const p2 = payloadOf();
+      ok(sent?.inputs?.action === 'remove' && p2.ids?.length === 2 && !('expect' in p2), '  작은 삭제는 expect 없이 id 2개만 보낸다', JSON.stringify(p2).slice(0, 120));
+      await idle();
+    } else await page.click('#sheet [data-close]');
+
+    /* F4 — 같은 대기줄(collector)에 기다리는 실행이 있으면 보내지 않는다(보내면 그 실행이 시작 전에 취소될 수 있다) */
+    let queueMode = 'pending';
+    const qRun = { id: 77, name: '장학금 공고 수집', path: '.github/workflows/collect-scholarships.yml', status: 'pending', html_url: 'https://example.invalid/queued' };
+    const isQueueUrl = (u) => /\/actions\/runs\?/.test(u.href);
+    const onQueue = (route) => {
+      const st = new URL(route.request().url()).searchParams.get('status');
+      const runs = (queueMode === 'pending' && st === 'pending') ? [qRun]
+        : (queueMode === 'running' && st === 'in_progress') ? [{ ...qRun, status: 'in_progress' }] : [];
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ total_count: runs.length, workflow_runs: runs }) });
+    };
+    await page.route(isQueueUrl, onQueue);
+    const confirmOne = async () => {
+      await review();
+      await pickN(1);
+      await page.click('[data-selbar] [data-sel="confirm"]');
+      await page.waitForSelector('#sheet:not([hidden])');
+      await page.click('#sheet [data-bulk-go]');
+    };
+    nSent = 0;
+    await confirmOne();
+    await page.waitForTimeout(800);
+    const tQ = await jobText();
+    ok(nSent === 0, 'F4 같은 줄에 기다리는 수집 로봇 실행이 있으면 요청을 보내지 않는다', `보낸 횟수 ${nSent}`);
+    ok(/줄을 서 있어요/.test(tQ) && /다시 눌러/.test(tQ), '  「줄을 서 있어요 … 다시 눌러 주세요」라고 알린다', tQ.slice(0, 90));
+    ok(await idle(), '  작업 잠금이 풀린다');
+    queueMode = 'running';
+    nSent = 0;
+    await confirmOne();
+    await page.waitForTimeout(500);
+    const tR = await jobText();
+    ok(nSent === 1, '  실행 중인 로봇만 있으면 보낸다 (실행 중인 것은 취소되지 않는다)', `보낸 횟수 ${nSent}`);
+    ok(/수집 로봇이 끝나면 이어서 반영/.test(tR), '  그때는 「수집 로봇이 끝나면 이어서 반영됩니다」', tR.slice(0, 90));
+    await idle();
+    queueMode = 'empty';
+
+    /* 줄 서는 동안은 '반영 중'이 아니라 '줄 서는 중'이라고 말한다 */
+    let runMode = 'queued';
+    const qAt = () => new Date(Date.now() + 5000).toISOString();
+    const onRuns = (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ workflow_runs: [
+      runMode === 'queued' ? { id: 41, status: 'queued', conclusion: null, created_at: qAt(), html_url: 'https://example.invalid/run41' }
+        : { id: 41, status: 'completed', conclusion: 'success', created_at: qAt(), html_url: 'https://example.invalid/run41' }] }) });
+    await page.route('**/actions/workflows/**/runs**', onRuns);
+    nSent = 0;
+    await confirmOne();
+    const sawQueued = await page.waitForFunction(() => /줄 서는 중/.test(document.querySelector('#job-text')?.textContent || ''), null, { timeout: 8000 }).then(() => true, () => false);
+    ok(nSent === 1 && sawQueued, 'F4 보낸 실행이 줄을 서 있으면 「줄 서는 중」이라고 말한다 (반영 중이라고 하지 않는다)', (await jobText()).slice(0, 80));
+    runMode = 'done';
+    ok(await page.waitForFunction(() => /반영 완료/.test(document.querySelector('#job-text')?.textContent || '') && !window.__admin.jobBusy(), null, { timeout: 30000 }).then(() => true, () => false),
+      '  줄에서 풀려 끝나면 「반영 완료」 (줄 서는 동안은 15초마다 다시 본다)');
+    await page.unroute('**/actions/workflows/**/runs**', onRuns);
+
+    /* F9 — 실패를 단계 결과로 가른다(예전엔 무엇이든 '검사를 통과하지 못해 되돌렸습니다') */
+    let failMode = 'apply';
+    const failRun = () => ({ id: 31, status: 'completed', conclusion: failMode === 'early' ? 'cancelled' : 'failure', created_at: qAt(), html_url: 'https://example.invalid/run31' });
+    const onFailRuns = (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ workflow_runs: [failRun()] }) });
+    const onJobs = (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(failMode === 'early' ? { total_count: 0, jobs: [] } : { total_count: 1, jobs: [{
+      id: 501, status: 'completed', conclusion: 'failure', html_url: 'https://example.invalid/job501',
+      check_run_url: 'https://api.github.com/repos/seonju5543-web/hanggonggan/check-runs/501',
+      steps: [{ name: '요청 내용 적용', status: 'completed', conclusion: 'failure', number: 5 }, { name: '데이터 감사', status: 'completed', conclusion: 'skipped', number: 6 },
+        { name: '저장', status: 'completed', conclusion: 'skipped', number: 8 }, { name: '🚨 실패 알림', status: 'completed', conclusion: 'success', number: 10 }] }] }) });
+    const onAnn = (route) => (failMode === 'apply'
+      ? route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([
+        { message: '관리자 조정 실패 — 한 번에 6건을 지우는 요청입니다(지금 164건). 실수로 목록을 통째로 지우는 것을 막으려고 지울 건수를 숫자로 한 번 더 받습니다 — 받은 값: 없음', annotation_level: 'failure' },
+        { message: 'Process completed with exit code 1.', annotation_level: 'failure' }]) })
+      : route.fulfill({ status: 403, contentType: 'application/json', body: JSON.stringify({ message: 'Resource not accessible by personal access token' }) }));
+    const isJobs = (u) => /\/actions\/runs\/\d+\/jobs/.test(u.href);
+    const isAnn = (u) => /\/check-runs\/\d+\/annotations/.test(u.href);
+    await page.route('**/actions/workflows/**/runs**', onFailRuns);
+    await page.route(isJobs, onJobs);
+    await page.route(isAnn, onAnn);
+    const failCase = async (mode) => {
+      failMode = mode;
+      await confirmOne();
+      await page.waitForFunction(() => /bad/.test(document.querySelector('#job')?.className || '') && !window.__admin.jobBusy(), null, { timeout: 20000 }).catch(() => {});
+      return jobText();
+    };
+    const tA = await failCase('apply');
+    ok(/한 번에 6건/.test(tA) && /요청을 받지 않았습니다/.test(tA) && !/검사를 통과하지 못해/.test(tA),
+      'F9 입력 거절이면 저장소가 남긴 사유를 그대로 보인다 (감사 탓으로 적지 않는다)', tA.slice(0, 100));
+    ok(!(await page.evaluate(() => window.__admin.jobBusy())), '  작업 잠금이 풀린다');
+    const tB = await failCase('noann');
+    ok(/실행 기록에서/.test(tB) && !/한 번에/.test(tB) && !/검사를 통과하지 못해/.test(tB),
+      '  사유를 못 읽으면(권한 없음 403) 지어내지 않고 「실행 기록에서」로 끝낸다', tB.slice(0, 100));
+    const tC = await failCase('early');
+    ok(/시작 전에 취소/.test(tC) && /바뀌지 않았습니다/.test(tC), '  작업이 0개인 취소는 「시작 전에 취소됐습니다」', tC.slice(0, 100));
+    ok(!(await page.evaluate(() => window.__admin.jobBusy())), '  세 경우 모두 작업 잠금이 풀린다');
+    await page.unroute('**/actions/workflows/**/runs**', onFailRuns);
+    await page.unroute(isJobs, onJobs);
+    await page.unroute(isAnn, onAnn);
+    await page.unroute(isQueueUrl, onQueue);
+    await page.unroute('**/actions/workflows/**/dispatches', onDispatch);
+    await page.click('[data-sel="none"]').catch(() => {});
+  }
 
   /* ⑨ 화면에서 직접 등록 (C) — 관리자 화면의 목적 절반이 여기 있었다.
      예전 코드에는 "등록 버튼은 다음 단계에 붙습니다"라고 적혀 있었다. */
