@@ -233,7 +233,9 @@ function mergeOwnPrograms(o, t) {
 /* 인스타 장부(insta/seen.json · 2026-10-04 로봇·도구 점검) — 🔴 아래 일반 `seen.json` 규칙(주소→날짜 표)에 걸리면
    올림 기록(posted)과 다른 쪽의 준비 줄이 **사라진다**(표본으로 확인) → 지운 올림 기록은 같은 글을 두 번 올리게 한다.
    그래서 일반 규칙보다 **앞에** 둔다. 인스타 작업의 대기줄을 공고별로 나눠(insta.yml) 두 실행이 같은 장부를 쓸 수 있다.
-   · posted — 공고 코드로 합집합, **절대 버리지 않는다**. 같은 코드면 media 가 있는 쪽 → 이른 at → 내 것.
+   · posted — **절대 버리지 않는다**. 같은 공고·같은 게시물(code·media 가 둘 다 같은 줄)만 한 줄로 줄이고(이른 at → 내 것),
+     같은 공고라도 media 가 다르면 둘 다 남긴다(실제 이중 게시의 증거) · code 가 없는 줄도 그대로 남긴다(리뷰 2026-10-05 —
+     옛 판은 code 하나로 줄여 code 없는 줄을 버리고 한쪽 안의 이중 게시 기록을 하나로 합쳤다).
    · prepared — 공고 코드로 합집합. 같은 코드가 한쪽에서만 바뀌었으면(공통 조상과 같은 쪽이 있으면) 바뀐 쪽.
      둘 다 바뀌었으면 상태 순위 posted > skipped·expired > prepared > failed, 같으면 날짜가 늦은 쪽, 그래도 같으면 내 것.
      (조상을 보는 이유: 사람이 건너뛴 카드를 다시 그리는 동안 자동 준비가 장부를 쓰면, 순위만으로는 옛 '건너뜀' 이 새 그림을 이긴다.) */
@@ -248,10 +250,15 @@ function mergeInstaSeen(o, t, base = null) {
     for (const [c, r] of tm) if (!om.has(c)) out.push(r);
     return out;
   };
-  const posted = union(o?.posted, t?.posted, (a, b) => {
-    if (!!a.media !== !!b.media) return a.media ? a : b;
-    return String(b.at || '') < String(a.at || '') ? b : a;
-  });
+  /* 올림 기록 — 열쇠는 code·media(code 가 없으면 줄 전체). 공통 조상의 줄은 양쪽에 다 있으므로 같은 열쇠는 한 줄로 줄인다. */
+  const postKey = (r) => (r && r.code ? `c:${r.code}|${r.media ?? ''}` : `j:${JSON.stringify(r)}`);
+  const postedMap = new Map();
+  for (const r of [...(Array.isArray(o?.posted) ? o.posted : []), ...(Array.isArray(t?.posted) ? t.posted : [])]) {
+    if (r == null) continue;
+    const k = postKey(r); const prev = postedMap.get(k);
+    if (!prev || String(r.at || '') < String(prev.at || '')) postedMap.set(k, r);   // 같은 게시물이면 이른 at · 같으면 먼저 본 것(내 것)
+  }
+  const posted = [...postedMap.values()];
   const bm = byCode(base?.prepared);
   const prepared = union(o?.prepared, t?.prepared, (a, b, c) => {
     const was = bm.get(c);

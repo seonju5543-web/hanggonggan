@@ -21,6 +21,7 @@ const { checkEntry, isDuplicatePair, sameProgram } = createRequire(import.meta.u
 import { classifyKind, schoolDomain } from './kind-evidence.mjs';
 import { loadSchoolNames, schoolTokens } from './school-names.mjs';
 import { mergeInto } from './registered-merge.mjs';
+import { stripSiteChrome } from './attachment-link.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfgPath = new URL('auto-register-config.json', HERE);
@@ -385,7 +386,10 @@ if (!cfg.enabled) {
     added.push(entry);
   }
 
-  if (added.length || removed || promoted.length) {
+  /* 게시판 공통 링크를 정식 등록 첨부에서도 걷는다 — 장부와 함께 세야 등록 뒤에 드러난 것도 걷힌다(attachment-link.mjs · 2026-10-05).
+     장부(notices)는 여기서 저장하지 않는다 — 장부는 수집 로봇이 같은 규칙으로 걷는다 */
+  const chromeRemoved = stripSiteChrome([registered.items, notices.items || []]);
+  if (added.length || removed || promoted.length || chromeRemoved) {
     registered.updatedAt = TODAY;
     fs.writeFileSync(registeredPath, JSON.stringify(registered, null, 1) + '\n');
   }

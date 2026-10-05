@@ -10,16 +10,21 @@
  *       node insta/ledger.mjs expire                        마감이 지난 카드(준비·건너뜀·실패)를 '만료' 로 바꾸고 그 폴더를 지운다
  *                                                          (2026-10-04 · 규칙은 pick.mjs expireRows · 🔴 올린 것의 폴더는 절대 안 지운다
  *                                                          — 관리자 「올림」 줄의 썸네일이 읽는다 · 마지막 줄 `expired=<건수>`)
+ *       node insta/ledger.mjs posted <코드> --media=<번호> [--permalink=<주소>]
+ *                                                          올린 기록 한 줄(워크플로 「올린 기록 저장」 · 2026-10-05) — 올리기 단계가 올린 뒤
+ *                                                          멈춰 게시 명령이 장부에 못 적었어도 media 번호로 적는다(이미 있으면 그대로)
  *       node insta/ledger.mjs show                          장부 요약
+ * 장부 줄 모양·만료 규칙·올림 기록은 전부 pick.mjs 한 곳(preparedRow · expireAndClean · recordPosted) — 관문이 임시 폴더에 이 파일을 복사해 실제로 돌린다.
  */
-import { readFileSync, existsSync, rmSync } from 'node:fs';
-import { readSeen, writeSeen, markPrepared, expireRows } from './pick.mjs';
+import { readFileSync, existsSync } from 'node:fs';
+import { readSeen, writeSeen, markPrepared, preparedRow, expireAndClean, recordPosted } from './pick.mjs';
 import { kstDay } from './graph.mjs';
 
 const ROOT = new URL('../', import.meta.url);
 const [cmd, ...rest] = process.argv.slice(2);
 const codes = rest.filter((a) => !a.startsWith('--'));
-const by = (rest.find((a) => a.startsWith('--by=')) || '').slice(5) || null;
+const opt = (k) => (rest.find((a) => a.startsWith(`--${k}=`)) || '').slice(k.length + 3) || null;
+const by = opt('by');
 const seen = readSeen();
 
 if (cmd === 'prepared') {
@@ -27,9 +32,7 @@ if (cmd === 'prepared') {
   for (const c of codes) {
     const f = new URL(`insta/pub/${c}/meta.json`, ROOT);
     if (!existsSync(f)) { console.error(`🚨 insta/pub/${c}/meta.json 이 없습니다 — 그리지 않은 것을 장부에 적을 수 없습니다.`); process.exit(1); }
-    const m = JSON.parse(readFileSync(f, 'utf8'));
-    markPrepared(seen, { code: c, org: m.org, name: m.name, due: m.due, school: m.school || null,
-      tplNo: m.tplNo, cards: m.cards, dir: `insta/pub/${c}`, at: m.at, dates: m.dates || null, status: 'prepared' });   // dates — 관리자 화면이 옛 「마감 D-N」 카드를 가린다
+    markPrepared(seen, preparedRow(c, JSON.parse(readFileSync(f, 'utf8'))));   // dates 까지 — 관리자 화면·게시가 옛 「마감 D-N」 카드를 가린다
   }
   writeSeen(seen);
   console.log(`장부: 준비 ${seen.prepared.filter((p) => p.status === 'prepared').length}건 · 건너뜀 ${seen.prepared.filter((p) => p.status === 'skipped').length}건 · 올림 ${seen.posted.length}건`);
@@ -50,21 +53,24 @@ if (cmd === 'prepared') {
   writeSeen(seen);
   console.log(`못 그림: ${codes.join(' ')}`);
 } else if (cmd === 'expire') {
-  const posted = new Set(seen.posted.map((p) => p.code));
-  const gone = expireRows(seen, Date.now());
-  for (const c of gone) {
-    // 코드는 장부에서 왔다 — 폴더 이름으로 못 쓰는 글자면(../ 등) 지우지 않는다. 올린 것은 두 번 확인한다.
-    if (!/^[A-Za-z0-9_-]+$/.test(c) || posted.has(c)) continue;
-    rmSync(new URL(`insta/pub/${c}/`, ROOT), { recursive: true, force: true });
-    console.log(`  만료·정리: ${c}`);
-  }
+  const gone = expireAndClean(seen, new URL('insta/pub/', ROOT), Date.now(), (c) => console.log(`  만료·정리: ${c}`));
   if (gone.length) writeSeen(seen);
   console.log(`마감 지나 정리 ${gone.length}건`);
   console.log(`expired=${gone.length}`);
+} else if (cmd === 'posted') {
+  const [c] = codes;
+  const media = opt('media');
+  if (!c || !/^[A-Za-z0-9_-]+$/.test(c) || !media) { console.error('코드와 --media=<번호> 를 주세요.'); process.exit(1); }
+  const f = new URL(`insta/pub/${c}/meta.json`, ROOT);
+  const m = existsSync(f) ? JSON.parse(readFileSync(f, 'utf8')) : {};
+  if (recordPosted(seen, { code: c, org: m.org, name: m.name, tplNo: m.tplNo, media, permalink: opt('permalink'), by: '기록 단계' })) {
+    writeSeen(seen);
+    console.log(`올림 기록: ${c} (media ${media}) — 게시 명령이 못 적은 것을 적었습니다`);
+  } else console.log(`올림 기록: ${c} (media ${media}) 은 이미 장부에 있습니다`);
 } else if (cmd === 'show') {
   for (const p of seen.prepared) console.log(`  ${p.status.padEnd(8)} ${p.code}  ${p.org || ''} · ${p.name || ''}  판형 ${p.tplNo ?? '?'}번  ${p.at || ''}`);
   console.log(`  올림 ${seen.posted.length}건`);
 } else {
-  console.error('prepared | skip | failed | expire | show');
+  console.error('prepared | skip | failed | expire | posted | show');
   process.exit(1);
 }

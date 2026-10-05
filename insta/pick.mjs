@@ -19,7 +19,7 @@
  *       node insta/pick.mjs --list    상위 12개를 점수와 함께 (사람이 볼 용도)
  *       node insta/pick.mjs --new [--max=6]   아직 준비 안 한 공고를 점수순으로 (JSON 배열)
  */
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, rmSync } from 'node:fs';
 import { kstDay } from './graph.mjs';
 
 const ROOT = new URL('../', import.meta.url);
@@ -38,12 +38,35 @@ export function markPrepared(seen, rec) {
   if (i >= 0) seen.prepared[i] = { ...seen.prepared[i], ...row }; else seen.prepared.push(row);
   return seen;
 }
+/** 그린 카드의 meta.json(render.mjs --pub) → 장부 줄 — `ledger.mjs prepared` 와 `revise.mjs` 가 같이 쓰는 한 곳(리뷰 2026-10-05).
+ *  🔴 `dates` 를 꼭 옮긴다 — 관리자 화면(instaPublishBlock)과 게시(publishRefusal)가 이 칸으로 옛 「마감 D-N」 카드를 가린다.
+ *     빠지면 새로 그린 2·3·4번 카드 전부가 '옛 카드 — 다시 그린 뒤 게시' 로 막히고, 다시 그려도 안 풀린다(두 곳에 손으로 적던 시절의 함정). */
+export const preparedRow = (code, m, extra = {}) => ({
+  code, org: m.org, name: m.name, due: m.due, school: m.school || null, tplNo: m.tplNo, cards: m.cards,
+  dir: `insta/pub/${code}`, at: m.at, dates: m.dates || null, status: 'prepared', ...extra,
+});
+
+/** 올린 기록 한 줄 — 게시 명령(publish.mjs)과 워크플로 「올린 기록 저장」(ledger.mjs posted)이 같이 쓰는 한 곳.
+ *  같은 공고·같은 게시물(media)이 이미 있으면 그대로 둔다(두 길이 같은 게시를 두 번 적지 않게) — 적었으면 true.
+ *  🔴 media 가 다르면 다른 게시물이다(실제 이중 게시의 증거) — 버리지 않고 적는다. */
+export function recordPosted(seen, rec, now = Date.now()) {
+  if (!rec?.code) return false;
+  if (seen.posted.some((p) => p.code === rec.code && String(p.media || '') === String(rec.media || ''))) return false;
+  const at = kstDay(now);                       // 🔴 KST — UTC 면 새벽에 어제로 찍힌다
+  seen.posted.push({ code: rec.code, org: rec.org ?? null, name: rec.name ?? null, tplNo: rec.tplNo ?? null,
+    at, media: rec.media ?? null, permalink: rec.permalink || null, ...(rec.by ? { by: rec.by } : {}) });
+  // 준비 장부의 줄도 '올림' 으로 — 관리자 화면이 두 장부를 같이 본다.
+  const pr = seen.prepared.find((p) => p.code === rec.code);
+  if (pr) { pr.status = 'posted'; pr.postedAt = at; }
+  return true;
+}
 
 /** 올리기 전에 마감이 지난 카드를 '만료(expired)' 로 바꾼다 — 바꾼 공고 코드 목록을 돌려준다 (2026-10-04 로봇·도구 점검).
  *  🔴 마감이 지난 카드는 다시 그릴 수도(캡션 거절) 올릴 수도(publishRefusal) 없는데 지우는 단계가 없어
  *     insta/pub 이 3주에 100MB 로 불었다(Pages 사이트 상한 1GB). 폴더 지우기는 `ledger.mjs expire` 가 한다.
  *  올린 것(posted)은 절대 안 건드린다 — 관리자 「올림」 줄의 썸네일이 그 폴더를 읽는다.
- *  마감 없음·오늘 마감(23:59 KST 전)·미래 마감은 그대로. */
+ *  마감 없음·오늘 마감(23:59 KST 전)·미래 마감은 그대로.
+ *  `expiredFrom` 에 만료 전 상태를 남긴다 — 사람이 「건너뛰기」 로 정한 카드(skipped)는 재단이 마감을 미뤄도 다시 그리지 않는다(candidates). */
 export const EXPIRABLE = ['prepared', 'skipped', 'failed'];
 export function expireRows(seen, now = Date.now()) {
   const posted = new Set((seen.posted || []).map((p) => p.code));
@@ -52,11 +75,28 @@ export function expireRows(seen, now = Date.now()) {
     if (!EXPIRABLE.includes(p.status) || posted.has(p.code) || !p.due) continue;
     const t = Date.parse(`${p.due}T23:59:59+09:00`);
     if (Number.isNaN(t) || t >= now) continue;
+    p.expiredFrom = p.status;
     p.status = 'expired';
     p.expiredAt = kstDay(now);
     out.push(p.code);
   }
   return out;
+}
+
+/** 만료 + 그 카드 폴더 지우기 — `ledger.mjs expire` 의 몸통(리뷰 2026-10-05 · 관문이 임시 폴더로 실제로 돌린다).
+ *  `pubDir` 는 공고 폴더들이 든 곳(file URL · 끝에 `/`). 지운 공고 코드 목록을 돌려준다 — 장부 저장은 부르는 쪽이 한다.
+ *  🔴 지우는 것은 `pubDir/<만료한 코드>/` 하나씩뿐이다 — pubDir 통째는 절대 아니다.
+ *  🔴 올린 것(posted)은 두 번 확인한다(expireRows 도 빼지만) — 관리자 「올림」 줄의 썸네일이 그 폴더를 읽는다.
+ *  코드는 장부에서 왔다 — 폴더 이름으로 못 쓰는 글자면(../ 등) 장부만 고치고 지우지 않는다. */
+export function expireAndClean(seen, pubDir, now = Date.now(), log = () => {}) {
+  const posted = new Set((seen.posted || []).map((p) => p.code));
+  const gone = expireRows(seen, now);
+  for (const c of gone) {
+    if (!/^[A-Za-z0-9_-]+$/.test(c) || posted.has(c)) continue;
+    rmSync(new URL(`${c}/`, pubDir), { recursive: true, force: true });
+    log(c);
+  }
+  return gone;
 }
 
 /** 🔴 로봇 기록장과 같은 모양(들여쓰기 1칸)으로 저장한다 — 다르게 저장하면 파일 전체가
@@ -113,9 +153,12 @@ export function candidates(items, today, seen, { unpreparedOnly = false } = {}) 
     .filter((p) => p.status !== 'failed' || (today - Date.parse(`${p.failedAt}T00:00:00+09:00`)) < RETRY_MS)
     .map((p) => [p.code, p]));
   // 🔴 마감이 지나 만료한 카드라도 재단이 마감을 미뤘으면(지금 공고의 마감이 장부 줄보다 늦다) 다시 그린다.
+  //    단 사람이 「건너뛰기」 로 정한 카드(expiredFrom skipped)는 다시 그리지 않는다 — 담당자 셋에게 같은 공고 알림이 다시 가지 않게(리뷰 2026-10-05).
+  //    사람이 되살리려면 관리자 화면 「이 판형으로 다시 그리기」(코드를 준 준비)로 — 그 길은 이 후보 고르기를 거치지 않는다.
   const stillPrepped = (x) => {
     const p = prepped.get(x.code);
     if (!p) return false;
+    if (p.status === 'expired' && p.expiredFrom === 'skipped') return true;
     return !(p.status === 'expired' && x.due && p.due && String(x.due) > String(p.due));
   };
   const drop = { 이미올림: 0, 이미준비: 0, 마감지남: 0, 마감없음: 0, 금액미확인: 0 };

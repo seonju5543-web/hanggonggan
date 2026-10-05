@@ -11,7 +11,7 @@
       대상은 앱에서 그때그때 고른다(2026-07-30·08-24 에 같은 유형으로 두 번 죽었다).
    🔴 판정도 베끼지 않는다 — 달력이 쓰는 `calMarks` 를 그대로 불러 확인한다. */
 const { chromium } = require('playwright-core');
-const { assertOwnServer, dismissNotify } = require('./onboard-helper.js');
+const { assertOwnServer, dismissNotify, bootGone } = require('./onboard-helper.js');
 
 const PORT = process.env.PORT || 8123;
 const EXE = process.env.CHROME_PATH;
@@ -46,6 +46,7 @@ async function seed(page, saved, applied = []) {
      앱이 나가는 순간(`pagehide`) 지금 화면을 다시 적는다 — 그게 맞는 동작이라 지워 둔 장부가
      곧바로 되살아난다. 그러니 어디에서 시작할지는 **검사가 정한다.** */
   await page.waitForSelector('#bottom-nav:not([hidden])');
+  await bootGone(page);
   await page.click('.nav-item[data-nav="home"]');
   await page.waitForSelector('#screen-home:not([hidden])');
   await page.waitForTimeout(250);

@@ -8,7 +8,7 @@ import { urlKey, dedupeNotices, capNotices, clickRowKey } from './url-key.mjs';
 import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mjs';
 import { publishBySchool, dropUnserved } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
-import { isAttachmentEntry } from './attachment-link.mjs';
+import { isAttachmentEntry, linkAttachments, stripSiteChrome } from './attachment-link.mjs';
 import { cleanTitle, isMenuEntry } from './clean-title.mjs';
 import { isDetailUrl, rowDetailCandidates, ruleDetailCandidates, sameTitle, observeLanding } from './detail-url.mjs';
 /* 원문 주소 확인은 공용 판정 한 곳(link-landing.mjs judgeLanding) — 링크 사냥꾼·원문 링크 복구와 같은 것 (2026-10-03) */
@@ -260,12 +260,9 @@ async function loadPage(url, { attempts = 3, lines = report, retryClosed = 1 } =
           const dText = dHtml.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ')
             .replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
 
-          const atts = (await detailPage.$$eval('a[href]', (as) => as.map((a) => ({
+          const atts = linkAttachments(await detailPage.$$eval('a[href]', (as) => as.map((a) => ({
             title: (a.textContent || '').replace(/\s+/g, ' ').trim(), url: a.href,
-          }))).catch(() => []))
-            .filter((l) => /\.(hwp|hwpx|doc|docx|pdf|xls|xlsx)(\?|$)/i.test(l.url) || /download|fileDown/i.test(l.url))
-            .filter((l) => l.title.length >= 4 && l.title.length <= 120)
-            .slice(0, 6).map((l) => ({ name: l.title.slice(0, 100), url: l.url }));
+          }))).catch(() => []), detailPage.url());   // 첨부 고르기·스크립트 주소 풀기는 attachment-link.mjs 한 곳
           /* 공고 원문 주소 정하기 (2026-07-31 전면 수정 — detail-url.mjs 규칙 사용).
              예전에는 '물음표가 있는가'로만 판정해서 두 가지를 놓쳤다:
                · 동국대처럼 주소가 `/article/JANGHAKNOTICE/detail/2666`(경로형)인 게시판 →
@@ -484,11 +481,7 @@ async function harvestTarget(t, report) {
           bodies[it.url] = { title: it.title, text: text.trim().slice(0, 15000), at: todayStr, via: 'browser' };
         }
         deadlineHint = deadlineHintFrom(text);
-        attachments = d.links
-          .filter((l) => /\.(hwp|hwpx|doc|docx|pdf|xls|xlsx)(\?|$)/i.test(l.url) || /download|fileDown/i.test(l.url))
-          .filter((l) => l.title.length >= 4 && l.title.length <= 120)
-          .slice(0, 6)
-          .map((l) => ({ name: l.title.slice(0, 100), url: l.url }));
+        attachments = linkAttachments(d.links, it.url);   // 첨부 고르기·스크립트 주소 풀기는 attachment-link.mjs 한 곳 (2026-10-05)
       }
       }
       const rec = {
@@ -679,6 +672,8 @@ const beforeCap = notices.items;
    위 capNotices는 **폰이 통째로 받는 옛 파일**을 작게 유지하려는 것이고, 학교별 파일에는
    그 상한이 필요 없다(학생은 자기 학교 것만 받는다). 그래서 자르기 **전** 목록으로 발행한다 —
    순서가 바뀌면 학교별 파일도 16건으로 잘려 나눈 뜻이 사라진다. 경위는 collector/publish-notices.mjs */
+/* 게시판 공통 링크를 첨부에서 걷는다 — 정식 등록분과 함께 센다(attachment-link.mjs stripSiteChrome · 2026-10-05) */
+stripSiteChrome([beforeCap, (() => { try { return JSON.parse(fs.readFileSync(new URL('../data/registered.json', HERE), 'utf8')).items || []; } catch { return []; } })()]);
 publishBySchool(beforeCap);
 
 notices.items = capNotices(notices.items);

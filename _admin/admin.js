@@ -2801,9 +2801,12 @@ function instaTplName(no) {
 }
 function instaDday(due) {
   if (!due) return { cls: '', label: '마감 원문 확인' };
-  const d = Math.round((Date.parse(`${due}T23:59:59+09:00`) - Date.now()) / 864e5);
-  if (Number.isNaN(d)) return { cls: '', label: '마감 원문 확인' };
-  if (d < 0) return { cls: 'past', label: '마감 지남' };
+  const t = Date.parse(`${due}T23:59:59+09:00`);
+  if (Number.isNaN(t)) return { cls: '', label: '마감 원문 확인' };
+  /* 🔴 지났는지는 시각으로 바로 본다 — 날 수를 반올림해 보면 마감 다음 날 낮 12시 전까지 -0 이 '오늘 마감' 으로 읽혀
+     게시 버튼이 다시 떴다(2026-10-05 · 로봇 쪽 publishRefusal 은 시각으로 거절한다 — 화면과 로봇이 같은 잣대) */
+  if (t < Date.now()) return { cls: 'past', label: '마감 지남' };
+  const d = Math.round((t - Date.now()) / 864e5);
   return { cls: d <= 3 ? 'near' : d <= 7 ? 'soon' : '', label: d === 0 ? '오늘 마감' : `D-${d}` };
 }
 /* 게시 버튼 대신 이유를 둘 줄인가 — 이유 한 줄 또는 null (2026-10-04 로봇·도구 점검).
@@ -2812,7 +2815,7 @@ function instaDday(due) {
    폴더만 가리킨다(그림에 그린 날 기준 「마감 D-N」 이 박혔다 · 새로 그린 줄에는 dates: 'absolute' 가 있다). */
 function instaPublishBlock(p) {
   if (!p || !p.due || Number.isNaN(Date.parse(`${p.due}T23:59:59+09:00`))) return null;
-  if (instaDday(p.due).cls === 'past') return '마감 지남 — 게시 안 함';
+  if (instaDday(p.due).cls === 'past') return '마감 지남 — 게시 안 함';   // 마감일 23:59:59 KST 를 넘었다(publishRefusal 과 같은 잣대)
   if (p.dates !== 'absolute' && [2, 3, 4].includes(Number(p.tplNo))) return '옛 카드(D-N) — 다시 그린 뒤 게시';
   return null;
 }

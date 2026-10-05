@@ -75,8 +75,10 @@ jobs:
     timeout-minutes: 40          # 🔴 없으면 GitHub 기본값 6시간까지 매달린다 (6건 × ~40초 + 설치 + Pages 대기)
     # 코드를 준 준비(이 판형으로 다시 그리기)는 그 공고의 줄 — 같은 공고의 게시·건너뛰기와 차례를 지킨다.
     # 코드 없는 자동·버튼 준비끼리는 한 줄(기다리던 것이 밀려 취소돼도 같은 일을 하는 다음 실행이 있다).
+    # 🔴 사람이 run-notify.txt 를 올린 알림(push)은 push 마다 제 줄 — 자동 준비 줄에 넣으면 기다리던 알림이 다음 자동 준비에
+    #    밀려 **조용히 취소된다**(push 에는 inputs 가 없어 코드로 줄을 못 나눈다 · 2026-10-05). 알림은 그리지 않고, 겹쳐 돈 정리분 저장은 장부 병합 규칙이 합친다.
     concurrency:
-      group: ${{ inputs.code && format('insta-code-{0}', inputs.code) || 'insta-prepare' }}
+      group: ${{ inputs.code && format('insta-code-{0}', inputs.code) || github.event_name == 'push' && format('insta-push-{0}', github.sha) || 'insta-prepare' }}
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
@@ -351,6 +353,7 @@ jobs:
           exit 1
 
       - name: 실패하면 시끄럽게
+        id: alarm
         # 못 그린 공고는 위 단계가 이미 알렸다 — 같은 실행에서 이슈를 두 번 만들지 않는다
         if: ${{ (failure() || cancelled()) && steps.draw.outputs.bad == '' }}
         env:
@@ -360,9 +363,8 @@ jobs:
           OK: ${{ steps.draw.outputs.ok }}
           SAVED: ${{ steps.commit.outputs.base }}
         run: |
-          echo '🚨 준비가 실패했습니다 — 이슈를 만들었습니다.' >> "$GITHUB_STEP_SUMMARY"
+          echo '🚨 준비가 실패했습니다 — 이슈로 알렸습니다.' >> "$GITHUB_STEP_SUMMARY"
           gh label create insta-fail --repo "$REPO" --color B60205 --description '인스타 게시 실패' 2>/dev/null || true
-          gh issue list --repo "$REPO" --label insta-fail --state open --json title --jq '.[].title' | grep -q "준비가 실패" && exit 0
           # 🔴 그린 카드가 어디까지 갔는지 사실대로 — 장부가 기본 브랜치에 들어간 뒤 멈췄으면 그 카드는 다음 실행이 다시 뽑지 않는다
           #    (준비됨이라서). 그걸 말하지 않으면 알림이 안 간 카드가 관리자 화면에만 조용히 남는다(2026-10-04 점검).
           NOTE=''
@@ -370,6 +372,13 @@ jobs:
             NOTE="그린 카드: $OK — 장부에 준비됨으로 적혀 관리자 화면 › 인스타 에 있습니다. 개발자 알림(이슈·메일)은 못 갔을 수 있습니다 — Actions 「인스타 카드뉴스 게시」 → 알림 + code 로 다시 보낼 수 있습니다."
           elif [ -n "$OK" ]; then
             NOTE="그린 카드: $OK — 장부를 기본 브랜치에 저장하기 전에 멈췄습니다. 다음 준비 실행이 다시 그립니다."
+          fi
+          # 열린 '준비가 실패' 이슈가 있으면 새로 만들지 않고 거기에 댓글 — 🔴 끝내 버리면 이번 실패의 NOTE(알림이 못 간 카드)가 어디에도 안 남는다(리뷰 2026-10-05).
+          N=$(gh issue list --repo "$REPO" --label insta-fail --state open --json number,title --jq '[.[] | select(.title | contains("준비가 실패"))][0].number // empty')
+          if [ -n "$N" ]; then
+            gh issue comment "$N" --repo "$REPO" --body "다시 실패 — 실행 로그: https://github.com/$REPO/actions/runs/$RUN
+          $NOTE"
+            exit 0
           fi
           gh issue create --repo "$REPO" --label insta-fail \
             --title '🚨 인스타 카드 준비가 실패했습니다' \
@@ -454,13 +463,20 @@ jobs:
       #    `git add` 목록에 넣는 것까지가 한 세트다. 올라갔으면 앞 단계가 넘어졌어도 반드시 적는다(always).
       # 🔴 main 에는 올리지 않는다(2026-10-04) — 앱·Pages 는 이 장부를 읽지 않고(관리자 화면은 기본 브랜치를 읽는다) 배포 로봇이
       #    옮긴다. 옛 판은 기본 브랜치에 저장한 뒤 main push 가 거절돼(fetch first) '게시 실패' 이슈를 냈다(#263 — 게시는 성공).
+      # 올리기 단계가 올린 뒤에 넘어졌어도(media 번호가 남았으면) 여기서 media 번호로 올림 기록을 적는다 — publish.mjs 가 이미 적었으면
+      # 그대로 둔다(같은 공고·같은 media 는 한 줄 · 규칙은 pick.mjs recordPosted 한 곳 · 2026-10-05 리뷰).
       - name: 올린 기록 저장
         id: record
-        if: ${{ always() && steps.post.outcome == 'success' }}
+        if: ${{ always() && (steps.post.outcome == 'success' || steps.post.outputs.media != '') }}
+        env:
+          CODE: ${{ inputs.code }}
+          MEDIA: ${{ steps.post.outputs.media }}
+          PERMALINK: ${{ steps.post.outputs.permalink }}
         run: |
           bash tools/setup-collab.sh       # 🔴 다른 공고의 준비·건너뛰기가 같은 장부를 쓸 수 있다 — 장부 병합 규칙 등록(mergeInstaSeen)
           git config user.name  'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
+          if [ -n "$MEDIA" ]; then node insta/ledger.mjs posted "$CODE" --media="$MEDIA" --permalink="$PERMALINK"; fi
           git add insta/seen.json
           git diff --cached --quiet && { echo 'seen.json 변화 없음'; exit 0; }
           git commit -m '인스타: 올린 공고 기록'
@@ -473,6 +489,7 @@ jobs:
       #    '실패' 가 아니라 '취소' 다(CLAUDE.md). 둘 다 잡는다.
       # 🔴 올라간 뒤의 실패를 '게시가 실패했습니다' 라고 하지 않는다 — 사람이 다시 누르면 장부에 없는 글이라 **두 번 올라간다**(2026-10-04).
       - name: 실패하면 시끄럽게
+        id: alarm
         if: ${{ failure() || cancelled() }}
         env:
           GH_TOKEN: ${{ github.token }}
@@ -485,12 +502,22 @@ jobs:
           PERMALINK: ${{ steps.post.outputs.permalink }}
         run: |
           gh label create insta-fail --repo "$REPO" --color B60205 --description '인스타 게시 실패' 2>/dev/null || true
-          if [ "$POSTED" = success ] && [ "$RECORDED" != success ]; then
+          # 올라갔다는 증거 — 단계 성공, 또는 publish.mjs 가 올린 즉시 남긴 media 번호(단계가 그 뒤에 넘어지거나 시한에 끊겨도 남는다 · 2026-10-05)
+          UP=''; { [ "$POSTED" = success ] || [ -n "$MEDIA" ]; } && UP=1
+          # 올라갔고 기록 단계도 성공했다 — 장부에 올림 기록이 있으니 다시 눌러도 '이미 올린 공고' 로 막힌다. 이슈는 만들지 않는다.
+          if [ -n "$UP" ] && [ "$RECORDED" = success ]; then
+            if [ "$POSTED" = success ]; then echo '게시·기록은 끝났습니다 — 그 뒤 단계만 멈췄습니다.' >> "$GITHUB_STEP_SUMMARY"
+            else echo "게시·기록은 끝났습니다 — 올리기 단계는 올린 뒤 멈췄지만 기록 단계가 media 번호($MEDIA)로 장부에 적었습니다." >> "$GITHUB_STEP_SUMMARY"; fi
+            exit 0
+          fi
+          if [ -n "$UP" ]; then
+            if [ "$POSTED" = success ]; then WHY='그 뒤 장부(insta/seen.json)에 올림 기록을 저장하지 못했습니다.'
+            else WHY="그 뒤 게시 단계가 끝나기 전에 멈췄고 기록 단계도 끝나지 못해, 장부(insta/seen.json)에 올림 기록이 적혔는지 알 수 없습니다 — posted 에 $CODE 가 없으면 아래처럼 넣으세요."; fi
             echo '⚠️ 인스타에는 올라갔는데 기록 저장이 실패했습니다 — 다시 게시하지 마세요. 이슈를 만들었습니다.' >> "$GITHUB_STEP_SUMMARY"
             gh issue create --repo "$REPO" --label insta-fail \
               --title "⚠️ 인스타에는 올라갔는데 기록 저장만 실패했습니다 — 다시 게시하지 마세요 ($CODE)" \
               --body "게시는 됐습니다 — ${PERMALINK:-(게시물 주소를 못 받았습니다 · 인스타 앱에서 확인)} (media ${MEDIA:-?})
-          그 뒤 장부(insta/seen.json)에 올림 기록을 저장하지 못했습니다.
+          $WHY
           🔴 관리자 화면에서 「게시」 를 다시 누르지 마세요 — 장부에 없어서 같은 글이 한 번 더 올라갑니다.
 
           장부에 손으로 넣는 법 (Claude 세션에 '인스타 올림 기록 넣어줘 $CODE' 라고 해도 됩니다):
@@ -501,8 +528,17 @@ jobs:
           실행 로그: https://github.com/$REPO/actions/runs/$RUN"
             exit 0
           fi
-          if [ "$POSTED" = success ]; then
-            echo '게시·기록은 끝났습니다 — 그 뒤 단계만 멈췄습니다.' >> "$GITHUB_STEP_SUMMARY"
+          # 🔴 올리는 도중 시한에 걸리거나 실행이 취소되면 올라갔는지 모른다(인스타가 받은 뒤 답만 늦을 수 있다) — '실패' 라고 단정하지 않는다.
+          if [ "$POSTED" = cancelled ]; then
+            echo '⚠️ 게시 단계가 도중에 끊겼습니다 — 올라갔는지 먼저 확인하세요. 이슈를 만들었습니다.' >> "$GITHUB_STEP_SUMMARY"
+            gh issue create --repo "$REPO" --label insta-fail \
+              --title "⚠️ 인스타 게시 단계가 도중에 끊겼습니다 — 올라갔는지 먼저 확인하세요 ($CODE)" \
+              --body "올리는 도중 작업 시한에 걸렸거나 실행이 취소되어, 인스타에 올라갔는지 이 실행으로는 알 수 없습니다.
+          1) 인스타 앱에서 이 계정의 피드에 이 공고가 올라왔는지 먼저 보세요.
+          2) 올라왔으면 「게시」 를 다시 누르지 마세요 — 장부(insta/seen.json)에 올림 기록이 없어 같은 글이 한 번 더 올라갑니다. Claude 세션에 '인스타 올림 기록 넣어줘 $CODE' 라고 하세요.
+          3) 안 올라왔으면 관리자 화면에서 「게시」 를 다시 누르면 됩니다.
+
+          실행 로그: https://github.com/$REPO/actions/runs/$RUN"
             exit 0
           fi
           echo '🚨 게시가 실패했습니다 — 이슈를 만들었습니다.' >> "$GITHUB_STEP_SUMMARY"
@@ -510,7 +546,7 @@ jobs:
             --title '🚨 인스타 게시가 실패했습니다' \
             --body "실행 로그: https://github.com/$REPO/actions/runs/$RUN
 
-          자주 나는 원인 넷 (로그의 첫 🚨 줄이 이유입니다)
+          자주 나는 원인 넷 (로그의 🚨 줄을 보세요 — 「토큰이 N일 뒤 만료됩니다」 경고는 원인이 아닐 수 있습니다)
           - 마감이 지난 카드·그림에 「마감 D-N」 이 박힌 옛 카드 → 게시 거절 — 건너뛰거나 관리자 화면 「이 판형으로 다시 그리기」 로 다시 그린 뒤 게시
           - 토큰 만료 → IG_ACCESS_TOKEN 갱신 (「인스타 토큰 수명 확인」 참고)
           - 그림이 아직 공개 안 됨 → Pages 배포를 기다렸다 「게시」 를 다시

@@ -16,7 +16,7 @@
 const fs = require('fs');
 const path = require('path');
 const { chromium } = require('playwright-core');
-const { assertOwnServer, dismissNotify, webfontBanner } = require('./onboard-helper.js');
+const { assertOwnServer, dismissNotify, webfontBanner, bootGone } = require('./onboard-helper.js');
 const inter = require('../interactions.js');
 
 const PORT = process.env.PORT || 8123;
@@ -44,6 +44,7 @@ async function seed(page) {
   }, PROFILE);
   await page.reload({ waitUntil: 'networkidle' });
   await page.waitForSelector('#bottom-nav:not([hidden])');
+  await bootGone(page);
   await page.click('.nav-item[data-nav="home"]');
   await page.waitForSelector('#screen-home:not([hidden])');
   await page.waitForTimeout(250);

@@ -112,10 +112,11 @@ async function openWith(ctx, resume) {
     /* 🔴 고정 2.5초 뒤 한 번 재면 **느린 실행 기계에서 걷히는 중에 잰다** — 2026-09-30 같은 커밋이
        main 에서는 초록, 기본 브랜치에서는 이 한 줄만 빨강이었다(a6900ed). 걷히기를 **기다리되
        시한을 둔다**.
-       🔴 시한은 boot.js 의 안전장치(BOOT_TIMEOUT_MS 6초 — 앱이 안 와도 스스로 걷힌다)보다
-          **짧아야** 한다. 길게 잡으면 app.js 가 영영 안 와도 안전장치가 걷어 줘서 통과한다(거짓 초록불).
-          부팅 화면이 붙은 뒤 위 반복 1.2초 + 여기 4초 = 5.2초 < 6초. 정상은 늦춘 1.8초 + 바닥값 1초 + 걷힘 움직임. */
-    const bootGone = await slow.waitForSelector('#boot', { state: 'hidden', timeout: 4000 }).then(() => true, () => false);
+       🔴 boot.js 의 안전장치(BOOT_TIMEOUT_MS 6초)는 덮개를 **걷지 않는다** — '다시 시도'를 띄울 뿐이다.
+          그래서 시한을 길게 잡아도 app.js 가 영영 안 오는 판이 통과하지는 않는다(그 판은 아래 ⑧이 잰다).
+          정상(2026-10-04 켤 때마다 인트로): 늦춘 1.8초 + 첫 데이터가 다 와서 한 번 그리기 + 손이 빈 것 확인
+          + 인트로 1.7초 + 페이드 0.4초 ≈ 4.5~5초. 느린 실행 기계 여유를 둬 8초. */
+    const bootGone = await slow.waitForSelector('#boot', { state: 'hidden', timeout: 8000 }).then(() => true, () => false);
     ok('앱 코드가 오면 부팅 화면이 걷힌다', bootGone);
     ok('그리고 홈이다', (await shown(slow)) === 'home');
     await slow.close();

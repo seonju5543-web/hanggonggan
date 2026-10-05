@@ -35,7 +35,7 @@ jobs:
     env:
       NODE_EXTRA_CA_CERTS: collector/certs/bundle.pem   # 계명대처럼 중간 인증서를 안 보내는 학교 (collector/certs/README.md)
     # 상한 = 단계 상한의 합 + 여유 3 (관문 test-collector 「교내 소식」이 대소관계를 잰다 · 상한을 키워 때우지 말 것).
-    # 찾기 7 + 수집 6 + 썸네일 5 + 수집 알림·닫기 2 + 사진 알림·닫기 2 + 관문 5 + 되돌리기 1 + 감사 알림·닫기 2 + 저장 3 + 리포트 1 + 넘어짐 알림 1 = 35 → 39
+    # 찾기 7 + 수집 6 + 썸네일 5 + 관문 5 + 되돌리기 1 + 저장 3 + 리포트 1 + 수집 알림·닫기 2 + 사진 알림·닫기 2 + 감사 알림·닫기 2 + 넘어짐 알림 1 = 35 → 39
     # (경보 짝 넷은 2026-10-04 로봇·도구 점검에서 더했다 — 경보는 이슈 하나에 모이고 회복하면 닫힌다 · tools/alert-issue.mjs)
     timeout-minutes: 39
     steps:
@@ -84,6 +84,80 @@ jobs:
           npm i sharp --no-audit --no-fund --silent
           node collector/collect-news-thumbs.mjs
 
+      # 데이터 관문 — 저장 직전. 규칙을 어기면 이번 실행의 소식 파일을 되돌리고 알린다(장학 수집과 같은 규칙).
+      - name: 데이터 관문 (수집기 규칙 테스트 + 데이터 감사)
+        id: audit
+        timeout-minutes: 5
+        continue-on-error: true
+        run: |
+          node verify/test-collector.mjs
+          node verify/audit-data.js
+
+      - name: 감사 실패 시 이번 소식 발행분 되돌리기
+        if: steps.audit.outcome == 'failure'
+        timeout-minutes: 1
+        run: |
+          git checkout -- data/news collector/seen-news.json 2>/dev/null || true
+          # 썸네일 장부는 따로 — 한 줄에 묶으면 장부가 아직 없는 첫 실행에 git checkout 이 통째로 실패해 소식 파일도 안 돌아간다
+          git checkout -- collector/news-thumbs.json 2>/dev/null || rm -f collector/news-thumbs.json
+          git clean -fdq data/news || true
+
+      - name: 수집 상태 저장 (중복 방지 기록)
+        timeout-minutes: 3
+        run: |
+          git config user.name "handaejang-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # 로봇이 고친 파일은 전부 git add 에 (이슈 #79 규칙) — 발행 파일·장부·커서·건강·출처·리포트
+          [ -d data/news ] && git add data/news
+          [ -f collector/seen-news.json ] && git add collector/seen-news.json
+          [ -f collector/news-cursor.json ] && git add collector/news-cursor.json
+          [ -f collector/news-health.json ] && git add collector/news-health.json
+          [ -f collector/news-sources.json ] && git add collector/news-sources.json
+          [ -f collector/news-report.md ] && git add collector/news-report.md
+          [ -f collector/find-news-boards-report.md ] && git add collector/find-news-boards-report.md
+          [ -f collector/news-thumbs.json ] && git add collector/news-thumbs.json
+          [ -f collector/news-thumbs-report.md ] && git add collector/news-thumbs-report.md
+          true
+          if ! git diff --cached --quiet; then
+            git commit -m "news: 교내 소식 수집"
+            pushed=0
+            for i in 1 2 3; do
+              if git push; then pushed=1; break; fi
+              git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+            done
+            if [ "$pushed" != "1" ]; then
+              echo "::error::소식 데이터 push 실패 — 3회 재시도 모두 실패. 이번 수집분이 저장되지 않았습니다."
+              exit 1
+            fi
+          fi
+
+      # 리포트 이슈는 **사람 손이 필요할 때만** 만든다(연속 실패·글을 못 읽는 게시판·찾기 로봇이 못 찾은 학교) — 매일 새 이슈는 소음이다.
+      # 🔴 수동 실행만으로는 열지 않는다 (2026-10-04) — 옛 판은 버튼을 누를 때마다 담당자 지정 이슈를 새로 만들어
+      #    열린 소식 리포트가 20건이 됐다(그중 다수가 '새 글 0건'). 확인이 필요하면 버튼의 「리포트 이슈를 남긴다」를 켠다
+      #    (세션은 실행 로그·collector/news-report.md 로 본다). 같은 날 리포트는 한 이슈에 댓글로 모인다(제목에 건수를 넣지 않는다).
+      - name: 리포트 이슈 (사람 손이 필요할 때만)
+        if: steps.run.outputs.needs_human == '1' || inputs.report
+        timeout-minutes: 1
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NEW_COUNT: ${{ steps.run.outputs.new_count }}
+          NEEDS_HUMAN: ${{ steps.run.outputs.needs_human }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          {
+            printf '🗞 %s KST — 새 글 %s건 · 사람 손 필요: %s\n\n' "$(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')" "${NEW_COUNT:-?}" "$([ "$NEEDS_HUMAN" = 1 ] && echo 예 || echo '아니요(확인용 실행)')"
+            cat collector/news-report.md; echo; echo '---'; echo; [ -f collector/find-news-boards-report.md ] && cat collector/find-news-boards-report.md
+          } > /tmp/news-issue.md || true
+          if [ "$(wc -c < /tmp/news-issue.md)" -gt 60000 ]; then head -c 60000 /tmp/news-issue.md > /tmp/news-cut.md; printf '\n\n> ⚠️ 리포트가 길어 잘렸습니다 — 전문은 collector/news-report.md\n' >> /tmp/news-cut.md; mv /tmp/news-cut.md /tmp/news-issue.md; fi
+          node tools/alert-issue.mjs --mode open --match exact \
+            --title "🗞 교내 소식 수집 리포트 $(TZ=Asia/Seoul date +%Y-%m-%d)" \
+            --label news-report --label-color 0E8A16 --label-description '교내 소식 수집 리포트(사람 손이 필요할 때)' \
+            --assignee "$OWNER" --body-file /tmp/news-issue.md
+
+      # ── 경보 짝 셋(수집 단계·사진 단계·데이터 감사)은 **저장·리포트 뒤**에 둔다 (2026-10-05 코드 리뷰) ──
+      #    여는 단계는 continue-on-error 가 없다 — 이슈 API 가 흔들려 넘어지면 작업이 실패해 아래 넘어짐 알림(robot-down)이 사람에게 닿게 하려는 것.
+      #    그래서 저장 **앞**에 두면 그날 경보 하나가 넘어지는 순간 관문·저장이 건너뛰어져 그 실행의 소식이 저장되지 않았다(사진 단계는 보강인데도).
+      #    각 if 는 steps.*.outcome 을 보므로 자리를 옮겨도 판정은 같다. 관문 「로봇·도구 점검 관문」 alerts ⑧.
       # 🔴 단계 경보는 이슈 **하나**에 모으고 회복하면 닫는다 (2026-10-04 로봇·도구 점검 · tools/alert-issue.mjs).
       #    옛 판은 '열린 최신 소식 리포트'에 댓글만 달아, 받을 리포트가 없는 날엔 **조용했다**.
       #    넘어짐 알림(robot-down)과 따로 둔다 — 단계 실패는 continue-on-error 라 작업은 초록으로 끝나 '로봇이 넘어졌다'와 뜻이 다르다.
@@ -143,24 +217,6 @@ jobs:
             ✅ 소식 사진(썸네일) 단계가 다시 성공했습니다 — 자동으로 닫습니다.
             실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-      # 데이터 관문 — 저장 직전. 규칙을 어기면 이번 실행의 소식 파일을 되돌리고 알린다(장학 수집과 같은 규칙).
-      - name: 데이터 관문 (수집기 규칙 테스트 + 데이터 감사)
-        id: audit
-        timeout-minutes: 5
-        continue-on-error: true
-        run: |
-          node verify/test-collector.mjs
-          node verify/audit-data.js
-
-      - name: 감사 실패 시 이번 소식 발행분 되돌리기
-        if: steps.audit.outcome == 'failure'
-        timeout-minutes: 1
-        run: |
-          git checkout -- data/news collector/seen-news.json 2>/dev/null || true
-          # 썸네일 장부는 따로 — 한 줄에 묶으면 장부가 아직 없는 첫 실행에 git checkout 이 통째로 실패해 소식 파일도 안 돌아간다
-          git checkout -- collector/news-thumbs.json 2>/dev/null || rm -f collector/news-thumbs.json
-          git clean -fdq data/news || true
-
       # 감사 실패는 조용히 넘어가지 않는다 — 되돌리기만 하고 끝나면 홈 구역이 **소리 없이 멈춘다**(리뷰 2026-10-01).
       # 🔴 이슈 **하나**에 모은다 (2026-10-04) — 옛 판은 날짜 붙은 제목으로 실패할 때마다 새 이슈를 만들었다(하루 2회 + 수동).
       #    다시 통과하면 아래 짝 단계가 닫는다.
@@ -191,58 +247,6 @@ jobs:
           body: |
             ✅ 교내 소식 데이터 감사가 다시 통과했습니다 — 이번 발행분은 저장됩니다. 자동으로 닫습니다.
             실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-      - name: 수집 상태 저장 (중복 방지 기록)
-        timeout-minutes: 3
-        run: |
-          git config user.name "handaejang-bot"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # 로봇이 고친 파일은 전부 git add 에 (이슈 #79 규칙) — 발행 파일·장부·커서·건강·출처·리포트
-          [ -d data/news ] && git add data/news
-          [ -f collector/seen-news.json ] && git add collector/seen-news.json
-          [ -f collector/news-cursor.json ] && git add collector/news-cursor.json
-          [ -f collector/news-health.json ] && git add collector/news-health.json
-          [ -f collector/news-sources.json ] && git add collector/news-sources.json
-          [ -f collector/news-report.md ] && git add collector/news-report.md
-          [ -f collector/find-news-boards-report.md ] && git add collector/find-news-boards-report.md
-          [ -f collector/news-thumbs.json ] && git add collector/news-thumbs.json
-          [ -f collector/news-thumbs-report.md ] && git add collector/news-thumbs-report.md
-          true
-          if ! git diff --cached --quiet; then
-            git commit -m "news: 교내 소식 수집"
-            pushed=0
-            for i in 1 2 3; do
-              if git push; then pushed=1; break; fi
-              git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
-            done
-            if [ "$pushed" != "1" ]; then
-              echo "::error::소식 데이터 push 실패 — 3회 재시도 모두 실패. 이번 수집분이 저장되지 않았습니다."
-              exit 1
-            fi
-          fi
-
-      # 리포트 이슈는 **사람 손이 필요할 때만** 만든다(연속 실패·글을 못 읽는 게시판·찾기 로봇이 못 찾은 학교) — 매일 새 이슈는 소음이다.
-      # 🔴 수동 실행만으로는 열지 않는다 (2026-10-04) — 옛 판은 버튼을 누를 때마다 담당자 지정 이슈를 새로 만들어
-      #    열린 소식 리포트가 20건이 됐다(그중 다수가 '새 글 0건'). 확인이 필요하면 버튼의 「리포트 이슈를 남긴다」를 켠다
-      #    (세션은 실행 로그·collector/news-report.md 로 본다). 같은 날 리포트는 한 이슈에 댓글로 모인다(제목에 건수를 넣지 않는다).
-      - name: 리포트 이슈 (사람 손이 필요할 때만)
-        if: steps.run.outputs.needs_human == '1' || inputs.report
-        timeout-minutes: 1
-        env:
-          GH_TOKEN: ${{ github.token }}
-          NEW_COUNT: ${{ steps.run.outputs.new_count }}
-          NEEDS_HUMAN: ${{ steps.run.outputs.needs_human }}
-          OWNER: ${{ github.repository_owner }}
-        run: |
-          {
-            printf '🗞 %s KST — 새 글 %s건 · 사람 손 필요: %s\n\n' "$(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')" "${NEW_COUNT:-?}" "$([ "$NEEDS_HUMAN" = 1 ] && echo 예 || echo '아니요(확인용 실행)')"
-            cat collector/news-report.md; echo; echo '---'; echo; [ -f collector/find-news-boards-report.md ] && cat collector/find-news-boards-report.md
-          } > /tmp/news-issue.md || true
-          if [ "$(wc -c < /tmp/news-issue.md)" -gt 60000 ]; then head -c 60000 /tmp/news-issue.md > /tmp/news-cut.md; printf '\n\n> ⚠️ 리포트가 길어 잘렸습니다 — 전문은 collector/news-report.md\n' >> /tmp/news-cut.md; mv /tmp/news-cut.md /tmp/news-issue.md; fi
-          node tools/alert-issue.mjs --mode open --match exact \
-            --title "🗞 교내 소식 수집 리포트 $(TZ=Asia/Seoul date +%Y-%m-%d)" \
-            --label news-report --label-color 0E8A16 --label-description '교내 소식 수집 리포트(사람 손이 필요할 때)' \
-            --assignee "$OWNER" --body-file /tmp/news-issue.md
 
       # 🔴 넘어짐 알림 한 벌(robot-down)로 (2026-10-04) — 옛 판은 열린 소식 리포트에 댓글만 달아, 리포트가 없으면 조용했다.
       #    회복하면 하트비트가 닫는다.
