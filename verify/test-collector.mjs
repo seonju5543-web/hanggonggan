@@ -1386,7 +1386,14 @@ console.log('\n■ 수집망 복원 (2026-09-29 · 2026-08-30 좁힘을 되돌�
     '연세대학교 미래캠퍼스', '고려대학교 세종캠퍼스', '동국대학교 WISE캠퍼스'];   // 분교는 별개 학교 (data.js UNIVERSITIES)
   eq('일반 수집에 경희대·한국외대가 있다', ['경희대학교', '한국외국어대학교'].filter((n) => !uniq(sc.schools).includes(n)), []);
   eq('일반 수집에 2026-08-30 에 뺐던 학교가 전부 돌아왔다', REVIVED.filter((n) => !uniq(sc.schools).includes(n)), []);
-  eq('브라우저 수집도 두 곳 이상이다 (17곳을 되살렸다)', bt.targets.length >= 19, true);
+  /* 되살린 19곳을 버리지 않았다 — 보관(parked)으로 옮긴 곳도 센다 (2026-10-05 점검 B5·B10: 일반 로봇이 정상인데 브라우저가 0건·멈춤이던
+     서울대·서강·숙명·가천·홍익을 보관으로 옮겼다 — schools.json _collector 규칙). 지운 것만 빨간불이다. */
+  eq('브라우저 수집도 두 곳 이상이다 (17곳을 되살렸다 · 보관으로 옮긴 곳 포함)', bt.targets.length + (Array.isArray(bt.parked) ? bt.parked.length : 0) >= 19, true);
+  eq('  브라우저 보관(parked) 학교는 일반 로봇이 읽는다 (schools.json 에 주소가 있고 collector:"browser" 가 아니다)',
+    (bt.parked || []).filter((p) => !sc.schools.some((x) => x.school === p.school && x.boardUrl && x.collector !== 'browser')).map((p) => p.school), []);
+  /* 후보 주소에 학교 첫 화면을 두지 않는다 (2026-10-05 점검 B10) — 첫 화면의 '장학' 낱말 링크(수상 소식 등)를 공고로 긁는다(숙명 실측) */
+  const homePage = (u) => { try { return ['/', '/index.do', '/kr/index.do', '/main', '/main.do', '/index.html', '/index.jsp'].includes(new URL(u).pathname.replace(/\/+$/, '') || '/'); } catch { return false; } };
+  eq('  브라우저 후보 주소는 학교 첫 화면이 아니다', bt.targets.flatMap((t) => (t.candidates || []).filter(homePage).map((u) => `${t.school} ${u}`)), []);
   eq('브라우저 수집 학교는 일반 수집 학교의 부분집합이다 (앱 상수가 schools.json 만 보므로)',
     uniq(bt.targets).filter((n) => !uniq(sc.schools).includes(n)), []);
   eq('  항목마다 게시판 주소 칸이 있다', sc.schools.every((x) => 'boardUrl' in x), true);

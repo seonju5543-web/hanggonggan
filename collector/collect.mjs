@@ -696,7 +696,10 @@ for (const r of results) {
    그래서 일반 수집기 담당 학교(홍익대)가 며칠째 '⚠️ 오류' 한 줄로 조용히 빠져 있어도
    아무도 몰랐다. 한 번 실패는 학교가 잠깐 느린 것이라 저절로 복구되지만,
    **연속 실패는 주소가 바뀐 것**이라 사람이 손을 대야 한다 — 그 구분을 여기서도 한다.
-   장부는 브라우저 수집기와 같은 health.json을 쓴다(학교 이름이 열쇠라 섞이지 않는다). */
+   장부는 브라우저 수집기와 같은 health.json을 쓴다. ⚠️ 두 로봇이 같이 보는 학교는 **같은 줄의 fails 를 같이 쓴다**(학교 이름이 열쇠라
+   섞인다 — 예전 주석의 '섞이지 않는다'는 틀렸다: 서울대는 브라우저가 멈춰 +1, 이 로봇이 ✅ 로 0 → 브라우저 쪽 연속 실패가 3에 영영 안 닿았다).
+   그래서 브라우저 쪽 연속 횟수는 제 칸(browserFails · browserWhy — collector/browser-health.mjs)에 센다. 이 로봇은 fails·lastOk 만 고친다
+   (아래 h 객체의 다른 칸은 건드리지 않는다 · 2026-10-05 점검 B4). */
 const healthPath = new URL('health.json', HERE);
 let health = {};
 try { health = JSON.parse(fs.readFileSync(healthPath, 'utf8')); } catch { /* 첫 실행 */ }

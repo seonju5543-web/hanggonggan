@@ -517,7 +517,8 @@ export default async function gate(eq, ctx) {
         /--search '"교내 소식 데이터 감사 실패" in:title'/.test(newsIssue) && /gh issue comment "\$open"/.test(newsIssue), /gate-guard\.mjs --report collector\/news-report\.md --note \/tmp\/gate-note\.md/.test(cn)],
       [true, false, true, true, true]);
     const bc = wf('browser-collect.yml');
-    eq('  브라우저 알림 둘(감사 실패·실패/시간초과)은 브라우저형 리포트로', (bc.match(/'"브라우저형 수집 리포트" in:title'/g) || []).length, 2);
+    /* 2026-10-05 browser 묶음 B4 — 셋째 알림(여러 번 연속 공고를 못 읽은 학교 · 0건 날)도 같은 제 리포트 이슈로 */
+    eq('  브라우저 알림 셋(감사 실패·실패/시간초과·연속으로 못 읽은 학교)은 브라우저형 리포트로', (bc.match(/'"브라우저형 수집 리포트" in:title'/g) || []).length, 3);
     eq('  사냥꾼은 장학공고 리포트로 (제 리포트 이슈가 없다)', /'"장학공고 수집 리포트" in:title'/.test(wf('link-hunter.yml')), true);
   }
 

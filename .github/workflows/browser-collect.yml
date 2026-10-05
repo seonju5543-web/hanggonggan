@@ -272,6 +272,25 @@ jobs:
             --assignee "${{ github.repository_owner }}" \
             --assignee "Se-Hyeon-Jo"
 
+      # 🚨 여러 번 연속 공고를 못 읽은 학교 (2026-10-05 점검 B4 · 판정은 collector/browser-health.mjs 한 곳).
+      #    리포트 이슈는 새 공고가 있는 날만 생겨서(위 if) 0건인 날엔 리포트 머리의 🚨 줄이 파일에만 남았다 — 그날은 최근 리포트 이슈에 코멘트한다.
+      #    학교 이름은 env 로만 받는다(단계 출력 표현식을 셸 글자에 직접 넣지 않는다 — 이름에 따옴표·기호가 섞여도 명령이 안 깨지게). 저장 뒤라 실패해도 실행을 빨갛게 만들지 않는다
+      #    (빨가면 아래 실패 알림이 '수집분이 저장되지 않았다'는 틀린 말을 붙인다).
+      - name: 🚨 연속으로 공고를 못 읽은 학교 알림 (최근 리포트 이슈에 코멘트)
+        if: steps.run.outcome == 'success' && steps.run.outputs.chronic != '' && steps.run.outputs.new_count == '0' && github.event_name != 'workflow_dispatch'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHRONIC: ${{ steps.run.outputs.chronic }}
+        run: |
+          last=$(gh issue list --repo "${{ github.repository }}" \
+            --search '"브라우저형 수집 리포트" in:title' --state open \
+            --limit 1 --json number --jq '.[0].number' || true)
+          if [ -n "$last" ] && [ "$last" != "null" ]; then
+            gh issue comment "$last" --repo "${{ github.repository }}" \
+              --body "🖥 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 🚨 **여러 번 연속 공고를 못 읽은 학교**: $CHRONIC — 게시판 주소 확인이 필요해요(정찰: collector/run-probe.txt · 학교별로 본 것은 collector/browser-report.md). 새 공고가 0건이라 새 리포트는 만들지 않았어요." || true
+          fi
+
       # 실패 시 즉시 알림 (조용한 중단 방지 — 2026-07-19 도입)
       # 🔴 제 리포트 이슈로 (2026-10-04) — '"수집 리포트"' 부분 일치는 장학공고 리포트 이슈와 섞였다(#381 코멘트 9개 중 이 로봇 것은 1개).
       #    무엇을 되돌렸는지는 gate-guard 의 단락(/tmp/gate-note.md)을 싣는다.
