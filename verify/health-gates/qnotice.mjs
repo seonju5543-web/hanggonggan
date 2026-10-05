@@ -372,10 +372,37 @@ export default async function qnotice(eq, ctx) {
       [/if \(process\.argv\[1\] && import\.meta\.url === pathToFileURL\(path\.resolve\(process\.argv\[1\]\)\)\.href\) main\(\);\s*$/.test(src),
         /const AC = createRequire\(import\.meta\.url\)\('\.\.\/apply-channel\.js'\)/.test(src) && /const PORTAL_SUBMIT = AC\.PORTAL_SUBMIT;/.test(src), /const PORTAL_SUBMIT\s*=\s*\//.test(src)],
       [true, true, false]);
-    const { judgePortalLine } = require('../../apply-channel.js');
+    const { judgePortalLine, hasPortalName } = require('../../apply-channel.js');
     eq('  찾아 넣은 고유 이름은 앱 판정이 신청 시스템으로 읽는다 (결과 보는 줄은 아니다)',
-      [judgePortalLine(TEXT.a)?.system, judgePortalLine('ㅇ 신청방법 : ON 국민 - 포털 - 학생서비스 - 장학정보 - 장학신청')?.system, judgePortalLine('다 . 선발확인 : KUPID 로그인 후 확인')?.ok],
-      ['KUPID', 'ON 국민', false]);
+      [judgePortalLine(TEXT.a)?.system, judgePortalLine(TEXT.b)?.system, judgePortalLine('다 . 선발확인 : KUPID 로그인 후 확인')?.ok],
+      ['KUPID', 'KUPID', false]);
+
+    /* 🔴 표에 이름을 넣으면 **데이터 검사**도 그 이름을 근거로 읽어야 한다 (2026-10-05 리뷰 · 막은 사고) — test-collector 「등록 데이터에 근거 없는
+       포털 단정이 없다」가 손으로 적은 낱말 목록(포털만 · 포탈·KUPID 없음)으로 재서, 다음 수집의 발췌기가 고려대 소망장학금에 채울
+       applyPortal 'KUPID'(근거 「가. 포탈(KUPID) - 학사행정 - …」)를 근거 없음으로 세어 데이터 관문이 빨개질 참이었다(그날 자동 등록이 통째로 되돌려진다).
+       근거 낱말은 apply-channel.js hasPortalName 한 곳(표 + 흔한 이름) — 검사는 그것을 불러 쓴다. */
+    eq('  포털 근거 낱말 — 표의 이름(KUPID·인포21) · 포털/포탈 · …정보시스템은 근거 · 메뉴 아닌 맨 낱말(장학팀)은 아니다',
+      [hasPortalName(TEXT.b), hasPortalName('나. 포탈 - 학사행정 - 등록/장학 - 장학금신청'), hasPortalName('신청방법: 인포21을 통한 신청'), hasPortalName(TEXT.c), hasPortalName('장학팀 방문 접수')],
+      [true, true, true, true, false]);
+    const tc = stripComments(fs.readFileSync(new URL('verify/test-collector.mjs', root), 'utf8'));
+    const tcPart = tc.slice(tc.indexOf("eq('등록 데이터에 근거 없는 포털 단정이 없다'") - 900, tc.indexOf("eq('등록 데이터에 근거 없는 포털 단정이 없다'"));
+    eq('  데이터 검사 배선 — 근거 낱말을 apply-channel.js 에서 받아 쓰고(hasPortalName) 손으로 적은 목록이 없다',
+      [/return \{ submitChannelKind, submitChannelLabel, hasPortalName \};/.test(tc), /const hasPortalName = built\.hasPortalName;/.test(tcPart), /PORTAL_WORDS\s*=\s*\//.test(tc)],
+      [true, true, false]);
+    /* 진짜 발췌기를 임시 폴더에서 — 원문의 「포탈(KUPID)」 줄로 applyPortal 을 채우고, 채운 값이 데이터 검사의 근거 판정을 지난다 */
+    const sb = sandbox(root, 'hdj-qnotice-portal-');
+    try {
+      const U = 'https://www.korea.ac.kr/notice/3856';
+      const BODY = '지원 대상은 국내 대학에 재학 중인 학부생으로서 직전 학기 성적이 평균 이상인 학생입니다.\n'
+        + '선발된 학생에게는 한 학기 등록금 전액과 생활비를 함께 지원하며 학업 계획서를 심사합니다.\n';
+      sb.write('collector/extracted/notices-text.json', [{ title: '2026-2학기 소망장학금 신청 안내', url: U, text: `${BODY}4. 신청방법\n${TEXT.b}\n5. 문의 : 학생지원팀` }]);
+      sb.write('data/registered.json', { items: [{ id: 'k1', name: '2026-2학기 소망장학금 신청 안내', sourceUrl: U, auto: true, eligibility: { schoolOnly: '고려대학교' } }] });
+      const r = sb.run('collector/extract-excerpts.mjs', ['--write'], { EXCERPTS_AS_LIB: '' });
+      const k1 = (sb.json('data/registered.json')?.items || [])[0] || {};
+      const docs = [].concat(k1.documents || [], k1.excerpts || []).join(' ');
+      eq('  [발췌기 실행] 원문 「포탈(KUPID)」 줄로 신청 시스템을 채우고 · 그 값이 데이터 검사의 근거 판정을 지난다',
+        [r.status, k1.applyPortal, hasPortalName(docs) || !!(k1.applyPortalSource && hasPortalName(k1.applyPortalSource))], [0, 'KUPID', true]);
+    } finally { sb.done?.(); }
   }
 
   /* ── ⑧ 양식이 붙은 열린 공고 수 · 옛 양식 후보 (app1-03 ③ · app1-08 ①) ── */

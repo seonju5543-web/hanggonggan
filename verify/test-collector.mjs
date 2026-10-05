@@ -10698,7 +10698,7 @@ console.log('\n■ 모르는 접수 방법을 단정하지 않는다 (2026-09-21
   const built = new Function(`${acSrc}
 ${dataSrc.match(/const SUBMIT_CHANNEL_LABEL = \{[\s\S]*?\};/)[0]}
 ${[ 'isFormAttachment', 'hasFormAttachment', 'hasPortalEvidence', 'submitChannelKind', 'submitChannelLabel' ].map(grabFn).join('\n')}
-return { submitChannelKind, submitChannelLabel };`)();
+return { submitChannelKind, submitChannelLabel, hasPortalName };`)();
   const kind = built.submitChannelKind;
   const label = built.submitChannelLabel;
 
@@ -10726,11 +10726,14 @@ return { submitChannelKind, submitChannelLabel };`)();
      (발췌는 14칸 상한이라 신청방법 줄이 자주 밀려난다 — 실측 원문 15건 vs 발췌 1건).
      ⚠️ 이 검사의 이빨은 그대로다: **어느 쪽이든 근거가 있어야** 포털이라고 부를 수 있고,
         `applyPortalSource` 는 그 안에 **시스템 이름이 실제로 들어 있어야** 근거로 친다. */
-  const PORTAL_WORDS = /종합정보시스템|HUFS\s?Ability|학사정보시스템|학생지원시스템|포털|인포\s?21|INFO\s?21/i;
+  /* 🔴 근거 낱말은 apply-channel.js hasPortalName 한 곳 — 시스템 표(PORTAL_SYSTEMS) + 흔한 이름(포털·포탈·…정보시스템) (2026-10-05 리뷰).
+     여기 손으로 적은 목록에 '포탈'·KUPID 가 없어서, 표에 KUPID 를 넣은 뒤 다음 수집의 발췌기가 채울 고려대 원문
+     「포탈(KUPID) - 학사행정 - …」을 근거 없음으로 세어 데이터 관문이 빨개질 참이었다(그날 자동 등록이 통째로 되돌려진다). */
+  const hasPortalName = built.hasPortalName;
   const baseless = claimed.filter((it) => {
     const t = [].concat(it.documents || [], it.excerpts || []).join(' ');
-    if (PORTAL_WORDS.test(t)) return false;
-    return !(it.applyPortalSource && PORTAL_WORDS.test(it.applyPortalSource));
+    if (hasPortalName(t)) return false;
+    return !(it.applyPortalSource && hasPortalName(it.applyPortalSource));
   });
   eq('등록 데이터에 근거 없는 포털 단정이 없다', baseless.length, 0);
 }
