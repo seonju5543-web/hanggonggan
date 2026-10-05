@@ -14,6 +14,7 @@
    관문: verify/health-gates/bodies.mjs
    ============================================================ */
 import { createRequire } from 'node:module';
+import { canonUrl } from './canon-url.mjs';
 
 const { notStale } = createRequire(import.meta.url)('../match-engine.js');
 
@@ -56,6 +57,21 @@ export function ledgerEntry(prev, outcome, { today, minBody, name, restAfter = 3
   if (outcome === 'gone') return { tries: restAfter, at: today, minBody, gone: true, name, ...keepOk };
   if (outcome === 'hung') return { tries: (p.tries || 0) + 1, at: today, minBody, hung: true, name, ...keepOk };
   return { tries: (p.tries || 0) + 1, at: today, minBody, name, ...keepOk };
+}
+
+/** 장부에서 등록 목록(items)에 없는 공고의 칸을 지운다(제자리) — 지운 칸 수를 돌려준다.
+    열쇠는 로봇이 쓰는 것과 같은 canonUrl(sourceUrl). '_' 로 시작하는 칸(표식)은 남긴다.
+    왜: 확보도 날짜로 남기게 된 뒤(ok) 지우는 곳이 없으면 장부가 확보한 공고 수만큼 끝없이 자란다(2026-10-04 리뷰 R5). */
+export function pruneLedger(ledger, items) {
+  const live = new Set();
+  for (const it of items || []) if (it && it.sourceUrl) live.add(canonUrl(it.sourceUrl));
+  let dropped = 0;
+  for (const k of Object.keys(ledger || {})) {
+    if (k.startsWith('_') || live.has(k)) continue;
+    delete ledger[k];
+    dropped += 1;
+  }
+  return dropped;
 }
 
 /* 첨부 이름 비교 — 앞 번호(`1. `)와 `미리보기` 꼬리를 뗀다. 안 떼면 `1. ○○.hwp` 와 `○○.hwp` 가 다른 첨부로 보여

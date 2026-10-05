@@ -33,7 +33,8 @@ import { makeStripper } from './page-boilerplate.mjs';
 import { withDeadline, TIMED_OUT, makeBudget } from './harvest-budget.mjs';
 import { readLinkFixes, humanFixUrlBy } from './link-fixes-read.mjs';
 /* 대상 거르기·차례·장부 한 칸·첨부 합치기는 순수 함수 파일 하나에 — 이 파일은 불러오는 순간 돌아 관문이 못 부른다 */
-import { restingAfterOk, closedForStudents, orderTargets, ledgerEntry, newAttachments } from './rescue-plan.mjs';
+import { restingAfterOk, closedForStudents, orderTargets, ledgerEntry, newAttachments, pruneLedger } from './rescue-plan.mjs';
+import { writeFileAtomic } from './write-atomic.mjs';
 
 const { requirementLines } = createRequire(import.meta.url)('../match-engine.js');
 const HERE = new URL('.', import.meta.url);
@@ -46,6 +47,8 @@ const BUDGET_MS = Number(process.env.RESCUE_BUDGET_MS || 12 * 60 * 1000);
 const PAGE_MS = Number(process.env.RESCUE_NOTICE_MS || 60000);   // 한 공고 절대 시한 — 아래 목록 돌기 참고 (관문은 짧게 줄여 돌린다)
 const GAP_MS = Number(process.env.RESCUE_GAP_MS || 2500);        // 공고 사이 쉼 — 같은 학교를 몰아치지 않는다
 const CAP = Number(process.env.RESCUE_CAP || 25);
+/* 감시 타이머 — 아래 '감시 타이머' 머리말 · 워크플로: 9분 + 60초 + 30초 = 10분 30초 < 단계 시한 11분 */
+const WATCHDOG_MS = Number(process.env.RESCUE_WATCHDOG_MS || (BUDGET_MS + PAGE_MS + 30000));
 const CTX_OPTS = {
   userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36',
   locale: 'ko-KR',
@@ -118,17 +121,21 @@ export function pickTargets(items) {
    낱말 하나 때문에 넘어져 4분간 찾은 13건을 통째로 버린 적이 있다.
    🔴 **공고 하나가 끝날 때마다** 부른다(아래 목록 돌기 finally) — 2026-10-04 run #53 은 넷째 공고에서 멈춰 단계 시한(11분)에
       잘렸고, 끝에서 한 번만 저장하던 탓에 이미 받은 3건까지 잃었다. 단계 시한은 '넘어짐'이 아니라 강제 종료라
-      신호 처리기로는 못 살린다(그날 node 는 시한 뒤에도 고아로 남아 있었다). progress 는 리포트 끝 '(진행 중 …)' 꼬리. */
-function saveAll(crashNote, progress = '') {
+      신호 처리기로는 못 살린다(그날 node 는 시한 뒤에도 고아로 남아 있었다). progress 는 리포트 끝 '(진행 중 …)' 꼬리.
+   🔴 쓰기는 **임시 파일에 다 쓴 뒤 이름만 바꾼다**(write-atomic.mjs · 리뷰 R2) — 공고마다 1MB 넘는 본문 파일을 최대 50번 덮어쓰므로,
+      쓰는 도중 강제로 끊기면 반쯤 쓴 JSON 이 남는다. 감사는 그 파일을 읽지 않아 그대로 커밋되고, 다음 실행은 읽기에 실패해
+      빈 본문 파일로 시작해 브라우저 본문 전부를 잃는다. stopNote 는 감시 타이머가 멈췄을 때의 한 줄. */
+function saveAll(crashNote, progress = '', stopNote = '') {
   if (!WRITE) return;
   const cutoff = new Date(Date.now() - 60 * 86400000).toISOString().slice(0, 10);
   const keep = {};
   for (const [u, v] of Object.entries(bodies)) if (!v.at || v.at >= cutoff) keep[u] = v;
-  fs.writeFileSync(bodiesPath, JSON.stringify(keep, null, 1));
-  fs.writeFileSync(ledgerPath, JSON.stringify(ledger, null, 1));
-  if (regDirty) fs.writeFileSync(regPath, JSON.stringify(reg, null, 1) + '\n');
+  writeFileAtomic(bodiesPath, JSON.stringify(keep, null, 1));
+  writeFileAtomic(ledgerPath, JSON.stringify(ledger, null, 1));
+  if (regDirty) writeFileAtomic(regPath, JSON.stringify(reg, null, 1) + '\n');
   if (crashNote) report.push('', `🚨 도중에 넘어졌습니다: ${crashNote}`);
-  fs.writeFileSync(reportPath, [...report, ...(progress && !crashNote ? ['', progress] : [])].join('\n') + '\n');
+  if (stopNote) report.push('', stopNote);
+  writeFileAtomic(reportPath, [...report, ...(progress && !crashNote ? ['', progress] : [])].join('\n') + '\n');
 }
 const onCrash = (e) => { try { saveAll(String((e && e.message) || e).slice(0, 200)); } catch { /* 저장도 실패하면 어쩔 수 없다 */ } process.exit(1); };
 process.on('uncaughtException', onCrash);
@@ -140,7 +147,29 @@ log(`대상 ${targets.length}건 (아직 자격을 못 읽은 공고 — 읽을 
 if (targets.length) log(`차례: ${targets.slice(0, 10).map((t) => t.it.id).join(' · ')}${targets.length > 10 ? ' …' : ''}`);
 report.push(`대상 **${targets.length}건** · 이번 실행 한도 ${CAP}건`, '');
 if (!WRITE) { log('미리보기 — --write 를 붙여야 실제로 받는다'); process.exit(0); }
+/* 등록 목록에서 빠진 공고의 장부 칸은 지운다 (리뷰 R5) — 확보도 날짜로 남기게 된 뒤(rescue-plan ledgerEntry 'ok')로는
+   지우는 곳이 없으면 장부가 확보한 공고 수만큼 끝없이 자란다. 열쇠는 이 로봇이 쓰는 것과 같은 canonUrl(sourceUrl). */
+{
+  const dropped = pruneLedger(ledger, reg.items);
+  if (dropped) log(`장부 정리 — 등록 목록에서 빠진 공고 ${dropped}칸을 지웠다`);
+}
 if (!targets.length) { saveAll(); process.exit(0); }
+
+const total = Math.min(CAP, targets.length);
+let got = 0, miss = 0, done = 0, gone = 0, hung = 0;
+const progress = () => `(진행 중 ${done}/${total} — 확보 ${got} · 본문 없음 ${miss} · 시한 초과 ${hung} · 삭제 ${gone})`;
+/* 🔴 **감시 타이머** (2026-10-04 리뷰 R2) — 예산·한 공고 시한이 있어도, 시한 없는 호출 하나(브라우저 띄우기 등)가 서면 단계 시한(11분)이
+   node 를 강제로 끊는다. 그날(run #53) node 는 시한 뒤에도 고아로 살아 있었다 — 공고마다 저장하는 지금은 그런 고아가 관문·저장 단계와
+   같은 때에 파일을 고쳐 '감사 안 된 판'이 커밋될 수 있다. 그래서 단계 시한보다 먼저 **스스로** 여기까지 저장하고 끝낸다.
+   종료 코드 1 — 끝까지 못 간 것이라 워크플로가 작업을 실패로 남기고 알린다(점검 bodies-2). 브라우저를 띄우기 전에 건다. */
+setTimeout(() => {
+  const sec = Math.round(WATCHDOG_MS / 1000);
+  log(`⏱ 감시 타이머 ${sec}초 — 끝나지 않아 여기까지 저장하고 멈춘다`);
+  try {
+    saveAll('', progress(), `⏱ 감시 타이머(${sec}초)에 멈췄습니다 — 단계 시한 전에 여기까지 저장하고 끝냈습니다. 어느 공고에서 멈췄는지는 실행 로그의 마지막 ▶ 줄에 있습니다.`);
+  } catch { /* 저장도 실패하면 어쩔 수 없다 */ }
+  process.exit(1);
+}, WATCHDOG_MS).unref();
 
 let browser = await chromium.launch({ args: ['--no-sandbox'] });
 let ctx = await browser.newContext(CTX_OPTS);
@@ -166,9 +195,6 @@ async function freshContext() {
 
 const fixUrl = humanFixUrlBy(readLinkFixes(new URL('../data/link-fixes.json', HERE)));
 const budget = makeBudget(BUDGET_MS);
-const total = Math.min(CAP, targets.length);
-let got = 0, miss = 0, done = 0, gone = 0, hung = 0;
-const progress = () => `(진행 중 ${done}/${total} — 확보 ${got} · 본문 없음 ${miss} · 시한 초과 ${hung} · 삭제 ${gone})`;
 for (const t of targets) {
   if (done >= CAP) { log(`이번 실행 한도(${CAP}건) 도달`); break; }
   /* 시간 예산은 **시작 전에** 본다 — 예산을 넘긴 채 시작하면 강제 종료로 저장까지 죽는다
@@ -309,7 +335,7 @@ for (const t of targets) {
        영영 다시 받으려 애쓴다. 건국대 총동문회 장학생이 실제로 이 상태였다. */
     if (/게시물이?\s*\(?가?\)?\s*존재\s*하지\s*않|삭제된?\s*게시물|없는 게시물/.test(text)) {
       gone += 1;
-      ledger[key] = { tries: REST_AFTER, at: today, minBody: MIN_BODY, gone: true, name };
+      ledger[key] = ledgerEntry(ledger[key], 'gone', { today, minBody: MIN_BODY, name, restAfter: REST_AFTER });   // 칸 = { tries: REST_AFTER, gone: true, … } · 지난 확보 날짜는 이어 둔다(리뷰 R5)
       report.push(`- 🗑 **${t.it.name.slice(0, 40)}** — 게시판에서 내려갔습니다(삭제된 공고). 등록 목록에서 뺄지 검토가 필요합니다.`);
       log(`🗑 ${t.it.name.slice(0, 30)} — 삭제된 공고`);
       continue;

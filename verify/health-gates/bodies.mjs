@@ -25,7 +25,7 @@ import { fileURLToPath } from 'node:url';
 import { cleanEnv, stripComments, stripYamlComments } from './gate.mjs';
 import { browserBodyEntry, clickBodyEntry } from '../../collector/html-text.mjs';
 import { canonUrl } from '../../collector/canon-url.mjs';
-import { restingAfterOk, closedForStudents, orderTargets, ledgerEntry, newAttachments } from '../../collector/rescue-plan.mjs';
+import { restingAfterOk, closedForStudents, orderTargets, ledgerEntry, newAttachments, pruneLedger } from '../../collector/rescue-plan.mjs';
 import { slugOf, attSig, missWait, pickEligDocTargets } from '../../collector/elig-attach-plan.mjs';
 import { fillRetired, nextShells, fillCounts } from '../../collector/notice-source.mjs';
 
@@ -125,6 +125,12 @@ export default async function bodies(eq, ctx) {
         ledgerEntry(undefined, 'miss', { today, minBody: 100, name: 'n' })],
       [{ ok: today, at: today, tries: 0, name: 'n' }, { tries: 2, at: today, minBody: 100, hung: true, name: 'n', ok: '2026-09-01' },
         { tries: 1, at: today, minBody: 100, name: 'n' }]);
+    const L0 = { [canonUrl('https://a.example/x?id=1')]: { ok: today }, [canonUrl('https://b.example/gone?id=2')]: { tries: 1 }, _v: 1 };
+    eq('  장부 정리(pruneLedger) — 등록 목록에 없는 공고 칸만 지운다 · 표식 칸(_)은 남긴다 · 삭제된 공고 칸도 지난 확보 날짜를 이어 둔다 (리뷰 R5)',
+      [pruneLedger(L0, [{ sourceUrl: 'https://a.example/x?id=1' }]), Object.keys(L0).sort(),
+        ledgerEntry({ tries: 1, ok: '2026-09-01' }, 'gone', { today, minBody: 100, name: 'n', restAfter: 3 }),
+        /ledger\[key\] = ledgerEntry\(ledger\[key\], 'gone'/.test(stripComments(readText('collector/rescue-bodies.mjs')))],
+      [1, ['_v', canonUrl('https://a.example/x?id=1')].sort(), { tries: 3, at: today, minBody: 100, gone: true, name: 'n', ok: '2026-09-01' }, true]);
     eq('  첨부 합치기 — 번호·미리보기 꼬리를 뗀 이름이 같으면 같은 첨부',
       newAttachments([{ name: '공고문.hwp' }], [{ name: '1. 공고문.hwp 미리보기' }, { name: '신청서.hwp' }, { name: '신청서.hwp' }]).map((a) => a.name), ['신청서.hwp']);
   }
@@ -180,6 +186,42 @@ export default async function bodies(eq, ctx) {
       [pw.filter((l) => l === 'newContext').length, (reportNow.match(/^- ⏱ /gm) || []).length, /\(진행 중 4\/5/.test(reportNow)],
       [4, 3, true]);
     eq('  공고를 시작할 때 ▶ 줄을 찍는다(멈춘 자리를 로그로 안다)', /▶ 1\/5 /.test(w.out) && /▶ 4\/5 /.test(w.out), true);
+
+    /* ⓓ 저장 도중 강제 종료 · 감시 타이머 · 장부 정리 (리뷰 R2·R5) */
+    sb.write('kill-on-write.mjs', [
+      "import fs from 'node:fs';",
+      'const orig = fs.writeFileSync; let n = 0;',
+      'fs.writeFileSync = function (file, data, ...rest) {',
+      '  const p = file instanceof URL ? file.pathname : String(file);',
+      '  if (/browser-bodies\\.json/.test(p) && ++n === Number(process.env.KILL_ON_WRITE_N || 2)) {',
+      '    orig.call(fs, file, String(data).slice(0, Math.floor(String(data).length / 2)), ...rest);',
+      "    process.kill(process.pid, 'SIGKILL');",
+      '  }',
+      '  return orig.call(fs, file, data, ...rest);',
+      '};', ''].join('\n'));
+    sb.write('data/registered.json', { items: [item('k1', 'ok-k1'), item('k2', 'ok-k2'), item('k3', 'ok-k3')] });
+    sb.write('collector/rescue-ledger.json', {});
+    sb.write('collector/extracted/browser-bodies.json', {});
+    const kw = sb.run('collector/rescue-bodies.mjs', ['--write'], { RESCUE_GAP_MS: '0', RESCUE_BUDGET_MS: '120000', RESCUE_CAP: '10' }, 25000,
+      ['--import', sb.abs('kill-on-write.mjs')]);
+    const kb = sb.json('collector/extracted/browser-bodies.json');
+    eq('① ⓓ 🔴 본문 파일을 쓰는 도중에 강제로 죽어도 파일이 반쯤 잘리지 않는다 — 바로 앞 저장 판(첫 공고 본문) 그대로 · 임시 파일에 쓰고 이름만 바꾼다 (리뷰 R2)',
+      [kw.signal, kb !== null, !!(kb && kb[u('ok-k1')]), !!(kb && kb[u('ok-k2')])], ['SIGKILL', true, true, false]);
+
+    sb.write('data/registered.json', { items: [item('w1', 'ok-w1'), item('w2', 'hang-forever-w2'), item('w3', 'ok-w3')] });
+    sb.write('collector/rescue-ledger.json', { [canonUrl('https://fake.example/left-registered?id=1')]: { tries: 2, at: shift(today, -2), minBody: 100 } });
+    sb.write('collector/extracted/browser-bodies.json', {});
+    const t0 = Date.now();
+    const wd = sb.run('collector/rescue-bodies.mjs', ['--write'],
+      { RESCUE_NOTICE_MS: '600000', RESCUE_GAP_MS: '0', RESCUE_BUDGET_MS: '1200000', RESCUE_CAP: '10', RESCUE_WATCHDOG_MS: '1500' }, 9000);
+    const wdMs = Date.now() - t0;
+    const wdLed = sb.json('collector/rescue-ledger.json') || {};
+    const wdRep = sb.read('collector/rescue-report.md') || '';
+    eq('  감시 타이머 — 한 공고 시한보다 오래 멈춘 호출이 있어도 단계 시한 전에 스스로 저장하고 끝낸다(종료 코드 1 · 강제 종료 아님) · 앞 공고의 본문·장부와 리포트 꼬리가 남는다 (리뷰 R2)',
+      [wd.status, wd.signal, wdMs < 8000, !!(wdLed[canonUrl(u('ok-w1'))] || {}).ok, /감시 타이머/.test(wdRep) && /\(진행 중 2\/3/.test(wdRep), !!(sb.json('collector/extracted/browser-bodies.json') || {})[u('ok-w1')]],
+      [1, null, true, true, true, true]);
+    eq('  장부 정리 — 등록 목록에서 빠진 공고의 칸은 지운다(확보 기록을 남기게 된 뒤 장부가 끝없이 자라지 않게) (리뷰 R5)',
+      Object.keys(wdLed).includes(canonUrl('https://fake.example/left-registered?id=1')), false);
   } finally {
     sb.done();
   }
