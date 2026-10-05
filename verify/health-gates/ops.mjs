@@ -128,6 +128,14 @@ export default async function gate(eq, ctx) {
       [NB.branchLabel({ ref: BASE, pointsAt: ['claude/zzz', 'main', 'claude/aaa'] }),
         NB.remoteBranchesFrom('refs/remotes/origin/HEAD\nrefs/remotes/origin/main\nrefs/remotes/origin/claude/foo\n'), NB.remoteBranchesFrom(null)],
       ['claude/aaa', ['main', 'claude/foo'], null]);
+    /* 병합 커밋 push (리뷰 R1) — Z = merge(X, 봇) 를 main 에 올렸다: Z 를 가리키는 작업 브랜치는 없고 첫 부모 X 를 claude/foo 가 가리킨다 */
+    const refsAt = NB.refsByCommit(`zzz refs/remotes/origin/main\nzzz refs/remotes/origin/${BASE}\nxxx refs/remotes/origin/claude/foo\nbbb refs/remotes/origin/claude/other\nzzz refs/remotes/origin/HEAD\n`);
+    eq('  pushBranchLabel — 병합 커밋 main 실행: HEAD 다음 첫 부모(X)의 작업 브랜치 · 둘째 부모 쪽(봇 커밋을 가리키는 남의 브랜치)은 줄에 없으면 안 본다 · 아무도 없으면 HEAD 만 보는 규칙 · 못 읽음은 null',
+      [NB.pushBranchLabel({ ref: 'main', commits: ['zzz', 'xxx'], refsAt }), NB.pushBranchLabel({ ref: 'main', commits: ['zzz'], refsAt }),
+        NB.pushBranchLabel({ ref: 'main', commits: ['zzz', 'yyy'], refsAt }), NB.pushBranchLabel({ ref: 'claude/bar', commits: ['zzz'], refsAt }),
+        NB.pushBranchLabel({ ref: 'main', commits: ['zzz', 'xxx'], refsAt: null }), NB.pushBranchLabel({ ref: 'main', commits: [], refsAt }),
+        [...NB.refsByCommit('aaa refs/remotes/origin/HEAD\naaa refs/remotes/origin/main\n').entries()], NB.refsByCommit(null)],
+      ['claude/foo', BASE, BASE, 'claude/bar', null, null, [['aaa', ['main']]], null]);
     eq('  다시 보낼 응답은 429·5xx 만', [429, 500, 503, 400, 401, 404, 200].map(NB.retryable), [true, true, true, false, false, false, false]);
     const fake = (seq) => {
       let n = 0;
@@ -158,6 +166,33 @@ export default async function gate(eq, ctx) {
       eq('  동작 — main 실행이 그 커밋의 작업 브랜치를 적는다 · 작업 브랜치가 없으면 기본 브랜치',
         [/^\s*브랜치: claude\/foo$/m.test(withTopic), new RegExp(`^\\s*브랜치: ${BASE.replace(/[/.]/g, '\\$&')}$`, 'm').test(baseOnly)], [true, true]);
     } finally { R.done(); }
+    /* 동작 — 병합 커밋 main (리뷰 R1 재현): 작업 브랜치 claude/foo = X · main = merge(X, 봇 커밋) = Z · 기본 브랜치 = Z(또는 봇 커밋) */
+    const M = tmpRepo('ops-notion-merge-');
+    try {
+      const sha = () => M.git('rev-parse', 'HEAD').stdout.trim();
+      M.git('init', '-q', '-b', 'main'); M.put('seed.txt', 's'); M.git('add', '-A'); M.git('commit', '-qm', '씨앗'); const S = sha();
+      M.git('checkout', '-q', '-b', 'claude/foo'); M.put('x.txt', 'x'); M.git('add', '-A'); M.git('commit', '-qm', '작업 X'); const X = sha();
+      M.git('checkout', '-q', '-b', 'bot', S); M.put('b.txt', 'b'); M.git('add', '-A'); M.git('commit', '-qm', '봇 커밋'); const B = sha();
+      M.git('checkout', '-q', 'claude/foo'); M.git('merge', '-q', '--no-ff', '--no-edit', 'bot'); const Z = sha();
+      M.git('update-ref', 'refs/remotes/origin/claude/foo', X); M.git('update-ref', 'refs/remotes/origin/main', Z); M.git('update-ref', `refs/remotes/origin/${BASE}`, Z);
+      M.git('update-ref', 'refs/remotes/origin/claude/other', B);      // 남의 브랜치가 둘째 부모(봇 커밋)를 가리킨다 — 고르면 안 된다
+      const dry = (beforeSha) => {
+        const r = spawnSync(process.execPath, [path.join(rootPath, 'tools/notion-status.mjs'), '--dry'], { cwd: M.dir, encoding: 'utf8', timeout: 60000,
+          env: { ...M.env, NOTION_TOKEN: 'dry', GITHUB_ACTOR: 'didinin-wq', GITHUB_REF_NAME: 'main', GITHUB_EVENT_BEFORE: beforeSha } });
+        return (((r.stdout || '') + (r.stderr || '')).match(/^\s*브랜치: (.*)$/m) || [])[1] || '(없음)';
+      };
+      const baseAtZ = dry(S);
+      M.git('update-ref', `refs/remotes/origin/${BASE}`, B);
+      const baseElsewhere = dry(S);
+      eq('  동작 — 병합 커밋을 main 에 올린 실행도 작업 브랜치를 적는다(기본 브랜치가 그 병합 커밋이든 아니든) · 둘째 부모를 가리키는 남의 브랜치는 안 고른다',
+        [baseAtZ, baseElsewhere], ['claude/foo', 'claude/foo']);
+    } finally { M.done(); }
+    /* 배선 — 노션 쓰기가 재시도 함수를 거친다(맨 fetch 로 노션을 부르지 않는다 · 리뷰 R5) */
+    const ns = stripComments(read(root, 'tools/notion-status.mjs'));
+    eqCode('  notion-status.mjs — 노션 PATCH 는 patchWithRetry(fetch, …) 로만 · 맨 fetch( 호출 없음 · 브랜치 칸은 pushBranchLabel 로',
+      [/patchWithRetry\(fetch,\s*`https:\/\/api\.notion\.com\/v1\/pages\//.test(ns), (ns.match(/(?<![\w.$])fetch\s*\(/g) || []).length,
+        /const label = pushBranchLabel\(\{[^}]*commits:\s*pushedCommits/.test(ns)],
+      [true, 0, true]);
   }
 
   /* ── ⑤ gaps-04 데이터 로봇 목록은 워크플로에서 읽는다 ── */
