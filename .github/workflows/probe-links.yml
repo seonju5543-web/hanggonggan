@@ -24,8 +24,17 @@ jobs:
     # 대기줄(concurrency: collector)을 쓰기 때문에 그동안 다음 수집이 줄을 섰다.
     # 학교를 더 붙일수록 '한 곳이 안 열려 멈추는' 확률도 같이 오른다.
     timeout-minutes: 15   # 정찰은 짧다
+    # 🔴 push 로 깼으면 이번 push 가 새로 넣은 줄만 연다 (2026-10-05 로봇·도구 점검 · gaps-05) — 매 push 마다 옛 줄 25개를
+    #    다시 열어 같은 학교를 하루 네 번 두드렸다. 손으로 돌리면(workflow_dispatch) 지금처럼 전부 연다.
+    env:
+      PROBE_BEFORE: ${{ github.event_name == 'push' && github.event.before || '' }}
     steps:
       - uses: actions/checkout@v4
+      # 기본 fetch-depth 1 이면 push 직전 판이 없다 — 그 커밋 하나만 받아 둔다(못 받으면 정찰이 전부 열고 리포트에 그렇게 적는다)
+      - name: push 직전 판 받기 (새 줄 가리기용)
+        if: env.PROBE_BEFORE != ''
+        timeout-minutes: 2
+        run: git fetch --no-tags --depth=1 origin "$PROBE_BEFORE" || true
       - uses: actions/setup-node@v4
         with:
           node-version: 20

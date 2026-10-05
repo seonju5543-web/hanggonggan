@@ -2,6 +2,10 @@
 #
 # checkUrl:  이 주소를 로그인 없는 새 탭에서 열어 그대로 보고 (로그인 벽인지 포함)
 # findBoard: <시작 주소> | <눌러 들어갈 글자 > 글자>
+#
+# 🔴 push 로 깨면 **이번 push 가 새로 넣은 줄만** 연다 (2026-10-05 로봇·도구 점검 · collector/probe-lines.mjs) — 그대로인 옛 줄은 다시 두드리지 않는다.
+#    같은 줄을 다시 보려면 그 줄을 지웠다 다시 넣어 push 하거나, Actions 에서 수동 실행(전부 연다).
+#    답을 받은 줄은 '# (답 받음 날짜 · 근거) ' 를 앞에 붙여 막는다(수동 실행에서도 안 열리게).
 
 # 2026-10-04 (대대적 점검 2차) — 1차 답: 홍익대는 세 주소 모두 봇 차단 화면(cdn-botmanager.stclab.com 'Security Verification') → 개발자에게 묻는다.
 #   시립대 FA1 은 '일반공지 < UOS공지'(장학 전용 아님 확인) · 첫 화면 '장학/학자금대출' 메뉴의 scholarship.do 는 아직 안 열어 봄 → 열어 본다(안내 페이지인지 게시판인지).
@@ -22,16 +26,18 @@ findBoard: https://wise.dongguk.ac.kr/main | 공지사항
 # 2026-10-04 — 원문 링크 바로잡기 (개발자 지시 *"원문 공고 링크를 최대한 어떻게든 찾을 방법"*). 맨 앞에 둔다(정찰 예산 11분 — 뒤 줄은 잘릴 수 있다).
 #   우리 파일(수집 기록·본문 사본·git 기록)에 **이미 있던** 진짜 주소들이 지금 그 글을 여는지 · 주소 틀(경희 소식 GET · 온통청년 정책 · 1365 www)이 맞는지.
 #   경희 소식(www.khu.ac.kr 200316)은 눌러 열면 POST 라 목록 표식뿐 — 같은 게시판 소프트웨어의 news.khu.ac.kr 은 GET 상세가 열린다.
-checkUrl: https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323083
-checkUrl: https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322415
-checkUrl: https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54815
+#   (답 받음 2026-10-04 정찰 #47 — SESSIONS.md 「2026-10-04 원문 바로잡기」: 경희 GET 상세·news.khu 322415·서울교대 54815·연세 944246 은 그 글 · 인제 247129 는 다른 사업.
+#    국민 12307 은 시한 · 온통청년 정책 주소 틀은 미확인 · 1365·대전은 답 기록을 못 찾음 → 그 다섯 줄은 그대로 둔다)
+# (답 받음 2026-10-04 정찰 #47 · 그 글) checkUrl: https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323083
+# (답 받음 2026-10-04 정찰 #47 · 그 글) checkUrl: https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322415
+# (답 받음 2026-10-04 정찰 #47 · 그 글) checkUrl: https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54815
 checkUrl: https://www.kookmin.ac.kr/user/kmuNews/notice/7/12307/view.do?currentPageNo=1
-checkUrl: https://www.yonsei.ac.kr/bbs/sc/58/944246/artclView.do
+# (답 받음 2026-10-04 정찰 #47 · 그 글) checkUrl: https://www.yonsei.ac.kr/bbs/sc/58/944246/artclView.do
 checkUrl: https://www.youthcenter.go.kr/youthPolicy/ythPlcyTotalSearch/ythPlcyDetail/20250123005400110393
 checkUrl: https://www.1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3523464
 checkUrl: https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3523464
 checkUrl: https://www.daejeonyouthportal.kr/content/CT_000000000070/cntPage.do?commonMenuNo=79_92&dpmSectionFst=2&dpmSectionScd=10
-checkUrl: https://www.inje.go.kr/portal/field-info/scholarship?articleSeq=247129
+# (답 받음 2026-10-04 정찰 #47 · 다른 사업) checkUrl: https://www.inje.go.kr/portal/field-info/scholarship?articleSeq=247129
 
 # 2026-08-29 — 개발자 지시: 한국장학재단 통합검색의 **상세 화면**에 무엇이 있는지 확인.
 #   목록(기관명·장학금명·모집마감일)은 이미 받아 봤다(1,869건). 문제는 상세다 —
@@ -40,7 +46,8 @@ checkUrl: https://www.inje.go.kr/portal/field-info/scholarship?articleSeq=247129
 #   앱 내 브라우저는 CSRF 를 넣어 주는 스크립트가 차단돼 토큰이 DOM 에 없다).
 #   → 진짜 브라우저로 목록에서 '상세보기'를 눌러 그 화면의 **항목 이름과 글자**를 받아 적는다.
 #   자격요건이 있으면 교외 장학금 자격 매칭의 재료가 생긴다(지금 67건이 '자격 미확인').
-findBoard: https://portal.kosaf.go.kr/CO/jspAction.do?beanName=PTSMCstmDsgnGoodsSVC&methodName=getItgnSrchCstmDsgnGoodsList&inputVOName=kr.go.kosaf.portal.pt.sm.cstmdsgngoods.svc.PTSMCstmDsgnGoodsSVO&forwardOnlyFlag=N&ignoreSession=Y&forwardPage=pt/sm/cstmdsgngoods/PTSMCstmDsgnGoods_10M&naviParam=MK,05,02,01 | 상세보기
+#   (답 받음 — 상세 화면을 받는 법이 collector/kosaf-fetch.mjs 머리말에 적혀 있다(상세 POST · 재조사 금지 · CLAUDE.md 「노션에 없고 여기서만 사는 것」 ③))
+# (답 받음 2026-08-29 · kosaf-fetch.mjs 머리말) findBoard: https://portal.kosaf.go.kr/CO/jspAction.do?beanName=PTSMCstmDsgnGoodsSVC&methodName=getItgnSrchCstmDsgnGoodsList&inputVOName=kr.go.kosaf.portal.pt.sm.cstmdsgngoods.svc.PTSMCstmDsgnGoodsSVO&forwardOnlyFlag=N&ignoreSession=Y&forwardPage=pt/sm/cstmdsgngoods/PTSMCstmDsgnGoods_10M&naviParam=MK,05,02,01 | 상세보기
 
 # 2026-09-17 — 마감일 감사(verify/deadline-audit.mjs)가 '근거 없음'으로 잡은 4건.
 #   마감이 게시판 요약(deadlineHint)에서 읽혔는데 그 요약은 저장되지 않아 대조할 원문이 없다.
@@ -122,7 +129,8 @@ checkUrl: https://www.smu.ac.kr/kor/life/scholarship.do
 #   경북: 웹 검색 결과에 그대로 잡힌 학사공지 목록 주소(stdList.action?menu_idx=42)가 로그인 없이 날짜 줄을 보이는지.
 #   서울대: 일반공지는 장학 글이 많아 소식이 2건뿐 → 웹 검색에 잡힌 학부대학 공지사항 화면의 날짜 줄.
 #   고려 세종: 일반공지 3건 → 웹 검색에 잡힌 학사공지(7903 · 글 5,934개) 화면의 날짜 줄.
-checkUrl: https://www.sogang.ac.kr/ko/story/notification-event
-checkUrl: https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdList.action?menu_idx=42
-checkUrl: https://snuc.snu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/
-checkUrl: https://sejong.korea.ac.kr/koreaSejong/7903/subview.do
+#   (답 받음 2026-10-04 · 커밋 b444b603 '소식 0건 학교 없애기' — 경북 학사공지 doRead 규칙 · 서강 행사특강 API 규칙 · 서울대 학부대학 공지 · 고려 세종 학사공지 extraBoards)
+# (답 받음 2026-10-04 · b444b603) checkUrl: https://www.sogang.ac.kr/ko/story/notification-event
+# (답 받음 2026-10-04 · b444b603) checkUrl: https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdList.action?menu_idx=42
+# (답 받음 2026-10-04 · b444b603) checkUrl: https://snuc.snu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/
+# (답 받음 2026-10-04 · b444b603) checkUrl: https://sejong.korea.ac.kr/koreaSejong/7903/subview.do
