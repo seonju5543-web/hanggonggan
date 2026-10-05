@@ -3,6 +3,10 @@
  "updatedAt": "2026-10-05",
  "schools": 40,
  "files": {
+  "서울시립대학교": {
+   "file": "n1au199v.json",
+   "count": 22
+  },
   "연세대학교 미래캠퍼스": {
    "file": "n1if6uwu.json",
    "count": 14
@@ -133,10 +137,6 @@
   },
   "전남대학교": {
    "file": "nwqmwga.json",
-   "count": 2
-  },
-  "서울시립대학교": {
-   "file": "n1au199v.json",
    "count": 2
   },
   "서울과학기술대학교": {

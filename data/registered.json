@@ -11076,6 +11076,287 @@
    "attachments": [],
    "sourceUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158449&noCat=501",
    "sourceKind": "auto"
+  },
+  {
+   "id": "auto-q1brddate20260930brdseq1",
+   "name": "[교외/신청] 2026년 인송장학생 선발(음악학과..",
+   "boardTitle": "[교외/신청] 2026년 인송장학생 선발(음악학과..",
+   "type": "교외",
+   "kindEvidence": [
+    "제목 표식 「[교외」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-05",
+   "provider": "주관 기관 원문 확인",
+   "amount": "200만원",
+   "amountValue": 2000000,
+   "deadline": "2026-10-15",
+   "listedAt": "2026-10-05",
+   "period": "접수 기간 ~2026-10-15",
+   "summary": "서울시립대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울시립대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-05 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260930&brdSeq=1&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
+   "sourceKind": "auto",
+   "deadlineFrom": "공고 원문",
+   "applyEmail": "scholarship@uos.ac.kr",
+   "applyEmailSource": "- 제출방법 : 서식 작성 후 메일 제출(scholarship@uos.ac.kr)",
+   "applyEmailFrom": "공고 원문",
+   "eligibilityLines": [
+    "1. 선발 대상자 : 음악학과 에 재학중인 학부생 4명",
+    "2. 자격 요건",
+    "- 대상 : 정규학기 재학생으로서 학교에서 1개 이상의 학기를 이수하였으며, 졸업까지 2개 이상의 학기가 남아있는 학생 (현재 졸업학기생 지원 불가)",
+    "* 2026-2학기 현재 재학생 2027-1학기에도 재학 권고 / 장학금 수혜기간(2026학년도부터 1년) 중 계속학업권고",
+    "- 성적 : (직전학기 기준) 평점평균 80점 이상 또는 전학기 평균 80점이상",
+    "- 이수학점 : (직전학기 기준) 12학점 이상",
+    "- 경제여건 : (2026-2학기 기준) 소득분위 8분위 이내 / 한국장학재단",
+    "- 2026-2학기 타 장학금을 수혜받지 않은 학생(전체대상 장학수혜는 가능)",
+    "- 교외장학금(타재단,기업,지자체) / 생활비 교내장학금 51만원이상 수혜자 지원불가",
+    "- 단, 국가장학금 및 교내 장학금, 근로장학금만 중복수혜 가능"
+   ],
+   "excerpts": [
+    "- 제출기한 : 10월 15일(목) 17시까지",
+    "- 제출방법 : 서식 작성 후 메일 제출(scholarship@uos.ac.kr)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 2000000,
+    "ratio": 0,
+    "min": 2000000,
+    "max": 2000000,
+    "raw": "4. 장학금 : 200만원 / 2026-2학기에 전액 지급"
+   },
+   "amountFrom": "공고 원문",
+   "exclusivity": {
+    "kind": "allowed",
+    "scope": "narrow",
+    "raw": "- 단, 국가장학금 및 교내 장학금, 근로장학금만 중복수혜 가능"
+   },
+   "exclusivityFrom": "공고 원문"
+  },
+  {
+   "id": "auto-q1brddate20260809brdseq1",
+   "name": "[국가/신청] ★2026-2학기 주거안정장학금 2..",
+   "boardTitle": "[국가/신청] ★2026-2학기 주거안정장학금 2..",
+   "type": "교외",
+   "kindEvidence": [
+    "교내 증거 없음 — 기본값"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-10-05",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-09-09",
+   "listedAt": "2026-10-05",
+   "period": "접수 기간 ~2026-09-09",
+   "summary": "서울시립대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울시립대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-05 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260809&brdSeq=1&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
+   "sourceKind": "auto",
+   "deadlineFrom": "공고 원문",
+   "openDate": "2026-08-12",
+   "announceDate": "2026-10-14",
+   "eligibilityLines": [
+    "월 지급 한도 내에서 학생이 지출한 비용 ( 실비 ) 을 개별 지급 6 . 지원대상 : 본 장학금은 원거리",
+    "* 대학에 진학한 기초생활수급자 또는 차상위계층 학생 중 만 39 세 이하의 미혼자 이며, 사업 참여대학에 재학중 또는 입학예정인 학부생 ( 대학원생 제외 ) 을 대상 으로",
+    "운영하는 사업임",
+    "* 원거리 인정기준(한국장학재단 설정 기준) : 우리 대학의 경우 수도권 ** 이외의 지역에 해당",
+    "** 수도권 : 서울특별시, 인천광역시(옹진군 전체 및 강화군 교동면/삼산면/서도면 제외), 경기도",
+    "7. 우선지원 및 지급 제외 기준 : 붙임4 자료 참조"
+   ],
+   "excerpts": [
+    "장학금 신청기간 : 2026.8.12.(수 ) 9 시 ~ 9.9.(수 ) 18 시 2 .",
+    "신청방법 : 한국장학재단 홈페이지 ( www.kosaf.go.kr) 또는 모바일 앱에서 학생 본인 직접 신청 ( 붙임 1, 2 참고 ) 4 ."
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-q1brddate20260807brdseq2",
+   "name": "[교내/선발] 2026학년도 2학기 학부 교내장학..",
+   "boardTitle": "[교내/선발] 2026학년도 2학기 학부 교내장학..",
+   "type": "교내",
+   "kindEvidence": [
+    "제목 표식 「교내」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-05",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-10-05",
+   "period": "접수 기간 원문 확인",
+   "summary": "서울시립대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울시립대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-05 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260807&brdSeq=2&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "4. 공로 예비 장학 및 교수지원장학, 일부 대체 등록자 중 26학년도 2학기 장학 대상자로 선발되어 기납부금에 대한 환급 등은 추후 2026년 9월 말 일괄 개별 지급 예정 입니다. (교수지원장학 현재 선발 진행 중)"
+   ]
+  },
+  {
+   "id": "auto-q1brddate20260526brdseq1",
+   "name": "[근로/신청] 2026년 2학기 국가근로장학금 신..",
+   "boardTitle": "[근로/신청] 2026년 2학기 국가근로장학금 신..",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「국가근로」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-05",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-10-05",
+   "period": "접수 기간 원문 확인",
+   "summary": "서울시립대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울시립대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-05 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260526&brdSeq=1&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "2. 장학생 필수 자격 요건: \"재학생\" 신분 유지",
+    "한국장학재단 규정에 따라, 국가근로장학생은 근로 기간 내내 '재학생' 신분을 유지해야 합니다.",
+    "다음의 경우 근로가 불가능합니다.",
+    "- 학기 중 휴학 또는 졸업 시, 해당 시점부터 근로 불가",
+    "- 신청 당시 재학생이었더라도, 근로 시작 전 또는 학기 중 휴학 시 자격 상실"
+   ]
+  },
+  {
+   "id": "auto-q1brddate20260427brdseq1",
+   "name": "[교내/선발] 2026학년도 시대인재장학 선발 안..",
+   "boardTitle": "[교내/선발] 2026학년도 시대인재장학 선발 안..",
+   "type": "교내",
+   "kindEvidence": [
+    "제목 표식 「교내」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-05",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-10-05",
+   "period": "접수 기간 원문 확인",
+   "summary": "서울시립대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울시립대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-05 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260427&brdSeq=1&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "2. 선발대상",
+    "가. 2025학년도 별별포인트 적립자",
+    "나. 직전학기 평균평점 3.5이상인 재학생",
+    "다. 정규학기 등록자(수업연한 초과자 제외)",
+    "라. 직전학기 유기정학 이상 중징계를 받지 않은 자"
+   ]
+  },
+  {
+   "id": "auto-q1brddate20260409brdseq1",
+   "name": "[교내/신청] 2026학년도 제1학기 형설장학금 ..",
+   "boardTitle": "[교내/신청] 2026학년도 제1학기 형설장학금 ..",
+   "type": "교내",
+   "kindEvidence": [
+    "제목 표식 「교내」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-05",
+   "provider": "주관 기관 원문 확인",
+   "amount": "30만원",
+   "amountValue": 300000,
+   "deadline": "2026-04-15",
+   "listedAt": "2026-10-05",
+   "period": "접수 기간 ~2026-04-15",
+   "summary": "서울시립대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울시립대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-05 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260409&brdSeq=1&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
+   "sourceKind": "auto",
+   "deadlineFrom": "공고 원문",
+   "openDate": "2026-04-13",
+   "eligibilityLines": [
+    "※ 선발대상자 안내 : 1순위) My UOS+ 푸쉬 알림 → 2순위) 문자메세지 순서로 발송"
+   ],
+   "excerpts": [
+    "※ 선발대상자 안내 : 1순위) My UOS+ 푸쉬 알림 → 2순위) 문자메세지 순서로 발송",
+    "신청기간 : 26.4.13.(월) 9시 ~ 4.15.(수) 18시까지",
+    "장학금액 : 형설장학1 30만원/월, 형설장학2 15만원/월"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 300000,
+    "ratio": 0,
+    "min": 300000,
+    "max": 300000,
+    "raw": "4. 장학금액 : 형설장학1 30만원/월, 형설장학2 15만원/월 ※ 장학금액은 예산상황에 따라 변동될 수 있음."
+   },
+   "amountFrom": "공고 원문"
   }
  ]
 }
