@@ -328,6 +328,19 @@ export default async function gate(eq, ctx) {
       eq('  저장 형식은 로봇과 같다 (JSON.stringify(x, null, 1) + 끝 개행)', S.read('data/registered.json'), J(reg));
       S.done();
     }
+    /* ㉣ 제목이 둘인 리포트 — 게시판 수집 단계가 잘리면 리포트에 지난 실행의 제목이 남고 자동 등록이 이번 제목을 끝에 덧붙인다.
+       고치는 것은 **마지막**(이번 실행) 제목 하나 — 지난 실행의 'N건 등록'을 되돌림이라 하지 않는다(리뷰 2026-10-04 재현) */
+    {
+      const S = scenario({ ...HEAD, 'r.md': '# 리포트\n\n### 🤖 자동 등록 (선조치후보고) — 8건 등록\n\n- 지난 실행\n' },
+        { 'data/registered.json': { items: [{ id: 'old', auto: true, v: 1 }, { id: 'n7', auto: true, bad: true }] },
+          'r.md': '# 리포트\n\n### 🤖 자동 등록 (선조치후보고) — 8건 등록\n\n- 지난 실행\n\n### 🤖 자동 등록 (선조치후보고) — 1건 등록\n\n- 이번 실행\n' });
+      const rep = S.read('r.md');
+      eq('  ㉣ 제목이 둘인 리포트(지난 실행 제목이 남음)는 마지막 제목만 \'시도 · 되돌림\' · 단락은 그 아래',
+        [S.out.gate, /— 8건 등록\n/.test(rep), /— 8건 등록 시도/.test(rep), /— 1건 등록 시도 · ↩ 데이터 관문에 걸려 되돌림/.test(rep),
+          rep.indexOf('새 자동 등록 1건을 되돌렸습니다') > rep.indexOf('— 1건 등록 시도'), rep.indexOf('새 자동 등록 1건을 되돌렸습니다') > rep.indexOf('- 지난 실행')],
+        ['reverted-auto', true, false, true, true, true]);
+      S.done();
+    }
     /* ㉡ 기존 항목 수정이 원인 → 새 자동 등록분을 빼도 빨강 → 정식 등록 파일을 HEAD 바이트로 → 통과(reverted-files) · 쉬기 장부에 안 적는다 */
     {
       const S = scenario(HEAD, { 'data/registered.json': { items: [{ id: 'old', auto: true, v: 2, bad: true }, { id: 'n2', auto: true }] } });
