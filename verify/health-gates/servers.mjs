@@ -8,6 +8,13 @@
      ⑧ 게시판을 같이 쓰는 분교(한양 ERICA·건국 글로컬·홍익 세종) 학생은 제 학교 새 글로 안 깨워졌다.
      ⑨ 로그인 서버(Supabase)를 보는 로봇이 없었다.
      ⑩ 공용 파일 하나가 안 실리면 서비스워커가 `NOTIFY_RULES` 에서 던져 푸시를 받고도 알림 0건이었다.
+   리뷰(2026-10-05)에서 더한 것:
+     ③④ 매일 확인이 lastRun 하나만 봐서 08:10 발송 회차의 '한 대도 안 받음'이 20:10 '없음' 회차에 가려졌다 → lastSentRun.
+     ⑥(c) 위 ⑥ 수리로 plan 걸음(새로 뜬 실행 환경의 첫 부르기)이 Node 실측 약 9ms 로 10ms 한도에 닿았다 → 글자 일은 notices 걸음으로 ·
+          싼 열쇠(titleSeenKeyFast)가 사본·폰과 같은 답인지 \s 의 모든 글자로 잰다 · 계산 시간 자체는 흔들려 관문으로 두지 않고 꼴만 잠근다.
+     ⑥(d) 장부를 줄 단위로(state:seenLines) — 옛 열쇠(state:seen)는 고치지 않는다(옛 코드로 되돌려도 넘어지지 않게).
+     ⑥(e) 수집일 규칙의 '이틀'이 폰과 대조되지 않았다(하루·이틀 반으로 바꿔도 초록) → 경계 표본을 양쪽에 돌린다.
+     ⑥(f)(g) 배포 직후 첫 회차(옛 장부) · 회차 한가운데 배포(옛 꼴 요약).
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부는 읽지 않는다. 코드 파일(server/·sw.js·엔진)은 코드라 읽는다.
    🔴 Date.now·fetch 는 바꿔 끼운 뒤 finally 로 되돌린다. */
 import fs from 'node:fs';
@@ -154,6 +161,7 @@ export default async function gate(eq, ctx) {
       const pub = Buffer.from(await crypto.subtle.exportKey('raw', pair.publicKey)).toString('base64url');
       const env4 = { SUBS: fakeKV(), VAPID_JWK: JSON.stringify(jwk), VAPID_PUBLIC: pub };
       await env4.SUBS.put('state:seen', JSON.stringify(['n:https://seed/0']));   // 첫 실행이 아니게(첫 실행은 새 글로 안 깨운다)
+      await env4.SUBS.put('state:planAt', String(KST('2026-10-03T20:10:00')));   // 지난 판정 시각도 있게(없으면 옛 장부 회차라 새 글로 안 깨운다)
       const ep = 'https://fcm.googleapis.com/fcm/send/sample';
       await env4.SUBS.put(W.subKey(ep), JSON.stringify({ endpoint: ep, school: 'A대학교', campus: '' }));
       let feed = [{ url: 'https://n/1', school: 'A대학교', title: '새 장학 안내' }];
@@ -180,6 +188,18 @@ export default async function gate(eq, ctx) {
       const v2 = pushVerdict({ curlOk: true, code: 200, json: s2, now: KST('2026-10-05T06:17:00') });
       eq('④ 그 /health 로 다음 날 06:17 매일 확인 — 없어진 구독만 있던 회차는 경보가 아니다(ok · 등록 0대 경고만)',
         [v2.verdict, v2.warnings.length], ['ok', 1]);
+      /* 발송 회차 뒤에 '알릴 거리 없음' 회차가 와도 발송 결과가 남는다 (2026-10-05 리뷰 — 06:17 확인이 보던 lastRun 은 대개 전날 20:10
+         회차라, 그 회차가 '없음'이면 08:10 회차의 '보냈는데 한 대도 안 받음'이 덮여 그날 놓쳤다) */
+      await env4.SUBS.put(W.subKey(ep), JSON.stringify({ endpoint: ep, school: 'A대학교', campus: '' }));
+      feed = [...feed, { url: 'https://n/3', school: 'A대학교', title: '세 번째 장학' }];
+      pushStatus = 400;                                                          // 받아 주지도 · 없어진 구독이라 하지도 않음
+      await runSlot(env4, KST('2026-10-05T08:10:30'));
+      await runSlot(env4, KST('2026-10-05T20:10:30'));                          // 새 글 없음 → '알릴 거리 없음'
+      const s3 = await health(env4);
+      eq('③ 발송 회차(받아 준 수 0) 다음 회차가 \'알릴 거리 없음\'이어도 /health.lastSentRun 에 발송 회차가 남는다(lastRun 은 없음 회차)',
+        [s3.lastRun && s3.lastRun.outcome, pick(s3.lastSentRun)], ['nothing', { outcome: 'sent', sent: 1, woke: 0, dropped: 0, slot: '2026-10-05#08:10' }]);
+      eq('④ 그 /health 로 다음 날 06:17 매일 확인 — 깨우기를 보낸 마지막 회차로 보아 error(가려지지 않는다)',
+        pushVerdict({ curlOk: true, code: 200, json: s3, now: KST('2026-10-06T06:17:00') }).verdict, 'error');
     }
 
     /* ④ 매일 확인의 판정 — 표본 */
@@ -195,6 +215,11 @@ export default async function gate(eq, ctx) {
     eq('  판정 — 없어진 구독만 있던 회차 {sent:1 · dropped:1 · woke:0} ok · 살아 있는 구독이 남았는데 0건 {sent:3 · dropped:1 · woke:0} error',
       [pv({ lastRun: { outcome: 'sent', sent: 1, dropped: 1, woke: 0 } }), pv({ lastRun: { outcome: 'sent', sent: 3, dropped: 1, woke: 0 } })],
       ['ok', 'error']);
+    eq('  판정 — 발송 회차(lastSentRun)를 본다: 그 뒤 \'없음\' 회차가 와도 받아 준 수 0 이면 error · 받아 줬으면 ok · 칸이 없는 옛 서버는 lastRun 으로',
+      [pv({ lastRun: { outcome: 'nothing', sent: 0, woke: 0 }, lastSentRun: { outcome: 'sent', sent: 3, woke: 0 } }),
+        pv({ lastRun: { outcome: 'nothing', sent: 0, woke: 0 }, lastSentRun: { outcome: 'sent', sent: 3, woke: 2 } }),
+        pv({ lastRun: { outcome: 'sent', sent: 3, woke: 0 }, lastSentRun: null })],
+      ['error', 'ok', 'error']);
     const w0 = pushVerdict({ curlOk: true, code: 200, json: { ...okJ, lastSlot: null, subs: 0 }, now: NOW });
     eq('  새 저장소(lastSlot null)·등록 0대는 경고만 하고 ok', [w0.verdict, w0.warnings.length], ['ok', 2]);
     eq('  깨우기 실패 문구는 원인을 단정하지 않고 woke 가 도착 수가 아님을 적는다',
@@ -229,30 +254,103 @@ export default async function gate(eq, ctx) {
       const rNew = await wake(env, [{ url: 'https://b/3', school: '고려대학교', title: '오늘 새 글', foundAt: '2026-10-04' }]);
       eq('  (b) 새 주소·새 제목이라도 지난 판정보다 이틀 넘게 앞서 수집된 글 → 깨우지 않는다 · 오늘 수집된 글 → 깨운다', [rOld.schools, rNew.schools], [[], ['고려대학교']]);
     }
+    const NR = require('../../notify-rules.js');
     {
-      const NR = require('../../notify-rules.js');
-      const titles = ['2026 장학 안내', '2026\t장학  안내', '2026 장학 안내 ', ' [공지] 장학　안내'];
+      /* \s 가 맞추는 모든 글자(ES 명세의 WhiteSpace·LineTerminator) + 빈칸처럼 보이지만 \s 가 아닌 글자(폭 없는 빈칸 U+200B·U+180E)
+         — 서버는 notices 걸음에서 싼 길(titleSeenKeyFast · 보통 빈칸만 지움)로 열쇠를 만들므로, 그 길이 사본·폰과 같은 답인지 글자마다 잰다 */
+      const WS = ['\t', '\n', '\v', '\f', '\r', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+        ' ', ' ', ' ', ' ', ' ', ' ', ' ', '　', '﻿', '​', '᠎'];
+      const titles = ['2026 장학 안내', '2026\t장학  안내', '2026 장학 안내 ', ' [공지] 장학　안내', '2026장학안내', '',
+        ...WS.map((c) => `2026${c}장학 ${c}${c}안내${c}`)];
       const got = titles.map((title) => {
         const n = { url: `https://a/${encodeURIComponent(title)}`, school: '가천대학교', title };
         const out = NR.evaluate({ now: KST('2026-10-04T08:10:00'), profile: { school: '가천대학교' }, notices: [n], noticeForProfile: () => true });
         const phone = (out.ledger.seenNotice || []).filter((k) => k.startsWith('t:'));
-        return [phone, typeof W.titleSeenKey === 'function' ? [W.titleSeenKey(n)] : null];
+        const fn = (f) => (typeof f === 'function' ? [f(n)] : null);
+        return [JSON.stringify(title), phone, fn(W.titleSeenKey), fn(W.titleSeenKeyFast), [sum([n]).notices[0].tk]];
       });
-      eq('  (c) 학교+제목 열쇠가 폰(notify-rules 장부)과 글자까지 같다 — 빈칸·탭·NBSP·전각 빈칸 표본 (사본 대조)', got.filter(([a, b]) => JSON.stringify(a) !== JSON.stringify(b)), []);
-      eq('  (c) 대조가 실제로 열쇠를 읽었다(헛도는 검사가 아니다)', got.every(([a]) => a.length === 1), true);
+      eq('  (c) 학교+제목 열쇠가 폰(notify-rules 장부)과 글자까지 같다 — 사본(titleSeenKey)·싼 길(titleSeenKeyFast)·notices 걸음의 tk 모두 · \\s 의 모든 글자와 비슷한 글자 표본',
+        got.filter(([, a, ...rest]) => rest.some((b) => JSON.stringify(a) !== JSON.stringify(b))).map(([t]) => t), []);
+      eq(`  (c) 대조가 실제로 열쇠를 읽었다(헛도는 검사가 아니다 · 제목 ${titles.length}개)`, got.every(([, a]) => a.length === 1), true);
+      /* plan 걸음은 장부만 다룬다 — 제목이 실려 오면 그 걸음에서 글자 일을 하게 된다(2026-10-05 리뷰: 새로 뜬 실행 환경의 첫 부르기가
+         Node 실측 약 9ms 로 10ms 한도에 닿았다). 계산 시간 자체는 흔들려 관문으로 두지 않는다 — 꼴만 잠근다 */
+      const m = sum([{ url: 'https://a/1', school: '한양대학교', title: '학자금 대출 안내', campus: '', foundAt: '2026-10-01T09:00:00+09:00' }]).notices[0];
+      eq('  (c) notices 걸음이 넘기는 꼴에 제목이 없다(글자 일은 그 걸음에서 끝) — 열쇠·수집일(날짜)·대출 표시·분교까지 깨울 학교',
+        [Object.keys(m).sort(), m.found, m.loan, m.wake], [['found', 'loan', 'school', 'tk', 'url', 'wake'], Date.parse('2026-10-01'), 1, ['한양대학교', '한양대학교 ERICA캠퍼스']]);
     }
     {
       const env = { SUBS: fakeKV() };
       const cur = { url: 'https://a/cur', school: '가천대학교', title: '오래 실린 공고' };
       const old = Array.from({ length: 4000 }, (_, i) => `n:https://old/${i}`);
-      await env.SUBS.put('state:seen', JSON.stringify(['n:https://a/cur', 't:가천대학교|오래실린공고', ...old]));
+      const legacyLedger = JSON.stringify(['n:https://a/cur', 't:가천대학교|오래실린공고', ...old]);
+      await env.SUBS.put('state:seen', legacyLedger);                     // 옛 꼴(JSON 배열 · 옛 열쇠 이름)
+      await env.SUBS.put('state:planAt', String(KST('2026-10-03T20:10:00')));
       at(KST('2026-10-04T08:10:00'));
       await wake(env, [cur]);
-      const kept = JSON.parse(await env.SUBS.get('state:seen'));
+      const kept = typeof W.readSeen === 'function' ? await W.readSeen(env) : JSON.parse(await env.SUBS.get('state:seen'));
       at(KST('2026-10-04T20:10:00'));
       const again = await wake(env, [cur]);
       eq('  (d) 옛 열쇠 4000개 + 지금 실린 공고 → 장부를 자를 때 지금 공고의 열쇠가 남고(상한 4000) 다음 회차에 다시 깨우지 않는다',
-        [kept.includes('n:https://a/cur'), kept.length <= 4000, again.schools], [true, true, []]);
+        [kept.includes('n:https://a/cur'), kept.includes('t:가천대학교|오래실린공고'), kept.length, again.schools], [true, true, 4000, []]);
+      eq('  (d) 장부는 새 열쇠에 줄 단위로 쓰고 · 옛 열쇠(state:seen · JSON)는 건드리지 않는다(옛 코드로 되돌려도 넘어지지 않게)',
+        [await env.SUBS.get('state:seen') === legacyLedger, /^n:https:\/\/old\/\d+\n/.test((await env.SUBS.get('state:seenLines')) || '')], [true, true]);
+    }
+
+    /* ⑥(e) 수집일 규칙(지난 판정보다 이틀 넘게 앞선 글 = 본 것)이 폰(foundBeforeLastCheck)과 같은 답이다 — 경계 표본을 양쪽에 함께 돌린다
+       (2026-10-05 리뷰 — 이틀을 하루·이틀 반으로 바꿔도 초록이던 것) */
+    {
+      const L = (iso) => Date.parse(iso);
+      const cases = [
+        ['2026-10-02', L('2026-10-04T00:00:00Z')],              // 정확히 이틀 → 본 것
+        ['2026-10-02', L('2026-10-03T23:00:00Z')],              // 이틀에서 한 시간 모자람 → 새 글
+        ['2026-10-02', L('2026-10-04T01:00:00Z')],              // 이틀 하고 한 시간 → 본 것
+        ['2026-10-02', L('2026-10-03T12:00:00Z')],              // 하루 반 → 새 글 (하루로 줄이면 여기가 갈린다)
+        ['2026-10-02', L('2026-10-04T11:00:00Z')],              // 이틀 반에서 한 시간 모자람 → 본 것 (이틀 반으로 늘리면 여기가 갈린다)
+        ['2026-10-02T23:30:00+09:00', L('2026-10-04T00:00:00Z')], // 시각이 붙은 수집일 — 날짜 10글자만 읽는다
+        ['', L('2026-10-04T00:00:00Z')],                         // 수집일 없음 → 새 글
+        ['엉뚱', L('2026-10-04T00:00:00Z')],                     // 못 읽는 수집일 → 새 글
+      ];
+      const rows = [];
+      for (const [foundAt, last] of cases) {
+        const n = { url: `https://e/${rows.length}`, school: '가천대학교', title: `경계 표본 ${rows.length}`, foundAt };
+        const out = NR.evaluate({ now: last + 12 * 3600e3, profile: { school: '가천대학교' }, notices: [n], noticeForProfile: () => true,
+          ledger: { baseline: true, enabled: true, lastCheck: last, seenNotice: ['https://seed/0'] } });
+        const phoneNew = out.events.some((e) => e.type === 'feed');
+        const env = { SUBS: fakeKV() };
+        await env.SUBS.put('state:seen', JSON.stringify(['n:https://seed/0']));
+        await env.SUBS.put('state:planAt', String(last));
+        at(last + 12 * 3600e3);
+        const serverNew = (await wake(env, [n])).schools.length > 0;
+        rows.push([foundAt, new Date(last).toISOString(), phoneNew, serverNew]);
+      }
+      eq('  (e) 수집일 경계 표본 — 서버(깨울지)와 폰(새 공고 알림)이 같은 답', rows.filter(([, , p, sv]) => p !== sv), []);
+      eq('  (e) 경계 표본이 양쪽 답(본 것·새 글)을 모두 낸다(헛도는 검사가 아니다)', rows.map(([, , p]) => p), [false, true, false, true, false, false, true, true]);
+    }
+
+    /* ⑥(f) 이 판이 올라간 뒤 첫 회차(옛 장부 = 주소 열쇠만 · 지난 판정 시각 없음) — 주소만 바뀐 글로 깨우지 않는다 (2026-10-05 리뷰) */
+    {
+      const env = { SUBS: fakeKV() };
+      await env.SUBS.put('state:seen', JSON.stringify(['n:https://a/#n-1', 'old-reg']));   // 옛 코드가 남긴 꼴
+      at(KST('2026-10-04T08:10:00'));
+      const regToday = [{ id: 'nat', eligibility: {}, deadline: '2026-10-04' }, { id: 'old-reg', eligibility: { schoolOnly: 'B대학교' }, deadline: '2026-12-01' },
+        { id: 'new-reg', eligibility: { schoolOnly: 'C대학교' }, deadline: '2026-12-01' }];
+      const r1 = await wake(env, [{ url: 'https://a/view?id=1', school: '가천대학교', title: '2026 장학 안내' }], regToday);
+      at(KST('2026-10-04T20:10:00'));
+      const r2 = await wake(env, [{ url: 'https://a/view?id=1', school: '가천대학교', title: '2026 장학 안내' }, { url: 'https://a/view?id=2', school: '가천대학교', title: '진짜 새 글' }], regToday);
+      eq('  (f) 옛 장부 첫 회차 — 주소만 바뀐 글은 안 깨우고(새 글 사유를 세지 않음) · 마감·정식 등록 새 공고는 깨운다 → 다음 회차부터 새 글은 깨운다',
+        [r1.schools, r1.wakeAll, r2.schools, r2.wakeAll], [['C대학교'], true, ['가천대학교'], false]);
+    }
+    /* ⑥(g) 배포가 회차 한가운데 떨어진 경우 — 옛 코드가 notices 걸음에서 남긴 꼴({url, school, title})을 새 plan 이 받아도 같은 판정 */
+    {
+      const env = { SUBS: fakeKV() };
+      await env.SUBS.put('state:seen', JSON.stringify(['n:https://seed/0']));
+      await env.SUBS.put('state:planAt', String(KST('2026-10-03T20:10:00')));
+      at(KST('2026-10-04T08:10:00'));
+      const r = await W.schoolsToWake(env, { reg: [], notices: [
+        { url: 'https://g/1', school: '건국대학교', title: '새 장학 안내' }, { url: 'https://g/2', school: '가천대학교', title: '학자금 대출 안내' }] });
+      const led = typeof W.readSeen === 'function' ? await W.readSeen(env) : [];
+      eq('  (g) 옛 꼴(제목이 실린 요약)도 그 자리에서 새 꼴로 — 분교까지 깨우고 · 대출은 안 깨우고 · 학교+제목 열쇠를 장부에 적는다',
+        [[...r.schools].sort(), led.includes('t:건국대학교|새장학안내')], [['건국대학교', '건국대학교 글로컬캠퍼스'], true]);
     }
 
     /* ⑦ 마감 사유는 공고마다 하루 한 번 · 여러 학교만 받는 공고는 그 학교만 */
@@ -308,6 +406,7 @@ export default async function gate(eq, ctx) {
       for (const n of notices) {
         const env = { SUBS: fakeKV() };
         await env.SUBS.put('state:seen', JSON.stringify(['n:https://seed/0']));    // 첫 실행이 아니게
+        await env.SUBS.put('state:planAt', String(KST('2026-10-03T20:10:00')));   // 옛 장부 회차가 아니게
         at(KST('2026-10-04T08:10:00'));
         const got = (await wake(env, [n])).schools;
         const want = profiles.filter((p) => ME.noticeForProfile(n, { school: p }));
