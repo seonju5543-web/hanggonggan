@@ -2545,7 +2545,7 @@ const ROBOTS = [
     f: 'kosaf-fetch.yml',
     n: '한국장학재단 수확 로봇',
     d: '층2(재단 장학금) 목록·상세·선발공고문 사본을 받아 옵니다',
-    when: '월·목 05:53',
+    when: '화·금 05:53',
     inputs: [{ name: 'mode', kind: 'choice', label: '무엇을 할까요', def: 'full',
       options: ['full', 'attach', 'probe'],
       hint: { full: '수확 → 공고문 사본 → 저장 (예약과 같음)', attach: '공고문 사본만',

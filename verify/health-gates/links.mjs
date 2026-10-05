@@ -29,6 +29,50 @@ function repoSandbox(root, prefix) {
   return sb;
 }
 
+/* cron 줄의 주석 요일·시각이 cron 과 맞나 (links-15) — 문제 목록을 돌려준다(빈 배열 = 맞음).
+   주석을 '=' 로 나눠 조각마다 시간대를 정한다(조각에 UTC 가 있으면 UTC · 없으면 KST — 이 저장소 주석은 KST 가 기본).
+   요일은 'X요일' 또는 'X·Y' 꼴만 읽는다('수집'의 '수'·홑글자 '월'은 요일로 안 읽는다) · 시각은 'HH:MM KST|UTC' 꼴만. */
+const DOW = ['일', '월', '화', '수', '목', '금', '토'];
+export function cronCommentProblems(line) {
+  const m = String(line || '').match(/cron:\s*'([^']+)'\s*(?:#\s*(.*))?$/);
+  if (!m || !m[2]) return [];
+  const [mi, hr, , , dw] = m[1].trim().split(/\s+/);
+  const fixedTime = /^\d+$/.test(mi) && /^\d+$/.test(hr);
+  const days = (field) => {
+    if (!field || field === '*') return null;
+    const out = new Set();
+    for (const part of field.split(',')) {
+      const r = part.match(/^(\d)-(\d)$/);
+      if (r) for (let d = +r[1]; d <= +r[2]; d += 1) out.add(d % 7);
+      else if (/^\d$/.test(part)) out.add(+part % 7);
+      else return null;
+    }
+    return out;
+  };
+  const utcDays = days(dw);
+  const shift = fixedTime && +hr + 9 >= 24 ? 1 : 0;
+  const kstDays = utcDays && fixedTime ? new Set([...utcDays].map((d) => (d + shift) % 7)) : null;
+  const pad = (n) => String(n).padStart(2, '0');
+  const problems = [];
+  for (const seg of m[2].split('=')) {
+    const tz = /UTC/.test(seg) ? 'UTC' : 'KST';
+    const want = tz === 'UTC' ? utcDays : kstDays;
+    const said = new Set();
+    for (const x of seg.matchAll(/([일월화수목금토])요일/g)) said.add(DOW.indexOf(x[1]));
+    for (const x of seg.matchAll(/[일월화수목금토](?:·[일월화수목금토])+/g)) for (const ch of x[0].split('·')) said.add(DOW.indexOf(ch));
+    if (said.size && want && [...said].sort().join() !== [...want].sort().join()) {
+      problems.push(`${tz} 요일 '${[...said].map((d) => DOW[d]).join('·')}' ≠ cron '${[...want].sort().map((d) => DOW[d]).join('·')}'`);
+    }
+    if (fixedTime) {
+      const at = tz === 'UTC' ? `${pad(+hr)}:${pad(+mi)}` : `${pad((+hr + 9) % 24)}:${pad(+mi)}`;
+      for (const x of seg.matchAll(new RegExp(`(\\d{1,2}):(\\d{2})\\s*${tz}`, 'g'))) {
+        if (`${pad(+x[1])}:${x[2]}` !== at) problems.push(`${tz} 시각 ${x[1]}:${x[2]} ≠ cron ${at}`);
+      }
+    }
+  }
+  return problems;
+}
+
 export default async function links(eq, ctx) {
   const root = ctx.root;
 
@@ -227,5 +271,60 @@ export default async function links(eq, ctx) {
     const iPrune = save.indexOf('pruneHuntState('); const iWrite = save.indexOf('writeFileSync(statePath');
     eq('⑤ 배선 — 사냥꾼이 장부를 쓰기 바로 전에 정리한다 · 리포트에 걷어 낸 수',
       [iPrune > 0 && iWrite > iPrune, /장부 정리: \$\{prunedKeys\}건/.test(save)], [true, true]);
+  }
+
+  /* ── ⑥ 원문 링크 복구 로봇 — 바깥 시계 · 예약 주석의 요일 ── */
+  {
+    eq('⑥ 예약 주석 요일 대조 표본 — 월 20:13 UTC 는 KST 화요일 · \'=\' 로 나눈 조각마다 시간대 · \'수집\'의 \'수\'는 요일이 아니다',
+      [cronCommentProblems("    - cron: '13 20 * * 1'   # 매주 월요일 05:13 KST").length, cronCommentProblems("    - cron: '13 20 * * 1'   # 매주 화요일 05:13 KST").length,
+        cronCommentProblems("    - cron: '53 20 * * 1,4'   # 월·목 05:53 KST (홀수 분").length, cronCommentProblems("    - cron: '37 20 * * 1'   # 매주 월 20:37 UTC = 화 05:37 KST").length,
+        cronCommentProblems("    - cron: '23 21 * * 1'    # 매주 화요일 06:23 KST = UTC 월요일 21:23 (수집 예약과 겹치지 않는 홀수 분)").length,
+        cronCommentProblems("    - cron: '40 6 * * 1'   # 월요일 15:40 KST").length, cronCommentProblems("    - cron: '7 23 * * *'   # 매일 08:07 KST").length,
+        cronCommentProblems("    - cron: '7 23 * * *'   # 매일 07:07 KST").length, cronCommentProblems("    - cron: '29 */3 * * *'     # 3시간마다").length],
+      [1, 0, 1, 0, 0, 0, 0, 1, 0]);
+    const wfDir = fileURLToPath(new URL('.github/workflows/', root));
+    const bad = [];
+    for (const f of fs.readdirSync(wfDir).filter((x) => /\.ya?ml$/.test(x))) {
+      fs.readFileSync(path.join(wfDir, f), 'utf8').split('\n').forEach((l, i) => { if (/^\s*-\s*cron:/.test(l)) for (const p of cronCommentProblems(l)) bad.push(`${f}:${i + 1} ${p}`); });
+    }
+    eq('⑥ 워크플로 예약 줄 전부 — 주석의 요일·시각이 cron 과 맞다(UTC 월 20시대 = KST 화 새벽)', bad, []);
+    const adm = fs.readFileSync(new URL('_admin/admin.js', root), 'utf8');
+    eq('⑥ 관리자 화면 로봇 목록 — 한국장학재단 수확은 화·금(KST)', /f: 'kosaf-fetch\.yml'[\s\S]{0,600}?when: '화·금 05:53'/.test(adm), true);
+    const rs = stripComments(fs.readFileSync(new URL('collector/resolve-detail-urls.mjs', root), 'utf8'));
+    eq('⑥ 복구 로봇에 바깥 시계가 있다 — 예산 + 유예 뒤 저장(saveAll)하고 끝낸다 · 정상 종료를 붙들지 않는다(unref)',
+      [/setTimeout\(\(\) => \{[\s\S]{0,600}?saveAll\(/.test(rs), /watchdog\.unref\(\)/.test(rs), /RESOLVE_WATCHDOG_GRACE_MS/.test(rs)], [true, true, true]);
+    /* 진짜 복구 로봇을 임시 폴더에서 — 가짜 브라우저의 게시판 열기가 영영 안 끝나게(진짜 브라우저처럼 일거리를 붙든 채) 두고 예산을 짧게 준다 */
+    const FAKE_PW = [
+      "import fs from 'node:fs';",
+      "const log = (s) => fs.appendFileSync('pw-calls.log', s + '\\n');",
+      "const page = { goto: (u) => { log('goto ' + u); return new Promise(() => { setInterval(() => {}, 1000); }); }, close: async () => {}, waitForTimeout: async () => {},",
+      "  evaluate: async () => null, $$eval: async () => [], $$: async () => [], url: () => 'about:blank', content: async () => '' };",
+      'const ctx = { newPage: async () => page, close: async () => {}, clearCookies: async () => {}, waitForEvent: async () => null };',
+      'export const chromium = { launch: async () => ({ newContext: async () => ctx, close: async () => {} }) };',
+    ].join('\n');
+    const runResolver = (trigger) => {
+      const sb = repoSandbox(root, 'hdj-links-resolve-');
+      try {
+        sb.module('playwright', { 'package.json': JSON.stringify({ name: 'playwright', type: 'module', main: 'index.js' }), 'index.js': FAKE_PW });
+        const t = '2026학년도 2학기 표본재단 장학생 선발 안내';
+        sb.write('data/notices.json', { items: [{ title: t, url: `https://board.example.ac.kr/bbs/list.do?menu=7#n-${encodeURIComponent(t)}`, school: '표본대학교', foundAt: '2026-10-01' }] });
+        sb.write('data/registered.json', { items: [] });
+        if (trigger) sb.write('collector/run-resolve-urls.txt', trigger);
+        const r = sb.run('collector/resolve-detail-urls.mjs', [], { RESOLVE_BUDGET_MS: '300', RESOLVE_WATCHDOG_GRACE_MS: '300', RESOLVE_ONLY_BOARD: '' }, 15000);
+        return { status: r.status, signal: r.signal, out: r.out, report: sb.read('collector/resolve-report.md') || '', calls: sb.read('pw-calls.log') || '', resolved: sb.json('collector/resolved-urls.json') };
+      } finally { sb.done(); }
+    };
+    const hung = runResolver('');
+    eq('⑥ [복구 로봇 실행] 게시판 열기가 매달려도 예산 + 유예 뒤 스스로 저장하고 0 으로 끝난다(리포트에 ⏰ · 넘어짐 메모 없음)',
+      [hung.status, hung.signal, /⏰ \*\*예산\(\d+분\)을 넘겨 스스로 멈췄습니다/.test(hung.report), /넘어졌습니다/.test(hung.report), /^goto /m.test(hung.calls), hung.status === 0 ? '' : hung.out.slice(-300)],
+      [0, null, true, false, true, '']);
+
+    /* ── ⑦ 복구 로봇의 소급 재검사를 뺐다 (links-10 · 개발자 결정) ── */
+    const ro = runResolver('recheckOnly: true\n');
+    eq('⑦ [복구 로봇 실행] 재검사 기록(recheck)을 쓰지 않는다 · 옛 설정 recheckOnly 는 게시판을 열지 않고 그 사실만 적고 끝난다',
+      [!!hung.resolved && 'recheck' in hung.resolved, ro.status, ro.calls, /recheckOnly 는 이제 하는 일이 없습니다/.test(ro.report), /소급 재검사/.test(ro.report)],
+      [false, 0, '', true, false]);
+    eq('⑦ 재검사 고리가 되살아나지 않았다 — 이미 고친 주소를 다시 여는 루프·판정 기록이 없다(그 일은 원문 링크 확인 로봇 link-check 몫)',
+      [/verifyCandidate\(url, titles, 0, live/.test(rs), /recheckLog/.test(rs), /rechecked/.test(rs)], [false, false, false]);
   }
 }

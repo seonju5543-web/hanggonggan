@@ -14,8 +14,10 @@
    ⑤ 확인된 주소로 data/notices.json · data/registered.json을 고친다.
       끝내 못 찾은 공고는 표식을 그대로 두고 리포트에 남긴다 — 지어내지 않는다.
 
-   🔴 2026-10-03 — **소급 재검사는 기록만 한다**(주소를 표식으로 되돌리지 않는다). 판정은 공용 판정 한 곳
-      (link-landing.mjs judgeLanding)으로 본다. 경위는 아래 '소급 재검사' 머리말.
+   🔴 2026-10-05 — **소급 재검사를 뺐다**(점검 links-10 · 개발자 결정 '재검사만 끈다 — 고치는 일은 그대로').
+      2026-10-03 부터 기록만 했는데 그 기록(resolved-urls.json 의 recheck)을 읽는 코드가 하나도 없었고, 판정이 원문 링크 확인 로봇과
+      엇갈렸다(고려 subview.do?enc= — 확인 로봇은 'post'). 이미 고친 주소가 그 공고로 가는지는 원문 링크 확인 로봇(link-check.mjs)이
+      매일 학생처럼 열어 보고 앱 표시를 맡는다 — 두 로봇이 같은 일을 하지 않는다. 되살리지 말 것.
 
    실행: node collector/resolve-detail-urls.mjs [--dry]  (워크플로 resolve-detail-urls.yml) */
 import fs from 'node:fs';
@@ -34,9 +36,7 @@ const DRY = process.argv.includes('--dry');
 
 /* 집계 — 맨 위에 둔다. 아래 '넘어져도 저장' 장치가 언제 불려도 읽을 수 있어야 한다. */
 let fixed = 0; let failed = 0;
-let rechecked = 0;
 const resolvedMap = {}; // 표식 주소 → 진짜 원문 주소 (기록용)
-const recheckLog = {};  // 소급 재검사 판정 — 주소 → { v, why, at } (기록용 · 주소는 안 바꾼다 · 2026-10-03)
 
 /* ── 넘어져도 그때까지 고친 것은 반드시 저장한다 (2026-08-01, 링크 사냥꾼과 같은 장치) ──
    사냥꾼이 원문 주소 13건을 찾아 놓고 리포트 마지막 줄에서 넘어져 전부 버린 사고가 있었다.
@@ -61,6 +61,22 @@ const LIMIT_BOARDS = Number(process.env.RESOLVE_MAX_BOARDS || 20);
 const BUDGET_MS = Number(process.env.RESOLVE_BUDGET_MS || 25 * 60000);
 const startedAt = Date.now();
 const outOfTime = () => Date.now() - startedAt > BUDGET_MS;
+/* 🔴 바깥 시계 (2026-10-05 점검 links-15 · 링크 사냥꾼·원문 링크 확인 로봇과 같은 장치) — outOfTime() 은 게시판·후보 루프 머리에서만 묻는다.
+   시한 없는 자리(browser.close() · 클릭 뒤 기다림)에서 매달리면 워크플로 시한(40분)이 밖에서 끊어 넘어짐 훅도 못 돌고 그때까지 고친 것을 잃는다.
+   예산 + 유예가 지나면 어디서 멈춰 있든 저장하고 끝낸다. 설계된 멈춤이라 넘어짐 메모 없이 저장하고 0 으로 끝낸다. unref — 정상 종료를 붙들지 않는다. */
+const watchdog = setTimeout(() => {
+  if (crashed) return;
+  crashed = true;                                    // saveAll 을 두 번 부르지 않는다(넘어짐 훅과 같은 표식)
+  console.error(`\n⏰ 예산(${Math.round(BUDGET_MS / 60000)}분)을 넘겨 스스로 멈춥니다 — 여기까지 고친 것은 저장합니다.`);
+  try {
+    report.push('', `⏰ **예산(${Math.round(BUDGET_MS / 60000)}분)을 넘겨 스스로 멈췄습니다** — 여기까지 고친 것은 저장했고, 남은 것은 다음 실행이 이어서 고칩니다.`, '');
+    saveAll(null);
+  } catch (e) {
+    console.error('저장까지 실패했습니다:', e);
+  }
+  process.exit(0);
+}, BUDGET_MS + Number(process.env.RESOLVE_WATCHDOG_GRACE_MS || 90 * 1000));
+watchdog.unref();
 
 const noticesPath = new URL('../data/notices.json', HERE);
 const registeredPath = new URL('../data/registered.json', HERE);
@@ -69,11 +85,6 @@ const registered = JSON.parse(fs.readFileSync(registeredPath, 'utf8'));
 
 /* 같은 사이트의 다른 공고 제목 — 목록 판정 재료(규칙은 detail-url.mjs otherTitlesOnSite 한 곳 · 링크 사냥꾼과 같다) */
 const siteTitles = (url, exclude = []) => otherTitlesOnSite(url, [...(notices.items || []), ...(registered.items || [])], { exclude, clean: stripRowTail });
-/* 이번 실행에서 실제로 연 게시판 목록의 행 제목(사이트별) — 소급 재검사의 목록 판정 재료.
-   우리 데이터의 같은 사이트 제목만으로는 목록 화면에 겹치는 것이 적어(목록은 최근 글 10여 개뿐) 목록을 '그 공고'로 읽을 수 있다
-   (2026-10-03 로컬 게시판 시험: 아는 형제 제목 1개뿐이라 목록 화면이 post 로 기록됐다 — 목록 판정은 다른 제목 3개가 보여야 선다). */
-const liveRowsByOrigin = new Map();
-const originOf = (u) => { try { return new URL(u).origin; } catch { return ''; } };
 
 /* 고쳐야 할 항목 모으기 — 두 파일을 같은 방식으로 다룬다.
    🔴 관리자가 이미 원문 주소를 넣은 공고(data/link-fixes.json)는 뺀다 (2026-10-04) — 이 로봇이 표식을 바꾸면 관리자 열쇠(u:<표식>)가
@@ -105,7 +116,8 @@ function runFileSetting(key) {
   } catch { return ''; }
 }
 const ONLY = process.env.RESOLVE_ONLY_BOARD || runFileSetting('onlyBoard');
-// 이미 고친 주소 점검만 (게시판을 덜 두드린다) — 트리거 파일 `recheckOnly: true` 로도 지정 가능
+/* 옛 설정 `recheckOnly: true`(이미 고친 주소 점검만) — 재검사를 뺐으므로(위 머리말 2026-10-05) 이 판은 게시판을 열지 않고 리포트에 그 사실만 적는다.
+   트리거 파일(run-resolve-urls.txt)은 고쳐 push 하면 로봇이 도는 파일이라 그 줄은 그 파일을 고칠 일이 생길 때 같이 지운다. */
 const RECHECK_ONLY = process.argv.includes('--recheck-only') || runFileSetting('recheckOnly') === 'true';
 const boards = new Map();
 for (const t of targets) {
@@ -280,7 +292,8 @@ async function scanBoard(page, listUrl, maxPages) {
 
 
 let boardCount = 0;
-for (const [listUrl, group] of boards) {
+if (RECHECK_ONLY) report.push('- recheckOnly 는 이제 하는 일이 없습니다 — 이미 고친 주소 확인은 원문 링크 확인 로봇(link-check)이 매일 합니다. 게시판을 열지 않았습니다.', '');
+for (const [listUrl, group] of (RECHECK_ONLY ? [] : boards)) {
   boardCount += 1;
   if (boardCount > LIMIT_BOARDS) { report.push(`- (게시판 상한 ${LIMIT_BOARDS} 초과 — 나머지는 다음 실행)`); break; }
   report.push(`### ${listUrl}`);
@@ -301,7 +314,6 @@ for (const [listUrl, group] of boards) {
 
   /* 목록을 여러 페이지 훑어 '누를 수 있는 행'을 모은다 */
   const rows = await scanBoard(page, listUrl, Number(process.env.RESOLVE_MAX_PAGES || 6));
-  liveRowsByOrigin.set(originOf(listUrl), (liveRowsByOrigin.get(originOf(listUrl)) || []).concat(rows.map((r) => stripRowTail(r.t)).filter((x) => x.length >= 8)));
   const boardForms = await scrapeForms(page);   // 게시판이 스스로 쓰는 폼 — 원문 주소의 정답지
   const pagesSeen = Math.max(...rows.map((r) => r.pageNo), 1);
   report.push(`- 목록 ${pagesSeen}페이지에서 행 ${rows.length}개`);
@@ -318,7 +330,7 @@ for (const [listUrl, group] of boards) {
     .concat(siteTitles(listUrl, [want]));
 
   let boardCandidateTotal = 0;
-  for (const t of (RECHECK_ONLY ? [] : group)) {
+  for (const t of group) {
     if (outOfTime()) { report.push('  - (시간 상한 도달 — 나머지는 다음 실행에서 이어서 고칩니다)'); break; }
     /* 게시판 행을 찾는 제목 — 원제목이 있으면 그것, 없으면 표식 속 제목. 행 꼬리(작성 부서·날짜·조회수)는 뗀다 (2026-10-03) */
     const want = stripRowTail(t.ref.boardTitle || markerTitle(t.url));
@@ -415,51 +427,9 @@ for (const [listUrl, group] of boards) {
   report.push('');
 }
 
-/* ── 소급 재검사 (운영 원칙 7) — 🔴 **기록만 한다. 주소를 되돌리지 않는다** (2026-10-03) ────────────
-   이미 원문 주소로 바꿔 둔 항목도 다시 열어 본다. 예전엔 여기서 '목록이거나 다른 글'이면 게시판 목록 표식(#n-)으로
-   **되돌렸다**(사본 없이 덮어썼다). 같은 날 링크 사냥꾼의 순찰이 같은 방식으로 멀쩡한 원문 5건을 목록으로 바꿨다
-   (항공대 3·건국대·부경대 — 대조한 제목이 행 꼬리 달린 원제목·앱 이름이었고, 로그인 벽을 제목보다 먼저 봤다).
-   판정하는 쪽이 고치기까지 하면 오판 한 번이 곧 데이터 손상이다. 그래서:
-     · '앱의 모든 링크를 새 탭으로 열어 보는 일'은 원문 링크 확인 로봇(collector/link-check.mjs)이 매일 하고,
-       다른 날 두 번 같은 문제를 봐야 앱이 '확인 필요'로 표시한다(주소는 그대로).
-     · 이 재검사는 판정을 리포트와 resolved-urls.json 의 recheck 에만 적는다 — 사람이 보고 고친다.
-   판정은 공용 한 곳(judgeLanding)이고, 목록 판정 재료(다른 글 제목)를 반드시 넘긴다. */
-if (!outOfTime()) {
-  report.push('### 소급 재검사 (이미 고쳐 둔 주소가 정말 그 공고로 가는가 — 기록만, 주소는 그대로)');
-  const boardKeys = [...boards.keys()].map((l) => { try { const u = new URL(l); return u.origin + '/' + (u.pathname.split('/').filter(Boolean)[0] || ''); } catch { return null; } }).filter(Boolean);
-  const done = [];
-  for (const n of notices.items || []) {
-    if (!isMarkerUrl(n.url) && boardKeys.some((k) => (n.url || '').startsWith(k))) done.push({ ref: n, urlField: 'url', title: n.title });
-  }
-  for (const r of registered.items || []) {
-    if (!isMarkerUrl(r.sourceUrl) && boardKeys.some((k) => (r.sourceUrl || '').startsWith(k))) done.push({ ref: r, urlField: 'sourceUrl', title: r.boardTitle || r.name, id: r.id });
-  }
-  const verdicts = [];
-  for (const d of done) {
-    if (outOfTime()) { report.push('- (시간 상한 — 나머지 재검사는 다음 실행에서)'); break; }
-    rechecked += 1;
-    const titles = expectTitles(d.ref);
-    const url = d.ref[d.urlField];
-    const live = (liveRowsByOrigin.get(originOf(url)) || []).filter((x) => !titles.some((w) => sameTitle(w, x))).slice(0, 60);
-    const v = await verifyCandidate(url, titles, 0, live.concat(siteTitles(url, titles)));
-    verdicts.push({ d, v });
-    recheckLog[url] = { v: v.v, why: v.why, at: new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10) };
-    await new Promise((r) => setTimeout(r, 700));  // 학교 서버를 몰아치지 않는다
-  }
-  /* 판정을 **전부** 남긴다 — '학교가 우리를 막은 것'(unread)과 '앱에 넣어 둔 링크가 진짜 깨진 것'을 사람이 가를 수 있게 */
-  const byV = {};
-  for (const x of verdicts) byV[x.v.v] = (byV[x.v.v] || 0) + 1;
-  report.push(`- 판정 분포: ${Object.entries(byV).map(([k, n]) => `${k} ${n}건`).join(' · ') || '없음'} (unread = 판정 불가 · 문제로 세지 않음)`);
-  verdicts.filter((x) => !x.v.ok && x.v.v !== 'unread').slice(0, 12)
-    .forEach((x) => report.push(`    · ${x.v.v} · ${x.v.why} — ${String(x.d.title).slice(0, 34)} → ${String(x.d.ref[x.d.urlField]).slice(0, 76)}`));
-  verdicts.filter((x) => x.v.ok).slice(0, 5)
-    .forEach((x) => report.push(`    · ✅ 통과 — ${String(x.d.title).slice(0, 34)} → ${String(x.d.ref[x.d.urlField]).slice(0, 76)}`));
-  report.push(`- 재검사 ${rechecked}건 · **주소는 하나도 바꾸지 않았습니다**(원문 링크 확인 로봇이 앱 표시를 맡습니다)`);
-  report.push('');
-}
 /* 저장·리포트를 한 곳에 모아 둔다 — 정상 종료도, 넘어졌을 때도 같은 길로 저장한다. */
 function saveAll(crashNote) {
-  /* 데이터를 바꾸는 것은 **표식을 확인된 원문으로 바꾼 것(fixed)뿐**이다 — 재검사는 되돌리지 않는다(2026-10-03) */
+  /* 데이터를 바꾸는 것은 **표식을 확인된 원문으로 바꾼 것(fixed)뿐**이다 */
   if (!DRY && fixed) {
     fs.writeFileSync(noticesPath, JSON.stringify(notices, null, 1));
     fs.writeFileSync(registeredPath, JSON.stringify(registered, null, 1));
@@ -472,18 +442,18 @@ function saveAll(crashNote) {
       report.push('');
     }
   }
-  fs.writeFileSync(new URL('resolved-urls.json', HERE), JSON.stringify({ updatedAt: new Date().toISOString().slice(0, 10), map: resolvedMap, recheck: recheckLog }, null, 1));
+  fs.writeFileSync(new URL('resolved-urls.json', HERE), JSON.stringify({ updatedAt: new Date().toISOString().slice(0, 10), map: resolvedMap }, null, 1));
 
   report.push('---');
   if (crashNote) {
     report.push(`🚨 **로봇이 도중에 넘어졌습니다** — 여기까지 고친 것은 저장했습니다. 넘어진 자리: \`${crashNote}\``);
     report.push('');
   }
-  report.push(`복구 **${fixed}건** · 실패 ${failed}건 · 소급 재검사 ${rechecked}건(기록만 — 되돌림 없음)${DRY ? ' (모의 실행 — 저장 안 함)' : ''}`);
+  report.push(`복구 **${fixed}건** · 실패 ${failed}건${DRY ? ' (모의 실행 — 저장 안 함)' : ''}`);
   if (failed) report.push('실패분은 목록 주소를 그대로 두었습니다 — 앱은 이 경우 "게시판 목록이 열려요"라고 정직하게 알립니다.');
   fs.writeFileSync(new URL('resolve-report.md', HERE), report.join('\n'));
   console.log(report.join('\n'));
-  if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `fixed=${fixed}\nfailed=${failed}\nrechecked=${rechecked}\n`);
+  if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `fixed=${fixed}\nfailed=${failed}\n`);
 }
 
 await verifyCtx?.close().catch(() => {});

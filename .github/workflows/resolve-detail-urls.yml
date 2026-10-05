@@ -7,7 +7,7 @@ name: 원문 링크 복구 로봇
 # 실행 방법:
 #   · collector/run-resolve-urls.txt 를 고쳐 push (push-to-run — GitHub MCP 없는 세션도 가능)
 #   · Actions 화면에서 수동 실행 (기본 브랜치에 올라간 뒤부터 가능)
-#   · 매주 월요일 새벽 — 게시판 개편으로 주소가 바뀌어도 스스로 다시 맞춘다
+#   · 매주 화요일 새벽(KST) — 게시판 개편으로 주소가 바뀌어도 스스로 다시 맞춘다
 
 on:
   workflow_dispatch:
@@ -17,7 +17,7 @@ on:
         type: boolean
         default: false
       recheck_only:
-        description: '이미 고친 주소 점검만 (게시판을 덜 두드린다)'
+        description: '(쓰지 않음 — 이미 고친 주소 확인은 원문 링크 확인 로봇이 매일 한다 · 켜면 게시판을 열지 않고 끝난다)'
         type: boolean
         default: false
   push:
@@ -28,7 +28,7 @@ on:
     paths:
       - 'collector/run-resolve-urls.txt'
   schedule:
-    - cron: '13 20 * * 1'   # 매주 월요일 05:13 KST
+    - cron: '13 20 * * 1'   # 매주 화요일 05:13 KST = 월요일 20:13 UTC (주석 요일은 관문 「로봇·도구 점검 관문」 links ⑥ 이 cron 과 대조)
 
 permissions:
   contents: write
