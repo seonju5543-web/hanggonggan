@@ -5,13 +5,17 @@
      ② ops-10 하트비트 문턱(간격 × 3)이 3시간 로봇에서 9시간 — 예약 실측 최대 틈 9.7시간보다 짧아 헛경보 → 바닥값 12시간.
      ③ ops-11 하트비트가 작업 브랜치의 성공도 셌다 → 기본 브랜치(와 main)의 성공만.
      ④ ops-12 노션 '브랜치' 칸이 늘 main(세 곳 push 에서 대기줄에 남는 실행) · 노션 500 한 번에 빨간불 → 커밋을 가리키는 작업 브랜치 · 재시도.
+        (리뷰 R1·R5: 병합 커밋을 main 에 올린 push 는 첫 부모 쪽으로 따라간다 · 노션 PATCH 가 재시도 함수를 거치는지 배선도 잰다)
      ⑤ gaps-04 tools/robot-run.sh 의 손 목록(8개)이 낡아 registered.json 을 쓰는 로봇이 빠졌고, gh 실패를 '비어 있음 ✅'으로 말했다.
+        (리뷰 R3: 글자 대조만으로는 `gh … || true` 되돌림을 못 잡았다 → 가짜 gh 로 겉옷을 실제로 돌린다)
      ⑥ gaps-05 정찰이 push 마다 살아 있는 줄 전부(25개)를 다시 열어 같은 학교를 하루 네 번 두드렸다 → 이번 push 가 넣은 줄만.
-     ⑦ ops-14 Node 20 판 액션(checkout·setup-node v4 · github-script v7)과 node-version 20.
+        (리뷰 R4·R6: 줄 고르기를 pickDirectives 한 곳으로 · 열 줄이 그 결과뿐인지 · 받기 단계의 continue-on-error)
+     ⑦ ops-14(Node 20 판 액션)는 이 묶음에 없다 — 다른 묶음이 새 판 줄을 더해 반드시 부딪힌다(리뷰 R2). 모든 묶음을 합친 뒤 마지막 한 커밋이
+        판 줄을 바꾸고 그 관문을 이 파일 끝에 더한다.
    🔴 표본(고정 예시)과 임시 git 저장소만 잰다 — data/·collector/ 장부는 읽지 않는다.
-   🔴 코드 위생 대조(⑤ 겉옷 글자 · ⑥ 워크플로 글자 · ⑦ 액션 판)는 문서 관문과 같은 잣대(로컬·verify-ui DOC_GATES=1 에서만 실패 ·
+   🔴 코드 위생 대조(④ 노션 배선 · ⑤ 겉옷 글자 · ⑥ 정찰 배선·워크플로 글자)는 문서 관문과 같은 잣대(로컬·verify-ui DOC_GATES=1 에서만 실패 ·
       수집 로봇의 데이터 관문에서는 경고만) — 거기서 빨개지면 자동 등록분이 되돌려진다.
-   🔴 임시 저장소를 쓰는 관문(①④)은 자식 env 에서 GIT_DIR·GIT_WORK_TREE·GIT_INDEX_FILE 을 지운다(훅 안에서 돌 때 진짜 저장소를 건드리지 않게).
+   🔴 임시 저장소를 쓰는 관문(①④⑤)은 자식 env 에서 GIT_DIR·GIT_WORK_TREE·GIT_INDEX_FILE 을 지운다(훅 안에서 돌 때 진짜 저장소를 건드리지 않게).
    🔴 notion-status.mjs·probe-links.mjs 는 **불러오는 순간 실행된다** — 규칙 파일(notion-branch.mjs·probe-lines.mjs)만 불러 쓰고, 본체는 따로 돌린다. */
 import fs from 'node:fs';
 import os from 'node:os';
