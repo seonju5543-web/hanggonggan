@@ -18,6 +18,7 @@
         진짜 소식 로봇을 이 컴퓨터 안의 가짜 게시판(127.0.0.1)으로 돌려 ⑤ 의 열쇠 달기와 같이 잰다
      ⑧ 재단 게시판 찾기 로봇의 실패 이유 (api-10): '홈페이지 못 엶 (fetch failed)' 28곳이 무엇 때문인지 몰랐다 — fetch-board.mjs netReason 을 불러 쓴다
      ⑨ 활동 상한 (api-11): foundAt 순으로 잘라 오래 열린 API 글이 잘렸다 '새 글'로 돌아올 수 있었다 — open-api-map.mjs actKeepDate · capActivities
+     ⑩ 소식 썸네일 sharp 판 고정 (news-11) — collect-news.yml
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
 import os from 'node:os';
@@ -26,7 +27,7 @@ import http from 'node:http';
 import { spawnSync, spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
-import { stripComments, cleanEnv } from './gate.mjs';
+import { stripComments, stripYamlComments, cleanEnv } from './gate.mjs';
 import { sandbox } from './bodies.mjs';
 import { clearFuturePosted, newsFloor, isNewsRow, pruneSeen, SEEN_KEEP_DAYS } from '../../collector/news-kind.mjs';
 import { activityKind } from '../../collector/activity-kind.mjs';
@@ -363,5 +364,12 @@ export default async function qfeeds(eq, ctx) {
     eq('  수집 로봇의 60일 거름과 상한이 같은 날짜(actKeepDate)를 쓴다',
       [/acts\.items = acts\.items\.filter\(\(n\) => \(actKeepDate\(n\) \|\| '9999'\) >= cutoff\)/.test(collectSrc), /acts\.items = capActivities\(acts\.items, ACT_CAP\)/.test(collectSrc), /acts\.items\.slice\(0, ACT_CAP\)/.test(collectSrc)],
       [true, true, false]);
+  }
+
+  /* ── ⑩ 소식 썸네일 단계의 sharp 판 고정 ── */
+  {
+    const wf = stripYamlComments(fs.readFileSync(new URL('.github/workflows/collect-news.yml', root), 'utf8'));
+    eq('⑩ 소식 썸네일 단계가 sharp 를 판을 정해 받는다 (판 없이 받으면 새 판이 Node 20 을 빼는 날 썸네일이 조용히 멈춘다)',
+      [/npm i sharp@\d/.test(wf), /npm i sharp(?![@\w-])/.test(wf)], [true, false]);
   }
 }
