@@ -7,7 +7,8 @@
         빨개졌다**. 규칙을 감사가 쓰는 한 곳(verify/source-rules.cjs · entry-rules checkEntry)으로 옮기고 저장소가 저장 전에 같은 함수로 거절한다.
         감사의 일은 auditSourceFiles 하나 — 표본으로 돌리고, 감사가 그 결과를 경고로 낮추지 않았는지도 본다(리뷰: errors→warns 로 바꿔도 조용했다).
      ③ 실데이터 단정 톱니 — test-collector 가 실데이터를 읽어 단정하면 로봇이 데이터를 바꾸는 순간 관문이 빨개진다(10-01·10-04 사고).
-        읽는 곳 수를 파일별로 세어 늘면 빨간불 · 저장 전 관문이 없던 등록금·학과 갱신 로봇에 관문 · 등록금 표본.
+        읽는 곳 수를 파일별로 세어 늘면 빨간불(ROOT 기준 path.join·readFileSync 꼴 포함) · 도구가 대신 읽는 호출(TOOL_READS_ALLOW)도 ·
+        저장 전 관문이 없던 등록금·학과 갱신 로봇에 관문 · 등록금 표본.
      ④ 데이터 관문 되돌리기 — 되돌린 뒤 관문을 다시 재지 않아(revert-auto) 원인이 기존 항목이면 관문 실패 상태로 저장되고,
         링크 사냥꾼은 결과를 버리고도 초록불이었다. collector/gate-guard.mjs 를 임시 git 저장소 + 가짜 관문으로 잰다 · 워크플로 배선 · 쉬기 장부.
         소식 로봇도 같은 도구를 쓴다 — 단락이 늘 '정식 등록'을 말해 소식 리포트에 사실과 반대인 문장이 들어갔다(리뷰) → 소식 단계 시나리오도 잰다.
@@ -36,13 +37,39 @@ export const stripComments = (s) => String(s).replace(/\/\*[\s\S]*?\*\//g, '').r
 export const stripYamlComments = (s) => String(s).replace(/^\s*#.*$/gm, '');
 
 /* test-collector 소스에서 **실데이터를 읽는 곳**을 파일별로 센다 — `new URL('../data/…')`·`require('../data/…')`·
-   `createRequire(…)('../data/…')` 와 로봇·관리자가 쓰는 설정·장부 json. 임시 폴더 표본(path.join(dir, 'data/…'))은 세지 않는다. */
+   `createRequire(…)('../data/…')`·`readFileSync('data/…')`·`path.join(ROOT|root|__dirname…, 'data/…')`(조각으로 나눠 적은
+   `path.join(ROOT, 'data', 'x.json')` 포함) 와 로봇·관리자가 쓰는 설정·장부 json.
+   임시 폴더 표본(`path.join(dir, 'data/…')` — 저장소 뿌리 이름이 아닌 것)은 세지 않는다.
+   (리뷰 2026-10-04: `fs.readFileSync(path.join(ROOT, 'data/registered.json'))` 꼴은 세지 않아 톱니를 조용히 비켜 갈 수 있었다) */
 const CFG_FILES = 'news-sources|activity-sources|external-sources|schools|own-programs|pending-forms|news-config|activity-config';
+const ROOT_NAMES = String.raw`(?:ROOT|root|REPO|repo|repoRoot|__dirname|HERE|process\.cwd\(\))`;
 export function realDataReads(src) {
-  const re = new RegExp(String.raw`(?:new URL|req(?:uire)?|\))\(\s*['\x60](?:\.\./)?(data/[^'\x60]*|collector/(?:${CFG_FILES})\.json)['\x60]`, 'g');
+  const target = String.raw`['\x60](?:\.{1,2}/)?(data/[^'\x60]*|collector/(?:${CFG_FILES})\.json)['\x60]`;
+  const res = [
+    new RegExp(String.raw`(?:new URL|req(?:uire)?|\)|readFileSync|readText)\(\s*${target}`, 'g'),
+    new RegExp(String.raw`path\.(?:join|resolve)\(\s*${ROOT_NAMES}\s*,\s*(?:['\x60]\.\.['\x60]\s*,\s*)?${target}`, 'g'),
+  ];
   const n = {};
-  for (const m of stripComments(src).matchAll(re)) n[m[1]] = (n[m[1]] || 0) + 1;
+  const add = (k) => { n[k] = (n[k] || 0) + 1; };
+  const code = stripComments(src);
+  for (const re of res) for (const m of code.matchAll(re)) add(m[1]);
+  /* 조각으로 나눠 적은 꼴 — path.join(ROOT, 'data', 'registered.json') */
+  const seg = new RegExp(String.raw`path\.(?:join|resolve)\(\s*${ROOT_NAMES}\s*,\s*(?:['\x60]\.\.['\x60]\s*,\s*)?['\x60](data|collector)['\x60]\s*,\s*['\x60]([^'\x60]+)['\x60]`, 'g');
+  for (const m of code.matchAll(seg)) {
+    const k = `${m[1]}/${m[2]}`;
+    if (m[1] === 'data' || new RegExp(String.raw`^collector/(?:${CFG_FILES})\.json$`).test(k)) add(k);
+  }
   return n;
+}
+/* 불러온 **도구가 대신** 실데이터를 읽는 곳 — 정규식으로는 안 보인다(예: deadline-audit 의 auditDeadlines() 가 registered.json 을 읽고,
+   그 결과로 '마감은 전부 YYYY-MM-DD' 실데이터 단정이 남아 있다). 호출 수를 세어 늘면 ✕ · 다음 점검에서 줄일 목록이다.
+   🔴 늘리지 말 것 — 표본 파일을 넘기는 꼴(what-shows 의 WHAT_SHOWS_REGISTERED 처럼)로 바꾸고 줄인다. */
+export const TOOL_READS_ALLOW = {
+  'auditDeadlines(': { reads: 'data/registered.json (verify/deadline-audit.mjs)', allow: 1 },
+};
+export function toolDataReads(src) {
+  const code = stripComments(src);
+  return Object.fromEntries(Object.keys(TOOL_READS_ALLOW).map((k) => [k, code.split(k).length - 1]));
 }
 /* 허용 개수(2026-10-04 1단계 정리 뒤 실측). 🔴 늘리지 말 것 — 실데이터의 항목 불변식은 verify/audit-data.js(entry-rules·source-rules)로,
    개수·'있어야 한다'는 표본 단정 + `ℹ` 숫자 보이기로. 줄었으면 이 표도 줄인다(다음 점검에서 남은 것을 줄인다). */
@@ -225,7 +252,18 @@ export default async function gate(eq, ctx) {
     eq('③ test-collector 의 실데이터 읽기가 늘지 않았다 (늘었으면 그 단정은 audit-data.js 로 · 개수·있음은 표본 + ℹ — CLAUDE.md)', over, []);
     const under = Object.entries(REAL_READ_ALLOW).filter(([f, n]) => (now[f] || 0) < n).map(([f, n]) => `${f} ${n}→${now[f] || 0}`);
     if (under.length) console.log(`  ℹ 실데이터 읽기가 줄었다 — 허용 표(REAL_READ_ALLOW)도 줄이세요: ${under.join(' · ')}`);
-    eq('  톱니가 헛돌지 않는다 — 표본 한 줄을 더하면 센다', realDataReads(`${tc}\nJSON.parse(readText(new URL('../data/registered.json', import.meta.url)));`)['data/registered.json'], (now['data/registered.json'] || 0) + 1);
+    const plus = (line) => (realDataReads(`${tc}\n${line}`)['data/registered.json'] || 0) - (now['data/registered.json'] || 0);
+    eq('  톱니가 헛돌지 않는다 — 읽는 꼴마다 표본 한 줄을 더하면 센다(new URL · ROOT 기준 path.join · 조각 path.join · 상대 경로 readFileSync) · 임시 폴더 표본은 안 센다',
+      [plus("JSON.parse(readText(new URL('../data/registered.json', import.meta.url)));"), plus("fs.readFileSync(path.join(ROOT, 'data/registered.json'), 'utf8');"),
+        plus("fs.readFileSync(path.join(__dirname, '..', 'data', 'registered.json'), 'utf8');"), plus("fs.readFileSync('data/registered.json', 'utf8');"),
+        plus("fs.writeFileSync(path.join(dir, 'data/registered.json'), '{}');")],
+      [1, 1, 1, 1, 0]);
+    const tools = toolDataReads(tc);
+    const toolOver = Object.entries(tools).filter(([k, n]) => n > TOOL_READS_ALLOW[k].allow).map(([k, n]) => `${k} ${TOOL_READS_ALLOW[k].allow}→${n} (${TOOL_READS_ALLOW[k].reads})`);
+    eq('③ 도구가 대신 실데이터를 읽는 호출도 늘지 않았다 (TOOL_READS_ALLOW — 다음 점검에서 줄일 목록)', toolOver, []);
+    const toolUnder = Object.entries(tools).filter(([k, n]) => n < TOOL_READS_ALLOW[k].allow).map(([k, n]) => `${k} ${TOOL_READS_ALLOW[k].allow}→${n}`);
+    if (toolUnder.length) console.log(`  ℹ 도구가 대신 읽는 호출이 줄었다 — 표(TOOL_READS_ALLOW)도 줄이세요: ${toolUnder.join(' · ')}`);
+    eq('  (도구 호출 톱니도 헛돌지 않는다 — 한 줄 더하면 센다)', toolDataReads(`${tc}\nDA.auditDeadlines(new Date());`)['auditDeadlines('], (tools['auditDeadlines('] || 0) + 1);
     /* 등록금·학과 갱신 로봇도 저장 전에 데이터 관문을 지난다 — 관문 단계에 continue-on-error 가 없고 git commit 보다 앞 */
     const gated = (wf) => {
       const y = stripYamlComments(fs.readFileSync(new URL(`.github/workflows/${wf}`, root), 'utf8'));
