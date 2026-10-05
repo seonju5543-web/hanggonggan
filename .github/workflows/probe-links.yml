@@ -34,6 +34,7 @@ jobs:
       - name: push 직전 판 받기 (새 줄 가리기용)
         if: env.PROBE_BEFORE != ''
         timeout-minutes: 2
+        continue-on-error: true   # 보강 단계 — 멈추거나 시한을 넘겨도 정찰은 돈다(옛 판이 없으면 전부 열고 리포트에 그렇게 적는다)
         run: git fetch --no-tags --depth=1 origin "$PROBE_BEFORE" || true
       - uses: actions/setup-node@v4
         with:

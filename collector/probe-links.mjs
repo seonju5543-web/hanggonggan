@@ -22,7 +22,7 @@ import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { chromium } from 'playwright';
 import { looksLikeLoginWall, isDetailUrl } from './detail-url.mjs';
-import { directives, addedDirectives } from './probe-lines.mjs';
+import { pickDirectives } from './probe-lines.mjs';
 
 const HERE = new URL('.', import.meta.url);
 let cfg = '';
@@ -30,21 +30,13 @@ try { cfg = fs.readFileSync(new URL('run-probe.txt', HERE), 'utf8'); } catch { /
 
 /* 🔴 push 로 깼으면 **이번 push 가 새로 넣은 줄만** 연다 (2026-10-05 로봇·도구 점검 · gaps-05 · collector/probe-lines.mjs 머리말).
    PROBE_BEFORE = push 직전 커밋(github.event.before). 셸을 거치지 않고, 40자리 16진수일 때만 git 에 넘긴다(notion-status 와 같은 검사).
-   옛 판을 못 읽으면 전부 열고 리포트 첫머리에 그렇다고 적는다(정직). 손으로 돌리면(PROBE_BEFORE 없음) 지금처럼 전부 연다. */
-const probeBefore = String(process.env.PROBE_BEFORE || '').trim();
-let only = null;          // null = 전부 · 아니면 { checkUrl: [...], findBoard: [...] }
-let scopeNote = '';
-if (probeBefore) {
-  if (/^[0-9a-f]{40}$/.test(probeBefore) && !/^0+$/.test(probeBefore)) {
-    try {
-      const old = execFileSync('git', ['show', `${probeBefore}:collector/run-probe.txt`], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
-      only = addedDirectives(old, cfg);
-      scopeNote = `_이번 push 가 새로 넣은 줄만 열었다 — checkUrl ${only.checkUrl.length} · findBoard ${only.findBoard.length} (그대로인 옛 줄은 다시 두드리지 않는다 · 전부 보려면 Actions 에서 수동 실행)_`;
-    } catch { /* 옛 판을 못 읽음 — 아래에서 전부 연다 */ }
-  }
-  if (!only) scopeNote = '⚠️ 이번엔 바뀐 줄을 못 가려 전부 열었다 (push 직전 판의 run-probe.txt 를 못 읽음)';
-}
-const lines = (key) => (only ? only[key] || [] : directives(cfg, key));
+   옛 판을 못 읽으면 전부 열고 리포트 첫머리에 그렇다고 적는다(정직). 손으로 돌리면(PROBE_BEFORE 없음) 지금처럼 전부 연다.
+   🔴 줄 고르기는 probe-lines.mjs pickDirectives 한 곳 — 여기서 다시 고르지 말 것(관문 ops ⑥ 이 표본과 배선을 같이 잰다). */
+const { lines, only, note: scopeNote } = pickDirectives({
+  before: process.env.PROBE_BEFORE,
+  cfg,
+  readOld: (sha) => execFileSync('git', ['show', `${sha}:collector/run-probe.txt`], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }),
+});
 
 const report = [`## 🔎 링크 정찰 리포트 (${new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 16).replace('T', ' ')} KST)`, ''];
 if (scopeNote) report.push(scopeNote, '');

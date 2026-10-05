@@ -26,3 +26,24 @@ export function addedDirectives(beforeText, afterText, keys = DIRECTIVE_KEYS) {
   }
   return out;
 }
+
+/** 이번 실행에 열 줄 고르기 — probe-links.mjs 가 이것 하나만 부른다 (2026-10-05 코드 리뷰 R4 · 관문이 표본으로 잰다)
+    before: env PROBE_BEFORE(push 직전 커밋 · 비면 손으로 돌린 것 → 전부) · cfg: 지금 run-probe.txt 글자
+    readOld(sha): push 직전 판의 run-probe.txt 글자를 돌려준다(못 읽으면 던진다) — 40자리 16진수(0 아님)일 때만 부른다(셸로 넘기지 않는다)
+    → { lines(key): 열 값들, only: null(전부) | { checkUrl, findBoard }, note: 리포트 첫머리 문구('' = 없음) }
+    옛 판을 못 읽으면 전부 열고 그렇다고 적는다(정직) — 조용히 0줄로 끝내지 않는다. */
+export function pickDirectives({ before, cfg, readOld }) {
+  const b = String(before || '').trim();
+  const all = { lines: (key) => directives(cfg, key), only: null, note: '' };
+  if (!b) return all;                                                      // 손으로 돌림 — 지금처럼 전부
+  let only = null;
+  if (/^[0-9a-f]{40}$/.test(b) && !/^0+$/.test(b)) {
+    try { only = addedDirectives(readOld(b), cfg); } catch { only = null; }
+  }
+  if (!only) return { ...all, note: '⚠️ 이번엔 바뀐 줄을 못 가려 전부 열었다 (push 직전 판의 run-probe.txt 를 못 읽음)' };
+  return {
+    lines: (key) => only[key] || [],
+    only,
+    note: `_이번 push 가 새로 넣은 줄만 열었다 — checkUrl ${only.checkUrl.length} · findBoard ${only.findBoard.length} (그대로인 옛 줄은 다시 두드리지 않는다 · 전부 보려면 Actions 에서 수동 실행)_`,
+  };
+}

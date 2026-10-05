@@ -296,11 +296,27 @@ export default async function gate(eq, ctx) {
       PL.addedDirectives(before, after), { checkUrl: ['https://d.kr/4', 'https://e.kr/5'], findBoard: ['https://f.kr | 공지'] });
     eq('  directives — 살아 있는 줄 전부(손으로 돌릴 때) · 옛 판이 비면 전부 새 줄',
       [PL.directives(after, 'checkUrl'), PL.addedDirectives('', 'checkUrl: https://x.kr').checkUrl], [['https://a.kr/1', 'https://d.kr/4', 'https://e.kr/5'], ['https://x.kr']]);
+    /* 줄 고르기 한 곳(pickDirectives) — 손 실행 · push(옛 판 읽음) · 옛 판 못 읽음 · 0 커밋(새 브랜치) · 16진수 아닌 값 (리뷰 R4) */
+    const OLD_SHA = 'a'.repeat(40);
+    const asked = [];
+    const readOld = (sha) => { asked.push(sha); if (sha !== OLD_SHA) throw new Error('없음'); return before; };
+    const pick = (b) => { const p = PL.pickDirectives({ before: b, cfg: after, readOld }); return [p.lines('checkUrl'), p.lines('findBoard'), p.only === null, /못 가려 전부/.test(p.note)]; };
+    const allC = PL.directives(after, 'checkUrl'), allF = PL.directives(after, 'findBoard');
+    eq('  pickDirectives — 손 실행은 전부(문구 없음) · push 는 새 줄만 · 옛 판을 못 읽거나 0 커밋·이상한 값이면 전부 열고 그렇다고 적는다 · 16진수 40자리만 git 에 넘긴다',
+      [pick(''), pick(OLD_SHA), pick('b'.repeat(40)), pick('0'.repeat(40)), pick('HEAD; rm -rf /'), asked],
+      [[allC, allF, true, false], [['https://d.kr/4', 'https://e.kr/5'], ['https://f.kr | 공지'], false, false], [allC, allF, true, true], [allC, allF, true, true], [allC, allF, true, true],
+        [OLD_SHA, 'b'.repeat(40)]]);
     const pl = stripComments(read(root, 'collector/probe-links.mjs'));
     const yml = read(root, '.github/workflows/probe-links.yml');
-    eqCode('  probe-links.mjs 가 probe-lines.mjs 를 불러 PROBE_BEFORE 의 옛 판과 견주고(셸 없이 git show) · 워크플로가 github.event.before 를 넘기고 그 커밋을 받아 둔다',
-      [/from '\.\/probe-lines\.mjs'/.test(pl), /process\.env\.PROBE_BEFORE/.test(pl), /execFileSync\('git', \['show'/.test(pl), /addedDirectives\(/.test(pl),
-        /PROBE_BEFORE:\s*\$\{\{[^}]*github\.event\.before[^}]*\}\}/.test(yml), /git fetch --no-tags --depth=1 origin "\$PROBE_BEFORE"/.test(yml)],
-      [true, true, true, true, true, true]);
+    const fetchStep = (yml.match(/- name: push 직전 판 받기[^\n]*\n((?:[ \t]{8,}[^\n]*\n)+)/) || [])[1] || '';
+    eqCode('  probe-links.mjs 의 열 줄(lines)은 pickDirectives 가 준 것뿐(PROBE_BEFORE · 셸 없는 git show 를 넘김 · 따로 고르는 directives( 없음) · 두 반복문이 그 lines 를 쓴다',
+      [/from '\.\/probe-lines\.mjs'/.test(pl), /const \{\s*lines\b[^}]*\}\s*=\s*pickDirectives\(\{[^]*?before:\s*process\.env\.PROBE_BEFORE[^]*?readOld:[^]*?execFileSync\('git', \['show'/.test(pl),
+        (pl.match(/\b(const|let|var|function)\s+lines\b|\blines\s*=/g) || []).length, /(?<![\w.])(directives|addedDirectives)\(/.test(pl),
+        /for \(const \w+ of lines\('checkUrl'\)\)/.test(pl), /for \(const \w+ of lines\('findBoard'\)\)/.test(pl)],
+      [true, true, 0, false, true, true]);
+    eqCode('  probe-links.yml — github.event.before 를 넘기고 그 커밋을 받아 둔다 · 그 받기 단계는 보강 단계(시한 + continue-on-error) · 실패해도 정찰은 돈다',
+      [/PROBE_BEFORE:\s*\$\{\{[^}]*github\.event\.before[^}]*\}\}/.test(yml), /git fetch --no-tags --depth=1 origin "\$PROBE_BEFORE"/.test(fetchStep),
+        /^\s*timeout-minutes:\s*\d+/m.test(fetchStep), /^\s*continue-on-error:\s*true\b/m.test(fetchStep)],
+      [true, true, true, true]);
   }
 }
