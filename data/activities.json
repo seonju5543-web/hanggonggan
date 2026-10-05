@@ -1,6 +1,96 @@
 {
- "updatedAt": "2026-10-05",
+ "updatedAt": "2026-10-06",
  "items": [
+  {
+   "title": "[강동구 청년해냄센터] 전문분야 창업멘토링 10월 참가자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179330",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/qSXLn"
+    },
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/qUXLn"
+    }
+   ],
+   "deadlineHint": "접수기간 2026-09-22 ~ 2026-10-06 14:00 주관기관명 강동구 청년해냄센터 대상 전체 창업업력 전체 연락처 02-488-688",
+   "deadline": "2026-10-06",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-22 ~ 2026-10-06 14:00"
+    },
+    {
+     "label": "모집인원",
+     "text": "6팀 (선착순 마감, 강동구민 우선선발)"
+    }
+   ],
+   "eligibilityLines": [
+    "신청대상 : 예비창업자, 기창업자",
+    "신청 시 요청하는 정보(개인정보포함)는 사업운영기관에서 관리되오니 이점 반드시 유의하여 주시기 바랍니다.",
+    "대상연령 : 전체"
+   ],
+   "eligibilityPriority": [
+    "모집인원: 6팀 (선착순 마감, 강동구민 우선선발)"
+   ],
+   "detailsV": 3,
+   "field": "멘토링",
+   "excerptsAt": "2026-10-05",
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-10-05"
+  },
+  {
+   "title": "[모집공고] 「시장·고객 발굴(Market to Tech) 프로그램」 참가자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179406",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/Ls1Ln"
+    },
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/As1Ln"
+    },
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/os1Ln"
+    },
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/ws1Ln"
+    }
+   ],
+   "deadlineHint": "접수기간 2026-09-18 ~ 2026-10-06 17:00 주관기관명 울산과학기술원 대상 대학생, 일반인, 일반기업, 1인 창조기업 창업업력",
+   "deadline": "2026-10-06",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-18 ~ 2026-10-06 17:00"
+    }
+   ],
+   "eligibilityLines": [
+    "신청대상 : ○ 모집대상",
+    "- (트랙 1) UNIST 연구자 : 기술 기반 창업 및 기술사업화에 관심 있는 학부·대학원생·연구자",
+    "- (트랙 2) 동남권 딥테크 예비창업자 : 울산·부산·경남 지역 기반 딥테크 분야 창업 희망자(예비창업자, 창업3년이내가능,동남권 활동예정자가능)",
+    "대상연령 : 전체",
+    "대상 : 대학생, 일반인, 일반기업, 1인 창조기업"
+   ],
+   "eligibilityExcludes": [
+    "동일 사업 아이템으로 창업3년 이상",
+    "신청 시 요청하는 정보(개인정보포함)는 사업운영기관에서 관리되오니 이점 반드시 유의하여 주시기 바랍니다."
+   ],
+   "detailsV": 3,
+   "excerptsAt": "2026-10-05",
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-10-05"
+  },
   {
    "title": "2026 옥천군 로컬 크리에이터 아카데미",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179354",
@@ -705,55 +795,6 @@
     "중·고등학생,학교 밖 청소년"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)"
-  },
-  {
-   "title": "[모집공고] 「시장·고객 발굴(Market to Tech) 프로그램」 참가자 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179406",
-   "kind": "대외활동",
-   "deadline": "2026-10-06",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-09-18 ~ 2026-10-06"
-    },
-    {
-     "label": "대상",
-     "text": "○ 모집대상 - (트랙 1) UNIST 연구자 : 기술 기반 창업 및 기술사업화에 관심 있는 학부·대학원생·연구자 - (트랙 2) 동남권 딥테크 예비창업자 : 울산·부산·경남 지역 기반 딥테크 분야 창업 희망자(예비창업자, 창업3년이내가능,동남권 활동예정자가능)"
-    },
-    {
-     "label": "활동지역",
-     "text": "전국"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "프로그램 운영사무국",
-   "api": "kstartup",
-   "apiId": "179406",
-   "id": "api-kstartup-179406",
-   "eligibilityLines": [
-    "모집대상",
-    "(트랙",
-    "1) UNIST 연구자 : 기술 기반 창업 및 기술사업화에 관심 있는 학부·대학원생·연구자",
-    "(트랙",
-    "2) 동남권 딥테크 예비창업자 : 울산·부산·경남 지역 기반 딥테크 분야 창업 희망자(예비창업자, 창업3년이내가능,동남권 활동예정자가능)"
-   ],
-   "eligibilityExcludes": [
-    "동일 사업 아이템으로 창업3년 이상"
-   ],
-   "noticeLines": [
-    "UNIST 연구자와 동남권 딥테크 예비창업자가 시장과 고객으로부터 출발하는 창업 검증 과정을 경험할",
-    "「시장·고객 발굴(Market to Tech) 프로그램」 참여자를 모집합니다.",
-    "본 프로그램은 시장 환경 분석, 고객 문제 정의, 수요 검증 등 시장·고객 중심의 창업 검증 과정을 체계적으로 지원하고,",
-    "전문가 강의와 실습, 과제 피드백, 현장 검증을 통해 창업 아이디어의 시장 적합성을 검토하며 사업화 가능성을 구체화합니다.",
-    "온라인 접수 : https://forms.gle/xg4ysH9eMTKZZpBS8"
-   ],
-   "detailsV": 3,
-   "foundAt": "2026-10-04",
-   "seenAt": "2026-10-05",
-   "excerptsAt": "2026-10-05"
   },
   {
    "title": "(오전 월/수)강남차병원 국제진료소 통번역 정기 봉사자 모집 (대학생 봉사자 모집)",
@@ -1990,46 +2031,6 @@
     "학생통합서비스센터 진로 ･ 심리상담실에서는 재학생을 대상으로 자기성찰과 치유를 위한"
    ],
    "eligibilityFrom": "브라우저 본문"
-  },
-  {
-   "title": "[강동구 청년해냄센터] 전문분야 창업멘토링 10월 참가자 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179330",
-   "kind": "대외활동",
-   "field": "멘토링",
-   "deadline": "2026-10-06",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-09-22 ~ 2026-10-06"
-    },
-    {
-     "label": "대상",
-     "text": "예비창업자, 기창업자"
-    },
-    {
-     "label": "활동지역",
-     "text": "전국"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "강동구 청년해냄센터",
-   "api": "kstartup",
-   "apiId": "179330",
-   "id": "api-kstartup-179330",
-   "eligibilityLines": [
-    "예비창업자, 기창업자"
-   ],
-   "noticeLines": [
-    "강동구 청년해냄센터에서 전문분야 창업 멘토링 데이 계획을 다음과 같이 공고하오니 참여 희망자는 안내에 따라 신청하시기 바랍니다.",
-    "온라인 접수 : http://www.gdhaenaem.com/?c=168&s=&gp=1&gbn=viewok&ix=11838"
-   ],
-   "detailsV": 3,
-   "foundAt": "2026-10-01",
-   "seenAt": "2026-10-05",
-   "excerptsAt": "2026-10-05"
   },
   {
    "title": "청년의 아이디어가 브랜드가 되는 과정 | RE:CREATE 성수 인사이트포럼 「성수, 브랜드의 전성시대」 참가자 모집",
@@ -4547,7 +4548,15 @@
    "campus": "",
    "host": "경기청년포털",
    "foundAt": "2026-09-30",
-   "detailsV": 3
+   "detailsV": 3,
+   "eligibilityLines": [
+    "ㅇ자격요건 본인이거주하거나주로활동하는지역",
+    "ㅇ신청가능 기간 기간내상시",
+    "경기도 생활권 19-39세 청년",
+    "2026년 6월 29일(월) ~11월 13일(금)",
+    "진행과정"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)"
   },
   {
    "title": "「나만의 커리어 지도 그리기」참여자 모집",
