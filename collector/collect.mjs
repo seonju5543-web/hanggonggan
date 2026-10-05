@@ -23,7 +23,7 @@ import { activityExcerpts, activityDetails, putActivityDetails, ACT_DETAILS_V, s
 import { htmlToLines } from './html-text.mjs';
 import { robotsAllows } from './robots.mjs';
 import { extractLinks, stripSessionId, hrefText } from './board-links.mjs';
-import { tidyExternal, dropReason as externalDropReason } from './external-clean.mjs';
+import { tidyExternal, dropReason as externalDropReason, fillDeadlineFromHint } from './external-clean.mjs';
 import { canonUrl } from './canon-url.mjs';
 import { fetchBoard, netReason } from './fetch-board.mjs';
 import { NEWS_BOARD_RULES } from './news-board-rules.mjs';
@@ -648,6 +648,8 @@ ext.items.forEach((n) => bodyReader.heal(n));   // 껍데기에서 시작한 기
 /* 제목 부스러기(번호·게시일·미리보기·주석)를 떼고, 옛 글·결과 발표·재단 메뉴를 거른다 (2026-10-01 개발자 지시).
    🔴 **매 실행 전체에** 건다 — 이 파일은 합집합 병합이라 병합이 되살린 글도 여기서 다시 걸러진다. 규칙은 external-clean.mjs 한 곳. */
 const extDropped = {};
+/* 마감 칸이 없는 옛 글은 원문 기간 줄에서 같은 판독기로 마감을 채운다 — 그래야 아래 '마감 지남' 거름이 그 글도 본다 (2026-10-05 점검 api-01 · external-clean.mjs) */
+ext.items.forEach((n) => fillDeadlineFromHint(n, (t) => activityExcerpts(t).deadline));
 ext.items = ext.items.map(tidyExternal).filter((n) => {
   const why = externalDropReason(n, notices.updatedAt);
   if (why) { const k = /\d{4}/.test(why) ? '옛 글' : why; extDropped[k] = (extDropped[k] || 0) + 1; }

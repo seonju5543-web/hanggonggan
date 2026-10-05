@@ -2,10 +2,15 @@
    잰다:
      ① 미래 게시일 (news-1): 아주대 「어학졸업인증 …(~2027.1.22)」이 게시일 2027-01-22 로 실려 홈 소식 띠 맨 앞에 붙어 있었다 —
         발행이 새 글·실린 글 구분 없이 오늘보다 뒤인 게시일을 비운다(news-kind.mjs clearFuturePosted · newsFloor 앞)
+     ② 재단 새 공고 — 마감 지난 글 (collect-09 · api-01 · app2-F6): 송파 상반기 06-24·음성 09-18 이 몇 달 떠 있었다 —
+        마감 다음 날까지만(CLOSED_KEEP_DAYS 와 같은 뜻) · 제목 머리 [마감] 표식 · 마감 칸 없는 옛 글은 원문 기간 줄에서 같은 판독기로 채운다 ·
+        소급 도구(tools/refilter-feeds.mjs)는 임시 폴더에서 진짜로 돌린다
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
 import { stripComments } from './gate.mjs';
+import { sandbox } from './bodies.mjs';
 import { clearFuturePosted, newsFloor } from '../../collector/news-kind.mjs';
+import { dropReason as extDropReason, fillDeadlineFromHint, tidyExternal } from '../../collector/external-clean.mjs';
 
 const src = (root, rel) => stripComments(fs.readFileSync(new URL(rel, root), 'utf8'));
 /* a 가 b 보다 앞에 있다(둘 다 있어야 참) */
@@ -14,6 +19,7 @@ const before = (s, a, b) => { const i = s.indexOf(a); const j = s.indexOf(b); re
 export default async function qfeeds(eq, ctx) {
   const root = ctx.root;
   const newsSrc = src(root, 'collector/collect-news.mjs');
+  const collectSrc = src(root, 'collector/collect.mjs');
 
   /* ── ① 미래 게시일 ── */
   {
@@ -38,5 +44,51 @@ export default async function qfeeds(eq, ctx) {
     eq('  비운 뒤엔 바닥 4건이 진짜 최근 글 넷이다 (미래 글은 수집일 08-20 로 맨 뒤)', kept, ['b', 'c', 'd', 'e']);
     eq('  소식 로봇이 발행 때 newsFloor 보다 먼저 KST 날짜로 부른다',
       before(newsSrc, 'clearFuturePosted(all, todayStr())', 'newsFloor(all'), true);
+  }
+
+  /* ── ② 재단 새 공고 — 마감 지난 글 ── */
+  {
+    const T = '2026-10-04';
+    const D = (o) => extDropReason(tidyExternal(o), T);
+    eq('② 마감이 이틀 넘게 지난 재단 글은 뺀다 · 이유 글자에 숫자가 없다(집계가 옛 글로 뭉치지 않게)',
+      D({ title: '2026년 군민평생 장학생 선발 공고', deadline: '2026-09-18' }), '마감 지남');
+    eq('  마감 다음 날까지는 남긴다 (CLOSED_KEEP_DAYS) · 남은 마감 · 마감 모름',
+      [D({ title: '2026년 하반기 송파구인재육성장학재단 장학생 선발 공고', deadline: '2026-10-03' }),
+        D({ title: '2026년 하반기 송파구인재육성장학재단 장학생 선발 공고', deadline: '2026-10-10' }),
+        D({ title: '2026년 하반기 송파구인재육성장학재단 장학생 선발 공고' })], [null, null, null]);
+    eq('  제목 머리 마감 표식은 뺀다 · [마감임박] 은 남긴다',
+      [!!D({ title: "[마감] '원거리 진학 대학생 주거 장학금' 대상자 모집" }), !!D({ title: '(모집마감) 2026 장학생 모집' }), D({ title: '[마감임박] 2026 장학생 모집 공고' })],
+      [true, true, null]);
+    const fake = (t) => (/9\.\s*18/.test(t) ? '2026-09-18' : null);
+    const a = { title: 'x', deadlineHint: '신청기간 : 2026. 8. 31.(월) ～ 9. 18.(금)' };
+    const b = { title: 'y', deadline: '2026-10-30', deadlineHint: '신청기간 : 2026. 8. 31.(월) ～ 9. 18.(금)' };
+    const c = { title: 'z', deadlineHint: '문의 : 장학팀' };
+    eq('  마감 칸 없는 옛 글은 원문 기간 줄에서 채운다 · 이미 있는 마감·못 읽는 줄은 그대로',
+      [fillDeadlineFromHint(a, fake), a.deadline, fillDeadlineFromHint(b, fake), b.deadline, fillDeadlineFromHint(c, fake), c.deadline || null],
+      [true, '2026-09-18', false, '2026-10-30', false, null]);
+    eq('  수집 로봇이 발행 때 거름(map(tidyExternal)) 앞에서 수집과 같은 판독기로 채운다',
+      before(collectSrc, 'fillDeadlineFromHint(n, (t) => activityExcerpts(t).deadline)', 'ext.items = ext.items.map(tidyExternal)'), true);
+
+    /* 소급 도구(tools/refilter-feeds.mjs)를 임시 폴더에서 진짜로 돌린다 — 날짜는 오늘과 상관없게(2020·2099) */
+    const sb = sandbox(root, 'hdj-qfeeds-refilter-');
+    try {
+      sb.write('tools/refilter-feeds.mjs', fs.readFileSync(new URL('tools/refilter-feeds.mjs', root)));
+      sb.write('collector/extracted/notices-text.json', []);   // 마감 판독기(extract-excerpts.mjs)가 불러올 때 읽는 두 파일 — 빈 표본
+      sb.write('data/registered.json', { items: [] });
+      const EXT = { updatedAt: '2026-10-01', items: [
+        { title: '군민평생 장학생 선발 공고', url: 'https://a.example.or.kr/1', host: '음성군장학회', deadline: '2020-09-18' },
+        { title: '영동군민장학생 선발 알림', url: 'https://a.example.or.kr/2', host: '영동군', deadlineHint: '신청기간 : 2020. 8. 31.(월) ～ 2020. 9. 18.(금)' },
+        { title: "[마감] '원거리 진학 대학생 주거 장학금' 대상자 모집", url: 'https://a.example.or.kr/3', host: '고속도로장학재단' },
+        { title: '하반기 장학생 선발 공고', url: 'https://a.example.or.kr/4', host: '송파구', deadline: '2099-12-31' },
+      ] };
+      sb.write('data/external.json', JSON.stringify(EXT, null, 1));
+      const dry = sb.run('tools/refilter-feeds.mjs');
+      const unchanged = sb.read('data/external.json') === JSON.stringify(EXT, null, 1);
+      const w = sb.run('tools/refilter-feeds.mjs', ['--write']);
+      const out = sb.json('data/external.json');
+      eq('  [소급 도구] 보기만 하면 안 쓴다 · --write 면 마감 지남(칸·기간 줄)·마감 표식을 빼고 열린 글만 · 로봇과 같은 저장 꼴',
+        [dry.status, unchanged, w.status, (out?.items || []).map((n) => n.url.slice(-1)), sb.read('data/external.json') === JSON.stringify(out, null, 1)],
+        [0, true, 0, ['4'], true]);
+    } finally { sb.done(); }
   }
 }

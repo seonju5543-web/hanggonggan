@@ -405,6 +405,18 @@ try {
   errors.push(...SR.auditSourceFiles(readCfg, { served, aggregator }));
 }
 
+/* 재단·지자체 글(data/external.json)이 지금 거름 규칙을 따르는가 (2026-10-05 — test-collector 의 실데이터 관문을 여기 경고로 옮겼다 · 점검 collect-09).
+   🔴 오류로 두지 말 것: 규칙(external-clean.mjs dropReason)을 더한 날·병합이 지난 글을 되살린 날 모든 로봇의 데이터 관문이 빨개진다.
+   수집 로봇이 발행 때마다 전체에 다시 걸므로 경고는 다음 실행에 스스로 사라진다. ES 모듈을 require 로 부른다(Node 20.19+ · 아래 원문 링크 절과 같은 길). */
+try {
+  const XC = require('../collector/external-clean.mjs');
+  const ext = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/external.json'), 'utf8'));
+  const left = (ext.items || []).map(XC.tidyExternal).map((n) => [n, XC.dropReason(n, ext.updatedAt || new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10))]).filter(([, why]) => why);
+  if (left.length) warns.push(`external — 지금 규칙이면 빠질 글 ${left.length}건이 실려 있습니다 (예: '${String(left[0][0].title).slice(0, 30)}' · ${left[0][1]}) — 다음 장학 수집 실행이 다시 거릅니다`);
+} catch (e) {
+  warns.push(`재단·지자체 글 거름을 다시 걸어 보지 못했습니다: ${e.message.slice(0, 80)}`);
+}
+
 /* ── 원문 링크 (2026-10-03 · 원문 대신 재단 홈페이지·게시판 목록이 열리던 사고) ──────────
    앱이 보여 주는 링크 **전부**(정식 등록·실시간 공고 학교별 파일·재단·지자체·대외활동·소식)를 한 규칙으로 훑는다 —
    그전엔 정식 등록의 `#n-` 만 봤고 나머지 피드는 아무도 안 봤다. 규칙은 verify/link-audit.cjs 한 곳.

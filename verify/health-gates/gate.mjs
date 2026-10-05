@@ -74,7 +74,7 @@ export function toolDataReads(src) {
 /* 허용 개수(2026-10-04 1단계 정리 뒤 실측). 🔴 늘리지 말 것 — 실데이터의 항목 불변식은 verify/audit-data.js(entry-rules·source-rules)로,
    개수·'있어야 한다'는 표본 단정 + `ℹ` 숫자 보이기로. 줄었으면 이 표도 줄인다(다음 점검에서 남은 것을 줄인다). */
 export const REAL_READ_ALLOW = {
-  'data/registered.json': 11, 'data/forms.json': 3, 'data/activities.json': 3, 'data/external.json': 2,
+  'data/registered.json': 11, 'data/forms.json': 3, 'data/activities.json': 3, 'data/external.json': 1,
   'data/news/index.json': 2, 'data/notices/': 1, 'data/notices.json': 1, 'data/majors/index.json': 1, 'data/${f}.json': 1,
   'collector/schools.json': 5, 'collector/activity-sources.json': 2, 'collector/news-sources.json': 1,
   'collector/external-sources.json': 1, 'collector/own-programs.json': 1,

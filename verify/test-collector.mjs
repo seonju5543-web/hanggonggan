@@ -1937,10 +1937,9 @@ console.log('\n■ 재단·지자체 글 다듬기 (collector/external-clean.mjs
   const cm = readText(new URL('../collector/collect.mjs', import.meta.url));
   eq('수집 로봇이 발행할 때 전체 글에 다듬기·거르기를 건다',
     /ext\.items = ext\.items\.map\(tidyExternal\)\.filter\(\(n\) => \{\s*const why = externalDropReason\(n, notices\.updatedAt\)/.test(cm), true);
-  /* 실데이터 — 지금 저장된 파일에 다시 걸어도 걸러질 것이 없어야 한다(발행 결과가 규칙을 따른다) */
-  const ext = JSON.parse(readText(new URL('../data/external.json', import.meta.url)));
-  const leftover = (ext.items || []).map(tidyExternal).filter((n) => extDropReason(n, ext.updatedAt || today));
-  eq(`  저장된 data/external.json 이 이미 걸러져 있다 (${(ext.items || []).length}건)`, leftover.map((n) => n.title), []);
+  /* 실데이터('저장된 data/external.json 이 이미 걸러져 있다')는 verify/audit-data.js **경고**로 옮겼다 (2026-10-05 점검 collect-09) —
+     거름 규칙(마감 지남)을 더하는 순간 지금 데이터 때문에 이 관문이 빨개져, 이 관문을 데이터 관문으로 쓰는 소식·장학 로봇이 제 결과를 버린다
+     (CLAUDE.md '실데이터에 기댄 고정 검사를 관문에 두지 말 것'). 규칙은 위 표본과 health-gates/qfeeds.mjs 가 잰다. */
 }
 
 console.log('\n■ 재단·지자체 게시판 (2026-09-26 · 노션 F-13 · 교외 확대)');
