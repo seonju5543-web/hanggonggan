@@ -35,6 +35,7 @@
  * 실행: update-progress.yml 의 `notion` 작업(push 때만).
  */
 import { execSync } from 'node:child_process';
+import { branchLabel, remoteBranchesFrom, patchWithRetry } from './notion-branch.mjs';
 
 const MAX_TEXT = 1900;   // 노션 rich_text 한 조각 상한은 2000자
 const LOG_LINES = 8;
@@ -250,10 +251,15 @@ function fitLines(text, max) {
   return kept.join('\n') || text.slice(0, max);
 }
 
+/* '브랜치' 칸 — 이 실행의 ref 가 아니라 **이 커밋을 올린 작업 브랜치** (2026-10-05 · ops-12 · tools/notion-branch.mjs 머리말).
+   세 곳 push 에서 대기줄에 마지막으로 남는 실행은 대개 main 이라 ref 를 그대로 적으면 칸이 늘 'main' 이었다.
+   checkout 의 fetch-depth: 0 이 원격 브랜치를 전부 받아 둔다. 못 읽으면 칸을 쓰지 않는다(짐작으로 덮지 않는다). */
+const pointsAtRaw = sh("git for-each-ref --points-at HEAD --format='%(refname)' refs/remotes/origin");
+const label = branchLabel({ ref, pointsAt: pointsAtRaw.ok ? remoteBranchesFrom(pointsAtRaw.out) : null });
 const props = {
-  '브랜치': { rich_text: [{ text: { content: ref.slice(0, 200) || '(모름)' } }] },
   '갱신': { rich_text: [{ text: { content: new Date(Date.now() + 9 * 3600 * 1000).toISOString().replace('T', ' ').slice(0, 16) + ' KST' } }] },
 };
+if (label) props['브랜치'] = { rich_text: [{ text: { content: label.slice(0, 200) } }] };
 if (log.ok && log.out) {
   props['최근 커밋'] = { rich_text: [{ text: { content: fitLines(log.out, MAX_TEXT) } }] };
 } else {
@@ -281,18 +287,26 @@ if (process.argv.includes('--dry')) {
   console.log(`[시험] ${who.name} (${actor}) → ${who.page}`);
   for (const [k, v] of Object.entries(props)) console.log(`  ${k}: ${v.rich_text[0].text.content.replace(/\n/g, '\n' + ' '.repeat(k.length + 4))}`);
   if (!props['지금 하는 일']) console.log('  지금 하는 일: (못 읽어서 그대로 둠)');
+  if (!props['브랜치']) console.log('  브랜치: (못 읽어서 그대로 둠)');
   process.exit(0);
 }
 
-const res = await fetch(`https://api.notion.com/v1/pages/${who.page}`, {
-  method: 'PATCH',
-  headers: {
-    Authorization: `Bearer ${token}`,
-    'Notion-Version': '2022-06-28',
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({ properties: props }),
-});
+/* 노션이 잠깐 넘어진 것(429·5xx·연결 실패)은 쉬었다 다시 보낸다(3초·8초 · ops-12) — 2026-10-01 500 한 번에 빨간불로 끝났다. */
+let res;
+try {
+  res = await patchWithRetry(fetch, `https://api.notion.com/v1/pages/${who.page}`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Notion-Version': '2022-06-28',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ properties: props }),
+  });
+} catch (e) {
+  console.error(`✕ ${who.name}: 노션에 닿지 못했습니다 (세 번 시도) — ${e.message}`);
+  process.exit(1);
+}
 
 if (!res.ok) {
   /* 🔴 조용히 넘어가지 않는다 — 열쇠 만료·공유 해제는 '갱신' 칸이 멈춘 것으로만 보여
@@ -302,4 +316,4 @@ if (!res.ok) {
   console.error('  노션 통합에 「한대장」 페이지가 공유돼 있는지, NOTION_TOKEN 이 살아 있는지 확인하세요.');
   process.exit(1);
 }
-console.log(`✓ ${who.name} — ${ref}`);
+console.log(`✓ ${who.name} — ${label || '(브랜치 칸 그대로 둠)'} (ref: ${ref})`);
