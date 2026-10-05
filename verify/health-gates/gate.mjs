@@ -426,6 +426,11 @@ export default async function gate(eq, ctx) {
       eq('④ ㉤ 쉬기 장부 — 한 번은 안 쉼 · 두 번이면 그날~2일 뒤 쉼 · 3일·4일 뒤 다시 봄 · 등록되면 지움',
         [once, H.isHeld(L, 'x', '2026-10-02'), H.isHeld(L, 'x', '2026-10-04'), H.isHeld(L, 'x', '2026-10-05'), H.isHeld(L, 'x', '2026-10-06'), H.pruneRegistered(L, new Set(['x'])).ledger.items.length],
         [false, true, true, false, false, 0]);
+      /* 끝내 등록되지 않는 공고(마감 지남·사람이 막음)가 영영 남지 않게 — 마지막으로 걸린 지 30일 넘은 줄은 지운다(리뷰 2026-10-04) */
+      const old = { items: [{ id: 'a', reverts: 2, lastAt: '2026-09-01' }, { id: 'b', reverts: 2, lastAt: '2026-09-02' }, { id: 'c', reverts: 1, lastAt: '2026-10-01' }] };
+      const pr = H.pruneRegistered(old, new Set(['c']), '2026-10-02');
+      eq('  쉬기 장부 — 정식 등록된 줄과 30일 넘게 지난 줄을 지운다(30일째는 남김) · 날짜를 안 주면 지난 줄은 그대로',
+        [pr.ledger.items.map((x) => x.id), pr.removed, pr.stale, H.pruneRegistered(old, new Set()).ledger.items.length], [['b'], 2, 1, 3]);
     }
     /* 워크플로 배선 (주석 걷고) */
     const wfText = (f) => stripYamlComments(fs.readFileSync(new URL(`.github/workflows/${f}`, root), 'utf8'));
@@ -466,15 +471,19 @@ export default async function gate(eq, ctx) {
         if (ledger) w('collector/auto-held.json', ledger(dir));
         const r = spawnSync(process.execPath, [path.join(dir, 'collector/auto-register.mjs')], { cwd: dir, encoding: 'utf8', env: cleanEnv() });
         const res = { status: r.status, ids: JSON.parse(fs.readFileSync(path.join(dir, 'data/registered.json'), 'utf8')).items.map((i) => i.id),
-          report: fs.readFileSync(path.join(dir, 'collector/report.md'), 'utf8') };
+          report: fs.readFileSync(path.join(dir, 'collector/report.md'), 'utf8'),
+          ledger: fs.existsSync(path.join(dir, 'collector/auto-held.json')) ? JSON.parse(fs.readFileSync(path.join(dir, 'collector/auto-held.json'), 'utf8')) : null };
         fs.rmSync(dir, { recursive: true, force: true });
         return res;
       };
       const free = runAreg(null);
       const today = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
-      const held = runAreg(() => ({ items: free.ids.map((id) => ({ id, reverts: 2, lastAt: today })) }));
-      eq('④ 자동 등록 — 장부 없으면 등록(대조군) · 두 번 걸린 공고는 등록하지 않고 컨펌 대기에 이유를 남긴다',
-        [free.status, free.ids.length, held.status, held.ids, /데이터 관문에 2번 걸려 되돌린 공고 — 3일 쉬었다 다시 봅니다/.test(held.report)], [0, 1, 0, [], true]);
+      const held = runAreg(() => ({ items: [...free.ids.map((id) => ({ id, reverts: 2, lastAt: today })), { id: 'auto-gone', reverts: 2, lastAt: '2020-01-01' }] }));
+      const group = held.report.slice(held.report.indexOf('**데이터 관문 쉬기'));
+      eq('④ 자동 등록 — 장부 없으면 등록(대조군) · 두 번 걸린 공고는 등록하지 않고 \'데이터 관문 쉬기\' 묶음에 이유를 남긴다(신호가 약하다는 묶음이 아니다) · 30일 넘은 장부 줄은 지운다',
+        [free.status, free.ids.length, held.status, held.ids, /\*\*데이터 관문 쉬기 1건\*\*/.test(held.report), /데이터 관문에 2번 걸려 되돌린 공고 — 3일 쉬었다 다시 봅니다/.test(group),
+          /함께 들어온 다른 공고 때문에 같이 되돌려졌을 수도/.test(group), /자동 기준 미달/.test(held.report), (held.ledger.items || []).map((x) => x.id)],
+        [0, 1, 0, [], true, true, true, false, free.ids]);
     }
     eq('  옛 이름(revert-auto)은 gate-guard 의 auto 단계만 부르는 얇은 입구다 (로직 사본 없음)',
       /import \{ main \} from '\.\/gate-guard\.mjs'/.test(fs.readFileSync(new URL('collector/revert-auto.mjs', root), 'utf8')) && !/knownIds|execSync/.test(stripComments(fs.readFileSync(new URL('collector/revert-auto.mjs', root), 'utf8'))), true);

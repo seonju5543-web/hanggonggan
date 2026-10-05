@@ -247,6 +247,8 @@ if (!cfg.enabled) {
   const batchSeen = new Set();
   const added = [];
   const held = [];
+  /* 데이터 관문 쉬기(auto-held.json)로 이번에 건너뛴 공고 — '선발·모집 신호가 약해요'와 이유가 달라 리포트에 따로 묶는다 */
+  const gateHeld = [];
   const promoted = [];   // 다른 학교의 같은 사업으로 전국 승격된 기존 등록분 (2026-09-30)
   /* 거른 이유를 센다 — **조용한 탈락이 이 사고의 정체였다** (2026-09-19). 리포트가 hold 만 적고
      skip 은 한 줄도 안 적어서, 경희대 교내 장학 넷과 '가짜 동일 사업' 여덟이 몇 주 동안
@@ -270,12 +272,13 @@ if (!cfg.enabled) {
      2026-08-30 개발자 지시로 경희대·한국외대 둘로 좁혔고(수집은 그대로, 등록만 — 자격 진단·양식을 붙이는 사람 손이 드는 층),
      2026-09-29 개발자 지시("정식 등록도 44곳으로 넓혀")로 다시 비웠다. 경위·부작용은 설정 파일의 `_schools`. */
   const onlySchools = new Set(cfg.schools || []);
-  /* 관문에 걸려 되돌린 공고 장부 — 정식 등록에 들어간 id 는 지운다(관문을 지났다). 장부는 gate-guard 가 처음 만든다(없으면 빈 장부) */
+  /* 관문에 걸려 되돌린 공고 장부 — 정식 등록에 들어간 id 는 지운다(관문을 지났다) · 마지막으로 걸린 지 30일 넘은 줄도 지운다(끝내 등록되지
+     않는 공고가 영영 남지 않게). 장부는 gate-guard 가 처음 만든다(없으면 빈 장부) */
   const heldPath = new URL('auto-held.json', HERE);
   let heldLedger = null;
   try { heldLedger = JSON.parse(fs.readFileSync(heldPath, 'utf8')); } catch { /* 아직 없음 */ }
   if (heldLedger) {
-    const pr = pruneRegistered(heldLedger, new Set(registered.items.map((i) => i.id)));
+    const pr = pruneRegistered(heldLedger, new Set(registered.items.map((i) => i.id)), TODAY);
     heldLedger = pr.ledger;
     if (pr.removed) fs.writeFileSync(heldPath, `${JSON.stringify(heldLedger, null, 1)}\n`);
   }
@@ -324,7 +327,7 @@ if (!cfg.enabled) {
        되풀이하지 않게(10-03~04 실측 8건). 상한(maxPerRun)을 먹지 않고, 조용히 빠지지 않게 컨펌 대기에 이유를 남긴다. */
     if (heldLedger && isHeld(heldLedger, id, TODAY)) {
       const times = (heldLedger.items.find((x) => x.id === id) || {}).reverts || 2;
-      held.push({ n, why: `데이터 관문에 ${times}번 걸려 되돌린 공고 — 3일 쉬었다 다시 봅니다` });
+      gateHeld.push({ n, why: `데이터 관문에 ${times}번 걸려 되돌린 공고 — 3일 쉬었다 다시 봅니다` });
       continue;
     }
     const title = cleanTitle(n.title).slice(0, 70);
@@ -473,8 +476,16 @@ if (!cfg.enabled) {
     for (const { keep, n } of promoted) report.push(`- \`${keep.id}\` ${(keep.name || '').slice(0, 40)} ← ${n.school} 게시판 [${cleanTitle(n.title).slice(0, 40)}](${n.url})`);
   }
   if (held.length) {
-    report.push('', `**컨펌 대기 (자동 기준 미달 ${held.length}건)** — 장학 신호는 있지만 선발·모집 신호가 약해요:`);
+    report.push('', `**컨펌 대기 (자동 기준 미달 ${held.length}건)** — 장학 신호는 있지만 선발·모집 신호가 약하거나 등록 규칙에 걸렸어요(괄호에 이유):`);
     for (const h of held.slice(0, 10)) report.push(`- ${h.n.title.slice(0, 60)} (${h.why})`);
+    if (held.length > 10) report.push(`- … 외 ${held.length - 10}건`);
+  }
+  /* 🔴 데이터 관문 쉬기는 따로 묶는다 — 이유가 '신호가 약해서'가 아니다. 같은 실행에 함께 들어온 다른 공고 때문에 같이 되돌려졌을 수도 있어
+     (되돌리기는 그 실행의 새 자동 등록분을 한꺼번에 뺀다) 원인을 이 공고로 단정하지 않는다. */
+  if (gateHeld.length) {
+    report.push('', `**데이터 관문 쉬기 ${gateHeld.length}건** — 데이터 관문에 두 번 걸려 되돌린 공고라 마지막으로 걸린 날부터 3일 자동 등록을 쉬어요. 같은 실행에 함께 들어온 다른 공고 때문에 같이 되돌려졌을 수도 있어요(장부 \`collector/auto-held.json\`):`);
+    for (const h of gateHeld.slice(0, 10)) report.push(`- ${h.n.title.slice(0, 60)} (${h.why})`);
+    if (gateHeld.length > 10) report.push(`- … 외 ${gateHeld.length - 10}건`);
   }
   if (skipped.size) {
     const total = [...skipped.values()].reduce((a, b) => a + b, 0);
