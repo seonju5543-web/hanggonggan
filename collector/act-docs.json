@@ -249,5 +249,53 @@
  "https://www.nis.go.kr/CM/1_3/view.do?seq=403&currentPage=1&selectBox=&searchKeyword=&fromDate=&toDate=": {
   "at": "2026-10-05",
   "tries": 1
+ },
+ "https://fintech.or.kr/web/expo/idea.do?menu_id=10300": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.ulsan?bbsId=BBS_0000000000000309&mId=008001002000000000&dataId=60581": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=176858": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=178200": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000251/articleView.do?searchSeq=16639&commonMenuNo=180_35": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000242/articleView.do?searchSeq=15729&commonMenuNo=506_533": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000242/articleView.do?searchSeq=14869&commonMenuNo=506_533": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000274/articleView.do?commonMenuNo=180_191&searchSeq=16721": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000274/articleView.do?commonMenuNo=180_191&searchSeq=16720": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://youth.gyeongnam.go.kr/youth/board.es?mid=a10501020000&bid=0006&list_no=6876&act=view": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179225": {
+  "at": "2026-10-05",
+  "tries": 1
+ },
+ "https://youth.gg.go.kr/gg/intro/notice.do?mode=view&articleNo=9878&article.offset=0&articleLimit=10": {
+  "at": "2026-10-05",
+  "tries": 1
  }
 }
