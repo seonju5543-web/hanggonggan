@@ -251,6 +251,38 @@ export function parseFiles(htmlText) {
   return out;
 }
 
+/* ── 첨부의 '같은 파일' 열쇠 (2026-10-05 점검 · refresh KOSAF-01) ──────────────────────────
+   🔴 주소 전체를 비교하지 말 것 — 첨부 주소 끝의 `encVal` 칸은 **상세를 받을 때마다 새로 온다**(실측: 09-30판↔10-02판
+      사본 64곳 모두 encVal 하나만 달랐다). 주소 전체로 비교하던 옛 판은 매 실행 '새 회차'로 보고 사본 79곳을 전부 다시 받았다
+      (첨부 리포트 네 번 연속 '이미 있던 것 0곳').
+   열쇠는 서버 저장 이름 `filename` 칸이다 — 끝에 올린 시각 꼬리(_YYYYMMDDhhmmss00)가 붙어 재단이 새 회차를 올리면 바뀐다.
+   ⚠️ 틀리면 '못 받는' 쪽이 아니라 '다시 받는' 쪽으로 틀리게 짰다(못 읽으면 다른 열쇠 → 다시 받는다). */
+/** 첨부 주소 하나의 열쇠 — 'f:'+서버 저장 이름 › 'd:'+보여 줄 이름 › 'u:'+encVal 뺀 주소 › 'r:'+원문(주소가 아니면) */
+export function attachKey(url) {
+  let u;
+  try { u = new URL(String(url || '')); } catch { return `r:${url}`; }
+  const fn = u.searchParams.get('filename');
+  if (fn) return `f:${fn}`;
+  const dn = u.searchParams.get('FileNameDn');
+  if (dn) return `d:${dn}`;
+  u.searchParams.delete('encVal');
+  return `u:${u.href}`;
+}
+/** 첨부 주소 여럿의 열쇠 — 빈 값은 빼고 정렬해 줄바꿈으로 잇는다
+    (구분자를 '|' 로 하지 말 것 — 질의 문자열에 '|' 가 날것으로 올 수 있다) */
+export function filesKey(urls) {
+  return (urls || []).filter(Boolean).map(attachKey).sort().join('\n');
+}
+/** 장부의 사본(mirror)이 지금 상세의 첨부와 같은 파일인가 — 지금 첨부가 없으면 참(옛 사본을 지키지 않을 까닭이 없다).
+    옛 장부(key 칸 없음)는 사람용 `from`(주소 전체를 '|' 로 이은 것)을 열쇠로 풀어 비교한다 — 첫 실행부터 다시 받지 않는다. */
+export function mirrorMatches(files, mirror) {
+  const now = filesKey((files || []).map((f) => (f && f.url) || ''));
+  if (!now) return true;
+  const m = mirror || {};
+  const want = m.key ?? filesKey(String(m.from || '').split('|'));
+  return now === want;
+}
+
 /* 🔴 KOSAF 가 파일을 내려 줄 때 이름은 **본문이 아니라 헤더**에 있다(링크 글자는 `[다운로드]`
    하나뿐이라 이름이 없다). 한국 관공서 서버는 여기서 세 가지 꼴을 섞어 쓴다 —
    RFC5987(`filename*=UTF-8''…`) · 퍼센트 인코딩 · **EUC-KR 바이트를 latin1 로 실어 보내기**.

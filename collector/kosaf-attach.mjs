@@ -34,7 +34,7 @@ import { makeBudget } from './harvest-budget.mjs';
 import { slimKosaf, loadBlock } from './kosaf-open.mjs';
 import {
   createSession, parseFiles, fileCellHtml, filenameFrom, nameFromUrl, safeFileName,
-  looksLikeHtml, sniffKind,
+  looksLikeHtml, sniffKind, mirrorMatches, filesKey,
 } from './kosaf-session.mjs';
 
 const arg = (k, d) => {
@@ -113,9 +113,10 @@ function mirrorAlive(it) {
   if (!m.files.every((f) => fs.existsSync(path.join(ROOT_DIR, f.path)))) return false;
   /* 🔴 **재단이 새 회차 공고문으로 갈아 끼우면 다시 받아야 한다** (2026-09-12 코드 리뷰).
      파일이 있다는 것만 보면, 지난 회차 공고문을 학생에게 영영 보여 주게 된다.
-     상세를 새로 받을 때 첨부 주소도 새로 오므로, 그 주소가 달라졌으면 낡은 것이다. */
-  const now = (it.files || []).map((f) => f.url || '').filter(Boolean).sort().join('|');
-  return !now || now === (m.from || '');
+     상세를 새로 받을 때 첨부 주소도 새로 오므로, 그 **파일 이름**이 달라졌으면 낡은 것이다.
+     🔴 주소 전체로 비교하지 말 것(2026-10-05) — 주소 끝 encVal 칸은 받을 때마다 바뀌어 매 실행 전부 다시 받았다.
+        '같은 파일' 열쇠는 kosaf-session.mjs 의 attachKey 한 곳(서버 저장 이름 · 올린 시각 꼬리 포함). */
+  return mirrorMatches(it.files || [], m);
 }
 
 async function mirrorOne(session, it) {
@@ -130,8 +131,10 @@ async function mirrorOne(session, it) {
      예전엔 상한에 걸리면 그냥 `return` 해서, 이미 받아 커밋될 파일이 장부에 없는
      '주인 없는 이진 파일'이 되고 다음 실행이 같은 것을 또 받았다.
      '넘어져도 저장'(2026-08-01 사냥꾼 사고)과 같은 규칙이다. */
+  /* from = 사람이 읽는 원래 주소들 · key = 다음 실행이 '같은 파일인가'를 재는 열쇠(filesKey — encVal 이 바뀌어도 같다) */
   const keep = () => {
-    if (saved.length) it.mirror = { at: today, from: (it.files || []).map((f) => f.url || '').filter(Boolean).sort().join('|'), files: saved };
+    const urls = (it.files || []).map((f) => f.url || '').filter(Boolean);
+    if (saved.length) it.mirror = { at: today, from: [...urls].sort().join('|'), key: filesKey(urls), files: saved };
   };
   for (const [n, f] of files.entries()) {
     if (!f.url) {
