@@ -18,7 +18,7 @@ import { NEWS_BOARD_RULES, newsRuleKey, rowsForBoard, verifyRuleDetail, needsDet
 import { urlKey, dedupeNotices, rekeyLedger } from './url-key.mjs';
 import { isAttachmentEntry } from './attachment-link.mjs';
 import { activityKind } from './activity-kind.mjs';
-import { newsKind, isNewsRow, newsFloor } from './news-kind.mjs';
+import { newsKind, isNewsRow, newsFloor, clearFuturePosted } from './news-kind.mjs';
 import { fetchBoard, netReason } from './fetch-board.mjs';
 import { publishBySchool, dropUnserved } from './publish-notices.mjs';
 import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from './harvest-budget.mjs';
@@ -236,6 +236,8 @@ all = collapseSamePost(all);   // 같은 글이 제목 다듬기 차이로 두 �
 all = dedupeNotices(all, { distinct: newsDistinct });   // 글 번호가 다르면 같은 주소(목록 표식)라도 다른 글
 all = dropUnserved(all);
 for (const n of all) { if (newsHidden(n, hideCfg)) { n.hidden = true; } else if (n.hidden && !n.hiddenBy) { delete n.hidden; } }
+/* 앞날 게시일은 비운다 — 바닥 4건·보관 기한·학교별 파일이 모두 정리된 값을 보게 (news-kind.mjs clearFuturePosted 한 곳 · 2026-10-05 점검 news-1 · KST 날짜) */
+const futureCleared = clearFuturePosted(all, todayStr());
 /* 보관 기한 — 수집일 30일 · 게시일 60일(소급 — 규칙이 바뀌면 실린 글도 같은 잣대). 단 학교마다 최근 NEWS_MIN_KEEP 건은 남긴다(newsFloor · 소식 0건 학교가 생기지 않게) */
 const floor = newsFloor(all, NEWS_MIN_KEEP);
 all = all.filter((n) => floor.has(n) || ((n.foundAt || '9999') >= cutoff && (!n.postedAt || n.postedAt >= postedCutoff())));
@@ -276,6 +278,7 @@ const lines = [
   `## 🗞 교내 소식 수집 리포트 (${todayStr()})`, '',
   `새 글 **${freshAll.length}건** → 앱 홈 「우리 학교 소식」 (학교별 파일 data/news/ · ${pub.schools}개교 · 게시판 아는 학교 ${known}/${mains.length}${boards.length > mains.length ? ` · 둘째 게시판 ${boards.length - mains.length}곳` : ''})`, '',
 ];
+if (futureCleared) lines.push(`ℹ️ 오늘보다 뒤인 게시일 ${futureCleared}건은 게시일이 아니라 비웠습니다 (제목 안 기한 날짜 등 · 수집일로 정렬)`, '');
 if (zeroSchools.length) lines.push(`### 🙋 소식이 0건인 학교 ${zeroSchools.length}곳 — 출처를 찾아야 합니다 (모든 학교는 소식이 있다)`, ...zeroSchools.map((n) => `- ${n}`), '');
 if (skippedByBudget.length) {
   lines.push(`⏰ **시간 예산(${humanMs(BUDGET_MS)})에 걸려 게시판 ${skippedByBudget.length}곳을 이번 실행에서 못 봤습니다** — ${skippedByBudget.slice(0, 8).join(' · ')}${skippedByBudget.length > 8 ? ' …' : ''}`);

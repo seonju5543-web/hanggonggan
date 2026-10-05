@@ -64,6 +64,19 @@ export function isNewsRow(row, opts = {}) {
   return true;
 }
 
+/* 오늘보다 뒤인 게시일은 게시일이 아니다 — 칸을 지운다 (2026-10-05 점검 news-1).
+   아주대 「어학졸업인증 …(~2027.1.22)」·방송대 2027-01-01 이 게시일로 실려, 앱이 게시일 순으로 그리는 홈 소식 띠 맨 앞에 몇 달씩 붙어 있었다
+   (newsFloor 가 최근 4건을 기한과 상관없이 남기므로 30일 기한으로도 안 빠진다). board-links.mjs 는 **새로 읽는 줄**에만 '앞날은 비운다'를 걸어
+   규칙형 게시판·옛 글에는 소급되지 않았다 → 발행이 새 글·실린 글 구분 없이 한 곳에서 거른다(newsFloor 앞).
+   글자·제목은 바꾸지 않는다(지어내지 않는다 — 비운다). 같은 날은 남긴다. today 는 로봇의 KST 날짜(YYYY-MM-DD) · 돌려주는 것은 지운 개수 */
+export function clearFuturePosted(items, today) {
+  let n = 0;
+  for (const it of items || []) {
+    if (it && it.postedAt && String(it.postedAt) > String(today)) { delete it.postedAt; n++; }
+  }
+  return n;
+}
+
 /* 학교마다 가장 최근 소식 n 건 — 수집일·게시일 기한이 지나도 남긴다 (2026-10-03 개발자 지시 "소식이 0건인 학교는 없어").
    글이 드문 게시판(서강 공지사항: 6월 30일 뒤 새 글 없음)은 기한이 다 지나면 홈 첫 화면 띠가 비었다.
    🔴 오래된 고정 공지를 새로 데려오는 길이 아니다 — 수집 때 게시일 기한(60일)은 그대로라, 여기 남는 것은 **실렸던** 글뿐이다.
