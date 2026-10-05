@@ -169,7 +169,9 @@ export default async function gate(eq, ctx = {}) {
   eq('  되돌린 주소에 `#038;` 조각이 남지 않는다', got.some((l) => /#038|&#|&amp;/.test(l.url)), false);
   const cm = code(read('collector/collect.mjs'));
   eq('  일반 수집기의 첨부 주소도 같은 함수(hrefText)로 푼다 — `&amp;` 만 푸는 사본이 없다',
-    /import \{[^}]*\bhrefText\b[^}]*\} from '\.\/board-links\.mjs'/.test(cm) && /new URL\(hrefText\(m\[1\]\), item\.url\)/.test(cm) && !/replace\(\/&amp;\/g, '&'\)/.test(cm), true);
+    /import \{[^}]*\bhrefText\b[^}]*\} from '\.\/board-links\.mjs'/.test(cm) && /detailAttachments\(html, item\.url, \{ decode: hrefText \}\)/.test(cm) && !/replace\(\/&amp;\/g, '&'\)/.test(cm)
+      /* 첨부 읽기가 attachment-link.mjs detailAttachments 로 옮겨 갔다(2026-10-05) — 그 함수가 주소를 풀기 **전에** decode 를 부르는지까지 본다 */
+      && /const raw = decode\(/.test(fs.readFileSync(new URL('../../collector/attachment-link.mjs', import.meta.url), 'utf8')), true);
   const ar = code(read('collector/auto-register.mjs'));
   eq('  자동 등록은 되돌린 주소를 담고(sourceUrl: nUrl) 같은 주소로 \'이미 등록\'을 가린다',
     /const nUrl = decodeUrlEntities\(n\.url\)/.test(ar) && /sourceUrl: nUrl,/.test(ar) && !/sourceUrl: n\.url/.test(ar)

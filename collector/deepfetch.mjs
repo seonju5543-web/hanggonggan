@@ -321,14 +321,20 @@ async function downloadEligDocs() {
      실측: 넘기려던 공고 7건 전부에 A4 포스터급 그림이 있었다(최대 5906×8268). */
   const IMG_EXT = /\.(png|jpe?g|gif|webp)$/i;
 
-  const targets = [];
-  for (const it of reg.items) {
-    if (it.program || requirementLines(it).length) continue;
-    const atts = (it.attachments || []).filter((a) => a.url && (
-      (OK_EXT.test(a.name || '') && isNoticeDoc(a.name)) || (a.bodyImage && IMG_EXT.test(a.name || ''))));
-    if (atts.length) targets.push({ it, atts: atts.slice(0, 2) });
-    if (targets.length >= MAX_NOTICES) break;
-  }
+  /* 고르기는 elig-targets.mjs 한 곳 (2026-10-05 · UI-12) — 줄이 돈다(시도한 날 `at`) · 금액·마감만 빈 공고도 · 안 보이는 공고는 안 받는다 */
+  const { pickEligTargets } = await import('./elig-targets.mjs');
+  const { notStale } = createRequire(import.meta.url)('../match-engine.js');
+  const today = new Date().toISOString().slice(0, 10);
+  const idxPath = new URL('elig-docs.json', OUT);
+  let index = {};
+  try { index = JSON.parse(fs.readFileSync(idxPath, 'utf8')); } catch { /* 첫 실행 */ }
+  const targets = pickEligTargets(reg.items, index, today, {
+    requirementLines,
+    live: (it) => notStale(it, new Date()) && (!it.deadline || it.deadline >= today),
+    docAtts: (it) => (it.attachments || []).filter((a) => a.url && (
+      (OK_EXT.test(a.name || '') && isNoticeDoc(a.name)) || (a.bodyImage && IMG_EXT.test(a.name || '')))).slice(0, 2),
+    max: MAX_NOTICES,
+  });
   console.log(`자격용 공고문 첨부 대상 ${targets.length}건 (예산 ${Math.round(BUDGET_MS / 1000)}초)`);
   if (!targets.length) return 0;
 
@@ -339,15 +345,14 @@ async function downloadEligDocs() {
     const m = f.match(/^elig-([a-z0-9]{1,6})-/);
     if (m && refreshing.has(m[1])) fs.unlinkSync(new URL(f, OUT));
   }
-  const idxPath = new URL('elig-docs.json', OUT);
-  let index = {};
-  try { index = JSON.parse(fs.readFileSync(idxPath, 'utf8')); } catch { /* 첫 실행 */ }
   for (const k of Object.keys(index)) if (refreshing.has(index[k].slug)) delete index[k];
 
   let got = 0;
   for (const { it, atts } of targets) {
     if (Date.now() - startedAt > BUDGET_MS) { console.log('예산 도달 — 나머지는 다음 실행'); break; }
     const slug = slugOf(it.name);
+    /* 시도한 날을 먼저 적는다 — 하나도 못 받아도 적어야 다음 실행이 다른 공고로 넘어간다(elig-targets.mjs 주석 ①) */
+    (index[it.id] ||= { slug, files: [] }).at = today;
     let ai = 0;
     for (const a of atts) {
       if (Date.now() - startedAt > BUDGET_MS) break;

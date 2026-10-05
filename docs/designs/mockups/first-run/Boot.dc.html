@@ -12,40 +12,36 @@
     body { margin: 0; font-family: 'Pretendard Variable', Pretendard, 'Noto Sans KR', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
     a { color: #8a6a1f; } a:hover { color: #6d541a; }
 
-    /* 등장 움직임 — 앱(style.css '부팅 화면' 절)과 같은 값이다.
-       한 번만 나타나고 멈춘다 · 0.56초에 끝나 화면이 걷히기 전 0.44초가 고요하다 ·
-       되튐 없는 감속 곡선 하나. 계속 도는 것은 아래 표시 하나뿐이고, 그것도 1.2초 뒤에야
-       나타난다(앱이 제때 오면 학생은 못 본다 — 그게 맞다). */
-    .m-logo { animation: boot-in-logo 0.44s cubic-bezier(0.22, 0.61, 0.36, 1) 0.02s both; }
-    .m-word { animation: boot-in-word 0.40s cubic-bezier(0.22, 0.61, 0.36, 1) 0.16s both; }
-    .m-spin {
-      opacity: 0;
-      animation: boot-spin 0.8s linear infinite, boot-spin-in 0.3s ease 1.2s forwards;
-    }
-    @keyframes boot-in-logo {
-      from { opacity: 0; transform: scale(0.94) translateY(6px); }
-      to   { opacity: 1; transform: none; }
-    }
-    @keyframes boot-in-word {
-      from { opacity: 0; transform: translateY(9px); }
-      to   { opacity: 1; transform: none; }
-    }
-    @keyframes boot-spin { to { transform: rotate(360deg); } }
-    @keyframes boot-spin-in { to { opacity: 1; } }
-    /* 걷힘 움직임 (2026-10-04 개발자 결정 — "둘 다 페이드로") — 앱(style.css '걷힘 움직임' 절)과
-       같은 값. 로고·글자가 살짝 커지며 흐려지고 덮개가 투명해지며 밑의 홈이 드러난다.
-       시안에서는 1초 뒤 걷히고 3.4초마다 되풀이한다(앱은 한 번). */
+    /* 부팅 화면 = 인트로 (2026-10-04 개발자 승인 — 소개 영상 1:05~1:09 엔딩 · 캔버스 시안 A안 「밝은 인트로 · 페이드」 ·
+       같은 날 "선이 그려지는 에니메이션 -> 페이드아웃 효과 전체로 통일"). **켤 때마다** 이 한 벌이다.
+       앱이 그려지는 동안은 빈 덮개 → 앱이 다 되고 손이 비면 인트로 → 0.35초 정지 → 페이드.
+       앱(style.css '인트로' 절)과 **같은 값**이다 — 관문 test-collector '첫 실행 화면' 절이 길이·늦추기를 하나씩 대조한다.
+       시안에서는 되풀이한다(앱은 한 번). */
     .m-cover { --boot-fade: 400ms; }
+    .m-dot { fill: #d9b56a; opacity: 0; transform-box: fill-box; transform-origin: 50% 50%; }
+    .m-logo, .m-word { opacity: 0; }
+    .m-logo path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+    .m-run .m-logo { animation: boot-intro-logo 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s both; }
+    .m-run .m-logo path:nth-of-type(1) { animation: boot-intro-draw 0.5s ease-in-out 0.25s both; }
+    .m-run .m-logo path:nth-of-type(2) { animation: boot-intro-draw 0.5s ease-in-out 0.4s both; }
+    .m-run .m-logo path:nth-of-type(3) { animation: boot-intro-draw 0.4s ease-in-out 0.55s both; }
+    .m-run .m-dot { animation: boot-intro-dot 0.2s ease-out 0.95s both; }
+    .m-run .m-word { animation: boot-intro-word 0.35s ease-out 1s both; }
+    @keyframes boot-intro-logo { from { opacity: 0; transform: scale(0.82); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
+    @keyframes boot-intro-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+    @keyframes boot-intro-dot { 0% { opacity: 1; transform: scale(0); } 60% { opacity: 1; transform: scale(1.25); } 100% { opacity: 1; transform: scale(1); } }
+    @keyframes boot-intro-word { from { opacity: 0; transform: translateY(6px); filter: blur(10px); } to { opacity: 1; transform: none; filter: none; } }
     .m-cover.m-fade { opacity: 0; transition: opacity var(--boot-fade) cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; }
-    .m-cover.m-fade .m-logo, .m-cover.m-fade .m-word { animation: boot-fade-out var(--boot-fade) cubic-bezier(0.4, 0, 0.2, 1) both; }
-    .m-cover.m-fade .m-spin { animation: none; opacity: 0; }
+    .m-cover.m-fade .m-logo, .m-cover.m-fade .m-word { opacity: 1; animation: boot-fade-out var(--boot-fade) cubic-bezier(0.4, 0, 0.2, 1) both; }
+    .m-cover.m-fade .m-logo path { stroke-dashoffset: 0; animation: none; }
+    .m-cover.m-fade .m-dot { opacity: 1; animation: none; }
     @keyframes boot-fade-out { to { transform: scale(1.04); filter: blur(6px); } }
     @media (prefers-reduced-motion: reduce) {
-      .m-logo, .m-word { animation: none; }
-      .m-spin { animation: none; opacity: 1; }
+      .m-logo, .m-word, .m-run .m-logo, .m-run .m-word { animation: none; opacity: 1; }
+      .m-logo path, .m-run .m-logo path { animation: none; stroke-dashoffset: 0; }
+      .m-dot, .m-run .m-dot { animation: none; opacity: 1; }
       .m-cover { --boot-fade: 0ms; }
       .m-cover.m-fade { transition: none; }
-      .m-cover.m-fade .m-logo, .m-cover.m-fade .m-word { animation: none; }
     }
   </style>
 </helmet>
@@ -66,34 +62,39 @@
 <div class="m-cover" style="position: absolute; inset: 0; background: #fefdfc; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;">
 
   <div class="m-logo" style="width: 88px; height: 88px; border-radius: 27px; color: #f6f0e2; display: flex; align-items: center; justify-content: center; background: radial-gradient(120% 130% at 78% -18%, rgba(184, 145, 47, 0.20) 0%, rgba(184, 145, 47, 0) 58%), radial-gradient(90% 90% at -10% 108%, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0) 60%), #23201a;">
-    <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path d="M22 10v6"/></svg>
+    <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="M22 10L12 5 2 10l10 5 10-5z"/><path pathLength="1" d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path pathLength="1" d="M22 10v6"/><circle class="m-dot" cx="22" cy="16.9" r="1.1" stroke="none"/></svg>
   </div>
 
   <div class="m-word" style="font-size: 38px; font-weight: 800; letter-spacing: -0.035em; color: #23201a; line-height: 1;">한대장</div>
-
-  <div style="position: absolute; left: 0; right: 0; bottom: 92px; display: flex; justify-content: center;">
-    <div class="m-spin" style="width: 26px; height: 26px; border-radius: 999px; border: 2px solid rgba(25, 23, 19, 0.10); border-top-color: rgba(25, 23, 19, 0.34);"></div>
-  </div>
 </div>
 
 </div>
 <script>
-  /* 걷힘을 되풀이해 보여 준다 — 앱은 한 번만 한다. 1초(바닥값) → 페이드.
-     시간은 boot.js 처럼 CSS 에서 읽는다 — 숫자를 여기 적으면 위 값을 고칠 때 어긋난다. */
+  /* 부팅을 되풀이해 보여 준다 — 앱은 한 번만 한다. 빈 덮개(앱이 그려지는 동안 · 시안은 APP_LOAD_MS 로 흉내)
+     → 돌기 시작 → INTRO_SHOW_MS 뒤 페이드.
+     🔴 INTRO_SHOW_MS 는 boot.js `BOOT_INTRO_SHOW_MS` 와 같아야 한다(관문이 대조한다).
+     페이드 길이는 boot.js 처럼 CSS 에서 읽는다. */
   (function () {
+    var INTRO_SHOW_MS = 1700;
     var c = document.querySelector('.m-cover'); if (!c) return;
     var ms = function (name) {
       var v = String(getComputedStyle(c).getPropertyValue(name) || '').trim();
       var n = parseFloat(v) || 0; return /[^m]s$/.test(v) ? n * 1000 : n;
     };
+    var APP_LOAD_MS = 800;   /* 시안에서 흉내 내는 '앱이 그려지는 시간' — 기기마다 다르다 */
     function cycle() {
-      c.classList.remove('m-fade'); c.style.visibility = '';
+      c.classList.remove('m-run', 'm-fade'); c.style.visibility = '';
+      void c.offsetWidth;   /* 애니메이션을 처음부터 다시 돌리려면 한 번 그려야 한다 */
       setTimeout(function () {
-        c.classList.add('m-fade');
-        setTimeout(function () { c.style.visibility = 'hidden'; }, ms('--boot-fade'));
-      }, 1000);
+        c.classList.add('m-run');
+        setTimeout(function () {
+          c.classList.add('m-fade');
+          setTimeout(function () { c.style.visibility = 'hidden'; }, ms('--boot-fade'));
+        }, INTRO_SHOW_MS);
+      }, APP_LOAD_MS);
     }
-    cycle(); setInterval(cycle, 3400);
+    var go = function () { cycle(); setInterval(cycle, APP_LOAD_MS + INTRO_SHOW_MS + 2400); };
+    try { document.fonts.load('800 38px "Noto Sans KR"', '한대장').then(go, go); } catch (e) { go(); }
   })();
 </script>
 </x-dc>

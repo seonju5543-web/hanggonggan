@@ -20,6 +20,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const http = require('http');
+const { bootGone } = require('./onboard-helper.js');
 
 const EXE = process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const ROOT = path.join(__dirname, '..');
@@ -267,6 +268,9 @@ const seedScript = (seed) => `localStorage.setItem('handaejang.v1', ${JSON.strin
   /* 앱을 열면 알림 동의 시트가 떠서 뒤 화면 클릭을 가로막는다.
      검사하려는 것은 로그인이지 알림이 아니므로 먼저 닫는다. */
   const settle = async (page, ms) => {
+    /* 🔴 덮개가 걷힌 뒤부터 센다 (2026-10-04 — 켤 때마다 인트로). 동의 시트의 시계는 덮개가 걷힌 뒤에
+       돌기 시작하므로(notifyAfterBoot), 여는 순간부터 세면 아래 닫기가 시트가 뜨기 전에 끝난다. */
+    await bootGone(page);
     await page.waitForTimeout(ms || 900);
     /* 동의 시트는 2.9초 뒤에 **한 번 더** 뜬다(notifyMaybeAskConsent) — 한 번만 닫으면
        그다음 클릭에서 다시 가로막힌다. 그 시점을 지나서까지 몇 번 닫아 준다. */

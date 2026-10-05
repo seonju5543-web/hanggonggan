@@ -1681,6 +1681,15 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
       [r.status, got.map((x) => x.title).sort(), (got.find((x) => x.title === '가') || {}).deadline, ((got.find((x) => x.title === '가') || {}).eligibilityLines || []).length],
       [0, ['가', '나', '다'], '2026-11-01', 1]);
   }
+  /* 🔴 저장 단계가 충돌로 죽어도 수집분은 남는다 (2026-10-04 run 37203460175 — 얹기 충돌에 그 자리에서 죽어 실행 결과가 통째로 사라졌다).
+     두 수집 로봇: 얹기 실패는 되돌리고 빠져나와 묶음을 만들고 · 실패 때만 실행 결과물로 올린다. */
+  for (const f of ['collect-scholarships.yml', 'browser-collect.yml']) {
+    const y = strip(readText(new URL(`../.github/workflows/${f}`, import.meta.url)));
+    eq(`  ${f}: 얹기 충돌은 되돌리고 묶음을 남겨 올린다`,
+      /if ! git pull --rebase --autostash origin "\$\{GITHUB_REF_NAME\}"; then\s*git rebase --abort/.test(y)
+        && /git bundle create unsaved\/unsaved\.bundle/.test(y)
+        && /if: failure\(\)\s*uses: actions\/upload-artifact@v4\s*with:\s*name: unsaved-[\s\S]{0,80}path: unsaved\//.test(y), true);
+  }
   /* ③ 출처 */
   const src = JSON.parse(readText(new URL('../collector/activity-sources.json', import.meta.url)));
   const served = createRequire(import.meta.url)('../match-engine.js').SERVED_SCHOOLS;   // 2026-09-29: 두 곳 → 44곳, 상수 한 곳에서 읽는다
@@ -1711,7 +1720,7 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
   eq('showScreen 이 그린다', /if \(name === 'activities'\) renderActivities\(\);/.test(app), true);
   eq('늦게 온 데이터로 다시 그린다 (rerenderVisible)', /if \(!\$\('#screen-activities'\)\.hidden\) renderActivities\(\);/.test(app), true);
   eq('당겨서 새로고침이 같이 받는다 (refreshAllData)', /const jobs = \[loadNotices\(\), [^\n]*loadActivities\(\)/.test(app), true);
-  eq('첫 실행에 받는다', /^loadActivities\(\);$/m.test(app), true);
+  eq('첫 실행에 받는다', /^const bootJobs = \[[^\n]*loadActivities\(\)/m.test(app), true);
   eq('못 받아 왔어도 빈 문서로 내려앉는다 (뼈대가 굳지 않게)', /liveActivities = d \|\| liveActivities \|\| \{ items: \[\], updatedAt: null \}/.test(app), true);
   eq('학교 범위는 엔진의 activityForProfile 한 곳', /activityForProfile\(n, p\)/.test(app) && !/function activityForProfile/.test(app), true);
   /* 2026-10-01 개발자 지시("장학금 탭이랑 똑같은 흐름") — 활동 카드는 게시판 글 카드가 아니라 **장학 카드와 같은 그림**이다.
@@ -1984,7 +1993,7 @@ console.log('\n■ 재단·지자체 게시판 (2026-09-26 · 노션 F-13 · 교
   const homeSlice = html.slice(html.indexOf('id="screen-home"'), html.indexOf('id="screen-explore"'));
   eq('홈에 구역이 있다 — 학교 게시판 구역 바로 아래', homeSlice.indexOf('id="live-notices"') > 0 && homeSlice.indexOf('id="live-notices"') < homeSlice.indexOf('id="external-notices"'), true);
   eq('renderHome 이 그린다', /\$\('#external-notices'\)\.innerHTML = externalNoticesHtml\(\);/.test(app), true);
-  eq('당겨서 새로고침·첫 실행이 받는다', /loadActivities\(\), loadExternal\(\)\]/.test(app) && /^loadExternal\(\);$/m.test(app), true);
+  eq('당겨서 새로고침·첫 실행이 받는다', /loadActivities\(\), loadExternal\(\)\]/.test(app) && /^const bootJobs = \[[^\n]*loadExternal\(\)/m.test(app), true);
   eq('못 받아 왔어도 빈 문서', /liveExternal = d \|\| liveExternal \|\| \{ items: \[\], updatedAt: null \}/.test(app), true);
   eq('카드는 한 벌 · 주최를 윗줄에 (마감을 읽은 글은 D-day 도) · 「공고」 를 겹쳐 적지 않는다(2026-10-04 · 구역 제목이 「…새 공고」)', /noticeCardHtml\(n, \{ org: n\.host, dday: n\.deadline \?/.test(app) && !/function externalCardHtml/.test(app), true);
   eq('등록된 주소는 뺀다 — 학교 구역과 같은 잣대(registeredUrlMatcher)', (app.match(/registeredUrlMatcher\(\)/g) || []).length >= 2, true);
@@ -2359,7 +2368,7 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   const homeSlice = html.slice(html.indexOf('id="screen-home"'), html.indexOf('id="screen-explore"'));
   eq('홈 첫 화면 띠 — 히어로(아이콘 네 칸) 다음 · 「나에게 맞는 장학금」 앞 · 옛 아래 구역(#school-news)은 없다 (2026-10-04 승인 시안 1안)', homeSlice.indexOf('class="hero-card"') > 0 && homeSlice.indexOf('class="hero-card"') < homeSlice.indexOf('id="home-news"') && homeSlice.indexOf('id="home-news"') < homeSlice.indexOf('id="home-deadline-list"') && !/id="school-news"/.test(html), true);
   eq('renderHome 이 그린다 · 소식이 없으면 구역째 숨긴다', /const newsHtml = homeNewsHtml\(\);\s*\$\('#home-news'\)\.innerHTML = newsHtml;\s*\$\('#home-news'\)\.hidden = !newsHtml;/.test(app), true);
-  eq('당겨서 새로고침·첫 실행이 받는다', /const jobs = \[loadNotices\(\), loadNews\(\),/.test(app) && /^loadNews\(\);$/m.test(app), true);
+  eq('당겨서 새로고침·첫 실행이 받는다', /const jobs = \[loadNotices\(\), loadNews\(\),/.test(app) && /^const bootJobs = \[[^\n]*loadNews\(\)/m.test(app), true);
   eq('학교가 정해지거나 바뀔 때 공고와 **같은 자리에서** 받는다', (app.match(/loadNewsIfSchoolChanged\(\);/g) || []).length, (app.match(/loadNoticesIfSchoolChanged\(\);/g) || []).length);
   eq('못 받아 왔어도 빈 문서 (뼈대가 굳지 않게)', /liveNews = d \|\| liveNews \|\| \{ items: \[\], updatedAt: null \}/.test(app), true);
   eq('옛 통짜 파일로 물러나는 길이 없다', /data\/news\.json/.test(app), false);
@@ -4649,9 +4658,106 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
   const mapping = extsOf(/const ext = \(a\.name\.match\(\/\\\.\(([^)]+)\)\$\/i\)/);
   const gap = wanted.filter((e) => !mapping.includes(e));
   eq(`받는 확장자 ${wanted.length}종이 모두 파일 이름 규칙에 있다`, gap.join(',') || '(없음)', '(없음)');
+  /* 🔴 첨부 받기 줄이 돈다 · 금액·마감만 빈 공고도 받는다 (2026-10-05 · UI-12 — 학생 화면 공고 27건이 한 번도 순서가 안 왔다) */
+  {
+    const ET = await import(new URL('../collector/elig-targets.mjs', import.meta.url));
+    const req = (it) => it.req || [];
+    const o = { requirementLines: req, docAtts: (it) => it.atts || [], live: (it) => !it.closed, max: 2 };
+    const doc = [{ name: '공고문.pdf', url: 'u' }];
+    const items = [
+      { id: 'A', atts: doc },                                                        // 어제 받아 봤다 — 쉰다
+      { id: 'B', atts: doc },                                                        // 한 번도 안 받았다
+      { id: 'C', atts: doc, req: ['재학생'], deadline: '2026-10-30' },              // 자격은 읽었지만 금액이 비었다
+      { id: 'D', atts: doc, closed: true },                                          // 학생에게 안 보인다
+      { id: 'E', atts: doc, req: ['재학생'], deadline: '2026-10-30', amountValue: 1000000 },   // 다 읽었다
+      { id: 'F', atts: doc },                                                        // 열흘 전에 받아 봤다
+    ];
+    const idx = { A: { at: '2026-10-04', files: [] }, F: { at: '2026-09-25', files: [] } };
+    eq('첨부 받기: 안 해 본 것부터 · 금액만 빈 공고도 · 최근에 해 본 것과 안 보이는 것은 건너뛴다',
+      ET.pickEligTargets(items, idx, '2026-10-05', o).map((t) => t.it.id), ['B', 'C']);
+    eq('  한도가 남으면 오래전에 해 본 것도', ET.pickEligTargets(items, idx, '2026-10-05', { ...o, max: 5 }).map((t) => t.it.id), ['B', 'C', 'F']);
+    eq('  deepfetch 가 이 고르기를 쓴다', /pickEligTargets\(/.test(eligFn), true);
+    eq('  시도한 날을 색인에 적는다(안 적으면 줄이 다시 멈춘다)', /\.at\s*=\s*today/.test(eligFn), true);
+    /* 🔴 PaddleOCR 로 읽은 본문 그림이 **그 공고의 것인가** (2026-10-05 · 개발자 "paddle ocr 붙여") — 장학 제목의 흔한 낱말은 증거가 아니다 */
+    const G = await import(new URL('../collector/elig-ocr-guard.mjs', import.meta.url));
+    eq('장학 그림 OCR: 제목의 고유한 낱말이 그림에 있으면 그 공고의 것',
+      [G.ownsScholarshipImage('2026년 금신사랑장학생 선발 안내 (대학생)', '공통 2026년 금신사랑장학생 선발 안내'),
+       G.ownsScholarshipImage('2026년 하반기 문주장학재단 주관 AI·ICT 분야 장학생 모집', '[홍보] 2026 하반기 AI·ICT 인재 장학생 모집 안내')], [true, true]);
+    eq('  남의 배너는 \'장학생\' 이 겹쳐도 아니다', G.ownsScholarshipImage('제주도 내 공공임대주택에 입주한 가구 장학생 모집', '2026년 우양재단 동행장학생 모집 안내'), false);
+    eq('  제목 낱말의 꼬리(장학생·장학금·재단)를 떼고도 본다 — 「포스코비전장학생」 제목 · 그림엔 「포스코비전장학은」(진짜 포스터를 비울 뻔했다)',
+      G.ownsScholarshipImage('포스코비전장학은 올바른 품성을 갖춘 대학생이', '포스코청암재단 포스코비전장학생 (2026)'), true);
+    eq('  제목에 고유한 낱말이 없으면 가릴 수 없으니 남긴다', G.ownsScholarshipImage('장학생 모집 2026', '[교외장학] 2026 장학생 모집'), true);
+    const csP = readText(new URL('../.github/workflows/collect-scholarships.yml', import.meta.url));
+    const atP = (re) => csP.search(re);
+    eq('  수집 로봇: tesseract → PaddleOCR(공고문 첨부만) → 주인 확인 → 발췌',
+      [atP(/ocr-text\.py/), atP(/paddle-ocr\.py collector\/extracted --prefix=elig-/), atP(/node collector\/elig-ocr-guard\.mjs/), atP(/extract-excerpts\.mjs --write/)]
+        .every((v, i, a) => v >= 0 && (i === 0 || a[i - 1] < v)), true);
+    /* OCR 이 발췌·금액보다 뒤면 그 실행엔 못 읽고, 다음 실행의 첨부 받기가 .ocr.txt 를 지워 영영 못 읽는다 */
+    const cs = readText(new URL('../.github/workflows/collect-scholarships.yml', import.meta.url));
+    const at = (re) => cs.search(re);
+    eq('  수집 로봇: 첨부 받기 → OCR → 발췌 · 금액 순서',
+      [at(/deepfetch\.mjs --elig-attach/), at(/ocr-text\.py/), at(/extract-excerpts\.mjs --write/), at(/extract-amounts\.mjs --write/)]
+        .every((v, i, a) => v >= 0 && (i === 0 || a[i - 1] < v)), true);
+  }
   const AT = await import(new URL('../collector/attachment-text.mjs', import.meta.url));
   /* ① 신청서·동의서는 읽지 않는다 — 읽으면 개인정보 수집 항목이 자격 자리에 앉는다
         (2026-08-20에 실제로 3건이 그렇게 돼 통째로 되돌린 적이 있다) */
+  /* 🔴 게시판 내려받기 스크립트를 진짜 주소로 (2026-10-05 · 첨부 34건이 이름만 보이고 안 받아졌다 — 실측: 세션 없는 새 브라우저에서 아래 주소로 파일이 받아진다) */
+  {
+    const AL = await import(new URL('../collector/attachment-link.mjs', import.meta.url));
+    const st = 'https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&bnum=5233&bidx=896094';
+    eq('서울과기대 downloadfile(경로, 저장이름, 원래이름) → bbs_download.jsp',
+      AL.resolveJsDownload("javascript:downloadfile('/storage/www/bbs/5233','592B624FC1BF4F50A7D7D37F78C65087_.hwp','2.조형도동문 장학생 선발 공고문.hwp' )", st),
+      'https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=592B624FC1BF4F50A7D7D37F78C65087_.hwp&ogrfname=2.%EC%A1%B0%ED%98%95%EB%8F%84%EB%8F%99%EB%AC%B8+%EC%9E%A5%ED%95%99%EC%83%9D+%EC%84%A0%EB%B0%9C+%EA%B3%B5%EA%B3%A0%EB%AC%B8.hwp');
+    eq("  원래 이름 안에 따옴표가 그대로 있어도(「웰로 'Wello' 앱」 — 서울과기대는 이스케이프하지 않는다) 끝까지 읽는다",
+      AL.resolveJsDownload("javascript:downloadfile('/storage/www/bbs/5233','390EA3A32A694C878680B18505BDF879_.pdf','붙임3. 매뉴얼(웰로 'Wello' 앱).pdf' );", st),
+      new URL('https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?' + new URLSearchParams({ fpath: '/storage/www/bbs/5233', fname: '390EA3A32A694C878680B18505BDF879_.pdf', ogrfname: "붙임3. 매뉴얼(웰로 'Wello' 앱).pdf" })).href);
+    eq('대전청년포털 fileDownLoad(파일ID, 순번) → FileDown.do',
+      AL.resolveJsDownload("javascript:dypCommonFn.fileManage.fileDownLoad('FILE_000000000328512','0')", 'https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000239/articleView.do?searchSeq=16718'),
+      'https://www.daejeonyouthportal.kr/comt/fms/FileDown.do?atchFileId=FILE_000000000328512&fileSn=0');
+    eq("동국대 downGO(이름, 경로, 저장이름) → /cmmn/fileDown.do · 이름 속 \\' 도 푼다",
+      AL.resolveJsDownload("javascript:downGO('붙임3. 매뉴얼(웰로 \\'Wello\\' 앱).pdf','/files/article/JANGHAKNOTICE/26766011/','7C31D4C946AD470EA56798EB13ED3ACF.pdf');", 'https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766011'),
+      new URL('https://www.dongguk.edu/cmmn/fileDown.do?filename=' + encodeURIComponent("붙임3. 매뉴얼(웰로 'Wello' 앱).pdf") + '&filepath=/files/article/JANGHAKNOTICE/26766011/&filerealname=7C31D4C946AD470EA56798EB13ED3ACF.pdf').href);
+    eq('  규칙은 그 사이트에서만 — 다른 학교의 같은 이름 함수는 모른다', AL.resolveJsDownload("javascript:downloadfile('/a','b.hwp','c.hwp')", 'https://www.other.ac.kr/x'), null);
+    eq('  잘린 호출(`downloadfile(`)은 짐작하지 않는다', AL.resolveJsDownload('javascript:downloadfile(', st), null);
+    eq('상세 첨부: 큰따옴표 href 안의 작은따옴표에서 끊지 않는다 · 주석 속 옛 링크는 줍지 않는다 · 안내창(alert)은 첨부가 아니다',
+      AL.detailAttachments(`<a href="javascript:downloadfile('/storage/www/bbs/5233','A_.hwp','공고문.hwp' )">공고문.hwp</a>
+        <!-- <a href="javascript:alert('현재 작업중입니다.');" class="file_bg">(붙임) 옛 일정(21년 08월 2주차).hwp</a> -->
+        <a href="javascript:alert('현재 작업중입니다.');">(붙임) 신청서.hwp</a>
+        <a href="/files/form.pdf">신청 양식.pdf</a>`, st).map((a) => a.url),
+      ['https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=A_.hwp&ogrfname=%EA%B3%B5%EA%B3%A0%EB%AC%B8.hwp',
+       'https://www.seoultech.ac.kr/files/form.pdf']);
+  }
+  {
+    const AL = await import(new URL('../collector/attachment-link.mjs', import.meta.url));
+    eq('브라우저 링크 첨부: 스크립트는 진짜 주소로 · 안내창은 버린다',
+      AL.linkAttachments([{ title: '공고문.pdf', url: "javascript:dypCommonFn.fileManage.fileDownLoad('FILE_1','0')" },
+        { title: '(붙임) 일정.hwp', url: "javascript:alert('현재 작업중입니다.');" }], 'https://www.daejeonyouthportal.kr/board/x').map((a) => a.url),
+      ['https://www.daejeonyouthportal.kr/comt/fms/FileDown.do?atchFileId=FILE_1&fileSn=0']);
+    const bc = readText(new URL('../collector/browser-collect.mjs', import.meta.url));
+    eq('  브라우저 수집기의 두 길이 모두 linkAttachments 를 쓴다(걸러 내기가 두 벌이 되지 않게)', (bc.match(/linkAttachments\(/g) || []).length, 2);
+    const cm = readText(new URL('../collector/collect.mjs', import.meta.url));
+    eq('  일반 수집기는 detailAttachments 를 쓴다', /detailAttachments\(html, item\.url/.test(cm), true);
+  }
+  /* 🔴 게시판 공통 링크는 첨부가 아니다 (2026-10-05 · 서울과기대 「장학금 규정·지침」 · 계명대 「캠퍼스 투어」 · 광운대 부서 메뉴 · 로고 그림 —
+     같은 사이트의 서로 다른 공고 3건 이상에 같은 주소로 붙으면 공통 링크다. 진짜 첨부는 글마다 번호가 달라 주소가 다르다) */
+  {
+    const AL = await import(new URL('../collector/attachment-link.mjs', import.meta.url));
+    const side = { name: '장학금 규정 전문', url: 'https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST.hwp' };
+    const own = (n) => ({ name: `공고문${n}.hwp`, url: `https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fname=${n}` });
+    const notices = [1, 2, 3].map((n) => ({ url: `https://www.seoultech.ac.kr/x?bidx=${n}`, attachments: [own(n), side] }));
+    const reg = [{ sourceUrl: 'https://www.seoultech.ac.kr/x?bidx=1', attachments: [own(1), side] }];   // 같은 글이 두 파일에 — 한 번으로 센다
+    const removed = AL.stripSiteChrome([notices, reg]);
+    eq('세 공고에 같은 주소로 붙은 게시판 공통 링크는 뺀다 · 글마다 다른 진짜 첨부는 남긴다',
+      [removed, notices.map((n) => n.attachments.length), reg[0].attachments.length], [4, [1, 1, 1], 1]);
+    const two = [1, 2].map((n) => ({ url: `https://a.ac.kr/x?n=${n}`, attachments: [{ name: '같은 신청서.hwp', url: 'https://a.ac.kr/f/1.hwp' }] }));
+    eq('  두 공고까지는 공통으로 보지 않는다(같은 사업을 두 글로 올린 경우)', [AL.stripSiteChrome([two]), two[0].attachments.length], [0, 1]);
+    eq('  화면 틀 글자가 그대로 남은 이름(`\' + fileItem.fileNm + \'`)은 첨부가 아니다',
+      AL.linkAttachments([{ title: "' + fileItem.fileNm + '", url: 'https://kep.kookmin.ac.kr/com/cmsv/FileCtr/fileDefaultDownload.do?fileNo=' }], 'https://kep.kookmin.ac.kr/x').length, 0);
+    for (const f of ['collect.mjs', 'browser-collect.mjs', 'auto-register.mjs']) {
+      eq(`  ${f} 가 저장 전에 stripSiteChrome 을 부른다`, /stripSiteChrome\(/.test(readText(new URL('../collector/' + f, import.meta.url))), true);
+    }
+  }
   eq('공고문은 읽을 대상', AT.isNoticeDoc('2026년 장학생 선발 공고문.hwp'), true);
   eq('  신청서는 읽지 않는다', AT.isNoticeDoc('장학금 신청서.hwp'), false);
   eq('  개인정보 동의서도 읽지 않는다', AT.isNoticeDoc('개인정보 수집·이용 동의서.hwp'), false);
@@ -5718,6 +5824,39 @@ console.log('\n■ 금액 산정 — 부풀리지 않는가 (2026-08-27)');
     wonOf(['장학금액', '한 학기 장학금 12,420천원 (약 $0.9만), 4개월 이상 체류']), 12420000);
   eq('  천만원이 천원보다 먼저다', wonOf(['장학금액 : 5천만원(1인당)']), 50000000);
   eq('  수수료 5천원은 금액이 아니다', kindOf(['장학금액', '발급 수수료 5천원']), 'unknown');
+  /* ①-4 원문에 금액이 또렷한데 '금액 원문 확인'이던 다섯 꼴 (2026-10-05 · 노션 UI-12 · 전부 실제 원문 줄) */
+  eq('이름표 뒤가 콜론 대신 ` - ` (경주시장학회 공고문)', wonOf(['□ 장학금액 - 1인당 200만원']), 2000000);
+  eq('  ` - ` 꼴이어도 총액은 읽지 않는다', kindOf(['- 장학금액 - 총상금 5천만원']), 'unknown');
+  eq('  `총 2회 지급` 은 총액이 아니다 (외대 가족장학금 — 맨 `총`+숫자를 총액으로 넣었다가 5건을 잃었다)',
+    wonOf(['가 . 장학금액 : 최대 1,000,000 원 ( 등록금 범위 내 지급 )', '나 . 1 가족당 형제 · 자매 합산하여 총 2 회에 한하여 지급']), 1000000);
+  eq('장학금액이 `등록금액` 그 자체면 등록금 전액 (의대 81학번 후배 사랑)',
+    PA.amountFrom(['4. 장학금액 (1 인당 ) : 등록금액 ( 본 장학금은 생활비성 장학금으로 등록금 범위 초과하여 지급 가능 )']).ratio, 1);
+  eq('  `등록금액 범위 내` 는 얼마인지 모른다', kindOf(['장학금액 : 등록금액 범위 내 지급']), 'unknown');
+  eq('  `등록금액의 50%` 는 절반', PA.amountFrom(['장학금액 : 등록금액의 50%']).ratio, 0.5);
+  eq('선발인원 줄의 `/ 1 인 150 만 원` (대전청년내일재단 성취)',
+    wonOf(['나 . 선발인원 : 468 명 ( 대전 지역 소재 대학 374 명 , 타지역 소재 대학 94 명 ) / 1 인 150 만 원']), 1500000);
+  eq('  1인 표시 없는 인원 줄은 금액이 아니다', kindOf(['나. 선발인원 : 30명 (예산 4,500만원)']), 'unknown');
+  eq('`지원 규모 및 성격 :` (송화재단 — 다음 줄의 `선발인원 : 0명` 은 예산 신호가 아니다)',
+    wonOf(['나. 지원 규모 및 성격 : 3,000,000원(한 학기), 등록금성', '다. 선발인원 : 0명 (재단 내부 심사에 따른 선발인원 추후 확정)']), 3000000);
+  eq('  인원이 같이 적힌 지원 규모는 예산이다', kindOf(['지원 규모 : 100명, 5억원']), 'unknown');
+  eq('  1인당 표시 없이 천만원을 넘는 지원 규모는 예산이다', kindOf(['지원규모 : 5억원']), 'unknown');
+  eq('번호 붙은 맨 `장학금` 머리글 + 대상별 금액이면 대학생 몫 (봄내장학생)',
+    wonOf(['7. 장학금', '고등학생 50만 원, 대학생 최대 100만 원', '* 원격대학장학생: 최대 50만원, 세인트존스대학교장학생: 500만원']), 1000000);
+  eq('  글자가 벌어진 `장 학 금:` 도 이름표', wonOf(['❍ 장 학 금: 고등학생 50만 원, 대학생 최대 100만 원']), 1000000);
+  eq('  번호 없는 맨 `장학금` 은 메뉴다', kindOf(['# 장학금', '등록금 납부 50만원']), 'unknown');
+  eq('괄호 이름표 `ㅇ (지 급 액) 1인 150만 원` (대전청년내일재단 공고문 HWPX)',
+    wonOf(['ㅇ (선발인원) 468명(대전 소재 대학생 374명, 타지역 소재 대학생 94명)', 'ㅇ (지 급 액) 1인 150만 원']), 1500000);
+  eq('  괄호 이름표가 금액이 아니면 머리글이 아니다', kindOf(['ㅇ (선발인원) 468명 · 예산 7억 200만 원']), 'unknown');
+  eq('`시급: 12,790원` — 콜론이 붙어도 시급형 (아주대 대청교 멘토 공고문)', kindOf(['장학금액', '5. 시급: 12,790원 x 멘토링 시간']), 'hourly');
+  /* 🔴 대상별로 비율이 갈리면 하나로 못 적는다 — 로봇이 「전액」으로 읽어 합계에 넣고 있었다(2026-10-05 · 등록 4건) */
+  eq('재직 기업별로 갈리는 비율은 모른다 (고졸 후학습자)',
+    kindOf(['장학금액', '중소·중견기업 : 수혜 학기 등록금 전액', '대기업·비영리기관 : 수혜 학기 등록금 50%']), 'unknown');
+  eq('  괄호 속 예외 비율도 갈림이다', kindOf(['■ 지원내용 : 등록금 전액 ( 단 , 대기업 및 비영리법인 , 비사업자는 50% 지원 )']), 'unknown');
+  eq('  분수 비율도 (장애학생장학 · 수업료 전액 / 2/3)',
+    kindOf(['2. 장학금액 : 장애의 정도가 심한 장애인 – 수업료 전액 장애의 정도가 심하지 않은 장애인 – 수업료의 2/3']), 'unknown');
+  eq('  같은 비율을 두 번 말한 것은 갈림이 아니다',
+    PA.amountFrom(['2. 선발인원 및 지원금액 : 1 명 (서울 ), 등록금 전액 * 타 장학금 수혜내역이 있는 학생의 경우 , 선발 후 타 장학금액과 포함하여 전액지원']).ratio, 1);
+  eq('  비율 하나면 그대로 (소망장학금)', PA.amountFrom(['4. 장학금액: 수업료의 50% 금액']).ratio, 0.5);
   /* 넓히면서 드러난 옛 구멍 둘 — 둘 다 실제 원문 줄이다 */
   eq('숫자 속 쉼표에서 조각을 가르지 않는다 (1인당 최대 1,000,000원)',
     wonOf(['장학금액', '1인당 최대 1,000,000원', '(인당 지원액) 개인별 상이(최대 500천원) ※대출이자 금액에 따라 상이']), 1000000);
@@ -6472,6 +6611,10 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
     eq('금액 줄을 돌려준다', v.ok && v.amountLines.includes('장학금액 : 1인당 300만원 (생활비성)'), true);
     /* 금액처럼 생기지 않은 줄은 버린다 — 자격 관문(REQ_SIGNAL)을 대면 안 되지만 아무거나 받아도 안 된다 */
     eq('금액이 아닌 줄은 버린다', v.ok && !v.amountLines.includes('문의 : 학생지원팀'), true);
+    /* `200만 원` — 만과 원 사이가 띄어진 원문도 금액 줄이다 (2026-10-05 · UI-12 · 산재 노동자 자녀 포스터에서 줄이 버려졌다) */
+    const v2 = AI.verifyPdfLines({ none: false, why: '', lines: ['대한민국 국적의 4년제 대학 재학생'], excludes: [],
+      amountLines: ['지원 내용 성장지원금 1인 200만 원 (2회 분할 지급)'] });
+    eq('`200만 원` 처럼 띄어 쓴 금액 줄도 받는다', v2.ok && v2.amountLines.length, 1);
     /* 그 줄을 parse-amount 에 먹이면 1인당 300만원이 나온다 (150만원 분할에 끌려가지 않는다) */
     const PAx = createRequire(import.meta.url)('../parse-amount.js');
     const a = PAx.amountFrom(['장학금액', '장학금액 : 1인당 300만원 (생활비성)', '지급 방법 : 학기당 150만원씩 2회 분할']);
@@ -6782,6 +6925,13 @@ console.log('\n■ 금액을 로봇이 못 읽은 공고 — 사람이 적는다
   eq('만원으로 딱 떨어지면 만원, 아니면 원',
      [wonText(5000000), wonText(1234000), amountText({ kind: 'range', min: 1000000, max: 3000000 })],
      ['500만원', '1,234,000원', '100만원 ~ 300만원']);
+  /* 🔴 로봇이 등록금 비율·시급까지 읽고도 카드는 '금액 원문 확인' 이던 것 (2026-10-05 · UI-12 — 등록 10건) */
+  eq('등록금 비율·시급도 카드 문구가 된다',
+     [amountText({ kind: 'ratio', ratio: 1 }), amountText({ kind: 'ratio', ratio: 0.5 }),
+      amountText({ kind: 'hourly', raw: '■ 장학금액 : 시간당 12,790원 ■ 근로시간 - 주 20시간' }),
+      amountText({ kind: 'hourly', raw: '근로장학금 : 10,320원/시간' })],
+     ['등록금 전액', '등록금 50%', '시급 12,790원', '시급 10,320원']);
+  eq('  시급 숫자를 못 찾으면 문구를 만들지 않는다', amountText({ kind: 'hourly', raw: '활동 시간 기준 지급' }), '');
   /* 🔴 이미 숫자가 든 문구는 건드리지 않는다 — 사람이 다듬은 뜻을 맨 숫자로 덮으면 사라진다 */
   eq('이미 숫자가 든 문구는 덮지 않는다',
      amountAfterValue('등록금 + 영농정착 지원 300만원', 5000000), '등록금 + 영농정착 지원 300만원');
@@ -7281,7 +7431,7 @@ console.log('\n■ 첫 실행 화면 (2026-09-09)');
   eq('boot.js 에 시한이 있다 (갇히지 않는다)', /BOOT_TIMEOUT_MS/.test(bootJs), true);
   eq('boot.js 가 걷는 손잡이를 연다', /window\.bootDone/.test(bootJs), true);
   eq('app.js 가 화면을 정한 뒤 부팅 화면을 걷는다',
-    /window\.bootDone\(\)/.test(readText(new URL('app.js', root))), true);
+    /window\.bootDone\(bootSettled\)/.test(readText(new URL('app.js', root))), true);
 
   /* ③ 🔴 boot.js 는 **다른 스크립트보다 먼저** 실려야 한다. 뒤에 두면 그 사이가
      그대로 비고, 그게 이 파일이 없애려던 바로 그 틈이다. */
@@ -7572,74 +7722,91 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   eq('온보딩 갈무리가 id 없는 체크박스도 담는다', /check-list[\s\S]{0,200}checked/.test(appJs), true);
   eq('되살릴 때 캠퍼스 칸을 다시 그린다', /renderCampusChips\(campus\)/.test(appJs), true);
 
-  /* ⑥ 🔴 부팅 화면에 **바닥값**이 있어야 한다 (2026-09-09 개발자 지적:
-     "환영 화면이 나타났지만 사용자가 겨우 볼 수 있을 만큼 시간이 짧았어").
-     바닥값이 없으면 보이는 길이가 **앱 코드가 실리는 데 걸린 시간 그대로**라 기기마다
-     들쭉날쭉하고, 캐시가 데워진 폰에서는 깜빡이고 만다. */
+  /* ⑥ 🔴 부팅 화면을 **보여 주는 시간** — 켤 때마다 인트로 (2026-10-04 개발자 지시:
+     "선이 그려지는 에니메이션 -> 페이드아웃 효과 전체로 통일"). 인트로가 돌기 시작한 뒤 최소 시간을 지키고
+     걷는다 — 2026-09-09 의 1초 바닥값을 대신한다(인트로가 늘 그보다 길다). */
   const bootJs2 = readText(new URL('../boot.js', import.meta.url));
-  const minMs = Number((bootJs2.match(/BOOT_MIN_SHOW_MS\s*=\s*(\d+)/) || [])[1]);
-  eq('부팅 화면에 최소로 보여 주는 시간이 있다', minMs > 0, true);
-  eq('그 시간을 실제로 기다린다 (선언만 해 두지 않는다)',
-    /BOOT_MIN_SHOW_MS\s*-\s*sinceShown\(\)/.test(bootJs2), true);
-  eq('시한(6초)보다는 짧다', minMs < Number((bootJs2.match(/BOOT_TIMEOUT_MS\s*=\s*(\d+)/) || [])[1]), true);
-  /* 🔴 **시안에서 개발자가 보고 고른 값과 같아야 한다** — 갈라지면 승인받은 것과 다른 것이 나간다.
-     ⚠️ 750 을 못 박지 않는다(2026-09-09 코드 리뷰): 개발자가 나중에 값을 바꾸기로 하고 시안·앱을
-        **함께** 고치면, 못 박아 둔 검사가 '둘이 다르다'는 라벨로 빨간불을 낸다 — 없는 불일치를
-        있다고 말하는 것이라 다음 세션이 엉뚱한 곳을 뒤진다. 재는 것은 '둘이 같은가' 하나다. */
+  const introShow = Number((bootJs2.match(/BOOT_INTRO_SHOW_MS\s*=\s*(\d+)/) || [])[1]);
+  eq('인트로를 보여 주는 최소 시간이 있다', introShow > 0, true);
+  eq('그 시간을 실제로 기다린다 (인트로가 돈 뒤 그만큼 지나서 걷는다)',
+    /setTimeout\(fadeOut,\s*introSkip \? 0 : BOOT_INTRO_SHOW_MS\)/.test(bootJs2), true);
+  eq('옛 1초 바닥값이 남아 있지 않다 (둘이 섞이면 어느 쪽이 이기는지 모른다)', /BOOT_MIN_SHOW_MS|sinceShown/.test(bootJs2), false);
+  eq('시한(6초)보다는 짧다', introShow < Number((bootJs2.match(/BOOT_TIMEOUT_MS\s*=\s*(\d+)/) || [])[1]), true);
+  /* 🔴 **시안에서 개발자가 보고 고른 값과 같아야 한다** — 값을 못 박지 않고 둘이 같은가만 잰다(2026-09-09 코드 리뷰) */
   const mock = readText(new URL('../docs/designs/mockups/first-run/Main.dc.html', import.meta.url));
   const mockMs = Number((mock.match(/booting:\s*false\s*\}\);\s*resolve\(\);\s*\},\s*(\d+)\)/) || [])[1]);
   eq('시안에서 값을 읽어 냈다 (읽기 실패는 NaN 이라 조용히 통과하면 안 된다)', Number.isFinite(mockMs), true);
-  eq('시안이 쓰는 값과 앱이 쓰는 값이 같다', minMs, mockMs);
+  eq('시안(첫 실행 흐름)의 부팅 길이와 앱의 인트로 길이가 같다', introShow, mockMs);
 
-  /* ⑨ 🔴 부팅 화면의 **등장 움직임** (2026-09-09 개발자 지시: "로고나 글자가 애니메이션
-     형태로 나타난다. 하지만 앱의 신뢰성을 떨어뜨리지 않으면서도 깔끔해야 한다").
-     지키는 것은 그 두 조건을 옮긴 셋이다 — 셋 다 값이 어긋나면 조용히 나빠지는 유형이라
-     글로만 적어 두면 다음 세션이 되돌린다. */
+  /* ⑨ 🔴 부팅 화면의 **등장 = 인트로**, 그것도 **앱이 다 그려지고 손이 빈 뒤에** (2026-10-04 개발자 지적:
+     "시안과 같이 스무스한 트랜지션이 필요한데 지금 현황은 중간에 끊기고 프로페셔널하지 못해").
+     실측(4배 느린 CPU): 스크립트가 실리는 동안 돌린 인트로는 6초에 프레임 20장 · 1.6초씩 멈췄다 —
+     자격 엔진이 홈을 그리는 일과 선 긋기가 같은 줄(메인 스레드)을 쓴다. 그래서 순서를 지킨다. */
   const css = readText(new URL('../style.css', import.meta.url));
   const bootMock = readText(new URL('../docs/designs/mockups/first-run/Boot.dc.html', import.meta.url));
-  /* 이름으로 그 애니메이션이 쓰인 선언 한 줄을 집어 초 단위 값만 읽는다.
-     shorthand 는 앞의 시간이 길이, 뒤의 시간이 늦추기다. */
   const useOf = (text, name) => {
     const decl = (text.match(new RegExp('animation:[^;]*\\b' + name + '\\b[^;]*;')) || [''])[0];
     const seg = decl.split(',').find((s) => s.includes(name)) || '';
-    /* cubic-bezier 안의 숫자에는 s 가 안 붙으므로 여기서 걸리지 않는다 */
     const secs = [...seg.matchAll(/([\d.]+)s\b/g)].map((m) => Number(m[1]) * 1000);
     return { dur: secs[0], delay: secs[1] || 0, decl };
   };
-  const logoIn = useOf(css, 'boot-in-logo');
-  const wordIn = useOf(css, 'boot-in-word');
+  eq('켤 때마다 인트로다 (오늘 처음 · 4시간 같은 조건이 없다)', /BOOT_INTRO_GAP_MS|toDateString|handaejang\.resume/.test(bootJs2), false);
+  eq('인트로는 앱이 다 된 뒤에 돈다 (bootDone 이 손이 빌 때를 기다려 runIntro)',
+    /window\.bootDone = function[\s\S]{0,400}whenQuiet\(runIntro\)/.test(bootJs2), true);
+  eq('  스크립트가 실리는 동안에는 돌리지 않는다 (runIntro 를 부르는 곳이 그 하나뿐이다)',
+    (bootJs2.match(/runIntro\b/g) || []).length === 2 && !/setTimeout\(runIntro/.test(bootJs2), true);
+  const quietBody = bootJs2.slice(bootJs2.indexOf('function whenQuiet'), bootJs2.indexOf('function runIntro'));
+  eq('손이 빈 것을 프레임 간격으로 잰다 (iOS 사파리에는 longtask 가 없다)',
+    /requestAnimationFrame/.test(quietBody) && /BOOT_QUIET_GAP_MS/.test(quietBody) && /BOOT_QUIET_FRAMES/.test(quietBody), true);
+  eq('  손이 비고 글꼴도 준비돼야 돈다', /good >= BOOT_QUIET_FRAMES && fontReady/.test(quietBody), true);
+  eq('  그래도 무한정 기다리지 않는다 (천장)', /Date\.now\(\) - since > BOOT_QUIET_MAX_MS/.test(quietBody), true);
+  eq('인트로가 돌기 전에는 로고·글자가 보이지 않는다 (빈 덮개 · 시스템 스플래시와 이음매 없음)',
+    /\.boot-logo, \.boot-word \{ opacity: 0;/.test(css), true);
+  eq('움직이는 것은 따로 층을 받는다 (will-change — 앱이 일해도 투명도·크기·흐림은 끊기지 않게)',
+    /\.boot-logo, \.boot-word \{[^}]*will-change:\s*opacity, transform, filter/.test(css), true);
+  eq('옛 0.56초 등장이 남아 있지 않다 (두 등장이 섞이면 로고가 두 번 나타난다)', /boot-in-logo|boot-in-word/.test(css), false);
   const spinIn = useOf(css, 'boot-spin-in');
-  eq('로고에 등장 움직임이 있다', Number.isFinite(logoIn.dur), true);
-  eq('글자에 등장 움직임이 있다', Number.isFinite(wordIn.dur), true);
-
-  /* ㉮ **바닥값보다 일찍 끝난다.** 걷히는 순간까지 움직이고 있으면 급해 보인다 —
-     끝나고 고요한 시간이 남아야 '차분히 놓였다'로 읽힌다. */
-  eq('로고 등장이 최소 노출 시간 안에 끝난다', logoIn.dur + logoIn.delay < minMs, true);
-  eq('글자 등장이 최소 노출 시간 안에 끝난다', wordIn.dur + wordIn.delay < minMs, true);
-
-  /* ㉯ **한 번만 나타나고 멈춘다.** 로고·글자가 계속 움직이면 '들어왔다'가 아니라
-     '아직도 로딩 중'으로 읽힌다 — 그게 신뢰를 깎는 자리다. */
-  eq('로고가 계속 움직이지 않는다', /infinite/.test(logoIn.decl), false);
-  eq('글자가 계속 움직이지 않는다', /infinite/.test(wordIn.decl), false);
-
-  /* ㉰ 계속 도는 표시는 **바닥값이 지난 뒤에야** 나온다 — 앱이 제때 오면 학생은 못 본다.
-     처음부터 띄우면 빠른 기기에서도 매번 '기다리는 화면'이 된다. */
-  eq('도는 표시가 최소 노출 시간이 지난 뒤에 나타난다', spinIn.delay > minMs, true);
-
+  eq('도는 표시는 오래 걸릴 때만 나온다 (2초 넘게 앱이 안 올 때)', spinIn.delay >= 2000, true, String(spinIn.delay));
+  eq('인트로가 돌면 도는 표시를 끈다 (앱이 이미 왔다는 뜻)',
+    /#boot\.boot-intro-run \.boot-spin\s*\{\s*animation:\s*none;\s*opacity:\s*0/.test(css), true);
   /* 🔴 그 표시는 등장 애니메이션이 opacity 를 올리므로, 움직임을 줄인 기기에서
      `animation: none` 만 주면 **영영 안 보인다**(느린 기기에서 아무 표시도 없는 빈 화면). */
   const reduce = css.slice(css.indexOf('@media (prefers-reduced-motion: reduce)', css.indexOf('.boot-spin')));
-  eq('움직임을 줄인 기기에서 로고·글자 등장을 끈다',
-    /\.boot-logo,\s*\.boot-word\s*\{\s*animation:\s*none/.test(reduce.slice(0, 400)), true);
   eq('그때 도는 표시는 보이게 되돌린다 (안 그러면 영영 안 보인다)',
     /\.boot-spin\s*\{\s*animation:\s*none;\s*opacity:\s*1/.test(reduce.slice(0, 400)), true);
-
-  /* 🔴 시안과 앱이 갈라지지 않는다 — 값을 못 박지 않고 **둘이 같은가**만 잰다(위 ⑥과 같은 이유) */
-  eq('시안의 로고 등장이 앱과 같다',
-    [logoIn.dur, logoIn.delay], [useOf(bootMock, 'boot-in-logo').dur, useOf(bootMock, 'boot-in-logo').delay]);
-  eq('시안의 글자 등장이 앱과 같다',
-    [wordIn.dur, wordIn.delay], [useOf(bootMock, 'boot-in-word').dur, useOf(bootMock, 'boot-in-word').delay]);
-  eq('시안의 도는 표시 지연이 앱과 같다', spinIn.delay, useOf(bootMock, 'boot-spin-in').delay);
+  eq('움직임 줄이기에서 인트로는 다 그려진 로고 한 장이다',
+    /#boot \.boot-logo, #boot \.boot-word, #boot\.boot-intro-run \.boot-logo, #boot\.boot-intro-run \.boot-word \{ animation: none; opacity: 1; \}/.test(reduce.slice(0, 1400))
+      && /#boot \.boot-logo path, #boot\.boot-intro-run \.boot-logo path \{ animation: none; stroke-dashoffset: 0; \}/.test(reduce.slice(0, 1400)), true);
+  /* ⑨-2 🔴 **덮개 밑에서 홈을 일곱 번 다시 그리지 않는다** (2026-10-04 실측 — 인트로가 끊긴 진짜 원인).
+     데이터 파일이 하나 올 때마다 홈을 통째로 그려 0.4~1.8초씩 멈췄고, 파일이 오는 틈을 프레임 감지가
+     '한가하다'로 읽어 인트로를 그 한가운데에 시작했다. 고친 뒤(4배 느린 CPU): 인트로 1.7초에 프레임 100장 · 최악 간격 0.05초. */
+  const bootApp = readText(new URL('../app.js', import.meta.url));
+  const bootNotify = readText(new URL('../notify.js', import.meta.url));
+  eq('덮개가 떠 있는 동안 다시 그리기는 모아 둔다 (rerenderVisible 이 bootHold 를 본다)',
+    /function rerenderVisible\(\) \{\s*if \(!state\.profile\) return;\s*if \(bootHold\) \{ bootHeld = true; return; \}/.test(bootApp), true);
+  eq('  덮개가 걷히면 무조건 푼다 (늦게 온 데이터도 그려진다)', /addEventListener\('boot:gone', bootHoldRelease\)/.test(bootApp), true);
+  eq('  boot.js 가 덮개를 다 걷은 뒤 boot:gone 을 알린다',
+    /el\.hidden = true;[\s\S]{0,200}dispatchEvent\(new Event\('boot:gone'\)\)/.test(bootJs2), true);
+  const bootLoads = (bootApp.match(/const bootJobs = \[([^\]]*)\]/) || [])[1] || '';
+  eq('처음 받는 데이터가 전부 그 모음에 든다 (refreshAllData 의 로더 + 등록금 + 보관함)',
+    ['loadNotices', 'loadNews', 'loadActivities', 'loadExternal', 'loadRegistered', 'loadKosaf'].every((f) => bootLoads.includes(f + '()'))
+      && /bootJobs\.push\(loadTuition\(\)\)/.test(bootApp) && /bootJobs\.push\(walletRefresh\(\)/.test(bootApp), true);
+  eq('  그 모음을 지나는 곳은 전부 rerenderVisible 로 그린다 (renderHome 을 바로 부르면 모으기를 건너뛴다)',
+    !/tuitionTable = [^\n]*\n\s*if \(state\.profile && !\$\('#screen-home'\)\.hidden\) renderHome\(\)/.test(bootApp)
+      && /bootJobs\.push\(walletRefresh\(\)\.then\(photoRefresh\)\.then\(\(\) => \{\s*refreshOpenScreen\(\);\s*rerenderVisible\(\);/.test(bootApp), true);
+  eq('덮개에 \'다 와서 한 번 그렸다\'는 약속을 건넨다 (bootDone(bootSettled))',
+    /const bootSettled = Promise\.all\(bootJobs[^\n]*\.then\(bootHoldRelease\)/.test(bootApp) && /window\.bootDone\(bootSettled\)/.test(bootApp), true);
+  eq('  boot.js 는 그 약속을 기다린 뒤 프레임을 본다 (천장 있음)',
+    /settled\.then\(go, go\)/.test(bootJs2) && /setTimeout\(go, BOOT_SETTLE_MAX_MS\)/.test(bootJs2)
+      && /var go = function \(\) \{ if \(went\) return; went = true; whenQuiet\(runIntro\); \}/.test(bootJs2), true);
+  eq('  덮개 파일이 없어도 모으기는 풀린다', /if \(typeof window\.bootDone === 'function'\) window\.bootDone\(bootSettled\);\s*else bootHoldRelease\(\);/.test(bootApp), true);
+  eq('알림 쪽에 \'덮개가 걷힌 뒤\' 손잡이가 있다 (boot:gone · 덮개가 없으면 곧바로)',
+    /function notifyAfterBoot\(fn\) \{[\s\S]{0,200}boot\.hidden\) \{ fn\(\); return; \}[\s\S]{0,200}addEventListener\('boot:gone', once, \{ once: true \}\)/.test(bootNotify), true);
+  eq('  첫 알림 확인(자격 엔진 0.4초)은 그 뒤에 돈다 (1.2초 시계가 인트로 한가운데에 떨어졌다)',
+    /setTimeout\(\(\) => notifyAfterBoot\(\(\) => \{ notifyCheck\(\{ quiet: true \}\)/.test(bootNotify)
+      && !/setTimeout\(\(\) => \{ notifyCheck\(\{ quiet: true \}\)/.test(bootNotify), true);
+  eq('  알림 동의 시트도 그 뒤에 뜬다 (페이드가 끝나는 순간 앱 대신 시트가 보였다)',
+    /notifyAfterBoot\(\(\) => setTimeout\(\(\) => \{\s*if \(notifyLedger\.askedAt\) return;/.test(bootNotify), true);
 
   /* ⑩ 🔴 부팅 화면의 **걷힘 움직임** — 페이드 (2026-10-04 개발자 결정: "둘 다 페이드로").
      로고·글자가 살짝 커지며 흐려지고 덮개가 투명해지며 밑의 앱이 드러난다(.boot-fade).
@@ -7683,24 +7850,12 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   eq('시안의 스크립트도 시간을 CSS 에서 읽는다 (숫자를 박으면 CSS 를 고칠 때 어긋난다)',
     /ms\('--boot-fade'\)/.test(bootMock) && !/,\s*\d[\d.]*\s*\+\s*\d/.test(bootMock.slice(bootMock.indexOf('<script>'))), true);
 
-  /* ⑪ 🔴 **인트로** — 오늘 처음 열었거나 4시간 넘게 쉬었을 때만 (2026-10-04 개발자 승인 · 시안 A안).
+  /* ⑪ 🔴 **인트로의 움직임** (2026-10-04 개발자 승인 · 시안 A안 · 켤 때마다).
      학사모 선이 그려지고 금색 점이 맺힌 뒤 '한대장' 이 나타나고, 정지했다가 위의 페이드로 걷힌다. */
-  const gapMs = (() => {
-    const m = bootJs2.match(/BOOT_INTRO_GAP_MS\s*=\s*([\d\s*]+);/);
-    return m ? m[1].split('*').reduce((a, b) => a * Number(b.trim()), 1) : NaN;
-  })();
-  /* 🔴 '홈으로 간다'(이어보기 창)와 '인트로가 뜬다'가 같은 순간에 바뀌어야 한다 — 두 곳에 적은 값을 대조한다 */
-  eq('인트로 간격이 이어보기 창(resume.js RESUME_WINDOW_MS)과 같다', gapMs, R.RESUME_WINDOW_MS);
-  eq('인트로 판단이 이어보기 장부의 마지막 시각을 읽는다', /localStorage\.getItem\('handaejang\.resume'\)/.test(bootJs2), true);
-  eq('날짜가 바뀌어도 인트로다 (오늘 처음 연 것)', /toDateString\(\)\s*!==\s*new Date\(nowAt\)\.toDateString\(\)/.test(bootJs2), true);
-  eq('처음 켠 학생에게는 인트로를 보이지 않는다 (온보딩 정문 투어링이 먼저)', /if \(!first\)\s*\{[\s\S]{0,120}handaejang\.resume/.test(bootJs2), true);
-  /* 🔴 글꼴을 기다린 뒤에 돈다 — 안 기다리면 '한대장' 이 뜨기 전에 앱으로 넘어간다(2026-10-04 시안에서 지적) */
+  /* 🔴 글꼴을 기다린다 — 안 기다리면 '한대장' 이 뜨기 전에 움직임이 끝난다(2026-10-04 시안에서 지적) */
   eq('인트로가 글꼴 준비를 기다린다 (document.fonts.load)', /document\.fonts\.load\([^)]*한대장/.test(bootJs2), true);
-  eq('  그래도 무한정 기다리지는 않는다 (천장)', /setTimeout\(runIntro,\s*BOOT_FONT_WAIT_MS\)/.test(bootJs2), true);
-  eq('  최소 노출 시간을 인트로가 실제로 돈 때부터 센다',
-    /BOOT_INTRO_SHOW_MS\s*-\s*\(Date\.now\(\)\s*-\s*introRunAt\)/.test(bootJs2), true);
-  const introShow = Number((bootJs2.match(/BOOT_INTRO_SHOW_MS\s*=\s*(\d+)/) || [])[1]);
-  const introMock = readText(new URL('../docs/designs/mockups/first-run/Intro.dc.html', import.meta.url));
+  eq('  그래도 무한정 기다리지는 않는다 (천장)', /setTimeout\(markFont,\s*BOOT_FONT_WAIT_MS\)/.test(bootJs2), true);
+  const introMock = bootMock;
   /* 앱의 선택자 하나와 시안의 선택자 하나에서 같은 애니메이션의 길이·늦추기를 읽는다 */
   const useSel = (text, sel) => {
     const i = text.indexOf(sel);
@@ -7710,12 +7865,12 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
     return { dur: secs[0], delay: secs[1] || 0, decl };
   };
   const PAIRS = [
-    ['로고', '#boot.boot-intro.boot-intro-run .boot-logo {', '.m-run .m-logo {'],
+    ['로고', '#boot.boot-intro-run .boot-logo {', '.m-run .m-logo {'],
     ['첫 선', '.boot-logo path:nth-of-type(1) {', '.m-logo path:nth-of-type(1) {'],
     ['둘째 선', '.boot-logo path:nth-of-type(2) {', '.m-logo path:nth-of-type(2) {'],
     ['셋째 선', '.boot-logo path:nth-of-type(3) {', '.m-logo path:nth-of-type(3) {'],
-    ['금색 점', '#boot.boot-intro.boot-intro-run .boot-dot {', '.m-run .m-dot {'],
-    ['글자', '#boot.boot-intro.boot-intro-run .boot-word {', '.m-run .m-word {'],
+    ['금색 점', '#boot.boot-intro-run .boot-dot {', '.m-run .m-dot {'],
+    ['글자', '#boot.boot-intro-run .boot-word {', '.m-run .m-word {'],
   ];
   let introEnd = 0;
   for (const [label, appSel, mockSel] of PAIRS) {
@@ -7725,28 +7880,14 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
     eq(`  한 번만 움직인다 (${label})`, /infinite/.test(a.decl), false);
     introEnd = Math.max(introEnd, a.dur + a.delay);
   }
-  /* ㉮ 다 나타난 뒤 고요한 정지가 남아야 한다 — 걷히는 순간까지 움직이면 급해 보인다(평소 부팅과 같은 이유) */
+  /* ㉮ 다 나타난 뒤 고요한 정지가 남아야 한다 — 걷히는 순간까지 움직이면 급해 보인다 */
   eq('인트로 움직임이 최소 노출 시간 안에 끝난다 (끝나고 정지가 남는다)', introEnd < introShow, true, `${introEnd} < ${introShow}`);
   eq('인트로 최소 노출 시간이 시안과 같다', introShow, Number((introMock.match(/INTRO_SHOW_MS\s*=\s*(\d+)/) || [])[1]));
-  eq('인트로 전체(글꼴 천장 + 노출)가 시한(6초)보다 짧다',
-    Number((bootJs2.match(/BOOT_FONT_WAIT_MS\s*=\s*(\d+)/) || [])[1]) + introShow
-      < Number((bootJs2.match(/BOOT_TIMEOUT_MS\s*=\s*(\d+)/) || [])[1]), true);
   /* 부팅 덮개 블록만, 주석을 걷어 내고 본다 — 주석에는 '왜 넣지 않는가'를 적느라 그 문구가 있다 */
   const idxHtml = readText(new URL('../index.html', import.meta.url));
   const bootHtml = idxHtml.slice(idxHtml.indexOf('<div id="boot">'), idxHtml.indexOf('id="boot-fail"')).replace(/<!--[\s\S]*?-->/g, '');
   eq('부팅 덮개 블록을 읽어 냈다', bootHtml.includes('boot-word'), true);
   eq('태그라인이 없다 (매일 보는 화면의 광고 · 2026-10-04 개발자 확인)', /한 번에 찾고|장학금은 끝까지/.test(bootHtml), false);
-  /* 🔴 인트로가 평소 지연보다 길어 도는 표시가 매번 스며 나왔다(2026-10-04 브라우저 확인) —
-     인트로 날의 표시는 '글꼴 천장 + 인트로 노출' 이 지난 뒤에야 나와야 한다 */
-  const introSpin = useSel(bootBlock, '#boot.boot-intro .boot-spin {');
-  const spinDelay = (() => { const d = introSpin.decl.split(',').find((x) => x.includes('boot-spin-in')) || '';
-    const secs = [...d.matchAll(/([\d.]+)s\b/g)].map((m) => Number(m[1]) * 1000); return secs[1]; })();
-  eq('인트로 날의 도는 표시는 인트로가 끝난 뒤에야 나온다 (앱이 제때 오면 못 본다)',
-    spinDelay > Number((bootJs2.match(/BOOT_FONT_WAIT_MS\s*=\s*(\d+)/) || [])[1]) + introShow, true, String(spinDelay));
-  eq('움직임 줄이기에서 인트로는 다 그려진 로고 한 장이다',
-    /#boot\.boot-intro \.boot-logo path, #boot\.boot-intro\.boot-intro-run \.boot-logo path \{ animation: none; stroke-dashoffset: 0; \}/.test(reduce.slice(0, 1400)), true);
-  eq('스크립트보다 그림이 먼저 나와도 평소 등장이 시작되지 않는다 (인트로 날 깜빡임 방지)',
-    /html:not\(\[data-boot\]\) \.boot-logo,\s*html:not\(\[data-boot\]\) \.boot-word \{ animation-play-state: paused; \}/.test(css), true);
 
   /* ⑧ 🔴 알림 딥링크는 **공고 목록이 올 때까지 기다린다** (2026-09-09 개발자 지적).
      한 번 보고 없으면 탐색 탭으로 보내던 것이 원인이었다 — 회선이 느린 폰에서는 늘 그랬다. */
@@ -9669,6 +9810,17 @@ console.log('■ 첨부에서 마감일 — 본문이 껍데기인 게시판 (20
       읽힌것.length > 0 || Object.keys(색인).length === 0, true);
   }
   eq('첨부에서 마감을 읽는 함수가 있다', typeof AWAIT_EE.deadlineFromDocs, 'function');
+  /* 🔴 제목이 '연장'인데 첨부가 **연장 전 원래 공고문**이면 그 마감은 지난 기간이다 (2026-10-05 · UI-12 —
+     상명대 「인재육성 장학생 선발계획 공고 안내(기간 연장)」 의 첨부가 원래 공고문이라 9.23 을 읽어 10.8 까지 열린 공고를 닫을 뻔했다) */
+  {
+    const 원래 = Object.assign(['신청기간 : 2026. 9. 1.(월) ~ 9. 23.(수) 17:00 까지'], { files: ['a.hwpx'] });
+    const 연장본 = Object.assign(['선발계획을 아래와 같이 연장 공고합니다.\n신청기간 : 2026. 9. 1.(월) ~ 10. 8.(목) 17:00 까지'], { files: ['b.hwpx'] });
+    eq('  제목이 연장인데 첨부가 원래 공고문이면 마감을 안 읽는다',
+      AWAIT_EE.deadlineFromDocs({ id: 'x', name: '2026년 하반기 인재육성 장학생 선발계획 공고 안내(기간 연장)' }, 원래), null);
+    eq('    첨부도 연장 공고면 읽는다',
+      AWAIT_EE.deadlineFromDocs({ id: 'x', name: '선발계획 연장 공고' }, 연장본), '2026-10-08');
+    eq('    제목에 연장이 없으면 그대로', AWAIT_EE.deadlineFromDocs({ id: 'x', name: '선발계획 공고' }, 원래), '2026-09-23');
+  }
 
   /* ⚠️ 붙임 자르기·발표 이름표·관리자 표식은 **선주 세션 판**이 더 촘촘해 그쪽을 남겼다
      (아래 ④ 절 — 붙임 변형 일곱·통째 붙임·서류 목록 속 [서식 n]·첨부에서 접수시작/발표까지).
@@ -11595,7 +11747,7 @@ console.log('\n■ 자격요건 로봇 (진짜 브라우저) — 장학·대외�
   /* 🔴 PaddleOCR 판 고정 — 판을 안 적으면 그날 최신(3.3.x)이 깔려 x86 클라우드에서 모든 그림이 오류(2026-10-04 · 맥은 ARM 이라 멀쩡했다) */
   for (const f of ['rescue-bodies.yml', 'collect-scholarships.yml']) {
     const y = readText(new URL('../.github/workflows/' + f, import.meta.url));
-    eq(`  🔴 ${f} — PaddleOCR 은 판을 고정해 깐다`, [...y.matchAll(/pip install[^\n]*paddle[^\n]*/g)].map((m) => /paddlepaddle==[\d.]+ paddleocr==[\d.]+/.test(m[0])), [true]);
+    eq(`  🔴 ${f} — PaddleOCR 은 판을 고정해 깐다`, ((ms) => ms.length > 0 && ms.every((m) => /paddlepaddle==[\d.]+ paddleocr==[\d.]+/.test(m[0])))([...y.matchAll(/pip install[^\n]*paddle[^\n]*/g)]), true);   // 설치 줄이 여럿이어도(장학 포스터 · 대외활동) 전부
   }
   const caps = [...wf.matchAll(/^ {8}timeout-minutes: (\d+)/gm)].map((m) => Number(m[1]));
   const job = Number((wf.match(/^ {4}timeout-minutes: (\d+)/m) || [])[1]);
