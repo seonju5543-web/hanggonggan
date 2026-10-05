@@ -16,7 +16,7 @@ import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { canonUrl } from './canon-url.mjs';
 import { makeStripperMulti } from './page-boilerplate.mjs';   // 메뉴·푸터 껍데기를 걷어낸 본문만 읽는다 — 메뉴의 '발전기금'·'포털'이 증거로 세어졌다(첫 시험)
-import { classifyKind, schoolDomain, SCHOOL_APPLY_RE, domainMatches } from './kind-evidence.mjs';
+import { classifyKind, SCHOOL_APPLY_RE, domainMatches, domainForSchool } from './kind-evidence.mjs';
 import { loadSchoolNames, schoolTokens } from './school-names.mjs';
 import { mergeInto } from './registered-merge.mjs';
 const { sameProgram } = createRequire(import.meta.url)('../verify/entry-rules.cjs');
@@ -37,7 +37,9 @@ const strip = makeStripperMulti([texts]);
 const bodyByKey = new Map(texts.map((x) => [canonUrl(x.url), strip(x.url, x.text || '', { fallback: false })]));
 const schools = JSON.parse(fs.readFileSync(new URL('schools.json', HERE), 'utf8')).schools || [];
 const names = loadSchoolNames(new URL('../data.js', HERE));
-const domainOf = (school) => { const row = schools.find((x) => x.school === school && x.boardUrl); return row ? schoolDomain(row.boardUrl) : ''; };
+/* 학교 도메인 — 규칙은 kind-evidence.mjs domainForSchool 한 곳(schools.json 주소 → 없으면 브라우저 대상 첫 후보 · 2026-10-05 점검 collect-16). 읽기만 한다 */
+const browserTargets = (() => { try { return JSON.parse(fs.readFileSync(new URL('browser-targets.json', HERE), 'utf8')).targets || []; } catch { return []; } })();
+const domainOf = (school) => domainForSchool(school, schools, browserTargets);
 
 /* 이 항목이 '학교 한정 · 교외 · 로봇 등록' 인가 — 승격 후보의 조건 */
 export function isCandidate(it) {
