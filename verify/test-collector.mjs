@@ -1661,10 +1661,11 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
   eq('활동 글을 장학 피드(freshAll)에 넣지 않는다', /freshActs\.push\(it\)/.test(cm) && !/freshAll\.push\(it\);\s*\n\s*\}\s*\n\s*if \(isAct\)/.test(cm), true);
   eq('활동 파일도 60일·중복·서비스 학교·상한 규칙을 지킨다',
     /* 2026-10-01 — 공공 API 글만 seenAt(API 가 마지막으로 준 날)으로 잰다 · 게시판 글은 그대로 foundAt (「공공 API 로봇」 I3) */
-    /acts\.items = acts\.items\.filter\(\(n\) => \(\(n\.api && n\.seenAt\) \|\| n\.foundAt \|\| '9999'\) >= cutoff\)/.test(cm)
+    /* 2026-10-05 — 그 날짜(seenAt || foundAt)는 open-api-map.mjs actKeepDate 한 곳 · 상한도 같은 날짜로 고른다(capActivities · 점검 api-11) */
+    /acts\.items = acts\.items\.filter\(\(n\) => \(actKeepDate\(n\) \|\| '9999'\) >= cutoff\)/.test(cm)
     && /acts\.items = dedupeNotices\(acts\.items\)/.test(cm)
     && /dropUnserved\(acts\.items\.filter\(\(n\) => n\.school\)\)/.test(cm)
-    && /acts\.items = acts\.items\.slice\(0, ACT_CAP\)/.test(cm), true);
+    && /acts\.items = capActivities\(acts\.items, ACT_CAP\)/.test(cm), true);
   /* 🔴 블록 안에서 끝나야 한다 — 예전 [\s\S]*?continue; 는 파일 어디의 continue 에나 맞아 관문이 빈 채였다(2026-10-01 수리 · 코드는 return 으로 게시판을 마친다) */
   eq('전용 게시판은 장학 피드에 담지 않는다 (actResults 에 담고 return)', /if \(isAct\) \{\s*actResults\.push\(\{\s*name,[\s\S]{0,400}?items: freshA,\s*\}\);\s*return;/.test(cm), true);
   const strip = (t) => t.split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
@@ -11209,7 +11210,9 @@ console.log('\n■ 공공 API 로봇 (2026-10-01)');
   eq('I2 같은 제목의 게시판 글도 API 글이 대신한다', M.mergeApi([{ ...board, title: k1.title, url: 'https://board/9' }], { kstartup: { ok: true, items: [k1] } }, { today }).length, 1);
   const cmSrc = readText(new URL('../collector/collect.mjs', import.meta.url));
   eq('I3 API 글엔 seenAt 이 붙고, 수집 로봇의 60일 삭제는 API 글을 seenAt 으로 잰다',
-    [M.mergeApi([], { kstartup: { ok: true, items: [k1] } }, { today })[0].seenAt, /\(\(n\.api && n\.seenAt\) \|\| n\.foundAt \|\| '9999'\) >= cutoff/.test(cmSrc)], [today, true]);
+    /* 2026-10-05 — 그 날짜는 open-api-map.mjs actKeepDate 한 곳(수집 로봇의 60일 거름·상한이 같이 쓴다 · 점검 api-11) */
+    [M.mergeApi([], { kstartup: { ok: true, items: [k1] } }, { today })[0].seenAt, /\(actKeepDate\(n\) \|\| '9999'\) >= cutoff/.test(cmSrc)
+      && M.actKeepDate({ api: 'kstartup', seenAt: today, foundAt: '2026-01-01' }) === today && M.actKeepDate({ foundAt: '2026-01-01', seenAt: today }) === '2026-01-01'], [today, true]);
   eq('M3 신청기간 여러 구간은 날짜 모양으로 잇는다(\\N 이 카드에 안 보인다)', p1.excerpts.find((x) => x.label === '모집기간').text, '2026-01-01 ~ 2026-03-31 · 2026-09-01 ~ 2026-11-30');
   eq('M4 주최가 카드 윗줄(host)과 같으면 발췌로 또 적지 않는다', k1.excerpts.some((x) => x.label === '주최'), false);
   /* 로봇·워크플로 배선 */

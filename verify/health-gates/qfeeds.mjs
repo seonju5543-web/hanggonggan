@@ -17,6 +17,7 @@
      ⑦ 소식 장부 정리 (news-13): seen-news.json 이 지우는 곳 없이 하루 70~80 열쇠씩 자랐다 — news-kind.mjs pruneSeen(90일 · 실린 글·다시 본 글 · 읽은 게시판만) ·
         진짜 소식 로봇을 이 컴퓨터 안의 가짜 게시판(127.0.0.1)으로 돌려 ⑤ 의 열쇠 달기와 같이 잰다
      ⑧ 재단 게시판 찾기 로봇의 실패 이유 (api-10): '홈페이지 못 엶 (fetch failed)' 28곳이 무엇 때문인지 몰랐다 — fetch-board.mjs netReason 을 불러 쓴다
+     ⑨ 활동 상한 (api-11): foundAt 순으로 잘라 오래 열린 API 글이 잘렸다 '새 글'로 돌아올 수 있었다 — open-api-map.mjs actKeepDate · capActivities
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
 import os from 'node:os';
@@ -35,6 +36,7 @@ import { activityDetails, eligLineOk, sanitizeElig } from '../../collector/activ
 import { boardKey, dropRetiredBoards } from '../../collector/news-board-rules.mjs';
 import { urlKey } from '../../collector/url-key.mjs';
 import { netReason } from '../../collector/fetch-board.mjs';
+import { actKeepDate, capActivities } from '../../collector/open-api-map.mjs';
 
 const require = createRequire(import.meta.url);
 const src = (root, rel) => stripComments(fs.readFileSync(new URL(rel, root), 'utf8'));
@@ -343,5 +345,23 @@ export default async function qfeeds(eq, ctx) {
       const why = sb.json('collector/external-sources.json')?.sources?.[0]?.probe?.why || '';
       eq('  [찾기 로봇 실행] 홈페이지를 못 열면 원인 코드(ECONNREFUSED)를 적는다 — \'fetch failed\' 만 적지 않는다', [r.status, /ECONNREFUSED/.test(why), why !== '홈페이지 못 엶 (fetch failed)'], [0, true, true]);
     } finally { sb.done(); }
+  }
+
+  /* ── ⑨ 활동 상한은 오늘 API 가 준 글을 자르지 않는다 ── */
+  {
+    /* 넘겨받는 순서 = 수집 로봇의 foundAt 내림차순. foundAt 순으로 앞 둘을 자르면(옛 slice) API 글이 빠진다 */
+    const items = [
+      { title: '어제 본 게시판 글', foundAt: '2026-10-03' },
+      { title: '보름 전 게시판 글', foundAt: '2026-09-20' },
+      { title: '두 달 열린 정책(API)', api: 'youthPolicy', foundAt: '2026-08-01', seenAt: '2026-10-04' },
+      { title: '석 달 전 게시판 글', foundAt: '2026-07-01' },
+    ];
+    eq('⑨ 상한은 살아 있는 날(API 글은 seenAt)로 고르고 · 순서는 넘겨받은 foundAt 순 그대로 (오늘 API 가 준 글을 자르지 않는다)',
+      capActivities(items, 2).map((n) => n.title), ['어제 본 게시판 글', '두 달 열린 정책(API)']);
+    eq('  actKeepDate — API 글은 seenAt · 게시판 글은 foundAt · 상한보다 적으면 그대로',
+      [actKeepDate(items[2]), actKeepDate(items[0]), capActivities(items, 5).length], ['2026-10-04', '2026-10-03', 4]);
+    eq('  수집 로봇의 60일 거름과 상한이 같은 날짜(actKeepDate)를 쓴다',
+      [/acts\.items = acts\.items\.filter\(\(n\) => \(actKeepDate\(n\) \|\| '9999'\) >= cutoff\)/.test(collectSrc), /acts\.items = capActivities\(acts\.items, ACT_CAP\)/.test(collectSrc), /acts\.items\.slice\(0, ACT_CAP\)/.test(collectSrc)],
+      [true, true, false]);
   }
 }

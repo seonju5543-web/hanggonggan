@@ -24,6 +24,7 @@ import { htmlToLines } from './html-text.mjs';
 import { robotsAllows } from './robots.mjs';
 import { extractLinks, stripSessionId, hrefText } from './board-links.mjs';
 import { tidyExternal, dropReason as externalDropReason, fillDeadlineFromHint } from './external-clean.mjs';
+import { actKeepDate, capActivities } from './open-api-map.mjs';   // 활동 피드 60일·상한이 같은 날짜를 쓴다 (순수 모듈 — 불러도 아무것도 실행하지 않는다)
 import { canonUrl } from './canon-url.mjs';
 import { fetchBoard, netReason } from './fetch-board.mjs';
 import { NEWS_BOARD_RULES } from './news-board-rules.mjs';
@@ -597,7 +598,7 @@ fs.writeFileSync(noticesPath, JSON.stringify(notices, null, 1));
 acts.items = retitleItems(freshActs.concat(acts.items || []));   // 실린 글에도 지금 제목 청소(원칙 7 소급 · 주소는 그대로 · 2026-10-05)
 /* 공공 API 글(n.api)은 처음 본 날이 아니라 **API 가 마지막으로 준 날(seenAt)**로 잰다 — 몇 달 열린 정책이 61일째 지워졌다가
    다음 날 '새 글'로 맨 위에 돌아오지 않게. 닫힌 글은 API 로봇이 뺀다(collector/open-api-map.mjs mergeApi). */
-acts.items = acts.items.filter((n) => ((n.api && n.seenAt) || n.foundAt || '9999') >= cutoff);
+acts.items = acts.items.filter((n) => (actKeepDate(n) || '9999') >= cutoff);
 acts.items = acts.items.filter((n) => !isAttachmentEntry(n));
 acts.items = acts.items.filter((n) => !notActivity(n.title));   // 결과·보도·지난 해 글은 모집 글이 아니다 — 이미 실린 글에도 소급(2026-10-04 · activity-kind.mjs)
 acts.items.forEach(sanitizeBenefit);   // 「혜택」에 섞인 조건은 자격 줄로 — 출처(본문·API)와 상관없이 매번 모든 글에(2026-10-04 · activity-excerpts.mjs splitBenefit)
@@ -606,7 +607,7 @@ acts.items.forEach((n) => bodyReader.heal(n));   // 껍데기에서 시작한 �
 acts.items = dedupeNotices(acts.items);
 acts.items = acts.items.filter((n) => !n.school).concat(dropUnserved(acts.items.filter((n) => n.school)));
 acts.items.sort((a, b) => String(b.foundAt || '').localeCompare(String(a.foundAt || '')));
-acts.items = acts.items.slice(0, ACT_CAP);
+acts.items = capActivities(acts.items, ACT_CAP);   // 상한은 살아 있는 날(actKeepDate)로 고르고 순서는 foundAt 그대로 — 오래 열린 API 글이 잘렸다 '새 글'로 돌아오지 않게(점검 api-11)
 /* 관리자가 숨긴 표식(hiddenBy)이 있는 글은 주소가 바뀌어도 숨김을 지킨다 — 공공 API 글은 주소 칸 고르기가 바뀌면 주소가 달라진다(리뷰 2026-10-04 ·
    번호로 이어받은 숨김을 여기서 풀면 숨긴 글이 다시 뜬다). 되살리기는 관리자 버튼이 hidden·hiddenBy 를 함께 지운다 */
 acts.items.forEach((n) => { if (actHide.has(canonUrl(n.url))) n.hidden = true; else if (n.hidden && !n.hiddenBy && !actHide.has(canonUrl(n.url))) delete n.hidden; });
