@@ -247,6 +247,24 @@ export function zeroFeedSchools(items, served = SERVED_SCHOOLS) {
   return (served || []).filter((s) => !has.has(s));
 }
 
+/* 그 0건 학교의 까닭 — 그 학교 게시판의 **이번 상태 줄**(collect.mjs results 의 { status, items })에서만 고른다. 짐작해 적지 않는다.
+   🔴 opts.browser = 브라우저 로봇이 읽는 학교인가(browser-targets.json). 고려·중앙·부산·계명은 schools.json 주소가 비어 일반 로봇의 상태 줄이
+      '⚙️ 게시판 주소 미설정'이지만 게시판은 브라우저 로봇이 읽는다 — 그대로 '게시판 주소 없음'이라 적으면 틀린 까닭이 된다(2026-10-05 · CLAUDE.md 매 세션 5).
+   같은 까닭이 게시판 여럿에서 나오면 한 번만 적는다. */
+export function zeroFeedWhy(rows, opts = {}) {
+  const BROWSER = '브라우저 로봇이 읽는 학교 — browser-report 참조';
+  const list = (rows || []).filter(Boolean);
+  if (!list.length) return opts.browser ? BROWSER : '이번 일반 수집 기록 없음';
+  return [...new Set(list.map((r) => {
+    const st = String(r.status || '');
+    if (/브라우저 담당/.test(st) || (opts.browser && /게시판 주소 미설정/.test(st))) return BROWSER;
+    if (/게시판 주소 미설정/.test(st)) return '게시판 주소 없음';
+    const m = st.match(/실공고 (\d+)건 감지/);
+    if (m && !(r.items || []).length) return `게시판 ${m[1]}건 감지 · 모두 전에 본 글`;
+    return st.slice(0, 60);
+  }))].join(' / ');
+}
+
 export function patchUrlsBySchool(items, opts = {}) {
   const dir = opts.dir || new URL('../data/notices/', HERE);
   const want = new Map();

@@ -9,7 +9,7 @@
            주소로 되돌아가지 않는다(고친 주소 X · 10-03 이 표식으로 바꾼 Y) · 수집기 끝부분과 같은 차례로 두 번·세 번 돌려 잰다
         ⓔ (리뷰 R2) 메운 글 주소의 HTML 기호(&#038;)는 앱과 같은 함수로 되돌린다 · ⓕ (리뷰 R3) 진짜 유실(restored)과 상한에 잘린 글(kept)을 따로 센다
      ② 고아 파일(publishBySchool · app2-F4/collect-12) — 목록에 글이 없는 학교의 옛 파일은 빈 파일로 · 이미 빈 파일·못 읽는 파일·이름이 안 맞는 파일은 그대로
-     ③ 화면 0건 학교(zeroFeedSchools · app2-F2/collect-06) — 리포트 머리 한 줄
+     ③ 화면 0건 학교(zeroFeedSchools · zeroFeedWhy · app2-F2/collect-06) — 리포트 머리 한 줄 · 까닭은 이번 상태 줄에서만(브라우저 학교를 '주소 없음'이라 적지 않는다)
      ④ 누락 감사(coverage-rules coverageSets · classifyMiss inLedger · collect-10 · 리뷰 R4) — 장부에만 남은 글을 '가진 것'으로 세지 않는다
         (가르는 곳은 순수 함수 하나 — 표본으로 잰다 · 감사 스크립트는 그 함수에 장부를 ledger 로만 넘긴다)
      ⑤ 사람이 돌리는 메우기 도구(collector/heal-feed.mjs · collect-01 복구) — 임시 git 저장소에서 사고 직전 커밋을 원천으로 그대로 돌린다
@@ -22,7 +22,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
 import { cleanEnv, stripComments } from './gate.mjs';
-import { healFromLedger, publishBySchool, zeroFeedSchools, readSchoolFiles, dropUnserved, FEED_HEAL_SINCE } from '../../collector/publish-notices.mjs';
+import { healFromLedger, publishBySchool, zeroFeedSchools, zeroFeedWhy, readSchoolFiles, dropUnserved, FEED_HEAL_SINCE } from '../../collector/publish-notices.mjs';
 import { dedupeNotices, capNotices, urlKey, titleKey } from '../../collector/url-key.mjs';
 import { classifyMiss, coverageSets, findMissing } from '../../collector/coverage-rules.mjs';
 import { isAttachmentEntry } from '../../collector/attachment-link.mjs';
@@ -206,8 +206,20 @@ export default async function feed(eq, ctx) {
     const src = stripComments(fs.readFileSync(new URL('collector/collect.mjs', root), 'utf8'));
     const pubAt = src.indexOf('publishBySchool(beforeCap)');
     const zAt = src.indexOf('zeroFeedSchools(beforeCap)');
-    eq('  수집 리포트가 발행 목록으로 재고 머리에 한 줄 적는다 (까닭은 게시판 상태 줄에서)',
-      [pubAt > 0 && zAt > pubAt, /lines\.push\(`🙋 서비스 학교인데 앱 실시간 공고 0건 \$\{zeroFeed\.length\}곳/.test(src), /게시판 주소 미설정/.test(src)], [true, true, true]);
+    eq('  수집 리포트가 발행 목록으로 재고 머리에 한 줄 적는다 (까닭은 zeroFeedWhy 하나 · 브라우저 학교인지 같이 넘긴다)',
+      [pubAt > 0 && zAt > pubAt, /lines\.push\(`🙋 서비스 학교인데 앱 실시간 공고 0건 \$\{zeroFeed\.length\}곳/.test(src),
+        /zeroFeedWhy\(results\.filter\([^;]*\{\s*browser:\s*browserSchools\.has\(school\)\s*\}\)/.test(src)], [true, true, true]);
+    /* 까닭은 그 학교 게시판의 이번 상태 줄에서만 — 상태 줄 글자는 collect.mjs harvestBoard 의 꼴 그대로 */
+    const unset = { status: '⚙️ 게시판 주소 미설정 (행이 클릭형이라 browser-targets.json 이 담당)', items: [] };
+    const seenAll = { status: '✅ 정상 (실공고 15건 감지)', items: [] };
+    const fresh1 = { status: '✅ 정상 (실공고 3건 감지)', items: [{ title: '새 글' }] };
+    eq("  zeroFeedWhy — 🔴 schools.json 주소가 비어도 브라우저 로봇이 읽는 학교는 '게시판 주소 없음'이라 적지 않는다 (고려·중앙·부산·계명)",
+      [zeroFeedWhy([unset], { browser: true }), zeroFeedWhy([unset]), zeroFeedWhy([], { browser: true }), zeroFeedWhy([])],
+      ['브라우저 로봇이 읽는 학교 — browser-report 참조', '게시판 주소 없음', '브라우저 로봇이 읽는 학교 — browser-report 참조', '이번 일반 수집 기록 없음']);
+    eq('  감지한 글이 모두 전에 본 글 · 브라우저 담당 줄 · 그 밖의 상태 줄은 그대로 · 같은 까닭은 한 번만',
+      [zeroFeedWhy([seenAll]), zeroFeedWhy([{ status: '🖥 브라우저 담당 게시판 — 일반 로봇은 건너뜀', items: [] }]),
+        zeroFeedWhy([{ status: '⚠️ 오류 (시간 초과) — 주소 확인 필요', items: [] }]), zeroFeedWhy([seenAll, seenAll]), zeroFeedWhy([fresh1])],
+      ['게시판 15건 감지 · 모두 전에 본 글', '브라우저 로봇이 읽는 학교 — browser-report 참조', '⚠️ 오류 (시간 초과) — 주소 확인 필요', '게시판 15건 감지 · 모두 전에 본 글', '✅ 정상 (실공고 3건 감지)']);
   }
 
   /* ── ④ 누락 감사 — 장부에만 남은 글 ── */
