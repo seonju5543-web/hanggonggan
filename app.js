@@ -423,9 +423,54 @@ function cleanCardTitle(name) {
   /* 🔴 앞 표식은 **대괄호만** 뗀다 — 소괄호를 넣으면 '(재)무안군승달장학회'의 법인 표기와
      '(서울캠퍼스)' 같은 구분자가 사라진다(실측으로 확인하고 좁혔다). */
   t = t.replace(/^(?:[[【]\s*[^\]】]{1,12}\s*[\]】]\s*)+/, '').trim();
-  t = t.replace(/[(（]\s*(?:~|-|—|\d)[\d\s.~\-—/월일년까지]*\s*[)）]\s*$/, '').trim();
+  t = splitTitleDates(t).title;   // 날짜·기간은 한 곳에서(2026-10-05)
   t = t.replace(/[\s·\-–—:,]+$/, '').trim();
   return t.length >= 4 ? t : before;
+}
+
+/* ── 카드 제목의 날짜·기간 (2026-10-05 개발자 지적 "제목에 날짜 들어간 거 아직도 있는데") ──
+   카드 제목 세 갈래(정식 등록 cleanCardTitle · 대외활동 activityTitle · 게시판·재단·소식 noticeCardHtml)가 **이 한 곳**을 부른다 —
+   예전엔 셋이 따로 떼어 게시판 카드는 원제목 그대로였고 정식 등록은 `(~9/10)` 꼴만 뗐다.
+   · 괄호 안이 날짜·기간뿐이면 괄호째 뗀다(`(~8/3)` `(9.11~9.28)` `(10/5 마감)` `(~2026.11.11.(수))` `[10월10일(토)/10-18시]`)
+   · 괄호 안에 다른 말이 섞였으면 **날짜 조각만** 뗀다(`(10/26 마감, 공학계열, 생활비 연 1200만원)` → `(공학계열, 생활비 연 1200만원)`)
+   · 꼬리 게시일(`… 공고 2026.09 . 28`)을 뗀다
+   🔴 '날'까지 있는 날짜만 날짜다 — `2026학년도`·`10월 프로그램`·`2학기`·`제13회` 는 제목이다.
+   🔴 지어내지 않는다 — 떼어 낸 조각(dates)은 원문 글자 그대로 돌려준다(D-day 가 없는 카드는 회색 줄로 옮긴다 · 정보를 잃지 않게).
+   ⚠️ 상세 시트는 원제목 그대로다(게시판에서 찾을 때 쓰는 글자). */
+const TD_DAY = '(?:(?:20)?\\d{2}\\s?[.\\-/년]\\s?)?\\d{1,2}\\s?(?:[./]|월\\s?)\\s?\\d{1,2}\\s?(?:일)?\\.?(?:\\s?(?:[(（][월화수목금토일][)）]|[/.]?[월화수목금토일](?![가-힣])))?';
+const TD_DAY_RE = new RegExp(TD_DAY);
+const TD_DAY_G = new RegExp(TD_DAY, 'g');
+function isDateBit(seg) {
+  const x = String(seg || '');
+  if (!TD_DAY_RE.test(x)) return false;
+  const rest = x.replace(TD_DAY_G, '')
+    .replace(/(?:오전|오후)?\s?\d{1,2}\s?(?::\d{2}|시)(?:\s?\d{1,2}분)?/g, '')
+    .replace(/까지|부터|마감|모집|접수|연장|기간|신청|중|\d+일?/g, '')
+    .replace(/[~\-–—/.,:()（）\s]/g, '');
+  return rest.length === 0;
+}
+function splitTitleDates(title) {
+  const before = String(title || '').trim();
+  const dates = [];
+  let t = before.replace(/([(（[【])([^()（）[\]【】]*(?:[(（][^()（）]*[)）][^()（）[\]【】]*)*)([)）\]】])/g, (m, open, inner, close) => {
+    let hit = false;
+    const keep = [];
+    for (const x of inner.split(/\s*[,，]\s*/)) {
+      if (isDateBit(x)) { hit = true; dates.push(x.trim()); continue; }
+      const tag = x.match(/^([^\d~\-–]{1,8}?)\s*[-–]\s*(.+)$/);              // `[교내-10/30]` — 분류표는 두고 날짜만
+      if (tag && isDateBit(tag[2])) { hit = true; dates.push(tag[2].trim()); keep.push(tag[1]); continue; }
+      const lead = x.match(/^\s*(~?\s*[\d.\s/()（）월화수목금토일~\-–]+(?:까지|마감|부터))\s+(.+)$/);   // `(9/18까지 신청 및 제출)` — 앞 날짜만
+      if (lead && isDateBit(lead[1])) { hit = true; dates.push(lead[1].trim()); keep.push(lead[2]); continue; }
+      keep.push(x);
+    }
+    if (!hit) return m;
+    return keep.filter((x) => x.trim()).length ? `${open}${keep.join(', ')}${close}` : ' ';
+  });
+  /* 붙여 쓴 기간 꼬리 — `…신청 안내_09.22(화)~10.9(금)` · `…프로그램:10/1(목)~10/6(화)` · `… 안내 2026.09.01.(화)~2026.10.06.(화)` */
+  t = t.replace(/(?:\s*[_:：]\s*|\s+)([~\d][\d.\s~\-–/()（）월화수목금토일년시:까지마감부터]{3,40})$/, (m, tail) => (isDateBit(tail) && /[~\-–]|까지|마감/.test(m + tail) || /[_:：]/.test(m) && isDateBit(tail) ? (dates.push(tail.trim()), ' ') : m));
+  t = t.replace(/\s+(20\d{2}\s?\.\s?\d{1,2}(?:\s?\.\s?\d{1,2})?\.?|20\d{2}-\d{1,2}-\d{1,2})\s*$/, ' ');   // 꼬리 게시일 — 마감이 아니라 dates 에 안 넣는다
+  t = t.replace(/\s{2,}/g, ' ').replace(/[\s·\-–—:,]+$/, '').trim();
+  return t.replace(/\s/g, '').length >= 4 ? { title: t, dates } : { title: before, dates: [] };
 }
 
 /* notStale(오래된 공고 숨김)은 match-engine.js에 있다 — 화면에서 숨긴 공고를
@@ -2930,6 +2975,7 @@ const SCHOOL_PHOTO_RE = /^assets\/schools\/[a-z0-9]+-[0-9a-f]{8}\.webp$/;
 const PHOTO_FOCUS_RE = /^\d{1,3}% \d{1,3}%$/;
 function noticeCardHtml(n, opts) {
   const o = opts || {};
+  const tSplit = splitTitleDates(unent(n.title));   // 카드 제목의 날짜·기간 — 공용 규칙(2026-10-05)
   const thumb = o.thumb && NEWS_THUMB_RE.test(o.thumb) ? o.thumb : '';
   const link = sourceLink(n, 'card');
   /* 안전하지 않은 주소면 href 를 아예 안 단다 — `href=""` 는 앱 자신을 다시 연다(첨부와 같은 사고 · 2026-10-03)
@@ -2971,7 +3017,9 @@ function noticeCardHtml(n, opts) {
              우리는 이 글의 마감일을 **모른다**(수집한 것은 제목·링크·기간 문장 한 줄뿐이다).
              모르는 것을 단정하지 않는다(원칙 8-1) — 기간은 아래 줄이 원문 그대로 말한다. */ ''}
       </div>
-      <p class="sch-name">${esc(unent(n.title))}</p>
+      <p class="sch-name">${esc(tSplit.title)}</p>
+      ${/* 제목에서 뗀 마감·기간은 D-day·기간 줄이 없는 카드에서만 회색 줄로 — 같은 사실을 두 번 적지 않는다 */ ''}
+      ${!o.dday && !(o.excerpts || []).length && !(n.deadlineHint && hintShort(n.deadlineHint)) && tSplit.dates.length ? `<p class="sch-provider">${esc(tSplit.dates.join(' · '))}</p>` : ''}
       ${/* 원문 발췌 줄 (2026-09-29 · 활동 글) — 이름표 : 원문 문장. 발췌가 있으면 기간 한 줄은 겹쳐 적지 않는다 */ ''}
       ${(o.excerpts || []).map((x) => `<p class="sch-provider">${esc(x.label)} · ${esc(unent(x.text))}</p>`).join('')}
       ${!(o.excerpts || []).length && n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) && hintShort(n.deadlineHint) ? `<p class="sch-provider">${esc(hintShort(n.deadlineHint))}</p>` : ''}
@@ -3144,6 +3192,7 @@ function activityTitle(n) {
   t = t.replace(/^(?:[[【]\s*[^\]】]{1,14}\s*[\]】]\s*)+/, (run) => run.replace(/[[【]\s*([^\]】]{1,14})\s*[\]】]\s*/g, (m, tag) => (ACT_TAG.test(tag.trim()) ? '' : m)));
   t = t.replace(/\s*[(（]\s*~[^()（）]*(?:[(（][^()（）]*[)）][^()（）]*)*[)）]\s*$/, '');      // `(~10/22)` · `(~9/30(금)까지)`
   t = t.replace(/\s*(?:자세히|더보기)\s*$/, '').replace(/[\s·\-–—:,]+$/, '').trim();
+  t = splitTitleDates(t).title;   // 남은 날짜·기간은 카드 제목 공용 규칙으로(2026-10-05)
   return t.length >= 4 ? t : before;
 }
 /* 혜택 원문은 `○ 맞춤형 정책상담 · 일자리 … ○ 참여혜택 · 대면 …` 처럼 한 줄에 여럿이 붙어 온다 — 항목으로 **나누기만** 한다 */

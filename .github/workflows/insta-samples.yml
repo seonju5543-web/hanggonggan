@@ -12,10 +12,14 @@ on:
 
 permissions:
   contents: write
+  issues: write     # 실패를 이슈로 부른다(아래 robot-down · 2026-10-04)
 
 concurrency:
   group: insta-samples
-  cancel-in-progress: true      # 견본은 최신 것만 뜻이 있다 — 밀린 실행은 버려도 된다
+  # 견본은 최신 것만 뜻이 있다 — 밀린 실행은 버려도 된다. 🔴 그런데 **도는 실행**은 취소하지 않는다(2026-10-04):
+  #   취소는 아래 넘어짐 알림(cancelled())을 헛경보로 세운다(시간 초과와 취소 사유를 if: 로 못 가른다).
+  #   false 여도 GitHub 은 기다리는 실행을 하나만 남기고 더 오래된 대기분은 버린다 — '밀린 것은 버린다'는 그대로다.
+  cancel-in-progress: false
 
 env:
   BASE: claude/nice-heisenberg-WESq5
@@ -50,4 +54,12 @@ jobs:
           #   관리자 화면은 기본 브랜치의 raw 주소로 견본을 본다(코드 리뷰).
       - name: 실패하면 시끄럽게
         if: ${{ failure() || cancelled() }}
-        run: echo '🚨 판형 견본을 못 그렸습니다 — 새 판형 파일이 깨졌을 가능성이 큽니다.' >> "$GITHUB_STEP_SUMMARY"
+        run: echo '🚨 판형 견본을 못 그렸습니다 — 새 판형 파일이 깨졌는지 실행 로그에서 확인하세요.' >> "$GITHUB_STEP_SUMMARY"
+      # 🔴 요약 한 줄은 아무도 안 본다 — 넘어짐 알림 한 벌(robot-down)로 이슈를 연다 (2026-10-04 로봇·도구 점검).
+      #    회복하면 하트비트가 닫는다.
+      - name: 🚨 로봇이 넘어졌다
+        if: ${{ failure() || cancelled() }}
+        uses: ./.github/actions/robot-down
+        with:
+          robot: 인스타 판형 견본
+          token: ${{ github.token }}

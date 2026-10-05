@@ -103,6 +103,19 @@ for (const [key, tpl] of Object.entries(forms.templates)) {
   }
 }
 
+/* ⑦ 자기소개서 칸 종류 (2026-10-04 · 로봇·도구 점검) — 세션이 옮긴 양식의 서술형 칸 이름을 essay-ask.js 가 모르면
+   주간 작성 규칙 학습 로봇의 검사가 닷새 뒤에 멈췄다(09-24 추가 → 09-29 멈춤 → 10-01 수리). 양식을 고친 그날 여기서 보이게 한다.
+   규칙은 verify/essay-unknown-fields.cjs 한 곳(주간 검사 verify-essay-ask.mjs 도 같은 함수).
+   🔴 경고다(오류 아님) — 오류로 두면 그날 자동 등록분이 되돌려진다. 학생 화면은 그 칸에도 일반 질문을 내 깨지지 않는다. */
+try {
+  const { unknownStoryFields } = require('./essay-unknown-fields.cjs');
+  for (const u of unknownStoryFields(forms.templates)) {
+    warns.push(`forms:${u.form}.${u.id} — 자기소개서 칸 '${u.label.slice(0, 40)}' 의 종류를 모릅니다 · essay-ask.js 의 ESSAY_KINDS 에 이 이름을 더하세요(그대로 두면 학생에게 일반 질문만 나가고, 매주 도는 작성 규칙 학습 로봇이 이 칸 때문에 멈춥니다)`);
+  }
+} catch (e) {
+  warns.push(`자기소개서 칸 종류를 확인하지 못했습니다: ${e.message.slice(0, 80)}`);
+}
+
 /* 피드·양식 큐 감사 (2026-07-30 추가) — 로봇이 매일 바꾸는 데이터도 같이 본다.
    그동안 감사는 정식 등록만 봤고, 피드 중복(시립대 40건 중 실제 13건)과
    양식 원본 유실은 사람이 눈으로 볼 때까지 아무도 몰랐다. */

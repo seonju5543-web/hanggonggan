@@ -6,7 +6,7 @@
    🔴 파일을 더하면 여기 목록에도 적는다 — 디렉터리를 훑어 부르면 지운 파일·오타가 조용히 빠진다.
    🔴 묶음 파일이 아무것도 재지 않으면 실패로 센다(검사가 조용하면 통과가 아니라 무력해진 것 — CLAUDE.md 매 세션 3).
    혼자 돌리기: node verify/health-gates.mjs [묶음 …] */
-export const PARTS = ['gate', 'feed'];
+export const PARTS = ['gate', 'feed', 'ci', 'alerts', 'servers', 'insta'];
 
 export async function runHealthGates(eq, only = []) {
   const root = new URL('../', import.meta.url);

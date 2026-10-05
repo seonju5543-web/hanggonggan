@@ -102,8 +102,27 @@ const behind = sh('git rev-list --count HEAD..origin/main', true) || '0';
 console.log(`현재 브랜치: ${sh('git rev-parse --abbrev-ref HEAD')} (${head})`);
 console.log(`배포 브랜치: main (${sh('git rev-parse --short origin/main')})`);
 
+/* 🔴 main 에 있다 ≠ 학생 앱에 나갔다 (2026-10-04 — main push 셋이 Pages 빌드를 하나도 안 일으켜 홈 새 구역이 두 시간 넘게 안 떴는데
+   이 검사는 ✅ 「반영되는 상태」라고 말했다). Pages 가 마지막으로 지은 커밋의 앱 파일이 main 과 다르면 그 사실을 말한다.
+   gh 가 없거나 못 물으면 건너뛴다(로봇·다른 컴퓨터) — 그때는 그렇게 적는다. 고치는 법: gh api -X POST repos/<저장소>/pages/builds */
+function pagesLag() {
+  const repo = (sh('git remote get-url origin', true) || '').replace(/^.*github\.com[:/]/, '').replace(/\.git$/, '');
+  if (!repo) return { skip: '저장소 이름을 못 읽음' };
+  const out = sh(`gh api repos/${repo}/pages/builds/latest -q '"\\(.status) \\(.commit)"'`, true);
+  if (!out) return { skip: 'gh 로 Pages 상태를 묻지 못함' };
+  const [status, commit] = out.trim().split(/\s+/);
+  const lag = sh(`git diff --stat ${commit}..origin/main -- ${APP_PATHS.join(' ')}`, true);
+  return { status, commit: (commit || '').slice(0, 8), lag, repo };
+}
+
 if (!diff) {
-  console.log('\n✅ 앱 파일 기준으로 main과 같음 — 지금 내용이 사용자 앱에 반영되는 상태입니다.');
+  const pg = pagesLag();
+  if (pg.lag) {
+    console.log(`\n⚠️ main 에는 있지만 **학생 앱(Pages)은 아직 옛 판**입니다 — Pages 가 마지막으로 지은 커밋 ${pg.commit} (${pg.status}).`);
+    console.log(pg.status === 'building' ? '   지금 짓는 중이면 1~2분 뒤 다시 보세요.' : `   빌드가 안 일어났습니다. 이렇게 요청하세요:\n   gh api -X POST repos/${pg.repo}/pages/builds`);
+    process.exit(1);
+  }
+  console.log('\n✅ 앱 파일 기준으로 main과 같음 — 지금 내용이 사용자 앱에 반영되는 상태입니다.' + (pg.skip ? ` (Pages 빌드 확인은 건너뜀 — ${pg.skip})` : ` (Pages 빌드 ${pg.commit} 확인)`));
   if (behind !== '0') console.log(`   (참고: main에만 있는 커밋 ${behind}개 — 앱 파일 외 변경이라 화면에는 영향 없음)`);
   process.exit(0);
 }

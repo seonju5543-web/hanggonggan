@@ -56,9 +56,12 @@ permissions:
 
 # 🔴 수집 로봇들과 **다른 대기줄**을 쓴다 — 같은 줄에 넣으면 GitHub 이 대기 중인
 #    실행을 새 실행으로 취소해서 예약 수집이 조용히 사라진다(CLAUDE.md).
-concurrency:
-  group: insta-publish
-  cancel-in-progress: false
+# 🔴 대기줄은 **작업마다** 둔다(아래 각 작업의 concurrency · 2026-10-04 로봇·도구 점검). 옛 판은 워크플로 하나에 줄 하나였는데,
+#    한 줄에는 '도는 것 1 + 기다리는 것 1' 만 있어서 사람이 게시·건너뛰기를 연달아 누르면 가운데 것이 **조용히 취소됐다**
+#    (취소된 실행은 단계가 하나도 안 돌아 실패 알림도 없다). 이제 같은 공고끼리만 한 줄(insta-code-<코드>) — 같은 공고를
+#    두 번 누르면 두 번째가 첫 번째 뒤에 돌아 '이미 올린 공고' 검사에 걸린다. 다른 공고끼리는 서로 안 기다린다.
+#    그래서 두 작업이 같은 장부(insta/seen.json)를 쓸 수 있다 — 저장 단계마다 병합 규칙을 먼저 등록한다
+#    (tools/setup-collab.sh → merge-json-union.mjs 의 mergeInstaSeen · 올림 기록은 절대 안 버린다).
 
 env:
   BASE: claude/nice-heisenberg-WESq5
@@ -70,6 +73,11 @@ jobs:
     if: ${{ !startsWith(inputs.step, '게시') && !startsWith(inputs.step, '건너뛰기') }}
     runs-on: ubuntu-latest
     timeout-minutes: 40          # 🔴 없으면 GitHub 기본값 6시간까지 매달린다 (6건 × ~40초 + 설치 + Pages 대기)
+    # 코드를 준 준비(이 판형으로 다시 그리기)는 그 공고의 줄 — 같은 공고의 게시·건너뛰기와 차례를 지킨다.
+    # 코드 없는 자동·버튼 준비끼리는 한 줄(기다리던 것이 밀려 취소돼도 같은 일을 하는 다음 실행이 있다).
+    concurrency:
+      group: ${{ inputs.code && format('insta-code-{0}', inputs.code) || 'insta-prepare' }}
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
         with:
@@ -85,6 +93,20 @@ jobs:
       - name: 사실 관문
         run: node verify/verify-insta.js
 
+      # 🔴 마감이 지난 카드는 다시 그릴 수도(캡션 거절) 올릴 수도(게시 거절) 없다 — 장부를 '만료(expired)' 로 바꾸고 폴더를 지운다
+      #    (2026-10-04 로봇·도구 점검 · 지우는 단계가 없어 insta/pub 이 3주에 100MB 로 불었다 · Pages 사이트 상한 1GB).
+      #    규칙은 insta/pick.mjs 의 expireRows 한 곳 · 🔴 올린 것의 폴더는 안 지운다(관리자 「올림」 줄의 썸네일) · git 이력에는 남는다.
+      #    정리가 넘어져도 새 카드는 그린다(보강 단계). 지운 것은 아래 커밋 단계가 같이 올린다. '무엇을 할지' 보다 먼저 —
+      #    재단이 마감을 미룬 공고는 다시 뽑힌다(pick.mjs candidates).
+      - name: 마감 지난 카드 정리
+        id: expire
+        continue-on-error: true
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          node insta/ledger.mjs expire | tee /tmp/expire.txt
+          echo "n=$(sed -n 's/^expired=//p' /tmp/expire.txt | tail -1)" >> "$GITHUB_OUTPUT"
+
       # 무엇을 그릴지 — 알림(push-to-run·버튼)이면 그 코드 하나를 **안 그리고** 그대로 보낸다.
       - name: 무엇을 할지 정한다
         id: plan
@@ -99,7 +121,7 @@ jobs:
             # 🔴 표식 파일이 빈 채로 push 되는 일은 정상이다(처음 만들 때 · 보낸 뒤 지울 때) — 빨간불이 아니라 조용한 종료.
             if [ -z "$CODE" ] && [ "$EVENT" = push ]; then echo "mode=none" >> "$GITHUB_OUTPUT"; echo "codes=" >> "$GITHUB_OUTPUT"; echo 'run-notify.txt 의 code: 가 비어 있어 아무것도 안 합니다.'; exit 0; fi
             [ -n "$CODE" ] || { echo '알릴 공고 코드가 비어 있습니다 — code 칸을 채우세요.'; exit 1; }
-            [ -d "insta/pub/$CODE" ] || { echo "🚨 insta/pub/$CODE 가 없습니다 — 먼저 그려서 커밋했는지 보세요."; exit 1; }
+            [ -d "insta/pub/$CODE" ] || { echo "🚨 insta/pub/$CODE 가 없습니다 — 먼저 그려서 커밋했는지 보세요(마감이 지나 정리된 카드면 장부 insta/seen.json 에 expired 로 적혀 있습니다)."; exit 1; }
             echo "mode=notify" >> "$GITHUB_OUTPUT"; echo "codes=$CODE" >> "$GITHUB_OUTPUT"
             echo "다시 알림: $CODE"
           elif [ -n "$CODE" ]; then
@@ -150,28 +172,53 @@ jobs:
               echo '```'; cat "insta/pub/$c/caption.txt"; echo '```'
             done
           } >> "$GITHUB_STEP_SUMMARY"
+      # 올림 파일(artifact)은 **이번 카드만** — 옛 판은 insta/pub 통째(약 85MB)를 그리는 실행마다 다시 올렸다(2026-10-04).
+      - name: 이번 카드만 모은다 (실행 기록의 올림 파일)
+        if: ${{ steps.plan.outputs.codes != '' }}
+        env:
+          CODES: ${{ steps.draw.outputs.ok || steps.plan.outputs.codes }}
+          DEST: ${{ runner.temp }}/cards
+        run: |
+          mkdir -p "$DEST"
+          for c in $CODES; do
+            if [ -d "insta/pub/$c" ]; then cp -r "insta/pub/$c" "$DEST/$c"; else echo "($c 폴더 없음)"; fi
+          done
       - uses: actions/upload-artifact@v4
         if: ${{ steps.plan.outputs.codes != '' }}
         with:
           name: 카드
-          path: insta/pub/
+          path: ${{ runner.temp }}/cards/
           retention-days: 7
 
       # 🔴 커밋해야 GitHub Pages 가 공개 주소로 서빙한다 — 인스타는 그 주소로 가져간다.
-      #    다른 공고의 폴더는 건드리지 않는다(공고당 폴더 하나).
+      #    다른 공고의 폴더는 건드리지 않는다(공고당 폴더 하나). 새 카드가 없어도 마감 지나 정리한 것은 올린다(2026-10-04).
       - name: 게시용 그림·장부 커밋
-        if: ${{ always() && steps.plan.outputs.mode == 'draw' && steps.plan.outputs.codes != '' }}
+        id: commit
+        if: ${{ always() && steps.plan.outputs.mode != 'none' }}
+        env:
+          OK: ${{ steps.draw.outputs.ok }}
+          EXPIRED: ${{ steps.expire.outputs.n }}
         run: |
+          bash tools/setup-collab.sh       # 🔴 다른 공고의 게시·건너뛰기가 같은 장부를 쓸 수 있다 — 장부 병합 규칙 등록(mergeInstaSeen)
           git config user.name  'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git add -A insta/pub insta/seen.json
           git diff --cached --quiet && { echo '바뀐 게 없습니다'; exit 0; }
-          git commit -m "인스타: 카드 준비 — $(echo "${{ steps.draw.outputs.ok }}" | wc -w | tr -d ' ')건"
+          git commit -m "인스타: 카드 준비 $(echo "$OK" | wc -w | tr -d ' ')건 · 마감 지나 정리 ${EXPIRED:-0}건"
           for i in 1 2 3; do
             git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE"; sleep 5; }
             [ "$i" = 3 ] && { echo '🚨 기본 브랜치에 못 올렸습니다'; exit 1; }   # 🔴 sleep 이 0 을 남겨 그냥 넘어가던 자리
           done
-          git push origin HEAD:main        # 🔴 Pages 는 main 을 배포한다
+          echo 'base=ok' >> "$GITHUB_OUTPUT"   # 장부가 기본 브랜치에 들어갔다 — 아래 실패 알림이 이것으로 말을 고른다
+          # 🔴 Pages 는 main 을 배포한다 — main 에만 있는 커밋(배포 로봇)과 엇갈리면 그냥 push 는 거절된다
+          #    (2026-09-12 #263 — 게시 작업이 이렇게 죽었다). 받아 합치고 다시 — 기본 브랜치 루프와 같은 꼴.
+          for i in 1 2 3; do
+            git push origin HEAD:main && break
+            [ "$i" = 3 ] && { echo '🚨 main 에 못 올렸습니다'; exit 1; }
+            git fetch origin main && git merge --no-edit -m '인스타: 카드 준비분 main 반영 (자동)' origin/main \
+              || { git merge --abort || true; echo '🚨 main 을 받아 합치지 못했습니다(충돌 또는 통신)'; exit 1; }
+            sleep 5
+          done
 
       # 🔴 Pages 가 서빙을 시작해야 이슈·메일에 박은 그림이 뜬다. 아직 404 인 채로 만들면
       #    GitHub 의 그림 중계(camo)가 **그 404 를 캐시해** 나중에도 안 보인다.
@@ -259,6 +306,27 @@ jobs:
             --user "$MAIL_USER:$MAIL_PASS" --mail-from "$MAIL_USER" $RCPT --upload-file /tmp/mail.txt
           echo "✅ 메일을 보냈습니다 — $(sed -n 's/^To: //p' /tmp/mail.txt)"
 
+      # 🔴 쓸모없어진 준비 이슈를 닫는다 (2026-10-04 로봇·도구 점검 · insta/ready-issues.mjs).
+      #    준비 이슈는 「올리거나 건너뛰면 저절로 닫힙니다」라고 약속하는데, 옛 판은 이슈 안 카드가 1건 이하일 때만 닫고
+      #    마감 지난 카드는 아무도 안 봐서, 올릴 카드가 하나도 없는 이슈가 열린 채 쌓였다(10-04 · 8건).
+      #    담긴 카드가 전부 올렸거나·건너뛰었거나·마감이 지났을 때만 닫는다(장부에 없는 카드는 모름 → 둔다).
+      #    🔴 아무것도 올리지 않는다 — 게시는 사람만 누른다.
+      - name: 쓸모없어진 준비 이슈 닫기
+        if: ${{ always() }}
+        continue-on-error: true
+        timeout-minutes: 2
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh issue list --repo "$REPO" --label insta-ready --state open --limit 300 --json number,body > /tmp/ready.json
+          node insta/ready-issues.mjs closable /tmp/ready.json > /tmp/closable.tsv
+          while IFS=$'\t' read -r n why; do
+            [ -n "$n" ] || continue
+            gh issue close "$n" --repo "$REPO" --comment "담긴 카드가 모두 올렸거나 건너뛰었거나 마감이 지났습니다 — 게시할 것이 없어 닫습니다. ($why · 자동)"
+            echo "닫음 #$n ($why)"
+          done < /tmp/closable.tsv
+
       - name: 못 그린 공고가 있으면 시끄럽게
         if: ${{ steps.draw.outputs.bad != '' }}
         env:
@@ -289,21 +357,36 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           RUN: ${{ github.run_id }}
+          OK: ${{ steps.draw.outputs.ok }}
+          SAVED: ${{ steps.commit.outputs.base }}
         run: |
           echo '🚨 준비가 실패했습니다 — 이슈를 만들었습니다.' >> "$GITHUB_STEP_SUMMARY"
           gh label create insta-fail --repo "$REPO" --color B60205 --description '인스타 게시 실패' 2>/dev/null || true
           gh issue list --repo "$REPO" --label insta-fail --state open --json title --jq '.[].title' | grep -q "준비가 실패" && exit 0
+          # 🔴 그린 카드가 어디까지 갔는지 사실대로 — 장부가 기본 브랜치에 들어간 뒤 멈췄으면 그 카드는 다음 실행이 다시 뽑지 않는다
+          #    (준비됨이라서). 그걸 말하지 않으면 알림이 안 간 카드가 관리자 화면에만 조용히 남는다(2026-10-04 점검).
+          NOTE=''
+          if [ -n "$OK" ] && [ "$SAVED" = ok ]; then
+            NOTE="그린 카드: $OK — 장부에 준비됨으로 적혀 관리자 화면 › 인스타 에 있습니다. 개발자 알림(이슈·메일)은 못 갔을 수 있습니다 — Actions 「인스타 카드뉴스 게시」 → 알림 + code 로 다시 보낼 수 있습니다."
+          elif [ -n "$OK" ]; then
+            NOTE="그린 카드: $OK — 장부를 기본 브랜치에 저장하기 전에 멈췄습니다. 다음 준비 실행이 다시 그립니다."
+          fi
           gh issue create --repo "$REPO" --label insta-fail \
             --title '🚨 인스타 카드 준비가 실패했습니다' \
             --body "실행 로그: https://github.com/$REPO/actions/runs/$RUN
 
-          사실 관문이 빨간불이면 카드가 원문을 상하게 하고 있다는 뜻이라, 고치기 전에는 올리면 안 됩니다."
+          사실 관문이 빨간불이면 카드가 원문을 상하게 하고 있다는 뜻이라, 고치기 전에는 올리면 안 됩니다.
+          $NOTE"
 
   # ── ② 게시 — ①이 커밋한 것을 그대로 올린다. **다시 안 그린다** ──
   publish:
     if: ${{ startsWith(inputs.step, '게시') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # 같은 공고끼리만 한 줄 — 같은 공고를 두 번 누르면 두 번째가 기다렸다가 '이미 올린 공고' 검사에 걸린다(위 머리말)
+    concurrency:
+      group: ${{ format('insta-code-{0}', inputs.code) }}
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
         with:
@@ -338,29 +421,44 @@ jobs:
             echo "⚠️ 열린 준비 이슈에 $CODE 표식이 없습니다 — 손으로 그렸거나 이미 닫힌 건입니다. 지금 버튼을 누른 사람이 확인한 것으로 봅니다."
           fi
 
+      # 🔴 마감이 지난 카드·그림에 「마감 D-N」 이 박힌 옛 카드(2026-10-04 전에 그린 2·3·4번)는 publish.mjs 가 거절한다(publishRefusal).
+      #    올라가면 media·permalink 를 이 단계의 출력으로 남긴다 — 아래 실패 알림이 '올라갔는가' 를 알아야 한다.
       - name: 인스타에 올리기
+        id: post
         env:
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
-        run: node insta/publish.mjs --code="${{ inputs.code }}" --publish
+          CODE: ${{ inputs.code }}
+        run: node insta/publish.mjs --code="$CODE" --publish
 
-      # 이 공고만 담긴 준비 이슈는 닫고, 여러 건이 담긴 이슈에는 코멘트만 남긴다.
+      # 남은 카드(올릴 수 있는 것)가 없으면 준비 이슈를 닫고, 있으면 코멘트만 남긴다.
+      # 🔴 '남은 카드'는 insta/ready-issues.mjs 한 곳이 장부로 센다(올림·건너뜀·마감 지남은 뺀다 · 2026-10-04) —
+      #    옛 판은 이슈 안 카드 수(1건 이하)만 봐서, 나머지가 마감 지났거나 건너뛴 이슈가 영영 안 닫혔다.
+      #    장부(seen.json)는 바로 앞 단계가 이미 고쳤다. 세지 못하면(빈 값) 닫지 않고 코멘트만 단다.
+      #    보강 단계라 넘어져도 기록 저장을 막지 않는다(2026-10-04 — 막으면 올라간 글이 장부에 안 남는다).
       - name: 준비 이슈 정리
+        continue-on-error: true
+        timeout-minutes: 3
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           CODE: ${{ inputs.code }}
         run: |
           for n in $(gh issue list --repo "$REPO" --label insta-ready --state open --json number,body --jq ".[] | select(.body | contains(\"<!-- insta-code: $CODE -->\")) | .number"); do
-            CNT=$(gh issue view "$n" --repo "$REPO" --json body --jq .body | grep -c '<!-- insta-code: ')
-            if [ "$CNT" -le 1 ]; then gh issue close "$n" --repo "$REPO" --comment "올렸습니다 ($CODE) — 자동으로 닫습니다.";
-            else gh issue comment "$n" --repo "$REPO" --body "올렸습니다 — $CODE"; fi
+            LIVE=$(gh issue view "$n" --repo "$REPO" --json body --jq .body | node insta/ready-issues.mjs live-in-body || true)
+            if [ "${LIVE:-1}" = "0" ]; then gh issue close "$n" --repo "$REPO" --comment "올렸습니다 ($CODE) — 남은 카드가 없어 자동으로 닫습니다.";
+            else gh issue comment "$n" --repo "$REPO" --body "올렸습니다 — $CODE (남은 카드 ${LIVE:-?}건)"; fi
           done
 
       # 🔴 올린 것을 기억 못 하면 내일 같은 공고를 다시 올린다(이슈 #75 유형).
-      #    `git add` 목록에 넣는 것까지가 한 세트다.
+      #    `git add` 목록에 넣는 것까지가 한 세트다. 올라갔으면 앞 단계가 넘어졌어도 반드시 적는다(always).
+      # 🔴 main 에는 올리지 않는다(2026-10-04) — 앱·Pages 는 이 장부를 읽지 않고(관리자 화면은 기본 브랜치를 읽는다) 배포 로봇이
+      #    옮긴다. 옛 판은 기본 브랜치에 저장한 뒤 main push 가 거절돼(fetch first) '게시 실패' 이슈를 냈다(#263 — 게시는 성공).
       - name: 올린 기록 저장
+        id: record
+        if: ${{ always() && steps.post.outcome == 'success' }}
         run: |
+          bash tools/setup-collab.sh       # 🔴 다른 공고의 준비·건너뛰기가 같은 장부를 쓸 수 있다 — 장부 병합 규칙 등록(mergeInstaSeen)
           git config user.name  'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git add insta/seen.json
@@ -370,24 +468,50 @@ jobs:
             git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE"; sleep 5; }
             [ "$i" = 3 ] && { echo '🚨 기본 브랜치에 못 올렸습니다'; exit 1; }   # 🔴 sleep 이 0 을 남겨 그냥 넘어가던 자리
           done
-          git push origin HEAD:main
 
       # 🔴 `if: failure()` 는 **시간 초과에 반응하지 않는다** — 상한을 넘긴 작업은
       #    '실패' 가 아니라 '취소' 다(CLAUDE.md). 둘 다 잡는다.
+      # 🔴 올라간 뒤의 실패를 '게시가 실패했습니다' 라고 하지 않는다 — 사람이 다시 누르면 장부에 없는 글이라 **두 번 올라간다**(2026-10-04).
       - name: 실패하면 시끄럽게
         if: ${{ failure() || cancelled() }}
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           RUN: ${{ github.run_id }}
+          CODE: ${{ inputs.code }}
+          POSTED: ${{ steps.post.outcome }}
+          RECORDED: ${{ steps.record.outcome }}
+          MEDIA: ${{ steps.post.outputs.media }}
+          PERMALINK: ${{ steps.post.outputs.permalink }}
         run: |
-          echo '🚨 게시가 실패했습니다 — 이슈를 만들었습니다.' >> "$GITHUB_STEP_SUMMARY"
           gh label create insta-fail --repo "$REPO" --color B60205 --description '인스타 게시 실패' 2>/dev/null || true
+          if [ "$POSTED" = success ] && [ "$RECORDED" != success ]; then
+            echo '⚠️ 인스타에는 올라갔는데 기록 저장이 실패했습니다 — 다시 게시하지 마세요. 이슈를 만들었습니다.' >> "$GITHUB_STEP_SUMMARY"
+            gh issue create --repo "$REPO" --label insta-fail \
+              --title "⚠️ 인스타에는 올라갔는데 기록 저장만 실패했습니다 — 다시 게시하지 마세요 ($CODE)" \
+              --body "게시는 됐습니다 — ${PERMALINK:-(게시물 주소를 못 받았습니다 · 인스타 앱에서 확인)} (media ${MEDIA:-?})
+          그 뒤 장부(insta/seen.json)에 올림 기록을 저장하지 못했습니다.
+          🔴 관리자 화면에서 「게시」 를 다시 누르지 마세요 — 장부에 없어서 같은 글이 한 번 더 올라갑니다.
+
+          장부에 손으로 넣는 법 (Claude 세션에 '인스타 올림 기록 넣어줘 $CODE' 라고 해도 됩니다):
+          - insta/seen.json 의 posted 끝에 한 줄: {\"code\": \"$CODE\", \"media\": \"${MEDIA}\", \"permalink\": \"${PERMALINK}\", \"at\": \"<올린 날 KST YYYY-MM-DD>\"} (org·name·tplNo 는 insta/pub/$CODE/meta.json 에서)
+          - 같은 code 의 prepared 줄은 status 를 \"posted\" 로, postedAt 을 같은 날로
+          - 저장은 들여쓰기 1칸(JSON.stringify(x, null, 1)) · 기본 브랜치에
+
+          실행 로그: https://github.com/$REPO/actions/runs/$RUN"
+            exit 0
+          fi
+          if [ "$POSTED" = success ]; then
+            echo '게시·기록은 끝났습니다 — 그 뒤 단계만 멈췄습니다.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo '🚨 게시가 실패했습니다 — 이슈를 만들었습니다.' >> "$GITHUB_STEP_SUMMARY"
           gh issue create --repo "$REPO" --label insta-fail \
             --title '🚨 인스타 게시가 실패했습니다' \
             --body "실행 로그: https://github.com/$REPO/actions/runs/$RUN
 
-          자주 나는 원인 셋
+          자주 나는 원인 넷 (로그의 첫 🚨 줄이 이유입니다)
+          - 마감이 지난 카드·그림에 「마감 D-N」 이 박힌 옛 카드 → 게시 거절 — 건너뛰거나 관리자 화면 「이 판형으로 다시 그리기」 로 다시 그린 뒤 게시
           - 토큰 만료 → IG_ACCESS_TOKEN 갱신 (「인스타 토큰 수명 확인」 참고)
           - 그림이 아직 공개 안 됨 → Pages 배포를 기다렸다 「게시」 를 다시
           - 24시간 50건 상한 초과 → 내일 다시"
@@ -397,6 +521,10 @@ jobs:
     if: ${{ startsWith(inputs.step, '건너뛰기') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # 같은 공고끼리만 한 줄 — 여러 줄을 연달아 건너뛰어도 서로 취소하지 않는다(위 머리말)
+    concurrency:
+      group: ${{ format('insta-code-{0}', inputs.code) }}
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
         with:
@@ -413,6 +541,7 @@ jobs:
         run: |
           [ -n "$CODE" ] || { echo '🚨 공고 코드를 주세요.'; exit 1; }
           node insta/ledger.mjs skip "$CODE" --by="$ACTOR"
+          bash tools/setup-collab.sh       # 🔴 다른 공고의 준비·게시가 같은 장부를 쓸 수 있다 — 장부 병합 규칙 등록(mergeInstaSeen)
           git config user.name  'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git add insta/seen.json
@@ -421,11 +550,28 @@ jobs:
             git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE"; sleep 5; }
             [ "$i" = 3 ] && { echo '🚨 기본 브랜치에 못 올렸습니다'; exit 1; }
           done
+          # 남은 카드 수는 insta/ready-issues.mjs 한 곳(위 게시 작업과 같다) — 장부는 바로 위에서 고쳤다
           for n in $(gh issue list --repo "$REPO" --label insta-ready --state open --json number,body --jq ".[] | select(.body | contains(\"<!-- insta-code: $CODE -->\")) | .number"); do
-            CNT=$(gh issue view "$n" --repo "$REPO" --json body --jq .body | grep -c '<!-- insta-code: ')
-            if [ "$CNT" -le 1 ]; then gh issue close "$n" --repo "$REPO" --comment "건너뛰기로 정했습니다 ($CODE · $ACTOR).";
-            else gh issue comment "$n" --repo "$REPO" --body "건너뛰기 — $CODE ($ACTOR)"; fi
+            LIVE=$(gh issue view "$n" --repo "$REPO" --json body --jq .body | node insta/ready-issues.mjs live-in-body || true)
+            if [ "${LIVE:-1}" = "0" ]; then gh issue close "$n" --repo "$REPO" --comment "건너뛰기로 정했습니다 ($CODE · $ACTOR) — 남은 카드가 없어 자동으로 닫습니다.";
+            else gh issue comment "$n" --repo "$REPO" --body "건너뛰기 — $CODE ($ACTOR) (남은 카드 ${LIVE:-?}건)"; fi
           done
       - name: 실패하면 시끄럽게
         if: ${{ failure() || cancelled() }}
         run: echo '🚨 건너뛰기 기록에 실패했습니다.' >> "$GITHUB_STEP_SUMMARY"
+      # 🔴 요약 한 줄은 아무도 안 본다 — 이슈로 부른다 (2026-10-04 로봇·도구 점검).
+      #    넘어짐 알림(robot-down)이 아니라 경보 한 곳의 따로 제목을 쓴다: 건너뛰기는 사람이 누른 일이라, 같은 워크플로의
+      #    다른 작업(매일 준비)이 성공했다고 하트비트가 닫으면 '기록이 안 됐다'는 사실이 사라진다. 사람이 확인하고 닫는다.
+      - name: 🚨 건너뛰기 실패 이슈
+        if: ${{ failure() || cancelled() }}
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          title: 🚨 인스타 건너뛰기 기록에 실패했습니다
+          label: insta-fail
+          label-description: 인스타 게시 실패
+          body: |
+            공고 `${{ inputs.code }}` 의 건너뛰기를 장부에 적지 못했습니다(누른 사람 ${{ github.actor }}). 장부에 안 적히면 그 카드는 '준비됨'으로 남습니다.
+            실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            관리자 화면 › 인스타 에서 건너뛰기를 다시 누르거나 Claude 세션에 '인스타 건너뛰기 실패 확인해줘'라고 지시하세요.

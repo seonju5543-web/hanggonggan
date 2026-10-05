@@ -38,6 +38,7 @@ on:
 permissions:
   contents: write
   issues: write
+  actions: write       # 배포 뒤 화면 검사(verify-ui)를 깨우기 위해 (아래 '화면 검사 깨우기' 단계 · 2026-10-04)
 
 # deploy-sync·main-guard 와 **다른** 그룹. 같은 그룹에 넣으면 GitHub 이 대기 중인 오래된 실행을
 # 취소해 버려서, 사람이 누른 배포가 조용히 사라진다.
@@ -94,6 +95,8 @@ jobs:
             echo "❌ '$SRC' 브랜치를 찾지 못했어요."
             echo "state=nobranch" >> "$GITHUB_OUTPUT"; exit 0
           fi
+          # 합치기 전 기본 브랜치 위치 — 이 배포가 insta/run-notify.txt 를 바꿨는지 아래 '인스타 수정본 알림 깨우기' 가 본다
+          echo "before=$(git rev-parse "origin/$BASE")" >> "$GITHUB_OUTPUT"
 
           # ── 표식 확인 (push 로 깨어났을 때만) ──────────────────────────
           # 표식 파일이 '지금 push 된 브랜치'를 가리킬 때만 배포한다. 다른 세션이 기본 브랜치를
@@ -169,6 +172,114 @@ jobs:
             const a=x=>Array.isArray(x)?x:(x.items||[]);
             console.log('실시간 공고 '+a(n).length+'건 · 정식 등록 '+a(r).length+'건');"
           git log --oneline -5
+
+      # 🔴 배포한 내용으로 화면 검사를 깨운다 (2026-10-04 · 로봇·도구 점검).
+      #    이 워크플로가 올린 push 는 GitHub 규칙상 다른 워크플로를 깨우지 못해(위 머리말),
+      #    작업 브랜치 하나만 쓰는 세션의 배포는 화면 검사(verify-ui)가 **한 번도 안 돈 채** 앱에 나갈 수 있었다
+      #    (실측: 10-02 15:12Z → 10-03 08:06Z 사이 verify-ui 실행 0). 버튼 실행(workflow_dispatch)만은
+      #    이 열쇠(GITHUB_TOKEN)로도 새 실행을 만든다 — GitHub 이 허용하는 예외다.
+      #    기본 브랜치로 깨우는 이유: ① 빨간불 경보를 닫는 단계가 기본 브랜치에서만 돈다 ② main 은 방금 기본 브랜치를 합친 같은 내용이다.
+      #    ⚠️ 배포를 막지는 않는다(검사는 배포 뒤에 돈다) — 막을지는 개발자 결정 대기.
+      #    깨우기가 실패해도 배포는 이미 끝났으니 실패로 보이지 않게 continue-on-error.
+      - name: 화면 검사 깨우기 (배포한 내용으로)
+        if: steps.run.outputs.state == 'deployed'
+        continue-on-error: true
+        timeout-minutes: 3
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: gh workflow run verify-ui.yml --repo "$REPO" --ref claude/nice-heisenberg-WESq5
+
+      # 🔴 채팅에서 고친 인스타 카드의 알림을 깨운다 (2026-10-04 로봇·도구 점검 · 스킬 insta-revise 5-3).
+      #    작업 브랜치만 쓰는 세션은 insta/run-notify.txt 를 이 워크플로로 기본 브랜치에 올리는데, 이 워크플로의 push 는
+      #    다른 워크플로를 못 깨워(위 머리말) insta.yml 의 push 트리거가 **조용히 안 돌았다** — 수정본 알림이 개발자에게 안 갔다.
+      #    버튼 실행(workflow_dispatch)만은 이 열쇠로도 깨어난다(화면 검사 깨우기와 같은 예외). 기본 브랜치에 폴더가 올라간 **뒤**여야 한다
+      #    (insta.yml 이 거기서 insta/pub/<코드> 를 찾는다). 사람이 기본 브랜치에 직접 올린 표식은 insta.yml 의 push 트리거가 그대로 받는다 —
+      #    여기는 이 배포가 그 파일을 바꿨을 때만 깨우므로 두 번 울리지 않는다.
+      #    🔴 step 글자는 insta.yml 선택지와 한 글자도 다르면 안 된다(422 거절 — 관문 verify/health-gates/insta.mjs 가 대조한다).
+      - name: 인스타 수정본 알림 깨우기 (insta/run-notify.txt 가 바뀌었을 때)
+        id: instanotify
+        if: steps.run.outputs.state == 'deployed' || steps.run.outputs.state == 'uptodate'
+        continue-on-error: true
+        timeout-minutes: 3
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BASE: claude/nice-heisenberg-WESq5
+          BEFORE: ${{ steps.run.outputs.before }}
+        run: |
+          set -u
+          [ -n "$BEFORE" ] || { echo '배포 전 기본 브랜치 위치를 몰라 건너뜁니다.'; exit 0; }
+          git fetch origin "$BASE"
+          if [ -z "$(git diff --name-only "$BEFORE" "origin/$BASE" -- insta/run-notify.txt)" ]; then
+            echo '인스타 알림 표식(insta/run-notify.txt)은 이번 배포로 바뀌지 않았습니다.'; exit 0
+          fi
+          CODE="$(git show "origin/$BASE:insta/run-notify.txt" | sed -n 's/^code:[[:space:]]*//p' | head -1 | tr -d '\r' | sed 's/[[:space:]]*$//')"
+          if ! printf '%s' "$CODE" | grep -qE '^[A-Za-z0-9_-]+$'; then
+            echo "insta/run-notify.txt 의 code: 줄이 비었거나 공고 코드 꼴이 아닙니다('$CODE') — 알림을 깨우지 않습니다."; exit 0
+          fi
+          gh workflow run insta.yml --repo "$REPO" --ref "$BASE" -f step='알림 (준비된 카드를 다시 보낸다)' -f code="$CODE"
+          {
+            echo "📸 인스타 수정본 알림을 깨웠습니다 — 공고 \`$CODE\`"
+            echo "실행 목록: https://github.com/$REPO/actions/workflows/insta.yml"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # 깨우기가 넘어지면 수정본 알림이 안 간 것이다 — 배포는 끝났으니 배포 실패가 아니라 따로 이슈로 부른다(사람이 확인하고 닫는다).
+      - name: 🚨 인스타 수정본 알림을 못 깨웠다
+        if: steps.instanotify.outcome == 'failure'
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          title: 🚨 인스타 수정본 알림을 못 깨웠습니다
+          label: insta-fail
+          label-description: 인스타 게시 실패
+          body: |
+            「이 기기에서 배포」 가 insta/run-notify.txt 를 기본 브랜치에 올렸는데 「인스타 카드뉴스 게시」(알림)를 깨우지 못했습니다 — 수정본이 개발자에게 안 갔습니다.
+            Actions 「인스타 카드뉴스 게시」 를 단계 「알림 (준비된 카드를 다시 보낸다)」 와 run-notify.txt 의 code 로 직접 실행하세요.
+            실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      # 🔴 배포가 됐으면 옛 '배포 실패' 경보를 닫는다 (2026-10-04 로봇·도구 점검 · 묶음 alerts).
+      #    아래 실패 알림은 열기·댓글만 해서, 그 뒤 손으로든 다음 배포로든 다 나간 작업의 🚨 가 09-14 부터 열려 있었다(#274 —
+      #    본문·댓글의 브랜치 다섯 모두 main 보다 앞선 커밋 0).
+      #    판정은 **사실 하나**로만 한다: 경보에 적힌 작업 브랜치가 전부 main 에 들어갔는가(compare main...브랜치 의 ahead_by == 0).
+      #    브랜치를 못 찾음(지워짐·404)·조회 실패·이름 '?' 는 '모름'이라 그 경보는 그대로 둔다 — 못 읽은 것을 '나갔다'로 읽지 않는다.
+      #    어느 브랜치에서 돌아도 같은 사실을 보므로 안전하다. 보강이라 실패해도 배포를 빨갛게 하지 않는다.
+      - name: 배포가 됐으면 옛 배포 실패 경보를 닫는다
+        if: steps.run.outputs.state == 'deployed' || steps.run.outputs.state == 'uptodate'
+        continue-on-error: true
+        timeout-minutes: 2
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -u
+          # 라벨이 아니라 **제목**으로 찾는다 — 라벨 붙이기가 막혀 라벨 없이 만들어진 옛 경보도 잡힌다(아래 실패 알림의 예비 명령).
+          for n in $(gh issue list --repo "$REPO" --state open --limit 500 \
+                       --json number,title --jq '.[] | select(.title | startswith("🚨 이 기기에서 배포 실패")) | .number'); do
+            text="$(gh issue view "$n" --repo "$REPO" --json body,comments --jq '[.body] + [.comments[].body] | join("\n")')" \
+              || { echo "#$n: 본문을 못 읽어 그대로 둡니다"; continue; }
+            branches="$(printf '%s\n' "$text" | grep -oE '작업 브랜치 `[^`]+`' | sed -E 's/^작업 브랜치 `//; s/`$//' | sort -u || true)"
+            if [ -z "$branches" ]; then echo "#$n: 브랜치 이름을 못 찾아 그대로 둡니다"; continue; fi
+            all=1; lines=""
+            while IFS= read -r b; do
+              [ -n "$b" ] || continue
+              ahead="$(gh api "repos/$REPO/compare/main...$b" --jq .ahead_by 2>/dev/null || true)"
+              case "$ahead" in
+                0) lines+="· \`$b\` — main 에 모두 들어갔습니다"$'\n' ;;
+                ''|*[!0-9]*) all=0; lines+="· \`$b\` — 확인하지 못했습니다(브랜치가 없거나 조회 실패)"$'\n' ;;
+                *) all=0; lines+="· \`$b\` — 아직 main 에 없는 커밋 ${ahead}개"$'\n' ;;
+              esac
+            done <<< "$branches"
+            printf '#%s\n%s' "$n" "$lines"
+            if [ "$all" = "1" ]; then
+              gh issue close "$n" --repo "$REPO" --reason completed \
+                --comment "✅ $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST — 이 경보에 적힌 작업 브랜치가 전부 앱(main)에 들어갔습니다. 자동으로 닫습니다."$'\n\n'"${lines}"$'\n'"확인한 실행: ${RUN_URL}"
+            else
+              echo "#$n: 아직 다 나가지 않았거나 확인하지 못해 그대로 둡니다"
+            fi
+          done
 
       # 조용히 멈추지 않는다. 알림이 쌓이지 않게 열려 있는 같은 이슈가 있으면 코멘트만 단다.
       - name: 🚨 배포 실패 알림

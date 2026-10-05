@@ -30,6 +30,18 @@ jobs:
         env:
           SITE: https://seonju5543-web.github.io/hanggonggan
         run: |
+          # 🔴 **두 번까지 본다** (2026-10-04 로봇·도구 점검). 배포 직후에 돌면 Pages 가 아직 옛 판을 내보내는 사이일 수 있다
+          #    (#384 — 배포 1분 뒤 실행 ❌ · 5분 뒤 다시 돌리니 통과). 처음에 어긋나면 3분 쉬고
+          #    **저장소 main 도 그때 것으로 다시 받아** 한 번 더 본다. 두 번 다 어긋날 때만 경보다.
+          #    (대조 스크립트는 회차마다 /tmp/try.out 에 쓰고, 끝에 마지막 회차 값만 진짜 출력으로 옮긴다.)
+          for try in 1 2; do
+          if [ "$try" = 2 ]; then
+            echo
+            echo "⏳ Pages 배포가 진행 중일 수 있어 3분 뒤 다시 봅니다 (저장소 main 도 그때 것으로 다시 받습니다)"
+            sleep 180
+            git fetch -q origin main && git checkout -q --detach FETCH_HEAD || echo "⚠️ main 을 다시 받지 못했습니다 — 처음 받은 판으로 다시 봅니다"
+          fi
+          rm -rf live
           mkdir -p live
 
           # 🔴 **앱이 실제로 받는 파일을 본다** (2026-09-29 신설).
@@ -81,16 +93,27 @@ jobs:
             console.log([...new Set(out)].join(' '));
           ")
 
-          for f in sw.js app.js data/notices.json data/registered.json data/forms.json $EXTRA; do
+          # 🔴 앱이 받는 그 밖의 파일 (2026-10-04 로봇·도구 점검) — 이 점검이 대외활동·재단·층2·등록금·검색 요약·자기소개서 규칙 둘·
+          #    정문 사진 목록·약관을 안 봐서 404 여도 초록이었다. 손 목록을 만들지 않고 **앱 스크립트의 fetch·getDoc 글자**에서 뽑는다
+          #    (tools/app-fetch-files.cjs — 앱이 새 파일을 받게 되면 저절로 따라온다). 위 목록·EXTRA 에 이미 있는 것은 뺀다.
+          APP_FILES=$(node -e "
+            const { appFetchFiles } = require('./tools/app-fetch-files.cjs');
+            const skip = new Set(['sw.js', 'app.js', 'data/notices.json', 'data/registered.json', 'data/forms.json', ...process.argv.slice(1)]);
+            console.log(appFetchFiles('.').filter((f) => !skip.has(f)).join(' '));
+          " $EXTRA)
+
+          for f in sw.js app.js data/notices.json data/registered.json data/forms.json $EXTRA $APP_FILES; do
             mkdir -p "live/$(dirname "$f")"
             curl -sSL --max-time 30 -H 'Cache-Control: no-cache' "$SITE/$f" -o "live/$f" || echo "받기 실패: $f"
           done
           echo "— 앱이 실제로 받는 파일도 확인: $EXTRA —"
+          echo "— 앱 스크립트가 받는 그 밖의 파일: $APP_FILES —"
 
           echo "— 캐시 응답 헤더(참고) —"
           curl -sSI --max-time 30 "$SITE/data/registered.json" | grep -i "cache-control\|etag\|last-modified" || true
 
-          EXTRA_FILES="$EXTRA" node - <<'EOF'
+          : > /tmp/try.out
+          EXTRA_FILES="$EXTRA" APP_FILES="$APP_FILES" GITHUB_OUTPUT=/tmp/try.out node - <<'EOF'
           const fs = require('fs');
           /* 파일마다 담는 모양이 달라서(공고=items 배열, 양식=templates 목록) 개수를 각각 센다.
              모양을 못 읽으면 '읽기실패'로 남겨 두 쪽 다 undefined라 통과해 버리는 일이 없게 한다. */
@@ -117,6 +140,9 @@ jobs:
           const linkCheck = (p) => { try { const j = JSON.parse(fs.readFileSync(p, 'utf8')); return j && j.bad && typeof j.bad === 'object' ? `${Object.keys(j.bad).length}건+${Object.keys(j.fix || {}).length}@${String(j.updatedAt || '-').slice(0, 16)}` : '읽기실패'; } catch { return '읽기실패'; } };
           // 관리자 바로잡기(data/link-fixes.json)는 bad 가 없고 fix 만 있다 — 건수·시각으로 비교(못 읽으면 '읽기실패' · 404 를 통과로 세지 않는다)
           const linkFixes = (p) => { try { const j = JSON.parse(fs.readFileSync(p, 'utf8')); return j && j.fix && typeof j.fix === 'object' ? `${Object.keys(j.fix).length}건@${String(j.updatedAt || '-').slice(0, 16)}` : '읽기실패'; } catch { return '읽기실패'; } };
+          /* 앱이 받는 그 밖의 파일·색인은 **바이트 수 + 지문**으로 (2026-10-04) — Pages 는 머리말 없는 파일을 바이트 그대로 내보내므로
+             같아야 정상이다. 개수로 세면 칸 수만 같아도 통과한다(색인은 칸 넷 대 넷). 404 쪽(HTML)은 지문이 달라 같다고 세지 않는다. */
+          const hash = (p) => { try { const b = fs.readFileSync(p); return `${b.length}B#${require('crypto').createHash('sha1').update(b).digest('hex').slice(0, 8)}`; } catch { return '읽기실패'; } };
           const rows = [
             ['서비스워커 버전', cache('sw.js'), cache('live/sw.js')],
             ['실시간 공고(옛)', count('data/notices.json'), count('live/data/notices.json')],
@@ -139,21 +165,30 @@ jobs:
             const m = f === 'data/link-check.json' ? linkCheck : f === 'data/link-fixes.json' ? linkFixes : measure;   // 원문 링크 확인·바로잡기는 건수·시각으로(위 linkCheck·linkFixes)
             rows.push([`${label} ${f.split('/').pop()}`, m(f), m('live/' + f)]);
           }
+          const appFiles = (process.env.APP_FILES || '').split(/\s+/).filter(Boolean);
+          for (const f of appFiles) rows.push([`앱이 받는 파일 ${f}`, hash(f), hash('live/' + f)]);
+          for (const f of ['data/notices/index.json', 'data/news/index.json']) rows.push([`색인 지문 ${f.split('/').slice(-2).join('/')}`, hash(f), hash('live/' + f)]);
           let bad = 0;
+          const diffs = [];
           console.log('\n항목             저장소(main)   실제 앱   결과');
           for (const [name, repo, live] of rows) {
             const ok = String(repo) === String(live);
-            if (!ok) bad++;
+            if (!ok) { bad++; diffs.push(`· ${name} — 저장소 ${repo} · 앱 ${live}`); }
             console.log(`${name.padEnd(16)} ${String(repo).padEnd(13)} ${String(live).padEnd(9)} ${ok ? '✅ 같음' : '❌ 다름'}`);
           }
           const appOk = fs.existsSync('live/app.js') && fs.readFileSync('live/app.js', 'utf8').length > 1000;
           console.log(`앱 코드 내려받기 ${appOk ? '✅ 정상' : '❌ 실패'}`);
-          if (!appOk) bad++;
+          if (!appOk) { bad++; diffs.push('· 앱 코드 내려받기 실패'); }
           fs.appendFileSync(process.env.GITHUB_OUTPUT, `bad=${bad}\n`);
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `diff<<__LIVE_DIFF__\n${diffs.join('\n') || '(없음)'}\n__LIVE_DIFF__\n`);
           console.log(bad === 0
             ? '\n✅ 배포된 앱이 저장소와 같습니다 — 사용자는 재설치 없이 최신 내용을 봅니다.'
             : `\n❌ ${bad}개 항목이 어긋납니다 (Pages 배포가 아직 안 끝났거나 동기화 실패).`);
           EOF
+          bad=$(sed -n 's/^bad=//p' /tmp/try.out | tail -1)
+          [ "$bad" = "0" ] && break
+          done
+          cat /tmp/try.out >> "$GITHUB_OUTPUT"
 
       # 관리자 페이지가 학생용 주소에 딸려 나가지 않았는지 매일 확인한다.
       #
@@ -201,22 +236,45 @@ jobs:
             --title "🚨 관리자 페이지가 공개 주소에 노출됨 ($(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST)" \
             --repo "$REPO" --assignee "$OWNER" --body-file /tmp/admin-leak.md
 
+      # 🔴 어긋남은 이슈 **하나**에 모으고, 다시 같아지면 닫는다 (2026-10-04 로봇·도구 점검 · tools/alert-issue.mjs).
+      #    옛 판은 실행마다 시각 붙은 새 이슈를 만들고 닫는 길이 없어, 다음 날부터 통과했는데도 #350 이 열린 채였다.
+      #    제목 앞머리(prefix)로 찾아 옛 시각 붙은 제목도 이어지고 닫힌다.
       - name: 🚨 어긋남 알림
         if: steps.check.outputs.bad != '0'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh issue create \
-            --title "🚨 앱 반영 점검 실패 ($(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST)" \
-            --repo "${{ github.repository }}" \
-            --assignee "${{ github.repository_owner }}" \
-            --body "배포된 앱(https://seonju5543-web.github.io/hanggonggan)이 저장소 main과 다릅니다.
-          Pages 배포가 늦어졌을 수도 있으니 먼저 다시 실행해 보고, 계속 다르면 배포 동기화를 확인하세요.
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          match: prefix
+          title: 🚨 앱 반영 점검 실패
+          label: live-check
+          label-description: 배포된 앱이 저장소 main 과 다름
+          assignee: ${{ github.repository_owner }}
+          body: |
+            배포된 앱(https://seonju5543-web.github.io/hanggonggan)이 저장소 main과 다르거나, 대조를 끝까지 하지 못했습니다(어긋나면 3분 뒤 한 번 더 봅니다).
+            계속 다르면 배포 동기화를 확인하세요. 다음 점검에서 같아지면 이 이슈는 저절로 닫힙니다.
 
-          실행 기록: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            어긋난 항목(비어 있으면 대조 단계가 끝까지 못 간 것 — 실행 기록을 보세요):
+            ${{ steps.check.outputs.diff }}
 
-          ---
-          _Generated by [Claude Code](https://claude.ai/code)_"
+            실행 기록: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            ---
+            _Generated by [Claude Code](https://claude.ai/code)_
+
+      - name: 다시 같아지면 옛 어긋남 경보를 닫는다
+        if: steps.check.outputs.bad == '0'
+        continue-on-error: true
+        timeout-minutes: 2
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          match: prefix
+          title: 🚨 앱 반영 점검 실패
+          body: |
+            ✅ 배포된 앱이 저장소(main)와 다시 같습니다 — 자동으로 닫습니다.
+            실행 기록: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       # 🔴 실행 알림 (2026-09-06 신설) — 결과 알림과 다른 것이다.
       #    결과 알림: "보러 갔더니 상태가 이상하더라"  · 실행 알림: "보러 가다가 내가 넘어졌다"

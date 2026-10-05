@@ -2677,6 +2677,7 @@ console.log('\n■ 학교 대표 사진 (2026-10-03 개발자 지시 "썸네일�
     ${/* 카드의 링크 이름은 source-link.js 한 곳(2026-10-03 원문 링크 정직성) — 흉내 내지 않고 진짜 파일을 싣는다 */ readText(new URL('source-link.js', root))}
     const NEWS_THUMB_RE = ${re('NEWS_THUMB_RE')}; const SCHOOL_PHOTO_RE = ${re('SCHOOL_PHOTO_RE')}; const PHOTO_FOCUS_RE = ${re('PHOTO_FOCUS_RE')};
     let schoolPhotos = null; const state = { profile: null };
+    ${app.slice(app.indexOf('const TD_DAY ='), app.indexOf('/* notStale(오래된 공고 숨김)'))}
     ${cut('noticeCardHtml')}
     ${cut('schoolPhotoFor')}
     return { noticeCardHtml, schoolPhotoFor, set: (d) => { schoolPhotos = d; }, me: (school) => { state.profile = school ? { school } : null; } };`;
@@ -3602,6 +3603,16 @@ console.log('\n■ 마감일을 원문에서 읽는다 (2026-08-30)');
   /* 🔴 줄 끝의 전화번호 하이픈을 범위 기호로 읽으면 **멀쩡한 마감일이 통째로 버려진다** */
   eq('날짜 뒤 전화번호가 있어도 마감일을 잃지 않는다',
     D('신청기간: 2026. 8. 20.(목) 까지 · 문의 02-940-5114'), '2026-08-20');
+  /* 🔴 표 칸이 줄로 갈라지면 이름표와 날짜가 **다른 줄**이다(htmlToLines · 2026-10-05 G-3 —
+     아주대 바르게장학 `접수기한` / `2026.10.26.(월) 23:59 까지`, 서울시립 빅데이터사업단 `1. 신청기간`).
+     콜론 없는 줄은 **이름표로 끝나는 짧은 줄 + 바로 다음 줄이 날짜로 시작**할 때만 잇는다. */
+  eq('이름표 다음 줄의 날짜', D('접수기한\n2026.10.26.(월) 23:59 까지\n선발된 장학생에 한해 개별 통보 / 11.02.(월) 예정'), '2026-10-26');
+  eq('번호 붙은 이름표 다음 줄의 범위',
+    D('1. 신청기간\n2026. 11. 02.(월) ~ 2026. 12. 07.(월) 17시까지\n-기간 외 신청 불가'), '2026-12-07');
+  eq('  다음 줄이 날짜로 시작하지 않으면 잇지 않는다', D('신청기간\n장학팀 공지 참고 2026.10.1 까지'), null);
+  eq('  문장은 이름표가 아니다', D('신청기간을 꼭 확인하세요\n2026.10.01 까지'), null);
+  eq('  지급 기간은 줄을 이어도 마감이 아니다', D('지급기간\n2026. 9. 1. ~ 2027. 2. 28.'), null);
+  eq('  맨 「기간」은 까지가 있어야', D('기간\n2026. 9. 1. ~ 2027. 2. 12.'), null);
 
   /* ── 접수 시작일 · 발표일 (2026-09-07 · 캘린더 UI-21) ──
      🔴 이 둘은 마감일과 **같은 줄**에서 와야 한다. 끝을 못 읽는 줄에서 시작만 주우면
@@ -7880,7 +7891,7 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
     appJs.match(/function cardOrgLine\(sch\) \{[\s\S]*?\n\}\n/),
   ];
   eq('cardTitle · cleanCardTitle · cardOrgLine 을 app.js 에서 떼어 냈다', parts.every(Boolean), true);
-  const src = parts.map((m) => (m ? m[0] : '')).join('\n');
+  const src = appJs.slice(appJs.indexOf('const TD_DAY ='), appJs.indexOf('/* notStale(오래된 공고 숨김)')) + parts.map((m) => (m ? m[0] : '')).join('\n');   // 카드 제목 날짜 규칙 한 곳(2026-10-05)
   const [cardTitle, cardOrgLine] = ['cardTitle', 'cardOrgLine'].map((n) => new Function(`${src}\nreturn ${n};`)());
   const t = (name, provider) => cardTitle({ name, provider });
 
@@ -11284,7 +11295,22 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
     [(appX.match(/activityTitle\(n\)/g) || []).length >= 3, /foot = benefitShort\(activityBenefit\(n\)\)/.test(appX), /benefitItems\(benefit\)\.map/.test(appX), /benefit && benefit\.length <= 40 \? `<p class="sheet-amount">/.test(appX)], [true, true, true, true]);
   {
     const grab = (a, b) => appX.slice(appX.indexOf(a), appX.indexOf(b, appX.indexOf(a)));
-    const fn = new Function('unent', `${grab('const ACT_TAG', '/* 제목 괄호 속 대상')}; return { activityTitle, benefitShort, benefitItems };`)((x) => String(x));
+    const fn = new Function('unent', `${grab('const TD_DAY =', '/* notStale(오래된 공고 숨김)')}; ${grab('const ACT_TAG', '/* 제목 괄호 속 대상')}; return { activityTitle, benefitShort, benefitItems };`)((x) => String(x));
+    /* 카드 제목의 날짜·기간 — 세 갈래 카드가 부르는 한 곳 (2026-10-05 개발자 지적 "제목에 날짜 들어간 거 아직도 있는데") */
+    const TD = new Function(`${grab('const TD_DAY =', '/* notStale(오래된 공고 숨김)')}; return splitTitleDates;`)();
+    const T = (x) => TD(x).title;
+    eq('  제목 날짜 — 괄호 안이 기간뿐이면 괄호째 (`(~8/3)` `(9.11~9.28)` `(10/5 마감)` `(~2026.11.11.(수))` `(~10.8.목 17시)`)',
+      ['염곡문화재단 장학생 선발 안내(~8/3)', '원전 장학금 신청안내 (9.11~9.28)', '발전기금 장학생 선발 안내(10/5 마감)', '대산농촌재단 장학생 선발 안내(~2026.11.11.(수))', '인재육성 장학생 선발 안내(~10.8.목 17시)'].map(T),
+      ['염곡문화재단 장학생 선발 안내', '원전 장학금 신청안내', '발전기금 장학생 선발 안내', '대산농촌재단 장학생 선발 안내', '인재육성 장학생 선발 안내']);
+    eq('  섞인 괄호는 날짜 조각만 · 분류표의 날짜만 · 붙여 쓴 기간 꼬리 · 꼬리 게시일',
+      [T('해동과학문화재단 장학생 선발 안내(10/26 마감, 공학계열, 생활비 연 1200만원)'), T('[교내-10/30] 2026학년도 2학기 소망장학금 신청 안내'), T('2026학년도 2학기 점프장학 신청 안내_09.22(화)~10.9(금)'), T('청춘두두두 10월 프로그램 참가자 모집 공고 2026.09 . 28')],
+      ['해동과학문화재단 장학생 선발 안내(공학계열, 생활비 연 1200만원)', '[교내] 2026학년도 2학기 소망장학금 신청 안내', '2026학년도 2학기 점프장학 신청 안내', '청춘두두두 10월 프로그램 참가자 모집 공고']);
+    eq('  🔴 날짜가 아닌 것은 남긴다 — 학년도·「10월 프로그램」·회차·분수·캠퍼스 괄호·문장 속 행사 날짜',
+      ['2026학년도 2학기 장학금 신청 안내', '청춘두두두 10월 프로그램 참가자 모집', '제13회 수림재단 동교인재상 선발 안내', '故장영희교수 장학금(영문 및 인문사회계열, 등록금 2/3)', '국가근로장학생 모집(서울캠퍼스)', '10월 6일(화)과 10월 8일(목) 헌혈 버스 시행 안내'].map(T),
+      ['2026학년도 2학기 장학금 신청 안내', '청춘두두두 10월 프로그램 참가자 모집', '제13회 수림재단 동교인재상 선발 안내', '故장영희교수 장학금(영문 및 인문사회계열, 등록금 2/3)', '국가근로장학생 모집(서울캠퍼스)', '10월 6일(화)과 10월 8일(목) 헌혈 버스 시행 안내']);
+    eq('  뗀 마감은 버리지 않고 돌려준다(D-day 없는 카드의 회색 줄) · 세 갈래 카드가 이 함수를 부른다',
+      [TD('장학생 선발 안내(~8/3)').dates, /splitTitleDates\(t\)\.title/.test(appX.slice(appX.indexOf('function cleanCardTitle'))), /t = splitTitleDates\(t\)\.title;/.test(appX.slice(appX.indexOf('function activityTitle'))), /const tSplit = splitTitleDates\(unent\(n\.title\)\)/.test(appX)],
+      [['~8/3'], true, true, true]);
     eq('  제목 — 정책브리핑 `기간 : …` 꼬리 · 꼬리 날짜 · 이모티콘 · `[일반]` 분류표 · `(~10/22)` · `마감` 머리를 뗀다 · 주최 대괄호는 남긴다',
       ['[감사원] 2026년 국민제안 감사 아이디어 공모 기간 : 2026.10.01 ~ 2026.10.31', '[공고] 2026년 청춘두두두 10월 프로그램 참가자 모집 공고 2026.09 . 28', '📢 「2026 보성 두드림 스테이」 추가 모집 🌿',
         '[일반] [강북청년창업마루] 2026년 창업 교육 참가자 모집(~10/22)', '마감 [울산창조경제혁신센터] 학생 창업동아리 모집', '[동국대BMC창업보육센터] 패키지지원 프로그램 모집(~9/30(금)까지)'].map((t) => fn.activityTitle({ title: t })),

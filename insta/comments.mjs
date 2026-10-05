@@ -54,9 +54,15 @@ export async function fetchAll(fetchImpl = fetch, store = fileStore, now = Date.
       });
     }
   }
-  items.sort((a, b) => String(b.at || '').localeCompare(String(a.at || '')));
+  // 순서를 고정한다(시각 내림차순 → 같으면 id) — 인스타가 주는 순서가 흔들리면 같은 댓글로도 파일이 바뀐다.
+  items.sort((a, b) => String(b.at || '').localeCompare(String(a.at || '')) || String(a.id).localeCompare(String(b.id)));
+  const count = items.filter((c) => !c.error).length;
+  const failed = items.filter((c) => c.error).length;
+  // 🔴 댓글이 그대로면 쓰지 않는다 (2026-10-04 로봇·도구 점검) — 매번 updatedAt 한 줄만 바뀐 '댓글 fetch' 커밋이 쌓였다.
+  //    그래서 updatedAt 은 '받아 온 시각' 이 아니라 **마지막으로 바뀐 시각**이다(받아 온 시각은 Actions 실행 기록이 말한다).
+  if (prev.updatedAt && JSON.stringify(items) === JSON.stringify(prev.items || [])) return { state: 'ok', unchanged: true, count, failed };
   store.write({ updatedAt: new Date(now).toISOString(), items });
-  return { state: 'ok', count: items.filter((c) => !c.error).length, failed: items.filter((c) => c.error).length };
+  return { state: 'ok', count, failed };
 }
 
 /** 답글·숨김·삭제. `live` 가 아니면 하려던 일만 말하고 끝낸다. */
@@ -93,7 +99,9 @@ if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file:').hre
     if (!kind || kind === 'fetch') {
       const r = await fetchAll();
       if (r.state === 'none') { console.log('시크릿이 없습니다 — 계정 연결 전이라 정상입니다.'); console.log('state=none'); process.exit(0); }
-      console.log(`■ 댓글 ${r.count}건 받아 적음 (못 받은 게시물 ${r.failed}건)`); console.log('state=ok');
+      console.log(r.unchanged ? `■ 댓글 ${r.count}건 — 지난번과 같아 파일을 안 고쳤습니다 (못 받은 게시물 ${r.failed}건)`
+        : `■ 댓글 ${r.count}건 받아 적음 (못 받은 게시물 ${r.failed}건)`);
+      console.log('state=ok');
     } else {
       const r = await act(kind, { comment: val('comment'), text: val('text'), unhide: process.argv.includes('--unhide') }, live);
       console.log(r.dry ? `── 예행연습 — ${r.plan}\n   실제로 하려면 --do 를 주세요.` : `✅ ${r.plan}`);

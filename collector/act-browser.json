@@ -116,5 +116,98 @@
  "https://answer.moaform.com/answers/M1GLjZ": {
   "at": "2026-10-04",
   "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3517342": {
+  "at": "2026-10-04",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521608": {
+  "at": "2026-10-04",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3523464": {
+  "at": "2026-10-04",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3522927": {
+  "at": "2026-10-04",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://www.bai.go.kr/bai/etc/popupzone/detail?ppId=120": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://www.msit.go.kr/bbs/view.do?sCode=user&mId=307&mPid=208&bbsSeqNo=94&nttSeqNo=3187433": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://www.rda.go.kr/board/board.do?mode=view&prgId=nei_ancmttEntry&dataNo=100000812622": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://www.dema.mil.kr/web/dema/info/notice/4/1012194/view.do": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://www.schoolkeepa.or.kr/cop/bbs/selectArticleDetail.do?nttId=1711&bbsId=BBSMSTR_000000000001": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://www.mois.go.kr/frt/bbs/type010/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000008&nttId=129837": {
+  "at": "2026-10-04",
+  "tries": 1,
+  "lines": [
+   "모바일신분증에 관심 있는 국민이면 누구나 참가할 수 있으며 , 모바일신분증을 보다 쉽고 편리하게 사용할 수 있는 참신한 아이디어와 해결방법을 자유롭게 작성하여 제출하면 된다 ."
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://www.instagram.com/p/DcxwHT5AYap/?hl=en&img_index=1": {
+  "at": "2026-10-04",
+  "tries": 1
+ },
+ "https://k-knowledge.kr/ekp/pub/pn/pub.read.jsp?id=102": {
+  "at": "2026-10-04",
+  "tries": 1,
+  "lines": [
+   "참가 자격 : 제출서류 *제출물 부문별 작품 파일 1부",
+   "디지털집현전의 국가지식정보를 활용해",
+   "대한민국 국민 누구나 참가 가능"
+  ],
+  "excludes": [],
+  "from": "공고문 첨부(OCR)"
+ },
+ "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140267&article.offset=0&articleLimit=10": {
+  "at": "2026-10-04",
+  "tries": 1,
+  "lines": [
+   "1. 모집대상",
+   "- 만 19세 이상 성인으로 최소 1회 이상 발목의 접질림으로 발목 외측 인대 부상 병력이 있는 경우",
+   "- 최근 6개월 이내 최소 2회 이상 발목 관절의 ‘휘청거림’ 경험이 있는 경우",
+   "\"발목의 휘청거림\"은 일시적으로 발목을 통제할 수 없는 불안정성이나 발목이 접질리는 느낌",
+   "- 발목의 반복적인 접질림 때문에 일상생활 및 스포츠 활동에 어려움이 있는 경우"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
  }
 }

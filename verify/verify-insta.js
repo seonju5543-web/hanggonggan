@@ -344,8 +344,9 @@ const today = new Date();
         };
         return { f, hit, ids, sent: () => hit.filter((h) => h === 'publish').length, early: () => early };
       };
+      // outFile: null — 워크플로 단계 출력(GITHUB_OUTPUT)에 가짜 게시 결과를 남기지 않는다(이 관문은 준비 작업 안에서 돈다)
       const run = (srv) => P.publish({ dir: 'x', images: ['https://i/1.jpg', 'https://i/2.jpg'],
-        caption: 'c', live: true, f: srv.f, waits: fast, tokenStore: mem, log: () => {} });
+        caption: 'c', live: true, f: srv.f, waits: fast, tokenStore: mem, log: () => {}, outFile: null });
       const threw = async (srv) => { try { await run(srv); return false; } catch { return true; } };
 
       // ① 정상 — 처리될 때까지 기다렸다 올린다

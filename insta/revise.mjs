@@ -47,7 +47,7 @@ if (r.status !== 0) { console.error(`\n🚨 다시 그리기 실패 (종료 ${r.
 const meta = JSON.parse(readFileSync(metaFile, 'utf8'));
 const seen = readSeen();
 markPrepared(seen, { code, org: meta.org, name: meta.name, due: meta.due, school: meta.school || null, tplNo: meta.tplNo, cards: meta.cards,
-  dir: `insta/pub/${code}`, at: meta.at, revisedAt: meta.at, status: 'prepared' });
+  dir: `insta/pub/${code}`, at: meta.at, revisedAt: meta.at, dates: meta.dates || null, status: 'prepared' });
 writeSeen(seen);
 
 if (!args.includes('--no-preview')) {

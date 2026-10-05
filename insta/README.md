@@ -8,7 +8,7 @@
 
 | # | 지시 | 어디에 |
 |---|---|---|
-| ① | 공고당 게시물 하나 | `insta/pub/<공고 코드>/` — 폴더 하나가 게시물 하나. 장부는 `seen.json` (`prepared` 준비 · `posted` 올림) |
+| ① | 공고당 게시물 하나 | `insta/pub/<공고 코드>/` — 폴더 하나가 게시물 하나. 장부는 `seen.json` (`prepared` 준비 · `posted` 올림). 준비 줄의 상태는 prepared·skipped·failed·posted·**expired**(올리기 전에 마감이 지나 폴더를 지운 것 — 준비 실행마다 `ledger.mjs expire` · 2026-10-04) |
 | ② | 생기면 바로 · 개발자 셋에게 메일 | `insta.yml` 이 수집 로봇 셋이 끝날 때마다(`workflow_run`) 새 공고를 그려 **이슈 담당자 셋**(GitHub 이 메일을 보낸다) + SMTP 메일. 명단 `team.json` |
 | ③ | 채팅에서 수정 · 그림 제시 · 발송 전 물음 | `revise.mjs` 가 다시 그리고 미리보기를 만든다. 보내는 것은 `run-notify.txt` push-to-run. 순서는 스킬 `insta-revise` |
 | ④ | 번호 고정 판형 | `templates.json` — 1 사진 · 2 카톡 · 3 굿노트 · 4 포스터. `--tpl=번호`. 번호는 안 바뀐다 |
@@ -109,6 +109,7 @@ node insta/render.mjs <공고> --tpl=3 --pub       # 게시용 폴더 insta/pub/
 node insta/revise.mjs <코드> --tpl=4 --font="Gaegu"   # 준비된 것을 고쳐 다시 그리고 미리보기
 node insta/preview.mjs --dir=insta/pub/<코드>    # 피드 크기 미리보기 한 장
 node insta/ledger.mjs show                       # 준비·건너뜀·올림 장부
+node insta/ledger.mjs expire                     # 마감 지난 카드(올리지 않은 것)를 만료로 · 폴더 지움 (준비 실행이 매번 부른다)
 node insta/new-template.mjs <id> "<이름>" "<베낀 것>"   # 새 판형 시작 파일 (다음 번호)
 node insta/samples.mjs                           # 판형 견본
 node insta/sweep-overflow.mjs [--tpl=번호]       # 전수 넘침 측정 (판형당 약 1분)
@@ -127,7 +128,7 @@ node verify/verify-insta.js                      # 사실 관문
 | `notices.mjs` | **무엇을 올릴 수 있나** — 교외(KOSAF) + 교내. 다른 파일은 다 이걸 본다 |
 | `school.mjs` | 교내 공고를 카드 재료로. 자격/제외 가르기는 `section-head.js`·`match-engine.js` 를 쓴다 |
 | `pick.mjs` | 후보·점수 · `--new` 준비 안 한 공고 전부 · `seen.json` 읽고 쓰기(`markPrepared`) |
-| `ledger.mjs` | 워크플로가 장부를 고치는 명령줄 껍데기(prepared · skip · show) |
+| `ledger.mjs` | 워크플로가 장부를 고치는 명령줄 껍데기(prepared · skip · failed · expire · show) |
 | `templates.json` | **판형 번호표** — 번호 고정 · 내장 3벌 + `templates/<번호>-<id>.mjs` |
 | `templates/4-poster.mjs` | 바깥 판형 파일의 본보기 — 새 판형은 이 꼴 |
 | `new-template.mjs` | 다음 번호로 시작 파일을 만든다 |

@@ -7,7 +7,8 @@
  * 🔴 올린 것·준비한 것은 `insta/seen.json` 이 기억한다. 없으면 매일 같은 공고를 새 공고로
  *    올린다(수집기 이슈 #75 와 같은 유형). 장부는 둘이다 —
  *    `posted`   올린 것(되돌릴 수 없는 사실 · 게시 단계만 적는다)
- *    `prepared` 카드를 그려 개발자에게 보낸 것(`insta/pub/<코드>/` 와 짝 · 상태 prepared/skipped)
+ *    `prepared` 카드를 그려 개발자에게 보낸 것(`insta/pub/<코드>/` 와 짝 · 상태 prepared/skipped/failed/expired/posted)
+ *               expired = 올리기 전에 마감이 지나 폴더를 지운 것(expireRows · `ledger.mjs expire` · 2026-10-04)
  *
  * 🔴 **공고 하나에 게시물 하나 · 생기면 바로**(2026-09-12 개발자 지시). 예전엔 월·목에 점수
  *    1등 하나만 골랐다. 지금은 아직 준비 안 한 공고를 **전부** 후보로 보되, 한 실행에서
@@ -19,6 +20,7 @@
  *       node insta/pick.mjs --new [--max=6]   아직 준비 안 한 공고를 점수순으로 (JSON 배열)
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { kstDay } from './graph.mjs';
 
 const ROOT = new URL('../', import.meta.url);
 const SEEN = new URL('insta/seen.json', ROOT);
@@ -35,6 +37,26 @@ export function markPrepared(seen, rec) {
   const row = { status: 'prepared', ...rec };
   if (i >= 0) seen.prepared[i] = { ...seen.prepared[i], ...row }; else seen.prepared.push(row);
   return seen;
+}
+
+/** 올리기 전에 마감이 지난 카드를 '만료(expired)' 로 바꾼다 — 바꾼 공고 코드 목록을 돌려준다 (2026-10-04 로봇·도구 점검).
+ *  🔴 마감이 지난 카드는 다시 그릴 수도(캡션 거절) 올릴 수도(publishRefusal) 없는데 지우는 단계가 없어
+ *     insta/pub 이 3주에 100MB 로 불었다(Pages 사이트 상한 1GB). 폴더 지우기는 `ledger.mjs expire` 가 한다.
+ *  올린 것(posted)은 절대 안 건드린다 — 관리자 「올림」 줄의 썸네일이 그 폴더를 읽는다.
+ *  마감 없음·오늘 마감(23:59 KST 전)·미래 마감은 그대로. */
+export const EXPIRABLE = ['prepared', 'skipped', 'failed'];
+export function expireRows(seen, now = Date.now()) {
+  const posted = new Set((seen.posted || []).map((p) => p.code));
+  const out = [];
+  for (const p of seen.prepared || []) {
+    if (!EXPIRABLE.includes(p.status) || posted.has(p.code) || !p.due) continue;
+    const t = Date.parse(`${p.due}T23:59:59+09:00`);
+    if (Number.isNaN(t) || t >= now) continue;
+    p.status = 'expired';
+    p.expiredAt = kstDay(now);
+    out.push(p.code);
+  }
+  return out;
 }
 
 /** 🔴 로봇 기록장과 같은 모양(들여쓰기 1칸)으로 저장한다 — 다르게 저장하면 파일 전체가
@@ -87,14 +109,20 @@ export function candidates(items, today, seen, { unpreparedOnly = false } = {}) 
   // 준비돼 있거나(개발자 메일함에 있다) 건너뛰기로 정한 것은 다시 그리지 않는다.
   // 🔴 못 그린 것(failed)은 **7일 쉬었다** 다시 — 바로 다시 뽑으면 같은 공고가 매 실행 1등으로 나머지를 굶긴다.
   const RETRY_MS = 7 * 864e5;
-  const prepped = new Set((seen.prepared || [])
+  const prepped = new Map((seen.prepared || [])
     .filter((p) => p.status !== 'failed' || (today - Date.parse(`${p.failedAt}T00:00:00+09:00`)) < RETRY_MS)
-    .map((p) => p.code));
+    .map((p) => [p.code, p]));
+  // 🔴 마감이 지나 만료한 카드라도 재단이 마감을 미뤘으면(지금 공고의 마감이 장부 줄보다 늦다) 다시 그린다.
+  const stillPrepped = (x) => {
+    const p = prepped.get(x.code);
+    if (!p) return false;
+    return !(p.status === 'expired' && x.due && p.due && String(x.due) > String(p.due));
+  };
   const drop = { 이미올림: 0, 이미준비: 0, 마감지남: 0, 마감없음: 0, 금액미확인: 0 };
   const ok = [];
   for (const x of items) {
     if (done.has(x.code)) { drop.이미올림++; continue; }
-    if (unpreparedOnly && prepped.has(x.code)) { drop.이미준비++; continue; }
+    if (unpreparedOnly && stillPrepped(x)) { drop.이미준비++; continue; }
     if (!x.due) { drop.마감없음++; continue; }
     const t = new Date(`${x.due}T23:59:59+09:00`).getTime();
     if (Number.isNaN(t)) { drop.마감없음++; continue; }

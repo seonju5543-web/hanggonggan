@@ -93,6 +93,10 @@ collector/link-check-report.md  merge=ours
 collector/link-check-state.json merge=ours
 data/link-check.json            merge=ours
 
+# 인스타 장부 (2026-10-04 로봇·도구 점검) — 인스타 작업의 대기줄을 공고별로 나눠 두 실행이 같은 장부를 쓸 수 있다.
+# 🔴 규칙은 merge-json-union.mjs 의 mergeInstaSeen(올림 기록은 절대 안 버린다) — 일반 seen.json 규칙(주소→날짜)에 걸리면 올림 기록이 사라진다.
+insta/seen.json merge=jsonunion
+
 # 원문 후보 장부 (2026-10-04) — 원문 링크 확인 로봇(link-check.yml) 하나만 쓴다. 매 실행 통째로 새로 쓰이므로 리포트처럼 내 쪽을 남긴다.
 # 후보 파일(collector/link-candidates.json)은 사람·세션이 쓰는 입력이라 여기 넣지 않는다(합집합 규칙이 merge-json-union.mjs 에 없다).
 collector/link-candidates-state.json merge=ours

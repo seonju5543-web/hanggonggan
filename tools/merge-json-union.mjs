@@ -230,7 +230,42 @@ function mergeOwnPrograms(o, t) {
   return out;
 }
 
+/* 인스타 장부(insta/seen.json · 2026-10-04 로봇·도구 점검) — 🔴 아래 일반 `seen.json` 규칙(주소→날짜 표)에 걸리면
+   올림 기록(posted)과 다른 쪽의 준비 줄이 **사라진다**(표본으로 확인) → 지운 올림 기록은 같은 글을 두 번 올리게 한다.
+   그래서 일반 규칙보다 **앞에** 둔다. 인스타 작업의 대기줄을 공고별로 나눠(insta.yml) 두 실행이 같은 장부를 쓸 수 있다.
+   · posted — 공고 코드로 합집합, **절대 버리지 않는다**. 같은 코드면 media 가 있는 쪽 → 이른 at → 내 것.
+   · prepared — 공고 코드로 합집합. 같은 코드가 한쪽에서만 바뀌었으면(공통 조상과 같은 쪽이 있으면) 바뀐 쪽.
+     둘 다 바뀌었으면 상태 순위 posted > skipped·expired > prepared > failed, 같으면 날짜가 늦은 쪽, 그래도 같으면 내 것.
+     (조상을 보는 이유: 사람이 건너뛴 카드를 다시 그리는 동안 자동 준비가 장부를 쓰면, 순위만으로는 옛 '건너뜀' 이 새 그림을 이긴다.) */
+const INSTA_RANK = { posted: 4, skipped: 3, expired: 3, prepared: 2, failed: 1 };
+const instaWhen = (p) => [p?.revisedAt || p?.at, p?.skippedAt, p?.expiredAt, p?.failedAt, p?.postedAt].filter(Boolean).map(String).sort().pop() || '';
+function mergeInstaSeen(o, t, base = null) {
+  const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  const byCode = (rows) => new Map((Array.isArray(rows) ? rows : []).filter((r) => r && r.code).map((r) => [r.code, r]));
+  const union = (oa, ta, choose) => {
+    const om = byCode(oa); const tm = byCode(ta); const out = [];
+    for (const [c, r] of om) out.push(tm.has(c) ? choose(r, tm.get(c), c) : r);
+    for (const [c, r] of tm) if (!om.has(c)) out.push(r);
+    return out;
+  };
+  const posted = union(o?.posted, t?.posted, (a, b) => {
+    if (!!a.media !== !!b.media) return a.media ? a : b;
+    return String(b.at || '') < String(a.at || '') ? b : a;
+  });
+  const bm = byCode(base?.prepared);
+  const prepared = union(o?.prepared, t?.prepared, (a, b, c) => {
+    const was = bm.get(c);
+    if (was && same(a, was)) return b;
+    if (was && same(b, was)) return a;
+    const ra = INSTA_RANK[a.status] || 0; const rb = INSTA_RANK[b.status] || 0;
+    if (ra !== rb) return ra > rb ? a : b;
+    return instaWhen(b) > instaWhen(a) ? b : a;
+  });
+  return { ...(t || {}), ...(o || {}), posted, prepared };
+}
+
 const RULES = [
+  { match: /(^|\/)insta\/seen\.json$/, merge: mergeInstaSeen, base: true },   // 🔴 일반 seen.json 규칙보다 앞 — 위 머리말 · 공통 조상을 받는 유일한 규칙
   { match: /(^|\/)collector\/own-programs\.json$/, merge: mergeOwnPrograms },
   { match: /(^|\/)collector\/candidates\.json$/, merge: mergeCandidateLedger },
   { match: /(^|\/)collector\/pagination\.json$/, merge: mergePagination },
@@ -268,9 +303,11 @@ function main() {
     console.error(`[merge-json-union] JSON을 읽지 못해 자동 병합하지 않음: ${rel}`);
     return 1;
   }
+  // 공통 조상(%O)은 `base: true` 규칙(인스타 장부)만 받는다 — 셋째 인자를 다른 뜻으로 쓰는 규칙이 있다(mergeSchoolNotices 의 opts).
+  //    못 읽으면 없는 것으로(순위 규칙으로 물러난다).
   let merged;
   try {
-    merged = rule.merge(ours, theirs);
+    merged = rule.base ? rule.merge(ours, theirs, readJson(oursBase) || null) : rule.merge(ours, theirs);
   } catch (e) {
     console.error(`[merge-json-union] 병합 중 오류라 손대지 않음: ${rel} — ${e.message}`);
     return 1;
@@ -283,6 +320,4 @@ function main() {
   return 0;
 }
 
-// 공통 조상(%O)은 쓰지 않지만 git이 넘겨주므로 자리를 지켜 둔다
-void oursBase;
 process.exit(main());

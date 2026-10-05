@@ -19,7 +19,7 @@
  * 실행: node insta/publish.mjs --code=<공고 코드> [--publish]      (= --dir=insta/pub/<코드>)
  *       node insta/publish.mjs --dir=insta/pub/<코드> --urls | --wait-only
  */
-import { readFileSync, existsSync, readdirSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync, appendFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 // 🔴 Instagram Login 경로 — **페이스북 페이지가 필요 없다**(2026-09-11 문서 확인).
@@ -133,7 +133,29 @@ async function tokenDays(f = fetch, store = null) {
   } catch { return null; }                       // 못 물어봐도 게시는 막지 않는다
 }
 
-export async function publish({ dir, images, caption, live, f = fetch, waits = WAITS, tokenStore = null, log = say }) {
+/** 게시를 거절할 카드인가 — 이유 한 줄 또는 null (2026-10-04 로봇·도구 점검).
+ *  🔴 게시는 되돌릴 수 없다 — 관리자 화면 줄에 '마감 지남' 이 떠도 게시 버튼이 같이 있었고, 이 파일도 마감을 안 봤다.
+ *  ① 마감이 지난 카드는 올리지 않는다.
+ *  ② 그림에 「마감 D-N」(그린 날 기준 상대 날짜)이 박힌 옛 카드는 올리지 않는다 — 2026-10-04 이전에 그린 판형 2·3·4번 폴더
+ *     (마지막 마감 2026-12-31). 새로 그린 폴더는 meta.json 에 `dates: 'absolute'` 가 있다(render.mjs --pub).
+ *     판형 번호는 한 번 붙으면 안 바뀌므로(insta/templates.json) [2, 3, 4] 는 그 옛 폴더만 가리킨다.
+ *     짝: _admin/admin.js 의 instaPublishBlock(화면에서 게시 버튼 자리에 이유를 둔다) — 옛 폴더 전용이라 일부러 두 곳에 둔다.
+ *  마감이 없는 카드(손으로 그린 '원문 확인')는 막지 않는다 — 그림에 날짜가 없다. */
+export const OLD_RELATIVE_TPL = [2, 3, 4];
+export function publishRefusal(meta, now = Date.now()) {
+  const m = meta || {};
+  const t = m.due ? Date.parse(`${m.due}T23:59:59+09:00`) : NaN;
+  if (Number.isNaN(t)) return null;
+  if (t < now) return `마감이 지난 카드(마감 ${m.due})입니다 — 올리지 않습니다. 관리자 화면에서 건너뛰기를 누르세요.`;
+  if (m.dates !== 'absolute' && OLD_RELATIVE_TPL.includes(Number(m.tplNo)))
+    return `그린 날(${m.at || '?'}) 기준 「마감 D-N」 이 그림에 박힌 옛 카드입니다 — 관리자 화면의 「이 판형으로 다시 그리기」 로 다시 그려 확인한 뒤 게시하세요.`;
+  return null;
+}
+
+/** 🔴 `outFile`(워크플로의 GITHUB_OUTPUT)에 올린 결과를 남긴다 — 그 뒤 기록 저장이 실패해도 워크플로가
+ *  '올라갔다' 는 사실을 알아 「다시 게시하지 마세요」 이슈를 낸다(2026-10-04 · 옛 판은 '게시가 실패했습니다' 라고 해서
+ *  사람이 다시 누르면 같은 글이 두 번 올라갈 수 있었다). */
+export async function publish({ dir, images, caption, live, f = fetch, waits = WAITS, tokenStore = null, log = say, outFile = process.env.GITHUB_OUTPUT }) {
   const id = process.env.IG_USER_ID;
   if (!id || !process.env.IG_ACCESS_TOKEN) throw new Error('IG_USER_ID · IG_ACCESS_TOKEN 이 없습니다.');
   if (images.length < 2 || images.length > 10) throw new Error(`캐러셀은 2~10장인데 ${images.length}장입니다.`);
@@ -176,6 +198,11 @@ export async function publish({ dir, images, caption, live, f = fetch, waits = W
     { tries: waits.pubTries, gapMs: waits.pubGapMs, f, log });
   const { permalink } = await graph(mediaId, { fields: 'permalink' }, 'GET', f).catch(() => ({}));
   log(`  ✅ 게시 완료 ${mediaId}${permalink ? ` — ${permalink}` : ''}`);
+  // ⚠️ 여기서 넘어지면 올라간 글이 '실패' 로 보이고 장부에도 안 적힌다 — 쓰기 실패는 삼킨다.
+  if (outFile) {
+    const one = (v) => String(v ?? '').replace(/[\r\n]/g, '');
+    try { appendFileSync(outFile, `media=${one(mediaId)}\npermalink=${one(permalink)}\n`); } catch { /* 결과 칸은 거들 뿐 */ }
+  }
   return { mediaId, permalink: permalink || null, dir };
 }
 
@@ -208,6 +235,14 @@ if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file:').hre
     process.exit(0);
   }
 
+  // 🔴 올리기 **전에** 카드를 본다(예행연습도 같다) — 마감 지난 카드·「마감 D-N」 이 박힌 옛 카드는 거절(publishRefusal).
+  //    meta.json 이 없으면 올린 뒤 장부에 적을 수 없다(올라갔는데 기억 못 함 = 내일 또 올린다) — 그래서 먼저 막는다.
+  const metaUrl = new URL('meta.json', abs);
+  if (!existsSync(metaUrl)) { console.error(`\n🚨 ${dir}/meta.json 이 없습니다 — 올린 뒤 장부에 적을 수 없어 올리지 않습니다. 「준비」 로 다시 그리세요.`); process.exit(1); }
+  const meta = JSON.parse(readFileSync(metaUrl, 'utf8'));
+  const refused = publishRefusal(meta);
+  if (refused) { console.error(`\n🚨 ${refused}`); process.exit(1); }
+
   const live = process.argv.includes('--publish');
   // 🔴 스택 트레이스를 뱉으면 무엇이 잘못됐는지 안 보인다. 한 줄로 말하고 죽는다.
   const out = await publish({ dir, images, caption, live })
@@ -216,7 +251,6 @@ if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file:').hre
     // 🔴 올린 것을 기억하지 못하면 내일 같은 공고를 새 공고로 다시 올린다(이슈 #75 유형).
     const { readSeen, writeSeen } = await import('./pick.mjs');
     const { kstDay } = await import('./render.mjs');
-    const meta = JSON.parse(readFileSync(new URL('meta.json', abs), 'utf8'));
     const seen = readSeen();
     seen.posted.push({ code: meta.code, org: meta.org, name: meta.name, tplNo: meta.tplNo ?? null,
       at: kstDay(), media: out.mediaId, permalink: out.permalink });   // 🔴 KST — UTC 면 새벽에 어제로 찍힌다
