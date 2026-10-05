@@ -22,7 +22,7 @@ export const REPORT_RULES = [
   { kind: 'essay', re: /^📘 작성 규칙 학습/, keep: 1 },
   { kind: 'elig', re: /^✅ 자격/, keep: 1 },
   { kind: 'coverage', re: /^🔍 공고 누락 감사/, keep: 1 },
-  { kind: 'probe', re: /^🔍 게시판 후보 정찰 리포트/, keep: 1 },
+  /* '🔍 게시판 후보 정찰 리포트'는 뺐다 — 그 도구(probe-boards.yml · collector/probe.mjs)를 2026-10-05 지웠다(같은 일은 find-boards·probe-links 가 한다) */
 ];
 
 export const ruleFor = (title) => REPORT_RULES.find((r) => r.re.test(String(title ?? '').trim())) || null;

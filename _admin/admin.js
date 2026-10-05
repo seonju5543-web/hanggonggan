@@ -2709,7 +2709,6 @@ const ROBOTS = [
   { f: 'admin-lock-check.yml', n: '관리자 화면 잠금 확인', d: '이 화면이 정말 잠겨 있는지 밖에서 열어 봅니다', when: '매일 14:23' },
   { f: 'close-old-reports.yml', n: '오래된 리포트 닫기', d: '지난 수집 리포트를 닫아 경보가 묻히지 않게 합니다', when: '매주 월' },
   { f: 'probe-links.yml', n: '링크 정찰', d: '이 주소가 학생 눈에 어떻게 보이는지 확인합니다', when: '수동' },
-  { f: 'probe-boards.yml', n: '게시판 후보 정찰', d: '새 학교의 장학 게시판 주소 후보를 찾아 리포트로 올립니다', when: '수동' },
   { f: 'insta-token-check.yml', n: '인스타 토큰 수명 확인', d: '인스타 열쇠가 며칠 남았는지 봅니다', when: '매일 03:17' },
   { f: 'insta-samples.yml', n: '인스타 판형 견본', d: '판형별 견본 그림을 다시 그립니다', when: '수동' },
   /* 돈이 나가는 로봇 둘 — `def` 는 가장 싼 쪽이다 */
