@@ -405,7 +405,8 @@ switch (action) {
     const paired = new Set(ids.map((x) => (cfg.blockPairs || {})[x]).filter(Boolean).map(canonUrl));
     const prefixOf = (x) => (String(x).match(/^[a-z]+-/) || ['auto-'])[0];
     /* 겹쳐서 꼬리표를 단 id(`<옛 id>-<주소 꼬리표>` · canon-url.mjs registerId)도 그 주소에서 나온 것이다 */
-    const derived = (u) => ids.some((x) => x === idFromUrl(prefixOf(x), u) || x === `${idFromUrl(prefixOf(x), u)}-${canon.idHash(canonUrl(u))}`);
+    const tagOf = (u) => (typeof canon.idHash === 'function' ? canon.idHash(canonUrl(u)) : '');
+    const derived = (u) => ids.some((x) => x === idFromUrl(prefixOf(x), u) || x === `${idFromUrl(prefixOf(x), u)}-${tagOf(u)}`);
     cfg.blockUrls = (cfg.blockUrls || []).filter((u) => {
       const cu = canonUrl(u);
       return !wantUrl.has(cu) && !paired.has(cu) && !derived(u);

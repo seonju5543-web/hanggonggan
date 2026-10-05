@@ -3,6 +3,14 @@
      ① 자동 등록 id 겹침 (links-new-1): id 공식(정렬한 주소의 끝 24자)이 게시판 공통값을 잡는 게시판에서 그 게시판 글이 전부 같은 id 를 받아
         한 글이 등록되면 나머지가 '이미 등록(같은 id)', 사람이 한 글을 막으면 나머지가 '사람이 막아 둔 공고'로 **조용히** 빠졌다(9개교 70여 건) —
         공식은 그대로 두고 겹칠 때만 꼬리표 id(canon-url.mjs registerId 한 곳) · **진짜 auto-register.mjs·admin-apply.mjs 를 임시 폴더에서 돌린다**
+     ② 경로의 세션 표식 (links-7): 경기대 글이 `View.do;jsessionid=…` 째로 담겨 세션만 다른 같은 글이 다른 글이 됐다 — canonUrl·urlKey 가 떼고
+        (원본 규칙 board-links.mjs stripSessionId 와 같은 답인지 대조) · 합칠 때 세션 없는 판이 남고 · 로봇들이 씻은 주소(detail-url.mjs cleanStoredUrl)로 확인·저장
+     ③ 못 닿은 표적은 내일 (links-14): 시간 초과·게시판 안 열림이 nextTryAt 을 안 남겨 하루 다섯 번 같은 학교를 두드렸다(link-hunt-rules.mjs recordAttempt)
+     ④ 사냥꾼 리포트 (links-2): 3단계가 찾은 공고도 '아직 못 찾음'에 남았다 · 이슈 본문에 어느 공고인지 없었다(escalationLines)
+     ⑤ 사냥꾼 장부 정리 (links-9): link-hunt.json 1,404줄 중 956줄이 데이터에 없는 공고였다(pruneHuntState)
+     ⑥ 복구 로봇 바깥 시계 · 예약 주석 요일 (links-15): 매달리면 고친 것을 잃는다 — **진짜 resolve-detail-urls.mjs 를 가짜 브라우저로 임시 폴더에서** ·
+        'UTC 월 20시대'를 'KST 월요일'이라 적은 주석(실제 화요일) — 워크플로 예약 줄 전부를 cron 과 대조(cronCommentProblems)
+     ⑦ 복구 로봇 소급 재검사 끔 (links-10 · 개발자 결정): 읽는 곳 없는 판정 기록 · 원문 링크 확인 로봇과 엇갈린 판정 — 되살아나지 않게
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
 import path from 'node:path';
