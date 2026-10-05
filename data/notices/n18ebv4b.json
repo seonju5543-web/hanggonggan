@@ -1,6 +1,6 @@
 {
  "school": "서울교육대학교",
- "updatedAt": "2026-10-04",
+ "updatedAt": "2026-10-05",
  "items": [
   {
    "title": "[우양재단] 2026년 동행 장학생 모집 (가족 돌봄 청년 대상, ~10/18)",
@@ -109,16 +109,18 @@
    "deadlineHint": "접수기간: 2026. 8. 24.(월) 09:00 ~ 9. 22. (화) 18:00&nbsp; &nbsp; 6. 기타문의: 054-270-575",
    "school": "서울교육대학교",
    "campus": "",
-   "foundAt": "2026-09-30"
+   "foundAt": "2026-09-30",
+   "boardTitle": "[통영시] 2026년 상반기분 통영시 학자금 이자 지원 신청 안내"
   },
   {
-   "title": "2026학년도 2학기 국가근로장학생 희망근로지 2차 신청기간 안내",
-   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-2026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EC%83%9D%20%ED%9D%AC%EB%A7%9D%EA%B7%BC%EB%A1%9C%EC%A7%80%202%EC%B0%A8%20%EC%8B%A0%EC%B2%AD%EA%B8%B0%EA%B0%84%20%EC%95%88%EB%82%B4",
+   "title": "2026학년도 2학기 국가근로장학생 선발 결과 및 2차 추가 선발 안내",
+   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54793",
    "attachments": [],
-   "deadlineHint": null,
+   "deadlineHint": "신청기간 안내 학생처 2026.09.01 721 614 「2026년 하반기 익산시 대학생 학자금 이자 지원 사업」안내 학생처 2026.08.31",
    "school": "서울교육대학교",
    "campus": "",
-   "foundAt": "2026-09-30"
+   "foundAt": "2026-09-30",
+   "boardTitle": "2026학년도 2학기 국가근로장학생 선발 결과 및 2차 추가 선발 안내"
   },
   {
    "title": "「2026년 하반기 익산시 대학생 학자금 이자 지원 사업」안내",
@@ -152,16 +154,8 @@
    "deadlineHint": null,
    "school": "서울교육대학교",
    "campus": "",
-   "foundAt": "2026-09-30"
-  },
-  {
-   "title": "2026학년도 2학기 국가근로장학생 선발 결과 및 2차 추가 선발 안내",
-   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54793",
-   "attachments": [],
-   "deadlineHint": "신청기간 안내 학생처 2026.09.01 721 614 「2026년 하반기 익산시 대학생 학자금 이자 지원 사업」안내 학생처 2026.08.31",
-   "school": "서울교육대학교",
-   "campus": "",
-   "foundAt": "2026-09-30"
+   "foundAt": "2026-09-30",
+   "boardTitle": "「2026년 하반기 익산시 대학생 학자금 이자 지원 사업」안내"
   }
  ]
 }

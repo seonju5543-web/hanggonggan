@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-04",
+ "updatedAt": "2026-10-05",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -98,7 +98,10 @@
     "(인당 지원액) 개인별 상이(최대 1,000천원) ※대출원금 잔액에 따라 상이",
     "(인당 지원액) 개인별 상이(최대 500천원) ※2025. 7. 1.~2026. 6. 30.에 발생한 대출이자 금액에 따라 상이"
    ],
-   "aiTries": 1
+   "aiTries": 1,
+   "applyEmail": "jh@sri.re.kr",
+   "applyEmailSource": "O신청서및 구비서류 전부e-mail제출(jh@sri.re.kr)",
+   "applyEmailFrom": "공고문 첨부(OCR)"
   },
   {
    "id": "reg-khu-uiam",
@@ -282,8 +285,8 @@
    "provider": "정읍시민장학재단",
    "amount": "우수인재장학금 (4년제·전문대 차등 — 원문 확인)",
    "amountValue": 2200000,
-   "deadline": null,
-   "period": "2026년도 선발 (2026.7.8 공고 — 접수기간 원문 확인)",
+   "deadline": "2026-07-27",
+   "period": "2026년도 선발 (2026.7.8 공고 — 접수기간 ~2026-07-27)",
    "summary": "부모(부 또는 모)가 정읍시에 주소를 둔 국내 대학 재학생이면 학교와 관계없이 지원할 수 있는 지역 장학금입니다. 접수는 부모 주민등록지 읍면동 주민센터에 방문 제출해요.",
    "eligibility": {
     "selective": true
@@ -348,7 +351,9 @@
     "raw": "지급금액 : 1인당 4년대 220만원, 전문대 180만원"
    },
    "amountFrom": "공고 원문",
-   "aiTries": 1
+   "aiTries": 1,
+   "deadlineFrom": "공고문 첨부(OCR)",
+   "openDate": "2026-07-13"
   },
   {
    "id": "reg-hufs-seed",
@@ -1745,7 +1750,8 @@
    ],
    "deadlineFrom": "게시판 제목(링크 정찰 run 35207443601 로 확인) · [교외] 2026학년도 2학기 충북인재평생교육진흥원 장학생 선발공고(8. 4. ~ 8. 27.)",
    "aiTries": 1,
-   "boardTitle": "충북인재평생교육진흥원 장학생 (2026 하반기)"
+   "boardTitle": "충북인재평생교육진흥원 장학생 (2026 하반기)",
+   "announceDate": "2026-10-28"
   },
   {
    "id": "auto-082f26ec8898eab98ceca780",
@@ -2532,7 +2538,19 @@
    ],
    "kindConfidence": "low",
    "kindFrom": "로봇(원문) 2026-10-01",
-   "openDate": "2026-09-01"
+   "openDate": "2026-09-01",
+   "alsoPostedAt": [
+    {
+     "school": "고려대학교 세종캠퍼스",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/272997/artclView.do",
+     "id": "notice:https://sejong.korea.ac.kr/bbs/koreaSejong/659/272997/artclView.do"
+    },
+    {
+     "school": "동국대학교 WISE캠퍼스",
+     "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520613",
+     "id": "notice:https://wise.dongguk.ac.kr/article/servicenotice/detail/520613"
+    }
+   ]
   },
   {
    "id": "auto-ent2431263956artclviewdo",
@@ -2651,7 +2669,8 @@
    ],
    "kindConfidence": "low",
    "kindFrom": "로봇(원문) 2026-10-01",
-   "announceDate": "2026-10-22"
+   "announceDate": "2026-10-22",
+   "openDate": "2026-09-01"
   },
   {
    "id": "auto-oardid321881menuno200318",
@@ -3624,7 +3643,15 @@
     "max": 0,
     "raw": "장학금액 지 급 액 : 2026년 2학기 등록금 전액"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "alsoPostedAt": [
+    {
+     "school": "홍익대학교",
+     "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158439&noCat=501",
+     "id": "notice:https://www.hongik.ac.kr/kr/newscenter/notice.do?articleno=158439&nocat=501"
+    }
+   ],
+   "openDate": "2026-09-24"
   },
   {
    "id": "auto-oardid323127menuno200318",
@@ -3754,6 +3781,26 @@
      "school": "가천대학교",
      "url": "https://www.gachon.ac.kr/bbs/kor/478/125417/artclView.do",
      "id": "notice:https://www.gachon.ac.kr/bbs/kor/478/125417/artclView.do"
+    },
+    {
+     "school": "연세대학교 미래캠퍼스",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/944188/artclView.do",
+     "id": "notice:https://mirae.yonsei.ac.kr/bbs/wj/104/944188/artclView.do"
+    },
+    {
+     "school": "고려대학교 세종캠퍼스",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/273125/artclView.do",
+     "id": "notice:https://sejong.korea.ac.kr/bbs/koreaSejong/659/273125/artclView.do"
+    },
+    {
+     "school": "동국대학교 WISE캠퍼스",
+     "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520602",
+     "id": "notice:https://wise.dongguk.ac.kr/article/servicenotice/detail/520602"
+    },
+    {
+     "school": "한국항공대학교",
+     "url": "https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=&mode=read&seq=11197",
+     "id": "notice:https://kau.ac.kr/kaulife/scholnoti.php?code=s1301&seq=11197"
     }
    ],
    "amountSpec": {
@@ -3942,11 +3989,17 @@
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323082",
    "sourceKind": "auto",
    "eligibilityLines": [
-    "3. 선발기준",
-    "□ 성적 35% + 생활정도 50% + 경주시 거주기간 15%",
+    "3.선발기준",
+    "성적 35%+ 생활정도 50%+ 경주시 거주기간15%",
     "□ 가산점 대상 (중복적용 불가) (해당자에 한함)",
-    "ㆍ 3자녀 이상 가정의 자녀(자녀수별로 세분화 점수)",
-    "- 3자녀 : 5점, 4자녀 : 7점, 5자녀 이상 : 10점"
+    "3자녀 이상 가정의 자녀(자녀수별로 세분화 점수)",
+    "-3자녀:5점,4자녀:7점,5자녀 이상:10점",
+    "·국민기초생활수급가정,장애인가정(본인 또는 부모의 장애의 정도가 심한 장애인),",
+    "한부모가정,조손가정,다문화가정:5점",
+    "·차상위계층:3점",
+    "·지역 고교생의 지역 대학 진학 : 3점",
+    "동점자 우선순위",
+    "·생활정도,학업성적,거주기간 순"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
    "kindEvidence": [
@@ -4134,6 +4187,11 @@
      "school": "서울대학교",
      "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=362",
      "id": "notice:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?category1=장학공지&mod=document&uid=362"
+    },
+    {
+     "school": "한국항공대학교",
+     "url": "https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=&mode=read&seq=11140",
+     "id": "notice:https://kau.ac.kr/kaulife/scholnoti.php?code=s1301&seq=11140"
     }
    ],
    "amountLines": [
@@ -4218,7 +4276,8 @@
     "max": 2000000,
     "raw": "장학금액 : 1인당 200만원 (생활비)"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "announceDate": "2026-09-30"
   },
   {
    "id": "auto-ent2431265667artclviewdo",
@@ -4286,7 +4345,8 @@
     "max": 2000000,
     "raw": "장학금액 : 840백만원 - 1인당 최대 200만원(등록금성 지원, 등록금 범위 내 지원)"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "openDate": "2026-08-24"
   },
   {
    "id": "auto-ent2431264946artclviewdo",
@@ -4976,6 +5036,16 @@
      "school": "가천대학교",
      "url": "https://www.gachon.ac.kr/bbs/kor/478/125614/artclView.do",
      "id": "notice:https://www.gachon.ac.kr/bbs/kor/478/125614/artclView.do"
+    },
+    {
+     "school": "홍익대학교",
+     "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158448&noCat=501",
+     "id": "notice:https://www.hongik.ac.kr/kr/newscenter/notice.do?articleno=158448&nocat=501"
+    },
+    {
+     "school": "한국항공대학교",
+     "url": "https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=&mode=read&seq=11233",
+     "id": "notice:https://kau.ac.kr/kaulife/scholnoti.php?code=s1301&seq=11233"
     }
    ],
    "scopeFrom": "같은 사업이 전북대학교 게시판에도 올라옴(자동) — 전북대학교 게시판 https://www.jbnu.ac.kr/web/news/notice/sub01.do?category=6#n-2026%EB%85%84%EB%8F%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20(%EC%9E%AC)%EB%85%BC%EC%82%B0%EC%8B%9C%EC%9E%A5%ED%95%99%ED%9A%8C%20%ED%95%99%EC%97%85%EC%9E%A5%EB%A0%A4%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4",
@@ -5832,7 +5902,8 @@
     "max": 2000000,
     "raw": "장학금액 지원 내용 성장지원금 1인 200만 원 (2회 분할 지급)"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "openDate": "2026-09-07"
   },
   {
    "id": "auto-larshipdoarticleno375935",
@@ -6067,15 +6138,14 @@
    "boardTitle": "2026년 JW이종호재단 기초과학자 장학생 선발 안내",
    "type": "교외",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "2,400만원",
+   "amountValue": 24000000,
    "deadline": "2026-10-30",
    "listedAt": "2026-09-30",
    "period": "접수 기간 ~2026-10-30",
    "summary": "국민대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "국민대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -6093,11 +6163,6 @@
      "name": "본문이미지-838x1188.jpg",
      "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/findUploadImg.do?fileNo=eb23bf94ea2f41cf96e5564e02a9ca7d",
      "bodyImage": true
-    },
-    {
-     "name": "본문이미지-1638x1163.gif",
-     "url": "https://www.kookmin.ac.kr/content/05sub/style0005/images/common/webacc.gif",
-     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12373/view.do?currentPageNo=1",
@@ -6112,7 +6177,17 @@
    "announceDate": "2026-12-18",
    "applyEmail": "jwf@jwhealthcare.com",
    "applyEmailSource": "•2026년 10월 1일(목) -10월 30일(금) 서류제출 •jwf@jwhealthcare.com",
-   "applyEmailFrom": "공고문 첨부(OCR)"
+   "applyEmailFrom": "공고문 첨부(OCR)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 24000000,
+    "ratio": 0,
+    "min": 24000000,
+    "max": 24000000,
+    "raw": "장학금:주거생활비 최대 3년 지원 O지원자의 주거 월세 비용을 장학금으로 지원 예정 •3년간 최대 2400만원 한도 내 월세 실비 지급 서류심사 면접 합격자 발표 [1차) (2차)"
+   },
+   "amountFrom": "공고 원문",
+   "scopeFrom": "로봇 2026-10-05 · 원문 증거로 전국 — 접수 이메일 도메인 jwhealthcare.com (학교 밖) (게시: 국민대학교)"
   },
   {
    "id": "auto-bbssc58944123artclviewdo",
@@ -6352,7 +6427,12 @@
     "■ 장학금액 : 시간당 12,790원",
     "- 장학금액 : 교내부서 시간당 12,790원"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「국가근로」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-05"
   },
   {
    "id": "auto-nuid100nttid30159ptabno5",
@@ -6412,7 +6492,12 @@
    "excerpts": [
     "장학금액: 1인당 최대 200만원 (한 학기 기준, 생활비성 장학금)"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "kindEvidence": [
+    "교내 증거 없음 — 기본값"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-10-05"
   },
   {
    "id": "auto-archgbn0searchordersort0",
@@ -6479,11 +6564,11 @@
    "boardTitle": "2026학년도 2학기 4·19선양재단 나라사랑 4·19 민주장학생 선발 공고",
    "type": "교외",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
-   "deadline": null,
+   "amount": "20만원",
+   "amountValue": 200000,
+   "deadline": "2026-09-13",
    "listedAt": "2026-09-30",
-   "period": "접수 기간 원문 확인",
+   "period": "접수 기간 ~2026-09-13",
    "summary": "중앙대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
@@ -6503,7 +6588,37 @@
     }
    ],
    "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&page=2&nttId=30154",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "deadlineFrom": "공고 원문",
+   "applyEmail": "sybae1937@cau.ac.kr",
+   "applyEmailSource": "나. 제출방법: 제출서류의 PDF 파일을 메일(sybae1937@cau.ac.kr)로 제출",
+   "applyEmailFrom": "공고 원문",
+   "eligibilityLines": [
+    "1. 선발대상",
+    "가. 2026-2학기 재학생",
+    "나. 4·19 정신을 계승할 수 있는 학생",
+    "다. 장학금 수여식에 참석할 수 있는 학생(필참)",
+    "※ 일시 및 장소: 2026. 11. 7.(토요일) 오전 11시, 종로5가 기독교회관 강당 2층"
+   ],
+   "excerpts": [
+    "장학금액: 2026-2학기 생활비성 장학금 20만원",
+    "제출방법: 제출서류의 PDF 파일을 메일(sybae1937@cau.ac.kr)로 제출"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 200000,
+    "ratio": 0,
+    "min": 200000,
+    "max": 200000,
+    "raw": "2. 장학금액: 2026-2학기 생활비성 장학금 20만원"
+   },
+   "amountFrom": "공고 원문",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「재단」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-05"
   },
   {
    "id": "auto-nuid100nttid30130ptabno5",
@@ -6511,8 +6626,8 @@
    "boardTitle": "2026-2학기 중소기업 취업연계 장학금(희망사다리Ⅰ유형) 신규장학생 신청 안내",
    "type": "교외",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "200만원",
+   "amountValue": 2000000,
    "deadline": null,
    "listedAt": "2026-09-30",
    "period": "접수 기간 원문 확인",
@@ -6539,7 +6654,37 @@
     }
    ],
    "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&page=2&nttId=30130",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "2. 지원대상",
+    "ㅇ (기본요건) 대한민국 국적자로 일반대 3학년 이상 또는 전문대 2학년 이상의 학생이며, 대학의 최소이수학점 이상을 이수하고(대학의 최소이수학점 기준이 없는 경우 12학점 이상 이수), 직전학기 성적이 100점 만점의 70점 이상인 자",
+    "※ 연도·학기별 사업 참여대학의 재학생이어야 함(중앙대학교는 참여대학)",
+    "- 취업지원형: 기본요건을 충족하는 학생 중 중소·중견기업 취업(희망)자",
+    "- 창업지원형: 기본요건을 충족하는 학생 중 창업(희망)자",
+    "※ 취업 여부는 장학금 신청과 무관(기취(창)업자, 취(창)업 희망/예정자 모두 지원가능)",
+    "※ 본 장학금 기존 수혜자 중 전문대 장학생이 졸업 후 전공심화 또는 4년제 편입하는 경우, 전공심화/편입한 첫 학기에 한해 신규로 재신청 가능",
+    "※ 조기취업형 계약학과는 1학년에 한해 신청 및 지원 가능",
+    "※ (일자리사업 중복참여 금지) 직접일자리 사업은 중소기업 취업연계 장학사업 참여기간 내 중복참여가 불가하며, 기타 참여가능 사업은 고용노동부로 문의"
+   ],
+   "excerpts": [
+    "2026년 2학기 중소기업 취업연계 장학금(희망사다리Ⅰ유형) 신규장학생 선발을 위한 학생신청 기간을 공지하오니, 중소·중견기업 취업 또는 창업을 희망하는 학생들의 많은 관심과 신청 바랍니다.",
+    "☎ 문의: 1800-0499(취업연계 상담센터)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 2000000,
+    "ratio": 0,
+    "min": 2000000,
+    "max": 2000000,
+    "raw": "3. 지원내용 ㅇ (등록금) 수혜학기 등록금 전액 - 수혜학기 중복지원 여부와 등록금액에 따라 장학금액 변동가능 - 장학생 지원기준을 충족하지 못할 시 장학금 지원 중단 ㅇ (취·창업지원금) 수혜학기 당 200만원 - 매 학기 직무기초교육 이수자에 한해 지원"
+   },
+   "amountFrom": "공고 원문",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「기업」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-05"
   },
   {
    "id": "auto-enoticedoarticleno768425",
@@ -7027,11 +7172,6 @@
      "name": "본문이미지-785x1117.jpg",
      "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/findUploadImg.do?fileNo=d5ba21686ec544dba26a17064c30ef17",
      "bodyImage": true
-    },
-    {
-     "name": "본문이미지-1638x1163.gif",
-     "url": "https://www.kookmin.ac.kr/content/05sub/style0005/images/common/webacc.gif",
-     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12387/view.do?currentPageNo=1",
@@ -7089,11 +7229,6 @@
     {
      "name": "본문이미지-779x1113.jpg",
      "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/findUploadImg.do?fileNo=26f7a5d8a9674826ae4098fbeedf6994",
-     "bodyImage": true
-    },
-    {
-     "name": "본문이미지-1638x1163.gif",
-     "url": "https://www.kookmin.ac.kr/content/05sub/style0005/images/common/webacc.gif",
      "bodyImage": true
     }
    ],
@@ -10209,9 +10344,9 @@
    "provider": "주관 기관 원문 확인",
    "amount": "200만원",
    "amountValue": 2000000,
-   "deadline": null,
+   "deadline": "2026-10-08",
    "listedAt": "2026-10-04",
-   "period": "접수 기간 원문 확인",
+   "period": "접수 기간 ~2026-10-08",
    "summary": "광운대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
@@ -10264,7 +10399,9 @@
     "max": 2000000,
     "raw": "장학금액 지원 금액 : 200만원"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "deadlineFrom": "공고문 첨부(OCR)",
+   "openDate": "2026-09-01"
   },
   {
    "id": "auto-notiphpcodes1301seq11193",
@@ -10690,6 +10827,255 @@
    "applyEmail": "janghak@seoultech.ac.kr",
    "applyEmailSource": "본인 명의의 전자항공권, 탑승권 등 증빙내역을 첨부하여 메일 발송( janghak@seoultech.ac.kr ) 후 반드시 전화(02-970-6054)",
    "applyEmailFrom": "공고 원문"
+  },
+  {
+   "id": "auto-bswj104944259artclviewdo",
+   "name": "[교내] 2026학년도 2학기 형제장학금 신청 안내(~10/23)",
+   "boardTitle": "[교내] 2026학년도 2학기 형제장학금 신청 안내(~10/23)",
+   "type": "교내",
+   "kindEvidence": [
+    "제목 표식 「교내」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-05",
+   "provider": "주관 기관 원문 확인",
+   "amount": "40만원",
+   "amountValue": 400000,
+   "deadline": "2026-10-23",
+   "deadlineFrom": "게시판 요약 · ~10/23",
+   "period": "접수 ~2026-10-23",
+   "summary": "연세대학교 미래캠퍼스 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "연세대학교 미래캠퍼스"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-05 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "형제장학금 신청서.hwp",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1014875/download.do"
+    }
+   ],
+   "sourceUrl": "https://mirae.yonsei.ac.kr/bbs/wj/104/944259/artclView.do",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "1. 신청대상 : 미래캠퍼스 재학 중인 학부생(원주의과대학 및 원주간호대학 포함, 신촌 및 국제캠퍼스 제외)"
+   ],
+   "excerpts": [
+    "1번 신청 시, 신청자격과 지급기준에 해당하면 추가 신청 없이 계속 지급(2018년 1학기 이후)",
+    "장학금액 : 40만원 / 1인 (개별 계좌지급), 생활비(학업장려금)명목의 장학금으로 등록금 중복지원에 해당하지 않음",
+    "→ 내용 작성 후 제출서류 첨부하여 등록"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 400000,
+    "ratio": 0,
+    "min": 400000,
+    "max": 400000,
+    "raw": "3. 장학금액 : 40만원 / 1인 (개별 계좌지급), 생활비(학업장려금)명목의 장학금으로 등록금 중복지원에 해당하지 않음"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-bswj104944143artclviewdo",
+   "name": "[교외] 2026년 「강원·세종건설·신디자인랩」브랜드장학금 하반기 장학생 선발(~10/8)",
+   "boardTitle": "[교외] 2026년 「강원·세종건설·신디자인랩」브랜드장학금 하반기 장학생 선발(~10/8)",
+   "type": "교외",
+   "kindEvidence": [
+    "제목 표식 「[교외」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-05",
+   "provider": "주관 기관 원문 확인",
+   "amount": "300만원",
+   "amountValue": 3000000,
+   "deadline": "2026-10-08",
+   "deadlineFrom": "게시판 요약 · ~10/8",
+   "period": "접수 ~2026-10-08",
+   "summary": "연세대학교 미래캠퍼스 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "연세대학교 미래캠퍼스"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-05 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "강원인재원 공고 제2026-44호 2026년 「강원·세종건설·신디자인랩」 브랜드장학금 선발공고문.pdf",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1014705/download.do"
+    },
+    {
+     "name": "붙임 2. 2026년 「강원·세종건설·신디자인랩」 브랜드장학금 신청서 1부.hwp",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1014707/download.do"
+    },
+    {
+     "name": "붙임 4. 개인정보 수집 및 이용동의서 1부.hwp",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1014708/download.do"
+    }
+   ],
+   "sourceUrl": "https://mirae.yonsei.ac.kr/bbs/wj/104/944143/artclView.do",
+   "sourceKind": "auto",
+   "applyEmail": "Gnjael.gwd@gmail.com",
+   "applyEmailSource": "○ (신청방법) 서류 구비 후 이메일 Gnjael.gwd@gmail.com) 접수",
+   "applyEmailFrom": "공고문 첨부(OCR)",
+   "announceDate": "2026-10-23",
+   "eligibilityLines": [
+    "❍ 선발대상 : 도내 대학 재학·휴학(학부)·대학원(석사)·강원학사생",
+    "※ 도내 학생들의 경우 1년 이상 도내 거주 필, 강원학사생은 학사 거주 여부 확인",
+    "❍ 선발인원 : 15명 내외"
+   ],
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 3000000,
+    "ratio": 0,
+    "min": 3000000,
+    "max": 3000000,
+    "raw": "❍ 지원내용 : 해외 탐방 경비 1인 최대 300만 원 * 제출한 예산계획서 기준 항공료, 숙박비, 입장료, 교통비(기차 등) 항목 지원 ** 단체봉사·선교 등 탐방 목적과 다른 활동 시 선발 및 비용 지원 불가 ※ 사유를 불문하고 계획 미이행 시, 지원 금액 반환 의무(반환 각서 작성)"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-jong659273296artclviewdo",
+   "name": "[교내]2026학년도 2학기 미래로장학금 2차 신청 안내(학부)",
+   "boardTitle": "[교내]2026학년도 2학기 미래로장학금 2차 신청 안내(학부)",
+   "type": "교내",
+   "kindEvidence": [
+    "제목 표식 「교내」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-05",
+   "provider": "주관 기관 원문 확인",
+   "amount": "180만원",
+   "amountValue": 1800000,
+   "deadline": "2026-10-30",
+   "deadlineFrom": "게시판 요약 · ~ 10. 30",
+   "period": "접수 ~2026-10-30",
+   "summary": "고려대학교 세종캠퍼스 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "고려대학교 세종캠퍼스"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-05 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/273296/artclView.do",
+   "sourceKind": "auto",
+   "openDate": "2026-10-01",
+   "eligibilityLines": [
+    "3. 선발 기준",
+    "가. 2026학년도 2학기 국가장학금(Ⅰ유형) 신청 및 심사결과 승인 완료자",
+    "나. 국가장학금(Ⅰ유형) 수혜기준 충족자",
+    "1) 직전학기 12학점 이상 이수",
+    "2) 백분위 성적 80점 이상(평점 2.5 이상)의 성적취득(※ F학점 및 학점포기 과목 포함 성적)",
+    "3) 0분위(기초/차상위)는 70점 이상(평점 1.5 이상)의 성적취득",
+    "4) C학점 경고제 통과자로 국가장학금Ⅰ유형을 수혜한 경우 미래로 장학금 지급 가능",
+    "5) 정규학기 마지막 학기 재학생은 이수학점 기준 제외",
+    "6) 국가장학금(Ⅰ유형) 탈락자 중 재단거절사유가 \"학제별/학생별 최대지원횟수\"이고",
+    "해당학기가 정규학기이고 타 기준을 충족할 경우 미래로장학금 지급가능",
+    "7) 선발당시 소득분위 미확정자 또는 9-10분위는 미선발",
+    "8) 신입/편입/재입학생은 입학 첫학기에 한하여 성적 및 학점 기준 미적용",
+    "9) 신청서 내 신청사유 1, 2 각각 150자 (공백 제외) 이상 성실 작성 필수.",
+    "미작성 시 지급 제외 / 불성실 작성 시 장학금 50% 감면 후 지급"
+   ],
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 1800000,
+    "ratio": 0,
+    "min": 1800000,
+    "max": 1800000,
+    "raw": "나. 장학금액 구분 미래로장학금 0구간(기초생활수급자) 수업료 100% 지원(국가장학금 금액 포함) + 생활비 장학금 학기당 180만원 0구간(차상위) 수업료 100% 지원 (국가장학금 금액 포함)"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-ervicenoticedetail520607",
+   "name": "「2026 상반기 AI·ICT 인재 장학생 모집」 안내(대상: 서울시 서초구에 주소지를 둔 재학생)",
+   "boardTitle": "「2026 상반기 AI·ICT 인재 장학생 모집」 안내(대상: 서울시 서초구에 주소지를 둔 재학생)",
+   "type": "교외",
+   "kindEvidence": [
+    "교내 증거 없음 — 기본값"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-10-05",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-10-05",
+   "period": "접수 기간 원문 확인",
+   "summary": "동국대학교 WISE캠퍼스 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교 WISE캠퍼스"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-05 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "(신청서식)2026년_하반기_문주장학재단_주관_장학생_지원서식.hwp",
+     "url": "javascript:downGO('(신청서식)2026년_하반기_문주장학재단_주관_장학생_지원서식.hwp','/files/article/servicenotice/520607/','063C30D7C486457CA7D757198AD374E6.hwp');"
+    },
+    {
+     "name": "(공고문)2026년_하반기_문주장학재단_주관_AI_ICT_장학생_선발_공고문.pdf",
+     "url": "javascript:downGO('(공고문)2026년_하반기_문주장학재단_주관_AI_ICT_장학생_선발_공고문.pdf','/files/article/servicenotice/520607/','F201A662E8C1437EB71F30828C2E394E.pdf');"
+    }
+   ],
+   "sourceUrl": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520607",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-oarticleno158449nocat501",
+   "name": "[대전광역시] 2026년 하반기 성취장학생 선발 연장",
+   "boardTitle": "[대전광역시] 2026년 하반기 성취장학생 선발 연장",
+   "type": "교외",
+   "kindEvidence": [
+    "교내 증거 없음 — 기본값"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-10-05",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-10-05",
+   "period": "접수 기간 원문 확인",
+   "summary": "홍익대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "홍익대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-05 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158449&noCat=501",
+   "sourceKind": "auto"
   }
  ]
 }
