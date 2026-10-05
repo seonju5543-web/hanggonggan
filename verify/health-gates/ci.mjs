@@ -7,6 +7,8 @@
      ① 양식 표본 — 표본을 언제·무엇으로 심는가(verify/open-form-sample.cjs · 드라이버와 같은 함수) + 드라이버 배선
      ② 화면 검사 워크플로 — 한 곳이 넘어져도 그물이 남는다(실패를 모아 끝에 한 번 · 브라우저 경로 뒤 **모든** 관문 단계 !cancelled() ·
         화면 검사·전 여정은 서버·브라우저 준비가 됐을 때만 · 경보는 failure() 그대로 · 경보 본문은 화면 검사가 돌았는지부터 가른다 — 셸 글을 실제로 돌려 본다)
+        · 드라이버 루프도 **셸 글을 실제로 돌린다**(가짜 node·timeout) — 실패를 모으는가 · 20분 예산을 넘으면 남은 이름을 넘기고 실패로 끝나는가
+          (2026-10-04 코드 리뷰: 루프 줄을 `|| echo` 로 바꿔 영구 초록불을 만들어도 글자 대조는 통과했다)
      ③ 작업 브랜치 배포(device-deploy.yml) 뒤 화면 검사를 깨운다
      ④ 양식을 고친 그날 '종류를 모르는 자기소개서 칸'을 데이터 감사가 경고한다(verify/essay-unknown-fields.cjs · 주간 검사와 같은 함수 · 경고만)
         (점검 명세는 양식 로봇 리포트에 붙이라 했지만, 그 로봇은 칸에 kind 를 달지 않아 영영 안 울린다 — 'story' 는 세션이 단다.
@@ -61,6 +63,31 @@ function fnBody(src, name) {
   const j = i < 0 ? -1 : src.indexOf('\n}\n', i);
   if (j < 0) return '';
   return src.slice(i, j + 2).replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+}
+
+/* 화면 검사 단계의 셸 글을 **실제로 돌린다** — GitHub 의 기본 셸과 같은 `bash -eo pipefail`.
+   가짜 node: 드라이버 이름을 적고 · GATE_FAIL 에 든 이름이면 실패 · GATE_STEP 초만큼 시계(SECONDS)를 앞으로 민다(오래 걸린 드라이버).
+   가짜 timeout: `node` 앞의 마지막 인자(그 드라이버의 시한)를 적고 뒤를 그대로 부른다.
+   🔴 진짜 드라이버를 절대 부르지 않는다: 같은 이름의 셸 함수가 먼저 잡히고, 빈 임시 폴더에서 돌아 함수가 빠져도 verify/ 가 없다.
+      GITHUB_OUTPUT 은 임시 파일 — 이 관문이 Actions 안에서 돌 때 진짜 출력을 더럽히지 않게 환경을 새로 만든다. */
+function runDriverLoop(script, { fail = [], step = 0 } = {}) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ci-loop-'));
+  const f = (n) => path.join(dir, n);
+  for (const n of ['out', 'ran', 'tl']) fs.writeFileSync(f(n), '');
+  const fake = [
+    'timeout() { local d=""; while [ $# -gt 0 ] && [ "$1" != node ]; do d="$1"; shift; done; echo "$d" >> "$GATE_TL"; "$@"; }',
+    'node() { echo "${1#verify/}" >> "$GATE_RAN"; if [ "${GATE_STEP:-0}" -gt 0 ]; then SECONDS=$((SECONDS + GATE_STEP)); fi; case " $GATE_FAIL " in *" ${1#verify/} "*) return 1 ;; esac; return 0; }',
+  ].join('\n');
+  try {
+    const r = spawnSync('bash', ['--noprofile', '--norc', '-eo', 'pipefail', '-c', `${fake}\n${script}`], {
+      cwd: dir, encoding: 'utf8', timeout: 20000,
+      env: { PATH: process.env.PATH || '/usr/bin:/bin', HOME: dir, GITHUB_OUTPUT: f('out'), GATE_RAN: f('ran'), GATE_TL: f('tl'), GATE_FAIL: fail.join(' '), GATE_STEP: String(step) },
+    });
+    const lines = (n) => fs.readFileSync(f(n), 'utf8').split('\n').filter(Boolean);
+    const out = {};
+    for (const l of lines('out')) { const k = l.indexOf('='); if (k > 0) out[l.slice(0, k)] = l.slice(k + 1); }
+    return { rc: r.status, out, ran: lines('ran'), tl: lines('tl').map(Number) };
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 }
 
 /* 경보 단계의 셸 글을 **실제로 돌려** 본문을 받는다 — 글자 대조로는 갈래가 바뀌어도 모른다.
@@ -159,6 +186,35 @@ export default async function gate(eq, ctx) {
   eq('  ⓑ 드라이버 실패를 `||` 로 받아 모은다(기본 셸이 bash -e 라 이게 없으면 첫 실패에서 멈춘다)', nodeLines.every((l) => l.includes('||')), true);
   eq('  ⓒ 모은 실패로 마지막에 한 번 빨간불 · 실패 목록을 출력으로 넘긴다',
     [/\bexit 1\b/.test(drivers.run || ''), /failed=.*>>\s*"\$GITHUB_OUTPUT"/.test(drivers.run || ''), drivers.id], [true, true, 'drivers']);
+  /* ⓙ 루프를 **실제로 돌린다**(2026-10-04 코드 리뷰 2차) — 위 ⓑⓒ 는 글자라, 루프 줄을 `|| echo "❌ $f"`(실패를 안 모음)로 바꿔
+     화면 검사가 늘 초록으로 끝나도 `||`·`exit 1`·`failed=` 글자가 남아 통과했다(실측). 막으려는 최악이 바로 그 '조용한 초록불'이다. */
+  const list = ((/for f in ([\s\S]*?);\s*do\b/.exec(drivers.run || '') || [])[1] || '').split(/[\s\\]+/).filter((x) => /\.js$/.test(x));
+  const iReg = list.indexOf('verify-registered.js');
+  const iNews = list.indexOf('verify-news.js');
+  eq('  ⓙ 드라이버 목록을 읽어 냈다 · verify-registered 와 verify-news 사이에 다른 드라이버가 있다(사이도 도는지 잴 수 있다)',
+    [list.length >= 20, iReg >= 0, iNews > iReg + 1], [true, true, true]);
+  const two = runDriverLoop(drivers.run || '', { fail: ['verify-registered.js', 'verify-news.js'] });
+  eq('  ⓙ (돌려 봄) 둘이 넘어지면: 종료 1 · 출력 failed 가 정확히 그 둘 · 돌리지 못한 것 없음 · 목록 전부가 차례대로 돌았다',
+    [two.rc, two.out.failed, two.out.unrun, JSON.stringify(two.ran) === JSON.stringify(list)],
+    [1, 'verify-registered.js verify-news.js', '', true]);
+  eq('  ⓙ (돌려 봄) 드라이버마다 시한을 걸었다(timeout · 5분 이하)',
+    [two.tl.length === list.length, two.tl.every((t) => t > 0 && t <= 300)], [true, true]);
+  const none = runDriverLoop(drivers.run || '', {});
+  eq('  ⓙ (돌려 봄) 전부 통과하면: 종료 0 · failed 빈 값 · unrun 빈 값 · 전부 돌았다',
+    [none.rc, none.out.failed, none.out.unrun, none.ran.length === list.length], [0, '', '', true]);
+  const budgetMin = Number((/^budget=\$\(\((\d+)\s*\*\s*60\)\)$/m.exec(drivers.run || '') || [])[1]);
+  eq('  ⓚ 루프 전체 예산을 읽어 냈다(budget=$((분*60)))', budgetMin > 0, true);
+  const slow = runDriverLoop(drivers.run || '', { step: budgetMin * 60 - 50 });
+  eq('  ⓚ (돌려 봄) 예산을 다 쓰면: 새 드라이버를 시작하지 않고 · 남은 이름 전부를 unrun 으로 넘기고 · 실패(1)로 끝난다(취소 대신 경보)',
+    [slow.rc, slow.ran, slow.out.unrun, slow.out.failed], [1, list.slice(0, 2), list.slice(2).join(' '), '']);
+  eq('  ⓚ (돌려 봄) 드라이버 하나의 시한도 남은 예산을 넘지 않는다(첫째 5분 · 둘째는 남은 50초 안)',
+    [slow.tl[0], slow.tl[1] > 0 && slow.tl[1] <= 50], [300, true]);
+  const jobCap = Number((/^ {4}timeout-minutes:\s*(\d+)/m.exec(ui) || [])[1]);
+  const journeyRun = by('전 여정 회귀 (drive.js)').run || '';
+  const journeySec = Number((/\btimeout -k \d+ (\d+) node verify\/drive\.js\b/.exec(journeyRun) || [])[1]);
+  eq('  ⓚ 전 여정(drive.js)도 스스로 끝낸다(timeout -k · 5분 이하)', [journeySec > 0, journeySec <= 300], [true, true]);
+  eq('  ⓚ 작업 상한 > 화면 검사 예산 + 전 여정 시한 + 준비·값싼 관문 여유 3분 (넘치면 \'취소\'로 끝나 경보가 안 뜬다)',
+    jobCap > budgetMin + Math.ceil(journeySec / 60) + 3, true);
   for (const n of ['말투·토큰 관문', '수집기·관리자 규칙 관문 (브라우저 불필요)', '전 여정 회귀 (drive.js)']) {
     eq(`  ⓓ 「${n}」 은 앞 단계가 실패해도 돈다(!cancelled())`, /!cancelled\(\)|always\(\)/.test(by(n).if || ''), true);
   }
@@ -186,8 +242,8 @@ export default async function gate(eq, ctx) {
   /* ⓘ 경보가 화면 검사 단계가 **돌았는지**부터 가른다 — 실패 목록만 보면 건너뛴 날에도 '실패한 드라이버: 없음'이라
      하나도 안 돈 것을 다 통과한 것처럼 적었다(CLAUDE.md 매 세션 5). 셸 글을 실제로 돌려 세 갈래 본문을 받는다. */
   const envOf = (k) => ((new RegExp(`^ {10}${k}:\\s*(.+)$`, 'm').exec(alarm.raw || '') || [])[1] || '').trim();
-  eq('  ⓘ 경보가 화면 검사 단계의 결과(outcome)와 실패 목록을 받는다',
-    [envOf('DRIVERS'), envOf('FAILED')], ['${{ steps.drivers.outcome }}', '${{ steps.drivers.outputs.failed }}']);
+  eq('  ⓘ 경보가 화면 검사 단계의 결과(outcome)·실패 목록·돌리지 못한 목록을 받는다',
+    [envOf('DRIVERS'), envOf('FAILED'), envOf('UNRUN')], ['${{ steps.drivers.outcome }}', '${{ steps.drivers.outputs.failed }}', '${{ steps.drivers.outputs.unrun }}']);
   const HEAD = '앱 화면 검사(브라우저)가 빨간불입니다';
   const OLD_LIE = /실패한 드라이버: 없음/;
   const skipped = runAlarm(alarm.run || '', { DRIVERS: 'skipped', FAILED: '' });
@@ -199,6 +255,13 @@ export default async function gate(eq, ctx) {
   const failed = runAlarm(alarm.run || '', { DRIVERS: 'failure', FAILED: 'verify-x.js verify-y.js' });
   eq('  ⓘ 드라이버가 넘어진 날: 실패한 드라이버 이름을 그대로 싣는다',
     [failed.includes(HEAD), failed.includes('실패한 드라이버: verify-x.js verify-y.js.'), /전부 통과|돌지 않았습니다/.test(failed)], [true, true, false]);
+  const unrunOnly = runAlarm(alarm.run || '', { DRIVERS: 'failure', FAILED: '', UNRUN: 'verify-a.js verify-b.js' });
+  eq('  ⓘ 예산을 다 써서 못 돈 날: 그 이름을 「돌리지 못한」 것으로 적고 · 「실패한 드라이버」·「끝까지 돌았습니다」라고 하지 않는다',
+    [unrunOnly.includes(HEAD), /돌리지 못한 드라이버\W*verify-a\.js verify-b\.js/.test(unrunOnly), /실패한 드라이버:/.test(unrunOnly), /끝까지 돌았습니다/.test(unrunOnly), /목록을 받지 못했습니다/.test(unrunOnly)],
+    [true, true, false, false, false]);
+  const both = runAlarm(alarm.run || '', { DRIVERS: 'failure', FAILED: 'verify-x.js', UNRUN: 'verify-y.js' });
+  eq('  ⓘ 넘어진 것과 못 돈 것이 함께면 둘을 갈라 적는다',
+    [both.includes('실패한 드라이버: verify-x.js.'), /돌리지 못한 드라이버\W*verify-y\.js/.test(both), /끝까지 돌았습니다/.test(both)], [true, true, false]);
   const noList = runAlarm(alarm.run || '', { DRIVERS: 'failure', FAILED: '' });
   eq('  ⓘ 실패했는데 목록이 비면 「없음」이 아니라 목록을 못 받았다고 적는다',
     [noList.includes(HEAD), /목록을 받지 못했습니다/.test(noList), OLD_LIE.test(noList)], [true, true, false]);
