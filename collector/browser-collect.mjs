@@ -4,7 +4,7 @@
 import fs from 'node:fs';
 import { deadlineHintFrom } from './deadline-hint.mjs';
 import { chromium } from 'playwright';
-import { urlKey, dedupeNotices, capNotices, clickRowKey } from './url-key.mjs';
+import { urlKey, dedupeNotices, capNotices, clickRowKey, rekeyLedger } from './url-key.mjs';
 import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mjs';
 import { publishBySchool, dropUnserved, healFromLedger, readSchoolFiles } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
@@ -57,6 +57,7 @@ try { cursor = JSON.parse(fs.readFileSync(cursorPath, 'utf8')); } catch { /* 첫
 const seenPath = new URL('seen.json', HERE);
 let seen = {};
 try { seen = JSON.parse(fs.readFileSync(seenPath, 'utf8')); } catch { /* 첫 실행 */ }
+rekeyLedger(seen);   // 열쇠 규칙(urlKey)이 바뀌었으면 옛 열쇠를 새 열쇠로 잇는다 — 안 하면 그 게시판 글이 통째로 다시 '새 글' (2026-10-05 점검 B6)
 
 const noticesPath = new URL('../data/notices.json', HERE);
 /* 브라우저가 그린 상세 본문 — 자바스크립트로 그리는 게시판(서강·부산·건국·명지)은

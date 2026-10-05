@@ -10,7 +10,7 @@
 import fs from 'node:fs';
 import { deadlineHintFrom } from './deadline-hint.mjs';
 import { FETCH_HEADERS } from './http-headers.mjs';
-import { urlKey, dedupeNotices, capNotices } from './url-key.mjs';
+import { urlKey, dedupeNotices, capNotices, rekeyLedger } from './url-key.mjs';
 import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mjs';
 import { publishBySchool, dropUnserved, healFromLedger, readSchoolFiles, zeroFeedSchools, zeroFeedWhy } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
@@ -58,6 +58,7 @@ try { cursor = JSON.parse(fs.readFileSync(cursorPath, 'utf8')); } catch { /* 첫
 const seenPath = new URL('seen.json', HERE);
 let seen = {};
 try { seen = JSON.parse(fs.readFileSync(seenPath, 'utf8')); } catch { /* 첫 실행 */ }
+rekeyLedger(seen);   // 열쇠 규칙(urlKey)이 바뀌었으면 옛 열쇠를 새 열쇠로 잇는다 — 안 하면 그 게시판 글이 통째로 다시 '새 글' (2026-10-05 점검 B6)
 
 const noticesPath = new URL('../data/notices.json', HERE);
 let notices = { updatedAt: null, items: [] };
@@ -79,6 +80,7 @@ try { actCfg = JSON.parse(fs.readFileSync(actCfgPath, 'utf8')); } catch { /* 설
 const seenActPath = new URL('seen-activities.json', HERE);
 let seenAct = {};
 try { seenAct = JSON.parse(fs.readFileSync(seenActPath, 'utf8')); } catch { /* 첫 실행 */ }
+rekeyLedger(seenAct);   // 같은 열쇠 규칙(urlKey)으로 적는 장부 — 위 seen 과 같은 이유
 const actsPath = new URL('../data/activities.json', HERE);
 let acts = { updatedAt: null, items: [] };
 try { acts = JSON.parse(fs.readFileSync(actsPath, 'utf8')); } catch { /* 첫 실행 */ }
@@ -100,6 +102,7 @@ try { extCfg = JSON.parse(fs.readFileSync(extCfgPath, 'utf8')); } catch { /* 설
 const seenExtPath = new URL('seen-external.json', HERE);
 let seenExt = {};
 try { seenExt = JSON.parse(fs.readFileSync(seenExtPath, 'utf8')); } catch { /* 첫 실행 */ }
+rekeyLedger(seenExt);   // 같은 열쇠 규칙(urlKey)으로 적는 장부 — 위 seen 과 같은 이유
 const extPath = new URL('../data/external.json', HERE);
 let ext = { updatedAt: null, items: [] };
 try { ext = JSON.parse(fs.readFileSync(extPath, 'utf8')); } catch { /* 첫 실행 */ }
