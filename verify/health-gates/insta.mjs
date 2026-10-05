@@ -148,18 +148,24 @@ export default async function gate(eq, ctx) {
     [mainOutsideLoop, mainInLoop.map((s) => s.name)], [[], ['게시용 그림·장부 커밋']]);
   const post = (steps.publish || []).find((s) => s.id === 'post') || {};
   const record = (steps.publish || []).find((s) => s.name === '올린 기록 저장') || {};
-  eq('②-c 올리기 단계에 id: post · 기록 저장은 올라갔으면 앞이 넘어져도 돈다 · 실패 알림이 steps.post.outcome 을 본다',
+  eq('②-c 올리기 단계에 id: post · 기록 저장은 올라갔으면(단계 성공 또는 media 번호) 앞이 넘어져도 돈다 · 실패 알림이 steps.post.outcome·media 를 본다',
     [/insta\/publish\.mjs[^\n]*--publish/.test(post.run || ''), /always\(\)/.test(record.if || ''), /steps\.post\.outcome == 'success'/.test(record.if || ''),
-      /steps\.post\.outcome/.test(pubFail.raw || '')], [true, true, true, true]);
+      /steps\.post\.outputs\.media != ''/.test(record.if || ''), /steps\.post\.outcome/.test(pubFail.raw || ''), /steps\.post\.outputs\.media/.test(pubFail.raw || '')],
+    [true, true, true, true, true, true]);
   const failRun = (env) => runStep(pubFail.run || 'exit 9', { CODE: 'C1', ...env });
   const titleOf = (out) => ((/\[--title\] \[([^\]]*)\]/.exec(out) || [])[1] || '(이슈 없음)');
-  eq('  실패 알림을 돌려 본다 — 올라갔는데 기록 실패 → 「다시 게시하지 마세요」(주소 포함) · 안 올라감 → 「게시가 실패」 · 둘 다 됨 → 이슈 없음',
+  const NOREPOST = '⚠️ 인스타에는 올라갔는데 기록 저장만 실패했습니다 — 다시 게시하지 마세요 (C1)';
+  eq('  실패 알림을 돌려 본다 — 올라갔는데 기록 실패 → 「다시 게시하지 마세요」(주소 포함) · 올린 뒤 단계가 넘어짐(media 번호만 남음) → 같은 경고 · 도중에 끊김(증거 없음) → 「먼저 확인」 · 안 올라감 → 「게시가 실패」 · 둘 다 됨 → 이슈 없음',
     [titleOf(failRun({ POSTED: 'success', RECORDED: 'failure', PERMALINK: 'https://www.instagram.com/p/x/', MEDIA: 'M1' })),
       /instagram\.com\/p\/x/.test(failRun({ POSTED: 'success', RECORDED: 'failure', PERMALINK: 'https://www.instagram.com/p/x/', MEDIA: 'M1' })),
+      titleOf(failRun({ POSTED: 'failure', RECORDED: 'success', MEDIA: 'M1' })), titleOf(failRun({ POSTED: 'cancelled', RECORDED: 'cancelled', MEDIA: 'M1' })),
+      titleOf(failRun({ POSTED: 'cancelled', RECORDED: 'skipped' })),
       titleOf(failRun({ POSTED: 'failure', RECORDED: 'skipped' })), titleOf(failRun({ POSTED: 'success', RECORDED: 'success' }))],
-    ['⚠️ 인스타에는 올라갔는데 기록 저장만 실패했습니다 — 다시 게시하지 마세요 (C1)', true, '🚨 인스타 게시가 실패했습니다', '(이슈 없음)']);
+    [NOREPOST, true, NOREPOST, NOREPOST, '⚠️ 인스타 게시 단계가 도중에 끊겼습니다 — 올라갔는지 먼저 확인하세요 (C1)',
+      '🚨 인스타 게시가 실패했습니다', '(이슈 없음)']);
   /* publish() 가 올린 결과를 GITHUB_OUTPUT 에 남긴다 — 명령줄은 outFile 을 안 넘기므로 기본값(환경변수) 길로 잰다 */
-  {
+  /* hang — 올린 뒤 게시물 주소 묻기가 영영 답이 없다(그 요청엔 시한이 없다 → 작업 시한에 끊긴다) */
+  const fakeRound = async (hang) => {
     const out = path.join(tmp('out'), 'gh-output');
     fs.writeFileSync(out, '');
     const keep = { u: process.env.IG_USER_ID, t: process.env.IG_ACCESS_TOKEN, o: process.env.GITHUB_OUTPUT };
@@ -172,23 +178,24 @@ export default async function gate(eq, ctx) {
       if (/content_publishing_limit/.test(s)) return ok({ data: [] });
       if (/\/77\/media_publish$/.test(s)) return ok({ id: 'M1' });
       if (/\/77\/media$/.test(s)) return ok({ id: `c${++made}` });
-      if (/\/M1\?/.test(s)) return ok({ permalink: 'https://www.instagram.com/p/x/' });
+      if (/\/M1\?/.test(s)) return hang ? new Promise(() => {}) : ok({ permalink: 'https://www.instagram.com/p/x/' });
       if (/\/c\d+\?/.test(s)) return ok({ status_code: 'FINISHED' });
       throw new Error(`뜻밖의 주소 ${s}`);
     };
-    let got;
     try {
       process.env.IG_USER_ID = '77'; process.env.IG_ACCESS_TOKEN = 'tok-관문'; process.env.GITHUB_OUTPUT = out;
-      const r = await P.publish({ dir: 'x', images: ['https://i/1.jpg', 'https://i/2.jpg'], caption: 'c', live: true, f,
+      const run = P.publish({ dir: 'x', images: ['https://i/1.jpg', 'https://i/2.jpg'], caption: 'c', live: true, f,
         waits: { ...P.WAITS, liveGapMs: 0, readyGapMs: 0, pubGapMs: 0 }, tokenStore: { read: () => ({}), write: () => {} }, log: () => {} });
-      got = [r && r.mediaId, fs.readFileSync(out, 'utf8')];
-    } catch (e) { got = [`넘어짐 ${e.message}`, '']; } finally {
+      const r = await Promise.race([run, new Promise((res) => setTimeout(() => res('(멈춤)'), 1500))]);
+      return [r && (r.mediaId || r), fs.readFileSync(out, 'utf8')];
+    } catch (e) { return [`넘어짐 ${e.message}`, '']; } finally {
       for (const [k, v] of [['IG_USER_ID', keep.u], ['IG_ACCESS_TOKEN', keep.t], ['GITHUB_OUTPUT', keep.o]]) if (v === undefined) delete process.env[k]; else process.env[k] = v;
       fs.rmSync(path.dirname(out), { recursive: true, force: true });
     }
-    eq('②-d 가짜 인스타 한 바퀴 — 올리면 GITHUB_OUTPUT 에 media·permalink 를 남긴다(실패 알림이 「올라갔다」 를 안다)',
-      got, ['M1', 'media=M1\npermalink=https://www.instagram.com/p/x/\n']);
-  }
+  };
+  eq('②-d 가짜 인스타 한 바퀴 — 올리면 GITHUB_OUTPUT 에 media·permalink 를 남긴다 · 주소 묻기에서 멈춰도 media 는 이미 남아 있다(실패 알림이 「올라갔다」 를 안다)',
+    [await fakeRound(false), await fakeRound(true)],
+    [['M1', 'media=M1\npermalink=https://www.instagram.com/p/x/\n'], ['(멈춤)', 'media=M1\n']]);
   const prepFail = (steps.prepare || []).find((s) => s.name === '실패하면 시끄럽게') || {};
   const bodyOf = (out) => ((/\[--body\] \[([\s\S]*?)\]\n/.exec(out) || [])[1] || '');
   eq('  준비 실패 알림 — 장부가 기본 브랜치에 들어갔으면 「관리자 화면에 있다 · 알림 다시 보내기」, 아니면 「다음 실행이 다시 그린다」',

@@ -196,13 +196,15 @@ export async function publish({ dir, images, caption, live, f = fetch, waits = W
   // ③ 게시
   const { id: mediaId } = await publishWhenReady(id, carousel,
     { tries: waits.pubTries, gapMs: waits.pubGapMs, f, log });
+  // ⚠️ 결과 칸 쓰기가 넘어지면 올라간 글이 '실패' 로 보이고 장부에도 안 적힌다 — 쓰기 실패는 삼킨다.
+  const one = (v) => String(v ?? '').replace(/[\r\n]/g, '');
+  const note = (k, v) => { if (outFile) try { appendFileSync(outFile, `${k}=${one(v)}\n`); } catch { /* 결과 칸은 거들 뿐 */ } };
+  // 🔴 올라간 **즉시** media 를 먼저 남긴다 — 아래 주소 묻기는 시한이 없어, 거기서 멈춰 작업 시한에 취소되면
+  //    실패 알림이 '안 올라갔다' 고 읽어 「게시가 실패했습니다」 → 다시 누르면 두 번 올라간다(2026-10-05 재검증).
+  note('media', mediaId);
   const { permalink } = await graph(mediaId, { fields: 'permalink' }, 'GET', f).catch(() => ({}));
+  note('permalink', permalink);
   log(`  ✅ 게시 완료 ${mediaId}${permalink ? ` — ${permalink}` : ''}`);
-  // ⚠️ 여기서 넘어지면 올라간 글이 '실패' 로 보이고 장부에도 안 적힌다 — 쓰기 실패는 삼킨다.
-  if (outFile) {
-    const one = (v) => String(v ?? '').replace(/[\r\n]/g, '');
-    try { appendFileSync(outFile, `media=${one(mediaId)}\npermalink=${one(permalink)}\n`); } catch { /* 결과 칸은 거들 뿐 */ }
-  }
   return { mediaId, permalink: permalink || null, dir };
 }
 

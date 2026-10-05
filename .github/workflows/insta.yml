@@ -456,9 +456,10 @@ jobs:
       #    `git add` 목록에 넣는 것까지가 한 세트다. 올라갔으면 앞 단계가 넘어졌어도 반드시 적는다(always).
       # 🔴 main 에는 올리지 않는다(2026-10-04) — 앱·Pages 는 이 장부를 읽지 않고(관리자 화면은 기본 브랜치를 읽는다) 배포 로봇이
       #    옮긴다. 옛 판은 기본 브랜치에 저장한 뒤 main push 가 거절돼(fetch first) '게시 실패' 이슈를 냈다(#263 — 게시는 성공).
+      # 올리기 단계가 올린 뒤에 넘어졌어도(media 번호가 남았으면) publish.mjs 가 적어 둔 장부가 있을 수 있다 — 있으면 저장한다.
       - name: 올린 기록 저장
         id: record
-        if: ${{ always() && steps.post.outcome == 'success' }}
+        if: ${{ always() && (steps.post.outcome == 'success' || steps.post.outputs.media != '') }}
         run: |
           bash tools/setup-collab.sh       # 🔴 다른 공고의 준비·건너뛰기가 같은 장부를 쓸 수 있다 — 장부 병합 규칙 등록(mergeInstaSeen)
           git config user.name  'github-actions[bot]'
@@ -487,12 +488,16 @@ jobs:
           PERMALINK: ${{ steps.post.outputs.permalink }}
         run: |
           gh label create insta-fail --repo "$REPO" --color B60205 --description '인스타 게시 실패' 2>/dev/null || true
-          if [ "$POSTED" = success ] && [ "$RECORDED" != success ]; then
+          # 올라갔다는 증거 — 단계 성공, 또는 publish.mjs 가 올린 즉시 남긴 media 번호(단계가 그 뒤에 넘어지거나 시한에 끊겨도 남는다 · 2026-10-05)
+          UP=''; { [ "$POSTED" = success ] || [ -n "$MEDIA" ]; } && UP=1
+          if [ -n "$UP" ] && { [ "$POSTED" != success ] || [ "$RECORDED" != success ]; }; then
+            if [ "$POSTED" = success ]; then WHY='그 뒤 장부(insta/seen.json)에 올림 기록을 저장하지 못했습니다.'
+            else WHY="그 뒤 게시 단계가 끝나기 전에 멈춰, 장부(insta/seen.json)에 올림 기록이 적혔는지 알 수 없습니다 — posted 에 $CODE 가 없으면 아래처럼 넣으세요."; fi
             echo '⚠️ 인스타에는 올라갔는데 기록 저장이 실패했습니다 — 다시 게시하지 마세요. 이슈를 만들었습니다.' >> "$GITHUB_STEP_SUMMARY"
             gh issue create --repo "$REPO" --label insta-fail \
               --title "⚠️ 인스타에는 올라갔는데 기록 저장만 실패했습니다 — 다시 게시하지 마세요 ($CODE)" \
               --body "게시는 됐습니다 — ${PERMALINK:-(게시물 주소를 못 받았습니다 · 인스타 앱에서 확인)} (media ${MEDIA:-?})
-          그 뒤 장부(insta/seen.json)에 올림 기록을 저장하지 못했습니다.
+          $WHY
           🔴 관리자 화면에서 「게시」 를 다시 누르지 마세요 — 장부에 없어서 같은 글이 한 번 더 올라갑니다.
 
           장부에 손으로 넣는 법 (Claude 세션에 '인스타 올림 기록 넣어줘 $CODE' 라고 해도 됩니다):
@@ -503,8 +508,21 @@ jobs:
           실행 로그: https://github.com/$REPO/actions/runs/$RUN"
             exit 0
           fi
-          if [ "$POSTED" = success ]; then
+          if [ -n "$UP" ]; then
             echo '게시·기록은 끝났습니다 — 그 뒤 단계만 멈췄습니다.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          # 🔴 올리는 도중 시한에 끊기면 올라갔는지 모른다(인스타가 받은 뒤 답만 늦을 수 있다) — '실패' 라고 단정하지 않는다.
+          if [ "$POSTED" = cancelled ]; then
+            echo '⚠️ 게시 단계가 도중에 끊겼습니다 — 올라갔는지 먼저 확인하세요. 이슈를 만들었습니다.' >> "$GITHUB_STEP_SUMMARY"
+            gh issue create --repo "$REPO" --label insta-fail \
+              --title "⚠️ 인스타 게시 단계가 도중에 끊겼습니다 — 올라갔는지 먼저 확인하세요 ($CODE)" \
+              --body "올리는 도중 작업 시한에 끊겨, 인스타에 올라갔는지 이 실행으로는 알 수 없습니다.
+          1) 인스타 앱에서 이 계정의 피드에 이 공고가 올라왔는지 먼저 보세요.
+          2) 올라왔으면 「게시」 를 다시 누르지 마세요 — 장부(insta/seen.json)에 올림 기록이 없어 같은 글이 한 번 더 올라갑니다. Claude 세션에 '인스타 올림 기록 넣어줘 $CODE' 라고 하세요.
+          3) 안 올라왔으면 관리자 화면에서 「게시」 를 다시 누르면 됩니다.
+
+          실행 로그: https://github.com/$REPO/actions/runs/$RUN"
             exit 0
           fi
           echo '🚨 게시가 실패했습니다 — 이슈를 만들었습니다.' >> "$GITHUB_STEP_SUMMARY"
