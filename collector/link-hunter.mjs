@@ -83,7 +83,7 @@ import { dedupeNotices } from './url-key.mjs';
    왜 재발행이면 안 되는지는 publish-notices.mjs 의 patchUrlsBySchool 첫머리에 있다. */
 import { patchUrlsBySchool } from './publish-notices.mjs';
 /* 장부 규칙(시도 기록 · 사람에게 알릴 때 · '내려간 듯')은 순수 함수 파일 하나 — 관문이 가짜 장부로 그대로 돌려 본다 (2026-10-04 · 이슈 #387) */
-import { recordAttempt, settleEscalation, listScanEnd } from './link-hunt-rules.mjs';
+import { recordAttempt, settleEscalation, listScanEnd, escalationLines, pruneHuntState } from './link-hunt-rules.mjs';
 /* 관리자가 이미 원문을 넣은 공고는 건드리지 않는다 (2026-10-04) — 표식을 바꾸면 관리자 열쇠(u:<표식>)가 안 맞아 그 주소가 화면에서 사라진다 */
 import { readLinkFixes, humanFixedBy } from './link-fixes-read.mjs';
 
@@ -95,7 +95,12 @@ const DRY = process.argv.includes('--dry');
 const today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
 
 /* 집계 — 맨 위에 둔다. 아래 '넘어져도 저장' 장치가 언제 불려도 읽을 수 있어야 하기 때문. */
-let found = 0; let failed = 0; let gone = 0; let stuck = 0;
+let found = 0; let gone = 0; let stuck = 0;
+/* 아직 못 찾은 공고 — 숫자가 아니라 열쇠 묶음으로 센다(2026-10-05 점검 links-2): 1단계에서 실패로 센 공고를 같은 실행의 3단계가 찾아도
+   숫자는 안 내려가 끝줄 '아직 못 찾음'이 부풀었다(#387: 6건 중 1건은 찾은 것). 3단계가 찾으면 뺀다. */
+const failedKeys = new Set();
+const escalatedNow = [];   // 이번에 처음 사람에게 알리는 공고 — 리포트 머리 절(escalationLines)
+let prunedKeys = 0;        // 저장할 때 걷어 낸 장부 줄 수(pruneHuntState)
 
 /* ── 넘어져도 그때까지 찾은 것은 반드시 저장한다 (2026-08-01) ──────────────
    왜 만들었나: 리포트 마지막 줄의 낱말 하나가 틀려(옛 이름 GIVE_UP_AFTER) 로봇이
@@ -532,21 +537,26 @@ report.push('## 1단계 · 사냥 (원문 공고가 안 열리는 링크 고치�
 /* 장부 한 줄 고치기 — 규칙은 link-hunt-rules.mjs recordAttempt 한 곳.
    🔴 여기서 사람에게 알릴 건(stuck)을 세지 않는다 — 3단계가 같은 실행에서 찾아낼 수 있다(이슈 #387). 세는 곳은 3단계 뒤 한 곳.
    scan: '목록에서 못 찾음'일 때 목록을 끝까지 봤나('end') · 더 있을 수 있나('deep') — 'deep' 이면 '내려간 듯'으로 적지 않는다 */
-function record(t, outcome, why, scan) {
+function record(t, outcome, why, scan, opts = {}) {
   const st = state.items[t.key] || { attempts: 0, title: String(t.title).slice(0, 80) };
-  state.items[t.key] = recordAttempt(st, outcome, why, { today, url: t.ref[t.field], scan });
+  state.items[t.key] = recordAttempt(st, outcome, why, { today, url: t.ref[t.field], scan, ...opts });
 }
 
 for (const [listUrl, group] of boards) {
   if (outOfTime()) { report.push('_(시간 상한 — 나머지 게시판은 다음 실행)_'); break; }
   report.push(`### ${listUrl}`);
   const page = await ctx.newPage();
-  let opened = false;
+  let opened = false; let openErr = '';
   for (let a = 0; a < 3 && !opened; a += 1) {
     try { await page.goto(listUrl, { waitUntil: a >= 2 ? 'commit' : 'domcontentloaded', timeout: a ? 45000 : 30000 }); opened = true; }
-    catch (e) { if (a === 2) report.push(`- ❌ 게시판 열기 실패: ${(e.message || '').split('\n')[0].slice(0, 70)}`); else await page.waitForTimeout(3000 * (a + 1)); }
+    catch (e) { openErr = (e.message || '').split('\n')[0].slice(0, 70); if (a === 2) report.push(`- ❌ 게시판 열기 실패: ${openErr}`); else await page.waitForTimeout(3000 * (a + 1)); }
   }
-  if (!opened) { await page.close().catch(() => {}); report.push(''); continue; }
+  if (!opened) {
+    /* 게시판이 안 열리면 그 게시판 대상 전부를 내일로 미룬다(못 읽음 — 횟수에는 안 센다 · links-14). 안 적으면 실행마다 같은 게시판을 세 번씩 다시 두드린다 */
+    for (const t of group) record(t, 'net', `게시판 열기 실패: ${openErr}`);
+    report.push(`- ⏭ 이 게시판의 대상 ${group.length}건은 내일 다시 봅니다(횟수에는 안 셉니다)`);
+    await page.close().catch(() => {}); report.push(''); continue;
+  }
   await page.waitForTimeout(3500);
   const forms = await scrapeForms(page);
 
@@ -660,7 +670,7 @@ for (const [listUrl, group] of boards) {
         record(t, 'ok');
         report.push(`  - ✅ ${want.slice(0, 42)} → ${url.slice(0, 104)}`);
       } else {
-        failed += 1;
+        failedKeys.add(t.key);
         /* '못 읽음'으로 셀 것은 **학교 서버에 닿지 못한 경우만**이다.
            HTTP 404는 닿았는데 그 주소가 없다는 뜻이라 판정이 난 것이므로 횟수에 센다.
            안 그러면 404만 나는 공고는 시도 횟수가 영영 안 올라가 escalate가 되지 않고,
@@ -681,8 +691,8 @@ for (const [listUrl, group] of boards) {
   const scan = listScanEnd({ stop, nextControl });
   for (const t of remaining.values()) {
     /* 시간 상한으로 목록을 다 못 본 공고는 '못 찾음'이 아니라 '못 해 봄'이다 — 횟수에 세지 않는다(다음 실행이 다시 본다) */
-    if (stop === 'out-of-time') { record(t, 'net', '시간 상한 — 목록을 다 못 봄'); report.push(`  - ⏱ 시간 상한 — 다음 실행에서: ${huntTitle(t).slice(0, 46)}`); continue; }
-    failed += 1;
+    if (stop === 'out-of-time') { record(t, 'net', '시간 상한 — 목록을 다 못 봄', undefined, { defer: false }); report.push(`  - ⏱ 시간 상한 — 다음 실행에서: ${huntTitle(t).slice(0, 46)}`); continue; }
+    failedKeys.add(t.key);
     record(t, 'bad', '목록에서 못 찾음', scan);
     const st = state.items[t.key];
     report.push(`  - ⚠️ 목록에서 못 찾음 (${st.attempts}회째 · ${scan === 'end' ? '목록 끝까지 봄' : '읽은 쪽 너머에 있을 수 있음'} · 계속 다시 찾습니다): ${huntTitle(t).slice(0, 46)}`);
@@ -790,6 +800,7 @@ if (stillLost.length && !outOfTime()) {
     if (got) {
       if (!DRY) { t.ref[t.field] = got; rememberBoardTitle(t, gotText); }   // got 은 씻어서 확인한 주소(위 cu · links-7)
       extraFound += 1; found += 1;
+      failedKeys.delete(t.key);   // 1단계에서 못 찾음으로 센 것을 거둔다(links-2)
       record(t, 'ok');
       report.push(`  - ✅ 다른 경로에서 찾음: ${want.slice(0, 40)} → ${got.slice(0, 100)}`);
     } else {
@@ -806,7 +817,11 @@ if (stillLost.length && !outOfTime()) {
    예전엔 1단계가 세 번째 실패를 적는 순간 셌다 — 같은 실행의 3단계가 그 공고를 찾아냈는데도 '3회 못 찾은 공고 1건' 이슈가 열렸다.
    시간이 모자라 3단계를 못 해 본 공고는 이번에 세지 않는다(다음 실행이 3단계까지 해 보고 센다). */
 for (const t of stillLost) {
-  if (stage3Failed.has(t.key) && settleEscalation(state.items[t.key])) stuck += 1;
+  if (stage3Failed.has(t.key) && settleEscalation(state.items[t.key])) {
+    stuck += 1;
+    const st = state.items[t.key] || {};
+    escalatedNow.push({ title: huntTitle(t), key: t.key, attempts: st.attempts, lastWhy: st.lastWhy, likelyGone: st.likelyGone });
+  }
 }
 
 /* 저장·리포트를 한 곳에 모아 둔다 — 정상 종료도, 넘어졌을 때도 **같은 길로** 저장한다.
@@ -836,6 +851,14 @@ function saveAll(crashNote) {
       }
       fs.writeFileSync(registeredPath, JSON.stringify(registered, null, 1));
     }
+    /* 장부 정리 — 데이터에 없는 공고·꺼진 순찰의 흔적을 걷는다(규칙은 link-hunt-rules.mjs pruneHuntState · links-9). 고친 주소가 반영된 뒤의 데이터로 잰다 */
+    const liveKeys = new Set([...(notices.items || []).map((n) => `n:${n.url}`), ...(registered.items || []).map((r) => `r:${r.id}`)]);
+    const beforeKeys = Object.keys(state.items || {}).length;
+    /* 순찰 설정은 아래(runPatrol 앞)에서 읽는다 — 그 전에 넘어져 여기 오면 아직 못 읽으므로 켜진 것으로 보고 순찰 흔적을 남긴다 */
+    let patrolOn = true;
+    try { patrolOn = PATROL_PER_RUN > 0; } catch { /* 설정 읽기 전에 넘어짐 */ }
+    state.items = pruneHuntState(state.items, liveKeys, today, 30, { patrolOn });
+    prunedKeys = beforeKeys - Object.keys(state.items).length;
     fs.writeFileSync(statePath, JSON.stringify(state, null, 1));
   }
 
@@ -844,12 +867,15 @@ function saveAll(crashNote) {
     skipped.forEach(({ t, st }) => report.push(`- ⏳ ${st.nextTryAt} 에 다시 시도 (${st.attempts || 0}회 실패${st.likelyGone ? ' · 게시판에서 내려간 듯' : ''}) — ${String(t.title).slice(0, 44)} (${st.lastWhy || ''})`));
     report.push('');
   }
+  if (prunedKeys > 0) { report.push(`_(장부 정리: ${prunedKeys}건 걷어 냄 — 데이터에 없는 공고·꺼진 순찰의 흔적)_`); report.push(''); }
   report.push('---');
   if (crashNote) {
     report.push(`🚨 **로봇이 도중에 넘어졌습니다** — 여기까지 찾은 것은 저장했습니다. 넘어진 자리: \`${crashNote}\``);
     report.push('');
   }
-  report.push(`원문 주소 확보 **${found}건** · 아직 못 찾음 ${failed}건 · 사람에게 알릴 건 ${stuck}건${DRY ? ' — 모의 실행' : ''}`);
+  report.push(`원문 주소 확보 **${found}건** · 아직 못 찾음 ${failedKeys.size}건 · 사람에게 알릴 건 ${stuck}건${DRY ? ' — 모의 실행' : ''}`);
+  /* 이번에 처음 알리는 공고는 머리말 바로 뒤에 — 이슈 본문(리포트 전체)의 첫 화면에서 어느 공고인지 보이게(links-2 · #387) */
+  report.splice(2, 0, ...escalationLines(escalatedNow));
   report.push('');
   report.push('**포기하는 건 없습니다** — 못 찾은 공고는 간격을 늘려 가며(1일→3일→7일→14일→30일) 계속 다시 찾습니다.');
   report.push('');
@@ -857,7 +883,7 @@ function saveAll(crashNote) {
   fs.writeFileSync(new URL('link-hunt-report.md', HERE), report.join('\n'));
   console.log(report.join('\n'));
   if (process.env.GITHUB_OUTPUT) {
-    fs.appendFileSync(process.env.GITHUB_OUTPUT, `found=${found}\nfailed=${failed}\nstuck=${stuck}\n`);
+    fs.appendFileSync(process.env.GITHUB_OUTPUT, `found=${found}\nfailed=${failedKeys.size}\nstuck=${stuck}\n`);
   }
 }
 

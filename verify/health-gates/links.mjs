@@ -14,6 +14,7 @@ import { canonUrl, idFromUrl, idHash, registerId } from '../../collector/canon-u
 import { urlKey, noticeUrlRank, preferNotice } from '../../collector/url-key.mjs';
 import { stripSessionId } from '../../collector/board-links.mjs';
 import { rowDetailCandidates, cleanStoredUrl } from '../../collector/detail-url.mjs';
+import { recordAttempt, escalationLines, pruneHuntState } from '../../collector/link-hunt-rules.mjs';
 
 /* 경기대 eGov 게시판 꼴 — 글 번호(nttNo)는 가운데, 끝은 게시판 공통값(searchKrwd·sf.pnos) */
 const KGU = (ntt, sess = '') => `https://www.kyonggi.ac.kr/www/selectBbsNttView.do${sess}?key=7520&bbsNo=1073&nttNo=${ntt}&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888`;
@@ -158,5 +159,73 @@ export default async function links(eq, ctx) {
         /detailCandidates\(\{[^}]*\}\)\s*\.map\(cleanStoredUrl\)/.test(rs),
         /allLinks\s*\.map\(\(l\) => \(\{ \.\.\.l, url: cleanStoredUrl\(l\.url\) \}\)\)/.test(bc)],
       [true, true, true, true]);
+  }
+
+  /* ── ③ 학교 서버에 못 닿은 표적은 내일 다시 ── */
+  {
+    const day = { today: '2026-10-04', nowMs: Date.parse('2026-10-04T03:00:00Z') };
+    const net = recordAttempt({ attempts: 2 }, 'net', 'Timeout', day);
+    eq('③ 못 닿음(net)은 횟수에 안 세고 내일(KST)로 미룬다 · 우리 시간 상한(defer:false)은 미루지 않는다 · 더 늦은 날은 줄이지 않는다 · 지난 날은 내일로',
+      [net.attempts, net.nextTryAt, recordAttempt({ attempts: 2 }, 'net', '시간 상한', { ...day, defer: false }).nextTryAt,
+        recordAttempt({ attempts: 2, nextTryAt: '2026-10-03' }, 'net', '시간 상한', { ...day, defer: false }).nextTryAt,
+        recordAttempt({ attempts: 2, nextTryAt: '2026-10-10' }, 'net', 'Timeout', day).nextTryAt, recordAttempt({ attempts: 1, nextTryAt: '2026-09-04' }, 'net', 'Timeout', day).nextTryAt,
+        recordAttempt({ attempts: 0 }, 'net', 'Timeout', { today: '2026-10-04', nowMs: Date.parse('2026-10-04T16:00:00Z') }).nextTryAt],
+      [2, '2026-10-05', undefined, '2026-10-03', '2026-10-10', '2026-10-05', '2026-10-06']);
+    const lh = stripComments(fs.readFileSync(new URL('collector/link-hunter.mjs', root), 'utf8'));
+    const failBranch = (lh.match(/if \(!opened\) \{[\s\S]{0,400}/) || [''])[0];
+    eq('③ 배선 — 게시판이 안 열리면 그 게시판 대상 전부를 net 으로 적는다(미룸) · 시간 상한 줄은 defer:false · record 가 opts 를 넘긴다',
+      [/for \(const t of group\) record\(t, 'net'/.test(failBranch), /record\(t, 'net', '시간 상한[^']*', undefined, \{ defer: false \}\)/.test(lh),
+        /recordAttempt\(st, outcome, why, \{[^}]*\.\.\.opts \}\)/.test(lh)],
+      [true, true, true]);
+  }
+
+  /* ── ④ 사냥꾼 리포트 — 아직 못 찾은 수 · 이번에 알리는 공고 ── */
+  {
+    const two = [
+      { title: '2026학년도 2학기 표본재단 장학생 선발 안내', key: 'n:https://a.example.ac.kr/list.do#n-x', attempts: 3, lastWhy: '목록에서 못 찾음', likelyGone: true },
+      { title: '표본시민장학회 장학생 모집', key: 'r:auto-sample', attempts: 4, lastWhy: 'HTTP 404' },
+    ];
+    const lines = escalationLines(two);
+    eq('④ 이번에 처음 알리는 공고 절 — 머리 한 줄 + 공고마다 한 줄(제목·횟수·열쇠) · 없으면 절을 안 찍는다',
+      [lines[0], lines.filter((l) => /^- /.test(l)).length, two.every((x) => lines.some((l) => l.includes(x.title) && l.includes(x.key))), escalationLines([]), escalationLines()],
+      ['### 🙋 사람 확인 필요 — 이번에 처음 알리는 공고 2건', 2, true, [], []]);
+    const lh = stripComments(fs.readFileSync(new URL('collector/link-hunter.mjs', root), 'utf8'));
+    const got = (lh.match(/extraFound \+= 1[\s\S]{0,400}/) || [''])[0];
+    const save = (lh.match(/function saveAll\([\s\S]*?\n\}\n/) || [''])[0];
+    eq('④ 배선 — 3단계가 찾으면 \'못 찾음\'에서 뺀다 · 끝줄·출력은 묶음 크기 · 리포트 머리에 이번 알림 절',
+      [/failedKeys\.delete\(t\.key\)/.test(got), /\bfailed \+= 1/.test(lh), /아직 못 찾음 \$\{failedKeys\.size\}건/.test(save), /failed=\$\{failedKeys\.size\}/.test(save),
+        /report\.splice\(2, 0, \.\.\.escalationLines\(escalatedNow\)\)/.test(save), /escalatedNow\.push\(/.test(lh)],
+      [true, false, true, true, true, true]);
+  }
+
+  /* ── ⑤ 사냥꾼 장부 정리 ── */
+  {
+    const today = '2026-10-05';
+    const ago = (n) => new Date(Date.parse(`${today}T00:00:00Z`) - n * 86400000).toISOString().slice(0, 10);
+    const items = {
+      'n:live-next': { attempts: 2, lastTried: ago(1), lastWhy: '목록에서 못 찾음', nextTryAt: '2026-10-08', patrolledAt: ago(3), escalated: true, likelyGone: true, title: 't' },
+      'n:dead-patrol': { patrolledAt: ago(5), lastWhy: 'HTTP 404' },
+      'r:dead-resolved-10': { attempts: 0, status: 'resolved', lastTried: ago(10), lastWhy: '', resolvedUrl: 'https://a.example.ac.kr/view.do?seq=1' },
+      'r:dead-resolved-40': { attempts: 0, status: 'resolved', lastTried: ago(40), lastWhy: '' },
+      'n:dead-escalated-5': { attempts: 3, escalated: true, lastTried: ago(5), lastWhy: '목록에서 못 찾음', nextTryAt: '2026-10-20' },
+      'n:dead-trying': { attempts: 1, lastTried: ago(2), lastWhy: 'HTTP 404', nextTryAt: '2026-10-06' },
+      'r:live-patrol-only': { patrolledAt: ago(2), lastWhy: '' },
+    };
+    const frozen = JSON.stringify(items);
+    const live = new Set(['n:live-next', 'r:live-patrol-only']);
+    const out = pruneHuntState(items, live, today);
+    const { patrolledAt, ...rest } = items['n:live-next'];
+    eq('⑤ 데이터에 있는 열쇠는 남고(순찰이 꺼져 있으면 순찰 흔적만 뗀다 · 다른 칸 그대로) · 순찰 흔적뿐인 줄은 버린다',
+      [out['n:live-next'], 'r:live-patrol-only' in out], [rest, false]);
+    eq('⑤ 데이터에 없는 열쇠 — 순찰 흔적·시도 중인 것은 버리고 · 찾은 것(10일 전)·알린 것(5일 전)은 남기고 · 40일 지난 찾은 것은 버린다',
+      [Object.keys(out).sort()], [['n:dead-escalated-5', 'n:live-next', 'r:dead-resolved-10']]);
+    eq('⑤ 넘겨받은 장부는 안 고친다 · 순찰을 켜면 순찰 흔적을 남긴다',
+      [JSON.stringify(items) === frozen, pruneHuntState(items, live, today, 30, { patrolOn: true })['n:live-next'].patrolledAt, 'r:live-patrol-only' in pruneHuntState(items, live, today, 30, { patrolOn: true })],
+      [true, ago(3), true]);
+    const lh = stripComments(fs.readFileSync(new URL('collector/link-hunter.mjs', root), 'utf8'));
+    const save = (lh.match(/function saveAll\([\s\S]*?\n\}\n/) || [''])[0];
+    const iPrune = save.indexOf('pruneHuntState('); const iWrite = save.indexOf('writeFileSync(statePath');
+    eq('⑤ 배선 — 사냥꾼이 장부를 쓰기 바로 전에 정리한다 · 리포트에 걷어 낸 수',
+      [iPrune > 0 && iWrite > iPrune, /장부 정리: \$\{prunedKeys\}건/.test(save)], [true, true]);
   }
 }
