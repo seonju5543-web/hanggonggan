@@ -11,7 +11,9 @@
      ④ 활동 자격 (api-06): 납작한 표의 `대상연령 : 만 20세 이상 ~ 만 39세 이하, 만 40세 이상` 이 범위 하나로 읽혀 45세가 미달(틀린 미달) ·
         개인정보 처리 안내문이 자격 자리에 — activity-excerpts.mjs eligLineOk 한 곳 · 실린 글 sanitizeElig · 브라우저 장부 mergeBrowserResults
      ⑤ 뺀 게시판의 소식 (news-4): 경북 boardUrl 을 포토뉴스 → 학사공지로 바꾼 뒤 포토뉴스 글이 바닥 4건 자리에 남았다 —
-        새 글에 게시판 열쇠(src) · 이번에 본 글은 열쇠를 고쳐 단다 · 지금 출처에 없는 게시판의 글은 발행에서 뺀다(news-board-rules.mjs dropRetiredBoards)
+        새 글에 게시판 열쇠(src) · 이번에 본 글은 열쇠를 고쳐 단다 · 지금 출처에 없는 게시판의 글은 발행에서 뺀다(news-board-rules.mjs dropRetiredBoards) ·
+        진짜 소식 로봇을 임시 폴더에서 예산 0(게시판을 안 두드린다)으로 돌려 발행만 잰다
+     ⑥ 합격·선발 결과 글 (news-12): 「최종 합격자 알림」·「선발 결과 안내」·「선정 결과」·「최종 결과 발표」 6건이 소식으로 실렸다 — news-kind.mjs NOT_NEWS
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
 import os from 'node:os';
@@ -21,7 +23,9 @@ import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { stripComments, cleanEnv } from './gate.mjs';
 import { sandbox } from './bodies.mjs';
-import { clearFuturePosted, newsFloor } from '../../collector/news-kind.mjs';
+import { clearFuturePosted, newsFloor, isNewsRow } from '../../collector/news-kind.mjs';
+import { activityKind } from '../../collector/activity-kind.mjs';
+import { isAttachmentEntry } from '../../collector/attachment-link.mjs';
 import { dropReason as extDropReason, fillDeadlineFromHint, tidyExternal } from '../../collector/external-clean.mjs';
 import { activityDetails, eligLineOk, sanitizeElig } from '../../collector/activity-excerpts.mjs';
 import { boardKey, dropRetiredBoards } from '../../collector/news-board-rules.mjs';
@@ -240,5 +244,24 @@ export default async function qfeeds(eq, ctx) {
         [0, ['2', '3'], false, true]);
       if (r.status !== 0) console.log(r.out.slice(-800));
     } finally { sb.done(); }
+  }
+
+  /* ── ⑥ 소식 — 합격·선발 결과 글은 안 싣는다 ── */
+  {
+    const K = new RegExp((collectSrc.match(/const KEYWORDS = \/(.+?)\/;/) || [])[1]);
+    const opts = { scholarship: K, activityKind, isAttachmentEntry };
+    const row = (title) => isNewsRow({ title, url: 'https://u.example.ac.kr/1' }, opts);
+    const RESULTS = [
+      '[홍보실]2026학년도 2학기 학생 홍보대사(영상·디자인) 최종 합격자 알림',
+      '[대학교육혁신원] 2026학년도 2학기 제1기 학생 서포터즈 「MJ IN:US(이너스)」 최종 합격자 안내',
+      '[학생지원팀] 2026학년도 2학기 KAU 사회봉사단 선발 결과 안내',
+      '[IC-PBL교수학습센터] 2026학년도 글로벌 IC-PBL 프런티어 최종 결과 발표',
+      '[4단계BK21대학원혁신사업] 2026학년도 대학원생 우수논문상 선정 결과',
+      '[4단계BK21대학원혁신사업] 2026 PKNU 우수 연구실(Proud Lab) 선정 결과',
+    ];
+    eq('⑥ 합격자 알림·안내 · 선발/선정 결과 · 최종 결과 발표는 소식으로 싣지 않는다 (실린 6건 제목 그대로)', RESULTS.map(row), RESULTS.map(() => false));
+    eq('  경기 일정 및 결과 · 검사 결과 안내 · 담화문은 싣는다 (결과 안내 전반을 막지 않는다)',
+      ['[체육지원팀] 아이스하키부 경기 일정 및 결과 안내', '2026학년도 2학기 교직 적성 및 인성검사(1차) 결과 안내', '총장 담화문'].map(row), [true, true, true]);
+    eq('  KEYWORDS 를 수집기 소스에서 읽었다(장학 그물)', K.test('국가장학금 신청'), true);
   }
 }
