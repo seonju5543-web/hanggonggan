@@ -33,7 +33,7 @@ const { isExcludeHead: shExclude, headText: shHead } = _cr(import.meta.url)('../
    🔴 **공고문만** 본다(attachment-text.mjs 첫머리 참조) — 신청서·동의서를 읽으면
    개인정보 수집 항목이 지원 자격 자리에 앉는다(실제로 겪고 되돌린 적이 있다). */
 import { attachmentText, readable, docOrder, isOcrSource } from './attachment-text.mjs';
-import { findApplyEmail, humanOwnedEmail } from './apply-email.mjs';
+import { findApplyEmail, humanOwnedEmail, staleApplyEmail } from './apply-email.mjs';
 import { decodeEntities } from './clean-title.mjs';
 /* 포털 판정은 `apply-channel.js` 한 곳 — 앱·관리자 화면도 같은 파일을 쓴다(베끼지 말 것).
    ⚠️ `_cr` 는 위에서 이미 들여왔다 — 다시 import 하면 그 자리에서 죽는다(실제로 그랬다). */
@@ -676,7 +676,7 @@ const strip = makeStripper(texts);
 let eligDocs = {};
 try { eligDocs = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
 
-let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, gotDeadline = 0, dlFromDoc = 0, gotOpen = 0, gotAnnounce = 0, gotApplyEmail = 0, gotApplyPortal = 0;
+let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, gotDeadline = 0, dlFromDoc = 0, gotOpen = 0, gotAnnounce = 0, gotApplyEmail = 0, droppedApplyEmail = 0, gotApplyPortal = 0;
 /* 공고문 첨부에서 자격 줄을 읽는다. 본문 경로와 원문 없는 경로가 **같은 함수**를 써야
    "본문 있을 땐 읽고 없을 땐 안 읽는" 어긋남이 안 생긴다. 스캔 PDF 등 글자가 안 나오는
    것은 조용히 건너뛴다(읽은 척하는 것보다 안 읽는 편이 낫다). */
@@ -884,6 +884,15 @@ if (!process.env.EXCERPTS_AS_LIB) main();
 function main() {
 for (const it of reg.items) {
   if (it.program) continue;
+  /* 🔴 이미 들어간 접수 메일도 **지금 규칙으로 다시 묻는다** (2026-10-05 점검 app1-04 · 원칙 7 소급) — 아래 fillApplyEmail 은
+     값이 있으면 다시 보지 않아서, '오류 발생 시에만' 쓰는 예비 메일·'서류만 메일' 줄로 들어간 주소가 규칙을 고친 뒤에도 남았다
+     (고려대 송화재단 · 연세대 신문고). 본문 유무와 상관없이 모든 항목에 먼저 묻고, 지운 뒤 fillApplyEmail 이 새 규칙으로 다시 찾는다.
+     사람(관리자·AI)이 넣은 값은 staleApplyEmail 이 건드리지 않는다. 판정은 apply-email.mjs 한 곳. */
+  if (staleApplyEmail(it)) {
+    droppedApplyEmail += 1;
+    console.log(`   [접수메일 걷음] ${it.id} — ${it.applyEmail} · 지금 규칙으로는 접수처가 아닌 줄`);
+    if (WRITE) { delete it.applyEmail; delete it.applyEmailSource; delete it.applyEmailFrom; }
+  }
   const src = sourceFor(it, idx);
 
   /* 원문이 없으면 **아무 판단도 하지 않는다** (2026-08-03 수정).
@@ -1024,7 +1033,7 @@ for (const it of reg.items) {
 console.log(`\n게시판 메뉴를 걷어낸 공고 ${cleaned}건`);
 console.log(`발췌 성공 ${hit}건 · 원문은 읽었으나 발췌 불가 ${none}건 · 원문 미확보라 손대지 않음 ${kept}건`);
 console.log(`마감일을 새로 읽은 공고 ${gotDeadline}건 (그중 공고문 첨부에서 ${dlFromDoc}건)`);
-console.log(`접수 메일 주소를 새로 읽은 공고 ${gotApplyEmail}건`);
+console.log(`접수 메일 주소를 새로 읽은 공고 ${gotApplyEmail}건 · 지금 규칙으로 접수처가 아니라 걷은 공고 ${droppedApplyEmail}건`);
 console.log(`포털 신청 시스템을 새로 읽은 공고 ${gotApplyPortal}건`);
 console.log(`접수 시작일 ${gotOpen}건 · 발표일 ${gotAnnounce}건 (캘린더용 — 원문에 있을 때만)`);
 if (WRITE) {

@@ -45,13 +45,35 @@ const OTHER_SENDER = /(교수|지도교수|추천인|추천자|학과장|담당�
 /* 이름표가 대놓고 접수처라고 말하는 줄이 가장 믿을 만하다 — 여럿이면 이쪽을 먼저 고른다. */
 const EXPLICIT = /(접수\s*주소|접수처|제출처|접수\s*방법|제출\s*방법|지원\s*방법)/;
 
-/** 한 줄이 '학생이 여기로 낸다'고 말하는가 — 판정 근거를 통째로 돌려준다. */
-export function judgeLine(line) {
+/* 🔴 **오류가 났을 때만 쓰는 예비 길** (2026-10-05 점검 app1-04 · 고려대 송화재단 실례).
+   원문 6항은 「신청방법: 방문 제출 또는 온라인 신청」이고 메일 줄은
+   「※ 온라인 신청 오류 발생 시 scholarship@korea.ac.kr로 제출」 — 정상 접수처가 아니다.
+   큰 '접수 메일 열기' 버튼을 띄우면 학생은 정상 경로 대신 예비 메일함으로 신청서를 낸다. */
+const FALLBACK_ONLY = /(오류|장애|불가피|부득이|문제|접속\s*불가|시스템\s*점검)\s*(가|이)?\s*(발생\s*)?(시|할\s*경우|한\s*경우|하는\s*경우|되는\s*경우|경우에?(만|는)?)(?![가-힣])/;
+
+/* 🔴 **신청은 다른 곳에서 끝나고 메일은 서류만 받는 줄** (같은 날 · 연세대 신문고장학금 실례).
+   「'새글'버튼을 눌러서 신청서 작성 후 저장해야 장학금 신청 완료됨) 관련 제출서류는 scholar@yonsei.ac.kr로」 —
+   메일로 신청서를 보내면 신청이 안 된다. 두 조건이 **같은 줄에 함께** 있을 때만 거른다:
+   ① 메일이 아닌 곳에서 끝나는 행위(저장해야 · 새글 · 홈페이지/포털/시스템에서 신청) ② 주소 바로 앞이 '서류'.
+   ⚠️ '…로 제출하면 신청이 완료됩니다' 같은 진짜 메일 접수 줄은 받아야 한다 — '신청 완료' 낱말 하나로 거르지 말 것.
+   ⚠️ 원문에 따라 두 말이 **바로 앞 줄**에 갈라져 있다(같은 연세 공고의 다른 판 — 「…저장해야 장학금 신청 완료됨)」 ↵ 「관련 제출서류는 …로 보내」).
+      그래서 findApplyEmail 은 앞 두 줄을 `before` 로 넘긴다. '신청서·양식'을 받는 곳(「홈페이지에서 신청서 다운로드」)은 다른 경로가 아니다(`(?!서|양식)`). */
+const ELSEWHERE_DONE = /(저장해야|작성\s*후\s*저장|새\s*글|(홈페이지|포털|포탈|시스템|사이트)\s*(에서|을\s*통해|를\s*통해)\s*(온라인\s*)?(신청|작성)(?!서|양식))/;
+const DOCS_BY_MAIL = /서류[^@\n]{0,20}[A-Za-z0-9._%+-]+@/;
+
+/** 한 줄이 '학생이 여기로 낸다'고 말하는가 — 판정 근거를 통째로 돌려준다.
+ *  @param {string} line    판정할 줄
+ *  @param {string} [before] 바로 앞 줄들(있으면) — '신청은 다른 곳에서 끝난다'가 앞 줄에 있는 꼴만 본다 */
+export function judgeLine(line, before = '') {
   const text = String(line || '').replace(/\s+/g, ' ').trim();
   const m = text.match(MAIL_RE);
   if (!m) return null;
   if (INQUIRY.test(text)) return { ok: false, why: '문의처', addr: m[0], line: text };
   if (OTHER_SENDER.test(text)) return { ok: false, why: '제3자 제출', addr: m[0], line: text };
+  if (FALLBACK_ONLY.test(text)) return { ok: false, why: '예외 경로(오류·불가피 시)', addr: m[0], line: text };
+  if ((ELSEWHERE_DONE.test(text) || ELSEWHERE_DONE.test(String(before || ''))) && DOCS_BY_MAIL.test(text)) {
+    return { ok: false, why: '신청은 다른 경로 — 메일은 서류만', addr: m[0], line: text };
+  }
   if (!SUBMIT_VERB.test(text)) return { ok: false, why: '내는 행위가 없음', addr: m[0], line: text };
   return { ok: true, explicit: EXPLICIT.test(text), addr: m[0], line: text };
 }
@@ -64,8 +86,8 @@ export function judgeLine(line) {
 export function findApplyEmail(text) {
   const lines = String(text || '').split('\n');
   let best = null;
-  for (const raw of lines) {
-    const v = judgeLine(raw);
+  for (let i = 0; i < lines.length; i += 1) {
+    const v = judgeLine(lines[i], lines.slice(Math.max(0, i - 2), i).join(' '));
     if (!v || !v.ok) continue;
     /* 이름표가 있는 줄이 이긴다. 같은 급이면 **먼저 나온 줄**을 쓴다 —
        공고는 접수 방법을 앞에 적고 뒤에 부연을 단다. */
@@ -84,3 +106,20 @@ export function findApplyEmail(text) {
 
 /** 사람(관리자·AI)이 정한 값은 로봇이 덮지 않는다 — 마감일의 `humanOwned` 와 같은 규칙. */
 export const humanOwnedEmail = (from) => /^(AI|관리자)/.test(from || '');
+
+/**
+ * 이미 들어간 로봇 값이 **지금 규칙으로는 접수처가 아닌가** (2026-10-05 점검 app1-04 · 원칙 7 소급).
+ * 발췌기(fillApplyEmail)는 applyEmail 이 있으면 다시 보지 않아서, 규칙을 고쳐도 이미 들어간 값은 그대로 남았다.
+ * 발췌기가 매 실행 모든 항목에 이것을 먼저 묻고, 참이면 세 칸을 지운 뒤 새 규칙으로 다시 찾는다.
+ * 🔴 사람(관리자·AI)이 넣은 값은 건드리지 않는다.
+ * ⚠️ 근거 문장은 길면 주소 앞뒤 90자로 잘려 있다(findApplyEmail) — 잘린 탓에 '내는 낱말'이 창 밖으로 나간 것은
+ *    지우지 않는다(본문이 없는 날이면 다시 찾지 못해 멀쩡한 주소를 잃는다).
+ */
+export function staleApplyEmail(it) {
+  if (!it || !it.applyEmail || humanOwnedEmail(it.applyEmailFrom)) return false;
+  const src = String(it.applyEmailSource || '');
+  const v = judgeLine(src);
+  if (v && v.ok) return false;
+  if (v && v.why === '내는 행위가 없음' && /^…|…$/.test(src.trim())) return false;
+  return true;
+}
