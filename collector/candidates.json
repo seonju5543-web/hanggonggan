@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-10-06",
- "count": 2065,
+ "count": 2069,
  "items": [
   {
    "title": "(한국장학재단) 해양수산부 청년창업어업인장학생 추가 모집 선발 안내",
@@ -66,6 +66,29 @@
    "foundAt": "2026-10-06"
   },
   {
+   "title": "[교외] 2026년 손태희장학재단 장학생 선발 안..",
+   "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1&pageIndex=2#n-%5B%EA%B5%90%EC%99%B8%5D%202026%EB%85%84%20%EC%86%90%ED%83%9C%ED%9D%AC%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88..",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서울시립대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[교외] 세종이도인재장학금 특기적성 분야 접수 안..",
+   "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260821&brdSeq=2&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
+   "attachments": [
+    {
+     "name": "[최종] 2026 세종이도인재장학금 장학생 모집[A2]포스터-복사.pdf",
+     "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260821&brdSeq=2&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&#n-%5B%EC%B5%9C%EC%A2%85%5D%202026%20%EC%84%B8%EC%A2%85%EC%9D%B4%EB%8F%84%EC%9D%B8%EC%9E%AC%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%5BA2%5D%ED%8F%AC%EC%8A%A4%ED%84%B0-%EB%B3%B5%EC%82%AC.pdf"
+    }
+   ],
+   "deadlineHint": "신청기간 - 핵심인재육성 장학사업 (특기적성): 2026. 8. 10.(월) ~ 9. 30.(수), 18:00까지 나. 신청대상: 세종특별자치시",
+   "school": "서울시립대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
    "title": "[학생지원팀] <아산사회복지재단> 2027년 의생명과학분야 대학 장학생 선발 안내",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276474&article.offset=0&articleLimit=10&srCategoryId=22",
    "attachments": [
@@ -115,6 +138,24 @@
    "attachments": [],
    "deadlineHint": "신청기간 : 2026.10.12.(월 ) 10:00 ~ 2026.10.23.(금 ) 23:00 3. 신청방법 : ON 국민 포털 로그인 → 상단",
    "school": "국민대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[교외-11/11]2027년도 대산농촌재단 대산장학생 선발 안내(재단지원)",
+   "url": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjclMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "고려대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[교외-11/2]2027학년도 해동과학문화재단 해동장학생 모집 안내(학교지원)",
+   "url": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjUlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "고려대학교",
    "campus": "",
    "foundAt": "2026-10-06"
   },
