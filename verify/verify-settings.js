@@ -1078,7 +1078,9 @@ const eq = (label, got, want) => {
      🔴 **CSS 를 읽지 말고 그려서 잰다** — `width:100%` 는 h2 상자 기준이라, h2 가 줄 전체로
         늘어나면 규칙은 그대로인데 밑줄만 화면 끝까지 간다(그게 이 절이 막는 진짜 사고다).
         그래서 글자(Range)와 밑줄(::after)을 **따로 재서** 맞대 본다. */
-  console.log('\n■ 화면 제목 밑줄 — 글자 폭만큼만 그어진다');
+  /* 🔴 2026-10-06 사장님 지시 'AI 티' 개선안 A 로 **밑줄을 없앴다** — 그래서 이 절은 이제
+     '밑줄이 없다'를 그려서 잰다(되살아나면 여기서 걸린다 · test-collector 'AI 티 정리' 절과 짝). */
+  console.log('\n■ 화면 제목 밑줄 — 없다 (2026-10-06 개선안 A)');
   {
     const 잰다 = async (nav, sel) => {
       await page.click(`.nav-item[data-nav="${nav}"]`);
@@ -1104,8 +1106,7 @@ const eq = (label, got, want) => {
     eq(`  (검사가 무력하지 않은지 — 제목 폭이 서로 다르다: ${폭들.join(' · ')}px)`,
       new Set(폭들).size, 3);
     for (const m of 머리줄) {
-      eq(`🔴 「${m.글자}」 밑줄이 글자 폭과 같다 (글자 ${Math.round(m.글자폭)}px · 밑줄 ${Math.round(m.밑줄)}px)`,
-        Math.abs(m.밑줄 - m.글자폭) <= 2, true);
+      eq(`🔴 「${m.글자}」 밑에 강조선이 그려지지 않는다 (밑줄 ${Math.round(m.밑줄)}px)`, m.밑줄, 0);
     }
     await page.click('.nav-item[data-nav="my"]');
     await page.waitForSelector('#screen-my:not([hidden])');
