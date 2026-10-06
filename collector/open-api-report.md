@@ -59,10 +59,10 @@
     - 10802 · 성동구 성우에게 배우는 면접특강_스피치편 → https://www.youthcenter.go.kr/bbs03View/48/10802 · 살핀 칸: 주소 칸 없음
     - 10794 · 2026년 중앙행정기관 청년정책평가단 모집 → https://www.youthcenter.go.kr/bbs03View/48/10794 · 살핀 칸: 주소 칸 없음
     - 10792 · KOICA 해외봉사단 학점인정제 온라인 설명회 → https://www.youthcenter.go.kr/bbs03View/48/10792 · 살핀 칸: 주소 칸 없음
-- ✅ **온통청년 청년정책** — 받은 행 3146 · 실은 글 **15** · 버림: 공모전·대외활동 아님(주거·금융 등 정책) 2923 · 마감 지남 87 · 상한 15건 초과 72 · 원문 주소 없음 36 · 같은 글 12 · 같은 기관 홈페이지(원문 주소 없음) 1
+- ✅ **온통청년 청년정책** — 받은 행 3164 · 실은 글 **15** · 버림: 공모전·대외활동 아님(주거·금융 등 정책) 2940 · 마감 지남 87 · 상한 15건 초과 73 · 원문 주소 없음 36 · 같은 글 12 · 같은 기관 홈페이지(원문 주소 없음) 1
   - 자격 줄 있는 글 13/15 · 원문 안내 있는 글 15/15
   - 첫 행 칸: `plcyNo, bscPlanCycl, bscPlanPlcyWayNo, bscPlanFcsAsmtNo, bscPlanAsmtNo, pvsnInstGroupCd, plcyPvsnMthdCd, plcyAprvSttsCd, plcyNm, plcyKywdNm, plcyExplnCn, lclsfNm, mclsfNm, plcySprtCn, sprvsnInstCd, sprvsnInstCdNm, sprvsnInstPicNm, operInstCd, operInstCdNm, operInstPicNm, sprtSclLmtYn, aplyPrdSeCd, bizPrdSeCd, bizPrdBgngYmd, bizPrdEndYmd, bizPrdEtcCn, plcyAplyMthdCn, srngMthdCn, aplyUrlAddr, sbmsnDcmntCn, etcMttrCn, refUrlAddr1, refUrlAddr2, sprtSclCnt, sprtArvlSeqYn, sprtTrgtMinAge, sprtTrgtMaxAge, sprtTrgtAgeLmtYn, mrgSttsCd, earnCndSeCd, earnMinAmt, earnMaxAmt, earnEtcCn, addAplyQlfcCndCn, ptcpPrpTrgtCn, inqCnt, rgtrInstCd, rgtrInstCdNm, rgtrUpInstCd, rgtrUpInstCdNm, rgtrHghrkInstCd, rgtrHghrkInstCdNm, zipCd, plcyMajorCd, jobCd, schoolCd, aplyYmd, frstRegDt, lastMdfcnDt, sbizCd`
-  - 코드 칸 값(첫 세 행): pvsnInstGroupCd=0054001|0054002|0054002 · plcyPvsnMthdCd=0042006|0042002|0042006 · plcyAprvSttsCd=0044002|0044002|0044002 · sprvsnInstCd=6301219|5690000|5690000 · operInstCd=6301226|       |        · aplyPrdSeCd=0057001|0057002|0057002 · bizPrdSeCd=0056001|0056002|0056002 · mrgSttsCd=0055003|0055001|0055003 · earnCndSeCd=0043001|0043001|0043001 · rgtrInstCd=6300000|5690000|5690000 · rgtrUpInstCd=0000000|0000000|0000000 · rgtrHghrkInstCd=6300000|5690000|5690000 · zipCd=30110,30140,30170,30200,30230|36110|36110 · plcyMajorCd=0011009|0011009|0011009 · jobCd=0013010|0013001,0013002,0013004,0013005,0013007,|0013010 · schoolCd=0049005|0049010|0049010 · sbizCd=0014010|0014010|0014010
+  - 코드 칸 값(첫 세 행): pvsnInstGroupCd=0054002|0054002|0054002 · plcyPvsnMthdCd=0042002|0042002|0042010 · plcyAprvSttsCd=0044002|0044002|0044002 · sprvsnInstCd=1721000|1721000|5690000 · operInstCd=       |       |        · aplyPrdSeCd=0057001|0057002|0057002 · bizPrdSeCd=0056002|0056002|0056002 · mrgSttsCd=0055003|0055003|0055003 · earnCndSeCd=0043001|0043001|0043001 · rgtrInstCd=6431068|6431068|5690000 · rgtrUpInstCd=6431053|6431053|0000000 · rgtrHghrkInstCd=6430000|6430000|5690000 · zipCd=43111,43112,43113,43114,43130,43150,4372|43111,43112,43113,43114,43130,43150,4372|36110 · plcyMajorCd=0011009|0011009|0011009 · jobCd=0013010|0013010|0013010 · schoolCd=0049010|0049010|0049010 · sbizCd=0014010|0014010|0014010
   - 대외활동 · ‘나의 광주 정착 키트’ 2기 참여자 모집 (~2026-10-28) — https://spectacular-foe-878.notion.site/338df122937c8008ac28de053bd9ce5d?source=copy_link
   - 대외활동 · 청년 생명사랑 서포터즈 운영 (~2026-11-30) — https://www.usspc.or.kr/
   - 대외활동 · (연수구) 청년 자격증 응시료 지원 (~2026-11-30) — https://youth.incheon.go.kr/youthpolicy/youthPolicyInfoDetail.do?poly_seq=419
@@ -83,6 +83,6 @@
     - 20260413005400212702 · 대학생 봉사활동 활성화 → https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56236 · 살핀 칸: refUrlAddr1=https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56236(2)
     - 20260407005400212532 · 이전공공기관 취업아카데미 운영 → https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56147 · 살핀 칸: refUrlAddr1=https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56147(2)
 
-data/activities.json — API 글 52 → **52건** (전체 201건)
+data/activities.json — API 글 49 → **52건** (전체 200건)
 
 > 열쇠·출처 설명: `collector/open-api.mjs` 머리말 · 바꾸는 규칙: `collector/open-api-map.mjs` · 설계: `docs/designs/external-sources.md` §10
