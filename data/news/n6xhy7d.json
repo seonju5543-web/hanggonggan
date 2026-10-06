@@ -3,6 +3,45 @@
  "updatedAt": "2026-10-06",
  "items": [
   {
+   "title": "[국제학생] 2026 서울 외국인 취업 채용 박람회 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53431&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-06",
+   "kind": "행사",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/bdb5e79077577209.webp"
+  },
+  {
+   "title": "[일반] [대한핸드볼협회] 한국핸드볼연맹 핸드볼 H리그 대학생 크리에이터 H-CRE8TOR 모집",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53436&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-06",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/1f7f6b71f9749c11.webp"
+  },
+  {
+   "title": "[외부] [교보교육재단] 2026 교육 심포지엄 참여 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53435&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-06",
+   "kind": "행사",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/6ab29d307f54d38e.webp"
+  },
+  {
+   "title": "[국제학생] 은평구 문화관광과_2026 IFWY 행사 참여 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53433&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-06",
+   "kind": "행사",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/1fa567ce221d933b.webp"
+  },
+  {
    "title": "[외부] [서울특별시] 제12회 서울 29초 영화제",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53430&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "postedAt": "2026-10-06",
@@ -321,42 +360,6 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[국제학생] 제8회 ISF 외국인 유학생 커리어페어(취업·창업·대학진학)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53311&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-10",
-   "kind": "행사",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/070b330dd43186e0.webp"
-  },
-  {
-   "title": "[국제학생] 2026학년도 2학기 K 컬쳐 프로그램 외국인 유학생 모집",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53253&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-02",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/7879663be2e80dc3.webp"
-  },
-  {
-   "title": "[일반] 2026학년도 2학기 수학클리닉 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53269&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-03",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[국제교류] [대학혁신사업] 2026학년도 2학기 어울림: 멘토링 프로그램 활동 서류 및 유의사항 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53265&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-03",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/2b0a7bb05b421dfc.webp"
   }
  ]
 }
