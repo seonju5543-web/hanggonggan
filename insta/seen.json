@@ -2360,6 +2360,78 @@
    "cards": 5,
    "dir": "insta/pub/2000428001",
    "at": "2026-10-06"
+  },
+  {
+   "status": "prepared",
+   "code": "auto-ent2431268564artclviewdo",
+   "org": "한국외국어대학교",
+   "name": "[서울] 2026-2 영어대학 동문회 장학금 장학생 모집",
+   "due": "2026-10-15",
+   "school": "한국외대",
+   "tplNo": 1,
+   "cards": 4,
+   "dir": "insta/pub/auto-ent2431268564artclviewdo",
+   "at": "2026-10-06"
+  },
+  {
+   "status": "prepared",
+   "code": "0663001",
+   "org": "재단법인 마포인재육성장학재단",
+   "name": "마포장학생",
+   "due": "2026-10-07",
+   "school": null,
+   "tplNo": 2,
+   "cards": 5,
+   "dir": "insta/pub/0663001",
+   "at": "2026-10-06"
+  },
+  {
+   "status": "prepared",
+   "code": "2000401009",
+   "org": "재단법인 대전광역시서구인재육성장학재단",
+   "name": "특수영상콘텐츠분야 특별장학생",
+   "due": "2026-10-08",
+   "school": null,
+   "tplNo": 2,
+   "cards": 5,
+   "dir": "insta/pub/2000401009",
+   "at": "2026-10-06"
+  },
+  {
+   "status": "prepared",
+   "code": "2000401002",
+   "org": "재단법인 대전청년내일재단",
+   "name": "성취장학금",
+   "due": "2026-10-08",
+   "school": null,
+   "tplNo": 1,
+   "cards": 5,
+   "dir": "insta/pub/2000401002",
+   "at": "2026-10-06"
+  },
+  {
+   "status": "prepared",
+   "code": "2000072001",
+   "org": "부산광역시 기장군청",
+   "name": "기장군장학금(복지장학금)",
+   "due": "2026-10-30",
+   "school": null,
+   "tplNo": 3,
+   "cards": 5,
+   "dir": "insta/pub/2000072001",
+   "at": "2026-10-06"
+  },
+  {
+   "status": "prepared",
+   "code": "2000428004",
+   "org": "재단법인 옥천군장학회",
+   "name": "졸업장학생",
+   "due": "2026-10-06",
+   "school": null,
+   "tplNo": 4,
+   "cards": 5,
+   "dir": "insta/pub/2000428004",
+   "at": "2026-10-06"
   }
  ]
 }
