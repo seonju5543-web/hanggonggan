@@ -376,5 +376,101 @@
   ],
   "excludes": [],
   "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3520568": {
+  "at": "2026-10-06",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3520570": {
+  "at": "2026-10-06",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.ulsan?bbsId=BBS_0000000000000309&mId=008001002000000000&dataId=60769": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://youth.gyeongnam.go.kr/youth/board.es?mid=a10501020000&bid=0006&list_no=6907&act=view": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/268492/artclView.do": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://wise.dongguk.ac.kr/article/servicenotice/detail/520732": {
+  "at": "2026-10-06",
+  "tries": 1,
+  "lines": [
+   "장애학생지원",
+   "장애인 복지시설"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53429&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16477&menuNo=200118&pageIndex=1": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16320&menuNo=200118&pageIndex=2": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16282&menuNo=200118&pageIndex=2": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16323&menuNo=200118&pageIndex=2": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16322&menuNo=200118&pageIndex=2": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16233&menuNo=200118&pageIndex=3": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16211&menuNo=200118&pageIndex=3": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16195&menuNo=200118&pageIndex=3": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16190&menuNo=200118&pageIndex=3": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12390/view.do?currentPageNo=1": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://www.inha.ac.kr/bbs/kr/8/45615/artclView.do": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://www.inha.ac.kr/bbs/kr/8/45511/artclView.do": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=57138&bidx=894190&qidx=57138&cate=0&allboard=true&nowpage=3": {
+  "at": "2026-10-06",
+  "tries": 1
  }
 }

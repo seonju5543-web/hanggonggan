@@ -9177,6 +9177,18 @@
     {
      "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp (다운로드 : 16회)",
      "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=ca127512499eb0e0ba00b24b184d8221&bbsId=1083"
+    },
+    {
+     "name": "[공문] 2026년 우양재단 동행 장학 모집 협조 요청.hwp (다운로드 : 16회)",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=0c6797a234b08b8ba908c89f3f55b111&bbsId=1083"
+    },
+    {
+     "name": "[붙임1] 2026년 동행장학 홍보 포스터.jpg (다운로드 : 17회)",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=29df0f5abb5a9a6114328315d3bcc08b&bbsId=1083"
+    },
+    {
+     "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp (다운로드 : 17회)",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=ca127512499eb0e0ba00b24b184d8221&bbsId=1083"
     }
    ],
    "sourceUrl": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=55323",
@@ -11552,7 +11564,16 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-06 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "마이크로디그리과정",
+     "url": "https://plus.cnu.ac.kr/html/kr/26file/2026_di_2010.pdf"
+    },
+    {
+     "name": "(붙임1) 26-2학기 희망사다리(1유형) 신규장학생 추천자 선발계획(안).hwp",
+     "url": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2515592&atch_no=1"
+    }
+   ],
    "sourceUrl": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515592&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
    "sourceKind": "auto",
    "eligibilityLines": [
@@ -11660,7 +11681,13 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-06 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "본문이미지-2399x2962.jpg",
+     "url": "https://www.ajou.ac.kr/_attach/ajou/editor-image/2026/10/WqSmlYrxuNjssCdHPDuXZNqNtI.jpg",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=377067&article.offset=0&articleLimit=10",
    "sourceKind": "auto"
   },
