@@ -445,11 +445,7 @@
   "checkedAt": "2026-10-05"
  },
  "https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1": {
-  "ok": true,
-  "way": {
-   "kind": "page",
-   "param": "pageIndex"
-  },
+  "ok": false,
   "checkedAt": "2026-10-06"
  }
 }
