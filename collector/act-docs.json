@@ -345,5 +345,53 @@
  "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16282&menuNo=200118&pageIndex=2": {
   "at": "2026-10-06",
   "tries": 1
+ },
+ "https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.ulsan?bbsId=BBS_0000000000000309&mId=008001002000000000&dataId=60769": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/268532/artclView.do": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/268492/artclView.do": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16323&menuNo=200118&pageIndex=2": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16322&menuNo=200118&pageIndex=2": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16321&menuNo=200118&pageIndex=2": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16233&menuNo=200118&pageIndex=3": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16211&menuNo=200118&pageIndex=3": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16195&menuNo=200118&pageIndex=3": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16190&menuNo=200118&pageIndex=3": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140240&article.offset=0&articleLimit=10": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12390/view.do?currentPageNo=1": {
+  "at": "2026-10-06",
+  "tries": 1
  }
 }

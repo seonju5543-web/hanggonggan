@@ -1117,6 +1117,22 @@
    "lastTryAt": "2026-10-06",
    "retired": true,
    "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
+  },
+  {
+   "id": "auto-leno276482srcategoryid22",
+   "name": "[학생지원팀] 2026년도 2학기 진도군인재육성장학회 장학생 선발 안내(2026. 9. 21.(월) ~ 10. 8.(목))",
+   "target": "2026년도 2학기 진도군인재육성장학회 장학생 선발 안",
+   "added": "2026-10-06",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-notiphpcodes1301seq11294",
+   "name": "2026학년도 하나장학생 신청 안내",
+   "target": "2026학년도 하나장학생 신청 안내",
+   "added": "2026-10-06",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }

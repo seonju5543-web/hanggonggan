@@ -1,8 +1,71 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-10-06",
- "count": 2069,
+ "count": 2119,
  "items": [
+  {
+   "title": "[공통][교외] 2026년 우양재단 동행 장학생 모집(~10/18)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/268539/artclView.do",
+   "attachments": [
+    {
+     "name": "[붙임1] 2026년 동행장학 홍보 포스터.jpg",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/151640/download.do"
+    },
+    {
+     "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/151641/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[서울][교내]2026-2 영어대학 동문회 장학금 장학생 모집(~10/15)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/268564/artclView.do",
+   "attachments": [],
+   "deadlineHint": "지원기간 : 2026. 10. 8(목 ) 09:00 ~ 10. 15(목 ) 15:00 까지 나 . 선발 : 2026. 10. 26(월) 예정 다",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "2027년 아산사회복지재단 북한이탈청소년장학생 선발 안내",
+   "url": "https://home.knu.ac.kr/HOME/knussw/sub.htm?nav_code=knu1619416593&mode=view&mv_data=aWR4PTIxNTMmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=",
+   "attachments": [
+    {
+     "name": "별첨1_ 2027년 아산북한이탈청소년장학생 선발안내.pdf",
+     "url": "https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxNTMmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=0"
+    },
+    {
+     "name": "별첨2_ 2027년 북한이탈청소년 장학생 선발 안내 포스터.pdf",
+     "url": "https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxNTMmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=1"
+    }
+   ],
+   "deadlineHint": "신청 기간: 2026. 10. 6.(화) ~ 10. 26.(월) 2. 지원 금액: 학업장려금 연간 600만원(학기당 300만원) 3. 접수 방법",
+   "school": "경북대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "2027년 아산사회복지재단 의생명과학분야 대학 장학생 선발 안내",
+   "url": "https://home.knu.ac.kr/HOME/knussw/sub.htm?nav_code=knu1619416593&mode=view&mv_data=aWR4PTIxNTQmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=",
+   "attachments": [
+    {
+     "name": "별첨1 _2027년 의생명과학분야 대학 장학생 선발안내.pdf",
+     "url": "https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxNTQmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=0"
+    },
+    {
+     "name": "별첨2 _2027년 의생명과학분야 대학 장학생 선발안내 포스터.pdf",
+     "url": "https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxNTQmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=1"
+    }
+   ],
+   "deadlineHint": "신청 기간: 2026. 10. 6.(화) ~ 10. 26.(월) 2. 접수 방법: 아산재단 지원신청서비스 접속 후 개별 신청 3. 지원 금액:",
+   "school": "경북대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
   {
    "title": "(한국장학재단) 해양수산부 청년창업어업인장학생 추가 모집 선발 안내",
    "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2513&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
@@ -22,6 +85,78 @@
    ],
    "deadlineHint": null,
    "school": "강원대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[아산사회복지재단] 2027년도 북한이탈청소년 장학생 선발 안내",
+   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2514&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "attachments": [
+    {
+     "name": "별첨1_ 2027년 아산북한이탈청소년장학생 선발안내.pdf chevron_forward",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261006033333517.pdf&path=/bbs/34&fn=%EB%B3%84%EC%B2%A81_%202027%EB%85%84%20%EC%95%84%EC%82%B0%EB%B6%81%ED%95%9C%EC%9D%B4%ED%83%88%EC%B2%AD%EC%86%8C%EB%85%84%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%EC%95%88%EB%82%B4.pdf"
+    },
+    {
+     "name": "별첨2_ 2027년 북한이탈청소년 장학생 선발 안내 포스터.pdf chevron_forward",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261006033338010.pdf&path=/bbs/34&fn=%EB%B3%84%EC%B2%A82_%202027%EB%85%84%20%EB%B6%81%ED%95%9C%EC%9D%B4%ED%83%88%EC%B2%AD%EC%86%8C%EB%85%84%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%20%ED%8F%AC%EC%8A%A4%ED%84%B0.pdf"
+    }
+   ],
+   "deadlineHint": "접수 기간: 2026년 10월 6일(화) ~ 10월 26일(월) 23시 59분 - 접수 방법: 아산재단 지원신청 서비스( https://welf",
+   "school": "강원대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[아산사회복지재단] 2027년도 의생명과학분야 대학 장학생 선발 안내",
+   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2515&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "attachments": [
+    {
+     "name": "별첨1 _2027년 의생명과학분야 대학 장학생 선발안내.pdf chevron_forward",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261006033651070.pdf&path=/bbs/34&fn=%EB%B3%84%EC%B2%A81%20_2027%EB%85%84%20%EC%9D%98%EC%83%9D%EB%AA%85%EA%B3%BC%ED%95%99%EB%B6%84%EC%95%BC%20%EB%8C%80%ED%95%99%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%EC%95%88%EB%82%B4.pdf"
+    },
+    {
+     "name": "별첨2 _2027년 의생명과학분야 대학 장학생 선발안내 포스터.pdf chevron_forward",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261006033654436.pdf&path=/bbs/34&fn=%EB%B3%84%EC%B2%A82%20_2027%EB%85%84%20%EC%9D%98%EC%83%9D%EB%AA%85%EA%B3%BC%ED%95%99%EB%B6%84%EC%95%BC%20%EB%8C%80%ED%95%99%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%EC%95%88%EB%82%B4%20%ED%8F%AC%EC%8A%A4%ED%84%B0.pdf"
+    }
+   ],
+   "deadlineHint": "접수 기간: 2026년 10월 6일(화) ~ 10월 26일(월) 23시 59분 - 접수 방법: 아산재단 지원신청 서비스( https://welf",
+   "school": "강원대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "2026학년도 하나장학생 신청 안내",
+   "url": "https://kau.ac.kr/kaulife/scholnoti.php?code=s1301&page=&mode=read&seq=11294",
+   "attachments": [
+    {
+     "name": "양식1. 하나장학생 신청서(대학생용).docx",
+     "url": "https://kau.ac.kr/upfile/2026/10/06/20261006064835-6363.docx"
+    },
+    {
+     "name": "양식2. 개인정보 수집이용 및 제공 동의서.pdf",
+     "url": "https://kau.ac.kr/upfile/2026/10/06/20261006064835-6dcc.pdf"
+    },
+    {
+     "name": "장학생 추천서(양식).hwpx",
+     "url": "https://kau.ac.kr/upfile/2026/10/06/20261006081832-5437.hwpx"
+    }
+   ],
+   "deadlineHint": "지원기간 : 2026.10.06.(화) 10:00 ~ 10.21.(수) 23:59 2027학년도 전기 일반대학원 신입생 모집일정 자세히 보기 2",
+   "school": "한국항공대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[교외] 2026년 2학기 중소기업 취업연계 장학사업(희망사다리Ⅰ유형) 신규장학생 심사기준",
+   "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/944279/artclView.do",
+   "attachments": [
+    {
+     "name": "2026학년도 2학기 중소기업취업연계장학금 신규장학생 자체선발기준(공지용).pdf",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1014900/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "연세대학교 미래캠퍼스",
    "campus": "",
    "foundAt": "2026-10-06"
   },
@@ -89,6 +224,115 @@
    "foundAt": "2026-10-06"
   },
   {
+   "title": "[교외]2026년 우양재단 동행장학생 모집",
+   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/273400/artclView.do",
+   "attachments": [
+    {
+     "name": "[붙임1] 2026년 동행장학 홍보 포스터.jpg",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/182927/download.do"
+    },
+    {
+     "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/182928/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "고려대학교 세종캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[교외]2027년 아산북한이탈청소년 장학생 선발 안내",
+   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/273404/artclView.do",
+   "attachments": [
+    {
+     "name": "별첨2_ 2027년 북한이탈청소년 장학생 선발 안내 포스터.pdf",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/182937/download.do"
+    },
+    {
+     "name": "별첨1_ 2027년 아산북한이탈청소년장학생 선발안내.pdf",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/182938/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "고려대학교 세종캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[교외]2027년 아산의생명과학분야 장학생 선발 안내",
+   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/273406/artclView.do",
+   "attachments": [
+    {
+     "name": "별첨1 _2027년 의생명과학분야 대학 장학생 선발안내.pdf",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/182940/download.do"
+    },
+    {
+     "name": "별첨2 _2027년 의생명과학분야 대학 장학생 선발안내 포스터.pdf",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/182941/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "고려대학교 세종캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[대산농촌재단] 2027년도 대산농촌재단 장학생 선발 안내",
+   "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520733",
+   "attachments": [
+    {
+     "name": "[붙임2] 2027 대산장학생 선발요강.pdf",
+     "url": "javascript:downGO('[붙임2] 2027 대산장학생 선발요강.pdf','/files/article/servicenotice/520733/','43CFD707F49E4E04BECCA25F09F73D39.pdf');"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[국가근로] 2026학년도 2학기 국가근로장학생 추가 모집 안내(교수학습개발센터)",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=377067&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[교외장학] 2027 대상장학생 선발 모집 공고",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=377085&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "[붙임2] 2027 대산장학생 선발요강.pdf",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=377085&attachNo=334666"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[교외장학] 2026년 우양재단 동행 장학생 모집",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=377087&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "[공문] 2026년 우양재단 동행 장학 모집 요강.pdf",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=377087&attachNo=334668"
+    },
+    {
+     "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=377087&attachNo=334669"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
    "title": "[학생지원팀] <아산사회복지재단> 2027년 의생명과학분야 대학 장학생 선발 안내",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276474&article.offset=0&articleLimit=10&srCategoryId=22",
    "attachments": [
@@ -115,6 +359,177 @@
    "foundAt": "2026-10-06"
   },
   {
+   "title": "[학생지원팀] 2026년 2학기 문주장학재단 AI·ICT 분야 인재 장학생 선발 안(2026. 9. 21.(월) ~ 10. 8.(목))",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276477&article.offset=0&articleLimit=10&srCategoryId=22",
+   "attachments": [
+    {
+     "name": "(공고문)2026년_하반기_문주장학재단_주관_AI_ICT_장학생_선발_공고문_최종.pdf",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276477&attachNo=226255"
+    },
+    {
+     "name": "(신청서식)2026년_하반기_문주장학재단_주관_장학생_지원서식.hwp",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276477&attachNo=226256"
+    },
+    {
+     "name": "(신청서식)2026년_하반기_문주장학재단_주관_장학생_지원서식.hwpx",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276477&attachNo=226257"
+    }
+   ],
+   "deadlineHint": "접수기간 : 2026. 9. 21.(월) ~ 10. 8.(목) 방문 또는 우편접수 ● 제출서류 : 붙임 공고문 참조 ● 방문접수 : 평일 09시",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[학생지원팀] 2026년도 2학기 진도군인재육성장학회 장학생 선발 안내(2026. 9. 21.(월) ~ 10. 8.(목))",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276482&article.offset=0&articleLimit=10&srCategoryId=22",
+   "attachments": [
+    {
+     "name": "★2026년하반기장학생선발공고.pdf",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276482&attachNo=226259"
+    },
+    {
+     "name": "★(신청서식)2026년하반기장학생.hwpx",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276482&attachNo=226260"
+    }
+   ],
+   "deadlineHint": "신청기간: 2026. 9. 21.(월) ~ 10. 8.(목) - 지원금액: 대학생 최대 150만 원 ※ 생활비성 장학금이며, 대학생은 등록금 실",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[학생지원팀] 2026년 하반기 영주시 대학생 학자금대출 이자 지원 신청 안내( ~ 10. 8.(목) 18:00)",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276487&article.offset=0&articleLimit=10&srCategoryId=22",
+   "attachments": [
+    {
+     "name": "[붙임1] 영주시 대학생 학자금대출 이자지원 신청서.hwp",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276487&attachNo=226261"
+    },
+    {
+     "name": "[붙임2] 개인정보 수집이용 및 제3자 제공조회 동의서.hwp",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276487&attachNo=226262"
+    }
+   ],
+   "deadlineHint": "신청기간: 2026. 9. 21.(월) 09:00 ~ 10. 8.(목) 18:00 - 지원내용: 2018년 하반기 이후 한국장학재단에서 대출받은",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[학생지원팀] <아산사회복지재단> 2027년도 북한이탈청소년 장학생 선발 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276506&article.offset=0&articleLimit=10&srCategoryId=22",
+   "attachments": [
+    {
+     "name": "별첨1_ 2027년 아산북한이탈청소년장학생 선발안내.pdf",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276506&attachNo=226283"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[공통] (생활비)2027년 아산사회복지재단 북한이탈청소년장학생 선발 안내",
+   "url": "https://www.gachon.ac.kr/bbs/kor/478/125899/artclView.do",
+   "attachments": [
+    {
+     "name": "아산사회복지재단2027북한이탈청소년장학생-2027년북한이탈청소년장학생선발안내포스터.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156401/download.do"
+    },
+    {
+     "name": "아산사회복지재단2027북한이탈청소년장학생-2027년아산북한이탈청소년장학생선발안내.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156402/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[공통] (생활비)2027년 아산사회복지재단 의생명과학분야 대학 장학생 선발 안내(2,3,4학년 진학 예정자)",
+   "url": "https://www.gachon.ac.kr/bbs/kor/478/125900/artclView.do",
+   "attachments": [
+    {
+     "name": "아산사회복지재단2027의생명과학분야대학장학생-2027년의생명과학분야대학장학생선발안내포스터.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156403/download.do"
+    },
+    {
+     "name": "아산사회복지재단2027의생명과학분야대학장학생-2027년의생명과학분야대학장학생선발안내.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156404/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[아산사회복지재단] 2027년 북한이탈청소년 장학생 선발 안내",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158915&noCat=501",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "홍익대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[학부-교외장학] 2027학년도 대산농촌재단 장학생 선발 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45727/artclView.do",
+   "attachments": [
+    {
+     "name": "[붙임1] 2027 대산장학생 선발 공지.jpg",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41455/download.do"
+    },
+    {
+     "name": "[붙임2] 2027 대산장학생 선발요강.pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41456/download.do"
+    }
+   ],
+   "deadlineHint": "접수 기한 : ~ 26. 11. 11. (수) 5. 제출처 : dsa@dsa.or.kr (재단 이메일로 직접 제출) 6. 제출 시 유의사항 가.",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[학부-교외장학] 2027년 아산사회복지재단 의생명과학분야 대학 장학생 선발 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45730/artclView.do",
+   "attachments": [
+    {
+     "name": "별첨2 _2027년 의생명과학분야 대학 장학생 선발안내 포스터.pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41458/download.do"
+    },
+    {
+     "name": "별첨1 _2027년 의생명과학분야 대학 장학생 선발안내.pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41459/download.do"
+    }
+   ],
+   "deadlineHint": "접수 기한 : ~ 2026 . 10. 26 . (월) 6. 제출 서류 : 붙임 참조 7. 유의사항 가. 전체 학업성적 평점이 기준 학점 3.7",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[학부-교외장학] 2027년 아산사회복지재단 북한이탈청소년장학생 선발 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45731/artclView.do",
+   "attachments": [
+    {
+     "name": "별첨2_ 2027년 북한이탈청소년 장학생 선발 안내 포스터.pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41460/download.do"
+    },
+    {
+     "name": "별첨1_ 2027년 아산북한이탈청소년장학생 선발안내.pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41461/download.do"
+    }
+   ],
+   "deadlineHint": "접수 기한 : ~ 26 . 10. 26 . (월) 6. 제출 서류 : 붙임 참조 7. 유의사항 가. 전체 학업성적 평점이 기준 학점 3.0 /",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
    "title": "[교외][등록금] 2027 대산농촌재단 대산장학생 선발 안내(~ 11. 11.(수))",
    "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1209208/artclView.do",
    "attachments": [
@@ -137,6 +552,24 @@
    "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12468/view.do?currentPageNo=1",
    "attachments": [],
    "deadlineHint": "신청기간 : 2026.10.12.(월 ) 10:00 ~ 2026.10.23.(금 ) 23:00 3. 신청방법 : ON 국민 포털 로그인 → 상단",
+   "school": "국민대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "2027년 아산사회복지재단 북한이탈청소년 장학생 선발 안내",
+   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12471/view.do?currentPageNo=1",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "국민대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "2027년 아산사회복지재단 의생명과학분야 대학 장학생 선발 안내",
+   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12473/view.do?currentPageNo=1",
+   "attachments": [],
+   "deadlineHint": null,
    "school": "국민대학교",
    "campus": "",
    "foundAt": "2026-10-06"
@@ -174,11 +607,477 @@
    "foundAt": "2026-10-06"
   },
   {
+   "title": "(홍보) 삼원장학재단 2026년 2학기 삼원장학생 선발안내(~9/30(수)까지)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=5233&bidx=894204&qidx=5233&cate=0&allboard=true&nowpage=3",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "F_장학생 선발요강(제24기 후기_2026년 2학기).pdf",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=8F3C8DDDA095421CA68A1FD73AC41569_.pdf&ogrfname=F_%EC%9E%A5%ED%95%99%EC%83%9D+%EC%84%A0%EB%B0%9C%EC%9A%94%EA%B0%95%28%EC%A0%9C24%EA%B8%B0+%ED%9B%84%EA%B8%B0_2026%EB%85%84+2%ED%95%99%EA%B8%B0%29.pdf"
+    },
+    {
+     "name": "F_장학생 선발원서(제24기 후기_2026년 2학기).pdf",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=CC64EA9A38E6484C82373FF7504C7E24_.pdf&ogrfname=F_%EC%9E%A5%ED%95%99%EC%83%9D+%EC%84%A0%EB%B0%9C%EC%9B%90%EC%84%9C%28%EC%A0%9C24%EA%B8%B0+%ED%9B%84%EA%B8%B0_2026%EB%85%84+2%ED%95%99%EA%B8%B0%29.pdf"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "(홍보) 경원장학재단 2026년도 2학기 제7기 장학생 선발 안내(~9/30(수)까지)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=5233&bidx=894206&qidx=5233&cate=0&allboard=true&nowpage=3",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "제7기 경원장학재단 장학생 선발 안내 공고문.pdf",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=34A956AEAA25407DAA5846A5E9D8FE42_.pdf&ogrfname=%EC%A0%9C7%EA%B8%B0+%EA%B2%BD%EC%9B%90%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8+%EC%9E%A5%ED%95%99%EC%83%9D+%EC%84%A0%EB%B0%9C+%EC%95%88%EB%82%B4+%EA%B3%B5%EA%B3%A0%EB%AC%B8.pdf"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "(홍보) (재)광산장학회 2026년도 장학생 선발 공고(~9/18(금)까지)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=5233&bidx=894255&qidx=5233&cate=0&allboard=true&nowpage=3",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "(공고)2026년도 (재)광산장학회 장학생 선발계획 공고.pdf",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=81D88E9D7769473DA3AA8038469AD634_.pdf&ogrfname=%28%EA%B3%B5%EA%B3%A0%292026%EB%85%84%EB%8F%84+%28%EC%9E%AC%29%EA%B4%91%EC%82%B0%EC%9E%A5%ED%95%99%ED%9A%8C+%EC%9E%A5%ED%95%99%EC%83%9D+%EC%84%A0%EB%B0%9C%EA%B3%84%ED%9A%8D+%EA%B3%B5%EA%B3%A0.pdf"
+    },
+    {
+     "name": "2026년도 (재)광산장학회 장학생 신청서 및 구비서류 서식.hwpx",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=8DA218E9269D4CB7A6BCAA82E6FB3631_.hwpx&ogrfname=2026%EB%85%84%EB%8F%84+%28%EC%9E%AC%29%EA%B4%91%EC%82%B0%EC%9E%A5%ED%95%99%ED%9A%8C+%EC%9E%A5%ED%95%99%EC%83%9D+%EC%8B%A0%EC%B2%AD%EC%84%9C+%EB%B0%8F+%EA%B5%AC%EB%B9%84%EC%84%9C%EB%A5%98+%EC%84%9C%EC%8B%9D.hwpx"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "(홍보) 한국장학재단 희망사다리 장학금 신청 안내(~9/18(금)까지)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=5233&bidx=894811&qidx=5233&cate=0&allboard=true&nowpage=2",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "(포스터) 2026년 2학기 중소기업취업연계장학금.jpg",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=03D1B01F82BD4860826EC0D32CB97855_.jpg&ogrfname=%28%ED%8F%AC%EC%8A%A4%ED%84%B0%29+2026%EB%85%84+2%ED%95%99%EA%B8%B0+%EC%A4%91%EC%86%8C%EA%B8%B0%EC%97%85%EC%B7%A8%EC%97%85%EC%97%B0%EA%B3%84%EC%9E%A5%ED%95%99%EA%B8%88.jpg"
+    },
+    {
+     "name": "중소기업 취업연계(희망사다리 1유형)_(학생용) 장학신청 매뉴얼.pdf",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=3ECECCB0EA3E4D38A1252B5A1E6C5313_.pdf&ogrfname=%EC%A4%91%EC%86%8C%EA%B8%B0%EC%97%85+%EC%B7%A8%EC%97%85%EC%97%B0%EA%B3%84%28%ED%9D%AC%EB%A7%9D%EC%82%AC%EB%8B%A4%EB%A6%AC+1%EC%9C%A0%ED%98%95%29_%28%ED%95%99%EC%83%9D%EC%9A%A9%29+%EC%9E%A5%ED%95%99%EC%8B%A0%EC%B2%AD+%EB%A7%A4%EB%89%B4%EC%96%BC.pdf"
+    },
+    {
+     "name": "(포스터) 2026년 2학기 고졸후학습자장학금.jpg",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=FFB1AB188AE8401C895D8008A7AC4728_.jpg&ogrfname=%28%ED%8F%AC%EC%8A%A4%ED%84%B0%29+2026%EB%85%84+2%ED%95%99%EA%B8%B0+%EA%B3%A0%EC%A1%B8%ED%9B%84%ED%95%99%EC%8A%B5%EC%9E%90%EC%9E%A5%ED%95%99%EA%B8%88.jpg"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[발전기금] 일진에이테크(주) 산학장학생 선발(~9/16(수)까지)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=5233&bidx=894824&qidx=5233&cate=0&allboard=true&nowpage=2",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "2.일진에이테크 산학장학생 선발 공고문.hwp",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=4F219649AA2B4058800BC55B4A87C8AE_.hwp&ogrfname=2.%EC%9D%BC%EC%A7%84%EC%97%90%EC%9D%B4%ED%85%8C%ED%81%AC+%EC%82%B0%ED%95%99%EC%9E%A5%ED%95%99%EC%83%9D+%EC%84%A0%EB%B0%9C+%EA%B3%B5%EA%B3%A0%EB%AC%B8.hwp"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026. 9. 3.(목) ~ 9. 16.(수) 18:00까지 6. 장학금액 -학부생: 1인당 월 50만원(연 600만원) -대학원",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[한국장학재단] 2026년 2학기 국가장학금 신청자 가구원 동의 안내(~9/16(수까지)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=5233&bidx=894871&qidx=5233&cate=0&allboard=true&nowpage=2",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "붙임1. 가구원 정보제공 동의 안내사항.jpg",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=69F572DBB74D41E68D3C12E3EB0C0293_.jpg&ogrfname=%EB%B6%99%EC%9E%841.+%EA%B0%80%EA%B5%AC%EC%9B%90+%EC%A0%95%EB%B3%B4%EC%A0%9C%EA%B3%B5+%EB%8F%99%EC%9D%98+%EC%95%88%EB%82%B4%EC%82%AC%ED%95%AD.jpg"
+    },
+    {
+     "name": "붙임3. 가구원 정보제공 동의 매뉴얼(웰로 'Wello' 앱).pdf",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=390EA3A32A694C878680B18505BDF879_.pdf&ogrfname=%EB%B6%99%EC%9E%843.+%EA%B0%80%EA%B5%AC%EC%9B%90+%EC%A0%95%EB%B3%B4%EC%A0%9C%EA%B3%B5+%EB%8F%99%EC%9D%98+%EB%A7%A4%EB%89%B4%EC%96%BC%28%EC%9B%B0%EB%A1%9C+%27Wello%27+%EC%95%B1%29.pdf"
+    },
+    {
+     "name": "붙임2. 가구원 정보제공 동의 매뉴얼(홈페이지 모바일앱).pdf",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=32ECEF888A4C4007A955B6B6880CE173_.pdf&ogrfname=%EB%B6%99%EC%9E%842.+%EA%B0%80%EA%B5%AC%EC%9B%90+%EC%A0%95%EB%B3%B4%EC%A0%9C%EA%B3%B5+%EB%8F%99%EC%9D%98+%EB%A7%A4%EB%89%B4%EC%96%BC%28%ED%99%88%ED%8E%98%EC%9D%B4%EC%A7%80++%EB%AA%A8%EB%B0%94%EC%9D%BC%EC%95%B1%29.pdf"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "(홍보) 재단법인 춘천인재육성장학재단 2026년 하반기 봄내장학생 선발 안내(~10/7(수)까지)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=896254&qidx=5233&cate=0&allboard=true&nowpage=1",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "자주 묻는 질문(26년 하반기)_봄내장학금.hwp",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=9AE6236AE6E74E13A5D34D52D4451C9A_.hwp&ogrfname=%EC%9E%90%EC%A3%BC+%EB%AC%BB%EB%8A%94+%EC%A7%88%EB%AC%B8%2826%EB%85%84+%ED%95%98%EB%B0%98%EA%B8%B0%29_%EB%B4%84%EB%82%B4%EC%9E%A5%ED%95%99%EA%B8%88.hwp"
+    },
+    {
+     "name": "2026년 하반기 봄내장학생 선발 공고(게시용-QR).hwp",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=B7024A6D6E4F4AC58EFCB7E254187194_.hwp&ogrfname=2026%EB%85%84+%ED%95%98%EB%B0%98%EA%B8%B0+%EB%B4%84%EB%82%B4%EC%9E%A5%ED%95%99%EC%83%9D+%EC%84%A0%EB%B0%9C+%EA%B3%B5%EA%B3%A0%28%EA%B2%8C%EC%8B%9C%EC%9A%A9-QR%29.hwp"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "(홍보) 2026년 하반기 (재)논산시장학회 학업장려 장학생 선발 안내(~10/30(금)까지)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=896262&qidx=5233&cate=0&allboard=true&nowpage=1",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "2026년도 하반기 재단법인 논산시장학회 장학생 신청 서식.hwpx",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=B4408C7478B7460AB4D292BFB4841FFA_.hwpx&ogrfname=2026%EB%85%84%EB%8F%84+%ED%95%98%EB%B0%98%EA%B8%B0+%EC%9E%AC%EB%8B%A8%EB%B2%95%EC%9D%B8+%EB%85%BC%EC%82%B0%EC%8B%9C%EC%9E%A5%ED%95%99%ED%9A%8C+%EC%9E%A5%ED%95%99%EC%83%9D+%EC%8B%A0%EC%B2%AD+%EC%84%9C%EC%8B%9D.hwpx"
+    },
+    {
+     "name": "2026년도 하반기 재단법인 논산시장학회 장학생 선발 공고문(발췌본).hwpx",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=841444BDC7CF4C1D90A08DF9F74851BA_.hwpx&ogrfname=2026%EB%85%84%EB%8F%84+%ED%95%98%EB%B0%98%EA%B8%B0+%EC%9E%AC%EB%8B%A8%EB%B2%95%EC%9D%B8+%EB%85%BC%EC%82%B0%EC%8B%9C%EC%9E%A5%ED%95%99%ED%9A%8C+%EC%9E%A5%ED%95%99%EC%83%9D+%EC%84%A0%EB%B0%9C+%EA%B3%B5%EA%B3%A0%EB%AC%B8%28%EB%B0%9C%EC%B7%8C%EB%B3%B8%29.hwpx"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "(홍보) 희망사다리 장학생 대상 대전 일자리 박람회 안내(10/13(화요일))",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=896263&qidx=5233&cate=0&allboard=true&nowpage=1",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "2027년 대산농촌재단 장학생 선발 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140362&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    },
+    {
+     "name": "[붙임2] 2027 대산장학생 선발요강.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140362&attachNo=118105"
+    }
+   ],
+   "deadlineHint": "제출기한 2026. 11. 11.(수) 6. 제출처 • 제출방법: 이메일 • 제출처: dsa@dsa.or.kr 7.선발일정 • 1단계: 서류심사",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "2027학년도 아산사회복지재단 북한이탈청소년장학생 선발 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140363&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    },
+    {
+     "name": "별첨1_ 2027년 아산북한이탈청소년장학생 선발안내.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140363&attachNo=118107"
+    }
+   ],
+   "deadlineHint": "접수기간 : 2026년 10월 6일(화) ~ 10월 26일(월)까지 ※ 면접심사 : 개별 안내 예정 4) 접수방법 : 아산재단 지원신청서비스 접",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "2027년 아산사회복지재단 의생명과학분야 대학 장학생 선발 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140365&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    },
+    {
+     "name": "별첨1 _2027년 의생명과학분야 대학 장학생 선발안내.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140365&attachNo=118109"
+    }
+   ],
+   "deadlineHint": "접수기간 : 2026년 10월 6일(화) ~ 10월 26일(월)까지 ※ 면접 심사 : 개별 안내 예정 4) 접수방법 : 아산재단 지원신청서비스",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "2027년도 해동과학문화재단 해동장학생 선발 안내(공학계열 학부생, ~ 10.28(수) 09:00까지)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140368&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    },
+    {
+     "name": "2027 해동장학생 신규지원(ㅇㅇ대,ㅇ학년,이름).hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140368&attachNo=118112"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
    "title": "[교외] 대산농촌재단 농업리더 장학생 선발 안내(11/11 마감, 등록금 전액)",
    "url": "https://www.sogang.ac.kr/ko/detail/551530?bbsConfigFk=141&namepage=ScholarshipNotice",
    "attachments": [],
    "deadlineHint": null,
    "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[교외] 풀브라이트 미국 유학·연구 장학금 설명회 안내(11/6, 오후 12시)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551532?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[교외] 아산사회복지재단 북한이탈청소년 장학생 선발 안내(10/26 마감, 생활비 연600만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551533?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[교외] 아산사회복지재단 의생명과학분야 장학생 선발 안내(10/26 마감, 생활비 연600만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551534?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[발전기금] 삼정KPMG 장학생 선발 안내(10/30 마감, 회계사준비생, 생활비 250만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551536?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "지원기간: 2026년 10월 7일(수)~2026년 10월 30일(금) 오후 11시까지(마감시한 준수) 5. 지원방법: 장학금 신청서(첨부)를 작",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "2027년도 대산장학생 선발 안내",
+   "url": "https://www.yonsei.ac.kr/bbs/sc/58/944274/artclView.do",
+   "attachments": [
+    {
+     "name": "[붙임1] 2027 대산장학생 선발 공지.jpg",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1014891/download.do"
+    },
+    {
+     "name": "[붙임2] 2027 대산장학생 선발요강.pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1014892/download.do"
+    }
+   ],
+   "deadlineHint": "제출 기한: 2026.11.11.(수) 5. 제출처: dsa@dsa.or.kr 로 접수 (이메일 접수) 6. 문의처: 차세대 농업인재 양성사업",
+   "school": "연세대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "2027년 북한이탈청소년장학생 선발 안내",
+   "url": "https://www.yonsei.ac.kr/bbs/sc/58/944276/artclView.do",
+   "attachments": [
+    {
+     "name": "2027년 북한이탈청소년 장학생 선발 안내 포스터.pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1014894/download.do"
+    },
+    {
+     "name": "2027년 아산북한이탈청소년장학생 선발안내.pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1014895/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "연세대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "2027년도 아산사회복지재단 의생명과학분야 대학 장학생 선발 안내",
+   "url": "https://www.yonsei.ac.kr/bbs/sc/58/944277/artclView.do",
+   "attachments": [
+    {
+     "name": "별첨1 _2027년 의생명과학분야 대학 장학생 선발안내.pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1014896/download.do"
+    },
+    {
+     "name": "별첨2 _2027년 의생명과학분야 대학 장학생 선발안내 포스터.pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1014897/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간: 2026.10.06.(화)~2026.10.26.(월) 23:59 4. 접수방법: 온라인 접수 ◦ 주소 : https://welfare",
+   "school": "연세대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "2027년 아산사회복지재단 북한이탈청소년 장학생 선발 안내",
+   "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=231963863&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "별첨1_ 2027년 아산북한이탈청소년장학생 선발안내.pdf",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=231963863&attachNo=378767"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "2027년 아산사회복지재단 의생명과학분야 대학 장학생 선발 안내",
+   "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=231963867&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "별첨1 _2027년 의생명과학분야 대학 장학생 선발안내.pdf",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=231963867&attachNo=378769"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "2026-2학기 대학혁신지원사업 'CSU Pride 청송장학금' 장학생",
+   "url": "https://www3.chosun.ac.kr/bbs/scho/332/281775/artclView.do",
+   "attachments": [
+    {
+     "name": "2026학년도 2학기 대학혁신지원사업 CSU Pride 청송장학금 장학생 선발계획(안).hwp",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/379176/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026. 10. 19.(월) 09:00 ~ 10. 21.(수) 17:00 4. 신청 방법 가. 온라인 신청 : 종합정보시스템 로그",
+   "school": "조선대학교",
    "campus": "",
    "foundAt": "2026-10-06"
   },
