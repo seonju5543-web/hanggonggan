@@ -1,7 +1,32 @@
 {
  "school": "계명대학교",
- "updatedAt": "2026-10-05",
+ "updatedAt": "2026-10-06",
  "items": [
+  {
+   "title": "2026학년도 2학기 ONE-STOP 전공 박람회 개최",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=0&pageOrder=0&cmd=2&parm_bod_uid=271182&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-10-06",
+   "kind": "행사",
+   "school": "계명대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[교수학습개발센터] 2026학년도 2학기 전공 기초역량 증진 콘텐츠 프로그램 안내",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271163&pageOrder=0&cmd=2&parm_bod_uid=270428&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-09-07",
+   "school": "계명대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[교수학습개발센터] 2026학년도 2학기 학습의 본질 강의 콘텐츠 프로그램 안내",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271163&pageOrder=0&cmd=2&parm_bod_uid=270423&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-09-07",
+   "school": "계명대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
   {
    "title": "[K-Cloud] 2026학년도 2학기 K-Cloud 융합 성장 인증제 신청 안내",
    "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=0&pageOrder=0&cmd=2&parm_bod_uid=271043&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",

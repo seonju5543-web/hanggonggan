@@ -1,7 +1,54 @@
 {
  "school": "전북대학교",
- "updatedAt": "2026-10-05",
+ "updatedAt": "2026-10-06",
  "items": [
+  {
+   "title": "평생지도교수제 교과목 [진로개발 및 상담] 학기중 대체프로그램 실시 및 참가신청 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/218117/detailView.do",
+   "postedAt": "2026-10-06",
+   "postId": "218117",
+   "school": "전북대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/3470a06344e2202a.webp"
+  },
+  {
+   "title": "[언어교육부] 10월 외국어 강좌 안내/토익,토익스피킹 시험 할인 안내 (강의계획서 붙임 참조)",
+   "url": "https://www.jbnu.ac.kr/web/Board/218116/detailView.do",
+   "postedAt": "2026-10-06",
+   "postId": "218116",
+   "kind": "학사",
+   "school": "전북대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[언어교육부] 10월 24일(토) 모의토익 실시 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/218115/detailView.do",
+   "postedAt": "2026-10-06",
+   "postId": "218115",
+   "school": "전북대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[RED/ORANGE BELT] 큰사람프로젝트 'AI 면접' 항목 이수 방법 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/218110/detailView.do",
+   "postedAt": "2026-10-06",
+   "postId": "218110",
+   "school": "전북대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "전북대학교 온라인 취업 지원 시스템 이용 안내(종합)",
+   "url": "https://www.jbnu.ac.kr/web/Board/218109/detailView.do",
+   "postedAt": "2026-10-06",
+   "postId": "218109",
+   "school": "전북대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
   {
    "title": "국립중앙과학관 「AI 과거시험」 참여 안내 (10월 9일~10일 대전 국립중앙과학관(",
    "url": "https://www.jbnu.ac.kr/web/Board/218101/detailView.do",
@@ -52,8 +99,7 @@
    "school": "전북대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "postId": "218048",
-   "thumb": "data/news/img/823c6c874119c581.webp"
+   "postId": "218048"
   },
   {
    "title": "[언어교육부] 10월 24일(토) 모의토익 실시 안내",
@@ -138,7 +184,7 @@
    "school": "전북대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "thumb": "data/news/img/3593e8f1751a9b8e.webp"
+   "thumb": "data/news/img/e21c54deb7e42363.webp"
   },
   {
    "title": "[창업교육센터] 2026년 Scale-up 학생 창업자를 찾아라! 모집공고(~10/12까지)",

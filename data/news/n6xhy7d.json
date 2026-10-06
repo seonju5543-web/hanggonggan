@@ -1,7 +1,16 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-10-05",
+ "updatedAt": "2026-10-06",
  "items": [
+  {
+   "title": "[외부] [서울특별시] 제12회 서울 29초 영화제",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53430&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-06",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/da242396ea10cec3.webp"
+  },
   {
    "title": "[국제학생] 2026 외국인 태권도 경연축제 참가 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53421&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -89,7 +98,7 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/e8eb41bf3b57e2de.webp"
+   "thumb": "data/news/img/144f0e2dbd2e1eca.webp"
   },
   {
    "title": "[일반] [서울특별시] 2026년 서울시 빅데이터 캠퍼스 전문교육 과정 안내(10월)",
@@ -134,7 +143,7 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/1092671676a5e655.webp"
+   "thumb": "data/news/img/15706244571851d8.webp"
   },
   {
    "title": "[일반] [체육지원팀] 아이스하키부 「2026 LG 코리아 아이스하키리그」 경기 일정 및 결과 안내",
@@ -233,7 +242,7 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/900bb371fe3edc5a.webp"
+   "thumb": "data/news/img/02cc6af7898628b0.webp"
   },
   {
    "title": "[일반] 2026 베스트티처와 함께하는 신임교원 티칭 토크",
@@ -268,7 +277,7 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/37412651230c08b3.webp"
+   "thumb": "data/news/img/c4e25facb502d43e.webp"
   },
   {
    "title": "[학생] 2027학년도 일학습병행 학생 설명회",
@@ -278,7 +287,7 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/7c6156a8d5e16810.webp"
+   "thumb": "data/news/img/b0c93c4c7d7f3328.webp"
   },
   {
    "title": "[학사] 2026학년도 2학기 학부 수강과목 포기 안내",
@@ -348,15 +357,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/2b0a7bb05b421dfc.webp"
-  },
-  {
-   "title": "[일반] 2026-2 교수법 이러닝 시리즈 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53256&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-02",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/2d4c78a62e0796b4.webp"
   }
  ]
 }

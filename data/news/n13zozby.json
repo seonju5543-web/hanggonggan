@@ -1,7 +1,53 @@
 {
  "school": "부산대학교",
- "updatedAt": "2026-10-05",
+ "updatedAt": "2026-10-06",
  "items": [
+  {
+   "title": "[언어교육원] 2026학년도 2학기 학부 졸업대체 모의토익 실시 안내",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511396",
+   "postedAt": "2026-10-06",
+   "school": "부산대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/f2bfb61c8757c6f2.webp"
+  },
+  {
+   "title": "[(재)부산대자율상권조합] 청년연구팀...",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511394",
+   "postedAt": "2026-10-06",
+   "school": "부산대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/48c472c2d6261281.webp"
+  },
+  {
+   "title": "[부산광역시, 부산여성가족과 평생교육진흥원] 「2026년 제2회 양성평등정책포럼...",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511391",
+   "postedAt": "2026-10-06",
+   "kind": "행사",
+   "school": "부산대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/9b2a6553e8158d63.webp"
+  },
+  {
+   "title": "[교육부, 경찰청] 「2026년 경찰청 여성안전 홍보 영상」 안내",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511389",
+   "postedAt": "2026-10-06",
+   "school": "부산대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/b4665c1c7a1b08c6.webp"
+  },
+  {
+   "title": "[도서관] 오늘이 마지막! 2026 대학도서관 이용자 만족도 조사(~10/6)",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511386",
+   "postedAt": "2026-10-06",
+   "kind": "생활",
+   "school": "부산대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
   {
    "title": "부산대학교 Google AI 서비스 제공 안내(구글 Workspace Plus,...",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511385",
@@ -69,8 +115,7 @@
    "kind": "생활",
    "school": "부산대학교",
    "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/66416323db0c597c.webp"
+   "foundAt": "2026-10-01"
   },
   {
    "title": "고등교육 규제특례 신청 관련 의견수렴 안내",

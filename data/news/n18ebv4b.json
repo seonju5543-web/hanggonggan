@@ -1,7 +1,18 @@
 {
  "school": "서울교육대학교",
- "updatedAt": "2026-10-05",
+ "updatedAt": "2026-10-06",
  "items": [
+  {
+   "title": "[서초1동] \"2026 서일 별빛 페스타\" 축제 안내",
+   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=1309&bbsId=1082&nttSn=55339",
+   "postedAt": "2026-10-06",
+   "postId": "55339",
+   "kind": "행사",
+   "school": "서울교육대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/69329c386961fde0.webp"
+  },
   {
    "title": "언제나 반짝이는 우리들의 캠퍼스 - 2026 서울교대 사진 공모전 수상작 안내",
    "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=1309&bbsId=1082&nttSn=55328",

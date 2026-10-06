@@ -1,7 +1,43 @@
 {
  "school": "아주대학교",
- "updatedAt": "2026-10-05",
+ "updatedAt": "2026-10-06",
  "items": [
+  {
+   "title": "[AI융합교육원] 2026-2학기 AI리터러시 교과목 중간고사 대학원생 감독 모집",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377020&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-06",
+   "kind": "학사",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[일자리+센터] [캠리_온라인 설명회] NEZOT 주식회사(일본 고베 본사 취업)(10/6_당일 재공지)",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377017&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-06",
+   "kind": "행사",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[메이커스페이스] 🛠️2026.10월 장비 기초교육 안내(3D프린터, 레이저가공기)",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377013&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-06",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[심리학과] SF 글쓰기 강연 안내",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377004&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-06",
+   "kind": "행사",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/2d8c5bc0b16fa800.webp"
+  },
   {
    "title": "내일 잊지말고 파란색 꼭👖🧢...파란학기제 10주년 이벤트 드레스코드 BLUE-💙",
    "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=376987&article.offset=0&articleLimit=10",
@@ -36,8 +72,7 @@
    "kind": "행사",
    "school": "아주대학교",
    "campus": "",
-   "foundAt": "2026-10-02",
-   "thumb": "data/news/img/a6e525981685f956.webp"
+   "foundAt": "2026-10-02"
   },
   {
    "title": "[보건진료소] 2026학년도 비타민데이 안내",

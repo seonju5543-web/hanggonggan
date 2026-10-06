@@ -1,7 +1,40 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-10-05",
+ "updatedAt": "2026-10-06",
  "items": [
+  {
+   "title": "[행정공고] 치의학전문대학원 승강기내부 고정형 CCTV 설치로 인한 행정예...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70567",
+   "postedAt": "2026-10-06",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[취업정보] 2026년 글로컬대학사업 「AI, 역량검사부터 면접까지」",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70564",
+   "postedAt": "2026-10-06",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/6ecdd5f0c4faccf6.webp"
+  },
+  {
+   "title": "[취업정보] [한국경제인협회] 2026년 대학생 취업인식도 설문조사 참여 ...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70563",
+   "postedAt": "2026-10-06",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[모집공고] 대학 산학협력단지 조성지원사업 산학공동기술개발(R&BD)과제 공고",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70561",
+   "postedAt": "2026-10-06",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
   {
    "title": "[채용공고] 2026년 제3회 지역 이공계 대학생 기초역량 강화 사업단 서...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70556",

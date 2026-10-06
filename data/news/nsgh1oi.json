@@ -1,6 +1,6 @@
 {
  "school": "서울대학교",
- "updatedAt": "2026-10-05",
+ "updatedAt": "2026-10-06",
  "items": [
   {
    "title": "[학습상담실] 나는 어떻게 공부해야 할까?: SNU진단검사 이벤트",
@@ -106,15 +106,6 @@
    "board": "학부대학 공지",
    "foundAt": "2026-10-04",
    "thumb": "data/news/img/2fc07c020867d06e.webp"
-  },
-  {
-   "title": "★ 2026학년도 제2학기 등록금 수납계획 알림",
-   "url": "https://snuc.snu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/?mod=document&uid=822",
-   "postedAt": "2026-08-06",
-   "school": "서울대학교",
-   "campus": "",
-   "board": "학부대학 공지",
-   "foundAt": "2026-10-04"
   },
   {
    "title": "서울대학교 학부대학 교수학습개발센터 학생 조교 모집(~10/14)",
