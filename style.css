@@ -2730,19 +2730,9 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
   text-align: left;
 }
 .wallet-label:hover { color: var(--accent); }
-.wallet-q {
-  width: 15px; height: 15px;
-  flex: none;
-  display: grid; place-items: center;
-  border-radius: 50%;
-  background: var(--accent-soft);
-  color: var(--accent);
-  /* 10px → --t-2xs(11.5px). 15px 원 안의 숫자라 1.5px 커진다 — 스케일에 없는 칸을
-     새로 만드는 쪽이 더 나쁘다(2026-09-06). */
-  font-size: var(--t-2xs);
-  font-weight: 800;
-  line-height: 1;
-}
+/* 「?」 동그라미(.wallet-q)는 뗐다 (2026-10-06 · 개선안 G). 누를 수 있다는 표시는 이름의 점선 밑줄로 —
+   여덟 줄에 같은 장식이 반복되던 것을 글자 하나의 표시로 줄였다. */
+.wallet-label { text-decoration: underline dotted var(--text-weak); text-underline-offset: 4px; }
 .wallet-status { font-size: var(--t-xs); color: var(--text-weak); margin-top: 3px; }
 .wallet-row { align-items: center; min-height: 56px; }
 
@@ -2875,7 +2865,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 
 /* 정렬 목록 — 눌러서 여는 방식으로 바뀌었다 (2026-08-31 개발자 지시).
    지금 기준이 무엇인지 버튼에 보이고, 목록에서 골라 바꾼다. */
-.sort-btn { border: 1px solid var(--line); border-radius: var(--radius-pill); padding: 0 13px; }
+.sort-btn { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 0 13px; }   /* 알약 → 입력칸 모서리 (2026-10-06 · 개선안 H — 모든 것이 같은 알약이던 AI 지문. 알약은 칩에만) */
 .sort-btn:hover { background: var(--surface-2); border-color: var(--text-weak); }
 .sort-btn[aria-expanded="true"] { border-color: var(--accent); color: var(--accent); }
 .sort-menu {
@@ -4135,27 +4125,9 @@ button, input, select, textarea { letter-spacing: inherit; }
 
 
 
-/* 화면 제목 아래 얇은 강조선 — 브랜드가 '있다'는 최소한의 표시.
-   🔴 **글자 폭만큼만 긋는다** (2026-09-13 개발자 지시 — "같은 길이로 하지 말고 글자 크기에
-      맞춰서"). 전에는 28px 고정이라 「장학금 찾기」(109px)·「신청 내역」(88px)·「MY」(35px)
-      밑에 똑같은 토막이 붙어, 긴 제목에서는 밑줄이 글자 중간에서 끊기고 짧은 제목에서는
-      글자보다 길었다(실측).
-   🔴 `width: fit-content` 를 **빼지 말 것** — 지금은 세 머리줄이 전부 flex 라 h2 가 이미
-      글자 폭이지만, flex 아닌 머리줄이 하나라도 생기면 h2 가 줄 전체로 늘어나
-      밑줄이 화면 끝까지 그어진다. 그때 원인을 찾기 어렵다. */
-.page-header h2 {
-  position: relative;
-  width: fit-content;
-  padding-bottom: var(--space-8);
-}
-.page-header h2::after {
-  content: '';
-  position: absolute;
-  left: 0; bottom: 0;
-  width: 100%; height: 3px;
-  border-radius: var(--radius-pill);
-  background: var(--accent);
-}
+/* 화면 제목 아래 강조선은 **없앴다** (2026-10-06 사장님 지시 'AI 티 나는 화면 탈출' · 개선안 A).
+   제목 밑 색 막대는 AI가 만든 화면의 대표 지문(장식용 밑줄)이라, 제목은 굵기만으로 선다.
+   ⚠️ 되살리지 말 것 — test-collector 'AI 티 정리' 절이 막는다. */
 
 /* 눌린 탭 — 전에는 먹색이라 안 눌린 것과 굵기로만 갈렸다 */
 .nav-item.active { color: var(--accent); }

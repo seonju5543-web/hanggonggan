@@ -350,6 +350,34 @@ red-green 을 양쪽으로 확인했다 — 호출을 되돌리면 ✕, 함수 �
 그건 새 크기가 아니라 **베이스라인 척도의 값**(`--t-xs`)이고, 카드가 배지 대신
 기관명 줄을 쓰게 되면서 그 자리에 온 것이다(카드 구조는 남기기로 한 부분).
 
+## 3-6. 세 번째 — 사장님 지시 「AI 티 나는 화면 탈출」 (2026-10-06)
+
+지시(은서님 전달): *"앱 전체 인터페이스 개선 방법 연구(릴스·유튜브 등 'AI 티 나는 화면 탈출법' 검색) 후 적용."*
+
+### 조사에서 모은 지문
+출처: [How to detect AI slop in your design](https://github.com/Laith0003/ux-skill/wiki/How-to-detect-AI-slop-in-your-design) ·
+[925 Studios — AI slop design tells](https://www.925studios.co/blog/ai-slop-design-tells) ·
+[noqta — overused UI patterns 2026](https://noqta.tn/en/blog/ai-design-slop-overused-ui-patterns-fix-2026) ·
+[Why your AI keeps building the same purple gradient website](https://scour.ing/@emschwartz/p/https://prg.sh/ramblings/Why-Your-AI-Keeps-Building-the-Same-Purple-Gradient-Website) ·
+[요즘 디자이너들은 무슨 바이브코딩을 할까?](https://brunch.co.kr/@hailey-kim/17).
+기본 서체 · 보라/파랑 그라데이션 · 모든 것에 같은 큰 둥근 모서리 · 그림자+테두리+배경 겹치기 · 브랜드색 남발 ·
+장식용 밑줄·색 막대 · 아이콘 원 · 카드마다 같은 배지 · 템플릿이 빈칸을 읽어 주는 문구 · 장식 모션.
+이모지·그라데이션·말투·토큰은 이미 `ui-tone` 관문이 막고 있고, 글자 크기·서체는 3-5절(2026-09-11 되돌림)에 따라 손대지 않았다.
+
+### 앱 실측에서 남은 것 여덟(A~H) → 전후 사진 → 은서님이 다섯을 골랐다
+| | 적용 | 무엇 |
+|---|---|---|
+| A | ✅ | 화면 제목 밑 강조선(`.page-header h2::after`) 제거 |
+| B | ✗ | 파랑을 누르는 것에만 (금액·적합도 먹색) — 고르지 않음 |
+| C | ✗ | 선택 칩을 먹색으로 채움 — 고르지 않음 |
+| D | ✅ | 카드 윗줄에서 `주관 기관 원문 확인` 접기(`cardOrgLine`) — 상세 주관 줄은 그대로(원칙 8-1) |
+| E | ✅ | 장학 상세 제목도 `cardTitle` 정리(게시판 표식 `[장학공지]` 등). 게시판에서 찾을 제목은 맨 아래 '목록에서 ○○을 찾아' 줄이 따로 말한다 |
+| F | ✗ | 상세 판정 알약 2개 → 글자 — 고르지 않음 |
+| G | ✅ | 서류 보관함 줄마다 붙던 `?` 동그라미 제거 → 이름 점선 밑줄 |
+| H | ✅ | 정렬 단추 알약 → `--radius-sm`(입력칸과 같은 모서리). 알약은 칩에만 |
+
+관문: `verify/test-collector.mjs` 「'AI 티' 정리 A·D·E·G·H」 절 — 다섯 다 되돌려 실패하는 것을 확인했다.
+
 ## 4. 원래 제안이던 것 (2026-09-10 전권 위임으로 **전부 구현됨** — 3-2절 참조)
 
 아래는 처음에 '승인이 필요하다'고 적어 둔 목록이다. 지금은 8건 모두 코드에 들어가 있다.

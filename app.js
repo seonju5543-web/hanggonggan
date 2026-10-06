@@ -376,7 +376,8 @@ function ddayWords(d) {
    길이는 재 봤다(2026-09-21 · 375px 폰 너비에 실제로 그려 놓고 잰 값, 카드 제목 폭 335px):
    전체 169장에서 1줄 158 → 154 · 2줄 11 → 15. **3줄은 0건이고 잘리는 카드도 없다**
    (`.sch-name` 은 줄임표도 줄 수 제한도 없다). 4장이 한 줄 늘어나는 것이 전부다.
-   🔴 상세 시트는 **원제목 그대로** 둔다 — 거기는 원문과 대조하는 자리다. */
+   ⚠️ 상세 시트 제목도 이 함수를 쓴다(2026-10-06 사장님 지시 · 개선안 E). 원문과 대조할 글자는
+      '공고 원문 안내' 발췌와 원문 링크가 그대로 준다. */
 function cardTitle(sch) {
   return cleanCardTitle(String(sch.name || '').trim());
 }
@@ -398,7 +399,11 @@ const bareOrg = (t) => String(t || '').replace(/^(재단법인|사단법인|학�
 const orgBase = (t) => String(t || '').replace(/\s*\([^)]*\)\s*$/, '').trim();
 function cardOrgLine(sch) {
   const prov = String(sch.provider || '').trim();
-  if (!prov) return String(sch.type || '');
+  /* 🔴 **'모른다'는 표시는 카드 윗줄에 싣지 않는다** (2026-10-06 사장님 지시 'AI 티' · 개선안 D).
+     로봇이 주관 기관을 못 읽으면 `주관 기관 원문 확인` 이 들어오는데, 그게 거의 모든 카드
+     윗줄을 채워 **템플릿이 자기 빈칸을 읽어 주는** 모양이 됐다(AI 화면의 대표 지문).
+     감추는 게 아니라 자리를 옮기는 것이다 — 상세 시트의 주관 줄은 그대로 그 말을 한다(원칙 8-1). */
+  if (!prov || /원문 확인|미확인/.test(prov)) return String(sch.type || '');
   const title = cardTitle(sch);
   /* ⚠️ `bareOrg(title)` 로도 대조하지 않는다 — 앞머리를 떼는 것은 **없던 조각을 만들지 못하므로**
      `title.includes` 가 이미 하는 일이다(리뷰가 죽은 코드로 짚었고 실측으로도 0건이었다). */
@@ -416,7 +421,7 @@ function cardOrgLine(sch) {
    🔴 뒤 괄호는 **날짜·기간처럼 보일 때만** 뗀다. '(서울캠퍼스)' 같은 것은 남겨야 한다
       (느슨하게 떼면 캠퍼스가 사라져 다른 공고와 구별이 안 된다 — 2026-08-21 사고 유형).
    🔴 남는 글자가 4자 미만이면 아무것도 떼지 않는다(제목이 사라지는 것을 막는다).
-   ⚠️ 상세 시트는 원제목 그대로다 — 게시판에서 찾을 때 쓰는 글자라 바꾸면 안 된다. */
+   ⚠️ 2026-10-06 부터 상세 시트 제목도 이 함수를 쓴다(사장님 지시 · 개선안 E — openDetail 주석). */
 function cleanCardTitle(name) {
   let t = String(name || '').trim();
   const before = t;
@@ -436,7 +441,7 @@ function cleanCardTitle(name) {
    · 꼬리 게시일(`… 공고 2026.09 . 28`)을 뗀다
    🔴 '날'까지 있는 날짜만 날짜다 — `2026학년도`·`10월 프로그램`·`2학기`·`제13회` 는 제목이다.
    🔴 지어내지 않는다 — 떼어 낸 조각(dates)은 원문 글자 그대로 돌려준다(D-day 가 없는 카드는 회색 줄로 옮긴다 · 정보를 잃지 않게).
-   ⚠️ 상세 시트는 원제목 그대로다(게시판에서 찾을 때 쓰는 글자). */
+   ⚠️ 장학 상세 시트 제목도 cardTitle 로 정리한다(2026-10-06 · 개선안 E). */
 const TD_DAY = '(?:(?:20)?\\d{2}\\s?[.\\-/년]\\s?)?\\d{1,2}\\s?(?:[./]|월\\s?)\\s?\\d{1,2}\\s?(?:일)?\\.?(?:\\s?(?:[(（][월화수목금토일][)）]|[/.]?[월화수목금토일](?![가-힣])))?';
 const TD_DAY_RE = new RegExp(TD_DAY);
 const TD_DAY_G = new RegExp(TD_DAY, 'g');
@@ -4338,7 +4343,11 @@ function openDetail(id) {
            처럼 바로 윗줄과 같은 말을 두 번 하는 데이터가 많다(개발자 지적). 없앤 정보는
            없다: 주관은 아랫줄에, '한국장학재단 등록' 이라는 사실은 원문 링크 이름
            ('한국장학재단 ↗')이 말한다. */ ''}
-      <h3 class="sheet-title">${esc(sch.name)}</h3>
+      ${/* 🔴 상세 제목도 카드와 **같은 정리**를 거친다 (2026-10-06 사장님 지시 'AI 티' · 개선안 E).
+           예전엔 '게시판에서 찾을 때 쓰는 글자'라며 `[장학공지]` 같은 게시판 표식을 그대로 두었다.
+           게시판에서 찾을 제목은 맨 아래 묶음의 '목록에서 ○○을 찾아' 줄(boardListTitle)이 따로 말하므로
+           제목이 그 일을 겸할 필요가 없다. 지우기만 한다(cleanCardTitle — 한 글자도 더하지 않는다). */ ''}
+      <h3 class="sheet-title">${esc(cardTitle(sch))}</h3>
       <p class="sheet-amount">${esc(sch.amount)}</p>
       ${/* 금액을 숫자로 못 읽은 층2 공고 — 재단이 그 칸에 적어 둔 말을 그대로 옮긴다.
            카드 머리에는 안 띄운다(위 kosafAmountLabel 주석). */ ''}
@@ -6525,9 +6534,11 @@ function renderWallet() {
         <div class="wallet-row">
           <div class="wallet-info">
             ${/* 🔴 서류 이름은 **누를 수 있다** — 어디서 떼는지를 작은 창으로 알려 준다.
-                 발급처를 줄마다 깔아 두면 여덟 줄이 설명으로 가득 차 정작 '있다/없다'가 안 보인다. */ ''}
+                 발급처를 줄마다 깔아 두면 여덟 줄이 설명으로 가득 차 정작 '있다/없다'가 안 보인다.
+                 🔴 줄마다 붙던 「?」 동그라미는 뗐다(2026-10-06 사장님 지시 'AI 티' · 개선안 G) —
+                    같은 장식이 여덟 번 반복됐다. 누를 수 있다는 표시는 이름의 점선 밑줄(style.css)이 한다. */ ''}
             <button class="wallet-label" data-issue="${s.slot}" aria-haspopup="dialog">
-              ${esc(s.label)}<span class="wallet-q" aria-hidden="true">?</span>
+              ${esc(s.label)}
             </button>
             ${rec ? '' : '<p class="wallet-status">없음</p>'}
           </div>

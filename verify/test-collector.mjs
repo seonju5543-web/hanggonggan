@@ -8039,9 +8039,11 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   eq('  제목에 없으면 예전처럼 붙인다',
     cardOrgLine({ type: '교외', provider: '한국장학재단', name: '대학생 청소년교육지원장학금(대청교) 멘토' }),
     '교외 · 한국장학재단');
-  eq('  기관명을 못 읽은 공고도 예전 그대로',
+  /* 2026-10-06 개선안 D(사장님 지시 'AI 티' · 은서님 선택)로 뒤집혔다 — 모름 표시는 카드 윗줄에 싣지 않고
+     상세 시트의 주관 줄이 그 말을 한다(원칙 8-1: 감추지 않고 자리를 옮긴다). */
+  eq('  기관명을 못 읽은 공고는 윗줄에 교내/교외만 (모름 표시는 상세에서)',
     cardOrgLine({ type: '교외', provider: '주관 기관 원문 확인', name: '2026년 코나아이 소상공인 장학생 모집' }),
-    '교외 · 주관 기관 원문 확인');
+    '교외');
   eq('  provider 가 비면 교내/교외만', cardOrgLine({ type: '교내', provider: '', name: '가족장학금' }), '교내');
   /* 🔴 기관명 칸의 꼬리 괄호(접수처 표기)를 떼고 대조한다 — 안 떼면 통째로 겹치는데도 못 알아본다
      (2026-09-21 코드 리뷰 · 실측 3건: 가송재단 · 양천장학회 · 미래의동반자재단) */
@@ -8680,6 +8682,24 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
     eq('  묶음은 한 문단이다 (<p> 하나 · 점으로 잇는다)',
       (facts.match(/<p[\s>]/g) || []).length === 1 && /\.join\(' · '\)/.test(facts), true);
     eq("  군말 '자세한 내용은 … 에서 확인' 이 없다", /자세한 내용은/.test(facts), false);
+  }
+
+  /* 🔴 'AI 티' 정리 A·D·E·G·H (2026-10-06 사장님 지시 → 전후 사진 보고 → 은서님이 다섯 개 골랐다).
+     조사 근거·전후 사진: docs/designs/ai-tell-removal.md 3-6절. 되살리면 여기서 걸린다. */
+  {
+    const cssAll = readText(new URL('../style.css', import.meta.url));
+    const css = cssAll.replace(/\/\*[\s\S]*?\*\//g, '');   // 주석 속 글자로 통과·실패하지 않게
+    eq('A 화면 제목 밑 강조선(.page-header h2::after)이 없다', /\.page-header h2::after\s*\{/.test(css), false);
+    const org = appSrc2.slice(appSrc2.indexOf('function cardOrgLine('), appSrc2.indexOf('function cardOrgLine(') + 1500);
+    eq("D 카드 윗줄은 '주관 기관 원문 확인'(모름 표시)을 싣지 않는다",
+      /if \(!prov \|\| \/원문 확인\|미확인\/\.test\(prov\)\) return String\(sch\.type/.test(org), true);
+    const od = appSrc2.slice(appSrc2.indexOf('function openDetail('), appSrc2.indexOf('function openDetail(') + 20000);
+    eq('E 장학 상세 제목도 카드와 같은 정리(cardTitle)를 거친다',
+      /class="sheet-title">\$\{esc\(cardTitle\(sch\)\)\}/.test(od) && !/class="sheet-title">\$\{esc\(sch\.name\)\}/.test(od), true);
+    eq("G 서류 이름마다 '?' 동그라미(wallet-q)를 붙이지 않는다", /wallet-q/.test(appSrc2.replace(/\/\*[\s\S]*?\*\//g, '')), false);
+    eq('  대신 이름의 점선 밑줄로 누를 수 있음을 알린다', /\.wallet-label \{[^}]*underline dotted/.test(css), true);
+    eq('H 정렬 단추는 알약이 아니라 입력칸 모서리다',
+      /\.sort-btn \{[^}]*border-radius: var\(--radius-sm\)/.test(css) && !/\.sort-btn \{[^}]*border-radius: var\(--radius-pill\)/.test(css), true);
   }
 }
 
