@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-05T19:10:51.133Z",
+ "updatedAt": "2026-10-06T16:36:56.485Z",
  "v": 1,
  "bad": {
   "https://2026grchallenge.com/": {
@@ -8,7 +8,7 @@
   },
   "https://blog.naver.com/mopaspr/224399694473?trackingCode=blog_bloghome_searchlist": {
    "v": "other",
-   "at": "2026-10-05"
+   "at": "2026-10-07"
   },
   "https://maicon.kr/": {
    "v": "home",
@@ -34,13 +34,17 @@
    "v": "other",
    "at": "2026-10-06"
   },
+  "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=893444&article.offset=0&articleLimit=10": {
+   "v": "gone",
+   "at": "2026-10-07"
+  },
   "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=95279&article.offset=0&articleLimit=10": {
    "v": "other",
    "at": "2026-10-06"
   },
   "https://www.usspc.or.kr/": {
    "v": "home",
-   "at": "2026-10-05"
+   "at": "2026-10-07"
   },
   "https://www.welchon.com/web/lay1/program/S1T31C447/eventNewView.do?menuIdx=&cIdx=evpr&bbsIdx=2214028": {
    "v": "login",
