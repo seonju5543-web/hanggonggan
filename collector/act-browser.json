@@ -366,5 +366,15 @@
   ],
   "excludes": [],
   "from": "브라우저 본문"
+ },
+ "https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.ulsan?bbsId=BBS_0000000000000309&mId=008001002000000000&dataId=60581": {
+  "at": "2026-10-06",
+  "tries": 1,
+  "lines": [
+   "■ 모집대상",
+   "부·울·경 소재 대학(원)생(재·휴학생 포함)·졸업유예생으로 구성된 예비창업팀"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
  }
 }
