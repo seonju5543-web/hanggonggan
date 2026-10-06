@@ -1069,8 +1069,10 @@
    "added": "2026-10-05",
    "fetched": false,
    "schematized": false,
-   "tries": 5,
-   "lastTryAt": "2026-10-06"
+   "tries": 6,
+   "lastTryAt": "2026-10-06",
+   "retired": true,
+   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
   },
   {
    "id": "auto-nuid100nttid30154ptabno5",
@@ -1079,8 +1081,10 @@
    "added": "2026-10-05",
    "fetched": false,
    "schematized": false,
-   "tries": 5,
-   "lastTryAt": "2026-10-06"
+   "tries": 6,
+   "lastTryAt": "2026-10-06",
+   "retired": true,
+   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
   },
   {
    "id": "auto-onttid000100000000003862",
@@ -1089,8 +1093,10 @@
    "added": "2026-10-05",
    "fetched": false,
    "schematized": false,
-   "tries": 5,
-   "lastTryAt": "2026-10-06"
+   "tries": 6,
+   "lastTryAt": "2026-10-06",
+   "retired": true,
+   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
   },
   {
    "id": "auto-bsid1083mi3004nttid55323",
@@ -1107,8 +1113,10 @@
    "added": "2026-10-05",
    "fetched": false,
    "schematized": false,
-   "tries": 5,
-   "lastTryAt": "2026-10-06"
+   "tries": 6,
+   "lastTryAt": "2026-10-06",
+   "retired": true,
+   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
   }
  ]
 }
