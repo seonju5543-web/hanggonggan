@@ -11806,10 +11806,10 @@
     "제목 표식 「[교외」"
    ],
    "kindConfidence": "high",
-   "kindFrom": "로봇(제목)",
+   "kindFrom": "로봇(원문) 2026-10-06",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "200만원",
+   "amountValue": 2000000,
    "deadline": "2026-10-12",
    "deadlineFrom": "게시판 요약 · ~ 2026.10.12",
    "period": "접수 ~2026-10-12",
@@ -11827,7 +11827,33 @@
    "auto": true,
    "attachments": [],
    "sourceUrl": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NzElMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "applyEmail": "scholarship@korea.ac.kr",
+   "applyEmailSource": "※ 온라인 신청 오류 발생 시 scholarship@korea.ac.kr로 제출",
+   "applyEmailFrom": "공고 원문",
+   "openDate": "2026-10-07",
+   "eligibilityLines": [
+    "2. 선발 대상: ○ 2026학년도 2학기 기준 경제학과에 재학 중인 학생",
+    "(휴학생, 복수학위제, 초과학기 학생 지원 불가)",
+    "○ 직전학기에 12학점 이상 이수, 평점 3.0 이상인 자",
+    "○ 경제적으로 어려움을 겪고 있으나 학업에 대한 열정이 있는 학생"
+   ],
+   "excerpts": [
+    "접수기간: 2026.10.7(수) 9시 ~ 2026.10.12(월) 17시",
+    "제출 서류: 각 1부씩 제출, 2026.10월 이후 발급분만 인정",
+    "기타사항: ○ 제출 기한 준수 - 학교 제출 기한(2026.10.12)",
+    "문의처: 고려대학교 학생지원팀 02-3290-1104"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 2000000,
+    "ratio": 0,
+    "min": 2000000,
+    "max": 2000000,
+    "raw": "4. 지원 내용: ○ 선발인원 - 1명(2배수 추천 후 재단에서 최종 1명 선발) ○ 지원성격 - 생활비 ○ 지원금액 - 200만원"
+   },
+   "amountFrom": "공고 원문"
   }
  ]
 }

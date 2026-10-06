@@ -393,5 +393,21 @@
  "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12390/view.do?currentPageNo=1": {
   "at": "2026-10-06",
   "tries": 1
+ },
+ "https://www.inha.ac.kr/bbs/kr/8/45615/artclView.do": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://www.inha.ac.kr/bbs/kr/8/45511/artclView.do": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=57138&bidx=894190&qidx=57138&cate=0&allboard=true&nowpage=3": {
+  "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515411&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=": {
+  "at": "2026-10-06",
+  "tries": 1
  }
 }
