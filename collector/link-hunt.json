@@ -7253,6 +7253,14 @@
    "nextTryAt": "2026-10-07",
    "status": "resolved",
    "resolvedUrl": "https://www.gachon.ac.kr/bbs/kor/478/125899/artclView.do"
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-2026%EB%85%84%20%EC%9A%B0%EC%96%91%EC%9E%AC%EB%8B%A8%20%EB%8F%99%ED%96%89%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91": {
+   "attempts": 0,
+   "title": "2026년 우양재단 동행 장학생 모집",
+   "lastTried": "2026-10-07",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30230&pageNo=1"
   }
  }
 }
