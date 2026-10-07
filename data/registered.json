@@ -9261,6 +9261,18 @@
     {
      "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp (다운로드 : 18회)",
      "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=ca127512499eb0e0ba00b24b184d8221&bbsId=1083"
+    },
+    {
+     "name": "[공문] 2026년 우양재단 동행 장학 모집 협조 요청.hwp (다운로드 : 19회)",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=0c6797a234b08b8ba908c89f3f55b111&bbsId=1083"
+    },
+    {
+     "name": "[붙임1] 2026년 동행장학 홍보 포스터.jpg (다운로드 : 20회)",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=29df0f5abb5a9a6114328315d3bcc08b&bbsId=1083"
+    },
+    {
+     "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp (다운로드 : 19회)",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=ca127512499eb0e0ba00b24b184d8221&bbsId=1083"
     }
    ],
    "sourceUrl": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=55323",
@@ -12052,7 +12064,16 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-07 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "2026년 손태희장학재단 4기 장학생 선발 공고문.pdf",
+     "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260821&brdSeq=3&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&#"
+    },
+    {
+     "name": "2026년 손태희장학재단 4기 장학생 서식.hwpx",
+     "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260821&brdSeq=3&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&#"
+    }
+   ],
    "sourceUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260821&brdSeq=3&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
    "sourceKind": "auto",
    "deadlineFrom": "공고 원문",
