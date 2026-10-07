@@ -1,0 +1,12 @@
+GET /repos/o/r/issues?state=open&per_page=100&page=1 
+GET /repos/o/r/actions/workflows/resolve-detail-urls.yml/runs?status=success&per_page=1 
+GET /repos/o/r/actions/workflows/link-hunter.yml/runs?status=success&per_page=1 
+GET /repos/o/r/actions/workflows/audit-coverage.yml/runs?status=success&per_page=1 
+GET /repos/o/r/actions/workflows/check-live.yml/runs?status=success&per_page=1 
+GET /repos/o/r/issues/386/comments?per_page=100&page=1 
+GET /repos/o/r/issues/400/comments?per_page=100&page=1 
+GET /repos/o/r/issues/401/comments?per_page=100&page=1 
+GET /repos/o/r/issues/402/comments?per_page=100&page=1 
+GET /repos/o/r/issues/403/comments?per_page=100&page=1 
+POST /repos/o/r/issues/386/comments {"body":"✅ 2026-10-05 17:48 KST — **원문 링크 복구 로봇** 이 다시 끝까지 돌았습니다(경보 뒤에 시작한 실행이 성공 · https://github.com/o/r/actions/runs/37141332557). 넘어짐 경보를 닫습니다. 다시 넘어지면 새로 알립니다. (로봇 하트비트 · 자동)"}
+PATCH /repos/o/r/issues/386 {"state":"closed","state_reason":"completed"}

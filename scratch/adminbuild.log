@@ -1,0 +1,38 @@
+■ 관리자 화면 빠진 이웃 검사 — /home/user/hanggonggan/.claude/worktrees/wf_d6ceb102-5bf-9/_admin/dist
+  훑은 스크립트 16개: admin.js · vendor/activity-kind.mjs · vendor/apply-channel.js · vendor/canon-url.mjs · vendor/data.js · vendor/deadline-hint.mjs · vendor/edit-diff.mjs · vendor/entry-rules.js · vendor/form-plan.js · vendor/forms.js · vendor/link-fix.mjs · vendor/news-kind.mjs · vendor/notice-source.mjs · vendor/page-boilerplate.mjs · vendor/source-link.js · vendor/url-key.mjs
+  index.html 의 <script src> 도 함께 본다 (고전 스크립트는 import 그래프에 없다)
+✓ 빠진 이웃 없음 — 모든 import 가 짝을 찾았습니다
+
+■ CI 감시 범위 — vendor 로 옮기는 collector 원본 9개
+  ✓ 전부 감시 범위 안: collector/url-key.mjs · collector/deadline-hint.mjs · collector/notice-source.mjs · collector/canon-url.mjs · collector/page-boilerplate.mjs · tools/edit-diff.mjs · collector/activity-kind.mjs · collector/news-kind.mjs · collector/link-fix.mjs
+빌드 완료 → _admin/dist
+_admin/dist:
+total 380
+drwxr-xr-x 3 root root   4096 Oct  5 16:14 .
+drwxr-xr-x 3 root root   4096 Oct  5 16:14 ..
+-rw-r--r-- 1 root root    744 Oct  5 16:14 _headers
+-rw-r--r-- 1 root root  59354 Oct  5 16:14 admin.css
+-rw-r--r-- 1 root root 291067 Oct  5 16:14 admin.js
+-rw-r--r-- 1 root root  11155 Oct  5 16:14 index.html
+-rw-r--r-- 1 root root     26 Oct  5 16:14 robots.txt
+drwxr-xr-x 2 root root   4096 Oct  5 16:14 vendor
+
+_admin/dist/vendor:
+total 280
+drwxr-xr-x 2 root root  4096 Oct  5 16:14 .
+drwxr-xr-x 3 root root  4096 Oct  5 16:14 ..
+-rw-r--r-- 1 root root  7515 Oct  5 16:14 activity-kind.mjs
+-rw-r--r-- 1 root root 14281 Oct  5 16:14 apply-channel.js
+-rw-r--r-- 1 root root  6470 Oct  5 16:14 canon-url.mjs
+-rw-r--r-- 1 root root 43920 Oct  5 16:14 data.js
+-rw-r--r-- 1 root root  8857 Oct  5 16:14 deadline-hint.mjs
+-rw-r--r-- 1 root root 18871 Oct  5 16:14 edit-diff.mjs
+-rw-r--r-- 1 root root 21978 Oct  5 16:14 entry-rules.js
+-rw-r--r-- 1 root root 15861 Oct  5 16:14 form-plan.js
+-rw-r--r-- 1 root root 37023 Oct  5 16:14 forms.js
+-rw-r--r-- 1 root root  8591 Oct  5 16:14 link-fix.mjs
+-rw-r--r-- 1 root root 11115 Oct  5 16:14 news-kind.mjs
+-rw-r--r-- 1 root root 15449 Oct  5 16:14 notice-source.mjs
+-rw-r--r-- 1 root root  6136 Oct  5 16:14 page-boilerplate.mjs
+-rw-r--r-- 1 root root 19192 Oct  5 16:14 source-link.js
+-rw-r--r-- 1 root root 16018 Oct  5 16:14 url-key.mjs

@@ -1,0 +1,13 @@
+Merge branch 'fix/ops' into integ/health-sweep — B줄 끝(admin-2 → refresh → ops)
+
+같은 문제를 두 세션이 고친 곳 — 없다. 양쪽이 바꾼 파일은 넷이고 자리가 다르다:
+- 학과·등록금 갱신 워크플로: 데이터 관문 단계(이쪽 · 2026-10-04) + 제 대기줄·기본 브랜치 끝·2·8월 예약·넘어짐 알림(refresh QUEUE-01 · MAJORS-01) — 한 벌로 합쳐짐(관문 단계 하나)
+- 관리자 화면(_admin/admin.js): 로봇 표 시각(한국장학재단 화·금 · 누락 감사 화) + 수집 대기줄 목록에서 갱신 로봇 둘을 뺌 · 학과 갱신 예약 시각 · 게시판 후보 정찰 줄 삭제
+- 묶음 목록(PARTS) — 열네 묶음 전부: gate · feed · bodies · browser · qnotice · qfeeds · links · ci · alerts · servers · insta · admin · refresh · ops
+ops 가 지운 게시판 후보 정찰(probe-boards.yml · collector/probe.mjs · probe-candidates.json)을 부르는 곳은 남지 않았다(지난 기록 SESSIONS.md 만)
+액션 판 올리기(ops-14)는 ops 가 스스로 걷어 두었다 — 워크플로 전부 checkout·setup-node v4 · node 20 한 벌
+
+검사: health-gates 열네 묶음 전부 통과 · test-collector(DOC_GATES=1) 통과 · 워크플로 중복 키·단계 id 중복 0
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01Q8cvV7LejYVSK8g7ZP5BkW

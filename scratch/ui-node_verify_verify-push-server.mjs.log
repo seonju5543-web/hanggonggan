@@ -1,0 +1,72 @@
+(node:30623) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///tmp/claude-0/-home-user-hanggonggan/409b9928-bac2-5670-b5b4-24e2b322cd7b/scratchpad/integ/server/push/worker.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /tmp/claude-0/-home-user-hanggonggan/409b9928-bac2-5670-b5b4-24e2b322cd7b/scratchpad/integ/server/push/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1] VAPID 서명 — 푸시 서비스가 실제로 검사하는 부분
+  ✓ 푸시가 실제로 발송 시도됨
+  ✓ Authorization 헤더 형식이 규격에 맞음
+  ✓ 서명이 공개키로 검증됨 (푸시 서비스가 수락할 서명)
+  ✓ JWT 헤더 alg=ES256
+  ✓ aud가 푸시 서비스 주소
+  ✓ 만료시각이 24시간 이내 (규격 상한)
+  ✓ sub가 연락처
+  ✓ 폰이 꺼져 있으면 12시간 보관 요청
+  ✓ 본문 없는 깨우기 푸시 (개인정보가 서버에서 나가지 않음)
+
+[2] 푸시 엔드포인트 검사 — 아무 주소로나 요청을 쏘지 않는다
+  ✓ 정상 푸시 주소는 통과
+  ✓ 이상한 주소는 전부 거부
+
+[3] 깨울 학교 판정
+  ✓ 첫 실행은 아무도 깨우지 않음 (기존 공고를 새 공고로 착각하지 않게)
+  ✓ 변화가 없으면 조용
+  ✓ 새 공고가 생긴 학교만 깨움
+  ✓ 마감 임박 공고가 있는 학교를 깨움
+  ✓ 전국 대상 공고는 모두 깨움
+  ✓ 대출 공고로는 깨우지 않음
+  ✓ 진짜 새 장학 공고면 깨움
+
+[4] 구독 등록 · 해지 · 잘못된 입력
+  ✓ 구독 등록 성공
+  ✓ 앱 주소에만 CORS 허용
+  ✓ 폰 주소와 학교가 저장됨
+  ✓ 저장 항목은 endpoint·school·campus·시각 4개뿐 (개인정보 없음)
+  ✓ 이상한 엔드포인트는 거부
+  ✓ 지나치게 긴 값 거부
+  ✓ 해지하면 저장소에서 삭제됨
+  ✓ 관리자 열쇠 없이는 수동 실행 불가
+  ✓ 관리자 열쇠가 맞으면 수동 실행 가능
+
+[5] 앱을 지운 폰 정리
+  ✓ 410(사라진 폰)이 오면 구독을 자동 삭제
+
+[6] 실제 공고 데이터로 실행
+  ✓ 실데이터 첫 실행에 '새 공고' 깨움 없음 (등록 176건·피드 418건)
+      (첫 실행에서 나온 마감 임박 사유: auto-9599ec839d20ec84a0ebb09c:due, auto-oardid323127menuno200318:due, auto-bbssc58944184artclviewdo:due, auto-bbssc58944066artclviewdo:due, auto-kuk2351208039artclviewdo:due, auto-2026100720ec98a4ed9b8420:due, auto-otice06doarticleno140331:due)
+  ✓ 두 번째 실행: 깨울 학교 0곳 · 전국 false (오늘·내일 마감 7건 기준)
+
+[7] 무료 등급 제한 — 바깥 요청 50건 · 계산 시간 10ms
+  ✓ 어떤 걸음도 바깥 요청 50건을 넘지 않음 (최대 25건)
+  ✓ 구독자 60명 전원이 결국 깨워짐 (나눠 보내기)
+  ✓ 발송이 여러 걸음으로 나뉘어 이어짐
+  ✓ 무거운 데이터 해석은 걸음을 나눠 한 번씩만 (계산 시간 보호)
+  ✓ 같은 푸시 서비스에는 서명을 한 번만 만들어 재사용 (계산 시간 보호)
+  ✓ 마지막 걸음에서 회차가 정상 종료됨
+  ✓ 깨울 시각(08:10) 전에는 시작하지 않음
+  ✓ 08:10 KST에 시작
+  ✓ 조금 늦게 깨어나도(1시간 20분) 시작 — 예약이 밀려도 거른 날이 없게
+  ✓ 너무 늦게 지나친 시각은 건너뜀 (한밤중 몰아보내기 방지)
+  ✓ 20:10 KST에 시작
+  ✓ 밤늦게는 깨우지 않음
+  ✓ 같은 걸음을 5회 실패하면 이번 회차를 포기하고
+  ✓ 사유를 남긴다 (/health에서 보임 — 조용한 중단 불가)
+  ✓ /health가 현재 걸음과 마지막 오류를 보여줌
+  ✓ /health가 등록 0대를 보여줌
+  ✓ /health가 등록 2대를 보여줌 (state 키는 제외)
+  ✓ 시험 발송도 관리자 열쇠 없이는 불가
+  ✓ 열쇠가 맞으면 등록된 폰을 즉시 깨움
+  ✓ 시험 발송도 바깥 요청 50건 이내
+
+✅ 푸시 발송 서버 검증 전부 통과
+

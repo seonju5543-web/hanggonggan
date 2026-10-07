@@ -1,0 +1,119 @@
+ef44c079 로봇·도구 점검 관문 ops 머리말 — 리뷰가 더한 잣대(R1·R3~R6)와 ⑦ 이 이 묶음에 없는 까닭(R2)을 적는다
+2eb3f4c2 지난 리포트 정리 규칙 머리말 — '🔍 게시판 정찰' 은 그 도구를 2026-10-05 지웠다고 적는다 (리뷰 R10)
+317ae414 링크 정찰 — 열 줄 고르기를 probe-lines.mjs pickDirectives 한 곳으로 · push 직전 판 받기는 보강 단계(continue-on-error) (리뷰 R4 · R6)
+6d6821b6 로컬 로봇 겉옷 — gh 가 실패하면 실패한 상태 이름과 gh 의 문구를 그대로 보인다 · 관문이 가짜 gh 로 겉옷을 실제로 돌린다 (리뷰 R3 · R8)
+163889b8 배포 감시 해결 안내 — ⓪ 에서 기본 브랜치·main 을 먼저 합치고 ①②③ 은 같은 HEAD 를 올린다 (리뷰 R1)
+bc6e2826 노션 「작업 현황」 '브랜치' 칸 — 병합 커밋을 main 에 올린 push 도 작업 브랜치를 적는다 · 노션 쓰기가 재시도를 거치는지 관문이 잰다 (리뷰 R1 · R5)
+2f2e649d 워크플로 액션 판 올리기(ops-14)를 이 묶음에서 뺀다 — 명세대로 모든 묶음을 합친 뒤 마지막 한 커밋으로 (리뷰 R2)
+14a5dc94 워크플로 — Node 24 판 액션(checkout·setup-node v5 · github-script v8) · node-version 22 (ops ops-14)
+98b92d82 로봇·도구 점검 관문 ops 묶음 — 운영 감시 도구 여섯 수리가 되돌아가면 빨간불 (verify/health-gates/ops.mjs)
+ac682ddc 게시판 후보 정찰 도구를 지운다 — 7월 후보 목록만 읽던 수동 도구(실행 1회) · 같은 일은 find-boards·probe-links (ops links-16 · 결정 ①)
+7e04f1a0 링크 정찰 — push 로 깨면 이번 push 가 새로 넣은 줄만 연다 · 답 받은 줄 막기 (ops gaps-05)
+71a05377 로봇 하트비트 — 문턱 바닥값 12시간 · 기본 브랜치(와 main)의 성공만 센다 (ops ops-10 · ops-11)
+5b5cd5a8 노션 「작업 현황」 — '브랜치' 칸은 그 커밋을 올린 작업 브랜치 · 노션이 잠깐 넘어지면 다시 보낸다 (ops ops-12)
+1092d504 로컬 로봇 겉옷 — 데이터 로봇 목록을 워크플로에서 읽는다 · gh 실패를 '비어 있음 ✅'으로 말하지 않는다 (ops gaps-04)
+856d3929 배포 감시 — main 만 앞선 것은 ❌ 가 아니라 (참고) · assets/ 도 앱 파일 · main 하나에만 올리라고 권하지 않는다 (ops ops-09)
+2bd88215 로봇·도구 점검 관문 refresh 묶음 — 갱신 로봇 일곱 수리가 되돌아가면 빨간불 (verify/health-gates/refresh.mjs)
+49bf18e6 작성 규칙 학습 — 시든 출처 두 곳(인크루트 가치관·인생관 · 5회 연속 규칙 0종)을 seeds 에서 빼 tried 에 보관 (refresh ESSAY-03 · 결정 ①)
+854b2a4c 학교·시작 화면 사진 — 고른 사진이 다시 받은 뒤 다른 사진이 되면 만들지 않는다 · 사진 수집 도구 묶음 길이·Openverse 끄기·불러도 안 돈다 (refresh GATE-02 · GATE-01)
+8f685ef9 한국장학재단 로봇 — 공고문 사본을 매 실행 다시 받지 않는다 · 수확 예산 시계를 목록 전에 켠다 (refresh KOSAF-01 · KOSAF-02)
+b1796588 학과·등록금 갱신 로봇 — 제 대기줄 · 기본 브랜치 끝 · 넘어짐 알림 · 학과는 2·8월 예약 · 열쇠 없으면 빨간불 · 학과 진단 리포트 (refresh QUEUE-01 · gaps-06 · MAJORS-02 · MAJORS-01)
+96dbd57b 관리자 화면 로봇 「지금 실행」도 수집 대기줄을 먼저 본다 — 손으로 깨운 수집 로봇이 줄에서 기다리던 다른 실행을 시작 전에 취소시키지 않게 (admin-F4 같은 원인)
+8af7579f 로봇·도구 점검 관문 admin 묶음 — 관리자 화면 모듈 문법(같은 이름 두 번 선언) · 도구 파일 대조는 로봇에서 경고만(softEq · 다른 묶음과 같은 잣대) · 드라이버에 줄 못 읽음·감사 실패·저장 도중 멈춤 세 경우 (verify/health-gates/admin.mjs · verify/verify-admin.js)
+cbf01a45 관리자 화면 — 실패 문구 표 이름 겹침(STEP) 때문에 화면 전체가 안 뜨던 것 수리 · 실패·대기 문구는 확인한 것만 말한다 (admin 재시도 검증)
+2f6ee8ca Merge branch 'fix/insta-2' into fix/admin-2
+21f7b252 인스타 로봇 리뷰 수리 — 장부 규칙 한 곳 · 주소 묻기 시한 · 관문은 진짜 명령으로 재고 글자 관문은 로봇에서 경고만 (리뷰 R1~R6 · R8~R11)
+12ffd5b1 인스타 장부 병합 — 올림 기록은 code·media 로 합친다 (리뷰 R7)
+8e0c73c3 인스타 게시 — 올라간 즉시 media 번호를 남기고, 올린 뒤의 어떤 멈춤도 「게시가 실패했습니다」 라고 하지 않는다
+20782d01 인스타 재검증에서 찾은 틈 둘 — 관리자 화면의 '마감 지남' 을 시각으로 · 사람이 올린 알림(push)을 자동 준비 대기줄에서 뺀다
+43953423 Merge branch 'fix/servers-2' into fix/insta-2
+fdd3fa23 WIP(미검증) admin 묶음 — 이전 시도가 끝내지 못하고 작업 트리에 남긴 변경(2026-10-04 17:40~17:49) 보관
+443fbe10 로봇·도구 점검 관문 servers — 문서 글자 단정은 로봇 워크플로에서 경고만 (리뷰 R2)
+d40bea0c 푸시 발송 서버 리뷰 수리 — plan 걸음 계산 시간을 옛 판 수준으로 · 발송 회차를 따로 남김 · 배포 직후 첫 회차 · 수집일 이틀을 폰과 대조
+4831022f Merge branch 'fix/alerts-2' into fix/servers-2
+d738cd6a Merge branch 'fix/servers' into fix/servers-2
+f2f74b90 하트비트 — robotDownVerdicts 설명에 endedAt·scheduledOnly 칸을 적는다
+d58d3071 로봇·도구 점검 관문 alerts — 실제로 묶는 줄을 잰다 (코드 리뷰 3차 · 변이 일곱이 초록이던 것)
+62f07fc1 하트비트 넘어짐 경보 닫기 — 경보 전에 끝난 성공·수동(모의·부분) 실행의 성공으로 닫지 않는다 (코드 리뷰 3차)
+b0001070 교내 소식 로봇 — 경보 짝 셋(수집·사진·감사)을 저장·리포트 뒤로 (코드 리뷰 3차)
+dd94cb07 로봇·도구 점검 관문 alerts — 다른 세션의 무해한 워크플로 편집이 로봇 결과를 되돌리지 않게 (코드 리뷰 3차)
+b0170322 로봇·도구 점검 관문 alerts S3 — 실패 때만 결과물을 올리는 단계(알림 아님)에 헛빨간불을 내지 않는다 · 뒤의 넘어짐 알림이 그 실패 갈래(failure·cancelled)를 모두 덮으면 통과
+3de805b6 Merge branch 'fix/ci' into fix/alerts-2
+19b7865c essay-ask 주석 바로잡기 — 09-29 주간 로봇을 멈춘 칸은 로봇이 아니라 세션이 손으로 옮긴 양식의 칸이었다
+28b380a9 화면 검사 관문 ① — 양식 표본 배선을 driveAnyLiveForm 몸통을 실제로 돌려 잰다 (코드 리뷰 2차)
+926a47e5 화면 검사 루프에 20분 예산 · 관문이 루프를 실제로 돌려 '실패를 모으는가'를 잰다 (코드 리뷰 2차)
+33f3bae1 링크 사냥꾼: 원문 주소 0건 확보
+fe21be5f search-index: 검색용 요약 갱신
+03126222 browser-collector: harvest update
+eab072a6 링크 사냥꾼: 원문 주소 0건 확보
+17e7c888 search-index: 검색용 요약 갱신
+f141d466 collector: seen state update
+4e44d0d6 search-index: 검색용 요약 갱신
+70af0bcc news: 교내 소식 수집
+f0a62ffe 인스타: 트랙션 수확
+38b7c565 링크 사냥꾼: 원문 주소 4건 확보
+a1211a6a 인스타: 댓글 fetch
+3f2076e6 자격요건 로봇: 장학 본문 재수집 · 대외활동 브라우저 자격
+e505fb7f open-api: 공공 API 대외활동·공모전 갱신
+8daf7d06 게시판 공통 링크를 첨부에서 걷는다 — 모든 글에 붙던 메뉴·규정·로고 20종 (개발자 "진행해")
+8cb1f746 첨부 내려받기 스크립트를 진짜 주소로 — 이름만 보이고 안 받아지던 34건 (개발자 "2번 문제 해결")
+eeca10c2 인스타: 댓글 fetch
+d91e0d69 장학 포스터도 PaddleOCR 로 읽는다 + 그 공고의 그림인지 확인 (개발자 "paddle ocr 붙여" · 노션 UI-12)
+3d054243 Merge remote-tracking branch 'origin/claude/nice-heisenberg-WESq5' into claude/g9-g3-work-22ad46
+c65e8c04 원문을 찾아 읽었다 — 학생 화면 '금액 미확인' 57 → 20 · 마감 120 → 146건 (노션 UI-12)
+04f4bf14 수집 로봇 저장 단계: 얹기 충돌이 나도 수집분을 잃지 않는다 (run 37203460175 · 2026-10-04 12:49Z)
+588a7673 로봇·도구 점검 관문 insta 묶음 — 그림에 상대 날짜 없음·게시 거절(명령줄 그대로)·관리자 줄(①) · main push 는 재시도 루프 안에만·올라간 뒤 실패 알림·GITHUB_OUTPUT(②) · 작업별 대기줄·장부 병합기 진짜 명령(④) · 만료·다시 뽑기·정리 단계 순서(⑦) · 댓글 헛쓰기(⑧) · 배포가 알림을 깨우는 셸(⑨) (verify/health-gates/insta.mjs)
+35b347d5 이 기기에서 배포 — insta/run-notify.txt 를 바꾼 배포면 「인스타 카드뉴스 게시」(알림 · 그 code)를 깨운다(로봇 push 는 push 트리거를 못 깨워 수정본 알림이 조용히 안 갔다) · 깨우기 실패는 따로 이슈 · 스킬 insta-revise 5-3 안내
+ea62683e 인스타 워크플로 — 대기줄을 작업마다(같은 공고끼리만 한 줄 · 연달아 누른 게시·건너뛰기가 조용히 취소되던 것) · insta/seen.json 병합 규칙(mergeInstaSeen — 올림 기록은 절대 안 버린다 · 한쪽만 바뀐 줄은 바뀐 쪽 · 일반 seen.json 규칙보다 앞) · 게시 작업의 main push 제거(#263 거짓 '게시 실패') · 준비의 main push 는 받아 합치는 3회 루프 · 올라갔는데 기록 저장만 실패하면 「다시 게시하지 마세요」 이슈 · 준비 실행마다 마감 지난 카드 정리 · 올림 파일은 이번 카드만
+847eee4d 인스타 장부 — 올리기 전에 마감이 지난 카드는 '만료(expired)' 로 바꾸고 폴더를 지운다(pick.mjs expireRows 한 곳 · ledger.mjs expire · 올린 것의 폴더는 안 지운다 · 재단이 마감을 미루면 다시 뽑힌다) · 준비 이슈 정리 이유에 만료를 '마감' 으로 센다 · 댓글이 그대로면 comments.json 을 쓰지 않는다(updatedAt = 마지막으로 바뀐 시각 · 순서 고정)
+f1575b14 인스타 — 카드 그림에 상대 날짜를 박지 않는다(판형 2·3·4 「마감 D-21」 → 「10월 23일 마감」 · meta.json dates: 'absolute') · 마감 지난 카드·옛 「마감 D-N」 카드는 게시 거절(publish.mjs publishRefusal · 예행연습도 · meta.json 없으면 올리지 않음) · 관리자 화면은 그 줄에 게시 버튼 대신 이유(instaPublishBlock) · 올리면 media·permalink 를 GITHUB_OUTPUT 에 · 댓글 카드 문구 「마지막 변화」 · 깨우기 문구는 '줄을 세웠다' 까지
+8c2d05dd 서비스워커 번호 v225 — origin/main 의 시작 화면 수리(d3163c20)가 같은 날 v224 를 먼저 썼다 · 두 갈래의 한 일을 모두 남긴다(머리말 규칙)
+6abf8f87 로그인 서버 매일 확인 — 설정 파일을 못 읽으면 '꺼짐'이 아니라 실패(종료 1 → robot-down) · 관문 ⑨ 가 명령줄 전체를 표본 파일로 잰다
+985f61d9 푸시 서버 사본 대조 — 제목 캠퍼스 표(TITLE_CAMPUS)·taggedSchool 을 match-engine 과 소스 글자로 대조(관문 ⑧) · 서버 폴더 안내의 스위치·대조 문구를 실제대로
+479dcd8e 푸시 서버 매일 확인 — 없어진 구독만 있던 회차는 경보가 아니다(살아 있는 구독에 보낸 수 = sent − dropped 로 판정) · 관문 ③ 에 발송 회차 표본(받아 줌 1건 → 다음 회차 410 → 다음 날 판정 ok)
+b72c2b79 푸시 발송 서버 — 사본을 두는 이유 문구를 확인한 사실만으로(엔진을 싣는 값도 계산 시간 안에 들여야 한다)
+4b209f5f 접수 대행 서버 켜는 법 ④ — 판정 파일(match-engine.js)을 묶어 싣으므로 그 파일이 바뀌면 다시 올려야 한다 · 불러 쓰는 꼴은 기본 가져오기
+3c7dfbe0 로봇·도구 점검 관문 servers 묶음 — 워커가 Workers 에서 못 싣는 모듈(①) · 서버 안내(②) · /health 회차·회복(③⑤) · 매일 확인 판정(④) · 본 공고 셋과 장부 자르기(⑥ · 폰 장부와 열쇠 대조) · 마감 하루 한 번·여러 학교(⑦) · 분교 깨우기(⑧ · match-engine 과 대조) · 로그인 서버 확인(⑨) · 서비스워커 알림 1건(⑩) (verify/health-gates/servers.mjs)
+7168b069 로그인 서버(Supabase) 매일 확인 신설 — 06:41 KST · 공개 열쇠로 /auth/v1/health 만 묻는다(3번 · 20초) · 이상하면 경보 한 곳(🚨 로그인 서버(Supabase) 이상) · 회복하면 닫는다 · 관리자 「로봇」에서 부를 수 있다 · 설계 문서 「어디가 끊기면」에 로그인 줄
+af5dd914 서비스워커 — 알림 규칙 파일이 안 실려도 푸시를 받으면 알림 1건(NOTIFY_RULES 를 typeof 로 · v224)
+b6ec0769 푸시 서버 매일 확인 — 판정을 한 곳(tools/push-health-verdict.mjs)으로 옮기고 '예약 회차가 돌았는가'까지 본다(두 회차 연속 안 돎 stale · 새 코드 미배포 outdated · 깨우기를 보냈는데 한 건도 안 받음 error)
+b2f9256e 푸시 발송 서버 — 빈 알림으로 깨우지 않는다: 본 공고는 주소·학교+제목·수집일 셋으로(폰과 같은 규칙) · 마감 사유는 공고마다 하루 한 번 · 여러 학교만 받는 공고는 그 학교만 · 게시판을 같이 쓰는 분교도 깨운다 · 장부는 데이터에 없는 옛 열쇠부터 자른다 · /health 에 마지막 회차(lastSlot·lastRun) · 회복하면 lastError 를 pastError 로
+ddd2a11e 접수 대행 서버 — 엔진을 기본 가져오기로(Workers 에는 node:module 이 없어 올리는 순간 넘어진다) · 서버 폴더 안내를 지금 모습으로(push 켜짐 · chat·essay·apply 꺼짐 · mail-worker 쓰지 않음) · 발송 증빙은 Supabase apply_sends 라고 바로 적는다
+e56711a7 첨부 받기 줄이 돈다 · 금액·마감만 빈 공고도 받는다 · OCR 을 발췌·금액 앞으로 (노션 UI-12)
+33eda312 Merge branch 'fix/alerts' into fix/servers
+1a1a1b53 Merge remote-tracking branch 'origin/claude/nice-heisenberg-WESq5' into claude/g9-g3-work-22ad46
+b64e19d9 금액: 원문에 또렷한데 못 읽던 다섯 꼴 + 읽고도 카드에 안 적던 비율·시급 + 갈리는 비율 과장 (노션 UI-12)
+a25a3bf2 로봇·도구 점검 관문 alerts 묶음 — 경보가 사람에게 닿고(S3) 하나로 모이고(planAlert) 회복하면 닫히는가(robotDownVerdicts·resolve 짝) · 라벨(S1)·체크아웃(S2)·이슈 권한(S4) · 리포트 정리·앱이 받는 파일·인스타 준비 이슈 표본 (verify/health-gates/alerts.mjs)
+b99a620c 푸시 시험 발송·관리자 잠금 확인 — 판정 못 한 것을 초록으로 두지 않는다(열쇠 오류·한 대도 못 깨움은 실패 · 잠금 판정 불가는 그날 실패) · 주소를 안 줬으면 미리보기 주소도 연다(없는 미리보기는 판정에서 뺀다)
+557a74a4 인스타 — 살아 있는 카드가 없는 준비 이슈는 닫는다(insta/ready-issues.mjs 한 곳 · 올림·건너뜀·마감 지남) · 보조 로봇 넷의 실패는 이슈로(robot-down) · tee 단계는 pipefail
+467c27b0 공공 API·작성 규칙 학습 — 회복하면 경보를 닫는다(출처가 모두 ✅ 면 🛰 알림 닫기 · 새 📘 리포트가 옛 리포트를 넘겨받고 성공하면 🚨 닫기) · 작성 규칙 학습은 시간 초과에도 리포트하고 실패는 robot-down
+6e1501f4 화면 검사 빨간불 경보를 경보 도구로 — 두 브랜치 실행이 같은 초에 둘을 만들던 것(#389·#390)을 다시 보아 큰 번호를 닫는다 · 경보 도구·규칙 파일만 고친 커밋에도 화면 검사가 돈다
+65252600 실제 앱 반영 확인 — 앱 스크립트의 fetch·getDoc 에서 받는 파일을 뽑아 지문으로 대조하고(손 목록 금지) · 어긋나면 3분 뒤 main 을 다시 받아 한 번 더 · 경보는 하나에 모으고 같아지면 닫는다
+fa0b40ac 교내 소식 로봇 경보 — 감사·수집 단계·사진 단계 경보는 이슈 하나에 모이고 회복하면 닫힌다 · 넘어짐은 robot-down · 리포트는 사람 손이 필요할 때만(수동 실행만으로는 안 연다)
+abee0e56 링크 사냥꾼·공고 누락 감사 — 결과는 이슈 하나에 모으고(고정 제목 · 라벨은 도구가 만든다) 실패는 robot-down 으로 사람에게 닿게
+fec74d61 지난 리포트 정리 규칙을 한 곳(tools/report-retention.mjs)으로 — 🗞 소식·📘 작성 규칙·✅ 자격·🔍 누락 감사·🔍 정찰도 유형별 최신 건만 남기고 닫는다 · 경보·사냥꾼·인스타는 표에 없다 · 로컬 액션 앞에 체크아웃
+54d5ae03 작업 브랜치 배포가 되면 옛 '배포 실패' 경보를 닫는다 — 경보에 적힌 브랜치가 전부 main 에 들어갔을 때만(compare ahead_by 0 · 모름은 둔다)
+d5831a14 하트비트가 다시 선 로봇의 넘어짐 경보를 닫는다(--close-recovered) — 그 로봇의 마지막 성공이 경보를 낸 실행보다 뒤에 시작됐을 때만 · 못 읽으면 둔다
+590a4d59 경보 이슈 한 곳(tools/alert-issue.mjs · 공용 액션 alert-issue) — 라벨이 아니라 제목으로 찾아 댓글, 같은 초 중복은 닫고, 회복하면 resolve 로 닫는다 · robot-down 도 이 도구를 쓰고 실패하면 옛 gh 길로 물러난다
+362aa49f Merge remote-tracking branch 'origin/claude/nice-heisenberg-WESq5' into claude/start-work-9737a2
+d3163c20 시작 화면: 켤 때마다 학사모 인트로 → 페이드 · 끊김 수리 (2026-10-04 개발자 지적)
+14fe37c7 미래에셋 해외교환 제36기(두 번째 등록분) 마감 2026-10-06 — 원문 '4. 선발일정: 온라인 지원 (서류 접수) 9.30(수) 10:00 ~10.6(화) 15:00' (노션 G-3 · 관리자 저장 경로)
+db606a7b 마감일: 이름표와 날짜가 다른 줄이어도 읽는다 (노션 G-3)
+98a53c70 Merge remote-tracking branch 'origin/claude/nice-heisenberg-WESq5' into claude/start-work-9737a2
+2a69b116 Pages 깨우기 — 손 단추 없음(관리자 로봇 목록 관문 · 빌드가 빠지면 check-deploy-sync 가 명령을 보여 준다)
+f4285e4a 원문 링크 확인 — 문제 확정 10건 · 원문 바로잡기 14건
+b6f0ce31 Merge branch 'fix/ci' into fix/alerts
+62707e09 main push 마다 Pages 빌드를 한 번 요청한다 — 사람 push 가 빌드를 안 일으킨 일이 이틀 연속(학생 앱이 옛 판에 머묾)
+15c34ef1 화면 검사 관문 ① — 표본 심기 전 이른 반환을 글자 하나가 아니라 몸통을 잘라 잰다
+9a22cb56 화면 검사 워크플로 — 앞의 값싼 관문이 넘어져도 드라이버·전 여정이 돌고, 경보는 화면 검사가 돌았는지부터 가른다
+5c546b21 Merge remote-tracking branch 'origin/claude/nice-heisenberg-WESq5' into claude/start-work-9737a2
+777cdf8b 카드 제목의 날짜·기간을 한 곳(splitTitleDates)에서 — 정식 등록·대외활동·게시판/재단/소식 카드 세 갈래가 같은 규칙 · 섞인 괄호는 날짜 조각만 · 뗀 마감은 D-day 없는 카드의 회색 줄로 · 소식 제목 꼬리 소급 + 감사가 소식도 본다 · 보도자료가 활동으로 실린 1건 숨김
+78cdcb88 자격요건 로봇: 장학 본문 재수집 · 대외활동 브라우저 자격
+9fc30068 로봇·도구 점검 관문 ci 묶음 — 화면 검사 그물이 데이터 탓으로 걷히지 않는가 (verify/health-gates/ci.mjs)
+da5dbc36 양식을 고친 그날 '종류를 모르는 자기소개서 칸'을 데이터 감사가 경고한다 (주간 검사와 같은 함수 한 곳)
+e04eb92e 작업 브랜치 배포 뒤 화면 검사를 깨운다 — 이 워크플로의 push 는 다른 워크플로를 못 깨워 검사 없이 앱에 나갈 수 있었다
+6c394198 화면 검사 워크플로 — 드라이버 하나가 넘어져도 끝까지 돌고 뒤 관문 셋도 같은 실행에서 돈다
+30b78c7a 화면 검사 양식 표본 — 고르는 규칙을 순수 함수 한 곳(verify/open-form-sample.cjs)으로 · 양식 공고가 하나도 안 남는 날은 앱 내장 양식으로
+85069850 Merge remote-tracking branch 'origin/claude/nice-heisenberg-WESq5' into claude/start-work-9737a2
+c589257f 배포 감시가 Pages 빌드까지 본다 — main push 셋이 Pages 빌드를 안 일으켜 홈 새 구역이 안 떴는데 ✅ 라고 말했다(2026-10-04 · 수동 빌드 요청으로 반영)
+b6fb9997 정찰 2차 — 서울시립대 장학 안내 주소 · 동국대 WISE 공지사항 (1차 답 받음 주석 · 홍익대는 봇 차단 화면)

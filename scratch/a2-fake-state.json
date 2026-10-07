@@ -1,0 +1,79 @@
+{
+ "labels": [],
+ "issues": [
+  {
+   "number": 386,
+   "title": "🚨 로봇이 넘어졌어요 — 원문 링크 복구 로봇",
+   "body": "실행 로그: https://github.com/o/r/actions/runs/37141082198",
+   "state": "closed",
+   "created_at": "2026-10-03T17:36:00Z",
+   "state_reason": "completed"
+  },
+  {
+   "number": 400,
+   "title": "🚨 로봇이 넘어졌어요 — 링크 사냥꾼",
+   "body": "실행 로그: https://github.com/o/r/actions/runs/500",
+   "state": "open",
+   "created_at": "2026-10-03T17:36:00Z"
+  },
+  {
+   "number": 401,
+   "title": "🚨 로봇이 넘어졌어요 — 공고 누락 감사",
+   "body": "실행 로그: https://github.com/o/r/actions/runs/700",
+   "state": "open",
+   "created_at": "2026-10-03T17:36:00Z"
+  },
+  {
+   "number": 402,
+   "title": "🚨 로봇이 넘어졌어요 — 없는 로봇",
+   "body": "",
+   "state": "open",
+   "created_at": "2026-10-03T17:36:00Z"
+  },
+  {
+   "number": 403,
+   "title": "🚨 로봇이 넘어졌어요 — 실제 앱 반영 확인",
+   "body": "x /actions/runs/800",
+   "state": "open",
+   "created_at": "2026-10-03T17:36:00Z"
+  }
+ ],
+ "comments": {
+  "386": [
+   {
+    "body": "✅ 2026-10-05 17:48 KST — **원문 링크 복구 로봇** 이 다시 끝까지 돌았습니다(경보 뒤에 시작한 실행이 성공 · https://github.com/o/r/actions/runs/37141332557). 넘어짐 경보를 닫습니다. 다시 넘어지면 새로 알립니다. (로봇 하트비트 · 자동)",
+    "user": {
+     "type": "Bot"
+    },
+    "created_at": "2026-10-05T08:48:04.500Z"
+   }
+  ],
+  "400": [
+   {
+    "body": "다시 넘어짐 /actions/runs/650",
+    "user": {
+     "type": "Bot"
+    },
+    "created_at": "2026-10-03T18:30:00Z"
+   }
+  ]
+ },
+ "runs": {
+  "resolve-detail-urls.yml": {
+   "id": 37141332557,
+   "run_started_at": "2026-10-03T17:40:00Z",
+   "updated_at": "2026-10-03T17:58:00Z"
+  },
+  "link-hunter.yml": {
+   "id": 600,
+   "run_started_at": "2026-10-03T18:00:00Z",
+   "updated_at": "2026-10-03T18:10:00Z"
+  },
+  "audit-coverage.yml": {
+   "id": 700,
+   "run_started_at": "2026-10-03T17:30:00Z",
+   "updated_at": "2026-10-03T17:40:00Z"
+  },
+  "check-live.yml": "error"
+ }
+}

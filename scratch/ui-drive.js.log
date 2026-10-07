@@ -1,0 +1,46 @@
+STEP title: 한대장 — 한국 대학교 장학금, 한 번에 | h1: 한 곳에서 찾고한 번에 신청
+STEP school suggestions for 외대: 한국외국어대학교
+STEP school picked: 한국외국어대학교
+STEP school suggestions for 서울: 서울대학교, 서울시립대학교, 서울과학기술대학교, 서울교육대학교, 서울기독대학교, 서울신학대학교, 서울여자대학교, 서울장신대학교, 서울한영대학교, 서울예술대학교, 남서울대학교
+STEP campus chips: 서울캠퍼스 | 글로벌캠퍼스(용인)
+STEP major suggestions for 스페인: 스페인어과
+STEP major picked: 스페인어과
+STEP checkbox check visible (bg-image): yes
+STEP home: 최대 9,363만원 / 한국외국어대학교 · 글로벌캠퍼스(용인)
+STEP home campus shown: true
+STEP wallet saved: 없음
+STEP doc-prep questions shown, defaults preselected: 4 chips
+STEP draft preview (first 130 chars): [인적사항] / 한국외국어대학교 스페인어과 3학년 이선주 / 학번 202312345 · 연락처 010-1234-5678 · test@hufs.ac.kr /  / [지원 동기] / 안녕하세요. 한국외국어대학교 스페인어과 3학년 이선주입니다. 한국장학재단
+STEP cert checklist: ✓ 성적증명서 — 보관함에서 자동 첨부 · grade-cert.png
+STEP toast after confirm shows official channel
+STEP applied detail official link: 2026.10.05 준비 완료 · 최종 제출처: 한국장학재단
+STEP saved docs section exists: 1
+STEP submit guide steps: 4
+STEP copy toast: 복사 완료 · 공식 신청 페이지에 붙여넣기
+STEP share button exists: 1
+STEP bulk list rows: 26 | 홈 버튼이 말한 건수: 26 (일치)
+STEP bulk summary: 선택 26건 · 최대 6,990만원 · 금액 미확인 7건 제외
+STEP bulk more badges: 2 | meta 줄: 3 | 자격 원문 줄: 0
+STEP bulk after uncheck: 선택한 25건 준비하기 | 뺀 줄 흐려짐: 1
+STEP 뺀 공고가 신청내역에 담겼나 (false 여야 정상): false
+STEP apps total: 26 | pending(서류 작성 필요): 1
+STEP apps summary: 준비 완료 25건 · 서류 작성 필요 1건 예상 최대 수혜액 7,590만원 제출·발표는 각 공식 채널에서 · 결과는 여기에 기록 · 금액 미확인 6건 제외
+STEP pending detail btn: 서류 작성 이어서 하기
+STEP pending flow kind: ff
+STEP pending resolved, remaining pending: 0
+STEP my profile: 이
+      이선주 님학적정보 수정 ›
+    
+    
+      사진 올리기
+        
+      
+      
+    
+    
+    한국외국어대학
+STEP my has undefined/NaN (없어야 정상): false
+PROBE reload lands on home: false
+PROBE storage key v1 has common info: true
+PROBE corrupted storage -> onboarding, no crash: true
+ERRORS: none

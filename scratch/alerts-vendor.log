@@ -1,0 +1,7 @@
+■ 관리자 화면 빠진 이웃 검사 — /home/user/hanggonggan/.claude/worktrees/wf_6db34be4-346-6/_admin/dist
+  훑은 스크립트 16개: admin.js · vendor/activity-kind.mjs · vendor/apply-channel.js · vendor/canon-url.mjs · vendor/data.js · vendor/deadline-hint.mjs · vendor/edit-diff.mjs · vendor/entry-rules.js · vendor/form-plan.js · vendor/forms.js · vendor/link-fix.mjs · vendor/news-kind.mjs · vendor/notice-source.mjs · vendor/page-boilerplate.mjs · vendor/source-link.js · vendor/url-key.mjs
+  index.html 의 <script src> 도 함께 본다 (고전 스크립트는 import 그래프에 없다)
+✓ 빠진 이웃 없음 — 모든 import 가 짝을 찾았습니다
+
+■ CI 감시 범위 — vendor 로 옮기는 collector 원본 9개
+  ✓ 전부 감시 범위 안: collector/url-key.mjs · collector/deadline-hint.mjs · collector/notice-source.mjs · collector/canon-url.mjs · collector/page-boilerplate.mjs · tools/edit-diff.mjs · collector/activity-kind.mjs · collector/news-kind.mjs · collector/link-fix.mjs

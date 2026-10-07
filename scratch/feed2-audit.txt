@@ -1,0 +1,90 @@
+금액 근거: 원문 발췌 71건 · 발췌 없이 숫자만 3건
+감사 대상: 정식 등록 164건 · 양식 56종
+
+[경고 — 소급 적용 필요 항목]
+ ⚠ registered:reg-hi-jeju — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:reg-khu-uiam — 학생이 원문 보기를 눌러도 그 공고로 못 가고 게시판 목록이 열립니다 (원문 주소를 아직 못 찾았습니다)
+ ⚠ registered:reg-hi-jeongeup — 학생이 원문 보기를 눌러도 그 공고로 못 가고 게시판 목록이 열립니다 (원문 주소를 아직 못 찾았습니다)
+ ⚠ registered:reg-khu-intern — 학생이 원문 보기를 눌러도 그 공고로 못 가고 게시판 목록이 열립니다 (원문 주소를 아직 못 찾았습니다)
+ ⚠ registered:auto-rnoticedoarticleno154473 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:reg-partner-foundation — formId도 noForm도 없음 — 양식을 연결하거나 양식 없음 사유를 기재하세요
+ ⚠ registered:reg-partner-foundation — 신청서류 첨부(미래의동반자재단 장학금 신청서(학생용) 2026-2 골…)가 있는데 양식 미등록
+ ⚠ registered:auto-ent2431263956artclviewdo — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-9599ec839d20ec84a0ebb09c — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-ent2431266533artclviewdo — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-99ec839d20ec84a0ebb09c20 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-oardid323011menuno200318 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-ent2431265667artclviewdo — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-ent2431264946artclviewdo — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-oardid322922menuno200318 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-oardid322875menuno200318 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-oardid322874menuno200318 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-20ec9588eb82b40922ed9994 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-oardid323199menuno200318 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-kuk2351206961artclviewdo — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-larshipdoarticleno375940 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-larshipdoarticleno375827 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-larshipdoarticleno375968 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-larshipdoarticleno375935 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-larshipdoarticleno375792 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-2427viewdocurrentpageno1 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-2373viewdocurrentpageno1 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-bbssc58944123artclviewdo — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-bbssc58944072artclviewdo — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-aaa8eca79120eab3b5eab3a0 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-nuid100nttid30176ptabno5 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-nuid100nttid30159ptabno5 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-nuid100nttid30154ptabno5 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-nuid100nttid30130ptabno5 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-enoticedoarticleno768425 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-srchenable1srchvotetype1 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-2387viewdocurrentpageno1 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-2385viewdocurrentpageno1 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-2349viewdocurrentpageno1 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-orykeywordpaged1slug2026 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-rykeywordpaged1slug20262 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-eba79dec82aceb8ba4eba6ac — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-8eca79120ec9588eb82b4202 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-o2432actionviewno9994682 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-pnoticedoarticleno367130 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-pnoticedoarticleno366829 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-onttid000100000000003862 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-larshipdoarticleno376795 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-993detailviewdocategory6 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-leno275978srcategoryid22 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-notiphpcodes1301seq11234 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-bsid1083mi3004nttid55323 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-oardid323225menuno200318 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-enoticedoarticleno769228 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-0005009002000000seq31569 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-pnoticedoarticleno367194 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-dmodeviewduid53299tpage1 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-lviewdocategory6menu2377 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-dmodeviewduid53420tpage1 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-notiphpcodes1301seq11156 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-hkrwdsfpnos1073sfpnos888 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered:auto-0bnum57138cate0qidx57138 — 지원 자격을 아직 못 읽었습니다 — 학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다
+ ⚠ registered — 같은 공고 이중 등록 의심: auto-larshipdoarticleno375940('[공지] 2026학년도 2학기 퇴직교직원자녀장학') ↔ auto-larshipdoarticleno375827('[공지] 2026학년도 2학기 가족장학 신청 안')
+ ⚠ forms:auto-동산장학회-장학생-선발-apply — 질문 상한 초과: 직접 입력 14개 (상한 10) (직접입력 14·클릭 1·전체 15) — 병합하거나 원본과 대조해 정리가 필요합니다
+ ⚠ forms:auto-이원길-장학금-apply — 질문 상한 초과: 직접 입력 14개 (상한 10) (직접입력 14·클릭 3·전체 17) — 병합하거나 원본과 대조해 정리가 필요합니다
+ ⚠ 자격 품질: reg-hufs-myeonhak [금액 안내가 자격으로] 10학기 이하 후기 이중전공자는 등록금 전액 납부 시 신청 가능 — 지원 자격 자리에 요건이 아닌 줄이 있습니다
+ ⚠ 자격 품질: auto-c839d20ec84a0ebb09c20202 [선발인원이 자격으로] 서울 소재 대학교 또는 비서울 소재 대학교(서울시민) 재학생 228명 내외 — 지원 자격 자리에 요건이 아닌 줄이 있습니다
+ ⚠ 자격 품질: auto-otice06doarticleno140261 [브라우저 제목줄이 섞여 들어옴] 공지사항 게시판읽기 ([ 한국장학재단 ] 2026학년도 2학기 중소기업 취업연계 (희망사다리1유형) 신규장학생 선발기준 안내) | 성균관대학교 — 지원 자격 자리에 요건이 아닌 줄이 있습니다
+ ⚠ 자격 품질: reg-partner-foundation [같은 줄이 자격·제외 두 칸에] 2026년 2학기 기준 1학년 또는2학년 학생 (2026년 2학기 휴학생 및 휴학 예정자 지원 불가) — 줄이 엉뚱한 칸에 있습니다
+ ⚠ 자격 품질: reg-partner-foundation [같은 줄이 자격·제외 두 칸에] 경영학 또는 경제학 전공 학생 — 줄이 엉뚱한 칸에 있습니다
+ ⚠ 자격 품질: reg-partner-foundation [같은 줄이 자격·제외 두 칸에] 한국장학재단 산정 기준 소득분위 9분위 이하 (2026년 2학기 기준을 원칙으로 하며, 미확정 시 최근 학기 기준 자료 제출 가능) — 줄이 엉뚱한 칸에 있습니다
+ ⚠ 자격 품질: auto-notiphpcodes1301seq11207 [자격 칸만 비어 있다 (절 가르기 의심)] 선발 1줄 · 제외 0줄 — 줄이 엉뚱한 칸에 있습니다
+ ⚠ 자격 품질: auto-notice7doarticleno894170 [자격 칸만 비어 있다 (절 가르기 의심)] 선발 1줄 · 제외 1줄 — 줄이 엉뚱한 칸에 있습니다
+ ⚠ registered:reg-sejong-didim — 금액 1,000,000원의 원문 발췌가 없습니다 (원문이 첨부·제목에만 있는 공고 — 화면은 원문 링크를 줍니다)
+ ⚠ registered:reg-dongsan — 금액 8,000,000원의 원문 발췌가 없습니다 (원문이 첨부·제목에만 있는 공고 — 화면은 원문 링크를 줍니다)
+ ⚠ registered:auto-kuk2351202780artclviewdo — 금액 1,000,000원의 원문 발췌가 없습니다 (원문이 첨부·제목에만 있는 공고 — 화면은 원문 링크를 줍니다)
+ ⚠ registered:auto-ent2431267935artclviewdo — 자격 줄이 조각나 보입니다 (원문 줄바꿈일 수 있음 — 원문을 열어 확인하세요): "2026-2학기 재학생 중 4 촌 이내 친인척이 3 인 (본인포함) 이상 한국외대 학부과정의 동문인 경우"
+ ⚠ registered:auto-krbbskr845644artclviewdo — 자격 줄이 조각나 보입니다 (원문 줄바꿈일 수 있음 — 원문을 열어 확인하세요): "(단, 이번 학기 8차 학기인 경우 직전 정규학기 12학점 이상 신청하고 9학점 이상 취득."
+ ⚠ registered — 정식 등록을 **학교별 파일로 나눌 때입니다.** 지금 한 학생이 남의 학교 공고로만 186KB 를 받습니다(학교 36곳 · 전국분 137KB 은 모두가 받아야 합니다). 실시간 공고·학과 목록과 같은 방식입니다 — 전국분 파일 하나 + 학교별 파일. 이름 규칙은 match-engine.js 에, 발행은 collector/publish-notices.mjs 를 본뜨면 됩니다 (왜 2026-09-26에는 미뤘는지: SESSIONS.md 「첫 화면에서 받는 양 절반으로」)
+ ⚠ registered — 첨부가 javascript: 내려받기 스크립트인 공고 2건 — 앱은 링크 없이 이름만 보입니다: auto-5bnum57138cate0qidx57138, auto-094bnum5233cate0qidx5233
+ ⚠ notices(학교별) — 첨부가 javascript: 내려받기 스크립트인 공고 16건 — 앱은 링크 없이 이름만 보입니다: [보건진료소] 2026학년도 2학기 국가근로, [발전기금] 2026학년도 2학기 조형도동문, (홍보) 2026년 하반기 제36기 미래에셋 외 13
+ ⚠ activities — 첨부가 javascript: 내려받기 스크립트인 공고 13건 — 앱은 링크 없이 이름만 보입니다: 2026년 강북창업지원센터 10월 창업 교육, 2026년 경기 스타트업 아카데미 딥테크 세, 2026년 체육인 직업안정 사업(창업지원)  외 10
+
+real	0m4.158s
+user	0m4.303s
+sys	0m0.254s

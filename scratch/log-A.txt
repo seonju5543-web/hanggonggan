@@ -1,0 +1,115 @@
+— 앱이 실제로 받는 파일도 확인: data/notices/index.json data/notices/nsgh1oi.json data/notices/n14n199r.json data/notices/n1iz3lr8.json data/notices/nzzc8bm.json data/notices/n1x6ubj9.json data/notices/n16dvfry.json data/notices/n1mo5fbn.json data/notices/n1tk2q9m.json data/notices/n174lvh5.json data/notices/ntxxf09.json data/notices/n18ebv4b.json data/notices/n12kfbyt.json data/notices/ncuyr4z.json data/notices/n1w4hprp.json data/notices/n1nel147.json data/notices/n6xhy7d.json data/notices/n1tasrsl.json data/notices/nkeh7pq.json data/notices/nf097dk.json data/notices/nlzhvsh.json data/notices/nmljo8t.json data/notices/ntyl0r5.json data/notices/nmpm6i7.json data/notices/n1or8oiw.json data/notices/n1ozjjw8.json data/notices/n1lw6ycq.json data/notices/n19cz03g.json data/notices/nz3ew5y.json data/notices/nwqmwga.json data/notices/n1au199v.json data/notices/n14kv35j.json data/notices/n1qr99q6.json data/notices/n1nesasz.json data/notices/n13zozby.json data/notices/n1a4mxa4.json data/notices/n1as48ix.json data/majors/n19cz03g.json data/majors/n1nz11jj.json data/news/index.json data/news/n14kv35j.json data/news/n14n199r.json data/news/n18ebv4b.json data/news/n1ch7t87.json data/news/n1tk2q9m.json data/news/nf097dk.json data/news/nsgh1oi.json data/news/n13zozby.json data/news/n16dvfry.json data/news/n1iz3lr8.json data/news/n1lw6ycq.json data/news/n1nel147.json data/news/n1tasrsl.json data/news/nkeh7pq.json data/news/n16l2078.json data/news/n174lvh5.json data/news/n19cz03g.json data/news/n1as48ix.json data/news/n1au199v.json data/news/n1b3og5n.json data/news/n1mo5fbn.json data/news/n1nesasz.json data/news/n1or8oiw.json data/news/n1ozjjw8.json data/news/n1qr99q6.json data/news/n1uf7bji.json data/news/n1w4hprp.json data/news/n1x6ubj9.json data/news/n2we95k.json data/news/n6xhy7d.json data/news/ncuyr4z.json data/news/nl1xm19.json data/news/nlzhvsh.json data/news/nmljo8t.json data/news/ntxxf09.json data/news/ntyl0r5.json data/news/nv8pha4.json data/news/nwqmwga.json data/news/nz3ew5y.json data/news/n12kfbyt.json data/news/n1a4mxa4.json data/news/n1if6uwu.json data/news/nmpm6i7.json data/news/nzzc8bm.json data/news/img/d51a4a96048d74ef.webp data/news/img/36248fd565055fcc.webp data/news/img/fd6b7e68f141ae29.webp data/link-check.json data/link-fixes.json assets/schools/photos.json assets/schools/nmljo8t-32d62b57.webp —
+— 앱 스크립트가 받는 그 밖의 파일: assets/gates/gates.json data/activities.json data/essay-form-rules.json data/essay-playbook.json data/external.json data/kosaf-open.json data/search-index.json data/tuition.json terms.html —
+— 캐시 응답 헤더(참고) —
+
+항목             저장소(main)   실제 앱   결과
+서비스워커 버전         handaejang-v223 handaejang-v223 ✅ 같음
+실시간 공고(옛)        346           346       ✅ 같음
+정식 등록            164           164       ✅ 같음
+양식               56            56        ✅ 같음
+공고 색인 index.json 4             4         ✅ 같음
+공고(학교별) nsgh1oi.json 9             9         ✅ 같음
+공고(학교별) n14n199r.json 23            23        ✅ 같음
+공고(학교별) n1iz3lr8.json 17            17        ✅ 같음
+공고(학교별) nzzc8bm.json 20            20        ✅ 같음
+공고(학교별) n1x6ubj9.json 4             4         ✅ 같음
+공고(학교별) n16dvfry.json 14            14        ✅ 같음
+공고(학교별) n1mo5fbn.json 6             6         ✅ 같음
+공고(학교별) n1tk2q9m.json 11            11        ✅ 같음
+공고(학교별) n174lvh5.json 13            13        ✅ 같음
+공고(학교별) ntxxf09.json 12            12        ✅ 같음
+공고(학교별) n18ebv4b.json 11            11        ✅ 같음
+공고(학교별) n12kfbyt.json 1             1         ✅ 같음
+공고(학교별) ncuyr4z.json 3             3         ✅ 같음
+공고(학교별) n1w4hprp.json 3             3         ✅ 같음
+공고(학교별) n1nel147.json 40            40        ✅ 같음
+공고(학교별) n6xhy7d.json 5             5         ✅ 같음
+공고(학교별) n1tasrsl.json 19            19        ✅ 같음
+공고(학교별) nkeh7pq.json 24            24        ✅ 같음
+공고(학교별) nf097dk.json 3             3         ✅ 같음
+공고(학교별) nlzhvsh.json 4             4         ✅ 같음
+공고(학교별) nmljo8t.json 16            16        ✅ 같음
+공고(학교별) ntyl0r5.json 1             1         ✅ 같음
+공고(학교별) nmpm6i7.json 1             1         ✅ 같음
+공고(학교별) n1or8oiw.json 15            15        ✅ 같음
+공고(학교별) n1ozjjw8.json 4             4         ✅ 같음
+공고(학교별) n1lw6ycq.json 9             9         ✅ 같음
+공고(학교별) n19cz03g.json 3             3         ✅ 같음
+공고(학교별) nz3ew5y.json 8             8         ✅ 같음
+공고(학교별) nwqmwga.json 2             2         ✅ 같음
+공고(학교별) n1au199v.json 2             2         ✅ 같음
+공고(학교별) n14kv35j.json 17            17        ✅ 같음
+공고(학교별) n1qr99q6.json 1             1         ✅ 같음
+공고(학교별) n1nesasz.json 1             1         ✅ 같음
+공고(학교별) n13zozby.json 3             3         ✅ 같음
+공고(학교별) n1a4mxa4.json 2             2         ✅ 같음
+공고(학교별) n1as48ix.json 19            19        ✅ 같음
+학과(학교별) n19cz03g.json 175           175       ✅ 같음
+학과(학교별) n1nz11jj.json 23            23        ✅ 같음
+소식 색인 index.json 4             4         ✅ 같음
+소식(학교별) n14kv35j.json 12            12        ✅ 같음
+소식(학교별) n14n199r.json 8             8         ✅ 같음
+소식(학교별) n18ebv4b.json 10            10        ✅ 같음
+소식(학교별) n1ch7t87.json 8             8         ✅ 같음
+소식(학교별) n1tk2q9m.json 19            19        ✅ 같음
+소식(학교별) nf097dk.json 19            19        ✅ 같음
+소식(학교별) nsgh1oi.json 20            20        ✅ 같음
+소식(학교별) n13zozby.json 14            14        ✅ 같음
+소식(학교별) n16dvfry.json 19            19        ✅ 같음
+소식(학교별) n1iz3lr8.json 9             9         ✅ 같음
+소식(학교별) n1lw6ycq.json 11            11        ✅ 같음
+소식(학교별) n1nel147.json 20            20        ✅ 같음
+소식(학교별) n1tasrsl.json 15            15        ✅ 같음
+소식(학교별) nkeh7pq.json 14            14        ✅ 같음
+소식(학교별) n16l2078.json 18            18        ✅ 같음
+소식(학교별) n174lvh5.json 8             8         ✅ 같음
+소식(학교별) n19cz03g.json 10            10        ✅ 같음
+소식(학교별) n1as48ix.json 13            13        ✅ 같음
+소식(학교별) n1au199v.json 15            15        ✅ 같음
+소식(학교별) n1b3og5n.json 12            12        ✅ 같음
+소식(학교별) n1mo5fbn.json 16            16        ✅ 같음
+소식(학교별) n1nesasz.json 15            15        ✅ 같음
+소식(학교별) n1or8oiw.json 9             9         ✅ 같음
+소식(학교별) n1ozjjw8.json 9             9         ✅ 같음
+소식(학교별) n1qr99q6.json 15            15        ✅ 같음
+소식(학교별) n1uf7bji.json 15            15        ✅ 같음
+소식(학교별) n1w4hprp.json 8             8         ✅ 같음
+소식(학교별) n1x6ubj9.json 30            30        ✅ 같음
+소식(학교별) n2we95k.json 10            10        ✅ 같음
+소식(학교별) n6xhy7d.json 40            40        ✅ 같음
+소식(학교별) ncuyr4z.json 14            14        ✅ 같음
+소식(학교별) nl1xm19.json 9             9         ✅ 같음
+소식(학교별) nlzhvsh.json 29            29        ✅ 같음
+소식(학교별) nmljo8t.json 10            10        ✅ 같음
+소식(학교별) ntxxf09.json 18            18        ✅ 같음
+소식(학교별) ntyl0r5.json 18            18        ✅ 같음
+소식(학교별) nv8pha4.json 9             9         ✅ 같음
+소식(학교별) nwqmwga.json 12            12        ✅ 같음
+소식(학교별) nz3ew5y.json 7             7         ✅ 같음
+소식(학교별) n12kfbyt.json 6             6         ✅ 같음
+소식(학교별) n1a4mxa4.json 9             9         ✅ 같음
+소식(학교별) n1if6uwu.json 10            10        ✅ 같음
+소식(학교별) nmpm6i7.json 11            11        ✅ 같음
+소식(학교별) nzzc8bm.json 7             7         ✅ 같음
+소식 사진 d51a4a96048d74ef.webp 18592         18592     ✅ 같음
+소식 사진 36248fd565055fcc.webp 20322         20322     ✅ 같음
+소식 사진 fd6b7e68f141ae29.webp 14206         14206     ✅ 같음
+원문 링크 확인 link-check.json 0건+12@2026-10-04T10:28 0건+12@2026-10-04T10:28 ✅ 같음
+원문 바로잡기 link-fixes.json 16건@2026-10-04 22:43 16건@2026-10-04 22:43 ✅ 같음
+학교 사진 목록 photos.json 44            44        ✅ 같음
+학교 사진 nmljo8t-32d62b57.webp 48996         48996     ✅ 같음
+앱이 받는 파일 assets/gates/gates.json 5122B#a65b16ef 5122B#a65b16ef ✅ 같음
+앱이 받는 파일 data/activities.json 219243B#a4d3a31a 219243B#a4d3a31a ✅ 같음
+앱이 받는 파일 data/essay-form-rules.json 2542B#fb418aea 2542B#fb418aea ✅ 같음
+앱이 받는 파일 data/essay-playbook.json 22136B#7aa4b4e5 22136B#7aa4b4e5 ✅ 같음
+앱이 받는 파일 data/external.json 23588B#c310db93 23588B#c310db93 ✅ 같음
+앱이 받는 파일 data/kosaf-open.json 192533B#440d59eb 192533B#440d59eb ✅ 같음
+앱이 받는 파일 data/search-index.json 39325B#d67ac0aa 39325B#d67ac0aa ✅ 같음
+앱이 받는 파일 data/tuition.json 48000B#35a4e00a 48000B#35a4e00a ✅ 같음
+앱이 받는 파일 terms.html 24002B#fdd77587 24002B#fdd77587 ✅ 같음
+색인 지문 notices/index.json 2966B#509a8e2c 2966B#509a8e2c ✅ 같음
+색인 지문 news/index.json 3547B#30d9c3dc 3547B#30d9c3dc ✅ 같음
+앱 코드 내려받기 ✅ 정상
+
+✅ 배포된 앱이 저장소와 같습니다 — 사용자는 재설치 없이 최신 내용을 봅니다.
+rc=0

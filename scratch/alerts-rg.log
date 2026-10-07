@@ -1,0 +1,38 @@
+OK  ① planAlert 를 라벨만 보고 첫 이슈로 → red: ✕   같은 라벨을 쓰는 **다른 로봇** 경보와 섞지 않는다(라벨이 아니라 제목으로 찾는다) → green exit 0
+OK  ① 같은 초 중복을 안 닫음 → red: ✕   같은 초에 둘(#389·#390 꼴) — 작은 번호에 댓글 · 큰 번호는 닫는다 → green exit 0
+OK  ① robot-down 을 옛 검색 길만으로 → red: ✕   robot-down 이 경보 도구를 **제목 그대로**(exact) 부르고 · 실패하면 옛 gh 길로 물러난다 · 제목 꼴은 그대로 → green exit 0
+OK  ② news 규칙을 표에서 뺌 → red: ✕ ② 14일 지난 🗞 소식 리포트 다섯 — 최신 셋은 남기고 둘만 → green exit 0
+OK  ② 🚨 를 고르는 규칙을 넣음 → red: ✕   🚨·🔧·📸·🛰·🎨 는 아무리 오래돼도 안 고른다(경보·사냥꾼·인스타는 각자 닫는 길이 있다) → green exit 0
+OK  ② close-old-reports 를 옛 jq 두 종류로 → red: ✕   close-old-reports 가 규칙 한 곳(tools/report-retention.mjs)을 부르고 · 옛 두 종류 jq 정규식이 없다 · 목록 상 → green exit 0
+OK  ③ robotDownVerdicts 가 createdAt 만 봄 → red: ✕   성공 뒤 17:59 에 다시 넘어진 봇 댓글 → 둔다 → green exit 0
+OK  ③ 경보를 낸 그 실행의 초록을 회복으로 읽음(updated 기준) → red: ✕   경보를 낸 **바로 그 실행**이 초록으로 끝난 것(단계 실패를 넘김)은 닫지 않는다 → green exit 0
+OK  ③ 하트비트 닫기 단계 지움 → red: ✕   하트비트 워크플로가 닫기 단계를 돌린다(보강 — 시한 · 실패해도 판정은 그대로) → green exit 0
+OK  ④ getDoc 갈래를 정규식에서 뺌 → red: ✕ ④ fetchPathsIn — 글자 그대로인 상대 경로만(getDoc 포함 · 변수·템플릿·바깥 주소 제외) → green exit 0
+OK  ④ check-live 에서 require 지움 → red: ✕   check-live 가 앱 스크립트에서 목록을 뽑고(손 목록 금지) 지문으로 대조한다 → green exit 0
+OK  ④ check-live 다시 보기 고리 지움 → red: ✕   어긋나면 3분 뒤 main 을 다시 받아 한 번 더 본다(Pages 배포 중 헛경보) → green exit 0
+OK  ④ check-live resolve 단계 조건 바꿈 → red: ✕   어긋남은 경보 한 곳(prefix · live-check) · 같아지면 닫는다 · 맨몸 gh issue create 없음 → green exit 0
+OK  ⑤ 옛 「코드 1개 이하」 규칙 → red: ✕   (A 마감 지남, D 마감 지남, E 올림) → 닫는다 · (A, B) → 둔다 · (C 건너뜀) → 닫는다 · (F 마감 없음) → 둔다 → green exit 0
+OK  ⑤ insta.yml 준비 끝 닫기 단계 지움 → red: ✕   insta.yml — 게시·건너뛰기의 정리는 살아 있는 카드 수로(옛 「1건 이하」 규칙 없음) · 준비 끝에 쓸모없어진 이슈 닫기 → green exit 0
+OK  ⑥ S1 link-hunter 를 옛 gh --label 로 → red: ✕   S1 모든 워크플로·액션 — `gh issue create --label X` 면 같은 파일에 `gh label create X` 가 있다(없으면 gh 가 → green exit 0
+OK  ⑥ S2 close-old-reports 체크아웃 뺌 → red: ✕   S2 모든 워크플로 — 로컬 액션(./.github/actions/…)보다 앞에 actions/checkout 이 있다(job 마다) → green exit 0
+OK  ⑥ S3 link-hunter 실패 알림을 ::warning 로 → red: ✕   S3 모든 워크플로 — failure()·cancelled() 단계는 이슈(robot-down·alert-issue·gh issue·issues.creat → green exit 0
+OK  ⑦ insta-stats shell: bash 뺌 → red: ✕ ⑦ insta-stats.yml — `| tee` 단계는 pipefail(shell: bash 또는 set -o pipefail) — 없으면 node 가 넘어 → green exit 0
+OK  ⑧ collect-news 감사 알림을 옛 날짜 gh 로 → red: ✕ ⑧ 감사 실패 — 경보 한 곳(날짜 붙은 새 이슈를 매번 만들지 않는다) · 다시 통과하면 닫는다 → green exit 0
+OK  ⑧ collect-news 리포트를 수동 실행마다 → red: ✕   리포트는 사람 손이 필요할 때만(수동 실행만으로는 안 연다 · 확인용 inputs.report) · 경보 도구 · 제목에 건수 없음 → green exit 0
+OK  ⑧ collect-news 실패를 옛 리포트 댓글로 → red: ✕   실패·시간초과는 robot-down(리포트 이슈가 없어도 닿는다) → green exit 0
+OK  ⑨ verify-ui 경보를 옛 라벨 찾기·만들기로 → red: ✕ ⑨ 빨간불 경보는 failure() 그대로 · 경보 도구(prefix · ui-gate)로 · 본문은 앞 단계 출력 · 맨몸 gh issue create 없음 → green exit 0
+OK  ⑩ open-api resolve 단계 지움 → red: ✕ ⑩ open-api — 출처가 모두 다시 받아지면(❌ 없음 · 정찰 아님 · success) 「🛰 공공 API 로봇 알림」을 닫는다 → green exit 0
+OK  ⑩ device-deploy 닫기 단계의 ahead_by 판정 지움 → red: ✕   device-deploy — 배포됐으면(deployed·uptodate) 옛 배포 실패 경보를 브랜치가 전부 main 에 들어갔을 때만 닫는다(모름은 둔다 → green exit 0
+OK  ⑩ essay 리포트에서 cancelled() 지움 → red: ✕   essay-playbook — 시간 초과(취소)에도 리포트 · 새 리포트가 옛 📘 를 넘겨받아 닫고 · 성공하면 🚨 를 닫는다 · 실패는 robot-dow → green exit 0
+BAD ⑪ push-check 판정 줄 지움 → red: (✕ 없음) → green exit 0
+OK  ⑪ admin-lock unknown 실패 단계 지움 → red: ✕   admin-lock-check — 판정 불가(unknown)면 그날 실행을 실패로 남긴다(며칠 이어지면 하트비트가 알린다) → green exit 0
+BAD ⑪ admin-lock 미리보기 확인 지움 → red: (✕ 없음) → green exit 0
+OK  ⑫ link-hunter 🔧 를 건수 붙은 제목으로 → red: ✕ ⑫ 링크 사냥꾼 🔧 — 경보 한 곳(라벨 link-hunter · 고정 제목 · 제목에 건수 없음) · 보강(시한·continue-on-error) → green exit 0
+OK  ⑪ push-check 판정 줄 지움 → red: ✕ ⑪ push-check — /test 응답을 읽어 실패로 끝낸다: HTTP 200 아님 · JSON 아님 · 서버 오류 · 숫자를 못 읽음 · 한 대도 못 깨 → green exit 0
+OK  ⑪ admin-lock unknown 실패 단계 지움 → red: ✕   admin-lock-check — 판정 불가(unknown)면 그날 실행을 실패로 남긴다(며칠 이어지면 하트비트가 알린다) → green exit 0
+OK  ⑪ admin-lock 미리보기 확인 지움 → red: ✕   admin-lock-check — 주소를 안 줬으면 미리보기 주소도 연다 · 열리면 경보(open=1) · 없는 미리보기는 판정에서 뺀다(매일 빨간불 금지 → green exit 0
+BAD ①실행부 담당자 막히면 다시 만들기 지움 → red: (✕ 없음) → green exit 0
+OK  ①실행부 같은 초 경합 정리 지움 → red: ✕   실행부 — 같은 초에 다른 실행이 먼저 만든 경보가 있으면 내 본문을 그쪽에 옮기고 내 것을 닫는다 → green exit 0
+OK  ①실행부 담당자 막히면 다시 만들기 지움 → red: ✕   실행부 — 라벨을 먼저 맞추고 · 담당자 지정이 막히면 담당자 없이 다시 만든다 → green exit 0
+OK  ①실행부 같은 초 경합 정리 지움 → red: ✕   실행부 — 같은 초에 다른 실행이 먼저 만든 경보가 있으면 내 본문을 그쪽에 옮기고 내 것을 닫는다 → green exit 0
+OK  ⑥ S4 insta-stats 이슈 권한 뺌 → red: ✕   S4 경보를 여는 워크플로는 이슈 쓰기 권한(issues: write)을 적어 둔다 — 없으면 경보가 403 으로 넘어진다 → green exit 0

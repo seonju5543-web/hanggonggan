@@ -1,0 +1,22 @@
+Merge branch 'fix/links' into integ/health-sweep — A줄 끝(qnotice-2 → qfeeds → links)을 기본 브랜치·B줄 합친 판 위에
+
+fix/links 는 기본 브랜치를 합치기 전 판(fix/browser) 위에서 고쳤다 — 같은 문제를 두 세션이 고친 곳과 남긴 것:
+
+① 저장된 제목에 꼬리가 남는 문제 (기본 762226e0 제목 꼬리 청소 ↔ links aca22edb·e9900d15 실린 글 제목 소급)
+   - 규칙은 기본 브랜치 cleanTitle(cutTail · 되풀이 청소) 하나 — 그대로. links 의 청소 규칙 둘(폭 없는 공백 · 끝의 「첨부파일 있음」)은 같은 cleanCore 에 얹힘
+   - 기본 쪽은 저장분을 한 번 손으로 소급하고 감사가 경고 · links 의 retitleItems 는 발행 때마다 cleanTitle 을 다시 입힌다(규칙이 아니라 '적용' — 두 벌 아님) → 둘 다 남김
+② 게시판 '껍데기' 걷기 (기본 8daf7d06 stripSiteChrome — 모든 글에 붙는 첨부 링크 ↔ links bfe46b85·d9f81626 — 본문 머리 배너 줄)
+   - 걷는 대상이 다르다(첨부 주소 ↔ 본문 줄 · page-boilerplate.mjs 를 불러 씀) → 둘 다 남김 · 자동 등록 저장 조건에 둘(chromeRemoved · lateDropped)을 다 넣음
+③ 카드 제목·윗줄 (기본 — 제목 날짜 규칙 TD_DAY·splitTitleDates ↔ links 351d1ae0 — 기관명 모름 providerUnknown)
+   - 서로 다른 함수 · verify/what-shows.mjs 와 test-collector 「카드 제목」 이 둘 다 떼어 돌리게 합침
+④ 수집기 import — cleanTitle·retitleItems(links) + detailAttachments·stripSiteChrome(기본) 한 줄씩
+
+묶음 목록(PARTS): gate · feed · bodies · browser · qnotice · qfeeds · links · ci · alerts · servers · insta · admin
+조용히 합쳐진 곳(양쪽이 바꿨지만 자리가 다름 · 중복 없음): 수집 워크플로 저장 목록(past-rounds.json) · 소식 sharp 판 고정 ·
+관리자 로봇 표 시각 · extract-excerpts(연장 첨부 마감 ↔ 낡은 접수 메일 걷기) · merge-json-union(장부 규칙 ↔ 재단 피드 다시 거름) · audit-data(제목 꼬리 ↔ 재단 거름 경고)
+워크플로 전부 중복 키·단계 id 중복 0 · 서비스워커 v225 그대로
+
+검사: health-gates 열두 묶음 전부 통과 · test-collector(DOC_GATES=1) 통과 · audit-data exit 0
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01Q8cvV7LejYVSK8g7ZP5BkW

@@ -1,0 +1,28 @@
+d2201f94f7bf374b18cd9f627c25a0ef308d33e9
+.github/workflows/collect-scholarships.yml
+collector/auto-register.mjs
+collector/collect.mjs
+collector/deepfetch.mjs
+verify/test-collector.mjs
+verify/what-shows.mjs
+
+Auto-merging .github/workflows/browser-collect.yml
+Auto-merging .github/workflows/collect-scholarships.yml
+CONFLICT (content): Merge conflict in .github/workflows/collect-scholarships.yml
+Auto-merging app.js
+Auto-merging collector/activity-excerpts.mjs
+Auto-merging collector/auto-register.mjs
+CONFLICT (content): Merge conflict in collector/auto-register.mjs
+Auto-merging collector/browser-collect.mjs
+Auto-merging collector/clean-title.mjs
+Auto-merging collector/collect.mjs
+CONFLICT (content): Merge conflict in collector/collect.mjs
+Auto-merging collector/deepfetch.mjs
+CONFLICT (content): Merge conflict in collector/deepfetch.mjs
+Auto-merging collector/extract-excerpts.mjs
+Auto-merging collector/paddle-ocr.py
+Auto-merging tools/edit-diff.mjs
+Auto-merging verify/test-collector.mjs
+CONFLICT (content): Merge conflict in verify/test-collector.mjs
+Auto-merging verify/what-shows.mjs
+CONFLICT (content): Merge conflict in verify/what-shows.mjs

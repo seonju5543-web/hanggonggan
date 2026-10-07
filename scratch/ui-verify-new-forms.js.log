@@ -1,0 +1,13 @@
+병합된 신규 양식: 5 / 5 samil-apply, bogun-study-apply, bogun-multi-apply, sanhak-foreign-apply, mju-gosi-apply
+  samil-apply {"q":5431,"doc":2082,"title":true}
+  bogun-study-apply {"q":3140,"doc":1336,"title":true}
+  bogun-multi-apply {"q":2786,"doc":1295,"title":true}
+  sanhak-foreign-apply {"q":15936,"doc":2216,"title":true}
+  mju-gosi-apply {"q":2424,"doc":1274,"title":true}
+삼일 UI 구동 대상: fixture-samil-apply | 재단법인 삼일장학회 장학생 선발 (검증용 표본)
+삼일 자동 채움 — 성명: 김검증 (자동 채움) | 휴대전화: 010-1234-5678 (자동 채움) | 이메일: test@test.ac.kr (자동 채움)
+삼일 생년월일 입력 위치: asked
+삼일 문서 — {"제목":true,"희망":true,"참석":true,"서약문":true}
+명지 고시 UI 구동 대상: fixture-mju-gosi-apply | 고시장학금 신청 (검증용 표본)
+명지 고시 문서 — {"제목":true,"제1호서식":true,"제한기준":true,"서약문":true}
+ERRORS: none

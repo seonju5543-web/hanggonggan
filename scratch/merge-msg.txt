@@ -1,0 +1,34 @@
+Merge origin/claude/nice-heisenberg-WESq5 into integ/health-sweep — 겹친 수리는 기본 브랜치 것을 주로, 점검 쪽은 빠진 동작만 얹는다
+
+겹친 곳마다 무엇을 남겼나 (기본 브랜치 = 이미 앱에 나간 쪽이 주인)
+
+① 자격용 공고문 첨부 고르기 (기본 e56711a7 elig-targets.mjs ↔ 점검 bodies-3·5 elig-attach-plan.mjs)
+   - 남김: 기본 브랜치 pickEligTargets(시도한 날 at · 사흘 쉼 · 안 해 본 것 → 오래된 것 · 금액·마감만 빈 공고도) — 고르기는 이것 하나
+   - 걷음: 점검의 pickEligDocTargets·attSig·missWait·서명(sig)·tried 칸, collector/elig-attach-plan.mjs 파일 통째(slugOf 는 deepfetch.mjs 원래 자리로)
+   - 옮겨 얹음(deepfetch.mjs 받기 루프 · 기본 쪽에 없던 것만): 대상 전부를 받기 전에 몽땅 지우지 않는다(예산에 잘린 공고가 원본·OCR 글자를 잃었다) ·
+     다시 받은 바이트가 같으면 파생 글자(.txt·.body.txt·.ocr.txt)를 지우지 않는다 · 하나도 못 받으면 옛 파일·색인 파일 목록 그대로 ·
+     예산에 잘려 일부만 받으면 아직 못 받은 옛 파일은 남긴다 · 오늘 날짜를 한국 날짜로
+   - '학생 화면에 아직 있나'를 자격요건 로봇과 같은 판정(rescue-plan.mjs closedForStudents)으로 — 같은 식이 두 곳에 있었다
+
+② 수집 로봇 워크플로 (기본 e56711a7·d91e0d69 OCR 을 발췌 앞으로 + 장학 포스터 PaddleOCR ↔ 점검 gate-guard 3분)
+   - 작업 상한 59/63 충돌 → 66 (단계 합 61 + 여유 5 · 관문 「일반 수집 예산」 61+3 < 66)
+   - 장학 포스터 단계는 기본 것 그대로 두고, 설치·읽기 실패를 `|| true`·경고 없는 실패 대신 ::warning:: 으로(gaps-02 규칙 — 설치가 실패하면 주인 확인이 안 돌았다)
+   - 의미상 겹침: OCR 이 PDF 글자 뽑기보다 앞서게 되어 새 양식 PDF 를 OCR 이 먼저 읽었고 apt-get update 가 두 번 — PDF 글자 뽑기를 OCR 바로 앞으로, 목록 갱신은 한 번
+   - PaddleOCR 판 고정은 세 줄 모두 3.2.0/3.3.3 한 벌(관문으로 잠금)
+   - paddle-status.json 이 collector/extracted 에 생겨 매 실행 커밋될 뻔 — .gitignore
+
+③ 정식 등록 자동화 import 충돌 (점검 auto-held.mjs ↔ 기본 8daf7d06 stripSiteChrome) — 둘 다 남김
+④ 서비스워커 — rerere 결과 v225(기본 v224 위) · CACHE 한 줄 · 두 갈래 메모 다 남음 확인
+⑤ 피드 메우기 도구(점검) — 기본 브랜치가 두 수집기 '앱 발행' 단락에 stripSiteChrome 을 넣어 차례가 어긋남(관문 feed 가 잡음) → 같은 함수·같은 자리로
+⑥ 장학 그림 주인 확인(기본 elig-ocr-guard.mjs)이 불러오는 순간 ACTIVITY_DOCS_AS_LIB 를 남겨, test-collector 안에서 띄운 activity-docs.mjs 자식이 헛돌아
+   관문 bodies ②ⓑ 둘이 빨갰다(수집 로봇 데이터 관문도 같은 길) — 불러온 뒤 표식을 되돌리고, 관문의 자식 환경(cleanEnv)도 표식을 물려주지 않는다
+⑦ 실패 단계 경보 관문 S3 — 기본 브랜치의 「못 넣은 수집분 보관」(failure() · 결과물 올리기)은 경보가 아니라 보관 · 뒤의 더 넓은 조건 경보가 사람에게 닿으면 통과로
+
+관문 (red-green: 되돌리면 ✕ 확인)
+- bodies ③ 다시 씀: 기본 고르기의 차례(어제 해 본 여섯이 앞자리를 차지하지 않는다) · 진짜 deepfetch 로 같은 바이트 파생 보존 · 다른 바이트 교체 ·
+  못 받으면 그대로 · 마감 지남 제외 · 같은 날 재실행 0건 · 예산에 잘려도 차례 안 온 공고의 원본·OCR 글자 그대로
+- bodies ②ⓒ 워크플로 전부의 PaddleOCR 줄 · 판 고정 한 벌 · paddle-status 무시 · ②ⓓ 라이브러리 표식 누수 · ⑤ PDF 글자 뽑기 → OCR 순서·목록 갱신 한 번
+- alerts S3 표본 셋 추가(더 넓은 조건은 덮고 · 취소를 뺀·&& 로 좁힌 조건은 못 덮는다)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01Q8cvV7LejYVSK8g7ZP5BkW

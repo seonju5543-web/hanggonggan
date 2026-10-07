@@ -1,0 +1,24 @@
+✅ 수집 로봇 4종: 저장 위치·실패 알림 정상
+✅ 배포 동기화가 데이터 로봇 전부를 감시 중
+
+현재 브랜치: integ/health-sweep (6a4713fc) · main 보다 앞선 커밋 173개 · 뒤처진 커밋 0개
+배포 브랜치: main (f1a801b7)
+
+❌ 내 쪽에만 있고 main(앱)에 없는 앱 파일 변경이 있습니다 (학생은 이 내용을 볼 수 없어요):
+
+app.js                | 12 ++++++++----
+ apply-channel.js      | 19 ++++++++++++++++++-
+ data.js               |  3 +++
+ essay-ask.js          |  5 +++--
+ parse-requirements.js | 33 ++++++++++++++++++++++++---------
+ sw.js                 |  7 +++++--
+ 6 files changed, 61 insertions(+), 18 deletions(-)
+
+해결 — CLAUDE.md 「브랜치 · 배포」 대로 세 곳에 같은 커밋을 올립니다 (기본 브랜치를 건너뛰고 main 에만 올리지 마세요):
+  ⓪ 먼저 둘 다 합칩니다:  git fetch origin && git merge origin/claude/nice-heisenberg-WESq5 && git merge origin/main
+  ① 작업 브랜치:  git push origin HEAD
+  ② 기본 브랜치:  git push origin HEAD:claude/nice-heisenberg-WESq5
+  ③ 앱(main):     git push origin HEAD:main   (GitHub Pages 가 자동 배포)
+  push 가 거절되면(그사이 로봇이 커밋했다) ⓪ 부터 다시 하고 ①②③ 을 다시 올립니다 — push 사이에 따로 합치면 세 곳이 서로 다른 커밋이 됩니다.
+  휴대폰·웹 세션(작업 브랜치 하나만 쓰는 세션)은 deploy/run-deploy.txt 의 branch: 줄에 브랜치 이름을 적어 push 하세요.
+(로봇 수집분은 '배포 동기화' 워크플로가 자동으로 올리므로 보통 이 검사는 통과합니다.)

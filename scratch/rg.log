@@ -1,0 +1,82 @@
+[openFormSample-visible-only] mutated rc=1 fails=5
+     ✕   화면에 안 보여도 양식이 있는 실제 등록 항목을 고른다(어느 학교든)
+     ✕   표본: id · 마감 오늘+20일 · 등록일 오늘(60일 규칙에 안 걸리게) · 양식 그대로
+     ✕   학교 범위 칸 셋만 지우고 다른 자격 칸은 그대로
+     ✕   달·해가 바뀌어도 날짜가 맞다
+     ✕ 실패 4건
+   restored rc=0 fails=0
+[shouldPlant-old-cond] mutated rc=1 fails=2
+     ✕ ① 보이는 양식 공고가 아예 없으면 표본을 심는다 (10-04 #390 — 예전 조건 `ids.length && …` 로는 false)
+     ✕ 실패 1건
+   restored rc=0 fails=0
+[builtin-fallback-removed] mutated rc=1 fails=2
+     ✕   등록 목록에 양식 공고가 하나도 없으면 앱 내장 양식을 실제 항목에 붙인다(데이터에 기대지 않는다)
+     ✕ 실패 1건
+   restored rc=0 fails=0
+[no-listedAt] mutated rc=1 fails=2
+     ✕   표본: id · 마감 오늘+20일 · 등록일 오늘(60일 규칙에 안 걸리게) · 양식 그대로
+     ✕ 실패 1건
+   restored rc=0 fails=0
+[driver-early-return] mutated rc=1 fails=2
+     ✕   드라이버가 같은 함수를 불러 쓴다(베끼지 않는다) · 후보 0장에서 빠져나가는 이른 반환이 없다
+     ✕ 실패 1건
+   restored rc=0 fails=0
+[ui-yml-base] mutated rc=1 fails=9
+     ✕   ⓐ 화면 검사 단계에 `set -e` 가 없다
+     ✕   ⓑ 드라이버 실패를 `||` 로 받아 모은다(기본 셸이 bash -e 라 이게 없으면 첫 실패에서 멈춘다)
+     ✕   ⓒ 모은 실패로 마지막에 한 번 빨간불 · 실패 목록을 출력으로 넘긴다
+     ✕   ⓓ 「말투·토큰 관문」 은 앞 단계가 실패해도 돈다(!cancelled())
+     ✕   ⓓ 「수집기·관리자 규칙 관문 (브라우저 불필요)」 은 앞 단계가 실패해도 돈다(!cancelled())
+     ✕   ⓓ 「전 여정 회귀 (drive.js)」 은 앞 단계가 실패해도 돈다(!cancelled())
+     ✕   ⓓ 전 여정은 서버를 띄웠을 때만
+     ✕   ⓕ 경보 본문이 옛 설명(`set -e` 로 뒤가 안 돈다)을 하지 않고 실패한 드라이버를 싣는다
+     ✕ 실패 8건
+   restored rc=0 fails=0
+[ui-yml-one-if-removed] mutated rc=1 fails=2
+     ✕   ⓓ 「말투·토큰 관문」 은 앞 단계가 실패해도 돈다(!cancelled())
+     ✕ 실패 1건
+   restored rc=0 fails=0
+[ui-yml-set-e-back] mutated rc=1 fails=2
+     ✕   ⓐ 화면 검사 단계에 `set -e` 가 없다
+     ✕ 실패 1건
+   restored rc=0 fails=0
+[ui-yml-bare-node] mutated rc=1 fails=2
+     ✕   ⓑ 드라이버 실패를 `||` 로 받아 모은다(기본 셸이 bash -e 라 이게 없으면 첫 실패에서 멈춘다)
+     ✕ 실패 1건
+   restored rc=0 fails=0
+[dd-no-actions-write] mutated rc=1 fails=2
+     ✕ ③ device-deploy 권한에 actions: write(화면 검사를 깨울 열쇠)
+     ✕ 실패 1건
+   restored rc=0 fails=0
+[dd-no-wake-step] mutated rc=1 fails=2
+     ✕   배포가 끝났을 때만 깨우고 · 깨우기 실패가 배포를 실패로 보이게 하지 않는다
+     ✕ 실패 1건
+   restored rc=0 fails=0
+[ui-no-dispatch] mutated rc=1 fails=2
+     ✕   verify-ui.yml 이 버튼 실행(workflow_dispatch)을 받는다 — 지우면 깨우기가 조용히 실패한다
+     ✕ 실패 1건
+   restored rc=0 fails=0
+[unknown-always-empty] mutated rc=1 fails=2
+     ✕ ④ 서술형(story) 칸 가운데 종류를 못 알아본 것만 집는다
+     ✕ 실패 1건
+   restored rc=0 fails=0
+[unknown-no-kind-cond] mutated rc=1 fails=2
+     ✕ ④ 서술형(story) 칸 가운데 종류를 못 알아본 것만 집는다
+     ✕ 실패 1건
+   restored rc=0 fails=0
+[audit-warn-to-error] mutated rc=1 fails=2
+     ✕   데이터 감사가 같은 함수로 양식 전부를 보고 **경고**로 적는다(오류면 그날 자동 등록분이 되돌려진다)
+     ✕ 실패 1건
+   restored rc=0 fails=0
+[audit-call-removed] mutated rc=1 fails=2
+     ✕   데이터 감사가 같은 함수로 양식 전부를 보고 **경고**로 적는다(오류면 그날 자동 등록분이 되돌려진다)
+     ✕ 실패 1건
+   restored rc=0 fails=0
+[weekly-inline-copy] mutated rc=1 fails=2
+     ✕   주간 검사(verify-essay-ask)도 같은 함수를 부른다 — 경고와 검사가 갈라지지 않는다
+     ✕ 실패 1건
+   restored rc=0 fails=0
+[parser-block-broken] mutated rc=1 fails=2
+     ✕ ② (해석기 자체 점검) 단계 셋 · 이름 · if · 여러 줄 run · 접힌 if
+     ✕ 실패 1건
+   restored rc=0 fails=0

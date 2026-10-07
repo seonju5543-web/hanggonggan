@@ -1,0 +1,7 @@
+로봇·도구 점검 관문 alerts 묶음 — 경보가 사람에게 닿고(S3) 하나로 모이고(planAlert) 회복하면 닫히는가(robotDownVerdicts·resolve 짝) · 라벨(S1)·체크아웃(S2)·이슈 권한(S4) · 리포트 정리·앱이 받는 파일·인스타 준비 이슈 표본 (verify/health-gates/alerts.mjs)
+
+순수 함수는 표본으로만, 워크플로는 코드 글자로 잰다(data/·collector 장부는 읽지 않는다). 고친 것마다 되돌려 ✕ 를 확인했다(red-green 33건 · 처음 HEAD 에서 S1·S2·S3 은 이미 빨강).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01Q8cvV7LejYVSK8g7ZP5BkW
+

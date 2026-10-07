@@ -1,0 +1,33 @@
+Merge branch 'fix/admin-2' into integ/health-sweep — B줄 끝(ci → alerts-2 → servers-2 → insta-2 → admin)을 A줄·기본 브랜치 합친 판 위에
+
+겹친 곳마다 무엇을 남겼나
+
+① 묶음 목록(verify/health-gates.mjs PARTS) — 둘을 합친 하나: gate · feed · bodies · browser · ci · alerts · servers · insta · admin
+
+② 실패 단계 경보 관문 S3(alerts.mjs) — fix/admin-2 판(broadFailKinds · coversDown · unwrap/splitTop · withUploadStep 표본)을 기본으로
+   - 걷음: 지난 병합에서 넣은 covers/disjuncts(같은 일을 하는 두 번째 판정)와 그 표본 셋 중 둘(더 좁은 조건 둘 — fix/admin-2 표본이 이미 잰다)
+   - 흡수: '|| 로 갈래를 더한 조건(브라우저 수집 꼴 failure() || cancelled() || steps.run.outcome == …)은 덮는다' 표본 하나를 fix/admin-2 의 좁힌 조건 표본 줄에
+
+③ 교내 소식 워크플로(collect-news.yml) — git 이 조용히 두 벌로 합쳐 「데이터 관문」(id: audit)이 두 번 · 되돌리기가 옛 1분 판과 gate-guard 판 둘이 됐다(중복 id 는 GitHub 이 파일을 거절한다)
+   - 한 벌로: 찾기 → 수집 → 사진 → 데이터 관문 → gate-guard 되돌리기(id guard · 3분 · 다시 재기) → 저장 → 리포트 →
+     경보 짝 셋(수집·사진·감사 — fix/admin-2 의 '저장·리포트 뒤' 자리) → 넘어짐 알림(robot-down) → 끝내 빨간불(still-failing)
+   - 감사 실패 알림은 HEAD 설계(gate-guard 결과·단락 · tools/alert-issue.mjs --match prefix 로 이슈 하나 · 다시 통과하면 닫기)
+   - 작업 상한 42 = 단계 합 38 + 여유(관문 '합 + 3 보다 크다') · 주석 셈을 단계 순서대로
+   - alerts ⑧ '여는 경보 셋' 세기가 액션(uses)만 셌다 — 감사 알림은 단락을 본문 파일로 싣느라 도구를 직접 부른다(run) → 둘 다 세고 리포트 이슈는 뺀다
+
+④ 그 밖에 양쪽이 바꾼 파일(_admin/admin.js · tools/admin-apply.mjs · tools/edit-diff.mjs · tools/merge-json-union.mjs)은 서로 다른 자리라 그대로 합쳤다 —
+   같은 일을 두 번 하는 곳 없음(워크플로 41개 단계 이름·id 중복 0 · 서비스워커 v225 한 줄 그대로)
+
+관문 (red-green: 되돌리면 ✕ 확인)
+- S3: 옛 '같은 조건 글자' 규칙 → 기본 브랜치 「못 넣은 수집분 보관」 헛빨간불 ✕ · && 로 좁혀도 덮는다고 보면 ✕ ·
+  수집 로봇 넘어짐 알림을 && 로 좁히면 ✕ · 브라우저 수집 알림에서 failure() 를 빼면 ✕
+- ⑧: 소식 감사 알림을 저장 앞으로 ✕ · 지우면 ✕ / gate: 소식 되돌리기에서 gate-guard 를 빼면 ✕ / test-collector 「교내 소식」: 상한 41 ✕
+
+화면 검사(verify-ui.yml 드라이버 전부 · PORT=8960 · ADMIN_PORT=8961) — verify-resume ⑥ '그 공고가 열린다' 하나만 빨갛다.
+  이 병합 탓이 아니다: 이 샌드박스에서 기본 브랜치 03daf3ed 그대로도 2/2 빨갛고, 점검 가지 병합 전 4e188f1c 는 2/2 통과 · 이 병합 직전 2d61469b 도 6번 중 2번만 통과(이 병합 뒤 판은 6/6 빨강).
+  같은 공고를 ?sch= 로 열어 재면 세 판 모두 상세 시트가 열린다(이동 시작 뒤 4.0~4.4초) — 기본 브랜치 시작 화면 수리 뒤로 networkidle 이 더 일찍 와
+  드라이버의 고정 대기(networkidle + 2.6초)에 걸린다(networkidle 뒤 2.1~2.3초 · 예전 1.1초). GitHub 의 화면 검사는 같은 코드(8daf7d06)로 통과했다.
+  드라이버는 고치지 않았다(검사만 고쳐 통과시키지 않는다).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01Q8cvV7LejYVSK8g7ZP5BkW

@@ -1,0 +1,26 @@
+[bodies-1 공고마다 저장] collector/rescue-bodies.mjs — 되돌림: exit 1 ✕ ① ⓑ 넷째·다섯째 사이에서 강제로 죽어도(단계 시한 흉내) 앞 공고들의 장부가 남는다 — 공고마다 저장 | 복원: exit 0 ✓ 전부 통과
+[bodies-1 한 공고 절대 시한] collector/rescue-bodies.mjs — 되돌림: exit 1 ✕ ① ⓑ 넷째·다섯째 사이에서 강제로 죽어도(단계 시한 흉내) 앞 공고들의 장부가 남는다 — 공고마다 저장 | 복원: exit 0 ✓ 전부 통과
+[bodies-4 이레 안 확보 쉼] collector/rescue-bodies.mjs — 되돌림: exit 1 ✕ ① ⓐ 로봇 미리보기의 차례 — 새 공고(E) → 확보한 지 여드레(B) → 한 번 실패(G) · 이레 안 확보(A)·마감 지남(C)·오래됨(D)·자격 줄 있음(F)은 없다 | 복원: exit 0 ✓ 전부 통과
+[bodies-4 마감 거름] collector/rescue-bodies.mjs — 되돌림: exit 1 ✕ ① ⓐ 로봇 미리보기의 차례 — 새 공고(E) → 확보한 지 여드레(B) → 한 번 실패(G) · 이레 안 확보(A)·마감 지남(C)·오래됨(D)·자격 줄 있음(F)은 없다 | 복원: exit 0 ✓ 전부 통과
+[bodies-2 끝까지 못 가면 실패] .github/workflows/rescue-bodies.yml — 되돌림: exit 1 ✕ ① ⓒ 재수집 단계가 끝까지 못 가면(시한·넘어짐) 저장 뒤 작업을 실패로 — 알림·하트비트가 성공으로 세지 않게 (bodies-2) | 복원: exit 0 ✓ 전부 통과
+[bodies-7 성공만 닫기] .github/workflows/rescue-bodies.yml — 되돌림: exit 1 ✕   성공한 실행은 rescue-bodies 라벨의 열린 이슈를 닫는다 — 성공일 때만 · 알림 뒤 (bodies-7) | 복원: exit 0 ✓ 전부 통과
+[bodies-7 오늘 리포트만] .github/workflows/rescue-bodies.yml — 되돌림: exit 0  | 복원: exit 0 ✓ 전부 통과
+[bodies-12③ 장부도 되돌림] .github/workflows/rescue-bodies.yml — 되돌림: exit 1 ✕   관문에 걸려 되돌릴 때 장부(rescue-ledger.json)도 되돌린다 — 본문은 되돌려지고 확보 기록만 남으면 이레 동안 아무도 안 연다 (bodies-12 ③) | 복원: exit 0 ✓ 전부 통과
+[bodies-12① 심층 수집 대기줄] .github/workflows/deep-fetch.yml — 되돌림: exit 1 ✕   심층 수집 워크플로는 제 대기줄(deep-fetch) — 수집 대기줄(collector)과 합치지 않는다 | 복원: exit 0 ✓ 전부 통과
+[bodies-12①/B8 받기 예산] collector/deepfetch.mjs — 되돌림: exit 1 ✕   받기 예산 — 예산(0.7초)이 지나면 다음 요청을 시작하지 않고 그때까지 받은 것을 저장한다(8건 중 일부만 · 저장된 수 = 받은 수) | 복원: exit 0 ✓ 전부 통과
+[gaps-02 엔진 고장 종료 코드 2] collector/paddle-ocr.py — 되돌림: exit 1 ✕ ② ⓐ 모든 그림이 같은 엔진 오류 — 종료 코드 2 · ::warning:: 한 줄 · 상태 파일에 고장 표시와 실패 파일 (예전엔 '끝 — 0장' 에 초록불) | 복원: exit 0 ✓ 전부 통과
+[gaps-02 장부 판 이동] collector/activity-docs.mjs — 되돌림: exit 1 ✕ ② ⓑ 장부 판이 바뀌면 자격 못 찾은 칸만 한 번 비운다 — 찾은 칸·공통 그림은 남는다 · 판을 적어 두 번째는 그대로 | 복원: exit 0 ✓ 전부 통과
+[gaps-02 기회 되돌리기(찾은 글 제외)] collector/activity-docs.mjs — 되돌림: exit 1 ✕   OCR 이 실패한 파일 때문에 자격을 못 찾은 글만 기회를 되돌린다 — 자격을 찾은 글·실패 파일이 없는 글은 그대로 · 0 아래로 안 간다 · 날짜는 그대로 | 복원: exit 0 ✓ 전부 통과
+[gaps-02 워크플로가 실패를 삼키지 않음] .github/workflows/collect-scholarships.yml — 되돌림: exit 1 ✕ ② ⓒ collect-scholarships.yml — PaddleOCR 설치·읽기 실패를 `|| true` 로 삼키지 않는다(경고를 남기고, 같은 단계의 --apply 는 계속) | 복원: exit 0 ✓ 전부 통과
+[bodies-3 받은 그대로 건너뛰기] collector/elig-attach-plan.mjs — 되돌림: exit 1 ✕ ③ 받을 차례 — 처음 받는 것(7·8·13) → 첨부가 바뀐 것(10) · 받은 그대로(1~6)·마감 지남(9)·오늘 못 받아 쉬는 것(12)·자격 있는 것(14)은 없다 | 복원: exit 0 ✓ 전부 통과
+[bodies-3 마감 거름] collector/elig-attach-plan.mjs — 되돌림: exit 1 ✕ ③ 받을 차례 — 처음 받는 것(7·8·13) → 첨부가 바뀐 것(10) · 받은 그대로(1~6)·마감 지남(9)·오늘 못 받아 쉬는 것(12)·자격 있는 것(14)은 없다 | 복원: exit 0 ✓ 전부 통과
+[bodies-5 파생 글자 보존] collector/deepfetch.mjs — 되돌림: exit 1 ✕   🔴 받은 바이트가 같으면 파생 글자(.ocr.txt)를 지우지 않는다 · 다르면 그 파생만 지운다 · 다시 받지 않은 공고의 파생은 그대로 (bodies-5) | 복원: exit 0 ✓ 전부 통과
+[bodies-6 자격용 PDF OCR] collector/ocr-text.py — 되돌림: exit 1 ✕ ⑤ OCR 후보 — 자격용 공고문 PDF 는 글자층이 있어도 읽는다 · 양식·그 밖의 PDF 는 글자층이 있으면 건너뛴다 · 글자층 없는 PDF 는 예전처럼 읽는다 | 복원: exit 0 ✓ 전부 통과
+[bodies-10 유료 단계 건너뛰기] .github/workflows/eligibility-fill.yml — 되돌림: exit 1 ✕ ⑥ 돈이 드는 단계 여섯은 대상이 0건이면 건너뛴다 · 무료 단계 넷은 그대로 돈다(받은 뒤에 대상이 생길 수 있다) | 복원: exit 0 ✓ 전부 통과
+[bodies-10 세 갈래 합] .github/workflows/eligibility-fill.yml — 되돌림: exit 1 ✕   대상 수 = 장학 본문 + 공고문 첨부 + 대외활동 (예전엔 첫 줄만 세어 첨부·대외활동만 있는 날 0 이었다) | 복원: exit 0 ✓ 전부 통과
+[B8 껍데기 물러서기] collector/notice-source.mjs — 되돌림: exit 1 ✕ ④ 물러서기 — 받기 실패 3번 또는 껍데기 3번 · 껍데기 2번은 아직 | 복원: exit 0 ✓ 전부 통과
+[R6 상대 수 이어 두기] collector/notice-source.mjs — 되돌림: exit 1 ✕   남길 수(fillCounts) — 받기 실패면 fails 하나 더(껍데기 수는 이어 둠) · 껍데기면 shells 하나 더(실패 수는 이어 둠) · 본문이 오면 둘 다 0 · 지난 수는 원래 항목에서 | 복원: exit 0 ✓ 전부 통과
+[R1 원래 항목에서 수 읽기] collector/deepfetch.mjs — 되돌림: exit 1 ✕ ④ 진짜 deepfetch --fill — 껍데기 3번인 주소는 물러서 안 받고(회전 0자리) · 껍데기 2번인 주소는 받아 3번으로 · 본문이 온 주소는 껍데기 칸 없음 | 복원: exit 0 ✓ 전부 통과
+[B7 클릭 본문 저장] collector/browser-collect.mjs — 되돌림: exit 1 ✕   브라우저 수집기 배선 — 상세 방문과 클릭 두 길이 같은 함수 · 클릭 때 남긴 본문을 상세 루프가 저장(cd) · 뭉갠 글자로 본문을 만들지 않는다 | 복원: exit 0 ✓ 전부 통과
+[B7 남의 글 막기(목록 화면)] collector/html-text.mjs — 되돌림: exit 1 ✕   🔴 남의 글을 붙이지 않는다 — 안 열렸으면 · 이 행 제목이 화면에 없으면 · 다른 행 제목이 셋 이상 보이면(아직 목록 화면) 남기지 않는다 | 복원: exit 0 ✓ 전부 통과
+[B7 줄을 살린 본문] collector/html-text.mjs — 되돌림: exit 1 ✕ ⑦ 상세 화면 → 본문 한 칸 — 줄을 살린다(여러 줄) · 표식 browser · 한글 120자 미만이면 본문으로 치지 않는다 | 복원: exit 0 ✓ 전부 통과

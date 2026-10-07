@@ -1,0 +1,9 @@
+02c16383 문서: 원문 바로잡기 — CLAUDE.md 한 줄(관문 위치) · 설계 문서 source-links.md 「원문 바로잡기」·남은 것
+3ae5a6a8 원문 바로잡기 첫 적용 — 경희 소식 GET 상세 규칙 · 경희 정식 등록 3건 원문 · 후보 7건
+8cebf818 Merge branch 'build/link-producers' into claude/source-link-integrity
+f6bc366c Merge branch 'build/admin-link-fix' into claude/source-link-integrity
+1a33db59 원문 링크를 만드는 로봇 고치기 — 서울교대 data-id 규칙 후보 · 사냥꾼 거짓 알림(#387) · 관리자 원문 보호 · 공공 API 주소 칸 고르기
+2e246d20 원문 후보 확인 로봇 — 찾아 온 주소를 학생처럼 열어 그 공고·그 회차인 것만 원문으로(link-check fix)
+dbcddef3 관리자 「원문 링크 손볼 것」 — 진짜 원문 공고 주소를 넣는 칸 (장부 data/link-fixes.json · linkFix/linkUnfix)
+f291d4aa Merge remote-tracking branch 'origin/claude/nice-heisenberg-WESq5' into claude/source-link-integrity
+01e5f65f 원문 바로잡기 지도 — 관리자가 넣은 원문(data/link-fixes.json)·로봇이 확인한 원문(link-check fix)을 링크 이름 한 곳이 먼저 쓴다

@@ -1,0 +1,60 @@
+✅ 수집 로봇 4종: 저장 위치·실패 알림 정상
+✅ 배포 동기화가 데이터 로봇 전부를 감시 중
+
+현재 브랜치: integ/health-sweep (faf86f03)
+배포 브랜치: main (c4089c45)
+
+❌ 아직 앱에 배포되지 않은 변경이 있습니다 (사용자는 이 내용을 볼 수 없어요):
+
+data/activities.json       | 191 +++++++++++++++++++++------------------------
+ data/external.json         |   2 +-
+ data/notices.json          |  19 ++---
+ data/notices/index.json    |   2 +-
+ data/notices/n12kfbyt.json |   2 +-
+ data/notices/n13zozby.json |   2 +-
+ data/notices/n14kv35j.json |   2 +-
+ data/notices/n14n199r.json |   2 +-
+ data/notices/n16dvfry.json |   2 +-
+ data/notices/n174lvh5.json |   2 +-
+ data/notices/n18ebv4b.json |   2 +-
+ data/notices/n19cz03g.json |   2 +-
+ data/notices/n1a4mxa4.json |   2 +-
+ data/notices/n1as48ix.json |   2 +-
+ data/notices/n1au199v.json |  14 ++--
+ data/notices/n1ch7t87.json |   2 +-
+ data/notices/n1if6uwu.json |   2 +-
+ data/notices/n1iz3lr8.json |   2 +-
+ data/notices/n1lw6ycq.json |   2 +-
+ data/notices/n1mo5fbn.json |   2 +-
+ data/notices/n1nel147.json |   2 +-
+ data/notices/n1nesasz.json |   2 +-
+ data/notices/n1or8oiw.json |   2 +-
+ data/notices/n1ozjjw8.json |   2 +-
+ data/notices/n1qr99q6.json |   2 +-
+ data/notices/n1tasrsl.json |   4 +-
+ data/notices/n1tk2q9m.json |   2 +-
+ data/notices/n1w4hprp.json |   2 +-
+ data/notices/n1x6ubj9.json |   2 +-
+ data/notices/n2we95k.json  |   2 +-
+ data/notices/n6xhy7d.json  |   2 +-
+ data/notices/ncuyr4z.json  |   2 +-
+ data/notices/nf097dk.json  |   2 +-
+ data/notices/nkeh7pq.json  |   2 +-
+ data/notices/nlzhvsh.json  |   2 +-
+ data/notices/nmljo8t.json  |   2 +-
+ data/notices/nmpm6i7.json  |   2 +-
+ data/notices/nsgh1oi.json  |   2 +-
+ data/notices/ntxxf09.json  |   2 +-
+ data/notices/ntyl0r5.json  |   2 +-
+ data/notices/nv8pha4.json  |   2 +-
+ data/notices/nwqmwga.json  |   2 +-
+ data/notices/nz3ew5y.json  |   2 +-
+ data/notices/nzzc8bm.json  |   2 +-
+ essay-ask.js               |   5 +-
+ parse-requirements.js      |  33 +++++---
+ sw.js                      |   7 +-
+ 47 files changed, 179 insertions(+), 174 deletions(-)
+
+해결: 아래로 main에 올리면 GitHub Pages가 자동 배포하고, 설치된 앱도 재설치 없이 반영됩니다.
+  git push origin HEAD:main
+(로봇 수집분은 '배포 동기화' 워크플로가 자동으로 올리므로 보통 이 검사는 통과합니다.)

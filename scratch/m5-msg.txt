@@ -1,0 +1,7 @@
+Merge origin/claude/nice-heisenberg-WESq5 into integ/health-sweep — 그사이 쌓인 기본 브랜치(로봇 저장 넷: 수집 장부 · 링크 사냥꾼 · 공공 API · 인스타 댓글)
+
+코드 변경 없음 — 로봇 기록장·발행 파일만이라 충돌 없이 합쳐졌다(합집합 병합기 · 리포트·커서는 내 것).
+같은 문제를 두 세션이 고친 곳 · 두 번 하는 단계 · 서비스워커 번호 변화 — 없음.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01Q8cvV7LejYVSK8g7ZP5BkW

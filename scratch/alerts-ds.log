@@ -1,0 +1,16 @@
+✅ 수집 로봇 4종: 저장 위치·실패 알림 정상
+✅ 배포 동기화가 데이터 로봇 전부를 감시 중
+
+현재 브랜치: fix/alerts (b6f0ce31)
+배포 브랜치: main (14fe37c7)
+
+❌ 아직 앱에 배포되지 않은 변경이 있습니다 (사용자는 이 내용을 볼 수 없어요):
+
+data/admin-log.json  |  6 ------
+ data/link-check.json | 57 ++--------------------------------------------------
+ data/registered.json |  9 ++++-----
+ 3 files changed, 6 insertions(+), 66 deletions(-)
+
+해결: 아래로 main에 올리면 GitHub Pages가 자동 배포하고, 설치된 앱도 재설치 없이 반영됩니다.
+  git push origin HEAD:main
+(로봇 수집분은 '배포 동기화' 워크플로가 자동으로 올리므로 보통 이 검사는 통과합니다.)

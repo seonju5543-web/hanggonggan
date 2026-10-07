@@ -1,0 +1,164 @@
+✅ 수집 로봇 4종: 저장 위치·실패 알림 정상
+✅ 배포 동기화가 데이터 로봇 전부를 감시 중
+
+현재 브랜치: integ/health-sweep (4e188f1c)
+배포 브랜치: main (d6fd00f6)
+
+❌ 아직 앱에 배포되지 않은 변경이 있습니다 (사용자는 이 내용을 볼 수 없어요):
+
+app.js                              |   42 +-
+ boot.js                             |  165 +-
+ data/activities.json                | 3631 +++++++++++++++++------------------
+ data/external.json                  |   43 +-
+ data/news/img/0ab5f007941088ee.webp |  Bin 0 -> 8828 bytes
+ data/news/img/0b28f9d29f89e01e.webp |  Bin 0 -> 9438 bytes
+ data/news/img/0e899a0058d2783c.webp |  Bin 24174 -> 0 bytes
+ data/news/img/102c21ad2b686e58.webp |  Bin 19026 -> 0 bytes
+ data/news/img/10edf970314424bc.webp |  Bin 17072 -> 0 bytes
+ data/news/img/124b48fd552a5493.webp |  Bin 18650 -> 0 bytes
+ data/news/img/138e594c8a98e1f4.webp |  Bin 0 -> 8404 bytes
+ data/news/img/13f55555068421b6.webp |  Bin 18320 -> 0 bytes
+ data/news/img/16d454ce2db821c5.webp |  Bin 16788 -> 0 bytes
+ data/news/img/24165a97b07ab6ef.webp |  Bin 15148 -> 0 bytes
+ data/news/img/274ef6e1453615e0.webp |  Bin 0 -> 9868 bytes
+ data/news/img/3064a3252cb3fa25.webp |  Bin 13280 -> 0 bytes
+ data/news/img/328c0d090ab9d939.webp |  Bin 17612 -> 0 bytes
+ data/news/img/382a5f3745371580.webp |  Bin 0 -> 10478 bytes
+ data/news/img/40093c93d21067df.webp |  Bin 0 -> 7396 bytes
+ data/news/img/42b0bb352085587f.webp |  Bin 0 -> 8788 bytes
+ data/news/img/4b738dabea0310b2.webp |  Bin 0 -> 13914 bytes
+ data/news/img/4ec7179d0720a100.webp |  Bin 29220 -> 0 bytes
+ data/news/img/5265f5d2a8cdc495.webp |  Bin 0 -> 9772 bytes
+ data/news/img/54e88b5ab492e8ec.webp |  Bin 0 -> 10166 bytes
+ data/news/img/58f721d189b5c331.webp |  Bin 12668 -> 0 bytes
+ data/news/img/5b86abc82b764cc5.webp |  Bin 15338 -> 0 bytes
+ data/news/img/617e906dc999a882.webp |  Bin 0 -> 24942 bytes
+ data/news/img/6ecd6466d779960c.webp |  Bin 15976 -> 0 bytes
+ data/news/img/70331ce7bc212fbc.webp |  Bin 0 -> 10520 bytes
+ data/news/img/78342b4d51cf0383.webp |  Bin 0 -> 15876 bytes
+ data/news/img/7a2caf19c155eb80.webp |  Bin 18682 -> 0 bytes
+ data/news/img/886da95c7ee83214.webp |  Bin 17864 -> 0 bytes
+ data/news/img/963e5f40a7c3e934.webp |  Bin 0 -> 9098 bytes
+ data/news/img/a487c31e7882380b.webp |  Bin 0 -> 10132 bytes
+ data/news/img/a5883a2e540f8e7e.webp |  Bin 28302 -> 0 bytes
+ data/news/img/a7fcfb39e43e027c.webp |  Bin 17410 -> 0 bytes
+ data/news/img/a86de82a90123d9a.webp |  Bin 0 -> 6430 bytes
+ data/news/img/a8cf99b1e88772f4.webp |  Bin 17882 -> 0 bytes
+ data/news/img/af1c4ad60569d9ed.webp |  Bin 0 -> 9280 bytes
+ data/news/img/b228ce6fa42c583b.webp |  Bin 0 -> 8822 bytes
+ data/news/img/baba251ac8afa2cc.webp |  Bin 0 -> 8546 bytes
+ data/news/img/bfbe39f90fce6046.webp |  Bin 0 -> 6266 bytes
+ data/news/img/c4bd99ce251a4d66.webp |  Bin 24946 -> 0 bytes
+ data/news/img/c57d3dd61e5401f3.webp |  Bin 22910 -> 0 bytes
+ data/news/img/d96bd5abc61a02b2.webp |  Bin 0 -> 13768 bytes
+ data/news/img/dc1cac22367f52ea.webp |  Bin 0 -> 21654 bytes
+ data/news/img/e677dd4ae4758f6c.webp |  Bin 16934 -> 0 bytes
+ data/news/img/e6d919361d2209ed.webp |  Bin 43740 -> 0 bytes
+ data/news/img/e812afcbf10a1b07.webp |  Bin 0 -> 10234 bytes
+ data/news/img/ecebffb911806256.webp |  Bin 16720 -> 0 bytes
+ data/news/img/f1f03636125c8dcc.webp |  Bin 12182 -> 0 bytes
+ data/news/img/f338875c3c00e34a.webp |  Bin 15294 -> 0 bytes
+ data/news/img/f64835415c525201.webp |  Bin 0 -> 12984 bytes
+ data/news/img/fcfd837319f948ee.webp |  Bin 0 -> 15182 bytes
+ data/news/img/fef2e8d427cf23fd.webp |  Bin 0 -> 10000 bytes
+ data/news/index.json                |   28 +-
+ data/news/n12kfbyt.json             |    2 +-
+ data/news/n13zozby.json             |    2 +-
+ data/news/n14kv35j.json             |    2 +-
+ data/news/n14n199r.json             |    2 +-
+ data/news/n16dvfry.json             |   11 +-
+ data/news/n16l2078.json             |    2 +-
+ data/news/n174lvh5.json             |    2 +-
+ data/news/n18ebv4b.json             |    2 +-
+ data/news/n19cz03g.json             |    2 +-
+ data/news/n1a4mxa4.json             |    2 +-
+ data/news/n1as48ix.json             |   10 +-
+ data/news/n1au199v.json             |    8 +-
+ data/news/n1b3og5n.json             |    2 +-
+ data/news/n1ch7t87.json             |    2 +-
+ data/news/n1if6uwu.json             |    2 +-
+ data/news/n1iz3lr8.json             |    2 +-
+ data/news/n1lw6ycq.json             |    2 +-
+ data/news/n1mo5fbn.json             |   10 +-
+ data/news/n1nel147.json             |    2 +-
+ data/news/n1nesasz.json             |    2 +-
+ data/news/n1or8oiw.json             |    2 +-
+ data/news/n1ozjjw8.json             |    4 +-
+ data/news/n1qr99q6.json             |    6 +-
+ data/news/n1tasrsl.json             |    2 +-
+ data/news/n1tk2q9m.json             |   52 +-
+ data/news/n1uf7bji.json             |   11 +-
+ data/news/n1w4hprp.json             |    2 +-
+ data/news/n1x6ubj9.json             |    2 +-
+ data/news/n2we95k.json              |    2 +-
+ data/news/n6xhy7d.json              |   14 +-
+ data/news/ncuyr4z.json              |    2 +-
+ data/news/nf097dk.json              |    2 +-
+ data/news/nkeh7pq.json              |    2 +-
+ data/news/nl1xm19.json              |    2 +-
+ data/news/nlzhvsh.json              |   12 +-
+ data/news/nmljo8t.json              |    2 +-
+ data/news/nmpm6i7.json              |    2 +-
+ data/news/nsgh1oi.json              |    2 +-
+ data/news/ntxxf09.json              |    2 +-
+ data/news/ntyl0r5.json              |    2 +-
+ data/news/nv8pha4.json              |    2 +-
+ data/news/nwqmwga.json              |    2 +-
+ data/news/nz3ew5y.json              |    2 +-
+ data/news/nzzc8bm.json              |   10 +-
+ data/notices.json                   | 1979 ++++++++++---------
+ data/notices/index.json             |   38 +-
+ data/notices/n12kfbyt.json          |    2 +-
+ data/notices/n13zozby.json          |    2 +-
+ data/notices/n14kv35j.json          |  259 ++-
+ data/notices/n14n199r.json          |    2 +-
+ data/notices/n16dvfry.json          |    2 +-
+ data/notices/n174lvh5.json          |    2 +-
+ data/notices/n18ebv4b.json          |   30 +-
+ data/notices/n19cz03g.json          |    2 +-
+ data/notices/n1a4mxa4.json          |    2 +-
+ data/notices/n1as48ix.json          |    2 +-
+ data/notices/n1au199v.json          |  223 +--
+ data/notices/n1ch7t87.json          |  114 --
+ data/notices/n1if6uwu.json          |  419 ----
+ data/notices/n1iz3lr8.json          |    2 +-
+ data/notices/n1lw6ycq.json          |    2 +-
+ data/notices/n1mo5fbn.json          |    2 +-
+ data/notices/n1nel147.json          |  490 ++++-
+ data/notices/n1nesasz.json          |    2 +-
+ data/notices/n1or8oiw.json          |    2 +-
+ data/notices/n1ozjjw8.json          |    2 +-
+ data/notices/n1qr99q6.json          |    2 +-
+ data/notices/n1tasrsl.json          |  144 +-
+ data/notices/n1tk2q9m.json          |    2 +-
+ data/notices/n1w4hprp.json          |    2 +-
+ data/notices/n1x6ubj9.json          |   21 +-
+ data/notices/n2we95k.json           |   97 -
+ data/notices/n6xhy7d.json           |  137 +-
+ data/notices/ncuyr4z.json           |    2 +-
+ data/notices/nf097dk.json           |    2 +-
+ data/notices/nkeh7pq.json           |    2 +-
+ data/notices/nl1xm19.json           |   99 +-
+ data/notices/nlzhvsh.json           |    2 +-
+ data/notices/nmljo8t.json           |    2 +-
+ data/notices/nmpm6i7.json           |    2 +-
+ data/notices/nsgh1oi.json           |    2 +-
+ data/notices/ntxxf09.json           |    2 +-
+ data/notices/ntyl0r5.json           |    2 +-
+ data/notices/nv8pha4.json           |   79 -
+ data/notices/nwqmwga.json           |    2 +-
+ data/notices/nz3ew5y.json           |    2 +-
+ data/notices/nzzc8bm.json           |    2 +-
+ data/registered.json                | 2401 ++++-------------------
+ data/search-index.json              |    2 +-
+ notify.js                           |   21 +-
+ parse-amount.js                     |   70 +-
+ parse-requirements.js               |   33 +-
+ section-head.js                     |   19 +-
+ style.css                           |   84 +-
+ sw.js                               |    7 +-
+ 151 files changed, 4555 insertions(+), 6392 deletions(-)
+
+해결: 아래로 main에 올리면 GitHub Pages가 자동 배포하고, 설치된 앱도 재설치 없이 반영됩니다.
+  git push origin HEAD:main
+(로봇 수집분은 '배포 동기화' 워크플로가 자동으로 올리므로 보통 이 검사는 통과합니다.)

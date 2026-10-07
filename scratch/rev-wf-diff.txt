@@ -1,0 +1,3114 @@
+diff --git a/.github/actions/alert-issue/action.yml b/.github/actions/alert-issue/action.yml
+new file mode 100644
+index 00000000..440b6239
+--- /dev/null
++++ b/.github/actions/alert-issue/action.yml
+@@ -0,0 +1,67 @@
++# ============================================================
++#  경보 이슈 한 곳 — 공용 액션 (2026-10-04 로봇·도구 점검 · 묶음 alerts)
++# ------------------------------------------------------------
++#  하는 일은 전부 tools/alert-issue.mjs 에 있다(머리말 참조). 여기는 입력을 환경 변수로 넘기는 껍데기뿐이다
++#  — 본문을 셸 글자에 끼워 넣지 않아 따옴표·역따옴표가 섞여도 깨지지 않는다.
++#    open    : 제목이 같은 열린 이슈에 댓글, 없으면 하나 만든다(같은 초 중복은 닫는다)
++#    resolve : 제목이 맞는 열린 이슈를 닫는다(회복)
++#  🔴 찾는 열쇠는 라벨이 아니라 **제목**이다(match: exact | prefix) — 라벨은 만들 때 붙이기만 한다.
++#  🔴 이 액션은 체크아웃된 저장소의 도구를 부른다 — 앞에 actions/checkout 이 있어야 한다(관문 alerts ⑥ S2).
++# ============================================================
++name: 경보 이슈 (한 곳)
++description: 로봇 경보를 제목이 같은 열린 이슈 하나에 모으고(댓글), 회복하면 닫는다
++inputs:
++  token:
++    description: GITHUB_TOKEN (issues write)
++    required: true
++  mode:
++    description: open | resolve
++    required: false
++    default: open
++  title:
++    description: 경보 제목 (찾는 열쇠 · 새로 만들 때의 제목)
++    required: true
++  match:
++    description: exact | prefix (prefix 면 시각이 붙은 옛 제목도 잡는다)
++    required: false
++    default: exact
++  label:
++    description: 새로 만들 때 붙일 라벨 (없으면 만든다)
++    required: false
++    default: ''
++  label-color:
++    description: 라벨 색
++    required: false
++    default: B60205
++  label-description:
++    description: 라벨 설명
++    required: false
++    default: ''
++  body:
++    description: 본문 (open 은 이슈·댓글 본문, resolve 는 닫는 댓글)
++    required: false
++    default: ''
++  body-file:
++    description: 본문 파일 (body 보다 우선)
++    required: false
++    default: ''
++  assignee:
++    description: 담당자 (빈칸·쉼표로 여럿 · 지정이 막히면 담당자 없이 다시 만든다)
++    required: false
++    default: ''
++runs:
++  using: composite
++  steps:
++    - shell: bash
++      env:
++        GH_TOKEN: ${{ inputs.token }}
++        ALERT_MODE: ${{ inputs.mode }}
++        ALERT_TITLE: ${{ inputs.title }}
++        ALERT_MATCH: ${{ inputs.match }}
++        ALERT_LABEL: ${{ inputs.label }}
++        ALERT_LABEL_COLOR: ${{ inputs.label-color }}
++        ALERT_LABEL_DESCRIPTION: ${{ inputs.label-description }}
++        ALERT_BODY: ${{ inputs.body }}
++        ALERT_BODY_FILE: ${{ inputs.body-file }}
++        ALERT_ASSIGNEE: ${{ inputs.assignee }}
++      run: node "$GITHUB_ACTION_PATH/../../../tools/alert-issue.mjs"
+diff --git a/.github/actions/robot-down/action.yml b/.github/actions/robot-down/action.yml
+index d8ddc494..42bfdb76 100644
+--- a/.github/actions/robot-down/action.yml
++++ b/.github/actions/robot-down/action.yml
+@@ -12,9 +12,14 @@
+ #    이 저장소가 여러 번 데인 자리다("베끼면 갈라진다" — canon-url·section-head).
+ #    알림 문구·중복 방지 규칙이 7벌로 흩어지면 한 곳만 고쳐진다.
+ #
+-#  🔴 라벨로 중복을 막는다 (제목 검색은 이모지·한글에서 놓친다 — 2026-07-31)
+-#    같은 로봇의 열린 이슈가 있으면 코멘트만 단다. 매일 도는 로봇이 매일
++#  🔴 같은 로봇의 열린 이슈가 있으면 코멘트만 단다. 매일 도는 로봇이 매일
+ #    새 이슈를 만들면 일주일이면 알림을 무시하게 된다.
++#    찾기·만들기는 경보 도구 한 곳(tools/alert-issue.mjs · 2026-10-04)이 **제목 글자 그대로** 비교해서 한다.
++#    옛 판은 `--search "로봇 in:title"`(GitHub 검색)이라 이모지·한글에서 놓쳤다(2026-07-31) — 검색이 아니라
++#    열린 이슈 목록을 받아 비교하므로 그 문제가 없고, 같은 초에 생긴 중복도 닫는다.
++#    도구가 실패하면(그 판의 체크아웃에 도구가 없는 날 등) **옛 gh 길로 물러난다** — 넘어짐 알림이
++#    조용해지는 것이 가장 나쁘다. 회복하면 하트비트(collector/robot-heartbeat.mjs --close-recovered)가 닫는다.
++#  🔴 입력 이름(robot·token)과 이슈 제목 꼴은 바꾸지 말 것 — 옛 이슈와 이어지고 하트비트가 제목으로 로봇을 찾는다.
+ # ============================================================
+ name: 로봇 넘어짐 알림
+ description: 예약 로봇이 실패·시간초과로 끝났을 때 이슈 하나에 모아 알린다
+@@ -46,7 +51,14 @@ runs:
+         건너뛰어졌습니다(2026-08-04 수집 로봇 사고). 지금은 둘 다 잡습니다.
+ 
+         반복되면 Claude 세션에 \"${ROBOT} 실패 확인해줘\"라고 지시하세요."
+-        # 라벨이 없으면 만든다 (없는 라벨로 검색하면 gh 가 오류를 낸다)
++        # 경보 도구 한 곳으로 — 제목이 같은 열린 이슈에 댓글, 없으면 만든다(같은 초 중복 정리)
++        tool="$GITHUB_ACTION_PATH/../../../tools/alert-issue.mjs"
++        if [ -f "$tool" ] && ALERT_BODY="$body" node "$tool" --mode open --match exact --title "$title" \
++             --label robot-down --label-color B60205 --label-description "예약 로봇이 실패·시간초과로 끝남"; then
++          exit 0
++        fi
++        echo "::warning::경보 도구로 알리지 못해 옛 길(gh)로 알립니다."
++        # 옛 길 — 라벨이 없으면 만든다 (없는 라벨로 검색하면 gh 가 오류를 낸다)
+         gh label create robot-down --repo "$REPO" --color B60205 \
+           --description "예약 로봇이 실패·시간초과로 끝남" 2>/dev/null || true
+         n=$(gh issue list --repo "$REPO" --label robot-down --state open \
+diff --git a/.github/workflows/admin-apply.yml b/.github/workflows/admin-apply.yml
+index 5cf458ba..0612d3a7 100644
+--- a/.github/workflows/admin-apply.yml
++++ b/.github/workflows/admin-apply.yml
+@@ -26,6 +26,14 @@ on:
+         description: '작업 내용 (JSON)'
+         required: true
+         type: string
++      dry_run:
++        # 시험 실행 (2026-10-04 로봇·도구 점검 admin-F10) — 버튼 길이 08-09 이후 Actions 에서 한 번도 안 돌아,
++        # 동작·저장 목록이 실제로 도는지 데이터를 안 바꾸고 확인할 길. 요청 적용 + 데이터 감사까지만 하고 저장(push)하지 않는다.
++        # 관리자 화면은 이 칸을 보내지 않는다(늘 false — 진짜 저장).
++        description: '시험 실행 — 켜면 요청 적용과 데이터 감사까지만 하고 저장하지 않습니다'
++        required: false
++        type: boolean
++        default: false
+ 
+ permissions:
+   contents: write
+@@ -76,8 +84,16 @@ jobs:
+           git checkout -- data collector
+           echo "::error::데이터 감사를 통과하지 못해 아무것도 저장하지 않았습니다."
+ 
++      - name: 시험 실행 — 저장하지 않고 바뀔 파일만 보인다
++        if: steps.audit.outcome == 'success' && inputs.dry_run
++        run: |
++          git status --short -- data collector
++          git diff --stat -- data collector
++          echo "::notice::시험 실행 — 요청 적용과 데이터 감사까지 통과했습니다. 저장(push)은 하지 않았습니다."
++
+       - name: 저장
+-        if: steps.audit.outcome == 'success'
++        id: save
++        if: steps.audit.outcome == 'success' && !inputs.dry_run
+         env:
+           ACTION: ${{ inputs.action }}
+           ACTOR: ${{ github.actor }}
+@@ -128,23 +144,39 @@ jobs:
+       - name: 🚨 실패 알림
+         # cancelled()도 본다 — 시간 상한을 넘긴 작업은 '실패'가 아니라 '취소'로 끝나서
+         # failure()만 보면 이 알림까지 건너뛴다 (2026-08-04·05 수집 로봇에서 실제로 겪은 구멍).
+-        if: failure() || cancelled()
++        # 시험 실행(dry_run)은 누른 사람이 그 실행을 보고 있다 — '조정이 반영되지 않았다'는 이슈를 열지 않는다.
++        if: (failure() || cancelled()) && !inputs.dry_run
+         env:
+           GH_TOKEN: ${{ github.token }}
+           REPO: ${{ github.repository }}
+           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+           ACTION_NAME: ${{ inputs.action }}
+           WHO: ${{ github.actor }}
++          # 어느 단계에서 멈췄는지로 본문을 가른다 (2026-10-04 admin-F9) — 예전엔 무엇이든 '감사 탓'으로 적었다.
++          # 대부분의 실패는 감사가 아니라 저장소의 입력 거절이다(tools/admin-apply.mjs fail()).
++          APPLY: ${{ steps.apply.outcome }}
++          AUDIT: ${{ steps.audit.outcome }}
++          SAVE: ${{ steps.save.outcome }}
+         run: |
+           LABEL="admin-apply"
+           gh label create "$LABEL" --repo "$REPO" --color 5319E7 \
+             --description "관리자 화면에서 요청한 조정 실패" 2>/dev/null || true
+           existing=$(gh issue list --repo "$REPO" --state open --label "$LABEL" \
+                        --json number --jq '.[0].number // empty' 2>/dev/null || echo "")
++          if [ "$APPLY" = "failure" ]; then
++            # 거절인지 도구가 넘어진 것인지는 실행 기록의 '관리자 조정 실패 — …' 줄이 말한다 — 여기서 단정하지 않는다
++            why="「요청 내용 적용」 단계에서 멈췄습니다 — 저장 전이라 데이터는 **바뀌지 않았습니다**. 저장소가 요청을 거절했으면 실행 기록에 「관리자 조정 실패 — …」 줄로 사유가 있습니다."
++          elif [ "$AUDIT" = "failure" ]; then
++            why="데이터 감사를 통과하지 못해 되돌렸습니다 — 데이터는 **바뀌지 않았습니다**."
++          elif [ "$SAVE" = "failure" ]; then
++            why="저장(push)에 실패했습니다 — 데이터는 **바뀌지 않았습니다**."
++          else
++            why="다른 단계에서 실패했거나 실행이 도중에 멈췄습니다(시간 상한 10분 또는 취소) — 저장됐는지는 실행 기록에서 확인하세요."
++          fi
+           body="관리자 화면에서 요청한 조정 \`${ACTION_NAME}\` 이 반영되지 않았습니다 (요청: @${WHO}).
+ 
+-          데이터는 **바뀌지 않았습니다** — 감사를 통과하지 못하면 되돌리도록 되어 있습니다.
+-          사유는 실행 기록에서 볼 수 있습니다: ${RUN_URL}
++          ${why}
++          사유 원문은 실행 기록에서 볼 수 있습니다: ${RUN_URL}
+ 
+           ---
+           _Generated by [Claude Code](https://claude.ai/code)_"
+diff --git a/.github/workflows/admin-lock-check.yml b/.github/workflows/admin-lock-check.yml
+index d49c6b9c..86512bcd 100644
+--- a/.github/workflows/admin-lock-check.yml
++++ b/.github/workflows/admin-lock-check.yml
+@@ -89,6 +89,43 @@ jobs:
+             esac
+           done
+ 
++          # 🔴 미리보기 주소도 연다 (2026-10-04 로봇·도구 점검). _admin/README.md 대로 운영 주소와 미리보기 주소는
++          #    **서로 다른 호스트**라 Access 가 한쪽만 덮으면 다른 쪽이 열린 채 남는다 — 그런데 이 로봇은 운영 주소만 열었다.
++          #    운영 브랜치가 기본 브랜치라 main 은 미리보기(main.…)가 될 수 있다. 그 주소가 실제로 있는지는 여기서 잰다.
++          #    주소를 손으로 준 실행(IN_URL)은 그 주소만 본다. 🔴 없는 미리보기(404·접속 불가 등)는 **판정에서 뺀다** —
++          #    없는 주소가 매일 '판정 불가' 빨간불을 내면 진짜 경보가 묻힌다. 열려 있으면 운영 주소와 같은 경보다.
++          preview=""
++          if [ -z "${IN_URL:-}" ]; then
++            PREVIEW_URL="https://main.hanggonggan-admin.pages.dev"
++            echo
++            echo "미리보기 주소도 확인: $PREVIEW_URL"
++            code=$(curl -s -o /tmp/pbody -D /tmp/phead -w '%{http_code}' --max-time 25 "$PREVIEW_URL/" || echo 000)
++            loc=$(grep -i '^location:' /tmp/phead 2>/dev/null | head -1 | tr -d '\r' | cut -d' ' -f2- || true)
++            echo "/ → HTTP $code${loc:+  →  $loc}"
++            case "$code" in
++              200)
++                if grep -qE '한대장 관리자|gate-key|admin\.css' /tmp/pbody; then
++                  echo "   🔴 미리보기 주소에서 로그인 없이 관리자 화면이 그대로 열립니다."
++                  open=1; preview=open
++                else
++                  echo "   (200이지만 관리자 화면은 아닙니다 — 미리보기 주소 없음으로 보고 판정에서 제외)"
++                fi
++                ;;
++              301|302|303|307|308)
++                if echo "$loc" | grep -qiE 'cloudflareaccess\.com|/cdn-cgi/access/login'; then
++                  echo "   ✅ 미리보기도 잠김 — Cloudflare Access 로그인으로 보냅니다."
++                  preview=locked
++                else
++                  echo "   ⚠️ 미리보기 주소가 Access 가 아닌 곳으로 보냅니다 — 판정에서 제외(사람이 한 번 볼 것)."
++                fi
++                ;;
++              *)
++                echo "   미리보기 주소 없음(HTTP $code) — 판정에서 제외"
++                ;;
++            esac
++          fi
++          echo "preview=$preview" >> "$GITHUB_OUTPUT"
++
+           echo
+           if [ "$open" = "1" ]; then
+             verdict=open
+@@ -114,6 +151,7 @@ jobs:
+           REPO: ${{ github.repository }}
+           OWNER: ${{ github.repository_owner }}
+           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
++          PREVIEW: ${{ steps.probe.outputs.preview }}
+         run: |
+           gh label create admin-lock --repo "$REPO" --color B60205 \
+             --description "관리자 화면 잠금 경보" 2>/dev/null || true
+@@ -133,6 +171,9 @@ jobs:
+           **운영 주소와 미리보기 주소는 서로 다른 호스트 이름**이라, 한쪽만 덮으면
+           다른 쪽이 열린 채로 남습니다. 설정한 뒤 이 워크플로를 다시 눌러 확인하세요.
+           EOF
++          if [ "$PREVIEW" = "open" ]; then
++            printf '\n⚠️ 이번에 로그인 없이 열린 곳에는 **미리보기 주소**(https://main.hanggonggan-admin.pages.dev)가 들어 있습니다 — 그 호스트도 Access 로 덮어야 합니다.\n' >> /tmp/lock.md
++          fi
+           printf '\n실행 기록: %s\n\n---\n_Generated by [Claude Code](https://claude.ai/code)_\n' \
+             "$RUN_URL" >> /tmp/lock.md
+           gh issue create \
+@@ -158,6 +199,16 @@ jobs:
+         if: steps.probe.outputs.open == '1'
+         run: exit 1
+ 
++      # 🔴 판정 불가면 그날 실행을 실패로 남긴다 (2026-10-04 로봇·도구 점검). 옛 판은 unknown 을 로그에만 남기고 초록으로 끝나,
++      #    하트비트도 '성공'으로 셌다 — 며칠 이어져도 아무도 몰랐다. 이제 빨간 실행이 사흘(예약 하루 × 3) 넘게 이어지면
++      #    하트비트가 「🚨 예약 로봇이 조용합니다」로 알린다(새 장부가 필요 없다). 경보 이슈는 열지도 닫지도 않는다
++      #    ('판정 불가일 때는 닫지 않는다' 그대로 · 넘어짐 알림도 안 선다 — 판정 단계 자체는 끝까지 갔다).
++      - name: 판정 불가면 실패로 남긴다
++        if: steps.probe.outputs.verdict == 'unknown'
++        run: |
++          echo "::warning::관리자 화면 잠금을 판정하지 못했습니다 — 잠겼다는 뜻이 아닙니다. 잠시 뒤 다시 실행해 주세요."
++          exit 1
++
+       # 🔴 실행 알림 (2026-09-06 신설) — 결과 알림과 다른 것이다.
+       #    결과 알림: "보러 갔더니 상태가 이상하더라"  · 실행 알림: "보러 가다가 내가 넘어졌다"
+       #    이게 없으면 감시 로봇이 죽었을 때 그 로봇이 지키던 것까지 함께 무음이 된다.
+diff --git a/.github/workflows/audit-coverage.yml b/.github/workflows/audit-coverage.yml
+index 8761ed48..0663293b 100644
+--- a/.github/workflows/audit-coverage.yml
++++ b/.github/workflows/audit-coverage.yml
+@@ -4,7 +4,7 @@ name: 공고 누락 감사
+ # 로봇은 자기가 읽은 것만 알아서 스스로는 누락을 셀 수 없다 — 그래서 바깥에서 대조한다.
+ on:
+   schedule:
+-    - cron: '23 21 * * 1'    # 매주 월요일 06:23 KST (수집 예약과 겹치지 않는 홀수 분)
++    - cron: '23 21 * * 1'    # 매주 화요일 06:23 KST = UTC 월요일 21:23 (수집 예약과 겹치지 않는 홀수 분)
+   workflow_dispatch:
+   push:
+     branches: ['claude/nice-heisenberg-WESq5']
+@@ -70,43 +70,47 @@ jobs:
+           fi
+ 
+       # 결과를 이슈로 — '원인 미상'이 있을 때만. 없으면 조용히 끝낸다(정상 세션에 소음 0).
+-      - name: 결과 이슈 (원인 미상이 있을 때만)
++      # 🔴 이슈 **하나**에 모은다 (2026-10-04 로봇·도구 점검). 옛 판은 라벨 coverage-audit 이 저장소에 없어 gh 가 실패 →
++      #    예비 명령이 라벨 없는 이슈를 매주 새로 만들었다(열린 🔍 10건). 제목은 고정(같은 제목이어야 댓글로 모인다),
++      #    날짜·건수는 본문 첫 줄에. 옛 날짜 붙은 🔍 는 리포트 정리(tools/report-retention.mjs · 최신 1건)가 닫는다.
++      - name: 결과 이슈 내용 만들기 (원인 미상이 있을 때만)
+         if: steps.run.outcome == 'success' && steps.run.outputs.unknown != '' && steps.run.outputs.unknown != '0'
++        timeout-minutes: 1
+         env:
+-          GH_TOKEN: ${{ github.token }}
++          UNKNOWN: ${{ steps.run.outputs.unknown }}
+         run: |
+-          BODY=collector/coverage-report.md
++          {
++            printf '🔍 %s KST — 원인 미상 **%s건**\n\n' "$(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')" "$UNKNOWN"
++            cat collector/coverage-report.md
++          } > /tmp/cov.md
+           LIMIT=60000
+-          if [ "$(wc -c < "$BODY")" -gt "$LIMIT" ]; then
+-            head -c "$LIMIT" "$BODY" > /tmp/cut.md
++          if [ "$(wc -c < /tmp/cov.md)" -gt "$LIMIT" ]; then
++            head -c "$LIMIT" /tmp/cov.md > /tmp/cut.md
+             printf '\n\n---\n> ⚠️ 리포트가 길어 잘렸습니다. 전문은 `collector/coverage-report.md`.\n' >> /tmp/cut.md
+-            BODY=/tmp/cut.md
++            mv /tmp/cut.md /tmp/cov.md
+           fi
+-          gh issue create \
+-            --title "🔍 공고 누락 감사 $(TZ=Asia/Seoul date +%Y-%m-%d) (원인 미상 ${{ steps.run.outputs.unknown }}건)" \
+-            --body-file "$BODY" \
+-            --repo "${{ github.repository }}" \
+-            --label "coverage-audit" \
+-            --assignee "${{ github.repository_owner }}" \
+-            --assignee "Se-Hyeon-Jo" || \
+-          gh issue create \
+-            --title "🔍 공고 누락 감사 $(TZ=Asia/Seoul date +%Y-%m-%d) (원인 미상 ${{ steps.run.outputs.unknown }}건)" \
+-            --body-file "$BODY" --repo "${{ github.repository }}"
++      - name: 결과 이슈 (원인 미상이 있을 때만)
++        if: steps.run.outcome == 'success' && steps.run.outputs.unknown != '' && steps.run.outputs.unknown != '0'
++        timeout-minutes: 2
++        uses: ./.github/actions/alert-issue
++        with:
++          token: ${{ github.token }}
++          mode: open
++          match: exact
++          title: 🔍 공고 누락 감사 — 원인 미상 공고
++          label: coverage-audit
++          label-color: 5319E7
++          label-description: 공고 누락 감사 결과(원인 미상)
++          assignee: ${{ github.repository_owner }} Se-Hyeon-Jo
++          body-file: /tmp/cov.md
+ 
+       # cancelled()까지 봐야 한다 — 상한을 넘긴 작업은 '실패'가 아니라 '취소'로 끝나서
+       # failure()만 보면 알림을 건너뛴다 (2026-08-04에 실제로 뚫린 구멍).
++      # 🔴 넘어짐 알림 한 벌(robot-down)로 (2026-10-04) — 옛 판은 없는 라벨로 `gh issue create … || true` 라
++      #    **이슈가 아예 안 만들어졌다**(조용한 실패). 감사 단계만 넘어져 작업이 초록이어도 이 조건으로 알린다.
+       - name: 🚨 감사가 끝까지 못 갔을 때
+         if: failure() || cancelled() || steps.run.outcome == 'failure'
+-        env:
+-          GH_TOKEN: ${{ github.token }}
+-        run: |
+-          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+-          {
+-            printf '감사 로봇이 끝까지 못 갔습니다(실패 또는 시간 초과).\n\n'
+-            printf '실행 로그: %s\n\n' "$RUN_URL"
+-            printf '수집 로봇에는 영향이 없습니다 — 감사는 데이터를 고치지 않습니다.\n'
+-          } > /tmp/audit-fail.md
+-          gh issue create \
+-            --title "🚨 공고 누락 감사 실패 $(TZ=Asia/Seoul date +%Y-%m-%d)" \
+-            --body-file /tmp/audit-fail.md \
+-            --repo "${{ github.repository }}" --label "coverage-audit" || true
++        uses: ./.github/actions/robot-down
++        with:
++          robot: 공고 누락 감사
++          token: ${{ github.token }}
+diff --git a/.github/workflows/browser-collect.yml b/.github/workflows/browser-collect.yml
+index 356a65a4..75a2282a 100644
+--- a/.github/workflows/browser-collect.yml
++++ b/.github/workflows/browser-collect.yml
+@@ -41,7 +41,7 @@ jobs:
+     #    그때의 교훈은 그대로다 — **상한을 키우는 것으로 때우지 말 것**. 단계가 오래 걸리면
+     #    그 단계의 예산(HARVEST_BUDGET_MS, 아래 timeout-minutes)을 줄이고, 상한은 그 합을
+     #    담는 그릇으로만 쓴다. verify/test-collector.mjs가 이 대소관계를 검사한다.
+-    timeout-minutes: 50   # 단계 합 46 + 준비·저장 여유 3 (2026-09-17 OCR 4분 · 2026-09-30 판정 로봇 2분 추가)
++    timeout-minutes: 53   # 단계 합 49 + 준비·저장 여유 3 (2026-09-17 OCR 4분 · 2026-09-30 판정 로봇 2분 · 2026-10-04 관문 다시 재기 3분 — gate-guard 새 단계의 몫)
+     steps:
+       - uses: actions/checkout@v4
+         with:
+@@ -170,12 +170,17 @@ jobs:
+         run: |
+           node verify/test-collector.mjs
+           node verify/audit-data.js
++      # 🔴 되돌리고 **관문을 다시 잰다** (2026-10-04 · 로봇·도구 점검 — 로직은 collector/gate-guard.mjs 한 곳).
++      #    예전엔 새 자동 등록분만 빼고 끝나, 원인이 기존 항목 수정(발췌 등)이면 아무것도 못 한 채 아래 저장 단계가 관문 실패 상태의
++      #    정식 등록 파일을 커밋했다. 이제 ① 새 자동 등록분 → 다시 재기 → ② 정식 등록·양식·대기열을 HEAD 판으로 → 다시 재기.
++      #    결과는 steps.guard.outputs.gate(reverted-auto · reverted-files · still-failing · flaky) — still-failing 이면 맨 끝 단계가 빨간불 + 이슈.
++      #    상한 3분 = 관문 최대 두 번(로컬 실측 ~25초씩) + 여유. 넘어지면 정식 등록 파일만이라도 HEAD 판으로(|| 뒤).
+       - name: 감사 실패 시 자동 등록분 되돌리기
++        id: guard
+         if: steps.audit.outcome == 'failure'
++        timeout-minutes: 3
+         run: |
+-          # 파일 전체가 아니라 '이번 실행이 새로 자동 등록한 공고'만 골라서 뺀다
+-          # (같은 실행의 원문 발췌 갱신 같은 정상 작업까지 버리지 않도록)
+-          node collector/revert-auto.mjs || git checkout -- data/registered.json
++          node collector/gate-guard.mjs --report collector/browser-report.md --note /tmp/gate-note.md --stage auto --stage data/registered.json,data/forms.json,collector/pending-forms.json || git checkout -- data/registered.json data/forms.json collector/pending-forms.json
+       # 저장 위치 원칙 (2026-07-31 두 개발자 판 통합 — 여기를 바꾸기 전에 반드시 읽을 것):
+       #   로봇은 **자기가 읽은 브랜치(= 실행된 브랜치, 기본 브랜치)에만** 저장한다.
+       #   '이미 본 공고' 기록(collector/seen.json)과 공고 목록을 읽은 곳과 쓰는 곳이 다르면,
+@@ -215,6 +220,8 @@ jobs:
+           [ -f collector/pagination.json ] && git add collector/pagination.json
+           [ -f collector/health.json ] && git add collector/health.json
+           [ -f collector/pending-forms.json ] && git add collector/pending-forms.json
++          [ -f collector/auto-held.json ] && git add collector/auto-held.json   # 관문에 걸린 자동 등록 쉬기 장부 (2026-10-04 · gate-guard·auto-register)
++          [ -f collector/past-rounds.json ] && git add collector/past-rounds.json   # 지난 회차 장부 — 등록 뒤 마감 경과로 뺀 등록분의 사업 (2026-10-05 · auto-register)
+           [ -d collector/extracted ] && git add collector/extracted
+           true  # 위 선택 파일이 없어도 저장 단계는 계속된다 (2026-07-19 8회 연속 실패 원인 수정)
+           if ! git diff --cached --quiet; then
+@@ -284,18 +291,48 @@ jobs:
+             --assignee "${{ github.repository_owner }}" \
+             --assignee "Se-Hyeon-Jo"
+ 
++      # 🚨 여러 번 연속 공고를 못 읽은 학교 (2026-10-05 점검 B4 · 판정은 collector/browser-health.mjs 한 곳).
++      #    리포트 이슈는 새 공고가 있는 날만 생겨서(위 if) 0건인 날엔 리포트 머리의 🚨 줄이 파일에만 남았다 — 그날은 최근 리포트 이슈에 코멘트한다.
++      #    학교 이름은 env 로만 받는다(단계 출력 표현식을 셸 글자에 직접 넣지 않는다 — 이름에 따옴표·기호가 섞여도 명령이 안 깨지게). 저장 뒤라 실패해도 실행을 빨갛게 만들지 않는다
++      #    (빨가면 아래 실패 알림이 '수집분이 저장되지 않았다'는 틀린 말을 붙인다).
++      - name: 🚨 연속으로 공고를 못 읽은 학교 알림 (최근 리포트 이슈에 코멘트)
++        if: steps.run.outcome == 'success' && steps.run.outputs.chronic != '' && steps.run.outputs.new_count == '0' && github.event_name != 'workflow_dispatch'
++        continue-on-error: true
++        env:
++          GH_TOKEN: ${{ github.token }}
++          CHRONIC: ${{ steps.run.outputs.chronic }}
++        run: |
++          last=$(gh issue list --repo "${{ github.repository }}" \
++            --search '"브라우저형 수집 리포트" in:title' --state open \
++            --limit 1 --json number --jq '.[0].number' || true)
++          if [ -n "$last" ] && [ "$last" != "null" ]; then
++            gh issue comment "$last" --repo "${{ github.repository }}" \
++              --body "🖥 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 🚨 **여러 번 연속 공고를 못 읽은 학교**: $CHRONIC — 게시판 주소 확인이 필요해요(정찰: collector/run-probe.txt · 학교별로 본 것은 collector/browser-report.md). 새 공고가 0건이라 새 리포트는 만들지 않았어요." || true
++          fi
++
+       # 실패 시 즉시 알림 (조용한 중단 방지 — 2026-07-19 도입)
++      # 🔴 제 리포트 이슈로 (2026-10-04) — '"수집 리포트"' 부분 일치는 장학공고 리포트 이슈와 섞였다(#381 코멘트 9개 중 이 로봇 것은 1개).
++      #    무엇을 되돌렸는지는 gate-guard 의 단락(/tmp/gate-note.md)을 싣는다.
+       - name: 🚨 데이터 감사 실패 알림
+         if: steps.audit.outcome == 'failure'
+         env:
+           GH_TOKEN: ${{ github.token }}
+         run: |
++          # 무엇을 되돌렸는지는 gate-guard 의 단락(/tmp/gate-note.md — 실제로 되돌린 파일에서 만든다)을 그대로 싣는다(문구를 여기 베끼지 않는다).
++          # 결과(steps.guard.outputs.gate)가 비었으면 되돌리기 도구가 넘어져 아래 || 뒤가 파일을 직전 판으로 돌린 것이다.
++          {
++            echo "🖥 브라우저형 수집 로봇: 🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **데이터 관문(감사) 실패**"
++            echo
++            if [ -n "${{ steps.guard.outputs.gate }}" ] && [ -s /tmp/gate-note.md ]; then cat /tmp/gate-note.md
++            else echo "> 되돌리기 도구가 결과를 남기지 못해 정식 등록·양식·양식 대기열 파일을 직전 판으로 돌렸습니다."; fi
++            echo
++            echo "실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '감사 실패 확인해줘'라고 지시하세요."
++          } > /tmp/audit-alert.md
+           last=$(gh issue list --repo "${{ github.repository }}" \
+-            --search '"수집 리포트" in:title' --state open \
++            --search '"브라우저형 수집 리포트" in:title' --state open \
+             --limit 1 --json number --jq '.[0].number' || true)
+           if [ -n "$last" ] && [ "$last" != "null" ]; then
+-            gh issue comment "$last" --repo "${{ github.repository }}" \
+-              --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **데이터 감사 실패 — 이번 자동 등록분은 되돌렸습니다.** 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · 수집된 공고 자체는 실시간 피드에 그대로 남아 있어요. Claude 세션에 '감사 실패 확인해줘'라고 지시하세요."
++            gh issue comment "$last" --repo "${{ github.repository }}" --body-file /tmp/audit-alert.md
+           fi
+ 
+       # cancelled() 필수 — 시간 상한을 넘긴 작업은 '실패'가 아니라 '취소'로 끝나서
+@@ -309,9 +346,38 @@ jobs:
+           GH_TOKEN: ${{ github.token }}
+         run: |
+           last=$(gh issue list --repo "${{ github.repository }}" \
+-            --search '"수집 리포트" in:title' --state open \
++            --search '"브라우저형 수집 리포트" in:title' --state open \
+             --limit 1 --json number --jq '.[0].number' || true)
+           if [ -n "$last" ] && [ "$last" != "null" ]; then
+             gh issue comment "$last" --repo "${{ github.repository }}" \
+               --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **브라우저형 수집 로봇이 끝까지 못 갔어요** (실패 또는 시간 초과) — 이번 실행의 **게시판 수집분은 저장되지 않았습니다**(양식·원문 보충 같은 나머지 작업 결과는 저장됐을 수 있어요). 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · 관리자 화면 → 로봇 (https://hanggonggan-admin.pages.dev/#robots) 에서 「브라우저형 수집 로봇」의 **지금 실행**을 **한 번** 눌러 보세요 — 학교 서버가 잠깐 늦은 것이면 이것으로 끝납니다. 그래도 또 넘어지면 Claude 세션에 '로봇 실패 확인해줘'라고 지시하세요."
+           fi
++
++      # 🔴 되돌린 뒤에도 관문이 빨가면 초록불로 끝내지 않는다 (2026-10-04 · 로봇·도구 점검).
++      #    failure()·cancelled() 알림 **뒤**에 둔다 — 앞에 두면 그 알림이 '이번 수집분은 저장되지 않았습니다'라는 틀린 말을 붙인다(저장은 됐다).
++      - name: 🚨 관문이 끝내 빨간불 (되돌린 뒤에도)
++        if: steps.guard.outputs.gate == 'still-failing'
++        env:
++          GH_TOKEN: ${{ github.token }}
++        run: |
++          {
++            echo "🖥 브라우저형 수집 로봇: 🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 되돌리기 단계를 거친 뒤에도 데이터 관문이 빨갛습니다 — 무엇을 되돌렸는지는 아래 단락에 있습니다."
++            echo
++            cat /tmp/gate-note.md 2>/dev/null || true
++            echo
++            echo "실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '데이터 관문 빨간불 확인해줘'라고 지시하세요."
++          } > /tmp/gate-issue.md
++          # 원인이 기존 데이터면 실행마다 빨갛다 — 열린 같은 이슈가 있으면 코멘트(하루 최대 5개씩 쌓이지 않게 · 2026-10-04 리뷰). 로봇 이름은 본문 첫 줄에.
++          open=$(gh issue list --repo "${{ github.repository }}" \
++            --search '"데이터 관문이 되돌린 뒤에도 빨간불" in:title' --state open \
++            --limit 1 --json number --jq '.[0].number' || true)
++          if [ -n "$open" ] && [ "$open" != "null" ]; then
++            gh issue comment "$open" --repo "${{ github.repository }}" --body-file /tmp/gate-issue.md || true
++          else
++            gh issue create --repo "${{ github.repository }}" \
++              --title "🚨 데이터 관문이 되돌린 뒤에도 빨간불 — 브라우저형 수집 로봇 $(TZ=Asia/Seoul date +%Y-%m-%d)" \
++              --body-file /tmp/gate-issue.md \
++              --assignee "${{ github.repository_owner }}" || true
++          fi
++          echo "::error::데이터 관문이 되돌린 뒤에도 빨간불입니다 — 이슈에 적었습니다."
++          exit 1
+diff --git a/.github/workflows/check-live.yml b/.github/workflows/check-live.yml
+index 12b84886..356b0f14 100644
+--- a/.github/workflows/check-live.yml
++++ b/.github/workflows/check-live.yml
+@@ -30,6 +30,18 @@ jobs:
+         env:
+           SITE: https://seonju5543-web.github.io/hanggonggan
+         run: |
++          # 🔴 **두 번까지 본다** (2026-10-04 로봇·도구 점검). 배포 직후에 돌면 Pages 가 아직 옛 판을 내보내는 사이일 수 있다
++          #    (#384 — 배포 1분 뒤 실행 ❌ · 5분 뒤 다시 돌리니 통과). 처음에 어긋나면 3분 쉬고
++          #    **저장소 main 도 그때 것으로 다시 받아** 한 번 더 본다. 두 번 다 어긋날 때만 경보다.
++          #    (대조 스크립트는 회차마다 /tmp/try.out 에 쓰고, 끝에 마지막 회차 값만 진짜 출력으로 옮긴다.)
++          for try in 1 2; do
++          if [ "$try" = 2 ]; then
++            echo
++            echo "⏳ Pages 배포가 진행 중일 수 있어 3분 뒤 다시 봅니다 (저장소 main 도 그때 것으로 다시 받습니다)"
++            sleep 180
++            git fetch -q origin main && git checkout -q --detach FETCH_HEAD || echo "⚠️ main 을 다시 받지 못했습니다 — 처음 받은 판으로 다시 봅니다"
++          fi
++          rm -rf live
+           mkdir -p live
+ 
+           # 🔴 **앱이 실제로 받는 파일을 본다** (2026-09-29 신설).
+@@ -81,16 +93,27 @@ jobs:
+             console.log([...new Set(out)].join(' '));
+           ")
+ 
+-          for f in sw.js app.js data/notices.json data/registered.json data/forms.json $EXTRA; do
++          # 🔴 앱이 받는 그 밖의 파일 (2026-10-04 로봇·도구 점검) — 이 점검이 대외활동·재단·층2·등록금·검색 요약·자기소개서 규칙 둘·
++          #    정문 사진 목록·약관을 안 봐서 404 여도 초록이었다. 손 목록을 만들지 않고 **앱 스크립트의 fetch·getDoc 글자**에서 뽑는다
++          #    (tools/app-fetch-files.cjs — 앱이 새 파일을 받게 되면 저절로 따라온다). 위 목록·EXTRA 에 이미 있는 것은 뺀다.
++          APP_FILES=$(node -e "
++            const { appFetchFiles } = require('./tools/app-fetch-files.cjs');
++            const skip = new Set(['sw.js', 'app.js', 'data/notices.json', 'data/registered.json', 'data/forms.json', ...process.argv.slice(1)]);
++            console.log(appFetchFiles('.').filter((f) => !skip.has(f)).join(' '));
++          " $EXTRA)
++
++          for f in sw.js app.js data/notices.json data/registered.json data/forms.json $EXTRA $APP_FILES; do
+             mkdir -p "live/$(dirname "$f")"
+             curl -sSL --max-time 30 -H 'Cache-Control: no-cache' "$SITE/$f" -o "live/$f" || echo "받기 실패: $f"
+           done
+           echo "— 앱이 실제로 받는 파일도 확인: $EXTRA —"
++          echo "— 앱 스크립트가 받는 그 밖의 파일: $APP_FILES —"
+ 
+           echo "— 캐시 응답 헤더(참고) —"
+           curl -sSI --max-time 30 "$SITE/data/registered.json" | grep -i "cache-control\|etag\|last-modified" || true
+ 
+-          EXTRA_FILES="$EXTRA" node - <<'EOF'
++          : > /tmp/try.out
++          EXTRA_FILES="$EXTRA" APP_FILES="$APP_FILES" GITHUB_OUTPUT=/tmp/try.out node - <<'EOF'
+           const fs = require('fs');
+           /* 파일마다 담는 모양이 달라서(공고=items 배열, 양식=templates 목록) 개수를 각각 센다.
+              모양을 못 읽으면 '읽기실패'로 남겨 두 쪽 다 undefined라 통과해 버리는 일이 없게 한다. */
+@@ -117,6 +140,9 @@ jobs:
+           const linkCheck = (p) => { try { const j = JSON.parse(fs.readFileSync(p, 'utf8')); return j && j.bad && typeof j.bad === 'object' ? `${Object.keys(j.bad).length}건+${Object.keys(j.fix || {}).length}@${String(j.updatedAt || '-').slice(0, 16)}` : '읽기실패'; } catch { return '읽기실패'; } };
+           // 관리자 바로잡기(data/link-fixes.json)는 bad 가 없고 fix 만 있다 — 건수·시각으로 비교(못 읽으면 '읽기실패' · 404 를 통과로 세지 않는다)
+           const linkFixes = (p) => { try { const j = JSON.parse(fs.readFileSync(p, 'utf8')); return j && j.fix && typeof j.fix === 'object' ? `${Object.keys(j.fix).length}건@${String(j.updatedAt || '-').slice(0, 16)}` : '읽기실패'; } catch { return '읽기실패'; } };
++          /* 앱이 받는 그 밖의 파일·색인은 **바이트 수 + 지문**으로 (2026-10-04) — Pages 는 머리말 없는 파일을 바이트 그대로 내보내므로
++             같아야 정상이다. 개수로 세면 칸 수만 같아도 통과한다(색인은 칸 넷 대 넷). 404 쪽(HTML)은 지문이 달라 같다고 세지 않는다. */
++          const hash = (p) => { try { const b = fs.readFileSync(p); return `${b.length}B#${require('crypto').createHash('sha1').update(b).digest('hex').slice(0, 8)}`; } catch { return '읽기실패'; } };
+           const rows = [
+             ['서비스워커 버전', cache('sw.js'), cache('live/sw.js')],
+             ['실시간 공고(옛)', count('data/notices.json'), count('live/data/notices.json')],
+@@ -139,21 +165,30 @@ jobs:
+             const m = f === 'data/link-check.json' ? linkCheck : f === 'data/link-fixes.json' ? linkFixes : measure;   // 원문 링크 확인·바로잡기는 건수·시각으로(위 linkCheck·linkFixes)
+             rows.push([`${label} ${f.split('/').pop()}`, m(f), m('live/' + f)]);
+           }
++          const appFiles = (process.env.APP_FILES || '').split(/\s+/).filter(Boolean);
++          for (const f of appFiles) rows.push([`앱이 받는 파일 ${f}`, hash(f), hash('live/' + f)]);
++          for (const f of ['data/notices/index.json', 'data/news/index.json']) rows.push([`색인 지문 ${f.split('/').slice(-2).join('/')}`, hash(f), hash('live/' + f)]);
+           let bad = 0;
++          const diffs = [];
+           console.log('\n항목             저장소(main)   실제 앱   결과');
+           for (const [name, repo, live] of rows) {
+             const ok = String(repo) === String(live);
+-            if (!ok) bad++;
++            if (!ok) { bad++; diffs.push(`· ${name} — 저장소 ${repo} · 앱 ${live}`); }
+             console.log(`${name.padEnd(16)} ${String(repo).padEnd(13)} ${String(live).padEnd(9)} ${ok ? '✅ 같음' : '❌ 다름'}`);
+           }
+           const appOk = fs.existsSync('live/app.js') && fs.readFileSync('live/app.js', 'utf8').length > 1000;
+           console.log(`앱 코드 내려받기 ${appOk ? '✅ 정상' : '❌ 실패'}`);
+-          if (!appOk) bad++;
++          if (!appOk) { bad++; diffs.push('· 앱 코드 내려받기 실패'); }
+           fs.appendFileSync(process.env.GITHUB_OUTPUT, `bad=${bad}\n`);
++          fs.appendFileSync(process.env.GITHUB_OUTPUT, `diff<<__LIVE_DIFF__\n${diffs.join('\n') || '(없음)'}\n__LIVE_DIFF__\n`);
+           console.log(bad === 0
+             ? '\n✅ 배포된 앱이 저장소와 같습니다 — 사용자는 재설치 없이 최신 내용을 봅니다.'
+             : `\n❌ ${bad}개 항목이 어긋납니다 (Pages 배포가 아직 안 끝났거나 동기화 실패).`);
+           EOF
++          bad=$(sed -n 's/^bad=//p' /tmp/try.out | tail -1)
++          [ "$bad" = "0" ] && break
++          done
++          cat /tmp/try.out >> "$GITHUB_OUTPUT"
+ 
+       # 관리자 페이지가 학생용 주소에 딸려 나가지 않았는지 매일 확인한다.
+       #
+@@ -201,22 +236,45 @@ jobs:
+             --title "🚨 관리자 페이지가 공개 주소에 노출됨 ($(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST)" \
+             --repo "$REPO" --assignee "$OWNER" --body-file /tmp/admin-leak.md
+ 
++      # 🔴 어긋남은 이슈 **하나**에 모으고, 다시 같아지면 닫는다 (2026-10-04 로봇·도구 점검 · tools/alert-issue.mjs).
++      #    옛 판은 실행마다 시각 붙은 새 이슈를 만들고 닫는 길이 없어, 다음 날부터 통과했는데도 #350 이 열린 채였다.
++      #    제목 앞머리(prefix)로 찾아 옛 시각 붙은 제목도 이어지고 닫힌다.
+       - name: 🚨 어긋남 알림
+         if: steps.check.outputs.bad != '0'
+-        env:
+-          GH_TOKEN: ${{ github.token }}
+-        run: |
+-          gh issue create \
+-            --title "🚨 앱 반영 점검 실패 ($(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST)" \
+-            --repo "${{ github.repository }}" \
+-            --assignee "${{ github.repository_owner }}" \
+-            --body "배포된 앱(https://seonju5543-web.github.io/hanggonggan)이 저장소 main과 다릅니다.
+-          Pages 배포가 늦어졌을 수도 있으니 먼저 다시 실행해 보고, 계속 다르면 배포 동기화를 확인하세요.
++        uses: ./.github/actions/alert-issue
++        with:
++          token: ${{ github.token }}
++          mode: open
++          match: prefix
++          title: 🚨 앱 반영 점검 실패
++          label: live-check
++          label-description: 배포된 앱이 저장소 main 과 다름
++          assignee: ${{ github.repository_owner }}
++          body: |
++            배포된 앱(https://seonju5543-web.github.io/hanggonggan)이 저장소 main과 다르거나, 대조를 끝까지 하지 못했습니다(어긋나면 3분 뒤 한 번 더 봅니다).
++            계속 다르면 배포 동기화를 확인하세요. 다음 점검에서 같아지면 이 이슈는 저절로 닫힙니다.
++
++            어긋난 항목(비어 있으면 대조 단계가 끝까지 못 간 것 — 실행 기록을 보세요):
++            ${{ steps.check.outputs.diff }}
+ 
+-          실행 기록: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
++            실행 기록: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+ 
+-          ---
+-          _Generated by [Claude Code](https://claude.ai/code)_"
++            ---
++            _Generated by [Claude Code](https://claude.ai/code)_
++
++      - name: 다시 같아지면 옛 어긋남 경보를 닫는다
++        if: steps.check.outputs.bad == '0'
++        continue-on-error: true
++        timeout-minutes: 2
++        uses: ./.github/actions/alert-issue
++        with:
++          token: ${{ github.token }}
++          mode: resolve
++          match: prefix
++          title: 🚨 앱 반영 점검 실패
++          body: |
++            ✅ 배포된 앱이 저장소(main)와 다시 같습니다 — 자동으로 닫습니다.
++            실행 기록: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+ 
+       # 🔴 실행 알림 (2026-09-06 신설) — 결과 알림과 다른 것이다.
+       #    결과 알림: "보러 갔더니 상태가 이상하더라"  · 실행 알림: "보러 가다가 내가 넘어졌다"
+diff --git a/.github/workflows/close-old-reports.yml b/.github/workflows/close-old-reports.yml
+index a9518de4..cf87a8ef 100644
+--- a/.github/workflows/close-old-reports.yml
++++ b/.github/workflows/close-old-reports.yml
+@@ -8,9 +8,13 @@ name: 오래된 수집 리포트 닫기
+ # 절대 건드리지 않는 것
+ #   · 🚨 경보 · 🔧 링크 사냥꾼 '못 찾은 공고' 등 **리포트가 아닌 모든 이슈**
+ #   · **사람이 코멘트를 단 리포트** — 개발자가 컨펌을 지시한 기록이라 가치가 있다
+-#   · 각 유형의 **최신 3건** — 수집 로봇이 '새 공고 0건' 알림을 남길 곳이 필요하다
++#   · 각 유형의 **최신 몇 건** — 수집 로봇이 '새 공고 0건' 알림을 남길 곳이 필요하다
+ #     (`collect-scholarships.yml`의 '0건 실행 알림'이 열린 리포트를 찾아 코멘트한다.
+ #      전부 닫으면 그 알림이 조용히 사라진다 — 로봇은 guard가 있어 실패하진 않는다)
++#   🔴 어떤 리포트를 몇 건 남기는지는 **tools/report-retention.mjs 의 규칙 표 한 곳**에 있다 (2026-10-04).
++#      옛 판은 여기 jq 에 🤖·🖥 두 종류만 적혀 있어 뒤에 생긴 🗞 교내 소식·📘 작성 규칙·✅ 자격·🔍 누락 감사·
++#      🔍 게시판 정찰 리포트가 영영 안 닫혔다(10-04 열린 이슈 186건). 경보·사냥꾼·인스타(🚨·🔧·📸·🛰·🎨)는
++#      그 표에 아예 없다 — 각자 회복하면 닫는 길이 따로 있다(관문 「로봇·도구 점검 관문」 alerts ②).
+ #
+ # 실행: Actions 탭 → 이 워크플로 → Run workflow · 자동: 매주 월요일 15:40 KST
+ 
+@@ -37,36 +41,34 @@ jobs:
+     runs-on: ubuntu-latest
+     timeout-minutes: 10
+     steps:
++      # 🔴 체크아웃이 먼저다 — 규칙 표(tools/report-retention.mjs)와 넘어짐 알림(로컬 액션 robot-down)이 저장소 파일이다.
++      #    없으면 넘어진 날 알림까지 'Can't find action.yml' 로 넘어진다(2026-10-03 다른 워크플로에서 실측 · 관문 alerts ⑥ S2).
++      - uses: actions/checkout@v4
++        with:
++          fetch-depth: 1
++
+       - name: 오래된 리포트만 골라 닫는다
+         env:
+           GH_TOKEN: ${{ github.token }}
+           REPO: ${{ github.repository }}
+           DAYS: ${{ inputs.days || '14' }}
+           DRY: ${{ inputs.dry_run || 'false' }}
+-          KEEP: '3'
+         run: |
+           set -euo pipefail
+-          cutoff=$(date -u -d "-${DAYS} days" +%Y-%m-%dT%H:%M:%SZ)
+-          echo "기준: $cutoff 이전에 만들어진 리포트 · 유형별 최신 ${KEEP}건은 남김"
++          echo "기준: ${DAYS}일 이전에 만들어진 리포트 · 유형별 최신 몇 건은 남김(규칙 표 tools/report-retention.mjs)"
+           echo "모드: $([ "$DRY" = "true" ] && echo '목록만 보기' || echo '실제로 닫음')"
+           echo
+ 
+-          gh issue list --repo "$REPO" --state open --limit 300 \
++          # 🔴 상한 1000 — 300 이면 열린 이슈가 그보다 많은 날 오래된 리포트가 목록에서 빠져 영영 안 닫힌다(10-04 이미 186건)
++          gh issue list --repo "$REPO" --state open --limit 1000 \
+             --json number,title,createdAt > /tmp/open.json
+           echo "열린 이슈 $(jq length /tmp/open.json)건"
+ 
+-          # 리포트만 고른다. 제목 접두사로 유형을 가른다 —
+-          # 🚨(경보)·🔧(사냥꾼)은 여기 안 걸린다.
+-          jq -r --arg cut "$cutoff" '
+-            [ .[] | select(.title | test("^(🤖 장학공고 수집 리포트|🖥 브라우저형 수집 리포트)")) ]
+-            | group_by(if (.title|startswith("🤖")) then "general" else "browser" end)
+-            | map(sort_by(.createdAt) | reverse)
+-            | .[] | .['"$KEEP"':] // []
+-            | .[] | select(.createdAt < $cut) | "\(.number)\t\(.title)"
+-          ' /tmp/open.json > /tmp/cand.tsv || true
++          # 리포트만 고른다 — 유형·남길 건수는 규칙 표 한 곳. 🚨(경보)·🔧(사냥꾼)·📸(인스타)는 표에 없어 안 걸린다.
++          node tools/report-retention.mjs /tmp/open.json --days "$DAYS" > /tmp/cand.tsv
+ 
+           n=$(wc -l < /tmp/cand.tsv | tr -d ' ')
+-          echo "닫기 후보 ${n}건 (오래됐고 최신 ${KEEP}건에도 없는 리포트)"
++          echo "닫기 후보 ${n}건 (오래됐고 유형별 최신 건에도 없는 리포트)"
+           echo
+ 
+           closed=0; kept=0
+@@ -96,7 +98,7 @@ jobs:
+ 
+           echo
+           echo "결과: $([ "$DRY" = "true" ] && echo '닫을 것' || echo '닫음') ${closed}건 · 사람 코멘트가 있어 남김 ${kept}건"
+-          echo "남은 열린 이슈: $(gh issue list --repo "$REPO" --state open --limit 300 --json number --jq length)건"
++          echo "남은 열린 이슈: $(gh issue list --repo "$REPO" --state open --limit 1000 --json number --jq length)건"
+ 
+       # 🔴 실행 알림 (2026-09-06 신설) — 결과 알림과 다른 것이다.
+       #    결과 알림: "보러 갔더니 상태가 이상하더라"  · 실행 알림: "보러 가다가 내가 넘어졌다"
+diff --git a/.github/workflows/collect-news.yml b/.github/workflows/collect-news.yml
+index f0411bd7..23bf20cb 100644
+--- a/.github/workflows/collect-news.yml
++++ b/.github/workflows/collect-news.yml
+@@ -10,6 +10,11 @@ on:
+     - cron: '19 22 * * *'   # 매일 07:19 KST
+     - cron: '19 4 * * *'    # 매일 13:19 KST
+   workflow_dispatch:
++    inputs:
++      report:
++        description: '리포트 이슈를 남긴다(확인용) — 비우면 사람 손이 필요할 때만'
++        type: boolean
++        default: false
+   push:
+     branches: ['claude/nice-heisenberg-WESq5']
+     paths:
+@@ -30,8 +35,10 @@ jobs:
+     env:
+       NODE_EXTRA_CA_CERTS: collector/certs/bundle.pem   # 계명대처럼 중간 인증서를 안 보내는 학교 (collector/certs/README.md)
+     # 상한 = 단계 상한의 합 + 여유 3 (관문 test-collector 「교내 소식」이 대소관계를 잰다 · 상한을 키워 때우지 말 것).
+-    # 찾기 7 + 수집 6 + 썸네일 5 + 알림 1 + 관문 5 + 되돌리기 1 + 감사 알림 1 + 저장 3 + 리포트 1 + 알림 1 = 31 → 35
+-    timeout-minutes: 35
++    # 찾기 7 + 수집 6 + 썸네일 5 + 관문 5 + 되돌리기 3 + 저장 3 + 리포트 1 + 수집 알림·닫기 2 + 사진 알림·닫기 2 + 감사 알림·닫기 2 + 넘어짐 알림 1 + 끝내 빨간불 1 = 38 → 42 (관문은 '합 + 3 보다 크다')
++    # (2026-10-04 로봇·도구 점검: 경보 짝 넷 — 경보는 이슈 하나에 모이고 회복하면 닫힌다 · tools/alert-issue.mjs ·
++    #  되돌리기 1 → 3 — 되돌릴 때마다 관문을 다시 잰다 · collector/gate-guard.mjs · 2026-10-05 경보 짝 셋은 저장·리포트 뒤로)
++    timeout-minutes: 42
+     steps:
+       - uses: actions/checkout@v4
+         with:
+@@ -69,28 +76,18 @@ jobs:
+       # 그림 도구 sharp 는 이 단계에서만 설치한다(설치 실패는 삼키지 않는다 — 단계가 실패로 남고 소식 저장은 그대로 간다).
+       # 상한 5 = 자체 예산 2.5분 + 글 하나 시한 30초 + 설치·정리 여유.
+       - name: 교내 소식 썸네일 (보강 — 실패해도 수집분은 나간다)
++        id: thumbs
+         timeout-minutes: 5
+         continue-on-error: true
+         env:
+           NEWS_THUMB_BUDGET_MS: '150000'
++        # 🔴 sharp 판 고정 (2026-10-05 점검 news-11) — 판 없이 받으면 새 판이 Node 20 을 빼는 날 이 단계가 아무 변경 없이 깨지고,
++        #    continue-on-error 라 썸네일이 조용히 멈춘다. 0.x 에서 @0.35 는 0.35.x 만 받는다 · node-version 을 올릴 때 같이 올린다
++        #    (gate-photos.yml 은 sharp@0.33 — 같은 관례).
+         run: |
+-          npm i sharp --no-audit --no-fund --silent
++          npm i sharp@0.35 --no-audit --no-fund --silent
+           node collector/collect-news-thumbs.mjs
+ 
+-      - name: 🚨 수집 단계 실패 알림 (최근 리포트 이슈에 코멘트)
+-        if: steps.run.outcome != 'success'
+-        timeout-minutes: 1
+-        env:
+-          GH_TOKEN: ${{ github.token }}
+-        run: |
+-          last=$(gh issue list --repo "${{ github.repository }}" \
+-            --search '"교내 소식 수집 리포트" in:title' --state open \
+-            --limit 1 --json number --jq '.[0].number' || true)
+-          if [ -n "$last" ] && [ "$last" != "null" ]; then
+-            gh issue comment "$last" --repo "${{ github.repository }}" \
+-              --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **소식 수집 단계가 ${{ steps.run.outcome }} 로 끝났습니다** (상한 6분에 잘렸거나 로봇이 죽었습니다). 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '소식 수집 실패 확인해줘'라고 지시하세요."
+-          fi
+-
+       # 데이터 관문 — 저장 직전. 규칙을 어기면 이번 실행의 소식 파일을 되돌리고 알린다(장학 수집과 같은 규칙).
+       - name: 데이터 관문 (수집기 규칙 테스트 + 데이터 감사)
+         id: audit
+@@ -100,26 +97,21 @@ jobs:
+           node verify/test-collector.mjs
+           node verify/audit-data.js
+ 
++      # 🔴 되돌리고 **관문을 다시 잰다** (2026-10-04 · 로봇·도구 점검 — collector/gate-guard.mjs 한 곳 · 장학 수집과 같은 장치).
++      #    예전엔 소식 파일만 되돌리고 끝나, 찾기 로봇이 고친 출처 목록(news-sources.json)이 원인이면 그대로 저장되고 초록불이었다.
++      #    ① 소식 발행분·장부·썸네일 장부 → 다시 재기 → ② 출처 목록 → 다시 재기. HEAD 에 없던 파일(첫 실행의 썸네일 장부)은 지운다.
++      #    still-failing 이면 맨 끝 단계가 빨간불. 넘어지면 소식 파일만이라도 HEAD 판으로(|| 뒤 — 옛 되돌리기와 같다).
+       - name: 감사 실패 시 이번 소식 발행분 되돌리기
++        id: guard
+         if: steps.audit.outcome == 'failure'
+-        timeout-minutes: 1
+-        run: |
+-          git checkout -- data/news collector/seen-news.json 2>/dev/null || true
+-          # 썸네일 장부는 따로 — 한 줄에 묶으면 장부가 아직 없는 첫 실행에 git checkout 이 통째로 실패해 소식 파일도 안 돌아간다
+-          git checkout -- collector/news-thumbs.json 2>/dev/null || rm -f collector/news-thumbs.json
+-          git clean -fdq data/news || true
+-
+-      # 감사 실패는 조용히 넘어가지 않는다 — 되돌리기만 하고 끝나면 홈 구역이 **소리 없이 멈춘다**(리뷰 2026-10-01). 이슈를 새로 연다(첫 실행엔 댓글 달 이슈가 없다).
+-      - name: 🚨 데이터 감사 실패 알림 (이슈 생성)
+-        if: steps.audit.outcome == 'failure'
+-        timeout-minutes: 1
+-        env:
+-          GH_TOKEN: ${{ github.token }}
++        timeout-minutes: 3
+         run: |
+-          gh issue create --repo "${{ github.repository }}" \
+-            --title "🚨 교내 소식 데이터 감사 실패 $(TZ=Asia/Seoul date +%Y-%m-%d) — 이번 발행분을 되돌렸습니다" \
+-            --body "소식 수집은 됐지만 관문(test-collector·audit-data)을 통과하지 못해 data/news 를 되돌렸습니다. 고칠 때까지 홈 「우리 학교 소식」이 갱신되지 않습니다. 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '소식 감사 실패 확인해줘'라고 지시하세요." \
+-            --assignee "${{ github.repository_owner }}"
++          node collector/gate-guard.mjs --report collector/news-report.md --note /tmp/gate-note.md --stage data/news,collector/seen-news.json,collector/news-thumbs.json --stage collector/news-sources.json || {
++            git checkout -- data/news collector/seen-news.json 2>/dev/null || true
++            # 썸네일 장부는 따로 — 한 줄에 묶으면 장부가 아직 없는 첫 실행에 git checkout 이 통째로 실패해 소식 파일도 안 돌아간다(gate-guard 는 파일마다 따로 본다)
++            git checkout -- collector/news-thumbs.json 2>/dev/null || rm -f collector/news-thumbs.json
++            git clean -fdq data/news || true
++          }
+ 
+       - name: 수집 상태 저장 (중복 방지 기록)
+         timeout-minutes: 3
+@@ -151,31 +143,148 @@ jobs:
+           fi
+ 
+       # 리포트 이슈는 **사람 손이 필요할 때만** 만든다(연속 실패·글을 못 읽는 게시판·찾기 로봇이 못 찾은 학교) — 매일 새 이슈는 소음이다.
+-      # 수동 실행 때는 늘 만든다(첫 실행 확인용).
++      # 🔴 수동 실행만으로는 열지 않는다 (2026-10-04) — 옛 판은 버튼을 누를 때마다 담당자 지정 이슈를 새로 만들어
++      #    열린 소식 리포트가 20건이 됐다(그중 다수가 '새 글 0건'). 확인이 필요하면 버튼의 「리포트 이슈를 남긴다」를 켠다
++      #    (세션은 실행 로그·collector/news-report.md 로 본다). 같은 날 리포트는 한 이슈에 댓글로 모인다(제목에 건수를 넣지 않는다).
+       - name: 리포트 이슈 (사람 손이 필요할 때만)
+-        if: github.event_name == 'workflow_dispatch' || steps.run.outputs.needs_human == '1'
++        if: steps.run.outputs.needs_human == '1' || inputs.report
+         timeout-minutes: 1
+         env:
+           GH_TOKEN: ${{ github.token }}
++          NEW_COUNT: ${{ steps.run.outputs.new_count }}
++          NEEDS_HUMAN: ${{ steps.run.outputs.needs_human }}
++          OWNER: ${{ github.repository_owner }}
+         run: |
+-          { cat collector/news-report.md; echo; echo '---'; echo; [ -f collector/find-news-boards-report.md ] && cat collector/find-news-boards-report.md; } > /tmp/news-issue.md || true
++          {
++            printf '🗞 %s KST — 새 글 %s건 · 사람 손 필요: %s\n\n' "$(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')" "${NEW_COUNT:-?}" "$([ "$NEEDS_HUMAN" = 1 ] && echo 예 || echo '아니요(확인용 실행)')"
++            cat collector/news-report.md; echo; echo '---'; echo; [ -f collector/find-news-boards-report.md ] && cat collector/find-news-boards-report.md
++          } > /tmp/news-issue.md || true
+           if [ "$(wc -c < /tmp/news-issue.md)" -gt 60000 ]; then head -c 60000 /tmp/news-issue.md > /tmp/news-cut.md; printf '\n\n> ⚠️ 리포트가 길어 잘렸습니다 — 전문은 collector/news-report.md\n' >> /tmp/news-cut.md; mv /tmp/news-cut.md /tmp/news-issue.md; fi
+-          gh issue create \
+-            --title "🗞 교내 소식 수집 리포트 $(TZ=Asia/Seoul date +%Y-%m-%d) (새 글 ${{ steps.run.outputs.new_count }}건)" \
+-            --body-file /tmp/news-issue.md \
+-            --repo "${{ github.repository }}" \
+-            --assignee "${{ github.repository_owner }}"
++          node tools/alert-issue.mjs --mode open --match exact \
++            --title "🗞 교내 소식 수집 리포트 $(TZ=Asia/Seoul date +%Y-%m-%d)" \
++            --label news-report --label-color 0E8A16 --label-description '교내 소식 수집 리포트(사람 손이 필요할 때)' \
++            --assignee "$OWNER" --body-file /tmp/news-issue.md
+ 
+-      - name: 🚨 실패·시간초과 알림 (최근 리포트 이슈에 코멘트)
+-        if: failure() || cancelled()
++      # ── 경보 짝 셋(수집 단계·사진 단계·데이터 감사)은 **저장·리포트 뒤**에 둔다 (2026-10-05 코드 리뷰) ──
++      #    여는 단계는 continue-on-error 가 없다 — 이슈 API 가 흔들려 넘어지면 작업이 실패해 아래 넘어짐 알림(robot-down)이 사람에게 닿게 하려는 것.
++      #    그래서 저장 **앞**에 두면 그날 경보 하나가 넘어지는 순간 관문·저장이 건너뛰어져 그 실행의 소식이 저장되지 않았다(사진 단계는 보강인데도).
++      #    각 if 는 steps.*.outcome 을 보므로 자리를 옮겨도 판정은 같다. 관문 「로봇·도구 점검 관문」 alerts ⑧.
++      # 🔴 단계 경보는 이슈 **하나**에 모으고 회복하면 닫는다 (2026-10-04 로봇·도구 점검 · tools/alert-issue.mjs).
++      #    옛 판은 '열린 최신 소식 리포트'에 댓글만 달아, 받을 리포트가 없는 날엔 **조용했다**.
++      #    넘어짐 알림(robot-down)과 따로 둔다 — 단계 실패는 continue-on-error 라 작업은 초록으로 끝나 '로봇이 넘어졌다'와 뜻이 다르다.
++      #    그래서 제목·라벨을 따로 쓰고, 그 단계가 다시 끝까지 가면 바로 아래 짝 단계가 닫는다.
++      - name: 🚨 수집 단계 실패 알림
++        if: steps.run.outcome != 'success'
++        timeout-minutes: 1
++        uses: ./.github/actions/alert-issue
++        with:
++          token: ${{ github.token }}
++          mode: open
++          title: 🚨 교내 소식 로봇 — 수집 단계가 끝까지 못 갔어요
++          label: news-step
++          label-description: 교내 소식 로봇의 단계가 끝까지 못 감
++          body: |
++            소식 수집 단계가 **${{ steps.run.outcome }}** 로 끝났습니다(상한 6분에 잘렸거나 로봇이 넘어졌을 수 있습니다 — 원인은 실행 로그에서 확인하세요).
++            실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
++            Claude 세션에 '소식 수집 실패 확인해줘'라고 지시하세요. 다음 실행에서 수집 단계가 끝까지 가면 이 이슈는 저절로 닫힙니다.
++      - name: 수집 단계가 다시 끝까지 가면 옛 경보를 닫는다
++        if: steps.run.outcome == 'success'
++        timeout-minutes: 1
++        continue-on-error: true
++        uses: ./.github/actions/alert-issue
++        with:
++          token: ${{ github.token }}
++          mode: resolve
++          title: 🚨 교내 소식 로봇 — 수집 단계가 끝까지 못 갔어요
++          body: |
++            ✅ 소식 수집 단계가 다시 끝까지 갔습니다 — 자동으로 닫습니다.
++            실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
++
++      # 사진(썸네일) 단계도 결과를 본다 — 보강이라 넘어져도 작업은 초록이라, 이게 없으면 사진이 멈춘 것을 아무도 모른다.
++      - name: 🚨 사진(썸네일) 단계 실패 알림
++        if: steps.thumbs.outcome == 'failure'
++        timeout-minutes: 1
++        uses: ./.github/actions/alert-issue
++        with:
++          token: ${{ github.token }}
++          mode: open
++          title: 🚨 교내 소식 로봇 — 사진(썸네일) 단계 실패
++          label: news-step
++          label-description: 교내 소식 로봇의 단계가 끝까지 못 감
++          body: |
++            소식 사진(썸네일) 단계가 실패했습니다. 소식 글은 그대로 나가지만 새 글의 사진이 붙지 않습니다.
++            실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
++            다음 실행에서 사진 단계가 성공하면 이 이슈는 저절로 닫힙니다.
++      - name: 사진 단계가 다시 성공하면 옛 경보를 닫는다
++        if: steps.thumbs.outcome == 'success'
++        timeout-minutes: 1
++        continue-on-error: true
++        uses: ./.github/actions/alert-issue
++        with:
++          token: ${{ github.token }}
++          mode: resolve
++          title: 🚨 교내 소식 로봇 — 사진(썸네일) 단계 실패
++          body: |
++            ✅ 소식 사진(썸네일) 단계가 다시 성공했습니다 — 자동으로 닫습니다.
++            실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
++
++      # 감사 실패는 조용히 넘어가지 않는다 — 되돌리기만 하고 끝나면 홈 구역이 **소리 없이 멈춘다**(리뷰 2026-10-01). 소식 리포트 이슈가 아니라 제 이슈로(첫 실행엔 댓글 달 리포트 이슈가 없다).
++      # 🔴 무엇을 되돌렸는지는 gate-guard 의 단락(/tmp/gate-note.md — 실제로 되돌린 파일에서 만든다)을 그대로 싣고, 제목은 결과로 가른다(2026-10-04 리뷰 —
++      #    다시 재니 통과(flaky)여도 '이번 발행분을 되돌렸습니다'라고 썼다). 🔴 이슈 **하나**에 모은다(제목에 날짜·결과를 넣지 않는다 —
++      #    옛 판은 실패마다 날짜 붙은 새 이슈) · 다시 통과하면 아래 짝 단계가 닫는다. prefix 로 찾아 날짜 붙은 옛 이슈에도 댓글이 붙는다.
++      - name: 🚨 데이터 감사 실패 알림
++        if: steps.audit.outcome == 'failure'
+         timeout-minutes: 1
+         env:
+           GH_TOKEN: ${{ github.token }}
+         run: |
+-          last=$(gh issue list --repo "${{ github.repository }}" \
+-            --search '"교내 소식 수집 리포트" in:title' --state open \
+-            --limit 1 --json number --jq '.[0].number' || true)
+-          if [ -n "$last" ] && [ "$last" != "null" ]; then
+-            gh issue comment "$last" --repo "${{ github.repository }}" \
+-              --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **교내 소식 로봇이 끝까지 못 갔어요** (실패 또는 시간 초과) — 이번 수집분은 저장되지 않았습니다. 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+-          fi
++          case "${{ steps.guard.outputs.gate }}" in
++            reverted-auto|reverted-files) result="되돌려서 통과" ;;
++            still-failing)                result="되돌려도 빨간불" ;;
++            flaky)                        result="다시 재니 통과(되돌린 것 없음)" ;;
++            *)                            result="되돌리기 도구가 넘어져 소식 파일을 직전 판으로 돌림" ;;
++          esac
++          {
++            echo "🗞 교내 소식 수집 로봇: 🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **데이터 관문(test-collector·audit-data) 실패** — $result"
++            echo
++            if [ -n "${{ steps.guard.outputs.gate }}" ] && [ -s /tmp/gate-note.md ]; then cat /tmp/gate-note.md
++            else echo "> 되돌리기 도구가 결과를 남기지 못해 소식 발행분(data/news)·소식 장부·소식 사진 장부를 직전 판으로 돌렸습니다 — 홈 「우리 학교 소식」은 이번 실행에 갱신되지 않습니다."; fi
++            echo
++            echo "실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '소식 감사 실패 확인해줘'라고 지시하세요."
++          } > /tmp/news-gate-issue.md
++          node tools/alert-issue.mjs --mode open --match prefix \
++            --title "🚨 교내 소식 데이터 감사 실패" \
++            --label news-audit --label-description '교내 소식 데이터 감사 실패' \
++            --assignee "${{ github.repository_owner }}" --body-file /tmp/news-gate-issue.md
++      - name: 감사가 다시 통과하면 옛 경보를 닫는다
++        if: steps.audit.outcome == 'success'
++        timeout-minutes: 1
++        continue-on-error: true
++        uses: ./.github/actions/alert-issue
++        with:
++          token: ${{ github.token }}
++          mode: resolve
++          title: 🚨 교내 소식 데이터 감사 실패
++          match: prefix
++          body: |
++            ✅ 교내 소식 데이터 감사가 다시 통과했습니다 — 이번 발행분은 저장됩니다. 자동으로 닫습니다.
++            실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
++
++      # 🔴 넘어짐 알림 한 벌(robot-down)로 (2026-10-04) — 옛 판은 열린 소식 리포트에 댓글만 달아, 리포트가 없으면 조용했다.
++      #    회복하면 하트비트가 닫는다.
++      - name: 🚨 실패·시간초과 알림
++        if: failure() || cancelled()
++        timeout-minutes: 1
++        uses: ./.github/actions/robot-down
++        with:
++          robot: 교내 소식 수집 로봇
++          token: ${{ github.token }}
++
++      # 🔴 되돌린 뒤에도 관문이 빨가면 초록불로 끝내지 않는다 (2026-10-04 · 로봇·도구 점검). 이슈는 위 '데이터 감사 실패 알림'이 이미 열었다(또는 코멘트).
++      #    failure()·cancelled() 알림 **뒤**에 둔다 — 앞에 두면 그 알림이 '이번 수집분은 저장되지 않았습니다'라는 틀린 말을 붙인다.
++      - name: 🚨 관문이 끝내 빨간불 (되돌린 뒤에도)
++        if: steps.guard.outputs.gate == 'still-failing'
++        timeout-minutes: 1
++        run: |
++          echo "::error::교내 소식 — 되돌리기 단계를 거친 뒤에도 데이터 관문이 빨갛습니다(무엇을 되돌렸는지는 감사 실패 이슈의 단락). 실행을 빨간불로 끝냅니다."
++          exit 1
+diff --git a/.github/workflows/collect-scholarships.yml b/.github/workflows/collect-scholarships.yml
+index b363e37a..5ae92786 100644
+--- a/.github/workflows/collect-scholarships.yml
++++ b/.github/workflows/collect-scholarships.yml
+@@ -41,7 +41,7 @@ jobs:
+     # 2026-09-29 수집망 2 → 44개교 복원: 「게시판 수집」 단계에 자체 상한 10분(예산 8분 + 마무리 2분)이 생겨
+     # 단계 합 4+10+6+5+1+4+3+3+4 = 40 → 상한 44. ⚠️ 상한을 키우는 것으로 때우지 말 것 — 단계가 오래 걸리면
+     # 그 단계의 예산(HARVEST_BUDGET_MS)을 줄이고, 상한은 그 합을 담는 그릇으로만 쓴다(8/2~3 사고의 교훈).
+-    timeout-minutes: 63   # 2026-10-05 장학 포스터 PaddleOCR 단계 7분 → 2026-10-03 대외활동 첨부·포스터 단계 9분(PaddleOCR 설치 포함) → 단계 합 51 + 여유 5 (2026-09-30 판정 로봇 2분 → 42+3)
++    timeout-minutes: 66   # 단계 합 61 + 여유 5 — 2026-10-05 장학 포스터 PaddleOCR 단계 7분 + 2026-10-04 관문 다시 재기 3분(gate-guard) (2026-10-03 대외활동 첨부·포스터 9분 → 51+5 · 2026-09-30 판정 로봇 2분 → 42+3)
+     steps:
+       - uses: actions/checkout@v4
+         with:
+@@ -162,16 +162,31 @@ jobs:
+           pip install olefile --quiet || true
+           python3 collector/hwp-bodytext.py || true
+ 
++      # PDF 글자 뽑기 (2026-09-05) — 첨부 293개 중 HWP 138개만 읽히고 있었다.
++      # PDF 94개(262만 자)가 잠들어 있었고 그 안에 자격·금액·작성 규정이 들어 있다.
++      # 🔴 위 '양식 확보' 단계 **안에** 넣으면 그 단계의 예산(6분)을 먹어 뒤따르는
++      #    스키마화가 통째로 안 돈다(2026-08-04 사고와 같은 구조). 그래서 자기 단계로 둔다.
++      # 🔴 OCR **앞**에 둔다 (2026-10-05 병합) — ocr-text.py 는 '글자층이 있는 PDF 는 pdf-text 가 이미 뽑았다'(.txt 가 있으면 건너뜀)로
++      #    양식·층2 PDF 를 거른다. OCR 이 발췌 앞으로 올라가며 이 단계보다 앞서게 되자, 이번 실행에 새로 받은 양식 PDF 를 OCR 이 먼저
++      #    쪽 그림으로 읽느라 예산(150초)을 썼다. 목록 갱신(apt-get update)도 여기 한 번만 한다.
++      - name: PDF 글자 뽑기
++        timeout-minutes: 3
++        continue-on-error: true
++        run: |
++          sudo apt-get update -qq
++          sudo apt-get install -y -qq poppler-utils
++          python3 collector/pdf-text.py
++
+       # 그림·스캔 첨부 글자 읽기 (OCR · 2026-09-17 개발자 지시 "직접 할 수 있으면 사용") — 무료 tesseract.
+       # 🔴 발췌·금액 **앞**에 둔다 (2026-10-05 · UI-12) — 뒤에 있으면 그 실행의 발췌·금액은 OCR 글자를 못 보고, 다음 실행의
+       #    첨부 받기가 같은 공고를 다시 받으며 .ocr.txt 를 지워 **영영 못 읽었다**(첨부 받기 → OCR → 발췌 순서 · 관문 「첨부 받기」).
++      #    지금 첨부 받기는 받은 바이트가 같으면 .ocr.txt 를 지우지 않는다(deepfetch.mjs · 점검 bodies-5) — 순서는 새로 받은 첨부를 그 실행에 읽기 위한 것.
+       # 품질 관문(한글 비율)을 넘은 것만 .ocr.txt 로 남기고, 장부(ocr-ledger.json)가 같은 파일을 다시 안 읽는다.
+       # 🔴 `|| true` 로 설치 실패를 삼키지 말 것 — '매번 0개 + 초록불'(pdf-text 와 같은 규칙 · test-collector 관문).
+       - name: 그림·스캔 첨부 글자 읽기 (OCR)
+         timeout-minutes: 4
+         continue-on-error: true
+         run: |
+-          sudo apt-get update -qq   # 아래 'PDF 글자 뽑기' 보다 앞에 왔으니 목록 갱신을 여기서
+           sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-kor poppler-utils
+           python3 collector/ocr-text.py --budget-sec=150
+ 
+@@ -183,8 +198,10 @@ jobs:
+         timeout-minutes: 7
+         continue-on-error: true
+         run: |
+-          pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3
+-          python3 collector/paddle-ocr.py collector/extracted --prefix=elig- --budget-sec=180 || true
++          # 🔴 설치·읽기 실패를 `|| true` 로 삼키지 않는다(아래 대외활동 단계와 같은 규칙 · 2026-10-04 점검 gaps-02) — 엔진 고장은 경고로 남기고,
++          #    bash -e 에 끊기지 않아 주인 확인(tesseract 가 읽은 그림 글자도 본다)은 늘 돈다
++          pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3 || echo "::warning::PaddleOCR 설치 실패 — 장학 포스터 읽기는 건너뛰고 주인 확인은 계속"
++          python3 collector/paddle-ocr.py collector/extracted --prefix=elig- --budget-sec=180 || echo "::warning::PaddleOCR 실패(엔진 고장이면 종료 코드 2) — 주인 확인은 계속"
+           node collector/elig-ocr-guard.mjs
+ 
+       - name: 공고 원문 발췌 갱신 (정직 원칙 — 추론 대신 원문 그대로)
+@@ -215,21 +232,6 @@ jobs:
+           node collector/kind-classify.mjs || echo "kind-classify 실패 — 다음 줄은 계속"
+           node collector/portal-candidates.mjs || echo "portal-candidates 실패"
+ 
+-      # 데이터 관문 (2026-07-30 도입): 로봇이 바꾼 데이터가 규칙을 어기면 저장하지 않고 되돌린다.
+-      # 잘못된 공고가 앱에 하루라도 노출되는 일을 막는 장치 — 사람이 감사를 기억해서 돌릴 필요가 없다.
+-      # 위치 규칙 (2026-08-01): 관문은 **저장 직전**에 둔다. 예전엔 양식 스키마화보다 앞에 있어서
+-      # 스키마화가 만든 잘못된 연결이 그 실행에서는 안 잡히고 다음 날 실행에서 터졌다(이슈 #79).
+-      # PDF 글자 뽑기 (2026-09-05) — 첨부 293개 중 HWP 138개만 읽히고 있었다.
+-      # PDF 94개(262만 자)가 잠들어 있었고 그 안에 자격·금액·작성 규정이 들어 있다.
+-      # 🔴 위 '양식 확보' 단계 **안에** 넣으면 그 단계의 예산(6분)을 먹어 뒤따르는
+-      #    스키마화가 통째로 안 돈다(2026-08-04 사고와 같은 구조). 그래서 자기 단계로 둔다.
+-      - name: PDF 글자 뽑기
+-        timeout-minutes: 3
+-        continue-on-error: true
+-        run: |
+-          sudo apt-get update -qq
+-          sudo apt-get install -y -qq poppler-utils
+-          python3 collector/pdf-text.py
+       # 대외활동·공모전 — 본문에 자격이 없는 글의 첨부·포스터를 무료로 읽는다 (2026-10-03 개발자 지시 "무료로 최대한 땜빵").
+       # 받은 파일은 collector/act-files/(.gitignore) — 한 단계 안에서 받고(①) HWP·OCR 글자를 뽑고 자격을 고른다(②). 커밋은 장부 act-docs.json 만.
+       # 유료 AI(③)는 여기서 안 돈다 — 「자격요건 매칭 · AI 자격 읽기」 버튼에서만. 보강 단계 규칙: 자기 상한 + continue-on-error.
+@@ -242,21 +244,30 @@ jobs:
+           pip install olefile --quiet
+           python3 collector/hwp-bodytext.py collector/act-files || true   # 실패해도 아래 읽기는 돈다(그 글의 무료 기회 두 번 중 하나를 날리지 않게)
+           sudo apt-get install -y -qq poppler-utils   # PDF 공고문을 쪽 그림으로(pdftoppm) — 서울문화포털 글은 자격이 PDF 에만 있다
+-          pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3   # 🔴 판 고정 — 3.3.x 는 x86 CPU 에서 첫 그림부터 ConvertPirAttribute2RuntimeAttribute 오류(2026-10-04 첫 클라우드 실행 · PaddleOCR discussions 17350)
+-          python3 collector/paddle-ocr.py collector/act-files --budget-sec=180 || true
++          pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3 || echo "::warning::PaddleOCR 설치 실패 — 아래 읽기가 엔진 없음으로 적고 HWP·본문으로만 계속"   # 🔴 실패를 삼키지도, 경고 없이 떼지도 말 것 — 떼면 같은 단계의 --apply 가 bash -e 에 끊겨 HWP 로 읽은 자격까지 버려진다(2026-10-04 점검 gaps-02) · 🔴 판 고정 — 3.3.x 는 x86 CPU 에서 첫 그림부터 ConvertPirAttribute2RuntimeAttribute 오류(2026-10-04 첫 클라우드 실행 · PaddleOCR discussions 17350)
++          python3 collector/paddle-ocr.py collector/act-files --budget-sec=180 || echo "::warning::PaddleOCR 실패 — 자격 읽기는 HWP·본문으로만 계속(엔진 고장이면 그 글의 기회는 --apply 가 되돌린다)"
+           node collector/activity-docs.mjs --apply
++      # 데이터 관문 (2026-07-30 도입): 로봇이 바꾼 데이터가 규칙을 어기면 저장하지 않고 되돌린다.
++      # 잘못된 공고가 앱에 하루라도 노출되는 일을 막는 장치 — 사람이 감사를 기억해서 돌릴 필요가 없다.
++      # 위치 규칙 (2026-08-01): 관문은 **저장 직전**에 둔다. 예전엔 양식 스키마화보다 앞에 있어서
++      # 스키마화가 만든 잘못된 연결이 그 실행에서는 안 잡히고 다음 날 실행에서 터졌다(이슈 #79).
+       - name: 데이터 관문 (수집기 규칙 테스트 + 데이터 감사)
+         id: audit
+         continue-on-error: true
+         run: |
+           node verify/test-collector.mjs
+           node verify/audit-data.js
++      # 🔴 되돌리고 **관문을 다시 잰다** (2026-10-04 · 로봇·도구 점검 — 로직은 collector/gate-guard.mjs 한 곳).
++      #    예전엔 새 자동 등록분만 빼고 끝나, 원인이 기존 항목 수정(발췌 등)이면 아무것도 못 한 채 아래 저장 단계가 관문 실패 상태의
++      #    정식 등록 파일을 커밋했다. 이제 ① 새 자동 등록분 → 다시 재기 → ② 정식 등록·양식·대기열을 HEAD 판으로 → 다시 재기.
++      #    결과는 steps.guard.outputs.gate(reverted-auto · reverted-files · still-failing · flaky) — still-failing 이면 맨 끝 단계가 빨간불 + 이슈.
++      #    상한 3분 = 관문 최대 두 번(로컬 실측 ~25초씩) + 여유. 넘어지면 정식 등록 파일만이라도 HEAD 판으로(|| 뒤).
+       - name: 감사 실패 시 자동 등록분 되돌리기
++        id: guard
+         if: steps.audit.outcome == 'failure'
++        timeout-minutes: 3
+         run: |
+-          # 파일 전체가 아니라 '이번 실행이 새로 자동 등록한 공고'만 골라서 뺀다
+-          # (같은 실행의 원문 발췌 갱신 같은 정상 작업까지 버리지 않도록)
+-          node collector/revert-auto.mjs || git checkout -- data/registered.json
++          node collector/gate-guard.mjs --report collector/report.md --note /tmp/gate-note.md --stage auto --stage data/registered.json,data/forms.json,collector/pending-forms.json || git checkout -- data/registered.json data/forms.json collector/pending-forms.json
+ 
+       - name: 수집 상태 저장 (중복 방지 기록)
+         run: |
+@@ -280,6 +291,8 @@ jobs:
+           [ -f collector/find-boards-report.md ] && git add collector/find-boards-report.md
+           [ -f data/external.json ] && git add data/external.json
+           [ -f collector/seen-external.json ] && git add collector/seen-external.json
++          # 대외활동·재단 출처의 연속 실패 장부 (2026-10-05 점검 collect-08 · collector/source-health.mjs) — 빠지면 매 실행 0 부터 세어 🙋 가 영영 안 뜬다
++          [ -f collector/source-health.json ] && git add collector/source-health.json
+           # 🔴 학교별 공고 파일 — 앱이 **실제로 읽는 것은 이쪽**이다(data/notices.json 은
+           #    학교별 파일이 아직 없는 학교를 위한 뒷길). 수집기는 매 실행 이 폴더를 새로
+           #    쓰는데 여기에 없어서 **한 번도 저장되지 않았다** — 2026-08-17 에 폴더를
+@@ -301,6 +314,8 @@ jobs:
+           [ -f collector/collect-cursor.json ] && git add collector/collect-cursor.json
+           [ -f collector/health.json ] && git add collector/health.json
+           [ -f collector/pending-forms.json ] && git add collector/pending-forms.json
++          [ -f collector/auto-held.json ] && git add collector/auto-held.json   # 관문에 걸린 자동 등록 쉬기 장부 (2026-10-04 · gate-guard·auto-register)
++          [ -f collector/past-rounds.json ] && git add collector/past-rounds.json   # 지난 회차 장부 — 등록 뒤 마감 경과로 뺀 등록분의 사업 (2026-10-05 · auto-register)
+           [ -d collector/extracted ] && git add collector/extracted
+           # 리포트 본문도 저장한다 — 이슈에만 올리고 파일을 커밋하지 않아서, 관리자 화면의
+           # '일반 수집 리포트' 버튼이 늘 "리포트 파일이 아직 없습니다"였다 (2026-08-12 수리).
+@@ -381,24 +396,54 @@ jobs:
+           last=$(gh issue list --repo "${{ github.repository }}" \
+             --search '"장학공고 수집 리포트" in:title' --state open \
+             --limit 1 --json number --jq '.[0].number' || true)
++          # 🔴 관문 결과로 가른다 (2026-10-04) — 관문이 빨간 날에도 '정상 실행'이라 적어 감사 실패가 묻혔다.
++          #    다시 재니 통과(flaky)는 빨간불이 아니다 — 결과 이름(영문)을 그대로 적지 않고 쉬운 말로(리뷰 2026-10-04).
++          if [ "${{ steps.audit.outcome }}" = "failure" ]; then
++            case "${{ steps.guard.outputs.gate }}" in
++              flaky)          gate="데이터 관문은 처음에 빨갛다가 다시 재니 통과 — 되돌린 것 없음" ;;
++              reverted-auto)  gate="**데이터 관문 빨간불** — 새 자동 등록분을 되돌려 통과" ;;
++              reverted-files) gate="**데이터 관문 빨간불** — 파일을 직전 판으로 되돌려 통과(무엇인지는 아래 코멘트)" ;;
++              still-failing)  gate="**데이터 관문 빨간불** — 되돌려도 빨간불(이 실행은 빨간불로 끝납니다)" ;;
++              *)              gate="**데이터 관문 빨간불** — 되돌리기 도구가 결과를 남기지 못함" ;;
++            esac
++            msg="🤖 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 수집은 정상 · $gate — 새 공고 0건 · 아래 감사 실패 코멘트를 보세요."
++          else
++            msg="🤖 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 수집 로봇 정상 실행 — 새 공고 0건이라 새 리포트는 만들지 않았어요."
++          fi
++          # 피드 메우기(🔁)·화면 0건 학교(🙋) 줄은 0건 날에도 붙인다 (2026-10-05 리뷰) — 리포트 이슈는 새 공고가 있는 날만 생겨,
++          # 피드가 비어 '새 공고 0건'이 이어지는 날(9-30 사고 뒤처럼)에 이 두 줄이 report.md 에만 남고 아무에게도 안 닿았다.
++          feedlines=$(grep -E '^(🔁|🙋) ' collector/report.md 2>/dev/null || true)
++          if [ -n "$feedlines" ]; then
++            msg="$msg"$'\n\n'"$feedlines"
++          fi
+           if [ -n "$last" ] && [ "$last" != "null" ]; then
+-            gh issue comment "$last" --repo "${{ github.repository }}" \
+-              --body "🤖 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 수집 로봇 정상 실행 — 새 공고 0건이라 새 리포트는 만들지 않았어요."
++            gh issue comment "$last" --repo "${{ github.repository }}" --body "$msg"
+           fi
+ 
+       # 로봇이 어떤 단계에서든 실패하면 조용히 멈추지 않고 즉시 알린다
+       # (2026-07-17~19 이틀간 8회 연속 실패를 아무도 몰랐던 사고의 재발 방지)
++      # 🔴 제 리포트 이슈로 (2026-10-04) — '"수집 리포트"' 부분 일치는 더 최근의 브라우저형 리포트 이슈를 집어(#381 코멘트 9개 중 4개가 이 로봇 것)
++      #    어느 로봇의 실패인지도 안 적혀 있었다. 무엇을 되돌렸는지는 gate-guard 의 단락(/tmp/gate-note.md)을 싣는다.
+       - name: 🚨 데이터 감사 실패 알림
+         if: steps.audit.outcome == 'failure'
+         env:
+           GH_TOKEN: ${{ github.token }}
+         run: |
++          # 무엇을 되돌렸는지는 gate-guard 의 단락(/tmp/gate-note.md — 실제로 되돌린 파일에서 만든다)을 그대로 싣는다(문구를 여기 베끼지 않는다).
++          # 결과(steps.guard.outputs.gate)가 비었으면 되돌리기 도구가 넘어져 아래 || 뒤가 파일을 직전 판으로 돌린 것이다.
++          {
++            echo "🤖 장학공고 수집 로봇: 🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **데이터 관문(감사) 실패**"
++            echo
++            if [ -n "${{ steps.guard.outputs.gate }}" ] && [ -s /tmp/gate-note.md ]; then cat /tmp/gate-note.md
++            else echo "> 되돌리기 도구가 결과를 남기지 못해 정식 등록·양식·양식 대기열 파일을 직전 판으로 돌렸습니다."; fi
++            echo
++            echo "실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '감사 실패 확인해줘'라고 지시하세요."
++          } > /tmp/audit-alert.md
+           last=$(gh issue list --repo "${{ github.repository }}" \
+-            --search '"수집 리포트" in:title' --state open \
++            --search '"장학공고 수집 리포트" in:title' --state open \
+             --limit 1 --json number --jq '.[0].number' || true)
+           if [ -n "$last" ] && [ "$last" != "null" ]; then
+-            gh issue comment "$last" --repo "${{ github.repository }}" \
+-              --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **데이터 감사 실패 — 이번 자동 등록분은 되돌렸습니다.** 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · 수집된 공고 자체는 실시간 피드에 그대로 남아 있어요. Claude 세션에 '감사 실패 확인해줘'라고 지시하세요."
++            gh issue comment "$last" --repo "${{ github.repository }}" --body-file /tmp/audit-alert.md
+           fi
+ 
+       # cancelled()가 반드시 있어야 한다 (2026-08-04에 뚫린 구멍).
+@@ -417,3 +462,32 @@ jobs:
+             gh issue comment "$last" --repo "${{ github.repository }}" \
+               --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **수집 로봇이 끝까지 못 갔어요** (실패 또는 시간 초과로 취소) — 이번 수집분은 저장되지 않았습니다. 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · 관리자 화면 → 로봇 (https://hanggonggan-admin.pages.dev/#robots) 에서 「일반 수집 로봇」의 **지금 실행**을 **한 번** 눌러 보세요 — 학교 서버가 잠깐 늦은 것이면 이것으로 끝납니다. 그래도 또 넘어지면 Claude 세션에 '로봇 실패 확인해줘'라고 지시하세요."
+           fi
++
++      # 🔴 되돌린 뒤에도 관문이 빨가면 초록불로 끝내지 않는다 (2026-10-04 · 로봇·도구 점검).
++      #    failure()·cancelled() 알림 **뒤**에 둔다 — 앞에 두면 그 알림이 '이번 수집분은 저장되지 않았습니다'라는 틀린 말을 붙인다(저장은 됐다).
++      - name: 🚨 관문이 끝내 빨간불 (되돌린 뒤에도)
++        if: steps.guard.outputs.gate == 'still-failing'
++        env:
++          GH_TOKEN: ${{ github.token }}
++        run: |
++          {
++            echo "🤖 장학공고 수집 로봇: 🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 되돌리기 단계를 거친 뒤에도 데이터 관문이 빨갛습니다 — 무엇을 되돌렸는지는 아래 단락에 있습니다."
++            echo
++            cat /tmp/gate-note.md 2>/dev/null || true
++            echo
++            echo "실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '데이터 관문 빨간불 확인해줘'라고 지시하세요."
++          } > /tmp/gate-issue.md
++          # 원인이 기존 데이터면 실행마다 빨갛다 — 열린 같은 이슈가 있으면 코멘트(하루 최대 5개씩 쌓이지 않게 · 2026-10-04 리뷰). 로봇 이름은 본문 첫 줄에.
++          open=$(gh issue list --repo "${{ github.repository }}" \
++            --search '"데이터 관문이 되돌린 뒤에도 빨간불" in:title' --state open \
++            --limit 1 --json number --jq '.[0].number' || true)
++          if [ -n "$open" ] && [ "$open" != "null" ]; then
++            gh issue comment "$open" --repo "${{ github.repository }}" --body-file /tmp/gate-issue.md || true
++          else
++            gh issue create --repo "${{ github.repository }}" \
++              --title "🚨 데이터 관문이 되돌린 뒤에도 빨간불 — 장학공고 수집 로봇 $(TZ=Asia/Seoul date +%Y-%m-%d)" \
++              --body-file /tmp/gate-issue.md \
++              --assignee "${{ github.repository_owner }}" || true
++          fi
++          echo "::error::데이터 관문이 되돌린 뒤에도 빨간불입니다 — 이슈에 적었습니다."
++          exit 1
+diff --git a/.github/workflows/deep-fetch.yml b/.github/workflows/deep-fetch.yml
+index e2abac72..5e747c6b 100644
+--- a/.github/workflows/deep-fetch.yml
++++ b/.github/workflows/deep-fetch.yml
+@@ -16,6 +16,12 @@ permissions:
+   contents: write
+   issues: write
+ 
++# 🔴 같은 로봇이 겹쳐 돌지 않게 — push-to-run 을 연달아 하거나 버튼을 두 번 누르면 둘이 같은 원문 파일을 쓰고 push 가 부딪힌다(2026-10-04 점검 bodies-12).
++#    수집 로봇의 대기줄(collector)과는 **합치지 않는다** — 같은 줄에 넣으면 기다리던 예약 수집이 취소된다(CLAUDE.md).
++concurrency:
++  group: deep-fetch
++  cancel-in-progress: false
++
+ jobs:
+   deepfetch:
+     runs-on: ubuntu-latest
+@@ -84,6 +90,8 @@ jobs:
+ 
+       # 조용한 중단 방지 — 심층 수집에도 실패 알림을 붙인다(2026-07-31).
+       # 이게 없으면 양식 원본을 기다리던 다음 세션이 "왜 안 왔지"만 반복하게 된다.
++      # 검색어는 '"장학공고 수집 리포트"' — 맨 '"수집 리포트"' 는 부분 일치라 더 최근의 브라우저형·소식 리포트 이슈를 집을 수 있다
++      # (장학 수집 로봇의 알림이 실제로 그랬다 — 2026-10-04 점검 · 이슈 #381). 양식 원본은 정식 등록 쪽 일이라 장학공고 리포트로 간다.
+       - name: 🚨 실패 알림 (최근 리포트 이슈에 코멘트)
+         # cancelled()도 본다 — 시간 상한을 넘긴 작업은 '실패'가 아니라 '취소'로 끝나서
+         # failure()만 보면 이 알림까지 건너뛴다 (2026-08-04·05 수집 로봇에서 실제로 겪은 구멍).
+@@ -92,7 +100,7 @@ jobs:
+           GH_TOKEN: ${{ github.token }}
+         run: |
+           last=$(gh issue list --repo "${{ github.repository }}" \
+-            --search '"수집 리포트" in:title' --state open \
++            --search '"장학공고 수집 리포트" in:title' --state open \
+             --limit 1 --json number --jq '.[0].number' || true)
+           if [ -n "$last" ] && [ "$last" != "null" ]; then
+             gh issue comment "$last" --repo "${{ github.repository }}" \
+diff --git a/.github/workflows/device-deploy.yml b/.github/workflows/device-deploy.yml
+index bb6f526b..771a6dec 100644
+--- a/.github/workflows/device-deploy.yml
++++ b/.github/workflows/device-deploy.yml
+@@ -38,6 +38,7 @@ on:
+ permissions:
+   contents: write
+   issues: write
++  actions: write       # 배포 뒤 화면 검사(verify-ui)를 깨우기 위해 (아래 '화면 검사 깨우기' 단계 · 2026-10-04)
+ 
+ # deploy-sync·main-guard 와 **다른** 그룹. 같은 그룹에 넣으면 GitHub 이 대기 중인 오래된 실행을
+ # 취소해 버려서, 사람이 누른 배포가 조용히 사라진다.
+@@ -94,6 +95,8 @@ jobs:
+             echo "❌ '$SRC' 브랜치를 찾지 못했어요."
+             echo "state=nobranch" >> "$GITHUB_OUTPUT"; exit 0
+           fi
++          # 합치기 전 기본 브랜치 위치 — 이 배포가 insta/run-notify.txt 를 바꿨는지 아래 '인스타 수정본 알림 깨우기' 가 본다
++          echo "before=$(git rev-parse "origin/$BASE")" >> "$GITHUB_OUTPUT"
+ 
+           # ── 표식 확인 (push 로 깨어났을 때만) ──────────────────────────
+           # 표식 파일이 '지금 push 된 브랜치'를 가리킬 때만 배포한다. 다른 세션이 기본 브랜치를
+@@ -170,6 +173,116 @@ jobs:
+             console.log('실시간 공고 '+a(n).length+'건 · 정식 등록 '+a(r).length+'건');"
+           git log --oneline -5
+ 
++      # 🔴 배포한 내용으로 화면 검사를 깨운다 (2026-10-04 · 로봇·도구 점검).
++      #    이 워크플로가 올린 push 는 GitHub 규칙상 다른 워크플로를 깨우지 못해(위 머리말),
++      #    작업 브랜치 하나만 쓰는 세션의 배포는 화면 검사(verify-ui)가 **한 번도 안 돈 채** 앱에 나갈 수 있었다
++      #    (실측: 10-02 15:12Z → 10-03 08:06Z 사이 verify-ui 실행 0). 버튼 실행(workflow_dispatch)만은
++      #    이 열쇠(GITHUB_TOKEN)로도 새 실행을 만든다 — GitHub 이 허용하는 예외다.
++      #    기본 브랜치로 깨우는 이유: ① 빨간불 경보를 닫는 단계가 기본 브랜치에서만 돈다 ② main 은 방금 기본 브랜치를 합친 같은 내용이다.
++      #    ⚠️ 배포를 막지는 않는다(검사는 배포 뒤에 돈다) — 막을지는 개발자 결정 대기.
++      #    깨우기가 실패해도 배포는 이미 끝났으니 실패로 보이지 않게 continue-on-error.
++      - name: 화면 검사 깨우기 (배포한 내용으로)
++        if: steps.run.outputs.state == 'deployed'
++        continue-on-error: true
++        timeout-minutes: 3
++        env:
++          GH_TOKEN: ${{ github.token }}
++          REPO: ${{ github.repository }}
++        run: gh workflow run verify-ui.yml --repo "$REPO" --ref claude/nice-heisenberg-WESq5
++
++      # 🔴 채팅에서 고친 인스타 카드의 알림을 깨운다 (2026-10-04 로봇·도구 점검 · 스킬 insta-revise 5-3).
++      #    작업 브랜치만 쓰는 세션은 insta/run-notify.txt 를 이 워크플로로 기본 브랜치에 올리는데, 이 워크플로의 push 는
++      #    다른 워크플로를 못 깨워(위 머리말) insta.yml 의 push 트리거가 **조용히 안 돌았다** — 수정본 알림이 개발자에게 안 갔다.
++      #    버튼 실행(workflow_dispatch)만은 이 열쇠로도 깨어난다(화면 검사 깨우기와 같은 예외). 기본 브랜치에 폴더가 올라간 **뒤**여야 한다
++      #    (insta.yml 이 거기서 insta/pub/<코드> 를 찾는다). 사람이 기본 브랜치에 직접 올린 표식은 insta.yml 의 push 트리거가 그대로 받는다 —
++      #    여기는 이 배포가 그 파일을 바꿨을 때만 깨우므로 두 번 울리지 않는다.
++      #    🔴 step 글자는 insta.yml 선택지와 한 글자도 다르면 안 된다(422 거절 — 관문 verify/health-gates/insta.mjs 가 대조한다).
++      - name: 인스타 수정본 알림 깨우기 (insta/run-notify.txt 가 바뀌었을 때)
++        id: instanotify
++        if: steps.run.outputs.state == 'deployed' || steps.run.outputs.state == 'uptodate'
++        continue-on-error: true
++        timeout-minutes: 3
++        env:
++          GH_TOKEN: ${{ github.token }}
++          REPO: ${{ github.repository }}
++          BASE: claude/nice-heisenberg-WESq5
++          BEFORE: ${{ steps.run.outputs.before }}
++        run: |
++          set -u
++          # 배포됐는데(deployed·uptodate) 합치기 전 위치가 비었으면 위 run 단계의 before= 줄이 빠진 것이다 — 조용히 넘기면 수정본 알림이
++          # 영영 안 간다. 실패로 끝내 아래 🚨 이슈를 태운다(리뷰 2026-10-05 · 관문이 before= 가 첫 git merge 보다 앞인지도 본다).
++          [ -n "$BEFORE" ] || { echo '🚨 배포 전 기본 브랜치 위치(before)를 몰라 인스타 알림 표식이 바뀌었는지 알 수 없습니다 — run 단계의 before= 줄을 보세요.'; exit 1; }
++          git fetch origin "$BASE"
++          if [ -z "$(git diff --name-only "$BEFORE" "origin/$BASE" -- insta/run-notify.txt)" ]; then
++            echo '인스타 알림 표식(insta/run-notify.txt)은 이번 배포로 바뀌지 않았습니다.'; exit 0
++          fi
++          CODE="$(git show "origin/$BASE:insta/run-notify.txt" | sed -n 's/^code:[[:space:]]*//p' | head -1 | tr -d '\r' | sed 's/[[:space:]]*$//')"
++          if ! printf '%s' "$CODE" | grep -qE '^[A-Za-z0-9_-]+$'; then
++            echo "insta/run-notify.txt 의 code: 줄이 비었거나 공고 코드 꼴이 아닙니다('$CODE') — 알림을 깨우지 않습니다."; exit 0
++          fi
++          gh workflow run insta.yml --repo "$REPO" --ref "$BASE" -f step='알림 (준비된 카드를 다시 보낸다)' -f code="$CODE"
++          {
++            echo "📸 인스타 수정본 알림을 깨웠습니다 — 공고 \`$CODE\`"
++            echo "실행 목록: https://github.com/$REPO/actions/workflows/insta.yml"
++          } >> "$GITHUB_STEP_SUMMARY"
++
++      # 깨우기가 넘어지면 수정본 알림이 안 간 것이다 — 배포는 끝났으니 배포 실패가 아니라 따로 이슈로 부른다(사람이 확인하고 닫는다).
++      - name: 🚨 인스타 수정본 알림을 못 깨웠다
++        if: steps.instanotify.outcome == 'failure'
++        uses: ./.github/actions/alert-issue
++        with:
++          token: ${{ github.token }}
++          mode: open
++          title: 🚨 인스타 수정본 알림을 못 깨웠습니다
++          label: insta-fail
++          label-description: 인스타 게시 실패
++          body: |
++            「이 기기에서 배포」 가 insta/run-notify.txt 를 기본 브랜치에 올렸는데 「인스타 카드뉴스 게시」(알림)를 깨우지 못했습니다 — 수정본이 개발자에게 안 갔습니다.
++            Actions 「인스타 카드뉴스 게시」 를 단계 「알림 (준비된 카드를 다시 보낸다)」 와 run-notify.txt 의 code 로 직접 실행하세요.
++            실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
++
++      # 🔴 배포가 됐으면 옛 '배포 실패' 경보를 닫는다 (2026-10-04 로봇·도구 점검 · 묶음 alerts).
++      #    아래 실패 알림은 열기·댓글만 해서, 그 뒤 손으로든 다음 배포로든 다 나간 작업의 🚨 가 09-14 부터 열려 있었다(#274 —
++      #    본문·댓글의 브랜치 다섯 모두 main 보다 앞선 커밋 0).
++      #    판정은 **사실 하나**로만 한다: 경보에 적힌 작업 브랜치가 전부 main 에 들어갔는가(compare main...브랜치 의 ahead_by == 0).
++      #    브랜치를 못 찾음(지워짐·404)·조회 실패·이름 '?' 는 '모름'이라 그 경보는 그대로 둔다 — 못 읽은 것을 '나갔다'로 읽지 않는다.
++      #    어느 브랜치에서 돌아도 같은 사실을 보므로 안전하다. 보강이라 실패해도 배포를 빨갛게 하지 않는다.
++      - name: 배포가 됐으면 옛 배포 실패 경보를 닫는다
++        if: steps.run.outputs.state == 'deployed' || steps.run.outputs.state == 'uptodate'
++        continue-on-error: true
++        timeout-minutes: 2
++        env:
++          GH_TOKEN: ${{ github.token }}
++          REPO: ${{ github.repository }}
++          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
++        run: |
++          set -u
++          # 라벨이 아니라 **제목**으로 찾는다 — 라벨 붙이기가 막혀 라벨 없이 만들어진 옛 경보도 잡힌다(아래 실패 알림의 예비 명령).
++          for n in $(gh issue list --repo "$REPO" --state open --limit 500 \
++                       --json number,title --jq '.[] | select(.title | startswith("🚨 이 기기에서 배포 실패")) | .number'); do
++            text="$(gh issue view "$n" --repo "$REPO" --json body,comments --jq '[.body] + [.comments[].body] | join("\n")')" \
++              || { echo "#$n: 본문을 못 읽어 그대로 둡니다"; continue; }
++            branches="$(printf '%s\n' "$text" | grep -oE '작업 브랜치 `[^`]+`' | sed -E 's/^작업 브랜치 `//; s/`$//' | sort -u || true)"
++            if [ -z "$branches" ]; then echo "#$n: 브랜치 이름을 못 찾아 그대로 둡니다"; continue; fi
++            all=1; lines=""
++            while IFS= read -r b; do
++              [ -n "$b" ] || continue
++              ahead="$(gh api "repos/$REPO/compare/main...$b" --jq .ahead_by 2>/dev/null || true)"
++              case "$ahead" in
++                0) lines+="· \`$b\` — main 에 모두 들어갔습니다"$'\n' ;;
++                ''|*[!0-9]*) all=0; lines+="· \`$b\` — 확인하지 못했습니다(브랜치가 없거나 조회 실패)"$'\n' ;;
++                *) all=0; lines+="· \`$b\` — 아직 main 에 없는 커밋 ${ahead}개"$'\n' ;;
++              esac
++            done <<< "$branches"
++            printf '#%s\n%s' "$n" "$lines"
++            if [ "$all" = "1" ]; then
++              gh issue close "$n" --repo "$REPO" --reason completed \
++                --comment "✅ $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST — 이 경보에 적힌 작업 브랜치가 전부 앱(main)에 들어갔습니다. 자동으로 닫습니다."$'\n\n'"${lines}"$'\n'"확인한 실행: ${RUN_URL}"
++            else
++              echo "#$n: 아직 다 나가지 않았거나 확인하지 못해 그대로 둡니다"
++            fi
++          done
++
+       # 조용히 멈추지 않는다. 알림이 쌓이지 않게 열려 있는 같은 이슈가 있으면 코멘트만 단다.
+       - name: 🚨 배포 실패 알림
+         # 🔴 cancelled() 를 함께 본다 — 시간 초과는 '실패'가 아니라 '취소'로 끝나서
+diff --git a/.github/workflows/eligibility-fill.yml b/.github/workflows/eligibility-fill.yml
+index ea4a16d7..fd96c686 100644
+--- a/.github/workflows/eligibility-fill.yml
++++ b/.github/workflows/eligibility-fill.yml
+@@ -82,14 +82,20 @@ jobs:
+         run: |
+           node collector/eligibility-ai.mjs --all | tee /tmp/preview.txt
+           node collector/activity-docs.mjs --ai | tee -a /tmp/preview.txt   # 대외활동 대상 수 (꺼진 채 세기만 — 돈 0)
+-          n=$(sed -n 's/.*대상 \([0-9]*\)건.*/\1/p' /tmp/preview.txt | head -1)
+-          echo "count=${n:-0}" >> "$GITHUB_OUTPUT"
++          # 🔴 세 숫자를 다 센다 (2026-10-04 점검 bodies-10) — 예전엔 첫 줄(장학 본문 대상)만 세어, 첨부·대외활동 대상만 있는 날은 0 으로 보였다
++          s=$(sed -n 's/.*대상 \([0-9]*\)건 — 전수.*/\1/p' /tmp/preview.txt | head -1)
++          d=$(sed -n 's/.*첨부로 읽을 수 있는 공고 \([0-9]*\)건.*/\1/p' /tmp/preview.txt | head -1)
++          a=$(sed -n 's/.*AI 대상 \([0-9]*\)건.*/\1/p' /tmp/preview.txt | head -1)
++          echo "대상 — 장학 본문 ${s:-0}건 · 공고문 첨부 ${d:-0}건 · 대외활동 ${a:-0}건"
++          echo "count=$(( ${s:-0} + ${d:-0} + ${a:-0} ))" >> "$GITHUB_OUTPUT"
+ 
+-      - name: 대상이 0건이면 여기서 끝
++      # 🔴 예전 이름은 '여기서 끝'이었지만 단계 안의 exit 0 일 뿐이라 아래 유료 단계가 그대로 돌았다(점검 bodies-10).
++      #    이제 돈이 드는 단계마다 count != '0' 을 본다. 무료 단계(첨부 받기·글자 뽑기·OCR·발췌)는 그대로 돈다 — 새 대상을 만들 수 있고,
++      #    미리보기의 0 은 받기 전 숫자다.
++      - name: 대상이 0건이면 유료 단계는 건너뛴다
+         if: steps.preview.outputs.count == '0'
+         run: |
+-          echo "::notice::AI로 읽을 대상이 없습니다 — 원문이 없거나 이미 다 읽었습니다."
+-          exit 0
++          echo "::notice::AI로 읽을 대상이 없습니다 — 원문이 없거나 이미 다 읽었습니다. 돈이 드는 단계는 건너뜁니다."
+ 
+       # 🔴 무료로 읽을 수 있는 것을 먼저 읽는다 — 이 저장소의 방식이다(양식 스키마화와 같은 순서).
+       #    본문이 "붙임 참조"뿐인 공고는 공고문 첨부(HWP·PDF)에 자격이 있다. 받아서 발췌하면
+@@ -102,7 +108,8 @@ jobs:
+ 
+       # 🔴 받은 첨부에서 글자를 뽑는 단계가 여기 없었다 (2026-09-15 실측 · 노션 F-9).
+       #    deepfetch --elig-attach 는 다시 받는 공고의 `elig-<슬러그>-*` 를 **파생 .txt 까지** 지우고
+-      #    원본만 새로 놓는다. 그런데 이 워크플로에는 글자를 다시 뽑는 단계가 없어, 2026-09-15 실행이
++      #    원본만 새로 놓는다(2026-10-04 점검 bodies-5 부터는 받은 바이트가 바뀐 파일의 파생만 지운다 — 처음 받은 파일·바뀐 파일은
++      #    여전히 글자를 새로 뽑아야 하므로 이 단계는 그대로 둔다). 그런데 이 워크플로에는 글자를 다시 뽑는 단계가 없어, 2026-09-15 실행이
+       #    울산연구원 공고문 HWP 의 본문 글자(20KB)와 PDF 글자를 **지운 채로 커밋**했다 — 다음 날
+       #    수집 로봇이 뽑을 때까지 무료 경로(발췌기·금액 로봇)는 그 첨부를 읽을 수 없었다.
+       #    deep-fetch.yml 과 같은 단계다. 관문: test-collector '첨부를 받는 로봇이 전부 본문 추출기를…'.
+@@ -135,7 +142,7 @@ jobs:
+         run: node collector/extract-excerpts.mjs --write
+ 
+       - name: SDK 설치
+-        if: inputs.mode != '미리보기만'
++        if: inputs.mode != '미리보기만' && steps.preview.outputs.count != '0'
+         # sharp 는 큰 포스터를 줄이는 데 쓴다 — API 는 한 변 8,000픽셀까지만 받는데
+         # 학교 포스터는 인쇄용 원본을 그대로 올려 이 한계를 자주 넘는다(실측 5906×8268).
+         run: npm i @anthropic-ai/sdk sharp --no-audit --no-fund --silent
+@@ -146,14 +153,14 @@ jobs:
+       # 본문이 '붙임 참조'뿐이고 내용이 공고문 PDF·포스터 그림에만 있는 공고들.
+       # 지정 실행을 여러 번 띄우면 서로의 registered.json 을 덮어쓰므로 한 번에 돈다.
+       - name: 첨부만 (공고문 PDF · 포스터 그림)
+-        if: inputs.mode == '첨부만'
++        if: inputs.mode == '첨부만' && steps.preview.outputs.count != '0'
+         env:
+           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+           ELIG_AI_ENABLE: '1'
+         run: node collector/eligibility-ai.mjs --docs-only --write | tee /tmp/trial.txt
+ 
+       - name: 공고 하나만
+-        if: inputs.mode == '공고 하나만'
++        if: inputs.mode == '공고 하나만' && steps.preview.outputs.count != '0'
+         env:
+           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+           ELIG_AI_ENABLE: '1'
+@@ -161,7 +168,7 @@ jobs:
+         run: node collector/eligibility-ai.mjs --only="$ONLY_ID" --write | tee /tmp/trial.txt
+ 
+       - name: 시범 3건
+-        if: inputs.mode == '전부' || inputs.mode == '시범 3건만'
++        if: (inputs.mode == '전부' || inputs.mode == '시범 3건만') && steps.preview.outputs.count != '0'
+         env:
+           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+           ELIG_AI_ENABLE: '1'
+@@ -184,7 +191,7 @@ jobs:
+ 
+       # ④ 전수 — 소넷 기준 2,229원(2026-08-23 실측). 처음 한 번뿐이다.
+       - name: 전수 169건
+-        if: inputs.mode == '전부'
++        if: inputs.mode == '전부' && steps.preview.outputs.count != '0'
+         env:
+           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+           ELIG_AI_ENABLE: '1'
+@@ -195,7 +202,7 @@ jobs:
+       # 대외활동·공모전 (2026-10-03 개발자 지시 "api 잔액 채우고 딸깍 하면 실행") — 무료로 못 읽은 글의 포스터·PDF·본문을 AI 에게.
+       # 지어냄을 막는 관문은 장학과 같다(eligibility-ai.mjs verifyPdfLines·verifyPick). 한 실행 최대 40건(ACT_AI_MAX).
+       - name: 대외활동 — 포스터·첨부·본문 AI 읽기
+-        if: inputs.mode == '전부' || inputs.mode == '대외활동만'
++        if: (inputs.mode == '전부' || inputs.mode == '대외활동만') && steps.preview.outputs.count != '0'
+         continue-on-error: true
+         timeout-minutes: 10
+         env:
+diff --git a/.github/workflows/essay-playbook.yml b/.github/workflows/essay-playbook.yml
+index a56aad10..beb7bf4e 100644
+--- a/.github/workflows/essay-playbook.yml
++++ b/.github/workflows/essay-playbook.yml
+@@ -116,8 +116,13 @@ jobs:
+       # 🔴 예약 실행은 **바뀐 게 있거나 실패했을 때만** 이슈를 연다 — 매주 '변화 없음' 이슈가
+       #    쌓이면 소음이 된다(수집 로봇의 '0건이면 코멘트만' 원칙과 같은 맥락). 사람이 누른
+       #    실행(workflow_dispatch)은 결과가 궁금해 누른 것이므로 언제나 리포트한다.
++      # 🔴 시간 초과(취소)도 리포트한다 (2026-10-04 로봇·도구 점검) — 상한을 넘긴 작업은 '실패'가 아니라 '취소'라
++      #    failure() 만 보면 예약 실행이 시간 초과로 끝난 날 이슈가 없었다.
++      # 🔴 새 리포트가 옛 리포트를 넘겨받는다 (2026-10-04) — 옛 판은 만들기만 해서 📘 12건·🚨 1건이 열려 있었다.
++      #    새 리포트를 만든 뒤: 사람 댓글이 없는 옛 📘 는 '새 리포트로 넘어갑니다'로 닫고, 이번 실행이 성공이면 옛 🚨 도 닫는다.
++      #    실패 실행은 아무것도 닫지 않는다. 지난 리포트 정리(tools/report-retention.mjs · 📘 최신 1건)가 안전망이다.
+       - name: 결과 리포트 이슈
+-        if: always() && (github.event_name == 'workflow_dispatch' || failure() || steps.save.outputs.changed == '1')
++        if: always() && (github.event_name == 'workflow_dispatch' || failure() || cancelled() || steps.save.outputs.changed == '1')
+         uses: actions/github-script@v7
+         with:
+           script: |
+@@ -125,17 +130,41 @@ jobs:
+             const read = (p) => { try { return fs.readFileSync(p, 'utf8').slice(0, 60000); } catch { return '(리포트를 만들지 못했습니다)'; } };
+             const ok = process.env.RESULT === 'success';
+             const house = read('collector/essay-house-report.md');
+-            await github.rest.issues.create({
+-              owner: context.repo.owner, repo: context.repo.repo,
++            const { owner, repo } = context.repo;
++            const made = await github.rest.issues.create({
++              owner, repo,
+               labels: ['essay-playbook'],
+               title: `${ok ? '📘' : '🚨'} 작성 규칙 학습 — ${new Date().toISOString().slice(0, 10)}`,
+               body: `${read('collector/essay-playbook-report.md')}\n\n---\n\n${house}`.slice(0, 60000),
+             });
++            const n = made.data.number;
++            if (ok) {
++              const open = await github.paginate(github.rest.issues.listForRepo, { owner, repo, state: 'open', labels: 'essay-playbook', per_page: 100 });
++              for (const i of open) {
++                if (i.number === n || i.pull_request) continue;
++                const t = String(i.title || '');
++                let why = '';
++                if (t.startsWith('🚨 작성 규칙 학습')) why = `✅ #${n} 실행이 성공했습니다 — 지난 실패 리포트를 닫습니다. (자동)`;
++                else if (t.startsWith('📘 작성 규칙 학습')) {
++                  const cs = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: i.number, per_page: 100 });
++                  if (cs.some((c) => c.user && c.user.type !== 'Bot')) continue;   // 사람 댓글이 있으면 남긴다(지시가 적혀 있을 수 있다)
++                  why = `새 리포트 #${n} 으로 넘어갑니다 — 지난 리포트를 닫습니다. 내용은 그대로 남아 있습니다. (자동)`;
++                }
++                if (!why) continue;
++                await github.rest.issues.createComment({ owner, repo, issue_number: i.number, body: why });
++                await github.rest.issues.update({ owner, repo, issue_number: i.number, state: 'closed', state_reason: 'completed' });
++              }
++            }
+         env:
+           RESULT: ${{ job.status }}
+ 
+       # 🔴 `if: failure()` 만 쓰면 **시간 초과에 반응하지 않는다** — 상한을 넘긴 작업은
+       #    '실패'가 아니라 '취소'로 끝나 알림 단계까지 건너뛴다(2026-08-04 사고).
++      # 🔴 넘어짐 알림 한 벌(robot-down)로 (2026-10-04) — 옛 판은 `::error` 한 줄이라 사람에게 안 닿았다.
++      #    회복하면 하트비트가 닫는다.
+       - name: 실패·취소 알림
+         if: failure() || cancelled()
+-        run: echo "::error::작성 규칙 학습이 실패하거나 취소됐습니다. 리포트 이슈를 확인하세요."
++        uses: ./.github/actions/robot-down
++        with:
++          robot: 작성 규칙 학습
++          token: ${{ github.token }}
+diff --git a/.github/workflows/insta-comments.yml b/.github/workflows/insta-comments.yml
+index 5004124d..c8777cd1 100644
+--- a/.github/workflows/insta-comments.yml
++++ b/.github/workflows/insta-comments.yml
+@@ -26,6 +26,7 @@ on:
+ 
+ permissions:
+   contents: write
++  issues: write     # 실패를 이슈로 부른다(아래 robot-down · 2026-10-04)
+ 
+ concurrency:
+   group: insta-comments
+@@ -45,8 +46,11 @@ jobs:
+       - uses: actions/setup-node@v4
+         with:
+           node-version: 20
++      # 🔴 shell: bash = `bash -eo pipefail` (2026-10-04) — 기본 셸(bash -e)은 pipefail 이 없어 `node … | tee` 에서
++      #    node 가 넘어져도 단계가 초록이었다. 그러면 실패 알림도 안 돈다.
+       - name: 작업
+         id: a
++        shell: bash
+         env:
+           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+           ACTION: ${{ inputs.action }}
+@@ -77,3 +81,11 @@ jobs:
+       - name: 실패하면 시끄럽게
+         if: ${{ failure() || cancelled() }}
+         run: echo '🚨 댓글 작업이 실패했습니다.' >> "$GITHUB_STEP_SUMMARY"
++      # 🔴 요약 한 줄은 아무도 안 본다 — 넘어짐 알림 한 벌(robot-down)로 이슈를 연다 (2026-10-04 로봇·도구 점검).
++      #    회복하면 하트비트가 닫는다.
++      - name: 🚨 로봇이 넘어졌다
++        if: ${{ failure() || cancelled() }}
++        uses: ./.github/actions/robot-down
++        with:
++          robot: 인스타 댓글
++          token: ${{ github.token }}
+diff --git a/.github/workflows/insta-samples.yml b/.github/workflows/insta-samples.yml
+index 175cd7ec..9a0e816d 100644
+--- a/.github/workflows/insta-samples.yml
++++ b/.github/workflows/insta-samples.yml
+@@ -12,10 +12,14 @@ on:
+ 
+ permissions:
+   contents: write
++  issues: write     # 실패를 이슈로 부른다(아래 robot-down · 2026-10-04)
+ 
+ concurrency:
+   group: insta-samples
+-  cancel-in-progress: true      # 견본은 최신 것만 뜻이 있다 — 밀린 실행은 버려도 된다
++  # 견본은 최신 것만 뜻이 있다 — 밀린 실행은 버려도 된다. 🔴 그런데 **도는 실행**은 취소하지 않는다(2026-10-04):
++  #   취소는 아래 넘어짐 알림(cancelled())을 헛경보로 세운다(시간 초과와 취소 사유를 if: 로 못 가른다).
++  #   false 여도 GitHub 은 기다리는 실행을 하나만 남기고 더 오래된 대기분은 버린다 — '밀린 것은 버린다'는 그대로다.
++  cancel-in-progress: false
+ 
+ env:
+   BASE: claude/nice-heisenberg-WESq5
+@@ -50,4 +54,12 @@ jobs:
+           #   관리자 화면은 기본 브랜치의 raw 주소로 견본을 본다(코드 리뷰).
+       - name: 실패하면 시끄럽게
+         if: ${{ failure() || cancelled() }}
+-        run: echo '🚨 판형 견본을 못 그렸습니다 — 새 판형 파일이 깨졌을 가능성이 큽니다.' >> "$GITHUB_STEP_SUMMARY"
++        run: echo '🚨 판형 견본을 못 그렸습니다 — 새 판형 파일이 깨졌는지 실행 로그에서 확인하세요.' >> "$GITHUB_STEP_SUMMARY"
++      # 🔴 요약 한 줄은 아무도 안 본다 — 넘어짐 알림 한 벌(robot-down)로 이슈를 연다 (2026-10-04 로봇·도구 점검).
++      #    회복하면 하트비트가 닫는다.
++      - name: 🚨 로봇이 넘어졌다
++        if: ${{ failure() || cancelled() }}
++        uses: ./.github/actions/robot-down
++        with:
++          robot: 인스타 판형 견본
++          token: ${{ github.token }}
+diff --git a/.github/workflows/insta-stats.yml b/.github/workflows/insta-stats.yml
+index a2bdd8e0..66fc4863 100644
+--- a/.github/workflows/insta-stats.yml
++++ b/.github/workflows/insta-stats.yml
+@@ -12,6 +12,7 @@ on:
+ 
+ permissions:
+   contents: write
++  issues: write     # 실패를 이슈로 부른다(아래 robot-down · 2026-10-04)
+ 
+ concurrency:
+   group: insta-stats
+@@ -31,8 +32,11 @@ jobs:
+       - uses: actions/setup-node@v4
+         with:
+           node-version: 20
++      # 🔴 shell: bash = `bash -eo pipefail` (2026-10-04) — 기본 셸(bash -e)은 pipefail 이 없어 `node … | tee` 에서
++      #    node 가 넘어져도(🚨 수확 실패) tee 가 0 을 돌려 단계가 초록이었다(실측 rc=0). 그러면 실패 알림도 안 돈다.
+       - name: 수확
+         id: h
++        shell: bash
+         env:
+           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+         run: node insta/stats.mjs | tee /tmp/out.txt; grep -q '^state=none' /tmp/out.txt && echo 'state=none' >> "$GITHUB_OUTPUT" || echo 'state=ok' >> "$GITHUB_OUTPUT"
+@@ -52,3 +56,11 @@ jobs:
+       - name: 실패하면 시끄럽게
+         if: ${{ failure() || cancelled() }}
+         run: echo '🚨 트랙션 수확이 실패했습니다 — 못 받은 것을 「반응 0」 으로 읽지 마세요.' >> "$GITHUB_STEP_SUMMARY"
++      # 🔴 요약 한 줄은 아무도 안 본다 — 넘어짐 알림 한 벌(robot-down)로 이슈를 연다 (2026-10-04 로봇·도구 점검).
++      #    회복하면 하트비트가 닫는다.
++      - name: 🚨 로봇이 넘어졌다
++        if: ${{ failure() || cancelled() }}
++        uses: ./.github/actions/robot-down
++        with:
++          robot: 인스타 트랙션 수확
++          token: ${{ github.token }}
+diff --git a/.github/workflows/insta-token-check.yml b/.github/workflows/insta-token-check.yml
+index ec99ea1c..ec380c10 100644
+--- a/.github/workflows/insta-token-check.yml
++++ b/.github/workflows/insta-token-check.yml
+@@ -117,3 +117,11 @@ jobs:
+       - name: 확인 자체가 실패하면
+         if: ${{ failure() || cancelled() }}
+         run: echo '🚨 토큰 확인이 실패했습니다 — 확인 못 한 것을 「괜찮다」로 읽지 마세요.' >> "$GITHUB_STEP_SUMMARY"
++      # 🔴 요약 한 줄은 아무도 안 본다 — 넘어짐 알림 한 벌(robot-down)로 이슈를 연다 (2026-10-04 로봇·도구 점검).
++      #    회복하면 하트비트가 닫는다.
++      - name: 🚨 로봇이 넘어졌다
++        if: ${{ failure() || cancelled() }}
++        uses: ./.github/actions/robot-down
++        with:
++          robot: 인스타 토큰 확인
++          token: ${{ github.token }}
+diff --git a/.github/workflows/insta.yml b/.github/workflows/insta.yml
+index 5454e653..882c9f0b 100644
+--- a/.github/workflows/insta.yml
++++ b/.github/workflows/insta.yml
+@@ -56,9 +56,12 @@ permissions:
+ 
+ # 🔴 수집 로봇들과 **다른 대기줄**을 쓴다 — 같은 줄에 넣으면 GitHub 이 대기 중인
+ #    실행을 새 실행으로 취소해서 예약 수집이 조용히 사라진다(CLAUDE.md).
+-concurrency:
+-  group: insta-publish
+-  cancel-in-progress: false
++# 🔴 대기줄은 **작업마다** 둔다(아래 각 작업의 concurrency · 2026-10-04 로봇·도구 점검). 옛 판은 워크플로 하나에 줄 하나였는데,
++#    한 줄에는 '도는 것 1 + 기다리는 것 1' 만 있어서 사람이 게시·건너뛰기를 연달아 누르면 가운데 것이 **조용히 취소됐다**
++#    (취소된 실행은 단계가 하나도 안 돌아 실패 알림도 없다). 이제 같은 공고끼리만 한 줄(insta-code-<코드>) — 같은 공고를
++#    두 번 누르면 두 번째가 첫 번째 뒤에 돌아 '이미 올린 공고' 검사에 걸린다. 다른 공고끼리는 서로 안 기다린다.
++#    그래서 두 작업이 같은 장부(insta/seen.json)를 쓸 수 있다 — 저장 단계마다 병합 규칙을 먼저 등록한다
++#    (tools/setup-collab.sh → merge-json-union.mjs 의 mergeInstaSeen · 올림 기록은 절대 안 버린다).
+ 
+ env:
+   BASE: claude/nice-heisenberg-WESq5
+@@ -70,6 +73,13 @@ jobs:
+     if: ${{ !startsWith(inputs.step, '게시') && !startsWith(inputs.step, '건너뛰기') }}
+     runs-on: ubuntu-latest
+     timeout-minutes: 40          # 🔴 없으면 GitHub 기본값 6시간까지 매달린다 (6건 × ~40초 + 설치 + Pages 대기)
++    # 코드를 준 준비(이 판형으로 다시 그리기)는 그 공고의 줄 — 같은 공고의 게시·건너뛰기와 차례를 지킨다.
++    # 코드 없는 자동·버튼 준비끼리는 한 줄(기다리던 것이 밀려 취소돼도 같은 일을 하는 다음 실행이 있다).
++    # 🔴 사람이 run-notify.txt 를 올린 알림(push)은 push 마다 제 줄 — 자동 준비 줄에 넣으면 기다리던 알림이 다음 자동 준비에
++    #    밀려 **조용히 취소된다**(push 에는 inputs 가 없어 코드로 줄을 못 나눈다 · 2026-10-05). 알림은 그리지 않고, 겹쳐 돈 정리분 저장은 장부 병합 규칙이 합친다.
++    concurrency:
++      group: ${{ inputs.code && format('insta-code-{0}', inputs.code) || github.event_name == 'push' && format('insta-push-{0}', github.sha) || 'insta-prepare' }}
++      cancel-in-progress: false
+     steps:
+       - uses: actions/checkout@v4
+         with:
+@@ -85,6 +95,20 @@ jobs:
+       - name: 사실 관문
+         run: node verify/verify-insta.js
+ 
++      # 🔴 마감이 지난 카드는 다시 그릴 수도(캡션 거절) 올릴 수도(게시 거절) 없다 — 장부를 '만료(expired)' 로 바꾸고 폴더를 지운다
++      #    (2026-10-04 로봇·도구 점검 · 지우는 단계가 없어 insta/pub 이 3주에 100MB 로 불었다 · Pages 사이트 상한 1GB).
++      #    규칙은 insta/pick.mjs 의 expireRows 한 곳 · 🔴 올린 것의 폴더는 안 지운다(관리자 「올림」 줄의 썸네일) · git 이력에는 남는다.
++      #    정리가 넘어져도 새 카드는 그린다(보강 단계). 지운 것은 아래 커밋 단계가 같이 올린다. '무엇을 할지' 보다 먼저 —
++      #    재단이 마감을 미룬 공고는 다시 뽑힌다(pick.mjs candidates).
++      - name: 마감 지난 카드 정리
++        id: expire
++        continue-on-error: true
++        timeout-minutes: 2
++        shell: bash
++        run: |
++          node insta/ledger.mjs expire | tee /tmp/expire.txt
++          echo "n=$(sed -n 's/^expired=//p' /tmp/expire.txt | tail -1)" >> "$GITHUB_OUTPUT"
++
+       # 무엇을 그릴지 — 알림(push-to-run·버튼)이면 그 코드 하나를 **안 그리고** 그대로 보낸다.
+       - name: 무엇을 할지 정한다
+         id: plan
+@@ -99,7 +123,7 @@ jobs:
+             # 🔴 표식 파일이 빈 채로 push 되는 일은 정상이다(처음 만들 때 · 보낸 뒤 지울 때) — 빨간불이 아니라 조용한 종료.
+             if [ -z "$CODE" ] && [ "$EVENT" = push ]; then echo "mode=none" >> "$GITHUB_OUTPUT"; echo "codes=" >> "$GITHUB_OUTPUT"; echo 'run-notify.txt 의 code: 가 비어 있어 아무것도 안 합니다.'; exit 0; fi
+             [ -n "$CODE" ] || { echo '알릴 공고 코드가 비어 있습니다 — code 칸을 채우세요.'; exit 1; }
+-            [ -d "insta/pub/$CODE" ] || { echo "🚨 insta/pub/$CODE 가 없습니다 — 먼저 그려서 커밋했는지 보세요."; exit 1; }
++            [ -d "insta/pub/$CODE" ] || { echo "🚨 insta/pub/$CODE 가 없습니다 — 먼저 그려서 커밋했는지 보세요(마감이 지나 정리된 카드면 장부 insta/seen.json 에 expired 로 적혀 있습니다)."; exit 1; }
+             echo "mode=notify" >> "$GITHUB_OUTPUT"; echo "codes=$CODE" >> "$GITHUB_OUTPUT"
+             echo "다시 알림: $CODE"
+           elif [ -n "$CODE" ]; then
+@@ -150,28 +174,53 @@ jobs:
+               echo '```'; cat "insta/pub/$c/caption.txt"; echo '```'
+             done
+           } >> "$GITHUB_STEP_SUMMARY"
++      # 올림 파일(artifact)은 **이번 카드만** — 옛 판은 insta/pub 통째(약 85MB)를 그리는 실행마다 다시 올렸다(2026-10-04).
++      - name: 이번 카드만 모은다 (실행 기록의 올림 파일)
++        if: ${{ steps.plan.outputs.codes != '' }}
++        env:
++          CODES: ${{ steps.draw.outputs.ok || steps.plan.outputs.codes }}
++          DEST: ${{ runner.temp }}/cards
++        run: |
++          mkdir -p "$DEST"
++          for c in $CODES; do
++            if [ -d "insta/pub/$c" ]; then cp -r "insta/pub/$c" "$DEST/$c"; else echo "($c 폴더 없음)"; fi
++          done
+       - uses: actions/upload-artifact@v4
+         if: ${{ steps.plan.outputs.codes != '' }}
+         with:
+           name: 카드
+-          path: insta/pub/
++          path: ${{ runner.temp }}/cards/
+           retention-days: 7
+ 
+       # 🔴 커밋해야 GitHub Pages 가 공개 주소로 서빙한다 — 인스타는 그 주소로 가져간다.
+-      #    다른 공고의 폴더는 건드리지 않는다(공고당 폴더 하나).
++      #    다른 공고의 폴더는 건드리지 않는다(공고당 폴더 하나). 새 카드가 없어도 마감 지나 정리한 것은 올린다(2026-10-04).
+       - name: 게시용 그림·장부 커밋
+-        if: ${{ always() && steps.plan.outputs.mode == 'draw' && steps.plan.outputs.codes != '' }}
++        id: commit
++        if: ${{ always() && steps.plan.outputs.mode != 'none' }}
++        env:
++          OK: ${{ steps.draw.outputs.ok }}
++          EXPIRED: ${{ steps.expire.outputs.n }}
+         run: |
++          bash tools/setup-collab.sh       # 🔴 다른 공고의 게시·건너뛰기가 같은 장부를 쓸 수 있다 — 장부 병합 규칙 등록(mergeInstaSeen)
+           git config user.name  'github-actions[bot]'
+           git config user.email 'github-actions[bot]@users.noreply.github.com'
+           git add -A insta/pub insta/seen.json
+           git diff --cached --quiet && { echo '바뀐 게 없습니다'; exit 0; }
+-          git commit -m "인스타: 카드 준비 — $(echo "${{ steps.draw.outputs.ok }}" | wc -w | tr -d ' ')건"
++          git commit -m "인스타: 카드 준비 $(echo "$OK" | wc -w | tr -d ' ')건 · 마감 지나 정리 ${EXPIRED:-0}건"
+           for i in 1 2 3; do
+             git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE"; sleep 5; }
+             [ "$i" = 3 ] && { echo '🚨 기본 브랜치에 못 올렸습니다'; exit 1; }   # 🔴 sleep 이 0 을 남겨 그냥 넘어가던 자리
+           done
+-          git push origin HEAD:main        # 🔴 Pages 는 main 을 배포한다
++          echo 'base=ok' >> "$GITHUB_OUTPUT"   # 장부가 기본 브랜치에 들어갔다 — 아래 실패 알림이 이것으로 말을 고른다
++          # 🔴 Pages 는 main 을 배포한다 — main 에만 있는 커밋(배포 로봇)과 엇갈리면 그냥 push 는 거절된다
++          #    (2026-09-12 #263 — 게시 작업이 이렇게 죽었다). 받아 합치고 다시 — 기본 브랜치 루프와 같은 꼴.
++          for i in 1 2 3; do
++            git push origin HEAD:main && break
++            [ "$i" = 3 ] && { echo '🚨 main 에 못 올렸습니다'; exit 1; }
++            git fetch origin main && git merge --no-edit -m '인스타: 카드 준비분 main 반영 (자동)' origin/main \
++              || { git merge --abort || true; echo '🚨 main 을 받아 합치지 못했습니다(충돌 또는 통신)'; exit 1; }
++            sleep 5
++          done
+ 
+       # 🔴 Pages 가 서빙을 시작해야 이슈·메일에 박은 그림이 뜬다. 아직 404 인 채로 만들면
+       #    GitHub 의 그림 중계(camo)가 **그 404 를 캐시해** 나중에도 안 보인다.
+@@ -259,6 +308,27 @@ jobs:
+             --user "$MAIL_USER:$MAIL_PASS" --mail-from "$MAIL_USER" $RCPT --upload-file /tmp/mail.txt
+           echo "✅ 메일을 보냈습니다 — $(sed -n 's/^To: //p' /tmp/mail.txt)"
+ 
++      # 🔴 쓸모없어진 준비 이슈를 닫는다 (2026-10-04 로봇·도구 점검 · insta/ready-issues.mjs).
++      #    준비 이슈는 「올리거나 건너뛰면 저절로 닫힙니다」라고 약속하는데, 옛 판은 이슈 안 카드가 1건 이하일 때만 닫고
++      #    마감 지난 카드는 아무도 안 봐서, 올릴 카드가 하나도 없는 이슈가 열린 채 쌓였다(10-04 · 8건).
++      #    담긴 카드가 전부 올렸거나·건너뛰었거나·마감이 지났을 때만 닫는다(장부에 없는 카드는 모름 → 둔다).
++      #    🔴 아무것도 올리지 않는다 — 게시는 사람만 누른다.
++      - name: 쓸모없어진 준비 이슈 닫기
++        if: ${{ always() }}
++        continue-on-error: true
++        timeout-minutes: 2
++        env:
++          GH_TOKEN: ${{ github.token }}
++          REPO: ${{ github.repository }}
++        run: |
++          gh issue list --repo "$REPO" --label insta-ready --state open --limit 300 --json number,body > /tmp/ready.json
++          node insta/ready-issues.mjs closable /tmp/ready.json > /tmp/closable.tsv
++          while IFS=$'\t' read -r n why; do
++            [ -n "$n" ] || continue
++            gh issue close "$n" --repo "$REPO" --comment "담긴 카드가 모두 올렸거나 건너뛰었거나 마감이 지났습니다 — 게시할 것이 없어 닫습니다. ($why · 자동)"
++            echo "닫음 #$n ($why)"
++          done < /tmp/closable.tsv
++
+       - name: 못 그린 공고가 있으면 시끄럽게
+         if: ${{ steps.draw.outputs.bad != '' }}
+         env:
+@@ -283,27 +353,49 @@ jobs:
+           exit 1
+ 
+       - name: 실패하면 시끄럽게
++        id: alarm
+         # 못 그린 공고는 위 단계가 이미 알렸다 — 같은 실행에서 이슈를 두 번 만들지 않는다
+         if: ${{ (failure() || cancelled()) && steps.draw.outputs.bad == '' }}
+         env:
+           GH_TOKEN: ${{ github.token }}
+           REPO: ${{ github.repository }}
+           RUN: ${{ github.run_id }}
++          OK: ${{ steps.draw.outputs.ok }}
++          SAVED: ${{ steps.commit.outputs.base }}
+         run: |
+-          echo '🚨 준비가 실패했습니다 — 이슈를 만들었습니다.' >> "$GITHUB_STEP_SUMMARY"
++          echo '🚨 준비가 실패했습니다 — 이슈로 알렸습니다.' >> "$GITHUB_STEP_SUMMARY"
+           gh label create insta-fail --repo "$REPO" --color B60205 --description '인스타 게시 실패' 2>/dev/null || true
+-          gh issue list --repo "$REPO" --label insta-fail --state open --json title --jq '.[].title' | grep -q "준비가 실패" && exit 0
++          # 🔴 그린 카드가 어디까지 갔는지 사실대로 — 장부가 기본 브랜치에 들어간 뒤 멈췄으면 그 카드는 다음 실행이 다시 뽑지 않는다
++          #    (준비됨이라서). 그걸 말하지 않으면 알림이 안 간 카드가 관리자 화면에만 조용히 남는다(2026-10-04 점검).
++          NOTE=''
++          if [ -n "$OK" ] && [ "$SAVED" = ok ]; then
++            NOTE="그린 카드: $OK — 장부에 준비됨으로 적혀 관리자 화면 › 인스타 에 있습니다. 개발자 알림(이슈·메일)은 못 갔을 수 있습니다 — Actions 「인스타 카드뉴스 게시」 → 알림 + code 로 다시 보낼 수 있습니다."
++          elif [ -n "$OK" ]; then
++            NOTE="그린 카드: $OK — 장부를 기본 브랜치에 저장하기 전에 멈췄습니다. 다음 준비 실행이 다시 그립니다."
++          fi
++          # 열린 '준비가 실패' 이슈가 있으면 새로 만들지 않고 거기에 댓글 — 🔴 끝내 버리면 이번 실패의 NOTE(알림이 못 간 카드)가 어디에도 안 남는다(리뷰 2026-10-05).
++          N=$(gh issue list --repo "$REPO" --label insta-fail --state open --json number,title --jq '[.[] | select(.title | contains("준비가 실패"))][0].number // empty')
++          if [ -n "$N" ]; then
++            gh issue comment "$N" --repo "$REPO" --body "다시 실패 — 실행 로그: https://github.com/$REPO/actions/runs/$RUN
++          $NOTE"
++            exit 0
++          fi
+           gh issue create --repo "$REPO" --label insta-fail \
+             --title '🚨 인스타 카드 준비가 실패했습니다' \
+             --body "실행 로그: https://github.com/$REPO/actions/runs/$RUN
+ 
+-          사실 관문이 빨간불이면 카드가 원문을 상하게 하고 있다는 뜻이라, 고치기 전에는 올리면 안 됩니다."
++          사실 관문이 빨간불이면 카드가 원문을 상하게 하고 있다는 뜻이라, 고치기 전에는 올리면 안 됩니다.
++          $NOTE"
+ 
+   # ── ② 게시 — ①이 커밋한 것을 그대로 올린다. **다시 안 그린다** ──
+   publish:
+     if: ${{ startsWith(inputs.step, '게시') }}
+     runs-on: ubuntu-latest
+     timeout-minutes: 20
++    # 같은 공고끼리만 한 줄 — 같은 공고를 두 번 누르면 두 번째가 기다렸다가 '이미 올린 공고' 검사에 걸린다(위 머리말)
++    concurrency:
++      group: ${{ format('insta-code-{0}', inputs.code) }}
++      cancel-in-progress: false
+     steps:
+       - uses: actions/checkout@v4
+         with:
+@@ -338,31 +430,53 @@ jobs:
+             echo "⚠️ 열린 준비 이슈에 $CODE 표식이 없습니다 — 손으로 그렸거나 이미 닫힌 건입니다. 지금 버튼을 누른 사람이 확인한 것으로 봅니다."
+           fi
+ 
++      # 🔴 마감이 지난 카드·그림에 「마감 D-N」 이 박힌 옛 카드(2026-10-04 전에 그린 2·3·4번)는 publish.mjs 가 거절한다(publishRefusal).
++      #    올라가면 media·permalink 를 이 단계의 출력으로 남긴다 — 아래 실패 알림이 '올라갔는가' 를 알아야 한다.
+       - name: 인스타에 올리기
++        id: post
+         env:
+           IG_USER_ID: ${{ secrets.IG_USER_ID }}
+           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+-        run: node insta/publish.mjs --code="${{ inputs.code }}" --publish
++          CODE: ${{ inputs.code }}
++        run: node insta/publish.mjs --code="$CODE" --publish
+ 
+-      # 이 공고만 담긴 준비 이슈는 닫고, 여러 건이 담긴 이슈에는 코멘트만 남긴다.
++      # 남은 카드(올릴 수 있는 것)가 없으면 준비 이슈를 닫고, 있으면 코멘트만 남긴다.
++      # 🔴 '남은 카드'는 insta/ready-issues.mjs 한 곳이 장부로 센다(올림·건너뜀·마감 지남은 뺀다 · 2026-10-04) —
++      #    옛 판은 이슈 안 카드 수(1건 이하)만 봐서, 나머지가 마감 지났거나 건너뛴 이슈가 영영 안 닫혔다.
++      #    장부(seen.json)는 바로 앞 단계가 이미 고쳤다. 세지 못하면(빈 값) 닫지 않고 코멘트만 단다.
++      #    보강 단계라 넘어져도 기록 저장을 막지 않는다(2026-10-04 — 막으면 올라간 글이 장부에 안 남는다).
+       - name: 준비 이슈 정리
++        continue-on-error: true
++        timeout-minutes: 3
+         env:
+           GH_TOKEN: ${{ github.token }}
+           REPO: ${{ github.repository }}
+           CODE: ${{ inputs.code }}
+         run: |
+           for n in $(gh issue list --repo "$REPO" --label insta-ready --state open --json number,body --jq ".[] | select(.body | contains(\"<!-- insta-code: $CODE -->\")) | .number"); do
+-            CNT=$(gh issue view "$n" --repo "$REPO" --json body --jq .body | grep -c '<!-- insta-code: ')
+-            if [ "$CNT" -le 1 ]; then gh issue close "$n" --repo "$REPO" --comment "올렸습니다 ($CODE) — 자동으로 닫습니다.";
+-            else gh issue comment "$n" --repo "$REPO" --body "올렸습니다 — $CODE"; fi
++            LIVE=$(gh issue view "$n" --repo "$REPO" --json body --jq .body | node insta/ready-issues.mjs live-in-body || true)
++            if [ "${LIVE:-1}" = "0" ]; then gh issue close "$n" --repo "$REPO" --comment "올렸습니다 ($CODE) — 남은 카드가 없어 자동으로 닫습니다.";
++            else gh issue comment "$n" --repo "$REPO" --body "올렸습니다 — $CODE (남은 카드 ${LIVE:-?}건)"; fi
+           done
+ 
+       # 🔴 올린 것을 기억 못 하면 내일 같은 공고를 다시 올린다(이슈 #75 유형).
+-      #    `git add` 목록에 넣는 것까지가 한 세트다.
++      #    `git add` 목록에 넣는 것까지가 한 세트다. 올라갔으면 앞 단계가 넘어졌어도 반드시 적는다(always).
++      # 🔴 main 에는 올리지 않는다(2026-10-04) — 앱·Pages 는 이 장부를 읽지 않고(관리자 화면은 기본 브랜치를 읽는다) 배포 로봇이
++      #    옮긴다. 옛 판은 기본 브랜치에 저장한 뒤 main push 가 거절돼(fetch first) '게시 실패' 이슈를 냈다(#263 — 게시는 성공).
++      # 올리기 단계가 올린 뒤에 넘어졌어도(media 번호가 남았으면) 여기서 media 번호로 올림 기록을 적는다 — publish.mjs 가 이미 적었으면
++      # 그대로 둔다(같은 공고·같은 media 는 한 줄 · 규칙은 pick.mjs recordPosted 한 곳 · 2026-10-05 리뷰).
+       - name: 올린 기록 저장
++        id: record
++        if: ${{ always() && (steps.post.outcome == 'success' || steps.post.outputs.media != '') }}
++        env:
++          CODE: ${{ inputs.code }}
++          MEDIA: ${{ steps.post.outputs.media }}
++          PERMALINK: ${{ steps.post.outputs.permalink }}
+         run: |
++          bash tools/setup-collab.sh       # 🔴 다른 공고의 준비·건너뛰기가 같은 장부를 쓸 수 있다 — 장부 병합 규칙 등록(mergeInstaSeen)
+           git config user.name  'github-actions[bot]'
+           git config user.email 'github-actions[bot]@users.noreply.github.com'
++          if [ -n "$MEDIA" ]; then node insta/ledger.mjs posted "$CODE" --media="$MEDIA" --permalink="$PERMALINK"; fi
+           git add insta/seen.json
+           git diff --cached --quiet && { echo 'seen.json 변화 없음'; exit 0; }
+           git commit -m '인스타: 올린 공고 기록'
+@@ -370,24 +484,70 @@ jobs:
+             git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE"; sleep 5; }
+             [ "$i" = 3 ] && { echo '🚨 기본 브랜치에 못 올렸습니다'; exit 1; }   # 🔴 sleep 이 0 을 남겨 그냥 넘어가던 자리
+           done
+-          git push origin HEAD:main
+ 
+       # 🔴 `if: failure()` 는 **시간 초과에 반응하지 않는다** — 상한을 넘긴 작업은
+       #    '실패' 가 아니라 '취소' 다(CLAUDE.md). 둘 다 잡는다.
++      # 🔴 올라간 뒤의 실패를 '게시가 실패했습니다' 라고 하지 않는다 — 사람이 다시 누르면 장부에 없는 글이라 **두 번 올라간다**(2026-10-04).
+       - name: 실패하면 시끄럽게
++        id: alarm
+         if: ${{ failure() || cancelled() }}
+         env:
+           GH_TOKEN: ${{ github.token }}
+           REPO: ${{ github.repository }}
+           RUN: ${{ github.run_id }}
++          CODE: ${{ inputs.code }}
++          POSTED: ${{ steps.post.outcome }}
++          RECORDED: ${{ steps.record.outcome }}
++          MEDIA: ${{ steps.post.outputs.media }}
++          PERMALINK: ${{ steps.post.outputs.permalink }}
+         run: |
+-          echo '🚨 게시가 실패했습니다 — 이슈를 만들었습니다.' >> "$GITHUB_STEP_SUMMARY"
+           gh label create insta-fail --repo "$REPO" --color B60205 --description '인스타 게시 실패' 2>/dev/null || true
++          # 올라갔다는 증거 — 단계 성공, 또는 publish.mjs 가 올린 즉시 남긴 media 번호(단계가 그 뒤에 넘어지거나 시한에 끊겨도 남는다 · 2026-10-05)
++          UP=''; { [ "$POSTED" = success ] || [ -n "$MEDIA" ]; } && UP=1
++          # 올라갔고 기록 단계도 성공했다 — 장부에 올림 기록이 있으니 다시 눌러도 '이미 올린 공고' 로 막힌다. 이슈는 만들지 않는다.
++          if [ -n "$UP" ] && [ "$RECORDED" = success ]; then
++            if [ "$POSTED" = success ]; then echo '게시·기록은 끝났습니다 — 그 뒤 단계만 멈췄습니다.' >> "$GITHUB_STEP_SUMMARY"
++            else echo "게시·기록은 끝났습니다 — 올리기 단계는 올린 뒤 멈췄지만 기록 단계가 media 번호($MEDIA)로 장부에 적었습니다." >> "$GITHUB_STEP_SUMMARY"; fi
++            exit 0
++          fi
++          if [ -n "$UP" ]; then
++            if [ "$POSTED" = success ]; then WHY='그 뒤 장부(insta/seen.json)에 올림 기록을 저장하지 못했습니다.'
++            else WHY="그 뒤 게시 단계가 끝나기 전에 멈췄고 기록 단계도 끝나지 못해, 장부(insta/seen.json)에 올림 기록이 적혔는지 알 수 없습니다 — posted 에 $CODE 가 없으면 아래처럼 넣으세요."; fi
++            echo '⚠️ 인스타에는 올라갔는데 기록 저장이 실패했습니다 — 다시 게시하지 마세요. 이슈를 만들었습니다.' >> "$GITHUB_STEP_SUMMARY"
++            gh issue create --repo "$REPO" --label insta-fail \
++              --title "⚠️ 인스타에는 올라갔는데 기록 저장만 실패했습니다 — 다시 게시하지 마세요 ($CODE)" \
++              --body "게시는 됐습니다 — ${PERMALINK:-(게시물 주소를 못 받았습니다 · 인스타 앱에서 확인)} (media ${MEDIA:-?})
++          $WHY
++          🔴 관리자 화면에서 「게시」 를 다시 누르지 마세요 — 장부에 없어서 같은 글이 한 번 더 올라갑니다.
++
++          장부에 손으로 넣는 법 (Claude 세션에 '인스타 올림 기록 넣어줘 $CODE' 라고 해도 됩니다):
++          - insta/seen.json 의 posted 끝에 한 줄: {\"code\": \"$CODE\", \"media\": \"${MEDIA}\", \"permalink\": \"${PERMALINK}\", \"at\": \"<올린 날 KST YYYY-MM-DD>\"} (org·name·tplNo 는 insta/pub/$CODE/meta.json 에서)
++          - 같은 code 의 prepared 줄은 status 를 \"posted\" 로, postedAt 을 같은 날로
++          - 저장은 들여쓰기 1칸(JSON.stringify(x, null, 1)) · 기본 브랜치에
++
++          실행 로그: https://github.com/$REPO/actions/runs/$RUN"
++            exit 0
++          fi
++          # 🔴 올리는 도중 시한에 걸리거나 실행이 취소되면 올라갔는지 모른다(인스타가 받은 뒤 답만 늦을 수 있다) — '실패' 라고 단정하지 않는다.
++          if [ "$POSTED" = cancelled ]; then
++            echo '⚠️ 게시 단계가 도중에 끊겼습니다 — 올라갔는지 먼저 확인하세요. 이슈를 만들었습니다.' >> "$GITHUB_STEP_SUMMARY"
++            gh issue create --repo "$REPO" --label insta-fail \
++              --title "⚠️ 인스타 게시 단계가 도중에 끊겼습니다 — 올라갔는지 먼저 확인하세요 ($CODE)" \
++              --body "올리는 도중 작업 시한에 걸렸거나 실행이 취소되어, 인스타에 올라갔는지 이 실행으로는 알 수 없습니다.
++          1) 인스타 앱에서 이 계정의 피드에 이 공고가 올라왔는지 먼저 보세요.
++          2) 올라왔으면 「게시」 를 다시 누르지 마세요 — 장부(insta/seen.json)에 올림 기록이 없어 같은 글이 한 번 더 올라갑니다. Claude 세션에 '인스타 올림 기록 넣어줘 $CODE' 라고 하세요.
++          3) 안 올라왔으면 관리자 화면에서 「게시」 를 다시 누르면 됩니다.
++
++          실행 로그: https://github.com/$REPO/actions/runs/$RUN"
++            exit 0
++          fi
++          echo '🚨 게시가 실패했습니다 — 이슈를 만들었습니다.' >> "$GITHUB_STEP_SUMMARY"
+           gh issue create --repo "$REPO" --label insta-fail \
+             --title '🚨 인스타 게시가 실패했습니다' \
+             --body "실행 로그: https://github.com/$REPO/actions/runs/$RUN
+ 
+-          자주 나는 원인 셋
++          자주 나는 원인 넷 (로그의 🚨 줄을 보세요 — 「토큰이 N일 뒤 만료됩니다」 경고는 원인이 아닐 수 있습니다)
++          - 마감이 지난 카드·그림에 「마감 D-N」 이 박힌 옛 카드 → 게시 거절 — 건너뛰거나 관리자 화면 「이 판형으로 다시 그리기」 로 다시 그린 뒤 게시
+           - 토큰 만료 → IG_ACCESS_TOKEN 갱신 (「인스타 토큰 수명 확인」 참고)
+           - 그림이 아직 공개 안 됨 → Pages 배포를 기다렸다 「게시」 를 다시
+           - 24시간 50건 상한 초과 → 내일 다시"
+@@ -397,6 +557,10 @@ jobs:
+     if: ${{ startsWith(inputs.step, '건너뛰기') }}
+     runs-on: ubuntu-latest
+     timeout-minutes: 10
++    # 같은 공고끼리만 한 줄 — 여러 줄을 연달아 건너뛰어도 서로 취소하지 않는다(위 머리말)
++    concurrency:
++      group: ${{ format('insta-code-{0}', inputs.code) }}
++      cancel-in-progress: false
+     steps:
+       - uses: actions/checkout@v4
+         with:
+@@ -413,6 +577,7 @@ jobs:
+         run: |
+           [ -n "$CODE" ] || { echo '🚨 공고 코드를 주세요.'; exit 1; }
+           node insta/ledger.mjs skip "$CODE" --by="$ACTOR"
++          bash tools/setup-collab.sh       # 🔴 다른 공고의 준비·게시가 같은 장부를 쓸 수 있다 — 장부 병합 규칙 등록(mergeInstaSeen)
+           git config user.name  'github-actions[bot]'
+           git config user.email 'github-actions[bot]@users.noreply.github.com'
+           git add insta/seen.json
+@@ -421,11 +586,28 @@ jobs:
+             git push origin "HEAD:$BASE" && break || { git pull --rebase origin "$BASE"; sleep 5; }
+             [ "$i" = 3 ] && { echo '🚨 기본 브랜치에 못 올렸습니다'; exit 1; }
+           done
++          # 남은 카드 수는 insta/ready-issues.mjs 한 곳(위 게시 작업과 같다) — 장부는 바로 위에서 고쳤다
+           for n in $(gh issue list --repo "$REPO" --label insta-ready --state open --json number,body --jq ".[] | select(.body | contains(\"<!-- insta-code: $CODE -->\")) | .number"); do
+-            CNT=$(gh issue view "$n" --repo "$REPO" --json body --jq .body | grep -c '<!-- insta-code: ')
+-            if [ "$CNT" -le 1 ]; then gh issue close "$n" --repo "$REPO" --comment "건너뛰기로 정했습니다 ($CODE · $ACTOR).";
+-            else gh issue comment "$n" --repo "$REPO" --body "건너뛰기 — $CODE ($ACTOR)"; fi
++            LIVE=$(gh issue view "$n" --repo "$REPO" --json body --jq .body | node insta/ready-issues.mjs live-in-body || true)
++            if [ "${LIVE:-1}" = "0" ]; then gh issue close "$n" --repo "$REPO" --comment "건너뛰기로 정했습니다 ($CODE · $ACTOR) — 남은 카드가 없어 자동으로 닫습니다.";
++            else gh issue comment "$n" --repo "$REPO" --body "건너뛰기 — $CODE ($ACTOR) (남은 카드 ${LIVE:-?}건)"; fi
+           done
+       - name: 실패하면 시끄럽게
+         if: ${{ failure() || cancelled() }}
+         run: echo '🚨 건너뛰기 기록에 실패했습니다.' >> "$GITHUB_STEP_SUMMARY"
++      # 🔴 요약 한 줄은 아무도 안 본다 — 이슈로 부른다 (2026-10-04 로봇·도구 점검).
++      #    넘어짐 알림(robot-down)이 아니라 경보 한 곳의 따로 제목을 쓴다: 건너뛰기는 사람이 누른 일이라, 같은 워크플로의
++      #    다른 작업(매일 준비)이 성공했다고 하트비트가 닫으면 '기록이 안 됐다'는 사실이 사라진다. 사람이 확인하고 닫는다.
++      - name: 🚨 건너뛰기 실패 이슈
++        if: ${{ failure() || cancelled() }}
++        uses: ./.github/actions/alert-issue
++        with:
++          token: ${{ github.token }}
++          mode: open
++          title: 🚨 인스타 건너뛰기 기록에 실패했습니다
++          label: insta-fail
++          label-description: 인스타 게시 실패
++          body: |
++            공고 `${{ inputs.code }}` 의 건너뛰기를 장부에 적지 못했습니다(누른 사람 ${{ github.actor }}). 장부에 안 적히면 그 카드는 '준비됨'으로 남습니다.
++            실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
++            관리자 화면 › 인스타 에서 건너뛰기를 다시 누르거나 Claude 세션에 '인스타 건너뛰기 실패 확인해줘'라고 지시하세요.
+diff --git a/.github/workflows/kosaf-fetch.yml b/.github/workflows/kosaf-fetch.yml
+index 5bc4186c..84bca910 100644
+--- a/.github/workflows/kosaf-fetch.yml
++++ b/.github/workflows/kosaf-fetch.yml
+@@ -17,7 +17,7 @@ name: 한국장학재단 수확 로봇
+ #    우리 앱은 2026년 2학기로 알고 있었고 **학교 공고를 직접 열어 우리 쪽이 맞았다.**
+ on:
+   schedule:
+-    - cron: '53 20 * * 1,4'   # 월·목 05:53 KST (홀수 분 · 05:23 은 '공고 본문 재수집'과 겹쳐 피했다 —
++    - cron: '53 20 * * 1,4'   # 화·금 05:53 KST = 월·목 20:53 UTC (홀수 분 · 05:23 은 '공고 본문 재수집'과 겹쳐 피했다 —
+     #                          둘 다 같은 브랜치에 커밋해서 push 가 부딪힌다)
+   workflow_dispatch:
+     inputs:
+diff --git a/.github/workflows/link-hunter.yml b/.github/workflows/link-hunter.yml
+index cb83370f..26a87ffe 100644
+--- a/.github/workflows/link-hunter.yml
++++ b/.github/workflows/link-hunter.yml
+@@ -126,8 +126,9 @@ jobs:
+           GH_TOKEN: ${{ github.token }}
+         run: |
+           echo "::error::데이터 감사에 걸려 이번 사냥 결과를 통째로 되돌렸습니다 — 찾아낸 원문 주소가 저장되지 않았습니다."
++          # 사냥꾼은 제 리포트 이슈가 없다 — 원문 주소는 정식 등록 쪽 일이라 장학공고 리포트 이슈에 붙인다(2026-10-04 · '"수집 리포트"' 부분 일치는 브라우저형 리포트와 섞였다)
+           last=$(gh issue list --repo "${{ github.repository }}" \
+-            --search '"수집 리포트" in:title' --state open \
++            --search '"장학공고 수집 리포트" in:title' --state open \
+             --limit 1 --json number --jq '.[0].number' || true)
+           if [ -n "$last" ] && [ "$last" != "null" ]; then
+             gh issue comment "$last" --repo "${{ github.repository }}" \
+@@ -163,21 +164,37 @@ jobs:
+ 
+       # 3회 못 찾은 건을 사람에게 알린다 — 로봇이 포기하는 게 아니라, 사람이 보면
+       # 더 빨리 풀릴 수 있는 것(게시판 주소가 바뀌었다 등)을 알리는 것이다.
+-      - name: 🔧 사람 확인 필요 건 알림
++      # 🔴 이슈 **하나**에 모은다 (2026-10-04 로봇·도구 점검). 옛 판은 실행마다 새 이슈를 만들었고, 라벨 link-hunter 가
++      #    저장소에 없어 gh 가 실패 → 예비 명령이 라벨·담당자 없는 이슈를 만들었다(열린 🔧 25건 · 10-03 하루에 셋).
++      #    그래서 제목에 건수를 넣지 않는다(같은 제목이어야 한 이슈에 댓글로 모인다) — 건수·시각은 본문 첫 줄에.
++      - name: 🔧 사람 확인 필요 건 내용 만들기
++        id: ask
+         if: steps.hunt.outputs.stuck != '' && steps.hunt.outputs.stuck != '0'
++        timeout-minutes: 1
++        continue-on-error: true
+         env:
+-          GH_TOKEN: ${{ github.token }}
++          STUCK: ${{ steps.hunt.outputs.stuck }}
++          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+         run: |
+-          gh issue create \
+-            --title "🔧 원문 주소를 3회 못 찾은 공고 ${{ steps.hunt.outputs.stuck }}건 (링크 사냥꾼 — 로봇은 계속 찾습니다)" \
+-            --body-file collector/link-hunt-report.md \
+-            --repo "${{ github.repository }}" \
+-            --label "link-hunter" \
+-            --assignee "${{ github.repository_owner }}" || \
+-          gh issue create \
+-            --title "🔧 원문 주소를 3회 못 찾은 공고 ${{ steps.hunt.outputs.stuck }}건 (링크 사냥꾼 — 로봇은 계속 찾습니다)" \
+-            --body-file collector/link-hunt-report.md \
+-            --repo "${{ github.repository }}"
++          {
++            printf '🔧 %s KST — 새로 사람 확인이 필요한 공고 **%s건** · 실행 로그: %s\n\n' "$(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')" "$STUCK" "$RUN_URL"
++            cat collector/link-hunt-report.md 2>/dev/null || echo '(리포트를 읽지 못했습니다 — 실행 로그를 보세요)'
++          } | head -c 60000 > /tmp/hunt.md
++      - name: 🔧 사람 확인 필요 건 알림
++        if: steps.hunt.outputs.stuck != '' && steps.hunt.outputs.stuck != '0'
++        timeout-minutes: 2
++        continue-on-error: true
++        uses: ./.github/actions/alert-issue
++        with:
++          token: ${{ github.token }}
++          mode: open
++          match: exact
++          title: 🔧 원문 주소를 3회 못 찾은 공고 (링크 사냥꾼 — 로봇은 계속 찾습니다)
++          label: link-hunter
++          label-color: 1D76DB
++          label-description: 링크 사냥꾼이 원문 주소를 3회 못 찾은 공고
++          assignee: ${{ github.repository_owner }}
++          body-file: /tmp/hunt.md
+ 
+       - uses: actions/upload-artifact@v4
+         if: always()
+@@ -191,8 +208,19 @@ jobs:
+       - name: 🚨 실패 알림
+         # cancelled()도 본다 — 시간 상한을 넘긴 작업은 '실패'가 아니라 '취소'로 끝나서
+         # failure()만 보면 이 알림까지 건너뛴다 (2026-08-04·05 수집 로봇에서 실제로 겪은 구멍).
++        # 🔴 이슈로 알린다 (2026-10-04) — 옛 판은 `::warning` 한 줄이라 사람에게 안 닿았고, 하트비트 문턱(하루 × 3)까지
++        #    최대 사흘 늦게 알았다(08-29~09-02 시간초과 5연속이 그 유형). 회복하면 하트비트가 닫는다.
+         if: failure() || cancelled()
+-        env:
+-          GH_TOKEN: ${{ github.token }}
++        uses: ./.github/actions/robot-down
++        with:
++          robot: 링크 사냥꾼
++          token: ${{ github.token }}
++
++      # 🔴 사냥 결과를 버렸으면 빨간불로 끝낸다 (2026-10-04 · 로봇·도구 점검). 위 '되돌렸음을 알린다'는 continue-on-error 라
++      #    작업이 초록불로 끝났다 — 이슈 #381 의 '결과 전량 폐기' 4회가 전부 초록불이었고 하트비트의 '마지막 성공'에도 안 잡혔다.
++      #    맨 끝에 둔다(업로드·실패 알림 뒤) — 리포트는 남기고 실행만 빨갛게. continue-on-error 를 달지 말 것.
++      - name: 🚨 감사에 걸려 결과를 버렸다 (빨간불)
++        if: always() && steps.audit.outcome == 'failure'
+         run: |
+-          echo "::warning::링크 사냥꾼 실행 실패 — ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
++          echo "::error::링크 사냥꾼 — 데이터 관문(감사)에 걸려 이번 사냥 결과를 저장하지 않았습니다. 실행을 빨간불로 끝냅니다."
++          exit 1
+diff --git a/.github/workflows/open-api.yml b/.github/workflows/open-api.yml
+index 634c6046..f789148e 100644
+--- a/.github/workflows/open-api.yml
++++ b/.github/workflows/open-api.yml
+@@ -91,10 +91,27 @@ jobs:
+           $(grep -E '❌|⏸|✅' collector/open-api-report.md 2>/dev/null || true)
+ 
+           실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+-          지난 글은 그대로 남아 있습니다. 고치려면 Claude 세션에 '공공 API 로봇 실패 확인해줘'라고 지시하세요."
+-          last=$(gh issue list --repo "${{ github.repository }}" --search '"공공 API 로봇" in:title' --state open --limit 1 --json number --jq '.[0].number' || true)
+-          if [ -n "$last" ] && [ "$last" != "null" ]; then
+-            gh issue comment "$last" --repo "${{ github.repository }}" --body "$body"
+-          else
+-            gh issue create --repo "${{ github.repository }}" --title "🛰 공공 API 로봇 알림" --body "$body"
+-          fi
++          지난 글은 그대로 남아 있습니다. 고치려면 Claude 세션에 '공공 API 로봇 실패 확인해줘'라고 지시하세요.
++          모든 출처를 다시 받아 오면 이 이슈는 저절로 닫힙니다."
++          # 경보 한 곳(tools/alert-issue.mjs · 2026-10-04) — 제목 글자 그대로 찾아 댓글, 없으면 만든다(GitHub 검색으로 찾지 않는다)
++          node tools/alert-issue.mjs --mode open --match exact --title '🛰 공공 API 로봇 알림' \
++            --label open-api --label-color 1D76DB --label-description '공공 API 로봇 출처 실패' --body "$body"
++
++      # 🔴 모든 출처가 다시 받아지면 알림을 닫는다 (2026-10-04 로봇·도구 점검). 옛 판은 ❌ 가 없으면 조용히 끝나기만 해서,
++      #    10-02 'fetch failed' 뒤 출처 넷이 모두 ✅ 로 돌아왔는데도 #356 이 열린 채였다. 정찰 실행은 받지 않으므로 닫지 않는다.
++      #    리포트가 없으면(못 읽음) 닫지 않는다 — 못 읽은 것을 '괜찮다'로 읽지 않는다.
++      - name: 모든 출처가 다시 받아지면 알림을 닫는다
++        if: success() && inputs.probe != true
++        timeout-minutes: 1
++        continue-on-error: true
++        env:
++          GH_TOKEN: ${{ github.token }}
++          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
++        run: |
++          [ -f collector/open-api-report.md ] || { echo "리포트가 없어 판정하지 않습니다 — 닫지 않습니다."; exit 0; }
++          if grep -q '❌' collector/open-api-report.md; then echo "아직 받지 못한 출처가 있어 닫지 않습니다."; exit 0; fi
++          body="✅ $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 공공 API 로봇 — 출처를 모두 다시 받았습니다. 자동으로 닫습니다.
++          $(grep -E '✅|⏸' collector/open-api-report.md 2>/dev/null || true)
++
++          실행 로그: ${RUN_URL}"
++          node tools/alert-issue.mjs --mode resolve --match exact --title '🛰 공공 API 로봇 알림' --body "$body"
+diff --git a/.github/workflows/probe-boards.yml b/.github/workflows/probe-boards.yml
+deleted file mode 100644
+index 42b16e7a..00000000
+--- a/.github/workflows/probe-boards.yml
++++ /dev/null
+@@ -1,28 +0,0 @@
+-name: 게시판 후보 정찰
+-
+-on:
+-  workflow_dispatch:
+-
+-permissions:
+-  issues: write
+-  contents: read
+-
+-jobs:
+-  probe:
+-    runs-on: ubuntu-latest
+-    # 시한이 없으면 GitHub 기본값 **6시간**이다 (2026-09-06 신설). 게시판 후보 주소를 훑어본다.
+-    timeout-minutes: 15
+-    steps:
+-      - uses: actions/checkout@v4
+-      - uses: actions/setup-node@v4
+-        with:
+-          node-version: 20
+-      - run: node collector/probe.mjs
+-      - env:
+-          GH_TOKEN: ${{ github.token }}
+-        run: |
+-          gh issue create \
+-            --title "🔍 게시판 후보 정찰 리포트 $(TZ=Asia/Seoul date +%Y-%m-%d\ %H:%M)" \
+-            --body-file collector/probe-report.md \
+-            --repo "${{ github.repository }}" \
+-            --assignee "${{ github.repository_owner }}"
+diff --git a/.github/workflows/probe-links.yml b/.github/workflows/probe-links.yml
+index 8cc89274..669454d5 100644
+--- a/.github/workflows/probe-links.yml
++++ b/.github/workflows/probe-links.yml
+@@ -24,8 +24,18 @@ jobs:
+     # 대기줄(concurrency: collector)을 쓰기 때문에 그동안 다음 수집이 줄을 섰다.
+     # 학교를 더 붙일수록 '한 곳이 안 열려 멈추는' 확률도 같이 오른다.
+     timeout-minutes: 15   # 정찰은 짧다
++    # 🔴 push 로 깼으면 이번 push 가 새로 넣은 줄만 연다 (2026-10-05 로봇·도구 점검 · gaps-05) — 매 push 마다 옛 줄 25개를
++    #    다시 열어 같은 학교를 하루 네 번 두드렸다. 손으로 돌리면(workflow_dispatch) 지금처럼 전부 연다.
++    env:
++      PROBE_BEFORE: ${{ github.event_name == 'push' && github.event.before || '' }}
+     steps:
+       - uses: actions/checkout@v4
++      # 기본 fetch-depth 1 이면 push 직전 판이 없다 — 그 커밋 하나만 받아 둔다(못 받으면 정찰이 전부 열고 리포트에 그렇게 적는다)
++      - name: push 직전 판 받기 (새 줄 가리기용)
++        if: env.PROBE_BEFORE != ''
++        timeout-minutes: 2
++        continue-on-error: true   # 보강 단계 — 멈추거나 시한을 넘겨도 정찰은 돈다(옛 판이 없으면 전부 열고 리포트에 그렇게 적는다)
++        run: git fetch --no-tags --depth=1 origin "$PROBE_BEFORE" || true
+       - uses: actions/setup-node@v4
+         with:
+           node-version: 20
+diff --git a/.github/workflows/push-check.yml b/.github/workflows/push-check.yml
+index a176c88b..1f6b5ead 100644
+--- a/.github/workflows/push-check.yml
++++ b/.github/workflows/push-check.yml
+@@ -23,7 +23,8 @@ jobs:
+       - name: ① 서버 상태 (/health)
+         run: |
+           echo "— 발송 서버 상태 —"
+-          curl -sS --max-time 20 https://handaejang-push.seonju5543.workers.dev/health || echo "(접속 실패)"
++          curl -sS --max-time 20 https://handaejang-push.seonju5543.workers.dev/health \
++            || echo "::warning::발송 서버 /health 에 접속하지 못했습니다 — 아래 시험 발송 결과로 판정합니다."
+           echo
+ 
+       - name: ② 시험 발송 (/test)
+@@ -37,8 +38,45 @@ jobs:
+             exit 0
+           fi
+           echo "— 시험 발송 결과 —"
+-          curl -sS --max-time 30 -X POST \
++          # 🔴 응답을 **읽어서** 판정한다 (2026-10-04 로봇·도구 점검). 옛 판은 찍기만 해서, 열쇠가 틀려 401({error:'unauthorized'})이
++          #    와도 · 한 대도 못 깨워도(woke 0) 초록불이었다 — '살아 있는지는 이 발송만이 증명'(CLAUDE.md)인데 그 증명이 거짓 초록이 된다.
++          #    판정은 지어내지 않고 server/push/worker.js 가 실제로 주는 칸(error · tried · woke · dropped)으로만 한다.
++          set +e
++          RESP=$(curl -sS --max-time 30 -X POST -w '\n%{http_code}' \
+             -H "x-admin-key: $KEY" \
+-            https://handaejang-push.seonju5543.workers.dev/test
+-          echo
++            https://handaejang-push.seonju5543.workers.dev/test)
++          RC=$?
++          set -e
++          CODE=$(printf '%s' "$RESP" | tail -1)
++          JSON=$(printf '%s' "$RESP" | sed '$d')
++          echo "HTTP $CODE"; echo "$JSON"; echo
++          if [ "$RC" != "0" ] || [ "$CODE" != "200" ]; then
++            echo "::error::시험 발송이 실패했습니다 (curl rc=$RC · HTTP $CODE) — 열쇠(PUSH_ADMIN_KEY)가 Cloudflare ADMIN_KEY 와 같은지, 서버가 살아 있는지 보세요."
++            echo "❌ 시험 발송 실패 — HTTP $CODE" >> "$GITHUB_STEP_SUMMARY"; exit 1
++          fi
++          if ! printf '%s' "$JSON" | jq -e 'type == "object"' >/dev/null 2>&1; then
++            echo "::error::응답을 읽지 못했습니다(JSON 이 아님) — 판정할 수 없어 실패로 남깁니다(못 읽은 것을 정상으로 읽지 않는다)."
++            echo "❌ 시험 발송 — 응답을 읽지 못함" >> "$GITHUB_STEP_SUMMARY"; exit 1
++          fi
++          ERR=$(printf '%s' "$JSON" | jq -r '.error // empty')
++          TRIED=$(printf '%s' "$JSON" | jq -r '.tried // empty' 2>/dev/null || true)
++          WOKE=$(printf '%s' "$JSON" | jq -r '.woke // empty' 2>/dev/null || true)
++          DROPPED=$(printf '%s' "$JSON" | jq -r '.dropped // 0' 2>/dev/null || echo 0)
++          if [ -n "$ERR" ]; then
++            echo "::error::발송 서버가 오류를 돌려줬습니다: $ERR"
++            echo "❌ 시험 발송 — 서버 오류: $ERR" >> "$GITHUB_STEP_SUMMARY"; exit 1
++          fi
++          if ! [[ "$TRIED" =~ ^[0-9]+$ && "$WOKE" =~ ^[0-9]+$ ]]; then
++            echo "::error::응답에서 tried·woke 를 읽지 못했습니다 — 판정할 수 없어 실패로 남깁니다(못 읽은 것을 정상으로 읽지 않는다)."
++            echo "❌ 시험 발송 — 응답을 읽지 못함" >> "$GITHUB_STEP_SUMMARY"; exit 1
++          fi
++          if [ "$TRIED" -eq 0 ]; then
++            echo "::warning::등록된 폰이 없습니다 — 깨울 대상이 없어 발송하지 않았습니다(서버 자체는 응답함)."
++            echo "⚠️ 시험 발송 — 등록된 폰 0대 (tried 0)" >> "$GITHUB_STEP_SUMMARY"; exit 0
++          fi
++          if [ "$WOKE" -eq 0 ]; then
++            echo "::error::등록된 폰 ${TRIED}대 가운데 한 대도 못 깨웠습니다 (dropped ${DROPPED})."
++            echo "❌ 시험 발송 — ${TRIED}대 중 0대 깨움 (dropped ${DROPPED})" >> "$GITHUB_STEP_SUMMARY"; exit 1
++          fi
++          echo "✅ 시험 발송 — ${TRIED}대 중 ${WOKE}대 깨움 (dropped ${DROPPED} — 죽은 등록 정리는 정상)" | tee -a "$GITHUB_STEP_SUMMARY"
+           echo "위 tried/woke가 등록된 폰 수와 같으면 정상입니다. dropped는 죽은 등록을 정리한 것(정상)."
+diff --git a/.github/workflows/push-health.yml b/.github/workflows/push-health.yml
+index 1c485a2d..052d21b2 100644
+--- a/.github/workflows/push-health.yml
++++ b/.github/workflows/push-health.yml
+@@ -15,6 +15,10 @@ name: 푸시 서버 상태 확인 (발송 없음)
+ #    시험 발송(`/test`)은 등록된 **모든 학생 폰에 실제 알림이 뜨는 일**이라,
+ #    사람이 `push-check` 를 직접 누를 때만 일어나야 한다. 여기서 부르면 안 된다.
+ #
++# 🔴 2026-10-04 — 서버가 '살아 있다'만 보던 것을 '예약 회차가 돌고 있다'까지 본다(로봇·도구 점검 · 묶음 servers).
++#    서버 /health 의 lastSlot(마지막으로 시작한 회차)·lastRun(마지막으로 끝까지 돈 회차)을 판정 도구
++#    tools/push-health-verdict.mjs 가 읽는다 — 두 회차 연속 안 돌았으면 stale, 새 코드가 안 올라갔으면 outdated.
++#
+ # ⚠️ `/health` 의 `subs` 는 **등록 기록 수이지 살아 있는 폰 수가 아니다**(worker.js 주석).
+ #    폰 쪽에서 구독이 죽어도 기록은 남아 있다가 다음 발송 때 404 로 정리된다.
+ #    "실제로 받는지"는 여전히 `push-check` 의 시험 발송으로만 증명된다.
+@@ -40,6 +44,14 @@ jobs:
+     runs-on: ubuntu-latest
+     timeout-minutes: 5
+     steps:
++      # 🔴 체크아웃이 먼저다 — 넘어짐 알림(로컬 액션 robot-down)과 그 경보 도구(tools/alert-issue.mjs)가 저장소 파일이라,
++      #    없으면 넘어진 날 알림까지 'Can't find action.yml' 로 넘어진다(관문 alerts ⑥ S2). 필요한 두 폴더만 받는다.
++      - uses: actions/checkout@v4
++        with:
++          sparse-checkout: |
++            .github/actions
++            tools
++
+       - name: /health 읽기
+         id: probe
+         env:
+@@ -53,29 +65,12 @@ jobs:
+           JSON=$(printf '%s' "$BODY" | sed '$d')
+           echo "— 응답 —"; echo "HTTP $CODE"; echo "$JSON"
+ 
+-          # 판정은 지어내지 않고 worker.js 가 실제로 주는 칸으로만 한다:
+-          #   ok · configured · step · sent · subs · lastError
+-          VERDICT=ok; WHY=""
+-          if [ "$CURL_RC" != "0" ] || [ "$CODE" != "200" ]; then
+-            VERDICT=down; WHY="서버가 응답하지 않습니다 (curl rc=$CURL_RC · HTTP $CODE)"
+-          else
+-            CONF=$(printf '%s' "$JSON" | jq -r '.configured // empty')
+-            LERR=$(printf '%s' "$JSON" | jq -r '.lastError // empty')
+-            SUBS=$(printf '%s' "$JSON" | jq -r '.subs // empty')
+-            if [ "$CONF" != "true" ]; then
+-              VERDICT=misconfig; WHY="VAPID 키가 서버에 없습니다 (configured=false) — 푸시가 실제로는 안 나갑니다"
+-            elif [ -n "$LERR" ]; then
+-              VERDICT=error; WHY="서버에 마지막 오류 기록이 남아 있습니다: $LERR"
+-            elif [ "$SUBS" = "-1" ]; then
+-              VERDICT=error; WHY="등록 저장소(KV)를 읽지 못했습니다 (subs=-1)"
+-            fi
+-            # subs=0 은 오류가 아니라 '알릴 대상이 없음'이다 — 이슈로 만들지 않고 로그에만 적는다
+-            [ "$SUBS" = "0" ] && echo "⚠️ 등록된 폰이 0대입니다 (오류는 아니지만 알림이 갈 곳이 없습니다)"
+-          fi
+-          echo "verdict=$VERDICT" >> "$GITHUB_OUTPUT"
+-          echo "why=$WHY"        >> "$GITHUB_OUTPUT"
++          # 판정은 한 곳(tools/push-health-verdict.mjs · 관문 verify/health-gates/servers.mjs ④)에서 한다 —
++          #   down · misconfig · error(lastError·subs=-1) · outdated(lastSlot 칸 없음) · stale(두 회차 연속 안 돎) ·
++          #   error(깨우기를 보냈는데 푸시 서비스가 한 건도 안 받음) · ok. 등록 0대·lastSlot null 은 경고만.
++          #   verdict·why 는 이 도구가 GITHUB_OUTPUT 에 적는다.
++          HEALTH_RC="$CURL_RC" HEALTH_CODE="$CODE" HEALTH_BODY="$JSON" node tools/push-health-verdict.mjs
+           { echo "json<<EOJ"; echo "$JSON"; echo "EOJ"; } >> "$GITHUB_OUTPUT"
+-          echo "판정: $VERDICT ${WHY:+— $WHY}"
+ 
+       - name: 🚨 이상이면 이슈로 알린다
+         if: steps.probe.outputs.verdict != 'ok'
+diff --git a/.github/workflows/refresh-majors.yml b/.github/workflows/refresh-majors.yml
+index ab0c1419..18629125 100644
+--- a/.github/workflows/refresh-majors.yml
++++ b/.github/workflows/refresh-majors.yml
+@@ -1,18 +1,29 @@
+ # 학교별 학과 목록 갱신 (2026-08-06)
+ # 커리어넷 오픈API에서 학교별 개설 학과를 수확해 data/majors.json으로 발행한다.
+-# 학과 개편은 학기 단위라 예약 실행은 두지 않았다 — 학기 시작 무렵 Actions에서 수동 실행.
+-# 키는 저장소 Secret CAREERNET_API_KEY (없으면 스크립트가 아무것도 안 하고 조용히 종료).
++# 학과 개편은 학기 단위다 — 학기 시작 전(2월·8월 20일 새벽)에 한 번씩 예약으로 돈다(2026-10-05 점검 결정 ·
++# 그 전에는 예약이 없어 08-06 로컬 실행 뒤로 한 번도 안 돌았다). 필요하면 관리자 화면 「학과 목록 갱신」이나 Actions 에서 수동 실행.
++# 키는 저장소 Secret CAREERNET_API_KEY — 없으면 Actions 에서는 빨간불(::error)로 끝난다(로컬 실행만 조용히 종료).
++# 실행 결과(서비스 학교인데 학과 파일이 없는 곳 · 분교 이름 후보)는 collector/majors-report.md 와 ::warning 으로 남는다.
+ # 저장은 기본 브랜치(로봇 저장 위치 원칙) — deploy-sync가 main으로 자동 배포한다.
+ name: 학과 목록 갱신 (커리어넷)
+ 
+ on:
++  # 2·8월 19일 21:29 UTC = 20일 06:29 KST (홀수 분 · 정각·UTC 자정 피함 · 같은 시각에 저장하는 로봇 없음).
++  # ⚠️ 달 칸이 있는 예약이라 하트비트(robot-heartbeat)는 '너무 오래 조용함'을 판정하지 않는다(null — 반년 간격은 주 단위로 못 잰다).
++  #    넘어지면 아래 넘어짐 알림이 알린다.
++  schedule:
++    - cron: '29 21 19 2,8 *'
+   workflow_dispatch:
+ 
+ permissions:
+   contents: write
++  issues: write
+ 
++# 🔴 수집 로봇과 다른 대기줄 (2026-10-05 · 옛 판은 group: collector) — 같은 줄이면 이 로봇이 기다리거나 도는 동안 줄에 선
++#    예약 수집·관리자 버튼 실행이 취소될 수 있다(GitHub 은 한 줄에 대기 실행을 하나만 남긴다). 이 로봇이 쓰는 파일
++#    (data/majors.json · data/majors/ · collector/majors-report.md)은 다른 로봇이 안 쓴다 · 저장 충돌은 아래 pull --rebase 재시도가 받는다.
+ concurrency:
+-  group: collector
++  group: refresh-majors
+   cancel-in-progress: false
+ 
+ jobs:
+@@ -22,10 +33,10 @@ jobs:
+     steps:
+       - uses: actions/checkout@v4
+         with:
+-          # 🔴 대기줄(collector)에서 기다린 뒤에는 **지금 브랜치 끝**에서 시작한다 (2026-09-30).
+-          #    기본값(GITHUB_SHA)은 큐에 들어간 시점에 굳어서, 앞 로봇이 저장한 커밋 위로 rebase 하다
+-          #    규칙 없는 장부에서 충돌 → 3회 실패 → 그 실행의 수집분이 통째로 버려졌다(브라우저 19곳 17분치).
+-          ref: ${{ github.ref_name }}
++          # 🔴 기본 브랜치의 **지금 끝**에서 시작하고 그 브랜치에만 저장한다 (kosaf-fetch 와 같은 꼴 · 2026-10-05).
++          #    기본값(GITHUB_SHA)은 실행이 생긴 시점에 굳어서 앞 로봇이 저장한 커밋 위로 rebase 하다 충돌할 수 있다(2026-09-30 사고) —
++          #    브랜치 이름으로 받으면 체크아웃 시점의 끝이다. 어느 브랜치에서 깨워도 읽는 곳과 저장하는 곳이 같다.
++          ref: claude/nice-heisenberg-WESq5
+       - uses: actions/setup-node@v4
+         with:
+           node-version: 20
+@@ -35,6 +46,15 @@ jobs:
+           CAREERNET_API_KEY: ${{ secrets.CAREERNET_API_KEY }}
+         run: node collector/majors.mjs
+ 
++      # 🔴 데이터 관문 (2026-10-04 · 로봇·도구 점검) — 다른 로봇처럼 저장 **전에** 규칙 관문과 데이터 감사를 지난다.
++      #    예전엔 관문 없이 저장해, 이 파일이 다른 로봇 관문의 전제를 깨면 저장은 되고 **다음 수집 로봇의 데이터 관문이 빨개져**
++      #    그 실행 결과가 되돌려질 참이었다. 걸리면 저장 없이 빨간불(수동 실행이라 사람이 본다) — continue-on-error 를 달지 말 것.
++      - name: 데이터 관문 (수집기 규칙 테스트 + 데이터 감사)
++        timeout-minutes: 5
++        run: |
++          node verify/test-collector.mjs
++          node verify/audit-data.js
++
+       - name: 저장
+         run: |
+           git config user.name "handaejang-bot"
+@@ -43,6 +63,8 @@ jobs:
+           #    빠뜨리면 앱은 새 학과를 영영 못 보고, 파일이 없으면 전국 공통 목록으로
+           #    조용히 물러나므로 화면상 아무 일도 안 일어난 것처럼 보인다.
+           git add data/majors.json data/majors
++          # 실행 리포트(서비스 학교인데 학과 파일이 없는 곳 · 분교 이름 후보) — 사람이 BRANCH_MAP 을 고칠 증거
++          [ -f collector/majors-report.md ] && git add collector/majors-report.md
+           git diff --cached --quiet && { echo "변경 없음"; exit 0; }
+           git commit -m "majors: 학교별 학과 목록 갱신 (커리어넷 API)"
+           for i in 1 2 3; do
+@@ -50,3 +72,11 @@ jobs:
+             sleep 5
+           done
+           echo "::error::push 3회 실패"; exit 1
++
++      # 🔴 시간 초과는 '실패'가 아니라 '취소'라 둘 다 본다 (2026-08-04 사고) · 회복하면 하트비트가 닫는다.
++      - name: 🚨 로봇이 넘어졌다
++        if: failure() || cancelled()
++        uses: ./.github/actions/robot-down
++        with:
++          robot: 학과 목록 갱신
++          token: ${{ github.token }}
+diff --git a/.github/workflows/refresh-tuition.yml b/.github/workflows/refresh-tuition.yml
+index 84a2740b..a3145900 100644
+--- a/.github/workflows/refresh-tuition.yml
++++ b/.github/workflows/refresh-tuition.yml
+@@ -11,9 +11,13 @@ on:
+ 
+ permissions:
+   contents: write
++  issues: write
+ 
++# 🔴 수집 로봇과 다른 대기줄 (2026-10-05 · 옛 판은 group: collector) — 같은 줄이면 이 로봇(최대 55분)이 기다리거나 도는 동안
++#    줄에 선 예약 수집·관리자 버튼 실행이 취소될 수 있다(GitHub 은 한 줄에 대기 실행을 하나만 남긴다). 이 로봇이 쓰는 파일
++#    (data/tuition.json)은 다른 로봇이 안 쓴다 · 저장 충돌은 아래 pull --rebase 재시도가 받는다.
+ concurrency:
+-  group: collector
++  group: refresh-tuition
+   cancel-in-progress: false
+ 
+ jobs:
+@@ -24,10 +28,10 @@ jobs:
+     steps:
+       - uses: actions/checkout@v4
+         with:
+-          # 🔴 대기줄(collector)에서 기다린 뒤에는 **지금 브랜치 끝**에서 시작한다 (2026-09-30).
+-          #    기본값(GITHUB_SHA)은 큐에 들어간 시점에 굳어서, 앞 로봇이 저장한 커밋 위로 rebase 하다
+-          #    규칙 없는 장부에서 충돌 → 3회 실패 → 그 실행의 수집분이 통째로 버려졌다(브라우저 19곳 17분치).
+-          ref: ${{ github.ref_name }}
++          # 🔴 기본 브랜치의 **지금 끝**에서 시작하고 그 브랜치에만 저장한다 (kosaf-fetch 와 같은 꼴 · 2026-10-05).
++          #    기본값(GITHUB_SHA)은 실행이 생긴 시점에 굳어서 앞 로봇이 저장한 커밋 위로 rebase 하다 충돌할 수 있다(2026-09-30 사고) —
++          #    브랜치 이름으로 받으면 체크아웃 시점의 끝이다. 어느 브랜치에서 깨워도 읽는 곳과 저장하는 곳이 같다.
++          ref: claude/nice-heisenberg-WESq5
+       - uses: actions/setup-node@v4
+         with:
+           node-version: 20
+@@ -44,6 +48,15 @@ jobs:
+         timeout-minutes: 45
+         run: node collector/fetch-tuition-field.mjs --write
+ 
++      # 🔴 데이터 관문 (2026-10-04 · 로봇·도구 점검) — 다른 로봇처럼 저장 **전에** 규칙 관문과 데이터 감사를 지난다.
++      #    예전엔 관문 없이 저장해, 이 파일이 다른 로봇 관문의 전제를 깨면 저장은 되고 **다음 수집 로봇의 데이터 관문이 빨개져**
++      #    그 실행 결과가 되돌려질 참이었다. 걸리면 저장 없이 빨간불(수동 실행이라 사람이 본다) — continue-on-error 를 달지 말 것.
++      - name: 데이터 관문 (수집기 규칙 테스트 + 데이터 감사)
++        timeout-minutes: 5
++        run: |
++          node verify/test-collector.mjs
++          node verify/audit-data.js
++
+       - name: 저장
+         run: |
+           git config user.name "handaejang-bot"
+@@ -56,3 +69,11 @@ jobs:
+             sleep 5
+           done
+           echo "::error::push 3회 실패"; exit 1
++
++      # 🔴 시간 초과는 '실패'가 아니라 '취소'라 둘 다 본다 (2026-08-04 사고) · 회복하면 하트비트가 닫는다.
++      - name: 🚨 로봇이 넘어졌다
++        if: failure() || cancelled()
++        uses: ./.github/actions/robot-down
++        with:
++          robot: 등록금 갱신
++          token: ${{ github.token }}
+diff --git a/.github/workflows/rescue-bodies.yml b/.github/workflows/rescue-bodies.yml
+index fe2a9ca8..a829c718 100644
+--- a/.github/workflows/rescue-bodies.yml
++++ b/.github/workflows/rescue-bodies.yml
+@@ -74,6 +74,8 @@ jobs:
+         env:
+           RESCUE_BUDGET_MS: '540000'   # 9분(2026-10-04 12→9 · 대외활동 단계 몫) — 못 끝낸 것은 다음 실행이 이어서 한다
+           RESCUE_CAP: ${{ inputs.cap || '50' }}   # 25→50 (2026-10-04 실측: 25건에 약 5분 · 예산 9분) — 예산이 먼저 멈추고 한 페이지 60초 시한이 있어 넘치지 않는다
++          # 감시 타이머(RESCUE_WATCHDOG_MS)는 따로 안 적는다 — 로봇이 예산 + 한 공고 시한 + 30초 = 10분 30초로 잡아 이 단계 시한(11분) 전에
++          # 스스로 저장하고 종료 코드 1 로 끝낸다(2026-10-04 리뷰 R2 · 고아 node 가 관문·저장 단계와 같은 때에 파일을 고치지 않게)
+         run: node collector/rescue-bodies.mjs --write
+ 
+       # 데이터 관문은 저장 직전에 둔다 (이슈 #79의 교훈)
+@@ -92,8 +94,8 @@ jobs:
+           pip install olefile --quiet
+           python3 collector/hwp-bodytext.py collector/act-files || true
+           sudo apt-get install -y -qq poppler-utils
+-          pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3   # 🔴 판 고정 — 3.3.x 는 x86 CPU 에서 첫 그림부터 ConvertPirAttribute2RuntimeAttribute 오류(2026-10-04 첫 클라우드 실행 · PaddleOCR discussions 17350)
+-          python3 collector/paddle-ocr.py collector/act-files --budget-sec=240 || true
++          pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3 || echo "::warning::PaddleOCR 설치 실패 — 아래 읽기가 엔진 없음으로 적고 HWP·본문으로만 계속"   # 🔴 실패를 삼키지도, 경고 없이 떼지도 말 것 — 떼면 같은 단계의 --apply 가 bash -e 에 끊겨 HWP 로 읽은 자격까지 버려진다(2026-10-04 점검 gaps-02) · 🔴 판 고정 — 3.3.x 는 x86 CPU 에서 첫 그림부터 ConvertPirAttribute2RuntimeAttribute 오류(2026-10-04 첫 클라우드 실행 · PaddleOCR discussions 17350)
++          python3 collector/paddle-ocr.py collector/act-files --budget-sec=240 || echo "::warning::PaddleOCR 실패 — 자격 읽기는 HWP·본문으로만 계속(엔진 고장이면 그 글의 기회는 --apply 가 되돌린다)"
+       - name: 대외활동 — 자격 고르기 (자기 장부에만)
+         timeout-minutes: 2
+         continue-on-error: true
+@@ -106,10 +108,12 @@ jobs:
+         run: |
+           node verify/test-collector.mjs
+           node verify/audit-data.js
++      # 🔴 장부(rescue-ledger.json)도 함께 되돌린다 (2026-10-04 점검 bodies-12) — 본문 확보는 장부에 '확보한 날'로 남는데(이레 쉼),
++      #    본문만 되돌리고 장부를 남기면 그 공고를 이레 동안 아무도 안 연다. 대외활동 장부·리포트는 남긴다('해 봤다'와 진단 기록).
+       - name: 관문에 걸리면 되돌린다
+         if: steps.audit.outcome == 'failure'
+         run: |
+-          git checkout -- collector/extracted/browser-bodies.json data/registered.json || true
++          git checkout -- collector/extracted/browser-bodies.json data/registered.json collector/rescue-ledger.json || true
+           echo "::error::재수집 결과가 감사를 통과하지 못했습니다. 되돌렸습니다."
+           exit 1
+ 
+@@ -143,8 +147,22 @@ jobs:
+             echo "::notice::새로 확보한 본문이 없습니다."
+           fi
+ 
++      # 🔴 재수집 단계가 끝까지 못 갔으면 작업을 실패로 남긴다 (2026-10-04 점검 bodies-2).
++      #    그 단계는 continue-on-error 라(아래 대외활동·관문·저장이 돌아야 한다) 단계 시한(11분)에 잘려도 작업은 '성공'이었다 —
++      #    run #53 은 장학 본문 0건인데 초록불이었고, 실패 알림도 안 갔고, 하트비트도 성공으로 셌다.
++      #    저장 **뒤**에 둔다(저장은 이미 끝났다) · 바로 아래 알림이 failure() 로 이슈를 만든다.
++      - name: 본문 재수집 단계가 끝까지 못 갔으면 실패로 남긴다
++        if: steps.rescue.outcome != 'success'
++        timeout-minutes: 1
++        run: |
++          echo "::error::본문 재수집 단계가 '${{ steps.rescue.outcome }}' 로 끝났습니다 — 감시 타이머에 멈췄거나 · 단계 시한(11분)에 잘렸거나 · 로봇이 넘어졌을 수 있습니다(어느 것인지는 위 단계 로그에). 그때까지 받은 것은 위에서 저장했습니다."
++          exit 1
++
+       # 🔴 `if: failure()` 만 쓰면 안 된다 — 시간 초과는 '실패'가 아니라 '취소'라
+       #    알림 단계까지 통째로 건너뛴다 (2026-08-04 사고).
++      # 🔴 저장소의 리포트가 **이번 실행 것**일 때만 붙인다 (2026-10-04 점검 bodies-7) — 리포트를 쓰기 전에 끊긴 실행이
++      #    9-30 판 리포트를 10-03 실패 이슈에 붙여, 실제로는 넷째 공고에서 멈춘 것을 '경희대 공고들이 4회째 본문 없음'처럼 읽게 했다.
++      # 🔴 원인을 단정하지 않는다 (리뷰 R3 · CLAUDE.md 매 세션 5) — 크롬 설치가 실패하면 재수집 단계는 돌지도 않는다. 갈래는 '예'로 열어 두고 로그로 보낸다.
+       - name: 실패하면 이슈로 알린다
+         if: failure() || cancelled()
+         continue-on-error: true
+@@ -152,11 +170,39 @@ jobs:
+         with:
+           script: |
+             const fs = require('fs');
+-            let body = '(리포트 없음)';
+-            try { body = fs.readFileSync('collector/rescue-report.md', 'utf8').slice(0, 8000); } catch {}
++            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
++            const today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);   // 리포트의 '실행:' 은 한국 날짜다
++            let report = '';
++            try { report = fs.readFileSync('collector/rescue-report.md', 'utf8'); } catch {}
++            const day = (report.match(/^실행: (\d{4}-\d{2}-\d{2})/m) || [])[1];
++            const none = '재수집 단계가 리포트를 쓰기 전에 끊겼거나 돌지 않았습니다 — 실행 로그를 보세요';
++            const part = !report ? [`(이번 실행의 리포트가 없습니다 — ${none})`]
++              : day !== today ? [`(이번 실행의 리포트가 없습니다 — ${none}. 저장소의 리포트는 ${day || '날짜 모름'} 판이라 붙이지 않았습니다)`]
++              : ['```', report.slice(0, 8000), '```'];
+             await github.rest.issues.create({
+               owner: context.repo.owner, repo: context.repo.repo,
+               labels: ['rescue-bodies'],
+-              title: `🚨 자격요건 로봇 (진짜 브라우저) 실패 — ${new Date().toISOString().slice(0, 10)}`,
+-              body: ['재수집이 실패하거나 시간 초과로 취소됐습니다.', '', '```', body, '```'].join('\n'),
++              title: `🚨 자격요건 로봇 (진짜 브라우저) 실패 — ${today}`,
++              body: ['자격요건 로봇이 끝까지 성공하지 못했습니다. 예: 진짜 크롬 설치 실패 · 재수집 단계가 감시 타이머에 멈춤·시한에 잘림·넘어짐 · 데이터 관문 · 저장 실패 · 작업 시한 취소 등 — 어느 것인지는 실행 로그에 있습니다.',
++                `실행 로그: ${runUrl}`, '', ...part].join('\n'),
++            });
++
++      # 끝까지 돈 실행은 옛 실패 이슈를 닫는다 (2026-10-04 점검 bodies-7 — 09-04·…·10-03 실패 이슈가 다 열려 있어 어느 것이 지금 일인지 알 수 없었다).
++      # 🔴 success() 일 때만 — 실패한 실행이 실패 이슈를 닫으면 안 된다. robot-heartbeat.yml '옛 경보를 닫는다'처럼 코멘트를 남기고 닫는다.
++      - name: 성공하면 옛 실패 이슈를 닫는다
++        if: success()
++        timeout-minutes: 1
++        continue-on-error: true
++        uses: actions/github-script@v7
++        with:
++          script: |
++            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
++            const open = await github.paginate(github.rest.issues.listForRepo, {
++              owner: context.repo.owner, repo: context.repo.repo, labels: 'rescue-bodies', state: 'open', per_page: 100,
+             });
++            for (const is of open.filter((x) => !x.pull_request)) {
++              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: is.number,
++                body: `다음 실행(${runUrl})이 끝까지 돌아 닫습니다.` });
++              await github.rest.issues.update({ owner: context.repo.owner, repo: context.repo.repo, issue_number: is.number,
++                state: 'closed', state_reason: 'completed' });
++            }
+diff --git a/.github/workflows/resolve-detail-urls.yml b/.github/workflows/resolve-detail-urls.yml
+index 520e661e..8eb18bf5 100644
+--- a/.github/workflows/resolve-detail-urls.yml
++++ b/.github/workflows/resolve-detail-urls.yml
+@@ -7,7 +7,7 @@ name: 원문 링크 복구 로봇
+ # 실행 방법:
+ #   · collector/run-resolve-urls.txt 를 고쳐 push (push-to-run — GitHub MCP 없는 세션도 가능)
+ #   · Actions 화면에서 수동 실행 (기본 브랜치에 올라간 뒤부터 가능)
+-#   · 매주 월요일 새벽 — 게시판 개편으로 주소가 바뀌어도 스스로 다시 맞춘다
++#   · 매주 화요일 새벽(KST) — 게시판 개편으로 주소가 바뀌어도 스스로 다시 맞춘다
+ 
+ on:
+   workflow_dispatch:
+@@ -17,7 +17,7 @@ on:
+         type: boolean
+         default: false
+       recheck_only:
+-        description: '이미 고친 주소 점검만 (게시판을 덜 두드린다)'
++        description: '(쓰지 않음 — 이미 고친 주소 확인은 원문 링크 확인 로봇이 매일 한다 · 켜면 게시판을 열지 않고 끝난다)'
+         type: boolean
+         default: false
+   push:
+@@ -28,7 +28,7 @@ on:
+     paths:
+       - 'collector/run-resolve-urls.txt'
+   schedule:
+-    - cron: '13 20 * * 1'   # 매주 월요일 05:13 KST
++    - cron: '13 20 * * 1'   # 매주 화요일 05:13 KST = 월요일 20:13 UTC (주석 요일은 관문 「로봇·도구 점검 관문」 links ⑥ 이 cron 과 대조)
+ 
+ permissions:
+   contents: write
+diff --git a/.github/workflows/robot-heartbeat.yml b/.github/workflows/robot-heartbeat.yml
+index 8776ae6f..45da0364 100644
+--- a/.github/workflows/robot-heartbeat.yml
++++ b/.github/workflows/robot-heartbeat.yml
+@@ -6,7 +6,7 @@
+ #     (실제로 2026-07-06 에 완전 누락이 있었다 — CLAUDE.md '예약 실행 혼잡 회피 정책').
+ #
+ #  하는 일: 워크플로 파일에서 예약을 읽어 기대 간격을 스스로 계산하고,
+-#           마지막 성공이 그 3배를 넘었으면 이슈 하나에 모아 알린다.
++#           마지막 성공이 그 3배(최소 12시간 — 예약은 수 시간 늦고 일부는 걸러진다 · 2026-10-05)를 넘었으면 이슈 하나에 모아 알린다.
+ #           예약을 고치면 기대 간격도 자동으로 따라간다(설정 파일을 두지 않은 이유).
+ # ============================================================
+ name: 로봇 하트비트 (예약이 도는지 확인)
+@@ -57,7 +57,7 @@ jobs:
+           GH_TOKEN: ${{ github.token }}
+         run: |
+           set -u
+-          body="아래 로봇이 **예정보다 3배 넘게 조용합니다.** 예약이 걸러졌거나 멈춰 있습니다.
++          body="아래 로봇이 **예정보다 3배(최소 12시간) 넘게 조용합니다.** 예약이 걸러졌거나 멈춰 있습니다(기본 브랜치·main 의 성공만 셉니다).
+ 
+           \`\`\`
+           ${{ steps.beat.outputs.report }}
+@@ -89,6 +89,19 @@ jobs:
+               --comment "✅ $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 예약 로봇이 모두 정상 간격으로 돌고 있습니다."
+           done
+ 
++      # 🔴 다시 선 로봇의 넘어짐 경보를 닫는다 (2026-10-04 로봇·도구 점검 · 묶음 alerts).
++      #    `.github/actions/robot-down` 은 열기·댓글만 한다 — 22분 뒤 같은 로봇이 성공했는데도 #386 이 열린 채 남았다.
++      #    워크플로 아홉 곳마다 '성공하면 닫기'를 붙이지 않고 여기서 한 번에 본다: 그 로봇의 마지막 성공이
++      #    **경보를 낸 실행보다 뒤에 시작됐을 때만** 닫는다(못 읽으면 그대로 둔다 · collector/robot-heartbeat.mjs 머리말).
++      #    보강이라 실패해도 하트비트 판정을 빨갛게 하지 않는다.
++      - name: 다시 선 로봇의 넘어짐 경보를 닫는다
++        if: ${{ !cancelled() }}
++        timeout-minutes: 2
++        continue-on-error: true
++        env:
++          GH_TOKEN: ${{ github.token }}
++        run: node collector/robot-heartbeat.mjs --close-recovered
++
+       # 자기 자신이 넘어진 것도 알린다 (감시자를 감시하는 자리는 여기가 마지막이다)
+       - name: 🚨 로봇이 넘어졌다
+         if: failure() || cancelled()
+diff --git a/.github/workflows/supabase-health.yml b/.github/workflows/supabase-health.yml
+new file mode 100644
+index 00000000..4250180e
+--- /dev/null
++++ b/.github/workflows/supabase-health.yml
+@@ -0,0 +1,103 @@
++name: 로그인 서버 상태 확인 (Supabase)
++
++# 로그인·기기 간 이어쓰기 서버(Supabase)가 **응답하는지** 매일 확인한다. (2026-10-04 로봇·도구 점검 · 묶음 servers)
++#
++# 왜 만들었나:
++#   · 로그인은 켜져 있는데(supabase-config.js 에 주소·공개 열쇠가 채워져 있다) 살아 있는지 보는 로봇이 없었다.
++#     푸시 서버(push-health)·관리자 잠금(admin-lock-check)은 매일 보면서 로그인 서버는 아무도 안 봤다.
++#   · Claude 실행 환경은 *.supabase.co 접속이 프록시에서 막혀 세션 안에서는 확인이 안 된다 — 바깥(Actions)에서 여는 것만이 증명이다.
++#
++# 판정은 한 곳(tools/supabase-health.mjs · 관문 verify/health-gates/servers.mjs ⑨):
++#   ok · misconfig(열쇠 거절 401/403) · down(그 밖·연결 실패 — 3번 물어도 안 될 때만) · off(설정이 비어 로그인이 꺼짐)
++#   🔴 설정 파일을 못 읽으면(문법 오류·충돌 표식 등) 판정을 내지 않고 확인 단계가 실패한다 → 맨 아래 robot-down.
++#      'off' 로 두면 아래 '닫는다' 단계가 열린 경보를 닫아 감시가 조용히 꺼진다(2026-10-04 리뷰).
++# 🔴 공개 열쇠만 쓴다(service_role 아님 · 시크릿 불필요). 데이터는 읽지도 쓰지도 않는다(/auth/v1/health 만).
++# ⚠️ 이 확인은 감시(알림)다 — 이 요청이 Supabase 휴면을 막아 주는지는 확인하지 않았다.
++#
++# 실행: Actions 탭 → 이 워크플로 → Run workflow · 자동: 매일 06:41 KST
++
++on:
++  schedule:
++    # 21:41 UTC = 06:41 KST. 정각·자정을 피한 홀수 분 · 푸시 서버 확인(06:17)과 겹치지 않게
++    - cron: '41 21 * * *'
++  workflow_dispatch:
++
++permissions:
++  contents: read
++  issues: write
++
++concurrency:
++  group: supabase-health      # 다른 로봇들과 대기줄을 섞지 않는다
++  cancel-in-progress: false
++
++jobs:
++  health:
++    runs-on: ubuntu-latest
++    timeout-minutes: 5
++    steps:
++      # 🔴 체크아웃이 먼저다 — 판정 도구(tools/)·경보 액션(.github/actions/)이 저장소 파일이다(관문 alerts ⑥ S2).
++      #    맨 위 폴더의 파일(supabase-config.js)은 sparse 체크아웃에서도 늘 같이 받는다.
++      - uses: actions/checkout@v4
++        with:
++          sparse-checkout: |
++            .github/actions
++            tools
++
++      - name: 로그인 서버 응답 확인
++        id: probe
++        run: node tools/supabase-health.mjs
++
++      - name: 🚨 이상이면 경보 이슈로 알린다
++        id: alarm
++        if: steps.probe.outputs.verdict == 'down' || steps.probe.outputs.verdict == 'misconfig'
++        uses: ./.github/actions/alert-issue
++        with:
++          token: ${{ github.token }}
++          mode: open
++          title: 🚨 로그인 서버(Supabase) 이상
++          match: exact
++          label: supabase-health
++          label-description: 로그인 서버(Supabase) 경보
++          assignee: ${{ github.repository_owner }}
++          body: |
++            학생 **로그인·기기 간 이어쓰기** 서버(Supabase)가 매일 확인에서 정상 응답하지 않았습니다 (3번 물어 봄).
++
++            > ${{ steps.probe.outputs.why }}
++
++            원인은 이 확인만으로는 알 수 없습니다. 먼저 볼 것:
++            1. Supabase 대시보드 → 이 프로젝트가 일시정지(Paused) 상태인지 · 상태 페이지(status.supabase.com)에 장애가 있는지
++            2. 열쇠 거절(401·403)이면 Settings → API Keys 의 공개 열쇠(Publishable key)가 `supabase-config.js` 의 `anonKey` 와 같은지
++
++            로그인이 멈춰도 앱은 게스트로 그대로 쓸 수 있습니다(기기 안 자료는 그대로) — 막히는 것은 로그인·다른 기기로 이어쓰기입니다.
++            정상으로 돌아오면 다음 날 확인이 이 이슈를 닫습니다.
++
++            실행 기록: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
++
++            ---
++            _Generated by [Claude Code](https://claude.ai/code)_
++
++      - name: 정상이면 옛 경보 이슈를 닫는다
++        if: steps.probe.outputs.verdict == 'ok' || steps.probe.outputs.verdict == 'off'
++        uses: ./.github/actions/alert-issue
++        with:
++          token: ${{ github.token }}
++          mode: resolve
++          title: 🚨 로그인 서버(Supabase) 이상
++          match: exact
++          body: |
++            ✅ 로그인 서버가 다시 정상으로 응답합니다(또는 로그인이 꺼져 확인 대상이 아닙니다). (자동 확인)
++
++            ---
++            _Generated by [Claude Code](https://claude.ai/code)_
++
++      - name: 결과를 실패로 남긴다 (이상한 경우)
++        if: steps.probe.outputs.verdict == 'down' || steps.probe.outputs.verdict == 'misconfig'
++        run: exit 1
++
++      # 결과 알림(위 경보)과 다른 것 — "보러 가다가 내가 넘어졌다"(확인 단계·경보 단계 자체가 실패·시간 초과)
++      - name: 🚨 로봇이 넘어졌다
++        if: cancelled() || (failure() && (steps.probe.outcome != 'success' || steps.alarm.outcome == 'failure'))
++        uses: ./.github/actions/robot-down
++        with:
++          robot: 로그인 서버 상태 확인
++          token: ${{ github.token }}
+diff --git a/.github/workflows/verify-ui.yml b/.github/workflows/verify-ui.yml
+index 779df8f2..d7fdc956 100644
+--- a/.github/workflows/verify-ui.yml
++++ b/.github/workflows/verify-ui.yml
+@@ -60,6 +60,16 @@ on:
+       - 'server/push/**'     # 푸시 발송 서버 (verify-push-server.mjs)
+       - 'insta/**'           # 인스타 카드 (verify-insta.js)
+       - '.github/workflows/verify-ui.yml'
++      # 🔴 경보 한 곳(2026-10-04 로봇·도구 점검) — 경보 도구·리포트 정리 규칙·앱이 받는 파일 목록과 공용 액션.
++      #    여기 없으면 그 파일만 고친 커밋에서 관문(test-collector 「로봇·도구 점검 관문」 alerts)이 한 번도 안 돈다.
++      - 'tools/alert-issue.mjs'
++      - 'tools/report-retention.mjs'
++      - 'tools/app-fetch-files.cjs'
++      - '.github/actions/**'
++      # 🔴 워크플로만 고친 커밋에도 돈다 (2026-10-05 리뷰). 「로봇·도구 점검 관문」(alerts S1~S4 · 각 로봇 절)은 워크플로 **글자**를 잰다.
++      #    여기 없으면 그 위반을 처음 보는 곳이 수집 로봇의 데이터 관문이 된다 — 그쪽은 경고만 하므로(로봇 결과를 되돌리지 않게)
++      #    엄격하게 실패시키는 곳은 이 검사 하나다. 로봇은 워크플로 파일을 커밋하지 않아 수집 커밋마다 돌지는 않는다.
++      - '.github/workflows/**'
+   workflow_dispatch:
+ 
+ permissions:
+@@ -76,6 +86,7 @@ jobs:
+     # 🔴 상한은 **모든 단계 예산을 담는 그릇**이다 (CLAUDE.md 규칙). 2026-09-21 에 전 여정
+     #    회귀(drive.js · 2~3분)를 더하며 25 → 30 으로 키웠다. 시간 초과는 '실패'가 아니라
+     #    '취소'라 아래 `if: failure()` 경보가 안 뜬다 — 그래서 넉넉히 둔다.
++    #    🔴 그릇을 키워 때우지 않는다 — 오래 걸리는 두 단계가 **스스로 끝낸다**(화면 검사 루프 예산 20분 · 전 여정 5분 · 2026-10-04).
+     timeout-minutes: 30
+     steps:
+       - uses: actions/checkout@v4
+@@ -83,15 +94,23 @@ jobs:
+         with:
+           node-version: 20
+       - run: npm init -y >/dev/null && npm i playwright-core@1 --no-audit --no-fund
+-      - run: npx playwright@1 install --with-deps chromium
++      # 🔴 `id: browser` — 아래 화면 검사·전 여정은 **이 단계가 성공했을 때만** 돈다. 앞(내려받기·도구 설치)이 넘어져도
++      #    이 단계가 건너뛰어져 성공이 아니게 되므로, 조건 하나로 준비 단계 전부를 본다(브라우저 없이 드라이버가 다 빨개지는 소음을 막는다).
++      - id: browser
++        run: npx playwright@1 install --with-deps chromium
+       - name: 브라우저 경로 찾기
+         run: echo "CHROME_PATH=$(find ~/.cache/ms-playwright -name chrome -type f | head -1)" >> $GITHUB_ENV
+ 
++      # 🔴 **여기부터 경보 앞까지 모든 관문 단계에 `!cancelled()` 를 단다** (2026-10-04 코드 리뷰).
++      #    GitHub 은 한 단계가 실패하면 `if:` 없는 아래 단계를 **통째로 건너뛴다.** 화면 검사 단계에만 달면
++      #    이 값싼 관문 일곱 가운데 하나만 넘어져도 드라이버 전부와 전 여정이 또 한 번도 안 돈다 — 2026-10-04 에 막으려던 '그물 걷힘'과 같은 꼴이다.
++      #    관문 verify/health-gates/ci.mjs ②(test-collector 「로봇·도구 점검 관문」 이 부른다)가 이 구간의 `if:` 를 하나씩 잰다(새 단계를 더할 때도).
+       # 🔴 순수 모듈 검사도 여기서 돌린다 (2026-08-29 코드 리뷰 지적).
+       #    essay-playbook.yml 에도 있지만 그건 **주 1회 예약**이라, 제출 관문이 깨져도
+       #    최대 일주일 뒤에 안다. 관문은 밀어 넣는 그 순간 막아야 한다.
+       #    브라우저가 필요 없어 몇 초면 끝난다.
+       - name: 제출 관문 판정 검사 (순수 모듈)
++        if: ${{ !cancelled() }}
+         run: node verify/verify-essay-submit.mjs
+ 
+       # 🔴 접수 대행 — 보내기 전 서버 재검증 (2026-09-25 · 고문 보고서 Q4).
+@@ -99,6 +118,7 @@ jobs:
+       #    자격을 조작한 신청서가 그대로 나가는 것. 지금은 mailto: 라 안 터지지만,
+       #    Resend 를 켜는 순간 우리가 보내는 주체가 된다 — 그때 이 관문이 서 있어야 한다.
+       - name: 접수 대행 재검증 관문 (순수 모듈)
++        if: ${{ !cancelled() }}
+         run: node verify/verify-apply-guard.mjs
+ 
+       # 🔴 아래 셋은 오랫동안 **어떤 워크플로에도 안 걸려 있었다**(2026-09-09 전수 조사에서 발견).
+@@ -107,12 +127,15 @@ jobs:
+       #    · push-server   — 발송 서버가 폰 주소·학교·캠퍼스 말고 아무것도 저장하지 않는가
+       #    · form-snapshot — 질문을 줄여도 **문서는 한 글자도 안 바뀐다**는 증명 (운영 원칙 4)
+       - name: 알림 규칙 관문 (순수 모듈)
++        if: ${{ !cancelled() }}
+         run: node verify/verify-notify-rules.js
+ 
+       - name: 푸시 발송 서버 관문
++        if: ${{ !cancelled() }}
+         run: node verify/verify-push-server.mjs
+ 
+       - name: 양식 문서 동일성 관문 (원칙 4)
++        if: ${{ !cancelled() }}
+         run: node verify/form-snapshot.mjs
+ 
+       # 🔴 인스타 카드 사실 관문 — 145건 전수. 브라우저가 필요 없다(파일·JSON 만 읽는다).
+@@ -120,6 +143,7 @@ jobs:
+       #    '모집 중'·저작자 표시 누락)을 잡는다. 규칙은 render.mjs 에서 **이름으로 떼어 온다** —
+       #    베끼면 코드를 되돌려도 초록불로 남는다(실제로 그랬다).
+       - name: 인스타 카드 사실 관문
++        if: ${{ !cancelled() }}
+         run: node verify/verify-insta.js
+ 
+       # 🔴 관리자 화면 빠진 이웃 — 브라우저가 필요 없다(파일만 읽는다). 몇 초면 끝난다.
+@@ -128,11 +152,14 @@ jobs:
+       #    이 단계가 부르는 build.sh 안에서 같은 관문이 돈다(규칙은 한 파일 — 베끼지 않는다).
+       #    Cloudflare 빌드 때도 같은 것이 돌지만, 그건 배포 직전이라 여기서 먼저 잡는다.
+       - name: 관리자 화면 빠진 이웃 관문
++        if: ${{ !cancelled() }}
+         run: |
+           bash _admin/build.sh
+ 
+       # 드라이버마다 8123·8124 를 쓴다 (verify/README.md)
+       - name: 로컬 서버 띄우기
++        id: server
++        if: ${{ !cancelled() }}
+         run: |
+           python3 -m http.server 8123 >/dev/null 2>&1 &
+           python3 -m http.server 8124 >/dev/null 2>&1 &
+@@ -141,9 +168,29 @@ jobs:
+       # ── 관문: 전부 통과해야 한다 (2026-08-29에 7개를 고쳐 모두 초록불로 만들었다) ──
+       # 🔴 여기서 실패하면 화면이 깨진 것이다. 넘기지 말 것 —
+       #    "나중에 보자"로 두면 정확히 그렇게 7개가 썩었다.
++      # 🔴 **하나가 넘어져도 끝까지 돈다** (2026-10-04 · 이슈 #389·#390). 예전엔 `set -e` + 맨몸 `node` 라
++      #    verify-registered 하나가 데이터 탓으로 넘어지자 뒤 드라이버 22개와 아래 단계 셋이 **통째로 안 돌았고**,
++      #    그 사이 들어온 토큰 위반(ui-tone)이 한 번도 안 보였다. `set -e` 만 지우면 아무것도 안 바뀐다 —
++      #    GitHub 기본 셸이 `bash -e` 라서 실패를 `||` 로 받아 모은 뒤 마지막에 한 번 실패시킨다.
++      #    `timeout 300`: 가장 긴 드라이버가 76초(verify-settings · 성공 실행 실측). 매달린 하나가 30분 그릇을 다 먹으면
++      #    '취소'로 끝나 경보가 안 뜬다 — 상한을 키우지 않고 드라이버마다 끊는다.
++      # 🔴 **루프 전체에도 예산이 있다 — 20분** (2026-10-04 코드 리뷰). 드라이버마다 5분만 있으면 26개 × 5분 = 130분이라,
++      #    셋만 상한까지 매달려도 30분 그릇이 넘쳐 '취소'로 끝나고 경보도 실패 목록도 안 나온다(조용한 실패).
++      #    예산을 다 쓰면 새 드라이버를 시작하지 않고 그 이름을 `unrun` 으로 넘긴 뒤 **실패로** 끝낸다 — 늘 경보가 뜬다.
++      #    드라이버 하나의 시한도 남은 예산을 넘지 않는다(`left`). 성공 실행은 13분 반이 걸렸다(2026-10-04 run 37227739276 실측).
++      #    작업 상한(30) > 이 예산(20) + 전 여정 시한(5) + 준비·값싼 관문 여유(3) — 관문 ci.mjs ② 가 셈과 루프를 실제로 돌려 잰다.
++      #    예산에 자주 걸리면 예산을 키우기 전에 어느 드라이버가 느려졌는지부터 본다(로그의 `──` 줄 사이 시각).
++      # 🔴 **앞의 값싼 관문이 넘어져도 돈다**(`!cancelled()` · 2026-10-04 코드 리뷰 — 조건이 없으면 일곱 가운데 하나만 빨개도
++      #    드라이버 전부와 전 여정이 통째로 건너뛰어졌다). 서버를 못 띄웠거나 브라우저를 못 깔았을 때만 건너뛴다 —
++      #    그때 경보는 '드라이버가 돌지 않았다'고 적는다(아래 경보의 DRIVERS).
+       - name: 화면 검사 (관문)
++        id: drivers
++        if: ${{ !cancelled() && steps.server.outcome == 'success' && steps.browser.outcome == 'success' }}
+         run: |
+-          set -e
++          budget=$((20*60))
++          end=$((SECONDS + budget))
++          fails=""
++          unrun=""
+           for f in verify-fit-badge.js verify-explore-sort.js verify-onboard-gaps.js \
+                    verify-registered.js verify-chat.js verify-apps-manage.js \
+                    verify-supabase.js verify-essay-ui.js verify-forms-data.js \
+@@ -154,9 +201,17 @@ jobs:
+                    verify-elig-ask.js \
+                    verify-apply-prep.js verify-activities.js verify-news.js \
+                    verify-region-city.js; do
++            left=$((end - SECONDS))
++            if [ "$left" -le 0 ]; then unrun="$unrun $f"; continue; fi
++            if [ "$left" -gt 300 ]; then left=300; fi
+             echo "── $f"
+-            node "verify/$f"
++            timeout -k 10 "$left" node "verify/$f" || { rc=$?; if [ "$rc" = 124 ] || [ "$rc" = 137 ]; then echo "❌ $f — 시한(${left}초) 안에 안 끝나 끊었다"; else echo "❌ $f"; fi; fails="$fails $f"; }
+           done
++          echo "failed=${fails# }" >> "$GITHUB_OUTPUT"
++          echo "unrun=${unrun# }" >> "$GITHUB_OUTPUT"
++          if [ -n "$unrun" ]; then echo "❌ 시간 예산($((budget / 60))분)을 다 써서 돌리지 못한 드라이버:$unrun"; fi
++          if [ -n "$fails" ]; then echo "❌ 실패한 드라이버:$fails"; fi
++          if [ -n "$fails$unrun" ]; then exit 1; fi
+ 
+ 
+       # 화면의 말투·토큰이 되돌아가지 않는지 (2026-08-31 신설 — 브라우저 없이 몇 초).
+@@ -169,7 +224,9 @@ jobs:
+       #    ⚠️ 검사를 무르게 한 것이 아니다. 여기서 실패하면 작업 전체가 여전히 빨간불이고,
+       #       다만 **화면 검사 결과도 함께 보인다.** 앞에 두면 둘 중 하나만 보인다.
+       #    ⚠️ 다시 앞으로 옮기지 말 것 — 옮기는 순간 뒤 단계가 또 통째로 사라진다.
++      #    🔴 앞 단계가 실패해도 돈다(`!cancelled()` — 2026-10-04 이전엔 이 조건이 없어 화면 검사가 빨간 날 통째로 건너뛰었다).
+       - name: 말투·토큰 관문
++        if: ${{ !cancelled() }}
+         run: node verify/ui-tone.mjs
+ 
+       # 수집기·관리자 규칙 관문 (2026-09-14 신설) — 브라우저가 필요 없어 3초면 끝난다.
+@@ -185,7 +242,9 @@ jobs:
+       #
+       # 🔴 **맨 끝에 둔다** — 말투·토큰 관문과 같은 이유다. 앞에 두면 여기서 걸린 날
+       #    브라우저 검사 20개가 통째로 안 돌아 그물이 걷힌 줄 아무도 모른다.
++      #    🔴 앞 단계가 실패해도 돈다(`!cancelled()` — 2026-10-04 이전엔 이 조건이 없어 앞이 빨간 날 통째로 건너뛰었다).
+       - name: 수집기·관리자 규칙 관문 (브라우저 불필요)
++        if: ${{ !cancelled() }}
+         # DOC_GATES: CLAUDE.md 부피·참조 대조는 **여기(코드 검사)와 로컬에서만** 실패시킨다.
+         #   수집 로봇도 이 파일을 데이터 관문으로 돌리는데, 거기서 문서 오타가 실패하면
+         #   그날 자동 등록분이 되돌려진다 — 문서 문제로 수집이 멈추면 안 된다(2026-09-23).
+@@ -202,16 +261,17 @@ jobs:
+       #    그 원인에는 아직 관문이 없다." 그 자리를 메운다.
+       #   수집 로봇은 실패하면 🚨 이슈를 남긴다. 화면 검사만 조용했다.
+       #
+-      # 🔴 라벨로 중복을 막는다 — 제목 검색은 이모지·한글에서 놓친다(2026-07-31).
+-      #    `.github/actions/robot-down` 이 같은 이유로 라벨을 쓴다. 열린 이슈가 있으면
+-      #    코멘트만 단다 — 매 push 마다 새 이슈를 만들면 일주일이면 알림을 무시하게 된다.
++      # 🔴 열린 경보가 있으면 코멘트만 단다 — 매 push 마다 새 이슈를 만들면 일주일이면 알림을 무시하게 된다.
++      #    찾기·만들기는 아래 경보 한 곳(tools/alert-issue.mjs · 2026-10-04)이 열린 이슈 목록의 **제목 글자**로 한다
++      #    (옛 판의 라벨 찾기는 같은 초 두 실행이 둘 다 '없음'을 봐 중복을 만들었다 · GitHub 검색은 이모지·한글에서 놓친다 — 2026-07-31).
+       #
+       # ⚠️ **여기서는 `cancelled()` 를 일부러 안 본다** — 이 저장소의 다른 로봇과 다르다.
+       #    다른 로봇은 예약(cron)이라 취소 = 시간 초과지만, 이 워크플로는
+       #    `cancel-in-progress: true` 라 **연달아 push 할 때마다 앞 실행이 정상적으로 취소된다.**
+       #    거기에 알림을 걸면 헛경보가 쏟아져 진짜 빨간불이 묻힌다(위 '무시하게 된다'와 같은 이유).
+-      #    ⚠️ 그래서 25분 상한을 넘긴 경우는 이 알림이 못 잡는다 — 알고 남긴 구멍이다.
+-      #       메우려면 취소 사유를 갈라야 하는데 GitHub 이 `if:` 로는 안 알려 준다.
++      #    ⚠️ 그래서 작업 상한(30분)을 넘긴 경우는 이 알림이 못 잡는다 — 취소 사유를 `if:` 로 가를 수 없어서다.
++      #       대신 넘기지 않게 한다: 화면 검사 루프는 20분 예산을 다 쓰면 남은 드라이버를 '돌리지 못함'으로 넘기고
++      #       **실패로** 끝내고, 전 여정은 5분에 끊는다(2026-10-04 · 관문 ci.mjs ②).
+ 
+       # 🔴 전 여정 회귀 — 온보딩 → 매칭 → 신청 → 양식 작성 → 일괄 준비 → 신청내역을
+       #    한 번에 걷는 **유일한** 검사인데, 2026-09-21 까지 **어느 워크플로에도 없었다.**
+@@ -223,42 +283,76 @@ jobs:
+       #    🔴 **값싼 관문(말투·토큰·수집기 규칙) 뒤에 둔다.** GitHub 은 한 단계가 실패하면
+       #       아래를 통째로 건너뛰므로, 앞에 두면 이 2~3분짜리가 빨간불일 때 3초짜리 관문
+       #       결과가 통째로 안 보인다 — 2026-09-03 에 ui-tone 을 맨 뒤로 옮긴 이유와 같다.
++      #    🔴 앞 단계가 실패해도 돈다(`!cancelled()` — 2026-10-04 이전엔 이 조건이 없어 앞이 빨간 날 통째로 건너뛰었다).
++      #       서버를 못 띄웠거나 브라우저를 못 깔았으면 돌 까닭이 없어 그때만 건너뛴다(위 화면 검사와 같은 조건).
++      #    🔴 5분에 끊는다(`timeout -k 10 300` · 2026-10-04 코드 리뷰) — 매달리면 30분 그릇이 넘쳐 '취소'로 끝나 경보가 안 뜬다.
++      #       끊기면 이 단계가 실패로 끝나 아래 경보가 뜬다. 위 화면 검사 예산(20분)과 합쳐 작업 상한 안에 들어가야 한다(관문 ci.mjs ②).
+       - name: 전 여정 회귀 (drive.js)
+-        run: PORT=8123 node verify/drive.js
++        if: ${{ !cancelled() && steps.server.outcome == 'success' && steps.browser.outcome == 'success' }}
++        run: PORT=8123 timeout -k 10 300 node verify/drive.js
+       - name: 🚨 화면 검사가 빨간불이다
++        id: alarm
+         if: failure()
+         env:
+           GH_TOKEN: ${{ github.token }}
+           REPO: ${{ github.repository }}
+           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+           BRANCH: ${{ github.ref_name }}
++          FAILED: ${{ steps.drivers.outputs.failed }}
++          # 🔴 화면 검사 단계가 **돌았는지부터** 가른다 (2026-10-04 코드 리뷰). 실패 목록(FAILED)만 보면
++          #    단계가 건너뛰어진 날에도 목록이 비어 '실패한 드라이버: 없음'이라고 적혀, 하나도 안 돈 것을 다 통과한 것처럼 말했다
++          #    (CLAUDE.md 매 세션 5 — 확인 안 한 원인을 경고 문구에 단정하지 않는다). 관문 verify/health-gates/ci.mjs ② 가 세 갈래를 실제로 돌려 본다.
++          DRIVERS: ${{ steps.drivers.outcome }}
++          # 시간 예산을 다 써서 **시작도 못 한** 드라이버 — '실패한 드라이버'와 섞지 않는다(돌지 않은 것을 넘어졌다고 적지 않는다).
++          UNRUN: ${{ steps.drivers.outputs.unrun }}
+         run: |
+           set -u
++          case "${DRIVERS:-}" in
++            success) drv="화면 검사 드라이버는 **전부 통과했습니다.** 빨간 단계는 그 밖(앞의 값싼 관문 · 말투·토큰 · 수집기 규칙 · 전 여정 등)에 있으니, 로그에서 빨간 표시가 붙은 단계를 찾으세요." ;;
++            failure)
++              drv=""
++              if [ -n "${FAILED:-}" ]; then drv="실패한 드라이버: ${FAILED}."; fi
++              if [ -n "${UNRUN:-}" ]; then
++                drv="${drv:+$drv }화면 검사의 시간 예산을 다 써서 **돌리지 못한 드라이버**: ${UNRUN}. 어느 드라이버가 오래 걸렸는지 로그의 \`──\` 줄 사이 시각을 보세요."
++              elif [ -n "$drv" ]; then
++                drv="$drv 드라이버는 하나가 넘어져도 끝까지 돌았습니다. 다른 빨간 단계가 더 있을 수 있으니 로그도 보세요."
++              else
++                drv="화면 검사 단계가 실패했는데 실패한 드라이버 목록을 받지 못했습니다 — 로그에서 \`❌\` 가 붙은 줄과 빨간 단계를 찾으세요."
++              fi ;;
++            *) drv="화면 검사 드라이버와 전 여정(drive.js)이 **돌지 않았습니다** — 그 앞의 준비 단계(코드 내려받기 · 도구 설치 · 브라우저 설치 · 로컬 서버 띄우기) 가운데 하나가 실패했습니다. 로그에서 빨간 표시가 붙은 단계를 찾으세요." ;;
++          esac
+           body="**앱 화면 검사(브라우저)가 빨간불입니다.** 화면이나 판정이 깨졌다는 뜻입니다.
+ 
+           · 브랜치: \`${BRANCH}\`
+           · 시각: $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST
+           · 실행 로그: ${RUN_URL}
+ 
+-          로그에서 \`❌\` 가 붙은 줄을 찾으면 어느 항목인지 바로 나옵니다.
+-          한 드라이버가 넘어지면 \`set -e\` 로 **그 뒤 드라이버는 안 돕니다** — 고친 뒤
+-          다시 돌리면 그때 다음 것이 드러날 수 있습니다.
++          ${drv}
+ 
+           다음 Claude 세션에 \"화면 검사 빨간불 고쳐줘\" 라고 지시하세요.
+ 
+           ---
+           _Generated by [Claude Code](https://claude.ai/code)_"
+-          gh label create ui-gate --repo "$REPO" --color B60205 \
+-            --description "앱 화면 검사(verify-ui)가 빨간불" 2>/dev/null || true
+-          n=$(gh issue list --repo "$REPO" --label ui-gate --state open \
+-                --limit 1 --json number --jq '.[0].number' 2>/dev/null || true)
+-          if [ -n "$n" ] && [ "$n" != "null" ]; then
+-            gh issue comment "$n" --repo "$REPO" --body "$body"
+-          else
+-            gh issue create --repo "$REPO" --label ui-gate \
+-              --title "🚨 앱 화면 검사가 빨간불입니다 ($(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST)" \
+-              --body "$body"
++          # 본문은 로그에도 찍고(사람이 실행 화면에서 바로 본다) 다음 단계(경보 한 곳)로 넘긴다.
++          printf '%s\n' "$body"
++          if [ -n "${GITHUB_OUTPUT:-}" ]; then
++            { echo 'body<<__UI_ALARM_BODY__'; printf '%s\n' "$body"; echo '__UI_ALARM_BODY__'; } >> "$GITHUB_OUTPUT"
+           fi
++      # 🔴 경보는 이슈 **하나**에 모은다 (2026-10-04 로봇·도구 점검 · tools/alert-issue.mjs).
++      #    옛 판은 '라벨로 열린 것 찾기 → 없으면 만들기'라, 기본 브랜치와 main 두 실행(대기줄이 ref 마다 따로)이 같은 초에 둘 다
++      #    '없음'을 보고 둘을 만들었다(#389·#390 · 09-30 #321·#322). 도구는 만든 뒤 다시 보아 큰 번호를 닫는다.
++      #    제목 앞머리(prefix)로 찾아 옛 시각 붙은 제목도 이어진다. 여는 것은 아무 브랜치에서나(놓치는 쪽이 더 나쁘다).
++      - name: 🚨 화면 검사 경보 이슈 (한 곳에 모은다)
++        if: failure()
++        uses: ./.github/actions/alert-issue
++        with:
++          token: ${{ github.token }}
++          mode: open
++          match: prefix
++          title: 🚨 앱 화면 검사가 빨간불입니다
++          label: ui-gate
++          label-description: 앱 화면 검사(verify-ui)가 빨간불
++          body: ${{ steps.alarm.outputs.body }}
+ 
+       # 다시 초록불이면 스스로 닫는다 (admin-lock-check 와 같은 방식).
+       # 🔴 '취소'는 닫는 근거가 못 된다 — 못 읽은 것을 '해결됐다'로 읽으면 경보가 조용히 사라진다.

@@ -1,0 +1,4 @@
+bad=0
+diff<<__LIVE_DIFF__
+(없음)
+__LIVE_DIFF__

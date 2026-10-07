@@ -1,0 +1,25 @@
+OK  ① apply-guard createRequire 되돌림 (server/apply/apply-guard.mjs) → 되돌림 ✕ 3건 [✕   실제 서버 코드 — 진입점부터 따라간 모든 파일에 node: 모듈·createRequire·없는 경로가 없다(접수 대행은 엔진을 기본 가져오기로)] · 복원 ✓
+OK  ② server/README 옛 판 (server/README.md) → 되돌림 ✕ 3건 [✕ ② server/README.md 에 워커 폴더 넷이 모두 나오고 · 폐기된 HANDAEJANG_CONFIG 안내가 없다 · mail-worker 는 쓰지 않음으로] · 복원 ✓
+OK  ③ 발송 회차 finishRun→clearRun (server/push/worker.js) → 되돌림 ✕ 3건 [✕ ③ 발송 회차(새 글 1 · 그 학교 구독 1)를 끝까지 돌리면 /health.lastRun 이 그 회차다 — 깨우기 1건 · 받아 줌 1건] · 복원 ✓
+OK  ③ 알릴 거리 없음 finishRun→clearRun (server/push/worker.js) → 되돌림 ✕ 3건 [✕ ③ 예약 회차를 끝까지 돌리면 /health 에 마지막으로 시작한 회차(lastSlot)와 결과(lastRun)가 보인다] · 복원 ✓
+OK  ③ /health lastSlot 칸 없음 (server/push/worker.js) → 되돌림 ✕ 3건 [✕ ③ 예약 회차를 끝까지 돌리면 /health 에 마지막으로 시작한 회차(lastSlot)와 결과(lastRun)가 보인다] · 복원 ✓
+OK  ④ verdict stale 줄 지움 (tools/push-health-verdict.mjs) → 되돌림 ✕ 2건 [✕ ④ 판정 — 정상 ok · 한 회차만 빠짐(10-03 08:10 · 22시간) ok · 두 회차 연속 빠짐(10-02 20:10 · 34시간) stale · lastSlot 칸 없음 outdat] · 복원 ✓
+OK  ④ verdict dropped 빼기 없앰 (tools/push-health-verdict.mjs) → 되돌림 ✕ 3건 [✕ ④ 그 /health 로 다음 날 06:17 매일 확인 — 없어진 구독만 있던 회차는 경보가 아니다(ok · 등록 0대 경고만)] · 복원 ✓
+OK  ⑤ 회복 판정 없앰 (server/push/worker.js) → 되돌림 ✕ 2건 [✕ ⑤ 그 뒤 회차가 끝까지 돌면 lastError 는 비고 같은 기록이 pastError 로 내려간다(KV 에서 지우지는 않는다)] · 복원 ✓
+OK  ⑥a 학교+제목 열쇠 안 봄 (server/push/worker.js) → 되돌림 ✕ 2건 [✕ ⑥ (a) 주소만 바뀌고 제목은 빈칸만 다른 같은 공고 → 깨우지 않는다 · 제목이 다른 새 글 → 그 학교] · 복원 ✓
+OK  ⑥b 수집일 규칙 안 봄 (server/push/worker.js) → 되돌림 ✕ 2건 [✕   (b) 새 주소·새 제목이라도 지난 판정보다 이틀 넘게 앞서 수집된 글 → 깨우지 않는다 · 오늘 수집된 글 → 깨운다] · 복원 ✓
+OK  ⑥c titleSeenKey 빈칸 다듬기 다름 (server/push/worker.js) → 되돌림 ✕ 2건 [✕   (c) 학교+제목 열쇠가 폰(notify-rules 장부)과 글자까지 같다 — 빈칸·탭·NBSP·전각 빈칸 표본 (사본 대조)] · 복원 ✓
+OK  ⑥d 장부를 넣은 순서로 자름 (server/push/worker.js) → 되돌림 ✕ 2건 [✕   (d) 옛 열쇠 4000개 + 지금 실린 공고 → 장부를 자를 때 지금 공고의 열쇠가 남고(상한 4000) 다음 회차에 다시 깨우지 않는다] · 복원 ✓
+OK  ⑦ 마감 하루 한 번 열쇠 없앰 (server/push/worker.js) → 되돌림 ✕ 2건 [✕ ⑦ 전국 공고(10-05 마감) — 10-04 08:10 깨움(장부가 빈 첫 실행에도) → 같은 날 20:10 안 깨움 → 10-05 08:10 깨움 → 20:10 안 깨움] · 복원 ✓
+OK  ⑦ schoolsAny 안 봄 (server/push/worker.js) → 되돌림 ✕ 2건 [✕   여러 학교만 받는 공고(schoolsAny · 캠퍼스 꼬리는 뗀다) → 전원이 아니라 그 학교만] · 복원 ✓
+OK  ⑧ 분교 안 깨움 (server/push/worker.js) → 되돌림 ✕ 2건 [✕   화면에 보이는 학교는 하나도 안 놓치고(놓침 0) · 화면 밖 학교는 제목이 밝힌 캠퍼스 말고는 안 깨운다 — 표본 6글 × 학교 6곳] · 복원 ✓
+OK  ⑧ TITLE_CAMPUS 사본에 표식 하나 다름 (server/push/worker.js) → 되돌림 ✕ 2건 [✕   제목 캠퍼스 표(TITLE_CAMPUS)와 taggedSchool 함수가 match-engine 과 글자까지 같다(소스 대조 — 표식 하나를 더해도 빨개진다)] · 복원 ✓
+OK  ⑨ verdict 401 줄 지움 (tools/supabase-health.mjs) → 되돌림 ✕ 2건 [✕   판정 — 200 ok · 401 misconfig · 403 misconfig · 540 down · 연결 실패 down] · 복원 ✓
+OK  ⑨ 못 읽으면 off (옛 꼴) (tools/supabase-health.mjs) → 되돌림 ✕ 4건 [✕ ⑨ 설정 읽기 — 주소·열쇠가 있으면 그 값(끝 / 는 뗀다) · 비었으면 null(= 꺼짐) · 못 읽으면(문법 오류·충돌 표식·맨 위 window·이름 없음) 던진다(꺼짐과 가른다)] · 복원 ✓
+OK  ⑨ 워크플로 체크아웃 뺌 (.github/workflows/supabase-health.yml) → 되돌림 ✕ 2건 [✕   supabase-health.yml — 예약은 홀수 분(0 아님) · 작업 시한 · 로컬 액션보다 체크아웃이 앞 · 판정 도구를 부른다] · 복원 ✓
+OK  ⑨ 워크플로 정각 예약 (.github/workflows/supabase-health.yml) → 되돌림 ✕ 2건 [✕   supabase-health.yml — 예약은 홀수 분(0 아님) · 작업 시한 · 로컬 액션보다 체크아웃이 앞 · 판정 도구를 부른다] · 복원 ✓
+OK  ⑩ sw.js typeof 되돌림 (sw.js) → 되돌림 ✕ 2건 [✕ ⑩ (a) importScripts 가 실패한 서비스워커가 빈 푸시를 받으면 — 거절 없이 알림 1건(기본 문구)] · 복원 ✓
+BAD ⑩ importScripts 목록에서 match-engine 뺌 (sw.js) → 되돌림 ✕ 0건 [없음] · 복원 ✓
+git status after: ''
+OK  ⑩ importScripts 목록에서 match-engine 뺌 (sw.js) → 되돌림 ✕ 2건 [✕   (b) sw.js 의 importScripts 목록(순서 그대로)을 실제 파일로 실으면 알림 규칙·엔진이 선다(목록에서 하나 빠지면 빨간불)] · 복원 ✓
+git status after: ''

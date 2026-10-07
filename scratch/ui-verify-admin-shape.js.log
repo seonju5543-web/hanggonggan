@@ -1,0 +1,25 @@
+■ 관리자 화면이 앱1과 **같은 모양**인가 (그려 놓고 잰다 · 2026-09-14)
+  ✓ btn ↔ 앱1 btn
+  ✓ btnPrimary ↔ 앱1 btnPrimary
+  ✓ btnSm ↔ 앱1 btnSm
+  ✓ chip ↔ 앱1 chip
+  ✓ chipOn ↔ 앱1 chipOn
+  ✓ pill ↔ 앱1 badge
+  ✓ empty ↔ 앱1 empty
+  ✓ row ↔ 앱1 schCard
+  ✓ input ↔ 앱1 input
+  ✓ textarea ↔ 앱1 textarea
+
+■ 목록에 상자를 두르지 않는다 (앱1 은 줄 사이 1px 선 하나로 가른다)
+  ✓ 목록 그릇에 테두리가 없다
+  ✓ 목록 그릇에 모서리가 없다
+
+■ 누르면 앱1과 같은 비율로 들어간다 (:active · CDP 로만 켠다)
+  ✓ btn:active 의 transform
+  ✓ chip:active 의 transform
+
+■ 관리자 확장(요약 카드)도 앱1 어휘 안에 있다
+  ✓ 요약 카드 모서리가 앱1 모서리 여섯 단 안에 있다
+  ✓ 요약 카드에 테두리를 두르지 않는다 (앱1 은 면으로 세운다)
+
+✓ 모양 관문 전부 통과

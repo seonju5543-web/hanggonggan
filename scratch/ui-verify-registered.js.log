@@ -1,0 +1,9 @@
+school: 성균관대학교
+explore total cards: 106 | SKKU registered visible: 0
+타 학교(광운 학교한정) 공고 미노출 확인: OK
+중복 제거 — 대조에 쓴 등록 공고: 제주평생교육장학진흥원 미래이음 장학금 (재공고)
+  이미 등록된 것 사라짐: true | 안 등록된 것 남음: true
+조병두 구간 건너뜀 — 마감돼 목록에서 내려간 공고입니다. 마감 전 양식 공고로 대체 구동합니다.
+  (이 학생에게 보이는 마감 전 양식 공고가 없음 — reg-hi-jeju 를 복사한 마감 전 표본(양식 jeju-consent-apply)으로 구동)
+대체 구동(마감 전 양식 공고): gate-open-form(←reg-hi-jeju) | 문서 생성: true
+ERRORS: none

@@ -1,0 +1,19 @@
+[
+ ["F5a 제목 열쇠 안 봄", "server/push/worker.js", "const wasSeen = seen.has(k) || seen.has(tk) || foundBeforePlan(n, planAt);", "const wasSeen = seen.has(k) || foundBeforePlan(n, planAt);"],
+ ["F5b planAt 안 적음", "server/push/worker.js", "  await env.SUBS.put('state:planAt', String(Date.now()));\n", ""],
+ ["F5d 장부 넣은 순서로 자름", "server/push/worker.js", "const keep = Array.from(seen).filter((x) => !present.has(x)).concat(Array.from(present));", "const keep = Array.from(new Set([...seen, ...present]));"],
+ ["F6 due 열쇠 없앰", "server/push/worker.js", "const dueFresh = dueSoon && !seen.has(dueKey);", "const dueFresh = dueSoon;"],
+ ["F6 schoolsAny 안 봄", "server/push/worker.js", "else if (s.schools && s.schools.length) s.schools.forEach((x) => schools.add(x));", "else if (false) {}"],
+ ["F7 분교 안 깨움", "server/push/worker.js", "for (const x of wakeSchoolsForNotice(n)) schools.add(x);", "schools.add(n.school);"],
+ ["F7 campus 요약 안 함", "server/push/worker.js", "campus: n.campus || '', foundAt", "campus: '', foundAt"],
+ ["F3 slot 안 넣음", "server/push/worker.js", "slot: slotKey, woke: 0", "slot: null, woke: 0"],
+ ["F3 sent 회차 clearRun", "server/push/worker.js", "if (finished) await finishRun(env, run, 'sent');", "if (finished) await clearRun(env);"],
+ ["F4 회복 판정 없앰", "server/push/worker.js", "const recovered = !!(lastError && lastRun && Number(lastRun.finishedAt) > Number(lastError.at));", "const recovered = false;"],
+ ["F3 verdict stale 26→48", "tools/push-health-verdict.mjs", "export const STALE_HOURS = 26;", "export const STALE_HOURS = 48;"],
+ ["F3 verdict outdated 없앰", "tools/push-health-verdict.mjs", "if (!Object.prototype.hasOwnProperty.call(j, 'lastSlot')) {", "if (false) {"],
+ ["F10 sw typeof 되돌림", "sw.js", "if (typeof NOTIFY_RULES !== 'undefined' && NOTIFY_RULES.shouldSelfUnsubscribe", "if (NOTIFY_RULES && NOTIFY_RULES.shouldSelfUnsubscribe"],
+ ["F1 apply createRequire", "server/apply/apply-guard.mjs", "import ME from '../../match-engine.js';", "import { createRequire as _cr } from 'node:module';\nconst ME = _cr(import.meta.url)('../../match-engine.js');"],
+ ["F8 403 → down", "tools/supabase-health.mjs", "if (ok && (c === 401 || c === 403)) {", "if (ok && (c === 401)) {"],
+ ["F8 재시도 1번", "tools/supabase-health.mjs", "tries = 3, waits", "tries = 1, waits"],
+ ["F8 cron 정각", ".github/workflows/supabase-health.yml", "- cron: '41 21 * * *'", "- cron: '0 21 * * *'"]
+]

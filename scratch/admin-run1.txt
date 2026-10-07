@@ -1,0 +1,11 @@
+✅ 입장 화면이 먼저 뜬다
+✅ 열쇠 전에는 본 화면이 숨겨져 있다
+✅ 열쇠 전에는 운영 현황 숫자가 전혀 보이지 않는다
+✅ 열쇠가 틀리면 입장하지 못한다
+page.waitForSelector: Timeout 15000ms exceeded.
+Call log:
+[2m  - waiting for locator('#app:not([hidden])') to be visible[22m
+
+    at /home/user/hanggonggan/.claude/worktrees/wf_6db34be4-346-24/verify/verify-admin.js:301:14 {
+  name: 'TimeoutError'
+}
