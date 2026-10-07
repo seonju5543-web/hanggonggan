@@ -1,7 +1,29 @@
 {
  "school": "동국대학교 WISE캠퍼스",
- "updatedAt": "2026-10-06",
+ "updatedAt": "2026-10-07",
  "items": [
+  {
+   "title": "2026년 김천시 한국전력기술 대학생 지역상생 장학금 안내(대상: 김천시에 1년 이상 주소를 두고 있는 원자력에너지전기공학과 재학생)",
+   "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520746",
+   "attachments": [
+    {
+     "name": "2026년 김천시한국전력기술 지역상생지원 장학금 및 취업준비금 신청서식.hwp",
+     "url": "javascript:downGO('2026년 김천시한국전력기술 지역상생지원 장학금 및 취업준비금 신청서식.hwp','/files/article/servicenotice/520746/','BA8FFD8BDFDD44B699FD4499581A837B.hwp');"
+    },
+    {
+     "name": "【별표 2] 대항생 지역상생 장학금 경상북도 소재 대학 인정학과 (2).hwp",
+     "url": "javascript:downGO('【별표 2]  대항생 지역상생 장학금 경상북도 소재 대학 인정학과 (2).hwp','/files/article/servicenotice/520746/','0CC828E95E0346C7AB5D349637DD859B.hwp');"
+    },
+    {
+     "name": "2026년 김천시한국전력기술 지역상생지원 장학금 및 취업준비금 지원 공고(재단).pdf",
+     "url": "javascript:downGO('2026년 김천시한국전력기술 지역상생지원 장학금 및 취업준비금 지원 공고(재단).pdf','/files/article/servicenotice/520746/','7D5C8F5A9B7B443D98D558B601549193.pdf');"
+    }
+   ],
+   "deadlineHint": "신청기간: 2026. 10. 6.(화) ~ 10. 30.(금) 18:00까지 2. 지원대상: 경상북도 소재 2년제 이상 대학 인정학과 재학생 등",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
   {
    "title": "[대산농촌재단] 2027년도 대산농촌재단 장학생 선발 안내",
    "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520733",

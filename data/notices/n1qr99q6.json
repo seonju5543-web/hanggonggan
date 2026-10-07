@@ -1,7 +1,25 @@
 {
  "school": "조선대학교",
- "updatedAt": "2026-10-06",
+ "updatedAt": "2026-10-07",
  "items": [
+  {
+   "title": "2026-2학기 중소기업 취업연계 장학금 서류제출 및 보증보험 동의 안내",
+   "url": "https://www3.chosun.ac.kr/bbs/scho/332/281793/artclView.do",
+   "attachments": [
+    {
+     "name": "1. 2026-2학기 선발계획(안).pdf",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/379185/download.do"
+    },
+    {
+     "name": "2. 보증보험 가입을 위한 개인정보 제공동의 매뉴얼.pdf",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/379186/download.do"
+    }
+   ],
+   "deadlineHint": "제출기한 : ~ 10. 13.(화 ) 17:00 5. 제출방법 : 장학팀 메일 (scholarship@chosun.ac.kr) 제출 * 지원서",
+   "school": "조선대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
   {
    "title": "2026-2학기 대학혁신지원사업 'CSU Pride 청송장학금' 장학생",
    "url": "https://www3.chosun.ac.kr/bbs/scho/332/281775/artclView.do",

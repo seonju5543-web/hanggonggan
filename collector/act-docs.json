@@ -58,10 +58,6 @@
   "at": "2026-10-04",
   "tries": 1
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521608": {
-  "at": "2026-10-04",
-  "tries": 1
- },
  "https://www.yonkang.org/kr/news/645": {
   "at": "2026-10-04",
   "tries": 1
@@ -408,6 +404,18 @@
  },
  "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515411&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=": {
   "at": "2026-10-06",
+  "tries": 1
+ },
+ "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156784479&pWise=sub&pWiseSub=C2": {
+  "at": "2026-10-07",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3527727": {
+  "at": "2026-10-07",
+  "tries": 1
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=48133&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-10-07",
   "tries": 1
  }
 }
