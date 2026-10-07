@@ -1,7 +1,16 @@
 {
  "school": "조선대학교",
- "updatedAt": "2026-10-06",
+ "updatedAt": "2026-10-07",
  "items": [
+  {
+   "title": "[신문방송사 교육방송국] 제39회 둘셋가요제 개최",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/281794/artclView.do",
+   "postedAt": "2026-10-07",
+   "school": "조선대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/00242100c70c40c5.webp"
+  },
   {
    "title": "[교육과정관리팀] 2026학년도 CSU-핵심역량(3C역량) 진단 조사 안내(모바일 상품권 증정)",
    "url": "https://www3.chosun.ac.kr/bbs/chosun/117/281777/artclView.do",

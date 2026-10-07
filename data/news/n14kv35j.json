@@ -1,7 +1,25 @@
 {
  "school": "서울과학기술대학교",
- "updatedAt": "2026-10-06",
+ "updatedAt": "2026-10-07",
  "items": [
+  {
+   "title": "[신문방송사] 제26회 방송제 개최 안내 10. 7.(수) 19:00",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896272&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-10-06",
+   "kind": "행사",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/54f98b882e9f7b74.webp"
+  },
+  {
+   "title": "제17회 융합교양 콜로키움 10월 14일 수요일 16:00~, 서울과기대 어의관 516호",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896269&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-10-06",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
   {
    "title": "[앵커사업단] 2026 랜선으로 만나는 릴레이 글로벌 취·창업 톡톡톡(talk) 신청 안내",
    "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896264&qidx=4691&cate=10&allboard=false&nowpage=1",

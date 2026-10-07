@@ -1,7 +1,26 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-10-06",
+ "updatedAt": "2026-10-07",
  "items": [
+  {
+   "title": "[일반] [프로그램 안내] 단 한 사람을 위한 직무설정 프롬프트 (~10/15)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53439&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-07",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/cba37ed567fa16e0.webp"
+  },
+  {
+   "title": "[시설] 한울관 및 아이스링크 주차장 입구 출입 금지 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53438&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-07",
+   "kind": "생활",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/0d3eadc45a820472.webp"
+  },
   {
    "title": "[국제학생] 2026 서울 외국인 취업 채용 박람회 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53431&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -340,23 +359,6 @@
    "title": "[일반] [정보통신처]불법 소프트웨어, 이미지, 폰트 사용 및 배포 방지를 위한 협조 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53314&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "postedAt": "2026-09-10",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[일반] [정보통신처]내PC지키미를 이용한 PC보안 및 알약 점검 협조 요청",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53313&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-10",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[학사] 2026학년도 2학기 폐강 교과목 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53312&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-10",
-   "kind": "학사",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-01"

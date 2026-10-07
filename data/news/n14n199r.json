@@ -1,6 +1,6 @@
 {
  "school": "서강대학교",
- "updatedAt": "2026-10-06",
+ "updatedAt": "2026-10-07",
  "items": [
   {
    "title": "[유로메나연구소] 국제학술대회 안내(10/16-10/17)",
@@ -81,18 +81,6 @@
    "board": "행사특강",
    "foundAt": "2026-10-04",
    "thumb": "data/news/img/9724b7d5f3f1983f.webp"
-  },
-  {
-   "title": "[트랜스내셔널인문학연구소] 국제포럼 HFA 안내 (8/21)",
-   "url": "https://www.sogang.ac.kr/ko/detail/550681?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
-   "postId": "550681",
-   "postedAt": "2026-08-07",
-   "kind": "행사",
-   "school": "서강대학교",
-   "campus": "",
-   "board": "행사특강",
-   "foundAt": "2026-10-04",
-   "thumb": "data/news/img/f479185e80d39d6b.webp"
   }
  ]
 }

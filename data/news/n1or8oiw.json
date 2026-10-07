@@ -1,7 +1,25 @@
 {
  "school": "동국대학교",
- "updatedAt": "2026-10-06",
+ "updatedAt": "2026-10-07",
  "items": [
+  {
+   "title": "10월 7일(수)~ 10월 8일(목) 헌혈 버스 시행 안내",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766501",
+   "postedAt": "2026-10-07",
+   "postId": "26766501",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "[카운슬링센터][집단상담 홍보]달달한 연애를 꿈꾸는 동국인을 위한 \"캠퍼스 연애 심리극\" 신청 안내 (3회 모두 참여시 마일리지 10점 지급)",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766499",
+   "postedAt": "2026-10-07",
+   "postId": "26766499",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
   {
    "title": "영자신문사 동국포스트 60.5기 신입 추가 모집",
    "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766496",
@@ -47,8 +65,7 @@
    "school": "동국대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "postId": "26766446",
-   "thumb": "data/news/img/c6145478a6f1b68f.webp"
+   "postId": "26766446"
   },
   {
    "title": "[중앙도서관] 2026년 대학도서관 이용자 만족도 조사 참여 안내 (~10/6)",
@@ -90,15 +107,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/9d7d38c548e9958b.webp"
-  },
-  {
-   "title": "[카운슬링센터][집단상담 홍보]달달한 연애를 꿈꾸는 동국인을 위한 \"캠퍼스 연애 심리극\" 신청 안내 (3회 모두 참여시 마일리지 10점 지급)",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766416",
-   "postedAt": "2026-09-29",
-   "school": "동국대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/9532f1dd23a1c853.webp"
   }
  ]
 }

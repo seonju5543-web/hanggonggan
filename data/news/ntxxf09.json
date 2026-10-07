@@ -1,7 +1,32 @@
 {
  "school": "경기대학교",
- "updatedAt": "2026-10-06",
+ "updatedAt": "2026-10-07",
  "items": [
+  {
+   "title": "[입학에서 취업까지] 2027년 2월 졸업에 관한 제반 사항 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626447&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-07",
+   "school": "경기대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "[일반] [독어독문학과] 2027학년도 전기 정시 대학원 신(편)입학 전형 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626442&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-07",
+   "school": "경기대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "[일반] 2026학년도 2학기 미등록생 최종 추가 등록기간 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626438&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-07",
+   "kind": "학사",
+   "school": "경기대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
   {
    "title": "[일반] [중어중문전공] 2027학년도 2월 졸업예정자 어학성적 제출 안내",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626426&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
@@ -113,14 +138,6 @@
    "campus": "",
    "foundAt": "2026-10-06",
    "thumb": "data/news/img/cdd2b83ef332a736.webp"
-  },
-  {
-   "title": "[입학에서 취업까지] 2027년 2월 졸업에 관한 제반 사항 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626396&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-06",
-   "school": "경기대학교",
-   "campus": "",
-   "foundAt": "2026-10-06"
   },
   {
    "title": "[일반] 한글날(10/9) 교학팀 휴무 안내",

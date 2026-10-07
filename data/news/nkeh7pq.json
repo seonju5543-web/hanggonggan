@@ -1,7 +1,16 @@
 {
  "school": "인하대학교",
- "updatedAt": "2026-10-06",
+ "updatedAt": "2026-10-07",
  "items": [
+  {
+   "title": "[정석학술정보관] 2026 Book나눔 도서기증캠페인 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45736/artclView.do",
+   "postedAt": "2026-10-07",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/ecd97f69d5b0ad8e.webp"
+  },
   {
    "title": "[박물관] 2026년 인하대학교박물관-한국역사연구회 공동 학술회의 개최 안내",
    "url": "https://www.inha.ac.kr/bbs/kr/8/45728/artclView.do",

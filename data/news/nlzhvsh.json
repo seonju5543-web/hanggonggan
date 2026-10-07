@@ -1,7 +1,25 @@
 {
  "school": "강원대학교",
- "updatedAt": "2026-10-06",
+ "updatedAt": "2026-10-07",
  "items": [
+  {
+   "title": "[도서관] 연구학술목적 AI활용법 교육 안내(강사초청)",
+   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11515&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "postedAt": "2026-10-07",
+   "kind": "생활",
+   "school": "강원대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/176f823d4f6c74f9.webp"
+  },
+  {
+   "title": "춘천캠퍼스 [매주 수요일은 후원의 집 가는 날] 안내드립니다.",
+   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11512&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "postedAt": "2026-10-07",
+   "school": "강원대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
   {
    "title": "[강원국제개발협력센터] 2026 강원 ODA 사업설명회 참석자 모집(~10/18)",
    "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11510&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",

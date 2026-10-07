@@ -1,7 +1,23 @@
 {
  "school": "계명대학교",
- "updatedAt": "2026-10-06",
+ "updatedAt": "2026-10-07",
  "items": [
+  {
+   "title": "뮤지컬 <드라큘라> 계명가족 특별할인 안내 ​",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271201&pageOrder=0&cmd=2&parm_bod_uid=270320&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-09-03",
+   "school": "계명대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "2026학년도 2학기 COMpass K 실적 입력 및 승인 마감 안내",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271201&pageOrder=0&cmd=2&parm_bod_uid=270265&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-09-02",
+   "school": "계명대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
   {
    "title": "[교수학습개발센터] 학습역량 강화 프로그램 개발을 위한 온라인 요구조사",
    "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271201&pageOrder=0&cmd=2&parm_bod_uid=271201&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
@@ -167,14 +183,6 @@
   {
    "title": "[필수(법정)교육] 2026학년도 2학기 학생 대상 온라인 폭력예방교육 수강 안내",
    "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=0&pageOrder=0&cmd=2&parm_bod_uid=270267&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
-   "postedAt": "2026-09-02",
-   "school": "계명대학교",
-   "campus": "",
-   "foundAt": "2026-10-03"
-  },
-  {
-   "title": "2026학년도 2학기 COMpass K 실적 입력 및 승인 마감 안내",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=0&pageOrder=0&cmd=2&parm_bod_uid=270265&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
    "postedAt": "2026-09-02",
    "school": "계명대학교",
    "campus": "",
