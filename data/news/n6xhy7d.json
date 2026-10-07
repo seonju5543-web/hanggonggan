@@ -3,6 +3,23 @@
  "updatedAt": "2026-10-07",
  "items": [
   {
+   "title": "[국제학생] 2027학년도 1학기 학부 외국인 신·편입생 1차 모집 필기고사 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53447&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-07",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "[일반] [(재)서울테크노파크] 제1회 지역 현안 해결 솔루션 챌린지",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53443&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-07",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/0b7cec3f201333c5.webp"
+  },
+  {
    "title": "[일반] [프로그램 안내] 단 한 사람을 위한 직무설정 프롬프트 (~10/15)",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53439&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "postedAt": "2026-10-07",
@@ -346,22 +363,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/b0c93c4c7d7f3328.webp"
-  },
-  {
-   "title": "[학사] 2026학년도 2학기 학부 수강과목 포기 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53320&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-10",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[일반] [정보통신처]불법 소프트웨어, 이미지, 폰트 사용 및 배포 방지를 위한 협조 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53314&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-10",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
   }
  ]
 }

@@ -3,6 +3,52 @@
  "updatedAt": "2026-10-07",
  "items": [
   {
+   "title": "스웨덴 왕립과학한림원 원장 특별 강연 안내 (10/30(금) 14:00)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140407&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-07",
+   "kind": "행사",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/a1bd5e167b17bba1.webp"
+  },
+  {
+   "title": "[채용공고] 인공지능 플러스 K건설인프라 레질리언스 연구센터(ERC) 행정직원 모집(~10/13(화))",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140399&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-07",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "성균관대학교 사범대학 학부대학/사범대학행정실 행정조교 모집(~10/14까지)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140410&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-07",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "성균관대학교 공과대학 자체계약직원 채용(~2026.10.13.(화) 오전 11시)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140404&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-07",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "성균관대학교 공과대학 행정조교 채용(~2026.10.13.(화) 오전 11시)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140401&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-07",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
    "title": "2026 하반기 교직원(정규직) 신규채용 서류전형 결과 및 필기전형 안내",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140376&article.offset=0&articleLimit=10",
    "postedAt": "2026-10-06",
@@ -314,51 +360,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/92d0f9ea8a7a12ec.webp"
-  },
-  {
-   "title": "성균관대 화학공학과 행정조교 모집(~10/6)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140097&article.offset=0&articleLimit=10",
-   "postedAt": "2026-09-30",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "인권센터(인문과학캠퍼스) 행정조교 모집 안내",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140072&article.offset=0&articleLimit=10",
-   "postedAt": "2026-09-21",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "AI응용공학과(일반대학원) 2027학년도 전기 대학원 신입생 모집",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140043&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-01",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/e0b6211afe10d6eb.webp"
-  },
-  {
-   "title": "[학생성공센터] 비교과 후기왕을 찾습니다! (~10/12)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=139949&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-01",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/ec87b24c85813734.webp"
-  },
-  {
-   "title": "제16차 한독공동정기학술대회(ADeKo Conference) 개최",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140293&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-01",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/50fd9d6758734942.webp"
   }
  ]
 }

@@ -3,6 +3,66 @@
  "updatedAt": "2026-10-07",
  "items": [
   {
+   "title": "[대학생활/업무안내] [건강증진센터]의료관련감염을 미리 예방하는 습관을 가져요!",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626471&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-07",
+   "school": "경기대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/87bef6b6472a5f74.webp"
+  },
+  {
+   "title": "[일반] 2026-2학기 논문·사례연구 서류 및 지도비 제출 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626461&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-07",
+   "school": "경기대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "[일반] 2026-2학기 박사과정 공개발표 안내 (박사 5학기 중 종합시험 통과자 해당)",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626460&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-07",
+   "school": "경기대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "[대학생활/업무안내] 2026-2 ·내 길 찾기 프로젝트· 진로집단상 프로그램 (전공자율선택제)",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626455&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-07",
+   "school": "경기대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/1019b72edce78894.webp"
+  },
+  {
+   "title": "[대학생활/업무안내] 2026-2 ·마음 나침반· 자기이해 집단상담",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626454&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-07",
+   "school": "경기대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/31eb8a3e7ddf7d55.webp"
+  },
+  {
+   "title": "[대학생활/업무안내] 2026-2 ·내 마음 사용법· 자기이해 집단상담",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626453&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-07",
+   "school": "경기대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/77f1b3ad6cef670a.webp"
+  },
+  {
+   "title": "[대학생활/업무안내] 2026-2 ·연애주파수:다들 연애 어떻게 해?· 대인관계 및 자기이해 집단상담",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626452&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-07",
+   "school": "경기대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
    "title": "[입학에서 취업까지] 2027년 2월 졸업에 관한 제반 사항 안내",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626447&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
    "postedAt": "2026-10-07",
@@ -288,15 +348,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/8bc49cdf739ae0ff.webp"
-  },
-  {
-   "title": "[수강에서 성적까지] (수학과) 2026-2학기 브릿지 프로젝트 강연 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626307&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-09-30",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
   }
  ]
 }
