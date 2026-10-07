@@ -390,22 +390,6 @@
   "at": "2026-10-06",
   "tries": 1
  },
- "https://www.inha.ac.kr/bbs/kr/8/45615/artclView.do": {
-  "at": "2026-10-06",
-  "tries": 1
- },
- "https://www.inha.ac.kr/bbs/kr/8/45511/artclView.do": {
-  "at": "2026-10-06",
-  "tries": 1
- },
- "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=57138&bidx=894190&qidx=57138&cate=0&allboard=true&nowpage=3": {
-  "at": "2026-10-06",
-  "tries": 1
- },
- "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515411&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=": {
-  "at": "2026-10-06",
-  "tries": 1
- },
  "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156784479&pWise=sub&pWiseSub=C2": {
   "at": "2026-10-07",
   "tries": 1
@@ -415,6 +399,26 @@
   "tries": 1
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=48133&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-10-07",
+  "tries": 1
+ },
+ "https://www.k-startup.go.kr/web/contents/webNOTICE_MATR.do?page=1&viewCount=18&id=176443&schBdcode=&schGroupCode=&schM=view": {
+  "at": "2026-10-07",
+  "tries": 1
+ },
+ "https://youth.gyeongnam.go.kr/youth/board.es?mid=a10501020000&bid=0006&list_no=6911&act=view": {
+  "at": "2026-10-07",
+  "tries": 1
+ },
+ "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140417&article.offset=0&articleLimit=10": {
+  "at": "2026-10-07",
+  "tries": 1
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53445&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-10-07",
+  "tries": 1
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/268648/artclView.do": {
   "at": "2026-10-07",
   "tries": 1
  }

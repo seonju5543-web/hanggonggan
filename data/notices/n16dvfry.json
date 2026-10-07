@@ -3,6 +3,41 @@
  "updatedAt": "2026-10-07",
  "items": [
   {
+   "title": "[근로장학] 10월 출근부 입력 마감일 및 장학금 지급 예정일 안내",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=377176&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "[학자금대출] 2026-2 구제등록 기간 한국장학재단 학자금대출 신청 및 실행 안내(학부생)",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=377120&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2026년_2학기_학자금대출_모바일 신청매뉴얼.pdf",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=377120&attachNo=334686"
+    },
+    {
+     "name": "2026년_2학기_학자금대출_모바일_실행매뉴얼.pdf",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=377120&attachNo=334687"
+    },
+    {
+     "name": "2026년_2학기_학자금대출_홈페이지_신청매뉴얼.pdf",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=377120&attachNo=334688"
+    },
+    {
+     "name": "2026년_2학기_학자금대출_홈페이지_실행매뉴얼.pdf",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=377120&attachNo=334689"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
    "title": "[교외장학] 2026년 우양재단 동행 장학생 모집",
    "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=377087&article.offset=0&articleLimit=10",
    "attachments": [
