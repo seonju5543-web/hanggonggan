@@ -439,15 +439,42 @@
    "excerptsAt": "2026-10-07"
   },
   {
-   "title": "[성균관대학교]2026 청년도약 인재양성 부트캠프 교육생 모집 안내",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140417&article.offset=0&articleLimit=10",
+   "title": "[인공지능혁신융합대학사업단] 2026 구름톤 아레나 참가자 모집 안내(참가비 전액 지원)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140433&article.offset=0&articleLimit=10",
    "kind": "대외활동",
    "attachments": [
     {
-     "name": "부속기관",
-     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+     "name": "01. 2026 구름톤 아레나 참가 신청서.xlsx",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140433&attachNo=118166"
     }
    ],
+   "deadlineHint": "모집 기한: 2026. 10. 30.(금) 13:00까지 지원 대상: 인공지능혁신융합대학사업 참여학과 원전공 재학생(복수전공 지원불가) ※ 사범",
+   "deadline": "2026-10-30",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026. 10. 30.(금) 13:00까지"
+    },
+    {
+     "label": "대상",
+     "text": "인공지능혁신융합대학사업 참여학과 원전공 재학생(복수전공 지원불가)"
+    }
+   ],
+   "eligibilityLines": [
+    "지원 범위: 프로그램 참가비 전액 지원",
+    "인공지능혁신융합대학사업 참여학과 원전공 재학생(복수전공 지원불가)"
+   ],
+   "detailsV": 3,
+   "excerptsAt": "2026-10-07",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "[성균관대학교]2026 청년도약 인재양성 부트캠프 교육생 모집 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140417&article.offset=0&articleLimit=10",
+   "kind": "대외활동",
+   "attachments": [],
    "deadlineHint": null,
    "detailsV": 3,
    "field": "교육·캠프",
@@ -1642,12 +1669,7 @@
    "title": "[스포츠재활 연구실] 만성 발목 불안정성 대상 발목 재활운동 연구 참여자 모집",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140343&article.offset=0&articleLimit=10",
    "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "부속기관",
-     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
-    }
-   ],
+   "attachments": [],
    "deadlineHint": null,
    "eligibilityLines": [
     "1. 모집대상",
@@ -5864,23 +5886,6 @@
     "3) 모집인원 : 초등멘토링 4명 / 중고등 멘토링 6명",
     "4) 모집기간 : ~ 9월 27일(일) pm11:59 까지"
    ],
-   "detailsV": 3
-  },
-  {
-   "title": "대한산업보건협회 산재 노동자 자녀 성장지원사업 참여자 모집 안내",
-   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12390/view.do?currentPageNo=1",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "' + fileItem.fileNm + '",
-     "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/fileDefaultDownload.do?fileNo="
-    }
-   ],
-   "deadlineHint": null,
-   "excerptsAt": "2026-10-04",
-   "school": "국민대학교",
-   "campus": "",
-   "foundAt": "2026-09-30",
    "detailsV": 3
   }
  ],
