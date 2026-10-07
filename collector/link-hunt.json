@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-06",
+ "updatedAt": "2026-10-07",
  "items": {
   "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2668%20%5B%ED%99%8D%EB%B3%B4%5D%20%ED%95%9C%EA%B5%AD%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EA%B3%B5%EA%B3%B5%EB%8D%B0%EC%9D%B4%ED%84%B0%20%EA%B0%9C%EB%B0%A9%20%EB%B0%8F%20%ED%99%9C%EC%9A%A9%20%EC%95%88%EB%82%B4%202026.0": {
    "attempts": 5,
@@ -7237,12 +7237,13 @@
    "resolvedUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260914&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&"
   },
   "n:https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1&pageIndex=2#n-%5B%EA%B5%90%EC%99%B8%5D%202026%EB%85%84%20%EC%86%90%ED%83%9C%ED%9D%AC%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88..": {
-   "attempts": 1,
+   "attempts": 0,
    "title": "[교외] 2026년 손태희장학재단 장학생 선발 안..",
-   "lastTried": "2026-10-06",
-   "lastWhy": "목록에서 못 찾음",
+   "lastTried": "2026-10-07",
+   "lastWhy": "",
    "nextTryAt": "2026-10-07",
-   "status": ""
+   "status": "resolved",
+   "resolvedUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260821&brdSeq=3&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&"
   },
   "n:https://www.gachon.ac.kr/kor/7986/subview.do#n-%5B%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80%5D%20(%EC%83%9D%ED%99%9C%EB%B9%84)2027%EB%85%84%20%EC%95%84%EC%82%B0%EC%82%AC%ED%9A%8C%EB%B3%B5%EC%A7%80%EC%9E%AC%EB%8B%A8%20%EB%B6%81%ED%95%9C%EC%9D%B4%ED%83%88%EC%B2%AD%EC%86%8C%EB%85%84%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C": {
    "attempts": 0,
