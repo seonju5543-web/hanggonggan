@@ -12908,10 +12908,10 @@
     "제목의 바깥 기관 낱말 「재단」"
    ],
    "kindConfidence": "high",
-   "kindFrom": "로봇(제목)",
+   "kindFrom": "로봇(원문) 2026-10-08",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "100만원",
+   "amountValue": 1000000,
    "deadline": "2026-10-23",
    "deadlineFrom": "게시판 요약 · ~10/23",
    "period": "접수 ~2026-10-23",
@@ -12929,7 +12929,22 @@
    "auto": true,
    "attachments": [],
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766521",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "excerpts": [
+    "장학금액 : 1 인당 100 만원 ( 지급시기 : 2026-2 학기 ) ( 생활비성 장학 )",
+    "신청기간 : ~ 2026.10.23( 금 ) 17:00 까지",
+    "문의 : 장학팀 02)2260-3698, 3043"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 1000000,
+    "ratio": 0,
+    "min": 1000000,
+    "max": 1000000,
+    "raw": "3. 장학금액 : 1 인당 100 만원 ( 지급시기 : 2026-2 학기 ) ( 생활비성 장학 )"
+   },
+   "amountFrom": "공고 원문"
   }
  ]
 }
