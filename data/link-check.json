@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-06T16:36:56.485Z",
+ "updatedAt": "2026-10-08T17:17:51.962Z",
  "v": 1,
  "bad": {
   "https://2026grchallenge.com/": {
@@ -22,6 +22,10 @@
    "v": "gone",
    "at": "2026-10-05"
   },
+  "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626405&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888": {
+   "v": "other",
+   "at": "2026-10-09"
+  },
   "https://www.mofa.go.kr/www/brd/m_4075/view.do?seq=369441&page=1&pitem=10": {
    "v": "other",
    "at": "2026-10-05"
@@ -29,6 +33,10 @@
   "https://www.msit.go.kr/bbs/view.do?sCode=user&mId=307&mPid=208&bbsSeqNo=94&nttSeqNo=3187433": {
    "v": "other",
    "at": "2026-10-05"
+  },
+  "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511394": {
+   "v": "other",
+   "at": "2026-10-09"
   },
   "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000": {
    "v": "other",
