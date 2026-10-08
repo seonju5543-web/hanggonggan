@@ -3,6 +3,22 @@
  "updatedAt": "2026-10-08",
  "schools": 42,
  "files": {
+  "동국대학교": {
+   "file": "n1or8oiw.json",
+   "count": 22
+  },
+  "가천대학교": {
+   "file": "nzzc8bm.json",
+   "count": 28
+  },
+  "상명대학교": {
+   "file": "n1ozjjw8.json",
+   "count": 5
+  },
+  "고려대학교": {
+   "file": "n1lw6ycq.json",
+   "count": 14
+  },
   "한국외국어대학교": {
    "file": "n19cz03g.json",
    "count": 6
@@ -18,10 +34,6 @@
   "명지대학교": {
    "file": "ntyl0r5.json",
    "count": 4
-  },
-  "가천대학교": {
-   "file": "nzzc8bm.json",
-   "count": 26
   },
   "이화여자대학교": {
    "file": "n1tk2q9m.json",
@@ -62,10 +74,6 @@
   "전남대학교": {
    "file": "nwqmwga.json",
    "count": 7
-  },
-  "동국대학교": {
-   "file": "n1or8oiw.json",
-   "count": 20
   },
   "계명대학교": {
    "file": "n1nel147.json",
@@ -119,10 +127,6 @@
    "file": "n1au199v.json",
    "count": 29
   },
-  "고려대학교": {
-   "file": "n1lw6ycq.json",
-   "count": 13
-  },
   "서강대학교": {
    "file": "n14n199r.json",
    "count": 28
@@ -154,10 +158,6 @@
   "광운대학교": {
    "file": "n6xhy7d.json",
    "count": 5
-  },
-  "상명대학교": {
-   "file": "n1ozjjw8.json",
-   "count": 4
   },
   "부경대학교": {
    "file": "n1nesasz.json",
