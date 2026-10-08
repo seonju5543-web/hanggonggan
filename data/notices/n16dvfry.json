@@ -1,7 +1,35 @@
 {
  "school": "아주대학교",
- "updatedAt": "2026-10-07",
+ "updatedAt": "2026-10-08",
  "items": [
+  {
+   "title": "[교외장학] 아산사회복지재단 2027년 북한이탈청소년 장학생 선발 안내",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=377206&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "별첨1_ 2027년 아산북한이탈청소년장학생 선발안내.pdf",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=377206&attachNo=334797"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-08"
+  },
+  {
+   "title": "[교외장학] 아산사회복지재단 2027년 의생명과학분야 대학 장학생 선발 안내",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=377204&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "별첨1 _2027년 의생명과학분야 대학 장학생 선발안내.pdf",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=377204&attachNo=334796"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-08"
+  },
   {
    "title": "[근로장학] 10월 출근부 입력 마감일 및 장학금 지급 예정일 안내",
    "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=377176&article.offset=0&articleLimit=10",

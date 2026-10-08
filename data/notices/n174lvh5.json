@@ -1,7 +1,25 @@
 {
  "school": "가톨릭대학교",
- "updatedAt": "2026-10-07",
+ "updatedAt": "2026-10-08",
  "items": [
+  {
+   "title": "[학생지원팀] (재)인천광역시 계양구 인재양성장학교육재단 2026년 2학기 장학생 선발 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276597&article.offset=0&articleLimit=10&srCategoryId=22",
+   "attachments": [
+    {
+     "name": "2026년_하반기_장학생_선발_공고.pdf",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276597&attachNo=226386"
+    },
+    {
+     "name": "하반기_장학생_선발_제출서식.hwp",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276597&attachNo=226387"
+    }
+   ],
+   "deadlineHint": "접수기간 : 2026. 10. 1.(목) ~ 10. 12.(월) - 접수방법 : 이메일(yhm3102@gyedu.or.kr) 또는 등기우편 (방",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-10-08"
+  },
   {
    "title": "[학생지원팀] <아산사회복지재단> 2027년도 북한이탈청소년 장학생 선발 안내",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276506&article.offset=0&articleLimit=10&srCategoryId=22",

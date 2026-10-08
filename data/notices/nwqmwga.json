@@ -1,7 +1,25 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-10-07",
+ "updatedAt": "2026-10-08",
  "items": [
+  {
+   "title": "[장학안내] 2026학년도 여수캠퍼스 청경나래 장학금(구 학생성공지원금) ...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70601&cate=8",
+   "attachments": [
+    {
+     "name": "교육기본시설/부속시설",
+     "url": "https://www.jnu.ac.kr/MainIntro/Institution/AttachedFac"
+    },
+    {
+     "name": "2026 여수캠퍼스 청경나래장학금 운영 계획(안내).hwpx",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2584159"
+    }
+   ],
+   "deadlineHint": "접수기간: 2026. 11. 23.(월) 09:00 ~ 2026. 11. 29.(일) 18:00 라. 지원(신청) 방법 전남대학교 포털사이트 (",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-08"
+  },
   {
    "title": "[장학안내] [한국농어촌의망재단]2026년 2학기 해양수산부 청년창업어업인...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70580&cate=8",
