@@ -1,20 +1,22 @@
 ## 🤖 장학공고 수집 리포트 (2026-10-08)
 
-새로 발견한 공고: **7건** — 앱의 '실시간 공고'에는 즉시 표시되며(링크 연결만), 맞춤 매칭·양식 작성 지원 등록은 아래에서 컨펌해 주세요.
+새로 발견한 공고: **18건** — 앱의 '실시간 공고'에는 즉시 표시되며(링크 연결만), 맞춤 매칭·양식 작성 지원 등록은 아래에서 컨펌해 주세요.
 
 > 등록하는 곳 — 관리자 화면 → 컨펌 작업대: https://hanggonggan-admin.pages.dev/#review
 > 「수집됐지만 아직 등록 안 한 공고」에서 원문 ↗ 으로 확인한 뒤 **등록하기**를 누르면 그 자리에서 등록됩니다(제목·구분·마감일·금액·주관·요약). 대출·대학원 전용처럼 규칙에 걸리는 것은 눌러도 막히니 안심하고 눌러도 됩니다.
 > 다만 **첨부된 신청서 양식**과 **자격 요건 줄들**은 원문과 같은 구조로 옮겨야 해서 화면에서 못 합니다 — 그것까지 필요하면 채팅에 "이슈 #N 의 ○○ 양식·자격까지 등록해줘"라고 말씀해 주세요.
 
-⏱ 게시판 86곳을 4분 35초에 다 돌았습니다(예산 8분).
+⏱ 게시판 86곳을 3분 55초에 다 돌았습니다(예산 8분).
 
-⚠️ 정식 등록을 **학교별 파일로 나눌 때입니다.** 지금 한 학생이 남의 학교 공고로만 283KB 를 받습니다(학교 41곳 · 전국분 155KB 은 모두가 받아야 합니다). 실시간 공고·학과 목록과 같은 방식입니다 — 전국분 파일 하나 + 학교별 파일. 이름 규칙은 match-engine.js 에, 발행은 collector/publish-notices.mjs 를 본뜨면 됩니다 (왜 2026-09-26에는 미뤘는지: SESSIONS.md 「첫 화면에서 받는 양 절반으로」)
+⚠️ 정식 등록을 **학교별 파일로 나눌 때입니다.** 지금 한 학생이 남의 학교 공고로만 290KB 를 받습니다(학교 41곳 · 전국분 159KB 은 모두가 받아야 합니다). 실시간 공고·학과 목록과 같은 방식입니다 — 전국분 파일 하나 + 학교별 파일. 이름 규칙은 match-engine.js 에, 발행은 collector/publish-notices.mjs 를 본뜨면 됩니다 (왜 2026-09-26에는 미뤘는지: SESSIONS.md 「첫 화면에서 받는 양 절반으로」)
 
 ### 경희대학교
 상태: 🖥 브라우저 담당 게시판 — 일반 로봇은 건너뜀
 
 ### 한국외국어대학교
 상태: ✅ 정상 (실공고 42건 감지)
+- [[공통][교외] 2027 대산농촌재단 대산장학생 모집 공고(~11/11)](https://dep.hufs.ac.kr/bbs/student/2431/268751/artclView.do)
+  - 📎 [[붙임] 2027 대산장학생 선발요강.pdf](https://dep.hufs.ac.kr/bbs/student/2431/151752/download.do)
 
 ### 서울대학교
 상태: ✅ 정상 (실공고 11건 감지)
@@ -23,7 +25,10 @@
 상태: ✅ 정상 (실공고 25건 감지)
 
 ### 연세대학교 미래캠퍼스
-상태: ✅ 정상 (실공고 42건 감지)
+상태: ✅ 정상 (실공고 43건 감지)
+- [[교외] 2027년도 대산농촌재단 장학생 선발 안내 (~11/11)](https://mirae.yonsei.ac.kr/bbs/wj/104/944309/artclView.do)
+  - 📎 [[대산농촌재단] 2027년도 대산농촌재단 장학생 선발 안내.pdf](https://mirae.yonsei.ac.kr/bbs/wj/104/1015011/download.do)
+  - 📎 [[붙임2] 2027 대산장학생 선발요강.pdf](https://mirae.yonsei.ac.kr/bbs/wj/104/1015012/download.do)
 
 ### 고려대학교
 상태: ⚙️ 게시판 주소 미설정 (개발자가 준 장학금공지 주소(korea.ac.kr/ko/568/subview.do)는 목록 행이 href="#1" + jf_view() 클릭 스크립트라 일반 fetch로는 링크가 하나도 안 나온다(2026-08-02 확인 — 옛 주소 scholarship.korea.ac.kr도 안내 홈페이지라 0건이었다). 동국대·경희대와 같은 클릭형이라 browser-targets.json으로 옮겼다)
@@ -53,7 +58,10 @@
 상태: 🖥 브라우저 담당 게시판 — 일반 로봇은 건너뜀
 
 ### 동국대학교 WISE캠퍼스
-상태: ✅ 정상 (실공고 4건 감지)
+상태: ✅ 정상 (실공고 5건 감지)
+- [2026 하반기 은평구민 장학생 선발 안내(대상: 은평구 2년 이상 거주중인 대학생)](https://wise.dongguk.ac.kr/article/servicenotice/detail/520782)
+  - ⏰ 신청기간: 10.12.(월) ~ 10.28.(수) 18:00까지 2. 신청방법: 등기우편, 방문접수 3. 신청서식: www.epjh.or.kr
+  - 📎 [【붙임】 2026. 하반기 은평구민 장학생 선발 공고_합본.pdf](javascript:downGO('【붙임】 2026. 하반기 은평구민 장학생 선발 공고_합본.pdf','/files/article/servicenotice/520782/','287248F9D1CF43AAB7356BD3D899E034.pdf');)
 
 ### 홍익대학교
 상태: ✅ 정상 (실공고 7건 감지)
@@ -66,19 +74,23 @@
 
 ### 명지대학교
 상태: ✅ 정상 (실공고 10건 감지)
+- [[한미교육위원단] 풀브라이트 미국 유학·연구 장학금 설명회](https://www.mju.ac.kr/bbs/mjukr/145/236185/artclView.do)
+- [2027년 북한이탈청소년장학생 선발 안내](https://www.mju.ac.kr/bbs/mjukr/145/236184/artclView.do)
+  - 📎 [별첨1_ 2027년 아산북한이탈청소년장학생 선발안내.pdf](https://www.mju.ac.kr/bbs/mjukr/145/181106/download.do)
 
 ### 상명대학교
 상태: 🖥 브라우저 담당 게시판 — 일반 로봇은 건너뜀
 
 ### 가천대학교
 상태: ✅ 정상 (실공고 146건 감지)
+- [[공통] 2026년 하반기 (재)은평구민장학재단 장학생 선발계획 안내](https://www.gachon.ac.kr/bbs/kor/478/125984/artclView.do)
+  - ⏰ 신청기간 : 2026년 10월 12일(월) ~ 10월 28일(수) 18:00까지 (주말, 공휴일 및 점심시간 12:00~13:00 제외) 4.
+  - 📎 [[붙임1]2026.하반기은평구민장학생선발공고.pdf](https://www.gachon.ac.kr/bbs/kor/478/156586/download.do)
+  - 📎 [[붙임2]신청서및개인정보수집이용제공및조회동의서.hwp](https://www.gachon.ac.kr/bbs/kor/478/156587/download.do)
+- [[공통] └ RE:2026학년도 2학기 하나금융나눔재단 하나장학생 선발결과 안내](https://www.gachon.ac.kr/bbs/kor/478/125974/artclView.do)
 
 ### 아주대학교
-상태: ✅ 정상 (실공고 11건 감지)
-- [[교외장학] 아산사회복지재단 2027년 북한이탈청소년 장학생 선발 안내](https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=377206&article.offset=0&articleLimit=10)
-  - 📎 [별첨1_ 2027년 아산북한이탈청소년장학생 선발안내.pdf](https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=377206&attachNo=334797)
-- [[교외장학] 아산사회복지재단 2027년 의생명과학분야 대학 장학생 선발 안내](https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=377204&article.offset=0&articleLimit=10)
-  - 📎 [별첨1 _2027년 의생명과학분야 대학 장학생 선발안내.pdf](https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=file-download&articleNo=377204&attachNo=334796)
+상태: ✅ 정상 (실공고 12건 감지)
 
 ### 국민대학교
 상태: ✅ 정상 (실공고 18건 감지)
@@ -91,19 +103,41 @@
 
 ### 이화여자대학교
 상태: ✅ 정상 (실공고 10건 감지)
+- [[학부]2026학년도 2학기 재단법인 송화 장학금 신청 안내](https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367311&article.offset=0&articleLimit=10)
+  - ⏰ 신청기간 2026.10.08 ~ 2026.10.14 조회 31 첨부2. 장학생 신상카드 양식_송화재단.xls 첨부3. 장학생 추천서 양식_송화재
+  - 📎 [첨부2. 장학생 신상카드 양식_송화재단.xls](https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367311&attachNo=353431)
+  - 📎 [첨부3. 장학생 추천서 양식_송화재단.xlsx](https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367311&attachNo=353432)
 
 ### 인하대학교
 상태: ✅ 정상 (실공고 45건 감지)
+- [[학부-교외장학] 2026학년도 하반기 은평구민 장학생 선발](https://www.inha.ac.kr/bbs/kr/8/45758/artclView.do)
+  - ⏰ 신청 기간 : 2026. 10. 12.( 월 ) ~ 10. 28. ( 수 ) 18:00 까지 6. 제출 서류 가 . 신청서 나 . 개인정보 수집
+  - 📎 [【붙임】 2026. 하반기 은평구민 장학생 선발 공고_합본.pdf](https://www.inha.ac.kr/bbs/kr/8/41480/download.do)
 
 ### 부산대학교
 상태: ⚙️ 게시판 주소 미설정 (주소는 확보했다(2026-08-02) — onestop.pusan.ac.kr 장학 공지 511건. 목록을 자바스크립트가 그리고 행이 href="#popup"이라 browser-targets.json이 담당한다)
 
 ### 가톨릭대학교
-상태: ✅ 정상 (실공고 9건 감지)
-- [[학생지원팀] (재)인천광역시 계양구 인재양성장학교육재단 2026년 2학기 장학생 선발 안내](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276597&article.offset=0&articleLimit=10&srCategoryId=22)
-  - ⏰ 접수기간 : 2026. 10. 1.(목) ~ 10. 12.(월) - 접수방법 : 이메일(yhm3102@gyedu.or.kr) 또는 등기우편 (방
-  - 📎 [2026년_하반기_장학생_선발_공고.pdf](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276597&attachNo=226386)
-  - 📎 [하반기_장학생_선발_제출서식.hwp](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276597&attachNo=226387)
+상태: ✅ 정상 (실공고 11건 감지)
+- [[학생지원팀] 2026년 하반기 은평구민장학재단 장학생 선발 안내](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276635&article.offset=0&articleLimit=10&srCategoryId=22)
+  - ⏰ 접수기간: 2026. 10. 12.(월) ~ 10. 28.(수) 3. 신청방법: 재단에 등기우편 또는 방문 접수 4. 유의사항: 제출서류, 접수
+  - 📎 [【붙임】 2026. 하반기 은평구민 장학생 선발 공고_합본.pdf](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276635&attachNo=226429)
+- [[학생지원팀] 2026년 양산시 대학생 학자금 대출 이자지원 접수 안내](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276607&article.offset=0&articleLimit=10&srCategoryId=22)
+  - ⏰ 신청기간 : 2026. 9. 14.(월) ~ 10. 23.(금) □ 지원내용 - 한국장학재단으로부터 받은 학자금의 2025년 하반기, 2026년
+  - 📎 [(공고) 2026년 양산시 대학생 학자금대출 이자지원 접수 공고.hwpx](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276607&attachNo=226400)
+  - 📎 [(서식)신청서 및 개인정보 이용 및 제공 동의서.hwpx](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276607&attachNo=226401)
+- [[학생지원팀] 2026년 (재)순천시인재육성장학회 장학생 선발 모집 안내](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276606&article.offset=0&articleLimit=10&srCategoryId=22)
+  - ⏰ 접수기간: 2026. 9.28.(월)~10.23.(금) - 신청방법: 장학회 방문 또는 이메일 * 기타 자세한 내용은 공고문 참조 2026년 (
+  - 📎 [2026년 (재)순천시인재육성장학회 장학생 모집 공고.pdf](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276606&attachNo=226399)
+- [[학생지원팀] 2026년 2학기 전남인재육성 장학생 선발 안내](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276604&article.offset=0&articleLimit=10&srCategoryId=22)
+  - ⏰ 신청기간: 2026. 9. 21.(월) ~ 10. 23.(금) 18:00 - 신청방법 - 온라인 신청: 전남인재평생교육진흥원 누리집(www.jn
+  - 📎 [1.+2026년+하반기+전남인재육성+장학생+모집+공고.hwp](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276604&attachNo=226396)
+  - 📎 [2.+2026년+하반기+전남인재육성+장학생+선발+세부+계획+및+평가방법.hwp](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276604&attachNo=226397)
+  - 📎 [3.+[서식]+제출서류+안내+및+별지서식.hwp](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276604&attachNo=226398)
+- [[학생지원팀] 2026년 2학기 한국선원복지고용센터 선원가족장학생 선발 안내](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276603&article.offset=0&articleLimit=10&srCategoryId=22)
+  - 📎 [2026년 2학기 선원가족장학사업 선발요강.pdf](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276603&attachNo=226393)
+  - 📎 [2026년 2학기 선원가족장학사업 신청서.hwp](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276603&attachNo=226394)
+  - 📎 [2026년 2학기 선원가족장학사업 신청서.pdf](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276603&attachNo=226395)
 
 ### 한국항공대학교
 상태: ✅ 정상 (실공고 54건 감지)
@@ -113,13 +147,13 @@
 
 ### 서울과학기술대학교
 상태: ✅ 정상 (실공고 58건 감지)
-- [[장애학생지원센터] 2026학년도 2학기 장애학생 봉사유형 국가근로장학생 모집 (1명)](https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=896348&qidx=57138&cate=0&allboard=true&nowpage=1)
-  - ⏰ 모집기간: ~2026. 10. 12.(월) 11:00까지 ※지원자가 많을 시 조기 마감될 수 있음 ※지원서 제출 후 1차 선발예정자에 한하여 개
-  - 📎 [근로학생 자기소개서.hwp](https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F57138&fname=432B92FD38364931881E5968A20ACB07_.hwp&ogrfname=%EA%B7%BC%EB%A1%9C%ED%95%99%EC%83%9D+%EC%9E%90%EA%B8%B0%EC%86%8C%EA%B0%9C%EC%84%9C.hwp)
-  - 📎 [국가근로장학생 지원서.hwp](https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F57138&fname=747F779F882F4F2EB2FF06CDB3C3407F_.hwp&ogrfname=%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EC%83%9D+%EC%A7%80%EC%9B%90%EC%84%9C.hwp)
-- [(홍보_신청기간 연장) 대전청년내일재단 2026년 하반기 인재육성장학생 선발 안내(~10/8(목)까지)](https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=5233&bidx=895270&qidx=5233&cate=0&allboard=true&nowpage=2)
-  - 📎 [2026년 성취(대) 장학생 선발계획 공고.hwpx](https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=48AA543A8EB043419F17871E15130DDB_.hwpx&ogrfname=2026%EB%85%84+%EC%84%B1%EC%B7%A8%28%EB%8C%80%29+%EC%9E%A5%ED%95%99%EC%83%9D+%EC%84%A0%EB%B0%9C%EA%B3%84%ED%9A%8D+%EA%B3%B5%EA%B3%A0.hwpx)
-- [[국제대학] 2026학년도 2학기 유학생 학습지원 튜터 장학생(수학) 추가 모집 (마감)](https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=57138&bidx=894671&qidx=57138&cate=0&allboard=true&nowpage=3)
+- [[장애학생지원센터] 2026학년도 2학기 장애학생 봉사유형 국가근로장학생 모집(학습도우미, 기간연장)](https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=896364&qidx=57138&cate=0&allboard=true&nowpage=1)
+  - ⏰ 모집기간: ~2026. 10. 16.(금) 16:00까지 ※지원자가 많을 시 조기 마감될 수 있음 ※지원서 제출 후 1차 선발예정자에 한하여 개
+  - 📎 [장학금 신청 주요 일정](https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf)
+  - 📎 [장학금 규정 전문(2021. 10. 1.)](https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp)
+  - 📎 [장학금 지침 전문(2026. 02. 04.)](https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp)
+  - 📎 [국가근로장학생 지원서.hwp](https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F57138&fname=A5870092D5B243E8A9F3666BAAAB3632_.hwp&ogrfname=%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EC%83%9D+%EC%A7%80%EC%9B%90%EC%84%9C.hwp)
+  - 📎 [근로학생 자기소개서.hwp](https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F57138&fname=283BF63DAF5543ACA8D13F391036FADB_.hwp&ogrfname=%EA%B7%BC%EB%A1%9C%ED%95%99%EC%83%9D+%EC%9E%90%EA%B8%B0%EC%86%8C%EA%B0%9C%EC%84%9C.hwp)
 
 ### 계명대학교
 상태: ⚙️ 게시판 주소 미설정 (주소는 확보했다(2026-08-02) — kmu.ac.kr 장학 공고 23건 보임. 상세 링크가 HTML에 없어 browser-targets.json이 담당한다)
@@ -132,9 +166,15 @@
 
 ### 경북대학교
 상태: ✅ 정상 (실공고 5건 감지)
+- [2026학년도 하반기 (재)은평구민장학재단 장학생 선발 안내](https://home.knu.ac.kr/HOME/knussw/sub.htm?nav_code=knu1619416593&mode=view&mv_data=aWR4PTIxNTUmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=)
+  - ⏰ 신청 기간: 2026. 10. 12.(월) ~ 10. 28.(수) 18:00 2. 신청 방법: 등기우편 또는 방문 접수(등기 우편은 도착일 기준
+  - 📎 [2026. 하반기 은평구민 장학생 선발 공고문.pdf](https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxNTUmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=0)
 
 ### 영남대학교
-상태: ✅ 정상 (실공고 17건 감지)
+상태: ✅ 정상 (실공고 13건 감지)
+- [2026년 하반기 은평구민 장학생 선발 안내](https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=231992344&article.offset=0&articleLimit=10)
+  - ⏰ 접수기간: 2026. 10. 12.(월) ~ 10. 28.(수) 18:00까지 2. 접수방법, 신청자격, 지원내용, 신청서식 등: 붙임 공고문
+  - 📎 [【붙임】 2026. 하반기 은평구민 장학생 선발 공고.pdf](https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=231992344&attachNo=379002)
 
 ### 전북대학교
 상태: ✅ 정상 (실공고 10건 감지)
@@ -144,38 +184,44 @@
 
 ### 전남대학교
 상태: ✅ 정상 (실공고 17건 감지)
-- [[장학안내] 2026학년도 여수캠퍼스 청경나래 장학금(구 학생성공지원금) ...](https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70601&cate=8)
-  - ⏰ 접수기간: 2026. 11. 23.(월) 09:00 ~ 2026. 11. 29.(일) 18:00 라. 지원(신청) 방법 전남대학교 포털사이트 (
-  - 📎 [교육기본시설/부속시설](https://www.jnu.ac.kr/MainIntro/Institution/AttachedFac)
-  - 📎 [2026 여수캠퍼스 청경나래장학금 운영 계획(안내).hwpx](https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2584159)
 
 ### 조선대학교
 상태: ✅ 정상 (실공고 45건 감지)
 
 ### 충북대학교
-상태: ✅ 정상 (실공고 7건 감지)
+상태: ✅ 정상 (실공고 6건 감지)
 
 ### 부경대학교
 상태: ✅ 정상 (실공고 17건 감지)
 
 ### 강원대학교
-상태: ✅ 정상 (실공고 11건 감지)
+상태: ✅ 정상 (실공고 10건 감지)
+- [2026년 하반기 은평구민 장학생 선발 공고](https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2516&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0)
+  - ⏰ 접수기간 : 2026.10.12~10.28.(수) 라. 신청자격등 세부사항은 붙임 파일 참조 파일 【붙임】 2026. 하반기 은평구민 장학생 선
+  - 📎 [【붙임】 2026. 하반기 은평구민 장학생 선발 공고_합본.pdf chevron_forward](https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261008035827810.pdf&path=/bbs/34&fn=%E3%80%90%EB%B6%99%EC%9E%84%E3%80%91%202026.%20%ED%95%98%EB%B0%98%EA%B8%B0%20%EC%9D%80%ED%8F%89%EA%B5%AC%EB%AF%BC%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B3%B5%EA%B3%A0_%ED%95%A9%EB%B3%B8.pdf)
 
-### 🎯 대외활동·공모전 새 글 4건 → 앱 '대외활동' 탭 (data/activities.json · 200건 게재 중)
+### 🎯 대외활동·공모전 새 글 12건 → 앱 '대외활동' 탭 (data/activities.json · 200건 게재 중)
 - **성균관대학교 (장학 게시판에서 발견)** — ✅
-  - [대외활동] [(연장)[창업지원단/실험실창업혁신단] 2026 SKKU 프리 텍스코어(10/13~14) 참가자 모집(라마다 호텔 수원, 총상금 350만원)](https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140438&article.offset=0&articleLimit=10) — ⏰ 신청기간: 2026.09.22.(화) ~ 2026.10.08.(목)까지 *모집기간 연장 ■ 행사일정 : 2026.10.13.(화) 11시 ~ 2
-- **광운대학교 (장학 게시판에서 발견)** — ✅
-  - [공모전] [[일반] [교육혁신원] 2026학년도 광운대학교 다전공 수기 공모전 안내 (~10/30(금))](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53452&tpage=1&searchKey=1&searchVal=&srCategoryId=) — ⏰ 접수 기간 및 제출처 접수 기간 2026년 10월 7일(수) ~ 30일(금) 제출 방법 첨부파일 [다전공_수기공모전_양식.hwp]을 활용하여 작
-- **한국외국어대학교 대외활동·공모전 「학생활동」** — ✅ 정상 (활동·공모전 9건 감지)
+  - [대외활동] [[대학혁신과공유센터] 인텐시브 워크숍 <바이브코딩으로 게임 만들기(with NC AI)> 참가 모집](https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140460&article.offset=0&articleLimit=10)
+- **한국외국어대학교 대외활동·공모전 「학생활동」** — ✅ 정상 (활동·공모전 11건 감지)
+  - [공모전] [[기후에너지환경부] 제13회 대학생 물환경 정책•기술 공모전](https://dep.hufs.ac.kr/bbs/student/2436/268742/artclView.do)
+  - [공모전] [[해양수산부] 2026 해양 안전 콘텐츠 공모전](https://dep.hufs.ac.kr/bbs/student/2436/268740/artclView.do)
+  - [공모전] [[소상공인시장진흥공단] 2026년 소상공인365 활용사례 공모전](https://dep.hufs.ac.kr/bbs/student/2436/268739/artclView.do)
+  - [대외활동] [[경기도] 2026년 경기스타트업 아카데미: 내가 투자한 스타트업과 성공하는 창업가의 3가](https://dep.hufs.ac.kr/bbs/student/2436/268737/artclView.do)
+  - [대외활동] [[경기도] 2026 경기 스타트업 아카데미 딥데크 세미나](https://dep.hufs.ac.kr/bbs/student/2436/268735/artclView.do)
+  - [대외활동] [[경기도] 경기 스타트업 아카데미 딥테크 교육](https://dep.hufs.ac.kr/bbs/student/2436/268734/artclView.do)
+  - [공모전] [[KAIST] 2026-2차, 외국발 허위정보 대응 대학생 아이디어 공모전](https://dep.hufs.ac.kr/bbs/student/2436/268731/artclView.do)
+  - [공모전] [[해양수산부] 2026 청년 어촌창업 아이디어 공모전](https://dep.hufs.ac.kr/bbs/student/2436/268730/artclView.do)
 - **한국외국어대학교 대외활동·공모전 「진로·취업」** — 🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요
 - **경희대학교 대외활동·공모전 「취업/경력」** — 🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요
 - **경희대학교 대외활동·공모전 「사회진출 프로그램 공지」** — 🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요
 - **정부24 공모전 대외활동·공모전** — ⛔ robots.txt 가 막아 둔 주소 — 읽지 않았습니다 (출처를 바꾸거나 보관하세요)
 - **온통청년 청년참여 프로그램 대외활동·공모전** — 🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요
 - **서울시 청년몽땅정보통 대외활동·공모전** — 🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요
-- **창업진흥원 K-Startup 대외활동·공모전** — ✅ 정상 (활동·공모전 3건 감지)
-  - [대외활동] [모두의 창업 등 정부지원사업 완벽 대비! 「1:1 맞춤형 창업 멘토링」 참가자 모집](https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179422) — ⏰ 접수기간 2026-10-02 ~ 2026-10-15 23:59 주관기관명 강남구여성능력개발센터 대상 대학생, 일반인, 대학, 일반기업, 1인 창
-  - [공모전] [2026 제10회 G밸리창업경진대회 참가기업 모집](https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179309) — ⏰ 접수기간 2026-09-18 ~ 2026-10-08 17:00 주관기관명 비디씨엑셀러레이터 대상 대학생, 일반인, 연구기관, 일반기업, 1인 창
+- **창업진흥원 K-Startup 대외활동·공모전** — ✅ 정상 (활동·공모전 5건 감지)
+  - [공모전] [2026년 청년 어촌창업 아이디어 공모전](https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179448) — ⏰ 접수기간 2026-10-07 ~ 2026-11-08 23:59 주관기관명 한국어촌어항공단 대상 대학생, 일반인 창업업력 예비창업자 연락처 02-
+  - [대외활동] [[광운대캠퍼스타운] AI 첫걸음 아카데미 (HELLO AI!) 참가자 모집 (선착순마감)](https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179429) — ⏰ 접수기간 2026-10-06 ~ 2026-10-26 09:00 주관기관명 광운대학교산학협력단 대상 전체 창업업력 전체 연락처 02-940-804
+  - [공모전] [2026 제2회 반려동물 창업 아이디어 경진대회 참가자 모집](https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179323) — ⏰ 접수기간 2026-09-22 ~ 2026-10-09 18:00 주관기관명 사단법인 한국반려동물산업협회 대상 청소년, 대학생, 일반인, 대학, 일
 - **대한민국 정책브리핑 이벤트·공모 대외활동·공모전** — ✅ 정상 (활동·공모전 23건 감지)
 - **경기청년포털 대외활동·공모전** — ✅ 정상 (활동·공모전 3건 감지)
 - **KOICA 봉사단 대외활동·공모전** — 🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요
@@ -191,7 +237,7 @@
 - **경남청년정보플랫폼 대외활동·공모전** — ✅ 정상 (활동·공모전 3건 감지)
 - **청년재단 대외활동·공모전** — ✅ 정상 (활동·공모전 2건 감지)
 
-### 🏛 재단·지자체 새 공고 0건 → 홈 '재단·지자체 새 공고' (data/external.json · 54건 게재 중 · 게시판 아는 곳 20/77)
+### 🏛 재단·지자체 새 공고 1건 → 홈 '재단·지자체 새 공고' (data/external.json · 55건 게재 중 · 게시판 아는 곳 20/77)
 - **재단법인 김해시미래인재장학재단** — ⚠️ 오류 (TimeoutError: 23) — 주소 확인 필요
 - **재단법인 상주시장학회** — ✅ 정상 (장학 공고 3건 감지)
 - **재단법인 삼원장학재단** — ✅ 정상 (장학 공고 24건 감지)
@@ -206,7 +252,8 @@
 - **미래에셋박현주재단** — 🟡 접속은 되지만 장학 공고를 찾지 못함 — 게시판이 맞는지 확인 필요
 - **아산사회복지재단** — ✅ 정상 (장학 공고 10건 감지)
 - **한국고등교육재단** — ⛔ robots.txt 가 막아 둔 주소 — 읽지 않았습니다 (출처를 바꾸거나 보관하세요)
-- **한국장학재단 공지** — ✅ 정상 (장학 공고 15건 감지)
+- **한국장학재단 공지** — ✅ 정상 (장학 공고 13건 감지)
+  - [2027학년도 학점은행제 학습자 학자금대출 지원기관 모집 안내](https://www.kosaf.go.kr/ko/notice.do?mode=view&searchStr=&searchType=&page=1&ctgrId1=&ctgrId2=&seqNo=21371) — ⏰ 신청기간: ’26. 10. 12.(월) ∼ 10. 21.(수) ※ 기한 내 서류제출이 어려운 경우 사전에 담당자에게 연락하여 제출 일정 조율 필
 - **국립국제교육원 공지** — ✅ 정상 (장학 공고 3건 감지)
 - **롯데장학재단** — 🟡 접속은 되지만 장학 공고를 찾지 못함 — 게시판이 맞는지 확인 필요
 - **일주학술문화재단** — ✅ 정상 (장학 공고 5건 감지)
@@ -219,60 +266,65 @@
 - (재)송파구 인재육성 장학재단: 2페이지 더 읽어 24행 추가
 - 관정이종환교육재단: 2페이지 더 읽어 17행 추가
 - 아산사회복지재단: 2페이지 더 읽어 50행 추가
-- 한국외국어대학교: 2페이지 더 읽어 84행 추가
+- 한국외국어대학교: 2페이지 더 읽어 83행 추가
 - 연세대학교: 2페이지 더 읽어 22행 추가
-- 연세대학교 미래캠퍼스: 2페이지 더 읽어 32행 추가
+- 연세대학교 미래캠퍼스: 2페이지 더 읽어 33행 추가
 - 가천대학교: 2페이지 더 읽어 417행 추가
 - 인하대학교: 2페이지 더 읽어 40행 추가
 - 한국항공대학교: 2페이지 더 읽어 196행 추가
 - 서울과학기술대학교: 2페이지 더 읽어 182행 추가
 - 한국방송통신대학교: 2페이지 더 읽어 30행 추가
 - 조선대학교: 2페이지 더 읽어 36행 추가
-- 한국외국어대학교 대외활동·공모전 「학생활동」: 2페이지 더 읽어 69행 추가
+- 한국외국어대학교 대외활동·공모전 「학생활동」: 2페이지 더 읽어 70행 추가
 - 서울문화포털 공모소식 대외활동·공모전: 2페이지 더 읽어 60행 추가
 
 📄 페이지 넘기기가 안 되는 게시판 74곳 (14일 뒤 다시 시도합니다)
 
 ---
 ⚙️ 설정: `collector/schools.json` · `collector/activity-sources.json` · `collector/external-sources.json` · 발행: `data/notices.json` · `data/activities.json` · `data/external.json` · 로봇: `collector/collect.mjs`
-**🧩 양식 원본 자동 확보 예약 2건** — 원본은 이 실행에서 바로 내려받고, 같은 실행의 무료 변환기가 앱 양식으로 옮겨요(못 옮긴 것은 리포트 '보류'에 남아요).
+**🧩 양식 원본 자동 확보 예약 3건** — 원본은 이 실행에서 바로 내려받고, 같은 실행의 무료 변환기가 앱 양식으로 옮겨요(못 옮긴 것은 리포트 '보류'에 남아요).
 
-**⏳ 스키마화 대기 중 92건** (원본 확보됨 — collector/pending-forms.json)
+**⏳ 스키마화 대기 중 94건** (원본 확보됨 — collector/pending-forms.json)
 
-### 🤖 자동 등록 (선조치후보고) — 4건 등록
+### 🤖 자동 등록 (선조치후보고) — 6건 등록
 
 자동 등록분은 앱에 **자동 등록 · 검수 전** 배지로 표시돼요. 잘못 등록된 건이 있으면 채팅으로 알려주시거나 `collector/auto-register-config.json`의 `blockIds`에 id를 넣어주세요.
 
-- `auto-leno276597srcategoryid22` [[학생지원팀] (재)인천광역시 계양구 인재양성장학교육재단 2026년 2학기 장학생 선발 안내](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276597&article.offset=0&articleLimit=10&srCategoryId=22) · 마감 2026-10-12 · 가톨릭대학교
-- `auto-8bnum57138cate0qidx57138` [[장애학생지원센터] 2026학년도 2학기 장애학생 봉사유형 국가근로장학생 모집 (1명)](https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=896348&qidx=57138&cate=0&allboard=true&nowpage=1) · 마감 2026-10-12 · 서울과학기술대학교
-- `auto-270bnum5233cate0qidx5233` [(홍보_신청기간 연장) 대전청년내일재단 2026년 하반기 인재육성장학생 선발 안내(~10/8(목)까지)](https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=5233&bidx=895270&qidx=5233&cate=0&allboard=true&nowpage=2) · 마감 2026-10-08 · 서울과학기술대학교
-- `auto-1bnum57138cate0qidx57138` [[국제대학] 2026학년도 2학기 유학생 학습지원 튜터 장학생(수학) 추가 모집 (마감)](https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=57138&bidx=894671&qidx=57138&cate=0&allboard=true&nowpage=3) · 서울과학기술대학교
+- `auto-ervicenoticedetail520782` [2026 하반기 은평구민 장학생 선발 안내(대상: 은평구 2년 이상 거주중인 대학생)](https://wise.dongguk.ac.kr/article/servicenotice/detail/520782) · 마감 2026-10-28 · 동국대학교 WISE캠퍼스
+- `auto-pnoticedoarticleno367311` [[학부]2026학년도 2학기 재단법인 송화 장학금 신청 안내](https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367311&article.offset=0&articleLimit=10) · 마감 2026-10-14 · 이화여자대학교
+- `auto-krbbskr845758artclviewdo` [[학부-교외장학] 2026학년도 하반기 은평구민 장학생 선발](https://www.inha.ac.kr/bbs/kr/8/45758/artclView.do) · 마감 2026-10-28 · 인하대학교
+- `auto-leno276606srcategoryid22` [[학생지원팀] 2026년 (재)순천시인재육성장학회 장학생 선발 모집 안내](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276606&article.offset=0&articleLimit=10&srCategoryId=22) · 마감 2026-10-23 · 가톨릭대학교
+- `auto-leno276604srcategoryid22` [[학생지원팀] 2026년 2학기 전남인재육성 장학생 선발 안내](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276604&article.offset=0&articleLimit=10&srCategoryId=22) · 마감 2026-10-23 · 가톨릭대학교
+- `auto-leno276603srcategoryid22` [[학생지원팀] 2026년 2학기 한국선원복지고용센터 선원가족장학생 선발 안내](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276603&article.offset=0&articleLimit=10&srCategoryId=22) · 
 
-**컨펌 대기 (자동 기준 미달 163건)** — 장학 신호는 있지만 선발·모집 신호가 약해요:
+**전국으로 승격 1건** — 다른 학교 게시판에 같은 사업이 올라와 한 학교 한정을 풀었어요(합치는 규칙은 관리자 합침과 같아요 · 근거는 항목의 scopeFrom).
+- `auto-leno276603srcategoryid22` [학생지원팀] 2026년 2학기 한국선원복지고용센터 선원가족장학생 선발  ← 서강대학교 게시판 [[교외] 한국선원복지고용센터 선원가족 장학생 선발 안내(10/23 마감,](https://www.sogang.ac.kr/ko/detail/550981?bbsConfigFk=141&namepage=ScholarshipNotice)
+
+**컨펌 대기 (자동 기준 미달 170건)** — 장학 신호는 있지만 선발·모집 신호가 약해요:
+- [공통][교외] 2027 대산농촌재단 대산장학생 모집 공고(~11/11) (2027년 이후 사업으로 보임 — 개발자 컨펌 대기)
+- [교외] 2027년도 대산농촌재단 장학생 선발 안내 (~11/11) (2027년 이후 사업으로 보임 — 개발자 컨펌 대기)
+- 2027년 북한이탈청소년장학생 선발 안내 (2027년 이후 사업으로 보임 — 개발자 컨펌 대기)
+- [공통] 2026년 하반기 (재)은평구민장학재단 장학생 선발계획 안내 (타교 등록분과 동일 사업(2026 하반기 은평구민 장학생 선발 안내() — 접수분 여부 컨펌 대기)
+- [학생지원팀] 2026년 하반기 은평구민장학재단 장학생 선발 안내 (타교 등록분과 동일 사업(2026 하반기 은평구민 장학생 선발 안내() — 접수분 여부 컨펌 대기)
+- 2026학년도 하반기 (재)은평구민장학재단 장학생 선발 안내 (타교 등록분과 동일 사업(2026 하반기 은평구민 장학생 선발 안내() — 접수분 여부 컨펌 대기)
+- 2026년 하반기 은평구민 장학생 선발 안내 (타교 등록분과 동일 사업(2026 하반기 은평구민 장학생 선발 안내() — 접수분 여부 컨펌 대기)
+- 2026년 우양재단 동행 장학생 모집 (타교 등록분과 동일 사업(2026년 우양재단 동행장학생 모집 안내) — 접수분 여부 컨펌 대기)
 - [교외장학] 아산사회복지재단 2027년 북한이탈청소년 장학생 선발 안내 (2027년 이후 사업으로 보임 — 개발자 컨펌 대기)
 - [교외장학] 아산사회복지재단 2027년 의생명과학분야 대학 장학생 선발 안내 (2027년 이후 사업으로 보임 — 개발자 컨펌 대기)
-- [장학안내] 2026학년도 여수캠퍼스 청경나래 장학금(구 학생성공지원금) ... (선발·모집·신청 신호 없음 — 개발자 컨펌 대기)
-- 2026년 우양재단 동행 장학생 모집 (타교 등록분과 동일 사업(2026년 우양재단 동행장학생 모집 안내) — 접수분 여부 컨펌 대기)
-- 2026-2학기 윤영문화재단 신규장학생 선발(1인당 200만원/~10.11(일)까지) (타교 등록분과 동일 사업(등록금외지원 2026년 제2학기 윤영문화재단) — 접수분 여부 컨펌 대기)
-- [교외] 2027학년도 (재)아산사회복지재단 의생명과학분야 장학생 선발 안내 (2027년 이후 사업으로 보임 — 개발자 컨펌 대기)
-- [교외] 2027년 아산재단 북한이탈청소년장학생 선발 (2027년 이후 사업으로 보임 — 개발자 컨펌 대기)
-- [교외]2027년도 대산농촌재단 장학생 선발 안내 (2027년 이후 사업으로 보임 — 개발자 컨펌 대기)
-- [교외] 2026년 국가유산진흥원 전통 기·예능 분야 및 매장유산 관련 분야 우수 장학생 선발 공고 (타교 등록분과 동일 사업(2026년도 국가유산진흥원 전통 기·예능 분) — 승격 불가(사람 지정·교내·마감 경과) 컨펌 대기)
-- 2026-2학기 중소기업 취업연계 장학사업(희망사다리 Ⅰ유형) 신규장학생 신청 안내 (타교 등록분과 동일 사업(2026-2학기 중소기업 취업연계 장학금(희) — 접수분 여부 컨펌 대기)
 
-**거른 공고 366건 — 이유별**
+**거른 공고 374건 — 이유별**
 
-- 이미 등록(원문 동일) · 106건
-- 이미 등록(동일 사업) · 56건
+- 이미 등록(원문 동일) · 110건
+- 이미 등록(동일 사업) · 57건
 - 이미 전국(동일 사업) · 53건
+- 이미 등록(같은 id) · 20건
 - 마감 경과 · 19건
-- 이미 등록(같은 id) · 19건
-- 행정 안내(신청 공고 아님) · 15건
-- 사람이 막아 둔 공고(blockIds/blockUrls) · 15건
+- 행정 안내(신청 공고 아님) · 16건
+- 학자금 대출·융자(장학금 아님) · 14건
+- 사람이 막아 둔 공고(blockIds/blockUrls) · 14건
 - 이미 등록(동일 사업)논산시장학회 ) · 13건
 - '장학' 신호 없음 · 13건
-- 학자금 대출·융자(장학금 아님) · 13건
-- 행사·연수·설명회(신청형 장학 아님) · 11건
+- 행사·연수·설명회(신청형 장학 아님) · 12건
 - 이미 등록(동일 사업)포항시장학회) · 11건
 - 국가장학금 상시 제도 — 앱 내 카드로 이미 안내 · 7건
 - 이미 등록(동일 사업)춘천인재육성장학) · 4건
@@ -303,9 +355,9 @@
 - 공통 [공통] 2026학년도 2학기 점프장학 신청 안내_09.22(화)~10.9(금) — 6회 실패 (마지막 시도 2026-09-26) · **자동 재시도 중단**(매일 시간만 버려서). 다시 받으려면 pending-forms.json에서 retired를 지우세요
 - 공통 2026년도 하반기 (재)논산시장학회 학업장려 장학생 선발 안내 — 6회 실패 (마지막 시도 2026-09-30) · **자동 재시도 중단**(매일 시간만 버려서). 다시 받으려면 pending-forms.json에서 retired를 지우세요
 
-### 🧩 양식 스키마화 — 무료 자동 0건 · API 0건 · 보류 81건
+### 🧩 양식 스키마화 — 무료 자동 0건 · API 0건 · 보류 88건
 
-**보류 81건** — 자동 변환기가 원본과 같은 문서를 장담하지 못한 것들이에요. 원본 다운로드 안내는 그대로 유지됩니다.
+**보류 88건** — 자동 변환기가 원본과 같은 문서를 장담하지 못한 것들이에요. 원본 다운로드 안내는 그대로 유지됩니다.
 
 - 2026-2학기 남가주동문회 장학금 신청공고.hwp (남가주동문장학회 장학생 선발) · 자동 변환 보류: 공고문·안내문 파일(채울 칸이 있는 서식 아님)
 - (서식) 개인정보수집이용동의서.hwp (남가주동문장학회 장학생 선발) · 원본에 있는 항목이 빠짐 — 주소·연락처·이메일·평점·소득분위. 원본 첨부 안내를 유지합니다(API 경로 대상)
@@ -320,7 +372,7 @@
 - 2026-2학기 라성 정형기재단 장학금 신청서.hwp ([글로벌][교외][일시지원] 2026-2학기 라성정형기 재단 장학) · 유료 경로 꺼짐(schematize-config apiEnabled:false) — 뽑힌 글자가 너무 적음 — 항목이 빠졌을 수 있음
 - (서식) 개인정보수집이용동의서.hwp ([글로벌][교외][일시지원] 2026-2학기 라성정형기 재단 장학) · 원본에 있는 항목이 빠짐 — 주소·연락처·이메일·평점·소득분위. 원본 첨부 안내를 유지합니다(API 경로 대상)
 
-**건너뜀 70건**
+**건너뜀 71건**
 
 - 2026년 서울사회복지공동모금회 상반기 바로바로론 사랑나눔장학생 모집 안내 — registered.json에 항목 없음
 - [글로벌] 긴급-등록금전액)2026-2학기 (재)봉은재단 장학생 추가선발 안내(화공생명,  — registered.json에 항목 없음
@@ -338,7 +390,7 @@
 
 ### 🌐 범위 승격 (학교 한정 → 전국) — 1건
 원문(접수 이메일 도메인·"재단에 직접 제출"·다른 학교의 같은 사업)이 전국 사업이라고 말하는 것만 풀었어요. 학교 창구(장학팀·포털)로 내는 것은 그 학교 한정이 맞아 그대로 둡니다.
-- 🌐 `auto-leno276597srcategoryid22` [학생지원팀] (재)인천광역시 계양구 인재양성장학교육재단 2026년 2학 — 접수 이메일 도메인 gyedu.or.kr (학교 밖) · 본문 「등기우편」 (게시 가톨릭대학교)
+- 🌐 `auto-ervicenoticedetail520782` 2026 하반기 은평구민 장학생 선발 안내(대상: 은평구 2년 이상 거주 — 본문 「등기우편」 (게시 동국대학교 WISE캠퍼스)
 ### 🏫 교내·교외 원문 판정 — 바뀐 것 0건 · 후보 3건 · 학교 제도 새로 배움 0건
 판정 근거는 항목의 kindEvidence(원문 글자)에 남아요. 후보는 관리자 화면에서 구분을 바꿔 주세요 — 되돌리면 그 이름은 다시 배우지 않아요.
 - 뒤집힌 판정 없음

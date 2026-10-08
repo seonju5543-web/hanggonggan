@@ -3,6 +3,24 @@
  "updatedAt": "2026-10-08",
  "items": [
   {
+   "title": "[학부]2026학년도 2학기 재단법인 송화 장학금 신청 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367311&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "첨부2. 장학생 신상카드 양식_송화재단.xls",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367311&attachNo=353431"
+    },
+    {
+     "name": "첨부3. 장학생 추천서 양식_송화재단.xlsx",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367311&attachNo=353432"
+    }
+   ],
+   "deadlineHint": "신청기간 2026.10.08 ~ 2026.10.14 조회 31 첨부2. 장학생 신상카드 양식_송화재단.xls 첨부3. 장학생 추천서 양식_송화재",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-08"
+  },
+  {
    "title": "[대학원] 2026학년도 2학기 일반대학원 ‘우수연구 장학금’ 신청 안내",
    "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367276&article.offset=0&articleLimit=10",
    "attachments": [],

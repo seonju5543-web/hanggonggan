@@ -2,6 +2,127 @@
  "updatedAt": "2026-10-08",
  "items": [
   {
+   "title": "2026년 청년 어촌창업 아이디어 공모전",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179448",
+   "kind": "공모전",
+   "attachments": [
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/Ub1Ln"
+    },
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/Rb1Ln"
+    }
+   ],
+   "deadlineHint": "접수기간 2026-10-07 ~ 2026-11-08 23:59 주관기관명 한국어촌어항공단 대상 대학생, 일반인 창업업력 예비창업자 연락처 02-",
+   "deadline": "2026-11-08",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-07 ~ 2026-11-08 23:59"
+    }
+   ],
+   "eligibilityLines": [
+    "신청대상 : 어촌 창업을 희망하거나 어촌과 협력하는 사업에 관심이 많은 만 19세 이상 39세 이하인 청년",
+    "대상연령 : 만 20세 이상 ~ 만 39세 이하",
+    "대상 : 대학생, 일반인"
+   ],
+   "eligibilityExcludes": [
+    "팀과 개인 모두 공고마감일까지 사업자 등록을 하지 않아야 하며, 타 공모전 수상이력이 있거나 사업화 중인 사업 아이템, 지적재산권 분쟁 우려가 있는 아이템 등은 제외",
+    "신청 시 요청하는 정보(개인정보포함)는 사업운영기관에서 관리되오니 이점 반드시 유의하여 주시기 바랍니다."
+   ],
+   "detailsV": 3,
+   "field": "기획·아이디어",
+   "excerptsAt": "2026-10-08",
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-10-08"
+  },
+  {
+   "title": "[광운대캠퍼스타운] AI 첫걸음 아카데미 (HELLO AI!) 참가자 모집 (선착순마감)",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179429",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/Zb1Ln"
+    },
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/Sb1Ln"
+    }
+   ],
+   "deadlineHint": "접수기간 2026-10-06 ~ 2026-10-26 09:00 주관기관명 광운대학교산학협력단 대상 전체 창업업력 전체 연락처 02-940-804",
+   "deadline": "2026-10-26",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-06 ~ 2026-10-26 09:00"
+    },
+    {
+     "label": "활동기간",
+     "text": "10.26(월) ~ 10.30(금)"
+    }
+   ],
+   "eligibilityLines": [
+    "신청대상 : AI에 관심 있는 누구나(25인 이내)",
+    "신청 시 요청하는 정보(개인정보포함)는 사업운영기관에서 관리되오니 이점 반드시 유의하여 주시기 바랍니다.",
+    "대상연령 : 전체"
+   ],
+   "detailsV": 3,
+   "field": "교육·캠프",
+   "excerptsAt": "2026-10-08",
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-10-08"
+  },
+  {
+   "title": "2026 제2회 반려동물 창업 아이디어 경진대회 참가자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179323",
+   "kind": "공모전",
+   "attachments": [
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/YYXLn"
+    },
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/dYXLn"
+    },
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/aYXLn"
+    },
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/0SXLn"
+    }
+   ],
+   "deadlineHint": "접수기간 2026-09-22 ~ 2026-10-09 18:00 주관기관명 사단법인 한국반려동물산업협회 대상 청소년, 대학생, 일반인, 대학, 일",
+   "deadline": "2026-10-09",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-22 ~ 2026-10-09 18:00"
+    }
+   ],
+   "eligibilityLines": [
+    "대상연령 : 전체",
+    "대상 : 청소년, 대학생, 일반인, 대학, 일반기업, 1인 창조기업",
+    "신청대상 : ➀ 전국의 예비창업자(개인·팀) 또는 창업 10년 미만 기업(개인·법인)"
+   ],
+   "detailsV": 3,
+   "field": "기획·아이디어",
+   "excerptsAt": "2026-10-08",
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-10-08"
+  },
+  {
    "title": "모두의 창업 등 정부지원사업 완벽 대비! 「1:1 맞춤형 창업 멘토링」 참가자 모집",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179422",
    "kind": "대외활동",
@@ -335,6 +456,249 @@
    "foundAt": "2026-10-08",
    "seenAt": "2026-10-08",
    "excerptsAt": "2026-10-08"
+  },
+  {
+   "title": "[대학혁신과공유센터] 인텐시브 워크숍 <바이브코딩으로 게임 만들기(with NC AI)> 참가 모집",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140460&article.offset=0&articleLimit=10",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    }
+   ],
+   "deadlineHint": null,
+   "eligibilityLines": [
+    "▶ 참가 대상",
+    "- 성균관대학교 재학생·휴학생(전공 무관)",
+    "- 개발 또는 게임 제작 경험이 없는 학생도 지원 가능",
+    "- 팀당 권장 사양 이상의 노트북(1대 이상) 필요(교육 프로그램 시 노트북 대여가 가능하나, 교육시간 외에는 사용이 불가합니다)",
+    "*CPU: Intel Core i7 급 이상 (동등 이상 성능의 AMD CPU 포함)",
+    "*GPU: NVIDIA GeForce RTX 4060 급 이상 (최소 지원 사양: GTX 1080 급 이상)",
+    "*RAM: 32GB 이상",
+    "▶ 특전",
+    "- 게임 업계 현직자 또는 전문가의 멘토링 및 심사",
+    "- VARCO 크레딧 지원",
+    "- 비교과 이수시간 35시간 부여(프로그램에 끝까지 참여한 경우에만 이수 가능)",
+    "- NC AI 프로그램 참가 확인서 발급",
+    "- 교육 프로그램 동안 노트북 지원",
+    "- 포트폴리오 제작 및 우수팀 수익화 연계 지원"
+   ],
+   "detailsV": 3,
+   "field": "교육·캠프",
+   "excerptsAt": "2026-10-08",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-08"
+  },
+  {
+   "title": "[기후에너지환경부] 제13회 대학생 물환경 정책•기술 공모전",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2436/268742/artclView.do",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": null,
+   "deadline": "2026-10-25",
+   "detailsV": 3,
+   "excerptsAt": "2026-10-08",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-10-08"
+  },
+  {
+   "title": "[해양수산부] 2026 해양 안전 콘텐츠 공모전",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2436/268740/artclView.do",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": null,
+   "deadline": "2026-10-22",
+   "detailsV": 3,
+   "excerptsAt": "2026-10-08",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "eligibilityLines": [
+    "참가자격 : 일반인,학생 등 모든 국민 대상",
+    "* ‘그림(손그림)'에한해대상을‘초등학생 이하’로제한"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)"
+  },
+  {
+   "title": "[소상공인시장진흥공단] 2026년 소상공인365 활용사례 공모전",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2436/268739/artclView.do",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": null,
+   "deadline": "2026-10-14",
+   "detailsV": 3,
+   "excerptsAt": "2026-10-08",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "eligibilityLines": [
+    "-이메일 제목: [활용사례공모전 제출]신청자(대표자)명",
+    "국민누구나",
+    "개인(1명) 또는 팀 단위(최대 5명)제출",
+    "진행일정",
+    "시상내역",
+    "서류 보완",
+    "1차평가",
+    "최우수상",
+    "1명(팀) 각 디지털온누리상품권60만원"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)"
+  },
+  {
+   "title": "[경기도] 2026년 경기스타트업 아카데미: 내가 투자한 스타트업과 성공하는 창업가의 3가",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2436/268737/artclView.do",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": null,
+   "deadline": "2026-10-21",
+   "detailsV": 3,
+   "field": "교육·캠프",
+   "excerptsAt": "2026-10-08",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "eligibilityLines": [
+    "참가대상 : [구글폼 QR코드]",
+    "경기도 내 창업을 준비 중인 예비창업자 및 창업 초기",
+    "단계의 창업기업 대표·임직원",
+    "운영일시",
+    "2026년10월 21일[수]14:00~16:30",
+    "운영방식",
+    "온라인:Zoom",
+    "오프라인:경기스타트업브릿지 12층 컨퍼런스홀",
+    "[경기도 성남시 수정구 금토로 52 E동]",
+    "GB54",
+    "경기도경제과학진흥원"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)"
+  },
+  {
+   "title": "[경기도] 2026 경기 스타트업 아카데미 딥데크 세미나",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2436/268735/artclView.do",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": null,
+   "deadline": "2026-10-15",
+   "detailsV": 3,
+   "field": "교육·캠프",
+   "excerptsAt": "2026-10-08",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-10-08"
+  },
+  {
+   "title": "[경기도] 경기 스타트업 아카데미 딥테크 교육",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2436/268734/artclView.do",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": null,
+   "deadline": "2026-10-14",
+   "detailsV": 3,
+   "field": "교육·캠프",
+   "excerptsAt": "2026-10-08",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "eligibilityLines": [
+    "모집대상 : 무료",
+    "~ 2026.10.14.",
+    "도내(예비)창업자, 창업기업 임직원,",
+    "대학(원)생,유관기관 등",
+    "TRACK 1",
+    "TRACK 2",
+    "AI 개발·서비스",
+    "로봇연계·자율주행",
+    "교육기간 2026.10.26.(월) ~10.30.(금)",
+    "교육기간 2026.10.19.(월)~10.23.(금)",
+    "10:00~17:00",
+    "10:00~17:00",
+    "교육장소 실시간 온라인 교육",
+    "교육장소 경기스타트업브릿지(E동) 4층 도약실"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)"
+  },
+  {
+   "title": "[KAIST] 2026-2차, 외국발 허위정보 대응 대학생 아이디어 공모전",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2436/268731/artclView.do",
+   "kind": "공모전",
+   "attachments": [
+    {
+     "name": "1. 2026년-2차 외국발 허위정보 대응 대학생 아이디어 공모전 안내서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2436/151743/download.do"
+    },
+    {
+     "name": "2. 공모전 참가서류(양식).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2436/151744/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "deadline": "2026-11-17",
+   "detailsV": 3,
+   "field": "기획·아이디어",
+   "excerptsAt": "2026-10-08",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "eligibilityLines": [
+    "참가 대상 국내 대학(원)생(휴학생 포함 개인 또는 팀)",
+    "공모 일정",
+    "시상 내역",
+    "접수:26.10.6.(화)~11.17.(화)",
+    "대상 1명 300만원",
+    "KAIST 총장상",
+    "심사:26.11.19.(목)~20.(금)",
+    "최우수상 4명 각100만원",
+    "안보융합원장상",
+    "10명 각50만원",
+    "결과 발표/시상:11월 말",
+    "주최:KAIST /주관:안보융합원"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)"
+  },
+  {
+   "title": "[해양수산부] 2026 청년 어촌창업 아이디어 공모전",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2436/268730/artclView.do",
+   "kind": "공모전",
+   "attachments": [
+    {
+     "name": "[신청지원서]청년 어촌창업 아이디어 공모전 지원.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2436/151742/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "deadline": "2026-11-08",
+   "detailsV": 3,
+   "field": "기획·아이디어",
+   "excerptsAt": "2026-10-08",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "eligibilityLines": [
+    "신청대상 : 2026",
+    "어촌창업을 희망하거나 어촌과 협력하는 사업에 관심이 많은",
+    "만 19세 이상39세 이하인 청년",
+    "공모주제 및 신청분야",
+    "어촌자원을 활용한 비즈니스 상생모델 제시",
+    "국내산 수산물 활용한 수산식품 사업화",
+    "(수산물 판로개척, 수산가공식품 개발 등)",
+    "어촌 인프라 연계한 공간 사업화",
+    "2. (어촌시설관광명소화, 유휴공간 소득사업화등)",
+    "어촌창업",
+    "3 어촌삶의질서비스개선ESG사업화",
+    "(지역 현안해결 및 서비스개선 사업화등)",
+    "4 기타 어촌을 연결한 자유 주제",
+    "아이디어",
+    "대상 : 1명 (팀)"
+   ],
+   "eligibilityExcludes": [
+    "팀과 개인 모두공고마감일까지 사업자 등록을 하지 않아야",
+    "하며, 타 공모전 수상이력이 있거나 사업화 중인 사업 아이템,",
+    "지적재산권 분쟁 우려가 있는 아이템 등은 제외함"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)"
   },
   {
    "title": "(연장)[창업지원단/실험실창업혁신단] 2026 SKKU 프리 텍스코어(10/13~14) 참가자 모집(라마다 호텔 수원, 총상금 350만원)",
@@ -3532,57 +3896,6 @@
    "excerptsAt": "2026-10-08"
   },
   {
-   "title": "2026 제2회 반려동물 창업 아이디어 경진대회 참가자 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179323",
-   "kind": "공모전",
-   "field": "기획·아이디어",
-   "deadline": "2026-10-11",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-09-21 ~ 2026-10-11"
-    },
-    {
-     "label": "대상",
-     "text": "➀ 전국의 예비창업자(개인·팀) 또는 창업 10년 미만 기업(개인·법인) ➁ 반려동물 산업에 관심 있는 전국 청소년 ※ 본 대회에서 창업자란 공고일 기준 사업자등록 후 1년 이상 10년 미만인 개인사업자 또는 법인사업자를 말함. ※ 본 대회에서 예비창업자란 공고일 기준 사업자등록을 하…"
-    },
-    {
-     "label": "활동지역",
-     "text": "전국"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "(사)한국반려동물산업협회",
-   "api": "kstartup",
-   "apiId": "179323",
-   "id": "api-kstartup-179323",
-   "eligibilityLines": [
-    "➀ 전국의 예비창업자(개인·팀) 또는 창업 10년 미만 기업(개인·법인)",
-    "➁ 반려동물 산업에 관심 있는 전국 청소년",
-    "※ 본 대회에서 창업자란 공고일 기준 사업자등록 후 1년 이상 10년 미만인",
-    "개인사업자 또는 법인사업자를 말함.",
-    "※ 본 대회에서 예비창업자란 공고일 기준 사업자등록을 하지 않은 자 또는",
-    "사업자등록 후 1년이 경과하지 않은 자를 말함.",
-    "※ 청소년은 공고일 기준 만 12세 이상 18세 이하인 자에 한함",
-    "※ 팀으로 참가하는 경우 팀장 1인을 포함하여 최대 4인(팀장 1인, 팀원 3인"
-   ],
-   "noticeLines": [
-    "『2026 제2회 반려동물 창업 아이디어 경진대회』참가자 모집 공고",
-    "전국의 창의적인 반려동물 창업 아이디어를 발굴·육성하고, 우수 아이디어의",
-    "사업화 및 지역 산업 연계를 통해 부울경(부산·울산·경남) 반려동물 산업의",
-    "경쟁력 강화와 창업 생태계 활성화를 도모하고자 「2026 제2회 반려동물 창",
-    "업 아이디어 경진대회」를 개최하오니, 많은 관심과 참여 바랍니다.",
-    "온라인 접수 : https://www.kcaia.kr/notice/17"
-   ],
-   "detailsV": 3,
-   "foundAt": "2026-10-01",
-   "seenAt": "2026-10-08",
-   "excerptsAt": "2026-10-08"
-  },
-  {
    "title": "2026년 경기 스타트업 아카데미 딥테크 세미나 참여자 모집 / Future AI Technology - AI 메모리 반도체의 발전과 미래",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179384",
    "kind": "대외활동",
@@ -5644,261 +5957,6 @@
     "다른 예술인 또는 주민과의 교류활동을통해예술인 간 네트워크 형성지원"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)"
-  },
-  {
-   "title": "[서울디자인재단] 2026년 업사이클 디자인 공모전 (연장)",
-   "url": "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16333&menuNo=200118&pageIndex=1",
-   "kind": "공모전",
-   "attachments": [],
-   "deadlineHint": "접수 기간이 07.23. (목)까지 연장되었습니다. &nbsp; ● 세부 주제 - 어린이부 : 내가 Green 미래 - 청소년부 : 지구를 위한",
-   "field": "디자인·미술",
-   "excerptsAt": "2026-10-04",
-   "school": "",
-   "campus": "",
-   "host": "서울문화포털 공모소식",
-   "foundAt": "2026-09-30",
-   "eligibilityLines": [
-    "● 참여 자격",
-    "- 국내/외 거주 내국인 또는 국내 거주 외국인",
-    "- 개인 또는 팀(인원수 제한 없음)",
-    "- 출품작 수 제한 없음",
-    "* 다 작품 수상 시 가장 높은 상격 1점에 한하여 수상"
-   ],
-   "noticeLines": [
-    "※ 일반부는 접수 마감되었으며, 어린이부·청소년부에 한해 접수 기간이 07.23."
-   ],
-   "detailsV": 3
-  },
-  {
-   "title": "[성동문화재단] 2026년 제 5회 신진 청년작가 공모전 개최 안내",
-   "url": "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16320&menuNo=200118&pageIndex=2",
-   "kind": "공모전",
-   "attachments": [
-    {
-     "name": "[공고문] 제5회 신진 청년작가 공모전.pdf [1,125,831byte]",
-     "url": "https://culture.seoul.go.kr/culture/cmmn/file/fileDown.do?menuNo=200118&atchFileId=626f9b0d59dd4abc83e5b2a8316ef8a1&fileSn=1&bbsId="
-    },
-    {
-     "name": "[서식1,2,3] 지원신청서외 붙임서류.hwp [102,400byte]",
-     "url": "https://culture.seoul.go.kr/culture/cmmn/file/fileDown.do?menuNo=200118&atchFileId=626f9b0d59dd4abc83e5b2a8316ef8a1&fileSn=2&bbsId="
-    }
-   ],
-   "deadlineHint": null,
-   "excerptsAt": "2026-10-04",
-   "school": "",
-   "campus": "",
-   "host": "서울문화포털 공모소식",
-   "foundAt": "2026-09-30",
-   "detailsV": 3
-  },
-  {
-   "title": "[동대문문화원] 2026 동대문구 문예공모전 개최요강",
-   "url": "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16329&menuNo=200118&pageIndex=2",
-   "kind": "공모전",
-   "attachments": [
-    {
-     "name": "1783579874_2026 동대문구 문예공모전 개최요강.hwp [70,144byte]",
-     "url": "https://culture.seoul.go.kr/culture/cmmn/file/fileDown.do?menuNo=200118&atchFileId=bfcf8b373a6440baaf2c905479df069e&fileSn=1&bbsId="
-    },
-    {
-     "name": "1783579874_2026 붙임.1 공모신청서.hwp [57,344byte]",
-     "url": "https://culture.seoul.go.kr/culture/cmmn/file/fileDown.do?menuNo=200118&atchFileId=bfcf8b373a6440baaf2c905479df069e&fileSn=2&bbsId="
-    }
-   ],
-   "deadlineHint": "접수기간 2026년 7월6일(월) ~ 8월3일(월) &middot;원고접수방법 - 동대문문화원 이메일로만 접수 [ ddmmhw@hanmail.n",
-   "excerpts": [
-    {
-     "label": "대상",
-     "text": "서울시민(성인) ※등단작가 제외"
-    },
-    {
-     "label": "혜택",
-     "text": "총 19명 시상"
-    }
-   ],
-   "excerptsAt": "2026-10-04",
-   "school": "",
-   "campus": "",
-   "host": "서울문화포털 공모소식",
-   "foundAt": "2026-09-30",
-   "eligibilityLines": [
-    "□ 참가 자격",
-    "·참가자격: 서울시민(성인) ※등단작가 제외",
-    "- 전년도 대상 수상자 제외",
-    "- 기성작가는 참가 불가"
-   ],
-   "noticeLines": [
-    "·원고접수기간 2026년 7월6일(월) ~ 8월3일(월)"
-   ],
-   "detailsV": 3
-  },
-  {
-   "title": "[서울문화재단] 청년예술 교류 프로그램 '미니 쇼케이스' 참여 청년예술인 공개모집",
-   "url": "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16282&menuNo=200118&pageIndex=2",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "1._&#039;미니_쇼케이스_릴레이&#039;_참여신청서(양식).hwpx [63,596byte]",
-     "url": "https://culture.seoul.go.kr/culture/cmmn/file/fileDown.do?menuNo=200118&atchFileId=02259432cbe94e279d8dfeac0cf1dd3a&fileSn=1&bbsId="
-    }
-   ],
-   "deadlineHint": null,
-   "field": "해외·교류",
-   "excerptsAt": "2026-10-04",
-   "school": "",
-   "campus": "",
-   "host": "서울문화포털 공모소식",
-   "foundAt": "2026-09-30",
-   "detailsV": 3
-  },
-  {
-   "title": "[종로문화재단] 제2회 전국 윤동주미디어공모전 참여자 모집",
-   "url": "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16323&menuNo=200118&pageIndex=2",
-   "kind": "공모전",
-   "attachments": [
-    {
-     "name": "제2회 전국 윤동주미디어공모전 참가신청서.hwp [58,880byte]",
-     "url": "https://culture.seoul.go.kr/culture/cmmn/file/fileDown.do?menuNo=200118&atchFileId=3fe72d67761b439f91b00b235ab5eb57&fileSn=1&bbsId="
-    }
-   ],
-   "deadlineHint": null,
-   "excerptsAt": "2026-10-04",
-   "school": "",
-   "campus": "",
-   "host": "서울문화포털 공모소식",
-   "foundAt": "2026-09-30",
-   "detailsV": 3
-  },
-  {
-   "title": "[종로문화재단] 제12회 전국 윤동주창작음악제 참여자 모집",
-   "url": "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16322&menuNo=200118&pageIndex=2",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "(붙임1)제12회 전국 윤동주창작음악제 참가신청서.hwp [71,168byte]",
-     "url": "https://culture.seoul.go.kr/culture/cmmn/file/fileDown.do?menuNo=200118&atchFileId=cb9dbd59f18e44f291359d6a612f7cf8&fileSn=1&bbsId="
-    },
-    {
-     "name": "(붙임2)제12회 전국 윤동주창작음악제 안내사항.hwp [235,520byte]",
-     "url": "https://culture.seoul.go.kr/culture/cmmn/file/fileDown.do?menuNo=200118&atchFileId=cb9dbd59f18e44f291359d6a612f7cf8&fileSn=2&bbsId="
-    }
-   ],
-   "deadlineHint": null,
-   "excerptsAt": "2026-10-04",
-   "school": "",
-   "campus": "",
-   "host": "서울문화포털 공모소식",
-   "foundAt": "2026-09-30",
-   "detailsV": 3
-  },
-  {
-   "title": "[종로문화재단] 제13회 전국 초·중생 윤동주시화공모전 참여자 모집",
-   "url": "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16321&menuNo=200118&pageIndex=2",
-   "kind": "공모전",
-   "attachments": [
-    {
-     "name": "제13회 전국 초중생 윤동주시화공모전 참가신청서.hwp [61,440byte]",
-     "url": "https://culture.seoul.go.kr/culture/cmmn/file/fileDown.do?menuNo=200118&atchFileId=1d80892975314c9996aea0a47f50c81e&fileSn=1&bbsId="
-    }
-   ],
-   "deadlineHint": null,
-   "excerptsAt": "2026-10-04",
-   "school": "",
-   "campus": "",
-   "host": "서울문화포털 공모소식",
-   "foundAt": "2026-09-30",
-   "detailsV": 3,
-   "eligibilityLines": [
-    "및중학교 재학생",
-    "후원:국가보훈부, 서울특별시(예정),한국문학관협회"
-   ],
-   "eligibilityFrom": "공고문 첨부(OCR)"
-  },
-  {
-   "title": "[동대문문화재단] 2026 동대문페스티벌 시민기획단 모집공고",
-   "url": "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16233&menuNo=200118&pageIndex=3",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "붙임. 2026동대문페스티벌 시민기획단 참가신청서(양식).hwp [67,072byte]",
-     "url": "https://culture.seoul.go.kr/culture/cmmn/file/fileDown.do?menuNo=200118&atchFileId=d965afd47c2642ea94156495f5780809&fileSn=1&bbsId="
-    }
-   ],
-   "deadlineHint": null,
-   "excerptsAt": "2026-10-04",
-   "school": "",
-   "campus": "",
-   "host": "서울문화포털 공모소식",
-   "foundAt": "2026-09-30",
-   "detailsV": 3
-  },
-  {
-   "title": "[서울문화재단] 2026년 서울청년문화패스 서포터즈 3기 '서청팬' 모집",
-   "url": "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16211&menuNo=200118&pageIndex=3",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": null,
-   "field": "서포터즈·기자단",
-   "excerptsAt": "2026-10-04",
-   "school": "",
-   "campus": "",
-   "host": "서울문화포털 공모소식",
-   "foundAt": "2026-09-30",
-   "detailsV": 3
-  },
-  {
-   "title": "[영등포문화재단] 영등포문화도시센터 2026 도시수변 디자이너 [오늘의 수변생활] 참여자 모집",
-   "url": "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16195&menuNo=200118&pageIndex=3",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "붙임1 모집공고문.pdf [183,824byte]",
-     "url": "https://culture.seoul.go.kr/culture/cmmn/file/fileDown.do?menuNo=200118&atchFileId=ebc17bc5561e4aa9bd3ed0abd0a3e13f&fileSn=1&bbsId="
-    },
-    {
-     "name": "붙임2 지원신청서.hwp [83,456byte]",
-     "url": "https://culture.seoul.go.kr/culture/cmmn/file/fileDown.do?menuNo=200118&atchFileId=ebc17bc5561e4aa9bd3ed0abd0a3e13f&fileSn=2&bbsId="
-    }
-   ],
-   "deadlineHint": null,
-   "excerptsAt": "2026-10-04",
-   "school": "",
-   "campus": "",
-   "host": "서울문화포털 공모소식",
-   "foundAt": "2026-09-30",
-   "detailsV": 3
-  },
-  {
-   "title": "[서울문화재단] 2026 서울문화예술교육센터 서초 정기대관② 3분기 공모 안내",
-   "url": "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16190&menuNo=200118&pageIndex=3",
-   "kind": "공모전",
-   "attachments": [
-    {
-     "name": "붙임1_공고문_예술교육센터_서초_정기대관2_3분기.pdf [162,977byte]",
-     "url": "https://culture.seoul.go.kr/culture/cmmn/file/fileDown.do?menuNo=200118&atchFileId=8644280b14b1435ab679473b1473ea2f&fileSn=1&bbsId="
-    },
-    {
-     "name": "붙임2._대관신청서_일반공간.hwp [34,304byte]",
-     "url": "https://culture.seoul.go.kr/culture/cmmn/file/fileDown.do?menuNo=200118&atchFileId=8644280b14b1435ab679473b1473ea2f&fileSn=2&bbsId="
-    }
-   ],
-   "deadlineHint": "접수기간: 2026.05.22.(금) 11:00 ~&nbsp; 6. 2.(화) 17:00 *시스템 접수분에 한함 &bull; 사용기간: 2026",
-   "deadline": "2026-06-02",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026.05.22.(금) 11:00 ~ 6. 2.(화) 17:00 *시스템 접수분에 한함"
-    }
-   ],
-   "excerptsAt": "2026-10-04",
-   "school": "",
-   "campus": "",
-   "host": "서울문화포털 공모소식",
-   "foundAt": "2026-09-30",
-   "noticeLines": [
-    "• 접수기간: 2026.05.22.(금) 11:00 ~ 6."
-   ],
-   "detailsV": 3
   }
  ],
  "fields": {

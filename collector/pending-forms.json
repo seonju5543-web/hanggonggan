@@ -1173,6 +1173,30 @@
    "added": "2026-10-08",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-pnoticedoarticleno367311",
+   "name": "[학부]2026학년도 2학기 재단법인 송화 장학금 신청 안내",
+   "target": "2026학년도 2학기 재단법인 송화 장학금 신청 안내",
+   "added": "2026-10-08",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-leno276604srcategoryid22",
+   "name": "[학생지원팀] 2026년 2학기 전남인재육성 장학생 선발 안내",
+   "target": "2026년 2학기 전남인재육성 장학생 선발 안내",
+   "added": "2026-10-08",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-leno276603srcategoryid22",
+   "name": "[학생지원팀] 2026년 2학기 한국선원복지고용센터 선원가족장학생 선발 안내",
+   "target": "2026년 2학기 한국선원복지고용센터 선원가족장학생 선",
+   "added": "2026-10-08",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }
