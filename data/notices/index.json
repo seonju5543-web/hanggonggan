@@ -3,6 +3,10 @@
  "updatedAt": "2026-10-08",
  "schools": 42,
  "files": {
+  "중앙대학교": {
+   "file": "n1iz3lr8.json",
+   "count": 20
+  },
   "아주대학교": {
    "file": "n16dvfry.json",
    "count": 21
@@ -18,10 +22,6 @@
   "전남대학교": {
    "file": "nwqmwga.json",
    "count": 7
-  },
-  "중앙대학교": {
-   "file": "n1iz3lr8.json",
-   "count": 20
   },
   "가천대학교": {
    "file": "nzzc8bm.json",
