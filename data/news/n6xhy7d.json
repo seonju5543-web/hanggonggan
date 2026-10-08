@@ -1,7 +1,25 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-10-07",
+ "updatedAt": "2026-10-08",
  "items": [
+  {
+   "title": "[학사] 2026학년도 2학기 중간고사 일정 및 시행 지침 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53449&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-08",
+   "kind": "학사",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-08"
+  },
+  {
+   "title": "[일반] 기간제 계약직원 채용 공고(전자정보공과대학 전자공학과)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53448&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-08",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-08"
+  },
   {
    "title": "[국제학생] 2027학년도 1학기 학부 외국인 신·편입생 1차 모집 필기고사 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53447&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -344,25 +362,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/4a6cb3dd9c8212c8.webp"
-  },
-  {
-   "title": "[국제학생] 2026 외국인 유학생 취업컨설팅 참여 안내(취업·비자 match-up day)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53343&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-15",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/c4e25facb502d43e.webp"
-  },
-  {
-   "title": "[학생] 2027학년도 일학습병행 학생 설명회",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53328&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-14",
-   "kind": "행사",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/b0c93c4c7d7f3328.webp"
   }
  ]
 }

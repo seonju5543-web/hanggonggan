@@ -1,7 +1,25 @@
 {
  "school": "명지대학교",
- "updatedAt": "2026-10-07",
+ "updatedAt": "2026-10-08",
  "items": [
+  {
+   "title": "[ 일반공지 ] 2027-1학기 명지대학교 전임교원 초빙 공고",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/141/236159/artclView.do",
+   "postedAt": "2026-10-08",
+   "kind": "채용",
+   "school": "명지대학교",
+   "campus": "",
+   "foundAt": "2026-10-08"
+  },
+  {
+   "title": "[인문캠퍼스] 2026-2학기 『천원의 아침밥』 행사 안내",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/141/236158/artclView.do",
+   "postedAt": "2026-10-08",
+   "kind": "행사",
+   "school": "명지대학교",
+   "campus": "",
+   "foundAt": "2026-10-08"
+  },
   {
    "title": "[제약바이오융합 특성화사업단] 2026학년도 융합전공 학생설명회 참여 신청 안내",
    "url": "https://www.mju.ac.kr/bbs/mjukr/141/236107/artclView.do",
@@ -142,16 +160,6 @@
    "school": "명지대학교",
    "campus": "",
    "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[인문캠퍼스] 2026-2학기 『천원의 아침밥』 행사 안내",
-   "url": "https://www.mju.ac.kr/bbs/mjukr/141/235827/artclView.do",
-   "postedAt": "2026-09-29",
-   "kind": "행사",
-   "school": "명지대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/120ded9940e62996.webp"
   },
   {
    "title": "[사회과학대학 교학팀] 계약직(인턴사무원)채용 공고",

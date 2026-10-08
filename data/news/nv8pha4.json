@@ -1,7 +1,17 @@
 {
  "school": "홍익대학교",
- "updatedAt": "2026-10-07",
+ "updatedAt": "2026-10-08",
  "items": [
+  {
+   "title": "[문정도서관] 교내 정전에 따른 도서관 임시 휴관 및 무인반납기 운영 중지 안내 (10/23~10/26)",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159015&noCat=32",
+   "postedAt": "2026-10-07",
+   "kind": "생활",
+   "school": "홍익대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/c7806f760bb84dc6.webp"
+  },
   {
    "title": "[HUSS 국제화프로그램(중국 시안)] 「뮤지엄 리믹스: 서울 X 시안 -문화유산의 디지털 전환과 콘텐츠 비즈니스」 추가선발(~10.08)",
    "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159000&noCat=514",

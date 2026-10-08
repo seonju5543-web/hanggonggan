@@ -1,7 +1,37 @@
 {
  "school": "서울시립대학교",
- "updatedAt": "2026-10-07",
+ "updatedAt": "2026-10-08",
  "items": [
+  {
+   "title": "[중앙도서관] 2026년 2학기 중간고사 대비 자유열람실 이용 안내 (10.08.(목)~10.26(월))",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31612&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-10-08",
+   "postId": "31612",
+   "kind": "학사",
+   "school": "서울시립대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/bf4bebe6ff29d412.webp"
+  },
+  {
+   "title": "2026년도 종로 가족사랑 어울림 한마당",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31609&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-10-08",
+   "postId": "31609",
+   "school": "서울시립대학교",
+   "campus": "",
+   "foundAt": "2026-10-08"
+  },
+  {
+   "title": "교내 드라마 촬영 안내(10/9 금, 10/10 토)",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31606&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-10-08",
+   "postId": "31606",
+   "school": "서울시립대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/551385837640c4e7.webp"
+  },
   {
    "title": "[교수학습개발센터] K-MOOC 홍보 간식차 행사 : 잘 뭌고 다니니",
    "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31603&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
