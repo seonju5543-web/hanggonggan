@@ -3,6 +3,33 @@
  "updatedAt": "2026-10-08",
  "items": [
   {
+   "title": "[입학에서 취업까지] [정치외교학전공] 경기도 일자리재단 2026 고용노동부 미래내일일경험지원사업",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626492&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-08",
+   "school": "경기대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/69e6e1b58ce5e57a.webp"
+  },
+  {
+   "title": "[일반] 2026년 정신건강의 날 기념 「마음이 웃는 순간」 캠페인 협조 요청",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626488&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-08",
+   "school": "경기대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/a86810fce36a1fbf.webp"
+  },
+  {
+   "title": "[수강에서 성적까지] 전설세 6주차 직무 Festival 관련 세부 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626486&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-08",
+   "kind": "학사",
+   "school": "경기대학교",
+   "campus": "",
+   "foundAt": "2026-10-08"
+  },
+  {
    "title": "[대학생활/업무안내] [건강증진센터]의료관련감염을 미리 예방하는 습관을 가져요!",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626471&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
    "postedAt": "2026-10-07",
@@ -320,34 +347,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/973c91f3225f1daa.webp"
-  },
-  {
-   "title": "[대학생활/업무안내] 융합컨텐츠디자인연구소 명칭 변경 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626329&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-01",
-   "school": "경기대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[수강에서 성적까지] 2026학년도 2학기 「인권과 성평등교육」 필수 이수 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626324&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-01",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/507e5ee3bb1d8178.webp"
-  },
-  {
-   "title": "[수강에서 성적까지] [창의공학부] 6주차 현직자와 함께하는 직무 Festival 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626310&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-09-30",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/8bc49cdf739ae0ff.webp"
   }
  ]
 }

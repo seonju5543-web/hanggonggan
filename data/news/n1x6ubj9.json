@@ -3,6 +3,33 @@
  "updatedAt": "2026-10-08",
  "items": [
   {
+   "title": "성균관대학교 문화예술미디어융합원 촉탁직원(연구원) 채용 공고",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140466&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-08",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-08"
+  },
+  {
+   "title": "대학원혁신센터 촉탁직원 채용 공고(BK대학원혁신사업)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140468&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-08",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-08"
+  },
+  {
+   "title": "[교수학습혁신센터] 제2회 AI in Higher Education 컨퍼런스 참여 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140459&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-08",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/13f36cc135018b60.webp"
+  },
+  {
    "title": "스웨덴 왕립과학한림원 원장 특별 강연 안내 (10/30(금) 14:00)",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140407&article.offset=0&articleLimit=10",
    "postedAt": "2026-10-07",
@@ -334,32 +361,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/1b32aca2c246744b.webp"
-  },
-  {
-   "title": "성균관대학교 경기도 중장년 일자리 캠퍼스 행정 전담 인력 채용",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140179&article.offset=0&articleLimit=10",
-   "postedAt": "2026-09-28",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "2026년 대학안전관리계획",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140158&article.offset=0&articleLimit=10",
-   "postedAt": "2026-09-23",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[도서 증정 이벤트(~10/11)] 물리학과 한정훈 교수님의 <양자문명> 북토크 영상 시청하고 도서 선물 받자!",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140137&article.offset=0&articleLimit=10",
-   "postedAt": "2026-09-23",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/92d0f9ea8a7a12ec.webp"
   }
  ]
 }

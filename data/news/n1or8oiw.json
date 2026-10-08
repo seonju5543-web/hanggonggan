@@ -3,6 +3,37 @@
  "updatedAt": "2026-10-08",
  "items": [
   {
+   "title": "[교수학습혁신센터] 2026 XR활용 학습역량 강화 체험 프로그램 신청자 모집",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766539",
+   "postedAt": "2026-10-08",
+   "postId": "26766539",
+   "kind": "채용",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/bd8bc373573ef216.webp"
+  },
+  {
+   "title": "[창업기술본부] 2026 XR 활용 MVP 제작 실습 (신청접수 : ~10.15.(목) 23:59까지)",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766523",
+   "postedAt": "2026-10-08",
+   "postId": "26766523",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/06720f8a1cb02c65.webp"
+  },
+  {
+   "title": "[교수학습혁신센터] 2026-2학기 동국 튜터링 튜티 모집",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766522",
+   "postedAt": "2026-10-08",
+   "postId": "26766522",
+   "kind": "채용",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-08"
+  },
+  {
    "title": "[취업팀] 실전 모의면접 컨설팅 - 나의 유형별 면접 완벽 마스터(마이성공스피치) [신청 ~ 10/12(월) 17시]",
    "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766508",
    "postedAt": "2026-10-07",
@@ -97,26 +128,6 @@
    "foundAt": "2026-10-01",
    "postId": "26766435",
    "thumb": "data/news/img/c5ab107347458cf5.webp"
-  },
-  {
-   "title": "[교수학습혁신센터] 2026 XR활용 학습역량 강화 체험 프로그램 신청자 모집",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766418",
-   "postedAt": "2026-09-29",
-   "kind": "채용",
-   "school": "동국대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/847ae3907220df00.webp"
-  },
-  {
-   "title": "[교수학습혁신센터] 2026-2학기 동국 튜터링 튜티 모집",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766417",
-   "postedAt": "2026-09-29",
-   "kind": "채용",
-   "school": "동국대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/9d7d38c548e9958b.webp"
   }
  ]
 }

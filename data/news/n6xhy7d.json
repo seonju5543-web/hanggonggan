@@ -3,6 +3,24 @@
  "updatedAt": "2026-10-08",
  "items": [
   {
+   "title": "[일반] [서울특별시여성가족재단] 서울 디지털성범죄 안심지원센터 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53454&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-08",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/5d2235b657bb5b41.webp"
+  },
+  {
+   "title": "[일반] [서울특별시] 2026년 하반기 동행안심벨(구 안심헬프미) 지원사업 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53453&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-08",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/4ecff66abf641214.webp"
+  },
+  {
    "title": "[학사] 2026학년도 2학기 중간고사 일정 및 시행 지침 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53449&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "postedAt": "2026-10-08",
@@ -345,23 +363,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/3154cb370bc83df3.webp"
-  },
-  {
-   "title": "[국제학생] 2027학년도 1학기 학부 외국인 신·편입생 모집 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53370&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-18",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[국제학생] 2026 IFWY 은평 컨퍼런스 참여 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53355&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-17",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/4a6cb3dd9c8212c8.webp"
   }
  ]
 }
