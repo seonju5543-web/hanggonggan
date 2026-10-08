@@ -9273,6 +9273,18 @@
     {
      "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp (다운로드 : 19회)",
      "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=ca127512499eb0e0ba00b24b184d8221&bbsId=1083"
+    },
+    {
+     "name": "[공문] 2026년 우양재단 동행 장학 모집 협조 요청.hwp (다운로드 : 20회)",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=0c6797a234b08b8ba908c89f3f55b111&bbsId=1083"
+    },
+    {
+     "name": "[붙임1] 2026년 동행장학 홍보 포스터.jpg (다운로드 : 21회)",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=29df0f5abb5a9a6114328315d3bcc08b&bbsId=1083"
+    },
+    {
+     "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp (다운로드 : 21회)",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=ca127512499eb0e0ba00b24b184d8221&bbsId=1083"
     }
    ],
    "sourceUrl": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=55323",
@@ -12746,6 +12758,11 @@
     {
      "name": "2026년 (재)순천시인재육성장학회 장학생 모집 공고.pdf",
      "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276606&attachNo=226399"
+    },
+    {
+     "name": "본문이미지-511x348.png",
+     "url": "https://www.catholic.ac.kr/_res/cuk/ko/img/main/cuk_webmark.png",
+     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276606&article.offset=0&articleLimit=10&srCategoryId=22",
@@ -12886,6 +12903,20 @@
     {
      "name": "2026년 2학기 선원가족장학사업 신청서.pdf",
      "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276603&attachNo=226395"
+    },
+    {
+     "name": "2026년 2학기 선원가족장학사업 선발요강.pdf",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276603&attachNo=226393"
+    },
+    {
+     "name": "본문이미지-1192x808.png",
+     "url": "https://www.catholic.ac.kr/_attach/cuk/editor-image/2026/10/JucRUSgZNqbVNwtxXYfabmnrHG.png",
+     "bodyImage": true
+    },
+    {
+     "name": "본문이미지-511x348.png",
+     "url": "https://www.catholic.ac.kr/_res/cuk/ko/img/main/cuk_webmark.png",
+     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276603&article.offset=0&articleLimit=10&srCategoryId=22",
@@ -12927,7 +12958,13 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-08 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "본문이미지-1002x551.png",
+     "url": "https://www.dongguk.edu/resources/images/site/main/120emblem.png",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766521",
    "sourceKind": "auto",
    "excerpts": [

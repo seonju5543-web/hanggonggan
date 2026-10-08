@@ -407,38 +407,6 @@
   "at": "2026-10-06",
   "tries": 1
  },
- "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16320&menuNo=200118&pageIndex=2": {
-  "at": "2026-10-06",
-  "tries": 1
- },
- "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16282&menuNo=200118&pageIndex=2": {
-  "at": "2026-10-06",
-  "tries": 1
- },
- "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16323&menuNo=200118&pageIndex=2": {
-  "at": "2026-10-06",
-  "tries": 1
- },
- "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16322&menuNo=200118&pageIndex=2": {
-  "at": "2026-10-06",
-  "tries": 1
- },
- "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16233&menuNo=200118&pageIndex=3": {
-  "at": "2026-10-06",
-  "tries": 1
- },
- "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16211&menuNo=200118&pageIndex=3": {
-  "at": "2026-10-06",
-  "tries": 1
- },
- "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16195&menuNo=200118&pageIndex=3": {
-  "at": "2026-10-06",
-  "tries": 1
- },
- "https://culture.seoul.go.kr/culture/bbs/B0000014/view.do?nttId=16190&menuNo=200118&pageIndex=3": {
-  "at": "2026-10-06",
-  "tries": 1
- },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3527998": {
   "at": "2026-10-06",
   "tries": 1,
@@ -479,6 +447,52 @@
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=48133&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-07",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3532134": {
+  "at": "2026-10-08",
+  "tries": 1,
+  "lines": [
+   "신청대상 : 성인",
+   "봉사기간",
+   "신청대상 : 성인·청소년"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3531938": {
+  "at": "2026-10-08",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3527764": {
+  "at": "2026-10-08",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/268742/artclView.do": {
+  "at": "2026-10-08",
+  "tries": 1,
+  "lines": [
+   "공모대상 국내 소재 대학교",
+   "재·휴학생으로 구성된 2~3인 팀",
+   "정책-기술",
+   "공모일정 접수기간 9.28.(월)-10.25.(일)",
+   "공모전 예선결과"
+  ],
+  "excludes": [],
+  "from": "공고문 첨부(OCR)"
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/268735/artclView.do": {
+  "at": "2026-10-08",
   "tries": 1
  }
 }
