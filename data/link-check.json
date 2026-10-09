@@ -1,26 +1,30 @@
 {
- "updatedAt": "2026-10-08T17:17:51.962Z",
+ "updatedAt": "2026-10-09T16:56:50.838Z",
  "v": 1,
  "bad": {
   "https://2026grchallenge.com/": {
    "v": "login",
-   "at": "2026-10-05"
+   "at": "2026-10-10"
   },
   "https://blog.naver.com/mopaspr/224399694473?trackingCode=blog_bloghome_searchlist": {
    "v": "other",
-   "at": "2026-10-07"
+   "at": "2026-10-10"
   },
   "https://maicon.kr/": {
    "v": "home",
-   "at": "2026-10-05"
+   "at": "2026-10-10"
   },
   "https://naraport.mof.go.kr/info/contest/contestIntroduce.do?subMenu1Nm=%EA%B3%B5%EB%AA%A8%EC%A0%84": {
    "v": "other",
-   "at": "2026-10-05"
+   "at": "2026-10-10"
   },
   "https://www.fishway.go.kr/home/mainPage.do": {
    "v": "gone",
-   "at": "2026-10-05"
+   "at": "2026-10-10"
+  },
+  "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?bbs_cde=28&btin.bbs_cde=28&btin.doc_no=1338432&btin.appl_no=000000&btin.page=1&btin.search_type=&btin.search_text=&popupDeco=&btin.note_div=row&menu_idx=214": {
+   "v": "other",
+   "at": "2026-10-10"
   },
   "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626405&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888": {
    "v": "other",
@@ -28,35 +32,35 @@
   },
   "https://www.mofa.go.kr/www/brd/m_4075/view.do?seq=369441&page=1&pitem=10": {
    "v": "other",
-   "at": "2026-10-05"
+   "at": "2026-10-10"
   },
   "https://www.msit.go.kr/bbs/view.do?sCode=user&mId=307&mPid=208&bbsSeqNo=94&nttSeqNo=3187433": {
    "v": "other",
-   "at": "2026-10-05"
+   "at": "2026-10-10"
   },
   "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511394": {
    "v": "other",
-   "at": "2026-10-09"
+   "at": "2026-10-10"
   },
   "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000": {
    "v": "other",
-   "at": "2026-10-06"
+   "at": "2026-10-10"
   },
   "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=893444&article.offset=0&articleLimit=10": {
    "v": "gone",
-   "at": "2026-10-07"
+   "at": "2026-10-10"
   },
   "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=95279&article.offset=0&articleLimit=10": {
    "v": "other",
-   "at": "2026-10-06"
+   "at": "2026-10-10"
   },
   "https://www.usspc.or.kr/": {
    "v": "home",
-   "at": "2026-10-07"
+   "at": "2026-10-10"
   },
   "https://www.welchon.com/web/lay1/program/S1T31C447/eventNewView.do?menuIdx=&cIdx=evpr&bbsIdx=2214028": {
    "v": "login",
-   "at": "2026-10-05"
+   "at": "2026-10-10"
   }
  },
  "fix": {
@@ -66,6 +70,13 @@
    "src": "robot",
    "title": "2026년 전입장학금 지원 공고",
    "round": "2026-11-30"
+  },
+  "id:kosaf-2000429014": {
+   "url": "https://scholarship.eumseong.go.kr/www/selectBbsNttView.do?key=33&bbsNo=3&nttNo=838",
+   "at": "2026-10-10",
+   "src": "robot",
+   "title": "2026년 한국가스안전공사 지역상생 특별장학생 선발 공고",
+   "round": "2026-10-23"
   },
   "u:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD-%EB%B9%84%EA%B5%90%EA%B3%BC%5D%20%5BArTechne%5D%202026%20%EB%B9%84%EA%B5%90%EA%B3%BC%20%EB%A7%88%EC%9D%BC%EB%A6%AC%EC%A7%80%20%EC%9E%A5%ED%95%99%EC%A0%9C%EB%8F%84": {
    "url": "https://www.gachon.ac.kr/bbs/kor/743/125694/artclView.do",
