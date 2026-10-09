@@ -1,11 +1,11 @@
-## 🖥 브라우저형 수집 리포트 (2026-10-08 19:23 KST)
+## 🖥 브라우저형 수집 리포트 (2026-10-09 11:55 KST)
 
 ### 한국외국어대학교
   - 📄 2페이지에서 장학 공고 15건 더 읽음
 - ✅ 링크 169 · 장학 공고 18 · https://dep.hufs.ac.kr/student/12767/subview.do
 
 ### 경희대학교
-- ⚪ 링크 292 · 장학 공고 0 · 이미 아는 공고 8건은 다시 열지 않음 · https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318
+- ⚪ 링크 292 · 장학 공고 0 · 이미 아는 공고 7건은 다시 열지 않음 · https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318
 
 ### 서울대학교
 - ⛔ 응답이 멈춰 7분 30초에서 강제 중단 — 여기까지 채집한 공고만 저장합니다
@@ -14,7 +14,7 @@
   - 📄 2페이지에서 장학 공고 10건 더 읽음
 - ✅ 링크 59 · 장학 공고 20 · https://www.yonsei.ac.kr/bbs/sc/58/artclList.do?findClSeq=257
   - 📄 2페이지에서 장학 공고 11건 더 읽음
-- ✅ 링크 480 · 장학 공고 21 · https://www.yonsei.ac.kr/sc/254/subview.do?enc=Zm5jdDF8QEB8JTJGYmJzJTJGc2MlMkY1OCUyRmFydGNsTGlzdC5kbyUzRmZpbmRDbFNlcSUzRDI1NyUyNg%3D%3D
+- ✅ 링크 493 · 장학 공고 21 · https://www.yonsei.ac.kr/sc/254/subview.do?enc=Zm5jdDF8QEB8JTJGYmJzJTJGc2MlMkY1OCUyRmFydGNsTGlzdC5kbyUzRmZpbmRDbFNlcSUzRDI1NyUyNg%3D%3D
 
 ### 서강대학교
 - ⚪ 링크 199 · 장학 공고 0 · https://www.sogang.ac.kr/ko/scholarship-notice
@@ -28,10 +28,10 @@
   - (본 글자) [교외] 해동과학문화재단 장학생 선발 안내(10/26 마감, 공학계열, 생활비 연 1200만원)
   - (본 글자) [교외] 우양재단 동행장학생 선발 안내(10/18 마감, 생활비 최대 100만원)
   - (본 글자) [교외] 논산시장학회 장학생 선발 안내(10/30 마감, 생활비 150만원)
-  - (본 글자) [교외] 서초구 문주장학재단 주관 AI, ICT 분야 장학생 모집 안내(10/8 마감, 등록금 전액)
+  - (본 글자) [교외] 인송문화재단 장학생 선발 안내(10/9 마감, 생활비 200만원)
 
 ### 서울시립대학교
-- ⚪ 링크 116 · 장학 공고 0 · 이미 아는 공고 25건은 다시 열지 않음 · https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1
+- ⚪ 링크 4 · 장학 공고 0 · https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1
 
 ### 중앙대학교
 - ⚪ 링크 654 · 장학 공고 0 · 이미 아는 공고 13건은 다시 열지 않음 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5
@@ -54,9 +54,7 @@
   - (본 링크) 2026-2학기 사회봉사2 교과목 개편 안내
   - (본 링크) 2026-2학기 군 복무 중 대학 원격강좌 학점취득제도 안내
   - (본 링크) 2026-2학기 코드쉐어 교과목 수강신청 안내(추가)
-- ✅ 링크 420 · 장학 공고 2 · 이미 아는 공고 13건은 다시 열지 않음 · https://www.gachon.ac.kr/kor/7986/subview.do
-  - [수집] [장학공지] 2026년 하반기 (재)은평구민장학재단 장학생 선발계획 안내
-  - [수집] [장학공지] RE:2026학년도 2학기 하나금융나눔재단 하나장학생 선발결과 안내
+- ⚪ 링크 418 · 장학 공고 0 · 이미 아는 공고 15건은 다시 열지 않음 · https://www.gachon.ac.kr/kor/7986/subview.do
 - ⚪ 링크 320 · 장학 공고 0 · https://www.gachon.ac.kr/
   - (프레임 1개 · 클릭 시도 0건)
   - (본 링크) 2027년 전자자료 구독을 위한 설문조사 실시 ○ 조사 기간 : 10월14일(수)까지
@@ -67,22 +65,16 @@
   - (본 링크) 2011학번 특례편입생 졸업학점기준(별표 A)
 
 ### 동국대학교
-- ✅ 링크 618 · 장학 공고 4 · 이미 아는 공고 17건은 다시 열지 않음 · https://www.dongguk.edu/article/JANGHAKNOTICE/list
-  - [수집] 공지 공지 2026학년도 2학기 동진나눔복지재단 장학생 선발(~10/23(금)까지) 2026.10.08. 조회 126
-  - [수집] 2733 [홍보] 2026 하반기 은평구민장학재단 장학생 선발 2026.10.08. 조회 63
-  - [수집] 2732 2026학년도 2학기 동진나눔복지재단 장학생 선발(~10/23(금)까지) 2026.10.08. 조회 126
+- ✅ 링크 615 · 장학 공고 1 · 이미 아는 공고 20건은 다시 열지 않음 · https://www.dongguk.edu/article/JANGHAKNOTICE/list
 
 ### 상명대학교
-- ✅ 링크 601 · 장학 공고 4 · https://www.smu.ac.kr/kor/life/notice.do
-  - [수집] 2026년 하반기 은평구민 장학생 선발 안내
-- ✅ 링크 601 · 장학 공고 4 · https://www.smu.ac.kr/kor/life/notice.do?srCategoryId=8
+- ✅ 링크 575 · 장학 공고 3 · https://www.smu.ac.kr/kor/life/notice.do
+- ✅ 링크 575 · 장학 공고 3 · https://www.smu.ac.kr/kor/life/notice.do?srCategoryId=8
 - ⚪ 링크 0 · 장학 공고 0 · https://www.smu.ac.kr/kor/life/scholarship.do
 
 ### 고려대학교
   - 📄 2페이지에서 장학 공고 7건 더 읽음
-- ✅ 링크 770 · 장학 공고 4 · 이미 아는 공고 5건은 다시 열지 않음 · https://www.korea.ac.kr/ko/568/subview.do
-  - [수집] [교외-10/28]2026년도 하반기 은평구민장학재단 은평구민 장학생 선발 안내(재단지원)
-  - [수집] [교외-10/28]2026년도 하반기 은평구민장학재단 은평구민 장학생 선발 안내(재단지원)
+- ✅ 링크 769 · 장학 공고 3 · 이미 아는 공고 6건은 다시 열지 않음 · https://www.korea.ac.kr/ko/568/subview.do
 
 ### 계명대학교
 - ❌ 오류(page.goto: Target page, context or browser has been closed) · https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&
@@ -102,7 +94,7 @@
 - ✅ 링크 590 · 장학 공고 40 · https://www.seoultech.ac.kr/service/info/janghak/
 
 ### 건국대학교
-- ✅ 링크 440 · 장학 공고 24 · https://www.konkuk.ac.kr/konkuk/2239/subview.do
+- ✅ 링크 436 · 장학 공고 22 · https://www.konkuk.ac.kr/konkuk/2239/subview.do
 
 ### 명지대학교
 - ✅ 링크 417 · 장학 공고 10 · https://www.mju.ac.kr/mjukr/259/subview.do
@@ -113,18 +105,16 @@
 - ✅ 링크 1052 · 장학 공고 42 · https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&
 
 ---
-이번 실행 신규 수집: **8건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
+이번 실행 신규 수집: **0건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
 ⏱ 소요 8분 / 예산 22분 · 학교 19/19곳 처리
 ⛔ **응답이 멈춰 강제로 끊은 학교 1곳**: 서울대학교 — 학교 서버가 연결만 열어 두고 답을 주지 않아 7분 30초에서 끊었어요. 끊지 않으면 로봇이 그 자리에 멈춰 서고, 강제 종료되면서 **그날 수집분 전체가 버려집니다**(2026-08-15~17에 3회 연속 그렇게 됐어요). 다음 실행(약 12시간 뒤)에 다시 시도합니다.
 
 ⚠️ **이번 실행에 접속 실패한 학교: 서울대학교** — 학교 서버가 응답하지 않아 이번 회차만 건너뛰었어요. 다음 실행(약 12시간 뒤)에 자동으로 다시 수집합니다.
 **⏳ 스키마화 대기 중 97건** (원본 확보됨 — collector/pending-forms.json)
 
-### 🤖 자동 등록 (선조치후보고) — 1건 등록
+### 🤖 자동 등록 (선조치후보고) — 0건 등록
 
-자동 등록분은 앱에 **자동 등록 · 검수 전** 배지로 표시돼요. 잘못 등록된 건이 있으면 채팅으로 알려주시거나 `collector/auto-register-config.json`의 `blockIds`에 id를 넣어주세요.
-
-- `auto-ghaknoticedetail26766521` [2026학년도 2학기 동진나눔복지재단 장학생 선발(~10/23(금)까지)](https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766521) · 마감 2026-10-23 · 동국대학교
+이번 실행에서 자동 등록 기준(개별 실공고·미등록·마감 전)을 전부 통과한 공고가 없어요.
 
 **컨펌 대기 (자동 기준 미달 166건)** — 장학 신호는 있지만 선발·모집 신호가 약해요:
 - [공통][교외] 2027 대산농촌재단 대산장학생 모집 공고(~11/11) (2027년 이후 사업으로 보임 — 개발자 컨펌 대기)
@@ -138,13 +128,13 @@
 - [교외] 2027학년도 (재)아산사회복지재단 의생명과학분야 장학생 선발 안내 (2027년 이후 사업으로 보임 — 개발자 컨펌 대기)
 - [교외] 2027년 아산재단 북한이탈청소년장학생 선발 (2027년 이후 사업으로 보임 — 개발자 컨펌 대기)
 
-**거른 공고 390건 — 이유별**
+**거른 공고 391건 — 이유별**
 
-- 이미 등록(원문 동일) · 116건
+- 이미 등록(원문 동일) · 117건
 - 이미 등록(동일 사업) · 65건
 - 이미 전국(동일 사업) · 54건
-- 이미 등록(같은 id) · 20건
-- 마감 경과 · 19건
+- 마감 경과 · 20건
+- 이미 등록(같은 id) · 19건
 - 행정 안내(신청 공고 아님) · 17건
 - 학자금 대출·융자(장학금 아님) · 14건
 - 사람이 막아 둔 공고(blockIds/blockUrls) · 14건
