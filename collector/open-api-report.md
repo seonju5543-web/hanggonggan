@@ -83,6 +83,6 @@
     - 20260413005400212702 · 대학생 봉사활동 활성화 → https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56236 · 살핀 칸: refUrlAddr1=https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56236(2)
     - 20260407005400212532 · 이전공공기관 취업아카데미 운영 → https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56147 · 살핀 칸: refUrlAddr1=https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56147(2)
 
-data/activities.json — API 글 52 → **52건** (전체 199건)
+data/activities.json — API 글 50 → **52건** (전체 200건)
 
 > 열쇠·출처 설명: `collector/open-api.mjs` 머리말 · 바꾸는 규칙: `collector/open-api-map.mjs` · 설계: `docs/designs/external-sources.md` §10
