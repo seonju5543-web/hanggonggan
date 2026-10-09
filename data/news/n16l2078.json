@@ -1,6 +1,6 @@
 {
  "school": "충북대학교",
- "updatedAt": "2026-10-08",
+ "updatedAt": "2026-10-09",
  "items": [
   {
    "title": "2027 전기 외국인특별전형 대학(원) 원서접수 및 모집요강 안내 2027 Spring Admission Guide for Int'l Students",
@@ -60,7 +60,8 @@
    "kind": "학사",
    "school": "충북대학교",
    "campus": "",
-   "foundAt": "2026-10-08"
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/e4fa3a1ae8d7087a.webp"
   },
   {
    "title": "[충북대학교 대학원혁신부] BK21 뉴스레터 Vol.1(2026.10.)",

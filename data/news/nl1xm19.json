@@ -1,6 +1,6 @@
 {
  "school": "충남대학교",
- "updatedAt": "2026-10-08",
+ "updatedAt": "2026-10-09",
  "items": [
   {
    "title": "2026년 하반기 채용대비「면접 프로그램」안내",
@@ -19,7 +19,8 @@
    "kind": "학사",
    "school": "충남대학교",
    "campus": "",
-   "foundAt": "2026-10-07"
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/929a8dacb83f2f5a.webp"
   },
   {
    "title": "2026년 10월 인재개발원 진로·취업 프로그램 안내",

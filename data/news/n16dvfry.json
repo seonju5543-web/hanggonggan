@@ -1,7 +1,15 @@
 {
  "school": "아주대학교",
- "updatedAt": "2026-10-08",
+ "updatedAt": "2026-10-09",
  "items": [
+  {
+   "title": "[Remind] 2026학년도 2학기 🍚스타셰프의 레시피로 전하는 총장님의 A+ 응원🍚 (26.10.14)",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377281&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-09",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-09"
+  },
   {
    "title": "[일자리+센터] 2026년 10월 채용공고분석 특강 참여자 모집",
    "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377267&article.offset=0&articleLimit=10",
@@ -45,7 +53,8 @@
    "kind": "학사",
    "school": "아주대학교",
    "campus": "",
-   "foundAt": "2026-10-08"
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/6ac4d56ef6560050.webp"
   },
   {
    "title": "[교육혁신팀] 2027-1학기 학생설계전공(복수/부) 신청 안내 *재공지",
@@ -53,7 +62,8 @@
    "postedAt": "2026-10-08",
    "school": "아주대학교",
    "campus": "",
-   "foundAt": "2026-10-08"
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/265f9ca70fc5d0e3.webp"
   },
   {
    "title": "[긴급] IEEE 과다 다운로드에 따른 IP 차단 안내",
@@ -107,8 +117,7 @@
    "postedAt": "2026-10-07",
    "school": "아주대학교",
    "campus": "",
-   "foundAt": "2026-10-07",
-   "thumb": "data/news/img/cbe7e07da6358b15.webp"
+   "foundAt": "2026-10-07"
   },
   {
    "title": "[🔔당일안내] 「2026 제2회 Google-아주대학교 AI융합캡스톤디자인 대회」 최종 성과발표회 개최 안내",
@@ -117,7 +126,8 @@
    "kind": "행사",
    "school": "아주대학교",
    "campus": "",
-   "foundAt": "2026-10-07"
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/ab421f9bb475d131.webp"
   },
   {
    "title": "[아주강좌] 제574회 강연 안내",
@@ -302,8 +312,7 @@
    "postedAt": "2026-10-14",
    "school": "아주대학교",
    "campus": "",
-   "foundAt": "2026-10-02",
-   "thumb": "data/news/img/3cfb93f9dcf208d2.webp"
+   "foundAt": "2026-10-02"
   },
   {
    "title": "[아르바이트] 10월 10일(토) ~ 10월 11일(일) 제580회 토익 정기시험",
@@ -350,15 +359,6 @@
    "campus": "",
    "foundAt": "2026-10-02",
    "thumb": "data/news/img/f1f03636125c8dcc.webp"
-  },
-  {
-   "title": "[공지] [학부] 어학졸업인증(2027년 2월 졸업)을 위한 공인어학 성적 등록 및 제출 안내 (~2027.1.22)",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=374473&article.offset=0&articleLimit=10",
-   "postedAt": "2027-01-22",
-   "kind": "학사",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
   }
  ]
 }

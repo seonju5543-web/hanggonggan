@@ -1,7 +1,15 @@
 {
  "school": "계명대학교",
- "updatedAt": "2026-10-08",
+ "updatedAt": "2026-10-09",
  "items": [
+  {
+   "title": "26학년도 2학기 일대일 컨설팅 프로그램 안내",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271262&pageOrder=0&cmd=2&parm_bod_uid=270606&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-09-14",
+   "school": "계명대학교",
+   "campus": "",
+   "foundAt": "2026-10-09"
+  },
   {
    "title": "[학생상담센터]2026학년도 2학기 주제별 집단상담 안내",
    "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271262&pageOrder=0&cmd=2&parm_bod_uid=271262&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
@@ -121,14 +129,6 @@
    "title": "[학생성공센터] MOS 365 교육 학생 모집(온라인)",
    "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271262&pageOrder=0&cmd=2&parm_bod_uid=270665&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
    "postedAt": "2026-09-15",
-   "school": "계명대학교",
-   "campus": "",
-   "foundAt": "2026-10-08"
-  },
-  {
-   "title": "26학년도 2학기 일대일 컨설팅 프로그램 안내",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271246&pageOrder=0&cmd=2&parm_bod_uid=270606&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
-   "postedAt": "2026-09-14",
    "school": "계명대학교",
    "campus": "",
    "foundAt": "2026-10-08"
