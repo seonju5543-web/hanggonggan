@@ -3,20 +3,24 @@
  "updatedAt": "2026-10-09",
  "schools": 44,
  "files": {
-  "전남대학교": {
-   "file": "nwqmwga.json",
-   "count": 34
+  "서울시립대학교": {
+   "file": "n1au199v.json",
+   "count": 29
   },
   "아주대학교": {
    "file": "n16dvfry.json",
    "count": 40
   },
+  "계명대학교": {
+   "file": "n1nel147.json",
+   "count": 34
+  },
   "이화여자대학교": {
    "file": "n1tk2q9m.json",
    "count": 40
   },
-  "계명대학교": {
-   "file": "n1nel147.json",
+  "전남대학교": {
+   "file": "nwqmwga.json",
    "count": 34
   },
   "부산대학교": {
@@ -42,10 +46,6 @@
   "한국항공대학교": {
    "file": "n1as48ix.json",
    "count": 17
-  },
-  "서울시립대학교": {
-   "file": "n1au199v.json",
-   "count": 28
   },
   "한양대학교": {
    "file": "n1b3og5n.json",
