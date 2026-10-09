@@ -413,5 +413,13 @@
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3520457": {
   "at": "2026-10-09",
   "tries": 1
+ },
+ "https://www.korea.kr/briefing/actuallyView.do?newsId=148973265&pWise=sub&pWiseSub=C4": {
+  "at": "2026-10-09",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521470": {
+  "at": "2026-10-09",
+  "tries": 1
  }
 }
