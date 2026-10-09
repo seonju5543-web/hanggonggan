@@ -2660,6 +2660,78 @@
    "cards": 5,
    "dir": "insta/pub/2000158005",
    "at": "2026-10-09"
+  },
+  {
+   "status": "prepared",
+   "code": "2000423010",
+   "org": "(재)진천군장학회",
+   "name": "희망사다리 장학금",
+   "due": "2026-10-23",
+   "school": null,
+   "tplNo": 2,
+   "cards": 5,
+   "dir": "insta/pub/2000423010",
+   "at": "2026-10-09"
+  },
+  {
+   "status": "prepared",
+   "code": "2000433014",
+   "org": "공주시한마음장학회",
+   "name": "귀농귀촌인자녀장학생",
+   "due": "2026-10-23",
+   "school": null,
+   "tplNo": 1,
+   "cards": 5,
+   "dir": "insta/pub/2000433014",
+   "at": "2026-10-09"
+  },
+  {
+   "status": "prepared",
+   "code": "2000433009",
+   "org": "공주시한마음장학회",
+   "name": "다문화가정자녀장학생",
+   "due": "2026-10-23",
+   "school": null,
+   "tplNo": 3,
+   "cards": 5,
+   "dir": "insta/pub/2000433009",
+   "at": "2026-10-09"
+  },
+  {
+   "status": "prepared",
+   "code": "0626007",
+   "org": "순천시인재육성장학회",
+   "name": "희망드림장학금",
+   "due": "2026-10-23",
+   "school": null,
+   "tplNo": 1,
+   "cards": 5,
+   "dir": "insta/pub/0626007",
+   "at": "2026-10-09"
+  },
+  {
+   "status": "prepared",
+   "code": "2700563005",
+   "org": "재단법인 광주북구 장학회",
+   "name": "동행장학생(장애인)",
+   "due": "2026-10-23",
+   "school": null,
+   "tplNo": 4,
+   "cards": 5,
+   "dir": "insta/pub/2700563005",
+   "at": "2026-10-09"
+  },
+  {
+   "status": "prepared",
+   "code": "0872001",
+   "org": "옥한흠장학회",
+   "name": "장학생",
+   "due": "2026-11-09",
+   "school": null,
+   "tplNo": 2,
+   "cards": 5,
+   "dir": "insta/pub/0872001",
+   "at": "2026-10-09"
   }
  ]
 }
