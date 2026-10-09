@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
- "updatedAt": "2026-10-08",
- "count": 2170,
+ "updatedAt": "2026-10-09",
+ "count": 2169,
  "items": [
   {
    "title": "[공통][교외] 2027 대산농촌재단 대산장학생 모집 공고(~11/11)",
@@ -36562,15 +36562,6 @@
    "school": "조선대학교",
    "campus": "",
    "foundAt": "2026-08-10"
-  },
-  {
-   "title": "2026년 하반기 군산시 대학생 학자금 이자 지원사업 안내",
-   "url": "https://www.hongik.ac.kr/kr/education/notice-undergrad.do?mode=view&articleNo=154909&noCat=24",
-   "attachments": [],
-   "deadlineHint": "까지 기간연장) 2026.07.02 학사 [세종캠퍼스] 2025학년도 후기(2026년 8월) 졸업예정자 전공명",
-   "school": "홍익대학교",
-   "campus": "",
-   "foundAt": "2026-08-09"
   }
  ]
 }

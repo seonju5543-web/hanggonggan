@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-08",
+ "updatedAt": "2026-10-09",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -1199,11 +1199,6 @@
    "note": "수집 로봇이 찾은 공고를 검수해 등록했어요. 금액·마감·자격은 원문 공고가 정본이니 함께 확인하세요.",
    "noForm": "검수 완료 2026-07-30 — 원문 첨부에 채울 신청서 양식 없음(있으면 다음 수집이 스키마화)",
    "attachments": [
-    {
-     "name": "본문이미지-1002x551.png",
-     "url": "https://www.dongguk.edu/resources/images/site/main/120emblem.png",
-     "bodyImage": true
-    },
     {
      "name": "본문이미지-3368x4768.jpg",
      "url": "https://www.dongguk.edu/cmmn/fileView?path=/ckeditor//JANGHAKNOTICE&physical=1785389080224.jpg&contentType=image",
@@ -7750,11 +7745,6 @@
    "auto": true,
    "attachments": [
     {
-     "name": "본문이미지-1002x551.png",
-     "url": "https://www.dongguk.edu/resources/images/site/main/120emblem.png",
-     "bodyImage": true
-    },
-    {
      "name": "본문이미지-4646x6693.jpg",
      "url": "https://www.dongguk.edu/cmmn/fileView?path=/ckeditor//JANGHAKNOTICE&physical=1789631687711.jpg&contentType=image",
      "bodyImage": true
@@ -8956,11 +8946,6 @@
     {
      "name": "본문이미지-2399x3457.jpg",
      "url": "https://www.catholic.ac.kr/_attach/cuk/editor-image/2026/09/HWGClQYEjyFBrIPQUccVSbjkIb.jpg",
-     "bodyImage": true
-    },
-    {
-     "name": "본문이미지-511x348.png",
-     "url": "https://www.catholic.ac.kr/_res/cuk/ko/img/main/cuk_webmark.png",
      "bodyImage": true
     }
    ],
@@ -12770,11 +12755,6 @@
     {
      "name": "2026년 (재)순천시인재육성장학회 장학생 모집 공고.pdf",
      "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276606&attachNo=226399"
-    },
-    {
-     "name": "본문이미지-511x348.png",
-     "url": "https://www.catholic.ac.kr/_res/cuk/ko/img/main/cuk_webmark.png",
-     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276606&article.offset=0&articleLimit=10&srCategoryId=22",
@@ -12924,11 +12904,6 @@
      "name": "본문이미지-1192x808.png",
      "url": "https://www.catholic.ac.kr/_attach/cuk/editor-image/2026/10/JucRUSgZNqbVNwtxXYfabmnrHG.png",
      "bodyImage": true
-    },
-    {
-     "name": "본문이미지-511x348.png",
-     "url": "https://www.catholic.ac.kr/_res/cuk/ko/img/main/cuk_webmark.png",
-     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276603&article.offset=0&articleLimit=10&srCategoryId=22",
@@ -12940,7 +12915,16 @@
      "id": "notice:https://www.sogang.ac.kr/ko/detail/550981?bbsconfigfk=141&namepage=ScholarshipNotice"
     }
    ],
-   "scopeFrom": "같은 사업이 서강대학교 게시판에도 올라옴(자동) — 서강대학교 게시판 https://www.sogang.ac.kr/ko/detail/550981?bbsConfigFk=141&namepage=ScholarshipNotice"
+   "scopeFrom": "같은 사업이 서강대학교 게시판에도 올라옴(자동) — 서강대학교 게시판 https://www.sogang.ac.kr/ko/detail/550981?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "eligibilityLines": [
+    "： - 유상교육대상자: 성적무관",
+    "대 학 생 |직전학기 성적 평균 2.0이상",
+    "○ 학비(수업료)를 면제 받는 경우",
+    "○ 고등학생 : 연간 120만원 이상 사내 학자금 및 타 기관 장학금을 지원받는 경우",
+    "o 대 학 생 : 1학기 등록금 범위를 조과하여 사내 학자금 및 타 기관 장학금을 지원 받는 경우",
+    "○ 선원법(제3조) 적용 제외 선박"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)"
   },
   {
    "id": "auto-ghaknoticedetail26766521",
@@ -12970,13 +12954,7 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-08 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [
-    {
-     "name": "본문이미지-1002x551.png",
-     "url": "https://www.dongguk.edu/resources/images/site/main/120emblem.png",
-     "bodyImage": true
-    }
-   ],
+   "attachments": [],
    "sourceUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766521",
    "sourceKind": "auto",
    "excerpts": [
