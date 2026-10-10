@@ -5486,10 +5486,10 @@ function renderSaved() {
   const el = $('#my-saved');
   if (!el) return;
   const list = savedScholarships();
-  { const sub = $('#my-sub-saved'); if (sub) { const n = list.filter((s) => s.deadline && dday(s.deadline).days >= 0 && dday(s.deadline).days <= CAL_SOON_DAYS).length; sub.textContent = list.length ? `저장 ${list.length}건${n ? ` · 마감 임박 ${n}건` : ''}` : '담아 둔 공고가 없어요'; } }
+  { const sub = $('#my-sub-saved'); if (sub) { const n = list.filter((s) => s.deadline && dday(s.deadline).days >= 0 && dday(s.deadline).days <= CAL_SOON_DAYS).length; sub.textContent = list.length ? `${list.length}개${n ? ` · 이번 주 마감 ${n}개` : ''}` : '비어 있음'; } }
   if (!list.length) {
     el.innerHTML = (`
-      <p class="empty">아직 담아 둔 장학금이 없어요<br /><span class="empty-sub">공고 카드의 북마크를 누르면 여기에 모여요</span></p><button class="btn btn-ghost btn-empty" data-go="explore">장학금 둘러보기</button>`);
+      <p class="empty">저장한 공고가 없어요<br /><span class="empty-sub">공고에서 북마크를 누르면 여기 모여요</span></p><button class="btn btn-ghost btn-empty" data-go="explore">장학금 둘러보기</button>`);
     return;
   }
   const open = list.filter((s) => s.deadline && dday(s.deadline).days >= 0)
@@ -5500,17 +5500,15 @@ function renderSaved() {
   const soon = open.filter((s) => dday(s.deadline).days <= CAL_SOON_DAYS).length;
 
   el.innerHTML = (`
-    ${open.length ? `<h5 class="cal-sec">마감이 다가오는 순</h5>${open.map((s) => calRowHtml(s, { save: true })).join('')}` : ''}
+    ${open.length ? `<h5 class="cal-sec">마감 순</h5>${open.map((s) => calRowHtml(s, { save: true })).join('')}` : ''}
     ${/* 🔴 날짜를 못 읽은 공고를 **숨기지 않는다** — 달력에는 찍을 수 없어 사라지는데,
          사라지면 학생은 그 공고가 없는 줄 안다. 여기가 그 자리다. */ ''}
     ${/* 🔴 '날짜를 아직 읽지 못한' → '기한은 원문에서 확인' (2026-09-17 개발자 지시).
          앞은 우리가 못 한 일이고 뒤는 학생이 할 일이다. 건수는 관리자 '마감일 없음'이 센다. */ ''}
-    ${undated.length ? `<h5 class="cal-sec">기한을 원문에서 확인할 공고 ${undated.length}건</h5>
-      <p class="cal-note">접수 기간이 공고 원문에만 있어요. 원문을 열어 확인해 주세요.</p>
+    ${undated.length ? `<h5 class="cal-sec">마감일 확인 필요 ${undated.length}개</h5>
       ${undated.map((s) => calRowHtml(s, { save: true })).join('')}` : ''}
     ${closed.length ? `<details class="cal-kosaf">
         <summary>이미 마감된 저장 공고 ${closed.length}건</summary>
-        <p class="cal-note">지우지 않고 둡니다 — 내년에 다시 열리는 공고가 많아요.</p>
         ${closed.map((s) => calRowHtml(s, { badge: false, save: true })).join('')}
       </details>` : ''}`);
 }
@@ -5791,7 +5789,7 @@ function learnedHtml(c) {
   const rows = LEARNED_COMMON.filter(([k]) => c[k]);
   if (!rows.length) return '';
   return `<div class="my-learned">
-    <p class="my-learned-head">신청서에서 배운 정보 <span>${rows.length}개 · 이 기기에만 저장</span></p>
+    <p class="my-learned-head">신청서에서 가져온 정보 <span>${rows.length}개</span></p>
     <ul>${rows.map(([k, label]) => `<li><span>${esc(label)}</span><strong>${esc(k === 'rrn' ? maskRrn(c[k]) : c[k])}</strong>
       <button type="button" class="btn-link" data-forget="${k}">지우기</button></li>`).join('')}</ul>
   </div>`;
@@ -5879,11 +5877,12 @@ function renderMyMenu(p, trackLabel) {
     head.innerHTML = `<span class="me-av" aria-hidden="true">${img}</span><span class="me-who"><b>${esc(p.name || '대학생')} 님</b><small>${line}</small></span>`;
   }
   const info = $('#my-sub-info');
-  if (info) info.textContent = [p.gpa != null ? `평점 ${p.gpa.toFixed(2)}` : '평점 미입력', p.bracket != null ? `${p.bracket}구간` : '지원구간 모름', p.status || ''].filter(Boolean).join(' · ');
+  /* 🔴 작은 글씨는 **상태·숫자만** (2026-10-10 은서 「멘트들이 너무 AI 같애」) — 설명을 덧붙이지 않는다 */
+  if (info) info.textContent = [p.gpa != null ? p.gpa.toFixed(2) : '평점 없음', p.bracket != null ? `${p.bracket}구간` : '구간 모름', p.status || ''].filter(Boolean).join(' · ');
   const set = $('#my-sub-settings');
   if (set) {
     const on = typeof notifyLedger !== 'undefined' && notifyLedger && notifyLedger.enabled && typeof Notification !== 'undefined' && Notification.permission === 'granted';
-    set.textContent = `알림 ${on ? '켜짐' : '꺼짐'} · 로그인 기록 · 자주 묻는 질문 · 약관`;
+    set.textContent = `알림 ${on ? '켜짐' : '꺼짐'}`;
   }
 }
 
@@ -6599,7 +6598,7 @@ function renderNotifyCard() {
 function renderWallet() {
   const el = $('#my-wallet');
   const have = DOC_SLOTS.filter((s) => walletCache[s.slot]).length;
-  { const sub = $('#my-sub-docs'); if (sub) sub.textContent = `올린 서류 ${have} / ${DOC_SLOTS.length} · 신청할 때 자동으로 붙어요`; }
+  { const sub = $('#my-sub-docs'); if (sub) sub.textContent = `${DOC_SLOTS.length}개 중 ${have}개`; }
   el.innerHTML = (`
     ${DOC_SLOTS.map((s) => {
       const rec = walletCache[s.slot];
@@ -6613,7 +6612,7 @@ function renderWallet() {
             <button class="wallet-label" data-issue="${s.slot}" aria-haspopup="dialog">
               ${esc(s.label)}
             </button>
-            ${rec ? '' : '<p class="wallet-status">없음</p>'}
+            ${rec ? '' : '<p class="wallet-status">미등록</p>'}
           </div>
           <div class="wallet-btns">
             ${rec ? `<button class="wallet-btn" data-view="${s.slot}">보기</button>
@@ -7515,16 +7514,14 @@ function renderAccountCard() {
   el.hidden = false;
   const u = authUser();
   el.innerHTML = u
-    ? `<p class="acc-head">계정 <span class="acc-on">이어쓰기 켜짐</span></p>
+    ? `<p class="acc-head">계정</p>
        <p class="acc-mail">${esc(u.email || '로그인됨')}</p>
-       <p class="acc-note">이 계정으로 다른 기기에서 로그인하면 프로필과 신청내역이 그대로 이어져요.
-         주민등록번호·계좌번호·증명서류는 서버로 보내지 않습니다.</p>
        <div class="acc-actions">
          <button class="btn btn-outline" id="btn-acc-out">로그아웃</button>
          <button class="btn btn-outline danger" id="btn-acc-del">탈퇴 (서버 정보 삭제)</button>
        </div>`
-    : `<p class="acc-head">기기를 바꿔도 이어 쓰려면</p>
-       <p class="acc-note">로그인하면 프로필과 신청 기록이 이어져요. 주민번호·계좌·증명서 파일은 서버로 나가지 않아요.</p>
+    : `<p class="acc-head">로그인</p>
+       <p class="acc-note">다른 폰에서도 내 정보와 신청 내역을 그대로 볼 수 있어요.</p>
        <div class="acc-actions">
          <button class="btn btn-primary" id="btn-acc-in">로그인</button>
          <button class="btn btn-outline" id="btn-acc-up">회원가입</button>

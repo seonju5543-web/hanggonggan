@@ -105,7 +105,7 @@ async function seed(page, saved, applied = []) {
   await page.waitForTimeout(300);
   ok('MY 화면에 보관함이 있다', await page.locator('#my-saved').count() === 1);
   /* 2026-10-10 C안 구조 — 공고 보관함은 MY 메뉴 줄을 눌러 들어가는 안쪽 화면이다 */
-  ok('MY 메뉴에 공고 보관함 줄이 있고 저장 건수를 말한다', /저장 \d+건/.test(await page.textContent('#my-sub-saved')));
+  ok('MY 메뉴에 공고 보관함 줄이 있고 저장 개수를 말한다', /^\d+개/.test((await page.textContent('#my-sub-saved')).trim()));
   await page.click('[data-my-go="mysaved"]');
   await page.waitForSelector('#screen-mysaved:not([hidden])');
   ok('줄을 누르면 공고 보관함 화면이 열린다', await page.$eval('#my-saved', (e) => e.offsetParent !== null));

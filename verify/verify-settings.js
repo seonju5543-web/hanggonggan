@@ -228,7 +228,7 @@ const eq = (label, got, want) => {
     await page.$eval('.nav-item[data-nav="my"]', (e) => e.classList.contains('active')), true);
 
   /* 2026-10-10 C안 — 로그인 전 계정 카드의 제목은 할 일을 말한다 */
-  eq('계정 카드 제목', (await page.textContent('#my-account .acc-head')).trim(), '기기를 바꿔도 이어 쓰려면');
+  eq('계정 카드 제목', (await page.textContent('#my-account .acc-head')).trim(), '로그인');
   eq('계정 버튼 둘 — 로그인 · 회원가입',
     await page.$$eval('#my-account .acc-actions .btn', (els) => els.map((e) => e.textContent.trim())),
     ['로그인', '회원가입']);
