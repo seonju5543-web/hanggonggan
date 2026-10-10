@@ -1,4 +1,4 @@
-## 🛰 공공 API 로봇 리포트 (2026-10-10)
+## 🛰 공공 API 로봇 리포트 (2026-10-11)
 
 - ✅ **K-Startup 사업공고** — 받은 행 148 · 실은 글 **15** · 버림: 공모전·대외활동 아님(지원사업 등) 108 · 상한 15건 초과 25
   - 자격 줄 있는 글 14/15 · 원문 안내 있는 글 15/15
@@ -22,15 +22,14 @@
     - 179325 · 2026 경기도 ESG 인식확산 교육 (5~7회차) 참 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179325 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179325(2)
     - 179280 · ETRI 기술활용 신사업 모델 공모전 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179280 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179280(2)
     - 179424 · 영도 창업오피스 크립톤 1:1 멘토링 입주기업 모집 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179424 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179424(2)
-- ✅ **1365 봉사참여정보** — 받은 행 500 · 실은 글 **15** · 상세 내용 15/15건 · 버림: 대학생·청년 대상 아님 437 · 상한 15건 초과 46 · 같은 글 2
+- ✅ **1365 봉사참여정보** — 받은 행 500 · 실은 글 **15** · 상세 내용 15/15건 · 버림: 대학생·청년 대상 아님 438 · 상한 15건 초과 45 · 같은 글 2
   - 자격 줄 있는 글 6/15 · 원문 안내 있는 글 15/15
   - 첫 행 칸: `actBeginTm, actEndTm, actPlace, adultPosblAt, gugunCd, nanmmbyNm, noticeBgnde, noticeEndde, progrmBgnde, progrmEndde, progrmRegistNo, progrmSj, progrmSttusSe, sidoCd, srvcClCode, url, yngbgsPosblAt`
-  - 코드 칸 값(첫 세 행): gugunCd=3700000|3230000|6300000 · sidoCd=6310000|6110000|6300000
-  - 대외활동 · 자원봉사센터 업무지원(대학생) (~2026-10-10) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3531938
+  - 코드 칸 값(첫 세 행): gugunCd=5570000|3090000|3780000 · sidoCd=6430000|6110000|6410000
   - 대외활동 · 대학생 & 대학원생 학교 휴업일로 인한 아동 놀이활동 및 지도 (~2026-10-12) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3517017
   - 대외활동 · 강동선사문화축제 자원봉사자 모집_성인(대학생)_주말 종일_토,일선택가능 (~2026-10-12) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3517342
+  - 대외활동 · [대학생 이상/ 10~15시] 제4회 아산테크노밸리 문화예술 축제 및 한마음대회 운영 보조 (~2026-10-12) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3520568
   - 주소 고르기 (번호 칸 `progrmRegistNo` · 점수 2 글 번호 있음 · 1 그 밖 · 0 첫 화면·번호 없는 보기 화면):
-    - 3531938 · 자원봉사센터 업무지원(대학생) → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3531938 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3531938(2)
     - 3517017 · 대학생 & 대학원생 학교 휴업일로 인한 아동 놀이활동  → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3517017 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3517017(2)
     - 3517342 · 강동선사문화축제 자원봉사자 모집_성인(대학생)_주말 종 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3517342 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3517342(2)
     - 3520568 · [대학생 이상/ 10~15시] 제4회 아산테크노밸리 문 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3520568 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3520568(2)
@@ -45,6 +44,7 @@
     - 3521994 · 10월(오전) 대전수학문화관 대학생 봉사활동 모집 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521994 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521994(2)
     - 3521995 · 10월(오후) 대전수학문화관 대학생 봉사활동 모집 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521995 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521995(2)
     - 3527834 · 전국 청소년·청년 댄스 경연대회 DANCE SPIRIT → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3527834 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3527834(2)
+    - 3532459 · 제20회 대구자원봉사박람회 모루공예 부스운영 보조 대학 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3532459 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3532459(2)
 - ✅ **온통청년 청년콘텐츠** — 받은 행 30 · 실은 글 **7** · 버림: 공모전·대외활동 아님(소식 글 등) 21 · 원문 주소 없음 1 · 마감 지남 1
   - 자격 줄 있는 글 2/7 · 원문 안내 있는 글 1/7
   - 첫 행 칸: `bbsSn, pstSn, pstSeSn, pstSeNm, pstTtl, pstWholCn, pstInqCnt, pstUrlAddr, atchFile, frstRgtrNm, frstRegDt, lastMdfrNm, lastMdfcnDt`
