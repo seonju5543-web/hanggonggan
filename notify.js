@@ -376,11 +376,9 @@ function notifySettingsHtml() {
   else if (sup.permission === 'granted') { statusText = '허용됨 · 앱에서 꺼 둔 상태'; statusCls = 'off'; }
   else { statusText = '아직 켜지 않음'; statusCls = 'off'; }
 
-  const rows = NOTIFY_RULES.TYPES.map((t) => `
-    <label class="nf-pref">
-      <span class="nf-pref-text"><strong>${t.icon} ${esc(t.label)}</strong></span>
-      <input type="checkbox" class="nf-switch" data-nf-pref="${t.id}" ${notifyLedger.prefs[t.id] ? 'checked' : ''} />
-    </label>`).join('');
+  /* 🔴 **켜기/끄기 스위치 하나만** 둔다 (2026-10-10 팀 업무 분장 MY 3번 — 은서: "알림 설정 시 세부사항 표시 대신 단순 켜기/끄기").
+     종류별 다섯 줄(새 공고·마감·제출·게시판·결과)은 화면에서 뺐다. 켜면 다섯 종류가 **모두** 켜진다(bindNotifySettings).
+     장부의 prefs 칸은 그대로 둔다 — 서비스워커·규칙 엔진(notify-rules.js)이 읽는 자리라 지우면 판정이 갈라진다. */
 
   /* 🔴 '앱을 켜지 않아도 받는 중' 상자를 없앴다 (2026-09-01 개발자 지시).
      푸시 연결은 알림을 켜면 자동으로 되고(pushEnsure), 켜졌는지는 맨 위 상태 줄이 말한다.
@@ -396,9 +394,9 @@ function notifySettingsHtml() {
         <p class="wallet-title">알림</p>
         <p class="nf-status nf-status-${statusCls}">${esc(statusText)}</p>
       </div>
-      <button class="wallet-btn ${on ? '' : 'primary'}" id="btn-nf-toggle">${on ? '끄기' : '켜기'}</button>
-    </div>
-    <div class="nf-prefs">${rows}</div>`;
+      <button type="button" class="nf-switch" id="btn-nf-toggle" role="switch" aria-checked="${on ? 'true' : 'false'}"
+        aria-label="휴대폰 알림 ${on ? '끄기' : '켜기'}"></button>
+    </div>`;
 }
 
 function bindNotifySettings() {
@@ -416,6 +414,8 @@ function bindNotifySettings() {
       const perm = await notifyRequestPermission();
       notifyLedger.askedAt = notifyLedger.askedAt || Date.now();
       notifyLedger.enabled = perm === 'granted';
+      /* 스위치 하나가 전부다 — 켜면 종류별 알림을 모두 켠다(예전에 종류별로 꺼 둔 것이 보이지 않는 채 남지 않게) */
+      if (notifyLedger.enabled) for (const t of NOTIFY_RULES.TYPES) notifyLedger.prefs[t.id] = true;
       await notifySaveLedger();
       if (perm === 'granted') {
         notifyRegisterBackground();

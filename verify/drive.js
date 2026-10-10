@@ -101,6 +101,8 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
 
   // ── 서류 보관함: 성적증명서 업로드
   await page.click('.nav-item[data-nav="my"]');
+  /* 서류 보관함은 처음엔 접혀 있다 (2026-10-10 팀 업무 분장 MY 1번) — 펼치기를 눌러 연다 */
+  await page.click('#my-wallet .my-fold > summary');
   await page.waitForSelector('#my-wallet .wallet-row');
   await page.setInputFiles('#my-wallet input[data-slot="gradeCert"]', __dirname + '/grade-cert.png');
   await page.waitForTimeout(400);

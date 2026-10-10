@@ -192,7 +192,7 @@ export default async function gate(eq, ctx) {
     T.one('KOSAF_ELIG'), T.one('kosafClean'), T.one('KOSAF_AMOUNT_UNKNOWN'), T.one('TD_DAY'), T.one('TD_DAY_RE'), T.one('TD_DAY_G'), T.fn('isDateBit'), T.fn('splitTitleDates'),
     ...['esc', 'unent', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'kosafAsScholarships',
       'sourceLinkHintHtml', 'attachmentLinkHtml', 'sourceLinkHtml', 'sourceNoteHtml', 'amountSourceLinkHtml',
-      'appLogLinkHtml', 'hintShort', 'noticeCardHtml', 'activityLinkHtml'].map(T.fn),   // hintShort — 카드 회색 기간 줄(2026-10-04)
+      'appLogLinkHtml', 'hintShort', 'shortDay', 'noticeCardHtml', 'activityLinkHtml'].map(T.fn),   // shortDay — 카드 수집 날짜를 「10.08」로 (2026-10-10)   // hintShort — 카드 회색 기간 줄(2026-10-04)
     /* kosafAsScholarships 가 읽는 앱 상태 — 저장·신청 내역은 없다(마감 지난 것도 전부 그린다 · 아래 dday 덮어쓰기) */
     'var kosafList = []; var kosafUpdatedAt = ""; var state = { applications: [] }; function isSaved() { return false; }',
   ].join('\n\n'), box, { filename: 'app.js(발췌)' });

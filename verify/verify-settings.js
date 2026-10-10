@@ -115,7 +115,19 @@ const eq = (label, got, want) => {
   await page.waitForSelector('#screen-my:not([hidden])');
   await page.waitForTimeout(400);
   eq('오른쪽 위에 설정(톱니) 버튼이 있다', await page.$eval('#btn-open-settings', (e) => e.offsetParent !== null), true);
-  eq('MY 안에서는 계정 절이 안 보인다', await page.$eval('#my-account', (e) => e.offsetParent !== null), false);
+  /* 🔴 계정(로그인)은 다시 MY 안이다 (2026-10-10 팀 업무 분장 MY 2번 — 은서: "로그인을 MY 화면 내부에 배치") */
+  eq('MY 안에 계정 절이 보인다', await page.$eval('#my-account', (e) => e.offsetParent !== null), true);
+  eq('계정 절은 프로필 카드 바로 아래다', await page.$eval('#my-account', (e) => e.previousElementSibling && e.previousElementSibling.id), 'my-profile');
+  eq('설정 화면에는 계정 절이 없다 (한 곳에만)', await page.$$eval('#screen-settings #my-account', (e) => e.length), 0);
+  /* 🔴 서류 보관함 · 공고 보관함은 처음엔 접혀 있다 (같은 날 MY 1번) */
+  eq('서류 보관함은 처음엔 접혀 있다', await page.$eval('#my-wallet .my-fold', (d) => d.open), false);
+  eq('공고 보관함은 처음엔 접혀 있다', await page.$eval('#my-saved .my-fold', (d) => d.open), false);
+  eq('접힌 머리줄에 펼치기 글자가 보인다', await page.$eval('#my-wallet .my-fold-btn', (e) => getComputedStyle(e, '::after').content), '"펼치기 ▾"');
+  await page.click('#my-wallet .my-fold > summary');
+  eq('펼치기를 누르면 서류 줄이 보인다', await page.$eval('#my-wallet .wallet-row', (e) => e.offsetParent !== null), true);
+  await page.evaluate(() => renderWallet());
+  eq('다시 그려도(서류 올린 뒤 등) 편 상태가 남는다', await page.$eval('#my-wallet .my-fold', (d) => d.open), true);
+  await page.click('#my-wallet .my-fold > summary');
   eq('MY 안에서는 알림 절이 안 보인다', await page.$eval('#my-notify', (e) => e.offsetParent !== null), false);
   await page.screenshot({ path: `${SHOT}/my.png` });
 
@@ -240,33 +252,11 @@ const eq = (label, got, want) => {
 
   eq('알림 절 제목', (await page.textContent('#my-notify .wallet-title')).trim(), '알림');
   eq('알림 상태 줄이 있다', (await page.textContent('#my-notify .nf-status')).trim().length > 0, true);
-  eq('오른쪽에 켜기 버튼', (await page.textContent('#btn-nf-toggle')).trim(), '켜기');
-  /* 🔴 다섯 줄의 **문구와 순서**가 목업과 같아야 한다. 하나라도 달라지면 여기서 걸린다. */
-  eq('알림 스위치 5줄이 목업과 같다',
-    await page.$$eval('#my-notify .nf-pref-text strong', (els) => els.map((e) => e.textContent.replace(/\s+/g, ' ').trim())),
-    ['내 조건에 맞는 새 장학 공고', '마감 하루 전 · 마감 당일', '제출 기록 안 한 공고',
-      '우리 학교 게시판 새 공고', '마감 지난 공고 결과 기록']);
-  eq('스위치가 5개', await page.$$eval('#my-notify .nf-switch', (e) => e.length), 5);
-
-  /* 🔴 **절 사이 빈칸은 눈에 보이는 것끼리 재야 한다** (2026-09-12 개발자 지시 "알림과
-     기타 사이 간격이 너무 커서 줄여"). 상자끼리 재면 둘 다 49px 로 **똑같아서 아무 문제가
-     없어 보인다** — 실제로 그렇게 재고 한 번 헷갈렸다. 알림의 마지막 줄은 제 여백 11px 을
-     이미 갖고 그 밑에 구분선도 없어서, 눈에는 62px 로 보였다(계정→알림 은 49px). */
-  {
-    const 빈칸 = await page.evaluate(() => {
-      const btn = document.querySelector('#my-account .btn, #my-account button');
-      const rows = [...document.querySelectorAll('#my-notify .nf-pref')];
-      const sw = rows[rows.length - 1].querySelector('.nf-switch');
-      const t1 = document.querySelector('#my-notify .wallet-title').getBoundingClientRect().top;
-      const t2 = document.querySelector('#set-etc .wallet-title').getBoundingClientRect().top;
-      return { 계정_알림: Math.round(t1 - btn.getBoundingClientRect().bottom),
-        알림_기타: Math.round(t2 - sw.getBoundingClientRect().bottom) };
-    });
-    eq('  (검사가 무력하지 않은지 — 두 빈칸을 실제로 쟀다)',
-      빈칸.계정_알림 > 20 && 빈칸.알림_기타 > 20, true);
-    eq(`🔴 알림→기타 빈칸이 계정→알림과 같은 리듬이다 (${빈칸.계정_알림}px vs ${빈칸.알림_기타}px)`,
-      Math.abs(빈칸.알림_기타 - 빈칸.계정_알림) <= 4, true);
-  }
+  /* 🔴 켜기/끄기 **스위치 하나** (2026-10-10 팀 업무 분장 MY 3번 — 은서: "세부사항 표시 대신 단순 켜기/끄기") */
+  eq('오른쪽에 스위치 (꺼짐)', await page.getAttribute('#btn-nf-toggle', 'aria-checked'), 'false');
+  eq('스위치는 role=switch 다 (보조기기가 켜짐/꺼짐으로 읽는다)', await page.getAttribute('#btn-nf-toggle', 'role'), 'switch');
+  eq('종류별 다섯 줄은 없다 (스위치 하나만)', await page.$$eval('#my-notify .nf-pref', (e) => e.length), 0);
+  eq('알림 절의 스위치는 하나뿐', await page.$$eval('#my-notify .nf-switch', (e) => e.length), 1);
 
   console.log('\n■ 덧붙인 세 줄 — 휴지통 · 이용약관 · 탈퇴');
   eq('기타 메뉴 줄 (2026-09-11 개발자 지시 순서대로)',
@@ -685,7 +675,8 @@ const eq = (label, got, want) => {
 
     /* 🔴 시트가 떠 있으면 그 안의 손짓을 뺏으면 안 된다 — 시트는 `#app` 안에 있어서
        막지 않으면 로그인 시트를 옆으로 쓸 때 설정 화면이 통째로 나가 버린다. */
-    await page.click('#btn-acc-in');
+    /* 로그인 버튼은 2026-10-10 에 MY 로 옮겼다 — 설정 화면 위에 시트를 띄우는 상황은 그대로 재현한다(같은 함수) */
+    await page.evaluate(() => openAuthSheet('in'));
     await page.waitForSelector('#detail-sheet:not([hidden])');
     await page.waitForTimeout(400);
     await swipe(page, { x: 200, y: 500, dx: 160 });
@@ -897,7 +888,7 @@ const eq = (label, got, want) => {
     await page.waitForSelector('#screen-settings:not([hidden])');
     await page.waitForTimeout(400);
 
-    for (const [name, sel] of [['알림 줄', '#my-notify .nf-pref'], ['기타 줄', '#set-etc .my-menu-item']]) {
+    for (const [name, sel] of [['기타 줄', '#set-etc .my-menu-item']]) {   // 알림 줄은 2026-10-10 스위치 하나로 바뀌어 없다
       const r = await press(sel);
       eq(`${name} — 정말 눌린 상태로 쟀다 (아니면 이 절이 통째로 헛검사다)`, r.눌렸나, true);
       eq(`${name} — 브라우저 기본 회색 판이 꺼져 있다`, 투명(r.기본판), true);

@@ -30,8 +30,8 @@ jobs:
     env:
       NODE_EXTRA_CA_CERTS: collector/certs/bundle.pem   # 계명대처럼 중간 인증서를 안 보내는 학교 (collector/certs/README.md)
     # 상한 = 단계 상한의 합 + 여유 3 (관문 test-collector 「교내 소식」이 대소관계를 잰다 · 상한을 키워 때우지 말 것).
-    # 찾기 7 + 수집 6 + 썸네일 5 + 알림 1 + 관문 5 + 되돌리기 1 + 감사 알림 1 + 저장 3 + 리포트 1 + 알림 1 = 31 → 35
-    timeout-minutes: 35
+    # 찾기 7 + 수집 6 + 썸네일 5 + 요약 3 + 알림 1 + 관문 5 + 되돌리기 1 + 감사 알림 1 + 저장 3 + 리포트 1 + 알림 1 = 34 → 38
+    timeout-minutes: 38
     steps:
       - uses: actions/checkout@v4
         with:
@@ -77,6 +77,15 @@ jobs:
           npm i sharp --no-audit --no-fund --silent
           node collector/collect-news-thumbs.mjs
 
+      # 요약 (보강 — 2026-10-10 팀 업무 분장 프론트 8번 · 은서). 글 화면의 본문 첫 문장을 **원문 그대로** 떠서 카드에 한두 줄로(collector/collect-news-desc.mjs).
+      # 상한 3 = 자체 예산 1.5분 + 글 하나 시한 20초 + 정리 여유.
+      - name: 교내 소식 요약 (보강 — 실패해도 수집분은 나간다)
+        timeout-minutes: 3
+        continue-on-error: true
+        env:
+          NEWS_DESC_BUDGET_MS: '90000'
+        run: node collector/collect-news-desc.mjs
+
       - name: 🚨 수집 단계 실패 알림 (최근 리포트 이슈에 코멘트)
         if: steps.run.outcome != 'success'
         timeout-minutes: 1
@@ -107,6 +116,7 @@ jobs:
           git checkout -- data/news collector/seen-news.json 2>/dev/null || true
           # 썸네일 장부는 따로 — 한 줄에 묶으면 장부가 아직 없는 첫 실행에 git checkout 이 통째로 실패해 소식 파일도 안 돌아간다
           git checkout -- collector/news-thumbs.json 2>/dev/null || rm -f collector/news-thumbs.json
+          git checkout -- collector/news-desc.json 2>/dev/null || rm -f collector/news-desc.json
           git clean -fdq data/news || true
 
       # 감사 실패는 조용히 넘어가지 않는다 — 되돌리기만 하고 끝나면 홈 구역이 **소리 없이 멈춘다**(리뷰 2026-10-01). 이슈를 새로 연다(첫 실행엔 댓글 달 이슈가 없다).
@@ -136,6 +146,7 @@ jobs:
           [ -f collector/find-news-boards-report.md ] && git add collector/find-news-boards-report.md
           [ -f collector/news-thumbs.json ] && git add collector/news-thumbs.json
           [ -f collector/news-thumbs-report.md ] && git add collector/news-thumbs-report.md
+          [ -f collector/news-desc.json ] && git add collector/news-desc.json
           true
           if ! git diff --cached --quiet; then
             git commit -m "news: 교내 소식 수집"

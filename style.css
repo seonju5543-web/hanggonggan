@@ -499,7 +499,8 @@ a.btn { text-decoration: none; }
    🔴 **몇 장인지는 여기서 정하지 않는다** — `:nth-child(n+4)` 로 적었더니 '셋'이 CSS 와
       app.js 두 곳에 살아, 상수만 고치면 버튼만 따라 바뀌고 목록은 그대로인 상태가 됐다
       (2026-09-12 코드 리뷰). 지금은 app.js 의 HOME_DEADLINE_TOP 이 표(.home-extra)를 붙인다. */
-#home-deadline-list:not(.more-open) .home-extra { display: none; }
+#home-deadline-list:not(.more-open) .home-extra,
+#live-list:not(.more-open) .home-extra { display: none; }
 .home-more { display: block; margin: var(--sp-2) auto 0; }   /* 생 px 대신 여백 토큰 — ui-tone 톱니 */
 .home-more[hidden] { display: none; }
 .sch-card {
@@ -1274,8 +1275,8 @@ textarea:focus {
   box-shadow: var(--knob);
   transition: transform 0.2s;
 }
-.nf-switch:checked { background: var(--primary); }
-.nf-switch:checked::after { transform: translateX(18px); }
+.nf-switch:checked, .nf-switch[aria-checked="true"] { background: var(--primary); }
+.nf-switch:checked::after, .nf-switch[aria-checked="true"]::after { transform: translateX(18px); }
 .nf-set-actions { display: flex; gap: 6px; margin-top: 14px; flex-wrap: wrap; }
 
 /* 진짜 푸시(앱을 켜지 않아도 받기) 설정 블록 */
@@ -3111,7 +3112,8 @@ body::after { opacity: 0.26; }
 #my-account .acc-head,
 #my-notify .wallet-title,
 #set-etc .wallet-title,
-#my-wallet .wallet-title {
+#my-wallet .wallet-title,
+#my-saved .wallet-title {
   display: block;
   font-size: var(--t-2xl);   /* 20px → 21px · 위 처방(크기·굵기·막대)은 그대로 산다 */
   font-weight: 800;
@@ -3125,7 +3127,8 @@ body::after { opacity: 0.26; }
 #my-account .acc-head::before,
 #my-notify .wallet-title::before,
 #set-etc .wallet-title::before,
-#my-wallet .wallet-title::before {
+#my-wallet .wallet-title::before,
+#my-saved .wallet-title::before {
   content: '';
   position: absolute;
   top: 0; left: 0;
@@ -3154,11 +3157,13 @@ body::after { opacity: 0.26; }
 #my-account .acc-head::before,
 #my-notify .wallet-title::before,
 #set-etc .wallet-title::before,
-#my-wallet .wallet-title::before { content: none; }
+#my-wallet .wallet-title::before,
+#my-saved .wallet-title::before { content: none; }
 #my-account .acc-head,
 #my-notify .wallet-title,
 #set-etc .wallet-title,
-#my-wallet .wallet-title { padding-top: 0; margin-bottom: 2px; }
+#my-wallet .wallet-title,
+#my-saved .wallet-title { padding-top: 0; margin-bottom: 2px; }
 #my-notify .nf-status, #my-wallet .wallet-sub { margin-top: 1px; margin-bottom: 8px; }
 
 .my-card { margin-top: 6px; padding-top: 18px; }
@@ -3201,7 +3206,8 @@ body::after { opacity: 0.26; }
 #my-wallet .wallet-label { line-height: 1.3; }
 #my-wallet .wallet-status { margin-top: 1px; line-height: 1.3; }
 #my-wallet .wallet-btn { padding: 6px 10px; }
-#my-wallet .wallet-title { margin-bottom: 10px; }   /* 제목과 목록 사이 얇은 숨 */
+#my-wallet .wallet-title,
+#my-saved .wallet-title { margin-bottom: 10px; }   /* 제목과 목록 사이 얇은 숨 */
 #my-account .acc-head { margin-bottom: 14px; }
 
 /* ── MY 잔선 정리 (2026-09-01 개발자 지시) ────────────────────────────
@@ -3443,7 +3449,8 @@ button, input, select, textarea { letter-spacing: inherit; }
 .sheet-title,
 #my-account .acc-head,
 #my-notify .wallet-title,
-#my-wallet .wallet-title { letter-spacing: var(--track-display); }
+#my-wallet .wallet-title,
+#my-saved .wallet-title { letter-spacing: var(--track-display); }
 
 /* 나머지는 전부 본문과 같은 자간으로 되돌린다 */
 .home-greet,
@@ -5101,3 +5108,37 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 .check-grid .check-item { padding: var(--space-12); gap: var(--space-8); font-size: var(--t-sm); }
 .check-grid .check-item input { width: 20px; height: 20px; }
 .onboard-step[data-step="5"] .field-label { display: block; margin: var(--space-16) 0 var(--space-8); }
+
+/* ── MY 접는 보관함 (2026-10-10 팀 업무 분장 MY 1번 — 서류 보관함 · 공고 보관함은 처음엔 접혀 있다) ──
+   머리줄 전체가 누르는 자리(<summary>) · 오른쪽 「펼치기/접기」 글자는 열림 상태를 CSS 가 바꿔 단다(여닫는 코드 0줄). */
+.my-fold > summary { list-style: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.my-fold > summary::-webkit-details-marker { display: none; }
+.my-fold-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); min-height: 44px; }
+.my-fold-title { display: flex; align-items: baseline; gap: var(--sp-2); min-width: 0; }
+.my-fold-title .wallet-title { margin: 0; }
+.my-fold-sub { font-size: var(--t-xs); color: var(--text-sub); font-weight: 600; white-space: nowrap; }
+.my-fold-btn { flex: none; font-size: var(--t-xs); font-weight: 700; color: var(--accent); }
+.my-fold-btn::after { content: '펼치기 ▾'; }
+.my-fold[open] .my-fold-btn::after { content: '접기 ▴'; }
+.my-fold-body { padding-top: var(--sp-2); }
+/* 접는 머리줄 안의 제목은 아래 여백을 두지 않는다 — 머리줄 높이(44px)가 줄 간격을 맡는다 */
+#my-wallet .my-fold-head .wallet-title,
+#my-saved .my-fold-head .wallet-title { margin-bottom: 0; }
+/* 계정 절(2026-10-10 MY 로 옮김)은 위 구분선을 긋지 않는다 — MY 가로줄 천장(verify-settings 「톱니」 3개)을 늘리지 않으려고.
+   큰 제목 「계정」과 위 여백이 프로필 표와 가른다. */
+#screen-my #my-account.my-card { border-top: 0; }
+
+/* 구역 머리줄 오른쪽의 누를 수 없는 글자(갱신 날짜) — 파랑은 '누를 수 있음'이라 쓰지 않는다 (2026-10-10) */
+.section-head .section-note { font-size: var(--t-xs); font-weight: 600; color: var(--text-weak); white-space: nowrap; }
+
+/* 교내 소식 요약 (2026-10-10 업무 분장 8번) — 원문 첫 문장 발췌. 두 줄에서 자른다 */
+.news-tile-desc, .sch-desc {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  font-size: var(--t-xs); line-height: 1.5; color: var(--text-sub); font-weight: 500;
+}
+.sch-desc { margin-top: var(--space-4); }
+.news-today {
+  display: inline-block; vertical-align: middle; margin-left: var(--space-4);
+  padding: 0 var(--sp-2); border-radius: var(--radius-pill);
+  background: var(--red-weak); color: var(--red); font-size: var(--t-2xs); font-weight: 800; line-height: 1.7;
+}

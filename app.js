@@ -2925,8 +2925,9 @@ function liveNoticesHead(updatedAt) {
   /* ⚠️ 제목 아래 설명 한 줄(`.section-sub`)을 2026-10-03 에 붙였다가 **같은 날 개발자 지시로
      걷었다** — 홈 아래 세 구역(학교 게시판 공고 · 우리 학교 소식 · 재단·지자체 새 공고)에
      전부 있었다. 다시 붙이지 말 것. */
+  /* 🔴 갱신 날짜는 **누를 수 없는 글자**라 파랑(link-btn — 이 앱에서 '누를 수 있음')을 쓰지 않는다 (2026-10-10 팀 업무 분장 11번 · 은서) */
   return `<div class="section-head" style="margin-top:4px"><h3>우리 학교 게시판 공고</h3>
-    <span class="link-btn">${updatedAt ? esc(updatedAt) + ' 갱신' : '매일 아침 갱신'}</span></div>`;
+    <span class="section-note">${updatedAt ? esc(shortDay(updatedAt)) + ' 갱신' : '매일 아침 갱신'}</span></div>`;
 }
 
 /* ⚠️ 검색 인자를 걷었다 (2026-09-18) — 이 목록이 탐색 화면에 있던 시절에는 그 화면의
@@ -2994,7 +2995,31 @@ function liveNoticesHtml() {
   if (!mine.length) {
     return head + `<p class="empty" style="margin-bottom:16px">아직 ${esc(p.school)} 게시판 연결 전이거나 새 공고가 없어요<br />연결되면 실제 공고가 여기에 자동으로 떠요.</p>`;
   }
-  return head + `<div class="card-list" style="margin-bottom:18px">` + mine.map(noticeCardHtml).join('') + `</div>`;
+  /* 🔴 (2026-10-10 팀 업무 분장 11번 · 은서 — 「우리학교 게시판 공고 · 재단 지자체 새 공고 인터페이스 개선」)
+     ① 카드마다 같은 「○○대학교 게시판」 윗줄이 반복됐다 — 구역 제목이 이미 그 말을 한다. 윗줄에는 **언제 올라왔나**를 적는다.
+     ② 22건이 한꺼번에 깔려 홈이 끝없이 길었다 — 다른 구역처럼 석 장만 펴고 「더보기」로 **가려 둔 카드를 편다**
+        (카드는 전부 그려 두고 CSS 가 가린다 · 다시 그리지 않으니 스크롤이 튀지 않는다 · 잘라 버리는 것이 아니다). */
+  const cards = mine.map((n, i) => noticeCardHtml(n, { org: noticeDayLine(n), dateTop: true })
+    .replace('class="sch-card notice-card', `class="sch-card notice-card${i >= HOME_DEADLINE_TOP ? ' home-extra' : ''}`)).join('');
+  const more = mine.length > HOME_DEADLINE_TOP
+    ? `<button type="button" class="link-btn home-more" id="live-more" data-live-more aria-controls="live-list" aria-expanded="${liveOpen ? 'true' : 'false'}">${liveOpen ? '접기' : `더보기 (${mine.length - HOME_DEADLINE_TOP}건)`}</button>`
+    : '';
+  return head + `<div class="card-list${liveOpen ? ' more-open' : ''}" id="live-list">` + cards + `</div>${more}<div style="margin-bottom:18px"></div>`;
+}
+let liveOpen = false;
+/* 날짜 짧게 — 「10.08」 (연도가 올해가 아니면 앞에 붙인다) */
+function shortDay(s) {
+  const m = String(s || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return String(s || '');
+  return m[1] === String(new Date().getFullYear()) ? `${m[2]}.${m[3]}` : `${m[1]}.${m[2]}.${m[3]}`;
+}
+/* 게시판 카드 윗줄 — 「오늘 수집」·「어제 수집」·「10.08 수집」 (게시일이 있으면 그것) */
+function noticeDayLine(n) {
+  const d = n.postedAt || n.foundAt || '';
+  const word = n.postedAt ? '게시' : '수집';
+  if (!d) return '게시판';
+  const days = Math.round((todayStart() - new Date(d + 'T00:00:00')) / 86400000);
+  return days === 0 ? `오늘 ${word}` : days === 1 ? `어제 ${word}` : `${shortDay(d)} ${word}`;
 }
 
 /* 게시판 글 카드 한 장 — 홈과 '교내' 칸이 **같은 그림**을 쓴다 (2026-09-18 분리).
@@ -3050,13 +3075,14 @@ function noticeCardHtml(n, opts) {
              모르는 것을 단정하지 않는다(원칙 8-1) — 기간은 아래 줄이 원문 그대로 말한다. */ ''}
       </div>
       <p class="sch-name">${esc(tSplit.title)}</p>
+      ${o.desc ? `<p class="sch-desc">${esc(unent(o.desc))}</p>` : ''}
       ${/* 제목에서 뗀 마감·기간은 D-day·기간 줄이 없는 카드에서만 회색 줄로 — 같은 사실을 두 번 적지 않는다 */ ''}
       ${!o.dday && !(o.excerpts || []).length && !(n.deadlineHint && hintShort(n.deadlineHint)) && tSplit.dates.length ? `<p class="sch-provider">${esc(tSplit.dates.join(' · '))}</p>` : ''}
       ${/* 원문 발췌 줄 (2026-09-29 · 활동 글) — 이름표 : 원문 문장. 발췌가 있으면 기간 한 줄은 겹쳐 적지 않는다 */ ''}
       ${(o.excerpts || []).map((x) => `<p class="sch-provider">${esc(x.label)} · ${esc(unent(x.text))}</p>`).join('')}
       ${!(o.excerpts || []).length && n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) && hintShort(n.deadlineHint) ? `<p class="sch-provider">${esc(hintShort(n.deadlineHint))}</p>` : ''}
       ${/* 링크 이름은 sourceLink 한 곳(card) — 목록·홈페이지·로봇이 확인한 문제 주소는 '원문'이라 부르지 않는다 (2026-10-03) */ ''}
-      <p class="sch-provider">${(n.attachments || []).length ? `첨부 ${(n.attachments || []).length}개 · ` : ''}${esc(n.foundAt || '')} 수집${link.label ? ` · ${esc(link.label)}` : ''}</p>
+      <p class="sch-provider">${[(n.attachments || []).length ? `첨부 ${(n.attachments || []).length}개` : '', o.dateTop || !n.foundAt ? '' : `${esc(shortDay(n.foundAt))} 수집`, link.label ? esc(link.label) : ''].filter(Boolean).join(' · ')}</p>
       ${/* 그 글의 사진 썸네일 (2026-10-03 개발자 지시 — 학교 글의 실제 사진). 소식 카드만 opts.thumb 로 넘긴다 · 제목이 이미 글자로 있어 alt 는 비운다(읽기 도구가 두 번 읽지 않게).
            못 받으면(404·오프라인) 그림을 빼고 글자 카드로 돌아간다 — bindEvents 의 error 잡이 · CSP 가 onerror= 를 막는다 */ ''}
       ${thumb ? `<img class="notice-thumb" src="${esc(thumb)}" alt="" loading="lazy" decoding="async" width="72" height="72" />` : ''}
@@ -3424,7 +3450,7 @@ function externalNoticesHtml() {
          aria-expanded="${shown >= mine.length ? 'true' : 'false'}">${shown >= mine.length ? '접기' : '더보기'}</button>`
     : '';
   return `<div class="section-head" style="margin-top:4px"><h3>재단·지자체 새 공고</h3>
-    <span class="link-btn">${liveExternal.updatedAt ? esc(liveExternal.updatedAt) + ' 갱신' : ''}</span></div>`
+    <span class="section-note">${liveExternal.updatedAt ? esc(shortDay(liveExternal.updatedAt)) + ' 갱신' : ''}</span></div>`
     + `<div class="card-list" id="external-list">`
     + mine.slice(0, shown).map((n) => noticeCardHtml(n, { org: n.host, dday: n.deadline ? { label: ddayWords(dday(n.deadline)), urgent: dday(n.deadline).days >= 0 && dday(n.deadline).days <= 7 } : null })).join('')
     + `</div>${more}<div style="margin-bottom:18px"></div>`;
@@ -3488,10 +3514,16 @@ function schoolNewsHtml() {
   const turn = {};
   return `<div class="card-list">${mine.map((n) => {
     const sp = n.thumb && NEWS_THUMB_RE.test(n.thumb) ? null : schoolPhotoFor(n, turn[n.school] = (turn[n.school] ?? -1) + 1);
-    return noticeCardHtml(n, { org: `${n.school} 공지${n.kind ? ' · ' + n.kind : ''}`, excerpts: n.postedAt ? [{ label: '게시', text: n.postedAt }] : [], thumb: n.thumb, schoolPhoto: sp });
+    return noticeCardHtml(n, { org: `${n.school} 공지${n.kind ? ' · ' + n.kind : ''}`, excerpts: n.postedAt ? [{ label: '게시', text: n.postedAt }] : [], thumb: n.thumb, schoolPhoto: sp, desc: n.desc });
   }).join('')}</div>`;
 }
 
+/* 오늘 올라온 글인가 — 게시일(없으면 수집일)이 오늘. todayStart 는 부를 때마다 오늘을 읽는다(PWA 가 며칠 살아 있어도 맞다) */
+function newsIsToday(n) {
+  const d = String(n.postedAt || n.foundAt || '').slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return false;
+  return new Date(d + 'T00:00:00').getTime() === todayStart().getTime();
+}
 /* 날짜 짧게 — 띠 카드 윗줄의 'MM.DD' (게시일, 없으면 수집일) */
 const newsDay = (n) => { const m = String(n.postedAt || n.foundAt || '').match(/^\d{4}-(\d{2})-(\d{2})/); return m ? `${m[1]}.${m[2]}` : ''; };
 
@@ -3503,7 +3535,9 @@ const newsDay = (n) => { const m = String(n.postedAt || n.foundAt || '').match(/
 function homeNewsHtml() {
   const p = state.profile;
   if (!p) return '';
-  const head = (all) => `<div class="section-head home-news-head"><h3>우리 학교 소식</h3>${all ? '<button type="button" class="link-btn home-news-all" data-news-all>전체 보기</button>' : ''}</div>`;
+  /* 오늘 올라온 글 수 — 「오늘 날짜 기준」(2026-10-10 업무 분장 8번). 머리줄 아래 설명 줄은 두지 않는다(10-03 개발자 지시) — 제목 옆 작은 알약 하나 */
+  const todayN = liveNews ? schoolNewsForMe().filter((n) => newsIsToday(n)).length : 0;
+  const head = (all) => `<div class="section-head home-news-head"><h3>우리 학교 소식${todayN ? ` <span class="news-today">오늘 ${todayN}</span>` : ''}</h3>${all ? '<button type="button" class="link-btn home-news-all" data-news-all>전체 보기</button>' : ''}</div>`;
   if (!liveNews) return head(false) + `<div class="news-strip" aria-busy="true">${'<span class="news-tile is-skel"><span class="news-tile-photo"></span><span class="news-tile-meta">&nbsp;</span><span class="news-tile-title">&nbsp;</span></span>'.repeat(3)}</div>`;
   const mine = schoolNewsForMe();
   if (!mine.length) return '';
@@ -3525,6 +3559,8 @@ function homeNewsHtml() {
       <span class="news-tile-photo">${src ? `<img class="news-tile-img" src="${esc(src)}" alt="" loading="lazy" decoding="async" width="148" height="104"${focus ? ` style="object-position:${esc(focus)}"` : ''}${fallback ? ` data-fallback="${esc(fallback)}"${spFocus ? ` data-fallback-focus="${esc(spFocus)}"` : ''}` : ''} />` : ''}</span>
       <span class="news-tile-meta">${esc(meta)}</span>
       <span class="news-tile-title">${esc(unent(n.title))}</span>
+      ${/* 요약 — 로봇이 원문 첫 문장을 떠 둔 글만(collector/collect-news-desc.mjs · 2026-10-10 업무 분장 8번). 없으면 줄을 안 그린다 */ ''}
+      ${n.desc ? `<span class="news-tile-desc">${esc(unent(n.desc))}</span>` : ''}
     </a>`;
   }).join('');
   return head(true) + `<div class="news-strip">${tiles}</div>`;
@@ -5448,8 +5484,9 @@ function renderSaved() {
   if (!el) return;
   const list = savedScholarships();
   if (!list.length) {
-    el.innerHTML = `<h3 class="my-card-title">보관함</h3>
-      <p class="empty">아직 담아 둔 장학금이 없어요<br /><span class="empty-sub">공고 카드의 북마크를 누르면 여기에 모여요</span></p><button class="btn btn-ghost btn-empty" data-go="explore">장학금 둘러보기</button>`;
+    el.innerHTML = myFoldHtml('saved', '공고 보관함', '저장 0건', `
+      <p class="empty">아직 담아 둔 장학금이 없어요<br /><span class="empty-sub">공고 카드의 북마크를 누르면 여기에 모여요</span></p><button class="btn btn-ghost btn-empty" data-go="explore">장학금 둘러보기</button>`);
+    bindMyFold(el, 'saved');
     return;
   }
   const open = list.filter((s) => s.deadline && dday(s.deadline).days >= 0)
@@ -5459,9 +5496,7 @@ function renderSaved() {
     .sort((a, b) => deadlineTs(b) - deadlineTs(a));
   const soon = open.filter((s) => dday(s.deadline).days <= CAL_SOON_DAYS).length;
 
-  el.innerHTML = `
-    <h3 class="my-card-title">보관함</h3>
-    <p class="my-flags">저장 ${list.length}건${soon ? ` · 마감 임박 ${soon}건` : ''}</p>
+  el.innerHTML = myFoldHtml('saved', '공고 보관함', `저장 ${list.length}건${soon ? ` · 마감 임박 ${soon}건` : ''}`, `
     ${open.length ? `<h5 class="cal-sec">마감이 다가오는 순</h5>${open.map((s) => calRowHtml(s, { save: true })).join('')}` : ''}
     ${/* 🔴 날짜를 못 읽은 공고를 **숨기지 않는다** — 달력에는 찍을 수 없어 사라지는데,
          사라지면 학생은 그 공고가 없는 줄 안다. 여기가 그 자리다. */ ''}
@@ -5474,7 +5509,8 @@ function renderSaved() {
         <summary>이미 마감된 저장 공고 ${closed.length}건</summary>
         <p class="cal-note">지우지 않고 둡니다 — 내년에 다시 열리는 공고가 많아요.</p>
         ${closed.map((s) => calRowHtml(s, { badge: false, save: true })).join('')}
-      </details>` : ''}`;
+      </details>` : ''}`);
+  bindMyFold(el, 'saved');
 }
 
 /* 신청 기록 ↔ 공고 잇기 — **기록을 버리지 않는다** (2026-09-20 개발자 지시로 신설).
@@ -5791,6 +5827,8 @@ function renderMy() {
     ver.textContent = parts.join(' · ');
   }
 
+  /* 계정(로그인) 절 — 프로필이 없어도 그린다(새 기기에서 로그인해 프로필을 받아 오는 길 · 2026-10-10 MY 로 옮김) */
+  renderAccountCard();
   const p = state.profile;
   if (!p) return;   // 온보딩을 아직 안 마친 상태 — 그릴 프로필이 없다
   const c = p.common || {};
@@ -5822,15 +5860,14 @@ function renderMy() {
          약관 「③ 서버로 보내지 않는 정보」가 원본이다. */ ''}
     ${learnedHtml(c)}`;
   bindPhotoButtons();
-  /* 🔴 계정·알림은 여기서 그리지 않는다 — 설정 화면으로 옮겼다 (2026-09-11).
-     renderSettings() 가 **같은 함수**를 불러 그린다. */
+  /* 🔴 알림은 여기서 그리지 않는다 — 설정 화면(renderSettings). 계정은 2026-10-10 에 MY 로 되돌렸다(위 renderAccountCard). */
   renderWallet();
   renderSaved();
 }
 
 /* ---------------- 설정 화면 (2026-09-11 · 개발자 목업 승인) ---------------- */
 function renderSettings() {
-  renderAccountCard();
+  /* 계정 절은 MY 로 옮겼다(2026-10-10 · renderMy 가 그린다) — 여기서는 알림만 */
   renderNotifyCard();
   const t = $('#btn-open-trash');
   if (t && !t.dataset.wired) { t.dataset.wired = '1'; t.addEventListener('click', () => showScreen('trash')); }
@@ -6535,10 +6572,25 @@ function renderNotifyCard() {
   bindNotifySettings();
 }
 
+/* 🔴 MY 의 서류 보관함 · 공고 보관함은 **처음엔 접혀 있다** (2026-10-10 팀 업무 분장 MY 1번 — 은서:
+   "기본 접힌 상태로 제공, 펼치기 버튼 클릭 시에만 펼쳐지도록"). 브라우저 기본 접기(<details>)라 여닫는 코드가 없다.
+   다시 그려도(서류를 올린 뒤 등) 학생이 편 상태를 지킨다 — 저장은 안 한다(새로 열면 다시 접힘). */
+const myFoldOpen = { wallet: false, saved: false };
+function myFoldHtml(key, title, sub, inner) {
+  return `<details class="my-fold" data-fold="${key}"${myFoldOpen[key] ? ' open' : ''}>
+    <summary class="my-fold-head"><span class="my-fold-title"><span class="wallet-title">${title}</span>${sub ? `<span class="my-fold-sub">${esc(sub)}</span>` : ''}</span><span class="my-fold-btn" aria-hidden="true"></span></summary>
+    <div class="my-fold-body">${inner}</div>
+  </details>`;
+}
+function bindMyFold(el, key) {
+  const d = el.querySelector('.my-fold');
+  if (d) d.addEventListener('toggle', () => { myFoldOpen[key] = d.open; });
+}
+
 function renderWallet() {
   const el = $('#my-wallet');
-  el.innerHTML = `
-    <p class="wallet-title">서류 보관함</p>
+  const have = DOC_SLOTS.filter((s) => walletCache[s.slot]).length;
+  el.innerHTML = myFoldHtml('wallet', '서류 보관함', `${have}/${DOC_SLOTS.length} 올림`, `
     ${DOC_SLOTS.map((s) => {
       const rec = walletCache[s.slot];
       return `
@@ -6561,7 +6613,8 @@ function renderWallet() {
             </label>
           </div>
         </div>`;
-    }).join('')}`;
+    }).join('')}`);
+  bindMyFold(el, 'wallet');
 
   /* 발급처 안내 창 — 시트를 열 만한 내용이 아니라서 **작은 창** 하나로 띄운다.
      🔴 발급처 글자는 data.js 의 DOC_SLOTS.issue 그대로다 — 여기서 지어내지 않는다. */
@@ -7073,6 +7126,17 @@ function bindEvents() {
   });
 
   $('#btn-apply-all').addEventListener('click', applyAll);
+
+  /* 우리 학교 게시판 공고 더보기 (2026-10-10) — 다시 그리지 않고 가려 둔 카드를 편다(홈 '나에게 맞는 장학금'과 같은 방식) */
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-live-more]');
+    if (!b) return;
+    liveOpen = !liveOpen;
+    const list = $('#live-list');
+    if (list) list.classList.toggle('more-open', liveOpen);
+    b.setAttribute('aria-expanded', liveOpen ? 'true' : 'false');
+    b.textContent = liveOpen ? '접기' : `더보기 (${list ? list.querySelectorAll('.home-extra').length : 0}건)`;
+  });
 
   /* 재단·지자체 새 공고 더보기 (2026-10-01) — 이 구역만 다시 그린다. 다 폈으면 '접기'로 석 장에 돌아간다. */
   document.addEventListener('click', (e) => {
