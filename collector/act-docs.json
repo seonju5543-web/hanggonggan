@@ -1,23 +1,23 @@
 {
  "https://www.youthcenter.go.kr/bbs03View/48/10811": {
-  "at": "2026-10-03",
-  "tries": 1
+  "at": "2026-10-10",
+  "tries": 2
  },
  "https://www.youthcenter.go.kr/bbs03View/48/10808": {
-  "at": "2026-10-03",
-  "tries": 1
+  "at": "2026-10-10",
+  "tries": 2
  },
  "https://www.youthcenter.go.kr/bbs03View/48/10806": {
-  "at": "2026-10-03",
-  "tries": 1
+  "at": "2026-10-10",
+  "tries": 2
  },
  "https://www.youthcenter.go.kr/bbs03View/48/10794": {
-  "at": "2026-10-03",
-  "tries": 1
+  "at": "2026-10-10",
+  "tries": 2
  },
  "https://www.youthcenter.go.kr/bbs03View/48/10792": {
-  "at": "2026-10-03",
-  "tries": 1
+  "at": "2026-10-10",
+  "tries": 2
  },
  "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000": {
   "at": "2026-10-03",
@@ -32,16 +32,16 @@
   "tries": 1
  },
  "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179371": {
-  "at": "2026-10-03",
-  "tries": 1
+  "at": "2026-10-10",
+  "tries": 2
  },
  "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179418": {
   "at": "2026-10-03",
   "tries": 1
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53417&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-10-03",
-  "tries": 1
+  "at": "2026-10-10",
+  "tries": 2
  },
  "_common": [
   "b82639305744c749"
