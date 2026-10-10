@@ -1,7 +1,17 @@
 {
  "school": "국민대학교",
- "updatedAt": "2026-10-09",
+ "updatedAt": "2026-10-10",
  "items": [
+  {
+   "title": "2026학년도 2학기 중간시험 시행 안내",
+   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12412/view.do?currentPageNo=1",
+   "postedAt": "2026-09-23",
+   "kind": "학사",
+   "school": "국민대학교",
+   "campus": "",
+   "foundAt": "2026-10-10",
+   "thumb": "data/news/img/7bba38b74988764a.webp"
+  },
   {
    "title": "2026학년도 2학기 제1전공 변경신청 안내",
    "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12465/view.do?currentPageNo=1",
