@@ -1,4 +1,4 @@
-## 🖥 브라우저형 수집 리포트 (2026-10-09 19:23 KST)
+## 🖥 브라우저형 수집 리포트 (2026-10-10 11:17 KST)
 
 ### 한국외국어대학교
   - 📄 2페이지에서 장학 공고 15건 더 읽음
@@ -14,7 +14,7 @@
   - 📄 2페이지에서 장학 공고 10건 더 읽음
 - ✅ 링크 59 · 장학 공고 20 · https://www.yonsei.ac.kr/bbs/sc/58/artclList.do?findClSeq=257
   - 📄 2페이지에서 장학 공고 11건 더 읽음
-- ✅ 링크 493 · 장학 공고 21 · https://www.yonsei.ac.kr/sc/254/subview.do?enc=Zm5jdDF8QEB8JTJGYmJzJTJGc2MlMkY1OCUyRmFydGNsTGlzdC5kbyUzRmZpbmRDbFNlcSUzRDI1NyUyNg%3D%3D
+- ✅ 링크 480 · 장학 공고 21 · https://www.yonsei.ac.kr/sc/254/subview.do?enc=Zm5jdDF8QEB8JTJGYmJzJTJGc2MlMkY1OCUyRmFydGNsTGlzdC5kbyUzRmZpbmRDbFNlcSUzRDI1NyUyNg%3D%3D
 
 ### 서강대학교
 - ⚪ 링크 199 · 장학 공고 0 · https://www.sogang.ac.kr/ko/scholarship-notice
@@ -28,7 +28,7 @@
   - (본 글자) [교외] 해동과학문화재단 장학생 선발 안내(10/26 마감, 공학계열, 생활비 연 1200만원)
   - (본 글자) [교외] 우양재단 동행장학생 선발 안내(10/18 마감, 생활비 최대 100만원)
   - (본 글자) [교외] 논산시장학회 장학생 선발 안내(10/30 마감, 생활비 150만원)
-  - (본 글자) [교외] 인송문화재단 장학생 선발 안내(10/9 마감, 생활비 200만원)
+  - (본 글자) [교외] 고속도로장학재단 장학생 선발 안내(10/11 마감, 생활비 500만원)
 
 ### 서울시립대학교
 - ⚪ 링크 116 · 장학 공고 0 · 이미 아는 공고 25건은 다시 열지 않음 · https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1
@@ -68,8 +68,8 @@
 - ✅ 링크 615 · 장학 공고 1 · 이미 아는 공고 20건은 다시 열지 않음 · https://www.dongguk.edu/article/JANGHAKNOTICE/list
 
 ### 상명대학교
-- ✅ 링크 575 · 장학 공고 3 · https://www.smu.ac.kr/kor/life/notice.do
-- ✅ 링크 575 · 장학 공고 3 · https://www.smu.ac.kr/kor/life/notice.do?srCategoryId=8
+- ✅ 링크 560 · 장학 공고 3 · https://www.smu.ac.kr/kor/life/notice.do
+- ✅ 링크 560 · 장학 공고 3 · https://www.smu.ac.kr/kor/life/notice.do?srCategoryId=8
 - ⚪ 링크 0 · 장학 공고 0 · https://www.smu.ac.kr/kor/life/scholarship.do
 
 ### 고려대학교
@@ -77,15 +77,14 @@
 - ✅ 링크 768 · 장학 공고 2 · 이미 아는 공고 6건은 다시 열지 않음 · https://www.korea.ac.kr/ko/568/subview.do
 
 ### 계명대학교
-  - 📄 2페이지에서 장학 공고 21건 더 읽음
-- ✅ 링크 1052 · 장학 공고 42 · https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&
+- ❌ 오류(page.goto: Target page, context or browser has been closed) · https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&
 
 ### 부산대학교
   - 📄 2페이지에서 장학 공고 8건 더 읽음
 - ✅ 링크 92 · 장학 공고 2 · 이미 아는 공고 8건은 다시 열지 않음 · https://onestop.pusan.ac.kr/page?menuCD=000000000000062
 
 ### 서울교육대학교
-- ⚪ 링크 374 · 장학 공고 0 · 이미 아는 공고 14건은 다시 열지 않음 · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
+- ⚪ 링크 371 · 장학 공고 0 · 이미 아는 공고 14건은 다시 열지 않음 · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
 
 ### 홍익대학교
 - ⚪ 링크 0 · 장학 공고 0 · https://www.hongik.ac.kr/kr/education/notice-undergrad.do?mode=list&srCategoryId=24&srStartDt=&srEndDt=&srSearchKey=article_title&srSearchVal=
@@ -99,6 +98,11 @@
 
 ### 명지대학교
 - ✅ 링크 417 · 장학 공고 10 · https://www.mju.ac.kr/mjukr/259/subview.do
+
+### 🔁 실패 학교 재시도 (몇 분 뒤 재접속)
+**계명대학교**
+  - 📄 2페이지에서 장학 공고 21건 더 읽음
+- ✅ 링크 1052 · 장학 공고 42 · https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&
 
 ---
 이번 실행 신규 수집: **0건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
