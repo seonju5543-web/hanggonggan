@@ -1829,9 +1829,12 @@ function renderHome() {
     /* 신청 내역 화면과 같은 수(내려간 공고 빼고) — 공고 목록을 받기 전엔 담은 수 그대로(받고 나서 줄어드는 것은 '내려감'이 확정된 뒤다) */
     applications: shownAppCount(),
   };
+  /* 대외활동·공모전 칸 — 목록이 아직 안 왔으면 0 이 아니라 '모름'이라 배지를 숨긴다(없다고 말하지 않는다) */
+  const acts = liveActivities ? activitiesForMe() : null;
+  ['대외활동', '공모전'].forEach((k) => { tileN[k] = acts ? acts.filter((n) => (n.kind || '대외활동') === k).length : null; });
   $('#hero-tiles').innerHTML = HERO_TILES.map((t) => `
-    <button type="button" class="hero-tile" data-hero-go="${t.go}" aria-label="${t.name} ${tileN[t.go]}건">
-      <span class="hero-ico ${t.tone}">${t.svg}<span class="hero-badge${tileN[t.go] ? '' : ' zero'}">${tileN[t.go]}</span></span>
+    <button type="button" class="hero-tile" data-hero-go="${t.go}" aria-label="${t.name}${tileN[t.go] == null ? '' : ` ${tileN[t.go]}건`}">
+      <span class="hero-ico ${t.tone}">${t.svg}${tileN[t.go] == null ? '' : `<span class="hero-badge${tileN[t.go] ? '' : ' zero'}">${tileN[t.go]}</span>`}</span>
       <span class="hero-tile-name">${t.name}</span>
     </button>`).join('');
 
@@ -1937,7 +1940,9 @@ const SORT_KEYS = Object.keys(EXPLORE_SORTS);
    "장학금 쪽과 똑같이"). 화면마다 다른 것은 단추·목록의 id 와 기준표뿐이다. 두 벌로 베끼면
    한쪽만 고쳐져 또 달라진다(이 화면이 이미 한 번 그렇게 갈라져 있었다). */
 const ACTIVITY_SORTS = {
-  recent: { label: '최근 수집순' },
+  /* 🔴 이름은 장학 탐색의 '등록 최신순'과 같은 말을 쓴다 (2026-10-10 팀 업무 분장 14번 — 은서: 용어 통일).
+     예전 이름 '최근 수집순'은 같은 기준을 다른 말로 불러 두 화면이 다른 정렬처럼 읽혔다. */
+  recent: { label: '등록 최신순' },
   deadline: { label: '마감 임박순' },
   /* 적합도순 (2026-10-01) — 장학 탐색과 같은 잣대: 판정(fitRank — 맞음 < 미확인 < 미달)이 먼저, 그 안에서 적합도 */
   fit: { label: '적합도순' },
@@ -2660,6 +2665,12 @@ const HERO_TILES = [
     svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.5v6" stroke="#6b5a3a" stroke-width="1.6"/><path d="M16 2.5h6.5l-1.6 2 1.6 2H16z" fill="#dd5d4b"/><rect x="4" y="15" width="24" height="14" rx="1.5" fill="#f1c56c"/><path d="M2 16.5L16 8.5l14 8z" fill="#c4553f"/><rect x="13" y="20" width="6" height="9" rx="1" fill="#8a5a2b"/><rect x="6.5" y="19" width="4" height="4" rx=".8" fill="#7cbfe6"/><rect x="21.5" y="19" width="4" height="4" rx=".8" fill="#7cbfe6"/><circle cx="16" cy="14.3" r="2" fill="#fff"/></svg>' },
   { go: '교외', name: '교외', tone: 'navy',
     svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 11.5L16 3.5l13 8z" fill="#6f87ba"/><circle cx="16" cy="8.4" r="1.7" fill="#f1c56c"/><rect x="3" y="11.5" width="26" height="3" rx="1" fill="#55709f"/><rect x="6" y="15" width="3.4" height="10" fill="#e9eef7"/><rect x="11.6" y="15" width="3.4" height="10" fill="#e9eef7"/><rect x="17" y="15" width="3.4" height="10" fill="#e9eef7"/><rect x="22.6" y="15" width="3.4" height="10" fill="#e9eef7"/><path d="M8.4 15v10M14 15v10M19.4 15v10M25 15v10" stroke="#c3cde0" stroke-width="1"/><rect x="3" y="25" width="26" height="2.5" rx="1" fill="#55709f"/><rect x="1.5" y="27.5" width="29" height="2.6" rx="1" fill="#3f5788"/></svg>' },
+  /* 대외활동·공모전 칸 (2026-10-10 팀 업무 분장 4번 — 은서: "홈 버튼 수를 늘려 크기 축소 · 대외활동 및 공모전 탭 홈화면에 반영").
+     누르면 대외활동·공모전 화면을 그 종류 칩이 켜진 채로 연다(아래 data-hero-go 배선). 숫자는 그 화면 목록과 같은 activitiesForMe(). */
+  { go: '대외활동', name: '대외활동', tone: 'orange', act: true,
+    svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 13h5l11-6.5v19L10 19H5a2 2 0 01-2-2v-2a2 2 0 012-2z" fill="#f08a3c"/><path d="M21 6.5v19" stroke="#c4651f" stroke-width="2.4" stroke-linecap="round"/><path d="M7.5 19l2 7.5h3.6L11.6 19z" fill="#8a4a1f"/><path d="M25 12.5c1.6.9 2.5 2.1 2.5 3.5s-.9 2.6-2.5 3.5" fill="none" stroke="#f1c56c" stroke-width="2" stroke-linecap="round"/><ellipse cx="8" cy="14.6" rx="2.2" ry="1" fill="#fff" opacity=".4"/></svg>' },
+  { go: '공모전', name: '공모전', tone: 'violet', act: true,
+    svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 5h14v7a7 7 0 01-14 0z" fill="#f1b03b"/><path d="M9 7.5H5.5a4 4 0 004 5M23 7.5h3.5a4 4 0 01-4 5" fill="none" stroke="#d9952a" stroke-width="2" stroke-linecap="round"/><rect x="14" y="18" width="4" height="5" fill="#d9952a"/><rect x="9.5" y="23" width="13" height="5" rx="1.5" fill="#7a5cc4"/><path d="M16 8.2l1.1 2.2 2.4.3-1.8 1.7.5 2.4-2.2-1.2-2.2 1.2.5-2.4-1.8-1.7 2.4-.3z" fill="#fff"/></svg>' },
   { go: 'applications', name: '신청 내역', tone: 'gold',
     svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="3" width="19" height="25" rx="2.5" fill="#fff" stroke="#cfc6b6" stroke-width="1.2"/><path d="M9 9h11M9 13.5h11M9 18h7" stroke="#9db2d8" stroke-width="2" stroke-linecap="round"/><g transform="rotate(38 22 19)"><rect x="19.5" y="7" width="5" height="17" rx="1" fill="#f1b03b"/><rect x="19.5" y="7" width="5" height="3" fill="#e98c9b"/><path d="M19.5 24h5L22 28.5z" fill="#f2d7ae"/><path d="M21.3 27.1h1.4L22 28.5z" fill="#33231f"/></g></svg>' },
 ];
@@ -3089,7 +3100,7 @@ const ACT_FIELD_ETC = '기타';
 const ACT_FIELD_FOLD = 6;          // 접었을 때 보이는 분야 수(분야 전체 · +n 제외) — 375px 에서 「+n」 까지 두 줄 · ponytail: 글자 폭을 안 재는 어림이라 분야 이름이 길어지면 셋째 줄로 샐 수 있다
 let activitiesFieldOpen = false;   // 「+n」 으로 펼쳤는가 — 종류 칩과 같이 저장하지 않는다
 let activitiesQuery = '';
-/* 정렬 둘 — 최근 수집순(기본) · 마감 임박순(마감을 읽은 글이 앞, 못 읽은 글은 뒤에 최근순) (2026-09-29 · 4차 리서치: 경쟁 앱의 기본 축) */
+/* 정렬 둘 — 등록 최신순(기본) · 마감 임박순(마감을 읽은 글이 앞, 못 읽은 글은 뒤에 최근순) (2026-09-29 · 4차 리서치: 경쟁 앱의 기본 축) */
 let activitiesSort = 'recent';
 
 function loadActivities() {
@@ -6772,6 +6783,14 @@ function bindEvents() {
     if (!t) return;
     const go = t.dataset.heroGo;
     if (go === 'applications') { showScreen('applications'); return; }
+    if (go === '대외활동' || go === '공모전') {
+      /* 종류 칩을 켠 채로 연다 — 칩을 직접 누른 것과 같은 상태(분야는 푼다 · 칩 배선 주석과 같은 이유) */
+      activitiesFilter = go;
+      activitiesField = 'all';
+      $$('#activities-filters .filter-chip').forEach((c) => c.classList.toggle('active', c.dataset.filter === go));
+      showScreen('activities');
+      return;
+    }
     exploreFilter = go === 'deadline' ? 'all' : go;
     $$('#explore-filters .filter-chip').forEach((c) => c.classList.toggle('active', c.dataset.filter === exploreFilter));
     if (go === 'deadline') { $(SORT_MENUS.explore.label).textContent = EXPLORE_SORTS.deadline.label; exploreSort = 'deadline'; }

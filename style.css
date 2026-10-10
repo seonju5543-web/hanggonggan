@@ -4774,7 +4774,8 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
    요소도 index.html 에서 뺐다(app.js renderHome 주석에 경위). */
 .hero-tiles {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  /* 6칸 (2026-10-10 은서 — 대외활동·공모전 칸을 더하고 칸을 줄였다). 375px 에서 칸 하나 ≈ 52px */
+  grid-template-columns: repeat(6, 1fr);
   margin: var(--sp-3) 0 var(--sp-2);
   /* 위아래 구분선 없음 (2026-10-01 CTO 지시) — 칸 사이는 여백만으로 가른다 */
 }
@@ -4796,25 +4797,28 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 .hero-tile:active .hero-ico { transform: scale(0.94); }
 .hero-ico {
   position: relative;
-  width: 42px;
-  height: 42px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: transform 0.12s ease;
 }
-.hero-ico svg { width: 24px; height: 24px; }
+.hero-ico svg { width: 21px; height: 21px; }
+.hero-tile-name { white-space: nowrap; letter-spacing: -0.02em; }
 .hero-ico.red   { background: var(--red-weak); }
 .hero-ico.green { background: var(--green-weak); }
 .hero-ico.navy  { background: var(--surface-2); }
 .hero-ico.gold  { background: var(--accent-soft); }
+.hero-ico.orange { background: var(--orange-weak); }
+.hero-ico.violet { background: var(--primary-weak); }
 .hero-badge {
   position: absolute;
   top: -5px;
   right: -7px;
-  min-width: 20px;
-  height: 20px;
+  min-width: 18px;
+  height: 18px;
   /* 🔴 좌우 여백을 8px → 4px (2026-10-03 개발자 지시 "너비가 너무 넓다").
      실측: 한 자리 숫자인데 26.7×20 짜리 **옆으로 늘어난 타원**이었다(여백 8+8 과 테두리 2+2 가
      최소 너비 20 을 넘겨 버려서다). 4px 로 줄이면 한 자리는 20×20 **동그라미**가 되고,
@@ -4825,7 +4829,7 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
   color: #fff;
   font-size: var(--t-2xs);
   font-weight: 800;
-  line-height: 16px;
+  line-height: 14px;
   text-align: center;
   border: 2px solid var(--bg);
   font-variant-numeric: tabular-nums;

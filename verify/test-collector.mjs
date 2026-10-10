@@ -8648,13 +8648,26 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
       /\.hero-tiles \{[^}]*border/.test(tail), false);
   }
 
+  /* 🔴 정렬 용어 통일 (2026-10-10 팀 업무 분장 14번 — 은서). 장학 탐색과 대외활동이 같은 기준을 같은 말로 부른다. */
+  {
+    const exp = appSrc2.slice(appSrc2.indexOf('const EXPLORE_SORTS = {'), appSrc2.indexOf('};', appSrc2.indexOf('const EXPLORE_SORTS = {')));
+    const act = appSrc2.slice(appSrc2.indexOf('const ACTIVITY_SORTS = {'), appSrc2.indexOf('};', appSrc2.indexOf('const ACTIVITY_SORTS = {')));
+    eq('정렬 이름 — 장학·대외활동 둘 다 「등록 최신순」 (「최근 수집순」 같은 다른 말을 쓰지 않는다)',
+      /label: '등록 최신순'/.test(exp) && /label: '등록 최신순'/.test(act) && !/label: '최근 수집순'/.test(act), true);
+  }
+
   /* 🔴 홈 히어로 그림 4칸 (2026-10-01 CTO 결정 · 시안 I4). */
   {
     const tiles = appSrc2.slice(appSrc2.indexOf('const HERO_TILES = ['), appSrc2.indexOf('];', appSrc2.indexOf('const HERO_TILES = [')));
     const gos = [...tiles.matchAll(/go: '([^']+)'/g)].map((m) => m[1]);
-    eq('히어로 그림 칸은 넷 — 마감 임박 · 교내 · 교외 · 신청 내역', gos, ['deadline', '교내', '교외', 'applications']);
+    /* 2026-10-10 팀 업무 분장 4번(은서) — 대외활동·공모전 칸을 더해 여섯 칸 · 칸은 작게 */
+    eq('히어로 그림 칸은 여섯 — 마감 임박 · 교내 · 교외 · 대외활동 · 공모전 · 신청 내역', gos, ['deadline', '교내', '교외', '대외활동', '공모전', 'applications']);
     eq('  그림은 SVG 다 (이모지 아님 — 폰마다 그림이 달라지지 않게)',
-      (tiles.match(/svg: '<svg /g) || []).length, 4);
+      (tiles.match(/svg: '<svg /g) || []).length, 6);
+    eq('  대외활동·공모전 칸은 그 종류 칩을 켠 채 대외활동 화면을 연다',
+      /go === '대외활동' \|\| go === '공모전'[\s\S]{0,400}activitiesFilter = go;[\s\S]{0,300}showScreen\('activities'\)/.test(appSrc2), true);
+    eq('  활동 목록이 아직 안 왔으면 0 이 아니라 배지를 숨긴다 (모름 ≠ 없음)',
+      /tileN\[t\.go\] == null \? ''/.test(appSrc2), true);
     /* 지구본 = 원 + 가로 적도선 + 경선 두 곡선. 교외 칸은 CTO 지시로 지구가 아니라 재단 건물이다 */
     const outer = tiles.slice(tiles.indexOf("go: '교외'"), tiles.indexOf("go: 'applications'"));
     eq("  교외 칸은 지구 그림이 아니다 (CTO 지시 — 재단 건물)",
