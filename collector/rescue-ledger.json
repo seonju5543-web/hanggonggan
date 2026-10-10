@@ -413,5 +413,11 @@
   "at": "2026-10-09",
   "minBody": 100,
   "name": "[학생지원팀] 2026년 2학기 한국선원복지고용센터 선원가족장학생 선발 안내"
+ },
+ "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12387/view.do?currentpageno=1": {
+  "tries": 1,
+  "at": "2026-10-11",
+  "minBody": 100,
+  "name": "등록금외지원 2026년도 SL이충곤재단 장학금 신청 안내(공학계열)(생활비성 장학금)"
  }
 }
