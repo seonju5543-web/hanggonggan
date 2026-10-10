@@ -3,13 +3,24 @@
  "updatedAt": "2026-10-10",
  "items": [
   {
+   "title": "[성균관대학교 청정에너지ICT연구소] 이공계열 석사졸업이상 연구원 모집(1명)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140472&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-10",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-10",
+   "desc": "최종 수정일 : 2026.10.10 첨부파일 ( 0 ) 게시글 내용 1. 담당 업무(1명)"
+  },
+  {
    "title": "성균관대학교 문화예술미디어융합원 촉탁직원(연구원) 채용 공고",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140466&article.offset=0&articleLimit=10",
    "postedAt": "2026-10-08",
    "kind": "채용",
    "school": "성균관대학교",
    "campus": "",
-   "foundAt": "2026-10-08"
+   "foundAt": "2026-10-08",
+   "desc": "최종 수정일 : 2026.10.08 총괄지원팀 첨부파일 ( 2 ) 게시글 내용 문화예술미디어융합원 촉탁직원(연구원)을 아래와 같이 채용하고자 하오니 많은 지원 바랍니다."
   },
   {
    "title": "대학원혁신센터 촉탁직원 채용 공고(BK대학원혁신사업)",
@@ -18,7 +29,8 @@
    "kind": "채용",
    "school": "성균관대학교",
    "campus": "",
-   "foundAt": "2026-10-08"
+   "foundAt": "2026-10-08",
+   "desc": "최종 수정일 : 2026.10.08 총괄지원팀 첨부파일 ( 2 ) 게시글 내용 우리대학 대학원혁신센터에서 BK대학원혁신지원사업을 담당할 촉탁직원을 아래와 같이 채용합니다."
   },
   {
    "title": "[교수학습혁신센터] 제2회 AI in Higher Education 컨퍼런스 참여 안내",
@@ -289,7 +301,8 @@
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/0fb1ce46ca702f27.webp"
+   "thumb": "data/news/img/0fb1ce46ca702f27.webp",
+   "desc": "일시: 2026년 10월 21일(수) 11:30~13:00 장소: 사회과학연구원 컨퍼런스룸(수선관 901호) 발표: 오서정 교수(글로벌리더학부) 새로운 백년의 시작 2026 아리랑 행사 자원봉사자 모집 (10/1)…"
   },
   {
    "title": "[산업전자응용연구소]비전임교원(연구교수) 채용",
@@ -351,16 +364,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/1a9d225a8fcbb71d.webp"
-  },
-  {
-   "title": "2026학년도 건학기념제 ESKARA: 초록의 파도 개최 안내 및 통제구역 등 안전 안내",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140190&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-01",
-   "kind": "행사",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/1b32aca2c246744b.webp"
   }
  ]
 }
