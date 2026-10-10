@@ -431,15 +431,6 @@
   "at": "2026-10-07",
   "tries": 1
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3531938": {
-  "at": "2026-10-08",
-  "tries": 1,
-  "lines": [
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3527764": {
   "at": "2026-10-08",
   "tries": 1,
