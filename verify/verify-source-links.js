@@ -178,7 +178,8 @@ const SCHOOL = process.env.LINKCHECK_SCHOOL || '경희';
   await page.waitForTimeout(400);
   const feed = await page.$$eval('#screen-home .notice-card', (els) => els.map((e) => ({
     href: e.href || '', title: (e.querySelector('.sch-name') || {}).textContent || '',
-    tail: [...e.querySelectorAll('.sch-provider')].map((p) => p.textContent.trim()).find((t) => / 수집/.test(t)) || '',
+    /* 카드 맨 아래 줄 — 링크 이름이 끝에 붙는 줄. 홈 게시판 카드는 2026-10-10 에 날짜를 윗줄로 올려 「수집」 낱말이 이 줄에 없을 수 있다 */
+    tail: [...e.querySelectorAll('.sch-provider')].map((p) => p.textContent.trim()).pop() || '',
   }))).catch(() => []);
   /* 카드 → 데이터 글 (앱이 받는 파일들 · 주소로 맞춘다) */
   const readItems = (p) => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, p), 'utf8')).items || []; } catch (e) { return []; } };
@@ -192,7 +193,7 @@ const SCHOOL = process.env.LINKCHECK_SCHOOL || '경희';
     if (!n) { feedWrong += 1; bad(`홈 카드의 글을 데이터에서 못 찾았습니다 — ${f.title.slice(0, 40)} · ${f.href.slice(0, 80)}`); continue; }
     const want = SL.sourceLink(n, 'card').label;
     feedChecked += 1;
-    if (!(want ? f.tail.endsWith(` · ${want}`) : !/↗/.test(f.tail))) { feedWrong += 1; bad(`게시판 글 카드 라벨이 규칙과 다릅니다 — 기대 「${want}」 · 화면 「${f.tail}」 · ${f.href.slice(0, 80)}`); }
+    if (!(want ? (f.tail === want || f.tail.endsWith(` · ${want}`)) : !/↗/.test(f.tail))) { feedWrong += 1; bad(`게시판 글 카드 라벨이 규칙과 다릅니다 — 기대 「${want}」 · 화면 「${f.tail}」 · ${f.href.slice(0, 80)}`); }
   }
   if (!feed.length) bad(`홈에 게시판 글 카드가 한 장도 없습니다 — 0건 통과는 통과가 아닙니다(${SCHOOL} 학교 파일·홈 구역 확인)`);
   else if (!feedWrong) ok(`홈 게시판 글 카드 라벨이 규칙(source-link.js)과 같다 (${feedChecked}/${feed.length}장 검사)`);
