@@ -110,26 +110,34 @@ const eq = (label, got, want) => {
   await dismissNotify(page);
   await page.waitForTimeout(300);
 
-  console.log('\n■ MY 화면 — 계정·알림은 여기 없고, 오른쪽 위에 설정이 있다');
+  console.log('\n■ MY 화면 — C안 구조 (2026-10-10 은서 「저번 C안처럼」): 머리줄 + 메뉴 줄 넷 + 로그인 카드');
   await page.click('.nav-item[data-nav="my"]');
   await page.waitForSelector('#screen-my:not([hidden])');
   await page.waitForTimeout(400);
-  eq('오른쪽 위에 설정(톱니) 버튼이 있다', await page.$eval('#btn-open-settings', (e) => e.offsetParent !== null), true);
-  /* 🔴 계정(로그인)은 다시 MY 안이다 (2026-10-10 팀 업무 분장 MY 2번 — 은서: "로그인을 MY 화면 내부에 배치") */
-  eq('MY 안에 계정 절이 보인다', await page.$eval('#my-account', (e) => e.offsetParent !== null), true);
-  eq('계정 절은 프로필 카드 바로 아래다', await page.$eval('#my-account', (e) => e.previousElementSibling && e.previousElementSibling.id), 'my-profile');
-  eq('설정 화면에는 계정 절이 없다 (한 곳에만)', await page.$$eval('#screen-settings #my-account', (e) => e.length), 0);
-  /* 🔴 서류 보관함 · 공고 보관함은 처음엔 접혀 있다 (같은 날 MY 1번) */
-  eq('서류 보관함은 처음엔 접혀 있다', await page.$eval('#my-wallet .my-fold', (d) => d.open), false);
-  eq('공고 보관함은 처음엔 접혀 있다', await page.$eval('#my-saved .my-fold', (d) => d.open), false);
-  eq('접힌 머리줄에 펼치기 글자가 보인다', await page.$eval('#my-wallet .my-fold-btn', (e) => getComputedStyle(e, '::after').content), '"펼치기 ▾"');
-  await page.click('#my-wallet .my-fold > summary');
-  eq('펼치기를 누르면 서류 줄이 보인다', await page.$eval('#my-wallet .wallet-row', (e) => e.offsetParent !== null), true);
-  await page.evaluate(() => renderWallet());
-  eq('다시 그려도(서류 올린 뒤 등) 편 상태가 남는다', await page.$eval('#my-wallet .my-fold', (d) => d.open), true);
-  await page.click('#my-wallet .my-fold > summary');
+  eq('머리줄에 이름과 학교가 있다', /김한장|님/.test(await page.textContent('#my-head')) && /한국외국어대학교/.test(await page.textContent('#my-head')), true);
+  eq('메뉴 줄 넷 — 내 정보 · 서류함 · 공고 보관함 · 알림 · 설정',
+    await page.$$eval('#screen-my .me-row .me-txt b', (els) => els.map((e) => e.textContent.trim())), ['내 정보', '서류함', '공고 보관함', '알림 · 설정']);
+  eq('줄마다 작은 글씨가 채워져 있다 (빈 줄 없음)', await page.$$eval('#screen-my .me-row small', (els) => els.every((e) => e.textContent.trim().length > 0)), true);
+  eq('알림 · 설정 줄이 설정 화면 문(#btn-open-settings)이다', await page.$eval('#btn-open-settings', (e) => e.classList.contains('me-row') && e.offsetParent !== null), true);
+  /* 🔴 계정(로그인)은 MY 안 — 메뉴 아래 카드 한 장 (2026-10-10 MY 2번 · 한 곳에만) */
+  eq('MY 안에 계정 카드가 보인다', await page.$eval('#my-account', (e) => e.offsetParent !== null), true);
+  eq('계정 카드는 메뉴 바로 아래다', await page.$eval('#my-account', (e) => e.previousElementSibling && e.previousElementSibling.classList.contains('me-menu')), true);
+  eq('설정 화면에는 계정 카드가 없다 (한 곳에만)', await page.$$eval('#screen-settings #my-account', (e) => e.length), 0);
+  eq('MY 첫 화면에는 프로필 표·서류·보관함 목록을 깔지 않는다 (안쪽 화면으로)',
+    await page.$$eval('#screen-my #my-profile, #screen-my #my-wallet, #screen-my #my-saved', (e) => e.length), 0);
   eq('MY 안에서는 알림 절이 안 보인다', await page.$eval('#my-notify', (e) => e.offsetParent !== null), false);
   await page.screenshot({ path: `${SHOT}/my.png` });
+  /* 메뉴 줄 → 안쪽 화면 → 뒤로 */
+  for (const [go, title, el] of [['mydocs', '서류함', '#my-wallet .wallet-row'], ['mysaved', '공고 보관함', '#my-saved'], ['myinfo', '내 정보', '#my-profile .my-grid']]) {
+    await page.click(`[data-my-go="${go}"]`);
+    await page.waitForSelector(`#screen-${go}:not([hidden])`);
+    eq(`  「${title}」 줄 → 안쪽 화면 (제목 · 내용)`, [(await page.textContent(`#screen-${go} .sub-header h2`)).trim(), await page.$eval(el, (e) => e.offsetParent !== null)], [title, true]);
+    eq('    아래 탭은 MY 가 켜진 채', await page.$eval('.nav-item[data-nav="my"]', (e) => e.classList.contains('active')), true);
+    if (go !== 'myinfo') {
+      await page.click(`#btn-${go}-back`);
+      await page.waitForSelector('#screen-my:not([hidden])');
+    }
+  }
 
   /* 🔴 **학적정보 수정은 그 글자만 눌러야 간다** (2026-09-12 개발자 지시 — "전체 표를 눌러도
      수정하는 걸로 넘어가는데 학적정보수정 부분만 눌렀을 때 수정가능하게").
@@ -145,11 +153,11 @@ const eq = (label, got, want) => {
     await page.click('#my-profile .my-grid div:nth-child(3)');   // 지원구간 칸
     await page.waitForTimeout(400);
     eq('🔴 표(지원구간 칸)를 눌러도 수정으로 넘어가지 않는다',
-      await page.evaluate(() => currentScreen), 'my');
+      await page.evaluate(() => currentScreen), 'myinfo');
     await page.click('#my-profile .my-line');                    // 학교·학과 줄
     await page.waitForTimeout(400);
     eq('🔴 학교 줄을 눌러도 넘어가지 않는다',
-      await page.evaluate(() => currentScreen), 'my');
+      await page.evaluate(() => currentScreen), 'myinfo');
 
     /* 🔴 사진 단추를 눌러도 수정으로 안 넘어간다 — 예전엔 카드가 버튼이라 파일 창과
        수정 화면이 **같이** 열렸고, 그걸 캡처 단계 가로채기로 막고 있었다. 그 장치를 걷은
@@ -162,7 +170,7 @@ const eq = (label, got, want) => {
       await photoBtn.click();
       await page.waitForTimeout(400);
       eq('🔴 사진 단추를 눌러도 수정으로 넘어가지 않는다',
-        await page.evaluate(() => currentScreen), 'my');
+        await page.evaluate(() => currentScreen), 'myinfo');
     }
 
     /* 🔴 **닿는 자리를 재 둔다** (2026-09-12 코드 리뷰) — 수정으로 가는 문이 이 글자 하나뿐인데
@@ -184,6 +192,7 @@ const eq = (label, got, want) => {
     const cancel = await page.$('[data-onboard-cancel]:not([hidden])');
     if (cancel) await cancel.click();
     await page.waitForTimeout(600);
+    /* 취소는 떠났던 안쪽 화면(내 정보)이나 MY 로 돌아온다 — 다음 절은 MY 첫 화면에서 시작하게 맞춘다 */
     if (await page.$eval('#screen-my', (e) => e.hidden)) {
       await page.evaluate(() => showScreen('my'));
       await page.waitForSelector('#screen-my:not([hidden])');
@@ -191,32 +200,9 @@ const eq = (label, got, want) => {
     await page.waitForTimeout(300);
   }
 
-  /* 🔴 **아이콘 버튼의 손가락 표적** (2026-09-18 개발자 결정 「충돌」 9 (b)).
-     실측으로 `.icon-btn`(알림 종 · 설정 톱니)이 38×38 이었다 — Apple 최소 44 에 6px 모자란다.
-     넓힌 것은 **누를 수 있는 넓이**뿐이고 보이는 38×38 은 그대로다(hover 면이 커지면
-     승인받은 모양이 바뀐다 — 그래서 `.my-edit-hint` 처럼 padding 으로 넓히지 않고
-     안 보이는 덧판 `.icon-btn::after` 로 넓혔다. style.css `.icon-btn` 절).
-     🔴 **크기를 재는 것으로는 증명이 안 된다** — 덧판은 눈에 안 보이고 상자 크기를 안 바꾼다.
-        그래서 네 귀퉁이를 **실제로 짚어 보고**(elementFromPoint) 버튼에 닿는지 센다.
-        되돌리면(덧판을 지우면) 귀퉁이가 빗나가 빨간불이 된다 — 확인함. */
-  {
-    const tap = await page.$eval('#btn-open-settings', (e) => {
-      const r = e.getBoundingClientRect();
-      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-      const hit = (dx, dy) => {
-        const el = document.elementFromPoint(cx + dx, cy + dy);
-        return !!(el && (el === e || e.contains(el)));
-      };
-      /* 44 짜리 표적이면 중심에서 ±21 까지는 버튼에 닿아야 한다(가장자리 1px 여유) */
-      const d = 21;
-      return {
-        보이는크기: `${Math.round(r.width)}×${Math.round(r.height)}`,
-        귀퉁이넷: [hit(-d, -d), hit(d, -d), hit(-d, d), hit(d, d)].filter(Boolean).length,
-      };
-    });
-    eq('보이는 아이콘 버튼은 38×38 그대로다 (모양을 키우지 않았다)', tap.보이는크기, '38×38');
-    eq('🔴 손가락이 닿는 넓이는 44×44 다 (네 귀퉁이를 실제로 짚어 확인)', tap.귀퉁이넷, 4);
-  }
+  /* 🔴 손가락 표적 — 설정 문이 2026-10-10 에 톱니(38px 아이콘 + 덧판)에서 MY 메뉴 줄로 바뀌었다. 줄 자체가 44px 이상이어야 한다 */
+  eq('🔴 MY 메뉴 줄은 손가락이 닿는 높이다 (44px 이상)',
+    await page.$$eval('#screen-my .me-row', (els) => els.every((e) => e.getBoundingClientRect().height >= 44)), true);
 
   console.log('\n■ 설정 화면 — 승인받은 목업 그대로인가');
   await page.click('#btn-open-settings');
@@ -241,7 +227,8 @@ const eq = (label, got, want) => {
   eq('MY 탭이 켜진 채로 남는다 (여기가 MY 안쪽이라는 표시)',
     await page.$eval('.nav-item[data-nav="my"]', (e) => e.classList.contains('active')), true);
 
-  eq('계정 절 제목', (await page.textContent('#my-account .acc-head')).trim(), '계정');
+  /* 2026-10-10 C안 — 로그인 전 계정 카드의 제목은 할 일을 말한다 */
+  eq('계정 카드 제목', (await page.textContent('#my-account .acc-head')).trim(), '기기를 바꿔도 이어 쓰려면');
   eq('계정 버튼 둘 — 로그인 · 회원가입',
     await page.$$eval('#my-account .acc-actions .btn', (els) => els.map((e) => e.textContent.trim())),
     ['로그인', '회원가입']);
@@ -994,6 +981,9 @@ const eq = (label, got, want) => {
     await page.waitForSelector('#screen-my:not([hidden])');
     await page.waitForTimeout(600);
 
+    /* 2026-10-10 C안 — 학적정보 표는 「내 정보」 안쪽 화면에 있다 */
+    await page.click('[data-my-go="myinfo"]');
+    await page.waitForSelector('#screen-myinfo:not([hidden])');
     /* ① 학적정보 표 — 칸마다 긋던 줄이 없다(윗줄 하나는 남는다) */
     const 표 = await page.$$eval('.my-grid > div', (els) => els.map((e) =>
       parseFloat(getComputedStyle(e).borderBottomWidth)));
@@ -1002,7 +992,11 @@ const eq = (label, got, want) => {
     eq('  다만 표를 윗블록과 가르는 줄 하나는 남는다',
       parseFloat(await page.$eval('.my-grid', (e) => getComputedStyle(e).borderTopWidth)) > 0, true);
 
-    /* ② 빈 안내문이 이미 줄이 있는 자리에서 윗줄을 또 긋지 않는다 */
+    /* ② 빈 안내문이 이미 줄이 있는 자리에서 윗줄을 또 긋지 않는다 — 빈 공고 보관함(안쪽 화면)에서 잰다 */
+    await page.click('#btn-myinfo-back');
+    await page.click('[data-my-go="mysaved"]');
+    await page.waitForSelector('#screen-mysaved:not([hidden])');
+    await page.waitForTimeout(300);
     const 빈안내 = await page.$$eval('.empty', (els) => els
       .filter((e) => e.offsetParent)
       .map((e) => ({

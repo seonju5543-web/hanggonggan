@@ -1105,13 +1105,13 @@ function showScreen(name, opts) {
   if (typeof resumeSaveScroll === 'function' && currentScreen && currentScreen !== name) {
     resumeSaveScroll(currentScreen, appScroller().scrollTop);
   }
-  ['onboarding', 'home', 'explore', 'activities', 'applications', 'my', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'].forEach((n) => {
+  ['onboarding', 'home', 'explore', 'activities', 'applications', 'my', 'myinfo', 'mydocs', 'mysaved', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'].forEach((n) => {
     $(`#screen-${n}`).hidden = n !== name;
   });
   $('#bottom-nav').hidden = name === 'onboarding';
   /* 설정·휴지통은 MY 안쪽 화면이라 아래 탭에서 **MY 가 켜진 채**로 둔다 —
      아무 탭도 안 켜져 있으면 학생이 지금 어디에 있는지 알 수 없다. */
-  const navOn = ['settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'].includes(name) ? 'my' : name;
+  const navOn = ['myinfo', 'mydocs', 'mysaved', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'].includes(name) ? 'my' : name;
   $$('.nav-item').forEach((b) => b.classList.toggle('active', b.dataset.nav === navOn));
 
   /* 🔴 안쪽 화면(설정·휴지통)은 **방향이 있는** 움직임으로 들어온다 (2026-09-11 개발자 지시).
@@ -1120,7 +1120,7 @@ function showScreen(name, opts) {
         style.css 에서 **이 규칙이 뒤에 와야** 이긴다(같은 굵기면 나중 것이 이긴다).
      ⚠️ 클래스를 떼었다 붙이는 것만으로는 다시 안 돈다 — 브라우저가 '바뀐 게 없다'고 본다.
         중간에 offsetWidth 를 한 번 읽어 강제로 끊어 준다. */
-  const SUB = ['settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'];
+  const SUB = ['myinfo', 'mydocs', 'mysaved', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'];
   /* 🔴 안쪽 화면에서는 **가로 손짓이 우리 것**이라고 앱 전체에 표시해 둔다 (2026-09-12).
      짧은 화면 아래 빈 자리는 화면이 아니라 `#app` 이라, 화면에만 주면 거기서 시작한
      손짓을 브라우저가 세로 스크롤로 가져간다. 안쪽 화면일 때만 켜는 이유는 style.css 에. */
@@ -1139,7 +1139,7 @@ function showScreen(name, opts) {
   if (name === 'explore') renderExplore();
   if (name === 'activities') renderActivities();
   if (name === 'applications') renderApplications();
-  if (name === 'my') renderMy();
+  if (name === 'my' || name === 'myinfo' || name === 'mydocs' || name === 'mysaved') renderMy();
   if (name === 'settings') renderSettings();
   if (name === 'trash') renderTrash();
   if (name === 'terms') renderTerms();
@@ -4653,6 +4653,9 @@ const SWIPE_EDGE_IOS = 24;   /* iOS 제 뒤로가기에 양보하는 왼쪽 끝 
    학생이 화면 가운데를 쓸어도 아무 일도 안 일어난다(검사에서 실제로 그렇게 걸렸다).
    지금 어느 화면인지는 `currentScreen` 이 말해 주고, 안쪽 화면일 때만 맡는다. */
 const SWIPE_BACK_TO = {
+  myinfo: 'my',
+  mydocs: 'my',
+  mysaved: 'my',
   settings: 'my',
   trash: 'settings',
   terms: 'settings',
@@ -5483,10 +5486,10 @@ function renderSaved() {
   const el = $('#my-saved');
   if (!el) return;
   const list = savedScholarships();
+  { const sub = $('#my-sub-saved'); if (sub) { const n = list.filter((s) => s.deadline && dday(s.deadline).days >= 0 && dday(s.deadline).days <= CAL_SOON_DAYS).length; sub.textContent = list.length ? `저장 ${list.length}건${n ? ` · 마감 임박 ${n}건` : ''}` : '담아 둔 공고가 없어요'; } }
   if (!list.length) {
-    el.innerHTML = myFoldHtml('saved', '공고 보관함', '저장 0건', `
+    el.innerHTML = (`
       <p class="empty">아직 담아 둔 장학금이 없어요<br /><span class="empty-sub">공고 카드의 북마크를 누르면 여기에 모여요</span></p><button class="btn btn-ghost btn-empty" data-go="explore">장학금 둘러보기</button>`);
-    bindMyFold(el, 'saved');
     return;
   }
   const open = list.filter((s) => s.deadline && dday(s.deadline).days >= 0)
@@ -5496,7 +5499,7 @@ function renderSaved() {
     .sort((a, b) => deadlineTs(b) - deadlineTs(a));
   const soon = open.filter((s) => dday(s.deadline).days <= CAL_SOON_DAYS).length;
 
-  el.innerHTML = myFoldHtml('saved', '공고 보관함', `저장 ${list.length}건${soon ? ` · 마감 임박 ${soon}건` : ''}`, `
+  el.innerHTML = (`
     ${open.length ? `<h5 class="cal-sec">마감이 다가오는 순</h5>${open.map((s) => calRowHtml(s, { save: true })).join('')}` : ''}
     ${/* 🔴 날짜를 못 읽은 공고를 **숨기지 않는다** — 달력에는 찍을 수 없어 사라지는데,
          사라지면 학생은 그 공고가 없는 줄 안다. 여기가 그 자리다. */ ''}
@@ -5510,7 +5513,6 @@ function renderSaved() {
         <p class="cal-note">지우지 않고 둡니다 — 내년에 다시 열리는 공고가 많아요.</p>
         ${closed.map((s) => calRowHtml(s, { badge: false, save: true })).join('')}
       </details>` : ''}`);
-  bindMyFold(el, 'saved');
 }
 
 /* 신청 기록 ↔ 공고 잇기 — **기록을 버리지 않는다** (2026-09-20 개발자 지시로 신설).
@@ -5860,9 +5862,29 @@ function renderMy() {
          약관 「③ 서버로 보내지 않는 정보」가 원본이다. */ ''}
     ${learnedHtml(c)}`;
   bindPhotoButtons();
+  renderMyMenu(p, trackLabel);
   /* 🔴 알림은 여기서 그리지 않는다 — 설정 화면(renderSettings). 계정은 2026-10-10 에 MY 로 되돌렸다(위 renderAccountCard). */
   renderWallet();
   renderSaved();
+}
+
+/* MY 첫 화면 — 머리줄 + 메뉴 줄의 작은 글씨 (2026-10-10 C안 구조).
+   🔴 숫자·말을 새로 만들지 않는다 — 프로필·서류함·보관함·알림 장부에 있는 것을 줄여 적을 뿐이다.
+   서류함·보관함 줄은 각자 그리는 함수(renderWallet·renderSaved)가 고친다(서류 캐시가 늦게 와도 맞게). */
+function renderMyMenu(p, trackLabel) {
+  const head = $('#my-head');
+  if (head) {
+    const img = profilePhoto && profilePhoto.url ? `<img src="${esc(profilePhoto.url)}" alt="" />` : esc((p.name || '학').charAt(0));
+    const line = [p.school || '대학 미설정', p.major || trackLabel, p.year ? `${p.year}학년` : ''].filter(Boolean).map(esc).join(' · ');
+    head.innerHTML = `<span class="me-av" aria-hidden="true">${img}</span><span class="me-who"><b>${esc(p.name || '대학생')} 님</b><small>${line}</small></span>`;
+  }
+  const info = $('#my-sub-info');
+  if (info) info.textContent = [p.gpa != null ? `평점 ${p.gpa.toFixed(2)}` : '평점 미입력', p.bracket != null ? `${p.bracket}구간` : '지원구간 모름', p.status || ''].filter(Boolean).join(' · ');
+  const set = $('#my-sub-settings');
+  if (set) {
+    const on = typeof notifyLedger !== 'undefined' && notifyLedger && notifyLedger.enabled && typeof Notification !== 'undefined' && Notification.permission === 'granted';
+    set.textContent = `알림 ${on ? '켜짐' : '꺼짐'} · 로그인 기록 · 자주 묻는 질문 · 약관`;
+  }
 }
 
 /* ---------------- 설정 화면 (2026-09-11 · 개발자 목업 승인) ---------------- */
@@ -6572,25 +6594,13 @@ function renderNotifyCard() {
   bindNotifySettings();
 }
 
-/* 🔴 MY 의 서류 보관함 · 공고 보관함은 **처음엔 접혀 있다** (2026-10-10 팀 업무 분장 MY 1번 — 은서:
-   "기본 접힌 상태로 제공, 펼치기 버튼 클릭 시에만 펼쳐지도록"). 브라우저 기본 접기(<details>)라 여닫는 코드가 없다.
-   다시 그려도(서류를 올린 뒤 등) 학생이 편 상태를 지킨다 — 저장은 안 한다(새로 열면 다시 접힘). */
-const myFoldOpen = { wallet: false, saved: false };
-function myFoldHtml(key, title, sub, inner) {
-  return `<details class="my-fold" data-fold="${key}"${myFoldOpen[key] ? ' open' : ''}>
-    <summary class="my-fold-head"><span class="my-fold-title"><span class="wallet-title">${title}</span>${sub ? `<span class="my-fold-sub">${esc(sub)}</span>` : ''}</span><span class="my-fold-btn" aria-hidden="true"></span></summary>
-    <div class="my-fold-body">${inner}</div>
-  </details>`;
-}
-function bindMyFold(el, key) {
-  const d = el.querySelector('.my-fold');
-  if (d) d.addEventListener('toggle', () => { myFoldOpen[key] = d.open; });
-}
-
+/* 서류함 · 공고 보관함은 2026-10-10 에 MY 의 **안쪽 화면**(mydocs·mysaved)으로 옮겼다 — 같은 날 아침의 접기(<details>)는 걷었다.
+   몇 건인지는 MY 메뉴 줄의 작은 글씨가 말한다(renderMyMenu). */
 function renderWallet() {
   const el = $('#my-wallet');
   const have = DOC_SLOTS.filter((s) => walletCache[s.slot]).length;
-  el.innerHTML = myFoldHtml('wallet', '서류 보관함', `${have}/${DOC_SLOTS.length} 올림`, `
+  { const sub = $('#my-sub-docs'); if (sub) sub.textContent = `올린 서류 ${have} / ${DOC_SLOTS.length} · 신청할 때 자동으로 붙어요`; }
+  el.innerHTML = (`
     ${DOC_SLOTS.map((s) => {
       const rec = walletCache[s.slot];
       return `
@@ -6614,7 +6624,6 @@ function renderWallet() {
           </div>
         </div>`;
     }).join('')}`);
-  bindMyFold(el, 'wallet');
 
   /* 발급처 안내 창 — 시트를 열 만한 내용이 아니라서 **작은 창** 하나로 띄운다.
      🔴 발급처 글자는 data.js 의 DOC_SLOTS.issue 그대로다 — 여기서 지어내지 않는다. */
@@ -7203,6 +7212,9 @@ function bindEvents() {
   /* 설정 화면 — MY 오른쪽 위 톱니로 들어가고, 왼쪽 위 화살표로 되돌아온다 (2026-09-11). */
   $('#btn-open-settings').addEventListener('click', () => showScreen('settings'));
   $('#btn-settings-back').addEventListener('click', () => showScreen('my', { back: true }));
+  /* MY 메뉴 줄 → 안쪽 화면 (2026-10-10 C안 구조). 되돌아오기는 왼쪽 위 화살표와 오른쪽으로 쓸기(SWIPE_BACK_TO) */
+  $$('[data-my-go]').forEach((b) => b.addEventListener('click', () => showScreen(b.dataset.myGo)));
+  for (const n of ['myinfo', 'mydocs', 'mysaved']) $(`#btn-${n}-back`).addEventListener('click', () => showScreen('my', { back: true }));
   $('#btn-trash-back').addEventListener('click', () => showScreen('settings', { back: true }));
   $('#btn-terms-back').addEventListener('click', () => showScreen('settings', { back: true }));
   for (const id of ['#btn-logins-back', '#btn-faq-back', '#btn-support-back', '#btn-perms-back']) {
@@ -7511,7 +7523,8 @@ function renderAccountCard() {
          <button class="btn btn-outline" id="btn-acc-out">로그아웃</button>
          <button class="btn btn-outline danger" id="btn-acc-del">탈퇴 (서버 정보 삭제)</button>
        </div>`
-    : `<p class="acc-head">계정</p>
+    : `<p class="acc-head">기기를 바꿔도 이어 쓰려면</p>
+       <p class="acc-note">로그인하면 프로필과 신청 기록이 이어져요. 주민번호·계좌·증명서 파일은 서버로 나가지 않아요.</p>
        <div class="acc-actions">
          <button class="btn btn-primary" id="btn-acc-in">로그인</button>
          <button class="btn btn-outline" id="btn-acc-up">회원가입</button>

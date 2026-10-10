@@ -152,6 +152,8 @@ const eq = (label, got, want) => {
 
 
   await page.click('.nav-item[data-nav="my"]');
+  /* 2026-10-10 C안 구조 — 프로필 카드는 MY 「내 정보」 안쪽 화면에 있다 */
+  await page.click('[data-my-go="myinfo"]');
   /* ⚠️ 2026-09-12 부터 **카드가 아니라 그 안의 버튼**을 눌러야 수정으로 간다
      (개발자 지시 — 표를 짚기만 해도 넘어가던 것을 막았다). */
   await page.click('.my-edit-hint');

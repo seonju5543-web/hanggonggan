@@ -567,37 +567,60 @@
     </section>
 
     <!-- ============ MY ============ -->
+    <!-- ============ MY (2026-10-10 은서 지시 — 「저번 C안처럼」 · 구조만 C안, 색·글꼴은 지금 앱 그대로) ============
+         머리줄(사진·이름·학교) + 메뉴 줄(내 정보 · 서류함 · 공고 보관함 · 알림·설정 — 누르면 안쪽 화면) + 아래 로그인 카드.
+         🔴 내용은 옮겼을 뿐 함수는 그대로다 — #my-profile(renderMy) · #my-wallet(renderWallet) · #my-saved(renderSaved) 가
+            각자 안쪽 화면(myinfo·mydocs·mysaved)에 산다. id 를 바꾸면 style.css 규칙과 검사가 떨어져 나간다.
+         🔴 #btn-open-settings 는 이제 톱니가 아니라 메뉴 줄이다(같은 id — 같은 설정 화면). -->
     <section id="screen-my" class="screen" hidden>
-      <!-- 🔴 오른쪽 위 톱니 = 설정 화면 (2026-09-11 개발자 지시 · 목업 승인).
-           계정·알림 카드는 여기서 **빼서** 설정 화면으로 옮겼다 — 같은 스위치가 두 곳에
-           보이면 어느 쪽이 진짜인지 알 수 없다(개발자가 '뺀다'로 결정). -->
-      <header class="page-header page-header-row">
+      <header class="page-header">
         <h2>MY</h2>
-        <button class="icon-btn" id="btn-open-settings" aria-label="설정" title="설정">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.9 19.3a1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.7 15a1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.7 8.9a1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.7a1.7 1.7 0 0 0 1.03-1.56V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15 4.7a1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.3 9v.01a1.7 1.7 0 0 0 1.56 1.02H21a2 2 0 1 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15z"/></svg>
-        </button>
       </header>
-      <!-- 🔴 카드 전체가 버튼이 아니다 (2026-09-12 개발자 지시) — 누를 수 있는 것은 안쪽의
-           '학적정보 수정' 버튼 하나다. 그래서 tappable·role=button·tabindex 를 뺐다:
-           남겨 두면 보조기기가 여전히 "프로필 수정 버튼"이라고 읽고 Tab 이 카드에 멈춘다. -->
-      <div id="my-profile" class="my-card"></div>
-      <!-- 🔴 계정(로그인·회원가입)은 **MY 안**이다 (2026-10-10 팀 업무 분장 MY 2번 — 은서: "로그인을 MY 화면 내부에 배치").
-           2026-09-11 에 설정 화면으로 옮겼던 것을 되돌렸다. 한 곳에만 둔다 — 설정 화면에서는 뺐다(같은 버튼이 두 곳이면 어느 쪽이 진짜인지 모른다). -->
-      <div id="my-account" class="my-card" hidden></div>
-      <div id="my-wallet" class="my-card"></div>
-      <!-- 보관함 — 저장(북마크)한 공고. app.js renderSaved()가 채운다 (2026-09-07) -->
-      <div id="my-saved" class="my-card"></div>
-      <!-- 서류 보관함 줄과 같은 꼴 — 왼쪽에 할 일, 오른쪽에 누를 것 (2026-08-31).
-           🔴 id 는 그대로 둔다. app.js 가 이 이름으로 동작을 붙인다. -->
-      <!-- 프로필 수정은 맨 위(수정하기 ›)에 이미 있어 여기서는 뺐다 (2026-08-31).
-           🔴 초기화는 **붉은 글자 자체가 버튼**이다 — 오른쪽에 실행 버튼을 따로 두면
-              목록을 훑다 손가락이 스치기 쉬운데, 이건 되돌릴 수 없는 동작이다. -->
+      <div class="me-head" id="my-head"></div>
+      <nav class="me-menu" aria-label="MY 메뉴">
+        <button type="button" class="me-row" data-my-go="myinfo"><span class="me-txt"><b>내 정보</b><small id="my-sub-info"></small></span><svg class="me-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        <button type="button" class="me-row" data-my-go="mydocs"><span class="me-txt"><b>서류함</b><small id="my-sub-docs"></small></span><svg class="me-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        <button type="button" class="me-row" data-my-go="mysaved"><span class="me-txt"><b>공고 보관함</b><small id="my-sub-saved"></small></span><svg class="me-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        <button type="button" class="me-row" id="btn-open-settings"><span class="me-txt"><b>알림 · 설정</b><small id="my-sub-settings"></small></span><svg class="me-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+      </nav>
+      <!-- 🔴 계정(로그인·회원가입)은 MY 안이다 (2026-10-10 MY 2번). C안처럼 메뉴 아래 카드 한 장 — 한 곳에만 둔다. -->
+      <div id="my-account" class="my-card me-login" hidden></div>
+      <!-- 🔴 초기화는 **붉은 글자 자체가 버튼**이다 — 되돌릴 수 없는 동작이라 오른쪽에 실행 버튼을 따로 두지 않는다. -->
       <div class="my-menu">
         <button class="my-danger-line" id="btn-reset">데이터 초기화</button>
       </div>
-      <!-- 🔴 판 번호를 여기 적지 않는다 — app.js 의 APP_VERSION 한 곳에서 온다.
-           고객센터 진단 정보가 같은 값을 쓰므로, 두 곳에 적으면 갈라진다. -->
+      <!-- 🔴 판 번호는 app.js 의 APP_VERSION 한 곳에서 온다. -->
       <p class="data-note" id="my-version"></p>
+    </section>
+    <section id="screen-myinfo" class="screen" hidden>
+      <header class="sub-header">
+        <button class="sub-back" id="btn-myinfo-back" aria-label="뒤로">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <h2>내 정보</h2>
+      </header>
+      <!-- 🔴 카드 전체가 버튼이 아니다 (2026-09-12 개발자 지시) — 누를 수 있는 것은 안쪽의 「학적정보 수정」 버튼 하나다. -->
+      <div id="my-profile" class="my-card"></div>
+    </section>
+    <section id="screen-mydocs" class="screen" hidden>
+      <header class="sub-header">
+        <button class="sub-back" id="btn-mydocs-back" aria-label="뒤로">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <h2>서류함</h2>
+      </header>
+      <p class="set-note">한 번 올리면 신청할 때마다 자동으로 붙어요. 파일은 이 폰에만 있어요.</p>
+      <div id="my-wallet" class="my-card"></div>
+    </section>
+    <section id="screen-mysaved" class="screen" hidden>
+      <header class="sub-header">
+        <button class="sub-back" id="btn-mysaved-back" aria-label="뒤로">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <h2>공고 보관함</h2>
+      </header>
+      <!-- 저장(북마크)한 공고 — app.js renderSaved() 가 채운다 (2026-09-07) -->
+      <div id="my-saved" class="my-card"></div>
     </section>
 
     <!-- ============ 설정 (2026-09-11 · 개발자 목업 승인) ============
