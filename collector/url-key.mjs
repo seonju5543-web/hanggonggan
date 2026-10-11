@@ -37,6 +37,15 @@ function postIdKey(raw) {
     const id = x.searchParams.get('nttSn') || x.searchParams.get('nttId');
     if (id) return `pid:${host}:${id}`;
   }
+  /* 서울과기대 게시판(?do=commonview&…&bnum=<게시판>&bidx=<글>) (2026-10-11 리뷰 R2) — 같은 글도 목록 몇 쪽에서 눌렀는지(nowpage)에 따라 주소가 달라,
+     게시판이 제목에 '(마감)'을 붙인 판('…(~9/28(월)까지)' nowpage=2 ↔ '…(마감)' nowpage=3 · bidx=894350)이 주소·제목 열쇠 어느 쪽으로도 안 합쳐져
+     두 장이 됐다. 게시판 번호와 글 번호를 함께 묶는다(글 번호만으로는 게시판끼리 겹칠 수 있다고 보고 보수적으로).
+     ⚠️ nowpage 를 VOLATILE 에 넣지 않은 까닭: 감사(audit-data.js)는 urlKey 로 중복을 세어 오류로 낸다 — 지금 데이터에 남은 같은 글 짝이 그날로
+        데이터 관문 빨간불이 된다. 이 열쇠는 수집기의 합치기(dedupeNotices)에만 걸려 다음 수집이 조용히 하나로 합친다. */
+  if (x.searchParams.get('do') === 'commonview') {
+    const b = x.searchParams.get('bidx'); const bn = x.searchParams.get('bnum') || '';
+    if (/^\d{1,12}$/.test(b || '') && /^\d{0,12}$/.test(bn)) return `pid:${host}:${bn}:${b}`;
+  }
   return '';
 }
 /* 목록 표식(#n-)에 담아 둔 게시판 글 번호(postId — 브라우저 수집이 확인된 규칙으로 행에서 읽은 것 · 2026-10-04).

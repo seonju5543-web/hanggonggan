@@ -13,8 +13,10 @@
      ⑥ 복구 로봇 바깥 시계 · 예약 주석 요일 (links-15): 매달리면 고친 것을 잃는다 — **진짜 resolve-detail-urls.mjs 를 가짜 브라우저로 임시 폴더에서** ·
         'UTC 월 20시대'를 'KST 월요일'이라 적은 주석(실제 화요일) — 워크플로 예약 줄 전부를 cron 과 대조(cronCommentProblems)
      ⑦ 복구 로봇 소급 재검사 끔 (links-10 · 개발자 결정): 읽는 곳 없는 판정 기록 · 원문 링크 확인 로봇과 엇갈린 판정 — 되살아나지 않게
-     ⑧ 사냥꾼 저장이 바꾼 주소를 학교별 파일 고치기에 넘기는 배선 (CC-1 · 동작은 feed ① ⓘ)
-     ⑨ 게시판이 안 열려 내일로 미룬 표적 (links-final-1): 같은 실행의 3단계가 같은 학교를 다시 두드렸다 — **진짜 link-hunter.mjs 를 가짜 브라우저로**
+     ⑧ 사냥꾼 저장이 바꾼 주소를 학교별 파일 고치기에 넘기는 배선 (CC-1 · 동작은 feed ① ⓘ) · (리뷰 R6) **진짜 link-hunter.mjs 를 '찾는' 가짜 브라우저로** —
+        표식이 진짜 주소로 풀리면 학교별 파일도 한 판 · 색인 count · 리포트의 합친 수
+     ⑨ 게시판이 안 열려 내일로 미룬 표적 (links-final-1): 같은 실행의 3단계가 같은 학교를 다시 두드렸다 — **진짜 link-hunter.mjs 를 가짜 브라우저로** ·
+        (리뷰) 게시판이 NET_STREAK_DAYS 번 잇달아 안 열린 날은 3단계를 한 번 · 못 찾으면 사람에게 한 번(netStreak · settleNetStreak)
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -26,7 +28,7 @@ import { canonUrl, idFromUrl, idHash, registerId } from '../../collector/canon-u
 import { urlKey, noticeUrlRank, preferNotice } from '../../collector/url-key.mjs';
 import { stripSessionId } from '../../collector/board-links.mjs';
 import { rowDetailCandidates, cleanStoredUrl } from '../../collector/detail-url.mjs';
-import { recordAttempt, escalationLines, pruneHuntState, boardUnreachableWhy } from '../../collector/link-hunt-rules.mjs';
+import { recordAttempt, escalationLines, pruneHuntState, boardUnreachableWhy, netStreakDue, settleNetStreak, NET_STREAK_DAYS } from '../../collector/link-hunt-rules.mjs';
 
 /* 경기대 eGov 게시판 꼴 — 글 번호(nttNo)는 가운데, 끝은 게시판 공통값(searchKrwd·sf.pnos) */
 const KGU = (ntt, sess = '') => `https://www.kyonggi.ac.kr/www/selectBbsNttView.do${sess}?key=7520&bbsNo=1073&nttNo=${ntt}&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888`;
@@ -303,6 +305,24 @@ export default async function links(eq, ctx) {
         recordAttempt({ attempts: 2, nextTryAt: '2026-10-10' }, 'net', 'Timeout', day).nextTryAt, recordAttempt({ attempts: 1, nextTryAt: '2026-09-04' }, 'net', 'Timeout', day).nextTryAt,
         recordAttempt({ attempts: 0 }, 'net', 'Timeout', { today: '2026-10-04', nowMs: Date.parse('2026-10-04T16:00:00Z') }).nextTryAt],
       [2, '2026-10-05', undefined, '2026-10-03', '2026-10-10', '2026-10-05', '2026-10-06']);
+    /* (리뷰 2026-10-11 · links-final-1 뒷손질) 게시판이 잇달아 안 열린 날 수 — 게시판 열기 실패(boardDown)만 하나씩 늘고, 게시판이 열린 결과는 모두 지운다.
+       NET_STREAK_DAYS 에 닿으면 그날 3단계를 한 번(netStreakDue) · 해 보고도 못 찾으면 센 날을 되돌리고 아직 안 알렸으면 한 번 알린다(settleNetStreak) */
+    let ns = { attempts: 0 };
+    for (let i = 0; i < NET_STREAK_DAYS - 1; i += 1) ns = recordAttempt(ns, 'net', boardUnreachableWhy('Timeout'), { ...day, boardDown: true });
+    const before7 = [ns.netStreak, netStreakDue(ns), ns.attempts];
+    ns = recordAttempt(ns, 'net', boardUnreachableWhy('Timeout'), { ...day, boardDown: true });
+    const at7 = [ns.netStreak, netStreakDue(ns)];
+    const first = settleNetStreak(ns);
+    const afterSettle = [first, ns.netStreak, !!ns.escalated, netStreakDue(ns)];
+    for (let i = 0; i < NET_STREAK_DAYS; i += 1) ns = recordAttempt(ns, 'net', boardUnreachableWhy('Timeout'), { ...day, boardDown: true });
+    const again = [netStreakDue(ns), settleNetStreak(ns), ns.netStreak, !!ns.escalated];
+    eq(`③ 게시판이 잇달아 안 열린 날 수 — ${NET_STREAK_DAYS - 1}번째까지는 미룸만 · ${NET_STREAK_DAYS}번째에 3단계를 한 번 · 못 찾으면 0 으로 되돌리고 처음 한 번만 알린다(다음 묶음은 3단계만)`,
+      [before7, at7, afterSettle, again], [[NET_STREAK_DAYS - 1, false, 0], [NET_STREAK_DAYS, true], [true, 0, true, false], [true, false, 0, true]]);
+    eq('  게시판이 열린 결과(상세만 못 읽음 net · 시간 상한 · 못 찾음 · 찾음)는 센 날을 지운다 · 찾은 줄은 3단계 대상이 아니다',
+      ['net', 'net-defer-false', 'bad', 'ok'].map((o) => recordAttempt({ attempts: 1, netStreak: 5 }, o.startsWith('net') ? 'net' : o, 'x', { ...day, defer: o === 'net-defer-false' ? false : undefined }).netStreak),
+      [undefined, undefined, undefined, undefined]);
+    eq('  찾은(resolved) 줄 · 기록 없음은 3단계 허용도 알림도 없다',
+      [netStreakDue({ status: 'resolved', netStreak: 9 }), netStreakDue(null), settleNetStreak(undefined)], [false, false, false]);
     const lh = stripComments(fs.readFileSync(new URL('collector/link-hunter.mjs', root), 'utf8'));
     const failBranch = (lh.match(/if \(!opened\) \{[\s\S]{0,400}/) || [''])[0];
     eq('③ 배선 — 게시판이 안 열리면 그 게시판 대상 전부를 net 으로 적는다(미룸) · 시간 상한 줄은 defer:false · record 가 opts 를 넘긴다',
@@ -316,7 +336,7 @@ export default async function links(eq, ctx) {
     const errs = ['page.goto: Timeout 30000ms exceeded.', 'page.goto: net::ERR_CONNECTION_REFUSED at https://a.example.ac.kr/list.do', 'page.goto: net::ERR_HTTP_RESPONSE_CODE_FAILURE at https://a.example.ac.kr/', ''];
     eq('③ 게시판을 못 연 표적의 장부 문구는 관리자 「죽은 링크」 거름에 안 걸린다(원인을 단정하지 않는다) · 거름은 살아 있다(HTTP 404·옛 문구 \'게시판 열기 실패\'는 걸린다) · 사냥꾼이 그 문구를 쓴다',
       [!!deadRe, errs.map((e) => !!deadRe && deadRe.test(boardUnreachableWhy(e))), !!deadRe && deadRe.test('HTTP 404'), !!deadRe && deadRe.test('게시판 열기 실패: Timeout'),
-        /record\(t, 'net', boardUnreachableWhy\(openErr\)\)/.test(failBranch), boardUnreachableWhy('a\nb'), boardUnreachableWhy('')],
+        /record\(t, 'net', boardUnreachableWhy\(openErr\), undefined, \{ boardDown: true \}\)/.test(failBranch), boardUnreachableWhy('a\nb'), boardUnreachableWhy('')],
       [true, errs.map(() => false), true, true, true, '게시판을 못 엶 — 내일 다시 봄 (a)', '게시판을 못 엶 — 내일 다시 봄']);
   }
 
@@ -330,6 +350,9 @@ export default async function links(eq, ctx) {
     eq('④ 이번에 처음 알리는 공고 절 — 머리 한 줄 + 공고마다 한 줄(제목·횟수·열쇠) · 없으면 절을 안 찍는다',
       [lines[0], lines.filter((l) => /^- /.test(l)).length, two.every((x) => lines.some((l) => l.includes(x.title) && l.includes(x.key))), escalationLines([]), escalationLines()],
       ['### 🙋 사람 확인 필요 — 이번에 처음 알리는 공고 2건', 2, true, [], []]);
+    const down = escalationLines([{ title: '표본재단 장학생 선발', key: 'n:https://a.example.ac.kr/list.do#n-y', attempts: 0, lastWhy: boardUnreachableWhy('Timeout'), boardDown: 7 }]);
+    eq("④ 게시판이 잇달아 안 열려 알리는 줄은 '0회 못 찾음'이 아니라 있었던 일(게시판이 n번 잇달아 안 열림 · 다른 경로로도 못 찾음)을 적는다",
+      [down.some((l) => /게시판이 7번 잇달아\(하루 한 번\) 안 열림 · 다른 게시판·사이트 검색으로도 못 찾음/.test(l)), down.some((l) => /0회 못 찾음/.test(l))], [true, false]);
     const lh = stripComments(fs.readFileSync(new URL('collector/link-hunter.mjs', root), 'utf8'));
     const got = (lh.match(/extraFound \+= 1[\s\S]{0,400}/) || [''])[0];
     const save = (lh.match(/function saveAll\([\s\S]*?\n\}\n/) || [''])[0];
@@ -433,6 +456,68 @@ export default async function links(eq, ctx) {
       [/patchUrlsBySchool\(notices\.items, \{ moved: movedNoticeUrls\(targets\) \}\)/.test(save),
         /import \{[^}]*\bmovedNoticeUrls\b[^}]*\} from '\.\/link-hunt-rules\.mjs'/.test(lh)],
       [true, true]);
+
+    /* (리뷰 R6) 글자 대조만으로는 saveAll 안의 차례가 바뀌는 회귀(예: dedupe 뒤에 moved 를 다시 만들기 · found 갈래 밖으로 옮기기)를 못 잡는다 —
+       **진짜 link-hunter.mjs 를 '찾는' 가짜 브라우저로 임시 폴더에서** 돌린다. 목록에는 표식 제목의 행, 그 행을 누르면 진짜 주소(R)의 상세 화면.
+       notices.json [R, M(표식 · 제목이 다름)] · 학교별 파일 [R, M] → 사냥꾼이 M 을 R 의 주소로 풀고 → 학교별 파일도 한 판 · 리포트에 합친 수 */
+    const SITE_PW = [
+      "import fs from 'node:fs';",
+      "const S = JSON.parse(fs.readFileSync('fake-site.json', 'utf8'));",
+      "const log = (s) => fs.appendFileSync('pw-calls.log', s + '\\n');",
+      'function mkPage() {',
+      "  let cur = 'about:blank';",
+      '  const p = {',
+      "    goto: async (u) => { log('goto ' + u); if (u !== S.list && !S.pages[u]) throw new Error('page.goto: net::ERR_CONNECTION_REFUSED at ' + u); cur = u; return { status: () => 200 }; },",
+      '    url: () => cur, title: async () => ((S.pages[cur] || {}).title || \'\'), frames: () => [p], content: async () => \'\',',
+      '    close: async () => {}, waitForTimeout: async () => {}, waitForFunction: async () => {}, waitForNavigation: async () => null, waitForLoadState: async () => {},',
+      '    keyboard: { press: async () => {} },',
+      '    $$eval: async () => (cur === S.list ? S.rows.map((r, i) => ({ i, t: r.t, abs: r.href, src: \'|\' + r.href + \'|\' })) : []),',
+      '    $$: async () => (cur === S.list ? S.rows.map((r) => ({ click: async () => { cur = r.href; }, evaluate: async () => { cur = r.href; } })) : []),',
+      '    evaluate: async (fn, arg) => {',
+      '      const src = String(fn);',
+      "      if (arg && arg.sels) { const pg = S.pages[cur]; return pg ? { headings: [pg.title], text: pg.text, hasPassword: false } : null; }",
+      "      if (/hiddenInputs/.test(src)) return { canonical: null, ogUrl: null, hiddenInputs: {} };",
+      "      if (/querySelectorAll\\('form'\\)/.test(src)) return [];",
+      '      return false;',
+      '    },',
+      '  };',
+      '  return p;',
+      '}',
+      'const ctx = { newPage: async () => mkPage(), close: async () => {}, clearCookies: async () => {}, waitForEvent: async () => null };',
+      'export const chromium = { launch: async () => ({ newContext: async () => ctx, close: async () => {} }) };',
+    ].join('\n');
+    const sb = repoSandbox(root, 'hdj-links-moved-');
+    try {
+      sb.module('playwright', { 'package.json': JSON.stringify({ name: 'playwright', type: 'module', main: 'index.js' }), 'index.js': SITE_PW });
+      const LIST = 'https://board.example.ac.kr/bbs/list.do?menu=7';
+      const core = '2026학년도 표본재단 해외교환 장학생 선발 안내';
+      const R = { title: `[공통] ${core}`, url: 'https://board.example.ac.kr/bbs/view.do?menu=7&no=125899', school: '표본대학교', foundAt: '2026-10-03' };
+      const M = { title: `[장학공지] ${core}`, url: `${LIST}#n-${encodeURIComponent(`[장학공지] ${core}`)}`, school: '표본대학교', foundAt: '2026-10-03' };
+      const O = { title: '2026학년도 표본시 다른재단 장학생 모집 안내', url: 'https://board.example.ac.kr/bbs/view.do?menu=7&no=125800', school: '표본대학교', foundAt: '2026-10-02' };
+      sb.write('fake-site.json', {
+        list: LIST,
+        rows: [{ t: `[장학공지] ${core} 2026.10.03`, href: R.url }, { t: `${O.title} 2026.10.02`, href: O.url }],
+        pages: {
+          [R.url]: { title: core, text: `${core}\n작성일 2026.10.03 조회 31\n첨부파일 신청서.hwp\n${'지원 대상은 국내 대학 재학생이며 학업 계획서를 심사합니다. '.repeat(12)}` },
+          [O.url]: { title: O.title, text: `${O.title}\n작성일 2026.10.02 조회 12` },
+        },
+      });
+      const fileKey = `data/notices/${createRequire(import.meta.url)('../../match-engine.js').noticeFileKey('표본대학교')}.json`;
+      sb.write('data/notices.json', { items: [R, M, O] });
+      sb.write(fileKey, { school: '표본대학교', updatedAt: '2026-10-03', items: [R, M, O] });
+      sb.write('data/notices/index.json', { note: '표본', updatedAt: '2026-10-03', schools: 1, files: { 표본대학교: { file: fileKey.split('/').pop(), count: 3 } } });
+      sb.write('data/registered.json', { items: [] });
+      const r = sb.run('collector/link-hunter.mjs', [], { HUNT_BUDGET_MS: '120000', HUNT_ONLY_BOARD: '', HUNT_PATROL: '0' }, 60000);
+      const rep = sb.read('collector/link-hunt-report.md') || '';
+      const feedUrls = ((sb.json('data/notices.json') || {}).items || []).map((n) => n.url);
+      const fileUrls = ((sb.json(fileKey) || {}).items || []).map((n) => n.url);
+      const ix = (((sb.json('data/notices/index.json') || {}).files || {})['표본대학교'] || {}).count;
+      const st = ((sb.json('collector/link-hunt.json') || {}).items || {})[`n:${M.url}`] || {};
+      eq('⑧ [사냥꾼 실행] 표식 M 을 진짜 주소 R 로 풀면 notices.json 과 학교별 파일 둘 다 한 판(제목이 달라도 옛 주소로 찾는다) · 색인 count 도 · 리포트에 합친 수 · 장부는 찾음(resolvedUrl R)',
+        [r.status, /원문 주소 확보 \*\*1건\*\*/.test(rep), feedUrls, fileUrls, ix, /학교별 공고 파일 1개에서 주소 1건을 함께 고쳤습니다 · 같은 글 1건을 합쳤습니다/.test(rep),
+          st.status, st.resolvedUrl, r.status ? r.out.slice(-300) : ''],
+        [0, true, [R.url, O.url], [R.url, O.url], 2, true, 'resolved', R.url, '']);
+    } finally { sb.done(); }
   }
 
   /* ── ⑨ 게시판이 안 열려 내일로 미룬 표적은 그날 3단계도 안 두드린다 (links-final-1 · 2026-10-11) ──
@@ -464,10 +549,26 @@ export default async function links(eq, ctx) {
         [0, [`goto ${LIST}`, `goto ${LIST}`, `goto ${LIST}`], false, true, 0, true, '']);
       eq("  끝줄은 미룬 것을 따로 센다 — '아직 못 찾음 0건 · 게시판이 안 열려 내일로 미룬 것 1건 · 사람에게 알릴 건 0건' · 🙋 절 없음",
         [/아직 못 찾음 0건 · 게시판이 안 열려 내일로 미룬 것 1건 · 사람에게 알릴 건 0건/.test(rep), /🙋 사람 확인 필요/.test(rep)], [true, false]);
+      eq('  장부에 게시판이 안 열린 날 1 을 적는다(netStreak — 잇달아 세는 칸)', st.netStreak, 1);
+
+      /* (리뷰 2026-10-11) 게시판이 NET_STREAK_DAYS 번째 안 열린 날 — 그날은 3단계(다른 게시판·사이트 검색)를 한 번 해 보고, 못 찾으면 사람에게 한 번 알린다.
+         안 그러면 목록 주소 하나만 죽은 게시판의 표적은 3단계 구출 길이 영구히 막히고 사람도 모른다(리포트 끝줄의 '내일로 미룬 것'으로만 보였다) */
+      fs.rmSync(path.join(sb.dir, 'pw-calls.log'), { force: true });
+      sb.write('collector/link-hunt.json', { updatedAt: '2026-10-01', items: { [`n:${MARK}`]: { attempts: 0, title: t, lastTried: '2026-10-01', lastWhy: boardUnreachableWhy('Timeout'), netStreak: NET_STREAK_DAYS - 1 } } });
+      const r7 = sb.run('collector/link-hunter.mjs', [], { HUNT_BUDGET_MS: '120000', HUNT_ONLY_BOARD: '', HUNT_PATROL: '0' }, 60000);
+      const calls7 = (sb.read('pw-calls.log') || '').trim().split('\n').filter(Boolean);
+      const rep7 = sb.read('collector/link-hunt-report.md') || '';
+      const st7 = ((sb.json('collector/link-hunt.json') || {}).items || {})[`n:${MARK}`] || {};
+      eq(`⑨ [사냥꾼 실행] 게시판이 ${NET_STREAK_DAYS}번째 안 열린 날은 3단계를 한 번 해 본다(사이트 검색 goto) · 못 찾으면 사람에게 한 번 알리고(🙋 · 게시판이 n번 잇달아 안 열림) 센 날을 0 으로`,
+        [r7.status, calls7, /## 3단계/.test(rep7), /↪ 1건은 게시판이 \d+번 이상 잇달아 안 열려 오늘 3단계/.test(rep7), /⏭ 이 게시판의 대상/.test(rep7),
+          /🙋 사람 확인 필요 — 이번에 처음 알리는 공고 1건/.test(rep7), new RegExp(`게시판이 ${NET_STREAK_DAYS}번 잇달아`).test(rep7),
+          /아직 못 찾음 1건 · 사람에게 알릴 건 1건/.test(rep7), st7.netStreak, !!st7.escalated, st7.attempts || 0, r7.status ? r7.out.slice(-300) : ''],
+        [0, [`goto ${LIST}`, `goto ${LIST}`, `goto ${LIST}`, 'goto https://board.example.ac.kr'], true, true, false, true, true, true, 0, true, 0, '']);
     } finally { sb.done(); }
     const lh = stripComments(fs.readFileSync(new URL('collector/link-hunter.mjs', root), 'utf8'));
     eq('⑨ 배선 — 게시판을 못 연 표적을 미룸 묶음에 넣고 · 3단계 목록에서 뺀다',
-      [/for \(const t of group\) deferredKeys\.add\(t\.key\)/.test(lh), /if \(deferredKeys\.has\(t\.key\)\) continue;[^\n]*\n\s*if \(isMarkerUrl\(t\.ref\[t\.field\]\)\) stillLost\.push\(t\)/.test(lh)],
+      [/const due = group\.filter\(\(t\) => netStreakDue\(state\.items\[t\.key\]\)\);\s*for \(const t of group\) if \(!due\.includes\(t\)\) deferredKeys\.add\(t\.key\)/.test(lh),
+        /if \(deferredKeys\.has\(t\.key\)\) continue;[^\n]*\n\s*if \(isMarkerUrl\(t\.ref\[t\.field\]\)\) stillLost\.push\(t\)/.test(lh)],
       [true, true]);
   }
 }

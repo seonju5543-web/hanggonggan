@@ -44,6 +44,8 @@ import { isAttachmentEntry } from './attachment-link.mjs';
 import { cleanTitle } from './clean-title.mjs';
 /* 주소의 HTML 기호(`&#038;`·`&amp;`) 되돌리기 — 앱과 같은 파일 하나(source-link.js · 수집기 board-links.mjs·auto-register 도 이것). 베끼지 않는다. */
 const { decodeUrlEntities } = require('../source-link.js');
+/* 사냥꾼이 푼 표식(옛 주소 → 찾은 주소) — 장부 규칙 파일 한 곳(readHuntMoves 가 읽어 healFromLedger 의 opts.moved 로) */
+import { resolvedNoticeUrls } from './link-hunt-rules.mjs';
 
 /* 학교 하나가 가질 수 있는 공고 수. 전체 상한(capNotices)과 달리 **다른 학교에 밀려
    줄어들지 않는다** — 학생은 자기 파일만 받으므로 옆 학교가 바쁘든 말든 상관없다. */
@@ -100,6 +102,9 @@ export function splitBySchool(items, perSchool = PER_SCHOOL) {
    못 찾아 같은 글이 두 장 남았고, 다음 수집의 메우기가 그 판을 학교별 파일에서 다시 실었다. 사냥꾼이 바꾼 주소 목록은 link-hunt-rules.mjs
    movedNoticeUrls 한 곳에서 만든다. 고친 파일은 쓰기 전에 dedupeNotices 를 한 번 건다 — 새 주소가 된 표식 판이 파일 안의 진짜 판과 같은 글로
    합쳐진다(notices.json 과 같은 규칙 · 재발행이 아니라 그 파일 안에서만). 순위 가드(아래)는 moved 에도 그대로 건다.
+   ⚠️ 파일 안 합치기는 **부르는 로봇 전부**에 걸린다 — moved 를 안 넘기는 원문 링크 복구(resolve-detail-urls.mjs)도 제목 열쇠로 주소를 고친 파일에서는
+      같은 글을 하나로 합친다(2026-10-11 리뷰 R7 · 지금 그 로봇에서 생길 일은 없지만 동작이 바뀐 것이라 적어 둔다).
+      합쳐서 글 수가 줄면 색인(index.json)의 그 학교 count 도 고쳐 쓴다(모양 { file, count } 는 그대로 · updatedAt 은 다음 발행이 맞춘다).
 
    🔴 **이 함수가 닿는 범위에는 천장이 있다 — 다음 세션이 없는 버그를 쫓지 않도록 적어 둔다.**
    `notices.json` 은 전체 상한 200건이고 학교별 파일은 학교당 60건이라, 학교별 파일에는
@@ -126,6 +131,11 @@ export function splitBySchool(items, perSchool = PER_SCHOOL) {
    ⚠️ **되돌리기** — schools.json·browser-targets.json 의 `parked` 에서 학교를 되살리고 SERVED_SCHOOLS 에 이름을 넣으면
    그날 수집부터 **새 글**이 담긴다(설정은 지우지 않고 보관 중이다). 🔴 이미 본 글은 seen.json 때문에 다시 수집되지 않는다 —
    그 글은 아래 healFromLedger 가 후보 장부(candidates.json)에서 FEED_HEAL_SINCE ~ FEED_HEAL_UNTIL(9-30 사고 창) 수집분만 메운다(2026-10-04 점검 collect-05 · 10-11 CC-1).
+   🔴 그래서 **9-30 뒤에 파킹했다가 다시 살리는 학교**는 로봇이 스스로 못 메운다 — 파킹 동안 seen.json 에 '봤다'로 남은 글은 다시 수집되지 않고,
+      장부 원천은 9-30 창 밖이라 안 실린다(영영 안 돌아온다). 학교를 다시 살릴 때는 사람이 메우기 도구를 한 번 돌린다:
+        bash tools/robot-run.sh node collector/heal-feed.mjs --dry --since=0000-00-00 --until=<파킹한 날>
+      (--since=0000-00-00 은 60일 규칙만 — 파킹 때 피드에서 뺀 글은 수집일이 파킹한 날 이하다. 그 사이 다른 서비스 학교 글도 같은 창에 든다)
+      → 찍힌 목록을 눈으로 보고(학교가 제목만 고친 같은 글 짝은 --skip=<주소> 로 뺀다) --dry 를 떼고 같은 명령을 한 번 더.
    ⚠️ **`data/registered.json` 은 건드리지 않는다** — 거기 남은 파킹 학교 공고는
    '전국인데 학교로 묶인 것'이라 개발자 판단 대기 항목이다(CLAUDE.md 첫머리). 성격이 다르다. */
 export function dropUnserved(items, served = SERVED_SCHOOLS) {
@@ -143,6 +153,7 @@ export function dropUnserved(items, served = SERVED_SCHOOLS) {
         since 는 장부의 8월 파킹분을 막는 것이고, 학교별 파일에는 그런 글이 없다). notices.json 전체 상한(capNotices · 학교당 40)에 잘린 글은
         여기서 그대로 돌아온다 — 학교별 파일이 학교당 PER_SCHOOL(60)까지 담는 원래 설계대로.
      ② ledger — 후보 장부. ① 의 규칙 + FEED_HEAL_SINCE ~ FEED_HEAL_UNTIL 수집분만(9-30 사고 창 · opts.since/opts.until · 까닭은 아래 두 상수 위).
+        사냥꾼이 이미 푼 표식은 찾은 주소로 바꿔 끼운 뒤 싣는다(opts.moved — readHuntMoves · 2026-10-11 리뷰 R2).
    🔴 **같은 글이면 ① 의 판(그 주소)을 쓴다** — 장부는 링크 로봇(link-hunter·resolve-detail-urls)도, 10-03 원문 링크 정직성 정리도
       고치지 않아 **수집 당시 주소**를 들고 있다. 장부 판을 쓰면 상한에 잘렸다 다시 실리는 글마다 고친 주소가 옛 주소로 되돌아가고
       (리뷰 R1 실측: 표식→진짜 주소로 고친 X 가 두 번째 실행에 #n- 표식으로 · 반대로 10-03 이 표식으로 바꾼 '다른 글 주소'가 되살아난다),
@@ -180,18 +191,33 @@ export const FEED_HEAL_SINCE = '2026-09-29';
    왜 9-30 인가(2026-10-11 git 이력으로 확인): 9-30 01:31 UTC 수집(ab897c3b)에서 병합기가 notices.json 을 460 → 200건으로 잘랐고(옛 slice(0,200)),
    그 뒤 수집들(17d68637 ~ 10-02)이 잘린 판으로 학교별 파일을 다시 쓰며 빠진 글은 **전부 foundAt 9-30 이하**였다(연이은 판 사이에서 사라진 글 전수).
    notices.json 은 그 뒤 10-03 까지 줄지 않았고(200 → 342), 10-03 11:29 의 두 번째 잘림(9f6d533a · 339 → 200)은 학교별 파일을 다시 쓰기 전에
-   같은 날 b75c58b6 이 장부를 339건으로 되살리고 병합기 상한을 고쳤다. 그래서 10-01 이후 수집분에는 장부로 메울 유실이 없다 —
-   그 뒤로 피드에서 빠진 글은 사냥꾼이 합친 것처럼 **일부러 합친 것**이다(실데이터: 이 날을 풀면 더 메워지는 글 3건 = 가천·고려 옛 판 + 9-30 사본이 따로 있는 계명 1건).
+   같은 날 b75c58b6 이 장부를 339건으로 되살리고 병합기 상한을 고쳤다. 그래서 10-01 이후 수집분에는 병합기 잘림으로 생긴 유실이 없다.
+   그 뒤로 피드에서 빠진 글은 실데이터에서 두 갈래였다(이 날을 풀면 더 메워지는 글 3건 · 2026-10-11 git 이력으로 확인):
+     · 사냥꾼이 합친 것(가천·고려 옛 판 — 일부러 합친 것이라 메우면 같은 글 두 장)
+     · notices.json 학교당 40 상한(capNotices)에 밀린 것 — 계명 '(재)광산장학회'(parm_bod_uid=269991 · 10-02 판): 8c2c7fe4(10-07 브라우저 수집)에서
+       계명 40건이 전부 10-07 판으로 바뀌며 밀렸고, 02114b4d(10-07)가 그 목록으로 학교별 파일을 42 → 40건으로 다시 썼다. 학생이 지금 보는 판(① 원천)이
+       생기기 전 일이다. 같은 글의 9-30 사본이 장부 창 안에 있어 메워지므로 유실은 없다. 앞으로 상한에 밀리는 글은 ① 원천이 그대로 되살린다.
    학생이 지금 보는 판(① opts.current — 학교별 파일)은 이 날로 묶지 않는다(상한에 잘린 글의 상시 자기 치유는 그쪽 몫).
+   장부 원천은 사냥꾼이 이미 푼 표식(opts.moved — readHuntMoves · link-hunt.json 의 찾은 줄)의 주소를 찾은 주소로 바꿔 끼운 뒤 싣는다 —
+   창 안(9-30) 글도 사냥꾼이 제목이 다른 짝과 합쳤으면 주소 열쇠로 같은 글이 되어 되살아나지 않는다(2026-10-11 리뷰 R2).
    11-29(9-30 + 60일)부터는 장부 원천이 저절로 하는 일이 없다 — 다른 사고로 장부 메우기가 다시 필요하면 이 날을 늘리지 말고
-   사람이 돌리는 메우기 도구(heal-feed.mjs)에 그 사고 창(--since · --until)을 주어 한 번 돌린다. */
+   사람이 돌리는 메우기 도구(heal-feed.mjs)에 그 사고 창(--since · --until)을 주어 --dry 목록을 눈으로 본 뒤 한 번 돌린다(학교가 제목만 고친 짝은 --skip). */
 export const FEED_HEAL_UNTIL = '2026-09-30';
 
 export function healFromLedger(items, ledger, opts = {}) {
   const today = opts.today || new Date();
   const keepDays = opts.keepDays ?? KEEP_DAYS;
   const since = opts.since ?? FEED_HEAL_SINCE;
-  const until = opts.until ?? FEED_HEAL_UNTIL;
+  /* '' 이면 상한이 아예 없어지지 않게 `||` (리뷰 R4 — `??` 는 빈 글자를 통과시켰다). 상한을 열려면 '9999-12-31' 을 준다 */
+  const until = opts.until || FEED_HEAL_UNTIL;
+  /* 사냥꾼이 푼 표식(옛 주소 → 찾은 주소 Map · readHuntMoves) — 장부 판에만 바꿔 끼운다(학교별 파일은 사냥꾼이 직접 고친다 · patchUrlsBySchool) */
+  const moved = opts.moved instanceof Map ? opts.moved : null;
+  const movedOf = (n) => {
+    if (!moved || !n || !n.url) return n;
+    const to = moved.get(n.url) || moved.get(decodeUrlEntities(n.url));
+    /* 순위 가드 — 진짜 주소를 표식·목록+번호로 바꾸지 않는다(patchUrlsBySchool 과 같은 규칙) */
+    return to && to !== n.url && noticeUrlRank(to) <= noticeUrlRank(n.url) ? { ...n, url: to } : n;
+  };
   const perSchool = opts.perSchool ?? PER_SCHOOL;   // 발행(publishBySchool)과 같은 값 — 수집기는 둘 다 기본값으로 부른다
   const ok = new Set(opts.served || SERVED_SCHOOLS);
   const counts = opts.counts && typeof opts.counts === 'object' ? opts.counts : {};
@@ -212,7 +238,7 @@ export function healFromLedger(items, ledger, opts = {}) {
   const shown = [];
   for (const n of opts.current || []) { const x = take(n, cutoff, false); if (x) shown.push(x); }
   const pool = [];
-  for (const n of ledger || []) { const x = take(n, from, true, until); if (x) pool.push(x); }
+  for (const n of ledger || []) { const x = take(movedOf(n), from, true, until); if (x) pool.push(x); }
   const A = dedupeNotices(items || []);
   if (!shown.length && !pool.length) return A;
   /* 새 칸 = '피드를 먼저 넣고 원천(① → ②)을 이어 넣었을 때 피드 칸 뒤에 생긴 칸'. 앞 칸 수가 피드 길이와 같으려면 피드가 dedupe 를 다시 걸어도
@@ -272,6 +298,13 @@ export function readSchoolFiles(opts = {}) {
   return out;
 }
 
+/* 사냥꾼이 이미 푼 표식 — collector/link-hunt.json 의 찾은 줄(옛 주소 → 찾은 주소 · 규칙은 link-hunt-rules.mjs resolvedNoticeUrls 한 곳).
+   수집기 둘·메우기 도구가 healFromLedger 의 opts.moved 로 넘긴다(2026-10-11 리뷰 R2). 못 읽으면 빈 Map(메우기는 예전처럼 돈다). */
+export function readHuntMoves(opts = {}) {
+  const file = opts.path || new URL('link-hunt.json', HERE);
+  try { return resolvedNoticeUrls((JSON.parse(fs.readFileSync(file, 'utf8')) || {}).items); } catch { return new Map(); }
+}
+
 /* 서비스 학교인데 넘겨받은 목록에 글이 하나도 없는 학교 (2026-10-04 점검 app2-F2) — 수집 리포트 머리에 한 줄로 적는다.
    학교별 상태 줄은 '✅ 정상 (실공고 15건 감지)'인데 학생 화면은 0건인 학교(한양 — 감지한 글이 전부 전에 본 글)가 조용히 남아 있었다.
    차례는 served 그대로. 게시판을 공유하는 분교(SHARED_BOARD_BRANCH)는 SERVED 에 없어 따로 다룰 것이 없다. */
@@ -310,6 +343,7 @@ export function patchUrlsBySchool(items, opts = {}) {
   try { files = fs.readdirSync(dir).filter((f) => /\.json$/.test(f) && f !== 'index.json'); } catch { return { files: 0, fixed: 0, merged: 0 }; }
 
   let fixed = 0, touched = 0, merged = 0;
+  const counts = new Map();   // 합쳐서 글 수가 준 학교 → 새 글 수 (색인 고치기)
   for (const f of files) {
     const path = new URL(f, dir);
     let doc;
@@ -326,9 +360,20 @@ export function patchUrlsBySchool(items, opts = {}) {
       const before = doc.items.length;
       doc.items = dedupeNotices(doc.items);
       merged += before - doc.items.length;
+      if (doc.items.length !== before && typeof doc.school === 'string') counts.set(doc.school, doc.items.length);
       fs.writeFileSync(path, JSON.stringify(doc, null, 1));
       fixed += changed; touched += 1;
     }
+  }
+  /* 색인의 글 수를 맞춘다(사람용 숫자 — 앱의 noticeFallbackNeeded 는 count 를 안 읽는다). 못 읽으면 그대로 둔다(다음 발행이 다시 쓴다) */
+  if (counts.size) {
+    const ix = new URL('index.json', dir);
+    try {
+      const doc = JSON.parse(fs.readFileSync(ix, 'utf8'));
+      let n = 0;
+      for (const [school, c] of counts) if (doc && doc.files && doc.files[school] && doc.files[school].count !== c) { doc.files[school].count = c; n += 1; }
+      if (n) fs.writeFileSync(ix, JSON.stringify(doc, null, 1));
+    } catch { /* 색인이 없거나 못 읽음 — 그대로 */ }
   }
   return { files: touched, fixed, merged };
 }

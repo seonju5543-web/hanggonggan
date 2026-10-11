@@ -8,13 +8,16 @@
         ⓓ (리뷰 R1) 학생이 지금 보는 판(학교별 파일)이 장부보다 먼저 — notices.json 상한(학교당 40)에 잘렸다 다시 실리는 글이 장부의 수집 당시
            주소로 되돌아가지 않는다(고친 주소 X · 10-03 이 표식으로 바꾼 Y) · 수집기 끝부분과 같은 차례로 두 번·세 번 돌려 잰다
         ⓔ (리뷰 R2) 메운 글 주소의 HTML 기호(&#038;)는 앱과 같은 함수로 되돌린다 · ⓕ (리뷰 R3) 진짜 유실(restored)과 상한에 잘린 글(kept)을 따로 센다
-        ⓖ 학교별 파일 상한 · ⓗ (CC-1) 장부 원천은 9-30 사고 창(FEED_HEAL_UNTIL)까지만 — 사냥꾼이 합친 옛 판·제목을 고친 옛 판이 되살아나지 않는다
-        ⓘ (CC-1) 사냥꾼이 바꾼 주소(movedNoticeUrls)로 학교별 파일도 고치고 파일 안에서 합친다 — 다음 수집 뒤에도 한 장
+        ⓖ 학교별 파일 상한 · ⓗ (CC-1) 장부 원천은 9-30 사고 창(FEED_HEAL_UNTIL)까지만 — 사냥꾼이 합친 옛 판·제목을 고친 옛 판이 되살아나지 않는다 ·
+           (리뷰 R2) 창 안 장부 표식도 사냥꾼이 푼 기록(link-hunt.json · resolvedNoticeUrls · readHuntMoves)으로 찾은 주소를 바꿔 끼운다 · 서울과기대 같은 글(bnum·bidx) ·
+           (리뷰 R4) until '' 은 기본값
+        ⓘ (CC-1) 사냥꾼이 바꾼 주소(movedNoticeUrls)로 학교별 파일도 고치고 파일 안에서 합친다 — 다음 수집 뒤에도 한 장 · (리뷰 R7) 색인 count 도
      ② 고아 파일(publishBySchool · app2-F4/collect-12) — 목록에 글이 없는 학교의 옛 파일은 빈 파일로 · 이미 빈 파일·못 읽는 파일·이름이 안 맞는 파일은 그대로
      ③ 화면 0건 학교(zeroFeedSchools · zeroFeedWhy · app2-F2/collect-06) — 리포트 머리 한 줄 · 까닭은 이번 상태 줄에서만(브라우저 학교를 '주소 없음'이라 적지 않는다)
      ④ 누락 감사(coverage-rules coverageSets · classifyMiss inLedger · collect-10 · 리뷰 R4) — 장부에만 남은 글을 '가진 것'으로 세지 않는다
         (가르는 곳은 순수 함수 하나 — 표본으로 잰다 · 감사 스크립트는 그 함수에 장부를 ledger 로만 넘긴다)
-     ⑤ 사람이 돌리는 메우기 도구(collector/heal-feed.mjs · collect-01 복구) — 임시 git 저장소에서 사고 직전 커밋을 원천으로 그대로 돌린다
+     ⑤ 사람이 돌리는 메우기 도구(collector/heal-feed.mjs · collect-01 복구) — 임시 git 저장소에서 사고 직전 커밋을 원천으로 그대로 돌린다 ·
+        (리뷰 R1) --dry 가 메울 글을 한 줄씩([표식] · 원천)·--skip=<주소>·원천에 없는 --skip 은 멈춤 · 사냥꾼이 푼 표식은 찾은 주소로 · (리뷰 R4) since > until 은 멈춤
      ⑥ (리뷰 R5) 수집기가 notices.json 을 못 읽은 실행(빈 목록으로 시작)에도 학교별 파일의 글이 비지 않는다
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
@@ -24,8 +27,8 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
 import { cleanEnv, stripComments, stripYamlComments } from './gate.mjs';
-import { healFromLedger, publishBySchool, zeroFeedSchools, zeroFeedWhy, readSchoolFiles, dropUnserved, patchUrlsBySchool, FEED_HEAL_SINCE, FEED_HEAL_UNTIL } from '../../collector/publish-notices.mjs';
-import { movedNoticeUrls } from '../../collector/link-hunt-rules.mjs';
+import { healFromLedger, publishBySchool, zeroFeedSchools, zeroFeedWhy, readSchoolFiles, readHuntMoves, dropUnserved, patchUrlsBySchool, FEED_HEAL_SINCE, FEED_HEAL_UNTIL } from '../../collector/publish-notices.mjs';
+import { movedNoticeUrls, resolvedNoticeUrls } from '../../collector/link-hunt-rules.mjs';
 import { dedupeNotices, capNotices, urlKey, titleKey } from '../../collector/url-key.mjs';
 import { classifyMiss, coverageSets, findMissing } from '../../collector/coverage-rules.mjs';
 import { isAttachmentEntry } from '../../collector/attachment-link.mjs';
@@ -129,7 +132,8 @@ export default async function feed(eq, ctx) {
   /* ── ① ⓒ 두 수집기 배선 ── */
   for (const f of ['collector/collect.mjs', 'collector/browser-collect.mjs']) {
     const src = stripComments(fs.readFileSync(new URL(f, root), 'utf8'));
-    const healAt = src.search(/notices\.items\s*=\s*healFromLedger\(notices\.items,\s*loadCandidates\(\)\.items,\s*\{\s*current:\s*readSchoolFiles\(\),\s*counts:\s*healCounts\s*\}\)/);
+    /* moved: readHuntMoves() — 사냥꾼이 푼 표식(link-hunt.json)으로 장부 판의 주소를 바꿔 끼운다(리뷰 R2 · 동작은 ① ⓗ) */
+    const healAt = src.search(/notices\.items\s*=\s*healFromLedger\(notices\.items,\s*loadCandidates\(\)\.items,\s*\{\s*current:\s*readSchoolFiles\(\),\s*moved:\s*readHuntMoves\(\),\s*counts:\s*healCounts\s*\}\)/);
     const saveAt = src.indexOf('saveCandidates(mergeCandidates(loadCandidates().items, freshAll))');
     const dropAt = src.search(/notices\.items\s*=\s*dropUnserved\(notices\.items\)/);
     const pubAt = src.indexOf('publishBySchool(beforeCap)');
@@ -235,6 +239,49 @@ export default async function feed(eq, ctx) {
     const counts = {};
     eq('  학생이 지금 보는 판(opts.current)은 창으로 묶지 않는다 — 10-03 글도 kept 로 돌아온다',
       [healFromLedger([R], [], { today: TODAY, served: S2, current: [R, C3], counts }).map((n) => n.url), counts], [[R.url, C3.url], { restored: 0, kept: 1 }]);
+    /* (리뷰 R4) until 에 빈 글자를 넘겨도 상한이 없어지지 않는다(`??` 는 '' 를 통과시켰다) */
+    eq("  until '' 은 기본값(FEED_HEAL_UNTIL)과 같다 — 상한이 사라지지 않는다 (리뷰 R4)",
+      healFromLedger([R, K1], [M, K0, Z], { today: TODAY, served: S2, until: '' }).map((n) => n.url), [R.url, K1.url, Z.url]);
+
+    /* (리뷰 R2) 창 **안**(9-30) 장부 표식 + 사냥꾼이 푼 기록 — 사냥꾼이 그 표식을 제목이 다른 짝과 합쳤으면 장부 판을 찾은 주소로 바꿔 끼워
+       같은 글로 본다(안 그러면 메우기가 다시 싣고 → 사냥꾼이 다시 합치고 → 다시 싣는 진동). 기록은 link-hunt.json 의 찾은 줄(resolvedNoticeUrls 한 곳) */
+    const W = { school: '가천대학교', title: '[비교과] 2026 표본 창 안 표식 글', url: `https://www.gachon.ac.kr/kor/7986/subview.do#n-${encodeURIComponent('[비교과] 2026 표본 창 안 표식 글')}`, foundAt: '2026-09-30' };
+    const WR = { school: '가천대학교', title: '[공통] 2026 표본 창 안 표식 글 (연장)', url: 'https://www.gachon.ac.kr/bbs/kor/478/125700/artclView.do', foundAt: '2026-09-30' };
+    const huntItems = {
+      [`n:${W.url}`]: { status: 'resolved', resolvedUrl: WR.url, lastTried: '2026-10-06' },
+      'n:https://www.gachon.ac.kr/kor/7986/subview.do#n-x': { status: '', attempts: 2 },                        // 아직 못 찾은 줄
+      'r:auto-sample': { status: 'resolved', resolvedUrl: 'https://www.gachon.ac.kr/bbs/kor/478/1/artclView.do' }, // 정식 등록 줄
+      'n:https://www.gachon.ac.kr/a/view.do?no=1': { status: 'resolved', resolvedUrl: 'https://www.gachon.ac.kr/a/view.do?no=1' },   // 주소 그대로
+    };
+    const hm = resolvedNoticeUrls(huntItems);
+    eq('  🔴 (리뷰 R2) 창 안(9-30) 장부 표식 + 사냥꾼이 푼 기록 — 기록 없이는 옛 표식 판이 되살아나고 · 기록(moved)이 있으면 찾은 주소로 같은 글이 되어 안 실린다',
+      [healFromLedger([WR], [W], { today: TODAY, served: S2 }).length, healFromLedger([WR], [W], { today: TODAY, served: S2, moved: hm }).map((n) => n.url)],
+      [2, [WR.url]]);
+    eq('  resolvedNoticeUrls — 찾은(resolved) 실시간 공고 줄만 옛 주소 → 찾은 주소 · 못 찾은 줄·정식 등록 줄·주소가 그대로인 줄은 안 넣는다',
+      [[...hm], resolvedNoticeUrls().size, resolvedNoticeUrls(null).size], [[[W.url, WR.url]], 0, 0]);
+    /* 순위 가드 — 기록이 진짜 주소를 표식으로 바꾸라고 해도 장부 판의 진짜 주소는 그대로 둔다 */
+    const realLedger = { ...WR, title: '2026 표본 진짜 주소 장부 글', url: 'https://www.gachon.ac.kr/bbs/kor/478/125701/artclView.do' };
+    eq('  moved 에도 순위 가드 — 진짜 주소를 표식으로 바꿔 끼우지 않는다',
+      healFromLedger([], [realLedger], { today: TODAY, served: S2, moved: new Map([[realLedger.url, W.url]]) }).map((n) => n.url), [realLedger.url]);
+    /* 읽는 쪽(readHuntMoves) — 파일 하나를 읽어 같은 규칙으로 · 없거나 못 읽으면 빈 Map(메우기는 예전처럼 돈다) */
+    const hdir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-feed-huntmoves-'));
+    fs.writeFileSync(path.join(hdir, 'link-hunt.json'), JSON.stringify({ updatedAt: '2026-10-06', items: huntItems }));
+    fs.writeFileSync(path.join(hdir, 'broken.json'), '{ 깨진');
+    eq('  readHuntMoves — link-hunt.json 을 읽어 같은 Map · 파일이 없거나 깨졌으면 빈 Map',
+      [[...readHuntMoves({ path: path.join(hdir, 'link-hunt.json') })], readHuntMoves({ path: path.join(hdir, 'none.json') }).size, readHuntMoves({ path: path.join(hdir, 'broken.json') }).size],
+      [[[W.url, WR.url]], 0, 0]);
+    fs.rmSync(hdir, { recursive: true, force: true });
+
+    /* (리뷰 R2) 서울과기대 — 같은 글(bnum·bidx)이 목록 쪽 번호(nowpage)와 제목('(~9/28(월)까지)' → '(마감)')만 바뀐 판. 주소·제목 열쇠로는 못 잇는다 */
+    const ST = (np, title, foundAt, bidx = '894350', bnum = '5233') => ({ school: '서울과학기술대학교', title, foundAt,
+      url: `https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=${np}&bnum=${bnum}&bidx=${bidx}&qidx=${bnum}&cate=0&allboard=true&nowpage=${np}` });
+    const S0 = ST(2, '(홍보) 2026년도 하반기 (재)달서인재육성장학재단 장학생 선발 공고(~9/28(월)까지)', '2026-09-30');
+    const S1 = ST(3, '(홍보) 2026년도 하반기 (재)달서인재육성장학재단 장학생 선발 공고(마감)', '2026-10-07');
+    const S3 = [...SERVED, '서울과학기술대학교'];
+    eq('  🔴 (리뷰 R2) 서울과기대 같은 글(게시판 번호 + 글 번호)은 쪽 번호·제목이 달라도 한 글 — 창 안 장부 판이 되살아나지 않는다 · 피드 판(마감)이 남는다',
+      [dedupeNotices([S1, S0]).map((n) => n.url), healFromLedger([S1], [S0], { today: TODAY, served: S3 }).map((n) => n.url)], [[S1.url], [S1.url]]);
+    eq('  글 번호가 다르거나 게시판 번호가 다르면 다른 글이다(넓게 묶지 않는다)',
+      [dedupeNotices([S1, ST(2, '(홍보) 다른 재단 장학생 선발', '2026-09-30', '894351')]).length, dedupeNotices([S1, ST(2, '[공지] 다른 게시판 글', '2026-09-30', '894350', '57138')]).length], [2, 2]);
   }
 
   /* ── ① ⓘ 사냥꾼이 바꾼 주소로 학교별 파일도 고치고 합친다 (CC-1 · 2026-10-11) ──
@@ -258,12 +305,14 @@ export default async function feed(eq, ctx) {
     const notices = dedupeNotices(items);
     const r = patchUrlsBySchool(notices, { dir, moved });
     const afterHunt = (fileItems(dir, '가천대학교') || []).map((n) => n.url);
+    const ixAfterHunt = ((JSON.parse(fs.readFileSync(new URL('index.json', dir), 'utf8')).files || {})['가천대학교'] || {}).count;
     const next = collectorTail({ dir, today: TODAY, served: S2, notices, ledger: [M] });
     const afterCollect = (fileItems(dir, '가천대학교') || []).map((n) => n.url);
     eq('① ⓘ movedNoticeUrls — 이번에 바뀐 실시간 공고만(옛 주소 → 새 주소) · 정식 등록·그대로인 표적은 안 넣는다',
       [[...moved], movedNoticeUrls([{ ref: { url: 'https://a.kr/1' }, field: 'url', key: 'n:https://a.kr/1' }]).size, movedNoticeUrls().size], [[[M.url, R.url]], 0, 0]);
     eq('  🔴 사냥꾼 직후 학교별 파일에서도 표식 판이 진짜 판과 한 장으로 합쳐진다 (제목이 달라도 옛 주소로 찾는다) · 고친 수·합친 수를 돌려준다',
       [afterHunt, r.fixed, r.merged, notices.length], [[R.url, O.url], 1, 1, 2]);
+    eq('  (리뷰 R7) 파일 안에서 합쳐 글 수가 줄면 색인(index.json)의 그 학교 count 도 고친다(3 → 2)', ixAfterHunt, 2);
     eq('  🔴 다음 수집 뒤에도 한 장 — 학교별 파일(kept)·장부(창 밖 10-03) 어느 쪽에서도 옛 판이 되살아나지 않는다',
       [afterCollect, next.counts, next.notices.map((n) => n.url)], [[R.url, O.url], { restored: 0, kept: 0 }, [R.url, O.url]]);
     /* 순위 가드는 moved 에도 — 진짜 주소를 표식으로 바꾸는 쪽(옛 주소 → 표식)은 고치지 않는다 · 바뀔 것이 없으면 파일을 안 쓴다 */
@@ -392,6 +441,12 @@ export default async function feed(eq, ctx) {
     const stale = { school: K, title: '2026 표본 오래된 장학 안내', url: 'https://k.kr/v?no=3', foundAt: day(70) };
     const attach = { school: K, title: '장학 신청서.hwp', url: 'https://k.kr/download.do?attachNo=4', foundAt: day(2) };
     w('data/notices.json', { updatedAt: day(0), items: [a2, attach, stale] }); w(fileK, { school: K, updatedAt: day(0), items: [a2] });
+    /* (리뷰 R2) 사냥꾼 장부 — 표식 M2 를 R2 의 주소로 푼 기록. 도구도 수집기처럼 이 기록으로 장부 판의 주소를 바꿔 끼운다(아래 srcMix) */
+    const R2 = { school: K, title: '[공통] 2026 표본 사냥꾼이 합친 재단 장학 안내', url: 'https://k.kr/v?no=21', foundAt: day(2) };
+    const M2 = { school: K, title: '[장학공지] 2026 표본 사냥꾼이 합친 재단 장학 안내', url: `https://k.kr/list.do#n-${encodeURIComponent('[장학공지] 2026 표본 사냥꾼이 합친 재단 장학 안내')}`, foundAt: day(2) };
+    /* 학교가 제목만 고친 같은 글의 표식 판 — 도구는 같은 글인지 모른다(사람이 목록을 보고 --skip 으로 뺀다) */
+    const K2 = { school: K, title: '공통 제36기 표본레에셋 해외교환 장학생 선발', url: `https://k.kr/list.do#n-${encodeURIComponent('공통 제36기 표본레에셋 해외교환 장학생 선발')}`, foundAt: day(3) };
+    w('collector/link-hunt.json', { updatedAt: day(0), items: { [`n:${M2.url}`]: { status: 'resolved', resolvedUrl: R2.url, lastTried: day(1) } } });
     g('add', '-A'); g('commit', '-qm', '사고(잘림)');
     const tool = fileURLToPath(new URL('collector/heal-feed.mjs', root));
     const run = (...args) => spawnSync(process.execPath, [tool, ...args], { cwd: dir, encoding: 'utf8', env: cleanEnv() });
@@ -408,7 +463,19 @@ export default async function feed(eq, ctx) {
     const dryDefault = run('--dry', '--since=0000-00-00', srcNew);
     const dryOpen = run('--dry', '--since=0000-00-00', '--until=9999-12-31', srcNew);
     const badUntil = run('--dry', '--until=10월', srcNew);
+    /* (리뷰 R4) 빈 창 — --since 만 주어 기본 --until 보다 늦으면 소리 없이 0건이 되던 것 → 멈춘다 */
+    const emptyWin = run('--dry', `--since=${day(1)}`, srcNew);
+    const emptyWin2 = run('--dry', '--since=2026-10-05', '--until=2026-10-01', srcNew);
+    /* (리뷰 R1) 메울 글 목록 · --skip · (리뷰 R2) 사냥꾼이 푼 표식 */
+    const srcMix = path.join(srcDir, 'mix.json');
+    fs.writeFileSync(srcMix, JSON.stringify({ items: [R2, M2, K2] }));
+    const W9 = '--until=9999-12-31';
+    const dryMix = run('--dry', '--since=0000-00-00', W9, srcMix);
+    const drySkip = run('--dry', '--since=0000-00-00', W9, `--skip=${K2.url}`, srcMix);
+    const badSkip = run('--dry', '--since=0000-00-00', W9, '--skip=https://k.kr/v?no=없는글', srcMix);
+    const mixClean = g('status', '--porcelain').stdout.trim() === '';
     fs.rmSync(srcDir, { recursive: true, force: true });
+    const rowsOf = (o) => (o.stdout || '').split('\n').filter((l) => l.startsWith('- '));
     const r = run('--since=0000-00-00', '--until=9999-12-31', `git:${snap}:data/notices/`, `git:${snap}:data/notices.json`);
     const feedOut = JSON.parse(fs.readFileSync(path.join(dir, 'data/notices.json'), 'utf8')).items;
     const fileOut = JSON.parse(fs.readFileSync(path.join(dir, fileK), 'utf8')).items;
@@ -418,6 +485,17 @@ export default async function feed(eq, ctx) {
       [dryDefault.status, (dryDefault.stdout.match(/메울 글 (\d+)건/) || [])[1], new RegExp(`until ${FEED_HEAL_UNTIL}`).test(dryDefault.stdout),
         dryOpen.status, (dryOpen.stdout.match(/메울 글 (\d+)건/) || [])[1], badUntil.status],
       [0, '0', true, 0, '1', 2]);
+    eq('  🔴 (리뷰 R4) --since 가 --until 보다 늦으면(빈 창) 이유를 적고 멈춘다 — --since 만 줘 기본 --until 에 걸린 경우도',
+      [emptyWin.status, /메울 창이 비었습니다/.test(emptyWin.stderr), /--until 기본값은/.test(emptyWin.stderr), emptyWin2.status, /--until 기본값은/.test(emptyWin2.stderr)],
+      [2, true, true, 2, false]);
+    eq('  🔴 (리뷰 R1) --dry 는 메울 글을 한 줄씩(학교 · 수집일 · 제목 · 주소 · 원천) — 표식 주소는 [표식] · 원천별·표식 수 · 사냥꾼이 푼 표식(M2)은 찾은 주소로 같은 글(R2)이 되어 한 줄',
+      [dryMix.status, (dryMix.stdout.match(/메울 글 (\d+)건/) || [])[1], rowsOf(dryMix),
+        new RegExp(`원천별: ${srcMix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} 2 · 그중 목록 표식\\(#n-\\) 1건`).test(dryMix.stdout)],
+      [0, '2', [`- ${K} · ${R2.foundAt} · ${R2.title} · ${R2.url} (${srcMix})`, `- [표식] ${K} · ${K2.foundAt} · ${K2.title} · ${K2.url} (${srcMix})`], true]);
+    eq('  🔴 (리뷰 R1) --skip=<주소> 는 그 글을 원천에서 뺀다 · 원천에 없는 주소면 오타일 수 있어 멈춘다(아무것도 안 쓴다)',
+      [drySkip.status, (drySkip.stdout.match(/메울 글 (\d+)건/) || [])[1], /원천에서 뺀 글 1건/.test(drySkip.stdout), rowsOf(drySkip).some((l) => l.includes('[표식]')),
+        badSkip.status, /--skip 주소가 원천에 없습니다/.test(badSkip.stderr), mixClean],
+      [0, '1', true, false, 2, true, true]);
     eq('  notices.json·학교별 파일 둘 다 · 고친 주소는 그대로 · 메운 글의 foundAt 은 원래 날짜 · 수집기처럼 60일 밖 글·첨부 링크는 거른다',
       [feedOut.map((n) => n.url), fileOut.map((n) => n.url), feedOut[1] && feedOut[1].foundAt], [[a2.url, b.url], [a2.url, b.url], b.foundAt]);
     /* '수집기 끝부분과 같은 함수·같은 차례'를 글자로 대조 — 피드를 바꾸는 함수(url-key · publish-notices · attachment-link 가 내보내는 이름)

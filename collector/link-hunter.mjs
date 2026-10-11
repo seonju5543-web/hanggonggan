@@ -59,6 +59,8 @@
    · '목록에서 못 찾음'이 3회 쌓여도 목록 끝까지 본 경우에만 '게시판에서 내려간 듯(likelyGone)'으로 적는다
      (쪽수·시간 상한에서 멈췄으면 더 뒤에 있을 수 있다). 규칙은 link-hunt-rules.mjs 한 곳.
    · 네트워크로 못 읽은 것은 횟수에 세지 않는다 — 학교 서버 사정이지 공고 잘못이 아니다.
+     게시판이 안 열린 표적은 그날 3단계도 안 두드리고 내일로 미룬다. 단 게시판이 NET_STREAK_DAYS(7)번 잇달아 안 열린 날은 3단계를 한 번 해 보고,
+     그래도 못 찾으면 사람에게 한 번 알린다(netStreak · 2026-10-11 리뷰 — 목록 주소 하나만 죽은 게시판의 구출 길이 영구히 막히지 않게).
    · 관리자가 원문 주소를 넣은 공고(data/link-fixes.json)는 대상에서 뺀다 — 표식을 바꾸면 관리자 주소가 화면에서 사라진다.
 
    실행: node collector/link-hunter.mjs [--dry]
@@ -83,7 +85,8 @@ import { dedupeNotices } from './url-key.mjs';
    왜 재발행이면 안 되는지는 publish-notices.mjs 의 patchUrlsBySchool 첫머리에 있다. */
 import { patchUrlsBySchool } from './publish-notices.mjs';
 /* 장부 규칙(시도 기록 · 사람에게 알릴 때 · '내려간 듯')은 순수 함수 파일 하나 — 관문이 가짜 장부로 그대로 돌려 본다 (2026-10-04 · 이슈 #387) */
-import { recordAttempt, settleEscalation, listScanEnd, escalationLines, pruneHuntState, boardUnreachableWhy, movedNoticeUrls } from './link-hunt-rules.mjs';
+import { recordAttempt, settleEscalation, listScanEnd, escalationLines, pruneHuntState, boardUnreachableWhy, movedNoticeUrls,
+  netStreakDue, settleNetStreak, NET_STREAK_DAYS } from './link-hunt-rules.mjs';
 /* 관리자가 이미 원문을 넣은 공고는 건드리지 않는다 (2026-10-04) — 표식을 바꾸면 관리자 열쇠(u:<표식>)가 안 맞아 그 주소가 화면에서 사라진다 */
 import { readLinkFixes, humanFixedBy } from './link-fixes-read.mjs';
 
@@ -556,9 +559,13 @@ for (const [listUrl, group] of boards) {
   }
   if (!opened) {
     /* 게시판이 안 열리면 그 게시판 대상 전부를 내일로 미룬다(못 읽음 — 횟수에는 안 센다 · links-14). 안 적으면 실행마다 같은 게시판을 세 번씩 다시 두드린다 */
-    for (const t of group) record(t, 'net', boardUnreachableWhy(openErr));   // 문구는 한 곳 — 관리자 「죽은 링크」에 안 걸리게(원인 단정 금지)
-    for (const t of group) deferredKeys.add(t.key);                           // 3단계도 오늘은 이 표적을 두드리지 않는다(links-final-1)
-    report.push(`- ⏭ 이 게시판의 대상 ${group.length}건은 내일 다시 봅니다(횟수에는 안 셉니다)`);
+    for (const t of group) record(t, 'net', boardUnreachableWhy(openErr), undefined, { boardDown: true });   // 문구는 한 곳 — 관리자 「죽은 링크」에 안 걸리게(원인 단정 금지)
+    /* 3단계도 오늘은 이 표적을 두드리지 않는다(links-final-1) — 단 게시판이 NET_STREAK_DAYS 번 잇달아 안 열린 표적은 오늘 3단계를 한 번 해 본다
+       (목록 주소 하나만 죽고 같은 학교의 다른 게시판·사이트 검색은 열리는 경우 구출 길이 영구히 막히지 않게 · 규칙은 link-hunt-rules.mjs netStreakDue) */
+    const due = group.filter((t) => netStreakDue(state.items[t.key]));
+    for (const t of group) if (!due.includes(t)) deferredKeys.add(t.key);
+    if (group.length > due.length) report.push(`- ⏭ 이 게시판의 대상 ${group.length - due.length}건은 내일 다시 봅니다(횟수에는 안 셉니다)`);
+    if (due.length) report.push(`- ↪ ${due.length}건은 게시판이 ${NET_STREAK_DAYS}번 이상 잇달아 안 열려 오늘 3단계(다른 게시판·사이트 검색)를 한 번 해 봅니다`);
     await page.close().catch(() => {}); report.push(''); continue;
   }
   await page.waitForTimeout(3500);
@@ -810,6 +817,7 @@ if (stillLost.length && !outOfTime()) {
       report.push(`  - ✅ 다른 경로에서 찾음: ${want.slice(0, 40)} → ${got.slice(0, 100)}`);
     } else {
       stage3Failed.add(t.key);
+      failedKeys.add(t.key);   // 끝줄 '아직 못 찾음'에 센다 — 게시판이 안 열려 1단계를 건너뛴 표적(netStreakDue)도 여기서 처음 못 찾음이 된다
       report.push(`  - ⚠️ 다른 경로에서도 못 찾음 (${tried.length}곳 시도): ${want.slice(0, 40)}`);
     }
     await new Promise((r) => setTimeout(r, 900));
@@ -822,10 +830,15 @@ if (stillLost.length && !outOfTime()) {
    예전엔 1단계가 세 번째 실패를 적는 순간 셌다 — 같은 실행의 3단계가 그 공고를 찾아냈는데도 '3회 못 찾은 공고 1건' 이슈가 열렸다.
    시간이 모자라 3단계를 못 해 본 공고는 이번에 세지 않는다(다음 실행이 3단계까지 해 보고 센다). */
 for (const t of stillLost) {
-  if (stage3Failed.has(t.key) && settleEscalation(state.items[t.key])) {
+  /* 게시판이 NET_STREAK_DAYS 번 잇달아 안 열려 오늘 3단계를 해 본 표적(위 1단계의 due) — 못 찾았으면 센 날 수를 되돌리고 아직 안 알렸으면 한 번 알린다(settleNetStreak).
+     횟수(attempts)로 알리는 길과 둘 다 부른다 — 하나가 알렸어도 센 날 수는 되돌려야 다음 3단계가 다시 그만큼 뒤로 간다 */
+  const downDays = (state.items[t.key] || {}).netStreak || 0;
+  const byTries = stage3Failed.has(t.key) && settleEscalation(state.items[t.key]);
+  const byBoardDown = stage3Failed.has(t.key) && settleNetStreak(state.items[t.key]);
+  if (byTries || byBoardDown) {
     stuck += 1;
     const st = state.items[t.key] || {};
-    escalatedNow.push({ title: huntTitle(t), key: t.key, attempts: st.attempts, lastWhy: st.lastWhy, likelyGone: st.likelyGone });
+    escalatedNow.push({ title: huntTitle(t), key: t.key, attempts: st.attempts, lastWhy: st.lastWhy, likelyGone: st.likelyGone, boardDown: byBoardDown ? downDays : 0 });
   }
 }
 
