@@ -26,7 +26,7 @@
 import { extractDatedRows } from './board-links.mjs';
 import { fetchBoard } from './fetch-board.mjs';
 import { canonUrl } from './canon-url.mjs';
-import { urlKey } from './url-key.mjs';
+import { urlKey, postIdKey } from './url-key.mjs';
 import crypto from 'node:crypto';
 
 /* 동국대 두 캠퍼스: 목록 주소 …/article/<게시판>/list → 상세 …/article/<게시판>/detail/<번호>.
@@ -409,8 +409,18 @@ export function collapseSamePost(items) {
    글 번호가 있으면 **학교|글 번호**(cfg.hidePosts)로 본다. 목록 표식(#n-제목) 주소는 같은 제목의 다른 글과 같아 주소로는 가리지 않는다
    (주소로 숨기면 내년에 다시 올라온 같은 제목의 글까지 숨었다). 그 밖은 주소(cfg.hideUrls). */
 export const newsPostKey = (n) => `${n.school}|${n.postId}`;
-/* 열쇠(주소·제목)가 같아도 다른 글인가 — 글 번호가 둘 다 있고 다르면 다른 글 (dedupeNotices 의 distinct · 발행과 git 병합기가 같이 쓴다) */
-export const newsDistinct = (a, b) => !!(a.postId && b.postId && a.postId !== b.postId);
+/* 열쇠(주소·제목)가 같아도 다른 글인가 (dedupeNotices 의 distinct · 발행과 git 병합기가 같이 쓴다)
+   ① 글 번호가 둘 다 있으면 그것으로 — 다르면 다른 글, 같으면 같은 글.
+   ② 목록 표식(#n-)이 아닌 진짜 주소 둘이 가리키는 글이 다르면 다른 글 (2026-10-11 점검 feeds-R1) — 같은 이름으로 되풀이되는 공지
+      (항공대 「대학 캠퍼스 방송 촬영 안내」 seq=11243·11303 · 글 번호 칸 없음)가 제목 열쇠 하나로 합쳐져 옛 글이 지워지고, 장부에 남아 돌아오지 않았다
+      (제목 소급이 둘을 갈라 주던 폭 없는 공백을 지우자 실제로 터졌다). 가리키는 글 = urlKey(휘발 값을 뗀 주소 — 계명대 같은 글이 pageRef 만 달라도 하나) ·
+      같은 게시판 체계의 글 번호 열쇠(url-key.mjs postIdKey)가 있으면 그것. 제목 열쇠 합치기는 주소가 제목뿐인 목록 표식 글에만 남는다. */
+const isNewsMarker = (n) => /#n-/.test(String(n.url || ''));
+const newsPostRef = (n) => postIdKey(n.url) || urlKey(n.url);
+export const newsDistinct = (a, b) => {
+  if (a.postId && b.postId) return a.postId !== b.postId;
+  return !isNewsMarker(a) && !isNewsMarker(b) && newsPostRef(a) !== newsPostRef(b);
+};
 export function newsHidden(n, cfg = {}) {
   if (n.postId && (cfg.hidePosts || []).includes(newsPostKey(n))) return true;
   if (n.postId && /#n-/.test(String(n.url || ''))) return false;
