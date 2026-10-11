@@ -11,9 +11,10 @@
    🔴 칸 이름을 `deadline` 으로 하지 말 것 — 앱 카드(app.js)가 n.deadline 으로 카드를 숨기고 D-day 를 그려 승인된 화면이 바뀐다.
    🔴 껍데기를 걷지 않은 본문으로 읽지 말 것 — 항공대 머리 배너(교수 채용 `접수기간 : 2026.10.15.(목) 13:30까지`)가 모든 글의 마감이 된다.
       그 호스트의 껍데기를 모르면(저장된 쪽이 3쪽 미만) 읽지 않는다(bodyDeadlineFrom 이 null). */
-import { hintWithoutChrome, isChromeHint } from './deadline-hint.mjs';
+import { hintWithoutChrome, isChromeHint, HINT_HEAD } from './deadline-hint.mjs';
 import { boilerMulti, boilerFor } from './page-boilerplate.mjs';
 import { canonUrl } from './canon-url.mjs';
+import { decodeEntities } from './clean-title.mjs';
 
 /* 🔴 달력에 없는 날은 마감이 아니다 — 못 믿으면 비운다 (2026-09-19 · `~ 26. 9. 10.` 이 `2026-26-09` 가 되어 카드에 D-NaN) */
 export const okDate = (y, mo, d) => {
@@ -23,35 +24,107 @@ export const okDate = (y, mo, d) => {
 };
 const ISO = /^\d{4}-\d{2}-\d{2}$/;
 
+/* 날짜를 읽기 전에 HTML 기호를 글자로 · 빈칸을 하나로 (2026-10-11 점검 gap-bf-3) — 게시판 요약은 본문 글자를 그대로 잘라 와
+   `2026 년 &nbsp;09 월 &nbsp;30 일까지`(방송대)처럼 기호가 섞여 있어 날짜 꼴이 깨졌다. 두 번 싼 것(&amp;nbsp;)도 있어 두 번 푼다. */
+const plain = (s) => decodeEntities(decodeEntities(String(s || ''))).replace(/\s+/g, ' ').trim();   // \s 는 &nbsp;(U+00A0)도 받는다
+/* 날짜 뒤 `까지·마감` 앞에 요일·시각이 끼어도 받는다 — `2026. 10. 8.(목) 18:00까지` · `10월 15일(목) 17시까지` (2026-10-11 · 충남대·건국대·서울시립대 요약).
+   예전엔 그 사이 숫자 없는 6~8자만 받아 시각이 끼면 못 읽었다 — 끝난 공고가 마감 없이 등록됐다.
+   🔴 사이에 범위 기호(`~`)나 `부터` 가 있으면 그 날짜는 **시작**이다 — `2026. 8. 24.(월) 10:00~ 마감시`(선착순 마감)·`(8/24부터 접수) 까지` 를 마감으로 읽지 않는다. */
+const GAP = '(?:(?!부터)[^\\d~∼〜～–—])';
+const DUE = `(?:${GAP}{0,8}|${GAP}{0,8}\\d{1,2}\\s*(?::\\s*\\d{2}|시)(?:\\s*\\d{1,2}\\s*분)?${GAP}{0,4})(까지|마감)`;
+const DUE_KR = new RegExp(`(\\d{4})\\s*년\\s*(\\d{1,2})\\s*월\\s*(\\d{1,2})\\s*일\\s*${DUE}`);
+const DUE_DOT = new RegExp(`(\\d{4})[.\\-\\/\\s]+(\\d{1,2})[.\\-\\/\\s]+(\\d{1,2})\\s*${DUE}`);
+/* 해 없는 `10/8 마감`·`10월 15일(목) 17시까지` (서강대 제목 `(10/8 마감, 생활비 150만원)` · 서울시립대 요약) — 성적 소수(`평점 3.5 이상 … 까지`)는 날짜가 아니다 */
+const BARE_DUE = new RegExp(`(?<![\\d.\\/~])(\\d{1,2})\\s*(?:\\/|\\.|월)\\s*(\\d{1,2})(?!\\d)\\s*일?\\.?\\s*(?:\\([^)]{0,6}\\)\\s*)?${DUE}`, 'g');
+const GRADE_NEAR = /평점|성적|학점|점수|GPA/i;
+/* 분수도 날짜가 아니다 (2026-10-11 리뷰) — `수업일수 1/4 경과 전까지`·`등록금 1/2 지원까지`·`수업일수 1/3선까지` 가 01-04·01-02·01-03 으로 읽혀
+   '마감 경과'로 조용히 걸러질 수 있었다. 앞 10자에 분수를 부르는 말(수업일수·등록금·학비·`…의`)이 있거나 뒤에 분수 꼬리(선·경과·지원·이내)가 오면 건너뛴다.
+   `선착순`·`지원 마감` 은 꼬리가 아니다(`10/8 지원마감` 은 마감이다). */
+const FRACTION_NEAR = /수업\s*일수|등록금|학비|의\s*$/;
+const FRACTION_TAIL = /^\s*(점|이상|이하|이내|만점|배|%|선(?!착)|경과|지원(?!\s*마감))/;
+function bareDue(hay) {
+  for (const m of hay.matchAll(BARE_DUE)) {
+    const date = m[0].match(/^\d{1,2}\s*(?:\/|\.|월)\s*\d{1,2}/)[0];
+    const before = hay.slice(Math.max(0, m.index - 10), m.index);
+    if (GRADE_NEAR.test(before) || FRACTION_NEAR.test(before) || FRACTION_TAIL.test(hay.slice(m.index + date.length))) continue;
+    return m;
+  }
+  return null;
+}
+/* 해 없는 날짜의 해 — 오늘의 해. 해가 바뀌는 길목만 가까운 쪽(11·12월에 읽은 1·2월 날짜는 다음 해 · 1·2월에 읽은 11·12월 날짜는 지난해).
+   🔴 그 밖은 늘 오늘의 해다 — '가까운 쪽'으로 넓히면 3월에 올라온 `~3/31` 이 10월엔 다음 해로 읽혀 끝난 공고가 열린 공고가 된다. */
+function bareYear(mo, today) {
+  const y = Number(String(today || '').slice(0, 4));
+  const tm = Number(String(today || '').slice(5, 7));
+  if (!y) return '';
+  if (tm >= 11 && Number(mo) <= 2) return String(y + 1);
+  if (tm && tm <= 2 && Number(mo) >= 11) return String(y - 1);
+  return String(y);
+}
+/* 기간 이름표로 **끝나는** 말(뒤에 짧은 괄호 하나까지) — 첫 콜론이 이 이름표의 것인지 가른다(이름표 목록은 deadline-hint.mjs 의 힌트 이름표와 같은 낱말 ·
+   장학 판독기 PERIOD_LABEL 의 `…마감일시` 꼴 포함) */
+const COLON_AFTER_LABEL = /(?:(?:신청|접수|모집|제출|응모|추천|지원)\s*(?:기간|기한|마감(?:일시|일자|일)?)|(?<![가-힣])(?:기한|마감(?:일시|일자|일)?))\s*(?:\([^()]{0,12}\))?\s*$/;
+/* 게시판 요약(deadlineHint)은 **이름표에서 시작하는 본문 한 토막**이다(deadline-hint.mjs deadlineHintFrom — `제출기한: 2026. 9. 11.(금) ※ …`).
+   그 이름표 뒤 날짜는 장학과 **같은 판독기**(extract-excerpts.mjs extractDeadline — 이름표 뒤 날짜만 · 범위면 끝 · 못 믿으면 null)로 읽는다.
+   판독기는 부르는 쪽이 넘긴다(불러오는 순간 원문 파일을 읽는 파일이라 여기서 import 하지 않는다 — 아래 bodyDeadlineFrom 과 같은 방식).
+   넘기지 않으면 이 갈래는 건너뛴다(예전처럼 `~`·`까지/마감` 꼴만). */
+function labeledHint(n, extract) {
+  if (typeof extract !== 'function' || !n || !n.deadlineHint) return null;
+  const hint = plain(n.deadlineHint);
+  /* 🔴 판독기는 **첫 콜론 앞 전부**를 이름표로 보고, 그 안 어디에든 기간 이름표가 있으면 받는다 — 그래서 **첫 콜론이 기간 이름표 바로 뒤일 때만** 넘긴다
+     (2026-10-11 리뷰). `신청기간 안내 작성자 : 학생지원팀 작성일 : 2026.08.12` · `신청기간 연장 안내 등록일 : 2026.09.30` 처럼 첫 콜론이 게시판
+     머리 줄(작성자·등록일)의 것이면 게시일이 마감이 된다 — 옛 꼴 요약 98줄을 피드 메우기가 되살린다. 콜론이 기간 이름표 뒤면 머리든 가운데든 그 이름표의 것이다
+     (`접수기간 및 방법 - 접수기간 : 2026. 8. 27.` · `… 또는 방문접수 5. 접수 기한 : 26. 9. 1. ~ 26. 9. 30.` · `신청기한(학생): …` — 원장 실례). */
+  const colon = hint.search(/[:：]/);
+  let labeled = colon >= 0 && COLON_AFTER_LABEL.test(hint.slice(0, colon)) ? hint : null;
+  /* 콜론 없는 머리 이름표(`제출기한 2026. 11. 11.(수) 6. 제출처 …` — 힌트를 자른 이름표 규칙은 앞말 붙은 이름표를 콜론 없이도 받는다)는
+     이름표 뒤에 콜론을 넣어 넘긴다 — **이름표 바로 뒤가 날짜일 때만**.
+     🔴 `신청기간 안내(~9/9) 작성일 2026.08.12 …`(게시판 머리 줄)에 콜론을 넣으면 게시일이 마감이 된다(만들면서 실측 4건). 그 밖은 건너뛴다. */
+  if (!labeled) {
+    const head = hint.match(HINT_HEAD);
+    const rest = head ? hint.slice(head[0].length) : '';
+    if (head && !/[:：]/.test(head[0]) && /^[~∼〜～]?\s*\d/.test(rest)) labeled = `${head[0].trim()} : ${rest}`;
+  }
+  if (!labeled) return null;
+  const got = extract(labeled);
+  if (!got || !ISO.test(got)) return null;
+  const [y, mo, d] = got.split('-');
+  return [hint.slice(0, 200), y, mo, d];
+}
+
 /**
  * 게시판 글 하나의 마감 — `{ date, text, from }` 또는 null.
  *   ① 본문 마감(bodyDeadline · 근거 문구 bodyDeadlineText 가 있을 때만) — from '공고 원문'
- *   ② 제목 + 게시판 요약의 명확한 날짜(YYYY.M.D · 한글 날짜 · `까지/마감`) — from '게시판 요약'
- *   ③ 연도 없는 `~7.03`·`~ 9. 18` — today 의 해로 읽는다(마감 경과 거르기용)
+ *   ② 제목 + 게시판 요약의 명확한 날짜(YYYY.M.D · 한글 날짜 · `까지/마감` · 요약 머리 이름표 뒤 날짜) — from '게시판 요약'
+ *   ③ 연도 없는 `~7.03`·`~ 9. 18`·`~ 9 월 28 일`·`10/8 마감` — today 의 해로 읽는다(마감 경과 거르기용 · 해 바뀌는 길목은 bareYear) · `yearGuessed: true` 를 단다
+ *   opts.extract — 이름표 판독기(장학과 같은 extractDeadline · 부르는 쪽이 넘긴다). 없으면 요약 머리 이름표 갈래를 건너뛴다.
  * text 는 **실제로 맞춘 문구**다 — 등록할 때 `deadlineFrom: '<from> · <text>'` 로 남겨 감사(deadline-audit)가 근거로 센다.
  */
-export function parseDeadline(n, today) {
+export function parseDeadline(n, today, opts = {}) {
   if (n && n.bodyDeadline && ISO.test(n.bodyDeadline) && n.bodyDeadlineText) {
     const [y, mo, d] = n.bodyDeadline.split('-');
     if (okDate(y, Number(mo), Number(d))) return { date: n.bodyDeadline, text: String(n.bodyDeadlineText).slice(0, 200), from: '공고 원문' };
   }
-  const hay = `${(n && n.title) || ''} ${(n && n.deadlineHint) || ''}`;
+  const hay = plain(`${(n && n.title) || ''} ${(n && n.deadlineHint) || ''}`);
   const m = hay.match(/~\s*(\d{4})[.\-\/\s]+(\d{1,2})[.\-\/\s]+(\d{1,2})/) ||
-            // 한글 날짜 "~2026년 7월 31일" (도레이재단 공고가 이 형태라 마감이 비어 있었다 — 2026-07-30 추가)
-            hay.match(/~\s*(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/) ||
-            hay.match(/(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일\s*[^\d]{0,8}(까지|마감)/) ||
-            hay.match(/(\d{4})[.\-\/\s]+(\d{1,2})[.\-\/\s]+(\d{1,2})\s*[^\d]{0,6}(까지|마감)/);
+            // 한글 날짜 "~2026년 7월 31일" (도레이재단 공고가 이 형태라 마감이 비어 있었다 — 2026-07-30 추가) · 숫자와 년·월·일 사이 빈칸도(2026-10-11)
+            hay.match(/~\s*(\d{4})\s*년\s*(\d{1,2})\s*월\s*(\d{1,2})\s*일/) ||
+            hay.match(DUE_KR) ||
+            hay.match(DUE_DOT) ||
+            labeledHint(n, opts.extract);
   if (m) {
     const iso = okDate(m[1], m[2], m[3]);
     if (iso) return { date: iso, text: m[0].trim(), from: '게시판 요약' };
   }
-  /* 연도 없는 "~7.03"·"~7/19" — 올해로 해석 (마감 경과 거르기용)
+  /* 연도 없는 "~7.03"·"~7/19"·"~ 9 월 28 일" — 올해로 해석 (마감 경과 거르기용)
      🔴 점 뒤 빈칸을 받는다 — 게시판은 `(~ 9. 18)` 처럼 띄어 쓴다. 안 받으면 마감을 못 읽어
         **끝난 공고가 '접수 기간 원문 확인' 을 달고 60일 동안 탭에 남는다**(2026-09-19 실측 3건). */
-  const m2 = hay.match(/~\s*(\d{1,2})\s*[.\/]\s*(\d{1,2})/);
-  if (m2) {
-    const iso = okDate(String(today || '').slice(0, 4), m2[1], m2[2]);
-    if (iso) return { date: iso, text: m2[0].trim(), from: '게시판 요약' };
+  const m2 = hay.match(/~\s*(\d{1,2})\s*[.\/월]\s*(\d{1,2})/);
+  const m3 = m2 || bareDue(hay);
+  if (m3) {
+    const iso = okDate(bareYear(m3[1], today), m3[1], m3[2]);
+    /* yearGuessed — 해를 오늘에서 짐작했다는 표시(자동 등록이 내년도 사업의 '지난 마감'을 거르지 않고 보류하는 데 쓴다 · register-timing.mjs guessedPastHold) */
+    if (iso) return { date: iso, text: m3[0].trim(), from: '게시판 요약', yearGuessed: true };
   }
   return null;
 }
