@@ -8692,6 +8692,51 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
     eq('  🔴 본문이 그림뿐이면 지어내지 않고 빈 값', ND.newsDesc('<h3>대학원 입학설명회 개최 안내</h3><p>작성일 2026-10-06</p><p><img src="a.jpg"></p><p>이전글</p>', '대학원 입학설명회 개최 안내'), '');
     const long = ND.newsDesc('<h3>긴 글의 제목입니다 안내</h3><p>' + '가나다라마바사 아자차카타파하 '.repeat(20) + '</p>', '긴 글의 제목입니다 안내');
     eq(`  길면 ${ND.DESC_MAX}자 안에서 자르고 … 를 붙인다`, long.length <= ND.DESC_MAX + 1 && long.endsWith('…'), true);
+
+    /* 🔴 남의 글·껍데기를 그 글의 요약으로 싣지 않는다 (2026-10-11 점검 gap-04 — 실린 요약 322건 중 25건에 같은 학교 다른 글 제목).
+       표본은 실제로 실린 요약의 꼴(동국·부경·서울대·한양·성균관)을 본떴다 — 실데이터를 읽지 않는다. */
+    const dgT = '10월 7일(수)~ 10월 8일(목) 헌혈 버스 시행 안내';
+    const dgS = ['[카운슬링센터] 온라인 심리검사 프로그램 참여 안내: \'나의 대학생활과 학습습관, 괜찮나?"',
+      '[취업팀] 실전 모의면접 컨설팅 - 나의 유형별 면접 완벽 마스터(마이성공스피치) [신청 ~ 10/12(월) 17시]', dgT];
+    const dongguk = `<h3>${dgT}</h3><p>작성자 학생지원팀</p><p>2026.10.05</p><div class="view_cont"><p><img src="blood.jpg"></p></div>`
+      + `<ul class="other"><li>${dgT}</li><li>${dgS[0]}</li><li>${dgS[1]}</li></ul><div>서울특별시 중구 필동로1길 30 동국대학교 (04620)</div>`;
+    eq('  🔴 동국 꼴 — 본문이 그림뿐이고 아래 목록에 제 제목 뒤 남의 제목 둘(+주소) → 빈 값 (남의 제목 줄에서 멈춘다 · 본문 전이어도)',
+      ND.newsDesc(dongguk, dgT, dgS), '');
+    const pkT = '[4단계BK21대학원혁신사업] 2026학년도 대학원생 우수논문상 선정 결과';
+    const pkS = ['[소프트웨어융합혁신원] 소프트웨어융합혁신원 인공지능·소프트웨어융합전공 설명회 개최 안내', '[4단계BK21대학원혁신사업] 2026 PKNU 우수 연구실(Proud Lab) 선정 결과', pkT];
+    eq('  🔴 부경 꼴 — 남의 제목 둘 뒤에 「수강신청」 → 빈 값',
+      ND.newsDesc(`<div class="bv"><h4>${pkT}</h4><span>2026-10-08</span><div><img src="x.png"></div></div><ul><li><a>${pkS[0]}</a></li><li><a>${pkS[1]}</a></li></ul><div class="quick"><a>수강신청</a></div>`, pkT, pkS), '');
+    const real = '튜터링 운영 교과목의 수강생이라면 튜티로 참여 가능합니다. 자세한 사항은 아래 이미지 및 첨부파일 참고 바랍니다.';
+    eq('  본문이 있으면 본문까지만 — 아래 남의 제목은 붙지 않는다',
+      ND.newsDesc(`<h3>${dgT}</h3><p>${real}</p><ul><li>${dgS[0]}</li><li>${dgS[1]}</li></ul>`, dgT, dgS), real);
+    eq('  🔴 「이전글·다음글」 줄에서 멈춘다 (목록에 없는 옛 글 제목이어도)',
+      ND.newsDesc('<h3>2026학년도 2학기 학습법 특강 안내</h3><p>작성일 2026.10.02</p><p><img src="poster.jpg"></p><div>이전글 [학사] 2025학년도 겨울 계절학기 수강신청 일정 안내</div><div>다음글 [취업] 2025 하반기 공기업 채용설명회 참가 신청 안내</div>', '2026학년도 2학기 학습법 특강 안내'), '');
+    eq('  🔴 서울대 꼴 — 「목록보기 다음글이 없습니다.」 뒤 남의 제목·주소 → 빈 값',
+      ND.newsDesc('<h3>2026학년도 2학기 리포트 집중지도(1차) 참가자 발표</h3><p><img src="a.png"></p><a>목록보기</a><div>다음글이 없습니다.</div><div>2026년 우양재단「동행 장학」장학생 모집</div><div>서울특별시 관악구 관악로 1, 서울대학교 61동 201호(우편번호 08826)</div>', '2026학년도 2학기 리포트 집중지도(1차) 참가자 발표'), '');
+    const hySent = '2026 애스크톤 예선 결과를 아래와 같이 발표합니다. 본선 진출 팀은 10월 20일까지 발표 자료를 제출해 주시기 바랍니다.';
+    eq('  🔴 한양 꼴 — 「작성자 IC-PBL교수학습센터」 처럼 이름표와 값이 한 줄이어도 줄째 뺀다 (한글 이름표가 실제로 걸린다)',
+      ND.newsDesc(`<h2>[IC-PBL교수학습센터] 2026 애스크톤 예선 결과 발표</h2><div>작성자 IC-PBL교수학습센터</div><div>공지분류</div><div>일반</div><div><p>${hySent}</p></div><div>댓글달기 (0개)</div>`, '[IC-PBL교수학습센터] 2026 애스크톤 예선 결과 발표'), hySent);
+    const skSent = '문화예술미디어융합원 촉탁직원(연구원)을 아래와 같이 채용하고자 하오니 많은 지원 바랍니다.';
+    eq('  🔴 성균관 꼴 — 「최종 수정일 :」·「첨부파일 ( 2 )」·「게시글 내용」 껍데기를 뺀다',
+      ND.newsDesc(`<h3>문화예술미디어융합원 촉탁직원(연구원) 채용 공고</h3><p>최종 수정일 : 2026.10.08</p><p>첨부파일 ( 2 )</p><p>게시글 내용</p><p>${skSent}</p>`, '문화예술미디어융합원 촉탁직원(연구원) 채용 공고'), skSent);
+    const ajSent = '시험준비로 지친 여러분들에게 전하는 총장님의 따듯한 격려 행사를 아래와 같이 안내합니다.';
+    eq('  홀로 선 이름표(<dt>작성자</dt>) 다음 줄의 값(학생지원팀)도 뺀다',
+      ND.newsDesc(`<h3>중간고사 격려 프리미엄 중식 행사 안내</h3><dl><dt>작성자</dt><dd>학생지원팀</dd><dt>등록일</dt><dd>2026.10.07</dd></dl><p>${ajSent}</p>`, '중간고사 격려 프리미엄 중식 행사 안내'), ajSent);
+    const s1 = '첨부 서류를 작성하여 10월 20일까지 학생지원팀에 제출하시기 바랍니다.';
+    const s2 = '다음 사항을 확인하여 10월 20일까지 학생지원팀에 서류를 제출하시기 바랍니다.';
+    eq('  본문 문장을 여는 낱말은 이름표로 보지 않는다 (「첨부 서류를 …」 · 「다음 사항을 …」)',
+      [ND.newsDesc(`<h3>장학금 서류 제출 안내</h3><p>${s1}</p>`, '장학금 서류 제출 안내'), ND.newsDesc(`<h3>장학금 서류 제출 안내</h3><p>${s2}</p>`, '장학금 서류 제출 안내')],
+      [s1, s2]);
+    /* 로봇(collect-news-desc.mjs)의 장부 규칙 — 같은 모듈의 순수 함수 */
+    const dgDesc = `${dgS[0]} ${dgS[1]}`;
+    eq('  장부 — 남의 제목을 담은 옛 요약은 입히지 않는다(네트워크 없이 바로 빠진다) · 멀쩡한 요약은 그대로',
+      [ND.descToShow({ at: '2026-10-10', desc: dgDesc }, dgT, dgS), ND.descToShow({ at: '2026-10-10', desc: real }, dgT, dgS), ND.descToShow({ at: '2026-10-10', none: 'x' }, dgT, dgS)],
+      [undefined, real, undefined]);
+    eq('  장부 — 제 제목은 남의 제목이 아니다 (목록에 제 제목이 섞여 와도)', ND.otherTitleLine([dgT], dgT)(`${dgT} 일정을 알려 드립니다`), false);
+    eq('  장부 — 옛 판 규칙으로 뜬 desc·none 은 한 번 다시 연다 (err 는 재시도 규칙이 따로)',
+      [ND.staleRule({ at: '2026-10-10', desc: 'a' }), ND.staleRule({ at: '2026-10-10', none: 'a' }), ND.staleRule({ at: '2026-10-11', v: ND.DESC_RULE, desc: 'a' }), ND.staleRule({ at: '2026-10-10', err: 'e', tries: 1 })],
+      [true, true, false, false]);
+
     const wf = readText(new URL('../.github/workflows/collect-news.yml', import.meta.url));
     const appN = readText(new URL('../app.js', import.meta.url));
     eq('  앱 — 요약이 있는 글만 요약 줄을 그린다 (홈 띠 · 전체 보기 카드)', [/\$\{n\.desc \? `<span class="news-tile-desc">/.test(appN), /\$\{o\.desc \? `<p class="sch-desc">/.test(appN), /desc: n\.desc \}\)/.test(appN)], [true, true, true]);

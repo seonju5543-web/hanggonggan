@@ -10,6 +10,9 @@
      ② 그 글의 화면에 **그 글의 제목이 있을 때만**(T.pageHasTitle — 서버 오류 화면에서 뜨지 않게) 본문 첫 문장들을 뜬다(news-desc.mjs)
      ③ 장부의 요약을 실린 글 전부에 입힌다(item.desc · 소급) — 못 뜬 글은 desc 가 없다(앱이 요약 줄을 안 그린다)
    🔴 발췌만 한다 — AI·짐작 없음. 판정은 순수 모듈 collector/news-desc.mjs 한 곳(관문이 그 파일을 그대로 부른다).
+   🔴 남의 글 제목을 요약으로 싣지 않는다 (2026-10-11 점검 gap-04): ② 에 같은 학교 소식의 제목들을 넘겨 그 줄에서 멈추고(newsDesc 셋째 인자),
+      ③ 에서는 장부의 요약이 같은 학교 다른 글 제목을 담았으면 입히지 않는다(descToShow — 옛 판으로 실린 것이 네트워크 없이 바로 빠진다).
+      장부 항목엔 규칙 판(v · DESC_RULE)을 적고, 판이 다른 desc·none 은 한 번 다시 연다(staleRule).
    ============================================================ */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -18,7 +21,7 @@ import { fetchBoard, netReason } from './fetch-board.mjs';
 import { NEWS_BOARD_RULES, newsRuleKey, postContentRequest } from './news-board-rules.mjs';
 import { withDeadline, TIMED_OUT } from './harvest-budget.mjs';
 import * as T from './news-thumb.mjs';
-import { newsDesc, DESC_MAX } from './news-desc.mjs';
+import { newsDesc, DESC_MAX, DESC_RULE, staleRule, descToShow } from './news-desc.mjs';
 
 const ROOT = process.env.NEWS_DESC_ROOT || fileURLToPath(new URL('..', import.meta.url));
 const NEWS_DIR = path.join(ROOT, 'data/news');
@@ -42,14 +45,17 @@ for (const f of (fs.existsSync(NEWS_DIR) ? fs.readdirSync(NEWS_DIR) : []).filter
   try { const doc = JSON.parse(raw); if (doc && Array.isArray(doc.items)) docs.push({ path: p, doc, eol: /\n$/.test(raw) }); } catch { /* 깨진 파일은 감사가 잡는다 */ }
 }
 const items = docs.flatMap((d) => d.doc.items);
+/* 같은 학교 소식의 제목들 — 학교 파일 하나가 한 학교다(newsFileFor). 숨긴 글도 그 학교 게시판에는 떠 있으니 넣는다 */
+const titlesOf = new Map();
+for (const d of docs) { const ts = d.doc.items.map((n) => n && n.title).filter(Boolean); for (const n of d.doc.items) titlesOf.set(n, ts); }
 const ledger = Object.assign({ posts: {} }, readJson(LEDGER_PATH, {}));
 ledger.posts ||= {};
 
-/* ① 볼 글 — 장부에 없거나, 잠깐 실패해 하루 지난 것(세 번까지) */
+/* ① 볼 글 — 장부에 없거나, 옛 판 규칙으로 뜬 것(한 번), 잠깐 실패해 하루 지난 것(세 번까지) */
 const want = items.filter((n) => {
   if (!n || !n.url || !n.school || n.hidden) return false;
   const e = ledger.posts[T.thumbKey(n)];
-  if (!e) return true;
+  if (!e || staleRule(e)) return true;
   if (e.err) return (e.tries || 1) < MAX_TRIES && dayDiff(e.at, today) >= RETRY_DAYS;
   return false;
 }).sort((a, b) => String(b.postedAt || b.foundAt || '').localeCompare(String(a.postedAt || a.foundAt || '')));
@@ -65,7 +71,7 @@ async function descFor(n) {
   let text = await res.text();
   try { if (/^\s*[{[]/.test(text)) text = JSON.stringify(JSON.parse(text)); } catch { /* JSON 아님 */ }
   if (!T.pageHasTitle(text, n.title)) return { err: '글 화면에 그 글의 제목이 없음' };
-  const d = newsDesc(text, n.title);
+  const d = newsDesc(text, n.title, titlesOf.get(n) || []);
   return d ? { desc: d } : { none: '본문 첫 문장을 확신할 수 없음' };
 }
 
@@ -83,9 +89,9 @@ const worker = async () => {
       const r = await withDeadline(descFor(n).catch((e) => ({ err: String(e && e.message || e).slice(0, 80) })), ITEM_HARD_MS);
       const out = r === TIMED_OUT ? { err: '시한 넘김' } : r;
       const prev = ledger.posts[key];
-      ledger.posts[key] = out.desc ? { at: today, desc: String(out.desc).slice(0, DESC_MAX + 1) }
-        : out.none ? { at: today, none: out.none }
-        : { at: today, err: out.err, tries: ((prev && prev.err && prev.tries) || 0) + 1 };
+      ledger.posts[key] = out.desc ? { at: today, v: DESC_RULE, desc: String(out.desc).slice(0, DESC_MAX + 1) }
+        : out.none ? { at: today, v: DESC_RULE, none: out.none }
+        : { at: today, v: DESC_RULE, err: out.err, tries: ((prev && prev.err && prev.tries) || 0) + 1 };
       done += 1; if (out.desc) got += 1;
       await new Promise((res) => setTimeout(res, GAP_MS));
     }
@@ -100,8 +106,7 @@ const live = new Set();
 for (const d of docs) {
   for (const n of d.doc.items || []) {
     const k = T.thumbKey(n); live.add(k);
-    const e = ledger.posts[k];
-    const w = e && e.desc ? e.desc : undefined;
+    const w = descToShow(ledger.posts[k], n.title, titlesOf.get(n) || []);   // 남의 제목을 담은 요약은 입히지 않는다
     if (n.desc === w) continue;
     if (w) n.desc = w; else delete n.desc;
     d.changed = true; changed += 1;
@@ -109,7 +114,9 @@ for (const d of docs) {
   if (d.changed) fs.writeFileSync(d.path, JSON.stringify(d.doc, null, 1) + (d.eol ? '\n' : ''));
 }
 for (const [k, e] of Object.entries(ledger.posts)) if (!live.has(k) && dayDiff(e.at, today) > KEEP_DAYS) delete ledger.posts[k];
-fs.writeFileSync(LEDGER_PATH, JSON.stringify({ note: '교내 소식 요약 장부 — collector/collect-news-desc.mjs 가 쓴다. posts: 글 열쇠별 결과(desc 원문 발췌 · none 못 뜸 · err 다시 시도).', ...ledger }, null, 1) + '\n');
+/* 머리말은 늘 이 글자로 — 장부에서 읽은 옛 머리말이 뒤의 펼치기로 덮어쓰지 않게 먼저 바꿔 둔다 */
+ledger.note = '교내 소식 요약 장부 — collector/collect-news-desc.mjs 가 쓴다. posts: 글 열쇠별 결과(desc 원문 발췌 · none 못 뜸 · err 다시 시도 · v 규칙 판 — collector/news-desc.mjs DESC_RULE 과 다르면 다시 연다).';
+fs.writeFileSync(LEDGER_PATH, JSON.stringify({ note: ledger.note, ...ledger }, null, 1) + '\n');
 const withDesc = items.filter((n) => n.desc).length;
 console.log(`교내 소식 요약 — 이번에 ${done}건 열어 ${got}건 뜸 · 실린 글 ${items.length}건 중 요약 ${withDesc}건 · 바뀐 글 ${changed}건 (${Math.round((Date.now() - t0) / 1000)}초)`);
 process.exit(0);
