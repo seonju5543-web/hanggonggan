@@ -19,6 +19,9 @@
      ⑧ 양식이 붙은 열린 공고 수 · 옛 양식 후보 (app1-03 ③ · app1-08 ①): 열린 공고 86건 중 학생이 앱에서 양식을 여는 것이 1건뿐이어도 리포트가 조용했다 —
         양식 로봇이 매 실행 숫자를 싣고 0~1건이면 🚨 · 쓰지 않는 옛 양식 중 같은 사업으로 보이는 것을 **후보로만**(자동으로 잇지 않는다 · 개발자 결정) ·
         **진짜 schematize-forms.mjs 를 임시 폴더에서 돌린다**
+     ⑨ 자동 등록 — 연도 상수 · 지난 글 등록 (gap-07 · gap-bf-3): `y >= 2027` 이 박혀 10월부터 내년도 장학생 모집을 전부 컨펌 대기로 돌렸다(보류 166건 중 90건) —
+        기준 연도는 오늘(register-timing.mjs) · 내년도는 마감이 올해 안이고 같은 사업으로 보이는 다른 글이 없을 때만 · 요약 머리 이름표 뒤 날짜를 읽어
+        끝난 공고를 마감 없이 등록하지 않는다 · **진짜 auto-register.mjs 를 임시 폴더에서 돌린다**
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말).
       로봇을 돌릴 때는 저장소 코드를 임시 폴더로 **복사**해 그 안의 표본만 읽고 쓴다(bodies.mjs sandbox). */
 import fs from 'node:fs';
@@ -284,7 +287,7 @@ export default async function qnotice(eq, ctx) {
       const reg2 = JSON.parse(fs.readFileSync(path.join(dir, 'data/registered.json'), 'utf8'));
       const report2 = fs.readFileSync(path.join(dir, 'collector/report.md'), 'utf8');
       eq('  [다음 실행] 장부가 계속 막는다 — 같은 사업 글 둘은 컨펌 대기 · 뺀 글 자신(주소 같음)은 다시 등록하지 않는다',
-        [run2.status, kwonIn(reg2.items), (report2.match(/같은 사업의 지난 회차/g) || []).length, reg2.items.some((i) => i.sourceUrl === U(10681))], [0, [], 2, false]);
+        [run2.status, kwonIn(reg2.items), (report2.match(/^- .*같은 사업의 지난 회차/gm) || []).length, reg2.items.some((i) => i.sourceUrl === U(10681))], [0, [], 2, false]);   // 목록 줄만 센다(아래 '이유별' 요약 줄은 빼고 · 2026-10-11)
       eq('  [자동 등록 실행] 뺀 글에 마감을 적어 두어 같은 실행에도 다시 등록하지 않는다',
         [nts.find((n) => n.url === U(10681))?.bodyDeadline, reg.items.filter((i) => i.sourceUrl === U(10681)).length], [shift(-90), 0]);
       eq('  [자동 등록 실행] 본문 마감이 지난 글은 등록하지 않는다 · 열린 글은 그 마감과 근거 문구로 등록한다',
@@ -542,19 +545,22 @@ export default async function qnotice(eq, ctx) {
       [true, true, true]);
   }
 
-  /* ── ⑨ 자동 등록 — 지난 글 등록 (2026-10-11 점검 gap-bf-3) ──
+  /* ── ⑨ 자동 등록 — 연도 상수 · 지난 글 등록 (2026-10-11 점검 gap-07 · gap-bf-3) ──
      ⓐ 게시판 글 마감 읽기(notice-deadline.mjs parseDeadline) — 요약 머리 이름표 뒤 날짜(장학과 같은 판독기) · `&nbsp;` · 숫자와 년·월·일 사이 빈칸 ·
         `까지` 앞 요일·시각 · 해 없는 `10/8 마감` · 해 바뀌는 길목. 이름표 없는 날짜(게시일·작성일)·범위의 시작(`10:00~ 마감시`·`부터`)·성적 소수는 읽지 않는다.
         표본은 점검이 원장(candidates.json deadlineHint)에서 확인한 실제 꼴이다(충남대 2 · 방송대 · 명지대 · 서강대).
      ⓑ 장학 판독기의 '해를 넘긴 범위'는 반년 안만(광산장학회 `26. 9. 24. ~ 9. 18.` 이 2027-09-18 이 되던 것)
-     ⓒ 자동 등록이 판독기를 넘긴다 */
+     ⓒ 제목 연도 규칙(register-timing.mjs) — 기준 연도는 오늘 · 올해+2 보류 · 내년도는 마감이 오늘~올해 안 + 형제 없음일 때만 · 오래된 글 보류
+     ⓓ **진짜 auto-register.mjs 를 임시 폴더에서** — 내년도 단독 사업은 등록 · 제목만 다른 같은 재단 글 셋은 하나도 따로 등록되지 않음 ·
+        끝난 공고(이름표 뒤 지난 날짜)는 마감 경과 · 수집 40일 된 마감 모름 글은 보류 · 리포트에 보류 이유별 숫자 */
   {
     let setLib = false;
     if (!process.env.EXCERPTS_AS_LIB) { process.env.EXCERPTS_AS_LIB = '1'; setLib = true; }
     const { activityExcerpts } = await import('../../collector/activity-excerpts.mjs');
     if (setLib) delete process.env.EXCERPTS_AS_LIB;
     const extract = (t) => activityExcerpts(t).deadline;
-    const { lastDateIn } = require('../entry-rules.cjs');
+    const { lastDateIn, programKey } = require('../entry-rules.cjs');
+    const RT = await import('../../collector/register-timing.mjs');
     const T = '2026-10-11';
     const read = (n, today = T, withExtract = true) => parseDeadline(n, today, withExtract ? { extract } : {});
     const dateOf = (n, today, w) => read(n, today, w)?.date ?? null;
@@ -589,8 +595,90 @@ export default async function qnotice(eq, ctx) {
     eq('⑨ⓑ 장학 판독기 — 해를 넘긴 범위는 반년 안만(`26. 9. 24. ~ 9. 18.` 은 원문 오타라 비운다) · `12. 20. ~ 1. 10.` 은 그대로 다음 해',
       [extract('신청기간 : 26. 9. 24.(월) ~ 9. 18.(금)'), extract('신청기간 : 2026. 12. 20.(일) ~ 1. 10.(일)')], [null, '2027-01-10']);
 
+    /* ⓒ 제목 연도 규칙 — 순수 함수 */
+    const DAESAN = ['[공통][교외] 2027 대산농촌재단 대산장학생 모집 공고(~11/11)', '(홍보) 대산농촌재단 2027년도 장학생 선발 안내(~11/11(수)까지)',
+      '[대산농촌재단] 2027 대산장학생 선발', '공통 「2027년도 대산장학생」 선발 안내', '[장학안내] [대산농촌재단] 2027년도 장학생 선발 안내'];
+    eq('⑨ⓒ (그래서 형제 규칙이 있다) 같은 사업 열쇠(programKey)는 대산농촌재단 제목 변형을 한 사업으로 못 묶는다',
+      new Set(DAESAN.map((t) => programKey(t))).size > 1, true);
+    eq('  형제 판정 — 제목 변형끼리는 같은 사업으로 본다(대산 다섯 · 아산 북한이탈) · 남의 사업(해동↔학자금대출 `학부생` · 스위스↔독일 `정부초청`)은 아니다',
+      [DAESAN.every((a) => DAESAN.some((b) => b !== a && RT.looksSameProgram(a, b))),
+        RT.looksSameProgram('2027년 북한이탈청소년장학생 선발 안내', '[교외장학] 아산사회복지재단 2027년 북한이탈청소년 장학생 선발 안내'),
+        RT.looksSameProgram('2027년도 해동과학문화재단 해동장학생 선발 안내(공학계열 학부생, ~ 10.28(수) 09:00까지)', '[학자금대출] 2026-2 구제등록 기간 한국장학재단 학자금대출 신청 및 실행 안내(학부생)'),
+        RT.looksSameProgram('[교외] 2027-2028 스위스 정부초청 장학생 선발 안내(~11/10)', '[장학공지] 2027 독일 정부초청(DAAD) 섬머코스 장학생 선발 안내'),
+        RT.looksSameProgram('[교외] 2027년도 (재)광산장학회 장학생 선발 공고', '[교외] 2027 서초 장학회 장학생 선발 안내')],   // 3자 낱말(`장학회`)은 같을 때만 — 안에 든 것까지 보면 남의 장학회가 묶인다
+      [true, true, false, false, false]);
+    const yh = (title, deadline, today = T, sibling = null) => (RT.yearHold({ title, deadline, today, sibling }) ? 'hold' : 'ok');
+    eq('  🔴 기준 연도는 오늘 — 10월: 내년도 사업(마감 오늘~올해 · 형제 없음)은 통과 · 올해+2 보류 · 마감 모름·올해 밖·형제 있음은 보류 · 올해 사업은 상관없음',
+      [yh('2027년도 대산농촌재단 장학생 선발 안내 (~11/11)', '2026-11-11'), yh('2028학년도 표본재단 장학생 선발', '2026-11-11'), yh('2027년도 표본재단 장학생 선발', null),
+        yh('2027년도 표본재단 장학생 선발', '2027-01-15'), yh('2027년도 대산농촌재단 장학생 선발 안내 (~11/11)', '2026-11-11', T, '외대 · 2027 대산농촌재단'), yh('2026년도 표본재단 장학생 선발', null)],
+      ['ok', 'hold', 'hold', 'hold', 'hold', 'ok']);
+    eq('  2027-01 이 와도 자동 등록이 멈추지 않는다 — `2027학년도 1학기 … (~1/31)` 는 올해 사업 · 2028 은 내년도 규칙',
+      [yh('2027학년도 1학기 표본장학금 신청(~1/31)', '2027-01-31', '2027-01-15'), yh('2028학년도 표본재단 장학생 선발', null, '2027-01-15'), yh('2029학년도 표본재단 장학생 선발', '2027-03-01', '2027-01-15')],
+      ['ok', 'hold', 'hold']);
+    eq('  제목 연도 — 학년도 범위 `2027-2028` 은 앞 해 · 글 번호 속 20xx 는 연도가 아니다',
+      [RT.titleYears('[교외] 2027-2028 스위스 정부초청 장학생 선발 안내(~11/10)'), RT.titleYears('표본 장학 공고 no=120271')], [[2027], []]);
+    eq('  차년도 계획·신입학도 오늘 기준 — 10월의 `2027학년도 해외 연수` 는 차년도 · 2027-03 의 같은 제목은 아니다 · 2027 의 `2028년도 유학` 은 차년도',
+      [RT.futurePlan('2027학년도 해외 연수 장학생 선발', T), RT.futurePlan('2027학년도 해외 연수 장학생 선발', '2027-03-01'), RT.futurePlan('2028년도 유학 장학생 선발', '2027-03-01'), RT.futurePlan('2026 신입학 장학', T)],
+      [true, false, true, true]);
+    eq('  오래된 글 — 수집 30일 넘고 마감 모름이면 보류 · 마감을 읽었거나 30일 안이거나 수집일이 없으면 아니다',
+      [!!RT.staleHold({ foundAt: '2026-08-18', deadline: null, today: T }), !!RT.staleHold({ foundAt: '2026-08-18', deadline: '2026-11-01', today: T }),
+        !!RT.staleHold({ foundAt: '2026-09-30', deadline: null, today: T }), !!RT.staleHold({ foundAt: null, deadline: null, today: T })],
+      [true, false, false, false]);
+
+    /* ⓓ 진짜 자동 등록 — 사본 저장소에서(불러오는 순간 실행되는 파일이라 import 하지 않는다) · 오늘은 로봇이 읽는 KST 오늘이라 표본 연도를 오늘에서 만든다 */
+    const sb = sandbox(root, 'hdj-qnotice-year-');
+    try {
+      sb.write('verify/entry-rules.cjs', fs.readFileSync(new URL('verify/entry-rules.cjs', root), 'utf8'));
+      const today = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+      const Y = Number(today.slice(0, 4));
+      const shift = (n) => new Date(Date.parse(today) + n * 86400000).toISOString().slice(0, 10);
+      const dot = (iso) => { const [y, m, d] = iso.split('-').map(Number); return `${y}. ${m}. ${d}.`; };
+      const md = (iso) => { const [, m, d] = iso.split('-').map(Number); return `${m}/${d}`; };
+      const past = shift(-20);
+      /* 해 없는 `~M/D` 표본은 올해 안의 가까운 날로 — 1·2월에 `~12/31` 을 쓰면 해 바뀌는 길목 규칙이 지난해로 읽어 관문이 계절을 탄다 */
+      const soon = shift(5) <= `${Y}-12-31` ? shift(5) : `${Y}-12-31`;
+      const U = (n) => `https://school.example.ac.kr/bbs/view.do?seq=${n}`;
+      sb.write('collector/auto-register-config.json', { enabled: true, schools: [], maxPerRun: 20, blockIds: [], blockUrls: [] });
+      sb.write('data/registered.json', { items: [] });
+      sb.write('data/forms.json', { templates: {} });
+      sb.write('collector/extracted/notices-text.json', []);   // 판독기(extract-excerpts)는 불러올 때 이 파일을 읽는다 — 없으면 이름표 갈래가 통째로 빠진다(로봇은 그때 리포트 대신 로그에 남긴다)
+      sb.write('data/notices.json', { items: [
+        /* 내년도 단독 사업 — 마감이 올해 안(요약 머리 이름표) · 형제 없음 → 등록 */
+        { title: `[교외] ${Y + 1}년도 단독표본재단 장학생 선발 안내`, url: U(1), school: '가대학교', foundAt: today, deadlineHint: `제출기한: ${Y}. 12. 31.(목) 6. 제출처: 재단 이메일` },
+        /* 같은 재단 공고 셋 — 학교마다 제목이 다르고 같은 사업 열쇠로 못 묶인다(대산농촌재단 꼴) → 하나도 따로 등록되지 않는다 */
+        { title: `[공통][교외] ${Y + 1} 표본농촌재단 표본장학생 모집 공고(~${md(soon)})`, url: U(2), school: '나대학교', foundAt: today },
+        { title: `(홍보) 표본농촌재단 ${Y + 1}년도 장학생 선발 안내(~${md(soon)}(수)까지)`, url: U(3), school: '다대학교', foundAt: today },
+        { title: `[표본농촌재단] ${Y + 1} 표본장학생 선발`, url: U(4), school: '라대학교', foundAt: today },
+        /* 올해+2 → 보류 */
+        { title: `${Y + 2}학년도 표본미래재단 장학생 선발 안내(~${md(soon)})`, url: U(5), school: '가대학교', foundAt: today },
+        /* 끝난 공고 — 이름표 뒤 지난 날짜(제출기한: · &nbsp; 한글 날짜 · M/D 마감) → 마감 경과 */
+        { title: `${Y}학년도 제2학기 표본 보훈장학금 추가 신청 안내`, url: U(6), school: '마대학교', foundAt: today, deadlineHint: `제출기한: ${dot(past)}(금) ※ 단과대학 취합일정을 고려하여 먼저 제출` },
+        { title: '[장학] (교외근로) 표본 근로장학생 모집', url: U(7), school: '바대학교', foundAt: today, deadlineHint: `제출기한 : ${past.slice(0, 4)} 년 &nbsp;${past.slice(5, 7)} 월 &nbsp;${past.slice(8, 10)} 일까지 * 조기 마감될 수 있습니다` },
+        { title: `[교외] 표본청년재단 인재육성장학생 선발 안내(${md(past)} 마감, 생활비 150만원)`, url: U(8), school: '사대학교', foundAt: today },
+        /* 수집한 지 40일 된 마감 모름 글 → 보류 · 오늘 수집한 마감 모름 글 → 등록 */
+        { title: `${Y}년 표본오래재단 장학생 선발 안내`, url: U(9), school: '아대학교', foundAt: shift(-40) },
+        { title: `${Y}년 표본새글재단 장학생 선발 안내`, url: U(10), school: '아대학교', foundAt: today },
+      ] });
+      sb.write('collector/report.md', '');
+      const r = sb.run('collector/auto-register.mjs', [], {}, 60000);
+      const reg = sb.json('data/registered.json') || { items: [] };
+      const rep = sb.read('collector/report.md') || '';
+      const at = (n) => reg.items.find((i) => i.sourceUrl === U(n));
+      eq('⑨ⓓ [자동 등록 실행] 끝까지 돈다', [r.status, r.status ? r.out.slice(-400) : ''], [0, '']);
+      eq('  [자동 등록 실행] 🔴 내년도 단독 사업은 등록한다 — 마감은 요약 머리 이름표에서 · 근거 문구를 남긴다',
+        [!!at(1), at(1)?.deadline, /제출기한/.test(at(1)?.deadlineFrom || '')], [true, `${Y}-12-31`, true]);
+      eq('  [자동 등록 실행] 🔴 제목만 다른 같은 재단 글 셋은 하나도 따로 등록되지 않는다(형제 둘 · 마감 모름 하나) · 올해+2 는 보류',
+        [[2, 3, 4, 5].map((n) => !!at(n)), (rep.match(/같은 사업으로 보이는 다른 글/g) || []).length >= 2, /표본장학생 선발 \(.*마감을 못 읽음/.test(rep), /올해\+2 이후/.test(rep)],
+        [[false, false, false, false], true, true, true]);
+      eq('  [자동 등록 실행] 🔴 끝난 공고(이름표 뒤 지난 날짜 · &nbsp; 한글 날짜 · M/D 마감)는 마감 경과로 거른다',
+        [[6, 7, 8].map((n) => !!at(n)), /마감 경과 · 3건/.test(rep)], [[false, false, false], true]);
+      eq('  [자동 등록 실행] 수집 40일 된 마감 모름 글은 보류 · 오늘 수집한 글은 등록 · 리포트에 보류 이유별 숫자',
+        [!!at(9), /수집한 지 40일 된 글인데 마감을 못 읽음/.test(rep), !!at(10), /컨펌 대기 이유별: /.test(rep)], [false, true, true, true]);
+    } finally { sb.done?.(); }
     const ar = stripComments(fs.readFileSync(new URL('collector/auto-register.mjs', root), 'utf8'));
-    eq('⑨ⓒ 자동 등록 배선 — 게시판 글 마감 읽기에 장학 판독기를 넘긴다(못 불러오면 그 갈래만 건너뛴다)',
-      [/parseNoticeDeadline\(n, TODAY, \{ extract: labeledDeadline \}\)/.test(ar), /extract: labeledDeadline,/.test(ar)], [true, true]);
+    eq('  자동 등록 배선 — 연도·차년도·오래된 글 규칙은 register-timing.mjs 를 불러 쓰고 · 연도를 박은 비교가 없고 · 연도 규칙은 같은 사업 판정 뒤 · 마감 판독기를 넘긴다',
+      [/import \{[^}]*\byearHold\b[^}]*\} from '\.\/register-timing\.mjs'/.test(ar), /futurePlan\(t, TODAY\)/.test(ar), /staleHold\(\{/.test(ar),
+        /20[2-9]\d/.test(ar.replace(/^.*\/\/.*$/gm, '')), ar.indexOf('yearHold({') > ar.indexOf('const twin = '), /parseNoticeDeadline\(n, TODAY, \{ extract: labeledDeadline \}\)/.test(ar)],
+      [true, true, true, false, true, true]);
   }
 }

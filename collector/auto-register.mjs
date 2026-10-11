@@ -28,6 +28,9 @@ import { isHeld, pruneRegistered } from './auto-held.mjs';
 import { stripSiteChrome } from './attachment-link.mjs';
 /* 등록 뒤 마감 경과로 뺀 등록분의 사업(지난 회차) 장부 — 규칙은 past-rounds.mjs 한 곳(2026-10-05 리뷰 · 빼고 나면 같은 사업의 다른 학교 글을 막던 짝이 사라졌다) */
 import { recordPastRounds, prunePastRounds, pastRoundOf } from './past-rounds.mjs';
+/* 차년도 계획 · 제목 연도 보류 · 오래된 글 보류 — 기준 연도를 오늘(TODAY)에서 읽는 규칙은 register-timing.mjs 한 곳(2026-10-11 점검 gap-07 · gap-bf-3 ·
+   예전엔 `202[7-9]`·`y >= 2027` 이 박혀 있었다 · 이 파일은 불러오는 순간 실행되어 관문이 표본으로 못 잰다) */
+import { futurePlan, yearHold, staleHold, looksSameProgram } from './register-timing.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfgPath = new URL('auto-register-config.json', HERE);
@@ -109,7 +112,7 @@ const NOT_UNDERGRAD = /대학원생?\s|석사|박사|수련의|졸업(생|자)\s
    ⚠️ `선발 알림` 은 넣지 않았다 — `선발 안내`(진짜 모집 공고)와 글자가 너무 가깝다.
    `선발자 공지` 는 2026-10-05 에 더했다(links-new-1 — id 가 겹쳐 가려져 있던 계명대 `국가근로장학생 최종선발자 공지` 가 풀리며 드러났다). */
 const ADMIN_NOTICE = /(^|\s)AWARDS?\b|award-news|졸업생[^\n]{0,20}(선발|수상|선정)|수상\s*소식|선정되었|선발되었|출근부|지급\s*안내|지급일|계좌\s*등록|서류\s*보완|유의사항\s*안내|중복지원|반환|환수|추천서\s*(총장|직인)|안내\s*및\s*FAQ|결과\s*(발표|안내|확인)|결과발표|선발\s*결과|확인\s*방법|포기\s*(신청|서)|희망\s*근로지|이중\s*선발|선발자\s*(공고|안내|명단|공지)|필수사항|(^|\s|└)RE:/;
-const FUTURE_PLAN = /202[7-9](?![\d])[^\d]*(학년도|년).*(유학|연수|입학|신입학)|신입학|입학전형/;
+/* 차년도 계획·신입학(futurePlan)은 register-timing.mjs 한 곳 — 기준 연도를 오늘(TODAY)에서 읽는다(예전엔 `202[7-9]` 가 박혀 있었다 · 2026-10-11 점검 gap-07) */
 /* 🔴 `장학생|장학금` 두 낱말만 보면 **학교 교내 장학금 이름을 통째로 놓친다** (2026-09-19 개발자 지적
    — "우리 학교 게시판 교내 공고가 장학금 탭에 안 올라온다"). 교내 장학은 이름이 `장학` 으로 끝난다:
    실측으로 `반영장학`·`우정장학(학업장려금)`·`우정장학(가계곤란)`·`경희꿈도전장학` 넷과 교외
@@ -135,7 +138,7 @@ try {
 } catch (e) { console.log(`이름표 판독기를 못 불러와 게시판 요약 머리 이름표·본문 마감 갈래를 건너뜀 — ${String((e && e.message) || e).slice(0, 160)}`); }
 const parseDeadline = (n) => parseNoticeDeadline(n, TODAY, { extract: labeledDeadline });
 
-function classify(n, regUrlSet, regItems, batchSeen, pastRounds) {
+function classify(n, regUrlSet, regItems, batchSeen, pastRounds, feed = []) {
   const t = n.title || '';
   const cu = canonUrl(decodeUrlEntities(n.url));
   const nt = normTitle(t);
@@ -150,12 +153,10 @@ function classify(n, regUrlSet, regItems, batchSeen, pastRounds) {
   if (EMPLOYMENT.test(t)) return { verdict: 'skip', why: '채용·고용성' };
   if (NOT_UNDERGRAD.test(t)) return { verdict: 'skip', why: '학부생 대상 아님(대학원 등)' };
   if (ADMIN_NOTICE.test(t)) return { verdict: 'skip', why: '행정 안내(신청 공고 아님)' };
-  if (FUTURE_PLAN.test(t)) return { verdict: 'skip', why: '차년도 계획·신입학(현 재학생 신청 대상 아님)' };
+  if (futurePlan(t, TODAY)) return { verdict: 'skip', why: '차년도 계획·신입학(현 재학생 신청 대상 아님)' };
   if (/국가장학금/.test(t)) return { verdict: 'skip', why: '국가장학금 상시 제도 — 앱 내 카드로 이미 안내' };
   if (!POSITIVE.test(t)) return { verdict: 'skip', why: "'장학' 신호 없음" };
-  // 2027년 이후 연도가 제목에 있으면 미래 사업일 가능성 — 자동 등록하지 않고 컨펌 대기
-  const years = (t.match(/20\d{2}/g) || []).map(Number);
-  if (years.some((y) => y >= 2027)) return { verdict: 'hold', why: '2027년 이후 사업으로 보임 — 개발자 컨펌 대기' };
+  /* 제목 연도 보류(내년도·그 뒤 사업)는 같은 사업 판정 **뒤**에서 본다(아래 yearHold) — 이미 등록된 같은 사업이면 흡수·승격이 먼저다(2026-10-11 점검 gap-07) */
   /* 같은 재단·같은 사업 감지: ① 이름 대조 ② 재단명 일치
      같은 학교(또는 전국 등록분)와 겹치면 = 재게시 중복(스킵), 다른 학교면 = 타교 접수분일 수 있음(컨펌 대기)
 
@@ -230,6 +231,19 @@ function classify(n, regUrlSet, regItems, batchSeen, pastRounds) {
   if (!ACTION.test(t)) return { verdict: 'hold', why: '선발·모집·신청 신호 없음 — 개발자 컨펌 대기' };
   const dl = parseDeadline(n);
   if (dl && dl.date < TODAY) return { verdict: 'skip', why: `마감 경과(${dl.date})` };
+  /* 🔴 제목 연도 — 기준은 오늘의 해(TODAY · register-timing.mjs yearHold). 올해+2 이후는 보류 · 내년도 사업은 마감이 오늘~올해 안으로 읽히고
+     같은 사업으로 보이는 다른 글(실시간 피드·정식 등록)이 없을 때만 등록한다 — 같은 사업 판정(programKey)이 재단 공고의 학교별 제목 변형을
+     못 묶어(대산농촌재단 실측) 형제가 있는 채로 풀면 한 실행에 학교마다 따로 등록된다. */
+  const sibling = () => {
+    const other = feed.find((x) => x !== n && x.title && canonUrl(decodeUrlEntities(x.url || '')) !== cu && looksSameProgram(t, x.title))
+      || regItems.find((i) => looksSameProgram(t, `${i.name || ''} ${i.boardTitle || ''}`));
+    return other ? `${other.school || schoolOf(other) || '전국'} · ${cleanTitle(other.title || other.name || '').slice(0, 24)}` : null;
+  };
+  const yh = yearHold({ title: t, deadline: dl ? dl.date : null, today: TODAY, sibling });
+  if (yh) return { verdict: 'hold', why: yh.why };
+  /* 수집한 지 30일 넘은 글인데 마감을 못 읽었으면 보류 — 피드 메우기가 되살린 옛 글이 이미 끝난 공고일 수 있다(2026-10-11 점검 gap-bf-3 · register-timing.mjs staleHold) */
+  const st = staleHold({ foundAt: n.foundAt, deadline: dl ? dl.date : null, today: TODAY });
+  if (st) return { verdict: 'hold', why: st.why };
   return { verdict: 'register', deadline: dl ? dl.date : null, deadlineText: dl ? dl.text : null, deadlineSrc: dl ? dl.from : null };
 }
 
@@ -354,7 +368,7 @@ if (!cfg.enabled) {
   for (const n of notices.items || []) {
     if (added.length >= (cfg.maxPerRun || 8)) { unseen += 1; continue; }
     if (onlySchools.size && n.school && !onlySchools.has(n.school)) { outOfScope += 1; continue; }
-    const r = classify(n, regUrlSet, registered.items, batchSeen, pastLedger);
+    const r = classify(n, regUrlSet, registered.items, batchSeen, pastLedger, notices.items || []);
     const nUrl = decodeUrlEntities(n.url);   // 담는 원문 주소 — `&#038;` 를 되돌린 것 (위 import 주석)
     if (r.verdict === 'promote' || r.verdict === 'absorb') {
       /* 기존 등록분을 전국으로(promote) 또는 이미 전국인 등록분에 게시 학교만 더한다(absorb) — 합치는 규칙은 registered-merge.mjs 한 곳
@@ -570,6 +584,10 @@ if (!cfg.enabled) {
     report.push('', `**컨펌 대기 (자동 기준 미달 ${held.length}건)** — 장학 신호는 있지만 선발·모집 신호가 약하거나 등록 규칙에 걸렸어요(괄호에 이유):`);
     for (const h of held.slice(0, 10)) report.push(`- ${h.n.title.slice(0, 60)} (${h.why})`);
     if (held.length > 10) report.push(`- … 외 ${held.length - 10}건`);
+    /* 이유별 숫자 — 목록은 10건에서 잘려 이유별 규모가 안 보였다(2026-10-11 점검 gap-07: 보류 166건 중 90건이 연도 규칙 하나였는데 리포트엔 7건만 보였다) */
+    const whyCount = new Map();
+    for (const h of held) { const k = String(h.why || '').split(' — ')[0].replace(/\([^)]*\)/g, '').replace(/\s*\d{4}-\d{2}-\d{2}\s*/g, ' ').trim(); whyCount.set(k, (whyCount.get(k) || 0) + 1); }
+    report.push('', `컨펌 대기 이유별: ${[...whyCount].sort((a, b) => b[1] - a[1]).map(([k, c]) => `${k} ${c}건`).join(' · ')}`);
   }
   /* 🔴 데이터 관문 쉬기는 따로 묶는다 — 이유가 '신호가 약해서'가 아니다. 같은 실행에 함께 들어온 다른 공고 때문에 같이 되돌려졌을 수도 있어
      (되돌리기는 그 실행의 새 자동 등록분을 한꺼번에 뺀다) 원인을 이 공고로 단정하지 않는다. */
