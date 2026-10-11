@@ -31,20 +31,6 @@
   },
   {
    "school": "",
-   "host": "정부24 공모전",
-   "boardUrl": "https://www.gov.kr/portal/cnstexhb",
-   "evidence": "웹 검색 2026-09-29: \"공모전 — 정부24(gov.kr/portal/cnstexhb)\" · 부처·공공기관 공모전 통합 목록 · 글 주소는 /portal/cnstexhb/<번호> · pageIndex 로 넘긴다",
-   "note": "정부 부처·공공기관 공모전의 원문 게시처 — 집계 사이트들이 그대로 싣는 출처"
-  },
-  {
-   "school": "",
-   "host": "온통청년 청년참여 프로그램",
-   "boardUrl": "https://www.youthcenter.go.kr/bbs03List/48",
-   "evidence": "웹 검색 2026-09-29: \"청년참여 프로그램 < 청년소식 — 온통청년(youthcenter.go.kr/bbs03View/48/…)\" · 한국고용정보원 운영",
-   "note": "정부 청년정책 포털의 참여 프로그램(서포터즈·참여단·공모) 게시판 — 열쇠 없이 읽는 HTML"
-  },
-  {
-   "school": "",
    "host": "서울시 청년몽땅정보통",
    "boardUrl": "https://youth.seoul.go.kr/bbs/list.do?key=2303300002",
    "evidence": "웹 검색 2026-09-29: \"청년정책 > 공지사항 — 청년몽땅정보통\" · [모집공고] 미래 청년 일자리 참여자 모집 등",
@@ -84,13 +70,6 @@
    "boardUrl": "https://www.niied.go.kr/web/main/nid/niied_board/list",
    "evidence": "웹 검색 2026-09-29: \"소식 > 공지사항 목록 — 국립국제교육원\" · 한중 대학생 교류 프로그램·외국정부초청장학생 모집",
    "note": "교환·유학 장학과 교류 프로그램 — 장학 낱말 글은 활동 판정에서 빠지고(장학 쪽), 교류·참가자 모집만 담긴다"
-  },
-  {
-   "school": "",
-   "host": "한국콘텐츠진흥원",
-   "boardUrl": "https://www.kocca.kr/kocca/pims/list.do?menuNo=204104",
-   "evidence": "웹 검색 2026-09-29: \"지원공고 < 알림마당 < 한국콘텐츠진흥원\" · APEC AI 영상 콘텐츠 공모전 등",
-   "note": "콘텐츠 분야 공모전·참가자 모집"
   },
   {
    "school": "",
@@ -174,6 +153,30 @@
    "evidence": "웹 검색 2026-09-29: \"경희대학교 공지사항 — 카테고리 GENERAL(일반) · 인권센터 공모전 등 모집 공고 포함\"",
    "note": "본교 일반 공지 — 상세는 detail.do?seq= 형태. 목록이 스크립트로 그려지면 🟡 가 뜬다 → browser-targets 로 옮긴다",
    "parkedAt": "2026-10-04 18:42 KST"
+  },
+  {
+   "school": "",
+   "host": "정부24 공모전",
+   "boardUrl": "https://www.gov.kr/portal/cnstexhb",
+   "evidence": "웹 검색 2026-09-29: \"공모전 — 정부24(gov.kr/portal/cnstexhb)\" · 부처·공공기관 공모전 통합 목록 · 글 주소는 /portal/cnstexhb/<번호> · pageIndex 로 넘긴다",
+   "note": "정부 부처·공공기관 공모전의 원문 게시처 — 집계 사이트들이 그대로 싣는 출처",
+   "parkedAt": "2026-10-12 02:26 KST"
+  },
+  {
+   "school": "",
+   "host": "한국콘텐츠진흥원",
+   "boardUrl": "https://www.kocca.kr/kocca/pims/list.do?menuNo=204104",
+   "evidence": "웹 검색 2026-09-29: \"지원공고 < 알림마당 < 한국콘텐츠진흥원\" · APEC AI 영상 콘텐츠 공모전 등",
+   "note": "콘텐츠 분야 공모전·참가자 모집",
+   "parkedAt": "2026-10-12 02:26 KST"
+  },
+  {
+   "school": "",
+   "host": "온통청년 청년참여 프로그램",
+   "boardUrl": "https://www.youthcenter.go.kr/bbs03List/48",
+   "evidence": "웹 검색 2026-09-29: \"청년참여 프로그램 < 청년소식 — 온통청년(youthcenter.go.kr/bbs03View/48/…)\" · 한국고용정보원 운영",
+   "note": "정부 청년정책 포털의 참여 프로그램(서포터즈·참여단·공모) 게시판 — 열쇠 없이 읽는 HTML",
+   "parkedAt": "2026-10-12 02:26 KST"
   }
  ]
 }

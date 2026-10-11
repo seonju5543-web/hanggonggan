@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-11",
+ "updatedAt": "2026-10-12",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -10929,7 +10929,7 @@
      "bodyImage": true
     }
    ],
-   "sourceUrl": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do;jsessionid=3C71C54E330DDE56AC526288ABDAD27C?key=7520&bbsNo=1073&nttNo=626271&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888",
+   "sourceUrl": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626271&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888",
    "sourceKind": "auto",
    "eligibilityPrev": {
     "lines": null,

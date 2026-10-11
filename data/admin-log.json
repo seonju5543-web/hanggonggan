@@ -143,6 +143,36 @@
    "by": "조세현",
    "action": "edit",
    "detail": "auto-bbssc58944066artclviewdo — deadline, period"
+  },
+  {
+   "at": "2026-10-12 02:26 KST",
+   "by": "claude-health-sweep",
+   "action": "activitySource",
+   "detail": "출처 보관 · 정부24 공모전 · https://www.gov.kr/portal/cnstexhb"
+  },
+  {
+   "at": "2026-10-12 02:26 KST",
+   "by": "claude-health-sweep",
+   "action": "activitySource",
+   "detail": "출처 보관 · 한국콘텐츠진흥원 · https://www.kocca.kr/kocca/pims/list.do?menuNo=204104"
+  },
+  {
+   "at": "2026-10-12 02:26 KST",
+   "by": "claude-health-sweep",
+   "action": "activitySource",
+   "detail": "출처 보관 · 온통청년 청년참여 프로그램 · https://www.youthcenter.go.kr/bbs03List/48"
+  },
+  {
+   "at": "2026-10-12 02:26 KST",
+   "by": "claude-health-sweep",
+   "action": "newsHide",
+   "detail": "숨김 5건 (숨긴 주소 5개 · 숨긴 글 번호 0개)"
+  },
+  {
+   "at": "2026-10-12 02:26 KST",
+   "by": "claude-health-sweep",
+   "action": "edit",
+   "detail": "auto-hkrwdsfpnos1073sfpnos888 — sourceUrl"
   }
  ]
 }
