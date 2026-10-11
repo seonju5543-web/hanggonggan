@@ -37,10 +37,16 @@ const DUE_DOT = new RegExp(`(\\d{4})[.\\-\\/\\s]+(\\d{1,2})[.\\-\\/\\s]+(\\d{1,2
 /* 해 없는 `10/8 마감`·`10월 15일(목) 17시까지` (서강대 제목 `(10/8 마감, 생활비 150만원)` · 서울시립대 요약) — 성적 소수(`평점 3.5 이상 … 까지`)는 날짜가 아니다 */
 const BARE_DUE = new RegExp(`(?<![\\d.\\/~])(\\d{1,2})\\s*(?:\\/|\\.|월)\\s*(\\d{1,2})(?!\\d)\\s*일?\\.?\\s*(?:\\([^)]{0,6}\\)\\s*)?${DUE}`, 'g');
 const GRADE_NEAR = /평점|성적|학점|점수|GPA/i;
+/* 분수도 날짜가 아니다 (2026-10-11 리뷰) — `수업일수 1/4 경과 전까지`·`등록금 1/2 지원까지`·`수업일수 1/3선까지` 가 01-04·01-02·01-03 으로 읽혀
+   '마감 경과'로 조용히 걸러질 수 있었다. 앞 10자에 분수를 부르는 말(수업일수·등록금·학비·`…의`)이 있거나 뒤에 분수 꼬리(선·경과·지원·이내)가 오면 건너뛴다.
+   `선착순`·`지원 마감` 은 꼬리가 아니다(`10/8 지원마감` 은 마감이다). */
+const FRACTION_NEAR = /수업\s*일수|등록금|학비|의\s*$/;
+const FRACTION_TAIL = /^\s*(점|이상|이하|이내|만점|배|%|선(?!착)|경과|지원(?!\s*마감))/;
 function bareDue(hay) {
   for (const m of hay.matchAll(BARE_DUE)) {
     const date = m[0].match(/^\d{1,2}\s*(?:\/|\.|월)\s*\d{1,2}/)[0];
-    if (GRADE_NEAR.test(hay.slice(Math.max(0, m.index - 10), m.index)) || /^\s*(점|이상|이하|만점|배|%)/.test(hay.slice(m.index + date.length))) continue;
+    const before = hay.slice(Math.max(0, m.index - 10), m.index);
+    if (GRADE_NEAR.test(before) || FRACTION_NEAR.test(before) || FRACTION_TAIL.test(hay.slice(m.index + date.length))) continue;
     return m;
   }
   return null;
@@ -55,6 +61,9 @@ function bareYear(mo, today) {
   if (tm && tm <= 2 && Number(mo) >= 11) return String(y - 1);
   return String(y);
 }
+/* 기간 이름표로 **끝나는** 말(뒤에 짧은 괄호 하나까지) — 첫 콜론이 이 이름표의 것인지 가른다(이름표 목록은 deadline-hint.mjs 의 힌트 이름표와 같은 낱말 ·
+   장학 판독기 PERIOD_LABEL 의 `…마감일시` 꼴 포함) */
+const COLON_AFTER_LABEL = /(?:(?:신청|접수|모집|제출|응모|추천|지원)\s*(?:기간|기한|마감(?:일시|일자|일)?)|(?<![가-힣])(?:기한|마감(?:일시|일자|일)?))\s*(?:\([^()]{0,12}\))?\s*$/;
 /* 게시판 요약(deadlineHint)은 **이름표에서 시작하는 본문 한 토막**이다(deadline-hint.mjs deadlineHintFrom — `제출기한: 2026. 9. 11.(금) ※ …`).
    그 이름표 뒤 날짜는 장학과 **같은 판독기**(extract-excerpts.mjs extractDeadline — 이름표 뒤 날짜만 · 범위면 끝 · 못 믿으면 null)로 읽는다.
    판독기는 부르는 쪽이 넘긴다(불러오는 순간 원문 파일을 읽는 파일이라 여기서 import 하지 않는다 — 아래 bodyDeadlineFrom 과 같은 방식).
@@ -62,12 +71,21 @@ function bareYear(mo, today) {
 function labeledHint(n, extract) {
   if (typeof extract !== 'function' || !n || !n.deadlineHint) return null;
   const hint = plain(n.deadlineHint);
+  /* 🔴 판독기는 **첫 콜론 앞 전부**를 이름표로 보고, 그 안 어디에든 기간 이름표가 있으면 받는다 — 그래서 **첫 콜론이 기간 이름표 바로 뒤일 때만** 넘긴다
+     (2026-10-11 리뷰). `신청기간 안내 작성자 : 학생지원팀 작성일 : 2026.08.12` · `신청기간 연장 안내 등록일 : 2026.09.30` 처럼 첫 콜론이 게시판
+     머리 줄(작성자·등록일)의 것이면 게시일이 마감이 된다 — 옛 꼴 요약 98줄을 피드 메우기가 되살린다. 콜론이 기간 이름표 뒤면 머리든 가운데든 그 이름표의 것이다
+     (`접수기간 및 방법 - 접수기간 : 2026. 8. 27.` · `… 또는 방문접수 5. 접수 기한 : 26. 9. 1. ~ 26. 9. 30.` · `신청기한(학생): …` — 원장 실례). */
+  const colon = hint.search(/[:：]/);
+  let labeled = colon >= 0 && COLON_AFTER_LABEL.test(hint.slice(0, colon)) ? hint : null;
   /* 콜론 없는 머리 이름표(`제출기한 2026. 11. 11.(수) 6. 제출처 …` — 힌트를 자른 이름표 규칙은 앞말 붙은 이름표를 콜론 없이도 받는다)는
-     판독기가 첫 콜론으로 이름표를 가르므로 이름표 뒤에 콜론을 넣어 넘긴다 — **이름표 바로 뒤가 날짜일 때만**.
-     🔴 `신청기간 안내(~9/9) 작성일 2026.08.12 …`(게시판 머리 줄)에 콜론을 넣으면 게시일이 마감이 된다(만들면서 실측 4건). 그 밖은 그대로 넘긴다. */
-  const head = hint.match(HINT_HEAD);
-  const rest = head ? hint.slice(head[0].length) : '';
-  const labeled = head && !/[:：]/.test(head[0]) && /^[~∼〜～]?\s*\d/.test(rest) ? `${head[0].trim()} : ${rest}` : hint;
+     이름표 뒤에 콜론을 넣어 넘긴다 — **이름표 바로 뒤가 날짜일 때만**.
+     🔴 `신청기간 안내(~9/9) 작성일 2026.08.12 …`(게시판 머리 줄)에 콜론을 넣으면 게시일이 마감이 된다(만들면서 실측 4건). 그 밖은 건너뛴다. */
+  if (!labeled) {
+    const head = hint.match(HINT_HEAD);
+    const rest = head ? hint.slice(head[0].length) : '';
+    if (head && !/[:：]/.test(head[0]) && /^[~∼〜～]?\s*\d/.test(rest)) labeled = `${head[0].trim()} : ${rest}`;
+  }
+  if (!labeled) return null;
   const got = extract(labeled);
   if (!got || !ISO.test(got)) return null;
   const [y, mo, d] = got.split('-');
@@ -78,7 +96,7 @@ function labeledHint(n, extract) {
  * 게시판 글 하나의 마감 — `{ date, text, from }` 또는 null.
  *   ① 본문 마감(bodyDeadline · 근거 문구 bodyDeadlineText 가 있을 때만) — from '공고 원문'
  *   ② 제목 + 게시판 요약의 명확한 날짜(YYYY.M.D · 한글 날짜 · `까지/마감` · 요약 머리 이름표 뒤 날짜) — from '게시판 요약'
- *   ③ 연도 없는 `~7.03`·`~ 9. 18`·`~ 9 월 28 일`·`10/8 마감` — today 의 해로 읽는다(마감 경과 거르기용 · 해 바뀌는 길목은 bareYear)
+ *   ③ 연도 없는 `~7.03`·`~ 9. 18`·`~ 9 월 28 일`·`10/8 마감` — today 의 해로 읽는다(마감 경과 거르기용 · 해 바뀌는 길목은 bareYear) · `yearGuessed: true` 를 단다
  *   opts.extract — 이름표 판독기(장학과 같은 extractDeadline · 부르는 쪽이 넘긴다). 없으면 요약 머리 이름표 갈래를 건너뛴다.
  * text 는 **실제로 맞춘 문구**다 — 등록할 때 `deadlineFrom: '<from> · <text>'` 로 남겨 감사(deadline-audit)가 근거로 센다.
  */
@@ -105,7 +123,8 @@ export function parseDeadline(n, today, opts = {}) {
   const m3 = m2 || bareDue(hay);
   if (m3) {
     const iso = okDate(bareYear(m3[1], today), m3[1], m3[2]);
-    if (iso) return { date: iso, text: m3[0].trim(), from: '게시판 요약' };
+    /* yearGuessed — 해를 오늘에서 짐작했다는 표시(자동 등록이 내년도 사업의 '지난 마감'을 거르지 않고 보류하는 데 쓴다 · register-timing.mjs guessedPastHold) */
+    if (iso) return { date: iso, text: m3[0].trim(), from: '게시판 요약', yearGuessed: true };
   }
   return null;
 }

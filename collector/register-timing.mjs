@@ -15,12 +15,14 @@ export function titleYears(title) {
   return [...t.matchAll(/(?<!\d)(20\d{2})(?!\d)/g)].map((m) => Number(m[1]));
 }
 
-/** 차년도 계획·신입학 — `<오늘의 다음 해 이후>학년도·년 … 유학·연수·입학·신입학` · `신입학` · `입학전형` (현 재학생 신청 대상이 아니다) */
+/** 차년도 계획·신입학 — `<오늘의 다음 해 이후>학년도·년 … 유학·연수·입학·신입학` · `신입학` · `입학전형` (현 재학생 신청 대상이 아니다) ·
+ *  `<다음 해 이후> … 신입생·입학 예정·예비 대학생` (예비 신입생 장학 — 예전엔 `>= 2027` 보류가 가려 주던 것 · 2026-10-11 리뷰) */
 export function futurePlan(title, today) {
   const t = String(title || '');
   if (/신입학|입학전형/.test(t)) return true;
   const Y = yearOf(today);
   if (!Y) return false;
+  if (/신입생|입학\s*예정|예비\s*(?:대학생|신입생)/.test(t) && titleYears(t).some((y) => y >= Y + 1)) return true;
   return [...t.matchAll(/(?<!\d)(20\d{2})(?!\d)(?=[^\d]*(?:학년도|년).*(?:유학|연수|입학|신입학))/g)].some((m) => Number(m[1]) >= Y + 1);
 }
 
@@ -36,17 +38,37 @@ export function nameTokens(title) {
   return [...new Set(String(title || '').replace(/(?<!\d)20\d{2}(?!\d)/g, ' ').split(/[^가-힣A-Za-z]+/)
     .filter((w) => w.length >= 3 && !STOCK.test(w)))];
 }
-/** 같은 사업으로 보이는가(느슨하게) — 같은 이름 낱말이 있거나, 4자 이상 낱말이 다른 쪽 낱말 안에 들어 있으면(`북한이탈청소년` ⊂ `북한이탈청소년장학생`) 같다고 본다.
+/* 낱말 끝의 붙박이 꼬리 — 떼고 남은 줄기가 사업 이름이다(`대산장학생` · `대산농촌재단` → `대산`). 긴 꼬리부터 맞춘다. */
+const NAME_TAIL = /(?:장학생|장학회|장학금|장학재단|농촌재단|문화재단|복지재단|재단)$/;
+/** 줄기 — 붙박이 꼬리를 뗀 이름(2자 이상 · 붙박이 말로만 된 것은 빼고) */
+const stemOf = (w) => {
+  const s = w.replace(NAME_TAIL, '');
+  return s !== w && s.length >= 2 && !STOCK.test(s) ? s : null;
+};
+/** 같은 사업으로 보이는가(느슨하게) — 같은 이름 낱말이 있거나, 4자 이상 낱말이 다른 쪽 낱말 안에 들어 있거나(`북한이탈청소년` ⊂ `북한이탈청소년장학생`),
+ *  붙박이 꼬리를 뗀 줄기가 같으면(`대산장학생` ↔ `대산농촌재단` — 2026-10-11 리뷰: 이 둘만 피드에 있으면 학교마다 따로 등록됐다) 같다고 본다.
  *  3자 낱말은 같을 때만 — 안에 든 것까지 보면 `학부생` 같은 말 하나로 남의 사업이 묶인다(만들면서 실측). */
 export function looksSameProgram(a, b) {
   const A = nameTokens(a);
   const B = nameTokens(b);
   const inside = (big, small) => small.length >= 4 && big.includes(small);
-  return A.some((x) => B.some((y) => x === y || inside(x, y) || inside(y, x)));
+  if (A.some((x) => B.some((y) => x === y || inside(x, y) || inside(y, x)))) return true;
+  const stemsB = new Set(B.map(stemOf).filter(Boolean));
+  return A.some((x) => { const s = stemOf(x); return !!s && stemsB.has(s); });
 }
 
+/* 보류 묶음 이름 — 리포트 '컨펌 대기 이유별' 숫자가 이 이름으로 센다(2026-10-11 리뷰: why 의 괄호가 겹쳐 같은 이유가 여러 줄로 갈렸다) */
+export const HOLD_CODE = {
+  far: '올해+2 이후 사업',
+  noDeadline: '내년도 사업 · 마감 모름',
+  outOfYear: '내년도 사업 · 마감이 오늘~올해 밖',
+  sibling: '내년도 사업 · 같은 사업으로 보이는 다른 글',
+  guessedPast: '내년도 사업 · 해 없는 마감이 올해로는 지남',
+  stale: '오래된 글 · 마감 모름',
+};
+
 /**
- * 제목 연도로 본 보류 — null(보류 아님) 또는 { why }.
+ * 제목 연도로 본 보류 — null(보류 아님) 또는 { why, code }. code 는 리포트 '이유별' 숫자의 묶음 이름(why 에는 글마다 다른 날짜·제목이 들어 있어 그것으로 묶으면 갈린다).
  *   · 올해+2 이후 → 보류
  *   · 올해+1(내년도 사업) → 마감을 읽었고 그 마감이 **오늘 ~ 올해 12-31** 안일 때만 통과. 마감을 못 읽었거나 올해 밖이면 보류.
  *     같은 사업으로 보이는 다른 글(형제)이 있으면 보류 — `sibling` 은 그 글을 한 줄로 말한 값(또는 그 값을 내는 함수 · 필요할 때만 부른다).
@@ -58,12 +80,12 @@ export function yearHold({ title, deadline, today, sibling } = {}) {
   const ys = titleYears(title);
   if (!Y || !ys.length) return null;
   const top = Math.max(...ys);
-  if (top >= Y + 2) return { why: `${top}년 사업으로 보임(올해+2 이후) — 개발자 컨펌 대기` };
+  if (top >= Y + 2) return { why: `${top}년 사업으로 보임(올해+2 이후) — 개발자 컨펌 대기`, code: HOLD_CODE.far };
   if (top !== Y + 1) return null;
-  if (!deadline) return { why: `${top}년(내년도) 사업인데 마감을 못 읽음 — 개발자 컨펌 대기` };
-  if (deadline < String(today) || deadline > `${Y}-12-31`) return { why: `${top}년(내년도) 사업 · 마감 ${deadline} 이 오늘~올해 안이 아님 — 개발자 컨펌 대기` };
+  if (!deadline) return { why: `${top}년(내년도) 사업인데 마감을 못 읽음 — 개발자 컨펌 대기`, code: HOLD_CODE.noDeadline };
+  if (deadline < String(today) || deadline > `${Y}-12-31`) return { why: `${top}년(내년도) 사업 · 마감 ${deadline} 이 오늘~올해 안이 아님 — 개발자 컨펌 대기`, code: HOLD_CODE.outOfYear };
   const sib = typeof sibling === 'function' ? sibling() : sibling;
-  if (sib) return { why: `${top}년(내년도) 사업 · 같은 사업으로 보이는 다른 글(${String(sib).slice(0, 40)})이 있어 학교마다 따로 등록되지 않게 컨펌 대기` };
+  if (sib) return { why: `${top}년(내년도) 사업 · 같은 사업으로 보이는 다른 글(${String(sib).slice(0, 40)})이 있어 학교마다 따로 등록되지 않게 컨펌 대기`, code: HOLD_CODE.sibling };
   return null;
 }
 
@@ -73,9 +95,30 @@ export function yearHold({ title, deadline, today, sibling } = {}) {
  * 이미 끝난 공고일 수 있다. 10-11 실측: 지금 로봇 등록분 가운데 이 규칙에 걸렸을 것은 1건뿐이고(수집 08-18 → 등록 09-30 ·
  * `…근로장학생(국가,교내) 모집_모집완료` · 마감 08-24) 그것도 지난 공고였다 — 상시 제도는 막지 않았다.
  */
-export function staleHold({ foundAt, deadline, today, days = 30 } = {}) {
+export function staleHold({ title, foundAt, deadline, today, days = 30 } = {}) {
   if (deadline || !foundAt || !today) return null;
+  /* 상시·수시·연중 제도는 마감이 없는 것이 정상이다 — 오래 걸려 있어도 끝난 공고가 아니다(2026-10-11 리뷰 · 새 게시판·메우기로 30일 넘은 상시 글이 올 수 있다) */
+  if (/상시|수시|연중/.test(String(title || ''))) return null;
   const age = Math.floor((Date.parse(String(today).slice(0, 10)) - Date.parse(String(foundAt).slice(0, 10))) / 86400000);
   if (!(age > days)) return null;
-  return { why: `수집한 지 ${age}일 된 글인데 마감을 못 읽음 — 이미 끝난 공고일 수 있어 컨펌 대기` };
+  return { why: `수집한 지 ${age}일 된 글인데 마감을 못 읽음 — 이미 끝난 공고일 수 있어 컨펌 대기`, code: HOLD_CODE.stale };
+}
+
+/**
+ * 해 없는 날짜로 읽은 마감이 지난 내년도 사업 — '마감 경과'로 거르지 말고 보류(2026-10-11 리뷰).
+ * 마감 연도는 해 없는 날짜일 때 오늘의 해로 짐작한다(notice-deadline.mjs bareYear · yearGuessed) — 10월에 올라온 `2027학년도 1학기 … (~1/15)` 는
+ * 2026-01-15 로 읽혀 조용히 걸러졌다(예전엔 연도 보류가 먼저라 컨펌 대기에 보였다). 제목이 내년도 이후이고 **다음 해로 읽으면 반년 안**인 마감만
+ * 그 짐작을 믿지 않고 사람이 본다(해 넘긴 범위의 반년 규칙과 같은 폭 · extract-excerpts.mjs dateFrom).
+ * 🔴 반년 조건을 빼지 말 것 — 10-11 피드에서 내년도 제목 + 해 없는 지난 마감 6건(미래에셋 해외교환 `10/6 마감` · 미래인재육성재단 `~9.22` 등)은
+ *    전부 **올해 진짜 지난 마감**이었다(다음 해로 읽으면 열 달 넘게 남는다). 그것까지 보류하면 컨펌 대기가 끝난 공고로 찬다.
+ */
+export function guessedPastHold({ title, deadline, yearGuessed, today } = {}) {
+  if (!yearGuessed || !deadline || !(deadline < String(today))) return null;
+  const Y = yearOf(today);
+  const ys = titleYears(title);
+  if (!Y || !ys.length || Math.max(...ys) < Y + 1) return null;
+  const next = `${Number(deadline.slice(0, 4)) + 1}${deadline.slice(4)}`;
+  const ahead = (Date.parse(next) - Date.parse(String(today).slice(0, 10))) / 86400000;
+  if (!(ahead > 0 && ahead <= 183)) return null;
+  return { why: `${Math.max(...ys)}년(내년도) 사업인데 해 없는 마감(${deadline.slice(5)})이 올해로는 지남 — 다음 해 마감일 수 있어 개발자 컨펌 대기`, code: HOLD_CODE.guessedPast };
 }

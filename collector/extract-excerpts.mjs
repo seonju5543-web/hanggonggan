@@ -279,7 +279,27 @@ function dateFrom(value, ctxYear) {
     if (!ctxYear) return null;
     BARE_DATE.lastIndex = 0;
     const b0 = BARE_DATE.exec(s);
-    return b0 ? ymd(ctxYear, b0[1], b0[2]) : null;
+    if (!b0) return null;
+    const first = ymd(ctxYear, b0[1], b0[2]);
+    if (!first) return null;
+    /* 🔴 해 없는 날짜도 **범위면 끝**이다 (2026-10-11 리뷰 · 해 있는 날짜와 같은 규칙) — 예전엔 첫 날짜를 그대로 돌려줘
+       `신청기간: 10.12.(월) ~ 10.28.(수) 18:00까지`(동국 WISE)가 10-12 로, 자동 등록의 요약 `접수기간 : 10. 5.(월) ~ 10. 30.(금) 2026학년도 2학기` 가
+       10-05 로 읽혀 열려 있는 공고가 '마감 경과'로 조용히 걸러지거나 일찍 닫혔다(저장 원문 1,631건 중 5건 · 전부 시작일 → 끝일). */
+    const rest = s.slice(b0.index + b0[0].length);
+    const at = rest.search(RANGE_SEP);
+    if (at < 0) return first;                        // `~` 없이 날짜 하나 = 그날이 마감
+    const after = rest.slice(at + 1);
+    BARE_DATE.lastIndex = 0;
+    const b1 = BARE_DATE.exec(after);
+    if (b1) {
+      const end = ymd(ctxYear, b1[1], b1[2]);
+      if (end && end >= first) return end;
+      /* 끝이 앞서면 해를 넘긴 것(`12. 20. ~ 1. 10.`) — 반년 안만(아래 해 있는 시작일과 같은 규칙 · 넘으면 원문 오타라 비운다) */
+      const next = ymd(ctxYear + 1, b1[1], b1[2]);
+      return next && (Date.parse(next) - Date.parse(first)) / 86400000 <= 183 ? next : null;
+    }
+    /* `~` 뒤에 날짜가 없으면 시작일을 마감으로 쓰지 않는다 — 같은 날 안의 **시각** 범위(`10. 5. 10:00 ~ 18:00`)만 그날 (아래와 같은 규칙) */
+    return /^[^0-9]{0,4}\d{1,2}\s?(:\s?\d{2}|시)/.test(after) ? first : null;
   }
   const start = ymd(m[1], m[2], m[3]);
   if (!start) return null;
@@ -302,7 +322,9 @@ function dateFrom(value, ctxYear) {
     /* 해가 안 적힌 끝 날짜는 시작한 해를 물려받는다. 그래도 앞서면 해를 넘긴 것
        (`12.20 ~ 1.10`) — 이건 짐작이 아니라 범위의 뜻이 정하는 값이다.
        🔴 해를 넘긴 범위는 짧다 — 반년 넘게 벌어지면 해를 넘긴 것이 아니라 **원문 오타**다(위 네 자리 끝 날짜와 같은 규칙 · 통째로 비운다).
-          `신청기간 26. 9. 24.(월) ~ 9. 18.(금)`(광산장학회 · 공고일 8. 24.)을 2027-09-18 로 읽어 끝난 공고가 1년 동안 열린 공고로 등록될 뻔했다(2026-10-11 실측). */
+          `신청기간 26. 9. 24.(월) ~ 9. 18.(금)`(광산장학회 · 공고일 8. 24.)을 2027-09-18 로 읽어 끝난 공고가 1년 동안 열린 공고로 등록될 뻔했다(2026-10-11 실측).
+       ⚠️ 의도: 반년 넘는 해 없는 끝 날짜는 **학년 단위 범위여도 비운다**(`2026. 3. 2. ~ 2. 28.` · `2026. 8. 1. ~ 2. 28.(토)까지` → null ·
+          저장 원문 1,631건 중 바뀌는 것은 광산 1건). 2학기 한 학기(`9. 1. ~ 2. 28.` · 180일)까지는 다음 해로 읽는다 — 관문 qnotice ⑨ⓑ 가 경계를 잠근다. */
     const y = Number(start.slice(0, 4));
     if (ymd(y, b[1], b[2]) >= start) return ymd(y, b[1], b[2]);
     const next = ymd(y + 1, b[1], b[2]);

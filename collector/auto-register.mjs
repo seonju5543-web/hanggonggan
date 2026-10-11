@@ -30,7 +30,7 @@ import { stripSiteChrome } from './attachment-link.mjs';
 import { recordPastRounds, prunePastRounds, pastRoundOf } from './past-rounds.mjs';
 /* 차년도 계획 · 제목 연도 보류 · 오래된 글 보류 — 기준 연도를 오늘(TODAY)에서 읽는 규칙은 register-timing.mjs 한 곳(2026-10-11 점검 gap-07 · gap-bf-3 ·
    예전엔 `202[7-9]`·`y >= 2027` 이 박혀 있었다 · 이 파일은 불러오는 순간 실행되어 관문이 표본으로 못 잰다) */
-import { futurePlan, yearHold, staleHold, looksSameProgram } from './register-timing.mjs';
+import { futurePlan, yearHold, staleHold, guessedPastHold, looksSameProgram } from './register-timing.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfgPath = new URL('auto-register-config.json', HERE);
@@ -230,7 +230,13 @@ function classify(n, regUrlSet, regItems, batchSeen, pastRounds, feed = []) {
   }
   if (!ACTION.test(t)) return { verdict: 'hold', why: '선발·모집·신청 신호 없음 — 개발자 컨펌 대기' };
   const dl = parseDeadline(n);
-  if (dl && dl.date < TODAY) return { verdict: 'skip', why: `마감 경과(${dl.date})` };
+  if (dl && dl.date < TODAY) {
+    /* 해 없는 날짜(`~1/15`)를 오늘의 해로 읽어 지난 것이 된 내년도 사업은 거르지 않고 보류한다(2026-10-11 리뷰 · register-timing.mjs guessedPastHold) —
+       10월의 `2027학년도 1학기 … (~1/15)` 가 2026-01-15 로 읽혀 조용히 걸러졌다(예전엔 연도 보류가 먼저라 컨펌 대기에 보였다) */
+    const gp = guessedPastHold({ title: t, deadline: dl.date, yearGuessed: dl.yearGuessed, today: TODAY });
+    if (gp) return { verdict: 'hold', why: gp.why, code: gp.code };
+    return { verdict: 'skip', why: `마감 경과(${dl.date})` };
+  }
   /* 🔴 제목 연도 — 기준은 오늘의 해(TODAY · register-timing.mjs yearHold). 올해+2 이후는 보류 · 내년도 사업은 마감이 오늘~올해 안으로 읽히고
      같은 사업으로 보이는 다른 글(실시간 피드·정식 등록)이 없을 때만 등록한다 — 같은 사업 판정(programKey)이 재단 공고의 학교별 제목 변형을
      못 묶어(대산농촌재단 실측) 형제가 있는 채로 풀면 한 실행에 학교마다 따로 등록된다. */
@@ -240,10 +246,10 @@ function classify(n, regUrlSet, regItems, batchSeen, pastRounds, feed = []) {
     return other ? `${other.school || schoolOf(other) || '전국'} · ${cleanTitle(other.title || other.name || '').slice(0, 24)}` : null;
   };
   const yh = yearHold({ title: t, deadline: dl ? dl.date : null, today: TODAY, sibling });
-  if (yh) return { verdict: 'hold', why: yh.why };
+  if (yh) return { verdict: 'hold', why: yh.why, code: yh.code };
   /* 수집한 지 30일 넘은 글인데 마감을 못 읽었으면 보류 — 피드 메우기가 되살린 옛 글이 이미 끝난 공고일 수 있다(2026-10-11 점검 gap-bf-3 · register-timing.mjs staleHold) */
-  const st = staleHold({ foundAt: n.foundAt, deadline: dl ? dl.date : null, today: TODAY });
-  if (st) return { verdict: 'hold', why: st.why };
+  const st = staleHold({ title: t, foundAt: n.foundAt, deadline: dl ? dl.date : null, today: TODAY });
+  if (st) return { verdict: 'hold', why: st.why, code: st.code };
   return { verdict: 'register', deadline: dl ? dl.date : null, deadlineText: dl ? dl.text : null, deadlineSrc: dl ? dl.from : null };
 }
 
@@ -322,10 +328,13 @@ if (!cfg.enabled) {
       extract: labeledDeadline,
       lastDateIn,
     });
-    for (const n of notices.items || []) reader.fill(n);
-    if (reader.counts.bodyDeadlines) {
+    /* 🔴 기간 힌트도 껍데기를 걷는다(heal) — 수집기(collect.mjs)는 자동 등록 전에 걷지만 브라우저 수집 워크플로·사람이 돌리는 피드 메우기(heal-feed) 뒤의 길은
+       걷지 않은 요약으로 왔다. 항공대 머리 배너(`접수기간 : 2026.10.15.(목) 13:30까지`)가 마감으로 읽혀 10-15 전에는 가짜 마감으로 등록되고
+       뒤에는 조용히 걸러졌다(2026-10-11 리뷰 · 원장 20줄). 규칙은 makeBodyReader 한 곳 — 수집기와 같은 순서(heal 다음 fill). */
+    for (const n of notices.items || []) { reader.heal(n); reader.fill(n); }
+    if (reader.counts.bodyDeadlines || reader.counts.hints) {
       noticesTouched = true;
-      console.log(`본문 마감을 저장된 원문에서 새로 읽은 글 ${reader.counts.bodyDeadlines}건`);
+      console.log(`저장된 원문(껍데기 걷고)에서 — 기간 힌트 다시 읽음 ${reader.counts.hints}건 · 본문 마감 새로 읽음 ${reader.counts.bodyDeadlines}건`);
     }
   } catch (e) { console.log(`본문 마감 채우기를 건너뜀 — ${String((e && e.message) || e).slice(0, 160)}`); }
 
@@ -380,7 +389,7 @@ if (!cfg.enabled) {
       regUrlSet.add(canonUrl(nUrl));
       continue;
     }
-    if (r.verdict === 'hold') { held.push({ n, why: r.why }); continue; }
+    if (r.verdict === 'hold') { held.push({ n, why: r.why, code: r.code }); continue; }
     if (r.verdict !== 'register') {
       /* 괄호 안 알맹이(공고 이름·날짜)는 떼고 이유만 남긴다 — 안 떼면 집계가 아니라 목록이 된다:
          `이미 등록(동일 사업: 충북…)` → `이미 등록(동일 사업)` · `마감 경과(2026-09-17)` → `마감 경과` */
@@ -585,8 +594,16 @@ if (!cfg.enabled) {
     for (const h of held.slice(0, 10)) report.push(`- ${h.n.title.slice(0, 60)} (${h.why})`);
     if (held.length > 10) report.push(`- … 외 ${held.length - 10}건`);
     /* 이유별 숫자 — 목록은 10건에서 잘려 이유별 규모가 안 보였다(2026-10-11 점검 gap-07: 보류 166건 중 90건이 연도 규칙 하나였는데 리포트엔 7건만 보였다) */
+    /* 묶음 이름 — 규칙이 준 code(register-timing.mjs HOLD_CODE)가 있으면 그것으로 센다. 없으면 why 의 앞부분에서 괄호를 **안쪽부터** 걷는다
+       (2026-10-11 리뷰: `\([^)]*\)` 한 번으로는 괄호가 겹친 why(다른 글 제목이 든 형제 이유)가 덜 걷혀 같은 이유가 여러 줄로 갈렸다) */
+    const whyKey = (h) => {
+      if (h.code) return h.code;
+      let k = String(h.why || '').split(' — ')[0];
+      for (let prev = null; prev !== k;) { prev = k; k = k.replace(/\([^()]*\)/g, ''); }
+      return k.replace(/[()]/g, '').replace(/\s*\d{4}-\d{2}-\d{2}\s*/g, ' ').replace(/\s+/g, ' ').trim();
+    };
     const whyCount = new Map();
-    for (const h of held) { const k = String(h.why || '').split(' — ')[0].replace(/\([^)]*\)/g, '').replace(/\s*\d{4}-\d{2}-\d{2}\s*/g, ' ').trim(); whyCount.set(k, (whyCount.get(k) || 0) + 1); }
+    for (const h of held) { const k = whyKey(h); whyCount.set(k, (whyCount.get(k) || 0) + 1); }
     report.push('', `컨펌 대기 이유별: ${[...whyCount].sort((a, b) => b[1] - a[1]).map(([k, c]) => `${k} ${c}건`).join(' · ')}`);
   }
   /* 🔴 데이터 관문 쉬기는 따로 묶는다 — 이유가 '신호가 약해서'가 아니다. 같은 실행에 함께 들어온 다른 공고 때문에 같이 되돌려졌을 수도 있어
