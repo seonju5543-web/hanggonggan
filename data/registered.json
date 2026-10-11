@@ -6213,6 +6213,11 @@
      "name": "본문이미지-838x1188.jpg",
      "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/findUploadImg.do?fileNo=eb23bf94ea2f41cf96e5564e02a9ca7d",
      "bodyImage": true
+    },
+    {
+     "name": "본문이미지-1638x1163.gif",
+     "url": "https://www.kookmin.ac.kr/content/05sub/style0005/images/common/webacc.gif",
+     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12373/view.do?currentPageNo=1",
@@ -9311,6 +9316,10 @@
     },
     {
      "name": "[공문] 2026년 우양재단 동행 장학 모집 협조 요청.hwp (다운로드 : 25회)",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=0c6797a234b08b8ba908c89f3f55b111&bbsId=1083"
+    },
+    {
+     "name": "[공문] 2026년 우양재단 동행 장학 모집 협조 요청.hwp (다운로드 : 26회)",
      "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=0c6797a234b08b8ba908c89f3f55b111&bbsId=1083"
     }
    ],
