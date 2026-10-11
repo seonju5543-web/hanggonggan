@@ -4,6 +4,7 @@
         발행이 새 글·실린 글 구분 없이 오늘보다 뒤인 게시일을 비운다(news-kind.mjs clearFuturePosted · newsFloor 앞)
      ② 재단 새 공고 — 마감 지난 글 (collect-09 · api-01 · app2-F6): 송파 상반기 06-24·음성 09-18 이 몇 달 떠 있었다 —
         마감 다음 날까지만(CLOSED_KEEP_DAYS 와 같은 뜻) · 제목 머리 [마감] 표식 · 마감 칸 없는 옛 글은 원문 기간 줄에서 같은 판독기로 채운다 ·
+        회차가 둘 이상인 기간 줄은 마지막 회차의 끝으로(못 읽으면 마감으로 안 지우고 채우지도 않는다 · feeds-R2) ·
         소급 도구(tools/refilter-feeds.mjs)는 임시 폴더에서 진짜로 돌린다
      ③ 합집합 병합기 (app2-F7): .gitattributes 에 merge=jsonunion 이라 적은 파일마다 **병합기를 진짜로 돌려** 규칙이 있는지 본다 ·
         활동 피드는 학교 없는 글을 상한으로 자르지 않는다 · 재단 피드는 합친 뒤 발행 거름을 다시 건다(로봇이 뺀 지난 글을 되살리지 않는다) ·
@@ -99,6 +100,21 @@ export default async function qfeeds(eq, ctx) {
       [true, '2026-09-18', false, '2026-10-30', false, null]);
     eq('  수집 로봇이 발행 때 거름(map(tidyExternal)) 앞에서 수집과 같은 판독기로 채운다',
       before(collectSrc, 'fillDeadlineFromHint(n, (t) => activityExcerpts(t).deadline)', 'ext.items = ext.items.map(tidyExternal)'), true);
+
+    /* 회차가 둘 이상인 기간 줄 (feeds-R2) — 마감 칸은 판독기가 읽은 1차 끝(09-15 · 10-05)이다. 마지막 회차의 끝으로 본다 */
+    const R2 = '신청기간: 1차 2026. 9. 1. ~ 9. 15. / 2차 2026. 10. 1. ~ 10. 31.';
+    const R2b = '접수기간 - 1차(6종) : 2026. 10. 1.(화) ~ 10. 5.(금) 18:00 - 2차(3종) : 2026. 10. 13.(월) ~ 10. 30.(금)';
+    const PAST = '접수기간 - 1차 : 2026. 3. 3.(화) ~ 3. 20.(금) - 2차 : 2026. 3. 23.(월) ~ 4. 3.(금)';
+    const CUT = '접수기간 - 1차(6종) : 2026. 3. 3.(화) ~ 3. 20.(금) 18:00 - 2차(3종) : 2026. 3. 23.(월) ~ 3.';
+    const G = (deadline, deadlineHint, today = T) => extDropReason(tidyExternal({ title: '2026년 장학생 선발 공고', deadline, deadlineHint }), today);
+    eq('  회차 둘 — 1차가 지나도 2차가 열려 있으면 남긴다 · 회차가 모두 지나면 뺀다 · 2차 끝 다음 날까지는 남긴다',
+      [G('2026-09-15', R2), G('2026-10-05', R2b, '2026-10-12'), G('2026-03-20', PAST), G('2026-09-15', R2, '2026-11-02'), G('2026-09-15', R2, '2026-11-01')],
+      [null, null, '마감 지남', '마감 지남', null]);
+    eq('  회차 줄이 잘려 마지막 끝을 못 읽으면 마감으로는 지우지 않는다(짐작 금지) · 날짜 없는 「1차 서류전형 > 2차 면접」은 회차 줄이 아니다(예전대로 뺀다)',
+      [G('2026-03-20', CUT), G('2026-09-18', '접수 기간 : 2026. 9. 1. ~ 9. 18. 선발 방법 : 1차 서류전형 > 2차 면접')], [null, '마감 지남']);
+    const cut = { title: 'k', deadlineHint: CUT };
+    eq('  회차가 둘 이상인 줄은 마감 칸을 채우지 않는다(판독기가 1차 끝을 읽어 학생 화면에 「마감」으로 보인다)',
+      [fillDeadlineFromHint(cut, () => '2026-03-20'), 'deadline' in cut], [false, false]);
 
     /* 소급 도구(tools/refilter-feeds.mjs)를 임시 폴더에서 진짜로 돌린다 — 날짜는 오늘과 상관없게(2020·2099) */
     const sb = sandbox(root, 'hdj-qfeeds-refilter-');

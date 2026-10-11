@@ -14,6 +14,7 @@
    ⚠️ 날짜가 없는 글(삼원·지헌 '제 19기' 등)은 옛 글인지 **모른다** — 짐작해 빼지 않는다(원칙 8-1).
    마감(deadline)을 읽은 글은 마감 다음 날까지만 남긴다(2026-10-05 점검 collect-09 — 송파 상반기 06-24·음성 09-18 이 홈 「재단·지자체 새 공고」에
    몇 달 떠 있었다). 마감 칸이 없는 옛 글은 원문 기간 줄(deadlineHint)에서 같은 판독기로 채운다(fillDeadlineFromHint · 판독기는 부르는 쪽이 넘긴다).
+   회차가 둘 이상인 기간 줄은 마지막 회차의 끝으로 판정한다(lastRoundEnd · 2026-10-11 점검 feeds-R2 — 1차 마감으로 2차가 열린 공고를 지웠다).
    이 파일은 불러와도 아무것도 실행하지 않고 아무것도 불러오지 않는다(검사·병합기·감사가 그대로 돌려 본다).
    ============================================================ */
 
@@ -78,11 +79,55 @@ const CLOSED_MARK = /^\s*[\[［(（]\s*(?:모집\s*)?마감\s*[\]］)）]/;
 /* 하루 앞 날짜 (YYYY-MM-DD) — 마감 다음 날까지는 남긴다: 앱 장학·활동 목록의 CLOSED_KEEP_DAYS(=1 · '마감 다음 날까지')와 같은 뜻 */
 const dayBefore = (today) => new Date(Date.parse(`${today}T00:00:00Z`) - 86400000).toISOString().slice(0, 10);
 
+/* ── 회차가 둘 이상인 기간 줄 (2026-10-11 점검 feeds-R2) ──
+   `신청기간: 1차 2026. 9. 1. ~ 9. 15. / 2차 2026. 10. 1. ~ 10. 31.` — 마감 판독기(extractDeadline)는 **첫 회차의 끝**(09-15)을 마감으로 읽는다.
+   그 날로 '마감 지남'을 걸면 2차 접수가 열려 있는 공고가 1차 이틀 뒤 지워지고, seen-external 장부에 남아 다음 수집에도 돌아오지 않는다.
+   판독기를 새로 만들지 않는다 — 여기서는 **날짜가 딸린 회차 꼬리표(`1차 … 날짜`)가 둘 이상인가**와 **마지막 회차의 끝 날짜**만 본다.
+   끝 날짜는 `~` 뒤(또는 `까지` 앞)의 날짜뿐이고, 해가 없으면 그 줄 앞쪽 날짜의 해를 물려받는다. 날 뒤에 마침표·`일`·괄호·빈칸이 없으면
+   (줄이 80자에서 잘린 `~ 3.`·`~ 2026.10.2`) 못 읽은 것으로 둔다 — 짐작해 이른 날로 지우지 않는다(원칙 8-1).
+   `1차 서류전형 > 2차 면접` 처럼 날짜가 안 딸린 회차는 세지 않는다(선발 단계이지 접수 회차가 아니다). */
+const ROUND_MARK = /(?<!\d)\d{1,2}\s*차(?![가-힣])/g;
+const FULL_YMD = /(20\d{2})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})(?=\s*[.일(\s])/g;
+const ymdOk = (y, m, d) => (m >= 1 && m <= 12 && d >= 1 && d <= 31 ? `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}` : null);
+const DATED = /^[^~∼～]{0,20}?(?:20\d{2}\s*[.\-/년]\s*)?\d{1,2}\s*[.\-/월]\s*\d{1,2}/;
+/** 회차 줄이 아니면 undefined · 회차 줄이면 마지막 회차의 끝 날짜(YYYY-MM-DD) · 그 끝을 못 읽으면 null */
+export function lastRoundEnd(hint) {
+  const s = String(hint || '');
+  const marks = [...s.matchAll(ROUND_MARK)];
+  const dated = marks.map((m, i) => ({ at: m.index + m[0].length, end: i + 1 < marks.length ? marks[i + 1].index : s.length }))
+    .filter((r) => DATED.test(s.slice(r.at, r.end)));
+  if (dated.length < 2) return undefined;
+  const last = dated[dated.length - 1];
+  let out = null;
+  /* 마지막 회차 칸 안에서 `~` 뒤 날짜(시각 범위 `13:00~15:30` 은 날짜가 아니라 건너뛴다) · `날짜 까지` */
+  for (const m of s.slice(last.at, last.end).matchAll(/[~∼～]\s*((?:20\d{2}\s*[.\-/년]\s*)?\d{1,2}\s*[.\-/월]\s*\d{1,2})(?=\s*[.일(\s])|((?:20\d{2}\s*[.\-/년]\s*)?\d{1,2}\s*[.\-/월]\s*\d{1,2})\s*[.일]?\s*(?:\([^)]{0,4}\)\s*)?(?:\d{1,2}:\d{2}\s*)?까지/g)) {
+    const raw = m[1] || m[2];
+    const pos = last.at + m.index;
+    const nums = raw.match(/\d+/g).map(Number);
+    let y; let mo; let d;
+    if (nums.length === 3) [y, mo, d] = nums;
+    else {
+      /* 해 없는 끝 날짜 — 그 줄에서 이보다 앞에 나온 마지막 온전한 날짜의 해 · 그 날짜보다 앞서면 다음 해(12월 ~ 1월) */
+      const anchors = [...s.slice(0, pos).matchAll(FULL_YMD)];
+      if (!anchors.length) continue;
+      const a = anchors[anchors.length - 1];
+      [mo, d] = nums;
+      y = Number(a[1]);
+      if (mo * 100 + d < Number(a[2]) * 100 + Number(a[3])) y += 1;
+    }
+    const v = ymdOk(y, mo, d);
+    if (v) out = v;
+  }
+  return out;
+}
+
 /* 마감 칸이 없는 글에 원문 기간 줄(deadlineHint)에서 마감을 채운다 — 수집 때와 **같은 판독기**를 부르는 쪽이 넘긴다
    (collect.mjs: activityExcerpts(t).deadline · 이 파일은 아무것도 불러오지 않는다). 이미 마감이 있는 글은 건드리지 않는다.
-   247b89f9 이전에 실린 글(영동 09-18 · 김해 03-20)은 마감 칸이 없어 '마감 지남' 규칙을 비켜 갔다(점검 api-01 ①). 바뀌면 true. */
+   247b89f9 이전에 실린 글(영동 09-18 · 김해 03-20)은 마감 칸이 없어 '마감 지남' 규칙을 비켜 갔다(점검 api-01 ①). 바뀌면 true.
+   회차가 둘 이상인 줄(lastRoundEnd)은 채우지 않는다 — 판독기는 첫 회차의 끝을 읽어, 학생 화면에 2차가 열린 공고를 '마감'으로 보인다(feeds-R2). */
 export function fillDeadlineFromHint(n, deadlineOf) {
   if (!n || n.deadline || !n.deadlineHint || typeof deadlineOf !== 'function') return false;
+  if (lastRoundEnd(n.deadlineHint) !== undefined) return false;
   const d = deadlineOf(n.deadlineHint);
   if (!d || !/^\d{4}-\d{2}-\d{2}$/.test(String(d))) return false;
   n.deadline = d;
@@ -99,7 +144,11 @@ export function dropReason(n, today) {
   if (!/20\d{2}/.test(t) && !/모집|선발|신청|공고|안내|접수|마감|공모|알림/.test(t)) return '소개 글';
   /* 🔴 이유 글자에 숫자를 넣지 말 것 — collect.mjs 집계(extDropped)가 숫자 든 이유를 '옛 글'로 뭉친다 */
   if (CLOSED_MARK.test(t)) return '마감 표식';
-  if (n.deadline && String(n.deadline) < dayBefore(today)) return '마감 지남';
+  if (n.deadline && String(n.deadline) < dayBefore(today)) {
+    /* 회차가 둘 이상인 기간 줄이면 마감 칸(첫 회차의 끝일 수 있다)이 아니라 마지막 회차의 끝으로 본다 · 그 끝을 못 읽으면 마감으로는 지우지 않는다(feeds-R2) */
+    const end = lastRoundEnd(n.deadlineHint);
+    if (end === undefined || (end && end < dayBefore(today))) return '마감 지남';
+  }
   const now = new Date(`${today}T00:00:00Z`);
   if (n.postedAt) {
     const age = (now - new Date(`${n.postedAt}T00:00:00Z`)) / 86400000;
