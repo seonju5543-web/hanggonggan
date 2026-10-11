@@ -1,18 +1,18 @@
 {
- "updatedAt": "2026-10-10T15:54:27.666Z",
+ "updatedAt": "2026-10-11T16:18:19.943Z",
  "v": 1,
  "bad": {
   "https://2026grchallenge.com/": {
    "v": "login",
-   "at": "2026-10-11"
+   "at": "2026-10-12"
   },
   "https://blog.naver.com/mopaspr/224399694473?trackingCode=blog_bloghome_searchlist": {
    "v": "other",
-   "at": "2026-10-11"
+   "at": "2026-10-12"
   },
   "https://maicon.kr/": {
    "v": "home",
-   "at": "2026-10-11"
+   "at": "2026-10-12"
   },
   "https://naraport.mof.go.kr/info/contest/contestIntroduce.do?subMenu1Nm=%EA%B3%B5%EB%AA%A8%EC%A0%84": {
    "v": "other",
@@ -20,7 +20,7 @@
   },
   "https://www.fishway.go.kr/home/mainPage.do": {
    "v": "gone",
-   "at": "2026-10-11"
+   "at": "2026-10-12"
   },
   "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11495&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0": {
    "v": "other",
@@ -28,7 +28,7 @@
   },
   "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?bbs_cde=28&btin.bbs_cde=28&btin.doc_no=1338432&btin.appl_no=000000&btin.page=1&btin.search_type=&btin.search_text=&popupDeco=&btin.note_div=row&menu_idx=214": {
    "v": "other",
-   "at": "2026-10-11"
+   "at": "2026-10-12"
   },
   "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626405&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888": {
    "v": "other",
@@ -44,7 +44,7 @@
   },
   "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511394": {
    "v": "other",
-   "at": "2026-10-11"
+   "at": "2026-10-12"
   },
   "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000": {
    "v": "other",
@@ -52,19 +52,19 @@
   },
   "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=893444&article.offset=0&articleLimit=10": {
    "v": "gone",
-   "at": "2026-10-11"
+   "at": "2026-10-12"
   },
   "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=95279&article.offset=0&articleLimit=10": {
    "v": "other",
-   "at": "2026-10-11"
+   "at": "2026-10-12"
   },
   "https://www.usspc.or.kr/": {
    "v": "home",
-   "at": "2026-10-11"
+   "at": "2026-10-12"
   },
   "https://www.welchon.com/web/lay1/program/S1T31C447/eventNewView.do?menuIdx=&cIdx=evpr&bbsIdx=2214028": {
    "v": "login",
-   "at": "2026-10-11"
+   "at": "2026-10-12"
   }
  },
  "fix": {
