@@ -82,41 +82,100 @@ const dayBefore = (today) => new Date(Date.parse(`${today}T00:00:00Z`) - 8640000
 /* ── 회차가 둘 이상인 기간 줄 (2026-10-11 점검 feeds-R2) ──
    `신청기간: 1차 2026. 9. 1. ~ 9. 15. / 2차 2026. 10. 1. ~ 10. 31.` — 마감 판독기(extractDeadline)는 **첫 회차의 끝**(09-15)을 마감으로 읽는다.
    그 날로 '마감 지남'을 걸면 2차 접수가 열려 있는 공고가 1차 이틀 뒤 지워지고, seen-external 장부에 남아 다음 수집에도 돌아오지 않는다.
-   판독기를 새로 만들지 않는다 — 여기서는 **날짜가 딸린 회차 꼬리표(`1차 … 날짜`)가 둘 이상인가**와 **마지막 회차의 끝 날짜**만 본다.
-   끝 날짜는 `~` 뒤(또는 `까지` 앞)의 날짜뿐이고, 해가 없으면 그 줄 앞쪽 날짜의 해를 물려받는다. 날 뒤에 마침표·`일`·괄호·빈칸이 없으면
-   (줄이 80자에서 잘린 `~ 3.`·`~ 2026.10.2`) 못 읽은 것으로 둔다 — 짐작해 이른 날로 지우지 않는다(원칙 8-1).
-   `1차 서류전형 > 2차 면접` 처럼 날짜가 안 딸린 회차는 세지 않는다(선발 단계이지 접수 회차가 아니다). */
+   판독기를 새로 만들지 않는다 — 여기서는 **접수 회차가 둘 이상인가**와 **마지막 회차의 끝 날짜**만 본다.
+   · 접수 회차 = 회차 꼬리표(`1차`) 바로 뒤에 날짜가 딸리고, 그 칸에 **기간 표식**(`~` 뒤 날짜 · 날짜 뒤 `까지`·`마감`)이 있는 칸.
+     `1차 서류심사 결과발표: 9. 22.`·`2차 면접: 9. 26.` 처럼 날짜 하나뿐인 선발 단계는 세지 않는다(리뷰 2026-10-11 — 세면 끝을 못 읽어 영영 안 지웠다).
+     줄 끝에서 잘린 칸(`2차(3종) : 2026. 3. 23.(월)` — 힌트는 80자에서 자른다)은 기간 표식이 잘렸을 수 있어, 선발 단계 낱말이 없으면 끝을 모르는 회차로 센다.
+   · 끝 날짜 = 마지막 회차 칸의 `~` 뒤(또는 `까지`·`마감` 앞) 날짜 중 가장 늦은 것. 해가 없으면 그 줄 앞쪽 날짜의 해를 물려받는다(12월 ~ 1월은 다음 해).
+   · 줄 끝에서 잘린 끝 날짜는 **그 글자로 가능한 가장 늦은 날**(상한)로 본다 — 짐작이 아니라 상한이다(리뷰 2026-10-11: 김해 상반기 `~ 3.` 을
+     못 읽어 3월 공고가 수집일 60일까지 떴다). `~ 3.` → 그 달 말일 · `~ 2026.10.2` → 10-29 · `~ 3. 25` → 3-25. 달도 못 읽으면(`~`·`~ 1`·`~ 2026.`) 모른다(null). */
 const ROUND_MARK = /(?<!\d)\d{1,2}\s*차(?![가-힣])/g;
 const FULL_YMD = /(20\d{2})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})(?=\s*[.일(\s])/g;
 const ymdOk = (y, m, d) => (m >= 1 && m <= 12 && d >= 1 && d <= 31 ? `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}` : null);
 const DATED = /^[^~∼～]{0,20}?(?:20\d{2}\s*[.\-/년]\s*)?\d{1,2}\s*[.\-/월]\s*\d{1,2}/;
-/** 회차 줄이 아니면 undefined · 회차 줄이면 마지막 회차의 끝 날짜(YYYY-MM-DD) · 그 끝을 못 읽으면 null */
+/* 기간 표식 — `~` 뒤가 숫자(시각 `~ 15:00` 은 아니다)이거나 줄 끝(잘림) · 날짜 가까이 뒤의 `까지`·`마감` */
+const PERIOD_MARK = /[~∼～]\s*(?:$|(?!\d{1,2}\s*:)\d)|\d[\d\s.:일()월화수목금토]{0,16}(?:까지|마감)/;
+const STAGE_WORD = /발표|면접|심사|결과|합격|시험|평가|통보|선정/;
+const maxDay = (a, b) => (!a ? b : !b ? a : a > b ? a : b);
+/* 해 없는 날짜가 해를 물려받을 날짜 — 그 줄에서 pos 앞에 나온 마지막 온전한 날짜 { y, m, d } · 없으면 null */
+function anchorBefore(s, pos) {
+  const anchors = [...s.slice(0, pos).matchAll(FULL_YMD)];
+  if (!anchors.length) return null;
+  const a = anchors[anchors.length - 1];
+  return { y: Number(a[1]), m: Number(a[2]), d: Number(a[3]) };
+}
+/* 해 없는 끝 날짜의 해 — 물려받은 날짜보다 앞서면 다음 해(12월 ~ 1월) */
+function yearFor(s, pos, mo, d) {
+  const a = anchorBefore(s, pos);
+  return a ? a.y + (mo * 100 + d < a.m * 100 + a.d ? 1 : 0) : null;
+}
+/* 줄 끝에서 잘린 끝 날짜의 상한. 날짜 조각이 아니면 undefined · 조각인데 달을 못 읽으면 null */
+function cutEndMax(s, pos, tail) {
+  const t = tail.trim();
+  if (/^(?:\d{0,4}|20\d{2}\s*[.\-/년])$/.test(t)) return null;   // `~` · `~ 1` · `~ 2026.` — 달을 모른다
+  const m = t.match(/^(?:(20\d{2})\s*[.\-/년]\s*)?(\d{1,2})(?:\s*([.\-/월])\s*(\d{0,2}))?$/);
+  if (!m) return undefined;
+  const [, y, mo, sep, d] = m;
+  /* 달 후보 — 구분 글자가 붙었으면 그 달 · 해 뒤에 숫자만 있으면 이어질 수 있다(`1` → 1·10·11·12 · `0` → 01~09) */
+  const months = sep ? [Number(mo)] : mo === '1' ? [1, 10, 11, 12] : mo === '0' ? [1, 2, 3, 4, 5, 6, 7, 8, 9] : [Number(mo)];
+  const a = y ? null : anchorBefore(s, pos);
+  if (!y && !a) return null;
+  let best = null;
+  for (const mm of months) {
+    if (mm < 1 || mm > 12) continue;
+    /* 날 후보 — 없으면 그 달 전부 · 한 자리면 그 날과 이어질 수 있는 두 자리(2 → 2·20~29 · 0 → 01~09) · 두 자리면 그 날 */
+    const days = [];
+    for (let dd = 1; dd <= 31; dd++) {
+      const ds = String(dd).padStart(2, '0');
+      if (!d || (d.length === 1 ? ds[0] === d || dd === Number(d) : ds === d)) days.push(dd);
+    }
+    for (const dd of days) {
+      /* 해 없는 후보 — 앞선 달이면 다음 해(12월 ~ 1월) · 같은 달에서 시작보다 앞선 날은 끝이 될 수 없어 후보가 아니다
+         (`3. 23. ~ 3.` 의 3월 1~22일을 다음 해로 넘기면 상한이 이듬해 3월이 된다) */
+      if (a && mm === a.m && dd < a.d) continue;
+      const yy = y ? Number(y) : a.y + (mm < a.m ? 1 : 0);
+      if (dd > new Date(Date.UTC(yy, mm, 0)).getUTCDate()) continue;
+      best = maxDay(best, ymdOk(yy, mm, dd));
+    }
+  }
+  return best;
+}
+/** 회차 줄이 아니면 undefined · 회차 줄이면 마지막 회차의 끝 날짜(YYYY-MM-DD · 잘렸으면 상한) · 그 끝을 못 읽으면 null */
 export function lastRoundEnd(hint) {
   const s = String(hint || '');
   const marks = [...s.matchAll(ROUND_MARK)];
-  const dated = marks.map((m, i) => ({ at: m.index + m[0].length, end: i + 1 < marks.length ? marks[i + 1].index : s.length }))
-    .filter((r) => DATED.test(s.slice(r.at, r.end)));
-  if (dated.length < 2) return undefined;
-  const last = dated[dated.length - 1];
+  const rounds = marks.map((m, i) => ({ at: m.index + m[0].length, end: i + 1 < marks.length ? marks[i + 1].index : s.length }))
+    .filter((r) => {
+      const cell = s.slice(r.at, r.end);
+      if (!DATED.test(cell)) return false;
+      if (PERIOD_MARK.test(cell)) return true;
+      return r.end === s.length && !STAGE_WORD.test(cell);   // 줄 끝에서 잘린 칸 — 기간 표식이 잘렸을 수 있다
+    });
+  if (rounds.length < 2) return undefined;
+  const last = rounds[rounds.length - 1];
+  const cell = s.slice(last.at, last.end);
   let out = null;
-  /* 마지막 회차 칸 안에서 `~` 뒤 날짜(시각 범위 `13:00~15:30` 은 날짜가 아니라 건너뛴다) · `날짜 까지` */
-  for (const m of s.slice(last.at, last.end).matchAll(/[~∼～]\s*((?:20\d{2}\s*[.\-/년]\s*)?\d{1,2}\s*[.\-/월]\s*\d{1,2})(?=\s*[.일(\s])|((?:20\d{2}\s*[.\-/년]\s*)?\d{1,2}\s*[.\-/월]\s*\d{1,2})\s*[.일]?\s*(?:\([^)]{0,4}\)\s*)?(?:\d{1,2}:\d{2}\s*)?까지/g)) {
+  /* 마지막 회차 칸 안에서 `~` 뒤 날짜(시각 범위 `13:00~15:30` 은 날짜가 아니라 건너뛴다) · `날짜 까지`·`날짜 마감` */
+  for (const m of cell.matchAll(/[~∼～]\s*((?:20\d{2}\s*[.\-/년]\s*)?\d{1,2}\s*[.\-/월]\s*\d{1,2})(?=\s*[.일(\s])|((?:20\d{2}\s*[.\-/년]\s*)?\d{1,2}\s*[.\-/월]\s*\d{1,2})\s*[.일]?\s*(?:\([^)]{0,4}\)\s*)?(?:\d{1,2}:\d{2}\s*)?(?:까지|마감)/g)) {
     const raw = m[1] || m[2];
-    const pos = last.at + m.index;
     const nums = raw.match(/\d+/g).map(Number);
     let y; let mo; let d;
     if (nums.length === 3) [y, mo, d] = nums;
     else {
-      /* 해 없는 끝 날짜 — 그 줄에서 이보다 앞에 나온 마지막 온전한 날짜의 해 · 그 날짜보다 앞서면 다음 해(12월 ~ 1월) */
-      const anchors = [...s.slice(0, pos).matchAll(FULL_YMD)];
-      if (!anchors.length) continue;
-      const a = anchors[anchors.length - 1];
       [mo, d] = nums;
-      y = Number(a[1]);
-      if (mo * 100 + d < Number(a[2]) * 100 + Number(a[3])) y += 1;
+      y = yearFor(s, last.at + m.index, mo, d);
+      if (!y) continue;
     }
-    const v = ymdOk(y, mo, d);
-    if (v) out = v;
+    out = maxDay(out, ymdOk(y, mo, d));
+  }
+  /* 줄 끝에서 잘린 끝 날짜 — 그 글자로 가능한 가장 늦은 날. 달을 못 읽으면 끝을 모른다(null) */
+  if (last.end === s.length) {
+    const cut = cell.match(/[~∼～]([^~∼～]*)$/);
+    if (cut) {
+      const ub = cutEndMax(s, last.at + cut.index, cut[1]);
+      if (ub === null) return null;
+      if (ub) out = maxDay(out, ub);
+    }
   }
   return out;
 }
@@ -144,11 +203,11 @@ export function dropReason(n, today) {
   if (!/20\d{2}/.test(t) && !/모집|선발|신청|공고|안내|접수|마감|공모|알림/.test(t)) return '소개 글';
   /* 🔴 이유 글자에 숫자를 넣지 말 것 — collect.mjs 집계(extDropped)가 숫자 든 이유를 '옛 글'로 뭉친다 */
   if (CLOSED_MARK.test(t)) return '마감 표식';
-  if (n.deadline && String(n.deadline) < dayBefore(today)) {
-    /* 회차가 둘 이상인 기간 줄이면 마감 칸(첫 회차의 끝일 수 있다)이 아니라 마지막 회차의 끝으로 본다 · 그 끝을 못 읽으면 마감으로는 지우지 않는다(feeds-R2) */
-    const end = lastRoundEnd(n.deadlineHint);
-    if (end === undefined || (end && end < dayBefore(today))) return '마감 지남';
-  }
+  /* 회차가 둘 이상인 기간 줄이면 마감 칸(첫 회차의 끝일 수 있다)이 아니라 마지막 회차의 끝(잘렸으면 상한)으로 본다 — 마감 칸이 없어도(채우지 않는다) ·
+     그 끝을 못 읽으면 마감으로는 지우지 않는다(feeds-R2) · 마감 칸이 더 늦으면 그 날 */
+  const roundEnd = lastRoundEnd(n.deadlineHint);
+  const closeDay = roundEnd === undefined ? n.deadline : roundEnd && maxDay(roundEnd, n.deadline || null);
+  if (closeDay && String(closeDay) < dayBefore(today)) return '마감 지남';
   const now = new Date(`${today}T00:00:00Z`);
   if (n.postedAt) {
     const age = (now - new Date(`${n.postedAt}T00:00:00Z`)) / 86400000;
