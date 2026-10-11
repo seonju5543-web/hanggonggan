@@ -1,4 +1,4 @@
-## 🖥 브라우저형 수집 리포트 (2026-10-10 18:42 KST)
+## 🖥 브라우저형 수집 리포트 (2026-10-11 10:48 KST)
 
 ### 한국외국어대학교
   - 📄 2페이지에서 장학 공고 15건 더 읽음
@@ -68,8 +68,8 @@
 - ✅ 링크 615 · 장학 공고 1 · 이미 아는 공고 20건은 다시 열지 않음 · https://www.dongguk.edu/article/JANGHAKNOTICE/list
 
 ### 상명대학교
-- ✅ 링크 560 · 장학 공고 3 · https://www.smu.ac.kr/kor/life/notice.do
-- ✅ 링크 560 · 장학 공고 3 · https://www.smu.ac.kr/kor/life/notice.do?srCategoryId=8
+- ✅ 링크 542 · 장학 공고 2 · https://www.smu.ac.kr/kor/life/notice.do
+- ✅ 링크 542 · 장학 공고 2 · https://www.smu.ac.kr/kor/life/notice.do?srCategoryId=8
 - ⚪ 링크 0 · 장학 공고 0 · https://www.smu.ac.kr/kor/life/scholarship.do
 
 ### 고려대학교
@@ -77,8 +77,7 @@
 - ✅ 링크 768 · 장학 공고 2 · 이미 아는 공고 6건은 다시 열지 않음 · https://www.korea.ac.kr/ko/568/subview.do
 
 ### 계명대학교
-  - 📄 2페이지에서 장학 공고 21건 더 읽음
-- ✅ 링크 1052 · 장학 공고 42 · https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&
+- ❌ 오류(page.goto: Target page, context or browser has been closed) · https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&
 
 ### 부산대학교
   - 📄 2페이지에서 장학 공고 8건 더 읽음
@@ -99,6 +98,11 @@
 
 ### 명지대학교
 - ✅ 링크 417 · 장학 공고 10 · https://www.mju.ac.kr/mjukr/259/subview.do
+
+### 🔁 실패 학교 재시도 (몇 분 뒤 재접속)
+**계명대학교**
+  - 📄 2페이지에서 장학 공고 21건 더 읽음
+- ✅ 링크 1052 · 장학 공고 42 · https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&
 
 ---
 이번 실행 신규 수집: **0건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
