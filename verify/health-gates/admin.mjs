@@ -198,4 +198,10 @@ export default async function gate(eq, ctx) {
       !!dry && /steps\.audit\.outcome == 'success'/.test(dry.if || '') && /inputs\.dry_run/.test(dry.if || '') && !/!inputs\.dry_run/.test(dry.if || '') && !/git (push|commit)/.test(dry.run || ''),
       !!alarm && /!inputs\.dry_run/.test(alarm.if || '')],
     [true, true, true, true]);
+  /* 시험 실행도 수집 대기줄(collector)에 서는데 화면의 '줄 확인'(F4)을 거치지 않는다 — 손으로 깨울 때 기다리던 수집 실행이 취소될 수 있다는 것을
+     깨우는 칸의 설명에 적어 둔다(2026-10-11 점검 app-admin-R1 · 동작 변경 없음 — 운영 주의). 그 대기줄에 서는 동안만 말한다(줄을 옮기면 설명도 같이) */
+  const inCollectorQueue = /^concurrency:\n\s+group: collector\s*$/m.test(ay);
+  const dryDesc = ((/\n {6}dry_run:\n(?: {8}#.*\n)*? {8}description: '([^'\n]*)'/.exec(ay)) || [])[1] || '';
+  eq('  F10 시험 실행 칸의 설명이 「깨우기 전에 수집 대기줄에 기다리는 실행이 없는지 확인 — 있으면 취소된다」를 말한다 (이 워크플로가 그 대기줄에 서는 동안)',
+    /수집 대기줄/.test(dryDesc) && /기다리는 실행/.test(dryDesc) && /취소/.test(dryDesc), inCollectorQueue);
 }

@@ -41,7 +41,7 @@ jobs:
     # 2026-09-29 수집망 2 → 44개교 복원: 「게시판 수집」 단계에 자체 상한 10분(예산 8분 + 마무리 2분)이 생겨
     # 단계 합 4+10+6+5+1+4+3+3+4 = 40 → 상한 44. ⚠️ 상한을 키우는 것으로 때우지 말 것 — 단계가 오래 걸리면
     # 그 단계의 예산(HARVEST_BUDGET_MS)을 줄이고, 상한은 그 합을 담는 그릇으로만 쓴다(8/2~3 사고의 교훈).
-    timeout-minutes: 66   # 단계 합 61 + 여유 5 — 2026-10-05 장학 포스터 PaddleOCR 단계 7분 + 2026-10-04 관문 다시 재기 3분(gate-guard) (2026-10-03 대외활동 첨부·포스터 9분 → 51+5 · 2026-09-30 판정 로봇 2분 → 42+3)
+    timeout-minutes: 70   # 단계 합 65 + 여유 5 — 2026-10-11 관문 다시 재기 3 → 5분(관문 한 번 ~55초 실측) + 끝내 빨간불 경보·닫기 짝 1+1 (2026-10-05 장학 포스터 PaddleOCR 단계 7분 + 2026-10-04 관문 다시 재기 3분 → 61+5 · 2026-10-03 대외활동 첨부·포스터 9분 → 51+5 · 2026-09-30 판정 로봇 2분 → 42+3)
     steps:
       - uses: actions/checkout@v4
         with:
@@ -261,11 +261,13 @@ jobs:
       #    예전엔 새 자동 등록분만 빼고 끝나, 원인이 기존 항목 수정(발췌 등)이면 아무것도 못 한 채 아래 저장 단계가 관문 실패 상태의
       #    정식 등록 파일을 커밋했다. 이제 ① 새 자동 등록분 → 다시 재기 → ② 정식 등록·양식·대기열을 HEAD 판으로 → 다시 재기.
       #    결과는 steps.guard.outputs.gate(reverted-auto · reverted-files · still-failing · flaky) — still-failing 이면 맨 끝 단계가 빨간불 + 이슈.
-      #    상한 3분 = 관문 최대 두 번(로컬 실측 ~25초씩) + 여유. 넘어지면 정식 등록 파일만이라도 HEAD 판으로(|| 뒤).
+      #    상한 5분 = 관문 최대 두 번 + 여유. 관문 한 번은 ~55초다(2026-10-11 4코어 실측 — test-collector 51초 + audit-data 4초 ·
+      #    옛 주석의 ~25초는 관문이 늘기 전 값). 두 번이면 ~2분이라 3분으로는 느린 러너에서 여유가 1분뿐이었다 — 시간 초과로 이 단계가
+      #    죽으면 || 뒤 예비 줄도 안 돌고 아래 저장 단계가 건너뛰어져 그 실행의 수집분이 통째로 안 남는다. 넘어지면 정식 등록 파일만이라도 HEAD 판으로(|| 뒤).
       - name: 감사 실패 시 자동 등록분 되돌리기
         id: guard
         if: steps.audit.outcome == 'failure'
-        timeout-minutes: 3
+        timeout-minutes: 5
         run: |
           node collector/gate-guard.mjs --report collector/report.md --note /tmp/gate-note.md --stage auto --stage data/registered.json,data/forms.json,collector/pending-forms.json || git checkout -- data/registered.json data/forms.json collector/pending-forms.json
 
@@ -463,10 +465,30 @@ jobs:
               --body "🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **수집 로봇이 끝까지 못 갔어요** (실패 또는 시간 초과로 취소) — 이번 수집분은 저장되지 않았습니다. 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · 관리자 화면 → 로봇 (https://hanggonggan-admin.pages.dev/#robots) 에서 「일반 수집 로봇」의 **지금 실행**을 **한 번** 눌러 보세요 — 학교 서버가 잠깐 늦은 것이면 이것으로 끝납니다. 그래도 또 넘어지면 Claude 세션에 '로봇 실패 확인해줘'라고 지시하세요."
           fi
 
+      # 🔴 '끝내 빨간불' 경보는 이슈 **하나**에 모으고, 관문이 다시 통과하면 닫는다 (2026-10-11 · 경보 한 곳 tools/alert-issue.mjs —
+      #    교내 소식 감사 경보와 같은 꼴). 옛 판은 GitHub 검색(--search … in:title)으로 찾고 없으면 제목에 로봇·날짜를 붙여 새로 만들었다 —
+      #    검색은 이모지·한글 제목을 놓칠 수 있어(alert-issue.mjs 머리말 · 2026-07-31) 같은 경보가 실행마다 쌓일 수 있었고, 닫는 단계가 없어 고친 뒤에도 열려 있었다.
+      #    제목은 고정(로봇 이름·시각은 본문 첫 줄) · prefix 로 찾아 날짜 붙은 옛 이슈에도 댓글이 붙는다 · 장학·브라우저 두 로봇이 같은 경보를 쓴다.
+      #    닫는 짝: 관문이 처음부터 통과한 실행 — 관문은 저장소 전체 데이터를 보므로 어느 로봇이 통과해도 닫아도 된다.
+      - name: 관문이 다시 통과하면 옛 '끝내 빨간불' 경보를 닫는다
+        if: steps.audit.outcome == 'success'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          title: 🚨 데이터 관문이 되돌린 뒤에도 빨간불
+          match: prefix
+          body: |
+            ✅ 데이터 관문이 다시 통과했습니다(장학공고 수집 로봇) — 자동으로 닫습니다.
+            실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
       # 🔴 되돌린 뒤에도 관문이 빨가면 초록불로 끝내지 않는다 (2026-10-04 · 로봇·도구 점검).
       #    failure()·cancelled() 알림 **뒤**에 둔다 — 앞에 두면 그 알림이 '이번 수집분은 저장되지 않았습니다'라는 틀린 말을 붙인다(저장은 됐다).
       - name: 🚨 관문이 끝내 빨간불 (되돌린 뒤에도)
         if: steps.guard.outputs.gate == 'still-failing'
+        timeout-minutes: 1
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -477,17 +499,13 @@ jobs:
             echo
             echo "실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '데이터 관문 빨간불 확인해줘'라고 지시하세요."
           } > /tmp/gate-issue.md
-          # 원인이 기존 데이터면 실행마다 빨갛다 — 열린 같은 이슈가 있으면 코멘트(하루 최대 5개씩 쌓이지 않게 · 2026-10-04 리뷰). 로봇 이름은 본문 첫 줄에.
-          open=$(gh issue list --repo "${{ github.repository }}" \
-            --search '"데이터 관문이 되돌린 뒤에도 빨간불" in:title' --state open \
-            --limit 1 --json number --jq '.[0].number' || true)
-          if [ -n "$open" ] && [ "$open" != "null" ]; then
-            gh issue comment "$open" --repo "${{ github.repository }}" --body-file /tmp/gate-issue.md || true
+          # 원인이 기존 데이터면 실행마다 빨갛다 — 열린 같은 경보에 댓글로 모인다(경보 도구가 제목 글자로 찾는다).
+          if node tools/alert-issue.mjs --mode open --match prefix \
+            --title "🚨 데이터 관문이 되돌린 뒤에도 빨간불" \
+            --label gate-red --label-description '데이터 관문이 되돌린 뒤에도 빨간불' \
+            --assignee "${{ github.repository_owner }}" --body-file /tmp/gate-issue.md; then
+            echo "::error::데이터 관문이 되돌린 뒤에도 빨간불입니다 — 이슈에 적었습니다."
           else
-            gh issue create --repo "${{ github.repository }}" \
-              --title "🚨 데이터 관문이 되돌린 뒤에도 빨간불 — 장학공고 수집 로봇 $(TZ=Asia/Seoul date +%Y-%m-%d)" \
-              --body-file /tmp/gate-issue.md \
-              --assignee "${{ github.repository_owner }}" || true
+            echo "::error::데이터 관문이 되돌린 뒤에도 빨간불입니다 — 경보 이슈를 열지 못했습니다(이 실행 로그를 보세요)."
           fi
-          echo "::error::데이터 관문이 되돌린 뒤에도 빨간불입니다 — 이슈에 적었습니다."
           exit 1
