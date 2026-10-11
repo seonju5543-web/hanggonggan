@@ -14,6 +14,7 @@
         'UTC 월 20시대'를 'KST 월요일'이라 적은 주석(실제 화요일) — 워크플로 예약 줄 전부를 cron 과 대조(cronCommentProblems)
      ⑦ 복구 로봇 소급 재검사 끔 (links-10 · 개발자 결정): 읽는 곳 없는 판정 기록 · 원문 링크 확인 로봇과 엇갈린 판정 — 되살아나지 않게
      ⑧ 사냥꾼 저장이 바꾼 주소를 학교별 파일 고치기에 넘기는 배선 (CC-1 · 동작은 feed ① ⓘ)
+     ⑨ 게시판이 안 열려 내일로 미룬 표적 (links-final-1): 같은 실행의 3단계가 같은 학교를 다시 두드렸다 — **진짜 link-hunter.mjs 를 가짜 브라우저로**
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -431,6 +432,42 @@ export default async function links(eq, ctx) {
     eq('⑧ 배선 — 사냥꾼 저장은 바꾼 주소를 학교별 파일 고치기에 넘긴다(movedNoticeUrls 한 곳 · 불러 쓴다)',
       [/patchUrlsBySchool\(notices\.items, \{ moved: movedNoticeUrls\(targets\) \}\)/.test(save),
         /import \{[^}]*\bmovedNoticeUrls\b[^}]*\} from '\.\/link-hunt-rules\.mjs'/.test(lh)],
+      [true, true]);
+  }
+
+  /* ── ⑨ 게시판이 안 열려 내일로 미룬 표적은 그날 3단계도 안 두드린다 (links-final-1 · 2026-10-11) ──
+     리포트에 '내일 다시 봅니다'라고 적은 같은 실행에서 3단계가 같은 학교의 다른 게시판·사이트 검색을 곧바로 열었고(죽은 서버에 한 건당 최대 4번 × 25초),
+     3단계도 실패하면 끝줄은 '아직 못 찾음 0건'인데 '사람에게 알릴 건'으로 올라갔다. **진짜 link-hunter.mjs 를 가짜 브라우저(여는 족족 연결 거부)로 임시 폴더에서** 돌린다. */
+  {
+    const REFUSE_PW = [
+      "import fs from 'node:fs';",
+      "const log = (s) => fs.appendFileSync('pw-calls.log', s + '\\n');",
+      "const page = { goto: async (u) => { log('goto ' + u); throw new Error('page.goto: net::ERR_CONNECTION_REFUSED at ' + u); }, close: async () => {}, waitForTimeout: async () => {},",
+      "  evaluate: async () => null, $$eval: async () => [], $$: async () => [], url: () => 'about:blank', content: async () => '', keyboard: { press: async () => {} } };",
+      'const ctx = { newPage: async () => page, close: async () => {}, clearCookies: async () => {}, waitForEvent: async () => null };',
+      'export const chromium = { launch: async () => ({ newContext: async () => ctx, close: async () => {} }) };',
+    ].join('\n');
+    const sb = repoSandbox(root, 'hdj-links-defer-');
+    try {
+      sb.module('playwright', { 'package.json': JSON.stringify({ name: 'playwright', type: 'module', main: 'index.js' }), 'index.js': REFUSE_PW });
+      const t = '2026학년도 2학기 표본재단 장학생 선발 안내';
+      const LIST = 'https://board.example.ac.kr/bbs/list.do?menu=7';
+      const MARK = `${LIST}#n-${encodeURIComponent(t)}`;
+      sb.write('data/notices.json', { items: [{ title: t, url: MARK, school: '표본대학교', foundAt: '2026-10-01' }] });
+      sb.write('data/registered.json', { items: [] });
+      const r = sb.run('collector/link-hunter.mjs', [], { HUNT_BUDGET_MS: '120000', HUNT_ONLY_BOARD: '', HUNT_PATROL: '0' }, 60000);
+      const calls = (sb.read('pw-calls.log') || '').trim().split('\n').filter(Boolean);
+      const rep = sb.read('collector/link-hunt-report.md') || '';
+      const st = ((sb.json('collector/link-hunt.json') || {}).items || {})[`n:${MARK}`] || {};
+      eq('⑨ [사냥꾼 실행] 게시판이 안 열린 표적은 그날 다시 두드리지 않는다 — 여는 것은 그 게시판 세 번뿐(3단계의 다른 게시판·사이트 검색 없음) · 장부는 내일',
+        [r.status, calls, /## 3단계/.test(rep), /⏭ 이 게시판의 대상 1건은 내일 다시 봅니다/.test(rep), st.attempts || 0, !!st.nextTryAt, r.status ? r.out.slice(-300) : ''],
+        [0, [`goto ${LIST}`, `goto ${LIST}`, `goto ${LIST}`], false, true, 0, true, '']);
+      eq("  끝줄은 미룬 것을 따로 센다 — '아직 못 찾음 0건 · 게시판이 안 열려 내일로 미룬 것 1건 · 사람에게 알릴 건 0건' · 🙋 절 없음",
+        [/아직 못 찾음 0건 · 게시판이 안 열려 내일로 미룬 것 1건 · 사람에게 알릴 건 0건/.test(rep), /🙋 사람 확인 필요/.test(rep)], [true, false]);
+    } finally { sb.done(); }
+    const lh = stripComments(fs.readFileSync(new URL('collector/link-hunter.mjs', root), 'utf8'));
+    eq('⑨ 배선 — 게시판을 못 연 표적을 미룸 묶음에 넣고 · 3단계 목록에서 뺀다',
+      [/for \(const t of group\) deferredKeys\.add\(t\.key\)/.test(lh), /if \(deferredKeys\.has\(t\.key\)\) continue;[^\n]*\n\s*if \(isMarkerUrl\(t\.ref\[t\.field\]\)\) stillLost\.push\(t\)/.test(lh)],
       [true, true]);
   }
 }

@@ -99,6 +99,9 @@ let found = 0; let gone = 0; let stuck = 0;
 /* 아직 못 찾은 공고 — 숫자가 아니라 열쇠 묶음으로 센다(2026-10-05 점검 links-2): 1단계에서 실패로 센 공고를 같은 실행의 3단계가 찾아도
    숫자는 안 내려가 끝줄 '아직 못 찾음'이 부풀었다(#387: 6건 중 1건은 찾은 것). 3단계가 찾으면 뺀다. */
 const failedKeys = new Set();
+/* 게시판이 안 열려 내일로 미룬 표적 (2026-10-11 점검 links-final-1) — 리포트에 '내일 다시 봅니다'라고 적은 표적을 같은 실행의 3단계가
+   곧바로 같은 학교의 다른 게시판·사이트 검색으로 다시 두드렸다(죽은 서버에 한 건당 최대 4번 × 25초). 3단계에서 빼고 끝줄에 따로 센다. */
+const deferredKeys = new Set();
 const escalatedNow = [];   // 이번에 처음 사람에게 알리는 공고 — 리포트 머리 절(escalationLines)
 let prunedKeys = 0;        // 저장할 때 걷어 낸 장부 줄 수(pruneHuntState)
 
@@ -554,6 +557,7 @@ for (const [listUrl, group] of boards) {
   if (!opened) {
     /* 게시판이 안 열리면 그 게시판 대상 전부를 내일로 미룬다(못 읽음 — 횟수에는 안 센다 · links-14). 안 적으면 실행마다 같은 게시판을 세 번씩 다시 두드린다 */
     for (const t of group) record(t, 'net', boardUnreachableWhy(openErr));   // 문구는 한 곳 — 관리자 「죽은 링크」에 안 걸리게(원인 단정 금지)
+    for (const t of group) deferredKeys.add(t.key);                           // 3단계도 오늘은 이 표적을 두드리지 않는다(links-final-1)
     report.push(`- ⏭ 이 게시판의 대상 ${group.length}건은 내일 다시 봅니다(횟수에는 안 셉니다)`);
     await page.close().catch(() => {}); report.push(''); continue;
   }
@@ -714,6 +718,7 @@ for (const [, group] of boards) {
   for (const t of group) {
     const st = state.items[t.key] || {};
     if (st.status === 'resolved') continue;
+    if (deferredKeys.has(t.key)) continue;   // 게시판이 안 열려 내일로 미룬 표적 — 같은 학교 서버를 오늘 다시 두드리지 않는다(links-final-1)
     if (isMarkerUrl(t.ref[t.field])) stillLost.push(t);
   }
 }
@@ -875,7 +880,7 @@ function saveAll(crashNote) {
     report.push(`🚨 **로봇이 도중에 넘어졌습니다** — 여기까지 찾은 것은 저장했습니다. 넘어진 자리: \`${crashNote}\``);
     report.push('');
   }
-  report.push(`원문 주소 확보 **${found}건** · 아직 못 찾음 ${failedKeys.size}건 · 사람에게 알릴 건 ${stuck}건${DRY ? ' — 모의 실행' : ''}`);
+  report.push(`원문 주소 확보 **${found}건** · 아직 못 찾음 ${failedKeys.size}건${deferredKeys.size ? ` · 게시판이 안 열려 내일로 미룬 것 ${deferredKeys.size}건` : ''} · 사람에게 알릴 건 ${stuck}건${DRY ? ' — 모의 실행' : ''}`);
   /* 이번에 처음 알리는 공고는 머리말 바로 뒤에 — 이슈 본문(리포트 전체)의 첫 화면에서 어느 공고인지 보이게(links-2 · #387) */
   report.splice(2, 0, ...escalationLines(escalatedNow));
   report.push('');
