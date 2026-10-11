@@ -25,8 +25,9 @@ const SESSION_IN_PATH = /;jsessionid=[^/?#]*/i;   // board-links.mjs stripSessio
 const isListPlusId = (u) => LIST_PLUS_ID_RE.test(String(u || '').replace(/&(?:amp|#0*38|#x0*26);/gi, '&'));
 /* 같은 게시판 글 번호 (2026-10-03 리뷰 F4) — 목록+번호 꼴(가천 subview.do?nttId=125843 · 서울교대 selectNttList?nttId=)과
    그 글의 진짜 주소(가천 /bbs/kor/478/125843/artclView.do · 서울교대 selectNttInfo?nttSn=)는 제목 머리말이 달라([장학공지]/[공통])
-   주소 열쇠·제목 열쇠 어느 쪽으로도 안 합쳐져 같은 공고가 두 장 떴다. 이 세 꼴만 '호스트+글 번호'로 묶는다. */
-function postIdKey(raw) {
+   주소 열쇠·제목 열쇠 어느 쪽으로도 안 합쳐져 같은 공고가 두 장 떴다. 이 세 꼴만 '호스트+글 번호'로 묶는다.
+   (내보내는 까닭: 교내 소식의 '다른 글' 잣대 news-board-rules.mjs newsDistinct 가 같은 열쇠를 쓴다 — 2026-10-11 점검 feeds-R1) */
+export function postIdKey(raw) {
   let x;
   try { x = new URL(String(raw || '').replace(/&(?:amp|#0*38|#x0*26);/gi, '&')); } catch { return ''; }
   const host = x.host.replace(/^www\./, '');

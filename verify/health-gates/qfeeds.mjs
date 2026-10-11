@@ -4,6 +4,8 @@
         발행이 새 글·실린 글 구분 없이 오늘보다 뒤인 게시일을 비운다(news-kind.mjs clearFuturePosted · newsFloor 앞)
      ② 재단 새 공고 — 마감 지난 글 (collect-09 · api-01 · app2-F6): 송파 상반기 06-24·음성 09-18 이 몇 달 떠 있었다 —
         마감 다음 날까지만(CLOSED_KEEP_DAYS 와 같은 뜻) · 제목 머리 [마감] 표식 · 마감 칸 없는 옛 글은 원문 기간 줄에서 같은 판독기로 채운다 ·
+        회차가 둘 이상인 기간 줄은 마지막 회차의 끝으로(마감 칸이 없어도 · 줄 끝에서 잘린 끝은 그 글자로 가능한 가장 늦은 날 · 달도 못 읽으면 안 지운다 ·
+        마감 칸은 채우지 않는다 · 날짜 하나뿐인 발표·면접 단계는 회차가 아니다 · feeds-R2 · 리뷰 2026-10-11) ·
         소급 도구(tools/refilter-feeds.mjs)는 임시 폴더에서 진짜로 돌린다
      ③ 합집합 병합기 (app2-F7): .gitattributes 에 merge=jsonunion 이라 적은 파일마다 **병합기를 진짜로 돌려** 규칙이 있는지 본다 ·
         활동 피드는 학교 없는 글을 상한으로 자르지 않는다 · 재단 피드는 합친 뒤 발행 거름을 다시 건다(로봇이 뺀 지난 글을 되살리지 않는다) ·
@@ -22,6 +24,9 @@
      ⑪ 공공 API 서버 묶음 (api-08): 공공데이터포털 장애의 재시도 쉼이 6분 예산 하나를 먹어 멀쩡한 온통청년까지 ❌ 가 될 수 있었다 —
         서버 묶음끼리 동시에 · 묶음 안 차례 · 결과는 API_SOURCES 순서(open-api-map.mjs runSourceGroups) · 진짜 로봇을 열쇠 없이 임시 폴더에서
      ⑫ robots.txt 를 누가 묻나 (api-13 · 지금 정책 유지): 대외활동·재단 출처는 학교 사이트라도 지키고 학교 장학·소식 게시판은 묻지 않는다 — 머리말과 배선이 같은지
+     ⑬ 같은 이름 다른 소식 (feeds-R1): 항공대 「대학 캠퍼스 방송 촬영 안내」 9-30·10-07 두 글이 제목 소급(폭 없는 공백 제거) 뒤 제목 열쇠 하나로 합쳐져 옛 글이 지워졌다 —
+        news-board-rules.mjs newsDistinct 한 곳(진짜 주소 둘이 다른 글을 가리키고 게시일도 다르면 다른 글 · 휘발 값만 다르면 같은 글) · 진짜 소식 로봇(예산 0)과 git 병합기를 돌려 잰다 ·
+        반대쪽(리뷰 2026-10-11): 이화 상세 주소의 목록 상태 값 no= 는 같은 글에서도 실행마다 바뀐다 — 게시일이 같으면 주소가 달라도 한 건(두 벌로 실려 옛 글 10건을 밀어냈다)
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
 import os from 'node:os';
@@ -37,8 +42,8 @@ import { activityKind } from '../../collector/activity-kind.mjs';
 import { isAttachmentEntry } from '../../collector/attachment-link.mjs';
 import { dropReason as extDropReason, fillDeadlineFromHint, tidyExternal } from '../../collector/external-clean.mjs';
 import { activityDetails, eligLineOk, sanitizeElig } from '../../collector/activity-excerpts.mjs';
-import { boardKey, dropRetiredBoards } from '../../collector/news-board-rules.mjs';
-import { urlKey } from '../../collector/url-key.mjs';
+import { boardKey, dropRetiredBoards, newsDistinct, collapseSamePost } from '../../collector/news-board-rules.mjs';
+import { urlKey, dedupeNotices } from '../../collector/url-key.mjs';
 import { netReason } from '../../collector/fetch-board.mjs';
 import { actKeepDate, capActivities, runSourceGroups, API_SOURCES } from '../../collector/open-api-map.mjs';
 
@@ -100,6 +105,34 @@ export default async function qfeeds(eq, ctx) {
     eq('  수집 로봇이 발행 때 거름(map(tidyExternal)) 앞에서 수집과 같은 판독기로 채운다',
       before(collectSrc, 'fillDeadlineFromHint(n, (t) => activityExcerpts(t).deadline)', 'ext.items = ext.items.map(tidyExternal)'), true);
 
+    /* 회차가 둘 이상인 기간 줄 (feeds-R2) — 마감 칸은 판독기가 읽은 1차 끝(09-15 · 10-05)이다. 마지막 회차의 끝으로 본다 */
+    const R2 = '신청기간: 1차 2026. 9. 1. ~ 9. 15. / 2차 2026. 10. 1. ~ 10. 31.';
+    const R2b = '접수기간 - 1차(6종) : 2026. 10. 1.(화) ~ 10. 5.(금) 18:00 - 2차(3종) : 2026. 10. 13.(월) ~ 10. 30.(금)';
+    const PAST = '접수기간 - 1차 : 2026. 3. 3.(화) ~ 3. 20.(금) - 2차 : 2026. 3. 23.(월) ~ 4. 3.(금)';
+    const CUT = '접수기간 - 1차(6종) : 2026. 3. 3.(화) ~ 3. 20.(금) 18:00 - 2차(3종) : 2026. 3. 23.(월) ~ 3.';
+    const G = (deadline, deadlineHint, today = T) => extDropReason(tidyExternal({ title: '2026년 장학생 선발 공고', deadline, deadlineHint }), today);
+    eq('  회차 둘 — 1차가 지나도 2차가 열려 있으면 남긴다 · 회차가 모두 지나면 뺀다 · 2차 끝 다음 날까지는 남긴다',
+      [G('2026-09-15', R2), G('2026-10-05', R2b, '2026-10-12'), G('2026-03-20', PAST), G('2026-09-15', R2, '2026-11-02'), G('2026-09-15', R2, '2026-11-01')],
+      [null, null, '마감 지남', '마감 지남', null]);
+    /* 줄 끝(80자)에서 잘린 끝 날짜 (리뷰 2026-10-11) — 김해 상반기 `… 2차(3종) : 2026. 3. 23.(월) ~ 3.` 은 마감 칸 없이 실려 있었다.
+       못 읽는다고 남기면 3월 공고가 수집일 60일까지 홈에 뜬다 → 그 글자로 가능한 가장 늦은 날(상한)로 판정한다 */
+    const OPEN = (tail) => `접수기간 - 1차 : 2026. 9. 1.(화) ~ 9. 15.(화) - 2차 : 2026. 9. 28.(월)${tail}`;
+    eq('  잘린 끝은 상한으로 — 「~ 3.」은 3월 말일까지라 회차가 모두 지났다(마감 칸이 없어도 뺀다) · 「~ 2026.10.2」는 10-29 까지(다음 날까지 남기고 그 뒤 뺀다)',
+      [G('2026-03-20', CUT), G(undefined, CUT), G('2026-09-15', OPEN(' ~ 2026.10.2'), '2026-10-30'), G('2026-09-15', OPEN(' ~ 2026.10.2'), '2026-10-31')],
+      ['마감 지남', '마감 지남', null, '마감 지남']);
+    eq('  2차가 아직 열려 있는데 끝이 잘렸으면 남긴다 — 「~ 10.」(10월 말일까지) · 「~ 10. 2」(10-29) · 달을 못 읽는 「~」·「~ 1」 · 「~」 앞에서 잘린 칸',
+      [G('2026-09-15', OPEN(' ~ 10.')), G('2026-09-15', OPEN(' ~ 10. 2')), G('2026-09-15', OPEN(' ~')), G('2026-09-15', OPEN(' ~ 1')), G('2026-09-15', OPEN(''))],
+      [null, null, null, null, null]);
+    /* 날짜가 딸린 선발 단계 (리뷰 2026-10-11) — 발표·면접은 날짜 하나뿐이라 접수 회차가 아니다. 세면 끝을 못 읽어 영영 안 지웠다 */
+    const STAGE1 = '신청기간: 2026. 9. 1.(월) ~ 9. 15.(월) 1차 서류심사 결과발표: 9. 22. 2차 면접: 9. 26.';
+    const STAGE2 = '접수: 2026. 9. 1. ~ 9. 15. / 1차 발표: 9. 20. / 2차 면접: 9. 25.';
+    eq('  날짜 없는 「1차 서류전형 > 2차 면접」 · 날짜 하나뿐인 「1차 … 결과발표: 9. 22. 2차 면접: 9. 26.」·「1차 발표 / 2차 면접」은 회차 줄이 아니다(마감 칸으로 뺀다)',
+      [G('2026-09-18', '접수 기간 : 2026. 9. 1. ~ 9. 18. 선발 방법 : 1차 서류전형 > 2차 면접'), G('2026-09-15', STAGE1), G('2026-09-15', STAGE2)],
+      ['마감 지남', '마감 지남', '마감 지남']);
+    const cut = { title: 'k', deadlineHint: CUT };
+    eq('  회차가 둘 이상인 줄은 마감 칸을 채우지 않는다(판독기가 1차 끝을 읽어 학생 화면에 「마감」으로 보인다)',
+      [fillDeadlineFromHint(cut, () => '2026-03-20'), 'deadline' in cut], [false, false]);
+
     /* 소급 도구(tools/refilter-feeds.mjs)를 임시 폴더에서 진짜로 돌린다 — 날짜는 오늘과 상관없게(2020·2099) */
     const sb = sandbox(root, 'hdj-qfeeds-refilter-');
     try {
@@ -111,15 +144,18 @@ export default async function qfeeds(eq, ctx) {
         { title: '영동군민장학생 선발 알림', url: 'https://a.example.or.kr/2', host: '영동군', deadlineHint: '신청기간 : 2020. 8. 31.(월) ～ 2020. 9. 18.(금)' },
         { title: "[마감] '원거리 진학 대학생 주거 장학금' 대상자 모집", url: 'https://a.example.or.kr/3', host: '고속도로장학재단' },
         { title: '하반기 장학생 선발 공고', url: 'https://a.example.or.kr/4', host: '송파구', deadline: '2099-12-31' },
+        { title: '상반기 장학생 선발 공고', url: 'https://a.example.or.kr/5', host: '김해시', deadlineHint: '접수기간 - 1차(6종) : 2020. 3. 3.(화) ~ 3. 20.(금) 18:00 - 2차(3종) : 2020. 3. 23.(월) ~ 3.' },
+        { title: '상반기 장학생 선발 공고', url: 'https://a.example.or.kr/6', host: '김해시', deadlineHint: '접수기간 - 1차(6종) : 2099. 3. 3.(화) ~ 3. 20.(금) 18:00 - 2차(3종) : 2099. 3. 23.(월) ~ 3.' },
       ] };
       sb.write('data/external.json', JSON.stringify(EXT, null, 1));
       const dry = sb.run('tools/refilter-feeds.mjs');
       const unchanged = sb.read('data/external.json') === JSON.stringify(EXT, null, 1);
       const w = sb.run('tools/refilter-feeds.mjs', ['--write']);
       const out = sb.json('data/external.json');
-      eq('  [소급 도구] 보기만 하면 안 쓴다 · --write 면 마감 지남(칸·기간 줄)·마감 표식을 빼고 열린 글만 · 로봇과 같은 저장 꼴',
-        [dry.status, unchanged, w.status, (out?.items || []).map((n) => n.url.slice(-1)), sb.read('data/external.json') === JSON.stringify(out, null, 1)],
-        [0, true, 0, ['4'], true]);
+      eq('  [소급 도구] 보기만 하면 안 쓴다 · --write 면 마감 지남(칸·기간 줄 · 잘린 회차 줄)·마감 표식을 빼고 열린 글만(회차 줄엔 마감 칸을 안 채운다) · 로봇과 같은 저장 꼴',
+        [dry.status, unchanged, w.status, (out?.items || []).map((n) => n.url.slice(-1)), (out?.items || []).find((n) => n.url.endsWith('/6'))?.deadline ?? null,
+          sb.read('data/external.json') === JSON.stringify(out, null, 1)],
+        [0, true, 0, ['4', '6'], null, true]);
     } finally { sb.done(); }
   }
 
@@ -417,5 +453,89 @@ export default async function qfeeds(eq, ctx) {
       [/대외활동·재단 출처는 학교 사이트에 있어도/.test(head), /장학 게시판/.test(head) && /소식 게시판/.test(head) && /묻지 않는다/.test(head)], [true, true]);
     eq('  배선이 정책과 같다 — 장학 수집기는 활동·재단 출처만 묻고(역할로 가른다) · 소식 로봇은 묻지 않는다',
       [/if \(\(isAct \|\| isExt\) && !\(await robotsAllows\(s\.boardUrl\)\)\)/.test(collectSrc), /robotsAllows|robots\.mjs/.test(newsSrc)], [true, false]);
+  }
+
+  /* ── ⑬ 같은 이름으로 되풀이되는 소식은 다른 글이다 (feeds-R1) ── */
+  {
+    const KAU = (seq) => `https://kau.example.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=${seq}`;
+    const KMU = (ref, uid) => `https://www.kmu.example.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=${ref}&pageOrder=0&cmd=2&parm_bod_uid=${uid}&mnu_uid=143&`;
+    const LIST = 'https://u.example.ac.kr/board/list.do';
+    const S = '한국항공대학교';
+    const a = { school: S, url: KAU(11303), title: '대학 캠퍼스 방송 촬영 안내', postedAt: '2026-10-07' };
+    const b = { school: S, url: KAU(11243), title: '대학 캠퍼스 방송 촬영 안내', postedAt: '2026-09-30' };
+    eq('⑬ newsDistinct — 진짜 주소 둘이 다른 글(seq)을 가리키고 게시일도 다르면 다른 글 · 휘발 값(pageRef)만 다르면 같은 글 · 같은 게시판 체계의 글 번호(목록+번호 ↔ 상세)는 같은 글',
+      [newsDistinct(a, b), newsDistinct({ url: KMU(271262, 271221) }, { url: KMU(271232, 271221) }),
+        newsDistinct({ url: 'https://www.snue.example.ac.kr/snue/na/ntt/selectNttList.do?mi=1309&bbsId=1082&nttId=55339' }, { url: 'https://www.snue.example.ac.kr/snue/na/ntt/selectNttInfo.do?mi=1309&bbsId=1082&nttSn=55339' })],
+      [true, false, false]);
+    /* 이화형 (리뷰 2026-10-11) — 상세 주소의 no= 는 목록 상태 값이라 같은 글(articleNo)에서도 실행마다 바뀐다(371 → 365). 주소 열쇠(urlKey)는 그 값을 몰라
+       '다른 글'로 보면 같은 글이 두 벌 실린다. 게시일이 같거나 없으면 '다른 글'이라 단정하지 않는다(제목 열쇠로 합친다) */
+    const EW = (no) => `https://www.ewha.example.ac.kr/ewha/news/notice.do?mode=view&articleNo=367207&article.offset=0&articleLimit=10&no=${no}`;
+    const e1 = { school: '이화여자대학교', url: EW(365), title: '[학부] 2026학년도 제2학기 영어 및 정보인증제 신청 안내', postedAt: '2026-10-01' };
+    const e2 = { ...e1, url: EW(371) };
+    eq('  게시일이 같거나 없으면 주소가 달라도 다른 글이라 단정하지 않는다 — 이화 같은 글(articleNo 같음 · no=365·371) · 같은 날 같은 이름 · 게시일 없는 같은 이름',
+      [newsDistinct(e1, e2), newsDistinct({ ...a, postedAt: '2026-10-07' }, { ...b, postedAt: '2026-10-07' }), newsDistinct({ ...a, postedAt: undefined }, { ...b, postedAt: undefined })],
+      [false, false, false]);
+    eq('  목록 표식(#n-)은 예전대로 — 같은 표식은 글 번호로만 가르고 · 표식과 진짜 주소는 제목 열쇠로 합친다 · 글 번호가 같으면 주소가 달라도 같은 글',
+      [newsDistinct({ url: `${LIST}#n-a`, postId: '41' }, { url: `${LIST}#n-a`, postId: '42' }), newsDistinct({ url: `${LIST}#n-a` }, { url: KAU(1) }),
+        newsDistinct({ url: KAU(1), postId: '7' }, { url: KAU(2), postId: '7' })],
+      [true, false, false]);
+    /* 발행과 같은 차례(collapseSamePost → dedupeNotices) — 제목 소급(폭 없는 공백 제거) 뒤에도 두 글이 남는다 */
+    const pub = (items) => dedupeNotices(collapseSamePost(items), { distinct: newsDistinct });
+    eq('  [발행 차례] 같은 제목 · 다른 seq 두 글은 둘 다 남는다 · pageRef 만 다른 계명대 짝은 하나로 합친다 · no= 만 다른 이화 같은 글은 한 건',
+      [pub([a, b]).length, pub([{ school: '계명대학교', url: KMU(271262, 271221), title: 'ISIC 국제학생증 발급 이벤트 안내' }, { school: '계명대학교', url: KMU(271232, 271221), title: 'ISIC 국제학생증 발급' }]).length,
+        pub([e2, e1]).length],
+      [2, 1, 1]);
+
+    /* 진짜 소식 로봇을 임시 폴더에서 — 예산 0(게시판을 안 두드린다)으로 발행만. 9-30 글의 제목 머리 폭 없는 공백은 소급이 지운다 */
+    const sb = sandbox(root, 'hdj-qfeeds-news3-');
+    try {
+      const kst = (d = 0) => new Date(Date.now() + 9 * 3600000 - d * 86400000).toISOString().slice(0, 10);
+      const keyOf = require('../../match-engine.js').noticeFileKey;
+      sb.write('collector/news-sources.json', { sources: [
+        { school: S, campus: '', boardUrl: 'https://kau.example.ac.kr/kaulife/notice.php?code=s1101' },
+        { school: '계명대학교', campus: '', boardUrl: 'https://www.kmu.example.ac.kr/uni/main/page.jsp?mnu_uid=143' },
+        { school: '이화여자대학교', campus: '', boardUrl: 'https://www.ewha.example.ac.kr/ewha/news/notice.do' },
+      ] });
+      sb.write('collector/news-config.json', {});
+      sb.write(`data/news/${keyOf(S)}.json`, { school: S, updatedAt: kst(1), items: [
+        { school: S, campus: '', url: KAU(11303), title: '대학 캠퍼스 방송 촬영 안내', foundAt: kst(3), postedAt: kst(4) },
+        { school: S, campus: '', url: KAU(11243), title: '​대학 캠퍼스 방송 촬영 안내', foundAt: kst(10), postedAt: kst(11) },
+      ] });
+      sb.write(`data/news/${keyOf('계명대학교')}.json`, { school: '계명대학교', updatedAt: kst(1), items: [
+        { school: '계명대학교', campus: '', url: KMU(271262, 271221), title: '2026학년도 2학기 ISIC 국제학생증(하나카드) 발급 이벤트 안내', foundAt: kst(2) },
+        { school: '계명대학교', campus: '', url: KMU(271232, 271221), title: '2026학년도 2학기 ISIC 국제학생증(하나카드) 발급', foundAt: kst(3) },
+      ] });
+      /* 이화 — 지난 실행이 no=365 판을, 이번 실행이 no=371 판을 실은 꼴(같은 글 · 같은 게시일) */
+      sb.write(`data/news/${keyOf('이화여자대학교')}.json`, { school: '이화여자대학교', updatedAt: kst(1), items: [
+        { ...e2, campus: '', foundAt: kst(1), postedAt: kst(5) },
+        { ...e1, campus: '', foundAt: kst(4), postedAt: kst(5) },
+      ] });
+      const r = sb.run('collector/collect-news.mjs', [], { NEWS_BUDGET_MS: '0' });
+      const kau = (sb.json(`data/news/${keyOf(S)}.json`)?.items || []);
+      const kmu = (sb.json(`data/news/${keyOf('계명대학교')}.json`)?.items || []);
+      const ewha = (sb.json(`data/news/${keyOf('이화여자대학교')}.json`)?.items || []);
+      eq('  [소식 로봇 실행] 항공대 같은 이름 두 글(seq 11303·11243)이 발행 뒤 둘 다 남고 제목은 소급돼 같다 · 계명대 pageRef 만 다른 짝은 한 건 · 이화 no= 만 다른 같은 글은 한 건',
+        [r.status, kau.map((n) => n.url.split('seq=')[1]).sort(), [...new Set(kau.map((n) => n.title))], kmu.length, ewha.length],
+        [0, ['11243', '11303'], ['대학 캠퍼스 방송 촬영 안내'], 1, 1]);
+      if (r.status !== 0) console.log(r.out.slice(-800));
+    } finally { sb.done(); }
+
+    /* git 병합기도 같은 잣대(newsDistinct) — 두 쪽에 하나씩 있는 같은 이름 다른 글을 둘 다 남긴다 */
+    const merger = fileURLToPath(new URL('tools/merge-json-union.mjs', root));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-qfeeds-merge2-'));
+    try {
+      const f = (n, x) => { const p = path.join(dir, n); fs.writeFileSync(p, JSON.stringify(x, null, 1)); return p; };
+      const o = f('o.json', { school: S, updatedAt: '2026-10-07', items: [{ ...a, foundAt: '2026-10-07' }] });
+      const m = spawnSync(process.execPath, [merger, f('b.json', {}), o, f('t.json', { school: S, updatedAt: '2026-10-01', items: [{ ...b, foundAt: '2026-10-01' }] }), 'data/news/n1as48ix.json'], { encoding: 'utf8', env: cleanEnv() });
+      let got = null;
+      try { got = JSON.parse(fs.readFileSync(o, 'utf8')).items.map((n) => n.url.split('seq=')[1]); } catch { /* 못 읽음 */ }
+      eq('  [병합기 실행] 소식 파일 — 같은 제목 · 다른 seq 두 글을 둘 다 남긴다', [m.status, got], [0, ['11303', '11243']]);
+      /* 이화 — 두 쪽이 같은 글을 no= 만 다른 주소로 들고 있으면 한 건 */
+      const o2 = f('o2.json', { school: '이화여자대학교', updatedAt: '2026-10-07', items: [{ ...e2, foundAt: '2026-10-07' }] });
+      const m2 = spawnSync(process.execPath, [merger, f('b2.json', {}), o2, f('t2.json', { school: '이화여자대학교', updatedAt: '2026-10-05', items: [{ ...e1, foundAt: '2026-10-05' }] }), 'data/news/n1tk2q9m.json'], { encoding: 'utf8', env: cleanEnv() });
+      let got2 = null;
+      try { got2 = JSON.parse(fs.readFileSync(o2, 'utf8')).items.length; } catch { /* 못 읽음 */ }
+      eq('  [병합기 실행] 소식 파일 — no= 만 다른 이화 같은 글(같은 게시일)은 한 건', [m2.status, got2], [0, 1]);
+    } finally { fs.rmSync(dir, { recursive: true, force: true }); }
   }
 }
