@@ -1,19 +1,23 @@
 {
  "note": "학교별 교내 소식 파일 색인 (data/news/). 앱은 match-engine.js newsFileFor(noticeFileKey) 로 자기 학교 파일을 바로 받는다 — 옛 통짜 파일로 물러나는 길은 없다. check-live.yml 이 이 색인의 학교 전부를 확인한다.",
- "updatedAt": "2026-10-10",
+ "updatedAt": "2026-10-11",
  "schools": 44,
  "files": {
-  "성균관대학교": {
-   "file": "n1x6ubj9.json",
+  "국민대학교": {
+   "file": "n1tasrsl.json",
+   "count": 17
+  },
+  "이화여자대학교": {
+   "file": "n1tk2q9m.json",
    "count": 40
   },
   "서울과학기술대학교": {
    "file": "n14kv35j.json",
    "count": 19
   },
-  "국민대학교": {
-   "file": "n1tasrsl.json",
-   "count": 16
+  "성균관대학교": {
+   "file": "n1x6ubj9.json",
+   "count": 40
   },
   "아주대학교": {
    "file": "n16dvfry.json",
@@ -26,10 +30,6 @@
   "계명대학교": {
    "file": "n1nel147.json",
    "count": 34
-  },
-  "이화여자대학교": {
-   "file": "n1tk2q9m.json",
-   "count": 40
   },
   "전남대학교": {
    "file": "nwqmwga.json",

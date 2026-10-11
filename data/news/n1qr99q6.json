@@ -1,6 +1,6 @@
 {
  "school": "조선대학교",
- "updatedAt": "2026-10-10",
+ "updatedAt": "2026-10-11",
  "items": [
   {
    "title": "[앵커사업단](최대 325만원 지원)(5차시 이내)온라인 콘텐츠(High-Tech) 개발 공모",
@@ -38,7 +38,8 @@
    "school": "조선대학교",
    "campus": "",
    "foundAt": "2026-10-06",
-   "thumb": "data/news/img/cf09d0f1cd72f19b.webp"
+   "thumb": "data/news/img/cf09d0f1cd72f19b.webp",
+   "desc": "교육혁신원 교육과정관리팀에서는 재학생들의 핵심역량 진단 결과를 통한 우수 , 취약 역량 파악 및 개선사항 도출을 위해 재학생들의 CSU- 핵심역량 (3C 역량 ) 진단을 아래와 같이 시행하오니 재학생 여러분의 많은…"
   },
   {
    "title": "[취업전략팀] 이트너스 취업설명회",
@@ -48,7 +49,8 @@
    "school": "조선대학교",
    "campus": "",
    "foundAt": "2026-10-06",
-   "thumb": "data/news/img/73adf4a241fda2cb.webp"
+   "thumb": "data/news/img/73adf4a241fda2cb.webp",
+   "desc": "대학혁신지원사업의 일환으로 \"인사·총무부터 플랫폼까지, 경영지원 전문기업\" 이트너스 채용설명회를 실시합니다."
   },
   {
    "title": "[홍보팀] 나만의 AI 도우미 ‘CSU AI’ 이용 안내",
@@ -57,7 +59,8 @@
    "school": "조선대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "thumb": "data/news/img/bf3d9b48de2d410e.webp"
+   "thumb": "data/news/img/bf3d9b48de2d410e.webp",
+   "desc": "조선대학교 구성원이라면 누구나 포털시스템에서 GPT·Claude·Gemini 등 다양한 AI를 한곳에서 이용할 수 있습니다."
   },
   {
    "title": "[THE조아] 2026년 10월 비교과 프로그램 안내",
@@ -65,7 +68,8 @@
    "postedAt": "2026-10-02",
    "school": "조선대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-02",
+   "desc": "프로그램에 대한 자세한 내용 확인 및 프로그램 신청은 THE조아시스템에서 가능합니다!"
   },
   {
    "title": "[G-LAMP사업단] 2026 하반기 블루밍 라운지(Blooming Rounge) 참여교원 모집공고",

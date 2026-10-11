@@ -1,6 +1,6 @@
 {
  "school": "서강대학교",
- "updatedAt": "2026-10-10",
+ "updatedAt": "2026-10-11",
  "items": [
   {
    "title": "[CGSI] 10월 16일 콜로키움 안내",
@@ -56,7 +56,8 @@
    "campus": "",
    "board": "행사특강",
    "foundAt": "2026-10-04",
-   "thumb": "data/news/img/f88bb6f2d533db97.webp"
+   "thumb": "data/news/img/f88bb6f2d533db97.webp",
+   "desc": "초청작가: 정지아 대담: 예소연 사회: 류일환(서강대학교 사학과) 참가 신청: 사전 예약 링크[ https://forms.gle/6Q585XS7XbAaZwcf7 ]"
   },
   {
    "title": "[HUSS 포용사회사업단] 제7회 포용사회와 정책인문학포럼 안내 (9/3)",
