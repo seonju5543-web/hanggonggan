@@ -24,7 +24,8 @@
         서버 묶음끼리 동시에 · 묶음 안 차례 · 결과는 API_SOURCES 순서(open-api-map.mjs runSourceGroups) · 진짜 로봇을 열쇠 없이 임시 폴더에서
      ⑫ robots.txt 를 누가 묻나 (api-13 · 지금 정책 유지): 대외활동·재단 출처는 학교 사이트라도 지키고 학교 장학·소식 게시판은 묻지 않는다 — 머리말과 배선이 같은지
      ⑬ 같은 이름 다른 소식 (feeds-R1): 항공대 「대학 캠퍼스 방송 촬영 안내」 9-30·10-07 두 글이 제목 소급(폭 없는 공백 제거) 뒤 제목 열쇠 하나로 합쳐져 옛 글이 지워졌다 —
-        news-board-rules.mjs newsDistinct 한 곳(진짜 주소 둘이 다른 글을 가리키면 다른 글 · 휘발 값만 다르면 같은 글) · 진짜 소식 로봇(예산 0)과 git 병합기를 돌려 잰다
+        news-board-rules.mjs newsDistinct 한 곳(진짜 주소 둘이 다른 글을 가리키고 게시일도 다르면 다른 글 · 휘발 값만 다르면 같은 글) · 진짜 소식 로봇(예산 0)과 git 병합기를 돌려 잰다 ·
+        반대쪽(리뷰 2026-10-11): 이화 상세 주소의 목록 상태 값 no= 는 같은 글에서도 실행마다 바뀐다 — 게시일이 같으면 주소가 달라도 한 건(두 벌로 실려 옛 글 10건을 밀어냈다)
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
 import os from 'node:os';
@@ -443,21 +444,30 @@ export default async function qfeeds(eq, ctx) {
     const KMU = (ref, uid) => `https://www.kmu.example.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=${ref}&pageOrder=0&cmd=2&parm_bod_uid=${uid}&mnu_uid=143&`;
     const LIST = 'https://u.example.ac.kr/board/list.do';
     const S = '한국항공대학교';
-    const a = { school: S, url: KAU(11303), title: '대학 캠퍼스 방송 촬영 안내' };
-    const b = { school: S, url: KAU(11243), title: '대학 캠퍼스 방송 촬영 안내' };
-    eq('⑬ newsDistinct — 진짜 주소 둘이 다른 글(seq)을 가리키면 다른 글 · 휘발 값(pageRef)만 다르면 같은 글 · 같은 게시판 체계의 글 번호(목록+번호 ↔ 상세)는 같은 글',
+    const a = { school: S, url: KAU(11303), title: '대학 캠퍼스 방송 촬영 안내', postedAt: '2026-10-07' };
+    const b = { school: S, url: KAU(11243), title: '대학 캠퍼스 방송 촬영 안내', postedAt: '2026-09-30' };
+    eq('⑬ newsDistinct — 진짜 주소 둘이 다른 글(seq)을 가리키고 게시일도 다르면 다른 글 · 휘발 값(pageRef)만 다르면 같은 글 · 같은 게시판 체계의 글 번호(목록+번호 ↔ 상세)는 같은 글',
       [newsDistinct(a, b), newsDistinct({ url: KMU(271262, 271221) }, { url: KMU(271232, 271221) }),
         newsDistinct({ url: 'https://www.snue.example.ac.kr/snue/na/ntt/selectNttList.do?mi=1309&bbsId=1082&nttId=55339' }, { url: 'https://www.snue.example.ac.kr/snue/na/ntt/selectNttInfo.do?mi=1309&bbsId=1082&nttSn=55339' })],
       [true, false, false]);
+    /* 이화형 (리뷰 2026-10-11) — 상세 주소의 no= 는 목록 상태 값이라 같은 글(articleNo)에서도 실행마다 바뀐다(371 → 365). 주소 열쇠(urlKey)는 그 값을 몰라
+       '다른 글'로 보면 같은 글이 두 벌 실린다. 게시일이 같거나 없으면 '다른 글'이라 단정하지 않는다(제목 열쇠로 합친다) */
+    const EW = (no) => `https://www.ewha.example.ac.kr/ewha/news/notice.do?mode=view&articleNo=367207&article.offset=0&articleLimit=10&no=${no}`;
+    const e1 = { school: '이화여자대학교', url: EW(365), title: '[학부] 2026학년도 제2학기 영어 및 정보인증제 신청 안내', postedAt: '2026-10-01' };
+    const e2 = { ...e1, url: EW(371) };
+    eq('  게시일이 같거나 없으면 주소가 달라도 다른 글이라 단정하지 않는다 — 이화 같은 글(articleNo 같음 · no=365·371) · 같은 날 같은 이름 · 게시일 없는 같은 이름',
+      [newsDistinct(e1, e2), newsDistinct({ ...a, postedAt: '2026-10-07' }, { ...b, postedAt: '2026-10-07' }), newsDistinct({ ...a, postedAt: undefined }, { ...b, postedAt: undefined })],
+      [false, false, false]);
     eq('  목록 표식(#n-)은 예전대로 — 같은 표식은 글 번호로만 가르고 · 표식과 진짜 주소는 제목 열쇠로 합친다 · 글 번호가 같으면 주소가 달라도 같은 글',
       [newsDistinct({ url: `${LIST}#n-a`, postId: '41' }, { url: `${LIST}#n-a`, postId: '42' }), newsDistinct({ url: `${LIST}#n-a` }, { url: KAU(1) }),
         newsDistinct({ url: KAU(1), postId: '7' }, { url: KAU(2), postId: '7' })],
       [true, false, false]);
     /* 발행과 같은 차례(collapseSamePost → dedupeNotices) — 제목 소급(폭 없는 공백 제거) 뒤에도 두 글이 남는다 */
     const pub = (items) => dedupeNotices(collapseSamePost(items), { distinct: newsDistinct });
-    eq('  [발행 차례] 같은 제목 · 다른 seq 두 글은 둘 다 남는다 · pageRef 만 다른 계명대 짝은 하나로 합친다',
-      [pub([a, b]).length, pub([{ school: '계명대학교', url: KMU(271262, 271221), title: 'ISIC 국제학생증 발급 이벤트 안내' }, { school: '계명대학교', url: KMU(271232, 271221), title: 'ISIC 국제학생증 발급' }]).length],
-      [2, 1]);
+    eq('  [발행 차례] 같은 제목 · 다른 seq 두 글은 둘 다 남는다 · pageRef 만 다른 계명대 짝은 하나로 합친다 · no= 만 다른 이화 같은 글은 한 건',
+      [pub([a, b]).length, pub([{ school: '계명대학교', url: KMU(271262, 271221), title: 'ISIC 국제학생증 발급 이벤트 안내' }, { school: '계명대학교', url: KMU(271232, 271221), title: 'ISIC 국제학생증 발급' }]).length,
+        pub([e2, e1]).length],
+      [2, 1, 1]);
 
     /* 진짜 소식 로봇을 임시 폴더에서 — 예산 0(게시판을 안 두드린다)으로 발행만. 9-30 글의 제목 머리 폭 없는 공백은 소급이 지운다 */
     const sb = sandbox(root, 'hdj-qfeeds-news3-');
@@ -467,6 +477,7 @@ export default async function qfeeds(eq, ctx) {
       sb.write('collector/news-sources.json', { sources: [
         { school: S, campus: '', boardUrl: 'https://kau.example.ac.kr/kaulife/notice.php?code=s1101' },
         { school: '계명대학교', campus: '', boardUrl: 'https://www.kmu.example.ac.kr/uni/main/page.jsp?mnu_uid=143' },
+        { school: '이화여자대학교', campus: '', boardUrl: 'https://www.ewha.example.ac.kr/ewha/news/notice.do' },
       ] });
       sb.write('collector/news-config.json', {});
       sb.write(`data/news/${keyOf(S)}.json`, { school: S, updatedAt: kst(1), items: [
@@ -477,12 +488,18 @@ export default async function qfeeds(eq, ctx) {
         { school: '계명대학교', campus: '', url: KMU(271262, 271221), title: '2026학년도 2학기 ISIC 국제학생증(하나카드) 발급 이벤트 안내', foundAt: kst(2) },
         { school: '계명대학교', campus: '', url: KMU(271232, 271221), title: '2026학년도 2학기 ISIC 국제학생증(하나카드) 발급', foundAt: kst(3) },
       ] });
+      /* 이화 — 지난 실행이 no=365 판을, 이번 실행이 no=371 판을 실은 꼴(같은 글 · 같은 게시일) */
+      sb.write(`data/news/${keyOf('이화여자대학교')}.json`, { school: '이화여자대학교', updatedAt: kst(1), items: [
+        { ...e2, campus: '', foundAt: kst(1), postedAt: kst(5) },
+        { ...e1, campus: '', foundAt: kst(4), postedAt: kst(5) },
+      ] });
       const r = sb.run('collector/collect-news.mjs', [], { NEWS_BUDGET_MS: '0' });
       const kau = (sb.json(`data/news/${keyOf(S)}.json`)?.items || []);
       const kmu = (sb.json(`data/news/${keyOf('계명대학교')}.json`)?.items || []);
-      eq('  [소식 로봇 실행] 항공대 같은 이름 두 글(seq 11303·11243)이 발행 뒤 둘 다 남고 제목은 소급돼 같다 · 계명대 pageRef 만 다른 짝은 한 건',
-        [r.status, kau.map((n) => n.url.split('seq=')[1]).sort(), [...new Set(kau.map((n) => n.title))], kmu.length],
-        [0, ['11243', '11303'], ['대학 캠퍼스 방송 촬영 안내'], 1]);
+      const ewha = (sb.json(`data/news/${keyOf('이화여자대학교')}.json`)?.items || []);
+      eq('  [소식 로봇 실행] 항공대 같은 이름 두 글(seq 11303·11243)이 발행 뒤 둘 다 남고 제목은 소급돼 같다 · 계명대 pageRef 만 다른 짝은 한 건 · 이화 no= 만 다른 같은 글은 한 건',
+        [r.status, kau.map((n) => n.url.split('seq=')[1]).sort(), [...new Set(kau.map((n) => n.title))], kmu.length, ewha.length],
+        [0, ['11243', '11303'], ['대학 캠퍼스 방송 촬영 안내'], 1, 1]);
       if (r.status !== 0) console.log(r.out.slice(-800));
     } finally { sb.done(); }
 
@@ -496,6 +513,12 @@ export default async function qfeeds(eq, ctx) {
       let got = null;
       try { got = JSON.parse(fs.readFileSync(o, 'utf8')).items.map((n) => n.url.split('seq=')[1]); } catch { /* 못 읽음 */ }
       eq('  [병합기 실행] 소식 파일 — 같은 제목 · 다른 seq 두 글을 둘 다 남긴다', [m.status, got], [0, ['11303', '11243']]);
+      /* 이화 — 두 쪽이 같은 글을 no= 만 다른 주소로 들고 있으면 한 건 */
+      const o2 = f('o2.json', { school: '이화여자대학교', updatedAt: '2026-10-07', items: [{ ...e2, foundAt: '2026-10-07' }] });
+      const m2 = spawnSync(process.execPath, [merger, f('b2.json', {}), o2, f('t2.json', { school: '이화여자대학교', updatedAt: '2026-10-05', items: [{ ...e1, foundAt: '2026-10-05' }] }), 'data/news/n1tk2q9m.json'], { encoding: 'utf8', env: cleanEnv() });
+      let got2 = null;
+      try { got2 = JSON.parse(fs.readFileSync(o2, 'utf8')).items.length; } catch { /* 못 읽음 */ }
+      eq('  [병합기 실행] 소식 파일 — no= 만 다른 이화 같은 글(같은 게시일)은 한 건', [m2.status, got2], [0, 1]);
     } finally { fs.rmSync(dir, { recursive: true, force: true }); }
   }
 }

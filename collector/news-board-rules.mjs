@@ -414,12 +414,17 @@ export const newsPostKey = (n) => `${n.school}|${n.postId}`;
    ② 목록 표식(#n-)이 아닌 진짜 주소 둘이 가리키는 글이 다르면 다른 글 (2026-10-11 점검 feeds-R1) — 같은 이름으로 되풀이되는 공지
       (항공대 「대학 캠퍼스 방송 촬영 안내」 seq=11243·11303 · 글 번호 칸 없음)가 제목 열쇠 하나로 합쳐져 옛 글이 지워지고, 장부에 남아 돌아오지 않았다
       (제목 소급이 둘을 갈라 주던 폭 없는 공백을 지우자 실제로 터졌다). 가리키는 글 = urlKey(휘발 값을 뗀 주소 — 계명대 같은 글이 pageRef 만 달라도 하나) ·
-      같은 게시판 체계의 글 번호 열쇠(url-key.mjs postIdKey)가 있으면 그것. 제목 열쇠 합치기는 주소가 제목뿐인 목록 표식 글에만 남는다. */
+      같은 게시판 체계의 글 번호 열쇠(url-key.mjs postIdKey)가 있으면 그것.
+      🔴 **게시일이 둘 다 있고 서로 다를 때만** ② 로 가른다 — 주소 열쇠가 모르는 목록 상태 값이 상세 주소에 붙는 게시판이 있다
+      (이화 notice.do?…articleNo=367260…&no=365 — 같은 글의 no 가 실행마다 371·365·364… 로 바뀐다). 그 값까지 '다른 글'로 보면 같은 글이
+      두 벌 실려 학교 40건 상한에서 옛 글 10건을 밀어냈다(리뷰 2026-10-11 · 발행 50건/중복 10 · 병합기 58건/중복 18). 게시일이 없거나 같으면
+      예전처럼 제목 열쇠로 합친다. 제목 열쇠 합치기는 그 밖에 주소가 제목뿐인 목록 표식 글에 남는다. */
 const isNewsMarker = (n) => /#n-/.test(String(n.url || ''));
 const newsPostRef = (n) => postIdKey(n.url) || urlKey(n.url);
 export const newsDistinct = (a, b) => {
   if (a.postId && b.postId) return a.postId !== b.postId;
-  return !isNewsMarker(a) && !isNewsMarker(b) && newsPostRef(a) !== newsPostRef(b);
+  return !isNewsMarker(a) && !isNewsMarker(b) && newsPostRef(a) !== newsPostRef(b)
+    && !!(a.postedAt && b.postedAt && a.postedAt !== b.postedAt);
 };
 export function newsHidden(n, cfg = {}) {
   if (n.postId && (cfg.hidePosts || []).includes(newsPostKey(n))) return true;
