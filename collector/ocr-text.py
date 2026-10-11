@@ -308,8 +308,12 @@ def run(roots, budget_sec):
                 stats['chars'] += len(text)
                 print(f"ocr ok: {rel}.ocr.txt ({info['hangul']}자 · 비율 {info['ratio']})")
             else:
-                if os.path.exists(out_path):
-                    os.remove(out_path)  # 내용이 바뀌어 관문을 못 넘게 됐으면 옛 결과를 남기지 않는다
+                # 내용이 바뀌어 관문을 못 넘게 됐으면 **내가 남긴** 옛 결과만 지운다(장부에 통과로 적힌 것).
+                # 🔴 장부에 통과 기록이 없는 .ocr.txt 는 남이 만든 것이다 — 장학 포스터 PaddleOCR(paddle-ocr.py --prefix=elig-)가
+                #    글자층 있는 elig-*.pdf 도 읽어 둔다. 그것을 지우면 뒤에 Paddle 단계가 없는 워크플로(브라우저·심층 수집·AI 자격 읽기)에서
+                #    자격 글자가 다음 일반 수집까지 사라진 채 커밋될 수 있었다(2026-10-11 점검 bodies-int-1).
+                if os.path.exists(out_path) and entry and entry.get('ok'):
+                    os.remove(out_path)
                 stats['rejected'] += 1
                 print(f"못 씀: {rel} — {info['why']}")
             save_ledger(root, ledger)   # 파일마다 저장 — 단계가 죽어도 여기까지는 남는다

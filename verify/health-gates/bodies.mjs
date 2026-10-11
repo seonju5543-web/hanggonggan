@@ -12,7 +12,7 @@
         activity-docs 의 장부 판 이동·기회 되돌리기(--apply·--fetch 를 임시 폴더에서 진짜로) · 두 워크플로가 실패를 삼키지 않는다
      ③ 자격용 공고문 첨부(deepfetch --elig-attach · bodies-3·5) — 줄이 돈다(고르기는 기본 브랜치 elig-targets.mjs) · 미리 몽땅 지우지 않고 바이트가 같으면 파생 글자 보존 (가짜 fetch 로 진짜 실행)
      ④ 원문 보충(deepfetch --fill · B8 · bodies-12 ①) — 껍데기도 세어 물러선다 · 받기 예산 · 심층 수집 대기줄 (가짜 fetch 로 진짜 실행)
-     ⑤ OCR(ocr-text.py · bodies-6) — 글자층이 있어도 자격용 PDF 는 쪽 그림으로
+     ⑤ OCR(ocr-text.py · bodies-6) — 글자층이 있어도 자격용 PDF 는 쪽 그림으로 · 관문에서 버릴 때 남(PaddleOCR)이 만든 .ocr.txt 는 안 지운다(bodies-int-1)
      ⑥ AI 자격 읽기 버튼(eligibility-fill.yml · bodies-10) — 대상 세 갈래 합 · 0 이면 돈이 드는 단계만 건너뛴다 (세기 줄을 bash 로 진짜 실행)
      ⑦ 브라우저 수집(browser-collect.mjs · B7) — 클릭형 게시판 상세 글자도 본문으로(남의 글 막기 셋) · 저장하는 본문은 줄을 살린 것
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말).
@@ -661,6 +661,35 @@ globalThis.fetch = async (url) => {
           got, [['elig-a-1.pdf', 'pdf'], ['elig-d-1.pdf', 'pdf']]);
       } finally {
         fs.rmSync(dir, { recursive: true, force: true });
+      }
+      /* 관문을 못 넘을 때 지우는 것은 **제가 남긴** .ocr.txt 뿐 (bodies-int-1) — 장학 포스터 PaddleOCR 이 글자층 있는 elig-*.pdf 도 먼저 읽어
+         .ocr.txt 를 남긴다. tesseract 가 처음 읽고 관문에서 버리며 그것을 지우면, 뒤에 Paddle 단계가 없는 워크플로에서 자격 글자가 빈 채 커밋될 수 있었다.
+         run() 을 진짜로 돌리되 쪽 그리기·tesseract 만 '포스터 글자'를 돌려주는 가짜로 바꾼다(관문에서 버려지는 꼴) */
+      const dir2 = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-ocrkeep-'));
+      try {
+        fs.writeFileSync(path.join(dir2, 'elig-p-1.pdf'), '%PDF-1.4\n글자층 있는 공고문');
+        fs.writeFileSync(path.join(dir2, 'elig-p-1.pdf.txt'), '글자층');
+        fs.writeFileSync(path.join(dir2, 'elig-p-1.pdf.ocr.txt'), 'PaddleOCR 이 읽은 자격 글자');   // 장부에 칸 없음 = 남이 만든 것
+        fs.writeFileSync(path.join(dir2, 'elig-t-1.pdf'), '%PDF-1.4\n바뀐 바이트');
+        fs.writeFileSync(path.join(dir2, 'elig-t-1.pdf.ocr.txt'), '예전에 tesseract 가 남긴 글자');   // 장부에 통과 기록 = 제가 만든 것
+        fs.writeFileSync(path.join(dir2, 'ocr-ledger.json'), JSON.stringify({ 'elig-t-1.pdf': { sig: '1:old', gate: 'old', ok: true, at: '2026-10-01' } }));
+        const code = ['import importlib.util, json, os, sys',
+          "spec = importlib.util.spec_from_file_location('ocrtext', sys.argv[1])",
+          'm = importlib.util.module_from_spec(spec)', 'spec.loader.exec_module(m)',
+          "POSTER = '=     2026년     재5지.\\n프로그램 소개   지원 자격\\n신정 기간   29   ueneE 이하\\n'",
+          'm.ocr_pdf = lambda path, deadline: (POSTER, 1)',
+          'm.tesseract = lambda path, deadline: POSTER',
+          'm.run([sys.argv[2]], 600)',
+          'led = json.load(open(os.path.join(sys.argv[2], m.LEDGER), encoding="utf-8"))',
+          "print(json.dumps([os.path.exists(os.path.join(sys.argv[2], f + '.ocr.txt')) for f in ('elig-p-1.pdf', 'elig-t-1.pdf')] + [[led.get(f, {}).get('ok') for f in ('elig-p-1.pdf', 'elig-t-1.pdf')]]))"].join('\n');
+        const r = spawnSync('python3', ['-c', code, fileURLToPath(new URL('collector/ocr-text.py', root)), dir2],
+          { encoding: 'utf8', env: cleanEnv({ PYTHONDONTWRITEBYTECODE: '1' }) });
+        let got = null;
+        try { got = JSON.parse((r.stdout || '').trim().split('\n').pop()); } catch { got = (r.stderr || r.stdout || '').slice(-200); }
+        eq('  관문에서 버릴 때 — 장부에 통과 기록이 없는 .ocr.txt(PaddleOCR 이 남긴 것)는 그대로 · 제가 전에 남긴 것(통과 기록)만 지운다 · 둘 다 장부엔 못 넘음으로',
+          got, [true, false, [false, false]]);
+      } finally {
+        fs.rmSync(dir2, { recursive: true, force: true });
       }
     }
   }
