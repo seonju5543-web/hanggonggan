@@ -14,7 +14,7 @@ import { makeBodyReader, corporaFrom } from './notice-deadline.mjs';
 import { FETCH_HEADERS } from './http-headers.mjs';
 import { urlKey, dedupeNotices, capNotices, rekeyLedger } from './url-key.mjs';
 import { loadCandidates, mergeCandidates, saveCandidates } from './candidates.mjs';
-import { publishBySchool, dropUnserved, healFromLedger, readSchoolFiles, zeroFeedSchools, zeroFeedWhy } from './publish-notices.mjs';
+import { publishBySchool, dropUnserved, healFromLedger, readSchoolFiles, readHuntMoves, zeroFeedSchools, zeroFeedWhy } from './publish-notices.mjs';
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry, retitleItems } from './clean-title.mjs';
 import { isAttachmentEntry, detailAttachments, stripSiteChrome } from './attachment-link.mjs';
@@ -528,9 +528,10 @@ saveCandidates(mergeCandidates(loadCandidates().items, freshAll));
    한 번 빠지면(9-30 병합기가 200건으로 자른 15개교 215건처럼) 영영 안 돌아왔다. 원천은 **학생이 지금 보는 학교별 파일 먼저**(같은 글이면
    그 판의 주소를 쓴다 — 장부는 링크 로봇이 고친 주소를 모른다), 그다음 후보 장부. 지금 글(notices.json)은 바꾸지 않는다 ·
    규칙·까닭은 publish-notices.mjs healFromLedger 한 곳. 🔴 두 수집기 모두에 둔다 — 한쪽만 두면 둘이 번갈아 학교별 파일을 다시 써서
-   되살린 글이 들쭉날쭉한다(관문 「로봇·도구 점검 관문」 feed). 🔴 학교별 파일은 아래 publishBySchool 이 다시 쓰기 **전에** 읽는다. */
+   되살린 글이 들쭉날쭉한다(관문 「로봇·도구 점검 관문」 feed). 🔴 학교별 파일은 아래 publishBySchool 이 다시 쓰기 **전에** 읽는다.
+   moved — 링크 사냥꾼이 이미 푼 표식(link-hunt.json 찾은 줄)은 장부 판의 주소를 찾은 주소로 바꿔 끼운다(같은 글이 두 장 되지 않게 · 2026-10-11 리뷰 R2). */
 const healCounts = {};
-notices.items = healFromLedger(notices.items, loadCandidates().items, { current: readSchoolFiles(), counts: healCounts });
+notices.items = healFromLedger(notices.items, loadCandidates().items, { current: readSchoolFiles(), moved: readHuntMoves(), counts: healCounts });
 const healedCount = healCounts.restored;   // 학교별 파일에도 없던 글 = 진짜 유실 (상한에 잘렸다 다시 실린 글 healCounts.kept 는 세지 않는다 · 리뷰 R3)
 if (healCounts.restored || healCounts.kept) console.log(`피드 메우기: 학교별 파일에도 없던 글 ${healCounts.restored}건(후보 장부에서) · notices.json 에만 없던 글 ${healCounts.kept}건(학교별 파일 그대로)`);
 

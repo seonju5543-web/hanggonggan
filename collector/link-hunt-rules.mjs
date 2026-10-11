@@ -29,6 +29,11 @@ export function recordAttempt(st, outcome, why, opts = {}) {
   const today = opts.today || new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
   s.lastTried = today;
   s.lastWhy = why || '';
+  /* 게시판이 안 열린 날을 잇달아 센다 (2026-10-11 리뷰 · links-final-1 뒷손질) — opts.boardDown(게시판 열기 실패)일 때만 하나 늘리고,
+     그 밖의 결과(찾음·못 찾음·상세만 못 읽음·시간 상한 — 게시판은 열렸다)는 지운다. 미룬 표적은 다음 날까지 다시 안 보므로 하루에 하나씩 는다.
+     NET_STREAK_DAYS 에 닿으면 사냥꾼이 그날 3단계(다른 게시판·사이트 검색)를 한 번 해 본다(netStreakDue · settleNetStreak). */
+  if (outcome === 'net' && opts.boardDown) s.netStreak = (s.netStreak || 0) + 1;
+  else delete s.netStreak;
   if (outcome === 'ok') {
     s.status = 'resolved'; s.resolvedUrl = opts.url || s.resolvedUrl; s.attempts = 0;
     delete s.escalated; delete s.likelyGone;          // 다시 표식이 되면 처음부터 센다
@@ -67,6 +72,24 @@ export function settleEscalation(st) {
   return true;
 }
 
+/* 게시판이 잇달아 안 열린 표적 (2026-10-11 리뷰 · links-final-1 뒷손질).
+   게시판이 안 열린 날은 그 표적을 3단계에서도 빼고 내일로 미룬다(같은 학교 서버를 하루에 여러 번 두드리지 않기). 그런데 게시판 목록 주소 하나만
+   영영 안 열리고 같은 학교의 다른 게시판·사이트 검색은 열리는 경우, 그대로 두면 3단계의 구출 길이 영구히 막히고 사람도 모른다.
+   그래서 미룬 날이 NET_STREAK_DAYS 번 잇달면 그날은 3단계를 한 번 해 본다(netStreakDue — 사냥꾼이 미룸 묶음에 안 넣는다).
+   3단계를 해 보고도 못 찾았으면 settleNetStreak: 센 날 수를 0 으로 되돌리고(다음 3단계는 다시 NET_STREAK_DAYS 번 뒤) ·
+   아직 안 알린 표적이면 사람에게 한 번 알린다(st.escalated — 참을 돌려준다 · 리포트 머리 절에 '게시판이 n번 잇달아 안 열림'). */
+export const NET_STREAK_DAYS = 7;
+export function netStreakDue(st) {
+  return !!st && st.status !== 'resolved' && (st.netStreak || 0) >= NET_STREAK_DAYS;
+}
+export function settleNetStreak(st) {
+  if (!netStreakDue(st)) return false;
+  st.netStreak = 0;
+  if (st.escalated) return false;
+  st.escalated = true;
+  return true;
+}
+
 /* 게시판이 안 열려 미룬 표적의 장부 문구 (리뷰 2026-10-05 · links-14 뒷손질) — 관리자 화면 「죽은 링크」(_admin/admin.js deadLinks)는
    lastWhy 의 'HTTP 4xx·5xx'·'실패'·'없음' 낱말로 줄을 고른다. '게시판 열기 실패'로 적으면 학교 서버가 잠깐 안 열린 것만으로 그 게시판의 표적 전부가
    '죽은 링크'로 올라와 다음에 열릴 때까지 남았다 — 확인 안 한 원인을 단정하는 셈이다(CLAUDE.md 매 세션 5). 그래서 '못 엶'(있었던 일)과 '내일 다시'만 적고,
@@ -78,15 +101,19 @@ export function boardUnreachableWhy(err) {
 
 /* 이번에 처음 사람에게 알리는 공고 줄 (2026-10-05 점검 links-2) — 이슈 본문은 리포트 전체라, 이 절이 없으면 이슈 제목의 'n건'이
    어느 공고인지 본문에서 찾을 수 없었다(#387). 사냥꾼이 리포트 머리말 바로 뒤에 넣는다. 빈 목록이면 [](절을 안 찍는다).
-   list: [{ title, key, attempts, lastWhy, likelyGone }] */
+   list: [{ title, key, attempts, lastWhy, likelyGone, boardDown(게시판이 잇달아 안 열린 날 수 — settleNetStreak 로 알린 것) }] */
 export function escalationLines(list) {
   const items = (list || []).filter(Boolean);
   if (!items.length) return [];
+  /* 게시판이 안 열린 표적은 횟수(attempts)를 안 센다 — '0회 못 찾음'이라 적지 않고 있었던 일(게시판이 n번 잇달아 안 열림 · 다른 경로로도 못 찾음)을 적는다 */
+  const what = (x) => (x.boardDown
+    ? `게시판이 ${x.boardDown}번 잇달아(하루 한 번) 안 열림 · 다른 게시판·사이트 검색으로도 못 찾음`
+    : `${x.attempts || 0}회 못 찾음${x.likelyGone ? ' · 게시판 끝까지 봤는데 없음(내려간 듯)' : ''}`);
   return [
     `### 🙋 사람 확인 필요 — 이번에 처음 알리는 공고 ${items.length}건`,
     '로봇은 계속 찾습니다 — 게시판 주소가 바뀌었거나 글이 내려갔는지 사람이 보면 더 빨리 풀릴 수 있는 것들이에요.',
     '',
-    ...items.map((x) => `- ${String(x.title || '').slice(0, 60)} — ${x.attempts || 0}회 못 찾음${x.likelyGone ? ' · 게시판 끝까지 봤는데 없음(내려간 듯)' : ''}`
+    ...items.map((x) => `- ${String(x.title || '').slice(0, 60)} — ${what(x)}`
       + `${x.lastWhy ? ` · 마지막 이유: ${String(x.lastWhy).slice(0, 60)}` : ''} (\`${String(x.key || '').slice(0, 120)}\`)`),
     '',
   ];
@@ -116,6 +143,40 @@ export function pruneHuntState(items, liveKeys, today, graceDays = 30, { patrolO
       continue;
     }
     if ((v.status === 'resolved' || v.escalated) && v.lastTried && v.lastTried >= cutoff) out[k] = v;
+  }
+  return out;
+}
+
+/* 이번 실행에 주소가 바뀐 실시간 공고 — 옛 주소 → 새 주소 (2026-10-11 점검 CC-1). 사냥꾼이 저장할 때 학교별 파일 고치기
+   (publish-notices.mjs patchUrlsBySchool 의 opts.moved)에 넘긴다. 열쇠 'n:<주소>' 는 표적을 모을 때의 주소라 그대로 옛 주소다.
+   🔴 왜 따로 넘기나: 사냥꾼은 표식을 풀고 notices.json 을 dedupeNotices 로 합치는데, 합쳐진 짝의 제목이 다르면(가천 '[장학공지]…' 표식 ↔
+      '[공통]…' 진짜 주소) 제목으로만 잇는 학교별 파일 고치기가 표식 판을 못 찾아 학생 화면에 같은 글 두 장이 남았다(그 판은 다음 수집의
+      메우기가 학교별 파일에서 다시 실었다). 옛 주소로도 찾아야 그 판이 새 주소가 되고, 파일 안에서 같은 글로 합쳐진다.
+   정식 등록(field 'sourceUrl')은 학교별 파일에 없으므로 넣지 않는다. 주소가 그대로인 표적도 넣지 않는다. */
+export function movedNoticeUrls(targets) {
+  const out = new Map();
+  for (const t of targets || []) {
+    if (!t || t.field !== 'url' || !t.ref || !String(t.key || '').startsWith('n:')) continue;
+    const from = String(t.key).slice(2);
+    const to = t.ref.url;
+    if (from && to && to !== from) out.set(from, to);
+  }
+  return out;
+}
+
+/* 사냥꾼이 이미 푼 실시간 공고 표식 — 장부(link-hunt.json)의 'n:<옛 주소>' 줄 중 찾은 것(resolved)의 옛 주소 → 찾은 주소 (2026-10-11 리뷰 R2).
+   피드 메우기(publish-notices.mjs healFromLedger 의 opts.moved · 읽기는 readHuntMoves)가 후보 장부의 옛 판을 싣기 전에 주소를 바꿔 끼운다.
+   🔴 왜: 후보 장부(candidates.json)는 수집 당시 주소·제목을 그대로 들고 있다. 사냥꾼이 그 표식을 풀고 제목이 다른 짝과 합친 글은
+      주소·제목·글 번호가 셋 다 어긋나, 사고 창(9-30) 안 글이면 메우기가 옛 표식 판을 다시 싣고 → 사냥꾼이 다시 합치고 → 다시 싣는 진동이 났다.
+      찾은 주소로 바꿔 끼우면 피드의 그 글과 주소 열쇠로 같은 글이 된다.
+   ⚠️ 찾은 줄은 마지막 시도 30일 뒤 장부 정리(pruneHuntState)가 걷는다 — 그 뒤 되살아난 옛 판은 다음 사냥이 다시 풀고 다시 적는다
+      (장부 원천의 사고 창은 11-29 에 저절로 닫힌다). 주소가 그대로인 줄·정식 등록 줄('r:')은 넣지 않는다. */
+export function resolvedNoticeUrls(items) {
+  const out = new Map();
+  for (const [k, v] of Object.entries(items || {})) {
+    if (!String(k).startsWith('n:') || !v || v.status !== 'resolved' || !v.resolvedUrl) continue;
+    const from = String(k).slice(2);
+    if (from && v.resolvedUrl !== from) out.set(from, v.resolvedUrl);
   }
   return out;
 }
