@@ -13,6 +13,7 @@
         링크 사냥꾼은 결과를 버리고도 초록불이었다. collector/gate-guard.mjs 를 임시 git 저장소 + 가짜 관문으로 잰다 · 워크플로 배선 · 쉬기 장부.
         소식 로봇도 같은 도구를 쓴다 — 단락이 늘 '정식 등록'을 말해 소식 리포트에 사실과 반대인 문장이 들어갔다(리뷰) → 소식 단계 시나리오도 잰다.
      ⑤ 알림이 제 리포트로 간다 — '"수집 리포트" in:title' 부분 일치가 다른 로봇의 리포트 이슈를 집었다(#381) · 워크플로 전부를 본다.
+        끝내 빨간불 경보는 경보 한 곳(tools/alert-issue.mjs)에 모이고 관문이 다시 통과하면 닫힌다(2026-10-11 · 검색으로 찾고 닫는 길이 없었다).
      ⑥ 양식 대기열 고아 — 정식 등록에서 빠진 공고의 대기 항목(123건 중 71건)을 스키마화 로봇이 매 실행 정리한다.
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
@@ -21,6 +22,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
+import { softEq } from './alerts.mjs';
 
 const require = createRequire(import.meta.url);
 
@@ -507,12 +509,27 @@ export default async function gate(eq, ctx) {
       [/'"장학공고 수집 리포트" in:title'/.test(auditAlert), /🤖 장학공고 수집 로봇:/.test(auditAlert), /cat \/tmp\/gate-note\.md/.test(auditAlert) && !/저장하지 않았습니다/.test(auditAlert), /steps\.audit\.outcome/.test(zero)], [true, true, true, true]);
     eq('  0건 알림 — 다시 재니 통과(flaky)를 빨간불이라 하지 않고 결과 이름(영문)을 그대로 적지 않는다',
       [/flaky\)\s+gate="데이터 관문은 처음에 빨갛다가 다시 재니 통과/.test(zero), /되돌림: \$\{\{ steps\.guard\.outputs\.gate \}\}/.test(zero)], [true, false]);
-    /* 끝내 빨간불 이슈는 열린 같은 이슈에 코멘트 — 원인이 기존 데이터면 실행마다(하루 최대 5번) 새 이슈가 쌓였다(리뷰) */
-    const dedupe = (f) => {
-      const st = wf(f).split(/\n(?= {6}- )/).find((x) => /steps\.guard\.outputs\.gate == 'still-failing'/.test(x)) || '';
-      return /--search '"데이터 관문이 되돌린 뒤에도 빨간불" in:title' --state open/.test(st) && /gh issue comment "\$open"/.test(st) && st.indexOf('gh issue comment') < st.indexOf('gh issue create');
+    /* 끝내 빨간불 경보 — 원인이 기존 데이터면 실행마다(하루 최대 5번) 빨갛다(리뷰 2026-10-04). 경보 한 곳(tools/alert-issue.mjs)으로
+       이슈 하나에 모으고, 관문이 다시 통과하면 닫는다(2026-10-11 · 점검 WF-1·CC-3). 옛 판은 GitHub 검색(--search … in:title)으로 찾고
+       없으면 로봇·날짜 붙은 제목으로 새로 만들었다 — 검색은 이모지·한글을 놓칠 수 있고(alert-issue.mjs 머리말), 닫는 단계가 하나도 없었다.
+       워크플로 글자를 재는 줄이라 로봇 워크플로에서는 경고만(softEq — alerts 묶음 ⓪과 같은 잣대) · 로컬·verify-ui(DOC_GATES=1)에서는 실패. */
+    const eqWf = softEq(eq, ctx.docGates ?? (!process.env.GITHUB_ACTIONS || process.env.DOC_GATES === '1'));
+    const GATE_RED = '🚨 데이터 관문이 되돌린 뒤에도 빨간불';
+    const stillAlarm = (f) => {
+      const ss = wf(f).split(/\n(?= {6}- )/);
+      const st = ss.find((x) => /steps\.guard\.outputs\.gate == 'still-failing'/.test(x)) || '';
+      const ok = ss.find((x) => /^\s+if: steps\.audit\.outcome == 'success'\s*$/m.test(x) && /^\s+mode: resolve\s*$/m.test(x)) || '';
+      const pick = (re, s) => ((re.exec(s) || [])[1] || '').trim();
+      return [
+        /node tools\/alert-issue\.mjs --mode open --match prefix/.test(st) && pick(/--title "([^"]*)"/, st) === GATE_RED,
+        /gh issue (?:list|create|comment)\b|--search\b/.test(st),
+        /^\s+timeout-minutes: \d+\s*$/m.test(st),
+        /uses: \.\/\.github\/actions\/alert-issue\b/.test(ok) && pick(/^\s+title:\s*(.+)$/m, ok) === GATE_RED && /^\s+match: prefix\s*$/m.test(ok),
+        /^\s+continue-on-error: true\s*$/m.test(ok) && /^\s+timeout-minutes: \d+\s*$/m.test(ok),
+      ];
     };
-    eq('  끝내 빨간불 이슈 — 열린 같은 이슈가 있으면 코멘트 (장학·브라우저)', [dedupe('collect-scholarships.yml'), dedupe('browser-collect.yml')], [true, true]);
+    eqWf('  끝내 빨간불 경보 — 경보 한 곳(고정 제목 · prefix · 검색·맨몸 gh 없음 · 시한) · 관문이 다시 통과하면 같은 제목을 닫는 짝(보강 규칙) (장학·브라우저)',
+      [stillAlarm('collect-scholarships.yml'), stillAlarm('browser-collect.yml')], [[true, false, true, true, true], [true, false, true, true, true]]);
     const cn = wf('collect-news.yml');
     const newsIssue = cn.split(/\n(?= {6}- )/).find((x) => /name: 🚨 데이터 감사 실패 알림/.test(x)) || '';
     eq('  소식 감사 실패 이슈 — 제목은 결과로 가르고(flaky 는 \'되돌린 것 없음\') · 본문은 gate-guard 단락 · 열린 같은 이슈엔 코멘트(공용 tools/alert-issue.mjs — 제목 앞글자로 찾아 날짜 붙은 옛 이슈도) · 되돌리기 단계가 단락을 남긴다',
