@@ -541,4 +541,56 @@ export default async function qnotice(eq, ctx) {
       [/await import\('\.\/form-reach\.mjs'\)/.test(sf), /function finish\(\) \{[\s\S]*?formReachReport\(reachItems, reachTemplates/.test(sf), /reachTemplates = forms\.templates/.test(sf)],
       [true, true, true]);
   }
+
+  /* ── ⑨ 자동 등록 — 지난 글 등록 (2026-10-11 점검 gap-bf-3) ──
+     ⓐ 게시판 글 마감 읽기(notice-deadline.mjs parseDeadline) — 요약 머리 이름표 뒤 날짜(장학과 같은 판독기) · `&nbsp;` · 숫자와 년·월·일 사이 빈칸 ·
+        `까지` 앞 요일·시각 · 해 없는 `10/8 마감` · 해 바뀌는 길목. 이름표 없는 날짜(게시일·작성일)·범위의 시작(`10:00~ 마감시`·`부터`)·성적 소수는 읽지 않는다.
+        표본은 점검이 원장(candidates.json deadlineHint)에서 확인한 실제 꼴이다(충남대 2 · 방송대 · 명지대 · 서강대).
+     ⓑ 장학 판독기의 '해를 넘긴 범위'는 반년 안만(광산장학회 `26. 9. 24. ~ 9. 18.` 이 2027-09-18 이 되던 것)
+     ⓒ 자동 등록이 판독기를 넘긴다 */
+  {
+    let setLib = false;
+    if (!process.env.EXCERPTS_AS_LIB) { process.env.EXCERPTS_AS_LIB = '1'; setLib = true; }
+    const { activityExcerpts } = await import('../../collector/activity-excerpts.mjs');
+    if (setLib) delete process.env.EXCERPTS_AS_LIB;
+    const extract = (t) => activityExcerpts(t).deadline;
+    const { lastDateIn } = require('../entry-rules.cjs');
+    const T = '2026-10-11';
+    const read = (n, today = T, withExtract = true) => parseDeadline(n, today, withExtract ? { extract } : {});
+    const dateOf = (n, today, w) => read(n, today, w)?.date ?? null;
+    /* 실제 꼴 — 원장 원문 그대로(점검 gap-bf-3) */
+    const CNU_911 = { title: '2026학년도 제2학기 영탑(A,B), 보훈장학금 및 외국인대학생(학 부) 장학금 추가 신청 안내', deadlineHint: '제출기한: 2026. 9. 11.(금) ※ 단과대학 취합일정을 고려하여, 학생은 위 제출기한보다 먼저 제출&nbsp; 다. 장학금액: 등록금 전' };
+    const KNOU_930 = { title: '[장학] (교외근로) 국가 근로장학생 모집 (생활협동조합_이마트24)', deadlineHint: '제출기한 : 2026 년 &nbsp;09 월 &nbsp;30 일까지 * 적격자 선발 시 조기 마감될 수 있습니다 . - 면접일정 : 2026 년' };
+    const MJU_928 = { title: '2026학년도 2학기 학술활동장려장학금 1·2종, 바둑특기장학금 2종 신청 안내', deadlineHint: '신청 기간 : 2026 년 9 월 1 일 (화 ) ~ 9 월 &nbsp;28 일 (월 ) 2. 성적 유효기간 &nbsp;가 . 재학생 : 202' };
+    const SOGANG_108 = { title: '[교외] *기간연장*대전청년내일재단 인재육성장학생 선발 안내(10/8 마감, 생활비 150만원)', deadlineHint: null };
+    const CNU_108 = { title: '2026학년도 제2학기 외국어성적우수 장학금 추가 신청 안내', deadlineHint: '신청기한(학생): 2026. 10. 8.(목) 18:00까지 [수업일수 1/3선] 4. 제출장소: 해당 학과 사무실' };
+    const SKKU_1111 = { title: '2027년 대산농촌재단 장학생 선발 안내', deadlineHint: '제출기한 2026. 11. 11.(수) 6. 제출처 • 제출방법: 이메일 • 제출처: dsa@dsa.or.kr 7.선발일정 • 1단계: 서류심사' };
+    eq('⑨ⓐ 이름표 뒤 날짜를 읽는다 — 제출기한: · &nbsp; 섞인 한글 날짜 · 해 없는 끝 `~ 9 월 28 일` · `(10/8 마감` · 콜론 없는 머리 이름표',
+      [CNU_911, KNOU_930, MJU_928, SOGANG_108, SKKU_1111].map((n) => dateOf(n)),
+      ['2026-09-11', '2026-09-30', '2026-09-28', '2026-10-08', '2026-11-11']);
+    eq('  `까지` 앞에 요일·시각이 끼어도 읽는다(판독기 없이 요약 꼴만으로) — `2026. 10. 8.(목) 18:00까지` · `10월 15일(목) 17시까지`',
+      [dateOf(CNU_108, T, false), dateOf({ title: '[교외/신청] 2026년 인송장학생 선발', deadlineHint: '제출기한 : 10월 15일(목) 17시까지 - 제출방법 : 서식 작성 후 메일 제출' }, T, false)],
+      ['2026-10-08', '2026-10-15']);
+    eq('  요약 머리 이름표 갈래는 판독기를 넘겨야 돈다(넘기지 않으면 예전처럼 · 판독기는 부르는 쪽이 넘긴다)', dateOf(CNU_911, T, false), null);
+    /* 읽으면 안 되는 것 — 게시판 머리 줄의 작성일 · 범위의 시작 · `부터` · 성적 소수 */
+    const SEOULTECH_BANNER = { title: '[공통][국가] 2026학년도 2학기 1차 주거안정장학금 신청기간 안내(~9/9)', deadlineHint: '신청기간 안내(~9/9) 작성일 2026.08.12 수정일 2026.08.12 작성자 studenty 조회수 10' };
+    const START_ONLY = { title: '[국제교류처] 2026학년도 2학기 교내 근로장학생 모집(대외국제부총장 비서실)(마감)', deadlineHint: '신청기간 ※ 통합정보시스템 신청: 2027. 8. 24.(월) 10:00~ 마감시 ※ 서류접수: 2026. 8. 19.(수)~ 8. 24.(월)' };
+    eq('  🔴 이름표 없는 날짜·범위의 시작은 마감이 아니다 — 작성일(08-12) 대신 제목 (~9/9) · `10:00~ 마감시` 의 시작(2027-08-24) 대신 범위 끝 · `(8/24부터 접수) 까지` · `평점 3.5 이상 … 마감`',
+      [dateOf(SEOULTECH_BANNER), dateOf(START_ONLY), dateOf({ title: '2026학년도 1학기 국가근로 장학생 신청 및 참여기관 안내(8/24부터 접수)', deadlineHint: '까지 (근로기관의 참여동의가 아직 안되어있으므로)' }),
+        dateOf({ title: '표본 장학생 평점 3.5 이상 제출 마감 안내' })],
+      ['2026-09-09', '2026-08-24', null, null]);
+    eq('  해 없는 날짜의 해 — 오늘의 해 · 해 바뀌는 길목만 가까운 쪽(12월의 `~1/10` → 다음 해 · 1월의 `~12/20` → 지난해) · 10월의 `~3/31` 은 올해(끝난 공고)',
+      [dateOf({ title: '표본 장학생 선발(~1/10)' }, '2026-12-20'), dateOf({ title: '표본 장학생 선발(~12/20)' }, '2027-01-05'), dateOf({ title: '표본 장학생 선발(~3/31)' })],
+      ['2027-01-10', '2026-12-20', '2026-03-31']);
+    /* 등록할 때 남기는 근거 문구(deadlineFrom)는 감사(deadline-audit)가 같은 날을 다시 읽어 낼 수 있어야 한다 — 2026-10-01 근거 없는 마감 사고 */
+    eq('  남기는 근거 문구에서 감사가 같은 날을 다시 읽는다(lastDateIn 또는 같은 판독기)',
+      [CNU_911, KNOU_930, MJU_928, SOGANG_108, SKKU_1111, CNU_108].map((n) => { const r = read(n); return !!r && (lastDateIn(r.text, r.date.slice(0, 4)) === r.date || extract(r.text) === r.date); }),
+      Array(6).fill(true));
+    eq('⑨ⓑ 장학 판독기 — 해를 넘긴 범위는 반년 안만(`26. 9. 24. ~ 9. 18.` 은 원문 오타라 비운다) · `12. 20. ~ 1. 10.` 은 그대로 다음 해',
+      [extract('신청기간 : 26. 9. 24.(월) ~ 9. 18.(금)'), extract('신청기간 : 2026. 12. 20.(일) ~ 1. 10.(일)')], [null, '2027-01-10']);
+
+    const ar = stripComments(fs.readFileSync(new URL('collector/auto-register.mjs', root), 'utf8'));
+    eq('⑨ⓒ 자동 등록 배선 — 게시판 글 마감 읽기에 장학 판독기를 넘긴다(못 불러오면 그 갈래만 건너뛴다)',
+      [/parseNoticeDeadline\(n, TODAY, \{ extract: labeledDeadline \}\)/.test(ar), /extract: labeledDeadline,/.test(ar)], [true, true]);
+  }
 }

@@ -125,8 +125,15 @@ const ACTION = /(선발|모집|신청|추천|접수)/;
 
 /* 마감 후보 추출 — 규칙은 collector/notice-deadline.mjs parseDeadline 한 곳(2026-10-05 옮김 · 본문 마감을 먼저 본다).
    돌려주는 것은 `{ date, text, from }` — text 는 **실제로 맞춘 문구**다(2026-09-17 · 노션 G-3). 등록할 때 `deadlineFrom: '<from> · <문구>'`
-   로 남겨 감사(verify/deadline-audit.mjs)가 그 문구를 근거로 센다. 달력에 없는 날은 마감이 아니다(okDate · 2026-09-19). */
-const parseDeadline = (n) => parseNoticeDeadline(n, TODAY);
+   로 남겨 감사(verify/deadline-audit.mjs)가 그 문구를 근거로 센다. 달력에 없는 날은 마감이 아니다(okDate · 2026-09-19).
+   게시판 요약 머리 이름표 뒤 날짜(`제출기한: 2026. 9. 11.(금)`)는 장학과 **같은 판독기**로 읽는다(2026-10-11 점검 gap-bf-3 — 못 읽어 끝난 공고가 마감 없이 등록됐다).
+   판독기(activity-excerpts → extract-excerpts)는 불러올 때 원문 파일을 읽으므로 **못 불러오면 그 갈래만 건너뛴다**(아래 본문 마감 채우기도 같은 판독기). */
+let labeledDeadline = null;
+try {
+  const { activityExcerpts } = await import('./activity-excerpts.mjs');
+  labeledDeadline = (t) => activityExcerpts(t).deadline;
+} catch (e) { console.log(`이름표 판독기를 못 불러와 게시판 요약 머리 이름표·본문 마감 갈래를 건너뜀 — ${String((e && e.message) || e).slice(0, 160)}`); }
+const parseDeadline = (n) => parseNoticeDeadline(n, TODAY, { extract: labeledDeadline });
 
 function classify(n, regUrlSet, regItems, batchSeen, pastRounds) {
   const t = n.title || '';
@@ -294,11 +301,11 @@ if (!cfg.enabled) {
      마감 없이 등록됐다가 발췌기에서 지난 마감을 받는다). 규칙은 notice-deadline.mjs makeBodyReader 한 곳 — 껍데기를 모르는 호스트는 읽지 않는다.
      판독기(activity-excerpts → extract-excerpts)는 불러올 때 원문 파일을 읽으므로 **못 불러오면 건너뛴다**(그 경우 예전처럼 제목·요약만 본다). */
   try {
-    const { activityExcerpts } = await import('./activity-excerpts.mjs');
+    if (!labeledDeadline) throw new Error('이름표 판독기 없음(위에서 못 불러옴)');
     const readJsonOr = (u, d) => { try { return JSON.parse(fs.readFileSync(u, 'utf8')); } catch { return d; } };
     const reader = makeBodyReader({
       ...corporaFrom(readJsonOr(new URL('extracted/notices-text.json', HERE), {}), readJsonOr(new URL('extracted/browser-bodies.json', HERE), {})),
-      extract: (t) => activityExcerpts(t).deadline,
+      extract: labeledDeadline,
       lastDateIn,
     });
     for (const n of notices.items || []) reader.fill(n);
