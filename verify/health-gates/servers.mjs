@@ -19,6 +19,10 @@
      ⑤ 발송(send) 걸음 포기가 다음 '알릴 거리 없음' 회차로 회복돼 lastError 가 지워졌다(발송이 끊겨도 06:17 확인·관리자 카드가 초록)
         → 포기한 걸음을 지나간 회차만 회복(worker.js errorRecovered 한 곳 · 발송 걸음은 lastSentRun) · 매일 확인 도구도 그 함수를 불러
           pastError 를 다시 본다(push-health.yml 이 server/push 를 받고 · server/push/package.json type module).
+   리뷰(2026-10-11)에서 더한 것:
+     ③④⑤ 구독자 없는 학교에만 새 글이 있는 회차가 {sent:0} 으로 lastSentRun 을 덮어 08:10 의 '한 대도 안 받음'과 발송 포기 기록을 지웠다
+        → 구독에 한 건 이상 보낸 회차(sent > 0)만 lastSentRun · 발송 회복 증거로.
+     ⑤ 포기 기록 칸이 하나라 회복 전 발송 포기를 reg·plan 포기가 덮으면 '끝까지 돈 회차'로 같이 회복됐다 → unsent 표식을 이어 적는다.
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부는 읽지 않는다. 코드 파일(server/·sw.js·엔진)은 코드라 읽는다.
    🔴 Date.now·fetch 는 바꿔 끼운 뒤 finally 로 되돌린다.
    🔴 **문서 글자**(server/README.md · apply/wrangler.toml 주석 · 설계 문서 data-flow.md)를 재는 줄은 로봇 워크플로에서 어긋나도
@@ -178,10 +182,11 @@ export default async function gate(eq, ctx) {
       await env4.SUBS.put(W.subKey(ep), JSON.stringify({ endpoint: ep, school: 'A대학교', campus: '' }));
       let feed = [{ url: 'https://n/1', school: 'A대학교', title: '새 장학 안내' }];
       let pushStatus = 201;
+      let regDown = false;                                                       // 정식 등록 데이터를 못 받음(reg 걸음 넘어짐 흉내)
       const pushes = [];
       globalThis.fetch = async (u) => {
         u = String(u);
-        if (u.endsWith('data/registered.json')) return new Response(JSON.stringify({ items: [] }));
+        if (u.endsWith('data/registered.json')) return regDown ? new Response('', { status: 503 }) : new Response(JSON.stringify({ items: [] }));
         if (u.endsWith('data/notices.json')) return new Response(JSON.stringify({ items: feed }));
         pushes.push(u);                                                          // 데이터 주소가 아니면 푸시 서비스
         return new Response('', { status: pushStatus });
@@ -212,6 +217,18 @@ export default async function gate(eq, ctx) {
         [s3.lastRun && s3.lastRun.outcome, pick(s3.lastSentRun)], ['nothing', { outcome: 'sent', sent: 1, woke: 0, dropped: 0, slot: '2026-10-05#08:10' }]);
       eq('④ 그 /health 로 다음 날 06:17 매일 확인 — 깨우기를 보낸 마지막 회차로 보아 error(가려지지 않는다)',
         pushVerdict({ curlOk: true, code: 200, json: s3, now: KST('2026-10-06T06:17:00') }).verdict, 'error');
+      /* 구독자 없는 학교에만 새 글이 있는 회차도 발송 기록을 덮지 않는다 (2026-10-11 리뷰) — plan 은 그 학교를 깨울 대상으로 고르지만
+         send 는 맞는 구독이 없어 {sent:0} 으로 끝난다. 예전엔 그 회차가 lastSentRun 을 덮어 08:10 의 '한 대도 안 받음'이 지워졌다 */
+      feed = [...feed, { url: 'https://n/4', school: 'A대학교', title: '네 번째 장학' }];
+      await runSlot(env4, KST('2026-10-06T08:10:30'));                          // 받아 준 수 0 (푸시 서비스 400 그대로)
+      feed = [...feed, { url: 'https://n/5', school: 'B대학교', title: '구독 없는 학교 장학' }];
+      await runSlot(env4, KST('2026-10-06T20:10:30'));                          // B대학교만 새 글 · B 구독 없음
+      const s4 = await health(env4);
+      eq('③ 발송 회차(받아 준 수 0) 다음 회차가 구독 없는 학교에만 새 글이어도(sent 0) /health.lastSentRun 은 08:10 발송 회차 그대로(lastRun 은 sent 0 회차)',
+        [pick(s4.lastRun), pick(s4.lastSentRun)],
+        [{ outcome: 'sent', sent: 0, woke: 0, dropped: 0, slot: '2026-10-06#20:10' }, { outcome: 'sent', sent: 1, woke: 0, dropped: 0, slot: '2026-10-06#08:10' }]);
+      eq('④ 그 /health 로 다음 날 06:17 매일 확인 — error(구독 없는 학교만 깨운 회차에 가려지지 않는다)',
+        pushVerdict({ curlOk: true, code: 200, json: s4, now: KST('2026-10-07T06:17:00') }).verdict, 'error');
 
       /* ⑤ 발송(send) 걸음 포기는 '알릴 거리 없음' 회차로 회복되지 않는다 (2026-10-11 점검 SIT-1) — 예전 회복 규칙은 포기한 걸음을
          보지 않고 '그 뒤 끝까지 돈 회차'면 지웠다. 포기한 회차의 plan 이 공고를 이미 '본 것'으로 적어 다음 회차는 대개 '없음'이라,
@@ -254,13 +271,43 @@ export default async function gate(eq, ctx) {
         ['nothing', '2026-10-05#20:10', 'send', null]);
       eq('④ 그 /health 로 다음 날 06:17 매일 확인 — error(예전 정상 발송 기록 lastSentRun 에 가려지지 않는다)',
         pushVerdict({ curlOk: true, code: 200, json: f2, now: KST('2026-10-06T06:17:00') }).verdict, 'error');
+      /* 구독자 없는 학교에만 새 글이 있는 회차는 발송 걸음을 지나도 아무에게도 안 보낸다({sent:0}) — 회복 증거가 아니다 (2026-10-11 리뷰) */
+      feed = [...feed, { url: 'https://p/b1', school: 'B대학교', title: '구독 없는 학교 장학' }];
+      await runSlotTrace(env5, KST('2026-10-06T08:10:30'));
+      const f2b = await health(env5);
+      eq('⑤ 발송 걸음 포기 뒤 회차가 구독 없는 학교에만 새 글(sent 0)이어도 lastError(send) 그대로 · lastSentRun 은 옛 회차 · 06:17 error',
+        [pick(f2b.lastRun), f2b.lastError && f2b.lastError.step, f2b.pastError, f2b.lastSentRun && f2b.lastSentRun.slot,
+          pushVerdict({ curlOk: true, code: 200, json: f2b, now: KST('2026-10-07T06:17:00') }).verdict],
+        [{ outcome: 'sent', sent: 0, woke: 0, dropped: 0, slot: '2026-10-06#08:10' }, 'send', null, '2026-10-04#08:10', 'error']);
+      /* 포기 기록 칸은 하나다 — 아직 회복 전인 발송 포기 위에 다른 걸음(reg) 포기가 덮여도, 그 기록이 '끝까지 돈 회차'로 회복돼
+         발송 실패까지 사라지지 않는다(unsent 표식 · 2026-10-11 리뷰) */
+      regDown = true;
+      const tr5c = await runSlotTrace(env5, KST('2026-10-06T20:10:30'));       // 정식 등록 데이터 다섯 번 못 받음 → reg 걸음 포기
+      regDown = false;
+      const f2c = await health(env5);
+      eq('⑤ 표본 — 회복 전 발송 포기 위에 reg 걸음 포기가 덮이면 그 기록에 unsent 표식이 이어진다',
+        [tr5c, f2c.lastError && f2c.lastError.step, f2c.lastError && f2c.lastError.unsent], [['aborted:reg'], 'reg', true]);
+      await runSlotTrace(env5, KST('2026-10-07T08:10:30'));                    // 새 글 없음 → '알릴 거리 없음'(reg 는 지나감)
+      const f2d = await health(env5);
+      eq('⑤ 그 뒤 \'알릴 거리 없음\' 회차가 reg 를 지나가도 lastError(reg · unsent)는 그대로 · 06:17 error(앞의 발송 실패가 가려지지 않는다)',
+        [f2d.lastRun && f2d.lastRun.outcome, f2d.lastError && f2d.lastError.step, f2d.pastError,
+          pushVerdict({ curlOk: true, code: 200, json: f2d, now: KST('2026-10-08T06:17:00') }).verdict],
+        ['nothing', 'reg', null, 'error']);
       feed = [...feed, { url: 'https://p/3', school: 'A대학교', title: '셋째 장학' }];
-      await runSlotTrace(env5, KST('2026-10-06T08:10:30'));                    // 새 글 → 발송 걸음을 끝까지 지남
+      await runSlotTrace(env5, KST('2026-10-07T20:10:30'));                    // 새 글 → 구독에 보냄(발송 걸음을 끝까지 지남)
       const f3 = await health(env5);
-      eq('⑤ 그 뒤 깨우기를 끝까지 보낸 회차가 오면 회복 — lastError 는 비고 send 기록이 pastError 로 · 매일 확인 ok',
-        [f3.lastError, f3.pastError && f3.pastError.step, pick(f3.lastSentRun),
-          pushVerdict({ curlOk: true, code: 200, json: f3, now: KST('2026-10-07T06:17:00') }).verdict],
-        [null, 'send', { outcome: 'sent', sent: 1, woke: 1, dropped: 0, slot: '2026-10-06#08:10' }, 'ok']);
+      eq('⑤ 그 뒤 구독에 한 건 이상 보낸 회차가 오면 회복 — lastError 는 비고 그 기록이 pastError 로 · 매일 확인 ok',
+        [f3.lastError, f3.pastError && f3.pastError.step, f3.pastError && f3.pastError.unsent, pick(f3.lastSentRun),
+          pushVerdict({ curlOk: true, code: 200, json: f3, now: KST('2026-10-08T06:17:00') }).verdict],
+        [null, 'reg', true, { outcome: 'sent', sent: 1, woke: 1, dropped: 0, slot: '2026-10-07#20:10' }, 'ok']);
+      /* 포기 때 앞 기록을 못 읽으면 표식을 단다(경보 쪽 — 다음 발송 회차가 오면 풀린다) · 포기 기록 쓰기는 멈추지 않는다 */
+      const kv6 = fakeKV();
+      await kv6.put('state:lastError', '{깨진 기록');
+      await kv6.put('state:run', JSON.stringify({ step: 'plan', tries: 5, startedAt: 1, slot: null, woke: 0, dropped: 0, sent: 0 }));
+      const r6 = await W.tick({ SUBS: kv6 });
+      const le6 = JSON.parse(kv6._m.get('state:lastError') || 'null') || {};
+      eq('  포기 때 앞 포기 기록을 못 읽으면 unsent 표식을 달고 그래도 포기 기록을 쓴다',
+        [r6 && r6.aborted, le6.step, le6.unsent], [true, 'plan', true]);
     }
 
     /* ④ 매일 확인의 판정 — 표본 */
@@ -291,6 +338,11 @@ export default async function gate(eq, ctx) {
         pv({ pastError: { at: 100, step: 'reg' }, lastRun: noneAt(200), lastSentRun: null }),
         pv({ pastError: { at: 100, step: 'reg' }, lastRun: noneAt(50), lastSentRun: null })],
       ['error', 'error', 'ok', 'ok', 'error']);
+    eq('  판정 — pastError(send) 뒤 발송 회차가 구독에 안 보낸 것(sent 0 · 옛 서버가 적은 꼴) error · pastError(reg · unsent) 뒤 \'없음\' 회차뿐 error · 그 뒤 구독에 보낸 회차 ok',
+      [pv({ pastError: { at: 100, step: 'send' }, lastRun: noneAt(200), lastSentRun: { outcome: 'sent', sent: 0, woke: 0, finishedAt: 150 } }),
+        pv({ pastError: { at: 100, step: 'reg', unsent: true }, lastRun: noneAt(200), lastSentRun: sentAt(50) }),
+        pv({ pastError: { at: 100, step: 'reg', unsent: true }, lastRun: noneAt(200), lastSentRun: sentAt(150) })],
+      ['error', 'error', 'ok']);
     const vSrc = stripComments(read('tools/push-health-verdict.mjs'));
     eq('  회복 규칙은 서버 한 곳(worker.js errorRecovered)을 불러 쓴다 — 판정 도구에 사본이 없고 · 서버 /health 도 같은 함수를 부른다',
       [/^import \{ errorRecovered \} from '\.\.\/server\/push\/worker\.js';$/m.test(vSrc), /function\s+errorRecovered|errorRecovered\s*=|step\s*===\s*'send'/.test(vSrc),
@@ -313,7 +365,9 @@ export default async function gate(eq, ctx) {
       const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'push-health-sparse-'));
       let res = null;
       try {
-        for (const d of dirs) if (fs.existsSync(path.join(rootDir, d))) fs.cpSync(path.join(rootDir, d), path.join(tmp, d), { recursive: true });
+        // git 에 없는 node_modules(server/push 에서 npm install 한 개발 기기 — wrangler·workerd 수백 MB)는 옮기지 않는다(CI 에는 없다)
+        const noModules = (src) => !path.relative(rootDir, src).split(path.sep).includes('node_modules');
+        for (const d of dirs) if (fs.existsSync(path.join(rootDir, d))) fs.cpSync(path.join(rootDir, d), path.join(tmp, d), { recursive: true, filter: noModules });
         const body = { ...okJ, lastSlot: '2026-10-05#20:10', pastError: { at: 100, step: 'send' }, lastRun: noneAt(200), lastSentRun: sentAt(50) };
         const env = { ...process.env, HEALTH_RC: '0', HEALTH_CODE: '200', HEALTH_BODY: JSON.stringify(body) };
         delete env.GITHUB_OUTPUT;                                                // 이 검사가 바깥 워크플로의 출력 파일에 쓰지 않게

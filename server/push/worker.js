@@ -375,13 +375,17 @@ const clearRun = async (env) => {
    KV 쓰기가 실패해도 매일 확인(push-health)은 초록이었다. 회차당 KV 쓰기 1건(하루 2건)이 는다.
    포기(같은 걸음 5회 실패)는 여기로 오지 않는다 — 그때는 지금처럼 state:lastError 만 남긴다.
    깨우기를 보낸 회차는 state:lastSentRun 에도 남긴다(2026-10-05 리뷰) — 매일 확인(06:17)이 보는 lastRun 은 대개 전날 20:10
-   회차라, 그 회차가 '알릴 거리 없음'이면 08:10 회차의 '보냈는데 한 대도 안 받음'이 덮여 그날 놓쳤다. 발송 회차에서만 KV 쓰기 1건이 는다. */
+   회차라, 그 회차가 '알릴 거리 없음'이면 08:10 회차의 '보냈는데 한 대도 안 받음'이 덮여 그날 놓쳤다. 발송 회차에서만 KV 쓰기 1건이 는다.
+   🔴 **구독에 한 건 이상 보낸 회차(sent > 0)만** 남긴다(2026-10-11 리뷰) — 새 글이 구독자 없는 학교에만 있으면 plan 은 그 학교를
+   깨울 대상으로 고르지만 send 는 맞는 구독이 없어 아무에게도 안 보내고 'sent' 로 끝난다. 그 {sent:0} 회차가 발송 기록을 덮어
+   ① 08:10 의 '보냈는데 한 대도 안 받음' 경보와 ② 발송 걸음 포기 기록(errorRecovered)을 지웠다 — 서명·발송을 하지 않은 회차라
+   발송이 되는지에 대해 아무것도 증명하지 않는다. lastRun 에는 그대로 남는다(회차가 돌았다는 기록). */
 const finishRun = async (env, run, outcome) => {
   const rec = JSON.stringify({
     slot: run.slot || null,                 // 예약 회차면 'YYYY-MM-DD#HH:MM'(KST) · 수동 /run 은 null
     startedAt: run.startedAt || null,
     finishedAt: Date.now(),
-    outcome,                                // 'nothing' = 알릴 거리 없음 · 'sent' = 깨우기를 끝까지 보냄
+    outcome,                                // 'nothing' = 알릴 거리 없음 · 'sent' = 발송 걸음을 끝까지 지남(맞는 구독이 없으면 sent 0)
     woke: run.woke || 0,                    // 푸시 서비스가 받아 준 수(폰에 닿은 수가 아니다)
     dropped: run.dropped || 0,              // 없어진 구독이라 지운 수
     sent: run.sent || 0,                    // 깨우기를 시도한 수
@@ -389,21 +393,26 @@ const finishRun = async (env, run, outcome) => {
     wakeAll: !!run.wakeAll,
   });
   await env.SUBS.put('state:lastRun', rec);
-  if (outcome === 'sent') await env.SUBS.put('state:lastSentRun', rec);
+  if (outcome === 'sent' && (run.sent || 0) > 0) await env.SUBS.put('state:lastSentRun', rec);
   await clearRun(env);
 };
 
 /* 포기 기록(state:lastError)이 회복됐는가 — **포기한 걸음을 그 뒤 회차가 실제로 지나갔을 때만** (2026-10-11 점검 · /health 와
    매일 확인 도구 tools/push-health-verdict.mjs 가 같이 부른다 — 베끼지 말 것).
-   - 발송(send) 걸음을 포기했다면 그 뒤 깨우기를 끝까지 보낸 회차(lastSentRun — 예약 회차든 수동 /run 이든)만 증거다.
+   - 발송(send) 걸음을 포기했다면 그 뒤 **구독에 한 건 이상 보낸** 회차(lastSentRun · sent > 0 — 예약 회차든 수동 /run 이든)만 증거다.
      '알릴 거리 없음' 회차는 plan 에서 끝나 send 를 거치지 않는다. 게다가 포기한 회차의 plan 이 그 공고들을 이미 '본 것'으로
      적어 두어 다음 회차는 대개 '없음'으로 끝난다 — 예전엔 그 회차로 회복을 쳐서, 발송이 끊겨도 매일 확인과 관리자 카드가 조용했다.
+     구독자 없는 학교에만 새 글이 있던 회차({sent:0})도 서명·발송을 하지 않았으니 증거가 아니다(finishRun 이 lastSentRun 에 안 적고,
+     여기서도 sent 를 한 번 더 본다 — 옛 서버 코드가 적어 둔 {sent:0} 기록을 매일 확인 도구가 다시 볼 때).
      시험 발송(/test)은 기록을 남기지 않아 증거가 아니다.
-   - reg·notices·plan 걸음은 끝까지 돈 회차(lastRun)면 지나간 것이다('없음' 회차도 plan 까지는 지난다). */
+   - reg·notices·plan 걸음은 끝까지 돈 회차(lastRun)면 지나간 것이다('없음' 회차도 plan 까지는 지난다).
+     단 그 기록에 unsent 표식이 있으면(아직 회복하지 않은 발송 포기를 이 포기가 덮어썼다 — 아래 tick 의 포기 갈래) 발송 걸음과 같은 규칙이다. */
 function errorRecovered(lastError, lastRun, lastSentRun) {
   if (!lastError) return false;
-  const proof = lastError.step === 'send' ? lastSentRun : lastRun;
-  return !!(proof && Number(proof.finishedAt) > Number(lastError.at));
+  const needSend = lastError.step === 'send' || lastError.unsent === true;
+  const proof = needSend ? lastSentRun : lastRun;
+  if (!proof || (needSend && !(Number(proof.sent) > 0))) return false;
+  return Number(proof.finishedAt) > Number(lastError.at);
 }
 
 /* 지금이 '깨울 시각'을 지났고 아직 안 깨웠으면 그 시각표를 돌려준다 */
@@ -443,8 +452,20 @@ async function tick(env, opts = {}) {
      tries는 걸음을 시작하기 **전에** 적는다 — 실행이 통째로 죽어도 숫자는 남아야 하기 때문. */
   if (run.tries >= STEP_MAX_TRIES) {
     await clearRun(env);
+    /* 포기 기록 칸은 하나라 뒤의 포기가 앞의 것을 덮는다. 앞의 것이 아직 회복하지 않은 발송 포기였으면, 덮어쓴 reg·notices·plan 포기가
+       '끝까지 돈 회차' 규칙으로 회복될 때 발송 실패까지 같이 사라졌다(2026-10-11 리뷰) → unsent 표식을 이어 적어 발송 규칙으로 보게 한다.
+       앞 기록을 못 읽으면 표식을 단다(경보 쪽 — 다음 발송 회차가 오면 풀린다). 포기 기록 쓰기가 먼저라 읽기 실패로 멈추지 않는다. */
+    let unsent = false;
+    if (run.step !== 'send') {
+      try {
+        const [prev, lr, lsr] = await Promise.all(['state:lastError', 'state:lastRun', 'state:lastSentRun']
+          .map(async (k) => JSON.parse((await env.SUBS.get(k)) || 'null')));
+        unsent = !!(prev && (prev.step === 'send' || prev.unsent === true) && !errorRecovered(prev, lr, lsr));
+      } catch (e) { unsent = true; }
+    }
     await env.SUBS.put('state:lastError', JSON.stringify({
-      at: Date.now(), step: run.step, note: `같은 걸음을 ${STEP_MAX_TRIES}회 실패해 이번 회차를 포기함`,
+      at: Date.now(), step: run.step, ...(unsent ? { unsent: true } : {}),
+      note: `같은 걸음을 ${STEP_MAX_TRIES}회 실패해 이번 회차를 포기함${unsent ? ' (그 전의 발송 포기도 아직 회복 전)' : ''}`,
     }));
     return { aborted: true, step: run.step };
   }
@@ -587,7 +608,7 @@ export default {
         pastError: recovered ? lastError : null, // 포기한 적이 있지만 그 뒤 회차가 그 걸음을 지나가 회복한 기록
         lastSlot,                            // 마지막으로 시작한 예약 회차 (KST)
         lastRun,                             // 마지막으로 끝까지 돈 회차의 결과 (finishRun)
-        lastSentRun,                         // 마지막으로 깨우기를 끝까지 보낸 회차 (outcome 'sent' · 없으면 null)
+        lastSentRun,                         // 마지막으로 구독에 한 건 이상 깨우기를 보낸 회차 (outcome 'sent' · sent > 0 · 없으면 null)
       }, 200, cors);
     }
 
