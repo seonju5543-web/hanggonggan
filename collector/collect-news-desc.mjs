@@ -11,8 +11,10 @@
      ③ 장부의 요약을 실린 글 전부에 입힌다(item.desc · 소급) — 못 뜬 글은 desc 가 없다(앱이 요약 줄을 안 그린다)
    🔴 발췌만 한다 — AI·짐작 없음. 판정은 순수 모듈 collector/news-desc.mjs 한 곳(관문이 그 파일을 그대로 부른다).
    🔴 남의 글 제목을 요약으로 싣지 않는다 (2026-10-11 점검 gap-04): ② 에 같은 학교 소식의 제목들을 넘겨 그 줄에서 멈추고(newsDesc 셋째 인자),
-      ③ 에서는 장부의 요약이 같은 학교 다른 글 제목을 담았으면 입히지 않는다(descToShow — 옛 판으로 실린 것이 네트워크 없이 바로 빠진다).
+      ③ 에서는 장부의 요약이 같은 학교 다른 글 제목을 담았으면 입히지 않는다(applyDescs → descToShow — 옛 판으로 실린 것이 네트워크 없이 바로 빠진다).
       장부 항목엔 규칙 판(v · DESC_RULE)을 적고, 판이 다른 desc·none 은 한 번 다시 연다(staleRule).
+      다시 열다 잠깐 실패해도 전에 뜬 요약은 지우지 않는다(nextEntry). 장부 쓰기·입히기 규칙은 news-desc.mjs 의 순수 함수
+      (nextEntry · applyDescs) — 여기서 식을 새로 쓰지 말 것(관문이 그 함수를 표본으로 잰다).
    ============================================================ */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -21,7 +23,7 @@ import { fetchBoard, netReason } from './fetch-board.mjs';
 import { NEWS_BOARD_RULES, newsRuleKey, postContentRequest } from './news-board-rules.mjs';
 import { withDeadline, TIMED_OUT } from './harvest-budget.mjs';
 import * as T from './news-thumb.mjs';
-import { newsDesc, DESC_MAX, DESC_RULE, staleRule, descToShow } from './news-desc.mjs';
+import { newsDesc, staleRule, nextEntry, applyDescs } from './news-desc.mjs';
 
 const ROOT = process.env.NEWS_DESC_ROOT || fileURLToPath(new URL('..', import.meta.url));
 const NEWS_DIR = path.join(ROOT, 'data/news');
@@ -88,10 +90,7 @@ const worker = async () => {
       const key = T.thumbKey(n);
       const r = await withDeadline(descFor(n).catch((e) => ({ err: String(e && e.message || e).slice(0, 80) })), ITEM_HARD_MS);
       const out = r === TIMED_OUT ? { err: '시한 넘김' } : r;
-      const prev = ledger.posts[key];
-      ledger.posts[key] = out.desc ? { at: today, v: DESC_RULE, desc: String(out.desc).slice(0, DESC_MAX + 1) }
-        : out.none ? { at: today, v: DESC_RULE, none: out.none }
-        : { at: today, v: DESC_RULE, err: out.err, tries: ((prev && prev.err && prev.tries) || 0) + 1 };
+      ledger.posts[key] = nextEntry(ledger.posts[key], out, today);   // 열기 실패 땐 전에 뜬 요약을 지우지 않는다
       done += 1; if (out.desc) got += 1;
       await new Promise((res) => setTimeout(res, GAP_MS));
     }
@@ -104,18 +103,15 @@ await Promise.all(Array.from({ length: LANES }, worker));
 let changed = 0;
 const live = new Set();
 for (const d of docs) {
-  for (const n of d.doc.items || []) {
-    const k = T.thumbKey(n); live.add(k);
-    const w = descToShow(ledger.posts[k], n.title, titlesOf.get(n) || []);   // 남의 제목을 담은 요약은 입히지 않는다
-    if (n.desc === w) continue;
-    if (w) n.desc = w; else delete n.desc;
-    d.changed = true; changed += 1;
-  }
-  if (d.changed) fs.writeFileSync(d.path, JSON.stringify(d.doc, null, 1) + (d.eol ? '\n' : ''));
+  for (const n of d.doc.items || []) live.add(T.thumbKey(n));
+  const c = applyDescs(d.doc.items || [], ledger.posts, T.thumbKey);   // 남의 제목을 담은 요약은 입히지 않는다
+  if (!c) continue;
+  changed += c;
+  fs.writeFileSync(d.path, JSON.stringify(d.doc, null, 1) + (d.eol ? '\n' : ''));
 }
 for (const [k, e] of Object.entries(ledger.posts)) if (!live.has(k) && dayDiff(e.at, today) > KEEP_DAYS) delete ledger.posts[k];
 /* 머리말은 늘 이 글자로 — 장부에서 읽은 옛 머리말이 뒤의 펼치기로 덮어쓰지 않게 먼저 바꿔 둔다 */
-ledger.note = '교내 소식 요약 장부 — collector/collect-news-desc.mjs 가 쓴다. posts: 글 열쇠별 결과(desc 원문 발췌 · none 못 뜸 · err 다시 시도 · v 규칙 판 — collector/news-desc.mjs DESC_RULE 과 다르면 다시 연다).';
+ledger.note = '교내 소식 요약 장부 — collector/collect-news-desc.mjs 가 쓴다. posts: 글 열쇠별 결과(desc 원문 발췌 · none 못 뜸 · err 다시 시도 — 전에 뜬 desc 는 재시도 동안 그대로 둔다 · v 규칙 판 — collector/news-desc.mjs DESC_RULE 과 다르면 다시 연다).';
 fs.writeFileSync(LEDGER_PATH, JSON.stringify({ note: ledger.note, ...ledger }, null, 1) + '\n');
 const withDesc = items.filter((n) => n.desc).length;
 console.log(`교내 소식 요약 — 이번에 ${done}건 열어 ${got}건 뜸 · 실린 글 ${items.length}건 중 요약 ${withDesc}건 · 바뀐 글 ${changed}건 (${Math.round((Date.now() - t0) / 1000)}초)`);

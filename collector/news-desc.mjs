@@ -14,6 +14,9 @@
       ② 「이전글·다음글·목록」 줄, 그리고 같은 학교 다른 글의 제목 줄(셋째 인자 siblings)에 닿으면 멈춘다 — 거기부터는 남의 글 목록이다.
          제목 줄 판정은 도우미 검색 요약과 같은 함수(notice-source.mjs makeTitleLine)를 불러 쓴다 — 베끼지 말 것.
       규칙을 바꾸면 DESC_RULE 을 올린다 — 로봇이 옛 판으로 뜬 글(desc·none)을 한 번씩 다시 연다.
+      ③ 남의 제목으로 멈추는 것은 그 제목을 통째로(또는 6할 이상) 담은 줄뿐이다(otherTitleLevel) — 짧은 조각은 건너뛰기만.
+         본문 자리(제목 줄)를 고를 때도 남의 제목을 통째로 담은 줄(비슷한 제목의 다른 글)은 고르지 않는다.
+      장부 규칙(nextEntry · applyDescs · staleRule · descToShow)도 이 파일의 순수 함수다 — 로봇은 부르기만 하고 관문이 표본으로 잰다.
    ============================================================ */
 import { makeTitleLine, normTitle } from './notice-source.mjs';
 
@@ -56,6 +59,29 @@ const MENU_HINT = /로그인|회원가입|사이트맵|바로가기|본문 바�
 export function otherTitleLine(siblings, title) {
   const own = normTitle(title);
   return makeTitleLine((siblings || []).filter((t) => t && normTitle(t) !== own).map((t) => ({ title: t })));
+}
+
+/**
+ * 줄이 같은 학교 다른 글의 제목과 얼마나 겹치나 — newsDesc 가 멈출지·건너뛸지·본문 자리로 고를지를 이 값으로 정한다.
+ *   0 남의 제목 아님(제 제목에 들어 있는 줄 포함) · 1 남의 제목의 짧은 조각(6할 미만) · 2 긴 조각(6할 이상) · 3 남의 제목을 통째로 담은 줄
+ * 짧은 조각(「2026.10.13.(화) 오전 11시」처럼 남의 제목 꼬리와 같은 날짜·시각 줄, 본문의 짧은 소제목)은 남의 목록이 시작됐다는
+ * 증거가 못 된다(점검 리뷰 — 조각 하나에 요약 전체가 '' 가 됐다). 담았는가 판정은 makeTitleLine 을 제목 하나씩 불러 쓴다(베끼지 말 것) —
+ * 여기서 더하는 것은 길이 비교 하나다.
+ * @returns {(line: string) => 0|1|2|3}
+ */
+export function otherTitleLevel(siblings, title) {
+  const own = normTitle(title);
+  const each = (siblings || []).filter((t) => t && normTitle(t) !== own)
+    .map((t) => ({ len: normTitle(t).length, hit: makeTitleLine([{ title: t }]) }));
+  return (line) => {
+    const n = normTitle(line);
+    /* 제 제목에 들어 있는 줄은 제 것 — 남의 제목과 글자가 똑같아도. 「… 안내(기간연장)」 글의 본문 머리가 「… 안내」로
+       되풀이되고, 같은 학교에 「… 안내」(첫 공고)가 따로 있는 일이 실제로 있다(인하대 저장 화면 — 남의 것으로 보면 본문 전에 멈춘다) */
+    if (own.includes(n)) return 0;
+    let lv = 0;
+    for (const s of each) if (s.hit(line)) lv = Math.max(lv, n.length >= s.len ? 3 : n.length >= s.len * 0.6 ? 2 : 1);
+    return lv;
+  };
 }
 
 /* 두 글자씩 겹치는 비율(다이스 계수) — 목록 제목과 글 화면 제목이 조금 다를 때(앞 번호 「9 」·괄호 꼬리) 같은 제목으로 본다 */
@@ -113,18 +139,28 @@ export function newsDesc(html, title, siblings = []) {
   const lines = pageLines(html);
   const nt = norm(title);
   if (!nt) return '';
-  /* 제목이 나오는 **마지막** 줄 다음부터가 본문이다 — 화면 맨 위 <title>·이동 경로에도 제목이 나오므로 마지막을 쓴다 */
+  /* 같은 학교 다른 글의 제목과 겹치는 정도(0~3) — 제 제목을 담은 줄(목록에 제 제목이 다시 나온 것)은 0 */
+  const sibLevel = otherTitleLevel(siblings, title);
+  /* 제목이 나오는 **마지막** 줄 다음부터가 본문이다 — 화면 맨 위 <title>·이동 경로에도 제목이 나오므로 마지막을 쓴다.
+     🔴 단 남의 제목을 통째로 담은 줄(비슷한 제목의 **다른 글** — 희망사다리Ⅰ↔Ⅱ · 헌혈 버스 회차)은 제 제목이 아니다 — 그 줄을
+     본문 자리로 고르면 본문을 건너뛰고 목록 뒤(주소·메뉴)부터 읽는다(점검 리뷰). 조각(1·2)은 고를 수 있다 — 본문 머리의
+     「2026 학년도 제1 학기」 같은 줄이 목록의 잘린 제목(「… 제1학기 형설장학금 ..」)에 들어 있을 뿐인 일이 있다(서울시립대 저장 화면). */
   let at = -1;
-  lines.forEach((l, i) => { if (titleLike(l, title)) at = i; });
+  lines.forEach((l, i) => { if (titleLike(l, title) && sibLevel(l) < 3) at = i; });
   if (at < 0) return '';
-  const isOther = otherTitleLine(siblings, title);
   const body = [];
   let skipValue = false;
   for (const l of lines.slice(at + 1)) {
-    if (skipValue) { skipValue = false; continue; }                   // 홀로 선 이름표의 값(작성자 → 학생지원팀)
+    /* 홀로 선 이름표의 값(작성자 → 학생지원팀) — 값처럼 보일 때만(짧고 문장으로 안 끝남) 건너뛴다.
+       값이 빈 이름표(「담당부서」 바로 다음이 본문 첫 문장 — 연세 미래 꼴)에서 본문을 버리지 않게(점검 리뷰) */
+    if (skipValue) { skipValue = false; if (l.length <= 30 && !/[다요]\.?$/.test(l)) continue; }
+    /* 🔴 여기부터는 남의 글 — 본문 전이어도 멈춘다(본문이 그림뿐인 글은 빈 값이 맞다. 건너뛰고 읽으면 목록 뒤 주소·메뉴가 요약이 된다).
+       남의 제목 판정은 「제목이 한 번 더」보다 먼저 — 비슷한 제목의 다른 글을 제 제목으로 보고 건너뛰면 그 뒤 주소가 요약이 된다 */
+    if (STOP_LINE.test(l)) break;
+    const lv = sibLevel(l);
+    if (lv >= 2) break;                                                 // 남의 제목(통째 또는 6할 이상)
+    if (lv === 1) continue;                                             // 남의 제목의 짧은 조각(날짜·소제목)은 건너뛰기만
     if (titleLike(l, title)) continue;                                  // 제목이 한 번 더
-    /* 🔴 여기부터는 남의 글 — 본문 전이어도 멈춘다(본문이 그림뿐인 글은 빈 값이 맞다. 건너뛰고 읽으면 목록 뒤 주소·메뉴가 요약이 된다) */
-    if (STOP_LINE.test(l) || isOther(l)) break;
     if (MENU_HINT.test(l)) { if (body.length) break; continue; }      // 본문 뒤 꼬리(저작권)에 닿으면 멈춘다
     if (VALUE_LABEL.test(l)) { skipValue = true; continue; }
     if (META_LINE.test(l) || hangul(l) < 4) continue;                  // 작성자·날짜·조회수·파일 이름
@@ -150,4 +186,43 @@ export function descToShow(entry, title, siblings) {
   const d = entry && entry.desc;
   if (!d) return undefined;
   return otherTitleLine(siblings, title)(d) ? undefined : d;
+}
+
+/**
+ * 글 하나를 열어 본 결과로 장부 항목을 새로 쓴다.
+ * 🔴 열기가 잠깐 실패하면(err) **전에 뜬 요약을 지우지 않는다** — 옛 판 요약을 새 판으로 다시 열다(staleRule) 학교 서버가
+ * 잠깐 안 받으면 멀쩡한 요약이 사라지고, 재시도 세 번이 다 실패하면 영영 안 돌아왔다(점검 리뷰). 재시도 동안에도 옛 요약은
+ * descToShow(남의 제목 거르기)를 거쳐 그대로 보인다. 다시 열어 새 판이 none 이라고 말하면 그때 빠진다.
+ * @param {object|undefined} prev 지금 장부 항목
+ * @param {{desc?: string, none?: string, err?: string}} out 이번에 열어 본 결과
+ * @param {string} today 오늘(YYYY-MM-DD · 한국 시각)
+ */
+export function nextEntry(prev, out, today) {
+  if (out && out.desc) return { at: today, v: DESC_RULE, desc: String(out.desc).slice(0, DESC_MAX + 1) };
+  if (out && out.none) return { at: today, v: DESC_RULE, none: out.none };
+  return {
+    at: today, v: DESC_RULE, err: (out && out.err) || '알 수 없는 실패', tries: ((prev && prev.err && prev.tries) || 0) + 1,
+    ...(prev && prev.desc ? { desc: prev.desc } : {}),
+  };
+}
+
+/**
+ * 한 학교 파일의 글들에 장부의 요약을 입힌다(소급) — 입힐 것이 없거나 남의 제목을 담은 요약이면 desc 를 뗀다.
+ * 같은 학교 제목들은 이 글 목록에서 뽑는다(학교 파일 하나가 한 학교 · 숨긴 글도 그 학교 게시판에는 떠 있으니 넣는다).
+ * @param {object[]} items 학교 파일의 글들(제자리에서 고친다)
+ * @param {object} posts 장부의 posts
+ * @param {(n: object) => string} keyOf 글 열쇠(news-thumb.mjs thumbKey — 썸네일 장부와 같은 열쇠)
+ * @returns {number} 바뀐 글 수
+ */
+export function applyDescs(items, posts, keyOf) {
+  const titles = (items || []).map((n) => n && n.title).filter(Boolean);
+  let changed = 0;
+  for (const n of items || []) {
+    if (!n) continue;
+    const w = descToShow((posts || {})[keyOf(n)], n.title, titles);
+    if (n.desc === w) continue;
+    if (w) n.desc = w; else delete n.desc;
+    changed += 1;
+  }
+  return changed;
 }
