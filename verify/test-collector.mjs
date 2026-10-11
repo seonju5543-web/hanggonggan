@@ -8737,13 +8737,20 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
       [ND.staleRule({ at: '2026-10-10', desc: 'a' }), ND.staleRule({ at: '2026-10-10', none: 'a' }), ND.staleRule({ at: '2026-10-11', v: ND.DESC_RULE, desc: 'a' }), ND.staleRule({ at: '2026-10-10', err: 'e', tries: 1 })],
       [true, true, false, false]);
 
+    /* 워크플로·로봇 코드 **글자**를 재는 줄은 softEq — 로봇 워크플로(데이터 관문)에선 어긋나도 경고만, 로컬·verify-ui(DOC_GATES=1)에선 실패 (점검 gap-06 · health-gates 와 같은 잣대) */
+    const { softEq } = await import('./health-gates/alerts.mjs');
+    const eqWf = softEq(eq, DOC_GATES);
     const wf = readText(new URL('../.github/workflows/collect-news.yml', import.meta.url));
     const appN = readText(new URL('../app.js', import.meta.url));
+    const robotN = readText(new URL('../collector/collect-news-desc.mjs', import.meta.url));
     eq('  앱 — 요약이 있는 글만 요약 줄을 그린다 (홈 띠 · 전체 보기 카드)', [/\$\{n\.desc \? `<span class="news-tile-desc">/.test(appN), /\$\{o\.desc \? `<p class="sch-desc">/.test(appN), /desc: n\.desc \}\)/.test(appN)], [true, true, true]);
     eq('  앱 — 「오늘 n」 은 부를 때마다 오늘을 읽는다 (todayStart · 날짜를 굳히지 않는다)', /function newsIsToday[\s\S]{0,300}todayStart\(\)/.test(appN), true);
-    eq('  워크플로 — 요약 단계는 보강(continue-on-error) · 장부를 저장하고 감사 실패 땐 되돌린다',
+    eqWf('  워크플로 — 요약 단계는 보강(continue-on-error) · 장부를 저장하고 감사 실패 땐 되돌린다',
       [/collect-news-desc\.mjs/.test(wf), /name: 교내 소식 요약[\s\S]{0,120}continue-on-error: true/.test(wf),
         /git add collector\/news-desc\.json/.test(wf), /git checkout -- collector\/news-desc\.json/.test(wf)], [true, true, true, true]);
+    eqWf('  로봇 — 같은 학교 제목을 넘기고(newsDesc 셋째 인자) · 입힐 때 descToShow · 다시 열 때 staleRule · 장부에 판(v)',
+      [/newsDesc\(text, n\.title, titlesOf\.get\(n\)/.test(robotN), /descToShow\(ledger\.posts\[k\]/.test(robotN), /staleRule\(e\)/.test(robotN), /v: DESC_RULE/.test(robotN)],
+      [true, true, true, true]);
   }
 
   /* 🔴 우리 학교 게시판 공고 · 재단·지자체 새 공고 (2026-10-10 팀 업무 분장 11번 — 은서) */
