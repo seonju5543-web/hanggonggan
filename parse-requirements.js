@@ -109,13 +109,36 @@ function parseCredits(t) {
 }
 
 /* ── 학년 ── `2학년 이상` `1학년` `신입생` */
+/* 🔴 **연도는 학년이 아니다** (2026-10-11 · 카드 분석 조각 B). `2026학년도 2학기 정규학기 재학생` 의
+   끝자리를 집어 '6학년' 조건을 만들었다 — 확신이 낮아 ✕ 는 안 냈지만 줄 전체가 '모름'이 되어,
+   재학·구간·성적이 다 맞는 학생에게도 표시가 없었다(실측 26줄 · 22건). 숫자 바로 뒤의 숫자는
+   학년이 아니다(`2026학년도`·`'26학년도`·`2026학년 신입생`). */
+const YEAR_NUM = /(?<!\d)(\d)\s*학년\s*(이상|이하|만)?/;
+const YEAR_NUM_ALL = /(?<!\d)\d\s*학년/g;
+/* 🔴 **예외 괄호는 요건이 아니라 면제다** (2026-10-11 · 조각 B).
+   `평점평균 2.0 이상인 자 (단, 신입생·편입생 성적제한 없음)` 의 `신입생` 을 집어 '1학년' 조건을
+   만들었다 — 3학년 학생은 성적·학점이 다 맞아도 그 줄이 '모름'이었다. 괄호가 말하는 것은
+   '신입생은 성적을 안 본다'이지 '신입생만 된다'가 아니다. 그래서 학년은 **괄호를 걷어 낸 본문**에서만 읽는다.
+   ⚠️ 걷어 낸 괄호에 학년 이야기가 있었으면 남은 조건의 확신을 **낮춘다** —
+      `3학년 이상 (… 3학년 1학기 진학 예정자 포함)` 은 2학년에게도 열려 있다. 괄호를 걷었다고
+      확신이 올라가면 틀린 미달이 생긴다(틀린 미달은 못 받는 것보다 나쁘다).
+   ⚠️ 학년 축에만 쓴다 — 성적·학점은 본문 그대로 읽는다(예외 괄호는 거기서 이미 확신을 낮춘다). */
+const YEAR_EXCEPT_PAREN = /[(（][^()（）]*(?:단\s*[,，]|다만|예외|무관|제외|없음|미적용|해당\s?없|포함|불문|관계\s?없)[^()（）]*[)）]/g;
 function parseYear(t) {
+  const dropped = [];
+  const body = String(t).replace(YEAR_EXCEPT_PAREN, (x) => { dropped.push(x); return ' '; });
+  const soften = dropped.some((x) => /학년|신입|편입|재입학/.test(x));
+  const r = parseYearBody(body);
+  if (r && soften) r.conf = LOW;
+  return r;
+}
+function parseYearBody(t) {
   if (/신입생/.test(t) && !/신\s*[·,\/]\s*편입생/.test(t)) return { kind: 'year', eq: 1, conf: LOW };
-  const m = t.match(/(\d)\s*학년\s*(이상|이하|만)?/);
+  const m = t.match(YEAR_NUM);
   if (!m) return null;
   const v = num(m[1]);
   if (v == null || v < 1 || v > 6) return null;
-  const many = (t.match(/\d\s*학년/g) || []).length > 1;   // `1학년 또는 2학년` — 범위라 단정 불가
+  const many = (t.match(YEAR_NUM_ALL) || []).length > 1;   // `1학년 또는 2학년` — 범위라 단정 불가
   if (m[2] === '이상') return { kind: 'year', min: v, conf: many ? LOW : HIGH };
   if (m[2] === '이하') return { kind: 'year', max: v, conf: many ? LOW : HIGH };
   return { kind: 'year', eq: v, conf: LOW };   // `2학년 학생` — 딱 그 학년인지 이상인지 애매
