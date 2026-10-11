@@ -392,7 +392,8 @@ export default async function gate(eq, ctx) {
     }
     /* ㉥ 소식 로봇 단계(collect-news.yml 과 같은 꼴) — 단락은 실제로 되돌린 소식 파일을 말하고 '정식 등록'·'자동 등록'은 한 글자도 없다(리뷰 — 사실과 반대인 문장) */
     {
-      const NEWS_STAGES = ['--stage', 'data/news,collector/seen-news.json,collector/news-thumbs.json', '--stage', 'collector/news-sources.json'];
+      /* collect-news.yml 의 되돌리기 단계와 같은 단계 목록 — 요약 장부(news-desc · 2026-10-11)까지 */
+      const NEWS_STAGES = ['--stage', 'data/news,collector/seen-news.json,collector/news-thumbs.json,collector/news-desc.json', '--stage', 'collector/news-sources.json'];
       const NH = { 'data/news/k.json': { school: '경희대학교', items: [{ id: 'p1' }] }, 'collector/seen-news.json': { seen: ['p1'] },
         'collector/news-sources.json': { sources: [{ id: 's1', school: '경희대학교' }] }, 'r.md': '# 교내 소식 수집 리포트\n\n- 새 글 2건\n' };
       const noScholar = (t) => !/정식 등록|자동 등록|등록·승격|실시간 피드/.test(t || '');
@@ -418,7 +419,7 @@ export default async function gate(eq, ctx) {
       const C = scenario({ ...NH, 'data/news/k.json': { items: [{ id: 'p1', bad: true }] } }, {}, { stages: NEWS_STAGES });
       const rc = C.read('note.md');
       eq('  직전 판부터 빨강 · 바뀐 소식 파일 없음 → still-failing · 되돌릴 수 있던 것을 말하고 \'되돌린 뒤에도\'라 하지 않는다 · 정식 등록 낱말 없음',
-        [C.out.gate, /되돌릴 수 있는 것\(교내 소식 발행분·소식 장부·소식 사진 장부·소식 출처 목록\)이 이번 실행에 바뀌지 않았는데도/.test(rc), /되돌린 뒤에도/.test(rc), noScholar(rc)],
+        [C.out.gate, /되돌릴 수 있는 것\(교내 소식 발행분·소식 장부·소식 사진 장부·소식 요약 장부·소식 출처 목록\)이 이번 실행에 바뀌지 않았는데도/.test(rc), /되돌린 뒤에도/.test(rc), noScholar(rc)],
         ['still-failing', true, false, true]);
       C.done();
     }

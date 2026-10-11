@@ -444,15 +444,19 @@ export default async function gate(eq, ctx) {
   eqWf('  사진(썸네일) 단계에 id 가 있고 그 결과를 보는 경보·닫기 짝이 있다',
     [ns.some((s) => s.id === 'thumbs' && /collect-news-thumbs\.mjs/.test(s.run || '')), alertsWhere("steps.thumbs.outcome == 'failure'").map(modeOf), alertsWhere("steps.thumbs.outcome == 'success'").map(modeOf)],
     [true, ['open'], ['resolve']]);
+  /* 요약 단계도 같다 (2026-10-11 · 점검 gates-2) — 기본 브랜치에서 합친 요약 단계만 id·경보 짝이 없어, 넘어져도 작업은 초록이고 이슈도 없었다 */
+  eqWf('  요약 단계에 id 가 있고 그 결과를 보는 경보·닫기 짝이 있다(보강이라 넘어져도 작업은 초록 — 짝이 없으면 요약이 멈춘 것을 아무도 모른다)',
+    [ns.some((s) => s.id === 'desc' && /collect-news-desc\.mjs/.test(s.run || '') && s['continue-on-error'] === 'true'), alertsWhere("steps.desc.outcome == 'failure'").map(modeOf), alertsWhere("steps.desc.outcome == 'success'").map(modeOf)],
+    [true, ['open'], ['resolve']]);
   /* 경보를 여는 단계는 저장 **뒤**에 (리뷰 2026-10-05) — 여는 단계는 continue-on-error 가 없어(넘어지면 robot-down 이 닿게) 저장 앞에 두면
      이슈 API 가 흔들린 날 관문·저장이 건너뛰어져 그 실행의 소식이 저장되지 않는다. 저장 앞에 둘 거면 continue-on-error 를 단다. */
   const saveAt = ns.findIndex((s) => /git commit/.test(s.run || ''));
-  /* 여는 경보 셋(수집·사진·감사) — 감사 실패 알림은 gate-guard 단락(/tmp/gate-note.md)을 본문 파일로 싣느라 도구를 직접 부른다
-     (run: node tools/alert-issue.mjs --match prefix · 2026-10-05 병합). 액션(uses)만 세면 둘이 되므로 둘 다 세고, 리포트 이슈(같은 도구 · open)는 뺀다 */
+  /* 여는 경보 넷(수집·사진·요약·감사 · 요약은 2026-10-11) — 감사 실패 알림은 gate-guard 단락(/tmp/gate-note.md)을 본문 파일로 싣느라 도구를 직접 부른다
+     (run: node tools/alert-issue.mjs --match prefix · 2026-10-05 병합). 액션(uses)만 세면 하나가 빠지므로 둘 다 세고, 리포트 이슈(같은 도구 · open)는 뺀다 */
   const opensAlert = ns.filter((s) => modeOf(s) === 'open' && /alert-issue/.test(`${s.uses || ''} ${s.run || ''}`) && !/교내 소식 수집 리포트/.test(s.raw || ''));
   const opensBeforeSave = ns.slice(0, Math.max(saveAt, 0)).filter((s) => modeOf(s) === 'open' && /alert-issue/.test(`${s.uses || ''} ${s.run || ''}`) && s['continue-on-error'] !== 'true').map((s) => s.name);
   eqWf('  경보를 여는 단계는 저장 뒤에(저장 앞이면 continue-on-error) — 경보 하나가 넘어져 그 실행의 소식이 저장되지 않는 일이 없게',
-    [saveAt > 0, opensBeforeSave, opensAlert.length], [true, [], 3]);
+    [saveAt > 0, opensBeforeSave, opensAlert.length], [true, [], 4]);
   /* 🔴 '실패 단계가 robot-down 하나뿐'으로 재지 않는다 — 다른 세션이 '못 넣은 수집분 보관(if: failure())' 같은 단계를 더하면 헛빨간불(리뷰 2026-10-05).
      그런 단계를 끼운 표본(진짜 파일 + 한 단계)에도 같은 판정이 나는지 함께 잰다. */
   eqWf('  실패·시간초과는 robot-down(리포트 이슈가 없어도 닿는다) · 결과물 올리기 단계를 끼워도 같은 판정(S3 도 통과)',
