@@ -209,7 +209,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 | `collector/pdf-text.py` `ocr-text.py` `hwp-*.py` | 첨부 글자 뽑기(`.ocr.txt` 는 품질 관문 통과분만) |
 | `verify/entry-rules.cjs` | 등록 규칙 한 곳 — 로봇(등록 전)과 감사(사후)가 같이 쓴다. **새 규칙은 여기에만** |
 | `_admin/` `tools/admin-apply.mjs` `tools/edit-diff.mjs` | 관리자 화면(Cloudflare Pages + Access) · 저장 경로 · 칸 정리 |
-| `server/push/` `server/chat/` `server/essay/` `server/mail-worker.js` | 푸시(가동) · 도우미 AI·초안·메일(배포 대기) |
+| `server/push/` `server/chat/` `server/essay/` `server/apply/` | 푸시(켜짐) · 도우미·초안·접수 대행(꺼짐) — 현황표 `server/README.md`(옛 `server/mail-worker.js` 는 2026-09-25 폐기) |
 | `insta/` | 인스타 카드뉴스(`insta/README.md` · 스킬 `insta-revise`·`insta-template`) |
 | `tools/notion-status.mjs` | 노션 「작업 현황」 로봇 |
 | `DESIGN.md` | 디자인 값의 사람용 사본 — 원본은 `style.css`, 관문 `verify/ui-tone.mjs` |
@@ -239,7 +239,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   자동 등록은 늘 게시한 학교로 `schoolOnly` 를 단다 — **재단·구청·KOSAF에 직접 내는 것은 전국**, 학교 창구(장학팀·포털·추천 배정)로 받는 것만 그 학교.
   새로 묶인 것은 관리자 「할 일」의 '교외인데 한 학교에만' 묶음에 뜬다. 칸을 새로 만들면 `admin-apply.mjs`·`edit-diff.mjs` 의 `ELIG_KEYS` 에도(안 하면 저장 때 조용히 버려진다).
 - **분교 ≠ 이원화** — 분교는 `UNIVERSITIES` 에 별개 학교, 이원화는 `CAMPUSES_BY_SCHOOL`. 게시판 공유 분교 판정은 `noticeForProfile` 한 곳(data.js 금지 — sw 가 안 읽는다).
-- **'오늘'을 상수로 굳히지 말 것** — `todayStart()` 가 부를 때마다 읽는다(PWA 는 며칠씩 떠 있다). 관문 「마감 판정이 앱을 켠 시각에 굳지 않는다」.
+- **'오늘'을 상수로 굳히지 말 것** — `todayStart()` 가 부를 때마다 읽는다(PWA 는 며칠씩 떠 있다) · 자동 등록의 연도도 오늘 기준(`yearHold` · `y >= 2027` 상수가 10월 내년도 모집 90건을 막았다). 관문 「마감 판정이 앱을 켠 시각에 굳지 않는다」.
 
 ### 교내/교외 · 제목 · 금액 · 마감
 
@@ -308,13 +308,13 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - **시작 화면**(정문 투어링): `docs/designs/start-screen.md` · `.onboard-step[data-step="0"]` 의 `flex: none` 을 빼면 높이 0 · 사진은 위키미디어 열린 라이선스만.
 - **개발자가 정한 화면 결정 (되돌리지 말 것)**: 카드 마감은 `D-3` 글자 하나(빨간 막대 삭제) · 적합도는 알약 · 누르면 회색 판이 아니라
   글자색이 바뀐다(탈퇴 제외 · `:active` 는 마우스가 아니라 CDP 로 잰다) · 패럴랙스 없음 · MY 프로필 카드는 통째 버튼이 아니다(`.my-edit-hint` 만) ·
-  여백은 상자 사이가 아니라 **글자와 글자 사이**로 잰다 · 화면 제목 밑줄은 글자 폭 · 구분선은 목록에만. 관문 `verify-settings.js`.
+  여백은 상자 사이가 아니라 **글자와 글자 사이**로 잰다 · 화면 제목 밑줄 없음(10-06 'AI 티' 개선안 A) · 구분선은 목록에만. 관문 `verify-settings.js`.
 - 일괄 신청 준비는 `confirm()` 이 아니라 앱 목록(`renderBulkPrep`) · 시트 그릇은 `#detail-sheet` · 체크해도 다시 그리지 않는다.
 - 기다림이 보이는 곳은 실시간 공고 구역 하나(`allScholarships` 가 상시 제도를 먼저 준다). 못 받아 왔을 때 `null` 로 두지 말 것(뼈대가 굳는다).
 
 ### 로봇 · 워크플로
 
-- **🔴 로봇이 고친 파일은 전부 `git add` 에** · 없을 수 있는 파일은 `[ -f … ] && git add` · 데이터 관문(감사)은 저장 직전 · 감사 실패면 결과가 하나도 안 남는다.
+- **🔴 로봇이 고친 파일은 전부 `git add` 에** · 없을 수 있는 파일은 `[ -f … ] && git add` · 데이터 관문(감사)은 저장 직전 · 빨가면 `collector/gate-guard.mjs` 가 단계별로 되돌리며 다시 잰다(끝내 빨가면 이슈 + 빨간불 · 두 번 걸린 자동 등록은 3일 쉼).
 - **🔴 모든 워크플로에 `timeout-minutes`** · 보강 단계는 `timeout-minutes` + `continue-on-error: true` · 실패 알림은 `if: failure() || cancelled()` ·
   학교마다 `withDeadline()` 절대 시한 · 전역 예산(`harvest-budget.mjs`) 안에 스스로 끝낸다(상한을 올리는 건 해법 아님) · 넘어져도 `saveAll()`.
 - 대기줄(concurrency)을 하나로 합치지 말 것(대기 실행이 취소된다) · 예약은 정각·UTC 자정을 피한다(지연·누락이 실제로 났다 · 관례는 홀수 분) · 새 공고 0건이면 이슈 대신 코멘트.
@@ -376,13 +376,13 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   2026-09-26까지 넷(`kosaf-fetch`·`essay-playbook`·`refresh-tuition`·`refresh-majors`)을 **초록불인 채로** 놓쳤다.
   새 로봇이 앱 데이터를 쓰면 `deploy-sync.yml` 의 `workflows:` 목록에도 이름을 넣는다(안 넣으면 최대 12시간 안 나간다).
 - 검사는 '돌리라고 적어 두면' 안 돈다 — 워크플로·훅에 걸어야 돈다. 새 사고는 **먼저 관문을 만들고** 여기엔 그 위치만 적는다.
-- 훅은 스킬 호출을 장부(`.claude/hooks/skill-ledger.sh`)에 적는다. Stop 훅이 **막는 것은 디버깅 빚뿐**(verify 빨간불 뒤 `systematic-debugging` 미호출), 리뷰는 알림.
-  빚 관문·노션 표식은 조기 종료보다 **위**에 둔다. 리뷰 스킬이 서브에이전트를 못 쓰면 diff 를 직접 보되 항목을 하나씩 짚는다.
+- **로봇·도구 점검**(2026-10-04~11 · 규칙 전체 `docs/designs/robot-health.md`): 고친 것마다 `verify/health-gates/` 묶음 — 관문 「로봇·도구 점검 관문」. 🔴 표본만 잰다(실데이터 단정은 `REAL_READ_ALLOW` 톱니로 잠김) · 워크플로·문서 글자는 `softEq`(로봇에선 경고) · 셸은 가짜 node·gh 로 실제로 돌린다.
+- 🔴 경보 이슈는 `tools/alert-issue.mjs` 한 곳(여는·닫는 단계의 제목이 같아야 닫힌다 · 제목에 날짜 금지 · 보강 단계도 경보 짝) · 푸시 서버는 공용 규칙의 사본을 둔다(원본을 바꾸면 `server/push/worker.js` 도) · 피드는 `healFromLedger` 로 스스로 메운다(피드에서 빼는 새 규칙은 메우기에도) · 열쇠 규칙을 바꾸면 실린 데이터도 새 열쇠로 다시 합친다.
+- 훅은 스킬 호출을 장부(`.claude/hooks/skill-ledger.sh`)에 적는다. Stop 훅이 **막는 것은 디버깅 빚뿐**(verify 빨간불 뒤 `systematic-debugging` 미호출), 리뷰는 알림. 빚 관문·노션 표식은 조기 종료보다 **위**에 둔다. 리뷰 스킬이 서브에이전트를 못 쓰면 diff 를 직접 보되 항목을 하나씩 짚는다.
 
 ## 제안서 → 진짜 원클릭 (개발자에게 설명할 때)
 
-마지막 제출은 학교 시스템이라 앱이 못 누른다. 장학팀 제안서가 문을 연다 — ①정보 연계(공고 직접 제공) ②표준화 접수 파일럿(이메일 접수 공식 인정 →
-그때부터 "신청 완료"를 정직하게 쓸 수 있다) ③학사 연동(증명서 발급 소멸). PDF 는 `proposals/`.
+마지막 제출은 학교 시스템이라 앱이 못 누른다. 장학팀 제안서가 문을 연다 — ①정보 연계(공고 직접 제공) ②표준화 접수 파일럿(이메일 접수 공식 인정 → 그때부터 "신청 완료"를 정직하게 쓸 수 있다) ③학사 연동(증명서 발급 소멸). PDF 는 `proposals/`.
 
 ## 앞으로 여기에 쓸 때의 규칙
 

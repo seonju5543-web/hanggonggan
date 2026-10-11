@@ -7,6 +7,11 @@
 #    같은 줄을 다시 보려면 그 줄을 지웠다 다시 넣어 push 하거나, Actions 에서 수동 실행(전부 연다).
 #    답을 받은 줄은 '# (답 받음 날짜 · 근거) ' 를 앞에 붙여 막는다(수동 실행에서도 안 열리게).
 
+# 2026-10-11 (점검 마무리) — 리포트는 '✅ 실공고 15·20건 감지'인데 학생 피드가 0건인 두 학교. 9월 뒤 수집 장부에 새 글이 하나도 없다(한양 seen 09월 이후 0 · 방송대 09월 4).
+#   게시판이 늘 같은 글(고정 공지)만 돌려주는지, 날짜 줄·글 주소가 무엇인지 본다(원인 단정 금지 — 이 답을 보고 고친다).
+checkUrl: https://www.hanyang.ac.kr/notice_all?p_p_id=kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_action=view&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_sCategoryId=224311300
+checkUrl: https://www.knou.ac.kr/bbs/knou/51/artclList.do?bbsClSeq=&bbsOpenWrdSeq=25&isViewMine=false&srchColumn=sj&srchWrd=
+
 # 2026-10-04 (대대적 점검 2차) — 1차 답: 홍익대는 세 주소 모두 봇 차단 화면(cdn-botmanager.stclab.com 'Security Verification') → 개발자에게 묻는다.
 #   시립대 FA1 은 '일반공지 < UOS공지'(장학 전용 아님 확인) · 첫 화면 '장학/학자금대출' 메뉴의 scholarship.do 는 아직 안 열어 봄 → 열어 본다(안내 페이지인지 게시판인지).
 #   동국대 WISE '장학' 은 국가장학 안내 표(/page/123 · 글 목록 아님) → 첫 화면에서 '공지사항' 을 눌러 들어간 최종 주소를 받는다(장학 분류가 있는지).
