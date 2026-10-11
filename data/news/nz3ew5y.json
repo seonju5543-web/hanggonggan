@@ -64,7 +64,8 @@
    "postedAt": "2026-09-10",
    "school": "연세대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "desc": "학생지원팀 담당부서 학생지원팀 ☞ 예약하기 &rarr; SEVENCOLOR (클릭)"
   },
   {
    "title": "일반공지 <2026학년도 2학기 신촌 교내·경복궁역 셔틀버스 운행 시간표> 신촌/국제",
@@ -91,7 +92,8 @@
    "school": "연세대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/f285dde821e22c9f.webp"
+   "thumb": "data/news/img/f285dde821e22c9f.webp",
+   "desc": "- 일시: 2026년 10월 1일(목), 14:00-16:05 - 장소: 연세대학교 백양누리 그랜드볼룸A"
   }
  ]
 }

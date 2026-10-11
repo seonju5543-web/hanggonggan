@@ -3,6 +3,10 @@
  "updatedAt": "2026-10-11",
  "schools": 44,
  "files": {
+  "전남대학교": {
+   "file": "nwqmwga.json",
+   "count": 36
+  },
   "국민대학교": {
    "file": "n1tasrsl.json",
    "count": 17
@@ -29,10 +33,6 @@
   },
   "계명대학교": {
    "file": "n1nel147.json",
-   "count": 34
-  },
-  "전남대학교": {
-   "file": "nwqmwga.json",
    "count": 34
   },
   "부산대학교": {
