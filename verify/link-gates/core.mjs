@@ -177,6 +177,15 @@ export default async function gate(eq, ctx) {
     const missing = [...used].filter((c) => !consts.includes(c));
     eq('⑧ what-shows.mjs 링크 자리 — 떼어 오는 앱 함수가 쓰는 한 줄 const 가 빠짐없이 같이 온다(빠지면 그 꼴의 글에서만 넘어진다)',
       [fns.length > 10, consts.includes('hintText'), missing], [true, true, []]);
+    /* 부르는 **함수**도 같다 (2026-10-11 · 10-10 카드 윗줄 날짜가 `shortDay` 를 부르기 시작해 게시판·재단·소식 카드에서
+       `shortDay is not defined` — const 만 재던 이 절이 못 잡았다). 떼어 오는 함수 몸이 부르는 app.js 최상위 함수가 목록에 없으면 실패. */
+    const topFn = [...appSrc.matchAll(/^function ([A-Za-z_$][\w$]*)\(/gm)].map((m) => m[1]);
+    const calls = new Set();
+    for (const src of fns.map(body)) for (const f of topFn) if (new RegExp(`\\b${f.replace(/\$/g, '\\$')}\\(`).test(src)) calls.add(f);
+    const stubbed = [...linkBlock.matchAll(/function ([A-Za-z_$][\w$]*)\(/g)].map((m) => m[1]);   // 도구가 자리에 직접 둔 대역(isSaved 등)
+    const missingFns = [...calls].filter((f) => !fns.includes(f) && !stubbed.includes(f));
+    eq('⑧ what-shows.mjs 링크 자리 — 떼어 오는 앱 함수가 부르는 앱 함수도 빠짐없이 같이 온다',
+      missingFns, []);
   }
   /* ⑨ 주소가 고쳐진 옛 공고가 '새 공고'로 다시 울리지 않는다 (리뷰 F3 — 사냥꾼이 표식을 진짜 주소로 고치면 같은 공고의 주소가 바뀐다) */
   {
