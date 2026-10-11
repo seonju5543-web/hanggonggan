@@ -210,7 +210,7 @@ if (totalBoard) L.push(`- 전체 인식 비율 **${Math.round(((totalBoard - tot
 L.push('');
 L.push('### 누락 원인별 (많은 순)');
 Object.entries(causeTotal).sort((a, b) => b[1] - a[1]).forEach(([c, n]) => {
-  const mark = c === '원인 미상' ? '🚨' : (c === '수집했지만 피드에서 빠짐' ? '⚠️' : '·');   // 빠짐 — 수집기의 장부 메우기(healFromLedger)가 FEED_HEAL_SINCE 이후 수집분은 다음 실행에 메운다
+  const mark = c === '원인 미상' ? '🚨' : (c === '수집했지만 피드에서 빠짐' ? '⚠️' : '·');   // 빠짐 — 수집기의 장부 메우기(healFromLedger)는 9-30 사고 창(FEED_HEAL_SINCE ~ FEED_HEAL_UNTIL) 수집분만 다음 실행에 메운다 · 그 밖은 사냥꾼이 합친 글 등
   L.push(`- ${mark} **${c}** ${n}건`);
 });
 if (!Object.keys(causeTotal).length) L.push('- 누락 없음');

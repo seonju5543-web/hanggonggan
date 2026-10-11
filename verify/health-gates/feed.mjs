@@ -8,6 +8,8 @@
         ⓓ (리뷰 R1) 학생이 지금 보는 판(학교별 파일)이 장부보다 먼저 — notices.json 상한(학교당 40)에 잘렸다 다시 실리는 글이 장부의 수집 당시
            주소로 되돌아가지 않는다(고친 주소 X · 10-03 이 표식으로 바꾼 Y) · 수집기 끝부분과 같은 차례로 두 번·세 번 돌려 잰다
         ⓔ (리뷰 R2) 메운 글 주소의 HTML 기호(&#038;)는 앱과 같은 함수로 되돌린다 · ⓕ (리뷰 R3) 진짜 유실(restored)과 상한에 잘린 글(kept)을 따로 센다
+        ⓖ 학교별 파일 상한 · ⓗ (CC-1) 장부 원천은 9-30 사고 창(FEED_HEAL_UNTIL)까지만 — 사냥꾼이 합친 옛 판·제목을 고친 옛 판이 되살아나지 않는다
+        ⓘ (CC-1) 사냥꾼이 바꾼 주소(movedNoticeUrls)로 학교별 파일도 고치고 파일 안에서 합친다 — 다음 수집 뒤에도 한 장
      ② 고아 파일(publishBySchool · app2-F4/collect-12) — 목록에 글이 없는 학교의 옛 파일은 빈 파일로 · 이미 빈 파일·못 읽는 파일·이름이 안 맞는 파일은 그대로
      ③ 화면 0건 학교(zeroFeedSchools · zeroFeedWhy · app2-F2/collect-06) — 리포트 머리 한 줄 · 까닭은 이번 상태 줄에서만(브라우저 학교를 '주소 없음'이라 적지 않는다)
      ④ 누락 감사(coverage-rules coverageSets · classifyMiss inLedger · collect-10 · 리뷰 R4) — 장부에만 남은 글을 '가진 것'으로 세지 않는다
@@ -22,7 +24,8 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
 import { cleanEnv, stripComments, stripYamlComments } from './gate.mjs';
-import { healFromLedger, publishBySchool, zeroFeedSchools, zeroFeedWhy, readSchoolFiles, dropUnserved, FEED_HEAL_SINCE } from '../../collector/publish-notices.mjs';
+import { healFromLedger, publishBySchool, zeroFeedSchools, zeroFeedWhy, readSchoolFiles, dropUnserved, patchUrlsBySchool, FEED_HEAL_SINCE, FEED_HEAL_UNTIL } from '../../collector/publish-notices.mjs';
+import { movedNoticeUrls } from '../../collector/link-hunt-rules.mjs';
 import { dedupeNotices, capNotices, urlKey, titleKey } from '../../collector/url-key.mjs';
 import { classifyMiss, coverageSets, findMissing } from '../../collector/coverage-rules.mjs';
 import { isAttachmentEntry } from '../../collector/attachment-link.mjs';
@@ -43,14 +46,15 @@ const auditDup = (items) => {
 
 /* 수집기 끝부분(collect.mjs·browser-collect.mjs 의 '앱 발행' 단락)과 같은 함수·같은 차례 — 새 글 얹기 → 60일 → 첨부 → dedupe →
    메우기(학교별 파일 먼저 · 장부) → 서비스 밖 → 학교별 파일 발행(자르기 전) → notices.json 상한. 임시 폴더에만 쓴다. */
-function collectorTail({ dir, today, served, notices, fresh = [], ledger = [] }) {
+function collectorTail({ dir, today, served, notices, fresh = [], ledger = [], until }) {
   const cutoff = new Date(today.getTime() - 60 * 86400000).toISOString().slice(0, 10);
   let items = fresh.concat(notices || []);
   items = items.filter((n) => (n.foundAt || '9999') >= cutoff);
   items = items.filter((n) => !isAttachmentEntry(n));
   items = dedupeNotices(items);
   const counts = {};
-  items = healFromLedger(items, ledger, { today, served, current: readSchoolFiles({ dir }), counts });
+  /* until — 수집기는 넘기지 않는다(기본 FEED_HEAL_UNTIL). 장부 날짜가 사고 창 뒤인 옛 표본(상한 ⓖ)만 상한 없이('9999-12-31') 잰다 */
+  items = healFromLedger(items, ledger, { today, served, current: readSchoolFiles({ dir }), counts, ...(until ? { until } : {}) });
   items = dropUnserved(items, served);
   publishBySchool(items, { dir, today });
   return { notices: capNotices(items), counts };
@@ -86,7 +90,7 @@ export default async function feed(eq, ctx) {
     const wide = healFromLedger(feedIn, ledger, { today: TODAY, served: SERVED, since: '0000-00-00' });
     eq("  since '0000-00-00' 이면 60일 규칙만 — 8월 글은 들고 7월(60일 밖)은 안 든다 · foundAt 내림차순",
       wide.map((n) => n.foundAt), ['2026-10-01', '2026-09-30', '2026-08-20']);
-    eq('  기본 since = 44개교 복원일', FEED_HEAL_SINCE, '2026-09-29');
+    eq('  기본 since = 44개교 복원일 · 기본 until = 9-30 사고 창 끝 (CC-1)', [FEED_HEAL_SINCE, FEED_HEAL_UNTIL], ['2026-09-29', '2026-09-30']);
     eq('  메울 것이 없으면 피드 그대로', healFromLedger([A], [A2], { today: TODAY, served: SERVED }).map((n) => n === A), [true]);
     /* 차례 — 장부가 오래된 글 먼저여도 결과는 foundAt 내림차순(리뷰 2026-10-05 R2: wide 표본은 장부가 이미 최신순이라 정렬을 지워도 초록이었다).
        정렬이 없으면 메운 글이 맨 뒤에 붙어 capNotices(학교당 40)가 더 최근 글을 자르고, 앱은 파일 차례대로 그려 맨 아래에 보인다. */
@@ -96,7 +100,7 @@ export default async function feed(eq, ctx) {
     eq('  🔴 장부 차례가 [오래된 글, 새 글]이어도 결과는 foundAt 내림차순 (메운 글이 맨 뒤에 붙지 않는다)',
       healFromLedger([Aold], [Cold, Bnew], { today: TODAY, served: SERVED, since: '0000-00-00' }).map((n) => n.foundAt), ['2026-09-30', '2026-09-25', '2026-08-20']);
     /* 제목은 저장하는 로봇과 같은 청소(cleanTitle)를 거친다 — 장부에는 청소 전 제목이 남아 있다 */
-    const dirty = { school: '건국대학교', title: '2026학년도 2학기 성적우수 장학생 선발 안내 학생지원팀 2026-09-30 조회 738', url: 'https://kk.kr/v?no=9', foundAt: '2026-10-02' };
+    const dirty = { school: '건국대학교', title: '2026학년도 2학기 성적우수 장학생 선발 안내 학생지원팀 2026-09-30 조회 738', url: 'https://kk.kr/v?no=9', foundAt: '2026-09-30' };   // 사고 창 안
     const cleaned = healFromLedger([], [dirty], { today: TODAY, served: SERVED });
     eq('  메운 글의 제목은 청소한다 (장부 원본은 그대로)', [cleaned[0].title, dirty.title.length > cleaned[0].title.length, cleaned[0] !== dirty],
       ['2026학년도 2학기 성적우수 장학생 선발 안내', true, true]);
@@ -194,17 +198,79 @@ export default async function feed(eq, ctx) {
     publishBySchool(notices0, { dir, today: TODAY });
     const urlsOf = () => (fileItems(dir, K) || []).map((n) => n.url);
     const before = new Set(urlsOf());
-    const run1 = collectorTail({ dir, today: TODAY, served: SERVED, notices: notices0, ledger: L });
+    const U = '9999-12-31';   // 표본 장부 날짜(10-04 … 09-29)가 사고 창 뒤까지 걸쳐 있다 — 상한 규칙만 재려고 창을 연다
+    const run1 = collectorTail({ dir, today: TODAY, served: SERVED, notices: notices0, ledger: L, until: U });
     const addedToFile = urlsOf().filter((u) => !before.has(u)).length;
-    const run2 = collectorTail({ dir, today: TODAY, served: SERVED, notices: run1.notices, ledger: L });
+    const run2 = collectorTail({ dir, today: TODAY, served: SERVED, notices: run1.notices, ledger: L, until: U });
     const after2 = urlsOf();
-    const run3 = collectorTail({ dir, today: TODAY, served: SERVED, notices: run2.notices, ledger: L });
+    const run3 = collectorTail({ dir, today: TODAY, served: SERVED, notices: run2.notices, ledger: L, until: U });
     eq('① ⓖ 🔴 1회차 restored = 학교별 파일에 실제로 더해진 수 (상한 60 밖으로 밀리는 장부 글은 싣지도 세지도 않는다)',
       [run1.counts.restored, addedToFile, urlsOf().length], [20, 20, 60]);
     eq('  2·3회차는 restored 0 — 같은 글을 매 실행 \'다시 실었다\'고 세지 않는다 · 파일은 그대로 60건',
       [run2.counts, run3.counts, after2.length, urlsOf().join() === after2.join()], [{ restored: 0, kept: 20 }, { restored: 0, kept: 20 }, 60, true]);
     eq('  상한은 발행과 같은 값을 쓴다 (opts.perSchool 로 바꾸면 그만큼만)',
-      [healFromLedger(notices0, L, { today: TODAY, served: SERVED }).length, healFromLedger(notices0, L, { today: TODAY, served: SERVED, perSchool: 45 }).length], [60, 45]);
+      [healFromLedger(notices0, L, { today: TODAY, served: SERVED, until: U }).length, healFromLedger(notices0, L, { today: TODAY, served: SERVED, perSchool: 45, until: U }).length], [60, 45]);
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+
+  /* ── ① ⓗ 장부 원천은 9-30 사고 창까지만 (CC-1 · 2026-10-11) ──
+     장부(candidates.json)는 수집 당시 주소·제목을 들고 있다. 링크 사냥꾼이 표식을 풀고 제목이 다른 짝과 합친 글(가천)·게시판이 제목을 고친 글(고려)은
+     dedupeNotices 열쇠(주소·제목·글 번호)가 셋 다 어긋나, 창을 묶지 않으면 '빠진 글'로 되살아나 학생 화면에 같은 장학금이 두 장 뜬다. */
+  {
+    const S2 = [...SERVED, '가천대학교', '고려대학교'];
+    const GT = '(생활비)2027년 아산사회복지재단 북한이탈청소년장학생 선발 안내';
+    const R = { school: '가천대학교', title: `[공통] ${GT}`, url: 'https://www.gachon.ac.kr/bbs/kor/478/125899/artclView.do', foundAt: '2026-10-03' };
+    const M = { school: '가천대학교', title: `[장학공지] ${GT}`, url: `https://www.gachon.ac.kr/kor/7986/subview.do#n-${encodeURIComponent(`[장학공지] ${GT}`)}`, foundAt: '2026-10-03' };
+    const K1 = { school: '고려대학교', title: '[교외-11/2]2027학년도 해동과학문화재단 해동장학생 모집 안내(학교지원)', url: 'https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQ%3D', foundAt: '2026-10-03' };
+    const K0 = { school: '고려대학교', title: '[교외-11/3]2027학년도 해동과학문화재단 해동장학생 모집 안내(학교지원)', url: 'https://www.korea.ac.kr/ko/568/subview.do?article.offset=10&nttId=000100000000003865', foundAt: '2026-10-01' };
+    const Z = { school: '고려대학교', title: '2026 표본 사고 창 안에서 빠진 재단 장학생 선발', url: 'https://www.korea.ac.kr/ko/568/subview.do?nttId=000100000000003700', foundAt: '2026-09-30' };
+    const open = healFromLedger([R, K1], [M, K0, Z], { today: TODAY, served: S2, until: '9999-12-31' });
+    const out = healFromLedger([R, K1], [M, K0, Z], { today: TODAY, served: S2 });
+    eq('① ⓗ (전제) 창을 열면 장부의 옛 판 둘(가천 표식 · 고려 [교외-11/3])이 되살아난다 — dedupe 열쇠가 셋 다 어긋나 같은 글로 못 본다',
+      [open.length, open.some((n) => n.url === M.url), open.some((n) => n.url === K0.url)], [5, true, true]);
+    eq('  🔴 기본(FEED_HEAL_UNTIL)은 9-30 뒤 수집한 장부 글을 메우지 않는다 — 옛 판 둘은 빠지고 · 창 안(9-30)에서 빠진 글은 그대로 메운다',
+      out.map((n) => n.url), [R.url, K1.url, Z.url]);
+    /* 학생이 지금 보는 판(학교별 파일)은 창으로 묶지 않는다 — 상한에 잘린 10-03 글은 그대로 돌아온다 */
+    const C3 = { school: '가천대학교', title: '2026 표본 상한에 잘린 10월 장학 안내', url: 'https://www.gachon.ac.kr/bbs/kor/478/125950/artclView.do', foundAt: '2026-10-03' };
+    const counts = {};
+    eq('  학생이 지금 보는 판(opts.current)은 창으로 묶지 않는다 — 10-03 글도 kept 로 돌아온다',
+      [healFromLedger([R], [], { today: TODAY, served: S2, current: [R, C3], counts }).map((n) => n.url), counts], [[R.url, C3.url], { restored: 0, kept: 1 }]);
+  }
+
+  /* ── ① ⓘ 사냥꾼이 바꾼 주소로 학교별 파일도 고치고 합친다 (CC-1 · 2026-10-11) ──
+     학교별 파일 [R, M] → 사냥꾼(표식 M 을 R 의 주소로 풀고 notices.json 을 dedupe) → 학교별 파일 고치기 → 다음 수집.
+     제목이 달라 예전 고치기(제목 열쇠만)는 M 을 못 찾았고, 다음 수집의 메우기가 학교별 파일의 M 을 kept 로 다시 실어 두 장이 계속 남았다. */
+  {
+    const dir = pathToFileURL(fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-feed-moved-')) + path.sep);
+    const S2 = [...SERVED, '가천대학교'];
+    const GT = '(생활비)2027년 아산사회복지재단 북한이탈청소년장학생 선발 안내';
+    const R = { school: '가천대학교', title: `[공통] ${GT}`, url: 'https://www.gachon.ac.kr/bbs/kor/478/125899/artclView.do', foundAt: '2026-10-03',
+      attachments: [{ name: '포스터.pdf', url: 'https://www.gachon.ac.kr/bbs/kor/478/156401/download.do' }] };
+    const M = { school: '가천대학교', title: `[장학공지] ${GT}`, url: `https://www.gachon.ac.kr/kor/7986/subview.do#n-${encodeURIComponent(`[장학공지] ${GT}`)}`, foundAt: '2026-10-03' };
+    const O = { school: '가천대학교', title: '2026 표본 다른 장학 안내', url: 'https://www.gachon.ac.kr/bbs/kor/478/125800/artclView.do', foundAt: '2026-10-02' };
+    publishBySchool([R, M, O], { dir, today: TODAY });
+    /* 사냥꾼 흉내 — 표적 열쇠는 표적을 모을 때의 주소('n:<표식>'), 찾으면 그 글의 주소만 바꾼다(link-hunter.mjs 1·3단계) · 저장 때 dedupe → 학교별 파일 고치기 */
+    const items = [R, M, O].map((n) => ({ ...n }));
+    const targets = [{ ref: items[1], field: 'url', title: items[1].title, key: `n:${items[1].url}` },
+      { ref: { sourceUrl: 'https://www.gachon.ac.kr/x/view?id=1' }, field: 'sourceUrl', title: '정식 등록', key: 'r:auto-x' }];
+    items[1].url = R.url;
+    const moved = movedNoticeUrls(targets);
+    const notices = dedupeNotices(items);
+    const r = patchUrlsBySchool(notices, { dir, moved });
+    const afterHunt = (fileItems(dir, '가천대학교') || []).map((n) => n.url);
+    const next = collectorTail({ dir, today: TODAY, served: S2, notices, ledger: [M] });
+    const afterCollect = (fileItems(dir, '가천대학교') || []).map((n) => n.url);
+    eq('① ⓘ movedNoticeUrls — 이번에 바뀐 실시간 공고만(옛 주소 → 새 주소) · 정식 등록·그대로인 표적은 안 넣는다',
+      [[...moved], movedNoticeUrls([{ ref: { url: 'https://a.kr/1' }, field: 'url', key: 'n:https://a.kr/1' }]).size, movedNoticeUrls().size], [[[M.url, R.url]], 0, 0]);
+    eq('  🔴 사냥꾼 직후 학교별 파일에서도 표식 판이 진짜 판과 한 장으로 합쳐진다 (제목이 달라도 옛 주소로 찾는다) · 고친 수·합친 수를 돌려준다',
+      [afterHunt, r.fixed, r.merged, notices.length], [[R.url, O.url], 1, 1, 2]);
+    eq('  🔴 다음 수집 뒤에도 한 장 — 학교별 파일(kept)·장부(창 밖 10-03) 어느 쪽에서도 옛 판이 되살아나지 않는다',
+      [afterCollect, next.counts, next.notices.map((n) => n.url)], [[R.url, O.url], { restored: 0, kept: 0 }, [R.url, O.url]]);
+    /* 순위 가드는 moved 에도 — 진짜 주소를 표식으로 바꾸는 쪽(옛 주소 → 표식)은 고치지 않는다 · 바뀔 것이 없으면 파일을 안 쓴다 */
+    const before = fs.readFileSync(new URL(`${noticeFileKey('가천대학교')}.json`, dir), 'utf8');
+    const g2 = patchUrlsBySchool([], { dir, moved: new Map([[R.url, M.url]]) });
+    eq('  순위 가드는 moved 에도 건다(진짜 주소를 표식으로 덮지 않는다) · 안 바뀌면 파일을 안 쓴다',
+      [g2.fixed, g2.files, fs.readFileSync(new URL(`${noticeFileKey('가천대학교')}.json`, dir), 'utf8') === before], [0, 0, true]);
     fs.rmSync(dir, { recursive: true, force: true });
   }
 
@@ -329,15 +395,29 @@ export default async function feed(eq, ctx) {
     g('add', '-A'); g('commit', '-qm', '사고(잘림)');
     const tool = fileURLToPath(new URL('collector/heal-feed.mjs', root));
     const run = (...args) => spawnSync(process.execPath, [tool, ...args], { cwd: dir, encoding: 'utf8', env: cleanEnv() });
-    const dry = run('--dry', '--since=0000-00-00', `git:${snap}:data/notices/`);
+    /* 표본 날짜는 지금 시각 기준(60일 규칙을 도구가 지금 시각으로 잰다)이라 사고 창(FEED_HEAL_UNTIL) 뒤다 — 메우기를 재는 실행은 --until 로 창을 연다 */
+    const dry = run('--dry', '--since=0000-00-00', '--until=9999-12-31', `git:${snap}:data/notices/`);
     const dryClean = g('status', '--porcelain').stdout.trim() === '';
-    const bad = run('--since=0000-00-00', 'git:없는커밋:data/notices.json');
+    const bad = run('--since=0000-00-00', '--until=9999-12-31', 'git:없는커밋:data/notices.json');
     const badClean = g('status', '--porcelain').stdout.trim() === '';
-    const r = run('--since=0000-00-00', `git:${snap}:data/notices/`, `git:${snap}:data/notices.json`);
+    /* 🔴 --until 을 안 주면 FEED_HEAL_UNTIL — 그 뒤 수집분은 메우지 않는다(CC-1) · 잘못된 꼴은 멈춘다.
+       원천은 저장소 밖 파일 하나(어제 수집한 새 글 — 지금 시각 기준이라 늘 사고 창 뒤) */
+    const srcDir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-feed-tool-src-'));
+    const srcNew = path.join(srcDir, 'new.json');
+    fs.writeFileSync(srcNew, JSON.stringify({ items: [{ school: K, title: '2026 표본 새로 수집한 재단 장학 안내', url: 'https://k.kr/v?no=5', foundAt: day(1) }] }));
+    const dryDefault = run('--dry', '--since=0000-00-00', srcNew);
+    const dryOpen = run('--dry', '--since=0000-00-00', '--until=9999-12-31', srcNew);
+    const badUntil = run('--dry', '--until=10월', srcNew);
+    fs.rmSync(srcDir, { recursive: true, force: true });
+    const r = run('--since=0000-00-00', '--until=9999-12-31', `git:${snap}:data/notices/`, `git:${snap}:data/notices.json`);
     const feedOut = JSON.parse(fs.readFileSync(path.join(dir, 'data/notices.json'), 'utf8')).items;
     const fileOut = JSON.parse(fs.readFileSync(path.join(dir, fileK), 'utf8')).items;
     eq('⑤ 메우기 도구 — --dry 와 못 읽는 원천은 아무것도 안 쓴다 · 사고 직전 커밋에서 빠진 글만 메운다',
       [dry.status, dryClean, bad.status, badClean, r.status], [0, true, 1, true, 0]);
+    eq(`  🔴 --until 을 안 주면 FEED_HEAL_UNTIL(${FEED_HEAL_UNTIL}) — 그 뒤 수집한 원천 글은 메우지 않는다 · 창을 열면 1건 · --until 꼴이 틀리면 멈춘다 (CC-1)`,
+      [dryDefault.status, (dryDefault.stdout.match(/메울 글 (\d+)건/) || [])[1], new RegExp(`until ${FEED_HEAL_UNTIL}`).test(dryDefault.stdout),
+        dryOpen.status, (dryOpen.stdout.match(/메울 글 (\d+)건/) || [])[1], badUntil.status],
+      [0, '0', true, 0, '1', 2]);
     eq('  notices.json·학교별 파일 둘 다 · 고친 주소는 그대로 · 메운 글의 foundAt 은 원래 날짜 · 수집기처럼 60일 밖 글·첨부 링크는 거른다',
       [feedOut.map((n) => n.url), fileOut.map((n) => n.url), feedOut[1] && feedOut[1].foundAt], [[a2.url, b.url], [a2.url, b.url], b.foundAt]);
     /* '수집기 끝부분과 같은 함수·같은 차례'를 글자로 대조 — 피드를 바꾸는 함수(url-key · publish-notices · attachment-link 가 내보내는 이름)

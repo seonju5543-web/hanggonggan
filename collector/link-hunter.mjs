@@ -83,7 +83,7 @@ import { dedupeNotices } from './url-key.mjs';
    왜 재발행이면 안 되는지는 publish-notices.mjs 의 patchUrlsBySchool 첫머리에 있다. */
 import { patchUrlsBySchool } from './publish-notices.mjs';
 /* 장부 규칙(시도 기록 · 사람에게 알릴 때 · '내려간 듯')은 순수 함수 파일 하나 — 관문이 가짜 장부로 그대로 돌려 본다 (2026-10-04 · 이슈 #387) */
-import { recordAttempt, settleEscalation, listScanEnd, escalationLines, pruneHuntState, boardUnreachableWhy } from './link-hunt-rules.mjs';
+import { recordAttempt, settleEscalation, listScanEnd, escalationLines, pruneHuntState, boardUnreachableWhy, movedNoticeUrls } from './link-hunt-rules.mjs';
 /* 관리자가 이미 원문을 넣은 공고는 건드리지 않는다 (2026-10-04) — 표식을 바꾸면 관리자 열쇠(u:<표식>)가 안 맞아 그 주소가 화면에서 사라진다 */
 import { readLinkFixes, humanFixedBy } from './link-fixes-read.mjs';
 
@@ -843,10 +843,12 @@ function saveAll(crashNote) {
       }
       fs.writeFileSync(noticesPath, JSON.stringify(notices, null, 1));
       /* 🔴 여기서 멈추면 고친 주소가 **다음 수집까지 학생 화면에 안 닿는다** —
-         앱은 data/notices.json 이 아니라 data/notices/<학교>.json 을 읽는다. */
-      const patched = patchUrlsBySchool(notices.items);
+         앱은 data/notices.json 이 아니라 data/notices/<학교>.json 을 읽는다.
+         🔴 바꾼 주소(옛 주소 → 새 주소)도 넘긴다 (2026-10-11 점검 CC-1) — 위에서 제목이 다른 짝과 합친 표식 판은 제목으로는 학교별 파일에서
+            못 찾아 두 장이 남았다. 학교별 파일 안에서도 같은 규칙으로 합친다(규칙은 publish-notices.mjs patchUrlsBySchool 한 곳). */
+      const patched = patchUrlsBySchool(notices.items, { moved: movedNoticeUrls(targets) });
       if (patched.fixed) {
-        report.push(`_(학교별 공고 파일 ${patched.files}개에서 주소 ${patched.fixed}건을 함께 고쳤습니다 — 앱이 읽는 것은 이쪽입니다)_`);
+        report.push(`_(학교별 공고 파일 ${patched.files}개에서 주소 ${patched.fixed}건을 함께 고쳤습니다${patched.merged ? ` · 같은 글 ${patched.merged}건을 합쳤습니다` : ''} — 앱이 읽는 것은 이쪽입니다)_`);
         report.push('');
       }
       fs.writeFileSync(registeredPath, JSON.stringify(registered, null, 1));

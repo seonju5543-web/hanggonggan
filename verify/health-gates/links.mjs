@@ -13,6 +13,7 @@
      ⑥ 복구 로봇 바깥 시계 · 예약 주석 요일 (links-15): 매달리면 고친 것을 잃는다 — **진짜 resolve-detail-urls.mjs 를 가짜 브라우저로 임시 폴더에서** ·
         'UTC 월 20시대'를 'KST 월요일'이라 적은 주석(실제 화요일) — 워크플로 예약 줄 전부를 cron 과 대조(cronCommentProblems)
      ⑦ 복구 로봇 소급 재검사 끔 (links-10 · 개발자 결정): 읽는 곳 없는 판정 기록 · 원문 링크 확인 로봇과 엇갈린 판정 — 되살아나지 않게
+     ⑧ 사냥꾼 저장이 바꾼 주소를 학교별 파일 고치기에 넘기는 배선 (CC-1 · 동작은 feed ① ⓘ)
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부를 읽어 단정하지 말 것(verify/health-gates.mjs 머리말). */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -421,5 +422,15 @@ export default async function links(eq, ctx) {
       [false, 0, '', true, false]);
     eq('⑦ 재검사 고리가 되살아나지 않았다 — 이미 고친 주소를 다시 여는 루프·판정 기록이 없다(그 일은 원문 링크 확인 로봇 link-check 몫)',
       [/verifyCandidate\(url, titles, 0, live/.test(rs), /recheckLog/.test(rs), /rechecked/.test(rs)], [false, false, false]);
+  }
+
+  /* ── ⑧ 사냥꾼 저장 — 바꾼 주소(옛 → 새)를 학교별 파일 고치기에 넘긴다 (CC-1 · 2026-10-11 · 실제 동작은 feed ① ⓘ 가 같은 함수로 잰다) ── */
+  {
+    const lh = stripComments(fs.readFileSync(new URL('collector/link-hunter.mjs', root), 'utf8'));
+    const save = (lh.match(/function saveAll\([\s\S]*?\n\}\n/) || [''])[0];
+    eq('⑧ 배선 — 사냥꾼 저장은 바꾼 주소를 학교별 파일 고치기에 넘긴다(movedNoticeUrls 한 곳 · 불러 쓴다)',
+      [/patchUrlsBySchool\(notices\.items, \{ moved: movedNoticeUrls\(targets\) \}\)/.test(save),
+        /import \{[^}]*\bmovedNoticeUrls\b[^}]*\} from '\.\/link-hunt-rules\.mjs'/.test(lh)],
+      [true, true]);
   }
 }

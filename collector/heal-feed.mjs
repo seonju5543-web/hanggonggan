@@ -2,7 +2,7 @@
    실시간 공고 피드 메우기 — 사람이 돌리는 도구 (2026-10-04 점검 collect-01 · app2-F1)
    ------------------------------------------------------------
    수집 로봇 둘(collect.mjs · browser-collect.mjs)은 매 실행 후보 장부(collector/candidates.json)에서
-   FEED_HEAL_SINCE 이후 수집분을 메운다(publish-notices.mjs healFromLedger). 이 도구는 **같은 함수를 같은 차례로**
+   FEED_HEAL_SINCE ~ FEED_HEAL_UNTIL(9-30 사고 창) 수집분을 메운다(publish-notices.mjs healFromLedger). 이 도구는 **같은 함수를 같은 차례로**
    한 번 돌리되, 메울 원천을 사람이 고른다 — 사고 직전 로봇이 발행한 판(git 커밋 안의 파일)처럼.
 
    왜 따로 있나 — 2026-09-30 병합기(옛 merge-json-union slice(0,200))가 notices.json 을 200건으로 잘라 15개교 215건이 학생 화면에서
@@ -13,8 +13,13 @@
      bash tools/robot-run.sh node collector/heal-feed.mjs [--since=YYYY-MM-DD] [--dry] [원천 …]
      원천: JSON 파일({items:[…]} 또는 배열) · 폴더(*.json, index.json 빼고) · git:<커밋>:<경로>(파일이나 폴더 — 커밋 안의 판을 읽는다)
      원천을 안 주면 collector/candidates.json (로봇과 같은 길). --since 기본은 FEED_HEAL_SINCE · '0000-00-00' 이면 60일 규칙만.
+     --until 기본은 FEED_HEAL_UNTIL(원천 글의 수집일이 이 날보다 늦으면 안 메운다 — 그 뒤 수집분은 링크 사냥꾼이 합친 옛 판일 수 있다 · CC-1).
+     다른 사고 창을 메울 때만 --until=YYYY-MM-DD 로 바꾼다('9999-12-31' 이면 상한 없음).
      --dry 는 숫자만 보이고 아무것도 쓰지 않는다.
    9-30 사고 복구: bash tools/robot-run.sh node collector/heal-feed.mjs --since=0000-00-00 git:ab897c3b:data/notices/ git:60ce385a:data/notices.json
+     (두 원천은 9-30 까지 수집분뿐이라 --until 기본값 그대로 같은 238건 · 2026-10-11 --dry 확인. 돌리기 전에 --dry 목록에서 학교가 제목만 고친
+      같은 글 짝 — 경희 '미레에셋'↔'미래에셋' — 을 눈으로 본다. 그런 짝의 표식 판은 링크 사냥꾼이 진짜 주소로 푸는 실행에서
+      notices.json 과 학교별 파일 양쪽에서 합쳐진다 — publish-notices.mjs patchUrlsBySchool 의 opts.moved · CC-1)
 
    하는 일(수집기 끝부분의 '앱 발행' 단락과 같은 함수·같은 차례 — 새 글 얹기만 없다): data/notices.json 읽기 → 60일 · 첨부 링크 거르기
    → dedupeNotices → healFromLedger(메우기만 · 지금 글은 안 바꾼다 · foundAt 그대로 · 학교별 파일 상한 안에 드는 것만 ·
@@ -32,7 +37,7 @@ import { pathToFileURL } from 'node:url';
 import { capNotices, dedupeNotices } from './url-key.mjs';
 import { loadCandidates, KEEP_DAYS } from './candidates.mjs';
 import { isAttachmentEntry, stripSiteChrome } from './attachment-link.mjs';
-import { healFromLedger, dropUnserved, publishBySchool, readSchoolFiles, FEED_HEAL_SINCE } from './publish-notices.mjs';
+import { healFromLedger, dropUnserved, publishBySchool, readSchoolFiles, FEED_HEAL_SINCE, FEED_HEAL_UNTIL } from './publish-notices.mjs';
 
 /* 데이터는 **지금 자리(저장소 맨 위)** 의 data/·collector/ 를 읽고 쓴다 — 관문이 임시 저장소에서 이 도구를 그대로 돌려 보게(관리자 저장소와 같은 방식) */
 const ROOT = process.cwd();
@@ -41,7 +46,10 @@ const args = process.argv.slice(2);
 const flag = (name) => args.find((a) => a.startsWith(`--${name}=`))?.split('=').slice(1).join('=');
 const DRY = args.includes('--dry');
 const since = flag('since') ?? FEED_HEAL_SINCE;
-if (!/^\d{4}-\d{2}-\d{2}$/.test(since)) { console.error(`⛔ --since 는 YYYY-MM-DD 꼴이어야 합니다: ${since}`); process.exit(2); }
+const until = flag('until') ?? FEED_HEAL_UNTIL;
+for (const [name, v] of [['since', since], ['until', until]]) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) { console.error(`⛔ --${name} 는 YYYY-MM-DD 꼴이어야 합니다: ${v}`); process.exit(2); }
+}
 const sources = args.filter((a) => !a.startsWith('--'));
 
 const itemsOf = (doc) => (Array.isArray(doc) ? doc : (doc && Array.isArray(doc.items) ? doc.items : []));
@@ -85,12 +93,12 @@ const cutoff = new Date(Date.now() - KEEP_DAYS * 86400000).toISOString().slice(0
 const kept = before.filter((n) => (n.foundAt || '9999') >= cutoff).filter((n) => !isAttachmentEntry(n));
 const cur = dedupeNotices(kept);
 const counts = {};
-const healed = healFromLedger(cur, pool, { since, current: readSchoolFiles({ dir: pathToFileURL(path.join(ROOT, 'data', 'notices') + path.sep) }), counts });
+const healed = healFromLedger(cur, pool, { since, until, current: readSchoolFiles({ dir: pathToFileURL(path.join(ROOT, 'data', 'notices') + path.sep) }), counts });
 const had = new Set(cur);
 const added = healed.filter((n) => !had.has(n));
 const by = {};
 for (const n of added) by[n.school] = (by[n.school] || 0) + 1;
-console.log(`원천 ${sources.length ? sources.join(' · ') : 'collector/candidates.json'} — 글 ${pool.length}건 · since ${since}`);
+console.log(`원천 ${sources.length ? sources.join(' · ') : 'collector/candidates.json'} — 글 ${pool.length}건 · since ${since} · until ${until}`);
 console.log(`메울 글 ${added.length}건(학교별 파일에도 없던 글 ${counts.restored} · notices.json 에만 없던 글 ${counts.kept}): ${Object.entries(by).sort((a, b) => b[1] - a[1]).map(([s, k]) => `${s} ${k}`).join(' · ') || '없음'}`);
 if (DRY) { console.log('--dry — 아무것도 쓰지 않았습니다.'); process.exit(0); }
 if (!added.length) { console.log('메울 글이 없어 아무것도 쓰지 않았습니다.'); process.exit(0); }

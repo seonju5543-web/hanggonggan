@@ -119,3 +119,20 @@ export function pruneHuntState(items, liveKeys, today, graceDays = 30, { patrolO
   }
   return out;
 }
+
+/* 이번 실행에 주소가 바뀐 실시간 공고 — 옛 주소 → 새 주소 (2026-10-11 점검 CC-1). 사냥꾼이 저장할 때 학교별 파일 고치기
+   (publish-notices.mjs patchUrlsBySchool 의 opts.moved)에 넘긴다. 열쇠 'n:<주소>' 는 표적을 모을 때의 주소라 그대로 옛 주소다.
+   🔴 왜 따로 넘기나: 사냥꾼은 표식을 풀고 notices.json 을 dedupeNotices 로 합치는데, 합쳐진 짝의 제목이 다르면(가천 '[장학공지]…' 표식 ↔
+      '[공통]…' 진짜 주소) 제목으로만 잇는 학교별 파일 고치기가 표식 판을 못 찾아 학생 화면에 같은 글 두 장이 남았다(그 판은 다음 수집의
+      메우기가 학교별 파일에서 다시 실었다). 옛 주소로도 찾아야 그 판이 새 주소가 되고, 파일 안에서 같은 글로 합쳐진다.
+   정식 등록(field 'sourceUrl')은 학교별 파일에 없으므로 넣지 않는다. 주소가 그대로인 표적도 넣지 않는다. */
+export function movedNoticeUrls(targets) {
+  const out = new Map();
+  for (const t of targets || []) {
+    if (!t || t.field !== 'url' || !t.ref || !String(t.key || '').startsWith('n:')) continue;
+    const from = String(t.key).slice(2);
+    const to = t.ref.url;
+    if (from && to && to !== from) out.set(from, to);
+  }
+  return out;
+}

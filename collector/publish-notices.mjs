@@ -95,6 +95,11 @@ export function splitBySchool(items, perSchool = PER_SCHOOL) {
    다른 학교에 있어도 섞이지 않는다. **다만 같은 학교 안의 제목 충돌까지 막지는 못한다** —
    normTitle 이 공지·괄호·점·물결을 지우므로 이론상 두 공고가 한 열쇠가 될 수 있다
    (실데이터 충돌 0건 · dedupeNotices 가 이미 같은 열쇠를 쓰므로 새로 생긴 위험은 아니다).
+   🔴 **opts.moved(옛 주소 → 새 주소 Map)가 오면 그것을 먼저 본다** (2026-10-11 점검 CC-1) — 링크 사냥꾼은 표식을 풀고 notices.json 을
+   dedupeNotices 로 합치는데, 합쳐진 짝의 제목이 다르면(가천 '[장학공지]…' 표식 ↔ '[공통]…' 진짜 주소) 제목 열쇠로는 학교별 파일의 표식 판을
+   못 찾아 같은 글이 두 장 남았고, 다음 수집의 메우기가 그 판을 학교별 파일에서 다시 실었다. 사냥꾼이 바꾼 주소 목록은 link-hunt-rules.mjs
+   movedNoticeUrls 한 곳에서 만든다. 고친 파일은 쓰기 전에 dedupeNotices 를 한 번 건다 — 새 주소가 된 표식 판이 파일 안의 진짜 판과 같은 글로
+   합쳐진다(notices.json 과 같은 규칙 · 재발행이 아니라 그 파일 안에서만). 순위 가드(아래)는 moved 에도 그대로 건다.
 
    🔴 **이 함수가 닿는 범위에는 천장이 있다 — 다음 세션이 없는 버그를 쫓지 않도록 적어 둔다.**
    `notices.json` 은 전체 상한 200건이고 학교별 파일은 학교당 60건이라, 학교별 파일에는
@@ -120,7 +125,7 @@ export function splitBySchool(items, perSchool = PER_SCHOOL) {
 
    ⚠️ **되돌리기** — schools.json·browser-targets.json 의 `parked` 에서 학교를 되살리고 SERVED_SCHOOLS 에 이름을 넣으면
    그날 수집부터 **새 글**이 담긴다(설정은 지우지 않고 보관 중이다). 🔴 이미 본 글은 seen.json 때문에 다시 수집되지 않는다 —
-   그 글은 아래 healFromLedger 가 후보 장부(candidates.json)에서 FEED_HEAL_SINCE 이후 수집분만 메운다(2026-10-04 점검 collect-05).
+   그 글은 아래 healFromLedger 가 후보 장부(candidates.json)에서 FEED_HEAL_SINCE ~ FEED_HEAL_UNTIL(9-30 사고 창) 수집분만 메운다(2026-10-04 점검 collect-05 · 10-11 CC-1).
    ⚠️ **`data/registered.json` 은 건드리지 않는다** — 거기 남은 파킹 학교 공고는
    '전국인데 학교로 묶인 것'이라 개발자 판단 대기 항목이다(CLAUDE.md 첫머리). 성격이 다르다. */
 export function dropUnserved(items, served = SERVED_SCHOOLS) {
@@ -137,7 +142,7 @@ export function dropUnserved(items, served = SERVED_SCHOOLS) {
      ① opts.current — **학생이 지금 보는 판**(학교별 파일 data/notices/*.json · readSchoolFiles). 60일 · 첨부 · 서비스 밖만 건다(since 는 안 건다 —
         since 는 장부의 8월 파킹분을 막는 것이고, 학교별 파일에는 그런 글이 없다). notices.json 전체 상한(capNotices · 학교당 40)에 잘린 글은
         여기서 그대로 돌아온다 — 학교별 파일이 학교당 PER_SCHOOL(60)까지 담는 원래 설계대로.
-     ② ledger — 후보 장부. ① 의 규칙 + FEED_HEAL_SINCE 이후 수집분만.
+     ② ledger — 후보 장부. ① 의 규칙 + FEED_HEAL_SINCE ~ FEED_HEAL_UNTIL 수집분만(9-30 사고 창 · opts.since/opts.until · 까닭은 아래 두 상수 위).
    🔴 **같은 글이면 ① 의 판(그 주소)을 쓴다** — 장부는 링크 로봇(link-hunter·resolve-detail-urls)도, 10-03 원문 링크 정직성 정리도
       고치지 않아 **수집 당시 주소**를 들고 있다. 장부 판을 쓰면 상한에 잘렸다 다시 실리는 글마다 고친 주소가 옛 주소로 되돌아가고
       (리뷰 R1 실측: 표식→진짜 주소로 고친 X 가 두 번째 실행에 #n- 표식으로 · 반대로 10-03 이 표식으로 바꾼 '다른 글 주소'가 되살아난다),
@@ -168,11 +173,25 @@ export function dropUnserved(items, served = SERVED_SCHOOLS) {
 /* 9-29 = 44개교 복원일. 그 전 수집분은 8월 30일 파킹으로 **일부러 뺀** 글이라 장부에서 메우지 않는다(마감도 대부분 지났다).
    11-28 이후에는 60일 경계가 이 날을 넘으므로 저절로 뜻이 없어진다 — 다시 학교를 파킹할 일이 생기면 그때 이 날을 옮긴다. */
 export const FEED_HEAL_SINCE = '2026-09-29';
+/* 🔴 장부 원천은 **9-30 사고 창 수집분까지만** 메운다 (2026-10-11 점검 CC-1). 장부에는 수집 당시 주소·제목이 그대로 남는데, 그 뒤에
+   링크 사냥꾼이 표식을 진짜 주소로 풀고 제목이 다른 짝과 합친 글(가천 '[장학공지]…' 표식 ↔ '[공통]…' 125899 · 10-06)이나 게시판이 제목을
+   고친 글(고려 '[교외-11/3]' ↔ '[교외-11/2]' · 10-01/10-06)은 dedupeNotices 열쇠(주소·제목·글 번호)가 셋 다 어긋나 '빠진 글'로 되살아났다 —
+   학생 화면에 같은 장학금 카드 두 장(하나는 옛 제목·옛 마감·목록 링크).
+   왜 9-30 인가(2026-10-11 git 이력으로 확인): 9-30 01:31 UTC 수집(ab897c3b)에서 병합기가 notices.json 을 460 → 200건으로 잘랐고(옛 slice(0,200)),
+   그 뒤 수집들(17d68637 ~ 10-02)이 잘린 판으로 학교별 파일을 다시 쓰며 빠진 글은 **전부 foundAt 9-30 이하**였다(연이은 판 사이에서 사라진 글 전수).
+   notices.json 은 그 뒤 10-03 까지 줄지 않았고(200 → 342), 10-03 11:29 의 두 번째 잘림(9f6d533a · 339 → 200)은 학교별 파일을 다시 쓰기 전에
+   같은 날 b75c58b6 이 장부를 339건으로 되살리고 병합기 상한을 고쳤다. 그래서 10-01 이후 수집분에는 장부로 메울 유실이 없다 —
+   그 뒤로 피드에서 빠진 글은 사냥꾼이 합친 것처럼 **일부러 합친 것**이다(실데이터: 이 날을 풀면 더 메워지는 글 3건 = 가천·고려 옛 판 + 9-30 사본이 따로 있는 계명 1건).
+   학생이 지금 보는 판(① opts.current — 학교별 파일)은 이 날로 묶지 않는다(상한에 잘린 글의 상시 자기 치유는 그쪽 몫).
+   11-29(9-30 + 60일)부터는 장부 원천이 저절로 하는 일이 없다 — 다른 사고로 장부 메우기가 다시 필요하면 이 날을 늘리지 말고
+   사람이 돌리는 메우기 도구(heal-feed.mjs)에 그 사고 창(--since · --until)을 주어 한 번 돌린다. */
+export const FEED_HEAL_UNTIL = '2026-09-30';
 
 export function healFromLedger(items, ledger, opts = {}) {
   const today = opts.today || new Date();
   const keepDays = opts.keepDays ?? KEEP_DAYS;
   const since = opts.since ?? FEED_HEAL_SINCE;
+  const until = opts.until ?? FEED_HEAL_UNTIL;
   const perSchool = opts.perSchool ?? PER_SCHOOL;   // 발행(publishBySchool)과 같은 값 — 수집기는 둘 다 기본값으로 부른다
   const ok = new Set(opts.served || SERVED_SCHOOLS);
   const counts = opts.counts && typeof opts.counts === 'object' ? opts.counts : {};
@@ -180,9 +199,10 @@ export function healFromLedger(items, ledger, opts = {}) {
   const cutoff = new Date(today.getTime() - keepDays * 86400000).toISOString().slice(0, 10);
   const from = since > cutoff ? since : cutoff;
   /* 피드에 실어도 되는 글인가(수집기가 피드에 거는 규칙 그대로) + 새 칸 다듬기. 고칠 것이 있으면 사본을 만든다(원천을 고치지 않는다). */
-  const take = (n, minDay, tidyTitle) => {
+  const take = (n, minDay, tidyTitle, maxDay) => {
     if (!n || !n.url || !n.school || !ok.has(n.school)) return null;
     if (!(String(n.foundAt || '') >= minDay)) return null;
+    if (maxDay && String(n.foundAt || '') > maxDay) return null;
     if (isAttachmentEntry(n)) return null;
     const url = decodeUrlEntities(n.url);
     const t = tidyTitle ? cleanTitle(n.title || '') : n.title;
@@ -192,7 +212,7 @@ export function healFromLedger(items, ledger, opts = {}) {
   const shown = [];
   for (const n of opts.current || []) { const x = take(n, cutoff, false); if (x) shown.push(x); }
   const pool = [];
-  for (const n of ledger || []) { const x = take(n, from, true); if (x) pool.push(x); }
+  for (const n of ledger || []) { const x = take(n, from, true, until); if (x) pool.push(x); }
   const A = dedupeNotices(items || []);
   if (!shown.length && !pool.length) return A;
   /* 새 칸 = '피드를 먼저 넣고 원천(① → ②)을 이어 넣었을 때 피드 칸 뒤에 생긴 칸'. 앞 칸 수가 피드 길이와 같으려면 피드가 dedupe 를 다시 걸어도
@@ -285,27 +305,32 @@ export function patchUrlsBySchool(items, opts = {}) {
     const k = titleKey(n);
     if (k && n.url) want.set(k, n.url);
   }
+  const moved = opts.moved instanceof Map ? opts.moved : new Map();
   let files = [];
-  try { files = fs.readdirSync(dir).filter((f) => /\.json$/.test(f) && f !== 'index.json'); } catch { return { files: 0, fixed: 0 }; }
+  try { files = fs.readdirSync(dir).filter((f) => /\.json$/.test(f) && f !== 'index.json'); } catch { return { files: 0, fixed: 0, merged: 0 }; }
 
-  let fixed = 0, touched = 0;
+  let fixed = 0, touched = 0, merged = 0;
   for (const f of files) {
     const path = new URL(f, dir);
     let doc;
     try { doc = JSON.parse(fs.readFileSync(path, 'utf8')); } catch { continue; }
     let changed = 0;
     for (const n of doc.items || []) {
-      const url = want.get(titleKey(n));
+      const url = moved.get(n.url) || want.get(titleKey(n));
       /* 🔴 순위를 낮추는 쪽으로는 고치지 않는다 (2026-10-03 실측) — 복구 로봇이 학교별 파일에만 찾아 둔 항공대 진짜 주소 2건을
          사냥꾼이 이 함수로 notices.json 의 옛 목록 표식으로 덮었다(notices.json 은 그 글을 아직 표식으로 들고 있었다). */
       if (url && url !== n.url && noticeUrlRank(url) <= noticeUrlRank(n.url)) { n.url = url; changed += 1; }
     }
     if (changed) {
+      /* 새 주소가 된 판이 같은 파일의 진짜 판과 같은 글이면 합친다(notices.json 과 같은 dedupeNotices · 위 주석 CC-1) */
+      const before = doc.items.length;
+      doc.items = dedupeNotices(doc.items);
+      merged += before - doc.items.length;
       fs.writeFileSync(path, JSON.stringify(doc, null, 1));
       fixed += changed; touched += 1;
     }
   }
-  return { files: touched, fixed };
+  return { files: touched, fixed, merged };
 }
 
 /* 로봇 장부(data/notices.json)에만 두는 칸 — 폰이 받는 학교별 파일에는 싣지 않는다 (2026-10-05 점검 collect-07).
