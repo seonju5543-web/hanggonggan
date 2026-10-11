@@ -1,7 +1,38 @@
 {
  "school": "가톨릭대학교",
- "updatedAt": "2026-10-05",
+ "updatedAt": "2026-10-11",
  "items": [
+  {
+   "title": "[취업지원팀] 국민연금공단 취업·채용설명회 행사",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276632&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-08",
+   "kind": "행사",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/121c0b59fa853414.webp",
+   "desc": "취업 준비부터 4대보험, 국민연금까지! 대학생이라면 꼭 알아야 할 취업·사회보험 정보를 한자리에서 만나보세요. 국민연금공단 채용정보와 함께 취업 후 꼭 알아야 할 4대보험과 연금제도를 쉽고 알차게 알려드립니다."
+  },
+  {
+   "title": "[학부대학운영팀] 2026학년도 겨울 계절학기 개설 희망과목 수요조사",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276532&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-06",
+   "kind": "학사",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[인간학연구소]제143차 콜로키움 개최 <대학생 수도원 체험의 영성적 의미>",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276495&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-06",
+   "kind": "학사",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/ce1d9933ed6a4e7d.webp",
+   "desc": "발표자 : 정태영 교수(가톨릭대학교 학부대학/문화영성대학원/중독학과) 1) 일시 : 2026년 10월 21일(수) 14:00 ~ 16:00"
+  },
   {
    "title": "[대학일자리플러스센터] 대학일자리플러스센터 x 총학생회 <백야> 간식행사 진행 안내",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276444&article.offset=0&articleLimit=10",
@@ -9,7 +40,8 @@
    "school": "가톨릭대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "thumb": "data/news/img/571ef9929a708403.webp"
+   "thumb": "data/news/img/571ef9929a708403.webp",
+   "desc": "[학생지원팀] 2026년도 하반기 마포인재육성장학재단 마포장학생 선발계획 공고 [학생지원팀] <아산사회복지재단> 2027년 의생명과학분야 대학 장학생 선발 안내 대학/대학원 주요사이트 관련 기관 맨위로가기 트리니티…"
   },
   {
    "title": "[학생생활상담소] 2026년 2학기 집단상담 신청 안내(ELP 비교과 점수 인정) (수정)",
@@ -18,7 +50,8 @@
    "school": "가톨릭대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "thumb": "data/news/img/67af30d9da25b1f6.webp"
+   "thumb": "data/news/img/67af30d9da25b1f6.webp",
+   "desc": "작성자 : 학생생활상담소 [학생생활상담소] 2026-2학기 집단상담 참가자 모집 안녕하세요, 학생생활상담소입니다. 학생생활상담소에서는 여러분의 건강한 대학생활을 돕기 위해 다양한 집단상담 프로그램을 운영합니다."
   },
   {
    "title": "[취업지원팀] 2026학년도 커리어 마스터 클래스 안내",
@@ -27,7 +60,8 @@
    "school": "가톨릭대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "thumb": "data/news/img/b9ae3bfa559b5256.webp"
+   "thumb": "data/news/img/b9ae3bfa559b5256.webp",
+   "desc": "작성자 : 취업지원팀 📍 신청 기간 : 10월 13일(화) 09:00 ~ 10월 25일(일) 23:59 까지"
   },
   {
    "title": "★★ 2026년 가톨릭대학교 창업보육센터 입주기업 모집 공고 ★★",

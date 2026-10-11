@@ -104,6 +104,11 @@ async function seed(page, saved, applied = []) {
   await page.click('.nav-item[data-nav="my"]');
   await page.waitForTimeout(300);
   ok('MY 화면에 보관함이 있다', await page.locator('#my-saved').count() === 1);
+  /* 2026-10-10 C안 구조 — 공고 보관함은 MY 메뉴 줄을 눌러 들어가는 안쪽 화면이다 */
+  ok('MY 메뉴에 공고 보관함 줄이 있고 저장 개수를 말한다', /^\d+개/.test((await page.textContent('#my-sub-saved')).trim()));
+  await page.click('[data-my-go="mysaved"]');
+  await page.waitForSelector('#screen-mysaved:not([hidden])');
+  ok('줄을 누르면 공고 보관함 화면이 열린다', await page.$eval('#my-saved', (e) => e.offsetParent !== null));
   ok('저장한 공고가 보관함에 보인다', await page.locator(`#my-saved .cal-row[data-detail="${firstId}"]`).count() === 1);
 
   /* 🔴 보관함에서 **바로 해제**할 수 있어야 한다 — 담는 곳과 빼는 곳이 다르면 학생이

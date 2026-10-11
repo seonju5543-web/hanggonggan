@@ -2383,7 +2383,7 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   eq('못 받아 왔어도 빈 문서 (뼈대가 굳지 않게)', /liveNews = d \|\| liveNews \|\| \{ items: \[\], updatedAt: null \}/.test(app), true);
   eq('옛 통짜 파일로 물러나는 길이 없다', /data\/news\.json/.test(app), false);
   eq('학교 범위는 엔진의 noticeForProfile 한 곳 · 숨긴 글 제외', /\.filter\(\(n\) => n && n\.url && n\.title && !n\.hidden && noticeForProfile\(n, p\)\)/.test(app), true);
-  eq('카드는 한 벌 — 윗줄만 「학교 공지 · 갈래」 · 게시일은 줄에서 읽은 것만 한 줄', /noticeCardHtml\(n, \{ org: `\$\{n\.school\} 공지\$\{n\.kind \? ' · ' \+ n\.kind : ''\}`, excerpts: n\.postedAt \? \[\{ label: '게시', text: n\.postedAt \}\] : \[\], thumb: n\.thumb, schoolPhoto: sp \}\)/.test(app) && !/function newsCardHtml/.test(app), true);
+  eq('카드는 한 벌 — 윗줄만 「학교 공지 · 갈래」 · 게시일은 줄에서 읽은 것만 한 줄', /noticeCardHtml\(n, \{ org: `\$\{n\.school\} 공지\$\{n\.kind \? ' · ' \+ n\.kind : ''\}`, excerpts: n\.postedAt \? \[\{ label: '게시', text: n\.postedAt \}\] : \[\], thumb: n\.thumb, schoolPhoto: sp, desc: n\.desc \}\)/.test(app) && !/function newsCardHtml/.test(app), true);
   eq('띠는 네 장(상수 하나) · 「전체 보기」는 그릇에 위임해 시트로 전부 · 옛 더보기 없음', /const NEWS_STRIP_N = 4;/.test(app) && /mine\.slice\(0, NEWS_STRIP_N\)/.test(app) && /newsBox\.addEventListener\('click', \(e\) => \{\s*if \(!e\.target\.closest\('\[data-news-all\]'\)\) return;\s*openNewsSheet\(\);/.test(app) && /\$\{schoolNewsHtml\(\)\}/.test(app) && !/data-news-more|NEWS_HOME_TOP/.test(app), true);
   const ui = strip(readText(new URL('.github/workflows/verify-ui.yml', root)));
   eq('브라우저 드라이버가 관문에 걸려 있다', /verify-news\.js/.test(ui), true);
@@ -2693,6 +2693,7 @@ console.log('\n■ 학교 대표 사진 (2026-10-03 개발자 지시 "썸네일�
     let schoolPhotos = null; const state = { profile: null };
     ${app.slice(app.indexOf('const TD_DAY ='), app.indexOf('/* notStale(오래된 공고 숨김)'))}
     ${cut('noticeCardHtml')}
+    ${cut('shortDay')}
     ${cut('schoolPhotoFor')}
     return { noticeCardHtml, schoolPhotoFor, set: (d) => { schoolPhotos = d; }, me: (school) => { state.profile = school ? { school } : null; } };`;
   const A = new Function(env)();
@@ -8064,9 +8065,9 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   eq('  제목에 없으면 예전처럼 붙인다',
     cardOrgLine({ type: '교외', provider: '한국장학재단', name: '대학생 청소년교육지원장학금(대청교) 멘토' }),
     '교외 · 한국장학재단');
-  /* 🔴 기관명을 못 읽은 공고는 윗줄에 '모름' 표시를 붙이지 않는다 (2026-10-05 점검 app1-09 · 2026-09-17 지시
-     "앱 내부 사정은 학생 화면에 안 적는다" — 제출처·지원서 초안·도우미는 이미 숨겼고 카드 윗줄만 새고 있었다) */
-  eq('  기관명을 못 읽은 공고는 교내/교외만 (「주관 기관 원문 확인」을 윗줄에 안 쓴다)',
+  /* 2026-10-06 개선안 D(사장님 지시 'AI 티' · 은서님 선택)로 뒤집혔다 — 모름 표시는 카드 윗줄에 싣지 않고
+     상세 시트의 주관 줄이 그 말을 한다(원칙 8-1: 감추지 않고 자리를 옮긴다). */
+  eq('  기관명을 못 읽은 공고는 윗줄에 교내/교외만 (모름 표시는 상세에서)',
     cardOrgLine({ type: '교외', provider: '주관 기관 원문 확인', name: '2026년 코나아이 소상공인 장학생 모집' }),
     '교외');
   eq('    「미확인」 표시도 같다', cardOrgLine({ type: '교외', provider: '주관 기관 미확인', name: '2026년 어느 장학생 모집' }), '교외');
@@ -8675,13 +8676,60 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
       /\.hero-tiles \{[^}]*border/.test(tail), false);
   }
 
+  /* 🔴 교내 소식 요약 (2026-10-10 팀 업무 분장 8번 — 은서) — 원문 첫 문장을 그대로 뜬다(발췌 · AI 없음) */
+  {
+    console.log('\n■ 교내 소식 요약 (원문 발췌)');
+    const ND = await import('../collector/news-desc.mjs');
+    const page = '<html><head><title>등록금 분할납부 안내 | 영남대</title></head><body><header><a>로그인</a></header>'
+      + '<div class="location">HOME &gt; 학사 &gt; 2026학년도 2학기 학부생 등록금 분할납부 안내</div>'
+      + '<h3>2026학년도 2학기 학부생 등록금 분할납부 안내</h3><dl><dt>작성자</dt><dd>재무팀</dd><dt>등록일</dt><dd>2026.10.07</dd><dt>조회수</dt><dd>152</dd></dl>'
+      + '<div><a>분할납부_신청서.hwp</a></div><div><p>2026학년도 2학기 등록금 분할납부 납부 기간을 아래와 같이 안내하오니 기한 내에 납부하시기 바랍니다.</p>'
+      + '<p>1. 납부기간: 2026. 10. 13.(화) ~ 10. 16.(금)</p></div><div>이전글 추석 연휴 도서관 운영 안내</div><footer>Copyright</footer></body></html>';
+    const want = '2026학년도 2학기 등록금 분할납부 납부 기간을 아래와 같이 안내하오니 기한 내에 납부하시기 바랍니다.';
+    eq('  본문 첫 문장을 원문 그대로 (작성자·날짜·조회수·파일 이름·목록은 빼고)', ND.newsDesc(page, '2026학년도 2학기 학부생 등록금 분할납부 안내'), want);
+    eq('  목록 제목이 조금 달라도(앞 번호 · 꼬리) 같은 글로 본다', ND.newsDesc(page, '9 2026학년도 2학기 학부생 등록금 2/2회, 3/4회 분할납부 안내'), want);
+    eq('  🔴 화면에 그 글의 제목이 없으면 뜨지 않는다 (남의 글·오류 화면)', ND.newsDesc(page, '정치외교학과 대학원 입학설명회 개최'), '');
+    eq('  🔴 본문이 그림뿐이면 지어내지 않고 빈 값', ND.newsDesc('<h3>대학원 입학설명회 개최 안내</h3><p>작성일 2026-10-06</p><p><img src="a.jpg"></p><p>이전글</p>', '대학원 입학설명회 개최 안내'), '');
+    const long = ND.newsDesc('<h3>긴 글의 제목입니다 안내</h3><p>' + '가나다라마바사 아자차카타파하 '.repeat(20) + '</p>', '긴 글의 제목입니다 안내');
+    eq(`  길면 ${ND.DESC_MAX}자 안에서 자르고 … 를 붙인다`, long.length <= ND.DESC_MAX + 1 && long.endsWith('…'), true);
+    const wf = readText(new URL('../.github/workflows/collect-news.yml', import.meta.url));
+    const appN = readText(new URL('../app.js', import.meta.url));
+    eq('  앱 — 요약이 있는 글만 요약 줄을 그린다 (홈 띠 · 전체 보기 카드)', [/\$\{n\.desc \? `<span class="news-tile-desc">/.test(appN), /\$\{o\.desc \? `<p class="sch-desc">/.test(appN), /desc: n\.desc \}\)/.test(appN)], [true, true, true]);
+    eq('  앱 — 「오늘 n」 은 부를 때마다 오늘을 읽는다 (todayStart · 날짜를 굳히지 않는다)', /function newsIsToday[\s\S]{0,300}todayStart\(\)/.test(appN), true);
+    eq('  워크플로 — 요약 단계는 보강(continue-on-error) · 장부를 저장하고 감사 실패 땐 되돌린다',
+      [/collect-news-desc\.mjs/.test(wf), /name: 교내 소식 요약[\s\S]{0,120}continue-on-error: true/.test(wf),
+        /git add collector\/news-desc\.json/.test(wf), /git checkout -- collector\/news-desc\.json/.test(wf)], [true, true, true, true]);
+  }
+
+  /* 🔴 우리 학교 게시판 공고 · 재단·지자체 새 공고 (2026-10-10 팀 업무 분장 11번 — 은서) */
+  {
+    const live = appSrc2.slice(appSrc2.indexOf('function liveNoticesHtml('), appSrc2.indexOf('function noticeCardHtml('));
+    eq('게시판 공고는 석 장만 펴고 나머지는 가려 둔다 (지우지 않는다 — home-extra)', /i >= HOME_DEADLINE_TOP \? ' home-extra'/.test(live), true);
+    eq('  가린 카드는 CSS 가 숨긴다 (#live-list:not(.more-open))', /#live-list:not\(\.more-open\) \.home-extra/.test(readText(new URL('../style.css', import.meta.url))), true);
+    eq('  카드 윗줄에 학교 이름을 되풀이하지 않고 날짜를 적는다', /org: noticeDayLine\(n\)/.test(live), true);
+    eq('  갱신 날짜는 파랑(누를 수 있음)이 아니다 — section-note', /<span class="link-btn">\$\{(updatedAt|liveExternal)/.test(appSrc2), false);
+  }
+
+  /* 🔴 정렬 용어 통일 (2026-10-10 팀 업무 분장 14번 — 은서). 장학 탐색과 대외활동이 같은 기준을 같은 말로 부른다. */
+  {
+    const exp = appSrc2.slice(appSrc2.indexOf('const EXPLORE_SORTS = {'), appSrc2.indexOf('};', appSrc2.indexOf('const EXPLORE_SORTS = {')));
+    const act = appSrc2.slice(appSrc2.indexOf('const ACTIVITY_SORTS = {'), appSrc2.indexOf('};', appSrc2.indexOf('const ACTIVITY_SORTS = {')));
+    eq('정렬 이름 — 장학·대외활동 둘 다 「등록 최신순」 (「최근 수집순」 같은 다른 말을 쓰지 않는다)',
+      /label: '등록 최신순'/.test(exp) && /label: '등록 최신순'/.test(act) && !/label: '최근 수집순'/.test(act), true);
+  }
+
   /* 🔴 홈 히어로 그림 4칸 (2026-10-01 CTO 결정 · 시안 I4). */
   {
     const tiles = appSrc2.slice(appSrc2.indexOf('const HERO_TILES = ['), appSrc2.indexOf('];', appSrc2.indexOf('const HERO_TILES = [')));
     const gos = [...tiles.matchAll(/go: '([^']+)'/g)].map((m) => m[1]);
-    eq('히어로 그림 칸은 넷 — 마감 임박 · 교내 · 교외 · 신청 내역', gos, ['deadline', '교내', '교외', 'applications']);
+    /* 2026-10-10 팀 업무 분장 4번(은서) — 대외활동·공모전 칸을 더해 여섯 칸 · 칸은 작게 */
+    eq('히어로 그림 칸은 여섯 — 마감 임박 · 교내 · 교외 · 대외활동 · 공모전 · 신청 내역', gos, ['deadline', '교내', '교외', '대외활동', '공모전', 'applications']);
     eq('  그림은 SVG 다 (이모지 아님 — 폰마다 그림이 달라지지 않게)',
-      (tiles.match(/svg: '<svg /g) || []).length, 4);
+      (tiles.match(/svg: '<svg /g) || []).length, 6);
+    eq('  대외활동·공모전 칸은 그 종류 칩을 켠 채 대외활동 화면을 연다',
+      /go === '대외활동' \|\| go === '공모전'[\s\S]{0,400}activitiesFilter = go;[\s\S]{0,300}showScreen\('activities'\)/.test(appSrc2), true);
+    eq('  활동 목록이 아직 안 왔으면 0 이 아니라 배지를 숨긴다 (모름 ≠ 없음)',
+      /tileN\[t\.go\] == null \? ''/.test(appSrc2), true);
     /* 지구본 = 원 + 가로 적도선 + 경선 두 곡선. 교외 칸은 CTO 지시로 지구가 아니라 재단 건물이다 */
     const outer = tiles.slice(tiles.indexOf("go: '교외'"), tiles.indexOf("go: 'applications'"));
     eq("  교외 칸은 지구 그림이 아니다 (CTO 지시 — 재단 건물)",
@@ -8709,6 +8757,26 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
     eq('  묶음은 한 문단이다 (<p> 하나 · 점으로 잇는다)',
       (facts.match(/<p[\s>]/g) || []).length === 1 && /\.join\(' · '\)/.test(facts), true);
     eq("  군말 '자세한 내용은 … 에서 확인' 이 없다", /자세한 내용은/.test(facts), false);
+  }
+
+  /* 🔴 'AI 티' 정리 A·D·E·G·H (2026-10-06 사장님 지시 → 전후 사진 보고 → 은서님이 다섯 개 골랐다).
+     조사 근거·전후 사진: docs/designs/ai-tell-removal.md 3-6절. 되살리면 여기서 걸린다. */
+  {
+    const cssAll = readText(new URL('../style.css', import.meta.url));
+    const css = cssAll.replace(/\/\*[\s\S]*?\*\//g, '');   // 주석 속 글자로 통과·실패하지 않게
+    eq('A 화면 제목 밑 강조선(.page-header h2::after)이 없다', /\.page-header h2::after\s*\{/.test(css), false);
+    const org = appSrc2.slice(appSrc2.indexOf('function cardOrgLine('), appSrc2.indexOf('function cardOrgLine(') + 1500);
+    eq("D 카드 윗줄은 '주관 기관 원문 확인'(모름 표시)을 싣지 않는다",
+      /if \(providerUnknown\(prov\)\) return String\(sch\.type/.test(org)
+      /* 판정은 providerUnknown 한 곳(지원서 초안 provLead 와 같이 쓴다 · 2026-10-11 합침) — 그 함수가 '모름' 두 꼴을 다 잡는가까지 */
+      && /const providerUnknown = \(v\) => !String\(v \|\| ''\)\.trim\(\) \|\| \/원문 확인\|미확인\/\.test/.test(appSrc2), true);
+    const od = appSrc2.slice(appSrc2.indexOf('function openDetail('), appSrc2.indexOf('function openDetail(') + 20000);
+    eq('E 장학 상세 제목도 카드와 같은 정리(cardTitle)를 거친다',
+      /class="sheet-title">\$\{esc\(cardTitle\(sch\)\)\}/.test(od) && !/class="sheet-title">\$\{esc\(sch\.name\)\}/.test(od), true);
+    eq("G 서류 이름마다 '?' 동그라미(wallet-q)를 붙이지 않는다", /wallet-q/.test(appSrc2.replace(/\/\*[\s\S]*?\*\//g, '')), false);
+    eq('  대신 이름의 점선 밑줄로 누를 수 있음을 알린다', /\.wallet-label \{[^}]*underline dotted/.test(css), true);
+    eq('H 정렬 단추는 알약이 아니라 입력칸 모서리다',
+      /\.sort-btn \{[^}]*border-radius: var\(--radius-sm\)/.test(css) && !/\.sort-btn \{[^}]*border-radius: var\(--radius-pill\)/.test(css), true);
   }
 }
 

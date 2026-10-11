@@ -110,14 +110,34 @@ const eq = (label, got, want) => {
   await dismissNotify(page);
   await page.waitForTimeout(300);
 
-  console.log('\n■ MY 화면 — 계정·알림은 여기 없고, 오른쪽 위에 설정이 있다');
+  console.log('\n■ MY 화면 — C안 구조 (2026-10-10 은서 「저번 C안처럼」): 머리줄 + 메뉴 줄 넷 + 로그인 카드');
   await page.click('.nav-item[data-nav="my"]');
   await page.waitForSelector('#screen-my:not([hidden])');
   await page.waitForTimeout(400);
-  eq('오른쪽 위에 설정(톱니) 버튼이 있다', await page.$eval('#btn-open-settings', (e) => e.offsetParent !== null), true);
-  eq('MY 안에서는 계정 절이 안 보인다', await page.$eval('#my-account', (e) => e.offsetParent !== null), false);
+  eq('머리줄에 이름과 학교가 있다', /김한장|님/.test(await page.textContent('#my-head')) && /한국외국어대학교/.test(await page.textContent('#my-head')), true);
+  eq('메뉴 줄 넷 — 내 정보 · 서류함 · 공고 보관함 · 알림 · 설정',
+    await page.$$eval('#screen-my .me-row .me-txt b', (els) => els.map((e) => e.textContent.trim())), ['내 정보', '서류함', '공고 보관함', '알림 · 설정']);
+  eq('줄마다 작은 글씨가 채워져 있다 (빈 줄 없음)', await page.$$eval('#screen-my .me-row small', (els) => els.every((e) => e.textContent.trim().length > 0)), true);
+  eq('알림 · 설정 줄이 설정 화면 문(#btn-open-settings)이다', await page.$eval('#btn-open-settings', (e) => e.classList.contains('me-row') && e.offsetParent !== null), true);
+  /* 🔴 계정(로그인)은 MY 안 — 메뉴 아래 카드 한 장 (2026-10-10 MY 2번 · 한 곳에만) */
+  eq('MY 안에 계정 카드가 보인다', await page.$eval('#my-account', (e) => e.offsetParent !== null), true);
+  eq('계정 카드는 메뉴 바로 아래다', await page.$eval('#my-account', (e) => e.previousElementSibling && e.previousElementSibling.classList.contains('me-menu')), true);
+  eq('설정 화면에는 계정 카드가 없다 (한 곳에만)', await page.$$eval('#screen-settings #my-account', (e) => e.length), 0);
+  eq('MY 첫 화면에는 프로필 표·서류·보관함 목록을 깔지 않는다 (안쪽 화면으로)',
+    await page.$$eval('#screen-my #my-profile, #screen-my #my-wallet, #screen-my #my-saved', (e) => e.length), 0);
   eq('MY 안에서는 알림 절이 안 보인다', await page.$eval('#my-notify', (e) => e.offsetParent !== null), false);
   await page.screenshot({ path: `${SHOT}/my.png` });
+  /* 메뉴 줄 → 안쪽 화면 → 뒤로 */
+  for (const [go, title, el] of [['mydocs', '서류함', '#my-wallet .wallet-row'], ['mysaved', '공고 보관함', '#my-saved'], ['myinfo', '내 정보', '#my-profile .my-grid']]) {
+    await page.click(`[data-my-go="${go}"]`);
+    await page.waitForSelector(`#screen-${go}:not([hidden])`);
+    eq(`  「${title}」 줄 → 안쪽 화면 (제목 · 내용)`, [(await page.textContent(`#screen-${go} .sub-header h2`)).trim(), await page.$eval(el, (e) => e.offsetParent !== null)], [title, true]);
+    eq('    아래 탭은 MY 가 켜진 채', await page.$eval('.nav-item[data-nav="my"]', (e) => e.classList.contains('active')), true);
+    if (go !== 'myinfo') {
+      await page.click(`#btn-${go}-back`);
+      await page.waitForSelector('#screen-my:not([hidden])');
+    }
+  }
 
   /* 🔴 **학적정보 수정은 그 글자만 눌러야 간다** (2026-09-12 개발자 지시 — "전체 표를 눌러도
      수정하는 걸로 넘어가는데 학적정보수정 부분만 눌렀을 때 수정가능하게").
@@ -133,11 +153,11 @@ const eq = (label, got, want) => {
     await page.click('#my-profile .my-grid div:nth-child(3)');   // 지원구간 칸
     await page.waitForTimeout(400);
     eq('🔴 표(지원구간 칸)를 눌러도 수정으로 넘어가지 않는다',
-      await page.evaluate(() => currentScreen), 'my');
+      await page.evaluate(() => currentScreen), 'myinfo');
     await page.click('#my-profile .my-line');                    // 학교·학과 줄
     await page.waitForTimeout(400);
     eq('🔴 학교 줄을 눌러도 넘어가지 않는다',
-      await page.evaluate(() => currentScreen), 'my');
+      await page.evaluate(() => currentScreen), 'myinfo');
 
     /* 🔴 사진 단추를 눌러도 수정으로 안 넘어간다 — 예전엔 카드가 버튼이라 파일 창과
        수정 화면이 **같이** 열렸고, 그걸 캡처 단계 가로채기로 막고 있었다. 그 장치를 걷은
@@ -150,7 +170,7 @@ const eq = (label, got, want) => {
       await photoBtn.click();
       await page.waitForTimeout(400);
       eq('🔴 사진 단추를 눌러도 수정으로 넘어가지 않는다',
-        await page.evaluate(() => currentScreen), 'my');
+        await page.evaluate(() => currentScreen), 'myinfo');
     }
 
     /* 🔴 **닿는 자리를 재 둔다** (2026-09-12 코드 리뷰) — 수정으로 가는 문이 이 글자 하나뿐인데
@@ -172,6 +192,7 @@ const eq = (label, got, want) => {
     const cancel = await page.$('[data-onboard-cancel]:not([hidden])');
     if (cancel) await cancel.click();
     await page.waitForTimeout(600);
+    /* 취소는 떠났던 안쪽 화면(내 정보)이나 MY 로 돌아온다 — 다음 절은 MY 첫 화면에서 시작하게 맞춘다 */
     if (await page.$eval('#screen-my', (e) => e.hidden)) {
       await page.evaluate(() => showScreen('my'));
       await page.waitForSelector('#screen-my:not([hidden])');
@@ -179,32 +200,9 @@ const eq = (label, got, want) => {
     await page.waitForTimeout(300);
   }
 
-  /* 🔴 **아이콘 버튼의 손가락 표적** (2026-09-18 개발자 결정 「충돌」 9 (b)).
-     실측으로 `.icon-btn`(알림 종 · 설정 톱니)이 38×38 이었다 — Apple 최소 44 에 6px 모자란다.
-     넓힌 것은 **누를 수 있는 넓이**뿐이고 보이는 38×38 은 그대로다(hover 면이 커지면
-     승인받은 모양이 바뀐다 — 그래서 `.my-edit-hint` 처럼 padding 으로 넓히지 않고
-     안 보이는 덧판 `.icon-btn::after` 로 넓혔다. style.css `.icon-btn` 절).
-     🔴 **크기를 재는 것으로는 증명이 안 된다** — 덧판은 눈에 안 보이고 상자 크기를 안 바꾼다.
-        그래서 네 귀퉁이를 **실제로 짚어 보고**(elementFromPoint) 버튼에 닿는지 센다.
-        되돌리면(덧판을 지우면) 귀퉁이가 빗나가 빨간불이 된다 — 확인함. */
-  {
-    const tap = await page.$eval('#btn-open-settings', (e) => {
-      const r = e.getBoundingClientRect();
-      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-      const hit = (dx, dy) => {
-        const el = document.elementFromPoint(cx + dx, cy + dy);
-        return !!(el && (el === e || e.contains(el)));
-      };
-      /* 44 짜리 표적이면 중심에서 ±21 까지는 버튼에 닿아야 한다(가장자리 1px 여유) */
-      const d = 21;
-      return {
-        보이는크기: `${Math.round(r.width)}×${Math.round(r.height)}`,
-        귀퉁이넷: [hit(-d, -d), hit(d, -d), hit(-d, d), hit(d, d)].filter(Boolean).length,
-      };
-    });
-    eq('보이는 아이콘 버튼은 38×38 그대로다 (모양을 키우지 않았다)', tap.보이는크기, '38×38');
-    eq('🔴 손가락이 닿는 넓이는 44×44 다 (네 귀퉁이를 실제로 짚어 확인)', tap.귀퉁이넷, 4);
-  }
+  /* 🔴 손가락 표적 — 설정 문이 2026-10-10 에 톱니(38px 아이콘 + 덧판)에서 MY 메뉴 줄로 바뀌었다. 줄 자체가 44px 이상이어야 한다 */
+  eq('🔴 MY 메뉴 줄은 손가락이 닿는 높이다 (44px 이상)',
+    await page.$$eval('#screen-my .me-row', (els) => els.every((e) => e.getBoundingClientRect().height >= 44)), true);
 
   console.log('\n■ 설정 화면 — 승인받은 목업 그대로인가');
   await page.click('#btn-open-settings');
@@ -229,7 +227,8 @@ const eq = (label, got, want) => {
   eq('MY 탭이 켜진 채로 남는다 (여기가 MY 안쪽이라는 표시)',
     await page.$eval('.nav-item[data-nav="my"]', (e) => e.classList.contains('active')), true);
 
-  eq('계정 절 제목', (await page.textContent('#my-account .acc-head')).trim(), '계정');
+  /* 2026-10-10 C안 — 로그인 전 계정 카드의 제목은 할 일을 말한다 */
+  eq('계정 카드 제목', (await page.textContent('#my-account .acc-head')).trim(), '로그인');
   eq('계정 버튼 둘 — 로그인 · 회원가입',
     await page.$$eval('#my-account .acc-actions .btn', (els) => els.map((e) => e.textContent.trim())),
     ['로그인', '회원가입']);
@@ -240,33 +239,11 @@ const eq = (label, got, want) => {
 
   eq('알림 절 제목', (await page.textContent('#my-notify .wallet-title')).trim(), '알림');
   eq('알림 상태 줄이 있다', (await page.textContent('#my-notify .nf-status')).trim().length > 0, true);
-  eq('오른쪽에 켜기 버튼', (await page.textContent('#btn-nf-toggle')).trim(), '켜기');
-  /* 🔴 다섯 줄의 **문구와 순서**가 목업과 같아야 한다. 하나라도 달라지면 여기서 걸린다. */
-  eq('알림 스위치 5줄이 목업과 같다',
-    await page.$$eval('#my-notify .nf-pref-text strong', (els) => els.map((e) => e.textContent.replace(/\s+/g, ' ').trim())),
-    ['내 조건에 맞는 새 장학 공고', '마감 하루 전 · 마감 당일', '제출 기록 안 한 공고',
-      '우리 학교 게시판 새 공고', '마감 지난 공고 결과 기록']);
-  eq('스위치가 5개', await page.$$eval('#my-notify .nf-switch', (e) => e.length), 5);
-
-  /* 🔴 **절 사이 빈칸은 눈에 보이는 것끼리 재야 한다** (2026-09-12 개발자 지시 "알림과
-     기타 사이 간격이 너무 커서 줄여"). 상자끼리 재면 둘 다 49px 로 **똑같아서 아무 문제가
-     없어 보인다** — 실제로 그렇게 재고 한 번 헷갈렸다. 알림의 마지막 줄은 제 여백 11px 을
-     이미 갖고 그 밑에 구분선도 없어서, 눈에는 62px 로 보였다(계정→알림 은 49px). */
-  {
-    const 빈칸 = await page.evaluate(() => {
-      const btn = document.querySelector('#my-account .btn, #my-account button');
-      const rows = [...document.querySelectorAll('#my-notify .nf-pref')];
-      const sw = rows[rows.length - 1].querySelector('.nf-switch');
-      const t1 = document.querySelector('#my-notify .wallet-title').getBoundingClientRect().top;
-      const t2 = document.querySelector('#set-etc .wallet-title').getBoundingClientRect().top;
-      return { 계정_알림: Math.round(t1 - btn.getBoundingClientRect().bottom),
-        알림_기타: Math.round(t2 - sw.getBoundingClientRect().bottom) };
-    });
-    eq('  (검사가 무력하지 않은지 — 두 빈칸을 실제로 쟀다)',
-      빈칸.계정_알림 > 20 && 빈칸.알림_기타 > 20, true);
-    eq(`🔴 알림→기타 빈칸이 계정→알림과 같은 리듬이다 (${빈칸.계정_알림}px vs ${빈칸.알림_기타}px)`,
-      Math.abs(빈칸.알림_기타 - 빈칸.계정_알림) <= 4, true);
-  }
+  /* 🔴 켜기/끄기 **스위치 하나** (2026-10-10 팀 업무 분장 MY 3번 — 은서: "세부사항 표시 대신 단순 켜기/끄기") */
+  eq('오른쪽에 스위치 (꺼짐)', await page.getAttribute('#btn-nf-toggle', 'aria-checked'), 'false');
+  eq('스위치는 role=switch 다 (보조기기가 켜짐/꺼짐으로 읽는다)', await page.getAttribute('#btn-nf-toggle', 'role'), 'switch');
+  eq('종류별 다섯 줄은 없다 (스위치 하나만)', await page.$$eval('#my-notify .nf-pref', (e) => e.length), 0);
+  eq('알림 절의 스위치는 하나뿐', await page.$$eval('#my-notify .nf-switch', (e) => e.length), 1);
 
   console.log('\n■ 덧붙인 세 줄 — 휴지통 · 이용약관 · 탈퇴');
   eq('기타 메뉴 줄 (2026-09-11 개발자 지시 순서대로)',
@@ -685,7 +662,8 @@ const eq = (label, got, want) => {
 
     /* 🔴 시트가 떠 있으면 그 안의 손짓을 뺏으면 안 된다 — 시트는 `#app` 안에 있어서
        막지 않으면 로그인 시트를 옆으로 쓸 때 설정 화면이 통째로 나가 버린다. */
-    await page.click('#btn-acc-in');
+    /* 로그인 버튼은 2026-10-10 에 MY 로 옮겼다 — 설정 화면 위에 시트를 띄우는 상황은 그대로 재현한다(같은 함수) */
+    await page.evaluate(() => openAuthSheet('in'));
     await page.waitForSelector('#detail-sheet:not([hidden])');
     await page.waitForTimeout(400);
     await swipe(page, { x: 200, y: 500, dx: 160 });
@@ -897,7 +875,7 @@ const eq = (label, got, want) => {
     await page.waitForSelector('#screen-settings:not([hidden])');
     await page.waitForTimeout(400);
 
-    for (const [name, sel] of [['알림 줄', '#my-notify .nf-pref'], ['기타 줄', '#set-etc .my-menu-item']]) {
+    for (const [name, sel] of [['기타 줄', '#set-etc .my-menu-item']]) {   // 알림 줄은 2026-10-10 스위치 하나로 바뀌어 없다
       const r = await press(sel);
       eq(`${name} — 정말 눌린 상태로 쟀다 (아니면 이 절이 통째로 헛검사다)`, r.눌렸나, true);
       eq(`${name} — 브라우저 기본 회색 판이 꺼져 있다`, 투명(r.기본판), true);
@@ -1003,6 +981,9 @@ const eq = (label, got, want) => {
     await page.waitForSelector('#screen-my:not([hidden])');
     await page.waitForTimeout(600);
 
+    /* 2026-10-10 C안 — 학적정보 표는 「내 정보」 안쪽 화면에 있다 */
+    await page.click('[data-my-go="myinfo"]');
+    await page.waitForSelector('#screen-myinfo:not([hidden])');
     /* ① 학적정보 표 — 칸마다 긋던 줄이 없다(윗줄 하나는 남는다) */
     const 표 = await page.$$eval('.my-grid > div', (els) => els.map((e) =>
       parseFloat(getComputedStyle(e).borderBottomWidth)));
@@ -1011,7 +992,11 @@ const eq = (label, got, want) => {
     eq('  다만 표를 윗블록과 가르는 줄 하나는 남는다',
       parseFloat(await page.$eval('.my-grid', (e) => getComputedStyle(e).borderTopWidth)) > 0, true);
 
-    /* ② 빈 안내문이 이미 줄이 있는 자리에서 윗줄을 또 긋지 않는다 */
+    /* ② 빈 안내문이 이미 줄이 있는 자리에서 윗줄을 또 긋지 않는다 — 빈 공고 보관함(안쪽 화면)에서 잰다 */
+    await page.click('#btn-myinfo-back');
+    await page.click('[data-my-go="mysaved"]');
+    await page.waitForSelector('#screen-mysaved:not([hidden])');
+    await page.waitForTimeout(300);
     const 빈안내 = await page.$$eval('.empty', (els) => els
       .filter((e) => e.offsetParent)
       .map((e) => ({
@@ -1078,7 +1063,9 @@ const eq = (label, got, want) => {
      🔴 **CSS 를 읽지 말고 그려서 잰다** — `width:100%` 는 h2 상자 기준이라, h2 가 줄 전체로
         늘어나면 규칙은 그대로인데 밑줄만 화면 끝까지 간다(그게 이 절이 막는 진짜 사고다).
         그래서 글자(Range)와 밑줄(::after)을 **따로 재서** 맞대 본다. */
-  console.log('\n■ 화면 제목 밑줄 — 글자 폭만큼만 그어진다');
+  /* 🔴 2026-10-06 사장님 지시 'AI 티' 개선안 A 로 **밑줄을 없앴다** — 그래서 이 절은 이제
+     '밑줄이 없다'를 그려서 잰다(되살아나면 여기서 걸린다 · test-collector 'AI 티 정리' 절과 짝). */
+  console.log('\n■ 화면 제목 밑줄 — 없다 (2026-10-06 개선안 A)');
   {
     const 잰다 = async (nav, sel) => {
       await page.click(`.nav-item[data-nav="${nav}"]`);
@@ -1104,8 +1091,7 @@ const eq = (label, got, want) => {
     eq(`  (검사가 무력하지 않은지 — 제목 폭이 서로 다르다: ${폭들.join(' · ')}px)`,
       new Set(폭들).size, 3);
     for (const m of 머리줄) {
-      eq(`🔴 「${m.글자}」 밑줄이 글자 폭과 같다 (글자 ${Math.round(m.글자폭)}px · 밑줄 ${Math.round(m.밑줄)}px)`,
-        Math.abs(m.밑줄 - m.글자폭) <= 2, true);
+      eq(`🔴 「${m.글자}」 밑에 강조선이 그려지지 않는다 (밑줄 ${Math.round(m.밑줄)}px)`, m.밑줄, 0);
     }
     await page.click('.nav-item[data-nav="my"]');
     await page.waitForSelector('#screen-my:not([hidden])');

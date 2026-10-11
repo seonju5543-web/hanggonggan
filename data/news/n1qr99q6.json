@@ -1,7 +1,57 @@
 {
  "school": "조선대학교",
- "updatedAt": "2026-10-05",
+ "updatedAt": "2026-10-11",
  "items": [
+  {
+   "title": "[앵커사업단](최대 325만원 지원)(5차시 이내)온라인 콘텐츠(High-Tech) 개발 공모",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/281844/artclView.do",
+   "postedAt": "2026-10-08",
+   "school": "조선대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "desc": "앵커사업단 (지역민/재직자 대상) G-RISE 지역사회 연계 온라인 콘텐츠( High-Tech) 개발 공모 조선대학교 앵커사업단에서는 지역 전략산업과 연계한 특화 교육과정을 개발하여 지역 맞춤형 인재 양성 체계를…"
+  },
+  {
+   "title": "[보건진료소] 10월 진료 휴진 일정 안내",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/281818/artclView.do",
+   "postedAt": "2026-10-07",
+   "kind": "생활",
+   "school": "조선대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "desc": "14일(수) 13시~ 17시 26일(월) 15시~17시 28일(수) 09시~11시 의사선생님 연차사용에 따른 진료시간이 변경됨을 알려드립니다. 양해 부탁드립니다. 보 건 진 료 소 장 첨부파일이(가) 없습니다."
+  },
+  {
+   "title": "[신문방송사 교육방송국] 제39회 둘셋가요제 개최",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/281794/artclView.do",
+   "postedAt": "2026-10-07",
+   "school": "조선대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/00242100c70c40c5.webp",
+   "desc": "학생복지팀 학생 여러분의 많은 관심 바랍니다. 첨부파일이(가) 없습니다. [창업성장지원팀] 2026학년도 심화창업캠프 참여자 모집 (제주 2박 3일, 전액무료) [교육과정관리팀] 2026학년도…"
+  },
+  {
+   "title": "[교육과정관리팀] 2026학년도 CSU-핵심역량(3C역량) 진단 조사 안내(모바일 상품권 증정)",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/281777/artclView.do",
+   "postedAt": "2026-10-06",
+   "school": "조선대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/cf09d0f1cd72f19b.webp",
+   "desc": "교육혁신원 교육과정관리팀에서는 재학생들의 핵심역량 진단 결과를 통한 우수 , 취약 역량 파악 및 개선사항 도출을 위해 재학생들의 CSU- 핵심역량 (3C 역량 ) 진단을 아래와 같이 시행하오니 재학생 여러분의 많은…"
+  },
+  {
+   "title": "[취업전략팀] 이트너스 취업설명회",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/281770/artclView.do",
+   "postedAt": "2026-10-06",
+   "kind": "행사",
+   "school": "조선대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/73adf4a241fda2cb.webp",
+   "desc": "대학혁신지원사업의 일환으로 \"인사·총무부터 플랫폼까지, 경영지원 전문기업\" 이트너스 채용설명회를 실시합니다."
+  },
   {
    "title": "[홍보팀] 나만의 AI 도우미 ‘CSU AI’ 이용 안내",
    "url": "https://www3.chosun.ac.kr/bbs/chosun/117/281727/artclView.do",
@@ -9,7 +59,8 @@
    "school": "조선대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "thumb": "data/news/img/bf3d9b48de2d410e.webp"
+   "thumb": "data/news/img/bf3d9b48de2d410e.webp",
+   "desc": "조선대학교 구성원이라면 누구나 포털시스템에서 GPT·Claude·Gemini 등 다양한 AI를 한곳에서 이용할 수 있습니다."
   },
   {
    "title": "[THE조아] 2026년 10월 비교과 프로그램 안내",
@@ -17,7 +68,8 @@
    "postedAt": "2026-10-02",
    "school": "조선대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-02",
+   "desc": "프로그램에 대한 자세한 내용 확인 및 프로그램 신청은 THE조아시스템에서 가능합니다!"
   },
   {
    "title": "[G-LAMP사업단] 2026 하반기 블루밍 라운지(Blooming Rounge) 참여교원 모집공고",

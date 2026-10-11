@@ -1,7 +1,207 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-10-05",
+ "updatedAt": "2026-10-11",
  "items": [
+  {
+   "title": "[채용공고] 2026년 제9회 전남대학교 앵커사업단·제2회 서남권공유대학사...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70629",
+   "postedAt": "2026-10-08",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-09"
+  },
+  {
+   "title": "[취업정보] [KIA]AutoLand광주 의전담당자 채용(~10.13.(화...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70628",
+   "postedAt": "2026-10-08",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-08"
+  },
+  {
+   "title": "[취업정보] [(주)오뚜기]2026 전라지역 B2C영업, B2B영업, 홍보...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70627",
+   "postedAt": "2026-10-08",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/f2cfc91a71d54ea8.webp"
+  },
+  {
+   "title": "[행정공고] 전남대학교 정문 5·18 기념 조형물 CCTV 설치 행정예고 ...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70626",
+   "postedAt": "2026-10-08",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-08"
+  },
+  {
+   "title": "[학사안내] 2026학년도 동계 계절학기 타 대학교(서울대) 교류수학 추천...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70625",
+   "postedAt": "2026-10-08",
+   "kind": "학사",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-08"
+  },
+  {
+   "title": "[취업정보] [재맞고] 2026 『AI를 활용한 보고서 및 레포트 작성법 ...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70624",
+   "postedAt": "2026-10-08",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/99d78b381ceb9804.webp"
+  },
+  {
+   "title": "[모집공고] [각화청소년문화의집] 2026년 북구 청소년 어울림 마당 「플...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70620",
+   "postedAt": "2026-10-08",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/624fd2e6eb7bc88a.webp"
+  },
+  {
+   "title": "[취업정보] [LT메탈]신입/경력채용(~10.20.(화)까지)",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70600",
+   "postedAt": "2026-10-07",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "[취업정보] [Bayer]입제 포장라인 지원, 입제 혼합라인 지원 (대전공...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70599",
+   "postedAt": "2026-10-07",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "[취업정보] [인천시설공단]2026 제2회 공무직 채용계획 공고(10.21...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70598",
+   "postedAt": "2026-10-07",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/c154a46ea2587dbc.webp"
+  },
+  {
+   "title": "[취업정보] [신한라이프]2026 신입채용(~10.16.(금)17까지)",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70597",
+   "postedAt": "2026-10-07",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "[취업정보] [코원에너지서비스*SK계열사]2026 합나기 대졸 신입사원(G...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70596",
+   "postedAt": "2026-10-07",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "[취업정보] [건설공제조합]2026년 하반기 신입직원 채용(~10.26.(...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70595",
+   "postedAt": "2026-10-07",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "[대학생활] [횡성군] 제22회 횡성한우축제 고향사랑기부제 이벤트 안내",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70581",
+   "postedAt": "2026-10-07",
+   "kind": "행사",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "[취업정보] 전남대 대학일자리플러스센터 이전 OPEN 이벤트",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70572",
+   "postedAt": "2026-10-06",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/70a0097fd2f61597.webp"
+  },
+  {
+   "title": "[채용공고] 2026년 제6회 전남대학교 G-LAMP사업단 박사후연구원(포...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70571",
+   "postedAt": "2026-10-06",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[채용공고] 2026년 전남대학교 3차년도 G-LAMP사업단 LAMP전임...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70570",
+   "postedAt": "2026-10-06",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[대학생활] 킹갓빛전남대와 충무공엠페러서울대가 만나면",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70569",
+   "postedAt": "2026-10-06",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[행정공고] 노인복지 활동관련 참여촉진 협조",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70568",
+   "postedAt": "2026-10-06",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[행정공고] 치의학전문대학원 승강기내부 고정형 CCTV 설치로 인한 행정예...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70567",
+   "postedAt": "2026-10-06",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[취업정보] 2026년 글로컬대학사업 「AI, 역량검사부터 면접까지」",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70564",
+   "postedAt": "2026-10-06",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/6ecdd5f0c4faccf6.webp"
+  },
+  {
+   "title": "[취업정보] [한국경제인협회] 2026년 대학생 취업인식도 설문조사 참여 ...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70563",
+   "postedAt": "2026-10-06",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[모집공고] 대학 산학협력단지 조성지원사업 산학공동기술개발(R&BD)과제 공고",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70561",
+   "postedAt": "2026-10-06",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
   {
    "title": "[채용공고] 2026년 제3회 지역 이공계 대학생 기초역량 강화 사업단 서...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70556",
@@ -41,15 +241,6 @@
   {
    "title": "[취업정보] [대웅그룹-대웅제약] 2026년 하반기 신입사원(채용연계형 인...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70552",
-   "postedAt": "2026-10-02",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "foundAt": "2026-10-02"
-  },
-  {
-   "title": "[채용공고] 2026년 제9회 전남대학교 앵커사업단·제2회 서남권공유대학사...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70549",
    "postedAt": "2026-10-02",
    "kind": "채용",
    "school": "전남대학교",

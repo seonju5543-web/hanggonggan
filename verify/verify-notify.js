@@ -137,7 +137,8 @@ async function onboard(page) {
     /* 문구가 '켜지 않았어요' → '아직 켜지 않음' 으로 바뀌었다. 지키는 것은 표현이 아니라
        **꺼져 있음을 숨기지 않는다**는 사실이다 — notify.js 의 statusText 갈래를 다 받는다. */
     ok(/켜지 않|차단|미지원|지원하지/.test(status), 'MY에 알림 상태가 정직하게 표시됨', status);
-    ok((await page.textContent('#btn-nf-toggle')).trim() === '켜기', 'MY에서 언제든 켤 수 있는 버튼 제공');
+    /* 2026-10-10 — 켜기/끄기 글자 버튼이 스위치 하나로 바뀌었다(팀 업무 분장 MY 3번). 꺼져 있음은 aria-checked 가 말한다 */
+    ok(await page.getAttribute('#btn-nf-toggle', 'aria-checked') === 'false', 'MY에서 언제든 켤 수 있는 스위치 제공 (꺼짐)');
     await page.screenshot({ path: SHOT('02-my-settings') });
 
     // 알림을 안 켰어도 앱 내 알림함에는 쌓인다
@@ -310,24 +311,27 @@ async function onboard(page) {
   ok(true, 'Esc로 알림함 닫힘');
 
   // ⑥ 항목별 설정 저장 · 실제 차단
-  console.log('\n  [설정] 항목별 켜기/끄기');
+  console.log('\n  [설정] 켜기/끄기 스위치 하나 (2026-10-10 — 종류별 다섯 줄은 화면에서 뺐다)');
   await page.click('.nav-item[data-nav="my"]');
   await page.click('#btn-open-settings');
   await page.waitForSelector('#my-notify:not([hidden])');
-  const prefCount = await page.$$eval('.nf-switch', (els) => els.length);
-  ok(prefCount === 5, '알림 종류 5가지를 개별로 켜고 끌 수 있음', prefCount);
+  const prefCount = await page.$$eval('#my-notify .nf-switch', (els) => els.length);
+  ok(prefCount === 1, '알림 설정은 스위치 하나뿐 (세부 항목 없음)', prefCount);
+  ok(await page.getAttribute('#btn-nf-toggle', 'aria-checked') === 'true', '켠 뒤 스위치가 켜짐으로 보인다');
+  ok(await page.evaluate(() => NOTIFY_RULES.TYPES.every((t) => notifyLedger.prefs[t.id])), '켜면 알림 다섯 종류가 모두 켜져 있다');
   const onText = await page.textContent('.nf-status');
   ok(/켜짐/.test(onText), 'MY 상태가 "켜짐"으로 바뀜', onText);
   await page.screenshot({ path: SHOT('06-my-on') });
 
-  await page.uncheck('[data-nf-pref="deadline"]');
+  /* 종류별 끄기는 화면에서 사라졌지만 규칙 엔진은 그대로 prefs 를 읽는다 — 장부를 직접 고쳐 엔진이 지키는지 본다 */
+  await page.evaluate(async () => { notifyLedger.prefs.deadline = false; await notifySaveLedger(); });
   await page.waitForTimeout(300);
   await page.reload({ waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(2500);
   await page.click('.nav-item[data-nav="my"]');
   await page.click('#btn-open-settings');
   await page.waitForSelector('#my-notify:not([hidden])');
-  const persisted = await page.isChecked('[data-nf-pref="deadline"]');
+  const persisted = await page.evaluate(() => notifyLedger.prefs.deadline);
   ok(persisted === false, '끈 설정이 새로고침 후에도 유지됨');
 
   const blocked = await page.evaluate(async () => {

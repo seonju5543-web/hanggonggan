@@ -1,7 +1,132 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-10-05",
+ "updatedAt": "2026-10-11",
  "items": [
+  {
+   "title": "[일반] [서울특별시여성가족재단] 서울 디지털성범죄 안심지원센터 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53454&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-08",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/5d2235b657bb5b41.webp",
+   "desc": "작성일 2026.10.08 | 수정일 2026.10.08 | 학생복지팀 가 . 지원대상 : 서울시 거주 · 재학 · 재직 중인 디지털성범죄 피해시민"
+  },
+  {
+   "title": "[일반] [서울특별시] 2026년 하반기 동행안심벨(구 안심헬프미) 지원사업 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53453&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-08",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/4ecff66abf641214.webp",
+   "desc": "작성일 2026.10.08 | 수정일 2026.10.08 | 학생복지팀 「 동행안심벨 」 지원 사업개요"
+  },
+  {
+   "title": "[학사] 2026학년도 2학기 중간고사 일정 및 시행 지침 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53449&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-08",
+   "kind": "학사",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "desc": "가 . 중간고사를 실시하는 과목 : 대면고사 원칙 나 . 중간고사를 미실시하는 과목 : 과제 등의 시험 대체나 온 / 오프라인 수업 진행"
+  },
+  {
+   "title": "[일반] 기간제 계약직원 채용 공고(전자정보공과대학 전자공학과)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53448&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-08",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "desc": "지원 자격 1. 대학교(4년제) 졸업자 이상 2. 남자의 경우 병역필 또는 면제자"
+  },
+  {
+   "title": "[국제학생] 2027학년도 1학기 학부 외국인 신·편입생 1차 모집 필기고사 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53447&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-07",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "[일반] [(재)서울테크노파크] 제1회 지역 현안 해결 솔루션 챌린지",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53443&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-07",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/0b7cec3f201333c5.webp",
+   "desc": "나 . 공모주제 : 과학기술을 활용하여 해결이 필요한 지역 현안 다 . 응모자격 : 지역 문제 해결에 관심 있는 국민 누구나"
+  },
+  {
+   "title": "[일반] [프로그램 안내] 단 한 사람을 위한 직무설정 프롬프트 (~10/15)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53439&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-07",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/cba37ed567fa16e0.webp"
+  },
+  {
+   "title": "[시설] 한울관 및 아이스링크 주차장 입구 출입 금지 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53438&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-07",
+   "kind": "생활",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/0d3eadc45a820472.webp"
+  },
+  {
+   "title": "[국제학생] 2026 서울 외국인 취업 채용 박람회 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53431&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-06",
+   "kind": "행사",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/bdb5e79077577209.webp"
+  },
+  {
+   "title": "[일반] [대한핸드볼협회] 한국핸드볼연맹 핸드볼 H리그 대학생 크리에이터 H-CRE8TOR 모집",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53436&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-06",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/1f7f6b71f9749c11.webp"
+  },
+  {
+   "title": "[외부] [교보교육재단] 2026 교육 심포지엄 참여 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53435&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-06",
+   "kind": "행사",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/6ab29d307f54d38e.webp"
+  },
+  {
+   "title": "[국제학생] 은평구 문화관광과_2026 IFWY 행사 참여 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53433&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-06",
+   "kind": "행사",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/1fa567ce221d933b.webp"
+  },
+  {
+   "title": "[외부] [서울특별시] 제12회 서울 29초 영화제",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53430&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-06",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/da242396ea10cec3.webp"
+  },
   {
    "title": "[국제학생] 2026 외국인 태권도 경연축제 참가 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53421&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -89,7 +214,7 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/e8eb41bf3b57e2de.webp"
+   "thumb": "data/news/img/144f0e2dbd2e1eca.webp"
   },
   {
    "title": "[일반] [서울특별시] 2026년 서울시 빅데이터 캠퍼스 전문교육 과정 안내(10월)",
@@ -134,7 +259,7 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/1092671676a5e655.webp"
+   "thumb": "data/news/img/15706244571851d8.webp"
   },
   {
    "title": "[일반] [체육지원팀] 아이스하키부 「2026 LG 코리아 아이스하키리그」 경기 일정 및 결과 안내",
@@ -233,7 +358,7 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/900bb371fe3edc5a.webp"
+   "thumb": "data/news/img/02cc6af7898628b0.webp"
   },
   {
    "title": "[일반] 2026 베스트티처와 함께하는 신임교원 티칭 토크",
@@ -243,120 +368,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/3154cb370bc83df3.webp"
-  },
-  {
-   "title": "[국제학생] 2027학년도 1학기 학부 외국인 신·편입생 모집 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53370&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-18",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[국제학생] 2026 IFWY 은평 컨퍼런스 참여 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53355&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-17",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/4a6cb3dd9c8212c8.webp"
-  },
-  {
-   "title": "[국제학생] 2026 외국인 유학생 취업컨설팅 참여 안내(취업·비자 match-up day)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53343&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-15",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/37412651230c08b3.webp"
-  },
-  {
-   "title": "[학생] 2027학년도 일학습병행 학생 설명회",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53328&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-14",
-   "kind": "행사",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/7c6156a8d5e16810.webp"
-  },
-  {
-   "title": "[학사] 2026학년도 2학기 학부 수강과목 포기 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53320&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-10",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[일반] [정보통신처]불법 소프트웨어, 이미지, 폰트 사용 및 배포 방지를 위한 협조 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53314&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-10",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[일반] [정보통신처]내PC지키미를 이용한 PC보안 및 알약 점검 협조 요청",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53313&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-10",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[학사] 2026학년도 2학기 폐강 교과목 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53312&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-10",
-   "kind": "학사",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[국제학생] 제8회 ISF 외국인 유학생 커리어페어(취업·창업·대학진학)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53311&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-10",
-   "kind": "행사",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/070b330dd43186e0.webp"
-  },
-  {
-   "title": "[국제학생] 2026학년도 2학기 K 컬쳐 프로그램 외국인 유학생 모집",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53253&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-02",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/7879663be2e80dc3.webp"
-  },
-  {
-   "title": "[일반] 2026학년도 2학기 수학클리닉 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53269&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-03",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[국제교류] [대학혁신사업] 2026학년도 2학기 어울림: 멘토링 프로그램 활동 서류 및 유의사항 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53265&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-03",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/2b0a7bb05b421dfc.webp"
-  },
-  {
-   "title": "[일반] 2026-2 교수법 이러닝 시리즈 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53256&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-02",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/2d4c78a62e0796b4.webp"
   }
  ]
 }

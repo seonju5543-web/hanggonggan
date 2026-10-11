@@ -376,7 +376,8 @@ function ddayWords(d) {
    길이는 재 봤다(2026-09-21 · 375px 폰 너비에 실제로 그려 놓고 잰 값, 카드 제목 폭 335px):
    전체 169장에서 1줄 158 → 154 · 2줄 11 → 15. **3줄은 0건이고 잘리는 카드도 없다**
    (`.sch-name` 은 줄임표도 줄 수 제한도 없다). 4장이 한 줄 늘어나는 것이 전부다.
-   🔴 상세 시트는 **원제목 그대로** 둔다 — 거기는 원문과 대조하는 자리다. */
+   ⚠️ 상세 시트 제목도 이 함수를 쓴다(2026-10-06 사장님 지시 · 개선안 E). 원문과 대조할 글자는
+      '공고 원문 안내' 발췌와 원문 링크가 그대로 준다. */
 function cardTitle(sch) {
   return cleanCardTitle(String(sch.name || '').trim());
 }
@@ -402,6 +403,11 @@ const orgBase = (t) => String(t || '').replace(/\s*\([^)]*\)\s*$/, '').trim();
 const providerUnknown = (v) => !String(v || '').trim() || /원문 확인|미확인/.test(String(v));
 function cardOrgLine(sch) {
   const prov = String(sch.provider || '').trim();
+  /* 🔴 **'모른다'는 표시는 카드 윗줄에 싣지 않는다** (2026-10-06 사장님 지시 'AI 티' · 개선안 D).
+     로봇이 주관 기관을 못 읽으면 `주관 기관 원문 확인` 이 들어오는데, 그게 거의 모든 카드
+     윗줄을 채워 **템플릿이 자기 빈칸을 읽어 주는** 모양이 됐다(AI 화면의 대표 지문).
+     감추는 게 아니라 자리를 옮기는 것이다 — 상세 시트의 주관 줄은 그대로 그 말을 한다(원칙 8-1).
+     판정은 `providerUnknown` 한 곳(지원서 초안 provLead 와 같이 쓴다 — 2026-10-05 점검 app1-09 가 같은 일을 먼저 했다). */
   if (providerUnknown(prov)) return String(sch.type || '');
   const title = cardTitle(sch);
   /* ⚠️ `bareOrg(title)` 로도 대조하지 않는다 — 앞머리를 떼는 것은 **없던 조각을 만들지 못하므로**
@@ -420,7 +426,7 @@ function cardOrgLine(sch) {
    🔴 뒤 괄호는 **날짜·기간처럼 보일 때만** 뗀다. '(서울캠퍼스)' 같은 것은 남겨야 한다
       (느슨하게 떼면 캠퍼스가 사라져 다른 공고와 구별이 안 된다 — 2026-08-21 사고 유형).
    🔴 남는 글자가 4자 미만이면 아무것도 떼지 않는다(제목이 사라지는 것을 막는다).
-   ⚠️ 상세 시트는 원제목 그대로다 — 게시판에서 찾을 때 쓰는 글자라 바꾸면 안 된다. */
+   ⚠️ 2026-10-06 부터 상세 시트 제목도 이 함수를 쓴다(사장님 지시 · 개선안 E — openDetail 주석). */
 function cleanCardTitle(name) {
   let t = String(name || '').trim();
   const before = t;
@@ -440,7 +446,7 @@ function cleanCardTitle(name) {
    · 꼬리 게시일(`… 공고 2026.09 . 28`)을 뗀다
    🔴 '날'까지 있는 날짜만 날짜다 — `2026학년도`·`10월 프로그램`·`2학기`·`제13회` 는 제목이다.
    🔴 지어내지 않는다 — 떼어 낸 조각(dates)은 원문 글자 그대로 돌려준다(D-day 가 없는 카드는 회색 줄로 옮긴다 · 정보를 잃지 않게).
-   ⚠️ 상세 시트는 원제목 그대로다(게시판에서 찾을 때 쓰는 글자). */
+   ⚠️ 장학 상세 시트 제목도 cardTitle 로 정리한다(2026-10-06 · 개선안 E). */
 const TD_DAY = '(?:(?:20)?\\d{2}\\s?[.\\-/년]\\s?)?\\d{1,2}\\s?(?:[./]|월\\s?)\\s?\\d{1,2}\\s?(?:일)?\\.?(?:\\s?(?:[(（][월화수목금토일][)）]|[/.]?[월화수목금토일](?![가-힣])))?';
 const TD_DAY_RE = new RegExp(TD_DAY);
 const TD_DAY_G = new RegExp(TD_DAY, 'g');
@@ -1104,13 +1110,13 @@ function showScreen(name, opts) {
   if (typeof resumeSaveScroll === 'function' && currentScreen && currentScreen !== name) {
     resumeSaveScroll(currentScreen, appScroller().scrollTop);
   }
-  ['onboarding', 'home', 'explore', 'activities', 'applications', 'my', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'].forEach((n) => {
+  ['onboarding', 'home', 'explore', 'activities', 'applications', 'my', 'myinfo', 'mydocs', 'mysaved', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'].forEach((n) => {
     $(`#screen-${n}`).hidden = n !== name;
   });
   $('#bottom-nav').hidden = name === 'onboarding';
   /* 설정·휴지통은 MY 안쪽 화면이라 아래 탭에서 **MY 가 켜진 채**로 둔다 —
      아무 탭도 안 켜져 있으면 학생이 지금 어디에 있는지 알 수 없다. */
-  const navOn = ['settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'].includes(name) ? 'my' : name;
+  const navOn = ['myinfo', 'mydocs', 'mysaved', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'].includes(name) ? 'my' : name;
   $$('.nav-item').forEach((b) => b.classList.toggle('active', b.dataset.nav === navOn));
 
   /* 🔴 안쪽 화면(설정·휴지통)은 **방향이 있는** 움직임으로 들어온다 (2026-09-11 개발자 지시).
@@ -1119,7 +1125,7 @@ function showScreen(name, opts) {
         style.css 에서 **이 규칙이 뒤에 와야** 이긴다(같은 굵기면 나중 것이 이긴다).
      ⚠️ 클래스를 떼었다 붙이는 것만으로는 다시 안 돈다 — 브라우저가 '바뀐 게 없다'고 본다.
         중간에 offsetWidth 를 한 번 읽어 강제로 끊어 준다. */
-  const SUB = ['settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'];
+  const SUB = ['myinfo', 'mydocs', 'mysaved', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'];
   /* 🔴 안쪽 화면에서는 **가로 손짓이 우리 것**이라고 앱 전체에 표시해 둔다 (2026-09-12).
      짧은 화면 아래 빈 자리는 화면이 아니라 `#app` 이라, 화면에만 주면 거기서 시작한
      손짓을 브라우저가 세로 스크롤로 가져간다. 안쪽 화면일 때만 켜는 이유는 style.css 에. */
@@ -1138,7 +1144,7 @@ function showScreen(name, opts) {
   if (name === 'explore') renderExplore();
   if (name === 'activities') renderActivities();
   if (name === 'applications') renderApplications();
-  if (name === 'my') renderMy();
+  if (name === 'my' || name === 'myinfo' || name === 'mydocs' || name === 'mysaved') renderMy();
   if (name === 'settings') renderSettings();
   if (name === 'trash') renderTrash();
   if (name === 'terms') renderTerms();
@@ -1828,9 +1834,12 @@ function renderHome() {
     /* 신청 내역 화면과 같은 수(내려간 공고 빼고) — 공고 목록을 받기 전엔 담은 수 그대로(받고 나서 줄어드는 것은 '내려감'이 확정된 뒤다) */
     applications: shownAppCount(),
   };
+  /* 대외활동·공모전 칸 — 목록이 아직 안 왔으면 0 이 아니라 '모름'이라 배지를 숨긴다(없다고 말하지 않는다) */
+  const acts = liveActivities ? activitiesForMe() : null;
+  ['대외활동', '공모전'].forEach((k) => { tileN[k] = acts ? acts.filter((n) => (n.kind || '대외활동') === k).length : null; });
   $('#hero-tiles').innerHTML = HERO_TILES.map((t) => `
-    <button type="button" class="hero-tile" data-hero-go="${t.go}" aria-label="${t.name} ${tileN[t.go]}건">
-      <span class="hero-ico ${t.tone}">${t.svg}<span class="hero-badge${tileN[t.go] ? '' : ' zero'}">${tileN[t.go]}</span></span>
+    <button type="button" class="hero-tile" data-hero-go="${t.go}" aria-label="${t.name}${tileN[t.go] == null ? '' : ` ${tileN[t.go]}건`}">
+      <span class="hero-ico ${t.tone}">${t.svg}${tileN[t.go] == null ? '' : `<span class="hero-badge${tileN[t.go] ? '' : ' zero'}">${tileN[t.go]}</span>`}</span>
       <span class="hero-tile-name">${t.name}</span>
     </button>`).join('');
 
@@ -1936,7 +1945,9 @@ const SORT_KEYS = Object.keys(EXPLORE_SORTS);
    "장학금 쪽과 똑같이"). 화면마다 다른 것은 단추·목록의 id 와 기준표뿐이다. 두 벌로 베끼면
    한쪽만 고쳐져 또 달라진다(이 화면이 이미 한 번 그렇게 갈라져 있었다). */
 const ACTIVITY_SORTS = {
-  recent: { label: '최근 수집순' },
+  /* 🔴 이름은 장학 탐색의 '등록 최신순'과 같은 말을 쓴다 (2026-10-10 팀 업무 분장 14번 — 은서: 용어 통일).
+     예전 이름 '최근 수집순'은 같은 기준을 다른 말로 불러 두 화면이 다른 정렬처럼 읽혔다. */
+  recent: { label: '등록 최신순' },
   deadline: { label: '마감 임박순' },
   /* 적합도순 (2026-10-01) — 장학 탐색과 같은 잣대: 판정(fitRank — 맞음 < 미확인 < 미달)이 먼저, 그 안에서 적합도 */
   fit: { label: '적합도순' },
@@ -2659,6 +2670,12 @@ const HERO_TILES = [
     svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.5v6" stroke="#6b5a3a" stroke-width="1.6"/><path d="M16 2.5h6.5l-1.6 2 1.6 2H16z" fill="#dd5d4b"/><rect x="4" y="15" width="24" height="14" rx="1.5" fill="#f1c56c"/><path d="M2 16.5L16 8.5l14 8z" fill="#c4553f"/><rect x="13" y="20" width="6" height="9" rx="1" fill="#8a5a2b"/><rect x="6.5" y="19" width="4" height="4" rx=".8" fill="#7cbfe6"/><rect x="21.5" y="19" width="4" height="4" rx=".8" fill="#7cbfe6"/><circle cx="16" cy="14.3" r="2" fill="#fff"/></svg>' },
   { go: '교외', name: '교외', tone: 'navy',
     svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 11.5L16 3.5l13 8z" fill="#6f87ba"/><circle cx="16" cy="8.4" r="1.7" fill="#f1c56c"/><rect x="3" y="11.5" width="26" height="3" rx="1" fill="#55709f"/><rect x="6" y="15" width="3.4" height="10" fill="#e9eef7"/><rect x="11.6" y="15" width="3.4" height="10" fill="#e9eef7"/><rect x="17" y="15" width="3.4" height="10" fill="#e9eef7"/><rect x="22.6" y="15" width="3.4" height="10" fill="#e9eef7"/><path d="M8.4 15v10M14 15v10M19.4 15v10M25 15v10" stroke="#c3cde0" stroke-width="1"/><rect x="3" y="25" width="26" height="2.5" rx="1" fill="#55709f"/><rect x="1.5" y="27.5" width="29" height="2.6" rx="1" fill="#3f5788"/></svg>' },
+  /* 대외활동·공모전 칸 (2026-10-10 팀 업무 분장 4번 — 은서: "홈 버튼 수를 늘려 크기 축소 · 대외활동 및 공모전 탭 홈화면에 반영").
+     누르면 대외활동·공모전 화면을 그 종류 칩이 켜진 채로 연다(아래 data-hero-go 배선). 숫자는 그 화면 목록과 같은 activitiesForMe(). */
+  { go: '대외활동', name: '대외활동', tone: 'orange', act: true,
+    svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 13h5l11-6.5v19L10 19H5a2 2 0 01-2-2v-2a2 2 0 012-2z" fill="#f08a3c"/><path d="M21 6.5v19" stroke="#c4651f" stroke-width="2.4" stroke-linecap="round"/><path d="M7.5 19l2 7.5h3.6L11.6 19z" fill="#8a4a1f"/><path d="M25 12.5c1.6.9 2.5 2.1 2.5 3.5s-.9 2.6-2.5 3.5" fill="none" stroke="#f1c56c" stroke-width="2" stroke-linecap="round"/><ellipse cx="8" cy="14.6" rx="2.2" ry="1" fill="#fff" opacity=".4"/></svg>' },
+  { go: '공모전', name: '공모전', tone: 'violet', act: true,
+    svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 5h14v7a7 7 0 01-14 0z" fill="#f1b03b"/><path d="M9 7.5H5.5a4 4 0 004 5M23 7.5h3.5a4 4 0 01-4 5" fill="none" stroke="#d9952a" stroke-width="2" stroke-linecap="round"/><rect x="14" y="18" width="4" height="5" fill="#d9952a"/><rect x="9.5" y="23" width="13" height="5" rx="1.5" fill="#7a5cc4"/><path d="M16 8.2l1.1 2.2 2.4.3-1.8 1.7.5 2.4-2.2-1.2-2.2 1.2.5-2.4-1.8-1.7 2.4-.3z" fill="#fff"/></svg>' },
   { go: 'applications', name: '신청 내역', tone: 'gold',
     svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="3" width="19" height="25" rx="2.5" fill="#fff" stroke="#cfc6b6" stroke-width="1.2"/><path d="M9 9h11M9 13.5h11M9 18h7" stroke="#9db2d8" stroke-width="2" stroke-linecap="round"/><g transform="rotate(38 22 19)"><rect x="19.5" y="7" width="5" height="17" rx="1" fill="#f1b03b"/><rect x="19.5" y="7" width="5" height="3" fill="#e98c9b"/><path d="M19.5 24h5L22 28.5z" fill="#f2d7ae"/><path d="M21.3 27.1h1.4L22 28.5z" fill="#33231f"/></g></svg>' },
 ];
@@ -2913,8 +2930,9 @@ function liveNoticesHead(updatedAt) {
   /* ⚠️ 제목 아래 설명 한 줄(`.section-sub`)을 2026-10-03 에 붙였다가 **같은 날 개발자 지시로
      걷었다** — 홈 아래 세 구역(학교 게시판 공고 · 우리 학교 소식 · 재단·지자체 새 공고)에
      전부 있었다. 다시 붙이지 말 것. */
+  /* 🔴 갱신 날짜는 **누를 수 없는 글자**라 파랑(link-btn — 이 앱에서 '누를 수 있음')을 쓰지 않는다 (2026-10-10 팀 업무 분장 11번 · 은서) */
   return `<div class="section-head" style="margin-top:4px"><h3>우리 학교 게시판 공고</h3>
-    <span class="link-btn">${updatedAt ? esc(updatedAt) + ' 갱신' : '매일 아침 갱신'}</span></div>`;
+    <span class="section-note">${updatedAt ? esc(shortDay(updatedAt)) + ' 갱신' : '매일 아침 갱신'}</span></div>`;
 }
 
 /* ⚠️ 검색 인자를 걷었다 (2026-09-18) — 이 목록이 탐색 화면에 있던 시절에는 그 화면의
@@ -2982,7 +3000,31 @@ function liveNoticesHtml() {
   if (!mine.length) {
     return head + `<p class="empty" style="margin-bottom:16px">아직 ${esc(p.school)} 게시판 연결 전이거나 새 공고가 없어요<br />연결되면 실제 공고가 여기에 자동으로 떠요.</p>`;
   }
-  return head + `<div class="card-list" style="margin-bottom:18px">` + mine.map(noticeCardHtml).join('') + `</div>`;
+  /* 🔴 (2026-10-10 팀 업무 분장 11번 · 은서 — 「우리학교 게시판 공고 · 재단 지자체 새 공고 인터페이스 개선」)
+     ① 카드마다 같은 「○○대학교 게시판」 윗줄이 반복됐다 — 구역 제목이 이미 그 말을 한다. 윗줄에는 **언제 올라왔나**를 적는다.
+     ② 22건이 한꺼번에 깔려 홈이 끝없이 길었다 — 다른 구역처럼 석 장만 펴고 「더보기」로 **가려 둔 카드를 편다**
+        (카드는 전부 그려 두고 CSS 가 가린다 · 다시 그리지 않으니 스크롤이 튀지 않는다 · 잘라 버리는 것이 아니다). */
+  const cards = mine.map((n, i) => noticeCardHtml(n, { org: noticeDayLine(n), dateTop: true })
+    .replace('class="sch-card notice-card', `class="sch-card notice-card${i >= HOME_DEADLINE_TOP ? ' home-extra' : ''}`)).join('');
+  const more = mine.length > HOME_DEADLINE_TOP
+    ? `<button type="button" class="link-btn home-more" id="live-more" data-live-more aria-controls="live-list" aria-expanded="${liveOpen ? 'true' : 'false'}">${liveOpen ? '접기' : `더보기 (${mine.length - HOME_DEADLINE_TOP}건)`}</button>`
+    : '';
+  return head + `<div class="card-list${liveOpen ? ' more-open' : ''}" id="live-list">` + cards + `</div>${more}<div style="margin-bottom:18px"></div>`;
+}
+let liveOpen = false;
+/* 날짜 짧게 — 「10.08」 (연도가 올해가 아니면 앞에 붙인다) */
+function shortDay(s) {
+  const m = String(s || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return String(s || '');
+  return m[1] === String(new Date().getFullYear()) ? `${m[2]}.${m[3]}` : `${m[1]}.${m[2]}.${m[3]}`;
+}
+/* 게시판 카드 윗줄 — 「오늘 수집」·「어제 수집」·「10.08 수집」 (게시일이 있으면 그것) */
+function noticeDayLine(n) {
+  const d = n.postedAt || n.foundAt || '';
+  const word = n.postedAt ? '게시' : '수집';
+  if (!d) return '게시판';
+  const days = Math.round((todayStart() - new Date(d + 'T00:00:00')) / 86400000);
+  return days === 0 ? `오늘 ${word}` : days === 1 ? `어제 ${word}` : `${shortDay(d)} ${word}`;
 }
 
 /* 게시판 글 카드 한 장 — 홈과 '교내' 칸이 **같은 그림**을 쓴다 (2026-09-18 분리).
@@ -3038,13 +3080,14 @@ function noticeCardHtml(n, opts) {
              모르는 것을 단정하지 않는다(원칙 8-1) — 기간은 아래 줄이 원문 그대로 말한다. */ ''}
       </div>
       <p class="sch-name">${esc(tSplit.title)}</p>
+      ${o.desc ? `<p class="sch-desc">${esc(unent(o.desc))}</p>` : ''}
       ${/* 제목에서 뗀 마감·기간은 D-day·기간 줄이 없는 카드에서만 회색 줄로 — 같은 사실을 두 번 적지 않는다 */ ''}
       ${!o.dday && !(o.excerpts || []).length && !(n.deadlineHint && hintShort(n.deadlineHint)) && tSplit.dates.length ? `<p class="sch-provider">${esc(tSplit.dates.join(' · '))}</p>` : ''}
       ${/* 원문 발췌 줄 (2026-09-29 · 활동 글) — 이름표 : 원문 문장. 발췌가 있으면 기간 한 줄은 겹쳐 적지 않는다 */ ''}
       ${(o.excerpts || []).map((x) => `<p class="sch-provider">${esc(x.label)} · ${esc(unent(x.text))}</p>`).join('')}
       ${!(o.excerpts || []).length && n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) && hintShort(n.deadlineHint) ? `<p class="sch-provider">${esc(hintShort(n.deadlineHint))}</p>` : ''}
       ${/* 링크 이름은 sourceLink 한 곳(card) — 목록·홈페이지·로봇이 확인한 문제 주소는 '원문'이라 부르지 않는다 (2026-10-03) */ ''}
-      <p class="sch-provider">${(n.attachments || []).length ? `첨부 ${(n.attachments || []).length}개 · ` : ''}${esc(n.foundAt || '')} 수집${link.label ? ` · ${esc(link.label)}` : ''}</p>
+      <p class="sch-provider">${[(n.attachments || []).length ? `첨부 ${(n.attachments || []).length}개` : '', o.dateTop || !n.foundAt ? '' : `${esc(shortDay(n.foundAt))} 수집`, link.label ? esc(link.label) : ''].filter(Boolean).join(' · ')}</p>
       ${/* 그 글의 사진 썸네일 (2026-10-03 개발자 지시 — 학교 글의 실제 사진). 소식 카드만 opts.thumb 로 넘긴다 · 제목이 이미 글자로 있어 alt 는 비운다(읽기 도구가 두 번 읽지 않게).
            못 받으면(404·오프라인) 그림을 빼고 글자 카드로 돌아간다 — bindEvents 의 error 잡이 · CSP 가 onerror= 를 막는다 */ ''}
       ${thumb ? `<img class="notice-thumb" src="${esc(thumb)}" alt="" loading="lazy" decoding="async" width="72" height="72" />` : ''}
@@ -3088,7 +3131,7 @@ const ACT_FIELD_ETC = '기타';
 const ACT_FIELD_FOLD = 6;          // 접었을 때 보이는 분야 수(분야 전체 · +n 제외) — 375px 에서 「+n」 까지 두 줄 · ponytail: 글자 폭을 안 재는 어림이라 분야 이름이 길어지면 셋째 줄로 샐 수 있다
 let activitiesFieldOpen = false;   // 「+n」 으로 펼쳤는가 — 종류 칩과 같이 저장하지 않는다
 let activitiesQuery = '';
-/* 정렬 둘 — 최근 수집순(기본) · 마감 임박순(마감을 읽은 글이 앞, 못 읽은 글은 뒤에 최근순) (2026-09-29 · 4차 리서치: 경쟁 앱의 기본 축) */
+/* 정렬 둘 — 등록 최신순(기본) · 마감 임박순(마감을 읽은 글이 앞, 못 읽은 글은 뒤에 최근순) (2026-09-29 · 4차 리서치: 경쟁 앱의 기본 축) */
 let activitiesSort = 'recent';
 
 function loadActivities() {
@@ -3412,7 +3455,7 @@ function externalNoticesHtml() {
          aria-expanded="${shown >= mine.length ? 'true' : 'false'}">${shown >= mine.length ? '접기' : '더보기'}</button>`
     : '';
   return `<div class="section-head" style="margin-top:4px"><h3>재단·지자체 새 공고</h3>
-    <span class="link-btn">${liveExternal.updatedAt ? esc(liveExternal.updatedAt) + ' 갱신' : ''}</span></div>`
+    <span class="section-note">${liveExternal.updatedAt ? esc(shortDay(liveExternal.updatedAt)) + ' 갱신' : ''}</span></div>`
     + `<div class="card-list" id="external-list">`
     + mine.slice(0, shown).map((n) => noticeCardHtml(n, { org: n.host, dday: n.deadline ? { label: ddayWords(dday(n.deadline)), urgent: dday(n.deadline).days >= 0 && dday(n.deadline).days <= 7 } : null })).join('')
     + `</div>${more}<div style="margin-bottom:18px"></div>`;
@@ -3476,10 +3519,16 @@ function schoolNewsHtml() {
   const turn = {};
   return `<div class="card-list">${mine.map((n) => {
     const sp = n.thumb && NEWS_THUMB_RE.test(n.thumb) ? null : schoolPhotoFor(n, turn[n.school] = (turn[n.school] ?? -1) + 1);
-    return noticeCardHtml(n, { org: `${n.school} 공지${n.kind ? ' · ' + n.kind : ''}`, excerpts: n.postedAt ? [{ label: '게시', text: n.postedAt }] : [], thumb: n.thumb, schoolPhoto: sp });
+    return noticeCardHtml(n, { org: `${n.school} 공지${n.kind ? ' · ' + n.kind : ''}`, excerpts: n.postedAt ? [{ label: '게시', text: n.postedAt }] : [], thumb: n.thumb, schoolPhoto: sp, desc: n.desc });
   }).join('')}</div>`;
 }
 
+/* 오늘 올라온 글인가 — 게시일(없으면 수집일)이 오늘. todayStart 는 부를 때마다 오늘을 읽는다(PWA 가 며칠 살아 있어도 맞다) */
+function newsIsToday(n) {
+  const d = String(n.postedAt || n.foundAt || '').slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return false;
+  return new Date(d + 'T00:00:00').getTime() === todayStart().getTime();
+}
 /* 날짜 짧게 — 띠 카드 윗줄의 'MM.DD' (게시일, 없으면 수집일) */
 const newsDay = (n) => { const m = String(n.postedAt || n.foundAt || '').match(/^\d{4}-(\d{2})-(\d{2})/); return m ? `${m[1]}.${m[2]}` : ''; };
 
@@ -3491,7 +3540,9 @@ const newsDay = (n) => { const m = String(n.postedAt || n.foundAt || '').match(/
 function homeNewsHtml() {
   const p = state.profile;
   if (!p) return '';
-  const head = (all) => `<div class="section-head home-news-head"><h3>우리 학교 소식</h3>${all ? '<button type="button" class="link-btn home-news-all" data-news-all>전체 보기</button>' : ''}</div>`;
+  /* 오늘 올라온 글 수 — 「오늘 날짜 기준」(2026-10-10 업무 분장 8번). 머리줄 아래 설명 줄은 두지 않는다(10-03 개발자 지시) — 제목 옆 작은 알약 하나 */
+  const todayN = liveNews ? schoolNewsForMe().filter((n) => newsIsToday(n)).length : 0;
+  const head = (all) => `<div class="section-head home-news-head"><h3>우리 학교 소식${todayN ? ` <span class="news-today">오늘 ${todayN}</span>` : ''}</h3>${all ? '<button type="button" class="link-btn home-news-all" data-news-all>전체 보기</button>' : ''}</div>`;
   if (!liveNews) return head(false) + `<div class="news-strip" aria-busy="true">${'<span class="news-tile is-skel"><span class="news-tile-photo"></span><span class="news-tile-meta">&nbsp;</span><span class="news-tile-title">&nbsp;</span></span>'.repeat(3)}</div>`;
   const mine = schoolNewsForMe();
   if (!mine.length) return '';
@@ -3513,6 +3564,8 @@ function homeNewsHtml() {
       <span class="news-tile-photo">${src ? `<img class="news-tile-img" src="${esc(src)}" alt="" loading="lazy" decoding="async" width="148" height="104"${focus ? ` style="object-position:${esc(focus)}"` : ''}${fallback ? ` data-fallback="${esc(fallback)}"${spFocus ? ` data-fallback-focus="${esc(spFocus)}"` : ''}` : ''} />` : ''}</span>
       <span class="news-tile-meta">${esc(meta)}</span>
       <span class="news-tile-title">${esc(unent(n.title))}</span>
+      ${/* 요약 — 로봇이 원문 첫 문장을 떠 둔 글만(collector/collect-news-desc.mjs · 2026-10-10 업무 분장 8번). 없으면 줄을 안 그린다 */ ''}
+      ${n.desc ? `<span class="news-tile-desc">${esc(unent(n.desc))}</span>` : ''}
     </a>`;
   }).join('');
   return head(true) + `<div class="news-strip">${tiles}</div>`;
@@ -4342,7 +4395,11 @@ function openDetail(id) {
            처럼 바로 윗줄과 같은 말을 두 번 하는 데이터가 많다(개발자 지적). 없앤 정보는
            없다: 주관은 아랫줄에, '한국장학재단 등록' 이라는 사실은 원문 링크 이름
            ('한국장학재단 ↗')이 말한다. */ ''}
-      <h3 class="sheet-title">${esc(sch.name)}</h3>
+      ${/* 🔴 상세 제목도 카드와 **같은 정리**를 거친다 (2026-10-06 사장님 지시 'AI 티' · 개선안 E).
+           예전엔 '게시판에서 찾을 때 쓰는 글자'라며 `[장학공지]` 같은 게시판 표식을 그대로 두었다.
+           게시판에서 찾을 제목은 맨 아래 묶음의 '목록에서 ○○을 찾아' 줄(boardListTitle)이 따로 말하므로
+           제목이 그 일을 겸할 필요가 없다. 지우기만 한다(cleanCardTitle — 한 글자도 더하지 않는다). */ ''}
+      <h3 class="sheet-title">${esc(cardTitle(sch))}</h3>
       <p class="sheet-amount">${esc(sch.amount)}</p>
       ${/* 금액을 숫자로 못 읽은 층2 공고 — 재단이 그 칸에 적어 둔 말을 그대로 옮긴다.
            카드 머리에는 안 띄운다(위 kosafAmountLabel 주석). */ ''}
@@ -4601,6 +4658,9 @@ const SWIPE_EDGE_IOS = 24;   /* iOS 제 뒤로가기에 양보하는 왼쪽 끝 
    학생이 화면 가운데를 쓸어도 아무 일도 안 일어난다(검사에서 실제로 그렇게 걸렸다).
    지금 어느 화면인지는 `currentScreen` 이 말해 주고, 안쪽 화면일 때만 맡는다. */
 const SWIPE_BACK_TO = {
+  myinfo: 'my',
+  mydocs: 'my',
+  mysaved: 'my',
   settings: 'my',
   trash: 'settings',
   terms: 'settings',
@@ -5431,9 +5491,10 @@ function renderSaved() {
   const el = $('#my-saved');
   if (!el) return;
   const list = savedScholarships();
+  { const sub = $('#my-sub-saved'); if (sub) { const n = list.filter((s) => s.deadline && dday(s.deadline).days >= 0 && dday(s.deadline).days <= CAL_SOON_DAYS).length; sub.textContent = list.length ? `${list.length}개${n ? ` · 이번 주 마감 ${n}개` : ''}` : '비어 있음'; } }
   if (!list.length) {
-    el.innerHTML = `<h3 class="my-card-title">보관함</h3>
-      <p class="empty">아직 담아 둔 장학금이 없어요<br /><span class="empty-sub">공고 카드의 북마크를 누르면 여기에 모여요</span></p><button class="btn btn-ghost btn-empty" data-go="explore">장학금 둘러보기</button>`;
+    el.innerHTML = (`
+      <p class="empty">저장한 공고가 없어요<br /><span class="empty-sub">공고에서 북마크를 누르면 여기 모여요</span></p><button class="btn btn-ghost btn-empty" data-go="explore">장학금 둘러보기</button>`);
     return;
   }
   const open = list.filter((s) => s.deadline && dday(s.deadline).days >= 0)
@@ -5443,22 +5504,18 @@ function renderSaved() {
     .sort((a, b) => deadlineTs(b) - deadlineTs(a));
   const soon = open.filter((s) => dday(s.deadline).days <= CAL_SOON_DAYS).length;
 
-  el.innerHTML = `
-    <h3 class="my-card-title">보관함</h3>
-    <p class="my-flags">저장 ${list.length}건${soon ? ` · 마감 임박 ${soon}건` : ''}</p>
-    ${open.length ? `<h5 class="cal-sec">마감이 다가오는 순</h5>${open.map((s) => calRowHtml(s, { save: true })).join('')}` : ''}
+  el.innerHTML = (`
+    ${open.length ? `<h5 class="cal-sec">마감 순</h5>${open.map((s) => calRowHtml(s, { save: true })).join('')}` : ''}
     ${/* 🔴 날짜를 못 읽은 공고를 **숨기지 않는다** — 달력에는 찍을 수 없어 사라지는데,
          사라지면 학생은 그 공고가 없는 줄 안다. 여기가 그 자리다. */ ''}
     ${/* 🔴 '날짜를 아직 읽지 못한' → '기한은 원문에서 확인' (2026-09-17 개발자 지시).
          앞은 우리가 못 한 일이고 뒤는 학생이 할 일이다. 건수는 관리자 '마감일 없음'이 센다. */ ''}
-    ${undated.length ? `<h5 class="cal-sec">기한을 원문에서 확인할 공고 ${undated.length}건</h5>
-      <p class="cal-note">접수 기간이 공고 원문에만 있어요. 원문을 열어 확인해 주세요.</p>
+    ${undated.length ? `<h5 class="cal-sec">마감일 확인 필요 ${undated.length}개</h5>
       ${undated.map((s) => calRowHtml(s, { save: true })).join('')}` : ''}
     ${closed.length ? `<details class="cal-kosaf">
         <summary>이미 마감된 저장 공고 ${closed.length}건</summary>
-        <p class="cal-note">지우지 않고 둡니다 — 내년에 다시 열리는 공고가 많아요.</p>
         ${closed.map((s) => calRowHtml(s, { badge: false, save: true })).join('')}
-      </details>` : ''}`;
+      </details>` : ''}`);
 }
 
 /* 신청 기록 ↔ 공고 잇기 — **기록을 버리지 않는다** (2026-09-20 개발자 지시로 신설).
@@ -5737,7 +5794,7 @@ function learnedHtml(c) {
   const rows = LEARNED_COMMON.filter(([k]) => c[k]);
   if (!rows.length) return '';
   return `<div class="my-learned">
-    <p class="my-learned-head">신청서에서 배운 정보 <span>${rows.length}개 · 이 기기에만 저장</span></p>
+    <p class="my-learned-head">신청서에서 가져온 정보 <span>${rows.length}개</span></p>
     <ul>${rows.map(([k, label]) => `<li><span>${esc(label)}</span><strong>${esc(k === 'rrn' ? maskRrn(c[k]) : c[k])}</strong>
       <button type="button" class="btn-link" data-forget="${k}">지우기</button></li>`).join('')}</ul>
   </div>`;
@@ -5775,6 +5832,8 @@ function renderMy() {
     ver.textContent = parts.join(' · ');
   }
 
+  /* 계정(로그인) 절 — 프로필이 없어도 그린다(새 기기에서 로그인해 프로필을 받아 오는 길 · 2026-10-10 MY 로 옮김) */
+  renderAccountCard();
   const p = state.profile;
   if (!p) return;   // 온보딩을 아직 안 마친 상태 — 그릴 프로필이 없다
   const c = p.common || {};
@@ -5806,15 +5865,35 @@ function renderMy() {
          약관 「③ 서버로 보내지 않는 정보」가 원본이다. */ ''}
     ${learnedHtml(c)}`;
   bindPhotoButtons();
-  /* 🔴 계정·알림은 여기서 그리지 않는다 — 설정 화면으로 옮겼다 (2026-09-11).
-     renderSettings() 가 **같은 함수**를 불러 그린다. */
+  renderMyMenu(p, trackLabel);
+  /* 🔴 알림은 여기서 그리지 않는다 — 설정 화면(renderSettings). 계정은 2026-10-10 에 MY 로 되돌렸다(위 renderAccountCard). */
   renderWallet();
   renderSaved();
 }
 
+/* MY 첫 화면 — 머리줄 + 메뉴 줄의 작은 글씨 (2026-10-10 C안 구조).
+   🔴 숫자·말을 새로 만들지 않는다 — 프로필·서류함·보관함·알림 장부에 있는 것을 줄여 적을 뿐이다.
+   서류함·보관함 줄은 각자 그리는 함수(renderWallet·renderSaved)가 고친다(서류 캐시가 늦게 와도 맞게). */
+function renderMyMenu(p, trackLabel) {
+  const head = $('#my-head');
+  if (head) {
+    const img = profilePhoto && profilePhoto.url ? `<img src="${esc(profilePhoto.url)}" alt="" />` : esc((p.name || '학').charAt(0));
+    const line = [p.school || '대학 미설정', p.major || trackLabel, p.year ? `${p.year}학년` : ''].filter(Boolean).map(esc).join(' · ');
+    head.innerHTML = `<span class="me-av" aria-hidden="true">${img}</span><span class="me-who"><b>${esc(p.name || '대학생')} 님</b><small>${line}</small></span>`;
+  }
+  const info = $('#my-sub-info');
+  /* 🔴 작은 글씨는 **상태·숫자만** (2026-10-10 은서 「멘트들이 너무 AI 같애」) — 설명을 덧붙이지 않는다 */
+  if (info) info.textContent = [p.gpa != null ? p.gpa.toFixed(2) : '평점 없음', p.bracket != null ? `${p.bracket}구간` : '구간 모름', p.status || ''].filter(Boolean).join(' · ');
+  const set = $('#my-sub-settings');
+  if (set) {
+    const on = typeof notifyLedger !== 'undefined' && notifyLedger && notifyLedger.enabled && typeof Notification !== 'undefined' && Notification.permission === 'granted';
+    set.textContent = `알림 ${on ? '켜짐' : '꺼짐'}`;
+  }
+}
+
 /* ---------------- 설정 화면 (2026-09-11 · 개발자 목업 승인) ---------------- */
 function renderSettings() {
-  renderAccountCard();
+  /* 계정 절은 MY 로 옮겼다(2026-10-10 · renderMy 가 그린다) — 여기서는 알림만 */
   renderNotifyCard();
   const t = $('#btn-open-trash');
   if (t && !t.dataset.wired) { t.dataset.wired = '1'; t.addEventListener('click', () => showScreen('trash')); }
@@ -6519,21 +6598,26 @@ function renderNotifyCard() {
   bindNotifySettings();
 }
 
+/* 서류함 · 공고 보관함은 2026-10-10 에 MY 의 **안쪽 화면**(mydocs·mysaved)으로 옮겼다 — 같은 날 아침의 접기(<details>)는 걷었다.
+   몇 건인지는 MY 메뉴 줄의 작은 글씨가 말한다(renderMyMenu). */
 function renderWallet() {
   const el = $('#my-wallet');
-  el.innerHTML = `
-    <p class="wallet-title">서류 보관함</p>
+  const have = DOC_SLOTS.filter((s) => walletCache[s.slot]).length;
+  { const sub = $('#my-sub-docs'); if (sub) sub.textContent = `${DOC_SLOTS.length}개 중 ${have}개`; }
+  el.innerHTML = (`
     ${DOC_SLOTS.map((s) => {
       const rec = walletCache[s.slot];
       return `
         <div class="wallet-row">
           <div class="wallet-info">
             ${/* 🔴 서류 이름은 **누를 수 있다** — 어디서 떼는지를 작은 창으로 알려 준다.
-                 발급처를 줄마다 깔아 두면 여덟 줄이 설명으로 가득 차 정작 '있다/없다'가 안 보인다. */ ''}
+                 발급처를 줄마다 깔아 두면 여덟 줄이 설명으로 가득 차 정작 '있다/없다'가 안 보인다.
+                 🔴 줄마다 붙던 「?」 동그라미는 뗐다(2026-10-06 사장님 지시 'AI 티' · 개선안 G) —
+                    같은 장식이 여덟 번 반복됐다. 누를 수 있다는 표시는 이름의 점선 밑줄(style.css)이 한다. */ ''}
             <button class="wallet-label" data-issue="${s.slot}" aria-haspopup="dialog">
-              ${esc(s.label)}<span class="wallet-q" aria-hidden="true">?</span>
+              ${esc(s.label)}
             </button>
-            ${rec ? '' : '<p class="wallet-status">없음</p>'}
+            ${rec ? '' : '<p class="wallet-status">미등록</p>'}
           </div>
           <div class="wallet-btns">
             ${rec ? `<button class="wallet-btn" data-view="${s.slot}">보기</button>
@@ -6543,7 +6627,7 @@ function renderWallet() {
             </label>
           </div>
         </div>`;
-    }).join('')}`;
+    }).join('')}`);
 
   /* 발급처 안내 창 — 시트를 열 만한 내용이 아니라서 **작은 창** 하나로 띄운다.
      🔴 발급처 글자는 data.js 의 DOC_SLOTS.issue 그대로다 — 여기서 지어내지 않는다. */
@@ -6765,6 +6849,14 @@ function bindEvents() {
     if (!t) return;
     const go = t.dataset.heroGo;
     if (go === 'applications') { showScreen('applications'); return; }
+    if (go === '대외활동' || go === '공모전') {
+      /* 종류 칩을 켠 채로 연다 — 칩을 직접 누른 것과 같은 상태(분야는 푼다 · 칩 배선 주석과 같은 이유) */
+      activitiesFilter = go;
+      activitiesField = 'all';
+      $$('#activities-filters .filter-chip').forEach((c) => c.classList.toggle('active', c.dataset.filter === go));
+      showScreen('activities');
+      return;
+    }
     exploreFilter = go === 'deadline' ? 'all' : go;
     $$('#explore-filters .filter-chip').forEach((c) => c.classList.toggle('active', c.dataset.filter === exploreFilter));
     if (go === 'deadline') { $(SORT_MENUS.explore.label).textContent = EXPLORE_SORTS.deadline.label; exploreSort = 'deadline'; }
@@ -7048,6 +7140,17 @@ function bindEvents() {
 
   $('#btn-apply-all').addEventListener('click', applyAll);
 
+  /* 우리 학교 게시판 공고 더보기 (2026-10-10) — 다시 그리지 않고 가려 둔 카드를 편다(홈 '나에게 맞는 장학금'과 같은 방식) */
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-live-more]');
+    if (!b) return;
+    liveOpen = !liveOpen;
+    const list = $('#live-list');
+    if (list) list.classList.toggle('more-open', liveOpen);
+    b.setAttribute('aria-expanded', liveOpen ? 'true' : 'false');
+    b.textContent = liveOpen ? '접기' : `더보기 (${list ? list.querySelectorAll('.home-extra').length : 0}건)`;
+  });
+
   /* 재단·지자체 새 공고 더보기 (2026-10-01) — 이 구역만 다시 그린다. 다 폈으면 '접기'로 석 장에 돌아간다. */
   document.addEventListener('click', (e) => {
     if (!e.target.closest('[data-external-more]')) return;
@@ -7113,6 +7216,9 @@ function bindEvents() {
   /* 설정 화면 — MY 오른쪽 위 톱니로 들어가고, 왼쪽 위 화살표로 되돌아온다 (2026-09-11). */
   $('#btn-open-settings').addEventListener('click', () => showScreen('settings'));
   $('#btn-settings-back').addEventListener('click', () => showScreen('my', { back: true }));
+  /* MY 메뉴 줄 → 안쪽 화면 (2026-10-10 C안 구조). 되돌아오기는 왼쪽 위 화살표와 오른쪽으로 쓸기(SWIPE_BACK_TO) */
+  $$('[data-my-go]').forEach((b) => b.addEventListener('click', () => showScreen(b.dataset.myGo)));
+  for (const n of ['myinfo', 'mydocs', 'mysaved']) $(`#btn-${n}-back`).addEventListener('click', () => showScreen('my', { back: true }));
   $('#btn-trash-back').addEventListener('click', () => showScreen('settings', { back: true }));
   $('#btn-terms-back').addEventListener('click', () => showScreen('settings', { back: true }));
   for (const id of ['#btn-logins-back', '#btn-faq-back', '#btn-support-back', '#btn-perms-back']) {
@@ -7413,15 +7519,14 @@ function renderAccountCard() {
   el.hidden = false;
   const u = authUser();
   el.innerHTML = u
-    ? `<p class="acc-head">계정 <span class="acc-on">이어쓰기 켜짐</span></p>
+    ? `<p class="acc-head">계정</p>
        <p class="acc-mail">${esc(u.email || '로그인됨')}</p>
-       <p class="acc-note">이 계정으로 다른 기기에서 로그인하면 프로필과 신청내역이 그대로 이어져요.
-         주민등록번호·계좌번호·증명서류는 서버로 보내지 않습니다.</p>
        <div class="acc-actions">
          <button class="btn btn-outline" id="btn-acc-out">로그아웃</button>
          <button class="btn btn-outline danger" id="btn-acc-del">탈퇴 (서버 정보 삭제)</button>
        </div>`
-    : `<p class="acc-head">계정</p>
+    : `<p class="acc-head">로그인</p>
+       <p class="acc-note">다른 폰에서도 내 정보와 신청 내역을 그대로 볼 수 있어요.</p>
        <div class="acc-actions">
          <button class="btn btn-primary" id="btn-acc-in">로그인</button>
          <button class="btn btn-outline" id="btn-acc-up">회원가입</button>

@@ -1,7 +1,38 @@
 {
  "school": "동국대학교 WISE캠퍼스",
- "updatedAt": "2026-10-05",
+ "updatedAt": "2026-10-11",
  "items": [
+  {
+   "title": "[정각원] 2026-2학기 정각도량 열린법회(2회차) 봉행 안내",
+   "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/520759",
+   "postedAt": "2026-10-07",
+   "postId": "520759",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/addcc29846d41b91.webp",
+   "desc": "작성자 박진영 동국의 인연이 예술로... <동국현대작가전> 개최 안내 2026-2학기 비교과 교육과정 마일리지 및 장학 신청 안내"
+  },
+  {
+   "title": "동국의 인연이 예술로... <동국현대작가전> 개최 안내",
+   "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/520755",
+   "postedAt": "2026-10-07",
+   "postId": "520755",
+   "kind": "행사",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "[한국대학교육협의회] 2026년 대학생 취업인식도 설문조사 참여 안내",
+   "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/520723",
+   "postedAt": "2026-10-06",
+   "postId": "520723",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "desc": "한국대학교육협의회와 한국경제인협회 ( 舊 전국경제인연합회 ) 는 대학생들의 취업시장 전망 및 직장 선호도를 파악하기 위해 전년도에 이어 아래와 같이 공동 조사를 진행하고자 합니다 . 본 설문조사는 전국 4 년제…"
+  },
   {
    "title": "[혁신] 2026학년도 2학기 교양융합교육원 ‘의사소통능력 향상 비교과 프로그램’ 수강 신청 안내",
    "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/520600",
@@ -20,7 +51,8 @@
    "school": "동국대학교 WISE캠퍼스",
    "campus": "",
    "foundAt": "2026-10-02",
-   "postId": "520711"
+   "postId": "520711",
+   "desc": "작성자 이미영 안녕하십니까. 정각원입니다. 10. 5.(월) 전 동국인 아침예불은 봉행되지 않음을 알려드립니다. 감사합니다."
   },
   {
    "title": "2026년 대학도서관 이용자 만족도 조사 참여 안내(~10/13)",
@@ -31,7 +63,8 @@
    "campus": "",
    "foundAt": "2026-10-02",
    "postId": "520710",
-   "thumb": "data/news/img/a6394aa84cc43f62.webp"
+   "thumb": "data/news/img/a6394aa84cc43f62.webp",
+   "desc": "작성자 박서원 ※ 이미지를 클릭하시면 만족도조사에 참여하실 수 있습니다. 많은 참여와 관심 부탁드립니다."
   },
   {
    "title": "양산지역 학생통학버스 운행 시간표 변경 안내",
@@ -61,7 +94,8 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "postId": "520707",
-   "thumb": "data/news/img/7b58872835a1c8b5.webp"
+   "thumb": "data/news/img/7b58872835a1c8b5.webp",
+   "desc": "작성자 오제인 안녕하십니까. 교수학습개발센터입니다. 2026학년도 2학기 학습법 LXP를 다음과 같이 시행합니다. 재학생 여러분의 많은 참여바랍니다. 감사합니다."
   },
   {
    "title": "[혁신] 2026학년도 2학기 학습법 콜로키움 개최 안내",

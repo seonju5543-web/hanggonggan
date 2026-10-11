@@ -1,7 +1,17 @@
 {
  "school": "세종대학교",
- "updatedAt": "2026-10-05",
+ "updatedAt": "2026-10-11",
  "items": [
+  {
+   "title": "[신청] 26-2 (2~4학년) 대면 그룹 컨설팅/온라인 셀프 학습 컨설팅 프로그램 (9/21~10/18)",
+   "url": "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=894275&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-06",
+   "school": "세종대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/498f3d8fb5b52332.webp",
+   "desc": "교수학습개발센터 SLT(자기조절학습검사)를 통해 자신의 학습 특성을 분석하고, 그 결과를 바탕으로 대학 생활에 맞는 효과적인 학습방법을 익히도록 지원하는 프로그램입니다."
+  },
   {
    "title": "2027-1학기 교수초빙(10월공고 연구중점 비정년제 전임교원) 안내",
    "url": "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=894209&article.offset=0&articleLimit=10",
@@ -27,7 +37,8 @@
    "school": "세종대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/ef0fcd62baeb4d0e.webp"
+   "thumb": "data/news/img/ef0fcd62baeb4d0e.webp",
+   "desc": "캠퍼스개발처 2026학년도 필수 폭력예방교육 이수 안내 (학부·대학원 공통) 2027-1학기 교수초빙(10월공고 연구중점 비정년제 전임교원) 안내"
   },
   {
    "title": "2027-1학기 교수초빙(9월공고_정년제 전임교원) 안내",
@@ -72,7 +83,8 @@
    "school": "세종대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/c0a94de4b9deb085.webp"
+   "thumb": "data/news/img/c0a94de4b9deb085.webp",
+   "desc": "교수학습개발센터 추석 연휴 및 중간고사 일정을 고려 하여 3차 기초학력증진 프로그램의 신청 기간과 진단평가 참여 기간을 연장 하였습니다. 또한, 해당 과목의 이해를 위해 학습 영역 등 안내 설명을 추가 하였습니다."
   },
   {
    "title": "[교양영어실] 2026 영어말하기 & 발표대회 안내",

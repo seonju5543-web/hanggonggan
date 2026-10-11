@@ -1,7 +1,16 @@
 {
  "school": "영남대학교",
- "updatedAt": "2026-10-05",
+ "updatedAt": "2026-10-11",
  "items": [
+  {
+   "title": "9 2026학년도 2학기 학부생 등록금 2/2회, 3/4회 분할납부 안내",
+   "url": "https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=231978023&article.offset=0&articleLimit=10&srYearMonth=2026-10&ref=calendar",
+   "postedAt": "2026-10-07",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "desc": "2026학년도 2학기 분할납부 미납부 대상자는 학칙 제25조에 의거하여 납부기간 종료일 다음날 제적 처리 되오니, 다음의 등록기간 중에 반드시 등록하시기 바랍니다."
+  },
   {
    "title": "9 2026학년도 2학기 중간시험 실시 및 부정행위자 처리 기준 안내",
    "url": "https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=231893401&article.offset=0&articleLimit=10&srYearMonth=2026-10&ref=calendar",
@@ -9,7 +18,8 @@
    "kind": "학사",
    "school": "영남대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "desc": "수업학적팀 (다운로드 : 2197) 첨부파일 다운로드 (다운로드 : 1518) 첨부파일 다운로드 2026학년도 2학기 중간시험 일정을 다음과 같이 안내하오니, 수강 과목별 시험 시간을 정확히 확인하시어 시험에…"
   },
   {
    "title": "8 2026학년도 2학기 교양, 교직, 일반선택 중간시험 시간표 안내(주간, 야간)",
@@ -18,7 +28,8 @@
    "kind": "학사",
    "school": "영남대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "desc": "3. 강의동 번호 1부. 4. 2026학년도 2학기 중간시험 부정행위자 처리 안내문 1부. 끝. 천마학부대학장 2026-2학기 정보전산원 수업 강의실 변경 안내 및 협조 요청 (9월28일부터) 2026학년도 2학기…"
   },
   {
    "title": "7 2026학년도 전기(27년2월) 조기졸업 신청 안내",
@@ -35,7 +46,8 @@
    "postedAt": "2026-09-22",
    "school": "영남대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "desc": "디지털융합대학 행정실 (다운로드 : 1829) 첨부파일 다운로드 2026-2학기 정보전산원(건물번호 F04) 수업의 강의실을 변경을 붙임 파일과 같이 안내하오니, 해당 학생들께서는 꼭 확인하시기 바라며, 적극적인…"
   },
   {
    "title": "5 2026학년도 2학기 중간강의평가 실시 안내",
@@ -44,16 +56,8 @@
    "kind": "학사",
    "school": "영남대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "4 2026학년도 2학기 졸업예정자(최종학기) 조기취업 공인출석 안내",
-   "url": "https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=231160615&article.offset=0&articleLimit=10&srYearMonth=2026-10&ref=calendar",
-   "postedAt": "2026-08-10",
-   "kind": "학사",
-   "school": "영남대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "desc": "1. 목적: 2026학년도 2학기 개설 강좌에 대한 교육 수요자의 다양한 요구와 의견을 조사하고, 그 결과를 담당교수에게 전달하여 학기 중 수업 운영 개선, 학습의 질 및 교육수요자의 만족도를 높이기 위함."
   }
  ]
 }

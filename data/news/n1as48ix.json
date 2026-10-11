@@ -1,14 +1,43 @@
 {
  "school": "한국항공대학교",
- "updatedAt": "2026-10-05",
+ "updatedAt": "2026-10-11",
  "items": [
+  {
+   "title": "[의료지원실] 2026.10.12.(월) 「헌혈 X 치킨원정대」 참여 안내",
+   "url": "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11308",
+   "postedAt": "2026-10-08",
+   "school": "한국항공대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/5fd842044cdb6586.webp",
+   "desc": "작성자 학생지원팀 대한적십자사 서울중앙혈액원의 협조 요청으로 「사랑의 헌혈」을 실시합니다. 생명나눔 헌혈문화를 확산하기 위해 헌혈버스와 멕시카나 치킨트럭 이 함께 온다고 하니 많은 관심과 적극적인 참여 바랍니다."
+  },
+  {
+   "title": "대학 캠퍼스 방송 촬영 안내",
+   "url": "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11303",
+   "postedAt": "2026-10-07",
+   "school": "한국항공대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "2026년 무장애관광 활성화 ESG캠페인 안내",
+   "url": "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11302",
+   "postedAt": "2026-10-07",
+   "school": "한국항공대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/711a4d25866052d3.webp",
+   "desc": "2. 주요내용 - 경기도 31개 시·군 지정 관광지의 무장애 시설 사진 및 이용정보를 볼런트립 앱에 등록"
+  },
   {
    "title": "2027학년도 1학기 미국 UNLV 해외연구실습 (SURE) 파견 학생 선발 안내",
    "url": "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11274",
    "postedAt": "2026-10-01",
    "school": "한국항공대학교",
    "campus": "",
-   "foundAt": "2026-10-05"
+   "foundAt": "2026-10-05",
+   "desc": "미국 University of Nevada, Las Vegas 파견 학생 선발 공고 국제교류팀에서는 본교생에게 해외대학 연구실습 기회를 제공하고자 , 미국 University of Nevada, Las Vegas…"
   },
   {
    "title": "[의료지원실] 시험기간 비타민 데이 안내",
@@ -16,7 +45,8 @@
    "postedAt": "2026-10-02",
    "school": "한국항공대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-02",
+   "desc": "작성자 학생지원팀 2학기 중간고사 준비기간 동안 피로회복을 위한 비타민을 제공하오니 필요한 학생 및 교직원은 자율적으로 수령하여 건강 챙기시기 바랍니다."
   },
   {
    "title": "[학생지원팀] 2026학년도 2학기 KAU 사회봉사단 선발 결과 안내",
@@ -32,7 +62,8 @@
    "postedAt": "2026-09-30",
    "school": "한국항공대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "desc": "09:30 - 11:30 기계관 앞 광장, 전자관 로비 11:30 - 12:30 본관 입구 * 기타사항 : 방송 관련 차량 다수 출입 예정 방송 촬영으로 캠퍼스 이용에 다소 불편한 부분 발생할 수 있습니다."
   },
   {
    "title": "2026학년도 비교과 프로그램 통합 사전 요구조사 실시 안내",

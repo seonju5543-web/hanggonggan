@@ -1,7 +1,83 @@
 {
  "school": "동국대학교",
- "updatedAt": "2026-10-05",
+ "updatedAt": "2026-10-11",
  "items": [
+  {
+   "title": "[교수학습혁신센터] 2026 XR활용 학습역량 강화 체험 프로그램 신청자 모집",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766539",
+   "postedAt": "2026-10-08",
+   "postId": "26766539",
+   "kind": "채용",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/bd8bc373573ef216.webp",
+   "desc": "이미지를 클릭하시면 드림패스 신청페이지로 접속이 가능합니다. [창업기술본부] 2026 XR 활용 MVP 제작 실습 (신청접수 : ~10.15.(목) 23:59까지) [HUSS] 2026학년도 L-HUSS 지역축제…"
+  },
+  {
+   "title": "[창업기술본부] 2026 XR 활용 MVP 제작 실습 (신청접수 : ~10.15.(목) 23:59까지)",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766523",
+   "postedAt": "2026-10-08",
+   "postId": "26766523",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/06720f8a1cb02c65.webp",
+   "desc": "본 프로그램은 XR 콘텐츠의 핵심 요소인 3D 그래픽 제작의 원리를 체험해보고, 3D 드로잉앱(Feather)을 활용하여 창업, 창작 아이디어를 표현하고 싶은 분을 위해 운영되는 프로그램입니다."
+  },
+  {
+   "title": "[교수학습혁신센터] 2026-2학기 동국 튜터링 튜티 모집",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766522",
+   "postedAt": "2026-10-08",
+   "postId": "26766522",
+   "kind": "채용",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "desc": "튜터링 운영 교과목 (학수번호+분반 동일)의 수강생이라면 튜티로 참여 가능합니다. 자세한 사항은 아래 이미지 및 첨부파일 참고 바랍니다. 감사합니다."
+  },
+  {
+   "title": "[취업팀] 실전 모의면접 컨설팅 - 나의 유형별 면접 완벽 마스터(마이성공스피치) [신청 ~ 10/12(월) 17시]",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766508",
+   "postedAt": "2026-10-07",
+   "postId": "26766508",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/28f29f5a8a248ddf.webp",
+   "desc": "or \"[10/12~11/5] 실전 모의면접 컨설팅 - 마이성공스피치 [1:1 비대면] (추가신청)\" 공지"
+  },
+  {
+   "title": "10월 7일(수)~ 10월 8일(목) 헌혈 버스 시행 안내",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766501",
+   "postedAt": "2026-10-07",
+   "postId": "26766501",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "desc": "[카운슬링센터] 온라인 심리검사 프로그램 참여 안내: '나의 대학생활과 학습습관, 괜찮나?\" [취업팀] 실전 모의면접 컨설팅 - 나의 유형별 면접 완벽 마스터(마이성공스피치) [신청 ~ 10/12(월) 17시]"
+  },
+  {
+   "title": "[카운슬링센터][집단상담 홍보]달달한 연애를 꿈꾸는 동국인을 위한 \"캠퍼스 연애 심리극\" 신청 안내 (3회 모두 참여시 마일리지 10점 지급)",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766499",
+   "postedAt": "2026-10-07",
+   "postId": "26766499",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "desc": "연애 심리극을 통해 나와 상대를 이해하고, 건강한 연애를 준비해보세요. <참여안내>"
+  },
+  {
+   "title": "영자신문사 동국포스트 60.5기 신입 추가 모집",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766496",
+   "postedAt": "2026-10-06",
+   "postId": "26766496",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/811b5cf644b95e75.webp",
+   "desc": "학내 유일 영자 신문사 The Dongguk Post에서 60.5기 신입기자를 모집합니다."
+  },
   {
    "title": "제32회 동대문학상 접수 연장 안내(~10/12)",
    "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766467",
@@ -37,8 +113,7 @@
    "school": "동국대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "postId": "26766446",
-   "thumb": "data/news/img/c6145478a6f1b68f.webp"
+   "postId": "26766446"
   },
   {
    "title": "[중앙도서관] 2026년 대학도서관 이용자 만족도 조사 참여 안내 (~10/6)",
@@ -60,35 +135,6 @@
    "foundAt": "2026-10-01",
    "postId": "26766435",
    "thumb": "data/news/img/c5ab107347458cf5.webp"
-  },
-  {
-   "title": "[교수학습혁신센터] 2026 XR활용 학습역량 강화 체험 프로그램 신청자 모집",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766418",
-   "postedAt": "2026-09-29",
-   "kind": "채용",
-   "school": "동국대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/847ae3907220df00.webp"
-  },
-  {
-   "title": "[교수학습혁신센터] 2026-2학기 동국 튜터링 튜티 모집",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766417",
-   "postedAt": "2026-09-29",
-   "kind": "채용",
-   "school": "동국대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/9d7d38c548e9958b.webp"
-  },
-  {
-   "title": "[카운슬링센터][집단상담 홍보]달달한 연애를 꿈꾸는 동국인을 위한 \"캠퍼스 연애 심리극\" 신청 안내 (3회 모두 참여시 마일리지 10점 지급)",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766416",
-   "postedAt": "2026-09-29",
-   "school": "동국대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/9532f1dd23a1c853.webp"
   }
  ]
 }

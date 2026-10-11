@@ -1,7 +1,66 @@
 {
  "school": "명지대학교",
- "updatedAt": "2026-10-05",
+ "updatedAt": "2026-10-11",
  "items": [
+  {
+   "title": "[대학원교학팀] 계약직원(인턴사무원) 채용 공고",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/141/236176/artclView.do",
+   "postedAt": "2026-10-08",
+   "kind": "채용",
+   "school": "명지대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "desc": "명지대학교 대학원교학처 자연캠퍼스교학팀에서는 인턴사무원 ( 계약직 ) 채용을 다음과 같이 공고하오니 많은 지원 바랍니다 ."
+  },
+  {
+   "title": "[인권센터] 명지대학교 재학생 대상 2026년 인권실태조사",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/141/236174/artclView.do",
+   "postedAt": "2026-10-08",
+   "school": "명지대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/d7296380c24e4099.webp",
+   "desc": "[인권센터에서는 명지대학교 재학생의 인권 및 성평등에 관한 의식 및 태도, 인권 침해 실태를 알아보기 위해 인권실태조사를 실시하려 합니다."
+  },
+  {
+   "title": "[ 일반공지 ] 2027-1학기 명지대학교 전임교원 초빙 공고",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/141/236159/artclView.do",
+   "postedAt": "2026-10-08",
+   "kind": "채용",
+   "school": "명지대학교",
+   "campus": "",
+   "foundAt": "2026-10-08"
+  },
+  {
+   "title": "[인문캠퍼스] 2026-2학기 『천원의 아침밥』 행사 안내",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/141/236158/artclView.do",
+   "postedAt": "2026-10-08",
+   "kind": "행사",
+   "school": "명지대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "desc": "가. 사업기간: 2026년 9월 1일 ~ 12월 14(월)(주말 및 공휴일 제외)"
+  },
+  {
+   "title": "[제약바이오융합 특성화사업단] 2026학년도 융합전공 학생설명회 참여 신청 안내",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/141/236107/artclView.do",
+   "postedAt": "2026-10-06",
+   "kind": "학사",
+   "school": "명지대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "desc": "우리대학교 대학혁신지원사업 제약바이오융합 특성화사업단에서는 제약바이오 융합전공 참여학생 모집 및 확산 , 제약바이오융합 특성화사업단 프로그램 이해도 향상을 위해 “2026 학년도 제약바이오융합 특성화사업단 융합전공…"
+  },
+  {
+   "title": "[한국어교육센터] 자연(용인)캠퍼스 한국어강사 모집 공고",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/141/236105/artclView.do",
+   "postedAt": "2026-10-06",
+   "kind": "채용",
+   "school": "명지대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "desc": "1. 모집분야 및 인원 가 . 모집분야 : 명지대학교 국제교류처 한국어교육센터 자연캠퍼스 [ 용인 ] 한국어 강사"
+  },
   {
    "title": "[창업교육센터] 기간제 전담직 채용 공고",
    "url": "https://www.mju.ac.kr/bbs/mjukr/141/235938/artclView.do",
@@ -9,7 +68,8 @@
    "kind": "채용",
    "school": "명지대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-02",
+   "desc": "창업교육센터 창업교육센터 행정업무 및 기타 제반 업무 [ 자격요건 ] ∙ 학사학위 이상 소지자 ∙ 공무원 임용요건에 결격사유가 없는 자 ∙ 남자는 병역을 필한 자 또는 면제자 [ 우대사항 ] ∙ 대학 행정 업무…"
   },
   {
    "title": "[MJ대학일자리플러스센터] 전국 지역인재 7급 수습직원 선발시험 향후 변경사항 안내",
@@ -124,25 +184,6 @@
    "school": "명지대학교",
    "campus": "",
    "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[제약바이오융합 특성화사업단] 2026학년도 융합전공 학생설명회 참여 신청 안내",
-   "url": "https://www.mju.ac.kr/bbs/mjukr/141/235832/artclView.do",
-   "postedAt": "2026-09-29",
-   "kind": "학사",
-   "school": "명지대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[인문캠퍼스] 2026-2학기 『천원의 아침밥』 행사 안내",
-   "url": "https://www.mju.ac.kr/bbs/mjukr/141/235827/artclView.do",
-   "postedAt": "2026-09-29",
-   "kind": "행사",
-   "school": "명지대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/120ded9940e62996.webp"
   },
   {
    "title": "[사회과학대학 교학팀] 계약직(인턴사무원)채용 공고",

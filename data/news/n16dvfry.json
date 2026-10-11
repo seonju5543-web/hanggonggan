@@ -1,7 +1,269 @@
 {
  "school": "아주대학교",
- "updatedAt": "2026-10-05",
+ "updatedAt": "2026-10-11",
  "items": [
+  {
+   "title": "[Remind] 2026학년도 2학기 🍚스타셰프의 레시피로 전하는 총장님의 A+ 응원🍚 (26.10.14)",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377281&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-09",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-09",
+   "desc": "학생지원팀 ▲ 포스터를 클릭하면 예약 페이지로 이동합니다. 시험준비로 지친 여러분들에게 전하는 총장님의 따듯한 격려 프리미엄 중식 다이닝 '무탄'과의 콜라보 특별 메뉴, 총장님의 중간고사 격려까지 준비되어 있으니,…"
+  },
+  {
+   "title": "[일자리+센터] 2026년 10월 채용공고분석 특강 참여자 모집",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377267&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-08",
+   "kind": "행사",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/d35c8c01f49a2630.webp"
+  },
+  {
+   "title": "[일자리+센터] [캠리] 아트라스콥코 엔지니어스 데이(10/12) 커피트럭 지원 및 샌드위치&디저트 세트 제공",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377258&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-08",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-08"
+  },
+  {
+   "title": "[일자리+센터] SEDEX 2026(제28회 반도체 대전)_10/12 사전등록 마감",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377250&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-08",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/1ea26af4408bdb8e.webp",
+   "desc": "대학일자리플러스센터 명함 신청방법 안내 [일자리+센터] [캠리] 아트라스콥코 엔지니어스 데이(10/12) 커피트럭 지원 및 샌드위치&디저트 세트 제공"
+  },
+  {
+   "title": "명함 신청방법 안내",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377245&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-08",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/a062ba4576ead158.webp"
+  },
+  {
+   "title": "[학부/학사과정] (26.10.08.) 2026-동계 계절학기 국내대학 학점교류 신청 안내",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377242&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-08",
+   "kind": "학사",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/6ac4d56ef6560050.webp"
+  },
+  {
+   "title": "[교육혁신팀] 2027-1학기 학생설계전공(복수/부) 신청 안내 *재공지",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377240&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-08",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-08",
+   "thumb": "data/news/img/265f9ca70fc5d0e3.webp"
+  },
+  {
+   "title": "[긴급] IEEE 과다 다운로드에 따른 IP 차단 안내",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377221&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-08",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-08"
+  },
+  {
+   "title": "2027-1학기 파란학기제 기업제안 프로그램 공모(~10/30)",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377181&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-07",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/054d56158d8bc94a.webp"
+  },
+  {
+   "title": "[총무팀] 2026학년도 가을축제 개최에 따른 주차 및 통행로 통제 재안내 / 10.7.(수) ~ 10.8. (목) 2일간",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377164&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-07",
+   "kind": "행사",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/92b0bb240de9c6bc.webp"
+  },
+  {
+   "title": "[중앙도서관] 학술정보 이용교육 10월 일정 안내",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377154&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-07",
+   "kind": "생활",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/f230c5a9368c1feb.webp"
+  },
+  {
+   "title": "[앵커] AJOU ANCHORE chap.16",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377135&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-07",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/253b3e1b414055c1.webp"
+  },
+  {
+   "title": "[일자리+센터] [캠리] 아트라스콥코_당일 참여자 커피트럭 이용 및 샌드위치&디저트 세트 제공(10/12)",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377113&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-07",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "[🔔당일안내] 「2026 제2회 Google-아주대학교 AI융합캡스톤디자인 대회」 최종 성과발표회 개최 안내",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377108&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-07",
+   "kind": "행사",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/ab421f9bb475d131.webp"
+  },
+  {
+   "title": "[아주강좌] 제574회 강연 안내",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377106&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-07",
+   "kind": "행사",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/b4ac638595f9705a.webp"
+  },
+  {
+   "title": "(학부 유학생 대상)[글로벌교양학부] 2026학년도 한국어 백일장 개최",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377105&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-07",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "[D-day] [A]nchor X [I]nnovation 부스 OPEN ❗",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377103&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-07",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "[교육성과평가센터]2026년 대학 교수학습 및 혁신에 관한 조사 관련 연구조원 모집",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377102&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-07",
+   "kind": "채용",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-07"
+  },
+  {
+   "title": "[일자리+센터] 📢🚗자동차 산업 궁금하다면?🧑‍🎓[선배만남의 날_기아]",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377099&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-07",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-07",
+   "thumb": "data/news/img/d9680c5b901d2e1c.webp"
+  },
+  {
+   "title": "[일자리+센터] 🎁EVENT 🔎\"대학일자리플러스센터 취업탐정사무소\" 일일 취업탐정 모집",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377090&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-06",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/b149783ecaae9528.webp"
+  },
+  {
+   "title": "[D-1] 제한 시간 내에 AI 부스에서 탈출하세요...",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377089&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-06",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "10/7(수) 아로새길 아주, 함께가게 맞히고 선물 받아가세요💝",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377081&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-06",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/953682cdb985246b.webp"
+  },
+  {
+   "title": "[메이커스페이스] 🍂아주대학교 메이커스페이스 SNS 팔로우 이벤트🍂",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377076&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-06",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "🎉파란학기제 10주년 생일파티 준비완료🎉 👖율곡관 로비로 오세요👗",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377060&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-06",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/d31e27385ddfe35f.webp"
+  },
+  {
+   "title": "[일자리+센터][외부설명회] 한미그룹 MR직무 온라인 채용설명회(신청:~10.13)",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377057&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-06",
+   "kind": "행사",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[AI융합교육원] 2026-2학기 AI리터러시 교과목 중간고사 대학원생 감독 모집",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377020&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-06",
+   "kind": "학사",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[일자리+센터] [캠리_온라인 설명회] NEZOT 주식회사(일본 고베 본사 취업)(10/6_당일 재공지)",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377017&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-06",
+   "kind": "행사",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[메이커스페이스] 🛠️2026.10월 장비 기초교육 안내(3D프린터, 레이저가공기)",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377013&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-06",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/05777ee23eeacc5f.webp"
+  },
+  {
+   "title": "[심리학과] SF 글쓰기 강연 안내",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377004&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-06",
+   "kind": "행사",
+   "school": "아주대학교",
+   "campus": "",
+   "foundAt": "2026-10-06",
+   "thumb": "data/news/img/2d8c5bc0b16fa800.webp"
+  },
   {
    "title": "내일 잊지말고 파란색 꼭👖🧢...파란학기제 10주년 이벤트 드레스코드 BLUE-💙",
    "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=376987&article.offset=0&articleLimit=10",
@@ -36,8 +298,7 @@
    "kind": "행사",
    "school": "아주대학교",
    "campus": "",
-   "foundAt": "2026-10-02",
-   "thumb": "data/news/img/a6e525981685f956.webp"
+   "foundAt": "2026-10-02"
   },
   {
    "title": "[보건진료소] 2026학년도 비타민데이 안내",
@@ -55,7 +316,7 @@
    "school": "아주대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "thumb": "data/news/img/3cfb93f9dcf208d2.webp"
+   "desc": "학생지원팀 ▲ 포스터를 클릭하면 예약 페이지로 이동합니다. 시험준비로 지친 여러분들에게 전하는 총장님의 따듯한 격려 프리미엄 중식 다이닝 '무탄'과의 콜라보 특별 메뉴, 총장님의 중간고사 격려까지 준비되어 있으니,…"
   },
   {
    "title": "[아르바이트] 10월 10일(토) ~ 10월 11일(일) 제580회 토익 정기시험",
@@ -94,15 +355,6 @@
    "foundAt": "2026-10-02"
   },
   {
-   "title": "(학부 유학생 대상)[글로벌교양학부] 2026학년도 한국어 백일장 개최",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=376883&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-02",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "thumb": "data/news/img/b642b06a26671c90.webp"
-  },
-  {
    "title": "[총무팀] 2026학년도 가을축제 개최에 따른 주차 및 통행로 통제 안내",
    "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=376880&article.offset=0&articleLimit=10",
    "postedAt": "2026-10-02",
@@ -111,78 +363,6 @@
    "campus": "",
    "foundAt": "2026-10-02",
    "thumb": "data/news/img/f1f03636125c8dcc.webp"
-  },
-  {
-   "title": "[공지] [학부] 어학졸업인증(2027년 2월 졸업)을 위한 공인어학 성적 등록 및 제출 안내 (~2027.1.22)",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=374473&article.offset=0&articleLimit=10",
-   "postedAt": "2027-01-22",
-   "kind": "학사",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[공지] [학군단]26년도 후반기 학군사관 ROTC 후보생 67,68기 모집안내(8.31~10.13)",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=373952&article.offset=0&articleLimit=10",
-   "postedAt": "2026-08-20",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/886da95c7ee83214.webp"
-  },
-  {
-   "title": "[공지] [학부/학사과정] ★필독★ 출석(전자출결, 공결, 취업계 등) 관련 안내",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=373746&article.offset=0&articleLimit=10",
-   "postedAt": "2026-08-14",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[일자리+센터] [캠리] 아스트라콥코_당일 커피트럭 운영(10/12)",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=376872&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-01",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/f0ad305c1137eee0.webp"
-  },
-  {
-   "title": "아주대학보사 수습기자 정기모집 (~10/10까지)",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=376855&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-01",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/be65e6f03152d669.webp"
-  },
-  {
-   "title": "「2026 제2회 Google-아주대학교 AI융합캡스톤디자인 대회」 최종 성과발표회 개최 안내(2026.10.07)",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=376835&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-07",
-   "kind": "행사",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/6633b237b817dd7d.webp"
-  },
-  {
-   "title": "[교육혁신팀] 🍂아주대와 함께하는 문화산책(10월)🍂",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=376831&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-01",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/a7fcfb39e43e027c.webp"
-  },
-  {
-   "title": "💡 U-Chance 10월 퀴즈대회 OPEN!💡",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=376830&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-01",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/10edf970314424bc.webp"
   }
  ]
 }

@@ -1069,8 +1069,10 @@
    "added": "2026-10-05",
    "fetched": false,
    "schematized": false,
-   "tries": 5,
-   "lastTryAt": "2026-10-06"
+   "tries": 6,
+   "lastTryAt": "2026-10-06",
+   "retired": true,
+   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
   },
   {
    "id": "auto-nuid100nttid30154ptabno5",
@@ -1079,8 +1081,10 @@
    "added": "2026-10-05",
    "fetched": false,
    "schematized": false,
-   "tries": 5,
-   "lastTryAt": "2026-10-06"
+   "tries": 6,
+   "lastTryAt": "2026-10-06",
+   "retired": true,
+   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
   },
   {
    "id": "auto-onttid000100000000003862",
@@ -1089,8 +1093,10 @@
    "added": "2026-10-05",
    "fetched": false,
    "schematized": false,
-   "tries": 5,
-   "lastTryAt": "2026-10-06"
+   "tries": 6,
+   "lastTryAt": "2026-10-06",
+   "retired": true,
+   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
   },
   {
    "id": "auto-bsid1083mi3004nttid55323",
@@ -1107,8 +1113,90 @@
    "added": "2026-10-05",
    "fetched": false,
    "schematized": false,
-   "tries": 5,
-   "lastTryAt": "2026-10-06"
+   "tries": 6,
+   "lastTryAt": "2026-10-06",
+   "retired": true,
+   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
+  },
+  {
+   "id": "auto-leno276482srcategoryid22",
+   "name": "[학생지원팀] 2026년도 2학기 진도군인재육성장학회 장학생 선발 안내(2026. 9. 21.(월) ~ 10. 8.(목))",
+   "target": "2026년도 2학기 진도군인재육성장학회 장학생 선발 안",
+   "added": "2026-10-06",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-notiphpcodes1301seq11294",
+   "name": "2026학년도 하나장학생 신청 안내",
+   "target": "2026학년도 하나장학생 신청 안내",
+   "added": "2026-10-06",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-ticedoarticleno231977952",
+   "name": "2026년 김천시-한국전력기술 지역상생지원 장학금 및 취업준비금 신청 안내",
+   "target": "2026년 김천시-한국전력기술 지역상생지원 장학금 및 ",
+   "added": "2026-10-07",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-kuk2351209318artclviewdo",
+   "name": "[학교추천][교외][등록금] 2026학년도 2학기 송화재단 장학생 추천 선발 안내(10. 7.(수) 13:00 ~ 10. 14",
+   "target": "2026학년도 2학기 송화재단 장학생 추천 선발 안내(",
+   "added": "2026-10-07",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-jong659273457artclviewdo",
+   "name": "[기금]2026학년도 2학기 고려대학교 세종 CPTA장학금 신청 안내",
+   "target": "2026학년도 2학기 고려대학교 세종 CPTA장학금 신",
+   "added": "2026-10-07",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-leno276597srcategoryid22",
+   "name": "[학생지원팀] (재)인천광역시 계양구 인재양성장학교육재단 2026년 2학기 장학생 선발 안내",
+   "target": "(재)인천광역시 계양구 인재양성장학교육재단 2026년 ",
+   "added": "2026-10-08",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-8bnum57138cate0qidx57138",
+   "name": "[장애학생지원센터] 2026학년도 2학기 장애학생 봉사유형 국가근로장학생 모집 (1명)",
+   "target": "2026학년도 2학기 장애학생 봉사유형 국가근로장학생 ",
+   "added": "2026-10-08",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-pnoticedoarticleno367311",
+   "name": "[학부]2026학년도 2학기 재단법인 송화 장학금 신청 안내",
+   "target": "2026학년도 2학기 재단법인 송화 장학금 신청 안내",
+   "added": "2026-10-08",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-leno276604srcategoryid22",
+   "name": "[학생지원팀] 2026년 2학기 전남인재육성 장학생 선발 안내",
+   "target": "2026년 2학기 전남인재육성 장학생 선발 안내",
+   "added": "2026-10-08",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-leno276603srcategoryid22",
+   "name": "[학생지원팀] 2026년 2학기 한국선원복지고용센터 선원가족장학생 선발 안내",
+   "target": "2026년 2학기 한국선원복지고용센터 선원가족장학생 선",
+   "added": "2026-10-08",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }

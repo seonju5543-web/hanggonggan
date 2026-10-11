@@ -171,8 +171,8 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
     eq('③ 처음에는 정렬 목록이 안 보인다', await menuShown(), false);
     await page.click('#activities-sort-btn'); await page.waitForTimeout(200);
     eq('③ 누르면 정렬 목록이 열린다 (탐색 화면과 같은 동작)', await menuShown(), true);
-    eq('③   선택지는 셋 — 최근 수집순 · 마감 임박순 · 적합도순(장학 탐색과 같은 잣대 · 2026-10-01)',
-      await page.$$eval('#activities-sort-menu [data-sort]', (e) => e.map((x) => x.textContent.trim())), ['최근 수집순', '마감 임박순', '적합도순']);
+    eq('③   선택지는 셋 — 등록 최신순 · 마감 임박순 · 적합도순(장학 탐색과 같은 잣대 · 2026-10-01)',
+      await page.$$eval('#activities-sort-menu [data-sort]', (e) => e.map((x) => x.textContent.trim())), ['등록 최신순', '마감 임박순', '적합도순']);
     eq('③   지금 기준에 표시가 있다',
       await page.$eval('#activities-sort-menu [aria-checked="true"]', (e) => e.dataset.sort), 'recent');
     await page.click('#activities-sort-menu [data-sort="deadline"]'); await page.waitForTimeout(200);
@@ -185,7 +185,7 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
       ['2026 대학생 해외봉사단 모집', '전국 청년 서포터즈 모집', '제3회 장학수기 공모전 공고']);
     await page.click('#activities-sort-btn'); await page.waitForTimeout(200);
     await page.click('#activities-sort-menu [data-sort="recent"]'); await page.waitForTimeout(200);
-    eq('③ 다시 골라 최근 수집순', await page.$eval('#activities-sort-label', (e) => e.textContent.trim()), '최근 수집순');
+    eq('③ 다시 골라 등록 최신순', await page.$eval('#activities-sort-label', (e) => e.textContent.trim()), '등록 최신순');
     await page.click('#activities-sort-btn'); await page.waitForTimeout(200);
     /* '바깥'은 화면 제목 — 목록 한가운데를 누르면 이제 카드가 눌려 상세 시트가 열린다(2026-10-01 카드가 시트를 연다) */
     await page.click('#screen-activities h2'); await page.waitForTimeout(150);
