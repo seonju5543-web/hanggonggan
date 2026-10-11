@@ -279,11 +279,11 @@
    "text": "글로벌캠퍼스 재학생",
    "exclude": false,
    "verdict": {
-    "P1": "ok",
-    "P2": "ok",
-    "P3": "ok",
+    "P1": null,
+    "P2": null,
+    "P3": null,
     "P4": "ok",
-    "P5": "ok",
+    "P5": null,
     "P6": "no"
    }
   },
@@ -308,7 +308,7 @@
     "P1": "ok",
     "P2": "ok",
     "P3": "ok",
-    "P4": "ok",
+    "P4": null,
     "P5": "ok",
     "P6": "no"
    }
@@ -984,7 +984,7 @@
     "P1": "ok",
     "P2": "ok",
     "P3": "ok",
-    "P4": "ok",
+    "P4": null,
     "P5": "ok",
     "P6": "no"
    }

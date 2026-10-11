@@ -250,10 +250,19 @@ function judgeCond(c, p, ctx) {
     case 'year': {
       const y = p.year == null ? null : Number(p.year);
       if (y == null || Number.isNaN(y)) return 'unknown';
-      if (c.min != null) return y >= c.min ? 'pass' : 'fail';
-      if (c.max != null) return y <= c.max ? 'pass' : 'fail';
-      if (c.eq != null) return y === c.eq ? 'pass' : 'unknown';   // `2학년 학생`은 딱 그 학년인지 애매
-      return 'unknown';
+      /* 🔴 **앞으로 올 학년도의 학년** (`ahead` · parse-requirements parseYear) — 그때 학생은 지금 학년부터
+         지금+ahead 사이다(휴학하면 안 오른다). 확실한 것만 말한다: 지금 이미 넘으면 통과, 그때까지 못 닿으면 미달,
+         그 사이는 모름. 줄은 확신이 낮아 미달도 화면에선 '모름'이 된다. */
+      const ahead = c.ahead > 0 ? c.ahead : 0;
+      let v = 'unknown';
+      if (c.min != null) v = y >= c.min ? 'pass' : (y + ahead >= c.min ? 'unknown' : 'fail');
+      else if (c.max != null) v = y + ahead <= c.max ? 'pass' : (y <= c.max ? 'unknown' : 'fail');
+      else if (c.eq != null) v = (y === c.eq && !ahead) ? 'pass' : 'unknown';   // `2학년 학생`은 딱 그 학년인지 애매
+      /* 🔴 **제외 줄에서는 뜻이 뒤집힌다** (2026-10-11 · 조각 B 리뷰 — 원래부터 있던 결함). `4학년 이상 재학생`
+         이 제외 줄이면 **4학년이** 걸린다. 안 뒤집으면 1~3학년이 미달이고 정작 4학년이 통과했다.
+         flags·nationality·school 과 같은 규약(제외 줄에서 fail = 그 학생이 걸린 것) · 모름은 그대로. */
+      if (c.exclude) return v === 'pass' ? 'fail' : v === 'fail' ? 'pass' : v;
+      return v;
     }
     case 'status': {
       if (!p.status) return 'unknown';
