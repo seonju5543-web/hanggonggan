@@ -14,6 +14,10 @@
      down      응답이 없음(curl 실패 · HTTP ≠ 200)
      misconfig 열쇠(VAPID)가 서버에 없음(configured ≠ true)
      error     포기 기록(lastError)이 남아 있음 · 등록 저장소를 못 읽음(subs = -1)
+               · 서버가 회복으로 내린 기록(pastError)이 서버의 회복 규칙(server/push/worker.js errorRecovered — 불러 쓴다)으로
+                 다시 보면 회복이 아님 — 발송(send) 걸음 포기는 그 뒤 깨우기를 끝까지 보낸 회차(lastSentRun)만 회복이다.
+                 옛 서버 코드는 '알릴 거리 없음' 회차로도 회복을 쳐서 발송이 끊겨도 초록이었다(2026-10-11 점검) — 서버와 이 도구가
+                 갈라지면 경보 쪽으로 간다
      outdated  `lastSlot` 칸이 아예 없음 — 새 서버 코드가 아직 배포되지 않았다
      stale     마지막으로 시작한 회차가 26시간보다 오래됨 — 두 회차(08:10·20:10) 연속 시작하지 않았다
                (06:17 확인의 정상 간격은 약 10시간 · 한 회차만 빠지면 약 22시간)
@@ -32,6 +36,8 @@
    ============================================================ */
 import fs from 'node:fs';
 import { pathToFileURL } from 'node:url';
+// 회복 규칙은 서버 한 곳 — push-health.yml 의 체크아웃이 server/push 를 받아야 한다(관문 servers ⑤)
+import { errorRecovered } from '../server/push/worker.js';
 
 export const STALE_HOURS = 26;
 
@@ -50,6 +56,9 @@ export function verdict({ curlOk, code, json, now = Date.now() } = {}) {
   if (!j) return out('down', '서버 응답을 읽지 못했습니다 (JSON 아님)');
   if (j.configured !== true) return out('misconfig', 'VAPID 키가 서버에 없습니다 (configured=false) — 푸시가 실제로는 안 나갑니다');
   if (j.lastError) return out('error', `서버에 마지막 오류 기록이 남아 있습니다: ${JSON.stringify(j.lastError)}`);
+  if (j.pastError && !errorRecovered(j.pastError, j.lastRun, j.lastSentRun)) {
+    return out('error', `서버가 회복한 것으로 내린 포기 기록(pastError)이 있지만, 그 뒤로 포기한 걸음을 끝까지 지나간 회차가 없습니다(발송 걸음이면 깨우기를 끝까지 보낸 회차 lastSentRun 이 그 뒤에 있어야 합니다) — 서버의 회복 판정이 이 도구와 다릅니다(옛 서버 코드가 배포돼 있을 수 있습니다): ${JSON.stringify(j.pastError)}`);
+  }
   if (String(j.subs) === '-1') return out('error', '등록 저장소(KV)를 읽지 못했습니다 (subs=-1)');
   if (String(j.subs) === '0') warnings.push('등록된 폰이 0대입니다 (오류는 아니지만 알림이 갈 곳이 없습니다)');
   if (!Object.prototype.hasOwnProperty.call(j, 'lastSlot')) {

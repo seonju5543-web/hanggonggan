@@ -15,6 +15,10 @@
      ⑥(d) 장부를 줄 단위로(state:seenLines) — 옛 열쇠(state:seen)는 고치지 않는다(옛 코드로 되돌려도 넘어지지 않게).
      ⑥(e) 수집일 규칙의 '이틀'이 폰과 대조되지 않았다(하루·이틀 반으로 바꿔도 초록) → 경계 표본을 양쪽에 돌린다.
      ⑥(f)(g) 배포 직후 첫 회차(옛 장부) · 회차 한가운데 배포(옛 꼴 요약).
+   점검(2026-10-11 · SIT-1)에서 더한 것:
+     ⑤ 발송(send) 걸음 포기가 다음 '알릴 거리 없음' 회차로 회복돼 lastError 가 지워졌다(발송이 끊겨도 06:17 확인·관리자 카드가 초록)
+        → 포기한 걸음을 지나간 회차만 회복(worker.js errorRecovered 한 곳 · 발송 걸음은 lastSentRun) · 매일 확인 도구도 그 함수를 불러
+          pastError 를 다시 본다(push-health.yml 이 server/push 를 받고 · server/push/package.json type module).
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부는 읽지 않는다. 코드 파일(server/·sw.js·엔진)은 코드라 읽는다.
    🔴 Date.now·fetch 는 바꿔 끼운 뒤 finally 로 되돌린다.
    🔴 **문서 글자**(server/README.md · apply/wrangler.toml 주석 · 설계 문서 data-flow.md)를 재는 줄은 로봇 워크플로에서 어긋나도
@@ -208,6 +212,55 @@ export default async function gate(eq, ctx) {
         [s3.lastRun && s3.lastRun.outcome, pick(s3.lastSentRun)], ['nothing', { outcome: 'sent', sent: 1, woke: 0, dropped: 0, slot: '2026-10-05#08:10' }]);
       eq('④ 그 /health 로 다음 날 06:17 매일 확인 — 깨우기를 보낸 마지막 회차로 보아 error(가려지지 않는다)',
         pushVerdict({ curlOk: true, code: 200, json: s3, now: KST('2026-10-06T06:17:00') }).verdict, 'error');
+
+      /* ⑤ 발송(send) 걸음 포기는 '알릴 거리 없음' 회차로 회복되지 않는다 (2026-10-11 점검 SIT-1) — 예전 회복 규칙은 포기한 걸음을
+         보지 않고 '그 뒤 끝까지 돈 회차'면 지웠다. 포기한 회차의 plan 이 공고를 이미 '본 것'으로 적어 다음 회차는 대개 '없음'이라,
+         발송이 끊겨도 06:17 확인·관리자 카드가 초록이었다. 새 가짜 KV(앞 표본의 받아 준 수 0 기록이 섞이지 않게) */
+      const kv5 = fakeKV();
+      let failSend = false;                                                      // 구독 기록 읽기에서 넘어짐 = 발송 걸음의 계산 시간 초과 흉내
+      const env5 = { SUBS: { ...kv5, get: async (k) => { if (failSend && k.startsWith('sub:')) throw new Error('표본 — 발송 걸음 넘어짐'); return kv5.get(k); } },
+        VAPID_JWK: JSON.stringify(jwk), VAPID_PUBLIC: pub };
+      await kv5.put('state:seen', JSON.stringify(['n:https://seed/0']));
+      await kv5.put('state:planAt', String(KST('2026-10-03T20:10:00')));
+      await kv5.put(W.subKey(ep), JSON.stringify({ endpoint: ep, school: 'A대학교', campus: '' }));
+      /* 넘어진 걸음은 다음 2분 걸음에서 이어진다(Workers 의 예약 실행과 같다) — 넘어짐·포기를 차례로 적는다 */
+      const runSlotTrace = async (env, startMs) => {
+        const trace = [];
+        let t = startMs;
+        for (let i = 0; i < 20; i += 1) {
+          at(t); t += 120000;
+          let r;
+          try { r = await W.tick(env); } catch (e) { trace.push('throw'); continue; }
+          if (r && r.aborted) trace.push(`aborted:${r.step}`);
+          if (r && r.idle) break;
+        }
+        return trace;
+      };
+      pushStatus = 201;
+      feed = [{ url: 'https://p/1', school: 'A대학교', title: '첫 장학' }];
+      await runSlotTrace(env5, KST('2026-10-04T08:10:30'));                    // 예전의 정상 발송(받아 줌 1)
+      feed = [...feed, { url: 'https://p/2', school: 'A대학교', title: '둘째 장학' }];
+      failSend = true;
+      const tr5 = await runSlotTrace(env5, KST('2026-10-05T08:10:30'));        // 새 글 있음 → 발송 걸음 다섯 번 넘어져 포기
+      const f1 = await health(env5);
+      eq('⑤ 표본 — 발송 걸음이 다섯 번 넘어지면 그 회차를 포기하고 /health.lastError 의 걸음은 send',
+        [tr5, f1.lastError && f1.lastError.step, f1.pastError, f1.lastSentRun && f1.lastSentRun.slot],
+        [['throw', 'throw', 'throw', 'throw', 'throw', 'aborted:send'], 'send', null, '2026-10-04#08:10']);
+      failSend = false;
+      await runSlotTrace(env5, KST('2026-10-05T20:10:30'));                    // 새 글 없음(둘째 장학은 포기한 회차가 이미 '본 것'으로 적음)
+      const f2 = await health(env5);
+      eq('⑤ 발송 걸음 포기 뒤 회차가 \'알릴 거리 없음\'으로 끝나도 lastError(send)는 그대로 보인다(pastError 로 내려가지 않는다)',
+        [f2.lastRun && f2.lastRun.outcome, f2.lastRun && f2.lastRun.slot, f2.lastError && f2.lastError.step, f2.pastError],
+        ['nothing', '2026-10-05#20:10', 'send', null]);
+      eq('④ 그 /health 로 다음 날 06:17 매일 확인 — error(예전 정상 발송 기록 lastSentRun 에 가려지지 않는다)',
+        pushVerdict({ curlOk: true, code: 200, json: f2, now: KST('2026-10-06T06:17:00') }).verdict, 'error');
+      feed = [...feed, { url: 'https://p/3', school: 'A대학교', title: '셋째 장학' }];
+      await runSlotTrace(env5, KST('2026-10-06T08:10:30'));                    // 새 글 → 발송 걸음을 끝까지 지남
+      const f3 = await health(env5);
+      eq('⑤ 그 뒤 깨우기를 끝까지 보낸 회차가 오면 회복 — lastError 는 비고 send 기록이 pastError 로 · 매일 확인 ok',
+        [f3.lastError, f3.pastError && f3.pastError.step, pick(f3.lastSentRun),
+          pushVerdict({ curlOk: true, code: 200, json: f3, now: KST('2026-10-07T06:17:00') }).verdict],
+        [null, 'send', { outcome: 'sent', sent: 1, woke: 1, dropped: 0, slot: '2026-10-06#08:10' }, 'ok']);
     }
 
     /* ④ 매일 확인의 판정 — 표본 */
@@ -228,6 +281,21 @@ export default async function gate(eq, ctx) {
         pv({ lastRun: { outcome: 'nothing', sent: 0, woke: 0 }, lastSentRun: { outcome: 'sent', sent: 3, woke: 2 } }),
         pv({ lastRun: { outcome: 'sent', sent: 3, woke: 0 }, lastSentRun: null })],
       ['error', 'ok', 'error']);
+    /* ⑤ 매일 확인도 서버가 내린 회복(pastError)을 같은 규칙으로 다시 본다 — 옛 서버 코드가 배포돼 있으면 '없음' 회차로 회복을 친다 */
+    const sentAt = (finishedAt, woke = 1) => ({ outcome: 'sent', sent: 1, woke, finishedAt });
+    const noneAt = (finishedAt) => ({ outcome: 'nothing', sent: 0, woke: 0, finishedAt });
+    eq('⑤ 판정 — pastError(send) 뒤 \'없음\' 회차뿐(발송 회차는 그 전) error · 발송 회차 없음 error · 그 뒤 발송 회차 ok · pastError(reg) 뒤 끝까지 돈 회차 ok · 그 전 회차뿐 error',
+      [pv({ pastError: { at: 100, step: 'send' }, lastRun: noneAt(200), lastSentRun: sentAt(50) }),
+        pv({ pastError: { at: 100, step: 'send' }, lastRun: noneAt(200), lastSentRun: null }),
+        pv({ pastError: { at: 100, step: 'send' }, lastRun: noneAt(200), lastSentRun: sentAt(150) }),
+        pv({ pastError: { at: 100, step: 'reg' }, lastRun: noneAt(200), lastSentRun: null }),
+        pv({ pastError: { at: 100, step: 'reg' }, lastRun: noneAt(50), lastSentRun: null })],
+      ['error', 'error', 'ok', 'ok', 'error']);
+    const vSrc = stripComments(read('tools/push-health-verdict.mjs'));
+    eq('  회복 규칙은 서버 한 곳(worker.js errorRecovered)을 불러 쓴다 — 판정 도구에 사본이 없고 · 서버 /health 도 같은 함수를 부른다',
+      [/^import \{ errorRecovered \} from '\.\.\/server\/push\/worker\.js';$/m.test(vSrc), /function\s+errorRecovered|errorRecovered\s*=|step\s*===\s*'send'/.test(vSrc),
+        /const recovered = errorRecovered\(lastError, lastRun, lastSentRun\);/.test(stripComments(read('server/push/worker.js'))), typeof W.errorRecovered],
+      [true, false, true, 'function']);
     const w0 = pushVerdict({ curlOk: true, code: 200, json: { ...okJ, lastSlot: null, subs: 0 }, now: NOW });
     eq('  새 저장소(lastSlot null)·등록 0대는 경고만 하고 ok', [w0.verdict, w0.warnings.length], ['ok', 2]);
     eq('  깨우기 실패 문구는 원인을 단정하지 않고 woke 가 도착 수가 아님을 적는다',
@@ -237,6 +305,24 @@ export default async function gate(eq, ctx) {
     const phProbe = stepsOf(ph).find((s) => s.id === 'probe') || {};
     eq('  push-health.yml 이 판정 도구 한 곳을 부르고(셸 판정 없음) · 도구 폴더를 받는다',
       [/node tools\/push-health-verdict\.mjs/.test(phProbe.run || ''), /jq -r '\.lastError/.test(phProbe.run || ''), /sparse-checkout: \|\n\s+\.github\/actions\n\s+tools/.test(ph)], [true, false, true]);
+    {
+      /* 워크플로가 받는 폴더(sparse-checkout)만으로 판정 도구가 실제로 돈다 — 서버 규칙을 불러 쓰게 되면서 server/push 가 없으면
+         그날 확인이 넘어진다 · package.json 의 type module 이 없으면 Node 가 worker.js 를 CommonJS 로 먼저 읽는다(22 판은 경고 · 문법 짐작이 없는 판은 넘어질 수 있다) */
+      const sparse = (/sparse-checkout: \|\n((?:[ \t]+\S[^\n]*\n)+)/.exec(ph) || [])[1] || '';
+      const dirs = sparse.split('\n').map((s) => s.trim()).filter(Boolean);
+      const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'push-health-sparse-'));
+      let res = null;
+      try {
+        for (const d of dirs) if (fs.existsSync(path.join(rootDir, d))) fs.cpSync(path.join(rootDir, d), path.join(tmp, d), { recursive: true });
+        const body = { ...okJ, lastSlot: '2026-10-05#20:10', pastError: { at: 100, step: 'send' }, lastRun: noneAt(200), lastSentRun: sentAt(50) };
+        const env = { ...process.env, HEALTH_RC: '0', HEALTH_CODE: '200', HEALTH_BODY: JSON.stringify(body) };
+        delete env.GITHUB_OUTPUT;                                                // 이 검사가 바깥 워크플로의 출력 파일에 쓰지 않게
+        res = spawnSync(process.execPath, ['tools/push-health-verdict.mjs'], { cwd: tmp, env, encoding: 'utf8', timeout: 20000 });
+      } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
+      eq('  push-health.yml 이 받는 폴더(sparse-checkout)만으로 판정 도구가 돈다 — server/push 를 받고 · 모듈 경고 없이 · 숨은 발송 포기를 error 로',
+        [dirs.includes('server/push'), res && res.status, res && /판정: error/.test(res.stdout), res && /MODULE_TYPELESS|SyntaxError|ERR_MODULE/.test(res.stderr)],
+        [true, 0, true, false]);
+    }
 
     /* ⑥ 본 공고 — 주소 · 학교+제목 · 수집일 (폰과 같은 셋) · 장부 자르기 */
     const sum = (items) => W.summarize(null, { items });

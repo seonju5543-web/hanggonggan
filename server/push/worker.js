@@ -393,6 +393,19 @@ const finishRun = async (env, run, outcome) => {
   await clearRun(env);
 };
 
+/* 포기 기록(state:lastError)이 회복됐는가 — **포기한 걸음을 그 뒤 회차가 실제로 지나갔을 때만** (2026-10-11 점검 · /health 와
+   매일 확인 도구 tools/push-health-verdict.mjs 가 같이 부른다 — 베끼지 말 것).
+   - 발송(send) 걸음을 포기했다면 그 뒤 깨우기를 끝까지 보낸 회차(lastSentRun — 예약 회차든 수동 /run 이든)만 증거다.
+     '알릴 거리 없음' 회차는 plan 에서 끝나 send 를 거치지 않는다. 게다가 포기한 회차의 plan 이 그 공고들을 이미 '본 것'으로
+     적어 두어 다음 회차는 대개 '없음'으로 끝난다 — 예전엔 그 회차로 회복을 쳐서, 발송이 끊겨도 매일 확인과 관리자 카드가 조용했다.
+     시험 발송(/test)은 기록을 남기지 않아 증거가 아니다.
+   - reg·notices·plan 걸음은 끝까지 돈 회차(lastRun)면 지나간 것이다('없음' 회차도 plan 까지는 지난다). */
+function errorRecovered(lastError, lastRun, lastSentRun) {
+  if (!lastError) return false;
+  const proof = lastError.step === 'send' ? lastSentRun : lastRun;
+  return !!(proof && Number(proof.finishedAt) > Number(lastError.at));
+}
+
 /* 지금이 '깨울 시각'을 지났고 아직 안 깨웠으면 그 시각표를 돌려준다 */
 function dueSlot(now) {
   const kst = new Date(now + 9 * 3600 * 1000);
@@ -552,10 +565,10 @@ export default {
       /* 마지막으로 **시작한** 예약 회차('YYYY-MM-DD#HH:MM' KST) — 매일 확인이 '예약이 돌고 있는가'를 이걸로 본다.
          새 KV 면 null 이다. */
       const lastSlot = (await env.SUBS.get('state:slot')) || null;
-      /* 포기 기록(lastError) 뒤에 회차가 끝까지 돌았으면 회복한 것이다 → lastError 는 비우고 pastError 로 내린다.
-         KV 에서 지우지는 않는다(무엇이 있었는지는 계속 보인다). 예전엔 지우는 길이 없어, 한 번 포기하면
-         회복한 뒤에도 매일 확인이 영영 빨간불이고 옛 경보 이슈도 안 닫혔다. */
-      const recovered = !!(lastError && lastRun && Number(lastRun.finishedAt) > Number(lastError.at));
+      /* 포기 기록(lastError) 뒤에 포기한 걸음을 지나간 회차가 있으면 회복한 것이다 → lastError 는 비우고 pastError 로 내린다
+         (규칙은 errorRecovered 한 곳 — 발송 걸음은 발송 회차로만). KV 에서 지우지는 않는다(무엇이 있었는지는 계속 보인다).
+         예전엔 지우는 길이 없어, 한 번 포기하면 회복한 뒤에도 매일 확인이 영영 빨간불이고 옛 경보 이슈도 안 닫혔다. */
+      const recovered = errorRecovered(lastError, lastRun, lastSentRun);
       /* 등록된 폰 수 — KV 화면을 눈으로 세지 않아도 되게 여기서 알려준다 (2026-08-07).
          ⚠️ 이 숫자는 '등록 기록'이지 '살아 있는 폰'이 아니다. 폰 쪽에서 구독이 죽어도
          기록은 남아 있다가 다음 발송 때 404로 정리된다. 살아 있는지는 /test로만 확인된다. */
@@ -570,8 +583,8 @@ export default {
         step: run ? run.step : 'idle',      // 지금 어느 걸음인지 (idle = 할 일 없음 · 정상)
         sent: run ? run.sent : 0,
         subs: subsMore ? `${subs}+` : subs,  // 등록 기록 수 (살아 있는 폰 수와 다를 수 있음)
-        lastError: recovered ? null : lastError, // 다섯 번 실패해 포기했고 그 뒤 회차가 아직 끝까지 못 돌았으면 여기
-        pastError: recovered ? lastError : null, // 포기한 적이 있지만 그 뒤 회차가 끝까지 돌아 회복한 기록
+        lastError: recovered ? null : lastError, // 다섯 번 실패해 포기했고 그 걸음을 지나간 회차가 아직 없으면 여기
+        pastError: recovered ? lastError : null, // 포기한 적이 있지만 그 뒤 회차가 그 걸음을 지나가 회복한 기록
         lastSlot,                            // 마지막으로 시작한 예약 회차 (KST)
         lastRun,                             // 마지막으로 끝까지 돈 회차의 결과 (finishRun)
         lastSentRun,                         // 마지막으로 깨우기를 끝까지 보낸 회차 (outcome 'sent' · 없으면 null)
@@ -626,8 +639,9 @@ export default {
   },
 };
 
-/* 테스트에서 부분만 떼어 쓰기 위한 내보내기 (Worker 동작에는 영향 없음) */
+/* 테스트·매일 확인 도구(tools/push-health-verdict.mjs — errorRecovered)에서 부분만 떼어 쓰기 위한 내보내기 (Worker 동작에는 영향 없음) */
 export {
   isPushEndpoint, schoolsToWake, ymd, subKey, tick, dueSlot, summarize,
   titleSeenKey, titleSeenKeyFast, taggedSchool, wakeSchoolsForNotice, SHARED_BOARD_BRANCH, noticeMini, readSeen,
+  errorRecovered,
 };
