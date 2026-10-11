@@ -250,10 +250,19 @@ function judgeCond(c, p, ctx) {
     case 'year': {
       const y = p.year == null ? null : Number(p.year);
       if (y == null || Number.isNaN(y)) return 'unknown';
-      if (c.min != null) return y >= c.min ? 'pass' : 'fail';
-      if (c.max != null) return y <= c.max ? 'pass' : 'fail';
-      if (c.eq != null) return y === c.eq ? 'pass' : 'unknown';   // `2학년 학생`은 딱 그 학년인지 애매
-      return 'unknown';
+      /* 🔴 **앞으로 올 학년도의 학년** (`ahead` · parse-requirements parseYear) — 그때 학생은 지금 학년부터
+         지금+ahead 사이다(휴학하면 안 오른다). 확실한 것만 말한다: 지금 이미 넘으면 통과, 그때까지 못 닿으면 미달,
+         그 사이는 모름. 줄은 확신이 낮아 미달도 화면에선 '모름'이 된다. */
+      const ahead = c.ahead > 0 ? c.ahead : 0;
+      let v = 'unknown';
+      if (c.min != null) v = y >= c.min ? 'pass' : (y + ahead >= c.min ? 'unknown' : 'fail');
+      else if (c.max != null) v = y + ahead <= c.max ? 'pass' : (y <= c.max ? 'unknown' : 'fail');
+      else if (c.eq != null) v = (y === c.eq && !ahead) ? 'pass' : 'unknown';   // `2학년 학생`은 딱 그 학년인지 애매
+      /* 🔴 **제외 줄에서는 뜻이 뒤집힌다** (2026-10-11 · 조각 B 리뷰 — 원래부터 있던 결함). `4학년 이상 재학생`
+         이 제외 줄이면 **4학년이** 걸린다. 안 뒤집으면 1~3학년이 미달이고 정작 4학년이 통과했다.
+         flags·nationality·school 과 같은 규약(제외 줄에서 fail = 그 학생이 걸린 것) · 모름은 그대로. */
+      if (c.exclude) return v === 'pass' ? 'fail' : v === 'fail' ? 'pass' : v;
+      return v;
     }
     case 'status': {
       if (!p.status) return 'unknown';
@@ -335,6 +344,14 @@ function judgeCond(c, p, ctx) {
         const a = norm(n);
         return a === mine || mine.startsWith(a) || a.startsWith(mine);
       });
+      /* 🔴 **한 학교만 받는 공고의 「○○대학」은 그 학교 안의 단과대학이다** (2026-10-11 · 카드 분석 조각 B).
+         한국외대 「2026-2학기 영어대학 재학생」·인하대 「미래융합대학 소속 학생은 …」 의 단과대학 이름을
+         학교 이름으로 견줘, 그 학교 학생 **전원**에게 「지원 자격 미달」이 떴다(what-shows 로 확인).
+         단과대학 이름은 끝없이 많아 낱말 목록(SCHOOL_COLLEGE)으로는 못 막는다 — 그래서 공고 맥락으로 본다:
+         한 학교 한정 공고에서 `대학교` 로 끝나지 않는 이름이 내 학교와 안 맞으면 **소속을 모르는 것**이다.
+         ⚠️ '모름'이지 '충족'이 아니다 — 학생이 그 단과대학인지 우리는 모른다(✓ 를 주면 틀린 안심).
+         ⚠️ 제외 줄도 같다 — `영어대학 학생은 제외` 에 그 학교 학생을 '통과'로 두면 틀린 안심이다. */
+      if (!hit && ctx && ctx.oneSchool && c.anyOf.some((n) => !/대학교$/.test(String(n).replace(/\s/g, '')))) return 'unknown';
       /* 🔴 제외 줄에서는 뜻이 뒤집힌다 — `서울대학교 학생은 제외` 는 **서울대 학생이** 걸린다.
          안 뒤집었더니 정반대가 됐다: 서울대 학생은 멀쩡히 통과하고 **남이 미달**이 됐다
          (2026-08-30 개발자 지적 "그 학교 학생이 쓰면 x 도 뜨는 거지?" — 안 떴다). */
@@ -626,7 +643,11 @@ function noticeCtx(sch) {
      회귀 검사('띄어 쓴 「대학 재학생」도 학부를 말한 것으로 본다')가 잡았다.
      ⚠️ 이건 '모른다'이지 '충족'이 아니다 — 학부가 대상인지 확실치 않아 ✓ 를 주지는 않는다. */
   const anyUndergrad = lines.some((t) => PR.mentionsUndergrad && PR.mentionsUndergrad(t));
-  return { bracketTable: brackets.size > 1, inAnyOf, multi, anyUndergrad, homeCity: homeCityOf(sch) };
+  /* 한 학교만 받는 공고인가 — 그 안의 `○○대학` 은 단과대학이다(judgeCond 'school' 참조).
+     학교 한정 칸이 없어도 교내 장학은 학교가 주는 것이라 같다(게시한 학교의 제도). */
+  const el = (sch && sch.eligibility) || {};
+  const oneSchool = !!(el.schoolOnly || (sch && sch.type === '교내'));
+  return { bracketTable: brackets.size > 1, inAnyOf, multi, anyUndergrad, homeCity: homeCityOf(sch), oneSchool };
 }
 
 /* 공고 하나에 대한 적합도 **내역**. 카드가 "요건 6개 중 4개 충족"을 띄우려면 숫자가 필요하다. */

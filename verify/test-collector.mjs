@@ -3430,6 +3430,34 @@ console.log('\n■ 학교 이름이 걸린 요건 (2026-08-30)');
   eq('추천 교수의 출신 학교는 안 집는다', of('충남대학교 학부 출신 교수의 추천서 1부'), null);
   /* 안내 문장을 요건으로 읽으면 방송대가 아닌 학생이 전부 미달이 된다 */
   eq('「별도 문의」 안내는 요건이 아니다', of('교환학생/방송대학생 별도 문의의'), null);
+
+  /* 🔴 (2026-10-11 · 카드 분석 조각 B) **한 학교만 받는 공고의 「○○대학」은 그 학교의 단과대학이다.**
+     한국외대 「2026-2학기 영어대학 재학생」 때문에 한국외대 학생 **전원**이 「지원 자격 미달」이었다
+     (인하대 「미래융합대학 소속 학생은 …」도). 소속은 우리가 모른다 — ✕ 도 ✓ 도 아니고 '모름'이다.
+     아래 줄은 실제 공고 문장이다. 공고는 실데이터에 기대지 않고 여기서 만든다. */
+  const MEs = createRequire(import.meta.url)('../match-engine.js');
+  const stu = (school) => ({ school, campus: '', track: 'humanities', major: '영어학과', year: 3, status: '재학',
+    gpa: 3.8, bracket: 5, credits: 15, region: '서울', parentRegion: '서울', nationality: 'korean', birthYear: 2004, flags: [], common: {} });
+  const own = (school, lines, extra) => ({ id: 't', name: 't', type: '교내', provider: 'p', amount: '-', amountValue: 0,
+    deadline: '2026-12-31', period: '-', summary: '-', documents: [], eligibility: { selective: true, schoolOnly: school }, eligibilityLines: lines, ...(extra || {}) });
+  const eng = own('한국외국어대학교', ['2026-2학기 영어대학 재학생', '직전학기 12학점이상, 평점평균 3.5 이상 취득한 자 (계절학기 제외)']);
+  eq('학교 한정 공고의 「영어대학 재학생」은 그 학교 학생에게 ✕ 가 아니다 (모름)',
+    MEs.requirementMatch(eng.eligibilityLines[0], stu('한국외국어대학교'), eng), null);
+  eq('  그래서 카드가 「지원 자격 미달」이 아니다', MEs.fitDetail(eng, stu('한국외국어대학교')).fails, []);
+  const fusion = '미래융합대학 소속 학생은 학기 차수와 관계없이 직전 정규학기 12학점 이상 신청하고 12학점 이상 취득한 자';
+  eq('  인하대 「미래융합대학 소속 학생은 …」도', MEs.requirementMatch(fusion, stu('인하대학교'), own('인하대학교', [fusion])), null);
+  eq('  교내 장학(학교 한정 칸 없음)도 같다',
+    MEs.requirementMatch(eng.eligibilityLines[0], stu('한국외국어대학교'), { ...eng, eligibility: { selective: true } }), null);
+  /* 제외 줄에서 '통과' 로 두면 그 단과대학 학생에게 틀린 안심이다 */
+  eq('  제외 줄의 단과대학도 통과가 아니라 모름이다',
+    MEs.judgeCond({ kind: 'school', anyOf: ['영어대학'], exclude: true, conf: 'high' }, stu('한국외국어대학교'), { oneSchool: true }), 'unknown');
+  /* ── 되돌아가면 안 되는 것 — 진짜 학교 이름은 여전히 판정한다 ── */
+  eq('  학교 한정 공고라도 「대학교」로 끝나는 다른 학교 이름은 ✕ 그대로',
+    MEs.requirementMatch('충남대학교 재학생', stu('한국외국어대학교'), own('한국외국어대학교', ['충남대학교 재학생'])), 'no');
+  eq('  학교 한정 공고에서 제 학교 이름은 ✓',
+    MEs.requirementMatch('한국외국어대학교 재학생', stu('한국외국어대학교'), own('한국외국어대학교', ['한국외국어대학교 재학생'])), 'ok');
+  eq('  전국 공고의 다른 학교는 ✕ 그대로',
+    MEs.requirementMatch('현재 충남대학교 재학 중인 학부생', stu('한국외국어대학교'), { type: '교외', eligibility: { selective: true }, eligibilityLines: ['현재 충남대학교 재학 중인 학부생'] }), 'no');
 }
 
 /* 2026-08-30 — 학과·전공·계열. 개발자 지적:
@@ -10333,6 +10361,63 @@ console.log('\n■ 자격 판정 전수 대조 — 틀린 ✓·틀린 ✗ (2026-
   eq('  「수료생 및 졸업생 제외」— 앞쪽 수료생도 금지',
     (PRq.parseLine('수료생 및 졸업생 제외', false).conds.find((c) => c.kind === 'status') || {}).not, ['수료', '졸업']);
   eq('  「휴학생은 신청할 수 없음」', mark('휴학생은 신청할 수 없음', onLeave), 'no');
+  /* ⑤-3-2 (2026-10-11 · 카드 분석 조각 B) 연도는 학년이 아니다 — `2026학년도` 의 끝자리를 '6학년' 으로 읽어
+     재학·구간·성적이 다 맞는 학생의 줄이 '모름' 이었다(실측 26줄 · 22건). 아래는 실제 공고 문장이다. */
+  const yearOf = (t) => PRq.parseLine(t, false).conds.find((c) => c.kind === 'year') || null;
+  eq('「2026학년도 2학기 정규학기 재학생」에서 학년 조건을 만들지 않는다 (하나장학 · 6학년으로 읽었다)', yearOf('2026학년도 2학기 정규학기 재학생'), null);
+  eq('  그래서 3학년 재학생에게 ✓', mark('2026학년도 2학기 정규학기 재학생'), 'ok');
+  eq('  「\'26학년도 정규학기 학부 재학생」도', yearOf('\'26학년도 정규학기 학부 재학생(등록 재학생이어야 함)'), null);
+  eq('  같은 줄의 진짜 학년(「2학년 이상」)은 그대로 읽는다',
+    yearOf('2026학년도 2학기 정규 수업연한 이내 재학 예정인 2학년 이상 학부생(휴학생 신청 불가)'), { kind: 'year', min: 2, conf: 'high' });
+  /* ⑤-3-3 예외 괄호는 면제다 — `(단, 신입생·편입생 성적제한 없음)` 의 신입생을 '1학년' 조건으로 읽었다(가족장학금) */
+  const famLine = '직전 정규학기 취득학점 12학점 이상, 평점평균 2.0 이상인 자 (단, 신입생 &middot; 편입생 성적제한 없음)';
+  eq('「(단, 신입생·편입생 성적제한 없음)」에서 학년 조건을 만들지 않는다 (가족장학금)', yearOf(famLine), null);
+  eq('  원문 띄어쓰기 그대로(「( 단 , … )」)도', yearOf('나 . 직전 정규학기 취득학점 12 학점 이상 , 평점평균 2.0 이상인 자 ( 단 , 신입생 · 편입생 성적제한 없음 )'), null);
+  eq('  성적 조건은 그대로 남는다', (PRq.parseLine(famLine, false).conds.find((c) => c.kind === 'grade') || {}).min, 2);
+  eq('  그래서 평점 3.5 · 15학점 3학년에게 ✓', mark(famLine), 'ok');
+  eq('  「(신입생, 편입생, 재입학생 예외)」·「(신입생 성적무관)」도',
+    [yearOf('직전 정규학기 12학점 이상, 평점평균 2.0 이상 취득한 자(신입생, 편입생, 재입학생 예외)'), yearOf('대학생 : 직전 학기 성적이 평점 2.0 이상 (신입생 성적무관)')], [null, null]);
+  /* 🔴 괄호를 걷었다고 확신이 올라가면 안 된다 — `(… 3학년 1학기 진학 예정자 포함)` 은 2학년에게도 열려 있다(틀린 미달) */
+  eq('  학년을 말하는 괄호를 걷으면 남은 학년 조건은 확신이 낮다 (2학년에게 ✕ 가 아니다)',
+    mark('대학교 3 학년 이상 ( 선발학기 기준 , 3 학년 1 학기 진학 예정자 포함 )', { year: 2 }), null);
+  /* 🔴 (조각 B 리뷰) 괄호 안의 **진짜 학년 요건**까지 걷으면 틀린 안심이다 — `제외`·`포함` 이 같이 있다고 학년이 사라졌다 */
+  eq('  「재학생(2학년 이상, 휴학생 제외)」은 1학년에게 ✓ 가 아니다 (괄호째 걷혀 학년이 사라졌다)',
+    [mark('재학생(2학년 이상, 휴학생 제외)', { year: 1 }), mark('재학생(3학년 이상, 단 편입생 제외)', { year: 2 }), mark('재학생(2학년 이상, 휴학생 포함)', { year: 1 })], [null, null, null]);
+  eq('  그 학년을 넘는 학생은 그대로 ✓', mark('재학생(2학년 이상, 휴학생 제외)', { year: 3 }), 'ok');
+  /* 🔴 (조각 B 리뷰) **앞으로 올 학년도의 학년은 지금 학년이 아니다** — 프로필 학년은 지금 학년이고 앱은 학년을 올리지 않는다.
+     `2027학년도 1학기 기준 2학년 이상` 이 지금 1학년에게 미달이면 틀린 미달이다(내년엔 2학년).
+     ⚠️ 시계에 기대지 않게 '올해 + 1' 학년도로 만든다(달력 해는 늘 지금 학년도 이상이라 그 다음 해는 늘 미래다). */
+  const nextAY = new Date().getFullYear() + 1;
+  const futLine = `${nextAY}학년도 1학기 기준 2학년 이상 재학생`;
+  const futSch = { type: '교외', eligibility: { selective: true }, eligibilityLines: [futLine] };
+  eq(`「${futLine}」은 지금 1학년에게 미달이 아니다 (모름)`, mark(futLine, { year: 1 }, futSch), null);
+  eq('  카드도 「지원 자격 미달」이 아니다', MEq.fitDetail(futSch, { ...base, year: 1 }).fails, []);
+  eq('  지금 이미 넘는 2학년은 ✓', mark(futLine, { year: 2 }, futSch), 'ok');
+  eq(`  「'${String(nextAY).slice(2)}-1학기 기준 3학년 이하」— 지금 3학년은 그때 4학년일 수 있어 ✓ 가 아니다`,
+    mark(`'${String(nextAY).slice(2)}-1학기 기준 3학년 이하 재학생`, { year: 3 }), null);
+  eq('  같은 학년도(「2026학년도 2학기 … 2학년 이상」)는 그대로 확신이 높다',
+    yearOf('2026학년도 2학기 정규 수업연한 이내 재학 예정인 2학년 이상 학부생(휴학생 신청 불가)').conf, 'high');
+  /* 🔴 (조각 B 리뷰) **제외 줄의 학년은 뜻이 뒤집힌다** — `4학년 이상 재학생` 이 제외 줄이면 4학년이 걸리고 1~3학년은 아니다.
+     안 뒤집어 1~3학년이 미달이고 4학년이 통과했다(원래부터 있던 결함 · 6학년 오독이 가리고 있었다). */
+  const exLine = '2026학년도 2학기 기준 4학년 이상 재학생';
+  const exCond = PRq.parseLine(exLine, true).conds.find((c) => c.kind === 'year');
+  eq(`제외 줄 「${exLine}」— 1~3학년은 걸리지 않고 4학년은 걸린다`,
+    [1, 2, 3, 4].map((y) => MEq.judgeCond(exCond, { ...base, year: y }, {})), ['pass', 'pass', 'pass', 'fail']);
+  const exSch = { type: '교외', eligibility: { selective: true }, eligibilityLines: ['대학교 재학생'], eligibilityExcludes: [exLine] };
+  eq('  1~3학년 카드는 「지원 자격 미달」이 아니다', [1, 2, 3].map((y) => MEq.fitDetail(exSch, { ...base, year: y }).fails), [[], [], []]);
+  /* 제외 줄은 조건이 **모두** 맞아야 걸린다 — 학년만 보고 ✕ 를 내면 받은 적 없는 3학년이 틀린 미달이다(확신을 낮춘다) */
+  const exAnd = { ...exSch, eligibilityExcludes: ['3학년 이상 학생 중 이미 본 장학금을 받은 자'] };
+  eq('  「3학년 이상 학생 중 이미 본 장학금을 받은 자」— 3학년이라는 것만으로 미달이 아니다', MEq.fitDetail(exAnd, { ...base, year: 3 }).fails, []);
+  /* 🔴 (조각 B 리뷰) 6학년 오독이 걷히자 **원래 못 읽던 요건**이 ✓ 로 드러났다(인송문화재단 @한국외대 — 4학년·글로벌캠퍼스에 ✓).
+     캠퍼스는 내 캠퍼스와 견주고, 남은 학기·다음 학기 재학은 우리가 모른다. 아래는 실제 공고 문장이다. */
+  const insong = '2026학년도 현재 정규학기 서울캠퍼스 재학생으로 학교에서 1 개 이상 학기를 이수하였으며, 졸업까지 2 개 이상의 학기가 남아있는 학생 (현재 졸업학기생 지원불가)';
+  eq('「… 졸업까지 2 개 이상의 학기가 남아있는 학생」은 4학년에게 ✓ 가 아니다', mark(insong, { year: 4 }), null);
+  eq('  「2027-1학기에도 재학 필수」도 ✓ 가 아니다', mark('2026-2학기 현재 재학생 2027-1학기에도 재학 필수'), null);
+  eq('  「… 재학 권고」는 요구가 아니라 그대로 ✓', mark('2026-2학기 현재 재학생 2027-1학기에도 재학 권고'), 'ok');
+  eq('  「서울캠퍼스 재학생」— 글로벌캠퍼스 학생에게 ✓ 가 아니다 · 서울캠퍼스 학생은 ✓',
+    [mark('2026-2학기 서울캠퍼스 재학생', { campus: '글로벌캠퍼스(용인)' }), mark('2026-2학기 서울캠퍼스 재학생', { campus: '서울캠퍼스' }), mark('2026-2학기 서울캠퍼스 재학생', { campus: '' })],
+    [null, 'ok', null]);
+  eq('  괄호 속 지명도 내 캠퍼스 이름이다 (「글로벌캠퍼스(용인)」↔「용인캠퍼스」)', mark('용인캠퍼스 재학생', { campus: '글로벌캠퍼스(용인)' }), 'ok');
   eq('  「휴학생은 신청 가능, 수료생은 신청 불가」에서 휴학생은 금지가 아니다',
     (PRq.parseLine('휴학생은 신청 가능, 수료생은 신청 불가', false).conds.find((c) => c.kind === 'status') || {}).anyOf, ['휴학']);
   eq('  「학적 제한 없음」은 부정이 아니다', (PRq.parseLine('휴학생 포함 학적 제한 없음', false).conds.find((c) => c.kind === 'status') || {}).not, undefined);

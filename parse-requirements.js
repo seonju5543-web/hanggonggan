@@ -109,13 +109,67 @@ function parseCredits(t) {
 }
 
 /* ── 학년 ── `2학년 이상` `1학년` `신입생` */
+/* 🔴 **연도는 학년이 아니다** (2026-10-11 · 카드 분석 조각 B). `2026학년도 2학기 정규학기 재학생` 의
+   끝자리를 집어 '6학년' 조건을 만들었다 — 확신이 낮아 ✕ 는 안 냈지만 줄 전체가 '모름'이 되어,
+   재학·구간·성적이 다 맞는 학생에게도 표시가 없었다(실측 26줄 · 22건). 숫자 바로 뒤의 숫자는
+   학년이 아니다(`2026학년도`·`'26학년도`·`2026학년 신입생`). */
+const YEAR_NUM = /(?<!\d)(\d)\s*학년\s*(이상|이하|만)?/;
+const YEAR_NUM_ALL = /(?<!\d)\d\s*학년/g;
+/* 🔴 **예외 괄호는 요건이 아니라 면제다** (2026-10-11 · 조각 B).
+   `평점평균 2.0 이상인 자 (단, 신입생·편입생 성적제한 없음)` 의 `신입생` 을 집어 '1학년' 조건을
+   만들었다 — 3학년 학생은 성적·학점이 다 맞아도 그 줄이 '모름'이었다. 괄호가 말하는 것은
+   '신입생은 성적을 안 본다'이지 '신입생만 된다'가 아니다. 그래서 학년은 **괄호를 걷어 낸 본문**에서만 읽는다.
+   ⚠️ 걷어 낸 괄호에 학년 이야기가 있었으면 남은 조건의 확신을 **낮춘다** —
+      `3학년 이상 (… 3학년 1학기 진학 예정자 포함)` 은 2학년에게도 열려 있다. 괄호를 걷었다고
+      확신이 올라가면 틀린 미달이 생긴다(틀린 미달은 못 받는 것보다 나쁘다).
+   ⚠️ 학년 축에만 쓴다 — 성적·학점은 본문 그대로 읽는다(예외 괄호는 거기서 이미 확신을 낮춘다). */
+const YEAR_EXCEPT_PAREN = /[(（][^()（）]*(?:단\s*[,，]|다만|예외|무관|제외|없음|미적용|해당\s?없|포함|불문|관계\s?없)[^()（）]*[)）]/g;
+/* 🔴 **걷어 낸 괄호에 숫자 학년이 있으면 그 학년을 버리지 않는다** (2026-10-11 · 조각 B 리뷰).
+   `재학생(2학년 이상, 휴학생 제외)` 은 괄호 안 `제외` 때문에 괄호째 걷혀 학년 조건이 **사라졌다** —
+   1학년에게 ✓(틀린 안심). 그럴 때는 원문 전체로 읽되 확신을 낮춘다(✓ 도 ✕ 도 아닌 '모름'이 된다).
+   `(단, 신입생·편입생 성적제한 없음)` 처럼 숫자 학년이 없는 괄호는 지금처럼 학년 조건을 안 만든다. */
+const YEAR_NUM_IN_PAREN = /(?<!\d)\d\s*학년/;
+/* 🔴 **앞으로 올 학년도의 학년은 지금 학년과 다르다** (2026-10-11 · 조각 B 리뷰).
+   `2027학년도 1학기 기준 2학년 이상 재학생` 의 `2학년` 은 **그때** 학년이다. 프로필 학년은 **지금** 학년이고
+   앱에는 학년을 올리는 장치가 없다 — 그대로 견주면 내년에 2학년이 될 지금의 1학년이 틀린 미달이 된다.
+   그래서 줄에 적힌 학년도가 지금 학년도보다 뒤면 확신을 낮추고 몇 해 뒤인지(`ahead`)를 적는다
+   (판정은 match-engine judgeCond 'year' — 지금 학년으로 이미 넘으면 ✓, 아니면 '모름').
+   ⚠️ 지금 학년도는 **부를 때마다** 센다 — 3월 전이면 작년 학년도다(PWA 는 며칠씩 떠 있다 · todayStart 와 같은 이유).
+   같은 학년도(`2026학년도 2학기 … 2학년 이상`)는 지금 학년 그대로라 확신을 낮추지 않는다. */
+const AY_MENTION = /(?<!\d)(?:(20\d{2})|['’‘](\d{2}))\s*(?:학년도|년도?\s*[12]\s*학기|[-.]\s*[12]\s*학기)/g;
+function academicYearNow() {
+  const d = new Date();
+  return d.getMonth() < 2 ? d.getFullYear() - 1 : d.getFullYear();   // 1·2월은 아직 작년 학년도
+}
+function yearsAhead(t) {
+  let top = 0;
+  for (const m of String(t).matchAll(AY_MENTION)) {
+    const y = m[1] ? Number(m[1]) : 2000 + Number(m[2]);
+    if (y > top) top = y;
+  }
+  return top ? Math.max(0, top - academicYearNow()) : 0;
+}
 function parseYear(t) {
+  const dropped = [];
+  const body = String(t).replace(YEAR_EXCEPT_PAREN, (x) => { dropped.push(x); return ' '; });
+  const soften = dropped.some((x) => /학년|신입|편입|재입학/.test(x));
+  let r = parseYearBody(body);
+  if (!r && dropped.some((x) => YEAR_NUM_IN_PAREN.test(x))) {
+    r = parseYearBody(String(t));
+    if (r) r.conf = LOW;
+  }
+  if (r && soften) r.conf = LOW;
+  const ahead = r ? yearsAhead(t) : 0;
+  if (r && ahead) { r.conf = LOW; r.ahead = ahead; }
+  return r;
+}
+function parseYearBody(t) {
   if (/신입생/.test(t) && !/신\s*[·,\/]\s*편입생/.test(t)) return { kind: 'year', eq: 1, conf: LOW };
-  const m = t.match(/(\d)\s*학년\s*(이상|이하|만)?/);
+  const m = t.match(YEAR_NUM);
   if (!m) return null;
   const v = num(m[1]);
   if (v == null || v < 1 || v > 6) return null;
-  const many = (t.match(/\d\s*학년/g) || []).length > 1;   // `1학년 또는 2학년` — 범위라 단정 불가
+  const many = (t.match(YEAR_NUM_ALL) || []).length > 1;   // `1학년 또는 2학년` — 범위라 단정 불가
   if (m[2] === '이상') return { kind: 'year', min: v, conf: many ? LOW : HIGH };
   if (m[2] === '이하') return { kind: 'year', max: v, conf: many ? LOW : HIGH };
   return { kind: 'year', eq: v, conf: LOW };   // `2학년 학생` — 딱 그 학년인지 이상인지 애매
@@ -919,10 +973,34 @@ function achieveAnswered(t, p) {
    우리가 아는 것(구간)으로 판정할 수 있는 줄까지 '모른다'가 된다.
    (2026-08-30 코드 리뷰에서 잡았다 — 지금 데이터에는 아직 없지만 들어오면 바로 물린다.) */
 const INCOME_ATTR = /(취약\s?계층|저소득|사회적\s?배려|가정\s?형편|생계|수급자)/;
+/* 🔴 **남은 학기·다음 학기 재학·졸업학기는 우리가 모른다** (2026-10-11 · 조각 B 리뷰).
+   인송문화재단 「… 졸업까지 2개 이상의 학기가 남아있는 학생 (현재 졸업학기생 지원불가)」·
+   「2026-2학기 현재 재학생 2027-1학기에도 재학 필수」 가 '재학' 하나가 맞아 4학년에게 ✓ 였다(틀린 안심).
+   프로필은 학년만 알고 몇 학기가 남았는지·다음 학기에 다닐지는 모른다. */
+const TERM_ATTR = /졸업까지[^.,()]{0,15}학기|학기가\s*남|학기\s*이상\s*남|잔여\s*학기|학기에도\s*재학(?!\s*권고)|졸업\s?학기생/;
+/* 🔴 **줄이 캠퍼스를 말하면 내 캠퍼스와 견준다** (같은 리뷰). `서울캠퍼스 재학생` 이 글로벌캠퍼스 학생에게 ✓ 였다.
+   프로필 캠퍼스(`글로벌캠퍼스(용인)` — 괄호 속 지명도 이름이다)가 줄의 캠퍼스와 맞을 때만 확인한 것으로 본다.
+   제외 줄은 반대다 — 내 캠퍼스가 걸리면 ✓ 가 아니다. 캠퍼스를 모르면 둘 다 모른다.
+   `양 캠퍼스`·`캠퍼스 무관` 은 요구가 아니다 · 예외 괄호(`(신촌 및 국제캠퍼스 제외)`) 속 이름은 요구가 아니다. */
+const CAMPUS_NAME = /([가-힣A-Za-z]{1,8})\s?캠퍼스/g;
+function campusUnasked(t, cs, p) {
+  if (/캠퍼스\s*(?:무관|구분\s?없|관계\s?없|모두|공통)/.test(t)) return false;
+  const named = [...t.replace(YEAR_EXCEPT_PAREN, ' ').matchAll(CAMPUS_NAME)].map((m) => m[1]).filter((n) => !/^(?:양|전|각|모든|전체|통합|본교|우리)$/.test(n));
+  if (!named.length) return false;
+  const raw = String((p && p.campus) || '');
+  const mine = [raw.replace(/[(（].*$/, ''), (raw.match(/[(（]([^)）]+)[)）]/) || [])[1] || '']
+    .map((x) => x.replace(/\s|캠퍼스/g, '')).filter(Boolean);
+  if (!mine.length) return true;
+  const hit = named.some((n) => mine.some((m) => n.includes(m) || m.includes(n)));
+  const isEx = cs.length > 0 && cs.every((c) => c.exclude);
+  return isEx ? hit : !hit;
+}
 function unaskedAttr(text, conds, p) {
   const t = String(text || '');
   const cs = conds || [];
   const has = (k) => cs.some((c) => c.kind === k);
+  if (TERM_ATTR.test(t)) return true;
+  if (campusUnasked(t, cs, p)) return true;
   /* `경력 무관`·`수상 여부 무관` 은 묻는 것이 아니다(2026-09-17 코드 리뷰) */
   if (ACHIEVE_ATTR.test(t) && !/(무관|불문|관계\s?없)/.test(t)) return !achieveAnswered(t, p);
   if (INCOME_ATTR.test(t) && (has('bracket') || has('flags'))) return false;
@@ -958,7 +1036,10 @@ function parseLine(line, isExclude) {
   push(parseStatus(t, isExclude)); push(parseFlags(t)); push(parseTrait(t, isExclude)); push(parseNationality(t));
   push(parseAge(t)); push(parseResidence(t)); push(parseSchool(t)); push(parseMajor(t));
   push(parseDegree(t, isExclude)); push(parseOpen(t, isExclude));
-  if (isExclude) conds.forEach((c) => { c.exclude = true; });
+  /* 🔴 제외 줄의 학년은 **확신을 낮춘다** (2026-10-11 · 조각 B 리뷰). 제외 줄은 조건이 모두 맞아야 걸린다 —
+     `3학년 이상 학생 중 이미 수혜받은 자` 에서 학년 하나만 보고 3학년을 ✕ 로 두면, 받은 적 없는 3학년이
+     틀린 미달이 된다(나머지 절은 우리가 못 읽는다). 뜻 뒤집기는 judgeCond 'year' 가 한다. */
+  if (isExclude) conds.forEach((c) => { c.exclude = true; if (c.kind === 'year') c.conf = LOW; });
   return { conds, multiProgram: MULTI_PROGRAM.test(t) };
 }
 
