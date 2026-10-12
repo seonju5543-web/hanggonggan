@@ -12169,7 +12169,16 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
   eq('  꼬리표의 「소재 대학」이 학교 위치 요건으로 읽히지 않는다 (읽히면 모든 줄이 모름이 된다)', PR2b.parseLine(gLine, false).conds.map((c) => c.kind), ['grade']);
   eq('  묻지 않은 처지 검사에도 꼬리표가 남지 않는다', PR2b.unaskedAttr('〔대전 소재 대학〕 2026-2학기 재학생', PR2b.parseLine('〔대전 소재 대학〕 2026-2학기 재학생', false).conds, dj), false);
   eq('  대전 학생 카드는 미달 아님 · 서울 학생은 두 갈래 모두 거주로 미달', [ME2.fitDetail(two, dj).fails.length, ME2.fitDetail(two, { ...dj, region: '서울', parentRegion: '서울' }).fails.length], [0, 2]);
-  eq('  「관내 대학」 같은 요건 줄은 갈래 이름이 아니다 (넓히면 요건이 사라진다)', ME2.requirementLines({ eligibilityLines: ['관내 대학 재학생', '대전 소재 대학생'] }, null, { all: true }), ['관내 대학 재학생']);
+  /* 🔴 리뷰(2026-10-12)가 잡은 것 — 첫 판은 `대전 소재 대학생`(요건 줄)까지 갈래 이름으로 삼켜 카드에서 지웠다 */
+  eq('  「관내 대학 재학생」·「대전 소재 대학생」·「서울 소재 대학교 재학생」은 요건 줄이라 그대로 보인다 (갈래 이름이 아니다)',
+    ME2.requirementLines({ eligibilityLines: ['관내 대학 재학생', '대전 소재 대학생', '서울 소재 대학교 재학생'] }, null, { all: true }), ['관내 대학 재학생', '대전 소재 대학생', '서울 소재 대학교 재학생']);
+  eq('  「대전 소재 대학」도 다음 줄이 번호 항목이 아니면 갈래 이름이 아니다',
+    ME2.requirementLines({ eligibilityLines: ['대전 소재 대학', '직전학기 평점 3.0 이상인 재학생'] }, null, { all: true }), ['직전학기 평점 3.0 이상인 재학생']);
+  eq('  갈래 아래 「(○○장학금) …」 묶음 표식은 꼬리표가 붙어도 여전히 묶음이다 (미달을 안 낸다)',
+    ME2.fitDetail({ type: '교외', eligibility: { selective: true }, eligibilityLines: ['대전 소재 대학', '① (성취장학금) 직전학기 평점 3.0 이상인 재학생', '② (희망장학금) 기초생활수급자인 재학생'] }, { ...dj, gpa: 2.0 }).fails, []);
+  eq('  요건 낱말이 든 금액 줄(「소득 8구간 이하: 100만원」)은 자격 블록에 남긴다 · 건너뛴 금액 줄도 상한에 센다',
+    [EX2.extractQualifyLines('1. 신청자격\n가. 재학생\n소득 8구간 이하: 100만원\n- 장학 금액 : 200 만원').includes('소득 8구간 이하: 100만원'), /skippedAmt < 14/.test(readText(new URL('../collector/extract-excerpts.mjs', import.meta.url)))], [true, true]);
+  eq('  제목 괄호의 「(대상 : 서울시민)」도 읽는다', EX2.qualFromTitle({ name: '장학생 모집(대상 : 서울시민)' }), ['서울시민']);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

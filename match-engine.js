@@ -19,7 +19,7 @@ const PR = (typeof module !== 'undefined' && module.exports)
   /* 🔴 브라우저에서는 **전역 함수**로 쓴다 — 여기에 이름을 빠뜨리면 Node 검사는 전부
      통과하는데 앱은 첫 카드에서 죽는다. `headRest`(section-head)에 이어 `caseBranch`도
      같은 실수를 했다(2026-08-24). 아래 회귀가 브라우저 순서로 실어 실제로 불러 본다. */
-  : { parseLine, parseDegree, gradOnly, gradTarget, mentionsUndergrad, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, REGIONS, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM, TRAIT_PAT, provincesOfCity };
+  : { parseLine, parseDegree, gradOnly, gradTarget, mentionsUndergrad, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, untag, REGIONS, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM, TRAIT_PAT, provincesOfCity };
 const PR2 = PR;   // requirementLines가 쓰는 별칭 (선언 순서 때문에 이름만 따로 둔다)
 /* 시·도 이름은 parse-requirements 가 갖고 있다 — 여기 베끼면 두 벌이 된다 */
 const PR_REGIONS = PR.REGIONS || [];
@@ -643,7 +643,7 @@ function noticeCtx(sch) {
     for (const c of PR.parseLine(it.text, false).conds) if (c.kind === 'bracket') brackets.add(c.max);
   }
   /* 여러 장학금이 묶인 공고 — 하나에 미달해도 다른 것에 지원한다(설계 조건 ⑧) */
-  const multi = items.some((it) => PR.MULTI_PROGRAM.test(it.text));
+  const multi = items.some((it) => PR.MULTI_PROGRAM.test(PR.untag(it.text)));
   /* 🔴 **공고 어딘가에 학부가 대상이라고 적혀 있으면** 다른 줄의 대학원 표현으로 미달을 내지
      않는다 (2026-09-12 · 핵심-4). 대상을 여러 줄에 나눠 적는 공고가 있다:
        `4년제 대학 재학생` / `대학원 석·박사 과정 재학생`  ← 둘 중 하나면 된다는 뜻이다.
@@ -695,7 +695,7 @@ function fitDetail(sch, p) {
     ...requirementLines(sch, lines, { onlyExclude: true }),
   ])];
   /* 여러 장학금이 묶인 공고는 0%를 내지 않는다(설계 조건 ⑧) — 하나에 미달해도 다른 것에 지원한다 */
-  const multi = items.some((it) => PR.MULTI_PROGRAM.test(it.text));
+  const multi = items.some((it) => PR.MULTI_PROGRAM.test(PR.untag(it.text)));
 
   const ctx = noticeCtx(sch);
 
@@ -1243,8 +1243,11 @@ const isTableCell = (t) => BARE_CELL.test(t) && !REAL_CATEGORY.test(t);
    두 갈래 아래 ①②③을 따로 적는다. 갈래 이름 줄은 요건 신호가 없어 버려지고, 두 갈래의 ①②③이 한 목록에 섞여
    `본인이 … 대전에 주소` 와 `본인 또는 부모가 … 대전에 주소` 가 나란히 보였다. 이름 줄은 그대로 안 보이되 그 아래 줄 앞에
    〔갈래〕 를 붙인다 — 판정은 parse-requirements 가 꼬리표를 떼고 본다(BRANCH_TAG · untag). 절이 바뀌거나 다른 갈래를 만나면 끝난다.
-   ⚠️ 좁게 잡는다 — `○○ 소재 대학(교·생)` 꼴만. 넓히면 `관내 대학` 같은 요건 줄이 꼬리표가 되어 사라진다. */
-const BRANCH_LABEL = /^[(（]?\s*[가-힣·]{2,8}\s?소재\s?(?:대학교?|대학생|전문대학?)\s*[)）]?\s*[:：]?$/;
+   ⚠️ 좁게 잡는다 — `○○ 소재 대학(교)` 꼴이고 **바로 다음 줄이 번호 항목**(①·가.·1))일 때만. 리뷰(2026-10-12)가 잡았다:
+      `대전 소재 대학생`·`서울 소재 대학교`·`충청북도 소재 전문대학` 은 그 자체가 요건 줄인데 첫 판은 이것까지 삼켜 카드에서 지웠다.
+      `대학생`·`전문대학` 은 빼고, 다음 줄 조건으로 '목록의 제목'임을 확인한다. */
+const BRANCH_LABEL = /^[(（]?\s*[가-힣·]{2,8}\s?소재\s?대학교?\s*[)）]?\s*[:：]?$/;
+const ENUM_START = /^\s*(?:[①-⑳]|[가-하]\s*[.)]|\d+\s*[.)]|[-·•]\s)/;
 function requirementLines(sch, lines, opts) {
   const keepPriority = !!(opts && opts.keepPriority);   // '먼저 뽑는 기준' 블록을 그릴 때만 참
   /* `loose` — '제외 대상'·'먼저 뽑는 기준' 블록을 그릴 때만 참.
@@ -1279,7 +1282,8 @@ function requirementLines(sch, lines, opts) {
   let anyLeft = 0, anyGroup = 0;   // 선택지 묶음 — 몇 줄 남았나 / 몇 번째 묶음인가 (위 주석)
   const meta = [];                 // out과 같은 순서로 각 줄의 묶음 번호
   let caseRun = false, caseGroup = 0;   // 연달아 오는 '경우별 분기'를 한 묶음으로 (아래 주석)
-  for (const l of joined) {
+  for (let li = 0; li < joined.length; li += 1) {
+    const l = joined[li];
     let t = tidyRequirement(l);
     const head = SH.sectionOf(l) || SH.sectionOf(t);
     /* 🔴 `※ 신청불가자: …` 같은 **곁말**은 절을 바꾸지 않는다 (2026-08-24 전수 조사).
@@ -1302,7 +1306,7 @@ function requirementLines(sch, lines, opts) {
       t = tidyRequirement(rest);
     }
     /* 갈래 이름 줄(`대전 소재 대학`) — 안 보이되 아래 줄에 〔갈래〕 로 남긴다 (위 BRANCH_LABEL 주석 · 자격 블록만) */
-    if (!loose && BRANCH_LABEL.test(t)) {
+    if (!loose && BRANCH_LABEL.test(t) && ENUM_START.test(joined[li + 1] || '')) {
       branch = t.replace(/^[(（]\s*|\s*[)）]\s*[:：]?$|\s*[:：]$/g, '').trim();
       continue;
     }

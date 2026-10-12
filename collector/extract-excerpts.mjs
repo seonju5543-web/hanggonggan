@@ -103,6 +103,7 @@ const QUALIFY_HEAD = /(신청\s?자격|지원\s?자격|응모\s?자격|자격\s?
    ⚠️ **줄 머리 + 콜론**일 때만이다 — 본문 가운데의 `대상` 은 여전히 아니다(위 주석의 '자격증 이름' 함정과 같은 이유). */
 /* 금액만 적힌 줄 — `- 장학 금액 : 200 만원 / 인 ( 생활비지원 )` · `○ 선발규모: 60,000천원` · `1학년 100만원` (조각 2 · blockFrom 이 건너뛴다).
    ⚠️ `등록금 실납부액 300 만원 이상인 학생` 처럼 금액 뒤에 조건 문장이 이어지는 줄은 요건이라 걸리지 않는다(끝이 금액·단위·괄호여야 한다). */
+const AMOUNT_ROW_KEEP = /구간|분위|수급|차상위|한부모|다자녀|장애|재학|학년|성적|평점|거주|출신/;
 const AMOUNT_ROW = /^[^:：]{0,16}[:：]\s*(?:1\s?인(?:당)?\s*)?[\d,.]+\s*(?:만\s?원|천\s?원|원)(?:\s*[\/·]\s*(?:인|학기|년|월|회))?(?:\s*[(（][^)）]*[)）])?\s*$|^[가-힣\d\s~·]{2,12}\s[\d,.]+\s*(?:만\s?원|천\s?원)\s*$/;
 /* 자격 블록의 끝 — **확실한 다음 절**에서만 끊는다.
    예전엔 '장학금액' 같은 낱말에서도 끊었는데, 자격이 표로 적힌 공고에서는 그게
@@ -586,7 +587,8 @@ function extractQualifyLines(text, opts = {}) {
      `2) 경제적 기준` 아래의 **기초생활수급자/차상위** 요건이 통째로 잘렸다 —
      수급자가 아닌 학생이 자기가 된다고 오해하게 되는, 잡음보다 나쁜 실패다.
      화면 쪽에서 잡음을 걸러내고 5줄로 줄이므로 여기서는 넉넉히 담아 두는 편이 맞다. */
-  for (let i = start; i < lines.length && out.length < 14; i += 1) {
+  let skippedAmt = 0;   // 건너뛴 금액 줄 — 상한에 그대로 센다(리뷰: 안 세면 그 자리에 꼬리 잡음이 한 줄 더 들어온다)
+  for (let i = start; i < lines.length && out.length + skippedAmt < 14; i += 1) {
     const l = lines[i];
     /* 🔴 표 머리글 칸은 **다음 절 판정보다 먼저** 걸러낸다 (2026-08-20 전수 읽기에서 발견).
        광운 국가고시장학금은 `장학금명|신청자격|장학금액|장학금지급기간` 표인데, 자격 절
@@ -640,7 +642,8 @@ function extractQualifyLines(text, opts = {}) {
        유흥수처럼 금액 줄 뒤에 진짜 요건이 이어지는 공고가 있다.
        ⚠️ 자리는 **다음 절 판정(NEXT_SECTION·번호 단계) 뒤**다 — 앞에 두면 `3. 장학금액 :` 같은 절 머리글을 끊지 않고 건너뛰어
           그 뒤 지급 내용·신청기간까지 자격 블록에 담긴다(첫 시험에서 실제로 그랬다 · 되돌리면 전후 대조에 12줄이 는다). */
-    if (shAmount(l) || AMOUNT_ROW.test(l)) continue;
+    /* ⚠️ `소득 8구간 이하: 100만원`·`기초생활수급자 200만원` 처럼 요건 낱말이 든 줄은 금액표여도 요건을 말하므로 남긴다(리뷰 — 화면과 같은 판정) */
+    if ((shAmount(l) || AMOUNT_ROW.test(l)) && !AMOUNT_ROW_KEEP.test(l)) { skippedAmt += 1; continue; }
     if (TABLE_NOISE.test(l.replace(/\s+/g, ' ').trim())) continue;   // 표 머리글·표 값
     if (l.length < 4 || l.length > 200) continue;
     if (!/[0-9가-힣]/.test(l)) continue;
@@ -885,7 +888,8 @@ function qualFromTitle(it) {
   const m = String(it.name || it.title || '').match(/[(（]\s*(?:지원|신청|모집|선발)?\s?대상\s*[:：]\s*([^()（）]{4,80}?)\s*[)）]/);
   if (!m) return [];
   const line = m[1].trim();
-  return REQ_SIGNAL.test(line.replace(/\S*증명서/g, '')) ? [line] : [];
+  /* `(대상 : 서울시민)` 의 시민·도민도 요건이다(리뷰) — REQ_SIGNAL 엔 없다 */
+  return (REQ_SIGNAL.test(line.replace(/\S*증명서/g, '')) || /(?:시|도|구|군)민/.test(line)) ? [line] : [];
 }
 
 function qualFromDocs(it) {
