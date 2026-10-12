@@ -692,21 +692,7 @@
    "status": "resolved",
    "resolvedUrl": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjElMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D"
   },
-  "r:auto-notiphpcodes1301seq11120": {
-   "lastWhy": "목록 화면(다른 공고 제목이 여럿 보임)",
-   "lastTried": "2026-10-03",
-   "attempts": 1,
-   "nextTryAt": "2026-10-04",
-   "status": ""
-  },
   "r:auto-notiphpcodes1301seq11234": {
-   "lastWhy": "목록에서 못 찾음",
-   "lastTried": "2026-10-03",
-   "attempts": 1,
-   "nextTryAt": "2026-10-04",
-   "status": ""
-  },
-  "r:auto-notiphpcodes1301seq11207": {
    "lastWhy": "목록에서 못 찾음",
    "lastTried": "2026-10-03",
    "attempts": 1,
