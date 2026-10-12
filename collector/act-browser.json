@@ -53,15 +53,6 @@
   "excludes": [],
   "from": "공고문 첨부(OCR)"
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3517342": {
-  "at": "2026-10-04",
-  "tries": 1,
-  "lines": [
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
  "https://www.mois.go.kr/frt/bbs/type010/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000008&nttId=129837": {
   "at": "2026-10-04",
   "tries": 1,
@@ -180,18 +171,6 @@
   ],
   "from": "브라우저 본문"
  },
- "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179225": {
-  "at": "2026-10-05",
-  "tries": 1,
-  "lines": [
-   "신청대상 : ○ 초기 스타트업 대표 및 임직원",
-   "○ 재무관리 역량을 강화하고자 하는 예비·초기 창업자",
-   "신청 시 요청하는 정보(개인정보포함)는 사업운영기관에서 관리되오니 이점 반드시 유의하여 주시기 바랍니다.",
-   "대상연령 : 전체"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
  "https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.ulsan?bbsId=BBS_0000000000000309&mId=008001002000000000&dataId=60581": {
   "at": "2026-10-06",
   "tries": 1,
@@ -202,39 +181,12 @@
   "excludes": [],
   "from": "브라우저 본문"
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3520568": {
-  "at": "2026-10-06",
-  "tries": 1,
-  "lines": [
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3520570": {
-  "at": "2026-10-06",
-  "tries": 1,
-  "lines": [
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/520732": {
   "at": "2026-10-06",
   "tries": 1,
   "lines": [
    "장애학생지원",
    "장애인 복지시설"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3527998": {
-  "at": "2026-10-06",
-  "tries": 1,
-  "lines": [
-   "봉사자유형 : 성인"
   ],
   "excludes": [],
   "from": "브라우저 본문"
@@ -310,14 +262,6 @@
   "at": "2026-10-11",
   "tries": 1
  },
- "https://www.youthcenter.go.kr/bbs03View/48/10794": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://www.youthcenter.go.kr/bbs03View/48/10792": {
-  "at": "2026-10-11",
-  "tries": 1
- },
  "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000": {
   "at": "2026-10-11",
   "tries": 1
@@ -331,10 +275,6 @@
   "tries": 1
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/268735/artclView.do": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://www.k-startup.go.kr/web/contents/webNOTICE_MATR.do?page=1&viewCount=18&id=176443&schBdcode=&schGroupCode=&schM=view": {
   "at": "2026-10-11",
   "tries": 1
  },
@@ -396,6 +336,30 @@
  },
  "https://www.bai.go.kr/bai/etc/popupzone/detail?ppId=120": {
   "at": "2026-10-11",
+  "tries": 1
+ },
+ "https://www.k-startup.go.kr/web/contents/webNOTICE_MATR.do?page=1&viewCount=18&id=176455&schBdcode=&schGroupCode=&schM=view": {
+  "at": "2026-10-12",
+  "tries": 1
+ },
+ "https://asanmirae.or.kr:449/main/index.php?m_cd=17&b_id=20260804102775189": {
+  "at": "2026-10-12",
+  "tries": 1
+ },
+ "https://www.msit.go.kr/bbs/view.do?sCode=user&mId=307&mPid=208&bbsSeqNo=94&nttSeqNo=3187433": {
+  "at": "2026-10-12",
+  "tries": 1
+ },
+ "https://www.rda.go.kr/board/board.do?mode=view&prgId=nei_ancmttEntry&dataNo=100000812622": {
+  "at": "2026-10-12",
+  "tries": 1
+ },
+ "https://www.xn--ob0bv3xdjilia71ica881v.com/": {
+  "at": "2026-10-12",
+  "tries": 1
+ },
+ "https://answer.moaform.com/answers/M1GLjZ": {
+  "at": "2026-10-12",
   "tries": 1
  }
 }
