@@ -525,7 +525,7 @@ async function checkCandBoard(q) {
   bumpHost(host);
   const tries = prevTries(c.cid) + 1;
   const retry = (why) => (tries >= MAX_TRIES ? { status: 'rejected', why: `${why} — ${tries}번째라 그만 봅니다`, checks: {} } : { status: 'pending', why, checks: {} });
-  if (b.error || !b.html || Number(b.status || 0) >= 400) return { res: retry(`게시판을 못 엶(${b.error ? short(b.error, 60) : `HTTP ${b.status}`})`) };
+  if (b.error || !b.html || Number(b.status || 0) >= 400) return { res: retry(`게시판을 못 엶(${b.error ? short(b.error, 60) : `응답 ${b.status}`})`) };
   const rows = extractDatedRows(b.html, b.finalUrl || c.board).map((r) => ({ ...r, url: normCandUrl(r.url) }))
     .filter((r) => hostAllowed(r.url, q.target.allowed) && linkShape(r.url) === 'page');
   let pick = null;

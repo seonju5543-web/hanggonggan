@@ -12181,5 +12181,97 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
   eq('  제목 괄호의 「(대상 : 서울시민)」도 읽는다', EX2.qualFromTitle({ name: '장학생 모집(대상 : 서울시민)' }), ['서울시민']);
 }
 
+/* ■ 신청서 원본 → PDF (2026-10-12 개발자 지시 "스키마화가 아니라 원본 그대로 · PDF 로 통일")
+   로봇 collector/form-pdf.mjs 는 공고 첨부의 신청서 원본을 글자 하나 안 바꾸고 PDF 로만 바꾼다.
+   관문은 순수 함수(대상 고르기 · 쪽 세기 · 지우기)와 임시 저장소에서의 한 바퀴(pdf 복사)를 재고, 워크플로 글자를 본다.
+   🔴 FORM_PDF_AS_LIB=1 이 아니면 불러오는 순간 본편이 돈다. */
+{
+  console.log('■ 신청서 원본 → PDF — 원본 그대로 · 마감 전만 · 조용히 0건이 되지 않는다 (2026-10-12)');
+  process.env.FORM_PDF_AS_LIB = '1';
+  const FP = await import('../collector/form-pdf.mjs').catch(() => ({}));
+  const os = await import('node:os');
+  const pdfBytes = (f) => { const fd = fs.openSync(f, 'r'); const b = Buffer.alloc(fs.fstatSync(fd).size); fs.readSync(fd, b, 0, b.length, 0); fs.closeSync(fd); return b; };
+  const isApp = (a) => /신청서|지원서|원서/.test((a && a.name) || '') && /\.(hwp|hwpx|docx?|zip)/i.test((a && a.name) || '');
+  eq('① 색인 줄 「파일\\t제목\\t첨부\\t크기」를 읽고 깨진 줄은 버린다',
+    FP.parseFormsIndex ? FP.parseFormsIndex('form-a-1.hwp\t효림 장학생 선발\t신청서.hwp\t1234\n깨진줄\n\nform-b-1.pdf\t우양 동행\t지원서.pdf\t9') : null,
+    [{ file: 'form-a-1.hwp', title: '효림 장학생 선발', attach: '신청서.hwp', bytes: 1234 }, { file: 'form-b-1.pdf', title: '우양 동행', attach: '지원서.pdf', bytes: 9 }]);
+  eq('② 마감 전 판정 — 마감 모름은 둔다 · 오늘 마감은 아직 · 어제는 지남',
+    FP.isOpen ? [FP.isOpen({}, '2026-10-12'), FP.isOpen({ deadline: '2026-10-12' }, '2026-10-12'), FP.isOpen({ deadline: '2026-10-11' }, '2026-10-12')] : null, [true, true, false]);
+  const rows = [{ file: 'form-x-1.hwp', title: '[교외] 2026년 효림장학재단 장학생 선발 안내', attach: '장학생 신청서.hwp', bytes: 10 },
+    { file: 'form-y-1.docx', title: '다른 공고', attach: '지원서.docx', bytes: 10 }];
+  const items = [
+    { id: 'open1', name: '2026년 효림장학재단 장학생 선발 안내', boardTitle: '[교외] 2026년 효림장학재단 장학생 선발 안내', deadline: '2026-12-01', attachments: [{ name: '장학생 신청서.hwp' }, { name: '공고문.pdf' }, { name: '결과보고서 양식.hwp' }] },
+    { id: 'open2', name: '다른 제목', deadline: '2026-12-01', attachments: [{ name: '지원서.docx' }] },
+    { id: 'closed', name: '지난 공고', deadline: '2026-01-01', attachments: [{ name: '장학생 신청서.hwp' }] },
+    { id: 'zip', name: '묶음', deadline: '2026-12-01', attachments: [{ name: '신청서.zip' }] },
+    { id: 'prog', name: '상시', program: true, attachments: [{ name: '장학생 신청서.hwp' }] },
+  ];
+  const picked = FP.pickFormTargets ? FP.pickFormTargets(items, rows, { today: '2026-10-12', isApplicationForm: isApp }) : { targets: [], missing: [] };
+  eq('③ 대상은 마감 전 공고의 신청서 첨부만 — 공고문·결과보고서 양식·zip·상시 제도·마감 지남은 아니다 · 원본은 첨부 이름 + 같은 제목으로 찾는다',
+    picked.targets.map((t) => [t.id, t.files.map((f) => f.src)]), [['open1', ['form-x-1.hwp']]]);
+  eq('  제목이 다른 색인 줄은 쓰지 않고 「아직 못 받음」으로 센다 (다른 공고의 양식을 붙이지 않는다)', picked.missing, [{ id: 'open2', name: '지원서.docx' }]);
+  const pdf = Buffer.from('%PDF-1.4\n1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n2 0 obj << /Type /Pages /Count 2 /Kids [3 0 R 4 0 R] >> endobj\n3 0 obj << /Type /Page >> endobj\n4 0 obj <</Type/Page>> endobj\n%%EOF', 'latin1');
+  eq('④ 쪽 수는 /Type /Page 만 센다 (/Pages 는 아니다 · 띄어쓰기 없어도)', FP.pdfPages ? FP.pdfPages(pdf) : null, 2);
+  eq('⑤ 파일 이름은 확장자를 떼고 위험한 글자만 바꾼다', FP.safeName ? [FP.safeName('장학생 신청서(2026).hwp'), FP.safeName('')] : null, ['장학생_신청서_2026_', 'form']);
+  /* ⑥ 한 파일 — pdf 는 복사 · 아닌 것은 거절 · 변환기 없으면 이유를 적는다 */
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'formpdf-'));
+  fs.writeFileSync(path.join(tmp, 'a.pdf'), pdf);
+  fs.writeFileSync(path.join(tmp, 'fake.pdf'), '<html>not pdf</html>');
+  fs.writeFileSync(path.join(tmp, 'b.hwp'), 'hwp');
+  const c1 = FP.convertOne ? FP.convertOne(path.join(tmp, 'a.pdf'), path.join(tmp, 'out', 'a.pdf')) : {};
+  const c2 = FP.convertOne ? FP.convertOne(path.join(tmp, 'fake.pdf'), path.join(tmp, 'out', 'f.pdf')) : {};
+  const c3 = FP.convertOne ? FP.convertOne(path.join(tmp, 'none.pdf'), path.join(tmp, 'out', 'n.pdf')) : {};
+  const c4 = FP.convertOne ? FP.convertOne(path.join(tmp, 'b.hwp'), path.join(tmp, 'out', 'b.pdf'), { soffice: path.join(tmp, 'no-such-soffice') }) : {};
+  eq('⑥ pdf 는 바이트 그대로 복사 · 가짜 pdf 와 없는 원본은 거절 · 변환기가 없으면 「변환기 없음」',
+    [c1.ok, c1.pages, fs.existsSync(path.join(tmp, 'out', 'a.pdf')) && pdfBytes(path.join(tmp, 'out', 'a.pdf')).equals(pdf), c2.why, c3.why, /변환기 없음/.test(c4.why || '')],
+    [true, 2, true, 'PDF 가 아님', '원본 파일 없음', true]);
+  /* ⑦ 지우기 — 마감 지난 공고와 색인에 없는 폴더는 지우고 살아 있는 것은 둔다 */
+  const pd = path.join(tmp, 'forms-pdf');
+  for (const d of ['live', 'dead', 'stray']) { fs.mkdirSync(path.join(pd, d), { recursive: true }); fs.writeFileSync(path.join(pd, d, '1-x.pdf'), pdf); }
+  const idx = { items: { live: [{ file: 'live/1-x.pdf' }], dead: [{ file: 'dead/1-x.pdf' }] } };
+  const dropped = FP.prune ? FP.prune(idx, new Set(['live']), pd) : null;
+  eq('⑦ 마감 지난 공고의 폴더·색인은 지우고 색인에 없는 폴더도 지운다 · 살아 있는 것은 둔다',
+    [dropped, Object.keys(idx.items), fs.existsSync(path.join(pd, 'live')), fs.existsSync(path.join(pd, 'dead')), fs.existsSync(path.join(pd, 'stray'))], [['dead'], ['live'], true, false, false]);
+  /* ⑧ 한 바퀴 — 임시 저장소(data.js 는 진짜 것을 복사해 isApplicationForm 을 불러 쓴다) */
+  const fakeRepo = path.join(tmp, 'repo');   // 임시 저장소 — 실데이터를 읽지 않는다(이름을 fakeRepo 로 두면 실데이터 톱니가 센다)
+  fs.mkdirSync(path.join(fakeRepo, 'data'), { recursive: true }); fs.mkdirSync(path.join(fakeRepo, 'collector', 'extracted'), { recursive: true });
+  fs.copyFileSync(new URL('../data.js', import.meta.url), path.join(fakeRepo, 'data.js'));
+  fs.writeFileSync(path.join(fakeRepo, 'data', 'registered.json'), JSON.stringify({ items: [
+    { id: 'r1', name: '우양재단 동행 장학생 모집', deadline: '2026-12-31', attachments: [{ name: '지원서.docx' }] },
+    { id: 'r2', name: '지난 공고', deadline: '2026-01-01', attachments: [{ name: '신청서.hwp' }] }] }));
+  fs.writeFileSync(path.join(fakeRepo, 'collector', 'extracted', 'forms-index.txt'), 'form-r1-1.docx\t우양재단 동행 장학생 모집\t지원서.docx\t100\n');
+  fs.writeFileSync(path.join(fakeRepo, 'collector', 'extracted', 'form-r1-1.docx'), 'docx-bytes');
+  /* 가짜 변환기 — soffice 처럼 --outdir 에 <이름>.pdf 를 둔다 (진짜 LibreOffice 없이 변환 길을 잰다) */
+  const fakeSoffice = path.join(tmp, 'fake-soffice.sh');
+  fs.writeFileSync(fakeSoffice, `#!/bin/sh\nout=""; while [ $# -gt 1 ]; do [ "$1" = "--outdir" ] && out="$2"; shift; done\nsrc="$1"; base=$(basename "$src"); printf '%s' '${pdf.toString('latin1')}' > "$out/\${base%.*}.pdf"\n`);
+  fs.chmodSync(fakeSoffice, 0o755);
+  fs.mkdirSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r2'), { recursive: true }); fs.writeFileSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r2', '1-x.pdf'), pdf);
+  fs.writeFileSync(path.join(fakeRepo, 'data', 'forms-pdf', 'index.json'), JSON.stringify({ updatedAt: '2026-10-01', items: { r2: [{ file: 'r2/1-x.pdf', name: '신청서.pdf' }] } }));
+  const quiet = () => {};
+  const dry = FP.runFormPdf ? FP.runFormPdf({ root: fakeRepo, today: '2026-10-12', dry: true, soffice: fakeSoffice, log: quiet }) : {};
+  eq('⑧ --dry 는 쓰지 않는다 — 지울 것·바꿀 것만 센다', [dry.dropped, fs.existsSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1')), fs.existsSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r2')), fs.existsSync(path.join(fakeRepo, 'collector', 'form-pdf-report.md'))], [['r2'], false, true, false]);
+  const real = FP.runFormPdf ? FP.runFormPdf({ root: fakeRepo, today: '2026-10-12', soffice: fakeSoffice, log: quiet }) : {};
+  const idxText = fs.existsSync(path.join(fakeRepo, 'data', 'forms-pdf', 'index.json')) ? readText(path.join(fakeRepo, 'data', 'forms-pdf', 'index.json')) : '';
+  const idxJ = idxText ? JSON.parse(idxText) : {};
+  eq('  실행은 마감 전 것을 변환기로 PDF 로 두고(바이트 그대로) 마감 지난 폴더를 지우며 색인·리포트를 쓴다 · 색인은 로봇 형식(들여쓰기 1)',
+    [real.done && real.done.map((d) => d.id), real.dropped, fs.existsSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '1-지원서.pdf')) && pdfBytes(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '1-지원서.pdf')).equals(pdf), fs.existsSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r2')),
+      idxJ.items && Object.keys(idxJ.items), idxJ.items && idxJ.items.r1 && idxJ.items.r1[0].from, idxText === JSON.stringify(idxJ, null, 1) + '\n', /이번에 바꿈 1/.test(fs.existsSync(path.join(fakeRepo, 'collector', 'form-pdf-report.md')) ? readText(path.join(fakeRepo, 'collector', 'form-pdf-report.md')) : '')],
+    [['r1'], ['r2'], true, false, ['r1'], '원본 그대로 변환', true, true]);
+  const again = FP.runFormPdf ? FP.runFormPdf({ root: fakeRepo, today: '2026-10-12', soffice: fakeSoffice, log: quiet }) : {};
+  eq('  다시 돌리면 이미 있는 것은 건너뛴다 (같은 파일을 날마다 다시 쓰지 않는다)', [again.done && again.done.length, /이미 있어 건너뜀 1/.test(readText(path.join(fakeRepo, 'collector', 'form-pdf-report.md')))], [0, true]);
+  fs.rmSync(tmp, { recursive: true, force: true });
+  /* ⑨ 워크플로·설치 스크립트 글자 */
+  const wf = readText(new URL('../.github/workflows/deep-fetch.yml', import.meta.url));
+  const step = wf.slice(wf.indexOf('신청서 원본 → PDF (양식 원본 그대로)'), wf.indexOf('git config user.name'));
+  eq('⑨ deep-fetch.yml 의 PDF 단계는 보강 단계(시한 + continue-on-error) · 자바 다리와 확장 설치 · 저장 목록에 data/forms-pdf 와 리포트',
+    [step.length > 0, /timeout-minutes:\s*\d+/.test(step), /continue-on-error: true/.test(step), /libreoffice-java-common/.test(step), /bash collector\/install-h2orestart\.sh/.test(step), /node collector\/form-pdf\.mjs/.test(step),
+      /git add data\/forms-pdf/.test(wf), /git add collector\/form-pdf-report\.md/.test(wf), /\|\| true/.test(step)],
+    [true, true, true, true, true, true, true, true, false]);
+  const sh = fs.existsSync(new URL('../collector/install-h2orestart.sh', import.meta.url)) ? readText(new URL('../collector/install-h2orestart.sh', import.meta.url)) : '';
+  eq('  설치 스크립트는 실패해도 0 으로 끝나고(보강 단계) 깔렸는지를 unopkg list 로 적는다', [/set -uo pipefail/.test(sh), /unopkg add --shared/.test(sh), /unopkg list/.test(sh), !/set -e/.test(sh)], [true, true, true, true]);
+  eq('  deploy-sync 가 이 워크플로(공고 원문 심층 수집)를 본다 — 안 보면 data/forms-pdf 가 앱으로 안 나간다', /공고 원문 심층 수집/.test(readText(new URL('../.github/workflows/deploy-sync.yml', import.meta.url))), true);
+}
+
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);

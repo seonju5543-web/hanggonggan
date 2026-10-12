@@ -35,7 +35,7 @@ jobs:
     # 실제로 7/31 브라우저 수집이 360분을 돌다 취소됐고, 수집 로봇 2종이 같은
     # 대기줄(concurrency: collector)을 쓰기 때문에 그동안 다음 수집이 줄을 섰다.
     # 학교를 더 붙일수록 '한 곳이 안 열려 멈추는' 확률도 같이 오른다.
-    timeout-minutes: 34   # 첨부 원본 내려받기 + OCR 4분 (2026-09-17)
+    timeout-minutes: 42   # 첨부 원본 내려받기 + OCR 4분 (2026-09-17) + 신청서 PDF 8분 (2026-10-12)
     steps:
       - uses: actions/checkout@v4
 
@@ -67,10 +67,22 @@ jobs:
         run: |
           sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-kor poppler-utils
           python3 collector/ocr-text.py --budget-sec=150
+      # 신청서 원본 → PDF (2026-10-12 개발자 지시 "스키마화가 아니라 원본 그대로 · PDF 로 통일") — collector/form-pdf.mjs.
+      # 보강 단계: 시한 + continue-on-error · HWP·HWPX 는 가져오기 확장(H2Orestart)이 있어야 읽힌다(설치 실패는 리포트가 '변환기가 못 읽음'으로 센다).
+      # 🔴 `|| true` 로 설치 실패를 삼키지 않는다(위 OCR 단계와 같은 규칙) · 저장 목록(git add)에 data/forms-pdf 를 넣는다(deploy-sync 가 이 워크플로 이름을 본다).
+      - name: 신청서 원본 → PDF (양식 원본 그대로)
+        timeout-minutes: 8
+        continue-on-error: true
+        run: |
+          sudo apt-get install -y -qq libreoffice-writer libreoffice-core libreoffice-java-common fonts-nanum   # java-common: HWP 확장이 자바라 없으면 조용히 '못 읽음'
+          bash collector/install-h2orestart.sh
+          node collector/form-pdf.mjs
       - run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add collector/extracted
+          [ -d data/forms-pdf ] && git add data/forms-pdf
+          [ -f collector/form-pdf-report.md ] && git add collector/form-pdf-report.md
           if ! git diff --cached --quiet; then
             git commit -m "deepfetch: notice texts + form originals"
             pushed=0
