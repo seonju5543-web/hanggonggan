@@ -39,4 +39,6 @@ jobs:
               esac
             done
             echo "$URL → 400(주소 틀림) ${n400}번 · 429(너무 많음) ${n429}번 · 그 밖:${other:- 없음}"
+            case "$URL" in *//handaejang-push.*) [ "$n429" -gt 0 ] && echo "  판정: ✅ 운영에 새 판(등록 횟수 제한)이 돌고 있다" || { echo "  판정: ⚠️ 운영은 옛 판이다 — server/push/README.md 「운영에 새 판이 올라갔는지 확인」 절대로 대시보드에서 승격"; verdict=1; } ;; esac
           done
+          exit $verdict
