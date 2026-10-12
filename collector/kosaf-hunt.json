@@ -6,6 +6,93 @@
   {
    "target": {
     "ds": "kosaf",
+    "key": "2000319002"
+   },
+   "board": "https://www.yeongju.go.kr/check/bbs/board.php?bo_table=yjra0101",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-13",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 100) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "0626001"
+   },
+   "url": "https://www.scij.kr/kr/sub_comm_01.do?mode=view&boardIdx=928",
+   "title": "2026년 (재)순천시인재육성장학회 장학생 모집 공고 2026년 (재)순천시인재육성장학회 장학생 선발 모집 계획을 알려드립니다. 학생들과 시민들이 신청할 수 있도록 많은 관심과 홍보 부탁드립니다.",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-13",
+   "note": "https://www.scij.kr/ 목록에서 고름 — 공고문 파일 제목 +2 · 재단 이름 +1 · 마감 해 +1 · 장학 낱말 +1 · 게시일 +1",
+   "also": [
+    "0626002",
+    "0626003",
+    "0626004",
+    "0626007",
+    "0626008",
+    "0626009"
+   ]
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2700563001"
+   },
+   "board": "https://bukgu.gwangju.kr/board.es?mid=b10201000000&bid=0275",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-13",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다",
+   "also": [
+    "2700563002",
+    "2700563004",
+    "2700563005",
+    "2700563006",
+    "2700563007"
+   ]
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2703156001"
+   },
+   "url": "https://www.jw-foundation.or.kr/notice/228",
+   "title": "2026 JW이종호재단 기초과학자 주거장학사업 장학생 선발",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-13",
+   "note": "https://www.jw-foundation.or.kr/ 목록에서 고름 — 사업 이름 +1 · 마감 해 +1 · 장학 낱말 +1 · 게시일 +1",
+   "also": [
+    "2704231001"
+   ]
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2701042001"
+   },
+   "url": "https://www.seoksung.co.kr/cms/bbs/board.php?bo_table=nanum&wr_id=522",
+   "title": "석성장학회, 2026년도 석성선행장학금 585명에 2억7천만원 전달",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-13",
+   "note": "http://www.seoksung.co.kr/cms/bbs/board.php?bo_table=nanum 목록에서 고름 — 사업 이름 +1 · 재단 이름 +1 · 마감 해 +1 · 장학 낱말 +1 · 게시일 +1"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2701042002"
+   },
+   "board": "http://www.seoksung.co.kr/cms/bbs/board.php?bo_table=nanum",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-13",
+   "note": "게시판처럼 보이는 쪽(공고 2건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
     "key": "2704345001"
    },
    "board": "https://yeonje.go.kr/edu/main.do",
@@ -20,13 +107,48 @@
   {
    "target": {
     "ds": "kosaf",
-    "key": "0641001"
+    "key": "2000436005"
    },
-   "board": "https://www.dsa.or.kr/data.html?Table=ins_bbs43",
+   "url": "https://asanmirae.or.kr:449/main/index.php?m_cd=32&b_id=20260714107548723",
+   "title": "2026년 우수봉사 장학생(대학생) 선발 공고",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-13",
+   "note": "https://asanmirae.or.kr:449/main/ 목록에서 고름 — 층2 홈 주소가 바로 그 글 +3 · 사업 이름 +1 · 마감 해 +1 · 장학 낱말 +1"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "1768681003"
+   },
+   "board": "https://www.busan.go.kr/nbnews",
    "source": "board",
    "by": "로봇(층2 글 사냥꾼)",
    "addedAt": "2026-10-13",
    "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2701295001"
+   },
+   "board": "https://cbck.or.kr/Board/K7120",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-13",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2701009001"
+   },
+   "url": "https://www.mariners.or.kr/business/view.php?bd_code=notice&bd_idx=7603",
+   "title": "2026년도 (사)한국해기사협회 육.해상 회원 자녀 장학생 선발 안내 new -->",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-13",
+   "note": "https://www.mariners.or.kr/ 목록에서 고름 — 재단 이름 +1 · 마감 해 +1 · 장학 낱말 +1 · 게시일 +1"
   },
   {
    "target": {
@@ -39,17 +161,6 @@
    "by": "로봇(층2 글 사냥꾼)",
    "addedAt": "2026-10-13",
    "note": "https://myungfoundation.or.kr/main/ko/ 목록에서 고름 — 사업 이름 +1 · 재단 이름 +1 · 마감 해 +1 · 학기·반기 +1 · 장학 낱말 +1 · 게시일 +1"
-  },
-  {
-   "target": {
-    "ds": "kosaf",
-    "key": "2000319002"
-   },
-   "board": "https://www.yeongju.go.kr/check/bbs/board.php?bo_table=yjra0101",
-   "source": "board",
-   "by": "로봇(층2 글 사냥꾼)",
-   "addedAt": "2026-10-13",
-   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 100) — 확인 로봇이 목록을 다시 읽어 고른다"
   }
  ]
 }
