@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-10-12",
- "count": 1865,
+ "count": 1871,
  "items": [
   {
    "title": "[공통][교외]2026년도 하반기 은평구민장학재단 장학생 선발 공고(~10/28)",
@@ -32,6 +32,113 @@
    "foundAt": "2026-10-12",
    "bodyDeadline": "2026-10-21",
    "bodyDeadlineText": "한국항공대학교 정규직 전환형 신규직원 채용 공고 지원기간 : 2026.10.06.(화) 10:00 ~ 10.21.(수) 23:59"
+  },
+  {
+   "title": "공통 2026년 경기도 학자금대출 장기연체자 신용회복 지원(2026/4/1(월) ~ 12/11(금))",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=321545",
+   "attachments": [
+    {
+     "name": "2026년 경기도 학자금대출 장기연체자 신용회복 지원사업 공고문.pdf",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=e611c215dc994388a65cc5203adce4e0&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "웹포스터(경기도 학자금대출 장기연체자 신용회복 지원사업).jpg",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=e611c215dc994388a65cc5203adce4e0&fileSn=2&bbsId=BMSR00040"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-10-12"
+  },
+  {
+   "title": "공통 [공통] 2026학년도 교내 장학제도 개편안내",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=321752",
+   "attachments": [
+    {
+     "name": "(카드뉴스) 장학제도 개편안내.pdf",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=7265952a47354a6f960e5b2e22ed705d&fileSn=1&bbsId=BMSR00040"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-10-12"
+  },
+  {
+   "title": "공통 [한국장학재단] 학자금지원구간 개편(2027학년도 1학기부터 적용)",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=321882",
+   "attachments": [
+    {
+     "name": "(한글) 학자금 지원구간 산정체계 개편 안내.hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=40eba172273d4e20821a4d6ae13fbe59&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "(이미지1) 학자금 지원구간 개편 홍보 이미지 파일.jpg",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=40eba172273d4e20821a4d6ae13fbe59&fileSn=2&bbsId=BMSR00040"
+    },
+    {
+     "name": "(이미지2) 학자금 지원구간 개편 홍보 이미지 파일.jpg",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=40eba172273d4e20821a4d6ae13fbe59&fileSn=3&bbsId=BMSR00040"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-10-12"
+  },
+  {
+   "title": "공통 2026-2학기 AI학업장려 학자금대출 신청 안내(~11.17.화까지)",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322331",
+   "attachments": [
+    {
+     "name": "AI학업장려 학자금대출 포스터.jpeg",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=a2ec0c489b8a410b8afbd66452611939&fileSn=1&bbsId=BMSR00040"
+    }
+   ],
+   "deadlineHint": "신청기간: 2026.7.1.(수) 9시 ~ 11.17.(화) 18시까지 2. 대상학과 -서울C: 빅데이터응용학과 - 국제C: 컴퓨터공학부(컴퓨터",
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-10-12"
+  },
+  {
+   "title": "공통 2026-2학기 한국장학재단 학자금대출(일반/취업후) 신청 안내(2026.7.1.(수) ~ 11....",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322371",
+   "attachments": [
+    {
+     "name": "2026년_2학기_학자금대출_홈페이지_신청매뉴얼.pdf",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=cdc972f250164b30b687de010dbaff29&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "2026년_2학기_학자금대출_홈페이지_실행매뉴얼.pdf",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=cdc972f250164b30b687de010dbaff29&fileSn=2&bbsId=BMSR00040"
+    },
+    {
+     "name": "2026년_2학기_학자금대출_모바일 신청매뉴얼.pdf",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=cdc972f250164b30b687de010dbaff29&fileSn=3&bbsId=BMSR00040"
+    },
+    {
+     "name": "2026년_2학기_학자금대출_모바일_실행매뉴얼.pdf",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=cdc972f250164b30b687de010dbaff29&fileSn=4&bbsId=BMSR00040"
+    },
+    {
+     "name": "2026-2학기 학자금대출 홍보 포스터.jpg",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=cdc972f250164b30b687de010dbaff29&fileSn=5&bbsId=BMSR00040"
+    }
+   ],
+   "deadlineHint": "신청기간 : (등록금/생활비대출) 2026.7.1.(수) ~ 11.17.(화) 18시 (취업 후 상환 전환대출) 2026.7.1.(수) ~ 11",
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-10-12"
+  },
+  {
+   "title": "공통 2026년도 하반기 은평구민 장학생 선발 공고",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323290",
+   "attachments": [],
+   "deadlineHint": "접수기간 : 2026.10.12.(월) ~ 10.28.(수) 18시 4. 신청자격 가. 공통요건 : 공고일 현재 은평구에 2년 이상 거주 나.",
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-10-12"
   },
   {
    "title": "[학부-교외장학] 2026년도 2학기 명인다문화장학재단 대학 장학생 모집 안내",

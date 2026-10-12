@@ -9293,8 +9293,7 @@
    "period": "접수 기간 ~2026-10-30",
    "summary": "한국항공대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "한국항공대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -9303,7 +9302,12 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-04 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "2027 독일 정부초청(DAAD) 섬머코스 장학생 선발 안내문 (1).pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367228&attachNo=353375"
+    }
+   ],
    "sourceUrl": "https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=&mode=read&seq=11193",
    "sourceKind": "auto",
    "deadlineFrom": "공고 원문",
@@ -9314,7 +9318,15 @@
    "excerpts": [
     "문의처 : 주한 독일고등교육진흥원 [( 전화 ) 02-324-0655, ( 이메일 ) info@daad-korea.org]"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "alsoPostedAt": [
+    {
+     "school": "이화여자대학교",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367228&article.offset=0&articleLimit=10",
+     "id": "notice:https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?articleno=367228"
+    }
+   ],
+   "scopeFrom": "같은 사업이 이화여자대학교 게시판에도 올라옴(자동) — 이화여자대학교 게시판 https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367228&article.offset=0&articleLimit=10"
   },
   {
    "id": "auto-notiphpcodes1301seq10610",
@@ -11678,6 +11690,41 @@
      "school": "영남대학교",
      "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=231963863&article.offset=0&articleLimit=10",
      "id": "notice:https://www.yu.ac.kr/scholar/notice/notice.do?articleno=231963863"
+    },
+    {
+     "school": "아주대학교",
+     "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=377206&article.offset=0&articleLimit=10",
+     "id": "notice:https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?articleno=377206"
+    },
+    {
+     "school": "건국대학교",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1209342/artclView.do",
+     "id": "notice:https://www.konkuk.ac.kr/bbs/konkuk/235/1209342/artclView.do"
+    },
+    {
+     "school": "중앙대학교",
+     "url": "https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&nttId=30224",
+     "id": "notice:https://www.cau.ac.kr/cms/FR_CON/view.do?menu_id=100&nttid=30224"
+    },
+    {
+     "school": "경희대학교",
+     "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323249",
+     "id": "notice:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323249&menuno=200318"
+    },
+    {
+     "school": "가천대학교",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/125899/artclView.do",
+     "id": "notice:https://www.gachon.ac.kr/bbs/kor/478/125899/artclView.do"
+    },
+    {
+     "school": "동국대학교",
+     "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766493",
+     "id": "notice:https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766493"
+    },
+    {
+     "school": "고려대학교",
+     "url": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjklMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
+     "id": "notice:https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjklMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg=="
     }
    ],
    "scopeFrom": "같은 사업이 성균관대학교 게시판에도 올라옴(자동) — 성균관대학교 게시판 https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140363&article.offset=0&articleLimit=10",
@@ -11739,6 +11786,333 @@
    "auto": true,
    "attachments": [],
    "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551530?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-archgbn0searchordersort0-0i8hia4",
+   "name": "(한국장학재단) 해양수산부 청년창업어업인장학생 추가 모집 선발 안내",
+   "boardTitle": "(한국장학재단) 해양수산부 청년창업어업인장학생 추가 모집 선발 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「한국장학재단」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-12",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-10-12",
+   "period": "접수 기간 원문 확인",
+   "summary": "강원대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "강원대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-12 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026년 2학기 해양수산부 청년창업어업인장학생 추가모집 선발공고문.pdf chevron_forward",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261006095511023.pdf&path=/bbs/34&fn=2026%EB%85%84%202%ED%95%99%EA%B8%B0%20%ED%95%B4%EC%96%91%EC%88%98%EC%82%B0%EB%B6%80%20%EC%B2%AD%EB%85%84%EC%B0%BD%EC%97%85%EC%96%B4%EC%97%85%EC%9D%B8%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%B6%94%EA%B0%80%EB%AA%A8%EC%A7%91%20%EC%84%A0%EB%B0%9C%EA%B3%B5%EA%B3%A0%EB%AC%B8.pdf"
+    }
+   ],
+   "sourceUrl": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2513&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-bswj104944023artclviewdo",
+   "name": "[교외] 2027-2028 스위스 정부초청 장학생 선발 안내(~11/10)",
+   "boardTitle": "[교외] 2027-2028 스위스 정부초청 장학생 선발 안내(~11/10)",
+   "type": "교외",
+   "kindEvidence": [
+    "제목 표식 「[교외」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-12",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-11-10",
+   "deadlineFrom": "공고 원문 · [교외] 2027-2028 스위스 정부초청 장학생 선발 안내(~11/10)",
+   "period": "접수 ~2026-11-10",
+   "summary": "연세대학교 미래캠퍼스 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "연세대학교 미래캠퍼스"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-12 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://mirae.yonsei.ac.kr/bbs/wj/104/944023/artclView.do",
+   "sourceKind": "auto",
+   "openDate": "2026-08-20",
+   "eligibilityLines": [
+    "나. 지원 자격: 해외 유학에 결격사유가 없는 대한민국 국적자 ※ 선발 과정별 지원자격이 상이하므로, 반드시 모집요강 및 홈페이지의 세부사항 확인 후 지원"
+   ],
+   "excerpts": [
+    "제출서류 등 세부사항: https://www.sbfi.admin.ch/scholarships_en",
+    "문의처: 주한스위스대사관 / seoul.science@eda.admin.ch"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-amepagescholarshipnotice-00jgl50",
+   "name": "[교외] 해동과학문화재단 장학생 선발 안내(10/26 마감, 공학계열, 생활비 연 1200만원)",
+   "boardTitle": "[교외] 해동과학문화재단 장학생 선발 안내(10/26 마감, 공학계열, 생활비 연 1200만원)",
+   "type": "교외",
+   "kindEvidence": [
+    "제목 표식 「[교외」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-12",
+   "provider": "주관 기관 원문 확인",
+   "amount": "1,200만원",
+   "amountValue": 12000000,
+   "deadline": "2026-10-26",
+   "deadlineFrom": "공고 원문 · [교외] 해동과학문화재단 장학생 선발 안내(10/26 마감, 공학계열, 생활비 연 1200만원)",
+   "period": "접수 ~2026-10-26",
+   "summary": "서강대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-12 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2027 해동장학생 모집요강.pdf",
+     "url": "https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxNTAmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=0"
+    },
+    {
+     "name": "2027 해동장학금 운영규정.pdf",
+     "url": "https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxNTAmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=1"
+    },
+    {
+     "name": "2027 해동장학생 신규지원(ㅇㅇ대;;ㅇ학년;;이름).hwp",
+     "url": "https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxNTAmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=2"
+    }
+   ],
+   "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551490?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "sourceKind": "auto",
+   "alsoPostedAt": [
+    {
+     "school": "경북대학교",
+     "url": "https://home.knu.ac.kr/HOME/knussw/sub.htm?nav_code=knu1619416593&mode=view&mv_data=aWR4PTIxNTAmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=",
+     "id": "notice:https://home.knu.ac.kr/HOME/knussw/sub.htm?mv_data=aWR4PTIxNTAmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=&nav_code=knu1619416593"
+    },
+    {
+     "school": "연세대학교",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/944258/artclView.do",
+     "id": "notice:https://www.yonsei.ac.kr/bbs/sc/58/944258/artclView.do"
+    }
+   ],
+   "scopeFrom": "같은 사업이 경북대학교 게시판에도 올라옴(자동) — 경북대학교 게시판 https://home.knu.ac.kr/HOME/knussw/sub.htm?nav_code=knu1619416593&mode=view&mv_data=aWR4PTIxNTAmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=",
+   "eligibilityLines": [
+    "3. 지원자격",
+    "2027년 2학기 기준 2학년 1학기, 2학년 2학기, 3학년 1학기 재학생(2학기 이상 학업을 연속적으로 할 수 있는 자)",
+    "지원가능 전공: 전자공학, 화공생명공학, 기계공학, 시스템반도체공학, 컴퓨터공학, 인공지능학, 반도체공학",
+    "한국장학재단 학자금 지원구간 4분위 이내",
+    "타 외부재단 학업장려금성 장학금 중복수혜 불가(국가장학금 및 교내장학금은 가능)"
+   ],
+   "excerpts": [
+    "신청기한: 2026년 10월 26일(월)까지",
+    "문의: 해동과학문화재단 02-521-2711, lovesiran@daeduck.com / 학생지원팀 02-705-8730"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 12000000,
+    "ratio": 0,
+    "min": 12000000,
+    "max": 12000000,
+    "raw": "1. 장학금: 생활비 연 1,200만원 매월 100만원 분할 지급 재단이 요구하는 성적(직전학기 12학점 이상 수강 등) 및 자기계발의 성취도를 만족하면 졸업까지 계속 지원 2. 학교 추천인원: 제한 없음"
+   },
+   "amountFrom": "공고 원문",
+   "exclusivity": {
+    "kind": "forbidden",
+    "scope": "external",
+    "raw": "타 외부재단 학업장려금성 장학금 중복수혜 불가(국가장학금 및 교내장학금은 가능)"
+   },
+   "exclusivityFrom": "공고 원문"
+  },
+  {
+   "id": "auto-archgbn0searchordersort0-0tglbr1",
+   "name": "2026학년도 2학기 중소기업 취업연계 장학금 선발계획 알림 및 심사서류 제출 요청",
+   "boardTitle": "2026학년도 2학기 중소기업 취업연계 장학금 선발계획 알림 및 심사서류 제출 요청",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「기업」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-12",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-10-12",
+   "period": "접수 기간 원문 확인",
+   "summary": "강원대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "강원대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-12 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2510&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-hkrwdsfpnos1073sfpnos888-04cu2lt",
+   "name": "[입학에서 취업까지] 2026-2학기 2차 교내장학금 신청 안내[가족, 문화예술, 고시, 챌린지]",
+   "boardTitle": "[입학에서 취업까지] 2026-2학기 2차 교내장학금 신청 안내[가족, 문화예술, 고시, 챌린지]",
+   "type": "교내",
+   "kindEvidence": [
+    "제목 표식 「교내」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-12",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-10-12",
+   "period": "접수 기간 원문 확인",
+   "summary": "경기대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경기대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-12 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626253&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-hkrwdsfpnos1073sfpnos888-123pi0s",
+   "name": "[입학에서 취업까지] [경기대학교 직원 낙전 드림장학회] 직원 낙전 기금 드림장학회 장학생 선발 안내 (2026.09.21.(",
+   "boardTitle": "[입학에서 취업까지] [경기대학교 직원 낙전 드림장학회] 직원 낙전 기금 드림장학회 장학생 선발 안내 (2026.09.21.(월) ~ 2026.10.13.(화))",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「장학회」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-12",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-10-13",
+   "deadlineFrom": "게시판 요약 · ~ 2026.10.13",
+   "period": "접수 ~2026-10-13",
+   "summary": "경기대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경기대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-12 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=625903&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-sknou51815772artclviewdo",
+   "name": "[장학] 2026. 2학기 한국방송통신대학교 교외(발전기금, 출판문화원,아시아발전재단)장학생 선발",
+   "boardTitle": "[장학] 2026. 2학기 한국방송통신대학교 교외(발전기금, 출판문화원,아시아발전재단)장학생 선발",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「재단」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(제목)",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-12-07",
+   "deadlineFrom": "게시판 요약 · ~ 12. 7",
+   "period": "접수 ~2026-12-07",
+   "summary": "한국방송통신대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국방송통신대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-12 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "★붙임2_공적활동확인서(활동사진 포함)_신규서식_2026-2학기.hwp",
+     "url": "https://www.knou.ac.kr/bbs/knou/51/277973/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.knou.ac.kr/bbs/knou/51/815772/artclView.do",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-archgbn0searchordersort0-1w8iqtl",
+   "name": "2026학년도 1학기 주거안정장학금 지급요청서(8월분) 신청 안내",
+   "boardTitle": "2026학년도 1학기 주거안정장학금 지급요청서(8월분) 신청 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "교내 증거 없음 — 기본값"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(제목)",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-10-12",
+   "period": "접수 기간 원문 확인",
+   "summary": "강원대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "강원대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-12 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2499&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
    "sourceKind": "auto"
   }
  ]
