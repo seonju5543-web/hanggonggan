@@ -244,6 +244,18 @@ export default async function gate(eq, ctx) {
   const km = C.kosafMatches(C.buildIndex({ ...DATA, external: eumPosts.concat(asanPosts) }), eumPosts.concat(asanPosts), { today: '2026-10-04' });
   eq('  kosafMatches — 그 재단 사이트의 글만 후보로(층2 홈 호스트 · 포트 무시) · 후보 출처는 match',
     km.map((c) => [c.target.key, c.source, c.url.split(/[?&](?:nttNo|b_id)=/)[1]]).sort(), [['2000429001', 'match', '828'], ['2000429013', 'match', '792'], ['2000436005', 'match', '20260714107548723']]);
+  /* 🔴 (2026-10-12 · 개발자 "KOSAF 원문은 재단의 개별 공고로") 짝지은 재단 피드 글이 겹침(C)으로 거절되던 것 —
+     색인에 실린 재단 글(external)은 그 주소의 '주인'이라 collisionOf 가 '다른 공고의 링크'로 세었다(제목이 층2 사업 이름과 다르다).
+     같은 재단 사이트의 피드 글은 짝 자체다 · 남의 사이트 글·정식 등록은 그대로 겹침. */
+  /* 제목이 층2 사업 이름과 **다른** 재단 글(실데이터 꼴 — 신안 '일반(저소득)장학생' ↔ '2026년 하반기 장학생 선발 공고') */
+  const eumOther = { title: '2026년 하반기 음성군장학회 장학생 선발 공고', url: 'https://scholarship.eumseong.go.kr/www/selectBbsNttView.do?key=33&bbsNo=3&nttNo=901', host: '재단', school: '', deadline: '' };
+  const idxExt = C.buildIndex({ ...DATA, external: eumPosts.concat(asanPosts, [eumOther]).map((p) => ({ host: '재단', school: '', deadline: '', ...p })) });
+  const eumT = idxExt.find({ ds: 'kosaf', key: '2000429013' });
+  eq('  층2 ↔ 같은 재단 사이트의 피드 글은 제목이 달라도 겹침이 아니다 (열어 보기 전에 거절되던 것)', [idxExt.ownersOf(eumOther.url).length >= 1, C.collisionOf(eumT, idxExt.ownersOf(eumOther.url))], [true, '']);
+  eq('  다른 사이트의 글·정식 등록 주소는 그대로 겹침', [
+    !!C.collisionOf(eumT, [{ ds: 'external', key: 'x', raw: 'https://other.or.kr/view?id=1', titles: ['다른 재단 공고'] }]),
+    !!C.collisionOf(eumT, [{ ds: 'registered', key: 'reg-x', raw: eumOther.url, titles: ['전혀 다른 제목의 공고'] }]),
+  ], [true, true]);
   const tw = C.twinCandidates(C.buildIndex({ ...DATA, pool: [
     { title: SNUE_TITLE, url: 'https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54793' },
     { title: SNUE_TITLE, url: 'https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083&nttId=54793' },

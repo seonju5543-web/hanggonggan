@@ -96,6 +96,13 @@ const URL_HARD_MS = 45000;          // 한 주소 절대 시한(열기 20초 + �
 const GOTO_MS = 20000;
 const TITLE_WAIT_MS = 6000;
 const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
+/* 🔴 폰으로 열면 다른 화면이 뜨는 사이트가 있다 (2026-10-12 · 개발자 실측 — 폰에서 누르면 15% 미만만 그 공고 · 로봇의 데스크톱 판정은 post 가 대부분).
+   학교 사이트는 폰 UA 를 모바일 첫 화면(m.*)으로 돌려보내거나 글 번호를 떨어뜨리기도 한다. 그래서 데스크톱으로 '공고'라 본 주소 가운데
+   **표본만** 아이폰 화면(UA·너비·터치)으로 한 번 더 열어 따로 적는다(`mobile` · 장부·리포트) — 앱 글자(bad)에는 **쓰지 않는다**(판정 한 벌이 두 벌이 되면
+   안 된다 · 먼저 갈라지는 사이트를 사람이 본다). 표본 수 LINK_CHECK_MOBILE_SAMPLE(0 이면 끈다) · 예산 안에서만. */
+const MOBILE_UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1';
+const MOBILE_SAMPLE = Number(process.env.LINK_CHECK_MOBILE_SAMPLE ?? 25);
+const MOBILE_RECHECK_DAYS = 30;   // 폰으로 본 지 30일 안이면 다시 안 본다
 
 const readJson = (f, fb) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return fb; } };
 
@@ -161,8 +168,9 @@ const watchdog = setTimeout(() => {
 watchdog.unref();
 
 /* ── 한 주소 열어 보기 ──────────────────────────────────────────── */
-let browser = null; let ctx = null;
+let browser = null; let ctx = null; let mctx = null;   // mctx = 폰 맥락(표본 재확인 · 필요할 때만 연다)
 let fake = null;
+const mobileResults = [];       // 폰 표본 — { url, host, v, why, desktopV }
 if (FAKE_FILE) fake = readJson(path.resolve(FAKE_FILE), {});
 
 /* 화면에 제목이 그려질 때까지 기다릴 조각 — 말머리·앞 번호를 떼야 본문과 맞는다(link-hunter 와 같은 꼴) */
@@ -183,9 +191,9 @@ async function openBrowser() {
 
 /* 본 것 그대로 — 판정 재료는 detail-url.mjs observeLanding **한 벌**(하나뿐인 제목 자리만 · 틀 안 포함 · 2만 자 · 비밀번호 칸).
    🔴 (2026-10-03 리뷰 LC-3) 여기 따로 두었던 사본은 h1~h3 를 **전부** 제목 자리로 세어, 행마다 h3 를 다는 목록을 'post' 로 판정했다. */
-async function observeLive(t, holder) {
-  await ctx.clearCookies().catch(() => {});
-  const page = await ctx.newPage();
+async function observeLive(t, holder, useCtx = ctx) {
+  await useCtx.clearCookies().catch(() => {});
+  const page = await useCtx.newPage();
   holder.page = page;
   /* 알림창(「삭제된 게시물입니다」 등) — 닫고 글자만 적어 둔다(판정 재료가 아니라 리포트에 보일 것) */
   const dialogs = [];
@@ -205,15 +213,16 @@ async function observeLive(t, holder) {
   }
 }
 
-async function observe(t) {
+async function observe(t, { mobile = false } = {}) {
   if (fake) {
-    const o = fake[t.url] || fake[t.raw];
+    const o = mobile ? fake[`mobile:${t.url}`] : (fake[t.url] || fake[t.raw]);
     return o ? { ...o } : { error: '가짜 관측 없음' };
   }
+  if (mobile && !mctx) mctx = await browser.newContext({ userAgent: MOBILE_UA, locale: 'ko-KR', viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
   const holder = {};
   /* 🔴 실패를 여기서 받아 둔다 — 시한에 걸려 버려진 작업이 **나중에** 실패하면 받을 사람이 없어
      unhandledRejection 으로 로봇 전체가 넘어진다(주소 하나 때문에 그날 실행이 빨간불). */
-  const work = observeLive(t, holder).catch((e) => ({ error: String((e && e.message) || e) }));
+  const work = observeLive(t, holder, mobile ? mctx : ctx).catch((e) => ({ error: String((e && e.message) || e) }));
   const got = await withDeadline(work, URL_HARD_MS);
   if (got === TIMED_OUT) {
     if (holder.page) holder.page.close().catch(() => {});
@@ -337,6 +346,16 @@ function buildReport({ sum, newBad, blocked, ledgerBad, note, fix, dropped }) {
 
   L.push(...candReport({ fix, dropped }));
 
+  if (mobileResults.length) {
+    const mv = { post: 0, bad: 0, unread: 0 };
+    for (const m of mobileResults) { if (m.v === 'post') mv.post += 1; else if (m.v === 'unread') mv.unread += 1; else mv.bad += 1; }
+    L.push(`### 폰(아이폰)으로 다시 열어 본 표본 — ${mobileResults.length}건 (데스크톱으로 '공고'였던 주소 가운데)`);
+    L.push(`- 폰에서도 공고 ${mv.post} · 폰에서는 다른 화면 ${mv.bad} · 판정 못 함 ${mv.unread} — 🔴 이 결과는 앱 글자를 바꾸지 않습니다(장부 \`mobile\` 에만 · 갈라지는 사이트를 사람이 봅니다)`);
+    mobileResults.filter((m) => m.v !== 'post' && m.v !== 'unread').slice(0, LIST_CAP)
+      .forEach((m) => L.push(`- ${m.host} — 폰: ${V_WORD[m.v] || m.v} (${short(m.why, 60)}) · 데스크톱: 공고 · ${m.url}`));
+    L.push('');
+  }
+
   L.push('### 우리를 막는 것으로 보이는 사이트 (이번 결과를 "판정 못 함"으로 돌렸습니다)');
   if (!blocked.length) L.push('- 없음');
   blocked.forEach(([host, n]) => L.push(`- ${host} — ${n}건 (제목 없는 화면이 절반을 넘음 · 학교 서버가 우리를 막았을 수 있어 문제로 세지 않습니다)`));
@@ -401,6 +420,8 @@ function finalize(note) {
     if (/^막힘 의심/.test(r.why || '')) blockedMap.set(r.host, (blockedMap.get(r.host) || 0) + 1);
     state[r.url] = nextState(state[r.url], { v: r.v, why: r.why }, TODAY, { final: r.final });
   }
+  /* 폰 표본 — 장부에만(`mobile`) · 앱이 받는 bad 에는 넣지 않는다(위 MOBILE_SAMPLE 주석) */
+  for (const m of mobileResults) if (state[m.url]) state[m.url].mobile = { v: m.v, why: m.why, at: TODAY };
   /* 앱에서 내려간 링크의 장부는 지운다 — 남겨 두면 장부만 자란다 */
   const live = new Set(targets.map((t) => t.url));
   const tidy = {};
@@ -437,7 +458,8 @@ function finalize(note) {
   if (process.env.GITHUB_OUTPUT) {
     const cn = (st) => candResults.filter((r) => r.res.status === st).length;
     fs.appendFileSync(process.env.GITHUB_OUTPUT, `checked=${results.length}\nnew_bad=${newBad.length}\nconfirmed=${Object.keys(ledgerBad).length}\npending=${sum.pending.length}\n`
-      + `cand_checked=${candResults.length}\ncand_verified=${cn('verified')}\ncand_suggest=${cn('suggest')}\ncand_rejected=${cn('rejected')}\nfixes=${Object.keys(fix).length}\n`);
+      + `cand_checked=${candResults.length}\ncand_verified=${cn('verified')}\ncand_suggest=${cn('suggest')}\ncand_rejected=${cn('rejected')}\nfixes=${Object.keys(fix).length}\n`
+      + `mobile_checked=${mobileResults.length}\nmobile_post=${mobileResults.filter((m) => m.v === 'post').length}\nmobile_other=${mobileResults.filter((m) => m.v !== 'post' && m.v !== 'unread').length}\n`);
   }
   return { newBad, ledgerBad, sum, fix };
 }
@@ -564,6 +586,32 @@ while (remaining.length) {
   const wasBad = !!(state[t.url] && BAD.includes(state[t.url].v));
   results.push({ url: t.url, host: t.host, v: verdict.v, why: verdict.why, final, decisive: !!verdict.decisive, wasBad });
   console.log(`  ${verdict.v.padEnd(6)} ${t.host} · ${short(t.title, 40)} (${short(verdict.why, 50)})`);
+}
+/* ── ⑥ 폰 표본 — 이번에 데스크톱으로 '공고'라 본 주소 가운데 N건을 아이폰 화면으로 한 번 더 (위 MOBILE_SAMPLE 주석 · 예산 안에서만) ── */
+{
+  const seed = [...TODAY].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+  const order = (u) => [...u].reduce((h, c) => (h * 33 + c.charCodeAt(0)) >>> 0, seed);
+  const fresh = (u) => { const m = state[u] && state[u].mobile; return !(m && m.at && (Date.parse(TODAY) - Date.parse(m.at)) / 86400000 < MOBILE_RECHECK_DAYS); };
+  const byUrl = new Map(targets.map((t) => [t.url, t]));
+  const sample = results.filter((r) => r.v === 'post' && fresh(r.url)).sort((a, b) => order(a.url) - order(b.url)).slice(0, Math.max(0, MOBILE_SAMPLE));
+  const mLast = new Map();
+  const left = [...sample];
+  while (left.length) {
+    if (!budget.hasRoom(URL_HARD_MS)) { stopNote = `${stopNote ? `${stopNote} ` : ''}📱 폰 표본은 예산이 모자라 ${left.length}건을 못 봤습니다.`; break; }
+    const pick = pickNext(left.map((r) => ({ ...r, url: r.url })), mLast, Date.now(), SPACING_MS);
+    if (pick.index < 0) { await sleep(Math.min(Math.max(pick.wait, 50), 5000)); continue; }
+    if (browser && !browser.isConnected()) break;
+    const r = left.splice(pick.index, 1)[0];
+    const t = byUrl.get(r.url);
+    if (!t) continue;
+    if (!fake) await ensureBrowser();
+    const obs = await observe(t, { mobile: true });
+    mLast.set(t.host, Date.now());
+    if (fake && obs.error === '가짜 관측 없음') continue;   // 가짜 관측에 폰 화면이 없으면 표본에서 뺀다
+    const verdict = judgeLanding({ ...obs, requestedUrl: t.url, titles: t.titles, titlesFromNameOnly: !!t.nameOnly, otherTitles: otherTitlesFor(t, targets, siteTitles) });
+    mobileResults.push({ url: t.url, host: t.host, v: verdict.v, why: verdict.why, desktopV: r.v });
+    console.log(`  📱 ${verdict.v.padEnd(6)} ${t.host} · ${short(t.title, 40)} (${short(verdict.why, 50)})`);
+  }
 }
 finalize(null);
 if (browser) await withDeadline(browser.close().catch(() => {}), 10000);

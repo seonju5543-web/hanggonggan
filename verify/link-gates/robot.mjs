@@ -329,6 +329,15 @@ export default async function gate(eq, ctx) {
     const rep = fs.readFileSync(path.join(tmp, 'collector/link-check-report.md'), 'utf8');
     eq('  리포트 — 새로 확정된 것을 먼저, 건너뛴 표식·층2를 센다', [/새로 확정된 문제 링크[^\n]*4건/.test(rep), rep.indexOf('새로 확정된 문제') < rep.indexOf('전체 현황'), /층2[^\n]*2건[^\n]*사본이 있는 것 1건/.test(rep), /목록 표식[^\n]*정식 등록 1/.test(rep)], [true, true, true, true]);
 
+    /* 📱 폰 표본 (2026-10-12 · 개발자 실측 "폰에서는 15% 미만") — 데스크톱으로 '공고'였던 A 를 아이폰 화면으로 다시 열면 첫 화면으로 돌려보내짐.
+       장부 `mobile` 과 리포트·워크플로 숫자에만 적고, 앱이 받는 bad 에는 **절대** 들어가지 않는다. 가짜 관측에 폰 화면이 없는 주소는 표본에서 뺀다. */
+    const mobileObs = { ...obsDay(true), [`mobile:${A}`]: { status: 200, finalUrl: 'https://m.a.test.kr/index.do', docTitle: '가대학교 모바일', text: 'm'.repeat(800) } };
+    const m1 = runRobot(tmp, mobileObs, '2026-10-06', { env: { LINK_CHECK_MOBILE_SAMPLE: '5' } });
+    const sm = state();
+    eq('📱 폰 표본 — 데스크톱 「공고」였던 주소를 아이폰 화면으로 다시 열어 장부 mobile 에 적는다 · 워크플로 숫자', [m1.code, sm[A] && sm[A].v, sm[A] && sm[A].mobile && sm[A].mobile.v, m1.out.mobile_checked, m1.out.mobile_other], [0, 'post', 'home', '1', '1']);
+    eq('  🔴 폰 판정은 앱이 받는 bad 에 들어가지 않는다 · 리포트에 폰 절이 있다', [Object.keys(ledger().bad).includes(A), /폰\(아이폰\)으로 다시 열어 본 표본/.test(fs.readFileSync(path.join(tmp, 'collector/link-check-report.md'), 'utf8'))], [false, true]);
+    const m2 = runRobot(tmp, mobileObs, '2026-10-07', { env: { LINK_CHECK_MOBILE_SAMPLE: '0' } });
+    eq('  표본 수 0 이면 폰 재확인을 하지 않는다', m2.out.mobile_checked, '0');
     const snapDry = hashTree(tmp, (rel) => rel === 'fake.json' || rel === 'gh-output.txt');
     const dry = run('2026-10-06', true, ['--dry']);
     eq('  --dry 는 아무 파일도 쓰지 않는다', [dry.code, changed(snapDry, hashTree(tmp, (rel) => rel === 'fake.json' || rel === 'gh-output.txt'))], [0, []]);
@@ -407,6 +416,9 @@ export default async function gate(eq, ctx) {
 
   const strip = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/[^\n]*/g, '$1');
   const runner = strip(read('collector/link-check.mjs'));
+  eq('📱 폰 표본 — 아이폰 UA·폰 화면 맥락 · 표본 수 설정 · 장부 mobile 에만 적고 publishBad 는 v 만 본다(앱 글자에 안 섞인다)',
+    [/iPhone/.test(runner), /LINK_CHECK_MOBILE_SAMPLE/.test(runner), /isMobile:\s*true/.test(runner), /state\[m\.url\]\.mobile = /.test(runner), !/mobile/.test(strip(read('collector/link-landing.mjs')).split('export function publishBad')[1].split('export default')[0])],
+    [true, true, true, true, true]);
   const plan = strip(read('collector/link-check-plan.mjs'));
   eq('  🔴 로봇의 쓰기 자리는 save() 하나 · 네 파일만 허락 · 데이터 파일 이름이 코드에 없다',
     [(runner.match(/writeFileSync\(/g) || []).length, /function save\(file, text\) \{\n\s+if \(!OUTPUTS\.has\(file\)\) throw/.test(runner),

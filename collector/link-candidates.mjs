@@ -607,6 +607,12 @@ export function judgeTitles(t, cand) {
 export function collisionOf(t, owners) {
   const others = (owners || []).filter((x) => x !== t && !(x.ds === t.ds && x.key === t.key))
     .filter((x) => !(t.ds === 'kosaf' && x.ds === 'kosaf' && x.org === t.org && x.deadline === t.deadline))
+    /* 🔴 층2 ↔ 재단 피드 글은 겹침이 아니라 **짝 자체**다 (2026-10-12 · 개발자 "KOSAF 원문은 재단의 개별 공고로").
+       재단 게시판에서 모은 글(data/external.json)은 그 재단 사이트의 글이고 제목이 층2 사업 이름과 다른 게 보통이라
+       ('2026년 하반기 장학생 선발 공고' ↔ '일반(저소득)장학생'), 여기서 '제목이 다른 다른 공고'로 세어져 kosafMatches 가
+       고른 후보를 열어 보기도 전에 거절했다(설계 문서 3단계 ①). 그 재단 사이트(allowed)의 피드 글이면 겹침에서 뺀다.
+       ⚠️ 다른 재단 사이트의 글·정식 등록·학교 피드 글은 그대로 겹침이다 — 남의 공고 주소를 층2에 달지 않는다. */
+    .filter((x) => !(t.ds === 'kosaf' && x.ds === 'external' && hostAllowed(x.raw, t.allowed)))
     .filter((x) => !x.titles.some((a) => t.titles.some((b) => sameTitle(a, b))));
   return others.length ? `다른 공고의 링크와 같은 주소(${others[0].label || others[0].key})` : '';
 }
