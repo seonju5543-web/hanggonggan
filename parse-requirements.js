@@ -41,7 +41,7 @@ function parseGrade(t) {
   const hasPct = /백분위|\/\s*100|100\s*점\s*만점|\d{2,3}\s*점\s*(이상|\/)/.test(t);
   const has45 = /\/\s*4\.5|4\.5\s*만점|평점\s*평균|평균\s*평점|평점이?\s*\d\.\d/.test(t);
   const has43 = /\/\s*4\.3|4\.3\s*만점/.test(t);
-  const hasLetter = /\b[ABC][+0]?\s*(학점)?\s*이상/.test(t);
+  const hasLetter = /\b[ABC][+0]?\s*(학점)?\s*이상|\([ABC][+0]?\)\s*이상/.test(t);   // `70점(C0) 이상` 의 괄호 등급도 단위다(두 단위 → 확신 낮음)
   const kinds = [hasPct, has45 || has43, hasLetter].filter(Boolean).length;
 
   /* ⚠️ 숫자와 `이상` 사이에 **딴 게 낀다** — 실제 원문에 이런 것들이 있는데 전부 놓치고 있었다:
@@ -60,7 +60,10 @@ function parseGrade(t) {
     if (v <= 4.5) return { kind: 'grade', scale: GRADE_SCALE.gpa45, min: v, conf: HAS_EXCEPTION.test(t) ? LOW : HIGH };
   }
   const mDec = t.match(/(\d\.\d{1,2})\s*점?\s*(?:\([^)]{0,8}\))?\s*(?:\/\s*4\.[35])?\s*점?\s*(?:이상|이상인|넘)/);
-  const mPct = t.match(/(?:백분위|평균)?\s*(\d{2,3})\s*점?\s*(?:\/\s*100)?\s*(?:만점)?\s*(?:이상|이상인)/);
+  /* 🔴 **점수와 `이상` 사이의 괄호** (2026-10-12 · 카드 분석 조각 1). `백분위 70점(C0) 이상`·`70점(평점 1.51에 해당) 이상`·
+     `70 점 (100 점 만점 ) 이상` — 괄호가 끼면 통째로 못 읽어 줄이 '모름'이었다(실측 4줄). 평점 쪽(mDec)이 이미 허용하는 것과 같다.
+     ⚠️ 앞이 숫자·점이면 안 된다 — `3.75점 이상` 의 `75` 를 백분위로 읽지 않게. */
+  const mPct = t.match(/(?:백분위|평균)?\s*(?<![\d.])(\d{2,3})\s*점?\s*(?:\([^()]{0,16}\))?\s*(?:\/\s*100)?\s*(?:만점)?\s*(?:이상|이상인)/);
 
   if (mDec) {
     const v = parseFloat(mDec[1]);
@@ -84,16 +87,28 @@ function parseGrade(t) {
 }
 
 /* ── 소득 구간(분위) ── `9구간 이하` `3분위 이내` */
+/* 🔴 **`0~8구간` 같은 범위는 `8구간 이하`와 같은 말이다** (2026-10-12 · 카드 분석 조각 1). 범위 꼴을 못 읽어
+   아주대 바르게장학 「소득분위 0~8구간인 재학생」이 10구간 학생에게도 ✓ 였다(틀린 안심 · 실측 4줄). 아래 범위는
+   위 `이하` 꼴과 같은 확신이다 — 뜻이 같은 두 표기에 다른 확신을 두면 판정이 두 벌이 된다.
+   ⚠️ `5분위 이상 ~ 6분위 이하`(지급액 표)와 다르다 — 그 꼴은 `이상` 이 있어 아래 many·이상 규칙으로 확신이 낮다. */
+const BRACKET_RANGE = /(?<!\d)(\d{1,2})\s*[~∼～\-–]\s*(\d{1,2})\s*(?:구간|분위)(?!\s*(?:이상|초과|는\s*미선발|은\s*미선발))/;
 function parseBracket(t) {
   const m = t.match(/(\d{1,2})\s*(?:구간|분위)\s*(이하|이내|미만)/);
-  if (!m) return null;
-  const v = num(m[1]);
+  const mr = m ? null : t.match(BRACKET_RANGE);
+  if (!m && !mr) return null;
+  const v = m ? num(m[1]) : num(mr[2]);
   if (v == null || v < 1 || v > 10) return null;
+  if (mr && (num(mr[1]) == null || num(mr[1]) > v)) return null;   // `8~0구간` 은 범위가 아니다
   /* 🔴 `5분위 이상 ~ 6분위 이하`처럼 구간이 여럿이면 요건이 아니라 **지급액 표**다
-     (서울과기대 근로장학이 이 표로 0% 오탐을 냈다 — 2026-08-24). */
+     (서울과기대 근로장학이 이 표로 0% 오탐을 냈다 — 2026-08-24). 범위 꼴 `0~8구간` 은 `구간` 이 한 번이라 하나로 센다. */
   const many = (t.match(/\d{1,2}\s*(구간|분위)/g) || []).length > 1;
-  return { kind: 'bracket', max: m[2] === '미만' ? v - 1 : v,
-           conf: (many || /이상/.test(t) || HAS_EXCEPTION.test(t)) ? LOW : HIGH };
+  /* 🔴 리뷰(2026-10-12 조각 1)가 잡은 두 구멍 — ① `1~3구간은 지원 불가`·`9-10분위 미선발`·`0~8구간이 아닌 자`·`1~3구간 우선 선발` 은
+     상한이 아니라 **반대말**이거나 순위다 → 확신을 낮춘다(✕ 를 못 낸다) ② `기초생활수급자 또는 1~5구간 해당자` 는 「또는」 줄이라
+     수급자인 학생이 7구간이어도 되는데, 처지(trait)만 푸는 OR 규칙은 구간 미달을 못 푼다 → 「또는」 줄의 구간도 확신을 낮춘다.
+     둘 다 '틀린 미달은 못 받는 것보다 나쁘다' 쪽이다(모름이 된다). 제외 줄의 뜻 뒤집기는 judgeCond 'bracket' 이 한다. */
+  const negated = /제외|불가|미선발|아닌|우선|또는/.test(t);
+  return { kind: 'bracket', max: m && m[2] === '미만' ? v - 1 : v,
+           conf: (many || negated || /이상/.test(t) || HAS_EXCEPTION.test(t)) ? LOW : HIGH };
 }
 
 /* ── 직전학기 이수학점 ── `12학점 이상` */
@@ -163,8 +178,24 @@ function parseYear(t) {
   if (r && ahead) { r.conf = LOW; r.ahead = ahead; }
   return r;
 }
+/* 🔴 **`3~4학년` 은 범위다 — `3학년 이상`+`4학년 이하`** (2026-10-12 · 카드 분석 조각 1). 범위 꼴을 못 읽어
+   「4년제 대학교 3~4학년 재학생」 같은 줄 6개가 판정 없이 비어 있었다. `3-4학년`·`3~4 학년` 도 같다.
+   판정은 match-engine judgeCond 'year' 가 min·max 를 함께 본다(둘 다 맞아야 ✓ · 하나라도 벗어나면 ✕).
+   ⚠️ `1학년 또는 2학년` 은 범위가 아니라 열거라 지금처럼 확신이 낮다(YEAR_NUM_ALL many). */
+const YEAR_RANGE = /(?<!\d)(\d)\s*[~∼～\-–]\s*(\d)\s*학년/;
 function parseYearBody(t) {
   if (/신입생/.test(t) && !/신\s*[·,\/]\s*편입생/.test(t)) return { kind: 'year', eq: 1, conf: LOW };
+  const mr = t.match(YEAR_RANGE);
+  if (mr) {
+    const lo = num(mr[1]), hi = num(mr[2]);
+    if (lo != null && hi != null && lo >= 1 && hi <= 6 && lo <= hi) {
+      /* 범위 밖에 다른 학년이 또 있으면(`3~4학년 또는 1학년 편입생`) 단정하지 않는다 */
+      const others = (t.replace(YEAR_RANGE, ' ').match(YEAR_NUM_ALL) || []).length > 0;
+      /* `고등학교 1~3학년 및 대학생` 의 범위는 고등학생 이야기다(리뷰) — 대학 4학년에게 ✕ 가 아니라 모름 */
+      const school = /고등|중학|초등/.test(t);
+      return { kind: 'year', min: lo, max: hi, conf: (others || school) ? LOW : HIGH };
+    }
+  }
   const m = t.match(YEAR_NUM);
   if (!m) return null;
   const v = num(m[1]);
@@ -391,7 +422,7 @@ const GRAD_BODY = /대학원\s?(석사|박사)?\s?과정|석사\s?(과정|학위
     이 줄이 학부로 읽히면 아래 parseDegree 의 'both' 갈래로 가므로, 그 갈래의 '남는 글자' 잣대가 독일어 요건을 ✓ 로 세지 않게 막는다.) */
 const UNDERGRAD_TOO = /학부|학사\s?과정|학사\s*(?:[,·ㆍ/]|및|와|과|또는|이나)\s*석\s?[·ㆍ]?\s*(?:박사)?[^.]{0,8}과정|학\s*[·ㆍ]\s*석\s*[·ㆍ]?\s*(?:박사?)?\s*과정|전문대|대학생|대학(?!원)\s*(재학|졸업|신입|편입|\d\s*학년)/;
 function gradOnly(t) {
-  const x = String(t || '');
+  const x = untag(t);
   if (GRAD_LABEL.test(x)) return true;
   return GRAD_BODY.test(x) && !UNDERGRAD_TOO.test(x);
 }
@@ -410,13 +441,13 @@ function gradOnly(t) {
       묶인 공고**는 빼고 본다 — 그 둘이 틀린 미달을 내던 자리다(2026-09-12 코드 리뷰).
       🔴 되돌리려거든 온보딩에 학위 과정 칸을 먼저 만들 것. */
 function gradTarget(t) {
-  const x = String(t || '');
+  const x = untag(t);
   if (GRAD_LABEL.test(x)) return 'label';
   return (GRAD_BODY.test(x) && !UNDERGRAD_TOO.test(x)) ? 'body' : null;
 }
 /* 이 줄이 학부생을 대상으로 말하는가. 🔴 판정은 위 UNDERGRAD_TOO **한 곳**에서만 한다 —
    베껴 두면 `대학생` 을 더한 것 같은 수리가 한쪽에만 들어가 두 벌이 갈라진다. */
-function mentionsUndergrad(t) { return UNDERGRAD_TOO.test(String(t || '')); }
+function mentionsUndergrad(t) { return UNDERGRAD_TOO.test(untag(t)); }
 
 /* ── 나이 ── `만 39세 이하` · 범위 `만 19세 ~ 만 34세` · `19~39세` (2026-10-01 — 대외활동·청년정책 공고의 가장 흔한 조건)
    🔴 범위는 **위·아래 둘 다** 본다 — 아래만 놓치면 `만 25~34세` 에 22살이 ✓ 가 된다(틀린 안심).
@@ -577,6 +608,19 @@ function unnamedPlace(t, about) {
   return { kind: 'residence', about: about || 'home', anyOf: [], cities: words, inArea: false, unnamed: true, conf: LOW };
 }
 
+/** `청양 출신`·`청양군 출신`·`충남 출신` 에서 표에 있는 지역 이름 — 없으면 null (출신 지역 · 조각 1) */
+function originPlaceIn(t) {
+  const m = String(t).match(/(?:^|[\s(,·])([가-힣]{2,7})\s?(?:출신|태생)/);   // 7자 — `강원특별자치도 출신`
+  if (!m) return null;
+  const w = m[1];
+  if (REGIONS.includes(w) || REGIONS.includes(w.replace(/(특별자치|특별|광역)?(시|도)$/, ''))) return w;
+  const bare = w.replace(/(시|군|구)$/, '');
+  for (const list of Object.values(REGION_CITIES)) {
+    if (list.includes(w) || list.some((c) => c.replace(/(시|군|구)$/, '') === bare && bare.length >= 2)) return w;
+  }
+  return null;
+}
+
 function parseResidence(t) {
   /* ⚠️ `주소를 둔` 의 `둔` 은 `두`+`ㄴ` 이 아니라 **한 글자**다 — `주소를?\s?두` 로 잡으려다
      `주소를 둔 광양보건대학교 재학생` 을 통째로 놓쳤다(한글은 음절이 미리 합쳐져 있다). */
@@ -594,6 +638,12 @@ function parseResidence(t) {
   /* 🔴 `관내 고등학교를 졸업하고 …` 는 **출신 고교**다 — '관내' 하나로 사는 곳이 되면 안 된다(2026-10-03 · 시·도 판정을 켜자
      김해시미래인재장학재단의 이 줄이 서울 학생에게 '미달 이유'로 떴다). 진짜 사는 곳 낱말이 함께 있을 때만 home 이다. */
   const homeStrong = /거주|주소|주민등록|시민|도민|군민|구민/.test(t);
+  /* 🔴 **`청양 출신` 은 출신 지역이다 — 판정하지 않고 '모름'으로 남긴다** (2026-10-12 · 카드 분석 조각 1).
+     출신 고교(ORIGIN_SCHOOL)는 가르면서 `○○ 출신` 만 있는 줄은 지역 축이 통째로 빠져, 다른 절(재학)이 맞으면
+     서울 학생에게 ✓ 였다(틀린 안심). 앱은 출신 지역을 묻지 않으므로 ✓ 도 ✕ 도 아니다.
+     ⚠️ **표에 있는 지역 이름일 때만** — `학부 출신 교수`·`농어촌 출신` 은 아니다(REGION_CITIES · REGIONS 로 확인). */
+  const originPlace = !homeStrong && originPlaceIn(t);
+  if (originPlace) return { kind: 'residence', about: 'origin', anyOf: [], cities: [originPlace], inArea: false, conf: LOW };
   const about = (homeWord && (homeStrong || !ORIGIN_SCHOOL.test(t))) ? 'home'
     : ORIGIN_SCHOOL.test(t) ? 'origin'
     : SCHOOL_PLACE.test(t) ? 'school' : 'home';
@@ -996,7 +1046,7 @@ function campusUnasked(t, cs, p) {
   return isEx ? hit : !hit;
 }
 function unaskedAttr(text, conds, p) {
-  const t = String(text || '');
+  const t = untag(text);
   const cs = conds || [];
   const has = (k) => cs.some((c) => c.kind === k);
   if (TERM_ATTR.test(t)) return true;
@@ -1027,8 +1077,14 @@ function parseOpen(t, isExclude) {
   return rest.length ? null : { kind: 'open', conf: HIGH };
 }
 
+/* 화면이 줄 앞에 붙이는 갈래 꼬리표 `〔대전 소재 대학〕` (2026-10-12 · 조각 2 · match-engine requirementLines BRANCH_LABEL).
+   판정은 꼬리표를 떼고 본다 — 안 떼면 `소재 … 대학` 이 학교 위치 요건으로 읽혀 모든 줄이 '모름'이 되고,
+   묻지 않은 처지 검사(unaskedAttr)에는 남는 글자가 되어 ✓ 를 막는다. 줄을 받는 함수는 전부 이걸 먼저 거친다. */
+const BRANCH_TAG = /^\s*〔[^〕]{2,24}〕\s*/;
+function untag(text) { return String(text || '').replace(BRANCH_TAG, ''); }
+
 function parseLine(line, isExclude) {
-  const t = String(line || '');
+  const t = untag(line);
   if (!t.trim()) return { conds: [], multiProgram: false };
   const conds = [];
   const push = (c) => { if (Array.isArray(c)) conds.push(...c); else if (c) conds.push(c); };
@@ -1110,7 +1166,7 @@ const CASE_STATUS = [
       아니라 한 요건의 속살이다(`달서구 구민 또는 그 자녀로서 재학 중인 학생` — 쪼개면
       아무 재학생이나 통과한다). 무엇을 OR 로 볼지는 부르는 쪽이 좁게 정한다. */
 function hasTopLevelOr(text) {
-  const t = String(text || '');
+  const t = untag(text);
   let depth = 0;
   for (let i = 0; i < t.length; i++) {
     const c = t[i];
@@ -1123,7 +1179,7 @@ function hasTopLevelOr(text) {
 
 /* 괄호 밖 `또는` 로 줄을 가른 **갈래들**. `hasTopLevelOr` 와 같은 자리를 센다. */
 function orBranches(text) {
-  const t = String(text || '');
+  const t = untag(text);
   const out = []; let depth = 0, last = 0;
   for (let i = 0; i < t.length; i++) {
     const c = t[i];
@@ -1136,7 +1192,7 @@ function orBranches(text) {
 }
 
 function caseBranch(text) {
-  const t = String(text || '').trim();
+  const t = untag(text).trim();
   /* 이름표가 줄 맨 앞에 있고 **콜론이 곧 따라와야** 분기다.
      `직전학기 성적기준: 80점…`처럼 앞말이 다르면 분기가 아니다. */
   /* `복학생인 경우, 휴학 직전학기 성적 기준` — 콜론 대신 `인 경우,` 로 갈라 쓴 분기도 있다

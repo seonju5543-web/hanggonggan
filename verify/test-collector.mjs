@@ -10434,6 +10434,46 @@ console.log('\n■ 자격 판정 전수 대조 — 틀린 ✓·틀린 ✗ (2026-
     (PRq.parseLine('휴학생은 신청 가능, 수료생은 신청 불가', false).conds.find((c) => c.kind === 'status') || {}).anyOf, ['휴학']);
   eq('  「학적 제한 없음」은 부정이 아니다', (PRq.parseLine('휴학생 포함 학적 제한 없음', false).conds.find((c) => c.kind === 'status') || {}).not, undefined);
   eq('  재학생은 「재학생(휴학생 제외)」에 여전히 ✓', mark('재학생(휴학생, 졸업유예자 제외)'), 'ok');
+  /* ⑤-3-4 (2026-10-12 · 카드 분석 조각 1) 자격 줄 읽기 나머지 — 학년 범위 · 구간 범위 · 백분위 괄호 · 출신 지역.
+     전부 실제 공고 문장이다. 되돌리면(범위를 못 읽으면) 판정 없이 '모름' 이 되거나(학년·백분위) 틀린 안심(구간)이 된다. */
+  const bracketOf = (t) => PRq.parseLine(t, false).conds.find((c) => c.kind === 'bracket') || null;
+  const gradeOf = (t) => PRq.parseLine(t, false).conds.find((c) => c.kind === 'grade') || null;
+  const resOf = (t) => PRq.parseLine(t, false).conds.find((c) => c.kind === 'residence') || null;
+  /* 학년 범위 — `3~4학년` 은 3학년 이상 + 4학년 이하(6줄이 판정 없이 비어 있었다) */
+  eq('「4년제 대학교 3~4학년 재학생」을 범위로 읽는다', yearOf('선발대상 : 4년제 대학교 3~4학년 재학생'), { kind: 'year', min: 3, max: 4, conf: 'high' });
+  eq('  「3-4학년」·「3~4 학년」도', [yearOf('2026학년도 2학기 기준, 4학기 이상 이수한 3-4학년 학생'), yearOf('가 . 4 학기 이상 이수한 3~4 학년 정규학기 재학생 ( 휴학 ( 예정 ) 생 제외 )')].map((c) => c && [c.min, c.max]), [[3, 4], [3, 4]]);
+  eq('  3·4학년은 ✓ · 1·2학년은 ✕ · 5학년(의·약학)도 ✕ (상한도 본다)', [1, 2, 3, 4, 5].map((y) => mark('선발대상 : 4년제 대학교 3~4학년 재학생', { year: y })), ['no', 'no', 'ok', 'ok', 'no']);
+  eq('  「고등학교 1~3학년 및 대학생」의 범위는 고등학생 이야기 — 4학년에게 ✕ 가 아니다 (리뷰)', mark('고등학교 1~3학년 및 대학생', { year: 4 }), null);
+  eq('  범위 밖에 다른 학년이 또 있으면 단정하지 않는다', (yearOf('3~4학년 또는 1학년 편입생') || {}).conf, 'low');
+  eq('  「1학년 또는 2학년」은 범위가 아니라 열거 — 그대로 확신이 낮다', (yearOf('1학년 또는 2학년 학생') || {}).conf, 'low');
+  eq('  앞으로 올 학년도의 범위는 지금 2학년에게 ✕ 가 아니다 (내년엔 3학년)', mark(`${nextAY}학년도 1학기 기준 3~4학년 재학생`, { year: 2 }), null);
+  eq('  연도 숫자를 범위로 읽지 않는다 (「2026-2학기」)', yearOf('2026-2학기 정규학기 재학생'), null);
+  /* 구간 범위 — `0~8구간` 은 `8구간 이하` 와 같은 말이다(아주대 바르게장학 · 10구간 학생에게 ✓ 였다 — 틀린 안심) */
+  eq('「소득분위 0~8구간인 재학생」은 8구간 이하다', bracketOf('① 소득분위 0~8구간인 재학생'), { kind: 'bracket', max: 8, conf: 'high' });
+  eq('  10구간 학생은 ✕ · 8구간은 ✓ (고치기 전엔 10구간도 ✓ 였다)', [mark('① 소득분위 0~8구간인 재학생', { bracket: 10 }), mark('① 소득분위 0~8구간인 재학생', { bracket: 8 })], ['no', 'ok']);
+  eq('  「0~3구간 해당자」·「0~5구간인 자」도', [(bracketOf('2026-2학기 국가장학금 1차/2차 신청자 중 0~3구간 해당자') || {}).max, (bracketOf('- 한국장학재단 학자금 지원구간 0~5구간인 자') || {}).max], [3, 5]);
+  eq('  지급액 표(「5분위 이상 ~ 6분위 이하」)는 여전히 확신이 낮다', (bracketOf('5분위 이상 ~ 6분위 이하') || {}).conf, 'low');
+  eq('  「9-10분위는 미선발」은 범위 요건으로 읽지 않는다 (뜻이 반대다)', bracketOf('7) 선발당시 소득분위 미확정자 또는 9-10분위는 미선발'), null);
+  /* 리뷰(2026-10-12)가 잡은 것 — 반대말·순위·「또는」 줄의 구간은 ✕ 를 못 낸다 · 제외 줄은 뜻이 뒤집힌다 */
+  eq('  「1~3구간은 지원 불가」·「9-10분위 미선발」·「0~8구간이 아닌 자」·「1~3구간 우선 선발」은 확신이 낮다 (상한이 아니다)',
+    ['소득 1~3구간은 지원 불가', '9-10분위 미선발', '0~8구간이 아닌 자', '1~3구간 우선 선발'].map((t) => (bracketOf(t) || {}).conf), ['low', 'low', 'low', 'low']);
+  eq('  그래서 5구간 학생이 「1~3구간은 지원 불가」 줄로 미달이 아니다', mark('소득 1~3구간은 지원 불가', { bracket: 5 }), null);
+  eq('  「기초생활수급자 또는 1~5구간 해당자」— 수급자 7구간 학생은 ✕ 가 아니다 (또는 줄)',
+    mark('기초생활수급·차상위계층 복지증명서 발급자 또는 한국장학재단 학자금 지원 1~5구간 해당자', { bracket: 7, flags: ['basicLiving'] }), null);
+  eq('  제외 절의 「1~3구간」은 1~3구간 학생이 걸리고 5구간은 아니다',
+    [2, 5].map((b) => MEq.judgeCond(PRq.parseLine('학자금 지원구간 1~3구간', true).conds.find((c) => c.kind === 'bracket') || {}, { ...base, bracket: b }, {})), ['fail', 'pass']);
+  /* 백분위 — 점수와 `이상` 사이의 괄호(4줄이 '모름' 이었다) · 미달은 여전히 안 낸다(환산표가 학교마다 다르다) */
+  eq('「백분위 70점(C0) 이상」을 읽는다 (괄호 등급도 단위라 확신은 낮다 — 백분위는 어차피 미달을 안 낸다)', gradeOf('직전 학기 성적이 백분위 70점(C0) 이상인 자'), { kind: 'grade', scale: 'percent', min: 70, conf: 'low' });
+  eq('  「70 점 (100 점 만점 ) 이상」도', (gradeOf('성적이 70 점 (100 점 만점 ) 이상인 자') || {}).min, 70);
+  eq('  「70점(평점 1.51에 해당) 이상」은 두 단위라 확신이 낮다', (gradeOf('○ (성적) 직전학기 성적이 백분위 70점(평점 1.51에 해당) 이상인 자') || {}).conf, 'low');
+  eq('  평점 3.8(백분위 84)은 ✓ · 평점 2.0 은 ✕ 가 아니라 모름', [mark('직전 학기 성적이 백분위 70점(C0) 이상인 자', { gpa: 3.8 }), mark('직전 학기 성적이 백분위 70점(C0) 이상인 자', { gpa: 2.0 })], ['ok', null]);
+  eq('  「평점 3.75점 이상」의 75 를 백분위로 읽지 않는다', (gradeOf('평점 3.75점 이상') || {}).scale, 'gpa45');
+  /* 출신 지역 — 앱은 묻지 않으므로 ✓ 도 ✕ 도 아니다(다른 절이 맞아 서울 학생에게 ✓ 였다 — 틀린 안심) */
+  eq('「청양 출신 대학생」은 출신 지역 줄이다', (resOf('청양 출신 대학생') || {}).about, 'origin');
+  eq('  재학생이라도 ✓ 가 아니다 (모름)', mark('청양 출신 재학생'), null);
+  eq('  「충남 출신」·「청양군 출신」·「강원특별자치도 출신」도', [(resOf('충남 출신 재학생') || {}).about, (resOf('청양군 출신 재학생') || {}).about, (resOf('강원특별자치도 출신 재학생') || {}).about], ['origin', 'origin', 'origin']);
+  eq('  표에 없는 낱말은 지역이 아니다 (「학부 출신 교수」·「농어촌 출신」)', [resOf('충남대학교 학부 출신 교수의 추천서 1부'), resOf('농어촌 지역 출신 학생')], [null, null]);
+  eq('  거주지 줄은 그대로 거주지다 (「청양군에 주소를 둔 자」)', (resOf('청양군에 주소를 둔 자') || {}).about, 'home');
   /* ⑤-4 `X 전공자` 의 X 가 일반 낱말이면 이름이 아니다 — 모든 학생이 ✗ 였다 */
   eq('「해당 학과 전공자」는 ✗ 가 아니다', mark('해당 학과 전공자'), null);
   eq('  「타 학과 전공자 지원 불가」도 ✗ 가 아니다', mark('타 학과 전공자 지원 불가'), null);
@@ -11926,8 +11966,9 @@ console.log('\n■ 대외활동 — 남은 글 표본에서 찾은 것 (2026-10-
   const MEX = rq('../match-engine.js');
   const PRX = rq('../parse-requirements.js');
   const el = (t, ti = '') => AX.activityDetails(t, ti).eligibilityLines;
+  /* 순서는 보지 않는다 — 2026-10-12(조각 2)부터 맨 `대상 :` 이 자격 이름표라 그 줄이 절로 먼저 잡히고 `대상연령` 은 표에서 뒤에 붙는다. 둘 다 있으면 된다 */
   eq('① 납작해진 표 — `대상` ↵ `대학생, 일반인 …` · `대상연령` ↵ `만 20세 이상 …` 을 이름표 줄로 잇고 둘 다 자격 줄',
-    el('대상연령\nmanual\n'.replace('manual', '만 20세 이상 ~ 만 39세 이하') + '대상\n대학생, 일반인, 대학, 연구기관', 'SaaS'), ['대상연령 : 만 20세 이상 ~ 만 39세 이하', '대상 : 대학생, 일반인, 대학, 연구기관']);
+    el('대상연령\nmanual\n'.replace('manual', '만 20세 이상 ~ 만 39세 이하') + '대상\n대학생, 일반인, 대학, 연구기관', 'SaaS').slice().sort(), ['대상 : 대학생, 일반인, 대학, 연구기관', '대상연령 : 만 20세 이상 ~ 만 39세 이하']);
   eq('  🔴 시상표의 `대상` ↵ `교육부장관상` · `대상` ↵ `1` 은 1등 상이지 자격이 아니다 · `봉사대상` ↵ `어르신` 은 봉사 받는 사람',
     [el('시상내역\n대상\n교육부장관상\n최우수상\n원장상'), el('대상\n1\n최우수\n2'), el('봉사대상\n어르신')], [[], [], []]);
   eq('  `봉사자유형` ↵ `성인` 은 자격(1365 봉사 글 틀) · 맨 `대상` ↵ `제출기한 및 제출방법`(다음 절 제목)은 잇지 않는다',
@@ -12078,6 +12119,57 @@ console.log('\n■ 자격요건 로봇 (진짜 브라우저) — 장학·대외�
   const ow = readText(new URL('../.github/workflows/open-api.yml', import.meta.url));
   eq('③ 공공 API — 다시 묻기 전 10초·40초 쉰다 · 실패 원인 코드를 적는다 · 하루 두 번(백업)',
     [/await sleep\(\[10000, 40000\]\[i\]\)/.test(oa), /last\?\.cause/.test(oa), (ow.match(/- cron:/g) || []).length], [true, true, 2]);
+}
+
+/* ══ 자격을 찾는 곳 넓히기 (2026-10-12 · 카드 분석 조각 2 · docs/designs/forms-links-cards.md 「다음에 할 조각」 2) ══
+   ① 줄 머리의 맨 `대상 :` 도 자격 이름표다(발췌기 QUALIFY_HEAD · 화면 section-head QUALIFY_WORD 한 쌍)
+   ② 본문·첨부에 자격이 없으면 제목 속 「(대상: …)」(qualFromTitle · 출처 '공고 제목')
+   ③ 금액 줄은 자격 블록에 담지 않는다(AMOUNT_ROW · isAmountHead — 끊지 않고 건너뛴다)
+   ④ 갈래 이름(`대전 소재 대학` / `타지역 소재 대학`)을 그 아래 줄에 〔갈래〕 로 남기고, 판정은 꼬리표를 떼고 본다(untag)
+   전부 실제 공고 문장이다. 되돌리면 ①② 는 자격이 비고 ③ 은 금액이 자격에 앉고 ④ 는 두 갈래가 섞인다. */
+console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 괄호 · 금액 줄 · 갈래 이름 (2026-10-12 · 조각 2)');
+{
+  /* 되돌리면(옛 발췌기) 함수가 없다 — 검사가 넘어지지 않고 빨간불이 나게 빈 대역을 둔다 */
+  const EX2 = { ...AWAIT_EE, qualFromTitle: AWAIT_EE.qualFromTitle || (() => undefined), AMOUNT_ROW: AWAIT_EE.AMOUNT_ROW || /$^/ };
+  const SH2 = createRequire(import.meta.url)('../section-head.js');
+  const ME2 = createRequire(import.meta.url)('../match-engine.js');
+  const PR2b = createRequire(import.meta.url)('../parse-requirements.js');
+  /* ① 우양재단 동행장학(서울교대) — `대상:` 한 줄이 자격의 전부였는데 번호 없는 `대상:` 은 이름표가 아니어서 비었다 */
+  const woo = '■ 모집 개요\n대상: 국내 4년제 대학 또는 2~3년제 전문대학 재학생 중 학자금지원구간 2분위 이하의 가족 돌봄 청년\n지원 내용: 11명 / 1인당 100만원 (2026년 1회성 지원)\n신청 기간: 2026. 10. 1.(목) ~ 10. 18.(일)';
+  eq('「대상: …」 한 줄을 자격 블록으로 읽는다 (우양재단 — 비어 있었다)', EX2.extractQualifyLines(woo), ['대상: 국내 4년제 대학 또는 2~3년제 전문대학 재학생 중 학자금지원구간 2분위 이하의 가족 돌봄 청년']);
+  eq('  본문 가운데의 「대상」은 여전히 이름표가 아니다', EX2.extractQualifyLines('2026년 동행 장학은 가족 돌봄 청년 을 대상으로 선발하오니,\n귀교의 해당 학생들이 신청할 수 있도록 홍보와 안내에 협조를 부탁드립니다.'), []);
+  eq('  화면도 같은 줄을 자격 머리글로 보고 이름표만 뗀다 (section-head)', [SH2.isQualifyHead('대상: 국내 4년제 대학 재학생'), SH2.headRest('대상: 국내 4년제 대학 재학생'), SH2.isQualifyHead('1. 대 상 :')], [true, '국내 4년제 대학 재학생', true]);
+  eq('  「대상자 확인」은 안내 절이지 자격 머리글이 아니다', [SH2.isQualifyHead('대상자 확인'), SH2.sectionOf('대상자 확인 방법')], [false, 'other']);
+  /* ② 동국대 WISE — 본문이 첨부 안내뿐이고 제목에만 대상이 있다 */
+  eq('제목 속 「(대상: …)」을 자격으로 읽는다 (동국대 WISE · 서초구)', EX2.qualFromTitle({ name: '「2026 상반기 AI·ICT 인재 장학생 모집」 안내(대상: 서울시 서초구에 주소지를 둔 재학생)' }), ['서울시 서초구에 주소지를 둔 재학생']);
+  eq('  요건 신호가 없는 괄호(「(대상: 전 학년)」)·괄호 없는 제목은 안 담는다', [EX2.qualFromTitle({ name: '2026 장학생 모집 안내(대상: 전 학년)' }), EX2.qualFromTitle({ name: '2026 장학생 모집 안내' })], [[], []]);
+  eq('  본편이 본문·첨부 다음에만 제목을 본다 (순서가 뒤집히면 요약이 본문을 이긴다)', (() => {
+    const src = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));
+    const a = src.indexOf('const got = qualFromDocs(it);\n    if (got.length) { qual = got; viaDoc = true;'), b = src.indexOf('const tq = qualFromTitle(it);');
+    return a > 0 && b > a && /viaTitle\) it\.eligibilityFrom = TITLE_LABEL/.test(src);
+  })(), true);
+  /* ③ 금액 줄 — 자격 블록이 담던 것들(실제 원문 꼴) */
+  eq('금액만 적힌 줄을 알아본다', ['- 장학 금액 : 200 만원 / 인 ( 생활비지원 )', '○ 선발규모: 60,000천원', '3 ) 금 액 : 250 만 원 ( 등록금 외 장학금 - 생활비성 )', '○ A] 급 액: 1인 100만원(학생 본인 계좌 입금)', '1학년 100만원'].map((t) => EX2.AMOUNT_ROW.test(t)), [true, true, true, true, true]);
+  eq('  금액이 **조건**인 줄은 금액 줄이 아니다 (「등록금 실납부액 300 만원 이상인 학생」)', ['다 . 2026 학년도 2 학기 등록금 실납부액 300 만원 이상인 학생', '소득분위 0~8구간인 재학생'].map((t) => EX2.AMOUNT_ROW.test(t)), [false, false]);
+  eq('  자격 블록은 금액 줄을 건너뛰고 뒤 요건은 담는다 (끊지 않는다 — 유흥수 꼴)', EX2.extractQualifyLines('1. 신청자격\n가. 2026-2학기 재학생\n- 장학 금액 : 200 만원 / 인\n나. 직전학기 평점 3.0 이상인 자\n2. 신청기간 : 10.1~10.8'), ['1. 신청자격', '가. 2026-2학기 재학생', '나. 직전학기 평점 3.0 이상인 자']);
+  eq('  금액 **절 머리글**(「3. 장학금액 :」)은 여전히 거기서 끊는다 (건너뛰기가 절 판정보다 뒤에 있어야 한다)', EX2.extractQualifyLines('1. 신청자격\n가. 2026-2학기 재학생\n3. 장학금액 : 200만원\n- 지급 시기 : 11월\n4. 신청기간 : 10.1~10.8'), ['1. 신청자격', '가. 2026-2학기 재학생']);
+  /* ④ 대전청년내일재단 성취장학(등록 11건) — 두 갈래의 ①②③이 한 목록에 섞여 보였다 */
+  const two = { type: '교외', eligibility: { selective: true }, eligibilityLines: ['ㅇ (신청자격) 아래 ①, ②, ③을 모두 충족하는 자', '대전 소재 대학',
+    '① 공고일 기준 본인이 1년 전부터 계속해서 대전광역시에 주소를 두고 있는 대한민국 국적의 학생', '② 직전 학기까지의 전체 평균 평점 3.5 이상(4.5 만점 기준) 성적을 가진 학생',
+    '타지역 소재 대학', '① 공고일 기준 본인 또는 부모가 1년 전부터 계속해서 대전광역시에 주소를 두고 있는 대한민국 국적의 학생', '② 직전 학기까지의 전체 평균 평점 3.5 이상(4.5 만점 기준) 성적을 가진 학생',
+    '3. 장학금액 : 150만원', '1인당 150만원'] };
+  const shown = ME2.requirementLines(two, null, { all: true });
+  eq('갈래 이름이 그 아래 줄에 〔갈래〕 로 남는다 · 이름 줄 자체는 안 보인다 · 금액 절은 안 담긴다',
+    [shown.filter((t) => t.startsWith('〔대전 소재 대학〕 ')).length, shown.filter((t) => t.startsWith('〔타지역 소재 대학〕 ')).length, shown.includes('대전 소재 대학'), shown.some((t) => /150만원/.test(t))], [2, 2, false, false]);
+  eq('  같은 글자의 ②가 갈래마다 따로 보인다 (전엔 하나로 뭉쳐 어느 갈래인지 몰랐다)', shown.filter((t) => /평점 3.5/.test(t)).length, 2);
+  const dj = { school: '건국대학교', campus: '', track: 'humanities', major: '영어학과', year: 3, status: '재학', gpa: 3.8, bracket: 5, credits: 15, region: '대전', parentRegion: '대전', nationality: 'korean', birthYear: 2004, flags: [], common: {} };
+  const gLine = shown.find((t) => /평점 3.5/.test(t)) || '', rLine = shown.find((t) => /본인이 1년/.test(t)) || '';   // 되돌리면 빈 줄 — 검사가 넘어지지 않고 빨간불
+  eq('  판정은 꼬리표를 떼고 본다 — 평점 3.8 ✓ · 2.0 ✕ · 대전 거주 ✓ · 서울 거주 ✕',
+    [ME2.requirementMatch(gLine, dj, two), ME2.requirementMatch(gLine, { ...dj, gpa: 2.0 }, two), ME2.requirementMatch(rLine, dj, two), ME2.requirementMatch(rLine, { ...dj, region: '서울', parentRegion: '서울' }, two)], ['ok', 'no', 'ok', 'no']);
+  eq('  꼬리표의 「소재 대학」이 학교 위치 요건으로 읽히지 않는다 (읽히면 모든 줄이 모름이 된다)', PR2b.parseLine(gLine, false).conds.map((c) => c.kind), ['grade']);
+  eq('  묻지 않은 처지 검사에도 꼬리표가 남지 않는다', PR2b.unaskedAttr('〔대전 소재 대학〕 2026-2학기 재학생', PR2b.parseLine('〔대전 소재 대학〕 2026-2학기 재학생', false).conds, dj), false);
+  eq('  대전 학생 카드는 미달 아님 · 서울 학생은 두 갈래 모두 거주로 미달', [ME2.fitDetail(two, dj).fails.length, ME2.fitDetail(two, { ...dj, region: '서울', parentRegion: '서울' }).fails.length], [0, 2]);
+  eq('  「관내 대학」 같은 요건 줄은 갈래 이름이 아니다 (넓히면 요건이 사라진다)', ME2.requirementLines({ eligibilityLines: ['관내 대학 재학생', '대전 소재 대학생'] }, null, { all: true }), ['관내 대학 재학생']);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

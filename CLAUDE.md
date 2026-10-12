@@ -223,7 +223,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 
 ### 판정 · 자격
 
-- **🔴 틀린 미달은 못 받는 것보다 나쁘다 · 판정 못 하는 축은 '틀린 안심'이다.** 확신 낮은 어긋남은 '모름'(`lineVerdict`). 배지·정렬은 `app.js fitVerdict` 한 곳.
+- **🔴 틀린 미달은 못 받는 것보다 나쁘다 · 판정 못 하는 축은 '틀린 안심'이다.** 확신 낮은 어긋남은 '모름'(`lineVerdict`). 배지·정렬은 `app.js fitVerdict` 한 곳. 범위(`3~4학년`·`0~8구간`)는 `이하`와 같은 확신 · 반대말(`1~3구간 불가`)·「또는」 줄·출신 지역(`originPlaceIn`)은 '모름' · 갈래 꼬리표 〔○○ 소재 대학〕 는 화면만의 것이라 판정은 `untag` 로 뗀다(관문 「자격을 찾는 곳 넓히기」).
 - **🔴 퍼센트를 숫자로 비교하지 말 것** — 판정 근거는 `met/total`·`fails`. 규칙은 `verify/fit-consistency.cjs` 한 곳, `=== 'no'` 로 본다. 관문 「적합도 상수」.
 - **🔴 자격/제외/선발은 낱말이 아니라 절 경계로** — `section-head.js`(베끼지 말 것 · `index.html`·`sw.js` 모두 match-engine 보다 먼저 싣는다).
   채점기(`eligibility-report.mjs`)는 **필터와 다른 축**으로 본다 — 같은 규칙을 쓰면 새 유형을 영영 못 본다.

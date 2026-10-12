@@ -28,7 +28,7 @@ import { makeStripper } from './page-boilerplate.mjs';
 /* 절 머리글 판정은 section-head.js 한 곳 — 화면(match-engine)·감사와 같은 파일을 쓴다.
    베끼면 '발췌기는 제외 절로 보는데 화면은 자격으로 보는' 어긋남이 생긴다. */
 import { createRequire as _cr } from 'node:module';
-const { isExcludeHead: shExclude, headText: shHead } = _cr(import.meta.url)('../section-head.js');
+const { isExcludeHead: shExclude, headText: shHead, isAmountHead: shAmount } = _cr(import.meta.url)('../section-head.js');
 /* 공고문 첨부에서 글자 뽑기 — 본문이 "붙임 참조"뿐인 공고가 있다.
    🔴 **공고문만** 본다(attachment-text.mjs 첫머리 참조) — 신청서·동의서를 읽으면
    개인정보 수집 항목이 지원 자격 자리에 앉는다(실제로 겪고 되돌린 적이 있다). */
@@ -97,7 +97,13 @@ function extractFrom(text) {
 /* 자격 절의 제목으로 실제 쓰이는 표현 (2026-08-02 미확보 80건을 세어 보고 추가).
    **그냥 '자격'이나 '대상'은 넣지 않는다** — 세어 보니 가장 많이 나온 것이
    '교원자격'·'평생교육사자격'처럼 **자격증 이름**이라, 넣으면 엉뚱한 줄이 요건으로 들어온다. */
-const QUALIFY_HEAD = /(신청\s?자격|지원\s?자격|응모\s?자격|자격\s?요건|지원\s?요건|신청\s?요건|장학생\s?기본\s?자격|장학생\s?자격|선발\s?요건|응모\s?요건|자격\s?기준|지원\s?조건|신청\s?조건|지원\s?대상|신청\s?대상|모집\s?대상|선발\s?대상|추천\s?대상|수혜\s?대상|장학\s?대상|지급\s?대상|지원\s?가능\s?대상|선발\s?기준|심사\s?기준|응시\s?자격|추천\s?조건|추천\s?자격|참가\s?자격|참여\s?자격|참가\s?대상|참여\s?대상|응모\s?대상|모집\s?자격|대\s?상\s?자\s*[:：]|^\s*\d+\s*[.)]\s*대\s?상\s*[:：])/;
+const QUALIFY_HEAD = /(신청\s?자격|지원\s?자격|응모\s?자격|자격\s?요건|지원\s?요건|신청\s?요건|장학생\s?기본\s?자격|장학생\s?자격|선발\s?요건|응모\s?요건|자격\s?기준|지원\s?조건|신청\s?조건|지원\s?대상|신청\s?대상|모집\s?대상|선발\s?대상|추천\s?대상|수혜\s?대상|장학\s?대상|지급\s?대상|지원\s?가능\s?대상|선발\s?기준|심사\s?기준|응시\s?자격|추천\s?조건|추천\s?자격|참가\s?자격|참여\s?자격|참가\s?대상|참여\s?대상|응모\s?대상|모집\s?자격|대\s?상\s?자\s*[:：]|^\s*\d+\s*[.)]\s*대\s?상\s*[:：]|^\s*(?:[\-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙❍◎￭·ㆍ*ㅇ]\s*)?대\s?상\s*[:：])/;
+/* 🔴 줄 머리의 맨 `대상 :` 도 이름표다 (2026-10-12 · 카드 분석 조각 2). 우양재단 동행장학(서울교대)은 `대상: 국내 4년제 대학 … 2분위 이하의
+   가족 돌봄 청년` 한 줄이 자격의 전부인데, 번호 없는 `대상:` 은 위 목록에 없고 2차 경로는 두 줄 이상만 믿어 자격이 통째로 비었다.
+   ⚠️ **줄 머리 + 콜론**일 때만이다 — 본문 가운데의 `대상` 은 여전히 아니다(위 주석의 '자격증 이름' 함정과 같은 이유). */
+/* 금액만 적힌 줄 — `- 장학 금액 : 200 만원 / 인 ( 생활비지원 )` · `○ 선발규모: 60,000천원` · `1학년 100만원` (조각 2 · blockFrom 이 건너뛴다).
+   ⚠️ `등록금 실납부액 300 만원 이상인 학생` 처럼 금액 뒤에 조건 문장이 이어지는 줄은 요건이라 걸리지 않는다(끝이 금액·단위·괄호여야 한다). */
+const AMOUNT_ROW = /^[^:：]{0,16}[:：]\s*(?:1\s?인(?:당)?\s*)?[\d,.]+\s*(?:만\s?원|천\s?원|원)(?:\s*[\/·]\s*(?:인|학기|년|월|회))?(?:\s*[(（][^)）]*[)）])?\s*$|^[가-힣\d\s~·]{2,12}\s[\d,.]+\s*(?:만\s?원|천\s?원)\s*$/;
 /* 자격 블록의 끝 — **확실한 다음 절**에서만 끊는다.
    예전엔 '장학금액' 같은 낱말에서도 끊었는데, 자격이 표로 적힌 공고에서는 그게
    표의 머리글이라 거기서 잘려 정작 중요한 요건 줄(장애의 정도가 심한 장애인 등)을
@@ -628,6 +634,13 @@ function extractQualifyLines(text, opts = {}) {
       }
     }
     if (JUNK.test(l)) continue;
+    /* 🔴 금액 줄은 자격이 아니다 (2026-10-12 · 카드 분석 조각 2). `3 ) 금 액 : 250 만 원`·`- 장학 금액 : 200 만원 / 인`·`○ 선발규모: 60,000천원`·
+       `1학년 100만원` 같은 금액 이름표·표 줄이 자격 블록에 담겨, 화면의 잡음 규칙(REQ_NOISE)에만 기대고 있었다.
+       이름표 판정은 section-head isAmountHead 한 곳(화면·감사와 같다) · 표 줄은 AMOUNT_ROW. 끊지 않고 **건너뛴다** —
+       유흥수처럼 금액 줄 뒤에 진짜 요건이 이어지는 공고가 있다.
+       ⚠️ 자리는 **다음 절 판정(NEXT_SECTION·번호 단계) 뒤**다 — 앞에 두면 `3. 장학금액 :` 같은 절 머리글을 끊지 않고 건너뛰어
+          그 뒤 지급 내용·신청기간까지 자격 블록에 담긴다(첫 시험에서 실제로 그랬다 · 되돌리면 전후 대조에 12줄이 는다). */
+    if (shAmount(l) || AMOUNT_ROW.test(l)) continue;
     if (TABLE_NOISE.test(l.replace(/\s+/g, ' ').trim())) continue;   // 표 머리글·표 값
     if (l.length < 4 || l.length > 200) continue;
     if (!/[0-9가-힣]/.test(l)) continue;
@@ -700,7 +713,7 @@ function scoopQualifyLines(text) {
    비슷한 코드를 따로 베껴야 했고(그러면 규칙이 두 벌이 된다), 검사도 '원본 글자를 읽어
    규칙이 살아 있는지만 보는' 약한 방식에 머물렀다. `EXCERPTS_AS_LIB=1`이면 본편을 건너뛴다. */
 export { extractQualifyLines, scoopQualifyLines, extractFrom, extractExcludeLines, extractPriorityLines,
-         extractDeadline, extractOpenDate, extractAnnounce };
+         extractDeadline, extractOpenDate, extractAnnounce, qualFromTitle, AMOUNT_ROW };
 
 let browserBodies = {};
 try { browserBodies = JSON.parse(fs.readFileSync(new URL('extracted/browser-bodies.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
@@ -714,7 +727,7 @@ const strip = makeStripper(texts);
 let eligDocs = {};
 try { eligDocs = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
 
-let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, gotDeadline = 0, dlFromDoc = 0, gotOpen = 0, gotAnnounce = 0, gotApplyEmail = 0, droppedApplyEmail = 0, gotApplyPortal = 0;
+let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, fromTitle = 0, gotDeadline = 0, dlFromDoc = 0, gotOpen = 0, gotAnnounce = 0, gotApplyEmail = 0, droppedApplyEmail = 0, gotApplyPortal = 0;
 /* 공고문 첨부에서 자격 줄을 읽는다. 본문 경로와 원문 없는 경로가 **같은 함수**를 써야
    "본문 있을 땐 읽고 없을 땐 안 읽는" 어긋남이 안 생긴다. 스캔 PDF 등 글자가 안 나오는
    것은 조용히 건너뛴다(읽은 척하는 것보다 안 읽는 편이 낫다). */
@@ -863,6 +876,18 @@ function fillApplyPortal(it, body) {
   else console.log(`   [포털] ${it.id} → ${got.system} (${from})`);
 }
 
+/* 제목 속 「(대상: …)」 (2026-10-12 · 카드 분석 조각 2) — 본문·첨부 어디에도 자격 절이 없는데 제목에만 대상을 적는 공고가 있다
+   (동국대 WISE 「…안내(대상: 서울시 서초구에 주소지를 둔 재학생)」 · 자격 빈칸 26건 중 2건).
+   🔴 본문·첨부에서 **한 줄도 못 뽑았을 때만** 쓴다 — 제목은 요약이라 본문이 있으면 본문이 정확하다.
+   요건 신호(REQ_SIGNAL)가 있는 괄호만 — `(대상: 전 학년)` 같은 빈 말은 안 담는다. 출처는 `eligibilityFrom = '공고 제목'`. */
+const TITLE_LABEL = '공고 제목';
+function qualFromTitle(it) {
+  const m = String(it.name || it.title || '').match(/[(（]\s*(?:지원|신청|모집|선발)?\s?대상\s*[:：]\s*([^()（）]{4,80}?)\s*[)）]/);
+  if (!m) return [];
+  const line = m[1].trim();
+  return REQ_SIGNAL.test(line.replace(/\S*증명서/g, '')) ? [line] : [];
+}
+
 function qualFromDocs(it) {
   /* 🔴 여기는 **1차(절 가르기)뿐이다. 2차(scoop)를 붙이지 말 것** (2026-09-04, 붙였다가 되돌렸다).
      본문 경로에는 `extractQualifyLines() || scoopQualifyLines()` 두 겹이 있어서 "첨부 경로도
@@ -951,14 +976,17 @@ for (const it of reg.items) {
        (받아 놓고 못 쓰는 상태였다 — 2026-08-21에 실제로 그랬다).
        🔴 못 뽑았을 때 기존 값을 지우지 않는 것은 그대로다 — '원문이 없다'는 '모른다'이지
        '자격이 없다'가 아니다(위 2026-08-03 주석과 같은 정신). */
-    const got = qualFromDocs(it);
+    let got = qualFromDocs(it);
+    let gotFrom = got.length ? docLabel(qualFromDocs.lastFile) : null;
+    /* 첨부에도 없으면 제목 속 「(대상: …)」 (조각 2 · qualFromTitle) */
+    if (!got.length) { got = qualFromTitle(it); if (got.length) gotFrom = TITLE_LABEL; }
     /* 🔴 AI·관리자가 채운 자격은 여기서도 덮지 않는다 (2026-09-17 · OCR 을 붙이자 바로 드러났다):
        본문 없는 공고의 포스터를 AI 가 읽어 둔 값(`AI(공고 포스터 그림)`)을, 같은 포스터의 OCR 글자를
        무료 경로가 읽게 되자 **더 거친 줄로 갈아 끼웠다**. 아래 본문 갈림길의 917행 규칙과 같은 규칙이다. */
     if (got.length && WRITE && !humanOwned(it.eligibilityFrom)) {
       it.eligibilityLines = got;
-      it.eligibilityFrom = docLabel(qualFromDocs.lastFile);
-      fromDoc += 1;
+      it.eligibilityFrom = gotFrom;
+      if (gotFrom === TITLE_LABEL) fromTitle += 1; else fromDoc += 1;
     }
     /* 🔴 원문이 없어도 **첨부는 있을 수 있다** — 마감일도 여기서 채운다.
        안 하면 '본문 껍데기 + 첨부에 요강' 게시판(경희대 유형)이 이 갈림길에서
@@ -990,10 +1018,15 @@ for (const it of reg.items) {
     : scoopQualifyLines(body);
   /* 본문에서 못 뽑았으면 **공고문 첨부**를 본다 — 순서를 뒤집지 말 것.
      본문이 있는 한 본문이 언제나 정확하다(첨부에는 붙임·서식이 섞인다). */
-  let viaDoc = false;
+  let viaDoc = false, viaTitle = false;
   if (!qual.length) {
     const got = qualFromDocs(it);
     if (got.length) { qual = got; viaDoc = true; fromDoc += 1; }
+    else {
+      /* 본문·첨부 어디에도 없으면 제목 속 「(대상: …)」 (조각 2 · qualFromTitle) — 본문이 있으면 본문이 늘 먼저다 */
+      const tq = qualFromTitle(it);
+      if (tq.length) { qual = tq; viaTitle = true; fromTitle += 1; }
+    }
   }
   /* 마감일 — **비어 있을 때만** 채운다. 사람이 넣은 값도, auto-register 가 제목에서
      읽은 값도 덮지 않는다(더 많이 본 쪽이 이기는 게 아니라 먼저 정해진 쪽이 이긴다). */
@@ -1040,7 +1073,8 @@ for (const it of reg.items) {
   if (WRITE && /^(AI|관리자)/.test(it.eligibilityFrom || '')) { kept += 1; continue; }
   if (WRITE) {
     if (viaDoc) it.eligibilityFrom = docLabel(qualFromDocs.lastFile);
-    else if (/^공고문 첨부/.test(it.eligibilityFrom || '')) delete it.eligibilityFrom;
+    else if (viaTitle) it.eligibilityFrom = TITLE_LABEL;
+    else if (/^공고문 첨부/.test(it.eligibilityFrom || '') || it.eligibilityFrom === TITLE_LABEL) delete it.eligibilityFrom;
     if (qual.length) it.eligibilityLines = qual;
     else delete it.eligibilityLines;   // 원문은 읽었는데 못 뽑았다 → 옛 값을 남기지 않는다
 
@@ -1075,6 +1109,7 @@ for (const it of reg.items) {
 }
 console.log(`\n게시판 메뉴를 걷어낸 공고 ${cleaned}건`);
 console.log(`발췌 성공 ${hit}건 · 원문은 읽었으나 발췌 불가 ${none}건 · 원문 미확보라 손대지 않음 ${kept}건`);
+console.log(`자격을 공고문 첨부에서 읽은 공고 ${fromDoc}건 · 제목 속 「(대상: …)」에서 읽은 공고 ${fromTitle}건`);
 console.log(`마감일을 새로 읽은 공고 ${gotDeadline}건 (그중 공고문 첨부에서 ${dlFromDoc}건)`);
 console.log(`접수 메일 주소를 새로 읽은 공고 ${gotApplyEmail}건 · 지금 규칙으로 접수처가 아니라 걷은 공고 ${droppedApplyEmail}건`);
 console.log(`포털 신청 시스템을 새로 읽은 공고 ${gotApplyPortal}건`);

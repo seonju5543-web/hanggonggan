@@ -838,11 +838,11 @@
    "text": "4년제 대학교 3~4학년 재학생",
    "exclude": false,
    "verdict": {
-    "P1": null,
-    "P2": null,
+    "P1": "ok",
+    "P2": "no",
     "P3": "ok",
-    "P4": null,
-    "P5": null,
+    "P4": "no",
+    "P5": "ok",
     "P6": "no"
    }
   },

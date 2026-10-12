@@ -240,9 +240,12 @@ function judgeCond(c, p, ctx) {
       }
       return 'unknown';
     }
-    case 'bracket':
+    case 'bracket': {
       if (p.bracket == null) return 'unknown';
-      return p.bracket <= c.max ? 'pass' : 'fail';
+      const vb = p.bracket <= c.max ? 'pass' : 'fail';
+      /* 제외 줄(`1~3구간은 제외`)에서는 뜻이 뒤집힌다 — year·flags 와 같은 규약 (2026-10-12 · 조각 1 리뷰) */
+      return c.exclude ? (vb === 'pass' ? 'fail' : 'pass') : vb;
+    }
     case 'credits':
       if (p.credits == null) return 'unknown';
       if (c.min != null) return p.credits >= c.min ? 'pass' : 'fail';
@@ -255,8 +258,13 @@ function judgeCond(c, p, ctx) {
          그 사이는 모름. 줄은 확신이 낮아 미달도 화면에선 '모름'이 된다. */
       const ahead = c.ahead > 0 ? c.ahead : 0;
       let v = 'unknown';
-      if (c.min != null) v = y >= c.min ? 'pass' : (y + ahead >= c.min ? 'unknown' : 'fail');
-      else if (c.max != null) v = y + ahead <= c.max ? 'pass' : (y <= c.max ? 'unknown' : 'fail');
+      /* `3~4학년` 은 min·max 가 함께 온다(2026-10-12 · 조각 1) — 둘 다 맞아야 통과, 하나라도 벗어나면 미달, 그 밖은 모름 */
+      const vMin = c.min == null ? null : (y >= c.min ? 'pass' : (y + ahead >= c.min ? 'unknown' : 'fail'));
+      const vMax = c.max == null ? null : (y + ahead <= c.max ? 'pass' : (y <= c.max ? 'unknown' : 'fail'));
+      if (vMin != null || vMax != null) {
+        const both = [vMin, vMax].filter(Boolean);
+        v = both.includes('fail') ? 'fail' : both.every((x) => x === 'pass') ? 'pass' : 'unknown';
+      }
       else if (c.eq != null) v = (y === c.eq && !ahead) ? 'pass' : 'unknown';   // `2학년 학생`은 딱 그 학년인지 애매
       /* 🔴 **제외 줄에서는 뜻이 뒤집힌다** (2026-10-11 · 조각 B 리뷰 — 원래부터 있던 결함). `4학년 이상 재학생`
          이 제외 줄이면 **4학년이** 걸린다. 안 뒤집으면 1~3학년이 미달이고 정작 4학년이 통과했다.
@@ -1231,6 +1239,12 @@ function anyOfCount(line) {
 const REAL_CATEGORY = /(자|생|중|상|하|명|원)$|북한이탈|새터민|다문화|기초생활|차상위|국적|유공|보훈|장애|한부모|다자녀|(?:시|도|구|군)민|성인|청년|누구나/;
 const isTableCell = (t) => BARE_CELL.test(t) && !REAL_CATEGORY.test(t);
 
+/* 🔴 **갈래 이름을 남긴다** (2026-10-12 · 카드 분석 조각 2). 대전청년내일재단 성취장학(등록 11건)은 `대전 소재 대학` / `타지역 소재 대학`
+   두 갈래 아래 ①②③을 따로 적는다. 갈래 이름 줄은 요건 신호가 없어 버려지고, 두 갈래의 ①②③이 한 목록에 섞여
+   `본인이 … 대전에 주소` 와 `본인 또는 부모가 … 대전에 주소` 가 나란히 보였다. 이름 줄은 그대로 안 보이되 그 아래 줄 앞에
+   〔갈래〕 를 붙인다 — 판정은 parse-requirements 가 꼬리표를 떼고 본다(BRANCH_TAG · untag). 절이 바뀌거나 다른 갈래를 만나면 끝난다.
+   ⚠️ 좁게 잡는다 — `○○ 소재 대학(교·생)` 꼴만. 넓히면 `관내 대학` 같은 요건 줄이 꼬리표가 되어 사라진다. */
+const BRANCH_LABEL = /^[(（]?\s*[가-힣·]{2,8}\s?소재\s?(?:대학교?|대학생|전문대학?)\s*[)）]?\s*[:：]?$/;
 function requirementLines(sch, lines, opts) {
   const keepPriority = !!(opts && opts.keepPriority);   // '먼저 뽑는 기준' 블록을 그릴 때만 참
   /* `loose` — '제외 대상'·'먼저 뽑는 기준' 블록을 그릴 때만 참.
@@ -1259,6 +1273,7 @@ function requirementLines(sch, lines, opts) {
      휴학생이 그 줄을 보고 자기가 된다고 읽는, **자격이 뒤집혀 보이는 실패**다.
      판정은 section-head.js 한 곳에 있다(발췌기·감사도 같은 파일을 쓴다 — 베끼지 말 것). */
   let sect = 'qualify';   // 머리글을 만나기 전까지는 자격 절로 본다(대개 자격부터 적는다)
+  let branch = '';        // 지금 읽는 줄이 어느 갈래(`대전 소재 대학`) 아래인가 — 비면 갈래 없음 (조각 2)
   let asideSect = false;  // 지금 절이 ※ 곁말에서 온 것인가 (아래 주석)
   let asideBase = 'qualify';   // 곁말 전에 있던 절 — 번호 항목을 만나면 여기로 돌아온다
   let anyLeft = 0, anyGroup = 0;   // 선택지 묶음 — 몇 줄 남았나 / 몇 번째 묶음인가 (위 주석)
@@ -1279,11 +1294,17 @@ function requirementLines(sch, lines, opts) {
       if (isAside) { asideSect = true; asideBase = sect; }
       else asideSect = false;
       sect = head;
+      branch = '';   // 절이 바뀌면 갈래도 끝난다 (조각 2)
       /* 🔴 머리글 뒤에 내용이 붙어 있으면 그 내용은 살린다 — `2) 추천대상 : 4년제 대학교…`.
          버리면 그 공고의 **유일한 자격 줄**이 사라진다(동산장학회로 실증). */
       const rest = SH.headRest(l);
       if (!rest) continue;
       t = tidyRequirement(rest);
+    }
+    /* 갈래 이름 줄(`대전 소재 대학`) — 안 보이되 아래 줄에 〔갈래〕 로 남긴다 (위 BRANCH_LABEL 주석 · 자격 블록만) */
+    if (!loose && BRANCH_LABEL.test(t)) {
+      branch = t.replace(/^[(（]\s*|\s*[)）]\s*[:：]?$|\s*[:：]$/g, '').trim();
+      continue;
     }
     /* 자격 블록을 그릴 때는 자격 절 밖의 줄을 담지 않는다.
        `loose`(제외·순위 블록)일 때는 이 잣대를 대지 않는다 — 그 블록은 애초에 자격이 아니다. */
@@ -1428,8 +1449,9 @@ function requirementLines(sch, lines, opts) {
           && !(AFFIRM_ELIG.test(t) && ENDS_AFFIRM.test(t))) continue;
       if (!REQ_SIGNAL.test(t)) continue;
     }
-    if (!out.includes(t)) {
-      out.push(t);
+    const shown = branch ? `〔${branch}〕 ${t}` : t;   // 갈래 꼬리표 (조각 2) — 판정은 parse-requirements 가 떼고 본다
+    if (!out.includes(shown)) {
+      out.push(shown);
       /* 🔴 연달아 오는 경우 분기는 **한 요건**이다 — 따로 세면 분모가 부풀어
          정읍시민이 요건 7개(실제 4개)로 잡혔다. 첫 분기에서 묶음을 열고 이어 붙인다. */
       if (PR.caseBranch(t)) {
