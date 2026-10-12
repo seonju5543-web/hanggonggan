@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-12T07:50:34.790Z",
+ "updatedAt": "2026-10-12T15:38:25.230Z",
  "v": 1,
  "bad": {
   "https://2026grchallenge.com/": {
@@ -77,6 +77,20 @@
    "src": "robot",
    "title": "2026년 한국가스안전공사 지역상생 특별장학생 선발 공고",
    "round": "2026-10-23"
+  },
+  "id:kosaf-2701009001": {
+   "url": "https://www.mariners.or.kr/business/view.php?bd_code=notice&bd_idx=7603",
+   "at": "2026-10-13",
+   "src": "robot",
+   "title": "2026년도 (사)한국해기사협회 육.해상 회원 자녀 장학생 선발 안내 new -->",
+   "round": "2026-10-13"
+  },
+  "id:kosaf-2704211001": {
+   "url": "https://myungfoundation.or.kr/modules/bbs/bbsView.php?id=28&page=1&&code=bbs_notice&xid=1",
+   "at": "2026-10-13",
+   "src": "robot",
+   "title": "명인다문화장학재단 2026년도 2학기 대학 장학생 모집",
+   "round": "2026-10-30"
   },
   "u:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD-%EB%B9%84%EA%B5%90%EA%B3%BC%5D%20%5BArTechne%5D%202026%20%EB%B9%84%EA%B5%90%EA%B3%BC%20%EB%A7%88%EC%9D%BC%EB%A6%AC%EC%A7%80%20%EC%9E%A5%ED%95%99%EC%A0%9C%EB%8F%84": {
    "url": "https://www.gachon.ac.kr/bbs/kor/743/125694/artclView.do",
