@@ -27,11 +27,19 @@ id = "b2eb1c8f30814fad91249e2f08334fbf"
 [triggers]
 crons = ["*/2 * * * *"]
 
-# 🔴 요청 횟수 제한 (2026-10-12 · server/shared/guard.mjs) — 접속 주소 하나가 /subscribe 를 1분에 10번까지. 없으면 통과(이미 가동 중인 서버라 알림을 끊지 않는다).
+# 🔴 요청 횟수 제한 (2026-10-12 · server/shared/guard.mjs) — 접속 주소 하나가 /subscribe 를 1분에 30번까지. 없으면 통과(이미 가동 중인 서버라 알림을 끊지 않는다).
 #    Cloudflare 무료 기능 · 1분 창.
+#    ⚠️ 10번이 아니라 30번인 까닭(같은 날 알림 재발 수리): 학생 폰은 앱을 열 때 하루 한 번 /subscribe 로 등록을 다시 알린다(notify.js pushEnsure).
+#       같은 학교 와이파이는 **접속 주소가 하나**라, 08:10 푸시 뒤 같은 분에 앱을 연 학생 10명이면 11번째부터 429 로 막혀 새 폰의 등록이
+#       다음 날로 밀린다. 한편 이 제한은 10번이든 30번이든 한 주소로 KV 하루 쓰기 한도(1,000회)를 지키지는 못한다(10번/분이어도 하루
+#       14,400회) — 폭주를 늦출 뿐이다. 그래서 정상 등록을 막지 않는 쪽을 고른다(알림이 끊기는 쪽이 더 큰 피해).
 [[ratelimits]]
 name = "SUB_LIMIT"
 namespace_id = "1103"
   [ratelimits.simple]
-  limit = 10
+  limit = 30
   period = 60
+
+# 운영 판 도장 — 여기 적지 않는다. 배포 워크플로(.github/workflows/push-deploy.yml)가 `wrangler deploy --var BUILD:<도장>` 으로 넣고
+# 서버가 /health 에 build 로 내보인다(tools/push-build-stamp.mjs). 여기 박아 두면 파일을 고칠 때마다 손으로 바꿔야 하고 잊으면 거짓 초록이 된다.
+# 🔴 운영은 이 워크플로 **한 길**로만 올린다 — Cloudflare 의 GitHub 연결 빌드(Workers Builds)는 끊는다(server/push/README.md 2단계).

@@ -73,7 +73,11 @@ jobs:
           #   down · misconfig · error(lastError·subs=-1) · outdated(lastSlot 칸 없음) · stale(두 회차 연속 안 돎) ·
           #   error(깨우기를 보냈는데 푸시 서비스가 한 건도 안 받음) · ok. 등록 0대·lastSlot null 은 경고만.
           #   verdict·why 는 이 도구가 GITHUB_OUTPUT 에 적는다.
-          HEALTH_RC="$CURL_RC" HEALTH_CODE="$CODE" HEALTH_BODY="$JSON" node tools/push-health-verdict.mjs
+          #   🔴 outdated(2026-10-12 · 알림 재발 수리): 운영 판 도장(build)을 저장소 도장(tools/push-build-stamp.mjs)과 대조한다 —
+          #   저장소에서 고친 서버 코드가 운영에 안 올라간 것을 매일 잡는다(예전엔 그걸 알 길이 없어 42회 연속 초록이었다).
+          EXPECT=$(node tools/push-build-stamp.mjs)
+          echo "저장소 도장: $EXPECT"
+          HEALTH_RC="$CURL_RC" HEALTH_CODE="$CODE" HEALTH_BODY="$JSON" HEALTH_EXPECT_BUILD="$EXPECT" node tools/push-health-verdict.mjs
           { echo "json<<EOJ"; echo "$JSON"; echo "EOJ"; } >> "$GITHUB_OUTPUT"
 
       - name: 🚨 이상이면 이슈로 알린다
@@ -102,7 +106,8 @@ jobs:
             echo "$JSON"
             echo '```'
             echo
-            echo "조치: Cloudflare 대시보드 → Workers → \`handaejang-push\` 에서"
+            echo "조치: 판정이 **outdated** 면 Actions → 「푸시 서버 배포」(push-deploy.yml) → Run workflow 로 운영에 올리세요"
+            echo "(배포 열쇠가 없으면 그 워크플로가 따로 알립니다). 그 밖의 판정은 Cloudflare 대시보드 → Workers → \`handaejang-push\` 에서"
             echo "로그와 배포 상태를 확인하세요. 설정 값은 \`server/push/README.md\` 에 있습니다."
             echo
             echo "고친 뒤에는 **\`푸시 알림 검사 (상태 + 시험 발송)\`** 을 눌러 실제 도달까지 확인하세요."

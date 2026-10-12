@@ -611,6 +611,11 @@ export default {
         lastSlot,                            // 마지막으로 시작한 예약 회차 (KST)
         lastRun,                             // 마지막으로 끝까지 돈 회차의 결과 (finishRun)
         lastSentRun,                         // 마지막으로 구독에 한 건 이상 깨우기를 보낸 회차 (outcome 'sent' · sent > 0 · 없으면 null)
+        /* 운영에 도는 판의 도장 (2026-10-12) — 배포 워크플로(.github/workflows/push-deploy.yml)가 `wrangler deploy --var BUILD:<도장>` 으로
+           올린 값. 저장소에서 같은 도장(tools/push-build-stamp.mjs)을 찍어 대조하면 '운영이 옛 판인가'가 보인다 — 예전엔 /health 로
+           어느 판이 도는지 알 수 없어, 저장소에서 고친 것이 운영에 안 올라가도 매일 확인이 초록이었다. 대시보드·GitHub 연결 빌드로
+           올린 판은 이 변수가 없어 null 이고, 매일 확인이 '옛 판'으로 경보한다(그 길로 올리면 도장이 없다 — 일부러 그렇다). */
+        build: env.BUILD || null,
       }, 200, cors);
     }
 

@@ -23,6 +23,10 @@
      ③④⑤ 구독자 없는 학교에만 새 글이 있는 회차가 {sent:0} 으로 lastSentRun 을 덮어 08:10 의 '한 대도 안 받음'과 발송 포기 기록을 지웠다
         → 구독에 한 건 이상 보낸 회차(sent > 0)만 lastSentRun · 발송 회복 증거로.
      ⑤ 포기 기록 칸이 하나라 회복 전 발송 포기를 reg·plan 포기가 덮으면 '끝까지 돈 회차'로 같이 회복됐다 → unsent 표식을 이어 적는다.
+   알림 재발 수리(2026-10-12 — "앱을 켜야만 알림이 온다"가 되풀이됨)에서 더한 것:
+     ⑪ 저장소에서 고친 서버 코드가 **운영에 안 올라가도 아무도 몰랐다** — Cloudflare 의 GitHub 연결 빌드가 성공하고도 운영은 옛 판이었고(10-12 실측),
+        매일 확인은 /health 칸만 봐서 42회 연속 초록. → 판 도장(tools/push-build-stamp.mjs · 묶음 파일 내용의 해시)을 배포 워크플로
+        (push-deploy.yml)가 BUILD 변수로 올리고 서버가 /health build 로 내보이며, 매일 확인·배포 확인이 저장소 도장과 대조한다(outdated).
    🔴 표본(고정 예시)만 잰다 — data/·collector/ 장부는 읽지 않는다. 코드 파일(server/·sw.js·엔진)은 코드라 읽는다.
    🔴 Date.now·fetch 는 바꿔 끼운 뒤 finally 로 되돌린다.
    🔴 **문서 글자**(server/README.md · apply/wrangler.toml 주석 · 설계 문서 data-flow.md)를 재는 줄은 로봇 워크플로에서 어긋나도
@@ -39,6 +43,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { stepsOf } from './ci.mjs';
 import { actionBeforeCheckout, codeOf, softEq } from './alerts.mjs';
 import { verdict as pushVerdict, slotTime } from '../../tools/push-health-verdict.mjs';
+import { stamp as buildStamp, bundleFiles } from '../../tools/push-build-stamp.mjs';
 import { readSupabaseConfig, verdict as sbVerdict, probe as sbProbe, run as sbRun } from '../../tools/supabase-health.mjs';
 
 const require = createRequire(import.meta.url);
@@ -678,6 +683,70 @@ export default async function gate(eq, ctx) {
         vm.runInContext("typeof NOTIFY_RULES === 'object' && typeof NOTIFY_RULES.shouldSelfUnsubscribe", sw2.box)],
       [true, ['object', 'function', 'function', 'function', 'function'], 'function']);
     eq('  (b) 규칙이 실린 서비스워커도 빈 푸시에 알림 1건(알릴 것 없으면 기본 문구)', [sw2.res, sw2.shown.length], ['resolved', 1]);
+
+    /* ── ⑪ 운영 판 도장 — 저장소에서 고친 서버 코드가 운영에 올라갔는지를 매일 확인이 잡는다 (2026-10-12 알림 재발 수리) ── */
+    {
+      /* (a) 도장은 묶음 파일 **내용**으로 — import 를 따라가고 · 어느 파일이든 한 글자 바뀌면 다른 도장 · 문서(README)는 안 들어간다 · 줄끝은 무시 */
+      const files = { 'w/worker.js': "import { a } from '../shared/g.mjs';\nexport default {};", 'shared/g.mjs': "export const a = 1;", 'w/wrangler.toml': 'name = "x"' };
+      const rf = (over = {}) => (f) => { const v = { ...files, ...over }[f]; if (v == null) throw new Error('없는 파일 ' + f); return v; };
+      const s0 = buildStamp('w/worker.js', rf(), ['w/wrangler.toml']);
+      eq('⑪ (a) 도장 — import 를 따라 묶음 파일을 모은다(worker · 따라간 shared · toml)', bundleFiles('w/worker.js', rf(), ['w/wrangler.toml']), ['shared/g.mjs', 'w/worker.js', 'w/wrangler.toml']);
+      eq('  (a) 같은 내용이면 같은 도장 · worker 한 글자 · 따라간 파일 한 글자 · toml 한 글자가 바뀌면 각각 다른 도장 · 줄끝(CR LF)만 다르면 같은 도장',
+        [buildStamp('w/worker.js', rf(), ['w/wrangler.toml']) === s0,
+          buildStamp('w/worker.js', rf({ 'w/worker.js': files['w/worker.js'] + ' ' }), ['w/wrangler.toml']) === s0,
+          buildStamp('w/worker.js', rf({ 'shared/g.mjs': 'export const a = 2;' }), ['w/wrangler.toml']) === s0,
+          buildStamp('w/worker.js', rf({ 'w/wrangler.toml': 'name = "y"' }), ['w/wrangler.toml']) === s0,
+          buildStamp('w/worker.js', rf({ 'shared/g.mjs': 'export const a = 1;\r\n' }), ['w/wrangler.toml']) === buildStamp('w/worker.js', rf({ 'shared/g.mjs': 'export const a = 1;\n' }), ['w/wrangler.toml']),
+          /^[0-9a-f]{12}$/.test(s0)],
+        [true, false, false, false, true, true]);
+      /* (a') 주석 속 import 예문은 따라가지 않는다(리뷰 — server/README.md 에 그런 글이 있어 worker 주석에 옮겨 적으면 없는 파일에서 넘어진다) ·
+         여러 줄 중괄호 import 는 따라간다 · `export default {` 뒤 줄을 건너 아무 따옴표나 잡지 않는다 */
+      const tricky = {
+        'w/worker.js': "/* 예: import X from '../../nope.js' 꼴 */\n// import Y from './nope2.mjs'\nimport {\n  a,\n  b,\n} from '../shared/g.mjs';\nexport default {\n  x: 1,\n};\n// 뒤 주석 from './nope3.mjs'\nconst u = 'https://x/y';",
+        'shared/g.mjs': 'export const a = 1, b = 2;', 'w/wrangler.toml': 'name = "x"',
+      };
+      eq("  (a') 주석 속 import 예문·주석 줄은 안 따라가고 · 여러 줄 중괄호 import 는 따라간다",
+        bundleFiles('w/worker.js', rf(tricky), ['w/wrangler.toml']), ['shared/g.mjs', 'w/worker.js', 'w/wrangler.toml']);
+      /* (b) 실제 저장소 — 도장에 worker.js·toml·문지기(guard.mjs)가 들어 있고 · 전부 배포 워크플로가 보는 경로(server/push/·server/shared/) 안이다
+         (밖의 파일을 import 하면 그 파일을 고쳐도 배포가 안 걸려 매일 확인이 영영 '옛 판' — 리뷰) · 서버는 /health 에 env.BUILD 를 내보인다(코드 글자 · 어디서나 엄격) */
+      const realFiles = bundleFiles();
+      eq('  (b) 도장에 든 파일이 전부 push-deploy.yml 의 paths(server/push/ · server/shared/) 안이다',
+        realFiles.filter((f) => !/^server\/(push|shared)\//.test(f)), []);
+      eq('  (b) 실제 묶음 — worker.js · wrangler.toml · 문지기(server/shared/guard.mjs)가 도장에 든다 · 명령줄 도구가 12자리 도장을 찍는다',
+        [realFiles.includes('server/push/worker.js'), realFiles.includes('server/push/wrangler.toml'), realFiles.includes('server/shared/guard.mjs'),
+          (() => { const r = spawnSync(process.execPath, ['tools/push-build-stamp.mjs'], { cwd: rootDir, encoding: 'utf8', timeout: 20000 }); return r.status === 0 && /^[0-9a-f]{12}\n$/.test(r.stdout); })()],
+        [true, true, true, true]);
+      eq('  (b) 서버 /health 가 운영 판 도장(build: env.BUILD)을 내보인다 · wrangler.toml 에 BUILD 를 박아 두지 않는다(박으면 손으로 바꿔야 해 거짓 초록)',
+        [/build:\s*env\.BUILD\s*\|\|\s*null/.test(stripComments(read('server/push/worker.js'))), /^\s*BUILD\s*=/m.test(read('server/push/wrangler.toml'))], [true, false]);
+      /* (c) 판정 — 도장을 넘기면 운영 build 가 다르거나 없을 때 outdated · 같으면 ok · 안 넘기면(옛 호출) 건너뛴다 · 다른 경보(lastError)가 먼저다 */
+      const okB = { ...okJ, build: 'abc123abc123' };
+      const pvB = (o, expectBuild) => pushVerdict({ curlOk: true, code: 200, json: { ...okB, ...o }, now: NOW, expectBuild }).verdict;
+      eq('  (c) 판정 — 도장 같음 ok · 다름 outdated · 운영에 도장 없음(대시보드로 올린 판) outdated · 도장 안 넘김 ok · 빈칸 넘김 ok · 포기 기록이 있으면 error 가 먼저',
+        [pvB({}, 'abc123abc123'), pvB({}, 'ffffffffffff'), pvB({ build: null }, 'abc123abc123'), pvB({ build: null }), pvB({ build: null }, '  '), pvB({ lastError: { at: 1 } }, 'ffffffffffff')],
+        ['ok', 'outdated', 'outdated', 'ok', 'ok', 'error']);
+      eq('  (c) outdated 문구는 배포 워크플로(push-deploy.yml)로 안내하고 원인을 단정하지 않는다',
+        (() => { const w = pushVerdict({ curlOk: true, code: 200, json: { ...okB, build: null }, now: NOW, expectBuild: 'abc123abc123' }).why; return [/push-deploy\.yml/.test(w), /없음/.test(w)]; })(), [true, true]);
+      /* (d) 배선 — 매일 확인이 도장을 찍어 넘기고 · 배포 워크플로가 기본 브랜치에서만 · 도장을 --var BUILD 로 올리고 · 올린 뒤 /health 를 읽어 대조하며 · 열쇠가 없으면 경보한다 */
+      const pd = readOpt('.github/workflows/push-deploy.yml');
+      const pdSteps = stepsOf(pd);
+      const pdRun = (id) => ((pdSteps.find((x) => x.id === id) || {}).run || '');
+      eqDoc('  (d) 매일 확인(push-health.yml)이 저장소 도장(tools/push-build-stamp.mjs)을 HEALTH_EXPECT_BUILD 로 판정 도구에 넘긴다',
+        [/EXPECT=\$\(node tools\/push-build-stamp\.mjs\)/.test(phProbe.run || ''), /HEALTH_EXPECT_BUILD="\$EXPECT" node tools\/push-health-verdict\.mjs/.test(phProbe.run || '')], [true, true]);
+      eqDoc('  (d) 배포 경보 라벨은 push-deploy(매일 확인의 push-health 라벨과 다르다 — 같으면 운영이 멀쩡한 날의 매일 확인이 배포 실패 경보를 닫는다) · 넘어짐 알림은 경보 셋이 안 다룬 실패 전부',
+        [pdSteps.filter((x) => /alert-issue/.test(x.uses || '') && !/mode: resolve/.test(x.raw || '')).every((x) => /label: push-deploy/.test(x.raw || '')) && pdSteps.some((x) => /label: push-deploy/.test(x.raw || '')),
+          pdSteps.some((x) => /robot-down/.test(x.uses || '') && /steps\.deploy\.outcome != 'failure' && steps\.verify\.outcome != 'failure' && steps\.keys\.outputs\.missing != 'true'/.test(x.if || ''))],
+        [true, true]);
+      eqDoc('  (d) 배포 워크플로(push-deploy.yml) — 기본 브랜치 push(server/push·server/shared)와 버튼 · 체크아웃도 기본 브랜치 고정 · 도장을 --var BUILD 로 올린다 · 올린 뒤 /health build 를 읽어 대조한다 · 열쇠 없음은 경보 이슈 + 실패',
+        [/on:\n\s+push:\n\s+branches: \[claude\/nice-heisenberg-WESq5\]\n\s+paths:\n(?:\s+- '[^']+'\n)+/.test(pd) && /- 'server\/push\/\*\*'/.test(pd) && /- 'server\/shared\/\*\*'/.test(pd) && /workflow_dispatch:/.test(pd),
+          /ref: claude\/nice-heisenberg-WESq5/.test(pd),
+          /npx wrangler deploy --var "BUILD:\$STAMP"/.test(pdRun('deploy')),
+          /jq -r '\.build \/\/ empty'/.test(pdRun('verify')) && /if \[ "\$GOT" = "\$STAMP" \]/.test(pdRun('verify')) && /exit 1\s*$/.test(pdRun('verify')),
+          /missing=true/.test(pdRun('keys')) && pdSteps.some((x) => /alert-issue/.test(x.uses || '') && /steps\.keys\.outputs\.missing == 'true'/.test(x.if || '')) && pdSteps.some((x) => /^exit 1$/m.test(x.run || '') && /steps\.keys\.outputs\.missing == 'true'/.test(x.if || '')),
+          /timeout-minutes:/.test(pd), /concurrency:\n\s+group: push-deploy/.test(pd), /cancel-in-progress: false/.test(pd)],
+        [true, true, true, true, true, true, true, true]);
+      eqDoc('  (d) 배포 확인 버튼(push-limit-check.yml)도 운영을 두드리지 않고 도장으로 대조한다(틀린 등록 60번 길은 없다)',
+        (() => { const t = readOpt('.github/workflows/push-limit-check.yml'); return [/node tools\/push-build-stamp\.mjs/.test(t), /jq -r '\.build \/\/ empty'/.test(t), /seq 1 60/.test(t), /not-a-push-service/.test(t)]; })(), [true, true, false, false]);
+    }
   } finally {
     Date.now = realNow;
     globalThis.fetch = realFetch;
