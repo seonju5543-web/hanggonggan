@@ -570,7 +570,7 @@ export function pickKosafPost(t, posts) {
 }
 /* 재단 게시판 글 주소인가 — 상세 주소 판정(isDetailUrl)에 더해, 재단 사이트의 낯선 번호 칸(아산 `index.php?m_cd=32&b_id=2026…`)도 글로 본다
    (data/external.json 은 우리 재단 게시판 로봇이 **날짜 붙은 글 줄**에서만 뽑은 것이라 메뉴가 아니다 — board-links.mjs extractDatedRows) */
-function looksLikePost(u) {
+export function looksLikePost(u) {
   if (isDetailUrl(u)) return true;
   try { return [...new URL(u).searchParams].some(([k, v]) => !/page|offset|limit|menu|m_cd|cate/i.test(k) && /^\d{3,}$/.test(String(v))); } catch { return false; }
 }
@@ -732,6 +732,9 @@ export function shouldOpen(entry, cand, today, round) {
   if (e.lastAt === today) return false;
   if (FINAL.includes(e.status)) {
     if (round && e.round && e.round !== round) return true;                         // 층2 회차가 바뀌었다 — 새 회차로 다시 본다
+    /* 겹침(C)으로 거절된 글 주소 후보는 다시 본다 — 겹침은 열지 않고 재는 판정이라 공짜이고, 규칙이 바뀌면(10-12 층2↔재단 피드) 풀려야 한다.
+       10-05 에 옛 규칙으로 거절된 아산·고속도로·송파·파안이 규칙을 고친 뒤에도 영영 닫혀 있었다. 아직 겹치면 같은 거절이 다시 적힐 뿐이다. */
+    if (e.status === 'rejected' && e.checks && e.checks.C === 'fail' && cand && cand.url) return true;
     /* 사람이 후보 줄을 다시 적었다(addedAt 이 판정한 날보다 뒤) — 로봇이 만든 후보(둘째 짝·층2 짝)는 날마다 새로 만들어져 해당 없음 */
     return !!(cand && !['twin', 'match'].includes(cand.source) && cand.addedAt && e.decidedAt && cand.addedAt > e.decidedAt);
   }

@@ -1,0 +1,126 @@
+name: 층2 재단 글 사냥꾼
+
+# 한국장학재단이 아는 재단 장학금(층2)을 **그 재단 홈페이지의 개별 공고 글**로 보내기 위해, 재단 홈페이지를 뒤져
+# 글 후보를 적는다 (2026-10-12 개발자 지시 — "KOSAF 원문은 한국장학재단이 아니라 재단의 개별 공고로").
+#   · 로봇: collector/kosaf-hunt.mjs — 재단마다 홈 + 메뉴 두 단계(쪽 10개 상한) · 같은 점수 규칙(pickKosafPost)으로 글 하나를 고른다
+#   · 쓰는 파일 넷: collector/kosaf-hunt.json(후보) · kosaf-hunt-state.json(재단별 본 날) · kosaf-hunt-report.md · external-sources.json(찾은 게시판 autoFound)
+#   🔴 앱에 싣지 않는다 — 끝나면 원문 링크 확인 로봇(link-check.yml · 후보 모드)을 깨워 학생처럼 열어 확인한 것만 data/link-check.json fix 에 싣는다.
+#   🔴 검색 엔진은 쓰지 않는다(열쇠 없음) · 같은 재단은 3일에 한 번 · 전체 예산 9분 안에 스스로 끝낸다(상한을 키우지 말 것).
+# 실행: 매일 17:23 KST(수집 로봇들이 학교를 두드리는 시간을 피해 · 확인 로봇 18:47 보다 앞) · Actions 수동(all: 3일 규칙 무시 · only: 호스트 조각 · dry)
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry:
+        description: '모의 실행(저장하지 않고 결과만 로그로)'
+        type: boolean
+        default: false
+      all:
+        description: '3일 규칙을 무시하고 전부 다시 본다'
+        type: boolean
+        default: false
+      only:
+        description: '재단 하나만 (홈페이지 주소 조각 — 예: shinan.go.kr)'
+        type: string
+        default: ''
+  schedule:
+    # 17:23 KST — 홀수 분 · UTC 정각/자정 피함 · 다른 커밋 로봇과 같은 분이 아니다(관문 「예약 겹침」)
+    - cron: '23 8 * * *'
+
+permissions:
+  contents: write
+  issues: write    # 경보 이슈
+  actions: write   # 끝나면 link-check.yml 을 후보 모드로 깨운다
+
+concurrency:
+  group: kosaf-hunt
+  cancel-in-progress: false
+
+jobs:
+  hunt:
+    runs-on: ubuntu-latest
+    if: github.ref_name == 'claude/nice-heisenberg-WESq5'
+    env:
+      NODE_EXTRA_CA_CERTS: collector/certs/bundle.pem
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
+        run: bash tools/setup-collab.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+
+      - id: hunt
+        name: 재단 홈페이지 뒤지기
+        env:
+          KOSAF_HUNT_MS: '540000'   # 9분
+        run: node collector/kosaf-hunt.mjs ${{ inputs.dry && '--dry' || '' }} ${{ inputs.all && '--all' || '' }} ${{ inputs.only && format('--only={0}', inputs.only) || '' }}
+
+      - name: 결과 저장 (기본 브랜치)
+        if: always() && !inputs.dry
+        run: |
+          git config user.name "handaejang-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # 🔴 로봇이 쓰는 파일은 이 넷뿐 — 데이터 파일의 주소는 건드리지 않는다
+          [ -f collector/kosaf-hunt.json ] && git add collector/kosaf-hunt.json
+          [ -f collector/kosaf-hunt-state.json ] && git add collector/kosaf-hunt-state.json
+          [ -f collector/kosaf-hunt-report.md ] && git add collector/kosaf-hunt-report.md
+          [ -f collector/external-sources.json ] && git add collector/external-sources.json
+          if ! git diff --cached --quiet; then
+            git commit -m "층2 재단 글 사냥꾼 — 후보 갱신"
+            pushed=0
+            for i in 1 2 3; do
+              if git push origin HEAD:${{ github.ref_name }}; then pushed=1; break; fi
+              git pull --rebase --autostash origin "${{ github.ref_name }}"
+            done
+            if [ "$pushed" != "1" ]; then
+              echo "::error::층2 글 사냥꾼 결과 push 실패 — 3회 재시도 모두 실패."
+              exit 1
+            fi
+          fi
+
+      # 후보를 적었으면 확인 로봇을 후보 모드로 깨운다 — 로봇 커밋(GITHUB_TOKEN)은 push 트리거를 일으키지 않아 직접 부른다
+      - name: 원문 링크 확인 로봇 깨우기 (후보 모드)
+        if: always() && !inputs.dry
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run link-check.yml --ref "${{ github.ref_name }}" -f mode=candidates || echo "::warning::확인 로봇을 깨우지 못했습니다 — 매일 18:47 실행이 후보를 봅니다"
+
+      - name: 리포트 출력
+        if: always()
+        run: cat collector/kosaf-hunt-report.md 2>/dev/null || true
+
+      # 🔴 경보 짝 — 사냥 단계가 넘어지면 이슈 하나에 모으고, 다시 끝까지 가면 같은 제목으로 닫는다(tools/alert-issue.mjs · 관문 alerts)
+      - name: 🚨 사냥 단계 실패 알림
+        if: steps.hunt.outcome != 'success'
+        timeout-minutes: 1
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          title: 🚨 층2 재단 글 사냥꾼 — 사냥 단계가 끝까지 못 갔어요
+          label: kosaf-hunt-step
+          body: |
+            재단 홈페이지를 뒤지는 단계가 끝까지 가지 못했습니다. 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      - name: ✅ 사냥 단계 회복 — 경보 닫기
+        if: steps.hunt.outcome == 'success'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          title: 🚨 층2 재단 글 사냥꾼 — 사냥 단계가 끝까지 못 갔어요
+          label: kosaf-hunt-step
+      # cancelled() 도 본다 — 시간 초과는 '실패'가 아니라 '취소'다(2026-08-04 수집 로봇 사고)
+      - name: 🚨 로봇이 넘어졌다
+        if: failure() || cancelled()
+        uses: ./.github/actions/robot-down
+        with:
+          robot: 층2 재단 글 사냥꾼
+          token: ${{ github.token }}

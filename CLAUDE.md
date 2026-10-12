@@ -203,7 +203,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 | `collector/extract-excerpts.mjs` | 원문 발췌 · 마감일 · 메일 접수 주소(`apply-email.mjs`) |
 | `collector/deepfetch.mjs` `rescue-bodies.mjs` | 본문·첨부 원본 받기 · **자격요건 로봇**(`.github/workflows/rescue-bodies.yml` · 진짜 크롬 · 하루 두 번) — 장학 본문 재수집 + 대외활동 `activity-docs.mjs --browser`. 🔴 진짜 브라우저로 자격을 찾는 로봇은 이것 하나(하나 더 만들면 같은 공고를 두 번 두드린다) · `data/activities.json` 은 안 쓰고 장부 act-browser.json 에만(수집 로봇이 합친다) |
 | `collector/schematize-forms.mjs` `schema-from-text.mjs` `form-pdf.mjs` | 양식 스키마화(무료 우선 · 10-12 지시로 멈출 예정) · 신청서 **원본 그대로** → PDF(`data/forms-pdf/` · HWP 는 H2Orestart + 자바 다리 · 관문 「신청서 원본 → PDF」) |
-| `collector/link-hunter.mjs` `probe-links.mjs` `resolve-detail-urls.mjs` `detail-url.mjs` | 원문 주소 찾기 · 정찰 · 주소 규칙 |
+| `collector/link-hunter.mjs` `probe-links.mjs` `resolve-detail-urls.mjs` `detail-url.mjs` `kosaf-hunt.mjs` | 원문 주소 찾기 · 정찰 · 주소 규칙 · 층2 → 재단 개별 공고 후보(재단 홈페이지를 뒤져 `kosaf-hunt.json` 에 · 확인은 link-check · 관문 「층2 재단 글 사냥꾼」) |
 | `collector/notice-source.mjs` `canon-url.mjs` `url-key.mjs` `clean-title.mjs` | '같은 공고인가'·'원문이 무엇인가' 규칙 한 곳 |
 | `collector/kosaf-*.mjs` | 층2 수확 · 첨부 사본 |
 | `collector/pdf-text.py` `ocr-text.py` `hwp-*.py` | 첨부 글자 뽑기(`.ocr.txt` 는 품질 관문 통과분만) |

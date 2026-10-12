@@ -12292,5 +12292,89 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
 }
 
 
+/* ■ 층2 재단 글 사냥꾼 (2026-10-12 개발자 지시 "KOSAF 원문은 재단의 개별 공고로 · 현재와 앞으로의 모든 공고")
+   collector/kosaf-hunt.mjs — 재단 홈페이지를 뒤져 층2 공고의 개별 글 **후보**를 적는다(앱에 싣는 것은 확인 로봇). 순수 함수와 글자를 잰다. */
+{
+  console.log('■ 층2 재단 글 사냥꾼 — 재단 홈페이지 → 게시판 → 그 사업 글 후보 (2026-10-12)');
+  process.env.KOSAF_HUNT_AS_LIB = '1';
+  const KH = await import('../collector/kosaf-hunt.mjs').catch(() => ({}));
+  const LCm = await import('../collector/link-candidates.mjs');
+  const K = (code, org, name, due, home, extra = {}) => ({ code, org, name, kind: '재단', due, home, fields: { 신청기간: `○ ${due.slice(0, 4)}-09-01 ~ ${due}` }, ...extra });
+  const kosaf = [
+    K('9001', '재단법인 가나장학재단', '성적우수장학생', '2026-11-30', 'https://gana.or.kr/'),   // '일반장학생' 은 사업 이름 밑동이 없어(programCore) 같은 재단의 다른 글과 점수 차가 안 난다 — 실데이터와 같다
+    K('9002', '재단법인 가나장학재단', '예체능장학생', '2026-11-30', 'https://gana.or.kr/'),
+    K('9003', '다라시장학회', '성적우수장학금', '2026-12-10', 'https://www.dara.go.kr/'),
+    K('9004', '마감지난재단', '옛장학생', '2026-01-10', 'https://old.or.kr/'),
+    K('9005', '고친재단', '이미찾은장학생', '2026-11-20', 'https://fixed.or.kr/'),
+  ];
+  const idx = LCm.buildIndex({ kosaf, externalSources: [], boards: [], registered: [], notices: [], news: [], external: [], activities: [], pool: [], kosafTexts: {} });
+  const fixes = { 'id:kosaf-9005': { url: 'https://fixed.or.kr/bbs/view.php?id=7', round: '2026-11-20', src: 'robot' } };
+  const groups = KH.huntTargets ? KH.huntTargets(idx, { today: '2026-10-12', fixes }) : [];
+  eq('① 사냥 대상 — 마감 전·회차 있음·개별 글 바로잡기 없음 · 재단(홈 호스트)별 묶음 · 공고 많은 재단 먼저', groups.map((g) => [g.host, g.targets.map((t) => t.key)]), [['gana.or.kr', ['9001', '9002']], ['dara.go.kr', ['9003']]]);
+  eq('  이미 그 회차 바로잡기가 있으면 대상이 아니다 · 회차가 다르면 대상이다', [KH.hasUsableFix && KH.hasUsableFix(idx.find({ ds: 'kosaf', key: '9005' }), fixes), KH.hasUsableFix && KH.hasUsableFix(idx.find({ ds: 'kosaf', key: '9005' }), { 'id:kosaf-9005': { ...fixes['id:kosaf-9005'], round: '2025-11-20' } })], [true, false]);
+  eq('  --only 는 호스트 조각으로 좁힌다', (KH.huntTargets ? KH.huntTargets(idx, { today: '2026-10-12', fixes, only: 'dara' }) : []).map((g) => g.host), ['dara.go.kr']);
+  /* ② 글 줄 — 날짜 붙은 줄만 · 그 재단 사이트의 글 주소 꼴만 */
+  const g1 = groups[0] || { targets: [idx.find({ ds: 'kosaf', key: '9001' })] };
+  const html = `<html><body><ul>
+    <li><a href="/bbs/view.php?id=101">2026년 하반기 가나장학재단 성적우수장학생 선발 공고</a> <span>2026-10-01</span></li>
+    <li><a href="/bbs/view.php?id=102">2026년 하반기 가나장학재단 예체능장학생 선발 공고</a> <span>2026-10-01</span></li>
+    <li><a href="/bbs/view.php?id=100">2026년 홈페이지 개편 안내</a> <span>2026-09-20</span></li>
+    <li><a href="https://other.example.com/view?id=5">2026년 다른 재단 장학생 모집</a> <span>2026-09-21</span></li>
+    <li><a href="/bbs/list.php?page=2">다음</a> <span>2026-09-21</span></li>
+  </ul></body></html>`;
+  const rows = KH.postRows ? KH.postRows(html, 'https://gana.or.kr/bbs/list.php', g1.targets[0].allowed) : [];
+  eq('② 쪽의 글 줄 — 날짜 붙은 줄 중 그 재단 사이트의 글 주소만(다른 사이트·목록 쪽은 뺀다)', rows.map((r) => r.url), ['https://gana.or.kr/bbs/view.php?id=101', 'https://gana.or.kr/bbs/view.php?id=102', 'https://gana.or.kr/bbs/view.php?id=100']);
+  /* ③ 후보 줄 — 사업마다 글 하나(같은 점수 규칙) · 못 고르면 게시판 줄 */
+  const pages = [{ url: 'https://gana.or.kr/', title: '(홈)', level: 0, html: '<html><body><a href="/bbs/list.php">공지사항</a></body></html>', links: [] },
+    { url: 'https://gana.or.kr/bbs/list.php', title: '공지사항', level: 1, html, links: [{ title: '2026년 하반기 가나장학재단 성적우수장학생 선발 공고', url: 'https://gana.or.kr/bbs/view.php?id=101' }, { title: '2026년 하반기 가나장학재단 예체능장학생 선발 공고', url: 'https://gana.or.kr/bbs/view.php?id=102' }, { title: '2025년 장학생 모집 공고', url: 'https://gana.or.kr/bbs/view.php?id=90' }] }];
+  const got = KH.huntLines ? KH.huntLines(g1, pages, { today: '2026-10-12' }) : { lines: [], found: [], boards: [] };
+  eq('③ 사업마다 그 글을 고른다(성적우수 ↔ 예체능이 섞이지 않는다 · 같은 재단의 다른 사업은 거절) · 줄은 url 후보 · source board · addedAt',
+    got.lines.map((l) => [l.target.key, l.url, l.source, l.addedAt]), [['9001', 'https://gana.or.kr/bbs/view.php?id=101', 'board', '2026-10-12'], ['9002', 'https://gana.or.kr/bbs/view.php?id=102', 'board', '2026-10-12']]);
+  eq('  글을 고른 **안쪽** 쪽이 그 재단의 게시판이 된다(byPick) — 홈은 게시판으로 적지 않는다', got.boards.map((b) => [b.url, b.byPick]), [['https://gana.or.kr/bbs/list.php', true]]);
+  /* 같은 글이 두 사업을 받는 공고 — 주소 하나에 줄 하나(첫 사업 + also) · 홈에서만 고르면 게시판은 안 적는다 */
+  const sharedHtml = html.replace('가나장학재단 성적우수장학생 선발 공고', '가나장학재단 성적우수·예체능 장학생 선발 공고').replace(/\s*<li><a href="\/bbs\/view\.php\?id=102">[^<]*<\/a> <span>2026-10-01<\/span><\/li>/, '');
+  const gotShared = KH.huntLines ? KH.huntLines(g1, [{ url: 'https://gana.or.kr/', title: '(홈)', level: 0, html: sharedHtml, links: pages[1].links }], { today: '2026-10-12' }) : { lines: [], boards: [1] };
+  eq('  같은 주소를 고른 사업들은 줄 하나(첫 사업 + also) · 홈에서만 골랐으면 게시판은 안 적는다', [gotShared.lines.map((l) => [l.target.key, l.url, l.also]), gotShared.boards.length], [[['9001', 'https://gana.or.kr/bbs/view.php?id=101', ['9002']]], 0]);
+  const pagesNoPick = [{ url: 'https://gana.or.kr/bbs/list.php', title: '공지사항', level: 1, html: html.replace(/성적우수장학생|예체능장학생/g, '우수봉사'), links: pages[1].links }];
+  const got2 = KH.huntLines ? KH.huntLines(g1, pagesNoPick, { today: '2026-10-12' }) : { lines: [] };
+  eq('  못 고르면 게시판처럼 보이는 쪽을 board 후보 **한 줄**로(첫 사업 + also · 확인 로봇이 브라우저로 다시 읽어 고른다) · 공고 3건 이상이면 게시판으로도 적는다',
+    [got2.lines.map((l) => [l.target.key, !!l.board, !l.url, l.also]), got2.boards.map((b) => b.byPick)], [[['9001', true, true, ['9002']]], [false]]);
+  const pagesHomeToo = [{ ...pagesNoPick[0], url: 'https://gana.or.kr/', title: '(홈)', level: 0 }, { ...pagesNoPick[0], level: 1 }];
+  eq('  홈에도 글 줄이 보여도 게시판 후보는 메뉴 안쪽 목록만(홈은 앱이 이미 보여 주는 곳)', (KH.huntLines ? KH.huntLines(g1, pagesHomeToo, { today: '2026-10-12' }) : { lines: [{}] }).lines[0].board, 'https://gana.or.kr/bbs/list.php');
+  eq('  아무 쪽에도 글 줄이 없으면 후보도 게시판도 없다', (KH.huntLines ? KH.huntLines(g1, [pages[0]], { today: '2026-10-12' }) : { lines: [1], boards: [1] }).lines.length + (KH.huntLines ? KH.huntLines(g1, [pages[0]], { today: '2026-10-12' }) : { boards: [1] }).boards.length, 0);
+  /* ④ 찾은 게시판 → external-sources (있던 줄 채움 · 사람 줄은 안 건드림 · 없으면 새 줄 · 보관된 곳은 안 씀) */
+  const cfg = { sources: [{ host: '가나장학재단', home: 'https://gana.or.kr/', boardUrl: null, seed: 'kosaf-open', probe: { checkedAt: '2026-09-30', why: '최고 0건' } }, { host: '다라시장학회', home: 'https://www.dara.go.kr/', boardUrl: 'https://www.dara.go.kr/human', seed: 'kosaf-open' }], parked: [{ host: '보관재단', home: 'https://parked.or.kr/', boardUrl: 'https://parked.or.kr/wrong' }] };
+  const b1 = KH.recordBoard ? KH.recordBoard(cfg, { home: 'https://gana.or.kr/', org: '재단법인 가나장학재단' }, got.boards[0], { today: '2026-10-12' }) : {};
+  const b2 = KH.recordBoard ? KH.recordBoard(cfg, { home: 'https://www.dara.go.kr/', org: '다라시장학회' }, { url: 'https://www.dara.go.kr/other', signals: 5, sample: [] }, { today: '2026-10-12' }) : {};
+  const b3 = KH.recordBoard ? KH.recordBoard(cfg, { home: 'https://new.or.kr/', org: '새재단' }, { url: 'https://new.or.kr/board', signals: 4, sample: ['a'] }, { today: '2026-10-12' }) : {};
+  const b4 = KH.recordBoard ? KH.recordBoard(cfg, { home: 'https://parked.or.kr/', org: '보관재단' }, { url: 'https://parked.or.kr/board2', signals: 4, sample: [] }, { today: '2026-10-12' }) : {};
+  eq('④ 빈 boardUrl 은 채우고(probe 지움·autoFound) · 이미 있는 것은 그대로 · 모르는 재단은 새 줄(seed kosaf-open) · 보관된 재단은 안 쓴다',
+    [b1.action, cfg.sources[0].boardUrl, !cfg.sources[0].probe, (cfg.sources[0].autoFound || {}).date, b2.action, cfg.sources[1].boardUrl, b3.action, cfg.sources.length, cfg.sources[2] && cfg.sources[2].seed, b4.action, cfg.sources.length],
+    ['filled', 'https://gana.or.kr/bbs/list.php', true, '2026-10-12', 'kept', 'https://www.dara.go.kr/human', 'added', 3, 'kosaf-open', 'parked', 3]);
+  /* ⑤ 후보 파일 합치기 — 같은 후보는 처음 적은 날을 지킨다(확인 로봇이 '새 후보'로 날마다 다시 열지 않게) · 오늘 본 재단의 옛 줄은 버린다 · 안 본 재단은 둔다 · 마감 지난 대상은 버린다 */
+  const prev = [{ target: { ds: 'kosaf', key: '9001' }, url: 'https://gana.or.kr/bbs/view.php?id=101', source: 'board', by: KH.BY, addedAt: '2026-10-01' },
+    { target: { ds: 'kosaf', key: '9001' }, url: 'https://gana.or.kr/bbs/view.php?id=55', source: 'board', by: KH.BY, addedAt: '2026-10-01' },
+    { target: { ds: 'kosaf', key: '9003' }, board: 'https://www.dara.go.kr/human', source: 'board', by: KH.BY, addedAt: '2026-10-02' },
+    { target: { ds: 'kosaf', key: '9004' }, url: 'https://old.or.kr/v?id=1', source: 'board', by: KH.BY, addedAt: '2026-10-02' }];
+  const merged = KH.mergeLines ? KH.mergeLines(prev, got.lines, new Set(['9001', '9002']), { today: '2026-10-12', keep: (l) => ['9001', '9002', '9003'].includes(String(l.target.key)) }) : [];
+  eq('⑤ 합치기 (오늘 본 대상은 코드로 알아본다 — 다른 호스트의 글을 골라도 옛 줄이 남지 않는다)', merged.map((l) => [l.target.key, l.url || l.board, l.addedAt]), [['9003', 'https://www.dara.go.kr/human', '2026-10-02'], ['9001', 'https://gana.or.kr/bbs/view.php?id=101', '2026-10-01'], ['9002', 'https://gana.or.kr/bbs/view.php?id=102', '2026-10-12']]);
+  eq('  60일 벼랑 전에 날짜를 새로 적는다(처음 적은 날이 50일 넘으면 오늘로)', (KH.mergeLines ? KH.mergeLines([{ ...prev[0], addedAt: '2026-08-10' }], got.lines.slice(0, 1), new Set(['9001']), { today: '2026-10-12' }) : [{}])[0].addedAt, '2026-10-12');
+  /* ⑥ 겹침으로 거절된 글 주소 후보는 다시 본다(규칙이 바뀌면 풀려야 한다 · 겹침 판정은 열지 않아 공짜) */
+  const rej = { status: 'rejected', why: '다른 공고의 링크와 같은 주소(x)', checks: { C: 'fail' }, decidedAt: '2026-10-05', lastAt: '2026-10-05', round: '2026-11-13' };
+  eq('⑥ 겹침(C) 거절 + url 후보 → 다시 본다 · board 후보나 다른 이유의 거절은 그대로', [LCm.shouldOpen(rej, { url: 'https://a.kr/v?id=1', source: 'match' }, '2026-10-12', '2026-11-13'), LCm.shouldOpen(rej, { board: 'https://a.kr/list', source: 'board' }, '2026-10-12', '2026-11-13'), LCm.shouldOpen({ ...rej, checks: { P: 'fail' } }, { url: 'https://a.kr/v?id=1', source: 'match' }, '2026-10-12', '2026-11-13')], [true, false, false]);
+  /* ⑦ 글자 — 확인 로봇이 사냥꾼 파일을 읽는다 · 워크플로 */
+  const lc = readText(new URL('../collector/link-check.mjs', import.meta.url));
+  eq('⑦ 확인 로봇이 collector/kosaf-hunt.json 을 후보로 읽는다(사람 후보와 같은 loadCandidates · 못 읽어도 사람 후보는 산다)', [/kosaf-hunt\.json/.test(lc), /loadCandidates\(JSON\.parse\(fs\.readFileSync\(HUNT_FILE/.test(lc), /kosaf-hunt\.json 을 읽지 못함/.test(lc)], [true, true, true]);
+  const wf = fs.existsSync(new URL('../.github/workflows/kosaf-hunt.yml', import.meta.url)) ? readText(new URL('../.github/workflows/kosaf-hunt.yml', import.meta.url)) : '';
+  eq('  kosaf-hunt.yml — 시한 · 기본 브랜치에서만 · 홀수 분 예약 · playwright · 저장 파일 넷 · 끝나면 확인 로봇을 후보 모드로 깨움 · 경보 짝(같은 제목)',
+    [/timeout-minutes:\s*\d+/.test(wf), /github\.ref_name == 'claude\/nice-heisenberg-WESq5'/.test(wf), /cron: '23 8 \* \* \*'/.test(wf), /playwright install/.test(wf),
+      ['collector/kosaf-hunt.json', 'collector/kosaf-hunt-state.json', 'collector/kosaf-hunt-report.md', 'collector/external-sources.json'].every((f) => wf.includes(`git add ${f}`)),
+      /gh workflow run link-check\.yml[^\n]*-f mode=candidates/.test(wf), (wf.match(/title: 🚨 층2 재단 글 사냥꾼 — 사냥 단계가 끝까지 못 갔어요/g) || []).length, /mode: resolve/.test(wf), /robot-down/.test(wf) && /failure\(\) \|\| cancelled\(\)/.test(wf), /issues: write/.test(wf)],
+    [true, true, true, true, true, true, 2, true, true, true]);
+  const ga = readText(new URL('../.gitattributes', import.meta.url));
+  eq('  .gitattributes 에 리포트·장부 줄(merge=ours) — 없으면 배포 동기화가 충돌로 멈춘다', [/^collector\/kosaf-hunt-report\.md\s+merge=ours$/m.test(ga), /^collector\/kosaf-hunt-state\.json\s+merge=ours$/m.test(ga), /^collector\/kosaf-hunt\.json\s+merge=ours$/m.test(ga)], [true, true, true]);
+}
+
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);

@@ -63,6 +63,7 @@ const LEDGER_FILE = path.join(ROOT, 'data', 'link-check.json');
 const REPORT_FILE = path.join(ROOT, 'collector', 'link-check-report.md');
 const CAND_STATE_FILE = path.join(ROOT, 'collector', 'link-candidates-state.json');
 const CAND_FILE = path.join(ROOT, 'collector', 'link-candidates.json');   // 읽기만 — 사람·세션이 쓴다
+const HUNT_FILE = path.join(ROOT, 'collector', 'kosaf-hunt.json');        // 읽기만 — 층2 글 사냥꾼(collector/kosaf-hunt.mjs)이 쓴다 · 같은 줄 꼴
 const TXT_FILE = path.join(ROOT, 'collector', 'run-link-check.txt');
 
 const argv = process.argv.slice(2);
@@ -137,6 +138,15 @@ let inputCands = [];
   else {
     const got = loadCandidates(raw || { v: 1, items: [] }, { today: TODAY });
     inputCands = got.ok; candFileBad = got.bad;
+  }
+  /* 층2 글 사냥꾼의 후보(2026-10-12) — 사람 후보와 같은 줄 꼴·같은 검사. 읽지 못하면 그 파일 줄만 건너뛴다(사람 후보까지 멈추지 않게) */
+  if (fs.existsSync(HUNT_FILE)) {
+    try {
+      const hunt = loadCandidates(JSON.parse(fs.readFileSync(HUNT_FILE, 'utf8')), { today: TODAY });
+      const have = new Set(inputCands.map((c) => c.cid));
+      for (const c of hunt.ok) if (!have.has(c.cid)) inputCands.push(c);
+      candFileBad.push(...hunt.bad.map((b) => ({ ...b, why: `(kosaf-hunt.json) ${b.why}` })));
+    } catch (e) { candFileBad.push({ i: -1, why: `kosaf-hunt.json 을 읽지 못함(${String(e.message).slice(0, 60)})` }); }
   }
 }
 let candState = readJson(CAND_STATE_FILE, {});
