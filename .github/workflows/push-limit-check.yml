@@ -21,28 +21,22 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: 틀린 주소로 25번 연달아 등록해 본다
-        env:
-          URL: https://handaejang-push.seonju5543.workers.dev/subscribe
+      # 운영 서버와 함께, 오늘 판이 확실히 든 미리보기 주소(main-…)도 눌러 본다 — 둘이 같은 결과면 판 차이가 아니라
+      # 제한 장치의 성질(Cloudflare 제한은 위치별·느슨하게 센다)이다. 그래서 60번씩 보낸다.
+      - name: 틀린 주소로 60번씩 연달아 등록해 본다 (운영 · 미리보기)
         run: |
-          n400=0; n429=0; other=""
-          for i in $(seq 1 25); do
-            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 -X POST "$URL" \
-              -H 'content-type: application/json' -H 'Origin: https://seonju5543-web.github.io' \
-              -d '{"endpoint":"https://not-a-push-service.invalid/limit-check","school":"배포확인"}')
-            case "$code" in
-              400) n400=$((n400+1)) ;;
-              429) n429=$((n429+1)) ;;
-              *) other="$other $code" ;;
-            esac
+          verdict=0
+          for URL in https://handaejang-push.seonju5543.workers.dev/subscribe https://main-handaejang-push.seonju5543.workers.dev/subscribe; do
+            n400=0; n429=0; other=""
+            for i in $(seq 1 60); do
+              code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 -X POST "$URL" \
+                -H 'content-type: application/json' -H 'Origin: https://seonju5543-web.github.io' \
+                -d '{"endpoint":"https://not-a-push-service.invalid/limit-check","school":"배포확인"}')
+              case "$code" in
+                400) n400=$((n400+1)) ;;
+                429) n429=$((n429+1)) ;;
+                *) other="$other $code" ;;
+              esac
+            done
+            echo "$URL → 400(주소 틀림) ${n400}번 · 429(너무 많음) ${n429}번 · 그 밖:${other:- 없음}"
           done
-          echo "결과: 400(주소 틀림) ${n400}번 · 429(너무 많음) ${n429}번 · 그 밖:${other:- 없음}"
-          if [ "$n429" -gt 0 ]; then
-            echo "판정: ✅ 새 판이 돌고 있다 — 등록 횟수 제한이 켜져 있다(2026-10-12 문지기 포함)."
-          elif [ "$n400" -eq 25 ]; then
-            echo "판정: ⚠️ 옛 판으로 보인다 — 제한 없이 25번 모두 주소 검사까지 갔다. Cloudflare → Workers → handaejang-push → Deployments 확인 필요."
-            exit 1
-          else
-            echo "판정: ❓ 판단 불가 — 서버 응답이 예상과 다르다(위 '그 밖' 코드)."
-            exit 1
-          fi
