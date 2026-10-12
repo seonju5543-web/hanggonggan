@@ -234,6 +234,15 @@ console.log('\n[4] 구독 등록 · 해지 · 잘못된 입력');
   res = await call('/subscribe', { endpoint: ep, school: 'ㄱ'.repeat(50) });
   ok(res.status === 400, '지나치게 긴 값 거부', res.status);
 
+  /* 🔴 가짜 등록 쏟아붓기 막기 (2026-10-12 · server/shared/guard.mjs) — 한도를 넘으면 429 · 장치가 없으면(옛 배포) 통과 */
+  env.SUB_LIMIT = { limit: async () => ({ success: false }) };
+  res = await call('/subscribe', { endpoint: ep + '2', school: '한국외국어대학교' });
+  ok(res.status === 429 && !(await env.SUBS.get(worker.subKey(ep + '2'))), '1분 한도를 넘은 등록은 429 · 저장하지 않는다', res.status);
+  delete env.SUB_LIMIT;
+  res = await call('/subscribe', { endpoint: ep + '3', school: '한국외국어대학교' });
+  ok(res.status === 200, '제한 장치가 없는 옛 배포는 막지 않는다 (가동 중인 알림을 끊지 않는다)', res.status);
+  await call('/unsubscribe', { endpoint: ep + '3' });
+
   res = await call('/unsubscribe', { endpoint: ep });
   ok(res.status === 200 && !(await env.SUBS.get(worker.subKey(ep))), '해지하면 저장소에서 삭제됨');
 

@@ -11,3 +11,12 @@ CHAT_MODEL = "claude-haiku-4-5-20251001"
 
 # 🔴 열쇠는 여기 두지 않는다. 배포 후 명령 한 줄로 넣는다:
 #     npx wrangler secret put ANTHROPIC_API_KEY
+
+# 🔴 요청 횟수 제한 (2026-10-12 · server/shared/guard.mjs) — 접속 주소 하나가 1분에 15번까지. 없으면 서버가 부르지 않는다(503) — 앱은 무료 안내봇으로 물러난다.
+#    Cloudflare 무료 기능 · 1분 창.
+[[ratelimits]]
+name = "CHAT_LIMIT"
+namespace_id = "1102"
+  [ratelimits.simple]
+  limit = 15
+  period = 60

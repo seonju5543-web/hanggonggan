@@ -8704,6 +8704,18 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
       /\.hero-tiles \{[^}]*border/.test(tail), false);
   }
 
+  /* 🔴 도우미 AI 서버 문지기 (2026-10-12 · server/shared/guard.mjs) — 접속 주소 하나가 1분 한도를 넘으면 429, 장치가 없으면 부르지 않는다(503) */
+  {
+    const chat = (await import('../server/chat/worker.js')).default;
+    const call = (env) => chat.fetch(new Request('https://c/', { method: 'POST', headers: { Origin: 'https://seonju5543-web.github.io', 'CF-Connecting-IP': '1.2.3.4', 'content-type': 'application/json' }, body: '{"q":"x","items":[]}' }), env);
+    const base = { ANTHROPIC_API_KEY: 'test' };
+    eq('도우미 서버 — 제한 장치가 없으면 503 (돈이 나가는 서버라 열어 두지 않는다)', (await call(base)).status, 503);
+    eq('  1분 한도를 넘으면 429', (await call({ ...base, CHAT_LIMIT: { limit: async () => ({ success: false }) } })).status, 429);
+    const keys = [];
+    await call({ ...base, CHAT_LIMIT: { limit: async (o) => { keys.push(o.key); return { success: false }; } } });
+    eq('  세는 열쇠는 Cloudflare 가 붙인 접속 주소다 (학생이 못 바꾼다)', keys, ['1.2.3.4']);
+  }
+
   /* 🔴 교내 소식 요약 (2026-10-10 팀 업무 분장 8번 — 은서) — 원문 첫 문장을 그대로 뜬다(발췌 · AI 없음) */
   {
     console.log('\n■ 교내 소식 요약 (원문 발췌)');

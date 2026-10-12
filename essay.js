@@ -705,6 +705,15 @@ async function essaySend(tpl, sch, btn) {
   }
   document.getElementById('essay-nudge')?.remove();
 
+  /* 🔴 AI 초안은 로그인한 학생만 (2026-10-12 · 서버가 토큰을 Supabase 에 물어 확인한다 — server/shared/guard.mjs).
+     로그인 안 했으면 보내지 않고 알려만 준다. ⚠️ 로그인 창을 여기서 열지 않는다 — 로그인 창과 신청서가
+     같은 시트(#detail-sheet)를 써서, 열면 쓰던 신청서 화면이 통째로 바뀐다. 쓰던 글은 그대로 남는다. */
+  const token = typeof freshAccessToken === 'function' ? await freshAccessToken() : null;
+  if (!token) {
+    if (typeof toast === 'function') toast('AI 초안은 MY에서 로그인하면 쓸 수 있어요');
+    return;
+  }
+
   const label = btn.textContent;
   btn.disabled = true;
   btn.textContent = '글을 쓰는 중… (20초쯤 걸려요)';
@@ -753,7 +762,7 @@ async function essaySend(tpl, sch, btn) {
     const timer = setTimeout(() => ctrl.abort(), essayCfg('timeoutMs', 60000));
     const res = await fetch(essayCfg('endpoint', ''), {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
       body: JSON.stringify(payload),
       signal: ctrl.signal,
     });
@@ -765,9 +774,11 @@ async function essaySend(tpl, sch, btn) {
   btn.textContent = label;
 
   /* 🔴 실패하면 아무것도 건드리지 않는다 — 학생이 쓴 글이 그대로 남아야 한다 */
-  if (!data || data.error === 'sensitive') {
+  if (!data || data.error) {
     const why = data && data.error === 'sensitive'
       ? '민감정보가 섞여 있어 보내지 않았어요 — 그 부분은 직접 써 주세요'
+      : data && data.error === 'too-many' ? '잠시 뒤 다시 눌러 주세요 (1분에 몇 번까지만 돼요)'
+      : data && data.error === 'login' ? '로그인이 끝났어요. 다시 로그인해 주세요'
       : '글을 받지 못했어요. 잠시 뒤 다시 눌러 보세요 (쓰신 내용은 그대로예요)';
     if (typeof toast === 'function') toast(why);
     return;

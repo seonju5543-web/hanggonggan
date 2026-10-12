@@ -13,6 +13,20 @@ ESSAY_MODEL = "claude-sonnet-5"
 # 사고 깊이. 자소서는 기계적인 일이 아니라 low 로 두지 않는다.
 # (effort 를 아예 안 주면 기본이 high 라 값이 더 나간다 — 지정하는 편이 낫다.)
 ESSAY_EFFORT = "medium"
+# 로그인 확인용 (2026-10-12 · server/shared/guard.mjs) — **공개값**이다. 앱의 supabase-config.js 와 같은 두 값.
+# 🔴 service_role 열쇠는 여기 두지 않는다(이 서버는 쓰지도 않는다).
+SUPABASE_URL = "https://ffnzmiorcojbhpqwqgcy.supabase.co"
+SUPABASE_ANON_KEY = "sb_publishable_kWvjVknBPO8V6ktPEHOlvA_-CTXhCAA"
+
+# 🔴 요청 횟수 제한 (2026-10-12) — 로그인한 학생 한 명이 1분에 4번까지. 없으면 서버가 부르지 않는다(503).
+#    Cloudflare 무료 기능. 1분(60초)·10초 창만 된다 — 하루 한도는 Anthropic 콘솔의 월 사용 한도가 맡는다(README).
+[[ratelimits]]
+name = "ESSAY_LIMIT"
+namespace_id = "1101"
+  [ratelimits.simple]
+  limit = 4
+  period = 60
+
 
 # 🔴 열쇠는 여기 두지 않는다. 배포 후 명령 한 줄로 넣는다:
 #     npx wrangler secret put ANTHROPIC_API_KEY

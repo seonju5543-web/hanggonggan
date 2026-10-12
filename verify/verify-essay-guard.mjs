@@ -33,7 +33,11 @@ const ok = (cond, name, extra) => {
 const head = (s) => console.log(`\n[${s}]`);
 
 const ORIGIN = 'https://seonju5543-web.github.io';
-const ENV = { ANTHROPIC_API_KEY: 'test-key-not-real' };
+/* 2026-10-12 — 로그인 확인·횟수 제한(server/shared/guard.mjs). 가짜 Supabase 는 아래 fetch 가 받는다 */
+let limiterSays = true;
+const ENV = { ANTHROPIC_API_KEY: 'test-key-not-real', SUPABASE_URL: 'https://sb.test', SUPABASE_ANON_KEY: 'anon-test',
+  ESSAY_LIMIT: { limit: async () => ({ success: limiterSays }) } };
+const GOOD_TOKEN = 'student-token';
 
 /* ── 가짜 Claude API ──
    호출된 본문을 전부 모아 둔다(④ 전수 검사용). reply 에 모델이 뭐라 답할지 심는다. */
@@ -41,6 +45,11 @@ const calls = [];
 let reply = { drafts: [] };
 const realFetch = globalThis.fetch;
 globalThis.fetch = async (url, init) => {
+  /* 가짜 Supabase — 진짜 토큰이면 회원 id, 아니면 401 (Claude 호출 목록에는 넣지 않는다) */
+  if (/\/auth\/v1\/user$/.test(String(url))) {
+    const ok = (init.headers.Authorization || '') === 'Bearer ' + GOOD_TOKEN;
+    return new Response(JSON.stringify(ok ? { id: 'user-1' } : { msg: 'bad jwt' }), { status: ok ? 200 : 401 });
+  }
   calls.push({ url: String(url), body: JSON.parse(init.body) });
   return new Response(JSON.stringify({
     stop_reason: 'end_turn',
@@ -48,9 +57,10 @@ globalThis.fetch = async (url, init) => {
   }), { status: 200, headers: { 'content-type': 'application/json' } });
 };
 
-const post = (payload) => worker.fetch(
-  new Request('https://x/', { method: 'POST', headers: { Origin: ORIGIN, 'content-type': 'application/json' }, body: JSON.stringify(payload) }),
-  ENV,
+const post = (payload, opts = {}) => worker.fetch(
+  new Request('https://x/', { method: 'POST', headers: { Origin: ORIGIN, 'content-type': 'application/json',
+    ...(opts.token === null ? {} : { Authorization: 'Bearer ' + (opts.token || GOOD_TOKEN) }) }, body: JSON.stringify(payload) }),
+  opts.env || ENV,
 );
 
 /* 정상적인 요청 하나 — 학생이 준 재료가 분명하다 */
@@ -399,6 +409,28 @@ reply = { drafts: [{ key: 'growth', text: '저는 성실합니다. 맞벌이 가
   const body = JSON.stringify(calls[calls.length - 1].body);
   ok(body.includes('지켜야 할 규칙'), '요청에 작성 규칙이 조건으로 실려 간다');
   ok(body.includes('두괄식'), '규칙집의 실제 규칙이 실려 간다');
+}
+
+head('22) 🔴 문지기 — 로그인한 학생만 · 1분 횟수 제한 (2026-10-12 · server/shared/guard.mjs)');
+{
+  reply = { drafts: [] };
+  const before = calls.length;
+  let r = await post(basePayload(), { token: null });
+  ok(r.status === 401 && (await r.json()).error === 'login', '로그인 토큰이 없으면 401 · login');
+  r = await post(basePayload(), { token: 'forged-token' });
+  ok(r.status === 401, '위조·만료 토큰이면 401 (Supabase 에 물어 확인한다 — 클라이언트 말을 믿지 않는다)');
+  limiterSays = false;
+  r = await post(basePayload());
+  ok(r.status === 429 && (await r.json()).error === 'too-many', '1분 한도를 넘으면 429 · too-many');
+  limiterSays = true;
+  const { ESSAY_LIMIT, ...noLimiter } = ENV;
+  r = await post(basePayload(), { env: noLimiter });
+  ok(r.status === 503 && (await r.json()).error === 'no-limiter', '🔴 제한 장치가 배포 설정에 없으면 부르지 않는다 (503 — 돈이 나가는 서버)');
+  ok(calls.length === before, '🔴 위 네 번 모두 Claude 를 한 번도 부르지 않았다 (크레딧 0원)');
+  r = await post(basePayload());
+  ok(r.status === 200, '로그인 + 한도 안이면 그대로 돈다');
+  const sl = fs.readFileSync(new URL('../server/apply/send-log.mjs', import.meta.url), 'utf8');
+  ok(/export \{ resolveUser \} from '\.\.\/shared\/guard\.mjs'/.test(sl) && !/async function resolveUser/.test(sl), '접수 대행도 같은 문지기 파일을 쓴다 (베낀 사본 없음)');
 }
 
 globalThis.fetch = realFetch;

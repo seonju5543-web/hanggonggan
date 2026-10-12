@@ -193,6 +193,7 @@ async function dismissNotify(page) {
     window.fetch = async (url, init) => {
       if (String(url).includes('fake.workers.dev')) {
         window.__sent.push(JSON.parse(init.body));
+        window.__auth = (init.headers || {}).Authorization || '';
         return new Response(JSON.stringify(window.__reply), { status: 200, headers: { 'content-type': 'application/json' } });
       }
       return real(url, init);
@@ -249,6 +250,14 @@ async function dismissNotify(page) {
   await page.waitForTimeout(200);
   await page.screenshot({ path: SHOT('2-followup') });
 
+  /* 🔴 로그인 안 했으면 보내지 않는다 (2026-10-12 · 서버가 토큰을 확인한다 — server/shared/guard.mjs) */
+  await page.evaluate(() => localStorage.removeItem('handaejang.auth'));
+  await page.click('#btn-essay-ai');
+  await page.waitForTimeout(600);
+  ok((await page.evaluate(() => window.__sent.length)) === 0, '🔴 로그인 안 했으면 초안 요청을 보내지 않는다');
+  ok(await page.$('.essay-fu:not([hidden]) .essay-fu-in') !== null, '  쓰던 신청서 화면은 그대로다 (로그인 창으로 바꾸지 않는다)');
+  await page.evaluate(() => localStorage.setItem('handaejang.auth', JSON.stringify({ accessToken: 'test-token', expiresAt: Date.now() + 3600e3 })));
+
   await page.click('#btn-essay-ai');
   await page.waitForTimeout(1000);
   const sent = await page.evaluate(() => window.__sent);
@@ -258,6 +267,7 @@ async function dismissNotify(page) {
     .filter((w) => body.includes(w));
   ok(leaks.length === 0, '③ 이름·학번·연락처·이메일·성적·소득분위가 나가지 않았다', leaks.join(', '));
   ok(!/fallbacks/.test(body), '③ fallbacks 를 붙이지 않는다');
+  ok((await page.evaluate(() => window.__auth)) === 'Bearer test-token', '③ 로그인 토큰을 실어 보낸다 (서버가 Supabase 에 물어 확인)');
   ok((sent[0].fields || []).every((f) => f.kind === 'story'),
     '③ story 칸만 보낸다 — 사실 나열형은 요청에 없다');
   /* 요청의 칸도 **키워드 질문이 붙은 칸**으로 고른다 — 첫 칸이 그 칸이라는 보장이 없다(위 ① 과 같은 이유) */

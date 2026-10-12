@@ -37,18 +37,7 @@ export const logConfigured = (env) => !!(env && env.SUPABASE_URL && env.SUPABASE
    그래서 학생의 로그인 토큰을 **Supabase 에 물어** 확인하고 그 답에 적힌 id 만 쓴다.
    ⚠️ 그래서 접수 대행은 **로그인한 학생만** 쓸 수 있다. 우리가 대신 보내는 일에는
       나중에 "내가 냈다"를 가릴 상대가 있어야 하므로, 이건 제약이 아니라 조건이다. */
-export async function resolveUser(env, authHeader) {
-  const tok = String(authHeader || '').replace(/^Bearer\s+/i, '').trim();
-  if (!tok || !env || !env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) return null;
-  try {
-    const r = await fetch(String(env.SUPABASE_URL).replace(/\/+$/, '') + '/auth/v1/user', {
-      headers: { apikey: env.SUPABASE_ANON_KEY, Authorization: 'Bearer ' + tok },
-    });
-    if (!r.ok) return null;
-    const u = await r.json();
-    return (u && u.id) || null;
-  } catch { return null; }
-}
+export { resolveUser } from '../shared/guard.mjs';   // 2026-10-12 — 초안·도우미 서버와 한 벌로 (베끼지 않는다)
 
 /**
  * 보낸 뒤 한 줄 적는다.

@@ -21,6 +21,8 @@
    배포: server/chat/README.md
    ============================================================ */
 
+import { clientIp, limitCheck } from '../shared/guard.mjs';
+
 const MODEL = 'claude-haiku-4-5-20251001';   // 고르기만 하므로 가장 싼 모델로 충분하다
 const MAX_ITEMS = 8;
 const MAX_QUOTES = 6;
@@ -84,6 +86,13 @@ export default {
     if (request.method !== 'POST') return say({ needSource: true, picks: [] }, origin, 405);
     if (!ALLOWED_ORIGINS.includes(origin)) return say({ needSource: true, picks: [] }, origin, 403);
     if (!env.ANTHROPIC_API_KEY) return say({ needSource: true, picks: [] }, origin, 503);
+
+    /* 🔴 한 접속 주소가 1분에 CHAT_LIMIT 번까지 (2026-10-12 · server/shared/guard.mjs).
+       도우미는 로그인 없이도 쓰는 기능이라 학생 id 대신 접속 주소(CF-Connecting-IP — 학생이 못 바꾼다)로 센다.
+       ⚠️ 제한 장치가 배포 설정에 없으면 부르지 않는다 — 돈이 나가는 서버다. 안 되면 앱은 무료 안내봇으로 물러난다. */
+    const lim = await limitCheck(env.CHAT_LIMIT, clientIp(request));
+    if (lim === 'missing') return say({ needSource: true, picks: [], error: 'no-limiter' }, origin, 503);
+    if (lim === 'limited') return say({ needSource: true, picks: [], error: 'too-many' }, origin, 429);
 
     let body;
     try { body = await request.json(); } catch (e) { return say({ needSource: true, picks: [] }, origin, 400); }

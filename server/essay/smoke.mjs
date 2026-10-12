@@ -146,6 +146,16 @@ function buildDemo(id) {
 /* ── 실제로 부른다 ──
    시연 모드는 공고 2건(B가 작동하는 것 · 블라인드가 작동하는 것)을 각각 한 번씩 부른다.
    호출 2회 ≈ 100원. 평소 실물 확인은 예전 그대로 1회다. */
+/* 문지기(2026-10-12 · server/shared/guard.mjs) — 이 시험은 '요청 모양'을 진짜 API 에 확인하는 것이라 로그인·횟수 제한은
+   가짜로 통과시킨다. 진짜로 나가는 것은 Anthropic 호출 하나뿐이다(로그인 확인 주소만 여기서 받는다). */
+const SMOKE_SB = 'https://smoke-auth.invalid';
+{
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = (url, init) => (String(url).startsWith(SMOKE_SB)
+    ? Promise.resolve(new Response(JSON.stringify({ id: 'smoke' }), { status: 200 }))
+    : realFetch(url, init));
+}
+
 const jobs = DEMO ? demoIds() : [null];
 
 for (const id of jobs) {
@@ -156,10 +166,11 @@ async function runOne(sendPayload) {
 const res = await worker.fetch(
   new Request('https://x/', {
     method: 'POST',
-    headers: { Origin: ORIGIN, 'content-type': 'application/json' },
+    headers: { Origin: ORIGIN, 'content-type': 'application/json', Authorization: 'Bearer smoke' },
     body: JSON.stringify(sendPayload),
   }),
-  { ANTHROPIC_API_KEY: KEY, ESSAY_MODEL: process.env.ESSAY_MODEL, ESSAY_EFFORT: process.env.ESSAY_EFFORT },
+  { ANTHROPIC_API_KEY: KEY, ESSAY_MODEL: process.env.ESSAY_MODEL, ESSAY_EFFORT: process.env.ESSAY_EFFORT,
+    SUPABASE_URL: SMOKE_SB, SUPABASE_ANON_KEY: 'smoke', ESSAY_LIMIT: { limit: async () => ({ success: true }) } },
 );
 const j = await res.json();
 

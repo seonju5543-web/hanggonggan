@@ -73,7 +73,10 @@ export function workerImportProblems(readFile, entry) {
 
 /* 워커 모듈을 매번 새로 싣는다(되돌려 본 판이 섞이지 않게) — 파일 주소 대신 글자로 실어 경고 없이 */
 async function loadPushWorker(root) {
-  const src = fs.readFileSync(new URL('server/push/worker.js', root), 'utf8');
+  /* 글자로 실으면 상대 경로(import '../shared/guard.mjs' · 2026-10-12)를 풀 기준이 없다 — 파일 주소로 바꿔 둔다 */
+  const base = new URL('server/push/', root);
+  const src = fs.readFileSync(new URL('server/push/worker.js', root), 'utf8')
+    .replace(/(from\s+['"])(\.\.?\/[^'"]+)(['"])/g, (m, a, spec, b) => a + new URL(spec, base).href + b);
   return import(`data:text/javascript;charset=utf-8,${encodeURIComponent(`${src}\n//# ${Date.now()}-${Math.random()}`)}`);
 }
 

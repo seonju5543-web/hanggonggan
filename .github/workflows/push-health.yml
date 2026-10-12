@@ -49,10 +49,12 @@ jobs:
       #    server/push — 판정 도구가 서버의 회복 규칙(worker.js errorRecovered)을 불러 쓴다(베끼지 않는다 · 2026-10-11 · 관문 servers ⑤).
       - uses: actions/checkout@v4
         with:
+          # server/shared — server/push/worker.js 가 불러 쓰는 문지기(2026-10-12)
           sparse-checkout: |
             .github/actions
             tools
             server/push
+            server/shared
 
       - name: /health 읽기
         id: probe

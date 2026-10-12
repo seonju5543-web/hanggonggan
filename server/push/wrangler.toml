@@ -26,3 +26,12 @@ id = "b2eb1c8f30814fad91249e2f08334fbf"
 #    **사용자가 0명이어도** 발송이 통째로 실패한다. 되돌리지 말 것.
 [triggers]
 crons = ["*/2 * * * *"]
+
+# 🔴 요청 횟수 제한 (2026-10-12 · server/shared/guard.mjs) — 접속 주소 하나가 /subscribe 를 1분에 10번까지. 없으면 통과(이미 가동 중인 서버라 알림을 끊지 않는다).
+#    Cloudflare 무료 기능 · 1분 창.
+[[ratelimits]]
+name = "SUB_LIMIT"
+namespace_id = "1103"
+  [ratelimits.simple]
+  limit = 10
+  period = 60

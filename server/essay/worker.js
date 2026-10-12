@@ -28,6 +28,7 @@
    ============================================================ */
 
 import { scanOutgoing, checkDraft, mayDraft, materialText, qualityCheck, rulesFor, scrubSchool } from './draft-guard.mjs';
+import { resolveUser, limitCheck } from '../shared/guard.mjs';
 /* 🔴 규칙집은 **저장소에 한 벌만** 둔다 (data/essay-playbook.json). 여기로 베껴 오면
    앱이 보여 주는 '고칠 곳'과 서버가 검사하는 기준이 갈라진다. wrangler 가 번들할 때
    이 JSON 을 코드 안에 넣어 준다 — 실행 중에 파일을 읽지 않는다. */
@@ -117,7 +118,7 @@ function cors(origin) {
   return {
     'Access-Control-Allow-Origin': allow,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',   // 로그인 토큰을 실어 보낸다(2026-10-12)
     'Content-Type': 'application/json',
   };
 }
@@ -185,6 +186,15 @@ export default {
     if (request.method !== 'POST') return say({ drafts: [], error: 'method' }, origin, 405);
     if (!ALLOWED_ORIGINS.includes(origin)) return say({ drafts: [], error: 'origin' }, origin, 403);
     if (!env.ANTHROPIC_API_KEY) return say({ drafts: [], error: 'no-key' }, origin, 503);
+
+    /* 🔴 로그인한 학생만 · 한 학생이 1분에 ESSAY_LIMIT 번까지 (2026-10-12 · server/shared/guard.mjs).
+       출처 이름(Origin)은 스크립트가 꾸밀 수 있어 그것만으로는 크레딧을 못 지킨다.
+       ⚠️ 제한 장치가 배포 설정에 없으면 **부르지 않는다** — 돈이 나가는 서버라 열어 두지 않는다. */
+    const userId = await resolveUser(env, request.headers.get('Authorization'));
+    if (!userId) return say({ drafts: [], error: 'login' }, origin, 401);
+    const lim = await limitCheck(env.ESSAY_LIMIT, userId);
+    if (lim === 'missing') return say({ drafts: [], error: 'no-limiter' }, origin, 503);
+    if (lim === 'limited') return say({ drafts: [], error: 'too-many' }, origin, 429);
 
     let raw;
     try { raw = await request.json(); } catch { return say({ drafts: [], error: 'bad-json' }, origin, 400); }

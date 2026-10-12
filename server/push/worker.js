@@ -35,6 +35,8 @@
      변수            : APP_ORIGIN (앱 주소), ALLOW_ORIGIN (앱 주소 — CORS 허용)
    ============================================================ */
 
+import { clientIp, limitCheck } from '../shared/guard.mjs';
+
 const SEND_PER_TICK = 25;         // 한 걸음에 깨울 폰 수 (무료 등급 외부 요청 50건/실행 — 절반만 쓴다)
 const MAX_SUBS_PER_WAKE = 2000;   // 한 번의 '알릴 거리'에 깨울 총 상한 (그 이상은 유료 등급 검토)
 const STEP_MAX_TRIES = 5;         // 같은 걸음을 이만큼 실패하면 포기하고 사유를 남긴다
@@ -613,6 +615,10 @@ export default {
     }
 
     if (url.pathname === '/subscribe' && request.method === 'POST') {
+      /* 🔴 한 접속 주소가 1분에 SUB_LIMIT 번까지 (2026-10-12 · server/shared/guard.mjs) — 가짜 등록을 쏟아부어
+         KV 무료 쓰기 한도(하루 1,000회)를 써 버리면 진짜 학생 등록이 막힌다.
+         ⚠️ 제한 장치가 배포 설정에 없으면 **통과시킨다** — 이미 학생 폰이 붙어 있는 서버라 막으면 알림이 끊긴다(돈은 안 나간다). */
+      if (await limitCheck(env.SUB_LIMIT, clientIp(request)) === 'limited') return json({ error: 'too many' }, 429, cors);
       let body;
       try { body = await request.json(); } catch (e) { return json({ error: 'bad json' }, 400, cors); }
       const endpoint = body && body.endpoint;

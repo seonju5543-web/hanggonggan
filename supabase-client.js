@@ -115,6 +115,14 @@ function sbFetch(path, opts) {
   });
 }
 
+/* 우리 서버(AI 초안 등)에 실어 보낼 로그인 토큰 — 만료가 가까우면 한 번 갱신한다. 로그인 안 했으면 null (2026-10-12 · server/shared/guard.mjs) */
+async function freshAccessToken() {
+  let t = authLoad();
+  if (!t) return null;
+  if (t.expiresAt && Date.now() > t.expiresAt - 30000 && t.refreshToken) { await authRefresh(); t = authLoad(); }
+  return t && t.accessToken ? t.accessToken : null;
+}
+
 /* 로그인한 사람 자격으로 부르기. 토큰이 만료됐으면 조용히 한 번 갱신하고 다시 시도한다. */
 async function sbAuthed(path, opts, retried) {
   let t = authLoad();
