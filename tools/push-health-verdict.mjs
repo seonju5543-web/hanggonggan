@@ -19,6 +19,9 @@
                  옛 서버 코드는 '알릴 거리 없음' 회차로도 회복을 쳐서 발송이 끊겨도 초록이었다(2026-10-11 점검) — 서버와 이 도구가
                  갈라지면 경보 쪽으로 간다
      outdated  `lastSlot` 칸이 아예 없음 — 새 서버 코드가 아직 배포되지 않았다
+     outdated  운영 판 도장(`build`)이 저장소의 도장(tools/push-build-stamp.mjs · HEALTH_EXPECT_BUILD)과 다르거나 없음 — 저장소에서 고친
+               서버 코드가 운영에 안 올라갔다(2026-10-12 · 알림 재발의 원인 — Cloudflare 의 GitHub 연결 빌드가 성공하고도 운영은 옛 판이었다).
+               도장을 안 넘기면(HEALTH_EXPECT_BUILD 없음) 이 줄은 건너뛴다
      stale     마지막으로 시작한 회차가 26시간보다 오래됨 — 두 회차(08:10·20:10) 연속 시작하지 않았다
                (06:17 확인의 정상 간격은 약 10시간 · 한 회차만 빠지면 약 22시간)
      error     구독에 깨우기를 보낸 마지막 회차(lastSentRun · sent > 0 만 적힌다 · 옛 서버면 lastRun)가 **살아 있는 구독에** 깨우기를 보냈는데(sent − dropped > 0)
@@ -31,7 +34,7 @@
      ok        그 밖
    경고(판정은 ok 그대로 · 로그에만): 등록 0대 · lastSlot 이 null(새 저장소 — 아직 한 회차도 시작 전)
 
-   실행: HEALTH_RC=<curl 종료 코드> HEALTH_CODE=<HTTP 코드> HEALTH_BODY=<응답 글> node tools/push-health-verdict.mjs
+   실행: HEALTH_RC=<curl 종료 코드> HEALTH_CODE=<HTTP 코드> HEALTH_BODY=<응답 글> [HEALTH_EXPECT_BUILD=<도장>] node tools/push-health-verdict.mjs
          → 표준 출력에 판정 · GITHUB_OUTPUT 이 있으면 verdict·why 를 적는다. 종료 코드는 늘 0(실패 처리는 워크플로가 한다).
    ============================================================ */
 import fs from 'node:fs';
@@ -48,7 +51,7 @@ export function slotTime(slot) {
 }
 
 /** 순수 판정 — { curlOk, code, json, now } → { verdict, why, warnings[] } */
-export function verdict({ curlOk, code, json, now = Date.now() } = {}) {
+export function verdict({ curlOk, code, json, now = Date.now(), expectBuild = '' } = {}) {
   const warnings = [];
   const out = (v, why) => ({ verdict: v, why, warnings });
   if (!curlOk || Number(code) !== 200) return out('down', `서버가 응답하지 않습니다 (HTTP ${code || '없음'})`);
@@ -63,6 +66,10 @@ export function verdict({ curlOk, code, json, now = Date.now() } = {}) {
   if (String(j.subs) === '0') warnings.push('등록된 폰이 0대입니다 (오류는 아니지만 알림이 갈 곳이 없습니다)');
   if (!Object.prototype.hasOwnProperty.call(j, 'lastSlot')) {
     return out('outdated', '서버 응답에 lastSlot 칸이 없습니다 — 새 서버 코드(server/push/worker.js)가 아직 배포되지 않은 것으로 보입니다. Cloudflare → Workers → handaejang-push 의 배포 기록을 확인하세요');
+  }
+  const want = String(expectBuild || '').trim();
+  if (want && String(j.build || '') !== want) {
+    return out('outdated', `운영에 도는 판(build=${j.build == null ? '없음' : JSON.stringify(j.build)})이 저장소의 판(${want})과 다릅니다 — 저장소에서 고친 서버 코드가 운영에 올라가지 않았습니다. Actions 「푸시 서버 배포」(push-deploy.yml)를 돌리세요(배포 열쇠 CLOUDFLARE_API_TOKEN·CLOUDFLARE_ACCOUNT_ID 가 있어야 합니다 — server/push/README.md). 대시보드나 GitHub 연결 빌드로 올린 판은 도장이 없어 늘 '옛 판'으로 보입니다`);
   }
   if (j.lastSlot == null) {
     warnings.push('lastSlot 이 비어 있습니다 — 새 저장소라 아직 한 회차도 시작하지 않았을 수 있습니다');
@@ -90,7 +97,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const body = String(process.env.HEALTH_BODY ?? '');
   let json = null;
   try { json = JSON.parse(body); } catch (e) { json = null; }
-  const v = verdict({ curlOk: rc === '0', code, json, now: Date.now() });
+  const v = verdict({ curlOk: rc === '0', code, json, now: Date.now(), expectBuild: process.env.HEALTH_EXPECT_BUILD || '' });
   for (const w of v.warnings) console.log(`⚠️ ${w}`);
   console.log(`판정: ${v.verdict}${v.why ? ` — ${v.why}` : ''}`);
   if (process.env.GITHUB_OUTPUT) {

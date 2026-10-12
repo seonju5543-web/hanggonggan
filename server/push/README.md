@@ -39,7 +39,9 @@ node server/push/gen-vapid.mjs
 > 🔑 공개키는 공개돼도 안전한 값이고, 개인키(VAPID_JWK)는 **서버에만** 넣습니다.
 > 개인키를 GitHub에 올리면 안 됩니다. (실수로 올렸다면 다시 만들어 교체하면 됩니다.)
 
-## 2단계 — 서버 올리기 (10분)
+## 2단계 — 서버 올리기 (10분 · 처음 한 번) + 그 뒤로는 저장소가 올린다
+
+처음 한 번은 컴퓨터에서 올립니다:
 
 ```bash
 cd server/push
@@ -68,6 +70,27 @@ https://handaejang-push.○○○.workers.dev
 curl https://handaejang-push.○○○.workers.dev/health
 # {"ok":true,"configured":true} 가 나오면 성공
 ```
+
+### 🔴 그 뒤로는 GitHub Actions 가 올린다 (2026-10-12 · 알림 재발 수리)
+
+기본 브랜치에 `server/push/`·`server/shared/` 가 바뀐 커밋이 올라오면 **`.github/workflows/push-deploy.yml`** 이 운영에 올리고,
+올린 뒤 `/health` 의 `build`(판 도장 · `tools/push-build-stamp.mjs`)를 **읽어서** 그 판인지 확인합니다. 다르면 실패 + 경보 이슈.
+매일 확인(`push-health.yml` 06:17)도 같은 도장을 대조해 **운영이 옛 판이면 `outdated` 로 경보**합니다 — 예전엔 이걸 알 길이 없었습니다.
+
+**왜 바꿨나**: 그전엔 Cloudflare 대시보드의 GitHub 연결 빌드(Workers Builds)가 올리게 돼 있었는데, 2026-10-12 실측으로
+그 빌드가 성공하고도 운영은 옛 판이었습니다(기본 브랜치 커밋 328cf445 → 운영 400×60 · `main-…` 미리보기 429×10).
+즉 **저장소에서 고친 서버 코드가 운영에 닿지 않아** "고쳤다"는 기록만 쌓이고 같은 알림 증상이 돌아왔습니다.
+어느 대시보드 설정이 틀렸는지는 세션이 대시보드를 못 봐 확인하지 못했습니다 — 그래서 대시보드 설정에 기대지 않는 길로 바꿨습니다.
+
+**개발자가 할 일 (한 번)**:
+1. Cloudflare → 오른쪽 위 프로필 → **My Profile → API Tokens → Create Token → 「Edit Cloudflare Workers」** 틀 → Continue → Create.
+   나온 토큰을 저장소 **Settings → Secrets and variables → Actions → New repository secret** 에 `CLOUDFLARE_API_TOKEN` 으로.
+2. 계정 번호(대시보드 → Workers & Pages 화면 오른쪽 「Account ID」, 또는 주소창 `dash.cloudflare.com/<여기>/`)를 `CLOUDFLARE_ACCOUNT_ID` 로.
+3. Actions → **「푸시 서버 배포」** → Run workflow. 초록이면 끝(요약에 ✅ 와 도장이 보입니다).
+4. 🔴 **Cloudflare → Workers → handaejang-push → Settings → Build 에서 GitHub 연결을 끊습니다.** 두 길이 같은 워커를 번갈아 올리면
+   어느 판이 도는지 다시 알 수 없게 됩니다(연결 빌드로 올린 판은 도장이 없어 매일 확인이 '옛 판'으로 경보합니다 — 일부러 그렇습니다).
+- 열쇠가 없으면 배포 워크플로가 **경보 이슈(🚨 푸시 서버 배포 실패)** 로 말하고 실패합니다. 조용히 초록이 되지 않습니다.
+- `wrangler deploy` 는 VAPID 열쇠·ADMIN_KEY(시크릿)를 지우지 않고, KV 는 `wrangler.toml` 의 번호로 잇습니다.
 
 ## 3단계 — 앱에 연결 (1분)
 
@@ -196,13 +219,7 @@ Cloudflare 무료 등급 한도는 **하루 10만 요청 / KV 하루 10만 읽�
 
 ## 운영에 새 판이 올라갔는지 확인 (2026-10-12)
 
-`/health` 만으로는 **어느 판이 도는지** 안 보인다. Actions 의 「푸시 서버 배포 확인」(`push-limit-check.yml`)을 누르면
-틀린 주소로 `/subscribe` 를 60번 보내 본다 — 등록 횟수 제한(2026-10-12 문지기)이 든 판이면 몇 번은 429 가 나온다.
-운영 주소와 미리보기 주소(`main-…`)를 함께 눌러 비교한다. 저장·발송은 없다.
-🔴 2026-10-12 실측: **GitHub 연결 빌드(Workers Builds)는 성공하는데 운영으로 안 올라간다.** 기본 브랜치에만 올린 커밋(328cf445)의
-빌드도 새 판을 미리보기(`main-…`)로만 올렸고, 운영은 60번 모두 400(제한 없음 · 옛 판)이었다.
-→ 운영에 올리려면 Cloudflare 대시보드가 필요하다(계정 주인 로그인):
-  ① Workers → handaejang-push → **Deployments** 에서 맨 위(가장 새) 버전의 「⋯ → Deploy」로 운영 승격, 그리고
-  ② 다시 안 생기게 **Settings → Build → Deploy command** 가 `npx wrangler deploy` 인지(‘versions upload’ 가 아닌지)와
-     **Production branch** 가 `claude/nice-heisenberg-WESq5` 인지 확인.
-  올린 뒤 이 확인 버튼을 다시 눌러 운영에서도 429 가 나오면 끝.
+`/health` 의 **`build`** 가 운영 판 도장입니다. 저장소에서 `node tools/push-build-stamp.mjs` 로 찍은 도장과 같으면 운영 = 저장소 기본 브랜치의 판.
+- 버튼: Actions 「푸시 서버 배포 확인」(`push-limit-check.yml`) — 도장을 찍어 `/health` 와 대조합니다(저장·발송·운영 두드림 없음).
+- 매일: `push-health.yml` 이 같은 대조를 해 다르면 `outdated` 경보 이슈.
+- `build` 가 `null` 이면 도장 없는 길(대시보드 · GitHub 연결 빌드)로 올린 옛 판입니다 → Actions 「푸시 서버 배포」로 올리세요.

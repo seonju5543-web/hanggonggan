@@ -343,7 +343,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 
 ### 알림 · 업데이트 · 보안
 
-- 진짜 푸시 가동 중(`server/push/` · 내용 없는 깨우기 → 폰이 기기 안 프로필로 문구를 만든다). 푸시를 받으면 보이는 알림 1건 필수. iOS 는 홈 화면 설치 후만.
+- 진짜 푸시 가동 중(`server/push/` · 내용 없는 깨우기 → 폰이 문구를 만든다 · 알림 1건 필수 · iOS 는 홈 화면 설치 후만). 🔴 **운영 배포는 `push-deploy.yml` 한 길**(2026-10-12 · Cloudflare GitHub 연결 빌드는 성공해도 운영에 안 올라가 알림 수리가 번번이 재발) — 서버 health 응답의 `build` = `tools/push-build-stamp.mjs` 도장 · 매일 확인이 다르면 `outdated` 경보. 관문 「로봇·도구 점검 관문」 servers ⑪.
 - **푸시 등록**: 브라우저의 실제 구독을 본다 · '껐다'와 '못 읽었다'를 구분(`shouldSelfUnsubscribe`) · 옛 주소는 서버에서도 지운다. 살아 있는지는 `push-check.yml` 발송만이 증명.
 - 장부는 IndexedDB(`handaejang-notify` — sw 는 localStorage 를 못 읽는다). "폰이 꺼져 있어도 즉시"라고 쓰지 말 것.
 - 서비스워커는 코드·데이터 모두 네트워크 우선 + `cache:'no-cache'` + 3.5초 폴백. 버전 인상은 옛 캐시 청소용 관례.
