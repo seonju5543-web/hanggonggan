@@ -1,7 +1,16 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-10-11",
+ "updatedAt": "2026-10-12",
  "items": [
+  {
+   "title": "[취업정보] 2026년 글로컬대학사업 「AI, 역량검사부터 면접까지」",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70636",
+   "postedAt": "2026-10-12",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-12"
+  },
   {
    "title": "[취업정보] 「현직자와의 AI 토크토크(1차)」참여 모집중!",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70631",
@@ -9,7 +18,8 @@
    "school": "전남대학교",
    "campus": "",
    "foundAt": "2026-10-11",
-   "thumb": "data/news/img/8aa7b591fa1857d4.webp"
+   "thumb": "data/news/img/8aa7b591fa1857d4.webp",
+   "src": "b7347301"
   },
   {
    "title": "[취업정보] 「AI, 역량검사부터 면접까지」모집중",
@@ -17,7 +27,8 @@
    "postedAt": "2026-10-11",
    "school": "전남대학교",
    "campus": "",
-   "foundAt": "2026-10-11"
+   "foundAt": "2026-10-11",
+   "src": "b7347301"
   },
   {
    "title": "[채용공고] 2026년 제9회 전남대학교 앵커사업단·제2회 서남권공유대학사...",
@@ -26,7 +37,8 @@
    "kind": "채용",
    "school": "전남대학교",
    "campus": "",
-   "foundAt": "2026-10-09"
+   "foundAt": "2026-10-09",
+   "src": "b7347301"
   },
   {
    "title": "[취업정보] [KIA]AutoLand광주 의전담당자 채용(~10.13.(화...",
@@ -35,7 +47,8 @@
    "kind": "채용",
    "school": "전남대학교",
    "campus": "",
-   "foundAt": "2026-10-08"
+   "foundAt": "2026-10-08",
+   "src": "b7347301"
   },
   {
    "title": "[취업정보] [(주)오뚜기]2026 전라지역 B2C영업, B2B영업, 홍보...",
@@ -44,7 +57,8 @@
    "school": "전남대학교",
    "campus": "",
    "foundAt": "2026-10-08",
-   "thumb": "data/news/img/f2cfc91a71d54ea8.webp"
+   "thumb": "data/news/img/f2cfc91a71d54ea8.webp",
+   "src": "b7347301"
   },
   {
    "title": "[행정공고] 전남대학교 정문 5·18 기념 조형물 CCTV 설치 행정예고 ...",
@@ -52,7 +66,8 @@
    "postedAt": "2026-10-08",
    "school": "전남대학교",
    "campus": "",
-   "foundAt": "2026-10-08"
+   "foundAt": "2026-10-08",
+   "src": "b7347301"
   },
   {
    "title": "[학사안내] 2026학년도 동계 계절학기 타 대학교(서울대) 교류수학 추천...",

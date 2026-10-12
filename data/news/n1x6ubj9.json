@@ -1,7 +1,49 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-10-11",
+ "updatedAt": "2026-10-12",
  "items": [
+  {
+   "title": "2026학년도 2학기 마이크로디그리(학사, 대학원) 이수·포기 신청(1차) 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140359&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-12",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-12",
+   "desc": "1. 마이크로디그리란, • 특정 주제/분야를 중심으로 여러 학문단위가 연계하여 제시하는 과목군에서 최소단위(micro) 학점 이수를 인증하는 소규모 모듈형 교육과정"
+  },
+  {
+   "title": "2026 국회 입법박람회 개최 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140484&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-12",
+   "kind": "행사",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-12",
+   "thumb": "data/news/img/4c0bf87958634ca6.webp"
+  },
+  {
+   "title": "[인공지능혁신융합대학사업] 2026학년도 인공지능혁신융합대학사업 겨울 계절학기 학점교류 수강 안내 (상시 업데이트)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140482&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-12",
+   "kind": "학사",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-12",
+   "desc": "인공지능혁신공유대학사업단 인공지능혁신융합대학사업의 협력교와 학점교류를 희망하는 학생은 아래 안내에 따라 신청하시기 바랍니다."
+  },
+  {
+   "title": "[HUSS] 인문사회융합인재양성사업 융합트랙 및 마이크로디그리 신청 안내(2학기 1차)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140478&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-12",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-12",
+   "desc": "인문사회융합인재양성사업단 인문사회 융합인재양성사업(HUSS)의 융합트랙 및 마이크로디그리 신청과 관련하여 다음과 같이 안내하오니 많은 신청 바랍니다."
+  },
   {
    "title": "[성균관대학교 청정에너지ICT연구소] 이공계열 석사졸업이상 연구원 모집(1명)",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140472&article.offset=0&articleLimit=10",
@@ -10,7 +52,8 @@
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-10-10",
-   "desc": "최종 수정일 : 2026.10.10 첨부파일 ( 0 ) 게시글 내용 1. 담당 업무(1명)"
+   "desc": "최종 수정일 : 2026.10.10 첨부파일 ( 0 ) 게시글 내용 1. 담당 업무(1명)",
+   "src": "45ec8fd1"
   },
   {
    "title": "성균관대학교 문화예술미디어융합원 촉탁직원(연구원) 채용 공고",
@@ -20,7 +63,8 @@
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-10-08",
-   "desc": "최종 수정일 : 2026.10.08 총괄지원팀 첨부파일 ( 2 ) 게시글 내용 문화예술미디어융합원 촉탁직원(연구원)을 아래와 같이 채용하고자 하오니 많은 지원 바랍니다."
+   "desc": "최종 수정일 : 2026.10.08 총괄지원팀 첨부파일 ( 2 ) 게시글 내용 문화예술미디어융합원 촉탁직원(연구원)을 아래와 같이 채용하고자 하오니 많은 지원 바랍니다.",
+   "src": "45ec8fd1"
   },
   {
    "title": "대학원혁신센터 촉탁직원 채용 공고(BK대학원혁신사업)",
@@ -30,7 +74,8 @@
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-10-08",
-   "desc": "최종 수정일 : 2026.10.08 총괄지원팀 첨부파일 ( 2 ) 게시글 내용 우리대학 대학원혁신센터에서 BK대학원혁신지원사업을 담당할 촉탁직원을 아래와 같이 채용합니다."
+   "desc": "최종 수정일 : 2026.10.08 총괄지원팀 첨부파일 ( 2 ) 게시글 내용 우리대학 대학원혁신센터에서 BK대학원혁신지원사업을 담당할 촉탁직원을 아래와 같이 채용합니다.",
+   "src": "45ec8fd1"
   },
   {
    "title": "[교수학습혁신센터] 제2회 AI in Higher Education 컨퍼런스 참여 안내",
@@ -40,7 +85,8 @@
    "campus": "",
    "foundAt": "2026-10-08",
    "thumb": "data/news/img/13f36cc135018b60.webp",
-   "desc": "2. 주제: AI in Action – 제도에서 현장까지 3. 일시: 2026년 10월 23일 (금) 오후 1:00 ~ 5:00"
+   "desc": "2. 주제: AI in Action – 제도에서 현장까지 3. 일시: 2026년 10월 23일 (금) 오후 1:00 ~ 5:00",
+   "src": "45ec8fd1"
   },
   {
    "title": "스웨덴 왕립과학한림원 원장 특별 강연 안내 (10/30(금) 14:00)",
@@ -51,7 +97,8 @@
    "campus": "",
    "foundAt": "2026-10-07",
    "thumb": "data/news/img/a1bd5e167b17bba1.webp",
-   "desc": "최종 수정일 : 2026.10.07 국제교류팀 첨부파일 ( 2 ) 게시글 내용 성균관대학교는 한국과학기술한림원과 공동으로 스웨덴 왕립과학한림원(KVA) 스벤 리딘(Sven Lidin) 원장을 초청하여 특별 강연을…"
+   "desc": "최종 수정일 : 2026.10.07 국제교류팀 첨부파일 ( 2 ) 게시글 내용 성균관대학교는 한국과학기술한림원과 공동으로 스웨덴 왕립과학한림원(KVA) 스벤 리딘(Sven Lidin) 원장을 초청하여 특별 강연을…",
+   "src": "45ec8fd1"
   },
   {
    "title": "[채용공고] 인공지능 플러스 K건설인프라 레질리언스 연구센터(ERC) 행정직원 모집(~10/13(화))",
@@ -61,7 +108,8 @@
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-10-07",
-   "desc": "나. 담당업무: 각종 연구비 및 사업비 관련 행정업무 3. 근로조건 가. 계약기간: 1년 단위 계약(매년 근무평가에 따라 연장 여부 결정), 최초 임용 시 수습 3개월(급여 동일)"
+   "desc": "나. 담당업무: 각종 연구비 및 사업비 관련 행정업무 3. 근로조건 가. 계약기간: 1년 단위 계약(매년 근무평가에 따라 연장 여부 결정), 최초 임용 시 수습 3개월(급여 동일)",
+   "src": "45ec8fd1"
   },
   {
    "title": "성균관대학교 사범대학 학부대학/사범대학행정실 행정조교 모집(~10/14까지)",
@@ -111,7 +159,8 @@
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-10-06",
-   "desc": "최종 수정일 : 2026.10.06 첨부파일 ( 1 ) 게시글 내용 성균관대학교 정보통신대학 전자전기공학부 사무실 행정인력을 아래와 같이 모집하오니 많은 관심과 지원을 바랍니다."
+   "desc": "최종 수정일 : 2026.10.06 첨부파일 ( 1 ) 게시글 내용 성균관대학교 정보통신대학 전자전기공학부 사무실 행정인력을 아래와 같이 모집하오니 많은 관심과 지원을 바랍니다.",
+   "src": "45ec8fd1"
   },
   {
    "title": "[학군단] `26.10.7.(수) 오후 1시 30분 학군단 비전 토크 콘서트 + 육군사관학교 군악대 공연 초대합니다.",
@@ -130,7 +179,8 @@
    "kind": "채용",
    "school": "성균관대학교",
    "campus": "",
-   "foundAt": "2026-10-06"
+   "foundAt": "2026-10-06",
+   "src": "45ec8fd1"
   },
   {
    "title": "[연장공지] 사회과학대학 행정조교(휴먼사이언스사회융합전공) 모집[~10.12.(월) 16:00까지, 조기채용시 마감 예정]",
@@ -175,7 +225,8 @@
    "kind": "채용",
    "school": "성균관대학교",
    "campus": "",
-   "foundAt": "2026-10-06"
+   "foundAt": "2026-10-06",
+   "src": "45ec8fd1"
   },
   {
    "title": "[학부대학/사범대학행정실][인사캠] 교내 근로학생 모집(10.11.(일)까지)",
@@ -202,7 +253,8 @@
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-10-06",
-   "thumb": "data/news/img/d1fcb1b1cf99761b.webp"
+   "thumb": "data/news/img/d1fcb1b1cf99761b.webp",
+   "src": "45ec8fd1"
   },
   {
    "title": "[대학혁신과공유센터] 2026학년도「탑골공원 학생 도슨트 프로그램」신청자 모집 안내",
@@ -210,7 +262,8 @@
    "postedAt": "2026-10-06",
    "school": "성균관대학교",
    "campus": "",
-   "foundAt": "2026-10-06"
+   "foundAt": "2026-10-06",
+   "src": "45ec8fd1"
   },
   {
    "title": "[(주)소노케어랩] 의료기기 하드웨어 개발 담당자 채용 공고",
@@ -219,7 +272,8 @@
    "kind": "채용",
    "school": "성균관대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-02",
+   "src": "45ec8fd1"
   },
   {
    "title": "[(주)소노케어랩] 경영지원부 회계 및 국가 과제 관리 담당자 채용 공고",
@@ -228,7 +282,8 @@
    "kind": "채용",
    "school": "성균관대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-02",
+   "src": "45ec8fd1"
   },
   {
    "title": "사학과 4단계 BK21 행정실무자 모집",
@@ -280,7 +335,8 @@
    "kind": "채용",
    "school": "성균관대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "src": "45ec8fd1"
   },
   {
    "title": "[관리팀(인사캠)] 혜화셔틀버스, 종로07/08 마을버스 이용자 설문조사",
@@ -299,18 +355,19 @@
    "kind": "채용",
    "school": "성균관대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "src": "45ec8fd1"
   },
   {
    "title": "사회과학대학 제40회 수선포럼 개최 안내: 2026.10.21.(수) 11:30~13:00",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140251&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-21",
    "kind": "행사",
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/0fb1ce46ca702f27.webp",
-   "desc": "일시: 2026년 10월 21일(수) 11:30~13:00 장소: 사회과학연구원 컨퍼런스룸(수선관 901호) 발표: 오서정 교수(글로벌리더학부) 새로운 백년의 시작 2026 아리랑 행사 자원봉사자 모집 (10/1)…"
+   "desc": "일시: 2026년 10월 21일(수) 11:30~13:00 장소: 사회과학연구원 컨퍼런스룸(수선관 901호) 발표: 오서정 교수(글로벌리더학부) 새로운 백년의 시작 2026 아리랑 행사 자원봉사자 모집 (10/1)…",
+   "src": "45ec8fd1"
   },
   {
    "title": "[산업전자응용연구소]비전임교원(연구교수) 채용",
@@ -328,7 +385,8 @@
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/f3c6217a7b2768e1.webp"
+   "thumb": "data/news/img/f3c6217a7b2768e1.webp",
+   "src": "45ec8fd1"
   },
   {
    "title": "[3D융합산업협회] 현대자동차와 함께하는 직무설명회 개최 안내(사전신청: ~10/7(수)까지)",
@@ -338,40 +396,6 @@
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[학생인재개발팀] 전국 지역인재 7급 수습직원 선발시험 향후 변경사항 안내",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140222&article.offset=0&articleLimit=10",
-   "postedAt": "2026-09-30",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[기초과학연구소] 대체근무자 채용 공고(채용 시 마감)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140203&article.offset=0&articleLimit=10",
-   "postedAt": "2026-09-29",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[마감] 한국어–영어 이중언어자 모집 (심리학 관련 척도 번역 및 검토- 사례비 10만원)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140192&article.offset=0&articleLimit=10",
-   "postedAt": "2026-09-30",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[앵커사업단] SKKU 인사캠 교원창업· 지식재산권 가이드 개최(10월 14일, 국제관)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140191&article.offset=0&articleLimit=10",
-   "postedAt": "2026-09-29",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/1a9d225a8fcbb71d.webp"
   }
  ]
 }

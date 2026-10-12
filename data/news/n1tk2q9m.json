@@ -1,14 +1,69 @@
 {
  "school": "이화여자대학교",
- "updatedAt": "2026-10-11",
+ "updatedAt": "2026-10-12",
  "items": [
+  {
+   "title": "홍보실 2026-2학기 B급 조교 모집 안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367320&article.offset=0&articleLimit=10&no=360",
+   "postedAt": "2026-10-12",
+   "kind": "채용",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-12",
+   "desc": "1. 모집 인원 : B급 조교 O명 2. 근무 부서 : 홍보실 (본관 307호)"
+  },
+  {
+   "title": "[채용] 공과대학 환경공학과 계약직원 모집",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367318&article.offset=0&articleLimit=10&no=359",
+   "postedAt": "2026-10-08",
+   "kind": "채용",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-12",
+   "desc": "공과대학 환경공학과에서 근무할 계약직원을 모집하오니 관심 있는 분들의 많은 지원 바랍니다."
+  },
+  {
+   "title": "[학적]서울대학교 2026학년도 겨울계절학기 학점교류 수강 안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367317&article.offset=0&articleLimit=10&no=358",
+   "postedAt": "2026-10-08",
+   "kind": "학사",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-12",
+   "desc": "본교 홈페이지 학사안내 > 학사정보 > 학점인정 > 국내대학학점교류 > 하단 게시판에 게시되었습니다 . 2026 학년도 서울대학교 겨울계절학기를 수강하고자 할 경우 해당 안내문 확인 후 2026 년 10 월 1 6…"
+  },
+  {
+   "title": "[교목실] 2026-2 채플 휴무 안내(10/12~10/23, 중간고사 기간 휴무)",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367314&article.offset=0&articleLimit=10&no=357",
+   "postedAt": "2026-10-08",
+   "kind": "학사",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-12",
+   "desc": "중간시험 기간이 있는 2주 동안 채플이 없는 점 참고하여 주시기 바랍니다."
+  },
+  {
+   "title": "[국제학생증] 신한은행, 하나은행 국제학생증 발급비 지원행사 안내 (10/12(월)~10/25(일))",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367310&article.offset=0&articleLimit=10&no=355",
+   "postedAt": "2026-10-08",
+   "kind": "학사",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-12"
+  },
   {
    "title": "[글로벌사회공헌원] 140주년 Global Leader Lecture Series 4 <기후변화, 환경노출과 건강: 과학적 근거에서 형평성과 실천까지>",
    "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367260&article.offset=0&articleLimit=10&no=365",
    "postedAt": "2026-10-06",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-10-11"
+   "foundAt": "2026-10-11",
+   "src": "ec6597da"
   },
   {
    "title": "이화여자대학교 창립 140주년 기념 음악회(2026.10.26.(월) 19:00)",
@@ -16,7 +71,8 @@
    "postedAt": "2026-10-06",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-10-11"
+   "foundAt": "2026-10-11",
+   "src": "ec6597da"
   },
   {
    "title": "[학부] 2026학년도 제2학기 영어 및 정보인증제 신청 안내",
@@ -24,7 +80,8 @@
    "postedAt": "2026-10-01",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-10-11"
+   "foundAt": "2026-10-11",
+   "src": "ec6597da"
   },
   {
    "title": "[학부] 2027학년도 제1학기 학부 재입학, 학부 졸업논문등제출자격재부여 신청안내",
@@ -32,7 +89,8 @@
    "postedAt": "2026-10-01",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-10-11"
+   "foundAt": "2026-10-11",
+   "src": "ec6597da"
   },
   {
    "title": "2027학년도 전기 일반대학원 입학전형 원서접수 안내",
@@ -40,7 +98,8 @@
    "postedAt": "2026-09-30",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-10-11"
+   "foundAt": "2026-10-11",
+   "src": "ec6597da"
   },
   {
    "title": "[교목실] 2026-2학기 이화감사페스티벌 참가 안내",
@@ -58,7 +117,8 @@
    "kind": "학사",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-10-11"
+   "foundAt": "2026-10-11",
+   "src": "ec6597da"
   },
   {
    "title": "[학부] 2026학년도 제2학기 마이크로전공 신청 및 취소 안내",
@@ -66,7 +126,8 @@
    "postedAt": "2026-09-16",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-10-11"
+   "foundAt": "2026-10-11",
+   "src": "ec6597da"
   },
   {
    "title": "[학부] 2026학년도 제2학기 부.복수전공 신청 및 취소 안내",
@@ -75,7 +136,8 @@
    "kind": "학사",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-10-11"
+   "foundAt": "2026-10-11",
+   "src": "ec6597da"
   },
   {
    "title": "[학생군사교육단] '26년 후반기 이화여자대학교 ROTC(학군단) 모집",
@@ -83,47 +145,8 @@
    "postedAt": "2026-09-01",
    "school": "이화여자대학교",
    "campus": "",
-   "foundAt": "2026-10-11"
-  },
-  {
-   "title": "[채용] 공과대학 환경공학과 계약직원 모집",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367318&article.offset=0&articleLimit=10&no=364",
-   "postedAt": "2026-10-08",
-   "kind": "채용",
-   "school": "이화여자대학교",
-   "campus": "",
    "foundAt": "2026-10-11",
-   "desc": "공과대학 환경공학과에서 근무할 계약직원을 모집하오니 관심 있는 분들의 많은 지원 바랍니다."
-  },
-  {
-   "title": "[학적]서울대학교 2026학년도 겨울계절학기 학점교류 수강 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367317&article.offset=0&articleLimit=10&no=363",
-   "postedAt": "2026-10-08",
-   "kind": "학사",
-   "school": "이화여자대학교",
-   "campus": "",
-   "foundAt": "2026-10-11",
-   "desc": "본교 홈페이지 학사안내 > 학사정보 > 학점인정 > 국내대학학점교류 > 하단 게시판에 게시되었습니다 . 2026 학년도 서울대학교 겨울계절학기를 수강하고자 할 경우 해당 안내문 확인 후 2026 년 10 월 1 6…"
-  },
-  {
-   "title": "[교목실] 2026-2 채플 휴무 안내(10/12~10/23, 중간고사 기간 휴무)",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367314&article.offset=0&articleLimit=10&no=362",
-   "postedAt": "2026-10-08",
-   "kind": "학사",
-   "school": "이화여자대학교",
-   "campus": "",
-   "foundAt": "2026-10-11",
-   "desc": "작성처 교목실 중간시험 기간이 있는 2주 동안 채플이 없는 점 참고하여 주시기 바랍니다."
-  },
-  {
-   "title": "[국제학생증] 신한은행, 하나은행 국제학생증 발급비 지원행사 안내 (10/12(월)~10/25(일))",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367310&article.offset=0&articleLimit=10&no=360",
-   "postedAt": "2026-10-08",
-   "kind": "학사",
-   "school": "이화여자대학교",
-   "campus": "",
-   "foundAt": "2026-10-11",
-   "desc": "작성처 학생처 학생지원팀(학생서비스) ISIC 국제학생증 인증비 지원행사 안내 해외여행, 어학연수, 교환학생, 배낭여행 필수템! ISIC 국제학생증 으로 전 세계 15만여 개 학생 할인 혜택 을 누려보세요."
+   "src": "ec6597da"
   },
   {
    "title": "[기계/일반경쟁]뇌융합과학연구원/데이타저장장치 1세트 구입",
@@ -332,14 +355,6 @@
   {
    "title": "[기계/일반경쟁]문회리 교수/서버(2) 1식 구입",
    "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367214&article.offset=0&articleLimit=10&no=385",
-   "postedAt": "2026-10-01",
-   "school": "이화여자대학교",
-   "campus": "",
-   "foundAt": "2026-10-02"
-  },
-  {
-   "title": "[기계/일반경쟁]문회리 교수/서버(1) 1식 구입",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367213&article.offset=0&articleLimit=10&no=384",
    "postedAt": "2026-10-01",
    "school": "이화여자대학교",
    "campus": "",

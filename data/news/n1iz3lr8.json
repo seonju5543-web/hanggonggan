@@ -1,7 +1,17 @@
 {
  "school": "중앙대학교",
- "updatedAt": "2026-10-11",
+ "updatedAt": "2026-10-12",
  "items": [
+  {
+   "title": "2027학년도 전반기 커뮤니케이션대학원 신·편입생 모집",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30233&pageNo=1",
+   "postId": "30233",
+   "postedAt": "2026-10-12",
+   "school": "중앙대학교",
+   "campus": "",
+   "src": "f4f8bc8f",
+   "foundAt": "2026-10-12"
+  },
   {
    "title": "[학생생활상담센터(다빈치)] '2026학년도 걱정 함께하세 토크콘서트 - 내 마음의 나침반 찾기: 진로 불안과 우울을 다루는 마음챙김' 안내",
    "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30232&pageNo=1",
@@ -11,7 +21,8 @@
    "school": "중앙대학교",
    "campus": "",
    "foundAt": "2026-10-08",
-   "thumb": "data/news/img/5ee2b7b42d131e8f.webp"
+   "thumb": "data/news/img/5ee2b7b42d131e8f.webp",
+   "src": "f4f8bc8f"
   },
   {
    "title": "ISIC 국제학생증 인증비 지원행사 안내",
@@ -21,7 +32,8 @@
    "kind": "학사",
    "school": "중앙대학교",
    "campus": "",
-   "foundAt": "2026-10-08"
+   "foundAt": "2026-10-08",
+   "src": "f4f8bc8f"
   },
   {
    "title": "2026년 하반기 캠퍼스리크루팅 개최 안내",
@@ -31,7 +43,8 @@
    "kind": "행사",
    "school": "중앙대학교",
    "campus": "",
-   "foundAt": "2026-10-07"
+   "foundAt": "2026-10-07",
+   "src": "f4f8bc8f"
   },
   {
    "title": "2027학년도 전반기 일반대학원 신입생 모집 안내",
@@ -40,7 +53,8 @@
    "postedAt": "2026-10-07",
    "school": "중앙대학교",
    "campus": "",
-   "foundAt": "2026-10-07"
+   "foundAt": "2026-10-07",
+   "src": "f4f8bc8f"
   },
   {
    "title": "전공진로 디스커버리(교수님과 1:1 상담) 신청 안내(~10.30)",
@@ -50,7 +64,8 @@
    "school": "중앙대학교",
    "campus": "",
    "foundAt": "2026-10-07",
-   "thumb": "data/news/img/4dcb6663a0c2f250.webp"
+   "thumb": "data/news/img/4dcb6663a0c2f250.webp",
+   "src": "f4f8bc8f"
   },
   {
    "title": "2026-2 재학생 분할등록(3차) 안내",
@@ -59,7 +74,8 @@
    "postedAt": "2026-10-07",
    "school": "중앙대학교",
    "campus": "",
-   "foundAt": "2026-10-07"
+   "foundAt": "2026-10-07",
+   "src": "f4f8bc8f"
   },
   {
    "title": "2027학년도 수시 논술고사 관련 캠퍼스 출입 통제 안내(10월 10일~11일)",
@@ -68,7 +84,8 @@
    "postedAt": "2026-10-02",
    "school": "중앙대학교",
    "campus": "",
-   "foundAt": "2026-10-03"
+   "foundAt": "2026-10-03",
+   "src": "f4f8bc8f"
   },
   {
    "title": "2학기 취업지원 프로그램 / ACP 그래픽 자격증 취득 과정",
@@ -79,7 +96,8 @@
    "campus": "",
    "foundAt": "2026-10-03",
    "thumb": "data/news/img/2504c24a2f1e8308.webp",
-   "desc": "[ACP 그래픽 자격증 취득 과정] ● 다빈치캠퍼스 행정인턴 채용공고 [다빈치캠퍼스 행정인턴 지원하기]"
+   "desc": "[ACP 그래픽 자격증 취득 과정] ● 다빈치캠퍼스 행정인턴 채용공고 [다빈치캠퍼스 행정인턴 지원하기]",
+   "src": "f4f8bc8f"
   },
   {
    "title": "HY사회복지재단 취약계층 학비보조 지원사업 2026년 든든 학업지원금 선발 공고",
@@ -89,7 +107,8 @@
    "school": "중앙대학교",
    "campus": "",
    "foundAt": "2026-10-03",
-   "thumb": "data/news/img/f3b69db638fddc3c.webp"
+   "thumb": "data/news/img/f3b69db638fddc3c.webp",
+   "src": "f4f8bc8f"
   },
   {
    "title": "교섭 요구 사실의 공고",

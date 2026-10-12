@@ -1,7 +1,59 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-10-11",
+ "updatedAt": "2026-10-12",
  "items": [
+  {
+   "title": "[일반] 2026 베스트티처와 함께하는 티칭 토크",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53459&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-12",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-12",
+   "thumb": "data/news/img/17cdfa96e8421cdb.webp",
+   "desc": "*본 이미지는 생성형 AI를 활용하여 제작되었습니다."
+  },
+  {
+   "title": "[일반] [정보통신처]불법 소프트웨어, 이미지, 폰트 사용 및 배포 방지를 위한 협조 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53458&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-12",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-12",
+   "desc": "1. 최근 S/W 및 웹페이지(이미지, 폰트) 저작권 침해문제가 심각하게 대두되고 있는 실정이며, 이에 다국적 S/W 기업 또는 관련 법무법인으로부터 관련 제품의 저작권 침해에 대한 경고 ( 내용증명) 를 받고…"
+  },
+  {
+   "title": "[일반] [정보통신처]내PC지키미를 이용한 PC보안 및 알약 점검 협조 요청",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53457&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-12",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-12",
+   "desc": "1. 사이버 보안 침해 사고의 교내 발생을 예방하기 위하여 PC보안 점검사항을 안내하오니 동참하여 주시기 바랍니다."
+  },
+  {
+   "title": "[일반] 기간제 계약직원 채용 공고(정보과학교육원 교학팀)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53456&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-12",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-12",
+   "desc": "기간제 계약직원 모집 공고 1. 지원 자격 및 우대사항 모집인원 담당업무 정보과학교육원(학점은행제) 교학팀 행정업무 등 지원 자격"
+  },
+  {
+   "title": "[일반] 기간제 계약직원 채용 공고(홍보기획실)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53455&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-12",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-12"
+  },
   {
    "title": "[일반] [서울특별시여성가족재단] 서울 디지털성범죄 안심지원센터 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53454&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -10,7 +62,8 @@
    "campus": "",
    "foundAt": "2026-10-08",
    "thumb": "data/news/img/5d2235b657bb5b41.webp",
-   "desc": "작성일 2026.10.08 | 수정일 2026.10.08 | 학생복지팀 가 . 지원대상 : 서울시 거주 · 재학 · 재직 중인 디지털성범죄 피해시민"
+   "desc": "작성일 2026.10.08 | 수정일 2026.10.08 | 학생복지팀 가 . 지원대상 : 서울시 거주 · 재학 · 재직 중인 디지털성범죄 피해시민",
+   "src": "b09cb042"
   },
   {
    "title": "[일반] [서울특별시] 2026년 하반기 동행안심벨(구 안심헬프미) 지원사업 안내",
@@ -20,7 +73,8 @@
    "campus": "",
    "foundAt": "2026-10-08",
    "thumb": "data/news/img/4ecff66abf641214.webp",
-   "desc": "작성일 2026.10.08 | 수정일 2026.10.08 | 학생복지팀 「 동행안심벨 」 지원 사업개요"
+   "desc": "작성일 2026.10.08 | 수정일 2026.10.08 | 학생복지팀 「 동행안심벨 」 지원 사업개요",
+   "src": "b09cb042"
   },
   {
    "title": "[학사] 2026학년도 2학기 중간고사 일정 및 시행 지침 안내",
@@ -30,7 +84,8 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-08",
-   "desc": "가 . 중간고사를 실시하는 과목 : 대면고사 원칙 나 . 중간고사를 미실시하는 과목 : 과제 등의 시험 대체나 온 / 오프라인 수업 진행"
+   "desc": "가 . 중간고사를 실시하는 과목 : 대면고사 원칙 나 . 중간고사를 미실시하는 과목 : 과제 등의 시험 대체나 온 / 오프라인 수업 진행",
+   "src": "b09cb042"
   },
   {
    "title": "[일반] 기간제 계약직원 채용 공고(전자정보공과대학 전자공학과)",
@@ -40,7 +95,8 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-08",
-   "desc": "지원 자격 1. 대학교(4년제) 졸업자 이상 2. 남자의 경우 병역필 또는 면제자"
+   "desc": "지원 자격 1. 대학교(4년제) 졸업자 이상 2. 남자의 경우 병역필 또는 면제자",
+   "src": "b09cb042"
   },
   {
    "title": "[국제학생] 2027학년도 1학기 학부 외국인 신·편입생 1차 모집 필기고사 안내",
@@ -48,7 +104,8 @@
    "postedAt": "2026-10-07",
    "school": "광운대학교",
    "campus": "",
-   "foundAt": "2026-10-07"
+   "foundAt": "2026-10-07",
+   "src": "b09cb042"
   },
   {
    "title": "[일반] [(재)서울테크노파크] 제1회 지역 현안 해결 솔루션 챌린지",
@@ -58,7 +115,8 @@
    "campus": "",
    "foundAt": "2026-10-07",
    "thumb": "data/news/img/0b7cec3f201333c5.webp",
-   "desc": "나 . 공모주제 : 과학기술을 활용하여 해결이 필요한 지역 현안 다 . 응모자격 : 지역 문제 해결에 관심 있는 국민 누구나"
+   "desc": "나 . 공모주제 : 과학기술을 활용하여 해결이 필요한 지역 현안 다 . 응모자격 : 지역 문제 해결에 관심 있는 국민 누구나",
+   "src": "b09cb042"
   },
   {
    "title": "[일반] [프로그램 안내] 단 한 사람을 위한 직무설정 프롬프트 (~10/15)",
@@ -78,7 +136,8 @@
    "campus": "",
    "foundAt": "2026-10-07",
    "thumb": "data/news/img/0d3eadc45a820472.webp",
-   "desc": "작성일 2026.10.07 | 수정일 2026.10.07 | 시설안전관리팀 담당부서 : 각 행정부서 / 연락처 : 02-940-5114 학사안내 학사일정 학사정보 교과안내 필수과목 개설안내 (연도별/학과별)…"
+   "desc": "작성일 2026.10.07 | 수정일 2026.10.07 | 시설안전관리팀 담당부서 : 각 행정부서 / 연락처 : 02-940-5114 학사안내 학사일정 학사정보 교과안내 필수과목 개설안내 (연도별/학과별)…",
+   "src": "b09cb042"
   },
   {
    "title": "[국제학생] 2026 서울 외국인 취업 채용 박람회 안내",
@@ -89,7 +148,8 @@
    "campus": "",
    "foundAt": "2026-10-06",
    "thumb": "data/news/img/bdb5e79077577209.webp",
-   "desc": "작성일 2026.10.06 | 수정일 2026.10.06 | 글로벌전략팀 ★ 참여 학생에게는 출석인증의뢰서 발급 예정(단 현장 사진 등으로 증빙 자료가 있어야 함) * 단, 출석인정 여부는 수업 담당 교수님…"
+   "desc": "작성일 2026.10.06 | 수정일 2026.10.06 | 글로벌전략팀 ★ 참여 학생에게는 출석인증의뢰서 발급 예정(단 현장 사진 등으로 증빙 자료가 있어야 함) * 단, 출석인정 여부는 수업 담당 교수님…",
+   "src": "b09cb042"
   },
   {
    "title": "[일반] [대한핸드볼협회] 한국핸드볼연맹 핸드볼 H리그 대학생 크리에이터 H-CRE8TOR 모집",
@@ -99,7 +159,8 @@
    "campus": "",
    "foundAt": "2026-10-06",
    "thumb": "data/news/img/1f7f6b71f9749c11.webp",
-   "desc": "▶ 활동 목표 나만이 만들어 낼 수 있는 콘텐츠 기획/제작을 통한 핸드볼과 제작 콘텐츠 바이럴"
+   "desc": "▶ 활동 목표 나만이 만들어 낼 수 있는 콘텐츠 기획/제작을 통한 핸드볼과 제작 콘텐츠 바이럴",
+   "src": "b09cb042"
   },
   {
    "title": "[외부] [교보교육재단] 2026 교육 심포지엄 참여 안내",
@@ -139,7 +200,8 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "thumb": "data/news/img/33c332f78000400f.webp"
+   "thumb": "data/news/img/33c332f78000400f.webp",
+   "src": "b09cb042"
   },
   {
    "title": "[학생] 2027학년도 일학습병행 신청 안내",
@@ -147,7 +209,8 @@
    "postedAt": "2026-10-02",
    "school": "광운대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-02",
+   "src": "b09cb042"
   },
   {
    "title": "[외부] [서울특별시] 청년미래센터 자기돌봄비 지원사업 안내",
@@ -234,7 +297,8 @@
    "postedAt": "2026-10-01",
    "school": "광운대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "src": "b09cb042"
   },
   {
    "title": "[일반] [HUSS-글로벌공생] 글로벌지속가능융합학과 2026 전공설명회 신청 안내",
@@ -263,7 +327,8 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/15706244571851d8.webp"
+   "thumb": "data/news/img/15706244571851d8.webp",
+   "src": "b09cb042"
   },
   {
    "title": "[일반] [체육지원팀] 아이스하키부 「2026 LG 코리아 아이스하키리그」 경기 일정 및 결과 안내",
@@ -272,7 +337,8 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/4ec7179d0720a100.webp"
+   "thumb": "data/news/img/4ec7179d0720a100.webp",
+   "src": "b09cb042"
   },
   {
    "title": "[일반] 기간제 계약직원 채용 공고(대학원 교학팀)",
@@ -290,7 +356,8 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/98bc3e9f9ea0713e.webp"
+   "thumb": "data/news/img/98bc3e9f9ea0713e.webp",
+   "src": "b09cb042"
   },
   {
    "title": "[학생] 광운대학교 2026학년도 참빛핵심역량 진단 참여 안내(2학년/3학년/4학년 대상)",
@@ -299,7 +366,8 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/6676685f39134afc.webp"
+   "thumb": "data/news/img/6676685f39134afc.webp",
+   "src": "b09cb042"
   },
   {
    "title": "[일반] 기간제 계약직원 채용 공고(정보통신처 통신운영팀)",
@@ -318,7 +386,8 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/fd6ae54dd6235578.webp"
+   "thumb": "data/news/img/fd6ae54dd6235578.webp",
+   "src": "b09cb042"
   },
   {
    "title": "[일반] [채용공고] 광운대학교 산학협력단 직원 채용 공고",
@@ -328,50 +397,6 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[일반] 기간제 계약직원 채용 공고(정보과학교육원 교학팀)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53391&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-28",
-   "kind": "채용",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[일반] [프로젝트 플라즈마] .HACK 2027 Call for Papers 연사 모집 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53388&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-23",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[병무] 2026년 10월 각 군 현역병 모집 계획 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53383&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-22",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/715524c127520b6e.webp"
-  },
-  {
-   "title": "[일반] [체육지원팀]광운대학교 축구부 2026 대학축구 스플릿라운드 경기 일정 및 결과 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53341&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-15",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/02cc6af7898628b0.webp"
-  },
-  {
-   "title": "[일반] 2026 베스트티처와 함께하는 신임교원 티칭 토크",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53374&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-21",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/3154cb370bc83df3.webp"
   }
  ]
 }

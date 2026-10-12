@@ -1,6 +1,6 @@
 {
  "school": "국민대학교",
- "updatedAt": "2026-10-11",
+ "updatedAt": "2026-10-12",
  "items": [
   {
    "title": "[AI tutor] K*lass-UP 프로그램 신청 안내",
@@ -9,7 +9,8 @@
    "school": "국민대학교",
    "campus": "",
    "foundAt": "2026-10-11",
-   "thumb": "data/news/img/02e76ec01083d9f8.webp"
+   "thumb": "data/news/img/02e76ec01083d9f8.webp",
+   "src": "78d70305"
   },
   {
    "title": "2026학년도 2학기 중간시험 시행 안내",
@@ -19,7 +20,8 @@
    "school": "국민대학교",
    "campus": "",
    "foundAt": "2026-10-10",
-   "thumb": "data/news/img/7bba38b74988764a.webp"
+   "thumb": "data/news/img/7bba38b74988764a.webp",
+   "src": "78d70305"
   },
   {
    "title": "2026학년도 2학기 제1전공 변경신청 안내",
@@ -27,7 +29,8 @@
    "postedAt": "2026-10-03",
    "school": "국민대학교",
    "campus": "",
-   "foundAt": "2026-10-03"
+   "foundAt": "2026-10-03",
+   "src": "78d70305"
   },
   {
    "title": "2026학년도 2학기 제1전공 신청 안내",
@@ -35,7 +38,8 @@
    "postedAt": "2026-10-03",
    "school": "국민대학교",
    "campus": "",
-   "foundAt": "2026-10-03"
+   "foundAt": "2026-10-03",
+   "src": "78d70305"
   },
   {
    "title": "2026학년도 2학기 다전공 신청",
@@ -43,7 +47,8 @@
    "postedAt": "2026-10-03",
    "school": "국민대학교",
    "campus": "",
-   "foundAt": "2026-10-03"
+   "foundAt": "2026-10-03",
+   "src": "78d70305"
   },
   {
    "title": "2026학년도 2학기 글말교실 운영 안내",
@@ -62,7 +67,8 @@
    "kind": "학사",
    "school": "국민대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "src": "78d70305"
   },
   {
    "title": "2026학년도 2학기 2차폐강 안내",
@@ -71,7 +77,8 @@
    "kind": "학사",
    "school": "국민대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "src": "78d70305"
   },
   {
    "title": "ISIC 국제학생증 발급비 지원행사 안내",
@@ -80,7 +87,8 @@
    "kind": "학사",
    "school": "국민대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "src": "78d70305"
   },
   {
    "title": "2027-1학기 자기설계연계·융합전공 신설 신청 안내",
@@ -90,7 +98,8 @@
    "school": "국민대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/2c9691b8e85f7fb0.webp"
+   "thumb": "data/news/img/2c9691b8e85f7fb0.webp",
+   "src": "78d70305"
   },
   {
    "title": "2026학년도 2학기 조기졸업 신청 안내",
@@ -99,7 +108,8 @@
    "kind": "학사",
    "school": "국민대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "src": "78d70305"
   },
   {
    "title": "2026학년도 2학기 다,부전공 변경 및 포기 신청 안내",
@@ -108,7 +118,8 @@
    "kind": "학사",
    "school": "국민대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "src": "78d70305"
   },
   {
    "title": "2026학년도 2학기 부전공 신청 안내",
@@ -154,7 +165,8 @@
    "kind": "학사",
    "school": "국민대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "src": "78d70305"
   }
  ]
 }

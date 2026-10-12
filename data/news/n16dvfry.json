@@ -1,7 +1,66 @@
 {
  "school": "아주대학교",
- "updatedAt": "2026-10-11",
+ "updatedAt": "2026-10-12",
  "items": [
+  {
+   "title": "[예약 당일 안내] 2026학년도 2학기 🍚스타셰프의 레시피로 전하는 총장님의 A+ 응원🍚 (26.10.14)",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377305&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-12",
+   "school": "아주대학교",
+   "campus": "",
+   "src": "e5299528",
+   "foundAt": "2026-10-12",
+   "desc": "학생지원팀 ▲ 포스터를 클릭하면 예약 페이지로 이동합니다. 시험준비로 지친 여러분들에게 전하는 총장님의 따듯한 격려 프리미엄 중식 다이닝 '무탄'과의 콜라보 특별 메뉴, 총장님의 중간고사 격려까지 준비되어 있으니,…"
+  },
+  {
+   "title": "The Ajou Universe Vol. 56",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377303&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-12",
+   "school": "아주대학교",
+   "campus": "",
+   "src": "e5299528",
+   "foundAt": "2026-10-12"
+  },
+  {
+   "title": "[재공지] ★ 재학생 건강검진 접수&비타민데이 ~10/16",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377301&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-12",
+   "kind": "생활",
+   "school": "아주대학교",
+   "campus": "",
+   "src": "e5299528",
+   "foundAt": "2026-10-12",
+   "desc": "보건진료소 2026년 재학생 건강검진 안내 학교 지원 · 무료 건강검진 아주대학교 재학생을 대상으로 건강검진을 실시합니다."
+  },
+  {
+   "title": "[일자리+센터] [캠리] 아트라스콥코(10/12_당일재공지) 커피트럭 운영 및 샌드위치&디저트 세트 제공",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377295&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-12",
+   "school": "아주대학교",
+   "campus": "",
+   "src": "e5299528",
+   "foundAt": "2026-10-12",
+   "thumb": "data/news/img/bf2c6c0b9eeab589.webp"
+  },
+  {
+   "title": "[다산학부대학] 2026-2학기 ACAT 시험 대학원생 감독자 모집 안내(~10/19)",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377292&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-12",
+   "school": "아주대학교",
+   "campus": "",
+   "src": "e5299528",
+   "foundAt": "2026-10-12"
+  },
+  {
+   "title": "제108회 한국어능력시험(TOPIK) 시행에 따른 성호관 출입 제한 안내(10.17~10.18)",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377291&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-12",
+   "school": "아주대학교",
+   "campus": "",
+   "src": "e5299528",
+   "foundAt": "2026-10-12",
+   "thumb": "data/news/img/8a90667086ba7738.webp"
+  },
   {
    "title": "[Remind] 2026학년도 2학기 🍚스타셰프의 레시피로 전하는 총장님의 A+ 응원🍚 (26.10.14)",
    "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377281&article.offset=0&articleLimit=10",
@@ -9,7 +68,8 @@
    "school": "아주대학교",
    "campus": "",
    "foundAt": "2026-10-09",
-   "desc": "학생지원팀 ▲ 포스터를 클릭하면 예약 페이지로 이동합니다. 시험준비로 지친 여러분들에게 전하는 총장님의 따듯한 격려 프리미엄 중식 다이닝 '무탄'과의 콜라보 특별 메뉴, 총장님의 중간고사 격려까지 준비되어 있으니,…"
+   "desc": "학생지원팀 ▲ 포스터를 클릭하면 예약 페이지로 이동합니다. 시험준비로 지친 여러분들에게 전하는 총장님의 따듯한 격려 프리미엄 중식 다이닝 '무탄'과의 콜라보 특별 메뉴, 총장님의 중간고사 격려까지 준비되어 있으니,…",
+   "src": "e5299528"
   },
   {
    "title": "[일자리+센터] 2026년 10월 채용공고분석 특강 참여자 모집",
@@ -36,8 +96,7 @@
    "school": "아주대학교",
    "campus": "",
    "foundAt": "2026-10-08",
-   "thumb": "data/news/img/1ea26af4408bdb8e.webp",
-   "desc": "대학일자리플러스센터 명함 신청방법 안내 [일자리+센터] [캠리] 아트라스콥코 엔지니어스 데이(10/12) 커피트럭 지원 및 샌드위치&디저트 세트 제공"
+   "thumb": "data/news/img/1ea26af4408bdb8e.webp"
   },
   {
    "title": "명함 신청방법 안내",
@@ -282,7 +341,8 @@
    "kind": "학사",
    "school": "아주대학교",
    "campus": "",
-   "foundAt": "2026-10-03"
+   "foundAt": "2026-10-03",
+   "src": "e5299528"
   },
   {
    "title": "[공지] [학부] 2026-2학기 미등록자 구제등록 안내(10.12. ~ 10.14.)",
@@ -291,7 +351,8 @@
    "kind": "학사",
    "school": "아주대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-02",
+   "src": "e5299528"
   },
   {
    "title": "[일자리+센터] [캠리][온라인 설명회] NEZOT 주식회사(일본 고베 본사 취업)(10/6)",
@@ -310,61 +371,6 @@
    "school": "아주대학교",
    "campus": "",
    "foundAt": "2026-10-02"
-  },
-  {
-   "title": "[필독] 2026학년도 2학기 🍚스타셰프의 레시피로 전하는 총장님의 A+ 응원🍚 (26.10.14)",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=376946&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-14",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "desc": "학생지원팀 ▲ 포스터를 클릭하면 예약 페이지로 이동합니다. 시험준비로 지친 여러분들에게 전하는 총장님의 따듯한 격려 프리미엄 중식 다이닝 '무탄'과의 콜라보 특별 메뉴, 총장님의 중간고사 격려까지 준비되어 있으니,…"
-  },
-  {
-   "title": "[아르바이트] 10월 10일(토) ~ 10월 11일(일) 제580회 토익 정기시험",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=376935&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-02",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-02"
-  },
-  {
-   "title": "[데이터보안]AI 보안 비교과 Skill-up AWS 교육 안내(10/07~10/14)",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=376930&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-02",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "thumb": "data/news/img/390a5ea3d820f510.webp"
-  },
-  {
-   "title": "[중앙도서관] 2026년 대학도서관 이용자 만족도 조사 참여 안내",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=376926&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-02",
-   "kind": "생활",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "thumb": "data/news/img/b6263217b563b89b.webp"
-  },
-  {
-   "title": "[다산학부대학] 2026-2학기 교양과목 중간고사 대학원생 감독자 모집",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=376906&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-02",
-   "kind": "학사",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-02"
-  },
-  {
-   "title": "[총무팀] 2026학년도 가을축제 개최에 따른 주차 및 통행로 통제 안내",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=376880&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-02",
-   "kind": "행사",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "thumb": "data/news/img/f1f03636125c8dcc.webp"
   }
  ]
 }
