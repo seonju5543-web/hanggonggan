@@ -1,0 +1,44 @@
+name: 푸시 서버 배포 확인 (등록 횟수 제한이 켜졌나)
+
+# 2026-10-12 · 은서 — 「푸시 서버 다시 배포 확인」.
+# 푸시 서버는 Cloudflare 의 GitHub 연결 배포(Workers Builds)로 저절로 올라간다. 그런데 /health 만으로는
+# **어느 판이 돌고 있는지** 안 보인다. 그래서 이번 판에만 있는 동작(등록 횟수 제한 · server/shared/guard.mjs)을
+# 겉에서 눌러 본다:
+#   · 틀린 폰 주소로 /subscribe 를 25번 연달아 보낸다.
+#     새 판이면 1분 10번을 넘긴 요청이 429(너무 많음) · 옛 판이면 전부 400(주소가 틀림).
+#   🔴 **아무것도 저장되지 않고 아무 폰도 깨우지 않는다** — 틀린 주소는 저장 전에 거절되고(400),
+#      제한에 걸린 요청은 주소를 보기도 전에 돌려보낸다(429). 학생 폰의 등록·알림과 무관하다.
+# 실행: Actions 탭 → 이 워크플로 → Run workflow (Claude 세션이 원격 실행해도 된다)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # 운영 서버와 함께, 오늘 판이 확실히 든 미리보기 주소(main-…)도 눌러 본다 — 둘이 같은 결과면 판 차이가 아니라
+      # 제한 장치의 성질(Cloudflare 제한은 위치별·느슨하게 센다)이다. 그래서 60번씩 보낸다.
+      - name: 틀린 주소로 60번씩 연달아 등록해 본다 (운영 · 미리보기)
+        run: |
+          verdict=0
+          for URL in https://handaejang-push.seonju5543.workers.dev/subscribe https://main-handaejang-push.seonju5543.workers.dev/subscribe; do
+            n400=0; n429=0; other=""
+            for i in $(seq 1 60); do
+              code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 -X POST "$URL" \
+                -H 'content-type: application/json' -H 'Origin: https://seonju5543-web.github.io' \
+                -d '{"endpoint":"https://not-a-push-service.invalid/limit-check","school":"배포확인"}')
+              case "$code" in
+                400) n400=$((n400+1)) ;;
+                429) n429=$((n429+1)) ;;
+                *) other="$other $code" ;;
+              esac
+            done
+            echo "$URL → 400(주소 틀림) ${n400}번 · 429(너무 많음) ${n429}번 · 그 밖:${other:- 없음}"
+            case "$URL" in *//handaejang-push.*) [ "$n429" -gt 0 ] && echo "  판정: ✅ 운영에 새 판(등록 횟수 제한)이 돌고 있다" || { echo "  판정: ⚠️ 운영은 옛 판이다 — server/push/README.md 「운영에 새 판이 올라갔는지 확인」 절대로 대시보드에서 승격"; verdict=1; } ;; esac
+          done
+          exit $verdict

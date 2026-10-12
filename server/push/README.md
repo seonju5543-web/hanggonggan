@@ -193,3 +193,16 @@ Cloudflare 무료 등급 한도는 **하루 10만 요청 / KV 하루 10만 읽�
 
 `push-config.js`의 두 값을 다시 빈 문자열로 만들고 배포하면 됩니다.
 앱은 예전처럼 "앱을 열 때 확인하는 알림"으로 조용히 돌아갑니다.
+
+## 운영에 새 판이 올라갔는지 확인 (2026-10-12)
+
+`/health` 만으로는 **어느 판이 도는지** 안 보인다. Actions 의 「푸시 서버 배포 확인」(`push-limit-check.yml`)을 누르면
+틀린 주소로 `/subscribe` 를 60번 보내 본다 — 등록 횟수 제한(2026-10-12 문지기)이 든 판이면 몇 번은 429 가 나온다.
+운영 주소와 미리보기 주소(`main-…`)를 함께 눌러 비교한다. 저장·발송은 없다.
+🔴 2026-10-12 실측: **GitHub 연결 빌드(Workers Builds)는 성공하는데 운영으로 안 올라간다.** 기본 브랜치에만 올린 커밋(328cf445)의
+빌드도 새 판을 미리보기(`main-…`)로만 올렸고, 운영은 60번 모두 400(제한 없음 · 옛 판)이었다.
+→ 운영에 올리려면 Cloudflare 대시보드가 필요하다(계정 주인 로그인):
+  ① Workers → handaejang-push → **Deployments** 에서 맨 위(가장 새) 버전의 「⋯ → Deploy」로 운영 승격, 그리고
+  ② 다시 안 생기게 **Settings → Build → Deploy command** 가 `npx wrangler deploy` 인지(‘versions upload’ 가 아닌지)와
+     **Production branch** 가 `claude/nice-heisenberg-WESq5` 인지 확인.
+  올린 뒤 이 확인 버튼을 다시 눌러 운영에서도 429 가 나오면 끝.
