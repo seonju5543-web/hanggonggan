@@ -22,7 +22,7 @@ export function decodeEntities(t) {
     .replace(/&quot;/g, '"').replace(/&apos;/g, "'")
     .replace(/&lt;/g, '<').replace(/&gt;/g, '>')
     .replace(/&nbsp;/g, ' ')
-    .replace(/&rarr;/g, '→').replace(/&rArr;/g, '⇒').replace(/&larr;/g, '←')
+    .replace(/&rarr;/g, '→').replace(/&rArr;/g, '⇒').replace(/&ge;/g, '≥').replace(/&le;/g, '≤').replace(/&larr;/g, '←')
     .replace(/&ndash;/g, '–').replace(/&mdash;/g, '—')
     .replace(/&middot;/g, '·').replace(/&hellip;/g, '…')
     .replace(/&amp;/g, '&');   // 반드시 마지막 — 먼저 풀면 &amp;quot; 가 이중 해제된다

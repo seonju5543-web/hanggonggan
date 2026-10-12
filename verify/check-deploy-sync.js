@@ -86,7 +86,7 @@ const APP_PATHS = (() => {
   const path = require('node:path');
   const root = path.join(__dirname, '..');
   /* assets — 앱이 받는 정문 사진·학교 대표 사진 목록(app.js 의 assets/gates/gates.json · assets/schools/photos.json)과 그 그림 (ops-09) */
-  const fixed = ['index.html', 'style.css', 'sw.js', 'manifest.json', 'terms.html', 'data', 'icons', 'assets'];
+  const fixed = ['index.html', 'style.css', 'sw.js', 'manifest.json', 'terms.html', 'about.html', 'about.js', 'data', 'icons', 'assets'];
   try {
     const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
     const scripts = [...html.matchAll(/src="([a-z0-9.-]+\.js)"/g)].map((m) => m[1]);
