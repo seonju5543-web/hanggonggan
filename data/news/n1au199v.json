@@ -3,6 +3,43 @@
  "updatedAt": "2026-10-12",
  "items": [
   {
+   "title": "💡 2026년도 제18회 UOS 연구 콜로키움 개최 안내(2026.10.15.(목) 11:00, 창의혁신관 SI 아레나)💡",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31643&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-10-12",
+   "postId": "31643",
+   "kind": "행사",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-10-12",
+   "thumb": "data/news/img/6842e0f41bde209e.webp",
+   "desc": "📌 발표주제 및 발표자 - 「Statistical Inference in High-Dimensional Models」 경제학부 권혁준 교수"
+  },
+  {
+   "title": "[학생과 나비스트 프로젝트] UpOS 팀 -「학교에 직접 제안하는 TF팀」모집 (총 40만원 상당 상품·전공 무관)",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31640&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-10-12",
+   "postId": "31640",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-10-12",
+   "thumb": "data/news/img/7fdf4acefc735934.webp",
+   "desc": "대학혁신지원사업 나비스트 프로젝트 UpOS 팀 「교내 문제 해결 TF팀 모집」안내 안녕하세요, 학생과 나비스트 프로젝트 UpOS 운영 팀입니다."
+  },
+  {
+   "title": "2026 대학일자리플러스센터 만족도 조사(2026.10.13~10.30.)",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31635&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-10-12",
+   "postId": "31635",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-10-12",
+   "thumb": "data/news/img/19621a740cc5269f.webp",
+   "desc": "인재개발실 고용노동부와 한국고용정보원에서는 ‘2026 년 대학일자리플러스센터 만족도 조사 ’ 를 실시하고 있습니다 . 본 조사는 대학일자리플러스사업 서비스 참여자의 만족도 조사를 통해 서비스 질 향상을 위한…"
+  },
+  {
    "title": "📚2026학년도 하반기 벽돌책 독서모임 [그것이 읽고 싶다] 참여 팀 모집",
    "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31598&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
    "postedAt": "2026-10-12",
@@ -55,7 +92,8 @@
    "school": "서울시립대학교",
    "campus": "",
    "src": "80d7d3bc",
-   "foundAt": "2026-10-12"
+   "foundAt": "2026-10-12",
+   "desc": "붙임 1. 공고문 1부. 2. 규정 전문 1부. 3. 신구조문대비표 1부. 끝."
   },
   {
    "title": "「서울시립대학교 교육혁신원 규정」일부개정 공포",
@@ -392,23 +430,6 @@
    "campus": "",
    "foundAt": "2026-10-02",
    "thumb": "data/news/img/3064a3252cb3fa25.webp"
-  },
-  {
-   "title": "[서울시 청년AI사다리 수요조사] 설문조사 참여시 모바일 상품권 증정!",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31580&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-01",
-   "school": "서울시립대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "thumb": "data/news/img/c4bd99ce251a4d66.webp"
-  },
-  {
-   "title": "[인재개발실] 전국 지역인재 7급 수습직원 선발시험 향후 변경사항 안내",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31581&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-01",
-   "school": "서울시립대학교",
-   "campus": "",
-   "foundAt": "2026-10-02"
   }
  ]
 }

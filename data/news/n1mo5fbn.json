@@ -3,6 +3,16 @@
  "updatedAt": "2026-10-12",
  "items": [
   {
+   "title": "[학생생활상담소] 세종이의 마음지킴이 학생생활상담소 이용 안내",
+   "url": "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=894503&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-12",
+   "school": "세종대학교",
+   "campus": "",
+   "src": "8a741b47",
+   "foundAt": "2026-10-12",
+   "desc": "학생생활상담소 안녕하세요, 학생생활상담소입니다. 세종대학교 재학생이라면, 누구나 무료로 심리 상담 및 심리검사를 받아볼 수 있습니다."
+  },
+  {
    "title": "[신청] 26-2 (2~4학년) 대면 그룹 컨설팅/온라인 셀프 학습 컨설팅 프로그램 (9/21~10/18)",
    "url": "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=894275&article.offset=0&articleLimit=10",
    "postedAt": "2026-10-06",
@@ -168,8 +178,7 @@
    "postedAt": "2026-08-25",
    "school": "세종대학교",
    "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/6ecd6466d779960c.webp"
+   "foundAt": "2026-10-01"
   }
  ]
 }

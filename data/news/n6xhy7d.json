@@ -3,6 +3,17 @@
  "updatedAt": "2026-10-12",
  "items": [
   {
+   "title": "[시설] 한울관 및 아이스링크 주차장 출입구 변경 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53462&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-12",
+   "kind": "생활",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-12",
+   "thumb": "data/news/img/c8bca91e0a109740.webp"
+  },
+  {
    "title": "[일반] 2026 베스트티처와 함께하는 티칭 토크",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53459&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "postedAt": "2026-10-12",
@@ -52,7 +63,8 @@
    "school": "광운대학교",
    "campus": "",
    "src": "b09cb042",
-   "foundAt": "2026-10-12"
+   "foundAt": "2026-10-12",
+   "desc": "기간제 계약직원 모집 공고 1. 지원 자격 및 우대사항 모집인원 담당업무 대학 행사 영상촬영 및 사진촬영 등 지원 자격"
   },
   {
    "title": "[일반] [서울특별시여성가족재단] 서울 디지털성범죄 안심지원센터 안내",
@@ -62,7 +74,7 @@
    "campus": "",
    "foundAt": "2026-10-08",
    "thumb": "data/news/img/5d2235b657bb5b41.webp",
-   "desc": "작성일 2026.10.08 | 수정일 2026.10.08 | 학생복지팀 가 . 지원대상 : 서울시 거주 · 재학 · 재직 중인 디지털성범죄 피해시민",
+   "desc": "가 . 지원대상 : 서울시 거주 · 재학 · 재직 중인 디지털성범죄 피해시민",
    "src": "b09cb042"
   },
   {
@@ -388,15 +400,6 @@
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/fd6ae54dd6235578.webp",
    "src": "b09cb042"
-  },
-  {
-   "title": "[일반] [채용공고] 광운대학교 산학협력단 직원 채용 공고",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53392&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-28",
-   "kind": "채용",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
   }
  ]
 }

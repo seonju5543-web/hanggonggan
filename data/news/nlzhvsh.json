@@ -3,6 +3,38 @@
  "updatedAt": "2026-10-12",
  "items": [
   {
+   "title": "[목요도서관] 제5강(독서: 왜, 어떤 책을 읽어야 하나) 추가 사전신청자 모집(40명)",
+   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11531&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "postedAt": "2026-10-12",
+   "kind": "생활",
+   "school": "강원대학교",
+   "campus": "",
+   "src": "784a7e0d",
+   "foundAt": "2026-10-12",
+   "thumb": "data/news/img/084cf26a8398cf6f.webp",
+   "desc": "[목요도서관 제5강 추가 사전신청자 모집_비교과/도서관 마일리지 및 상시학습 부여] -강연 일시: 2026. 10. 15.( 목 ) 12:00~13:00 -추가 모집기간: 10 월 12 일 (월 ) ~ 14 일 (…"
+  },
+  {
+   "title": "2027학년도 강원대학교 어린이집 원아모집 안내",
+   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11529&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "postedAt": "2026-10-12",
+   "school": "강원대학교",
+   "campus": "",
+   "src": "784a7e0d",
+   "foundAt": "2026-10-12"
+  },
+  {
+   "title": "2026학년도 다전공 역량 강화를 위한 비교과 프로그램 (진로탐색, 소통·스피치, 자기주도학습, AI활용역량} 안내",
+   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11530&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "postedAt": "2026-10-12",
+   "school": "강원대학교",
+   "campus": "",
+   "src": "784a7e0d",
+   "foundAt": "2026-10-12",
+   "thumb": "data/news/img/5dbf2cd8b2c0c8b2.webp",
+   "desc": "가. 주 제 : AI활용 역량강화, 자기주도 학습 컨설팅, 진로탐색, 소통·스피치 클리닉"
+  },
+  {
    "title": "2026학년도 2학기 춘천·삼척캠퍼스 재학생 등록금 3차 분할납부 안내",
    "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11528&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
    "postedAt": "2026-10-12",
@@ -357,34 +389,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/a5883a2e540f8e7e.webp"
-  },
-  {
-   "title": "[과학영재교육원] 2027 영재교육대상자 모집 안내",
-   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11428&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "postedAt": "2026-09-11",
-   "school": "강원대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "src": "784a7e0d"
-  },
-  {
-   "title": "2026년 학생예비군 동원Ⅱ형훈련(이월) 안내",
-   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11422&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "postedAt": "2026-09-10",
-   "school": "강원대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "2026학년도 2학기 학습클리닉(1:1 지도) 운영 안내",
-   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11404&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "postedAt": "2026-09-07",
-   "kind": "생활",
-   "school": "강원대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/24165a97b07ab6ef.webp",
-   "src": "784a7e0d"
   }
  ]
 }

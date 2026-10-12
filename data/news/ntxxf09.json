@@ -3,6 +3,28 @@
  "updatedAt": "2026-10-12",
  "items": [
   {
+   "title": "[대학생활/업무안내] [건강증진센터]2026학년도 독감/폐렴구균 예방접종 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626521&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-12",
+   "kind": "생활",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-10-12",
+   "thumb": "data/news/img/5bd72335d3b8189c.webp"
+  },
+  {
+   "title": "[입학에서 취업까지] [사회과학대학] 외국어 성적 제출 방법 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626515&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-12",
+   "kind": "학사",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-10-12",
+   "desc": "대학소개 대학·조직 대학생활 맞춤정보 어떤 정보 를 찾고계시나요? 맞춤설정 저장하기 (언제든 변경 가능합니다) 맞춤설정 이란? 소속, 내용, 기간별로 나만의 맞춤 콘텐츠를 찾아보세요."
+  },
+  {
    "title": "[입학에서 취업까지] [무역] 2026-2 졸업시험 안내 (2027.02 졸업자 대상)",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626497&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
    "postedAt": "2026-10-12",
@@ -53,7 +75,6 @@
    "campus": "",
    "foundAt": "2026-10-07",
    "thumb": "data/news/img/87bef6b6472a5f74.webp",
-   "desc": "다운로드 다운로드 다운로드 다운로드 다운로드 다운로드 다운로드 다운로드 다운로드 다운로드 관광전문대학원 학비감면 대상자 서류 제출 안내(입학 시 적용 대상자) [정치외교학전공] 경기도 일자리재단 2026 고용노동부…",
    "src": "bf927d3e"
   },
   {
@@ -345,23 +366,6 @@
    "school": "경기대학교",
    "campus": "",
    "foundAt": "2026-10-02"
-  },
-  {
-   "title": "[일반] [중어중문전공] 2026학년도 2학기 복수전공 선발 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626356&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-02",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "foundAt": "2026-10-02"
-  },
-  {
-   "title": "[입학에서 취업까지] 2026학년도 문헌정보학과 졸업시험",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626336&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-01",
-   "school": "경기대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
   }
  ]
 }

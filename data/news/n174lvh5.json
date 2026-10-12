@@ -3,6 +3,58 @@
  "updatedAt": "2026-10-12",
  "items": [
   {
+   "title": "[대학일자리플러스센터] 한국고용정보원 2026년 대학일자리플러스센터 만족도 조사 참여 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276661&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-12",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-12",
+   "thumb": "data/news/img/453cd33855f2fba4.webp",
+   "desc": "본 조사는 대학일자리플러스사업 서비스 참여자의 만족도 조사를 통해 서비스 질 향상을 위한 목적으로 실시하고 있습니다."
+  },
+  {
+   "title": "[학사행정팀] 2026-2학기 중간 수업평가 실시 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276658&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-12",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-12",
+   "desc": "2026-2학기에 개설된 학부 교과목을 대상으로 중간 수업평가를 실시하오니, 학생 여러분들의 많은 참여를 부탁드립니다."
+  },
+  {
+   "title": "[시설건축팀] 외부 촬영 관련 협조 안내 (11/14, 11/21, 11/28, 12/12)",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276692&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-12",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-12",
+   "desc": "[시설건축팀] 외부 촬영 관련 협조 안내 본교에서 외부 촬영이 아래와 같이 진행될 예정이오니, 교내 구성원 여러분의 협조를 부탁드립니다."
+  },
+  {
+   "title": "[시설건축팀] 김수환관 지하1층 주차장 냉난방 배관 교체공사 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276659&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-12",
+   "kind": "생활",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-12",
+   "desc": "2. 공사기간 : 2026년 10월 19일 월요일 ~ 2026년 10월 31일 토요일"
+  },
+  {
+   "title": "[대플-추천채용] 원테크스탑 한국지점 – IT 엔지니어 부문 신입사원 채용",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276682&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-12",
+   "kind": "채용",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-12"
+  },
+  {
    "title": "[교수학습개발원] '신임교원 리서치 콜로키엄' 5차 신청 안내(교원 대상)",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276649&article.offset=0&articleLimit=10",
    "postedAt": "2026-10-12",
@@ -75,7 +127,8 @@
    "campus": "",
    "foundAt": "2026-10-02",
    "thumb": "data/news/img/b9ae3bfa559b5256.webp",
-   "desc": "작성자 : 취업지원팀 📍 신청 기간 : 10월 13일(화) 09:00 ~ 10월 25일(일) 23:59 까지"
+   "desc": "작성자 : 취업지원팀 📍 신청 기간 : 10월 13일(화) 09:00 ~ 10월 25일(일) 23:59 까지",
+   "src": "5d85d287"
   },
   {
    "title": "★★ 2026년 가톨릭대학교 창업보육센터 입주기업 모집 공고 ★★",

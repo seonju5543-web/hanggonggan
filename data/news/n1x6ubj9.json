@@ -3,6 +3,39 @@
  "updatedAt": "2026-10-12",
  "items": [
   {
+   "title": "[네이버페이 1만원 증정, 온라인 실험 참여] AI 면접 환경에 따른 지원자의 인식과 경험에 관한 연구",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140512&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-12",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-12",
+   "thumb": "data/news/img/86a44006fbd38119.webp",
+   "desc": "AI 면접 프로그램을 직접 경험해보고 간단한 설문조사를 진행합니다. 본 실험은 만 19세 이상의 국내 재학 혹은 휴학 중인 한국 국적의 학부생 및 대학원생 모두 참여 가능합니다."
+  },
+  {
+   "title": "성균관대학교 소프트웨어융합대학 자체계약직원 채용(~2026.10.19.(월) 15시)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140509&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-12",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-12",
+   "desc": "2. 근무지: 성균관대학교 자연과학캠퍼스 3. 담당업무: BK21+ 사업 및 소프트웨어학과 대학원 제반 업무"
+  },
+  {
+   "title": "2026학년도 국제동계학기(WISE) 본교생 수강신청 사전 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140504&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-12",
+   "kind": "학사",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-12",
+   "desc": "국제교류팀 안녕하세요, 성균관대학교 학우 여러분. 해외 학생들과 함께 수업을 들으며 글로벌 역량을 키우고 계절학기 학점도 취득할 수 있는 2026학년도 국제동계학기 WISE 프로그램에 많은 관심과 참여 바랍니다."
+  },
+  {
    "title": "2026학년도 2학기 마이크로디그리(학사, 대학원) 이수·포기 신청(1차) 안내",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140359&article.offset=0&articleLimit=10",
    "postedAt": "2026-10-12",
@@ -52,7 +85,7 @@
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-10-10",
-   "desc": "최종 수정일 : 2026.10.10 첨부파일 ( 0 ) 게시글 내용 1. 담당 업무(1명)",
+   "desc": "1. 담당 업무(1명) - 연구 및 과제수행 논문화 - ① 반도체 및 절연 Thin Film 관련 연구 (Gate oxide 및 TCO 포함)",
    "src": "45ec8fd1"
   },
   {
@@ -368,34 +401,6 @@
    "thumb": "data/news/img/0fb1ce46ca702f27.webp",
    "desc": "일시: 2026년 10월 21일(수) 11:30~13:00 장소: 사회과학연구원 컨퍼런스룸(수선관 901호) 발표: 오서정 교수(글로벌리더학부) 새로운 백년의 시작 2026 아리랑 행사 자원봉사자 모집 (10/1)…",
    "src": "45ec8fd1"
-  },
-  {
-   "title": "[산업전자응용연구소]비전임교원(연구교수) 채용",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140244&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-01",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[인공지능혁신융합대학사업단] 2026 인공지능혁신융합대학사업단 호주 UTAS 해외교육 모집 안내",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140238&article.offset=0&articleLimit=10",
-   "postedAt": "2026-09-30",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/f3c6217a7b2768e1.webp",
-   "src": "45ec8fd1"
-  },
-  {
-   "title": "[3D융합산업협회] 현대자동차와 함께하는 직무설명회 개최 안내(사전신청: ~10/7(수)까지)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140235&article.offset=0&articleLimit=10",
-   "postedAt": "2026-09-30",
-   "kind": "행사",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
   }
  ]
 }

@@ -3,6 +3,28 @@
  "updatedAt": "2026-10-12",
  "items": [
   {
+   "title": "학사 2026학년도 휴학생 겨울계절제 수강신청 안내",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026%ED%95%99%EB%85%84%EB%8F%84-%ED%9C%B4%ED%95%99%EC%83%9D-%EA%B2%A8%EC%9A%B8%EA%B3%84%EC%A0%88%EC%A0%9C-%EC%88%98%EA%B0%95%EC%8B%A0%EC%B2%AD-%EC%95%88%EB%82%B4&keyword",
+   "postedAt": "2026-10-12",
+   "kind": "학사",
+   "school": "숭실대학교",
+   "campus": "",
+   "src": "3b348584",
+   "foundAt": "2026-10-12",
+   "thumb": "data/news/img/f153c78c916be8e1.webp"
+  },
+  {
+   "title": "학사 2026학년도 겨울계절제 차세대반도체 혁신융합대학 간 학점교류 신청 안내",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026%ED%95%99%EB%85%84%EB%8F%84-%EA%B2%A8%EC%9A%B8%EA%B3%84%EC%A0%88%EC%A0%9C-%EC%B0%A8%EC%84%B8%EB%8C%80%EB%B0%98%EB%8F%84%EC%B2%B4-%ED%98%81%EC%8B%A0%EC%9C%B5%ED%95%A9%EB%8C%80%ED%95%99-%EA%B0%84&keyword",
+   "postedAt": "2026-10-12",
+   "kind": "학사",
+   "school": "숭실대학교",
+   "campus": "",
+   "src": "3b348584",
+   "foundAt": "2026-10-12",
+   "desc": "*해당 공고문은 대학별 학점교류 안내에 따라 업데이트 되므로, 반드시 최신 버전으로 확인 바랍니다."
+  },
+  {
    "title": "기타 숭실가족수요예배 안내(10월 14일)",
    "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%88%AD%EC%8B%A4%EA%B0%80%EC%A1%B1%EC%88%98%EC%9A%94%EC%98%88%EB%B0%B0-%EC%95%88%EB%82%B410%EC%9B%94-14%EC%9D%BC&keyword",
    "postedAt": "2026-10-12",
@@ -93,7 +115,8 @@
    "kind": "채용",
    "school": "숭실대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-02",
+   "src": "3b348584"
   },
   {
    "title": "학사 교내 IT 서비스 시스템 작업으로 인한 서비스 일시 중단 안내",
