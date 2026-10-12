@@ -2753,7 +2753,7 @@ const ROBOTS = [
      안 일어나는' 버튼이 된다.
    · `two-school-scan.yml` — 일회용이고 push 트리거가 남의 브랜치를 본다.
    관문(test-collector)이 이 둘이 목록에 **없는지** 확인한다. */
-const ROBOT_NOT_LISTED = ['device-deploy.yml', 'two-school-scan.yml'];
+const ROBOT_NOT_LISTED = ['device-deploy.yml', 'two-school-scan.yml', 'push-limit-check.yml'];   // push-limit-check: 푸시 서버를 틀린 요청 25번으로 두드리는 진단(10-12 은서) — Actions 탭에서만
 
 /** 설명은 함수일 수 있다 — 건수를 사본으로 두지 않고 셀 때 센다 */
 const robotDesc = (r) => (typeof r.d === 'function' ? r.d() : r.d);

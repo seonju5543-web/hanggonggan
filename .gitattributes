@@ -32,9 +32,13 @@ collector/deepfetch-report.md merge=ours
 collector/link-hunt-report.md merge=ours
 collector/kosaf-attach-report.md merge=ours
 collector/find-boards-report.md merge=ours
+collector/form-pdf-report.md merge=ours
 
 # ── 수집된 원본 첨부: 내용 비교가 의미 없는 이진 파일로 취급 ──────────
 collector/extracted/**       -diff
+# 신청서 원본 → PDF (2026-10-12 · collector/form-pdf.mjs) — 사본은 이진 · 색인은 로봇이 매 실행 다시 쓴다
+data/forms-pdf/**            -diff
+data/forms-pdf/index.json    merge=ours
 
 # 사람이 큐레이션하는 data/registered.json·data/forms.json은 일부러 넣지 않았다.
 # 거기서는 '삭제'가 의미를 가지므로(잘못 등록분 제거) 합집합이 지운 항목을 되살릴 수 있다.

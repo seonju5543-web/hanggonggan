@@ -81,7 +81,7 @@ jobs:
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add collector/extracted
-          [ -d data/forms-pdf ] && git add data/forms-pdf
+          [ -d data/forms-pdf ] && git add -A data/forms-pdf
           [ -f collector/form-pdf-report.md ] && git add collector/form-pdf-report.md
           if ! git diff --cached --quiet; then
             git commit -m "deepfetch: notice texts + form originals"

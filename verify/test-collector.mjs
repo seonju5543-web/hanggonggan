@@ -9583,8 +9583,8 @@ console.log('\n■ 관리자 화면 로봇 목록 — 화면이 부를 수 있�
   eq("'이 기기에서 배포' 는 목록에 없다 (수동 실행에서는 아무것도 배포하지 않는다)",
     robots.some((r) => r.f === 'device-deploy.yml'), false);
   eq('일회용 로봇도 목록에 없다', robots.some((r) => r.f === 'two-school-scan.yml'), false);
-  eq('  그 둘을 화면이 정직하게 밝힌다',
-    notListed.includes('device-deploy.yml') && notListed.includes('two-school-scan.yml'), true);
+  eq('  그 둘을 화면이 정직하게 밝힌다 (push-limit-check 도 — 10-12 은서의 푸시 서버 진단 · Actions 탭에서만 · 셋째로 더했다)',
+    notListed.includes('device-deploy.yml') && notListed.includes('two-school-scan.yml') && notListed.includes('push-limit-check.yml'), true);
 
   /* ⑥ 화면이 **아예 못 부르는** 워크플로를 센다 — 새 로봇이 생기면 여기서 말해 준다.
      인스타·관리자 조정은 ROBOTS 에 없지만 화면이 다른 자리에서 부른다(파일 이름이 admin.js 에 있다). */
@@ -9598,7 +9598,7 @@ console.log('\n■ 관리자 화면 로봇 목록 — 화면이 부를 수 있�
     .replace(/const ROBOT_NOT_LISTED = \[[^\]]*\]/, '');
   const unreachable = all.filter((f) => !calls.includes(f));
   eq(`화면이 못 부르는 워크플로 (지금 ${unreachable.length}개: ${unreachable.join(' · ')})`,
-    unreachable.sort(), ['device-deploy.yml', 'two-school-scan.yml']);
+    unreachable.sort(), ['device-deploy.yml', 'push-limit-check.yml', 'two-school-scan.yml']);
 }
 
 console.log('\n■ 안내문이 사람을 화면으로 부른다 (채팅으로 되돌아가면 실패)');
@@ -12198,20 +12198,23 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
   eq('② 마감 전 판정 — 마감 모름은 둔다 · 오늘 마감은 아직 · 어제는 지남',
     FP.isOpen ? [FP.isOpen({}, '2026-10-12'), FP.isOpen({ deadline: '2026-10-12' }, '2026-10-12'), FP.isOpen({ deadline: '2026-10-11' }, '2026-10-12')] : null, [true, true, false]);
   const rows = [{ file: 'form-x-1.hwp', title: '[교외] 2026년 효림장학재단 장학생 선발 안내', attach: '장학생 신청서.hwp', bytes: 10 },
-    { file: 'form-y-1.docx', title: '다른 공고', attach: '지원서.docx', bytes: 10 }];
+    { file: 'form-y-1.docx', title: '다른 공고', attach: '지원서.docx', bytes: 10 }, { file: 'form-p-1.pdf', title: '피디에프 공고', attach: '장학금 신청서.pdf', bytes: 7 }];
   const items = [
     { id: 'open1', name: '2026년 효림장학재단 장학생 선발 안내', boardTitle: '[교외] 2026년 효림장학재단 장학생 선발 안내', deadline: '2026-12-01', attachments: [{ name: '장학생 신청서.hwp' }, { name: '공고문.pdf' }, { name: '결과보고서 양식.hwp' }] },
     { id: 'open2', name: '다른 제목', deadline: '2026-12-01', attachments: [{ name: '지원서.docx' }] },
+    { id: 'pdfform', name: '피디에프 공고', deadline: '2026-12-01', attachments: [{ name: '장학금 신청서.pdf' }, { name: '공고문.pdf' }] },
     { id: 'closed', name: '지난 공고', deadline: '2026-01-01', attachments: [{ name: '장학생 신청서.hwp' }] },
     { id: 'zip', name: '묶음', deadline: '2026-12-01', attachments: [{ name: '신청서.zip' }] },
     { id: 'prog', name: '상시', program: true, attachments: [{ name: '장학생 신청서.hwp' }] },
   ];
   const picked = FP.pickFormTargets ? FP.pickFormTargets(items, rows, { today: '2026-10-12', isApplicationForm: isApp }) : { targets: [], missing: [] };
-  eq('③ 대상은 마감 전 공고의 신청서 첨부만 — 공고문·결과보고서 양식·zip·상시 제도·마감 지남은 아니다 · 원본은 첨부 이름 + 같은 제목으로 찾는다',
-    picked.targets.map((t) => [t.id, t.files.map((f) => f.src)]), [['open1', ['form-x-1.hwp']]]);
+  eq('③ 대상은 마감 전 공고의 신청서 첨부만 — 공고문·결과보고서 양식·zip·상시 제도·마감 지남은 아니다 · 원본은 첨부 이름 + 같은 제목으로 찾는다 · PDF 로 올라온 신청서도(data.js 규칙은 hwp·doc 만 본다 — 리뷰)',
+    picked.targets.map((t) => [t.id, t.files.map((f) => f.src)]), [['open1', ['form-x-1.hwp']], ['pdfform', ['form-p-1.pdf']]]);
   eq('  제목이 다른 색인 줄은 쓰지 않고 「아직 못 받음」으로 센다 (다른 공고의 양식을 붙이지 않는다)', picked.missing, [{ id: 'open2', name: '지원서.docx' }]);
   const pdf = Buffer.from('%PDF-1.4\n1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n2 0 obj << /Type /Pages /Count 2 /Kids [3 0 R 4 0 R] >> endobj\n3 0 obj << /Type /Page >> endobj\n4 0 obj <</Type/Page>> endobj\n%%EOF', 'latin1');
   eq('④ 쪽 수는 /Type /Page 만 센다 (/Pages 는 아니다 · 띄어쓰기 없어도)', FP.pdfPages ? FP.pdfPages(pdf) : null, 2);
+  /* 객체 스트림 PDF 는 글자로 쪽이 안 보인다 — 0 은 '모름'이고 거절이 아니다(리뷰: 받아 둔 원본 25개 중 7개) */
+  const objPdf = Buffer.from('%PDF-1.5\n1 0 obj << /Type /ObjStm /N 3 /First 20 /Length 80 >> stream\n' + 'x'.repeat(80) + '\nendstream endobj\n%%EOF', 'latin1');
   eq('⑤ 파일 이름은 확장자를 떼고 위험한 글자만 바꾼다', FP.safeName ? [FP.safeName('장학생 신청서(2026).hwp'), FP.safeName('')] : null, ['장학생_신청서_2026_', 'form']);
   /* ⑥ 한 파일 — pdf 는 복사 · 아닌 것은 거절 · 변환기 없으면 이유를 적는다 */
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'formpdf-'));
@@ -12225,6 +12228,10 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
   eq('⑥ pdf 는 바이트 그대로 복사 · 가짜 pdf 와 없는 원본은 거절 · 변환기가 없으면 「변환기 없음」',
     [c1.ok, c1.pages, fs.existsSync(path.join(tmp, 'out', 'a.pdf')) && pdfBytes(path.join(tmp, 'out', 'a.pdf')).equals(pdf), c2.why, c3.why, /변환기 없음/.test(c4.why || '')],
     [true, 2, true, 'PDF 가 아님', '원본 파일 없음', true]);
+  fs.writeFileSync(path.join(tmp, 'obj.pdf'), objPdf);
+  const c5 = FP.convertOne ? FP.convertOne(path.join(tmp, 'obj.pdf'), path.join(tmp, 'out', 'o.pdf')) : {};
+  eq('  쪽을 못 세는(객체 스트림) PDF 도 받는다 — pages 0 = 모름 · 결과 폴더 안에 작업 폴더 찌꺼기를 남기지 않는다',
+    [c5.ok, c5.pages, fs.readdirSync(path.join(tmp, 'out')).filter((n) => n.startsWith('.conv')).length], [true, 0, 0]);
   /* ⑦ 지우기 — 마감 지난 공고와 색인에 없는 폴더는 지우고 살아 있는 것은 둔다 */
   const pd = path.join(tmp, 'forms-pdf');
   for (const d of ['live', 'dead', 'stray']) { fs.mkdirSync(path.join(pd, d), { recursive: true }); fs.writeFileSync(path.join(pd, d, '1-x.pdf'), pdf); }
@@ -12259,16 +12266,28 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
     [['r1'], ['r2'], true, false, ['r1'], '원본 그대로 변환', true, true]);
   const again = FP.runFormPdf ? FP.runFormPdf({ root: fakeRepo, today: '2026-10-12', soffice: fakeSoffice, log: quiet }) : {};
   eq('  다시 돌리면 이미 있는 것은 건너뛴다 (같은 파일을 날마다 다시 쓰지 않는다)', [again.done && again.done.length, /이미 있어 건너뜀 1/.test(readText(path.join(fakeRepo, 'collector', 'form-pdf-report.md')))], [0, true]);
+  /* 리뷰 셋: 학교가 같은 이름으로 다시 올리면(원본 크기가 다르면) 다시 바꾼다 · 색인에 없는 고아 파일은 지운다 · 예산이 다 되면 남은 것을 적고 끝낸다 */
+  fs.writeFileSync(path.join(fakeRepo, 'collector', 'extracted', 'forms-index.txt'), 'form-r1-1.docx\t우양재단 동행 장학생 모집\t지원서.docx\t101\n');
+  fs.writeFileSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '9-옛결과.pdf'), pdf);
+  const third = FP.runFormPdf ? FP.runFormPdf({ root: fakeRepo, today: '2026-10-12', soffice: fakeSoffice, log: quiet }) : {};
+  eq('  원본 크기가 바뀌면 다시 바꾼다 · 그 공고 폴더의 고아 파일은 지운다', [third.done && third.done.length, fs.existsSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '9-옛결과.pdf')), fs.existsSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '1-지원서.pdf'))], [1, false, true]);
+  fs.writeFileSync(path.join(fakeRepo, 'collector', 'extracted', 'forms-index.txt'), 'form-r1-1.docx\t우양재단 동행 장학생 모집\t지원서.docx\t102\n');
+  const budget = FP.runFormPdf ? FP.runFormPdf({ root: fakeRepo, today: '2026-10-12', soffice: fakeSoffice, budgetSec: 0, log: quiet }) : {};
+  eq('  예산이 다 되면 바꾸지 않고 「남김」으로 적는다 (단계 시한에 죽어 색인을 잃지 않게 스스로 끝낸다)', [budget.done && budget.done.length, budget.left && budget.left.length, /예산\(0초\)이 다 돼 남김 1개/.test(readText(path.join(fakeRepo, 'collector', 'form-pdf-report.md')))], [0, 1, true]);
   fs.rmSync(tmp, { recursive: true, force: true });
   /* ⑨ 워크플로·설치 스크립트 글자 */
   const wf = readText(new URL('../.github/workflows/deep-fetch.yml', import.meta.url));
   const step = wf.slice(wf.indexOf('신청서 원본 → PDF (양식 원본 그대로)'), wf.indexOf('git config user.name'));
   eq('⑨ deep-fetch.yml 의 PDF 단계는 보강 단계(시한 + continue-on-error) · 자바 다리와 확장 설치 · 저장 목록에 data/forms-pdf 와 리포트',
     [step.length > 0, /timeout-minutes:\s*\d+/.test(step), /continue-on-error: true/.test(step), /libreoffice-java-common/.test(step), /bash collector\/install-h2orestart\.sh/.test(step), /node collector\/form-pdf\.mjs/.test(step),
-      /git add data\/forms-pdf/.test(wf), /git add collector\/form-pdf-report\.md/.test(wf), /\|\| true/.test(step)],
+      /git add -A data\/forms-pdf/.test(wf), /git add collector\/form-pdf-report\.md/.test(wf), /\|\| true/.test(step)],
     [true, true, true, true, true, true, true, true, false]);
   const sh = fs.existsSync(new URL('../collector/install-h2orestart.sh', import.meta.url)) ? readText(new URL('../collector/install-h2orestart.sh', import.meta.url)) : '';
-  eq('  설치 스크립트는 실패해도 0 으로 끝나고(보강 단계) 깔렸는지를 unopkg list 로 적는다', [/set -uo pipefail/.test(sh), /unopkg add --shared/.test(sh), /unopkg list/.test(sh), !/set -e/.test(sh)], [true, true, true, true]);
+  eq('  설치 스크립트는 실패해도 0 으로 끝나고(보강 단계) 깔렸는지를 unopkg list 로 적는다 · 러너(runner 사용자)에선 sudo 로 --shared 를 깐다(리뷰 — 없으면 HWP 전부가 조용히 못 읽음)',
+    [/set -uo pipefail/.test(sh), /\$UNOPKG add --shared/.test(sh), /\$UNOPKG list/.test(sh), !/set -e/.test(sh), /sudo -n unopkg/.test(sh)], [true, true, true, true, true]);
+  const ga = readText(new URL('../.gitattributes', import.meta.url));
+  eq('  .gitattributes 에 리포트(merge=ours)·색인(merge=ours)·사본(-diff) 줄이 있다 — 없으면 배포 동기화가 충돌로 멈춘다(2026-08-01 사고와 같은 꼴)',
+    [/^collector\/form-pdf-report\.md\s+merge=ours$/m.test(ga), /^data\/forms-pdf\/index\.json\s+merge=ours$/m.test(ga), /^data\/forms-pdf\/\*\*\s+-diff$/m.test(ga)], [true, true, true]);
   eq('  deploy-sync 가 이 워크플로(공고 원문 심층 수집)를 본다 — 안 보면 data/forms-pdf 가 앱으로 안 나간다', /공고 원문 심층 수집/.test(readText(new URL('../.github/workflows/deploy-sync.yml', import.meta.url))), true);
 }
 
