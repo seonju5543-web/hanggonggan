@@ -1880,7 +1880,7 @@
    "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000103003",
    "org": "계양구 인재양성장학재단",
    "name": "드림장학금",
@@ -1889,10 +1889,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2000103003",
-   "at": "2026-09-30"
+   "at": "2026-09-30",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-13"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000103002",
    "org": "계양구 인재양성장학재단",
    "name": "특기장학금",
@@ -1901,10 +1903,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2000103002",
-   "at": "2026-09-30"
+   "at": "2026-09-30",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-13"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000103001",
    "org": "계양구 인재양성장학재단",
    "name": "학업우수장학금",
@@ -1913,7 +1917,9 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2000103001",
-   "at": "2026-09-30"
+   "at": "2026-09-30",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-13"
   },
   {
    "status": "prepared",
@@ -2078,7 +2084,7 @@
    "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "7411988002",
    "org": "한국수자원공사",
    "name": "댐주변지역학생장학금",
@@ -2087,7 +2093,9 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/7411988002",
-   "at": "2026-10-01"
+   "at": "2026-10-01",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-13"
   },
   {
    "status": "prepared",
