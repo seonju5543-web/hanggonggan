@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
- "updatedAt": "2026-10-12",
- "count": 1897,
+ "updatedAt": "2026-10-13",
+ "count": 1898,
  "items": [
   {
    "title": "[공통][교외]2026년도 하반기 은평구민장학재단 장학생 선발 공고(~10/28)",
@@ -702,6 +702,17 @@
    "school": "서강대학교",
    "campus": "",
    "foundAt": "2026-10-12"
+  },
+  {
+   "title": "[장학금 접수] 2026학년도 대학생 청소년교육지원사업 3차 멘토 선발 안내",
+   "url": "https://www3.chosun.ac.kr/bbs/scho/332/281694/artclView.do",
+   "attachments": [],
+   "deadlineHint": "신청기간 및 신청방법 가 . 신청기간 : 2026. 10. 6.( 화 ) 10 시 ~ 10. 12.( 월 ) 17 시 ※ 마감일 이후 신청자는",
+   "school": "조선대학교",
+   "campus": "",
+   "foundAt": "2026-10-12",
+   "bodyDeadline": "2026-10-12",
+   "bodyDeadlineText": "2026.10.12"
   },
   {
    "title": "2026-2학기 국가근로장학금 학생 추가신청 안내(한국장학재단)",
