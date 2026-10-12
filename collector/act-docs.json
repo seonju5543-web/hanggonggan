@@ -34,5 +34,61 @@
  "https://youth.gyeongnam.go.kr/youth/board.es?mid=a10501020000&bid=0006&list_no=6911&act=view": {
   "at": "2026-10-12",
   "tries": 1
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53464&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-10-12",
+  "tries": 1
+ },
+ "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156784479&pWise=sub&pWiseSub=C2": {
+  "at": "2026-10-12",
+  "tries": 1
+ },
+ "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140417&article.offset=0&articleLimit=10": {
+  "at": "2026-10-12",
+  "tries": 1
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53445&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-10-12",
+  "tries": 1
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=48133&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-10-12",
+  "tries": 1
+ },
+ "https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.ulsan?bbsId=BBS_0000000000000309&mId=008001002000000000&dataId=60769": {
+  "at": "2026-10-12",
+  "tries": 1
+ },
+ "https://youth.gyeongnam.go.kr/youth/board.es?mid=a10501020000&bid=0006&list_no=6907&act=view": {
+  "at": "2026-10-12",
+  "tries": 1
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/268492/artclView.do": {
+  "at": "2026-10-12",
+  "tries": 1
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53429&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-10-12",
+  "tries": 1
+ },
+ "https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=514&bcd=notice": {
+  "at": "2026-10-12",
+  "tries": 1
+ },
+ "https://kyf.or.kr/user/boardDetail.do?boardType=notice&bbsId=BBSMSTR_000000000367&nttNo=10054": {
+  "at": "2026-10-12",
+  "tries": 1
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/267199/artclView.do": {
+  "at": "2026-10-12",
+  "tries": 1
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/267176/artclView.do": {
+  "at": "2026-10-12",
+  "tries": 1
+ },
+ "https://www.youthcenter.go.kr/bbs03View/48/10811": {
+  "at": "2026-10-12",
+  "tries": 1
  }
 }
