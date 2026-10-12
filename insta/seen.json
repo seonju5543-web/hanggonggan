@@ -57,7 +57,7 @@
    "postedAt": "2026-09-13"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2704055001",
    "org": "재단법인 광산김씨대종중장학문화재단",
    "name": "수산장학생",
@@ -66,10 +66,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2704055001",
-   "at": "2026-09-12"
+   "at": "2026-09-12",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2703591003",
    "org": "한진해운장학재단",
    "name": "장학생",
@@ -78,10 +80,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2703591003",
-   "at": "2026-09-12"
+   "at": "2026-09-12",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700353015",
    "org": "한국교원단체총연합회",
    "name": "한국교총장학생",
@@ -90,10 +94,12 @@
    "tplNo": 4,
    "cards": 5,
    "dir": "insta/pub/2700353015",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000380009",
    "org": "국가보훈부",
    "name": "독립유공자 후손 장학금(스타벅스 코리아)",
@@ -102,7 +108,9 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2000380009",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
    "status": "posted",
@@ -118,7 +126,7 @@
    "postedAt": "2026-09-13"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2701052001",
    "org": "가천문화재단",
    "name": "가천효행상",
@@ -127,10 +135,12 @@
    "tplNo": 4,
    "cards": 4,
    "dir": "insta/pub/2701052001",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0603003",
    "org": "해석정해영선생장학문화재단",
    "name": "해석미술장학생",
@@ -139,10 +149,12 @@
    "tplNo": 4,
    "cards": 5,
    "dir": "insta/pub/0603003",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700032001",
    "org": "(재)앨트웰민초장학재단",
    "name": "장학생",
@@ -151,10 +163,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2700032001",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700076010",
    "org": "포항시장학회",
    "name": "지역인재장학금",
@@ -163,10 +177,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2700076010",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2703305007",
    "org": "재단법인 울산연구원",
    "name": "우수장학금",
@@ -175,10 +191,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2703305007",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2703305006",
    "org": "재단법인 울산연구원",
    "name": "재능장학금",
@@ -187,10 +205,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2703305006",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0800007",
    "org": "(재)전남광주통합특별시 서구 장학재단",
    "name": "행복(일반) 장학금",
@@ -199,10 +219,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/0800007",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700042001",
    "org": "재단법인 두을장학재단",
    "name": "두을장학재단장학금",
@@ -211,10 +233,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2700042001",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0575001",
    "org": "재단법인 삼원장학재단",
    "name": "삼원장학생",
@@ -223,10 +247,12 @@
    "tplNo": 4,
    "cards": 5,
    "dir": "insta/pub/0575001",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700353011",
    "org": "재단법인 세종연구원",
    "name": "특기적성장학생",
@@ -235,10 +261,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2700353011",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000257004",
    "org": "진안군청",
    "name": "생활안정비 지원",
@@ -247,10 +275,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2000257004",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2703609001",
    "org": "한국야쿠르트 사회복지재단",
    "name": "든든 학업지원금",
@@ -259,10 +289,12 @@
    "tplNo": 4,
    "cards": 5,
    "dir": "insta/pub/2703609001",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000441008",
    "org": "(재)부안군근농인재육성재단",
    "name": "다자녀장학생",
@@ -271,10 +303,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2000441008",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700724002",
    "org": "경상남도장학회",
    "name": "대학재학생 장학금",
@@ -283,10 +317,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2700724002",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000353004",
    "org": "경상남도청",
    "name": "대학재학장학금",
@@ -295,10 +331,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2000353004",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2701281001",
    "org": "재단법인 대하장학회",
    "name": "대하장학생",
@@ -307,7 +345,9 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2701281001",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
    "status": "prepared",
@@ -322,7 +362,7 @@
    "at": "2026-09-13"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000429010",
    "org": "(재)음성군장학회",
    "name": "군민평생장학금",
@@ -331,10 +371,12 @@
    "tplNo": 4,
    "cards": 4,
    "dir": "insta/pub/2000429010",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700096004",
    "org": "한국광산장학회",
    "name": "특정장학생",
@@ -343,10 +385,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2700096004",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0800006",
    "org": "(재)전남광주통합특별시 서구 장학재단",
    "name": "장애인장학금",
@@ -355,10 +399,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/0800006",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000380002",
    "org": "국가보훈부",
    "name": "보훈장학금(대학원장학)",
@@ -367,10 +413,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2000380002",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000380003",
    "org": "국가보훈부",
    "name": "보훈장학금(특수교육장학)",
@@ -379,10 +427,12 @@
    "tplNo": 2,
    "cards": 4,
    "dir": "insta/pub/2000380003",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700761001",
    "org": "동산장학회",
    "name": "동산장학생",
@@ -391,7 +441,9 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2700761001",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
    "status": "prepared",
@@ -454,7 +506,7 @@
    "at": "2026-09-13"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700420003",
    "org": "대관령꿈나무장학회",
    "name": "생활지원장학금",
@@ -463,10 +515,12 @@
    "tplNo": 2,
    "cards": 4,
    "dir": "insta/pub/2700420003",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000065001",
    "org": "서울특별시 양천구청",
    "name": "일반장학금",
@@ -475,10 +529,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2000065001",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000427002",
    "org": "영동군민장학회",
    "name": "난계국악장학금",
@@ -487,10 +543,12 @@
    "tplNo": 4,
    "cards": 5,
    "dir": "insta/pub/2000427002",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000427001",
    "org": "영동군민장학회",
    "name": "우수장학금",
@@ -499,10 +557,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2000427001",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0625002",
    "org": "울진군장학재단",
    "name": "특기장학금",
@@ -511,10 +571,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/0625002",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0625004",
    "org": "울진군장학재단",
    "name": "학업우수(직장인포함)장학금",
@@ -523,10 +585,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/0625004",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2703752010",
    "org": "재단법인 김해시미래인재장학재단",
    "name": "김해시의사회 지정기탁 장학금",
@@ -535,10 +599,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2703752010",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700096001",
    "org": "한국광산장학회",
    "name": "우수장학생(성적우수자)",
@@ -547,10 +613,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2700096001",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700096002",
    "org": "한국광산장학회",
    "name": "일반장학생",
@@ -559,10 +627,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2700096002",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2701197001",
    "org": "강원인재원",
    "name": "미래인재",
@@ -571,10 +641,12 @@
    "tplNo": 3,
    "cards": 4,
    "dir": "insta/pub/2701197001",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700076002",
    "org": "포항시장학회",
    "name": "문화·예술·기능 특기생",
@@ -583,10 +655,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2700076002",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700076006",
    "org": "포항시장학회",
    "name": "인재육성장학금",
@@ -595,10 +669,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2700076006",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700076003",
    "org": "포항시장학회",
    "name": "체육특기생",
@@ -607,10 +683,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2700076003",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0653001",
    "org": "당진발전본부장학회",
    "name": "성적장학금",
@@ -619,10 +697,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/0653001",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2500069001",
    "org": "재단법인 경주시장학회",
    "name": "일반장학생",
@@ -631,10 +711,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2500069001",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2500069002",
    "org": "재단법인 경주시장학회",
    "name": "특기장학생",
@@ -643,10 +725,12 @@
    "tplNo": 4,
    "cards": 5,
    "dir": "insta/pub/2500069002",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000458001",
    "org": "재단법인 상주시장학회",
    "name": "나래장학금",
@@ -655,10 +739,12 @@
    "tplNo": 4,
    "cards": 5,
    "dir": "insta/pub/2000458001",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000311001",
    "org": "재단법인 상주시장학회",
    "name": "특별장학금",
@@ -667,10 +753,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2000311001",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2703305004",
    "org": "재단법인 울산연구원",
    "name": "다자녀장학금",
@@ -679,10 +767,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2703305004",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700561003",
    "org": "달서인재육성장학재단",
    "name": "성적우수장학생",
@@ -691,10 +781,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2700561003",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700561004",
    "org": "달서인재육성장학재단",
    "name": "특기장학생",
@@ -703,10 +795,12 @@
    "tplNo": 4,
    "cards": 5,
    "dir": "insta/pub/2700561004",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700561005",
    "org": "달서인재육성장학재단",
    "name": "희망생활 장학생",
@@ -715,10 +809,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2700561005",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0800003",
    "org": "(재)전남광주통합특별시 서구 장학재단",
    "name": "다자녀장학금",
@@ -727,10 +823,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/0800003",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0800001",
    "org": "(재)전남광주통합특별시 서구 장학재단",
    "name": "성적우수장학금",
@@ -739,10 +837,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/0800001",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "1818318002",
    "org": "양구군청",
    "name": "대학생등록금지원",
@@ -751,10 +851,12 @@
    "tplNo": 2,
    "cards": 4,
    "dir": "insta/pub/1818318002",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700029002",
    "org": "장보고장학회(완도군청)",
    "name": "성적우수자",
@@ -763,10 +865,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2700029002",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700029003",
    "org": "장보고장학회(완도군청)",
    "name": "저소득자녀",
@@ -775,10 +879,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2700029003",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2703381002",
    "org": "재단법인 연수큰재장학재단",
    "name": "특기장학생",
@@ -787,10 +893,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2703381002",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2703381001",
    "org": "재단법인 연수큰재장학재단",
    "name": "학업우수장학생",
@@ -799,10 +907,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2703381001",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000441006",
    "org": "(재)부안군근농인재육성재단",
    "name": "반값등록금장학생",
@@ -811,10 +921,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2000441006",
-   "at": "2026-09-14"
+   "at": "2026-09-14",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2703469001",
    "org": "파안장학문화재단법인",
    "name": "장학금",
@@ -823,7 +935,9 @@
    "tplNo": 3,
    "cards": 4,
    "dir": "insta/pub/2703469001",
-   "at": "2026-09-14"
+   "at": "2026-09-14",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
    "status": "prepared",
@@ -838,7 +952,7 @@
    "at": "2026-09-14"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0625003",
    "org": "울진군장학재단",
    "name": "복지장학금",
@@ -847,10 +961,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/0625003",
-   "at": "2026-09-14"
+   "at": "2026-09-14",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700076004",
    "org": "포항시장학회",
    "name": "곰두리장학생",
@@ -859,10 +975,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2700076004",
-   "at": "2026-09-14"
+   "at": "2026-09-14",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0653002",
    "org": "당진발전본부장학회",
    "name": "복지장학금",
@@ -871,10 +989,12 @@
    "tplNo": 4,
    "cards": 5,
    "dir": "insta/pub/0653002",
-   "at": "2026-09-14"
+   "at": "2026-09-14",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "auto-b2adec9588eb82b420911928",
    "org": "경희대학교",
    "name": "푸른등대 한국수력원자력 k-원전 장학금 신청안내",
@@ -883,10 +1003,12 @@
    "tplNo": 3,
    "cards": 4,
    "dir": "insta/pub/auto-b2adec9588eb82b420911928",
-   "at": "2026-09-14"
+   "at": "2026-09-14",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000458002",
    "org": "재단법인 상주시장학회",
    "name": "희망장학금",
@@ -895,10 +1017,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2000458002",
-   "at": "2026-09-14"
+   "at": "2026-09-14",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2703305005",
    "org": "재단법인 울산연구원",
    "name": "생활장학금",
@@ -907,10 +1031,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2703305005",
-   "at": "2026-09-14"
+   "at": "2026-09-14",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0800002",
    "org": "(재)전남광주통합특별시 서구 장학재단",
    "name": "행복(생활비)장학금",
@@ -919,10 +1045,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/0800002",
-   "at": "2026-09-14"
+   "at": "2026-09-14",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2703381003",
    "org": "재단법인 연수큰재장학재단",
    "name": "복지장학생",
@@ -931,10 +1059,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2703381003",
-   "at": "2026-09-14"
+   "at": "2026-09-14",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000389001",
    "org": "(재)부산북구장학회",
    "name": "장학생",
@@ -943,7 +1073,9 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2000389001",
-   "at": "2026-09-14"
+   "at": "2026-09-14",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
    "status": "prepared",
@@ -1018,7 +1150,7 @@
    "at": "2026-09-14"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2703645001",
    "org": "사회복지법인 동행복지재단",
    "name": "의과학자 장학금",
@@ -1027,10 +1159,12 @@
    "tplNo": 4,
    "cards": 4,
    "dir": "insta/pub/2703645001",
-   "at": "2026-09-14"
+   "at": "2026-09-14",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2701092001",
    "org": "금천장학회",
    "name": "장학생",
@@ -1039,10 +1173,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2701092001",
-   "at": "2026-09-14"
+   "at": "2026-09-14",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2701084001",
    "org": "청송양수발전소장학회",
    "name": "성적우수학생",
@@ -1051,10 +1187,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2701084001",
-   "at": "2026-09-14"
+   "at": "2026-09-14",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000402010",
    "org": "충남평생교육진흥원",
    "name": "거주비지원 장학생",
@@ -1063,7 +1201,9 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2000402010",
-   "at": "2026-09-14"
+   "at": "2026-09-14",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
    "status": "prepared",
@@ -1102,7 +1242,7 @@
    "at": "2026-09-14"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2701084002",
    "org": "청송양수발전소장학회",
    "name": "사회적배려장학생",
@@ -1111,7 +1251,9 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2701084002",
-   "at": "2026-09-14"
+   "at": "2026-09-14",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
    "status": "prepared",
@@ -1126,7 +1268,7 @@
    "at": "2026-09-14"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "auto-ent2431263952artclviewdo",
    "org": "한국외국어대학교",
    "name": "2026년 2학기 고졸 후학습자 장학금 신청안내",
@@ -1135,10 +1277,12 @@
    "tplNo": 3,
    "cards": 4,
    "dir": "insta/pub/auto-ent2431263952artclviewdo",
-   "at": "2026-09-16"
+   "at": "2026-09-16",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "auto-9599ec839d20ec84a0ebb09c",
    "org": "경희대학교",
    "name": "제36기 미레에셋 해외교환 장학생 선발",
@@ -1147,10 +1291,12 @@
    "tplNo": 1,
    "cards": 4,
    "dir": "insta/pub/auto-9599ec839d20ec84a0ebb09c",
-   "at": "2026-09-16"
+   "at": "2026-09-16",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "auto-oardid322850menuno200318",
    "org": "경희대학교",
    "name": "2026년 2학기 제24기 후기 삼원장학생 선발 안내",
@@ -1159,10 +1305,12 @@
    "tplNo": 4,
    "cards": 4,
    "dir": "insta/pub/auto-oardid322850menuno200318",
-   "at": "2026-09-16"
+   "at": "2026-09-16",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0729002",
    "org": "현대자동차그룹",
    "name": "연구장학생(산학장학생)",
@@ -1171,10 +1319,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/0729002",
-   "at": "2026-09-18"
+   "at": "2026-09-18",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2703323001",
    "org": "메디힐장학재단",
    "name": "메디힐 유임순 장학생",
@@ -1183,10 +1333,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2703323001",
-   "at": "2026-09-18"
+   "at": "2026-09-18",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2500065002",
    "org": "울산광역시 남구장학재단",
    "name": "소상공인대학생자녀장학생",
@@ -1195,7 +1347,9 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2500065002",
-   "at": "2026-09-18"
+   "at": "2026-09-18",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
    "status": "prepared",
@@ -1234,7 +1388,7 @@
    "at": "2026-09-18"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0597001",
    "org": "전주인재육성재단",
    "name": "지역우수인재장학생",
@@ -1243,10 +1397,12 @@
    "tplNo": 4,
    "cards": 5,
    "dir": "insta/pub/0597001",
-   "at": "2026-09-18"
+   "at": "2026-09-18",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0651001",
    "org": "구례군청",
    "name": "성적우수장학생",
@@ -1255,10 +1411,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/0651001",
-   "at": "2026-09-18"
+   "at": "2026-09-18",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0651004",
    "org": "구례군청",
    "name": "체육/기능/예능특기생",
@@ -1267,10 +1425,12 @@
    "tplNo": 4,
    "cards": 5,
    "dir": "insta/pub/0651004",
-   "at": "2026-09-18"
+   "at": "2026-09-18",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700388001",
    "org": "(재)송파구 인재육성 장학재단",
    "name": "일반장학생",
@@ -1279,10 +1439,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2700388001",
-   "at": "2026-09-18"
+   "at": "2026-09-18",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0568001",
    "org": "광주남구장학회",
    "name": "행복나눔 장학생",
@@ -1291,10 +1453,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/0568001",
-   "at": "2026-09-18"
+   "at": "2026-09-18",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700017001",
    "org": "(재)고속도로장학재단",
    "name": "장학금",
@@ -1303,10 +1467,12 @@
    "tplNo": 4,
    "cards": 4,
    "dir": "insta/pub/2700017001",
-   "at": "2026-09-18"
+   "at": "2026-09-18",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000218001",
    "org": "충청북도 충주시청",
    "name": "장애인및자녀장학금",
@@ -1315,10 +1481,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2000218001",
-   "at": "2026-09-18"
+   "at": "2026-09-18",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0651002",
    "org": "구례군청",
    "name": "저소득층장학생",
@@ -1327,10 +1495,12 @@
    "tplNo": 4,
    "cards": 5,
    "dir": "insta/pub/0651002",
-   "at": "2026-09-18"
+   "at": "2026-09-18",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2701091002",
    "org": "한국중부발전 보령발전본부",
    "name": "희망의빛(기초생활수급자)",
@@ -1339,7 +1509,9 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2701091002",
-   "at": "2026-09-18"
+   "at": "2026-09-18",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
    "status": "prepared",
@@ -1390,7 +1562,7 @@
    "at": "2026-09-18"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "auto-20ec9588eb82b40922ed9994",
    "org": "경희대학교",
    "name": "[공통] 2026학년도 2학기 점프장학 신청 안내_09.22(화)~10.9(금)",
@@ -1399,7 +1571,9 @@
    "tplNo": 1,
    "cards": 4,
    "dir": "insta/pub/auto-20ec9588eb82b40922ed9994",
-   "at": "2026-09-23"
+   "at": "2026-09-23",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
    "status": "prepared",
@@ -1438,7 +1612,7 @@
    "at": "2026-09-30"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2702905001",
    "org": "재단법인 춘천인재육성장학재단",
    "name": "원격대학장학금",
@@ -1447,10 +1621,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2702905001",
-   "at": "2026-09-30"
+   "at": "2026-09-30",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0767002",
    "org": "재단법인 춘천인재육성장학재단",
    "name": "특기장학금",
@@ -1459,10 +1635,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/0767002",
-   "at": "2026-09-30"
+   "at": "2026-09-30",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700296021",
    "org": "(재)인천인재평생교육진흥원",
    "name": "iHUG 인천도시공사 장학금",
@@ -1471,10 +1649,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2700296021",
-   "at": "2026-09-30"
+   "at": "2026-09-30",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2500039004",
    "org": "재단법인 신안군장학재단",
    "name": "대학생생활비지원금",
@@ -1483,7 +1663,9 @@
    "tplNo": 4,
    "cards": 5,
    "dir": "insta/pub/2500039004",
-   "at": "2026-09-30"
+   "at": "2026-09-30",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
    "status": "prepared",
@@ -1546,7 +1728,7 @@
    "at": "2026-09-30"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700296019",
    "org": "(재)인천인재평생교육진흥원",
    "name": "관외대학거주비지원장학생",
@@ -1555,7 +1737,9 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2700296019",
-   "at": "2026-09-30"
+   "at": "2026-09-30",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
    "status": "prepared",
@@ -1570,7 +1754,7 @@
    "at": "2026-09-30"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0767001",
    "org": "재단법인 춘천인재육성장학재단",
    "name": "성적우수장학금",
@@ -1579,10 +1763,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/0767001",
-   "at": "2026-09-30"
+   "at": "2026-09-30",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000188003",
    "org": "재단법인 춘천인재육성장학재단",
    "name": "애향장학(유공자자녀또는본인)",
@@ -1591,10 +1777,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2000188003",
-   "at": "2026-09-30"
+   "at": "2026-09-30",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000188001",
    "org": "재단법인 춘천인재육성장학재단",
    "name": "애향장학생(통·리·반장자녀)",
@@ -1603,10 +1791,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2000188001",
-   "at": "2026-09-30"
+   "at": "2026-09-30",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000188004",
    "org": "재단법인 춘천인재육성장학재단",
    "name": "애향장학생(환경공원주변자녀)",
@@ -1615,10 +1805,12 @@
    "tplNo": 4,
    "cards": 5,
    "dir": "insta/pub/2000188004",
-   "at": "2026-09-30"
+   "at": "2026-09-30",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0767003",
    "org": "재단법인 춘천인재육성장학재단",
    "name": "주소이전장학금",
@@ -1627,10 +1819,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/0767003",
-   "at": "2026-09-30"
+   "at": "2026-09-30",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700296013",
    "org": "(재)인천인재평생교육진흥원",
    "name": "공익인재장학생",
@@ -1639,10 +1833,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2700296013",
-   "at": "2026-09-30"
+   "at": "2026-09-30",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0607007",
    "org": "문경시장학회",
    "name": "다자녀생활장학생",
@@ -1651,10 +1847,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/0607007",
-   "at": "2026-09-30"
+   "at": "2026-09-30",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000457002",
    "org": "재단법인 진도군인재육성장학회",
    "name": "특기장학생",
@@ -1663,10 +1861,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2000457002",
-   "at": "2026-09-30"
+   "at": "2026-09-30",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000457001",
    "org": "재단법인 진도군인재육성장학회",
    "name": "학업성적장학생",
@@ -1675,7 +1875,9 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2000457001",
-   "at": "2026-09-30"
+   "at": "2026-09-30",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
    "status": "prepared",
@@ -1726,7 +1928,7 @@
    "at": "2026-09-30"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2703662001",
    "org": "국가유산진흥원",
    "name": "장학생",
@@ -1735,10 +1937,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2703662001",
-   "at": "2026-09-30"
+   "at": "2026-09-30",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "7416477001",
    "org": "한국고전번역원",
    "name": "고전번역협동과정장학생",
@@ -1747,10 +1951,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/7416477001",
-   "at": "2026-09-30"
+   "at": "2026-09-30",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0568002",
    "org": "광주남구장학회",
    "name": "일반장학생",
@@ -1759,7 +1965,9 @@
    "tplNo": 4,
    "cards": 5,
    "dir": "insta/pub/0568002",
-   "at": "2026-09-30"
+   "at": "2026-09-30",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
    "status": "prepared",
@@ -1786,7 +1994,7 @@
    "at": "2026-09-30"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000188002",
    "org": "재단법인 춘천인재육성장학재단",
    "name": "애향장학생(저소득본인/자녀(손))",
@@ -1795,10 +2003,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2000188002",
-   "at": "2026-10-01"
+   "at": "2026-10-01",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700296010",
    "org": "(재)인천인재평생교육진흥원",
    "name": "SK행복장학생",
@@ -1807,10 +2017,12 @@
    "tplNo": 4,
    "cards": 5,
    "dir": "insta/pub/2700296010",
-   "at": "2026-10-01"
+   "at": "2026-10-01",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700296011",
    "org": "(재)인천인재평생교육진흥원",
    "name": "희망드림장학금",
@@ -1819,10 +2031,12 @@
    "tplNo": 4,
    "cards": 5,
    "dir": "insta/pub/2700296011",
-   "at": "2026-10-01"
+   "at": "2026-10-01",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000457004",
    "org": "재단법인 진도군인재육성장학회",
    "name": "보배사랑장학생",
@@ -1831,10 +2045,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2000457004",
-   "at": "2026-10-01"
+   "at": "2026-10-01",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2500039002",
    "org": "재단법인 신안군장학재단",
    "name": "다문화가정장학생",
@@ -1843,10 +2059,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2500039002",
-   "at": "2026-10-01"
+   "at": "2026-10-01",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2500039001",
    "org": "재단법인 신안군장학재단",
    "name": "일반(저소득)장학생",
@@ -1855,7 +2073,9 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2500039001",
-   "at": "2026-10-01"
+   "at": "2026-10-01",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
    "status": "prepared",
@@ -1966,7 +2186,7 @@
    "at": "2026-10-01"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0568005",
    "org": "광주남구장학회",
    "name": "봉사선행효행장학생",
@@ -1975,10 +2195,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/0568005",
-   "at": "2026-10-01"
+   "at": "2026-10-01",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0568004",
    "org": "광주남구장학회",
    "name": "특기장학생",
@@ -1987,10 +2209,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/0568004",
-   "at": "2026-10-01"
+   "at": "2026-10-01",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700582004",
    "org": "재단법인 무주군교육발전장학재단",
    "name": "반디장학생",
@@ -1999,7 +2223,9 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2700582004",
-   "at": "2026-10-01"
+   "at": "2026-10-01",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
    "status": "prepared",
@@ -2014,7 +2240,7 @@
    "at": "2026-10-01"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0568003",
    "org": "광주남구장학회",
    "name": "특별장학생",
@@ -2023,10 +2249,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/0568003",
-   "at": "2026-10-01"
+   "at": "2026-10-01",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2702905003",
    "org": "재단법인 춘천인재육성장학재단",
    "name": "자원봉사 우수 장학금",
@@ -2035,7 +2263,9 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2702905003",
-   "at": "2026-10-02"
+   "at": "2026-10-02",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
    "status": "prepared",
@@ -2050,7 +2280,7 @@
    "at": "2026-10-02"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2704197002",
    "org": "장애와 사회",
    "name": "장애학생 장학금 지원사업",
@@ -2059,7 +2289,9 @@
    "tplNo": 1,
    "cards": 4,
    "dir": "insta/pub/2704197002",
-   "at": "2026-10-02"
+   "at": "2026-10-02",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
    "status": "prepared",
@@ -2074,7 +2306,7 @@
    "at": "2026-10-02"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000401005",
    "org": "재단법인 대전광역시서구인재육성장학재단",
    "name": "소상공인 특별장학생",
@@ -2083,10 +2315,12 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2000401005",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700039007",
    "org": "재단법인 우양",
    "name": "대학원장학금(늘품)",
@@ -2095,7 +2329,9 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2700039007",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
    "status": "prepared",
@@ -2170,7 +2406,7 @@
    "at": "2026-10-06"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000401006",
    "org": "재단법인 대전광역시서구인재육성장학재단",
    "name": "방위사업청 특별장학생",
@@ -2179,10 +2415,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2000401006",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000401004",
    "org": "재단법인 대전광역시서구인재육성장학재단",
    "name": "성적우수장학생",
@@ -2191,10 +2429,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2000401004",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000401008",
    "org": "재단법인 대전광역시서구인재육성장학재단",
    "name": "우수자원봉사자 특별장학생",
@@ -2203,10 +2443,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2000401008",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000394004",
    "org": "재단법인 대전광역시서구인재육성장학재단",
    "name": "특기장학생",
@@ -2215,7 +2457,9 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2000394004",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
    "status": "prepared",
@@ -2350,7 +2594,7 @@
    "at": "2026-10-06"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000428001",
    "org": "재단법인 옥천군장학회",
    "name": "옥천인재장학",
@@ -2359,7 +2603,9 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2000428001",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
    "status": "prepared",
@@ -2374,7 +2620,7 @@
    "at": "2026-10-06"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0663001",
    "org": "재단법인 마포인재육성장학재단",
    "name": "마포장학생",
@@ -2383,10 +2629,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/0663001",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000401009",
    "org": "재단법인 대전광역시서구인재육성장학재단",
    "name": "특수영상콘텐츠분야 특별장학생",
@@ -2395,10 +2643,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2000401009",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000401002",
    "org": "재단법인 대전청년내일재단",
    "name": "성취장학금",
@@ -2407,7 +2657,9 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2000401002",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
    "status": "prepared",
@@ -2422,7 +2674,7 @@
    "at": "2026-10-06"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000428004",
    "org": "재단법인 옥천군장학회",
    "name": "졸업장학생",
@@ -2431,10 +2683,12 @@
    "tplNo": 4,
    "cards": 5,
    "dir": "insta/pub/2000428004",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000401007",
    "org": "재단법인 대전광역시서구인재육성장학재단",
    "name": "북한이탈주민 특별장학생",
@@ -2443,7 +2697,9 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2000401007",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-12"
   },
   {
    "status": "prepared",
