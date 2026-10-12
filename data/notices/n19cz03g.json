@@ -1,7 +1,21 @@
 {
  "school": "한국외국어대학교",
- "updatedAt": "2026-10-11",
+ "updatedAt": "2026-10-12",
  "items": [
+  {
+   "title": "[공통][교외]2026년도 하반기 은평구민장학재단 장학생 선발 공고(~10/28)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/268836/artclView.do",
+   "attachments": [
+    {
+     "name": "【붙임】 2026. 하반기 은평구민 장학생 선발 공고.pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/151780/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-10-12"
+  },
   {
    "title": "[공통][교외] 2027 대산농촌재단 대산장학생 모집 공고(~11/11)",
    "url": "https://dep.hufs.ac.kr/bbs/student/2431/268751/artclView.do",
@@ -87,6 +101,15 @@
    "school": "한국외국어대학교",
    "campus": "",
    "foundAt": "2026-10-01"
+  },
+  {
+   "title": "2026-2학기 재직동문교수회(HUFS 명문가 장학금) 신청안내(~10/16)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/267935/artclView.do",
+   "attachments": [],
+   "deadlineHint": "신청기간 : 2026. 10. 6.( 화 ) 09:00 ~ 2026. 10. 16.( 금 ) 16:00 까지 &nbsp; 5. 제출서류 &nbs",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-09-29"
   }
  ]
 }

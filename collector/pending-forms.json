@@ -1,14 +1,6 @@
 {
  "items": [
   {
-   "id": "auto-otice06doarticleno138713",
-   "name": "(공과대학)2026학년도 2학기 한국도레이과학진흥재단 장학생 선발안내(~2026년 7월 31일(금) AM 09:00까지)",
-   "target": "(공과대학)2026학년",
-   "added": "2026-07-27",
-   "fetched": true,
-   "schematized": true
-  },
-  {
    "id": "auto-ent2431260146artclviewdo",
    "name": "[글로벌][교외]2026-2학기 염곡문화재단 장학생 선발 안내(~8/3)",
    "target": "2026-2학기 염곡문",
@@ -49,90 +41,6 @@
    "schematized": true
   },
   {
-   "id": "reg-kw-gasong",
-   "name": "가송재단 장학생 선발 안내(광운)",
-   "target": "가송재단",
-   "added": "2026-07-30",
-   "fetched": true,
-   "schematized": true
-  },
-  {
-   "id": "auto-otice06doarticleno138629",
-   "name": "2026년 서울사회복지공동모금회 상반기 바로바로론 사랑나눔장학생 모집 안내",
-   "target": "2026년 서울사회복지",
-   "added": "2026-08-02",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-swwwhanyangackrnoticeall",
-   "name": "[총무인사팀]우편물실 근로장학생 모집(화요일)",
-   "target": "우편물실 근로장학생 모",
-   "added": "2026-08-02",
-   "fetched": true,
-   "schematized": true
-  },
-  {
-   "id": "auto-kuk2351167943artclviewdo",
-   "name": "★[국가근로] 2026-1학기 국가근로장학생 선발자 관련 안내",
-   "target": "★ 2026-1학기 국",
-   "added": "2026-08-02",
-   "fetched": false,
-   "schematized": false,
-   "tries": 6,
-   "lastTryAt": "2026-08-05",
-   "retired": true,
-   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
-  },
-  {
-   "id": "auto-jukr145233626artclviewdo",
-   "name": "[인문] 가송재단 2026년 2학기 장학생 선발",
-   "target": "가송재단 2026년 2",
-   "added": "2026-08-02",
-   "fetched": true,
-   "schematized": true
-  },
-  {
-   "id": "auto-skor478122193artclviewdo",
-   "name": "[글로벌] 긴급-등록금전액)2026-2학기 (재)봉은재단 장학생 추가선발 안내(화공생명, 바이오나노, 생명과학, 물리,",
-   "target": "긴급-등록금전액)202",
-   "added": "2026-08-02",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "reg-konkuk-uiam",
-   "name": "의암 손병희 우수논문 장학생 (건국대, 2026)",
-   "target": "의암 손병희 우수 논문",
-   "added": "2026-08-02",
-   "fetched": false,
-   "schematized": false,
-   "tries": 6,
-   "lastTryAt": "2026-08-05",
-   "retired": true,
-   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
-  },
-  {
-   "id": "reg-konkuk-bulgaria",
-   "name": "불가리아 정부초청 장학생 (건국대, 2026-2027)",
-   "target": "불가리아 정부초청 장학생",
-   "added": "2026-08-02",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "reg-gachon-seongjeok",
-   "name": "성적향상 장학금 신청 (가천대, 2026-1학기)",
-   "target": "가천대 2026-1학기 성적향상 장학금",
-   "added": "2026-08-02",
-   "fetched": false,
-   "schematized": false,
-   "tries": 6,
-   "lastTryAt": "2026-08-05",
-   "retired": true,
-   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
-  },
-  {
    "id": "reg-dongsan",
    "name": "동산장학회 장학생 (이공계 새터민 대상)",
    "target": "동산장학회 장학생 선발",
@@ -141,290 +49,12 @@
    "schematized": true
   },
   {
-   "id": "reg-ssu-saemunan",
-   "name": "새문안교회 장학생 (숭실대, 2026-2학기)",
-   "target": "새문안교회 장학생",
-   "added": "2026-08-02",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "reg-sejong-seongjeok",
-   "name": "성적향상장학금 신청 (세종대, 2026-1학기)",
-   "target": "세종대 2026-1 성적향상장학금",
-   "added": "2026-08-02",
-   "fetched": false,
-   "schematized": false,
-   "tries": 6,
-   "lastTryAt": "2026-08-05",
-   "retired": true,
-   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
-  },
-  {
    "id": "reg-partner-foundation",
    "name": "미래의동반자재단 장학생 선발 (주한미국상공회의소)",
    "target": "미래의동반자재단 장학생",
    "added": "2026-08-02",
    "fetched": true,
    "schematized": false
-  },
-  {
-   "id": "reg-catholic-alumni",
-   "name": "동문장학금 신청 (가톨릭대, 2026-2학기)",
-   "target": "가톨릭대 동문장학금",
-   "added": "2026-08-02",
-   "fetched": false,
-   "schematized": false,
-   "tries": 6,
-   "lastTryAt": "2026-08-05",
-   "retired": true,
-   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
-  },
-  {
-   "id": "reg-catholic-lee",
-   "name": "이원길 장학금 (가톨릭대, 2026-2학기)",
-   "target": "이원길 장학금",
-   "added": "2026-08-02",
-   "fetched": true,
-   "schematized": true
-  },
-  {
-   "id": "reg-uos-daecheonggyo-helper",
-   "name": "청소년교육지원장학금 활동도우미 모집 (서울시립대)",
-   "target": "청소년교육지원장학금 활동도우미",
-   "added": "2026-08-02",
-   "fetched": true,
-   "schematized": true
-  },
-  {
-   "id": "auto-eab3b5eca780ec82aced95ad",
-   "name": "장학 2026년 서울미래인재재단 서울인재대학장학금 선발 안내(1학년 대상, 8.3.월 10시~8.10.월 15시)",
-   "target": "장학 2026년 서울미",
-   "added": "2026-08-02",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-notice7doarticleno866189",
-   "name": "2026-1 성적향상장학금 신청안내",
-   "target": "2026-1 성적향상장",
-   "added": "2026-08-02",
-   "fetched": true,
-   "schematized": true
-  },
-  {
-   "id": "reg-ewha-gasong",
-   "name": "(재)가송재단 장학생 (이화여대 접수, 2026-2학기)",
-   "target": "[학부] 2026학년도 2학기 가송재단 장학",
-   "fetched": true,
-   "schematized": true,
-   "lastTryAt": "2026-08-03"
-  },
-  {
-   "id": "reg-inha-gasong",
-   "name": "(재)가송재단 장학생 (인하대 접수, 2026-2학기)",
-   "target": "[학부-교외장학] 2026학년도 2학기 가송",
-   "fetched": true,
-   "schematized": true
-  },
-  {
-   "id": "reg-ssu-gasong",
-   "name": "(재)가송재단 장학생 (숭실대 접수, 2026-2학기)",
-   "target": "장학 ★ 2026학년도 2학기 가송재단 장학",
-   "fetched": true,
-   "schematized": true
-  },
-  {
-   "id": "auto-scho332279981artclviewdo",
-   "name": "2026-2 교내장학금 신청 안내(신/편입생, 재학생)",
-   "target": "2026-2 교내장학금",
-   "added": "2026-08-03",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-scho332277911artclviewdo",
-   "name": "[장학금 접수] 2026학년도 국가우수장학금(이공계) 신규장학생 선발 공고",
-   "target": "2026학년도 국가우수",
-   "added": "2026-08-03",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-knuackrnano2432no9979955",
-   "name": "2026학년도 (재)운해장학재단 장학생 신청 안내",
-   "target": "2026학년도 (재)운",
-   "added": "2026-08-03",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-knuackrnano2432no9910969",
-   "name": "2016학년도 (재)동원학술연구재단‘내 자서전 미리 쓰고 받는’섬김의 리더십 장학생 선발 안내",
-   "target": "2016학년도 (재)동",
-   "added": "2026-08-03",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-knuackrnano2432no9910966",
-   "name": "2014-2학기 사랑드림장학사업(삼성) 장학금 신청 안내",
-   "target": "2014-2학기 사랑드",
-   "added": "2026-08-03",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-jukr145233953artclviewdo",
-   "name": "5.18 기념재단-5.18 희망장학생 모집 공고",
-   "target": "5.18 기념재단-5.18 희망장학생 모집 공고",
-   "added": "2026-08-04",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-enoticedoarticleno273597",
-   "name": "[학생지원팀] 2026년도 산학협동재단 국내 외국인 근로자 자녀 장학생 선발 신청 안내 (~7월 13일(월)까지)",
-   "target": "2026년도 산학협동재단 국내 외국인 근로자 자녀 장학",
-   "added": "2026-08-04",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-nuackrprogboardno2514559",
-   "name": "2026학년도 제2학기 교내 장학생(재학생) 선발 계획 안내",
-   "target": "2026학년도 제2학기 교내 장학생(재학생) 선발 계획",
-   "added": "2026-08-04",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-pnoticedoarticleno365933",
-   "name": "[학부]2026 5.18 희망장학생 선발 안내",
-   "target": "2026 5.18 희망장학생 선발 안내",
-   "added": "2026-08-04",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-krbbskr844732artclviewdo",
-   "name": "[학부-교외장학] 2026학년도 2학기 사회적협동조합 신협사회공헌재단 소외계층 장학생 선발 안내",
-   "target": "2026학년도 2학기 사회적협동조합 신협사회공헌재단 소",
-   "added": "2026-08-04",
-   "fetched": true,
-   "schematized": true
-  },
-  {
-   "id": "auto-rnoticedoarticleno154854",
-   "name": "[서울캠퍼스] 2026년도 2학기 국가근로 및 교내봉사 장학생 선발안내",
-   "target": "2026년도 2학기 국가근로 및 교내봉사 장학생 선발안",
-   "added": "2026-08-05",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-skor478122799artclviewdo",
-   "name": "[글로벌] (생활비)2026-2학기 (재)하림장학재단 하림장학생 선발 안내 N",
-   "target": "(생활비)2026-2학기 (재)하림장학재단 하림장학생 ",
-   "added": "2026-08-05",
-   "fetched": true,
-   "schematized": true
-  },
-  {
-   "id": "auto-sknou51808271artclviewdo",
-   "name": "[장학] 2026학년도 2학기 중앙도서관 국가근로장학생 모집(~8.14.)",
-   "target": "2026학년도 2학기 중앙도서관 국가근로장학생 모집(~",
-   "added": "2026-08-08",
-   "fetched": true,
-   "schematized": true
-  },
-  {
-   "id": "auto-sknou51808214artclviewdo",
-   "name": "[장학] (교외근로) 2026학년도 2학기 출판문화원 국가근로장학생 모집 (~08.21.)",
-   "target": "(교외근로) 2026학년도 2학기 출판문화원 국가근로장",
-   "added": "2026-08-08",
-   "fetched": true,
-   "schematized": true
-  },
-  {
-   "id": "auto-nuackrprogboardno2514606",
-   "name": "2026학년도 대학생 청소년 AI 교육지원사업 장학생 추천 안내",
-   "target": "2026학년도 대학생 청소년 AI 교육지원사업 장학생 ",
-   "added": "2026-08-08",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-chonackrkor7986subviewdo",
-   "name": "[공지사항-기타공지] 2026-2학기 지성학Ⅱ 서포터즈 장학생 모집 안내",
-   "target": "2026-2학기 지성학Ⅱ 서포터즈 장학생 모집 안내",
-   "added": "2026-08-11",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-enoticedoarticleno767674",
-   "name": "[학생복지팀] (2026-2) 근로장학생(학기중) 신청 안내",
-   "target": "(2026-2) 근로장학생(학기중) 신청 안내",
-   "added": "2026-08-11",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-eknuackrhomeknusswsubhtm",
-   "name": "2026년 세종이도인재장학금 장학생(핵심인재육성) 모집 안내",
-   "target": "2026년 세종이도인재장학금 장학생(핵심인재육성) 모집",
-   "added": "2026-08-12",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-larshipdoarticleno373578",
-   "name": "[장애학생지원실] 2026-2 면학장학생 모집( ~8.13 17:00)",
-   "target": "2026-2 면학장학생 모집( ~8.13 17:00)",
-   "added": "2026-08-12",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-krbbskr845011artclviewdo",
-   "name": "[학부-교외장학] 2026학년도 2학기 인하대동문장학회 변호산 장학금 장학생 선발 공고",
-   "target": "2026학년도 2학기 인하대동문장학회 변호산 장학금 장",
-   "added": "2026-08-12",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-rnoticedoarticleno155093",
-   "name": "입학관리본부 입학사정관실 봉사장학생 모집(~8/19 19:00)",
-   "target": "입학관리본부 입학사정관실 봉사장학생 모집(~8/19 1",
-   "added": "2026-08-13",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-iceinfojanghakbidx893886",
-   "name": "[교양대학] 물리실험 준비실 국가근로 장학생 모집",
-   "target": "물리실험 준비실 국가근로 장학생 모집",
-   "added": "2026-08-13",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-otice06doarticleno139106",
-   "name": "2026년도 세종연구원 \"세종이도인재장학금-핵심인재육성분야(특기적성)\" 장학생 선발안내",
-   "target": "2026년도 세종연구원 \"세종이도인재장학금-핵심인재육성",
-   "added": "2026-08-13",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-jukr145234489artclviewdo",
-   "name": "[자연캠퍼스] 2026학년도 2학기 학기중 국가근로장학생(교내근로) 선발 안내",
-   "target": "2026학년도 2학기 학기중 국가근로장학생(교내근로) ",
-   "added": "2026-08-15",
-   "fetched": true,
-   "schematized": true
   },
   {
    "id": "auto-srchenable1srchvotetype1",
@@ -439,62 +69,6 @@
    "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
   },
   {
-   "id": "auto-o2432actionviewno9910969",
-   "name": "2016학년도 (재)동원학술연구재단‘내 자서전 미리 쓰고 받는’섬김의 리더십 장학생 선발 안내",
-   "target": "2016학년도 (재)동원학술연구재단‘내 자서전 미리 쓰",
-   "added": "2026-08-16",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-o2432actionviewno9910966",
-   "name": "2014-2학기 사랑드림장학사업(삼성) 장학금 신청 안내",
-   "target": "2014-2학기 사랑드림장학사업(삼성) 장학금 신청 안",
-   "added": "2026-08-16",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-oardid322606menuno200318",
-   "name": "공통 2026년 상반기 사랑나눔장학생 모집 공고",
-   "target": "공통 2026년 상반기 사랑나눔장학생 모집 공고",
-   "added": "2026-08-17",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-bbssc58943574artclviewdo",
-   "name": "2026년 미래이음 장학금 장학생 추가 선발 안내",
-   "target": "2026년 미래이음 장학금 장학생 추가 선발 안내",
-   "added": "2026-08-18",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-scho332276283artclviewdo",
-   "name": "[장학금 접수] 2026학년도 동원글로벌드리머 장학생 선발안내(기한 연장)",
-   "target": "2026학년도 동원글로벌드리머 장학생 선발안내(기한 연",
-   "added": "2026-08-18",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-doarticleno155260nocat35",
-   "name": "[홍익대학교 박물관] 전시 지킴이 봉사장학생 모집(학부)",
-   "target": "전시 지킴이 봉사장학생 모집(학부)",
-   "added": "2026-08-18",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-otice06doarticleno139168",
-   "name": "2026학년도 2학기 다우기술 SW장학생 선발 안내(~8월 21일 금요일 오전 9시까지)",
-   "target": "2026학년도 2학기 다우기술 SW장학생 선발 안내(~",
-   "added": "2026-08-19",
-   "fetched": true,
-   "schematized": false
-  },
-  {
    "id": "auto-ent2431261572artclviewdo",
    "name": "[글로벌][교외] 2026-2학기 다우기술 SW장학생 모집안내 (~8/24)",
    "target": "2026-2학기 다우기술 SW장학생 모집안내 (~8/2",
@@ -503,137 +77,9 @@
    "schematized": false
   },
   {
-   "id": "auto-5bnum57138cate0qidx57138",
-   "name": "[재난안전관리본부] 2026학년도 2학기 근로장학생(국가,교내) 모집",
-   "target": "2026학년도 2학기 근로장학생(국가,교내) 모집",
-   "added": "2026-08-19",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-ticedoarticleno231273172",
-   "name": "2026-2학기 제 24기 후기 삼원장학생 선발 안내",
-   "target": "2026-2학기 제 24기 후기 삼원장학생 선발 안내",
-   "added": "2026-08-19",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-otice06doarticleno138056",
-   "name": "수원 율천동 꿈키움 희망장학사업 장학생 선발 안내",
-   "target": "수원 율천동 꿈키움 희망장학사업 장학생 선발 안내",
-   "added": "2026-08-19",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-bbssc58943928artclviewdo",
-   "name": "일반공지 2026학년도 2학기 경방육영회 장학생 선발 신촌/국제",
-   "target": "일반공지 2026학년도 2학기 경방육영회 장학생 선발 ",
-   "added": "2026-08-21",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-otice06doarticleno139284",
-   "name": "2026학년도 하계 의료인공지능특화융합인재양성사업 협력활동우수 장학생 선발 안내(~9/6)",
-   "target": "2026학년도 하계 의료인공지능특화융합인재양성사업 협력",
-   "added": "2026-08-22",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-leno274954srcategoryid22",
-   "name": "[학생지원팀] 2026-2학기 장애학생 도우미 국가근로장학생(생활/이동/수업대필) 모집 (★~8월26일까지)",
-   "target": "2026-2학기 장애학생 도우미 국가근로장학생(생활/이",
-   "added": "2026-08-24",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-skor478120036artclviewdo",
-   "name": "[공통] 2026년 국가우수장학(이공계) 장학생 성적우수 및 재학중우수유형 장학금 신청 안내",
-   "target": "2026년 국가우수장학(이공계) 장학생 성적우수 및 재",
-   "added": "2026-08-25",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-skor478119944artclviewdo",
-   "name": "[글로벌] KICS 한국통신학회 장학금 지원 대상자 선발 지원자 모집 안내(ICT 관련 학과)",
-   "target": "KICS 한국통신학회 장학금 지원 대상자 선발 지원자 ",
-   "added": "2026-08-25",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-skor478119859artclviewdo",
-   "name": "[공통] 2026-1학기 장학사정관(릴레이쉽) 장학금 신청 안내",
-   "target": "2026-1학기 장학사정관(릴레이쉽) 장학금 신청 안내",
-   "added": "2026-08-25",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-larshipdoarticleno374112",
-   "name": "[교외장학] 2026학년도 제23회 안중근 장학생 모집(~09.16.(수)까지)",
-   "target": "2026학년도 제23회 안중근 장학생 모집(~09.16",
-   "added": "2026-08-25",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-bbssc58943954artclviewdo",
-   "name": "일반공지 2026학년도 2학기 유한재단 결손 및 다문화 가정 장학생 대체 추천(~8/30) 신촌/국제",
-   "target": "일반공지 2026학년도 2학기 유한재단 결손 및 다문화",
-   "added": "2026-08-27",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-krbbskr845189artclviewdo",
-   "name": "[학부-교외장학] 2026학년도 KT&G장학재단 대학 상상 장학사업 장학생 모집 안내",
-   "target": "2026학년도 KT&G장학재단 대학 상상 장학사업 장학",
-   "added": "2026-08-27",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-doarticleno155863nocat35",
-   "name": "홍익 메이커스페이스 26-2학기 봉사장학생 선발 안내",
-   "target": "홍익 메이커스페이스 26-2학기 봉사장학생 선발 안내",
-   "added": "2026-08-27",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-leno275081srcategoryid22",
-   "name": "[학생지원팀] 2026학년도 <성적우수장학생> 장학금 양도 신청 안내(-9/2, 15시까지)",
-   "target": "2026학년도 <성적우수장학생> 장학금 양도 신청 안내",
-   "added": "2026-08-27",
-   "fetched": true,
-   "schematized": false
-  },
-  {
    "id": "auto-ent2431264197artclviewdo",
    "name": "[글로벌][교외][일시지원] 2026-2학기 라성정형기 재단 장학생 모집",
    "target": "2026-2학기 라성정형기 재단 장학생 모집",
-   "added": "2026-08-28",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-jukr145234769artclviewdo",
-   "name": "[교외근로-인문캠퍼스] 2026년도 2학기 국가근로(교외) 장학생 모집 안내",
-   "target": "2026년도 2학기 국가근로(교외) 장학생 모집 안내",
-   "added": "2026-08-28",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-krbbskr845234artclviewdo",
-   "name": "[다문화융합연구소] 2026-2 다문화 탈북(이주 북한배경)학생 멘토링 장학금 사업' 대학(원)생 멘토 모집(~9/6)",
-   "target": "2026-2 다문화 탈북(이주 북한배경)학생 멘토링 장",
    "added": "2026-08-28",
    "fetched": true,
    "schematized": false
@@ -687,15 +133,6 @@
    "name": "[서울]2026년 대학생 청소년 AI교육지원장학금 대학생 멘토 모집 안내(~10/30)",
    "target": "2026년 대학생 청소년 AI교육지원장학금 대학생 멘토",
    "added": "2026-09-20",
-   "fetched": true,
-   "schematized": true,
-   "manual": "2026-09-24 세션이 원본을 보고 옮김(원칙 5 ②)"
-  },
-  {
-   "id": "auto-ent2431267416artclviewdo",
-   "name": "[서울][교외] 2026년 하나금융나눔재단 하나장학생 모집(~9/29)",
-   "target": "2026년 하나금융나눔재단 하나장학생 모집(~9/29)",
-   "added": "2026-09-21",
    "fetched": true,
    "schematized": true,
    "manual": "2026-09-24 세션이 원본을 보고 옮김(원칙 5 ②)"
@@ -765,14 +202,6 @@
    "lastTryAt": "2026-09-26",
    "retired": true,
    "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
-  },
-  {
-   "id": "auto-oardid322922menuno200318",
-   "name": "공통 [공통] 2026학년도 2학기 경희꿈도전장학 신청 안내",
-   "target": "공통 [공통] 2026학년도 2학기 경희꿈도전장학 신청",
-   "added": "2026-09-25",
-   "fetched": true,
-   "schematized": false
   },
   {
    "id": "auto-20ec9588eb82b40922ed9994",
@@ -887,62 +316,6 @@
    "schematized": false
   },
   {
-   "id": "auto-krbbskr845514artclviewdo",
-   "name": "[학부-교외장학] 2026년 하나장학생 선발 공고(수정)",
-   "target": "2026년 하나장학생 선발 공고(수정)",
-   "added": "2026-09-30",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-krbbskr845362artclviewdo",
-   "name": "[학부-국가장학] 2026학년도 2학기 중소기업취업연계 (희망사다리Ⅰ) 장학금 신청 안내",
-   "target": "2026학년도 2학기 중소기업취업연계 (희망사다리Ⅰ) ",
-   "added": "2026-09-30",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-krbbskr845263artclviewdo",
-   "name": "[학부-교외장학] 2026학년도 2학기 유한재단 장학생 선발 안내",
-   "target": "2026학년도 2학기 유한재단 장학생 선발 안내",
-   "added": "2026-09-30",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-leno275925srcategoryid22",
-   "name": "[장애학생지원센터] 2026학년도 2학기 장애학생 특별장학금 신청안내(-9/23/수, 17시까지)",
-   "target": "2026학년도 2학기 장애학생 특별장학금 신청안내(-9",
-   "added": "2026-09-30",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-notiphpcodes1301seq11120",
-   "name": "2026학년도 2학기 교내장학금 신청 안내 학생지원팀 2026-09-02 1,076",
-   "target": "2026학년도 2학기 교내장학금 신청 안내 학생지원팀 ",
-   "added": "2026-09-30",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-notiphpcodes1301seq11207",
-   "name": "2026학년도 2학기 화전중앙교회 장학금 신청 안내 학생지원팀 2026-09-21 344",
-   "target": "2026학년도 2학기 화전중앙교회 장학금 신청 안내 학",
-   "added": "2026-10-01",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-notiphpcodes1301seq10660",
-   "name": "2026학년도 산학협동재단 장학생 선발 안내 학생지원팀 2026-05-19 738",
-   "target": "2026학년도 산학협동재단 장학생 선발 안내 학생지원팀",
-   "added": "2026-10-01",
-   "fetched": true,
-   "schematized": false
-  },
-  {
    "id": "auto-notiphpcodes1301seq10610",
    "name": "세종연구원 2026년도 세종이도인재장학금 장학생 선발 안내 학생지원팀 2026-05-11 1,664",
    "target": "세종연구원 2026년도 세종이도인재장학금 장학생 선발 ",
@@ -975,25 +348,9 @@
    "schematized": false
   },
   {
-   "id": "auto-otice06doarticleno140265",
-   "name": "2026년 2학기 송화재단 장학생 선발 안내(~2026.10.07 오후 1시까지)",
-   "target": "2026년 2학기 송화재단 장학생 선발 안내(~2026",
-   "added": "2026-10-01",
-   "fetched": true,
-   "schematized": false
-  },
-  {
    "id": "auto-krbbskr845690artclviewdo",
    "name": "[학부-교외장학] 2026학년도 우양재단 동행 장학생 모집 안내",
    "target": "2026학년도 우양재단 동행 장학생 모집 안내",
-   "added": "2026-10-01",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-spxboardid5cate8key70545",
-   "name": "[장학안내] [우양재단] 2026년 우양재단 동행 장학생 모집 안내",
-   "target": "2026년 우양재단 동행 장학생 모집 안내",
    "added": "2026-10-01",
    "fetched": true,
    "schematized": false
@@ -1023,26 +380,10 @@
    "schematized": false
   },
   {
-   "id": "auto-780ec9b90ed8c80202026051",
-   "name": "2026학년도 산학협동재단 장학생 선발 안내 학생지원팀 2026-05-19 738",
-   "target": "2026학년도 산학협동재단 장학생 선발 안내 학생지원팀",
-   "added": "2026-10-02",
-   "fetched": true,
-   "schematized": false
-  },
-  {
    "id": "auto-otice06doarticleno140331",
    "name": "2026학년도 하나금융나눔재단 국내 하나장학생 모집 안내( ~2026년 10월 06일 (화) 오전 9시 까지)",
    "target": "2026학년도 하나금융나눔재단 국내 하나장학생 모집 안",
    "added": "2026-10-02",
-   "fetched": true,
-   "schematized": false
-  },
-  {
-   "id": "auto-notiphpcodes1301seq10871",
-   "name": "2026학년도 산학협동재단 장학생 선발 안내 학생지원팀 2026-05-19 738",
-   "target": "2026학년도 산학협동재단 장학생 선발 안내 학생지원팀",
-   "added": "2026-10-04",
    "fetched": true,
    "schematized": false
   },
@@ -1066,18 +407,6 @@
    "id": "auto-ervicenoticedetail520607",
    "name": "「2026 상반기 AI·ICT 인재 장학생 모집」 안내(대상: 서울시 서초구에 주소지를 둔 재학생)",
    "target": "「2026 상반기 AI·ICT 인재 장학생 모집」 안내",
-   "added": "2026-10-05",
-   "fetched": false,
-   "schematized": false,
-   "tries": 6,
-   "lastTryAt": "2026-10-06",
-   "retired": true,
-   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
-  },
-  {
-   "id": "auto-nuid100nttid30154ptabno5",
-   "name": "2026학년도 2학기 4·19선양재단 나라사랑 4·19 민주장학생 선발 공고",
-   "target": "2026학년도 2학기 4·19선양재단 나라사랑 4·19",
    "added": "2026-10-05",
    "fetched": false,
    "schematized": false,
@@ -1195,6 +524,30 @@
    "name": "[학생지원팀] 2026년 2학기 한국선원복지고용센터 선원가족장학생 선발 안내",
    "target": "2026년 2학기 한국선원복지고용센터 선원가족장학생 선",
    "added": "2026-10-08",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-krbbskr845764artclviewdo",
+   "name": "[학부-교외장학] 2026년도 2학기 명인다문화장학재단 대학 장학생 모집 안내",
+   "target": "2026년도 2학기 명인다문화장학재단 대학 장학생 모집",
+   "added": "2026-10-12",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-srchenable1srchvotetype1-159letz",
+   "name": "[교외] 2026학년도 2학기 춘곡장학회 장학생 선발",
+   "target": "2026학년도 2학기 춘곡장학회 장학생 선발",
+   "added": "2026-10-12",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-srchenable1srchvotetype1-1xgmtcs",
+   "name": "[교내] 2026학년도 2학기 장애학생(사랑나눔장학금 A, B) 신청 안내",
+   "target": "2026학년도 2학기 장애학생(사랑나눔장학금 A, B)",
+   "added": "2026-10-12",
    "fetched": true,
    "schematized": false
   }

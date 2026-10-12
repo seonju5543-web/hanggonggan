@@ -1,6 +1,6 @@
 {
  "school": "서울대학교",
- "updatedAt": "2026-10-11",
+ "updatedAt": "2026-10-12",
  "items": [
   {
    "title": "2026년 하반기 일운과학기술재단 장학생 선발 안내",
@@ -141,6 +141,24 @@
    "school": "서울대학교",
    "campus": "",
    "foundAt": "2026-10-04"
+  },
+  {
+   "title": "2026학년도 2학기 한국장학재단 학자금대출 안내[재학생]",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&pageIndex=2&uid=316",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-09-30"
+  },
+  {
+   "title": "2026학년도 2학기 한국장학재단 학자금대출 안내[수료생(연구생)]",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&pageIndex=2&uid=323",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-09-30"
   }
  ]
 }

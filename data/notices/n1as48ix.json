@@ -1,7 +1,21 @@
 {
  "school": "한국항공대학교",
- "updatedAt": "2026-10-11",
+ "updatedAt": "2026-10-12",
  "items": [
+  {
+   "title": "2026 하반기 은평구민 장학생 선발 공고 안내",
+   "url": "https://kau.ac.kr/kaulife/scholnoti.php?code=s1301&page=&mode=read&seq=11312",
+   "attachments": [
+    {
+     "name": "【붙임】 2026. 하반기 은평구민 장학생 선발 공고_합본.pdf",
+     "url": "https://kau.ac.kr/upfile/2026/10/12/20261012010527-6b1f.pdf"
+    }
+   ],
+   "deadlineHint": "지원기간 : 2026.10.06.(화) 10:00 ~ 10.21.(수) 23:59 우리 대학이 세계대학평가 QS 진입에 도전합니다. 총장메시지-",
+   "school": "한국항공대학교",
+   "campus": "",
+   "foundAt": "2026-10-12"
+  },
   {
    "title": "2027년도 대산농촌재단 장학생 선발 안내",
    "url": "https://kau.ac.kr/kaulife/scholnoti.php?code=s1301&page=&mode=read&seq=11301",
@@ -47,7 +61,7 @@
      "url": "https://kau.ac.kr/upfile/2026/09/01/20260901170431-9982.pdf"
     }
    ],
-   "deadlineHint": "접수기간 : 2026.10.15.(목) 13:30까지 2026 동계 어학연수 (Advanced Language Program)모집 안내 자세히",
+   "deadlineHint": null,
    "school": "한국항공대학교",
    "campus": "",
    "foundAt": "2026-09-30"
@@ -56,7 +70,7 @@
    "title": "2026년 국가근로장학금 동계방학 집중근로 프로그램 운영 안내",
    "url": "https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=&mode=read&seq=11237",
    "attachments": [],
-   "deadlineHint": "접수기간 : 2026.10.15.(목) 13:30까지 2026 동계 어학연수 (Advanced Language Program)모집 안내 자세히",
+   "deadlineHint": "신청기간 : 2026. 10. 30.(금 ) ~ 2026. 11. 12.(목 ) 3. 근로장학생 최종 선발 결과 공개 ○ 공개 일자 : 2026",
    "school": "한국항공대학교",
    "campus": "",
    "foundAt": "2026-09-30"
@@ -78,7 +92,7 @@
      "url": "https://kau.ac.kr/upfile/2026/09/14/20260914144337-6871.hwp"
     }
    ],
-   "deadlineHint": "접수기간 : 2026.10.15.(목) 13:30까지 2026 동계 어학연수 (Advanced Language Program)모집 안내 자세히",
+   "deadlineHint": "신청기간 : 2026. 9. 14( 월 ) ~ 9. 30( 수 ) 9. 신청방법 : 본교 학생역량관리시스템 온라인 신청 - https://scm",
    "school": "한국항공대학교",
    "campus": "",
    "foundAt": "2026-09-30"
@@ -96,7 +110,7 @@
      "url": "https://kau.ac.kr/upfile/2026/09/02/20260902103858-8690.hwp"
     }
    ],
-   "deadlineHint": "접수기간 : 2026.10.15.(목) 13:30까지 2026 동계 어학연수 (Advanced Language Program)모집 안내 자세히",
+   "deadlineHint": "접수 기간 : 2026. 9. 1( 화 ) ~ 9. 18( 금 ) * 접수기간은 상황에 따라 변동 될 수 있음 3. 신청양식 : 첨부 파일 참조",
    "school": "한국항공대학교",
    "campus": "",
    "foundAt": "2026-09-30"
@@ -110,7 +124,7 @@
      "url": "https://kau.ac.kr/upfile/2026/09/28/20260928062726-3313.hwpx"
     }
    ],
-   "deadlineHint": "접수기간 : 2026.10.15.(목) 13:30까지 2026 동계 어학연수 (Advanced Language Program)모집 안내 자세히",
+   "deadlineHint": "신청기간 : 2026. 9. 1.( 화 ) ~ 10. 8.( 목 ) 17:00 까지 ( 기간 연장 ) 라 . 신청방법 : 대전청년포털 ( www",
    "school": "한국항공대학교",
    "campus": "",
    "foundAt": "2026-09-30"
@@ -128,7 +142,7 @@
      "url": "https://kau.ac.kr/upfile/2026/09/28/20260928062233-9450.hwpx"
     }
    ],
-   "deadlineHint": "접수기간 : 2026.10.15.(목) 13:30까지 2026 동계 어학연수 (Advanced Language Program)모집 안내 자세히",
+   "deadlineHint": "신청기간 : 2026. 9. 28.( 월 ) 09:00 ~ 10. 30.( 금 ) 18:00 - 접 수 처 : 논산시청 인구청년교육과 교육지원팀",
    "school": "한국항공대학교",
    "campus": "",
    "foundAt": "2026-09-30"
@@ -142,7 +156,7 @@
      "url": "https://kau.ac.kr/upfile/2026/09/21/20260921083346-8795.hwpx"
     }
    ],
-   "deadlineHint": "접수기간 : 2026.10.15.(목) 13:30까지 2026 동계 어학연수 (Advanced Language Program)모집 안내 자세히",
+   "deadlineHint": "신청기간 : 2026. 9. 22.( 화 ) ~ 9. 30.( 수 ) 9. 향후 추진 일정 - 장학생 선발 및 공지 : 개별 안내 - 장학금 지",
    "school": "한국항공대학교",
    "campus": "",
    "foundAt": "2026-09-30"
@@ -160,7 +174,7 @@
      "url": "https://kau.ac.kr/upfile/2026/09/18/20260918004645-1742.hwp"
     }
    ],
-   "deadlineHint": "접수기간 : 2026.10.15.(목) 13:30까지 2026 동계 어학연수 (Advanced Language Program)모집 안내 자세히",
+   "deadlineHint": "접수 기간 : 2026. 9. 28. ( 월 ) ~ 10. 7. ( 수 ) 2. 선발 대상 : 공고일 현재 주민등록 주소지가 1 년 이상 춘천시",
    "school": "한국항공대학교",
    "campus": "",
    "foundAt": "2026-09-30"
@@ -169,7 +183,7 @@
    "title": "독일 정부초청(DAAD) 섬머코스 장학생 선발 안내",
    "url": "https://kau.ac.kr/kaulife/scholnoti.php?searchkey=&searchvalue=&code=s1301&page=&mode=read&seq=11193",
    "attachments": [],
-   "deadlineHint": "접수기간 : 2026.10.15.(목) 13:30까지 2026 동계 어학연수 (Advanced Language Program)모집 안내 자세히",
+   "deadlineHint": "마감 : 2026. 10. 30. ( 연 1 회 ) 라 . 장학금 내역 : 어학 강좌 수강료 , 숙소 , 일회성 용돈 (475 유로 ), 여행경",
    "school": "한국항공대학교",
    "campus": "",
    "foundAt": "2026-09-30"
@@ -183,7 +197,7 @@
      "url": "https://kau.ac.kr/upfile/2026/09/08/20260908160013-2236.hwpx"
     }
    ],
-   "deadlineHint": "접수기간 : 2026.10.15.(목) 13:30까지 2026 동계 어학연수 (Advanced Language Program)모집 안내 자세히",
+   "deadlineHint": "신청기간 : 2026. 9. 1.( 화 ) ~ 9. 23.( 수 ) 17:00 까지 라 . 신청방법 : 대전청년포털 ( https://daeje",
    "school": "한국항공대학교",
    "campus": "",
    "foundAt": "2026-09-30"
@@ -197,7 +211,7 @@
      "url": "https://kau.ac.kr/upfile/2026/09/07/20260907173749-7788.pdf"
     }
    ],
-   "deadlineHint": "접수기간 : 2026.10.15.(목) 13:30까지 2026 동계 어학연수 (Advanced Language Program)모집 안내 자세히",
+   "deadlineHint": "접수 기간 : 2026. 8. 24. ( 월 ) 09:00 ~ 9. 22. ( 화 ) 18:00 7. 선발 발표 : 2026 년 11 월 예정",
    "school": "한국항공대학교",
    "campus": "",
    "foundAt": "2026-09-30"
@@ -215,7 +229,7 @@
      "url": "https://kau.ac.kr/upfile/2026/09/04/20260904143553-6070.pdf"
     }
    ],
-   "deadlineHint": "접수기간 : 2026.10.15.(목) 13:30까지 2026 동계 어학연수 (Advanced Language Program)모집 안내 자세히",
+   "deadlineHint": "기한 : 2026. 9. 16. ( 수 ) 18:00 까지 ( 온 · 오프라인 동일 ) 구분 기한 내 가족관계확인 및 가구원 정보제공 동의를 하",
    "school": "한국항공대학교",
    "campus": "",
    "foundAt": "2026-09-30"
@@ -249,7 +263,7 @@
      "url": "https://kau.ac.kr/upfile/2026/09/04/20260904141320-3532.hwp"
     }
    ],
-   "deadlineHint": "접수기간 : 2026.10.15.(목) 13:30까지 2026 동계 어학연수 (Advanced Language Program)모집 안내 자세히",
+   "deadlineHint": "접수 기간 : 2026. 9. 10. ( 목 ) ~ 10. 8. ( 목 ) 5. 신청 방법 : 진흥원 홈페이지 [ 장학금 지원신청 ] 에서 학생",
    "school": "한국항공대학교",
    "campus": "",
    "foundAt": "2026-09-30"
@@ -263,7 +277,7 @@
      "url": "https://kau.ac.kr/upfile/2026/09/04/20260904140119-7015.hwpx"
     }
    ],
-   "deadlineHint": "접수기간 : 2026.10.15.(목) 13:30까지 2026 동계 어학연수 (Advanced Language Program)모집 안내 자세히",
+   "deadlineHint": "신청 기간 : 2026. 9. 2. ( 수 ) ~ 9. 23. ( 수 ) 17:00 5. 신청 방법 : 전자 우편 , 방문 , 등기우편 접수 가",
    "school": "한국항공대학교",
    "campus": "",
    "foundAt": "2026-09-30"
@@ -281,7 +295,7 @@
      "url": "https://kau.ac.kr/upfile/2026/09/01/20260901150621-7994.hwpx"
     }
    ],
-   "deadlineHint": "접수기간 : 2026.10.15.(목) 13:30까지 2026 동계 어학연수 (Advanced Language Program)모집 안내 자세히",
+   "deadlineHint": "신청기간 : 2026. 8. 31.( 월 ) 9:00 ∼ 2026. 9. 18.( 금 ) 18:00 ㅇ 신청방법 : 익산시 홈페이지 ( http",
    "school": "한국항공대학교",
    "campus": "",
    "foundAt": "2026-09-30"
@@ -299,7 +313,7 @@
      "url": "https://kau.ac.kr/upfile/2026/05/22/20260522102352-1712.pdf"
     }
    ],
-   "deadlineHint": "접수기간 : 2026.10.15.(목) 13:30까지 2026 동계 어학연수 (Advanced Language Program)모집 안내 자세히",
+   "deadlineHint": "신청 기간 : 2026. 6. 1. ( 월 ) ~ 7. 6. (월 ) ※ 2026. 7. 28. ( 화 ) 결과 발표 예정 5. 신청 방법 :",
    "school": "한국항공대학교",
    "campus": "",
    "foundAt": "2026-09-30",
@@ -322,7 +336,7 @@
      "url": "https://kau.ac.kr/upfile/2026/05/19/20260519163740-2144.pdf"
     }
    ],
-   "deadlineHint": "접수기간 : 2026.10.15.(목) 13:30까지 2026 동계 어학연수 (Advanced Language Program)모집 안내 자세히",
+   "deadlineHint": "신청 기간 : 2026. 7. 6. ( 월 ) ~ 7. 9. ( 목 ) 14:00 까지 8. 문의처 : 학생지원팀 ( ☎ 02-300-0023",
    "school": "한국항공대학교",
    "campus": "",
    "foundAt": "2026-09-30",
@@ -345,7 +359,7 @@
      "url": "https://kau.ac.kr/upfile/2026/05/11/20260511131344-2753.hwp"
     }
    ],
-   "deadlineHint": "접수기간 : 2026.10.15.(목) 13:30까지 2026 동계 어학연수 (Advanced Language Program)모집 안내 자세히",
+   "deadlineHint": null,
    "school": "한국항공대학교",
    "campus": "",
    "foundAt": "2026-09-30"
@@ -359,7 +373,7 @@
      "url": "https://kau.ac.kr/upfile/2026/05/06/20260506161710-1997.pdf"
     }
    ],
-   "deadlineHint": "접수기간 : 2026.10.15.(목) 13:30까지 2026 동계 어학연수 (Advanced Language Program)모집 안내 자세히",
+   "deadlineHint": "모집기간 : 2026. 5. 6.( 수 ) 10 시 ~ 5. 22.( 금 ) 17 시 2) 선발대상 : 한국장학재단 학자금 지원구간 5 구간 이",
    "school": "한국항공대학교",
    "campus": "",
    "foundAt": "2026-09-30"

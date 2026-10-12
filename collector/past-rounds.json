@@ -1,0 +1,237 @@
+{
+ "_comment": "등록 뒤 마감 경과로 뺀 로봇 등록분의 사업(지난 회차) — 같은 사업 글은 새로 등록하지 않고 컨펌 대기로 내린다(collector/past-rounds.mjs). 뺀 날부터 60일 뒤 지운다. 로봇이 쓴다 · 손으로 고치지 말 것.",
+ "items": [
+  {
+   "id": "auto-oardid322606menuno200318",
+   "name": "공통 2026년 상반기 사랑나눔장학생 모집 공고",
+   "school": "",
+   "deadline": "2026-07-30",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=322606&menuno=200318",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-oardid322922menuno200318",
+   "name": "공통 [공통] 2026학년도 2학기 경희꿈도전장학 신청 안내",
+   "school": "경희대학교",
+   "deadline": "2026-09-13",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=322922&menuno=200318",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-0ec82aced95admoddocument",
+   "name": "2026년 하반기 일운과학기술재단 장학생 선발 안내",
+   "school": "서울대학교",
+   "deadline": "2026-09-27",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?category1=장학공지&mod=document&uid=392",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-larshipdoarticleno375935",
+   "name": "[대청교] 2026학년도 2학기 대학생 청소년교육지원장학 멘토 추가 모집 안내",
+   "school": "아주대학교",
+   "deadline": "2026-09-21",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?articleno=375935",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-nuid100nttid30159ptabno5",
+   "name": "2026학년도 AX미래장학금 장학생 선발 공고",
+   "school": "중앙대학교",
+   "deadline": "2026-09-21",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/view.do?contents_no=5&menu_id=100&nttid=30159&p_tab_no=5",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-nuid100nttid30154ptabno5",
+   "name": "2026학년도 2학기 4·19선양재단 나라사랑 4·19 민주장학생 선발 공고",
+   "school": "중앙대학교",
+   "deadline": "2026-09-13",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/view.do?contents_no=5&menu_id=100&nttid=30154&p_tab_no=5",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-5bnum57138cate0qidx57138",
+   "name": "[재난안전관리본부] 2026학년도 2학기 근로장학생(국가,교내) 모집_모집완료",
+   "school": "서울과학기술대학교",
+   "deadline": "2026-08-24",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?bidx=894075&bnum=57138&cate=0&qidx=57138",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-2387viewdocurrentpageno1",
+   "name": "등록금외지원 2026년도 SL이충곤재단 장학금 신청 안내(공학계열)(생활비성 장학금)",
+   "school": "국민대학교",
+   "deadline": "2026-09-20",
+   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12387/view.do?currentpageno=1",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-2385viewdocurrentpageno1",
+   "name": "등록금외지원 2026년 제2학기 윤영문화재단 장학생 선발 공고(문화예술 분야 우대)",
+   "school": "국민대학교",
+   "deadline": "2026-09-20",
+   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12385/view.do?currentpageno=1",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-2349viewdocurrentpageno1",
+   "name": "등록금외지원 2026년 하반기 인재육성 장학생 선발 계획 공고",
+   "school": "국민대학교",
+   "deadline": "2026-09-23",
+   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12349/view.do?currentpageno=1",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-notice7doarticleno893809",
+   "name": "푸른등대 한국수력원자력 K-원전 신규장학생 선발안내",
+   "school": "세종대학교",
+   "deadline": "2026-09-28",
+   "url": "https://www.sejong.ac.kr/kor/intro/notice7.do?articleno=893809",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-ucd000000000000062seq698",
+   "name": "2026학년도 2학기 중소기업 취업연계 장학사업(희망사다리Ⅰ유형) 학생 신청 기간 안내",
+   "school": "",
+   "deadline": "2026-09-18",
+   "url": "https://onestop.pusan.ac.kr/page?menucd=000000000000062&seq=698",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-202026091720eca1b0ed9a8c",
+   "name": "2026년 2학기 파안장학 선발 안내",
+   "school": "",
+   "deadline": "2026-09-28",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766270",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-notice7doarticleno892571",
+   "name": "2026-2 희망사다리Ⅰ유형(중소기업취업연계) 장학금 신청 안내",
+   "school": "세종대학교",
+   "deadline": "2026-09-18",
+   "url": "https://www.sejong.ac.kr/kor/intro/notice7.do?articleno=892571",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-notice7doarticleno892517",
+   "name": "2026-2 희망사다리Ⅱ유형(고졸후학습지원) 장학금 신청 안내",
+   "school": "세종대학교",
+   "deadline": "2026-09-18",
+   "url": "https://www.sejong.ac.kr/kor/intro/notice7.do?articleno=892517",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-notice7doarticleno892486",
+   "name": "2026-2 푸른등대 기부장학사업 신규장학생 선발 안내",
+   "school": "세종대학교",
+   "deadline": "2026-09-10",
+   "url": "https://www.sejong.ac.kr/kor/intro/notice7.do?articleno=892486",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-krbbskr845514artclviewdo",
+   "name": "[학부-교외장학] 2026년 하나장학생 선발 공고(수정)",
+   "school": "인하대학교",
+   "deadline": "2026-09-23",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45514/artclView.do",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-krbbskr845362artclviewdo",
+   "name": "[학부-국가장학] 2026학년도 2학기 중소기업취업연계 (희망사다리Ⅰ) 장학금 신청 안내",
+   "school": "인하대학교",
+   "deadline": "2026-09-18",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45362/artclView.do",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-krbbskr845263artclviewdo",
+   "name": "[학부-교외장학] 2026학년도 2학기 유한재단 장학생 선발 안내",
+   "school": "인하대학교",
+   "deadline": "2026-09-08",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45263/artclView.do",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-leno275925srcategoryid22",
+   "name": "[장애학생지원센터] 2026학년도 2학기 장애학생 특별장학금 신청안내(-9/23/수, 17시까지)",
+   "school": "가톨릭대학교",
+   "deadline": "2026-09-23",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?articleno=275925&srcategoryid=22",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-notiphpcodes1301seq11120",
+   "name": "2026학년도 2학기 교내장학금 신청 안내",
+   "school": "한국항공대학교",
+   "deadline": "2026-09-18",
+   "url": "https://kau.ac.kr/kaulife/scholnoti.php?code=s1301&seq=11120",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-notiphpcodes1301seq11207",
+   "name": "2026학년도 2학기 화전중앙교회 장학금 신청 안내",
+   "school": "한국항공대학교",
+   "deadline": "2026-09-30",
+   "url": "https://kau.ac.kr/kaulife/scholnoti.php?code=s1301&seq=11207",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-notiphpcodes1301seq11156",
+   "name": "2026년 하반기 인재육성(성취) 장학생 선발 안내",
+   "school": "한국항공대학교",
+   "deadline": "2026-09-23",
+   "url": "https://kau.ac.kr/kaulife/scholnoti.php?code=s1301&seq=11156",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-notiphpcodes1301seq10681",
+   "name": "2026년 2학기 청년창업농장학금 신청 안내",
+   "school": "한국항공대학교",
+   "deadline": "2026-07-06",
+   "url": "https://kau.ac.kr/kaulife/scholnoti.php?code=s1301&seq=10681",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-notiphpcodes1301seq10871",
+   "name": "2026학년도 산학협동재단 장학생 선발 안내",
+   "school": "한국항공대학교",
+   "deadline": "2026-07-09",
+   "url": "https://kau.ac.kr/kaulife/scholnoti.php?code=s1301&seq=10871",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-q1brddate20260809brdseq1",
+   "name": "[국가/신청] ★2026-2학기 주거안정장학금 2..",
+   "school": "서울시립대학교",
+   "deadline": "2026-09-09",
+   "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdbbsseq=1&brddate=20260809&brdseq=1",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-q1brddate20260409brdseq1",
+   "name": "[교내/신청] 2026학년도 제1학기 형설장학금 ..",
+   "school": "서울시립대학교",
+   "deadline": "2026-04-15",
+   "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdbbsseq=1&brddate=20260409&brdseq=1",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-q1brddate20260821brdseq3",
+   "name": "[교외] 2026년 손태희장학재단 장학생 선발 안..",
+   "school": "서울시립대학교",
+   "deadline": "2026-09-08",
+   "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdbbsseq=1&brddate=20260821&brdseq=3",
+   "droppedAt": "2026-10-12"
+  },
+  {
+   "id": "auto-1bnum57138cate0qidx57138",
+   "name": "[국제대학] 2026학년도 2학기 유학생 학습지원 튜터 장학생(수학) 추가 모집 (마감)",
+   "school": "서울과학기술대학교",
+   "deadline": "2026-09-08",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?bidx=894671&bnum=57138&cate=0&qidx=57138",
+   "droppedAt": "2026-10-12"
+  }
+ ]
+}
