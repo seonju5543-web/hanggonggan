@@ -699,8 +699,19 @@ export default async function gate(eq, ctx) {
           buildStamp('w/worker.js', rf({ 'shared/g.mjs': 'export const a = 1;\r\n' }), ['w/wrangler.toml']) === buildStamp('w/worker.js', rf({ 'shared/g.mjs': 'export const a = 1;\n' }), ['w/wrangler.toml']),
           /^[0-9a-f]{12}$/.test(s0)],
         [true, false, false, false, true, true]);
-      /* (b) 실제 저장소 — 도장에 worker.js·toml·문지기(guard.mjs)가 들어 있고 · 서버는 /health 에 env.BUILD 를 내보인다(코드 글자 · 어디서나 엄격) */
+      /* (a') 주석 속 import 예문은 따라가지 않는다(리뷰 — server/README.md 에 그런 글이 있어 worker 주석에 옮겨 적으면 없는 파일에서 넘어진다) ·
+         여러 줄 중괄호 import 는 따라간다 · `export default {` 뒤 줄을 건너 아무 따옴표나 잡지 않는다 */
+      const tricky = {
+        'w/worker.js': "/* 예: import X from '../../nope.js' 꼴 */\n// import Y from './nope2.mjs'\nimport {\n  a,\n  b,\n} from '../shared/g.mjs';\nexport default {\n  x: 1,\n};\n// 뒤 주석 from './nope3.mjs'\nconst u = 'https://x/y';",
+        'shared/g.mjs': 'export const a = 1, b = 2;', 'w/wrangler.toml': 'name = "x"',
+      };
+      eq("  (a') 주석 속 import 예문·주석 줄은 안 따라가고 · 여러 줄 중괄호 import 는 따라간다",
+        bundleFiles('w/worker.js', rf(tricky), ['w/wrangler.toml']), ['shared/g.mjs', 'w/worker.js', 'w/wrangler.toml']);
+      /* (b) 실제 저장소 — 도장에 worker.js·toml·문지기(guard.mjs)가 들어 있고 · 전부 배포 워크플로가 보는 경로(server/push/·server/shared/) 안이다
+         (밖의 파일을 import 하면 그 파일을 고쳐도 배포가 안 걸려 매일 확인이 영영 '옛 판' — 리뷰) · 서버는 /health 에 env.BUILD 를 내보인다(코드 글자 · 어디서나 엄격) */
       const realFiles = bundleFiles();
+      eq('  (b) 도장에 든 파일이 전부 push-deploy.yml 의 paths(server/push/ · server/shared/) 안이다',
+        realFiles.filter((f) => !/^server\/(push|shared)\//.test(f)), []);
       eq('  (b) 실제 묶음 — worker.js · wrangler.toml · 문지기(server/shared/guard.mjs)가 도장에 든다 · 명령줄 도구가 12자리 도장을 찍는다',
         [realFiles.includes('server/push/worker.js'), realFiles.includes('server/push/wrangler.toml'), realFiles.includes('server/shared/guard.mjs'),
           (() => { const r = spawnSync(process.execPath, ['tools/push-build-stamp.mjs'], { cwd: rootDir, encoding: 'utf8', timeout: 20000 }); return r.status === 0 && /^[0-9a-f]{12}\n$/.test(r.stdout); })()],
@@ -721,6 +732,10 @@ export default async function gate(eq, ctx) {
       const pdRun = (id) => ((pdSteps.find((x) => x.id === id) || {}).run || '');
       eqDoc('  (d) 매일 확인(push-health.yml)이 저장소 도장(tools/push-build-stamp.mjs)을 HEALTH_EXPECT_BUILD 로 판정 도구에 넘긴다',
         [/EXPECT=\$\(node tools\/push-build-stamp\.mjs\)/.test(phProbe.run || ''), /HEALTH_EXPECT_BUILD="\$EXPECT" node tools\/push-health-verdict\.mjs/.test(phProbe.run || '')], [true, true]);
+      eqDoc('  (d) 배포 경보 라벨은 push-deploy(매일 확인의 push-health 라벨과 다르다 — 같으면 운영이 멀쩡한 날의 매일 확인이 배포 실패 경보를 닫는다) · 넘어짐 알림은 경보 셋이 안 다룬 실패 전부',
+        [pdSteps.filter((x) => /alert-issue/.test(x.uses || '') && !/mode: resolve/.test(x.raw || '')).every((x) => /label: push-deploy/.test(x.raw || '')) && pdSteps.some((x) => /label: push-deploy/.test(x.raw || '')),
+          pdSteps.some((x) => /robot-down/.test(x.uses || '') && /steps\.deploy\.outcome != 'failure' && steps\.verify\.outcome != 'failure' && steps\.keys\.outputs\.missing != 'true'/.test(x.if || ''))],
+        [true, true]);
       eqDoc('  (d) 배포 워크플로(push-deploy.yml) — 기본 브랜치 push(server/push·server/shared)와 버튼 · 체크아웃도 기본 브랜치 고정 · 도장을 --var BUILD 로 올린다 · 올린 뒤 /health build 를 읽어 대조한다 · 열쇠 없음은 경보 이슈 + 실패',
         [/on:\n\s+push:\n\s+branches: \[claude\/nice-heisenberg-WESq5\]\n\s+paths:\n(?:\s+- '[^']+'\n)+/.test(pd) && /- 'server\/push\/\*\*'/.test(pd) && /- 'server\/shared\/\*\*'/.test(pd) && /workflow_dispatch:/.test(pd),
           /ref: claude\/nice-heisenberg-WESq5/.test(pd),

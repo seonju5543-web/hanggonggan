@@ -20,8 +20,8 @@
                  갈라지면 경보 쪽으로 간다
      outdated  `lastSlot` 칸이 아예 없음 — 새 서버 코드가 아직 배포되지 않았다
      outdated  운영 판 도장(`build`)이 저장소의 도장(tools/push-build-stamp.mjs · HEALTH_EXPECT_BUILD)과 다르거나 없음 — 저장소에서 고친
-               서버 코드가 운영에 안 올라갔다(2026-10-12 · 알림 재발의 원인 — Cloudflare 의 GitHub 연결 빌드가 성공하고도 운영은 옛 판이었다).
-               도장을 안 넘기면(HEALTH_EXPECT_BUILD 없음) 이 줄은 건너뛴다
+               서버 코드가 운영에 안 올라갔다(2026-10-12 실측: 커밋 328cf445 의 GitHub 연결 빌드가 성공했는데 운영은 옛 판 — 알림 재발의 원인 후보 ·
+               폰 도달은 안 쟀다). 도장을 안 넘기면(HEALTH_EXPECT_BUILD 없음) 이 줄은 건너뛴다. 앞선 판정(error 등)이 이기면 why 끝에 덧붙인다
      stale     마지막으로 시작한 회차가 26시간보다 오래됨 — 두 회차(08:10·20:10) 연속 시작하지 않았다
                (06:17 확인의 정상 간격은 약 10시간 · 한 회차만 빠지면 약 22시간)
      error     구독에 깨우기를 보낸 마지막 회차(lastSentRun · sent > 0 만 적힌다 · 옛 서버면 lastRun)가 **살아 있는 구독에** 깨우기를 보냈는데(sent − dropped > 0)
@@ -53,7 +53,11 @@ export function slotTime(slot) {
 /** 순수 판정 — { curlOk, code, json, now } → { verdict, why, warnings[] } */
 export function verdict({ curlOk, code, json, now = Date.now(), expectBuild = '' } = {}) {
   const warnings = [];
-  const out = (v, why) => ({ verdict: v, why, warnings });
+  const want = String(expectBuild || '').trim();
+  const j0 = json && typeof json === 'object' ? json : null;
+  const stale_build = !!(want && j0 && String(j0.build || '') !== want);
+  // 다른 판정이 이겨도 '운영이 옛 판'은 같이 말한다 — 옛 판의 포기 기록(lastError)을 보고 대시보드로 가기 전에 배포 버튼부터 누르게(리뷰)
+  const out = (v, why) => ({ verdict: v, why: v !== 'outdated' && v !== 'down' && stale_build ? `${why} · 운영이 옛 판입니다(build=${j0.build == null ? '없음' : JSON.stringify(j0.build)} · 저장소 ${want}) — Actions 「푸시 서버 배포」` : why, warnings });
   if (!curlOk || Number(code) !== 200) return out('down', `서버가 응답하지 않습니다 (HTTP ${code || '없음'})`);
   const j = json && typeof json === 'object' ? json : null;
   if (!j) return out('down', '서버 응답을 읽지 못했습니다 (JSON 아님)');
@@ -67,8 +71,7 @@ export function verdict({ curlOk, code, json, now = Date.now(), expectBuild = ''
   if (!Object.prototype.hasOwnProperty.call(j, 'lastSlot')) {
     return out('outdated', '서버 응답에 lastSlot 칸이 없습니다 — 새 서버 코드(server/push/worker.js)가 아직 배포되지 않은 것으로 보입니다. Cloudflare → Workers → handaejang-push 의 배포 기록을 확인하세요');
   }
-  const want = String(expectBuild || '').trim();
-  if (want && String(j.build || '') !== want) {
+  if (stale_build) {
     return out('outdated', `운영에 도는 판(build=${j.build == null ? '없음' : JSON.stringify(j.build)})이 저장소의 판(${want})과 다릅니다 — 저장소에서 고친 서버 코드가 운영에 올라가지 않았습니다. Actions 「푸시 서버 배포」(push-deploy.yml)를 돌리세요(배포 열쇠 CLOUDFLARE_API_TOKEN·CLOUDFLARE_ACCOUNT_ID 가 있어야 합니다 — server/push/README.md). 대시보드나 GitHub 연결 빌드로 올린 판은 도장이 없어 늘 '옛 판'으로 보입니다`);
   }
   if (j.lastSlot == null) {
