@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-10-12",
- "count": 1896,
+ "count": 1897,
  "items": [
   {
    "title": "[공통][교외]2026년도 하반기 은평구민장학재단 장학생 선발 공고(~10/28)",
@@ -436,6 +436,15 @@
    "attachments": [],
    "deadlineHint": null,
    "school": "국민대학교",
+   "campus": "",
+   "foundAt": "2026-10-12"
+  },
+  {
+   "title": "[교외-마감]2026학년도 2학기 송화재단 장학생 선발 안내(학교지원)",
+   "url": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjMlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
+   "attachments": [],
+   "deadlineHint": "접수기간: 2026.10.2(금) 9시 ~ 2026.10.12(월) 17시 5. 제출 서류: 각 1부씩 제출, 2026.10월 이후 발급분만 인",
+   "school": "고려대학교",
    "campus": "",
    "foundAt": "2026-10-12"
   },

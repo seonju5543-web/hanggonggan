@@ -20,11 +20,7 @@
   "checkedAt": "2026-09-30"
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318": {
-  "ok": true,
-  "way": {
-   "kind": "page",
-   "param": "pageIndex"
-  },
+  "ok": false,
   "checkedAt": "2026-10-12"
  },
  "https://dep.hufs.ac.kr/student/12767/subview.do": {

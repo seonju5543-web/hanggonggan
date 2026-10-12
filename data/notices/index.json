@@ -3,6 +3,10 @@
  "updatedAt": "2026-10-12",
  "schools": 43,
  "files": {
+  "고려대학교": {
+   "file": "n1lw6ycq.json",
+   "count": 14
+  },
   "서강대학교": {
    "file": "n14n199r.json",
    "count": 30
@@ -90,10 +94,6 @@
   "상명대학교": {
    "file": "n1ozjjw8.json",
    "count": 5
-  },
-  "고려대학교": {
-   "file": "n1lw6ycq.json",
-   "count": 14
   },
   "연세대학교 미래캠퍼스": {
    "file": "n1if6uwu.json",

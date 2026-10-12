@@ -574,6 +574,30 @@
    "added": "2026-10-12",
    "fetched": true,
    "schematized": true
+  },
+  {
+   "id": "auto-otice06doarticleno140050",
+   "name": "2027학년도 1학기 新대학원우수장학금 선발 안내(추천서 접수: 9.23.(수)~10.13.(화))",
+   "target": "2027학년도 1학기 新대학원우수장학금 선발 안내(추천",
+   "added": "2026-10-12",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-ticedoarticleno231554919",
+   "name": "2026-2학기 다문화가정 장학금 신청 안내",
+   "target": "2026-2학기 다문화가정 장학금 신청 안내",
+   "added": "2026-10-12",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-ticedoarticleno231554921",
+   "name": "2026-2학기 3대 동문가족 특별장학금 신청 안내",
+   "target": "2026-2학기 3대 동문가족 특별장학금 신청 안내",
+   "added": "2026-10-12",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }
