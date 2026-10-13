@@ -235,6 +235,13 @@
       "note": "로봇이 스스로 찾음 — 2026 시안장학회 장학생",
       "addedAt": "2026-10-01",
       "strike": 0
+    },
+    {
+      "url": "https://owlapply.com/ko/ai-dogu/jagisogeseo-saengseong",
+      "kind": "*",
+      "note": "로봇이 스스로 찾음 — 자기소개서 빌더",
+      "addedAt": "2026-10-13",
+      "strike": 0
     }
   ],
   "_큐": "규칙이 모자란 종류. 로봇이 스스로 채우고, 개발자가 그 종류의 주소를 seeds 에 넣어 주면 비워진다.",
@@ -247,7 +254,7 @@
     },
     {
       "url": "https://brunch.co.kr/keyword/%EC%9E%90%EC%86%8C%EC%84%9C",
-      "seenAt": "2026-08-24",
+      "seenAt": "2026-10-13",
       "why": "규칙 0종"
     },
     {
@@ -336,18 +343,13 @@
       "why": "규칙 0종"
     },
     {
-      "url": "https://owlapply.com/ko/ai-dogu/jagisogeseo-saengseong",
-      "seenAt": "2026-09-01",
-      "why": "규칙 0종"
-    },
-    {
       "url": "https://www.skillagit.com/people/people_view.php?b_id=008&idx=728",
-      "seenAt": "2026-09-05",
+      "seenAt": "2026-10-13",
       "why": "규칙 0종"
     },
     {
       "url": "https://community.linkareer.com/employment_data/5101410",
-      "seenAt": "2026-09-05",
+      "seenAt": "2026-10-13",
       "why": "규칙 0종"
     },
     {
@@ -383,6 +385,16 @@
     {
       "url": "https://community.linkareer.com/hothot",
       "seenAt": "2026-10-06",
+      "why": "규칙 0종"
+    },
+    {
+      "url": "https://linkareer.com/stem-community/stem-career-mentor/6616861",
+      "seenAt": "2026-10-13",
+      "why": "규칙 0종"
+    },
+    {
+      "url": "https://www.skillagit.com/people/people_view.php?b_id=008&idx=765",
+      "seenAt": "2026-10-13",
       "why": "규칙 0종"
     }
   ],
