@@ -12381,9 +12381,9 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
     !!(GGm.FILE_LABELS || []).find((l) => l.path === 'collector/external-sources.json' && /출처/.test(l.name) && /게시판/.test(l.after || '')), true);
   const wfSave = wf.indexOf('git add collector/kosaf-hunt.json');
   const wfGate = wf.indexOf('node verify/test-collector.mjs');
-  eq('  kosaf-hunt.yml — 저장 **앞**에 규칙 관문(always · continue-on-error · dry 는 건너뜀) · 빨가면 gate-guard 가 외부 출처 목록만 되돌려 다시 잰다(GATE_CMD 는 규칙 관문만) · 넘어지면 그 파일을 직전 판으로',
+  eq('  kosaf-hunt.yml — 저장 **앞**에 규칙 관문(always · continue-on-error · dry 는 건너뜀) · 되돌리기도 always(사냥이 잘려도 되돌리고 저장) · 빨가면 gate-guard 가 외부 출처 목록만 되돌려 다시 잰다(GATE_CMD 는 규칙 관문만) · 넘어지면 그 파일을 직전 판으로',
     [wfGate > 0 && wfGate < wfSave, /name: 데이터 관문\n\s+id: audit\n\s+if: always\(\) && !inputs\.dry\n\s+continue-on-error: true/.test(wf),
-      /id: guard\n\s+if: steps\.audit\.outcome == 'failure'\n\s+timeout-minutes: \d+/.test(wf),
+      /id: guard\n\s+if: always\(\) && steps\.audit\.outcome == 'failure'\n\s+timeout-minutes: \d+/.test(wf),
       /GATE_CMD='node verify\/test-collector\.mjs' node collector\/gate-guard\.mjs --report collector\/kosaf-hunt-report\.md --note \/tmp\/gate-note\.md --stage collector\/external-sources\.json \|\| git checkout -- collector\/external-sources\.json/.test(wf)],
     [true, true, true, true]);
   eq('  저장·확인 로봇 깨우기는 관문이 초록일 때만(처음 통과 · 되돌려서 통과 · 다시 재니 통과) — 끝내 빨가면 저장하지 않고 빨간불로 끝낸다 · 경보 짝(같은 제목 둘 · 되돌린 단락을 그대로 싣는다)',

@@ -48,7 +48,8 @@ jobs:
     if: github.ref_name == 'claude/nice-heisenberg-WESq5'
     env:
       NODE_EXTRA_CA_CERTS: collector/certs/bundle.pem
-    timeout-minutes: 22
+    # 상한 > 단계 합: 준비(checkout·playwright) ~3 + 사냥 예산 9 + 관문 4 + 되돌리기 5 + 저장·경보 ~3 = 24 → 여유 두고 28 (관문이 느린 날 저장·경보가 잘리지 않게)
+    timeout-minutes: 28
     steps:
       - uses: actions/checkout@v4
         with:
@@ -83,7 +84,7 @@ jobs:
       #    상한 5분 = 관문 최대 두 번 + 여유(관문 한 번 ~55초 · 2026-10-11 실측).
       - name: 관문 실패 시 외부 출처 목록 되돌리기
         id: guard
-        if: steps.audit.outcome == 'failure'
+        if: always() && steps.audit.outcome == 'failure'
         timeout-minutes: 5
         run: |
           GATE_CMD='node verify/test-collector.mjs' node collector/gate-guard.mjs --report collector/kosaf-hunt-report.md --note /tmp/gate-note.md --stage collector/external-sources.json || git checkout -- collector/external-sources.json
@@ -134,13 +135,13 @@ jobs:
             reverted-files) result="외부 출처 목록을 되돌려서 통과 — 후보·장부는 저장" ;;
             still-failing)  result="되돌려도 빨간불 — 이번 결과는 저장하지 않음" ;;
             flaky)          result="다시 재니 통과(되돌린 것 없음)" ;;
-            *)              result="되돌리기 도구가 넘어져 외부 출처 목록을 직전 판으로 돌림 — 이번 결과는 저장하지 않음" ;;
+            *)              result="되돌리기 단계가 결과를 남기지 못함(넘어짐·건너뜀·시간 초과) — 이번 결과는 저장하지 않음" ;;
           esac
           {
             echo "🎯 층2 재단 글 사냥꾼: 🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **데이터 관문(test-collector) 실패** — $result"
             echo
             if [ -n "${{ steps.guard.outputs.gate }}" ] && [ -s /tmp/gate-note.md ]; then cat /tmp/gate-note.md
-            else echo "> 되돌리기 도구가 결과를 남기지 못해 외부 출처 목록(collector/external-sources.json)을 직전 판으로 돌렸습니다."; fi
+            else echo "> 되돌리기 단계가 결과를 남기지 못했습니다(넘어짐·건너뜀·시간 초과) — 이번 결과는 저장하지 않았습니다."; fi
             echo
             echo "실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '사냥꾼 관문 실패 확인해줘'라고 지시하세요."
           } > /tmp/gate-issue.md
