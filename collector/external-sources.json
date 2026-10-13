@@ -741,17 +741,8 @@
   {
    "host": "재단법인 석성장학회",
    "home": "http://www.seoksung.co.kr/",
-   "boardUrl": "http://www.seoksung.co.kr/cms/bbs/board.php?bo_table=nanum",
-   "seed": "kosaf-open",
-   "autoFound": {
-    "date": "2026-10-13",
-    "signals": 2,
-    "menu": "층2 글 사냥꾼 · 층2 공고 글을 고른 쪽 · (재)석성장학회 › 나눔과 섬김의 세상",
-    "sample": [
-     "석성장학회, 2026년도 석성선행장학금 585명에 2억7천만원 전달",
-     "석성장학회, 2024년도 석성선행장학금 605명에 2억6천만원 전달"
-    ]
-   }
+   "boardUrl": null,
+   "seed": "kosaf-open"
   },
   {
    "host": "(재)인제군장학회",

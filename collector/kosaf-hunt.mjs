@@ -18,7 +18,11 @@
    앞으로 — 글을 찾은 쪽(또는 공고가 3건 이상인 쪽)은 재단 게시판으로 external-sources.json 에 적는다(autoFound · find-boards 와 같은 자리).
      그러면 재단·지자체 수집 로봇이 날마다 그 게시판을 읽고(data/external.json), 층2 짝짓기(kosafMatches)가 새 회차 글을 스스로 짝짓는다.
      층2 공고가 새로 들어오면(월·목 kosaf-fetch) 다음 날 이 로봇이 그 재단을 다시 본다.
-   🔴 검색 엔진은 쓰지 않는다(열쇠가 없다 — NAVER_CLIENT_ID/SECRET 가 생기면 ⑤ 검색 길을 여기에 더한다 · 지금은 홈페이지 길만).
+   ⑤ 검색 길 (2026-10-13 · 은서 — 사장님 "네이버 검색 API 발급받아서 넣어 줄 수 있음?") — 홈페이지 길로 글을 못 고른 공고(홈페이지를 못 연 재단 포함)만
+     네이버 웹문서 검색에 「재단 이름 + 사업 이름 + 공고」를 묻는다. 결과 중 **그 재단 사이트의 글 주소**(hostAllowed · looksLikePost)만 남겨 같은 점수 규칙
+     (pickKosafPost)으로 고르고, 후보 줄 source 'search'(검색 결과 제목은 증거로만 — 확인 로봇이 학생처럼 열어 본 뒤에야 앱에 실린다).
+     🔴 열쇠(GitHub Secrets NAVER_CLIENT_ID · NAVER_CLIENT_SECRET)가 없으면 이 길은 조용히 꺼진다 — 리포트에 '꺼짐(열쇠 없음)'으로 적는다.
+     🔴 한 실행 검색 상한 SEARCH_MAX(기본 60 — 무료 한도 하루 25,000번에 한참 못 미친다) · 검색 사이 틈 · 실패가 연달아 3번이면 그 실행은 검색을 멈춘다.
    🔴 같은 재단은 3일에 한 번(KOSAF_HUNT_RETRY_DAYS) · 한 재단 요청 10번 상한 · 전체 예산(KOSAF_HUNT_MS · 9분) 안에 스스로 끝낸다.
    실행: node collector/kosaf-hunt.mjs [--dry] [--all] [--only=호스트조각] [--no-browser]
    관문: verify/test-collector.mjs 「층2 재단 글 사냥꾼」 (순수 함수 — KOSAF_HUNT_AS_LIB=1 이면 본편을 건너뛴다)
@@ -40,11 +44,13 @@ const SL = require('../source-link.js');
 const HERE = fileURLToPath(new URL('.', import.meta.url));
 export const RETRY_DAYS = Number(process.env.KOSAF_HUNT_RETRY_DAYS || 3);
 export const MAX_PAGES_PER_HOST = 10;
-export const BOARD_MIN_SIGNALS = 3;        // find-boards 와 같은 문턱(글을 고른 쪽은 문턱 없이 게시판)
+export const BOARD_MIN_SIGNALS = 3;        // find-boards 와 같은 문턱 — 글을 고른 쪽도 이 문턱을 넘어야 게시판으로 적는다(2026-10-13: 공고 2건뿐인 소식 쪽이 재단 게시판으로 적혀 관문 「자동으로 찾은 게시판에는 증거」가 빨개졌다)
 const BUDGET_MS = Number(process.env.KOSAF_HUNT_MS || 9 * 60 * 1000);
 const PAGE_MS = 20000;
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
 export const BY = '로봇(층2 글 사냥꾼)';
+export const SEARCH_MAX = Number(process.env.KOSAF_HUNT_SEARCH_MAX || 60);
+const SEARCH_URL = 'https://openapi.naver.com/v1/search/webkr.json';
 const NOTE = '층2 재단 장학금의 개별 공고 후보 — 로봇(collector/kosaf-hunt.mjs)이 재단 홈페이지를 뒤져 적는다. 사람 후보 파일(link-candidates.json)과 같은 줄 꼴. 원문 링크 확인 로봇이 학생처럼 열어 확인한 것만 앱(data/link-check.json fix)에 실린다. 손으로 고치지 말 것 — 다음 실행이 다시 쓴다.';
 
 /* ── 순수 함수 ──────────────────────────────────────────────────────── */
@@ -114,11 +120,44 @@ export function huntLines(group, pages, { today = '' } = {}) {
   }
   /* 게시판으로 적을 쪽 — 글을 고른 **안쪽** 쪽이 먼저, 없으면 공고가 문턱 이상인 안쪽 쪽. 홈은 적지 않는다(수집 로봇이 홈 메뉴를 글로 읽는다) */
   const boards = [];
-  const pickedInner = found.map((f) => f.page).find((p) => (p.level || 0) > 0);
+  const pickedInner = found.map((f) => f.page).find((p) => (p.level || 0) > 0 && p.board.signals >= BOARD_MIN_SIGNALS);
   const boardPage = pickedInner || boardLike.find((p) => p.board.signals >= BOARD_MIN_SIGNALS) || null;
   if (boardPage) boards.push({ url: boardPage.url, menu: boardPage.title || '', signals: boardPage.board.signals, sample: boardPage.board.sample, byPick: !!pickedInner });
   return { lines, found, boards };
 }
+/** ⑤ 검색 길 — 열쇠 두 칸이 다 있어야 켜진다(하나라도 비면 null · 꺼짐) */
+export function searchKeys(env = process.env) {
+  const id = String((env && env.NAVER_CLIENT_ID) || '').trim(); const secret = String((env && env.NAVER_CLIENT_SECRET) || '').trim();
+  return id && secret ? { id, secret } : null;
+}
+/** 물을 말 — 재단 이름 + 사업 이름 + 공고 (재단 이름이 사업 이름에 이미 들어 있으면 한 번만) */
+export function searchQuery(t) {
+  const org = String((t && t.org) || '').trim(); const prog = String((t && t.program) || '').trim();
+  return [org, prog && org && prog.includes(org) ? '' : prog, '공고'].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+}
+/** 네이버 검색 응답 → 글 줄 — 그 재단 사이트의 글 주소만 · 제목의 <b> 강조·기호를 걷는다 */
+export function searchRows(json, allowed) {
+  const items = json && Array.isArray(json.items) ? json.items : [];
+  const clean = (x) => SL.decodeUrlEntities(String(x || '').replace(/<[^>]*>/g, '')).replace(/&(quot|#39|apos|amp|lt|gt);/g, (m, k) => ({ quot: '"', '#39': "'", apos: "'", amp: '&', lt: '<', gt: '>' })[k]).replace(/\s+/g, ' ').trim();
+  const seen = new Set(); const out = [];
+  for (const it of items) {
+    const u = normCandUrl(SL.decodeUrlEntities(String((it && it.link) || '')));
+    const title = clean(it && it.title);
+    if (!title || !/^https?:/i.test(u) || !hostAllowed(u, allowed) || SL.linkShape(u) !== 'page' || !looksLikePost(u)) continue;
+    const k = urlKey(u);
+    if (seen.has(k)) continue;
+    seen.add(k); out.push({ url: u, title });
+  }
+  return out;
+}
+/** 공고 하나의 검색 결과 → 후보 줄 하나(못 고르면 null) */
+export function searchLine(t, rows, query, { today = '' } = {}) {
+  const got = pickKosafPost(t, rows);
+  if (!got) return null;
+  return { target: { ds: 'kosaf', key: t.key }, url: got.p.url, title: got.p.title, source: 'search', query, by: BY, addedAt: today,
+    note: `네이버 검색에서 고름 — ${got.why.join(' · ')}`, ...((t.alsoCodes || []).length ? { also: t.alsoCodes.filter((c) => c !== t.key) } : {}) };
+}
+
 /** 찾은 게시판을 external-sources 에 — 있던 줄(홈 호스트 같음 또는 host 이름 같음)의 빈 boardUrl 을 채우거나 새 줄을 더한다. 사람이 적은 boardUrl 은 건드리지 않는다 */
 export function recordBoard(cfg, group, board, { today = '' } = {}) {
   const sources = (cfg.sources = cfg.sources || []);
@@ -223,6 +262,13 @@ async function crawlSite(group, { useBrowser, budget, log }) {
   return { pages, why: '' };
 }
 
+async function naverSearch(keys, query) {
+  const res = await fetch(`${SEARCH_URL}?query=${encodeURIComponent(query)}&display=10`, {
+    headers: { 'X-Naver-Client-Id': keys.id, 'X-Naver-Client-Secret': keys.secret }, signal: AbortSignal.timeout(PAGE_MS) });
+  if (!res.ok) throw new Error(`검색 응답 ${res.status}`);
+  return res.json();
+}
+
 /* ── 본편 ──────────────────────────────────────────────────────────── */
 export async function runHunt({ root, today, dry = false, all = false, only = '', useBrowser = true, log = console.log } = {}) {
   const P = (rel) => path.join(root, rel);
@@ -240,6 +286,8 @@ export async function runHunt({ root, today, dry = false, all = false, only = ''
   const due = groups.filter((g) => all || daysAgo((state.hosts[g.host] || {}).checkedAt) >= RETRY_DAYS);
   const huntedKeys = new Set(); const newLines = []; const report = [];
   const stats = { groups: groups.length, due: due.length, hunted: 0, found: 0, boardLines: 0, boardsAdded: 0, boardsFilled: 0, noPage: 0, nothing: 0 };
+  const keys = searchKeys(); const leftover = [];   // 홈페이지 길로 글을 못 고른 공고 — ⑤ 검색 길이 받는다
+  const sstat = { asked: 0, found: 0, failed: 0, why: '' };
   const R = (s) => report.push(s);
   let stopNote = '';
   try {
@@ -253,10 +301,13 @@ export async function runHunt({ root, today, dry = false, all = false, only = ''
       stats.noPage += 1;
       state.hosts[g.host] = { checkedAt: today, why, targets: g.targets.length };
       R(`- 🔴 **${g.org || g.host}** (${g.targets.length}건: ${names}) — ${why}`);
+      leftover.push(...g.targets);
       continue;
     }
     const { lines, found, boards } = huntLines(g, pages, { today });
     newLines.push(...lines);
+    const picked = new Set(found.map((f) => f.t.key));
+    leftover.push(...g.targets.filter((t) => !picked.has(t.key)));
     stats.found += found.length; stats.boardLines += lines.filter((l) => l.board).length;
     let boardNote = '';
     for (const b of boards) {
@@ -269,6 +320,24 @@ export async function runHunt({ root, today, dry = false, all = false, only = ''
     else if (lines.length) R(`- 🟡 **${g.org || g.host}** (${g.targets.length}건: ${names}) — 글은 못 고르고 게시판처럼 보이는 쪽만: ${lines[0].board}${boardNote}`);
     else { stats.nothing += 1; R(`- ⚪ ${g.org || g.host} (${g.targets.length}건: ${names}) — 쪽 ${pages.length}개를 봤지만 공고 글 줄이 없음(메뉴 두 단계 안에 게시판이 없거나 스크립트로만 그림)`); }
   }
+  /* ⑤ 검색 길 — 열쇠가 있을 때만 · 홈페이지 길로 못 고른 공고만 · 상한·예산 안에서 */
+  if (!keys) sstat.why = '꺼짐(열쇠 없음 — GitHub Secrets NAVER_CLIENT_ID · NAVER_CLIENT_SECRET)';
+  else {
+    const searched = [];
+    for (const t of leftover) {
+      if (sstat.asked >= SEARCH_MAX) { sstat.why = `상한 ${SEARCH_MAX}번 — 나머지는 다음 실행`; break; }
+      if (!budget.hasRoom(PAGE_MS)) { sstat.why = '예산이 다 됨 — 나머지는 다음 실행'; break; }
+      if (sstat.failed >= 3) { sstat.why = '검색 실패가 3번 — 이번 실행은 멈춤(열쇠·한도를 확인)'; break; }
+      const q = searchQuery(t);
+      sstat.asked += 1;
+      let json = null;
+      try { json = await naverSearch(keys, q); } catch (e) { sstat.failed += 1; log(`  검색 실패: ${q} — ${String((e && e.message) || e).slice(0, 60)}`); continue; }
+      const line = searchLine(t, searchRows(json, t.allowed), q, { today });
+      if (line) { newLines.push(line); sstat.found += 1; searched.push(`  - ${t.program || t.key} → ${line.title} (${line.note.replace(/^네이버 검색에서 고름 — /, '')})\n    ${line.url}`); }
+      await new Promise((r) => setTimeout(r, 300));
+    }
+    if (searched.length) R(`- 🔎 **네이버 검색으로 고른 글** ${searched.length}건\n${searched.join('\n')}`);
+  }
   } catch (e) { stopNote = `⚠️ 도중에 넘어짐(${String((e && e.message) || e).slice(0, 80)}) — 그때까지 본 것은 저장`; log(stopNote); }
   finally { if (browser) { await withDeadline(browser.close().catch(() => {}), 8000); browser = null; } }
   /* 합치기 — 마감 지났거나 fix 가 생긴 대상의 줄은 버린다(only 와 무관하게 살아 있는 대상 전체로 잰다) */
@@ -278,6 +347,7 @@ export async function runHunt({ root, today, dry = false, all = false, only = ''
     `## 🧭 층2 재단 글 사냥꾼 리포트 (${today})`, '',
     '한국장학재단이 아는 재단 장학금을 **그 재단 홈페이지의 개별 공고 글**로 보내기 위해 재단 홈페이지를 뒤져 후보를 적었습니다. 앱에 싣는 것은 원문 링크 확인 로봇이 학생처럼 열어 확인한 뒤입니다.',
     `대상 재단 ${stats.groups}곳(마감 전 층2 공고 ${groups.reduce((n, g) => n + g.targets.length, 0)}건) · 이번에 본 곳 ${stats.hunted}/${stats.due} · 글을 고름 ${stats.found}건 · 게시판만 ${stats.boardLines}건 · 홈페이지 못 엶 ${stats.noPage}곳 · 아무것도 못 찾음 ${stats.nothing}곳 · 재단 게시판 새로 ${stats.boardsAdded} / 채움 ${stats.boardsFilled}${stopNote ? ` — ${stopNote}` : ''}`,
+    `검색 길: ${keys ? `${sstat.asked}번 물어 글 ${sstat.found}건${sstat.failed ? ` · 실패 ${sstat.failed}` : ''}${sstat.why ? ` — ${sstat.why}` : ''}` : sstat.why}`,
     `후보 파일 줄 ${check.ok.length}개(쓰지 못한 줄 ${check.bad.length}) — 확인 로봇(link-check · 후보 모드)이 엽니다.`, '',
     ...report, '',
   ].join('\n');

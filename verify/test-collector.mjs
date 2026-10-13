@@ -12331,6 +12331,8 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
   eq('③ 사업마다 그 글을 고른다(성적우수 ↔ 예체능이 섞이지 않는다 · 같은 재단의 다른 사업은 거절) · 줄은 url 후보 · source board · addedAt',
     got.lines.map((l) => [l.target.key, l.url, l.source, l.addedAt]), [['9001', 'https://gana.or.kr/bbs/view.php?id=101', 'board', '2026-10-12'], ['9002', 'https://gana.or.kr/bbs/view.php?id=102', 'board', '2026-10-12']]);
   eq('  글을 고른 **안쪽** 쪽이 그 재단의 게시판이 된다(byPick) — 홈은 게시판으로 적지 않는다', got.boards.map((b) => [b.url, b.byPick]), [['https://gana.or.kr/bbs/list.php', true]]);
+  const thin = KH.huntLines ? KH.huntLines(g1, [pages[0], { ...pages[1], links: pages[1].links.slice(0, 1) }], { today: '2026-10-12' }) : { found: [], boards: [1] };
+  eq('  글을 골랐어도 공고 3건 문턱을 못 넘는 쪽은 게시판으로 적지 않는다(2026-10-13 석성장학회 소식 쪽 — 공고 2건)', [thin.found.length > 0, thin.boards.length], [true, 0]);
   /* 같은 글이 두 사업을 받는 공고 — 주소 하나에 줄 하나(첫 사업 + also) · 홈에서만 고르면 게시판은 안 적는다 */
   const sharedHtml = html.replace('가나장학재단 성적우수장학생 선발 공고', '가나장학재단 성적우수·예체능 장학생 선발 공고').replace(/\s*<li><a href="\/bbs\/view\.php\?id=102">[^<]*<\/a> <span>2026-10-01<\/span><\/li>/, '');
   const gotShared = KH.huntLines ? KH.huntLines(g1, [{ url: 'https://gana.or.kr/', title: '(홈)', level: 0, html: sharedHtml, links: pages[1].links }], { today: '2026-10-12' }) : { lines: [], boards: [1] };
@@ -12371,6 +12373,26 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
       ['collector/kosaf-hunt.json', 'collector/kosaf-hunt-state.json', 'collector/kosaf-hunt-report.md', 'collector/external-sources.json'].every((f) => wf.includes(`git add ${f}`)),
       /gh workflow run link-check\.yml[^\n]*-f mode=candidates/.test(wf), (wf.match(/title: 🚨 층2 재단 글 사냥꾼 — 사냥 단계가 끝까지 못 갔어요/g) || []).length, /mode: resolve/.test(wf), /robot-down/.test(wf) && /failure\(\) \|\| cancelled\(\)/.test(wf), /issues: write/.test(wf)],
     [true, true, true, true, true, true, 2, true, true, true]);
+  /* ⑧ 검색 길 (2026-10-13 · 사장님 "네이버 검색 API") — 열쇠 두 칸이 다 있어야 켜진다 · 그 재단 사이트의 글 주소만 · 같은 점수 규칙 · source search */
+  eq('⑧ 검색 열쇠 — 두 칸 다 있어야 켜진다(하나라도 비면 꺼짐)', KH.searchKeys ? [!!KH.searchKeys({}), !!KH.searchKeys({ NAVER_CLIENT_ID: 'a' }), !!KH.searchKeys({ NAVER_CLIENT_ID: 'a', NAVER_CLIENT_SECRET: ' ' }), !!KH.searchKeys({ NAVER_CLIENT_ID: 'a', NAVER_CLIENT_SECRET: 'b' })] : [], [false, false, false, true]);
+  const t1 = idx.find({ ds: 'kosaf', key: '9001' });
+  eq('  물을 말 — 재단 이름 + 사업 이름 + 공고', KH.searchQuery ? KH.searchQuery(t1) : '', '재단법인 가나장학재단 성적우수장학생 공고');
+  const sjson = { items: [
+    { title: '2026년 하반기 <b>가나장학재단</b> <b>성적우수장학생</b> 선발 공고', link: 'https://gana.or.kr/bbs/view.php?id=101' },
+    { title: '<b>가나장학재단</b> 성적우수장학생 공고 (블로그 퍼옴)', link: 'https://blog.naver.com/someone/2233' },
+    { title: '가나장학재단 공지사항', link: 'https://gana.or.kr/bbs/list.php' },
+    { title: '2026년 하반기 가나장학재단 예체능장학생 선발 공고', link: 'https://gana.or.kr/bbs/view.php?id=102' },
+    { title: '같은 글 다시', link: 'https://gana.or.kr/bbs/view.php?id=101' } ] };
+  const srows = KH.searchRows ? KH.searchRows(sjson, t1.allowed) : [];
+  eq('  검색 결과 → 그 재단 사이트의 글 주소만(블로그·목록 쪽은 뺀다 · 같은 주소는 한 줄) · 제목의 <b> 를 걷는다',
+    srows.map((r) => [r.url, r.title]), [['https://gana.or.kr/bbs/view.php?id=101', '2026년 하반기 가나장학재단 성적우수장학생 선발 공고'], ['https://gana.or.kr/bbs/view.php?id=102', '2026년 하반기 가나장학재단 예체능장학생 선발 공고']]);
+  const sl = KH.searchLine ? KH.searchLine(t1, srows, '재단법인 가나장학재단 성적우수장학생 공고', { today: '2026-10-13' }) : null;
+  eq('  같은 점수 규칙으로 그 사업 글을 고른다 · 후보 줄 source search · query 를 남긴다 · 확인 로봇이 읽는 꼴이다',
+    sl ? [sl.target.key, sl.url, sl.source, sl.query, LCm.loadCandidates({ v: 1, items: [sl] }, { today: '2026-10-13' }).ok.length] : [], ['9001', 'https://gana.or.kr/bbs/view.php?id=101', 'search', '재단법인 가나장학재단 성적우수장학생 공고', 1]);
+  eq('  그 사업 글이 없으면 고르지 않는다(남의 사업 글을 붙이지 않는다)', KH.searchLine ? KH.searchLine(t1, srows.filter((r) => /id=102/.test(r.url)), 'q', { today: '2026-10-13' }) : 'x', null);
+  const khSrc = readText(new URL('../collector/kosaf-hunt.mjs', import.meta.url));
+  eq('  열쇠는 환경 변수로만 받는다(코드에 값 없음) · 워크플로가 Secrets 를 넘긴다 · 상한이 있다',
+    [/X-Naver-Client-Id': keys\.id/.test(khSrc), /NAVER_CLIENT_ID: \$\{\{ secrets\.NAVER_CLIENT_ID \}\}/.test(wf), /NAVER_CLIENT_SECRET: \$\{\{ secrets\.NAVER_CLIENT_SECRET \}\}/.test(wf), /sstat\.asked >= SEARCH_MAX/.test(khSrc)], [true, true, true, true]);
   const ga = readText(new URL('../.gitattributes', import.meta.url));
   eq('  .gitattributes 에 리포트·장부 줄(merge=ours) — 없으면 배포 동기화가 충돌로 멈춘다', [/^collector\/kosaf-hunt-report\.md\s+merge=ours$/m.test(ga), /^collector\/kosaf-hunt-state\.json\s+merge=ours$/m.test(ga), /^collector\/kosaf-hunt\.json\s+merge=ours$/m.test(ga)], [true, true, true]);
 }

@@ -5,7 +5,9 @@ name: 층2 재단 글 사냥꾼
 #   · 로봇: collector/kosaf-hunt.mjs — 재단마다 홈 + 메뉴 두 단계(쪽 10개 상한) · 같은 점수 규칙(pickKosafPost)으로 글 하나를 고른다
 #   · 쓰는 파일 넷: collector/kosaf-hunt.json(후보) · kosaf-hunt-state.json(재단별 본 날) · kosaf-hunt-report.md · external-sources.json(찾은 게시판 autoFound)
 #   🔴 앱에 싣지 않는다 — 끝나면 원문 링크 확인 로봇(link-check.yml · 후보 모드)을 깨워 학생처럼 열어 확인한 것만 data/link-check.json fix 에 싣는다.
-#   🔴 검색 엔진은 쓰지 않는다(열쇠 없음) · 같은 재단은 3일에 한 번 · 전체 예산 9분 안에 스스로 끝낸다(상한을 키우지 말 것).
+#   · 검색 길(2026-10-13): 홈페이지 길로 못 고른 공고만 네이버 웹문서 검색에 묻는다 — 열쇠는 GitHub Secrets NAVER_CLIENT_ID ·
+#     NAVER_CLIENT_SECRET(값을 채팅·파일에 붙여 넣지 않는다). 없으면 그 길만 조용히 꺼지고 리포트에 '꺼짐(열쇠 없음)'.
+#   🔴 같은 재단은 3일에 한 번 · 검색은 한 실행 60번 상한 · 전체 예산 9분 안에 스스로 끝낸다(상한을 키우지 말 것).
 # 실행: 매일 17:23 KST(수집 로봇들이 학교를 두드리는 시간을 피해 · 확인 로봇 18:47 보다 앞) · Actions 수동(all: 3일 규칙 무시 · only: 호스트 조각 · dry)
 
 on:
@@ -59,6 +61,8 @@ jobs:
         name: 재단 홈페이지 뒤지기
         env:
           KOSAF_HUNT_MS: '540000'   # 9분
+          NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
         run: node collector/kosaf-hunt.mjs ${{ inputs.dry && '--dry' || '' }} ${{ inputs.all && '--all' || '' }} ${{ inputs.only && format('--only={0}', inputs.only) || '' }}
 
       - name: 결과 저장 (기본 브랜치)
