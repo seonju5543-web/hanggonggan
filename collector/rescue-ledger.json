@@ -29,12 +29,6 @@
   "minBody": 100,
   "name": "한미 첨단분야 청년교류 지원사업 제6기 장학생 (2026)"
  },
- "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=322606&menuno=200318": {
-  "tries": 0,
-  "at": "2026-08-23",
-  "name": "공통 2026년 상반기 사랑나눔장학생 모집 공고",
-  "minBody": 999
- },
  "https://dep.hufs.ac.kr/bbs/student/2431/264156/artclView.do": {
   "tries": 5,
   "at": "2026-09-15",
@@ -149,12 +143,6 @@
   "minBody": 100,
   "name": "[공지] 2026학년도 2학기 가족장학 신청 안내(~2026.10.02.(금) 까지)"
  },
- "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?articleno=375935": {
-  "tries": 2,
-  "at": "2026-10-04",
-  "minBody": 100,
-  "name": "[대청교] 2026학년도 2학기 대학생 청소년교육지원장학 멘토 추가 모집 안내"
- },
  "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?articleno=375792": {
   "tries": 2,
   "at": "2026-10-04",
@@ -184,12 +172,6 @@
   "at": "2026-10-04",
   "minBody": 100,
   "name": "2026년 하반기 인재육성 장학생 선발계획 공고 안내(기간 연장)"
- },
- "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12349/view.do?currentpageno=1": {
-  "tries": 1,
-  "at": "2026-10-04",
-  "minBody": 100,
-  "name": "등록금외지원 2026년 하반기 인재육성 장학생 선발 계획 공고 2026.09.08 대전청년내일재단 황새롬"
  },
  "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765909": {
   "tries": 3,
@@ -334,5 +316,89 @@
   "at": "2026-10-12",
   "tries": 0,
   "name": "2026학년도 2학기 동진나눔복지재단 장학생 선발(~10/23(금)까지)"
+ },
+ "https://kangwon.ac.kr/ko/bbs/750/detail.do?pageitm=10&pstsn=2516&searchgbn=0&searchordersort=0": {
+  "ok": "2026-10-14",
+  "at": "2026-10-14",
+  "tries": 0,
+  "name": "2026년 하반기 은평구민 장학생 선발 공고"
+ },
+ "https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=145&parm_bod_uid=270349&srchbgpuid=-1&srchenable=1&srchvotetype=-1": {
+  "ok": "2026-10-14",
+  "at": "2026-10-14",
+  "tries": 0,
+  "name": "[교내] 2026학년도 2학기 장애학생(사랑나눔장학금 A, B) 신청 안내"
+ },
+ "https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=145&parm_bod_uid=270222&srchbgpuid=-1&srchenable=1&srchvotetype=-1": {
+  "ok": "2026-10-14",
+  "at": "2026-10-14",
+  "tries": 0,
+  "name": "[교내] 2026-2학기 계명행복우수A, 총장특별(성적우수), 총장특별(학업우수) 장학생 신청 안내"
+ },
+ "https://www.sogang.ac.kr/ko/detail/551530?bbsconfigfk=141&namepage=ScholarshipNotice": {
+  "tries": 1,
+  "at": "2026-10-14",
+  "minBody": 100,
+  "name": "[교외] 대산농촌재단 농업리더 장학생 선발 안내(11/11 마감, 등록금 전액)"
+ },
+ "https://kangwon.ac.kr/ko/bbs/750/detail.do?pageitm=10&pstsn=2513&searchgbn=0&searchordersort=0": {
+  "tries": 1,
+  "at": "2026-10-14",
+  "minBody": 100,
+  "name": "(한국장학재단) 해양수산부 청년창업어업인장학생 추가 모집 선발 안내"
+ },
+ "https://kangwon.ac.kr/ko/bbs/750/detail.do?pageitm=10&pstsn=2510&searchgbn=0&searchordersort=0": {
+  "tries": 1,
+  "at": "2026-10-14",
+  "minBody": 100,
+  "name": "2026학년도 2학기 중소기업 취업연계 장학금 선발계획 알림 및 심사서류 제출 요청"
+ },
+ "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsno=1073&key=7520&nttno=626253&searchkrwd=장학&sf.pnos=1073&sf.pnos=888": {
+  "ok": "2026-10-14",
+  "at": "2026-10-14",
+  "tries": 0,
+  "name": "[입학에서 취업까지] 2026-2학기 2차 교내장학금 신청 안내[가족, 문화예술, 고시, 챌린지]"
+ },
+ "https://kangwon.ac.kr/ko/bbs/750/detail.do?pageitm=10&pstsn=2499&searchgbn=0&searchordersort=0": {
+  "ok": "2026-10-14",
+  "at": "2026-10-14",
+  "tries": 0,
+  "name": "2026학년도 1학기 주거안정장학금 지급요청서(8월분) 신청 안내"
+ },
+ "https://www.catholic.ac.kr/ko/campuslife/notice.do?articleno=276686&srcategoryid=22": {
+  "tries": 1,
+  "at": "2026-10-14",
+  "minBody": 100,
+  "name": "[학생지원팀] (한국장학재단) 2026-2학기 국가근로장학금 추가신청기간 안내(10/21~10/29)"
+ },
+ "https://www.seoultech.ac.kr/service/info/janghak/?bidx=896418&bnum=5233&cate=0&qidx=5233": {
+  "ok": "2026-10-14",
+  "at": "2026-10-14",
+  "tries": 0,
+  "name": "서울과학기술대학교 중소기업 취업연계 장학사업 (희망사다리Ⅰ유형) 신규장학생 자체선발 기준 안내"
+ },
+ "https://www.jbnu.ac.kr/web/Board/217349/detailView.do?category=6": {
+  "tries": 1,
+  "at": "2026-10-14",
+  "minBody": 100,
+  "name": "[JW이종호재단] 2026년 기초과학자 장학생 선발 안내"
+ },
+ "https://www.jbnu.ac.kr/web/Board/217522/detailView.do?category=6": {
+  "tries": 1,
+  "at": "2026-10-14",
+  "minBody": 100,
+  "name": "2026년도 2학기 전북대학교동창회 장학재단 장학생 선발 안내"
+ },
+ "https://www3.chosun.ac.kr/bbs/scho/332/281257/artclView.do": {
+  "ok": "2026-10-14",
+  "at": "2026-10-14",
+  "tries": 0,
+  "name": "[장학금 접수] 2026년 푸른등대 수력원자력 K-원전 장학금 신규장학생 선발 안내"
+ },
+ "https://sejong.korea.ac.kr/bbs/koreaSejong/659/273624/artclView.do": {
+  "ok": "2026-10-14",
+  "at": "2026-10-14",
+  "tries": 0,
+  "name": "[국가]2026학년도 2학기 한국장학재단 중소기업 취업연계 장학생(희망사다리Ⅰ유형) 추천"
  }
 }
