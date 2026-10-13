@@ -1,7 +1,61 @@
 {
  "school": "부산대학교",
- "updatedAt": "2026-10-12",
+ "updatedAt": "2026-10-13",
  "items": [
+  {
+   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(전북대학교)",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511534",
+   "postedAt": "2026-10-13",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-13",
+   "desc": "2026학년도 겨울계절수업 전북대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
+  },
+  {
+   "title": "2026학년도 겨울계절수업 강좌개설 수요조사 안내",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511531",
+   "postedAt": "2026-10-13",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-13"
+  },
+  {
+   "title": "[효원상담원] 내 몸이 보내는 SOS, '유비오 맥파 검사' 신청...",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511523",
+   "postedAt": "2026-10-13",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-13",
+   "thumb": "data/news/img/1fa03d6deaef6dbe.webp",
+   "desc": "혹시 요즘 밤에 잠이 들기 어려우신가요? 아니면 일상에서 작은일에도 쉽게 짜증이 느껴지나요? 효원상담원에서는 학생들의 몸과 마음에 누적된 스트레스를 확인하기 위해 '유비오 맥파 검사' 기계를 도입하였습니다."
+  },
+  {
+   "title": "[한국과학기술원] 2027년 KAIST-MIT 양자 정보 겨울학교 개최 안내",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511498",
+   "postedAt": "2026-10-13",
+   "kind": "행사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-13",
+   "thumb": "data/news/img/89168d3112c3156e.webp",
+   "desc": "대상자 : 양자정보과학에관심이있는학부생3~4학년 장 소 : kaist본원(※세부장소는변동될수있음) 접수방법 : 포스터qr코드및링크접속후참가신청작성및서류제출 ㅇ참가신청링크 :…"
+  },
+  {
+   "title": "[대한민국 국회] 「2026 국회 입법박람회」 개최 안내",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511495",
+   "postedAt": "2026-10-13",
+   "kind": "행사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-13"
+  },
   {
    "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(충북대학교)",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511485",
@@ -335,33 +389,8 @@
    "kind": "학사",
    "school": "부산대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[AX·정보화혁신본부] 인터넷회선 증속 및 방화벽 고도화 작업에 따른 인터넷 서...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511339",
-   "postedAt": "2026-10-01",
-   "school": "부산대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[대한무역투자진흥공사] K Connect AI 2026 컨퍼런스(M.AX CON...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511307",
-   "postedAt": "2026-09-30",
-   "school": "부산대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[부산광역시 금정구] 「2026 금정사랑 걷기대회」 개최 안내",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511287",
-   "postedAt": "2026-09-29",
-   "kind": "행사",
-   "school": "부산대학교",
-   "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/2d06dc0b70dd24ec.webp"
+   "src": "2d0d4013"
   }
  ]
 }

@@ -1,7 +1,63 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-10-12",
+ "updatedAt": "2026-10-13",
  "items": [
+  {
+   "title": "[일반] 2026학년도 로봇특성화대학 전공설명회 개최 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53471&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-13",
+   "kind": "행사",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-13",
+   "thumb": "data/news/img/d72e98d208141012.webp",
+   "desc": "안녕하세요, 로봇특성화대학사업단입니다. 로봇 분야에 관심 있는 학우 여러분의 진로 설계 및 전공 탐색을 지원하고자 로봇특성화대학사업단 전공설명회 를 개최합니다."
+  },
+  {
+   "title": "[국제학생] 2026-2학기 졸업예정자 한국어능력평가 시험(1차) 신청 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53470&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-13",
+   "kind": "학사",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-13",
+   "desc": "2026 학년도 2 학기 졸업 예정인 외국인 유학생을 대상으로 아래와 같이 한국어능력평가시험을 시행하오니 , 해당 학생들은 기간 내 반드시 신청해 주시기 바랍니다 ."
+  },
+  {
+   "title": "[일반] 기간제 계약직원 채용 공고(대학원 교학팀)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53466&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-13",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-13",
+   "desc": "기간제 계약직원 모집 공고 1. 지원 자격 및 우대사항 모집인원 담당업무 대학원 교학팀 행정업무 등 지원 자격"
+  },
+  {
+   "title": "[일반] [광운대, 동국대, 시립대 캠퍼스타운] 2026 AI+X 커넥트 포럼",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53465&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-13",
+   "kind": "행사",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-13",
+   "thumb": "data/news/img/6fabd28cd1ef7453.webp",
+   "desc": "서울시와 광운대학교·동국대학교·서울시립대학교 캠퍼스타운에서는 AI와 다양한 산업 분야의 융합을 통한 창업의 새로운 가능성을 모색하고자 **「2026 AI+X CONNECT FORUM」**을 개최합니다."
+  },
+  {
+   "title": "[학사] 2026학년도 4차 다전공(복수/부/심화/연계/마이크로/학생설계융합전공) 신청 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53469&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-13",
+   "kind": "학사",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-13"
+  },
   {
    "title": "[시설] 한울관 및 아이스링크 주차장 출입구 변경 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53462&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -350,55 +406,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/4ec7179d0720a100.webp",
-   "src": "b09cb042"
-  },
-  {
-   "title": "[일반] 기간제 계약직원 채용 공고(대학원 교학팀)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53410&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-30",
-   "kind": "채용",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[일반] 2026-2 참빛핵심역량 비교과인증제 안내(참빛포인트 받고 총장직인 인증서 받아서 졸업하자!)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53201&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-08-27",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/98bc3e9f9ea0713e.webp",
-   "src": "b09cb042"
-  },
-  {
-   "title": "[학생] 광운대학교 2026학년도 참빛핵심역량 진단 참여 안내(2학년/3학년/4학년 대상)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53378&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-22",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/6676685f39134afc.webp",
-   "src": "b09cb042"
-  },
-  {
-   "title": "[일반] 기간제 계약직원 채용 공고(정보통신처 통신운영팀)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53400&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-28",
-   "kind": "채용",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[학사] 2026년도 2학기 국제학생증 ISIC발급 지원행사 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53397&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-28",
-   "kind": "학사",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/fd6ae54dd6235578.webp",
    "src": "b09cb042"
   }
  ]

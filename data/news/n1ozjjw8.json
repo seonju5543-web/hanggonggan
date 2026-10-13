@@ -1,7 +1,19 @@
 {
  "school": "상명대학교",
- "updatedAt": "2026-10-12",
+ "updatedAt": "2026-10-13",
  "items": [
+  {
+   "title": "2026학년도 천안캠퍼스 외국인학생 총장 간담회 개최",
+   "url": "https://www.smu.ac.kr/webzine/today.do?mode=view&articleNo=769425&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-13",
+   "kind": "행사",
+   "school": "상명대학교",
+   "campus": "",
+   "src": "f8a29ec6",
+   "foundAt": "2026-10-13",
+   "thumb": "data/news/img/a076cd113b700cb2.webp",
+   "desc": "대외협력팀 지난 12일 천안캠퍼스 외국인학생 총장 간담회가 열렸다. 외국인 학생들의 학교생활과 한국생활 적응을 지원하고 학생 간 교류를 돕기 위해 마련된 이번 행사에는 중국, 카자흐스탄 등 5개국 외국인 학생…"
+  },
   {
    "title": "2026학년도 2학기 천안캠퍼스 학생자치기구 대표 총장간담회 개최",
    "url": "https://www.smu.ac.kr/webzine/today.do?mode=view&articleNo=769370&article.offset=0&articleLimit=10",
@@ -58,7 +70,8 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/e4379579175baa07.webp",
-   "src": "f8a29ec6"
+   "src": "f8a29ec6",
+   "desc": "대외협력팀 우리 대학 경영대학원 피트니스 MBA는 지난 7일 서울캠퍼스를 방문한 중국 최대 피트니스 산업 플랫폼인 ‘차이나핏(ChinaFit, 中國健身大會)’과 간담회를 가졌다."
   },
   {
    "title": "「2026 천안 유니브시티 페스티벌」 참여… 대학생 주도 문화예술 콘텐츠 선보여",

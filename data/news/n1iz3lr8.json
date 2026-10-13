@@ -1,7 +1,42 @@
 {
  "school": "중앙대학교",
- "updatedAt": "2026-10-12",
+ "updatedAt": "2026-10-13",
  "items": [
+  {
+   "title": "[총 상금 2,400만 원] 제28회 이데일리 아이디어 유니버시아드 대회 개최 안내 (~11/3)",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30248&pageNo=1",
+   "postId": "30248",
+   "postedAt": "2026-10-13",
+   "kind": "행사",
+   "school": "중앙대학교",
+   "campus": "",
+   "src": "f4f8bc8f",
+   "foundAt": "2026-10-13",
+   "thumb": "data/news/img/12abe1323dee198e.webp",
+   "desc": "-대학생들이 우리 사회와 경제의 현안을 함께 고민하고 자신만의 아이디어를 펼쳐 볼 수 있도록 이데일리에서 매년 「아이디어 유니버시아드 대회」개최 -이번 대회는 \\\"경계가 사라지는 시대\\\"를 주제로 진행 글로벌…"
+  },
+  {
+   "title": "2026학년도 동계 계절학기 국내대학 학점교류 안내(개별, 공유, 경인)",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30247&pageNo=1",
+   "postId": "30247",
+   "postedAt": "2026-10-13",
+   "kind": "학사",
+   "school": "중앙대학교",
+   "campus": "",
+   "src": "f4f8bc8f",
+   "foundAt": "2026-10-13"
+  },
+  {
+   "title": "2027학년도 1학기 가상융합대학원 신입생 모집",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30246&pageNo=1",
+   "postId": "30246",
+   "postedAt": "2026-10-13",
+   "school": "중앙대학교",
+   "campus": "",
+   "src": "f4f8bc8f",
+   "foundAt": "2026-10-13",
+   "thumb": "data/news/img/8b2ea41d617d61da.webp"
+  },
   {
    "title": "2026 Seoul Global Job Fair for International Residents : November 18, 2026",
    "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30243&pageNo=1",

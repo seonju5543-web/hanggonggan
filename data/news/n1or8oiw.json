@@ -1,7 +1,64 @@
 {
  "school": "동국대학교",
- "updatedAt": "2026-10-12",
+ "updatedAt": "2026-10-13",
  "items": [
+  {
+   "title": "[L-HUSS] L-HUSS 로컬 인문문화 북토크 안내",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766575",
+   "postedAt": "2026-10-13",
+   "postId": "26766575",
+   "school": "동국대학교",
+   "campus": "",
+   "src": "d521f12e",
+   "foundAt": "2026-10-13",
+   "desc": "안녕하세요. 동국대학교 인문사회융합인재양성사업단(HUSS)입니다. 오는 10월 16일(금)부터 11월 13일(금)까지 매주 금요일 동국대학교 인문사회융합인재양상사업단에서 ‘로컬 인문문화 북토크(부체: 책으로 잇는…"
+  },
+  {
+   "title": "[카운슬링센터][집단상담 홍보]심리극으로 알아보는 나의 연애와 관계, \"연애할때 나는 왜 그럴까?\" 신청 안내 (3회 모두 참여시 마일리지 10점 지급)",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766573",
+   "postedAt": "2026-10-13",
+   "postId": "26766573",
+   "school": "동국대학교",
+   "campus": "",
+   "src": "d521f12e",
+   "foundAt": "2026-10-13",
+   "thumb": "data/news/img/bf974e13afe2da0f.webp",
+   "desc": "설레지만 때로는 어려운 연애, 나는 왜 이런 모습일까요? 심리극으로 나의 연애 패턴과 숨겨진 마음을 알아보세요. <참여안내>"
+  },
+  {
+   "title": "10월 14일(수)~ 10월 15일(목) 헌혈 버스 시행 안내",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766572",
+   "postedAt": "2026-10-13",
+   "postId": "26766572",
+   "school": "동국대학교",
+   "campus": "",
+   "src": "d521f12e",
+   "foundAt": "2026-10-13"
+  },
+  {
+   "title": "제4회 총동창회장배 동국인 한마음 페스티벌 개최 안내",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766570",
+   "postedAt": "2026-10-13",
+   "postId": "26766570",
+   "kind": "행사",
+   "school": "동국대학교",
+   "campus": "",
+   "src": "d521f12e",
+   "foundAt": "2026-10-13",
+   "desc": "개인참가신청 : https://forms.gle/gh2SZhzJBGhdU2WN6 단체참가신청 : 첨부파일 작성 및 이메일(positive265@dongguk.edu) 제출"
+  },
+  {
+   "title": "제4회 총동창회장배 동국인 한마음 페스티벌 사진 이벤트 안내",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766583",
+   "postedAt": "2026-10-13",
+   "postId": "26766583",
+   "kind": "행사",
+   "school": "동국대학교",
+   "campus": "",
+   "src": "d521f12e",
+   "foundAt": "2026-10-13",
+   "thumb": "data/news/img/a8dd7db47035ca1a.webp"
+  },
   {
    "title": "[카운슬링센터] '온라인 심리검사'로 자기점검 해볼까? - 대학생활 적응 정도 및 학습 전략 장단점에 관하여",
    "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766566",

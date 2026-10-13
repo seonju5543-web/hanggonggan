@@ -1,7 +1,28 @@
 {
  "school": "충북대학교",
- "updatedAt": "2026-10-12",
+ "updatedAt": "2026-10-13",
  "items": [
+  {
+   "title": "2027학년도 전기(정시) 충북대학교 대학원별 입학전형 안내",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170643&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-10-13",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-10-13",
+   "desc": "1. 모집 대학원 가. 일반대학원 (대학원) - 입학과 : 일반전형(석사과정/석.박사통합과정/박사과정) 학과간협동과정(석사과정/석.박사통합과정/박사과정) 학연산협동과정(석사과정/박사과정) 정부위탁생특별전형(석사과정)"
+  },
+  {
+   "title": "2026학년도 동기 계절수업 다른 대학교 수학 안내(전북대)",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170636&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-10-12",
+   "kind": "학사",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-10-13",
+   "desc": "2. 수학추천자 서식 1부. 3. 국내 다른대학 수학허가 신청서 1부. 4. 다른 대학 수학 허가 신청서 작성법 1부. 끝. 대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
+  },
   {
    "title": "2026학년도 동기 계절수업 다른 대학교 수학 안내(국립창원대)",
    "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170633&pageUnit=10&searchCnd=all&pageIndex=1",
@@ -94,7 +115,7 @@
    "school": "충북대학교",
    "campus": "",
    "foundAt": "2026-10-08",
-   "desc": "다운로드 미리보기 대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공 공동실험실습관 카테고리 2027 전기 외국인특별전형 대학(원) 원서접수 및 모집요강 안내 2027 Spring…",
+   "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공",
    "src": "76d254e7"
   },
   {

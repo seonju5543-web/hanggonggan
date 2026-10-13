@@ -1,7 +1,38 @@
 {
  "school": "경기대학교",
- "updatedAt": "2026-10-12",
+ "updatedAt": "2026-10-13",
  "items": [
+  {
+   "title": "[입학에서 취업까지] 2027년 2월 졸업에 관한 제반 사항 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626564&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-13",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-10-13",
+   "desc": "이미지 확대보기 1. 외국어시험 성적 제출 기한 : 2027. 1. 14.(화)"
+  },
+  {
+   "title": "[입학에서 취업까지] [경제학전공] 2027년 2월 졸업에 관한 제반 사항 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626561&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-13",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-10-13",
+   "desc": "대학소개 대학·조직 대학생활 맞춤정보 어떤 정보 를 찾고계시나요? 맞춤설정 저장하기 (언제든 변경 가능합니다) 맞춤설정 이란? 소속, 내용, 기간별로 나만의 맞춤 콘텐츠를 찾아보세요."
+  },
+  {
+   "title": "[일반] 2027년 2월 졸업예정자 졸업시험 접수 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626560&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-13",
+   "kind": "학사",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-10-13",
+   "desc": "●접수 기간 : 2026. 10.13.(화)~ 2026. 10. 23.(금) 16시까지 접수 ●접수 방법 : 1.학번 2.이름 3.전화번호 4.평일 중 시험 응시 가능한 요일 및 시간 (예: 월·수…"
+  },
   {
    "title": "[대학생활/업무안내] [건강증진센터]2026학년도 독감/폐렴구균 예방접종 안내",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626521&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
@@ -335,32 +366,6 @@
   {
    "title": "[일반] [국어국문] 2026학년도 2학기 복수전공 선발 안내",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626361&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-02",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "foundAt": "2026-10-02"
-  },
-  {
-   "title": "[대학생활/업무안내] 수원시 도시정책 시민계획단 모집",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626360&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-02",
-   "school": "경기대학교",
-   "campus": "",
-   "foundAt": "2026-10-02"
-  },
-  {
-   "title": "[대학생활/업무안내] [건강증진센터]·살모넬라균 감염증· 미리 예방하세요",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626358&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-02",
-   "school": "경기대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "thumb": "data/news/img/92e063e11bc19321.webp"
-  },
-  {
-   "title": "[입학에서 취업까지] < 2026학년도 2학기 복수전공 신청 안내 >",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626357&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
    "postedAt": "2026-10-02",
    "kind": "학사",
    "school": "경기대학교",

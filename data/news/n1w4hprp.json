@@ -1,7 +1,19 @@
 {
  "school": "경희대학교",
- "updatedAt": "2026-10-12",
+ "updatedAt": "2026-10-13",
  "items": [
+  {
+   "title": "공통 [원테크스탑 한국지점] IT 엔지니어 부문 추천채용",
+   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323297",
+   "postedAt": "2026-10-13",
+   "postId": "323297",
+   "kind": "채용",
+   "school": "경희대학교",
+   "campus": "",
+   "src": "a92b27ac",
+   "foundAt": "2026-10-13",
+   "desc": "1. 제출방법 ① 미래인재센터 이메일 제출 ▶ work_register@khu.ac.kr"
+  },
   {
    "title": "국제 [심리상담센터] 타고난 나의 기본 설정인 기질과 성격을 이해하며 성장하는 2026학년도 TCI 기...",
    "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323274",
@@ -32,8 +44,7 @@
    "kind": "채용",
    "school": "경희대학교",
    "campus": "",
-   "foundAt": "2026-10-06",
-   "desc": "미래인재센터(서울) 파일 첨부 [추천채용] [새솔다이아몬드공업(주)] 해외영업(중국), 해외영업(미국) 부문 추천채용 [자유전공학부] 수학·물리·정보 학습지원 튜터 모집(~10/6)"
+   "foundAt": "2026-10-06"
   },
   {
    "title": "국제 [교수학습개발원] 국제C 학부생을 위한 학습컨설팅 신청 안내(10월)",

@@ -1,7 +1,18 @@
 {
  "school": "고려대학교",
- "updatedAt": "2026-10-12",
+ "updatedAt": "2026-10-13",
  "items": [
+  {
+   "title": "(어학강좌) OPIc IH+ Challenge 모집 안내",
+   "url": "https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE1MDQlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
+   "postedAt": "2026-10-13",
+   "postId": "000060000000061504",
+   "school": "고려대학교",
+   "campus": "",
+   "src": "26a9afc2",
+   "foundAt": "2026-10-13",
+   "thumb": "data/news/img/209ddc734c64963a.webp"
+  },
   {
    "title": "[취업은 SSC] 세상을 바꾸는 리더 렉처 시리즈 - 서동원 바른세상병원 병원장",
    "url": "https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE0NzQlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
@@ -203,7 +214,8 @@
    "school": "고려대학교",
    "campus": "",
    "foundAt": "2026-10-03",
-   "thumb": "data/news/img/0ec39ad3df0a6c6d.webp"
+   "thumb": "data/news/img/0ec39ad3df0a6c6d.webp",
+   "src": "26a9afc2"
   },
   {
    "title": "[고대빵] 2027 수능 선물세트 안내",

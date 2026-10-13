@@ -1,7 +1,18 @@
 {
  "school": "한국항공대학교",
- "updatedAt": "2026-10-12",
+ "updatedAt": "2026-10-13",
  "items": [
+  {
+   "title": "2026 충청남도 드론 페스타(Drone Festa) 행사 안내",
+   "url": "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11324",
+   "postedAt": "2026-10-13",
+   "kind": "행사",
+   "school": "한국항공대학교",
+   "campus": "",
+   "src": "9c5122cb",
+   "foundAt": "2026-10-13",
+   "thumb": "data/news/img/2c254d35b9cbd161.webp"
+  },
   {
    "title": "[항공·드론 혁신융합대학사업단] 2026년 GADLEX 채용박람회 참가자 모집(~10/16까지)",
    "url": "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11319",

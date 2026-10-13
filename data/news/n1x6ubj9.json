@@ -1,7 +1,80 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-10-12",
+ "updatedAt": "2026-10-13",
  "items": [
+  {
+   "title": "2026년 하반기 교직원(정규직) 경력채용 서류전형 결과 및 1차 면접전형 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140545&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-13",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-13",
+   "desc": "총괄지원팀 직원 경력채용을 위한 서류전형 결과 및 1차 면접전형을 아래와 같이 안내하오니 확인하여 주시기 바랍니다."
+  },
+  {
+   "title": "2026년 졸업앨범 추가 촬영 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140544&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-13",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-13",
+   "desc": "학생지원팀 2026년 졸업앨범 추가 촬영과 관련하여 다음과 같이 안내드리오니, 대상 학우분들께서는 참고해 주시기 바랍니다."
+  },
+  {
+   "title": "디지털교육혁신원 교육혁신팀 자체계약직원(PD 및 디자이너) 채용 공고",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140310&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-13",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-13",
+   "desc": "디지털교육혁신원 우리대학 교육혁신팀에서 근무할 자체계약직원을 다음과 같이 채용합니다."
+  },
+  {
+   "title": "[카운슬링센터] ✨가을맞이「관계 속 나 집단상담」참여자를 모집합니다! (인사캠)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140496&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-13",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-13",
+   "thumb": "data/news/img/61b9136366b3ca3e.webp",
+   "desc": "가족, 친구, 연인 관계 속 다양한 나, 쉽게 드러내지 못한 속마음을 함께 나누고, 더 편안한 관계를 위한 마음 연습 함께해요"
+  },
+  {
+   "title": "사회과학/예술대학행정실 행정조교 모집[~10.19.(월) 16:00까지]",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140537&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-13",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-13"
+  },
+  {
+   "title": "[아이폰 17 및 경품 다수] 2026년 학생인재개발팀/대학일자리플러스센터 만족도 조사",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140531&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-13",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-13",
+   "thumb": "data/news/img/453cd33855f2fba4.webp"
+  },
+  {
+   "title": "성균관대학교 삼성융합의과학원 임상연구설계평가학과 신임교원 채용",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140520&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-13",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-13"
+  },
   {
    "title": "[네이버페이 1만원 증정, 온라인 실험 참여] AI 면접 환경에 따른 지원자의 인식과 경험에 관한 연구",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140512&article.offset=0&articleLimit=10",
@@ -277,7 +350,8 @@
    "kind": "채용",
    "school": "성균관대학교",
    "campus": "",
-   "foundAt": "2026-10-06"
+   "foundAt": "2026-10-06",
+   "src": "45ec8fd1"
   },
   {
    "title": "[스타벅스 기프티콘 증정] 2026년 학생성공역량 및 학습경험 설문조사 안내(~10/7)",
@@ -334,73 +408,6 @@
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-10-02"
-  },
-  {
-   "title": "2026학년도 2학기 자연과학기반영역(BSM) 공동시험(중간) 일정 및 장소 안내 [자연과학캠퍼스]",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140325&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-02",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "thumb": "data/news/img/e4b324430b313916.webp"
-  },
-  {
-   "title": "[메타버스기반방사선안전ICT연구센터] 행정 업무 계약직 채용 공고",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140323&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-02",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-02"
-  },
-  {
-   "title": "[창의품/FYE] 2026학년도 2학기 인성함양 실천프로그램 흥인, 돈의, 숭례, 홍지 온라인 시행",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140317&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-02",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-02"
-  },
-  {
-   "title": "법학전문대학원 행정조교 모집 안내(~10.14.(수)/접수 연장)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140301&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-01",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "src": "45ec8fd1"
-  },
-  {
-   "title": "[관리팀(인사캠)] 혜화셔틀버스, 종로07/08 마을버스 이용자 설문조사",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140294&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-01",
-   "kind": "생활",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/93cc5574f50cc563.webp"
-  },
-  {
-   "title": "[성균관대학교 청정에너지ICT연구소] 이공계열 박사 후 연구원 모집(2명 이상)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140291&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-01",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "src": "45ec8fd1"
-  },
-  {
-   "title": "사회과학대학 제40회 수선포럼 개최 안내: 2026.10.21.(수) 11:30~13:00",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140251&article.offset=0&articleLimit=10",
-   "kind": "행사",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/0fb1ce46ca702f27.webp",
-   "desc": "일시: 2026년 10월 21일(수) 11:30~13:00 장소: 사회과학연구원 컨퍼런스룸(수선관 901호) 발표: 오서정 교수(글로벌리더학부) 새로운 백년의 시작 2026 아리랑 행사 자원봉사자 모집 (10/1)…",
-   "src": "45ec8fd1"
   }
  ]
 }

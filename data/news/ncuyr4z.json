@@ -1,7 +1,54 @@
 {
  "school": "전북대학교",
- "updatedAt": "2026-10-12",
+ "updatedAt": "2026-10-13",
  "items": [
+  {
+   "title": "[서울대학교] 2026학년도 동기 계절수업 교류수학 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/218347/detailView.do",
+   "postedAt": "2026-10-13",
+   "postId": "218347",
+   "kind": "학사",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-10-13"
+  },
+  {
+   "title": "[충북대학교] 2026학년도 동기 계절수업 교류수학 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/218346/detailView.do",
+   "postedAt": "2026-10-13",
+   "postId": "218346",
+   "kind": "학사",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-10-13",
+   "desc": "로딩이 오래걸리면 미리보기를 다시 눌러주세요."
+  },
+  {
+   "title": "2027학년도 전기 공공정책대학원 석사학위과정 신입생 모집 알림",
+   "url": "https://www.jbnu.ac.kr/web/Board/218341/detailView.do",
+   "postedAt": "2026-10-13",
+   "postId": "218341",
+   "kind": "학사",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-10-13"
+  },
+  {
+   "title": "「2026 전북 로컬페스타」행사 개최 홍보 및 홈페이지 게시물 등록 협조 요청",
+   "url": "https://www.jbnu.ac.kr/web/Board/218335/detailView.do",
+   "postedAt": "2026-10-13",
+   "postId": "218335",
+   "kind": "행사",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-10-13",
+   "thumb": "data/news/img/d7294e2d789b5d9b.webp",
+   "desc": "사무국 총무과 1. 귀 대학의 무궁한 발전을 기원합니다 . 2. 전북특별자치도경제통상진흥원 , 전북창조경제혁신센터 , ( 주 ) 크립톤에서는 유망 소상공인을 발굴하여 기업가형 소상공인으로 육성하는 「 로컬기업…"
+  },
   {
    "title": "2026학년도 2학기 중간 강의평가 실시 안내",
    "url": "https://www.jbnu.ac.kr/web/Board/218296/detailView.do",
@@ -378,25 +425,6 @@
    "campus": "",
    "foundAt": "2026-10-02",
    "thumb": "data/news/img/06040eddd1efc444.webp"
-  },
-  {
-   "title": "제15회 젠더문화축제(전북여성가족재단주최) 개최 및 참여 안내",
-   "url": "https://www.jbnu.ac.kr/web/Board/218017/detailView.do",
-   "postedAt": "2026-10-01",
-   "kind": "행사",
-   "school": "전북대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "thumb": "data/news/img/e21c54deb7e42363.webp"
-  },
-  {
-   "title": "[창업교육센터] 2026년 Scale-up 학생 창업자를 찾아라! 모집공고(~10/12까지)",
-   "url": "https://www.jbnu.ac.kr/web/Board/218011/detailView.do",
-   "postedAt": "2026-10-01",
-   "school": "전북대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "thumb": "data/news/img/99cdbc93cb326ad4.webp"
   }
  ]
 }

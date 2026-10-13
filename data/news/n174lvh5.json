@@ -1,7 +1,39 @@
 {
  "school": "가톨릭대학교",
- "updatedAt": "2026-10-12",
+ "updatedAt": "2026-10-13",
  "items": [
+  {
+   "title": "[CUK GAIA 디지털전환센터] G-ContAct AI Summit2026 초대",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276735&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-13",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-13",
+   "thumb": "data/news/img/348acf95fdd9a1fa.webp"
+  },
+  {
+   "title": "[대학일자리플러스센터] 2026학년도 일경험(인턴십) 우수수기 공모전 수상자 발표",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276715&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-13",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-13",
+   "desc": "성명 학번 학과 강*별 2021****5 특수교육과 박*원 2020****2 영어영문학과 방*영 2021****5 경영학과 성*원 2023****1 심리학과 이*은 2022****4 경영학과 최*호…"
+  },
+  {
+   "title": "[학부대학운영팀] 2026학년도 2학기 9주차 <Career Master Class> 안내 [Career DESIGN 수강생 대상]",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276713&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-13",
+   "kind": "생활",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-13",
+   "thumb": "data/news/img/8c524ea5f045b597.webp",
+   "desc": "2. 일시 및 특강 리스트(1개 특강 선 택) : 10/26( 월 ) ~ 10/30( 금 ) 18:00 ~ 20:00"
+  },
   {
    "title": "[대학일자리플러스센터] 한국고용정보원 2026년 대학일자리플러스센터 만족도 조사 참여 안내",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276661&article.offset=0&articleLimit=10",
@@ -52,7 +84,8 @@
    "school": "가톨릭대학교",
    "campus": "",
    "src": "5d85d287",
-   "foundAt": "2026-10-12"
+   "foundAt": "2026-10-12",
+   "desc": "* 추천채용 지원자는 서류전형 가산점 부여 ▶ 모집분야 : IT 엔지니어 부문 공통사항"
   },
   {
    "title": "[교수학습개발원] '신임교원 리서치 콜로키엄' 5차 신청 안내(교원 대상)",
