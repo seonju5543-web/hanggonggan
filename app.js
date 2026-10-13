@@ -2364,7 +2364,8 @@ function renderFormFill(restore) {
       <div class="sheet-handle"></div>
       <div class="sheet-body">
         <h3 class="sheet-title">${tpl.unofficial ? '지원문서 작성' : '양식 작성'}</h3>
-        <p class="sheet-provider">${esc(tpl.title)} · ${tpl.unofficial ? '자유 형식 제출 공고 — 이 문서를 그대로 제출할 수 있습니다' : '실제 공고 양식과 같은 구조로 만들어집니다'}</p>
+        <p class="sheet-provider">${esc(tpl.title)} · ${tpl.unofficial ? esc(tpl.lead || '이 공고에 맞춘 지원문서') : '실제 공고 양식과 같은 구조로 만들어집니다'}</p>
+        ${tpl.unofficial ? prepOriginalsHtml(sch) : ''}
         ${formQuestionsHtml(tpl)}
         ${typeof essayButtonHtml === 'function' ? essayButtonHtml(tpl) : ''}
         <button class="btn btn-primary btn-lg" id="btn-ff-generate">양식 문서 만들기</button>
@@ -2414,12 +2415,15 @@ function renderFormFill(restore) {
       renderFormFill();
       formProgressSave(true);   /* 미리보기로 넘어간 것도 진행분이다 */
     });
+    /* 🔴 맨 위부터 (2026-10-13 · verify-apply-prep 이 잡았다). 상세 시트에서 「신청 준비 시작」을 누르면 버튼까지 내려간
+       스크롤이 그대로 남아 질문 화면이 **중간부터** 보였고, 그 상태에선 아래로 쓸어 닫기도 안 됐다(scrollableAtTop). */
+    sheet.scrollTop = 0;
   } else {
     sheet.innerHTML = `
       <div class="sheet-handle"></div>
       <div class="sheet-body">
         <h3 class="sheet-title">작성 내용 확인</h3>
-        <p class="sheet-provider">칸을 눌러 직접 수정할 수 있습니다 · ${tpl.unofficial ? '자유 형식 제출용 지원문서' : '실제 공고 양식과 동일한 구조'}</p>
+        <p class="sheet-provider">칸을 눌러 직접 수정할 수 있습니다 · ${tpl.unofficial ? esc(tpl.lead || '이 공고에 맞춘 지원문서') : '실제 공고 양식과 동일한 구조'}</p>
         <div class="fd-wrap" id="ff-doc">${renderFormDoc(tpl, state.profile, formFill.ans, { editable: true })}</div>
         <button class="btn btn-primary btn-lg" id="btn-ff-confirm">이대로 신청 준비 완료</button>
         <div class="submit-actions" style="margin-top:8px">
@@ -2441,7 +2445,9 @@ function renderFormFill(restore) {
       else state.applications.push({ id: sch.id, name: sch.name, appliedAt: nowStamp(), step: 0, formAns: formFill.ans, pending: false });
       saveState();
       const ch = officialChannel(sch);
-      toast(`양식 작성 완료 · 문서를 저장해 ${ch.label}에 제출하세요`);
+      toast(tpl.unofficial && tpl.prepKind !== 'free'
+        ? `지원문서 작성 완료 · 내용을 ${ch.label}의 양식·입력 칸에 옮겨 제출하세요`
+        : `양식 작성 완료 · 문서를 저장해 ${ch.label}에 제출하세요`);
       formFill = null;
       formProgressClear();   /* 신청내역에 정식으로 들어갔으니 '쓰던 것' 표시를 지운다 */
       closeSheet();
@@ -2573,19 +2579,42 @@ function loadNotices() {
   });
 }
 
-/* 자유 형식 지원문서 연결 (2026-07-15): 공고가 별도 양식 없이 자유 형식 제출을
-   받는다고 '원문으로 확인된' 공고(prepDoc)에만 질문형 문서 작성 흐름을 붙인다.
-   공식 양식(formId)과 구분되도록 prepFormId로만 연결 — 채널 라벨은 그대로 유지. */
+/* 공고별 지원문서 연결 (2026-07-15 → 2026-10-13 개발자 결정으로 범위 확대).
+   🔴 앱 양식(formId)이 없는 **모든 정식 등록 공고**에 질문형 문서 작성 흐름을 붙인다.
+      예전엔 '자유 형식 제출이 원문으로 확인된 공고(prepDoc)'에만 붙였는데 실데이터에 0건이라, 학생은
+      「신청 준비 시작」을 눌러도 할 일 없는 빈 시트만 보고 버튼 한 번에 '준비 완료'가 됐다(2026-10-13 개발자:
+      *"앱 자체 문서는 있는 게 맞다 — 없으면 바로 신청내역으로 가고 앱의 신뢰도가 낮아진다"*).
+   🔴 정직함은 문서의 머리말이 지킨다(forms.js prepKindFor · '그대로 제출 가능'은 prepDoc 에서만).
+   공식 양식(formId)과 구분되도록 prepFormId 로만 연결 — 채널 라벨은 그대로 유지. 상시 제도(program)는 제외. */
 function attachPrepTemplates(list) {
   if (typeof FORM_TEMPLATES === 'undefined' || typeof buildPrepTemplate !== 'function') return;
   for (const s of list) {
-    // 개발자 지시(2026-07-15): 앱 제작 지원문서는 '문서 제출이 실제로 가능하다고
-    // 원문으로 확인된 공고(prepDoc: true)'에만 붙인다 — 나머지는 원문 발췌·링크만.
-    if (!s.prepDoc || s.formId || s.program) continue;
+    if (s.formId || s.program) continue;
     const pid = 'prep:' + s.id;
     FORM_TEMPLATES[pid] = buildPrepTemplate(s);
     s.prepFormId = pid;
   }
+}
+
+/* 원본 신청서 — 공고 첨부 중 신청서(isApplicationForm · data.js 한 곳) + 로봇이 PDF 로 바꿔 둔 사본(data/forms-pdf/index.json).
+   양식 작성 화면과 신청 준비 시트가 **같은 함수**로 그린다(베끼면 한쪽만 PDF 를 모른다). 층2 첨부는 선발 공고문이라 부르지 않는다. */
+let formPdfIndex = {};
+function loadFormPdfIndex() {
+  return fetch('data/forms-pdf/index.json', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((d) => { if (d && d.items) formPdfIndex = d.items; })
+    .catch(() => { /* 없으면 첨부 링크만 — 조용히 물러나되 아래 목록은 그대로 그린다 */ });
+}
+function prepOriginalsHtml(sch) {
+  if (sch.sourceKind === 'kosaf') return '';
+  const atts = (sch.attachments || []).filter((a) => a && !a.bodyImage && isApplicationForm(a));
+  const pdfs = (formPdfIndex[sch.id] || []).filter((f) => f && f.file);
+  if (!atts.length && !pdfs.length) return '';
+  const pdfLi = pdfs.map((f) => `<li class="att"><a href="${esc('data/forms-pdf/' + f.file)}" target="_blank" rel="noopener">${esc(f.name || f.file.split('/').pop())}</a> <span class="doc-legend">PDF · ${Number(f.pages) || '?'}쪽 · 원본 그대로</span></li>`).join('');
+  const attLi = atts.filter((a) => !pdfs.some((f) => f.name === a.name)).map((a) => `<li class="att">${attachmentLinkHtml(a)}</li>`).join('');
+  return `<h4>원본 신청서 양식 <span class="channel-tag">공고 원본</span></h4>
+      <ul class="doc-list">${pdfLi}${attLi}</ul>
+      <p class="dp-note">제출은 이 원본 양식으로 합니다 — 아래에서 정리한 내용을 옮겨 적으세요.</p>`;
 }
 
 /* 이 공고에서 쓸 양식 템플릿 id — 공식 양식이 우선, 없으면 준비용 문서 */
@@ -2781,7 +2810,7 @@ function loadKosaf() {
    (rerenderVisible 주석이 말하는 것과 같은 유형의 사고다). */
 function refreshAllData() {
   const ledger = loadLinkChecks();   // 원문 링크 확인 장부 먼저 — 정식 등록 그리기가 이것을 잠깐 기다린다(2026-10-03)
-  const jobs = [loadNotices(), loadNews(), loadRegistered(), loadKosaf(), loadActivities(), loadExternal()];
+  const jobs = [loadNotices(), loadNews(), loadRegistered(), loadKosaf(), loadFormPdfIndex(), loadActivities(), loadExternal()];
   jobs.push(ledger);
   if (typeof loadFormTemplates === 'function') jobs.push(loadFormTemplates());
   /* 🔴 `swReg` 는 이 파일 한참 아래(서비스워커 등록 자리)에서 `let` 으로 선언된다.
@@ -3700,6 +3729,7 @@ function renderApplyPrep(sch) {
       <h4>신청서 양식 <span class="channel-tag">공고 원본</span></h4>
       ${attList(formAtts)}
       <p class="dp-note">원본 파일을 내려받아 작성해 주세요.</p>` : ''}
+      ${(!formAtts.length && (formPdfIndex[sch.id] || []).length) ? prepOriginalsHtml(sch) : ''}
       ${otherAtts.length ? `
       <h4>${kosaf ? '선발 공고문 <span class="channel-tag">재단 원문</span>' : '공고 첨부 파일'}</h4>
       ${attList(otherAtts)}` : ''}
@@ -3712,7 +3742,9 @@ function renderApplyPrep(sch) {
       ${schoolPortalNote(sch)}
       ${(kosaf && sch.contact) ? `<p class="doc-legend">문의 ${esc(sch.contact)}</p>` : ''}
       ${sourceNoteHtml(sch)}
-      <button class="btn btn-primary btn-lg" id="btn-prep-confirm">이대로 신청 준비 완료</button>
+      ${/* 🔴 '완료'라는 말을 학생이 아무것도 안 한 시점에 쓰지 않는다 (2026-10-13 개발자 결정 — 이 시트는 이제
+           앱 지원문서가 없는 상시 제도·층2에서만 뜬다 · 그 밖은 양식 작성 화면이 먼저다) */ ''}
+      <button class="btn btn-primary btn-lg" id="btn-prep-confirm">확인했어요 — 신청내역에 담기</button>
       <p class="dp-note">누르면 신청내역에 담기고, 제출·결과는 그곳에서 기록합니다. 학교·재단에 접수되는 것은 아닙니다.</p>
     </div>`;
   /* 확인하면 **닫지 않고 그 공고의 '준비 완료' 화면을 연다** (2026-09-23 리뷰) — 다음 할 일
@@ -7735,7 +7767,7 @@ bindEvents();
 initOnboarding();
 loadLinkChecks();   // 원문 링크 확인 장부 — 링크를 그리는 목록들보다 먼저 띄운다(작다 · 없어도 조용하다)
 /* 처음 받는 데이터 — 다 도착하면(`bootJobs`) 홈을 한 번 그리고 인트로를 돌린다(위 `bootHold` 머리말) */
-const bootJobs = [loadNotices(), loadNews(), loadActivities(), loadExternal(), loadRegistered(), loadKosaf()];
+const bootJobs = [loadNotices(), loadNews(), loadActivities(), loadExternal(), loadRegistered(), loadKosaf(), loadFormPdfIndex()];
 /* 🔴 학과 목록은 **여기서 받지 않는다** (2026-09-26) — 209개교가 든 407KB 파일이었고
    쓰는 곳은 온보딩 자동추천 한 곳뿐이다. 학교가 정해질 때 그 학교 파일만 받는다
    (`loadMajorsFor` · 위 주석). */

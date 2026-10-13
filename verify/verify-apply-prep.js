@@ -5,7 +5,9 @@
    버튼을 누르는 **순간** `finalizeApply` 로 '신청 준비 완료'를 찍고 시트를 닫았다 — 학생은
    아무것도 준비하지 않았는데 신청내역에 '준비 완료'가 떴다(운영 원칙 1 정직한 신청 상태).
    실측으로 마감 전 공고 112건 중 100건(층1 32 · 층2 68)이 그 길이었다.
-   지금은 '신청 준비' 시트(`#apply-prep`)가 먼저 뜨고, 확인(`#btn-prep-confirm`)을 눌러야 담긴다.
+   2026-09-23: '신청 준비' 시트(`#apply-prep`)가 먼저 뜨고 확인(`#btn-prep-confirm`)을 눌러야 담겼다.
+   2026-10-13(개발자 결정 "앱 자체 문서는 있는 게 맞다"): 양식 없는 등록 공고엔 **공고별 지원문서**가 붙어 질문 화면(`#btn-ff-generate`)이
+   먼저 뜨고, 문서를 만들어 확인해야 담긴다. 준비 시트는 앱 문서가 없는 층2·상시 제도에만 남았다(⑤).
 
    🔴 **실제로 눌러서** 잰다 — 글자만 훑는 검사는 아무것도 안 하는 구현도 통과시킨다
       (2026-08-29 verify-sheet-back 이 그랬다). 핵심 항목은 ①의 '그 순간 신청내역에 없다'이고,
@@ -118,8 +120,9 @@ async function swipeDown(page, sel) {
     const can = (s) => applyLock(evaluateFor(s, p), state.applications.find((a) => a.id === s.id),
       dday(s.deadline)).canApply;
     const live = allScholarships().filter((s) => !s.program && dday(s.deadline).days >= 0 && !applied(s) && can(s));
-    /* 앱 양식이 **아예 없는** 공고만 — formId 만 있고 템플릿이 안 온 공고는 섞지 않는다 */
-    const plain = (s) => !s.formId && !s.prepFormId && !formTplIdFor(s) && !essayDefsFor(s).length;
+    /* 2026-10-13 개발자 결정 — 앱 양식(formId)이 없는 등록 공고에는 **앱 자체 지원문서**(prep:)가 붙는다.
+       층1 대상은 그 문서가 붙은 공고다(formId 만 있고 템플릿이 안 온 공고는 섞지 않는다). */
+    const plain = (s) => !s.formId && s.prepFormId && formTplIdFor(s) === s.prepFormId;
     const l1 = live.filter((s) => regIds.has(s.id) && s.sourceKind !== 'kosaf' && plain(s));
     /* 시트가 '신청서 양식'으로 부르는 규칙은 data.js isApplicationForm 한 곳 (2026-09-23 리뷰로 좁혔다) */
     const hasFormAtt = (s) => (s.attachments || []).some(isApplicationForm);
@@ -138,55 +141,62 @@ async function swipeDown(page, sel) {
   }, PLACEHOLDER_RE.source);
   console.log(`  · 후보 — 층1 양식 없음 ${pick.counts.l1}건 · 층2 ${pick.counts.l2}건`);
 
-  /* ══ ① 층1 · 앱 양식 없음 — 버튼을 눌러도 아직 담기지 않는다 ═══════════════ */
-  console.log('\n■ ① 층1 공고 — 「신청 준비 시작」 은 시트를 띄울 뿐 담지 않는다');
-  eq('마감 전 · 앱 양식 없음 · 서류 도우미 없음 · 미신청인 층1 공고가 있다 (없으면 이 검사는 무의미하다)', !!pick.A, true);
-  let prepOk = false;
+  /* ══ ① 층1 · 앱 양식 없음 → 앱 자체 지원문서 작성 화면이 먼저 뜬다 (2026-10-13 개발자 결정) ═══
+     예전(9-23)엔 '신청 준비' 시트가 떴다 — 그런데 그 시트에는 학생이 할 일이 없어 버튼 한 번에 '준비 완료'가 됐다.
+     이제 양식이 없는 등록 공고마다 공고에 맞춘 지원문서가 붙어, 버튼을 누르면 **질문 화면**(#btn-ff-generate)이 뜨고
+     문서를 만들어 확인해야 담긴다. 핵심은 변함없다 — 누르는 순간 신청내역에 없다. */
+  console.log('\n■ ① 층1 공고 — 「신청 준비 시작」 은 지원문서 작성 화면을 띄울 뿐 담지 않는다');
+  eq('마감 전 · 앱 양식 없음(자체 지원문서 붙음) · 미신청인 층1 공고가 있다 (없으면 이 검사는 무의미하다)', !!pick.A, true);
+  const pressApplyForm = async () => {
+    const btn = await page.evaluate(() => {
+      const b = document.querySelector('#btn-apply-one');
+      return b ? { label: b.textContent.trim(), disabled: b.disabled } : null;
+    });
+    if (!btn || btn.disabled) return { btn, form: false };
+    await page.click('#btn-apply-one', { timeout: 4000 });
+    const form = await page.waitForSelector('#btn-ff-generate', { state: 'visible', timeout: 3000 })
+      .then(() => true).catch(() => false);
+    return { btn, form };
+  };
   if (pick.A) {
     console.log(`  · 대상: ${pick.A.name} (${pick.A.id})`);
     /* ③을 잴 수 있게 — 안내 줄이 없는 공고가 골렸으면 한 줄 심는다(데이터에 기대지 않는다) */
     if (!pick.A.ph) {
       console.log('  · 서류 목록에 안내 줄이 없어 한 줄 심는다 (③ 픽스처)');
-      await page.evaluate((id) => { findSch(id).documents.push('지원 자격·제출 서류는 원문 공고에서 확인'); }, pick.A.id);
+      await page.evaluate((id) => { const s = findSch(id); s.documents.push('지원 자격·제출 서류는 원문 공고에서 확인'); attachPrepTemplates([s]); }, pick.A.id);
     }
     await open(pick.A.id);
-    const r = await pressApply();
+    const r = await pressApplyForm();
     eq('  버튼이 열려 있고 문구가 「신청 준비 시작」이다', r.btn && { label: r.btn.label, disabled: r.btn.disabled },
       { label: '신청 준비 시작', disabled: false });
-    prepOk = r.prep;
-    eq('  누르면 신청 준비 시트(#apply-prep)가 뜬다', r.prep, true);
-    eq('  확인 버튼(#btn-prep-confirm)이 있다', !!(await page.$('#btn-prep-confirm')), true);
+    eq('  누르면 지원문서 작성 화면(#btn-ff-generate)이 뜬다 — 빈 준비 시트가 아니다', [r.form, !!(await page.$('#apply-prep'))], [true, false]);
+    eq('  머리가 「지원문서 작성」 이고 둘째 줄이 그 문서의 성격(제출은 원본으로 · 포털에 붙여 넣기 · 원문 확인)을 말한다',
+      await page.evaluate(() => {
+        const t = document.querySelector('#detail-sheet .sheet-title');
+        const p = document.querySelector('#detail-sheet .sheet-provider');
+        return [t && t.textContent.trim(), !!(p && /원본 양식|붙여 넣을|원문에서 확인|그대로 제출|보낼 내용/.test(p.textContent))];
+      }), ['지원문서 작성', true]);
     /* 🔴 이게 핵심이다 — 예전 버그는 바로 이 순간 '신청 준비 완료'를 찍었다 */
     eq('  🔴 그 순간 신청내역(state.applications)에 없다', await appsOf(pick.A.id), { mem: [], disk: [] });
-    /* 옛 closeSheet 는 250ms 뒤에 시트를 숨겼다 — 그보다 오래 기다려 본다 */
     await page.waitForTimeout(500);
     eq('  시트가 닫히지 않고 열려 있다 (#detail-sheet.show)', await sheetOpen(), true);
 
-    /* ══ ② 시트 내용 ══ */
-    console.log('\n■ ② 신청 준비 시트가 무엇을 해야 하는지 말한다');
-    if (!prepOk) { fail++; console.log('  ✕ 신청 준비 시트가 안 떠 ②③⑥ 을 잴 수 없다'); }
+    /* ══ ② 질문 화면이 공고의 것을 보여 준다 ══ */
+    console.log('\n■ ② 지원문서 질문 화면 — 공고에서 온 것만');
+    if (!r.form) { fail++; console.log('  ✕ 질문 화면이 안 떠 ②③⑥ 을 잴 수 없다'); }
     else {
       const c = await page.evaluate(() => {
-        const root = document.querySelector('#apply-prep');
-        const heads = [...root.querySelectorAll('h4')].map((h) => h.textContent.replace(/\s+/g, ' ').trim());
-        const src = [...root.querySelectorAll('.doc-legend a')].map((a) => ({ href: a.href, text: a.textContent.trim() }));
-        return { heads, guide: root.querySelectorAll('.guide-list li').length, src,
-          text: root.innerText, boxed: [...root.querySelectorAll('li')].map((l) => l.textContent.trim()).filter((t) => t.startsWith('□')) };
+        const root = document.querySelector('#detail-sheet');
+        return {
+          text: root.innerText,
+          boxed: [...root.querySelectorAll('li')].map((l) => l.textContent.trim()).filter((t) => t.startsWith('□')),
+          questions: root.querySelectorAll('textarea, input[type="text"], input[type="checkbox"]').length,
+        };
       });
-      eq('  「최종 제출 방법」 머리가 있다', c.heads.some((h) => h.startsWith('최종 제출 방법')), true);
-      eq(`  제출 방법 안내 줄이 1개 이상이다 (${c.guide}줄)`, c.guide >= 1, true);
-      if (pick.A.src) {
-        const want = await page.evaluate((id) => safeUrl(findSch(id).sourceUrl), pick.A.id);
-        eq('  원문 링크 한 줄(.doc-legend a)이 그 공고의 원문 주소를 가리킨다',
-          c.src.length === 1 && c.src[0].href === want, true);
-      } else console.log('  · 원문 주소가 없는 공고라 링크 항목은 건너뜀');
-
+      eq(`  채울 칸이 하나 이상이다 (${c.questions}칸)`, c.questions >= 1, true);
       /* ══ ③ 안내 줄이 체크리스트 항목이 되지 않는다 ══ */
       console.log('\n■ ③ 「원문에서 확인」 안내 줄을 챙길 서류(□ …)로 올리지 않는다');
-      eq('  「□ 지원 자격·제출 서류는 원문 공고에서 확인」 이 없다',
-        c.text.includes('□ 지원 자격·제출 서류는 원문 공고에서 확인'), false);
       eq('  □ 항목 중 안내 줄이 하나도 없다', c.boxed.filter((t) => PLACEHOLDER_RE.test(t)), []);
-      eq('  그래도 제출 서류 이야기는 한다 (자리가 통째로 비지 않는다)', /제출 서류/.test(c.text), true);
 
       /* ══ ⑥-a 쓸어 닫으면 담기지 않는다 ══ */
       console.log('\n■ ⑥ 확인 없이 닫으면 담기지 않는다 — 아래로 쓸어 닫기');
@@ -195,49 +205,58 @@ async function swipeDown(page, sel) {
       eq('  신청내역에 없다', await appsOf(pick.A.id), { mem: [], disk: [] });
     }
 
-    /* ══ ④ 확인을 누르면 담긴다 ══ */
-    console.log('\n■ ④ 확인을 눌러야 담긴다');
+    /* ══ ④ 문서를 만들고 확인을 눌러야 담긴다 ══ */
+    console.log('\n■ ④ 문서를 만들어 확인을 눌러야 담긴다');
     await open(pick.A.id);
-    const r2 = await pressApply();
-    eq('  다시 열어 누르면 신청 준비 시트가 또 뜬다', r2.prep, true);
-    if (r2.prep) {
-      await page.click('#btn-prep-confirm', { timeout: 4000 });
-      eq('  확인을 누르면 신청내역에 pending:false 로 담긴다', await appsOf(pick.A.id),
-        { mem: [{ pending: false }], disk: [{ pending: false }] });
-      /* 확인하면 닫지 않고 **그 공고의 준비 완료 화면**을 연다 (2026-09-23 리뷰 — 메일 접수 버튼·
-         제출처·'공식 제출 완료로 기록'이 거기 있다. 닫으면 학생이 공고를 다시 찾아 열어야 했다) */
-      await page.waitForTimeout(500);
-      eq('  시트가 닫히지 않고 그 공고의 준비 완료 화면이 된다 (다음 할 일이 보인다)', await page.evaluate(() => {
-        const b = document.querySelector('#btn-apply-one');
-        return {
-          open: document.querySelector('#detail-sheet').classList.contains('show'),
-          prep: !!document.querySelector('#apply-prep'),
-          applied: !!document.querySelector('#detail-sheet .applied-at'),
-          btn: b && { label: b.textContent.trim(), disabled: b.disabled },
-        };
-      }), { open: true, prep: false, applied: true, btn: { label: '신청 준비 완료됨', disabled: true } });
-      await page.keyboard.press('Escape');
-      await closedAfter(500);
-    } else { fail++; console.log('  ✕ 신청 준비 시트가 안 떠 확인 버튼을 누를 수 없다'); }
+    const r2 = await pressApplyForm();
+    eq('  다시 열어 누르면 질문 화면이 또 뜬다', r2.form, true);
+    if (r2.form) {
+      await page.click('#btn-ff-generate', { timeout: 4000 });
+      const prev = await page.waitForSelector('#btn-ff-confirm', { state: 'visible', timeout: 4000 }).then(() => true).catch(() => false);
+      eq('  「양식 문서 만들기」 → 작성 내용 확인 화면(#btn-ff-confirm)', prev, true);
+      eq('  아직 신청내역에 없다', await appsOf(pick.A.id), { mem: [], disk: [] });
+      if (prev) {
+        const doc = await page.evaluate(() => {
+          const d = document.querySelector('#ff-doc');
+          return { title: d && d.querySelector('.fd-title') && d.querySelector('.fd-title').textContent, tag: d && d.querySelector('.fd-tag') && d.querySelector('.fd-tag').textContent,
+            boxedPh: [...(d ? d.querySelectorAll('td') : [])].map((t) => t.textContent).filter((t) => /^☐|^□/.test(t.trim()) && /원문 공고에서 확인/.test(t)).length };
+        });
+        eq('  문서 제목이 그 공고 이름을 담고 머리말이 문서의 성격을 밝힌다', [!!doc.title && doc.title.includes('지원문서'), !!doc.tag && /^※/.test(doc.tag.trim())], [true, true]);
+        eq('  문서 안에도 안내 줄이 체크 항목으로 들어가지 않는다', doc.boxedPh, 0);
+        await page.click('#btn-ff-confirm', { timeout: 4000 });
+        eq('  확인을 누르면 신청내역에 pending:false 로 담긴다', await appsOf(pick.A.id),
+          { mem: [{ pending: false }], disk: [{ pending: false }] });
+        await closedAfter(500);
+        await open(pick.A.id);
+        eq('  다시 열면 버튼이 「신청 준비 완료됨」 으로 잠긴다', await page.evaluate(() => {
+          const b = document.querySelector('#btn-apply-one');
+          return b && { label: b.textContent.trim(), disabled: b.disabled };
+        }), { label: '신청 준비 완료됨', disabled: true });
+        await page.keyboard.press('Escape');
+        await closedAfter(500);
+      }
+    } else { fail++; console.log('  ✕ 질문 화면이 안 떠 문서를 만들 수 없다'); }
   }
 
   /* ══ ② 이어서 — 첨부에 신청서 양식이 있는 공고 ══════════════════════════ */
-  console.log('\n■ ② 첨부에 신청서 양식이 있으면 「신청서 양식」 머리 아래 그 파일을 준다');
+  console.log('\n■ ② 첨부에 신청서 양식이 있으면 질문 화면 위 「원본 신청서 양식」 아래 그 파일을 준다');
   if (!pick.B) console.log('  · 첨부에 신청서 양식이 있는 양식 없음 층1 공고가 지금 없어 건너뜀');
   else {
     console.log(`  · 대상: ${pick.B.name} (${pick.B.id})`);
     await open(pick.B.id);
-    const r = await pressApply();
-    eq('  신청 준비 시트가 뜬다', r.prep, true);
-    if (r.prep) {
+    const r = await pressApplyForm();
+    eq('  지원문서 질문 화면이 뜬다', r.form, true);
+    if (r.form) {
       const got = await page.evaluate(() => {
-        const h = [...document.querySelectorAll('#apply-prep h4')].find((x) => x.textContent.trim().startsWith('신청서 양식'));
+        const h = [...document.querySelectorAll('#detail-sheet h4')].find((x) => x.textContent.trim().startsWith('원본 신청서 양식'));
         if (!h) return null;
         const ul = h.nextElementSibling;
         return ul && ul.matches('ul') ? [...ul.querySelectorAll('a')].map((a) => ({ name: a.textContent.trim(), href: a.href })) : [];
       });
-      eq('  「신청서 양식」 머리가 있다', got !== null, true);
-      eq('  그 아래에 공고의 양식 파일 링크가 그대로 있다', got, pick.B.formAtts);
+      eq('  「원본 신청서 양식」 머리가 있다', got !== null, true);
+      /* 로봇이 PDF 로 바꿔 둔 사본이 있으면 그 줄이 첨부 줄을 대신한다 — 이름은 어느 쪽이든 공고의 양식 파일 이름이어야 한다 */
+      eq('  그 아래에 공고의 양식 파일(이름)이 그대로 있다', (got || []).length >= 1 && pick.B.formAtts.every((f) => (got || []).some((g) => g.name === f.name)), true);
+      eq('  둘째 줄이 "제출은 원본 양식으로"라고 말한다', await page.evaluate(() => /원본 양식/.test(document.querySelector('#detail-sheet .sheet-provider').textContent)), true);
       eq('  아직 신청내역에 없다', await appsOf(pick.B.id), { mem: [], disk: [] });
       await page.keyboard.press('Escape');
       eq('  ESC 로 닫힌다', await closedAfter(600), true);

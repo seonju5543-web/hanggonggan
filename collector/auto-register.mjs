@@ -70,6 +70,7 @@ const TODAY = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
    이 파일은 불러오는 즉시 실행되므로 남이 여기서 가져갈 수 없어 따로 뺐다. */
 export { canonUrl } from './canon-url.mjs';
 import { canonUrl, idFromUrl, registerId } from './canon-url.mjs';
+import { pickRegisterAttachments } from './register-attachments.mjs';
 /* 🔴 원문 주소는 **HTML 기호를 되돌려** 담는다 (2026-10-03 · 원문 링크 정직성) — 게시판이 `&#038;` 로 내보낸 주소를
    그대로 담으면 브라우저가 `#038;…` 을 조각으로 읽어 글 번호가 사라진다(서울대 학생처 3건 실측: 공고 대신 메뉴 화면).
    되돌리는 규칙은 앱과 같은 파일(source-link.js) 하나다. '이미 등록됐나'를 묻는 열쇠도 되돌린 주소로 만든다 —
@@ -400,12 +401,10 @@ if (!cfg.enabled) {
     const cu = canonUrl(nUrl);
     batchSeen.add(cu);
     batchSeen.add(n.school + '|' + normTitle(n.title));
-    // 첨부는 신청서·공고문류만 (게시판 메뉴 링크 오염 방지)
-    // '원서·동의서·서약서·추천서'가 빠져 있어 진짜 신청서(예: 장학금지급원서)가 통째로
-    // 버려지던 것을 2026-07-30에 보강 — 염곡 3건 중 1건만 잡히던 실사례
-    const atts = (n.attachments || [])
-      .filter((a) => /신청서|지원서|신청양식|원서|서식|양식|동의서|서약서|추천서|공고/.test(a.name) && /\.(hwp|hwpx|doc|docx|pdf|zip|xlsx?)(\?|$)?/i.test(a.name + a.url))
-      .slice(0, 6);
+    // 첨부 고르기는 register-attachments.mjs 한 곳 (2026-10-13 · 이름 허용 목록 → 차단 목록).
+    // 예전 허용 목록(신청서·…·공고)은 「붙임1」「선발요강」「안내문」을 버려 등록분 38건이 첨부 0건이었다(실측).
+    // '원서·동의서·서약서·추천서'가 빠져 진짜 신청서가 버려지던 2026-07-30 사고도 같은 뿌리다.
+    const atts = pickRegisterAttachments(n.attachments || []);
     // 🔴 공식은 canon-url.mjs 하나 — 베끼면 관리자 화면의 register 와 갈라진다(2026-08-14 부경대 유형) · 겹치면 꼬리표 id(registerId · 위 legacyCanons 주석)
     const rid = registerId('auto-', nUrl, { holderCanon, blockedIds, blockedCanons: blockedUrls, ambiguous });
     const id = rid.id;

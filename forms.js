@@ -559,35 +559,119 @@ async function shareFormDoc(tpl, p, ans, sch) {
   downloadFormDoc(tpl, p, ans);
 }
 
-/* ---------- 자유 형식 지원문서 (2026-07-15 개발자 지시) ----------
-   공고가 별도 양식 없이 자유 형식 제출을 받는다고 원문으로 확인된 공고
-   (registered.json의 prepDoc: true)에만 제공한다 — 실제 제출 가능한 문서.
-   제출이 불가능한 공고에는 절대 붙이지 않는다(사용자 혼란·신뢰 훼손 방지). */
+/* ---------- 공고별 지원문서 (2026-07-15 개발자 지시 → 2026-10-13 개발자 결정으로 모든 등록 공고에) ----------
+   🔴 2026-10-13 개발자 결정: *"앱 자체 문서는 일단 있는 게 맞다 — 없으면 「신청 준비 시작」을 눌렀을 때
+      바로 신청내역으로 가고 앱의 신뢰도가 낮아진다."* 그래서 앱 양식(formId)이 없는 **모든 정식 등록 공고**에
+      이 문서가 붙는다(예전엔 prepDoc: true 인 공고만 — 실데이터에 0건이라 학생은 늘 빈 준비 시트만 봤다).
+   🔴 정직함은 **머리말(tag)**이 지킨다 — 같은 틀이지만 공고가 받는 것에 따라 다르게 말한다(prepKindFor):
+      free(원문이 자유 양식이라 확인 · prepDoc) → "그대로 제출할 수 있다" · attached(첨부 신청서 있음) → "원본 양식에 옮겨 적을
+      내용을 정리한다" · portal → "입력 칸에 붙여 넣을 답" · email → "메일에 첨부·본문으로" · unknown → "제출 전 원문에서 양식 유무 확인".
+      '그대로 제출 가능'이라는 말은 free 에서만 한다(원칙 8-2).
+   🔴 공고마다 다른 것은 **원문에서 온 것만**이다 — 작성형 서류 이름(documents)·지원 자격 줄(eligibilityLines)·제출 서류·제출 안내.
+      원문에 없는 절을 지어내지 않는다: 작성형 서류 이름이 없으면 기본 세 절(지원 동기·학업/활동·계획)만.
+   🔴 순수 함수 — 공고 객체만 받는다(브라우저·Node 겸용 · 관문 test-collector 「공고별 지원문서」가 Node 에서 부른다).
+      isApplicationForm(data.js)이 있으면 쓰고 없으면 이름 규칙으로 물러난다. */
+const PREP_WRITE_DOCS = [
+  { match: /자기소개서|자소서/, label: '자기소개서', q: '자기소개서에 담을 내용 — 성장 과정·지원 동기·강점을 사실대로' },
+  { match: /학업계획서|수학계획서/, label: '학업계획서', q: '남은 학기의 학업 계획과 목표' },
+  { match: /연구계획서/, label: '연구계획서', q: '연구 주제·방법·기대 결과' },
+  { match: /활동계획서/, label: '활동계획서', q: '활동 계획 — 무엇을 언제 어떻게' },
+  { match: /사유서|신청\s*사유/, label: '신청 사유서', q: '이 장학금을 신청하는 사유를 사실대로' },
+  { match: /지원\s*동기/, label: '지원 동기', q: '지원 동기' },
+  { match: /에세이|포부/, label: '에세이(포부)', q: '요구한 주제에 맞는 글' },
+];
+/* 자리표시 안내 줄('원문 공고에서 확인')과 자동 제출 서류는 서류 이름이 아니다 — app.js 의 DOC_PLACEHOLDER 와 같은 꼴(베끼지 않고 좁게 둔다) */
+const PREP_DOC_PLACEHOLDER = /(원문\s*공고|공고문)(에서)?\s*확인/;
+const PREP_ATT_FORM_NAME = /신청서|지원서|원서|계획서|동의서|서약서/;
+const PREP_ATT_DOC_EXT = /\.(hwp|hwpx|docx?|zip|pdf)/i;
+
+function prepRealDocs(sch) {
+  return (sch.documents || []).filter((d) => d && !PREP_DOC_PLACEHOLDER.test(d) && !/자동/.test(d));
+}
+function prepWriteDocs(sch) {
+  const out = [];
+  for (const d of prepRealDocs(sch)) {
+    const def = PREP_WRITE_DOCS.find((w) => w.match.test(d));
+    if (def && !out.some((o) => o.label === def.label)) out.push({ ...def, doc: d.replace(/\s*\(.*\)$/, '') });
+  }
+  return out;
+}
+function prepHasFormAttachment(sch) {
+  /* 층2(한국장학재단이 아는 재단 장학금)의 첨부는 재단이 올린 **선발 공고문**이다 — 이름에 '신청서'가 있어도 신청서라 부르지 않는다(CLAUDE.md 「층2」) */
+  if (sch.sourceKind === 'kosaf') return false;
+  const atts = (sch.attachments || []).filter((a) => a && !a.bodyImage);
+  if (typeof isApplicationForm === 'function') return atts.some(isApplicationForm);
+  return atts.some((a) => PREP_ATT_FORM_NAME.test(a.name || '') && PREP_ATT_DOC_EXT.test(a.name || ''));
+}
+/* 이 공고가 **무엇을 받는가** — 머리말을 정하는 한 곳. 순서가 뜻이다: 원문 확인(free)이 첨부 이름보다 앞, 접수 채널이 '모름'보다 앞 */
+function prepKindFor(sch) {
+  if (sch.prepDoc) return 'free';
+  if (prepHasFormAttachment(sch)) return 'attached';
+  if (sch.applyEmail) return 'email';
+  if (sch.applyPortal) return 'portal';
+  return 'unknown';
+}
+const PREP_TAGS = {
+  free: '※ 이 공고는 별도 신청서 양식 없이 자유 형식 제출을 받는다고 원문에서 확인했습니다 — 아래 문서를 그대로 제출할 수 있습니다.',
+  attached: '※ 이 공고에는 첨부된 신청서 양식이 있습니다 — 아래는 그 원본 양식에 옮겨 적을 내용을 정리한 문서이고, 제출은 공고의 원본 양식으로 합니다.',
+  portal: '※ 이 공고는 포털·온라인 입력으로 접수합니다 — 아래는 입력 칸에 붙여 넣을 답을 정리한 문서이고, 이 문서 자체를 내는 것은 아닙니다.',
+  email: '※ 이 공고는 메일로 접수합니다 — 아래 내용을 공고가 정한 서류와 함께 보내세요. 공고가 양식을 정했다면 그 양식으로 옮겨 적습니다.',
+  unknown: '※ 이 공고에서 첨부된 신청서 양식을 찾지 못했습니다 — 아래 문서로 내용을 준비하고, 제출 전 원문에서 양식·접수 방법을 확인하세요.',
+};
+/* 화면 머리줄용 짧은 말 — 긴 tag 는 문서 위에, 이것은 작성 화면 둘째 줄에 */
+const PREP_LEADS = {
+  free: '자유 형식 제출 공고 — 이 문서를 그대로 제출할 수 있습니다',
+  attached: '첨부 신청서 양식에 옮겨 적을 내용을 정리합니다 — 제출은 원본 양식으로',
+  portal: '포털 입력 칸에 붙여 넣을 답을 정리합니다',
+  email: '메일 접수 공고 — 보낼 내용을 정리합니다',
+  unknown: '내용을 먼저 준비합니다 — 양식·접수 방법은 제출 전 원문에서 확인',
+};
+/* 지원 자격 줄 → 학생이 스스로 확인하는 체크 항목(판정이 아니다 · 너무 긴 줄·조각 줄은 뺀다 · 여섯 줄까지) */
+function prepEligOptions(sch) {
+  const lines = (sch.eligibilityLines || []).map((l) => String(l || '').replace(/\s+/g, ' ').trim());
+  const out = [];
+  for (const l of lines) {
+    if (l.length < 6 || l.length > 90) continue;
+    if (!out.includes(l)) out.push(l);
+    if (out.length >= 6) break;
+  }
+  return out;
+}
+function prepSubmitNote(sch) {
+  const kind = prepKindFor(sch);
+  const where = { free: '공고의 접수처', attached: '원본 양식을 채워 공고의 접수처', portal: '공고가 안내한 포털·온라인 입력', email: `메일 ${sch.applyEmail || ''}`.trim(), unknown: '원문 공고의 접수 방법' }[kind];
+  const due = sch.deadline ? `마감 ${sch.deadline}` : '마감은 원문 확인';
+  return `${where} · ${due} · 학교·재단에 실제로 접수되는 것은 아니며 제출은 학생이 직접 합니다.`;
+}
+
 function buildPrepTemplate(sch) {
-  return {
-    title: `${sch.name} — 지원문서`,
-    docName: `지원문서_${(sch.name || '').replace(/[^가-힣a-zA-Z0-9]/g, '').slice(0, 24) || '장학금'}`,
-    org: sch.provider || '',
-    tag: '※ 이 공고는 별도 신청서 양식 없이 자유 형식 제출을 받습니다 — 아래 문서를 그대로 제출할 수 있습니다.',
-    unofficial: true,
-    pledge: '위 내용은 사실과 다름이 없습니다.',
-    signLabel: '지원자',
-    sections: [
-      {
-        heading: '신청 개요',
-        info: [
-          ['성 명', 'name', '학 교', 'school'],
-          ['학 과', 'major', '학 번', 'studentId'],
-          ['연락처', 'phone', '이메일', 'email']
-        ],
-        fields: [
-          { id: 'grade', label: '학년 (학기)', type: 'text', q: '학년(학기)', placeholder: '예: 3학년(6학기)' }
-        ]
-      },
+  const kind = prepKindFor(sch);
+  const writeDocs = prepWriteDocs(sch);
+  const sections = [
+    {
+      heading: '신청 개요',
+      info: [
+        ['성 명', 'name', '학 교', 'school'],
+        ['학 과', 'major', '학 번', 'studentId'],
+        ['연락처', 'phone', '이메일', 'email']
+      ],
+      fields: [
+        { id: 'grade', label: '학년 (학기)', type: 'text', q: '학년(학기)', placeholder: '예: 3학년(6학기)' }
+      ]
+    },
+  ];
+  if (writeDocs.length) {
+    /* 공고가 이름 붙여 요구한 작성형 서류마다 절 하나 — 절 이름은 원문 서류 이름 그대로 */
+    writeDocs.forEach((w, i) => sections.push({
+      heading: w.doc,
+      fields: [{ id: `write${i + 1}`, label: w.doc, type: 'textarea', kind: 'story', q: w.q }],
+    }));
+  } else {
+    sections.push(
       {
         heading: '지원 동기 및 신청 사유',
         fields: [
-          { id: 'reason', label: '지원 동기 및 신청 사유', type: 'textarea', q: '이 장학금에 지원하는 동기와 신청 사유', sugg: [
+          { id: 'reason', label: '지원 동기 및 신청 사유', type: 'textarea', kind: 'story', q: '이 장학금에 지원하는 동기와 신청 사유', sugg: [
             '등록금 부담을 덜고 학업에 온전히 집중하고 싶어 지원합니다. 가계 형편상 장학 지원이 학업을 이어가는 데 큰 힘이 됩니다.',
             '전공 심화와 진로 준비에 필요한 비용을 마련하고자 지원합니다. 성실히 쌓아온 성적으로 그 의지를 증명하겠습니다.'
           ] }
@@ -596,10 +680,10 @@ function buildPrepTemplate(sch) {
       {
         heading: '학업 및 활동 요약',
         fields: [
-          { id: 'study', label: '학업 성취 (성적·이수 현황)', type: 'textarea', q: '직전 학기 성적과 학업 성취를 요약해 주세요', sugg: [
+          { id: 'study', label: '학업 성취 (성적·이수 현황)', type: 'textarea', kind: 'story', q: '직전 학기 성적과 학업 성취를 요약해 주세요', sugg: [
             '직전 학기 평점 4.0 이상을 유지하며 전공 필수 과목을 성실히 이수했습니다.'
           ] },
-          { id: 'activity', label: '교내·외 활동', type: 'textarea', q: '교내·외 활동 내역 (동아리·봉사·프로젝트 등)', sugg: [
+          { id: 'activity', label: '교내·외 활동', type: 'textarea', kind: 'story', q: '교내·외 활동 내역 (동아리·봉사·프로젝트 등)', sugg: [
             '전공 학회와 봉사 동아리에서 꾸준히 활동하며 협업과 책임감을 길렀습니다.'
           ] }
         ]
@@ -607,16 +691,38 @@ function buildPrepTemplate(sch) {
       {
         heading: '향후 계획',
         fields: [
-          { id: 'plan', label: '학업·진로 계획', type: 'textarea', q: '남은 학기 학업 계획과 진로 목표', sugg: [
+          { id: 'plan', label: '학업·진로 계획', type: 'textarea', kind: 'story', q: '남은 학기 학업 계획과 진로 목표', sugg: [
             '남은 학기 동안 전공 심화 과목을 집중 이수하고, 졸업 후에는 전공을 살려 사회에 기여하겠습니다.'
           ] }
         ]
       },
-      {
-        heading: '제출 서류 확인',
-        note: (sch.documents || []).join(' · ') || '제출 서류는 원문 공고에서 확인하세요.',
-        fields: []
-      }
-    ]
+    );
+  }
+  const elig = prepEligOptions(sch);
+  if (elig.length) {
+    sections.push({
+      heading: '지원 자격 확인',
+      note: '공고 원문의 자격 줄 — 해당하는 것을 본인이 확인합니다',
+      fields: [{ id: 'eligCheck', label: '해당 사항', type: 'checks', q: '공고의 지원 자격 중 해당하는 항목을 모두 고르세요 (본인 확인)', options: elig }],
+    });
+  }
+  const docs = prepRealDocs(sch);
+  sections.push({
+    heading: '제출 서류 확인',
+    note: docs.length ? docs.join(' · ') : '제출 서류는 원문 공고에서 확인하세요.',
+    fields: []
+  });
+  sections.push({ heading: '제출 안내', note: prepSubmitNote(sch), fields: [] });
+  return {
+    title: `${sch.name} — 지원문서`,
+    docName: `지원문서_${(sch.name || '').replace(/[^가-힣a-zA-Z0-9]/g, '').slice(0, 24) || '장학금'}`,
+    org: sch.provider || '',
+    tag: PREP_TAGS[kind],
+    lead: PREP_LEADS[kind],
+    prepKind: kind,
+    unofficial: true,
+    pledge: '위 내용은 사실과 다름이 없습니다.',
+    signLabel: '지원자',
+    sections,
   };
 }
