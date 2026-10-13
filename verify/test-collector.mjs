@@ -12373,6 +12373,25 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
       ['collector/kosaf-hunt.json', 'collector/kosaf-hunt-state.json', 'collector/kosaf-hunt-report.md', 'collector/external-sources.json'].every((f) => wf.includes(`git add ${f}`)),
       /gh workflow run link-check\.yml[^\n]*-f mode=candidates/.test(wf), (wf.match(/title: 🚨 층2 재단 글 사냥꾼 — 사냥 단계가 끝까지 못 갔어요/g) || []).length, /mode: resolve/.test(wf), /robot-down/.test(wf) && /failure\(\) \|\| cancelled\(\)/.test(wf), /issues: write/.test(wf)],
     [true, true, true, true, true, true, 2, true, true, true]);
+  /* ⑦-1 저장 전 데이터 관문 (2026-10-13 — 사냥꾼이 관문 없이 증거 2건짜리 게시판을 외부 출처 목록에 적어, 그날 돌아간 로봇 전부(수집·브라우저·링크 사냥꾼 6회)가
+     「자동으로 찾은 게시판에는 증거가 붙어 있다」에 걸려 빨간불 · 되돌려도 원인이 기존 파일이라 still-failing). 저장하는 로봇은 전부 저장 직전에 관문을 거친다.
+     사냥꾼은 data/ 를 쓰지 않아 규칙 관문(test-collector)만 잰다 — 감사(audit-data)까지 묶으면 남의 데이터 빨간불에 사냥꾼 장부까지 멈춘다. */
+  const GGm = await import('../collector/gate-guard.mjs').catch(() => ({}));
+  eq('⑦-1 되돌리기 도구가 외부 출처 목록의 이름표·뒷일을 안다(단락이 「`collector/external-sources.json`」 경로 그대로가 되지 않게)',
+    !!(GGm.FILE_LABELS || []).find((l) => l.path === 'collector/external-sources.json' && /출처/.test(l.name) && /게시판/.test(l.after || '')), true);
+  const wfSave = wf.indexOf('git add collector/kosaf-hunt.json');
+  const wfGate = wf.indexOf('node verify/test-collector.mjs');
+  eq('  kosaf-hunt.yml — 저장 **앞**에 규칙 관문(always · continue-on-error · dry 는 건너뜀) · 빨가면 gate-guard 가 외부 출처 목록만 되돌려 다시 잰다(GATE_CMD 는 규칙 관문만) · 넘어지면 그 파일을 직전 판으로',
+    [wfGate > 0 && wfGate < wfSave, /name: 데이터 관문\n\s+id: audit\n\s+if: always\(\) && !inputs\.dry\n\s+continue-on-error: true/.test(wf),
+      /id: guard\n\s+if: steps\.audit\.outcome == 'failure'\n\s+timeout-minutes: \d+/.test(wf),
+      /GATE_CMD='node verify\/test-collector\.mjs' node collector\/gate-guard\.mjs --report collector\/kosaf-hunt-report\.md --note \/tmp\/gate-note\.md --stage collector\/external-sources\.json \|\| git checkout -- collector\/external-sources\.json/.test(wf)],
+    [true, true, true, true]);
+  eq('  저장·확인 로봇 깨우기는 관문이 초록일 때만(처음 통과 · 되돌려서 통과 · 다시 재니 통과) — 끝내 빨가면 저장하지 않고 빨간불로 끝낸다 · 경보 짝(같은 제목 둘 · 되돌린 단락을 그대로 싣는다)',
+    [/id: save\n\s+if: always\(\) && !inputs\.dry && \(steps\.audit\.outcome == 'success' \|\| steps\.guard\.outputs\.gate == 'reverted-files' \|\| steps\.guard\.outputs\.gate == 'flaky'\)/.test(wf),
+      /name: 원문 링크 확인 로봇 깨우기[^\n]*\n\s+if: always\(\) && !inputs\.dry && steps\.save\.outcome == 'success'/.test(wf),
+      (wf.match(/title: 🚨 층2 재단 글 사냥꾼 — 데이터 관문 실패/g) || []).length, /body-file: \/tmp\/gate-issue\.md/.test(wf) && /cat \/tmp\/gate-note\.md/.test(wf),
+      /if: steps\.audit\.outcome == 'failure' && steps\.guard\.outputs\.gate != 'reverted-files' && steps\.guard\.outputs\.gate != 'flaky'\n[\s\S]{0,400}?exit 1/.test(wf), wf.indexOf("steps.guard.outputs.gate != 'reverted-files'") > wf.indexOf('robot-down')],
+    [true, true, 2, true, true, true]);
   /* ⑧ 검색 길 (2026-10-13 · 사장님 "네이버 검색 API") — 열쇠 두 칸이 다 있어야 켜진다 · 그 재단 사이트의 글 주소만 · 같은 점수 규칙 · source search */
   eq('⑧ 검색 열쇠 — 두 칸 다 있어야 켜진다(하나라도 비면 꺼짐)', KH.searchKeys ? [!!KH.searchKeys({}), !!KH.searchKeys({ NAVER_CLIENT_ID: 'a' }), !!KH.searchKeys({ NAVER_CLIENT_ID: 'a', NAVER_CLIENT_SECRET: ' ' }), !!KH.searchKeys({ NAVER_CLIENT_ID: 'a', NAVER_CLIENT_SECRET: 'b' })] : [], [false, false, false, true]);
   const t1 = idx.find({ ds: 'kosaf', key: '9001' });

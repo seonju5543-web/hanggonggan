@@ -8,6 +8,10 @@ name: 층2 재단 글 사냥꾼
 #   · 검색 길(2026-10-13): 홈페이지 길로 못 고른 공고만 네이버 웹문서 검색에 묻는다 — 열쇠는 GitHub Secrets NAVER_CLIENT_ID ·
 #     NAVER_CLIENT_SECRET(값을 채팅·파일에 붙여 넣지 않는다). 없으면 그 길만 조용히 꺼지고 리포트에 '꺼짐(열쇠 없음)'.
 #   🔴 같은 재단은 3일에 한 번 · 검색은 한 실행 60번 상한 · 전체 예산 9분 안에 스스로 끝낸다(상한을 키우지 말 것).
+#   🔴 저장 직전에 규칙 관문(test-collector)을 거친다(2026-10-13): 관문 없이 증거 2건짜리 게시판을 외부 출처 목록에 적어 그날 돌아간 로봇 전부가
+#     「자동으로 찾은 게시판에는 증거가 붙어 있다」에 걸렸다(수집·브라우저·링크 사냥꾼 6회 빨간불 · 되돌려도 원인이 기존 파일이라 still-failing).
+#     빨가면 gate-guard 가 외부 출처 목록만 직전 판으로 되돌려 다시 재고, 그래도 빨가면 저장하지 않고 빨간불로 끝낸다(경보 짝 「데이터 관문 실패」).
+#     사냥꾼은 data/ 를 쓰지 않아 감사(audit-data)는 묶지 않는다 — 남의 데이터 빨간불에 사냥꾼 장부까지 멈추지 않게.
 # 실행: 매일 17:23 KST(수집 로봇들이 학교를 두드리는 시간을 피해 · 확인 로봇 18:47 보다 앞) · Actions 수동(all: 3일 규칙 무시 · only: 호스트 조각 · dry)
 
 on:
@@ -65,8 +69,29 @@ jobs:
           NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
         run: node collector/kosaf-hunt.mjs ${{ inputs.dry && '--dry' || '' }} ${{ inputs.all && '--all' || '' }} ${{ inputs.only && format('--only={0}', inputs.only) || '' }}
 
-      - name: 결과 저장 (기본 브랜치)
+      # 데이터 관문 — 외부 출처 목록(external-sources.json)에 적은 게시판이 규칙을 어기면 저장하지 않는다.
+      # always(): 사냥 단계가 시간 상한에 잘려도 그때까지 적은 후보는 관문을 거쳐 저장한다(링크 사냥꾼과 같은 이유 · 2026-08-01).
+      - name: 데이터 관문
+        id: audit
         if: always() && !inputs.dry
+        continue-on-error: true
+        timeout-minutes: 4
+        run: node verify/test-collector.mjs
+
+      # 🔴 되돌리고 **관문을 다시 잰다** (collector/gate-guard.mjs 한 곳 · 수집·소식 로봇과 같은 장치).
+      #    되돌릴 것은 외부 출처 목록 하나 — 후보·장부·리포트는 관문이 읽지 않는다. 넘어지면(|| 뒤) 그 파일만 직전 판으로.
+      #    상한 5분 = 관문 최대 두 번 + 여유(관문 한 번 ~55초 · 2026-10-11 실측).
+      - name: 관문 실패 시 외부 출처 목록 되돌리기
+        id: guard
+        if: steps.audit.outcome == 'failure'
+        timeout-minutes: 5
+        run: |
+          GATE_CMD='node verify/test-collector.mjs' node collector/gate-guard.mjs --report collector/kosaf-hunt-report.md --note /tmp/gate-note.md --stage collector/external-sources.json || git checkout -- collector/external-sources.json
+
+      # 저장은 관문이 초록일 때만 — 처음 통과 · 외부 출처 목록을 되돌려서 통과 · 다시 재니 통과(flaky). 끝내 빨가면(still-failing · 도구가 넘어짐) 저장하지 않는다.
+      - name: 결과 저장 (기본 브랜치)
+        id: save
+        if: always() && !inputs.dry && (steps.audit.outcome == 'success' || steps.guard.outputs.gate == 'reverted-files' || steps.guard.outputs.gate == 'flaky')
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -90,7 +115,7 @@ jobs:
 
       # 후보를 적었으면 확인 로봇을 후보 모드로 깨운다 — 로봇 커밋(GITHUB_TOKEN)은 push 트리거를 일으키지 않아 직접 부른다
       - name: 원문 링크 확인 로봇 깨우기 (후보 모드)
-        if: always() && !inputs.dry
+        if: always() && !inputs.dry && steps.save.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run link-check.yml --ref "${{ github.ref_name }}" -f mode=candidates || echo "::warning::확인 로봇을 깨우지 못했습니다 — 매일 18:47 실행이 후보를 봅니다"
@@ -98,6 +123,52 @@ jobs:
       - name: 리포트 출력
         if: always()
         run: cat collector/kosaf-hunt-report.md 2>/dev/null || true
+
+      # 🔴 관문 실패는 조용히 넘어가지 않는다 — 무엇을 되돌렸는지는 gate-guard 의 단락(/tmp/gate-note.md)을 그대로 싣고 제목은 결과로 가른다(소식 로봇과 같은 꼴).
+      #    이슈 **하나**에 모은다(제목에 날짜·결과 없음 · prefix) · 관문이 다시 통과하면 아래 짝이 닫는다.
+      - name: 🚨 데이터 관문 실패 알림
+        if: always() && !inputs.dry && steps.audit.outcome == 'failure'
+        timeout-minutes: 1
+        run: |
+          case "${{ steps.guard.outputs.gate }}" in
+            reverted-files) result="외부 출처 목록을 되돌려서 통과 — 후보·장부는 저장" ;;
+            still-failing)  result="되돌려도 빨간불 — 이번 결과는 저장하지 않음" ;;
+            flaky)          result="다시 재니 통과(되돌린 것 없음)" ;;
+            *)              result="되돌리기 도구가 넘어져 외부 출처 목록을 직전 판으로 돌림 — 이번 결과는 저장하지 않음" ;;
+          esac
+          {
+            echo "🎯 층2 재단 글 사냥꾼: 🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **데이터 관문(test-collector) 실패** — $result"
+            echo
+            if [ -n "${{ steps.guard.outputs.gate }}" ] && [ -s /tmp/gate-note.md ]; then cat /tmp/gate-note.md
+            else echo "> 되돌리기 도구가 결과를 남기지 못해 외부 출처 목록(collector/external-sources.json)을 직전 판으로 돌렸습니다."; fi
+            echo
+            echo "실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '사냥꾼 관문 실패 확인해줘'라고 지시하세요."
+          } > /tmp/gate-issue.md
+      - name: 🚨 데이터 관문 실패 — 경보 이슈
+        if: always() && !inputs.dry && steps.audit.outcome == 'failure'
+        timeout-minutes: 1
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          match: prefix
+          title: 🚨 층2 재단 글 사냥꾼 — 데이터 관문 실패
+          label: kosaf-hunt-gate
+          label-description: 층2 재단 글 사냥꾼 — 데이터 관문 실패
+          body-file: /tmp/gate-issue.md
+      - name: ✅ 데이터 관문 회복 — 경보 닫기
+        if: always() && !inputs.dry && steps.audit.outcome == 'success'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          match: prefix
+          title: 🚨 층2 재단 글 사냥꾼 — 데이터 관문 실패
+          body: |
+            ✅ 데이터 관문이 다시 통과했습니다 — 이번 후보는 저장됩니다. 자동으로 닫습니다.
+            실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       # 🔴 경보 짝 — 사냥 단계가 넘어지면 이슈 하나에 모으고, 다시 끝까지 가면 같은 제목으로 닫는다(tools/alert-issue.mjs · 관문 alerts)
       - name: 🚨 사냥 단계 실패 알림
@@ -128,3 +199,12 @@ jobs:
         with:
           robot: 층2 재단 글 사냥꾼
           token: ${{ github.token }}
+
+      # 🔴 되돌린 뒤에도 관문이 빨가면 초록불로 끝내지 않는다 — 이슈는 위 '데이터 관문 실패' 단계가 이미 열었다.
+      #    failure()·cancelled() 알림 **뒤**에 둔다(앞에 두면 그 알림이 '로봇이 넘어졌다'는 틀린 말을 붙인다 · 수집 로봇과 같은 순서).
+      #    되돌리기 도구가 넘어진 경우(gate 가 비어 있음)도 저장하지 않았으니 같이 빨간불 — 아니면 '아무것도 저장 안 됐는데 초록불'이 된다.
+      - name: 🚨 관문이 끝내 빨간불 (되돌린 뒤에도 · 되돌리기 도구가 넘어짐)
+        if: steps.audit.outcome == 'failure' && steps.guard.outputs.gate != 'reverted-files' && steps.guard.outputs.gate != 'flaky'
+        run: |
+          echo "::error::데이터 관문이 빨갛고(결과: '${{ steps.guard.outputs.gate }}') 이번 사냥 결과는 저장하지 않았습니다 — 이슈에 적었습니다."
+          exit 1

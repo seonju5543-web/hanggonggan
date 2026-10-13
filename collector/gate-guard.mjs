@@ -47,6 +47,7 @@ export const FILE_LABELS = [
   { path: 'collector/news-thumbs.json', name: '소식 사진 장부' },
   { path: 'collector/news-desc.json', name: '소식 요약 장부' },
   { path: 'collector/news-sources.json', name: '소식 출처 목록', after: '찾기 로봇이 이번에 고친 게시판 주소도 저장하지 않았습니다' },
+  { path: 'collector/external-sources.json', name: '재단·지자체 출처 목록', after: '이번 실행에 새로 찾은 재단 게시판 주소는 저장하지 않았습니다' },
 ];
 const labelOf = (p) => FILE_LABELS.find((l) => l.path === p.replace(/\/+$/, '')) || { path: p, name: `\`${p}\`` };
 const names = (paths) => [...new Set(paths.map((p) => labelOf(p).name))].join('·');
