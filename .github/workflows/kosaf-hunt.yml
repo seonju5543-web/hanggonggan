@@ -5,7 +5,7 @@ name: 층2 재단 글 사냥꾼
 #   · 로봇: collector/kosaf-hunt.mjs — 재단마다 홈 + 메뉴 두 단계(쪽 10개 상한) · 같은 점수 규칙(pickKosafPost)으로 글 하나를 고른다
 #   · 쓰는 파일 넷: collector/kosaf-hunt.json(후보) · kosaf-hunt-state.json(재단별 본 날) · kosaf-hunt-report.md · external-sources.json(찾은 게시판 autoFound)
 #   🔴 앱에 싣지 않는다 — 끝나면 원문 링크 확인 로봇(link-check.yml · 후보 모드)을 깨워 학생처럼 열어 확인한 것만 data/link-check.json fix 에 싣는다.
-#   · 검색 길(2026-10-13): 홈페이지 길로 못 고른 공고만 네이버 웹문서 검색에 묻는다 — 열쇠는 GitHub Secrets NAVER_CLIENT_ID ·
+#   · 검색 길(2026-10-13): 홈페이지 길로 못 고른 공고만 네이버 웹문서 검색(NAVER API HUB · 네이버클라우드)에 묻는다 — 열쇠는 GitHub Secrets NAVER_CLIENT_ID ·
 #     NAVER_CLIENT_SECRET(값을 채팅·파일에 붙여 넣지 않는다). 없으면 그 길만 조용히 꺼지고 리포트에 '꺼짐(열쇠 없음)'.
 #   🔴 같은 재단은 3일에 한 번 · 검색은 한 실행 60번 상한 · 전체 예산 9분 안에 스스로 끝낸다(상한을 키우지 말 것).
 #   🔴 저장 직전에 규칙 관문(test-collector)을 거친다(2026-10-13): 관문 없이 증거 2건짜리 게시판을 외부 출처 목록에 적어 그날 돌아간 로봇 전부가

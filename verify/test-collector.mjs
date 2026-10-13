@@ -12410,8 +12410,8 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
     sl ? [sl.target.key, sl.url, sl.source, sl.query, LCm.loadCandidates({ v: 1, items: [sl] }, { today: '2026-10-13' }).ok.length] : [], ['9001', 'https://gana.or.kr/bbs/view.php?id=101', 'search', '재단법인 가나장학재단 성적우수장학생 공고', 1]);
   eq('  그 사업 글이 없으면 고르지 않는다(남의 사업 글을 붙이지 않는다)', KH.searchLine ? KH.searchLine(t1, srows.filter((r) => /id=102/.test(r.url)), 'q', { today: '2026-10-13' }) : 'x', null);
   const khSrc = readText(new URL('../collector/kosaf-hunt.mjs', import.meta.url));
-  eq('  열쇠는 환경 변수로만 받는다(코드에 값 없음) · 워크플로가 Secrets 를 넘긴다 · 상한이 있다',
-    [/X-Naver-Client-Id': keys\.id/.test(khSrc), /NAVER_CLIENT_ID: \$\{\{ secrets\.NAVER_CLIENT_ID \}\}/.test(wf), /NAVER_CLIENT_SECRET: \$\{\{ secrets\.NAVER_CLIENT_SECRET \}\}/.test(wf), /sstat\.asked >= SEARCH_MAX/.test(khSrc)], [true, true, true, true]);
+  eq('  열쇠는 환경 변수로만 받는다(코드에 값 없음) · 주소는 NAVER API HUB(옛 개발자센터는 신규 신청이 닫혔다) · 워크플로가 Secrets 를 넘긴다 · 상한이 있다',
+    [/X-NCP-APIGW-API-KEY-ID': keys\.id/.test(khSrc) && /naverapihub\.apigw\.ntruss\.com\/search\/v1\/webkr/.test(khSrc), /NAVER_CLIENT_ID: \$\{\{ secrets\.NAVER_CLIENT_ID \}\}/.test(wf), /NAVER_CLIENT_SECRET: \$\{\{ secrets\.NAVER_CLIENT_SECRET \}\}/.test(wf), /sstat\.asked >= SEARCH_MAX/.test(khSrc)], [true, true, true, true]);
   const ga = readText(new URL('../.gitattributes', import.meta.url));
   eq('  .gitattributes 에 리포트·장부 줄(merge=ours) — 없으면 배포 동기화가 충돌로 멈춘다', [/^collector\/kosaf-hunt-report\.md\s+merge=ours$/m.test(ga), /^collector\/kosaf-hunt-state\.json\s+merge=ours$/m.test(ga), /^collector\/kosaf-hunt\.json\s+merge=ours$/m.test(ga)], [true, true, true]);
 }

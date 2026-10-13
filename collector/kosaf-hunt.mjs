@@ -19,7 +19,7 @@
      그러면 재단·지자체 수집 로봇이 날마다 그 게시판을 읽고(data/external.json), 층2 짝짓기(kosafMatches)가 새 회차 글을 스스로 짝짓는다.
      층2 공고가 새로 들어오면(월·목 kosaf-fetch) 다음 날 이 로봇이 그 재단을 다시 본다.
    ⑤ 검색 길 (2026-10-13 · 은서 — 사장님 "네이버 검색 API 발급받아서 넣어 줄 수 있음?") — 홈페이지 길로 글을 못 고른 공고(홈페이지를 못 연 재단 포함)만
-     네이버 웹문서 검색에 「재단 이름 + 사업 이름 + 공고」를 묻는다. 결과 중 **그 재단 사이트의 글 주소**(hostAllowed · looksLikePost)만 남겨 같은 점수 규칙
+     네이버 웹문서 검색(NAVER API HUB — 네이버클라우드 콘솔 → NAVER API HUB 에서 앱을 만들고 '검색 - 웹문서'를 고른다)에 「재단 이름 + 사업 이름 + 공고」를 묻는다. 결과 중 **그 재단 사이트의 글 주소**(hostAllowed · looksLikePost)만 남겨 같은 점수 규칙
      (pickKosafPost)으로 고르고, 후보 줄 source 'search'(검색 결과 제목은 증거로만 — 확인 로봇이 학생처럼 열어 본 뒤에야 앱에 실린다).
      🔴 열쇠(GitHub Secrets NAVER_CLIENT_ID · NAVER_CLIENT_SECRET)가 없으면 이 길은 조용히 꺼진다 — 리포트에 '꺼짐(열쇠 없음)'으로 적는다.
      🔴 한 실행 검색 상한 SEARCH_MAX(기본 60 — 무료 한도 하루 25,000번에 한참 못 미친다) · 검색 사이 틈 · 실패가 연달아 3번이면 그 실행은 검색을 멈춘다.
@@ -50,7 +50,9 @@ const PAGE_MS = 20000;
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
 export const BY = '로봇(층2 글 사냥꾼)';
 export const SEARCH_MAX = Number(process.env.KOSAF_HUNT_SEARCH_MAX || 60);
-const SEARCH_URL = 'https://openapi.naver.com/v1/search/webkr.json';
+/* 🔴 네이버 개발자센터(openapi.naver.com)는 2026-07-31 신규 신청을 닫고 검색 API 를 네이버클라우드 NAVER API HUB 로 옮겼다(2026-10-13 확인 —
+   개발자센터 '사용 API' 목록에 검색이 없다). 새 키는 HUB 에서만 나오고, 주소와 머리말 이름이 다르다. 옛 개발자센터 키는 HUB 에 안 통한다. */
+const SEARCH_URL = 'https://naverapihub.apigw.ntruss.com/search/v1/webkr';
 const NOTE = '층2 재단 장학금의 개별 공고 후보 — 로봇(collector/kosaf-hunt.mjs)이 재단 홈페이지를 뒤져 적는다. 사람 후보 파일(link-candidates.json)과 같은 줄 꼴. 원문 링크 확인 로봇이 학생처럼 열어 확인한 것만 앱(data/link-check.json fix)에 실린다. 손으로 고치지 말 것 — 다음 실행이 다시 쓴다.';
 
 /* ── 순수 함수 ──────────────────────────────────────────────────────── */
@@ -264,7 +266,7 @@ async function crawlSite(group, { useBrowser, budget, log }) {
 
 async function naverSearch(keys, query) {
   const res = await fetch(`${SEARCH_URL}?query=${encodeURIComponent(query)}&display=10`, {
-    headers: { 'X-Naver-Client-Id': keys.id, 'X-Naver-Client-Secret': keys.secret }, signal: AbortSignal.timeout(PAGE_MS) });
+    headers: { 'X-NCP-APIGW-API-KEY-ID': keys.id, 'X-NCP-APIGW-API-KEY': keys.secret }, signal: AbortSignal.timeout(PAGE_MS) });
   if (!res.ok) throw new Error(`검색 응답 ${res.status}`);
   return res.json();
 }
