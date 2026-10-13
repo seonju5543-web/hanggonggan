@@ -3212,6 +3212,19 @@
    "cards": 5,
    "dir": "insta/pub/2701083002",
    "at": "2026-10-09"
+  },
+  {
+   "status": "prepared",
+   "code": "2700691001",
+   "org": "재단법인 아이엠엠희망재단",
+   "name": "IMM장학생",
+   "due": "2026-10-16",
+   "school": null,
+   "tplNo": 4,
+   "cards": 5,
+   "dir": "insta/pub/2700691001",
+   "at": "2026-10-13",
+   "dates": "absolute"
   }
  ]
 }
