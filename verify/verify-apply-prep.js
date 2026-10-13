@@ -130,13 +130,17 @@ async function swipeDown(page, sel) {
     const l2 = live.filter((s) => s.sourceKind === 'kosaf' && !formTplIdFor(s) && !essayDefsFor(s).length);
     const C = l2.find((s) => (s.attachments || []).length) || l2[0] || null;
     const F = live.find((s) => formTplIdFor(s)) || null;
+    /* P — 로봇이 원본 PDF 로 바꿔 둔 신청서가 있는 공고(승인 시안 A · 2026-10-14). 색인은 앱이 받은 formsPdfIndex 그대로 */
+    const P = l1.find((s) => hasFormAtt(s) && formPdfsFor(s).length) || null;
     const brief = (s) => s && ({ id: s.id, name: s.name.slice(0, 40), src: !!s.sourceUrl,
       atts: (s.attachments || []).length,
       formAtts: (s.attachments || []).filter(isApplicationForm).map((a) => ({ name: a.name, href: safeUrl(a.url) })),
+      pdfs: formPdfsFor(s).map((f) => ({ href: new URL(`data/forms-pdf/${f.file}`, document.baseURI).href, pages: f.pages, bytes: f.bytes })),
       ph: s.documents.some((d) => PH.test(d)) });
-    return { A: brief(A), B: brief(B), C: brief(C), F: brief(F), counts: { l1: l1.length, l2: l2.length } };
+    return { A: brief(A), B: brief(B), C: brief(C), F: brief(F), P: brief(P),
+      counts: { l1: l1.length, l2: l2.length, pdf: Object.keys((formsPdfIndex && formsPdfIndex.items) || {}).length } };
   }, PLACEHOLDER_RE.source);
-  console.log(`  · 후보 — 층1 양식 없음 ${pick.counts.l1}건 · 층2 ${pick.counts.l2}건`);
+  console.log(`  · 후보 — 층1 양식 없음 ${pick.counts.l1}건 · 층2 ${pick.counts.l2}건 · 원본 PDF 색인 ${pick.counts.pdf}건`);
 
   /* ══ ① 층1 · 앱 양식 없음 — 버튼을 눌러도 아직 담기지 않는다 ═══════════════ */
   console.log('\n■ ① 층1 공고 — 「신청 준비 시작」 은 시트를 띄울 뿐 담지 않는다');
@@ -237,11 +241,60 @@ async function swipeDown(page, sel) {
         return ul && ul.matches('ul') ? [...ul.querySelectorAll('a')].map((a) => ({ name: a.textContent.trim(), href: a.href })) : [];
       });
       eq('  「신청서 양식」 머리가 있다', got !== null, true);
-      eq('  그 아래에 공고의 양식 파일 링크가 그대로 있다', got, pick.B.formAtts);
+      /* 승인 시안 A: 로봇이 바꿔 둔 원본 PDF 줄이 맨 위, 그 밑에 공고의 양식 파일이 그대로 */
+      const pdfN = pick.B.pdfs.length;
+      eq('  그 아래에 공고의 양식 파일 링크가 그대로 있다 (원본 PDF 줄 밑)', (got || []).slice(pdfN), pick.B.formAtts);
+      eq('  원본 PDF 줄은 색인에 있는 만큼만 (없으면 0줄)', (got || []).slice(0, pdfN).map((a) => a.name), pick.B.pdfs.map(() => '원본 양식 그대로 보기'));
       eq('  아직 신청내역에 없다', await appsOf(pick.B.id), { mem: [], disk: [] });
       await page.keyboard.press('Escape');
       eq('  ESC 로 닫힌다', await closedAfter(600), true);
       eq('  닫아도 신청내역에 없다', await appsOf(pick.B.id), { mem: [], disk: [] });
+    }
+  }
+
+  /* ══ ②-A 승인 시안 A(2026-10-14) — 로봇이 바꿔 둔 「원본 양식 그대로 보기」 줄 ══════ */
+  console.log('\n■ ②-A 원본 PDF 가 있는 공고는 「신청서 양식」 맨 위에 「원본 양식 그대로 보기」 줄이 선다 (승인 시안 A)');
+  eq('로봇이 PDF 로 바꿔 둔 신청서가 있고 마감 전인 층1 공고가 있다 (없으면 이 검사는 무의미하다)', !!pick.P, true);
+  if (pick.P) {
+    console.log(`  · 대상: ${pick.P.name} (${pick.P.id}) · PDF ${pick.P.pdfs.length}건`);
+    await open(pick.P.id);
+    const r = await pressApply();
+    eq('  신청 준비 시트가 뜬다', r.prep, true);
+    if (r.prep) {
+      const got = await page.evaluate(() => {
+        const h = [...document.querySelectorAll('#apply-prep h4')].find((x) => x.textContent.trim().startsWith('신청서 양식'));
+        const ul = h && h.nextElementSibling;
+        const rows = ul ? [...ul.querySelectorAll('li.att')] : [];
+        const row = (li) => ({ cls: li.className, icon: (li.querySelector('.att-ic') || {}).textContent, go: (li.querySelector('.att-go') || {}).textContent,
+          link: li.querySelector('a') && { text: li.querySelector('a').textContent.trim(), href: li.querySelector('a').href, blank: li.querySelector('a').target === '_blank' },
+          meta: (li.querySelector('.att-m') || {}).textContent || '' });
+        const note = ul && ul.nextElementSibling && ul.nextElementSibling.matches('.dp-note') ? ul.nextElementSibling.textContent.trim() : null;
+        return { n: rows.length, rows: rows.map(row), note };
+      });
+      const pdfRows = got.rows.slice(0, pick.P.pdfs.length);
+      eq('  첫 줄(들)이 원본 PDF 줄이다 — 「원본 양식 그대로 보기」 · 새 탭 · data/forms-pdf/ 주소', pdfRows.map((r) => r.link),
+        pick.P.pdfs.map((p) => ({ text: '원본 양식 그대로 보기', href: p.href, blank: true })));
+      eq('  그 줄은 PDF 아이콘 · 「열기 ›」 · 강조 꼴(att-row-new)', pdfRows.map((r) => [r.icon, r.go, /\batt-row-new\b/.test(r.cls)]),
+        pick.P.pdfs.map(() => ['PDF', '열기 ›', true]));
+      eq('  작은 글씨에 쪽수·크기·「글자 하나 안 바꾼 원본 사본」', pdfRows.map((r) => /^\d+쪽 · \d+KB · 글자 하나 안 바꾼 원본 사본/.test(r.meta)), pick.P.pdfs.map(() => true));
+      eq('  그 밑 줄은 학교 게시판 첨부(내려받기 ↓)', got.rows.slice(pick.P.pdfs.length).map((r) => [r.go, /^학교 게시판 첨부 · 내려받기/.test(r.meta)]),
+        pick.P.formAtts.map(() => ['↓', true]));
+      eq('  안내 문구 — 「양식 채우기」는 다음 단계', got.note, '위 PDF 에 답을 얹는 「양식 채우기」는 다음 단계에서 열립니다.');
+      /* 로봇이 PDF 로 둔 그 파일(같은 이름의 첨부)은 「원본 양식 그대로 보기」 줄이 보여 준다 — 「공고 첨부 파일」에 또 늘어놓지 않는다(10-14 실측 선원가족 · PDF 신청서) */
+      const twice = await page.evaluate((id) => {
+        const names = formPdfsFor(findSch(id)).map((f) => f.name);
+        const h = [...document.querySelectorAll('#apply-prep h4')].find((x) => x.textContent.trim().startsWith('공고 첨부 파일'));
+        const ul = h && h.nextElementSibling;
+        return ul ? [...ul.querySelectorAll('a')].map((a) => a.textContent.trim()).filter((t) => names.includes(t)) : [];
+      }, pick.P.id);
+      eq('  같은 파일을 「공고 첨부 파일」 목록에 한 번 더 늘어놓지 않는다 (신청서 양식 묶음의 원본 파일 줄은 그대로)', twice, []);
+      /* 새 탭 링크가 실제로 PDF 를 준다(서비스워커가 index.html 을 대신 주지 않는다) */
+      const head = await page.evaluate(async (u) => { const r = await fetch(u, { cache: 'no-store' }); return { ok: r.ok, type: r.headers.get('content-type') || '' }; }, pick.P.pdfs[0].href);
+      eq('  그 주소를 받으면 PDF 다 (서비스워커가 앱을 대신 주지 않는다)', head.ok && /pdf/i.test(head.type), true);
+      eq('  아직 신청내역에 없다', await appsOf(pick.P.id), { mem: [], disk: [] });
+      await page.screenshot({ path: process.env.SHOT_PATH || '/dev/null', fullPage: false }).catch(() => {});
+      await page.keyboard.press('Escape');
+      await closedAfter(600);
     }
   }
 

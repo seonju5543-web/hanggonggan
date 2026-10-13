@@ -74,8 +74,9 @@ jobs:
         timeout-minutes: 8
         continue-on-error: true
         run: |
-          sudo apt-get install -y -qq libreoffice-writer libreoffice-core libreoffice-java-common fonts-nanum   # java-common: HWP 확장이 자바라 없으면 조용히 '못 읽음'
+          sudo apt-get install -y -qq libreoffice-writer libreoffice-core libreoffice-java-common fonts-nanum fonts-noto-cjk   # java-common: HWP 확장이 자바라 없으면 조용히 '못 읽음'
           bash collector/install-h2orestart.sh
+          bash collector/install-form-fonts.sh   # 한글 문서 글꼴 → 나눔·Noto 못 박기 — 없으면 중국어 글꼴로 표가 깨진다(2026-10-12 실측 14/14 · 춘곡)
           node collector/form-pdf.mjs
       - run: |
           git config user.name "handaejang-bot"

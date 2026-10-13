@@ -12056,7 +12056,7 @@ console.log('\n■ 낡은 게시판 주소 고침 (2026-10-04 개발자 "주소 
     [/'동국대학교 WISE캠퍼스': \{ \.\.\.NEWS_BOARD_RULES\['동국대학교 WISE캠퍼스'\]/.test(csrc),
      rows(RULES['동국대학교 WISE캠퍼스'], `<a href="#none" onclick="goDetail(520676);"> <div class="mark"><span class="num">619</span></div> <div class="top"> <em>교외장학(지자체, 사설/기타)</em> <p class="tit"> 대전청년내일재단 2026년 장학생 선발 안내 </p> <div class="info"> <span>2026.09.28.</span> <span>양문수</span> <span>조회 171</span> </div> </div> </a>`, 'https://wise.dongguk.ac.kr/article/servicenotice/list')],
     [true, [{ title: '대전청년내일재단 2026년 장학생 선발 안내', url: 'https://wise.dongguk.ac.kr/article/servicenotice/detail/520676' }]]);
-  eq('  학교 없는 전국 출처는 주최 이름으로 규칙을 찾는다 · 전북(한 번호) 규칙은 그대로', [/BOARD_RULES\[s\.school \|\| s\.host\]/.test(csrc), rows(RULES['전북대학교'], `<a href="javascript:;" onclick="pf_DetailMove('215647')">장학생 선발 공고 안내</a>`, 'x')[0].url], [true, 'https://www.jbnu.ac.kr/web/Board/215647/detailView.do?category=6']);
+  eq('  학교 없는 전국 출처는 주최 이름으로 규칙을 찾는다(둘째 게시판은 rule 열쇠 · 한양 10-14) · 전북(한 번호) 규칙은 그대로', [/BOARD_RULES\[s\.rule \|\| s\.school \|\| s\.host\]/.test(csrc), rows(RULES['전북대학교'], `<a href="javascript:;" onclick="pf_DetailMove('215647')">장학생 선발 공고 안내</a>`, 'x')[0].url], [true, 'https://www.jbnu.ac.kr/web/Board/215647/detailView.do?category=6']);
   const SCH = JSON.parse(readText(new URL('../collector/schools.json', import.meta.url)));
   const ACTSRC = JSON.parse(readText(new URL('../collector/activity-sources.json', import.meta.url)));
   eq('④ 404 주소는 출처에서 빠지고 보관됐다 · 분교 셋은 주소가 있다',
@@ -12266,6 +12266,16 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
     [['r1'], ['r2'], true, false, ['r1'], '원본 그대로 변환', true, true]);
   const again = FP.runFormPdf ? FP.runFormPdf({ root: fakeRepo, today: '2026-10-12', soffice: fakeSoffice, log: quiet }) : {};
   eq('  다시 돌리면 이미 있는 것은 건너뛴다 (같은 파일을 날마다 다시 쓰지 않는다)', [again.done && again.done.length, /이미 있어 건너뜀 1/.test(readText(path.join(fakeRepo, 'collector', 'form-pdf-report.md')))], [0, true]);
+  /* 글꼴 표 도장(FONT_STAMP · 2026-10-14) — 도장 없는(옛 글꼴로 그린) 사본은 '이미 있음'이 아니라 다시 바꾼다 · 새 항목엔 도장이 적힌다 */
+  {
+    const ip = path.join(fakeRepo, 'data', 'forms-pdf', 'index.json');
+    const idx = JSON.parse(readText(ip)); const stamped = (idx.items.r1 || []).map((f) => f.fonts);
+    for (const f of (idx.items.r1 || [])) delete f.fonts;
+    fs.writeFileSync(ip, JSON.stringify(idx, null, 1) + '\n');
+    const restamp = FP.runFormPdf ? FP.runFormPdf({ root: fakeRepo, today: '2026-10-12', soffice: fakeSoffice, log: quiet }) : {};
+    eq('  글꼴 표 도장이 없는(2026-10-12 중국어 글꼴 사본) 항목은 건너뛰지 않고 다시 바꾼다 · 바꾼 항목에 도장이 적힌다',
+      [stamped, restamp.done && restamp.done.length, (JSON.parse(readText(ip)).items.r1 || []).map((f) => f.fonts)], [[FP.FONT_STAMP], 1, [FP.FONT_STAMP]]);
+  }
   /* 리뷰 셋: 학교가 같은 이름으로 다시 올리면(원본 크기가 다르면) 다시 바꾼다 · 색인에 없는 고아 파일은 지운다 · 예산이 다 되면 남은 것을 적고 끝낸다 */
   fs.writeFileSync(path.join(fakeRepo, 'collector', 'extracted', 'forms-index.txt'), 'form-r1-1.docx\t우양재단 동행 장학생 모집\t지원서.docx\t101\n');
   fs.writeFileSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '9-옛결과.pdf'), pdf);
@@ -12278,10 +12288,22 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
   /* ⑨ 워크플로·설치 스크립트 글자 */
   const wf = readText(new URL('../.github/workflows/deep-fetch.yml', import.meta.url));
   const step = wf.slice(wf.indexOf('신청서 원본 → PDF (양식 원본 그대로)'), wf.indexOf('git config user.name'));
-  eq('⑨ deep-fetch.yml 의 PDF 단계는 보강 단계(시한 + continue-on-error) · 자바 다리와 확장 설치 · 저장 목록에 data/forms-pdf 와 리포트',
+  eq('⑨ deep-fetch.yml 의 PDF 단계는 보강 단계(시한 + continue-on-error) · 자바 다리와 확장 설치 · 한글 글꼴 두 묶음 + 글꼴 표 설치(변환 앞) · 저장 목록에 data/forms-pdf 와 리포트',
     [step.length > 0, /timeout-minutes:\s*\d+/.test(step), /continue-on-error: true/.test(step), /libreoffice-java-common/.test(step), /bash collector\/install-h2orestart\.sh/.test(step), /node collector\/form-pdf\.mjs/.test(step),
-      /git add -A data\/forms-pdf/.test(wf), /git add collector\/form-pdf-report\.md/.test(wf), /\|\| true/.test(step)],
-    [true, true, true, true, true, true, true, true, false]);
+      /git add -A data\/forms-pdf/.test(wf), /git add collector\/form-pdf-report\.md/.test(wf), /\|\| true/.test(step),
+      /fonts-nanum fonts-noto-cjk/.test(step), step.indexOf('bash collector/install-form-fonts.sh') > 0 && step.indexOf('bash collector/install-form-fonts.sh') < step.indexOf('node collector/form-pdf.mjs')],
+    [true, true, true, true, true, true, true, true, false, true, true]);
+  /* 글꼴 표 — 2026-10-12 첫 사본 14개 전부가 중국어 글꼴(WenQuanYi Zen Hei · Playwright 의존성)로 그려져 표 칸이 넘쳤다(춘곡장학회 실측 · 나눔으로 바꾸니 사라짐).
+     표가 한글 문서의 흔한 글꼴 이름을 나눔·Noto 로 못 박고, 설치 스크립트가 fc-match 로 스스로 확인하며 실패를 삼키지 않는다 */
+  const fontsConf = readText(new URL('../collector/fonts/hwp-font-aliases.conf', import.meta.url));
+  const fontsSh = readText(new URL('../collector/install-form-fonts.sh', import.meta.url));
+  eq('  글꼴 표가 함초롬돋움·함초롬바탕·맑은 고딕·굴림·돋움·바탕 을 나눔(고딕·명조)으로 못 박는다 · 한글(lang ko) 기본도 나눔',
+    ['함초롬돋움', '함초롬바탕', '맑은 고딕', '굴림', '돋움', '바탕'].map((f) => new RegExp(`<family>${f}</family><prefer><family>Nanum(Gothic|Myeongjo)</family>`).test(fontsConf)).concat([/<string>ko<\/string>/.test(fontsConf)]),
+    [true, true, true, true, true, true, true]);
+  eq('  설치 스크립트 — 실패를 삼키지 않고(set -e · apt 에 || true 없음) 표를 사용자 fontconfig 에 복사하고 fc-match 로 한글 글꼴로 풀리는지 스스로 확인한다',
+    [/set -euo pipefail/.test(fontsSh), /fonts-nanum fonts-noto-cjk/.test(fontsSh), !/apt-get[^\n]*\|\| true/.test(fontsSh), /fontconfig\/conf\.d/.test(fontsSh), /hwp-font-aliases\.conf/.test(fontsSh), /fc-match/.test(fontsSh), /exit 1/.test(fontsSh)],
+    [true, true, true, true, true, true, true]);
+  eq('  FONT_STAMP 가 있고 로봇이 색인 항목에 fonts 로 적는다 (표를 바꾸면 도장을 올린다 — 옛 사본이 다시 그려진다)', [typeof FP.FONT_STAMP, /fonts: FONT_STAMP/.test(readText(new URL('../collector/form-pdf.mjs', import.meta.url)))], ['string', true]);
   const sh = fs.existsSync(new URL('../collector/install-h2orestart.sh', import.meta.url)) ? readText(new URL('../collector/install-h2orestart.sh', import.meta.url)) : '';
   eq('  설치 스크립트는 실패해도 0 으로 끝나고(보강 단계) 깔렸는지를 unopkg list 로 적는다 · 러너(runner 사용자)에선 sudo 로 --shared 를 깐다(리뷰 — 없으면 HWP 전부가 조용히 못 읽음)',
     [/set -uo pipefail/.test(sh), /\$UNOPKG add --shared/.test(sh), /\$UNOPKG list/.test(sh), !/set -e/.test(sh), /sudo -n unopkg/.test(sh)], [true, true, true, true, true]);

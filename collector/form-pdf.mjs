@@ -38,6 +38,9 @@ export const PDF_FORM = (a) => /신청서|지원서|원서/.test((a && a.name) |
 /* 변환 시간 예산(초) — deep-fetch 단계 시한(8분)보다 짧게 스스로 끝낸다 · 넘으면 남은 것을 리포트에 적고 다음 실행이 잇는다 */
 export const BUDGET_SEC = Number(process.env.FORM_PDF_BUDGET_SEC || 300);
 export const SOFFICE_TIMEOUT_MS = 60000;
+/* 글꼴 표 도장 — collector/fonts/hwp-font-aliases.conf(한글 문서 글꼴 → 나눔·Noto) 가 바뀌면 올린다. 색인 항목에 적어 두고, 도장이 다른 옛 사본은
+   '이미 있음'으로 건너뛰지 않고 다시 바꾼다(2026-10-12 첫 사본 14개 전부가 중국어 글꼴(WenQuanYi)로 그려져 표 칸이 넘쳤다 — 춘곡장학회 실측). */
+export const FONT_STAMP = 'ko-nanum-1';
 
 /* data.js 의 신청서 판정을 **불러 쓴다**(베끼면 앱과 로봇이 다른 첨부를 신청서라 부른다). data.js 는 브라우저 파일이라 함수를 이름으로 떼어 온다. */
 function loadFormRules(root) {
@@ -191,12 +194,12 @@ export function runFormPdf({ root, today, dry = false, soffice = process.env.FOR
     t.files.forEach((f, i) => {
       const file = `${t.id}/${i + 1}-${safeName(f.name)}.pdf`;
       /* 같은 이름·같은 자리·같은 원본 크기면 건너뛴다 — 학교가 같은 이름으로 다시 올리면(크기가 다르면) 다시 바꾼다 */
-      const prev = have.find((h) => h.name === f.name && h.file === file && (h.srcBytes || 0) === (f.srcBytes || 0) && fs.existsSync(path.join(outDir, h.file)));
+      const prev = have.find((h) => h.name === f.name && h.file === file && (h.srcBytes || 0) === (f.srcBytes || 0) && (h.fonts || '') === FONT_STAMP && fs.existsSync(path.join(outDir, h.file)));
       if (prev) { next.push(prev); skippedSame += 1; return; }
       if (dry) { log(`[dry] ${t.id} · ${f.name} ← ${f.src}`); return; }
       if (overBudget()) { left.push({ id: t.id, name: f.name }); return; }
       const r = convertOne(path.join(root, 'collector', 'extracted', f.src), path.join(outDir, file), { soffice });
-      if (r.ok) { next.push({ file, name: f.name, pages: r.pages, bytes: r.bytes, srcBytes: f.srcBytes || 0, from: '원본 그대로 변환', at: today }); done.push({ id: t.id, name: f.name, pages: r.pages }); flush(); }
+      if (r.ok) { next.push({ file, name: f.name, pages: r.pages, bytes: r.bytes, srcBytes: f.srcBytes || 0, from: '원본 그대로 변환', fonts: FONT_STAMP, at: today }); done.push({ id: t.id, name: f.name, pages: r.pages }); flush(); }
       else failed.push({ id: t.id, name: f.name, why: r.why });
     });
     if (next.length) index.items[t.id] = next;

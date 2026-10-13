@@ -2744,6 +2744,28 @@ function linkChecksWait() {
   return Promise.race([linkChecksJob.catch(() => {}), new Promise((res) => setTimeout(res, LINK_CHECK_WAIT_MS))]);
 }
 
+/* 신청서 원본 PDF 색인 (2026-10-14 · 승인 시안 A) — 로봇(collector/form-pdf.mjs)이 공고 첨부의 신청서 원본을 글자 하나 안 바꾸고 PDF 로 바꿔 둔 것.
+   { items: { <공고 id>: [{ file, name, pages, bytes }] } }. 못 받으면 빈 채로 — 줄이 안 보일 뿐 시트는 그대로 뜬다. */
+let formsPdfIndex = { items: {} };
+function loadFormsPdfIndex() {
+  return fetch('data/forms-pdf/index.json', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((j) => { if (j && j.items && typeof j.items === 'object') formsPdfIndex = j; })
+    .catch(() => {});
+}
+function formPdfsFor(sch) { return (sch && formsPdfIndex.items && formsPdfIndex.items[sch.id]) || []; }
+/* 첨부 한 줄(시안 A 꼴) — 아이콘(확장자) · 이름 · 작은 글씨 · 오른쪽 동작 */
+function attachRowHtml(a, { meta = '', go = '↓' } = {}) {
+  const ext = (String((a && a.name) || '').match(/\.(\w{2,5})$/) || [, ''])[1].toUpperCase();
+  return `<li class="att att-row"><span class="att-ic att-ic-${esc(ext.toLowerCase())}">${esc(ext || '파일')}</span><span class="att-t">${attachmentLinkHtml(a)}${meta ? `<span class="att-m">${esc(meta)}</span>` : ''}</span><span class="att-go">${esc(go)}</span></li>`;
+}
+function formPdfRowsHtml(sch) {
+  return formPdfsFor(sch).map((f) => {
+    const meta = `${f.pages ? `${f.pages}쪽 · ` : ''}${Math.max(1, Math.round((f.bytes || 0) / 1024))}KB · 글자 하나 안 바꾼 원본 사본${formPdfsFor(sch).length > 1 ? ` · ${f.name}` : ''}`;
+    return `<li class="att att-row att-row-new"><span class="att-ic att-ic-pdf">PDF</span><span class="att-t"><a href="${esc(`data/forms-pdf/${f.file}`)}" target="_blank" rel="noopener">원본 양식 그대로 보기</a><span class="att-m">${esc(meta)}</span></span><span class="att-go">열기 ›</span></li>`;
+  }).join('');
+}
+
 function loadRegistered() {
   return Promise.all([
     fetch('data/registered.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)),
@@ -2784,6 +2806,7 @@ function refreshAllData() {
   const jobs = [loadNotices(), loadNews(), loadRegistered(), loadKosaf(), loadActivities(), loadExternal()];
   jobs.push(ledger);
   if (typeof loadFormTemplates === 'function') jobs.push(loadFormTemplates());
+  jobs.push(loadFormsPdfIndex());   // 신청서 원본 PDF 색인 (시안 A)
   /* 🔴 `swReg` 는 이 파일 한참 아래(서비스워커 등록 자리)에서 `let` 으로 선언된다.
      그 줄이 아직 실행되기 전에 여기를 부르면 `typeof` 로 물어봐도 예외가 난다(TDZ).
      감싸 두지 않으면 새로고침이 통째로 넘어지므로 감싼다 — 새 버전 확인은 덤이고
@@ -3687,8 +3710,13 @@ function renderApplyPrep(sch) {
      (상세 시트의 '선발 공고문' 머리말과 같은 규칙) */
   const formAtts = kosaf ? [] : atts.filter(isApplicationForm);
   /* 본문 사진(bodyImage)은 공고 원문 그 자체다 — '첨부 파일'로 늘어놓지 않는다(원문 링크가 준다) */
-  const otherAtts = atts.filter((a) => !formAtts.includes(a) && !a.bodyImage);
-  const attList = (list) => `<ul class="doc-list">${list.map((a) => `<li class="att">${attachmentLinkHtml(a)}${a.bytes ? ` <span class="doc-legend">${Math.max(1, Math.round(a.bytes / 1024))}KB</span>` : ''}</li>`).join('')}</ul>`;
+  const pdfRows = kosaf ? '' : formPdfRowsHtml(sch);
+  /* 로봇이 PDF 로 둔 그 파일(이름이 같은 첨부)은 「원본 양식 그대로 보기」 줄이 이미 보여 준다 — 밑에 또 늘어놓지 않는다(PDF 신청서는 isApplicationForm 밖이라 여기 걸렸다 · 10-14 실측 선원가족) */
+  const pdfNames = new Set(formPdfsFor(sch).map((f) => f.name));
+  const otherAtts = atts.filter((a) => !formAtts.includes(a) && !a.bodyImage && !pdfNames.has(a.name));
+  /* 첨부 줄 — 승인 시안 A(2026-10-14) 꼴: 아이콘 · 이름 · 작은 글씨(출처 · 크기) · 오른쪽 ↓. 신청서 양식 묶음엔 로봇이 바꿔 둔 원본 PDF 줄이 맨 위에 선다 */
+  const kb = (a) => (a.bytes ? ` · ${Math.max(1, Math.round(a.bytes / 1024))}KB` : '');
+  const attList = (list, where) => `<ul class="doc-list">${list.map((a) => attachRowHtml(a, { meta: `${where}${kb(a)}` })).join('')}</ul>`;
   const excerpts = sch.excerpts || [];
   const certHtml = certStatusListHtml(sch);
   $('#detail-sheet').innerHTML = `
@@ -3696,13 +3724,13 @@ function renderApplyPrep(sch) {
     <div class="sheet-body" id="apply-prep">
       <h3 class="sheet-title">신청 준비</h3>
       <p class="sheet-provider">${esc(sch.name)} · 준비할 것을 확인하고 담아 두세요</p>
-      ${formAtts.length ? `
+      ${(formAtts.length || pdfRows) ? `
       <h4>신청서 양식 <span class="channel-tag">공고 원본</span></h4>
-      ${attList(formAtts)}
-      <p class="dp-note">원본 파일을 내려받아 작성해 주세요.</p>` : ''}
+      <ul class="doc-list">${pdfRows}${formAtts.map((a) => attachRowHtml(a, { meta: `학교 게시판 첨부 · 내려받기${kb(a)}` })).join('')}</ul>
+      <p class="dp-note">${pdfRows ? '위 PDF 에 답을 얹는 「양식 채우기」는 다음 단계에서 열립니다.' : '원본 파일을 내려받아 작성해 주세요.'}</p>` : ''}
       ${otherAtts.length ? `
       <h4>${kosaf ? '선발 공고문 <span class="channel-tag">재단 원문</span>' : '공고 첨부 파일'}</h4>
-      ${attList(otherAtts)}` : ''}
+      ${attList(otherAtts, kosaf ? '재단 원문 첨부' : '학교 게시판 첨부')}` : ''}
       ${excerpts.length ? `
       <h4>공고 원문 안내 <span class="channel-tag">원문 그대로</span></h4>
       <ul class="doc-list">${excerpts.map((e) => `<li>${esc(e)}</li>`).join('')}</ul>` : ''}
@@ -7741,6 +7769,7 @@ const bootJobs = [loadNotices(), loadNews(), loadActivities(), loadExternal(), l
    (`loadMajorsFor` · 위 주석). */
 bootJobs.push(loadTuition());  // 학교별 등록금 — `수업료 100%` 비율형 공고를 원으로 바꾸는 데 쓴다
 if (typeof loadFormTemplates === 'function') loadFormTemplates(); // 정식 등록 양식 최신화
+bootJobs.push(loadFormsPdfIndex());   // 신청서 원본 PDF 색인 — 신청 준비 시트의 「원본 양식 그대로 보기」 줄
 /* 🔴 두 손가락으로 화면이 커졌다 작아졌다 하던 것 (2026-09-01 개발자 지적).
    막는 곳이 셋이라 셋 다 있어야 한다 — 하나만 두면 어떤 폰에서는 그대로 커진다:
      ① index.html 뷰포트 user-scalable=no  (안드로이드 크롬 · 설치형 iOS)
