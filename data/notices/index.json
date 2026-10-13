@@ -3,6 +3,10 @@
  "updatedAt": "2026-10-13",
  "schools": 43,
  "files": {
+  "영남대학교": {
+   "file": "n12kfbyt.json",
+   "count": 21
+  },
   "연세대학교": {
    "file": "nz3ew5y.json",
    "count": 33
@@ -126,10 +130,6 @@
   "명지대학교": {
    "file": "ntyl0r5.json",
    "count": 13
-  },
-  "영남대학교": {
-   "file": "n12kfbyt.json",
-   "count": 20
   },
   "강원대학교": {
    "file": "nlzhvsh.json",

@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-10-13",
- "count": 1891,
+ "count": 1892,
  "items": [
   {
    "title": "[공통][교외]2027년 STX장학재단 장학생 선발 공고(~11/16)",
@@ -447,6 +447,20 @@
    "foundAt": "2026-10-13",
    "bodyDeadline": "2026-11-01",
    "bodyDeadlineText": "2026학년도 2학기 방일영문화재단 탈북대학생 장학생 선발 안내(~11/1)"
+  },
+  {
+   "title": "2026-2학기 한국장학재단 국가근로장학금 추가신청기간(3차) 안내",
+   "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=232062825&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "붙임1. 2026년 2학기 국가근로장학금 일반유형(추가) 학생신청 매뉴얼.pdf",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=232062825&attachNo=379189"
+    }
+   ],
+   "deadlineHint": "신청기간(3차) 안내 No.232062825 2026.10.13 20:12 314 붙임1. 2026년 2학기 국가근로장학금 일반유형(추가) 학생",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-13"
   },
   {
    "title": "[공통][교외]2026년도 하반기 은평구민장학재단 장학생 선발 공고(~10/28)",

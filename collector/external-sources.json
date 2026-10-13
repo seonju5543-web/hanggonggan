@@ -742,7 +742,15 @@
    "host": "재단법인 석성장학회",
    "home": "http://www.seoksung.co.kr/",
    "boardUrl": null,
-   "seed": "kosaf-open"
+   "seed": "kosaf-open",
+   "probe": {
+    "checkedAt": "2026-10-13",
+    "why": "최고 2건 (나눔과 섬김의 세상)",
+    "best": {
+     "url": "http://www.seoksung.co.kr/cms/bbs/board.php?bo_table=nanum",
+     "signals": 2
+    }
+   }
   },
   {
    "host": "(재)인제군장학회",
