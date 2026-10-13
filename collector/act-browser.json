@@ -361,5 +361,9 @@
  "https://answer.moaform.com/answers/M1GLjZ": {
   "at": "2026-10-12",
   "tries": 1
+ },
+ "https://www.dema.mil.kr/web/dema/info/notice/4/1012194/view.do": {
+  "at": "2026-10-13",
+  "tries": 1
  }
 }
