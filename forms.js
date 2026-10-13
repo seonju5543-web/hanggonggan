@@ -603,19 +603,21 @@ function prepHasFormAttachment(sch) {
   if (typeof isApplicationForm === 'function') return atts.some(isApplicationForm);
   return atts.some((a) => PREP_ATT_FORM_NAME.test(a.name || '') && PREP_ATT_DOC_EXT.test(a.name || ''));
 }
-/* 이 공고가 **무엇을 받는가** — 머리말을 정하는 한 곳. 순서가 뜻이다: 원문 확인(free)이 첨부 이름보다 앞, 접수 채널이 '모름'보다 앞 */
+/* 이 공고가 **무엇을 받는가** — 머리말을 정하는 한 곳. 순서가 뜻이다: 원문 확인(free) > **원문이 말한 접수 방법(메일·포털)** > 첨부 신청서 > 모름.
+   🔴 접수 방법이 첨부 파일명보다 앞이다 — data.js submitChannelKind 와 같은 결정(2026-09-23: 첨부는 거기서 받아 내는 서식이지 다른 제출처가 아니다).
+      첨부 신청서는 어느 갈래든 질문 화면 머리(prepOriginalsHtml)가 따로 보여 준다. */
 function prepKindFor(sch) {
   if (sch.prepDoc) return 'free';
-  if (prepHasFormAttachment(sch)) return 'attached';
   if (sch.applyEmail) return 'email';
   if (sch.applyPortal) return 'portal';
+  if (prepHasFormAttachment(sch)) return 'attached';
   return 'unknown';
 }
 const PREP_TAGS = {
   free: '※ 이 공고는 별도 신청서 양식 없이 자유 형식 제출을 받는다고 원문에서 확인했습니다 — 아래 문서를 그대로 제출할 수 있습니다.',
   attached: '※ 이 공고에는 첨부된 신청서 양식이 있습니다 — 아래는 그 원본 양식에 옮겨 적을 내용을 정리한 문서이고, 제출은 공고의 원본 양식으로 합니다.',
   portal: '※ 이 공고는 포털·온라인 입력으로 접수합니다 — 아래는 입력 칸에 붙여 넣을 답을 정리한 문서이고, 이 문서 자체를 내는 것은 아닙니다.',
-  email: '※ 이 공고는 메일로 접수합니다 — 아래 내용을 공고가 정한 서류와 함께 보내세요. 공고가 양식을 정했다면 그 양식으로 옮겨 적습니다.',
+  email: '※ 이 공고는 메일로 접수합니다 — 아래는 보낼 내용을 정리한 문서이고, 공고가 정한 서식·서류에 옮겨 적어 보내세요(이 문서 자체를 보내는 것은 아닙니다).',
   unknown: '※ 이 공고에서 첨부된 신청서 양식을 찾지 못했습니다 — 아래 문서로 내용을 준비하고, 제출 전 원문에서 양식·접수 방법을 확인하세요.',
 };
 /* 화면 머리줄용 짧은 말 — 긴 tag 는 문서 위에, 이것은 작성 화면 둘째 줄에 */
@@ -623,7 +625,7 @@ const PREP_LEADS = {
   free: '자유 형식 제출 공고 — 이 문서를 그대로 제출할 수 있습니다',
   attached: '첨부 신청서 양식에 옮겨 적을 내용을 정리합니다 — 제출은 원본 양식으로',
   portal: '포털 입력 칸에 붙여 넣을 답을 정리합니다',
-  email: '메일 접수 공고 — 보낼 내용을 정리합니다',
+  email: '메일 접수 공고 — 공고가 정한 서식에 옮겨 적을 내용을 정리합니다',
   unknown: '내용을 먼저 준비합니다 — 양식·접수 방법은 제출 전 원문에서 확인',
 };
 /* 지원 자격 줄 → 학생이 스스로 확인하는 체크 항목(판정이 아니다 · 너무 긴 줄·조각 줄은 뺀다 · 여섯 줄까지) */

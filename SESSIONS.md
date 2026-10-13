@@ -20,7 +20,8 @@
   ② 앱 — `attachPrepTemplates` 가 양식·상시 제도 빼고 모든 등록 공고에 붙인다 · 질문 화면 머리에 원본 신청서(첨부 + `data/forms-pdf/index.json` PDF 사본 · `prepOriginalsHtml` 한 곳) ·
   질문 화면이 열릴 때 스크롤을 맨 위로(상세에서 버튼까지 내려간 스크롤이 남아 중간부터 보였고 쓸어 닫기도 안 됐다 — 드라이버가 잡았다) · 준비 시트 버튼에서 '완료' 뺌 · sw 가 forms-pdf 를 안 가로챔.
   ③ 로봇 — 자동 등록 첨부 필터를 이름 허용 목록에서 차단 목록으로(`collector/register-attachments.mjs` · 「붙임1」「선발요강」이 버려져 등록분 38건이 첨부 0건) ·
-  deepfetch 자격용 첨부 받기의 남는 자리를 '한 번도 안 받은 마감 전 공고'로(`pickAttachBacklog` · 13건) · `isApplicationForm` 에 pdf·계획서·동의서·서약서(추천서·보고서 제외).
+  deepfetch 자격용 첨부 받기의 남는 자리를 '한 번도 안 받은 마감 전 공고'의 공고문류 첨부로(`pickAttachBacklog` · 13건 · 빈 신청서는 안 넣는다) · `isApplicationForm` 에 pdf·계획서·동의서·서약서(추천서·보고서 제외).
+- **리뷰(서브에이전트)로 고친 것**: 일괄 준비가 `formId` 만 봐서 107건을 문서 없이 '준비 완료'로 담던 것(`bulkNeedsWork` → `formTplIdFor`) · 머리말 순서를 접수 방법(메일·포털) > 첨부로(`submitChannelKind` 와 같은 결정) · Node 다리(`form-engine-node.mjs`)가 data.js 를 실어 첨부 판정을 브라우저와 같은 갈래로 · 메일 머리말·모름 토스트 문구.
 - **관문**: `test-collector` 「공고별 지원문서」·「등록 첨부 고르기」· 밀린 첨부 · PDF 신청서 이름 · `verify-apply-prep.js` 층1 블록을 새 흐름(질문 화면 → 문서 → 확인)으로 다시 썼다.
   통과: test-collector · audit-data · form-snapshot(문서 56종 동일) · verify-apply-prep · verify-forms-data · verify-new-forms · verify-kosaf · verify-registered.
 - **남은 것**(설계 문서 §6): 층2(KOSAF)에도 지원문서를 붙일지(지금은 준비 시트) · 공고문 뒷장 서식 쪽 떼어 PDF 로(층2 37곳) · 준비 체크리스트 화면(준비 중 n/4) · 제출 서류 목록 로봇(documents 채우기 → prepDoc 근거).

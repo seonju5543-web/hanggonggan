@@ -1380,10 +1380,15 @@ console.log('\n■ 공고별 지원문서 — 앱 양식이 없는 등록 공고
   const withAtt = { ...base, attachments: [{ name: '붙임1 장학생 신청서.hwp', url: 'https://e.ac.kr/f.hwp' }] };
   eq('  첨부 신청서가 있으면 "원본 양식에 옮겨 적는다 · 제출은 원본 양식으로"',
     (() => { const t = eng.buildPrepTemplate(withAtt); return [t.prepKind, /원본 양식/.test(t.tag), /그대로 제출/.test(t.tag)]; })(), ['attached', true, false]);
-  eq('  순서 — 원문 확인(prepDoc) > 첨부 신청서 > 메일 > 포털 > 모름',
+  eq('  순서 — 원문 확인(prepDoc) > 원문이 말한 접수 방법(메일 > 포털) > 첨부 신청서 > 모름 (submitChannelKind 와 같은 결정 · 리뷰)',
     [eng.buildPrepTemplate({ ...withAtt, prepDoc: true }).prepKind, eng.buildPrepTemplate({ ...base, applyPortal: 'x', applyEmail: 'a@b.kr' }).prepKind,
-      eng.buildPrepTemplate({ ...base, applyPortal: 'x' }).prepKind, eng.buildPrepTemplate({ ...withAtt, applyPortal: 'x' }).prepKind],
-    ['free', 'email', 'portal', 'attached']);
+      eng.buildPrepTemplate({ ...base, applyPortal: 'x' }).prepKind, eng.buildPrepTemplate({ ...withAtt, applyPortal: 'x' }).prepKind, eng.buildPrepTemplate({ ...withAtt, applyEmail: 'a@b.kr' }).prepKind],
+    ['free', 'email', 'portal', 'portal', 'email']);
+  eq('  메일·포털 머리말도 "이 문서 자체를 내는 것이 아니다"를 말한다 (그대로 제출은 free 만)',
+    ['email', 'portal'].map((k) => eng.buildPrepTemplate({ ...base, [k === 'email' ? 'applyEmail' : 'applyPortal']: 'x' }).tag).map((t) => /그대로 제출/.test(t) || !/아닙니다/.test(t)), [false, false]);
+  /* 다리가 data.js 를 싣는가 — 안 실으면 첨부 판정이 forms.js 의 물러나는 규칙으로만 재어져 isApplicationForm 을 바꿔도 여기가 안 빨개진다(리뷰) */
+  eq('  Node 다리(form-engine-node)가 data.js 의 isApplicationForm 을 실어 브라우저와 같은 갈래를 잰다',
+    /data\.js/.test(readText(new URL('./form-engine-node.mjs', import.meta.url))) && eng.buildPrepTemplate({ ...base, attachments: [{ name: '[서식 2] 장학생 추천서 신청서양식.hwp', url: 'u' }] }).prepKind, 'unknown');
   eq('  층2(재단 공고문) 첨부는 신청서라 부르지 않는다 — 첨부 이름에 신청서가 있어도 attached 가 아니다',
     eng.buildPrepTemplate({ ...withAtt, sourceKind: 'kosaf' }).prepKind === 'attached', false);
   const t3 = eng.buildPrepTemplate({ ...base, documents: ['자기소개서 (자유 양식, A4 1장)', '학업계획서', '성적증명서 1부', '재학증명서 (자동 제출)'] });
@@ -1417,6 +1422,8 @@ console.log('\n■ 공고별 지원문서 — 앱 양식이 없는 등록 공고
   eq('  서비스워커는 PDF 사본을 가로채지 않는다 (공고문 사본과 같은 이유)', /\\\/data\\\/forms-pdf\\\//.test(readText(new URL('../sw.js', import.meta.url))), true);
   eq('  준비 시트 확인 버튼은 \'완료\'라고 말하지 않는다 (학생이 아직 한 일이 없다)',
     /id="btn-prep-confirm">[^<]*완료/.test(appSrc), false);
+  const bnw = appSrc.slice(appSrc.indexOf('function bulkNeedsWork('), appSrc.indexOf('function bulkTargets('));
+  eq('🔴 일괄 준비도 앱 지원문서를 \'쓸 것\'으로 센다 (formId 만 보면 107건이 문서 없이 준비 완료로 담긴다 — 리뷰)', /formTplIdFor\(sch\)/.test(bnw), true);
 }
 
 /* 2026-10-13 — 등록 첨부 고르기. 실측: 마감 전 등록 109건 중 첨부 0건이 38건 — 자동 등록의 이름 허용 목록이 「붙임1」「선발요강」「안내문」을 버렸다. */
@@ -4813,7 +4820,9 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
       ET.pickAttachBacklog([...items, { id: 'G', atts: doc }], { ...idx, G: { at: '2026-09-01', files: ['elig-g-1.pdf'] } }, '2026-10-05',
         { ...o, max: 5, exclude: ET.pickEligTargets(items, idx, '2026-10-05', o) }).map((t) => t.it.id), ['E', 'F']);
     eq('  자리가 없으면 비어 있다', ET.pickAttachBacklog(items, idx, '2026-10-05', { ...o, max: 0 }), []);
-    eq('  deepfetch 가 남는 자리를 이것으로 채운다', /pickAttachBacklog\(reg\.items/.test(eligFn) && /max: MAX_NOTICES - eligTargets\.length/.test(eligFn), true);
+    eq('  deepfetch 가 남는 자리를 이것으로 채운다 · 받는 것은 공고문류만(isNoticeDoc — 빈 신청서를 자격 글자 색인에 넣지 않는다)',
+      /pickAttachBacklog\(reg\.items/.test(eligFn) && /max: MAX_NOTICES - eligTargets\.length/.test(eligFn)
+        && /pickAttachBacklog\(reg\.items[\s\S]*?isNoticeDoc\(a\.name\)\)\.slice\(0, 3\)/.test(eligFn), true);
     /* 🔴 PaddleOCR 로 읽은 본문 그림이 **그 공고의 것인가** (2026-10-05 · 개발자 "paddle ocr 붙여") — 장학 제목의 흔한 낱말은 증거가 아니다 */
     const G = await import(new URL('../collector/elig-ocr-guard.mjs', import.meta.url));
     eq('장학 그림 OCR: 제목의 고유한 낱말이 그림에 있으면 그 공고의 것',

@@ -2445,9 +2445,12 @@ function renderFormFill(restore) {
       else state.applications.push({ id: sch.id, name: sch.name, appliedAt: nowStamp(), step: 0, formAns: formFill.ans, pending: false });
       saveState();
       const ch = officialChannel(sch);
-      toast(tpl.unofficial && tpl.prepKind !== 'free'
-        ? `지원문서 작성 완료 · 내용을 ${ch.label}의 양식·입력 칸에 옮겨 제출하세요`
-        : `양식 작성 완료 · 문서를 저장해 ${ch.label}에 제출하세요`);
+      /* 문서의 성격대로 말한다 (리뷰 2026-10-13) — 모르는 공고에 '양식·입력 칸이 있다'고 단정하지 않는다 */
+      toast(!tpl.unofficial || tpl.prepKind === 'free'
+        ? `양식 작성 완료 · 문서를 저장해 ${ch.label}에 제출하세요`
+        : tpl.prepKind === 'unknown'
+          ? '지원문서 작성 완료 · 제출 양식·방법은 원문에서 확인한 뒤 내용을 옮기세요'
+          : `지원문서 작성 완료 · 내용을 ${ch.label}의 양식·입력 칸에 옮겨 제출하세요`);
       formFill = null;
       formProgressClear();   /* 신청내역에 정식으로 들어갔으니 '쓰던 것' 표시를 지운다 */
       closeSheet();
@@ -3778,8 +3781,8 @@ let bulkPrep = null;   // { list: [sch], ids: Set } — 목록이 열려 있는 
    🔴 신청내역의 '서류 작성 필요' 배지와 **같은 기준**이어야 한다 — 여기서 새 기준을
       만들면 두 화면이 같은 공고를 두고 다른 말을 한다. */
 function bulkNeedsWork(sch) {
-  return !!(essayDefsFor(sch).length
-    || (sch.formId && typeof FORM_TEMPLATES !== 'undefined' && FORM_TEMPLATES[sch.formId]));
+  /* 앱 지원문서(prep:)도 '쓸 것'이다 (2026-10-13 리뷰 — formId 만 보던 탓에 일괄 준비가 107건을 아무 문서 없이 '준비 완료'로 담았다) */
+  return !!(essayDefsFor(sch).length || formTplIdFor(sch));
 }
 
 /* 일괄 준비 대상 — 자격 통과 · 아직 안 담음 · 마감 전 · 오래되지 않음.

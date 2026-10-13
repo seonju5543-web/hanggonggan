@@ -372,10 +372,12 @@ async function downloadEligDocs() {
     (OK_EXT.test(a.name || '') && isNoticeDoc(a.name)) || (a.bodyImage && IMG_EXT.test(a.name || '')))).slice(0, 2);
   const eligTargets = pickEligTargets(reg.items, index, today, { requirementLines, live, docAtts, max: MAX_NOTICES });
   /* 남는 자리는 '아직 한 번도 안 받은 마감 전 공고'로 (2026-10-13 · elig-targets.mjs pickAttachBacklog) —
-     신청서 서식이 든 첨부를 자격을 다 읽은 공고라서 안 받던 구멍. 받는 것은 문서 첨부 전부(isNoticeDoc 이 아닌 신청서 파일도) */
+     공고문 뒷장에 신청서 서식이 든 첨부를 자격을 다 읽은 공고라서 안 받던 구멍.
+     🔴 받는 것은 **공고문류만**(isNoticeDoc · 같은 색인을 발췌기·금액·AI 자격 읽기가 읽는다 — 빈 신청서 파일을 넣으면 체크 칸이 자격 줄이 된다, 리뷰).
+        낱개 신청서 파일은 양식 PDF 로봇(form-pdf.mjs)의 몫이다. */
   const backlog = pickAttachBacklog(reg.items, index, today, {
     live, exclude: eligTargets,
-    docAtts: (it) => (it.attachments || []).filter((a) => a.url && !a.bodyImage && OK_EXT.test(a.name || '')).slice(0, 3),
+    docAtts: (it) => (it.attachments || []).filter((a) => a.url && !a.bodyImage && OK_EXT.test(a.name || '') && isNoticeDoc(a.name)).slice(0, 3),
     max: MAX_NOTICES - eligTargets.length,
   });
   const targets = [...eligTargets, ...backlog];
