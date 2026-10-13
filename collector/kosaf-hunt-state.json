@@ -145,7 +145,7 @@
   },
   "busan.go.kr": {
    "checkedAt": "2026-10-14",
-   "pages": 5,
+   "pages": 10,
    "found": 0,
    "lines": 1,
    "targets": 1,
@@ -182,8 +182,11 @@
   },
   "dsa.or.kr": {
    "checkedAt": "2026-10-14",
-   "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT → 브라우저도 실패(page.goto: Timeout 20000ms exceede)",
-   "targets": 1
+   "pages": 3,
+   "found": 0,
+   "lines": 1,
+   "targets": 1,
+   "why": "글은 못 고르고 게시판만"
   },
   "fordrivers.or.kr": {
    "checkedAt": "2026-10-14",
@@ -397,8 +400,11 @@
   },
   "yangcheon.go.kr": {
    "checkedAt": "2026-10-14",
-   "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT → 브라우저도 실패(page.goto: Timeout 20000ms exceede)",
-   "targets": 1
+   "pages": 9,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
   },
   "ycsf.or.kr": {
    "checkedAt": "2026-10-14",

@@ -31,6 +31,22 @@
    "0626009"
   ]
  },
+ "kosaf|0641001|board:https://www.dsa.or.kr/data.html?Table=ins_bbs43": {
+  "ds": "kosaf",
+  "key": "0641001",
+  "url": "",
+  "board": "https://www.dsa.or.kr/data.html?Table=ins_bbs43",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "firstAt": "2026-10-14",
+  "lastAt": "2026-10-14",
+  "tries": 1,
+  "status": "pending",
+  "why": "게시판을 못 엶(page.goto: Timeout 20000ms exceeded. Call log: - navigating…)",
+  "checks": {},
+  "round": "2026-11-11",
+  "nextAt": "2026-10-15"
+ },
  "kosaf|1768681003|board:https://www.busan.go.kr/nbnews": {
   "ds": "kosaf",
   "key": "1768681003",

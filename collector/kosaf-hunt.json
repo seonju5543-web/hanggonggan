@@ -145,6 +145,17 @@
   {
    "target": {
     "ds": "kosaf",
+    "key": "0641001"
+   },
+   "board": "https://www.dsa.or.kr/data.html?Table=ins_bbs43",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-14",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
     "key": "2700045011"
    },
    "board": "https://gwangyang.go.kr/fund/",
