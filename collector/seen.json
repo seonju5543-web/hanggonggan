@@ -3183,7 +3183,7 @@
  "https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=145&pageNo=1&pageOrder=0&pagePrvNxt=1&pageRef=271062&parm_bod_uid=270346&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": "2026-09-30",
  "click:https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145|교내근로2026학년도2학기교내근로장학생선발결과안내": "2026-10-07",
  "https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=145&pageNo=1&pageOrder=0&pagePrvNxt=1&pageRef=271062&parm_bod_uid=270343&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": "2026-09-30",
- "click:https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145|국가근로2026학년도2학기국가학기중교외근로장학생최종선발자": "2026-10-07",
+ "click:https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145|국가근로2026학년도2학기국가학기중교외근로장학생최종선발자": "2026-10-13",
  "https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=145&pageNo=1&pageOrder=0&pagePrvNxt=1&pageRef=271062&parm_bod_uid=270268&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": "2026-09-30",
  "click:https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145|국가근로2026학년도2학기국가교내근로장학생최종선발자": "2026-10-07",
  "https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=145&pageNo=1&pageOrder=0&pagePrvNxt=1&pageRef=271062&parm_bod_uid=270261&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": "2026-09-30",
@@ -4126,5 +4126,16 @@
  "https://www.skku.edu/skku/campus/skk_comm/notice06.do?article.offset=0&articleLimit=10&articleNo=140524&mode=view": "2026-10-13",
  "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12488/view.do?currentPageNo=1": "2026-10-13",
  "https://home.knu.ac.kr/HOME/knussw/sub.htm?mode=view&mv_data=aWR4PTIxNTYmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=&nav_code=knu1619416593": "2026-10-13",
- "https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=815&nttNo=170638&pageUnit=10&searchCtgry=%ed%95%99%ec%82%ac%2f%ec%9e%a5%ed%95%99": "2026-10-13"
+ "https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=815&nttNo=170638&pageUnit=10&searchCtgry=%ed%95%99%ec%82%ac%2f%ec%9e%a5%ed%95%99": "2026-10-13",
+ "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardId=323299&menuNo=200318": "2026-10-13",
+ "click:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318|국제국제c2026학년도2학기마일리지장학적립내역인출안내": "2026-10-13",
+ "https://www.cau.ac.kr/cms/FR_CON/index.do?CONTENTS_NO=5&MENU_ID=100&P_TAB_NO=5#n-2027%ED%95%99%EB%85%84%EB%8F%84%20STX%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B3%B5%EA%B3%A0": "2026-10-13",
+ "click:https://www.cau.ac.kr/cms/FR_CON/index.do?CONTENTS_NO=5&MENU_ID=100&P_TAB_NO=5|2027학년도stx장학재단장학생선발공고": "2026-10-13",
+ "https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=145&pageNo=1&parm_bod_uid=271313&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": "2026-10-13",
+ "click:https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145|교외2026년하반기은평구민장학생선발공고": "2026-10-13",
+ "https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=145&pageNo=2&parm_bod_uid=270343&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": "2026-10-13",
+ "click:https://www.korea.ac.kr/ko/568/subview.do?article.offset=10|교외-마감2026학년도2학기송화재단장학생선발안내학교지원": "2026-10-12",
+ "https://www.korea.ac.kr/ko/568/subview.do#n-%5B%EA%B5%90%EC%99%B8-11%2F16%5D2027%ED%95%99%EB%85%84%EB%8F%84%20STX%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4(%EC%9E%AC%EB%8B%A8%EC%A7%80%EC%9B%90": "2026-10-13",
+ "click:https://www.korea.ac.kr/ko/568/subview.do|교외-11/162027학년도stx장학재단장학생선발안내재단지원": "2026-10-13",
+ "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NzQlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D": "2026-10-13"
 }
