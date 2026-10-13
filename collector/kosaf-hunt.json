@@ -1,7 +1,7 @@
 {
  "v": 1,
  "note": "층2 재단 장학금의 개별 공고 후보 — 로봇(collector/kosaf-hunt.mjs)이 재단 홈페이지를 뒤져 적는다. 사람 후보 파일(link-candidates.json)과 같은 줄 꼴. 원문 링크 확인 로봇이 학생처럼 열어 확인한 것만 앱(data/link-check.json fix)에 실린다. 손으로 고치지 말 것 — 다음 실행이 다시 쓴다.",
- "updatedAt": "2026-10-13",
+ "updatedAt": "2026-10-14",
  "items": [
   {
    "target": {
@@ -137,30 +137,6 @@
    "by": "로봇(층2 글 사냥꾼)",
    "addedAt": "2026-10-13",
    "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다"
-  },
-  {
-   "target": {
-    "ds": "kosaf",
-    "key": "2701009001"
-   },
-   "url": "https://www.mariners.or.kr/business/view.php?bd_code=notice&bd_idx=7603",
-   "title": "2026년도 (사)한국해기사협회 육.해상 회원 자녀 장학생 선발 안내 new -->",
-   "source": "board",
-   "by": "로봇(층2 글 사냥꾼)",
-   "addedAt": "2026-10-13",
-   "note": "https://www.mariners.or.kr/ 목록에서 고름 — 재단 이름 +1 · 마감 해 +1 · 장학 낱말 +1 · 게시일 +1"
-  },
-  {
-   "target": {
-    "ds": "kosaf",
-    "key": "2704211001"
-   },
-   "url": "https://myungfoundation.or.kr/modules/bbs/bbsView.php?id=28&page=1&&code=bbs_notice&xid=1",
-   "title": "명인다문화장학재단 2026년도 2학기 대학 장학생 모집",
-   "source": "board",
-   "by": "로봇(층2 글 사냥꾼)",
-   "addedAt": "2026-10-13",
-   "note": "https://myungfoundation.or.kr/main/ko/ 목록에서 고름 — 사업 이름 +1 · 재단 이름 +1 · 마감 해 +1 · 학기·반기 +1 · 장학 낱말 +1 · 게시일 +1"
   }
  ]
 }
