@@ -3,13 +3,65 @@
  "updatedAt": "2026-10-14",
  "items": [
   {
+   "title": "(대학원)2026년도 동진장학연구재단 동진장학금 선발 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140575&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "동진장학금 장학생 선발 공고(동진장학연구재단).pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140575&attachNo=118348"
+    },
+    {
+     "name": "서식1 장학생지원서.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140575&attachNo=118349"
+    },
+    {
+     "name": "서식2 자기소개서.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140575&attachNo=118350"
+    },
+    {
+     "name": "서식3 지도교수 추천서.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140575&attachNo=118351"
+    },
+    {
+     "name": "서식4 개인정보수집동의서.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140575&attachNo=118352"
+    },
+    {
+     "name": "서식5 개인정보수집동의서(부모).hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140575&attachNo=118353"
+    }
+   ],
+   "deadlineHint": "신청기간: 10월 15일 ~ 10월 30일 * 신청방법: 이메일 접수(admin@djfoundation.or.kr) * 제출서류: 첨부된 공고문",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-14"
+  },
+  {
+   "title": "2027년도 두산연강재단 장학생 선발 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140562&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "1. 2027년도 두산연강재단 장학생 선발 공고문.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140562&attachNo=118332"
+    },
+    {
+     "name": "2. 자주 묻는 질문(Q&amp;A).pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140562&attachNo=118333"
+    },
+    {
+     "name": "3. 추천서(재단 양식).docx",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140562&attachNo=118334"
+    }
+   ],
+   "deadlineHint": "접수 기간 : 2026년 10월 14 일(수) 09 시 ~ 11월 13일(금) 18 시(한국시간 기준) 7. 접수 방법 : 두산연강재단 홈페이지",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-14"
+  },
+  {
    "title": "2026년 성암육영회 장학생 선발안내(10.14(수)~10.19(월) 09:00까지)",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140538&article.offset=0&articleLimit=10",
    "attachments": [
-    {
-     "name": "부속기관",
-     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
-    },
     {
      "name": "2026년 성암육영회 지원서류.hwp",
      "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140538&attachNo=118298"
@@ -24,10 +76,6 @@
    "title": "2027년도 STX장학재단 장학생 선발 안내",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140524&article.offset=0&articleLimit=10",
    "attachments": [
-    {
-     "name": "부속기관",
-     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
-    },
     {
      "name": "27년 STX장학재단 장학생 선발요강.pdf",
      "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140524&attachNo=118278"

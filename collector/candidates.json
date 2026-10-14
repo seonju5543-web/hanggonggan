@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-10-14",
- "count": 1906,
+ "count": 1921,
  "items": [
   {
    "title": "[공통][교내]2026학년도 창업장학금 신청 안내(~11/27)",
@@ -45,6 +45,101 @@
    "foundAt": "2026-10-14"
   },
   {
+   "title": "[서울]2025-2학기 국가장학금 1유형 지급(4차 지급실행) 일정 안내",
+   "url": "https://sc.hanyang.ac.kr/-12?p_p_id=kr_ac_hanyang_bbs_web_portlet_BbsPortlet&p_p_lifecycle=0&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_action=view_message&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_messageId=147701",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "한양대학교",
+   "campus": "서울",
+   "foundAt": "2026-10-14"
+  },
+  {
+   "title": "[서울] 2026-1학기 국가장학금(1차) 신청 안내",
+   "url": "https://sc.hanyang.ac.kr/-12?p_p_id=kr_ac_hanyang_bbs_web_portlet_BbsPortlet&p_p_lifecycle=0&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_action=view_message&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_messageId=149513",
+   "attachments": [],
+   "deadlineHint": "신청기간 : 2025. 11. 20.(목) 09:00 ~ 2025. 12. 26.(금) 18:00 2. 서류제출 및 가구원동의 : 2025. 1",
+   "school": "한양대학교",
+   "campus": "서울",
+   "foundAt": "2026-10-14",
+   "bodyDeadline": "2025-12-26",
+   "bodyDeadlineText": "※ 재학생은 1차 신청이 원칙이며 2차 신청 시 학생신청 및 소득산정 완료 후 학사재단정보 심사 단계에서 재단거절로 탈락됩니다. (단, 재학 중 2회에 한하여 구제신청 자동 적용) 1. 신청기간 : 2025. 11. 20.(목) 09:00 ~ 2025. 12. 26.(금) 18:00"
+  },
+  {
+   "title": "[교내] 2026-1학기 학부 재학생 교내 가계곤란장학 신청(2025.11.20.(목) ~ 2026.01.30.(금))",
+   "url": "https://sc.hanyang.ac.kr/-12?p_p_id=kr_ac_hanyang_bbs_web_portlet_BbsPortlet&p_p_lifecycle=0&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_action=view_message&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_messageId=149609",
+   "attachments": [
+    {
+     "name": "서울캠퍼스 2026-1학기 학부생 교내장학금(가계곤란장학) 신청 안내.pdf",
+     "url": "https://sc.hanyang.ac.kr/documents/portlet_file_entry/11048027/%EC%84%9C%EC%9A%B8%EC%BA%A0%ED%8D%BC%EC%8A%A4+2026-1%ED%95%99%EA%B8%B0+%ED%95%99%EB%B6%80%EC%83%9D+%EA%B5%90%EB%82%B4%EC%9E%A5%ED%95%99%EA%B8%88%28%EA%B0%80%EA%B3%84%EA%B3%A4%EB%9E%80%EC%9E%A5%ED%95%99%29+%EC%8B%A0%EC%B2%AD+%EC%95%88%EB%82%B4.pdf/e2ea26c6-0113-c8d0-6020-464e9fba7b75?status=0&download=true"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "한양대학교",
+   "campus": "서울",
+   "foundAt": "2026-10-14"
+  },
+  {
+   "title": "[서울]2025-2학기 국가장학금 1유형 지급(5차 지급실행) 일정 안내",
+   "url": "https://sc.hanyang.ac.kr/-12?p_p_id=kr_ac_hanyang_bbs_web_portlet_BbsPortlet&p_p_lifecycle=0&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_action=view_message&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_messageId=150207",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "한양대학교",
+   "campus": "서울",
+   "foundAt": "2026-10-14"
+  },
+  {
+   "title": "[서울]2025-2학기 국가장학금 1유형 지급(6차 지급실행) 일정 안내",
+   "url": "https://sc.hanyang.ac.kr/-12?p_p_id=kr_ac_hanyang_bbs_web_portlet_BbsPortlet&p_p_lifecycle=0&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_action=view_message&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_messageId=151805",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "한양대학교",
+   "campus": "서울",
+   "foundAt": "2026-10-14"
+  },
+  {
+   "title": "[서울] 2026-1학기 국가장학금(2차) 신청 안내",
+   "url": "https://sc.hanyang.ac.kr/-12?p_p_id=kr_ac_hanyang_bbs_web_portlet_BbsPortlet&p_p_lifecycle=0&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_action=view_message&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_messageId=162903",
+   "attachments": [],
+   "deadlineHint": "신청기간 : 2026. 2. 3.(화) 09:00 ~ 2026. 3. 17.(화) 18:00 2. 서류제출 및 가구원동의 : 2026. 2. 3",
+   "school": "한양대학교",
+   "campus": "서울",
+   "foundAt": "2026-10-14",
+   "bodyDeadline": "2026-03-17",
+   "bodyDeadlineText": "(단, 재학 중 2회에 한하여 구제신청 자동 적용) 1. 신청기간 : 2026. 2. 3.(화) 09:00 ~ 2026. 3. 17.(화) 18:00"
+  },
+  {
+   "title": "[교내] 2026-1학기 학부 재학생(신편입생 포함) 교내 가계곤란장학금 2차 신청 안내(2026.02.03.~2026.03.31.)",
+   "url": "https://sc.hanyang.ac.kr/-12?p_p_id=kr_ac_hanyang_bbs_web_portlet_BbsPortlet&p_p_lifecycle=0&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_action=view_message&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_messageId=163605",
+   "attachments": [
+    {
+     "name": "서울캠퍼스 2026-1학기 학부생 교내장학금(가계곤란장학) 2차 신청 안내.pdf",
+     "url": "https://sc.hanyang.ac.kr/documents/portlet_file_entry/11048027/%EC%84%9C%EC%9A%B8%EC%BA%A0%ED%8D%BC%EC%8A%A4+2026-1%ED%95%99%EA%B8%B0+%ED%95%99%EB%B6%80%EC%83%9D+%EA%B5%90%EB%82%B4%EC%9E%A5%ED%95%99%EA%B8%88%28%EA%B0%80%EA%B3%84%EA%B3%A4%EB%9E%80%EC%9E%A5%ED%95%99%29+2%EC%B0%A8+%EC%8B%A0%EC%B2%AD+%EC%95%88%EB%82%B4.pdf/8fd82409-4d0e-6e47-e6ab-47031920ce82?status=0&download=true"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "한양대학교",
+   "campus": "서울",
+   "foundAt": "2026-10-14"
+  },
+  {
+   "title": "[교내] 2026-2학기 학부생 교내 가계곤란장학 신청(2026.05.22.(금) ~ 2026.07.31.(금))",
+   "url": "https://sc.hanyang.ac.kr/-12?p_p_id=kr_ac_hanyang_bbs_web_portlet_BbsPortlet&p_p_lifecycle=0&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_action=view_message&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_messageId=188105",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "한양대학교",
+   "campus": "서울",
+   "foundAt": "2026-10-14"
+  },
+  {
+   "title": "[교내] 2026-2학기 학부 재학생(신편입생 포함) 교내 가계곤란장학 2차 신청 안내(2026.08.13.(목) ~ 2026.09.30.(수))",
+   "url": "https://sc.hanyang.ac.kr/-12?p_p_id=kr_ac_hanyang_bbs_web_portlet_BbsPortlet&p_p_lifecycle=0&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_action=view_message&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_messageId=219501",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "한양대학교",
+   "campus": "서울",
+   "foundAt": "2026-10-14"
+  },
+  {
    "title": "[교외] 2026년 하반기 은평구민 장학생 선발 공고",
    "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/273635/artclView.do",
    "attachments": [
@@ -59,6 +154,46 @@
    "foundAt": "2026-10-14",
    "bodyDeadline": "2026-10-28",
    "bodyDeadlineText": "나. 선발 인원 : 000명 다. 신청 기간 : 2026년 10월 12일(월) ~ 10월 28일(수) 18:00까지 (주말, 공휴일 및 점심시간 12:00~13:00 제외)"
+  },
+  {
+   "title": "2027년도 북한이탈청소년 장학생 선발 안내(~10.26.까지)",
+   "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520830",
+   "attachments": [
+    {
+     "name": "별첨1_ 2027년 아산북한이탈청소년장학생 선발안내.pdf",
+     "url": "javascript:downGO('별첨1_ 2027년 아산북한이탈청소년장학생 선발안내.pdf','/files/article/servicenotice/520830/','334F8617E12C4256B337BF1A48A4509A.pdf');"
+    }
+   ],
+   "deadlineHint": "접수 기간: 2026년 10월 6일(화) ~ 10월 26일(월) 23시 59분 - 접수 방법: 아산재단 지원신청 서비스( https://welf",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-14",
+   "bodyDeadline": "2026-10-26",
+   "bodyDeadlineText": "2027년도 북한이탈청소년 장학생 선발 안내(~10.26.까지)"
+  },
+  {
+   "title": "[두산연강재단] 2027년도 대학 장학생 선발 안내",
+   "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520832",
+   "attachments": [
+    {
+     "name": "3. 추천서(재단 양식).pdf",
+     "url": "javascript:downGO('3. 추천서(재단 양식).pdf','/files/article/servicenotice/520832/','6489725D7CDF4538B3EDECFD03525FFB.pdf');"
+    },
+    {
+     "name": "2. 자주 묻는 질문(Q&A).pdf",
+     "url": "javascript:downGO('2. 자주 묻는 질문(Q&A).pdf','/files/article/servicenotice/520832/','50C29C63F6024BFE9782AFE83387CC6F.pdf');"
+    },
+    {
+     "name": "1. 2027년도 두산연강재단 장학생 선발 공고문.pdf",
+     "url": "javascript:downGO('1. 2027년도 두산연강재단 장학생 선발 공고문.pdf','/files/article/servicenotice/520832/','8A7D07A4C1F44864B997A710EC682E48.pdf');"
+    }
+   ],
+   "deadlineHint": "접수 기간: 2026년 10 월 14일(수) ~ 11월 13일(금) 18시까지 접수 방법: 두산연강재단 홈페이지( www.yonkang.org)",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-14",
+   "bodyDeadline": "2026-11-13",
+   "bodyDeadlineText": "장학생 혜택: 졸업 시까지 학기당 학업장려금(생활비성) 400 만 원 지원 및 장학생 워크숍 참여 기회 제공 접수 기간: 2026년 10 월 14일(수) ~ 11월 13일(금) 18시까지"
   },
   {
    "title": "2026-1학기 중앙사랑 II유형 장학금 지급 안내",
@@ -679,6 +814,94 @@
    "school": "명지대학교",
    "campus": "",
    "foundAt": "2026-10-14"
+  },
+  {
+   "title": "2027년도 두산연강재단 장학생 선발 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140562&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    },
+    {
+     "name": "1. 2027년도 두산연강재단 장학생 선발 공고문.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140562&attachNo=118332"
+    },
+    {
+     "name": "2. 자주 묻는 질문(Q&amp;A).pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140562&attachNo=118333"
+    },
+    {
+     "name": "3. 추천서(재단 양식).docx",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140562&attachNo=118334"
+    }
+   ],
+   "deadlineHint": "접수 기간 : 2026년 10월 14 일(수) 09 시 ~ 11월 13일(금) 18 시(한국시간 기준) 7. 접수 방법 : 두산연강재단 홈페이지",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-14",
+   "bodyDeadline": "2026-11-13",
+   "bodyDeadlineText": "가. 공고 및 서류 접수 : '26년 10월 14일(수) ~ 11월 13일(금) 18시까지(한국시간 기준)"
+  },
+  {
+   "title": "(대학원)2026년도 동진장학연구재단 동진장학금 선발 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140575&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    },
+    {
+     "name": "동진장학금 장학생 선발 공고(동진장학연구재단).pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140575&attachNo=118348"
+    },
+    {
+     "name": "서식1 장학생지원서.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140575&attachNo=118349"
+    },
+    {
+     "name": "서식2 자기소개서.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140575&attachNo=118350"
+    },
+    {
+     "name": "서식3 지도교수 추천서.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140575&attachNo=118351"
+    },
+    {
+     "name": "서식4 개인정보수집동의서.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140575&attachNo=118352"
+    },
+    {
+     "name": "서식5 개인정보수집동의서(부모).hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140575&attachNo=118353"
+    }
+   ],
+   "deadlineHint": "신청기간: 10월 15일 ~ 10월 30일 * 신청방법: 이메일 접수(admin@djfoundation.or.kr) * 제출서류: 첨부된 공고문",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-14"
+  },
+  {
+   "title": "[교외] 두산연강재단 장학생 선발 안내(11/13 마감, 생활비 400만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551595?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "신청기간 : 2026년 10월 14일(수) ~ 11월 13일(금) 오후 6시 4. 신청방법: 재단 홈페이지 신청 http://www.yonkan",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-14",
+   "bodyDeadline": "2026-11-13",
+   "bodyDeadlineText": "[교외] 두산연강재단 장학생 선발 안내(11/13 마감, 생활비 400만원)"
+  },
+  {
+   "title": "[교외] 방일영문화재단 장학생 선발 안내(10/30 마감, 1학년 탈북학생, 학업장려금 월 70만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551597?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "신청기한: 2026년 10월 30일(금) 오후 5시까지 5. 신청방법: 직접 또는 우편 제출하거나 모든 서류를 하나의 PDF 파일로 만들어 학생",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-14",
+   "bodyDeadline": "2026-10-30",
+   "bodyDeadlineText": "[교외] 방일영문화재단 장학생 선발 안내(10/30 마감, 1학년 탈북학생, 학업장려금 월 70만원)"
   },
   {
    "title": "2027년도 두산연강재단 장학생 선발 공고 안내",

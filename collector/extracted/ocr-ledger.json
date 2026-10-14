@@ -1465,5 +1465,15 @@
   "ratio": 0.971,
   "hangul": 224,
   "lines": 8
+ },
+ "elig-n0pyd0-1.pdf": {
+  "sig": "56685:83cac7df9a64",
+  "gate": "0.9/200/0.6/v2",
+  "ok": true,
+  "at": "2026-10-14",
+  "pages": 2,
+  "ratio": 0.913,
+  "hangul": 612,
+  "lines": 39
  }
 }

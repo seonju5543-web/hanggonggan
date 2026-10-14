@@ -1,8 +1,24 @@
 {
  "note": "학교별 실시간 공고 파일 색인. 앱은 noticeFileKey 로 자기 파일을 바로 찾아가고, 그 파일이 없을 때 옛 data/notices.json 을 받을지 말지를 이 색인으로 판단한다(match-engine.js noticeFallbackNeeded). 사람이 어느 파일이 어느 학교인지 보는 데도 쓴다.",
  "updatedAt": "2026-10-14",
- "schools": 43,
+ "schools": 44,
  "files": {
+  "서강대학교": {
+   "file": "n14n199r.json",
+   "count": 33
+  },
+  "성균관대학교": {
+   "file": "n1x6ubj9.json",
+   "count": 20
+  },
+  "한양대학교": {
+   "file": "n1b3og5n.json",
+   "count": 9
+  },
+  "동국대학교 WISE캠퍼스": {
+   "file": "n2we95k.json",
+   "count": 11
+  },
   "한국외국어대학교": {
    "file": "n19cz03g.json",
    "count": 10
@@ -59,10 +75,6 @@
    "file": "n1if6uwu.json",
    "count": 30
   },
-  "성균관대학교": {
-   "file": "n1x6ubj9.json",
-   "count": 18
-  },
   "홍익대학교": {
    "file": "nv8pha4.json",
    "count": 11
@@ -74,10 +86,6 @@
   "충남대학교": {
    "file": "nl1xm19.json",
    "count": 15
-  },
-  "서강대학교": {
-   "file": "n14n199r.json",
-   "count": 31
   },
   "국민대학교": {
    "file": "n1tasrsl.json",
@@ -130,10 +138,6 @@
   "상명대학교": {
    "file": "n1ozjjw8.json",
    "count": 5
-  },
-  "동국대학교 WISE캠퍼스": {
-   "file": "n2we95k.json",
-   "count": 9
   },
   "아주대학교": {
    "file": "n16dvfry.json",

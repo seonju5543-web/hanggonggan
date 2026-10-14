@@ -13560,6 +13560,106 @@
     "raw": "3. 장학금액 : 1인당 1,000,000원 (등록금 범위 외 생활비 지원 성격)"
    },
    "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-otice06doarticleno140575",
+   "name": "(대학원)2026년도 동진장학연구재단 동진장학금 선발 안내",
+   "boardTitle": "(대학원)2026년도 동진장학연구재단 동진장학금 선발 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「재단」",
+    "접수 이메일 도메인 djfoundation.or.kr (학교 밖)"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-14",
+   "provider": "주관 기관 원문 확인",
+   "amount": "500만원",
+   "amountValue": 5000000,
+   "deadline": "2026-10-30",
+   "deadlineFrom": "게시판 요약 · ~ 10월 30",
+   "period": "접수 ~2026-10-30",
+   "summary": "성균관대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-14 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "동진장학금 장학생 선발 공고(동진장학연구재단).pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140575&attachNo=118348"
+    },
+    {
+     "name": "서식1 장학생지원서.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140575&attachNo=118349"
+    },
+    {
+     "name": "서식2 자기소개서.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140575&attachNo=118350"
+    },
+    {
+     "name": "서식3 지도교수 추천서.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140575&attachNo=118351"
+    },
+    {
+     "name": "서식4 개인정보수집동의서.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140575&attachNo=118352"
+    },
+    {
+     "name": "서식5 개인정보수집동의서(부모).hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140575&attachNo=118353"
+    }
+   ],
+   "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140575&article.offset=0&articleLimit=10",
+   "sourceKind": "auto",
+   "applyEmail": "admin@djfoundation.or.kr",
+   "applyEmailSource": "* 신청방법: 이메일 접수(admin@djfoundation.or.kr)",
+   "applyEmailFrom": "공고 원문",
+   "openDate": "2026-10-15",
+   "announceDate": "2026-11-06",
+   "eligibilityLines": [
+    "* 지원자격",
+    "- 대한민국 국적이며, 국내 대학원 화학 전공자(석사, 석박사통합 및 박사과정 수행자)",
+    "- 지원대상 전공: 화학, 화학생명(생물)공학, 신소재공학, 고분자공학, 재료화학공학, 화학공학",
+    "- 소득기준: 한국장학재단 소득구간 9구간 이하(2026-1학기 or 2학기)",
+    "- 성적요건: 평점평균 3.2/4.5 이상인 자",
+    "' 석사/석박통합: 현재 재학중인 과정에서 1개 학기 이상 성적 보유자",
+    "' 박사: 현재과정 및 직전과정(석사)성적 평점평균 3.2/4.5 이상인 자",
+    "- 타 재단/기업/지방자치단체 장학금(생활비성) 중복수혜는 허용하지 않습니다.",
+    "(단, 한국장학재단 국가장학금, 교내장학금은 예외)",
+    "* 신청기간: 10월 15일 ~ 10월 30일",
+    "* 신청방법: 이메일 접수(admin@djfoundation.or.kr)",
+    "* 제출서류: 첨부된 공고문 확인 必",
+    "* 문의: 동진장학연구재단(csy@djfoundation.or.kr / 02-6393-5324)",
+    "※ 문의가능시간: 평일 09:00 ~ 15:00 (점심시간 12시 ~ 13시)"
+   ],
+   "excerpts": [
+    "* 신청기간: 10월 15일 ~ 10월 30일",
+    "* 신청방법: 이메일 접수(admin@djfoundation.or.kr)",
+    "* 문의: 동진장학연구재단(csy@djfoundation.or.kr / 02-6393-5324)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 5000000,
+    "ratio": 0,
+    "min": 5000000,
+    "max": 5000000,
+    "raw": "* 지원내용: 학업장력금 5,000,000원 (26-2학기) * 선발인원: 총 60명"
+   },
+   "amountFrom": "공고 원문",
+   "exclusivity": {
+    "kind": "allowed",
+    "scope": "external",
+    "raw": "- 타 재단/기업/지방자치단체 장학금(생활비성) 중복수혜는 허용하지 않습니다."
+   },
+   "exclusivityFrom": "공고 원문",
+   "scopeFrom": "로봇 2026-10-14 · 원문 증거로 전국 — 접수 이메일 도메인 djfoundation.or.kr (학교 밖) (게시: 성균관대학교)"
   }
  ]
 }
