@@ -150,6 +150,16 @@ async function fetchDetail(item) {
    · json : 화면은 SPA라 껍데기만 오지만 목록을 주는 내부 API가 따로 있다.
    · dataId: 행이 <a href="javascript:" data-id="…">라 평범한 fetch로도 번호는 뽑힌다. */
 const BOARD_RULES = {
+  /* 한양대 「서울 장학안내 › 장학공지」(sc.hanyang.ac.kr/-12 · 2026-10-14 개발자 결정 13 "수단과 방법을 가리지 않고"):
+     행이 <a href="#none" onclick="_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_viewMessage(219501, true, false)"> 이고 날짜는 <span class="date">2026. 6. 23</span>.
+     상세는 같은 주소에 view_message + messageId — 홈 화면의 '최근 글' 링크가 그 꼴이었고(정찰 2026-10-14 · 샌드박스 Playwright) 그 주소로 열면 그 글 제목이 h 태그에 있다.
+     전체공지의 장학 필터(www.hanyang.ac.kr notice_all)는 그대로 두고 이 게시판을 둘째 줄로 더한다(줄의 rule 열쇠로만 이 규칙을 쓴다 — 전체공지 줄은 보통 링크다). */
+  '한양대학교 장학안내': {
+    kind: 'onclick',
+    fn: /BbsPortlet_viewMessage\(\s*(\d+)/,
+    detail: (id, boardUrl) => `${String(boardUrl).split(/[?#]/)[0]}?p_p_id=kr_ac_hanyang_bbs_web_portlet_BbsPortlet&p_p_lifecycle=0&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_action=view_message&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_messageId=${id}`,
+    evidence: '정찰 2026-10-14(샌드박스 Playwright): 목록 행 onclick viewMessage(219501) · 홈의 최근 글 링크 …/-12?…action=view_message&…messageId=219501 · 그 주소를 새 탭으로 열면 「[교내] 2026-2학기 … 가계곤란장학 2차 신청 안내」가 제목 자리에',
+  },
   '서강대학교': {
     kind: 'json',
     api: 'https://www.sogang.ac.kr/api/api/v1/mainKo/BbsData/boardList?pageNum=1&pageSize=30&bbsConfigFk=141',
@@ -323,7 +333,8 @@ async function harvestBoard(s, ctx = { dead: false }) {
     return;
   }
   try {
-    const rule = BOARD_RULES[s.school || s.host];   // 학교 없는 전국 출처는 주최 이름으로
+    /* 규칙 열쇠 — 줄에 rule 이 적혀 있으면 그 규칙(한 학교가 게시판 둘을 쓰고 한쪽만 클릭형일 때 · 2026-10-14 한양대), 없으면 학교 이름 · 학교 없는 전국 출처는 주최 이름 */
+    const rule = BOARD_RULES[s.rule || s.school || s.host];
     let rawLinks;
     if (rule) {
       rawLinks = await rowsByRule(rule, s.boardUrl);   // 링크가 아닌 행을 쓰는 게시판

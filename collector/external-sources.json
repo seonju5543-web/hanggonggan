@@ -7,7 +7,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-09-30",
+    "checkedAt": "2026-10-14",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://www.haesuk.or.kr/",
@@ -21,7 +21,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-09-30",
+    "checkedAt": "2026-10-14",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://gachon.or.kr/",
@@ -35,7 +35,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-09-30",
+    "checkedAt": "2026-10-14",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://www.uljinsf.kr/",
@@ -49,9 +49,12 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-09-30",
-    "why": "홈페이지 못 엶 (fetch failed)",
-    "best": null
+    "checkedAt": "2026-10-14",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://www.yangcheon.go.kr/site/yangcheon/main.do",
+     "signals": 0
+    }
    }
   },
   {
@@ -60,7 +63,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-09-30",
+    "checkedAt": "2026-10-14",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.mpva.go.kr/",
@@ -106,7 +109,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-09-30",
+    "checkedAt": "2026-10-14",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://www.mincho.or.kr/",
@@ -120,8 +123,8 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-09-30",
-    "why": "홈페이지 못 엶 (fetch failed)",
+    "checkedAt": "2026-10-14",
+    "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
     "best": null
    }
   },
@@ -131,9 +134,12 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-09-30",
-    "why": "홈페이지 못 엶 (fetch failed)",
-    "best": null
+    "checkedAt": "2026-10-14",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://www.pc.go.kr/",
+     "signals": 0
+    }
    }
   },
   {

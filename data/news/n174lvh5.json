@@ -1,7 +1,29 @@
 {
  "school": "가톨릭대학교",
- "updatedAt": "2026-10-13",
+ "updatedAt": "2026-10-14",
  "items": [
+  {
+   "title": "[기숙사상담실 마음숲] 2026학년도 2학기 열린상담실 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276754&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-14",
+   "kind": "생활",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-14",
+   "thumb": "data/news/img/d8d3de2d297eeae7.webp",
+   "desc": "혼자 가지고 있기엔 버거운 고민이 있다면 ? 한숨 돌리며 편안한 마음으로 쉬고 싶다면 ? 오직 기숙사생들을 위한 마음 쉼터로 오세요 ! 기숙사 상담실 마음숲에서 매주 화요일 오후 3시~5시 상담실을 엽니다 .…"
+  },
+  {
+   "title": "[대학일자리플러스센터] 넥스트플레이어 – 컨텐츠/마케팅 공채 인턴 1기 모집",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276751&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-14",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-14",
+   "desc": "***본 공고 확인 후, 아래의 메일 제목 형식에 맞춰 이메일로 지원하는 경우 서류 전형에서 가산점 부여 예정"
+  },
   {
    "title": "[CUK GAIA 디지털전환센터] G-ContAct AI Summit2026 초대",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276735&article.offset=0&articleLimit=10",
@@ -138,8 +160,7 @@
    "school": "가톨릭대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "thumb": "data/news/img/571ef9929a708403.webp",
-   "desc": "[학생지원팀] 2026년도 하반기 마포인재육성장학재단 마포장학생 선발계획 공고 [학생지원팀] <아산사회복지재단> 2027년 의생명과학분야 대학 장학생 선발 안내 대학/대학원 주요사이트 관련 기관 맨위로가기 트리니티…"
+   "thumb": "data/news/img/571ef9929a708403.webp"
   },
   {
    "title": "[학생생활상담소] 2026년 2학기 집단상담 신청 안내(ELP 비교과 점수 인정) (수정)",
@@ -149,7 +170,7 @@
    "campus": "",
    "foundAt": "2026-10-02",
    "thumb": "data/news/img/67af30d9da25b1f6.webp",
-   "desc": "작성자 : 학생생활상담소 [학생생활상담소] 2026-2학기 집단상담 참가자 모집 안녕하세요, 학생생활상담소입니다. 학생생활상담소에서는 여러분의 건강한 대학생활을 돕기 위해 다양한 집단상담 프로그램을 운영합니다.",
+   "desc": "[학생생활상담소] 2026-2학기 집단상담 참가자 모집 안녕하세요, 학생생활상담소입니다. 학생생활상담소에서는 여러분의 건강한 대학생활을 돕기 위해 다양한 집단상담 프로그램을 운영합니다.",
    "src": "5d85d287"
   },
   {

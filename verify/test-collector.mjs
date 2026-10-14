@@ -1522,7 +1522,7 @@ console.log('\n■ 공고문 뒷장 서식 쪽 떼기 — 쪽 글자의 표식�
   eq('  서비스워커가 뗀 쪽 PDF 를 가로채지 않는다', /\\\/data\\\/form-pages\\\//.test(readText(new URL('../sw.js', import.meta.url))), true);
   const app = readText(new URL('../app.js', import.meta.url));
   eq('  앱이 색인을 받아 질문 화면 머리에 「공고문 안 신청서 서식」으로 보인다 (층1·층2 같은 함수)',
-    [/fetch\('data\/form-pages\/index\.json'/.test(app), /formPagesIndex\[sch\.id\]/.test(app.slice(app.indexOf('function prepOriginalsHtml('))), /loadFormPagesIndex\(\)/.test(app.match(/^const bootJobs = .*$/m)[0])], [true, true, true]);
+    [/fetch\('data\/form-pages\/index\.json'/.test(app), /formPageRowsHtml\(sch\)/.test(app.slice(app.indexOf('function prepOriginalsHtml('))), /bootJobs\.push\(loadFormPagesIndex\(\)\)/.test(app) && /jobs\.push\(loadFormPagesIndex\(\)\)/.test(app)], [true, true, true]);
 }
 
 /* 2026-10-13 ③ — 신청 준비 체크리스트. '준비 완료'는 버튼이 아니라 네 항목(서류 확인·작성·증명서·제출 방법)의 결과다. */
@@ -12262,7 +12262,7 @@ console.log('\n■ 낡은 게시판 주소 고침 (2026-10-04 개발자 "주소 
     const hit = m[2].match(rule.fn) || []; const id = hit[1];
     const inner = rule.titleIn ? ((m[3].match(rule.titleIn) || [])[1] ?? m[3]) : m[3];
     return id ? { title: inner.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), url: rule.detail(id, boardUrl, hit) } : null;
-  }).filter(Boolean);
+  }).filter((x) => x && x.title);   // 수집기와 같이 제목 없는 줄(사진만 감싼 링크)은 버린다
   eq('② 청년재단 — 번호 둘(글·게시판)로 재단 첫 화면과 같은 상세 주소 · 제목 칸만(번호·날짜·조회수 빼고)',
     rows(RULES['청년재단'], `<a class="v2-board-list__row" href="javascript:void(0)" onclick="fn_detail('10053','BBSMSTR_000000000367')"> <span> 807 </span> <strong> 2026년 청년다다름사업 참여수기 공모전 안내 </strong> <span>2026.09.21</span> <span>37</span> </a>`, 'https://kyf.or.kr/user/board.do?boardType=notice'),
     [{ title: '2026년 청년다다름사업 참여수기 공모전 안내', url: 'https://kyf.or.kr/user/boardDetail.do?boardType=notice&bbsId=BBSMSTR_000000000367&nttNo=10053' }]);
@@ -12270,7 +12270,10 @@ console.log('\n■ 낡은 게시판 주소 고침 (2026-10-04 개발자 "주소 
     [/'동국대학교 WISE캠퍼스': \{ \.\.\.NEWS_BOARD_RULES\['동국대학교 WISE캠퍼스'\]/.test(csrc),
      rows(RULES['동국대학교 WISE캠퍼스'], `<a href="#none" onclick="goDetail(520676);"> <div class="mark"><span class="num">619</span></div> <div class="top"> <em>교외장학(지자체, 사설/기타)</em> <p class="tit"> 대전청년내일재단 2026년 장학생 선발 안내 </p> <div class="info"> <span>2026.09.28.</span> <span>양문수</span> <span>조회 171</span> </div> </div> </a>`, 'https://wise.dongguk.ac.kr/article/servicenotice/list')],
     [true, [{ title: '대전청년내일재단 2026년 장학생 선발 안내', url: 'https://wise.dongguk.ac.kr/article/servicenotice/detail/520676' }]]);
-  eq('  학교 없는 전국 출처는 주최 이름으로 규칙을 찾는다 · 전북(한 번호) 규칙은 그대로', [/BOARD_RULES\[s\.school \|\| s\.host\]/.test(csrc), rows(RULES['전북대학교'], `<a href="javascript:;" onclick="pf_DetailMove('215647')">장학생 선발 공고 안내</a>`, 'x')[0].url], [true, 'https://www.jbnu.ac.kr/web/Board/215647/detailView.do?category=6']);
+  eq('④ 한양대 장학안내(둘째 게시판 · 2026-10-14 정찰) — 누르기형 viewMessage(번호) · 상세는 같은 쪽의 view_message 주소 · 사진 링크(글자 없음)는 줄이 되지 않는다',
+    rows(RULES['한양대학교 장학안내'], `<a href="#none" onclick="_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_viewMessage(219501, true, false)"> <img src="/documents/11048027/0/x.jpg" alt="[교내] 사진"> </a> <a href="#none" class="" onclick="_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_viewMessage(219501, true, false)"> [교내] 2026-2학기 학부 재학생(신편입생 포함) 교내 가계곤란장학 2차 신청 안내(2026.08.13.(목) ~ 2026.09.30.(수)) </a>`, 'https://sc.hanyang.ac.kr/-12'),
+    [{ title: '[교내] 2026-2학기 학부 재학생(신편입생 포함) 교내 가계곤란장학 2차 신청 안내(2026.08.13.(목) ~ 2026.09.30.(수))', url: 'https://sc.hanyang.ac.kr/-12?p_p_id=kr_ac_hanyang_bbs_web_portlet_BbsPortlet&p_p_lifecycle=0&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_action=view_message&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_messageId=219501' }]);
+  eq('  학교 없는 전국 출처는 주최 이름으로 규칙을 찾는다(둘째 게시판은 rule 열쇠 · 한양 10-14) · 전북(한 번호) 규칙은 그대로', [/BOARD_RULES\[s\.rule \|\| s\.school \|\| s\.host\]/.test(csrc), rows(RULES['전북대학교'], `<a href="javascript:;" onclick="pf_DetailMove('215647')">장학생 선발 공고 안내</a>`, 'x')[0].url], [true, 'https://www.jbnu.ac.kr/web/Board/215647/detailView.do?category=6']);
   const SCH = JSON.parse(readText(new URL('../collector/schools.json', import.meta.url)));
   const ACTSRC = JSON.parse(readText(new URL('../collector/activity-sources.json', import.meta.url)));
   eq('④ 404 주소는 출처에서 빠지고 보관됐다 · 분교 셋은 주소가 있다',
@@ -12480,6 +12483,21 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
     [['r1'], ['r2'], true, false, ['r1'], '원본 그대로 변환', true, true]);
   const again = FP.runFormPdf ? FP.runFormPdf({ root: fakeRepo, today: '2026-10-12', soffice: fakeSoffice, log: quiet }) : {};
   eq('  다시 돌리면 이미 있는 것은 건너뛴다 (같은 파일을 날마다 다시 쓰지 않는다)', [again.done && again.done.length, /이미 있어 건너뜀 1/.test(readText(path.join(fakeRepo, 'collector', 'form-pdf-report.md')))], [0, true]);
+  /* 글꼴 표 도장(FONT_STAMP · 2026-10-14) — 도장 없는(옛 글꼴로 그린) 사본은 '이미 있음'이 아니라 다시 바꾼다 · 새 항목엔 도장이 적힌다 */
+  {
+    const ip = path.join(fakeRepo, 'data', 'forms-pdf', 'index.json');
+    const idx = JSON.parse(readText(ip)); const stamped = (idx.items.r1 || []).map((f) => f.fonts);
+    for (const f of (idx.items.r1 || [])) delete f.fonts;
+    fs.writeFileSync(ip, JSON.stringify(idx, null, 1) + '\n');
+    const restamp = FP.runFormPdf ? FP.runFormPdf({ root: fakeRepo, today: '2026-10-12', soffice: fakeSoffice, log: quiet }) : {};
+    eq('  글꼴 표 도장이 없는(2026-10-12 중국어 글꼴 사본) 항목은 건너뛰지 않고 다시 바꾼다 · 바꾼 항목에 도장이 적힌다',
+      [stamped, restamp.done && restamp.done.length, (JSON.parse(readText(ip)).items.r1 || []).map((f) => f.fonts)], [[FP.FONT_STAMP], 1, [FP.FONT_STAMP]]);
+    /* 도장 없는 옛 사본은 예산이 다 되거나 변환이 넘어져도 **지우지 않는다**(리뷰 2026-10-14 — 지우면 다음 실행까지 앱 줄이 사라진다) */
+    const idx2 = JSON.parse(readText(ip)); for (const f of (idx2.items.r1 || [])) delete f.fonts; fs.writeFileSync(ip, JSON.stringify(idx2, null, 1) + '\n');
+    const keep = FP.runFormPdf ? FP.runFormPdf({ root: fakeRepo, today: '2026-10-12', soffice: fakeSoffice, budgetSec: 0, log: quiet }) : {};
+    const kept = (JSON.parse(readText(ip)).items.r1 || []);
+    eq('  예산이 다 돼 못 바꾼 옛 사본은 색인·파일이 그대로 남는다(도장 없이)', [keep.left && keep.left.length, kept.length, kept.map((f) => f.fonts), kept.every((f) => fs.existsSync(path.join(fakeRepo, 'data', 'forms-pdf', f.file)))], [1, 1, [undefined], true]);
+  }
   /* 리뷰 셋: 학교가 같은 이름으로 다시 올리면(원본 크기가 다르면) 다시 바꾼다 · 색인에 없는 고아 파일은 지운다 · 예산이 다 되면 남은 것을 적고 끝낸다 */
   fs.writeFileSync(path.join(fakeRepo, 'collector', 'extracted', 'forms-index.txt'), 'form-r1-1.docx\t우양재단 동행 장학생 모집\t지원서.docx\t101\n');
   fs.writeFileSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '9-옛결과.pdf'), pdf);
@@ -12492,10 +12510,22 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
   /* ⑨ 워크플로·설치 스크립트 글자 */
   const wf = readText(new URL('../.github/workflows/deep-fetch.yml', import.meta.url));
   const step = wf.slice(wf.indexOf('신청서 원본 → PDF (양식 원본 그대로)'), wf.indexOf('git config user.name'));
-  eq('⑨ deep-fetch.yml 의 PDF 단계는 보강 단계(시한 + continue-on-error) · 자바 다리와 확장 설치 · 저장 목록에 data/forms-pdf 와 리포트',
+  eq('⑨ deep-fetch.yml 의 PDF 단계는 보강 단계(시한 + continue-on-error) · 자바 다리와 확장 설치 · 한글 글꼴 두 묶음 + 글꼴 표 설치(변환 앞) · 저장 목록에 data/forms-pdf 와 리포트',
     [step.length > 0, /timeout-minutes:\s*\d+/.test(step), /continue-on-error: true/.test(step), /libreoffice-java-common/.test(step), /bash collector\/install-h2orestart\.sh/.test(step), /node collector\/form-pdf\.mjs/.test(step),
-      /git add -A data\/forms-pdf/.test(wf), /git add collector\/form-pdf-report\.md/.test(wf), /\|\| true/.test(step)],
-    [true, true, true, true, true, true, true, true, false]);
+      /git add -A data\/forms-pdf/.test(wf), /git add collector\/form-pdf-report\.md/.test(wf), /\|\| true/.test(step),
+      /fonts-nanum fonts-noto-cjk/.test(step), step.indexOf('bash collector/install-form-fonts.sh') > 0 && step.indexOf('bash collector/install-form-fonts.sh') < step.indexOf('node collector/form-pdf.mjs')],
+    [true, true, true, true, true, true, true, true, false, true, true]);
+  /* 글꼴 표 — 2026-10-12 첫 사본 14개 전부가 중국어 글꼴(WenQuanYi Zen Hei · Playwright 의존성)로 그려져 표 칸이 넘쳤다(춘곡장학회 실측 · 나눔으로 바꾸니 사라짐).
+     표가 한글 문서의 흔한 글꼴 이름을 나눔·Noto 로 못 박고, 설치 스크립트가 fc-match 로 스스로 확인하며 실패를 삼키지 않는다 */
+  const fontsConf = readText(new URL('../collector/fonts/hwp-font-aliases.conf', import.meta.url));
+  const fontsSh = readText(new URL('../collector/install-form-fonts.sh', import.meta.url));
+  eq('  글꼴 표가 함초롬돋움·함초롬바탕·맑은 고딕·굴림·돋움·바탕 을 나눔(고딕·명조)으로 못 박는다 · 한글(lang ko) 기본도 나눔',
+    ['함초롬돋움', '함초롬바탕', '맑은 고딕', '굴림', '돋움', '바탕'].map((f) => new RegExp(`<family>${f}</family><prefer><family>Nanum(Gothic|Myeongjo)</family>`).test(fontsConf)).concat([/<string>ko<\/string>/.test(fontsConf)]),
+    [true, true, true, true, true, true, true]);
+  eq('  설치 스크립트 — 실패를 삼키지 않고(set -e · apt 에 || true 없음) 표를 사용자 fontconfig 에 복사하고 fc-match 로 한글 글꼴로 풀리는지 스스로 확인한다',
+    [/set -euo pipefail/.test(fontsSh), /fonts-nanum fonts-noto-cjk/.test(fontsSh), !/apt-get[^\n]*\|\| true/.test(fontsSh), /fontconfig\/conf\.d/.test(fontsSh), /hwp-font-aliases\.conf/.test(fontsSh), /fc-match/.test(fontsSh), /exit 1/.test(fontsSh)],
+    [true, true, true, true, true, true, true]);
+  eq('  FONT_STAMP 가 있고 로봇이 색인 항목에 fonts 로 적는다 (표를 바꾸면 도장을 올린다 — 옛 사본이 다시 그려진다)', [typeof FP.FONT_STAMP, /fonts: FONT_STAMP/.test(readText(new URL('../collector/form-pdf.mjs', import.meta.url)))], ['string', true]);
   const sh = fs.existsSync(new URL('../collector/install-h2orestart.sh', import.meta.url)) ? readText(new URL('../collector/install-h2orestart.sh', import.meta.url)) : '';
   eq('  설치 스크립트는 실패해도 0 으로 끝나고(보강 단계) 깔렸는지를 unopkg list 로 적는다 · 러너(runner 사용자)에선 sudo 로 --shared 를 깐다(리뷰 — 없으면 HWP 전부가 조용히 못 읽음)',
     [/set -uo pipefail/.test(sh), /\$UNOPKG add --shared/.test(sh), /\$UNOPKG list/.test(sh), !/set -e/.test(sh), /sudo -n unopkg/.test(sh)], [true, true, true, true, true]);

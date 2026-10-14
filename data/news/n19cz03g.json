@@ -1,7 +1,18 @@
 {
  "school": "한국외국어대학교",
- "updatedAt": "2026-10-13",
+ "updatedAt": "2026-10-14",
  "items": [
+  {
+   "title": "제7회 EU Certificate Course 수강생 모집 안내",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/269047/artclView.do",
+   "postedAt": "2026-10-14",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-10-14",
+   "thumb": "data/news/img/f594f942e9f67f61.webp",
+   "desc": "\"지리, 와인부터 안보에서 축구까지, 6가지 키워드로 읽는 다채로운 유럽!\" 한국외국어대학교 장모네 EU센터(Jean Monnet Centre of Excellence)에서 주관하는 2026 제6회 EU…"
+  },
   {
    "title": "한국외대 글로벌캠퍼스 명수당 가을철 단풍 관람객 행락차량 사전 예약 안내",
    "url": "https://www.hufs.ac.kr/bbs/hufs/2180/268861/artclView.do",
@@ -95,7 +106,8 @@
    "school": "한국외국어대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "src": "54a450a4"
+   "src": "54a450a4",
+   "desc": "한국외국어대학교 글로벌미디어커뮤니케이션대학원 2027 학년도 전기 석사학위과정 신입생 모집(특별/일반)"
   },
   {
    "title": "(서울) 2026년도 후반기 학생예비군 기본 2차훈련(안내)",
@@ -134,7 +146,8 @@
    "postedAt": "2026-09-23",
    "school": "한국외국어대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "desc": "한국외국어대학교 G-앵커사업단에서는 아주대학교와 함께 글로벌 취업·창업·인턴십을 꿈꾸는 재학생을 위한 「2026 랜선으로 만나는 릴레이 글로벌 취·창업 톡톡톡(talk)」을 진행합니다."
   },
   {
    "title": "교원 인사발령",

@@ -62,6 +62,18 @@ jobs:
       - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
 
+      # 검색 열쇠 자가 점검 — 값은 찍지 않는다. 두 Secret 이 '있는가'만 본다(2026-10-14 · 열쇠를 넣었는데 로봇은 '없음'이라던 사고).
+      # ⚠️ 전체 Secret 이름 목록(toJSON(secrets))을 받던 첫 판은 GitHub 가 실행을 '승인 필요(action_required)'로 멈춰 세웠다(run 38497868019 · 작업 0개) — 쓰지 않는다.
+      - name: 검색 열쇠 있는가 (이름만)
+        env:
+          HAS_ID: ${{ secrets.NAVER_CLIENT_ID != '' }}
+          HAS_SECRET: ${{ secrets.NAVER_CLIENT_SECRET != '' }}
+        run: |
+          echo "NAVER_CLIENT_ID 있음: $HAS_ID · NAVER_CLIENT_SECRET 있음: $HAS_SECRET"
+          if [ "$HAS_ID" != "true" ] || [ "$HAS_SECRET" != "true" ]; then
+            echo "::warning::네이버 검색 열쇠가 저장소 Actions Secrets 에 이 이름으로 없습니다 — Settings → Secrets and variables → Actions → Repository secrets 에 NAVER_CLIENT_ID · NAVER_CLIENT_SECRET 두 개(환경(Environment) 비밀·Variables 에 넣으면 이 작업에선 안 보입니다)"
+          fi
+
       - id: hunt
         name: 재단 홈페이지 뒤지기
         env:
