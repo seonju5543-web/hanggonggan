@@ -261,6 +261,31 @@
   "round": "2026-10-31",
   "nextAt": "2026-10-15"
  },
+ "kosaf|2700045011|https://gwangyang.go.kr/fund/board.es?mid=a60401000000&bid=0156&list_no=205387&act=view": {
+  "ds": "kosaf",
+  "key": "2700045011",
+  "url": "https://gwangyang.go.kr/fund/board.es?mid=a60401000000&bid=0156&list_no=205387&act=view",
+  "source": "match",
+  "by": "로봇(재단 게시판 글과 짝 — 마감 같음 +2 · 사업 이름 +1 · 마감 해 +1 · 학기·반기 +1 · 장학 낱말 +1)",
+  "title": "2026년 하반기 대학생 생활비 장학금 지원 계획 공고",
+  "firstAt": "2026-10-14",
+  "lastAt": "2026-10-14",
+  "tries": 1,
+  "status": "rejected",
+  "why": "재단 이름이 화면에 없음",
+  "checks": {
+   "C": "ok",
+   "L": "ok",
+   "H": "ok",
+   "T": "ok",
+   "R": "ok",
+   "X": "fail",
+   "P": "ok"
+  },
+  "round": "2026-10-31",
+  "decidedAt": "2026-10-14",
+  "also": []
+ },
  "kosaf|2700071007|board:https://www.ycsf.or.kr/open/notice/list.html": {
   "ds": "kosaf",
   "key": "2700071007",
