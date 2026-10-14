@@ -1,6 +1,52 @@
 {
- "updatedAt": "2026-10-13",
+ "updatedAt": "2026-10-14",
  "items": [
+  {
+   "title": "[교외] 2026년 하반기 은평구민 장학생 선발 공고",
+   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/273635/artclView.do",
+   "attachments": [
+    {
+     "name": "【붙임】 2026. 하반기 은평구민 장학생 선발 공고_합본.pdf",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/183271/download.do"
+    }
+   ],
+   "deadlineHint": "신청 기간 : 2026년 10월 12일(월) ~ 10월 28일(수) 18:00까지 (주말, 공휴일 및 점심시간 12:00~13:00 제외) 라.",
+   "school": "고려대학교 세종캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-14",
+   "bodyDeadline": "2026-10-28",
+   "bodyDeadlineText": "나. 선발 인원 : 000명 다. 신청 기간 : 2026년 10월 12일(월) ~ 10월 28일(수) 18:00까지 (주말, 공휴일 및 점심시간 12:00~13:00 제외)"
+  },
+  {
+   "title": "2026-2학기 주거안정장학금 학생 매뉴얼(포기 및 반환)",
+   "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=232076902&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2026년 장학생 포기 및 반환 매뉴얼.pdf",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=232076902&attachNo=379200"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-14"
+  },
+  {
+   "title": "2026-2학기 주거안정장학금 선발자 교육이수 및 장학생 서약서 제출 안내",
+   "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=232076897&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2026년 장학생 서약서 작성 매뉴얼.pdf",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=232076897&attachNo=379201"
+    }
+   ],
+   "deadlineHint": "제출기한: 2026. 10. 21.(수) 24시까지 - 기한 내 장학생 서약서 미제출 시 장학금 지급 제외 3. 교육이수 및 장학생 서약서 제출",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-14",
+   "bodyDeadline": "2026-10-21",
+   "bodyDeadlineText": "- 2026-2학기 주거안정장학금 선발자(한국장학재단 홈페이지 확인 가능) 2. 교육이수 및 장학생 서약서 제출기한: 2026. 10. 21.(수) 24시까지"
+  },
   {
    "title": "2026-2학기 한국장학재단 국가근로장학금 추가신청기간(3차) 안내",
    "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=232062825&article.offset=0&articleLimit=10",
@@ -9467,46 +9513,6 @@
    "school": "영남대학교",
    "campus": "",
    "foundAt": "2026-09-30"
-  },
-  {
-   "title": "2026년 하반기 (재)춘천인재육성장학재단 봄내장학생 선발 안내",
-   "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=231696101&article.offset=0&articleLimit=10",
-   "attachments": [
-    {
-     "name": "2026년 하반기 봄내장학생 선발 공고(게시용-QR).pdf",
-     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=231696101&attachNo=377886"
-    },
-    {
-     "name": "자주 묻는 질문(26년 하반기)_봄내장학금.hwp",
-     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=231696101&attachNo=377887"
-    }
-   ],
-   "deadlineHint": "신청기간: 2026. 9. 28.(월) ~ 10. 7.(수) [10일간] &nbsp;※ 이번학기(26년 2학기) 등록금 자부담금 없는 경우(전액",
-   "school": "영남대학교",
-   "campus": "",
-   "foundAt": "2026-09-30",
-   "bodyDeadline": "2026-10-07",
-   "bodyDeadlineText": "(재)춘천인재육성장학재단에서 2026년 하반기 봄내장학생을 다음과 같이 선발하오니 해당 학생은 신청에 참고하시기 바랍니다. 1. 신청기간: 2026. 9. 28.(월) ~ 10. 7.(수) [10일간]"
-  },
-  {
-   "title": "2026년 하반기 (재)논산시장학회 학업장려 장학생 선발 안내",
-   "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=231850880&article.offset=0&articleLimit=10",
-   "attachments": [
-    {
-     "name": "2026년도 하반기 재단법인 논산시장학회 장학생 선발 공고문(발췌본).hwpx",
-     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=231850880&attachNo=378191"
-    },
-    {
-     "name": "2026년도 하반기 재단법인 논산시장학회 장학생 신청 서식.hwpx",
-     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=231850880&attachNo=378192"
-    }
-   ],
-   "deadlineHint": "접수기간: 2026.9.28.(월) 9:00 ~ 10.30.(금) 18:00 2. 신청방법: 방문 접수 또는 우편 접수 (등기우편만 가능) &n",
-   "school": "영남대학교",
-   "campus": "",
-   "foundAt": "2026-09-30",
-   "bodyDeadline": "2026-10-30",
-   "bodyDeadlineText": "신청하시기 바랍니다. 1. 접수기간: 2026.9.28.(월) 9:00 ~ 10.30.(금) 18:00"
   },
   {
    "title": "국가장학금 등 학자금 지원을 위한 지원 구간 체계 개편 안내(27년부터 적용)",

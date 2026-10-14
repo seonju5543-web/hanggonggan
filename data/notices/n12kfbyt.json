@@ -1,7 +1,35 @@
 {
  "school": "영남대학교",
- "updatedAt": "2026-10-13",
+ "updatedAt": "2026-10-14",
  "items": [
+  {
+   "title": "2026-2학기 주거안정장학금 학생 매뉴얼(포기 및 반환)",
+   "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=232076902&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2026년 장학생 포기 및 반환 매뉴얼.pdf",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=232076902&attachNo=379200"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-14"
+  },
+  {
+   "title": "2026-2학기 주거안정장학금 선발자 교육이수 및 장학생 서약서 제출 안내",
+   "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=232076897&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2026년 장학생 서약서 작성 매뉴얼.pdf",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=232076897&attachNo=379201"
+    }
+   ],
+   "deadlineHint": "제출기한: 2026. 10. 21.(수) 24시까지 - 기한 내 장학생 서약서 미제출 시 장학금 지급 제외 3. 교육이수 및 장학생 서약서 제출",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-14"
+  },
   {
    "title": "2026-2학기 한국장학재단 국가근로장학금 추가신청기간(3차) 안내",
    "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=232062825&article.offset=0&articleLimit=10",
