@@ -342,13 +342,13 @@
   "name": "[교외] 대산농촌재단 농업리더 장학생 선발 안내(11/11 마감, 등록금 전액)"
  },
  "https://kangwon.ac.kr/ko/bbs/750/detail.do?pageitm=10&pstsn=2513&searchgbn=0&searchordersort=0": {
-  "tries": 2,
+  "tries": 3,
   "at": "2026-10-14",
   "minBody": 100,
   "name": "(한국장학재단) 해양수산부 청년창업어업인장학생 추가 모집 선발 안내"
  },
  "https://kangwon.ac.kr/ko/bbs/750/detail.do?pageitm=10&pstsn=2510&searchgbn=0&searchordersort=0": {
-  "tries": 2,
+  "tries": 3,
   "at": "2026-10-14",
   "minBody": 100,
   "name": "2026학년도 2학기 중소기업 취업연계 장학금 선발계획 알림 및 심사서류 제출 요청"
@@ -366,7 +366,7 @@
   "name": "2026학년도 1학기 주거안정장학금 지급요청서(8월분) 신청 안내"
  },
  "https://www.catholic.ac.kr/ko/campuslife/notice.do?articleno=276686&srcategoryid=22": {
-  "tries": 2,
+  "tries": 3,
   "at": "2026-10-14",
   "minBody": 100,
   "name": "[학생지원팀] (한국장학재단) 2026-2학기 국가근로장학금 추가신청기간 안내(10/21~10/29)"
@@ -378,27 +378,33 @@
   "name": "서울과학기술대학교 중소기업 취업연계 장학사업 (희망사다리Ⅰ유형) 신규장학생 자체선발 기준 안내"
  },
  "https://www.jbnu.ac.kr/web/Board/217349/detailView.do?category=6": {
-  "tries": 2,
+  "tries": 3,
   "at": "2026-10-14",
   "minBody": 100,
   "name": "[JW이종호재단] 2026년 기초과학자 장학생 선발 안내"
- },
- "https://www.jbnu.ac.kr/web/Board/217522/detailView.do?category=6": {
-  "tries": 2,
-  "at": "2026-10-14",
-  "minBody": 100,
-  "name": "2026년도 2학기 전북대학교동창회 장학재단 장학생 선발 안내"
- },
- "https://www3.chosun.ac.kr/bbs/scho/332/281257/artclView.do": {
-  "ok": "2026-10-14",
-  "at": "2026-10-14",
-  "tries": 0,
-  "name": "[장학금 접수] 2026년 푸른등대 수력원자력 K-원전 장학금 신규장학생 선발 안내"
  },
  "https://sejong.korea.ac.kr/bbs/koreaSejong/659/273624/artclView.do": {
   "ok": "2026-10-14",
   "at": "2026-10-14",
   "tries": 0,
   "name": "[국가]2026학년도 2학기 한국장학재단 중소기업 취업연계 장학생(희망사다리Ⅰ유형) 추천"
+ },
+ "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12488/view.do?currentpageno=1": {
+  "ok": "2026-10-14",
+  "at": "2026-10-14",
+  "tries": 0,
+  "name": "2026학년도 2학기 국가근로장학금(일반유형) 3차 신청 안내"
+ },
+ "https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsno=8&key=815&nttno=170638&searchctgry=학사/장학": {
+  "ok": "2026-10-14",
+  "at": "2026-10-14",
+  "tries": 0,
+  "name": "2026학년도 2학기 국가근로장학금 일반유형 추가신청기간 안내"
+ },
+ "https://kangwon.ac.kr/ko/bbs/750/detail.do?pageitm=10&pstsn=2518&searchgbn=0&searchordersort=0": {
+  "tries": 1,
+  "at": "2026-10-14",
+  "minBody": 100,
+  "name": "(강릉.원주) 2026. 2학기 도전장학금 신청 안내"
  }
 }
