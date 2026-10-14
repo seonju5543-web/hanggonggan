@@ -154,24 +154,6 @@
   "excludes": [],
   "from": "공고문 첨부(OCR)"
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3520457": {
-  "at": "2026-10-09",
-  "tries": 1,
-  "lines": [
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521470": {
-  "at": "2026-10-10",
-  "tries": 1,
-  "lines": [
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3532459": {
   "at": "2026-10-11",
   "tries": 1,
@@ -366,17 +348,6 @@
   "tries": 1,
   "lines": [
    "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3517342": {
-  "at": "2026-10-14",
-  "tries": 1,
-  "lines": [
-   "신청대상 : 성인",
-   "봉사기간",
-   "신청대상 : 성인·청소년"
   ],
   "excludes": [],
   "from": "브라우저 본문"
