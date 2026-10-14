@@ -1,7 +1,41 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-10-13",
+ "updatedAt": "2026-10-14",
  "items": [
+  {
+   "title": "[국제학생] [외국인 유학생 대상 무료 실무·커리어 프로그램] HanPass PASSMAKERS 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53473&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-14",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-14",
+   "thumb": "data/news/img/83b7cca7504ed186.webp",
+   "desc": "- 대상: 한국 취업 및 커리어 성장에 관심 있는 외국인 유학생·졸업예정자·취업준비생 (한국어 일상 회화 가능, 6회 밋업 및 Showcase 오프라인 참여 가능자)"
+  },
+  {
+   "title": "[일반] 기간제 계약직원 채용 공고(인문사회과학대학 교학팀)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53472&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-14",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-14",
+   "desc": "기간제 계약직원 모집 공고 1. 지원 자격 및 우대사항 모집인원 직무내용 인문사회과학대학 교학팀 및 학과 행정업무 등 지원 자격"
+  },
+  {
+   "title": "[일반] 「글로벌 커리어 리스타트 박람회」 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53474&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-14",
+   "kind": "행사",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-14",
+   "thumb": "data/news/img/8a932bd95c593021.webp",
+   "desc": "- 일시 및 장소: 2026. 10. 29. (목) 10시 ~ 17시, 코엑스 마곡 4F 르웨스트홀"
+  },
   {
    "title": "[일반] 2026학년도 로봇특성화대학 전공설명회 개최 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53471&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -56,7 +90,8 @@
    "school": "광운대학교",
    "campus": "",
    "src": "b09cb042",
-   "foundAt": "2026-10-13"
+   "foundAt": "2026-10-13",
+   "desc": "2026 학년도 4 차 다전공 이수 신청에 관해 다음과 같이 공지하오니 희망하는 다전공 관련 내용을 반드시 숙지한 뒤 기간 내 신청하시기 바랍니다 . Ⅰ . 신청기간 Ⅱ . 신청대상 2 ~ 4 학년 재학생"
   },
   {
    "title": "[시설] 한울관 및 아이스링크 주차장 출입구 변경 안내",
@@ -377,36 +412,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/16d454ce2db821c5.webp"
-  },
-  {
-   "title": "[일반] [HUSS-글로벌공생] 2026학년도 「HUSS 인문사회 취업 페스티벌」 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53405&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-29",
-   "kind": "행사",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/5f0b9f2c9d09c3a8.webp"
-  },
-  {
-   "title": "[일반] [체육지원팀] 광운대학교 아이스하키부 「2026 KUSF 대학 U-리그」 홈경기 개최 일정 및 결과안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53342&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-15",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/15706244571851d8.webp",
-   "src": "b09cb042"
-  },
-  {
-   "title": "[일반] [체육지원팀] 아이스하키부 「2026 LG 코리아 아이스하키리그」 경기 일정 및 결과 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53406&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-30",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/4ec7179d0720a100.webp",
-   "src": "b09cb042"
   }
  ]
 }
