@@ -196,11 +196,13 @@ export function runFormPdf({ root, today, dry = false, soffice = process.env.FOR
       /* 같은 이름·같은 자리·같은 원본 크기면 건너뛴다 — 학교가 같은 이름으로 다시 올리면(크기가 다르면) 다시 바꾼다 */
       const prev = have.find((h) => h.name === f.name && h.file === file && (h.srcBytes || 0) === (f.srcBytes || 0) && (h.fonts || '') === FONT_STAMP && fs.existsSync(path.join(outDir, h.file)));
       if (prev) { next.push(prev); skippedSame += 1; return; }
+      /* 글꼴 도장만 다른 옛 사본 — 다시 그리되, 예산이 다 되거나 변환이 넘어지면 **옛 사본을 그대로 둔다**(지우면 다음 실행까지 앱에서 줄이 사라진다 · 리뷰 2026-10-14) */
+      const stale = have.find((h) => h.name === f.name && h.file === file && (h.srcBytes || 0) === (f.srcBytes || 0) && fs.existsSync(path.join(outDir, h.file)));
       if (dry) { log(`[dry] ${t.id} · ${f.name} ← ${f.src}`); return; }
-      if (overBudget()) { left.push({ id: t.id, name: f.name }); return; }
+      if (overBudget()) { left.push({ id: t.id, name: f.name }); if (stale) next.push(stale); return; }
       const r = convertOne(path.join(root, 'collector', 'extracted', f.src), path.join(outDir, file), { soffice });
       if (r.ok) { next.push({ file, name: f.name, pages: r.pages, bytes: r.bytes, srcBytes: f.srcBytes || 0, from: '원본 그대로 변환', fonts: FONT_STAMP, at: today }); done.push({ id: t.id, name: f.name, pages: r.pages }); flush(); }
-      else failed.push({ id: t.id, name: f.name, why: r.why });
+      else { failed.push({ id: t.id, name: f.name, why: r.why }); if (stale) next.push(stale); }
     });
     if (next.length) index.items[t.id] = next;
     else if (!dry) delete index.items[t.id];

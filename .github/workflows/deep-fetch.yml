@@ -71,6 +71,7 @@ jobs:
       # 보강 단계: 시한 + continue-on-error · HWP·HWPX 는 가져오기 확장(H2Orestart)이 있어야 읽힌다(설치 실패는 리포트가 '변환기가 못 읽음'으로 센다).
       # 🔴 `|| true` 로 설치 실패를 삼키지 않는다(위 OCR 단계와 같은 규칙) · 저장 목록(git add)에 data/forms-pdf 를 넣는다(deploy-sync 가 이 워크플로 이름을 본다).
       - name: 신청서 원본 → PDF (양식 원본 그대로)
+        id: formpdf
         timeout-minutes: 8
         continue-on-error: true
         run: |
@@ -78,6 +79,28 @@ jobs:
           bash collector/install-h2orestart.sh
           bash collector/install-form-fonts.sh   # 한글 문서 글꼴 → 나눔·Noto 못 박기 — 없으면 중국어 글꼴로 표가 깨진다(2026-10-12 실측 14/14 · 춘곡)
           node collector/form-pdf.mjs
+      # 🔴 경보 짝 — 보강 단계라 넘어져도 실행은 초록이다. 글꼴·확장 설치가 깨지면 'PDF 0건 + 초록불'이 되므로 이슈 하나에 모으고 회복하면 같은 제목으로 닫는다(tools/alert-issue.mjs)
+      - name: 🚨 신청서 원본 → PDF 단계 실패 알림
+        if: always() && steps.formpdf.outcome == 'failure'
+        timeout-minutes: 1
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          title: 🚨 신청서 원본 → PDF 단계가 넘어졌어요
+          label: form-pdf-step
+          body: |
+            신청서 원본을 PDF 로 바꾸는 단계가 끝까지 가지 못했습니다(글꼴·HWP 확장 설치 또는 변환). 그동안 앱의 「원본 양식 그대로 보기」 줄은 옛 사본으로 남습니다. 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      - name: ✅ 신청서 원본 → PDF 단계 회복 — 경보 닫기
+        if: always() && steps.formpdf.outcome == 'success'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          title: 🚨 신청서 원본 → PDF 단계가 넘어졌어요
+          label: form-pdf-step
       - run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

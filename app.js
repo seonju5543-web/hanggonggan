@@ -3712,7 +3712,7 @@ function renderApplyPrep(sch) {
   /* 본문 사진(bodyImage)은 공고 원문 그 자체다 — '첨부 파일'로 늘어놓지 않는다(원문 링크가 준다) */
   const pdfRows = kosaf ? '' : formPdfRowsHtml(sch);
   /* 로봇이 PDF 로 둔 그 파일(이름이 같은 첨부)은 「원본 양식 그대로 보기」 줄이 이미 보여 준다 — 밑에 또 늘어놓지 않는다(PDF 신청서는 isApplicationForm 밖이라 여기 걸렸다 · 10-14 실측 선원가족) */
-  const pdfNames = new Set(formPdfsFor(sch).map((f) => f.name));
+  const pdfNames = new Set(formPdfsFor(sch).map((f) => f.name));   // 이름으로만 거른다 — 학교가 같은 이름으로 다른 파일을 올리면 로봇이 크기 차이로 다시 바꾼다(form-pdf srcBytes)
   const otherAtts = atts.filter((a) => !formAtts.includes(a) && !a.bodyImage && !pdfNames.has(a.name));
   /* 첨부 줄 — 승인 시안 A(2026-10-14) 꼴: 아이콘 · 이름 · 작은 글씨(출처 · 크기) · 오른쪽 ↓. 신청서 양식 묶음엔 로봇이 바꿔 둔 원본 PDF 줄이 맨 위에 선다 */
   const kb = (a) => (a.bytes ? ` · ${Math.max(1, Math.round(a.bytes / 1024))}KB` : '');

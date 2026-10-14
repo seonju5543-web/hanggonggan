@@ -12048,7 +12048,7 @@ console.log('\n■ 낡은 게시판 주소 고침 (2026-10-04 개발자 "주소 
     const hit = m[2].match(rule.fn) || []; const id = hit[1];
     const inner = rule.titleIn ? ((m[3].match(rule.titleIn) || [])[1] ?? m[3]) : m[3];
     return id ? { title: inner.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), url: rule.detail(id, boardUrl, hit) } : null;
-  }).filter(Boolean);
+  }).filter((x) => x && x.title);   // 수집기와 같이 제목 없는 줄(사진만 감싼 링크)은 버린다
   eq('② 청년재단 — 번호 둘(글·게시판)로 재단 첫 화면과 같은 상세 주소 · 제목 칸만(번호·날짜·조회수 빼고)',
     rows(RULES['청년재단'], `<a class="v2-board-list__row" href="javascript:void(0)" onclick="fn_detail('10053','BBSMSTR_000000000367')"> <span> 807 </span> <strong> 2026년 청년다다름사업 참여수기 공모전 안내 </strong> <span>2026.09.21</span> <span>37</span> </a>`, 'https://kyf.or.kr/user/board.do?boardType=notice'),
     [{ title: '2026년 청년다다름사업 참여수기 공모전 안내', url: 'https://kyf.or.kr/user/boardDetail.do?boardType=notice&bbsId=BBSMSTR_000000000367&nttNo=10053' }]);
@@ -12056,6 +12056,9 @@ console.log('\n■ 낡은 게시판 주소 고침 (2026-10-04 개발자 "주소 
     [/'동국대학교 WISE캠퍼스': \{ \.\.\.NEWS_BOARD_RULES\['동국대학교 WISE캠퍼스'\]/.test(csrc),
      rows(RULES['동국대학교 WISE캠퍼스'], `<a href="#none" onclick="goDetail(520676);"> <div class="mark"><span class="num">619</span></div> <div class="top"> <em>교외장학(지자체, 사설/기타)</em> <p class="tit"> 대전청년내일재단 2026년 장학생 선발 안내 </p> <div class="info"> <span>2026.09.28.</span> <span>양문수</span> <span>조회 171</span> </div> </div> </a>`, 'https://wise.dongguk.ac.kr/article/servicenotice/list')],
     [true, [{ title: '대전청년내일재단 2026년 장학생 선발 안내', url: 'https://wise.dongguk.ac.kr/article/servicenotice/detail/520676' }]]);
+  eq('④ 한양대 장학안내(둘째 게시판 · 2026-10-14 정찰) — 누르기형 viewMessage(번호) · 상세는 같은 쪽의 view_message 주소 · 사진 링크(글자 없음)는 줄이 되지 않는다',
+    rows(RULES['한양대학교 장학안내'], `<a href="#none" onclick="_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_viewMessage(219501, true, false)"> <img src="/documents/11048027/0/x.jpg" alt="[교내] 사진"> </a> <a href="#none" class="" onclick="_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_viewMessage(219501, true, false)"> [교내] 2026-2학기 학부 재학생(신편입생 포함) 교내 가계곤란장학 2차 신청 안내(2026.08.13.(목) ~ 2026.09.30.(수)) </a>`, 'https://sc.hanyang.ac.kr/-12'),
+    [{ title: '[교내] 2026-2학기 학부 재학생(신편입생 포함) 교내 가계곤란장학 2차 신청 안내(2026.08.13.(목) ~ 2026.09.30.(수))', url: 'https://sc.hanyang.ac.kr/-12?p_p_id=kr_ac_hanyang_bbs_web_portlet_BbsPortlet&p_p_lifecycle=0&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_action=view_message&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_messageId=219501' }]);
   eq('  학교 없는 전국 출처는 주최 이름으로 규칙을 찾는다(둘째 게시판은 rule 열쇠 · 한양 10-14) · 전북(한 번호) 규칙은 그대로', [/BOARD_RULES\[s\.rule \|\| s\.school \|\| s\.host\]/.test(csrc), rows(RULES['전북대학교'], `<a href="javascript:;" onclick="pf_DetailMove('215647')">장학생 선발 공고 안내</a>`, 'x')[0].url], [true, 'https://www.jbnu.ac.kr/web/Board/215647/detailView.do?category=6']);
   const SCH = JSON.parse(readText(new URL('../collector/schools.json', import.meta.url)));
   const ACTSRC = JSON.parse(readText(new URL('../collector/activity-sources.json', import.meta.url)));
@@ -12275,6 +12278,11 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
     const restamp = FP.runFormPdf ? FP.runFormPdf({ root: fakeRepo, today: '2026-10-12', soffice: fakeSoffice, log: quiet }) : {};
     eq('  글꼴 표 도장이 없는(2026-10-12 중국어 글꼴 사본) 항목은 건너뛰지 않고 다시 바꾼다 · 바꾼 항목에 도장이 적힌다',
       [stamped, restamp.done && restamp.done.length, (JSON.parse(readText(ip)).items.r1 || []).map((f) => f.fonts)], [[FP.FONT_STAMP], 1, [FP.FONT_STAMP]]);
+    /* 도장 없는 옛 사본은 예산이 다 되거나 변환이 넘어져도 **지우지 않는다**(리뷰 2026-10-14 — 지우면 다음 실행까지 앱 줄이 사라진다) */
+    const idx2 = JSON.parse(readText(ip)); for (const f of (idx2.items.r1 || [])) delete f.fonts; fs.writeFileSync(ip, JSON.stringify(idx2, null, 1) + '\n');
+    const keep = FP.runFormPdf ? FP.runFormPdf({ root: fakeRepo, today: '2026-10-12', soffice: fakeSoffice, budgetSec: 0, log: quiet }) : {};
+    const kept = (JSON.parse(readText(ip)).items.r1 || []);
+    eq('  예산이 다 돼 못 바꾼 옛 사본은 색인·파일이 그대로 남는다(도장 없이)', [keep.left && keep.left.length, kept.length, kept.map((f) => f.fonts), kept.every((f) => fs.existsSync(path.join(fakeRepo, 'data', 'forms-pdf', f.file)))], [1, 1, [undefined], true]);
   }
   /* 리뷰 셋: 학교가 같은 이름으로 다시 올리면(원본 크기가 다르면) 다시 바꾼다 · 색인에 없는 고아 파일은 지운다 · 예산이 다 되면 남은 것을 적고 끝낸다 */
   fs.writeFileSync(path.join(fakeRepo, 'collector', 'extracted', 'forms-index.txt'), 'form-r1-1.docx\t우양재단 동행 장학생 모집\t지원서.docx\t101\n');

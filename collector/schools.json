@@ -61,7 +61,7 @@
   },
   {
    "school": "한양대학교",
-   "campus": "",
+   "campus": "서울",
    "boardUrl": "https://sc.hanyang.ac.kr/-12",
    "rule": "한양대학교 장학안내",
    "note": "개발자 결정 13(2026-10-14) — 「서울 장학안내 › 장학공지」(학생지원팀이 올리는 교내·국가·교외 장학 공지 · 전체공지 장학 필터와 겹치는 글은 주소 열쇠로 가린다). 행이 클릭형(onclick viewMessage)이라 collect.mjs BOARD_RULES '한양대학교 장학안내' 규칙으로 읽는다. ERICA 는 esc.hanyang.ac.kr 에 장학 공지 게시판이 없어(교내 홍보 게시판뿐) 전체공지 줄이 [ERICA] 표시 글을 맡는다."

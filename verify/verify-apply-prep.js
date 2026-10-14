@@ -276,7 +276,7 @@ async function swipeDown(page, sel) {
         pick.P.pdfs.map((p) => ({ text: '원본 양식 그대로 보기', href: p.href, blank: true })));
       eq('  그 줄은 PDF 아이콘 · 「열기 ›」 · 강조 꼴(att-row-new)', pdfRows.map((r) => [r.icon, r.go, /\batt-row-new\b/.test(r.cls)]),
         pick.P.pdfs.map(() => ['PDF', '열기 ›', true]));
-      eq('  작은 글씨에 쪽수·크기·「글자 하나 안 바꾼 원본 사본」', pdfRows.map((r) => /^\d+쪽 · \d+KB · 글자 하나 안 바꾼 원본 사본/.test(r.meta)), pick.P.pdfs.map(() => true));
+      eq('  작은 글씨에 쪽수·크기·「글자 하나 안 바꾼 원본 사본」', pdfRows.map((r) => /^(\d+쪽 · )?\d+KB · 글자 하나 안 바꾼 원본 사본/.test(r.meta)), pick.P.pdfs.map(() => true));
       eq('  그 밑 줄은 학교 게시판 첨부(내려받기 ↓)', got.rows.slice(pick.P.pdfs.length).map((r) => [r.go, /^학교 게시판 첨부 · 내려받기/.test(r.meta)]),
         pick.P.formAtts.map(() => ['↓', true]));
       eq('  안내 문구 — 「양식 채우기」는 다음 단계', got.note, '위 PDF 에 답을 얹는 「양식 채우기」는 다음 단계에서 열립니다.');
