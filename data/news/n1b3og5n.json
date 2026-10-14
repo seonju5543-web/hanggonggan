@@ -3,6 +3,17 @@
  "updatedAt": "2026-10-14",
  "items": [
   {
+   "title": "[상담센터]2026-2학기 인문대학 찾아가는 상담 「마음 IN:門」",
+   "url": "https://www.hanyang.ac.kr/notice_all?p_p_id=kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_action=view_message&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_entryId=120602",
+   "postedAt": "2026-10-14",
+   "school": "한양대학교",
+   "campus": "",
+   "src": "1328ecac",
+   "foundAt": "2026-10-14",
+   "thumb": "data/news/img/279e5f2282928b23.webp",
+   "desc": "학업, 진로, 학교생활, 대인관계, 정서, 성격 등에 고민이나 어려움이 있는 학생들은 전문상담사의 도움을 받아 보세요~ * 일 정 : 10/26(월) ~ 10/30(금) * 대 상: 인문대학 학부생 및 대학원생 *…"
+  },
+  {
    "title": "[상담센터]2026-2 한양인 마음 HOW “온라인 고민상담소” 고민사연 모집",
    "url": "https://www.hanyang.ac.kr/notice_all?p_p_id=kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_action=view_message&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_entryId=120501",
    "postedAt": "2026-10-13",
@@ -171,7 +182,8 @@
    "kind": "학사",
    "school": "한양대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "desc": "본 평가는 수강생 여러분의 의견을 청취하여 남은 학기 수업을 보완·개선하기 위한 목적으로 시행되며 익명이 보장 되오니 적극적인 참여 바랍니다."
   },
   {
    "title": "2026학년도 한양대학교 교수 노동조합 교섭요구 사실 공고",
@@ -180,7 +192,8 @@
    "kind": "채용",
    "school": "한양대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "desc": "캠퍼스 게시 전체 “한양대학교 교수 노동조합”으로부터 2026학년도 임금협정 체결을 위한 교섭요구 사실이 있어, 그 사실을 아래와 같이 공고하오니 우리 대학과 교섭하려는 노동조합은 공고기간 내에…"
   }
  ]
 }

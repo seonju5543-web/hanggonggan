@@ -3,6 +3,47 @@
  "updatedAt": "2026-10-14",
  "items": [
   {
+   "title": "[법학연구소] 사회적약자 법제도연구센터 제16차 콜로키움 개최(10/27(화))",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377499&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-14",
+   "school": "아주대학교",
+   "campus": "",
+   "src": "e5299528",
+   "foundAt": "2026-10-14",
+   "thumb": "data/news/img/2ad8281de19f5115.webp"
+  },
+  {
+   "title": "[일자리+센터] 2026 청년미래직진프로그램(미래산업 트렌드to진로직〮무탐색)",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377479&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-14",
+   "school": "아주대학교",
+   "campus": "",
+   "src": "e5299528",
+   "foundAt": "2026-10-14",
+   "desc": "※ 필독사항 - 본 과정은 미래 직업 역량을 강화하고 최신 직업 트렌드와 진로 탐색을 희망하는 학생들에게 추천"
+  },
+  {
+   "title": "[아주강좌] 제575회 강연 안내",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377463&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-14",
+   "kind": "행사",
+   "school": "아주대학교",
+   "campus": "",
+   "src": "e5299528",
+   "foundAt": "2026-10-14",
+   "thumb": "data/news/img/181e889657d790fe.webp"
+  },
+  {
+   "title": "[기획팀] 아주대학교 학칙 개정(안) 사전 공고",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377460&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-14",
+   "school": "아주대학교",
+   "campus": "",
+   "src": "e5299528",
+   "foundAt": "2026-10-14",
+   "desc": "아주대학교 학칙 제70조(학칙개정) 제2항에 의거하여 붙임과 같이 아주대학교 학칙 개정(안)을 사전 공고합니다."
+  },
+  {
    "title": "[일자리+센터] 26하반기 모의면접 실전반-인성/역량 면접",
    "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377449&article.offset=0&articleLimit=10",
    "postedAt": "2026-10-14",
@@ -347,41 +388,6 @@
    "school": "아주대학교",
    "campus": "",
    "foundAt": "2026-10-07"
-  },
-  {
-   "title": "[교육성과평가센터]2026년 대학 교수학습 및 혁신에 관한 조사 관련 연구조원 모집",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377102&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-07",
-   "kind": "채용",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-07"
-  },
-  {
-   "title": "[일자리+센터] 📢🚗자동차 산업 궁금하다면?🧑‍🎓[선배만남의 날_기아]",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377099&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-07",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "thumb": "data/news/img/d9680c5b901d2e1c.webp"
-  },
-  {
-   "title": "[일자리+센터] 🎁EVENT 🔎\"대학일자리플러스센터 취업탐정사무소\" 일일 취업탐정 모집",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377090&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-06",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-06",
-   "thumb": "data/news/img/b149783ecaae9528.webp"
-  },
-  {
-   "title": "[D-1] 제한 시간 내에 AI 부스에서 탈출하세요...",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377089&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-06",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-06"
   }
  ]
 }

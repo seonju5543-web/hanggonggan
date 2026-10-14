@@ -3,6 +3,29 @@
  "updatedAt": "2026-10-14",
  "items": [
   {
+   "title": "2026학년도 2학기 미래차 SDV/전동화/자율주행 마이크로디그리 신청 안내 - 10/19(월)~10/23(금)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140577&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-14",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-14",
+   "thumb": "data/news/img/7afde5722a8cf77c.webp",
+   "desc": "게임기술개발지원센터 2026학년도 2학기 (1차) 「미래차 SDV/전동화/자율주행 마이크로디그리」에 대하여 아래와 같이 안내하오니 관심있는 학생들의 많은 신청 바랍니다."
+  },
+  {
+   "title": "[인공지능혁신융합대학사업단] AICOSS 사업단 설명회 참석 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140563&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-14",
+   "kind": "행사",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-14",
+   "thumb": "data/news/img/70729779fd42e300.webp",
+   "desc": "- 일자: 2026년 11월 2일(월) - 장소: 호암관 50106호 <사전 신청 및 참석 혜택>"
+  },
+  {
    "title": "[자과캠] 예비군 동원Ⅱ형 이월 훈련 일정 변경 안내",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140559&article.offset=0&articleLimit=10",
    "postedAt": "2026-10-14",
@@ -96,7 +119,8 @@
    "school": "성균관대학교",
    "campus": "",
    "src": "45ec8fd1",
-   "foundAt": "2026-10-13"
+   "foundAt": "2026-10-13",
+   "desc": "삼성융합의과학원 1. 선발 분야: 임상역학 및 임상연구방법론 (Clinical Epidemiology and Clinical Research Methodology)"
   },
   {
    "title": "[네이버페이 1만원 증정, 온라인 실험 참여] AI 면접 환경에 따른 지원자의 인식과 경험에 관한 연구",
@@ -192,7 +216,7 @@
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-10-08",
-   "desc": "최종 수정일 : 2026.10.08 총괄지원팀 첨부파일 ( 2 ) 게시글 내용 문화예술미디어융합원 촉탁직원(연구원)을 아래와 같이 채용하고자 하오니 많은 지원 바랍니다.",
+   "desc": "총괄지원팀 문화예술미디어융합원 촉탁직원(연구원)을 아래와 같이 채용하고자 하오니 많은 지원 바랍니다.",
    "src": "45ec8fd1"
   },
   {
@@ -203,7 +227,7 @@
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-10-08",
-   "desc": "최종 수정일 : 2026.10.08 총괄지원팀 첨부파일 ( 2 ) 게시글 내용 우리대학 대학원혁신센터에서 BK대학원혁신지원사업을 담당할 촉탁직원을 아래와 같이 채용합니다.",
+   "desc": "총괄지원팀 우리대학 대학원혁신센터에서 BK대학원혁신지원사업을 담당할 촉탁직원을 아래와 같이 채용합니다.",
    "src": "45ec8fd1"
   },
   {
@@ -393,26 +417,6 @@
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-10-06",
-   "src": "45ec8fd1"
-  },
-  {
-   "title": "[(주)소노케어랩] 의료기기 하드웨어 개발 담당자 채용 공고",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140327&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-02",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "src": "45ec8fd1"
-  },
-  {
-   "title": "[(주)소노케어랩] 경영지원부 회계 및 국가 과제 관리 담당자 채용 공고",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140326&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-02",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
    "src": "45ec8fd1"
   }
  ]

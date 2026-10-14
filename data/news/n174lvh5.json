@@ -3,6 +3,17 @@
  "updatedAt": "2026-10-14",
  "items": [
   {
+   "title": "[지역협력센터] 연천 여행단(연천 로컬 관광 크리에이터) 모집 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276759&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-14",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-14",
+   "thumb": "data/news/img/f4d40816ca6e695c.webp",
+   "desc": "연천 1박 2일 여행 코스를 직접 기획하고, 다녀온 뒤 사진·숏폼 콘텐츠로 남기는 재학생 참여 프로그램입니다."
+  },
+  {
    "title": "[기숙사상담실 마음숲] 2026학년도 2학기 열린상담실 안내",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276754&article.offset=0&articleLimit=10",
    "postedAt": "2026-10-14",
@@ -181,7 +192,6 @@
    "campus": "",
    "foundAt": "2026-10-02",
    "thumb": "data/news/img/b9ae3bfa559b5256.webp",
-   "desc": "작성자 : 취업지원팀 📍 신청 기간 : 10월 13일(화) 09:00 ~ 10월 25일(일) 23:59 까지",
    "src": "5d85d287"
   },
   {
@@ -218,8 +228,7 @@
    "school": "가톨릭대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/a78c5cf200e2b7f2.webp",
-   "desc": "[대학일자리플러스센터] 진천상공회의소 2026년 미래내일 일경험 참여자 모집 안내 [교수학습개발원] 2026학년도 AI활용 세미나 4차 ‘에이전틱 AI시대, 대학 교수 업무 방식 패러다임 변화’ 신청 안내…"
+   "thumb": "data/news/img/a78c5cf200e2b7f2.webp"
   },
   {
    "title": "[취업지원팀] 전국 지역인재 7급 수습직원 선발시험 변경사항 안내",
@@ -227,8 +236,7 @@
    "postedAt": "2026-09-30",
    "school": "가톨릭대학교",
    "campus": "",
-   "foundAt": "2026-10-01",
-   "desc": "[학생지원팀] 2026학년도 2학기 하나금융나눔재단 하나장학생 선발 안내 [대학일자리플러스센터] 진천상공회의소 2026년 미래내일 일경험 참여자 모집 안내 대학/대학원 주요사이트 관련 기관 맨위로가기 트리니티…"
+   "foundAt": "2026-10-01"
   }
  ]
 }

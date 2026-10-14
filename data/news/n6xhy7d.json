@@ -3,6 +3,39 @@
  "updatedAt": "2026-10-14",
  "items": [
   {
+   "title": "[일반] [채용공고] 광운대학교 산학협력단 「RISE 사업단」직원 채용 공고",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53480&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-14",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-14",
+   "desc": "「광운대학교 산학협력단」 에서 유능하고 역량 있는 인재를 다음과 같이 공개 채용합니다. 광운대학교 산학협력단장"
+  },
+  {
+   "title": "[학사] 2026학년도 학부제 입학생 세부전공 선택 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53478&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-14",
+   "kind": "학사",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-14",
+   "desc": "신청 대상 및 세부전공 신청 대상 학부 모집단위로 입학한 전공 미확정 1학년 재학생(해당 학부: 7개 학부) 인공지능융합대학 컴퓨터정보공학부 지능컴퓨팅시스템전공 지능정보전공 소프트웨어학부 소프트웨어전공 인공지능전공…"
+  },
+  {
+   "title": "[학사] 재학생 모집단위 내 세부전공 변경 시행 공고",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53481&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-14",
+   "kind": "학사",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-14",
+   "desc": "신청 대상 학부 모집단위로 입학한 현재 2학년 및 3학년 재학생 신청 방법 온라인 신청서 작성 후 제출 신청 링크 또는 QR코드로 접속 신청서 작성 내용 세부전공 변경 신청정보 변경 사유 변경 후 진로계획 및 향후…"
+  },
+  {
    "title": "[국제학생] [외국인 유학생 대상 무료 실무·커리어 프로그램] HanPass PASSMAKERS 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53473&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "postedAt": "2026-10-14",
@@ -176,7 +209,7 @@
    "campus": "",
    "foundAt": "2026-10-08",
    "thumb": "data/news/img/4ecff66abf641214.webp",
-   "desc": "작성일 2026.10.08 | 수정일 2026.10.08 | 학생복지팀 「 동행안심벨 」 지원 사업개요",
+   "desc": "「 동행안심벨 」 지원 사업개요 □ 사업개요 ㅇ ( 지원대상 ) 서울시 거주자 및 서울 소재 직장 ․ 학교에 소속된 사람",
    "src": "b09cb042"
   },
   {
@@ -385,33 +418,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/144f0e2dbd2e1eca.webp"
-  },
-  {
-   "title": "[일반] [서울특별시] 2026년 서울시 빅데이터 캠퍼스 전문교육 과정 안내(10월)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53389&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-23",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[국제학생] 2027학년도 전기 대학원 외국인 학생 모집 안내 / 2027 Spring Graduate Admission Guide for International Students",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53381&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-01",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "src": "b09cb042"
-  },
-  {
-   "title": "[일반] [HUSS-글로벌공생] 글로벌지속가능융합학과 2026 전공설명회 신청 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53414&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-01",
-   "kind": "행사",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/16d454ce2db821c5.webp"
   }
  ]
 }
