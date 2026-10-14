@@ -1,6 +1,36 @@
 {
- "updatedAt": "2026-10-13",
+ "updatedAt": "2026-10-14",
  "items": [
+  {
+   "title": "2026년 하반기 대학생 생활비 장학금 지원 계획 공고",
+   "url": "https://gwangyang.go.kr/fund/board.es?mid=a60401000000&bid=0156&list_no=205387&act=view",
+   "attachments": [
+    {
+     "name": "2026년 하반기 대학생 생활비 장학금 지원 계획공고(최종).pdf",
+     "url": "https://gwangyang.go.kr/boardDownload.es?bid=0156&list_no=205387&seq=1"
+    },
+    {
+     "name": "미리보기",
+     "url": "https://gwangyang.go.kr/attachPreview.es?bid=0156&list_no=205387&seq=1"
+    }
+   ],
+   "deadlineHint": "접수기간 : 2026. 9. 1. ~ 10. 31. (약 2개월 간, 2학기분 ) 2. 지원대상: 34세 이하 정규 학제 (전문)대학교 최종 학",
+   "deadline": "2026-10-31",
+   "school": "",
+   "campus": "",
+   "host": "백운장학회(광양)",
+   "foundAt": "2026-10-14"
+  },
+  {
+   "title": "(백운장학금, 대학생 생활비 장학금 2학기 신청) 2026학년도 2학기 학자금 지원구간 통지서 사전 발급 안내",
+   "url": "https://gwangyang.go.kr/fund/board.es?mid=a60401000000&bid=0156&list_no=200251&act=view",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "",
+   "campus": "",
+   "host": "백운장학회(광양)",
+   "foundAt": "2026-10-14"
+  },
   {
    "title": "2026년 2학기 주거안정장학금 서약서, 지급요청서, 포기 및 반환 관련 안내",
    "url": "https://www.kosaf.go.kr/ko/notice.do?mode=view&searchStr=&searchType=&page=1&ctgrId1=&ctgrId2=&seqNo=21380",
@@ -112,17 +142,6 @@
    "campus": "",
    "host": "(재)음성군장학회",
    "foundAt": "2026-10-02"
-  },
-  {
-   "title": "2026년 하반기 예산군 학자금대출 이자지원 신청 안내",
-   "url": "https://www.kosaf.go.kr/ko/notice.do?mode=view&searchStr=&searchType=&page=1&ctgrId1=&ctgrId2=&seqNo=21359",
-   "attachments": [],
-   "deadlineHint": "신청기간: 2026.9.30.(수) &sim; 2026.10.12.(월) ㅇ 신청방법: 등기우편 접수, 방문접수 ㅇ 신청주소: 충청남도 예산군",
-   "deadline": "2026-10-12",
-   "school": "",
-   "campus": "",
-   "host": "한국장학재단 공지",
-   "foundAt": "2026-10-01"
   },
   {
    "title": "2026년 효·선행 장학금 안내",
