@@ -37,3 +37,27 @@ export function pickEligTargets(items, index, today, o) {
   cands.sort((a, b) => (a.at || '').localeCompare(b.at || ''));    // 안 해 본 것('') → 오래된 것
   return cands.slice(0, o.max).map(({ it, atts }) => ({ it, atts }));
 }
+
+/* 첨부 **밀린 것** 받기 (2026-10-13 · 개발자 "실제 양식을 늘리는 길")
+   🔴 왜 — 실측(마감 전 등록 109건): 자격·금액·마감을 다 읽은 공고는 위 고르기의 대상이 아니라 그 첨부를 아무도 안 받았다.
+      첨부 목록은 있는데 파일이 없는 마감 전 공고 13건 — 그 안의 신청서 서식·공고문을 앱이 모른다.
+   그래서 자격용 대상이 상한에 못 미치면 남는 자리를 **학생에게 보이는데 아직 한 번도 받지 않은 공고**로 채운다.
+   받아 둔 글자는 같은 색인(elig-docs.json)에 들어가 발췌·서식 쪽 찾기가 함께 쓴다.
+   ⚠️ 한 번 받은 공고는 다시 받지 않는다(색인에 files 가 있으면 끝) — 자격용 줄과 달리 '다시 읽을 것'이 없다.
+   ⚠️ `exclude` 에 든 공고(이번에 자격용으로 이미 고른 것)는 뺀다. */
+export function pickAttachBacklog(items, index, today, o) {
+  const taken = new Set((o.exclude || []).map((t) => (t.it || t).id));
+  const cands = [];
+  for (const it of items) {
+    if (it.program || !o.live(it) || taken.has(it.id)) continue;
+    const row = index[it.id];
+    if (row && Array.isArray(row.files) && row.files.length) continue;      // 이미 받았다
+    const at = (row || {}).at || '';
+    if (at && daysBetween(at, today) < ELIG_REST_DAYS) continue;            // 최근에 해 봤는데 못 받았다 — 쉰다
+    const atts = o.docAtts(it);
+    if (!atts.length) continue;
+    cands.push({ it, atts, at });
+  }
+  cands.sort((a, b) => (a.at || '').localeCompare(b.at || ''));
+  return cands.slice(0, Math.max(0, o.max | 0)).map(({ it, atts }) => ({ it, atts }));
+}

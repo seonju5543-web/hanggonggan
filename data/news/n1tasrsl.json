@@ -1,6 +1,6 @@
 {
  "school": "국민대학교",
- "updatedAt": "2026-10-13",
+ "updatedAt": "2026-10-14",
  "items": [
   {
    "title": "[AI tutor] K*lass-UP 프로그램 신청 안내",
@@ -148,15 +148,6 @@
    "school": "국민대학교",
    "campus": "",
    "foundAt": "2026-10-01"
-  },
-  {
-   "title": "[TEAM교육인증센터] 2026학년도 제1회 온라인 코딩역량인증시험(PCCE, PCCP, PCSQL) 안내",
-   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12232/view.do?currentPageNo=1",
-   "postedAt": "2026-08-14",
-   "school": "국민대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/2ad8f8e03fa8c3af.webp"
   },
   {
    "title": "2026학년도 재(휴)학생(학부/대학원) 학생증 발급 안내",

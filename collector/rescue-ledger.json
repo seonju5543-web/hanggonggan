@@ -336,19 +336,19 @@
   "name": "[교내] 2026-2학기 계명행복우수A, 총장특별(성적우수), 총장특별(학업우수) 장학생 신청 안내"
  },
  "https://www.sogang.ac.kr/ko/detail/551530?bbsconfigfk=141&namepage=ScholarshipNotice": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-10-14",
   "minBody": 100,
   "name": "[교외] 대산농촌재단 농업리더 장학생 선발 안내(11/11 마감, 등록금 전액)"
  },
  "https://kangwon.ac.kr/ko/bbs/750/detail.do?pageitm=10&pstsn=2513&searchgbn=0&searchordersort=0": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-10-14",
   "minBody": 100,
   "name": "(한국장학재단) 해양수산부 청년창업어업인장학생 추가 모집 선발 안내"
  },
  "https://kangwon.ac.kr/ko/bbs/750/detail.do?pageitm=10&pstsn=2510&searchgbn=0&searchordersort=0": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-10-14",
   "minBody": 100,
   "name": "2026학년도 2학기 중소기업 취업연계 장학금 선발계획 알림 및 심사서류 제출 요청"
@@ -366,7 +366,7 @@
   "name": "2026학년도 1학기 주거안정장학금 지급요청서(8월분) 신청 안내"
  },
  "https://www.catholic.ac.kr/ko/campuslife/notice.do?articleno=276686&srcategoryid=22": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-10-14",
   "minBody": 100,
   "name": "[학생지원팀] (한국장학재단) 2026-2학기 국가근로장학금 추가신청기간 안내(10/21~10/29)"
@@ -378,13 +378,13 @@
   "name": "서울과학기술대학교 중소기업 취업연계 장학사업 (희망사다리Ⅰ유형) 신규장학생 자체선발 기준 안내"
  },
  "https://www.jbnu.ac.kr/web/Board/217349/detailView.do?category=6": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-10-14",
   "minBody": 100,
   "name": "[JW이종호재단] 2026년 기초과학자 장학생 선발 안내"
  },
  "https://www.jbnu.ac.kr/web/Board/217522/detailView.do?category=6": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-10-14",
   "minBody": 100,
   "name": "2026년도 2학기 전북대학교동창회 장학재단 장학생 선발 안내"

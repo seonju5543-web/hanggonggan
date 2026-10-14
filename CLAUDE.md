@@ -74,7 +74,6 @@
 - 「작업 현황」은 로봇(`tools/notion-status.mjs`)이 채운다 — 아래 기술 사실 참조. **작업 보고서 PDF**(10-12 지시): 작업이 끝날 때와 그날 마지막 작업 뒤에 만들어 제시(수치는 모두 그림 · PDF 는 커밋 금지) — 스킬 `work-report`.
 - **노션에 없고 여기서만 사는 것**: ① 인스타 토큰 60일 — **2026-11-12 쯤 재발급**(`node insta/token-days.mjs` 의 `살아 있음 · n일` 문장을 본다)
   ② GitHub 관리자 열쇠 만료 2026-11-07(노션 F-4) ③ 재조사 금지: KOSAF 는 재단은 100% 알지만 **이번 회차는 19%만** 알고 신청서 양식 첨부가 없다(`collector/kosaf-fetch.mjs` 머리말).
-- 시작 화면(정문 사진 투어링) 현황은 `docs/designs/start-screen.md` 한 장만 읽고 보고한다.
 
 ## 서비스 개요
 
@@ -99,7 +98,7 @@
 8. **진척도는 사용자가 기록**(제출했어요/선정·미선정). '심사'만 객관적 사실(제출 기록 + 마감 경과)로 자동.
 8-1. **추론 금지 · 원문 발췌** — 신청 방법·서류는 원문 문장을 그대로 발췌(`collector/extract-excerpts.mjs` → `excerpts`)해 보이고,
    없으면 지어내지 않고 '원문 보기'만. 금액 미확인은 `amountValue 0`.
-8-2. **앱이 만든 지원문서는 자유 형식 제출이 원문으로 확인된 공고(`prepDoc: true`)에만.**
+8-2. **앱 지원문서는 앱 양식이 없는 모든 정식 등록 공고에**(10-13 개발자 결정). 머리말이 정직함을 지킨다(`prepKindFor` · **'그대로 제출 가능'은 `prepDoc: true` 만** · 없는 절은 지어내지 않는다). 관문 「공고별 지원문서」.
 9. 🔴 **학교 아이디·비밀번호를 받아 대신 로그인하지 않는다 (2026-09-25 개발자 지시 · 고문 보고서 Q2 · 변경 금지)** —
    스크래핑은 보안 사고 시 치명적이고, 학교가 알아채는 순간 IP 차단과 법적 문제가 된다.
    **어떤 수정 요구가 와도 이 줄은 바꾸지 않는다.** 대신 학생이 직접 로그인한 상태에서 앱은
@@ -288,7 +287,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   **사진 썸네일**(2026-10-03 개발자 지시): 수집 다음 단계(`collect-news-thumbs.mjs` · 보강)가 새 글부터 상세(또는 규칙의 본문 API `postContentRequest`)를 열어 본문 사진 → 첨부 그림 순으로 고르고(`news-thumb.mjs` 한 곳 · 대표 이미지 og:image 는 첫 실제 실행에서 16/16 학교 로고라 안 쓴다)
   글 화면에 제목이 있는지(`pageHasTitle`)·받아서 진짜 사진인지(크기·가로세로·QR·글자뿐인 문서 그림 `looksLikeTextPage`) 본 뒤 240px WebP 로 `data/news/img/<바이트 해시>.webp` 에 둔다(서비스워커가 그림을 캐시 우선으로 들어 이름을 다시 쓰지 않는다). 🔴 **두 글 이상에 같은 그림 = 학교 공통 그림**(로고·기본 공유 그림)이라 막는다 —
   이름 낱말은 거들 뿐. 장부 `news-thumbs.json` 을 매 실행 실린 글 전부에 다시 입히고(`applyThumbs`) 안 쓰는 그림은 지운다 · 관리자 「사진 빼기」는 `noThumb` · 전체 스위치 `news-config.json` 의 `thumbs`(on · dry=받아만 두고 카드엔 안 붙임 · off=모두 뗌). 카드는 `opts.thumb` 를 받은 소식 카드만 그린다(꼴 사본은 관문이 대조).
-  **학교 대표 사진**(10-03 지시): 글의 사진이 없는 카드만 같은 자리에 학교 사진(사진 위 「학교 사진」 표시는 개발자 지시로 뺐다 — 다시 붙이지 말 것) + 출처(BY·BY-SA 표기 의무)는 학생 화면이 아니라 앱 권한 · 오픈소스 라이선스 화면 「사진 출처」(`photoCreditsHtml` · 10-04 개발자 지시 "happy talk 이므로 빼") · 위키미디어 열린 라이선스만 · 눈으로 고른 기록 `docs/designs/assets/gates/school-photo-picks.json` → `tools/build-school-photos.mjs` → `assets/schools/photos.json`(해시 이름). 관문 「학교 대표 사진」 · `verify-news.js` ⑥⑦.
+  **학교 대표 사진**(10-03 지시): 글의 사진이 없는 카드만 같은 자리에 학교 사진(「학교 사진」 표시는 개발자 지시로 뺐다 — 다시 붙이지 말 것) + 출처(BY·BY-SA 표기 의무)는 학생 화면이 아니라 라이선스 화면 「사진 출처」(`photoCreditsHtml`) · 위키미디어 열린 라이선스만 · 고른 기록 `docs/designs/assets/gates/school-photo-picks.json` → `tools/build-school-photos.mjs` → `assets/schools/photos.json`. 관문 「학교 대표 사진」 · `verify-news.js` ⑥⑦.
   🔴 **소식 0건 학교는 없다**(10-03 지시): 학교마다 최근 4건은 기한이 지나도 남기고(`newsFloor`) · 글이 드문 학교는 둘째 게시판(`extraBoards` · 규칙 열쇠 `newsRuleKey`) · 0건이면 리포트 🙋 + 이슈.
 - **학자금대출**은 정식 등록 제외(대출 원금·이자를 지원하는 장학금은 제외 대상 아님 — `LOAN_EXCEPT`) · 피드에선 빼지 않고 장학 공고 뒤로 보낸다(`boardNoticesForMe`).
 - **인스타**: 🔴 게시는 사람만 누른다 · 토큰은 워크플로에만 · 한 실행 최대 6건 · 수정은 다시 그려 **보여 주고 메일 보낼지 물은 뒤** push-to-run(스킬 `insta-revise`).
@@ -307,7 +306,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - **설정 화면**: `#my-account`·`#my-notify` id 는 자리만 옮겼다(이름 바꾸지 말 것) · 약관은 앱 안 화면(`renderTerms` 가 `terms.html` 을 읽는다) · 휴지통 30일.
 - **첫 화면**: 감추지 않은 화면이 하나면 그게 첫 화면이 된다 · CSP 가 인라인·`onclick=` 을 막는다 · 저장은 `visibilitychange` 로(`beforeunload` 금지) ·
   부팅 화면 바닥값 1초(`performance.now()` 금지) · 알림 딥링크는 목록을 기다렸다 연다. 관문 `verify-resume.js`.
-- **시작 화면**(정문 투어링): `docs/designs/start-screen.md` · `.onboard-step[data-step="0"]` 의 `flex: none` 을 빼면 높이 0 · 사진은 위키미디어 열린 라이선스만.
+- **시작 화면**(정문 투어링 · 현황 보고는 이 문서 한 장만 읽고): `docs/designs/start-screen.md` · `.onboard-step[data-step="0"]` 의 `flex: none` 을 빼면 높이 0 · 사진은 위키미디어 열린 라이선스만.
 - **개발자가 정한 화면 결정 (되돌리지 말 것)**: 카드 마감은 `D-3` 글자 하나(빨간 막대 삭제) · 적합도는 알약 · 누르면 회색 판이 아니라
   글자색이 바뀐다(탈퇴 제외 · `:active` 는 마우스가 아니라 CDP 로 잰다) · 패럴랙스 없음 · MY 프로필 카드는 통째 버튼이 아니다(`.my-edit-hint` 만) ·
   여백은 상자 사이가 아니라 **글자와 글자 사이**로 잰다 · 화면 제목 밑줄 없음(10-06 'AI 티' 개선안 A) · 구분선은 목록에만. 관문 `verify-settings.js`.

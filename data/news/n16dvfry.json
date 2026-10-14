@@ -1,7 +1,17 @@
 {
  "school": "아주대학교",
- "updatedAt": "2026-10-13",
+ "updatedAt": "2026-10-14",
  "items": [
+  {
+   "title": "[일자리+센터] 26하반기 모의면접 실전반-인성/역량 면접",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377449&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-14",
+   "school": "아주대학교",
+   "campus": "",
+   "src": "e5299528",
+   "foundAt": "2026-10-14",
+   "thumb": "data/news/img/6a14986d486ccbc0.webp"
+  },
   {
    "title": "[총동문회] 선배가 쏜다! 중간고사 간식 이벤트 (10/15)",
    "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377443&article.offset=0&articleLimit=10",
@@ -11,7 +21,8 @@
    "campus": "",
    "src": "e5299528",
    "foundAt": "2026-10-13",
-   "thumb": "data/news/img/f8bb4f0e2353c906.webp"
+   "thumb": "data/news/img/f8bb4f0e2353c906.webp",
+   "desc": "총동문회 중간고사 준비로 바쁜 재학생 여러분을 응원하기 위해 아주대학교 총동문회 가 간식행사를 준비했습니다. 선배님들의 사랑을 가득 담은 닭강정 먹고 힘내서 시험 잘 마무리하세요!"
   },
   {
    "title": "[일자리+센터] 고용노동부 대학일자리플러스센터 만족도 조사",
@@ -98,7 +109,8 @@
    "school": "아주대학교",
    "campus": "",
    "src": "e5299528",
-   "foundAt": "2026-10-12"
+   "foundAt": "2026-10-12",
+   "thumb": "data/news/img/06c12ce45006a016.webp"
   },
   {
    "title": "[교육대학원] 개원 30주년 기념행사 보조 아르바이트생 모집 (~ 10/14)",
@@ -136,7 +148,8 @@
    "school": "아주대학교",
    "campus": "",
    "src": "e5299528",
-   "foundAt": "2026-10-12"
+   "foundAt": "2026-10-12",
+   "thumb": "data/news/img/298167227c592218.webp"
   },
   {
    "title": "[재공지] ★ 재학생 건강검진 접수&비타민데이 ~10/16",
@@ -369,15 +382,6 @@
    "school": "아주대학교",
    "campus": "",
    "foundAt": "2026-10-06"
-  },
-  {
-   "title": "10/7(수) 아로새길 아주, 함께가게 맞히고 선물 받아가세요💝",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377081&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-06",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-06",
-   "thumb": "data/news/img/953682cdb985246b.webp"
   }
  ]
 }

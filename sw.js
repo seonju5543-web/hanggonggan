@@ -172,7 +172,8 @@ self.addEventListener('fetch', (e) => {
           몇 개만 눌러도 폰 캐시가 앱 전체보다 커진다(오프라인에 쓸 것도 아니다).
      브라우저에 맡기면 둘 다 없다 — 내려받기는 브라우저가 원래 잘하는 일이다. */
   if (/\/data\/kosaf-files\//.test(url.pathname)) return;
-  if (/\/data\/forms-pdf\//.test(url.pathname)) return;   // 신청서 원본 PDF 사본(2026-10-14 시안 A) — 같은 이유
+  /* 신청서 원본 PDF 사본(data/forms-pdf/ · 2026-10-13)도 같은 이유로 — 새 탭으로 여는 PDF 는 navigate 라 index.html 이 대신 나간다 */
+  if (/\/data\/forms-pdf\//.test(url.pathname)) return;
 
   /* 화면 자체 */
   if (e.request.mode === 'navigate') {

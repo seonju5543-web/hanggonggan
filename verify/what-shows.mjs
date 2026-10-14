@@ -215,7 +215,9 @@ function pressRoute(sch) {
   if (got.includes('finalize')) return "🚨 확인 화면 없이 곧장 '신청 준비 완료'로 담긴다";
   if (got[0] === 'form') {
     const id = run('formTplIdFor')(s);
-    return `양식 작성 화면 (${id}${run('FORM_TEMPLATES')[id].unofficial ? ' · 자유 형식 지원문서' : ''})`;
+    /* 앱 지원문서(unofficial)는 공고마다 성격이 다르다(forms.js prepKindFor) — 문서의 lead 를 그대로 옮긴다(2026-10-13 · '자유 형식'이라 뭉뚱그리지 않는다) */
+    const tplNow = run('FORM_TEMPLATES')[id];
+    return `양식 작성 화면 (${id}${tplNow.unofficial ? ` · 앱 지원문서 — ${tplNow.lead || '자유 형식 지원문서'}` : ''})`;
   }
   if (got[0] === 'doc') return `서류 도우미 (${run('essayDefsFor')(s).map((d) => d.doc).join(' · ')})`;
   if (got[0] === 'prep') {

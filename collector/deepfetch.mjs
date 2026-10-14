@@ -359,7 +359,7 @@ async function downloadEligDocs() {
   const IMG_EXT = /\.(png|jpe?g|gif|webp)$/i;
 
   /* 고르기는 elig-targets.mjs 한 곳 (2026-10-05 · UI-12) — 줄이 돈다(시도한 날 `at`) · 금액·마감만 빈 공고도 · 안 보이는 공고는 안 받는다 */
-  const { pickEligTargets } = await import('./elig-targets.mjs');
+  const { pickEligTargets, pickAttachBacklog } = await import('./elig-targets.mjs');
   /* '학생 화면에 아직 있나'는 자격요건 로봇과 같은 판정 한 곳(rescue-plan.mjs closedForStudents — 마감(한국 날짜) 전 · notStale) — 2026-10-05 병합 때
      여기 따로 적혀 있던 같은 식을 이것으로 바꿨다(둘이 갈라지면 한 로봇은 받고 다른 로봇은 안 여는 공고가 생긴다) */
   const { closedForStudents } = await import('./rescue-plan.mjs');
@@ -367,14 +367,21 @@ async function downloadEligDocs() {
   const idxPath = new URL('elig-docs.json', OUT);
   let index = {};
   try { index = JSON.parse(fs.readFileSync(idxPath, 'utf8')); } catch { /* 첫 실행 */ }
-  const targets = pickEligTargets(reg.items, index, today, {
-    requirementLines,
-    live: (it) => !closedForStudents(it, today),
-    docAtts: (it) => (it.attachments || []).filter((a) => a.url && (
-      (OK_EXT.test(a.name || '') && isNoticeDoc(a.name)) || (a.bodyImage && IMG_EXT.test(a.name || '')))).slice(0, 2),
-    max: MAX_NOTICES,
+  const live = (it) => !closedForStudents(it, today);
+  const docAtts = (it) => (it.attachments || []).filter((a) => a.url && (
+    (OK_EXT.test(a.name || '') && isNoticeDoc(a.name)) || (a.bodyImage && IMG_EXT.test(a.name || '')))).slice(0, 2);
+  const eligTargets = pickEligTargets(reg.items, index, today, { requirementLines, live, docAtts, max: MAX_NOTICES });
+  /* 남는 자리는 '아직 한 번도 안 받은 마감 전 공고'로 (2026-10-13 · elig-targets.mjs pickAttachBacklog) —
+     공고문 뒷장에 신청서 서식이 든 첨부를 자격을 다 읽은 공고라서 안 받던 구멍.
+     🔴 받는 것은 **공고문류만**(isNoticeDoc · 같은 색인을 발췌기·금액·AI 자격 읽기가 읽는다 — 빈 신청서 파일을 넣으면 체크 칸이 자격 줄이 된다, 리뷰).
+        낱개 신청서 파일은 양식 PDF 로봇(form-pdf.mjs)의 몫이다. */
+  const backlog = pickAttachBacklog(reg.items, index, today, {
+    live, exclude: eligTargets,
+    docAtts: (it) => (it.attachments || []).filter((a) => a.url && !a.bodyImage && OK_EXT.test(a.name || '') && isNoticeDoc(a.name)).slice(0, 3),
+    max: MAX_NOTICES - eligTargets.length,
   });
-  console.log(`자격용 공고문 첨부 대상 ${targets.length}건 (예산 ${Math.round(BUDGET_MS / 1000)}초)`);
+  const targets = [...eligTargets, ...backlog];
+  console.log(`자격용 공고문 첨부 대상 ${eligTargets.length}건 + 밀린 첨부 ${backlog.length}건 (예산 ${Math.round(BUDGET_MS / 1000)}초)`);
   if (!targets.length) return 0;
 
   let got = 0;

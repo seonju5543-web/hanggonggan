@@ -1,7 +1,28 @@
 {
  "school": "서울시립대학교",
- "updatedAt": "2026-10-13",
+ "updatedAt": "2026-10-14",
  "items": [
+  {
+   "title": "[제68호] 학생처 대학일자리플러스센터 뉴스레터",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31645&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-10-14",
+   "postId": "31645",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-10-14"
+  },
+  {
+   "title": "[공모전 결과] 대학일자리플러스센터 등 사업 우수사례 공모전 교내 추천작 결과발표",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31648&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-10-14",
+   "postId": "31648",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-10-14",
+   "desc": "인재개발실 서울시립대학교 대학일자리플러스센터입니다. 고용노동부 주관 [2026년 대학일자리플러스센터 등 사업 우수사례 공모전]에 관심을 가지고 참여해 주신 학생 여러분께 진심으로 감사드립니다."
+  },
   {
    "title": "💡 2026년도 제18회 UOS 연구 콜로키움 개최 안내(2026.10.15.(목) 11:00, 창의혁신관 SI 아레나)💡",
    "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31643&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
@@ -147,7 +168,8 @@
    "school": "서울시립대학교",
    "campus": "",
    "src": "80d7d3bc",
-   "foundAt": "2026-10-12"
+   "foundAt": "2026-10-12",
+   "desc": "붙임 1. 공고문 1부. 2. 규정 전문 1부. 3. 신구조문대비표 1부. 끝."
   },
   {
    "title": "2026 이루매런 5km 마라톤대회 신청 안내",
@@ -413,27 +435,6 @@
    "postId": "31511",
    "thumb": "data/news/img/f5b574c4b93d7127.webp",
    "src": "80d7d3bc"
-  },
-  {
-   "title": "[전공설계융합지원센터] 전공융합 릴레이 다전공 졸업생 현직자 간담회 신청 안내(~10.15.(목) 13:00)-사전신청자 다과 및 도시락제공!",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31548&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-01",
-   "kind": "행사",
-   "school": "서울시립대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "postId": "31548",
-   "thumb": "data/news/img/5b86abc82b764cc5.webp",
-   "src": "80d7d3bc"
-  },
-  {
-   "title": "[정경대학] 2026년 제11회 정경대학 토론배틀 참가 모집 안내 * 모집 기간 연장 (~10/3 17시)",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31438&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-01",
-   "school": "서울시립대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "thumb": "data/news/img/3064a3252cb3fa25.webp"
   }
  ]
 }

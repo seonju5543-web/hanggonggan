@@ -1,7 +1,20 @@
 {
  "school": "서강대학교",
- "updatedAt": "2026-10-13",
+ "updatedAt": "2026-10-14",
  "items": [
+  {
+   "title": "[도서관] 2026학년도 제6회 『국외도서 웹전시회』 (10/14~10/28)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551590?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
+   "postId": "551590",
+   "postedAt": "2026-10-14",
+   "kind": "행사",
+   "school": "서강대학교",
+   "campus": "",
+   "board": "행사특강",
+   "src": "c13ee4bc",
+   "foundAt": "2026-10-14",
+   "thumb": "data/news/img/19ebf55ed6587126.webp"
+  },
   {
    "title": "[CGSI] 10월 16일 콜로키움 안내",
    "url": "https://www.sogang.ac.kr/ko/detail/551541?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",

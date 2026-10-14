@@ -1,7 +1,17 @@
 {
  "school": "부산대학교",
- "updatedAt": "2026-10-13",
+ "updatedAt": "2026-10-14",
  "items": [
+  {
+   "title": "[에듀테크센터] (10/23(금)) Global Career Meetup 안내 ...",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511537",
+   "postedAt": "2026-10-14",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-14",
+   "thumb": "data/news/img/46e8a6a4fe616555.webp"
+  },
   {
    "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(전북대학교)",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511534",
@@ -160,7 +170,7 @@
    "campus": "",
    "foundAt": "2026-10-07",
    "thumb": "data/news/img/134b4fb6cfd1a6d0.webp",
-   "desc": "[수소선박기술센터] 작성일자 2026-10-07 게시종료일 2026-10-21 18:09 부산대학교 수소선박기술센터에서는 산업통상자원부, 한국산업기술진흥원이 지원하고 한국조선해양플랜트협회가 주관하는…",
+   "desc": "부산대학교 수소선박기술센터에서는 산업통상자원부, 한국산업기술진흥원이 지원하고 한국조선해양플랜트협회가 주관하는 『조선해양미래혁신인재양성센터사업 』을 수행하고 있습니다.",
    "src": "2d0d4013"
   },
   {
@@ -381,16 +391,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/1d36906e417a8ac8.webp"
-  },
-  {
-   "title": "[학생과] 2026학년도 동계 해외도전과 체험 파견팀 모집",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511351",
-   "postedAt": "2026-10-01",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "src": "2d0d4013"
   }
  ]
 }

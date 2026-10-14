@@ -449,8 +449,10 @@ const SUBMIT_GUIDES = {
    갈라 두면 채널은 '원본 양식 다운로드형'이라 말하는데 시트는 양식이 없다고 그리게 된다. */
 function isFormAttachment(a) {
   const name = (a && a.name) || '';
-  /* `원서` 는 2026-09-23 에 더했다 — `F_장학생 선발원서.docx`(삼원)가 신청서인데 안 걸렸다(실측 영향 1건) */
-  return /신청서|지원서|원서|양식|서식|서류/.test(name) && /\.(hwp|hwpx|docx?|zip)/i.test(name);
+  /* `원서` 는 2026-09-23 에 더했다 — `F_장학생 선발원서.docx`(삼원)가 신청서인데 안 걸렸다(실측 영향 1건)
+     `pdf` 와 계획서·동의서·서약서는 2026-10-13 — PDF 로 올라온 신청서 4개와 활동계획서·개인정보 동의서가 '학생이 내는 서식'인데
+     이름 규칙이 빼서 화면이 '양식 없음'으로 불렀다(실측 · 양식 PDF 로봇 form-pdf.mjs 는 이미 PDF 를 받고 있었다 — 화면 규칙만 뒤처졍다). */
+  return /신청서|지원서|원서|양식|서식|서류|계획서|동의서|서약서/.test(name) && /\.(hwp|hwpx|docx?|zip|pdf)/i.test(name);
 }
 function hasFormAttachment(sch) {
   return (sch.attachments || []).some(isFormAttachment);
@@ -459,7 +461,8 @@ function hasFormAttachment(sch) {
    주세요'라고 단정해도 되는 것만 (2026-09-23 리뷰). isFormAttachment 는 채널을 가르는 데는 넓어도
    되지만, '작성하라'고 말하기엔 넓다 — `결과보고서 양식.hwp` 도 거기 걸린다(점프장학 실측). */
 function isApplicationForm(a) {
-  return isFormAttachment(a) && /신청서|지원서|원서/.test((a && a.name) || '');
+  /* 계획서·동의서·서약서도 학생이 채워 내는 서식이다(2026-10-13) — 추천서는 남(교수)이 쓰므로 뺀다 · '결과보고서 양식'은 여전히 아니다 */
+  return isFormAttachment(a) && /신청서|지원서|원서|계획서|동의서|서약서/.test((a && a.name) || '') && !/추천서|보고서/.test((a && a.name) || '');
 }
 
 /* 접수 채널 분류 — 실제 공고의 접수 방식 (정직 표기: 앱이 대신 못 누르는 채널은 명시).

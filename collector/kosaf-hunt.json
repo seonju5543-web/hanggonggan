@@ -6,17 +6,6 @@
   {
    "target": {
     "ds": "kosaf",
-    "key": "2000319002"
-   },
-   "board": "https://www.yeongju.go.kr/check/bbs/board.php?bo_table=yjra0101",
-   "source": "board",
-   "by": "로봇(층2 글 사냥꾼)",
-   "addedAt": "2026-10-13",
-   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 100) — 확인 로봇이 목록을 다시 읽어 고른다"
-  },
-  {
-   "target": {
-    "ds": "kosaf",
     "key": "0626001"
    },
    "url": "https://www.scij.kr/kr/sub_comm_01.do?mode=view&boardIdx=928",
@@ -50,6 +39,21 @@
     "2700563005",
     "2700563006",
     "2700563007"
+   ]
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000279003"
+   },
+   "board": "https://www.hampyeong.go.kr/pg/GosiList.do?pageId=www273",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-14",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다",
+   "also": [
+    "2000279001",
+    "2000279004"
    ]
   },
   {
@@ -137,6 +141,83 @@
    "by": "로봇(층2 글 사냥꾼)",
    "addedAt": "2026-10-13",
    "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "0641001"
+   },
+   "board": "https://www.dsa.or.kr/data.html?Table=ins_bbs43",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-14",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2700045011"
+   },
+   "board": "https://gwangyang.go.kr/fund/",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-14",
+   "note": "게시판처럼 보이는 쪽(공고 3건 · 글 줄 3) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000315002"
+   },
+   "board": "https://www.usc.go.kr/water/main.do",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-14",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 7) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000204008"
+   },
+   "board": "https://council.wonju.go.kr/content/news/photoGallery.html",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-14",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 9) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2700071007"
+   },
+   "board": "https://www.ycsf.or.kr/open/notice/list.html",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-14",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 15) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000319002"
+   },
+   "board": "https://www.yeongju.go.kr/check/bbs/board.php?bo_table=yjra0101",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-13",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 100) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000206004"
+   },
+   "board": "https://www.yw.go.kr/www/selectBbsNttList.do?bbsNo=86&key=524",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-14",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 9) — 확인 로봇이 목록을 다시 읽어 고른다"
   }
  ]
 }

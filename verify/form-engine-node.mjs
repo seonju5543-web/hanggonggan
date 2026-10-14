@@ -27,9 +27,13 @@ function readEsc(appSrc) {
 export function loadFormEngine({ profile = null } = {}) {
   const formsSrc = fs.readFileSync(fileURLToPath(new URL('forms.js', ROOT)), 'utf8');
   const appSrc = fs.readFileSync(fileURLToPath(new URL('app.js', ROOT)), 'utf8');
+  /* data.js 도 그대로 싣는다 (2026-10-13 리뷰) — forms.js 의 공고별 지원문서가 첨부 판정에 data.js 의 isApplicationForm 을 쓴다.
+     안 실으면 forms.js 의 '물러나는 규칙'만 재어져 브라우저가 실제로 타는 갈래가 검사 밖에 남는다. 브라우저도 data.js 를 forms.js 보다 먼저 싣는다. */
+  const dataSrc = fs.readFileSync(fileURLToPath(new URL('data.js', ROOT)), 'utf8');
 
   const preamble = `
     ${readEsc(appSrc)}
+    ${dataSrc}
     const state = { profile: __profile };
     const document = { querySelector: () => null, querySelectorAll: () => [], createElement: () => ({ click(){}, remove(){}, style:{} }) };
     const $ = () => null;
