@@ -1389,8 +1389,11 @@ console.log('\n■ 공고별 지원문서 — 앱 양식이 없는 등록 공고
   /* 다리가 data.js 를 싣는가 — 안 실으면 첨부 판정이 forms.js 의 물러나는 규칙으로만 재어져 isApplicationForm 을 바꿔도 여기가 안 빨개진다(리뷰) */
   eq('  Node 다리(form-engine-node)가 data.js 의 isApplicationForm 을 실어 브라우저와 같은 갈래를 잰다',
     /data\.js/.test(readText(new URL('./form-engine-node.mjs', import.meta.url))) && eng.buildPrepTemplate({ ...base, attachments: [{ name: '[서식 2] 장학생 추천서 신청서양식.hwp', url: 'u' }] }).prepKind, 'unknown');
-  eq('  층2(재단 공고문) 첨부는 신청서라 부르지 않는다 — 첨부 이름에 신청서가 있어도 attached 가 아니다',
-    eng.buildPrepTemplate({ ...withAtt, sourceKind: 'kosaf' }).prepKind === 'attached', false);
+  eq('  층2(재단 공고문)는 \'kosaf\' — 첨부 이름에 신청서가 있어도 attached 가 아니고, 머리말은 "재단 선발 공고문이 정한다 · 이 문서 자체를 내는 것은 아니다" (2026-10-13 ①)',
+    (() => { const t = eng.buildPrepTemplate({ ...withAtt, sourceKind: 'kosaf' }); return [t.prepKind, /선발 공고문/.test(t.tag), /이 문서 자체를 내는 것은 아닙니다/.test(t.tag), /그대로 제출/.test(t.tag)]; })(), ['kosaf', true, true, false]);
+  eq('  prepDoc(원문 확인)은 층2보다도 앞이다', eng.buildPrepTemplate({ ...base, sourceKind: 'kosaf', prepDoc: true }).prepKind, 'free');
+  eq('  앱은 층2 항목에도 붙인다(kosafAsScholarships → attachPrepTemplate) · 다시 받으면 지운다',
+    (() => { const aj = readText(new URL('../app.js', import.meta.url)); return [/\.map\(attachPrepTemplate\);/.test(aj.slice(aj.indexOf('function kosafAsScholarships('))), /startsWith\('prep:kosaf-'\)\) delete FORM_TEMPLATES\[k\]/.test(aj)]; })(), [true, true]);
   const t3 = eng.buildPrepTemplate({ ...base, documents: ['자기소개서 (자유 양식, A4 1장)', '학업계획서', '성적증명서 1부', '재학증명서 (자동 제출)'] });
   eq('  공고가 이름 붙인 작성형 서류마다 절 하나 — 절 이름은 원문 서류 이름 · 서술 칸은 kind:story(서류 도우미가 붙을 자리)',
     t3.sections.filter((s) => (s.fields || []).some((f) => f.kind === 'story')).map((s) => s.heading), ['자기소개서', '학업계획서']);
@@ -1413,9 +1416,9 @@ console.log('\n■ 공고별 지원문서 — 앱 양식이 없는 등록 공고
     [true, true, true, true]);
   /* 앱 연결 — 글자가 아니라 실제 모양을 본다 */
   const appSrc = readText(new URL('../app.js', import.meta.url));
-  const attach = appSrc.slice(appSrc.indexOf('function attachPrepTemplates('), appSrc.indexOf('/* 원본 신청서 —'));
+  const attach = appSrc.slice(appSrc.indexOf('function attachPrepTemplate('), appSrc.indexOf('/* 원본 신청서 —'));
   eq('🔴 앱은 양식(formId)·상시 제도만 빼고 **모든 등록 공고**에 붙인다 (prepDoc 한정으로 되돌리면 빈 준비 시트가 돌아온다)',
-    [/if \(s\.formId \|\| s\.program\) continue;/.test(attach), /!s\.prepDoc/.test(attach)], [true, false]);
+    [/if \(s\.formId \|\| s\.program\) return s;/.test(attach), /!s\.prepDoc/.test(attach), /for \(const s of list\) attachPrepTemplate\(s\);/.test(attach)], [true, false, true]);
   const ff = appSrc.slice(appSrc.indexOf('function renderFormFill('), appSrc.indexOf('/* ---------------- 실시간 공고'));
   eq('  양식 작성 화면이 원본 신청서(첨부 + PDF 사본)를 한 함수(prepOriginalsHtml)로 보여 주고 머리줄은 문서의 lead 를 쓴다',
     [/prepOriginalsHtml\(sch\)/.test(ff), /tpl\.lead/.test(ff), /data\/forms-pdf\/index\.json/.test(appSrc)], [true, true, true]);
@@ -1446,6 +1449,98 @@ console.log('\n■ 등록 첨부 고르기 — 이름 허용 목록이 아니라
   const ar = readText(new URL('../collector/auto-register.mjs', import.meta.url));
   eq('  자동 등록이 이 함수를 쓴다 (옛 이름 허용 목록이 남아 있지 않다)',
     [/pickRegisterAttachments\(n\.attachments/.test(ar), /신청서\|지원서\|신청양식\|원서\|서식\|양식\|동의서\|서약서\|추천서\|공고\/\.test\(a\.name\)/.test(ar)], [true, false]);
+}
+
+/* 2026-10-13 ④ — 제출 서류 목록. 자동 등록 175건의 documents 가 자리표시 한 줄이라 '자유 양식 자기소개서'를 받는 공고(prepDoc)를 한 건도 몰랐다. */
+console.log('\n■ 제출 서류 목록 — 원문의 「제출서류」 절을 서류 이름으로 · 자유 양식 근거로만 prepDoc (2026-10-13)');
+{
+  const DL = await import(new URL('../collector/doc-list.mjs', import.meta.url));
+  const t = ['1. 신청자격', ' - 재학생', '2. 제출서류', '  가. 장학금 신청서 1부', '  나. 자기소개서 (자유 양식, A4 1장 이내) 1부', '  다. 성적증명서, 재학증명서 각 1부',
+    '  ※ 발급일 2개월 이내 서류만 인정', '  (부모와 함께 표기된 서류)', '3. 신청방법 : 장학팀 방문 제출', '4. 문의 : 02-000-0000'].join('\n');
+  const r = DL.readDocuments(t);
+  eq('🔴 「제출서류」 절의 줄만 서류다 — 머리 기호·번호를 떼고 원문 글자 그대로 · 쉼표 목록은 가른다 · 다음 절(신청방법)에서 멈춘다 · 주석(※)·괄호 설명 줄은 뺀다',
+    r.docs, ['장학금 신청서 1부', '자기소개서 (자유 양식, A4 1장 이내) 1부', '성적증명서', '재학증명서 각 1부']);
+  eq('  자유 양식 근거는 작성형 서류(자기소개서)와 같은 문장 — 원문 글자 그대로', [r.free, /자기소개서 \(자유 양식/.test(r.basis)], [true, true]);
+  eq('  머리줄에 바로 붙은 목록(「제출서류 : A, B」)도 읽는다', DL.extractDocumentList('제출서류 : 신청서 1부, 성적증명서 1부, 통장사본 1부\n신청기간 : 10.1~10.20'), ['신청서 1부', '성적증명서 1부', '통장사본 1부']);
+  eq('  절이 없으면 빈 배열 — 지어내지 않는다', DL.extractDocumentList('지원자격 : 재학생\n문의 : 장학팀'), []);
+  eq('  자유 양식 낱말만 있고 작성형 서류가 없으면 근거가 아니다', DL.freeFormBasis('제출서류\n- 재학증명서 (양식 자유)\n', ['재학증명서 (양식 자유)']), null);
+  eq('  소제목·전화·주소·파일 이름·지시문은 서류가 아니다',
+    DL.extractDocumentList(['제출서류', '[필수 제출서류]', '추가 제출 가능 서류 (가점)', '계양구인재양성재단 (☎546-9345)', 'https://example.or.kr', '파일제목 : 이름-학과-신청서', '모든 서류 스캔해 PDF로 제출(사진 촬영본 금지)', '◯ 지원 분야별 필수 제출 자료', '장학생 선발원서(소정양식)', '주민등록등본 1부'].join('\n')),
+    ['장학생 선발원서(소정양식)', '주민등록등본 1부']);
+  eq('  자리표시 한 줄만 든 목록은 비어 있는 것이다', [DL.placeholderOnly(['지원 자격·제출 서류는 원문 공고에서 확인']), DL.placeholderOnly(['재단 공고문에서 확인']), DL.placeholderOnly(['재학증명서'])], [true, true, false]);
+  /* 발췌기가 이 규칙으로 documents 를 채우고 prepDoc 을 켠다 — 사람 것은 덮지 않고, 신청서 첨부가 있으면 prepDoc 을 켜지 않는다 */
+  const ee = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));
+  const fd = ee.slice(ee.indexOf('function fillDocuments('), ee.indexOf('function main()'));
+  eq('  발췌기가 두 갈래(본문 · 첨부만)에서 모두 부른다', (ee.match(/fillDocuments\(it, (body|null), docs\);/g) || []).length, 2);
+  eq('  사람(관리자·AI)이 적은 목록과 자리표시가 아닌 옛 목록은 덮지 않는다',
+    [/\/\^\(관리자\|AI\)\/\.test\(it\.documentsFrom/.test(fd), /docsPlaceholderOnly\(it\.documents\) && !robotOwned\) return/.test(fd)], [true, true]);
+  eq('  prepDoc 은 근거 있음 · 신청서 첨부 없음 · 양식·상시 제도 아님 · 관리자가 끄지 않음 일 때만 · 근거는 300자 상한 · 출처 표식(prepDocFrom 로봇)',
+    [/got\.basis && !hasFormAtt && !it\.formId && !it\.program && !\/\^관리자\/\.test\(it\.prepDocFrom/.test(fd), /prepDocBasis = got\.basis\.slice\(0, 300\)/.test(fd), /prepDocFrom = `로봇/.test(fd)], [true, true, true]);
+}
+
+/* 2026-10-13 ② — 공고문 뒷장 서식 쪽. 신청서가 따로 첨부되지 않은 공고라도 공고문 PDF 뒷장에 「별지」 서식이 붙는다(층2 재단 37곳) — 아무도 꺼내지 않았다. */
+console.log('\n■ 공고문 뒷장 서식 쪽 떼기 — 쪽 글자의 표식으로 서식 쪽을 고른다 (2026-10-13)');
+{
+  process.env.FORM_PAGES_AS_LIB = '1';
+  const FP = await import(new URL('../collector/form-pages.mjs', import.meta.url));
+  const notice = '2026년 ○○장학회 장학생 선발 공고\n1. 지원자격 : 재학생\n2. 제출서류\n  붙임 1. 장학생 신청서 1부\n  붙임 2. 개인정보 동의서 1부\n3. 신청기간 : 10.1~10.20';
+  const form = '[별지 1호 서식]\n장학생 신청서\n성   명 |          | 생년월일 |        |\n학   과 |          | 학   번  |        |\n위와 같이 신청합니다.\n2026년   월   일\n신청인 :            (서명 또는 인)\n○○장학회 귀하';
+  const consent = '개인정보 수집·이용 동의서\n□ 동의함  □ 동의하지 않음\n성명 :        생년월일 :\n(서명)';
+  eq('🔴 「붙임 1. 신청서 1부」 같은 첨부 목록 줄이 든 공고 쪽은 서식이 아니다', FP.classifyPage(notice, 1), 'notice');
+  eq('  별지 머리 + 인적사항 표 + 서명란 쪽은 서식이다', FP.classifyPage(form, 3), 'form');
+  eq('  동의서 쪽(체크 칸 + 서명)도 서식이다', FP.classifyPage(consent, 4), 'form');
+  eq('  첫 쪽은 더 엄격하다 — 서식 제목 한 줄만으로는 표지로 본다', [FP.classifyPage('장학생 신청서\n', 1), FP.classifyPage(form, 1)], ['notice', 'form']);
+  eq('  이어진 쪽은 한 구간으로', [FP.groupRanges([3, 4, 5, 7]), FP.rangeLabel(FP.groupRanges([3, 4, 5, 7]))], [[[3, 5], [7, 7]], '3~5, 7']);
+  const fakeFs = { exists: (p) => /elig-a-1\.pdf|elig-b-1\.hwpx|\/kosaf\/777$|\/kosaf\/777\//.test(p) || /\/kosaf\/777/.test(p), readdir: () => ['공고문.pdf', '안내.hwp', '사진.jpg', '글자.txt'] };
+  const t = FP.pickPageTargets({
+    registered: [{ id: 'a', name: 'A', deadline: '2099-01-01' }, { id: 'b', name: 'B', deadline: '2099-01-01' }, { id: 'old', name: 'O', deadline: '2000-01-01' }, { id: 'p', name: 'P', program: true }],
+    kosaf: [{ code: '777', org: '재단', name: '장학', due: '' }, { code: '888', org: '옛', name: '끝', due: '2000-01-01' }],
+    eligIndex: { a: { files: ['elig-a-1.pdf', 'elig-a-2.jpg'] }, b: { files: ['elig-b-1.hwpx'] }, old: { files: ['elig-o-1.pdf'] } },
+    today: '2026-10-13', extractedDir: '/x', kosafDir: '/kosaf', ...fakeFs,
+  });
+  eq('  대상 — 마감 전 층1 공고문(PDF·HWP·HWPX·DOCX)과 층2 재단 사본(그림·글자 파일 제외) · 마감 지난 것·상시 제도는 뺀다',
+    t.map((x) => `${x.id}:${x.files.map((f) => f.name).join('+')}`), ['a:elig-a-1.pdf', 'b:elig-b-1.hwpx', 'kosaf-777:공고문.pdf+안내.hwp']);
+  eq('  마감을 모르는 재단은 산 것으로 본다(층2 규칙과 같다)', FP.isOpen('', '2026-10-13'), true);
+  /* 배선 — 워크플로 보강 단계 · 저장 목록 · 병합 규칙 · 서비스워커 · 앱 */
+  const wf = readText(new URL('../.github/workflows/deep-fetch.yml', import.meta.url)).split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
+  eq('  deep-fetch 보강 단계(시한 + continue-on-error)로 돌고 data/form-pages 를 저장한다',
+    [/timeout-minutes: 6\s*\n\s*continue-on-error: true\s*\n\s*run: \|\s*\n\s*sudo apt-get install -y -qq poppler-utils\s*\n\s*node collector\/form-pages\.mjs/.test(wf), /git add -A data\/form-pages/.test(wf), /git add collector\/form-pages-report\.md/.test(wf)], [true, true, true]);
+  const ga = readText(new URL('../.gitattributes', import.meta.url));
+  eq('  병합 규칙 — 사본은 이진 · 색인·리포트는 내 것', /data\/form-pages\/\*\*\s+-diff/.test(ga) && /data\/form-pages\/index\.json\s+merge=ours/.test(ga) && /collector\/form-pages-report\.md merge=ours/.test(ga), true);
+  eq('  서비스워커가 뗀 쪽 PDF 를 가로채지 않는다', /\\\/data\\\/form-pages\\\//.test(readText(new URL('../sw.js', import.meta.url))), true);
+  const app = readText(new URL('../app.js', import.meta.url));
+  eq('  앱이 색인을 받아 질문 화면 머리에 「공고문 안 신청서 서식」으로 보인다 (층1·층2 같은 함수)',
+    [/fetch\('data\/form-pages\/index\.json'/.test(app), /formPagesIndex\[sch\.id\]/.test(app.slice(app.indexOf('function prepOriginalsHtml('))), /loadFormPagesIndex\(\)/.test(app.match(/^const bootJobs = .*$/m)[0])], [true, true, true]);
+}
+
+/* 2026-10-13 ③ — 신청 준비 체크리스트. '준비 완료'는 버튼이 아니라 네 항목(서류 확인·작성·증명서·제출 방법)의 결과다. */
+console.log('\n■ 신청 준비 체크리스트 — 준비 완료는 네 항목의 결과 · pending(작성 남음)의 뜻은 그대로 (2026-10-13)');
+{
+  const app = readText(new URL('../app.js', import.meta.url));
+  const take = (name) => { const s0 = app.indexOf(`function ${name}(`); let d = 0, seen = false; for (let i = app.indexOf('{', s0); i < app.length; i += 1) { if (app[i] === '{') { d += 1; seen = true; } else if (app[i] === '}') { d -= 1; if (seen && !d) return app.slice(s0, i + 1); } } throw new Error(name); };
+  const items = app.match(/const PREP_ITEMS = \[[\s\S]*?\n\];/)[0];
+  const ESSAY_DEFS = [{ match: /자기소개서/ }];
+  const mk = (wallet) => new Function('formTplIdFor', 'essayDefsFor', 'DOC_PLACEHOLDER', 'ESSAY_DEFS', 'docWalletStatus',
+    `${items}\n${take('prepChecklist')}\n${take('prepStateLabel')}\nreturn { prepChecklist, prepStateLabel };`)(
+    (s) => (s.form ? 'f1' : null), (s) => (s.documents || []).filter((d) => /자기소개서/.test(d)).map(() => ({})), /(원문\s*공고|공고문)(에서)?\s*확인/, ESSAY_DEFS,
+    (d) => (d in wallet ? { ok: wallet[d] } : null));
+  const P = mk({ 재학증명서: true, 성적증명서: false });
+  const sch = { form: true, documents: ['재학증명서', '성적증명서 (자동 제출)', '지원 자격·제출 서류는 원문 공고에서 확인'] };
+  const c0 = P.prepChecklist({ pending: false }, sch);
+  eq('🔴 문서를 안 썼으면 작성 항목이 비고, 보관함에 증명서가 다 있으면 증명서는 자동 ✓ · 자동 서류·자리표시는 세지 않는다',
+    [c0.items.map((i) => `${i.key}:${i.done ? 1 : 0}${i.auto ? 'a' : ''}`), c0.done, c0.complete], [['docs:0', 'write:0a', 'certs:1a', 'submit:0'], 1, false]);
+  const c1 = P.prepChecklist({ pending: false, formAns: { x: 1 }, prep: { docs: true, submit: true } }, sch);
+  eq('  문서를 썼고 학생이 서류·제출 방법을 확인하면 4/4 완료', [c1.done, c1.complete], [4, true]);
+  eq('  작성할 것이 없는 공고(양식·자소서 없음)는 작성 항목이 처음부터 ✓', P.prepChecklist({ pending: false }, { documents: [] }).items.find((i) => i.key === 'write').done, true);
+  const P2 = mk({ 재학증명서: false });
+  eq('  증명서가 보관함에 없으면 학생이 「확인했어요」로 넘길 수 있다(수동)', [P2.prepChecklist({ pending: false }, sch).items[2].done, P2.prepChecklist({ pending: false, prep: { certs: true } }, sch).items[2].done], [false, true]);
+  eq('  상태 낱말 — 작성 남음 > 준비 중 n/4 > 단계 이름 · 제출을 적은 건은 체크리스트와 상관없이 단계 이름',
+    [P.prepStateLabel({ pending: true }, sch, '신청 준비 완료'), P.prepStateLabel({ pending: false }, sch, '신청 준비 완료'), P.prepStateLabel({ pending: false, submittedAt: '2026-10-01' }, sch, '공식 제출'), P.prepStateLabel({ pending: false, formAns: {}, prep: { docs: true, submit: true } }, sch, '신청 준비 완료')],
+    ['서류 작성 필요', '준비 중 1/4', '공식 제출', '신청 준비 완료']);
+  /* 화면 셋이 같은 함수를 쓴다 — 카드 배지 · 신청내역 막대 · 상세 버튼/체크리스트 · 요약 */
+  eq('  카드 배지 · 신청내역 막대 · 상세 버튼 · 요약이 모두 prepStateLabel/prepChecklist 를 쓴다',
+    [/prepStateLabel\(myApp, sch/.test(take('cardBadgeHtml')), /prepStateLabel\(app, sch, stepLabel\)/.test(take('appCard')), /prepStateLabel\(app, sch, '신청 준비 완료됨'\)/.test(take('openDetail')), /data-prep-toggle/.test(take('openDetail')), /inPrep/.test(take('renderApplications'))], [true, true, true, true, true]);
+  eq('  낱말 「서류 작성 필요」 는 그대로 pending 이 말한다 (옛 관문과 같은 모양)', /app\.pending \? '서류 작성 필요'/.test(app), true);
 }
 
 /* 2026-08-20 — 자격 절을 어디서 끊나. 개발자가 "본문에 다 써 있는데 못 읽는 것 같다"고

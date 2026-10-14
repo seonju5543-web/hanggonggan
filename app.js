@@ -1585,14 +1585,15 @@ function fitBadgeHtml(fit, fd, { full = false } = {}) {
    🔴 판정을 새로 만들지 않는다 — fitVerdict / fitTone 을 그대로 쓴다.
    🔴 뺀 것들이 사라지는 게 아니다: 교내외는 기관명 줄로, 마감은 글로, '검수 전'은 상세 시트로
       옮겼다(상세의 badge-kind 가 '교외 · 검수 전'을 이미 낸다). 정직 표기는 그대로 지켜진다. */
-function cardBadgeHtml(fit, fd, myApp) {
+function cardBadgeHtml(fit, fd, myApp, sch) {
   /* 🔴 신청내역에 **있기만 한 것**을 '신청 완료'라고 부르지 않는다 (2026-09-10 코드 리뷰).
      '한 번에 신청 준비'로 담은 건은 `pending` 인 채 들어가므로, 신청내역은 '서류 작성 필요'
      라고 하는데 목록 카드만 '신청 완료'라고 말하고 있었다 — 학생은 다 끝난 줄 알고 넘어간다.
      ⚠️ 낱말은 신청내역(`stepNow`)이 쓰는 것과 같은 것을 쓴다. */
   if (myApp) return myApp.pending
     ? '<span class="badge badge-pending">서류 작성 필요</span>'
-    : '<span class="badge badge-applied">신청 완료</span>';
+    : (sch && /^준비 중/.test(prepStateLabel(myApp, sch, '')) ? `<span class="badge badge-pending">${esc(prepStateLabel(myApp, sch, ''))}</span>`
+      : '<span class="badge badge-applied">신청 완료</span>');
   const v = fitVerdict(fit, fd);
   if (v === 'no') return '<span class="badge badge-fit-no">지원 자격 미달</span>';
   if (v === 'unread') return '<span class="badge badge-fit-unknown">자격 미확인</span>';
@@ -1615,7 +1616,7 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
      ⚠️ 낱말은 신청내역(`stepNow`)이 쓰는 것과 **같은 것을 쓴다** — 여기서 새로 지어내면
         두 화면이 또 다른 말을 하게 된다. */
   const myApp = state.applications.find((a) => a.id === sch.id);
-  const badge = cardBadgeHtml(fit, fd, myApp);
+  const badge = cardBadgeHtml(fit, fd, myApp, sch);
   const due = sch.program ? '상시 제도' : ddayWords(d);
   /* 금액을 못 읽은 공고가 등록 48건 중 34건(71%)이다. 예전엔 그 자리에 '금액 원문 확인'이
      카드에서 **가장 굵은 줄**로 떴다 — 템플릿이 자기 빈칸을 읽어 주는 모습이었다.
@@ -2160,6 +2161,37 @@ function autoDocs(sch) {
    확인 — 공식 제출 시 함께 준비하세요" 처럼 **서류가 아닌 것을 챙기라고** 말한다(2026-09-23). */
 const DOC_PLACEHOLDER = /(원문\s*공고|공고문)(에서)?\s*확인/;
 
+/* ── 신청 준비 체크리스트 (2026-10-13 ③ · 개발자 "남은 것 모두 진행") ──────────────────────
+   '준비 완료'는 버튼이 아니라 네 항목의 결과다 — ① 제출 서류 확인 ② 서류 작성 ③ 증명서 준비 ④ 제출 방법 확인.
+   🔴 `app.pending`(서류 작성이 남았다)의 뜻은 그대로다 — 그 위에 나머지 항목을 얹는다. 자동으로 아는 것(작성했나 · 보관함에 증명서가 다 있나)은
+      앱이 체크하고, 모르는 것(서류를 확인했나 · 제출 방법을 봤나)은 학생이 누른다(`app.prep`). 상태 낱말은 신청내역·카드·상세가 **같은 함수**를 쓴다. */
+const PREP_ITEMS = [
+  { key: 'docs', label: '제출 서류 확인', manual: true },
+  { key: 'write', label: '서류 작성', manual: false },
+  { key: 'certs', label: '증명서 준비', manual: true },
+  { key: 'submit', label: '제출 방법 확인', manual: true },
+];
+function prepChecklist(app, sch) {
+  const manual = (app && app.prep) || {};
+  const needsWrite = !!(sch && (formTplIdFor(sch) || essayDefsFor(sch).length));
+  const written = !!(app && (app.formAns || (app.docs && app.docs.length)));
+  const certDocs = sch ? (sch.documents || []).filter((d) => !/자동/.test(d) && !DOC_PLACEHOLDER.test(d) && !ESSAY_DEFS.some((e) => e.match.test(d))) : [];
+  const certsAuto = certDocs.length > 0 && certDocs.every((d) => { const st = docWalletStatus(d); return !!(st && st.ok); });
+  const items = PREP_ITEMS.map((it) => {
+    if (it.key === 'write') return { ...it, done: !needsWrite || written, auto: true };
+    if (it.key === 'certs') return { ...it, done: certsAuto || !!manual.certs, auto: certsAuto };
+    return { ...it, done: !!manual[it.key], auto: false };
+  });
+  const done = items.filter((i) => i.done).length;
+  return { items, done, total: items.length, complete: done === items.length };
+}
+/* 신청내역·카드가 쓰는 짧은 상태 — '서류 작성 필요' > '준비 중 n/4' > 단계 이름 */
+function prepStateLabel(app, sch, stepLabel) {
+  if (app.pending) return '서류 작성 필요';
+  const pc = prepChecklist(app, sch);
+  return !pc.complete && !app.submittedAt && !app.result ? `준비 중 ${pc.done}/${pc.total}` : stepLabel;
+}
+
 /* 증명서류(작성형 제외)의 보관함 상태 목록 HTML */
 function certStatusListHtml(sch) {
   const certDocs = sch.documents.filter((doc) => !ESSAY_DEFS.some((e) => e.match.test(doc)) && !DOC_PLACEHOLDER.test(doc));
@@ -2589,14 +2621,17 @@ function loadNotices() {
       *"앱 자체 문서는 있는 게 맞다 — 없으면 바로 신청내역으로 가고 앱의 신뢰도가 낮아진다"*).
    🔴 정직함은 문서의 머리말이 지킨다(forms.js prepKindFor · '그대로 제출 가능'은 prepDoc 에서만).
    공식 양식(formId)과 구분되도록 prepFormId 로만 연결 — 채널 라벨은 그대로 유지. 상시 제도(program)는 제외. */
+function attachPrepTemplate(s) {
+  if (typeof FORM_TEMPLATES === 'undefined' || typeof buildPrepTemplate !== 'function') return s;
+  if (s.formId || s.program) return s;
+  const pid = 'prep:' + s.id;
+  /* 층2 항목은 부를 때마다 새로 만들어지므로(kosafAsScholarships) 템플릿은 한 번만 짓고 다시 쓴다 — 목록을 다시 받으면 loadKosaf 가 지운다 */
+  if (!FORM_TEMPLATES[pid] || s.sourceKind !== 'kosaf') FORM_TEMPLATES[pid] = buildPrepTemplate(s);
+  s.prepFormId = pid;
+  return s;
+}
 function attachPrepTemplates(list) {
-  if (typeof FORM_TEMPLATES === 'undefined' || typeof buildPrepTemplate !== 'function') return;
-  for (const s of list) {
-    if (s.formId || s.program) continue;
-    const pid = 'prep:' + s.id;
-    FORM_TEMPLATES[pid] = buildPrepTemplate(s);
-    s.prepFormId = pid;
-  }
+  for (const s of list) attachPrepTemplate(s);
 }
 
 /* 원본 신청서 — 공고 첨부 중 신청서(isApplicationForm · data.js 한 곳) + 로봇이 PDF 로 바꿔 둔 사본(data/forms-pdf/index.json).
@@ -2608,16 +2643,31 @@ function loadFormPdfIndex() {
     .then((d) => { if (d && d.items) formPdfIndex = d.items; })
     .catch(() => { /* 없으면 첨부 링크만 — 조용히 물러나되 아래 목록은 그대로 그린다 */ });
 }
+/* 공고문 뒷장에서 뗀 신청서 서식 쪽 (2026-10-13 ② · collector/form-pages.mjs · data/form-pages/index.json) — 층1·층2 모두 */
+let formPagesIndex = {};
+function loadFormPagesIndex() {
+  return fetch('data/form-pages/index.json', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((d) => { if (d && d.items) formPagesIndex = d.items; })
+    .catch(() => { /* 없으면 그 줄만 안 그린다 */ });
+}
 function prepOriginalsHtml(sch) {
-  if (sch.sourceKind === 'kosaf') return '';
-  const atts = (sch.attachments || []).filter((a) => a && !a.bodyImage && isApplicationForm(a));
-  const pdfs = (formPdfIndex[sch.id] || []).filter((f) => f && f.file);
-  if (!atts.length && !pdfs.length) return '';
+  const kosaf = sch.sourceKind === 'kosaf';
+  /* 층2 첨부는 재단이 올린 **선발 공고문**이다 — 신청서라 부르지 않는다(CLAUDE.md 「층2」) · 층1은 신청서 이름의 첨부만 */
+  const atts = (sch.attachments || []).filter((a) => a && !a.bodyImage && (kosaf || isApplicationForm(a)));
+  const pdfs = kosaf ? [] : (formPdfIndex[sch.id] || []).filter((f) => f && f.file);
+  const pages = (formPagesIndex[sch.id] || []).filter((f) => f && f.file);
+  if (!atts.length && !pdfs.length && !pages.length) return '';
   const pdfLi = pdfs.map((f) => `<li class="att"><a href="${esc('data/forms-pdf/' + f.file)}" target="_blank" rel="noopener">${esc(f.name || f.file.split('/').pop())}</a> <span class="doc-legend">PDF · ${Number(f.pages) || '?'}쪽 · 원본 그대로</span></li>`).join('');
+  const pageLi = pages.map((f) => `<li class="att"><a href="${esc('data/form-pages/' + f.file)}" target="_blank" rel="noopener">${esc(f.name || '공고문 안 신청서 서식')}</a> <span class="doc-legend">PDF · ${Number(f.pages) || '?'}쪽 · 공고문에서 뗀 쪽</span></li>`).join('');
   const attLi = atts.filter((a) => !pdfs.some((f) => f.name === a.name)).map((a) => `<li class="att">${attachmentLinkHtml(a)}</li>`).join('');
-  return `<h4>원본 신청서 양식 <span class="channel-tag">공고 원본</span></h4>
-      <ul class="doc-list">${pdfLi}${attLi}</ul>
-      <p class="dp-note">제출은 이 원본 양식으로 합니다 — 아래에서 정리한 내용을 옮겨 적으세요.</p>`;
+  const head = kosaf ? '선발 공고문 <span class="channel-tag">재단 원문</span>' : '원본 신청서 양식 <span class="channel-tag">공고 원본</span>';
+  const note = kosaf
+    ? '접수 방법과 서식은 재단의 공고문이 정합니다 — 아래에서 정리한 내용을 그 서식에 옮겨 적으세요.'
+    : '제출은 이 원본 양식으로 합니다 — 아래에서 정리한 내용을 옮겨 적으세요.';
+  return `<h4>${head}</h4>
+      <ul class="doc-list">${pdfLi}${pageLi}${attLi}</ul>
+      <p class="dp-note">${note}</p>`;
 }
 
 /* 이 공고에서 쓸 양식 템플릿 id — 공식 양식이 우선, 없으면 준비용 문서 */
@@ -2802,6 +2852,8 @@ function loadKosaf() {
       if (!d) { if (appsData.kosaf !== 'ok') appsData.kosaf = 'fail'; rerenderVisible(); return; }   // 다시 받기 실패에 받아 둔 목록을 비우지 않는다
       appsData.kosaf = 'ok';
       kosafList = d.items || [];
+      /* 층2 지원문서 템플릿은 다시 받을 때 지운다 — 다음 kosafAsScholarships 가 새 데이터로 다시 짓는다 */
+      if (typeof FORM_TEMPLATES !== 'undefined') for (const k of Object.keys(FORM_TEMPLATES)) if (k.startsWith('prep:kosaf-')) delete FORM_TEMPLATES[k];
       kosafUpdatedAt = d.updatedAt || '';
       rerenderVisible();
     })
@@ -2813,7 +2865,7 @@ function loadKosaf() {
    (rerenderVisible 주석이 말하는 것과 같은 유형의 사고다). */
 function refreshAllData() {
   const ledger = loadLinkChecks();   // 원문 링크 확인 장부 먼저 — 정식 등록 그리기가 이것을 잠깐 기다린다(2026-10-03)
-  const jobs = [loadNotices(), loadNews(), loadRegistered(), loadKosaf(), loadFormPdfIndex(), loadActivities(), loadExternal()];
+  const jobs = [loadNotices(), loadNews(), loadRegistered(), loadKosaf(), loadFormPdfIndex(), loadFormPagesIndex(), loadActivities(), loadExternal()];
   jobs.push(ledger);
   if (typeof loadFormTemplates === 'function') jobs.push(loadFormTemplates());
   /* 🔴 `swReg` 는 이 파일 한참 아래(서비스워커 등록 자리)에서 `let` 으로 선언된다.
@@ -2949,7 +3001,9 @@ function kosafAsScholarships() {
            자격 판정을 못 붙이는 대신 재단이 쓴 것을 그대로 옮긴다 — 해석하지 않는다. */
         ...(kosafClean(f['선발인원']) ? { headcount: kosafClean(f['선발인원']) } : {}),
       };
-    });
+    })
+    /* 층2에도 앱 지원문서 (2026-10-13 ① · 개발자 "남은 것 모두 진행") — 머리말은 forms.js prepKindFor 의 'kosaf'(재단 접수 방법은 공고문 확인) */
+    .map(attachPrepTemplate);
 }
 
 /* 실시간 공고 구역의 머리말 — '아직 안 옴'과 '없음' 이 같은 머리말을 쓰도록 한 곳에 둔다 */
@@ -4396,7 +4450,7 @@ function openDetail(id) {
   const srcHint = sourceLinkHintHtml(sourceLink(sch, 'detail'));
 
   let btnLabel = '신청 준비 시작';
-  if (app && !app.pending) btnLabel = '신청 준비 완료됨';
+  if (app && !app.pending) btnLabel = prepStateLabel(app, sch, '신청 준비 완료됨') === '신청 준비 완료됨' ? '신청 준비 완료됨' : `${prepStateLabel(app, sch, '')} — 아래 체크리스트`;
   else if (app && app.pending && gone) btnLabel = '이어서 작성할 수 없는 공고';   // 데이터에서 빠진 공고 — 왜 빠졌는지는 단정하지 않는다(원칙 8-1)
   else if (app && app.pending) btnLabel = '서류 작성 이어서 하기';
   else if (d.days < 0) btnLabel = '마감된 장학금';
@@ -4503,7 +4557,18 @@ function openDetail(id) {
               <span class="ap-dot"></span><span class="ap-label">${s}</span>
             </div>`).join('')}
         </div>
-        <p class="applied-at">${app.appliedAt} 준비 완료 · 최종 제출처: ${ch.url ? `<a href="${esc(safeUrl(ch.url))}" target="_blank" rel="noopener">${esc(ch.label)}</a>` : esc(ch.label)}</p>
+        ${(() => {
+          /* 준비 체크리스트 (2026-10-13 ③) — 첫 단계에서만 · 자동 항목은 ✓/— 로 보이고 나머지는 학생이 누른다 */
+          if (step !== 0) return '';
+          const pc = prepChecklist(app, sch);
+          return `<h4>신청 준비 체크리스트 <span class="channel-tag">${pc.done}/${pc.total}</span></h4>
+          <ul class="doc-list doc-badged prep-check">${pc.items.map((it) => `
+            <li>${it.done ? '<span class="doc-auto">✓</span>' : '<span class="doc-manual">□</span>'} ${esc(it.label)}${it.auto && it.done ? ' <span class="doc-legend">자동 확인</span>' : ''}${
+              it.manual && !(it.auto && it.done) ? ` <button class="link-btn" data-prep-toggle="${it.key}">${it.done ? '되돌리기' : '확인했어요'}</button>` : ''}${
+              it.key === 'write' && !it.done ? ' <span class="doc-legend">위 버튼에서 이어서 작성</span>' : ''}</li>`).join('')}
+          </ul>`;
+        })()}
+        <p class="applied-at">${app.appliedAt} ${prepChecklist(app, sch).complete || step > 0 ? '준비 완료' : '신청내역에 담김 · 준비 중'} · 최종 제출처: ${ch.url ? `<a href="${esc(safeUrl(ch.url))}" target="_blank" rel="noopener">${esc(ch.label)}</a>` : esc(ch.label)}</p>
         ${step === 0 ? `
           <button class="btn btn-outline" id="btn-mark-submitted" style="width:100%;margin-bottom:6px">공식 제출 완료로 기록</button>
           <p class="dp-note">최종 제출은 ${esc(ch.label)}에서 이루어집니다. 제출을 마친 뒤 누르면 다음 단계로 넘어갑니다.</p>` : ''}
@@ -4575,6 +4640,16 @@ function openDetail(id) {
   /* 자격 묻기 — 줄 아래 단추와 펼침 구획 (2026-09-17 · 노션 AI-1) */
   eligAskWire(sch);
   /* 진척도 기록 버튼 (있을 때만) */
+  /* 준비 체크리스트 토글 (2026-10-13 ③) — 학생이 확인한 것만 적는다 · 자동 항목(작성·증명서 자동)은 버튼이 없다 */
+  $$('#detail-sheet [data-prep-toggle]').forEach((b) => b.addEventListener('click', () => {
+    const a = state.applications.find((x) => x.id === sch.id);
+    if (!a) return;
+    a.prep = a.prep || {};
+    const k = b.dataset.prepToggle;
+    a.prep[k] = !a.prep[k];
+    saveState();
+    openDetail(sch.id);
+  }));
   const markBtn = $('#btn-mark-submitted');
   if (markBtn) markBtn.addEventListener('click', () => recordSubmitted(sch));
   const wonBtn = $('#btn-result-won');
@@ -5056,7 +5131,8 @@ function appCard(app, sch) {
      위쪽 배지로 두면 분류 배지(교내/교외)와 같은 무게로 보여서 '단계'라는 것이 안 읽혔고,
      정작 그 아래 막대가 무엇을 재는 막대인지는 화면 어디에도 안 적혀 있었다.
      이제 이름과 'n/4'가 막대 바로 위에 붙어, 막대와 글자가 같은 것을 말한다. */
-  const stepNow = app.pending ? '서류 작성 필요' : stepLabel;
+  const stepNow = app.pending ? '서류 작성 필요' : prepStateLabel(app, sch, stepLabel);
+  const inPrep = /^준비 중/.test(stepNow);
   /* 🔴 마감된 공고는 여기가 **유일한 자리**다 (2026-09-05 — 목록은 마감 다음 날 내린다).
      진행 단계만 적으면 제출 안 한 채 마감된 건이 '신청 준비 완료'로만 보여 아직 낼 수 있다고
      오해한다. 판정을 새로 만들지 않고 dday() 가 이미 내린 cls 를 읽는다 — 목록·상세·알림과
@@ -5069,8 +5145,9 @@ function appCard(app, sch) {
      ⚠️ 제출을 기록한 건은 **빼지 않는다** — 그건 마감 뒤에도 진짜로 진행 중(심사)이다.
         결과를 기록한 건도 제 색(선정 빨강·미선정 회색)을 그대로 쓴다. */
   const deadPrep = isClosed && !app.submittedAt && !app.result;
-  const stepCount = app.pending ? '' : `${step + 1}/${APP_STEPS.length}`;
-  const pct = app.pending ? 6 : ((step + 1) / APP_STEPS.length) * 100;
+  const stepCount = (app.pending || inPrep) ? '' : `${step + 1}/${APP_STEPS.length}`;
+  /* 준비 중이면 첫 칸(25%) 안에서 체크 수만큼 찬다 — 완료 칸을 다 칠하지 않는다 */
+  const pct = app.pending ? 6 : inPrep ? Math.max(8, (prepChecklist(app, sch).done / PREP_ITEMS.length) * 25) : ((step + 1) / APP_STEPS.length) * 100;
   return `
     <div class="swipe-row${appsLogOpen.has(app.id) ? ' log-open' : ''}" data-row="${esc(app.id)}">
       ${appsSelectMode ? `<input type="checkbox" class="row-check" data-pick="${esc(app.id)}" ${checked}
@@ -5111,6 +5188,11 @@ function appCard(app, sch) {
 function nextAction(app, sch, step, d, closed) {
   const go = (label) => `<button class="app-next-btn" data-detail="${esc(sch.id)}">${label}</button>`;
   if (app.pending) return { text: '신청서 작성이 남았어요', btn: go('이어서 작성') };
+  if (step === 0 && !closed) {
+    /* 준비 체크리스트가 남았으면 그것이 다음 할 일이다 (2026-10-13 ③) — 체크는 상세 시트에서 */
+    const pc = prepChecklist(app, sch);
+    if (!pc.complete) return { text: `준비 중 ${pc.done}/${pc.total} · 남은 것: ${pc.items.filter((i) => !i.done).map((i) => i.label).join(' · ')}`, btn: go('준비 이어서') };
+  }
   if (step === 0) {
     return closed
       ? { text: '접수가 마감됐어요. 제출하셨나요?',
@@ -5692,8 +5774,10 @@ function renderApplications() {
   }
   if (learned) saveState();
   const apps = rows.map((r) => r.app);
-  const prepared = apps.filter((a) => !a.pending);
   const pending = apps.filter((a) => a.pending);
+  /* 준비 중(체크리스트 남음)은 '준비 완료'로 세지 않는다 (2026-10-13 ③) — 제출·결과를 적은 건은 체크리스트와 상관없이 다음 단계다 */
+  const inPrep = rows.filter((r) => !r.app.pending && /^준비 중/.test(prepStateLabel(r.app, r.sch, ''))).map((r) => r.app);
+  const prepared = apps.filter((a) => !a.pending && !inPrep.includes(a));
   const submitted = prepared.filter((a) => a.submittedAt && !a.result);
   const wonApps = prepared.filter((a) => a.result === 'won');
   /* 🔴 금액을 못 읽은 공고는 **금액을 모른다** — 0 으로 두고 그 건수를 따로 센다(내려간 공고는 2026-10-02 부터 여기 오지 않는다).
@@ -5716,7 +5800,7 @@ function renderApplications() {
          ${/* 🔴 금액의 이름표를 **건수 줄에서 떼어냈다** (2026-09-20 개발자 지적).
               예전엔 `… · 서류 작성 필요 1건 · 선정된 장학금` 처럼 한 줄에 가운뎃점으로
               붙어 있어, 아래 금액의 이름표가 **네 번째 건수처럼** 읽혔다. */ ''}
-         <p>준비 완료 ${prepared.length}건${submitted.length ? ` · 제출·심사 중 ${submitted.length}건` : ''}${wonApps.length ? ` · 선정 ${wonApps.length}건` : ''}${pending.length ? ` · 서류 작성 필요 ${pending.length}건` : ''}</p>
+         <p>준비 완료 ${prepared.length}건${inPrep.length ? ` · 준비 중 ${inPrep.length}건` : ''}${submitted.length ? ` · 제출·심사 중 ${submitted.length}건` : ''}${wonApps.length ? ` · 선정 ${wonApps.length}건` : ''}${pending.length ? ` · 서류 작성 필요 ${pending.length}건` : ''}</p>
          <p class="summary-label">${wonApps.length ? '선정된 장학금' : '예상 최대 수혜액'}</p>
          <p class="summary-amount">${shownAmount ? won(shownAmount) : '금액 미확인'}</p>
          <p class="summary-note">제출·발표는 각 공식 채널에서 · 결과는 여기에 기록${
@@ -7770,7 +7854,7 @@ bindEvents();
 initOnboarding();
 loadLinkChecks();   // 원문 링크 확인 장부 — 링크를 그리는 목록들보다 먼저 띄운다(작다 · 없어도 조용하다)
 /* 처음 받는 데이터 — 다 도착하면(`bootJobs`) 홈을 한 번 그리고 인트로를 돌린다(위 `bootHold` 머리말) */
-const bootJobs = [loadNotices(), loadNews(), loadActivities(), loadExternal(), loadRegistered(), loadKosaf(), loadFormPdfIndex()];
+const bootJobs = [loadNotices(), loadNews(), loadActivities(), loadExternal(), loadRegistered(), loadKosaf(), loadFormPdfIndex(), loadFormPagesIndex()];
 /* 🔴 학과 목록은 **여기서 받지 않는다** (2026-09-26) — 209개교가 든 407KB 파일이었고
    쓰는 곳은 온보딩 자동추천 한 곳뿐이다. 학교가 정해질 때 그 학교 파일만 받는다
    (`loadMajorsFor` · 위 주석). */

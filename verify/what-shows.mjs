@@ -119,7 +119,7 @@ vm.runInContext([
   ...['ENTITIES', 'ENTITY_RE', 'PARTIAL_ENTITY_END', 'hintText', 'NEWS_THUMB_RE', 'SCHOOL_PHOTO_RE', 'PHOTO_FOCUS_RE',
     'CLOSED_KEEP_DAYS', 'KOSAF_ELIG', 'kosafClean', 'KOSAF_AMOUNT_UNKNOWN', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G'].map(takeConst),
   ...['isDateBit', 'splitTitleDates', 'hintShort', 'shortDay'].map(takeFn),   // 카드 제목 날짜·회색 기간 줄(2026-10-04·05) · 카드 윗줄 날짜(10-10)
-  ...['esc', 'unent', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'kosafAsScholarships', 'sourceLinkHintHtml',
+  ...['esc', 'unent', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'attachPrepTemplate', 'kosafAsScholarships', 'sourceLinkHintHtml',   // attachPrepTemplate: 층2 항목마다 지원문서를 붙인다(2026-10-13 ① · FORM_TEMPLATES 가 없는 자리에선 그대로 돌려준다)
     'attachmentLinkHtml', 'sourceLinkHtml', 'sourceNoteHtml', 'amountSourceLinkHtml', 'appLogLinkHtml', 'noticeCardHtml', 'activityLinkHtml'].map(takeFn),
   /* 층2 바꾸기가 읽는 앱 상태 — 이 도구는 저장·신청 내역을 모른다(없음) */
   'var kosafList = []; var kosafUpdatedAt = ""; var state = { applications: [] }; function isSaved() { return false; }',
@@ -199,7 +199,7 @@ vm.runInContext(`Object.assign(FORM_TEMPLATES, ${JSON.stringify(JSON.parse(fs.re
   const isForm = dataSrc.match(/^function isFormAttachment\([\s\S]*?^\}/m);
   if (!isForm) throw new Error('data.js 에서 isFormAttachment() 을 못 찾았습니다 — 가져올 수 없으면 멈춥니다.');
   vm.runInContext([isForm[0], takeBlockConst('ESSAY_DEFS'),
-    ...['essayDefsFor', 'formTplIdFor', 'attachPrepTemplates', 'applyTo'].map(takeFn)].join('\n\n'),
+    ...['essayDefsFor', 'formTplIdFor', 'attachPrepTemplate', 'attachPrepTemplates', 'applyTo'].map(takeFn)].join('\n\n'),
     pressCtx, { filename: 'app.js(신청 버튼)' });
 }
 function pressRoute(sch) {

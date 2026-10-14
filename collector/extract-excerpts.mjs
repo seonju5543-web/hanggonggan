@@ -35,6 +35,7 @@ const { isExcludeHead: shExclude, headText: shHead, isAmountHead: shAmount } = _
 import { attachmentText, readable, docOrder, isOcrSource } from './attachment-text.mjs';
 import { findApplyEmail, humanOwnedEmail, staleApplyEmail } from './apply-email.mjs';
 import { decodeEntities } from './clean-title.mjs';
+import { readDocuments, placeholderOnly as docsPlaceholderOnly } from './doc-list.mjs';
 /* 포털 판정은 `apply-channel.js` 한 곳 — 앱·관리자 화면도 같은 파일을 쓴다(베끼지 말 것).
    ⚠️ `_cr` 는 위에서 이미 들여왔다 — 다시 import 하면 그 자리에서 죽는다(실제로 그랬다). */
 const { findApplyPortal } = _cr(import.meta.url)('../apply-channel.js');
@@ -730,7 +731,7 @@ const strip = makeStripper(texts);
 let eligDocs = {};
 try { eligDocs = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
 
-let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, fromTitle = 0, gotDeadline = 0, dlFromDoc = 0, gotOpen = 0, gotAnnounce = 0, gotApplyEmail = 0, droppedApplyEmail = 0, gotApplyPortal = 0;
+let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, fromTitle = 0, gotDeadline = 0, dlFromDoc = 0, gotOpen = 0, gotAnnounce = 0, gotApplyEmail = 0, droppedApplyEmail = 0, gotApplyPortal = 0, gotDocs = 0, gotFree = 0;
 /* 공고문 첨부에서 자격 줄을 읽는다. 본문 경로와 원문 없는 경로가 **같은 함수**를 써야
    "본문 있을 땐 읽고 없을 땐 안 읽는" 어긋남이 안 생긴다. 스캔 PDF 등 글자가 안 나오는
    것은 조용히 건너뛴다(읽은 척하는 것보다 안 읽는 편이 낫다). */
@@ -953,6 +954,42 @@ function fillCalendarDates(it, readOpen, readAnnounce) {
 }
 
 if (!process.env.EXCERPTS_AS_LIB) main();
+/* 제출 서류 목록 · 자유 양식 근거 (2026-10-13 · 개발자 "남은 것 모두 진행" ④) — 규칙은 doc-list.mjs 한 곳.
+   🔴 덮지 않는 것: 사람(관리자·AI)이 적은 목록(documentsFrom) · 자리표시가 아닌 목록을 가진 옛 등록분(사람이 읽어 적은 것 · 출처 표식이 없다).
+      로봇이 적은 목록(documentsFrom '공고 원문'·'공고문 첨부…')과 자리표시 한 줄만 든 목록만 다시 쓴다.
+   🔴 prepDoc(그대로 제출 가능)은 **자유 양식 근거 문장**이 원문에 있고 · 신청서 첨부가 없고 · 앱 양식·상시 제도가 아닐 때만 켠다 — 근거(prepDocBasis)는 원문 글자 그대로
+      (tools/admin-apply.mjs 의 짝 규칙과 같다). 관리자가 끈 것(prepDocFrom '관리자')은 다시 켜지 않는다. */
+const FORM_ATT_NAME = /신청서|지원서|원서|계획서|동의서|서약서/;
+function fillDocuments(it, body, docsFn) {
+  if (/^(관리자|AI)/.test(it.documentsFrom || '')) return;
+  const robotOwned = /^(공고 원문|공고문 첨부)/.test(it.documentsFrom || '');
+  if (!docsPlaceholderOnly(it.documents) && !robotOwned) return;
+  let got = body ? readDocuments(body) : { docs: [], basis: null };
+  let from = '공고 원문';
+  if (!got.docs.length) {
+    const texts = docsFn ? docsFn() : [];
+    for (let i = 0; i < texts.length; i += 1) {
+      const r = readDocuments(annexCut(texts[i]));
+      if (r.docs.length) { got = r; from = docLabel((texts.files || [])[i]); break; }
+    }
+  }
+  if (!got.docs.length) return;
+  gotDocs += 1;
+  if (!WRITE) { console.log(`   [서류 ${from}] ${it.id} → ${got.docs.join(' · ').slice(0, 120)}${got.basis ? `  ⟶ 자유 양식: ${got.basis.slice(0, 60)}` : ''}`); return; }
+  it.documents = got.docs;
+  it.documentsFrom = from;
+  const hasFormAtt = (it.attachments || []).some((at) => FORM_ATT_NAME.test(at.name || '') && /\.(hwp|hwpx|docx?|zip|pdf)/i.test(at.name || ''));
+  if (got.basis && !hasFormAtt && !it.formId && !it.program && !/^관리자/.test(it.prepDocFrom || '')) {
+    if (it.prepDoc !== true || it.prepDocBasis !== got.basis.slice(0, 300)) {
+      it.prepDoc = true; it.prepDocBasis = got.basis.slice(0, 300); it.prepDocFrom = `로봇 ${from}`;
+    }
+    gotFree += 1;
+  } else if (it.prepDoc && /^로봇/.test(it.prepDocFrom || '') && !got.basis) {
+    /* 로봇이 켰는데 지금 원문엔 근거가 없다 — 끈다(사람이 켠 것은 두 번째 조건으로 보호된다) */
+    delete it.prepDoc; delete it.prepDocBasis; delete it.prepDocFrom;
+  }
+}
+
 function main() {
 for (const it of reg.items) {
   if (it.program) continue;
@@ -1009,6 +1046,7 @@ for (const it of reg.items) {
     fillCalendarDates(it, () => openDateFromDocs(it, docs()), () => announceFromDocs(it, docs()));
     fillApplyEmail(it, null);          // 본문이 없으니 첨부에서만 — 본문 경로와 같은 함수
     fillApplyPortal(it, null);
+    fillDocuments(it, null, docs);     // 제출 서류 목록도 첨부에서 (2026-10-13 ④)
     kept += 1; continue;
   }
 
@@ -1062,6 +1100,8 @@ for (const it of reg.items) {
   fillCalendarDates(it,
     () => extractOpenDate(body) || openDateFromDocs(it, docs()),
     () => extractAnnounce(body) || announceFromDocs(it, docs()));
+  /* 제출 서류 목록 · 자유 양식 근거 — 본문 먼저, 못 읽으면 공고문 첨부 (2026-10-13 ④ · 규칙은 doc-list.mjs) */
+  fillDocuments(it, body, docs);
 
   /* 🔴 **AI가 다른 출처에서 읽은 자격은 건드리지 않는다** (2026-08-23).
      아래 `delete it.eligibilityLines`는 '원문은 읽었는데 못 뽑았다 → 낡은 발췌를 남기지 않는다'는
@@ -1117,6 +1157,7 @@ console.log(`자격을 공고문 첨부에서 읽은 공고 ${fromDoc}건 · 제
 console.log(`마감일을 새로 읽은 공고 ${gotDeadline}건 (그중 공고문 첨부에서 ${dlFromDoc}건)`);
 console.log(`접수 메일 주소를 새로 읽은 공고 ${gotApplyEmail}건 · 지금 규칙으로 접수처가 아니라 걷은 공고 ${droppedApplyEmail}건`);
 console.log(`포털 신청 시스템을 새로 읽은 공고 ${gotApplyPortal}건`);
+console.log(`제출 서류 목록을 읽은 공고 ${gotDocs}건 · 그중 자유 양식 근거로 앱 지원문서를 그대로 낼 수 있는 공고 ${gotFree}건`);
 console.log(`접수 시작일 ${gotOpen}건 · 발표일 ${gotAnnounce}건 (캘린더용 — 원문에 있을 때만)`);
 if (WRITE) {
   fs.writeFileSync(regPath, JSON.stringify(reg, null, 1) + '\n');

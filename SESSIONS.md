@@ -24,7 +24,7 @@
 - **리뷰(서브에이전트)로 고친 것**: 일괄 준비가 `formId` 만 봐서 107건을 문서 없이 '준비 완료'로 담던 것(`bulkNeedsWork` → `formTplIdFor`) · 머리말 순서를 접수 방법(메일·포털) > 첨부로(`submitChannelKind` 와 같은 결정) · Node 다리(`form-engine-node.mjs`)가 data.js 를 실어 첨부 판정을 브라우저와 같은 갈래로 · 메일 머리말·모름 토스트 문구.
 - **관문**: `test-collector` 「공고별 지원문서」·「등록 첨부 고르기」· 밀린 첨부 · PDF 신청서 이름 · `verify-apply-prep.js` 층1 블록을 새 흐름(질문 화면 → 문서 → 확인)으로 다시 썼다.
   통과: test-collector · audit-data · form-snapshot(문서 56종 동일) · verify-apply-prep · verify-forms-data · verify-new-forms · verify-kosaf · verify-registered.
-- **남은 것**(설계 문서 §6): 층2(KOSAF)에도 지원문서를 붙일지(지금은 준비 시트) · 공고문 뒷장 서식 쪽 떼어 PDF 로(층2 37곳) · 준비 체크리스트 화면(준비 중 n/4) · 제출 서류 목록 로봇(documents 채우기 → prepDoc 근거).
+- **같은 날 밤 — 남은 것 넷 착수**(개발자 *"남은 것 모두 진행해"* · 설계 문서 §7): ④ 제출 서류 목록 로봇(`collector/doc-list.mjs` · 발췌기 `fillDocuments` · dry-run 112건) · ② 공고문 뒷장 서식 쪽 떼기(`collector/form-pages.mjs` · deep-fetch 보강 단계 · `data/form-pages/` · 로컬 PDF 46개 중 서식 쪽 7) · ① 층2 지원문서(`kosafAsScholarships` → `attachPrepTemplate` · 머리말 kosaf · CLAUDE.md 층2 줄) · ③ 준비 체크리스트(`prepChecklist`·`prepStateLabel` 한 벌 · 준비 중 n/4 · 상세 시트 「확인했어요」). 관문 넷 추가 · `verify-apply-prep` ④⑤ 재작성.
 
 ## 2026-10-12 — 알림 재발 수리: "앱을 켜야만 알림이 온다" (개발자 지시 *"클라우드 플레어 문제를 분석하고 … 다시는 이런 일이 발생하지 않게"*)
 

@@ -77,12 +77,22 @@ jobs:
           sudo apt-get install -y -qq libreoffice-writer libreoffice-core libreoffice-java-common fonts-nanum   # java-common: HWP 확장이 자바라 없으면 조용히 '못 읽음'
           bash collector/install-h2orestart.sh
           node collector/form-pdf.mjs
+      # 공고문 뒷장의 신청서 서식 쪽 떼기 (2026-10-13 · collector/form-pages.mjs) — 층1 공고문 첨부 + 층2 재단 공고문 사본의 서식 쪽만 떼어 data/form-pages/ 에.
+      # 보강 단계(시한 + continue-on-error) · poppler-utils 는 위 PDF 글자 단계가 깔았다(여기서 한 번 더 — 그 단계가 실패했을 수 있다) · HWP·HWPX 는 위 단계의 LibreOffice+확장을 쓴다.
+      - name: 공고문 뒷장 서식 쪽 떼기
+        timeout-minutes: 6
+        continue-on-error: true
+        run: |
+          sudo apt-get install -y -qq poppler-utils
+          node collector/form-pages.mjs
       - run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add collector/extracted
           [ -d data/forms-pdf ] && git add -A data/forms-pdf
           [ -f collector/form-pdf-report.md ] && git add collector/form-pdf-report.md
+          [ -d data/form-pages ] && git add -A data/form-pages
+          [ -f collector/form-pages-report.md ] && git add collector/form-pages-report.md
           if ! git diff --cached --quiet; then
             git commit -m "deepfetch: notice texts + form originals"
             pushed=0

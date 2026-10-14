@@ -608,6 +608,8 @@ function prepHasFormAttachment(sch) {
       첨부 신청서는 어느 갈래든 질문 화면 머리(prepOriginalsHtml)가 따로 보여 준다. */
 function prepKindFor(sch) {
   if (sch.prepDoc) return 'free';
+  /* 층2(한국장학재단이 아는 재단 장학금 · 2026-10-13 ①) — 재단이 직접 받는다. 첨부는 선발 공고문이지 신청서가 아니고, 접수 방법은 공고문·재단 홈페이지가 말한다 */
+  if (sch.sourceKind === 'kosaf') return 'kosaf';
   if (sch.applyEmail) return 'email';
   if (sch.applyPortal) return 'portal';
   if (prepHasFormAttachment(sch)) return 'attached';
@@ -619,6 +621,7 @@ const PREP_TAGS = {
   portal: '※ 이 공고는 포털·온라인 입력으로 접수합니다 — 아래는 입력 칸에 붙여 넣을 답을 정리한 문서이고, 이 문서 자체를 내는 것은 아닙니다.',
   email: '※ 이 공고는 메일로 접수합니다 — 아래는 보낼 내용을 정리한 문서이고, 공고가 정한 서식·서류에 옮겨 적어 보내세요(이 문서 자체를 보내는 것은 아닙니다).',
   unknown: '※ 이 공고에서 첨부된 신청서 양식을 찾지 못했습니다 — 아래 문서로 내용을 준비하고, 제출 전 원문에서 양식·접수 방법을 확인하세요.',
+  kosaf: '※ 한국장학재단이 아는 재단 장학금입니다 — 접수 방법과 서식은 재단의 선발 공고문(또는 재단 홈페이지)이 정합니다. 아래는 그때 옮겨 적을 내용을 정리한 문서이고, 이 문서 자체를 내는 것은 아닙니다.',
 };
 /* 화면 머리줄용 짧은 말 — 긴 tag 는 문서 위에, 이것은 작성 화면 둘째 줄에 */
 const PREP_LEADS = {
@@ -627,6 +630,7 @@ const PREP_LEADS = {
   portal: '포털 입력 칸에 붙여 넣을 답을 정리합니다',
   email: '메일 접수 공고 — 공고가 정한 서식에 옮겨 적을 내용을 정리합니다',
   unknown: '내용을 먼저 준비합니다 — 양식·접수 방법은 제출 전 원문에서 확인',
+  kosaf: '재단 접수 공고 — 선발 공고문의 서식·방법에 맞춰 옮겨 적을 내용을 정리합니다',
 };
 /* 지원 자격 줄 → 학생이 스스로 확인하는 체크 항목(판정이 아니다 · 너무 긴 줄·조각 줄은 뺀다 · 여섯 줄까지) */
 function prepEligOptions(sch) {
@@ -641,7 +645,7 @@ function prepEligOptions(sch) {
 }
 function prepSubmitNote(sch) {
   const kind = prepKindFor(sch);
-  const where = { free: '공고의 접수처', attached: '원본 양식을 채워 공고의 접수처', portal: '공고가 안내한 포털·온라인 입력', email: `메일 ${sch.applyEmail || ''}`.trim(), unknown: '원문 공고의 접수 방법' }[kind];
+  const where = { free: '공고의 접수처', attached: '원본 양식을 채워 공고의 접수처', portal: '공고가 안내한 포털·온라인 입력', email: `메일 ${sch.applyEmail || ''}`.trim(), unknown: '원문 공고의 접수 방법', kosaf: '재단 선발 공고문·홈페이지가 정한 접수 방법' }[kind];
   const due = sch.deadline ? `마감 ${sch.deadline}` : '마감은 원문 확인';
   return `${where} · ${due} · 학교·재단에 실제로 접수되는 것은 아니며 제출은 학생이 직접 합니다.`;
 }

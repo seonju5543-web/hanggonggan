@@ -174,6 +174,7 @@ self.addEventListener('fetch', (e) => {
   if (/\/data\/kosaf-files\//.test(url.pathname)) return;
   /* 신청서 원본 PDF 사본(data/forms-pdf/ · 2026-10-13)도 같은 이유로 — 새 탭으로 여는 PDF 는 navigate 라 index.html 이 대신 나간다 */
   if (/\/data\/forms-pdf\//.test(url.pathname)) return;
+  if (/\/data\/form-pages\//.test(url.pathname)) return;   // 공고문에서 뗀 서식 쪽(2026-10-13)
 
   /* 화면 자체 */
   if (e.request.mode === 'navigate') {

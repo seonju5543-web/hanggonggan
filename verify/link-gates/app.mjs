@@ -190,7 +190,7 @@ export default async function gate(eq, ctx) {
   vm.runInContext([
     T.one('ENTITIES'), T.one('ENTITY_RE'), T.one('PARTIAL_ENTITY_END'), T.one('hintText'), T.one('NEWS_THUMB_RE'), T.one('SCHOOL_PHOTO_RE'), T.one('PHOTO_FOCUS_RE'), T.one('CLOSED_KEEP_DAYS'),
     T.one('KOSAF_ELIG'), T.one('kosafClean'), T.one('KOSAF_AMOUNT_UNKNOWN'), T.one('TD_DAY'), T.one('TD_DAY_RE'), T.one('TD_DAY_G'), T.fn('isDateBit'), T.fn('splitTitleDates'),
-    ...['esc', 'unent', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'kosafAsScholarships',
+    ...['esc', 'unent', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'attachPrepTemplate', 'kosafAsScholarships',   // attachPrepTemplate: 층2 지원문서(2026-10-13 ①) — FORM_TEMPLATES 가 없는 자리에선 그대로 돌려준다
       'sourceLinkHintHtml', 'attachmentLinkHtml', 'sourceLinkHtml', 'sourceNoteHtml', 'amountSourceLinkHtml',
       'appLogLinkHtml', 'hintShort', 'shortDay', 'noticeCardHtml', 'activityLinkHtml'].map(T.fn),   // shortDay — 카드 수집 날짜를 「10.08」로 (2026-10-10)   // hintShort — 카드 회색 기간 줄(2026-10-04)
     /* kosafAsScholarships 가 읽는 앱 상태 — 저장·신청 내역은 없다(마감 지난 것도 전부 그린다 · 아래 dday 덮어쓰기) */

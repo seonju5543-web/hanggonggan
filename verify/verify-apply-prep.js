@@ -130,7 +130,8 @@ async function swipeDown(page, sel) {
     const score = (s) => (s.documents.some((d) => PH.test(d)) ? 4 : 0) + (s.sourceUrl ? 2 : 0) + (hasFormAtt(s) ? 0 : 1);
     const A = l1.slice().sort((a, b) => score(b) - score(a))[0] || null;
     const B = l1.find((s) => s !== A && hasFormAtt(s)) || null;
-    const l2 = live.filter((s) => s.sourceKind === 'kosaf' && !formTplIdFor(s) && !essayDefsFor(s).length);
+    /* 층2도 2026-10-13 부터 앱 지원문서가 붙는다(① · 머리말 'kosaf') — 대상은 그 문서가 붙은 것 */
+    const l2 = live.filter((s) => s.sourceKind === 'kosaf' && s.prepFormId && formTplIdFor(s) === s.prepFormId);
     const C = l2.find((s) => (s.attachments || []).length) || l2[0] || null;
     const F = live.find((s) => formTplIdFor(s)) || null;
     const brief = (s) => s && ({ id: s.id, name: s.name.slice(0, 40), src: !!s.sourceUrl,
@@ -231,7 +232,14 @@ async function swipeDown(page, sel) {
         eq('  다시 열면 버튼이 「신청 준비 완료됨」 으로 잠긴다', await page.evaluate(() => {
           const b = document.querySelector('#btn-apply-one');
           return b && { label: b.textContent.trim(), disabled: b.disabled };
-        }), { label: '신청 준비 완료됨', disabled: true });
+        }), { label: '준비 중 1/4 — 아래 체크리스트', disabled: true });   /* 문서는 썼고(1/4) 서류·증명서·제출 방법 확인이 남았다 (2026-10-13 ③ 체크리스트) */
+        eq('  준비 체크리스트가 보이고, 「확인했어요」를 누르면 2/4 가 된다', await page.evaluate(async () => {
+          const li = document.querySelectorAll('#detail-sheet .prep-check li').length;
+          const b = document.querySelector('#detail-sheet [data-prep-toggle="docs"]');
+          if (!b) return { li, btn: 'no-toggle' };
+          b.click(); await new Promise((r) => setTimeout(r, 300));
+          return { li, btn: document.querySelector('#btn-apply-one').textContent.trim() };
+        }), { li: 4, btn: '준비 중 2/4 — 아래 체크리스트' });
         await page.keyboard.press('Escape');
         await closedAfter(500);
       }
@@ -264,32 +272,30 @@ async function swipeDown(page, sel) {
     }
   }
 
-  /* ══ ⑤ 층2(한국장학재단 목록) — 같은 흐름 ═════════════════════════════════ */
-  console.log('\n■ ⑤ 층2 공고도 시트를 먼저 띄운다 · 첨부는 「선발 공고문」 이다');
-  eq('마감 전 · 서류 도우미 없음 · 미신청인 층2 공고가 있다 (없으면 이 검사는 무의미하다)', !!pick.C, true);
+  /* ══ ⑤ 층2(한국장학재단 목록) — 질문 화면이 먼저 · 첨부는 「선발 공고문」 (2026-10-13 ① 층2 지원문서) ═════ */
+  console.log('\n■ ⑤ 층2 공고도 지원문서 질문 화면을 먼저 띄운다 · 첨부는 「선발 공고문」 이다');
+  eq('마감 전 · 미신청인 층2 공고(지원문서 붙음)가 있다 (없으면 이 검사는 무의미하다)', !!pick.C, true);
   if (pick.C) {
     console.log(`  · 대상: ${pick.C.name} (${pick.C.id})`);
     await open(pick.C.id);
-    const r = await pressApply();
-    eq('  누르면 신청 준비 시트(#apply-prep)가 뜬다', r.prep, true);
+    const r = await pressApplyForm();
+    eq('  누르면 지원문서 질문 화면(#btn-ff-generate)이 뜬다 — 빈 준비 시트가 아니다', [r.form, !!(await page.$('#apply-prep'))], [true, false]);
     eq('  🔴 그 순간 신청내역에 없다', await appsOf(pick.C.id), { mem: [], disk: [] });
-    if (r.prep) {
+    if (r.form) {
       const c = await page.evaluate(() => {
-        const root = document.querySelector('#apply-prep');
+        const root = document.querySelector('#detail-sheet');
         return {
+          lead: root.querySelector('.sheet-provider').textContent,
           heads: [...root.querySelectorAll('h4')].map((h) => h.textContent.replace(/\s+/g, ' ').trim()),
-          boxed: [...root.querySelectorAll('li')].map((l) => l.textContent.trim()).filter((t) => t.startsWith('□')),
           /* KOSAF 첨부 원주소는 Referer 검사라 학생이 못 받는다 (verify-kosaf 와 같은 규칙) */
           kosafDl: [...root.querySelectorAll('a')].filter((a) => /kosaf\.go\.kr.*(download|fileDown|atchFile)/i.test(a.href)).length,
-          guide: root.querySelectorAll('.guide-list li').length,
         };
       });
+      eq('  둘째 줄이 재단 접수(선발 공고문의 서식·방법)를 말한다', /재단 접수|선발 공고문/.test(c.lead), true);
       /* 🔴 재단 첨부는 선발 공고문이다 — '신청서 양식'이라 부르면 학생이 그 안에서 빈칸을 찾는다 */
-      eq('  「신청서 양식」 이라고 부르지 않는다', c.heads.some((h) => h.startsWith('신청서 양식')), false);
+      eq('  「원본 신청서 양식」 이라고 부르지 않는다', c.heads.some((h) => h.startsWith('원본 신청서 양식')), false);
       if (pick.C.atts) eq('  첨부 머리가 「선발 공고문」 이다', c.heads.some((h) => h.startsWith('선발 공고문')), true);
       else console.log('  · 첨부가 있는 층2 공고가 지금 없어 머리 이름 항목은 건너뜀');
-      eq('  「최종 제출 방법」 과 안내 줄이 있다', c.heads.some((h) => h.startsWith('최종 제출 방법')) && c.guide >= 1, true);
-      eq('  「재단 공고문에서 확인」 안내 줄을 □ 항목으로 올리지 않는다', c.boxed.filter((t) => PLACEHOLDER_RE.test(t)), []);
       eq('  KOSAF 첨부 내려받기 원주소가 없다', c.kosafDl, 0);
 
       /* ══ ⑥-b ESC 로 닫아도 담기지 않는다 ══ */

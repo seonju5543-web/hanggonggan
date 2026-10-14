@@ -207,3 +207,15 @@ C 는 "별도 양식 없이 자기소개서(또는 학업계획서·신청 사�
 4. **제출 서류 목록 로봇**(§3-1) — `documents` 를 채우고 자유 양식 근거로 `prepDoc` 을 켠다 → 머리말이 'free' 가 되는 공고가 생긴다.
 5. 일괄 준비 — 앱 문서가 있는 공고는 전부 '서류 작성 필요'로 담긴다(`bulkNeedsWork` 가 `formTplIdFor` 를 본다 · 리뷰에서 잡음). 상시 제도(국가장학금 등 · 문서 없음)만 '바로 준비 가능'. 신청내역에서 다음 할 일 순서로 보여 주는 것은 3 과 함께.
 6. 리뷰(서브에이전트)가 잡아 같은 날 고친 것: 일괄 준비의 빈 '준비 완료' · 밀린 첨부에 빈 신청서 파일이 섞이는 것 · 머리말 순서(접수 방법 > 첨부 · `submitChannelKind` 와 같은 결정) · Node 다리가 data.js 를 안 실어 첨부 판정이 검사 밖이던 것 · 메일 머리말·모름 토스트 문구.
+
+## 7. 남은 것 넷 착수 (2026-10-13 밤 · 개발자 *"남은 것 모두 진행해"*)
+
+| 조각 | 무엇 | 어디 · 관문 |
+|---|---|---|
+| ④ 제출 서류 목록 로봇 | 원문의 「제출서류」 절을 서류 이름으로 `documents` 에(원문 글자 그대로 · 자리표시만 든 목록과 로봇이 적은 목록만 덮는다) · 「자유 양식」 문장이 작성형 서류와 함께 있고 신청서 첨부가 없으면 `prepDoc` + 근거(`prepDocBasis` · `prepDocFrom 로봇`) | `collector/doc-list.mjs`(순수) · `extract-excerpts.mjs fillDocuments` · 관문 「제출 서류 목록」. dry-run: 마감 전·후 등록분에서 서류 목록이 생기는 공고 112건 · 자유 양식 근거 2건(둘 다 신청서 첨부가 있어 prepDoc 은 안 켠다 — 자기소개서만 자유, 신청서는 재단 양식) |
+| ② 공고문 뒷장 서식 쪽 | 층1 공고문 첨부·층2 재단 공고문 사본의 쪽 글자를 읽어 서식 쪽(별지 머리·서명란·인적사항 표·체크 칸)만 떼어 `data/form-pages/<id>/` + `index.json` · HWP·HWPX 는 LibreOffice(+H2Orestart)로 PDF 를 만들어 본다(클라우드 단계에만 확장이 있다) · 질문 화면 머리에 「공고문 안 신청서 서식 (n~m쪽)」 | `collector/form-pages.mjs` · `deep-fetch.yml` 보강 단계 · `app.js loadFormPagesIndex`·`prepOriginalsHtml` · 관문 「공고문 뒷장 서식 쪽 떼기」. 로컬 dry-run(PDF 만 · 46파일 406쪽): 서식 쪽이 있는 PDF 7(층1 2 · 층2 5) — HWP 33·HWPX 16 은 클라우드 첫 실행 리포트(`collector/form-pages-report.md`)에서 본다 |
+| ① 층2 지원문서 | `kosafAsScholarships` 가 항목마다 `attachPrepTemplate` · 머리말 `kosaf`(접수는 선발 공고문이 정한다 · 이 문서 자체를 내는 것은 아니다) · 질문 화면 머리는 「선발 공고문」(신청서라 부르지 않는다) + 뗀 서식 쪽 | `forms.js prepKindFor` · CLAUDE.md 「층2」 줄 개정 · `verify-apply-prep.js` ⑤ 재작성 · 관문 「공고별 지원문서」 kosaf 줄 |
+| ③ 준비 체크리스트 | 네 항목(제출 서류 확인 · 서류 작성 · 증명서 준비 · 제출 방법 확인) — 작성·증명서는 앱이 자동으로, 나머지는 학생이 상세 시트에서 「확인했어요」 · 상태 낱말 '준비 중 n/4' 를 카드 배지·신청내역 막대·상세 버튼·요약이 **같은 함수**(`prepStateLabel`·`prepChecklist`)로 · `pending`(작성 남음)의 뜻은 그대로 | `app.js PREP_ITEMS` · 관문 「신청 준비 체크리스트」 · `verify-apply-prep.js` ④(문서 확인 뒤 '준비 중 1/4' → 토글 '2/4') |
+
+- 화면 모양은 기존 요소(doc-list · link-btn · channel-tag)만 썼다 — 새 색·새 글자 크기 없음(ui-tone 관문). 시안은 개발자가 "컨펌 불필요"라 했지만 화면을 보시고 바꾸실 수 있다(`verify-apply-prep` 가 문구를 잠근다).
+- 다음: 클라우드 첫 실행 뒤 ② 리포트의 HWP 변환 건수 · ④ `--write` 가 실린 `documents`/`prepDoc` 건수를 리포트로 · 층2 지원문서 사용 실측.
