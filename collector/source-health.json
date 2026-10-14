@@ -2,73 +2,76 @@
  "https://dep.hufs.ac.kr/student/12769/subview.do": {
   "name": "한국외국어대학교 대외활동·공모전 「학생활동」",
   "fails": 0,
-  "lastOk": "2026-10-13"
+  "lastOk": "2026-10-14"
  },
  "https://www.hufs.ac.kr/hufs/11302/subview.do": {
   "name": "한국외국어대학교 대외활동·공모전 「진로·취업」",
-  "fails": 6,
+  "fails": 7,
   "lastOk": null,
   "why": "🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요"
  },
  "https://isss.khu.ac.kr/globalcenter/user/bbs/BMSR00040/list.do?menuNo=7900041": {
   "name": "경희대학교 대외활동·공모전 「취업/경력」",
-  "fails": 6,
+  "fails": 7,
   "lastOk": null,
   "why": "🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요"
  },
  "https://goodjob.khu.ac.kr/bbs/board.php?bo_table=s2_5": {
   "name": "경희대학교 대외활동·공모전 「사회진출 프로그램 공지」",
-  "fails": 6,
+  "fails": 7,
   "lastOk": null,
   "why": "🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요"
  },
  "https://youth.seoul.go.kr/bbs/list.do?key=2303300002": {
   "name": "서울시 청년몽땅정보통 대외활동·공모전",
-  "fails": 6,
+  "fails": 7,
   "lastOk": null,
-  "why": "🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요"
+  "why": "⛔ 응답이 멈춰 1분 30초에서 강제 중단 — 여기까지 주운 공고만 저장합니다"
  },
  "https://www.k-startup.go.kr/web/main/mainSection0.do": {
   "name": "창업진흥원 K-Startup 대외활동·공모전",
   "fails": 0,
-  "lastOk": "2026-10-13"
+  "lastOk": "2026-10-14"
  },
  "https://www.korea.kr/etc/byulBeforeList.do": {
   "name": "대한민국 정책브리핑 이벤트·공모 대외활동·공모전",
-  "fails": 0,
-  "lastOk": "2026-10-13"
+  "fails": 1,
+  "lastOk": "2026-10-13",
+  "why": "⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요"
  },
  "https://youth.gg.go.kr/gg/intro/notice.do": {
   "name": "경기청년포털 대외활동·공모전",
   "fails": 0,
-  "lastOk": "2026-10-13"
+  "lastOk": "2026-10-14"
  },
  "https://kov.koica.go.kr/ho/cobb/ovhHoCobbBbsNormalList.do?menuId=MENU0000000000000162&bbsSn=1004": {
   "name": "KOICA 봉사단 대외활동·공모전",
-  "fails": 6,
+  "fails": 7,
   "lastOk": null,
   "why": "🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요"
  },
  "https://www.niied.go.kr/web/main/nid/niied_board/list": {
-  "name": "국립국제교육원 공지",
-  "fails": 0,
-  "lastOk": "2026-10-14"
+  "name": "국립국제교육원 대외활동·공모전",
+  "fails": 1,
+  "lastOk": "2026-10-14",
+  "why": "⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요"
  },
  "https://www.culture.go.kr/portal/cltBnf/cltSup/list.do?menuNo=200104": {
   "name": "문화포털 문화지원사업 대외활동·공모전",
-  "fails": 4,
+  "fails": 5,
   "lastOk": "2026-10-12",
   "why": "🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요"
  },
  "https://culture.seoul.go.kr/culture/bbs/B0000014/list.do?menuNo=200118": {
   "name": "서울문화포털 공모소식 대외활동·공모전",
   "fails": 0,
-  "lastOk": "2026-10-13"
+  "lastOk": "2026-10-14"
  },
  "https://young.busan.go.kr/jprog/list.nm": {
   "name": "부산청년플랫폼 대외활동·공모전",
-  "fails": 0,
-  "lastOk": "2026-10-13"
+  "fails": 1,
+  "lastOk": "2026-10-13",
+  "why": "⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요"
  },
  "https://youth.incheon.go.kr/bbs/bbsMsgList.do?bcd=notice": {
   "name": "인천유스톡톡 청년포털 대외활동·공모전",

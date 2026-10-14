@@ -1,8 +1,26 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-10-14",
- "count": 1883,
+ "count": 1886,
  "items": [
+  {
+   "title": "(강릉.원주) 2026. 2학기 도전장학금 신청 안내",
+   "url": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2518&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "attachments": [
+    {
+     "name": "신청서 및 개인정보제공동의서(2026.2학기 도전장학금).hwp chevron_forward",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261014102411007.hwp&path=/bbs/34&fn=%EC%8B%A0%EC%B2%AD%EC%84%9C%20%EB%B0%8F%20%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4%EC%A0%9C%EA%B3%B5%EB%8F%99%EC%9D%98%EC%84%9C(2026.2%ED%95%99%EA%B8%B0%20%EB%8F%84%EC%A0%84%EC%9E%A5%ED%95%99%EA%B8%88).hwp"
+    },
+    {
+     "name": "(포스터) 2026. 2학기 도전장학금 신청 안내.png chevron_forward",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261014102420825.png&path=/bbs/34&fn=(%ED%8F%AC%EC%8A%A4%ED%84%B0)%202026.%202%ED%95%99%EA%B8%B0%20%EB%8F%84%EC%A0%84%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4.png"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "강원대학교",
+   "campus": "",
+   "foundAt": "2026-10-14"
+  },
   {
    "title": "[교외] 2026년 하반기 은평구민 장학생 선발 공고",
    "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/273635/artclView.do",
@@ -333,6 +351,56 @@
    "attachments": [],
    "deadlineHint": null,
    "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-14"
+  },
+  {
+   "title": "[장학안내] 2026학년도 2학기 국가근로장학금 일반유형 추가 신청기간 운...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70666&cate=8",
+   "attachments": [
+    {
+     "name": "교육기본시설/부속시설",
+     "url": "https://www.jnu.ac.kr/MainIntro/Institution/AttachedFac"
+    },
+    {
+     "name": "2026년 2학기 국가근로장학금 일반유형(추가) 학생신청 매뉴얼 (1).pdf",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2586558"
+    },
+    {
+     "name": "2026년 2학기 국가근로장학금 일반유형(추가) 학생신청 매뉴얼 (2).pdf",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2586559"
+    }
+   ],
+   "deadlineHint": "신청기간 운영 안내 문의전화(연락처) 1599-2290 작성일 2026.10.14 09:40 조회 250 첨부파일 #1 2026년 2학기 국가근",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-14",
+   "bodyDeadline": "2026-10-29",
+   "bodyDeadlineText": "3. 신청요건: 2026학년도 2학기 한국장학재단 국가장학금 1, 2차를 통합신청하여 학자금 지원구간이 산정된 학생 4. 신청기간: '26. 10. 21.(수) 09:00 ~ 10. 29.(목) 18:00"
+  },
+  {
+   "title": "[장학안내] 2027년도 두산연강재단 대학장학생 선발 안내",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70672&cate=8",
+   "attachments": [
+    {
+     "name": "교육기본시설/부속시설",
+     "url": "https://www.jnu.ac.kr/MainIntro/Institution/AttachedFac"
+    },
+    {
+     "name": "1. 2027년도 두산연강재단 장학생 선발 공고문.pdf",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2586574"
+    },
+    {
+     "name": "2. 자주 묻는 질문(Q&amp;A).pdf",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2586575"
+    },
+    {
+     "name": "3. 추천서(재단 양식).docx",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2586576"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "전남대학교",
    "campus": "",
    "foundAt": "2026-10-14"
   },

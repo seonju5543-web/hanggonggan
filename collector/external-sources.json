@@ -164,7 +164,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-09-30",
+    "checkedAt": "2026-10-14",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://www.kwangsankim.co.kr/",
@@ -175,12 +175,17 @@
   {
    "host": "전주인재육성재단",
    "home": "https://www.jinjae.kr/",
-   "boardUrl": null,
+   "boardUrl": "https://www.jinjae.kr/main/",
    "seed": "kosaf-open",
-   "probe": {
-    "checkedAt": "2026-09-30",
-    "why": "홈페이지 못 엶 (The operation was aborted due to timeout)",
-    "best": null
+   "autoFound": {
+    "date": "2026-10-14",
+    "signals": 4,
+    "menu": "(홈)",
+    "sample": [
+     "후원신청 지역발전은 지역장학생 후원에서 시작됩니다. [전북은행] 520-13-0354187 바로가기",
+     "02 2024.02 장학금 지급 신청서 장학금 지급 신청서 양식",
+     "02 2024.02 장학생 신청서 장학생 신청서 양식"
+    ]
    }
   },
   {
@@ -189,7 +194,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-09-30",
+    "checkedAt": "2026-10-14",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://injae.gwd.go.kr/",
@@ -203,8 +208,8 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-09-30",
-    "why": "홈페이지 못 엶 (fetch failed)",
+    "checkedAt": "2026-10-14",
+    "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
     "best": null
    }
   },
@@ -214,12 +219,9 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-09-30",
-    "why": "최고 0건 ((홈))",
-    "best": {
-     "url": "https://www.ewp.co.kr/kor/main/",
-     "signals": 0
-    }
+    "checkedAt": "2026-10-14",
+    "why": "홈페이지 못 엶 (TypeError: ECONNRESET)",
+    "best": null
    }
   },
   {
@@ -228,8 +230,8 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-09-30",
-    "why": "홈페이지 못 엶 (fetch failed)",
+    "checkedAt": "2026-10-14",
+    "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
     "best": null
    }
   },
@@ -255,20 +257,25 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-09-30",
-    "why": "홈페이지 못 엶 (fetch failed)",
+    "checkedAt": "2026-10-14",
+    "why": "홈페이지 못 엶 (TypeError: ENOTFOUND)",
     "best": null
    }
   },
   {
    "host": "재단법인 울산연구원",
    "home": "https://uill.uri.re.kr/",
-   "boardUrl": null,
+   "boardUrl": "https://uill.uri.re.kr/",
    "seed": "kosaf-open",
-   "probe": {
-    "checkedAt": "2026-09-30",
-    "why": "홈페이지 못 엶 (fetch failed)",
-    "best": null
+   "autoFound": {
+    "date": "2026-10-14",
+    "signals": 5,
+    "menu": "(홈)",
+    "sample": [
+     "사항 2026년 하반기 장학생 추가공고(지역정착청년인재장학금) 안내",
+     "사항 2026년 하반기 장학생 선발 안내",
+     "--> > 타기관소식 변경 --> 경영공시 [한국장학재단] 2027년 부터 달라지는 \"학자금 지원구간\" --> 타기관소식 [한국장학재단] 2027년 부터 달라지는 \"학자금 지원구간\""
+    ]
    }
   },
   {

@@ -13415,11 +13415,11 @@
    "kindConfidence": "high",
    "kindFrom": "로봇(원문) 2026-10-14",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
-   "deadline": null,
+   "amount": "50만원",
+   "amountValue": 500000,
+   "deadline": "2026-08-12",
    "listedAt": "2026-10-14",
-   "period": "접수 기간 원문 확인",
+   "period": "접수 기간 ~2026-08-12",
    "summary": "중앙대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
@@ -13434,7 +13434,38 @@
    "auto": true,
    "attachments": [],
    "sourceUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30000&pageNo=2",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "deadlineFrom": "공고 원문",
+   "openDate": "2026-07-13",
+   "eligibilityLines": [
+    "- 본인: 교육지원 대상자 증명서",
+    "- 북한이탈주민: 교육보호대상자 증명서 및 고졸 학력인정 증빙서류",
+    "- 합격확인서",
+    "- 국가고시반 지도교수 확인서 (1차 합격자만 해당)",
+    "- 가족관계증명서",
+    "( 부 또는 모 명의 발급)",
+    "① 중앙나래장학금 신청서",
+    "② 개인정보보호수집이용 동의서",
+    "③ 수혜받은 외부장학금 모집요강",
+    "④ 수혜금액을 확인할 수 있는 증빙자료",
+    "( ③,④ 항목은 학생지원팀을 경유하지 않은 장학금 수혜 대상자만 제출함)",
+    "2026.7.13.( 월) 10시 ~ 8.12(수) 15시까지",
+    "※ 2026-2학기 등록금 고지감면을 위한 신청기간이며2026. 12. 31.까지 포털을 통해 신청가능. 단, 보훈장학금은 2026.9.23.까지 학생지원팀으로 신청하여야만 수혜가 가능함.",
+    "※ 본 공고일 이후부터 2026-2학기 기말시험기간이전(2026.12.21.까지)까지 합격자 발표가 나는 국가시험은 별도의 장학금 신청공고가 없으며, 본 공지사항으로 갈음함."
+   ],
+   "excerpts": [
+    "※ 2026-2학기 등록금 고지감면을 위한 신청기간이며2026."
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 500000,
+    "ratio": 0,
+    "min": 500000,
+    "max": 500000,
+    "raw": "지급액 수업료의 50% 이상 50 만원 수업료의 50% 미만 ~ 30 만원 이상 30 만원 - 등록금 범위 초과 지원하는 생활비성 장학금임 - 동일학기 다수 기관 중복수혜자의 경우 최대 장학금 지원기관 기준 1회만 지원"
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-qlmjzmaw5kv29yzcuzrcuyng-0icq1ql",
@@ -13479,6 +13510,43 @@
     "접수 방법: 두산연강재단 홈페이지(www.yonkang.org)를 통한 온라인 신청"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-archgbn0searchordersort0-0xe0ymd",
+   "name": "(강릉.원주) 2026. 2학기 도전장학금 신청 안내",
+   "boardTitle": "(강릉.원주) 2026. 2학기 도전장학금 신청 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "교내 증거 없음 — 기본값"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-10-14",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-10-14",
+   "period": "접수 기간 원문 확인",
+   "summary": "강원대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "강원대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-14 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "신청서 및 개인정보제공동의서(2026.2학기 도전장학금).hwp chevron_forward",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261014102411007.hwp&path=/bbs/34&fn=%EC%8B%A0%EC%B2%AD%EC%84%9C%20%EB%B0%8F%20%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4%EC%A0%9C%EA%B3%B5%EB%8F%99%EC%9D%98%EC%84%9C(2026.2%ED%95%99%EA%B8%B0%20%EB%8F%84%EC%A0%84%EC%9E%A5%ED%95%99%EA%B8%88).hwp"
+    }
+   ],
+   "sourceUrl": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2518&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "sourceKind": "auto"
   }
  ]
 }
