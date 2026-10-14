@@ -2172,13 +2172,16 @@ const PREP_ITEMS = [
   { key: 'submit', label: '제출 방법 확인', manual: true },
 ];
 function prepChecklist(app, sch) {
-  const manual = (app && app.prep) || {};
-  const needsWrite = !!(sch && (formTplIdFor(sch) || essayDefsFor(sch).length));
-  const written = !!(app && (app.formAns || (app.docs && app.docs.length)));
+  /* 🔴 체크리스트가 생기기 전에 담은 항목(`prep` 칸이 없다)은 그때 규칙대로 '준비 완료'다 — 새 규칙을 소급해 영영 '준비 중'에 가두지 않는다
+     (리뷰 2026-10-13: 옛 항목은 버튼이 잠겨 작성 항목을 채울 길이 없었다). 새로 담는 자리마다 `prep: {}` 를 적는다. */
+  const legacy = !app || app.prep === undefined;
+  const manual = legacy ? { docs: true, certs: true, submit: true } : (app.prep || {});
+  /* '작성'은 `pending`(서류 작성이 남았다)의 반대다 — 양식·자소서가 없는 공고는 담는 순간 pending:false 라 바로 ✓ */
+  const written = !!app && !app.pending;
   const certDocs = sch ? (sch.documents || []).filter((d) => !/자동/.test(d) && !DOC_PLACEHOLDER.test(d) && !ESSAY_DEFS.some((e) => e.match.test(d))) : [];
   const certsAuto = certDocs.length > 0 && certDocs.every((d) => { const st = docWalletStatus(d); return !!(st && st.ok); });
   const items = PREP_ITEMS.map((it) => {
-    if (it.key === 'write') return { ...it, done: !needsWrite || written, auto: true };
+    if (it.key === 'write') return { ...it, done: written, auto: true };
     if (it.key === 'certs') return { ...it, done: certsAuto || !!manual.certs, auto: certsAuto };
     return { ...it, done: !!manual[it.key], auto: false };
   });
@@ -2474,7 +2477,7 @@ function renderFormFill(restore) {
     $('#btn-ff-confirm').addEventListener('click', () => {
       const existing = state.applications.find((a) => a.id === sch.id);
       if (existing) { existing.pending = false; existing.formAns = formFill.ans; existing.appliedAt = nowStamp(); }
-      else state.applications.push({ id: sch.id, name: sch.name, appliedAt: nowStamp(), step: 0, formAns: formFill.ans, pending: false });
+      else state.applications.push({ id: sch.id, name: sch.name, appliedAt: nowStamp(), step: 0, formAns: formFill.ans, pending: false, prep: {} });
       saveState();
       const ch = officialChannel(sch);
       /* 문서의 성격대로 말한다 (리뷰 2026-10-13) — 모르는 공고에 '양식·입력 칸이 있다'고 단정하지 않는다 */
@@ -3732,7 +3735,7 @@ function finalizeApply(sch, docs) {
     existing.docs = docs;
     existing.appliedAt = nowStamp();
   } else {
-    state.applications.push({ id: sch.id, name: sch.name, appliedAt: nowStamp(), step: 0, docs, pending: false });
+    state.applications.push({ id: sch.id, name: sch.name, appliedAt: nowStamp(), step: 0, docs, pending: false, prep: {} });
   }
   saveState();
   const ch = officialChannel(sch);
@@ -4164,7 +4167,7 @@ function bulkStart() {
   }
   const need = go.filter(bulkNeedsWork);
   go.forEach((sch) => state.applications.push({
-    id: sch.id, name: sch.name, appliedAt: nowStamp(), step: 0, docs: null, pending: bulkNeedsWork(sch),
+    id: sch.id, name: sch.name, appliedAt: nowStamp(), step: 0, docs: null, pending: bulkNeedsWork(sch), prep: {},
   }));
   saveState();
   closeSheet();
@@ -4565,7 +4568,7 @@ function openDetail(id) {
           <ul class="doc-list doc-badged prep-check">${pc.items.map((it) => `
             <li>${it.done ? '<span class="doc-auto">✓</span>' : '<span class="doc-manual">□</span>'} ${esc(it.label)}${it.auto && it.done ? ' <span class="doc-legend">자동 확인</span>' : ''}${
               it.manual && !(it.auto && it.done) ? ` <button class="link-btn" data-prep-toggle="${it.key}">${it.done ? '되돌리기' : '확인했어요'}</button>` : ''}${
-              it.key === 'write' && !it.done ? ' <span class="doc-legend">위 버튼에서 이어서 작성</span>' : ''}</li>`).join('')}
+              it.key === 'write' && !it.done ? ' <span class="doc-legend">「서류 작성 이어서 하기」로</span>' : ''}</li>`).join('')}
           </ul>`;
         })()}
         <p class="applied-at">${app.appliedAt} ${prepChecklist(app, sch).complete || step > 0 ? '준비 완료' : '신청내역에 담김 · 준비 중'} · 최종 제출처: ${ch.url ? `<a href="${esc(safeUrl(ch.url))}" target="_blank" rel="noopener">${esc(ch.label)}</a>` : esc(ch.label)}</p>

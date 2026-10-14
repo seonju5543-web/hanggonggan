@@ -30,7 +30,9 @@ export const SOFFICE_TIMEOUT_MS = 60000;
 const STRONG = [
   /^\s*[\[(【〔［]?\s*(별지|서식|별첨)\s*(제\s*)?\d*\s*(호)?\s*(서식|양식)?\s*[\])】〕］]?\s*(서식|양식)?\s*$/m,
   /^\s*붙임\s*\d*\s*(호\s*)?(서식|양식)\s*$/m,
-  /\(\s*서명\s*(또는|\/|·)\s*(인|날인)\s*\)|\(\s*서명\s*\)|서명\s*\(\s*인\s*\)|\(\s*인\s*\)\s*$/m,
+  /\(\s*서명\s*(또는|\/|·)\s*(인|날인)\s*\)|\(\s*서명\s*\)|서명\s*\(\s*인\s*\)/,
+  /* 맨 「(인)」 은 공고 끝의 직인 줄(「○○장학재단 이사장 (인)」)에도 있다 — 기관장 직함이 없는 줄에서만 서식 표식이다(리뷰) */
+  /^(?!.*(이사장|총장|회장|원장|대표|장관|시장|군수|구청장|교육감|센터장|학장|처장|단장|위원장|조합장|재단장|사장)).*\(\s*인\s*\)\s*$/m,
   /^\s*(장학(생|금)\s*)?(신\s*청\s*서|지\s*원\s*서|추\s*천\s*서|동\s*의\s*서|서\s*약\s*서|자\s*기\s*소\s*개\s*서|학\s*업\s*계\s*획\s*서|활\s*동\s*계\s*획\s*서|확\s*인\s*서)\s*$/m,
   /위와\s*같이\s*(신청|지원|추천|동의|서약)합니다/,
 ];
@@ -174,13 +176,18 @@ export function runFormPages({ root, today, dry = false, budgetSec = BUDGET_SEC,
   try { const j = JSON.parse(fs.readFileSync(indexPath, 'utf8')); if (j && j.items) index = j; } catch { /* 첫 실행 */ }
   const targets = pickPageTargets({ registered: reg, kosaf, eligIndex, today, extractedDir: path.join(root, 'collector', 'extracted'), kosafDir: path.join(root, 'data', 'kosaf-files') });
   const live = new Set(targets.map((t) => t.id));
-  const dropped = dry ? Object.keys(index.items).filter((id) => !live.has(id)) : prune(index, live, outDir);
+  /* 🔴 대상이 하나도 없는데 색인에 공고가 있으면 지우지 않는다 — 색인(elig-docs.json)·사본 폴더를 못 읽은 실행(얕은 체크아웃 등)이 결과를 통째로 지우고 커밋한다(리뷰) */
+  const skipPrune = !targets.length && Object.keys(index.items).length > 0;
+  if (skipPrune) log('⚠️ 대상 0건 — 색인·사본을 못 읽은 실행으로 보고 지우기를 건너뛴다');
+  const dropped = (dry || skipPrune) ? Object.keys(index.items).filter((id) => !live.has(id)) : prune(index, live, outDir);
   const done = []; const none = []; const failed = []; const left = []; let skipped = 0;
   const t0 = Date.now();
   const overBudget = () => (Date.now() - t0) / 1000 >= budgetSec;
   const flush = () => { if (dry) return; fs.mkdirSync(outDir, { recursive: true }); index.updatedAt = today; fs.writeFileSync(indexPath, JSON.stringify(index, null, 1) + '\n'); };
-  const tools = pdfPageCount.length ? run('pdfinfo', ['-v']) : { ok: true };
-  if (!tools.ok && !/pdfinfo version/.test(String(tools.why))) { const why = tools.why; targets.forEach((t) => failed.push({ id: t.id, name: t.name, why })); }
+  /* 도구 확인 — pdfinfo -v 는 판에 따라 0 아닌 종료코드로 버전을 stderr 에 적는다(그때 why 에 'pdfinfo version' 이 든다) */
+  const tools = run('pdfinfo', ['-v']);
+  const havePoppler = tools.ok || /pdfinfo version/.test(String(tools.why || ''));
+  if (!havePoppler) { const why = tools.why; targets.forEach((t) => failed.push({ id: t.id, name: t.name, why })); }
   else for (const t of targets) {
     if (overBudget()) { left.push({ id: t.id, name: t.name }); continue; }
     const have = index.items[t.id] || [];

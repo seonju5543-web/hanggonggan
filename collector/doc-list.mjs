@@ -15,7 +15,7 @@ import { decodeEntities } from './clean-title.mjs';
 export const DOC_HEAD = /(제출\s*(할\s*)?서류|구비\s*서류|신청\s*서류|접수\s*서류|필요\s*서류|첨부\s*서류|제출\s*서류\s*및\s*(방법|절차))/;
 /* 다음 절의 머리 — 여기서 서류 목록이 끝난다(서류 이름이 이런 낱말로 시작하는 일은 없다) */
 const NEXT_HEAD = /^\s*(?:[\[(【〔]?\s*)?(?:[\d①-⑳]+\s*[.)]?\s*|[가-힣]\s*[.)]\s*|[-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙❍◎￭·ㆍ*ㅇ]\s*)?(신청\s*방법|신청\s*기간|접수\s*기간|접수\s*방법|제출\s*방법|제출\s*기한|제출\s*처|문의|유의\s*사항|기타|선발\s*(인원|방법|절차|일정)|지원\s*자격|신청\s*자격|지급|심사|발표|지원\s*내용|장학\s*금액|지원\s*금액|일정|향후|결과)/;
-const BULLET = /^[\s\-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙❍◎￭·ㆍ*ㅇ]+|^\s*[\[(【〔]?\s*(?:[\d①-⑳]+|[가나다라마바사아자차카타파하])\s*[.)\]】〕]\s*/;
+const BULLET = /^[\s\-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙❍◎￭·ㆍ*ㅇ√]+|^\s*[\[(【〔]?\s*(?:\d{1,2}\s*[.)\]】〕]|[①-⑳]\s*[.)\]】〕]?|[가나다라마바사아자차카타파하]\s*[.)\]】〕])\s*/;
 const DOC_WORD = /서|증명|사본|원본|통장|신분증|사진|등본|확인|계획|추천|동의|지원|신청|소개|이력|포트폴리오|성적|재학|졸업|가족|소득|수급/;
 export const WRITE_DOC = /자기소개서|자소서|학업계획서|수학계획서|연구계획서|활동계획서|사유서|지원\s*동기|에세이|포부|소개서|계획서/;
 export const FREE_FORM = /자유\s*(양식|서식|형식)|별도\s*(의\s*)?(양식|서식)(은|이)?\s*(없|무)|(양식|서식)\s*(은|이)?\s*(없음|없습니다|무)|서식\s*자유|자유롭게\s*작성|양식\s*자유|형식\s*자유/;
@@ -28,7 +28,7 @@ const DOC_NOUN = /증명|증빙|사본|원본|신청서|지원서|원서|확인�
 const isSubHead = (c) => { const bare = (/^[\[(【〔]/.test(c) && /[\])】〕]$/.test(c)) ? c.slice(1, -1).trim() : c; const core = bare.replace(/\s*[\[(【〔][^\])】〕]*[\])】〕]\s*$/, '').trim(); return /(서류|자료)$/.test(core) && !DOC_NOUN.test(core); };
 const isDocLike = (c) => {
   if (!DOC_WORD.test(c)) return false;
-  if (c.replace(/\s/g, '').length < 4) return false;
+  if (c.replace(/\s/g, '').length < 4 && !DOC_NOUN.test(c)) return false;   // 「신청서」「등본」 같은 짧은 이름은 두고 OCR 조각(「서재다」)만 뺀다
   if (/^[(（]/.test(c)) return false;                                   // 괄호로 시작하는 줄은 앞 서류의 설명이다
   if (HEAD_ONLY.test(c) || FILE_NOTE.test(c) || isSubHead(c)) return false;
   if (NOT_DOC.test(c)) return false;
@@ -46,7 +46,16 @@ const FILE_NOTE = /파일\s*(제목|명)|파일명/;
 /* 한 줄에 여러 서류가 쉼표·가운뎃점으로 붙어 있으면 가른다 — 조각마다 서류 낱말이 있을 때만(문장을 토막 내지 않는다) */
 function splitInline(s) {
   if (!/[,，·]/.test(s) || s.length > 120) return [s];
-  const parts = s.split(/\s*[,，·]\s*/).map((p) => p.trim()).filter(Boolean);
+  /* 괄호 안의 쉼표(「신청서 1부 (소정양식, 사진 부착)」)는 가르지 않는다 — 리뷰 */
+  const parts = []; let depth = 0; let cur = '';
+  for (const ch of s) {
+    if (/[\[(【〔（]/.test(ch)) depth += 1; else if (/[\])】〕）]/.test(ch)) depth = Math.max(0, depth - 1);
+    if (depth === 0 && /[,，·]/.test(ch)) { parts.push(cur.trim()); cur = ''; } else cur += ch;
+  }
+  parts.push(cur.trim());
+  const cleaned = parts.filter(Boolean);
+  if (cleaned.length < 2) return [s];
+  parts.length = 0; parts.push(...cleaned);
   if (parts.length < 2 || !parts.every((p) => p.length <= 40 && DOC_WORD.test(p))) return [s];
   return parts;
 }
@@ -82,15 +91,18 @@ export function extractDocumentList(text) {
   return out.filter((d) => !/(원문\s*공고|공고문|홈페이지)(에서|를)?\s*(확인|참고)/.test(d));
 }
 
-/** 자유 양식 근거 — 작성형 서류가 있고 그 문장이 자유 양식을 말할 때만 그 문장(원문 글자 · 300자 상한). 없으면 null */
-export function freeFormBasis(text, docs = []) {
-  const hasWrite = (docs || []).some((d) => WRITE_DOC.test(d));
+/* 지정 양식을 말하는 낱말 — 이 말이 든 줄은 '자유 양식'이 아니다(「자기소개서(소정 양식) … 추천서는 자유 양식」 처럼 섞인 줄도 근거가 아니다) */
+const FIXED_FORM = /소정\s*(양식|서식)|별지|지정\s*(양식|서식)|첨부\s*(양식|서식)|재단\s*(양식|서식)|제\s*\d+\s*호\s*서식/;
+/** 자유 양식 근거 — **그 줄 자체가** 작성형 서류 이름과 자유 양식을 함께 말할 때만 그 문장(원문 글자 · 300자 상한). 없으면 null.
+    🔴 서류 목록에 작성형 서류가 있다는 것만으로 다른 줄의 '자유 양식'을 빌려 오지 않는다(리뷰 2026-10-13 — 추천서가 자유 양식인데 자기소개서를 그대로 내라고 말했다). */
+export function freeFormBasis(text) {
   const lines = String(text || '').split(/\n/).map((l) => l.replace(/\s+/g, ' ').trim()).filter(Boolean);
   for (const l of lines) {
-    if (!FREE_FORM.test(l)) continue;
-    if (l.length > 300) continue;
-    /* 그 줄 자체가 작성형 서류를 말하거나, 서류 목록에 작성형 서류가 있어야 한다 */
-    if (WRITE_DOC.test(l) || hasWrite) return l;
+    if (!FREE_FORM.test(l) || l.length > 300) continue;
+    if (!WRITE_DOC.test(l) || FIXED_FORM.test(l)) continue;
+    /* 자유 양식이 추천서(남이 쓴다)에만 붙은 줄은 학생 문서의 근거가 아니다 */
+    if (/추천서/.test(l) && !/자기소개서|자소서|계획서|사유서|지원\s*동기|에세이|포부/.test(l)) continue;
+    return l;
   }
   return null;
 }
@@ -98,7 +110,7 @@ export function freeFormBasis(text, docs = []) {
 /** 둘을 한 번에 — 발췌기가 부르는 꼴 */
 export function readDocuments(text) {
   const docs = extractDocumentList(text);
-  const basis = freeFormBasis(text, docs);
+  const basis = freeFormBasis(text);
   return { docs, basis, free: !!basis };
 }
 

@@ -718,6 +718,10 @@ switch (action) {
       mark('eligibilityExcludes', 'eligibilityExcludesFrom');
       mark('eligibilityPriority', 'eligibilityPriorityFrom');
       mark('eligibilityLines', 'eligibilityFrom');   // 이미 열려 있던 칸 — 지금은 매일 지워진다
+      /* 2026-10-13 ④ — 제출 서류 목록·자유 양식 스위치도 로봇(extract-excerpts fillDocuments)이 매 실행 다시 쓴다. 관리자가 고치거나 끈 것은 표식으로 지킨다
+         (끈 것: prepDoc 이 사라져도 prepDocFrom 은 '관리자'로 남겨 로봇이 다시 켜지 않게 — 리뷰) */
+      mark('documents', 'documentsFrom');
+      if (changed.includes('prepDoc')) it.prepDocFrom = OWNER;
       /* 원문 주소를 고쳤는데 같은 공고에 예전 「원문 바로잡기」(data/link-fixes.json)가 있으면 그것이 늘 이겨 고친 주소가 앱에 안 나간다
          (리뷰 2026-10-04) — 같은 커밋에서 그 바로잡기를 지우고 기록에 남긴다. 사람이 방금 넣은 주소가 새 원문이다 */
       if (changed.includes('sourceUrl')) {

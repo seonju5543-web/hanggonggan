@@ -984,8 +984,8 @@ function fillDocuments(it, body, docsFn) {
       it.prepDoc = true; it.prepDocBasis = got.basis.slice(0, 300); it.prepDocFrom = `로봇 ${from}`;
     }
     gotFree += 1;
-  } else if (it.prepDoc && /^로봇/.test(it.prepDocFrom || '') && !got.basis) {
-    /* 로봇이 켰는데 지금 원문엔 근거가 없다 — 끈다(사람이 켠 것은 두 번째 조건으로 보호된다) */
+  } else if (it.prepDoc && /^로봇/.test(it.prepDocFrom || '') && (!got.basis || hasFormAtt)) {
+    /* 로봇이 켰는데 지금 원문엔 근거가 없거나 신청서 첨부가 붙었다 — 끈다(사람이 켠 것은 두 번째 조건으로 보호된다) */
     delete it.prepDoc; delete it.prepDocBasis; delete it.prepDocFrom;
   }
 }

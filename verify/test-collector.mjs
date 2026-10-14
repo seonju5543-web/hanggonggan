@@ -1463,7 +1463,16 @@ console.log('\n■ 제출 서류 목록 — 원문의 「제출서류」 절을 
   eq('  자유 양식 근거는 작성형 서류(자기소개서)와 같은 문장 — 원문 글자 그대로', [r.free, /자기소개서 \(자유 양식/.test(r.basis)], [true, true]);
   eq('  머리줄에 바로 붙은 목록(「제출서류 : A, B」)도 읽는다', DL.extractDocumentList('제출서류 : 신청서 1부, 성적증명서 1부, 통장사본 1부\n신청기간 : 10.1~10.20'), ['신청서 1부', '성적증명서 1부', '통장사본 1부']);
   eq('  절이 없으면 빈 배열 — 지어내지 않는다', DL.extractDocumentList('지원자격 : 재학생\n문의 : 장학팀'), []);
-  eq('  자유 양식 낱말만 있고 작성형 서류가 없으면 근거가 아니다', DL.freeFormBasis('제출서류\n- 재학증명서 (양식 자유)\n', ['재학증명서 (양식 자유)']), null);
+  eq('  자유 양식 낱말만 있고 작성형 서류가 없으면 근거가 아니다', DL.freeFormBasis('제출서류\n- 재학증명서 (양식 자유)\n'), null);
+  eq('🔴 다른 서류(추천서)가 자유 양식이거나 자기소개서가 소정 양식이면 근거가 아니다 (리뷰 — 자기소개서를 그대로 내라고 말할 뻔했다)',
+    [DL.freeFormBasis('- 자기소개서 (소정 양식) 1부\n- 추천서 1부\n※ 추천서는 자유 양식으로 작성'), DL.freeFormBasis('- 자기소개서(소정 양식) · 학업계획서는 자유 양식')], [null, null]);
+  eq('  괄호 안의 쉼표는 가르지 않는다 · 「①」 기호를 뗀다 · 「신청서」 같은 짧은 이름은 남긴다',
+    DL.extractDocumentList('제출서류\n① 장학금 신청서 1부 (소정양식, 사진 부착)\n② 신청서\n③ 서재다\n④ 성적증명서 1부, 재학증명서 1부'),
+    ['장학금 신청서 1부 (소정양식, 사진 부착)', '신청서', '성적증명서 1부', '재학증명서 1부']);
+  /* 관리자가 고친 목록·끈 스위치는 로봇이 되덮지 않는다 — admin-apply 가 주인 표식을 남긴다(리뷰) */
+  const aa = readText(new URL('../tools/admin-apply.mjs', import.meta.url));
+  eq('  관리자 화면이 documents → documentsFrom · prepDoc → prepDocFrom 에 관리자 표식을 남긴다', [/mark\('documents', 'documentsFrom'\)/.test(aa), /changed\.includes\('prepDoc'\)\) it\.prepDocFrom = OWNER/.test(aa)], [true, true]);
+  eq('  로봇은 신청서 첨부가 나중에 붙어도 제 prepDoc 을 끈다', /\(!got\.basis \|\| hasFormAtt\)/.test(readText(new URL('../collector/extract-excerpts.mjs', import.meta.url))), true);
   eq('  소제목·전화·주소·파일 이름·지시문은 서류가 아니다',
     DL.extractDocumentList(['제출서류', '[필수 제출서류]', '추가 제출 가능 서류 (가점)', '계양구인재양성재단 (☎546-9345)', 'https://example.or.kr', '파일제목 : 이름-학과-신청서', '모든 서류 스캔해 PDF로 제출(사진 촬영본 금지)', '◯ 지원 분야별 필수 제출 자료', '장학생 선발원서(소정양식)', '주민등록등본 1부'].join('\n')),
     ['장학생 선발원서(소정양식)', '주민등록등본 1부']);
@@ -1490,6 +1499,9 @@ console.log('\n■ 공고문 뒷장 서식 쪽 떼기 — 쪽 글자의 표식�
   eq('  별지 머리 + 인적사항 표 + 서명란 쪽은 서식이다', FP.classifyPage(form, 3), 'form');
   eq('  동의서 쪽(체크 칸 + 서명)도 서식이다', FP.classifyPage(consent, 4), 'form');
   eq('  첫 쪽은 더 엄격하다 — 서식 제목 한 줄만으로는 표지로 본다', [FP.classifyPage('장학생 신청서\n', 1), FP.classifyPage(form, 1)], ['notice', 'form']);
+  eq('🔴 공고 끝의 직인 줄(「○○장학재단 이사장 (인)」 + 날짜)은 서식이 아니다 (리뷰 — 거의 모든 공고의 마지막 쪽)',
+    FP.classifyPage('6. 문의 : 02-000-0000\n\n2026년 10월 13일\n\n○○장학재단 이사장 (인)', 3), 'notice');
+  eq('  대상이 0건인데 색인에 공고가 있으면 지우기를 건너뛴다(색인·사본을 못 읽은 실행이 결과를 통째로 지우지 않게)', /skipPrune/.test(readText(new URL('../collector/form-pages.mjs', import.meta.url))), true);
   eq('  이어진 쪽은 한 구간으로', [FP.groupRanges([3, 4, 5, 7]), FP.rangeLabel(FP.groupRanges([3, 4, 5, 7]))], [[[3, 5], [7, 7]], '3~5, 7']);
   const fakeFs = { exists: (p) => /elig-a-1\.pdf|elig-b-1\.hwpx|\/kosaf\/777$|\/kosaf\/777\//.test(p) || /\/kosaf\/777/.test(p), readdir: () => ['공고문.pdf', '안내.hwp', '사진.jpg', '글자.txt'] };
   const t = FP.pickPageTargets({
@@ -1526,17 +1538,20 @@ console.log('\n■ 신청 준비 체크리스트 — 준비 완료는 네 항목
     (d) => (d in wallet ? { ok: wallet[d] } : null));
   const P = mk({ 재학증명서: true, 성적증명서: false });
   const sch = { form: true, documents: ['재학증명서', '성적증명서 (자동 제출)', '지원 자격·제출 서류는 원문 공고에서 확인'] };
-  const c0 = P.prepChecklist({ pending: false }, sch);
-  eq('🔴 문서를 안 썼으면 작성 항목이 비고, 보관함에 증명서가 다 있으면 증명서는 자동 ✓ · 자동 서류·자리표시는 세지 않는다',
+  const c0 = P.prepChecklist({ pending: true, prep: {} }, sch);
+  eq('🔴 작성이 남았으면(pending) 작성 항목이 비고, 보관함에 증명서가 다 있으면 증명서는 자동 ✓ · 자동 서류·자리표시는 세지 않는다',
     [c0.items.map((i) => `${i.key}:${i.done ? 1 : 0}${i.auto ? 'a' : ''}`), c0.done, c0.complete], [['docs:0', 'write:0a', 'certs:1a', 'submit:0'], 1, false]);
   const c1 = P.prepChecklist({ pending: false, formAns: { x: 1 }, prep: { docs: true, submit: true } }, sch);
   eq('  문서를 썼고 학생이 서류·제출 방법을 확인하면 4/4 완료', [c1.done, c1.complete], [4, true]);
-  eq('  작성할 것이 없는 공고(양식·자소서 없음)는 작성 항목이 처음부터 ✓', P.prepChecklist({ pending: false }, { documents: [] }).items.find((i) => i.key === 'write').done, true);
+  eq('  작성이 끝났으면(pending:false) 작성 항목은 ✓ — 양식이 없어 담는 순간 끝난 공고도 같다', P.prepChecklist({ pending: false, prep: {} }, { documents: [] }).items.find((i) => i.key === 'write').done, true);
+  eq('🔴 체크리스트 전(prep 칸 없음)에 담은 옛 항목은 그때 규칙대로 준비 완료다 — 소급해 가두지 않는다(리뷰: 버튼이 잠겨 채울 길이 없었다)',
+    [P.prepChecklist({ pending: false }, sch).complete, P.prepStateLabel({ pending: false }, sch, '신청 준비 완료')], [true, '신청 준비 완료']);
   const P2 = mk({ 재학증명서: false });
-  eq('  증명서가 보관함에 없으면 학생이 「확인했어요」로 넘길 수 있다(수동)', [P2.prepChecklist({ pending: false }, sch).items[2].done, P2.prepChecklist({ pending: false, prep: { certs: true } }, sch).items[2].done], [false, true]);
+  eq('  증명서가 보관함에 없으면 학생이 「확인했어요」로 넘길 수 있다(수동)', [P2.prepChecklist({ pending: false, prep: {} }, sch).items[2].done, P2.prepChecklist({ pending: false, prep: { certs: true } }, sch).items[2].done], [false, true]);
   eq('  상태 낱말 — 작성 남음 > 준비 중 n/4 > 단계 이름 · 제출을 적은 건은 체크리스트와 상관없이 단계 이름',
-    [P.prepStateLabel({ pending: true }, sch, '신청 준비 완료'), P.prepStateLabel({ pending: false }, sch, '신청 준비 완료'), P.prepStateLabel({ pending: false, submittedAt: '2026-10-01' }, sch, '공식 제출'), P.prepStateLabel({ pending: false, formAns: {}, prep: { docs: true, submit: true } }, sch, '신청 준비 완료')],
-    ['서류 작성 필요', '준비 중 1/4', '공식 제출', '신청 준비 완료']);
+    [P.prepStateLabel({ pending: true, prep: {} }, sch, '신청 준비 완료'), P.prepStateLabel({ pending: false, prep: {} }, sch, '신청 준비 완료'), P.prepStateLabel({ pending: false, prep: {}, submittedAt: '2026-10-01' }, sch, '공식 제출'), P.prepStateLabel({ pending: false, formAns: {}, prep: { docs: true, submit: true } }, sch, '신청 준비 완료')],
+    ['서류 작성 필요', '준비 중 2/4', '공식 제출', '신청 준비 완료']);
+  eq('  새로 담는 자리 셋(양식 확인 · 준비 시트 확인 · 일괄)이 모두 prep: {} 을 적는다', (app.match(/pending: (false|bulkNeedsWork\(sch\)), prep: \{\}/g) || []).length, 3);
   /* 화면 셋이 같은 함수를 쓴다 — 카드 배지 · 신청내역 막대 · 상세 버튼/체크리스트 · 요약 */
   eq('  카드 배지 · 신청내역 막대 · 상세 버튼 · 요약이 모두 prepStateLabel/prepChecklist 를 쓴다',
     [/prepStateLabel\(myApp, sch/.test(take('cardBadgeHtml')), /prepStateLabel\(app, sch, stepLabel\)/.test(take('appCard')), /prepStateLabel\(app, sch, '신청 준비 완료됨'\)/.test(take('openDetail')), /data-prep-toggle/.test(take('openDetail')), /inPrep/.test(take('renderApplications'))], [true, true, true, true, true]);
