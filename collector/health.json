@@ -150,10 +150,9 @@
   "lastOk": "2026-10-14"
  },
  "중앙대학교": {
-  "fails": 1,
-  "lastOk": "2026-10-13",
-  "browserFails": 1,
-  "browserWhy": "시한 안에 못 끝냄"
+  "fails": 0,
+  "lastOk": "2026-10-14",
+  "browserFails": 0
  },
  "고려대학교": {
   "fails": 0,
