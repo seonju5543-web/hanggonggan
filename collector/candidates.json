@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-10-15",
- "count": 1938,
+ "count": 1941,
  "items": [
   {
    "title": "(글로벌)(교외)2026-2학기 글로벌 비전(신우회) 장학금 신청안내",
@@ -152,6 +152,33 @@
    "foundAt": "2026-10-15",
    "bodyDeadline": "2026-11-13",
    "bodyDeadlineText": "다. 선발인원: 00명 라. 접수기한: 2026. 10. 14일(수) ~ 11. 13.(금 ) 18:00"
+  },
+  {
+   "title": "2026-2학기 동국인재육성장학 선발 및 결과발표 안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765781",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-15"
+  },
+  {
+   "title": "2026-2학기 복지장학2(면학) 장학 안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765782",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-15"
+  },
+  {
+   "title": "2026-2학기 주거안정장학금 우선지원 및 지원제외 기준 안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765808",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-15"
   },
   {
    "title": "[공통] (생활비)2027년도 두산연강재단 대학 장학생 선발 안내",

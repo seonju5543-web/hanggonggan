@@ -41,7 +41,7 @@
    "kind": "page",
    "param": "pageNo"
   },
-  "checkedAt": "2026-10-14"
+  "checkedAt": "2026-10-15"
  },
  "https://www.hongik.ac.kr/kr/newscenter/notice.do": {
   "ok": false,
@@ -193,7 +193,7 @@
    "kind": "page",
    "param": "pageNo"
   },
-  "checkedAt": "2026-10-14"
+  "checkedAt": "2026-10-15"
  },
  "https://www.smu.ac.kr/kor/life/notice.do": {
   "ok": false,
@@ -214,7 +214,7 @@
    "param": "article.offset",
    "limit": 10
   },
-  "checkedAt": "2026-10-14"
+  "checkedAt": "2026-10-15"
  },
  "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100": {
   "ok": false,
