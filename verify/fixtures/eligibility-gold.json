@@ -645,8 +645,8 @@
    "verdict": {
     "P1": null,
     "P2": null,
-    "P3": null,
-    "P4": null,
+    "P3": "no",
+    "P4": "no",
     "P5": null,
     "P6": "no"
    }
@@ -722,9 +722,9 @@
    "exclude": false,
    "verdict": {
     "P1": null,
-    "P2": "ok",
+    "P2": null,
     "P3": null,
-    "P4": null,
+    "P4": "no",
     "P5": null,
     "P6": "no"
    }

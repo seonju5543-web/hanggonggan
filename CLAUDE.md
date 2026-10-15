@@ -36,7 +36,7 @@
 ## 🔴 장학금 판정 자동화 (2026-09-30 지시 — *"2번의 이유를 분석하고 장학금 판정을 자동화"*)
 
 - **왜 사람 손이었나**: `noticeKind` 는 제목만 보고, 학교는 제 장학금에 '교내'라고 적지 않아 학교마다 사람이 원문을 읽고 `OWN_PROGRAMS` 를 채워야 했다
-  (44개교에서 경희대 하나). 낱말 목록으로 교외를 찾는 옛길은 막혔다(09-18 실측 · 17/19 오판). 남은 길은 **원문 증거**다.
+  (44개교에서 경희대 하나). 낱말 목록으로 교외를 찾는 옛길은 막혔다(09-18 실측). 남은 길은 **원문 증거**다.
 - **판정기 `collector/kind-evidence.mjs`**(`classifyKind` · 순수 함수): 제목 표식 → 학교 제도 표(고정 `OWN_PROGRAMS` + 학습 `own-programs.json`) →
   제목의 바깥 기관 낱말(`ORG_RE`) → 학교 이름표(`schoolTokens`) + 본문 증거(교비·장학팀 접수·학교 도메인 이메일) 순. 이름표 없이 본문 낱말만으로는 교내로 보지 않는다
   (첫 시험: 메뉴의 '발전기금'·'포털'이 증거로 세어졌다 → 껍데기를 걷어낸 본문만 읽는다 `makeStripperMulti`). 증거 없음 = 교외.
@@ -51,7 +51,7 @@
   (`absorbed` · `isNationalAbsorber` · 여러 학교만 받는 공고는 그 학교가 `schoolsAny` 에 있을 때만) · 승격은 로봇 등록·교외·사람 미지정·마감 전만
   ③ 관리자가 구분·범위를 고치면 `kindFrom`·`scopeFrom` 에 '관리자' 표식(없으면 로봇이 다음 실행에 되돌린다) ④ 판정 로봇 셋은 리포트 파일을 인자로 받는다(브라우저 수집은 `browser-report.md`).
 - 🔴 **합칠 때 마감은 날짜를 내는 문구와 함께만 옮긴다**(`deadlineQuote` · 2026-10-01 첫 클라우드 실행에서 근거 없는 마감이 4건이 되어 데이터 관문이 빨간불 → 그날 자동 등록 8건이 되돌려졌다).
-  **실데이터에 기댄 고정 검사를 관문에 두지 말 것** — 「정식 등록도 나눌 때」의 '지금은 선 아래' 줄이 44개교 복원 뒤 같은 사고를 냈다(지금은 숫자만).
+  **실데이터에 기댄 고정 검사를 관문에 두지 말 것** — 「정식 등록도 나눌 때」의 '지금은 선 아래' 줄이 44개교 복원 뒤 같은 사고를 냈다.
 - 그 밖(같은 지시): 브라우저 담당 게시판은 `schools.json` `collector:"browser"` 로 일반 로봇이 건너뛴다 · 못 읽는 학교는 `run-probe.txt` 정찰 · 주소 없는 분교는
   `school-board-seeds.json` 씨앗을 `find-boards.mjs` 가 훑어 후보만 리포트(자동으로 넣지 않는다) · 포털 표 후보 `collector/portal-candidates.mjs` · 정문 사진은 44개교(`fetch-gate-photos.mjs`).
   관문 「장학금 판정 자동화 · 범위 승격」.
@@ -242,7 +242,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - **분교 ≠ 이원화** — 분교는 `UNIVERSITIES` 에 별개 학교, 이원화는 `CAMPUSES_BY_SCHOOL`. 게시판 공유 분교 판정은 `noticeForProfile` 한 곳(data.js 금지 — sw 가 안 읽는다).
 - **'오늘'을 상수로 굳히지 말 것** — `todayStart()` 가 부를 때마다 읽는다(PWA 는 며칠씩 떠 있다) · 자동 등록의 연도도 오늘 기준(`yearHold`). 관문 「마감 판정이 앱을 켠 시각에 굳지 않는다」.
 - **공고 카드 품질(10-15)**: 「○○의 경우」 줄은 범위 밖 학생에게 '모름'(`lineVerdict`) · 열거 학년·이수 학기(`parseSemester`)·따옴표 속 구간·「3.0/4.5」 성적은 판정 · 자격 줄이 없으면 구조화 조건이 요건(`fitDetail`) ·
-  조각·글 제목·※ 예외는 자격 줄이 아니다(`looksFragment`·aside) · ✕ 는 한 번만 · 「공고 안내」는 `noticeSummaryHtml` 한 곳(골라서 · 지어내지 않음). 관문 「공고 카드 품질」.
+  조각·글 제목·※ 예외는 자격 줄 아님(`looksFragment`·aside) · 중위소득 %는 지원구간 표로(`parseIncomeBand`) · 단과대 이름으론 ✓ 안 줌 · ✕ 는 한 번만 · 「공고 안내」는 `noticeSummaryHtml` 한 곳(골라서). 관문 「공고 카드 품질」.
 
 ### 교내/교외 · 제목 · 금액 · 마감
 
@@ -273,7 +273,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   관리자 「활동」 탭(`#activities`): 종류 바꾸기·숨기기(지우지 않고 `hidden` + `activity-config.json`)·출처 추가/보관 — `activityKind`·`activityHide`·`activitySource`. 관문 같은 절 ⑤ · `verify-admin.js`.
   활동 글의 마감·발췌는 `collector/activity-excerpts.mjs` 한 곳(마감 규칙은 장학과 같은 `extractDeadline` · 나머지는 원문 문장 그대로 · 분야는 `activityField`) · 공공·재단 게시판은 `collector/robots.mjs` 로 robots.txt 를 묻고 읽는다 · 카드 D-day 는 `dday()` 한 곳. 관문 같은 절 ⑥.
   **공공 API 로봇**(2026-10-01 · `collector/open-api.mjs` · 규칙 `collector/open-api-map.mjs`): K-Startup·1365(`DATA_GO_KR_KEY`)·온통청년 정책·콘텐츠(`YOUTHCENTER_KEY`·`YOUTHCENTER_CONTENT_KEY` — 🔴 포털 열쇠로 안 열린다) → 같은 `data/activities.json`(`api` 칸) · 못 받은 출처(0행·칸 바뀜 포함)의 지난 글은 지우지 않는다 · 수집 로봇의 60일 삭제는 API 글엔 `seenAt` · 실패는 로봇 리포트(첫 실행에 생긴다)의 ❌ → 이슈. 관문 「공공 API 로봇」.
-  🔴 발췌기에 넘기는 상세 글자는 **줄을 살린 것**(`collector/html-text.mjs` `htmlToLines` — deepfetch·rescue 도 같은 것) — 한 줄로 뭉개면 **전부 0건**이 된다(2026-09-30 실측). 발췌 없이 실린 글은 다음 실행이 다시 읽는다(`ACT_BACKFILL` · `excerptsAt`).
+  🔴 발췌기에 넘기는 상세 글자는 **줄을 살린 것**(`collector/html-text.mjs` `htmlToLines` — deepfetch·rescue 도 같은 것) — 한 줄로 뭉개면 **전부 0건**이 된다(09-30 실측). 발췌 없이 실린 글은 다음 실행이 다시 읽는다(`ACT_BACKFILL` · `excerptsAt`).
 - **재단·지자체 게시판(교외 확대)** (2026-09-26 · 노션 F-13): 링커리어류는 크롤링이 아니라 **주최사 직접 등록**이라 긁지 않는다 — 우리는 주최의 제 게시판을 읽는다.
   출처 `collector/external-sources.json` 은 `kosaf-open.json` 의 재단 홈페이지에서 왔고, `collector/find-boards.mjs` 가 게시판을 찾아 `autoFound` 로 적는다(잘못 찾으면 `parked`).
   글은 `data/external.json`(학교 피드와 따로) → 홈 「재단·지자체 새 공고」(`externalNoticesHtml` · 등록된 주소는 `registeredUrlMatcher` 로 뺀다). 링크 읽는 눈은 `collector/board-links.mjs` 한 곳. 관문 「재단·지자체 게시판」.
@@ -345,7 +345,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 
 ### 알림 · 업데이트 · 보안
 
-- 진짜 푸시 가동 중(`server/push/` · 내용 없는 깨우기 → 폰이 문구를 만든다 · 알림 1건 필수 · iOS 는 홈 화면 설치 후만). 🔴 **운영 배포는 `push-deploy.yml` 한 길**(10-12 실측 · 폰 도달은 안 쟀다) — 서버 health 응답의 `build` = `tools/push-build-stamp.mjs` 도장 · 매일 확인이 다르면 `outdated` 경보. 관문 「로봇·도구 점검 관문」 servers ⑪.
+- 진짜 푸시 가동 중(`server/push/` · 내용 없는 깨우기 → 폰이 문구를 만든다 · 알림 1건 필수 · iOS 는 홈 화면 설치 후만). 🔴 **운영 배포는 `push-deploy.yml` 한 길**(10-12 실측) — 서버 health 응답의 `build` = `tools/push-build-stamp.mjs` 도장 · 매일 확인이 다르면 `outdated` 경보. 관문 「로봇·도구 점검 관문」 servers ⑪.
 - **푸시 등록**: 브라우저의 실제 구독을 본다 · '껐다'와 '못 읽었다'를 구분(`shouldSelfUnsubscribe`) · 옛 주소는 서버에서도 지운다. 살아 있는지는 `push-check.yml` 발송만이 증명.
 - 장부는 IndexedDB(`handaejang-notify` — sw 는 localStorage 를 못 읽는다). "폰이 꺼져 있어도 즉시"라고 쓰지 말 것.
 - 서비스워커는 코드·데이터 모두 네트워크 우선 + `cache:'no-cache'` + 3.5초 폴백. 버전 인상은 옛 캐시 청소용 관례.

@@ -243,7 +243,8 @@ function judgeCond(c, p, ctx) {
     }
     case 'bracket': {
       if (p.bracket == null) return 'unknown';
-      const vb = p.bracket <= c.max ? 'pass' : 'fail';
+      /* 중위소득 사이 값(`80% 이하`)은 걸친 구간이 있다 — max 아래는 ✓ · failFrom 부터 ✕ · 그 사이는 모름 (parse-requirements parseIncomeBand · 2026-10-15) */
+      const vb = p.bracket <= c.max ? 'pass' : (c.failFrom != null && p.bracket < c.failFrom) ? 'unknown' : 'fail';
       /* 제외 줄(`1~3구간은 제외`)에서는 뜻이 뒤집힌다 — year·flags 와 같은 규약 (2026-10-12 · 조각 1 리뷰) */
       return c.exclude ? (vb === 'pass' ? 'fail' : 'pass') : vb;
     }
@@ -277,10 +278,10 @@ function judgeCond(c, p, ctx) {
     case 'semester': {
       /* n학년은 2n-1 또는 2n 학기다 — 두 값이 **다 맞을 때만** ✓, 다 어긋날 때만 ✕, 갈리면 모름 (parse-requirements parseSemester · 2026-10-15) */
       const y = p.year == null ? null : Number(p.year);
-      if (y == null || Number.isNaN(y) || y < 1) return 'unknown';
+      if (y == null || Number.isNaN(y) || y < 1 || c.ahead) return 'unknown';   // ahead — 앞으로 올 학년도의 학기(`2027년 2학기 기준 …`)는 지금 학기로 못 잰다
       /* 등록 기준(`8학기 이하`)은 지금 다니는 학기(2n-1·2n) · 마친 기준(`6학기 이하 이수`·`4학기 이상 수료`)은 한 학기 앞(2n-2·2n-1) — 리뷰 2026-10-15 */
       const [lo, hi] = c.done ? [y * 2 - 2, y * 2 - 1] : [y * 2 - 1, y * 2];
-      const okAt = (s) => (c.max == null || s <= c.max) && (c.min == null || s >= c.min);
+      const okAt = (s) => (c.anyOf ? c.anyOf.includes(s) : ((c.max == null || s <= c.max) && (c.min == null || s >= c.min)));   // anyOf — `2학년 1학기, 2학년 2학기, 3학년 1학기`
       const a = okAt(lo), b = okAt(hi);
       const v = a && b ? 'pass' : !a && !b ? 'fail' : 'unknown';
       return c.exclude ? (v === 'pass' ? 'fail' : v === 'fail' ? 'pass' : v) : v;
@@ -1066,6 +1067,8 @@ const NOT_A_REQUIREMENT = new RegExp([
   '\\(\\s*\\d{1,3}\\s*점\\s*\\)|따라\\s*평정|평정\\s*(기준|결과)',
   '산정\\s*(기간|방법|기준)\\s*$',                          // 마일리지 산정기간
   '평가\\s*(항목|비율)',
+  /* 배점표의 한 행 — `3자녀 : 5점, 4자녀 : 7점, 5자녀 이상 : 10점` · `학자금지원구간에 따라 점수 차등 부여(20점~50점)` (2026-10-15 · 123줄 진단 ⑦) */
+  '\\d+\\s*점\\s*,[^.]{0,40}\\d+\\s*점|점수\\s*(차등|부여)',
 ].join('|'));
 
 /* 제외 대상은 **버리지 않고 자리를 옮긴다** — 정보는 맞고 자리가 틀린 것뿐이다.
@@ -1239,6 +1242,8 @@ function tidyRequirement(line) {
    `2026-2학기 정규학기 학부 재학생 및 복학예정자 중`.
    🔴 버리면 안 된다 — 그 줄에 진짜 요건이 들어 있다. **다음 줄과 이어 붙인다.** */
 const CONTINUES = /(또는|및|이고|이며|하여|중)\s*$|\s인\s*$|[,·+]\s*$/;
+/* 참고 줄 — `1학년 재학생은 성적 기준을 적용하지 않음` 처럼 요건을 **푸는** 말(2026-10-15 · 123줄 진단 ⑧). 요건이 아니라 옅게 보이고 분모에서 뺀다(aside) */
+const NOTE_LINE = /(?:기준|요건|조건)(?:을|은|는|이)?\s*(?:적용하지\s*않|적용\s*안\s*함|미적용|면제)/;
 /* 토씨로 끝난 줄(`… 주민등록 주소지를`)은 **뒷줄이 조각일 때만** 잇는다 (2026-10-15 · 리뷰) — 아무 뒷줄이나 이으면 표 머리
    (`드림 장학금 | 학업 ㅣ. …`)가 자격 줄에 붙었다. `학과`·`문의` 의 끝 글자는 토씨가 아니다 */
 const PARTICLE_END = /[가-힣](?:을|를|에|(?<!문)의|와|(?<!학)과|에서|으로|로서)\s*$/;
@@ -1554,7 +1559,7 @@ function requirementLines(sch, lines, opts) {
       /* ※ 곁말로 들어와 '누구는 신청 가능' 으로 통과한 줄은 요건이 아니라 **예외 참고**다(면학장학금 `10학기 이하 후기 이중전공자는 … 신청 가능`).
          화면은 옅게 보이고 적합도 분모에서 뺀다(fitDetail) — 요건으로 세면 '확인 필요'가 부풀어 적합도가 깎였다(2026-10-15) */
       /* `… 장학금 미수혜자인 경우에만 지원 가능` 은 예외가 아니라 **제한**이다(리뷰 2026-10-15 · 인송문화재단) — 참고로 옅게 두면 '요건 아님'으로 읽힌다 */
-      aside.push(isAside && !EXCLUDE_LINE.test(t) && AFFIRM_ELIG.test(t) && !/에만|만\s?(?:신청|지원|가능)/.test(t));
+      aside.push(NOTE_LINE.test(t) || (isAside && !EXCLUDE_LINE.test(t) && AFFIRM_ELIG.test(t) && !/에만|만\s?(?:신청|지원|가능)/.test(t)));
       /* 🔴 연달아 오는 경우 분기는 **한 요건**이다 — 따로 세면 분모가 부풀어
          정읍시민이 요건 7개(실제 4개)로 잡혔다. 첫 분기에서 묶음을 열고 이어 붙인다. */
       if (PR.caseBranch(t)) {
