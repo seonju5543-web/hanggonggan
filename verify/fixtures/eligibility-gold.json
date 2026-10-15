@@ -526,11 +526,11 @@
    "text": "4년제 대학교 이공계 전공 새터민 (북한 출생)으로 2026년도 2학기 재학 예정인 대학생",
    "exclude": false,
    "verdict": {
-    "P1": null,
+    "P1": "no",
     "P2": null,
-    "P3": null,
+    "P3": "no",
     "P4": null,
-    "P5": null,
+    "P5": "no",
     "P6": "no"
    }
   },

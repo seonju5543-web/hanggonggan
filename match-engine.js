@@ -195,6 +195,8 @@ const FIT_MIN = 5;       // 미달이어도 5 — 파싱이 틀렸을 수 있다
    🔴 **모르면 unknown**이다. 틀린 fail은 학생에게서 장학금을 뺏는다. */
 /* 등급 → 4.5 만점 평점 (2026-08-30). `B0` 는 `B` 와 같은 뜻이다(학교가 둘 다 쓴다). */
 const LETTER_GPA = { 'A+': 4.5, A: 4.0, A0: 4.0, 'B+': 3.5, B: 3.0, B0: 3.0, 'C+': 2.5, C: 2.0, C0: 2.0 };
+/* 계열 묶음 — 문과(인문·사회·상경) · 이과(자연·공학·의약) · 예체능. 묶음이 다르면 ✕, 같으면 모름(judgeCond 'major' ④ · 2026-10-15) */
+const TRACK_GROUP = { humanities: '문', social: '문', business: '문', science: '이', engineering: '이', medical: '이', arts: '예' };
 /* 백분위 ↔ 4.5 만점 평점 — 두 표(judgeCond 'grade' percent 주석). 사이 값은 직선으로 잇는다 */
 const PCT_STRICT = [[60, 1.0], [65, 1.5], [70, 2.0], [75, 2.5], [80, 3.0], [85, 3.5], [90, 4.0], [95, 4.5], [100, 4.5]];
 const PCT_LENIENT = [[65, 1.0], [70, 1.5], [75, 2.0], [80, 2.5], [85, 3.0], [90, 3.5], [95, 4.0], [100, 4.5]];
@@ -440,7 +442,12 @@ function judgeCond(c, p, ctx) {
         if (c.fuzzy) return 'unknown';
         return c.exclude ? 'pass' : 'fail';
       }
-      /* ④ 계열이 어긋난 것은 **모른다** — 재단 7분류와 우리 8분류가 안 맞는다 */
+      /* ④ 계열이 어긋난 것 — 문과↔이과처럼 **먼 묶음**이면 ✕ (2026-10-15 개발자 결정 "계열은 알 수 있잖아" · 단과대는 학교마다 이름이 달라 보류).
+         같은 묶음(상경↔사회과학 · 자연↔의약)은 분류가 서로 안 맞을 수 있어 모름 · 사범은 문·이과 과목이 섞여 ✕ 를 안 낸다 · 말이 흐린 줄(관련·우대)도 모름 */
+      if (c.tracks && p.track && !c.soft && p.track !== 'education') {
+        const far = c.tracks.every((t) => t !== 'education' && TRACK_GROUP[t] && TRACK_GROUP[t] !== TRACK_GROUP[p.track]);
+        if (far) return c.exclude ? 'pass' : 'fail';
+      }
       return 'unknown';
     }
     case 'residence': {

@@ -1061,8 +1061,9 @@ function parseMajor(t) {
     kind: 'major',
     ...(names.length ? { names } : {}),
     ...(tracks.length ? { tracks } : {}),
-    /* 계열만 있는 줄은 언제나 fuzzy — 분류가 서로 안 맞는다 */
+    /* 계열만 있는 줄은 언제나 fuzzy — 분류가 서로 안 맞는다. soft 는 **말이 흐린 것**(관련·우대·권장)만 — 먼 계열 ✕ 는 soft 가 아닐 때만(judgeCond 'major' ④ · 2026-10-15) */
     fuzzy: !names.length || MAJOR_FUZZY.test(t),
+    soft: MAJOR_FUZZY.test(t),
     conf: HAS_EXCEPTION.test(t) ? LOW : HIGH,
   };
 }
