@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-10-15",
- "count": 1956,
+ "count": 1959,
  "items": [
   {
    "title": "(글로벌)(교외)2026-2학기 글로벌 비전(신우회) 장학금 신청안내",
@@ -110,6 +110,15 @@
    "foundAt": "2026-10-15",
    "bodyDeadline": "2026-11-13",
    "bodyDeadlineText": "선발 인원 : 00명 신청 기간 : 2026. 10. 14.( 수 ) ~ 11. 13.( 금 ) 18:00 까지"
+  },
+  {
+   "title": "풀브라이트 미국 유학·연구 장학금 설명회",
+   "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/944368/artclView.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "연세대학교 미래캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-15"
   },
   {
    "title": "2026학년도 2학기 장학사정관 추천 학업지원장학생 선발 안내",
@@ -321,6 +330,15 @@
    "attachments": [],
    "deadlineHint": null,
    "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-10-15"
+  },
+  {
+   "title": "[두산연강재단] 2027년 두산연강재단 장학생 선발 공고 (생활비성)",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159284&noCat=501",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "홍익대학교",
    "campus": "",
    "foundAt": "2026-10-15"
   },
@@ -580,6 +598,44 @@
     }
    ],
    "deadlineHint": "모집 기간: 2026년 10월 14일 (수) ~ 10월 27일 (화) 오후 6시 - 제출 방법: 이메일 제출 후 원본 서류 우편 제출 - 결과",
+   "school": "연세대학교",
+   "campus": "",
+   "foundAt": "2026-10-15"
+  },
+  {
+   "title": "2027학년도 한국지도자육성장학재단 장학생 선발 안내",
+   "url": "https://www.yonsei.ac.kr/bbs/sc/58/944373/artclView.do",
+   "attachments": [
+    {
+     "name": "1. 2027년도_서류양식(지원서).hwp",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015104/download.do"
+    },
+    {
+     "name": "2. 2027년도_서류양식(추천서).hwp",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015105/download.do"
+    },
+    {
+     "name": "3. 2027년도_서류양식(자기소개서).hwp",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015106/download.do"
+    },
+    {
+     "name": "4. 2027년도_개인정보활용동의서.hwp",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015107/download.do"
+    },
+    {
+     "name": "5. 2027년도_장학생 의무사항 참여 동의서.hwp",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015108/download.do"
+    },
+    {
+     "name": "일반장학생 선발 포스터.pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015109/download.do"
+    },
+    {
+     "name": "장학생 선발관련 FAQ.pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015110/download.do"
+    }
+   ],
+   "deadlineHint": null,
    "school": "연세대학교",
    "campus": "",
    "foundAt": "2026-10-15"

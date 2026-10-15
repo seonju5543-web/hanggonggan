@@ -5,7 +5,15 @@
  "files": {
   "연세대학교": {
    "file": "nz3ew5y.json",
-   "count": 37
+   "count": 38
+  },
+  "연세대학교 미래캠퍼스": {
+   "file": "n1if6uwu.json",
+   "count": 31
+  },
+  "홍익대학교": {
+   "file": "nv8pha4.json",
+   "count": 12
   },
   "서울시립대학교": {
    "file": "n1au199v.json",
@@ -134,14 +142,6 @@
   "고려대학교 세종캠퍼스": {
    "file": "n1ch7t87.json",
    "count": 17
-  },
-  "연세대학교 미래캠퍼스": {
-   "file": "n1if6uwu.json",
-   "count": 30
-  },
-  "홍익대학교": {
-   "file": "nv8pha4.json",
-   "count": 11
   },
   "조선대학교": {
    "file": "n1qr99q6.json",
