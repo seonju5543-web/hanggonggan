@@ -11,7 +11,9 @@
   ],
   "from": "브라우저 본문"
  },
- "_common": [],
+ "_common": [
+  "939935e1b1f9556d"
+ ],
  "https://www.knou.ac.kr/bbs/knou/51/816545/artclView.do": {
   "at": "2026-10-04",
   "tries": 1,
@@ -154,153 +156,7 @@
   "excludes": [],
   "from": "공고문 첨부(OCR)"
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3532459": {
-  "at": "2026-10-11",
-  "tries": 1,
-  "lines": [
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "_ocrV": "paddle-pin-2026-10-04",
- "https://www.youthcenter.go.kr/bbs03View/48/10811": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://www.youthcenter.go.kr/bbs03View/48/10808": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://www.youthcenter.go.kr/bbs03View/48/10806": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://www.culture.go.kr/portal/cltBnf/cltSup/view.do?viewTp=2&rcrtSn=234939&menuNo=200104&sSort=2&pageIndex=1": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://www.korea.kr/briefing/actuallyView.do?newsId=148973265&pWise=sub&pWiseSub=C4": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/268735/artclView.do": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://youth.gyeongnam.go.kr/youth/board.es?mid=a10501020000&bid=0006&list_no=6911&act=view": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156784479&pWise=sub&pWiseSub=C2": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140417&article.offset=0&articleLimit=10": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53445&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=48133&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.ulsan?bbsId=BBS_0000000000000309&mId=008001002000000000&dataId=60769": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://youth.gyeongnam.go.kr/youth/board.es?mid=a10501020000&bid=0006&list_no=6907&act=view": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/268492/artclView.do": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53429&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=514&bcd=notice": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://kyf.or.kr/user/boardDetail.do?boardType=notice&bbsId=BBSMSTR_000000000367&nttNo=10054": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/267199/artclView.do": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/267176/artclView.do": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53417&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://www.bai.go.kr/bai/etc/popupzone/detail?ppId=120": {
-  "at": "2026-10-11",
-  "tries": 1
- },
- "https://www.k-startup.go.kr/web/contents/webNOTICE_MATR.do?page=1&viewCount=18&id=176455&schBdcode=&schGroupCode=&schM=view": {
-  "at": "2026-10-12",
-  "tries": 1
- },
- "https://asanmirae.or.kr:449/main/index.php?m_cd=17&b_id=20260804102775189": {
-  "at": "2026-10-12",
-  "tries": 1
- },
- "https://www.msit.go.kr/bbs/view.do?sCode=user&mId=307&mPid=208&bbsSeqNo=94&nttSeqNo=3187433": {
-  "at": "2026-10-12",
-  "tries": 1
- },
- "https://www.rda.go.kr/board/board.do?mode=view&prgId=nei_ancmttEntry&dataNo=100000812622": {
-  "at": "2026-10-12",
-  "tries": 1
- },
- "https://www.xn--ob0bv3xdjilia71ica881v.com/": {
-  "at": "2026-10-12",
-  "tries": 1
- },
- "https://answer.moaform.com/answers/M1GLjZ": {
-  "at": "2026-10-12",
-  "tries": 1
- },
- "https://www.dema.mil.kr/web/dema/info/notice/4/1012194/view.do": {
-  "at": "2026-10-13",
-  "tries": 1
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3532468": {
-  "at": "2026-10-13",
-  "tries": 1,
-  "lines": [
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://www.youthcenter.go.kr/bbs03View/48/10827": {
-  "at": "2026-10-13",
-  "tries": 1
- },
- "https://jejuyouthdream.com/policy/detail/70": {
-  "at": "2026-10-13",
-  "tries": 1
- },
- "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140536&article.offset=0&articleLimit=10": {
-  "at": "2026-10-13",
-  "tries": 1
- },
+ "_ocrV": "press-attach-2026-10-16",
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/520819": {
   "at": "2026-10-13",
   "tries": 1,
@@ -311,26 +167,6 @@
   "excludes": [],
   "from": "브라우저 본문"
  },
- "https://dep.hufs.ac.kr/bbs/student/2436/268996/artclView.do": {
-  "at": "2026-10-13",
-  "tries": 1
- },
- "https://www.schoolkeepa.or.kr/cop/bbs/selectArticleDetail.do?nttId=1711&bbsId=BBSMSTR_000000000001": {
-  "at": "2026-10-13",
-  "tries": 1
- },
- "https://www.instagram.com/p/DcxwHT5AYap/?hl=en&img_index=1": {
-  "at": "2026-10-13",
-  "tries": 1
- },
- "https://www.knou.ac.kr/bbs/knou/51/816423/artclView.do": {
-  "at": "2026-10-13",
-  "tries": 1
- },
- "https://www.kogl.or.kr/contest/contestMain.do": {
-  "at": "2026-10-13",
-  "tries": 1
- },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3523909": {
   "at": "2026-10-13",
   "tries": 1,
@@ -339,27 +175,6 @@
   ],
   "excludes": [],
   "from": "브라우저 본문"
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3533781": {
-  "at": "2026-10-14",
-  "tries": 1,
-  "lines": [
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://www.jinjae.kr/main/menu?gc=873HSUS&do=view&bwrite_id=3": {
-  "at": "2026-10-14",
-  "tries": 1
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/269119/artclView.do": {
-  "at": "2026-10-14",
-  "tries": 1
- },
- "https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=525&bcd=notice": {
-  "at": "2026-10-14",
-  "tries": 1
  },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3531332": {
   "at": "2026-10-15",
@@ -392,15 +207,110 @@
   "excludes": [],
   "from": "브라우저 본문"
  },
- "https://www.instagram.com/acrc0229/p/DeF3w_FE4Yt/?img_index=1": {
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3518148": {
+  "at": "2026-10-15",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://www.youthcenter.go.kr/bbs03View/48/10827": {
   "at": "2026-10-15",
   "tries": 1
  },
- "https://www.xn--299apb8dq67d5vc4xhnlenrm2waj8klo7b.com/": {
+ "https://www.youthcenter.go.kr/bbs03View/48/10811": {
+  "at": "2026-10-15",
+  "tries": 1
+ },
+ "https://www.youthcenter.go.kr/bbs03View/48/10808": {
+  "at": "2026-10-15",
+  "tries": 1
+ },
+ "https://www.youthcenter.go.kr/bbs03View/48/10806": {
+  "at": "2026-10-15",
+  "tries": 1
+ },
+ "https://jejuyouthdream.com/policy/detail/70": {
   "at": "2026-10-15",
   "tries": 1
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53490&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-10-15",
+  "tries": 1
+ },
+ "https://www.jinjae.kr/main/menu?gc=873HSUS&do=view&bwrite_id=3": {
+  "at": "2026-10-15",
+  "tries": 1
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/269119/artclView.do": {
+  "at": "2026-10-15",
+  "tries": 1
+ },
+ "https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=525&bcd=notice": {
+  "at": "2026-10-15",
+  "tries": 1
+ },
+ "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140536&article.offset=0&articleLimit=10": {
+  "at": "2026-10-15",
+  "tries": 1
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/268996/artclView.do": {
+  "at": "2026-10-15",
+  "tries": 1
+ },
+ "https://www.k-startup.go.kr/web/contents/webNOTICE_MATR.do?page=1&viewCount=18&id=176455&schBdcode=&schGroupCode=&schM=view": {
+  "at": "2026-10-15",
+  "tries": 1
+ },
+ "https://www.culture.go.kr/portal/cltBnf/cltSup/view.do?viewTp=2&rcrtSn=234939&menuNo=200104&sSort=2&pageIndex=1": {
+  "at": "2026-10-15",
+  "tries": 1
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/268735/artclView.do": {
+  "at": "2026-10-15",
+  "tries": 1
+ },
+ "https://youth.gyeongnam.go.kr/youth/board.es?mid=a10501020000&bid=0006&list_no=6911&act=view": {
+  "at": "2026-10-15",
+  "tries": 1,
+  "lines": [
+   "경남 창원시 의창구 사림로 45 번길 59 에 위치한 경남 청년센터는 경상남도미래세대재단이 운영한다 . 경남도민과 도내 학교에 재학 중이거나 직장에 재직 중인 19~39 세 청년이라면 누구나 이용할 수 있으며 , 청년들을 위한 다양한 맞춤형 정책과 소통 공간을 제공할 예정이다 ."
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140417&article.offset=0&articleLimit=10": {
+  "at": "2026-10-15",
+  "tries": 1
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53445&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-10-15",
+  "tries": 1
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=48133&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-10-15",
+  "tries": 1
+ },
+ "https://youth.gyeongnam.go.kr/youth/board.es?mid=a10501020000&bid=0006&list_no=6907&act=view": {
+  "at": "2026-10-15",
+  "tries": 1
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/268492/artclView.do": {
+  "at": "2026-10-15",
+  "tries": 1
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53429&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-10-15",
+  "tries": 1,
+  "lines": [
+   "참가대상 : 대한민국 거주 누구나(개인 또는 팀 4인 이하)"
+  ],
+  "excludes": [],
+  "from": "공고문 첨부(OCR)"
+ },
+ "https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=519&bcd=notice": {
   "at": "2026-10-15",
   "tries": 1
  }
