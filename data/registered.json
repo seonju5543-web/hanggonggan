@@ -13866,8 +13866,7 @@
    "period": "접수 ~2026-11-13",
    "summary": "경북대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "경북대학교"
+    "selective": true
    },
    "documents": [
     "지원 자격·제출 서류는 원문 공고에서 확인"
@@ -13896,7 +13895,15 @@
     "max": 2000000,
     "raw": "3. 장학 금액: 최대 200만원(등록금 실 납부액)"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "alsoPostedAt": [
+    {
+     "school": "영남대학교",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=232091479&article.offset=0&articleLimit=10",
+     "id": "notice:https://www.yu.ac.kr/scholar/notice/notice.do?articleno=232091479"
+    }
+   ],
+   "scopeFrom": "같은 사업이 영남대학교 게시판에도 올라옴(자동) — 영남대학교 게시판 https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=232091479&article.offset=0&articleLimit=10"
   },
   {
    "id": "auto-ent2431269173artclviewdo",
@@ -14063,6 +14070,179 @@
     "raw": "3. 선발인원 및 장학금액 : 3 명 / 연 1 회 2,500,000 원"
    },
    "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-otice06doarticleno140601",
+   "name": "2026학년도 심산혁신장학금 장학생 선발안내( ~ 2026년 11월 6일(금) 오후 5시까지)",
+   "boardTitle": "2026학년도 심산혁신장학금 장학생 선발안내( ~ 2026년 11월 6일(금) 오후 5시까지)",
+   "type": "교외",
+   "kindEvidence": [
+    "교내 증거 없음 — 기본값"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-10-15",
+   "provider": "주관 기관 원문 확인",
+   "amount": "200만원",
+   "amountValue": 2000000,
+   "deadline": "2026-11-06",
+   "deadlineFrom": "공고 원문 · 2026학년도 심산혁신장학금 장학생 선발안내( ~ 2026년 11월 6일(금) 오후 5시까지)",
+   "period": "접수 ~2026-11-06",
+   "summary": "성균관대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "성균관대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-15 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "[붙임_1] 심산혁신장학금 신청서 양식.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140601&attachNo=118388"
+    },
+    {
+     "name": "[붙임_2] 개인정보 수집 및 이용동의서(성균관대학교).hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140601&attachNo=118389"
+    }
+   ],
+   "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140601&article.offset=0&articleLimit=10",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "1. 장학생 자격요건",
+    "1) 기본 자격: 본교 학사과정 재학생 (성별, 나이, 학년, 전공, 소득분위, 성적/학점 모두 무관)",
+    "2) 선발 기준: 기존 지식에 얽매이지 않고 누구도 하지 않은 도전적·창의적 행동 계획을 가진 학생",
+    "※ 예시: 만주 광개토대왕비를 직접 관찰하고 비문의 내용을 창의적으로 해석하려는 계획 등"
+   ],
+   "excerpts": [
+    "제출기한: 2026년 11월 6일 오후 5시까지"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 2000000,
+    "ratio": 0,
+    "min": 2000000,
+    "max": 2000000,
+    "raw": "2. 지원내용 1) 지원 금액: 1인당 2,000,000원 (생활비성 장학금) 2) 선발 인원: 5명 내외 ※ 지원자의 도전 및 창의성 기준 부합 여부에 따라 최종 선발 인원이 조정될 수 있으며, 미선발 인원이 발생할 경우 차년도로 이월되어 추가 선발될 수 있습니다."
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-0713no2515760sitedvscdkr",
+   "name": "2026학년도 MEGA CNU GLOBAL 장학 「재학생 성적우수자 TRACK」모집 안내",
+   "boardTitle": "2026학년도 MEGA CNU GLOBAL 장학 「재학생 성적우수자 TRACK」모집 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "교내 증거 없음 — 기본값"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-10-15",
+   "provider": "주관 기관 원문 확인",
+   "amount": "600만원",
+   "amountValue": 6000000,
+   "deadline": "2026-10-20",
+   "deadlineFrom": "공고 원문 · 4. 파견 시기: 2027학년도 여름방학 5. 지원 기간: 2026. 10. 14.(수) 9:00 ~ 10. 20.(화) 15:00까지",
+   "period": "접수 ~2026-10-20",
+   "summary": "충남대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "충남대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-15 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "마이크로디그리과정",
+     "url": "https://plus.cnu.ac.kr/html/kr/26file/2026_di_2010.pdf"
+    },
+    {
+     "name": "붙임1_2026 mega cnu global 장학_재학생 성적 우수자 track 모집 공고.hwpx",
+     "url": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2515760&atch_no=1"
+    },
+    {
+     "name": "붙임2_해외파견프로그램_목록(재학생track).xlsx",
+     "url": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2515760&atch_no=2"
+    },
+    {
+     "name": "붙임3-1_수학계획서_서식.hwp",
+     "url": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2515760&atch_no=3"
+    },
+    {
+     "name": "붙임3-2_수학계획서_서식.pdf",
+     "url": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2515760&atch_no=4"
+    }
+   ],
+   "sourceUrl": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515760&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
+   "sourceKind": "auto",
+   "openDate": "2026-10-14",
+   "announceDate": "2026-10-26",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 6000000,
+    "ratio": 0,
+    "min": 6000000,
+    "max": 6000000,
+    "raw": "2. 장학 혜택: 무료 원어민 어학과정 제공 및 파견 장학금 600만원 지원 3. 파견 대학: 해외 자매대학 5개교 4. 파견 시기: 2027학년도 여름방학"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-15nttno170722searchctgry",
+   "name": "2026학년도 2학기 천사장학생 선발 안내",
+   "boardTitle": "2026학년도 2학기 천사장학생 선발 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "본문 「교내장학」",
+    "접수 이메일 도메인 cbnu.ac.kr (학교)",
+    "접수처 「장학팀 방문 제출」"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-10-15",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-10-29",
+   "deadlineFrom": "공고 원문 · 2026학년도 2학기 천사장학생 선발 계획을 아래와 같이 알려드리니, 해당 학생들은 기한 내에 신청하여 주시기 바랍니다. 1. 신청기간: 2026. 10. 15.(목) ~ 10. 29.(목) 18:00까지",
+   "period": "접수 ~2026-10-29",
+   "summary": "충북대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "충북대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-15 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=815&bbsNo=8&nttNo=170722&pageUnit=10&searchCtgry=%ed%95%99%ec%82%ac%2f%ec%9e%a5%ed%95%99&searchCnd=all&pageIndex=1",
+   "sourceKind": "auto",
+   "applyEmail": "ektha5928@cbnu.ac.kr",
+   "applyEmailSource": "※ 천사장학금 신청서는 학생과에 원본 제출 및 웹메일(ektha5928@cbnu.ac.kr)로 HWP파일 제출 필요 (메일 제목 형식: 천사장학금 신청서_성명 _학번)",
+   "applyEmailFrom": "공고 원문",
+   "openDate": "2026-10-15",
+   "eligibilityLines": [
+    "2. 신청자격",
+    "- 정규학기에 재학 중인 학부생",
+    "- 징계 등 처분 이력이 없는 학생",
+    "- 객관적인 가계곤란(붙임 참고) 증빙자료와 학과장 추천서 제출이 가능한 학생",
+    "- 고른 기회 부여를 위해 천사장학금은 최대 2회까지 수혜 가능"
+   ],
+   "excerpts": [
+    "기타문의: 학생과 장학팀(☎043-261-2027)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   }
  ]
 }
