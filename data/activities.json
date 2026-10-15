@@ -2,6 +2,40 @@
  "updatedAt": "2026-10-15",
  "items": [
   {
+   "title": "2026 경기도 ESG 인식확산 교육 (5~7회차) 참여자 모집 안내",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179325",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/oUXLn"
+    },
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/wUXLn"
+    }
+   ],
+   "deadlineHint": "접수기간 2026-09-22 ~ 2026-10-16 14:00 주관기관명 (재)경기도경제과학진흥원 대상 전체 창업업력 전체 연락처 031-259",
+   "deadline": "2026-10-16",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-22 ~ 2026-10-16 14:00"
+    }
+   ],
+   "eligibilityLines": [
+    "신청대상 : 경기도 도민·기업 재직자·학생 등 누구나",
+    "대상연령 : 전체"
+   ],
+   "detailsV": 3,
+   "field": "교육·캠프",
+   "excerptsAt": "2026-10-15",
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-10-15"
+  },
+  {
    "title": "[무료|150석 한정] 딥테크 창업가 컨퍼런스 d.day : founders summit 참가자 모집 10/29",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179527",
    "kind": "대외활동",
@@ -2378,47 +2412,6 @@
    "noticeLines": [
     "강남구여성능력개발센터에서는 정부지원사업(모두의 창업 등) 도전 및 성공적인 창업 준비를 지원하기 위해 분야별 전문 멘토와 함께하는 1:1 맞춤형 창업 멘토링을 운영합니다. 창업의 첫걸음부터 비즈니스 모델 구체화, 서비스 고도화까지 개별 맞춤 솔루션을 받아보실 기회이니 역량 있는 예비·초기 창업자분들의 많은 관심과 참여 바랍니다.",
     "온라인 접수 : https://buly.kr/5q8K6WN"
-   ],
-   "detailsV": 3,
-   "foundAt": "2026-10-08",
-   "seenAt": "2026-10-15",
-   "excerptsAt": "2026-10-15"
-  },
-  {
-   "title": "2026 경기도 ESG 인식확산 교육 (5~7회차) 참여자 모집 안내",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179325",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-10-16",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-09-22 ~ 2026-10-16"
-    },
-    {
-     "label": "대상",
-     "text": "경기도 도민·기업 재직자·학생 등 누구나"
-    },
-    {
-     "label": "활동지역",
-     "text": "경기"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "ESGi 이에스지아이",
-   "api": "kstartup",
-   "apiId": "179325",
-   "id": "api-kstartup-179325",
-   "eligibilityLines": [
-    "경기도 도민·기업 재직자·학생 등 누구나"
-   ],
-   "noticeLines": [
-    "본 기업은 (재)경기도경제과학진흥원의 주관으로 「2026년 경기도 ESG 인식확산 교육 5~7회」를 추진합니다.",
-    "이에 경기도 도민, 기업, 재직자 및 학생 등 ESG에 관심 있는 사람을 모집하오니 희망하는 사람들의 많은 신청을 바랍니다.",
-    "온라인 접수 : http://edu.grc.or.kr/userMain/goUserMain?lang=ko"
    ],
    "detailsV": 3,
    "foundAt": "2026-10-08",

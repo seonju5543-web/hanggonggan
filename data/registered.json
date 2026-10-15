@@ -14321,11 +14321,11 @@
    "kindConfidence": "low",
    "kindFrom": "로봇(원문) 2026-10-15",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
+   "amount": "등록금 전액",
    "amountValue": 0,
-   "deadline": null,
+   "deadline": "2026-11-13",
    "listedAt": "2026-10-15",
-   "period": "접수 기간 원문 확인",
+   "period": "접수 기간 ~2026-11-13",
    "summary": "부산대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
@@ -14340,7 +14340,30 @@
    "auto": true,
    "attachments": [],
    "sourceUrl": "https://onestop.pusan.ac.kr/page?menuCD=000000000000062&mode=DETAIL&seq=702",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "deadlineFrom": "공고 원문",
+   "applyEmail": "scholarship@pusan.ac.kr",
+   "applyEmailSource": "4. 신청방법 : 학생과 방문 제출 ( 대학 본관 2 층 ) 또는 e-mail 제출 (scholarship@pusan.ac.kr) 후 면담 전 원본 제출",
+   "applyEmailFrom": "공고 원문",
+   "openDate": "2026-10-19",
+   "eligibilityLines": [
+    "1. 신청대상 ( 세부사항은 [ 붙임 ] 의 선발계획 참조 )",
+    "( 학부생 ) 2026 학년도 2 학기 재학 중인 정규학기 학생 중 직전학기 성적 2.0 이상 및 이수학점 12 학점 이상으로 가계곤란 사유에 해당하는 학생",
+    "( 일반대학원생 ) 2026 학년도 2 학기 재학 중인 정규학기 학생 중 직전학기 성적 3.0 이상으로 가계곤란 사유에 해당하는 학생"
+   ],
+   "excerpts": [
+    "신청방법 : 학생과 방문 제출 ( 대학 본관 2 층 ) 또는 e-mail 제출 (scholarship@pusan.ac.kr) 후 면담 전 원본 제출"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "ratio",
+    "value": 0,
+    "ratio": 1,
+    "min": 0,
+    "max": 0,
+    "raw": "2. 지원금액 : 가계곤란 정도에 따라 차등 금액 지급 ( 등록금에 한함 ) ※ 2026 학년도 2 학기 등록금을 전액 감면 ( 등록금 전액 장학생 ) 받은 경우 지원 불가"
+   },
+   "amountFrom": "공고 원문"
   }
  ]
 }
