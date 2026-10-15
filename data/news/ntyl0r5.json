@@ -3,6 +3,50 @@
  "updatedAt": "2026-10-15",
  "items": [
   {
+   "title": "[교육미션센터] 기간제 전담직 채용 공고",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/141/236356/artclView.do",
+   "postedAt": "2026-10-15",
+   "kind": "채용",
+   "school": "명지대학교",
+   "campus": "",
+   "src": "7f376301",
+   "foundAt": "2026-10-15",
+   "desc": "1. 모집부문 및 지원자격 담당업무 자격요건 및 우대사항 명지대학교 교육미션센터"
+  },
+  {
+   "title": "[대학일자리플러스센터] 만족도조사 참여 안내",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/141/236355/artclView.do",
+   "postedAt": "2026-10-15",
+   "school": "명지대학교",
+   "campus": "",
+   "src": "7f376301",
+   "foundAt": "2026-10-15",
+   "thumb": "data/news/img/9099b06d203e81f9.webp",
+   "desc": "고용노동부와 한국고용정보원에서는 “2026년 대학일자리플러스센터 만족도 조사” 를 실시하고 있습니다 . 본 조사는 대학일자리플러스사업 서비스 참여자의 만족도 조사를 통해 서비스 질 향상을 위한 목적으로 실사하고…"
+  },
+  {
+   "title": "[AI융합교육원] 기간제 전담직(계약직) 채용 공고",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/141/236349/artclView.do",
+   "postedAt": "2026-10-15",
+   "kind": "채용",
+   "school": "명지대학교",
+   "campus": "",
+   "src": "7f376301",
+   "foundAt": "2026-10-15",
+   "desc": "명지대학교 AI 융합교육원에서 함께 일할 기간제 전담직 ( 계약직 ) 직원을 다음과 같이 채용하오니 많은 지원 바랍니다 ."
+  },
+  {
+   "title": "[방목기초교육대학] 2026-2 대단위 중간고사 시험 안내",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/141/236348/artclView.do",
+   "postedAt": "2026-10-15",
+   "kind": "학사",
+   "school": "명지대학교",
+   "campus": "",
+   "src": "7f376301",
+   "foundAt": "2026-10-15",
+   "thumb": "data/news/img/d9d56d1ab7328204.webp"
+  },
+  {
    "title": "[IR센터] 자연캠퍼스 전임연구원 채용 공고",
    "url": "https://www.mju.ac.kr/bbs/mjukr/141/236311/artclView.do",
    "postedAt": "2026-10-14",
@@ -262,7 +306,8 @@
    "kind": "채용",
    "school": "명지대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "desc": "1. 채용분야 및 지원자격 채용부서 주요업무 자격요건 및 우대사항 사회과학대학 인턴사무원 학사관리 및 행정업무"
   },
   {
    "title": "2026학년도 2학기 대학 재학생 등록금 구제 납부 안내",

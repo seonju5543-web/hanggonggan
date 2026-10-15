@@ -3,6 +3,29 @@
  "updatedAt": "2026-10-15",
  "items": [
   {
+   "title": "2026년 제16회 영어말하기 대회 운영안내",
+   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11540&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "postedAt": "2026-10-15",
+   "kind": "생활",
+   "school": "강원대학교",
+   "campus": "",
+   "src": "784a7e0d",
+   "foundAt": "2026-10-15",
+   "thumb": "data/news/img/d0bed00369b8dc87.webp",
+   "desc": "강릉교양교육센터 주관 2026년 제16회 영어말하기 대회를 아래와 같이 개최하오니, 여러분들의 많은 참여바랍니다. ★ 신청 및 일정 관련 내용"
+  },
+  {
+   "title": "「2026년 강릉해람시민대학」 운영 (사전신청: ~11.4)",
+   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11539&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "postedAt": "2026-10-15",
+   "school": "강원대학교",
+   "campus": "",
+   "src": "784a7e0d",
+   "foundAt": "2026-10-15",
+   "thumb": "data/news/img/a5ee49b836fb28cd.webp",
+   "desc": "(운영대상) 강릉시 지역주민 및 대학구성원 (운영기간) 2026. 11. 10.(화) ~ 12.(목), 17.(화) ~ 18.(수) / 매일 18:30~21:00"
+  },
+  {
    "title": "[강릉앵커사업단]2026학년도 2학기 캡스톤디자인 프로그램(강릉.원주) 프로젝트 팀 선정평가 발표",
    "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11538&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
    "postedAt": "2026-10-14",
@@ -235,7 +258,8 @@
    "school": "강원대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "thumb": "data/news/img/4b18be5754f8315a.webp"
+   "thumb": "data/news/img/4b18be5754f8315a.webp",
+   "desc": "강원대학교 총동창회에서는 동문 및 대학 구성원 간 교류와 화합을 위한 「강대인 봄내길 걷기대회」를 개최합니다."
   },
   {
    "title": "[생활협동조합] 크누테리아 한식 메뉴 재개 안내",
@@ -280,7 +304,8 @@
    "school": "강원대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "src": "784a7e0d"
+   "src": "784a7e0d",
+   "desc": "▶ 검진대상 : 강원대학교 재학생(대학원생 포함) * 인원 한정, 선착순 마감"
   },
   {
    "title": "2026년 학생예비군 11.3. 기본훈련(3차) 안내",
@@ -375,25 +400,6 @@
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/6ca113811c3bc1d6.webp",
    "src": "784a7e0d"
-  },
-  {
-   "title": "강원대학교 재학생 대상 무료 온라인 모의 토익/모의 토익스피킹/모의 오픽 시험 안내",
-   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11458&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "postedAt": "2026-09-17",
-   "school": "강원대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/1780a40d63c7c488.webp"
-  },
-  {
-   "title": "[강연] 영문학자가 본 \"오디세이\" 집으로 가는 여러가지 길",
-   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11457&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "postedAt": "2026-09-17",
-   "kind": "행사",
-   "school": "강원대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/54cc5a34d913d517.webp"
   }
  ]
 }

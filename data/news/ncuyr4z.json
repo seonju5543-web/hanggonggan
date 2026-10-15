@@ -3,6 +3,29 @@
  "updatedAt": "2026-10-15",
  "items": [
   {
+   "title": "[D-1] 2026 동계 JBNU 파란사다리 해외 파견프로그램 추가 선발 안내(기한: 10/16까지)",
+   "url": "https://www.jbnu.ac.kr/web/Board/218448/detailView.do",
+   "postedAt": "2026-10-15",
+   "postId": "218448",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-10-15",
+   "desc": "많은 학우분들의 지원 바랍니다.(마지막 모집) 1. 파란사다리 프로그램이란?"
+  },
+  {
+   "title": "[전북인문사회연구원] 2026년 제1회 콜로키움 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/218431/detailView.do",
+   "postedAt": "2026-10-15",
+   "postId": "218431",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-10-15",
+   "thumb": "data/news/img/398461207f85765e.webp",
+   "desc": "전북인문사회연구원 안녕하십니까 ? 전북대학교 전북인문사회연구원에서 2026 년 제 1 회 콜로키움을 다음과 같이 진행합니다 ."
+  },
+  {
    "title": "[D-2] 2026 동계 JBNU 파란사다리 해외 파견프로그램 추가 선발 안내(기한: 10/16까지)",
    "url": "https://www.jbnu.ac.kr/web/Board/218423/detailView.do",
    "postedAt": "2026-10-14",
@@ -308,7 +331,8 @@
    "school": "전북대학교",
    "campus": "",
    "foundAt": "2026-10-06",
-   "thumb": "data/news/img/56e86b56f9a841d9.webp"
+   "thumb": "data/news/img/56e86b56f9a841d9.webp",
+   "desc": "정치외교학과 전북대 동아시아·다문화 융· 복합 연계전공은 동남아와 동북아를 포괄한 동아시아 지역연구를 이주이민연구와 융합하여 정치학자, 인류학자, 사회학자, 개발학자가 함께 교육함으로써 동아시아 지역에 대한…"
   },
   {
    "title": "평생지도교수제 교과목 [진로개발 및 상담] 학기중 대체프로그램 실시 및 참가신청 안내",
@@ -337,7 +361,8 @@
    "postId": "218115",
    "school": "전북대학교",
    "campus": "",
-   "foundAt": "2026-10-06"
+   "foundAt": "2026-10-06",
+   "desc": "언어교육부 언어교육부에서 아래와 같이 모의토익을 실시하오니, 많은 관심 부탁드립니다."
   },
   {
    "title": "[RED/ORANGE BELT] 큰사람프로젝트 'AI 면접' 항목 이수 방법 안내",
@@ -416,26 +441,6 @@
    "campus": "",
    "foundAt": "2026-10-02",
    "postId": "218047"
-  },
-  {
-   "title": "[중앙도서관] ⌈PIN⌋ '같은 결 다른 색' 10월 전시 안내",
-   "url": "https://www.jbnu.ac.kr/web/Board/218044/detailView.do",
-   "postedAt": "2026-10-02",
-   "kind": "행사",
-   "school": "전북대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "postId": "218044",
-   "thumb": "data/news/img/44bc2b4a1e2e7d40.webp"
-  },
-  {
-   "title": "[예비군] 2026년도 예비군훈련 2차 훈련 공고",
-   "url": "https://www.jbnu.ac.kr/web/Board/218043/detailView.do",
-   "postedAt": "2026-10-02",
-   "school": "전북대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "postId": "218043"
   }
  ]
 }
