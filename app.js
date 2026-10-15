@@ -3391,7 +3391,8 @@ function openActivityDetail(url) {
   const { sch, result, fit, fd } = activityFit(n);
   const d = n.deadline ? dday(n.deadline) : null;
   const benefit = unent(activityBenefit(n));
-  const rows = (n.excerpts || []).filter((x) => x.label !== '혜택');
+  /* 「대상」 발췌는 자격 줄이 있으면 위 「지원 자격」이 이미 보여 준다 — 같은 A·B·C 조건이 「모집 안내」에 한 번 더 떴다(쇼미더임팩트 · 2026-10-16 개발자 지적) */
+  const rows = (n.excerpts || []).filter((x) => x.label !== '혜택' && !(x.label === '대상' && (n.eligibilityLines || []).length));
   /* 원문 안내 — 위 '모집 안내'에 이미 나온 문장은 다시 적지 않는다(같은 접수기간이 두 칸에 떴다 · 2026-10-01) */
   const flat = (x) => String(unent(x || '')).replace(/[\s:：·\-–]/g, '');
   const seenText = [...(n.excerpts || []).map((x) => flat(x.text)), ...(n.eligibilityLines || []).map(flat)].filter((x) => x.length >= 6);
@@ -4250,6 +4251,26 @@ const NS_LABELS = [
 ];
 const NS_SKIP = /^(?:지원|신청|응모|모집|선발|추천)\s?(?:자격|대상|요건)$|^자격\s?요건$|^대상$/;
 const NS_DANGLE = /(?:하고|하며|하여|이며|및|또는|으로|에서|,|\(|：|:|~|-|·)$/;
+/* 줄로 쪼개진 원문을 **읽을 수 있는 줄**로 (2026-10-16 개발자 "공고 안내에도 그냥 원문에서 절만 잘라서") — 글자는 그대로, 잇기만 한다
+   · 납작한 표 `활동일시` ↵ `ㅇ 2026.10.18` → `활동일시 : 2026.10.18` (NS_BARE_LABEL — 이름표만 남은 줄은 다음 줄의 이름표다)
+   · 줄바꿈으로 끊긴 한 문장 `…희망하는` ↵ `기업들의 …` ↵ `하는 … 합니다.` → 한 줄 (앞 줄이 문장 끝 NS_LINE_END 가 아니고 다음 줄이 항목 머리 NS_ITEM_HEAD 가 아닐 때)
+   · 이름표 없는 줄은 **문장이거나 알맹이(숫자·주소)가 있을 때만**(NS_SENTENCE) — `강북창업지원센터에서` 같은 조각은 안 보인다 */
+const NS_BARE_LABEL = /^[\s○●■□ㅇ·\-–]*[가-힣\s]{2,8}(?:기간|일시|일정|장소|방법|대상|내용|인원|문의|혜택|접수|자격|요건)\s*[:：]?\s*$/;
+const NS_LINE_END = /(?:[.。!?)）」』>:：]|[다요함음임됨]|\d)\s*$/;
+const NS_ITEM_HEAD = /^\s*(?:[○•◦▪■□◎※\-–·ㅇ*▶▷◆◇①-⑳]|\d{1,2}\s?[.)]|[A-Za-z가-힣]\s?[.)]\s|[가-힣A-Za-z0-9\s·()]{1,14}\s?[:：])/;
+const NS_SENTENCE = /(?:[.。!?)）」』]|[다요함음임됨])\s*$|\d|https?:|@/;
+function joinNoticeLines(segs) {
+  const out = [];
+  for (const raw of segs) {
+    const s = String(raw || '').trim();
+    if (!s) continue;
+    const prev = out[out.length - 1];
+    if (prev && NS_BARE_LABEL.test(prev) && !NS_BARE_LABEL.test(s)) { out[out.length - 1] = `${prev.replace(/^[\s○●■□ㅇ·\-–]+/, '').replace(/[\s:：]+$/, '')} : ${s.replace(/^[\s○●■□ㅇ·\-–]+/, '')}`; continue; }
+    if (prev && !NS_LINE_END.test(prev) && !NS_BARE_LABEL.test(s) && !NS_ITEM_HEAD.test(s) && !/^[^:：]{1,16}[:：]/.test(prev)) { out[out.length - 1] = `${prev} ${s}`; continue; }
+    out.push(s);
+  }
+  return out;
+}
 function tidyChars(s) {
   const t = String(s || '').replace(/[․‧]/g, '·').replace(/\s*[⦁•◦∙]\s*/g, ' · ').replace(/\u260E\s?/g, '전화 ')
     .replace(/(\d)\s+(인|명|원|점|개|건|회|년|월|일|학기|학년|학점|구간|분위|부|매|쪽)(?![가-힣])/g, '$1$2')   // `1 인 당 1,000,000 원` → `1인 당 1,000,000원`
@@ -4259,7 +4280,7 @@ function tidyChars(s) {
 function noticeSummaryHtml(lines) {
   const rows = []; const seen = new Set();
   /* 한 줄에 글머리 기호로 여러 항목이 붙어 온 것(`○ (신청방법) 네이버 폼 … ○ (모집대상) 만 19세~39세`)은 항목마다 한 줄로 가른다 — 글자는 그대로 */
-  const segs = (lines || []).flatMap((raw) => String(raw || '').split(/\s+[○●■□\u25B6▷◆◇]\s*(?=\S)/));
+  const segs = joinNoticeLines((lines || []).flatMap((raw) => String(raw || '').split(/\s+[○●■□\u25B6▷◆◇]\s*(?=\S)/)));
   for (const raw of segs) {
     let t = tidyChars(unent(String(raw || '')))
       .replace(/[\u2605☆\u261E]+/g, ' ').replace(/!{2,}/g, '!')   // 꾸밈 기호·느낌표 줄 — 뜻이 없다
@@ -4279,6 +4300,7 @@ function noticeSummaryHtml(lines) {
       label = hit ? hit[1] : m[1].trim();
       body = m[2].trim();
     }
+    if (!label && !NS_SENTENCE.test(body)) continue;   // 이름표 없는 줄은 문장이거나 알맹이가 있어야 한다(2026-10-16)
     if (NS_DANGLE.test(body)) {
       if (!label) continue;   // 이름표 없는 잘린 조각은 뺀다
       /* 이름표가 있는 줄은 남기되 잘린 꼬리(`신청하고`·`및`)만 떼고 끝에 … — 글자를 지어내지 않는다(리뷰 2026-10-15 · "~하고에서 끊김" 그 자리) */

@@ -20,7 +20,7 @@
    (학습 로봇은 검색을 못 해 사람이 새 링크를 줘야 넓어진다. 주소는 추천하지 않는다).
 7. **로봇 운영 수리(저장 전 관문·되돌리기·경보 짝 빠짐)는 묻지 않고 즉시 한다**(2026-10-13 지시). 규칙 파일(`collector/*.json`)을 쓰는 로봇은 저장 앞에 `test-collector` 를 거친다 — 없는 로봇이 보이면 그 자리에서 붙인다(관문 「층2 재단 글 사냥꾼」 ⑦-1).
 
-## 🔴 수집망 44개교 복원 (2026-09-29 지시 — 대외활동·공모전 탭 + 인포 중심 피벗, *"죽은 학교들을 모두 다시 살려"*)
+## 🔴 수집망 44개교 복원 (2026-09-29 지시 *"죽은 학교들을 모두 다시 살려"*)
 
 - **수집·실시간 피드·대외활동은 44개교**. 고치는 자리는 셋이 한 세트 — `schools.json`·`browser-targets.json`
   (`parked` 는 '쓰지 않게 된 게시판' 보관 자리로 남긴다 · 지우지 말 것) + `match-engine.js` 의 `SERVED_SCHOOLS`(앱·알림·발행 공용 — 브라우저가
@@ -242,7 +242,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   새로 묶인 것은 관리자 「할 일」의 '교외인데 한 학교에만' 묶음에 뜬다. 칸을 새로 만들면 `admin-apply.mjs`·`edit-diff.mjs` 의 `ELIG_KEYS` 에도(안 하면 저장 때 조용히 버려진다).
 - **분교 ≠ 이원화** — 분교는 `UNIVERSITIES` 에 별개 학교, 이원화는 `CAMPUSES_BY_SCHOOL`. 게시판 공유 분교 판정은 `noticeForProfile` 한 곳(data.js 금지 — sw 가 안 읽는다).
 - **'오늘'을 상수로 굳히지 말 것** — `todayStart()` 가 부를 때마다 읽는다(PWA 는 며칠씩 떠 있다) · 자동 등록의 연도도 오늘 기준(`yearHold`). 관문 「마감 판정이 앱을 켠 시각에 굳지 않는다」.
-- **공고 카드 품질(10-15)**: 「○○의 경우」 줄은 범위 밖이면 '모름'(`lineVerdict`) · 열거 학년·이수 학기(`parseSemester`)·따옴표 구간·「3.0/4.5」 성적 판정 · 자격 줄이 없으면 구조화 조건이 요건(`fitDetail`) · 조각·글 제목·※ 예외는 자격 줄 아님(`looksFragment`·aside) · 중위소득 %는 구간 표로(`parseIncomeBand`) · 단과대론 ✓ 안 줌 · ✕ 는 한 번만 · 「공고 안내」는 `noticeSummaryHtml` 한 곳. 관문 「공고 카드 품질」.
+- **공고 카드 품질(10-15)**: 「○○의 경우」 줄은 범위 밖이면 '모름'(`lineVerdict`) · 열거 학년·이수 학기(`parseSemester`)·따옴표 구간·「3.0/4.5」 성적 판정 · 자격 줄이 없으면 구조화 조건이 요건(`fitDetail`) · 조각·글 제목·※ 예외는 자격 줄 아님(`looksFragment`·aside) · 중위소득 %는 구간 표로(`parseIncomeBand`) · 단과대론 ✓ 안 줌 · ✕ 는 한 번만 · 「공고 안내」는 `noticeSummaryHtml` 한 곳(끊긴 문장 잇기·조각 빼기) · 활동 자격 줄의 안내 문장·시상표는 `eligLineOk` 한 곳. 관문 「공고 카드 품질」.
 
 ### 교내/교외 · 제목 · 금액 · 마감
 
@@ -303,7 +303,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - **그려 놓고 센다** — 카드는 함수가 여럿이다(`schCard`·`liveNoticesHtml`). 값이 같아도 모양이 다를 수 있다(관리자 화면 · `verify-admin-shape.js`).
 - **서체 Pretendard 한 벌 · 작은 척도**(09-11 되돌림). 다시 바꾸자는 제안은 화면을 보여 주고 정한다. 파일 끝 카드 블록이 앞 규칙을 덮는다.
 - **디자인 토큰**: 원본 `style.css`, 관문 `ui-tone.mjs`(토큰 이탈 톱니 · 괄호 짝 · 병합 충돌 표식). 🔴 CSS 에 남은 충돌 표식·짝 없는 `}` 는 조용히 규칙을 삼킨다.
-- 🔴 **문서는 굴러가지 않는다 — `#app` 안쪽만 굴러간다**(2026-10-04 · iOS 26 이 문서 스크롤 중 하단 탭을 화면 중간에 그린다). 스크롤은 `appScroller`·`appScrollTo` 로(`window.scrollY` 는 늘 0) · 드라이버도 같다. 관문 `verify-interactions.js` UI-7 절.
+- 🔴 **문서는 굴러가지 않는다 — `#app` 안쪽만 굴러간다**(iOS 26 이 하단 탭을 화면 중간에 그린다). 스크롤은 `appScroller`·`appScrollTo` 로(`window.scrollY` 는 늘 0) · 드라이버도 같다. 관문 `verify-interactions.js` UI-7 절.
 - **시트는 전부 아래로 쓸어 닫는다** — `enableSheetSwipe` 한 곳 · 판정은 `scrollableAtTop` · 회귀는 TouchEvent 로.
 - **설정 화면**: `#my-account`·`#my-notify` id 는 자리만 옮겼다(이름 바꾸지 말 것) · 약관은 앱 안 화면(`renderTerms` 가 `terms.html` 을 읽는다) · 휴지통 30일.
 - **첫 화면**: 감추지 않은 화면이 하나면 그게 첫 화면이 된다 · CSP 가 인라인·`onclick=` 을 막는다 · 저장은 `visibilitychange` 로(`beforeunload` 금지) ·
