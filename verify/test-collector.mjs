@@ -10966,6 +10966,31 @@ console.log('\n■ 처지 요건 — 프로필에 칸이 없던 개인 사정');
   eq('  `산업재해` 는 재난·재해 피해가 아니다',
     kindsOf('○ 산업재해 및 기타사유로 가정생활이 어려운 근로자').includes('disaster'), false);
 
+  /* 🔴 국가장학금 **신청** (2026-10-15 · 노션 G-14 개발자 결정 ②) — 프로필에 없는 '행동'을 예/아니요로 묻는다. 전부 실제 원문 줄.
+     되돌리면: TRAIT_PAT 의 kosafApplied 를 빼면 「예」·「아니요」 줄이, unaskedAttr 의 KOSAF_EXTRA 를 빼면 '승인 완료'·'국가근로' 줄이 빨간불. */
+  const vb = (line, traits, extra) => MEt.requirementMatch(line, { ...base, ...(extra || {}), traits }, sch);
+  const KOSAF = '2026년도 2학기 국가장학금을 신청하여 소득분위가 산출된 자';
+  const NOTICED = '2026년도 2학기 한국장학재단 학자금 지원구간 통지를 받은 자';
+  eq('국가장학금 신청 — 안 물어봤으면 판정하지 않는다', [v(KOSAF, undefined), v(NOTICED, undefined)], [null, null]);
+  eq('  「예」 면 충족 · 「아니요」 면 미달 (지원구간 통지도 신청해야 온다)',
+    [v(KOSAF, { kosafApplied: true }), v(KOSAF, { kosafApplied: false }), v(NOTICED, { kosafApplied: true }), v(NOTICED, { kosafApplied: false })], ['ok', 'no', 'ok', 'no']);
+  const BRK = '2026학년도 2학기 국가장학금 신청자 중 소득분위가 8분위 이하인 자';
+  eq('  「신청자 중 8분위 이하」 — 예+5구간 ✓ · 예+9구간 ✕ · 아니요 ✕ · 구간만 알고 안 물었으면 모름(전엔 ✓ 였다 — 틀린 안심)',
+    [vb(BRK, { kosafApplied: true }, { bracket: 5 }), vb(BRK, { kosafApplied: true }, { bracket: 9 }), vb(BRK, { kosafApplied: false }, { bracket: 5 }), vb(BRK, undefined, { bracket: 5 })], ['ok', 'no', 'no', null]);
+  const APPROVED = '2026학년도 2학기 국가장학금(Ⅰ유형) 신청 및 심사결과 승인 완료자';
+  const WORK = '국가장학금 등 1·2차 통합신청을 완료하였으나 국가근로장학금을 신청하지 않은 학생';
+  eq('  신청 뒤의 일(심사 승인·국가근로장학금 신청)은 모른다 — 「예」 로 ✓ 를 주지 않고 「아니요」 는 미달',
+    [v(APPROVED, { kosafApplied: true }), v(APPROVED, { kosafApplied: false }), v(WORK, { kosafApplied: true }), v(WORK, { kosafApplied: false })], [null, 'no', null, 'no']);
+  eq('  국가근로장학금 신청자·면학장학금 미신청자·국가근로 미신청자·「신청할 수 없는 …도 선발 가능」·통지서(서류)는 안 읽는다',
+    ['0) 한국장학재단 2026학년도 2학기 국가근로장학금 신청자', '1. 신청 대상 : 2026-2 학기 면학장학금 미신청자', '( 국가근로장학금 미신청자는 희망근로지 신청 불가 )',
+      '국가장학금을 신청할 수 없는 대한민국 국적 미소지자도 선발 가능', '4.법정 저소득 증빙서류 또는 한국장학재단 학자금 지원구간 통지서 제출이 가능한 대학생']
+      .filter((t) => kindsOf(t).includes('kosafApplied')), []);
+  /* 리뷰에서 막은 꼴 — 실데이터에는 아직 없다(모양 검사): 둘째 `신청`이 `가능`이면 요구가 아니고, `통지를 받지 못한` 은 뜻이 반대다 */
+  eq('  「미신청자도 신청 가능」·「통지를 받지 못한 자」 꼴은 요구로 읽지 않는다 (모양 검사 · 실데이터 0줄)',
+    ['국가장학금 미신청자도 신청 가능', '학자금 지원구간 통지를 받지 못한 자'].filter((t) => kindsOf(t).includes('kosafApplied')), []);
+  eq('  물을 칸으로 내놓는다 · 답해서 나아질 수 없는 줄(승인 완료)은 묻지 않는다 · 구간을 알면 「신청자 중 8분위」 줄도 묻는다',
+    [EA.askableFields(KOSAF, base, sch), EA.askableFields(APPROVED, base, sch), EA.askableFields(BRK, { ...base, bracket: 5 }, sch)], [['trait:kosafApplied'], [], ['trait:kosafApplied']]);
+
   /* 종류와 이름표가 갈라지면 화면에 못 그린다 */
   const PRq = createRequire(import.meta.url)('../parse-requirements.js');
   eq('결격 처지는 파서가 아는 종류여야 한다',

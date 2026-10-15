@@ -446,6 +446,13 @@ const TRAIT_PAT = [
   ['bereaved', /유가족|유족|양육자의?\s?사망|사망한[^.]{0,14}자녀/],
   ['sailor', /선원|승무\s?경력/],
   ['diabetes', /당뇨/],
+  /* 🔴 국가장학금 **신청** — 프로필에 없는 '행동'을 예/아니요로 묻는다 (2026-10-15 · 노션 G-14 개발자 결정 ②).
+     `국가장학금을 신청하여 …`·`국가장학금 신청자 중 …`·`지원구간 통지를 받은 자`(통지는 신청해야 온다). 「예」 ✓ · 「아니요」 ✕ · 안 물었으면 모름.
+     ⚠️ `국가근로장학금` 은 다른 사업이라 안 걸린다(글자가 다르다) · 부정(`미신청자`·`신청하지 않은`·`신청 불가`)은 뜻이 갈려
+        (「미신청자 대상」↔「미신청자는 불가」) 읽지 않는다 — 실데이터에 국가장학금 부정 줄은 0 · `통지서`(서류 이름)는 아니다.
+     ⚠️ 신청 **뒤**의 일(심사 승인·수혜·국가근로장학금을 따로 신청했는지)은 모른다 — unaskedAttr 의 KOSAF_EXTRA 가 「예」의 ✓ 를 막는다.
+     ⚠️ `신청 가능`·`신청 권장`(해도 된다 · 하라는 안내)과 `통지를 받지 못한`(뜻이 반대)은 요구가 아니다 — 리뷰에서 막은 꼴(실데이터 0줄). */
+  ['kosafApplied', /국가장학금[^.]{0,24}?(?<!미)신청(?!\s?(?:하지|불가|할\s?수|안내|일정|기간|방법|자격|대상|가능|권장|권고|바람))|(?:지원\s?구간|소득\s?(?:구간|분위))\s?통지(?!서|를?\s?(?:받지|못))/],
 ];
 
 /* 🔴 **어느 칸에 있든 「있으면 미달」인 처지** (2026-09-19 실측으로 잡은 틀린 미달).
@@ -1123,6 +1130,10 @@ const ACHIEVE_PARTS = [
   [/(예비\s?)?창업자|예술인|센터\s?회원|(?<![가-힣])(대학생|대학원생|재학생)\s?(은|는)?\s?제외/, null],
 ];
 const ACHIEVE_ATTR = new RegExp(ACHIEVE_PARTS.map(([re]) => re.source).join('|'));
+/* 🔴 국가장학금 '신청'은 묻지만(TRAIT_PAT kosafApplied) 그 **뒤**는 모른다 — 심사 승인·수혜·국가근로장학금을 따로 신청했는지
+   (2026-10-15 · G-14 ②). `신청 및 심사결과 승인 완료자`·`통합신청을 완료하였으나 국가근로장학금을 신청하지 않은 학생` 에 「예」로
+   ✓ 를 주면 틀린 안심이라 막는다. 「아니요」의 ✕ 는 lineVerdict 가 HIGH 미달로 먼저 낸다(신청을 안 했으면 승인도 없다). */
+const KOSAF_EXTRA = /승인\s?완료|심사\s?결과|수혜|선정|국가근로장학금[^.]{0,16}신청/;
 /* 그 줄의 성취 낱말이 전부 **답을 받은** 처지로 덮이는가 */
 function achieveAnswered(t, p) {
   const tr = (p && p.traits) || {};
@@ -1167,6 +1178,7 @@ function unaskedAttr(text, conds, p) {
   if (TERM_ATTR.test(t) && !cs.some((c) => c.kind === 'semester' && (c.leftMin != null || c.last))) return true;   // 학년으로 한쪽을 아는 줄(parseSemester)은 판정에 맡긴다(2026-10-15)
   if (COLLEGE_ATTR.test(t) && !has('major')) return true;
   if (campusUnasked(t, cs, p)) return true;
+  if (KOSAF_EXTRA.test(t) && cs.some((c) => c.kind === 'trait' && c.anyOf.indexOf('kosafApplied') >= 0)) return true;   // 신청 뒤의 일은 모른다(위 KOSAF_EXTRA)
   /* `경력 무관`·`수상 여부 무관` 은 묻는 것이 아니다(2026-09-17 코드 리뷰) */
   if (ACHIEVE_ATTR.test(t) && !/(무관|불문|관계\s?없)/.test(t)) return !achieveAnswered(t, p);
   if (INCOME_ATTR.test(t) && (has('bracket') || has('flags'))) return false;

@@ -16,6 +16,7 @@
      node verify/what-shows.mjs 총동문회                 (이름 일부로 찾기)
      node verify/what-shows.mjs reg-hufs-samil --gpa=4.2 --credits=18 --bracket=2
      node verify/what-shows.mjs 면학 --school=한국외국어대학교 --track=humanities
+     node verify/what-shows.mjs 면학 --traits=kosafApplied:1      (묻기 상자에 답한 처지 · 1=예 0=아니요 · 안 주면 안 답한 상태)
 */
 import fs from 'node:fs';
 import vm from 'node:vm';
@@ -44,6 +45,14 @@ const num = (k, d) => {
   if (!/^-?\d+(\.\d+)?$/.test(v)) { console.error(`--${k}=${v} 는 숫자가 아닙니다.`); process.exit(1); }
   return Number(v);
 };
+/* 처지(trait) 답 — 묻기 상자(elig-ask)가 `profile.traits` 에 적는 것과 같은 자리 · 안 주면 '아직 안 물음' (2026-10-15).
+   숫자 칸과 같은 규칙으로 **틀린 입력이면 멈춘다** — 모르는 종류나 0·1 이 아닌 값을 조용히 '아니요'로 읽으면 그럴듯한 틀린 답이 된다. */
+const TRAIT_KEYS = Object.keys(require('../elig-ask.js').TRAIT_LABEL);
+const traits = Object.fromEntries(arg('traits', '').split(',').filter(Boolean).map((kv) => {
+  const [k, val] = kv.split(':');
+  if (!TRAIT_KEYS.includes(k) || !['0', '1'].includes(val)) { console.error(`--traits=${kv} 는 읽을 수 없습니다 — <종류>:1 또는 <종류>:0 (종류: ${TRAIT_KEYS.join(' ')})`); process.exit(1); }
+  return [k, val === '1'];
+}));
 const p = {
   school: arg('school', '한국외국어대학교'), campus: arg('campus', ''),
   track: arg('track', 'humanities'), major: arg('major', '영어학과'),
@@ -51,7 +60,7 @@ const p = {
   gpa: num('gpa', 3.2), bracket: num('bracket', 6),
   credits: num('credits', 14), region: arg('region', '서울'),
   parentRegion: arg('parentRegion', arg('region', '서울')), nationality: 'korean', birthYear: 2004,
-  flags: [], common: {},
+  flags: [], common: {}, ...(Object.keys(traits).length ? { traits } : {}),
 };
 
 let hits = reg.items.filter((x) => x.id === q || (x.name || '').includes(q));
