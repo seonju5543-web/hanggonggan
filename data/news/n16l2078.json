@@ -3,6 +3,39 @@
  "updatedAt": "2026-10-15",
  "items": [
   {
+   "title": "2026학년도 동기 계절수업 다른 대학교 수학 안내(경상국립대)",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170726&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-10-15",
+   "kind": "학사",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-10-15",
+   "desc": "국내 대학간 학술교류 협정에 따라 2026학년도 동기 계절수업 경상국립대 학점 교류 수학에 대하여 다음과 같이 안내하오니 수학을 희망하는 학생들은 기한 내 신청하여 주시기 바랍니다."
+  },
+  {
+   "title": "2026학년도 동기 계절수업 다른 대학교 수학 안내(국립순천대, 전남대)",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170723&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-10-15",
+   "kind": "학사",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-10-15",
+   "desc": "국내 대학간 학술교류 협정에 따라 2026학년도 동기 계절수업 학점 교류 수학에 대하여 다음과 같이 안내하오니 수학을 희망하는 학생들은 기한 내 신청하여 주시기 바랍니다."
+  },
+  {
+   "title": "(변경공고) 충북대학교 입학처 대학원 입시업무 보조 아르바이트 모집 안내",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170721&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-10-15",
+   "kind": "채용",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-10-15",
+   "desc": "1. 모집인원 및 근무기간<총2명> <근무유형A> 1명: 2026. 11. 2.(월) ~ 12. 11.(금) <근무유형B> 1명: 2026. 11. 9.(월) ~ 12. 11.(금)"
+  },
+  {
    "title": "법학연구소 보조연구원 공개경쟁채용시험 공고",
    "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170710&pageUnit=10&searchCnd=all&pageIndex=1",
    "postedAt": "2026-10-15",
@@ -278,7 +311,8 @@
    "kind": "채용",
    "school": "충북대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-02",
+   "desc": "충북대학교 공과대학 프로젝트사무원(계약직) 채용 계획을 아래와 같이 공고하오니 성실하고 능력 있는 분들의 많은 지원 바랍니다."
   },
   {
    "title": "2026학년도 2학기 토론 아카이브 참여자(팀) 모집",
@@ -286,7 +320,8 @@
    "postedAt": "2026-10-02",
    "school": "충북대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-02",
+   "desc": "· 토론 아카이브는 학내에 산재한 다양한 토론 문화를 수집하고 기록하는 프로그램 입니다."
   },
   {
    "title": "충북대학교 제증명 발급에 관한 지침 일부개정지침(안) 행정예고 및 의견수렴",
@@ -294,7 +329,8 @@
    "postedAt": "2026-10-02",
    "school": "충북대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-02",
+   "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
   },
   {
    "title": "충북대학교 대학회계 공무직(사무원) 공개경쟁채용시험 서류전형 합격자 및 필기시험 일정 공고",
@@ -362,33 +398,6 @@
    "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170355&pageUnit=10&searchCnd=all&pageIndex=1",
    "postedAt": "2026-10-01",
    "kind": "학사",
-   "school": "충북대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "충북대학교 창업지원단 기간제 계약직 채용 공고",
-   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170354&pageUnit=10&searchCnd=all&pageIndex=1",
-   "postedAt": "2026-10-01",
-   "kind": "채용",
-   "school": "충북대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "충북대학교 2027학년도 1학기(제91회) 전임교원 초빙 공고",
-   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170331&pageUnit=10&searchCnd=all&pageIndex=1",
-   "postedAt": "2026-10-01",
-   "kind": "채용",
-   "school": "충북대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "(2026-8차) 충북대학교 국제교류본부 대학회계 공무직(전문요원, 자체) 공개경쟁채용시험 공고",
-   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170300&pageUnit=10&searchCnd=all&pageIndex=1",
-   "postedAt": "2026-09-30",
-   "kind": "채용",
    "school": "충북대학교",
    "campus": "",
    "foundAt": "2026-10-01"

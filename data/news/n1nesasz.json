@@ -3,6 +3,17 @@
  "updatedAt": "2026-10-15",
  "items": [
   {
+   "title": "[KIMST]2026년도 찾아가는 진로상담 신청(~10/19(월) 18:00까지 사전등록)",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726615",
+   "postedAt": "2026-10-15",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-15",
+   "thumb": "data/news/img/7d2d48e82a0ff993.webp",
+   "desc": "영남씨그랜트센터 해양수산과학기술진흥원(KIMST)*에서 해양수산 분야 관련 학과 대학(원)생을 대상으로 '2026년도 찾아가는 진로상담'을 개최하오니 관심 있는 학생은 아래 내용과 포스터를 참고하여 신청바랍니다."
+  },
+  {
    "title": "[후원의집 홍보] 굿모닝내과 '부경대학교 구성원 대상 혜택 안내(Good Morning Internal Medicine(中文))",
    "url": "https://www.pknu.ac.kr/main/163?action=view&no=726609",
    "postedAt": "2026-10-15",
@@ -72,7 +83,9 @@
    "school": "부경대학교",
    "campus": "",
    "src": "53a197d6",
-   "foundAt": "2026-10-15"
+   "foundAt": "2026-10-15",
+   "thumb": "data/news/img/5aabcb7912db4e0c.webp",
+   "desc": "중간고사 준비에 지친 마음을 잠시 쉬게 해줄 작은 쇼핑타임! 나에게 맞는 새로운 옷을 찾아보세요."
   },
   {
    "title": "★ [학부대학] 2026-2학기 전공탐색 주간(전공 박람회) 개최 안내★",
@@ -82,7 +95,9 @@
    "school": "부경대학교",
    "campus": "",
    "src": "53a197d6",
-   "foundAt": "2026-10-15"
+   "foundAt": "2026-10-15",
+   "thumb": "data/news/img/f5bdd16c9b021d96.webp",
+   "desc": "2. 주요 행사 일정 1) 전공 박람회: 2026. 11. 3.(화) 11:00~17:00 , 부경컨벤션홀(E23관), 동원장보고관(E22관)"
   },
   {
    "title": "[채용공고] 국립부경대학교 정보융합대학 전자공학전공 조교 채용 공고",
@@ -155,7 +170,8 @@
    "campus": "",
    "foundAt": "2026-10-08",
    "thumb": "data/news/img/176486e725bb1c9b.webp",
-   "src": "53a197d6"
+   "src": "53a197d6",
+   "desc": "<생성형 AI로 기획부터 집필, 교정, 출판까지 AI와 함께하는 작가 시스템 실습 과정>"
   },
   {
    "title": "[학생상담센터] 2026-2학기 [학사경고자 및 소수집단학생 집중 심리·정서 지원] 운영 안내",
@@ -267,7 +283,8 @@
    "school": "부경대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/3fe94d3d212b7f3e.webp"
+   "thumb": "data/news/img/3fe94d3d212b7f3e.webp",
+   "desc": "이번 달 캘린더에는 우리 대학 정문광장을 든든히 지켜주는 수호수 '모과나무'의 풍경을 담았습니다!"
   },
   {
    "title": "[보건진료소] 인바디 예약검사 안내-9회차",
