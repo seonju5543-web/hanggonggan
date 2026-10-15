@@ -3248,7 +3248,7 @@ console.log('\n■ 접수 기간 한 줄 (2026-09-12)');
     const appSrc = readText(new URL('../app.js', import.meta.url));
     const dh = readText(new URL('../collector/deadline-hint.mjs', import.meta.url));
     const reOf = (src) => (src.match(/const PARTIAL_ENTITY_END = (\/.+\/);/) || [])[1];
-    eq('  앱이 이미 실린 힌트 끝의 반쪽 기호를 떼고 보인다(같은 꼴 · 두 자리 모두)', [reOf(appSrc) === reOf(dh) && !!reOf(dh), (appSrc.match(/esc\(hint(?:Text|Short)\(n\.deadlineHint\)\)/g) || []).length, /esc\(unent\(n\.deadlineHint\)\)/.test(appSrc), /function hintShort\(s\) \{\n  let t = hintText\(s\)/.test(appSrc)], [true, 2, false, true]);   // 카드는 hintShort(2026-10-04 · 첫 항목만) — 그것도 hintText 로 시작한다
+    eq('  앱이 이미 실린 힌트 끝의 반쪽 기호를 떼고 보인다(같은 꼴 · 두 자리 모두)', [reOf(appSrc) === reOf(dh) && !!reOf(dh), (appSrc.match(/(?:esc|tidyChars)\(hint(?:Text|Short)\(n\.deadlineHint\)\)/g) || []).length, /esc\(unent\(n\.deadlineHint\)\)/.test(appSrc), /function hintShort\(s\) \{\n  let t = hintText\(s\)/.test(appSrc)], [true, 2, false, true]);   // 카드는 hintShort(2026-10-04 · 첫 항목만) — 그것도 hintText 로 시작한다 · 활동 시트는 hintText 위에 tidyChars(2026-10-15)
     /* 리뷰(10-03) — 여기서 hintText 를 따로 지어 재면 앱의 것이 바뀌어도 모른다 → 앱 소스의 그 줄들(ENTITIES·ENTITY_RE·unent·PARTIAL_ENTITY_END·hintText)을 떼어 실행한다 */
     const line = (re) => (appSrc.match(re) || [''])[0];
     const unentSrc = (() => { const at = appSrc.indexOf('function unent('); return at < 0 ? '' : appSrc.slice(at, appSrc.indexOf('\n}', at) + 2); })();
@@ -10549,7 +10549,10 @@ console.log('\n■ 자격 판정 전수 대조 — 틀린 ✓·틀린 ✗ (2026-
   eq('  3·4학년은 ✓ · 1·2학년은 ✕ · 5학년(의·약학)도 ✕ (상한도 본다)', [1, 2, 3, 4, 5].map((y) => mark('선발대상 : 4년제 대학교 3~4학년 재학생', { year: y })), ['no', 'no', 'ok', 'ok', 'no']);
   eq('  「고등학교 1~3학년 및 대학생」의 범위는 고등학생 이야기 — 4학년에게 ✕ 가 아니다 (리뷰)', mark('고등학교 1~3학년 및 대학생', { year: 4 }), null);
   eq('  범위 밖에 다른 학년이 또 있으면 단정하지 않는다', (yearOf('3~4학년 또는 1학년 편입생') || {}).conf, 'low');
-  eq('  「1학년 또는 2학년」은 범위가 아니라 열거 — 그대로 확신이 낮다', (yearOf('1학년 또는 2학년 학생') || {}).conf, 'low');
+  /* 2026-10-15 카드 전수 — 열거(`1학년 또는 2학년`·`3, 4학년`)는 '그중 하나'라는 뜻이 분명해 범위와 같은 확신이다(3학년에게 '모름'이던 줄).
+     ⚠️ 편입·신입·`이상` 이 섞이면(`1학년 또는 2학년 편입생`) 여전히 낮다 */
+  eq('  「1학년 또는 2학년」은 열거 — 그중 하나라 확신이 높다 (anyOf)', (({ anyOf, conf }) => [anyOf, conf])(yearOf('1학년 또는 2학년 학생') || {}), [[1, 2], 'high']);
+  eq('    편입·신입이 섞인 열거는 확신이 낮다', (yearOf('1학년 또는 2학년 편입생') || {}).conf, 'low');
   eq('  앞으로 올 학년도의 범위는 지금 2학년에게 ✕ 가 아니다 (내년엔 3학년)', mark(`${nextAY}학년도 1학기 기준 3~4학년 재학생`, { year: 2 }), null);
   eq('  연도 숫자를 범위로 읽지 않는다 (「2026-2학기」)', yearOf('2026-2학기 정규학기 재학생'), null);
   /* 구간 범위 — `0~8구간` 은 `8구간 이하` 와 같은 말이다(아주대 바르게장학 · 10구간 학생에게 ✓ 였다 — 틀린 안심) */
@@ -12550,6 +12553,90 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
   eq('  .gitattributes 에 리포트·장부 줄(merge=ours) — 없으면 배포 동기화가 충돌로 멈춘다', [/^collector\/kosaf-hunt-report\.md\s+merge=ours$/m.test(ga), /^collector\/kosaf-hunt-state\.json\s+merge=ours$/m.test(ga), /^collector\/kosaf-hunt\.json\s+merge=ours$/m.test(ga)], [true, true, true]);
 }
 
+
+/* ■ 공고 카드 품질 (2026-10-15 개발자 지시 — "공고 카드를 눌렀을 때 … 사용자 입장에서 다 완벽했으면")
+   상세 200건을 브라우저로 전수 열어 본 결과를 한 절로 잠근다. 틀린 미달(8) · 학적정보로 판정할 수 있는데 모름(2) ·
+   깨진 글자(3) · 엉뚱한 칸(4) · 자리 표시 글자(6) · 같은 줄 두 번(7). 되돌리면 그 자리에서 빨간불. */
+console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · 깨진 글자 · 같은 줄 두 번 (2026-10-15)');
+{
+  const ME3 = createRequire(import.meta.url)('../match-engine.js');
+  const PR3 = createRequire(import.meta.url)('../parse-requirements.js');
+  const st = { school: '한국외국어대학교', campus: '', track: 'humanities', major: '영어학과', year: 3, status: '재학', gpa: 3.2, bracket: 6, credits: 14, region: '서울', parentRegion: '서울', nationality: 'korean', birthYear: 2004, flags: [], common: {} };
+  const kinds = (t) => PR3.parseLine(t, false).conds.map((c) => c.kind);
+  /* ① 틀린 미달 — 「조례」의 지역 이름은 사는 곳이 아니다 (경상남도장학회 · 서울 학생에게 ✕) */
+  eq('① 「경상남도 청년 기본 조례」의 지역은 사는 곳이 아니다 → 거주 조건 없음', kinds('「경상남도 청년 기본 조례」에 따른 39세(\'87년) 이하').includes('residence'), false);
+  /* ② 틀린 미달 — `○○의 경우` 로 범위를 좁힌 줄은 그 범위 밖 학생에게 아무 말도 안 한다 (산청양수장학회 · 영어학과에 20학점 ✕) */
+  eq('② 「의과대학 재학생의 경우 20학점 이상」은 영어학과 학생에게 모름 (미달 아님)', ME3.requirementMatch('의과대학 재학생의 경우 직전년도 전 학기를 20학점 이상 이수하고 성적 평균 B학점 이상인 학생', st, null), null);
+  eq('  범위가 나와 맞으면 그대로 판정한다 (「재학생의 경우 12학점 이상」 · 14학점 ✓)', ME3.requirementMatch('재학생의 경우 직전학기 12학점 이상 이수한 자', st, null), 'ok');
+  /* ③ 학적정보로 판정할 수 있는데 모름이던 줄들 */
+  eq('③ 따옴표 속 구간 「"학자금 지원구간 7구간" 이내」 → 6구간 ✓', ME3.requirementMatch('한국장학재단 "학자금 지원구간 7구간" 이내의 학생(2026-2학기 기준)', st, null), 'ok');
+  eq('  「5구간 이내 / 복지자격, 1~5구간」 — 같은 수가 두 번이면 표가 아니다 → 6구간 ✕', ME3.requirementMatch('학자금 지원구간 5구간 이내 / 복지자격, 1~5구간', st, null), 'no');
+  eq('  「‘복지자격~8구간’ 이내」 → 6구간 ✓', ME3.requirementMatch('경제적 요건: 재단이 지정하는 학기의 한국장학재단 학자금 지원구간(소득분위)이 ‘복지자격~8구간’ 이내인 자', st, null), 'ok');
+  eq('  두 척도를 나란히 적은 성적 「B0(3.0/4.5 또는 3.0/4.3) 이상」 → 3.2 ✓ · 2.8 ✕', [ME3.requirementMatch('직전학기 평균평점 B0(3.0/4.5 또는 3.0/4.3) 이상 (최소이수학점 : 12학점)', st, null), ME3.requirementMatch('직전학기 평균평점 B0(3.0/4.5 또는 3.0/4.3) 이상 (최소이수학점 : 12학점)', { ...st, gpa: 2.8 }, null)], ['ok', 'no']);
+  eq('  「모두 3.0/4.5(또는 2.87/4.3) 이상인 자」 → 3.2 ✓', ME3.requirementMatch('성적 요건(동시충족): 직전학기 성적 및 총평점평균 모두 3.0/4.5(또는 2.87/4.3) 이상인 자', st, null), 'ok');
+  eq('  「8학기 이하인 자」 → 3학년(5~6학기) ✓ · 5학년 ✕ · 4학년은 모름(7~8학기)', [ME3.requirementMatch('2026-2학기 등록자, 2026-2학기를 포함하여 8학기 이하인 자', st, null), ME3.requirementMatch('8학기 이하인 자', { ...st, year: 5 }, null), ME3.requirementMatch('8학기 이하인 자', { ...st, year: 4 }, null)], ['ok', 'no', 'ok']);
+  eq('  「4학기 이상 수료자 (3, 4학년 재학생)」 → 3학년 ✓ · 1학년 ✕', [ME3.requirementMatch('2026-2학기 현재 4학기 이상 수료자 (3, 4학년 재학생)', st, null), ME3.requirementMatch('2026-2학기 현재 4학기 이상 수료자 (3, 4학년 재학생)', { ...st, year: 1 }, null)], ['ok', 'no']);
+  eq('  「1학년 또는2학년 학생」 → 3학년 ✕ · 2학년 ✓', [ME3.requirementMatch('2026년 2학기 기준 1학년 또는2학년 학생', st, null), ME3.requirementMatch('2026년 2학기 기준 1학년 또는2학년 학생', { ...st, year: 2 }, null)], ['no', 'ok']);
+  eq('  「2026-2학기」의 2 는 학기 조건이 아니다', kinds('2026-2학기 재학생').includes('semester'), false);
+  /* ④ 상시 제도 — 구조화 조건(성적·구간)을 다 맞혔는데 배지는 '자격 미확인'이었다 (국가장학금 Ⅰ유형) */
+  const kosafI = { id: 'kosaf-type1', eligibility: { minGpa: 2.75, maxBracket: 8 } };
+  eq('④ 자격 줄이 없어도 구조화 조건을 다 맞히면 미확인이 아니다 (met=total)', (() => { const fd = ME3.fitDetail(kosafI, st); return [fd.unread, fd.met, fd.total]; })(), [false, 2, 2]);
+  eq('  구조화 조건에 미달이면 fails 에 그 이유', ME3.fitDetail(kosafI, { ...st, gpa: 2.0 }).fails.length, 1);
+  eq('  구조화 조건이 없고 줄도 없으면 예전처럼 미확인', ME3.fitDetail({ id: 'x', eligibility: {} }, st).unread, true);
+  /* ⑤ 깨진 글자 — 화면에 나가는 줄을 다듬는다 (글자를 지어내지 않는다 · 기호·자간·엔터티만) */
+  eq('⑤ HTML 엔터티 「형제 &middot; 자매」 → 「형제 · 자매」', ME3.tidyRequirement('2026-2학기 본교 학부에 형제 &middot; 자매가 2 인 이상 동시에 재학하고 있는 자'), '2026-2학기 본교 학부에 형제 · 자매가 2인 이상 동시에 재학하고 있는 자');
+  eq('  자간이 벌어진 낱말 「타 생 활 비성」 → 「타생활비성」 · 「가 계 곤란자」 → 「가계 곤란자」', [ME3.tidyRequirement('2026-1 타 생 활 비성 장학금 기수혜자는 지원불가'), ME3.tidyRequirement('가 계 곤란자 (26-2 한국장학재단 학자금지원구간으로 심사)')], ['2026-1 타생활비성 장학금 기수혜자는 지원불가', '가계 곤란자 (26-2 한국장학재단 학자금지원구간으로 심사)']);
+  eq('  낱자 낱말은 안 붙인다 「남구지역 소재 초·중·고 중 한 개 학교를」', ME3.tidyRequirement('남구지역 소재 초·중·고 중 한 개 학교를 졸업한 학생'), '남구지역 소재 초·중·고 중 한 개 학교를 졸업한 학생');
+  eq('  표 칸 「대 학 생 |직전학기 성적 평균 2.0이상」 → 「대학생 · 직전학기 …」', ME3.tidyRequirement('대 학 생 |직전학기 성적 평균 2.0이상'), '대학생 · 직전학기 성적 평균 2.0이상');
+  eq('  앞머리 콜론·글자 글머리 「： - 유상교육대상자: 성적무관」·「o 대학생 : 1학기 등록금 …」', [ME3.tidyRequirement('： - 유상교육대상자: 성적무관'), ME3.tidyRequirement('o 대학생 : 1학기 등록금 범위를 초과하여 받는 경우')], ['유상교육대상자: 성적무관', '대학생 : 1학기 등록금 범위를 초과하여 받는 경우']);
+  eq('  「[10구간 지원 가능 ]」의 닫는 괄호 앞 공백 · 「⦁」 글머리', [ME3.tidyRequirement('재학생 (학자금 지원구간 무관 [10구간 지원 가능 ])'), ME3.tidyRequirement('국가근로장학금사업 및 다문화 ⦁ 탈북학생 멘토링사업과 중복참여 불가')], ['재학생 (학자금 지원구간 무관 [10구간 지원 가능])', '국가근로장학금사업 및 다문화 · 탈북학생 멘토링사업과 중복참여 불가']);
+  eq('  「① 또는 ② 해당자 ① A ② B」는 원문 낱말로 「A 또는 B」 — 떼면 「또는 ②」로 시작하던 줄', ME3.tidyRequirement('① 또는 ② 해당자 ① 국내 대학·대학원 학생 ② 졸업 후 2년 이내 미취업자'), '국내 대학·대학원 학생 또는 졸업 후 2년 이내 미취업자');
+  /* ⑥ 조각난 줄 — 닫는 괄호만 있는 꼬리·토씨로 시작하는 줄은 자격 줄이 아니다 (계양구 인재양성 · OCR 로 줄이 끊긴 공고) */
+  eq('⑥ 「관내 학교 재학 중 수상실적으로 한정)」·「중인 학생)」·「두고 거주하고 있는 구민」은 화면에 안 나간다',
+    ME3.requirementLines({ eligibilityLines: ['관내 학교 재학 중 수상실적으로 한정)', '중인 학생)', '두고 거주하고 있는 구민', '직전학기 평점 3.0 이상인 재학생'] }, null, { all: true }), ['직전학기 평점 3.0 이상인 재학생']);
+  eq('  옆 띠의 글 제목(`… 참여자 모집`·`… 청년 정책`)은 자격 줄이 아니다 · 「…인 학생」은 그대로',
+    ME3.requirementLines({ eligibilityLines: ['2026년 1인가구 행복 동행사업 청년 1인가구 지원사업 [다채로움] 참여자 모집', '청년이라면 한 번쯤 꼭 읽어야 할 알기쉬운 청년 정책', '만 19세~39세 청년(1986년 ~ 2007년 출생자)', '직전학기 평점 3.0 이상인 학생'] }, null, { all: true }), ['만 19세~39세 청년(1986년 ~ 2007년 출생자)', '직전학기 평점 3.0 이상인 학생']);
+  eq('  토씨로 끝난 앞줄은 뒷줄과 잇는다 「계양구에 1년 이상 주민등록 주소지를」+「두고 거주하고 있는 구민」',
+    ME3.requirementLines({ eligibilityLines: ['공고일 현재 본인 또는 학부모가 계양구에 1년 이상 주민등록 주소지를', '두고 거주하고 있는 구민'] }, null, { all: true }), ['공고일 현재 본인 또는 학부모가 계양구에 1년 이상 주민등록 주소지를 두고 거주하고 있는 구민']);
+  /* ⑦ ※ 곁말로 들어온 '…는 신청 가능' 예외는 요건이 아니라 참고다 — 분모에서 뺀다 (면학장학금 「10학기 이하 후기 이중전공자는 … 신청 가능」이 '확인 필요'를 부풀렸다) */
+  const myeon = { eligibilityLines: ['가. 2026-2학기 등록자, 2026-2학기를 포함하여 8학기 이하인 자', '※ 10학기 이하 후기 이중전공자는 등록금 전액 납부 시 신청 가능', '나. 직전 정규학기 12학점 이상, 평점평균 2.0 이상인 자'] };
+  eq('⑦ 예외 곁말은 aside 로 표시되고 요건 수에 안 들어간다', [ME3.requirementLines(myeon, null, { all: true, withMeta: true }).map((it) => !!it.aside), ME3.fitDetail(myeon, st).total], [[false, true, false], 2]);
+  /* ⑧ 화면(app.js) — 글자로 잠근다(브라우저 드라이버는 verify-ui.yml 몫). 되돌리면 「원문 그대로」 머리·같은 줄 두 번·자리 표시 글자가 돌아온다 */
+  const appSrc = readText(new URL('../app.js', import.meta.url));
+  eq('⑧ 「공고 원문 안내 · 원문 그대로」 머리가 없다 — 세 시트(상세·신청 준비·활동)가 noticeSummaryHtml 한 곳을 부른다',
+    [/원문 안내 <span class="channel-tag">원문 그대로<\/span>/.test(appSrc), (appSrc.match(/noticeSummaryHtml\((?:sch\.excerpts|excerpts|notice)\)/g) || []).length], [false, 3]);
+  eq('  ✕ 로 이미 보인 줄은 「내 정보로 확인한 항목」에 또 적지 않는다 (shownBad)', /shownBad\.has\(r\.slice\(FAIL_PREFIX\.length\)\)/.test(appSrc), true);
+  eq('  주관·금액의 「원문 확인」 자리 표시는 큰 글씨·주관 줄에 안 나간다 · 본문 사진은 첨부 목록에 안 나간다',
+    [/providerUnknown\(sch\.amount\) \? '<p class="sheet-amount sheet-amount-unknown">/.test(appSrc), /providerUnknown\(sch\.provider\) \? \(\(String\(sch\.name/.test(appSrc), /filter\(\(a\) => a && !a\.bodyImage\);\n        if \(!atts\.length\) return '';/.test(appSrc)], [true, true, true]);
+  eq('  단추 밑 설명은 「최종 제출 · 제출처」 한 마디 (준비를 마치면 … 표시됩니다 없음)', [/준비를 마치면 최종 제출처/.test(appSrc), /최종 제출 · \$\{esc\(ch\.label\)\}/.test(appSrc)], [false, true]);
+  /* ⑨ 리뷰(2026-10-15)가 실데이터 전수 비교(등록 226 + 활동 200 × 7 프로필)로 잡은 틀린 미달·틀린 안심·글자 회귀 — 되돌리면 그대로 재현된다 */
+  eq('⑨ 「… 3.0/4.5점 또는」 — 이상이 분수 뒤에 없으면 성적 조건이 아니다 (춘곡장학회 · 평점 2.8 에게 ✕ 였다)', kinds('직전 정규학기에 12학점 이상 이수하였으며, 대학 전체학기 성적 평균 3.0/4.5점 또는').includes('grade'), false);
+  eq('  「잔여 학기 4학기 이상인 자」·「남은 학기가 4학기 이상인 자」는 이수 학기가 아니다 → 1학년에게 모름', [ME3.requirementMatch('잔여 학기 4학기 이상인 자', { ...st, year: 1 }, null), ME3.requirementMatch('남은 학기가 4학기 이상인 자', { ...st, year: 1 }, null)], [null, null]);
+  eq('  제외 줄의 학기(「7학기 이상 등록자 중 졸업유예자는 제외」)는 확신이 낮아 4학년을 떨어뜨리지 않는다', ME3.fitDetail({ eligibilityLines: ['직전학기 평점 2.0 이상'], eligibilityExcludes: ['7학기 이상 등록자 중 졸업유예자는 제외'] }, { ...st, year: 4 }).fails, []);
+  eq('  「6학기 이하 이수한 자」는 마친 학기 — 4학년(6·7학기 마침)은 모름 · 2학년 ✓', [ME3.requirementMatch('6학기 이하 이수한 자', { ...st, year: 4 }, null), ME3.requirementMatch('6학기 이하 이수한 자', { ...st, year: 2 }, null)], [null, 'ok']);
+  eq('  조례 구절만 걷어낸다 — 「… 조례에 따른 청년으로 경남에 주소를 둔 자」는 서울 학생에게 ✕ (통째로 버리면 틀린 안심)', ME3.requirementMatch('경상남도 청년 기본 조례에 따른 청년(19~39세)으로 경남에 주소를 둔 자', st, null), 'no');
+  eq('  구조화 되돌림의 fails 는 미달 사유만 · met 은 통과한 수', (() => { const fd = ME3.fitDetail(kosafI, { ...st, gpa: 2.0 }); return [fd.fails, fd.met]; })(), [['평점 2.75 이상 필요 (현재 2)'], 1]);
+  eq('  숫자-단위 붙이기는 예전 꼴을 지킨다 (「15 학점이상」·「4 년제」) · 새 단위는 앞가림', [ME3.tidyRequirement('직전학기 이수학점 15 학점이상'), ME3.tidyRequirement('4 년제 대학교 재학생'), ME3.tidyRequirement('2 인 이상')], ['직전학기 이수학점 15학점이상', '4년제 대학교 재학생', '2인 이상']);
+  eq('  토씨 줄은 뒷줄이 조각일 때만 잇는다 — 표 머리(「드림 장학금 | 학업 …」)는 안 붙는다 · 「학과」로 끝난 줄은 토씨가 아니다',
+    ME3.requirementLines({ eligibilityLines: ['공고일 현재 본인 또는 학부모가 계양구에 1년 이상 주민등록 주소지를', '드림 장학금 | 학업 ㅣ. 직전학기 학업 성적이 평균 평점 3.0 이상인 자', '지원 가능 학과: 컴퓨터공학과', '직전학기 평점 3.0 이상인 재학생'] }, null, { all: true }).some((t) => /주소지를 드림|학과 직전학기/.test(t)), false);
+  eq('  낱자가 하나라도 혼자 쓰는 말이면 안 붙인다 (「한 해 두 번 지급」·「꼭 한 번 읽을 것」·「몇 개 학교」·「열 명 선발」)',
+    ['한 해 두 번 지급', '꼭 한 번 읽을 것', '몇 개 학교', '열 명 선발'].map((x) => ME3.joinSpacedSyllables(x)), ['한 해 두 번 지급', '꼭 한 번 읽을 것', '몇 개 학교', '열 명 선발']);
+  eq('  OCR 테두리 「! 1) 2026-2학기 재학생 !」은 자격 줄로 남는다 · 「또한 …」으로 시작하는 요건도', ME3.requirementLines({ eligibilityLines: ['! 1) 2026-2학기 재학생 !', '또한 직전학기 12학점 이상 이수한 자'] }, null, { all: true }), ['2026-2학기 재학생', '또한 직전학기 12학점 이상 이수한 자']);
+  eq('  「… 미수혜자인 경우에만 신청 가능」은 참고(aside)가 아니라 요건', ME3.requirementLines({ eligibilityLines: ['※ 10학기 이하 후기 이중전공자는 타 장학금 미수혜자인 경우에만 신청 가능'] }, null, { all: true, withMeta: true }).map((it) => it.aside), [false]);
+  eq('  「1, 2학년 신청 제한」은 열거로 단정하지 않는다 · 「방송통신고등학생(1,2학년)」은 학년 조건이 아니다', [(PR3.parseLine('1, 2학년 신청 제한', false).conds.find((c) => c.kind === 'year') || {}).conf, PR3.parseLine('방송통신고등학생(1,2학년) 대상', false).conds.some((c) => c.kind === 'year')], ['low', false]);
+  /* ⑩ 「공고 안내」(noticeSummaryHtml)는 app.js 에서 그 블록을 떼어 실제로 돌린다 — 글자만 잠그면 시각 콜론·잘린 꼬리가 그대로 통과했다(리뷰 ⑬) */
+  {
+    const a = appSrc.indexOf('const NS_LABELS = ['), b = appSrc.indexOf('\nfunction sourceNoteHtml(');
+    const escS = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const nsh = (a > 0 && b > a) ? new Function('esc', 'unent', 'joinSpacedSyllables', `${appSrc.slice(a, b)}\nreturn noticeSummaryHtml;`)(escS, ME3.decodeEntities, ME3.joinSpacedSyllables) : () => '';
+    const html = nsh(['12.(월) - 접수방법 : 이메일(x@y.kr) 또는 등기우편', '<b>굵게</b> 문의 : 02-123 <script>x</script>', '장학금액 : 1 인 당 1,000,000 원', '지원자격 : 2026-1 학기 학부 재학생',
+      '매일 09:00~18:00 접수', '신청방법 : 포털 로그인 후 신청하고', '10.22.(목) 7:00~15:00', '모집기간) 2026.8.13.(목) ~ 2026.8.23(일) ○ (신청방법) 네이버 폼을 통한 온라인 신청']);
+    const items = [...html.matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => m[1].replace(/<b class="ns-k">([^<]*)<\/b>/g, '$1 · '));
+    eq('⑩ 공고 안내 — 번호·요일 꼬리 뗌 · 이름표 묶음(접수방법→신청 방법 · 장학금액→지원 금액) · 자격 줄 뺌 · 시각 콜론은 이름표 아님 · 잘린 꼬리는 … · 날짜는 번호가 아니다 · ○ 항목 가르기 · 글자는 esc',
+      items, ['신청 방법 · 이메일(x@y.kr) 또는 등기우편', '&lt;b&gt;굵게&lt;/b&gt; 문의 : 02-123 &lt;script&gt;x&lt;/script&gt;', '지원 금액 · 1인 당 1,000,000원', '매일 09:00~18:00 접수', '신청 방법 · 포털 로그인 후 신청…', '10.22.(목) 7:00~15:00', '신청 기간 · 2026.8.13.(목) ~ 2026.8.23(일)', '신청 방법 · 네이버 폼을 통한 온라인 신청']);
+    eq('  줄이 없으면 빈 글자 · 같은 줄은 한 번', [nsh([]), (nsh(['문의 : 02-1', '문의 : 02-1']).match(/<li>/g) || []).length], ['', 1]);
+  }
+}
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);

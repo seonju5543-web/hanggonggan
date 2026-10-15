@@ -59,6 +59,19 @@ function parseGrade(t) {
     const v = parseFloat(mBoth[1]);
     if (v <= 4.5) return { kind: 'grade', scale: GRADE_SCALE.gpa45, min: v, conf: HAS_EXCEPTION.test(t) ? LOW : HIGH };
   }
+  /* `3.0/4.5 또는 3.0/4.3` · `B0(3.0/4.5 또는 3.0/4.3) 이상` · `모두 3.0/4.5(또는 2.87/4.3) 이상` — 분수 꼴로 두 척도를 나란히 적은 줄은
+     **4.5 만점 쪽 수**가 곧 답이다(프로필 평점이 4.5 만점 · 위 mBoth 와 같은 이유). 괄호·`또는` 이 끼어 아래 mDec 가 못 읽던 꼴(2026-10-15 카드 전수).
+     ⚠️ `이상` 이 줄에 있어야 한다 — `2.0/4.5 미만 제외` 같은 반대말은 여기서 안 읽는다. 등급(B0)이 같이 적혀도 같은 문턱을 두 번 적은 것이라 확신을 안 낮춘다. */
+  const mSlash45 = t.match(/(\d\.\d{1,2})\s*점?\s*\/\s*4\.5(?!\d)/);
+  if (mSlash45 && !/미만|이하/.test(t)) {
+    /* 🔴 `이상` 은 분수 **바로 뒤**에 있어야 한다 (리뷰 2026-10-15) — 춘곡장학회 `12학점 이상 이수하였으며, … 성적 평균 3.0/4.5점 또는` 은
+       `이상` 이 학점 것이고 성적은 `또는` 으로 끊겨 다음 줄이 없다. 줄 어디서든 `이상` 을 찾으면 평점 2.8 학생에게 틀린 ✕ 가 뜬다. */
+    const tail = t.slice(mSlash45.index + mSlash45[0].length);
+    if (/^[^가-힣]*(?:또는\s*[\d./]+\s*)?\)?\s*점?\s*(?:만점\s*)?이상/.test(tail)) {
+      const v = parseFloat(mSlash45[1]);
+      if (v <= 4.5) return { kind: 'grade', scale: GRADE_SCALE.gpa45, min: v, conf: (hasPct || HAS_EXCEPTION.test(t)) ? LOW : HIGH };
+    }
+  }
   const mDec = t.match(/(\d\.\d{1,2})\s*점?\s*(?:\([^)]{0,8}\))?\s*(?:\/\s*4\.[35])?\s*점?\s*(?:이상|이상인|넘)/);
   /* 🔴 **점수와 `이상` 사이의 괄호** (2026-10-12 · 카드 분석 조각 1). `백분위 70점(C0) 이상`·`70점(평점 1.51에 해당) 이상`·
      `70 점 (100 점 만점 ) 이상` — 괄호가 끼면 통째로 못 읽어 줄이 '모름'이었다(실측 4줄). 평점 쪽(mDec)이 이미 허용하는 것과 같다.
@@ -93,15 +106,20 @@ function parseGrade(t) {
    ⚠️ `5분위 이상 ~ 6분위 이하`(지급액 표)와 다르다 — 그 꼴은 `이상` 이 있어 아래 many·이상 규칙으로 확신이 낮다. */
 const BRACKET_RANGE = /(?<!\d)(\d{1,2})\s*[~∼～\-–]\s*(\d{1,2})\s*(?:구간|분위)(?!\s*(?:이상|초과|는\s*미선발|은\s*미선발))/;
 function parseBracket(t) {
-  const m = t.match(/(\d{1,2})\s*(?:구간|분위)\s*(이하|이내|미만)/);
+  /* 따옴표·괄호가 수와 `이내` 사이에 끼기도 한다 — `"학자금 지원구간 7구간" 이내` · `‘복지자격~8구간’ 이내` (2026-10-15 카드 전수 · 둘 다 '모름'이었다) */
+  const m = t.match(/(\d{1,2})\s*(?:구간|분위)["”’'』」)]?\s*(이하|이내|미만)/);
   const mr = m ? null : t.match(BRACKET_RANGE);
-  if (!m && !mr) return null;
-  const v = m ? num(m[1]) : num(mr[2]);
+  /* `복지자격~8구간` — 아래 끝이 수가 아니라 복지자격(0구간)이다. 범위의 위 끝만 본다 */
+  const mw = (m || mr) ? null : t.match(/복지\s?자격\s*[~∼～\-–]\s*(\d{1,2})\s*(?:구간|분위)/);
+  if (!m && !mr && !mw) return null;
+  const v = m ? num(m[1]) : mr ? num(mr[2]) : num(mw[1]);
   if (v == null || v < 1 || v > 10) return null;
   if (mr && (num(mr[1]) == null || num(mr[1]) > v)) return null;   // `8~0구간` 은 범위가 아니다
   /* 🔴 `5분위 이상 ~ 6분위 이하`처럼 구간이 여럿이면 요건이 아니라 **지급액 표**다
-     (서울과기대 근로장학이 이 표로 0% 오탐을 냈다 — 2026-08-24). 범위 꼴 `0~8구간` 은 `구간` 이 한 번이라 하나로 센다. */
-  const many = (t.match(/\d{1,2}\s*(구간|분위)/g) || []).length > 1;
+     (서울과기대 근로장학이 이 표로 0% 오탐을 냈다 — 2026-08-24). 범위 꼴 `0~8구간` 은 `구간` 이 한 번이라 하나로 센다.
+     ⚠️ **같은 수가 두 번**(`5구간 이내 / 복지자격, 1~5구간`)은 표가 아니라 같은 말을 두 번 적은 것이다(2026-10-15) — 서로 다른 수만 센다. */
+  const nums = new Set((t.match(/\d{1,2}\s*(?:구간|분위)/g) || []).map((x) => num(x.match(/\d{1,2}/)[0])));
+  const many = nums.size > 1;
   /* 🔴 리뷰(2026-10-12 조각 1)가 잡은 두 구멍 — ① `1~3구간은 지원 불가`·`9-10분위 미선발`·`0~8구간이 아닌 자`·`1~3구간 우선 선발` 은
      상한이 아니라 **반대말**이거나 순위다 → 확신을 낮춘다(✕ 를 못 낸다) ② `기초생활수급자 또는 1~5구간 해당자` 는 「또는」 줄이라
      수급자인 학생이 7구간이어도 되는데, 처지(trait)만 푸는 OR 규칙은 구간 미달을 못 푼다 → 「또는」 줄의 구간도 확신을 낮춘다.
@@ -181,11 +199,24 @@ function parseYear(t) {
 /* 🔴 **`3~4학년` 은 범위다 — `3학년 이상`+`4학년 이하`** (2026-10-12 · 카드 분석 조각 1). 범위 꼴을 못 읽어
    「4년제 대학교 3~4학년 재학생」 같은 줄 6개가 판정 없이 비어 있었다. `3-4학년`·`3~4 학년` 도 같다.
    판정은 match-engine judgeCond 'year' 가 min·max 를 함께 본다(둘 다 맞아야 ✓ · 하나라도 벗어나면 ✕).
-   ⚠️ `1학년 또는 2학년` 은 범위가 아니라 열거라 지금처럼 확신이 낮다(YEAR_NUM_ALL many). */
+   ⚠️ `1학년 또는 2학년` 같은 열거는 아래 YEAR_ENUM 이 '그중 하나'(anyOf)로 읽는다(2026-10-15 — 전엔 확신이 낮아 '모름'이었다). */
 const YEAR_RANGE = /(?<!\d)(\d)\s*[~∼～\-–]\s*(\d)\s*학년/;
+/* 🔴 **열거는 범위와 같이 확신이 높다** — `1학년 또는 2학년`·`3, 4학년`·`2·3학년` 은 '그중 하나'라는 뜻이 분명하다(2026-10-15 카드 전수 ·
+   3학년에게 `1학년 또는2학년` 이 '모름'이었다). 열거 밖에 다른 학년 말이 또 있으면 단정하지 않는다(아래 others). */
+const YEAR_ENUM = /(?<!\d)(\d)(?:\s*학년)?(?:\s*(?:[,·、/]|또는|이나)\s*(\d)(?:\s*학년)?)+\s*학년/;
 function parseYearBody(t) {
   if (/신입생/.test(t) && !/신\s*[·,\/]\s*편입생/.test(t)) return { kind: 'year', eq: 1, conf: LOW };
   const mr = t.match(YEAR_RANGE);
+  const me = !mr && t.match(YEAR_ENUM);   // 범위(`3~4학년`)가 있으면 범위 길로 — `3~4학년 또는 1학년 편입생` 은 그 길이 확신을 낮춘다
+  if (me) {
+    const list = [...new Set((me[0].match(/\d/g) || []).map(num))].filter((v) => v != null && v >= 1 && v <= 6);
+    const others = (t.replace(YEAR_ENUM, ' ').match(YEAR_NUM_ALL) || []).length > 0;
+    if (/고등|중학|초등/.test(t)) return null;   // `방송통신고등학생(1,2학년)` — 대학 학년이 아니다(리뷰 2026-10-15 · 대학 1학년에게 ✓ 였다)
+    /* `1학년 또는 2학년 편입생` — 열거가 아니라 다른 처지 이야기일 수 있다 · `1, 2학년 신청 제한` 은 뜻이 반대다(리뷰) → 둘 다 확신을 낮춘다.
+       ⚠️ 반대말은 괄호 **밖**에서만 본다 — `1학년 또는2학년 학생 (휴학 예정자 지원 불가)` 의 불가는 휴학생 이야기다(정답표 · 3학년에게 ✕ 가 맞다) */
+    const unsure = /편입|재입학|신입|이상|이하/.test(t) || /제한|아님|아닌|불가|제외/.test(t.replace(/[(（][^()（）]*[)）]/g, ' '));
+    if (list.length >= 2) return { kind: 'year', anyOf: list, conf: (others || unsure) ? LOW : HIGH };
+  }
   if (mr) {
     const lo = num(mr[1]), hi = num(mr[2]);
     if (lo != null && hi != null && lo >= 1 && hi <= 6 && lo <= hi) {
@@ -204,6 +235,24 @@ function parseYearBody(t) {
   if (m[2] === '이상') return { kind: 'year', min: v, conf: many ? LOW : HIGH };
   if (m[2] === '이하') return { kind: 'year', max: v, conf: many ? LOW : HIGH };
   return { kind: 'year', eq: v, conf: LOW };   // `2학년 학생` — 딱 그 학년인지 이상인지 애매
+}
+
+/* ── 이수 학기 ── `8학기 이하인 자` · `4학기 이상 수료자` (2026-10-15 카드 전수 — 학년을 아는데 '모름'이던 줄).
+   프로필은 학년만 알고 학기는 모른다 — n학년은 2n-1 또는 2n 학기다. 그래서 **둘 다 맞을 때만** ✓, 둘 다 어긋날 때만 ✕(judgeCond 'semester').
+   ⚠️ `2026-2학기`·`2학기 재학생`·`직전학기` 의 학기는 기간이지 이수 학기가 아니다 — 앞에 연도·하이픈·점이 붙었거나 `이하·이상` 이 없으면 안 읽는다.
+   ⚠️ `졸업까지 2개 이상의 학기가 남아` 는 남은 학기라 unaskedAttr(TERM_ATTR)이 '모름'으로 막는다. */
+function parseSemester(t) {
+  /* 남은 학기(`잔여 학기 4학기 이상`·`남은 학기가 4학기 이상`)는 이수 학기가 아니다 — 어순과 무관하게 낱말이 있으면 안 읽는다(리뷰 2026-10-15 · 1학년에게 ✕ 였다) */
+  if (/잔여|남은|남아|남기|남을|학기\s*(?:이상|이하)?\s*남/.test(t)) return null;
+  const m = t.match(/(?<![\d\-.~년])(\d{1,2})\s*학기\s*(이하|이내|이상|미만|초과)/);
+  if (!m) return null;
+  const v = num(m[1]);
+  if (v == null || v < 1 || v > 12) return null;
+  const many = (t.match(/(?<![\d\-.~년])\d{1,2}\s*학기\s*(?:이하|이내|이상|미만|초과)/g) || []).length > 1;
+  const upper = /이하|이내|미만/.test(m[2]);
+  /* `6학기 이하 이수한 자`·`4학기 이상 수료자` 는 **마친** 학기다 — n학년은 2n-2 또는 2n-1 학기를 마쳤다(judgeCond 'semester' · 리뷰 2026-10-15) */
+  return { kind: 'semester', [upper ? 'max' : 'min']: m[2] === '미만' ? v - 1 : m[2] === '초과' ? v + 1 : v,
+           done: /이수|수료|마친|마치/.test(t), conf: (many || HAS_EXCEPTION.test(t)) ? LOW : HIGH };
 }
 
 /* ── 학적 상태 ── 자격 줄이면 '이래야 한다', 제외 줄이면 '이러면 안 된다' */
@@ -632,6 +681,9 @@ function parseResidence(t) {
      읽게 되는 후퇴다. 갈래를 정하기 전에 이 문턱을 먼저 본다. */
   /* `39세 이하 청년 (부산시 청년 기준)` — **나이를 어느 법으로 세나**를 말하는 것이지 사는 곳이 아니다(2026-10-03 · 시·도 미달을 켜자 드러난 틀린 미달) */
   if (/(?:시|도|군|구)\s?청년\s?기준/.test(t)) return null;
+  /* `「경상남도 청년 기본 조례」에 따른 39세 이하` — 조례 이름 속 지역도 사는 곳이 아니다(2026-10-15 카드 전수 · 서울 학생에게 ✕).
+     🔴 줄을 통째로 버리지 않고 **조례 구절만 걷어낸다** (리뷰) — `… 조례에 따른 청년으로 경남에 주소를 둔 자` 의 진짜 거주 요건은 남아야 한다(안 그러면 틀린 안심). */
+  t = String(t).replace(/「[^」]*조례」|[가-힣]{1,10}(?:시|도|군|구)\s?(?:청년\s?)?(?:기본\s?)?조례/g, ' ');
   /* `기존 전라남도 22개 시·군 대상` — 그 지역 사람이 대상이라는 말이다(2026-10-04 · 온통청년 정책 제목 · 서울 학생에게 95% 가 떴다) */
   const areaTarget = /(?:시\s?[·ㆍ]\s?군|시군|지역)\s*(?:주민\s*)?대상/.test(t);
   const homeWord = areaTarget || /거주|주소|주민등록|시민|도민|군민|구민|관내|관할/.test(t);
@@ -1088,14 +1140,14 @@ function parseLine(line, isExclude) {
   if (!t.trim()) return { conds: [], multiProgram: false };
   const conds = [];
   const push = (c) => { if (Array.isArray(c)) conds.push(...c); else if (c) conds.push(c); };
-  push(parseGrade(t)); push(parseBracket(t)); push(parseCredits(t)); push(parseYear(t));
+  push(parseGrade(t)); push(parseBracket(t)); push(parseCredits(t)); push(parseYear(t)); push(parseSemester(t));
   push(parseStatus(t, isExclude)); push(parseFlags(t)); push(parseTrait(t, isExclude)); push(parseNationality(t));
   push(parseAge(t)); push(parseResidence(t)); push(parseSchool(t)); push(parseMajor(t));
   push(parseDegree(t, isExclude)); push(parseOpen(t, isExclude));
   /* 🔴 제외 줄의 학년은 **확신을 낮춘다** (2026-10-11 · 조각 B 리뷰). 제외 줄은 조건이 모두 맞아야 걸린다 —
      `3학년 이상 학생 중 이미 수혜받은 자` 에서 학년 하나만 보고 3학년을 ✕ 로 두면, 받은 적 없는 3학년이
      틀린 미달이 된다(나머지 절은 우리가 못 읽는다). 뜻 뒤집기는 judgeCond 'year' 가 한다. */
-  if (isExclude) conds.forEach((c) => { c.exclude = true; if (c.kind === 'year') c.conf = LOW; });
+  if (isExclude) conds.forEach((c) => { c.exclude = true; if (c.kind === 'year' || c.kind === 'semester') c.conf = LOW; });   // 학기도 같은 이유(`7학기 이상 등록자 중 졸업유예자는 제외` · 리뷰 2026-10-15)
   return { conds, multiProgram: MULTI_PROGRAM.test(t) };
 }
 

@@ -217,8 +217,11 @@ const PROFILE = {
     if (!s) return 'no-item';
     openDetail(s.id);
     await new Promise((r) => setTimeout(r, 250));
+    /* 2026-10-15 — 자격 줄에 ✕ 로 이미 보인 미달은 '내 정보로 확인한 항목'에 또 적지 않는다(eligibilityRowsHtml ③).
+       그래서 근거 줄은 둘 중 하나다: 위 자격 줄의 ✕(그 미달 문장 그대로) 또는 `미달해요:` 줄. 어느 쪽이든 r-bad · ✕ 여야 한다. */
+    const fail = fitDetail(s, state.profile).fails[0];
     const li = [...document.querySelectorAll('#detail-sheet .reason-list li')]
-      .find((e) => /미달해요/.test(e.textContent));
+      .find((e) => /미달해요/.test(e.textContent) || e.textContent.includes(fail));
     if (!li) return 'no-line';
     return li.className.includes('r-bad') && li.textContent.trim().startsWith('✕') ? 'bad' : `wrong:${li.className}`;
   }), 'bad');
