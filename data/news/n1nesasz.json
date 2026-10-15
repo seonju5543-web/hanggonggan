@@ -1,7 +1,89 @@
 {
  "school": "부경대학교",
- "updatedAt": "2026-10-14",
+ "updatedAt": "2026-10-15",
  "items": [
+  {
+   "title": "[후원의집 홍보] 굿모닝내과 '부경대학교 구성원 대상 혜택 안내(Good Morning Internal Medicine(中文))",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726609",
+   "postedAt": "2026-10-15",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-15",
+   "thumb": "data/news/img/5605140be508161a.webp"
+  },
+  {
+   "title": "[후원의집 홍보] 굿모닝내과 '부경대학교 구성원 대상 혜택 안내(수액 15%추가 할인)",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726608",
+   "postedAt": "2026-10-15",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-15",
+   "thumb": "data/news/img/ecad17655ceb617e.webp",
+   "desc": "대외협력과 (재)국립부경대학교발전기금의 후원의 집 \"굿모닝내과\" 부경대학교 구성원 대상 이벤트 혜택을 소개합니다."
+  },
+  {
+   "title": "2026년 10월 모의토익 시험 고사장 안내",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726607",
+   "postedAt": "2026-10-15",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-15",
+   "desc": "* 시험 일자 : 2026년 10 월 15일 ( 목 ) * 시험 장소: 미래관(A21) 2층 소민홀 * 입실 시간 : 18:20 입실시작 , 18:50 이후 절대 입실 금지 * 시험준비물"
+  },
+  {
+   "title": "■ 채용공고 ■ 대학입학전형 업무보조 일용직원 채용 공고 - 접수기한 2026.10.19.(월)까지",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726606",
+   "postedAt": "2026-10-15",
+   "kind": "채용",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-15"
+  },
+  {
+   "title": "2027학년도 전기 전임교원 신규채용 초빙공고(2026.10.14.)",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726600",
+   "postedAt": "2026-10-14",
+   "kind": "채용",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-15",
+   "thumb": "data/news/img/c3b91dea765e7b2f.webp"
+  },
+  {
+   "title": "[4단계BK21대학원혁신사업] 2026 PAC(PKNU Open Lab, Academic Conference, Connection) 개최 안내(10/28(수)~10/30(금))",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726594",
+   "postedAt": "2026-10-14",
+   "kind": "행사",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-15",
+   "thumb": "data/news/img/24ccfd56ad4e3ffd.webp"
+  },
+  {
+   "title": "★ (기간연장) 글로벌커넥트 카페 [Fall Clothing Swap] 가을·겨울 옷 나눔 행사",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726591",
+   "postedAt": "2026-10-14",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-15"
+  },
+  {
+   "title": "★ [학부대학] 2026-2학기 전공탐색 주간(전공 박람회) 개최 안내★",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726588",
+   "postedAt": "2026-10-14",
+   "kind": "행사",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-15"
+  },
   {
    "title": "[채용공고] 국립부경대학교 정보융합대학 전자공학전공 조교 채용 공고",
    "url": "https://www.pknu.ac.kr/main/163?action=view&no=726583",

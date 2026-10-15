@@ -1,7 +1,17 @@
 {
  "school": "경기대학교",
- "updatedAt": "2026-10-14",
+ "updatedAt": "2026-10-15",
  "items": [
+  {
+   "title": "[일반] [혁신지원/국고] 전공자율선택제 교육지원 효과성 분석 및 환류체계 구축 사업(2차) 참여인원 모집",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626590&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-14",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-10-15",
+   "desc": "- 모집대상: 2025학년도 전공자율선택제 입학생 중 전공선택 완료 재학생 8명 내외"
+  },
   {
    "title": "[일반] 2026학년도 2학기 학점포기 추가 시행 안내",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626589&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
@@ -64,7 +74,6 @@
    "campus": "",
    "src": "bf927d3e",
    "foundAt": "2026-10-14",
-   "thumb": "data/news/img/49ee6bbe520e9d79.webp",
    "desc": "이미지 확대보기 - 대상: 2025학년도 전공자율선택제 입학생 중 전공선택을 완료한 2학년 재학생"
   },
   {
@@ -189,7 +198,7 @@
    "school": "경기대학교",
    "campus": "",
    "foundAt": "2026-10-07",
-   "desc": "서비스경영전문대학원 2026년 10월 07일 11시 30분 37초 2026학년도 2학기 박사학위 공개발표 신청 및 관련 서류 제출 안내드리오니 확인하시어 해당자는 기한 내 제출 부탁드립니다."
+   "desc": "2026학년도 2학기 박사학위 공개발표 신청 및 관련 서류 제출 안내드리오니 확인하시어 해당자는 기한 내 제출 부탁드립니다."
   },
   {
    "title": "[대학생활/업무안내] 2026-2 ·내 길 찾기 프로젝트· 진로집단상 프로그램 (전공자율선택제)",
@@ -199,7 +208,7 @@
    "campus": "",
    "foundAt": "2026-10-07",
    "thumb": "data/news/img/1019b72edce78894.webp",
-   "desc": "학생상담센터 2026년 10월 07일 11시 07분 39초 이미지 확대보기 * 본 프로그램은 대학혁신지원사업의 지원을 받아 진행되는 프로그램입니다. * 정원이 다 찰 경우, 대기인원으로 등록됩니다."
+   "desc": "이미지 확대보기 * 본 프로그램은 대학혁신지원사업의 지원을 받아 진행되는 프로그램입니다. * 정원이 다 찰 경우, 대기인원으로 등록됩니다."
   },
   {
    "title": "[대학생활/업무안내] 2026-2 ·마음 나침반· 자기이해 집단상담",
@@ -370,14 +379,6 @@
   {
    "title": "[일반] 한글날(10/9) 교학팀 휴무 안내",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626374&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-02",
-   "school": "경기대학교",
-   "campus": "",
-   "foundAt": "2026-10-02"
-  },
-  {
-   "title": "[일반] [사학] 2026학년도 2학기 학술답사 추가 신청 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626371&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
    "postedAt": "2026-10-02",
    "school": "경기대학교",
    "campus": "",

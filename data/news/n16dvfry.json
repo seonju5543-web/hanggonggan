@@ -1,7 +1,18 @@
 {
  "school": "아주대학교",
- "updatedAt": "2026-10-14",
+ "updatedAt": "2026-10-15",
  "items": [
+  {
+   "title": "[일자리+센터] 중간고사 준비 잠시 쉬어가기! 15분 투자로 챙기는 청년고용 혜택 설명회 개최",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377501&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-14",
+   "kind": "학사",
+   "school": "아주대학교",
+   "campus": "",
+   "src": "e5299528",
+   "foundAt": "2026-10-15",
+   "thumb": "data/news/img/ce8133fa0786c12e.webp"
+  },
   {
    "title": "[법학연구소] 사회적약자 법제도연구센터 제16차 콜로키움 개최(10/27(화))",
    "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377499&article.offset=0&articleLimit=10",
@@ -10,7 +21,8 @@
    "campus": "",
    "src": "e5299528",
    "foundAt": "2026-10-14",
-   "thumb": "data/news/img/2ad8281de19f5115.webp"
+   "thumb": "data/news/img/2ad8281de19f5115.webp",
+   "desc": "연구원 및 교직원 등 아주대학교 교내 구성원 여러분들의 자유로운 참석이 가능하오니, 많은 관심과 참여 부탁드립니다."
   },
   {
    "title": "[일자리+센터] 2026 청년미래직진프로그램(미래산업 트렌드to진로직〮무탐색)",
@@ -31,7 +43,8 @@
    "campus": "",
    "src": "e5299528",
    "foundAt": "2026-10-14",
-   "thumb": "data/news/img/181e889657d790fe.webp"
+   "thumb": "data/news/img/181e889657d790fe.webp",
+   "desc": "다산학부대학교학팀 다산학부대학에서는 매주 목요일, 교내외 저명한 인사들을 초청하여 아주강좌를 진행하고 있습니다. 제575회 강연에 대해 다음과 같이 안내드립니다."
   },
   {
    "title": "[기획팀] 아주대학교 학칙 개정(안) 사전 공고",
@@ -82,7 +95,8 @@
    "school": "아주대학교",
    "campus": "",
    "src": "e5299528",
-   "foundAt": "2026-10-13"
+   "foundAt": "2026-10-13",
+   "desc": "🧑&zwj;🎓졸업생 선배와 함께하는 🚗자동차 산업 취업🧑&zwj;💼 특강을 진행합니다. 관심 있는 학생들의 많은 참여 부탁드립니다! 👉 선배님의 생생한 취업 성공 전략이 궁금하다면? 👈 📌 신청방법 :"
   },
   {
    "title": "[입학팀] 2027학년도 아주대학교 학생부종합전형 면접 진행 스태프 모집 안내",
@@ -376,14 +390,6 @@
   {
    "title": "(학부 유학생 대상)[글로벌교양학부] 2026학년도 한국어 백일장 개최",
    "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377105&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-07",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-07"
-  },
-  {
-   "title": "[D-day] [A]nchor X [I]nnovation 부스 OPEN ❗",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377103&article.offset=0&articleLimit=10",
    "postedAt": "2026-10-07",
    "school": "아주대학교",
    "campus": "",

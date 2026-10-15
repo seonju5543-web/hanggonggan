@@ -1,7 +1,17 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-10-14",
+ "updatedAt": "2026-10-15",
  "items": [
+  {
+   "title": "[학사] KLAS 종합정보서비스 보안 강화 조치 시행 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53483&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-15",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-15",
+   "desc": "1. 최근 AI 를 이용한 해외 해킹 시도가 급증함에 따라 , 학생 여러분의 개인정보를 안전하게 보호하기 위해 KLAS 종합정보서비스 보안 강화 조치를 아래와 같이 시행하오니 양지하여 주시기 바랍니다 ."
+  },
   {
    "title": "[일반] [채용공고] 광운대학교 산학협력단 「RISE 사업단」직원 채용 공고",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53480&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -272,7 +282,6 @@
    "campus": "",
    "foundAt": "2026-10-07",
    "thumb": "data/news/img/0d3eadc45a820472.webp",
-   "desc": "작성일 2026.10.07 | 수정일 2026.10.07 | 시설안전관리팀 담당부서 : 각 행정부서 / 연락처 : 02-940-5114 학사안내 학사일정 학사정보 교과안내 필수과목 개설안내 (연도별/학과별)…",
    "src": "b09cb042"
   },
   {
@@ -409,15 +418,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/e6d919361d2209ed.webp"
-  },
-  {
-   "title": "[일반] [HUSS-글로벌공생] (재학생 누구나 신청 가능)글로벌 공생 HUSS 2026 산학연협력 EXPO 단체 참가 학생 모집 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53323&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-11",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/144f0e2dbd2e1eca.webp"
   }
  ]
 }

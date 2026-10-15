@@ -1,7 +1,18 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-10-14",
+ "updatedAt": "2026-10-15",
  "items": [
+  {
+   "title": "외국인유학생지원팀 촉탁직원 채용 공고",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140583&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-15",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-15",
+   "desc": "총괄지원팀 우리대학 외국인유학생지원팀에서 근무할 촉탁직원을 아래와 같이 채용합니다."
+  },
   {
    "title": "2026학년도 2학기 미래차 SDV/전동화/자율주행 마이크로디그리 신청 안내 - 10/19(월)~10/23(금)",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140577&article.offset=0&articleLimit=10",
@@ -250,7 +261,7 @@
    "campus": "",
    "foundAt": "2026-10-07",
    "thumb": "data/news/img/a1bd5e167b17bba1.webp",
-   "desc": "최종 수정일 : 2026.10.07 국제교류팀 첨부파일 ( 2 ) 게시글 내용 성균관대학교는 한국과학기술한림원과 공동으로 스웨덴 왕립과학한림원(KVA) 스벤 리딘(Sven Lidin) 원장을 초청하여 특별 강연을…",
+   "desc": "국제교류팀 성균관대학교는 한국과학기술한림원과 공동으로 스웨덴 왕립과학한림원(KVA) 스벤 리딘(Sven Lidin) 원장을 초청하여 특별 강연을 개최합니다.",
    "src": "45ec8fd1"
   },
   {
@@ -282,7 +293,7 @@
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-10-07",
-   "desc": "최종 수정일 : 2026.10.07 정보통신/소프트웨어/공과대학행정실 첨부파일 ( 1 ) 게시글 내용 성균관대학교 공과대학 행정실에서 행정조교를 다음과 같이 모집하오니 관심 있는 분의 많은 지원바랍니다."
+   "desc": "정보통신/소프트웨어/공과대학행정실 성균관대학교 공과대학 행정실에서 행정조교를 다음과 같이 모집하오니 관심 있는 분의 많은 지원바랍니다."
   },
   {
    "title": "성균관대학교 공과대학 행정조교 채용(~2026.10.13.(화) 오전 11시)",
@@ -408,15 +419,6 @@
    "campus": "",
    "foundAt": "2026-10-06",
    "thumb": "data/news/img/d1fcb1b1cf99761b.webp",
-   "src": "45ec8fd1"
-  },
-  {
-   "title": "[대학혁신과공유센터] 2026학년도「탑골공원 학생 도슨트 프로그램」신청자 모집 안내",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140163&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-06",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-06",
    "src": "45ec8fd1"
   }
  ]
