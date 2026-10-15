@@ -35,6 +35,7 @@ import { FETCH_HEADERS } from './http-headers.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { attachmentText, isOcrSource, isNoticeDoc } from './attachment-text.mjs';
 import { activityDetails, eligLineOk } from './activity-excerpts.mjs';
+const { cutAtNextSection } = await import('./extract-excerpts.mjs');   // activity-excerpts 와 같은 이유로 동적으로(환경변수보다 뒤에)
 
 const HERE = new URL('.', import.meta.url);
 const ACTS = fileURLToPath(new URL('../data/activities.json', HERE));
@@ -103,7 +104,9 @@ export function candidateFiles(n, html, pageUrl) {
     const name = String(a.name || '');
     if (FORMISH.test(name)) continue;
     if (!(DOC_EXT.test(name) || DOC_EXT.test(a.url || ''))) continue;
-    if (!(isNoticeDoc(name) || IMG_EXT.test(name) || /포스터|요강|안내문|공고문|리플렛|홍보물/.test(name))) continue;
+    /* `보도자료` 도 읽는다(2026-10-16 · 정책브리핑의 공모 글은 본문이 「첨부를 참고」 뿐이고 참가자격이 보도자료 HWPX·PDF 에만 있다 — korea.kr·과기정통부 실측).
+       활동 글만의 규칙이다 — isNoticeDoc(장학 deepfetch 와 공용)은 건드리지 않는다 */
+    if (!(isNoticeDoc(name) || IMG_EXT.test(name) || /포스터|요강|안내문|공고문|리플렛|홍보물|보도자료|\(보도\)/.test(name))) continue;
     out.push({ url: a.url, name, from: 'attach' });
   }
   /* 🔴 본문 그림은 **글 제목 뒤**에서만 — 앞쪽은 사이트 머리·메뉴 그림이다(첫 실측: 인증서·광고 배너가 받아졌다) */
@@ -232,7 +235,8 @@ async function fetchPost(n, until, common = new Set(), owners = new Map()) {
 
 /* 요강으로 가는 링크 — 이름으로 고른다. 같은 사이트(호스트)만 · 파일·자바스크립트 링크는 뺀다 */
 /* 🔴 이름이 분명한 것만 — `자세히 보기`·`모집 안내` 는 옆 목록의 **다른 사업**으로 갔다(스파로스 아카데미 → 「부산에 방문하는 청년」 · 2026-10-03 실측) */
-const GUIDE = /요강|공고문|참가\s?안내|참여\s?안내|대회\s?개요|공모\s?개요/;
+/* `공모안내`·`대회소개`·`참여방법` 도 따라간다(2026-10-16 · 지식재산처·데이터안심구역·공공누리처럼 첫 화면은 메뉴뿐이고 자격은 그 하위 페이지에 있다). `모집 안내` 는 여전히 안 간다(다른 사업 글) */
+const GUIDE = /요강|공고문|참가\s?안내|참여\s?안내|대회\s?개요|공모\s?개요|공모\s?안내|대회\s?소개|참여\s?방법/;
 export function guideLinks(html, pageUrl) {
   let host = '';
   try { host = new URL(pageUrl).host; } catch { return []; }
@@ -409,7 +413,8 @@ export function mergeBrowserResults(acts, bled = readJson(BROWSER_LEDGER, {})) {
   let got = 0;
   for (const n of acts.items) {
     const r = bled[n.url];
-    const lines = ((r && r.lines) || []).filter(eligLineOk);
+    /* 장부의 줄은 적힌 날의 자르기로 뽑힌 것 — 합칠 때 절 끝(참가방법·시상규모)에서 한 번 더 자른다(extract-excerpts cutAtNextSection · 2026-10-16) */
+    const lines = cutAtNextSection((r && r.lines) || []).filter(eligLineOk);
     if (!lines.length || !needsElig(n)) continue;
     n.eligibilityLines = lines;
     const excludes = (r.excludes || []).filter(eligLineOk);

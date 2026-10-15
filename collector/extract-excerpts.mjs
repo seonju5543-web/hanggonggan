@@ -716,8 +716,15 @@ function scoopQualifyLines(text) {
    이 파일은 **불러오는 순간 아래 본편이 통째로 실행되던** 구조라 규칙 하나를 시험해 보려면
    비슷한 코드를 따로 베껴야 했고(그러면 규칙이 두 벌이 된다), 검사도 '원본 글자를 읽어
    규칙이 살아 있는지만 보는' 약한 방식에 머물렀다. `EXCERPTS_AS_LIB=1`이면 본편을 건너뛴다. */
+/** 이미 뽑힌 자격 줄 묶음을 **다음 절 머리글**(참가방법·시상규모·신청기간…)에서 자른다 — 브라우저 장부(act-browser.json)의 옛 줄처럼
+    원문 없이 줄만 남은 것에 blockFrom 과 같은 절 끝 규칙을 거는 한 곳(2026-10-16 · 중앙청년지원센터 청년정책 공모전). 첫 줄은 절 제목일 수 있어 안 본다 */
+function cutAtNextSection(lines) {
+  const ls = Array.isArray(lines) ? lines : [];
+  const i = ls.findIndex((l, k) => k > 0 && NEXT_SECTION.test(String(l || '')));
+  return i > 0 ? ls.slice(0, i) : ls;
+}
 export { extractQualifyLines, scoopQualifyLines, extractFrom, extractExcludeLines, extractPriorityLines,
-         extractDeadline, extractOpenDate, extractAnnounce, qualFromTitle, AMOUNT_ROW };
+         extractDeadline, extractOpenDate, extractAnnounce, qualFromTitle, AMOUNT_ROW, cutAtNextSection };
 
 let browserBodies = {};
 try { browserBodies = JSON.parse(fs.readFileSync(new URL('extracted/browser-bodies.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }

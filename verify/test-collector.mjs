@@ -4865,6 +4865,12 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
       new URL('https://www.dongguk.edu/cmmn/fileDown.do?filename=' + encodeURIComponent("붙임3. 매뉴얼(웰로 'Wello' 앱).pdf") + '&filepath=/files/article/JANGHAKNOTICE/26766011/&filerealname=7C31D4C946AD470EA56798EB13ED3ACF.pdf').href);
     eq('  규칙은 그 사이트에서만 — 다른 학교의 같은 이름 함수는 모른다', AL.resolveJsDownload("javascript:downloadfile('/a','b.hwp','c.hwp')", 'https://www.other.ac.kr/x'), null);
     eq('  잘린 호출(`downloadfile(`)은 짐작하지 않는다', AL.resolveJsDownload('javascript:downloadfile(', st), null);
+    /* 과기정통부(2026-10-16 · 정책브리핑 공모 글의 보도자료 첨부가 0건이었다) — 호출이 onclick 에 있고 단추 글자는 `다운로드` 뿐, 파일 이름은 앞 요소에 */
+    const msit = 'https://www.msit.go.kr/bbs/view.do?sCode=user&mId=307&mPid=208&bbsSeqNo=94&nttSeqNo=3187433';
+    eq('과기정통부 fn_download(번호, 순번, 확장자) → /ssm/file/fileDown.do', AL.resolveJsDownload("javascript:fn_download('54098', '1', 'hwpx');", msit), 'https://www.msit.go.kr/ssm/file/fileDown.do?atchFileNo=54098&fileOrd=1');
+    eq('  onclick 호출 + 앞 요소의 파일 이름 — href 가 void 여도 첨부가 된다 · 모르는 onclick(getExtension_path) 은 첨부가 아니다',
+      AL.detailAttachments('<li><a title="파일명" class="ico_file_hwp">260615 조간 (보도) 과기정통부 공모전 개최.(수정).hwpx</a> <span><a href="javascript:void(0);" onclick="fn_download(\'54098\', \'1\', \'hwpx\');" class="down">다운로드</a> <a href="javascript:void(0);" onclick="getExtension_path(\'54098\', \'1\');">바로보기</a></span></li>', msit),
+      [{ name: '260615 조간 (보도) 과기정통부 공모전 개최.(수정).hwpx', url: 'https://www.msit.go.kr/ssm/file/fileDown.do?atchFileNo=54098&fileOrd=1' }]);
     eq('상세 첨부: 큰따옴표 href 안의 작은따옴표에서 끊지 않는다 · 주석 속 옛 링크는 줍지 않는다 · 안내창(alert)은 첨부가 아니다',
       AL.detailAttachments(`<a href="javascript:downloadfile('/storage/www/bbs/5233','A_.hwp','공고문.hwp' )">공고문.hwp</a>
         <!-- <a href="javascript:alert('현재 작업중입니다.');" class="file_bg">(붙임) 옛 일정(21년 08월 2주차).hwp</a> -->
@@ -12056,6 +12062,10 @@ console.log('\n■ 대외활동·공모전 — 첨부·포스터 읽기 (2026-10
   const guideHtml = '<a href="/guide/rule.do">대회 요강</a><a href="/notice/2">자세히 보기</a><a href="/apply">모집 안내</a><a href="https://other.go.kr/x">공고문</a><a href="/files/a.pdf">공고문</a>';
   eq('⑥ 따라갈 링크 — 이름이 분명한 것(요강·공고문)만 · 같은 사이트만 · 파일 링크는 첨부 몫 · `자세히 보기`·`모집 안내` 는 안 간다(다른 사업으로 갔다)',
     AD.guideLinks(guideHtml, 'https://hack.kr/main'), ['https://hack.kr/guide/rule.do']);
+  eq('  `공모안내`·`대회소개`·`참여방법` 도 따라간다(2026-10-16 · 지식재산처·데이터안심구역 첫 화면은 메뉴뿐) · `모집 안내` 는 여전히 아니다',
+    AD.guideLinks('<a href="/info">공모안내 보기</a><a href="/intro">대회소개</a><a href="/how">참여방법</a><a href="/apply">모집 안내</a>', 'https://hack.kr/main'), ['https://hack.kr/info', 'https://hack.kr/intro', 'https://hack.kr/how']);
+  eq('  첨부 이름 `보도자료`·`(보도)` 도 공고문으로 받는다(활동만 · korea.kr·과기정통부) · 서식은 여전히 아니다',
+    [AD.candidateFiles({ title: 't', attachments: [{ name: '261007 2026 청년정책 공모전 개최 보도자료_최종.hwpx', url: 'https://korea.kr/common/download.do?fileId=1' }, { name: '260615 조간 (보도) 공모전 개최.hwpx', url: 'https://msit.go.kr/f/2' }, { name: '참가신청서.hwpx', url: 'https://korea.kr/f/3' }] }, '', 'https://korea.kr/x').map((f) => f.url)], [['https://korea.kr/common/download.do?fileId=1', 'https://msit.go.kr/f/2']]);
   const linkRead = (txt) => AD.eligFromFiles({ title: '2026 스페이스 해커톤' }, ['k-L0.txt'], () => txt, '/tmp', () => false);
   eq('  🔴 따라간 요강 페이지도 글 제목 낱말이 있어야 그 글의 것 — 재단의 다른 장학금 안내가 붙을 뻔했다',
     [linkRead('장학금 안내\n참가자격 : 대학교 2학년 이상'), (linkRead('2026 스페이스 해커톤 대회 요강\n참가자격 : 위성정보에 관심있는 대학생·대학원생 및 일반인') || {}).from], [null, '요강 페이지']);
@@ -12120,7 +12130,11 @@ console.log('\n■ 대외활동 — 남은 글 표본에서 찾은 것 (2026-10-
   eq('④ 모집 글이 아닌 것 — 결과·보도·지난 해 글은 대외활동이 아니다 · 모집 글은 그대로',
     [AK.notActivity('2026년 제3회 장학수기 공모전 심사 결과...'), AK.notActivity('가명정보 활용 경진대회 대상·최우수상 동시 석권'), AK.notActivity('2018년 사회복지 협력기관 워크숍', new Date('2026-10-04')), AK.notActivity('2026년 경기 스타트업 아카데미 참여자 모집', new Date('2026-10-04')), AK.notActivity('2025학년도 겨울 해외탐방 모집', new Date('2026-10-04'))],
     [true, true, true, false, false]);
-  eq('  수집 로봇이 이미 실린 글에도 소급한다', /acts\.items = acts\.items\.filter\(\(n\) => !notActivity\(n\.title\)\)/.test(readText(new URL('../collector/collect.mjs', import.meta.url))), true);
+  eq('  수집 로봇이 이미 실린 글에도 소급한다 · 인스타그램 게시물도 같은 자리에서 뺀다 · 들일 때도', [/acts\.items = acts\.items\.filter\(\(n\) => !notActivity\(n\.title\) && !unreadableSource\(n\.url\)\)/.test(readText(new URL('../collector/collect.mjs', import.meta.url))), /\.filter\(\(i\) => !unreadableSource\(i\.url\)\)/.test(readText(new URL('../collector/collect.mjs', import.meta.url)))], [true, true]);
+  eq('  `(설명) 연합뉴스 … 기사 관련`·`보도 설명` 은 모집 글이 아니다 · `[보도자료] 2026 청년정책 공모전 개최` 는 모집 글 (2026-10-16)',
+    [AK.notActivity('(설명) 연합뉴스, "정부 해외취업연수 매년 10% 안팎 폐강" 기사 관련'), AK.notActivity('보도 설명 자료'), AK.notActivity('[보도자료] 2026 청년정책 공모전 개최')], [true, true, false]);
+  eq('  인스타그램·페이스북 게시물은 읽을 수 없는 출처 — 기관 홈페이지는 아니다(2026-10-16 개발자 "피드에서 빼")',
+    ['https://www.instagram.com/acrc0229/p/DeF3w_FE4Yt/?img_index=1', 'https://m.facebook.com/x/posts/1', 'https://www.korea.kr/briefing/x.do', 'https://instagram.com.example.org/'].map(AK.unreadableSource), [true, true, false, false]);
   eq('⑤ 그림 — 큰 카드뉴스(1920×1080)는 받는다 · 광고 배너(846×510)는 아니다', [AD.posterShaped({ w: 1920, h: 1080 }), AD.posterShaped({ w: 846, h: 510 })], [true, false]);
   eq('  페이지에 직접 박힌 그림(data:image/png;base64)도 후보 · 다른 data: 는 아니다(감사원 팝업)',
     AD.candidateFiles({ title: '감사 아이디어 공모', attachments: [] }, '<h1>감사 아이디어 공모</h1><img src="data:image/png;base64,iVBORw0KGgo="><img src="data:text/html;base64,PGI+">', 'https://bai.go.kr/x').map((f) => f.url.slice(0, 22)), ['data:image/png;base64,']);
@@ -12212,6 +12226,11 @@ console.log('\n■ 자격요건 로봇 (진짜 브라우저) — 장학·대외�
   const n = AD.mergeBrowserResults(acts, { u1: { lines: ['참가자격 : 대학생'], from: '브라우저 본문' }, u2: { lines: ['덮으면 안 됨'], from: '브라우저 본문' }, u3: { at: '2026-10-04', tries: 1 } });
   eq('① 수집 로봇이 브라우저 장부를 합친다 — 아직 자격이 없는 글에만 · 결과 없는 장부 줄은 무시',
     [n, acts.items[0].eligibilityLines, acts.items[0].eligibilityFrom, acts.items[1].eligibilityLines, acts.items[2].eligibilityLines], [1, ['참가자격 : 대학생'], '브라우저 본문', ['본문 자격'], undefined]);
+  {
+    const a2 = { items: [{ url: 'u9', title: 'x' }] };
+    AD.mergeBrowserResults(a2, { u9: { lines: ['ㅇ 참가자격 : 청년 (19~34 세 ) 개인 또는 팀', '※ 기업 및 영리단체는 참여 불가', 'ㅇ 참가방법 : 온통청년 홈페이지', 'ㅇ 시상규모 : 10 명 , 상금 총 390 만원', '대상 (1)', '100 만원'], from: '브라우저 본문' } });
+    eq('  장부의 옛 줄도 합칠 때 절 끝(참가방법·시상규모)에서 자른다 — 중앙청년지원센터 청년정책 공모전(2026-10-16)', a2.items[0].eligibilityLines, ['ㅇ 참가자격 : 청년 (19~34 세 ) 개인 또는 팀', '※ 기업 및 영리단체는 참여 불가']);
+  }
   eq('  🔴 브라우저 모드는 data/activities.json 을 쓰지 않는다 · 장부는 모드마다 따로(act-docs.json / act-browser.json)',
     [/if \(changed && !BROWSER\) fs\.writeFileSync\(ACTS/.test(src), /const LEDGER = BROWSER \? BROWSER_LEDGER : PLAIN_LEDGER;/.test(src)], [true, true]);
   eq('  브라우저는 무료 모드가 이미 해 본 글만 · 이미 찾은 글은 다시 안 연다', [/if \(BROWSER && !plainTried\[n\.url\]\) continue;/.test(src), /if \(BROWSER && ledger\[n\.url\] && ledger\[n\.url\]\.lines\) continue;/.test(src)], [true, true]);
