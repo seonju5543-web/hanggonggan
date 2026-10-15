@@ -69,7 +69,7 @@ const ACT_HEAD = /공모\s?(?:자격|대상)|교육\s?대상|참가\s?범위|응
 const OPEN_LINE = /(?:(?:국민|세계인|시민|청년|학생|대학생|개인|팀|관심\s?(?:있는|있으신)\s?(?:분|사람)?)\s*(?:이면\s*)?(?:누구나|모두)|누구나)\s*(?:참여|참가|신청|응모|지원)?\s*(?:가능)?\s*(?:\d+\s?(?:인|명))?\s*(?:[(（].*[)）])?\s*[.!]?\s*$|(?:대상|자격|연령|나이)\s*[:：]?\s*제한\s?없음/;
 const NOT_OPEN = /심사|수상|시상|제외|이해|쉽게|볼\s?수|이용|열람|니다/;
 /* 누가 낼 수 있나를 말하는 줄글 — `…누구나 참가할 수 있으며` · `…재학생을 대상으로 …를 모집` · `…이면 신청할 수 있다` */
-const WHO_SENTENCE = /누구나\s*(?:참가|참여|신청|응모|지원)\s*(?:할\s*수\s*있|이?\s*가능)|(?:재학생|대학생|청년|주민|시민|도민|구민|학생|국민)[^.]{0,20}(?:을|를)\s*대상으로|(?:이면|라면|인\s*경우)\s*(?:누구나\s*)?(?:참가|참여|신청|응모|지원)\s*(?:할\s*수\s*있|가능)/;
+const WHO_SENTENCE = /누구나\s*(?:참가|참여|신청|응모|지원)\s*(?:할\s*수\s*있|이?\s*가능)|(?:이라면|라면|이면)\s*누구나|(?:재학생|대학생|청년|주민|시민|도민|구민|학생|국민)[^.]{0,20}(?:을|를)\s*대상으로|(?:이면|라면|인\s*경우)\s*(?:누구나\s*)?(?:참가|참여|신청|응모|지원)\s*(?:할\s*수\s*있|가능)/;
 /* 🔴 `[ \t]` 이지 `\s` 가 아니다 — `\s` 는 줄바꿈까지 먹어 `<응모자격>` 아래 줄이 이름표 줄에 붙었다(첫 실측) */
 /* 🔴 칸 이름으로 끝나는 이름표만 — `[서울문화재단] 2026년 …` 같은 제목 머리말을 `서울문화재단 : …` 으로 바꾸지 않는다(리뷰) */
 /* 납작해진 표 — 이름표가 한 줄에 혼자, 값이 다음 줄(`대상` ↵ `대학생, 일반인 …` · `대상연령` ↵ `만 20세 이상 …` — K-Startup·대전청년포털 실측).
@@ -84,7 +84,8 @@ const joinTablePairs = (t) => {
     /* 맨 `대상` 은 값이 **사람**을 가리킬 때만 잇는다 — 다음 절 제목(`제출기한 및 제출방법`)과 붙은 적이 있다(TOPIK 공고문 · 2026-10-04) */
     const award = /^대상$/.test(a) && (/상(?:\s|\(|$)|^\d+\s*(?:명|점|건)?$|원$|만\s?원/.test(b)
       || !/생|인|자(?:\s|,|$|\()|민|년|팀|누구나|세|기업|교사|교원|가구|학생|청소년|성인|국민|일반/.test(b));
-    if (TABLE_LABEL.test(a) && b && b.length <= 150 && !TABLE_LABEL.test(b) && !/[:：]/.test(a) && !award) { ls[i] = `${a} : ${b}`; ls[i + 1] = ''; }
+    /* 다음 줄이 또 다른 표 머리(`공모주제`·`제출자료`)면 값이 아니다 — `참가대상 : 공모주제` 가 자격이 됐다(그린리모델링 요강 페이지 · 2026-10-16) */
+    if (TABLE_LABEL.test(a) && b && b.length <= 150 && !TABLE_LABEL.test(b) && !isTableHead(b) && !/[:：]/.test(a) && !award) { ls[i] = `${a} : ${b}`; ls[i + 1] = ''; }
   }
   return ls.join('\n');
 };
@@ -121,7 +122,8 @@ const HEAD_LIKE = (l) => {
 /* 줄글 — `모바일신분증에 관심 있는 국민이면 누구나 참가할 수 있으며 , …`(보도자료 꼴 · 2026-10-03 실측 20건이 이 꼴이었다).
    '누가 낼 수 있나'를 말하는 문장만 원문 그대로. **이름표 줄이 하나도 없을 때만** 쓴다(activityDetails 맨 끝).
    판정은 parseOpen 이 남는 글자 0일 때만 ✓ 라 이런 긴 문장은 '모름'으로 남는다(틀린 안심 없음) */
-const proseLines = (t) => [...new Set(t.split('\n').map((l) => l.trim()).filter((l) => l.length >= 8 && l.length <= 200 && WHO_SENTENCE.test(l) && !NOT_OPEN.test(l.replace(/니다\s*\.?$/, ''))))].slice(0, 2);
+/* 안내 말투(NOT_OPEN)는 **누가 낼 수 있나를 말하는 앞부분**에서만 본다 — `19~34세 청년이라면 누구나, … 블로그를 통해 쉽게 참여할 수 있다`(보도자료 · 2026-10-16)의 `쉽게` 는 참여 방법 쪽 말이다 */
+const proseLines = (t) => [...new Set(t.split('\n').map((l) => l.trim()).filter((l) => l.length >= 8 && l.length <= 200 && WHO_SENTENCE.test(l) && !NOT_OPEN.test(l.replace(/니다\s*\.?$/, '').split(/누구나/)[0])))].slice(0, 2);
 function qualifyLines(t) {
   let q = extractQualifyLines(t, { head: ACT_HEAD, trustHead: true });
   /* 맨 제목 줄(`지원자격`)은 장학 발췌기가 표 머리글로 보고 빼므로 첫 줄이 내용일 수 있다 — 그 바로 윗줄이 제목이면 맞다(리뷰) */
@@ -162,6 +164,8 @@ export function eligLineOk(line) {
   const t = l.trim();
   if (POLITE_END.test(t) && !HAS_LABEL.test(t) && !(ELIG_SAY.test(t) && !NOT_SAY.test(t))) return false;
   if (LABEL_ONLY.test(t) || AWARD_ROW.test(t)) return false;
+  /* (f) 수상자 명단 `대상 : 박명건(전라남도)` — 지난 회차 수상작 표의 '대상(大賞)' 줄이 참가 대상으로 실렸다(농진청 안전365 요강 페이지 · 2026-10-16) */
+  if (/^[\s○●■□ㅇ·\-–]*(?:대상|최우수상|우수상|장려상)\s*[:：]\s*[가-힣]{2,4}\s*[(（][가-힣]{2,8}[)）]\s*$/.test(t)) return false;
   return true;
 }
 /** 이미 실린 활동 글의 자격 줄에 같은 거름을 다시 건다 — 비면 칸을 지운다 · 바뀌면 true (수집 로봇 발행 때 모든 글에 · 원칙 7 소급).
@@ -171,7 +175,7 @@ export function sanitizeElig(it) {
   let changed = false;
   for (const k of ['eligibilityLines', 'eligibilityExcludes']) {
     if (!Array.isArray(it[k])) continue;
-    const kept = it[k].filter(eligLineOk);
+    const kept = (k === 'eligibilityLines' ? cutAtTableLabel(it[k]) : it[k]).filter(eligLineOk);   // 표 머리에서 자르기도 소급(2026-10-16)
     if (kept.length === it[k].length) continue;
     changed = true;
     if (kept.length) it[k] = kept; else delete it[k];
@@ -180,6 +184,16 @@ export function sanitizeElig(it) {
   return changed;
 }
 
+/* 납작한 정의 표(`참가 대상` ↵ `대한민국 국민 누구나` ↵ `참가 형태` ↵ `개인 또는 3인 이하 팀` ↵ `출품 수` ↵ …)는 자격 짝 **다음 이름표**에서 끝이다 —
+   요강 페이지의 표 전체(공모 분야·주최·공모 주제)가 자격 13줄로 실렸다(지식재산처·데이터안심구역 · 2026-10-16). 이름표는 짧고(10자 이하) 숫자·콜론이 없으며
+   끝이 표 머리 낱말이다 · 사람·대상을 말하는 짧은 값(`대학생`·`성인`·`개인 또는 팀`)은 이름표가 아니다(joinTablePairs 와 같은 눈) */
+const TABLE_HEAD_WORD = /(?:형태|분야|주제|주최|주관|안내|신청|평가|일정|방법|기간|내용|시상|규격|심사|접수|문의|장소|일시|발표|부문|혜택|상금|출품\s?수|인원|규모|내역|목적|자료|배경|개요|절차|순서)\s*$/;
+const VALUE_WORD = /생|인|자(?:\s|,|$|\()|민|년|팀|누구나|세|기업|교사|교원|가구|학생|청소년|성인|국민|일반|대상|자격/;
+const isTableHead = (l) => { const t = String(l || '').trim(); return t.length <= 10 && !/[\d:：]/.test(t) && TABLE_HEAD_WORD.test(t) && !VALUE_WORD.test(t); };
+function cutAtTableLabel(lines) {
+  const i = lines.findIndex((l, k) => k > 0 && isTableHead(l));
+  return i > 0 ? lines.slice(0, i) : lines;
+}
 export function activityDetails(text, title) {
   const t = labelColon(String(text || ''));
   if (!t.trim()) return { eligibilityLines: [], eligibilityExcludes: [], eligibilityPriority: [], noticeLines: [] };
@@ -206,6 +220,7 @@ export function activityDetails(text, title) {
   if (who && !qual.some((q) => flat(q).includes(flat(who)) || (core(q).length >= 4 && flat(who).includes(core(q))))) qual = [...qual, who];
   if (!qual.length) qual = proseLines(body);
   if (!qual.length && body !== t) qual = proseLines(t);
+  qual = cutAtTableLabel(qual);
   return {
     eligibilityLines: noContact(qual).filter(eligLineOk),
     eligibilityExcludes: noContact(extractExcludeLines(t)).filter(eligLineOk),

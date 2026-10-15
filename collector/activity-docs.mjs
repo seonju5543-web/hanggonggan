@@ -76,7 +76,11 @@ export const needsElig = (n) => !n.hidden && !(n.eligibilityLines && n.eligibili
 export function afterTitle(html, title) {
   const key = String(title || '').replace(/\[[^\]]*\]|\([^)]*\)/g, '').trim().slice(0, 10);
   if (key.length < 5) return html;
-  const at = html.lastIndexOf(key);
+  /* 🔴 **본문(</head> 뒤) 첫 번째** 제목 자리부터 — 마지막 자리를 쓰면 글 아래 '이전글·다음글·관련 글' 띠에 제목이 한 번 더 나오는 게시판에서
+     본문 포스터가 통째로 잘려 나갔다(농진청 `00._포스터.png`·한국교육환경보호원 getImage.do · 2026-10-16 실측 — 두 글 다 후보 0개). <head> 의 <title> 은 건너뛴다 */
+  const body = Math.max(0, html.search(/<\/head>/i));
+  const first = html.indexOf(key, body);
+  const at = first >= 0 ? first : html.lastIndexOf(key);
   return at < 0 ? html : html.slice(at);
 }
 
@@ -236,7 +240,7 @@ async function fetchPost(n, until, common = new Set(), owners = new Map()) {
 /* 요강으로 가는 링크 — 이름으로 고른다. 같은 사이트(호스트)만 · 파일·자바스크립트 링크는 뺀다 */
 /* 🔴 이름이 분명한 것만 — `자세히 보기`·`모집 안내` 는 옆 목록의 **다른 사업**으로 갔다(스파로스 아카데미 → 「부산에 방문하는 청년」 · 2026-10-03 실측) */
 /* `공모안내`·`대회소개`·`참여방법` 도 따라간다(2026-10-16 · 지식재산처·데이터안심구역·공공누리처럼 첫 화면은 메뉴뿐이고 자격은 그 하위 페이지에 있다). `모집 안내` 는 여전히 안 간다(다른 사업 글) */
-const GUIDE = /요강|공고문|참가\s?안내|참여\s?안내|대회\s?개요|공모\s?개요|공모\s?안내|대회\s?소개|참여\s?방법/;
+const GUIDE = /요강|공고문|참가\s?안내|참여\s?안내|대회\s?개요|공모(?:전)?\s?(?:개요|안내|소개)|공모\s?부문|대회\s?소개|참여\s?방법/;   // 공모전개요·공모전소개·공모부문: 해양안전 콘텐츠 공모전 단일 사이트(포스터엔 자격이 없고 그 메뉴에 있다)
 export function guideLinks(html, pageUrl) {
   let host = '';
   try { host = new URL(pageUrl).host; } catch { return []; }
@@ -271,7 +275,7 @@ export function dueFree(entry, today) {
 /* ── OCR 엔진이 고장 난 동안 깎인 무료 기회 (2026-10-04 점검 gaps-02) ──
    10-03·10-04 첫 클라우드 실행들은 PaddleOCR 이 모든 그림에서 같은 오류로 '0장'이었는데(판 고정 전) 장부는 그 시도를 한 번으로 셌다.
    글마다 두 번뿐인 기회(MAX_TRIES)라, 두 번째도 고장 난 엔진에 걸리면 그 글은 무료 경로에서 영영 빠진다. */
-const LEDGER_V = 'paddle-pin-2026-10-04';   // 장부 판 — 바꾸면 다음 실행이 자격 못 찾은 칸을 한 번 비운다
+const LEDGER_V = 'press-attach-2026-10-16';   // 장부 판 — 바꾸면 다음 실행이 자격 못 찾은 칸을 한 번 비운다 · 10-16: 보도자료 첨부·onclick 내려받기·요강 링크 규칙이 바뀌어 못 읽은 글을 다시 해 본다
 /** 장부 판이 다르면 자격을 못 찾은 칸(lines 없음)을 한 번 비운다 — 비운 글은 다음 실행에 바로 다시 해 본다(dueFree(undefined)=true).
     `_` 로 시작하는 칸(_common 공통 그림 · _ocrV 판)은 남긴다. 몇 칸을 비웠는지 돌려준다. */
 export function migrateOcrTries(ledger, v = LEDGER_V) {

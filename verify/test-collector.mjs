@@ -12021,6 +12021,16 @@ console.log('\n■ 대외활동·공모전 — 활동 글의 자격 읽기 (2026
     [PRX0.provincesOfCity('구리시'), /const REGION_CITIES/.test(readText(new URL('../data.js', import.meta.url))), /: \{ parseLine,[^}]*provincesOfCity/.test(readText(new URL('../match-engine.js', import.meta.url)))], [['경기'], false, true]);
   eq('  🔴 `관내 고등학교를 졸업하고 …` 는 출신 고교지 사는 곳이 아니다 · `관내 주소` 는 사는 곳', [(PRX0.parseLine('관내 고등학교를 졸업하고 전국 의과대학에 재학 중인 자').conds.find((c) => c.kind === 'residence') || {}).about !== 'home', (PRX0.parseLine('관내에 주소를 둔 자').conds.find((c) => c.kind === 'residence') || {}).about], [true, 'home']);
   eq('  배점표(`성적 35% + 생활정도 50% + 경주시 거주기간 15%`)는 자격 줄이 아니다', MEX.requirementLines({ eligibilityLines: ['□ 성적 35% + 생활정도 50% + 경주시 거주기간 15%'] }, null, { all: true }).length, 0);
+  /* 2026-10-16 정책브리핑 공모 글 — 요강 페이지의 납작한 정의 표 · 보도자료 줄글 · 주석 찌꺼기 */
+  eq('  납작한 정의 표는 자격 짝 다음 이름표(`참가 형태`·`출품 수`·`공모 분야`)에서 끝난다 — 표 전체(주최·공모 주제)가 자격 13줄로 실렸다(지식재산처 요강 페이지)',
+    el(['공모 개요', '공모명', '2026년 지식재산 보호 광고 공모전', '참가 대상', '대한민국 국민 누구나', '참가 형태', '개인 또는 3인 이하 팀', '출품 수', '제한 없음', '공모 분야', '숏폼 영상, 포스터', '주최', '지식재산처'].join('\n'), '[지식재산처] 2026 지식재산 보호 광고 공모전'),
+    ['참가 대상 : 대한민국 국민 누구나']);
+  eq('  사람을 말하는 짧은 값(`대학생`·`성인`)은 이름표가 아니라 잘리지 않는다', el(['참가대상', '대학생', '대학원생', '참가 형태', '개인'].join('\n')), ['참가대상 : 대학생', '대학원생']);
+  eq('  보도자료 줄글 `19~34세 청년이라면 누구나, … 쉽게 참여할 수 있다` 는 누가 낼 수 있나를 말한다(`쉽게` 는 참여 방법 쪽 말)',
+    el('□ 올해 공모전은 19~34세 청년이라면 누구나, 10월 7일부터 10월 30일까지 온통청년 등 SNS와 블로그*를 통해 쉽게 참여할 수 있다.\n□ 국무조정실은 밝혔다.', '[보도자료] 2026 청년정책 공모전 개최').length, 1);
+  eq('  이미 실린 글의 표 꼬리도 sanitizeElig 가 자른다(소급)', (() => { const it = { eligibilityLines: ['참가 대상 : 대한민국 국민 누구나', '참가 형태', '개인 또는 3인 이하 팀'], eligibilityFrom: '요강 페이지' }; return [AX.sanitizeElig(it), it.eligibilityLines]; })(), [true, ['참가 대상 : 대한민국 국민 누구나']]);
+  eq('  HTML 주석은 글자가 아니다 — `<!-- … -->` 찌꺼기 `-->` 줄이 `참가대상 : -->` 가 됐다(데이터안심구역)',
+    (await import('../collector/html-text.mjs')).htmlToLines('<p>참가대상</p><!-- <span>옛 글</span> --><p>국민 누구나</p>').split('\n'), ['참가대상', '국민 누구나']);
   eq('⑥ 소급 — 판(detailsV)을 올려 옛 글도 다시 읽는다 · 수집 로봇은 제목을 넘긴다',
     [AX.ACT_DETAILS_V >= 3, (readText(new URL('../collector/collect.mjs', import.meta.url)).match(/activityDetails\(detail\.text, it\.title\)/g) || []).length], [true, 2]);
 }
@@ -12136,6 +12146,11 @@ console.log('\n■ 대외활동 — 남은 글 표본에서 찾은 것 (2026-10-
   eq('  인스타그램·페이스북 게시물은 읽을 수 없는 출처 — 기관 홈페이지는 아니다(2026-10-16 개발자 "피드에서 빼")',
     ['https://www.instagram.com/acrc0229/p/DeF3w_FE4Yt/?img_index=1', 'https://m.facebook.com/x/posts/1', 'https://www.korea.kr/briefing/x.do', 'https://instagram.com.example.org/'].map(AK.unreadableSource), [true, true, false, false]);
   eq('⑤ 그림 — 큰 카드뉴스(1920×1080)는 받는다 · 광고 배너(846×510)는 아니다', [AD.posterShaped({ w: 1920, h: 1080 }), AD.posterShaped({ w: 846, h: 510 })], [true, false]);
+  eq('  본문 그림은 </head> 뒤 **첫** 제목 자리부터 — 글 아래 관련 글 띠에 제목이 또 있어도 본문 포스터를 잘라내지 않는다(농진청 `00._포스터.png` · 2026-10-16)',
+    AD.candidateFiles({ title: '2026 농업·농촌 스토리텔링콘텐츠 공모전', attachments: [] }, '<head><title>2026 농업·농촌 스토리텔링콘텐츠 공모전</title></head><body><img src="/menu/gnb.png"><h2>2026 농업·농촌 스토리텔링콘텐츠 공모전</h2><img src="/editor/00._포스터.png"><ul><li>2026 농업·농촌 스토리텔링콘텐츠 공모전 관련 글</li></ul><img src="/img/WAMark.png"></body>', 'https://www.rda.go.kr/board/board.do').map((f) => f.url),
+    ['https://www.rda.go.kr/editor/00._%ED%8F%AC%EC%8A%A4%ED%84%B0.png', 'https://www.rda.go.kr/img/WAMark.png']);   // 주소는 URL 이 그대로 적는 꼴(퍼센트 부호)
+  eq('  `공모전개요`·`공모전소개`·`공모부문` 메뉴도 요강으로 따라간다(해양안전 콘텐츠 공모전 — 포스터엔 자격이 없다)',
+    AD.guideLinks('<a href="/intro">공모전개요</a><a href="/part">공모부문 및 제출방법</a><a href="/news">공지사항</a>', 'https://sea.kr/'), ['https://sea.kr/intro', 'https://sea.kr/part']);
   eq('  페이지에 직접 박힌 그림(data:image/png;base64)도 후보 · 다른 data: 는 아니다(감사원 팝업)',
     AD.candidateFiles({ title: '감사 아이디어 공모', attachments: [] }, '<h1>감사 아이디어 공모</h1><img src="data:image/png;base64,iVBORw0KGgo="><img src="data:text/html;base64,PGI+">', 'https://bai.go.kr/x').map((f) => f.url.slice(0, 22)), ['data:image/png;base64,']);
 }

@@ -14,6 +14,7 @@ import { normTitle } from './notice-source.mjs';
 
 export function htmlToLines(html) {
   return decodeEntities(String(html || '')
+    .replace(/<!--[\s\S]*?-->/g, ' ')   // 주석은 화면에 없다 — 태그 규칙이 `<!-- …` 를 첫 `>` 까지만 먹어 `-->` 줄이 남았고 `참가대상 : -->` 가 자격이 됐다(2026-10-16)
     .replace(/<script[\s\S]*?<\/script>/gi, ' ')
     .replace(/<style[\s\S]*?<\/style>/gi, ' ')
     .replace(/<br\s*\/?>/gi, '\n')
