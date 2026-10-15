@@ -195,6 +195,20 @@ const FIT_MIN = 5;       // 미달이어도 5 — 파싱이 틀렸을 수 있다
    🔴 **모르면 unknown**이다. 틀린 fail은 학생에게서 장학금을 뺏는다. */
 /* 등급 → 4.5 만점 평점 (2026-08-30). `B0` 는 `B` 와 같은 뜻이다(학교가 둘 다 쓴다). */
 const LETTER_GPA = { 'A+': 4.5, A: 4.0, A0: 4.0, 'B+': 3.5, B: 3.0, B0: 3.0, 'C+': 2.5, C: 2.0, C0: 2.0 };
+/* 백분위 ↔ 4.5 만점 평점 — 두 표(judgeCond 'grade' percent 주석). 사이 값은 직선으로 잇는다 */
+const PCT_STRICT = [[60, 1.0], [65, 1.5], [70, 2.0], [75, 2.5], [80, 3.0], [85, 3.5], [90, 4.0], [95, 4.5], [100, 4.5]];
+const PCT_LENIENT = [[65, 1.0], [70, 1.5], [75, 2.0], [80, 2.5], [85, 3.0], [90, 3.5], [95, 4.0], [100, 4.5]];
+function pctToGpa(pct, table) {
+  const p = Number(pct);
+  if (!Number.isFinite(p)) return null;
+  if (p < table[0][0]) return table === PCT_LENIENT ? 0 : null;   // 너그러운 표 아래(65점 미만)는 누구도 못 떨어뜨린다 · 엄격한 표 아래는 모름
+  if (p >= table[table.length - 1][0]) return table[table.length - 1][1];
+  for (let i = 1; i < table.length; i++) {
+    const [p0, g0] = table[i - 1], [p1, g1] = table[i];
+    if (p <= p1) return g0 + (g1 - g0) * (p - p0) / (p1 - p0);
+  }
+  return null;
+}
 
 /* 🔴 **이 앱의 프로필은 학부다** (2026-09-12 · 노션 핵심-4). 온보딩이 받는 학적은
    1~4학년 + 재학·신입학·복학예정·휴학·초과학기·졸업유예뿐이라(index.html `#in-year`·
@@ -225,8 +239,13 @@ function judgeCond(c, p, ctx) {
       if (c.scale === S.gpa45) return p.gpa >= c.min ? 'pass' : 'fail';
       if (c.scale === S.gpa43) return (p.gpa / 4.5 * 4.3) >= c.min ? 'pass' : 'fail';
       if (c.scale === S.percent) {
-        const pct = p.gpa / 4.5 * 100;
-        return pct >= c.min + 10 ? 'pass' : 'unknown';   // 환산표가 학교마다 달라 미달은 안 낸다
+        /* 🔴 백분위는 **등급 띠**로 잰다 (2026-10-15 개발자 결정 "성적도 학적정보에서 알 수 있잖아"). 환산표가 학교마다 달라 두 표의 안전한 쪽만 쓴다 —
+           ✓ 는 엄격한 쪽(80점 = B0 3.0 · 85 = B+ 3.5 · 90 = A0 4.0 · 70 = C0 2.0 — 국가장학금 'B학점 = 80점' 관례) · ✕ 는 너그러운 쪽(4.5 = 100 · 4.0 = 95 · 3.5 = 90 · 3.0 = 85 · 2.5 = 80 · 2.0 = 75 — 많은 대학 환산표).
+           어느 학교 표로도 틀리지 않는 자리만 말하고 그 사이는 모름(3.2 학생: 80점 ✓ · 85점 모름 · 70점 ✓). 예전 규칙(선형 환산 +10)은 80점에 평점 4.05 가 있어야 ✓ 라 사실상 아무것도 못 말했다. */
+        const strict = pctToGpa(c.min, PCT_STRICT), lenient = pctToGpa(c.min, PCT_LENIENT);
+        if (strict != null && p.gpa >= strict) return 'pass';
+        if (lenient != null && p.gpa < lenient) return 'fail';
+        return 'unknown';
       }
       /* 🔴 **등급도 환산한다** (2026-08-30 개발자 지적: "성적 단위 27줄 정도는 환산할 수 있을텐데").
          4.5 만점의 표준 대응은 A+ 4.5 · A 4.0 · B+ 3.5 · B 3.0 · C+ 2.5 · C 2.0 이다.
@@ -237,7 +256,8 @@ function judgeCond(c, p, ctx) {
       if (c.scale === S.letter) {
         const need = LETTER_GPA[String(c.min || '').toUpperCase().replace(/학점/g, '')];
         if (need == null) return 'unknown';
-        return p.gpa >= need ? 'pass' : 'unknown';
+        /* 반 등급(0.5) 아래면 어느 학교 기준(B = 2.7 인 4.3 만점 학교 포함)으로도 못 미친다 → ✕ (2026-10-15 개발자 결정) */
+        return p.gpa >= need ? 'pass' : (p.gpa < need - 0.5 ? 'fail' : 'unknown');
       }
       return 'unknown';
     }
@@ -268,7 +288,7 @@ function judgeCond(c, p, ctx) {
         v = both.includes('fail') ? 'fail' : both.every((x) => x === 'pass') ? 'pass' : 'unknown';
       }
       else if (c.anyOf) v = ahead ? 'unknown' : (c.anyOf.includes(y) ? 'pass' : 'fail');   // `1학년 또는 2학년`·`3, 4학년` — 그중 하나(2026-10-15)
-      else if (c.eq != null) v = (y === c.eq && !ahead) ? 'pass' : 'unknown';   // `2학년 학생`은 딱 그 학년인지 애매
+      else if (c.eq != null) v = ahead ? (y + ahead === c.eq ? 'pass' : 'unknown') : (y === c.eq ? 'pass' : 'fail');   // `기준 1학년`은 그 학년(2026-10-15 개발자 결정) · 확신이 낮은 줄(다른 학년 함께·예외 괄호)은 lineVerdict 가 ✕ 를 안 낸다
       /* 🔴 **제외 줄에서는 뜻이 뒤집힌다** (2026-10-11 · 조각 B 리뷰 — 원래부터 있던 결함). `4학년 이상 재학생`
          이 제외 줄이면 **4학년이** 걸린다. 안 뒤집으면 1~3학년이 미달이고 정작 4학년이 통과했다.
          flags·nationality·school 과 같은 규약(제외 줄에서 fail = 그 학생이 걸린 것) · 모름은 그대로. */
@@ -279,12 +299,20 @@ function judgeCond(c, p, ctx) {
       /* n학년은 2n-1 또는 2n 학기다 — 두 값이 **다 맞을 때만** ✓, 다 어긋날 때만 ✕, 갈리면 모름 (parse-requirements parseSemester · 2026-10-15) */
       const y = p.year == null ? null : Number(p.year);
       if (y == null || Number.isNaN(y) || y < 1 || c.ahead) return 'unknown';   // ahead — 앞으로 올 학년도의 학기(`2027년 2학기 기준 …`)는 지금 학기로 못 잰다
+      /* 남은 학기·마지막 학기 — 4년제에서 지금 학기 뒤 남은 학기는 {8−2y, 9−2y}: 3학년 이하면 2학기 이상 남았고 마지막 학기가 아니다 · 4학년은 모름 (2026-10-15) */
+      if (c.leftMin != null) { const v = (8 - y * 2 >= c.leftMin) ? 'pass' : 'unknown'; return c.exclude ? (v === 'pass' ? 'fail' : v) : v; }
+      if (c.last) { const v = y <= 3 ? 'fail' : 'unknown'; return c.exclude ? (v === 'fail' ? 'pass' : v) : v; }
       /* 등록 기준(`8학기 이하`)은 지금 다니는 학기(2n-1·2n) · 마친 기준(`6학기 이하 이수`·`4학기 이상 수료`)은 한 학기 앞(2n-2·2n-1) — 리뷰 2026-10-15 */
       const [lo, hi] = c.done ? [y * 2 - 2, y * 2 - 1] : [y * 2 - 1, y * 2];
       const okAt = (s) => (c.anyOf ? c.anyOf.includes(s) : ((c.max == null || s <= c.max) && (c.min == null || s >= c.min)));   // anyOf — `2학년 1학기, 2학년 2학기, 3학년 1학기`
       const a = okAt(lo), b = okAt(hi);
       const v = a && b ? 'pass' : !a && !b ? 'fail' : 'unknown';
       return c.exclude ? (v === 'pass' ? 'fail' : v === 'fail' ? 'pass' : v) : v;
+    }
+    case 'cert': {
+      /* 어학 성적 — 온보딩 체크(`cert`)가 없다고 적혀 있으면 ✕(구조화 needCert 와 같은 규칙) · 있으면 점수를 몰라 모름 (2026-10-15) */
+      if (p.cert === false && !c.exclude) return 'fail';
+      return 'unknown';
     }
     case 'status': {
       if (!p.status) return 'unknown';
@@ -539,6 +567,7 @@ function lineVerdict(text, p, isExclude, ctx) {
      처럼 대상을 말하는 문장이 화면에서 아무 표시 없이 사라졌다. 지금은 학위 축(parseDegree)이
      판정하고, 학부/대학원 기준을 나란히 적은 표(`일반대학원생 : 평점 4.0`)만 무관하다. */
   if (PR.gradTarget(text) === 'label') return null;
+  if (isNoteLine(PR.untag(text))) return null;   // 참고 줄(`1학년 재학생은 성적 기준을 적용하지 않음`)은 요건이 아니다 — 학년을 읽어 ✕ 를 내면 안 된다(2026-10-15)
   /* 🔴 경우별 분기(`신입생:` `재학생:` `복학생 및 편입생:`)는 **내 경우만** 판정한다
      (2026-08-24 개발자 지적). 안 그러면 재학생인데 `신입생:` 줄에도 ✓가 붙는다.
      프로필에 없는 경우(편입생·학년제)는 해당 여부를 모르므로 아무 표시도 안 한다. */
@@ -1243,7 +1272,9 @@ function tidyRequirement(line) {
    🔴 버리면 안 된다 — 그 줄에 진짜 요건이 들어 있다. **다음 줄과 이어 붙인다.** */
 const CONTINUES = /(또는|및|이고|이며|하여|중)\s*$|\s인\s*$|[,·+]\s*$/;
 /* 참고 줄 — `1학년 재학생은 성적 기준을 적용하지 않음` 처럼 요건을 **푸는** 말(2026-10-15 · 123줄 진단 ⑧). 요건이 아니라 옅게 보이고 분모에서 뺀다(aside) */
-const NOTE_LINE = /(?:기준|요건|조건)(?:을|은|는|이)?\s*(?:적용하지\s*않|적용\s*안\s*함|미적용|면제)/;
+const NOTE_LINE = /(?:기준|요건|조건)(?:을|은|는|이)?\s*(?:적용하지\s*않|적용\s*안\s*함|미적용|면제)|(?:학점|성적)\s*(?:기준\s*)?제한\s*없/;   // `마지막 학기 등록자는 이수학점 제한 없음` 도 참고다(2026-10-15 · 3학년에게 ✕ 가 떴다)
+/* 참고인가는 **괄호 밖**으로 본다 — `평점평균 2.0 이상인 자 (단, 신입생·편입생 성적제한 없음)` 은 요건이고 괄호는 면제 부연이다 */
+const isNoteLine = (t) => NOTE_LINE.test(String(t || '').replace(/[(（][^()（）]*[)）]/g, ' '));
 /* 토씨로 끝난 줄(`… 주민등록 주소지를`)은 **뒷줄이 조각일 때만** 잇는다 (2026-10-15 · 리뷰) — 아무 뒷줄이나 이으면 표 머리
    (`드림 장학금 | 학업 ㅣ. …`)가 자격 줄에 붙었다. `학과`·`문의` 의 끝 글자는 토씨가 아니다 */
 const PARTICLE_END = /[가-힣](?:을|를|에|(?<!문)의|와|(?<!학)과|에서|으로|로서)\s*$/;
@@ -1559,7 +1590,7 @@ function requirementLines(sch, lines, opts) {
       /* ※ 곁말로 들어와 '누구는 신청 가능' 으로 통과한 줄은 요건이 아니라 **예외 참고**다(면학장학금 `10학기 이하 후기 이중전공자는 … 신청 가능`).
          화면은 옅게 보이고 적합도 분모에서 뺀다(fitDetail) — 요건으로 세면 '확인 필요'가 부풀어 적합도가 깎였다(2026-10-15) */
       /* `… 장학금 미수혜자인 경우에만 지원 가능` 은 예외가 아니라 **제한**이다(리뷰 2026-10-15 · 인송문화재단) — 참고로 옅게 두면 '요건 아님'으로 읽힌다 */
-      aside.push(NOTE_LINE.test(t) || (isAside && !EXCLUDE_LINE.test(t) && AFFIRM_ELIG.test(t) && !/에만|만\s?(?:신청|지원|가능)/.test(t)));
+      aside.push(isNoteLine(t) || (isAside && !EXCLUDE_LINE.test(t) && AFFIRM_ELIG.test(t) && !/에만|만\s?(?:신청|지원|가능)/.test(t)));
       /* 🔴 연달아 오는 경우 분기는 **한 요건**이다 — 따로 세면 분모가 부풀어
          정읍시민이 요건 7개(실제 4개)로 잡혔다. 첫 분기에서 묶음을 열고 이어 붙인다. */
       if (PR.caseBranch(t)) {

@@ -90,7 +90,8 @@ function parseGrade(t) {
     return { kind: 'grade', scale: GRADE_SCALE.percent, min: v,
              conf: (kinds > 1 || HAS_EXCEPTION.test(t)) ? LOW : HIGH };
   }
-  if (hasLetter) return { kind: 'grade', scale: GRADE_SCALE.letter, min: (t.match(/([ABC][+0]?)\s*(학점)?\s*이상/) || [])[1], conf: LOW };
+  /* 등급 하나만 적은 줄(`B학점 이상`)은 확신이 높다 — judgeCond 가 반 등급 아래만 ✕ 로 낸다(학교별 기준 차이는 그 여유가 흡수한다 · 2026-10-15 개발자 결정). 단위가 둘이거나 예외가 붙으면 그대로 낮다 */
+  if (hasLetter) return { kind: 'grade', scale: GRADE_SCALE.letter, min: (t.match(/([ABC][+0]?)\s*(학점)?\s*이상/) || [])[1], conf: (kinds > 1 || HAS_EXCEPTION.test(t)) ? LOW : HIGH };
   /* `이상` 없이 **기준 등급만** 적는 공고가 있다: `직전학기 학교 성적 평균 B학점`.
      ⚠️ 앞에 `성적·평점·평균` 이 있을 때만 본다 — 없으면
         `특정대학 B학점이 2.7 기준인 대학은 신청서 접수 시 유의바람`(주의 문구)까지 요건이 된다. */
@@ -147,6 +148,14 @@ function parseIncomeBand(t) {
   for (let k = 2; k <= 10; k++) if (INCOME_CUT[k - 2] >= n) { failFrom = k; break; }
   const negated = /제외|불가|미선발|아닌|우선|또는/.test(t);
   return { kind: 'bracket', max: passMax, failFrom, income: n, conf: (negated || HAS_EXCEPTION.test(t)) ? LOW : HIGH };
+}
+
+/* ── 어학 성적 ── `IELTS Overall 5.5 이상`·`유럽언어기준 B1 이상의 독일어 능력`·`공인 영어성적 보유자` (2026-10-15 개발자 결정 "어학 성적도 학적정보에서").
+   프로필은 보유 여부(온보딩 `#in-cert` 체크)만 안다 → 없다고 적은 학생은 ✕(구조화 needCert 와 같은 규칙) · 있으면 점수를 몰라 모름(judgeCond 'cert') */
+const CERT_RE = /IELTS|TOEIC|TOEFL|TEPS|OPIc|JLPT|HSK|DELF|DELE|CEFR|유럽\s?언어\s?기준|어학\s*(?:성적|능력|점수)|(?:공인\s*)?(?:영어|외국어)\s*(?:성적|능력\s*시험|시험\s*성적)|Overall\s*\d/i;
+function parseCert(t) {
+  if (!CERT_RE.test(t) || /무관|불문|관계\s?없/.test(t)) return null;
+  return { kind: 'cert', conf: HAS_EXCEPTION.test(t) ? LOW : HIGH };
 }
 
 /* ── 직전학기 이수학점 ── `12학점 이상` */
@@ -258,7 +267,9 @@ function parseYearBody(t) {
   const many = (t.match(YEAR_NUM_ALL) || []).length > 1;   // `1학년 또는 2학년` — 범위라 단정 불가
   if (m[2] === '이상') return { kind: 'year', min: v, conf: many ? LOW : HIGH };
   if (m[2] === '이하') return { kind: 'year', max: v, conf: many ? LOW : HIGH };
-  return { kind: 'year', eq: v, conf: LOW };   // `2학년 학생` — 딱 그 학년인지 이상인지 애매
+  /* `2026년 2학기 기준 1학년`·`2학년 학생` — 학년 하나만 적은 줄은 **그 학년**이다(2026-10-15 개발자 결정 "학년한정은 학적정보에서").
+     예전엔 '이상인지 애매'하다며 확신을 낮춰 3학년에게 '모름'이었다. 다른 학년이 함께 적혔으면(many) 그대로 낮다 */
+  return { kind: 'year', eq: v, conf: many ? LOW : HIGH };
 }
 
 /* ── 이수 학기 ── `8학기 이하인 자` · `4학기 이상 수료자` (2026-10-15 카드 전수 — 학년을 아는데 '모름'이던 줄).
@@ -266,6 +277,12 @@ function parseYearBody(t) {
    ⚠️ `2026-2학기`·`2학기 재학생`·`직전학기` 의 학기는 기간이지 이수 학기가 아니다 — 앞에 연도·하이픈·점이 붙었거나 `이하·이상` 이 없으면 안 읽는다.
    ⚠️ `졸업까지 2개 이상의 학기가 남아` 는 남은 학기라 unaskedAttr(TERM_ATTR)이 '모름'으로 막는다. */
 function parseSemester(t) {
+  /* 남은 학기·마지막 학기는 학년으로 **한쪽만** 안다 (2026-10-15 개발자 결정 "졸업학기도 학적정보에서" · 4년제 기준): 3학년 이하면 졸업까지 2학기 이상 남았고
+     마지막 학기가 아니다 · 4학년은 1학기인지 2학기인지 프로필이 몰라 모름(judgeCond 'semester' leftMin·last) */
+  const left = t.match(/졸업\s*(?:시\s*)?까지[^.,()]{0,12}?(\d)\s*개?\s*(?:이상의?\s*)?학기/);
+  if (left && /남/.test(t)) return { kind: 'semester', leftMin: num(left[1]), conf: HAS_EXCEPTION.test(t) ? LOW : HIGH };
+  /* `마지막 학기 등록자는 이수학점 제한 없음` 은 요건이 아니라 면제 안내 — 읽지 않는다(match-engine NOTE_LINE 이 참고로 옅게 보인다) */
+  if (/(?:졸업\s*전\s*)?마지막\s*학기|졸업\s?학기(?:생|인\s*학생)/.test(t) && !/제한\s*없|면제|미적용|적용하지/.test(t)) return { kind: 'semester', last: true, conf: HIGH };
   /* 남은 학기(`잔여 학기 4학기 이상`·`남은 학기가 4학기 이상`)는 이수 학기가 아니다 — 어순과 무관하게 낱말이 있으면 안 읽는다(리뷰 2026-10-15 · 1학년에게 ✕ 였다) */
   if (/잔여|남은|남아|남기|남을|학기\s*(?:이상|이하)?\s*남/.test(t)) return null;
   /* `2학년 2학기 이상 재학생` → 4학기 이상 · `2학년 1학기, 2학년 2학기, 3학년 1학기 재학생` → 그중 하나(anyOf) (2026-10-15 · 123줄 진단 ⑤).
@@ -352,12 +369,13 @@ function parseStatus(t, isExclude) {
 /* ── 특별자격 ── 프로필 flags와 같은 이름을 쓴다 */
 const FLAG_PAT = [
   ['basicLiving', /기초\s?생활\s?수급|기초수급/], ['nearPoverty', /차상위/],
-  /* ⚠️ `multiChild` 를 `\d자녀 이상` 으로 넓히지 말 것 — 위 TRAIT_PAT 머리말 참조.
+  /* ⚠️ `multiChild` 를 `2자녀 이상` 으로 넓히지 말 것(둘째아·2자녀는 다자녀가 아니다) — 위 TRAIT_PAT 머리말 참조.
+     🔴 `3자녀 이상`·`자녀가 3명 이상` 은 다자녀(3자녀 이상)와 같은 말이라 읽는다(2026-10-15 개발자 결정 "자녀 3명은 다자녀에 적용").
      `merit` 은 `5.18민주유공자`·`국가보훈등록증` 을 놓치고 있었다(실측 1줄). */
   /* ⚠️ 맨 `유공자` 로 넓히지 말 것 (2026-09-19 코드 리뷰) — `시정유공자`·`새마을사업
      유공자` 가 걸려 국가유공자 학생이 새마을 장학금에 ✓ 를 받는다(archive 3줄).
      `flags` 는 '모름' 이 없어 넓히는 순간 곧 ✓ 다 — trait 보다 더 조심해야 한다. */
-  ['multiChild', /다자녀/], ['merit', /(국가|독립|참전|민주)\s?유공|보훈\s?(대상|등록)/],
+  ['multiChild', /다자녀|(?:자녀가?|자녀\s*수가?)\s*(?:3|세|셋|삼)\s*(?:명|인)?\s*이상|(?:3|세|삼)\s*자녀\s*이상|(?:3|세|삼)\s*(?:명|인)\s*이상(?:의|인)?\s*자녀/], ['merit', /(국가|독립|참전|민주)\s?유공|보훈\s?(대상|등록)/],
   /* 🔴 `특수교육대상자` 는 **장애 학생을 가리키는 행정 용어**다 (2026-08-30 개발자 지적:
      "특수교육대상자=장애학생인데 이것도 너가 판정할 수 있는 건데"). 못 알아봐서
      판정에서 빠지고 있었다. `장애인 등에 대한 특수교육법` 의 용어다. */
@@ -1145,7 +1163,7 @@ function unaskedAttr(text, conds, p) {
   const t = untag(text);
   const cs = conds || [];
   const has = (k) => cs.some((c) => c.kind === k);
-  if (TERM_ATTR.test(t)) return true;
+  if (TERM_ATTR.test(t) && !cs.some((c) => c.kind === 'semester' && (c.leftMin != null || c.last))) return true;   // 학년으로 한쪽을 아는 줄(parseSemester)은 판정에 맡긴다(2026-10-15)
   if (COLLEGE_ATTR.test(t) && !has('major')) return true;
   if (campusUnasked(t, cs, p)) return true;
   /* `경력 무관`·`수상 여부 무관` 은 묻는 것이 아니다(2026-09-17 코드 리뷰) */
@@ -1185,7 +1203,7 @@ function parseLine(line, isExclude) {
   if (!t.trim()) return { conds: [], multiProgram: false };
   const conds = [];
   const push = (c) => { if (Array.isArray(c)) conds.push(...c); else if (c) conds.push(c); };
-  push(parseGrade(t)); push(parseBracket(t)); push(parseIncomeBand(t)); push(parseCredits(t)); push(parseYear(t)); push(parseSemester(t));
+  push(parseGrade(t)); push(parseBracket(t)); push(parseIncomeBand(t)); push(parseCredits(t)); push(parseYear(t)); push(parseSemester(t)); push(parseCert(t));
   push(parseStatus(t, isExclude)); push(parseFlags(t)); push(parseTrait(t, isExclude)); push(parseNationality(t));
   push(parseAge(t)); push(parseResidence(t)); push(parseSchool(t)); push(parseMajor(t));
   push(parseDegree(t, isExclude)); push(parseOpen(t, isExclude));
