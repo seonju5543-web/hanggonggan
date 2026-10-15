@@ -139,14 +139,6 @@
   "at": "2026-10-13",
   "tries": 1
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3520457": {
-  "at": "2026-10-13",
-  "tries": 1
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521470": {
-  "at": "2026-10-13",
-  "tries": 1
- },
  "https://www.schoolkeepa.or.kr/cop/bbs/selectArticleDetail.do?nttId=1711&bbsId=BBSMSTR_000000000001": {
   "at": "2026-10-13",
   "tries": 1
@@ -203,10 +195,6 @@
   "at": "2026-10-13",
   "tries": 1
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3517342": {
-  "at": "2026-10-14",
-  "tries": 1
- },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3533781": {
   "at": "2026-10-14",
   "tries": 1
@@ -225,6 +213,10 @@
  },
  "https://www.jinjae.kr/main/menu?gc=873HSUS&do=view&bwrite_id=3": {
   "at": "2026-10-14",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3531332": {
+  "at": "2026-10-15",
   "tries": 1
  }
 }

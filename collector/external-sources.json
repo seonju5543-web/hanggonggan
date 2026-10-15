@@ -403,9 +403,12 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-09-30",
-    "why": "홈페이지 못 엶 (fetch failed)",
-    "best": null
+    "checkedAt": "2026-10-15",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "http://www.dooeul.or.kr/home/main/index.do",
+     "signals": 0
+    }
    }
   },
   {
@@ -414,10 +417,10 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-09-30",
+    "checkedAt": "2026-10-15",
     "why": "최고 0건 ((홈))",
     "best": {
-     "url": "https://www.sri.re.kr/",
+     "url": "https://www.sri.re.kr/nuri/",
      "signals": 0
     }
    }
@@ -428,8 +431,8 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-09-30",
-    "why": "홈페이지 못 엶 (fetch failed)",
+    "checkedAt": "2026-10-15",
+    "why": "홈페이지 못 엶 (TypeError: UNABLE_TO_VERIFY_LEAF_SIGNATURE)",
     "best": null
    }
   },
@@ -439,7 +442,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-09-30",
+    "checkedAt": "2026-10-15",
     "why": "홈페이지 못 엶 (HTTP 404)",
     "best": null
    }
@@ -466,8 +469,8 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-09-30",
-    "why": "홈페이지 못 엶 (fetch failed)",
+    "checkedAt": "2026-10-15",
+    "why": "홈페이지 못 엶 (TypeError: ERR_TLS_CERT_ALTNAME_INVALID)",
     "best": null
    }
   },
@@ -477,9 +480,12 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-09-30",
-    "why": "홈페이지 못 엶 (fetch failed)",
-    "best": null
+    "checkedAt": "2026-10-15",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://www.namgu.gwangju.kr/",
+     "signals": 0
+    }
    }
   },
   {
@@ -488,12 +494,9 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-09-30",
-    "why": "최고 0건 ((홈))",
-    "best": {
-     "url": "https://www.gyeongnam.go.kr/",
-     "signals": 0
-    }
+    "checkedAt": "2026-10-15",
+    "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
+    "best": null
    }
   },
   {
@@ -502,9 +505,12 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-09-30",
-    "why": "홈페이지 못 엶 (The operation was aborted due to timeout)",
-    "best": null
+    "checkedAt": "2026-10-15",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://www.buan.go.kr/index.buan",
+     "signals": 0
+    }
    }
   },
   {

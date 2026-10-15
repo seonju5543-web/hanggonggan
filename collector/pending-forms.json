@@ -646,6 +646,30 @@
    "added": "2026-10-14",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-sknou51818191artclviewdo",
+   "name": "[장학] (학생과) 2026학년도 2학기 교내 국가근로장학생 모집 공고(~2026.10.19.)",
+   "target": "(학생과) 2026학년도 2학기 교내 국가근로장학생 모",
+   "added": "2026-10-15",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-ent2431269173artclviewdo",
+   "name": "(글로벌)(교외)2026-2학기 글로벌 비전(신우회) 장학금 신청안내",
+   "target": "(글로벌)(교외)2026-2학기 글로벌 비전(신우회) ",
+   "added": "2026-10-15",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-bbssc58944362artclviewdo",
+   "name": "2026학년도 연세 월든장학금 신청 안내(생활비)",
+   "target": "2026학년도 연세 월든장학금 신청 안내(생활비)",
+   "added": "2026-10-15",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }

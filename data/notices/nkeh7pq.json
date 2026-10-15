@@ -1,7 +1,29 @@
 {
  "school": "인하대학교",
- "updatedAt": "2026-10-14",
+ "updatedAt": "2026-10-15",
  "items": [
+  {
+   "title": "[학부-교외장학] 2027학년도 두산연강재단 장학생 선발 공고",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45812/artclView.do",
+   "attachments": [
+    {
+     "name": "1. 2027년도 두산연강재단 장학생 선발 공고문.pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41506/download.do"
+    },
+    {
+     "name": "2. 자주 묻는 질문(Q&A).pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41507/download.do"
+    },
+    {
+     "name": "3. 추천서(재단 양식).docx",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41508/download.do"
+    }
+   ],
+   "deadlineHint": "접수 기한 : ~ 26. 11. 13. (금) 18:00(한국시간 기준) 7. 접수 방법 : 재단 홈페이지 신청(>> 클릭 <<) ※ 두산연강재",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-10-15"
+  },
   {
    "title": "[학부-교외장학] 2026학년도 인송문화재단 장학생 선발 안내",
    "url": "https://www.inha.ac.kr/bbs/kr/8/45782/artclView.do",

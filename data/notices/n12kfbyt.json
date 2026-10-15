@@ -1,7 +1,29 @@
 {
  "school": "영남대학교",
- "updatedAt": "2026-10-14",
+ "updatedAt": "2026-10-15",
  "items": [
+  {
+   "title": "2027년도 두산연강재단 장학생 선발 안내",
+   "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=232076909&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "1. 2027년도 두산연강재단 장학생 선발 공고문.pdf",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=232076909&attachNo=379206"
+    },
+    {
+     "name": "2. 자주 묻는 질문(Q&amp;A).pdf",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=232076909&attachNo=379207"
+    },
+    {
+     "name": "3. 추천서(재단 양식).docx",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=232076909&attachNo=379208"
+    }
+   ],
+   "deadlineHint": "접수기간: 2026. 10. 14.(수) ~ 11. 13.(금) 18시까지 2. 접수방법: 두산연강재단 홈페이지 신청 3. 지원자격, 지원내용,",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-10-15"
+  },
   {
    "title": "2026-2학기 주거안정장학금 학생 매뉴얼(포기 및 반환)",
    "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=232076902&article.offset=0&articleLimit=10",

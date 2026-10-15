@@ -1,7 +1,29 @@
 {
  "school": "가천대학교",
- "updatedAt": "2026-10-14",
+ "updatedAt": "2026-10-15",
  "items": [
+  {
+   "title": "[공통] (생활비)2027년도 두산연강재단 대학 장학생 선발 안내",
+   "url": "https://www.gachon.ac.kr/bbs/kor/478/126084/artclView.do",
+   "attachments": [
+    {
+     "name": "두산연강재단(2027)-자주묻는질문(QA).pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156831/download.do"
+    },
+    {
+     "name": "두산연강재단(2027)-추천서(재단양식).docx",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156832/download.do"
+    },
+    {
+     "name": "두산연강재단(2027)-선발공고문.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156833/download.do"
+    }
+   ],
+   "deadlineHint": "접수기간 : 2026년 10월 14일(수) ~ 11월 13일(금) 18시까지 3. 접수 방법 : 두산연강재단 홈페이지에서 신청 4. 장 학 금",
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-10-15"
+  },
   {
    "title": "[공통] 2026-2학기 중소기업취업연계(희망사다리1유향) 장학금 신규 장학생 선발 기준",
    "url": "https://www.gachon.ac.kr/bbs/kor/478/126060/artclView.do",
