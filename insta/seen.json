@@ -460,7 +460,7 @@
    "expiredAt": "2026-10-14"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700114001",
    "org": "영국문화원",
    "name": "IELTS Prize 장학금",
@@ -469,7 +469,9 @@
    "tplNo": 1,
    "cards": 4,
    "dir": "insta/pub/2700114001",
-   "at": "2026-09-13"
+   "at": "2026-09-13",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-16"
   },
   {
    "status": "prepared",
@@ -1080,7 +1082,7 @@
    "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700374002",
    "org": "파주돈재갑진장학회",
    "name": "장학생",
@@ -1089,7 +1091,9 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2700374002",
-   "at": "2026-09-14"
+   "at": "2026-09-14",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-16"
   },
   {
    "status": "prepared",
@@ -2476,7 +2480,7 @@
    "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000455002",
    "org": "(재)여수시인재육성장학회",
    "name": "특기장학금",
@@ -2485,10 +2489,12 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2000455002",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-16"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000455001",
    "org": "(재)여수시인재육성장학회",
    "name": "학업성적우수장학금",
@@ -2497,7 +2503,9 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2000455001",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-16"
   },
   {
    "status": "prepared",
@@ -2536,7 +2544,7 @@
    "at": "2026-10-06"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000455003",
    "org": "(재)여수시인재육성장학회",
    "name": "저소득자녀장학금",
@@ -2545,7 +2553,9 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2000455003",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-16"
   },
   {
    "status": "prepared",
@@ -2622,7 +2632,7 @@
    "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "auto-ent2431268564artclviewdo",
    "org": "한국외국어대학교",
    "name": "[서울] 2026-2 영어대학 동문회 장학금 장학생 모집",
@@ -2631,7 +2641,9 @@
    "tplNo": 1,
    "cards": 4,
    "dir": "insta/pub/auto-ent2431268564artclviewdo",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-16"
   },
   {
    "status": "expired",
@@ -2744,7 +2756,7 @@
    "expiredAt": "2026-10-15"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000455005",
    "org": "(재)여수시인재육성장학회",
    "name": "여수산단장학금",
@@ -2753,7 +2765,9 @@
    "tplNo": 3,
    "cards": 4,
    "dir": "insta/pub/2000455005",
-   "at": "2026-10-09"
+   "at": "2026-10-09",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-16"
   },
   {
    "status": "prepared",
@@ -2888,7 +2902,7 @@
    "at": "2026-10-09"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000455004",
    "org": "(재)여수시인재육성장학회",
    "name": "농어촌자녀장학금",
@@ -2897,7 +2911,9 @@
    "tplNo": 4,
    "cards": 4,
    "dir": "insta/pub/2000455004",
-   "at": "2026-10-09"
+   "at": "2026-10-09",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-16"
   },
   {
    "status": "prepared",
@@ -3164,7 +3180,7 @@
    "at": "2026-10-09"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700105002",
    "org": "울산광역시 남구장학재단",
    "name": "희망장학생",
@@ -3173,7 +3189,9 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2700105002",
-   "at": "2026-10-09"
+   "at": "2026-10-09",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-16"
   },
   {
    "status": "prepared",
@@ -3247,6 +3265,84 @@
    "cards": 5,
    "dir": "insta/pub/auto-ent2431269128artclviewdo",
    "at": "2026-10-14",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2701276002",
+   "org": "외수한일교류장학회",
+   "name": "장학생",
+   "due": "2026-10-23",
+   "school": null,
+   "tplNo": 1,
+   "cards": 5,
+   "dir": "insta/pub/2701276002",
+   "at": "2026-10-16",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "7491887001",
+   "org": "대한산업보건협회",
+   "name": "산재 노동자 자녀 성장지원사업",
+   "due": "2026-10-31",
+   "school": null,
+   "tplNo": 2,
+   "cards": 5,
+   "dir": "insta/pub/7491887001",
+   "at": "2026-10-16",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2000477012",
+   "org": "(재단법인)아산사회복지재단",
+   "name": "북한이탈청소년장학생",
+   "due": "2026-10-26",
+   "school": null,
+   "tplNo": 4,
+   "cards": 5,
+   "dir": "insta/pub/2000477012",
+   "at": "2026-10-16",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2000477013",
+   "org": "(재단법인)아산사회복지재단",
+   "name": "보건의료정책분야대학원장학생",
+   "due": "2026-10-26",
+   "school": null,
+   "tplNo": 3,
+   "cards": 5,
+   "dir": "insta/pub/2000477013",
+   "at": "2026-10-16",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2000477010",
+   "org": "(재단법인)아산사회복지재단",
+   "name": "의생명과학분야대학원장학생",
+   "due": "2026-10-26",
+   "school": null,
+   "tplNo": 4,
+   "cards": 5,
+   "dir": "insta/pub/2000477010",
+   "at": "2026-10-16",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2000477011",
+   "org": "(재단법인)아산사회복지재단",
+   "name": "해외의생명과학분야대학원장학생",
+   "due": "2026-10-26",
+   "school": null,
+   "tplNo": 2,
+   "cards": 5,
+   "dir": "insta/pub/2000477011",
+   "at": "2026-10-16",
    "dates": "absolute"
   }
  ]
