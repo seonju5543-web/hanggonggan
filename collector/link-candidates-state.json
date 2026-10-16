@@ -220,6 +220,22 @@
   "decidedAt": "2026-10-13",
   "also": []
  },
+ "kosaf|2000477010|board:https://www.asanfoundation.or.kr/af/library/bbs/afLibraryPhotoBbsList.do": {
+  "ds": "kosaf",
+  "key": "2000477010",
+  "url": "",
+  "board": "https://www.asanfoundation.or.kr/af/library/bbs/afLibraryPhotoBbsList.do",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "firstAt": "2026-10-16",
+  "lastAt": "2026-10-16",
+  "tries": 1,
+  "status": "pending",
+  "why": "게시판 목록(12줄)에서 그 글을 하나로 못 고름",
+  "checks": {},
+  "round": "2026-10-26",
+  "nextAt": "2026-10-17"
+ },
  "kosaf|2700017001|http://www.hsf.or.kr/bbs/board.php?bo_table=s5_1&wr_id=102": {
   "ds": "kosaf",
   "key": "2700017001",
