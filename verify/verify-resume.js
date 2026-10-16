@@ -223,10 +223,12 @@ async function openWith(ctx, resume) {
   if (target) {
     await seed(page, { v: 1, at: Date.now() - 60e3, screen: 'my', scroll: {} });
     await page.goto(`${URLBASE}?sch=${encodeURIComponent(target.id)}`, { waitUntil: 'networkidle' });
-    await page.waitForTimeout(2600);   // notifyHandleLaunch 는 1.6초 뒤에 돈다
+    /* notifyHandleLaunch 는 1.6초 뒤에 돌고 그 뒤 공고 목록이 와야 시트가 뜬다 — 고정 2.6초는 로컬에선 넉넉하고 CI 러너에선 모자랐다
+       (2026-10-16 verify-ui: 로컬 통과·클라우드만 세 번 연속 실패 · 바로 아래 느린 회선 변형은 6초를 기다려 통과). 시간이 아니라 **시트가 뜨는 것**을 기다린다. */
+    const opened = await page.waitForSelector('#detail-sheet', { state: 'visible', timeout: 8000 }).then(() => true).catch(() => false);
     const s = await shown(page);
     ok('마지막 탭(MY)으로 가지 않는다', s !== 'my', s);
-    ok('그 공고가 열린다', await page.isVisible('#detail-sheet').catch(() => false));
+    ok('그 공고가 열린다', opened);
 
     /* 🔴 **회선이 느린 폰**을 재현한다 (2026-09-09 개발자 지적: "알림을 눌렀는데 장학금-전체
        페이지로 이동이 되고 해당 공고로 바로 이동되지는 않아"). 공고 목록은 따로 받아 오는
