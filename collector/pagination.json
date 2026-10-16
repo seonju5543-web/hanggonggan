@@ -221,11 +221,7 @@
   "checkedAt": "2026-10-12"
  },
  "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083": {
-  "ok": true,
-  "way": {
-   "kind": "page",
-   "param": "currentPageNo"
-  },
+  "ok": false,
   "checkedAt": "2026-10-16"
  },
  "https://www.hongik.ac.kr/index.do": {
