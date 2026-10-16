@@ -1,6 +1,6 @@
 {
  "v": 1,
- "updatedAt": "2026-10-15",
+ "updatedAt": "2026-10-16",
  "hosts": {
   "jntle.kr": {
    "checkedAt": "2026-10-14",
@@ -429,6 +429,108 @@
    "lines": 1,
    "targets": 1,
    "why": "글은 못 고르고 게시판만"
+  },
+  "asanfoundation.or.kr": {
+   "checkedAt": "2026-10-16",
+   "pages": 7,
+   "found": 0,
+   "lines": 1,
+   "targets": 3,
+   "why": "글은 못 고르고 게시판만"
+  },
+  "jangsu.go.kr": {
+   "checkedAt": "2026-10-16",
+   "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT → 브라우저도 실패(page.goto: Timeout 20000ms exceede)",
+   "targets": 3
+  },
+  "daegu.go.kr": {
+   "checkedAt": "2026-10-16",
+   "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT → 브라우저도 실패(page.goto: Timeout 20000ms exceede)",
+   "targets": 2
+  },
+  "injae.gc.go.kr": {
+   "checkedAt": "2026-10-16",
+   "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT → 브라우저도 실패(page.goto: Timeout 20000ms exceede)",
+   "targets": 2
+  },
+  "suncheon.go.kr": {
+   "checkedAt": "2026-10-16",
+   "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT → 브라우저도 실패(page.goto: Timeout 20000ms exceede)",
+   "targets": 2
+  },
+  "asanfoundaton.or.kr": {
+   "checkedAt": "2026-10-16",
+   "why": "홈페이지 못 엶 (TypeError: ENOTFOUND → 브라우저도 실패(page.goto: net::ERR_NAME_NOT_RESOLVED at https:/)",
+   "targets": 1
+  },
+  "bangfound.org": {
+   "checkedAt": "2026-10-16",
+   "pages": 1,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "beautifulfund.org": {
+   "checkedAt": "2026-10-16",
+   "pages": 7,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "djfoundation.or.kr": {
+   "checkedAt": "2026-10-16",
+   "pages": 4,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "goheung.go.kr": {
+   "checkedAt": "2026-10-16",
+   "pages": 1,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "hanwooborad.or.kr": {
+   "checkedAt": "2026-10-16",
+   "why": "홈페이지 못 엶 (TypeError: ENOTFOUND → 브라우저도 실패(page.goto: net::ERR_NAME_NOT_RESOLVED at https:/)",
+   "targets": 1
+  },
+  "jiles.or.kr": {
+   "checkedAt": "2026-10-16",
+   "pages": 9,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "kiha21.or.kr": {
+   "checkedAt": "2026-10-16",
+   "pages": 1,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "yonkang.org": {
+   "checkedAt": "2026-10-16",
+   "pages": 10,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "yonsei.ac.kr": {
+   "checkedAt": "2026-10-16",
+   "pages": 1,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
   }
  }
 }
