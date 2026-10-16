@@ -621,7 +621,8 @@ const ACT_BACKFILL = 40;   // 2026-10-01 20→40 — 자격 판(detailsV) 소급
 let actBackfilled = 0;
 for (const it of acts.items) {
   /* 🔴 자격 판(detailsV)이 옛것인 글도 다시 읽는다 (2026-10-01 · 소급 — 원칙 7). API 글은 API 로봇이 채우므로 건너뛴다 */
-  if (actBackfilled >= ACT_BACKFILL || it.api || (it.excerptsAt && it.detailsV === ACT_DETAILS_V)) continue;
+  /* API 글은 API 본문으로 읽었으니 건너뛴다 — 단 거기서 자격이 안 나온 글은 원문 페이지를 읽어 본다(제주 청년정책 「체인지메이커」: API 칸은 한 줄, 페이지엔 자격 표 · 2026-10-16) */
+  if (actBackfilled >= ACT_BACKFILL || (it.api && (it.eligibilityLines || []).length) || (it.excerptsAt && it.detailsV === ACT_DETAILS_V)) continue;
   /* 못 받아 온 글은 **이레에 한 번만** 다시 두드린다 (2026-10-01 코드 리뷰) — 안 그러면 죽은 주소가 매 실행 40칸을 먹어
      앞쪽에 그런 글이 쌓이면 나머지가 영영 소급되지 않고, 같은 학교 게시판을 하루 세 번 두드린다 */
   if (it.detailsTriedAt && (Date.parse(todayIso) - Date.parse(it.detailsTriedAt)) < 7 * 86400000) continue;

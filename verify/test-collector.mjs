@@ -1985,7 +1985,7 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
     eq('  줄을 살린 글자(htmlToLines)면 마감·발췌를 읽는다 · &nbsp; 도 되돌린다 · 스크립트는 버린다', ex.activityExcerpts(htmlToLines(page)), { deadline: '2026-10-31', excerpts: [{ label: '모집기간', text: '2026. 9. 7. (월) ~ 2026. 10. 31. (토)' }, { label: '대상', text: '산재 노동자 자녀(대학생)' }] });
     eq('  상세 페이지 글자는 줄을 살려 돌려준다 (마감 단서 한 줄은 예전대로)', /deadlineHint: deadlineHintFrom\(text\), text: htmlToLines\(html\) \}/.test(cm), true);
     /* 2026-10-01 — 자격 판(detailsV)이 옛것인 글도 다시 읽는다(자격·적합도 소급) · API 글은 API 로봇 몫이라 건너뛴다 */
-    eq('  발췌 없이 실린 글은 다음 실행이 원문을 다시 읽어 채운다 (소급 · 예산 안 · 읽은 글은 excerptsAt)', /const ACT_BACKFILL = \d+;[\s\S]*?if \(actBackfilled >= ACT_BACKFILL \|\| it\.api \|\| \(it\.excerptsAt && it\.detailsV === ACT_DETAILS_V\)\) continue;[\s\S]*?if \(!budget\.hasRoom\([\s\S]*?it\.excerptsAt = /.test(cm) && /it\.excerptsAt = new Date\(\)\.toISOString\(\)\.slice\(0, 10\);   \/\/ 원문을 읽은 날/.test(cm), true);
+    eq('  발췌 없이 실린 글은 다음 실행이 원문을 다시 읽어 채운다 (소급 · 예산 안 · 읽은 글은 excerptsAt)', /const ACT_BACKFILL = \d+;[\s\S]*?if \(actBackfilled >= ACT_BACKFILL \|\| \(it\.api && \(it\.eligibilityLines \|\| \[\]\)\.length\) \|\| \(it\.excerptsAt && it\.detailsV === ACT_DETAILS_V\)\) continue;[\s\S]*?if \(!budget\.hasRoom\([\s\S]*?it\.excerptsAt = /.test(cm) && /it\.excerptsAt = new Date\(\)\.toISOString\(\)\.slice\(0, 10\);   \/\/ 원문을 읽은 날/.test(cm), true);
     for (const f of ['deepfetch.mjs', 'rescue-bodies.mjs']) {
       const src = readText(new URL(`../collector/${f}`, import.meta.url));
       eq(`  ${f} 도 같은 변환을 불러 쓴다 (베끼지 않는다)`, /htmlToLines\(html\)/.test(src) && !/replace\(\/<br\\s\*\\\/\?>\/gi/.test(src), true);
@@ -11765,6 +11765,9 @@ console.log('\n■ 공공 API 로봇 (2026-10-01)');
     [M.mapYouthContent({ ...cNull, pstTtl: '「2026 보성 두드림 스테이」 추가 모집', pstSeNm: '대외활동' }, opt).item?.kind, M.mapYouthContent({ ...cNull, pstTtl: '「2026 보성 두드림 스테이」 추가 모집', pstSeNm: '취업지원' }, opt).drop],
     ['대외활동', '공모전·대외활동 아님(소식 글 등)']);
   eq('  게시판 분류가 대외활동이어도 장학 제목은 활동 글이 아니다', !!M.mapYouthContent({ ...cNull, pstTtl: '2026 ○○재단 장학생 모집', pstSeNm: '대외활동' }, opt).drop, true);
+  eq('  본문(pstWholCn)의 그림은 첨부로 넘긴다 — 글 화면은 스크립트 껍데기라 포스터는 API 본문에만 있다(2026-10-16) · 아이콘·gif·상대 주소는 아니다 · 이름은 주소의 파일 이름',
+    M.mapYouthContent({ ...c, pstWholCn: '<p><img src="https://www.youthcenter.go.kr/upload/2026/%ED%8F%AC%EC%8A%A4%ED%84%B0.jpg"><img src="/icon/logo.png"><img src="https://x.kr/a.gif"></p>' }, opt).item.attachments,
+    [{ name: '포스터.jpg', url: 'https://www.youthcenter.go.kr/upload/2026/%ED%8F%AC%EC%8A%A4%ED%84%B0.jpg' }]);
   eq('  받는 순서 — 청년콘텐츠가 청년정책보다 먼저(예산을 청년정책이 다 쓰지 않게)', Object.keys(M.API_SOURCES).indexOf('youthContent') < Object.keys(M.API_SOURCES).indexOf('youthPolicy'), true);
   /* 응답 껍데기 */
   eq('findRows — 껍데기 이름을 몰라도 행 배열을 찾는다', M.findRows({ resultCode: 200, result: { pagging: {}, youthPolicyList: [{ plcyNm: 'a' }, { plcyNm: 'b' }] } }, 'plcyNm').length, 2);
@@ -12031,6 +12034,15 @@ console.log('\n■ 대외활동·공모전 — 활동 글의 자격 읽기 (2026
   eq('  이미 실린 글의 표 꼬리도 sanitizeElig 가 자른다(소급)', (() => { const it = { eligibilityLines: ['참가 대상 : 대한민국 국민 누구나', '참가 형태', '개인 또는 3인 이하 팀'], eligibilityFrom: '요강 페이지' }; return [AX.sanitizeElig(it), it.eligibilityLines]; })(), [true, ['참가 대상 : 대한민국 국민 누구나']]);
   eq('  HTML 주석은 글자가 아니다 — `<!-- … -->` 찌꺼기 `-->` 줄이 `참가대상 : -->` 가 됐다(데이터안심구역)',
     (await import('../collector/html-text.mjs')).htmlToLines('<p>참가대상</p><!-- <span>옛 글</span> --><p>국민 누구나</p>').split('\n'), ['참가대상', '국민 누구나']);
+  eq('  그림 글머리(`✅ 참여자격`)도 절 제목이다 · 다음 절 `✅ 공모기간`·`✅ 공모주제`·`✅ 시상내용` 에서 끝난다(청년재단 밥상 로그 · 2026-10-16)',
+    el('안내합니다.\n✅ 참여자격\n2025년 「청년다다름사업」에 참여중인 청년\n✅ 공모기간\n2026.09.10.(목) ～ 2026.10.12.(월)\n✅ 공모주제\n식사 에피소드\n✅ 시상내용\n대상 청년 1명 10만원', '2026년 청년다다름사업 청년 밥상 로그 공모전 안내'),
+    ['2025년 「청년다다름사업」에 참여중인 청년']);
+  eq('  그림 글머리는 어떤 그림이든(`🙋 모집대상` ↵ 값 ↵ `👥 모집규모`) — 울산 벤처빌더 실측 · 콜론만 남긴 이름표(`- 지역기준 :` ↵ `제주시, 서귀포시`)는 값과 잇고, 빈 정책 표(`만 0 세 ~ 만 0 세`·`제한없음`)는 버린다(제주 체인지메이커)',
+    [el('🙋 모집대상\n울산 지역 내 창업을 준비하고 있는 예비창업자\n👥 모집규모\n3인 1팀 기준, 총 10개팀(30명) 내외', '울산 벤처빌더 플랫폼 참여자 모집'),
+      el('신청자격\n지원대상\n- 나이\n: 만 0 세 ~ 만 0 세\n- 학력기준 :\n제한없음\n- 지역기준 :\n제주시, 서귀포시\n신청기간 : 추후 공지', '청년 체인지메이커 아카데미 운영')],
+    [['울산 지역 내 창업을 준비하고 있는 예비창업자'], ['지역기준 : 제주시, 서귀포시']]);
+  eq('  콜론 없이 이름표와 값이 한 줄(`지원대상 일반인` — 문화포털 표)은 `지원대상 : 일반인` · 콜론이 이미 있으면 그대로',
+    [el('기관명 인문360\n지원대상 일반인\n신청기간\n2026-10-02 ~ 2026-10-12')[0], el('지원대상 : 전국 대학생\n신청기간 : 10.1')], ['지원대상 : 일반인', ['지원대상 : 전국 대학생']]);
   eq('⑥ 소급 — 판(detailsV)을 올려 옛 글도 다시 읽는다 · 수집 로봇은 제목을 넘긴다',
     [AX.ACT_DETAILS_V >= 3, (readText(new URL('../collector/collect.mjs', import.meta.url)).match(/activityDetails\(detail\.text, it\.title\)/g) || []).length], [true, 2]);
 }
@@ -12149,6 +12161,14 @@ console.log('\n■ 대외활동 — 남은 글 표본에서 찾은 것 (2026-10-
   eq('  본문 그림은 </head> 뒤 **첫** 제목 자리부터 — 글 아래 관련 글 띠에 제목이 또 있어도 본문 포스터를 잘라내지 않는다(농진청 `00._포스터.png` · 2026-10-16)',
     AD.candidateFiles({ title: '2026 농업·농촌 스토리텔링콘텐츠 공모전', attachments: [] }, '<head><title>2026 농업·농촌 스토리텔링콘텐츠 공모전</title></head><body><img src="/menu/gnb.png"><h2>2026 농업·농촌 스토리텔링콘텐츠 공모전</h2><img src="/editor/00._포스터.png"><ul><li>2026 농업·농촌 스토리텔링콘텐츠 공모전 관련 글</li></ul><img src="/img/WAMark.png"></body>', 'https://www.rda.go.kr/board/board.do').map((f) => f.url),
     ['https://www.rda.go.kr/editor/00._%ED%8F%AC%EC%8A%A4%ED%84%B0.png', 'https://www.rda.go.kr/img/WAMark.png']);   // 주소는 URL 이 그대로 적는 꼴(퍼센트 부호)
+  eq('  제목이 스크립트 문자열(`document.title = …`)에 먼저 나와도 거기서 시작하지 않는다 — 스크립트는 먼저 걷는다(청년재단 · 2026-10-16)',
+    AD.candidateFiles({ title: '2026년 청년 밥상 로그 공모전 안내', attachments: [] }, '<head><title>x</title></head><body><script>document.title = "2026년 청년 밥상 로그 공모전 안내 | 청년재단"; var a = 1;</script><img src="/gnb/menu.png"><h3>2026년 청년 밥상 로그 공모전 안내</h3><img src="/upload/poster.png"></body>', 'https://kyf.or.kr/x').map((f) => f.url),
+    ['https://kyf.or.kr/upload/poster.png']);
+  eq('  본문 제목이 `농업&middot;농촌` 처럼 기호로 적혀도 찾는다 · alt 글자의 `naver` 로 포스터를 꾸밈 그림으로 버리지 않는다(농진청 · 2026-10-16)',
+    AD.candidateFiles({ title: '[농촌진흥청] 2026 농업·농촌 스토리텔링콘텐츠 공모전', attachments: [] }, '<head><title>2026 농업·농촌 스토리텔링콘텐츠 공모전</title></head><body><img src="/gnb.png"><h2>2026 농업&middot;농촌 스토리텔링콘텐츠 공모전</h2><img src="https://www.rda.go.kr/crosseditor/binary/images/000122/00._%ED%8F%AC%EC%8A%A4%ED%84%B0.png" alt="접수는 네이버폼 naver.me"><ul><li>2026 농업·농촌 스토리텔링콘텐츠 공모전 관련 글</li></ul></body>', 'https://www.rda.go.kr/board/board.do').map((f) => f.url),
+    ['https://www.rda.go.kr/crosseditor/binary/images/000122/00._%ED%8F%AC%EC%8A%A4%ED%84%B0.png']);
+  eq('  첨부 이름 `운영 개요` 도 공고문으로(포스코이앤씨 멘토링 — 본문은 한 줄) · 한 글만 AI 에 태우는 ACT_AI_ONLY 가 있다(사람이 읽은 포스터를 같은 관문에)',
+    [AD.candidateFiles({ title: 't', attachments: [{ name: '멘토링 Day 운영 개요(발송용).pdf', url: 'https://x.kr/f/1.pdf' }] }, '', 'https://x.kr/p').length, /process\.env\.ACT_AI_ONLY/.test(readText(new URL('../collector/activity-docs.mjs', import.meta.url)))], [1, true]);
   eq('  `공모전개요`·`공모전소개`·`공모부문` 메뉴도 요강으로 따라간다(해양안전 콘텐츠 공모전 — 포스터엔 자격이 없다)',
     AD.guideLinks('<a href="/intro">공모전개요</a><a href="/part">공모부문 및 제출방법</a><a href="/news">공지사항</a>', 'https://sea.kr/'), ['https://sea.kr/intro', 'https://sea.kr/part']);
   eq('  페이지에 직접 박힌 그림(data:image/png;base64)도 후보 · 다른 data: 는 아니다(감사원 팝업)',

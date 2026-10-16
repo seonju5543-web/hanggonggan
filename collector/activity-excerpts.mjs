@@ -86,6 +86,10 @@ const joinTablePairs = (t) => {
       || !/생|인|자(?:\s|,|$|\()|민|년|팀|누구나|세|기업|교사|교원|가구|학생|청소년|성인|국민|일반/.test(b));
     /* 다음 줄이 또 다른 표 머리(`공모주제`·`제출자료`)면 값이 아니다 — `참가대상 : 공모주제` 가 자격이 됐다(그린리모델링 요강 페이지 · 2026-10-16) */
     if (TABLE_LABEL.test(a) && b && b.length <= 150 && !TABLE_LABEL.test(b) && !isTableHead(b) && !/[:：]/.test(a) && !award) { ls[i] = `${a} : ${b}`; ls[i + 1] = ''; }
+    /* 콜론만 남긴 이름표(`- 지역기준 :` ↵ `제주시, 서귀포시` — 지자체 청년정책 상세 표 · 2026-10-16)도 다음 줄이 값이면 잇는다 */
+    const colonOnly = a.match(/^[\s\-–·ㅇ○]*((?:나이|연령|학력|소득|지역|근로|결혼|전공)\s?(?:기준|요건)?|(?:모집|신청|참가|참여|지원|응모)\s?(?:대상|자격))\s*[:：]\s*$/);
+    /* 다음 줄이 글머리 항목(`ㅇ 전 세계인 누구나`)이면 값이 아니라 목록이다 — 제목 줄로 두면 아래 항목들이 블록으로 읽힌다(관문 「홀로 선 <응모자격>」) */
+    if (colonOnly && b && b.length <= 150 && !/^[ㅇ○●■□▣◆◇▶·•\-–*]/.test(b) && !/[:：]\s*$/.test(b) && !isTableHead(b) && !TABLE_LABEL.test(b)) { ls[i] = `${colonOnly[1]} : ${b}`; ls[i + 1] = ''; }
   }
   return ls.join('\n');
 };
@@ -164,6 +168,9 @@ export function eligLineOk(line) {
   const t = l.trim();
   if (POLITE_END.test(t) && !HAS_LABEL.test(t) && !(ELIG_SAY.test(t) && !NOT_SAY.test(t))) return false;
   if (LABEL_ONLY.test(t) || AWARD_ROW.test(t)) return false;
+  /* (g) 빈 정책 표(지자체 청년정책 상세 — 제주 「체인지메이커」 실측 2026-10-16): `신청자격 : 지원대상 : - 나이`·`: 만 0 세 ~ 만 0 세`·`- 학력기준 :`·`제한없음` 은 칸만 있고 값이 없다 */
+  if (/[:：]\s*[-–]?\s*(?:나이|연령|학력\s?기준|소득\s?기준|지역\s?기준|근로\s?기준|결혼\s?기준|전공\s?요건|추가\s?단서)?\s*$/.test(t)) return false;
+  if (/만\s?0\s?세\s?~\s?만\s?0\s?세/.test(t) || /^[\s\-–·]*(?:[가-힣\s]{0,8}[:：]\s*)?제한\s?없음\s*$/.test(t)) return false;
   /* (f) 수상자 명단 `대상 : 박명건(전라남도)` — 지난 회차 수상작 표의 '대상(大賞)' 줄이 참가 대상으로 실렸다(농진청 안전365 요강 페이지 · 2026-10-16) */
   if (/^[\s○●■□ㅇ·\-–]*(?:대상|최우수상|우수상|장려상)\s*[:：]\s*[가-힣]{2,4}\s*[(（][가-힣]{2,8}[)）]\s*$/.test(t)) return false;
   return true;
@@ -187,15 +194,19 @@ export function sanitizeElig(it) {
 /* 납작한 정의 표(`참가 대상` ↵ `대한민국 국민 누구나` ↵ `참가 형태` ↵ `개인 또는 3인 이하 팀` ↵ `출품 수` ↵ …)는 자격 짝 **다음 이름표**에서 끝이다 —
    요강 페이지의 표 전체(공모 분야·주최·공모 주제)가 자격 13줄로 실렸다(지식재산처·데이터안심구역 · 2026-10-16). 이름표는 짧고(10자 이하) 숫자·콜론이 없으며
    끝이 표 머리 낱말이다 · 사람·대상을 말하는 짧은 값(`대학생`·`성인`·`개인 또는 팀`)은 이름표가 아니다(joinTablePairs 와 같은 눈) */
-const TABLE_HEAD_WORD = /(?:형태|분야|주제|주최|주관|안내|신청|평가|일정|방법|기간|내용|시상|규격|심사|접수|문의|장소|일시|발표|부문|혜택|상금|출품\s?수|인원|규모|내역|목적|자료|배경|개요|절차|순서)\s*$/;
+const TABLE_HEAD_WORD = /(?:형태|분야|주제|주최|주관|안내|신청|평가|일정|방법|기간|내용|시상|규격|심사|접수|문의|장소|일시|발표|부문|혜택|상금|출품\s?수|인원|규모|내역|목적|자료|배경|개요|절차|순서|결과)\s*$/;
 const VALUE_WORD = /생|인|자(?:\s|,|$|\()|민|년|팀|누구나|세|기업|교사|교원|가구|학생|청소년|성인|국민|일반|대상|자격/;
 const isTableHead = (l) => { const t = String(l || '').trim(); return t.length <= 10 && !/[\d:：]/.test(t) && TABLE_HEAD_WORD.test(t) && !VALUE_WORD.test(t); };
 function cutAtTableLabel(lines) {
   const i = lines.findIndex((l, k) => k > 0 && isTableHead(l));
   return i > 0 ? lines.slice(0, i) : lines;
 }
+/* 글머리 그림 기호(✅·✔·📌 — 청년재단·온통청년 글)는 `ㅇ ` 로 — 절 제목·다음 절·이름표 판정이 아는 기호여야 한다(`✅ 참여자격` 아래 한 줄이 통째로 버려졌다 · 2026-10-16) */
+const bulletNorm = (t) => t.replace(/^([ \t]*)[\p{Extended_Pictographic}✅✔☑▶]+(?:\uFE0F)?[ \t]*/gmu, '$1ㅇ ');   // 🙋·👥·📆 같은 그림 글머리 전부(울산 벤처빌더 실측 2026-10-16)
+/* 콜론 없이 이름표와 값이 한 줄(`지원대상 일반인` — 문화포털 표) → `지원대상 : 일반인`(콜론만 넣는다 · 값이 40자 안일 때 · 뒤에 콜론이 이미 있으면 그대로) */
+const inlineLabel = (t) => t.replace(/^([ \t]*(?:[ㅇ○●■□▣◆◇▶·•\-*]\s*)?)((?:지원|모집|참가|참여|신청|응모|공모)\s?(?:대상|자격))[ \t]+(?=[^\s:：][^\n:：]{0,40}$)/gm, '$1$2 : ');
 export function activityDetails(text, title) {
-  const t = labelColon(String(text || ''));
+  const t = labelColon(inlineLabel(bulletNorm(String(text || ''))));
   if (!t.trim()) return { eligibilityLines: [], eligibilityExcludes: [], eligibilityPriority: [], noticeLines: [] };
   /* 어디서부터 읽나 — 글 제목이 나오는 **자리마다** 읽어 보고 자격이 가장 많이 나오는 자리(같으면 뒤쪽).
      🔴 마지막 자리만 보면 두 번 나오는 제목 **사이**의 자격 표를 놓쳤다(K-Startup DMC 캠프 · 제목 191·214줄, 표 195~208줄 · 2026-10-04).
