@@ -3,6 +3,30 @@
  "updatedAt": "2026-10-16",
  "items": [
   {
+   "title": "[박물관] 2026년 글로벌 시민강좌 <한글의 우수성>에 여러분을 초대합니다.",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31666&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-10-16",
+   "postId": "31666",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-10-16",
+   "thumb": "data/news/img/51c8c5418a9730d2.webp",
+   "desc": "우리가 일상에서 매일 사용하는 한국어와 한글은 다른 언어를 사용하는 사람들에게 어떻게 다가갈까요 ? 서울시립대학교박물관에서는 2026 년 한글날 제정 100 주년과 훈민정음 반포 580 주년을 맞아 후베 교수와…"
+  },
+  {
+   "title": "2027학년도 제1학기 학석사연계과정 모집 안내",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31668&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-10-16",
+   "postId": "31668",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-10-16",
+   "thumb": "data/news/img/ddb58ca6901d1af7.webp",
+   "desc": "학사과정과 연계하여 석사학위를 조기(최저 5년, 학사 3.5년/석사 1.5년)에 취득할 수 있는 학·석사연계과정을 모집하오니, 관심 있는 학부 학생들의 많은 지원바랍니다."
+  },
+  {
    "title": "[대학일자리플러스센터] 2026년 실전면접준비반 프로그램 안내",
    "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31663&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
    "postedAt": "2026-10-15",
@@ -426,28 +450,6 @@
    "postId": "31347",
    "thumb": "data/news/img/d9d25cdb7112dbf9.webp",
    "desc": "인재개발실 #대학일자리플러스센터 #직무 역량 레벨업"
-  },
-  {
-   "title": "📌[월간AI] 9월 생성형 AI 활용 실무자를 위한 SQL📌 과정",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31394&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-02",
-   "school": "서울시립대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "postId": "31394",
-   "thumb": "data/news/img/3a4d28e5287233b8.webp",
-   "desc": "인재개발실 #대학일자리플러스센터 #취업역량개발팀"
-  },
-  {
-   "title": "✨기간연장✨[인공지능혁신융합대학사업단]「AICOSS Career Compass 2026」진로준비 실태조사(선착순 마감,🎁참여자 기프티콘 증정🎁)",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31462&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-02",
-   "school": "서울시립대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "postId": "31462",
-   "thumb": "data/news/img/c441b876e985d563.webp",
-   "desc": "2. 참여대상: 인공지능혁신융합대학사업단 참여학과 재학생(1~4학년) ※ 참여학과 : 인공지능학과 , 컴퓨터과학부 , 전자전기컴퓨터공학부 , 화학공학과 , 기계정보공학과 , 신소재공학과 , 토목공학과, 교통공학과,…"
   }
  ]
 }

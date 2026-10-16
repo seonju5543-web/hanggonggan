@@ -3,6 +3,53 @@
  "updatedAt": "2026-10-16",
  "items": [
   {
+   "title": "2026학년도 2학기 기초교양 <대학글쓰기> 중간고사 통합시험 일시 및 고사장 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/218503/detailView.do",
+   "postedAt": "2026-10-16",
+   "postId": "218503",
+   "kind": "학사",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-10-16"
+  },
+  {
+   "title": "중간시험 관련 전자기기 소지 및 사용 금지 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/218502/detailView.do",
+   "postedAt": "2026-10-16",
+   "postId": "218502",
+   "kind": "학사",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-10-16",
+   "thumb": "data/news/img/56e4580e3f90bde9.webp",
+   "desc": "- 스마트폰, 스마트워치, AI글래스(스마트 안경) 등 전자기기의 소지 및 사용 금지"
+  },
+  {
+   "title": "2026년 2학기 거창군 지역출신 대학생 등록금 지원사업 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/218501/detailView.do",
+   "postedAt": "2026-10-16",
+   "postId": "218501",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-10-16",
+   "thumb": "data/news/img/642190a363f3da3b.webp"
+  },
+  {
+   "title": "[언어교육부] 11월 외국어 강좌 안내/토익,토익스피킹 시험 할인 안내 (강의계획서 붙임 참조)",
+   "url": "https://www.jbnu.ac.kr/web/Board/218499/detailView.do",
+   "postedAt": "2026-10-16",
+   "postId": "218499",
+   "kind": "학사",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-10-16",
+   "thumb": "data/news/img/f3247e62cc78fc03.webp"
+  },
+  {
    "title": "[교육혁신본부] 2026학년도 AI 활용 학습튜터링 튜터-튜티 모집 안내",
    "url": "https://www.jbnu.ac.kr/web/Board/218462/detailView.do",
    "postedAt": "2026-10-16",
@@ -403,50 +450,6 @@
    "foundAt": "2026-10-05",
    "thumb": "data/news/img/57ab97f6b92495ce.webp",
    "desc": "국립중앙과학관에서 전통 과학기술과 인공지능(AI)을 결합한 참여형 행사 「AI 과거시험」 을 개최합니다."
-  },
-  {
-   "title": "[KOICA] MOU(학점인정) 체결 대학 홍보 캠페인 안내 10/7(수)",
-   "url": "https://www.jbnu.ac.kr/web/Board/218081/detailView.do",
-   "postedAt": "2026-10-02",
-   "kind": "학사",
-   "school": "전북대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "postId": "218081",
-   "thumb": "data/news/img/2bfff21f2c8e3774.webp",
-   "desc": "전북국제개발협력센터 KOICA 프로젝트 봉사단 모집 & 학점인정제 홍보 설명회 전북대학교 재학생 여러분을 대상으로 KOICA 해외봉사단 및 학점인정제 를 안내하는 홍보 설명회를 진행합니다."
-  },
-  {
-   "title": "[D-5] [파란사다리] 2026 동계 JBNU 파란사다리 해외 파견프로그램 추가 선발 안내",
-   "url": "https://www.jbnu.ac.kr/web/Board/218078/detailView.do",
-   "postedAt": "2026-10-02",
-   "school": "전북대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "postId": "218078",
-   "desc": "많은 학우분들의 지원 바랍니다. 1. 파란사다리 프로그램이란? - 자기개발과 진로개척에 꿈과 열정을 지닌 대학생에게 해외 연수 경험 제공을 통해 글로벌 역량 개발"
-  },
-  {
-   "title": "[중앙도서관] 「미술로 읽어본다」 전시 안내",
-   "url": "https://www.jbnu.ac.kr/web/Board/218049/detailView.do",
-   "postedAt": "2026-10-02",
-   "kind": "행사",
-   "school": "전북대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "postId": "218049",
-   "thumb": "data/news/img/88ae2b313047a317.webp",
-   "desc": "중앙도서관 정보운영과 2026년 미술품 대여전시 지원사업 「여기가 갤러리」 중앙도서관 중도라운지 전시갤러리에서 「미술로 읽어본다」 전시를 운영합니다."
-  },
-  {
-   "title": "[언어교육부] 10월 외국어 강좌 안내/토익,토익스피킹 시험 할인 안내 (강의계획서 붙임 참조)",
-   "url": "https://www.jbnu.ac.kr/web/Board/218048/detailView.do",
-   "postedAt": "2026-10-02",
-   "kind": "학사",
-   "school": "전북대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "postId": "218048"
   }
  ]
 }

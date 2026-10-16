@@ -3,6 +3,16 @@
  "updatedAt": "2026-10-16",
  "items": [
   {
+   "title": "[학사] [대학혁신사업] 집중상담기간(KW All Care Week) 시행 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53504&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-16",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-16",
+   "desc": "교수님과 함께 나누는 따뜻한 대화, 더 든든한 대학생활의 시작 학생 여러분의 학업과 진로 고민을 함께 나누고 대학생활 적응을 위해, 지도교수와 학생이 만나는 집중상담기간 「KW All Care Week」 를…"
+  },
+  {
    "title": "[일반] 기간제 계약직원 채용 공고(정보통신처 통신운영팀)",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53495&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "postedAt": "2026-10-16",
@@ -421,16 +431,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/8640b5ff417aa176.webp"
-  },
-  {
-   "title": "[외부] [광운대캠퍼스타운] 창업센터 연합 정기 IR 「KW SPACE6」",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53411&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-30",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/f338875c3c00e34a.webp",
-   "desc": "❏ 장소 : 광운대학교 80주년기념관 301호, 306호 310호"
   }
  ]
 }
