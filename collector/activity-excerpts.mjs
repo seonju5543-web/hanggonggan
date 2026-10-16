@@ -13,8 +13,9 @@ const { eachLabeledValue, extractDeadline, extractQualifyLines, scoopQualifyLine
 
 /* 카드에 보이는 순서. 이름표 정규식은 **줄 머리의 짧은 이름표**에만 맞춘다. */
 export const EXCERPT_LABELS = [
-  ['모집기간', /^(?:모집|접수|신청|공모|응모|참가\s*신청)\s*(?:기간|일정|기한)$/],
-  ['활동기간', /^(?:활동|운영|교육|봉사|파견|프로그램)\s*(?:기간|일정|일자)$/],
+  ['모집기간', /^(?:모집|접수|신청|공모|응모|참가\s*신청)\s*(?:기간|일정|기한|마감(?:일시?)?)$|^기간$/],   // 맨 `기간`(교육부 청년정책 공모전 `ㅇ ( 기간 ) 2026.10.7. ~ 10.30.` · 2026-10-17)
+  ['일시', /^(?:대회|행사|교육|세미나|설명회|워크숍|특강|진행|운영)?\s*(?:일시|일자)$/],   // 행사·특강의 날(접수 마감이 아니라 그날이다 — 마감으로 읽지 않고 안내 줄로만 · 2026-10-17 실측 10여 건)
+  ['활동기간', /^(?:활동|운영|교육|봉사|파견|프로그램|진행)\s*(?:기간|일정|일자)$/],
   ['대상', /^(?:모집|지원|참가|응모|참여|신청)\s*(?:대상|자격)$|^자격\s*요건$|^대상$/],
   ['혜택', /^(?:활동\s*)?(?:혜택|특전|지원\s*사항|지원\s*내용)$|^시상(?:\s*내역|\s*내용)?$|^상금$|^혜택\s*및\s*특전$/],
   ['주최', /^(?:주최|주관|주최\s*[·/]\s*주관|주관\s*[·/]\s*주최|운영\s*기관)$/],
@@ -36,7 +37,7 @@ function valueFor(text, re) {
 
 /** @returns {{ deadline: string|null, excerpts: Array<{label:string, text:string}> }} */
 export function activityExcerpts(text) {
-  const t = String(text || '');
+  const t = normalizeText(text);   // 그림 글머리·콜론 없는 이름표·괄호 이름표 — activityDetails 와 같은 정리(2026-10-17 · 밥상 로그 `✅ 공모기간` 이 마감 0건이었다)
   if (!t.trim()) return { deadline: null, excerpts: [] };
   const excerpts = [];
   for (const [label, re] of EXCERPT_LABELS) {
@@ -204,9 +205,14 @@ function cutAtTableLabel(lines) {
 /* 글머리 그림 기호(✅·✔·📌 — 청년재단·온통청년 글)는 `ㅇ ` 로 — 절 제목·다음 절·이름표 판정이 아는 기호여야 한다(`✅ 참여자격` 아래 한 줄이 통째로 버려졌다 · 2026-10-16) */
 const bulletNorm = (t) => t.replace(/^([ \t]*)[\p{Extended_Pictographic}✅✔☑▶]+(?:\uFE0F)?[ \t]*/gmu, '$1ㅇ ');   // 🙋·👥·📆 같은 그림 글머리 전부(울산 벤처빌더 실측 2026-10-16)
 /* 콜론 없이 이름표와 값이 한 줄(`지원대상 일반인` — 문화포털 표) → `지원대상 : 일반인`(콜론만 넣는다 · 값이 40자 안일 때 · 뒤에 콜론이 이미 있으면 그대로) */
-const inlineLabel = (t) => t.replace(/^([ \t]*(?:[ㅇ○●■□▣◆◇▶·•\-*]\s*)?)((?:지원|모집|참가|참여|신청|응모|공모)\s?(?:대상|자격))[ \t]+(?=[^\s:：][^\n:：]{0,40}$)/gm, '$1$2 : ');
+const PERIODISH = '(?:(?:모집|접수|신청|공모|응모|참가)\\s?(?:기간|일정|기한|마감)|(?:활동|운영|교육|봉사|프로그램|진행)\\s?(?:기간|일정)|(?:대회|행사|교육|세미나|설명회|워크숍|특강|진행|운영)?\\s?(?:일시|일자)|기간)';
+const inlineLabel = (t) => t
+  .replace(/^([ \t]*(?:[ㅇ○●■□▣◆◇▶·•\-*]\s*)?)((?:지원|모집|참가|참여|신청|응모|공모)\s?(?:대상|자격))[ \t]+(?=[^\s:：][^\n:：]{0,40}$)/gm, '$1$2 : ')
+  /* `공모기간 2026. 10. 6. – 11. 2.`(지식재산처) · `진행일정 2026-11-07~2027.02.19`(한남대) — 기간·일시 이름표 뒤에 콜론 없이 날짜가 붙은 줄 · `접수 마감 - 2026년 11월 2일`(외대부고)의 대시도 콜론으로 */
+  .replace(new RegExp(`^([ \\t]*(?:[ㅇ○●■□▣◆◇▶·•\\-*]\\s*)?)(${PERIODISH})[ \\t]*(?:[-–—][ \\t]*)?(?=(?:20\\d\\d|\\d{1,2})\\s?[.\\-/년월]|상시|수시|연중)`, 'gm'), '$1$2 : ');   // `신청기간 상시`(한남대) 도
+const normalizeText = (text) => labelColon(inlineLabel(bulletNorm(String(text || ''))));
 export function activityDetails(text, title) {
-  const t = labelColon(inlineLabel(bulletNorm(String(text || ''))));
+  const t = normalizeText(text);
   if (!t.trim()) return { eligibilityLines: [], eligibilityExcludes: [], eligibilityPriority: [], noticeLines: [] };
   /* 어디서부터 읽나 — 글 제목이 나오는 **자리마다** 읽어 보고 자격이 가장 많이 나오는 자리(같으면 뒤쪽).
      🔴 마지막 자리만 보면 두 번 나오는 제목 **사이**의 자격 표를 놓쳤다(K-Startup DMC 캠프 · 제목 191·214줄, 표 195~208줄 · 2026-10-04).
@@ -224,7 +230,7 @@ export function activityDetails(text, title) {
   if (!qual.length) qual = bodyQual(joinTablePairs(t));
   /* '대상:' 이름표 줄도 **함께** 본다 (2026-10-01) — 자격 절이 짧은 한 줄(`참가자격 : 만 19~34세 대한민국 국민`)만 주고
      진짜 조건은 '대상:' 줄(`KOICA 사업 참여 경험이 있으며 …`)에 있던 공고가 **95% ✓** 로 떴다(틀린 안심). 한쪽이 다른 쪽을 품으면 하나만 둔다. */
-  const who = eachLabeledValue(t, (label) => EXCERPT_LABELS[2][1].test(label.replace(/\s/g, '')), (v) => (cleanValue(v).length >= 4 ? cleanValue(v) : null));
+  const who = eachLabeledValue(t, (label) => EXCERPT_LABELS.find(([l]) => l === '대상')[1].test(label.replace(/\s/g, '')), (v) => (cleanValue(v).length >= 4 ? cleanValue(v) : null));
   const flat = (x) => String(x).replace(/[\s:：·]/g, '');
   /* 🔴 이름표를 뗀 앞 줄이 **빈 글자**면 비교하지 않는다 — 빈 글자는 어디에나 '들어 있어서' 대상 줄이 빠졌다(`■ 참가자격` 제목 줄 · 2026-10-04 관문) */
   const core = (q) => flat(q).replace(/^.*?(?:대상|자격)/, '');

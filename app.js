@@ -3397,6 +3397,8 @@ function openActivityDetail(url) {
   const flat = (x) => String(unent(x || '')).replace(/[\s:：·\-–]/g, '');
   const seenText = [...(n.excerpts || []).map((x) => flat(x.text)), ...(n.eligibilityLines || []).map(flat)].filter((x) => x.length >= 6);
   const notice = (n.noticeLines || []).filter((l) => !seenText.some((e) => flat(l).includes(e)));
+  const eligRows = eligibilityRowsHtml(sch, result).replace(/<li class="r-unk">\? 지원 자격은 [^<]*<\/li>/g, '');   // '원문에서 확인' 한 줄뿐이면 빈 글자 → 칸을 접는다
+  const recruitHtml = activityRecruitHtml(n, rows);
   sheetBack = null;   // 이 시트에는 돌아갈 곳이 없다 — 내리면 닫힌다
   $('#detail-sheet').innerHTML = `
     <div class="sheet-handle"></div>
@@ -3413,18 +3415,34 @@ function openActivityDetail(url) {
 
       ${/* 지원 자격 — 장학 시트와 **같은 함수·같은 모양**(eligibilityRowsHtml · fitBadgeHtml full · 묻기 상자).
            '지원 가능·선발 심사' 알약(STATUS_META)은 달지 않는다 — 활동 글에는 구조화 조건이 없어 그 알약은 늘 '가능'이라 거짓 안심이 된다. */ ''}
+      ${/* 🔴 읽은 자격이 하나도 없으면 「지원 자격」 칸 자체를 접는다(2026-10-17 개발자 "원문에서 확인 이렇게 뜨는 게 하나도 없어야") — '원문에서 확인하라'는 줄은
+           학생에게 아무 정보도 아니다. 모른다는 사실은 칸이 없는 것으로 말하고, 원문 단추가 아래에 있다. 장학 시트는 그대로(자격 미확인 배지가 그 몫) */ ''}
+      ${eligRows ? `
       <div class="sheet-verdict">
         <h4>지원 자격</h4>
         <span class="verdict-marks">${fitBadgeHtml(fit, fd, { full: true })}</span>
       </div>
-      <ul class="reason-list">${eligibilityRowsHtml(sch, result)}</ul>
+      <ul class="reason-list">${eligRows}</ul>` : ''}
       ${eligAskHtml(sch)}
 
       ${benefit && benefit.length > 40 ? `
       <h4>혜택</h4>
       <ul class="doc-list">${benefitItems(benefit).map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
-      <h4>모집 안내</h4>
-      ${rows.length
+      ${/* 「모집 안내」도 보일 것이 있을 때만 — 없으면 칸을 접는다('모집 기간·대상은 원문에서 확인' 문구 삭제 · 2026-10-17) */ ''}
+      ${recruitHtml ? `<h4>모집 안내</h4>${recruitHtml}` : ''}
+      ${noticeSummaryHtml(notice)}
+      ${(n.attachments || []).length ? `
+      <h4>공고 원본 첨부</h4>
+      <ul class="doc-list">${n.attachments.map((a) => `<li class="att">${attachmentLinkHtml(a, 'color:var(--primary)')}</li>`).join('')}</ul>` : ''}
+      ${n.deadline ? `<p class="sheet-deadline">마감일 ${esc(n.deadline)}</p>` : ''}
+      ${activityLinkHtml(n)}
+    </div>`;
+  openSheetShell();
+  eligAskWire(sch, () => openActivityDetail(url));   // 묻기 상자 배선 — 다시 그릴 때 이 시트로 돌아온다
+}
+/* 활동 시트 「모집 안내」 본문 — 발췌 줄이 있으면 그것, 없으면 기간 한 토막(deadlineHint), 둘 다 없으면 빈 글자(칸을 접는다) */
+function activityRecruitHtml(n, rows) {
+  return rows.length
         ? `<ul class="doc-list">${rows.flatMap((x) => {
           /* 한 칸에 여러 항목이 글머리 기호로 붙어 온 것(`2026.8.13 ~ 8.23 ○ (신청방법) 네이버 폼 … ○ (모집대상) 만 19세~39세`)은
              항목마다 한 줄로 — 뒤 항목의 괄호 이름표가 그 줄의 이름표다(공고 안내 noticeSummaryHtml 과 같은 규칙 · 2026-10-15) */
@@ -3440,16 +3458,7 @@ function openActivityDetail(url) {
           ? `<ul class="doc-list">${tidyChars(hintText(n.deadlineHint)).split(/\s+[○●■□\u25B6▷◆◇]\s*(?=\S)/)
             .map((s) => s.replace(/^[(（]?\s*([가-힣\s]{2,8})[)）]\s*/, '$1 · ').trim()).filter((s) => s.length >= 4)
             .map((s) => `<li>${esc(s)}</li>`).join('')}</ul>`
-          : '<p class="doc-legend">모집 기간·대상은 공고 원문에서 확인해 주세요.</p>')}
-      ${noticeSummaryHtml(notice)}
-      ${(n.attachments || []).length ? `
-      <h4>공고 원본 첨부</h4>
-      <ul class="doc-list">${n.attachments.map((a) => `<li class="att">${attachmentLinkHtml(a, 'color:var(--primary)')}</li>`).join('')}</ul>` : ''}
-      <p class="sheet-deadline">마감일 ${esc(n.deadline || '원문 공고 확인')}</p>
-      ${activityLinkHtml(n)}
-    </div>`;
-  openSheetShell();
-  eligAskWire(sch, () => openActivityDetail(url));   // 묻기 상자 배선 — 다시 그릴 때 이 시트로 돌아온다
+          : '');
 }
 
 /* ---------------- 재단·지자체 새 공고 (2026-09-26 · 노션 F-13 · 교외 확대) ----------------
