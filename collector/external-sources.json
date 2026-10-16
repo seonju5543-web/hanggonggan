@@ -828,7 +828,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-01",
+    "checkedAt": "2026-10-16",
     "why": "홈페이지 못 엶 (HTTP 400)",
     "best": null
    }
@@ -839,7 +839,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-01",
+    "checkedAt": "2026-10-16",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.ycsf.or.kr/",
@@ -853,8 +853,8 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-01",
-    "why": "홈페이지 못 엶 (fetch failed)",
+    "checkedAt": "2026-10-16",
+    "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
     "best": null
    }
   },
@@ -865,8 +865,8 @@
    "seed": "web-search",
    "evidence": "웹 검색 2026-09-29: \"서울장학재단 — hissf.or.kr\" · 서울희망 대학진로장학금(800명·연 400만원)·서울해외교환학생장학금 · 공지 글 주소 programs/user/news/ssfnews/read.asp",
    "probe": {
-    "checkedAt": "2026-10-01",
-    "why": "홈페이지 못 엶 (fetch failed)",
+    "checkedAt": "2026-10-16",
+    "why": "홈페이지 못 엶 (TypeError: ENOTFOUND)",
     "best": null
    }
   },
@@ -877,7 +877,7 @@
    "seed": "web-search",
    "evidence": "웹 검색 2026-09-29: \"삼성꿈장학재단 — sdream.or.kr\" · 글로벌 희망장학생(학기당 480만원) 공지",
    "probe": {
-    "checkedAt": "2026-10-01",
+    "checkedAt": "2026-10-16",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.sdream.or.kr/",
@@ -892,7 +892,7 @@
    "seed": "web-search",
    "evidence": "웹 검색 2026-09-29: \"현대차 정몽구 스칼러십 — 온라인 장학생 선발 사이트\"",
    "probe": {
-    "checkedAt": "2026-10-01",
+    "checkedAt": "2026-10-16",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.cmkfoundation-scholarship.org/",
@@ -956,7 +956,7 @@
    "seed": "web-search",
    "evidence": "웹 검색 2026-09-29: \"포스코청암재단 — postf.org\" · 장학생 선발 사이트 postf.recruiter.co.kr",
    "probe": {
-    "checkedAt": "2026-10-01",
+    "checkedAt": "2026-10-16",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.postf.org/",
@@ -994,9 +994,12 @@
    "seed": "web-search",
    "evidence": "웹 검색 2026-09-29: \"동원육영재단 — dwef.or.kr\" · YTF·IDS 장학 프로그램",
    "probe": {
-    "checkedAt": "2026-10-01",
-    "why": "홈페이지 못 엶 (fetch failed)",
-    "best": null
+    "checkedAt": "2026-10-16",
+    "why": "최고 2건 ((홈))",
+    "best": {
+     "url": "https://www.dwef.or.kr/main;jsessionid=4F4BCB94F368B894FBFF9DA111716C78.dweffront",
+     "signals": 2
+    }
    }
   },
   {
