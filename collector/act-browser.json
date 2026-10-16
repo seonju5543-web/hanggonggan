@@ -446,5 +446,16 @@
  "https://www.kogl.or.kr/contest/contestMain.do": {
   "at": "2026-10-16",
   "tries": 1
+ },
+ "https://www.youthcenter.go.kr/bbs03View/48/10836": {
+  "at": "2026-10-16",
+  "tries": 1,
+  "lines": [
+   "신청대상 : 만 19세 이상 만34세 미만",
+   "*군복무 기간에 따라만 35~37세 까지 지원가능",
+   "국무조정실"
+  ],
+  "excludes": [],
+  "from": "공고문 첨부(OCR)"
  }
 }

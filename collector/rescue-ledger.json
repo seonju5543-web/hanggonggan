@@ -418,5 +418,17 @@
   "at": "2026-10-15",
   "tries": 0,
   "name": "2026년 성암육영회 장학생 모집 안내"
+ },
+ "https://www.yonsei.ac.kr/bbs/sc/58/944388/artclView.do": {
+  "ok": "2026-10-16",
+  "at": "2026-10-16",
+  "tries": 0,
+  "name": "2026학년도 하반기 재단법인 인석장학회 장학생 선발 안내"
+ },
+ "https://wise.dongguk.ac.kr/article/servicenotice/detail/520867": {
+  "tries": 1,
+  "at": "2026-10-16",
+  "minBody": 100,
+  "name": "[한국고등교육재단] 인재림 장학생 선발 안내"
  }
 }
