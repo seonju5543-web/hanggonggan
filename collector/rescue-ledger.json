@@ -155,12 +155,6 @@
   "minBody": 100,
   "name": "2026년 대전청년내일재단 성취(대) 장학생 선발계획 연장 공고"
  },
- "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12373/view.do?currentpageno=1": {
-  "tries": 4,
-  "at": "2026-10-12",
-  "minBody": 100,
-  "name": "2026년 JW이종호재단 기초과학자 장학생 선발 안내"
- },
  "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?bbs_seq=30196&board_category_no=11&board_seq=4&contents_no=5&menu_id=100&p_tab_no=5&site_no=2": {
   "tries": 2,
   "at": "2026-10-04",
@@ -377,12 +371,6 @@
   "tries": 0,
   "name": "서울과학기술대학교 중소기업 취업연계 장학사업 (희망사다리Ⅰ유형) 신규장학생 자체선발 기준 안내"
  },
- "https://www.jbnu.ac.kr/web/Board/217349/detailView.do?category=6": {
-  "tries": 3,
-  "at": "2026-10-14",
-  "minBody": 100,
-  "name": "[JW이종호재단] 2026년 기초과학자 장학생 선발 안내"
- },
  "https://sejong.korea.ac.kr/bbs/koreaSejong/659/273624/artclView.do": {
   "ok": "2026-10-14",
   "at": "2026-10-14",
@@ -426,8 +414,8 @@
   "name": "2026학년도 하반기 재단법인 인석장학회 장학생 선발 안내"
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/520867": {
-  "tries": 1,
-  "at": "2026-10-16",
+  "tries": 2,
+  "at": "2026-10-17",
   "minBody": 100,
   "name": "[한국고등교육재단] 인재림 장학생 선발 안내"
  }
