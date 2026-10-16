@@ -13921,6 +13921,11 @@
      "school": "계명대학교",
      "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271403&pageOrder=0&cmd=2&parm_bod_uid=271403&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
      "id": "notice:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=145&parm_bod_uid=271403&srchbgpuid=-1&srchenable=1&srchvotetype=-1"
+    },
+    {
+     "school": "동국대학교 WISE캠퍼스",
+     "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520863",
+     "id": "notice:https://wise.dongguk.ac.kr/article/servicenotice/detail/520863"
     }
    ],
    "scopeFrom": "같은 사업이 영남대학교 게시판에도 올라옴(자동) — 영남대학교 게시판 https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=232091479&article.offset=0&articleLimit=10"
@@ -14379,6 +14384,362 @@
     "raw": "2. 지원금액 : 가계곤란 정도에 따라 차등 금액 지급 ( 등록금에 한함 ) ※ 2026 학년도 2 학기 등록금을 전액 감면 ( 등록금 전액 장학생 ) 받은 경우 지원 불가"
    },
    "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-bbssc58944388artclviewdo",
+   "name": "2026학년도 하반기 재단법인 인석장학회 장학생 선발 안내",
+   "boardTitle": "2026학년도 하반기 재단법인 인석장학회 장학생 선발 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「재단법인」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-16",
+   "provider": "주관 기관 원문 확인",
+   "amount": "400만원",
+   "amountValue": 4000000,
+   "deadline": "2026-11-18",
+   "deadlineFrom": "공고 원문 · 1）지원서 제출 기한 : 2026. 11. 18（수）오전 10시부터 2026. 11. 26.（목） 오후 4시까지 인석장학회 홈페이지 온라인 접수",
+   "period": "접수 ~2026-11-18",
+   "summary": "연세대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "연세대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-16 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "인석장학회 장학신청.pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015129/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.yonsei.ac.kr/bbs/sc/58/944388/artclView.do",
+   "sourceKind": "auto",
+   "excerpts": [
+    "3）장학금 지급 금액 : 장학금 지급 금액 : 연간 400만원（학기 별 200만원 분할 지급 예정）"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 4000000,
+    "ratio": 0,
+    "min": 4000000,
+    "max": 4000000,
+    "raw": "3）장학금 지급 금액 : 장학금 지급 금액 : 연간 400만원（학기 별 200만원 분할 지급 예정）"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-bbssc58944387artclviewdo",
+   "name": "2026 한국고등교육재단 인재림 장학생 제7기 선발 안내",
+   "boardTitle": "2026 한국고등교육재단 인재림 장학생 제7기 선발 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「재단」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-16",
+   "provider": "주관 기관 원문 확인",
+   "amount": "800만원",
+   "amountValue": 8000000,
+   "deadline": "2026-10-29",
+   "deadlineFrom": "공고 원문 · 2026.10.08 ~ 2026.10.29",
+   "period": "접수 ~2026-10-29",
+   "summary": "연세대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-16 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "[한국고등교육재단] 인재림 제7기 장학생 선발 모집 요강.docx",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015128/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.yonsei.ac.kr/bbs/sc/58/944387/artclView.do",
+   "sourceKind": "auto",
+   "alsoPostedAt": [
+    {
+     "school": "서강대학교",
+     "url": "https://www.sogang.ac.kr/ko/detail/551609?bbsConfigFk=141&namepage=ScholarshipNotice",
+     "id": "notice:https://www.sogang.ac.kr/ko/detail/551609?bbsconfigfk=141&namepage=ScholarshipNotice"
+    },
+    {
+     "school": "가천대학교",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/126192/artclView.do",
+     "id": "notice:https://www.gachon.ac.kr/bbs/kor/478/126192/artclView.do"
+    },
+    {
+     "school": "인하대학교",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/45832/artclView.do",
+     "id": "notice:https://www.inha.ac.kr/bbs/kr/8/45832/artclView.do"
+    },
+    {
+     "school": "충북대학교",
+     "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=815&bbsNo=8&nttNo=170749&pageUnit=10&searchCtgry=%ed%95%99%ec%82%ac%2f%ec%9e%a5%ed%95%99&searchCnd=all&pageIndex=1",
+     "id": "notice:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsno=8&key=815&nttno=170749&searchctgry=학사/장학"
+    }
+   ],
+   "scopeFrom": "같은 사업이 서강대학교 게시판에도 올라옴(자동) — 서강대학교 게시판 https://www.sogang.ac.kr/ko/detail/551609?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "openDate": "2026-10-08",
+   "eligibilityLines": [
+    "4. 지원자격:",
+    "기본 요건",
+    "① 대한민국 국적 보유자(복수국적자 포함) 지원 가능",
+    "② 2028년 2월까지 학부생 자격 유지 필수",
+    "③ 어학연수, 교환학생, 취업 및 군 복무 등으로 프로그램 불참 및 중단 불가",
+    "④ 소속 대학, 한국장학재단 등 타 기관의 장학금 및 장학 프로그램과 중복수혜 가능",
+    "학적 요건",
+    "① 전국 4년제 대학 2~3학년(학년 수료기준은 재학 중인 학교 규정에 따름) 지원 가능",
+    "(지원 가능) 성적표에 2개 학기 이상(계절 학기 불포함) 교과목 이수 기록이 있는 학생",
+    "(지원 가능) 1학년 2학기 이수 후 ~ 3학년 2학기 이수 후 휴학 중인 학생",
+    "(지원 불가능) 지원 시점 기준, 4학년 재학생 및 초과 학기 이수 예정자 지원 불가",
+    "② 편입생의 경우 이전 학교 성적 증명서 제출 필수",
+    "③ 학제 5~6년인 전공에 한하여, 각 2~4학년과 2~5학년에 재학 중인 학생 지원 가능"
+   ],
+   "excerpts": [
+    "문의처: forest.talent@kfas.or.kr"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 8000000,
+    "ratio": 0,
+    "min": 8000000,
+    "max": 8000000,
+    "raw": "5. 지원내용: 장학금(800만원) 및 프로그램 교육비 전액 지원 Design Thinking Project 활동비(팀별 200만원) Design Thinking Project 우수팀(200만원)"
+   },
+   "amountFrom": "공고 원문",
+   "exclusivity": {
+    "kind": "allowed",
+    "scope": "external",
+    "raw": "④ 소속 대학, 한국장학재단 등 타 기관의 장학금 및 장학 프로그램과 중복수혜 가능"
+   },
+   "exclusivityFrom": "공고 원문",
+   "sameAs": "한국고등교육재단",
+   "sameAsFrom": "자동"
+  },
+  {
+   "id": "auto-amepagescholarshipnotice-0mbofms",
+   "name": "[교외] 한국지도자육성장학재단 장학생 선발 안내(11/3 마감, 등록금 전액 or 생활비 350만원)",
+   "boardTitle": "[교외] 한국지도자육성장학재단 장학생 선발 안내(11/3 마감, 등록금 전액 or 생활비 350만원)",
+   "type": "교외",
+   "kindEvidence": [
+    "제목 표식 「[교외」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-16",
+   "provider": "주관 기관 원문 확인",
+   "amount": "350만원",
+   "amountValue": 3500000,
+   "deadline": "2026-11-03",
+   "deadlineFrom": "공고 원문 · [교외] 한국지도자육성장학재단 장학생 선발 안내(11/3 마감, 등록금 전액 or 생활비 350만원)",
+   "period": "접수 ~2026-11-03",
+   "summary": "서강대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-16 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2027년도장학생추천안내문.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156966/download.do"
+    },
+    {
+     "name": "1.2027년도_서류양식(지원서).hwp",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156967/download.do"
+    },
+    {
+     "name": "2.2027년도_서류양식(추천서).hwp",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156968/download.do"
+    },
+    {
+     "name": "3.2027년도_서류양식(자기소개서).hwp",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156969/download.do"
+    },
+    {
+     "name": "4.2027년도_개인정보활용동의서.hwp",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156970/download.do"
+    },
+    {
+     "name": "5.2027년도_장학생의무사항참여동의서.hwp",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156971/download.do"
+    },
+    {
+     "name": "장학생선발관련FAQ.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156972/download.do"
+    },
+    {
+     "name": "일반장학생선발포스터.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/156973/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551605?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "sourceKind": "auto",
+   "alsoPostedAt": [
+    {
+     "school": "가천대학교",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/126183/artclView.do",
+     "id": "notice:https://www.gachon.ac.kr/bbs/kor/478/126183/artclView.do"
+    },
+    {
+     "school": "연세대학교",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/944373/artclView.do",
+     "id": "notice:https://www.yonsei.ac.kr/bbs/sc/58/944373/artclView.do"
+    }
+   ],
+   "scopeFrom": "같은 사업이 가천대학교 게시판에도 올라옴(자동) — 가천대학교 게시판 https://www.gachon.ac.kr/bbs/kor/478/126183/artclView.do",
+   "openDate": "2026-10-26",
+   "announceDate": "2026-11-24",
+   "eligibilityLines": [
+    "3. 지원자격",
+    "대한민국 국적 보유자로 2027년 1학기 기준 3학년 1학기 등록 예정 재학생",
+    "2027년 1학기 휴학 예정자 지원 불가",
+    "매 정규학기 당 최소 12학점 이상 이수한 자(계절학기 미인정)",
+    "2026년 2학기 포함 전체학기 백분율 성적이 85점(2.8/4.3) 이상인 자",
+    "학칙에 의한 징계사실(학사징계 포함)이 없는 자",
+    "리더십활동 유경험자 및 특별재능 보유자 가산점* 부여",
+    "* 가산점 항목(대학교 입학 이후 취득한 것)",
+    "대한민국인재상 수상",
+    "대통령상 또는 국무총리상 수상",
+    "장관 또는 광역단체장상 수상(동급 수상실적 인정)",
+    "전국 규모의 이상의 학술 또는 논문 공모전 입상자",
+    "대학 총학생회장 또는 부총학생회장 당선 또는 역임자"
+   ],
+   "excerpts": [
+    "신청기한: 2026년 11월 3일(화) 오후 5시까지"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 3500000,
+    "ratio": 0,
+    "min": 3500000,
+    "max": 3500000,
+    "raw": "1. 장학금: 등록금 전액 또는 생활비 350만원"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-ervicenoticedetail520867",
+   "name": "[한국고등교육재단] 인재림 장학생 선발 안내",
+   "boardTitle": "[한국고등교육재단] 인재림 장학생 선발 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「재단」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-16",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-10-16",
+   "period": "접수 기간 원문 확인",
+   "summary": "동국대학교 WISE캠퍼스 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교 WISE캠퍼스"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-16 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "[한국고등교육재단] 인재림 제7기 장학생 선발 모집 요강.pdf",
+     "url": "javascript:downGO('[한국고등교육재단] 인재림 제7기 장학생 선발 모집 요강.pdf','/files/article/servicenotice/520867/','61C4384459C14428BC7EF124921184C2.pdf');"
+    }
+   ],
+   "sourceUrl": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520867",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-oarticleno159308nocat501",
+   "name": "[한국고등교육재단] 인재림 제7기 장학생 모집",
+   "boardTitle": "[한국고등교육재단] 인재림 제7기 장학생 모집",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「재단」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-16",
+   "provider": "주관 기관 원문 확인",
+   "amount": "800만원",
+   "amountValue": 8000000,
+   "deadline": "2026-12-21",
+   "listedAt": "2026-10-16",
+   "period": "접수 기간 ~2026-12-21",
+   "summary": "홍익대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "홍익대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-16 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "[한국고등교육재단] 인재림 제7기 장학생 선발 모집 요강.docx",
+     "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=download&articleNo=159308&attachNo=93393"
+    }
+   ],
+   "sourceUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159308&noCat=501",
+   "sourceKind": "auto",
+   "deadlineFrom": "공고문 첨부",
+   "eligibilityFrom": "공고문 첨부",
+   "eligibilityLines": [
+    "[지원 자격]",
+    "📌 기본 요건",
+    "대한민국 국적 보유자(복수국적자 포함) 지원 가능",
+    "2028년 2월까지 학부생 자격 유지 필수",
+    "어학연수, 교환학생, 취업 및 군 복무 등으로 프로그램 불참 및 중단 불가",
+    "소속 대학, 한국장학재단 등 타 기관의 장학금 및 장학 프로그램과 중복수혜 가능",
+    "📌 학적 요건",
+    "전국 4년제 대학 2~3학년(학년 수료기준은 재학 중인 학교 규정에 따름) 지원 가능",
+    "(지원 가능) 성적표에 2개 학기 이상(계절 학기 불포함) 교과목 이수 기록이 있는 학생",
+    "(지원 가능) 1학년 2학기 이수 후 ~ 3학년 2학기 이수 후 휴학 중인 학생",
+    "(지원 불가능) 지원 시점 기준, 4학년 재학생 및 초과 학기 이수 예정자 지원 불가",
+    "편입생의 경우 이전 학교 성적 증명서 제출 필수",
+    "학제 5~6년인 전공에 한하여, 각 2~4학년과 2~5학년에 재학 중인 학생 지원 가능",
+    "[제출 서류]"
+   ],
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 8000000,
+    "ratio": 0,
+    "min": 8000000,
+    "max": 8000000,
+    "raw": "장학 혜택 장학금(800만원) 및 프로그램 교육비 전액 지원 Design Thinking Project 활동비(팀별 200만원) Design Thinking Project 우수팀(200만원) ABCD 커리큘럼 AI Integration Course AI를 활용하여 문제를 정의∙해결하는 프로젝트를 수행하며 ‘AI 렌즈’로 세상을 바라보는 과정(AI 렌즈란? "
+   },
+   "amountFrom": "공고 원문",
+   "sameAs": "한국고등교육재단",
+   "sameAsFrom": "자동"
   }
  ]
 }

@@ -694,6 +694,16 @@
    "added": "2026-10-15",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-amepagescholarshipnotice-0mbofms",
+   "name": "[교외] 한국지도자육성장학재단 장학생 선발 안내(11/3 마감, 등록금 전액 or 생활비 350만원)",
+   "target": "한국지도자육성장학재단 장학생 선발 안내(11/3 마감,",
+   "added": "2026-10-16",
+   "fetched": false,
+   "schematized": false,
+   "tries": 1,
+   "lastTryAt": "2026-10-16"
   }
  ]
 }

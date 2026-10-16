@@ -2,6 +2,48 @@
  "updatedAt": "2026-10-16",
  "items": [
   {
+   "title": "[해수부] 2026년 해양수산 통합데모데이 참가자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179533",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/2p1Ln"
+    },
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/ov1Ln"
+    }
+   ],
+   "deadlineHint": "접수기간 2026-10-15 ~ 2026-11-12 13:59 주관기관명 부산지역대학연합기술지주(주) 대상 전체 창업업력 전체 연락처 051-7",
+   "deadline": "2026-11-12",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-15 ~ 2026-11-12 13:59"
+    },
+    {
+     "label": "대상",
+     "text": "해양수산 분야 창업 및 투자 생태계에 관심 있는 누구나"
+    },
+    {
+     "label": "주최",
+     "text": "해양수산부, 해양수산과학기술진흥원(KIMST)"
+    }
+   ],
+   "eligibilityLines": [
+    "신청대상 : 해양수산 분야 창업생태계 관심자 (스타트업, 예비창업자, 투자자, 유관기관, 학생 및 일반인 등)",
+    "대상연령 : 전체",
+    "참가대상 : 해양수산 분야 창업 및 투자 생태계에 관심 있는 누구나"
+   ],
+   "detailsV": 4,
+   "excerptsAt": "2026-10-16",
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-10-16"
+  },
+  {
    "title": "성남 기후테크 UpSkill 아카데미 Vol.3 - 투자유치를 위한 IR 전략",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179490",
    "kind": "대외활동",
@@ -260,6 +302,73 @@
    "foundAt": "2026-10-16",
    "seenAt": "2026-10-16",
    "excerptsAt": "2026-10-16"
+  },
+  {
+   "title": "[일반] [인권센터 특강 - 기프티콘 제공] 보내기 전에 10초! : AI · SNS시대, 나와 타인의 디지털 경계를 지키는 법",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53505&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "광운미디어",
+     "url": "https://www.kw.ac.kr/ko/etc/2018_kw110.pdf"
+    }
+   ],
+   "deadlineHint": null,
+   "detailsV": 4,
+   "field": "교육·캠프",
+   "excerptsAt": "2026-10-16",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-16"
+  },
+  {
+   "title": "[일반] [공학교육혁신센터] 2026 IRC4U 스피치 경진대회 참가자 모집",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=51058&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "kind": "공모전",
+   "attachments": [
+    {
+     "name": "Attachment 2026 컨소시엄 스피치 경진대회 참가 신청서.hwp",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35441&ano=51058"
+    },
+    {
+     "name": "Attachment 개인정보 수집 활용 및 촬영 활용 동의서.hwp",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35442&ano=51058"
+    }
+   ],
+   "deadlineHint": null,
+   "detailsV": 4,
+   "field": "과학·공학",
+   "excerptsAt": "2026-10-16",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-16",
+   "eligibilityLines": [
+    "01 참가 대상",
+    "05 제출서류",
+    "지능형 로봇 컨소시엄 대학의 공학계열 재학생"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)"
+  },
+  {
+   "title": "[일반] 제14회 창업보육투자유치경연회 참가팀 모집(~11/16)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53498&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "Attachment 창보투신청서_00팀1.hwp",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35436&ano=53498"
+    },
+    {
+     "name": "Attachment 창업아이디어제안서_OO팀1.hwp",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35437&ano=53498"
+    }
+   ],
+   "deadlineHint": null,
+   "detailsV": 4,
+   "excerptsAt": "2026-10-16",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-16"
   },
   {
    "title": "2026 경기도 ESG 인식확산 교육 (5~7회차) 참여자 모집 안내",
@@ -5726,23 +5835,6 @@
     "②수상작발표2026년 12월"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)"
-  },
-  {
-   "title": "[경찰청] 대국민 보이스피싱 대응 아이디어 공모전",
-   "url": "https://phishingout.spectory.net/idea",
-   "kind": "공모전",
-   "attachments": [],
-   "deadlineHint": "접수기간 2026년 8월 24일(월) ~ 9월 30일(수) 18:00 참가대상 대한민국 국민 누구나 (개인 또는 4인 이내 팀) 공모주제 정책",
-   "field": "기획·아이디어",
-   "excerptsAt": "2026-10-04",
-   "school": "",
-   "campus": "",
-   "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-09-30",
-   "detailsV": 3,
-   "eligibilityLines": [
-    "참가대상 : 대한민국 국민 누구나 (개인 또는 4인 이내 팀)"
-   ]
   }
  ],
  "fields": {

@@ -3,38 +3,41 @@
  "updatedAt": "2026-10-16",
  "items": [
   {
-   "title": "[일반] [공지] 2026학년도 1학기 로봇특성화대학재정지원사업 양성학생 장학금 신청 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53475&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "title": "[등록/장학] [한국고등교육재단] 인재림 제7기 장학생 모집 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53500&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "attachments": [
     {
-     "name": "부설기관",
-     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
-    },
-    {
-     "name": "부설연구기관",
-     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
-    },
-    {
-     "name": "연구지원팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
-    },
-    {
-     "name": "연구진흥팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
-    },
-    {
-     "name": "경영관리팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
-    },
-    {
-     "name": "기술지주회사",
-     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
-    },
-    {
-     "name": "광운미디어",
-     "url": "https://www.kw.ac.kr/ko/etc/2018_kw110.pdf"
+     "name": "Attachment 20261016 [한국고등교육재단] 인재림 제7기 장학생 선발 모집 요강.docx",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35439&ano=53500"
     }
    ],
+   "deadlineHint": null,
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-16"
+  },
+  {
+   "title": "[등록/장학] 2027년도 한국지도자육성장학재단 신규장학생 모집 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53497&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "Attachment 2027년도 장학생 추천 안내문.pdf",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35433&ano=53497"
+    },
+    {
+     "name": "Attachment 장학생 선발관련 FAQ.pdf",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35434&ano=53497"
+    }
+   ],
+   "deadlineHint": "제출 기간 및 방법 > 1 . 제출기간 : 2026.10.22.(목 ) ~ 2026.11.05.(목 ) 12:00 까지 2. 제출방법 : 학생복",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-16"
+  },
+  {
+   "title": "[일반] [공지] 2026학년도 1학기 로봇특성화대학재정지원사업 양성학생 장학금 신청 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53475&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [],
    "deadlineHint": "신청기간 : 2026. 10. 14.( 수 ) ~ 2026. 10. 20.( 화 ) ​ ​ ​○ 신청방법 : https://airobot.kwu",
    "school": "광운대학교",
    "campus": "",
@@ -45,36 +48,8 @@
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53463&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "attachments": [
     {
-     "name": "부설기관",
-     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
-    },
-    {
-     "name": "부설연구기관",
-     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
-    },
-    {
-     "name": "연구지원팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
-    },
-    {
-     "name": "연구진흥팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
-    },
-    {
-     "name": "경영관리팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
-    },
-    {
-     "name": "기술지주회사",
-     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
-    },
-    {
      "name": "Attachment 20261012 【붙임】 2026. 하반기 은평구민 장학생 선발 공고_합본.pdf",
      "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35404&ano=53463"
-    },
-    {
-     "name": "광운미디어",
-     "url": "https://www.kw.ac.kr/ko/etc/2018_kw110.pdf"
     }
    ],
    "deadlineHint": "신청기간 : 2026. 10. 12.( 월 )~ 10. 28.(수 ) 까지 ​ 4. 신청 자격 1) 공통요건 : 공고일 현재 은평구에 2 년 이",

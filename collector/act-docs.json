@@ -190,5 +190,17 @@
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3527276": {
   "at": "2026-10-16",
   "tries": 1
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53505&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-10-16",
+  "tries": 1
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=51058&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-10-16",
+  "tries": 1
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53498&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-10-16",
+  "tries": 1
  }
 }
