@@ -14490,6 +14490,21 @@
      "school": "충북대학교",
      "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=815&bbsNo=8&nttNo=170749&pageUnit=10&searchCtgry=%ed%95%99%ec%82%ac%2f%ec%9e%a5%ed%95%99&searchCnd=all&pageIndex=1",
      "id": "notice:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsno=8&key=815&nttno=170749&searchctgry=학사/장학"
+    },
+    {
+     "school": "영남대학교",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=232105637&article.offset=0&articleLimit=10",
+     "id": "notice:https://www.yu.ac.kr/scholar/notice/notice.do?articleno=232105637"
+    },
+    {
+     "school": "경희대학교",
+     "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323340",
+     "id": "notice:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323340&menuno=200318"
+    },
+    {
+     "school": "동국대학교",
+     "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766630",
+     "id": "notice:https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766630"
     }
    ],
    "scopeFrom": "같은 사업이 서강대학교 게시판에도 올라옴(자동) — 서강대학교 게시판 https://www.sogang.ac.kr/ko/detail/551609?bbsConfigFk=141&namepage=ScholarshipNotice",
@@ -14740,6 +14755,119 @@
    "amountFrom": "공고 원문",
    "sameAs": "한국고등교육재단",
    "sameAsFrom": "자동"
+  },
+  {
+   "id": "auto-ervicenoticedetail520872",
+   "name": "2026-2학기 복지장학생(부모장애) 선발 안내",
+   "boardTitle": "2026-2학기 복지장학생(부모장애) 선발 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "본문 「교내장학」"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-10-16",
+   "provider": "주관 기관 원문 확인",
+   "amount": "30만원",
+   "amountValue": 300000,
+   "deadline": "2026-11-20",
+   "deadlineFrom": "공고 원문 · 6. 신청기간 : 11 .20.(금)까지",
+   "period": "접수 ~2026-11-20",
+   "summary": "동국대학교 WISE캠퍼스 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교 WISE캠퍼스"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-16 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "복지장학생(부모장애유형) 신청서(양식).hwp",
+     "url": "javascript:downGO('복지장학생(부모장애유형) 신청서(양식).hwp','/files/article/servicenotice/520872/','1722741C5C19464AB216CC7AC1190A47.hwp');"
+    }
+   ],
+   "sourceUrl": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520872",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "4. 신청대상 : 부모 장애정도가 심한장애 ( 기존 1~3 급 ) 이고 , 소득분위가 9 분위 이하인 자"
+   ],
+   "excerpts": [
+    "장학금액 : 1 인당 30 만원(생활비 지원 장학으로 등록금초과 수혜가능)",
+    "신청기간 : 11 .20.(금)까지",
+    "문의 : 학생서비스팀 ( ☎ 770-2047)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 300000,
+    "ratio": 0,
+    "min": 300000,
+    "max": 300000,
+    "raw": "3. 장학금액 : 1 인당 30 만원(생활비 지원 장학으로 등록금초과 수혜가능)"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-ervicenoticedetail520869",
+   "name": "2026-2학기 영어(토익)성적장학 신청 안내",
+   "boardTitle": "2026-2학기 영어(토익)성적장학 신청 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "본문 「교내장학」"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-10-16",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-11-13",
+   "deadlineFrom": "게시판 요약 · ~ 11.13",
+   "period": "접수 ~2026-11-13",
+   "summary": "동국대학교 WISE캠퍼스 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교 WISE캠퍼스"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-16 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "영어(토익)성적장학+신청서(양식).hwp",
+     "url": "javascript:downGO('영어(토익)성적장학+신청서(양식).hwp','/files/article/servicenotice/520869/','18121DE8BF6247E0AC2974F62D4AD3D9.hwp');"
+    }
+   ],
+   "sourceUrl": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520869",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "1. 선발기준",
+    "세부내용",
+    "선발요건",
+    "1. 직전학기 취득학점 15 학점 이상",
+    "7 학기 : 12 학점이상",
+    "1~4 번 요건 모두 충족시 신청가능"
+   ],
+   "excerpts": [
+    "신청기간 : 10.16.(금 ) ~ 11.13.( 금 ) 까지(기한엄수)",
+    "신청기간 : 10.16.(금 ) ~ 11.13.(금) 23:59 까지(기한 엄수)",
+    "신청 방법 : NDRIMS [학생신청]신청함-[장학] 토익장학신청: 계좌검증 후 장학명 ' 영어(토익)성적장학A/B ' 선택>>PDF 업로드(신청서류 PDF 합치기 후 제출)",
+    "문의 : 054-770-2047"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "exclusivity": {
+    "kind": "allowed",
+    "scope": "external",
+    "raw": "- 상기 장학금은 수업료 100% 범위내에서 이중수혜 가능"
+   },
+   "exclusivityFrom": "공고 원문"
   }
  ]
 }

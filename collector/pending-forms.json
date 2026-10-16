@@ -702,7 +702,27 @@
    "added": "2026-10-16",
    "fetched": false,
    "schematized": false,
-   "tries": 2,
+   "tries": 3,
+   "lastTryAt": "2026-10-16"
+  },
+  {
+   "id": "auto-ervicenoticedetail520872",
+   "name": "2026-2학기 복지장학생(부모장애) 선발 안내",
+   "target": "2026-2학기 복지장학생(부모장애) 선발 안내",
+   "added": "2026-10-16",
+   "fetched": false,
+   "schematized": false,
+   "tries": 1,
+   "lastTryAt": "2026-10-16"
+  },
+  {
+   "id": "auto-ervicenoticedetail520869",
+   "name": "2026-2학기 영어(토익)성적장학 신청 안내",
+   "target": "2026-2학기 영어(토익)성적장학 신청 안내",
+   "added": "2026-10-16",
+   "fetched": false,
+   "schematized": false,
+   "tries": 1,
    "lastTryAt": "2026-10-16"
   }
  ]

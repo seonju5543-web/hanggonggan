@@ -999,9 +999,9 @@
     "답변등록",
     "처리상태"
    ],
-   "detailsV": 3,
+   "detailsV": 4,
    "field": "기획·아이디어",
-   "excerptsAt": "2026-10-15",
+   "excerptsAt": "2026-10-16",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-15"
@@ -1012,9 +1012,9 @@
    "kind": "공모전",
    "attachments": [],
    "deadlineHint": null,
-   "detailsV": 3,
+   "detailsV": 4,
    "field": "글쓰기·논문",
-   "excerptsAt": "2026-10-15",
+   "excerptsAt": "2026-10-16",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-15"
@@ -1036,9 +1036,9 @@
      "text": "국립한밭대학교 인문사회융합인재양성사업연구소 , 대전광역시 유성구"
     }
    ],
-   "detailsV": 3,
+   "detailsV": 4,
    "field": "IT·소프트웨어",
-   "excerptsAt": "2026-10-15",
+   "excerptsAt": "2026-10-16",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-15",
@@ -1065,9 +1065,9 @@
     "ㅇ 주요 내용 : 3 대 프로그램 기획",
     "정기설명회 프로그램"
    ],
-   "detailsV": 3,
+   "detailsV": 4,
    "field": "봉사",
-   "excerptsAt": "2026-10-15",
+   "excerptsAt": "2026-10-16",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-15"
@@ -1084,9 +1084,9 @@
     "✅ 신청 기간 : 2026. 10. 6.(화) ~ 2026. 10.29.(목) 15:00",
     "https://forms.gle/vCQ1UwhYKeagWM7v9"
    ],
-   "detailsV": 3,
+   "detailsV": 4,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-15",
+   "excerptsAt": "2026-10-16",
    "school": "한국외국어대학교",
    "campus": "",
    "foundAt": "2026-10-15"
@@ -1112,9 +1112,9 @@
     "신청기간: 2026년 10월 14일(수) ~ 11월 13일(금)",
     "신청방법: 구글폼 링크 신청(신청링크: https://forms.gle/BF8eDEYpB4dJfnVM7 )"
    ],
-   "detailsV": 3,
+   "detailsV": 4,
    "field": "봉사",
-   "excerptsAt": "2026-10-15",
+   "excerptsAt": "2026-10-16",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-15"
@@ -1208,7 +1208,8 @@
    "school": "",
    "campus": "",
    "host": "울산청년정책플랫폼 U-PAGE",
-   "foundAt": "2026-10-14"
+   "foundAt": "2026-10-14",
+   "detailsTriedAt": "2026-10-16"
   },
   {
    "title": "전주시 글로벌 해외연수생 1기 첫 수혜자",
@@ -1216,9 +1217,9 @@
    "kind": "대외활동",
    "attachments": [],
    "deadlineHint": null,
-   "detailsV": 3,
+   "detailsV": 4,
    "field": "해외·교류",
-   "excerptsAt": "2026-10-14",
+   "excerptsAt": "2026-10-16",
    "school": "",
    "campus": "",
    "host": "전주인재육성재단",
@@ -1250,9 +1251,9 @@
     "신청대상 : 여성 벤처·스타트업 대표, 예비창업자 등",
     "대상연령 : 전체"
    ],
-   "detailsV": 3,
+   "detailsV": 4,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-14",
+   "excerptsAt": "2026-10-16",
    "school": "",
    "campus": "",
    "host": "창업진흥원 K-Startup",
@@ -1294,9 +1295,9 @@
     "대상연령 : 만 20세 이상 ~ 만 39세 이하",
     "신청대상 : 기술기반 창업 아이디어를 보유하거나 IP 창출에 관심있는 대학(원)생 20팀 내외"
    ],
-   "detailsV": 3,
+   "detailsV": 4,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-14",
+   "excerptsAt": "2026-10-16",
    "school": "",
    "campus": "",
    "host": "창업진흥원 K-Startup",
@@ -1324,20 +1325,9 @@
      "text": "2026-08-31 ~ 2026-10-14 23:59"
     }
    ],
-   "eligibilityLines": [
-    "신청대상 : IT 서비스·솔루션 분야의 Pre-money Valuation 100억~300억 원 내외 스타트업",
-    "▪️ 제품·서비스 출시 후 본격적인 스케일업을 준비하는 팀",
-    "▪️ 투자 유치와 후속 성장의 다음 단계가 필요한 팀",
-    "▪️ 사업화 전략과 적절한 파트너 연결이 필요한 팀",
-    "▪️ 대·중견기업 및 공공기관과의 협업 기회를 넓히고 싶은 팀",
-    "▪️ 글로벌 진출을 본격적으로 검토하고 있는 팀"
-   ],
-   "eligibilityExcludes": [
-    "공고에 명시된 신청 대상 요건에 해당하지 않는 기업"
-   ],
-   "detailsV": 3,
+   "detailsV": 4,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-14",
+   "excerptsAt": "2026-10-16",
    "school": "",
    "campus": "",
    "host": "창업진흥원 K-Startup",
@@ -1349,9 +1339,9 @@
    "kind": "대외활동",
    "attachments": [],
    "deadlineHint": null,
-   "detailsV": 3,
+   "detailsV": 4,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-14",
+   "excerptsAt": "2026-10-16",
    "school": "한국외국어대학교",
    "campus": "",
    "foundAt": "2026-10-14",
@@ -1372,9 +1362,9 @@
    ],
    "deadlineHint": null,
    "deadline": "2026-10-28",
-   "detailsV": 3,
+   "detailsV": 4,
    "field": "멘토링",
-   "excerptsAt": "2026-10-14",
+   "excerptsAt": "2026-10-16",
    "school": "한국외국어대학교",
    "campus": "",
    "foundAt": "2026-10-14"
@@ -1396,9 +1386,9 @@
     "※ 휴학생 및 대학 졸업자 지원 가능",
     "※ 대학 입학 예정자 및 대학 합격 후 재학 이력 없이 휴학한 경우 지원 불가"
    ],
-   "detailsV": 3,
+   "detailsV": 4,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-14",
+   "excerptsAt": "2026-10-16",
    "school": "한국외국어대학교",
    "campus": "",
    "foundAt": "2026-10-14"
@@ -1672,14 +1662,9 @@
      "text": "2026-09-22 ~ 2026-10-13 23:30"
     }
    ],
-   "eligibilityLines": [
-    "대상연령 : 만 40세 이상",
-    "대상 : 일반인, 일반기업",
-    "신청대상 : 기업의 성장을 고민하는 여성CEO(여성임원포함) 총 80명 / 선착순마감"
-   ],
-   "detailsV": 3,
+   "detailsV": 4,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-13",
+   "excerptsAt": "2026-10-16",
    "school": "",
    "campus": "",
    "host": "창업진흥원 K-Startup",
@@ -1707,18 +1692,9 @@
      "text": "2026-09-18 ~ 2026-10-13 23:59"
     }
    ],
-   "eligibilityLines": [
-    "대상 : 대학생, 일반인, 대학, 연구기관, 일반기업, 1인 창조기업",
-    "창업업력",
-    "[무료 세미나] ChatGPT·Gemini 시대, 우리 브랜드 AI 검색 노출 전략",
-    "※(유의)해당 공고는 중소벤처기업부와 창업진흥원이 아닌 민간에서 지원하는 사업으로, 신청부터 관리까지 모든 과정을 해당기관에서 전담",
-    "2026년 09월 18일",
-    "토스페이먼츠",
-    "대상연령 : 전체"
-   ],
-   "detailsV": 3,
+   "detailsV": 4,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-13",
+   "excerptsAt": "2026-10-16",
    "school": "",
    "campus": "",
    "host": "창업진흥원 K-Startup",
@@ -1741,7 +1717,8 @@
    "school": "",
    "campus": "",
    "host": "인천유스톡톡 청년포털",
-   "foundAt": "2026-10-13"
+   "foundAt": "2026-10-13",
+   "detailsTriedAt": "2026-10-16"
   },
   {
    "title": "Applications Now Open: 2026 OASIS-6 Global Startup Challenge 「2026 외국인 창업대전(OASIS-6)」 참가자 모집",
@@ -1785,8 +1762,8 @@
     "ㅇ 이미 사업화된 아이템",
     "※ 세부 기준은 첨부 모집공고 참조"
    ],
-   "detailsV": 3,
-   "excerptsAt": "2026-10-13",
+   "detailsV": 4,
+   "excerptsAt": "2026-10-16",
    "school": "",
    "campus": "",
    "host": "창업진흥원 K-Startup",
@@ -1803,9 +1780,9 @@
     }
    ],
    "deadlineHint": null,
-   "detailsV": 3,
+   "detailsV": 4,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-13",
+   "excerptsAt": "2026-10-16",
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-10-13"
@@ -1831,9 +1808,9 @@
     "신청기한 : 플로깅 진행 1주전 화요일 9시부터 , (예) 9월15일(화) 신청, 9월8일(화) 오전 9시 선착순 신청",
     "신청방법 : https://forms.gle/CEFcHny5kGorRAfe8"
    ],
-   "detailsV": 3,
+   "detailsV": 4,
    "field": "봉사",
-   "excerptsAt": "2026-10-13",
+   "excerptsAt": "2026-10-16",
    "school": "동국대학교 WISE캠퍼스",
    "campus": "",
    "foundAt": "2026-10-13",
