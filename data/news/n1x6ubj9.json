@@ -1,7 +1,39 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-10-15",
+ "updatedAt": "2026-10-16",
  "items": [
+  {
+   "title": "[인사캠] 2026년 11월 체력증진센터(경영관, 600주년기념관) 회원모집 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140568&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-16",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-16",
+   "desc": "성균관대학교 인문사회과학캠퍼스 체력증진센터 2026년 11월 회원을 아래와 같이 모집하오니 교내 구성원 여러분들의 많은 이용 바랍니다. Ⅰ. 등록 기준일 - 2026년 11월 1일(일) Ⅱ. 모집 안내"
+  },
+  {
+   "title": "2027학년도 1학기(1차) 의료 인공지능 융합 교육과정 이수제(Track B) 학부생 모집 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140614&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-16",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-16",
+   "thumb": "data/news/img/5a0f9c5e6b41c1f0.webp",
+   "desc": "- 학부생 연구학점(필수학생연구, 약학연구)을 포함하여 Track A(의료인공지능 마이크로디그리) 과목 및 Track B 지정 교과목 중 12학점 이상 이수"
+  },
+  {
+   "title": "2027학년도 1학기(1차) 의료 인공지능 마이크로디그리 학부생 모집 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140613&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-16",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-16",
+   "thumb": "data/news/img/1274661b29fac9d9.webp",
+   "desc": "의료인공지능융합인재양성사업단 의료 인공지능 마이크로디그리와 관련하여 다음과 같이 안내드리오니 확인하시어 많은 신청 바랍니다."
+  },
   {
    "title": "삼성서울병원 암환자삶의질연구소 대학생/대학원생/대학교원 자원봉사 모집",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140606&article.offset=0&articleLimit=10",
@@ -389,7 +421,7 @@
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-10-06",
-   "desc": "최종 수정일 : 2026.10.06 첨부파일 ( 1 ) 게시글 내용 성균관대학교 정보통신대학 전자전기공학부 사무실 행정인력을 아래와 같이 모집하오니 많은 관심과 지원을 바랍니다.",
+   "desc": "성균관대학교 정보통신대학 전자전기공학부 사무실 행정인력을 아래와 같이 모집하오니 많은 관심과 지원을 바랍니다.",
    "src": "45ec8fd1"
   },
   {
@@ -400,35 +432,8 @@
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-10-06",
-   "thumb": "data/news/img/53cf74089c4bcd95.webp"
-  },
-  {
-   "title": "성균관대학교 학생성공센터행정실 촉탁직원 채용 공고",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140352&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-06",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-06",
-   "src": "45ec8fd1"
-  },
-  {
-   "title": "[연장공지] 사회과학대학 행정조교(휴먼사이언스사회융합전공) 모집[~10.12.(월) 16:00까지, 조기채용시 마감 예정]",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=139593&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-06",
-   "kind": "학사",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-06"
-  },
-  {
-   "title": "[공학교육혁신센터] 2026 공학페스티벌 공대생 심사위원단 모집 안내(~10.21(수)까지)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140377&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-06",
-   "kind": "행사",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-06"
+   "thumb": "data/news/img/53cf74089c4bcd95.webp",
+   "desc": "안녕하세요, 성균관대 학군단입니다. 학군단에서는 ‘26년 학군단 비전 토크 콘서트와 더불어 육사 군악대 특별공연을 준비 하였으니 많은 참여 바랍니다."
   }
  ]
 }

@@ -1,6 +1,6 @@
 {
  "school": "서울시립대학교",
- "updatedAt": "2026-10-15",
+ "updatedAt": "2026-10-16",
  "items": [
   {
    "title": "[대학일자리플러스센터] 2026년 실전면접준비반 프로그램 안내",
@@ -390,7 +390,8 @@
    "campus": "",
    "foundAt": "2026-10-02",
    "postId": "31587",
-   "thumb": "data/news/img/a1bf1a8e0082305f.webp"
+   "thumb": "data/news/img/a1bf1a8e0082305f.webp",
+   "desc": "원클릭 자동화부터 실시간 대시보드 구축까지! 구글코리아와 고용노동부가 함께하는 청년 AI 역량 강화 프로그램, Gemini Academy 워크숍에서 여러분의 AI 역량을 레벨업하세요! 🚀"
   },
   {
    "title": "📢[10월 월간AI] 생성형AI 활용 실무자를 위한 파이썬 과정 접수",
@@ -412,7 +413,8 @@
    "foundAt": "2026-10-02",
    "postId": "31537",
    "thumb": "data/news/img/386d66d3cf6d35c2.webp",
-   "src": "80d7d3bc"
+   "src": "80d7d3bc",
+   "desc": "인재개발실 *서울시립대 재학생 및 34세 이하 지역청년만 신청가능, 34세 이상 미승인 처리 #대학일자리플러스센터 #DX 역량 강화 #디지털 협업툴"
   },
   {
    "title": "📢300개 탈잉 강좌 목록 본문 공개🎁5천원 커피쿠폰🎁네이버포인트 3만원 이벤트 [직무 역량 레벨업] Track1, Track2",
@@ -422,7 +424,8 @@
    "campus": "",
    "foundAt": "2026-10-02",
    "postId": "31347",
-   "thumb": "data/news/img/d9d25cdb7112dbf9.webp"
+   "thumb": "data/news/img/d9d25cdb7112dbf9.webp",
+   "desc": "인재개발실 #대학일자리플러스센터 #직무 역량 레벨업"
   },
   {
    "title": "📌[월간AI] 9월 생성형 AI 활용 실무자를 위한 SQL📌 과정",
@@ -432,7 +435,8 @@
    "campus": "",
    "foundAt": "2026-10-02",
    "postId": "31394",
-   "thumb": "data/news/img/3a4d28e5287233b8.webp"
+   "thumb": "data/news/img/3a4d28e5287233b8.webp",
+   "desc": "인재개발실 #대학일자리플러스센터 #취업역량개발팀"
   },
   {
    "title": "✨기간연장✨[인공지능혁신융합대학사업단]「AICOSS Career Compass 2026」진로준비 실태조사(선착순 마감,🎁참여자 기프티콘 증정🎁)",
@@ -442,7 +446,8 @@
    "campus": "",
    "foundAt": "2026-10-02",
    "postId": "31462",
-   "thumb": "data/news/img/c441b876e985d563.webp"
+   "thumb": "data/news/img/c441b876e985d563.webp",
+   "desc": "2. 참여대상: 인공지능혁신융합대학사업단 참여학과 재학생(1~4학년) ※ 참여학과 : 인공지능학과 , 컴퓨터과학부 , 전자전기컴퓨터공학부 , 화학공학과 , 기계정보공학과 , 신소재공학과 , 토목공학과, 교통공학과,…"
   }
  ]
 }

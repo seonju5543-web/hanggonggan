@@ -1,7 +1,18 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-10-15",
+ "updatedAt": "2026-10-16",
  "items": [
+  {
+   "title": "[일반] 기간제 계약직원 채용 공고(정보통신처 통신운영팀)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53495&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-16",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-16",
+   "desc": "기간제 계약직원 모집 공고 1. 지원 자격 및 우대사항 모집인원 담당업무 PC실습실 및 행정부서 정보화기자재 관리 등 지원 자격"
+  },
   {
    "title": "[외부] [대한민국국회] 2026 국회 입법 박람회 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53493&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -379,7 +390,8 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "src": "b09cb042"
+   "src": "b09cb042",
+   "desc": "KW-IPP 공동훈련센터에서는 2027 학년도 일학습병행 신청과 관련하여 다음과 같이 안내하오니 학생들의 많은 참여 바랍니다 . 일학습병행 제도안내 * 현장 실무 기반 학습을 한국 현실에 맞게 설계한 “ 현장기반…"
   },
   {
    "title": "[외부] [서울특별시] 청년미래센터 자기돌봄비 지원사업 안내",
@@ -388,7 +400,8 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "thumb": "data/news/img/29fa980137dd083c.webp"
+   "thumb": "data/news/img/29fa980137dd083c.webp",
+   "desc": "ㅇ 지원대상 : 서울시 거주 만 13~34 세 가족돌봄청소년 · 청년 140 명"
   },
   {
    "title": "[일반] [창업] 2026년 강북창업지원센터 하반기 신규 입주기업 모집",
@@ -397,7 +410,8 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/21087c754c1814b5.webp"
+   "thumb": "data/news/img/21087c754c1814b5.webp",
+   "desc": "예비창업자와 우수 창업기업을 위한 창업 보육 지원과 경쟁력 강화를 위해 서울특별시 강북구가 건립하고 광운대학교 산학협력단이 위탁 운영하는 강북창업지원센터에 입주할 기업을 모집하오니 역량 있는 (예비)창업자의 많은…"
   },
   {
    "title": "[일반] [한국지능정보사회진흥원] 「모두의 AI 실험실」 온라인 플랫폼 안내",
@@ -415,16 +429,8 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/f338875c3c00e34a.webp"
-  },
-  {
-   "title": "[일반] [고려사이버대학교] '창업자를 위한 알기 쉬운 스타트업 설립과 운영' 수강 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53409&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-09-30",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/58f721d189b5c331.webp"
+   "thumb": "data/news/img/f338875c3c00e34a.webp",
+   "desc": "❏ 장소 : 광운대학교 80주년기념관 301호, 306호 310호"
   }
  ]
 }

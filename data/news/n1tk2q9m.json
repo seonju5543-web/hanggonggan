@@ -1,7 +1,69 @@
 {
  "school": "이화여자대학교",
- "updatedAt": "2026-10-15",
+ "updatedAt": "2026-10-16",
  "items": [
+  {
+   "title": "[기계/일반경쟁][교내연구비]장선복교수/레이저형광이미지분석기 및 PC본체 1세트 구입",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367437&article.offset=0&articleLimit=10&no=376",
+   "postedAt": "2026-10-16",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-16",
+   "desc": "(상세 사양 및 수량 관련 첨부된 규격사양서 확인 必) 바. 납품기간: 발주 후 4주 이내 납품 및 검수 완료(2026년 12월 31일 이전 납품 및 검수 완료)"
+  },
+  {
+   "title": "[다문화연구소] 마다가스카르, 제36회 상호문화대화(Intercultural Dialogue) 개최 / 10월 27일(화) 포스코관 B151호",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367436&article.offset=0&articleLimit=10&no=375",
+   "postedAt": "2026-10-16",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-16",
+   "thumb": "data/news/img/4b2a8a9e4fee004c.webp",
+   "desc": "상호문화대화는 이화여자대학교 다문화연구소와 국제처가 공동으로 주최하고 있습니다. 상호문화대화 는 민족적, 문화적, 언어적 배경이 다른 개인들이나 집단들이 상호 이해와 존중을 바탕으로 개방적이고 예의 바른 의견…"
+  },
+  {
+   "title": "[밀알학교] “한마음 등산 DAY” 행사 지원 인력 신청 안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367432&article.offset=0&articleLimit=10&no=371",
+   "postedAt": "2026-10-15",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-16",
+   "desc": "밀알학교에서 학교교육과정과 연계하여 재학생의 기초체력 형성 및 지역사회 적응을 위한 \"한마음 등산 DAY\" 행사 지원 인력을 모집하오니, 관심있는 학생은 아래 내용을 확인하여 지원하시기 바랍니다."
+  },
+  {
+   "title": "이화 창립 140주년 기념 명예박사학위 수여식 참석 신청 기한 연장(~ 10. 29.(목))",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367428&article.offset=0&articleLimit=10&no=369",
+   "postedAt": "2026-10-15",
+   "kind": "학사",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-16",
+   "desc": "신청방법: 지능형학생지원시스템 E-벗 > 미래설계 > 비교과활동 > 대내비교과 > 검색창에 '명예박사학위' 검색 > 프로그램명 '이화 창립 140주년 기념 명예박사학위 수여식 참석 신청' 클릭 *원활한 행사 진행을…"
+  },
+  {
+   "title": "[안전팀] 본교 구성원 대상 심폐소생술 집체교육 신청 안내(26.10.20.(화))(재공지)",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367411&article.offset=0&articleLimit=10&no=368",
+   "postedAt": "2026-10-15",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-16",
+   "desc": "관리처 안전팀에서는 본교 구성원의 위험상황에 대비하여 심폐소생술교육을 실시하고자 하오니 구성원 여러분들의 많은 관심 부탁드립니다."
+  },
+  {
+   "title": "[학생지원팀] 2026-2학기 든든한 이화사랑 행사 아르바이트 모집(~10/16)",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367406&article.offset=0&articleLimit=10&no=367",
+   "postedAt": "2026-10-15",
+   "kind": "채용",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-16"
+  },
   {
    "title": "2026학년도 제2학기 학부 및 각 대학원 중간수강소감(중간강의평가) 설문 실시 안내",
    "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367377&article.offset=0&articleLimit=10&no=377",
@@ -10,7 +72,8 @@
    "school": "이화여자대학교",
    "campus": "",
    "src": "ec6597da",
-   "foundAt": "2026-10-15"
+   "foundAt": "2026-10-15",
+   "desc": "※ 2026학년도 제1학기부터 본교 강의평가 명칭이 변경되었습니다(강의평가&rarr;수강소감). 교과목 담당 교원이 수강생들의 의견을 참고하여 수업을 운영할 수 있도록 학생 여러분들의 적극적인 참여를 부탁 드립니다."
   },
   {
    "title": "[교육기획팀] 2026 AI4AE DAY 참가 신청 안내 (11. 6.(금))",
@@ -54,48 +117,6 @@
    "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367123&article.offset=0&articleLimit=10&no=377",
    "postedAt": "2026-09-28",
    "kind": "학사",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-15"
-  },
-  {
-   "title": "[밀알학교] “한마음 등산 DAY” 행사 지원 인력 신청 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367432&article.offset=0&articleLimit=10&no=373",
-   "postedAt": "2026-10-15",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-15",
-   "desc": "밀알학교에서 학교교육과정과 연계하여 재학생의 기초체력 형성 및 지역사회 적응을 위한 \"한마음 등산 DAY\" 행사 지원 인력을 모집하오니, 관심있는 학생은 아래 내용을 확인하여 지원하시기 바랍니다."
-  },
-  {
-   "title": "이화 창립 140주년 기념 명예박사학위 수여식 참석 신청 기한 연장(~ 10. 29.(목))",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367428&article.offset=0&articleLimit=10&no=371",
-   "postedAt": "2026-10-15",
-   "kind": "학사",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-15",
-   "thumb": "data/news/img/1b5cc2cdaa19089c.webp",
-   "desc": "신청방법: 지능형학생지원시스템 E-벗 > 미래설계 > 비교과활동 > 대내비교과 > 검색창에 '명예박사학위' 검색 > 프로그램명 '이화 창립 140주년 기념 명예박사학위 수여식 참석 신청' 클릭 *원활한 행사 진행을…"
-  },
-  {
-   "title": "[안전팀] 본교 구성원 대상 심폐소생술 집체교육 신청 안내(26.10.20.(화))(재공지)",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367411&article.offset=0&articleLimit=10&no=370",
-   "postedAt": "2026-10-15",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-15",
-   "desc": "관리처 안전팀에서는 본교 구성원의 위험상황에 대비하여 심폐소생술교육을 실시하고자 하오니 구성원 여러분들의 많은 관심 부탁드립니다."
-  },
-  {
-   "title": "[학생지원팀] 2026-2학기 든든한 이화사랑 행사 아르바이트 모집(~10/16)",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367406&article.offset=0&articleLimit=10&no=369",
-   "postedAt": "2026-10-15",
-   "kind": "채용",
    "school": "이화여자대학교",
    "campus": "",
    "src": "ec6597da",
@@ -180,7 +201,8 @@
    "school": "이화여자대학교",
    "campus": "",
    "src": "ec6597da",
-   "foundAt": "2026-10-15"
+   "foundAt": "2026-10-15",
+   "desc": "신산업융합대학행정실에서 성실하고 책임감 있는 자세로 함께 근무할 계약 직원을 모집하오니 많은 지원 바랍니다."
   },
   {
    "title": "이화여자대학교 연구윤리센터 특임교수 채용 공고",
@@ -374,25 +396,6 @@
    "school": "이화여자대학교",
    "campus": "",
    "foundAt": "2026-10-11"
-  },
-  {
-   "title": "[기계/일반경쟁]뇌융합과학연구원/데이타저장장치 1세트 구입",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367309&article.offset=0&articleLimit=10&no=359",
-   "postedAt": "2026-10-08",
-   "school": "이화여자대학교",
-   "campus": "",
-   "foundAt": "2026-10-11",
-   "desc": "나. 입찰서류제출 마감일시 및 장소: 2026년 10월 15일(목) 11:00, 이비즈포유(ebiz4u.co.kr)"
-  },
-  {
-   "title": "[채용] 이화여자대학교 교육∙연구혁신단 미래혁신센터 계약직 연구원(육아휴직대체) 모집: ~ 10.14.(수) 낮 12시 마감",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367308&article.offset=0&articleLimit=10&no=358",
-   "postedAt": "2026-10-08",
-   "kind": "채용",
-   "school": "이화여자대학교",
-   "campus": "",
-   "foundAt": "2026-10-11",
-   "desc": "작성처 미래혁신센터 이화여자대학교 교육∙연구혁신단 미래혁신센터에서 대학혁신지원사업 업무를 수행할 계약직 연구원(육아휴직대체)을 다음과 같이 모집하오니 관심 있는 분들의 많은 지원 바랍니다."
   }
  ]
 }
