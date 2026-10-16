@@ -97,6 +97,13 @@ const TEMPLATE_NAME = /'\s*\+|\+\s*'|fileItem\.|\$\{/;
 /** 공고 상세 HTML 에서 첨부 {name, url} — 일반 수집기(collect.mjs fetchDetail)가 쓴다.
     🔴 ① `href="…"` 와 `href='…'` 를 따옴표 짝으로 읽는다 — `[^"']*` 로 읽으면 `javascript:downloadfile(` 에서 끊겼다(22건)
     ② HTML 주석을 먼저 걷는다 — 화면에 없는 옛 첨부가 주워졌다 ③ 스크립트 호출은 resolveJsDownload 로 진짜 주소로 */
+/* 첨부 이름 끝·앞의 **아이콘 글자**를 뗀다 — 머티리얼 아이콘은 글자(ligature)로 그려져 링크 글에 `선발공고문.pdf chevron_forward` 처럼 붙어 온다
+   (2026-10-17 · 강원대: 그 꼬리 때문에 확장자 검사(`\.pdf$`)가 안 맞아 PDF 공고문 3개가 첨부로 인식되지 않았고 포스터 그림만 받혔다).
+   두 길(HTML 상세 · 브라우저 링크)이 같이 쓴다. */
+/* 소문자만 — 아이콘 글자(ligature)는 늘 소문자고, 이름 속 `Download Guide` 같은 보통 낱말은 대문자로 시작한다 */
+const ICON_WORDS = /(?:^|\s)(?:chevron_(?:forward|right|left)|file_download|download|attach_file|attachment|open_in_new|description|insert_drive_file|save_alt|arrow_(?:forward|downward|right))(?=\s|$)/g;
+export const cleanAttachName = (name) => String(name || '').replace(ICON_WORDS, ' ').replace(/\s+/g, ' ').trim();
+
 export function detailAttachments(html, pageUrl, { decode = (s) => s, max = 8 } = {}) {
   const src = String(html || '').replace(/<!--[\s\S]*?-->/g, ' ');
   const out = new Map();
@@ -109,7 +116,7 @@ export function detailAttachments(html, pageUrl, { decode = (s) => s, max = 8 } 
     const oc = (m[1] + m[4]).match(/\bonclick\s*=\s*(?:"([^"]*)"|'([^']*)')/i);
     if ((!raw || JS_NOT_DOWNLOAD.test(raw)) && oc) raw = `javascript:${decode(oc[1] ?? oc[2] ?? '').trim()}`;
     if (!raw || raw.startsWith('#') || JS_NOT_DOWNLOAD.test(raw)) continue;
-    let name = m[5].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    let name = cleanAttachName(m[5].replace(/<[^>]+>/g, ' '));
     let url = /^javascript:/i.test(raw) ? resolveJsDownload(raw, pageUrl) || raw : null;
     if (!url) { try { url = new URL(raw, pageUrl).href; } catch { continue; } }
     /* 단추 글자(`다운로드`)뿐이면 파일 이름은 바로 앞 요소에 있다 — 태그를 줄로 바꿔 마지막 파일 이름 줄을 쓴다(지어내지 않는다 · 없으면 그대로) */
@@ -128,6 +135,7 @@ export function detailAttachments(html, pageUrl, { decode = (s) => s, max = 8 } 
     화면에 그려진 링크라 주석 문제는 없다. 스크립트 호출만 진짜 주소로 바꾼다(resolveJsDownload). */
 export function linkAttachments(links, pageUrl, max = 6) {
   return (links || [])
+    .map((l) => ({ ...l, title: cleanAttachName(l.title) }))
     .map((l) => (/^javascript:/i.test(l.url || '') ? { ...l, url: resolveJsDownload(l.url, pageUrl) || l.url } : l))
     .filter((l) => !JS_NOT_DOWNLOAD.test(l.url || ''))
     .filter((l) => ATTACH_EXT.test(l.url) || /download|fileDown/i.test(l.url))

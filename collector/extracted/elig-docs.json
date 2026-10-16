@@ -212,9 +212,10 @@
   "slug": "1o1955",
   "files": [
    "elig-1o1955-1.png",
-   "elig-1o1955-2.png"
+   "elig-1o1955-2.png",
+   "elig-1o1955-3.pdf"
   ],
-  "at": "2026-10-04"
+  "at": "2026-10-17"
  },
  "auto-84a0ebb09c20eab3b5eab3a0": {
   "slug": "1lm9up",
@@ -719,9 +720,11 @@
  "auto-archgbn0searchordersort0-0i8hia4": {
   "slug": "167klr",
   "files": [
-   "elig-167klr-1.jpg"
+   "elig-167klr-1.jpg",
+   "elig-167klr-2.pdf",
+   "elig-167klr-3.pdf"
   ],
-  "at": "2026-10-14"
+  "at": "2026-10-17"
  },
  "auto-archgbn0searchordersort0-0tglbr1": {
   "slug": "m8pch2",
@@ -875,5 +878,14 @@
    "elig-q641o0-1.docx"
   ],
   "at": "2026-10-16"
+ },
+ "reg-hi-jeju": {
+  "slug": "11xj8n",
+  "files": [
+   "elig-11xj8n-1-1.pdf",
+   "elig-11xj8n-1-2.pdf",
+   "elig-11xj8n-1-3.pdf"
+  ],
+  "at": "2026-10-17"
  }
 }

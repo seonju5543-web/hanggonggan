@@ -251,7 +251,13 @@ for (const sch of hits) {
 
   const listLines = ME.requirementLines(sch, null);                    // 목록 카드 — 5줄 상한
   const allLines = ME.requirementLines(sch, null, { all: true });      // 상세 시트 — 전부
-  const exLines = ME.requirementLines(sch, [...(sch.eligibilityExcludes || []), ...(sch.eligibilityLines || [])], { onlyExclude: true });
+  /* 앱(eligibilityRowsHtml · 2026-10-15)과 같이 **두 목록을 따로** 거르고 자격 블록에 이미 보인 줄은 뺀다 — 이어 붙이면 제외 목록의 머리말
+     (`지원 불가 대상:`)이 뒤따르는 자격 줄을 제외 절로 끌어들여 이 도구만 자격 1줄을 '제외'로 보고했다(2026-10-17 미래에셋 해외교환 실측) */
+  const shownReq = new Set(allLines);
+  const exLines = [...new Set([
+    ...ME.requirementLines(sch, sch.eligibilityExcludes || [], { onlyExclude: true }),
+    ...ME.requirementLines(sch, sch.eligibilityLines || [], { onlyExclude: true }),
+  ])].filter((t) => !shownReq.has(t));
 
   console.log(`\n■ ${sch.name || sch.id}`);
   /* 🔴 **카드에 실제로 찍히는 두 줄**을 앱 함수 그대로 보여 준다 (2026-09-21 코드 리뷰가 잡았다).

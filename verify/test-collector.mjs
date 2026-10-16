@@ -4716,8 +4716,9 @@ console.log('\n■ AI 자격 읽기 안전장치 (2026-08-20)');
   eq('    PNG 가 아니라 JPEG 로 내보낸다 (PNG 는 포스터에서 몇 배로 부푼다)', /\.jpeg\(\{ quality/.test(src), true);
   const wf = readText(new URL('../.github/workflows/eligibility-fill.yml', import.meta.url));
   eq('      줄이는 도구가 워크플로에 설치된다', /npm i @anthropic-ai\/sdk sharp/.test(wf), true);
-  const dfx = readText(new URL('../collector/deepfetch.mjs', import.meta.url));
-  eq('  본문 그림도 내려받는다 (이름 규칙에는 안 걸린다)', /a\.bodyImage && IMG_EXT\.test/.test(dfx), true);
+  /* 고르기는 elig-targets.mjs pickDocAttachments 한 곳(2026-10-17) — 그림은 공고문류 뒤에 */
+  const etx = readText(new URL('../collector/elig-targets.mjs', import.meta.url));
+  eq('  본문 그림도 내려받는다 (이름 규칙에는 안 걸린다)', /a\.bodyImage && IMG_EXT\.test/.test(etx), true);
 
   /* 2026-08-23 — 자격을 **구조로** 읽는 경로. 종단추천장학처럼 원문이 표인 공고에서
      '공통 / 둘 중 하나 / 성적'이 평평해지면 학생이 뜻을 정반대로 읽는다(설계 문서 참조). */
@@ -4790,7 +4791,9 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
      그건 안 받을 이유가 아니라 받아 보고 안 되면 버릴 이유였다 — 못 읽는 PDF는
      readable()이 조용히 거른다. 안 받으면 그 공고는 영영 자격을 못 읽는다. */
   const df = readText(new URL('../collector/deepfetch.mjs', import.meta.url));
-  eq('자격용 공고문 첨부에 PDF가 들어간다', /OK_EXT = \/\\\.\(hwp\|hwpx\|docx\?\|pdf\)/.test(df), true);
+  const etSrc = readText(new URL('../collector/elig-targets.mjs', import.meta.url));
+  /* 받는 목록은 elig-targets.mjs DOC_EXT·IMG_EXT 한 곳(2026-10-17) — deepfetch 의 두 자리가 pickDocAttachments 로 그것을 쓴다 */
+  eq('자격용 공고문 첨부에 PDF가 들어간다', /DOC_EXT = \/\\\.\([^)]*pdf[^)]*\)/.test(etSrc), true);
   /* 🔴 **목록이 갈라지면 파일이 `.bin`으로 저장돼 아무도 못 읽는다.**
      받을 대상(OK_EXT·IMG_EXT)에만 넣고 파일 확장자를 정하는 쪽을 안 고치면,
      내려받은 것이 전부 `.bin`이 된다 — attachmentText()·AI 경로 둘 다 확장자로
@@ -4800,15 +4803,90 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
   /* ⚠️ **자격 함수 안만 본다.** `const ext = (a.name.match(…))` 는 양식 내려받기 쪽에도
      같은 이름으로 있어서, 파일 전체에서 찾으면 엉뚱한 줄을 잰다(실제로 그랬다). */
   const eligFn = df.slice(df.indexOf('async function downloadEligDocs'));
-  const extsOf = (re) => (eligFn.match(re) || [, ''])[1].split('|')
+  const extsOf = (src, re) => (src.match(re) || [, ''])[1].split('|')
     .map((x) => x.replace('?', '').replace(/[()]/g, '')).filter(Boolean);
   const wanted = [...new Set([
-    ...extsOf(/OK_EXT = \/\\\.\(([^)]+)\)\$\/i/),
-    ...extsOf(/IMG_EXT = \/\\\.\(([^)]+)\)\$\/i/),
+    ...extsOf(etSrc, /DOC_EXT = \/\\\.\(([^)]+)\)\$\/i/),
+    ...extsOf(etSrc, /IMG_EXT = \/\\\.\(([^)]+)\)\$\/i/),
   ])];
-  const mapping = extsOf(/const ext = \(a\.name\.match\(\/\\\.\(([^)]+)\)\$\/i\)/);
+  const mapping = extsOf(eligFn, /const ext = \(a\.name\.match\(\/\\\.\(([^)]+)\)\$\/i\)/);
   const gap = wanted.filter((e) => !mapping.includes(e));
   eq(`받는 확장자 ${wanted.length}종이 모두 파일 이름 규칙에 있다`, gap.join(',') || '(없음)', '(없음)');
+  eq('  deepfetch 의 두 자리(자격용·밀린 첨부)가 pickDocAttachments 를 쓴다 · 직접 거르는 OK_EXT 는 없다',
+    (eligFn.match(/pickDocAttachments\(it\.attachments/g) || []).length === 2 && !/OK_EXT\.test/.test(eligFn), true);
+  /* 🔴 공고문류가 본문 그림보다 먼저 (2026-10-17 · 미래에셋 해외교환: 경희대 본문 그림 5장이 앞에 있어 상한 2개가 그림으로 차고 「선발 요강.pdf」는
+     한 번도 받히지 않았다 — 자격은 그 PDF 에만 있었다). zip 묶음도 받는다(홍익대 제주 미래이음 — 공고문이 zip 안에만). */
+  {
+    const { pickDocAttachments } = await import(new URL('../collector/elig-targets.mjs', import.meta.url));
+    const { isNoticeDoc, zipNoticeDocs, readableDoc, attachmentText: attText } = await import(new URL('../collector/attachment-text.mjs', import.meta.url));
+    const atts = [
+      { name: '본문이미지-527x735.png', url: 'i1', bodyImage: true }, { name: '본문이미지-544x728.png', url: 'i2', bodyImage: true },
+      { name: '본문이미지-530x771.png', url: 'i3', bodyImage: true },
+      { name: '붙임1.(공고) 제36기 해외교환 장학생 선발 요강.pdf', url: 'p1' }, { name: '붙임2.(별첨) 개인정보 제공 동의서.pdf', url: 'p2' },
+      { name: '(붙임1) 2026년 미래이음 장학금 신청 제출(구비) 서류-재공고.zip', url: 'z1' },
+    ];
+    eq('첨부 고르기: 공고문 PDF·zip 묶음이 본문 그림보다 먼저 · 동의서는 뺀다 · 상한 2',
+      pickDocAttachments(atts, { max: 2, isNoticeDoc }).map((a) => a.url), ['p1', 'z1']);
+    eq('  밀린 첨부 자리(그림 제외 · 상한 3)', pickDocAttachments(atts, { max: 3, images: false, isNoticeDoc }).map((a) => a.url), ['p1', 'z1']);
+    eq('  공고문류가 없으면 그림이 남는다', pickDocAttachments(atts.slice(0, 3), { max: 2, isNoticeDoc }).map((a) => a.url), ['i1', 'i2']);
+    /* zip 안 읽기 — 저장(method 0) zip 을 손으로 만든다(UTF-8 이름 깃발 0x800). 동의서·환산표는 빠지고 공고문이 먼저 */
+    const makeZip = (entries) => {
+      const locals = [], centrals = []; let off = 0;
+      for (const [name, data] of entries) {
+        const n = Buffer.from(name, 'utf8'); const crc = 0;
+        const lh = Buffer.alloc(30); lh.writeUInt32LE(0x04034b50, 0); lh.writeUInt16LE(0x800, 6); lh.writeUInt16LE(0, 8); lh.writeUInt32LE(crc, 14);
+        lh.writeUInt32LE(data.length, 18); lh.writeUInt32LE(data.length, 22); lh.writeUInt16LE(n.length, 26); lh.writeUInt16LE(0, 28);
+        const ch = Buffer.alloc(46); ch.writeUInt32LE(0x02014b50, 0); ch.writeUInt16LE(0x800, 8); ch.writeUInt16LE(0, 10); ch.writeUInt32LE(crc, 16);
+        ch.writeUInt32LE(data.length, 20); ch.writeUInt32LE(data.length, 24); ch.writeUInt16LE(n.length, 28); ch.writeUInt16LE(0, 30); ch.writeUInt16LE(0, 32);
+        ch.writeUInt32LE(off, 42);
+        locals.push(lh, n, data); centrals.push(ch, n); off += 30 + n.length + data.length;
+      }
+      const cd = Buffer.concat(centrals);
+      const end = Buffer.alloc(22); end.writeUInt32LE(0x06054b50, 0); end.writeUInt16LE(entries.length, 8); end.writeUInt16LE(entries.length, 10);
+      end.writeUInt32LE(cd.length, 12); end.writeUInt32LE(off, 16);
+      return Buffer.concat([...locals, cd, end]);
+    };
+    const pad = (s) => Buffer.from(s.padEnd(1200, '.'));
+    const zip = makeZip([
+      ['(참고) 임대차계약 묵시적 갱신 관련 안내-재공고.pdf', pad('%PDF-1.4 안내')],
+      ['(신청서식) 개인정보 제공 동의서-재공고.hwp', pad('HWP 동의서')],
+      ['(붙임2) 성적등급 및 평점평균 환산기준표-재공고.pdf', pad('%PDF-1.4 표')],
+      ['(공고문) 2026년 미래이음 장학금 장학생 선발 계획 재공고.pdf', pad('%PDF-1.4 공고문')],
+      ['작은파일.pdf', Buffer.from('tiny')],
+    ]);
+    eq('  zip 묶음에서 공고문류만 · 공고문이 먼저 · 동의서·환산표·1KB 미만은 뺀다',
+      zipNoticeDocs(zip).map((d) => d.name.split(' ')[0]), ['(공고문)', '(참고)']);
+    eq('  꺼낸 항목은 확장자·내용을 가진다', zipNoticeDocs(zip)[0].ext === 'pdf' && zipNoticeDocs(zip)[0].buf.toString().startsWith('%PDF-1.4 공고문'), true);
+    /* OCR 포스터 — 이름표 뒤 콜론 · 낮은 문턱 (2026-10-17 · 강원대 청년창업어업인 포스터 한글 150자가 300자 문턱에 버려졌고 콜론이 없어 이름표도 못 봤다) */
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ocr-doc-'));
+    const poster = path.join(dir, 'elig-x-1.jpg');
+    fs.writeFileSync(poster, 'jpg');
+    fs.writeFileSync(poster + '.ocr.txt', ['청년 창업어업인 장학금', '선발인원 10명 내외', '신청대상 대한민국 국적자로 수산관련대학에 재학중인 1학년 2학기 ~,',
+      '만 40세 미만 학생', '지원금액 매학기 등록금 전액 +학업장려금 200만원', '신청방법 한국농어촌희망재단 홈페이지에서 신청', '대학생 누구나 환영합니다'].join('\n'));
+    const got = attText(poster);
+    eq('  OCR 글자의 줄 머리 이름표 뒤에 콜론이 붙는다 (신청대상 · 지원금액 · 신청방법)',
+      /^신청대상 : 대한민국/m.test(got) && /^지원금액 : 매학기/m.test(got) && /^신청방법 : 한국/m.test(got), true);
+    eq('  본문 가운데 낱말은 안 건드린다', /대학생 누구나 환영합니다/.test(got) && !/만 40세 미만 : /.test(got), true);
+    eq('  OCR 첨부는 한글 80자면 읽을 만하다 · OCR 아닌 첨부는 300자 그대로',
+      [readableDoc(poster, got), readableDoc(path.join(dir, 'elig-x-2.hwp'), got)], [true, false]);
+    const { extractQualifyLines: eql } = await import(new URL('../collector/extract-excerpts.mjs', import.meta.url));
+    eq('  그 포스터에서 자격 줄이 나온다 (금액·신청방법 줄은 아님)',
+      eql(got).filter((l) => /국적자|40세/.test(l)).length === 2 && !eql(got).some((l) => /등록금 전액|홈페이지/.test(l)), true);
+    /* 포스터 옆 칸의 조각(`스마트폰으로`)은 자격 줄이 아니다 — 실제 OCR 결과의 줄 순서 그대로 */
+    const ocr2 = got + '\n스마트폰으로\n바로 신청 가능!';
+    eq('  홀로 선 조사 조각(스마트폰으로)은 안 담는다', eql(ocr2.replace('신청방법 : 한국농어촌희망재단 홈페이지에서 신청\n', '')).some((l) => /^스마트폰으로$/.test(l)), false);
+    fs.rmSync(dir, { recursive: true, force: true });
+    /* 🔴 납작해진 표·분야별 표는 자격이 아니다 (2026-10-17 · 울산연구원 하반기 HWP 실측 두 모양 — 전엔 14칸이 통째로 자격이 됐고, 칸을 걸러내자
+       이번엔 우수장학금 한 분야의 「성적 4.0/4.5 이상」 이 공고 전체 요건이 됐다. 틀린 미달은 못 받는 것보다 나쁘다 → 둘 다 비운다) */
+    const flat = ['□ 선발개요', '지원대상', '신청 대상', '직접 온라인', '신청 후 서류제출', '다자녀장학금', '120백만원', '1,500천원', '생활장학금', '61백만원',
+      '초‧중‧고등학생, 대학생', '10백만원'].join('\n');
+    eq('  납작해진 표(짧은 칸 7할 이상)는 비운다', eql(flat), []);
+    const multi = ['신청자격 및 선발기준', '⁕등록금성', '• 울산시 소재 고등학교 졸업자로 공고일 현재 주민등록상 울산 거주자', '• 직전학기 취득학점이 12학점 이상, 성적이 4.0/4.5 이상인 학생',
+      '※ 선발기준 우선순위', '⁕등록금성', '• 울산시 소재 고등학교 졸업자로 공고일 현재 주민등록상 울산 거주자', '• 부모의 가족관계증명서상 2인 이상의 다자녀 가구',
+      '• 직전학기 취득학점이 12학점 이상, 성적이 3.0/4.5 이상인 학생', '※ 선발기준 우선순위'].join('\n');
+    eq('  같은 줄이 되풀이되는 분야별 표도 비운다', eql(multi), []);
+    eq('  대조군: 보통 자격 절은 그대로', eql(['3. 신청자격', '가. 2026-2학기 학부 재학생', '나. 직전학기 12학점 이상 이수, 평점 3.0 이상인 학생', '다. 울산시 거주자', '4. 제출서류', '가. 성적증명서 1부'].join('\n')).length, 4);
+  }
   /* 🔴 첨부 받기 줄이 돈다 · 금액·마감만 빈 공고도 받는다 (2026-10-05 · UI-12 — 학생 화면 공고 27건이 한 번도 순서가 안 왔다) */
   {
     const ET = await import(new URL('../collector/elig-targets.mjs', import.meta.url));
@@ -4836,7 +4914,7 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
     eq('  자리가 없으면 비어 있다', ET.pickAttachBacklog(items, idx, '2026-10-05', { ...o, max: 0 }), []);
     eq('  deepfetch 가 남는 자리를 이것으로 채운다 · 받는 것은 공고문류만(isNoticeDoc — 빈 신청서를 자격 글자 색인에 넣지 않는다)',
       /pickAttachBacklog\(reg\.items/.test(eligFn) && /max: MAX_NOTICES - eligTargets\.length/.test(eligFn)
-        && /pickAttachBacklog\(reg\.items[\s\S]*?isNoticeDoc\(a\.name\)\)\.slice\(0, 3\)/.test(eligFn), true);
+        && /pickAttachBacklog\(reg\.items[\s\S]*?pickDocAttachments\(it\.attachments, \{ max: 3, images: false, isNoticeDoc \}\)/.test(eligFn), true);
     /* 🔴 PaddleOCR 로 읽은 본문 그림이 **그 공고의 것인가** (2026-10-05 · 개발자 "paddle ocr 붙여") — 장학 제목의 흔한 낱말은 증거가 아니다 */
     const G = await import(new URL('../collector/elig-ocr-guard.mjs', import.meta.url));
     eq('장학 그림 OCR: 제목의 고유한 낱말이 그림에 있으면 그 공고의 것',
@@ -4899,6 +4977,13 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
       AL.linkAttachments([{ title: '공고문.pdf', url: "javascript:dypCommonFn.fileManage.fileDownLoad('FILE_1','0')" },
         { title: '(붙임) 일정.hwp', url: "javascript:alert('현재 작업중입니다.');" }], 'https://www.daejeonyouthportal.kr/board/x').map((a) => a.url),
       ['https://www.daejeonyouthportal.kr/comt/fms/FileDown.do?atchFileId=FILE_1&fileSn=0']);
+    /* 아이콘 글자 꼬리 (2026-10-17 · 강원대 `선발공고문.pdf chevron_forward` — 확장자 검사가 안 맞아 PDF 공고문이 첨부로 인식되지 않았다) · 두 길 모두 */
+    eq('  첨부 이름의 아이콘 글자(chevron_forward·file_download)를 뗀다 — HTML 상세·브라우저 링크 두 길',
+      [AL.cleanAttachName('2026년 2학기 선발공고문.pdf chevron_forward'), AL.cleanAttachName('file_download 요강.hwp'),
+        AL.detailAttachments('<a href="/bbs/750/download.do?f=1">선발공고문.pdf <i>chevron_forward</i></a>', 'https://kangwon.ac.kr/ko/bbs/750/detail.do')[0].name,
+        AL.linkAttachments([{ title: '선발안내.pdf chevron_forward', url: 'https://kangwon.ac.kr/ko/bbs/750/download.do?f=2' }], 'https://kangwon.ac.kr/x')[0].name],
+      ['2026년 2학기 선발공고문.pdf', '요강.hwp', '선발공고문.pdf', '선발안내.pdf']);
+    eq('  이름 가운데의 보통 낱말은 안 건드린다', AL.cleanAttachName('Download Guide 안내문.pdf'), 'Download Guide 안내문.pdf');
     const bc = readText(new URL('../collector/browser-collect.mjs', import.meta.url));
     eq('  브라우저 수집기의 두 길이 모두 linkAttachments 를 쓴다(걸러 내기가 두 벌이 되지 않게)', (bc.match(/linkAttachments\(/g) || []).length, 2);
     const cm = readText(new URL('../collector/collect.mjs', import.meta.url));
@@ -6766,7 +6851,7 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
      영영 '금액 원문 확인'이었다. 자격 발췌기와 **같은 색인(elig-docs)·같은 함수(attachmentText)**
      를 써야 "발췌기는 읽는데 금액 로봇은 못 읽는" 어긋남이 안 생긴다. */
   eq('금액 로봇이 공고문 첨부 색인을 연다', /elig-docs\.json/.test(ex), true);
-  eq('  첨부 글자는 발췌기와 같은 함수로 읽는다', /import \{ attachmentText, readable, docOrder \} from '\.\/attachment-text\.mjs'/.test(ex), true);
+  eq('  첨부 글자는 발췌기와 같은 함수로 읽는다 (readableDoc — OCR 포스터 문턱도 같다)', /import \{ attachmentText, readableDoc, docOrder \} from '\.\/attachment-text\.mjs'/.test(ex), true);
   eq('  본문·AI 줄로 못 읽었을 때만 첨부를 본다', /a\.kind === 'unknown' && hasDocs/.test(ex), true);
   eq('  첨부 금액도 parse-amount 가 정한다', /PA\.amountFrom\(t\.split/.test(ex), true);
 

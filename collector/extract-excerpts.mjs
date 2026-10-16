@@ -32,7 +32,7 @@ const { isExcludeHead: shExclude, headText: shHead, isAmountHead: shAmount } = _
 /* 공고문 첨부에서 글자 뽑기 — 본문이 "붙임 참조"뿐인 공고가 있다.
    🔴 **공고문만** 본다(attachment-text.mjs 첫머리 참조) — 신청서·동의서를 읽으면
    개인정보 수집 항목이 지원 자격 자리에 앉는다(실제로 겪고 되돌린 적이 있다). */
-import { attachmentText, readable, docOrder, isOcrSource } from './attachment-text.mjs';
+import { attachmentText, readableDoc, docOrder, isOcrSource } from './attachment-text.mjs';
 import { findApplyEmail, humanOwnedEmail, staleApplyEmail } from './apply-email.mjs';
 import { decodeEntities } from './clean-title.mjs';
 /* 포털 판정은 `apply-channel.js` 한 곳 — 앱·관리자 화면도 같은 파일을 쓴다(베끼지 말 것).
@@ -57,6 +57,9 @@ const HAS_SUBSTANCE = /\d{1,4}\s*[.\-/년]\s*\d{1,2}|\d{1,2}\s*월\s*\d{1,2}|\d{
 const DANGLING = /(다음|아래|같이|경우|위해|통해|관련|및|또는)\s*[.．]?\s*$/;
 
 const JUNK = /바로가기|사이트맵|SITEMAP|로그인|회원가입|검색어|메뉴|팝업|카드뉴스|이전글|다음글|목록으로|목록보기|첨부파일\s*$|저작권|개인정보처리방침|instagram|facebook/i;
+/* 포스터 OCR 의 홀로 선 조각 — `스마트폰으로`·`QR코드를` 처럼 조사로 끝나는 짧은 한 낱말은 옆 칸 글의 조각이지 요건이 아니다
+   (2026-10-17 · 강원대 청년창업어업인 포스터: 「스마트폰으로 바로 신청 가능!」 안내의 첫 낱말이 자격 줄에 섞였다) */
+const LONE_PARTICLE = /^[가-힣]{2,5}(?:으로|에서|에게|를|을)$/;
 
 function extractFrom(text) {
   if (!text) return [];
@@ -644,7 +647,7 @@ function extractQualifyLines(text, opts = {}) {
         if (body.length <= 20) break;
       }
     }
-    if (JUNK.test(l)) continue;
+    if (JUNK.test(l) || LONE_PARTICLE.test(l.trim())) continue;
     /* 🔴 금액 줄은 자격이 아니다 (2026-10-12 · 카드 분석 조각 2). `3 ) 금 액 : 250 만 원`·`- 장학 금액 : 200 만원 / 인`·`○ 선발규모: 60,000천원`·
        `1학년 100만원` 같은 금액 이름표·표 줄이 자격 블록에 담겨, 화면의 잡음 규칙(REQ_NOISE)에만 기대고 있었다.
        이름표 판정은 section-head isAmountHead 한 곳(화면·감사와 같다) · 표 줄은 AMOUNT_ROW. 끊지 않고 **건너뛴다** —
@@ -660,6 +663,14 @@ function extractQualifyLines(text, opts = {}) {
   }
   // 제목 줄 하나만 남았고 내용이 없으면 쓸모없다
   if (!(out.length >= 1 && out.join('').length >= 10)) return [];
+  /* 🔴 납작해진 표는 자격이 아니다 (2026-10-17 · 울산연구원 하반기 HWP: 표의 칸 「신청 대상 | 직접 온라인 | 다자녀장학금 | 120백만원 | 1,500천원 …」
+     14칸이 통째로 자격 줄이 됐다 — '대학생' 한 낱말이 요건 신호를 통과시켰다). 네 줄 이상인데 7할이 10자 이하면 요건 문장이 아니라 칸들이다 →
+     비우고 다음 후보(점수 순)로 넘긴다. 진짜 요건은 「직전학기 12학점 이상」처럼 10자를 넘는 문장이 대부분이다. */
+  if (out.length >= 4 && out.filter((l) => l.replace(/\s+/g, ' ').trim().length <= 10).length >= out.length * 0.7) return [];
+  /* 🔴 같은 줄이 두 번 나오는 블록은 **분야별 표**다 (같은 울산 HWP: 「신청자격 및 선발기준」 표가 우수·다자녀·생활… 분야마다 `⁕등록금성`·
+     `※ 선발기준 우선순위` 를 되풀이한다). 그 표의 `성적 4.0/4.5 이상` 은 우수장학금 한 분야의 기준이라 공고 전체의 요건으로 보이면
+     다자녀 분야로 갈 수 있는 학생에게 틀린 미달이 붙는다(qualFromDocs 머리말의 실측). 분야를 갈라 담는 구조가 생기기 전엔 비워 둔다. */
+  if (new Set(out.map((l) => l.replace(/\s+/g, ' ').trim())).size < out.length) return [];
   /* 🔴 마지막 관문 — 이 블록이 정말 '누가 받을 수 있나'를 말하고 있는가 (2026-08-20).
      자격 절 제목을 잘못 짚으면(이화 양영재단: '신청방법' 블록을 자격으로 읽었다) 제출서류·
      유의사항 8줄이 통째로 **지원 자격 자리에** 앉는다. 학생은 그걸 요건으로 읽고 자기가
@@ -865,8 +876,9 @@ function docTexts(it) {
   const out = [];
   out.files = [];                       // 글자와 같은 차례의 파일 이름 — 어느 첨부에서 읽었는지 표식에 쓴다
   for (const f of docOrder((eligDocs[it.id] || {}).files)) {   // 원문 글자(HWP)가 OCR 보다 먼저
-    const t = attachmentText(fileURLToPath(new URL(`extracted/${f}`, HERE)));
-    if (readable(t)) { out.push(t); out.files.push(f); }
+    const p = fileURLToPath(new URL(`extracted/${f}`, HERE));
+    const t = attachmentText(p);
+    if (readableDoc(p, t)) { out.push(t); out.files.push(f); }   // OCR 포스터는 문턱이 낮다(attachment-text readableDoc 한 곳)
   }
   return out;
 }
@@ -985,8 +997,9 @@ function qualFromDocs(it) {
      분야별 요건을 제대로 다루려면 절이 아니라 **분야를 갈라 담는 구조**가 먼저 필요하다. */
   qualFromDocs.lastFile = null;
   for (const f of docOrder((eligDocs[it.id] || {}).files)) {   // 원문 글자(HWP)가 OCR 보다 먼저
-    const t = attachmentText(fileURLToPath(new URL(`extracted/${f}`, HERE)));
-    if (!readable(t)) continue;
+    const p = fileURLToPath(new URL(`extracted/${f}`, HERE));
+    const t = attachmentText(p);
+    if (!readableDoc(p, t)) continue;   // OCR 포스터는 문턱이 낮다(attachment-text readableDoc 한 곳 · 2026-10-17 강원대 어업인 포스터)
     const got = extractQualifyLines(t);
     if (got.length) { qualFromDocs.lastFile = f; return got; }
   }

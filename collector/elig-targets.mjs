@@ -9,6 +9,19 @@
      ③ 학생에게 안 보이는 공고(마감 지남·오래됨)는 받지 않는다 — 예산을 살아 있는 공고에 쓴다. */
 export const ELIG_REST_DAYS = 3;
 
+/* 받을 첨부 고르기 **한 곳** — deepfetch 의 자격용·밀린 첨부 두 자리가 같이 쓴다.
+   🔴 공고문류(hwp·hwpx·docx·pdf·zip 묶음 · isNoticeDoc)가 **본문 그림보다 먼저**다 (2026-10-17 · 미래에셋 해외교환: 첨부 7개 중 앞 5개가 경희대
+      본문 그림이라 상한 2개가 그림으로 차고 「선발 요강.pdf」는 한 번도 받히지 않았다 — 자격은 그 PDF 에만 있었다).
+   `images: false` 면 그림은 빼고 공고문류만(밀린 첨부 자리). */
+export const DOC_EXT = /\.(hwp|hwpx|docx?|pdf|zip)$/i;
+export const IMG_EXT = /\.(png|jpe?g|gif|webp)$/i;
+export function pickDocAttachments(atts, { max = 2, images = true, isNoticeDoc } = {}) {
+  const all = (atts || []).filter((a) => a && a.url);
+  const docs = all.filter((a) => !a.bodyImage && DOC_EXT.test(a.name || '') && isNoticeDoc(a.name));
+  const imgs = images ? all.filter((a) => a.bodyImage && IMG_EXT.test(a.name || '')) : [];
+  return [...docs, ...imgs].slice(0, max);
+}
+
 const daysBetween = (a, b) => Math.round((new Date(b + 'T00:00:00') - new Date(a + 'T00:00:00')) / 86400000);
 
 /** 아직 원문에서 읽을 것이 남은 공고인가 — 자격·금액·마감 중 하나라도 비었다 */

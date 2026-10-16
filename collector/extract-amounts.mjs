@@ -23,7 +23,7 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
-import { attachmentText, readable, docOrder } from './attachment-text.mjs';
+import { attachmentText, readableDoc, docOrder } from './attachment-text.mjs';
 /* 🔴 금액 문구(`500만원`)를 만드는 규칙은 **한 곳**이다 — 관리자 화면이 손으로 금액을 적을
    때도 같은 문구가 붙어야 한다(2026-09-17 · F-9 컨펌 2). 여기에 다시 적으면 로봇이 쓴 카드와
    사람이 쓴 카드가 다른 꼴로 뜬다. */
@@ -55,8 +55,9 @@ let eligDocs = {};
 try { eligDocs = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
 function amountFromDocs(it) {
   for (const f of docOrder((eligDocs[it.id] || {}).files)) {   // 원문 글자(HWP)가 OCR 보다 먼저
-    const t = attachmentText(fileURLToPath(new URL(`extracted/${f}`, HERE)));
-    if (!readable(t)) continue;
+    const p = fileURLToPath(new URL(`extracted/${f}`, HERE));
+    const t = attachmentText(p);
+    if (!readableDoc(p, t)) continue;   // OCR 포스터는 문턱이 낮다(attachment-text readableDoc 한 곳 — 발췌기와 같다)
     const got = PA.amountFrom(t.split('\n').map((s) => s.trim()).filter(Boolean));
     if (got.kind !== 'unknown') return got;
   }

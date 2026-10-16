@@ -6,7 +6,7 @@ import { isHtmlPayload } from './attachment-link.mjs';
 /* 요청 머리말은 http-headers.mjs 한 곳에 있다 — 베껴 두면 한쪽만 고쳐져
    "수집기는 받는데 심층 수집은 못 받는" 어긋남이 생긴다 (2026-08-20 신설, 첫머리 주석 참조) */
 import { FETCH_HEADERS } from './http-headers.mjs';
-import { isNoticeDoc } from './attachment-text.mjs';
+import { isNoticeDoc, zipNoticeDocs } from './attachment-text.mjs';
 import { canonUrl, normTitle, indexTexts, sourceFor, needsFetch, fillRetired, fillCounts } from './notice-source.mjs';
 import { makeBudget } from './harvest-budget.mjs';
 
@@ -350,16 +350,14 @@ async function downloadEligDocs() {
      실제로 남은 미확보 공고 중 내용이 PDF 공고문에만 있는 것이 여럿 있었다
      (충북인재평생교육진흥원 `2026년 하반기 장학생 선발 공고문.pdf` 등).
      스캔 PDF(글자가 아예 없는 것)는 여전히 AI 경로의 몫이다. */
-  const OK_EXT = /\.(hwp|hwpx|docx?|pdf)$/i;
+  /* 확장자 목록·고르기는 elig-targets.mjs pickDocAttachments 한 곳(2026-10-17) — zip 묶음도 받아 안의 공고문류를 꺼낸다(아래) */
   /* 🔴 **본문이 그림뿐인 공고**의 그림도 받는다 (2026-08-23).
      `[홍보]` 계열은 글자 없이 포스터만 올려 둔다 — 재수집 로봇이 그런 그림을 찾아
      `bodyImage: true` 로 적어 둔다(가로·세로 300px 이상만). 이름 규칙(isNoticeDoc)에는
      안 걸리므로 여기서 따로 통과시킨다. 무료로는 못 읽지만 AI가 그림째 읽는다.
      실측: 넘기려던 공고 7건 전부에 A4 포스터급 그림이 있었다(최대 5906×8268). */
-  const IMG_EXT = /\.(png|jpe?g|gif|webp)$/i;
-
   /* 고르기는 elig-targets.mjs 한 곳 (2026-10-05 · UI-12) — 줄이 돈다(시도한 날 `at`) · 금액·마감만 빈 공고도 · 안 보이는 공고는 안 받는다 */
-  const { pickEligTargets, pickAttachBacklog } = await import('./elig-targets.mjs');
+  const { pickEligTargets, pickAttachBacklog, pickDocAttachments } = await import('./elig-targets.mjs');
   /* '학생 화면에 아직 있나'는 자격요건 로봇과 같은 판정 한 곳(rescue-plan.mjs closedForStudents — 마감(한국 날짜) 전 · notStale) — 2026-10-05 병합 때
      여기 따로 적혀 있던 같은 식을 이것으로 바꿨다(둘이 갈라지면 한 로봇은 받고 다른 로봇은 안 여는 공고가 생긴다) */
   const { closedForStudents } = await import('./rescue-plan.mjs');
@@ -368,8 +366,8 @@ async function downloadEligDocs() {
   let index = {};
   try { index = JSON.parse(fs.readFileSync(idxPath, 'utf8')); } catch { /* 첫 실행 */ }
   const live = (it) => !closedForStudents(it, today);
-  const docAtts = (it) => (it.attachments || []).filter((a) => a.url && (
-    (OK_EXT.test(a.name || '') && isNoticeDoc(a.name)) || (a.bodyImage && IMG_EXT.test(a.name || '')))).slice(0, 2);
+  /* 🔴 공고문류가 본문 그림보다 먼저다 — 그림이 앞에 다섯이면 상한 2개가 그림으로 차 PDF 공고문을 영영 안 받았다(미래에셋 해외교환 · 2026-10-17) */
+  const docAtts = (it) => pickDocAttachments(it.attachments, { max: 2, isNoticeDoc });
   const eligTargets = pickEligTargets(reg.items, index, today, { requirementLines, live, docAtts, max: MAX_NOTICES });
   /* 남는 자리는 '아직 한 번도 안 받은 마감 전 공고'로 (2026-10-13 · elig-targets.mjs pickAttachBacklog) —
      공고문 뒷장에 신청서 서식이 든 첨부를 자격을 다 읽은 공고라서 안 받던 구멍.
@@ -377,7 +375,7 @@ async function downloadEligDocs() {
         낱개 신청서 파일은 양식 PDF 로봇(form-pdf.mjs)의 몫이다. */
   const backlog = pickAttachBacklog(reg.items, index, today, {
     live, exclude: eligTargets,
-    docAtts: (it) => (it.attachments || []).filter((a) => a.url && !a.bodyImage && OK_EXT.test(a.name || '') && isNoticeDoc(a.name)).slice(0, 3),
+    docAtts: (it) => pickDocAttachments(it.attachments, { max: 3, images: false, isNoticeDoc }),
     max: MAX_NOTICES - eligTargets.length,
   });
   const targets = [...eligTargets, ...backlog];
@@ -407,23 +405,30 @@ async function downloadEligDocs() {
         if (buf.length < 1000 || buf.length > MAX_BYTES) continue;   // 5906×8268 포스터도 8MB 안에 든다(실측)
         // 받아 보니 문서가 아니라 로그인 페이지면 버린다 — 글자로 읽으면 엉뚱한 자격이 된다
         if (isHtmlPayload(buf)) { console.log('elig doc skip (웹페이지였음):', a.name); continue; }
-        ai += 1; got += 1;
         /* 🔴 확장자는 **첨부 이름**에서 딴다 — 주소는 `download.do`처럼 확장자가 없는 경우가 많다.
-           그리고 이 목록은 위 OK_EXT와 **반드시 같아야 한다.** 2026-08-23에 OK_EXT에만
+           그리고 이 목록은 받는 목록(elig-targets DOC_EXT·IMG_EXT)과 **반드시 같아야 한다.** 2026-08-23에 받는 목록에만
            pdf를 넣고 여기를 안 고쳐서, 받아 온 PDF 5개가 전부 `.bin`으로 저장됐다 —
            `attachmentText()`는 확장자로 해석기를 고르므로 손도 못 댔다.
            파일은 멀쩡히 내려받아져 있는데(320KB·1.1MB…) 아무도 못 읽는 상태였다. */
-        const ext = (a.name.match(/\.(hwp|hwpx|docx?|pdf|png|jpe?g|gif|webp)$/i) || [, 'bin'])[1].toLowerCase();
-        const fname = `elig-${slug}-${ai}.${ext}`;
-        /* 🔴 받은 바이트가 지금 파일과 같으면 파생 글자(.txt·.body.txt·.ocr.txt)를 지우지 않는다(bodies-5) — 다르면 그 파일의 파생만 지운다 */
-        const target = new URL(fname, OUT);
-        const same = fs.existsSync(target) && fs.readFileSync(target).equals(buf);
-        if (!same) {
-          for (const d of oldNames) if (d.startsWith(`${fname}.`)) fs.rmSync(new URL(d, OUT), { force: true });
-          fs.writeFileSync(target, buf);
-        }
-        files.push(fname);
-        console.log('elig doc ok:', it.id, a.name, buf.length, same ? '(그대로)' : '');
+        const ext = (a.name.match(/\.(hwp|hwpx|docx?|pdf|zip|png|jpe?g|gif|webp)$/i) || [, 'bin'])[1].toLowerCase();
+        /* zip 묶음은 안의 공고문류만 꺼내 저장한다(attachment-text zipNoticeDocs 한 곳) — zip 자체는 아무도 못 읽는다
+           (2026-10-17 · 홍익대 제주 미래이음: 공고문이 zip 안에만 있어 자격을 영영 못 읽었다) */
+        const inner = ext === 'zip' ? zipNoticeDocs(buf) : null;
+        if (inner && !inner.length) { console.log('elig doc skip (zip 안에 공고문류 없음):', a.name); continue; }
+        ai += 1; got += 1;
+        /* 저장 한 곳 — 🔴 받은 바이트가 지금 파일과 같으면 파생 글자(.txt·.body.txt·.ocr.txt)를 지우지 않는다(bodies-5) · 다르면 그 파일의 파생만 지운다 */
+        const keep = (fname, data, label) => {
+          const target = new URL(fname, OUT);
+          const same = fs.existsSync(target) && fs.readFileSync(target).equals(data);
+          if (!same) {
+            for (const d of oldNames) if (d.startsWith(`${fname}.`)) fs.rmSync(new URL(d, OUT), { force: true });
+            fs.writeFileSync(target, data);
+          }
+          files.push(fname);
+          console.log('elig doc ok:', it.id, label, data.length, same ? '(그대로)' : '');
+        };
+        if (inner) inner.forEach((d, k) => keep(`elig-${slug}-${ai}-${k + 1}.${d.ext}`, d.buf, `${a.name} › ${d.name}`));
+        else keep(`elig-${slug}-${ai}.${ext}`, buf, a.name);
       /* 🔴 오류를 낱말 하나로 뭉개지 말 것 (2026-08-23). `e.name || e.message` 는
          Node fetch 의 연결 실패를 전부 `TypeError` 한 낱말로 줄여 버려, 조선대 공고문
          PDF가 왜 안 받아지는지 알 수 없었다. 진짜 원인은 `cause` 안에 들어 있다
