@@ -137,6 +137,7 @@ jobs:
         run: |
           node collector/scope-promote.mjs collector/browser-report.md || echo "scope-promote 실패 — 다음 줄은 계속"
           node collector/kind-classify.mjs collector/browser-report.md || echo "kind-classify 실패 — 다음 줄은 계속"
+          node collector/docs-fill.mjs collector/browser-report.md || echo "docs-fill 실패 — 다음 줄은 계속"   # 자리표시뿐인 서류 칸을 원문 「제출서류」 절로(2026-10-17)
           node collector/portal-candidates.mjs collector/browser-report.md || echo "portal-candidates 실패"
         # 리포트 파일을 넘기는 이유: 이 워크플로는 browser-report.md 만 커밋한다(report.md 에 적으면 아무도 못 본다 · 리뷰 3차)
 

@@ -731,8 +731,61 @@ function cutAtNextSection(lines) {
   const i = ls.findIndex((l, k) => k > 0 && NEXT_SECTION.test(String(l || '')));
   return i > 0 ? ls.slice(0, i) : ls;
 }
+/* ── 제출 서류 (2026-10-17 개발자 "원문에서 확인 이렇게 뜨는 게 하나도 없어야") ──────────────────────────────
+   자동 등록분 220건의 documents 는 자리표시 한 줄(`지원 자격·제출 서류는 원문 공고에서 확인`)뿐이라 시트가 「제출 서류는 공고 원문에서
+   확인해 주세요」를 찍었다. 원문에는 `4. 제출서류` 절 아래 `가. 성적증명서 1부 / 나. 장학금 지급원서 ( 첨부서류 ) 1부 …` 가 있다(저장 원문 156건).
+   규칙(자격 절 읽기와 같은 심장 — 지어내지 않는다 · 원문 줄 그대로 · 못 믿으면 비운다):
+     · 절 머리는 이름표뿐인 짧은 줄(`4. 제출서류`·`2) 필수제출서류`·`■ 구비서류`) 또는 `제출서류 : 신청서 1부, 성적증명서 1부`(한 줄에 값)
+     · 아래 줄은 **서류 이름처럼 생긴 줄만**(…서·증명·사본·등본·통장·포트폴리오·`1부`) · 표 머리(구분·필수·선택·비고)·설명 문장(…니다)·90자 넘는 줄은 아니다
+     · 다음 절 머리(같은 단계 번호 · 제출기한·신청방법·문의·유의사항…)에서 끝 · 많아야 12줄 */
+const DOC_HEAD = /^(?:필수\s?)?(?:제출|구비|신청|첨부|필요|준비)\s?서류(?:\s?(?:안내|목록|및\s?방법))?$/;
+const DOC_NEXT = /^(?:(?:제출|신청|접수)\s?(?:기한|방법|기간|처)|문의|유의\s?사항|선발\s?(?:기준|방법|일정)|심사|일정|지급|기타|신청\s?및|비고)/;
+const DOC_ISH = /(?:서|증명|사본|등본|초본|통장|포트폴리오|에세이|성적표|진단서|증빙|확인증)\s*(?:[(（\d]|\d|$|,|·|\s)|\d\s?부(?!터)|증명서|신청서|동의서|추천서|서약서|계획서|이력서|자기소개서|원서|확인서/;
+const DOC_TABLE = /^(?:구분|제출\s?서류|필수|선택|서류|비고|해당자|공통|세부\s?내용|제출\s?방법)$/;
+const tidyDoc = (l) => unent(l).replace(/^[\s\-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙❍◎￭·ㆍ*ㅇ✅✔]+/, '').replace(/^(?:[가-힣]\s*[.)]|\d{1,2}\s*[.)]|[①-⑳]|\(\d{1,2}\))\s*/, '')
+  .replace(/\s+(부|매|통)(?=\s|$|[(,])/g, '$1').replace(/\(\s+/g, '(').replace(/\s+\)/g, ')').replace(/\s+/g, ' ').trim();
+function extractDocuments(text) {
+  if (!text) return [];
+  const lines = String(text).split(/\n+/).map((l) => unent(l).replace(/[ \t　]+/g, ' ').trim()).filter(Boolean);
+  for (let i = 0; i < lines.length; i += 1) {
+    const l = lines[i];
+    const at = l.search(/[:：]/);
+    /* 머리 뒤 꼬리표는 떼고 본다 — `4. 제출 서류 [가~다]`·`바. 제출 서류 → 10월 이후 발급분만 인정`·`※ 제출서류(필수제출)`(실측 29건) */
+    const head = shHead(at >= 0 ? l.slice(0, at) : l).replace(/[\[(（][^\])）]*[\])）]|→.*$/g, '').replace(/\s/g, '');
+    if (!DOC_HEAD.test(head)) continue;
+    /* 한 줄에 값 — `제출서류 : 신청서 1부, 성적증명서 1부` */
+    if (at >= 0 && l.slice(at + 1).trim().length >= 4) {
+      const items = l.slice(at + 1).split(/\s*[,、·]\s*|\s\/\s/).map((x) => tidyDoc(x)).filter((x) => x.length >= 2 && x.length <= 90 && DOC_ISH.test(x));
+      if (items.length) return items.slice(0, 12);
+    }
+    const mark = markerOf(l);
+    const out = [];
+    for (let j = i + 1; j < lines.length && out.length < 12; j += 1) {
+      const x = lines[j];
+      const xh = shHead(x.split(/[:：]/)[0]).replace(/\s/g, '');
+      if (DOC_NEXT.test(xh)) break;
+      const mk = markerOf(x);
+      if (mark.kind && mk.kind === mark.kind && (mk.kind !== 'num' || mk.n > mark.n)) break;   // 같은 단계의 다음 절
+      if (!mark.kind && SECTION_HEAD.test(x) && x.replace(/^\s*(?:[가-힣]\s*[.)]|\d+\s*\.|[■□▣◇◆]\s*)\s*/, '').length <= 20 && !DOC_ISH.test(x)) break;
+      if (/^\s*[※*]/.test(x)) continue;                                     // 곁말(`※ 다른 학기의 확인서는 인정하지 않음`)
+      const d = tidyDoc(x);
+      if (!d || d.length > 90 || DOC_TABLE.test(d)) continue;
+      if (/(?:니다|세요|바랍니다|함)\s*\.?$/.test(d) && !/\d\s?부/.test(d)) continue;   // 설명 문장
+      if (/파일명|파일로|가나다순|(?:로|에)\s?제출|작성\s?후|업로드/.test(d)) continue;      // 제출 방법 문장(`반드시 PDF 1개 파일로 … 제출`)
+      if (!/\d\s?부/.test(d) && /(?:만\s?인정|인정됨|인정하지|발급본|발급받|가능함|불가함|필요함|제외됨|제외함)/.test(d)) continue;   // 서류 **조건**을 말하는 곁말(`성적증명서는 … 발급본만 인정됨`) — 서류 이름이 아니다
+      if (!DOC_ISH.test(d)) continue;
+      if (!out.includes(d)) out.push(d);
+    }
+    if (out.length) return out;
+  }
+  return [];
+}
+/* 자리표시 서류 — 앱(app.js DOC_PLACEHOLDER)과 같은 글자. 바꾸면 둘 다(관문이 대조한다) */
+const DOC_PLACEHOLDER = /(원문\s*공고|공고문|재?공고\s*원문)(에서)?\s*확인/;
+const isDocPlaceholder = (doc) => DOC_PLACEHOLDER.test(String(doc || ''));
+
 export { extractQualifyLines, scoopQualifyLines, extractFrom, extractExcludeLines, extractPriorityLines,
-         extractDeadline, extractOpenDate, extractAnnounce, qualFromTitle, AMOUNT_ROW, cutAtNextSection };
+         extractDeadline, extractOpenDate, extractAnnounce, qualFromTitle, AMOUNT_ROW, cutAtNextSection, extractDocuments, isDocPlaceholder };
 
 let browserBodies = {};
 try { browserBodies = JSON.parse(fs.readFileSync(new URL('extracted/browser-bodies.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }

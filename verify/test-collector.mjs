@@ -12756,6 +12756,33 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
   eq('  흐린 말(「이공계 관련 학과 우대」)·단과대(「공과대학 재학생」)는 그대로 모름 · 제외 줄 「이공계 전공자 제외」는 인문 학생을 안 건드린다', [mm('이공계 관련 학과 우대'), mm('공과대학 재학생'), ME3.fitDetail({ eligibilityLines: ['직전학기 평점 2.0 이상'], eligibilityExcludes: ['이공계 전공자 제외'] }, st).fails], [null, null, []]);
   eq('  어학 성적 — 보유 체크가 없으면 ✕ · 있으면 점수를 몰라 모름 · 「어학 성적 무관」은 조건 아님', [mm('유럽언어기준 B1 이상의 독일어 능력을 보유한 학사 및 석사과정 학생', { cert: false }), mm('Overall 5.5 이상의 성적', { cert: false }), mm('유럽언어기준 B1 이상의 독일어 능력을 보유한 학사 및 석사과정 학생', { cert: true }), kinds('어학 성적 무관').includes('cert')], ['no', 'no', null, false]);
   eq('  배점표 행(「3자녀 : 5점, 4자녀 : 7점 …」·「점수 차등 부여」)은 자격 줄이 아니다 · 「성적 기준을 적용하지 않음」은 참고(aside)', ME3.requirementLines({ eligibilityLines: ['3자녀 : 5점, 4자녀 : 7점, 5자녀 이상 : 10점', '대학생: 학자금지원구간(10구간)에 따라 점수 차등 부여(20점~50점)', '직전학기 평점 3.0 이상', '1학년 재학생은 성적 기준을 적용하지 않음'] }, null, { all: true, withMeta: true }).map((it) => [it.text, it.aside]), [['직전학기 평점 3.0 이상', false], ['1학년 재학생은 성적 기준을 적용하지 않음', true]]);
+  /* ⑮ 제출 서류 (2026-10-17 개발자 "원문에서 확인 이렇게 뜨는 게 하나도 없어야") — 자리표시뿐인 등록분 220건 중 원문 156건의 「제출서류」 절을 읽어 채운다 */
+  {
+    const X5 = await import('../collector/extract-excerpts.mjs');
+    process.env.DOCS_FILL_AS_LIB = '1';
+    const DF = await import('../collector/docs-fill.mjs');
+    eq('⑮ 「4. 제출서류」 절 — `가.` 항목만 · 다음 절(5. 제출기한)에서 끝 · `1 부` 는 `1부`',
+      X5.extractDocuments(['4. 제출서류', '가. 장학생 추천서 1부 (붙임 양식)', '나. 재학증명서 1 부', '다. 성적증명서 1부 (2026-1학기 성적 포함)', '5. 제출기한: 2026. 8. 10.(월) 오후 1시까지', '6. 문의 : 장학팀'].join('\n')),
+      ['장학생 추천서 1부 (붙임 양식)', '재학증명서 1부', '성적증명서 1부 (2026-1학기 성적 포함)']);
+    eq('  곁말(※)·제출 방법 문장(`반드시 PDF 1개 파일로 … 제출`)·표 머리(구분·필수)는 서류가 아니다 · ① 번호와 HTML 기호(&#9312;)도 뗀다',
+      X5.extractDocuments(['2) 필수제출서류', '구분', '필수', '&#9312; 짧은 에세이 1 부 ( Hufs Ability 다운로드 )', '※ 다른 학기의 확인서는 인정하지 않음', '&#9313; 성적증명서 1 부', '반드시 PDF 1 개 파일로 제출 (파일명 : 지원서 (학번).pdf)', '3) 지원방법 : 온라인 신청'].join('\n')),
+      ['짧은 에세이 1부 (Hufs Ability 다운로드)', '성적증명서 1부']);
+    eq('  한 줄에 값(`제출서류 : 신청서 1부, 성적증명서 1부`) · 절이 없으면 빈 배열(지어내지 않는다) · 설명 문장만 있으면 빈 배열',
+      [X5.extractDocuments('○ 제출서류 : 신청서 1부, 성적증명서 1부, 통장 사본'), X5.extractDocuments('장학금 안내\n신청은 포털에서 합니다.'), X5.extractDocuments('3. 제출서류\n서류는 장학팀에 제출하시기 바랍니다.\n4. 문의')], [['신청서 1부', '성적증명서 1부', '통장 사본'], [], []]);
+    const items = [{ id: 'a', documents: ['지원 자격·제출 서류는 원문 공고에서 확인'], sourceUrl: 'https://x.kr/1' }, { id: 'b', documents: ['재학증명서'], sourceUrl: 'https://x.kr/2' }, { id: 'c', documents: ['구비서류는 재공고 원문 확인'], documentsFrom: '관리자 2026-10-01', sourceUrl: 'https://x.kr/3' }, { id: 'd', documents: ['신청 방법·서류는 원문 공고 확인'], sourceUrl: 'https://x.kr/4' }];
+    const NS = await import('../collector/notice-source.mjs');
+    const PAD = '\n이 장학금은 학업에 뜻을 둔 학생을 돕기 위해 마련되었습니다. 신청 전 안내문을 꼼꼼히 읽어 주시기 바랍니다. 문의 사항은 장학팀으로 연락해 주세요. 많은 관심과 참여를 바랍니다. 선발된 학생에게는 개별로 연락을 드리며, 지급 시기는 학기 중 공지합니다.';   // 본문으로 치려면 MIN_BODY(100자) 넘어야 한다(notice-source hasText)
+    /* 🔴 두 원문에 같은 문장이 있으면 메뉴로 걷혀 본문 글자가 모자란다(page-boilerplate) — 패딩은 글마다 다르게 */
+    const idx5 = NS.indexTexts([{ url: 'https://x.kr/1', text: '3. 제출서류\n가. 재학증명서 1부\n나. 성적증명서 1부\n4. 문의' + PAD }, { url: 'https://x.kr/3', text: '3. 제출서류\n가. 통장 사본\n4. 문의' + PAD.replace(/학생/g, '청년').replace(/장학팀/g, '재단 사무국').replace(/안내문/g, '모집 요강') }], {});
+    const r5 = DF.fillDocuments(items, idx5, '2026-10-17');
+    eq('  채우기 로봇 — 자리표시뿐인 글만(사람이 적은 서류·관리자 표식·원문 없음은 그대로) · 근거 표식을 남긴다',
+      [r5.filled, items[0].documents, items[0].documentsFrom, items[1].documents, items[2].documents, items[3].documents], [1, ['재학증명서 1부', '성적증명서 1부'], '로봇 2026-10-17 · 원문 「제출서류」 절', ['재학증명서'], ['구비서류는 재공고 원문 확인'], ['신청 방법·서류는 원문 공고 확인']]);
+    const appD = readText(new URL('../app.js', import.meta.url));
+    eq('  자리표시 판정은 앱(DOC_PLACEHOLDER)과 로봇(isDocPlaceholder)이 같은 글자 · 앱은 서류가 없으면 칸을 접는다(문구 없음) · 관리자가 서류를 고치면 documentsFrom 표식',
+      [(appD.match(/const DOC_PLACEHOLDER = (\/.*?\/);/) || [])[1], (readText(new URL('../collector/extract-excerpts.mjs', import.meta.url)).match(/const DOC_PLACEHOLDER = (\/.*?\/);/) || [])[1], /제출 서류는 공고 원문에서 확인해 주세요\.<\/p>/.test(appD.slice(appD.indexOf('<h4>지원 자격</h4>'))), /\$\{hasRealDocs \? '<h4>제출 서류<\/h4>' : ''\}/.test(appD) && /const hasRealDocs = \(sch\.documents \|\| \[\]\)\.some\(\(doc\) => !DOC_PLACEHOLDER\.test\(doc\)\)/.test(appD), /if \(changed\.includes\('documents'\)\) it\.documentsFrom = OWNER;/.test(readText(new URL('../tools/admin-apply.mjs', import.meta.url)))],
+      ['/(원문\\s*공고|공고문|재?공고\\s*원문)(에서)?\\s*확인/', '/(원문\\s*공고|공고문|재?공고\\s*원문)(에서)?\\s*확인/', false, true, true]);
+    eq('  두 수집 워크플로가 데이터 관문 앞에서 돌린다', ['collect-scholarships.yml', 'browser-collect.yml'].map((f) => /node collector\/docs-fill\.mjs/.test(readText(new URL(`../.github/workflows/${f}`, import.meta.url)))), [true, true]);
+  }
   /* ⑭ 활동 시트 (2026-10-16 개발자 "~불가 · ~니다 원문 그대로 · 평택시민 같은 안내문구 · 쇼미더임팩트 A·B·C 복붙 · 공고 안내는 절만 잘라서") —
      자격 줄 거름은 activity-excerpts eligLineOk 한 곳(네 길 + sanitizeElig 소급) · 자격 절은 참가방법·시상에서 끊긴다 · 화면은 noticeSummaryHtml 이 줄을 잇고 조각을 뺀다 */
   {

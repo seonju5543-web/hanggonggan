@@ -3779,7 +3779,7 @@ function renderApplyPrep(sch) {
       <h4>${kosaf ? '선발 공고문 <span class="channel-tag">재단 원문</span>' : '공고 첨부 파일'}</h4>
       ${attList(otherAtts, kosaf ? '재단 원문 첨부' : '학교 게시판 첨부')}` : ''}
       ${noticeSummaryHtml(excerpts)}
-      ${certHtml || '<p class="dp-note">제출 서류는 공고 원문에서 확인해 주세요.</p>'}
+      ${certHtml}
       <h4>최종 제출 방법 <span class="channel-tag">${submitChannelLabel(sch)}</span></h4>
       <ol class="guide-list">${ch.guide.map((g) => `<li>${g}</li>`).join('')}</ol>
       ${schoolPortalNote(sch)}
@@ -4551,6 +4551,7 @@ function openDetail(id) {
      `applyCaution` 줄이 말하고, 누를지는 학생이 정한다. 문구를 여기로 되돌리면
      '신청할 수 없음'이라는 **사실이 아닌 말**이 화면에 다시 뜬다. */
 
+  const hasRealDocs = (sch.documents || []).some((doc) => !DOC_PLACEHOLDER.test(doc));   // 자리표시뿐이면 「제출 서류」 칸을 접는다(2026-10-17)
   $('#detail-sheet').innerHTML = `
     <div class="sheet-handle"></div>
     <div class="sheet-body">
@@ -4608,7 +4609,9 @@ function openDetail(id) {
       <ul class="reason-list">${reasonRows}${missingRows}</ul>
       ${eligAskHtml(sch)}
 
-      <h4>제출 서류</h4>
+      ${/* 🔴 읽은 서류가 없으면 「제출 서류」 칸을 접는다(2026-10-17 개발자 "원문에서 확인 이렇게 뜨는 게 하나도 없어야") — 자리표시 한 줄은 서류가 아니고,
+           '원문에서 확인하라'는 문장은 학생에게 정보가 아니다. 원문 링크는 맨 아래 sheet-facts 가 준다 */ ''}
+      ${hasRealDocs ? '<h4>제출 서류</h4>' : ''}
       ${/* 🔴 doc-badged — 줄마다 '자동'·'직접' 배지가 붙는 목록이라는 표시.
            style.css 가 이 클래스를 보고 **왼쪽 점을 뺀다**(2026-09-17 개발자 지시:
            배지가 이미 항목을 가르므로 점은 표식이 두 겹). 아래 map 이 배지를 항상
@@ -4618,7 +4621,7 @@ function openDetail(id) {
            없으면 목록 대신 그 안내를 한 줄로 말한다(맨 아래 sheet-facts 의 srcLink 가 링크를 준다). */ ''}
       ${(() => {
         const docs = sch.documents.filter((doc) => !DOC_PLACEHOLDER.test(doc));
-        if (!docs.length) return '<p class="doc-legend">제출 서류는 공고 원문에서 확인해 주세요.</p>';
+        if (!docs.length) return '';   // 칸 자체를 접는다(위 h4 와 같은 조건)
         return `<ul class="doc-list doc-badged">${docs.map((doc) => {
           const auto = /자동/.test(doc);
           return `<li>${auto ? '<span class="doc-auto">자동</span>' : '<span class="doc-manual">직접</span>'} ${esc(doc)}</li>`;
