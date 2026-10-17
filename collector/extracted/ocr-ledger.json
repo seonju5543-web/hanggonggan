@@ -1590,5 +1590,25 @@
   "ratio": 0.953,
   "hangul": 4903,
   "lines": 220
+ },
+ "elig-m8pch2-2.jpg": {
+  "sig": "503409:d67ea285d9cc",
+  "gate": "0.9/200/0.6/v2",
+  "ok": true,
+  "at": "2026-10-17",
+  "pages": 1,
+  "ratio": 0.92,
+  "hangul": 341,
+  "lines": 26
+ },
+ "elig-wio1un-1.pdf": {
+  "sig": "274648:f3e8bf93a637",
+  "gate": "0.9/200/0.6/v2",
+  "ok": true,
+  "at": "2026-10-17",
+  "pages": 10,
+  "ratio": 0.945,
+  "hangul": 3108,
+  "lines": 205
  }
 }

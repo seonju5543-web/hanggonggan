@@ -702,8 +702,8 @@
    "added": "2026-10-16",
    "fetched": false,
    "schematized": false,
-   "tries": 3,
-   "lastTryAt": "2026-10-16"
+   "tries": 4,
+   "lastTryAt": "2026-10-17"
   },
   {
    "id": "auto-ervicenoticedetail520872",
@@ -712,8 +712,8 @@
    "added": "2026-10-16",
    "fetched": false,
    "schematized": false,
-   "tries": 1,
-   "lastTryAt": "2026-10-16"
+   "tries": 2,
+   "lastTryAt": "2026-10-17"
   },
   {
    "id": "auto-ervicenoticedetail520869",
@@ -722,8 +722,8 @@
    "added": "2026-10-16",
    "fetched": false,
    "schematized": false,
-   "tries": 1,
-   "lastTryAt": "2026-10-16"
+   "tries": 2,
+   "lastTryAt": "2026-10-17"
   }
  ]
 }

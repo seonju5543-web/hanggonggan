@@ -3,10 +3,6 @@
   "b82639305744c749"
  ],
  "_ocrV": "press-attach-2026-10-16",
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3523909": {
-  "at": "2026-10-15",
-  "tries": 1
- },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3531332": {
   "at": "2026-10-15",
   "tries": 1
@@ -217,6 +213,22 @@
  },
  "https://www.rda.go.kr/board/board.do?mode=view&prgId=nei_ancmttEntry&dataNo=100000812622": {
   "at": "2026-10-16",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3531200": {
+  "at": "2026-10-17",
+  "tries": 1
+ },
+ "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179319": {
+  "at": "2026-10-17",
+  "tries": 1
+ },
+ "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179448": {
+  "at": "2026-10-17",
+  "tries": 1
+ },
+ "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179429": {
+  "at": "2026-10-17",
   "tries": 1
  }
 }
