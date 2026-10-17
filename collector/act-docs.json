@@ -238,5 +238,9 @@
  "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179354": {
   "at": "2026-10-17",
   "tries": 1
+ },
+ "https://www.korea.kr/news/policyNewsView.do?newsId=148973658&pWise=sub&pWiseSub=R2": {
+  "at": "2026-10-17",
+  "tries": 1
  }
 }
