@@ -1,7 +1,27 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-10-16",
+ "updatedAt": "2026-10-17",
  "items": [
+  {
+   "title": "[채용공고] 2026년 제2회 전남대학교 패키지 지원대학 사업 전문 및 사...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70704",
+   "postedAt": "2026-10-16",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-17"
+  },
+  {
+   "title": "[취업정보] [한샘]리하우스 디자이너 채용★학교 추천채용(~10.22.(목...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70703",
+   "postedAt": "2026-10-16",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-17"
+  },
   {
    "title": "[채용공고] 2026년 제6회 국제협력과 기간제 계약직 직원 공개채용시험 ...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70700",
@@ -71,7 +91,8 @@
    "school": "전남대학교",
    "campus": "",
    "src": "b7347301",
-   "foundAt": "2026-10-16"
+   "foundAt": "2026-10-16",
+   "thumb": "data/news/img/87242cc74204a6a3.webp"
   },
   {
    "title": "[채용공고] 제9회 앵커사업단 및 제2회 서남권 공유대학 사업단 직원 채용...",
@@ -380,25 +401,6 @@
    "campus": "",
    "foundAt": "2026-10-11",
    "thumb": "data/news/img/8aa7b591fa1857d4.webp",
-   "src": "b7347301"
-  },
-  {
-   "title": "[취업정보] 「AI, 역량검사부터 면접까지」모집중",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70630",
-   "postedAt": "2026-10-11",
-   "school": "전남대학교",
-   "campus": "",
-   "foundAt": "2026-10-11",
-   "src": "b7347301"
-  },
-  {
-   "title": "[채용공고] 2026년 제9회 전남대학교 앵커사업단·제2회 서남권공유대학사...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70629",
-   "postedAt": "2026-10-08",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "foundAt": "2026-10-09",
    "src": "b7347301"
   }
  ]

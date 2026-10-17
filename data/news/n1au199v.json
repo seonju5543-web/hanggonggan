@@ -1,7 +1,19 @@
 {
  "school": "서울시립대학교",
- "updatedAt": "2026-10-16",
+ "updatedAt": "2026-10-17",
  "items": [
+  {
+   "title": "★★★ “전공, 아직도 고민하고 있나요?” <2026 서울시립대학교 전공설명회> 개최 ★★★",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31671&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-10-16",
+   "postId": "31671",
+   "kind": "행사",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-10-17",
+   "thumb": "data/news/img/55361fc21614139d.webp"
+  },
   {
    "title": "[박물관] 2026년 글로벌 시민강좌 <한글의 우수성>에 여러분을 초대합니다.",
    "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31666&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
@@ -439,17 +451,6 @@
    "thumb": "data/news/img/386d66d3cf6d35c2.webp",
    "src": "80d7d3bc",
    "desc": "인재개발실 *서울시립대 재학생 및 34세 이하 지역청년만 신청가능, 34세 이상 미승인 처리 #대학일자리플러스센터 #DX 역량 강화 #디지털 협업툴"
-  },
-  {
-   "title": "📢300개 탈잉 강좌 목록 본문 공개🎁5천원 커피쿠폰🎁네이버포인트 3만원 이벤트 [직무 역량 레벨업] Track1, Track2",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31347&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-02",
-   "school": "서울시립대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "postId": "31347",
-   "thumb": "data/news/img/d9d25cdb7112dbf9.webp",
-   "desc": "인재개발실 #대학일자리플러스센터 #직무 역량 레벨업"
   }
  ]
 }
