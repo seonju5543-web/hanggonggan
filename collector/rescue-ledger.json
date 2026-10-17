@@ -341,12 +341,6 @@
   "minBody": 100,
   "name": "(한국장학재단) 해양수산부 청년창업어업인장학생 추가 모집 선발 안내"
  },
- "https://kangwon.ac.kr/ko/bbs/750/detail.do?pageitm=10&pstsn=2510&searchgbn=0&searchordersort=0": {
-  "tries": 3,
-  "at": "2026-10-14",
-  "minBody": 100,
-  "name": "2026학년도 2학기 중소기업 취업연계 장학금 선발계획 알림 및 심사서류 제출 요청"
- },
  "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsno=1073&key=7520&nttno=626253&searchkrwd=장학&sf.pnos=1073&sf.pnos=888": {
   "ok": "2026-10-14",
   "at": "2026-10-14",
@@ -414,7 +408,7 @@
   "name": "2026학년도 하반기 재단법인 인석장학회 장학생 선발 안내"
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/520867": {
-  "tries": 2,
+  "tries": 3,
   "at": "2026-10-17",
   "minBody": 100,
   "name": "[한국고등교육재단] 인재림 장학생 선발 안내"
