@@ -1,8 +1,17 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-10-17",
- "count": 1890,
+ "count": 1891,
  "items": [
+  {
+   "title": "[교외-10/29]한국고등교육재단 인재림 제7기 장학생 모집 안내(재단지원)",
+   "url": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4ODElMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "고려대학교",
+   "campus": "",
+   "foundAt": "2026-10-17"
+  },
   {
    "title": "[공통][교외] 2027년도 두산연강재단 대학 장학생 모집(~11/13)",
    "url": "https://dep.hufs.ac.kr/bbs/student/2431/269279/artclView.do",

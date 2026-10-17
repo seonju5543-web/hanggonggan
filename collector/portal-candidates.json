@@ -16,6 +16,21 @@
    },
    "others": [],
    "unique": false
+  },
+  {
+   "school": "국민대학교",
+   "best": {
+    "system": "ON 국민",
+    "count": 1,
+    "evidence": [
+     {
+      "id": "auto-2445viewdocurrentpageno1",
+      "text": "ㅇ 신청방법 : ON 국민 - 포털 - 학생서비스 - 장학정보 - 장학신청"
+     }
+    ]
+   },
+   "others": [],
+   "unique": false
   }
  ]
 }
