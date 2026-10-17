@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-17",
+ "updatedAt": "2026-10-18",
  "items": {
   "r:auto-082f26ec8898eab98ceca780": {
    "attempts": 0,
@@ -137,14 +137,6 @@
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323098"
-  },
-  "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%202026%EB%85%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20%EB%AC%B8%EC%A3%BC%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20AI%C2%B7ICT%20%EB%B6%84%EC%95%BC%20%EC%9D%B8%EC%9E%AC%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20": {
-   "attempts": 0,
-   "title": "공통 2026년 하반기 문주장학재단 AI·ICT 분야 인재 장학생 선발 안내",
-   "lastTried": "2026-09-17",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323111"
   },
   "r:auto-99ec839d20ec84a0ebb09c20": {
    "attempts": 0,
