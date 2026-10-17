@@ -17,8 +17,10 @@
 function fitInconsistency(M, it, p) {
   const fd = M.fitDetail(it, p);
   if (fd.unread) return null;
-  const marks = (M.requirementLines(it, it.eligibilityLines) || [])
-    .map((l) => M.requirementMatch(l, p, it));
+  /* 참고 줄(aside — ※ 예외·「성적 기준 미적용」)은 화면이 판정 없이 옅게 그리고 적합도 분모에서도 뺀다(2026-10-15) — 여기서도 뺀다 */
+  const marks = (M.requirementLines(it, it.eligibilityLines, { withMeta: true }) || [])
+    .filter((x) => !x.aside)
+    .map((x) => M.requirementMatch(x.text, p, it));
   /* ✕는 미달 사유가 있을 때만 나와야 한다. 사유가 없는데 ✕가 보이면
      화면과 판정이 다른 말을 하는 것이다.
      ('요건을 다 충족했는데 ✕' 는 이 조건에 포함된다 — met === total 이면 fails 가 비어 있다.

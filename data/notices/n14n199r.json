@@ -1,7 +1,52 @@
 {
  "school": "서강대학교",
- "updatedAt": "2026-10-14",
+ "updatedAt": "2026-10-17",
  "items": [
+  {
+   "title": "[교외] 한국고등교육재단 인재림 장학생 선발 안내(10/29 마감, 연 800만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551609?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-16"
+  },
+  {
+   "title": "[교외] 한국지도자육성장학재단 장학생 선발 안내(11/3 마감, 등록금 전액 or 생활비 350만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551605?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "신청기한: 2026년 11월 3일(화) 오후 5시까지 5. 신청방법: 학생지원팀으로 직접 또는 등기우편 제출 주소: 서울특별시 마포구 백범로 3",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-16"
+  },
+  {
+   "title": "[교외] 성암육영회 장학생 선발 안내(10/27 마감, 생활비 연 200만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551594?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "신청기간: 2026년 10월 14일(수) ~ 10월 27일(화) 오후 6시 5. 신청방법: 이메일 제출 후 원본 서류 우편 제출 이메일주소: y",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-15"
+  },
+  {
+   "title": "[교외] 방일영문화재단 장학생 선발 안내(10/30 마감, 1학년 탈북학생, 학업장려금 월 70만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551597?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "신청기한: 2026년 10월 30일(금) 오후 5시까지 5. 신청방법: 직접 또는 우편 제출하거나 모든 서류를 하나의 PDF 파일로 만들어 학생",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-14"
+  },
+  {
+   "title": "[교외] 두산연강재단 장학생 선발 안내(11/13 마감, 생활비 400만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551595?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "신청기간 : 2026년 10월 14일(수) ~ 11월 13일(금) 오후 6시 4. 신청방법: 재단 홈페이지 신청 http://www.yonkan",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-14"
+  },
   {
    "title": "[교외] STX장학재단 장학생 선발 안내(11/16 마감, 등록금 300만원+학업보조금 월 50만원)",
    "url": "https://www.sogang.ac.kr/ko/detail/551577?bbsConfigFk=141&namepage=ScholarshipNotice",

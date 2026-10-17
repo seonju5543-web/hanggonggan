@@ -94,6 +94,8 @@ const TRAIT_LABEL = {
   bereaved:   '가족 사망 · 유가족',
   sailor:     '선원 · 선원 가족',
   diabetes:   '당뇨 진단',
+  /* 2026-10-15 · 노션 G-14 결정 ② — 「이번 학기 국가장학금을 신청했나요」를 명사형으로. 걸리는 줄은 parse-requirements TRAIT_PAT 참조 */
+  kosafApplied: '이번 학기 국가장학금 신청',
 };
 
 /* 칸 하나를 화면에 그리는 데 필요한 것.

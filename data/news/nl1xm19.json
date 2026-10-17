@@ -1,7 +1,35 @@
 {
  "school": "충남대학교",
- "updatedAt": "2026-10-14",
+ "updatedAt": "2026-10-17",
  "items": [
+  {
+   "title": "2026 동물사랑큰잔치 안내",
+   "url": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515755&code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
+   "postedAt": "2026-10-15",
+   "school": "충남대학교",
+   "campus": "",
+   "src": "fb93d66a",
+   "foundAt": "2026-10-15"
+  },
+  {
+   "title": "「AIㆍ스마트도시 혁신인재육성 사업」수행대학 선정 공고 안내",
+   "url": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515747&code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
+   "postedAt": "2026-10-14",
+   "school": "충남대학교",
+   "campus": "",
+   "src": "fb93d66a",
+   "foundAt": "2026-10-14",
+   "desc": "1. 사업기간: 착수일로부터 3년('26∼'28) 2. 지원규모 및 신청자격 등: [붙임1], [붙임2] 참고"
+  },
+  {
+   "title": "2026년 동절기 난방운영 및 에너지절약 안내",
+   "url": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515737&code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
+   "postedAt": "2026-10-14",
+   "school": "충남대학교",
+   "campus": "",
+   "src": "fb93d66a",
+   "foundAt": "2026-10-14"
+  },
   {
    "title": "2026학년도 2학기 학생생활관 보결 4차 모집 안내",
    "url": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515707&code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
@@ -122,7 +150,8 @@
    "school": "충남대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "src": "fb93d66a"
+   "src": "fb93d66a",
+   "desc": "안녕하세요. 충남대학교 대표홈페이지를 이용해 주시는 여러분께 안내드립니다. 충남대학교는 최근 대표홈페이지 내 일부 게시판의 게시글 및 댓글에 개인정보가 다수 게재되어 있는 사실을 확인하였습니다."
   },
   {
    "title": "[RISE] 2026 All-set 기업지원 사업 시행 공고",
@@ -140,8 +169,7 @@
    "kind": "생활",
    "school": "충남대학교",
    "campus": "",
-   "foundAt": "2026-10-01",
-   "desc": "작성자 학생생활관 내용보기 주요사이트 코러스시스템 발전기금 인재개발원 인터넷증명 홍보동영상 국립대학육성사업 DSC 공유대학 CNU With U+(학사지원시스템) 창업지원단 충남대학교병원 경영대학원 교육대학원…"
+   "foundAt": "2026-10-01"
   },
   {
    "title": "2026년 한미약품 하반기 채용설명회 안내",
@@ -179,7 +207,8 @@
    "postedAt": "2026-09-18",
    "school": "충남대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "desc": "1. 대 상: 대덕캠퍼스, 보운캠퍼스 건물 전체(단, 학생생활관 제외) 2. 기 간: 2026. 9. 28.(월) ~ 10. 1.(목)"
   },
   {
    "title": "추석 명절 청렴주의보 발령(2026년 제2호)",

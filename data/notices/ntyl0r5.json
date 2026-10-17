@@ -1,7 +1,43 @@
 {
  "school": "명지대학교",
- "updatedAt": "2026-10-14",
+ "updatedAt": "2026-10-17",
  "items": [
+  {
+   "title": "2026년 2학기 주거안정장학금 지급 관련 안내",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/145/236366/artclView.do",
+   "attachments": [
+    {
+     "name": "(붙임1) 2026년 장학생 서약서 작성 매뉴얼.pdf",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/145/181253/download.do"
+    },
+    {
+     "name": "(붙임2) 2026년 장학생 지급요청서 작성 매뉴얼.pdf",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/145/181254/download.do"
+    },
+    {
+     "name": "(붙임3) 2026년 장학생 포기 및 반환 매뉴얼.pdf",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/145/181255/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "명지대학교",
+   "campus": "",
+   "foundAt": "2026-10-16"
+  },
+  {
+   "title": "2026년 외수한일교류장학회 장학생 선발 안내",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/145/236317/artclView.do",
+   "attachments": [
+    {
+     "name": "2026년 외수한일교류장학회 장학생 추천서 양식.hwp",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/145/181227/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "명지대학교",
+   "campus": "",
+   "foundAt": "2026-10-14"
+  },
   {
    "title": "[한미교육위원단] 풀브라이트 미국 유학·연구 장학금 설명회",
    "url": "https://www.mju.ac.kr/bbs/mjukr/145/236185/artclView.do",

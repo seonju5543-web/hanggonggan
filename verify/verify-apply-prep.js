@@ -133,7 +133,9 @@ async function swipeDown(page, sel) {
     /* 층2도 2026-10-13 부터 앱 지원문서가 붙는다(① · 머리말 'kosaf') — 대상은 그 문서가 붙은 것 */
     const l2 = live.filter((s) => s.sourceKind === 'kosaf' && s.prepFormId && formTplIdFor(s) === s.prepFormId);
     const C = l2.find((s) => (s.attachments || []).length) || l2[0] || null;
-    const F = live.find((s) => formTplIdFor(s)) || null;
+    /* 🔴 F 는 **앱 양식(formId)이 있는** 공고다 — formTplIdFor 는 2026-10-13 부터 앱 지원문서(prep:)도 돌려주므로 그걸로 고르면
+       A(지원문서 공고)와 같은 공고가 잡혀 ①에서 이미 '신청 준비'한 뒤 ⑦에서 「버튼이 열려 있다」가 거짓이 된다(2026-10-16 verify-ui 빨간불 실측). */
+    const F = live.find((s) => s.formId && formTplIdFor(s) === s.formId) || null;
     /* P — 로봇이 원본 PDF 로 바꿔 둔 신청서가 있는 공고(승인 시안 A · 2026-10-14). 색인은 앱이 받은 formsPdfIndex 그대로 */
     const P = l1.find((s) => hasFormAtt(s) && formPdfsFor(s).length) || null;
     const brief = (s) => s && ({ id: s.id, name: s.name.slice(0, 40), src: !!s.sourceUrl,

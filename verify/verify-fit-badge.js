@@ -116,7 +116,11 @@ const PROFILE = (over) => ({
     const id = await cards[idx].evaluate((e) => e.dataset.detail);
     const expected = await page.evaluate((sid) => {
       const s = allScholarships().find((x) => x.id === sid);
-      return (requirementLines(s, null, { all: true }) || []).length;
+      /* 화면은 경우별 분기(`신입생:`·`재학생:`…) 중 **내 경우 줄이 있으면 그 줄만** 보인다(2026-10-15 · app.js eligibilityRowsHtml ①) — 같은 규칙으로 센다 */
+      const items = requirementLines(s, null, { all: true, withMeta: true }) || [];
+      const mine = (t) => { const cs = PR.caseBranch(t); return cs === null ? null : !!(state.profile && state.profile.status && cs.includes(state.profile.status)); };
+      const has = items.some((it) => mine(it.text) === true);
+      return items.filter((it) => !(has && mine(it.text) === false)).length;
     }, id);
     await cards[idx].click();
     await page.waitForTimeout(700);

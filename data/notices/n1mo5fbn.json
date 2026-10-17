@@ -1,7 +1,21 @@
 {
  "school": "세종대학교",
- "updatedAt": "2026-10-14",
+ "updatedAt": "2026-10-17",
  "items": [
+  {
+   "title": "2026-2학기 국가근로 장학생 3차 신청 안내",
+   "url": "https://www.sejong.ac.kr/kor/intro/notice7.do?mode=view&articleNo=894674&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "붙임1. 2026년 2학기 국가근로장학금 일반유형(추가) 학생신청 매뉴얼.pdf",
+     "url": "https://www.sejong.ac.kr/kor/intro/notice7.do?mode=download&articleNo=894674&attachNo=237754"
+    }
+   ],
+   "deadlineHint": "신청기간 신청기간 최종선발결과 3차 2026. 10. 21(수 ) 9시 ~ 10. 29(목 ) 18시까지 추후 개별통보 예정 ※ 개별연락을 통하",
+   "school": "세종대학교",
+   "campus": "",
+   "foundAt": "2026-10-15"
+  },
   {
    "title": "2026-2 학업수석총장장학금 선발 안내",
    "url": "https://www.sejong.ac.kr/kor/intro/notice7.do?mode=view&articleNo=894170&article.offset=0&articleLimit=10",

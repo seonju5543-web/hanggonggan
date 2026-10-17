@@ -1,70 +1,70 @@
 {
- "updatedAt": "2026-10-13T17:38:54.908Z",
+ "updatedAt": "2026-10-17T13:34:10.151Z",
  "v": 1,
  "bad": {
   "https://2026grchallenge.com/": {
    "v": "login",
-   "at": "2026-10-14"
+   "at": "2026-10-17"
   },
   "https://blog.naver.com/mopaspr/224399694473?trackingCode=blog_bloghome_searchlist": {
    "v": "other",
-   "at": "2026-10-14"
-  },
-  "https://maicon.kr/": {
-   "v": "home",
-   "at": "2026-10-14"
+   "at": "2026-10-17"
   },
   "https://naraport.mof.go.kr/info/contest/contestIntroduce.do?subMenu1Nm=%EA%B3%B5%EB%AA%A8%EC%A0%84": {
    "v": "other",
-   "at": "2026-10-14"
+   "at": "2026-10-17"
   },
-  "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276686&article.offset=0&articleLimit=10&srCategoryId=22": {
-   "v": "login",
-   "at": "2026-10-14"
+  "https://nysc.or.kr/nysc/pages/notice_view.php?id=288": {
+   "v": "other",
+   "at": "2026-10-17"
   },
-  "https://www.fishway.go.kr/home/mainPage.do": {
+  "https://www.dongguk.edu/article/JANGHAKNOTICE/list?pageNo=2#none": {
+   "v": "list",
+   "at": "2026-10-17"
+  },
+  "https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26766512": {
    "v": "gone",
-   "at": "2026-10-14"
+   "at": "2026-10-17"
+  },
+  "https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26766513": {
+   "v": "gone",
+   "at": "2026-10-17"
+  },
+  "https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26766521": {
+   "v": "gone",
+   "at": "2026-10-17"
+  },
+  "https://www.jinjae.kr/main/?gc=877EUFQ": {
+   "v": "login",
+   "at": "2026-10-17"
   },
   "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11495&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0": {
    "v": "other",
-   "at": "2026-10-14"
-  },
-  "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626405&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888": {
-   "v": "other",
-   "at": "2026-10-14"
-  },
-  "https://www.mofa.go.kr/www/brd/m_4075/view.do?seq=369441&page=1&pitem=10": {
-   "v": "other",
-   "at": "2026-10-14"
+   "at": "2026-10-17"
   },
   "https://www.msit.go.kr/bbs/view.do?sCode=user&mId=307&mPid=208&bbsSeqNo=94&nttSeqNo=3187433": {
    "v": "other",
-   "at": "2026-10-14"
-  },
-  "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511394": {
-   "v": "other",
-   "at": "2026-10-14"
+   "at": "2026-10-17"
   },
   "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000": {
    "v": "other",
-   "at": "2026-10-14"
+   "at": "2026-10-17"
   },
   "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=893444&article.offset=0&articleLimit=10": {
    "v": "gone",
-   "at": "2026-10-14"
+   "at": "2026-10-17"
   },
   "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=95279&article.offset=0&articleLimit=10": {
    "v": "other",
-   "at": "2026-10-14"
+   "at": "2026-10-17"
   },
   "https://www.usspc.or.kr/": {
    "v": "home",
-   "at": "2026-10-14"
+   "at": "2026-10-17"
   },
   "https://www.welchon.com/web/lay1/program/S1T31C447/eventNewView.do?menuIdx=&cIdx=evpr&bbsIdx=2214028": {
    "v": "login",
-   "at": "2026-10-14"
+   "at": "2026-10-17"
   }
  },
  "fix": {
@@ -81,13 +81,6 @@
    "src": "robot",
    "title": "2026년 한국가스안전공사 지역상생 특별장학생 선발 공고",
    "round": "2026-10-23"
-  },
-  "id:kosaf-2701009001": {
-   "url": "https://www.mariners.or.kr/business/view.php?bd_code=notice&bd_idx=7603",
-   "at": "2026-10-13",
-   "src": "robot",
-   "title": "2026년도 (사)한국해기사협회 육.해상 회원 자녀 장학생 선발 안내 new -->",
-   "round": "2026-10-13"
   },
   "id:kosaf-2704211001": {
    "url": "https://myungfoundation.or.kr/modules/bbs/bbsView.php?id=28&page=1&&code=bbs_notice&xid=1",

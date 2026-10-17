@@ -18,7 +18,7 @@ import { publishBySchool, dropUnserved, healFromLedger, readSchoolFiles, readHun
 import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry, retitleItems } from './clean-title.mjs';
 import { isAttachmentEntry, detailAttachments, stripSiteChrome } from './attachment-link.mjs';
-import { activityKind, activityField, notActivity, ACTIVITY_FIELDS } from './activity-kind.mjs';
+import { activityKind, activityField, notActivity, unreadableSource, ACTIVITY_FIELDS } from './activity-kind.mjs';
 import { activityExcerpts, activityDetails, putActivityDetails, ACT_DETAILS_V, sanitizeBenefit, sanitizeElig } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { robotsAllows } from './robots.mjs';
@@ -361,7 +361,8 @@ async function harvestBoard(s, ctx = { dead: false }) {
         .map((i) => ({ ...i, kind: activityKind(i.title, { scholarship: KEYWORDS }) }))
         .filter((i) => i.kind)
         .filter((i) => !isMenuEntry(i.title))
-        .filter((i) => !isAttachmentEntry(i));
+        .filter((i) => !isAttachmentEntry(i))
+        .filter((i) => !unreadableSource(i.url));   // 인스타그램·페이스북 게시물은 들이지 않는다(2026-10-16 · activity-kind.mjs)
       const freshA = actItems.filter((i) => !seenAct[urlKey(i.url)]).slice(0, ACT_FRESH_MAX);
       for (const it of freshA) {
         if (ctx.dead) return;
@@ -601,7 +602,7 @@ acts.items = retitleItems(freshActs.concat(acts.items || []));   // 실린 글�
    다음 날 '새 글'로 맨 위에 돌아오지 않게. 닫힌 글은 API 로봇이 뺀다(collector/open-api-map.mjs mergeApi). */
 acts.items = acts.items.filter((n) => (actKeepDate(n) || '9999') >= cutoff);
 acts.items = acts.items.filter((n) => !isAttachmentEntry(n));
-acts.items = acts.items.filter((n) => !notActivity(n.title));   // 결과·보도·지난 해 글은 모집 글이 아니다 — 이미 실린 글에도 소급(2026-10-04 · activity-kind.mjs)
+acts.items = acts.items.filter((n) => !notActivity(n.title) && !unreadableSource(n.url));   // 결과·보도·지난 해 글은 모집 글이 아니다 · 인스타그램 게시물은 뺀다 — 이미 실린 글에도 소급(2026-10-04 · 10-16 · activity-kind.mjs)
 acts.items.forEach(sanitizeBenefit);   // 「혜택」에 섞인 조건은 자격 줄로 — 출처(본문·API)와 상관없이 매번 모든 글에(2026-10-04 · activity-excerpts.mjs splitBenefit)
 acts.items.forEach(sanitizeElig);   // 자격 줄 거름(여러 갈래 나이·개인정보 안내문)을 실린 글 전부에 매번 — 소급(2026-10-05 점검 api-06 · activity-excerpts.mjs eligLineOk)
 acts.items.forEach((n) => bodyReader.heal(n));   // 껍데기에서 시작한 기간 힌트 소급(위 '껍데기를 걷은 본문' 단락)
@@ -620,7 +621,8 @@ const ACT_BACKFILL = 40;   // 2026-10-01 20→40 — 자격 판(detailsV) 소급
 let actBackfilled = 0;
 for (const it of acts.items) {
   /* 🔴 자격 판(detailsV)이 옛것인 글도 다시 읽는다 (2026-10-01 · 소급 — 원칙 7). API 글은 API 로봇이 채우므로 건너뛴다 */
-  if (actBackfilled >= ACT_BACKFILL || it.api || (it.excerptsAt && it.detailsV === ACT_DETAILS_V)) continue;
+  /* API 글은 API 본문으로 읽었으니 건너뛴다 — 단 거기서 자격이 안 나온 글은 원문 페이지를 읽어 본다(제주 청년정책 「체인지메이커」: API 칸은 한 줄, 페이지엔 자격 표 · 2026-10-16) */
+  if (actBackfilled >= ACT_BACKFILL || (it.api && (it.eligibilityLines || []).length) || (it.excerptsAt && it.detailsV === ACT_DETAILS_V)) continue;
   /* 못 받아 온 글은 **이레에 한 번만** 다시 두드린다 (2026-10-01 코드 리뷰) — 안 그러면 죽은 주소가 매 실행 40칸을 먹어
      앞쪽에 그런 글이 쌓이면 나머지가 영영 소급되지 않고, 같은 학교 게시판을 하루 세 번 두드린다 */
   if (it.detailsTriedAt && (Date.parse(todayIso) - Date.parse(it.detailsTriedAt)) < 7 * 86400000) continue;

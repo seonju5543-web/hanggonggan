@@ -1,7 +1,21 @@
 {
  "school": "서강대학교",
- "updatedAt": "2026-10-14",
+ "updatedAt": "2026-10-17",
  "items": [
+  {
+   "title": "[철학연구소] 10월 해외석학 초청 강연회",
+   "url": "https://www.sogang.ac.kr/ko/detail/551601?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
+   "postId": "551601",
+   "postedAt": "2026-10-15",
+   "kind": "행사",
+   "school": "서강대학교",
+   "campus": "",
+   "board": "행사특강",
+   "src": "c13ee4bc",
+   "foundAt": "2026-10-15",
+   "thumb": "data/news/img/960ddeae2c474f80.webp",
+   "desc": "발표제목: An introduction to purity of methods 이번 10월 30일 철학연구소에서는 프랑스 Université de Lorraine의 교수이신 Andrew Arana 선생님을 모시고…"
+  },
   {
    "title": "[도서관] 2026학년도 제6회 『국외도서 웹전시회』 (10/14~10/28)",
    "url": "https://www.sogang.ac.kr/ko/detail/551590?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",

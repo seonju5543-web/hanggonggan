@@ -39,13 +39,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-14",
-  "lastAt": "2026-10-14",
-  "tries": 1,
+  "lastAt": "2026-10-15",
+  "tries": 2,
   "status": "pending",
-  "why": "게시판을 못 엶(page.goto: Timeout 20000ms exceeded. Call log: - navigating…)",
+  "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-11-11",
-  "nextAt": "2026-10-15"
+  "nextAt": "2026-10-18"
  },
  "kosaf|1768681003|board:https://www.busan.go.kr/nbnews": {
   "ds": "kosaf",
@@ -71,13 +71,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-14",
-  "lastAt": "2026-10-14",
-  "tries": 1,
+  "lastAt": "2026-10-15",
+  "tries": 2,
   "status": "pending",
   "why": "게시판 목록(9줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-12-11",
-  "nextAt": "2026-10-15"
+  "nextAt": "2026-10-18"
  },
  "kosaf|2000206004|board:https://www.yw.go.kr/www/selectBbsNttList.do?bbsNo=86&key=524": {
   "ds": "kosaf",
@@ -103,13 +103,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-14",
-  "lastAt": "2026-10-14",
-  "tries": 1,
+  "lastAt": "2026-10-15",
+  "tries": 2,
   "status": "pending",
   "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-10-23",
-  "nextAt": "2026-10-15"
+  "nextAt": "2026-10-18"
  },
  "kosaf|2000315002|board:https://www.usc.go.kr/water/main.do": {
   "ds": "kosaf",
@@ -119,13 +119,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-14",
-  "lastAt": "2026-10-14",
-  "tries": 1,
+  "lastAt": "2026-10-15",
+  "tries": 2,
   "status": "pending",
   "why": "게시판 목록(7줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-11-03",
-  "nextAt": "2026-10-15"
+  "nextAt": "2026-10-18"
  },
  "kosaf|2000319002|board:https://www.yeongju.go.kr/check/bbs/board.php?bo_table=yjra0101": {
   "ds": "kosaf",
@@ -135,13 +135,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-13",
-  "lastAt": "2026-10-14",
-  "tries": 2,
+  "lastAt": "2026-10-17",
+  "tries": 3,
   "status": "pending",
   "why": "게시판 목록(100줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-12-31",
-  "nextAt": "2026-10-17"
+  "nextAt": "2026-10-24"
  },
  "kosaf|2000429013|https://scholarship.eumseong.go.kr/www/selectBbsNttView.do?key=33&bbsNo=3&nttNo=792": {
   "ds": "kosaf",
@@ -220,6 +220,22 @@
   "decidedAt": "2026-10-13",
   "also": []
  },
+ "kosaf|2000477010|board:https://www.asanfoundation.or.kr/af/library/bbs/afLibraryPhotoBbsList.do": {
+  "ds": "kosaf",
+  "key": "2000477010",
+  "url": "",
+  "board": "https://www.asanfoundation.or.kr/af/library/bbs/afLibraryPhotoBbsList.do",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "firstAt": "2026-10-16",
+  "lastAt": "2026-10-17",
+  "tries": 2,
+  "status": "pending",
+  "why": "게시판 목록(12줄)에서 그 글을 하나로 못 고름",
+  "checks": {},
+  "round": "2026-10-26",
+  "nextAt": "2026-10-20"
+ },
  "kosaf|2700017001|http://www.hsf.or.kr/bbs/board.php?bo_table=s5_1&wr_id=102": {
   "ds": "kosaf",
   "key": "2700017001",
@@ -253,13 +269,38 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-14",
-  "lastAt": "2026-10-14",
-  "tries": 1,
+  "lastAt": "2026-10-15",
+  "tries": 2,
   "status": "pending",
   "why": "게시판 목록(3줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-10-31",
-  "nextAt": "2026-10-15"
+  "nextAt": "2026-10-18"
+ },
+ "kosaf|2700045011|https://gwangyang.go.kr/fund/board.es?mid=a60401000000&bid=0156&list_no=205387&act=view": {
+  "ds": "kosaf",
+  "key": "2700045011",
+  "url": "https://gwangyang.go.kr/fund/board.es?mid=a60401000000&bid=0156&list_no=205387&act=view",
+  "source": "match",
+  "by": "로봇(재단 게시판 글과 짝 — 마감 같음 +2 · 사업 이름 +1 · 마감 해 +1 · 학기·반기 +1 · 장학 낱말 +1)",
+  "title": "2026년 하반기 대학생 생활비 장학금 지원 계획 공고",
+  "firstAt": "2026-10-14",
+  "lastAt": "2026-10-14",
+  "tries": 1,
+  "status": "rejected",
+  "why": "재단 이름이 화면에 없음",
+  "checks": {
+   "C": "ok",
+   "L": "ok",
+   "H": "ok",
+   "T": "ok",
+   "R": "ok",
+   "X": "fail",
+   "P": "ok"
+  },
+  "round": "2026-10-31",
+  "decidedAt": "2026-10-14",
+  "also": []
  },
  "kosaf|2700071007|board:https://www.ycsf.or.kr/open/notice/list.html": {
   "ds": "kosaf",
@@ -269,13 +310,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-14",
-  "lastAt": "2026-10-14",
-  "tries": 1,
+  "lastAt": "2026-10-15",
+  "tries": 2,
   "status": "pending",
   "why": "게시판 목록(15줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-12-31",
-  "nextAt": "2026-10-15"
+  "nextAt": "2026-10-18"
  },
  "kosaf|2700388001|https://janghak.songpa.go.kr/22/?q=YToxOntzOjEyOiJrZXl3b3JkX3R5cGUiO3M6MzoiYWxsIjt9&bmode=view&idx=174161241&t=board": {
   "ds": "kosaf",
@@ -377,6 +418,22 @@
   "checks": {},
   "round": "2026-11-30",
   "decidedAt": "2026-10-14"
+ },
+ "kosaf|2701295001|board:http://www.cbck.or.kr/Board/K7120": {
+  "ds": "kosaf",
+  "key": "2701295001",
+  "url": "",
+  "board": "http://www.cbck.or.kr/Board/K7120",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "firstAt": "2026-10-17",
+  "lastAt": "2026-10-17",
+  "tries": 1,
+  "status": "rejected",
+  "why": "그 사이트 robots.txt 가 게시판 훑기를 막음 — 글 주소로 다시 적어 주세요",
+  "checks": {},
+  "round": "2026-12-11",
+  "decidedAt": "2026-10-17"
  },
  "kosaf|2701295001|board:https://cbck.or.kr/Board/K7120": {
   "ds": "kosaf",

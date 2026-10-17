@@ -1,7 +1,43 @@
 {
  "school": "가톨릭대학교",
- "updatedAt": "2026-10-14",
+ "updatedAt": "2026-10-17",
  "items": [
+  {
+   "title": "[학생지원팀] <한국고등교육재단> 2027년 인재림 제7기 장학생 선발 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276842&article.offset=0&articleLimit=10&srCategoryId=22",
+   "attachments": [
+    {
+     "name": "[한국고등교육재단] 인재림 제7기 장학생 선발 모집 요강.docx",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276842&attachNo=226599"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-10-16"
+  },
+  {
+   "title": "[학생지원팀] 2027년도 두산연강재단 대학 장학생 선발 안내(10. 14.(수) ~ 11. 13.(금) 18:00까지)",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276772&article.offset=0&articleLimit=10&srCategoryId=22",
+   "attachments": [
+    {
+     "name": "1. 2027년도 두산연강재단 장학생 선발 공고문.pdf",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276772&attachNo=226541"
+    },
+    {
+     "name": "2. 자주 묻는 질문(Q&amp;A).pdf",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276772&attachNo=226542"
+    },
+    {
+     "name": "3. 추천서(재단 양식).docx",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276772&attachNo=226543"
+    }
+   ],
+   "deadlineHint": "접수 기간: 2026. 10. 14.(수) ~ 11. 13.(금) 18:00까지 4. 접수 방법: 두산연강재단 홈페이지(www.yonkang.o",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-10-15"
+  },
   {
    "title": "[학생지원팀] (한국장학재단) 2026-2학기 국가근로장학금 추가신청기간 안내(10/21~10/29)",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276686&article.offset=0&articleLimit=10&srCategoryId=22",

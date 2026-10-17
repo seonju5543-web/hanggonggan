@@ -1,7 +1,67 @@
 {
  "school": "고려대학교 세종캠퍼스",
- "updatedAt": "2026-10-14",
+ "updatedAt": "2026-10-17",
  "items": [
+  {
+   "title": "[교외]2027년도 두산연강재단 장학생 선발 공고",
+   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/273701/artclView.do",
+   "attachments": [
+    {
+     "name": "1. 2027년도 두산연강재단 장학생 선발 공고문.pdf",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/183384/download.do"
+    },
+    {
+     "name": "2. 자주 묻는 질문(Q&amp;A).pdf",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/183385/download.do"
+    },
+    {
+     "name": "3. 추천서(재단 양식).docx",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/183386/download.do"
+    }
+   ],
+   "deadlineHint": "접수 기간 : 2026 년 10 월 14 일(수) 09 시 ~ 11 월 13 일(금) 18 시(한국시간 기준) 7. 접수 방법 : 두산연강재단",
+   "school": "고려대학교 세종캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-16"
+  },
+  {
+   "title": "[교외]2027년 한국지도자육성장학재단 일반장학생 선발 안내",
+   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/273696/artclView.do",
+   "attachments": [
+    {
+     "name": "2027년도 장학생 추천 안내문.pdf",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/183368/download.do"
+    },
+    {
+     "name": "장학생 선발관련 FAQ.pdf",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/183369/download.do"
+    },
+    {
+     "name": "1. 2027년도_서류양식(지원서).hwp",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/183376/download.do"
+    },
+    {
+     "name": "2. 2027년도_서류양식(추천서).hwp",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/183377/download.do"
+    },
+    {
+     "name": "3. 2027년도_서류양식(자기소개서).hwp",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/183378/download.do"
+    },
+    {
+     "name": "4. 2027년도_개인정보활용동의서.hwp",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/183379/download.do"
+    },
+    {
+     "name": "5. 2027년도_장학생 의무사항 참여 동의서.hwp",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/183380/download.do"
+    }
+   ],
+   "deadlineHint": "신청기한: 2026년 10월 29일 목요일 오후 5시까지(추가접수 불가능) 3. 신청방법: 제출서류 구비하여 방문 제출 - 미래관 클래스룸세모",
+   "school": "고려대학교 세종캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-16"
+  },
   {
    "title": "[교외] 2026년 하반기 은평구민 장학생 선발 공고",
    "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/273635/artclView.do",

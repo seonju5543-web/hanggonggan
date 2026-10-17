@@ -7,11 +7,11 @@
   },
   {
    "id": "P2",
-   "label": "경희 공학 2학년 · 평점 4.2 · 2구간 · 서울 · 기초수급"
+   "label": "경희 공학 2학년 · 평점 4.2 · 2구간 · 서울 · 기초수급 · 국가장학금 신청함"
   },
   {
    "id": "P3",
-   "label": "경희 인문 4학년 · 평점 2.8 · 8구간 · 경기"
+   "label": "경희 인문 4학년 · 평점 2.8 · 8구간 · 경기 · 국가장학금 안 냄"
   },
   {
    "id": "P4",
@@ -55,7 +55,7 @@
   },
   {
    "id": "reg-sejong-didim",
-   "text": "또는 ② 해당자 ① 국내 대학·대학원 학생(재학생 및 휴학생) ② 대학교 졸업(수료) 후 2년 이내 미취업자",
+   "text": "국내 대학·대학원 학생(재학생 및 휴학생) 또는 대학교 졸업(수료) 후 2년 이내 미취업자",
    "exclude": false,
    "verdict": {
     "P1": "ok",
@@ -146,7 +146,7 @@
   },
   {
    "id": "reg-hufs-seed",
-   "text": "2026-1학기 학부 재학생 (서울 및 글로벌) 으로 2026-1학기 평점 및 전체 평점 3.5 이상인 학생으로 아래 항목 중 2 개 이상 해당되는 자",
+   "text": "2026-1학기 학부 재학생 (서울 및 글로벌) 으로 2026-1학기 평점 및 전체 평점 3.5 이상인 학생으로 아래 항목 중 2개 이상 해당되는 자",
    "exclude": false,
    "verdict": {
     "P1": "ok",
@@ -185,12 +185,12 @@
   },
   {
    "id": "reg-kosaf-daecheonggyo",
-   "text": "직전학기 성적 백분위 70 점 이상인 재학생 (학자금 지원구간 무관 [10구간 지원 가능 ])",
+   "text": "직전학기 성적 백분위 70점 이상인 재학생 (학자금 지원구간 무관 [10구간 지원 가능])",
    "exclude": false,
    "verdict": {
-    "P1": null,
+    "P1": "ok",
     "P2": "ok",
-    "P3": null,
+    "P3": "ok",
     "P4": null,
     "P5": "ok",
     "P6": null
@@ -341,15 +341,15 @@
   },
   {
    "id": "auto-ent2431260269artclviewdo",
-   "text": "직전학기 백분위 성적 70 점 이상",
+   "text": "직전학기 백분위 성적 70점 이상",
    "exclude": false,
    "verdict": {
-    "P1": null,
+    "P1": "ok",
     "P2": "ok",
-    "P3": null,
+    "P3": "ok",
     "P4": null,
     "P5": "ok",
-    "P6": null
+    "P6": "ok"
    }
   },
   {
@@ -396,12 +396,12 @@
    "text": "2026년 2학기 기준 1학년",
    "exclude": false,
    "verdict": {
-    "P1": null,
-    "P2": null,
-    "P3": null,
+    "P1": "no",
+    "P2": "no",
+    "P3": "no",
     "P4": "ok",
-    "P5": null,
-    "P6": null
+    "P5": "no",
+    "P6": "no"
    }
   },
   {
@@ -432,7 +432,7 @@
   },
   {
    "id": "reg-hufs-gasong",
-   "text": "학업성적이 평균 평점 80 점 또는 평균평점 B 학점 이상인 학생 (F 학점이 있는 경우 지원 불가)",
+   "text": "학업성적이 평균 평점 80점 또는 평균평점 B 학점 이상인 학생 (F 학점이 있는 경우 지원 불가)",
    "exclude": false,
    "verdict": {
     "P1": "ok",
@@ -526,11 +526,11 @@
    "text": "4년제 대학교 이공계 전공 새터민 (북한 출생)으로 2026년도 2학기 재학 예정인 대학생",
    "exclude": false,
    "verdict": {
-    "P1": null,
+    "P1": "no",
     "P2": null,
-    "P3": null,
+    "P3": "no",
     "P4": null,
-    "P5": null,
+    "P5": "no",
     "P6": "no"
    }
   },
@@ -539,11 +539,11 @@
    "text": "2026년 2학기 기준 1학년 또는2학년 학생 (2026년 2학기 휴학생 및 휴학 예정자 지원 불가)",
    "exclude": false,
    "verdict": {
-    "P1": null,
-    "P2": null,
-    "P3": null,
+    "P1": "no",
+    "P2": "ok",
+    "P3": "no",
     "P4": "ok",
-    "P5": null,
+    "P5": "no",
     "P6": "no"
    }
   },
@@ -645,8 +645,8 @@
    "verdict": {
     "P1": null,
     "P2": null,
-    "P3": null,
-    "P4": null,
+    "P3": "no",
+    "P4": "no",
     "P5": null,
     "P6": "no"
    }
@@ -722,9 +722,9 @@
    "exclude": false,
    "verdict": {
     "P1": null,
-    "P2": "ok",
+    "P2": null,
     "P3": null,
-    "P4": null,
+    "P4": "no",
     "P5": null,
     "P6": "no"
    }
@@ -866,15 +866,15 @@
    "verdict": {
     "P1": "ok",
     "P2": "ok",
-    "P3": null,
+    "P3": "no",
     "P4": null,
     "P5": "ok",
-    "P6": null
+    "P6": "no"
    }
   },
   {
    "id": "auto-oardid321881menuno200318",
-   "text": "장애인 모범: 초·중·고·대학생",
+   "text": "장애인 모범 - 초·중·고·대학생",
    "exclude": false,
    "verdict": {
     "P1": null,
@@ -887,7 +887,7 @@
   },
   {
    "id": "auto-oardid321881menuno200318",
-   "text": "장애인 특기적성: 초·중·고·대학생",
+   "text": "장애인 특기적성 - 초·중·고·대학생",
    "exclude": false,
    "verdict": {
     "P1": null,
@@ -926,7 +926,7 @@
   },
   {
    "id": "auto-ent2431265883artclviewdo",
-   "text": "2026-2학기 본교 학부에 형제 · 자매가 2 인 이상 동시에 재학하고 있는 자",
+   "text": "2026-2학기 본교 학부에 형제 · 자매가 2인 이상 동시에 재학하고 있는 자",
    "exclude": false,
    "verdict": {
     "P1": null,
@@ -1065,6 +1065,97 @@
     "P4": null,
     "P5": null,
     "P6": "no"
+   }
+  },
+  {
+   "id": "reg-hufs-myeonhak",
+   "text": "2026년도 2학기 국가장학금을 신청하여 소득분위가 산출된 자",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": null,
+    "P6": null
+   }
+  },
+  {
+   "id": "auto-ent2431265667artclviewdo",
+   "text": "2026년도 2학기 한국장학재단 학자금 지원구간 통지를 받은 자",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": null,
+    "P6": null
+   }
+  },
+  {
+   "id": "auto-oardid322875menuno200318",
+   "text": "2026-2학기 국가장학금 1차/2차 신청자 중 0~3구간 해당자",
+   "exclude": false,
+   "verdict": {
+    "P1": "no",
+    "P2": "ok",
+    "P3": "no",
+    "P4": "no",
+    "P5": "no",
+    "P6": null
+   }
+  },
+  {
+   "id": "auto-oardid322874menuno200318",
+   "text": "2026학년도 2학기 국가장학금(1차, 2차)을 신청하여 2026-2학기 지원 구간 8구간 이하인 자",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": null,
+    "P6": null
+   }
+  },
+  {
+   "id": "auto-jong659273296artclviewdo",
+   "text": "2026학년도 2학기 국가장학금(Ⅰ유형) 신청 및 심사결과 승인 완료자",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": "no",
+    "P4": null,
+    "P5": null,
+    "P6": null
+   }
+  },
+  {
+   "id": "auto-2468viewdocurrentpageno1",
+   "text": "2026학년도 2학기 국가장학금 신청자 중 소득분위가 8분위 이하인 자",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": "ok",
+    "P3": "no",
+    "P4": null,
+    "P5": null,
+    "P6": null
+   }
+  },
+  {
+   "id": "auto-ticedoarticleno232062825",
+   "text": "국가장학금 등 1·2차 통합신청을 완료하였으나 국가근로장학금을 신청하지 않은 학생",
+   "exclude": false,
+   "verdict": {
+    "P1": null,
+    "P2": null,
+    "P3": "no",
+    "P4": null,
+    "P5": null,
+    "P6": null
    }
   }
  ]

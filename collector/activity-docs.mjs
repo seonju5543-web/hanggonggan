@@ -33,8 +33,10 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { FETCH_HEADERS } from './http-headers.mjs';
 import { htmlToLines } from './html-text.mjs';
+import { decodeEntities } from './clean-title.mjs';
 import { attachmentText, isOcrSource, isNoticeDoc } from './attachment-text.mjs';
 import { activityDetails, eligLineOk } from './activity-excerpts.mjs';
+const { cutAtNextSection } = await import('./extract-excerpts.mjs');   // activity-excerpts 와 같은 이유로 동적으로(환경변수보다 뒤에)
 
 const HERE = new URL('.', import.meta.url);
 const ACTS = fileURLToPath(new URL('../data/activities.json', HERE));
@@ -75,7 +77,14 @@ export const needsElig = (n) => !n.hidden && !(n.eligibilityLines && n.eligibili
 export function afterTitle(html, title) {
   const key = String(title || '').replace(/\[[^\]]*\]|\([^)]*\)/g, '').trim().slice(0, 10);
   if (key.length < 5) return html;
-  const at = html.lastIndexOf(key);
+  /* 🔴 **본문(</head> 뒤) 첫 번째** 제목 자리부터 — 마지막 자리를 쓰면 글 아래 '이전글·다음글·관련 글' 띠에 제목이 한 번 더 나오는 게시판에서
+     본문 포스터가 통째로 잘려 나갔다(농진청 `00._포스터.png`·한국교육환경보호원 getImage.do · 2026-10-16 실측 — 두 글 다 후보 0개). <head> 의 <title> 은 건너뛴다 */
+  /* 스크립트 문자열 속 제목(`document.title = '…'`)에서 시작하면 그 뒤 글자가 스크립트 코드다(청년재단 실측) — 스크립트·스타일은 먼저 걷는다 */
+  /* 글자 기호를 먼저 되돌린다 — 본문 제목이 `농업&middot;농촌` 으로 적힌 게시판(농진청)에서 제목을 못 찾아 글 아래 관련 글 띠의 제목으로 내려가 포스터가 잘렸다(2026-10-16) */
+  html = decodeEntities(String(html || '')).replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ');
+  const body = Math.max(0, html.search(/<\/head>/i));
+  const first = html.indexOf(key, body);
+  const at = first >= 0 ? first : html.lastIndexOf(key);
   return at < 0 ? html : html.slice(at);
 }
 
@@ -103,7 +112,9 @@ export function candidateFiles(n, html, pageUrl) {
     const name = String(a.name || '');
     if (FORMISH.test(name)) continue;
     if (!(DOC_EXT.test(name) || DOC_EXT.test(a.url || ''))) continue;
-    if (!(isNoticeDoc(name) || IMG_EXT.test(name) || /포스터|요강|안내문|공고문|리플렛|홍보물/.test(name))) continue;
+    /* `보도자료` 도 읽는다(2026-10-16 · 정책브리핑의 공모 글은 본문이 「첨부를 참고」 뿐이고 참가자격이 보도자료 HWPX·PDF 에만 있다 — korea.kr·과기정통부 실측).
+       활동 글만의 규칙이다 — isNoticeDoc(장학 deepfetch 와 공용)은 건드리지 않는다 */
+    if (!(isNoticeDoc(name) || IMG_EXT.test(name) || /포스터|요강|안내문|공고문|리플렛|홍보물|보도자료|\(보도\)|개요/.test(name))) continue;   // `운영 개요` 도(포스코이앤씨 멘토링 — 본문은 한 줄, 개요 파일에 전부)
     out.push({ url: a.url, name, from: 'attach' });
   }
   /* 🔴 본문 그림은 **글 제목 뒤**에서만 — 앞쪽은 사이트 머리·메뉴 그림이다(첫 실측: 인증서·광고 배너가 받아졌다) */
@@ -111,7 +122,9 @@ export function candidateFiles(n, html, pageUrl) {
   const re = /<img\b[^>]*\bsrc\s*=\s*["']([^"']+)["'][^>]*>/gi;
   let m;
   while ((m = re.exec(body)) !== null) {
-    if (CHROME_IMG.test(m[0])) continue;
+    /* 꾸밈 그림 판정은 주소·class 로 — alt·title 글자는 뺀다(농진청 포스터의 alt 에 '네이버폼(naver)' 이 있어 포스터가 꾸밈 그림으로 버려졌다 · 2026-10-16) */
+    const cls = (m[0].match(/\bclass\s*=\s*(?:"([^"]*)"|'([^']*)')/i) || [])[1] || '';
+    if (CHROME_IMG.test(m[1]) || CHROME_IMG.test(cls)) continue;
     let u;
     try { u = new URL(m[1].replace(/&amp;/g, '&'), pageUrl).href; } catch { continue; }
     if (CHROME_IMG.test(u)) continue;
@@ -232,7 +245,8 @@ async function fetchPost(n, until, common = new Set(), owners = new Map()) {
 
 /* 요강으로 가는 링크 — 이름으로 고른다. 같은 사이트(호스트)만 · 파일·자바스크립트 링크는 뺀다 */
 /* 🔴 이름이 분명한 것만 — `자세히 보기`·`모집 안내` 는 옆 목록의 **다른 사업**으로 갔다(스파로스 아카데미 → 「부산에 방문하는 청년」 · 2026-10-03 실측) */
-const GUIDE = /요강|공고문|참가\s?안내|참여\s?안내|대회\s?개요|공모\s?개요/;
+/* `공모안내`·`대회소개`·`참여방법` 도 따라간다(2026-10-16 · 지식재산처·데이터안심구역·공공누리처럼 첫 화면은 메뉴뿐이고 자격은 그 하위 페이지에 있다). `모집 안내` 는 여전히 안 간다(다른 사업 글) */
+const GUIDE = /요강|공고문|참가\s?안내|참여\s?안내|대회\s?개요|공모(?:전)?\s?(?:개요|안내|소개)|공모\s?부문|대회\s?소개|참여\s?방법/;   // 공모전개요·공모전소개·공모부문: 해양안전 콘텐츠 공모전 단일 사이트(포스터엔 자격이 없고 그 메뉴에 있다)
 export function guideLinks(html, pageUrl) {
   let host = '';
   try { host = new URL(pageUrl).host; } catch { return []; }
@@ -267,7 +281,7 @@ export function dueFree(entry, today) {
 /* ── OCR 엔진이 고장 난 동안 깎인 무료 기회 (2026-10-04 점검 gaps-02) ──
    10-03·10-04 첫 클라우드 실행들은 PaddleOCR 이 모든 그림에서 같은 오류로 '0장'이었는데(판 고정 전) 장부는 그 시도를 한 번으로 셌다.
    글마다 두 번뿐인 기회(MAX_TRIES)라, 두 번째도 고장 난 엔진에 걸리면 그 글은 무료 경로에서 영영 빠진다. */
-const LEDGER_V = 'paddle-pin-2026-10-04';   // 장부 판 — 바꾸면 다음 실행이 자격 못 찾은 칸을 한 번 비운다
+const LEDGER_V = 'press-attach-2026-10-16';   // 장부 판 — 바꾸면 다음 실행이 자격 못 찾은 칸을 한 번 비운다 · 10-16: 보도자료 첨부·onclick 내려받기·요강 링크 규칙이 바뀌어 못 읽은 글을 다시 해 본다
 /** 장부 판이 다르면 자격을 못 찾은 칸(lines 없음)을 한 번 비운다 — 비운 글은 다음 실행에 바로 다시 해 본다(dueFree(undefined)=true).
     `_` 로 시작하는 칸(_common 공통 그림 · _ocrV 판)은 남긴다. 몇 칸을 비웠는지 돌려준다. */
 export function migrateOcrTries(ledger, v = LEDGER_V) {
@@ -409,7 +423,8 @@ export function mergeBrowserResults(acts, bled = readJson(BROWSER_LEDGER, {})) {
   let got = 0;
   for (const n of acts.items) {
     const r = bled[n.url];
-    const lines = ((r && r.lines) || []).filter(eligLineOk);
+    /* 장부의 줄은 적힌 날의 자르기로 뽑힌 것 — 합칠 때 절 끝(참가방법·시상규모)에서 한 번 더 자른다(extract-excerpts cutAtNextSection · 2026-10-16) */
+    const lines = cutAtNextSection((r && r.lines) || []).filter(eligLineOk);
     if (!lines.length || !needsElig(n)) continue;
     n.eligibilityLines = lines;
     const excludes = (r.excludes || []).filter(eligLineOk);
@@ -425,7 +440,11 @@ async function aiPhase(acts, write) {
   process.env.ELIG_AI_AS_LIB = '1';      // 본편(장학 등록분 처리)은 건너뛰고 함수만 쓴다
   const AI = await import('./eligibility-ai.mjs');
   const cfg = readJson(fileURLToPath(new URL('eligibility-ai-config.json', HERE)), {});
-  const targets = acts.items.filter((n) => needsElig(n) && (n.aiTries || 0) < (cfg.giveUpAfter ?? 3));
+  /* ACT_AI_ONLY=<주소 일부> — 한 글만(사람이 포스터를 읽어 ELIG_AI_FAKE 로 같은 관문에 태울 때 · 2026-10-16). 가짜 응답은 호출마다 같아 여러 글에 돌리면 안 된다 */
+  const only = process.env.ACT_AI_ONLY || '';
+  let targets = acts.items.filter((n) => needsElig(n) && (n.aiTries || 0) < (cfg.giveUpAfter ?? 3) && (!only || n.url.includes(only)));
+  /* 🔴 ACT_AI_ONLY 는 **한 글**만 — 두 글에 걸리면 같은 가짜 응답이 둘 다에 적힌다(첫 실행에서 성균관대 글 둘에 같은 줄이 들어갔다 · 2026-10-16). 걸리는 글이 둘 이상이면 아무것도 안 한다 */
+  if (only && targets.length > 1) { log(`ACT_AI_ONLY='${only}' 에 ${targets.length}건이 걸립니다 — 한 글만 가리키도록 주소를 더 적어 주세요(아무것도 하지 않음): ${targets.map((n) => n.url).join(' · ')}`); targets = []; }
   log(`AI 대상 ${targets.length}건 (자격 0줄 · 무료로 못 읽은 것)`);
   const on = cfg.enabled || process.env.ELIG_AI_ENABLE === '1';
   if (!on) { log('꺼져 있음 (eligibility-ai-config.json enabled · 버튼은 ELIG_AI_ENABLE=1) — 부르지 않는다'); return 0; }
@@ -443,7 +462,9 @@ async function aiPhase(acts, write) {
     const item = { name: n.title };
     let v = null, from = '';
     try {
-      const files = (await fetchPost(n, Date.now() + 60000, common, owners)) || [];
+      let files = (await fetchPost(n, Date.now() + 60000, common, owners)) || [];
+      /* 스크립트 껍데기 페이지(국방부·물환경)는 무료 모드가 아무것도 못 받는다 — 브라우저 로봇이 받아 둔 같은 글의 파일(act-files/<키>-*)이 있으면 그것을 쓴다(2026-10-16) */
+      if (!files.some((f) => AI_FILE.test(f))) { try { files = fs.readdirSync(DIR).filter((f) => f.startsWith(`${keyOf(n.url)}-`)); } catch { /* 폴더 없음 */ } }
       const file = files.find((f) => AI_FILE.test(f));
       if (file) {
         const kind = /\.pdf$/i.test(file) ? 'pdf' : 'image';

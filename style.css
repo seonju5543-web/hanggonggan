@@ -1329,6 +1329,15 @@ textarea:focus {
 
 /* 판정할 수 없는 요건 — 번호만 붙이고 색을 칠하지 않는다 (틀린 초록 체크보다 낫다) */
 .reason-list .r-req { color: var(--text-sub); }
+/* ※ 예외 참고(`10학기 이하 후기 이중전공자는 … 신청 가능`) — 요건이 아니라 옅게 (2026-10-15 · app.js eligibilityRowsHtml ②) */
+.reason-list .r-aside { color: var(--text-weak); }
+/* 금액을 못 읽은 공고의 금액 자리 — 큰 파란 글씨가 아니라 옅은 한 줄 (2026-10-15 · openDetail) */
+.sheet-amount.sheet-amount-unknown { font-size: var(--t-sm); font-weight: 500; color: var(--text-sub); }
+/* 증명서류 체크리스트 — 줄마다 ✓·□·△ 가 있어 목록 점은 두 겹이다 (2026-10-15 · certStatusListHtml) */
+.doc-list.doc-check li::before { display: none; }
+.doc-list.doc-check li { padding-left: var(--space-2); }
+/* 「공고 안내」 이름표 (2026-10-15 · noticeSummaryHtml) */
+.doc-list.notice-summary .ns-k { font-weight: 700; color: var(--text); margin-right: var(--space-6); }
 
 /* 갈래 이름 — '둘 중 하나' 아래에서 어느 쪽이 내 경우인지 가리키는 줄 (2026-08-23).
    원문의 표 머리(예: "재학생(계속장학생)")를 그대로 쓴다. 학생은 자기가 어느 쪽인지

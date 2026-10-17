@@ -1,7 +1,71 @@
 {
  "school": "가톨릭대학교",
- "updatedAt": "2026-10-14",
+ "updatedAt": "2026-10-17",
  "items": [
+  {
+   "title": "경기·인천 지역 대학의 지속가능한 발전을 위한 정책토론회 개최 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276840&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-16",
+   "kind": "행사",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-16",
+   "thumb": "data/news/img/0e908fc74342ab4f.webp",
+   "desc": "경기·인천 지역 대학의 정책적 소외 문제를 살펴보고 지속가능한 발전 방안을 논의하는 정책토론회가 개최됩니다. 관심 있는 분들의 많은 참여 바랍니다."
+  },
+  {
+   "title": "[학생지원팀] 2026년 2학기 거창군 지역출신 대학생 등록금 지원사업 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276848&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-16",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-16",
+   "thumb": "data/news/img/38b095bdd78297a8.webp"
+  },
+  {
+   "title": "[교무행정팀] 2027년 2월 말 퇴직교원 정부포상 추천대상자 공개검증",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276819&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-16",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-16"
+  },
+  {
+   "title": "[대플-추천채용] 한샘 – 2026년 하반기 영업직 신입(TR) 공개채용",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276847&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-16",
+   "kind": "채용",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-16",
+   "desc": "***추천채용을 통해 지원하는 경우 “서류전형 가점” 혜택 부여 1. 세부일정 : *전형절차 : 서류전형 -> 1차면접 -> 인성검사 -> 최종면접 -> 최종합격"
+  },
+  {
+   "title": "[학사행정팀] 2026학년도 겨울계절학기 서울 및 경인지역 대학교 학점교류 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276791&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-15",
+   "kind": "학사",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-15",
+   "desc": "※ 교류대학의 접수 마감일을 확인하고 , 트리니티에서 신청 후 필히 방문 및 서류제출 ( 제출처 : 학사행정팀 / 미카엘관 H104 호 09:00~17:00, 점심시간 12:00~13:00 제외 )"
+  },
+  {
+   "title": "[지역협력센터] 연천 여행단(연천 로컬 관광 크리에이터) 모집 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276759&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-14",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-14",
+   "thumb": "data/news/img/f4d40816ca6e695c.webp",
+   "desc": "연천 1박 2일 여행 코스를 직접 기획하고, 다녀온 뒤 사진·숏폼 콘텐츠로 남기는 재학생 참여 프로그램입니다."
+  },
   {
    "title": "[기숙사상담실 마음숲] 2026학년도 2학기 열린상담실 안내",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276754&article.offset=0&articleLimit=10",
@@ -181,7 +245,6 @@
    "campus": "",
    "foundAt": "2026-10-02",
    "thumb": "data/news/img/b9ae3bfa559b5256.webp",
-   "desc": "작성자 : 취업지원팀 📍 신청 기간 : 10월 13일(화) 09:00 ~ 10월 25일(일) 23:59 까지",
    "src": "5d85d287"
   },
   {
@@ -190,7 +253,8 @@
    "postedAt": "2026-09-22",
    "school": "가톨릭대학교",
    "campus": "",
-   "foundAt": "2026-10-02"
+   "foundAt": "2026-10-02",
+   "desc": "1. 모집공간 ○ 대상공간(가톨릭대학교 성심교정) 2. 모집대상 ○ 자격요건"
   },
   {
    "title": "[IR센터] 2026학년도 2학기 CUK-COCOA 대학생 역량 자가진단 평가 이벤트 안내",
@@ -218,8 +282,7 @@
    "school": "가톨릭대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/a78c5cf200e2b7f2.webp",
-   "desc": "[대학일자리플러스센터] 진천상공회의소 2026년 미래내일 일경험 참여자 모집 안내 [교수학습개발원] 2026학년도 AI활용 세미나 4차 ‘에이전틱 AI시대, 대학 교수 업무 방식 패러다임 변화’ 신청 안내…"
+   "thumb": "data/news/img/a78c5cf200e2b7f2.webp"
   },
   {
    "title": "[취업지원팀] 전국 지역인재 7급 수습직원 선발시험 변경사항 안내",
@@ -227,8 +290,7 @@
    "postedAt": "2026-09-30",
    "school": "가톨릭대학교",
    "campus": "",
-   "foundAt": "2026-10-01",
-   "desc": "[학생지원팀] 2026학년도 2학기 하나금융나눔재단 하나장학생 선발 안내 [대학일자리플러스센터] 진천상공회의소 2026년 미래내일 일경험 참여자 모집 안내 대학/대학원 주요사이트 관련 기관 맨위로가기 트리니티…"
+   "foundAt": "2026-10-01"
   }
  ]
 }

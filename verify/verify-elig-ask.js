@@ -213,6 +213,45 @@ async function seed(page) {
     `남은 칸 ${after.inputs} · 단추 ${closed.one}`);
   ok('  그래도 공고는 그대로다', closed.title === titleBefore, closed.title);
 
+  /* ⑧ 국가장학금 신청 항목 (2026-10-15 · 노션 G-14 결정 ②) — 프로필에 없는 '행동'을 예/아니요로 묻고, 그 답이 위 자격 블록의 줄을 판정한다.
+     🔴 공고 id 를 박지 않는다 — 그 항목을 물을 수 있는 공고를 그때그때 고른다(없으면 건너뛴다고 알린다).
+     세 상태를 본다: 안 답함 → 표시 없음(r-req) · 「예」 → ✓(r-ok) · 「아니요」 → ✕(r-bad). 프로필은 매번 새로 심는다. */
+  const KOSAF_ROW = '국가장학금[^.]{0,24}신청|지원\\s?구간 통지';
+  const kosafTarget = await page.evaluate(() => {
+    const hit = allScholarships().map((s) => ({ id: s.id, ask: askableForSch(s, state.profile) }))
+      .find((x) => x.ask.includes('trait:kosafApplied'));
+    return hit ? hit.id : null;
+  });
+  if (!kosafTarget) console.log('  ⓘ 국가장학금 신청을 물을 공고가 없어 ⑧ 을 건너뜁니다 (마감으로 목록이 비었을 수 있습니다)');
+  else {
+    const kosafRows = () => page.evaluate((re) => [...document.querySelectorAll('#detail-sheet .r-elig')]
+      .filter((li) => new RegExp(re).test(li.textContent)).map((li) => li.className), KOSAF_ROW);
+    const answer = async (val) => {
+      await seed(page);
+      await page.evaluate((id) => openDetail(id), kosafTarget);
+      await page.waitForSelector('#detail-sheet:not([hidden])');
+      const before = await kosafRows();
+      await page.click('#detail-sheet [data-elig-open]');
+      await page.waitForSelector('#detail-sheet .elig-ask-on');
+      const label = await page.evaluate(() => [...document.querySelectorAll('.elig-ask-yn > span')].map((s) => s.textContent));
+      await page.click(`[data-elig-trait="kosafApplied"][data-elig-val="${val}"]`);
+      await page.click('[data-elig-save]');
+      await page.waitForTimeout(400);
+      const after = await kosafRows();
+      const saved = await page.evaluate(() => (JSON.parse(localStorage.getItem('handaejang.v1')).profile.traits || {}).kosafApplied);
+      return { before, after, label, saved };
+    };
+    const yes = await answer('1');
+    ok('국가장학금 신청 — 묻기 상자에 「이번 학기 국가장학금 신청」 항목이 뜬다 (기존 처지 항목과 같은 예/아니요 알약)',
+      yes.label.includes('이번 학기 국가장학금 신청'), yes.label.join(' / '));
+    ok('  답하기 전에는 그 줄에 표시가 없다', yes.before.length > 0 && yes.before.every((c) => /r-req/.test(c)), yes.before.join(' / ') || '줄 없음');
+    ok('  「예」 로 저장하면 그 줄이 ✓ 가 된다', yes.after.some((c) => /r-ok/.test(c)) && !yes.after.some((c) => /r-bad/.test(c)), yes.after.join(' / ') || '줄 없음');
+    ok('  답이 프로필 traits 에 true 로 남는다', yes.saved === true, String(yes.saved));
+    const no = await answer('0');
+    ok('  「아니요」 로 저장하면 그 줄이 ✕ 가 된다', no.after.some((c) => /r-bad/.test(c)) && !no.after.some((c) => /r-ok/.test(c)), no.after.join(' / ') || '줄 없음');
+    ok('  답이 프로필 traits 에 false 로 남는다', no.saved === false, String(no.saved));
+  }
+
   console.log(`\n${fails.length ? `✕ 실패 ${fails.length}건` : `✓ 전부 통과 (${pass}항목)`}`);
   fails.forEach((f) => console.log(`   - ${f}`));
   await browser.close();

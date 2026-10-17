@@ -748,7 +748,7 @@ function sourceLinkHintHtml(link) {
    실측: 정식 등록·활동 첨부 50건이 이 꼴이다. 받을 길은 원문 게시판뿐이라 그렇게 말한다(지어내지 않는다). */
 function attachmentLinkHtml(a, style) {
   const href = safeUrl(a && a.url);
-  const name = esc((a && a.name) || '첨부 파일');
+  const name = esc(unent((a && a.name) || '').replace(/\s+/g, ' ').trim() || '첨부 파일');   // 이름에 남은 `&nbsp;[ 101.7 KB ]` 엔터티를 푼다(2026-10-15)
   return href
     ? `<a href="${esc(href)}" target="_blank" rel="noopener"${style ? ` style="${style}"` : ''}>${name}</a>`
     : `${name} <span class="doc-legend">(원문 게시판에서 내려받기)</span>`;
@@ -2159,7 +2159,7 @@ function autoDocs(sch) {
    자동 등록분은 documents 에 `지원 자격·제출 서류는 원문 공고에서 확인` 한 줄만 들고 온다
    (층2는 `재단 공고문에서 확인`). 이걸 체크리스트에 올리면 "□ 지원 자격·제출 서류는 원문 공고에서
    확인 — 공식 제출 시 함께 준비하세요" 처럼 **서류가 아닌 것을 챙기라고** 말한다(2026-09-23). */
-const DOC_PLACEHOLDER = /(원문\s*공고|공고문)(에서)?\s*확인/;
+const DOC_PLACEHOLDER = /(원문\s*공고|공고문|재?공고\s*원문)(에서)?\s*확인/;   // `구비서류는 재공고 원문 확인` 도 서류가 아니다(2026-10-15)
 
 /* ── 신청 준비 체크리스트 (2026-10-13 ③ · 개발자 "남은 것 모두 진행") ──────────────────────
    '준비 완료'는 버튼이 아니라 네 항목의 결과다 — ① 제출 서류 확인 ② 서류 작성 ③ 증명서 준비 ④ 제출 방법 확인.
@@ -2210,7 +2210,8 @@ function certStatusListHtml(sch) {
     if (/자동/.test(doc)) return `<li>△ ${name} — 학교·재단 연동 후 자동 첨부 (또는 보관함에 올려두세요)</li>`;
     return `<li>□ ${esc(doc)} — 공식 제출 시 함께 준비하세요</li>`;
   }).join('');
-  return `<h4>증명서류 체크리스트</h4><ul class="doc-list">${rows}</ul>
+  /* doc-check — 줄마다 ✓·□·△ 표식이 있어 목록 점은 뺀다(표식이 두 겹이던 자리 · 2026-10-15 · style.css) */
+  return `<h4>증명서류 체크리스트</h4><ul class="doc-list doc-check">${rows}</ul>
     <p class="dp-note">보관함(MY 탭) 서류는 다음 신청부터 자동 첨부.</p>`;
 }
 
@@ -2399,12 +2400,13 @@ function renderFormFill(restore) {
       <div class="sheet-handle"></div>
       <div class="sheet-body">
         <h3 class="sheet-title">${tpl.unofficial ? '지원문서 작성' : '양식 작성'}</h3>
-        <p class="sheet-provider">${esc(tpl.title)} · ${tpl.unofficial ? esc(tpl.lead || '이 공고에 맞춘 지원문서') : '실제 공고 양식과 같은 구조로 만들어집니다'}</p>
+        ${/* 양식 이름의 깨진 점(`수집․이용․제3자` — 한글 문서의 가운뎃점 글자)은 보통 가운뎃점으로(2026-10-15) · 뒤의 설명 문장은 뺐다 */ ''}
+        <p class="sheet-provider">${esc(tidyChars(tpl.title))}${tpl.unofficial ? ` · ${esc(tpl.lead || '이 공고에 맞춘 지원문서')}` : ''}</p>
         ${tpl.unofficial ? prepOriginalsHtml(sch) : ''}
         ${formQuestionsHtml(tpl)}
         ${typeof essayButtonHtml === 'function' ? essayButtonHtml(tpl) : ''}
         <button class="btn btn-primary btn-lg" id="btn-ff-generate">양식 문서 만들기</button>
-        <p class="dp-note">이미 아는 정보는 묻지 않고 자동으로 채웁니다 — 위 '프로필에서 자동으로 채운 항목'에서 확인·수정할 수 있습니다.</p>
+        ${/* '이미 아는 정보는 묻지 않고 자동으로 채웁니다 — 위 …에서 확인' 줄을 뺐다(2026-10-15) — 그 '위 항목'이 없는 양식에서도 떠 있었고, 있을 땐 그 접힘 제목이 이미 같은 말을 한다 */ ''}
       </div>`;
     /* 잠깐 나갔다 온 학생의 답을 그대로 되돌려 넣는다 (AI 초안도 같은 칸에 있어 함께 온다).
        🔴 `essayBind` **앞에** 둔다 — 뒤에 두면 초안 도우미가 이미 읽어 간 값과 어긋난다. */
@@ -3359,7 +3361,7 @@ const activityBenefit = (n) => ((n.excerpts || []).find((x) => x.label === '혜�
    🔴 주최를 적은 대괄호(`[감사원]`·`[KOICA…]`)는 남긴다 — 정책브리핑 글은 그것이 유일한 주최 정보다. 게시판 분류표(`[일반]`·`[공고]`)만 뗀다 */
 const ACT_TAG = /^(?:일반|공통|외부|공고|공지|모집|안내|홍보|국제학생|학사|봉사|행사|교내|교외|마감|모집중|접수중|진행중|이벤트)$/;
 function activityTitle(n) {
-  let t = unent(String((n && n.title) || '')).replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, '').replace(/\s+/g, ' ').trim();
+  let t = unent(String((n && n.title) || '')).replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, '').replace(/[\u2022\u25CF]/g, '\u00B7').replace(/[\u2605\u2606\u261E]+/g, ' ').replace(/\s+/g, ' ').trim();   // 제목의 굵은 점·별·손가락 기호는 가운뎃점이나 공백으로 — 꾸밈이지 뜻이 아니다 (2026-10-15)
   const before = t;
   t = t.replace(/\s*기간\s*:\s*\d{4}[\d.\s~\-]*$/, '');                                   // 정책브리핑 `… 기간 : 2026.09.14 ~ 2026.10.13`
   t = t.replace(/\s+\S*(?:팀|과|처|센터)\s+\d{4}-\d{2}-\d{2}.*$/, '');                     // 게시판 행 찌꺼기 `학생지원팀 2026-05-18 1,0…`
@@ -3454,11 +3456,14 @@ function openActivityDetail(url) {
   const { sch, result, fit, fd } = activityFit(n);
   const d = n.deadline ? dday(n.deadline) : null;
   const benefit = unent(activityBenefit(n));
-  const rows = (n.excerpts || []).filter((x) => x.label !== '혜택');
+  /* 「대상」 발췌는 자격 줄이 있으면 위 「지원 자격」이 이미 보여 준다 — 같은 A·B·C 조건이 「모집 안내」에 한 번 더 떴다(쇼미더임팩트 · 2026-10-16 개발자 지적) */
+  const rows = (n.excerpts || []).filter((x) => x.label !== '혜택' && !(x.label === '대상' && (n.eligibilityLines || []).length));
   /* 원문 안내 — 위 '모집 안내'에 이미 나온 문장은 다시 적지 않는다(같은 접수기간이 두 칸에 떴다 · 2026-10-01) */
   const flat = (x) => String(unent(x || '')).replace(/[\s:：·\-–]/g, '');
   const seenText = [...(n.excerpts || []).map((x) => flat(x.text)), ...(n.eligibilityLines || []).map(flat)].filter((x) => x.length >= 6);
   const notice = (n.noticeLines || []).filter((l) => !seenText.some((e) => flat(l).includes(e)));
+  const eligRows = eligibilityRowsHtml(sch, result).replace(/<li class="r-unk">\? 지원 자격은 [^<]*<\/li>/g, '');   // '원문에서 확인' 한 줄뿐이면 빈 글자 → 칸을 접는다
+  const recruitHtml = activityRecruitHtml(n, rows);
   sheetBack = null;   // 이 시트에는 돌아갈 곳이 없다 — 내리면 닫힌다
   $('#detail-sheet').innerHTML = `
     <div class="sheet-handle"></div>
@@ -3475,33 +3480,50 @@ function openActivityDetail(url) {
 
       ${/* 지원 자격 — 장학 시트와 **같은 함수·같은 모양**(eligibilityRowsHtml · fitBadgeHtml full · 묻기 상자).
            '지원 가능·선발 심사' 알약(STATUS_META)은 달지 않는다 — 활동 글에는 구조화 조건이 없어 그 알약은 늘 '가능'이라 거짓 안심이 된다. */ ''}
+      ${/* 🔴 읽은 자격이 하나도 없으면 「지원 자격」 칸 자체를 접는다(2026-10-17 개발자 "원문에서 확인 이렇게 뜨는 게 하나도 없어야") — '원문에서 확인하라'는 줄은
+           학생에게 아무 정보도 아니다. 모른다는 사실은 칸이 없는 것으로 말하고, 원문 단추가 아래에 있다. 장학 시트는 그대로(자격 미확인 배지가 그 몫) */ ''}
+      ${eligRows ? `
       <div class="sheet-verdict">
         <h4>지원 자격</h4>
         <span class="verdict-marks">${fitBadgeHtml(fit, fd, { full: true })}</span>
       </div>
-      <ul class="reason-list">${eligibilityRowsHtml(sch, result)}</ul>
+      <ul class="reason-list">${eligRows}</ul>` : ''}
       ${eligAskHtml(sch)}
 
       ${benefit && benefit.length > 40 ? `
-      <h4>혜택 <span class="channel-tag">원문 그대로</span></h4>
+      <h4>혜택</h4>
       <ul class="doc-list">${benefitItems(benefit).map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
-      <h4>모집 안내 <span class="channel-tag">원문 그대로</span></h4>
-      ${rows.length
-        ? `<ul class="doc-list">${rows.map((x) => `<li>${esc(x.label)} · ${esc(unent(x.text))}</li>`).join('')}</ul>`
-        : (n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint)
-          ? `<ul class="doc-list"><li>${esc(hintText(n.deadlineHint))}</li></ul>`
-          : '<p class="doc-legend">모집 기간·대상은 공고 원문에서 확인해 주세요.</p>')}
-      ${notice.length ? `
-      <h4>공고 원문 안내 <span class="channel-tag">원문 그대로</span></h4>
-      <ul class="doc-list">${notice.map((l) => `<li>${esc(unent(l))}</li>`).join('')}</ul>` : ''}
+      ${/* 「모집 안내」도 보일 것이 있을 때만 — 없으면 칸을 접는다('모집 기간·대상은 원문에서 확인' 문구 삭제 · 2026-10-17) */ ''}
+      ${recruitHtml ? `<h4>모집 안내</h4>${recruitHtml}` : ''}
+      ${noticeSummaryHtml(notice)}
       ${(n.attachments || []).length ? `
       <h4>공고 원본 첨부</h4>
       <ul class="doc-list">${n.attachments.map((a) => `<li class="att">${attachmentLinkHtml(a, 'color:var(--primary)')}</li>`).join('')}</ul>` : ''}
-      <p class="sheet-deadline">마감일 ${esc(n.deadline || '원문 공고 확인')}</p>
+      ${n.deadline ? `<p class="sheet-deadline">마감일 ${esc(n.deadline)}</p>` : ''}
       ${activityLinkHtml(n)}
     </div>`;
   openSheetShell();
   eligAskWire(sch, () => openActivityDetail(url));   // 묻기 상자 배선 — 다시 그릴 때 이 시트로 돌아온다
+}
+/* 활동 시트 「모집 안내」 본문 — 발췌 줄이 있으면 그것, 없으면 기간 한 토막(deadlineHint), 둘 다 없으면 빈 글자(칸을 접는다) */
+function activityRecruitHtml(n, rows) {
+  return rows.length
+        ? `<ul class="doc-list">${rows.flatMap((x) => {
+          /* 한 칸에 여러 항목이 글머리 기호로 붙어 온 것(`2026.8.13 ~ 8.23 ○ (신청방법) 네이버 폼 … ○ (모집대상) 만 19세~39세`)은
+             항목마다 한 줄로 — 뒤 항목의 괄호 이름표가 그 줄의 이름표다(공고 안내 noticeSummaryHtml 과 같은 규칙 · 2026-10-15) */
+          const segs = tidyChars(unent(x.text)).split(/\s+[○●■□\u25B6▷◆◇]\s*(?=\S)/);
+          const first = segs[0].replace(/^[(（]?\s*[가-힣\s]{2,8}[)）]\s*/, (m) => (m.replace(/[()（）\s]/g, '') === String(x.label).replace(/\s/g, '') ? '' : m));
+          return [`<li>${esc(x.label)} · ${esc(first)}</li>`, ...segs.slice(1).map((s) => {
+            const m = s.match(/^[(（]([가-힣A-Za-z0-9\s·]{1,12})[)）]\s*(.+)$/);
+            return m ? `<li>${esc(m[1].trim())} · ${esc(m[2].trim())}</li>` : `<li>${esc(s)}</li>`;
+          })];
+        }).join('')}</ul>`
+        : (n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint)
+          /* 기간 한 토막(deadlineHint)도 글머리 기호로 붙은 항목은 줄을 가르고, 앞이 잘린 괄호 이름표(`모집기간) …`)는 `모집기간 · …` 로(2026-10-15) */
+          ? `<ul class="doc-list">${tidyChars(hintText(n.deadlineHint)).split(/\s+[○●■□\u25B6▷◆◇]\s*(?=\S)/)
+            .map((s) => s.replace(/^[(（]?\s*([가-힣\s]{2,8})[)）]\s*/, '$1 · ').trim()).filter((s) => s.length >= 4)
+            .map((s) => `<li>${esc(s)}</li>`).join('')}</ul>`
+          : '');
 }
 
 /* ---------------- 재단·지자체 새 공고 (2026-09-26 · 노션 F-13 · 교외 확대) ----------------
@@ -3821,10 +3843,8 @@ function renderApplyPrep(sch) {
       ${otherAtts.length ? `
       <h4>${kosaf ? '선발 공고문 <span class="channel-tag">재단 원문</span>' : '공고 첨부 파일'}</h4>
       ${attList(otherAtts, kosaf ? '재단 원문 첨부' : '학교 게시판 첨부')}` : ''}
-      ${excerpts.length ? `
-      <h4>공고 원문 안내 <span class="channel-tag">원문 그대로</span></h4>
-      <ul class="doc-list">${excerpts.map((e) => `<li>${esc(e)}</li>`).join('')}</ul>` : ''}
-      ${certHtml || '<p class="dp-note">제출 서류는 공고 원문에서 확인해 주세요.</p>'}
+      ${noticeSummaryHtml(excerpts)}
+      ${certHtml}
       <h4>최종 제출 방법 <span class="channel-tag">${submitChannelLabel(sch)}</span></h4>
       <ol class="guide-list">${ch.guide.map((g) => `<li>${g}</li>`).join('')}</ol>
       ${schoolPortalNote(sch)}
@@ -3833,7 +3853,8 @@ function renderApplyPrep(sch) {
       ${/* 🔴 '완료'라는 말을 학생이 아무것도 안 한 시점에 쓰지 않는다 (2026-10-13 개발자 결정 — 이 시트는 이제
            앱 지원문서가 없는 상시 제도·층2에서만 뜬다 · 그 밖은 양식 작성 화면이 먼저다) */ ''}
       <button class="btn btn-primary btn-lg" id="btn-prep-confirm">확인했어요 — 신청내역에 담기</button>
-      <p class="dp-note">누르면 신청내역에 담기고, 제출·결과는 그곳에서 기록합니다. 학교·재단에 접수되는 것은 아닙니다.</p>
+      ${/* 정직한 신청 상태(원칙 1)는 한 마디로 — 긴 설명은 뺐다(2026-10-15) */ ''}
+      <p class="dp-note">신청내역에 담길 뿐, 학교·재단에 접수되지는 않아요.</p>
     </div>`;
   /* 확인하면 **닫지 않고 그 공고의 '준비 완료' 화면을 연다** (2026-09-23 리뷰) — 다음 할 일
      (메일 접수 버튼·제출처 열기·'공식 제출 완료로 기록')이 거기 있다. 닫아 버리면 메일 접수
@@ -4284,6 +4305,93 @@ function schoolPortalNote(sch) {
 /* '자세한 내용은 ○○ ↗에서 확인' 한 줄 — 공고 상세와 신청 준비 시트가 같이 쓴다.
    🔴 링크 이름은 그 주소가 **실제로 여는 화면**을 말한다(아래 openDetail 의 두 문단 참조).
       시트마다 따로 적으면 한쪽만 '원문 공고'라고 거짓말하게 된다. */
+/* ── 「공고 안내」 — 원문 발췌를 **읽을 수 있는 몇 줄**로 (2026-10-15 개발자 지시 ⑤ "원문 글을 그대로 긁어 … 원문 그대로 원칙을 바꿔라").
+   예전엔 발췌(excerpts)를 「공고 원문 안내 · 원문 그대로」 머리 아래 줄 단위로 그대로 쏟았다 — 글머리 기호(`8) 문의처`·`■ 접수 방법`·`○ 문의처`)가 붙은 채,
+   한 줄에 여러 이름표가 붙은 채. 이제는 **골라서 다듬는다** — 문장을 지어내지는 않는다(원칙 8-1 의 '추론 금지'는 그대로 · 바뀐 것은 '통째로'가 '골라서'로).
+     · 이름표(`신청기간 :`·`접수방법 :`·`장학금액 :`·`문의처 :`)를 알아보고 **같은 뜻의 이름표를 한 이름으로** 묶는다 — 신청 기간 · 신청 방법 · 지원 금액 · 제출 서류 · 문의
+     · 지원 자격·대상 줄은 여기 다시 적지 않는다(위 「지원 자격」이 보여 준다)
+     · 글머리 기호·번호·엔터티를 떼고(tidyRequirement 와 같은 규칙) 한 줄을 180자에서 끊지 않고 **문장 끝에서** 자른다 · 같은 줄은 한 번만
+     · 이름표가 없는 문장은 그대로 두되 끝이 `하고`·`및`·`,` 로 잘린 조각은 뺀다(원문이 잘려 온 것 — 보여 주면 "~하고에서 끊김")
+     · 많아야 여덟 줄 — 나머지는 원문 링크 몫
+   활동 시트의 공고 안내(noticeLines)도 같은 함수를 쓴다(이름표 없는 문장만이라 다듬기·조각 거르기만 걸린다). */
+const NS_LABELS = [
+  [/^(?:서류\s?)?(?:신청|접수|모집|지원|응모|추천|제출)\s?(?:기간|기한|마감(?:일시?)?)$/, '신청 기간'],
+  [/^(?:신청|접수|제출|응모|지원)\s?방법$/, '신청 방법'],
+  [/^(?:장학|지원|지급|수여)?\s?금액$|^(?:선발\s?인원\s?및\s?)?(?:장학|지원|지급)\s?금액(?:\s?및\s?(?:선발|추천)\s?인원)?$/, '지원 금액'],
+  [/^(?:선발|모집|추천)\s?인원$/, '선발 인원'],
+  [/^(?:제출|구비|필수)\s?서류$/, '제출 서류'],
+  [/^(?:기타\s?)?(?:관련\s?)?문의(?:처)?(?:\s?및\s?.*)?$|^전화$|^연락처$|^기타\s?사항\s?및\s?문의처$/, '문의'],
+  [/^기타\s?사항$|^유의\s?사항$|^참고$/, '참고'],
+];
+const NS_SKIP = /^(?:지원|신청|응모|모집|선발|추천)\s?(?:자격|대상|요건)$|^자격\s?요건$|^대상$/;
+const NS_DANGLE = /(?:하고|하며|하여|이며|및|또는|으로|에서|,|\(|：|:|~|-|·)$/;
+/* 줄로 쪼개진 원문을 **읽을 수 있는 줄**로 (2026-10-16 개발자 "공고 안내에도 그냥 원문에서 절만 잘라서") — 글자는 그대로, 잇기만 한다
+   · 납작한 표 `활동일시` ↵ `ㅇ 2026.10.18` → `활동일시 : 2026.10.18` (NS_BARE_LABEL — 이름표만 남은 줄은 다음 줄의 이름표다)
+   · 줄바꿈으로 끊긴 한 문장 `…희망하는` ↵ `기업들의 …` ↵ `하는 … 합니다.` → 한 줄 (앞 줄이 문장 끝 NS_LINE_END 가 아니고 다음 줄이 항목 머리 NS_ITEM_HEAD 가 아닐 때)
+   · 이름표 없는 줄은 **문장이거나 알맹이(숫자·주소)가 있을 때만**(NS_SENTENCE) — `강북창업지원센터에서` 같은 조각은 안 보인다 */
+const NS_BARE_LABEL = /^[\s○●■□ㅇ·\-–]*[가-힣\s]{2,8}(?:기간|일시|일정|장소|방법|대상|내용|인원|문의|혜택|접수|자격|요건)\s*[:：]?\s*$/;
+const NS_LINE_END = /(?:[.。!?)）」』>:：]|[다요함음임됨]|\d)\s*$/;
+/* ▪(U+25AA)·▶(U+25B6)는 글머리 기호인데 유니코드 표에선 그림 글자라 화면 이모지 관문(ui-tone)에 걸린다 — 코드로 적는다 */
+const NS_ITEM_HEAD = /^\s*(?:[○•◦\u25AA■□◎※\-–·ㅇ*\u25B6▷◆◇①-⑳]|\d{1,2}\s?[.)]|[A-Za-z가-힣]\s?[.)]\s|[가-힣A-Za-z0-9\s·()]{1,14}\s?[:：])/;
+const NS_SENTENCE = /(?:[.。!?)）」』]|[다요함음임됨])\s*$|\d|https?:|@/;
+function joinNoticeLines(segs) {
+  const out = [];
+  for (const raw of segs) {
+    const s = String(raw || '').trim();
+    if (!s) continue;
+    const prev = out[out.length - 1];
+    if (prev && NS_BARE_LABEL.test(prev) && !NS_BARE_LABEL.test(s)) { out[out.length - 1] = `${prev.replace(/^[\s○●■□ㅇ·\-–]+/, '').replace(/[\s:：]+$/, '')} : ${s.replace(/^[\s○●■□ㅇ·\-–]+/, '')}`; continue; }
+    if (prev && !NS_LINE_END.test(prev) && !NS_BARE_LABEL.test(s) && !NS_ITEM_HEAD.test(s) && !/^[^:：]{1,16}[:：]/.test(prev)) { out[out.length - 1] = `${prev} ${s}`; continue; }
+    out.push(s);
+  }
+  return out;
+}
+function tidyChars(s) {
+  const t = String(s || '').replace(/[․‧]/g, '·').replace(/\s*[⦁•◦∙]\s*/g, ' · ').replace(/\u260E\s?/g, '전화 ')
+    .replace(/(\d)\s+(인|명|원|점|개|건|회|년|월|일|학기|학년|학점|구간|분위|부|매|쪽)(?![가-힣])/g, '$1$2')   // `1 인 당 1,000,000 원` → `1인 당 1,000,000원`
+    .replace(/\s+/g, ' ').trim();
+  return typeof joinSpacedSyllables === 'function' ? joinSpacedSyllables(t) : t;   // `온라인 신 청` (match-engine 의 같은 규칙)
+}
+function noticeSummaryHtml(lines) {
+  const rows = []; const seen = new Set();
+  /* 한 줄에 글머리 기호로 여러 항목이 붙어 온 것(`○ (신청방법) 네이버 폼 … ○ (모집대상) 만 19세~39세`)은 항목마다 한 줄로 가른다 — 글자는 그대로 */
+  const segs = joinNoticeLines((lines || []).flatMap((raw) => String(raw || '').split(/\s+[○●■□\u25B6▷◆◇]\s*(?=\S)/)));
+  for (const raw of segs) {
+    let t = tidyChars(unent(String(raw || '')))
+      .replace(/[\u2605☆\u261E]+/g, ' ').replace(/!{2,}/g, '!')   // 꾸밈 기호·느낌표 줄 — 뜻이 없다
+      .replace(/^[\s\-–—•\u25AA\u25B6▷◆◇○●■□▣\u2605\u2666⇒‡◦∙❍◎￭·ㆍ*◌◍※]+/, '')   // 그림 기호는 \u 로 적는다(화면 말투 관문 ui-tone 이 이모지로 센다)
+      /* 번호를 뗀다 — ⚠️ `10.22.(목)` 의 `10.` 은 번호가 아니라 날짜다(뒤에 날짜가 이어지면 안 뗀다 · 대외활동 실측) */
+      .replace(/^\(?\s*\d{1,2}\s*\)\s*|^\d{1,2}\.(?!\s?\d{1,2}\s?[.(월])\s*|^[①-⑳]\s*|^[가-힣]\s*[.)]\s+/, '')
+      .replace(/^[(（][월화수목금토일][)）]\s*[-–]?\s*/, '')   // `12.(월) - 접수방법 :` — 앞 줄에서 떨어져 나온 날짜 꼬리(번호는 위에서 이미 뗐다)
+      .replace(/\s+/g, ' ').trim();
+    if (t.length < 4) continue;
+    /* 이름표 — `신청기간 : …` · `(신청방법) …` · 앞 괄호가 잘린 `모집기간) …` 꼴. ⚠️ 시각(`09:00`)·주소(`https://`)의 콜론은 이름표가 아니다(리뷰 2026-10-15) */
+    const m = t.match(/^([가-힣A-Za-z0-9\s·]{1,16}?)\s*[:：](?!\d|\/\/)\s*(.+)$/) || t.match(/^[(（]([가-힣A-Za-z0-9\s·]{1,12})[)）]\s*(.+)$/) || t.match(/^([가-힣\s]{2,8})[)）]\s*(.+)$/);
+    let label = '', body = t;
+    if (m) {
+      const key = m[1].replace(/\s+/g, '');
+      if (NS_SKIP.test(key)) continue;
+      const hit = NS_LABELS.find(([re]) => re.test(key));
+      label = hit ? hit[1] : m[1].trim();
+      body = m[2].trim();
+    }
+    if (!label && !NS_SENTENCE.test(body)) continue;   // 이름표 없는 줄은 문장이거나 알맹이가 있어야 한다(2026-10-16)
+    if (NS_DANGLE.test(body)) {
+      if (!label) continue;   // 이름표 없는 잘린 조각은 뺀다
+      /* 이름표가 있는 줄은 남기되 잘린 꼬리(`신청하고`·`및`)만 떼고 끝에 … — 글자를 지어내지 않는다(리뷰 2026-10-15 · "~하고에서 끊김" 그 자리) */
+      body = body.replace(/\s*(?:하고|하며|하여|이며|및|또는|으로|에서|,|\(|：|:|~|-|·)$/, '').trim() + '…';
+    }
+    if (body.length > 180) { const cut = body.slice(0, 180).match(/^[\s\S]*[.。]\s/); body = cut ? cut[0].trim() : body.slice(0, 180).replace(/\s\S*$/, '') + '…'; }
+    const k = (label + body).replace(/\s/g, '');
+    if (seen.has(k)) continue;
+    seen.add(k);
+    rows.push({ label, body });
+    if (rows.length >= 8) break;
+  }
+  if (!rows.length) return '';
+  return `<h4>공고 안내</h4><ul class="doc-list notice-summary">${rows.map((r) => `<li>${r.label ? `<b class="ns-k">${esc(r.label)}</b>` : ''}${esc(r.body)}</li>`).join('')}</ul>`;
+}
+
 function sourceNoteHtml(sch) {
   const a = sourceLinkHtml(sch);
   /* 목록이면 찾을 제목, 로봇이 문제를 확정한 주소면 본 것 한 줄 — 상세 시트 맨 아래와 같은 안내(2026-10-03) */
@@ -4323,7 +4431,21 @@ function eligibilityRowsHtml(sch, result) {
      초록 체크로 띄우면 "자격이 된다"로 읽혀 모순이 된다(2026-08-02 개발자 지적) — 카드 자체가
      이미 그 학교 학생에게만 보이므로 통과 쪽은 아예 빼고, 학교가 다른 경우(✕)만 남긴다. */
   const isScopeOk = (r) => /^재학 대학 공고/.test(r);
-  const judged = result.reasons.filter((r) => !isScopeOk(r));
+  /* 🔴 상세 시트는 요건을 **전부** 보여 준다 (2026-08-24). 화면 상한(5줄) 때문에
+     배지는 '요건 9개 중 3개 충족'이라고 하는데 시트에는 5줄만 떠서, 학생이 세어 보면
+     숫자가 안 맞았다. 카드는 요약이라 짧아도 되지만 **상세는 읽으러 오는 자리**다. */
+  /* 2026-10-15 카드 전수(개발자 지시 "가독성이 매우 떨어짐") — 세 가지를 줄인다.
+     ① 경우별 분기(`신입생:`·`재학생:`·`복학생:`…)는 **내 경우 줄이 있으면 그 줄만** 보인다(정읍시민 7줄 → 4줄). 내 경우가 없으면 전부.
+     ② ※ 예외 곁말(`10학기 이하 후기 이중전공자는 … 신청 가능`)은 요건이 아니라 참고라 옅게(r-aside · 적합도 분모에서도 뺀다 — match-engine).
+     ③ 위에서 ✕ 로 이미 보인 줄을 '내 정보로 확인한 항목'에 **또** 적지 않는다(111건이 같은 줄을 두 번 보였다). */
+  const reqItems = requirementLines(sch, null, { all: true, withMeta: true });
+  const myCase = (t) => { const cs = PR.caseBranch(t); return cs === null ? null : !!(state.profile && state.profile.status && cs.includes(state.profile.status)); };
+  const hasMyCase = reqItems.some((it) => myCase(it.text) === true);
+  const reqShown = reqItems.filter((it) => !(hasMyCase && myCase(it.text) === false));
+  const reqLines = reqShown.map((it) => it.text);
+  const shownBad = new Set(reqShown.filter((it) => !it.aside && requirementMatch(it.text, state.profile, sch) === 'no').map((it) => it.text));
+  const FAIL_PREFIX = '공고에 적힌 요건에 미달해요: ';
+  const judged = result.reasons.filter((r) => !isScopeOk(r) && !(r.startsWith(FAIL_PREFIX) && shownBad.has(r.slice(FAIL_PREFIX.length))));
 
   const checkRows = judged.map((r) => {
     /* 🔴 `미달`을 빠뜨려 **미달 근거 줄에 초록 ✓ 가 붙어 있었다** (2026-09-12 코드 리뷰).
@@ -4346,13 +4468,11 @@ function eligibilityRowsHtml(sch, result) {
   /* 요건은 원문을 통째로 붙이지 않고 **짧게 다듬어 번호를 매겨** 보여 준다.
      프로필과 확실히 맞으면 ✓, 확실히 안 맞으면 ✕, 판정할 수 없으면 색 없이 둔다
      (2026-08-02 개발자 지시). 판정 규칙은 match-engine에 있어 알림과 갈라지지 않는다. */
-  /* 🔴 상세 시트는 요건을 **전부** 보여 준다 (2026-08-24). 화면 상한(5줄) 때문에
-     배지는 '요건 9개 중 3개 충족'이라고 하는데 시트에는 5줄만 떠서, 학생이 세어 보면
-     숫자가 안 맞았다. 카드는 요약이라 짧아도 되지만 **상세는 읽으러 오는 자리**다. */
-  const reqLines = requirementLines(sch, null, { all: true });
   /* 요건 한 줄을 그리는 법 — 구조 렌더와 평평한 렌더가 **같은 함수**를 쓴다.
-     따로 두면 한쪽만 고쳐져서 두 모양의 판정이 갈라진다. */
-  const reqRow = (e, extra) => {
+     따로 두면 한쪽만 고쳐져서 두 모양의 판정이 갈라진다. 줄(문자열) 또는 withMeta 항목({text, aside}) 둘 다 받는다. */
+  const reqRow = (it, extra) => {
+    const e = typeof it === 'string' ? it : it.text;
+    if (it && it.aside) return `<li class="r-elig r-aside${extra ? ' ' + extra : ''}">${esc(e)}</li>`;
     const m = requirementMatch(e, state.profile, sch);
     /* 🔴 `r-req`는 **자격 요건·먼저 뽑는 기준·제외** 세 블록이 함께 쓴다. 그래서 밖에서는
        어느 줄이 자격인지 가릴 수 없었다(검사가 셋을 다 세고 있었다 — 2026-08-26).
@@ -4376,14 +4496,15 @@ function eligibilityRowsHtml(sch, result) {
     reasonRows += `<li class="r-head">다음 ${reqStruct.either.length === 2 ? '둘' : reqStruct.either.length + '가지'} 중 하나 <em>하나만 해당하면 됩니다</em></li>`;
     reqStruct.either.forEach((b, i) => {
       /* 이름을 못 읽었으면 지어내지 않고 순서로만 가른다 (원칙 8-1) */
+      /* 갈래 이름이 첫 줄과 같은 글자면(`취업지원형 : …` 가 이름이자 줄) 줄을 한 번만 — 같은 문장이 두 번 보였다(2026-10-15) */
       reasonRows += `<li class="r-branch">${esc(b.label || `${i + 1}번째 경우`)}</li>`
-        + b.lines.map((e) => reqRow(e, 'r-inbranch')).join('');
+        + b.lines.filter((e) => e !== b.label).map((e) => reqRow(e, 'r-inbranch')).join('');
     });
   } else if (reqLines.length) {
     // 소제목을 달지 않는다 — 바깥 <h4>가 이미 '지원 자격'이라 두 번 나온다
     /* 번호(1) 2) 3))는 붙이지 않는다 — 요건은 순서가 아니라 목록이고,
        판정 못 한 줄에 번호만 달면 체크된 줄과 뒤섞여 어수선하다(2026-08-02 개발자 지시). */
-    reasonRows += reqLines.map((e) => reqRow(e)).join('');
+    reasonRows += reqShown.map((it) => reqRow(it)).join('');
   } else if (requirementLines(sch, qLines).length) {
     // 자격 줄이 없으면 발췌 문장으로 물러나되, **같은 정리를 거쳐** 보여 준다
     reasonRows += requirementLines(sch, qLines)
@@ -4412,8 +4533,14 @@ function eligibilityRowsHtml(sch, result) {
      발췌기가 따로 뽑아 둔 eligibilityExcludes만 보면, 자격 절에 섞인 제외 줄이
      '지원 자격'으로 뜨거나(휴학생·자퇴생이 자격으로 떴다) 갈 곳이 없어 사라졌다.
      둘을 합쳐 넘기고, 무엇이 제외인지는 match-engine이 절 경계로 판정한다. */
-  const exLines = requirementLines(
-    sch, [...(sch.eligibilityExcludes || []), ...(sch.eligibilityLines || [])], { onlyExclude: true });
+  /* 🔴 두 목록을 **따로** 거른다 (2026-10-15 카드 전수) — 이어 붙이면 제외 목록의 절 머리글이 뒤따르는 자격 줄까지 제외 절로 끌어들여
+     자격 세 줄이 '지원 제외 대상'에 **또** 떴다(미래의동반자재단). 적합도(fitDetail)는 애초에 따로 본다 — 화면만 이어 붙이고 있었다.
+     위 자격 블록에 이미 보인 줄은 제외 블록에 다시 적지 않는다(같은 줄이 ✓ 와 제외로 두 번 보이던 kosaf 글). */
+  const shownReq = new Set(reqLines);
+  const exLines = [...new Set([
+    ...requirementLines(sch, sch.eligibilityExcludes || [], { onlyExclude: true }),
+    ...requirementLines(sch, sch.eligibilityLines || [], { onlyExclude: true }),
+  ])].filter((t) => !shownReq.has(t));
   if (exLines.length) {
     reasonRows += `<li class="r-head">지원 제외 대상</li>`
       + exLines.map((e) => `<li class="r-req">${esc(e)}</li>`).join('');
@@ -4490,6 +4617,7 @@ function openDetail(id) {
      `applyCaution` 줄이 말하고, 누를지는 학생이 정한다. 문구를 여기로 되돌리면
      '신청할 수 없음'이라는 **사실이 아닌 말**이 화면에 다시 뜬다. */
 
+  const hasRealDocs = (sch.documents || []).some((doc) => !DOC_PLACEHOLDER.test(doc));   // 자리표시뿐이면 「제출 서류」 칸을 접는다(2026-10-17)
   $('#detail-sheet').innerHTML = `
     <div class="sheet-handle"></div>
     <div class="sheet-body">
@@ -4520,11 +4648,24 @@ function openDetail(id) {
            게시판에서 찾을 제목은 맨 아래 묶음의 '목록에서 ○○을 찾아' 줄(boardListTitle)이 따로 말하므로
            제목이 그 일을 겸할 필요가 없다. 지우기만 한다(cleanCardTitle — 한 글자도 더하지 않는다). */ ''}
       <h3 class="sheet-title">${esc(cardTitle(sch))}</h3>
-      <p class="sheet-amount">${esc(sch.amount)}</p>
+      ${/* 🔴 '모른다'는 표시(`금액 원문 확인`·`면학장학금 (세부 원문 확인)`)를 **큰 파란 글씨**로 띄우지 않는다 (2026-10-15 카드 전수 · 24건).
+           자리는 그대로 두되(드라이버가 .sheet-amount 를 읽는다) 옅은 한 줄로 '지원 금액은 원문 공고에서 확인' 이라고만 말한다. */ ''}
+      ${providerUnknown(sch.amount) ? '<p class="sheet-amount sheet-amount-unknown">지원 금액은 원문 공고에서 확인</p>' : `<p class="sheet-amount">${esc(sch.amount)}</p>`}
       ${/* 금액을 숫자로 못 읽은 층2 공고 — 재단이 그 칸에 적어 둔 말을 그대로 옮긴다.
            카드 머리에는 안 띄운다(위 kosafAmountLabel 주석). */ ''}
       ${sch.amountNote ? `<p class="doc-legend">재단이 적어 둔 지원금액 — ${esc(sch.amountNote)}</p>` : ''}
-      <p class="sheet-provider">${esc(sch.provider)} · ${esc(sch.period)}</p>
+      ${/* 주관·접수 줄 — 로봇이 못 읽은 칸(`주관 기관 원문 확인`·`접수 기간 원문 확인`)은 적지 않는다(2026-10-15 · 73건이 그 글자였다).
+           주관을 못 읽었으면 제목 앞 대괄호의 기관(`[화성시]` — 카드 제목에선 떼는 글자)이 그 자리를 채운다 · 둘 다 없으면 줄 자체가 없다(마감은 맨 아래 줄이 말한다) */ ''}
+      ${(() => {
+        /* 🔴 제목 앞 대괄호는 대개 **게시판 표식**(`[공통]`·`[교외]`·`[서울]`·`[기한 연장]`)이다 — 기관 꼴(`[화성시]`·`[한국장학재단]`·`[우양재단]`)일 때만 주관으로 쓴다
+           (리뷰 2026-10-15 · 첫 판은 108장에 「주관 · 공통」 같은 지어낸 주관을 띄웠다 — 원칙 8-1). 기간은 날짜가 하나라도 있으면 자리 표시가 아니다(`신청 7.29 ~ 8.4 (…, 원문 확인)`) */
+        const tag = providerUnknown(sch.provider) ? ((String(sch.name || '').match(/^\s*[[【]\s*([^\]】]{2,14})\s*[\]】]/) || [])[1] || '').trim() : '';
+        const ORG_TAIL = /(?:시|군|구|도|청|재단|장학회|진흥원|센터|협회|공단|공사|은행|그룹|위원회|문화원|교육청|대학교|대학|학회|조합|법인)$/;
+        const prov = providerUnknown(sch.provider) ? (ORG_TAIL.test(tag) && !/^(?:서울|글로벌|교외|교내|공통|학부|대학원)$/.test(tag) ? tag : '') : sch.provider;
+        const period = (providerUnknown(sch.period) && !/\d/.test(String(sch.period || ''))) ? '' : sch.period;
+        const bits = [prov, period].filter(Boolean);
+        return bits.length ? `<p class="sheet-provider">${bits.map(esc).join(' · ')}</p>` : '';
+      })()}
       ${scheduleRowHtml(sch)}
 
       <div class="sheet-verdict">
@@ -4534,7 +4675,9 @@ function openDetail(id) {
       <ul class="reason-list">${reasonRows}${missingRows}</ul>
       ${eligAskHtml(sch)}
 
-      <h4>제출 서류</h4>
+      ${/* 🔴 읽은 서류가 없으면 「제출 서류」 칸을 접는다(2026-10-17 개발자 "원문에서 확인 이렇게 뜨는 게 하나도 없어야") — 자리표시 한 줄은 서류가 아니고,
+           '원문에서 확인하라'는 문장은 학생에게 정보가 아니다. 원문 링크는 맨 아래 sheet-facts 가 준다 */ ''}
+      ${hasRealDocs ? '<h4>제출 서류</h4>' : ''}
       ${/* 🔴 doc-badged — 줄마다 '자동'·'직접' 배지가 붙는 목록이라는 표시.
            style.css 가 이 클래스를 보고 **왼쪽 점을 뺀다**(2026-09-17 개발자 지시:
            배지가 이미 항목을 가르므로 점은 표식이 두 겹). 아래 map 이 배지를 항상
@@ -4544,25 +4687,28 @@ function openDetail(id) {
            없으면 목록 대신 그 안내를 한 줄로 말한다(맨 아래 sheet-facts 의 srcLink 가 링크를 준다). */ ''}
       ${(() => {
         const docs = sch.documents.filter((doc) => !DOC_PLACEHOLDER.test(doc));
-        if (!docs.length) return '<p class="doc-legend">제출 서류는 공고 원문에서 확인해 주세요.</p>';
+        if (!docs.length) return '';   // 칸 자체를 접는다(위 h4 와 같은 조건)
         return `<ul class="doc-list doc-badged">${docs.map((doc) => {
           const auto = /자동/.test(doc);
           return `<li>${auto ? '<span class="doc-auto">자동</span>' : '<span class="doc-manual">직접</span>'} ${esc(doc)}</li>`;
         }).join('')}</ul>`;
       })()}
 
-      ${(sch.excerpts && sch.excerpts.length) ? `
-      <h4>공고 원문 안내 <span class="channel-tag">원문 그대로</span></h4>
-      <ul class="doc-list">${sch.excerpts.map((e) => `<li>${esc(e)}</li>`).join('')}</ul>` : ''}
-      ${(sch.attachments && sch.attachments.length) ? `
-      ${/* 🔴 머리말이 **그 파일이 실제로 무엇인지**를 말해야 한다 (2026-09-12).
+      ${noticeSummaryHtml(sch.excerpts)}
+      ${(() => {
+        /* 본문 사진(bodyImage · `본문이미지-793x1121.jpg`)은 첨부가 아니라 공고 원문 그 자체다 — 신청 준비 시트와 같은 규칙(51건이 이름만 늘어서 있었다 · 2026-10-15) */
+        const atts = (sch.attachments || []).filter((a) => a && !a.bodyImage);
+        if (!atts.length) return '';
+        /* 🔴 머리말이 **그 파일이 실제로 무엇인지**를 말해야 한다 (2026-09-12).
            층1은 학교 게시판에 붙어 있던 신청서 양식이고, 층2는 재단이 KOSAF 에 올린
            선발 공고문이다. 둘을 '첨부 양식' 한 이름으로 부르면, 공고문을 받은 학생이
-           신청서인 줄 알고 그 안에서 빈칸을 찾는다(원칙 8-1 — 확인 안 한 것을 말하지 않는다). */ ''}
+           신청서인 줄 알고 그 안에서 빈칸을 찾는다(원칙 8-1 — 확인 안 한 것을 말하지 않는다). */
+        return `
       <h4>${sch.sourceKind === 'kosaf' ? '선발 공고문 <span class="channel-tag">재단 원문</span>' : '공고 원본 첨부 양식'}</h4>
       <ul class="doc-list">
-        ${sch.attachments.map((a) => `<li class="att">${attachmentLinkHtml(a, 'color:var(--primary)')}${a.bytes ? ` <span class="doc-legend">${Math.max(1, Math.round(a.bytes / 1024))}KB</span>` : ''}</li>`).join('')}
-      </ul>` : ''}
+        ${atts.map((a) => `<li class="att">${attachmentLinkHtml(a, 'color:var(--primary)')}${a.bytes ? ` <span class="doc-legend">${Math.max(1, Math.round(a.bytes / 1024))}KB</span>` : ''}</li>`).join('')}
+      </ul>`;
+      })()}
       ${/* 🔴 마감일·중복 수혜 · 문의 · 원문 링크는 **맨 아래 한 묶음**이다 (2026-10-02 CTO 지시).
            예전엔 문의는 지원 자격 아래, 링크는 제출 서류 아래(공고 원문 안내 아래에 한 번 더),
            마감일은 첨부 아래로 흩어져 있었다. 원문 링크(srcLink)는 여기서 **한 번만** 쓴다.
@@ -4657,7 +4803,8 @@ function openDetail(id) {
         ? '신청 전에 공고 원문에서 지원 자격을 확인하세요.'
         : '입력한 정보로는 요건이 맞지 않아 보입니다. 판정이 틀릴 수 있으니 원문을 확인한 뒤 신청하세요.'}</p>` : ''}
       <button class="btn btn-primary btn-lg" id="btn-apply-one" ${canApply ? '' : 'disabled'}>${btnLabel}</button>
-      ${canApply ? `<p class="dp-note">준비를 마치면 최종 제출처(${esc(ch.label)})가 표시됩니다.${(!sch.formId && sch.prepFormId) ? ' 이 공고는 별도 양식 없이 자유 형식 제출을 받으므로, 앱에서 제출용 지원문서를 작성할 수 있습니다.' : ''}</p>` : ''}
+      ${/* 단추 밑 한 줄 — 사실만(최종 제출처). '준비를 마치면 … 표시됩니다'·'자유 형식 제출을 받으므로 …' 같은 설명은 뺐다(2026-10-15 개발자 지시 "happy talk 전부 삭제") */ ''}
+      ${canApply ? `<p class="dp-note">최종 제출 · ${esc(ch.label)}</p>` : ''}
     </div>`;
 
   openSheetShell();

@@ -1,7 +1,105 @@
 {
  "school": "한국외국어대학교",
- "updatedAt": "2026-10-14",
+ "updatedAt": "2026-10-17",
  "items": [
+  {
+   "title": "[공통][교외] 2027년도 한국지도자육성장학재단 신규장학생 모집",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/269297/artclView.do",
+   "attachments": [
+    {
+     "name": "1. 2027년도_서류양식(지원서).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/152091/download.do"
+    },
+    {
+     "name": "2. 2027년도_서류양식(추천서).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/152092/download.do"
+    },
+    {
+     "name": "3. 2027년도_서류양식(자기소개서).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/152093/download.do"
+    },
+    {
+     "name": "4. 2027년도_개인정보활용동의서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/152094/download.do"
+    },
+    {
+     "name": "5. 2027년도_장학생 의무사항 참여 동의서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/152095/download.do"
+    }
+   ],
+   "deadlineHint": "제출기한 : 2026. 11. 2( 월 ) 13:00 도착분 7. 제출방법 및 제출처 : 소속 캠퍼스별로 방문 또는 등기우편 제출 가 . 서울캠",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-10-16"
+  },
+  {
+   "title": "[서울][교외] 2026년 방일영문화재단 탈북학생 장학생 선발 안내(~10/23)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/269303/artclView.do",
+   "attachments": [
+    {
+     "name": "붙임.방일영문화재단 장학금 신청서.pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/152105/download.do"
+    }
+   ],
+   "deadlineHint": "제출기간 및 접수처 가. 제출기간 : 2026. 10. 23.(금) 오후 4시까지(마감일 준수) 나. 접수처 : 서울캠퍼스 장학팀(국제학사 12",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-10-16"
+  },
+  {
+   "title": "[공통][교외] 2027년도 두산연강재단 대학 장학생 모집(~11/13)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/269279/artclView.do",
+   "attachments": [
+    {
+     "name": "1. 2027년도 두산연강재단 장학생 선발 공고문.pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/152070/download.do"
+    },
+    {
+     "name": "2. 자주 묻는 질문(Q&A).pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/152071/download.do"
+    },
+    {
+     "name": "3. 추천서(재단 양식).docx",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/152072/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-10-16"
+  },
+  {
+   "title": "(글로벌)(교외)2026-2학기 글로벌 비전(신우회) 장학금 신청안내",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/269173/artclView.do",
+   "attachments": [
+    {
+     "name": "2026-2학기 글로벌비전장학금 신청서 및 추천서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/151963/download.do"
+    },
+    {
+     "name": "개인정보수집이용동의서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/151964/download.do"
+    }
+   ],
+   "deadlineHint": "제출기한 : 2026. 10. 19.( 월 ) ~ 2026. 11. 3( 화 ) 오후 15:00 까지 8. 신청방법 : 온라인 신청 (HUFS",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-10-15"
+  },
+  {
+   "title": "[공통][교내]2026학년도 창업장학금 신청 안내(~11/27)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/269128/artclView.do",
+   "attachments": [
+    {
+     "name": "창업장학금 공고문.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/151948/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026. 10. 27.(화) ~ 11. 27.(금) 23:59까지 심의 및 선정 : 2026. 11. ~ 12. 중 (서면 심의)",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-10-14"
+  },
   {
    "title": "[공통][교외]2027년 STX장학재단 장학생 선발 공고(~11/16)",
    "url": "https://dep.hufs.ac.kr/bbs/student/2431/268959/artclView.do",

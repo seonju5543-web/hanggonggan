@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-12",
+ "updatedAt": "2026-10-17",
  "items": {
   "auto-larshipdoarticleno376668": [
    {
@@ -65,6 +65,16 @@
     "srcBytes": 37262,
     "from": "원본 그대로 변환",
     "at": "2026-10-12"
+   },
+   {
+    "file": "auto-notiphpcodes1301seq11294/2-양식2._개인정보_수집이용_및_제공_동의서.pdf",
+    "name": "양식2. 개인정보 수집이용 및 제공 동의서.pdf",
+    "pages": 1,
+    "bytes": 245779,
+    "srcBytes": 245779,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-17"
    }
   ],
   "auto-ticedoarticleno231977952": [
@@ -78,17 +88,6 @@
     "at": "2026-10-12"
    }
   ],
-  "auto-kuk2351209318artclviewdo": [
-   {
-    "file": "auto-kuk2351209318artclviewdo/1-2_추천-학교_서류_장학신청서_송화재단.pdf",
-    "name": "2 (추천-학교)(서류) 장학신청서_송화재단.hwp",
-    "pages": 2,
-    "bytes": 35306,
-    "srcBytes": 33280,
-    "from": "원본 그대로 변환",
-    "at": "2026-10-12"
-   }
-  ],
   "auto-jong659273457artclviewdo": [
    {
     "file": "auto-jong659273457artclviewdo/1-2026학년도_2학기_세종_CPTA장학금_신청서_소정양식_.pdf",
@@ -96,17 +95,6 @@
     "pages": 2,
     "bytes": 82925,
     "srcBytes": 95744,
-    "from": "원본 그대로 변환",
-    "at": "2026-10-12"
-   }
-  ],
-  "auto-8bnum57138cate0qidx57138": [
-   {
-    "file": "auto-8bnum57138cate0qidx57138/1-국가근로장학생_지원서.pdf",
-    "name": "국가근로장학생 지원서.hwp",
-    "pages": 2,
-    "bytes": 46494,
-    "srcBytes": 45056,
     "from": "원본 그대로 변환",
     "at": "2026-10-12"
    }
@@ -128,7 +116,8 @@
     "bytes": 287340,
     "srcBytes": 287340,
     "from": "원본 그대로 변환",
-    "at": "2026-10-12"
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-17"
    }
   ],
   "auto-krbbskr845764artclviewdo": [
@@ -162,6 +151,30 @@
     "srcBytes": 49664,
     "from": "원본 그대로 변환",
     "at": "2026-10-12"
+   }
+  ],
+  "auto-0713no2515412sitedvscdkr": [
+   {
+    "file": "auto-0713no2515412sitedvscdkr/2-붙임2._2026년_장학생_선발_공고문_신청서_포함_.pdf",
+    "name": "붙임2. 2026년 장학생 선발 공고문(신청서 포함).pdf",
+    "pages": 17,
+    "bytes": 783432,
+    "srcBytes": 783432,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-17"
+   }
+  ],
+  "auto-bbssc58944344artclviewdo": [
+   {
+    "file": "auto-bbssc58944344artclviewdo/1-2027_방일영장학생_지원신청서_탈북대학생_.pdf",
+    "name": "2027 방일영장학생 지원신청서(탈북대학생).pdf",
+    "pages": 1,
+    "bytes": 169972,
+    "srcBytes": 169972,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-17"
    }
   ]
  }

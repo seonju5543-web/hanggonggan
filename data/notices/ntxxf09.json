@@ -1,7 +1,25 @@
 {
  "school": "경기대학교",
- "updatedAt": "2026-10-14",
+ "updatedAt": "2026-10-17",
  "items": [
+  {
+   "title": "[입학에서 취업까지] [한국고등교육재단] 인재림 제7기 장학생 모집 안내 ( ~ 2026.10.29.(목)15:00까지)",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626659&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "경기대학교",
+   "campus": "",
+   "foundAt": "2026-10-16"
+  },
+  {
+   "title": "[입학에서 취업까지] [두산연강재단] 2027년도 두산연강재단 장학생 선발 안내 ( ~ 2026.11.13.(금)18시 까지)",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626604&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888",
+   "attachments": [],
+   "deadlineHint": "접수 기간: 2026년 10월 14일(수) ~ 11월 13일(금) 18시까지 - 접수 방법: 두산연강재단 홈페이지(www.yonkang.org)",
+   "school": "경기대학교",
+   "campus": "",
+   "foundAt": "2026-10-15"
+  },
   {
    "title": "[입학에서 취업까지] [은평구민장학재단] 2026 하반기 은평구민 장학생 선발 안내 ( ~ 2026.10.28.(수)18:00)",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626498&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888",

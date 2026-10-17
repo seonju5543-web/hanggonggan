@@ -1,7 +1,63 @@
 {
  "school": "조선대학교",
- "updatedAt": "2026-10-14",
+ "updatedAt": "2026-10-17",
  "items": [
+  {
+   "title": "[취업전략팀] NEZOT주식회사 온라인 채용설명회",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282075/artclView.do",
+   "postedAt": "2026-10-16",
+   "kind": "행사",
+   "school": "조선대학교",
+   "campus": "",
+   "src": "c6a7801d",
+   "foundAt": "2026-10-16",
+   "thumb": "data/news/img/0f9610f3444def4d.webp",
+   "desc": "네조트주식회사의 기업 소개부터 웹개발자 채용정보, 전형 절차까지 온라인으로 확인하세요!"
+  },
+  {
+   "title": "[대학일자리플러스센터] 2026 대학일자리플러스센터 비교과프로그램 참여 수기 공모전 수상자 공고",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282070/artclView.do",
+   "postedAt": "2026-10-16",
+   "school": "조선대학교",
+   "campus": "",
+   "src": "c6a7801d",
+   "foundAt": "2026-10-16",
+   "desc": "일자리지원팀 2026 대학일자리플러스센터 에세이 공모전 심사 결과 안내 프로그램에 참여해주신 재학생, 졸업생 여러분 감사합니다. 수상을 진심으로 축하드립니다. 공모전 심사 결과를 아래와 같이 안내합니다."
+  },
+  {
+   "title": "[취업전략팀] 취업성공수기 공모전이 달라졌어요👀 양식 간소화 & 원고료 지급 일정 변경!",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282064/artclView.do",
+   "postedAt": "2026-10-15",
+   "school": "조선대학교",
+   "campus": "",
+   "src": "c6a7801d",
+   "foundAt": "2026-10-15",
+   "thumb": "data/news/img/9d6fa3fee60eb1d2.webp",
+   "desc": "취업전략팀 📢조선대학교 2026 하반기 취업성공수기 공모전 양식 및 원고료 지급 일정 변경 안내 안녕하세요! 조선대학교 취업전략팀입니다 😊 취업성공수기 공모전 관련 변경사항을 안내드립니다."
+  },
+  {
+   "title": "[앵커사업단] 2026년 제1회 전남·광주 앵커사업단 취업박람회 및 사전등록 이벤트 안내",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282034/artclView.do",
+   "postedAt": "2026-10-14",
+   "kind": "행사",
+   "school": "조선대학교",
+   "campus": "",
+   "src": "c6a7801d",
+   "foundAt": "2026-10-14",
+   "thumb": "data/news/img/371250ecdbf9b6c4.webp",
+   "desc": "- 일시: 2026. 10. 28.(수) ~ 10. 29.(목) - 장소: 김대중컨벤션센터 B홀"
+  },
+  {
+   "title": "[CSU창작마을센터] 투어 및 키캡키링 만들기 체험 프로그램 안내",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282021/artclView.do",
+   "postedAt": "2026-10-14",
+   "school": "조선대학교",
+   "campus": "",
+   "src": "c6a7801d",
+   "foundAt": "2026-10-14",
+   "thumb": "data/news/img/4ef0b746cf78be93.webp",
+   "desc": "📝 신청 대상 및 신청 방법 신청 대상: 누구나 무료로 참여 가능 (참가비 무료) ① 홈페이지 예약 CSU창작마을센터 홈페이지 접속 사용신청 &rarr; 투어 &rarr; 예약신청 홈페이지:…"
+  },
   {
    "title": "[중앙도서관] 학생 자율 독서토론클럽「읽는사이」모집",
    "url": "https://www3.chosun.ac.kr/bbs/chosun/117/281995/artclView.do",
@@ -171,7 +227,8 @@
    "school": "조선대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "src": "c6a7801d"
+   "src": "c6a7801d",
+   "desc": "본교에서는 글로벌 인재양성 및 취업률 제고를 위하여 재학생 여러분들의 외국어 실력을 향상 시키고자 YBM 한국토익위원회 주관 본교 TOEIC 특별 시험 (= 모의토익 ) 을 시행 중에 있습니다."
   },
   {
    "title": "[교육과정관리팀] THE조아 설문 이벤트 안내 (경품 추첨)",
@@ -181,7 +238,8 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/e677dd4ae4758f6c.webp",
-   "src": "c6a7801d"
+   "src": "c6a7801d",
+   "desc": "교육과정관리팀 조선대학교 학생통합지원시스템 'THE조아'에서 설문 이벤트를 진행합니다."
   },
   {
    "title": "[보건진료소] 2026년도 교내헌혈 안내 (10.06)",
@@ -222,7 +280,7 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/96895ec1b37020a0.webp",
-   "desc": "일자리지원팀 [조선대학교 취업학생처 교내 10월 비교과 프로그램] 조선대학교 대학일자리플러스센터, 취업전략팀, 등 학생 취업지원 부서에서는 우리대학 재학생 및 졸업생을 대상으로 진로/취창업 비교과 프로그램을…"
+   "desc": "일자리지원팀 조선대학교 대학일자리플러스센터, 취업전략팀, 등 학생 취업지원 부서에서는 우리대학 재학생 및 졸업생을 대상으로 진로/취창업 비교과 프로그램을 진행하고 있습니다."
   },
   {
    "title": "[창업성장지원팀] 2026학년도 앵커 창업동아리 4차 모집",
@@ -240,7 +298,8 @@
    "school": "조선대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/df45b92d6ebabd93.webp"
+   "thumb": "data/news/img/df45b92d6ebabd93.webp",
+   "desc": "디지털교육지원팀 대학 내 올바른 저작권 문화 확산과 불법 복제 근절을 위해 아래와 같이 홍보영상을 게시합니다."
   },
   {
    "title": "[졸업생특화프로그램] 2026년 10월 프로그램 메뉴판",
@@ -249,7 +308,8 @@
    "school": "조선대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/383933f949f3ced7.webp"
+   "thumb": "data/news/img/383933f949f3ced7.webp",
+   "desc": "일자리지원팀 ※ 잡플래닛 취업 콘텐츠 이용 신청 ※ - 조선대학교 졸업생 이용 가능"
   },
   {
    "title": "대학생이 반드시 지켜야 할 저작권 상식",
@@ -268,7 +328,8 @@
    "school": "조선대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/300219bdad3664e0.webp"
+   "thumb": "data/news/img/300219bdad3664e0.webp",
+   "desc": "📍 장소: 중앙도서관 1층 동고동락 꿈터 Career LAB 👥 대상: 이공계열, 인문ㆍ사회ㆍ상경계열(산업공학, 화학공학, 임산공학, 기계공학, 전기공학, 경영학, 경제학, 회계학, 에너지공학 등) 💼…"
   }
  ]
 }

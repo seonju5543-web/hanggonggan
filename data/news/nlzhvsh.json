@@ -1,7 +1,80 @@
 {
  "school": "강원대학교",
- "updatedAt": "2026-10-14",
+ "updatedAt": "2026-10-17",
  "items": [
+  {
+   "title": "[강릉앵커사업단] 2026학년도 2학기 캡스톤디자인 프로그램 오리엔테이션 자료 안내",
+   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11543&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "postedAt": "2026-10-16",
+   "kind": "행사",
+   "school": "강원대학교",
+   "campus": "",
+   "src": "784a7e0d",
+   "foundAt": "2026-10-16"
+  },
+  {
+   "title": "2027년 2월 말 퇴직교원 정부포상 및 장관표창 후보자 사전공개 검증",
+   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11546&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "postedAt": "2026-10-16",
+   "school": "강원대학교",
+   "campus": "",
+   "src": "784a7e0d",
+   "foundAt": "2026-10-16",
+   "desc": "의견이 있으신 분께서는 기한 내 아래 전자우편 또는 전화로 의견을 제출하여 주시기 바랍니다."
+  },
+  {
+   "title": "2026 '모두의 박물관 누구나 큐레이터'(재학생 진로 탐색 교육 프로그램) 교육참가 신청 안내",
+   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11545&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "postedAt": "2026-10-16",
+   "school": "강원대학교",
+   "campus": "",
+   "src": "784a7e0d",
+   "foundAt": "2026-10-16",
+   "thumb": "data/news/img/0cef514e6e10d70b.webp",
+   "desc": "강원대학교 중앙박물관에서는 \"모두의 박물관 누구나 큐레이터\" (재학생 진로 탐색 프로그램)교육 참가자를 다음과 같이 모집하오니 희망자는 참여하시기 바랍니다."
+  },
+  {
+   "title": "2026년 제16회 영어말하기 대회 운영안내",
+   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11540&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "postedAt": "2026-10-15",
+   "kind": "생활",
+   "school": "강원대학교",
+   "campus": "",
+   "src": "784a7e0d",
+   "foundAt": "2026-10-15",
+   "thumb": "data/news/img/d0bed00369b8dc87.webp",
+   "desc": "강릉교양교육센터 주관 2026년 제16회 영어말하기 대회를 아래와 같이 개최하오니, 여러분들의 많은 참여바랍니다. ★ 신청 및 일정 관련 내용"
+  },
+  {
+   "title": "「2026년 강릉해람시민대학」 운영 (사전신청: ~11.4)",
+   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11539&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "postedAt": "2026-10-15",
+   "school": "강원대학교",
+   "campus": "",
+   "src": "784a7e0d",
+   "foundAt": "2026-10-15",
+   "thumb": "data/news/img/a5ee49b836fb28cd.webp",
+   "desc": "(운영대상) 강릉시 지역주민 및 대학구성원 (운영기간) 2026. 11. 10.(화) ~ 12.(목), 17.(화) ~ 18.(수) / 매일 18:30~21:00"
+  },
+  {
+   "title": "[강릉앵커사업단]2026학년도 2학기 캡스톤디자인 프로그램(강릉.원주) 프로젝트 팀 선정평가 발표",
+   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11538&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "postedAt": "2026-10-14",
+   "school": "강원대학교",
+   "campus": "",
+   "src": "784a7e0d",
+   "foundAt": "2026-10-14"
+  },
+  {
+   "title": "찾아가는 청년전세임대 상담 홍보 부스 안내",
+   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11537&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "postedAt": "2026-10-14",
+   "school": "강원대학교",
+   "campus": "",
+   "src": "784a7e0d",
+   "foundAt": "2026-10-14",
+   "desc": "3. 장 소 : 미래광장 4. 주요내용 : 청년전세임대제도 안내 및 상담창구 운등 등 붙임 : 홍보 포스터 1부. 끝."
+  },
   {
    "title": "[종료] 강릉캠퍼스 일부 건물 네트워크 장비 긴급 펌웨어 업데이트에 따른 인터넷 일시 중단 안내",
    "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11534&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
@@ -184,7 +257,8 @@
    "school": "강원대학교",
    "campus": "",
    "foundAt": "2026-10-06",
-   "thumb": "data/news/img/94fb5d1a8737b01e.webp"
+   "thumb": "data/news/img/94fb5d1a8737b01e.webp",
+   "desc": "안녕하세요! 백령스포츠센터 11월 단체 강습 모집 안내 드립니다! 아래 일정을 참고해 주세요."
   },
   {
    "title": "[목요도서관] 제4강(영화 속 여행: 우리는 왜 여행을 떠나는 것일까) 추가 사전신청자 모집(40명)",
@@ -194,7 +268,8 @@
    "school": "강원대학교",
    "campus": "",
    "foundAt": "2026-10-06",
-   "thumb": "data/news/img/2ebf5a4d5ec8711a.webp"
+   "thumb": "data/news/img/2ebf5a4d5ec8711a.webp",
+   "desc": "[목요도서관 제4강 추가 사전신청자 모집_비교과/도서관 마일리지 및 상시학습 부여] -강연 일시: 2026. 10. 8.(목) 12:00~13:00 -추가 모집기간: 10월 6일(화) ~ 7일(수)"
   },
   {
    "title": "2학기 중간고사 대비 비타민 및 유산균 지급 안내",
@@ -204,7 +279,8 @@
    "school": "강원대학교",
    "campus": "",
    "foundAt": "2026-10-06",
-   "src": "784a7e0d"
+   "src": "784a7e0d",
+   "desc": "보건진료소에서는 중간고사 기간을 맞이하여 대학 구성원의 피로회복 및 면역력 강화를 위해 비타민 및 유산균을 지급하고자 합니다."
   },
   {
    "title": "강원대학교 총동창회 「강대인 봄내길 걷기대회」 참가 안내",
@@ -213,7 +289,8 @@
    "school": "강원대학교",
    "campus": "",
    "foundAt": "2026-10-02",
-   "thumb": "data/news/img/4b18be5754f8315a.webp"
+   "thumb": "data/news/img/4b18be5754f8315a.webp",
+   "desc": "강원대학교 총동창회에서는 동문 및 대학 구성원 간 교류와 화합을 위한 「강대인 봄내길 걷기대회」를 개최합니다."
   },
   {
    "title": "[생활협동조합] 크누테리아 한식 메뉴 재개 안내",
@@ -258,7 +335,8 @@
    "school": "강원대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "src": "784a7e0d"
+   "src": "784a7e0d",
+   "desc": "▶ 검진대상 : 강원대학교 재학생(대학원생 포함) * 인원 한정, 선착순 마감"
   },
   {
    "title": "2026년 학생예비군 11.3. 기본훈련(3차) 안내",
@@ -267,7 +345,8 @@
    "school": "강원대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "src": "784a7e0d"
+   "src": "784a7e0d",
+   "desc": "✔ 훈련일시 : 11. 3.(화) 09:00 ~ 18:00 ✔ 훈련장소 : 동해과학화예비군훈련장"
   },
   {
    "title": "2026년 『제대군인 주간』 홍보",
@@ -275,7 +354,8 @@
    "postedAt": "2026-09-30",
    "school": "강원대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "desc": "다음주는 제대군인주간으로 아래와 같이 홍보하오니 참고하시기 바랍니다. \"지금부터 제대로 빛날 차례\" [리;스펙] 국가를 위해 헌신한 당신, 제대로 응원합니다. 제대군인주간(2026.10.65 ~ 10. 11.)"
   },
   {
    "title": "[정강희망프로젝트] 음악이 흐르는 화요도서관 참가 안내",
@@ -286,7 +366,8 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/4fb29a687972f9b4.webp",
-   "src": "784a7e0d"
+   "src": "784a7e0d",
+   "desc": "강원대학교 음악학과 강우성 교수님과 함께하는「음악이 흐르는 화요도서관」에 여러분을 초대합니다."
   },
   {
    "title": "평생교육원 2026 산림기술자 전문교육 모집 안내",
@@ -314,7 +395,8 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/4940df5ee02eec7a.webp",
-   "src": "784a7e0d"
+   "src": "784a7e0d",
+   "desc": "행사를 진행하오니 관심있는 학생들의 많은참여 바랍니다!!! 1. 행사일시 : 2026.10. 16.(금) 14:30 ~ 17:30"
   },
   {
    "title": "춘천시 시내버스 일부노선 개편 안내",
@@ -322,73 +404,8 @@
    "postedAt": "2026-09-21",
    "school": "강원대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "2026학년도 KNU 교양교육 혁신포럼 개최",
-   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11466&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "postedAt": "2026-09-21",
-   "kind": "행사",
-   "school": "강원대학교",
-   "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/d0239663a974cced.webp",
-   "src": "784a7e0d"
-  },
-  {
-   "title": "[일반대학원 입학] 2027학년도 전기 강원대학교 춘천캠퍼스 일반대학원 신입생 모집",
-   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11461&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "postedAt": "2026-09-17",
-   "school": "강원대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "src": "784a7e0d"
-  },
-  {
-   "title": "[학군단] '26년 후반기 ROTC 학군사관 후보생 67·68기(1,2학년 대상) 모집 공고",
-   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11460&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "postedAt": "2026-09-17",
-   "school": "강원대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/6ca113811c3bc1d6.webp",
-   "src": "784a7e0d"
-  },
-  {
-   "title": "강원대학교 재학생 대상 무료 온라인 모의 토익/모의 토익스피킹/모의 오픽 시험 안내",
-   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11458&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "postedAt": "2026-09-17",
-   "school": "강원대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/1780a40d63c7c488.webp"
-  },
-  {
-   "title": "[강연] 영문학자가 본 \"오디세이\" 집으로 가는 여러가지 길",
-   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11457&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "postedAt": "2026-09-17",
-   "kind": "행사",
-   "school": "강원대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/54cc5a34d913d517.webp"
-  },
-  {
-   "title": "2027학년도 교수·학습지원을 위한 학습 프로그램 요구조사 안내(기간연장)",
-   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11449&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "postedAt": "2026-09-15",
-   "school": "강원대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/328c0d090ab9d939.webp"
-  },
-  {
-   "title": "(춘천) 2026년 하반기 학생예비군훈련 안내",
-   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11445&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "postedAt": "2026-09-15",
-   "school": "강원대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
+   "desc": "1. 춘천시 시내버스 일부노선이 2026. 9. 30.(수) 첫차부터 부분개편되어 운영 된다고 하니 재학생 및 학내 구성원은 이용에 참고하여 주시기 바랍니다."
   }
  ]
 }

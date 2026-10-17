@@ -63,6 +63,11 @@ const JS_DOWNLOAD_RULES = [
     /* 정의(/js/dyp/comt/commonFn.js): fileDownLoad(atchFileId, fileSn) → window.open(contextPath + "/comt/fms/FileDown.do?atchFileId=…&fileSn=…") · contextPath = "" */
     call: /^javascript:\s*(?:dypCommonFn\.fileManage\.)?fileDownLoad\(\s*'([^']+)'\s*,\s*'([^']*)'\s*\)/i,
     path: (m) => `/comt/fms/FileDown.do?${new URLSearchParams({ atchFileId: m[1], fileSn: m[2] })}` },
+  { host: /(^|\.)msit\.go\.kr$/i,
+    /* 정의(공고 상세 HTML): fn_download(atchFileNo, fileOrd, ext) → 폼을 /ssm/file/fileDown.do 로 보낸다(atchFileNo·fileOrd) — GET 으로도 같은 파일이 온다(2026-10-16 실측 11MB hwpx).
+       호출은 href 가 아니라 onclick 에 있다 — detailAttachments 가 onclick 을 href 자리로 넘긴다 */
+    call: /^javascript:\s*fn_download\(\s*'(\d+)'\s*,\s*'(\d+)'/i,
+    path: (m) => `/ssm/file/fileDown.do?${new URLSearchParams({ atchFileNo: m[1], fileOrd: m[2] })}` },
   { host: /(^|\.)dongguk\.edu$/i,
     /* 정의(공고 상세 HTML): function downGO(file_nm, file_path, file_sys_nm){ location.href="/cmmn/fileDown.do?filename="+encodeURIComponent(file_nm)+"&filepath="+file_path+"&filerealname="+file_sys_nm }
        이름 안의 따옴표는 `\'` 로 적혀 온다(「웰로 \'Wello\' 앱」) — 그래서 인자를 `\'` 를 건너 읽고 되돌린다 */
@@ -92,17 +97,34 @@ const TEMPLATE_NAME = /'\s*\+|\+\s*'|fileItem\.|\$\{/;
 /** 공고 상세 HTML 에서 첨부 {name, url} — 일반 수집기(collect.mjs fetchDetail)가 쓴다.
     🔴 ① `href="…"` 와 `href='…'` 를 따옴표 짝으로 읽는다 — `[^"']*` 로 읽으면 `javascript:downloadfile(` 에서 끊겼다(22건)
     ② HTML 주석을 먼저 걷는다 — 화면에 없는 옛 첨부가 주워졌다 ③ 스크립트 호출은 resolveJsDownload 로 진짜 주소로 */
+/* 첨부 이름 끝·앞의 **아이콘 글자**를 뗀다 — 머티리얼 아이콘은 글자(ligature)로 그려져 링크 글에 `선발공고문.pdf chevron_forward` 처럼 붙어 온다
+   (2026-10-17 · 강원대: 그 꼬리 때문에 확장자 검사(`\.pdf$`)가 안 맞아 PDF 공고문 3개가 첨부로 인식되지 않았고 포스터 그림만 받혔다).
+   두 길(HTML 상세 · 브라우저 링크)이 같이 쓴다. */
+/* 소문자만 — 아이콘 글자(ligature)는 늘 소문자고, 이름 속 `Download Guide` 같은 보통 낱말은 대문자로 시작한다 */
+const ICON_WORDS = /(?:^|\s)(?:chevron_(?:forward|right|left)|file_download|download|attach_file|attachment|open_in_new|description|insert_drive_file|save_alt|arrow_(?:forward|downward|right))(?=\s|$)/g;
+export const cleanAttachName = (name) => String(name || '').replace(ICON_WORDS, ' ').replace(/\s+/g, ' ').trim();
+
 export function detailAttachments(html, pageUrl, { decode = (s) => s, max = 8 } = {}) {
   const src = String(html || '').replace(/<!--[\s\S]*?-->/g, ' ');
   const out = new Map();
-  const re = /<a\b[^>]*?href\s*=\s*(?:"([^"]*)"|'([^']*)')[^>]*>([\s\S]*?)<\/a>/gi;
+  const re = /<a\b([^>]*?)href\s*=\s*(?:"([^"]*)"|'([^']*)')([^>]*)>([\s\S]*?)<\/a>/gi;
   let m;
   while ((m = re.exec(src)) !== null && out.size < max) {
-    const raw = decode((m[1] ?? m[2] ?? '').trim());
+    let raw = decode((m[2] ?? m[3] ?? '').trim());
+    /* ④ `href="javascript:void(0)" onclick="fn_download('54098','1','hwpx')"` — 호출이 onclick 에 있는 게시판(과기정통부 · 2026-10-16).
+       빈 href 일 때만 onclick 을 호출로 본다 · 모르는 함수면 아래 resolveJsDownload 가 null 이라 첨부가 되지 않는다 */
+    const oc = (m[1] + m[4]).match(/\bonclick\s*=\s*(?:"([^"]*)"|'([^']*)')/i);
+    if ((!raw || JS_NOT_DOWNLOAD.test(raw)) && oc) raw = `javascript:${decode(oc[1] ?? oc[2] ?? '').trim()}`;
     if (!raw || raw.startsWith('#') || JS_NOT_DOWNLOAD.test(raw)) continue;
-    const name = m[3].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    let name = cleanAttachName(m[5].replace(/<[^>]+>/g, ' '));
     let url = /^javascript:/i.test(raw) ? resolveJsDownload(raw, pageUrl) || raw : null;
     if (!url) { try { url = new URL(raw, pageUrl).href; } catch { continue; } }
+    /* 단추 글자(`다운로드`)뿐이면 파일 이름은 바로 앞 요소에 있다 — 태그를 줄로 바꿔 마지막 파일 이름 줄을 쓴다(지어내지 않는다 · 없으면 그대로) */
+    if (!ATTACH_EXT.test(name) && /^javascript:/i.test(raw) && url !== raw) {
+      const before = src.slice(Math.max(0, m.index - 500), m.index).replace(/<[^>]+>/g, '\n').split('\n').map((s) => s.replace(/\s+/g, ' ').trim());
+      const file = before.reverse().find((s) => ATTACH_EXT.test(s) && s.length <= 120);
+      if (file) name = file;
+    }
     const isFile = ATTACH_EXT.test(url) || ATTACH_EXT.test(name) || /mode=download|download\.do|fileDown|attach|bbs_download/i.test(url);
     if (isFile && name.length >= 4 && name.length <= 120 && !TEMPLATE_NAME.test(name) && !out.has(url)) out.set(url, { name: name.slice(0, 100), url });
   }
@@ -113,6 +135,7 @@ export function detailAttachments(html, pageUrl, { decode = (s) => s, max = 8 } 
     화면에 그려진 링크라 주석 문제는 없다. 스크립트 호출만 진짜 주소로 바꾼다(resolveJsDownload). */
 export function linkAttachments(links, pageUrl, max = 6) {
   return (links || [])
+    .map((l) => ({ ...l, title: cleanAttachName(l.title) }))
     .map((l) => (/^javascript:/i.test(l.url || '') ? { ...l, url: resolveJsDownload(l.url, pageUrl) || l.url } : l))
     .filter((l) => !JS_NOT_DOWNLOAD.test(l.url || ''))
     .filter((l) => ATTACH_EXT.test(l.url) || /download|fileDown/i.test(l.url))

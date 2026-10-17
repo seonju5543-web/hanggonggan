@@ -1,7 +1,52 @@
 {
  "school": "서울과학기술대학교",
- "updatedAt": "2026-10-14",
+ "updatedAt": "2026-10-17",
  "items": [
+  {
+   "title": "[교수학습개발센터] ST 스위치온(C) 참여자 추가 모집",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896662&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-10-16",
+   "kind": "채용",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-10-16",
+   "thumb": "data/news/img/0367494ad1edcb9a.webp",
+   "desc": "교수학습개발센터에서 2026학년도 2차 ST 스위치온(C) 참여자를 추가 모집하오니, 학생 여러분의 많은 관심과 참여 바랍니다."
+  },
+  {
+   "title": "[교육혁신원] 2026학년도 전공 설계 지원 체계 구축을 위한 인식 및 수요조사 안내(10.15~10.27)",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896599&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-10-15",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-10-15",
+   "thumb": "data/news/img/ef138bc7dc23e8cf.webp",
+   "desc": "안녕하세요. 전공 설계 지원 체계 구축을 위한 재학생들의 인식 및 수요조사 파악을 위해 설문조사를 실시합니다."
+  },
+  {
+   "title": "[교양대학] 제17회 융합교양 콜로키움 개최 및 참가 안내",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896591&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-10-15",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-10-15",
+   "thumb": "data/news/img/7b6f797459ddc625.webp",
+   "desc": "서울과기대 교양대학 융합교양학부 정기 콜로키엄 참가 안내 2026년 서울과기대 융합교양학부 정기 콜로키엄은 <AI와 함께 만드는, 맞춤형 로봇 -몸의 모양부터 움직이는 방법까지> 을 주제로 진행합니다."
+  },
+  {
+   "title": "[메이커장비교육] SLA 3D프린터 장비교육",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896533&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-10-14",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-10-14",
+   "thumb": "data/news/img/ca1f88138cbac485.webp",
+   "desc": "장비교육 신청시 신청서 양식이 미흡한경우 (디지털서명 누락, 작성해야하는 부분 누락, 교육명 누락 등 ) 먼저 신청하셨더라도 후순위로 선발될수있습니다. 이전 내용이 없습니다."
+  },
   {
    "title": "[학생상담센터] 2026학년도 2학기 마음나눔 카페 '오늘, 커피한잔' OPEN (국립대학육성사업)",
    "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896419&qidx=4691&cate=10&allboard=false&nowpage=1",
@@ -124,7 +169,8 @@
    "school": "서울과학기술대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/5cf8843c068b2e82.webp"
+   "thumb": "data/news/img/5cf8843c068b2e82.webp",
+   "desc": "2026. 9. 30(수) ~ 10. 2(금) / 3일간 행사시간 10:00 ~ 18:00 (단, 2.(금) 17:00종료) 행사장소 일산 KINTEX 제2전시장 10홀 홈페이지 지역성장 인재양성체계(앵커) 사업,…"
   },
   {
    "title": "SLW(서울라이프위크) 2026 개최 안내",
@@ -155,7 +201,8 @@
    "school": "서울과학기술대학교",
    "campus": "",
    "foundAt": "2026-10-01",
-   "thumb": "data/news/img/0afb8b21c3e25f75.webp"
+   "thumb": "data/news/img/0afb8b21c3e25f75.webp",
+   "desc": "서울과학기술대학교 생활관에서는 국내외 학생 간 문화교류 및 커뮤니티 활성화를 위한『GLOBAL PLAYGROUND』를 2026. 10. 1일자로 오픈함을 알려드립니다."
   },
   {
    "title": "[총무과]주차게이트 네트워크 카메라(CCTV) 신규 설치에 따른 의견 수렴 안내",
@@ -164,7 +211,8 @@
    "kind": "생활",
    "school": "서울과학기술대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "desc": "2. 설치 장소: 붙임파일 확인 3. 설치 목적: 교내 안전사고 및 범죄 예방, 관련 증거 확보"
   },
   {
    "title": "★서울과학기술대학교 영재교육원(구리/남양주) 2027학년도 심화과정 신입생 모집★",
@@ -172,7 +220,8 @@
    "postedAt": "2026-09-30",
    "school": "서울과학기술대학교",
    "campus": "",
-   "foundAt": "2026-10-01"
+   "foundAt": "2026-10-01",
+   "desc": "1. 모집분야 및 인원 모집분야 전형유형 및 모집인원 모집대상 일반전형 사회통합전형 기회균등 / 사회다양성 수학·AI심화 현재 초등학교 6학년 과학심화"
   },
   {
    "title": "[보건진료소] 대학가 마약류 등 오남용 예방 캠페인 행사 안내",

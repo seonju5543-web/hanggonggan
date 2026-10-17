@@ -31,8 +31,14 @@ export const isNoticeDoc = (name) => {
   return NOTICEISH.test(n) && !FORMISH.test(n);
 };
 
-/* zip(=docx·hwpx) 안을 직접 읽는다 — 바깥 라이브러리 없이 */
-function unzipEntries(buf) {
+/* zip(=docx·hwpx·첨부 묶음) 안을 직접 읽는다 — 바깥 라이브러리 없이.
+   항목 이름은 UTF-8 로 읽되 깨지면 EUC-KR 로 다시 읽는다(한글 윈도우가 만든 zip · 2026-10-17 홍익대 묶음 첨부). */
+const entryName = (b) => {
+  const u = b.toString('utf8');
+  if (!u.includes('�')) return u;
+  try { return new TextDecoder('euc-kr').decode(b); } catch { return u; }   // ICU 없는 node 면 깨진 이름 그대로(확장자는 ASCII 라 살아 있다)
+};
+export function unzipEntries(buf) {
   const out = {};
   let end = buf.length - 22;
   while (end >= 0 && buf.readUInt32LE(end) !== 0x06054b50) end -= 1;
@@ -47,7 +53,7 @@ function unzipEntries(buf) {
     const extraLen = buf.readUInt16LE(ptr + 30);
     const commentLen = buf.readUInt16LE(ptr + 32);
     const localOff = buf.readUInt32LE(ptr + 42);
-    const name = buf.slice(ptr + 46, ptr + 46 + nameLen).toString('utf8');
+    const name = entryName(buf.slice(ptr + 46, ptr + 46 + nameLen));
     const lNameLen = buf.readUInt16LE(localOff + 26);
     const lExtraLen = buf.readUInt16LE(localOff + 28);
     const dataOff = localOff + 30 + lNameLen + lExtraLen;
@@ -56,6 +62,21 @@ function unzipEntries(buf) {
     ptr += 46 + nameLen + extraLen + commentLen;
   }
   return out;
+}
+
+/* 묶음 zip 첨부 안의 **공고문류**(hwp·hwpx·docx·pdf) — zip 자체는 아무도 못 읽으므로 deepfetch 가 이것으로 꺼내 저장한다
+   (2026-10-17 · 홍익대 「제주 미래이음 장학금」: 공고문·제출서류 안내가 zip 하나에만 들어 있어 자격을 영영 못 읽었다).
+   이름 규칙은 낱개 첨부와 같은 isNoticeDoc(동의서·서식·환산표는 뺀다) · 공고문·선발계획·요강이 먼저 · 최대 4개. */
+export function zipNoticeDocs(buf) {
+  const out = [];
+  for (const [name, data] of Object.entries(unzipEntries(buf))) {
+    const base = name.split('/').pop();
+    const m = base.match(/\.(hwpx?|docx?|pdf)$/i);
+    if (!m || !data || data.length < 1000 || !isNoticeDoc(base)) continue;
+    out.push({ name: base, ext: m[1].toLowerCase(), buf: data });
+  }
+  const rank = (n) => (/공고문|선발\s?계획|요강/.test(n) ? 0 : 1);
+  return out.sort((a, b) => rank(a.name) - rank(b.name)).slice(0, 4);
 }
 
 /* 🔴 **문단 단위로 이어 붙인다** (2026-08-20 — 안 그래서 숫자가 사라졌다).
@@ -160,8 +181,11 @@ export function attachmentText(filePath) {
    `.ocr.txt` 가 없으면 '못 읽었다'다 — pdf-text.py 의 `.pdf.txt` 는 여기서 **일부러 안 읽는다**
    (위 2026-08-20 결정: 글자층 PDF 는 숫자가 빠진 채 나와 자격 줄이 원문보다 나빠진다.
    OCR 은 픽셀을 읽으므로 그 문제가 없고, 대신 오독을 관문(한글 비율·줄 단위)으로 거른다). */
+/* 포스터는 이름표 뒤에 콜론이 없다(`신청대상 대한민국 국적자로 …` · `지원금액 매학기 등록금 전액`) — 발췌기·금액 로봇이 이름표를
+   알아보도록 **줄 머리 이름표 뒤에만** 콜론을 둔다(2026-10-17 · 강원대 청년창업어업인 포스터: 자격 줄이 있는데 못 읽었다). */
+const OCR_LABEL = /^((?:신청|지원|선발|모집|참가|참여)\s?(?:대상|자격|인원|금액|기간|방법|문의)|접수\s?(?:기간|방법)|문의처?)\s+(?=\S)/gm;
 function ocrText(filePath) {
-  try { return fs.readFileSync(filePath + '.ocr.txt', 'utf8'); } catch { return ''; }
+  try { return fs.readFileSync(filePath + '.ocr.txt', 'utf8').replace(OCR_LABEL, '$1 : '); } catch { return ''; }
 }
 
 /* 이 파일의 글자가 OCR 에서 온 것인가 — 출처 표식(`공고문 첨부(OCR)`)을 붙이는 데 쓴다.
@@ -183,3 +207,7 @@ export function docOrder(files) {
 
 /* 읽을 만한 글자인가 — 한글이 이만큼은 나와야 자격을 찾아볼 가치가 있다 */
 export const readable = (text, min = 300) => String(text || '').replace(/[^가-힣]/g, '').length >= min;
+/* 🔴 OCR 로 읽은 첨부는 문턱이 낮다 (2026-10-17) — 포스터는 글자가 적어(강원대 어업인 포스터 한글 150자) 300자 문턱에 통째로 버려졌다.
+   OCR 글자는 이미 품질 관문(ocr-text.py)을 넘은 것만 남아 있으므로 짧다고 못 믿을 이유가 없다. 첨부를 읽는 로봇은 readable 대신 이것을 쓴다. */
+export const OCR_MIN = 80;
+export const readableDoc = (filePath, text = attachmentText(filePath)) => readable(text, isOcrSource(filePath) ? OCR_MIN : 300);

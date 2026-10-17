@@ -32,7 +32,7 @@ const { isExcludeHead: shExclude, headText: shHead, isAmountHead: shAmount } = _
 /* 공고문 첨부에서 글자 뽑기 — 본문이 "붙임 참조"뿐인 공고가 있다.
    🔴 **공고문만** 본다(attachment-text.mjs 첫머리 참조) — 신청서·동의서를 읽으면
    개인정보 수집 항목이 지원 자격 자리에 앉는다(실제로 겪고 되돌린 적이 있다). */
-import { attachmentText, readable, docOrder, isOcrSource } from './attachment-text.mjs';
+import { attachmentText, readableDoc, docOrder, isOcrSource } from './attachment-text.mjs';
 import { findApplyEmail, humanOwnedEmail, staleApplyEmail } from './apply-email.mjs';
 import { decodeEntities } from './clean-title.mjs';
 import { readDocuments, placeholderOnly as docsPlaceholderOnly } from './doc-list.mjs';
@@ -58,6 +58,9 @@ const HAS_SUBSTANCE = /\d{1,4}\s*[.\-/년]\s*\d{1,2}|\d{1,2}\s*월\s*\d{1,2}|\d{
 const DANGLING = /(다음|아래|같이|경우|위해|통해|관련|및|또는)\s*[.．]?\s*$/;
 
 const JUNK = /바로가기|사이트맵|SITEMAP|로그인|회원가입|검색어|메뉴|팝업|카드뉴스|이전글|다음글|목록으로|목록보기|첨부파일\s*$|저작권|개인정보처리방침|instagram|facebook/i;
+/* 포스터 OCR 의 홀로 선 조각 — `스마트폰으로`·`QR코드를` 처럼 조사로 끝나는 짧은 한 낱말은 옆 칸 글의 조각이지 요건이 아니다
+   (2026-10-17 · 강원대 청년창업어업인 포스터: 「스마트폰으로 바로 신청 가능!」 안내의 첫 낱말이 자격 줄에 섞였다) */
+const LONE_PARTICLE = /^[가-힣]{2,5}(?:으로|에서|에게|를|을)$/;
 
 function extractFrom(text) {
   if (!text) return [];
@@ -120,7 +123,8 @@ const NEXT_SECTION = new RegExp(SECT_PREFIX +
      "3. 제출기한 : ~2026.8.3" 처럼 **콜론 뒤에 내용이 붙은 소제목**은 아래 SECTION_HEAD
      길이 규칙(짧아야 제목)에 걸리지 않아, 제출기한·양식 안내가 자격 자리에 앉아 있었다
      (한국장학재단 이공계 중간평가 공고로 실증 — 자격 4줄 중 3줄이 이 유형이었다). */
-  '(신청\\s?기간|접수\\s?기간|지원\\s?기간|신청\\s?접수|신청\\s?방법|접수\\s?방법|제출\\s?서류|구비\\s?서류|제출\\s?방법|제출\\s?기한|신청\\s?기한|접수\\s?기한|확인\\s?방법|대상자\\s?확인|양식|서식|선발\\s?방법|유의\\s?사항|문의|지급|장학금?\\s?(지급|금액|내용|혜택|종류)|안내|일정|기타|참고|제외\\s?대상|선발\\s?제외|지원\\s?내용|혜택)');
+  /* 활동 공고의 다음 절 — `ㅇ 참가방법 :`·`ㅇ 시상규모 :` (2026-10-16 · 중앙청년지원센터 청년정책 공모전: 참가자격 뒤 참가방법·시상표 14줄이 자격에 딸려 왔다) */
+  '(신청\\s?기간|접수\\s?기간|지원\\s?기간|신청\\s?접수|신청\\s?방법|접수\\s?방법|참가\\s?방법|참여\\s?방법|응모\\s?방법|제출\\s?서류|구비\\s?서류|제출\\s?방법|제출\\s?기한|신청\\s?기한|접수\\s?기한|확인\\s?방법|대상자\\s?확인|양식|서식|선발\\s?방법|유의\\s?사항|문의|지급|장학금?\\s?(지급|금액|내용|혜택|종류)|안내|일정|기타|참고|제외\\s?대상|선발\\s?제외|지원\\s?내용|혜택|시상\\s?(?:규모|내역|내용|계획|식)|상금\\s*[:：]|접수처\\s*[:：]|제출처\\s*[:：]|(?:공모|응모|모집|참가|참여)\\s?기간|공모\\s?(?:주제|부문))');   // 공모 글의 다음 절(청년재단 밥상 로그 — `✅ 참여자격` 뒤 `✅ 공모기간`·`✅ 공모주제`·`✅ 시상내용` 이 자격에 딸려 왔다 · 2026-10-16)
 
 /* 자격 절이 끝났는지 판단하는 **구조적** 기준 (2026-08-02 해성문화재단 사례).
    공고는 보통 '가. / 나. / 다. / 라.' 또는 '1. / 2. / 3.'으로 절이 나뉜다.
@@ -209,7 +213,7 @@ const unent = (s) => ENT.reduce((t, [re, ch]) => t.replace(re, ch), s);
    🔴 **앞머리 동사가 이 파서의 방어선이다.** `게시기간`·`지급기간`·`근로기간`·`거주기간`·
    `마일리지 산정기간`이 전부 여기서 걸러진다 — 이 목록을 넓히면(예: 맨 `기간`) 장학금을
    **주는** 기간이 신청 마감으로 둔갑한다. 회귀는 test-collector '마감일' 절의 '읽으면 안 되는 것'. */
-const PERIOD_LABEL = /(신청|접수|모집|지원|응모|제출|추천)\s?(기간|기한|마감(일시?)?)/;
+const PERIOD_LABEL = /(신청|접수|모집|지원|응모|제출|추천|공모)\s?(기간|기한|마감(일시?)?)/;   // 공모 기간(KAIST 허위정보 아이디어 공모 — 발췌는 됐는데 마감만 비었다 · 2026-10-17)
 /* 맨 `기간`·`기한`·`마감`도 이름표다 — **단, 그것뿐일 때만.** 실제 원문에 `가. 기간 : 2026. 7. 20.
    ~ 8. 14.(금) 16:00 까지` 가 있는데 앞머리 동사를 요구하다 놓치고 있었다(2026-08-30 개발자 지적).
    🔴 `거주기간`·`근로기간`처럼 **앞에 말이 붙으면 여기서 안 걸린다** — 그게 방어선이다.
@@ -306,6 +310,9 @@ function dateFrom(value, ctxYear) {
       const next = ymd(ctxYear + 1, b1[1], b1[2]);
       return next && (Date.parse(next) - Date.parse(first)) / 86400000 <= 183 ? next : null;
     }
+    /* `10월 7일(수) ~ 30일(금)` — 끝에 달이 없으면 시작한 달이다(광운대 다전공 수기 공모 · 2026-10-17). 30일처럼 달이 생략된 날만, 시작일 뒤여야 한다 */
+    const dOnly0 = after.match(/^[^0-9]{0,4}(\d{1,2})\s?일(?!\s?[.\-/월]\s?\d)/);
+    if (dOnly0) { const end = ymd(ctxYear, b0[1], dOnly0[1]); if (end && end >= first) return end; }
     /* `~` 뒤에 날짜가 없으면 시작일을 마감으로 쓰지 않는다 — 같은 날 안의 **시각** 범위(`10. 5. 10:00 ~ 18:00`)만 그날 (아래와 같은 규칙) */
     return /^[^0-9]{0,4}\d{1,2}\s?(:\s?\d{2}|시)/.test(after) ? first : null;
   }
@@ -342,6 +349,9 @@ function dateFrom(value, ctxYear) {
      `신청기간: 2026. 8. 10.(월) ~ 선발 완료시 까지` 를 8월 10일 마감으로 읽어
      아직 열려 있는 공고를 끝난 것으로 만들 뻔했다(2026-08-30 전수 대조에서 잡았다).
      예외는 같은 날 안의 **시각** 범위뿐이다: `2026. 8. 24.(월) 10:00 ~ 18:00`. */
+  /* `2026년 10월 7일(수) ~ 30일(금)` — 끝에 달이 없으면 시작한 달(위 해 없는 갈래와 같은 규칙 · 2026-10-17) */
+  const dOnly = after.match(/^[^0-9]{0,4}(\d{1,2})\s?일(?!\s?[.\-/월]\s?\d)/);
+  if (dOnly) { const end = ymd(m[1], m[2], dOnly[1]); if (end && end >= start) return end; }
   return /^[^0-9]{0,4}\d{1,2}\s?(:\s?\d{2}|시)/.test(after) ? start : null;
 }
 
@@ -576,9 +586,11 @@ function extractQualifyLines(text, opts = {}) {
      그래서 점수 순으로 몇 곳을 실제로 읽어 보고, 아래 관문(요건 신호)을 통과한 첫 블록을 쓴다.
      관문이 이미 '자격이 아닌 블록'을 걸러 주므로 이 되풀이가 안전하다.
      상위 4곳까지만 본다 — 더 뒤지면 공고 끝의 엉뚱한 절까지 손을 뻗는다. */
-  let best = -99, top = cands[0];
-  for (const i of cands) { const s = headScore(lines[i]); if (s > best) { best = s; top = i; } }
-  return blockFrom(top);
+  /* 점수 순으로 **몇 곳을 실제로 읽어 본다**(위 주석의 약속 — 그동안 코드는 1등 한 곳만 읽고 빈손이면 포기했다 · 2026-10-16 물환경 공모전:
+     `■ 참가 대상` 보다 뒤쪽 시상표의 `대상(1팀) : 장관상` 이 1등이 되어 진짜 자격 두 줄을 통째로 놓쳤다). 관문(요건 신호·trustHead)이 자격 아닌 블록을 거르므로 안전하다 */
+  const ranked = [...cands].map((i) => [i, headScore(lines[i])]).sort((a, b) => b[1] - a[1] || a[0] - b[0]).slice(0, 4);
+  for (const [i] of ranked) { const got = blockFrom(i); if (got.length) return got; }
+  return [];
 
   function blockFrom(start) {
   const startMark = markerOf(lines[start]);
@@ -636,7 +648,7 @@ function extractQualifyLines(text, opts = {}) {
         if (body.length <= 20) break;
       }
     }
-    if (JUNK.test(l)) continue;
+    if (JUNK.test(l) || LONE_PARTICLE.test(l.trim())) continue;
     /* 🔴 금액 줄은 자격이 아니다 (2026-10-12 · 카드 분석 조각 2). `3 ) 금 액 : 250 만 원`·`- 장학 금액 : 200 만원 / 인`·`○ 선발규모: 60,000천원`·
        `1학년 100만원` 같은 금액 이름표·표 줄이 자격 블록에 담겨, 화면의 잡음 규칙(REQ_NOISE)에만 기대고 있었다.
        이름표 판정은 section-head isAmountHead 한 곳(화면·감사와 같다) · 표 줄은 AMOUNT_ROW. 끊지 않고 **건너뛴다** —
@@ -652,6 +664,14 @@ function extractQualifyLines(text, opts = {}) {
   }
   // 제목 줄 하나만 남았고 내용이 없으면 쓸모없다
   if (!(out.length >= 1 && out.join('').length >= 10)) return [];
+  /* 🔴 납작해진 표는 자격이 아니다 (2026-10-17 · 울산연구원 하반기 HWP: 표의 칸 「신청 대상 | 직접 온라인 | 다자녀장학금 | 120백만원 | 1,500천원 …」
+     14칸이 통째로 자격 줄이 됐다 — '대학생' 한 낱말이 요건 신호를 통과시켰다). 네 줄 이상인데 7할이 10자 이하면 요건 문장이 아니라 칸들이다 →
+     비우고 다음 후보(점수 순)로 넘긴다. 진짜 요건은 「직전학기 12학점 이상」처럼 10자를 넘는 문장이 대부분이다. */
+  if (out.length >= 4 && out.filter((l) => l.replace(/\s+/g, ' ').trim().length <= 10).length >= out.length * 0.7) return [];
+  /* 🔴 같은 줄이 두 번 나오는 블록은 **분야별 표**다 (같은 울산 HWP: 「신청자격 및 선발기준」 표가 우수·다자녀·생활… 분야마다 `⁕등록금성`·
+     `※ 선발기준 우선순위` 를 되풀이한다). 그 표의 `성적 4.0/4.5 이상` 은 우수장학금 한 분야의 기준이라 공고 전체의 요건으로 보이면
+     다자녀 분야로 갈 수 있는 학생에게 틀린 미달이 붙는다(qualFromDocs 머리말의 실측). 분야를 갈라 담는 구조가 생기기 전엔 비워 둔다. */
+  if (new Set(out.map((l) => l.replace(/\s+/g, ' ').trim())).size < out.length) return [];
   /* 🔴 마지막 관문 — 이 블록이 정말 '누가 받을 수 있나'를 말하고 있는가 (2026-08-20).
      자격 절 제목을 잘못 짚으면(이화 양영재단: '신청방법' 블록을 자격으로 읽었다) 제출서류·
      유의사항 8줄이 통째로 **지원 자격 자리에** 앉는다. 학생은 그걸 요건으로 읽고 자기가
@@ -716,8 +736,68 @@ function scoopQualifyLines(text) {
    이 파일은 **불러오는 순간 아래 본편이 통째로 실행되던** 구조라 규칙 하나를 시험해 보려면
    비슷한 코드를 따로 베껴야 했고(그러면 규칙이 두 벌이 된다), 검사도 '원본 글자를 읽어
    규칙이 살아 있는지만 보는' 약한 방식에 머물렀다. `EXCERPTS_AS_LIB=1`이면 본편을 건너뛴다. */
+/** 이미 뽑힌 자격 줄 묶음을 **다음 절 머리글**(참가방법·시상규모·신청기간…)에서 자른다 — 브라우저 장부(act-browser.json)의 옛 줄처럼
+    원문 없이 줄만 남은 것에 blockFrom 과 같은 절 끝 규칙을 거는 한 곳(2026-10-16 · 중앙청년지원센터 청년정책 공모전). 첫 줄은 절 제목일 수 있어 안 본다 */
+function cutAtNextSection(lines) {
+  const ls = Array.isArray(lines) ? lines : [];
+  const i = ls.findIndex((l, k) => k > 0 && NEXT_SECTION.test(String(l || '')));
+  return i > 0 ? ls.slice(0, i) : ls;
+}
+/* ── 제출 서류 (2026-10-17 개발자 "원문에서 확인 이렇게 뜨는 게 하나도 없어야") ──────────────────────────────
+   자동 등록분 220건의 documents 는 자리표시 한 줄(`지원 자격·제출 서류는 원문 공고에서 확인`)뿐이라 시트가 「제출 서류는 공고 원문에서
+   확인해 주세요」를 찍었다. 원문에는 `4. 제출서류` 절 아래 `가. 성적증명서 1부 / 나. 장학금 지급원서 ( 첨부서류 ) 1부 …` 가 있다(저장 원문 156건).
+   규칙(자격 절 읽기와 같은 심장 — 지어내지 않는다 · 원문 줄 그대로 · 못 믿으면 비운다):
+     · 절 머리는 이름표뿐인 짧은 줄(`4. 제출서류`·`2) 필수제출서류`·`■ 구비서류`) 또는 `제출서류 : 신청서 1부, 성적증명서 1부`(한 줄에 값)
+     · 아래 줄은 **서류 이름처럼 생긴 줄만**(…서·증명·사본·등본·통장·포트폴리오·`1부`) · 표 머리(구분·필수·선택·비고)·설명 문장(…니다)·90자 넘는 줄은 아니다
+     · 다음 절 머리(같은 단계 번호 · 제출기한·신청방법·문의·유의사항…)에서 끝 · 많아야 12줄 */
+const DOC_HEAD = /^(?:필수\s?)?(?:제출|구비|신청|첨부|필요|준비)\s?서류(?:\s?(?:안내|목록|및\s?방법))?$/;
+const DOC_NEXT = /^(?:(?:제출|신청|접수)\s?(?:기한|방법|기간|처)|문의|유의\s?사항|선발\s?(?:기준|방법|일정)|심사|일정|지급|기타|신청\s?및|비고)/;
+const DOC_ISH = /(?:서|증명|사본|등본|초본|통장|포트폴리오|에세이|성적표|진단서|증빙|확인증)\s*(?:[(（\d]|\d|$|,|·|\s)|\d\s?부(?!터)|증명서|신청서|동의서|추천서|서약서|계획서|이력서|자기소개서|원서|확인서/;
+const DOC_TABLE = /^(?:구분|제출\s?서류|필수|선택|서류|비고|해당자|공통|세부\s?내용|제출\s?방법)$/;
+const tidyDoc = (l) => unent(l).replace(/^[\s\-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙❍◎￭·ㆍ*ㅇ✅✔]+/, '').replace(/^(?:[가-힣]\s*[.)]|\d{1,2}\s*[.)]|[①-⑳]|\(\d{1,2}\))\s*/, '')
+  .replace(/\s+(부|매|통)(?=\s|$|[(,])/g, '$1').replace(/\(\s+/g, '(').replace(/\s+\)/g, ')').replace(/\s+/g, ' ').trim();
+function extractDocuments(text) {
+  if (!text) return [];
+  const lines = String(text).split(/\n+/).map((l) => unent(l).replace(/[ \t　]+/g, ' ').trim()).filter(Boolean);
+  for (let i = 0; i < lines.length; i += 1) {
+    const l = lines[i];
+    const at = l.search(/[:：]/);
+    /* 머리 뒤 꼬리표는 떼고 본다 — `4. 제출 서류 [가~다]`·`바. 제출 서류 → 10월 이후 발급분만 인정`·`※ 제출서류(필수제출)`(실측 29건) */
+    const head = shHead(at >= 0 ? l.slice(0, at) : l).replace(/[\[(（][^\])）]*[\])）]|→.*$/g, '').replace(/\s/g, '');
+    if (!DOC_HEAD.test(head)) continue;
+    /* 한 줄에 값 — `제출서류 : 신청서 1부, 성적증명서 1부` */
+    if (at >= 0 && l.slice(at + 1).trim().length >= 4) {
+      const items = l.slice(at + 1).split(/\s*[,、·]\s*|\s\/\s/).map((x) => tidyDoc(x)).filter((x) => x.length >= 2 && x.length <= 90 && DOC_ISH.test(x));
+      if (items.length) return items.slice(0, 12);
+    }
+    const mark = markerOf(l);
+    const out = [];
+    for (let j = i + 1; j < lines.length && out.length < 12; j += 1) {
+      const x = lines[j];
+      const xh = shHead(x.split(/[:：]/)[0]).replace(/\s/g, '');
+      if (DOC_NEXT.test(xh)) break;
+      const mk = markerOf(x);
+      if (mark.kind && mk.kind === mark.kind && (mk.kind !== 'num' || mk.n > mark.n)) break;   // 같은 단계의 다음 절
+      if (!mark.kind && SECTION_HEAD.test(x) && x.replace(/^\s*(?:[가-힣]\s*[.)]|\d+\s*\.|[■□▣◇◆]\s*)\s*/, '').length <= 20 && !DOC_ISH.test(x)) break;
+      if (/^\s*[※*]/.test(x)) continue;                                     // 곁말(`※ 다른 학기의 확인서는 인정하지 않음`)
+      const d = tidyDoc(x);
+      if (!d || d.length > 90 || DOC_TABLE.test(d)) continue;
+      if (/(?:니다|세요|바랍니다|함)\s*\.?$/.test(d) && !/\d\s?부/.test(d)) continue;   // 설명 문장
+      if (/파일명|파일로|가나다순|(?:로|에)\s?제출|작성\s?후|업로드/.test(d)) continue;      // 제출 방법 문장(`반드시 PDF 1개 파일로 … 제출`)
+      if (!/\d\s?부/.test(d) && /(?:만\s?인정|인정됨|인정하지|발급본|발급받|가능함|불가함|필요함|제외됨|제외함)/.test(d)) continue;   // 서류 **조건**을 말하는 곁말(`성적증명서는 … 발급본만 인정됨`) — 서류 이름이 아니다
+      if (!DOC_ISH.test(d)) continue;
+      if (!out.includes(d)) out.push(d);
+    }
+    if (out.length) return out;
+  }
+  return [];
+}
+/* 자리표시 서류 — 앱(app.js DOC_PLACEHOLDER)과 같은 글자. 바꾸면 둘 다(관문이 대조한다) */
+const DOC_PLACEHOLDER = /(원문\s*공고|공고문|재?공고\s*원문)(에서)?\s*확인/;
+const isDocPlaceholder = (doc) => DOC_PLACEHOLDER.test(String(doc || ''));
+
 export { extractQualifyLines, scoopQualifyLines, extractFrom, extractExcludeLines, extractPriorityLines,
-         extractDeadline, extractOpenDate, extractAnnounce, qualFromTitle, AMOUNT_ROW };
+         extractDeadline, extractOpenDate, extractAnnounce, qualFromTitle, AMOUNT_ROW, cutAtNextSection, extractDocuments, isDocPlaceholder };
 
 let browserBodies = {};
 try { browserBodies = JSON.parse(fs.readFileSync(new URL('extracted/browser-bodies.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
@@ -797,8 +877,9 @@ function docTexts(it) {
   const out = [];
   out.files = [];                       // 글자와 같은 차례의 파일 이름 — 어느 첨부에서 읽었는지 표식에 쓴다
   for (const f of docOrder((eligDocs[it.id] || {}).files)) {   // 원문 글자(HWP)가 OCR 보다 먼저
-    const t = attachmentText(fileURLToPath(new URL(`extracted/${f}`, HERE)));
-    if (readable(t)) { out.push(t); out.files.push(f); }
+    const p = fileURLToPath(new URL(`extracted/${f}`, HERE));
+    const t = attachmentText(p);
+    if (readableDoc(p, t)) { out.push(t); out.files.push(f); }   // OCR 포스터는 문턱이 낮다(attachment-text readableDoc 한 곳)
   }
   return out;
 }
@@ -917,8 +998,9 @@ function qualFromDocs(it) {
      분야별 요건을 제대로 다루려면 절이 아니라 **분야를 갈라 담는 구조**가 먼저 필요하다. */
   qualFromDocs.lastFile = null;
   for (const f of docOrder((eligDocs[it.id] || {}).files)) {   // 원문 글자(HWP)가 OCR 보다 먼저
-    const t = attachmentText(fileURLToPath(new URL(`extracted/${f}`, HERE)));
-    if (!readable(t)) continue;
+    const p = fileURLToPath(new URL(`extracted/${f}`, HERE));
+    const t = attachmentText(p);
+    if (!readableDoc(p, t)) continue;   // OCR 포스터는 문턱이 낮다(attachment-text readableDoc 한 곳 · 2026-10-17 강원대 어업인 포스터)
     const got = extractQualifyLines(t);
     if (got.length) { qualFromDocs.lastFile = f; return got; }
   }

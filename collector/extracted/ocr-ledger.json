@@ -1465,5 +1465,150 @@
   "ratio": 0.971,
   "hangul": 224,
   "lines": 8
+ },
+ "elig-n0pyd0-1.pdf": {
+  "sig": "56685:83cac7df9a64",
+  "gate": "0.9/200/0.6/v2",
+  "ok": true,
+  "at": "2026-10-14",
+  "pages": 2,
+  "ratio": 0.913,
+  "hangul": 612,
+  "lines": 39
+ },
+ "elig-17fe0w-1.png": {
+  "sig": "179634:49597156e032",
+  "gate": "0.9/200/0.6/v2",
+  "ok": false,
+  "at": "2026-10-15",
+  "pages": 1,
+  "ratio": 0.136,
+  "hangul": 3,
+  "lines": 1,
+  "why": "한글 비율 0.14 < 0.9 — 포스터·장식 글자로 본다"
+ },
+ "elig-mdklo3-1.jpg": {
+  "sig": "1128162:751b324fbbec",
+  "gate": "0.9/200/0.6/v2",
+  "ok": false,
+  "at": "2026-10-15",
+  "pages": 1,
+  "ratio": 0.883,
+  "hangul": 115,
+  "lines": 11,
+  "why": "한글 비율 0.88 < 0.9 — 포스터·장식 글자로 본다"
+ },
+ "elig-14vt6j-1.pdf": {
+  "sig": "71969:f9632b6afa43",
+  "gate": "0.9/200/0.6/v2",
+  "ok": false,
+  "at": "2026-10-15",
+  "pages": 2,
+  "ratio": 0.897,
+  "hangul": 668,
+  "lines": 47,
+  "why": "한글 비율 0.90 < 0.9 — 포스터·장식 글자로 본다"
+ },
+ "elig-1ou26f-1.pdf": {
+  "sig": "118973:82c0348a743a",
+  "gate": "0.9/200/0.6/v2",
+  "ok": true,
+  "at": "2026-10-16",
+  "pages": 3,
+  "ratio": 0.939,
+  "hangul": 944,
+  "lines": 52
+ },
+ "elig-1ou26f-2.pdf": {
+  "sig": "98739:126129677d1e",
+  "gate": "0.9/200/0.6/v2",
+  "ok": true,
+  "at": "2026-10-16",
+  "pages": 2,
+  "ratio": 0.959,
+  "hangul": 1063,
+  "lines": 42
+ },
+ "elig-11xj8n-1-1.pdf": {
+  "sig": "308005:b8ed1dcc60b8",
+  "gate": "0.9/200/0.6/v2",
+  "ok": true,
+  "at": "2026-10-16",
+  "pages": 5,
+  "ratio": 0.948,
+  "hangul": 1788,
+  "lines": 104
+ },
+ "elig-11xj8n-1-2.pdf": {
+  "sig": "72695:60131261b783",
+  "gate": "0.9/200/0.6/v2",
+  "ok": true,
+  "at": "2026-10-16",
+  "pages": 1,
+  "ratio": 0.928,
+  "hangul": 224,
+  "lines": 10
+ },
+ "elig-11xj8n-1-3.pdf": {
+  "sig": "133139:cc6973d8db52",
+  "gate": "0.9/200/0.6/v2",
+  "ok": true,
+  "at": "2026-10-16",
+  "pages": 4,
+  "ratio": 0.952,
+  "hangul": 1282,
+  "lines": 83
+ },
+ "elig-167klr-2.pdf": {
+  "sig": "152659:6ac952546755",
+  "gate": "0.9/200/0.6/v2",
+  "ok": false,
+  "at": "2026-10-16",
+  "pages": 2,
+  "ratio": 0.899,
+  "hangul": 723,
+  "lines": 46,
+  "why": "한글 비율 0.90 < 0.9 — 포스터·장식 글자로 본다"
+ },
+ "elig-167klr-3.pdf": {
+  "sig": "434586:16fb0fb23e04",
+  "gate": "0.9/200/0.6/v2",
+  "ok": false,
+  "at": "2026-10-16",
+  "pages": 2,
+  "ratio": 0.865,
+  "hangul": 401,
+  "lines": 20,
+  "why": "한글 비율 0.87 < 0.9 — 포스터·장식 글자로 본다"
+ },
+ "elig-1o1955-3.pdf": {
+  "sig": "4097838:4b8fc6c611a5",
+  "gate": "0.9/200/0.6/v2",
+  "ok": true,
+  "at": "2026-10-16",
+  "pages": 10,
+  "ratio": 0.953,
+  "hangul": 4903,
+  "lines": 220
+ },
+ "elig-m8pch2-2.jpg": {
+  "sig": "503409:d67ea285d9cc",
+  "gate": "0.9/200/0.6/v2",
+  "ok": true,
+  "at": "2026-10-17",
+  "pages": 1,
+  "ratio": 0.92,
+  "hangul": 341,
+  "lines": 26
+ },
+ "elig-wio1un-1.pdf": {
+  "sig": "274648:f3e8bf93a637",
+  "gate": "0.9/200/0.6/v2",
+  "ok": true,
+  "at": "2026-10-17",
+  "pages": 10,
+  "ratio": 0.945,
+  "hangul": 3108,
+  "lines": 205
  }
 }

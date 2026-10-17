@@ -763,6 +763,8 @@ switch (action) {
         if (it.type === '교외') blockLearnedProgram(it);
       }
       if (changed.includes('eligibility') && scopeOf(it.eligibility) !== oldScope) it.scopeFrom = OWNER;
+      /* 제출 서류도 같은 규칙 — 서류 채우기 로봇(docs-fill.mjs)이 이 표식을 보고 사람이 적은 서류를 덮지 않는다(2026-10-17) */
+      if (changed.includes('documents')) it.documentsFrom = OWNER;
       /* 발표일도 같은 규칙 — 로봇(fillCalendarDates)이 이 표식을 본다 */
       if (changed.includes('announceDate')) it.announceDateFrom = it.announceDate ? OWNER : `${OWNER} · 비움`;
       /* 금액도 같은 규칙 (2026-09-17 · F-9 컨펌 2 · 개발자 결정 '나' — 관리자가 손으로 채운다).

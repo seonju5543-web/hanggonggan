@@ -37,3 +37,4 @@ collector/extracted/paddle-status.json
 # 통째로 바꿔 끼우기(collector/write-atomic.mjs)의 임시 파일 — 쓰는 도중 끊기면 남는다(다음 저장이 덮어쓴다) · 커밋하지 않는다
 collector/**/*.tmp
 data/**/*.tmp
+.claude/launch.json

@@ -165,7 +165,7 @@ const labeled = (label, raw) => {
 };
 
 /* 같은 모양의 글 하나 — 학교가 빈 전국 글(앱이 모든 학생에게 보인다) */
-function item({ title, url, kind, field, deadline, host, excerpts, api, details, apiId }) {
+function item({ title, url, kind, field, deadline, host, excerpts, api, details, apiId, attachments }) {
   /* 카드 윗줄에 주최가 이미 나온다 — 같은 이름을 발췌 '주최'로 또 적지 않는다 (리뷰 M4) */
   const h = clip(host);
   excerpts = (excerpts || []).filter((x) => x && !(x.label === '주최' && x.text === h));
@@ -177,7 +177,7 @@ function item({ title, url, kind, field, deadline, host, excerpts, api, details,
     deadline: deadline || undefined,
     deadlineHint: null,
     excerpts,
-    attachments: [],
+    attachments: attachments || [],
     school: '',
     campus: '',
     host: h,
@@ -315,10 +315,25 @@ export function mapYouthContent(r, { scholarship, today, bad } = {}) {
     host: r.pstSeNm ? `온통청년 ${r.pstSeNm}` : '온통청년',
     excerpts: ex.excerpts,
     details: activityDetails(htmlToLines(r.pstWholCn)),
+    /* 글 화면(bbs03View)은 스크립트 껍데기라 어떤 로봇도 본문을 못 본다(2026-10-16 실측 5건 모두 글자 1451 — 틀 글자뿐). 본문은 API 가 준 pstWholCn 에 있고
+       대개 포스터 그림 한 장이다 → 그림 주소를 첨부로 넘겨 첨부·포스터 로봇(activity-docs)이 받아 읽게 한다. 이름은 주소의 파일 이름(지어내지 않는다) */
+    attachments: bodyImages(r.pstWholCn),
     api: 'youthContent',
   }) };
 }
 
+/** 본문 HTML 의 그림 → 첨부 {name, url} (절대 주소만 · 아이콘·꾸밈 그림 이름은 뺀다 · 최대 4장) */
+export function bodyImages(html) {
+  const out = [];
+  for (const m of String(html || '').matchAll(/<img\b[^>]*\bsrc\s*=\s*["']([^"']+)["']/gi)) {
+    const u = m[1].replace(/&amp;/g, '&').trim();
+    if (!/^https?:\/\//i.test(u) || /logo|icon|btn|button|banner|blank|spacer|arrow|bullet|emoticon|\.gif(?:[?#]|$)/i.test(u)) continue;
+    const name = decodeURIComponent((u.split(/[?#]/)[0].split('/').pop() || '').slice(0, 80)) || '본문 그림';
+    if (!out.some((a) => a.url === u)) out.push({ name, url: u });
+    if (out.length >= 4) break;
+  }
+  return out;
+}
 export const MAPPERS = { kstartup: mapKstartup, vol1365: map1365, youthPolicy: mapYouthPolicy, youthContent: mapYouthContent };
 
 const daysBetween = (a, b) => Math.round((Date.parse(`${b}T00:00:00Z`) - Date.parse(`${a}T00:00:00Z`)) / 86400000);

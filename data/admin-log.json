@@ -173,6 +173,24 @@
    "by": "claude-health-sweep",
    "action": "edit",
    "detail": "auto-hkrwdsfpnos1073sfpnos888 — sourceUrl"
+  },
+  {
+   "at": "2026-10-17 01:10 KST",
+   "by": "조세현",
+   "action": "edit",
+   "detail": "reg-hi-jeju — deadline, period"
+  },
+  {
+   "at": "2026-10-17 01:10 KST",
+   "by": "조세현",
+   "action": "revert",
+   "detail": "2건 제거(233 → 231건) · 재등록 차단 id 2·주소 2"
+  },
+  {
+   "at": "2026-10-17 01:14 KST",
+   "by": "조세현",
+   "action": "edit",
+   "detail": "auto-archgbn0searchordersort0-0i8hia4 — deadline, period"
   }
  ]
 }
