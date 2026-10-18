@@ -1,4 +1,4 @@
-## 🛰 공공 API 로봇 리포트 (2026-10-18)
+## 🛰 공공 API 로봇 리포트 (2026-10-19)
 
 - ✅ **K-Startup 사업공고** — 받은 행 158 · 실은 글 **15** · 버림: 공모전·대외활동 아님(지원사업 등) 116 · 상한 15건 초과 27
   - 자격 줄 있는 글 15/15 · 원문 안내 있는 글 15/15
@@ -22,10 +22,10 @@
     - 179480 · 2026 시흥시 청년창업가 네트워킹 행사 참가자 모집 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179480 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179480(2)
     - 179423 · ANTLER | 2026 앤틀러 글로벌 리쿠르팅데이 참 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179423 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179423(2)
     - 179366 · [푼타컴퍼니]로컬 인디브랜드 성장을 위한 국내 및 글로 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179366 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179366(2)
-- ✅ **1365 봉사참여정보** — 받은 행 500 · 실은 글 **15** · 상세 내용 15/15건 · 버림: 대학생·청년 대상 아님 434 · 상한 15건 초과 47 · 같은 글 4
+- ✅ **1365 봉사참여정보** — 받은 행 500 · 실은 글 **15** · 상세 내용 15/15건 · 버림: 대학생·청년 대상 아님 431 · 상한 15건 초과 50 · 같은 글 4
   - 자격 줄 있는 글 11/15 · 원문 안내 있는 글 15/15
   - 첫 행 칸: `actBeginTm, actEndTm, actPlace, adultPosblAt, gugunCd, nanmmbyNm, noticeBgnde, noticeEndde, progrmBgnde, progrmEndde, progrmRegistNo, progrmSj, progrmSttusSe, sidoCd, srvcClCode, url, yngbgsPosblAt`
-  - 코드 칸 값(첫 세 행): gugunCd=3100000|3090000|3090000 · sidoCd=6110000|6110000|6110000
+  - 코드 칸 값(첫 세 행): gugunCd=3100000|3930000|3210000 · sidoCd=6110000|6410000|6110000
   - 대외활동 · (성인, 대학생) 평택시다함께돌봄센터17호점에서 10월 20일 하루 봉사가 가능하신 분을 모집합니다 (~2026-10-19) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3518148
   - 대외활동 · 10월(오전) 대전수학문화관 대학생 봉사활동 모집 (~2026-10-20) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521994
   - 대외활동 · 10월(오후) 대전수학문화관 대학생 봉사활동 모집 (~2026-10-20) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521995
