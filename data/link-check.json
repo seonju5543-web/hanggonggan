@@ -1,70 +1,90 @@
 {
- "updatedAt": "2026-10-18T12:45:59.469Z",
+ "updatedAt": "2026-10-18T13:55:18.160Z",
  "v": 1,
  "bad": {
   "https://2026grchallenge.com/": {
    "v": "login",
-   "at": "2026-10-17"
+   "at": "2026-10-18"
   },
   "https://blog.naver.com/mopaspr/224399694473?trackingCode=blog_bloghome_searchlist": {
    "v": "other",
-   "at": "2026-10-17"
+   "at": "2026-10-18"
   },
   "https://naraport.mof.go.kr/info/contest/contestIntroduce.do?subMenu1Nm=%EA%B3%B5%EB%AA%A8%EC%A0%84": {
    "v": "other",
-   "at": "2026-10-17"
+   "at": "2026-10-18"
   },
   "https://nysc.or.kr/nysc/pages/notice_view.php?id=288": {
    "v": "other",
-   "at": "2026-10-17"
+   "at": "2026-10-18"
+  },
+  "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=377067&article.offset=0&articleLimit=10": {
+   "v": "gone",
+   "at": "2026-10-18"
   },
   "https://www.dongguk.edu/article/JANGHAKNOTICE/list?pageNo=2#none": {
    "v": "list",
-   "at": "2026-10-17"
+   "at": "2026-10-18"
   },
   "https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26766512": {
    "v": "gone",
-   "at": "2026-10-17"
+   "at": "2026-10-18"
   },
   "https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26766513": {
    "v": "gone",
-   "at": "2026-10-17"
+   "at": "2026-10-18"
   },
   "https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26766521": {
    "v": "gone",
-   "at": "2026-10-17"
+   "at": "2026-10-18"
   },
   "https://www.jinjae.kr/main/?gc=877EUFQ": {
    "v": "login",
-   "at": "2026-10-17"
+   "at": "2026-10-18"
   },
   "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11495&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0": {
    "v": "other",
-   "at": "2026-10-17"
+   "at": "2026-10-18"
+  },
+  "https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjExODYlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D": {
+   "v": "other",
+   "at": "2026-10-18"
   },
   "https://www.msit.go.kr/bbs/view.do?sCode=user&mId=307&mPid=208&bbsSeqNo=94&nttSeqNo=3187433": {
    "v": "other",
-   "at": "2026-10-17"
+   "at": "2026-10-18"
   },
   "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000": {
    "v": "other",
-   "at": "2026-10-17"
+   "at": "2026-10-18"
+  },
+  "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=892640&article.offset=0&articleLimit=10": {
+   "v": "gone",
+   "at": "2026-10-18"
   },
   "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=893444&article.offset=0&articleLimit=10": {
    "v": "gone",
-   "at": "2026-10-17"
+   "at": "2026-10-18"
+  },
+  "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=894138&article.offset=0&articleLimit=10": {
+   "v": "gone",
+   "at": "2026-10-18"
+  },
+  "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140267&article.offset=0&articleLimit=10": {
+   "v": "gone",
+   "at": "2026-10-18"
   },
   "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=95279&article.offset=0&articleLimit=10": {
    "v": "other",
-   "at": "2026-10-17"
+   "at": "2026-10-18"
   },
   "https://www.usspc.or.kr/": {
    "v": "home",
-   "at": "2026-10-17"
+   "at": "2026-10-18"
   },
   "https://www.welchon.com/web/lay1/program/S1T31C447/eventNewView.do?menuIdx=&cIdx=evpr&bbsIdx=2214028": {
    "v": "login",
-   "at": "2026-10-17"
+   "at": "2026-10-18"
   }
  },
  "fix": {
