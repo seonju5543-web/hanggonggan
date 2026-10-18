@@ -270,20 +270,20 @@
   "name": "[우양재단] 2026년 동행 장학생 모집 (가족 돌봄 청년 대상, ~10/18)"
  },
  "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&menuid=2000005009002000000&seq=31569": {
-  "ok": "2026-10-12",
-  "at": "2026-10-12",
+  "ok": "2026-10-19",
+  "at": "2026-10-19",
   "tries": 0,
   "name": "경영경제전문도서관 국가근로장학생 추가 모집"
  },
  "https://www.sejong.ac.kr/kor/intro/notice7.do?articleno=894170": {
-  "ok": "2026-10-12",
-  "at": "2026-10-12",
+  "ok": "2026-10-19",
+  "at": "2026-10-19",
   "tries": 0,
   "name": "2026-2 학업수석총장장학금 선발 안내"
  },
  "https://www.seoultech.ac.kr/service/info/janghak/?bidx=895210&bnum=57138&cate=0&qidx=57138": {
-  "ok": "2026-10-12",
-  "at": "2026-10-12",
+  "ok": "2026-10-19",
+  "at": "2026-10-19",
   "tries": 0,
   "name": "[필독]2026-2학기 선발된 국가근로장학생 사전교육 알림"
  },
@@ -294,10 +294,11 @@
   "name": "「2026 상반기 AI·ICT 인재 장학생 모집」 안내(대상: 서울시 서초구에 주소지를 둔 재학생)"
  },
  "https://www.hongik.ac.kr/kr/newscenter/notice.do?articleno=158449&nocat=501": {
-  "ok": "2026-10-12",
-  "at": "2026-10-12",
-  "tries": 0,
-  "name": "[대전광역시] 2026년 하반기 성취장학생 선발 연장"
+  "tries": 1,
+  "at": "2026-10-19",
+  "minBody": 100,
+  "name": "[대전광역시] 2026년 하반기 성취장학생 선발 연장",
+  "ok": "2026-10-12"
  },
  "https://www.catholic.ac.kr/ko/campuslife/notice.do?articleno=276606&srcategoryid=22": {
   "ok": "2026-10-12",
