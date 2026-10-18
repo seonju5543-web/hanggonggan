@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-18",
+ "updatedAt": "2026-10-19",
  "items": {
   "r:auto-082f26ec8898eab98ceca780": {
    "attempts": 0,
@@ -145,14 +145,6 @@
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323111"
-  },
-  "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%202026%EB%85%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20(%EC%9E%AC)%EC%B6%98%EC%B2%9C%EC%9D%B8%EC%9E%AC%EC%9C%A1%EC%84%B1%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EB%B4%84%EB%82%B4%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4": {
-   "attempts": 0,
-   "title": "공통 2026년 하반기 (재)춘천인재육성장학재단 봄내장학생 선발 안내",
-   "lastTried": "2026-09-18",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323127"
   },
   "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%20%5B%EA%B3%B5%ED%86%B5%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%A0%90%ED%94%84%EC%9E%A5%ED%95%99%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4_09.22(%ED%99%94)~": {
    "attempts": 0,
