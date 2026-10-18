@@ -3,6 +3,10 @@
  "updatedAt": "2026-10-18",
  "schools": 44,
  "files": {
+  "경기대학교": {
+   "file": "ntxxf09.json",
+   "count": 40
+  },
   "부산대학교": {
    "file": "n13zozby.json",
    "count": 40
@@ -106,10 +110,6 @@
   "서울대학교": {
    "file": "nsgh1oi.json",
    "count": 21
-  },
-  "경기대학교": {
-   "file": "ntxxf09.json",
-   "count": 40
   },
   "명지대학교": {
    "file": "ntyl0r5.json",

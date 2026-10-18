@@ -5947,16 +5947,16 @@
    "desc": "서대문소방서에 학생문화관 내 화재수신기 교체에 따른 안전점검을 아래와 같은 일정으로 실시하오니 업무에 참고하여 주시기 바랍니다."
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=270971&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-10-17",
+   "at": "2026-10-18",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1
+   "tries": 2
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=270970&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-10-17",
+   "at": "2026-10-18",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1
+   "tries": 2
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367342&mode=view&no=369": {
    "at": "2026-10-17",
@@ -5964,16 +5964,16 @@
    "desc": "외국계 취업을 준비하는 이화인을 위한 온라인 멘토링! 외국계 HR(인사팀)에서 재직중인 이화 선배님과 함께 외국계 기업의 채용 프로세스부터 지원서·면접 전략까지 실전 취업 노하우를 알아보세요! 📌 교육일정"
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=270938&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-10-17",
+   "at": "2026-10-18",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1
+   "tries": 2
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=270922&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-10-17",
+   "at": "2026-10-18",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1
+   "tries": 2
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367285&mode=view&no=382": {
    "at": "2026-10-17",
@@ -5981,10 +5981,10 @@
    "desc": "3. 장소: ECC 이삼봉홀 가. 현장투표 - 시간: 12:00~13:00 (본 행사 전)"
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=270812&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-10-17",
+   "at": "2026-10-18",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1
+   "tries": 2
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367285&mode=view&no=370": {
    "at": "2026-10-17",
@@ -6040,6 +6040,29 @@
    "at": "2026-10-18",
    "v": 2,
    "desc": "'26년 후반기 이화여대 ROTC 선발계획 1. 지원자격 : 이화여대 1, 2학년 재학생 (휴학생 포함) * 5년제 학과 및 복수전공생 3학년 지원 가능"
+  },
+  "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626663&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
+   "at": "2026-10-18",
+   "v": 2,
+   "desc": "이미지 확대보기 이미지 확대보기 이미지 확대보기 이미지 확대보기 일시: 2026년 10월 17일 (토) 장소: 경기대학교 종합강의동 건물 앞 경기대학교 일반대학원 제41대 원우회에서 2학기 종합시험을 치르시는…"
+  },
+  "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=270737&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
+   "at": "2026-10-18",
+   "v": 2,
+   "err": "글 화면에 그 글의 제목이 없음",
+   "tries": 1
+  },
+  "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=270732&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
+   "at": "2026-10-18",
+   "v": 2,
+   "err": "글 화면에 그 글의 제목이 없음",
+   "tries": 1
+  },
+  "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=270665&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
+   "at": "2026-10-18",
+   "v": 2,
+   "err": "글 화면에 그 글의 제목이 없음",
+   "tries": 1
   }
  }
 }
