@@ -1,7 +1,28 @@
 {
  "school": "한국방송통신대학교",
- "updatedAt": "2026-10-18",
+ "updatedAt": "2026-10-19",
  "items": [
+  {
+   "title": "[일반] [방송대 학보] KNOU위클리 305호(2026년 10월 19일 발행) 지면안내",
+   "url": "https://www.knou.ac.kr/bbs/knou/51/818772/artclView.do",
+   "postedAt": "2026-10-19",
+   "school": "한국방송통신대학교",
+   "campus": "",
+   "src": "6cb89020",
+   "foundAt": "2026-10-19",
+   "thumb": "data/news/img/79deb7d2faaad995.webp",
+   "desc": "◎ 커버스토리 : 서정원 교수(사회복지학과) 신간 『 AI 나라의 홍콩할머니 』"
+  },
+  {
+   "title": "[시험성적] 2026학년도 2학기 기말과제물 시행공고",
+   "url": "https://www.knou.ac.kr/bbs/knou/51/818151/artclView.do",
+   "postedAt": "2026-10-14",
+   "kind": "학사",
+   "school": "한국방송통신대학교",
+   "campus": "",
+   "src": "6cb89020",
+   "foundAt": "2026-10-19"
+  },
   {
    "title": "[시험성적] 2026학년도 2학기 출석수업대체시험 시행 공고",
    "url": "https://www.knou.ac.kr/bbs/knou/51/818437/artclView.do",

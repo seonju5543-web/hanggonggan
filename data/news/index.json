@@ -1,8 +1,36 @@
 {
  "note": "학교별 교내 소식 파일 색인 (data/news/). 앱은 match-engine.js newsFileFor(noticeFileKey) 로 자기 학교 파일을 바로 받는다 — 옛 통짜 파일로 물러나는 길은 없다. check-live.yml 이 이 색인의 학교 전부를 확인한다.",
- "updatedAt": "2026-10-18",
+ "updatedAt": "2026-10-19",
  "schools": 44,
  "files": {
+  "전남대학교": {
+   "file": "nwqmwga.json",
+   "count": 40
+  },
+  "한양대학교": {
+   "file": "n1b3og5n.json",
+   "count": 19
+  },
+  "광운대학교": {
+   "file": "n6xhy7d.json",
+   "count": 40
+  },
+  "아주대학교": {
+   "file": "n16dvfry.json",
+   "count": 40
+  },
+  "이화여자대학교": {
+   "file": "n1tk2q9m.json",
+   "count": 40
+  },
+  "인하대학교": {
+   "file": "nkeh7pq.json",
+   "count": 40
+  },
+  "한국방송통신대학교": {
+   "file": "n1uf7bji.json",
+   "count": 28
+  },
   "경기대학교": {
    "file": "ntxxf09.json",
    "count": 40
@@ -15,21 +43,9 @@
    "file": "n1au199v.json",
    "count": 40
   },
-  "이화여자대학교": {
-   "file": "n1tk2q9m.json",
-   "count": 40
-  },
-  "전남대학교": {
-   "file": "nwqmwga.json",
-   "count": 40
-  },
   "서울과학기술대학교": {
    "file": "n14kv35j.json",
    "count": 23
-  },
-  "아주대학교": {
-   "file": "n16dvfry.json",
-   "count": 40
   },
   "충북대학교": {
    "file": "n16l2078.json",
@@ -75,10 +91,6 @@
    "file": "n1tasrsl.json",
    "count": 18
   },
-  "한국방송통신대학교": {
-   "file": "n1uf7bji.json",
-   "count": 26
-  },
   "경희대학교": {
    "file": "n1w4hprp.json",
    "count": 16
@@ -87,16 +99,8 @@
    "file": "n1x6ubj9.json",
    "count": 40
   },
-  "광운대학교": {
-   "file": "n6xhy7d.json",
-   "count": 40
-  },
   "전북대학교": {
    "file": "ncuyr4z.json",
-   "count": 40
-  },
-  "인하대학교": {
-   "file": "nkeh7pq.json",
    "count": 40
   },
   "강원대학교": {
@@ -146,10 +150,6 @@
   "서울교육대학교": {
    "file": "n18ebv4b.json",
    "count": 12
-  },
-  "한양대학교": {
-   "file": "n1b3og5n.json",
-   "count": 18
   },
   "고려대학교 세종캠퍼스": {
    "file": "n1ch7t87.json",
