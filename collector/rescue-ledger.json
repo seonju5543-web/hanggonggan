@@ -294,11 +294,10 @@
   "name": "「2026 상반기 AI·ICT 인재 장학생 모집」 안내(대상: 서울시 서초구에 주소지를 둔 재학생)"
  },
  "https://www.hongik.ac.kr/kr/newscenter/notice.do?articleno=158449&nocat=501": {
-  "tries": 1,
-  "at": "2026-10-19",
-  "minBody": 100,
-  "name": "[대전광역시] 2026년 하반기 성취장학생 선발 연장",
-  "ok": "2026-10-12"
+  "ok": "2026-10-20",
+  "at": "2026-10-20",
+  "tries": 0,
+  "name": "[대전광역시] 2026년 하반기 성취장학생 선발 연장"
  },
  "https://www.catholic.ac.kr/ko/campuslife/notice.do?articleno=276606&srcategoryid=22": {
   "ok": "2026-10-12",
