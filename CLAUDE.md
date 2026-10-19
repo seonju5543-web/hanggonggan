@@ -2,8 +2,7 @@
 
 > 새 세션은 이 문서를 먼저 읽는다. 개발자는 코드를 모른다 — **전문 용어 없이**, 인과를 분명히 설명한다.
 > 여기엔 **규칙과 그 규칙을 지키는 관문 위치**만 둔다. 경위·실측·사고 기록은 `SESSIONS.md`
-> (필요할 때 제목으로 찾는다). 정리 직전 전문은 그 파일의
-> **「2026-09-23 이관분」** 절에 통째로 있다.
+> (필요할 때 제목으로 찾는다). 정리 직전 전문은 그 파일의 **「2026-09-23 이관분」** 절에 통째로 있다.
 
 ## 🔴 매 세션 이것만은
 
@@ -19,6 +18,7 @@
 6. **개발 업무 질문에는 답 끝에 `node tools/link-wanted.mjs` 결과를 붙여 링크를 요청한다**
    (학습 로봇은 검색을 못 해 사람이 새 링크를 줘야 넓어진다. 주소는 추천하지 않는다).
 7. **로봇 운영 수리(저장 전 관문·되돌리기·경보 짝 빠짐)는 묻지 않고 즉시 한다**. 규칙 파일(`collector/*.json`)을 쓰는 로봇은 저장 앞에 `test-collector` 를 거친다 — 없는 로봇이 보이면 그 자리에서 붙인다(관문 「층2 재단 글 사냥꾼」 ⑦-1).
+8. 🔴 **돈이 나가는 호출은 개발자가 채팅에서 그 실행을 지시했을 때만.** 유료 워크플로(`eligibility-fill.yml`·`essay-smoke.yml`)를 세션이 돌리거나 `apiEnabled`·`ELIG_AI_ENABLE` 을 켜지 않는다(08-23 세션이 하루 32번 돌렸다). 비용 질문은 `gh run list` 기록으로 답한다.
 
 ## 🔴 수집망 44개교 복원 (2026-09-29 지시 *"죽은 학교들을 모두 다시 살려"*)
 
@@ -48,7 +48,7 @@
   자동 등록도 같은 열쇠로 다른 학교의 같은 사업이 오면 새로 등록하지 않고 기존 것을 승격한다(`verdict: 'promote'`). 합치기는 `collector/registered-merge.mjs` 한 곳(관리자 merge 와 같다).
 - **리뷰 3차에서 막은 구멍 넷**(같은 날): ① 학교 이름표에 **지역 이름 밑동·두 글자 별칭을 쓰지 않는다**(`schoolTokens` · '부산광역시 대학생'이 부산대 교내로 읽혔다 ·
   지역 이름은 `parse-requirements.js` 의 `REGION_CITIES` 에서 읽는다 — 화면·판정·알림 한 벌) · 교내 high 는 '학교가 준다'는 본문 또는 약한 신호 둘 ② **이미 전국인 등록분은 세 번째 학교 글을 흡수**한다
-  (`absorbed` · `isNationalAbsorber` · 여러 학교만 받는 공고는 그 학교가 `schoolsAny` 에 있을 때만) · 승격은 로봇 등록·교외·사람 미지정·마감 전만
+  (`absorbed` · `isNationalAbsorber` · 여러 학교 공고는 `schoolsAny` 에 있을 때만) · 승격은 로봇 등록·교외·사람 미지정·마감 전만
   ③ 관리자가 구분·범위를 고치면 `kindFrom`·`scopeFrom` 에 '관리자' 표식(없으면 로봇이 다음 실행에 되돌린다) ④ 판정 로봇 셋은 리포트 파일을 인자로 받는다(브라우저 수집은 `browser-report.md`).
 - 🔴 **합칠 때 마감은 날짜를 내는 문구와 함께만 옮긴다**(`deadlineQuote` · 2026-10-01 근거 없는 마감 4건으로 관문 빨간불 → 자동 등록 8건 되돌림).
   **실데이터에 기댄 고정 검사를 관문에 두지 말 것** — 「정식 등록도 나눌 때」의 '지금은 선 아래' 줄이 같은 사고를 냈다.
@@ -56,12 +56,12 @@
   `school-board-seeds.json` 씨앗을 `find-boards.mjs` 가 훑어 후보만 리포트(자동으로 넣지 않는다) · 포털 표 후보 `collector/portal-candidates.mjs` · 정문 사진은 44개교(`fetch-gate-photos.mjs`).
   관문 「장학금 판정 자동화 · 범위 승격」.
 
-## 🔴 원문 링크 정직성 (2026-10-03 P0 — *"원문공고를 클릭했을 때 … 재단이나 장학금 페이지 전체가 표시"* · 장학·활동·소식 전반)
+## 🔴 원문 링크 정직성 (2026-10-03 P0 · 장학·활동·소식 전반)
 
 - **링크 이름은 `source-link.js` 한 곳**(`sourceLink` — 상세·금액·신청 내역·카드·활동·도우미·제출처). 주소 글자로 '원문'을 정하지 말 것 — 목록 표식·목록+번호(`isListPlusId`)·홈페이지 꼴·로봇 확정만 이름을 바꾸고, 보통 주소의 글자는 승인된 그대로다. 화면의 링크는 `verify/what-shows.mjs` 링크 줄로 말하고 · 데이터 감사는 다섯 묶음의 링크를 **경고만**(`verify/link-audit.cjs`). 관문 「원문 링크 정직성」 · 설계 `docs/designs/source-links.md`.
 - **원문 링크 확인 로봇** `collector/link-check.mjs`(매일 · 판정은 `collector/link-landing.mjs` 한 곳 · 학생처럼 새 탭) — 🔴 **주소를 고치지 않는다.** 다른 날 두 번 같은 문제여야 `data/link-check.json` 에 싣는다(앱이 받는다). 제목 먼저·로그인 벽은 나중 · 다른 글 제목을 반드시 넘긴다.
 - 🔴 **고치는 로봇은 멀쩡한 주소를 표식으로 덮어쓰지 않는다**(10-03 순찰 끔). 병합 순위 `preferNotice`: 진짜 주소 > 목록 표식 > 목록+번호.
-- **원문 바로잡기**(2026-10-04 · `source-link.js` ⑥ · 데이터는 로봇이 날마다 다시 만들어 거기 고쳐 쓰면 사라진다): 사람 `data/link-fixes.json`(관리자 「원문 링크 손볼 것」 → `tools/admin-apply.mjs` `linkFix` · 늘 이긴다) · 로봇 `data/link-check.json` `fix`(후보 `collector/link-candidates.json` 을 학생처럼 열어 `acceptCandidate` 를 통과한 것만 · 지금 링크가 이미 그 공고면 안 쓴다). 열쇠 `id:`·`u:` · 회차(`round`)는 층2만. 관문 같은 절 fixes·candidates·admin.
+- **원문 바로잡기**(`source-link.js` ⑥ · 로봇 데이터에 고쳐 쓰면 사라진다): 사람 `data/link-fixes.json`(관리자 「원문 링크 손볼 것」 → `tools/admin-apply.mjs` `linkFix` · 늘 이긴다) · 로봇 `data/link-check.json` `fix`(후보 `collector/link-candidates.json` 을 학생처럼 열어 `acceptCandidate` 통과분만). 열쇠 `id:`·`u:` · 회차(`round`)는 층2만. 관문 같은 절 fixes·candidates·admin.
 
 ## 관리자 업무 = 노션 백로그 (정본은 노션 하나)
 
@@ -272,7 +272,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   출처 `activity-sources.json` 은 주소마다 `evidence`(확인한 곳)를 적는다 · 집계 사이트는 출처가 아니다. 관문 「대외활동·공모전」 · `verify-activities.js`(서비스워커를 막고 잰다).
   관리자 「활동」 탭(`#activities`): 종류 바꾸기·숨기기(지우지 않고 `hidden` + `activity-config.json`)·출처 추가/보관 — `activityKind`·`activityHide`·`activitySource`. 관문 같은 절 ⑤ · `verify-admin.js`.
   활동 글의 마감·발췌는 `collector/activity-excerpts.mjs` 한 곳(마감 규칙은 장학과 같은 `extractDeadline` · 나머지는 원문 문장 그대로 · 분야는 `activityField`) · 공공·재단 게시판은 `collector/robots.mjs` 로 robots.txt 를 묻고 읽는다 · 카드 D-day 는 `dday()` 한 곳. 관문 같은 절 ⑥.
-  **공공 API 로봇**(2026-10-01 · `collector/open-api.mjs` · 규칙 `collector/open-api-map.mjs`): K-Startup·1365(`DATA_GO_KR_KEY`)·온통청년 정책·콘텐츠(`YOUTHCENTER_KEY`·`YOUTHCENTER_CONTENT_KEY` — 🔴 포털 열쇠로 안 열린다) → 같은 `data/activities.json`(`api` 칸) · 못 받은 출처(0행·칸 바뀜 포함)의 지난 글은 지우지 않는다 · 수집 로봇의 60일 삭제는 API 글엔 `seenAt` · 실패는 로봇 리포트(첫 실행에 생긴다)의 ❌ → 이슈. 관문 「공공 API 로봇」.
+  **공공 API 로봇**(`collector/open-api.mjs` · 규칙 `collector/open-api-map.mjs`): K-Startup·1365(`DATA_GO_KR_KEY`)·온통청년 정책·콘텐츠(`YOUTHCENTER_KEY`·`YOUTHCENTER_CONTENT_KEY` — 🔴 포털 열쇠로 안 열린다) → 같은 `data/activities.json`(`api` 칸) · 못 받은 출처(0행·칸 바뀜 포함)의 지난 글은 지우지 않는다 · 수집 로봇의 60일 삭제는 API 글엔 `seenAt` · 실패는 로봇 리포트(첫 실행에 생긴다)의 ❌ → 이슈. 관문 「공공 API 로봇」.
   🔴 발췌기에 넘기는 상세 글자는 **줄을 살린 것**(`collector/html-text.mjs` `htmlToLines` · deepfetch·rescue 도) — 한 줄로 뭉개면 **전부 0건**이 된다. 발췌 없이 실린 글은 다음 실행이 다시 읽는다(`ACT_BACKFILL` · `excerptsAt`).
 - **재단·지자체 게시판(교외 확대)** (2026-09-26 · 노션 F-13): 링커리어류는 크롤링이 아니라 **주최사 직접 등록**이라 긁지 않는다 — 우리는 주최의 제 게시판을 읽는다.
   출처 `collector/external-sources.json` 은 `kosaf-open.json` 의 재단 홈페이지에서 왔고, `collector/find-boards.mjs` 가 게시판을 찾아 `autoFound` 로 적는다(잘못 찾으면 `parked`).
@@ -285,7 +285,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   🔴 **목록이 보통 링크가 아닌 게시판은 `news-board-rules.mjs` 한 곳**(클릭형 onclick·data-id · 글 주소 없는 목록 표식 listOnly · API json/post) — 두 로봇이 `rowsForBoard` 하나를 부른다.
   상세 주소는 유추하지 않고, 상세가 있는 규칙은 **매번 첫 글의 상세를 열어** 그 글의 화면인지 본다(`verifyRuleDetail` · 목록 표식은 상세가 없어 건너뜀) · API 규칙은 정찰이 본 화면(`page`)만 게시판으로 올린다.
   같은 글은 **게시판의 글 번호**(`postId`)로 알아본다 — 목록 표식 주소(#n-제목)는 제목 다듬기가 바뀌면 달라져 두 번 실렸다(`collapseSamePost` · 발행 때 소급 · 숨김·git 병합도 글 번호 `newsHidden`·`newsDistinct`). 분류·캠퍼스 꼬리표는 떼지 않는다.
-  못 읽는 학교는 정찰(`run-probe.txt` `checkUrl:` — 누르기 전 목록 HTML · 날짜 줄이 상세를 여는 방식과 눌렀을 때의 주소 · 스크립트 요청과 응답 · 인증서 사슬은 `certHost:`) 결과만으로 규칙을 적는다.
+  못 읽는 학교는 정찰(`run-probe.txt` `checkUrl:` — 목록 HTML · 상세 여는 방식과 주소 · 스크립트 요청·응답 · 인증서는 `certHost:`) 결과만으로 규칙을 적는다.
   **사진 썸네일**(2026-10-03 개발자 지시): 수집 다음 단계(`collect-news-thumbs.mjs` · 보강)가 새 글부터 상세(또는 규칙의 본문 API `postContentRequest`)를 열어 본문 사진 → 첨부 그림 순으로 고르고(`news-thumb.mjs` 한 곳 · og:image 는 안 쓴다 — 전부 학교 로고였다)
   글 화면에 제목이 있는지(`pageHasTitle`)·받아서 진짜 사진인지(크기·가로세로·QR·글자뿐인 문서 그림 `looksLikeTextPage`) 본 뒤 240px WebP 로 `data/news/img/<바이트 해시>.webp` 에 둔다(서비스워커가 캐시 우선이라 이름을 다시 쓰지 않는다). 🔴 **두 글 이상에 같은 그림 = 학교 공통 그림**(로고·기본 공유 그림)이라 막는다 —
   이름 낱말은 거들 뿐. 장부 `news-thumbs.json` 을 매 실행 실린 글 전부에 다시 입히고(`applyThumbs`) 안 쓰는 그림은 지운다 · 관리자 「사진 빼기」는 `noThumb` · 전체 스위치 `news-config.json` 의 `thumbs`(on · dry=받아만 두고 카드엔 안 붙임 · off=모두 뗌). 카드는 `opts.thumb` 를 받은 소식 카드만 그린다(꼴 사본은 관문이 대조).
