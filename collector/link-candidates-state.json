@@ -39,13 +39,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-14",
-  "lastAt": "2026-10-15",
-  "tries": 2,
+  "lastAt": "2026-10-20",
+  "tries": 3,
   "status": "pending",
-  "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
+  "why": "게시판을 못 엶(page.goto: Timeout 20000ms exceeded. Call log: - navigating…)",
   "checks": {},
   "round": "2026-11-11",
-  "nextAt": "2026-10-18"
+  "nextAt": "2026-10-27"
  },
  "kosaf|1768681003|board:https://www.busan.go.kr/nbnews": {
   "ds": "kosaf",
@@ -87,13 +87,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-18",
-  "lastAt": "2026-10-18",
-  "tries": 1,
+  "lastAt": "2026-10-20",
+  "tries": 2,
   "status": "pending",
-  "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
+  "why": "게시판 목록(9줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-12-11",
-  "nextAt": "2026-10-19"
+  "nextAt": "2026-10-23"
  },
  "kosaf|2000206004|board:https://www.yw.go.kr/www/selectBbsNttList.do?bbsNo=86&key=524": {
   "ds": "kosaf",
@@ -236,6 +236,22 @@
   "decidedAt": "2026-10-13",
   "also": []
  },
+ "kosaf|2000443001|board:https://www.jangsu.go.kr/board/list.jangsu?boardId=BBS_0000128&menuCd=DOM_000000101001003000&contentsSid=10&cpath=": {
+  "ds": "kosaf",
+  "key": "2000443001",
+  "url": "",
+  "board": "https://www.jangsu.go.kr/board/list.jangsu?boardId=BBS_0000128&menuCd=DOM_000000101001003000&contentsSid=10&cpath=",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "firstAt": "2026-10-20",
+  "lastAt": "2026-10-20",
+  "tries": 1,
+  "status": "rejected",
+  "why": "그 사이트 robots.txt 가 게시판 훑기를 막음 — 글 주소로 다시 적어 주세요",
+  "checks": {},
+  "round": "2026-11-13",
+  "decidedAt": "2026-10-20"
+ },
  "kosaf|2000477010|board:https://www.asanfoundation.or.kr/af/library/bbs/afLibraryPhotoBbsList.do": {
   "ds": "kosaf",
   "key": "2000477010",
@@ -244,13 +260,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-16",
-  "lastAt": "2026-10-17",
-  "tries": 2,
+  "lastAt": "2026-10-20",
+  "tries": 3,
   "status": "pending",
   "why": "게시판 목록(12줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-10-26",
-  "nextAt": "2026-10-20"
+  "nextAt": "2026-10-27"
  },
  "kosaf|2700017001|http://www.hsf.or.kr/bbs/board.php?bo_table=s5_1&wr_id=102": {
   "ds": "kosaf",
@@ -459,13 +475,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-13",
-  "lastAt": "2026-10-13",
-  "tries": 1,
+  "lastAt": "2026-10-20",
+  "tries": 2,
   "status": "rejected",
   "why": "그 사이트 robots.txt 가 게시판 훑기를 막음 — 글 주소로 다시 적어 주세요",
   "checks": {},
   "round": "2026-12-11",
-  "decidedAt": "2026-10-13"
+  "decidedAt": "2026-10-20"
  },
  "kosaf|2703156001|https://www.jw-foundation.or.kr/notice/228": {
   "ds": "kosaf",
