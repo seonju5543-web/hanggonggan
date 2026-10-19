@@ -3,6 +3,29 @@
  "updatedAt": "2026-10-19",
  "items": [
   {
+   "title": "💡 2026년도 제19회 UOS 연구 콜로키움 개최 안내(2026.10.22.(목) 11:00, 창의혁신관 SI 아레나)💡",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31678&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-10-19",
+   "postId": "31678",
+   "kind": "행사",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-10-19",
+   "thumb": "data/news/img/32b01c4dcd35c355.webp",
+   "desc": "📌 발표주제 및 발표자 - 「 Sartificial Tactile Nerves & Smart Intelligence 」 서울시립대학교 첨단융합학부 이신형 교수"
+  },
+  {
+   "title": "2027년 2월말 퇴직교원 정부포상 추천대상자 공개 검증",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31676&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-10-19",
+   "postId": "31676",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-10-19"
+  },
+  {
    "title": "★★★ “전공, 아직도 고민하고 있나요?” <2026 서울시립대학교 전공설명회> 개최 ★★★",
    "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31671&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
    "postedAt": "2026-10-16",
@@ -428,29 +451,6 @@
    "postId": "31587",
    "thumb": "data/news/img/a1bf1a8e0082305f.webp",
    "desc": "원클릭 자동화부터 실시간 대시보드 구축까지! 구글코리아와 고용노동부가 함께하는 청년 AI 역량 강화 프로그램, Gemini Academy 워크숍에서 여러분의 AI 역량을 레벨업하세요! 🚀"
-  },
-  {
-   "title": "📢[10월 월간AI] 생성형AI 활용 실무자를 위한 파이썬 과정 접수",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31585&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-02",
-   "school": "서울시립대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "postId": "31585",
-   "thumb": "data/news/img/8cc620f21ec57575.webp",
-   "src": "80d7d3bc"
-  },
-  {
-   "title": "📌[DX 스킬툴] Excel/노션/PPT/Python/SQL/r구글 워크스페이스/Github/한글/HTML·CSS·JavaScript교육 안내",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31537&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-02",
-   "school": "서울시립대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "postId": "31537",
-   "thumb": "data/news/img/386d66d3cf6d35c2.webp",
-   "src": "80d7d3bc",
-   "desc": "인재개발실 *서울시립대 재학생 및 34세 이하 지역청년만 신청가능, 34세 이상 미승인 처리 #대학일자리플러스센터 #DX 역량 강화 #디지털 협업툴"
   }
  ]
 }
