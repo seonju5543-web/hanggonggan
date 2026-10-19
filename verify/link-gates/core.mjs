@@ -21,9 +21,10 @@ export default async function gate(eq, ctx) {
   eq('② 꼴: index·main 은 홈페이지 · 맨 도메인은 root(화면에선 보통 주소 — 공모전 전용 사이트 · 리뷰 APP-2) · 한 칸 폴더는 단정하지 않음 · 표식·스크립트',
     ['https://namgu.gwangju.kr', 'https://www.jeju.go.kr/index.htm', 'http://janghak.songpa.go.kr/main.jsp', 'https://nysc.or.kr/nysc/', 'https://a.kr/list.do#n-%EC%A0%9C', 'javascript:void(0)', '', 'https://a.kr/view.do?id=3'].map(L.linkShape),
     ['root', 'home', 'home', 'page', 'marker', 'none', 'none', 'page']);
-  eq('  맨 도메인 공모전 사이트(maicon.kr)는 활동 시트에서 그대로 「원문에서 신청하기」 · 로봇이 첫 화면으로 확정하면 그때 홈페이지',
+  /* 활동 시트 단추 이름은 2026-10-19 개발자 지시로 「원문 공고 ↗」("자세한 공고는 원문 공고에서 확인하라 하면서 … 원문공고 하이퍼링크") */
+  eq('  맨 도메인 공모전 사이트(maicon.kr)는 활동 시트에서 그대로 「원문 공고」 · 로봇이 첫 화면으로 확정하면 그때 홈페이지',
     [L.sourceLink({ url: 'https://maicon.kr/' }, 'activity').label, (() => { L.setLinkChecks({ bad: { 'https://maicon.kr/': { v: 'home', at: '2026-10-05' } } }); const x = L.sourceLink({ url: 'https://maicon.kr/' }, 'activity').label; L.setLinkChecks(null); return x; })()],
-    ['원문에서 신청하기 ↗', '주최 측 홈페이지 ↗']);
+    ['원문 공고 ↗', '주최 측 홈페이지 ↗']);
   eq('  판정기는 맨 도메인도 첫 화면으로 본다 — 돌려보내짐 · 제목 없는 뿌리 주소',
     [J.judgeLanding({ status: 200, requestedUrl: 'https://d.kr/v?id=1', finalUrl: 'https://d.kr/', text: 'z'.repeat(800), titles: ['어떤 공고 제목 테스트 2026'] }).v,
       J.judgeLanding({ status: 200, requestedUrl: 'https://namgu.gwangju.kr/', text: `남구청 ${'z'.repeat(2000)}`, titles: ['행복나눔 장학생 선발 2026'] }).v], ['home', 'home']);
@@ -50,7 +51,7 @@ export default async function gate(eq, ctx) {
     { href: 'https://a.kr/list.do#n-%EC%A0%9C%EB%AA%A9', kind: 'list', cls: 'list', label: '게시판 목록 ↗', hint: '제목', caution: '' });
   eq('  보통 주소는 예전 글자 그대로(승인받은 화면을 바꾸지 않는다)',
     ['detail', 'amount', 'applog', 'card', 'activity'].map((s) => L.sourceLink({ url: 'https://dep.hufs.ac.kr/bbs/x/1' }, s).label),
-    ['원문 공고 ↗', '원문 공고 ↗', '공고 원문 보기 ↗', '원문 보기 ↗', '원문에서 신청하기 ↗']);
+    ['원문 공고 ↗', '원문 공고 ↗', '공고 원문 보기 ↗', '원문 보기 ↗', '원문 공고 ↗']);   // 활동 시트는 10-19 개발자 지시로 「원문 공고 ↗」
   eq('  기관 홈페이지 주소(청년정책 API 실측 jeju index.htm)는 활동 시트에서 「신청하기」라 하지 않는다',
     L.sourceLink({ url: 'https://www.jeju.go.kr/index.htm' }, 'activity').label, '주최 측 홈페이지 ↗');
   L.setLinkChecks({ updatedAt: 't', bad: { 'https://s.kr/x?a=1&b=2': { v: 'list', at: '2026-10-04' }, 'https://s.kr/y?id=9': { v: 'gone', at: '2026-10-04' } } });

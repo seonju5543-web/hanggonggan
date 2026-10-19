@@ -160,6 +160,15 @@ function linkLines(it, where) {
     const h = linkFn('activityLinkHtml')(it);
     out.push(`       활동 시트 단추·안내 「${htmlText(h) || '(없음)'}」`);
     out.push(`       누르면 → ${hrefIn(h) || '(링크 없음)'}`);
+    /* 시트의 칸들이 무엇을 그리는가(2026-10-19 개발자 "자격요건이 공고 안내에 들어가 있다") — 자격·모집 안내·공고 안내는 이 세 칸의 글자를 그대로 그린다(없으면 칸을 접는다) */
+    const el = it.eligibilityLines || [], ex = it.excerpts || [], nl = it.noticeLines || [];
+    out.push(`   ─ 지원 자격 (${el.length}줄${el.length ? '' : ' · 칸 접힘'})`);
+    for (const l of el) out.push(`       · ${String(l).slice(0, 84)}`);
+    out.push(`   ─ 모집 안내 (${ex.length}줄${ex.length ? '' : ' · 칸 접힘'})`);
+    for (const x of ex) out.push(`       · ${x.label} · ${String(x.text).slice(0, 70)}`);
+    out.push(`   ─ 공고 안내 (${nl.length}줄${nl.length ? '' : ' · 칸 접힘'})`);
+    for (const l of nl.slice(0, 6)) out.push(`       · ${String(l).slice(0, 84)}`);
+    out.push(`   ─ 첨부 ${(it.attachments || []).length}개 · 마감 ${it.deadline || '(없음)'}`);
   }
   return out;
 }

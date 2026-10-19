@@ -158,7 +158,7 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
       ['지원 자격', true, ['✓ 만 19~34세 대한민국 국민']]);
     eq('⑤ 지원 가능 알약은 없다(활동 글엔 구조화 조건이 없어 늘 가능 — 거짓 안심)', await page.$$eval('#detail-sheet .status-pill', (e) => e.length), 0);
     eq('⑤ 공고 원문 안내 — 원문 문장 그대로', await page.$$eval('#detail-sheet .doc-list', (u) => u.map((x) => x.textContent.trim()).some((t) => t.includes('봉사단은 5개국에 파견합니다.'))), true);
-    eq('⑤ 원문 단추는 그 글 주소를 새 탭으로', await page.$eval('#detail-sheet a.btn-primary', (a) => [a.getAttribute('href'), a.target, a.textContent.trim()]), ['https://dep.hufs.ac.kr/bbs/x/1', '_blank', '원문에서 신청하기 ↗']);
+    eq('⑤ 원문 단추는 그 글 주소를 새 탭으로', await page.$eval('#detail-sheet a.btn-primary', (a) => [a.getAttribute('href'), a.target, a.textContent.trim()]), ['https://dep.hufs.ac.kr/bbs/x/1', '_blank', '원문 공고 ↗']);   // 2026-10-19 개발자: "자세한 공고는 원문 공고에서 확인하라 하면서 … 원문공고 하이퍼링크"
     eq('⑤ 단추 글자에 밑줄이 없다', await page.$eval('#detail-sheet a.btn-primary', (a) => getComputedStyle(a).textDecorationLine), 'none');
     await page.keyboard.press('Escape'); await page.waitForTimeout(500);
     eq('⑤ ESC 로 닫힌다 (장학 시트와 같은 그릇)', await page.$eval('#detail-sheet', (e) => e.hidden || !e.classList.contains('show')), true);

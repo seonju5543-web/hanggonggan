@@ -378,6 +378,9 @@ eq('큰따옴표(&quot;)를 되돌린다',
   cleanTitle('국가근로장학생 &quot;근로지담당자&quot; 안내자료'), '국가근로장학생 "근로지담당자" 안내자료');
 eq('숫자 표기(&#40;)를 되돌린다',
   cleanTitle('5·18 희망장학생 모집 안내&#40;~2026.08.12&#41;'), '5·18 희망장학생 모집 안내(~2026.08.12)');
+eq('제목 끝의 새 글 배지(NEW·new)를 뗀다 — 낱말 속 new 는 그대로 (2026-10-19)',
+  [cleanTitle('단풍철 국립공원 안전산행 비법?…체력에 맞는 탐방로 선택! NEW'), cleanTitle('2026년 청년정책 공모전 new'), cleanTitle('New Media 공모전')],
+  ['단풍철 국립공원 안전산행 비법?…체력에 맞는 탐방로 선택!', '2026년 청년정책 공모전', 'New Media 공모전']);
 eq('부등호(&lt; &gt;)를 되돌린다',
   cleanTitle('2학기 &lt;이원길 장학금&gt; 선발'), '2학기 <이원길 장학금> 선발');
 eq('&amp;를 마지막에 풀어 이중 해제가 안 생긴다', cleanTitle('A &amp;quot; B'), 'A &quot; B');
@@ -12364,6 +12367,9 @@ console.log('\n■ 대외활동 — 남은 글 표본에서 찾은 것 (2026-10-
   eq('  수집 로봇이 이미 실린 글에도 소급한다 · 인스타그램 게시물도 같은 자리에서 뺀다 · 들일 때도', [/acts\.items = acts\.items\.filter\(\(n\) => !notActivity\(n\.title\) && !unreadableSource\(n\.url\)\)/.test(readText(new URL('../collector/collect.mjs', import.meta.url))), /\.filter\(\(i\) => !unreadableSource\(i\.url\)\)/.test(readText(new URL('../collector/collect.mjs', import.meta.url)))], [true, true]);
   eq('  `(설명) 연합뉴스 … 기사 관련`·`보도 설명` 은 모집 글이 아니다 · `[보도자료] 2026 청년정책 공모전 개최` 는 모집 글 (2026-10-16)',
     [AK.notActivity('(설명) 연합뉴스, "정부 해외취업연수 매년 10% 안팎 폐강" 기사 관련'), AK.notActivity('보도 설명 자료'), AK.notActivity('[보도자료] 2026 청년정책 공모전 개최')], [true, true, false]);
+  eq('  정책브리핑 **정책 뉴스** 글(news/policyNewsView)과 「… 첫 수혜자」 소식 글은 모집 글이 아니다 (2026-10-19)',
+    [AK.unreadableSource('https://www.korea.kr/news/policyNewsView.do?newsId=148973658&pWise=sub'), AK.unreadableSource('https://www.korea.kr/briefing/pressReleaseView.do?newsId=1'),
+      AK.notActivity('전주시 글로벌 해외연수생 1기 첫 수혜자'), AK.notActivity('2026 글로벌 해외연수생 2기 모집')], [true, false, true, false]);
   eq('  인스타그램·페이스북 게시물은 읽을 수 없는 출처 — 기관 홈페이지는 아니다(2026-10-16 개발자 "피드에서 빼")',
     ['https://www.instagram.com/acrc0229/p/DeF3w_FE4Yt/?img_index=1', 'https://m.facebook.com/x/posts/1', 'https://www.korea.kr/briefing/x.do', 'https://instagram.com.example.org/'].map(AK.unreadableSource), [true, true, false, false]);
   eq('⑤ 그림 — 큰 카드뉴스(1920×1080)는 받는다 · 광고 배너(846×510)는 아니다', [AD.posterShaped({ w: 1920, h: 1080 }), AD.posterShaped({ w: 846, h: 510 })], [true, false]);
@@ -12983,6 +12989,24 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
   {
     const AX4 = await import('../collector/activity-excerpts.mjs');
     const ok = (l) => AX4.eligLineOk(l);
+    /* 2026-10-19 개발자 "세 글처럼 완벽하지 못한 애들 전부" — 전수 199건 재서 나온 유형 넷 */
+    eq('⑭-2 게시판 단추·칸 이름(답변등록·처리상태·SNS 업로드)과 자격 아닌 이름표 줄(ㅇ 기간 :·접수 :·문의 :)은 자격 줄이 아니다',
+      ['답변등록', '처리상태', 'SNS 업로드', 'ㅇ 기간 : 온통청년 , 청년정책사용설명서 sns 를 통해 동시 접수', '접수 : 이메일', '문의 : 02-000-0000', '시상 : 대상 1팀'].map(ok),
+      [false, false, false, false, false, false, false]);
+    eq('  대조군: 이름표 자격 줄·누구나 줄은 그대로', ['ㅇ 참가자격 : 대한민국 청년 (19~34 세 ) 누구나', '20세 이상, 65세 이하의 건강한 분'].map(ok), [true, true]);
+    /* 「1. 자격요건」 머리글 아래 장학 낱말 없는 조건(나이·'가능한 분')도 자격이다 — 1365 「찾아가는 치과진료소」(자격이 공고 안내 칸에만 있었다) */
+    const dental = AX4.activityDetails(["관악서울대학교치과병원과 관악구보건소 주관하는 '찾아가는 치과진료소' 사업으로 치과치료 지원 봉사 가능한 성인 및 대학생 자원봉사자를 모집하고 있습니다.",
+      '1. 자격요건', '2026년 10월 26일 오전, 1일 봉사가 가능한 분', '20세 이상, 65세 이하의 건강한 분', '자원봉사활동 목적과 의미를 이해하고 제반 규정을 성실히 이행할 수 있는 분', '2. 활동내용', '치과 진료 보조'].join('\n'));
+    eq('  「1. 자격요건」 아래 세 줄이 자격으로 읽힌다 (전엔 0줄 · 공고 안내에만 있었다)', dental.eligibilityLines.filter((l) => /가능한 분|건강한 분|이행할 수 있는 분/.test(l)).length, 3);
+    eq('  활동 내용 절은 자격에 안 딸려 온다', dental.eligibilityLines.some((l) => /치과 진료 보조/.test(l)), false);
+    /* 원문 링크 — 시트 단추·카드 링크 이름은 sourceLink(n,'activity') 한 곳 「원문 공고 ↗」 · 카드는 단추 바깥 링크(2026-10-19 개발자 "카드에도 원문공고 하이퍼링크") */
+    const appSrc14 = readText(new URL('../app.js', import.meta.url));
+    const slSrc = readText(new URL('../source-link.js', import.meta.url));
+    eq('  활동 시트 단추 이름은 「원문 공고 ↗」 · 안내 줄은 "자세한 내용과 신청은 원문 공고에서 확인"', /activity:\s*\{ page: '원문 공고 ↗'/.test(slSrc) && /자세한 내용과 신청은 원문 공고에서 확인하세요/.test(appSrc14), true);
+    eq('  활동 카드에 원문 링크(card-src-link)가 단추 바깥에 붙는다 · 이름은 같은 sourceLink',
+      /link: activityCardLinkHtml\(n\)/.test(appSrc14) && /function activityCardLinkHtml\(n\) \{\s*const link = sourceLink\(n, 'activity'\)/.test(appSrc14)
+        && /<\/button>/.test(appSrc14.slice(appSrc14.indexOf('function cardShellHtml'), appSrc14.indexOf('function cardShellHtml') + 900)) && /\$\{save\}\$\{link\}/.test(appSrc14), true);
+    eq('  카드 링크 자리는 style.css 에 있다(.card-src-link · has-link 아랫줄 여백)', /\.card-src-link \{/.test(readText(new URL('../style.css', import.meta.url))) && /\.sch-card-wrap\.has-link > \.sch-card \.sch-foot/.test(readText(new URL('../style.css', import.meta.url))), true);
     eq('⑭ 자격 줄 — 안내 문장(`…모집합니다`·`…제공하고 있습니다`·`…하시기 바랍니다`·`첨부파일이(가) 없습니다`·`가능합니다`)은 아니다',
       ['2026 평택시민나눔문화축제에서 합정장애인주간보호센터 홍보부스 운영을 보조해주실 자원봉사자를 모집합니다.', '합정장애인주간보호센터는 사회복지법인 연꽃마을에서 운영하고 있으며, 성인발달장애인을 위한 프로그램을 제공하고 있습니다.',
         '- 기타: 식권제공, 개인사정으로 참여가 어려울 시 사전에 반드시 반려신청하시기 바랍니다.', '첨부파일이(가) 없습니다.', '- 정해진 시간에만 봉사활동 가능합니다.', '장려상 2점 각 50만원을 시상합니다.', '- 꿈빛도서관은 기관장 직인을 찍어주지 않는 점 양해 부탁드립니다.(싸인으로 대체)'].map(ok),

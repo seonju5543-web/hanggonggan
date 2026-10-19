@@ -3524,6 +3524,18 @@ button, input, select, textarea { letter-spacing: inherit; }
 /* 카드 오른쪽 위는 단추 자리 — 배지가 그 아래로 흐르지 않게 자리를 비운다 */
 .sch-card-wrap > .sch-card .sch-top { padding-right: 34px; }
 
+/* 활동 카드 오른쪽 아래의 원문 링크(2026-10-19 개발자) — 북마크처럼 단추 바깥 · 아랫줄 글자와 겹치지 않게 자리를 비운다 */
+.card-src-link {
+  position: absolute;
+  right: 14px; bottom: 12px;
+  z-index: 2;
+  font-size: var(--t-xs);
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+}
+.sch-card-wrap.has-link > .sch-card .sch-foot { padding-right: calc(var(--sp-4) * 2 + var(--sp-2)); }   /* 「원문 공고 ↗」 자리 */
+
 .save-btn {
   position: absolute;
   top: 10px; right: 8px;

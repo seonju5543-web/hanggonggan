@@ -1652,10 +1652,11 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
      2026-09-09 에 카드 밑에 두었던 빨간 막대는 같은 지시로 **뺐다**(interactions.js 에서도
      지웠다 — 남겨 두면 다음 사람이 다시 붙인다). 7일 안쪽은 글자를 빨갛게(urgent) 한다.
    · 북마크 단추는 카드 **바깥**(save) — `.sch-card` 가 `<button>` 이라 안에 넣으면 단추 안의 단추가 된다. */
-function cardShellHtml({ save = '', attrs, org, badge = '', name, foot = '', footKnown = true, due = '', urgent = false }) {
+function cardShellHtml({ save = '', attrs, org, badge = '', name, foot = '', footKnown = true, due = '', urgent = false, link = '' }) {
+  /* link — 카드 오른쪽 아래의 작은 원문 링크(활동 카드 · 2026-10-19 개발자 "카드에도 원문공고 하이퍼링크"). 북마크처럼 **단추 바깥**에 둔다(단추 안의 링크는 허용되지 않는 구조) */
   return `
-    <div class="sch-card-wrap">
-    ${save}
+    <div class="sch-card-wrap${link ? ' has-link' : ''}">
+    ${save}${link}
     <button class="sch-card" ${attrs}>
       <div class="sch-top">
         <span class="sch-org">${esc(org)}</span>
@@ -3426,7 +3427,14 @@ function activityCardHtml(n) {
     footKnown: !!foot,
     due: d ? ddayWords(d) : '',
     urgent: !!d && d.days >= 0 && d.days <= 7,
+    link: activityCardLinkHtml(n),
   });
+}
+/* 활동 카드의 원문 링크 — 이름은 시트 단추와 같은 sourceLink(n, 'activity') 한 곳(「원문 공고 ↗」 · 목록·홈페이지면 그 이름) · 안전하지 않은 주소면 안 그린다 */
+function activityCardLinkHtml(n) {
+  const link = sourceLink(n, 'activity');
+  const href = safeUrl(link.href);
+  return href ? `<a class="card-src-link" href="${esc(href)}" target="_blank" rel="noopener">${esc(link.label)}</a>` : '';
 }
 
 /* 활동 시트 맨 아래 — 안내 한 줄 + 원문 단추 (2026-10-03 · 원문 링크 정직성).
@@ -3447,7 +3455,7 @@ function activityLinkHtml(n) {
     : sourceLinkHintHtml(link);
   return `${why ? `<p class="doc-legend">${why}</p>` : ''}
       ${href ? `<a class="btn btn-primary btn-lg" href="${esc(href)}" target="_blank" rel="noopener">${esc(link.label)}</a>
-      ${link.cls === 'post' ? '<p class="dp-note">신청은 주최 측 원문 페이지에서 진행돼요.</p>' : ''}` : ''}`;
+      ${link.cls === 'post' ? '<p class="dp-note">자세한 내용과 신청은 원문 공고에서 확인하세요.</p>' : ''}` : ''}`;
 }
 
 function openActivityDetail(url) {
