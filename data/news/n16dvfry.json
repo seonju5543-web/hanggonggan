@@ -1,7 +1,17 @@
 {
  "school": "아주대학교",
- "updatedAt": "2026-10-18",
+ "updatedAt": "2026-10-19",
  "items": [
+  {
+   "title": "[글로벌제약임상대학원]2027학년도 전기 정시 신입생 모집 안내",
+   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377600&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-19",
+   "school": "아주대학교",
+   "campus": "",
+   "src": "e5299528",
+   "foundAt": "2026-10-19",
+   "thumb": "data/news/img/d4126b02c54da51a.webp"
+  },
   {
    "title": "[교육대학원] 2027학년도 전기(정시) 신입생 모집 안내(10.30.(금) 9:00 ~ 11.9.(월) 18:00)",
    "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377588&article.offset=0&articleLimit=10",
@@ -407,16 +417,6 @@
    "campus": "",
    "foundAt": "2026-10-07",
    "thumb": "data/news/img/054d56158d8bc94a.webp"
-  },
-  {
-   "title": "[총무팀] 2026학년도 가을축제 개최에 따른 주차 및 통행로 통제 재안내 / 10.7.(수) ~ 10.8. (목) 2일간",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377164&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-07",
-   "kind": "행사",
-   "school": "아주대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "thumb": "data/news/img/92b0bb240de9c6bc.webp"
   }
  ]
 }

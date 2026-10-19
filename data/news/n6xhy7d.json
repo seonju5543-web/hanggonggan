@@ -1,7 +1,28 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-10-18",
+ "updatedAt": "2026-10-19",
  "items": [
+  {
+   "title": "[시설] 2026년 10월 교내 승강기 정기 점검 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53509&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-19",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-19",
+   "desc": "교내 승강기 정기점검을 아래와 같이 실시하오니 참고하여 주시기 바랍니다."
+  },
+  {
+   "title": "[일반] 기간제 계약직원 채용(중앙도서관 학술정보팀)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53508&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-19",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-19",
+   "desc": "기간제 계약직원 모집 공고 1. 지원 자격 및 우대사항 모집인원 담당업무 도서관 사서 및 부서 행정업무 등 지원 자격"
+  },
   {
    "title": "[학사] [대학혁신사업] 집중상담기간(KW All Care Week) 시행 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53504&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -412,25 +433,6 @@
    "foundAt": "2026-10-02",
    "thumb": "data/news/img/29fa980137dd083c.webp",
    "desc": "ㅇ 지원대상 : 서울시 거주 만 13~34 세 가족돌봄청소년 · 청년 140 명"
-  },
-  {
-   "title": "[일반] [창업] 2026년 강북창업지원센터 하반기 신규 입주기업 모집",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53229&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-08-31",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/21087c754c1814b5.webp",
-   "desc": "예비창업자와 우수 창업기업을 위한 창업 보육 지원과 경쟁력 강화를 위해 서울특별시 강북구가 건립하고 광운대학교 산학협력단이 위탁 운영하는 강북창업지원센터에 입주할 기업을 모집하오니 역량 있는 (예비)창업자의 많은…"
-  },
-  {
-   "title": "[일반] [한국지능정보사회진흥원] 「모두의 AI 실험실」 온라인 플랫폼 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53412&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-01",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/8640b5ff417aa176.webp"
   }
  ]
 }

@@ -1,7 +1,17 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-10-18",
+ "updatedAt": "2026-10-19",
  "items": [
+  {
+   "title": "[모집공고] [포스코퓨처엠] 「2026 포스코퓨처엠배 Future's Le...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70705",
+   "postedAt": "2026-10-19",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-19",
+   "thumb": "data/news/img/d66056de2b3131e4.webp"
+  },
   {
    "title": "[채용공고] 2026년 제2회 전남대학교 패키지 지원대학 사업 전문 및 사...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70704",
@@ -392,16 +402,6 @@
    "campus": "",
    "src": "b7347301",
    "foundAt": "2026-10-12"
-  },
-  {
-   "title": "[취업정보] 「현직자와의 AI 토크토크(1차)」참여 모집중!",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70631",
-   "postedAt": "2026-10-11",
-   "school": "전남대학교",
-   "campus": "",
-   "foundAt": "2026-10-11",
-   "thumb": "data/news/img/8aa7b591fa1857d4.webp",
-   "src": "b7347301"
   }
  ]
 }
