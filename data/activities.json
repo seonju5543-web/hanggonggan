@@ -1310,6 +1310,44 @@
    "excerptsAt": "2026-10-20"
   },
   {
+   "title": "구리시청년내일센터 - 2026 구리시청년내일센터 창업 아이디어 경진대회",
+   "url": "https://www.youthcenter.go.kr/bbs03View/48/10841",
+   "kind": "공모전",
+   "field": "기획·아이디어",
+   "deadlineHint": null,
+   "excerpts": [],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "온통청년 대외활동",
+   "api": "youthContent",
+   "apiId": "10841",
+   "id": "api-youthContent-10841",
+   "detailsV": 5,
+   "foundAt": "2026-10-20",
+   "seenAt": "2026-10-20",
+   "excerptsAt": "2026-10-20"
+  },
+  {
+   "title": "구리시청년내일센터 - 2026 청년교류 프로그램 <내 편, 우리 편 만나기>",
+   "url": "https://www.youthcenter.go.kr/bbs03View/48/10840",
+   "kind": "대외활동",
+   "field": "해외·교류",
+   "deadlineHint": null,
+   "excerpts": [],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "온통청년 대외활동",
+   "api": "youthContent",
+   "apiId": "10840",
+   "id": "api-youthContent-10840",
+   "detailsV": 5,
+   "foundAt": "2026-10-20",
+   "seenAt": "2026-10-20",
+   "excerptsAt": "2026-10-20"
+  },
+  {
    "title": "국무조정실 - 정부위원회 청년위원 통합공모 안내",
    "url": "https://www.youthcenter.go.kr/bbs03View/48/10836",
    "kind": "공모전",
@@ -1364,51 +1402,6 @@
    "api": "youthContent",
    "apiId": "10811",
    "id": "api-youthContent-10811",
-   "detailsV": 5,
-   "foundAt": "2026-10-02",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
-  },
-  {
-   "title": "용산 청년지음 <진로 고민 워크숍> 참여자 모집",
-   "url": "https://www.youthcenter.go.kr/bbs03View/48/10808",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadlineHint": null,
-   "excerpts": [],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "온통청년 취업지원",
-   "api": "youthContent",
-   "apiId": "10808",
-   "id": "api-youthContent-10808",
-   "detailsV": 5,
-   "foundAt": "2026-10-02",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
-  },
-  {
-   "title": "📢 「2026 보성 두드림 스테이」 추가 모집 🌿",
-   "url": "https://www.youthcenter.go.kr/bbs03View/48/10806",
-   "kind": "대외활동",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "이번 주 토요일(9/26)까지"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "온통청년 대외활동",
-   "api": "youthContent",
-   "apiId": "10806",
-   "id": "api-youthContent-10806",
-   "noticeLines": [
-    "ㅇ 신청기간: 이번 주 토요일(9/26)까지"
-   ],
    "detailsV": 5,
    "foundAt": "2026-10-02",
    "seenAt": "2026-10-20",
@@ -1612,6 +1605,79 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-09-30",
+   "seenAt": "2026-10-20",
+   "excerptsAt": "2026-10-20"
+  },
+  {
+   "title": "2026 서울형 청년인턴 직무캠프",
+   "url": "https://youth.seoul.go.kr/content.do?key=2310100012",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-12-31",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-03-01 ~ 2026-12-31"
+    },
+    {
+     "label": "혜택",
+     "text": "실무중심 직무교육과 인턴십 과정의 접목으로 청년 구직자에게 일경험 및 취업역량 강화 지원"
+    },
+    {
+     "label": "주최",
+     "text": "재단법인서울경제진흥원"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "서울특별시 미래청년기획관 청년정책담당관",
+   "api": "youthPolicy",
+   "apiId": "20261018005400213991",
+   "id": "api-youthPolicy-20261018005400213991",
+   "noticeLines": [
+    "사전직무교육 ✚ 인턴십(4개월) 및 직장적응교육 ➔ 취업연계",
+    "신청 방법 : 참여기업 모집·선정 후 참여자 모집·선발"
+   ],
+   "detailsV": 5,
+   "foundAt": "2026-10-20",
+   "seenAt": "2026-10-20",
+   "excerptsAt": "2026-10-20"
+  },
+  {
+   "title": "2026 서울영커리언스 캠프",
+   "url": "https://youth.seoul.go.kr/youthConts.do?key=2602120001&sc_pbancSeCd=030&sc_bbsStngSn=2212200001&sc_bbsCtgrySn=2602120020&sc_faqCtgryCd=027",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-12-31",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-03-01 ~ 2026-12-31"
+    },
+    {
+     "label": "혜택",
+     "text": "AI역량검사, 직무과제 수행 등을 통한 ‘커리어 로드맵’ 작성"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "서울특별시 미래청년기획관 청년정책담당관",
+   "api": "youthPolicy",
+   "apiId": "20261018005400213983",
+   "id": "api-youthPolicy-20261018005400213983",
+   "eligibilityLines": [
+    "비진학 청년 포함"
+   ],
+   "noticeLines": [
+    "나를 찾는 진로·직무 탐색 부트캠프",
+    "신청 방법 : ‘서울영커리언스 대학협의체’를 통한 참여 학생 모집"
+   ],
+   "detailsV": 5,
+   "foundAt": "2026-10-20",
    "seenAt": "2026-10-20",
    "excerptsAt": "2026-10-20"
   },
@@ -1944,77 +2010,6 @@
     "생애전환기 인생의 진로 설계 등으로 고민하는 청년에게 유명인 및 명사의 강연 참여 기회를 제공하여 안정적인 사회진입 지원",
     "신청 방법 : QR코드 신청 예정",
     "기타 : ※ 신청 및 사업기간 추후 공지"
-   ],
-   "detailsV": 5,
-   "foundAt": "2026-10-02",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
-  },
-  {
-   "title": "대학생 봉사활동 활성화",
-   "url": "https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56236",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-12-31",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-01-01 ~ 2026-12-31"
-    },
-    {
-     "label": "주최",
-     "text": "사단법인울산광역시자원봉사센터"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "울산광역시",
-   "api": "youthPolicy",
-   "apiId": "20260413005400212702",
-   "id": "api-youthPolicy-20260413005400212702",
-   "eligibilityLines": [
-    "지원대상 : 대학생봉사단(`26년 21기 봉사단)",
-    "청년들을 대상으로 자원봉사활동을 지원하여 이타심과 공동체성을 배양하고 더불어 사는 지역사회 조성에 기여"
-   ],
-   "noticeLines": [
-    "청년들을 대상으로 자원봉사활동을 지원하여 이타심과 공동체성을 배양하고 더불어 사는 지역사회 조성에 기여"
-   ],
-   "detailsV": 5,
-   "foundAt": "2026-10-02",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
-  },
-  {
-   "title": "이전공공기관 취업아카데미 운영",
-   "url": "https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56147",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-12-31",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-01-01 ~ 2026-12-31"
-    },
-    {
-     "label": "혜택",
-     "text": "국가기술자격증 ‘컨벤션기획사 2급’ 필기·실기 취득 교육 - 컨벤션 기획, 운영 및 현장 연출, 해외연사 초청 영문서신 작성방법 등 -「2025년 제3회 지속가능한 마이스·관광 울산포럼」참석 등"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "울산광역시",
-   "api": "youthPolicy",
-   "apiId": "20260407005400212532",
-   "id": "api-youthPolicy-20260407005400212532",
-   "eligibilityLines": [
-    "지원대상 : MICE산업에 관심 있는 청년, 공기관 담당자, 시민 등 50명"
-   ],
-   "noticeLines": [
-    "MICE산업 전문 교육 기회제공을 통해 MICE 인재 양성과 울산 MICE산업의 인적 경쟁력 강화"
    ],
    "detailsV": 5,
    "foundAt": "2026-10-02",
