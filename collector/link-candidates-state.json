@@ -268,6 +268,31 @@
   "round": "2026-10-26",
   "nextAt": "2026-10-27"
  },
+ "kosaf|2500058003|https://www.jiles.or.kr/community/notice/notice.htm?act=view&seq=13111": {
+  "ds": "kosaf",
+  "key": "2500058003",
+  "url": "https://www.jiles.or.kr/community/notice/notice.htm?act=view&seq=13111",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "title": "[모집공고] 2026년 제주인재육성 특별지정장학금 제주고씨수남공법환문중회 장학금 장학생 선발계획 공고",
+  "firstAt": "2026-10-20",
+  "lastAt": "2026-10-20",
+  "tries": 1,
+  "status": "suggest",
+  "why": "제목이 제목 자리가 아니라 본문에만 보임",
+  "checks": {
+   "C": "ok",
+   "L": "weak",
+   "H": "ok",
+   "T": "ok",
+   "R": "ok",
+   "X": "ok",
+   "P": "ok"
+  },
+  "round": "2026-10-30",
+  "decidedAt": "2026-10-20",
+  "also": []
+ },
  "kosaf|2700017001|http://www.hsf.or.kr/bbs/board.php?bo_table=s5_1&wr_id=102": {
   "ds": "kosaf",
   "key": "2700017001",
