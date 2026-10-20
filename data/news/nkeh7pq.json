@@ -3,6 +3,27 @@
  "updatedAt": "2026-10-20",
  "items": [
   {
+   "title": "2북관 엘리베이터 고장 점검으로 인한 운행 제한 안내 (2026.10.20.(화)~수리 완료 시)",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45860/artclView.do",
+   "postedAt": "2026-10-20",
+   "school": "인하대학교",
+   "campus": "",
+   "src": "f4141706",
+   "foundAt": "2026-10-20",
+   "desc": "2북관 엘리베이터 고장 점검으로 인한 승강기 임시 운행 제한을 아래와 같이 안내드리오니 양해와 협조 부탁드립니다."
+  },
+  {
+   "title": "ISIC 국제학생증 체크카드 발급비 지원 행사(11/2~11/15)",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45857/artclView.do",
+   "postedAt": "2026-10-20",
+   "kind": "학사",
+   "school": "인하대학교",
+   "campus": "",
+   "src": "f4141706",
+   "foundAt": "2026-10-20",
+   "thumb": "data/news/img/f64508f16e7824c5.webp"
+  },
+  {
    "title": "2026 동계 전공적응학기 시행 안내",
    "url": "https://www.inha.ac.kr/bbs/kr/8/45846/artclView.do",
    "postedAt": "2026-10-19",
@@ -394,27 +415,6 @@
    "thumb": "data/news/img/0c7e8a2edc3cad7f.webp",
    "src": "f4141706",
    "desc": "IPP듀얼공동훈련센터에서는 2027년도 상반기 일학습병행 참여를 희망하는 학생들을 대상으로 기업 초청 설명회를 개최합니다."
-  },
-  {
-   "title": "[대학혁신지원사업] \"나도 학생 강사\" : 학생 주도 학습 프로그램(SDC) 강사 모집",
-   "url": "https://www.inha.ac.kr/bbs/kr/8/45523/artclView.do",
-   "postedAt": "2026-09-15",
-   "kind": "채용",
-   "school": "인하대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/767fef9d03578817.webp",
-   "src": "f4141706"
-  },
-  {
-   "title": "[학생군사교육단] '26년 후반기 67, 68기 학군사관후보생 모집 공고",
-   "url": "https://www.inha.ac.kr/bbs/kr/8/45267/artclView.do",
-   "postedAt": "2026-09-01",
-   "school": "인하대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/9e522a5cbbaa20ed.webp",
-   "src": "f4141706"
   }
  ]
 }

@@ -3,6 +3,28 @@
  "updatedAt": "2026-10-20",
  "items": [
   {
+   "title": "2026 하반기 교직원(정규직) 신규채용 필기전형 결과 및 1차 면접전형 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140689&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-20",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-20",
+   "desc": "○ 채용분야 : 신규채용 - 일반행정 ○ 필기전형 합격자 발표 기간 : 2026. 10. 20.(화) 17:00 ~ 10. 25.(일) 17:00"
+  },
+  {
+   "title": "성균관대 삼성SDI-SKKU 이차전지산학협력연구센터 행정 직원 모집 (~10/26 월 오전 11시)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140674&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-20",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-20",
+   "desc": "1. 채용 분야 - 삼성SDI-SKKU 이차전지산학협력연구센터 소속 연구비 관리 업무"
+  },
+  {
    "title": "자연과학캠퍼스 통학 셔틀버스 시범운행 안내 (10/19~12/18)",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140492&article.offset=0&articleLimit=10",
    "postedAt": "2026-10-20",
@@ -414,28 +436,6 @@
    "campus": "",
    "foundAt": "2026-10-08",
    "desc": "총괄지원팀 문화예술미디어융합원 촉탁직원(연구원)을 아래와 같이 채용하고자 하오니 많은 지원 바랍니다.",
-   "src": "45ec8fd1"
-  },
-  {
-   "title": "대학원혁신센터 촉탁직원 채용 공고(BK대학원혁신사업)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140468&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-08",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "desc": "총괄지원팀 우리대학 대학원혁신센터에서 BK대학원혁신지원사업을 담당할 촉탁직원을 아래와 같이 채용합니다.",
-   "src": "45ec8fd1"
-  },
-  {
-   "title": "[교수학습혁신센터] 제2회 AI in Higher Education 컨퍼런스 참여 안내",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140459&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-08",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "thumb": "data/news/img/13f36cc135018b60.webp",
-   "desc": "2. 주제: AI in Action – 제도에서 현장까지 3. 일시: 2026년 10월 23일 (금) 오후 1:00 ~ 5:00",
    "src": "45ec8fd1"
   }
  ]
