@@ -238,7 +238,7 @@
    "targets": 1
   },
   "junggu.nonghyup.com": {
-   "checkedAt": "2026-10-17",
+   "checkedAt": "2026-10-20",
    "why": "홈페이지 못 엶 (TypeError: ENOTFOUND → 브라우저도 실패(page.goto: net::ERR_NAME_NOT_RESOLVED at http://)",
    "targets": 1
   },
@@ -259,7 +259,7 @@
    "why": "게시판도 글도 못 찾음"
   },
   "koreanurse.or.kr": {
-   "checkedAt": "2026-10-17",
+   "checkedAt": "2026-10-20",
    "pages": 1,
    "found": 0,
    "lines": 0,
@@ -267,7 +267,7 @@
    "why": "게시판도 글도 못 찾음"
   },
   "koswec.or.kr": {
-   "checkedAt": "2026-10-17",
+   "checkedAt": "2026-10-20",
    "pages": 6,
    "found": 0,
    "lines": 0,
@@ -291,8 +291,8 @@
    "why": ""
   },
   "namwon.go.kr": {
-   "checkedAt": "2026-10-17",
-   "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT → 브라우저도 실패(page.goto: Timeout 20000ms exceede)",
+   "checkedAt": "2026-10-20",
+   "why": "홈페이지 못 엶 (응답 400 → 브라우저도 실패(응답 400))",
    "targets": 1
   },
   "pjdjkjscholarship.or.kr": {
@@ -304,7 +304,7 @@
    "why": "게시판도 글도 못 찾음"
   },
   "scholarship.sarang.org": {
-   "checkedAt": "2026-10-17",
+   "checkedAt": "2026-10-20",
    "pages": 2,
    "found": 0,
    "lines": 0,
@@ -320,8 +320,8 @@
    "why": "게시판도 글도 못 찾음"
   },
   "sunchang.go.kr": {
-   "checkedAt": "2026-10-17",
-   "pages": 6,
+   "checkedAt": "2026-10-20",
+   "pages": 7,
    "found": 0,
    "lines": 0,
    "targets": 1,
@@ -480,15 +480,15 @@
    "targets": 1
   },
   "jiles.or.kr": {
-   "checkedAt": "2026-10-16",
+   "checkedAt": "2026-10-20",
    "pages": 9,
-   "found": 0,
-   "lines": 0,
+   "found": 1,
+   "lines": 1,
    "targets": 1,
-   "why": "게시판도 글도 못 찾음"
+   "why": ""
   },
   "kiha21.or.kr": {
-   "checkedAt": "2026-10-16",
+   "checkedAt": "2026-10-20",
    "pages": 1,
    "found": 0,
    "lines": 0,
@@ -496,7 +496,7 @@
    "why": "게시판도 글도 못 찾음"
   },
   "yonkang.org": {
-   "checkedAt": "2026-10-16",
+   "checkedAt": "2026-10-20",
    "pages": 10,
    "found": 0,
    "lines": 0,
@@ -504,8 +504,48 @@
    "why": "게시판도 글도 못 찾음"
   },
   "yonsei.ac.kr": {
-   "checkedAt": "2026-10-16",
+   "checkedAt": "2026-10-20",
    "pages": 1,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "gunsan.go.kr": {
+   "checkedAt": "2026-10-20",
+   "pages": 1,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "hanulsbh.com": {
+   "checkedAt": "2026-10-20",
+   "pages": 2,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "jcyouthcenter.com": {
+   "checkedAt": "2026-10-20",
+   "pages": 4,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "kfas.or.kr": {
+   "checkedAt": "2026-10-20",
+   "pages": 8,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "taejaefoundation.or.kr": {
+   "checkedAt": "2026-10-20",
+   "pages": 10,
    "found": 0,
    "lines": 0,
    "targets": 1,

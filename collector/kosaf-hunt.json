@@ -211,6 +211,18 @@
    "by": "로봇(층2 글 사냥꾼)",
    "addedAt": "2026-10-14",
    "note": "게시판처럼 보이는 쪽(공고 3건 · 글 줄 3) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2500058003"
+   },
+   "url": "https://www.jiles.or.kr/community/notice/notice.htm?act=view&seq=13111",
+   "title": "[모집공고] 2026년 제주인재육성 특별지정장학금 제주고씨수남공법환문중회 장학금 장학생 선발계획 공고",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-20",
+   "note": "https://www.jiles.or.kr/ 목록에서 고름 — 사업 이름 +1 · 마감 해 +1 · 장학 낱말 +1 · 게시일 +1"
   }
  ]
 }
