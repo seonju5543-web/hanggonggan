@@ -1,171 +1,6 @@
 {
- "updatedAt": "2026-10-20",
+ "updatedAt": "2026-10-21",
  "items": [
-  {
-   "title": "[대전창조경제혁신센터] 2026 대전 제조파트너스 매칭데이 참가자 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179482",
-   "kind": "대외활동",
-   "deadline": "2026-10-20",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-08 ~ 2026-10-20"
-    },
-    {
-     "label": "대상",
-     "text": "제조 분야 예비창업자 및 창업기업"
-    },
-    {
-     "label": "활동지역",
-     "text": "대전"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "대전창조경제혁신센터",
-   "api": "kstartup",
-   "apiId": "179482",
-   "id": "api-kstartup-179482",
-   "eligibilityLines": [
-    "제조 분야 예비창업자 및 창업기업"
-   ],
-   "noticeLines": [
-    "「2026 대전 제조파트너스 매칭데이」 참가자를 다음과 같이 모집하오니, 제조 창업에 관심 있는 분들의 많은 참여 바랍니다.",
-    "온라인 접수 : https://nextstep.io.kr/event-2026-261007"
-   ],
-   "detailsV": 5,
-   "foundAt": "2026-10-12",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
-  },
-  {
-   "title": "2026년 창업기업(예비창업자) 사업고도화 창업교육 참여자 모집 공고",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179437",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-10-20",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-01 ~ 2026-10-20"
-    },
-    {
-     "label": "대상",
-     "text": "다음 각 호의 어느 하나에 해당하는 창업기업 및 예비창업자 - 창업지원센터 입주자 및 입주신청자 - 통영시 내 소재지를 둔 업력 7년 이내 창업기업 - 통영시에서 창업을 희망하는 예비창업자"
-    },
-    {
-     "label": "활동지역",
-     "text": "경남"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "통영시장",
-   "api": "kstartup",
-   "apiId": "179437",
-   "id": "api-kstartup-179437",
-   "eligibilityLines": [
-    "다음 각 호의 어느 하나에 해당하는 창업기업 및 예비창업자",
-    "창업지원센터 입주자 및 입주신청자",
-    "통영시 내 소재지를 둔 업력 7년 이내 창업기업",
-    "통영시에서 창업을 희망하는 예비창업자"
-   ],
-   "noticeLines": [
-    "창업기업 및 예비창업자의 창업역량 강화를 위한 「2026년 창업기업(예비창업자) 사업고도화 창업교육」 참여자 모집을 다음과 같이 공고하오니, 많은 신청 바랍니다.",
-    "온라인 접수 : https://forms.gle/ZEKtkNmCqT6cKTTt8",
-    "방문 접수 : 통영리스타트플랫폼 5층 창업지원센터(경상남도 통영시 도남로 195)"
-   ],
-   "detailsV": 5,
-   "foundAt": "2026-10-12",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
-  },
-  {
-   "title": "이타카앤파트너스 조용민 대표 초청 특강 - 내가 투자한 스타트업과 성공하는 창업가의 3가지 비밀",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179426",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-10-20",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-06 ~ 2026-10-20"
-    },
-    {
-     "label": "대상",
-     "text": "예비창업자, 창업기업 대표 및 임직원, 대학(원)생, 유관기관 등"
-    },
-    {
-     "label": "활동지역",
-     "text": "경기"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "경기도·경기도경제과학진흥원",
-   "api": "kstartup",
-   "apiId": "179426",
-   "id": "api-kstartup-179426",
-   "eligibilityLines": [
-    "예비창업자, 창업기업 대표 및 임직원, 대학(원)생, 유관기관 등"
-   ],
-   "noticeLines": [
-    "경기도와 경기도경제과학진흥원에서는 「2026년 경기 스타트업 아카데미」의 일환으로 이카앤파트너스 조용민 대표를 초청하여 「내가 투자한 스타트업과 성공하는 창업가의 3가지 비밀」 특강을 운영합니다.",
-    "온라인 접수 : https://forms.gle/tgEX59Nzcdd53ZQg8"
-   ],
-   "detailsV": 5,
-   "foundAt": "2026-10-12",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
-  },
-  {
-   "title": "제3회 AI 및 기술기반 창업 트렌드 세미나 참가자 모집 (AI 비즈니스 실전 전략 : 멀티모달·에이전트 AX·AI 거버넌스)",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179236",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-10-20",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-09-11 ~ 2026-10-20"
-    },
-    {
-     "label": "대상",
-     "text": "① AI 분야와 기술창업에 관심 있는 교육관계자, 예비창업자, 대학생, 스타트업 관계자 ② 실생활 속 AI 기술 활용에 대한 이해를 높이고자 하는 일반인"
-    },
-    {
-     "label": "활동지역",
-     "text": "전국"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "경기창조경제혁신센터",
-   "api": "kstartup",
-   "apiId": "179236",
-   "id": "api-kstartup-179236",
-   "eligibilityLines": [
-    "① AI 분야와 기술창업에 관심 있는 교육관계자, 예비창업자, 대학생, 스타트업 관계자",
-    "② 실생활 속 AI 기술 활용에 대한 이해를 높이고자 하는 일반인"
-   ],
-   "noticeLines": [
-    "AI 분야 및 기술창업 활성화를 위해 참가자를 모집하오니 관심 있는 분들의 많은 신청 바랍니다.",
-    "온라인 접수 : https://eventcceiujb.netlify.app/",
-    "방문 접수 : 의정부시청 인재양성교육장 (제2별관 2층), 행사당일 현장접수"
-   ],
-   "detailsV": 5,
-   "foundAt": "2026-10-12",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
-  },
   {
    "title": "파주청년창업지원센터 하반기 청년 창업아카데미 참여기업/팀 모집 공고",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179318",
@@ -207,8 +42,8 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-10-13",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "[강동구 청년해냄센터] 2026 모의창업스쿨 2차 교육 참가자 모집 공고",
@@ -247,8 +82,8 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-10-15",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "2026년 강북창업지원센터 10월 창업 교육 및 그룹상담 프로그램 참가자 모집",
@@ -289,8 +124,8 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-10-02",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "쇼미더임팩트 시즌6 참가자 모집 [IMPACT IR 경연대회]",
@@ -334,8 +169,8 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-10-15",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "Tech Discovery 실험실창업 경진대회 참가자 모집",
@@ -385,8 +220,8 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-10-16",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "2026년 초기창업패키지 로켓십 IR 경진대회 참가기업 모집 (3회차: 기후·ESG)",
@@ -424,8 +259,8 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-10-15",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "2026 시흥시 청년창업가 네트워킹 행사 참가자 모집",
@@ -464,8 +299,8 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-10-17",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "ANTLER | 2026 앤틀러 글로벌 리쿠르팅데이 참가자 모집(10.24.)",
@@ -509,8 +344,8 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-10-07",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "[푼타컴퍼니]로컬 인디브랜드 성장을 위한 국내 및 글로벌 성장 프로그램 참가 기업 모집",
@@ -549,8 +384,8 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-10-17",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "2026년 대전 스타트업 원스톱 지원센터 아카데미 3회차",
@@ -589,8 +424,8 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-10-20",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "[광운대캠퍼스타운] AI 첫걸음 아카데미 (HELLO AI!) 참가자 모집 (선착순마감)",
@@ -629,188 +464,178 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-10-08",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
-   "title": "10월(오전) 대전수학문화관 대학생 봉사활동 모집",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521994",
+   "title": "[무료|150석 한정] 딥테크 창업가 컨퍼런스 d.day : founders summit 참가자 모집 10/29",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179527",
    "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-10-20",
+   "deadline": "2026-10-27",
    "deadlineHint": null,
    "excerpts": [
     {
      "label": "모집기간",
-     "text": "2026-09-14 ~ 2026-10-20"
+     "text": "2026-10-15 ~ 2026-10-27"
     },
     {
-     "label": "활동기간",
-     "text": "2026-10-01 ~ 2026-10-31"
+     "label": "대상",
+     "text": "딥테크 비즈니스와 성장 전략에 관심 있는 누구나 신청할 수 있습니다."
     },
     {
      "label": "활동지역",
-     "text": "대전수학문화관"
+     "text": "서울"
     }
    ],
    "attachments": [],
    "school": "",
    "campus": "",
-   "host": "대전교육정보원 대전수학문화관",
-   "api": "vol1365",
-   "apiId": "3521994",
-   "id": "api-vol1365-3521994",
-   "detailsV": 5,
+   "host": "재단법인 은행권청년창업재단",
+   "api": "kstartup",
+   "apiId": "179527",
+   "id": "api-kstartup-179527",
    "eligibilityLines": [
-    "3. 대상: 교육봉사활동에 관심 있는 대학생"
+    "딥테크 비즈니스와 성장 전략에 관심 있는 누구나 신청할 수 있습니다."
    ],
    "noticeLines": [
-    "일부 대학에서 요구하는 기관장 날인된 봉사활동 확인서를 개별 발급하지 않습니다.",
-    "(봉사활동 확인서는 월말에 1365 자원봉사포털에서 개별 발급)",
-    "1. 일시: 2026년 10월 (오전) 09:00~12:00",
-    "2. 장소: 대전수학문화관",
-    "3. 대상: 교육봉사활동에 관심 있는 대학생",
-    "4. 활동 내용"
+    "딥테크 창업가 7인이 시장 검증, 고객 확보, 조직 확장의 고비마다 내린 판단을 나누는 대담형 컨퍼런스 d.day : founders summit 참가자를 모집합니다.",
+    "온라인 접수 : https://bit.ly/47ipEs2"
    ],
-   "foundAt": "2026-10-17",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
-  },
-  {
-   "title": "10월(오후) 대전수학문화관 대학생 봉사활동 모집",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521995",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-10-20",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-09-14 ~ 2026-10-20"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026-10-01 ~ 2026-10-31"
-    },
-    {
-     "label": "활동지역",
-     "text": "대전수학문화관"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "대전교육정보원 대전수학문화관",
-   "api": "vol1365",
-   "apiId": "3521995",
-   "id": "api-vol1365-3521995",
    "detailsV": 5,
-   "eligibilityLines": [
-    "3. 대상: 교육봉사활동에 관심 있는 대학생"
-   ],
-   "noticeLines": [
-    "일부 대학에서 요구하는 기관장 날인된 봉사활동 확인서를 개별 발급하지 않습니다.",
-    "(봉사활동 확인서는 월말에 1365 자원봉사포털에서 개별 발급)",
-    "1. 일시: 2026년 10월 (오후) 13:00~17:00",
-    "2. 장소: 대전수학문화관",
-    "3. 대상: 교육봉사활동에 관심 있는 대학생",
-    "4. 활동 내용"
-   ],
-   "foundAt": "2026-10-17",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
-  },
-  {
-   "title": "[평일오전] 꿈빛 도서관 서가정리(대학생,일반성인)",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3524705",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-10-20",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-09-22 ~ 2026-10-20"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026-10-01 ~ 2026-10-30"
-    },
-    {
-     "label": "활동지역",
-     "text": "꿈빛도서관 아동실(1층),일반실(2층)"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "부천시립꿈빛도서관",
-   "api": "vol1365",
-   "apiId": "3524705",
-   "id": "api-vol1365-3524705",
-   "detailsV": 5,
-   "eligibilityLines": [
-    "- 신청대상 : 대학생, 일반인.",
-    "- 활동내용 : 서가정리 및 기타 업무보조, 환경미화",
-    "- 활동시간 : 평일 오전 9시 30분 ~ 13시 30분 (4시간)"
-   ],
-   "noticeLines": [
-    "주말과 평일의 봉사활동 시간이 다릅니다.",
-    "신청대상 : 대학생, 일반인.",
-    "활동내용 : 서가정리 및 기타 업무보조, 환경미화",
-    "활동시간 : 평일 오전 9시 30분 ~ 13시 30분 (4시간)",
-    "정해진 시간에만 봉사활동 가능합니다.",
-    "자음/모음 체계 및 소수점 등 수 배열의 이해 부족 시 반려 사유가 될 수 있습니다."
-   ],
    "foundAt": "2026-10-15",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
-   "title": "[평일오후] 꿈빛 도서관 서가정리(대학생,일반성인)",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3524706",
+   "title": "Applications Now Open: 2026 OASIS-6 Global Startup Challenge 「2026 외국인 창업대전(OASIS-6)」 참가자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179459",
    "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-10-20",
+   "deadline": "2026-10-27",
    "deadlineHint": null,
    "excerpts": [
     {
      "label": "모집기간",
-     "text": "2026-09-22 ~ 2026-10-20"
+     "text": "2026-10-08 ~ 2026-10-27"
     },
     {
-     "label": "활동기간",
-     "text": "2026-10-01 ~ 2026-10-30"
+     "label": "대상",
+     "text": "기술창업을 희망하는 합법 체류 외국인 창업자 및 예비창업자 ※ 팀으로 참가하는 경우 팀장은 외국인이어야 하며, 팀장 포함 5인 이내로 구성"
     },
     {
      "label": "활동지역",
-     "text": "꿈빛도서관 아동실(1층),일반실(2층)"
+     "text": "전국"
     }
    ],
    "attachments": [],
    "school": "",
    "campus": "",
-   "host": "부천시립꿈빛도서관",
-   "api": "vol1365",
-   "apiId": "3524706",
-   "id": "api-vol1365-3524706",
-   "detailsV": 5,
+   "host": "글로벌창업이민센터(한국능률협회컨설팅)",
+   "api": "kstartup",
+   "apiId": "179459",
+   "id": "api-kstartup-179459",
    "eligibilityLines": [
-    "- 신청대상 : 대학생, 일반인.",
-    "- 활동내용 : 서가정리 및 기타 업무보조, 환경미화",
-    "- 활동시간 : 평일 오후14시 00분 ~ 18시 00분 (4시간)"
+    "기술창업을 희망하는 합법 체류 외국인 창업자 및 예비창업자",
+    "※ 팀으로 참가하는 경우 팀장은 외국인이어야 하며, 팀장 포함 5인 이내로 구성"
+   ],
+   "eligibilityExcludes": [
+    "ㅇ 동일 또는 유사한 아이템으로 기존 경진대회에 입상한 경우",
+    "ㅇ 타인의 특허·실용신안 등 지식재산권을 침해하거나 침해할 우려가 있는 아이템",
+    "ㅇ 2026년 타 운영기관의 외국인 창업대전(OASIS-6) 입상자",
+    "ㅇ 이미 사업화된 아이템",
+    "※ 세부 기준은 첨부 모집공고 참조"
    ],
    "noticeLines": [
-    "주말과 평일의 봉사활동 시간이 다릅니다.",
-    "신청대상 : 대학생, 일반인.",
-    "활동내용 : 서가정리 및 기타 업무보조, 환경미화",
-    "활동시간 : 평일 오후14시 00분 ~ 18시 00분 (4시간)",
-    "정해진 시간에만 봉사활동 가능합니다.",
-    "자음/모음 체계 및 소수점 등 수 배열의 이해 부족 시 반려 사유가 될 수 있습니다."
+    "법무부와 글로벌창업이민센터(한국능률협회컨설팅)는 외국인 창업자 및 예비창업자의 우수한 기술창업 아이템을 발굴하기 위해 2026 외국인 창업대전(OASIS-6) 참가자를 모집하오니 많은 관심과 참여 바랍니다."
    ],
-   "foundAt": "2026-10-15",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "detailsV": 5,
+   "foundAt": "2026-10-13",
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
+  },
+  {
+   "title": "2026 정주영 창업경진대회: 무한(INFINITE)",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179245",
+   "kind": "공모전",
+   "field": "IT·소프트웨어",
+   "deadline": "2026-10-27",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-17 ~ 2026-10-27"
+    },
+    {
+     "label": "대상",
+     "text": "무한한 가능성의 힘을 믿고, 각 분야의 스타트업의 피칭을 통해 다양한 인사이트를 얻고 싶은 참가자 누구나"
+    },
+    {
+     "label": "활동지역",
+     "text": "전국"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "아산나눔재단",
+   "api": "kstartup",
+   "apiId": "179245",
+   "id": "api-kstartup-179245",
+   "eligibilityLines": [
+    "무한한 가능성의 힘을 믿고, 각 분야의 스타트업의 피칭을 통해 다양한 인사이트를 얻고 싶은 참가자 누구나"
+   ],
+   "noticeLines": [
+    "정주영 창업경진대회는 자신의 무한한 가능성을 믿는 창업가들과 함께",
+    "창업생태계의 경계를 넓혀왔습니다.",
+    "그 가능성이 한자리에 모이는 ‘2026 정주영 창업경진대회: 무한(INFINITE)’​이",
+    "10월 28일 코엑스 오디토리움에서 열립니다.",
+    "많은 관심과 참가 부탁드립니다.",
+    "온라인 접수 : https://bit.ly/4A8uC7K"
+   ],
+   "detailsV": 5,
+   "foundAt": "2026-10-21",
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
+  },
+  {
+   "title": "TECH IP-UP: IP 창출캠프 참가팀 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179484",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-10-28",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-12 ~ 2026-10-28"
+    },
+    {
+     "label": "대상",
+     "text": "기술기반 창업 아이디어를 보유하거나 IP 창출에 관심있는 대학(원)생 20팀 내외"
+    },
+    {
+     "label": "활동지역",
+     "text": "전국"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "단국대학교 기술지주회",
+   "api": "kstartup",
+   "apiId": "179484",
+   "id": "api-kstartup-179484",
+   "eligibilityLines": [
+    "기술기반 창업 아이디어를 보유하거나 IP 창출에 관심있는 대학(원)생 20팀 내외",
+    "대상 연령 : 만 20세 이상 ~ 만 39세 이하"
+   ],
+   "noticeLines": [
+    "대학(원)생의 기술기반 아이디어를 검증·구체화하고, 선행기술 조사와 AI 활용 출원 문서 작성 실습을 통해 IP 창출 및 사업화 역량을 강화하고자 다음과 같이 교육을 진행합니다.",
+    "온라인 접수 : https://learncle.com/event/S3xLY"
+   ],
+   "detailsV": 5,
+   "foundAt": "2026-10-14",
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "서초 탄소제로 환경놀이터 및 등굣길 캠페인 진행 대학생 봉사활동",
@@ -865,8 +690,96 @@
     "ㅇ 장 소: 서울반원초등학교"
    ],
    "foundAt": "2026-10-15",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
+  },
+  {
+   "title": "10월(오전) 대전수학문화관 대학생 봉사활동 모집",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521994",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-10-21",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-14 ~ 2026-10-21"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-10-01 ~ 2026-10-31"
+    },
+    {
+     "label": "활동지역",
+     "text": "대전수학문화관"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "대전교육정보원 대전수학문화관",
+   "api": "vol1365",
+   "apiId": "3521994",
+   "id": "api-vol1365-3521994",
+   "detailsV": 5,
+   "eligibilityLines": [
+    "3. 대상: 교육봉사활동에 관심 있는 대학생"
+   ],
+   "noticeLines": [
+    "일부 대학에서 요구하는 기관장 날인된 봉사활동 확인서를 개별 발급하지 않습니다.",
+    "(봉사활동 확인서는 월말에 1365 자원봉사포털에서 개별 발급)",
+    "1. 일시: 2026년 10월 (오전) 09:00~12:00",
+    "2. 장소: 대전수학문화관",
+    "3. 대상: 교육봉사활동에 관심 있는 대학생",
+    "4. 활동 내용"
+   ],
+   "foundAt": "2026-10-17",
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
+  },
+  {
+   "title": "10월(오후) 대전수학문화관 대학생 봉사활동 모집",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521995",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-10-21",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-14 ~ 2026-10-21"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-10-01 ~ 2026-10-31"
+    },
+    {
+     "label": "활동지역",
+     "text": "대전수학문화관"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "대전교육정보원 대전수학문화관",
+   "api": "vol1365",
+   "apiId": "3521995",
+   "id": "api-vol1365-3521995",
+   "detailsV": 5,
+   "eligibilityLines": [
+    "3. 대상: 교육봉사활동에 관심 있는 대학생"
+   ],
+   "noticeLines": [
+    "일부 대학에서 요구하는 기관장 날인된 봉사활동 확인서를 개별 발급하지 않습니다.",
+    "(봉사활동 확인서는 월말에 1365 자원봉사포털에서 개별 발급)",
+    "1. 일시: 2026년 10월 (오후) 13:00~17:00",
+    "2. 장소: 대전수학문화관",
+    "3. 대상: 교육봉사활동에 관심 있는 대학생",
+    "4. 활동 내용"
+   ],
+   "foundAt": "2026-10-17",
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "[성인/대학생] 2026 평택시민나눔문화축제 합정장애인주간보호센터 홍보부스 업무 보조",
@@ -909,8 +822,8 @@
     "4. 봉사내용:"
    ],
    "foundAt": "2026-10-15",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "(대학생)+청년&청소년 연합봉사, 지구를 위한 플로깅 해보깅(신중동역 주변 환경정화)",
@@ -960,8 +873,8 @@
     "물품 제공 및 주의사항 안내"
    ],
    "foundAt": "2026-10-14",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "함께놀고 함께그린(GREEN) 수정마을 행사 활동 보조 지원(성인(대학생)/토13:00~18:00)",
@@ -1004,8 +917,8 @@
     "질서지도 및 안내"
    ],
    "foundAt": "2026-10-16",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "관악서울대학교치과병원과 관악구보건소 주관 '찾아가는 치과진료소' 치과치료 지원 봉사활동",
@@ -1050,8 +963,8 @@
     "자원봉사활동 목적과 의미를 이해하고 제반 규정을 성실히 이행할 수 있는 분"
    ],
    "foundAt": "2026-10-16",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "이천시 유,초,중,고 특수학교 특수교육 지원 봉사 (대학생 성인 자원봉사자)",
@@ -1096,8 +1009,8 @@
     "활동장소: 이천시 내 유치원, 초등학교, 중학교, 고등학교 특수학급, 특수학교"
    ],
    "foundAt": "2026-10-16",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "[성인/대학생] 합정장애인주간보호센터 10월 월요일, 목요일 오후 프로그램 보조",
@@ -1140,47 +1053,8 @@
     "4. 봉사내용:"
    ],
    "foundAt": "2026-10-16",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
-  },
-  {
-   "title": "2026년 드림스타트 '부모첫걸음' 행사 진행 보조 대학생 봉사자 모집",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3531200",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-10-22",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-06 ~ 2026-10-22"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026-10-24 ~ 2026-10-24"
-    },
-    {
-     "label": "활동지역",
-     "text": "대전 서구청 드림스타트 프로그램실 및 장태산실"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "대전서구자원봉사센터",
-   "api": "vol1365",
-   "apiId": "3531200",
-   "id": "api-vol1365-3531200",
-   "detailsV": 5,
-   "noticeLines": [
-    "집결 및 진행장소: 대전 서구청 드림스타트 프로그램실 및 장태산실",
-    "봉사활동내용: 프로그램 진행 준비, 정리 및 아동돌봄",
-    "*교통비 및 식비 지급예정 (1인당 12,000원)",
-    "★대학생 자원봉사자 8명 (유아교육, 사회복지, 교육학과 모집)"
-   ],
-   "foundAt": "2026-10-17",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "충북교육도서관 도서 정리[북페스티벌](대학생)",
@@ -1220,8 +1094,8 @@
     "10. 25.(일) [공휴일 제외]"
    ],
    "foundAt": "2026-10-18",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "[시립화곡청소년센터] 제18기 청소년자원봉사단 '광락' 버스킹 보조 지도자 모집",
@@ -1262,8 +1136,8 @@
     "모집 대상: 대학생 자원봉사자(진행 보조 및 안전관리)"
    ],
    "foundAt": "2026-10-18",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "상명대학교박물관 기획전시실 전시지킴이 및 관리보조 오후팀_13:00~17:00",
@@ -1306,8 +1180,136 @@
     "6. 참고사항: 5회 이상 미신청자는 반려되며, 오전팀(10:00~12:00)으로 신청해도 가능함(ex. 오전팀 9월 4일/17일+오후팀 10월 2일/3일/7일=5회)"
    ],
    "foundAt": "2026-10-20",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
+  },
+  {
+   "title": "제32회 충청남도장애인체육대회 개막식 운영지원 [대학생] 자원봉사",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521018",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-10-23",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-15 ~ 2026-10-23"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-10-29 ~ 2026-10-29"
+    },
+    {
+     "label": "활동지역",
+     "text": "천안종합운동장"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "충청남도 천안시",
+   "api": "vol1365",
+   "apiId": "3521018",
+   "id": "api-vol1365-3521018",
+   "detailsV": 5,
+   "noticeLines": [
+    "제32회 충청남도장애인체육대회 개막식 운영지원 [대학생] 자원봉사",
+    "일시: 2026.10.29.(목) 16:00~22:00",
+    "장소: 천안시종합운동장 *집결지 신청자에 한해 추후 문자공지",
+    "내용: 개막식 관람객 입퇴장 관리(드론쇼 통제) 및 편의용품 배부, 안전관리 등",
+    "인원: 대학생 30명",
+    "기타: 식권(9천원권) 제공"
+   ],
+   "foundAt": "2026-10-21",
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
+  },
+  {
+   "title": "[10월1~30일]일상생활지도 및 학습지도(여성대학생 자원봉사자 모집)14:00-18:00",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3523686",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-10-23",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-21 ~ 2026-10-23"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-10-01 ~ 2026-10-30"
+    },
+    {
+     "label": "활동지역",
+     "text": "광진구2호점 우리동네키움센터(꿈정함)"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "꿈정함 우리동네키움센터",
+   "api": "vol1365",
+   "apiId": "3523686",
+   "id": "api-vol1365-3523686",
+   "detailsV": 5,
+   "eligibilityLines": [
+    "- 대상: 초등학교 1~6학년",
+    "- 14:00-18:00 / 일상생활지도, 학습지도, 자유놀이지도, 프로그램 보조 지도",
+    "*꼭 확인해주세요*"
+   ],
+   "noticeLines": [
+    "*봉사시간 및 활동내용*",
+    "여성 대학생 모집합니다.",
+    "대상: 초등학교 1~6학년",
+    "14:00-18:00 / 일상생활지도, 학습지도, 자유놀이지도, 프로그램 보조 지도",
+    "*꼭 확인해주세요*",
+    "외국인 선생님은 봉사활동이 어렵습니다"
+   ],
+   "foundAt": "2026-10-21",
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
+  },
+  {
+   "title": "[초록봉사단] 사랑의 연탄 나눔(고등학생, 대학생, 일반)",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3524278",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-10-23",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-09-21 ~ 2026-10-23"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-10-24 ~ 2026-10-24"
+    },
+    {
+     "label": "활동지역",
+     "text": "부산진구 초읍동"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "부산광역시 부산진구",
+   "api": "vol1365",
+   "apiId": "3524278",
+   "id": "api-vol1365-3524278",
+   "detailsV": 5,
+   "noticeLines": [
+    "초록봉사단에서 성인 자원봉사자를 모집합니다.",
+    "★★집결장소 확인 필수★★",
+    "활동내용 : 저소득가정 연탄 나눔 활동",
+    "활동일시 : 10/24(토) 9:00~15:00",
+    "★★★집결장소 : 기업은행 초읍지점★★★",
+    "활동장소 : 부산진구 초읍동"
+   ],
+   "foundAt": "2026-10-21",
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "구리시청년내일센터 - 2026 구리시청년내일센터 창업 아이디어 경진대회",
@@ -1325,8 +1327,8 @@
    "id": "api-youthContent-10841",
    "detailsV": 5,
    "foundAt": "2026-10-20",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "구리시청년내일센터 - 2026 청년교류 프로그램 <내 편, 우리 편 만나기>",
@@ -1344,8 +1346,8 @@
    "id": "api-youthContent-10840",
    "detailsV": 5,
    "foundAt": "2026-10-20",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "국무조정실 - 정부위원회 청년위원 통합공모 안내",
@@ -1367,8 +1369,8 @@
     "국무조정실"
    ],
    "foundAt": "2026-10-16",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "「2026 IFWY 은평 컨퍼런스」 참가자 모집 안내",
@@ -1385,8 +1387,8 @@
    "id": "api-youthContent-10827",
    "detailsV": 5,
    "foundAt": "2026-10-13",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "[KIDC/전액국비지원] KOICA 파라과이 프로젝트 봉사단(9기) 모집",
@@ -1404,8 +1406,8 @@
    "id": "api-youthContent-10811",
    "detailsV": 5,
    "foundAt": "2026-10-02",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "‘나의 광주 정착 키트’ 2기 참여자 모집",
@@ -1445,8 +1447,8 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-10-02",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "청년 생명사랑 서포터즈 운영",
@@ -1483,8 +1485,8 @@
     "https://www.usspc.or.kr/"
    ],
    "foundAt": "2026-10-04",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "(연수구) 청년 자격증 응시료 지원",
@@ -1530,8 +1532,8 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-10-02",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "2026년 평택시 청년창업도전 아카데미",
@@ -1565,8 +1567,8 @@
     "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000"
    ],
    "foundAt": "2026-10-02",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "청년 행정체험연수 운영",
@@ -1605,8 +1607,8 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-09-30",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "2026 서울형 청년인턴 직무캠프",
@@ -1642,8 +1644,8 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-10-20",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "2026 서울영커리언스 캠프",
@@ -1678,8 +1680,8 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-10-20",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "2026년 청년정책 종합상담 참여자 모집(기존 전라남도 22개 시·군 대상)",
@@ -1717,8 +1719,8 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-10-02",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "2026년 찬찬히 청년 사회생활(정서·심리)지원 캠퍼스 참여자 모집",
@@ -1759,8 +1761,8 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-10-02",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "k-뉴딜 아카데미",
@@ -1806,8 +1808,8 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-10-02",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "첨단산업 인재양성 부트캠프",
@@ -1851,8 +1853,8 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-10-02",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "창업어가 멘토링",
@@ -1890,8 +1892,8 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-10-02",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "청년정책 서포터즈",
@@ -1928,8 +1930,8 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-10-02",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "청년정책제안 아이디어 공모",
@@ -1979,8 +1981,8 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-10-02",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "청년 체인지메이커 아카데미 운영",
@@ -2013,8 +2015,8 @@
    ],
    "detailsV": 5,
    "foundAt": "2026-10-02",
-   "seenAt": "2026-10-20",
-   "excerptsAt": "2026-10-20"
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
   },
   {
    "title": "2026 D-Global 딥테크 스케일업 세미나 참가 기업 모집",
@@ -2219,56 +2221,6 @@
    ],
    "eligibilityFrom": "AI(공고 포스터 그림)",
    "eligibilityReviewed": false
-  },
-  {
-   "title": "[무료|150석 한정] 딥테크 창업가 컨퍼런스 d.day : founders summit 참가자 모집 10/29",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179527",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "다운로드",
-     "url": "https://www.k-startup.go.kr/afile/fileDownload/xT1Ln"
-    },
-    {
-     "name": "다운로드",
-     "url": "https://www.k-startup.go.kr/afile/fileDownload/yT1Ln"
-    },
-    {
-     "name": "다운로드",
-     "url": "https://www.k-startup.go.kr/afile/fileDownload/UT1Ln"
-    },
-    {
-     "name": "다운로드",
-     "url": "https://www.k-startup.go.kr/afile/fileDownload/RT1Ln"
-    }
-   ],
-   "deadlineHint": "접수기간 2026-10-15 ~ 2026-10-27 23:59 주관기관명 재단법인 은행권청년창업재단 대상 전체 창업업력 전체 연락처 02-203",
-   "deadline": "2026-10-27",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-15 ~ 2026-10-27 23:59"
-    },
-    {
-     "label": "대상",
-     "text": "본 행사 참석자 중 별도 선정 (확정자에게 10월 27일(화)까지 메일 안내)"
-    },
-    {
-     "label": "주최",
-     "text": "은행권청년창업재단 | 후원: 한국성장금융"
-    }
-   ],
-   "eligibilityLines": [
-    "대상연령 : 전체",
-    "신청대상 : 딥테크 비즈니스와 성장 전략에 관심 있는 누구나 신청할 수 있습니다.",
-    "본 행사 참석자 중 별도 선정 (확정자에게 10월 27일(화)까지 메일 안내)"
-   ],
-   "detailsV": 4,
-   "excerptsAt": "2026-10-16",
-   "school": "",
-   "campus": "",
-   "host": "창업진흥원 K-Startup",
-   "foundAt": "2026-10-15"
   },
   {
    "title": "[국무조정실] 2026 청년정책 공모전 요즘 청년에게 필요한 정책, 정답은 청년이 아니까",
@@ -2656,50 +2608,6 @@
    "foundAt": "2026-10-14"
   },
   {
-   "title": "TECH IP-UP: IP 창출캠프 참가팀 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179484",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "다운로드",
-     "url": "https://www.k-startup.go.kr/afile/fileDownload/s41Ln"
-    },
-    {
-     "name": "다운로드",
-     "url": "https://www.k-startup.go.kr/afile/fileDownload/7Y1Ln"
-    }
-   ],
-   "deadlineHint": null,
-   "deadline": "2026-10-28",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-12 ~ 2026-10-28 23:59"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026. 11. 6.(금) 13:00 ~ 11. 6.(토) 12:00 / 1박 2일"
-    }
-   ],
-   "eligibilityLines": [
-    "대상 : 대학생",
-    "창업업력",
-    "TECH IP-UP: IP 창출캠프 참가팀 모집",
-    "※(유의)해당 공고는 중소벤처기업부와 창업진흥원이 아닌 민간에서 지원하는 사업으로, 신청부터 관리까지 모든 과정을 해당기관에서 전담",
-    "2026년 10월 06일",
-    "단국대학교 기술지주회",
-    "대상연령 : 만 20세 이상 ~ 만 39세 이하",
-    "신청대상 : 기술기반 창업 아이디어를 보유하거나 IP 창출에 관심있는 대학(원)생 20팀 내외"
-   ],
-   "detailsV": 4,
-   "field": "교육·캠프",
-   "excerptsAt": "2026-10-16",
-   "school": "",
-   "campus": "",
-   "host": "창업진흥원 K-Startup",
-   "foundAt": "2026-10-14"
-  },
-  {
    "title": "2026 디캠프 배치 9기 모집 공고",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179094",
    "kind": "대외활동",
@@ -2907,55 +2815,6 @@
    "host": "인천유스톡톡 청년포털",
    "foundAt": "2026-10-13",
    "detailsTriedAt": "2026-10-16"
-  },
-  {
-   "title": "Applications Now Open: 2026 OASIS-6 Global Startup Challenge 「2026 외국인 창업대전(OASIS-6)」 참가자 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179459",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "다운로드",
-     "url": "https://www.k-startup.go.kr/afile/fileDownload/wK1Ln"
-    },
-    {
-     "name": "다운로드",
-     "url": "https://www.k-startup.go.kr/afile/fileDownload/qK1Ln"
-    },
-    {
-     "name": "다운로드",
-     "url": "https://www.k-startup.go.kr/afile/fileDownload/OK1Ln"
-    }
-   ],
-   "deadlineHint": "접수기간 2026-10-08 ~ 2026-10-27 16:00 주관기관명 한국능률협회컨설팅 대상 전체 창업업력 전체 연락처 02-2135-614",
-   "deadline": "2026-10-27",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-08 ~ 2026-10-27 16:00"
-    },
-    {
-     "label": "주최",
-     "text": "글로벌창업이민센터(한국능률협회컨설팅)"
-    }
-   ],
-   "eligibilityLines": [
-    "신청대상 : 기술창업을 희망하는 합법 체류 외국인 창업자 및 예비창업자",
-    "※ 팀으로 참가하는 경우 팀장은 외국인이어야 하며, 팀장 포함 5인 이내로 구성",
-    "대상연령 : 전체"
-   ],
-   "eligibilityExcludes": [
-    "ㅇ 동일 또는 유사한 아이템으로 기존 경진대회에 입상한 경우",
-    "ㅇ 타인의 특허·실용신안 등 지식재산권을 침해하거나 침해할 우려가 있는 아이템",
-    "ㅇ 2026년 타 운영기관의 외국인 창업대전(OASIS-6) 입상자",
-    "ㅇ 이미 사업화된 아이템",
-    "※ 세부 기준은 첨부 모집공고 참조"
-   ],
-   "detailsV": 4,
-   "excerptsAt": "2026-10-16",
-   "school": "",
-   "campus": "",
-   "host": "창업진흥원 K-Startup",
-   "foundAt": "2026-10-13"
   },
   {
    "title": "2026년 성균관대학교 서베이리서치센터 통계 워크숍 안내",
