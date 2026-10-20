@@ -1,7 +1,41 @@
 {
  "school": "부경대학교",
- "updatedAt": "2026-10-19",
+ "updatedAt": "2026-10-20",
  "items": [
+  {
+   "title": "[도서관] 조용민 대표(前 Google, SAMSUNG) 초청 강연 10.29.(목)",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726655",
+   "postedAt": "2026-10-20",
+   "kind": "행사",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-20",
+   "thumb": "data/news/img/33df3a31f69b5f9b.webp",
+   "desc": "Google과 SAMSUNG을 거친 글로벌 비즈니스 전문가 , 조용민 대표가 전하는 AI 관련 강연, 10.29.(목) 대학극장으로 방문해 주세요."
+  },
+  {
+   "title": "총 상금 7,000만원 '필전 2026-조선 백일장' 안내",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726652",
+   "postedAt": "2026-10-20",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-20",
+   "thumb": "data/news/img/7deec5ff7e4792ff.webp"
+  },
+  {
+   "title": "[부산경제진흥원] 제112회 부산미래경제포럼 추진 안내 및 홍보",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726651",
+   "postedAt": "2026-10-20",
+   "kind": "행사",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-20",
+   "thumb": "data/news/img/2aeaa87a7c2ba6e3.webp",
+   "desc": "※ 기존과 달리 오전 8시 35분에 시작되오니 참석 시 착오 없으시기 바랍니다."
+  },
   {
    "title": "★ 2026년 URP+ 신규 입주기업 모집 공고(~ 10.28. 11:00) ★",
    "url": "https://www.pknu.ac.kr/main/163?action=view&no=726640",
@@ -381,24 +415,6 @@
    "title": "[채용공고] 국립부경대학교 정보융합대학 미디어ICT공학전공 조교 채용 공고",
    "url": "https://www.pknu.ac.kr/main/163?action=view&no=726444",
    "postedAt": "2026-09-28",
-   "kind": "채용",
-   "school": "부경대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "★ 2026학년도 글로벌 언어집중강좌(GLIP) 세션3 등록자 안내사항",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726436",
-   "postedAt": "2026-09-23",
-   "school": "부경대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "desc": "[2026학년도 글로벌 언어집중강좌(GLIP) 세션3 등록자 안내사항] 프로그램 기간: 2026년 9월 28일(월) ~ 10월 16일(금)<3주> - 강좌별로 개강일이 다르니 반드시 [등록자 명단], [등록자…"
-  },
-  {
-   "title": "[채용공고] 국립부경대학교 앵커본부 계약직원(사무원) 채용 공고",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726426",
-   "postedAt": "2026-09-23",
    "kind": "채용",
    "school": "부경대학교",
    "campus": "",

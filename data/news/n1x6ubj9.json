@@ -1,7 +1,40 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-10-19",
+ "updatedAt": "2026-10-20",
  "items": [
+  {
+   "title": "자연과학캠퍼스 통학 셔틀버스 시범운행 안내 (10/19~12/18)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140492&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-20",
+   "kind": "생활",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-20",
+   "desc": "학생지원팀 자연과학캠퍼스 학생 및 교직원의 통학 편의를 높이고, 향후 통학 지원 정책 수립에 필요한 이용수요와 운영자료를 확보하기 위해 통학 셔틀버스를 다음과 같이 시범운행합니다."
+  },
+  {
+   "title": "에듀테크연구소 행정 직원 채용 공고",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140665&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-20",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-20",
+   "desc": "1. 채용분야 및 인원 가. 채용분야: 행정 나. 채용인원: 1명 2. 담당업무"
+  },
+  {
+   "title": "N센터_MRI_[한국한의학연구원] 뇌영상 데이터 수집을 위한 연구대상자 모집",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140666&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-20",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-20",
+   "desc": "안녕하세요. 한국한의학연구원에서 수행하고 있는 \"뇌영상 기반 글림프-신경조절 기전 조사\"연구의 연구 대상자를 모집합니다."
+  },
   {
    "title": "법학전문대학원 행정조교 모집 안내(~10.28.(수))",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140659&article.offset=0&articleLimit=10",
@@ -404,39 +437,6 @@
    "thumb": "data/news/img/13f36cc135018b60.webp",
    "desc": "2. 주제: AI in Action – 제도에서 현장까지 3. 일시: 2026년 10월 23일 (금) 오후 1:00 ~ 5:00",
    "src": "45ec8fd1"
-  },
-  {
-   "title": "스웨덴 왕립과학한림원 원장 특별 강연 안내 (10/30(금) 14:00)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140407&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-07",
-   "kind": "행사",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "thumb": "data/news/img/a1bd5e167b17bba1.webp",
-   "desc": "국제교류팀 성균관대학교는 한국과학기술한림원과 공동으로 스웨덴 왕립과학한림원(KVA) 스벤 리딘(Sven Lidin) 원장을 초청하여 특별 강연을 개최합니다.",
-   "src": "45ec8fd1"
-  },
-  {
-   "title": "[채용공고] 인공지능 플러스 K건설인프라 레질리언스 연구센터(ERC) 행정직원 모집(~10/13(화))",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140399&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-07",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "desc": "나. 담당업무: 각종 연구비 및 사업비 관련 행정업무 3. 근로조건 가. 계약기간: 1년 단위 계약(매년 근무평가에 따라 연장 여부 결정), 최초 임용 시 수습 3개월(급여 동일)",
-   "src": "45ec8fd1"
-  },
-  {
-   "title": "성균관대학교 사범대학 학부대학/사범대학행정실 행정조교 모집(~10/14까지)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140410&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-07",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "desc": "□ 모집인원: 2명 □ 근무지: 성균관대학교 호암관(서울시 종로구 소재)"
   }
  ]
 }

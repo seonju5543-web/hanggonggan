@@ -1,7 +1,27 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-10-19",
+ "updatedAt": "2026-10-20",
  "items": [
+  {
+   "title": "[학사안내] 최근 5년 이내 제적생 중 등록금 반환 대상자 안내",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70736",
+   "postedAt": "2026-10-20",
+   "kind": "학사",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-20"
+  },
+  {
+   "title": "[취업정보] [2025년 8월 및 2026년 2월 졸업생 대상] 2026년...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70735",
+   "postedAt": "2026-10-20",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-20",
+   "thumb": "data/news/img/7df3fad6c9dcd1fb.webp"
+  },
   {
    "title": "[학사안내] 2026학년도 동계 계절학기 타 대학교(동국대 서울캠퍼스) 교...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70732",
@@ -383,25 +403,6 @@
    "src": "b7347301",
    "foundAt": "2026-10-13",
    "thumb": "data/news/img/dab664bdfd1f8cfb.webp"
-  },
-  {
-   "title": "[취업정보] [케이터블유이코리아]수입영업부, 항공수입업무부, 해운수출업무부...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70661",
-   "postedAt": "2026-10-13",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-13"
-  },
-  {
-   "title": "[학사안내] 2026학년도 동계 계절학기 전남대학교 교류수학 안내",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70660",
-   "postedAt": "2026-10-13",
-   "kind": "학사",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-13"
   }
  ]
 }

@@ -1,7 +1,17 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-10-19",
+ "updatedAt": "2026-10-20",
  "items": [
+  {
+   "title": "[일반] 2027년 2월 말 퇴직교원 정부포상 및 장관표창 추천 대상자 공개검증",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53517&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-20",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-20",
+   "desc": "6. 기타 사항 가 . 제출된 의견은 공적심사 자료로만 활용됩니다 . 나 . 허위 및 비방 정보 접수 방지를 위하여 의견 제출자는 실명 , 연락처 및 의견에 대한 사실 관계와 관련 증빙 자료를 제출 하여야 합니다 ."
+  },
   {
    "title": "[학생] [광운대학교 산학협력단] 마케팅 현직자가 알려주는 AI시대 마케터의 직무 변화와 필요역량 교육",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53514&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -424,17 +434,6 @@
    "thumb": "data/news/img/1f7f6b71f9749c11.webp",
    "desc": "▶ 활동 목표 나만이 만들어 낼 수 있는 콘텐츠 기획/제작을 통한 핸드볼과 제작 콘텐츠 바이럴",
    "src": "b09cb042"
-  },
-  {
-   "title": "[외부] [교보교육재단] 2026 교육 심포지엄 참여 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53435&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-06",
-   "kind": "행사",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-06",
-   "thumb": "data/news/img/6ab29d307f54d38e.webp",
-   "desc": "가 . 행 사 명 : 2026 교육 심포지엄 「 ai 불안주의보 : 정답이 사라진 시대 , 미래세대 생존법 」 나 . 일 시 : 2026 년 10 월 23 일 금요일 14:00~17:30"
   }
  ]
 }

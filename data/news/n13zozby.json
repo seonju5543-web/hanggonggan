@@ -1,7 +1,18 @@
 {
  "school": "부산대학교",
- "updatedAt": "2026-10-19",
+ "updatedAt": "2026-10-20",
  "items": [
+  {
+   "title": "[에듀테크센터] 단과대학 계열별 맞춤 AI+X 교육 접수 기간 연장 및 대학원생...",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511654",
+   "postedAt": "2026-10-20",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-20",
+   "thumb": "data/news/img/1c479cfd52dd9943.webp",
+   "desc": "단과대학 계열별 AI+X 전공 실무 교육 교육기간 ※ 세션당 2 시간 진행"
+  },
   {
    "title": "[창업지원부] 하반기 창업지원 프로그램 전체 설명회 (마감 D-1 / 중식제공)",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511648",
@@ -76,7 +87,8 @@
    "campus": "",
    "src": "2d0d4013",
    "foundAt": "2026-10-19",
-   "desc": "한양대학교 박물관에서는 국립해양박물관과 함께 순회전시 연계 문화체험 프로그램 「사물의 길을 따라, 영도를 걷다」를 운영하오니 학생 분들의 많은 관심과 참여 바랍니다."
+   "desc": "한양대학교 박물관에서는 국립해양박물관과 함께 순회전시 연계 문화체험 프로그램 「사물의 길을 따라, 영도를 걷다」를 운영하오니 학생 분들의 많은 관심과 참여 바랍니다.",
+   "thumb": "data/news/img/e1a406c84a2953e9.webp"
   },
   {
    "title": "[박물관] 중간고사 후 1만원의 힐링 여행!!",
@@ -413,16 +425,6 @@
    "foundAt": "2026-10-08",
    "thumb": "data/news/img/e612f8007d083678.webp",
    "desc": "모집대상: 학부·석사·박사과정 재학생 및 휴학생, Post-Doc. 및 연구원",
-   "src": "2d0d4013"
-  },
-  {
-   "title": "2026학년도 4단계 BK21 대학원혁신 지원사업 [이공 우수인재 성장경로 지원...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511447",
-   "postedAt": "2026-10-08",
-   "school": "부산대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "desc": "[이공 우수인재 성장경로 지원 시범사업] 장학생 선정자 안내 본 사업에 많은 관심을 갖고 지원해 주신 모든 학부생 여러분들께 감사드립니다.",
    "src": "2d0d4013"
   }
  ]

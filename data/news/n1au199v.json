@@ -1,7 +1,40 @@
 {
  "school": "서울시립대학교",
- "updatedAt": "2026-10-19",
+ "updatedAt": "2026-10-20",
  "items": [
+  {
+   "title": "🖥[빅데이터/인공지능] UBAI 슈퍼컴퓨터 사용법 교육 프로그램 실시(도시과학빅데이터AI연구원)",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31681&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-10-20",
+   "postId": "31681",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-10-20",
+   "desc": "서울시립대학교 도시과학빅데이터 ∙AI 연구원에서 교내 연구자 분들을 대상으로 UBAI 슈퍼컴퓨터 활용 교육 프로그램 을 진행합니다 . 슈퍼컴퓨터 사용법이 익숙하지 않은 분들을 위해 , 기본 접속 방법 부터 서버에서…"
+  },
+  {
+   "title": "[인공지능혁신융합대학사업단] Microsoft 인공지능 국제인증자격증 교육과정(MS AI-901) 추가 교육생 모집(선착순)",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31680&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-10-20",
+   "postId": "31680",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-10-20",
+   "desc": "보다 많은 재학생들에게 교육 참여 기회를 제공하고자 마련된 특별 과정으로, AI 기초 역량을 쌓고 국제공인 자격 취득에 도전하려는 학생들의 많은 신청 바랍니다."
+  },
+  {
+   "title": "🎓 [일반대학원] 2026학년도【 대학원생 참여형 교육과정 개발 공모(2차)】안내 ~ ★",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31679&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-10-19",
+   "postId": "31679",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-10-20",
+   "desc": "1) 분야별 공모 설명 각 1부. 2) [공통] 개발 공모 신청서 1부."
+  },
   {
    "title": "💡 2026년도 제19회 UOS 연구 콜로키움 개최 안내(2026.10.22.(목) 11:00, 창의혁신관 SI 아레나)💡",
    "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31678&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
@@ -416,41 +449,6 @@
    "foundAt": "2026-10-07",
    "thumb": "data/news/img/c8550875152df42e.webp",
    "desc": "인재개발실 기업 : 크나우프 석고보드(주) 장소 : 21세기관 109-1호 강의실 내용 : 기업 채용 관련 안내 및 질의응답 #캠퍼스리크루팅 #크나우프석고보드(주)"
-  },
-  {
-   "title": "💡 2026년도 제17회 UOS 연구 콜로키움 개최 안내(2026.10.8.(목) 11:00, 창의혁신관 SI 아레나)",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31588&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-06",
-   "postId": "31588",
-   "kind": "행사",
-   "school": "서울시립대학교",
-   "campus": "",
-   "foundAt": "2026-10-06",
-   "thumb": "data/news/img/ccab2f8d7a2a86e5.webp",
-   "desc": "📌 발표주제 및 발표자 - 「 복 합 적인 조건을 고려하는 멀티모달 AI: 다양한 연구 사례와 확장 」 컴퓨터과학부 박관용 교수"
-  },
-  {
-   "title": "🎁[학부 2~4학년 재학생]🎁2026 UOS T-Star 학생미래핵심역량 진단 참여 안내(기한내 선착순)",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31409&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-06",
-   "postId": "31409",
-   "school": "서울시립대학교",
-   "campus": "",
-   "foundAt": "2026-10-06",
-   "thumb": "data/news/img/1f8456a3a06dfc63.webp",
-   "src": "80d7d3bc",
-   "desc": "우리 대학 역량 기반 교육 성과 측정 및 교육의 질 향상을 위해 『UOS T-Star 학생미래핵심역량 진단』을 실시하고자 합니다."
-  },
-  {
-   "title": "⭐️대학생을 위한 실전 AI 무료 강의! Gemini Academy 수강생 모집 중 (~10/18까지)⭐️",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31587&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-02",
-   "school": "서울시립대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "postId": "31587",
-   "thumb": "data/news/img/a1bf1a8e0082305f.webp",
-   "desc": "원클릭 자동화부터 실시간 대시보드 구축까지! 구글코리아와 고용노동부가 함께하는 청년 AI 역량 강화 프로그램, Gemini Academy 워크숍에서 여러분의 AI 역량을 레벨업하세요! 🚀"
   }
  ]
 }
