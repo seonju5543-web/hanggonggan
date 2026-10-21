@@ -3,6 +3,40 @@
  "updatedAt": "2026-10-21",
  "items": [
   {
+   "title": "2026학년도 겨울 계절수업 본교생 → 타 대학 학점교류 수강 안내(진행중)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140495&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-21",
+   "kind": "학사",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-21",
+   "desc": "2026학년도 겨울 계절수업 타 대학 학점교류를 희망하는 학생은 아래 안내에 따라 신청하시기 바랍니다. (게시일 기준으로 교류대학 누적 업데이트 됩니다.)"
+  },
+  {
+   "title": "2025년 소득에 대한 근로·자녀장려금 기한 후 신청 안내(~26.12.1.)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140706&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-21",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-21",
+   "thumb": "data/news/img/3677c86e70c878d3.webp",
+   "desc": "성균관대학교 장학담당 국세청에서는 2009년부터 열심히 일하지만 소득이 적어 생활이 어려운 근로자, 사업자 또는 종교인 가구에 대하여 근로·자녀장려금을 지급함으로써 근로 또는 사업을 장려하고 실질소득과 자녀양육을…"
+  },
+  {
+   "title": "[국립국악원] 2026 창작악단 정기공연 <전통의 재발견 Ⅶ> 행사 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140705&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-21",
+   "kind": "행사",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-21",
+   "thumb": "data/news/img/85674cc85a9dd2d7.webp",
+   "desc": "이번 공연은 가곡·가사·시조와 종묘제례악 악장, 낙양춘·보허자의 창사 등 전통 성악과 국악관현악을 함께 감상할 수 있는 무대로, 오는 10월 29일(목)부터 30일(금)까지 국립국악원 예악당에서 진행됩니다."
+  },
+  {
    "title": "성균인문아카데미 근로학생(아르바이트) 모집 안내 (11/3화, 1일)",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140697&article.offset=0&articleLimit=10",
    "postedAt": "2026-10-21",
@@ -405,38 +439,6 @@
    "src": "45ec8fd1",
    "foundAt": "2026-10-12",
    "thumb": "data/news/img/4c0bf87958634ca6.webp"
-  },
-  {
-   "title": "[인공지능혁신융합대학사업] 2026학년도 인공지능혁신융합대학사업 겨울 계절학기 학점교류 수강 안내 (상시 업데이트)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140482&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-12",
-   "kind": "학사",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-12",
-   "desc": "인공지능혁신공유대학사업단 인공지능혁신융합대학사업의 협력교와 학점교류를 희망하는 학생은 아래 안내에 따라 신청하시기 바랍니다."
-  },
-  {
-   "title": "[HUSS] 인문사회융합인재양성사업 융합트랙 및 마이크로디그리 신청 안내(2학기 1차)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140478&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-12",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-12",
-   "desc": "인문사회융합인재양성사업단 인문사회 융합인재양성사업(HUSS)의 융합트랙 및 마이크로디그리 신청과 관련하여 다음과 같이 안내하오니 많은 신청 바랍니다."
-  },
-  {
-   "title": "[성균관대학교 청정에너지ICT연구소] 이공계열 석사졸업이상 연구원 모집(1명)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140472&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-10",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-10",
-   "desc": "1. 담당 업무(1명) - 연구 및 과제수행 논문화 - ① 반도체 및 절연 Thin Film 관련 연구 (Gate oxide 및 TCO 포함)",
-   "src": "45ec8fd1"
   }
  ]
 }
