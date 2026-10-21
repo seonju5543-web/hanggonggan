@@ -1584,7 +1584,7 @@
    "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "auto-ent2431267751artclviewdo",
    "org": "한국외국어대학교",
    "name": "2026학년도 재직직원동문회 장학생 모집",
@@ -1593,7 +1593,9 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/auto-ent2431267751artclviewdo",
-   "at": "2026-09-28"
+   "at": "2026-09-28",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-21"
   },
   {
    "status": "expired",
@@ -2800,7 +2802,7 @@
    "expiredAt": "2026-10-17"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000158003",
    "org": "재단법인 하남교육재단",
    "name": "미래장학생",
@@ -2809,10 +2811,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2000158003",
-   "at": "2026-10-09"
+   "at": "2026-10-09",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-21"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000158004",
    "org": "재단법인 하남교육재단",
    "name": "행복장학생",
@@ -2821,10 +2825,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2000158004",
-   "at": "2026-10-09"
+   "at": "2026-10-09",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-21"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000158006",
    "org": "재단법인 하남교육재단",
    "name": "향토장학생",
@@ -2833,7 +2839,9 @@
    "tplNo": 4,
    "cards": 5,
    "dir": "insta/pub/2000158006",
-   "at": "2026-10-09"
+   "at": "2026-10-09",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-21"
   },
   {
    "status": "prepared",
@@ -2962,7 +2970,7 @@
    "expiredAt": "2026-10-19"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000158005",
    "org": "재단법인 하남교육재단",
    "name": "무지개장학생",
@@ -2971,7 +2979,9 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2000158005",
-   "at": "2026-10-09"
+   "at": "2026-10-09",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-21"
   },
   {
    "status": "prepared",
@@ -3072,7 +3082,7 @@
    "expiredAt": "2026-10-17"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000158002",
    "org": "재단법인 하남교육재단",
    "name": "희망장학생",
@@ -3081,7 +3091,9 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2000158002",
-   "at": "2026-10-09"
+   "at": "2026-10-09",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-21"
   },
   {
    "status": "prepared",
