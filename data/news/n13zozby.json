@@ -1,7 +1,18 @@
 {
  "school": "부산대학교",
- "updatedAt": "2026-10-20",
+ "updatedAt": "2026-10-21",
  "items": [
+  {
+   "title": "[효원상담원] 중간고사 이후, 지친 마음을 돌볼 수 있는 심리기술훈련 6차 안내",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511677",
+   "postedAt": "2026-10-21",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-21",
+   "desc": "6 차 주제 내 안의 긍정자원을 찾는 심리안정화 기술 익히기 6 차 일정 : 2026.10.30. ( 금 ) 10:30 &sim; 11:30 6 차 신청기한 : 2026.09.28.~ 2026.10.27. *…"
+  },
   {
    "title": "(일정 변경)[글로컬대학 30] 2026학년도 제5회 디지털인문학센터 컬로퀴엄...",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511672",
@@ -415,16 +426,6 @@
    "foundAt": "2026-10-13",
    "thumb": "data/news/img/89168d3112c3156e.webp",
    "desc": "대상자 : 양자정보과학에관심이있는학부생3~4학년 장 소 : kaist본원(※세부장소는변동될수있음) 접수방법 : 포스터qr코드및링크접속후참가신청작성및서류제출 ㅇ참가신청링크 :…"
-  },
-  {
-   "title": "[대한민국 국회] 「2026 국회 입법박람회」 개최 안내",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511495",
-   "postedAt": "2026-10-13",
-   "kind": "행사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-13"
   }
  ]
 }

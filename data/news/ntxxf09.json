@@ -1,7 +1,17 @@
 {
  "school": "경기대학교",
- "updatedAt": "2026-10-20",
+ "updatedAt": "2026-10-21",
  "items": [
+  {
+   "title": "[일반] [산업경영공학과] 2027년 2월 졸업 대상자 졸업논문 대체 자격증 제출 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626711&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-21",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-10-21",
+   "desc": "2027년 2월 졸업예정자는 졸업논문 대체 자격증을 제출기간 내 제출하여 주시기 바랍니다. 원활한 졸업 및 수강지도를 위해 이미 자격증을 취득하신 경우 미리 제출해 주시기 바랍니다."
+  },
   {
    "title": "[수강에서 성적까지] 2026 동계 계절학기 경인지역 학점교류 안내",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626704&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
@@ -412,16 +422,6 @@
    "campus": "",
    "foundAt": "2026-10-07",
    "desc": "2026학년도 2학기 박사학위 공개발표 신청 및 관련 서류 제출 안내드리오니 확인하시어 해당자는 기한 내 제출 부탁드립니다."
-  },
-  {
-   "title": "[대학생활/업무안내] 2026-2 ·내 길 찾기 프로젝트· 진로집단상 프로그램 (전공자율선택제)",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626455&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-07",
-   "school": "경기대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "thumb": "data/news/img/1019b72edce78894.webp",
-   "desc": "이미지 확대보기 * 본 프로그램은 대학혁신지원사업의 지원을 받아 진행되는 프로그램입니다. * 정원이 다 찰 경우, 대기인원으로 등록됩니다."
   }
  ]
 }

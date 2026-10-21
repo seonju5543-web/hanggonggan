@@ -1,7 +1,17 @@
 {
  "school": "충북대학교",
- "updatedAt": "2026-10-20",
+ "updatedAt": "2026-10-21",
  "items": [
+  {
+   "title": "2027학년도 전기 대학원(일반대학원) 입학원서 인터넷접수 안내",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170834&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-10-20",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-10-21",
+   "desc": "1. 모집 전형유형 가. 정원내전형 : 일반전형/ 학과간협동과정/ 학연산협동과정 나. 정원외전형 : 정부위탁생특별전형"
+  },
   {
    "title": "[세종앵커사업본부] 충북대학교와 함께하는 「세종 PET 페스티벌 」 개최 안내 (2026.10.24.(토))",
    "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170825&pageUnit=10&searchCnd=all&pageIndex=1",
@@ -415,16 +425,6 @@
    "campus": "",
    "foundAt": "2026-10-07",
    "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
-  },
-  {
-   "title": "2026. 2학기 생협 메가커피, 한빛식당 아르바이트 채용 안내",
-   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170530&pageUnit=10&searchCnd=all&pageIndex=1",
-   "postedAt": "2026-10-07",
-   "kind": "채용",
-   "school": "충북대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "desc": "1. 근무기간 : 채용 시 ~ 2026.12.18. 2. 모집직종 및 인원 : 4명 근무요일 메가커피 음료제조 및 판매 음료제조 및 판매 주말, 공휴일 쿱스켓 4호점 검수, 진열, 청소 주말, 공휴일 한빛식당…"
   }
  ]
 }

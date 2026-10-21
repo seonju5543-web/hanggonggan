@@ -1,7 +1,18 @@
 {
  "school": "인하대학교",
- "updatedAt": "2026-10-20",
+ "updatedAt": "2026-10-21",
  "items": [
+  {
+   "title": "[디지털혁신전략센터] 강화 리빙랩 현장 운영 지원 학생연구원 모집 (회차당 100,000원)",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45861/artclView.do",
+   "postedAt": "2026-10-21",
+   "kind": "채용",
+   "school": "인하대학교",
+   "campus": "",
+   "src": "f4141706",
+   "foundAt": "2026-10-21",
+   "desc": "인하대학교 디지털혁신전략센터에서는 디지털 기술을 활용하여 지역사회 문제를 해결하는 다양한 리빙랩 프로젝트를 운영하고 있습니다."
+  },
   {
    "title": "2북관 엘리베이터 고장 점검으로 인한 운행 제한 안내 (2026.10.20.(화)~수리 완료 시)",
    "url": "https://www.inha.ac.kr/bbs/kr/8/45860/artclView.do",
@@ -403,18 +414,6 @@
    "school": "인하대학교",
    "campus": "",
    "foundAt": "2026-10-02"
-  },
-  {
-   "title": "[IPP] 2027년도 상반기 일학습병행 학생 모집 기업 초청 설명회 사전 신청 안내",
-   "url": "https://www.inha.ac.kr/bbs/kr/8/45649/artclView.do",
-   "postedAt": "2026-09-29",
-   "kind": "행사",
-   "school": "인하대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/0c7e8a2edc3cad7f.webp",
-   "src": "f4141706",
-   "desc": "IPP듀얼공동훈련센터에서는 2027년도 상반기 일학습병행 참여를 희망하는 학생들을 대상으로 기업 초청 설명회를 개최합니다."
   }
  ]
 }

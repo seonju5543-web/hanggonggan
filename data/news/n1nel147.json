@@ -1,7 +1,16 @@
 {
  "school": "계명대학교",
- "updatedAt": "2026-10-20",
+ "updatedAt": "2026-10-21",
  "items": [
+  {
+   "title": "[인권센터] 영화로 보는 폭력예방교육 모집",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271472&pageOrder=0&cmd=2&parm_bod_uid=271472&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-10-21",
+   "school": "계명대학교",
+   "campus": "",
+   "src": "9a241a98",
+   "foundAt": "2026-10-21"
+  },
   {
    "title": "[학생성공센터] 2026학년도 2학기 학생성공 전공설계 챌린지북 참여 이벤트 안내",
    "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271466&pageOrder=0&cmd=2&parm_bod_uid=271462&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
@@ -351,14 +360,6 @@
    "title": "[학생성공센터] 휴먼-AI 협업 실습 프로그램 학생 모집",
    "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271201&pageOrder=0&cmd=2&parm_bod_uid=270737&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
    "postedAt": "2026-09-17",
-   "school": "계명대학교",
-   "campus": "",
-   "foundAt": "2026-10-06"
-  },
-  {
-   "title": "[학생상담센터] 2026년 2학기 통합스트레스 검사 실시 안내(추첨 기프티콘 지급/COM K1점)",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271201&pageOrder=0&cmd=2&parm_bod_uid=270448&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
-   "postedAt": "2026-09-08",
    "school": "계명대학교",
    "campus": "",
    "foundAt": "2026-10-06"

@@ -1,7 +1,37 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-10-20",
+ "updatedAt": "2026-10-21",
  "items": [
+  {
+   "title": "[학사안내] 2026학년도 동계 계절학기 타 대학교(강원대) 교류수학 추천...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70758",
+   "postedAt": "2026-10-21",
+   "kind": "학사",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-21"
+  },
+  {
+   "title": "[모집공고] [시립서울청소년센터] 2026년 찾아가는 서울시 특수학급 예능...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70757",
+   "postedAt": "2026-10-21",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-21",
+   "thumb": "data/news/img/cc5d25a7de5593d4.webp"
+  },
+  {
+   "title": "[채용공고] 2026년 제3회 전남대학교 국립대학육성사업(거점국립대) 전문...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70756",
+   "postedAt": "2026-10-20",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-21"
+  },
   {
    "title": "[취업정보] [모두투어네트워크]채용연계인턴(영업/상품/지원)★학교 추천채용...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70755",
@@ -71,7 +101,8 @@
    "school": "전남대학교",
    "campus": "",
    "src": "b7347301",
-   "foundAt": "2026-10-20"
+   "foundAt": "2026-10-20",
+   "thumb": "data/news/img/e1f6d2e8374a4e50.webp"
   },
   {
    "title": "[학사안내] 2026학년도 동계 특별학기 운영 계획 안내",
@@ -81,7 +112,8 @@
    "school": "전남대학교",
    "campus": "",
    "src": "b7347301",
-   "foundAt": "2026-10-20"
+   "foundAt": "2026-10-20",
+   "thumb": "data/news/img/0a1c880acb8c8d43.webp"
   },
   {
    "title": "[취업정보] [메리츠증권] 2026년 대졸 신입사원 공개채용 (~10.30...",
@@ -373,35 +405,6 @@
    "src": "b7347301",
    "foundAt": "2026-10-15",
    "thumb": "data/news/img/8454247ae084cefe.webp"
-  },
-  {
-   "title": "[취업정보] 2026년 글로컬대학사업 「제조 도메인 연계 산업 AI 실무 ...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70678",
-   "postedAt": "2026-10-15",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-15",
-   "thumb": "data/news/img/c29cc52c5150746c.webp"
-  },
-  {
-   "title": "[채용공고] 2026년도 제1회 전남대학교 거점국립대 패키지 지원대학 사업...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70677",
-   "postedAt": "2026-10-14",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-15"
-  },
-  {
-   "title": "[취업정보] [전남도시가스]2026 하반기 대졸 신입사원(G3) 모집(~1...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70676",
-   "postedAt": "2026-10-14",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-15"
   }
  ]
 }

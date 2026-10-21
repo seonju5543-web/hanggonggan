@@ -1,7 +1,18 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-10-20",
+ "updatedAt": "2026-10-21",
  "items": [
+  {
+   "title": "성균인문아카데미 근로학생(아르바이트) 모집 안내 (11/3화, 1일)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140697&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-21",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-21",
+   "desc": "성균인문아카데미 성균인문아카데미(인사캠, 600주년기념관)에서 함께 일할 근로학생(아르바이트)을 모집합니다."
+  },
   {
    "title": "2026 하반기 교직원(정규직) 신규채용 필기전형 결과 및 1차 면접전형 안내",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140689&article.offset=0&articleLimit=10",
@@ -425,17 +436,6 @@
    "campus": "",
    "foundAt": "2026-10-10",
    "desc": "1. 담당 업무(1명) - 연구 및 과제수행 논문화 - ① 반도체 및 절연 Thin Film 관련 연구 (Gate oxide 및 TCO 포함)",
-   "src": "45ec8fd1"
-  },
-  {
-   "title": "성균관대학교 문화예술미디어융합원 촉탁직원(연구원) 채용 공고",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140466&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-08",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "desc": "총괄지원팀 문화예술미디어융합원 촉탁직원(연구원)을 아래와 같이 채용하고자 하오니 많은 지원 바랍니다.",
    "src": "45ec8fd1"
   }
  ]

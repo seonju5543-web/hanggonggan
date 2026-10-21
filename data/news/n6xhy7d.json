@@ -1,7 +1,29 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-10-20",
+ "updatedAt": "2026-10-21",
  "items": [
+  {
+   "title": "[일반] 2026학년도 2학기 교육혁신원 교수학습센터 초빙교수 초빙 공고(~ 10/28. 09:00)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53525&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-21",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-21"
+  },
+  {
+   "title": "[일반] 광운 AI·로봇 미래교육 비전 선포식 행사 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53524&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-21",
+   "kind": "행사",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-21",
+   "thumb": "data/news/img/49a0ef77156aa6c5.webp",
+   "desc": "미래세대와 함께 AI·로봇 시대의 새로운 가능성을 열어가는 뜻깊은 자리에 초대합니다."
+  },
   {
    "title": "[일반] [지능형로봇혁신융합대학사업단] 2026 CO-SHOW 참관 신청",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53521&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -412,26 +434,6 @@
    "foundAt": "2026-10-07",
    "thumb": "data/news/img/0b7cec3f201333c5.webp",
    "desc": "나 . 공모주제 : 과학기술을 활용하여 해결이 필요한 지역 현안 다 . 응모자격 : 지역 문제 해결에 관심 있는 국민 누구나",
-   "src": "b09cb042"
-  },
-  {
-   "title": "[일반] [프로그램 안내] 단 한 사람을 위한 직무설정 프롬프트 (~10/15)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53439&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-07",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "thumb": "data/news/img/cba37ed567fa16e0.webp"
-  },
-  {
-   "title": "[시설] 한울관 및 아이스링크 주차장 입구 출입 금지 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53438&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-07",
-   "kind": "생활",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "thumb": "data/news/img/0d3eadc45a820472.webp",
    "src": "b09cb042"
   }
  ]

@@ -1,7 +1,27 @@
 {
  "school": "홍익대학교",
- "updatedAt": "2026-10-20",
+ "updatedAt": "2026-10-21",
  "items": [
+  {
+   "title": "2026학년도 동계계절학기 학점교류 신청 안내 (동국대학교)",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159414&noCat=500",
+   "postedAt": "2026-10-21",
+   "kind": "학사",
+   "school": "홍익대학교",
+   "campus": "",
+   "src": "9c41077f",
+   "foundAt": "2026-10-21"
+  },
+  {
+   "title": "[대학교육혁신사업단] 공동기기센터(세종) 장비 운용 보조인력 모집 공고",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159330&noCat=32",
+   "postedAt": "2026-10-19",
+   "school": "홍익대학교",
+   "campus": "",
+   "src": "9c41077f",
+   "foundAt": "2026-10-21",
+   "desc": "세종캠퍼스 공동기기센터(세종) 공동기기센터(세종)에서는 2026학년도 대학혁신지원사업의 일환으로 운영 중인 센터의 장비를 전문적으로 관리하고 운영할 보조인력을 모집합니다."
+  },
   {
    "title": "[거창군] 2026년 2학기 거창군 지역출신 대학생 등록금 지원사업 신청 안내",
    "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159309&noCat=501",
