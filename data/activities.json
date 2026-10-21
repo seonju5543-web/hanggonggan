@@ -1312,6 +1312,41 @@
    "excerptsAt": "2026-10-21"
   },
   {
+   "title": "한국어촌어항공단 - 2026 청년 어촌 창업 아이디어 공모전",
+   "url": "https://www.youthcenter.go.kr/bbs03View/48/10845",
+   "kind": "공모전",
+   "field": "기획·아이디어",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026년 11월 8일(일) 23:59까지 이메일 제출(co-vill@naver.com)"
+    },
+    {
+     "label": "대상",
+     "text": "어촌 창업을 희망하는 만 19세 이상 39세 이하 청년"
+    },
+    {
+     "label": "주최",
+     "text": "한국어촌어항공단"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "온통청년 대외활동",
+   "api": "youthContent",
+   "apiId": "10845",
+   "id": "api-youthContent-10845",
+   "eligibilityLines": [
+    "ㅇ 참가대상: 어촌 창업을 희망하는 만 19세 이상 39세 이하 청년"
+   ],
+   "detailsV": 5,
+   "foundAt": "2026-10-21",
+   "seenAt": "2026-10-21",
+   "excerptsAt": "2026-10-21"
+  },
+  {
    "title": "구리시청년내일센터 - 2026 구리시청년내일센터 창업 아이디어 경진대회",
    "url": "https://www.youthcenter.go.kr/bbs03View/48/10841",
    "kind": "공모전",
@@ -1387,25 +1422,6 @@
    "id": "api-youthContent-10827",
    "detailsV": 5,
    "foundAt": "2026-10-13",
-   "seenAt": "2026-10-21",
-   "excerptsAt": "2026-10-21"
-  },
-  {
-   "title": "[KIDC/전액국비지원] KOICA 파라과이 프로젝트 봉사단(9기) 모집",
-   "url": "https://www.youthcenter.go.kr/bbs03View/48/10811",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadlineHint": null,
-   "excerpts": [],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "온통청년 대외활동",
-   "api": "youthContent",
-   "apiId": "10811",
-   "id": "api-youthContent-10811",
-   "detailsV": 5,
-   "foundAt": "2026-10-02",
    "seenAt": "2026-10-21",
    "excerptsAt": "2026-10-21"
   },
