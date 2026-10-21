@@ -1,6 +1,6 @@
 {
  "v": 1,
- "updatedAt": "2026-10-20",
+ "updatedAt": "2026-10-21",
  "hosts": {
   "jntle.kr": {
    "checkedAt": "2026-10-20",
@@ -336,7 +336,7 @@
    "why": "게시판도 글도 못 찾음"
   },
   "tyrce.or.kr": {
-   "checkedAt": "2026-10-18",
+   "checkedAt": "2026-10-21",
    "why": "홈페이지 못 엶 (응답 403 → 브라우저도 실패(응답 403))",
    "targets": 1
   },
@@ -346,7 +346,7 @@
    "targets": 1
   },
   "usc.go.kr": {
-   "checkedAt": "2026-10-18",
+   "checkedAt": "2026-10-21",
    "pages": 8,
    "found": 0,
    "lines": 1,
@@ -354,12 +354,12 @@
    "why": "글은 못 고르고 게시판만"
   },
   "uwinjae.or.kr": {
-   "checkedAt": "2026-10-18",
+   "checkedAt": "2026-10-21",
    "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT → 브라우저도 실패(page.goto: Timeout 20000ms exceede)",
    "targets": 1
   },
   "wonju.go.kr": {
-   "checkedAt": "2026-10-18",
+   "checkedAt": "2026-10-21",
    "pages": 9,
    "found": 0,
    "lines": 1,
@@ -383,7 +383,7 @@
    "why": "게시판도 글도 못 찾음"
   },
   "ycsf.or.kr": {
-   "checkedAt": "2026-10-18",
+   "checkedAt": "2026-10-21",
    "pages": 4,
    "found": 0,
    "lines": 1,
@@ -391,7 +391,7 @@
    "why": "글은 못 고르고 게시판만"
   },
   "yeongju.go.kr": {
-   "checkedAt": "2026-10-18",
+   "checkedAt": "2026-10-21",
    "pages": 9,
    "found": 0,
    "lines": 1,
@@ -399,7 +399,7 @@
    "why": "글은 못 고르고 게시판만"
   },
   "yw.go.kr": {
-   "checkedAt": "2026-10-18",
+   "checkedAt": "2026-10-21",
    "pages": 9,
    "found": 0,
    "lines": 1,
