@@ -1,7 +1,36 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-10-21",
+ "updatedAt": "2026-10-22",
  "items": [
+  {
+   "title": "[학사안내] 2026학년도 동계 계절학기 타 대학교(부산대) 교류수학 추천...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70773",
+   "postedAt": "2026-10-22",
+   "kind": "학사",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-22"
+  },
+  {
+   "title": "[취업정보] 2026 거점형 특화프로그램 BUILD WITH AI 자격취...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70772",
+   "postedAt": "2026-10-22",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-22",
+   "thumb": "data/news/img/af56ee537559a186.webp"
+  },
+  {
+   "title": "[직원표창공개] 2027년도 2월말 퇴직교원 정부포상 및 장관표창 대상자 공개검증",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70771",
+   "postedAt": "2026-10-21",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-22"
+  },
   {
    "title": "[취업정보] [현대백화점]2026년 하반기 지방권역 캠퍼스 리쿠르팅 채용설명회",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70769",
@@ -71,7 +100,8 @@
    "school": "전남대학교",
    "campus": "",
    "src": "b7347301",
-   "foundAt": "2026-10-21"
+   "foundAt": "2026-10-21",
+   "thumb": "data/news/img/0417aaca2692dca3.webp"
   },
   {
    "title": "[학사안내] 2026학년도 동계 계절학기 타 대학교(제주대) 교류수학 추천...",
@@ -368,37 +398,6 @@
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70700",
    "postedAt": "2026-10-16",
    "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-16"
-  },
-  {
-   "title": "[채용공고] 2026년 제3회 전남대학교 첨단산업 인재양성 부트캠프 사업(...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70699",
-   "postedAt": "2026-10-16",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-16"
-  },
-  {
-   "title": "[채용공고] 2026년도 제1회 전남대학교 교육혁신본부 계약직원 채용시험 ...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70697",
-   "postedAt": "2026-10-16",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-16",
-   "thumb": "data/news/img/072964e5e59f50ca.webp"
-  },
-  {
-   "title": "[학사안내] 2026학년도 동계 계절학기 타 대학교(순천대) 교류수학 추천...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70696",
-   "postedAt": "2026-10-16",
-   "kind": "학사",
    "school": "전남대학교",
    "campus": "",
    "src": "b7347301",

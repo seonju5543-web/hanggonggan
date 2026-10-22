@@ -1,7 +1,26 @@
 {
  "school": "인하대학교",
- "updatedAt": "2026-10-21",
+ "updatedAt": "2026-10-22",
  "items": [
+  {
+   "title": "[모집마감임박/창업지원단] 총 상금 ★10억원★의 주인공을 찾습니다.(~10.27.(화) 14시까지)",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45897/artclView.do",
+   "postedAt": "2026-10-22",
+   "school": "인하대학교",
+   "campus": "",
+   "src": "f4141706",
+   "foundAt": "2026-10-22"
+  },
+  {
+   "title": "[BK21대학원혁신] 2026학년도 연구보안 교육 신청 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45896/artclView.do",
+   "postedAt": "2026-10-22",
+   "school": "인하대학교",
+   "campus": "",
+   "src": "f4141706",
+   "foundAt": "2026-10-22",
+   "desc": "한국산업기술보호협회와 함께 2026학년도 연구보안 교육을 아래와 같이 진행하오니 많은 참여 부탁드립니다."
+  },
   {
    "title": "김현태인하드림센터, 6호관 승강기 승강로 청소로 인한 운행 임시 중지 안내(2026.10.23.(금))",
    "url": "https://www.inha.ac.kr/bbs/kr/8/45894/artclView.do",
@@ -396,27 +415,6 @@
    "foundAt": "2026-10-08",
    "thumb": "data/news/img/c216d18f3f58608a.webp",
    "desc": "교수학습개발센터에서는 강의 개선 및 교수자와 학습자간의 상호작용 확대를 목적으로 「학기 중 강의진단」을 다음과 같이 실시하고자 합니다. 학생들의 많은 참여 바랍니다.",
-   "src": "f4141706"
-  },
-  {
-   "title": "[정석학술정보관] 2026 Book나눔 도서기증캠페인 안내",
-   "url": "https://www.inha.ac.kr/bbs/kr/8/45736/artclView.do",
-   "postedAt": "2026-10-07",
-   "school": "인하대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "thumb": "data/news/img/ecd97f69d5b0ad8e.webp",
-   "desc": "정석학술정보관에서는 기증받은 도서로 장서를 확충하고, 복본 도서는 교내 구성원들과 나누기 위한 ‘Book나눔 도서기증캠페인’을 진행합니다.",
-   "src": "f4141706"
-  },
-  {
-   "title": "[박물관] 2026년 인하대학교박물관-한국역사연구회 공동 학술회의 개최 안내",
-   "url": "https://www.inha.ac.kr/bbs/kr/8/45728/artclView.do",
-   "postedAt": "2026-10-06",
-   "kind": "행사",
-   "school": "인하대학교",
-   "campus": "",
-   "foundAt": "2026-10-06",
    "src": "f4141706"
   }
  ]

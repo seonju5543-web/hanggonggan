@@ -1,7 +1,18 @@
 {
  "school": "충북대학교",
- "updatedAt": "2026-10-21",
+ "updatedAt": "2026-10-22",
  "items": [
+  {
+   "title": "2026학년도 동기 계절수업 다른 대학교 수학 안내(부산대)",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170858&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-10-21",
+   "kind": "학사",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-10-22",
+   "desc": "국내 대학간 학술교류 협정에 따라 2026학년도 동기 계절수업 부산대 학점 교류 수학에 대하여 다음과 같이 안내하오니 수학을 희망하는 학생들은 기한 내 신청하여 주시기 바랍니다."
+  },
   {
    "title": "충북대학교 한시임기제 공무원(공업) 경력경쟁채용 공고",
    "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170850&pageUnit=10&searchCnd=all&pageIndex=1",
@@ -419,16 +430,6 @@
    "foundAt": "2026-10-08",
    "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공",
    "src": "76d254e7"
-  },
-  {
-   "title": "충북대학교 학생생활관 계약직(사무원-휴직대체인력) 채용 공고",
-   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170547&pageUnit=10&searchCnd=all&pageIndex=1",
-   "postedAt": "2026-10-08",
-   "kind": "채용",
-   "school": "충북대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
   }
  ]
 }

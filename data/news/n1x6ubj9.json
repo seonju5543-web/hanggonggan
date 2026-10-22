@@ -1,7 +1,39 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-10-21",
+ "updatedAt": "2026-10-22",
  "items": [
+  {
+   "title": "[대학원팀] 4단계 BK21 대학원혁신지원사업 사업추진관리 자체직원 채용 공고",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140715&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-22",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-22",
+   "desc": "- 4단계 BK21 대학원혁신사업 사업성과관리 및 지출 관련 처리 - 기타 국고사업 추진 관련 행정 지원"
+  },
+  {
+   "title": "2027년 2월말 퇴직교원(대학) 정부포상 추천자 공개검증",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140714&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-22",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-22",
+   "desc": "○ 공개기간 : 2026.10.22.(목)~10.26.(월), 5일간 ○ 의견제출 : nohyun95@skku.edu(교원인사팀 노현석 선임)"
+  },
+  {
+   "title": "의과대학 학부생 대상 의료AI 입문·실습교육 안내(~10/25까지 신청)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140711&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-21",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-22",
+   "thumb": "data/news/img/c9f9989e114cbbdb.webp",
+   "desc": "의료인공지능융합인재양성사업단 안녕하세요. 성균관대학교 의료인공지능융합인재양성사업단에서 '의료 인공지능 특화 융합인재 양성 사업'에 참여하는 의과대학 학부생을 대상으로 의료AI 입문·실습 교육을 실시하오니 관심있는…"
+  },
   {
    "title": "2026학년도 겨울 계절수업 본교생 → 타 대학 학점교류 수강 안내(진행중)",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140495&article.offset=0&articleLimit=10",
@@ -407,38 +439,6 @@
    "src": "45ec8fd1",
    "foundAt": "2026-10-12",
    "desc": "2. 근무지: 성균관대학교 자연과학캠퍼스 3. 담당업무: BK21+ 사업 및 소프트웨어학과 대학원 제반 업무"
-  },
-  {
-   "title": "2026학년도 국제동계학기(WISE) 본교생 수강신청 사전 안내",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140504&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-12",
-   "kind": "학사",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-12",
-   "desc": "국제교류팀 안녕하세요, 성균관대학교 학우 여러분. 해외 학생들과 함께 수업을 들으며 글로벌 역량을 키우고 계절학기 학점도 취득할 수 있는 2026학년도 국제동계학기 WISE 프로그램에 많은 관심과 참여 바랍니다."
-  },
-  {
-   "title": "2026학년도 2학기 마이크로디그리(학사, 대학원) 이수·포기 신청(1차) 안내",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140359&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-12",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-12",
-   "desc": "1. 마이크로디그리란, • 특정 주제/분야를 중심으로 여러 학문단위가 연계하여 제시하는 과목군에서 최소단위(micro) 학점 이수를 인증하는 소규모 모듈형 교육과정"
-  },
-  {
-   "title": "2026 국회 입법박람회 개최 안내",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140484&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-12",
-   "kind": "행사",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-12",
-   "thumb": "data/news/img/4c0bf87958634ca6.webp"
   }
  ]
 }

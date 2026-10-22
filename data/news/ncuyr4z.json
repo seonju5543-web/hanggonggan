@@ -1,7 +1,17 @@
 {
  "school": "전북대학교",
- "updatedAt": "2026-10-21",
+ "updatedAt": "2026-10-22",
  "items": [
+  {
+   "title": "2026학년도 2학기 성인지 교육 계획 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/218698/detailView.do",
+   "postedAt": "2026-10-22",
+   "postId": "218698",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-10-22"
+  },
   {
    "title": "[부산대학교] 2026학년도 동기 계절수업 교류수학 안내",
    "url": "https://www.jbnu.ac.kr/web/Board/218687/detailView.do",
@@ -46,7 +56,8 @@
    "school": "전북대학교",
    "campus": "",
    "src": "e41d3fac",
-   "foundAt": "2026-10-21"
+   "foundAt": "2026-10-21",
+   "desc": "로딩이 오래걸리면 미리보기를 다시 눌러주세요."
   },
   {
    "title": "[제주대학교] 2026학년도 동기 계절수업 교류수학 안내",
@@ -455,18 +466,6 @@
    "foundAt": "2026-10-13",
    "thumb": "data/news/img/d7294e2d789b5d9b.webp",
    "desc": "사무국 총무과 1. 귀 대학의 무궁한 발전을 기원합니다 . 2. 전북특별자치도경제통상진흥원 , 전북창조경제혁신센터 , ( 주 ) 크립톤에서는 유망 소상공인을 발굴하여 기업가형 소상공인으로 육성하는 「 로컬기업…"
-  },
-  {
-   "title": "2026학년도 2학기 중간 강의평가 실시 안내",
-   "url": "https://www.jbnu.ac.kr/web/Board/218296/detailView.do",
-   "postedAt": "2026-10-12",
-   "postId": "218296",
-   "kind": "학사",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-10-12",
-   "desc": "교무처 학사지원과 2026학년도 2학기 중간 강의평가를 다음과 같이 실시하오니 많은 참여 바랍니다."
   }
  ]
 }
