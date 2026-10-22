@@ -177,44 +177,40 @@
   "from": "브라우저 본문"
  },
  "https://www.youthcenter.go.kr/bbs03View/48/10827": {
-  "at": "2026-10-15",
-  "tries": 1
- },
- "https://jejuyouthdream.com/policy/detail/70": {
-  "at": "2026-10-15",
-  "tries": 1
+  "at": "2026-10-22",
+  "tries": 2
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53490&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-15",
   "tries": 1
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/269119/artclView.do": {
-  "at": "2026-10-15",
-  "tries": 1
+  "at": "2026-10-22",
+  "tries": 2
  },
  "https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=525&bcd=notice": {
-  "at": "2026-10-15",
-  "tries": 1
+  "at": "2026-10-22",
+  "tries": 2
  },
  "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140536&article.offset=0&articleLimit=10": {
-  "at": "2026-10-15",
-  "tries": 1
+  "at": "2026-10-22",
+  "tries": 2
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/268996/artclView.do": {
   "at": "2026-10-15",
   "tries": 1
  },
  "https://www.k-startup.go.kr/web/contents/webNOTICE_MATR.do?page=1&viewCount=18&id=176455&schBdcode=&schGroupCode=&schM=view": {
-  "at": "2026-10-15",
-  "tries": 1
+  "at": "2026-10-22",
+  "tries": 2
  },
  "https://www.culture.go.kr/portal/cltBnf/cltSup/view.do?viewTp=2&rcrtSn=234939&menuNo=200104&sSort=2&pageIndex=1": {
   "at": "2026-10-15",
   "tries": 1
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/268735/artclView.do": {
-  "at": "2026-10-15",
-  "tries": 1
+  "at": "2026-10-22",
+  "tries": 2
  },
  "https://youth.gyeongnam.go.kr/youth/board.es?mid=a10501020000&bid=0006&list_no=6911&act=view": {
   "at": "2026-10-15",
@@ -230,20 +226,20 @@
   "tries": 1
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53445&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-10-15",
-  "tries": 1
+  "at": "2026-10-22",
+  "tries": 2
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=48133&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-10-15",
-  "tries": 1
+  "at": "2026-10-22",
+  "tries": 2
  },
  "https://youth.gyeongnam.go.kr/youth/board.es?mid=a10501020000&bid=0006&list_no=6907&act=view": {
-  "at": "2026-10-15",
-  "tries": 1
+  "at": "2026-10-22",
+  "tries": 2
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/268492/artclView.do": {
-  "at": "2026-10-15",
-  "tries": 1
+  "at": "2026-10-22",
+  "tries": 2
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53429&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-15",
@@ -255,8 +251,8 @@
   "from": "공고문 첨부(OCR)"
  },
  "https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=519&bcd=notice": {
-  "at": "2026-10-15",
-  "tries": 1
+  "at": "2026-10-22",
+  "tries": 2
  },
  "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000": {
   "at": "2026-10-16",
