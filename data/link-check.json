@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-21T15:01:12.982Z",
+ "updatedAt": "2026-10-22T13:59:14.594Z",
  "v": 1,
  "bad": {
   "https://2026grchallenge.com/": {
@@ -40,10 +40,6 @@
   },
   "https://www.jinjae.kr/main/?gc=877EUFQ": {
    "v": "login",
-   "at": "2026-10-21"
-  },
-  "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11495&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0": {
-   "v": "other",
    "at": "2026-10-21"
   },
   "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271444&pageOrder=0&cmd=2&parm_bod_uid=271443&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&": {
