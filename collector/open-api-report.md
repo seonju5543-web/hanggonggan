@@ -1,4 +1,4 @@
-## 🛰 공공 API 로봇 리포트 (2026-10-22)
+## 🛰 공공 API 로봇 리포트 (2026-10-23)
 
 - ❌ **K-Startup 사업공고** — 요청 실패: fetch failed (UND_ERR_CONNECT_TIMEOUT Connect Timeout Error (attempted address: apis.data.go.kr:443, timeout: 10000ms)) · 지난 글 그대로 둠
 - ❌ **1365 봉사참여정보** — 요청 실패: fetch failed (UND_ERR_CONNECT_TIMEOUT Connect Timeout Error (attempted address: apis.data.go.kr:443, timeout: 10000ms)) · 지난 글 그대로 둠
