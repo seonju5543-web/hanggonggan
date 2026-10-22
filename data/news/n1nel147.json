@@ -3,6 +3,42 @@
  "updatedAt": "2026-10-22",
  "items": [
   {
+   "title": "2026학년도 AI 위크 안내",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=0&pageOrder=0&cmd=2&parm_bod_uid=271517&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-10-22",
+   "school": "계명대학교",
+   "campus": "",
+   "src": "9a241a98",
+   "foundAt": "2026-10-22"
+  },
+  {
+   "title": "[교수학습개발센터] 2026학년도 2학기 러닝 프론티어와 함께하는 또래 학습 컨설팅 신청 안내",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271519&pageOrder=0&cmd=2&parm_bod_uid=271514&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-10-22",
+   "school": "계명대학교",
+   "campus": "",
+   "src": "9a241a98",
+   "foundAt": "2026-10-22"
+  },
+  {
+   "title": "2026학년도 학생예비군 최종보충훈련 실시 안내",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271519&pageOrder=0&cmd=2&parm_bod_uid=271513&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-10-22",
+   "school": "계명대학교",
+   "campus": "",
+   "src": "9a241a98",
+   "foundAt": "2026-10-22"
+  },
+  {
+   "title": "2026학년도 계명가족 추수감사예배 안내",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271519&pageOrder=0&cmd=2&parm_bod_uid=271512&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-10-22",
+   "school": "계명대학교",
+   "campus": "",
+   "src": "9a241a98",
+   "foundAt": "2026-10-22"
+  },
+  {
    "title": "2026학년도 2학기 K-STAR S단계 1차 심사 선발자 대상 안내",
    "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=0&pageOrder=0&cmd=2&parm_bod_uid=271484&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
    "postedAt": "2026-10-21",
@@ -331,39 +367,6 @@
    "campus": "",
    "foundAt": "2026-10-07",
    "src": "9a241a98"
-  },
-  {
-   "title": "[교수학습개발센터] 2026학년도 2학기 전공 기초역량 증진 콘텐츠 프로그램 안내",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271232&pageOrder=0&cmd=2&parm_bod_uid=270428&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
-   "postedAt": "2026-09-07",
-   "school": "계명대학교",
-   "campus": "",
-   "foundAt": "2026-10-07"
-  },
-  {
-   "title": "뮤지컬 <드라큘라> 계명가족 특별할인 안내",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271201&pageOrder=0&cmd=2&parm_bod_uid=270320&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
-   "postedAt": "2026-09-03",
-   "school": "계명대학교",
-   "campus": "",
-   "foundAt": "2026-10-07"
-  },
-  {
-   "title": "2026학년도 2학기 COMpass K 실적 입력 및 승인 마감 안내",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271201&pageOrder=0&cmd=2&parm_bod_uid=270265&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
-   "postedAt": "2026-09-02",
-   "school": "계명대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "src": "9a241a98"
-  },
-  {
-   "title": "[학생성공센터] 생성형 AI 및 프로그래밍 실습 교육 학생 모집(선착순/온라인)",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271201&pageOrder=0&cmd=2&parm_bod_uid=270812&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
-   "postedAt": "2026-09-18",
-   "school": "계명대학교",
-   "campus": "",
-   "foundAt": "2026-10-06"
   }
  ]
 }

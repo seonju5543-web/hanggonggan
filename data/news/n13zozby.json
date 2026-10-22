@@ -3,6 +3,27 @@
  "updatedAt": "2026-10-22",
  "items": [
   {
+   "title": "2026학년도 겨울계절수업 및 도약수업 운영 안내",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511715",
+   "postedAt": "2026-10-22",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-22"
+  },
+  {
+   "title": "[부산광역시] 「WDC 도시디자인 실험실」(WDC City Design Lab)...",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511702",
+   "postedAt": "2026-10-22",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-22",
+   "thumb": "data/news/img/7c1f54a034514528.webp",
+   "desc": "부산광역시는 작년 7월 2028 세계디자인수도(WDC)로 선정됨에 따라 지역 청년들이 일상 속 도시문제를 발견하고 전문가와 함께 디자인 관점 해결방안을 마련하는 「WDC 도시디자인 실험실」사업을 운영 하고자 하니…"
+  },
+  {
    "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(숙명여자대학교)",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511699",
    "postedAt": "2026-10-22",
@@ -403,26 +424,6 @@
    "src": "2d0d4013",
    "foundAt": "2026-10-15",
    "thumb": "data/news/img/7246d4178ee0423c.webp"
-  },
-  {
-   "title": "(재공지)[글로컬대학 30] 2026학년도 제5회 디지털인문학센터 컬로퀴엄 개최...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511566",
-   "postedAt": "2026-10-15",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-15"
-  },
-  {
-   "title": "[재무과]2026학년도 제4회 재정위원회 개최 안내",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511562",
-   "postedAt": "2026-10-15",
-   "kind": "행사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-15",
-   "desc": "「부산대학교 재정 및 회계의 운영에 관한 규정」 제5조의3에 따라 2026학년도 제4회 재정위원회를 다음과 같이 개최함을 안내드립니다."
   }
  ]
 }
