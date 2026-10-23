@@ -1,7 +1,29 @@
 {
  "school": "인하대학교",
- "updatedAt": "2026-10-22",
+ "updatedAt": "2026-10-23",
  "items": [
+  {
+   "title": "[학사관리팀] 2026학년도 동계 계절학기 시행 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45859/artclView.do",
+   "postedAt": "2026-10-20",
+   "kind": "학사",
+   "school": "인하대학교",
+   "campus": "",
+   "src": "f4141706",
+   "foundAt": "2026-10-23",
+   "desc": "1. 신청 대상 가 . 2026-2학 기 현재 학부 재학생 및 일반 휴학생 ( 수료생 제외 )"
+  },
+  {
+   "title": "[항공드론사업단] 2026 항공드론 컨소시엄 항공·방산 산업체 연계형 현장교육 프로그램",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45908/artclView.do",
+   "postedAt": "2026-10-23",
+   "school": "인하대학교",
+   "campus": "",
+   "src": "f4141706",
+   "foundAt": "2026-10-23",
+   "thumb": "data/news/img/352f78675fd66127.webp",
+   "desc": "관심 있는 학생 분들에 많은 참여 바랍니다. 1. 대상 : 항공드론에 관심있는 인하대학교 재학생"
+  },
   {
    "title": "(기업별 100명 선착순 마감) 삼성/SK/현대차그룹 인적성 온라인 모의 시험 무료 지원 안내",
    "url": "https://www.inha.ac.kr/bbs/kr/8/45906/artclView.do",
@@ -392,27 +414,6 @@
    "src": "f4141706",
    "foundAt": "2026-10-12",
    "desc": "★ 신청하러 가기 >> http://learn.inha.ac.kr ★ CUBe 과목에 대한 내용과 영상을 아래 링크를 통해 확인해주세요:)"
-  },
-  {
-   "title": "실감 3면 콘텐츠 및 MR/VR 체험Day 안내 [10.15(목) 오전 10시 30분~11시 30분 / 오후 3시~4시]",
-   "url": "https://www.inha.ac.kr/bbs/kr/8/45761/artclView.do",
-   "postedAt": "2026-10-12",
-   "school": "인하대학교",
-   "campus": "",
-   "src": "f4141706",
-   "foundAt": "2026-10-12",
-   "desc": "안녕하세요 원격교육지원센터입니다. 실감 3면 콘텐츠 및 MR/VR 체험Day를 실시하오니 여러분의 많은 관심과 참여 바랍니다."
-  },
-  {
-   "title": "[법학연구소] 전임연구원 채용 공고",
-   "url": "https://www.inha.ac.kr/bbs/kr/8/45759/artclView.do",
-   "postedAt": "2026-10-08",
-   "kind": "채용",
-   "school": "인하대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "desc": "인하대학교 법학연구소는 다음과 같이 전임연구원을 모집하오니 많은 관심 바랍니다 .",
-   "src": "f4141706"
   }
  ]
 }

@@ -1,7 +1,41 @@
 {
  "school": "명지대학교",
- "updatedAt": "2026-10-22",
+ "updatedAt": "2026-10-23",
  "items": [
+  {
+   "title": "[건축대학] 2026학년도 학술제(\"건축을 다시, 읽다.\") 일정 안내",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/141/236531/artclView.do",
+   "postedAt": "2026-10-23",
+   "school": "명지대학교",
+   "campus": "",
+   "src": "7f376301",
+   "foundAt": "2026-10-23",
+   "thumb": "data/news/img/92653d3dfde39f4a.webp",
+   "desc": "1. 일시 : 2026. 11. 04.(수) ~ 11. 06.(금) 2. 장소 : 명지대학교 창조예술관 4층 로비 건축대학장"
+  },
+  {
+   "title": "[자연보건의료] 눈으로 보는 감염병 예방 \"30초, 올바른 손씻기 교육\" 안내",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/141/236530/artclView.do",
+   "postedAt": "2026-10-23",
+   "kind": "생활",
+   "school": "명지대학교",
+   "campus": "",
+   "src": "7f376301",
+   "foundAt": "2026-10-23",
+   "thumb": "data/news/img/26b9bebc1137f741.webp",
+   "desc": "*일시 : 2026.10.28(수)~10.29(목) / 13시~16시30분 *대상 : 명지대 학부 및 대학원생 *장소 :학관1층 보건의료센터"
+  },
+  {
+   "title": "[대학교육혁신원] 전임연구원 채용 공고",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/141/236529/artclView.do",
+   "postedAt": "2026-10-23",
+   "kind": "채용",
+   "school": "명지대학교",
+   "campus": "",
+   "src": "7f376301",
+   "foundAt": "2026-10-23",
+   "desc": "1. 모집분야 : 대학교육혁신원 소속 전임연구원 채용분야 임용예정일 채용인원 전임연구원"
+  },
   {
    "title": "[진단평가팀] 육아휴직 대체 기간제 전담직원 채용 공고",
    "url": "https://www.mju.ac.kr/bbs/mjukr/141/236469/artclView.do",

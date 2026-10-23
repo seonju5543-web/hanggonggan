@@ -1,7 +1,29 @@
 {
  "school": "홍익대학교",
- "updatedAt": "2026-10-22",
+ "updatedAt": "2026-10-23",
  "items": [
+  {
+   "title": "2026학년도 동계계절학기 학점교류 신청 안내 (서울시립대학교)",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159496&noCat=500",
+   "postedAt": "2026-10-23",
+   "kind": "학사",
+   "school": "홍익대학교",
+   "campus": "",
+   "src": "9c41077f",
+   "foundAt": "2026-10-23",
+   "desc": "학사지원팀 2026학년도 동계계절학기에 서울시립대학교에서 개설한 강좌를 수강하고자 하는 학생은 다음 사항을 참고하여 신청하기 바랍니다."
+  },
+  {
+   "title": "2026학년도 동계계절학기 학점교류 신청 안내 (서강대학교)",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159495&noCat=500",
+   "postedAt": "2026-10-23",
+   "kind": "학사",
+   "school": "홍익대학교",
+   "campus": "",
+   "src": "9c41077f",
+   "foundAt": "2026-10-23",
+   "desc": "2026학년도 동계계절학기에 서강대학교에서 개설한 강좌를 수강하고자 하는 학생은 다음 사항을 참고하여 신청하기 바랍니다."
+  },
   {
    "title": "홍익대학교 융합사업 클러스터(HIVE) 입주기업 모집공고",
    "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159492&noCat=32",

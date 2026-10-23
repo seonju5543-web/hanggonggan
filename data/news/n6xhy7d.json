@@ -1,7 +1,39 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-10-22",
+ "updatedAt": "2026-10-23",
  "items": [
+  {
+   "title": "[일반] 기간제 계약직원 채용 공고(교육혁신원 성과관리팀)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53542&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-23",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-23",
+   "desc": "모집인원 1. 지원 자격 및 우대사항 담당업무 1. 교육과정 질관리 및 교육성과 분석 지원"
+  },
+  {
+   "title": "[일반] 기간제 계약직원 채용 공고(국제처 글로벌전략팀)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53541&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-23",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-23",
+   "desc": "채용 부서 국제처 글로벌전략팀 모집인원 1. 지원 자격 및 우대사항 담당업무"
+  },
+  {
+   "title": "[시설] 2026년 동절기 시스템 냉난방기 난방 전환 일정 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53540&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-23",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-23",
+   "desc": "우리 학교 시스템 냉난방기의 난방 전환 일정을 아래와 같이 안내하오니 양지하여 주시기 바랍니다."
+  },
   {
    "title": "[국제학생] [외국인유학생] 조선왕릉골든벨 외국인 부문 참가 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53539&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -402,39 +434,6 @@
    "foundAt": "2026-10-08",
    "thumb": "data/news/img/5d2235b657bb5b41.webp",
    "desc": "가 . 지원대상 : 서울시 거주 · 재학 · 재직 중인 디지털성범죄 피해시민",
-   "src": "b09cb042"
-  },
-  {
-   "title": "[일반] [서울특별시] 2026년 하반기 동행안심벨(구 안심헬프미) 지원사업 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53453&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-08",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "thumb": "data/news/img/4ecff66abf641214.webp",
-   "desc": "「 동행안심벨 」 지원 사업개요 □ 사업개요 ㅇ ( 지원대상 ) 서울시 거주자 및 서울 소재 직장 ․ 학교에 소속된 사람",
-   "src": "b09cb042"
-  },
-  {
-   "title": "[학사] 2026학년도 2학기 중간고사 일정 및 시행 지침 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53449&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-08",
-   "kind": "학사",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "desc": "가 . 중간고사를 실시하는 과목 : 대면고사 원칙 나 . 중간고사를 미실시하는 과목 : 과제 등의 시험 대체나 온 / 오프라인 수업 진행",
-   "src": "b09cb042"
-  },
-  {
-   "title": "[일반] 기간제 계약직원 채용 공고(전자정보공과대학 전자공학과)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53448&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-08",
-   "kind": "채용",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "desc": "지원 자격 1. 대학교(4년제) 졸업자 이상 2. 남자의 경우 병역필 또는 면제자",
    "src": "b09cb042"
   }
  ]

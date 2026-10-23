@@ -1,7 +1,17 @@
 {
  "school": "부산대학교",
- "updatedAt": "2026-10-22",
+ "updatedAt": "2026-10-23",
  "items": [
+  {
+   "title": "[효원상담원] 내 몸이 보내는 SOS, '유비오 맥파 검사' 신청...",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511721",
+   "postedAt": "2026-10-23",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-23",
+   "desc": "혹시 요즘 밤에 잠이 들기 어려우신가요? 아니면 일상에서 작은일에도 쉽게 짜증이 느껴지나요?"
+  },
   {
    "title": "2026학년도 겨울계절수업 및 도약수업 운영 안내",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511715",
@@ -414,16 +424,6 @@
    "campus": "",
    "src": "2d0d4013",
    "foundAt": "2026-10-15"
-  },
-  {
-   "title": "2026년 부산지역 대학생 온라인 혐오차별 표현 실태조사",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511568",
-   "postedAt": "2026-10-15",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-15",
-   "thumb": "data/news/img/7246d4178ee0423c.webp"
   }
  ]
 }

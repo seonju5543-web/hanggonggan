@@ -1,7 +1,18 @@
 {
  "school": "가톨릭대학교",
- "updatedAt": "2026-10-22",
+ "updatedAt": "2026-10-23",
  "items": [
+  {
+   "title": "[대학일자리플러스센터] 이노진 – 품질관리 및 제형업무 채용",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277011&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-23",
+   "kind": "채용",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-23",
+   "desc": "1. 세부일정 : *전형절차 : 서류전형 -> 1차 실무자 면접 -> 2차 임원 면접 -> 최종합격"
+  },
   {
    "title": "[학사행정팀] 2026-2학기 일반휴학 신청 마감 안내",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276997&article.offset=0&articleLimit=10",
@@ -415,14 +426,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/a78c5cf200e2b7f2.webp"
-  },
-  {
-   "title": "[취업지원팀] 전국 지역인재 7급 수습직원 선발시험 변경사항 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276268&article.offset=0&articleLimit=10",
-   "postedAt": "2026-09-30",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
   }
  ]
 }

@@ -1,7 +1,28 @@
 {
  "school": "경기대학교",
- "updatedAt": "2026-10-22",
+ "updatedAt": "2026-10-23",
  "items": [
+  {
+   "title": "[수강에서 성적까지] 2026-2학기 예술대학원(수원) 종합시험 결과 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626762&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-23",
+   "kind": "학사",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-10-23",
+   "desc": "대학소개 대학·조직 대학생활 맞춤정보 어떤 정보 를 찾고계시나요? 맞춤설정 저장하기 (언제든 변경 가능합니다) 맞춤설정 이란? 소속, 내용, 기간별로 나만의 맞춤 콘텐츠를 찾아보세요."
+  },
+  {
+   "title": "[수강에서 성적까지] 2027학년도 학부제 전공배정 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626760&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-23",
+   "kind": "학사",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-10-23"
+  },
   {
    "title": "[일반] [중어중문전공] 2027학년도 학부제 전공배정 안내",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626758&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
@@ -402,26 +423,6 @@
    "src": "bf927d3e",
    "foundAt": "2026-10-14",
    "desc": "대학소개 대학·조직 대학생활 맞춤정보 어떤 정보 를 찾고계시나요? 맞춤설정 저장하기 (언제든 변경 가능합니다) 맞춤설정 이란? 소속, 내용, 기간별로 나만의 맞춤 콘텐츠를 찾아보세요."
-  },
-  {
-   "title": "[일반] (수학과) 전공자율선택제 재학생 의견수렴 공고",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626583&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-14",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-10-14",
-   "desc": "이미지 확대보기 - 대상: 2025학년도 전공자율선택제 입학생 중 전공선택을 완료한 2학년 재학생"
-  },
-  {
-   "title": "[입학에서 취업까지] 2027년 2월 졸업에 관한 제반 사항 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626564&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-13",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-10-13",
-   "desc": "이미지 확대보기 1. 외국어시험 성적 제출 기한 : 2027. 1. 14.(화)"
   }
  ]
 }
