@@ -55,13 +55,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-13",
-  "lastAt": "2026-10-14",
-  "tries": 2,
+  "lastAt": "2026-10-23",
+  "tries": 3,
   "status": "pending",
   "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-10-28",
-  "nextAt": "2026-10-17"
+  "nextAt": "2026-10-30"
  },
  "kosaf|2000204008|board:https://council.wonju.go.kr/content/news/photoGallery.html": {
   "ds": "kosaf",
@@ -87,13 +87,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-18",
-  "lastAt": "2026-10-20",
-  "tries": 2,
+  "lastAt": "2026-10-23",
+  "tries": 3,
   "status": "pending",
   "why": "게시판 목록(9줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-12-11",
-  "nextAt": "2026-10-23"
+  "nextAt": "2026-10-30"
  },
  "kosaf|2000206004|board:https://www.yw.go.kr/www/selectBbsNttList.do?bbsNo=86&key=524": {
   "ds": "kosaf",
@@ -236,6 +236,22 @@
   "decidedAt": "2026-10-13",
   "also": []
  },
+ "kosaf|2000439007|board:https://www.iksan.go.kr/business/board/post/list.do?boardUid=ff8080819927194f01994bc5f5fa30a0&menuUid=ff8080819927194f019936f6b61b1bc6": {
+  "ds": "kosaf",
+  "key": "2000439007",
+  "url": "",
+  "board": "https://www.iksan.go.kr/business/board/post/list.do?boardUid=ff8080819927194f01994bc5f5fa30a0&menuUid=ff8080819927194f019936f6b61b1bc6",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "firstAt": "2026-10-23",
+  "lastAt": "2026-10-23",
+  "tries": 1,
+  "status": "rejected",
+  "why": "그 사이트 robots.txt 가 게시판 훑기를 막음 — 글 주소로 다시 적어 주세요",
+  "checks": {},
+  "round": "2026-11-03",
+  "decidedAt": "2026-10-23"
+ },
  "kosaf|2000443001|board:https://www.jangsu.go.kr/board/list.jangsu?boardId=BBS_0000128&menuCd=DOM_000000101001003000&contentsSid=10&cpath=": {
   "ds": "kosaf",
   "key": "2000443001",
@@ -267,6 +283,22 @@
   "checks": {},
   "round": "2026-10-26",
   "nextAt": "2026-10-27"
+ },
+ "kosaf|2500058003|board:https://www.jiles.or.kr/community/notice/othernews.htm": {
+  "ds": "kosaf",
+  "key": "2500058003",
+  "url": "",
+  "board": "https://www.jiles.or.kr/community/notice/othernews.htm",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "firstAt": "2026-10-23",
+  "lastAt": "2026-10-23",
+  "tries": 1,
+  "status": "pending",
+  "why": "게시판 목록(15줄)에서 그 글을 하나로 못 고름",
+  "checks": {},
+  "round": "2026-10-30",
+  "nextAt": "2026-10-24"
  },
  "kosaf|2500058003|https://www.jiles.or.kr/community/notice/notice.htm?act=view&seq=13111": {
   "ds": "kosaf",
@@ -475,6 +507,22 @@
   "checks": {},
   "round": "2026-11-30",
   "decidedAt": "2026-10-14"
+ },
+ "kosaf|2701048001|board:https://sanhak.duksung.ac.kr/support/board/inside": {
+  "ds": "kosaf",
+  "key": "2701048001",
+  "url": "",
+  "board": "https://sanhak.duksung.ac.kr/support/board/inside",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "firstAt": "2026-10-23",
+  "lastAt": "2026-10-23",
+  "tries": 1,
+  "status": "pending",
+  "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
+  "checks": {},
+  "round": "2026-11-01",
+  "nextAt": "2026-10-24"
  },
  "kosaf|2701295001|board:http://www.cbck.or.kr/Board/K7120": {
   "ds": "kosaf",
