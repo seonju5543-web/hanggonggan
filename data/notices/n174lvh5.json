@@ -1,7 +1,34 @@
 {
  "school": "가톨릭대학교",
- "updatedAt": "2026-10-17",
+ "updatedAt": "2026-10-23",
  "items": [
+  {
+   "title": "[학생지원팀] 2026학년도 인송문화재단 인송장학생 선발 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276941&article.offset=0&articleLimit=10&srCategoryId=22",
+   "attachments": [
+    {
+     "name": "2026년 2학기 인송문화재단 제출 서류(재단양식).hwp",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276941&attachNo=226824"
+    },
+    {
+     "name": "[양식] 외부장학금 신청 및 추천을 위한 개인정보 수집 및 이용 동의서.hwpx",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276941&attachNo=226825"
+    }
+   ],
+   "deadlineHint": "제출기한 - 트리니티 신청: 2026. 10. 27.(화)까지 - 원본서류 제출: 2026. 10. 28.(수) 17:00까지 (12-13시 점",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
+  {
+   "title": "[학생지원팀][한국장학재단]2026년 2학기 푸른등대 기부장학금(2차) 신청 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277004&article.offset=0&articleLimit=10&srCategoryId=22",
+   "attachments": [],
+   "deadlineHint": "신청기간 안내(10/21~10/29) [학생지원팀] 2026년 2학기 한국선원복지고용센터 선원가족장학생 선발 안내(~10.30 접수기간 연장)",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
   {
    "title": "[학생지원팀] <한국고등교육재단> 2027년 인재림 제7기 장학생 선발 안내",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276842&article.offset=0&articleLimit=10&srCategoryId=22",

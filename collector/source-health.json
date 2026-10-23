@@ -50,9 +50,9 @@
   "why": "🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요"
  },
  "https://www.niied.go.kr/web/main/nid/niied_board/list": {
-  "name": "국립국제교육원 대외활동·공모전",
+  "name": "국립국제교육원 공지",
   "fails": 0,
-  "lastOk": "2026-10-17"
+  "lastOk": "2026-10-23"
  },
  "https://www.culture.go.kr/portal/cltBnf/cltSup/list.do?menuNo=200104": {
   "name": "문화포털 문화지원사업 대외활동·공모전",
@@ -121,95 +121,95 @@
  "http://www.sjjh.or.kr/": {
   "name": "재단법인 상주시장학회",
   "fails": 0,
-  "lastOk": "2026-10-17"
+  "lastOk": "2026-10-23"
  },
  "http://www.jiheonsf.or.kr/bbs/board.php?bo_table=tl_notice": {
   "name": "재단법인 삼원장학재단",
   "fails": 0,
-  "lastOk": "2026-10-17"
+  "lastOk": "2026-10-23"
  },
  "http://www.hjsfoundation.or.kr/": {
   "name": "한진해운장학재단",
   "fails": 0,
-  "lastOk": "2026-10-17"
+  "lastOk": "2026-10-23"
  },
  "https://janghak.songpa.go.kr/22": {
   "name": "(재)송파구 인재육성 장학재단",
   "fails": 0,
-  "lastOk": "2026-10-17"
+  "lastOk": "2026-10-23"
  },
  "https://paan.or.kr/": {
   "name": "파안장학문화재단법인",
   "fails": 0,
-  "lastOk": "2026-10-17"
+  "lastOk": "2026-10-23"
  },
  "https://medihealsf.or.kr/": {
   "name": "메디힐장학재단",
   "fails": 0,
-  "lastOk": "2026-10-17"
+  "lastOk": "2026-10-23"
  },
  "http://www.hsf.or.kr/": {
   "name": "(재)고속도로장학재단",
   "fails": 0,
-  "lastOk": "2026-10-17"
+  "lastOk": "2026-10-23"
  },
  "https://asanmirae.or.kr:449/main/": {
   "name": "아산시미래장학회",
   "fails": 0,
-  "lastOk": "2026-10-17"
+  "lastOk": "2026-10-23"
  },
  "https://www.ikef.or.kr/page.php?id=%2Fkj%2Fscholar_schedule": {
   "name": "관정이종환교육재단",
   "fails": 0,
-  "lastOk": "2026-10-17"
+  "lastOk": "2026-10-23"
  },
  "https://www.yonkang.org/kr": {
   "name": "두산연강재단",
   "fails": 0,
-  "lastOk": "2026-10-17"
+  "lastOk": "2026-10-23"
  },
  "https://foundation.miraeasset.com/ko/news/notice/list.do": {
   "name": "미래에셋박현주재단",
-  "fails": 16,
+  "fails": 17,
   "lastOk": null,
   "why": "🟡 접속은 되지만 장학 공고를 찾지 못함 — 게시판이 맞는지 확인 필요"
  },
  "https://www.asanfoundation.or.kr/af/library/bbs/afLibraryPhotoBbsList.do": {
   "name": "아산사회복지재단",
   "fails": 0,
-  "lastOk": "2026-10-17"
+  "lastOk": "2026-10-23"
  },
  "https://www.kosaf.go.kr/ko/notice.do": {
   "name": "한국장학재단 공지",
   "fails": 0,
-  "lastOk": "2026-10-17"
+  "lastOk": "2026-10-23"
  },
  "https://www.lottefoundation.or.kr/notice": {
   "name": "롯데장학재단",
-  "fails": 16,
+  "fails": 17,
   "lastOk": null,
   "why": "🟡 접속은 되지만 장학 공고를 찾지 못함 — 게시판이 맞는지 확인 필요"
  },
  "https://www.iljufoundation.org/homepage/index.do": {
   "name": "일주학술문화재단",
-  "fails": 3,
+  "fails": 4,
   "lastOk": "2026-10-16",
   "why": "⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요"
  },
  "https://gwangyang.go.kr/fund/": {
   "name": "백운장학회(광양)",
   "fails": 0,
-  "lastOk": "2026-10-17"
+  "lastOk": "2026-10-23"
  },
  "https://www.jinjae.kr/main/": {
   "name": "전주인재육성재단",
   "fails": 0,
-  "lastOk": "2026-10-17"
+  "lastOk": "2026-10-23"
  },
  "https://uill.uri.re.kr/": {
   "name": "재단법인 울산연구원",
-  "fails": 9,
+  "fails": 10,
   "lastOk": null,
-  "why": "⛔ robots.txt 가 막아 둔 주소 — 읽지 않았습니다 (출처를 바꾸거나 보관하세요)"
+  "why": "⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요"
  }
 }

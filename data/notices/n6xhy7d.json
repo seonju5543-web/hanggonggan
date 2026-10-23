@@ -1,35 +1,52 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-10-17",
+ "updatedAt": "2026-10-23",
  "items": [
+  {
+   "title": "[일반] 2026학년도 하반기 인석장학금 지원신청 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53536&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "Attachment 20261021 인석장학금 유형Ⅰ 온라인접수 체크리스트1.hwp",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35466&ano=53536"
+    },
+    {
+     "name": "Attachment 20261021 인석장학금 유형Ⅱ 온라인접수 체크리스트1.hwp",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35467&ano=53536"
+    }
+   ],
+   "deadlineHint": "제출기한 : 2026년 11월 18일 오전 10시부터 2026년 11월 26일 오후 4시까지 홈페이지 온라인 접수 2. 장학금의 종류 : 유형",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
+  {
+   "title": "[등록/장학] 2027학년도 해동과학문화재단 해동장학생 모집 안내(생활비성)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53519&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "Attachment 2027 해동장학생 신규지원(ㅇㅇ대,ㅇ학년,이름).hwp",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35453&ano=53519"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
+  {
+   "title": "[등록/장학] [한국장학재단] 2026년 2학기 푸른등대 기부장학금(2차) 신규장학생 신청 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53537&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
   {
    "title": "[등록/장학] 2026년 2학기 거창군 지역출신 대학생 등록금 지원 사업 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53506&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "attachments": [
-    {
-     "name": "부설기관",
-     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
-    },
-    {
-     "name": "부설연구기관",
-     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
-    },
-    {
-     "name": "연구지원팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
-    },
-    {
-     "name": "연구진흥팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
-    },
-    {
-     "name": "경영관리팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
-    },
-    {
-     "name": "기술지주회사",
-     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
-    },
     {
      "name": "Attachment 20261016 [거창군장학회] 공고문_2026년 2학기 거창군 지역출신 대학생 등록금 지원사업.pdf",
      "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35446&ano=53506"

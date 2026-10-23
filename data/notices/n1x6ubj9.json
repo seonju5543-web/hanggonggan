@@ -1,15 +1,89 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-10-17",
+ "updatedAt": "2026-10-23",
  "items": [
+  {
+   "title": "2026학년도 2학기 의료인공지능특화융합인재양성사업 연구우수 장학생 선발 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140764&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "장학금 신청서, 사업참여확약서, 개인정보제공활용동의서.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140764&attachNo=118505"
+    },
+    {
+     "name": "논문성과정보_이름.xlsx",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140764&attachNo=118506"
+    }
+   ],
+   "deadlineHint": "신청기간> 2026년 9월 1일~11월 30일까지 수시 접수(12월 이후 출판 예정자는 별도 문의) <제출서류> 가. 장학금신청서(첨부서식) 나",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
+  {
+   "title": "[발전협력팀] 2026학년도 수원지역동문회 장학생 선발 안내(~11/13)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140739&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "성균관대학교 수원장학회 장학금 신청서(2026).hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140739&attachNo=118489"
+    }
+   ],
+   "deadlineHint": "접수기간: ~ 2026.11.13.(금), 18:00 2. 신청방법(아래의 자료를 yjhm89@skku.edu로 메일제출) 가. 첨부파일의 장학",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
+  {
+   "title": "2027년 엔지니어링인재육성재단 제2기 장학생 모집 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140686&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "[붙임1][공고문]제2기(2027년도) 장학생 선발.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140686&attachNo=118460"
+    }
+   ],
+   "deadlineHint": "접수 기간 : 2026년 10월 19일(월) 12시 ~ 2026년 11월 13일(금) 18시 2. 지원 대상 : 엔지니어링 및 신ㆍ재생에너지 관",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
+  {
+   "title": "2026학년도 하반기 재단법인 인석장학회 장학생 선발 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140652&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "인석장학회 체크리스트.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140652&attachNo=118438"
+    }
+   ],
+   "deadlineHint": "제출 기한 : 2026. 11. 18.（수）오전 10시부터 2026. 11. 26.（목） 오후 4시까지 인석장학회 홈페이지 온라인 접수 2）장학",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
+  {
+   "title": "2026년도 2학기 (재)거창군장학회 거창군 지역출신 대학생 등록금 지원 신청 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140646&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "공고문_2026년 2학기 거창군 지역출신 대학생 등록금 지원사업.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140646&attachNo=118430"
+    },
+    {
+     "name": "신청서 서식(공지용).hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140646&attachNo=118431"
+    }
+   ],
+   "deadlineHint": "접수기간: 2026.10.15. ~ 11.16. 3) 지원대상: 지원요건을 충족하는 최종학년, 최종학년 직전학년 대학생 ※ 지원요건 등 상세 내",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
   {
    "title": "2026학년도 심산혁신장학금 장학생 선발안내( ~ 2026년 11월 6일(금) 오후 5시까지)",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140601&article.offset=0&articleLimit=10",
    "attachments": [
-    {
-     "name": "부속기관",
-     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
-    },
     {
      "name": "[붙임_1] 심산혁신장학금 신청서 양식.hwp",
      "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=140601&attachNo=118388"
@@ -27,12 +101,7 @@
   {
    "title": "[한국장학재단] 2026-2학기 주거안정장학금 지급 안내",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140581&article.offset=0&articleLimit=10",
-   "attachments": [
-    {
-     "name": "부속기관",
-     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
-    }
-   ],
+   "attachments": [],
    "deadlineHint": null,
    "school": "성균관대학교",
    "campus": "",

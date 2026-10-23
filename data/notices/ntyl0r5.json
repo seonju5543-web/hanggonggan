@@ -1,7 +1,45 @@
 {
  "school": "명지대학교",
- "updatedAt": "2026-10-17",
+ "updatedAt": "2026-10-23",
  "items": [
+  {
+   "title": "2027학년도 한국지도자육성장학금 선발 안내",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/145/236536/artclView.do",
+   "attachments": [
+    {
+     "name": "일반장학생 선발 포스터.pdf",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/145/181414/download.do"
+    },
+    {
+     "name": "장학생 선발관련 FAQ.pdf",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/145/181415/download.do"
+    },
+    {
+     "name": "1. 2027년도_서류양식(지원서).hwp",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/145/181416/download.do"
+    },
+    {
+     "name": "2. 2027년도_서류양식(추천서).hwp",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/145/181417/download.do"
+    },
+    {
+     "name": "3. 2027년도_서류양식(자기소개서).hwp",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/145/181418/download.do"
+    },
+    {
+     "name": "4. 2027년도_개인정보활용동의서.hwp",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/145/181419/download.do"
+    },
+    {
+     "name": "5. 2027년도_장학생 의무사항 참여 동의서.hwp",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/145/181420/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "명지대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
   {
    "title": "2026년 2학기 주거안정장학금 지급 관련 안내",
    "url": "https://www.mju.ac.kr/bbs/mjukr/145/236366/artclView.do",

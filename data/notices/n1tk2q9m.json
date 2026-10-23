@@ -1,7 +1,158 @@
 {
  "school": "이화여자대학교",
- "updatedAt": "2026-10-17",
+ "updatedAt": "2026-10-23",
  "items": [
+  {
+   "title": "[학부] 2026-2학기 이화플러스 장학금 신청 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367553&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "deadlineHint": "신청 기간: 2026. 11. 4.( 수 ) 09:00 ~ 11. 11.( 수 ) 17:00 4. 선발 결과 안내: 2026년 12월 중순 개별",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
+  {
+   "title": "2026학년도 제2학기 전공리더십 장학금 신청 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367550&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "deadlineHint": "신청기간: 2026. 11. 9.(월) 9:00 ~ 11. 18.(수) 17:00 4. 신청 방법 유레카 신청(유레카통합행정 > 학사행정 > 장",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
+  {
+   "title": "[학부] 2026년 2학기 선원가족장학사업 장학생 선발 기간 연장 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367595&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2026년 2학기 선원가족장학사업 선발 모집 요강(변경).hwp",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367595&attachNo=353660"
+    }
+   ],
+   "deadlineHint": "모집기간 구 분 당초 변경 접수 기간 2026. 09. 01. ∼ 2026. 10. 23. 2026. 09. 01. ∼ 2026. 10. 30.",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
+  {
+   "title": "[학부] 2026학년도 하반기 재단법인 인석장학회 장학생 선발 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367592&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "deadlineHint": "제출 기한 : 2026. 11. 18（수）오전 10시부터 2026. 11. 26.（목） 오후 4시까지 인석장학회 홈페이지 온라인 접수 2）장학금",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
+  {
+   "title": "[대학원] 2026학년도 2학기 본부기탁/선배라면/ 장학금 신청 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367588&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "deadlineHint": "신청기간: 2026. 10. 26.(월) ~ 30.(금) ∘ 신청방법: 소속 대학(원)으로 신청 ∘ 지원자격: 장학금별 상이 ∘ 선발장학생 의무",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
+  {
+   "title": "[학부] 2026년도 인송문화재단 장학생 선발 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367577&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "(서식) ‘仁松 일반장학생’ 선발 지원서_2026_2 (4).hwp",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367577&attachNo=353653"
+    }
+   ],
+   "deadlineHint": "마감 : 2,000,000원 (생활비지원), 2026. 10. 29(목) 17:00 3. 자격 요건 - 직전학기 또는 평균성적 80점 이상인 자",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
+  {
+   "title": "[학부] 2026학년도 2학기 본부기탁/선배라면 장학금 장학생 신청 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367570&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "deadlineHint": "신청기간 : 2026. 10. 26.( 월 ) ~ 10. 30.( 금 ) ∘ 신청방법 : 소속 대학으로 신청 ∘ 지원자격 : 장학금별 상이 ∘",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
+  {
+   "title": "[학부] 2026학년도 2학기 푸른등대 기부장학금(2차) 신청 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367560&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "붙임2_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준_Re960a36e25691.pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367560&attachNo=353636"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
+  {
+   "title": "[학부] 2027년도 해동과학문화재단 장학생 선발 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367545&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2027 해동장학생 신규지원(ㅇㅇ대,ㅇ학년,이름).hwp",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367545&attachNo=353630"
+    }
+   ],
+   "deadlineHint": "신청기한: 2026년 10월 30일(금) 17:00 4. 신청방법: 유레카시스템에서 온라인 신청 및 구비서류 업로드 (제출서류 순서대로 반드시",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
+  {
+   "title": "[학부] 2026년 성암육영회 장학생 선발 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367483&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "[성암2026-11] (붙임1) 2026년 장학생 모집 공고.pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367483&attachNo=353590"
+    },
+    {
+     "name": "[성암2026-11] (붙임2) 2026년 장학생 모집 서식.hwp",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367483&attachNo=353591"
+    }
+   ],
+   "deadlineHint": "모집 기간: 2026년 10월 14일 (수) ~ 10월 27일 (화) 오후 6시 - 제출 방법: 이메일 제출 후 원본 서류 우편 제출 - 결과",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
+  {
+   "title": "[학부] [한국고등교육재단] 인재림 장학생 선발 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367479&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "[한국고등교육재단] 인재림 제7기 장학생 선발 모집 요강.docx",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367479&attachNo=353588"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
+  {
+   "title": "[학부] 2026년 2학기 거창군 지역출신 대학생 등록금 장학금 신청 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367476&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "공고문_2026년 2학기 거창군 지역출신 대학생 등록금 지원사업.pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367476&attachNo=353584"
+    },
+    {
+     "name": "신청서 서식.hwpx",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367476&attachNo=353585"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
   {
    "title": "[학부] 2027년 STX장학재단 장학생 선발 안내",
    "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367441&article.offset=0&articleLimit=10",

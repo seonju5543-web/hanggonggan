@@ -1,7 +1,53 @@
 {
  "school": "동국대학교 WISE캠퍼스",
- "updatedAt": "2026-10-17",
+ "updatedAt": "2026-10-23",
  "items": [
+  {
+   "title": "2026-2학기 주거안정장학 설명회 개최 안내",
+   "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520931",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
+  {
+   "title": "[한국장학재단] 2026-2학기 푸른등대 기부장학금 2차 신청 안내",
+   "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520915",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
+  {
+   "title": "[한국장학재단] 중소기업 취업연계 장학생 기업탐방 모집 안내",
+   "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520914",
+   "attachments": [
+    {
+     "name": "붙임3. 개인정보 수집·이용 및 제3자 제공 동의서.pdf",
+     "url": "javascript:downGO('붙임3. 개인정보 수집·이용 및 제3자 제공 동의서.pdf','/files/article/servicenotice/520914/','5B728EDF7427413393CBFB3F430712FB.pdf');"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
+  {
+   "title": "2026학년도 2학기 주거안정장학금 선발 결과 및 서약서 제출 안내",
+   "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520882",
+   "attachments": [
+    {
+     "name": "붙임1.+장학생+서약서+매뉴얼.pdf",
+     "url": "javascript:downGO('붙임1.+장학생+서약서+매뉴얼.pdf','/files/article/servicenotice/520882/','9550FB31AEBE4835B1AFDFB0D05F8C58.pdf');"
+    }
+   ],
+   "deadlineHint": "제출기한 : ~ 2026.10.27.( 화 ) 까지 * 서약서 미제출 시 장학금 지급 대상에서 제외함 4. 제출방법 : 한국장학재단 홈페이지 >",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
   {
    "title": "2026-2학기 복지장학생(부모장애) 선발 안내",
    "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520872",

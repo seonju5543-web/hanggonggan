@@ -1,7 +1,30 @@
 {
  "school": "세종대학교",
- "updatedAt": "2026-10-17",
+ "updatedAt": "2026-10-23",
  "items": [
+  {
+   "title": "2027학년도 한국지도자육성장학재단 신규 장학생 신청 안내",
+   "url": "https://www.sejong.ac.kr/kor/intro/notice7.do?mode=view&articleNo=894863&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "deadlineHint": "제출기간 : 2026년 11월 4일(수) 오후3시까지 학생지원과(집현관104호) 제출 기한엄수 ■ 기타사항 : 서류 및 면접심사 일정, 선발자",
+   "school": "세종대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
+  {
+   "title": "2026-2 성적향상장학금 신청안내",
+   "url": "https://www.sejong.ac.kr/kor/intro/notice7.do?mode=view&articleNo=894852&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "(양식)성적향상장학금 신청서.hwp",
+     "url": "https://www.sejong.ac.kr/kor/intro/notice7.do?mode=download&articleNo=894852&attachNo=237829"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026 년 10 월 19 일 ( 월 ) ~ 11 월 6 일 ( 금 ) 오후 4 시까지 기한 엄수 ■ 신청절차 : ‘ 신청서 ’(",
+   "school": "세종대학교",
+   "campus": "",
+   "foundAt": "2026-10-23"
+  },
   {
    "title": "2026-2학기 국가근로 장학생 3차 신청 안내",
    "url": "https://www.sejong.ac.kr/kor/intro/notice7.do?mode=view&articleNo=894674&article.offset=0&articleLimit=10",
