@@ -1,16 +1,4 @@
 {
- "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179418": {
-  "at": "2026-10-03",
-  "tries": 1,
-  "lines": [
-   "신청대상 : 창업 초기에 알았더라면 좋았을 것들(선배 창업가가 전하는 초기창업 실전 노하우 : 자금조달, 마케팅, 사업운영에 관심있는 예비·초기 창업자",
-   "대상연령 : 전체"
-  ],
-  "excludes": [
-   "신청 시 요청하는 정보(개인정보포함)는 사업운영기관에서 관리되오니 이점 반드시 유의하여 주시기 바랍니다."
-  ],
-  "from": "브라우저 본문"
- },
  "_common": [
   "939935e1b1f9556d"
  ],
@@ -55,39 +43,6 @@
   "excludes": [],
   "from": "공고문 첨부(OCR)"
  },
- "https://www.mois.go.kr/frt/bbs/type010/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000008&nttId=129837": {
-  "at": "2026-10-04",
-  "tries": 1,
-  "lines": [
-   "모바일신분증에 관심 있는 국민이면 누구나 참가할 수 있으며 , 모바일신분증을 보다 쉽고 편리하게 사용할 수 있는 참신한 아이디어와 해결방법을 자유롭게 작성하여 제출하면 된다 ."
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://k-knowledge.kr/ekp/pub/pn/pub.read.jsp?id=102": {
-  "at": "2026-10-04",
-  "tries": 1,
-  "lines": [
-   "참가 자격 : 제출서류 *제출물 부문별 작품 파일 1부",
-   "디지털집현전의 국가지식정보를 활용해",
-   "대한민국 국민 누구나 참가 가능"
-  ],
-  "excludes": [],
-  "from": "공고문 첨부(OCR)"
- },
- "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140267&article.offset=0&articleLimit=10": {
-  "at": "2026-10-04",
-  "tries": 1,
-  "lines": [
-   "1. 모집대상",
-   "- 만 19세 이상 성인으로 최소 1회 이상 발목의 접질림으로 발목 외측 인대 부상 병력이 있는 경우",
-   "- 최근 6개월 이내 최소 2회 이상 발목 관절의 ‘휘청거림’ 경험이 있는 경우",
-   "\"발목의 휘청거림\"은 일시적으로 발목을 통제할 수 없는 불안정성이나 발목이 접질리는 느낌",
-   "- 발목의 반복적인 접질림 때문에 일상생활 및 스포츠 활동에 어려움이 있는 경우"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/520680": {
   "at": "2026-10-05",
   "tries": 1,
@@ -107,18 +62,6 @@
   ],
   "excludes": [],
   "from": "브라우저 본문"
- },
- "https://www.nongsaro.go.kr/portal/ps/psz/psza/contentSub.ps?menuId=PS02485&bbsId=10&pageIndex=1&pageSize=10&cntntsNo=53&nttSeCode=&searchType=title&searchText=": {
-  "at": "2026-10-05",
-  "tries": 1,
-  "lines": [
-   "대상 : 박명건(전라남도)",
-   "대상 : 신진섭(충청남도)",
-   "대상 : 김미정(강원도)",
-   "대상 : 홍여신(전남 강진)"
-  ],
-  "excludes": [],
-  "from": "요강 페이지"
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/520732": {
   "at": "2026-10-06",
@@ -255,17 +198,8 @@
   "tries": 2
  },
  "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000": {
-  "at": "2026-10-16",
-  "tries": 1
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3527276": {
-  "at": "2026-10-16",
-  "tries": 1,
-  "lines": [
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
+  "at": "2026-10-23",
+  "tries": 2
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53505&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-16",
@@ -327,36 +261,36 @@
   "from": "브라우저 본문"
  },
  "https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=514&bcd=notice": {
-  "at": "2026-10-16",
-  "tries": 1
+  "at": "2026-10-23",
+  "tries": 2
  },
  "https://kyf.or.kr/user/boardDetail.do?boardType=notice&bbsId=BBSMSTR_000000000367&nttNo=10054": {
   "at": "2026-10-16",
   "tries": 1
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/267199/artclView.do": {
-  "at": "2026-10-16",
-  "tries": 1
+  "at": "2026-10-23",
+  "tries": 2
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/267176/artclView.do": {
-  "at": "2026-10-16",
-  "tries": 1
+  "at": "2026-10-23",
+  "tries": 2
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53417&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-16",
   "tries": 1
  },
  "https://www.bai.go.kr/bai/etc/popupzone/detail?ppId=120": {
-  "at": "2026-10-16",
-  "tries": 1
+  "at": "2026-10-23",
+  "tries": 2
  },
  "https://asanmirae.or.kr:449/main/index.php?m_cd=17&b_id=20260804102775189": {
-  "at": "2026-10-16",
-  "tries": 1
+  "at": "2026-10-23",
+  "tries": 2
  },
  "https://www.msit.go.kr/bbs/view.do?sCode=user&mId=307&mPid=208&bbsSeqNo=94&nttSeqNo=3187433": {
-  "at": "2026-10-16",
-  "tries": 1
+  "at": "2026-10-23",
+  "tries": 2
  },
  "https://www.rda.go.kr/board/board.do?mode=view&prgId=nei_ancmttEntry&dataNo=100000812622": {
   "at": "2026-10-16",
@@ -374,18 +308,6 @@
    "국내 대학 재·휴학생 (2~3)팀 단위 참여(※개인 신청 불가)"
   ],
   "from": "브라우저 본문"
- },
- "https://www.schoolkeepa.or.kr/cop/bbs/selectArticleDetail.do?nttId=1711&bbsId=BBSMSTR_000000000001": {
-  "at": "2026-10-16",
-  "tries": 1
- },
- "https://www.knou.ac.kr/bbs/knou/51/816423/artclView.do": {
-  "at": "2026-10-16",
-  "tries": 1
- },
- "https://www.kogl.or.kr/contest/contestMain.do": {
-  "at": "2026-10-16",
-  "tries": 1
  },
  "https://www.youthcenter.go.kr/bbs03View/48/10836": {
   "at": "2026-10-16",
@@ -452,6 +374,80 @@
    "(주)렛츠",
    "대상연령 : 만 20세 이상 ~ 만 39세 이하",
    "신청대상 : - 지역 창업에 관심있는 옥천군 청년 20명"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://www.yonkang.org/kr/news/652": {
+  "at": "2026-10-23",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3539005": {
+  "at": "2026-10-23",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3494370": {
+  "at": "2026-10-23",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://wise.dongguk.ac.kr/article/servicenotice/detail/520896": {
+  "at": "2026-10-23",
+  "tries": 1,
+  "lines": [
+   "장애학생지원",
+   "장애인 복지시설"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://wise.dongguk.ac.kr/article/servicenotice/detail/520895": {
+  "at": "2026-10-23",
+  "tries": 1,
+  "lines": [
+   "장애학생지원",
+   "장애인 복지시설"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://wise.dongguk.ac.kr/article/servicenotice/detail/520875": {
+  "at": "2026-10-23",
+  "tries": 1,
+  "lines": [
+   "장애학생지원",
+   "장애인 복지시설"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53516&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-10-23",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3530809": {
+  "at": "2026-10-23",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3538655": {
+  "at": "2026-10-23",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인"
   ],
   "excludes": [],
   "from": "브라우저 본문"
