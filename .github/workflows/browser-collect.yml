@@ -41,7 +41,7 @@ jobs:
     #    그때의 교훈은 그대로다 — **상한을 키우는 것으로 때우지 말 것**. 단계가 오래 걸리면
     #    그 단계의 예산(HARVEST_BUDGET_MS, 아래 timeout-minutes)을 줄이고, 상한은 그 합을
     #    담는 그릇으로만 쓴다. verify/test-collector.mjs가 이 대소관계를 검사한다.
-    timeout-minutes: 57   # 단계 합 53 + 준비·저장 여유 3 (2026-09-17 OCR 4분 · 2026-09-30 판정 로봇 2분 · 2026-10-04 관문 다시 재기 3분 — gate-guard 새 단계의 몫 · 2026-10-11 그 단계 3 → 5분(관문 한 번 ~55초 실측) + 끝내 빨간불 경보·닫기 짝 1+1)
+    timeout-minutes: 66   # 단계 합 61 + 준비·저장 여유 3 (2026-10-23 발췌 단계 시한 6 + 경보 짝 1+1 — 보강 단계로 · 2026-09-17 OCR 4분 · 2026-09-30 판정 로봇 2분 · 2026-10-04 관문 다시 재기 3분 — gate-guard 새 단계의 몫 · 2026-10-11 그 단계 3 → 5분(관문 한 번 ~55초 실측) + 끝내 빨간불 경보·닫기 짝 1+1)
     steps:
       - uses: actions/checkout@v4
         with:
@@ -111,8 +111,36 @@ jobs:
         continue-on-error: true
         timeout-minutes: 1
         run: node collector/prune-health.mjs
+      # 🔴 보강 단계(시한 + continue-on-error · 2026-10-23) — 발췌 로봇이 넘어져도 **수집분은 저장**한다. 10-17~23 엿새 동안 이 단계의 한 줄(선언 순서) 때문에
+      #    실행이 통째로 죽어 새 공고 0건·되돌릴 것도 없이 조용히 비었다. 넘어지면 경보 짝이 이슈에 모으고 회복하면 같은 제목으로 닫는다(tools/alert-issue.mjs).
       - name: 공고 원문 발췌 갱신 (정직 원칙 — 추론 대신 원문 그대로)
+        id: excerpts
+        timeout-minutes: 6
+        continue-on-error: true
         run: node collector/extract-excerpts.mjs --write
+      - name: 🚨 발췌 단계 실패 알림
+        if: always() && steps.excerpts.outcome == 'failure'
+        timeout-minutes: 1
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          title: 🚨 공고 원문 발췌 단계가 넘어졌어요
+          label: excerpts-step
+          body: |
+            브라우저형 수집 로봇의 원문 발췌 단계(collector/extract-excerpts.mjs)가 끝까지 가지 못했습니다. 이번 수집분(새 공고·자동 등록)은 저장되지만, 자격·마감·제출 서류 발췌는 갱신되지 않아 카드 설명이 짧게 남습니다. 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '발췌 단계 실패 확인해줘'라고 지시하세요.
+      - name: ✅ 발췌 단계 회복 — 경보 닫기
+        if: always() && steps.excerpts.outcome == 'success'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          title: 🚨 공고 원문 발췌 단계가 넘어졌어요
+          label: excerpts-step
+          body: |
+            ✅ 원문 발췌 단계가 다시 끝까지 갔습니다(브라우저형 수집 로봇) — 자동으로 닫습니다. 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       # 🔴 **있는데 아무도 안 돌리던 로봇** (2026-09-13 · 노션 F-9 에서 찾았다).
       #   collector/extract-amounts.mjs 는 2026-08-27 에 만들어졌는데 **어느 워크플로에도

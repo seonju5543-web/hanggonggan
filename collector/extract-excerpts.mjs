@@ -1036,7 +1036,6 @@ function fillCalendarDates(it, readOpen, readAnnounce) {
   }
 }
 
-if (!process.env.EXCERPTS_AS_LIB) main();
 /* 제출 서류 목록 · 자유 양식 근거 (2026-10-13 · 개발자 "남은 것 모두 진행" ④) — 규칙은 doc-list.mjs 한 곳.
    🔴 덮지 않는 것: 사람(관리자·AI)이 적은 목록(documentsFrom) · 자리표시가 아닌 목록을 가진 옛 등록분(사람이 읽어 적은 것 · 출처 표식이 없다).
       로봇이 적은 목록(documentsFrom '공고 원문'·'공고문 첨부…')과 자리표시 한 줄만 든 목록만 다시 쓴다.
@@ -1247,3 +1246,7 @@ if (WRITE) {
   console.log('registered.json 반영 완료');
 }
 }
+
+/* 🔴 실행 호출은 파일의 **맨 끝**에 — 위의 const(FORM_ATT_NAME 등)는 끌어올려지지 않아, 호출이 선언보다 앞에 있으면
+   main() 안에서 그 상수를 쓰는 순간 'Cannot access before initialization' 으로 넘어진다(2026-10-17~23 · 두 수집 로봇이 엿새 동안 저장 0건 · 관문 「발췌 로봇 실행 호출」). */
+if (!process.env.EXCERPTS_AS_LIB) main();

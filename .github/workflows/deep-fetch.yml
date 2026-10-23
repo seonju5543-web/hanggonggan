@@ -11,6 +11,11 @@ on:
     branches: ['claude/nice-heisenberg-WESq5']
     paths:
       - 'collector/run-deepfetch.txt'   # 이 파일을 수정해 push하면 자동 실행
+  # 매일 03:33 KST (2026-10-23) — 「원본 양식 그대로 보기」(forms-pdf)·「공고문 안 신청서 서식」(form-pages)은 이 워크플로만 만드는데
+  # 수동·push-to-run 뿐이라 10-16 뒤로 멈춰 새 공고에 양식이 한 건도 붙지 않았다(앱이 받는 data/form-pages/index.json 은 만들어진 적도 없어 「앱 반영 점검」이 매일 빨간불).
+  # 홀수 분 · 다른 로봇과 다른 분(관문 「예약 겹침」) · 새벽이라 학교 서버·수집 로봇과 겹치지 않는다.
+  schedule:
+    - cron: '33 18 * * *'
 
 permissions:
   contents: write
@@ -25,6 +30,7 @@ concurrency:
 jobs:
   deepfetch:
     runs-on: ubuntu-latest
+    if: github.ref_name == 'claude/nice-heisenberg-WESq5'   # 예약·저장은 기본 브랜치에서만 — 다른 브랜치에서 돌면 기록장이 갈라진다(CLAUDE.md 브랜치 · 2026-10-23 예약 추가)
     # 🔴 학교가 중간 인증서를 빠뜨려 Node 만 연결이 막히는 곳이 있다(계명대·조선대 등).
     # 브라우저·curl 은 사슬을 스스로 이어 붙이지만 Node 는 안 한다 — '로봇만 못 읽고
     # 학생은 멀쩡히 보는' 상태가 된다. 검증을 끄는 것이 아니라 서버가 깜빡한 사슬 한 칸을

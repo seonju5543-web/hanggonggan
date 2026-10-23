@@ -1476,6 +1476,13 @@ console.log('\n■ 제출 서류 목록 — 원문의 「제출서류」 절을 
   const aa = readText(new URL('../tools/admin-apply.mjs', import.meta.url));
   eq('  관리자 화면이 documents → documentsFrom · prepDoc → prepDocFrom 에 관리자 표식을 남긴다', [/mark\('documents', 'documentsFrom'\)/.test(aa), /changed\.includes\('prepDoc'\)\) it\.prepDocFrom = OWNER/.test(aa)], [true, true]);
   eq('  로봇은 신청서 첨부가 나중에 붙어도 제 prepDoc 을 끈다', /\(!got\.basis \|\| hasFormAtt\)/.test(readText(new URL('../collector/extract-excerpts.mjs', import.meta.url))), true);
+  /* 🔴 발췌 로봇 실행 호출은 파일 **맨 끝** (2026-10-23) — 10-14 에 fillDocuments 와 const FORM_ATT_NAME 이 `main()` 호출 **뒤**에 붙었고, const 는 끌어올려지지 않아
+     서류 목록을 찾은 첫 공고에서 'Cannot access before initialization' 으로 넘어졌다. 10-17 저녁부터 23일까지 두 수집 로봇(하루 5회)이 모두 그 단계에서 죽어 새 공고가 한 건도 저장되지 않았다.
+     node --check 는 못 잡는다(실행해야 난다). 호출 뒤에 선언이 하나라도 있으면 빨간불. */
+  const eeAll = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));
+  const eeCall = eeAll.indexOf('if (!process.env.EXCERPTS_AS_LIB) main();');
+  eq('  발췌 로봇 실행 호출 — 파일 맨 끝에 있고 그 뒤에 const·let·function·class 선언이 없다(끌어올려지지 않는 const 를 main 이 쓴다)',
+    [eeCall > 0, !/^(const|let|var|function|class|export)\s/m.test(eeAll.slice(eeCall))], [true, true]);
   eq('  소제목·전화·주소·파일 이름·지시문은 서류가 아니다',
     DL.extractDocumentList(['제출서류', '[필수 제출서류]', '추가 제출 가능 서류 (가점)', '계양구인재양성재단 (☎546-9345)', 'https://example.or.kr', '파일제목 : 이름-학과-신청서', '모든 서류 스캔해 PDF로 제출(사진 촬영본 금지)', '◯ 지원 분야별 필수 제출 자료', '장학생 선발원서(소정양식)', '주민등록등본 1부'].join('\n')),
     ['장학생 선발원서(소정양식)', '주민등록등본 1부']);
