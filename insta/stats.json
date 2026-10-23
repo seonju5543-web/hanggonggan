@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-22T00:16:39.250Z",
+ "updatedAt": "2026-10-23T00:13:22.054Z",
  "account": {
   "username": "handaejang_",
   "followers": 3,
@@ -325,6 +325,14 @@
    "likes": 9,
    "comments": 0,
    "saved": 0
+  },
+  {
+   "at": "2026-10-23",
+   "followers": 3,
+   "media": 3,
+   "likes": 9,
+   "comments": 0,
+   "saved": 0
   }
  ],
  "posts": [
@@ -338,7 +346,7 @@
    "likes": 1,
    "comments": 0,
    "type": "CAROUSEL_ALBUM",
-   "reach": 17,
+   "reach": 18,
    "saved": 0,
    "shares": 1,
    "error": null
@@ -353,7 +361,7 @@
    "likes": 4,
    "comments": 0,
    "type": "CAROUSEL_ALBUM",
-   "reach": 20,
+   "reach": 21,
    "saved": 0,
    "shares": 0,
    "error": null
