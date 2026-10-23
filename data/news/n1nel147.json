@@ -3,6 +3,15 @@
  "updatedAt": "2026-10-23",
  "items": [
   {
+   "title": "2026대구여성영화제 개최 알림 및 비교과 프로그램 운영",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271541&pageOrder=0&cmd=2&parm_bod_uid=271535&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-10-23",
+   "school": "계명대학교",
+   "campus": "",
+   "src": "9a241a98",
+   "foundAt": "2026-10-23"
+  },
+  {
    "title": "2026학년도 AI 위크 안내",
    "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=0&pageOrder=0&cmd=2&parm_bod_uid=271517&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
    "postedAt": "2026-10-22",
@@ -358,15 +367,6 @@
    "school": "계명대학교",
    "campus": "",
    "foundAt": "2026-10-08"
-  },
-  {
-   "title": "2026학년도 2학기 「계명, 도전 ! AI 골든벨 !」 참가 학생 모집",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=0&pageOrder=0&cmd=2&parm_bod_uid=271234&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
-   "postedAt": "2026-10-06",
-   "school": "계명대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "src": "9a241a98"
   }
  ]
 }

@@ -3,6 +3,29 @@
  "updatedAt": "2026-10-23",
  "items": [
   {
+   "title": "2026 청춘마이크 충청권 특별공연 ‘추추마블 팝업’",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170917&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-10-23",
+   "kind": "행사",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-10-23",
+   "thumb": "data/news/img/36e04d641bf39177.webp",
+   "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
+  },
+  {
+   "title": "2026. 2학기 생협 한빛식당, 쿱스켓4호점, 메가커피 아르바이트 채용",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170891&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-10-22",
+   "kind": "채용",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-10-23",
+   "desc": "2026. 2학기 아르바이트 학생 채용 안내 1. 근무기간 : 채용 시 ~ 2026.12.18."
+  },
+  {
    "title": "2026학년도 동기 계절수업 다른 대학교 수학 안내(금오공대)",
    "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170881&pageUnit=10&searchCnd=all&pageIndex=1",
    "postedAt": "2026-10-22",
@@ -409,27 +432,6 @@
    "campus": "",
    "foundAt": "2026-10-08",
    "desc": "〉접수기간 Application period: 〉 원서접수 How to apply: Online( https://enter.jinhakapply.com / ) + 원본서류 우편/방문 접수 Submit…",
-   "src": "76d254e7"
-  },
-  {
-   "title": "국제학부 사무계약직(영어가능자) 공개경쟁채용시험 공고",
-   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170580&pageUnit=10&searchCnd=all&pageIndex=1",
-   "postedAt": "2026-10-08",
-   "kind": "채용",
-   "school": "충북대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공",
-   "src": "76d254e7"
-  },
-  {
-   "title": "2026학년도 2학기 충북대학교 공동실험실습관 공동활용기자재 수요조사 안내",
-   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170574&pageUnit=10&searchCnd=all&pageIndex=1",
-   "postedAt": "2026-10-08",
-   "school": "충북대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공",
    "src": "76d254e7"
   }
  ]

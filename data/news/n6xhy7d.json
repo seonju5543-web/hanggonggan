@@ -3,6 +3,28 @@
  "updatedAt": "2026-10-23",
  "items": [
   {
+   "title": "[일반] [채용공고] 광운대학교 산학협력단 「RISE 사업단(회계)」직원 채용 공고",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53547&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-23",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-23",
+   "desc": "「광운대학교 산학협력단」 에서 유능하고 역량 있는 인재를 다음과 같이 공개 채용합니다. 광운대학교 산학협력단장"
+  },
+  {
+   "title": "[일반] [HUSS-글로벌공생] AI기반 특허 빅데이터 분석을 통한 글로벌 융합인재 양성 교육 프로그램 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53545&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-23",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-23",
+   "thumb": "data/news/img/fd8f3187a3949a8a.webp",
+   "desc": "광운대학교 인문사회융합인재양성사업단(HUSS)에서 AI 활용 역량과 특허 빅데이터 분석 능력을 키우고, 지식재산 분야의 실무를 경험할 수 있는 「AI기반 특허 빅데이터 분석을 통한 글로벌융합인재 양성 교육…"
+  },
+  {
    "title": "[일반] 기간제 계약직원 채용 공고(교육혁신원 성과관리팀)",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53542&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "postedAt": "2026-10-23",
@@ -413,28 +435,6 @@
    "src": "b09cb042",
    "foundAt": "2026-10-12",
    "desc": "기간제 계약직원 모집 공고 1. 지원 자격 및 우대사항 모집인원 담당업무 정보과학교육원(학점은행제) 교학팀 행정업무 등 지원 자격"
-  },
-  {
-   "title": "[일반] 기간제 계약직원 채용 공고(홍보기획실)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53455&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-12",
-   "kind": "채용",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-12",
-   "desc": "기간제 계약직원 모집 공고 1. 지원 자격 및 우대사항 모집인원 담당업무 대학 행사 영상촬영 및 사진촬영 등 지원 자격"
-  },
-  {
-   "title": "[일반] [서울특별시여성가족재단] 서울 디지털성범죄 안심지원센터 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53454&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-08",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "thumb": "data/news/img/5d2235b657bb5b41.webp",
-   "desc": "가 . 지원대상 : 서울시 거주 · 재학 · 재직 중인 디지털성범죄 피해시민",
-   "src": "b09cb042"
   }
  ]
 }

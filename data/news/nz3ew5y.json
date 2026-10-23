@@ -3,6 +3,16 @@
  "updatedAt": "2026-10-23",
  "items": [
   {
+   "title": "일반공지 PHP 취약점 조치 안내 신촌/국제",
+   "url": "https://www.yonsei.ac.kr/bbs/sc/58/944452/artclView.do",
+   "postedAt": "2026-10-23",
+   "school": "연세대학교",
+   "campus": "",
+   "src": "d66b0482",
+   "foundAt": "2026-10-23",
+   "desc": "1. 안내 개요 최근 웹서비스 개발 프로그래밍 언어인 PHP에서 초고위험(Critical) 취약점 이 발견되어 한국인터넷진흥원(KISA), 교육부 사이버안전센터 등 국내외 관련기관에서 즉시 보안 업데이트를 권고하고…"
+  },
+  {
    "title": "일반공지 개인정보 유출 사실 안내 및 사과문 신촌/국제",
    "url": "https://www.yonsei.ac.kr/bbs/sc/58/944433/artclView.do",
    "postedAt": "2026-10-22",

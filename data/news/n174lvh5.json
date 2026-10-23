@@ -3,6 +3,26 @@
  "updatedAt": "2026-10-23",
  "items": [
   {
+   "title": "[학생지원팀] 2026학년도 2학기 동계방학 집중근로 희망근로지 신청 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277033&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-23",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-23"
+  },
+  {
+   "title": "2026-겨울학기 가톨릭계 대학 학점교류 안내(서강대, 가톨릭관동대, 대구가톨릭대, 부산가톨릭대)",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277031&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-23",
+   "kind": "학사",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-23",
+   "desc": "1. 학점교류 제도 안내 신청절차 1) [ 트리니티 ] – [ 학사정보 ] – [ 수업 / 성적 ] – [ 수업 ] – [ 국내학점교류신청 ( 가톨릭계대학 )] 에서 지원사항 작성"
+  },
+  {
    "title": "[대학일자리플러스센터] 이노진 – 품질관리 및 제형업무 채용",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277011&article.offset=0&articleLimit=10",
    "postedAt": "2026-10-23",
@@ -407,25 +427,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/b448f480376e86bf.webp"
-  },
-  {
-   "title": "[학생지원팀] 2026학년도 2학기 직무인턴 3차 신청 안내(10/1~10/7)",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276345&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-01",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "desc": "2026학년도 2학기 직무인턴 3차 신청 및 선발과 관련하여 아래와 같이 안내하오니 희망하는 학생은 신청해 주시기 바랍니다."
-  },
-  {
-   "title": "[앵커사업행정팀] 「2026 경기스타트업 서밋」 개최 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276349&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-01",
-   "kind": "행사",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/a78c5cf200e2b7f2.webp"
   }
  ]
 }
