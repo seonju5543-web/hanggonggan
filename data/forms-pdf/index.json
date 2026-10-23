@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-17",
+ "updatedAt": "2026-10-24",
  "items": {
   "auto-larshipdoarticleno376668": [
    {
@@ -10,71 +10,6 @@
     "srcBytes": 60416,
     "from": "원본 그대로 변환",
     "at": "2026-10-12"
-   }
-  ],
-  "auto-enoticedoarticleno769228": [
-   {
-    "file": "auto-enoticedoarticleno769228/1-_붙임2_2026년_우양재단_동행장학_신청서_서식.pdf",
-    "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp",
-    "pages": 6,
-    "bytes": 286601,
-    "srcBytes": 102912,
-    "from": "원본 그대로 변환",
-    "at": "2026-10-12"
-   }
-  ],
-  "auto-otice06doarticleno140281": [
-   {
-    "file": "auto-otice06doarticleno140281/1-_붙임2_2026년_우양재단_동행장학_신청서_서식.pdf",
-    "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp",
-    "pages": 6,
-    "bytes": 286601,
-    "srcBytes": 102912,
-    "from": "원본 그대로 변환",
-    "at": "2026-10-12"
-   }
-  ],
-  "auto-krbbskr845690artclviewdo": [
-   {
-    "file": "auto-krbbskr845690artclviewdo/1-_붙임2_2026년_우양재단_동행장학_신청서_서식.pdf",
-    "name": "[붙임2] 2026년 우양재단 동행장학 신청서 서식.hwp",
-    "pages": 6,
-    "bytes": 286601,
-    "srcBytes": 102912,
-    "from": "원본 그대로 변환",
-    "at": "2026-10-12"
-   }
-  ],
-  "auto-bswj104944259artclviewdo": [
-   {
-    "file": "auto-bswj104944259artclviewdo/1-형제장학금_신청서.pdf",
-    "name": "형제장학금 신청서.hwp",
-    "pages": 2,
-    "bytes": 45800,
-    "srcBytes": 46592,
-    "from": "원본 그대로 변환",
-    "at": "2026-10-12"
-   }
-  ],
-  "auto-notiphpcodes1301seq11294": [
-   {
-    "file": "auto-notiphpcodes1301seq11294/1-양식1._하나장학생_신청서_대학생용_.pdf",
-    "name": "양식1. 하나장학생 신청서(대학생용).docx",
-    "pages": 2,
-    "bytes": 77074,
-    "srcBytes": 37262,
-    "from": "원본 그대로 변환",
-    "at": "2026-10-12"
-   },
-   {
-    "file": "auto-notiphpcodes1301seq11294/2-양식2._개인정보_수집이용_및_제공_동의서.pdf",
-    "name": "양식2. 개인정보 수집이용 및 제공 동의서.pdf",
-    "pages": 1,
-    "bytes": 245779,
-    "srcBytes": 245779,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-17"
    }
   ],
   "auto-ticedoarticleno231977952": [
