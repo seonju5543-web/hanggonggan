@@ -3919,6 +3919,84 @@
    "dir": "insta/pub/2000348002",
    "at": "2026-10-23",
    "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2000348001",
+   "org": "진주시청",
+   "name": "성적우수장학생",
+   "due": "2026-11-13",
+   "school": null,
+   "tplNo": 4,
+   "cards": 5,
+   "dir": "insta/pub/2000348001",
+   "at": "2026-10-23",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2000348006",
+   "org": "진주시청",
+   "name": "지역특성화장학생",
+   "due": "2026-11-13",
+   "school": null,
+   "tplNo": 3,
+   "cards": 5,
+   "dir": "insta/pub/2000348006",
+   "at": "2026-10-23",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2000001134",
+   "org": "(재)한국장학재단",
+   "name": "다문화 · 탈북(이주 · 북한배경)학생 멘토링장학금",
+   "due": "2027-02-28",
+   "school": null,
+   "tplNo": 1,
+   "cards": 5,
+   "dir": "insta/pub/2000001134",
+   "at": "2026-10-23",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2000347003",
+   "org": "재단법인 거창군장학회",
+   "name": "거창군지역출신대학생등록금지원",
+   "due": "2026-11-16",
+   "school": null,
+   "tplNo": 4,
+   "cards": 5,
+   "dir": "insta/pub/2000347003",
+   "at": "2026-10-23",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2000446024",
+   "org": "재단법인 전남인재평생교육진흥원",
+   "name": "전남농업마이스터대학장학생",
+   "due": "2026-10-23",
+   "school": null,
+   "tplNo": 1,
+   "cards": 5,
+   "dir": "insta/pub/2000446024",
+   "at": "2026-10-23",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2700727005",
+   "org": "재단법인 안산인재육성재단",
+   "name": "대학생 본인부담 등록금 반값 지원",
+   "due": "2026-11-20",
+   "school": null,
+   "tplNo": 1,
+   "cards": 5,
+   "dir": "insta/pub/2700727005",
+   "at": "2026-10-23",
+   "dates": "absolute"
   }
  ]
 }
