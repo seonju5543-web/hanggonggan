@@ -45,7 +45,7 @@
    "kind": "page",
    "param": "pageNo"
   },
-  "checkedAt": "2026-10-17"
+  "checkedAt": "2026-10-24"
  },
  "https://www.hongik.ac.kr/kr/newscenter/notice.do": {
   "ok": false,
@@ -441,11 +441,7 @@
   "checkedAt": "2026-10-24"
  },
  "https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1": {
-  "ok": true,
-  "way": {
-   "kind": "page",
-   "param": "page"
-  },
+  "ok": false,
   "checkedAt": "2026-10-24"
  },
  "https://gwangyang.go.kr/fund/": {

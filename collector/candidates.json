@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-10-24",
- "count": 1717,
+ "count": 1742,
  "items": [
   {
    "title": "[삼척] 2026학년도 2학기 KNU-SOS 장학생 신청 안내(3차)",
@@ -367,6 +367,363 @@
    "foundAt": "2026-10-24",
    "bodyDeadline": "2026-11-12",
    "bodyDeadlineText": "가. 장학금명: 2026년 2학기 푸른등대 기부장학금(2차) 나. 학생 신청 및 서류제출 기간: 2026. 10. 22.(목) 09:00 ∼ 11. 12.(목) 18:00"
+  },
+  {
+   "title": "[창업교육센터] 『2026 학생 창업유망팀 300+』 최종 선발 재학생 대상 장학금 신청 안내(~11/4) (수정)",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766650",
+   "attachments": [
+    {
+     "name": "(양식)영수증 및 참여보고서_이름.hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=(%25EC%2596%2591%25EC%258B%259D)%25EC%2598%2581%25EC%2588%2598%25EC%25A6%259D%20%25EB%25B0%258F%20%25EC%25B0%25B8%25EC%2597%25AC%25EB%25B3%25B4%25EA%25B3%25A0%25EC%2584%259C_%25EC%259D%25B4%25EB%25A6%2584.hwp&filepath=/files/article/JANGHAKNOTICE/26766650/&filerealname=3E3B3058613B4F9C9794C42A25A0E3E5.hwp"
+    }
+   ],
+   "deadlineHint": "신청기한 : ~2026.11.04.(수)까지 4. 신청방법 : 구글폼 신청 https://forms.gle/5vzwyrd1WyHw7tsC7 ​",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "2026학년도 방일영장학생 선발(1학년 재학 중 탈북학생 대상, ~10/29(목) 17시까지)",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766656",
+   "attachments": [
+    {
+     "name": "1. 장학신청서.pdf",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=1.%20%25EC%259E%25A5%25ED%2595%2599%25EC%258B%25A0%25EC%25B2%25AD%25EC%2584%259C.pdf&filepath=/files/article/JANGHAKNOTICE/26766656/&filerealname=AF4A43C4F61341B8827E52080B4F7FD0.pdf"
+    },
+    {
+     "name": "2. 자기소개서(양식).hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=2.%20%25EC%259E%2590%25EA%25B8%25B0%25EC%2586%258C%25EA%25B0%259C%25EC%2584%259C(%25EC%2596%2591%25EC%258B%259D).hwp&filepath=/files/article/JANGHAKNOTICE/26766656/&filerealname=29EA15810E7A4FFF92325572A57A11D3.hwp"
+    },
+    {
+     "name": "3. 추천서(소속 단과대학 학장 또는 학과장).hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=3.%20%25EC%25B6%2594%25EC%25B2%259C%25EC%2584%259C(%25EC%2586%258C%25EC%2586%258D%20%25EB%258B%25A8%25EA%25B3%25BC%25EB%258C%2580%25ED%2595%2599%20%25ED%2595%2599%25EC%259E%25A5%20%25EB%2598%2590%25EB%258A%2594%20%25ED%2595%2599%25EA%25B3%25BC%25EC%259E%25A5).hwp&filepath=/files/article/JANGHAKNOTICE/26766656/&filerealname=20FCE7D67D324A90B985EC628E0EC210.hwp"
+    },
+    {
+     "name": "1. 장학신청서.pdf",
+     "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766656#n-1.%20%EC%9E%A5%ED%95%99%EC%8B%A0%EC%B2%AD%EC%84%9C.pdf"
+    }
+   ],
+   "deadlineHint": "신청기한 : ~ 2026.10.29.(목) 17:00까지(제출기한 엄수) 7. 제출방법 : 실물 서류 제출 - 방문제출: 본관 3 층 장학팀 -",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "2026-2학기 인송장학 장학생 선발 추천 안내(1인당 200만원(생활비), ~10/29(목) 17시까지)",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766657",
+   "attachments": [
+    {
+     "name": "1. 신청서류(양식).hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=1.%20%25EC%258B%25A0%25EC%25B2%25AD%25EC%2584%259C%25EB%25A5%2598(%25EC%2596%2591%25EC%258B%259D).hwp&filepath=/files/article/JANGHAKNOTICE/26766657/&filerealname=660A8DD9B14A4426977FB6BAAD6F19D0.hwp"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "2027년도 한국지도자육성장학재단 장학생 선발 안내(등록금전액 혹은 생활비 350만원, ~11/2(월) 17시까지)",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766659",
+   "attachments": [
+    {
+     "name": "1. 2027년도_서류양식(지원서).hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=1.%202027%25EB%2585%2584%25EB%258F%2584_%25EC%2584%259C%25EB%25A5%2598%25EC%2596%2591%25EC%258B%259D(%25EC%25A7%2580%25EC%259B%2590%25EC%2584%259C).hwp&filepath=/files/article/JANGHAKNOTICE/26766659/&filerealname=B8EC288ED33B45CEA0C704829894ED09.hwp"
+    },
+    {
+     "name": "2. 2027년도_서류양식(추천서).hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=2.%202027%25EB%2585%2584%25EB%258F%2584_%25EC%2584%259C%25EB%25A5%2598%25EC%2596%2591%25EC%258B%259D(%25EC%25B6%2594%25EC%25B2%259C%25EC%2584%259C).hwp&filepath=/files/article/JANGHAKNOTICE/26766659/&filerealname=421F10B178CD4DA28DC80349FF958361.hwp"
+    },
+    {
+     "name": "3. 2027년도_서류양식(자기소개서).hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=3.%202027%25EB%2585%2584%25EB%258F%2584_%25EC%2584%259C%25EB%25A5%2598%25EC%2596%2591%25EC%258B%259D(%25EC%259E%2590%25EA%25B8%25B0%25EC%2586%258C%25EA%25B0%259C%25EC%2584%259C).hwp&filepath=/files/article/JANGHAKNOTICE/26766659/&filerealname=30CE78A2B71F43048CFF20800AC86487.hwp"
+    },
+    {
+     "name": "4. 2027년도_개인정보활용동의서.hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=4.%202027%25EB%2585%2584%25EB%258F%2584_%25EA%25B0%259C%25EC%259D%25B8%25EC%25A0%2595%25EB%25B3%25B4%25ED%2599%259C%25EC%259A%25A9%25EB%258F%2599%25EC%259D%2598%25EC%2584%259C.hwp&filepath=/files/article/JANGHAKNOTICE/26766659/&filerealname=43D05EB7226940B0B9B6FC3A92E7C41F.hwp"
+    },
+    {
+     "name": "5. 2027년도_장학생 의무사항 참여 동의서.hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=5.%202027%25EB%2585%2584%25EB%258F%2584_%25EC%259E%25A5%25ED%2595%2599%25EC%2583%259D%20%25EC%259D%2598%25EB%25AC%25B4%25EC%2582%25AC%25ED%2595%25AD%20%25EC%25B0%25B8%25EC%2597%25AC%20%25EB%258F%2599%25EC%259D%2598%25EC%2584%259C.hwp&filepath=/files/article/JANGHAKNOTICE/26766659/&filerealname=F25D99CE99E642B6B80334D5F4C35F5B.hwp"
+    },
+    {
+     "name": "5. 2027년도_장학생 의무사항 참여 동의서.hwp",
+     "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766659#n-5.%202027%EB%85%84%EB%8F%84_%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%9D%98%EB%AC%B4%EC%82%AC%ED%95%AD%20%EC%B0%B8%EC%97%AC%20%EB%8F%99%EC%9D%98%EC%84%9C.hwp"
+    }
+   ],
+   "deadlineHint": "제출기한 : 2026.11.02.(월) 17:00까지 8. 제출방법 : 실물 서류 제출 - 방문제출: 본관 3 층 장학팀 - 우편제출 : (04",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "2026-2학기 창암장학재단 장학생 선발(생활비 1인 200만원, ~11/12(목) 17시까지)",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766661",
+   "attachments": [
+    {
+     "name": "2026년 창암장학생 신청양식.hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=2026%25EB%2585%2584%20%25EC%25B0%25BD%25EC%2595%2594%25EC%259E%25A5%25ED%2595%2599%25EC%2583%259D%20%25EC%258B%25A0%25EC%25B2%25AD%25EC%2596%2591%25EC%258B%259D.hwp&filepath=/files/article/JANGHAKNOTICE/26766661/&filerealname=AE9E0C284DAD491BA83145BCCCDF23D4.hwp"
+    },
+    {
+     "name": "2026년 창암장학생 신청양식.hwp",
+     "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766661#n-2026%EB%85%84%20%EC%B0%BD%EC%95%94%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%8B%A0%EC%B2%AD%EC%96%91%EC%8B%9D.hwp"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "2026-2학기 주거안정장학금 장학생 서약서 제출 안내(~10/25(일))",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766667",
+   "attachments": [
+    {
+     "name": "(붙임) 장학생 서약서 작성_매뉴얼(2026).pdf",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=(%25EB%25B6%2599%25EC%259E%2584)%20%25EC%259E%25A5%25ED%2595%2599%25EC%2583%259D%20%25EC%2584%259C%25EC%2595%25BD%25EC%2584%259C%20%25EC%259E%2591%25EC%2584%25B1_%25EB%25A7%25A4%25EB%2589%25B4%25EC%2596%25BC(2026).pdf&filepath=/files/article/JANGHAKNOTICE/26766667/&filerealname=9B78486E52FF4C4EB24098866EDDB4BF.pdf"
+    },
+    {
+     "name": "(붙임) 장학생 서약서 작성_매뉴얼(2026).pdf",
+     "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766667#n-(%EB%B6%99%EC%9E%84)%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%9C%EC%95%BD%EC%84%9C%20%EC%9E%91%EC%84%B1_%EB%A7%A4%EB%89%B4%EC%96%BC(2026).pdf"
+    }
+   ],
+   "deadlineHint": "제출기한 : 2026.10.25.( 일 ) 까지 3. 제출방법: 한국장학재단 홈페이지 > 장학금 > 주거안정장학금 > 교육이수 및 장학생 서약서",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "2026-2학기 송담큰스님장학 장학생 선발(~11/2(월) 17시까지)",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766668",
+   "attachments": [],
+   "deadlineHint": "신청기간 2026. 10. 20. ( 화 ) - 11. 02. ( 월 ) 17:00 심사일정 2026. 11. 03. ( 화 ) ~ 11. 11",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "2026-2학기 강영순기부자장학 장학생 선발(~11/2(월) 17시까지)",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766677",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "(안동)봉황사 지역미래불자육성장학 장학생 선발 안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766687",
+   "attachments": [],
+   "deadlineHint": "신청기한 : ~10.25.( 일 ) 23:59 까지 8. 장학생 주요 의무 사항 - 교내 장학증서 수여식 참석 (11.16.( 월 ) 11:00",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "2026학년도 인탑스평산장학재단 장학생 선발(이공계열 3-4학년 대상, 1인당 연 600만원, ~10/25(일)까지)",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766688",
+   "attachments": [
+    {
+     "name": "추천서(양식).hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=%25EC%25B6%2594%25EC%25B2%259C%25EC%2584%259C(%25EC%2596%2591%25EC%258B%259D).hwp&filepath=/files/article/JANGHAKNOTICE/26766688/&filerealname=7720653B2B994330A5DE3FC2F36DA7E2.hwp"
+    },
+    {
+     "name": "장학생 신청서 등 제출서류(양식).hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=%25EC%259E%25A5%25ED%2595%2599%25EC%2583%259D%20%25EC%258B%25A0%25EC%25B2%25AD%25EC%2584%259C%20%25EB%2593%25B1%20%25EC%25A0%259C%25EC%25B6%259C%25EC%2584%259C%25EB%25A5%2598(%25EC%2596%2591%25EC%258B%259D).hwp&filepath=/files/article/JANGHAKNOTICE/26766688/&filerealname=254EDE1964584019BAD8B3315CF3173D.hwp"
+    },
+    {
+     "name": "장학생 신청서 등 제출서류(양식).hwp",
+     "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766688#n-%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%8B%A0%EC%B2%AD%EC%84%9C%20%EB%93%B1%20%EC%A0%9C%EC%B6%9C%EC%84%9C%EB%A5%98(%EC%96%91%EC%8B%9D).hwp"
+    }
+   ],
+   "deadlineHint": "신청 기간 : ~2026.10.25(일)까지 나. 장학생 최종자 재단 선정 예정 다. 하반기 장학금 지급 일정 : 2026.11월 말 8. 유의",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "[홍보] 2026년 2학기 푸른등대 기부장학금(2차) 신규장학생 선발 안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766697",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "[홍보] 2027년 STX장학재단 장학생 선발 안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766700",
+   "attachments": [
+    {
+     "name": "27년 STX장학재단 장학생 선발요강.hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=27%25EB%2585%2584%20STX%25EC%259E%25A5%25ED%2595%2599%25EC%259E%25AC%25EB%258B%25A8%20%25EC%259E%25A5%25ED%2595%2599%25EC%2583%259D%20%25EC%2584%25A0%25EB%25B0%259C%25EC%259A%2594%25EA%25B0%2595.hwp&filepath=/files/article/JANGHAKNOTICE/26766700/&filerealname=82B1317EB1394ED59E7EAD123BFB0FDD.hwp"
+    },
+    {
+     "name": "27년 STX장학재단 장학생 선발요강.hwp",
+     "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766700#n-27%EB%85%84%20STX%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%EC%9A%94%EA%B0%95.hwp"
+    }
+   ],
+   "deadlineHint": "접수기간 : 2026년 11월 2일(월) 오전 10시 ~ 11월 16일(월) 오후 5시까지 (온라인 접수에 한하며, 접수기간 내에만 지원서양식",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "[홍보] 2026학년도 하반기 인석장학금 신청 안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766703",
+   "attachments": [
+    {
+     "name": "체크리스트.pdf",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=%25EC%25B2%25B4%25ED%2581%25AC%25EB%25A6%25AC%25EC%258A%25A4%25ED%258A%25B8.pdf&filepath=/files/article/JANGHAKNOTICE/26766703/&filerealname=55E385360167499D9EF5EC235F63BDCC.pdf"
+    }
+   ],
+   "deadlineHint": "제출 기한 : 2026.11.18(수）오전 10시 ~ 2026.11.26.(목) 오후 4시 2）장학금의 종류 : 유형 I （등록금） 및 유형 Ⅱ",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "2027년도 한국지도자육성장학재단 장학생 선발 안내(등록금전액 혹은 생활비 350만원, ~11/2(월) 17시까지)",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26766659",
+   "attachments": [
+    {
+     "name": "1. 2027년도_서류양식(지원서).hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=1.%202027%25EB%2585%2584%25EB%258F%2584_%25EC%2584%259C%25EB%25A5%2598%25EC%2596%2591%25EC%258B%259D(%25EC%25A7%2580%25EC%259B%2590%25EC%2584%259C).hwp&filepath=/files/article/JANGHAKNOTICE/26766659/&filerealname=B8EC288ED33B45CEA0C704829894ED09.hwp"
+    },
+    {
+     "name": "2. 2027년도_서류양식(추천서).hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=2.%202027%25EB%2585%2584%25EB%258F%2584_%25EC%2584%259C%25EB%25A5%2598%25EC%2596%2591%25EC%258B%259D(%25EC%25B6%2594%25EC%25B2%259C%25EC%2584%259C).hwp&filepath=/files/article/JANGHAKNOTICE/26766659/&filerealname=421F10B178CD4DA28DC80349FF958361.hwp"
+    },
+    {
+     "name": "3. 2027년도_서류양식(자기소개서).hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=3.%202027%25EB%2585%2584%25EB%258F%2584_%25EC%2584%259C%25EB%25A5%2598%25EC%2596%2591%25EC%258B%259D(%25EC%259E%2590%25EA%25B8%25B0%25EC%2586%258C%25EA%25B0%259C%25EC%2584%259C).hwp&filepath=/files/article/JANGHAKNOTICE/26766659/&filerealname=30CE78A2B71F43048CFF20800AC86487.hwp"
+    },
+    {
+     "name": "4. 2027년도_개인정보활용동의서.hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=4.%202027%25EB%2585%2584%25EB%258F%2584_%25EA%25B0%259C%25EC%259D%25B8%25EC%25A0%2595%25EB%25B3%25B4%25ED%2599%259C%25EC%259A%25A9%25EB%258F%2599%25EC%259D%2598%25EC%2584%259C.hwp&filepath=/files/article/JANGHAKNOTICE/26766659/&filerealname=43D05EB7226940B0B9B6FC3A92E7C41F.hwp"
+    },
+    {
+     "name": "5. 2027년도_장학생 의무사항 참여 동의서.hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=5.%202027%25EB%2585%2584%25EB%258F%2584_%25EC%259E%25A5%25ED%2595%2599%25EC%2583%259D%20%25EC%259D%2598%25EB%25AC%25B4%25EC%2582%25AC%25ED%2595%25AD%20%25EC%25B0%25B8%25EC%2597%25AC%20%25EB%258F%2599%25EC%259D%2598%25EC%2584%259C.hwp&filepath=/files/article/JANGHAKNOTICE/26766659/&filerealname=F25D99CE99E642B6B80334D5F4C35F5B.hwp"
+    }
+   ],
+   "deadlineHint": "제출기한 : 2026.11.02.(월) 17:00까지 8. 제출방법 : 실물 서류 제출 - 방문제출: 본관 3 층 장학팀 - 우편제출 : (04",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "2027년도 한국지도자육성장학재단 장학생 선발 안내(등록금전액 혹은 생활비 350만원, ~11/2(월) 17시까지)",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26766659",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "2026-2학기 창암장학재단 장학생 선발(생활비 1인 200만원, ~11/12(목) 17시까지)",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26766661",
+   "attachments": [
+    {
+     "name": "2026년 창암장학생 신청양식.hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=2026%25EB%2585%2584%20%25EC%25B0%25BD%25EC%2595%2594%25EC%259E%25A5%25ED%2595%2599%25EC%2583%259D%20%25EC%258B%25A0%25EC%25B2%25AD%25EC%2596%2591%25EC%258B%259D.hwp&filepath=/files/article/JANGHAKNOTICE/26766661/&filerealname=AE9E0C284DAD491BA83145BCCCDF23D4.hwp"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "2026-2학기 창암장학재단 장학생 선발(생활비 1인 200만원, ~11/12(목) 17시까지)",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26766661",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "2026-2학기 송담큰스님장학 장학생 선발(~11/2(월) 17시까지)",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26766668",
+   "attachments": [],
+   "deadlineHint": "신청기간 2026. 10. 20. ( 화 ) - 11. 02. ( 월 ) 17:00 심사일정 2026. 11. 03. ( 화 ) ~ 11. 11",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "2026-2학기 송담큰스님장학 장학생 선발(~11/2(월) 17시까지)",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26766668",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "2026-2학기 강영순기부자장학 장학생 선발(~11/2(월) 17시까지)",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26766677",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "2026-2학기 강영순기부자장학 장학생 선발(~11/2(월) 17시까지)",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26766677",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "(안동)봉황사 지역미래불자육성장학 장학생 선발 안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26766687",
+   "attachments": [],
+   "deadlineHint": "신청기한 : ~10.25.( 일 ) 23:59 까지 8. 장학생 주요 의무 사항 - 교내 장학증서 수여식 참석 (11.16.( 월 ) 11:00",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "(안동)봉황사 지역미래불자육성장학 장학생 선발 안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26766687",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "2026학년도 인탑스평산장학재단 장학생 선발(이공계열 3-4학년 대상, 1인당 연 600만원, ~10/25(일)까지)",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?nttId=26766688",
+   "attachments": [
+    {
+     "name": "추천서(양식).hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=%25EC%25B6%2594%25EC%25B2%259C%25EC%2584%259C(%25EC%2596%2591%25EC%258B%259D).hwp&filepath=/files/article/JANGHAKNOTICE/26766688/&filerealname=7720653B2B994330A5DE3FC2F36DA7E2.hwp"
+    },
+    {
+     "name": "장학생 신청서 등 제출서류(양식).hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=%25EC%259E%25A5%25ED%2595%2599%25EC%2583%259D%20%25EC%258B%25A0%25EC%25B2%25AD%25EC%2584%259C%20%25EB%2593%25B1%20%25EC%25A0%259C%25EC%25B6%259C%25EC%2584%259C%25EB%25A5%2598(%25EC%2596%2591%25EC%258B%259D).hwp&filepath=/files/article/JANGHAKNOTICE/26766688/&filerealname=254EDE1964584019BAD8B3315CF3173D.hwp"
+    }
+   ],
+   "deadlineHint": "신청 기간 : ~2026.10.25(일)까지 나. 장학생 최종자 재단 선정 예정 다. 하반기 장학금 지급 일정 : 2026.11월 말 8. 유의",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "2026학년도 인탑스평산장학재단 장학생 선발(이공계열 3-4학년 대상, 1인당 연 600만원, ~10/25(일)까지)",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26766688",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-24"
   },
   {
    "title": "[교외] 2026학년 제7기 인재림 장학생 선발 공고",

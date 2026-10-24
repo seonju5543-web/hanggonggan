@@ -786,7 +786,7 @@
    "added": "2026-10-24",
    "fetched": false,
    "schematized": false,
-   "tries": 2,
+   "tries": 3,
    "lastTryAt": "2026-10-24"
   },
   {
@@ -801,6 +801,46 @@
    "id": "auto-pnoticedoarticleno367476",
    "name": "[학부] 2026년 2학기 거창군 지역출신 대학생 등록금 장학금 신청 안내",
    "target": "2026년 2학기 거창군 지역출신 대학생 등록금 장학금",
+   "added": "2026-10-24",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-ghaknoticedetail26766688",
+   "name": "2026학년도 인탑스평산장학재단 장학생 선발(이공계열 3-4학년 대상, 1인당 연 600만원, ~10/25(일)까지)",
+   "target": "2026학년도 인탑스평산장학재단 장학생 선발(이공계열 ",
+   "added": "2026-10-24",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-ghaknoticedetail26766661",
+   "name": "2026-2학기 창암장학재단 장학생 선발(생활비 1인 200만원, ~11/12(목) 17시까지)",
+   "target": "2026-2학기 창암장학재단 장학생 선발(생활비 1인 ",
+   "added": "2026-10-24",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-ghaknoticedetail26766657",
+   "name": "2026-2학기 인송장학 장학생 선발 추천 안내(1인당 200만원(생활비), ~10/29(목) 17시까지)",
+   "target": "2026-2학기 인송장학 장학생 선발 추천 안내(1인당",
+   "added": "2026-10-24",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-ghaknoticedetail26766656",
+   "name": "2026학년도 방일영장학생 선발(1학년 재학 중 탈북학생 대상, ~10/29(목) 17시까지)",
+   "target": "2026학년도 방일영장학생 선발(1학년 재학 중 탈북학",
+   "added": "2026-10-24",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-ghaknoticedetail26766650",
+   "name": "[창업교육센터] 『2026 학생 창업유망팀 300+』 최종 선발 재학생 대상 장학금 신청 안내(~11/4) (수정)",
+   "target": "『2026 학생 창업유망팀 300+』 최종 선발 재학생",
    "added": "2026-10-24",
    "fetched": true,
    "schematized": false
