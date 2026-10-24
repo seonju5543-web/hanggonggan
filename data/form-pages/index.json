@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-24",
+ "updatedAt": "2026-10-25",
  "items": {
   "auto-oardid323011menuno200318": [
    {
@@ -470,6 +470,49 @@
     "srcPages": "6~8",
     "from": "공고문 서식 쪽 떼기",
     "at": "2026-10-24"
+   }
+  ],
+  "auto-4srsearchkeyarticletitle": [
+   {
+    "src": "elig-18fhtq-1.pdf",
+    "srcBytes": 2535243,
+    "none": true,
+    "at": "2026-10-25"
+   }
+  ],
+  "auto-pnoticedoarticleno367476": [
+   {
+    "file": "auto-pnoticedoarticleno367476/1-elig-176ryo-1_p6-8.pdf",
+    "name": "공고문 안 신청서 서식 (6~8쪽)",
+    "pages": 3,
+    "bytes": 297366,
+    "src": "elig-176ryo-1.pdf",
+    "srcBytes": 327526,
+    "srcPages": "6~8",
+    "from": "공고문 서식 쪽 떼기",
+    "at": "2026-10-25"
+   }
+  ],
+  "auto-900bnum5233cate0qidx5233": [
+   {
+    "src": "elig-81fm40-1.pdf",
+    "srcBytes": 113127,
+    "none": true,
+    "at": "2026-10-25"
+   },
+   {
+    "src": "elig-81fm40-2.pdf",
+    "srcBytes": 83883,
+    "none": true,
+    "at": "2026-10-25"
+   }
+  ],
+  "auto-0713no2515824sitedvscdkr": [
+   {
+    "src": "elig-ujjyp0-1.pdf",
+    "srcBytes": 106847,
+    "none": true,
+    "at": "2026-10-25"
    }
   ]
  }

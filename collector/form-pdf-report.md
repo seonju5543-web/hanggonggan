@@ -1,13 +1,13 @@
-## 📄 신청서 원본 → PDF 리포트 (2026-10-24)
+## 📄 신청서 원본 → PDF 리포트 (2026-10-25)
 
 공고 첨부의 신청서 원본(HWP·HWPX·DOC·DOCX·PDF)을 글자 하나 안 바꾸고 PDF 로 바꿔 `data/forms-pdf/` 에 둡니다(마감 전 공고만 · 마감 뒤 지움).
 🔴 양식을 만들어 내지 않습니다 — 못 바꾼 것은 아래에 이유와 함께 남깁니다.
 
-대상 공고 24건 · 파일 32개 — 이번에 바꿈 1 · 이미 있어 건너뜀 3 · 못 바꿈 28 · 원본을 아직 못 받음 9 · 마감 지나 지움 0건
+대상 공고 30건 · 파일 40개 — 이번에 바꿈 2 · 이미 있어 건너뜀 4 · 못 바꿈 34 · 원본을 아직 못 받음 10 · 마감 지나 지움 0건
 
 ### 못 바꾼 것 (이유별)
-- 변환기가 못 읽음(hwp) · 종료 77 · 변환기 말: ng access rights. Please make sure that you have sufficient access rights for the following location and restart LibreOffice: /home/runner/.config/libreoffice/4: 26개
-- 변환기가 못 읽음(hwpx) · 종료 77 · 변환기 말: ng access rights. Please make sure that you have sufficient access rights for the following location and restart LibreOffice: /home/runner/.config/libreoffice/4: 2개
+- 변환기가 못 읽음(hwp) · 종료 77 · 변환기 말: ng access rights. Please make sure that you have sufficient access rights for the following location and restart LibreOffice: /home/runner/.config/libreoffice/4: 31개
+- 변환기가 못 읽음(hwpx) · 종료 77 · 변환기 말: ng access rights. Please make sure that you have sufficient access rights for the following location and restart LibreOffice: /home/runner/.config/libreoffice/4: 3개
   - auto-ent2431266737artclviewdo · 붙임1.멘토 활동계획서 양식.hwp — 변환기가 못 읽음(hwp) · 종료 77 · 변환기 말: ng access rights. Please make sure that you have sufficient access rights for the following location and restart LibreOffice: /home/runner/.config/libreoffice/4
   - auto-larshipdoarticleno376668 · 붙임2-1. 2026-2학기_바르게, 1-1-1 캠페인 장학_신청서.hwp — 변환기가 못 읽음(hwp) · 종료 77 · 변환기 말: ng access rights. Please make sure that you have sufficient access rights for the following location and restart LibreOffice: /home/runner/.config/libreoffice/4
   - auto-larshipdoarticleno376668 · 붙임2-2. 2026-2학기_개인(신용)정보_수집_이용_제공_및_조회_동의서(바르게, 1-1-1 캠페인 장학).hwp — 변환기가 못 읽음(hwp) · 종료 77 · 변환기 말: ng access rights. Please make sure that you have sufficient access rights for the following location and restart LibreOffice: /home/runner/.config/libreoffice/4
@@ -36,8 +36,10 @@
   - auto-otice06doarticleno140646 · 신청서 서식(공지용).hwp — 변환기가 못 읽음(hwp) · 종료 77 · 변환기 말: ng access rights. Please make sure that you have sufficient access rights for the following location and restart LibreOffice: /home/runner/.config/libreoffice/4
   - auto-kuk2351210566artclviewdo · 2.2026학년도2학기복지장학금신청서류.hwp — 변환기가 못 읽음(hwp) · 종료 77 · 변환기 말: ng access rights. Please make sure that you have sufficient access rights for the following location and restart LibreOffice: /home/runner/.config/libreoffice/4
   - auto-kuk2351210566artclviewdo · 3.2026학년도2학기복지장학금개인정보이용및제공동의서.hwp — 변환기가 못 읽음(hwp) · 종료 77 · 변환기 말: ng access rights. Please make sure that you have sufficient access rights for the following location and restart LibreOffice: /home/runner/.config/libreoffice/4
+  - auto-notice7doarticleno894852 · (양식)성적향상장학금 신청서.hwp — 변환기가 못 읽음(hwp) · 종료 77 · 변환기 말: ng access rights. Please make sure that you have sufficient access rights for the following location and restart LibreOffice: /home/runner/.config/libreoffice/4
+  - auto-pnoticedoarticleno367476 · 신청서 서식.hwpx — 변환기가 못 읽음(hwpx) · 종료 77 · 변환기 말: ng access rights. Please make sure that you have sufficient access rights for the following location and restart LibreOffice: /home/runner/.config/libreoffice/4
 
-### 원본을 아직 못 받은 신청서 — 9개 (deepfetch 가 받는 몫 · collector/run-deepfetch.txt targets:)
+### 원본을 아직 못 받은 신청서 — 10개 (deepfetch 가 받는 몫 · collector/run-deepfetch.txt targets:)
 - auto-oardid323054menuno200318 · 2026-2학기 반영장학 선발 공지문 및 학업계획서 양식.hwpx
 - auto-oardid323225menuno200318 · 2026-2 경희목련장학 신청서_김쿠옹(학번).hwp
 - auto-archgbn0searchordersort0-0xe0ymd · 신청서 및 개인정보제공동의서(2026.2학기 도전장학금).hwp
@@ -47,4 +49,5 @@
 - auto-ervicenoticedetail520872 · 복지장학생(부모장애유형) 신청서(양식).hwp
 - auto-ervicenoticedetail520869 · 영어(토익)성적장학+신청서(양식).hwp
 - auto-15nttno170869searchctgry · 붙임2_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf
+- auto-amepagescholarshipnotice-0zk0x95 · 붙임1_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf
 

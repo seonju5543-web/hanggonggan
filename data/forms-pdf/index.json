@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-24",
+ "updatedAt": "2026-10-25",
  "items": {
   "auto-larshipdoarticleno376668": [
    {
@@ -122,6 +122,28 @@
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-10-24"
+   }
+  ],
+  "auto-ghaknoticedetail26766656": [
+   {
+    "file": "auto-ghaknoticedetail26766656/1-1._장학신청서.pdf",
+    "name": "1. 장학신청서.pdf",
+    "pages": 1,
+    "bytes": 214258,
+    "srcBytes": 214258,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-25"
+   },
+   {
+    "file": "auto-ghaknoticedetail26766656/2-1._장학신청서.pdf",
+    "name": "1. 장학신청서.pdf",
+    "pages": 1,
+    "bytes": 214258,
+    "srcBytes": 214258,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-25"
    }
   ]
  }
