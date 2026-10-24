@@ -378,15 +378,6 @@
   "at": "2026-10-23",
   "tries": 1
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3538655": {
-  "at": "2026-10-23",
-  "tries": 1,
-  "lines": [
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3527672": {
   "at": "2026-10-24",
   "tries": 1,
@@ -469,6 +460,24 @@
   "lines": [
    "신청대상 : 기후테크에 관심있는 누구나",
    "대상연령 : 전체"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3535407": {
+  "at": "2026-10-24",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3511658": {
+  "at": "2026-10-24",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인"
   ],
   "excludes": [],
   "from": "브라우저 본문"
