@@ -5,7 +5,7 @@
    "kind": "page",
    "param": "pageNo"
   },
-  "checkedAt": "2026-10-23"
+  "checkedAt": "2026-10-24"
  },
  "https://www.yonsei.ac.kr/bbs/sc/58/artclList.do?findClSeq=257": {
   "ok": true,
@@ -13,7 +13,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-10-23"
+  "checkedAt": "2026-10-24"
  },
  "https://www.skku.edu/skku/campus/skk_comm/notice06.do": {
   "ok": false,
@@ -145,7 +145,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-10-17"
+  "checkedAt": "2026-10-24"
  },
  "https://www.cbnu.ac.kr/www/selectBbsNttList.do?bbsNo=8&key=815&searchCtgry=%ED%95%99%EC%82%AC/%EC%9E%A5%ED%95%99": {
   "ok": false,
@@ -242,7 +242,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-10-23"
+  "checkedAt": "2026-10-24"
  },
  "https://www.gachon.ac.kr/kor/7986/subview.do": {
   "ok": false,
@@ -318,7 +318,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-10-23"
+  "checkedAt": "2026-10-24"
  },
  "https://www.ikef.or.kr/page.php?id=%2Fkj%2Fscholar_schedule": {
   "ok": true,
@@ -326,7 +326,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-10-23"
+  "checkedAt": "2026-10-24"
  },
  "https://foundation.miraeasset.com/ko/news/notice/list.do": {
   "ok": false,
@@ -354,7 +354,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-10-23"
+  "checkedAt": "2026-10-24"
  },
  "https://paan.or.kr/": {
   "ok": false,
@@ -398,7 +398,7 @@
    "kind": "page",
    "param": "pageIndex"
   },
-  "checkedAt": "2026-10-23"
+  "checkedAt": "2026-10-24"
  },
  "https://www.iljufoundation.org/homepage/index.do": {
   "ok": false,
@@ -414,7 +414,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-10-23"
+  "checkedAt": "2026-10-24"
  },
  "https://sejong.korea.ac.kr/koreaSejong/7906/subview.do": {
   "ok": false,
@@ -430,15 +430,15 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-10-17"
+  "checkedAt": "2026-10-24"
  },
  "https://www.hufs.ac.kr/hufs/11302/subview.do": {
   "ok": false,
-  "checkedAt": "2026-10-05"
+  "checkedAt": "2026-10-24"
  },
  "https://youth.incheon.go.kr/bbs/bbsMsgList.do?bcd=notice": {
   "ok": false,
-  "checkedAt": "2026-10-05"
+  "checkedAt": "2026-10-24"
  },
  "https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1": {
   "ok": false,
