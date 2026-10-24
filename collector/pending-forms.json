@@ -786,8 +786,24 @@
    "added": "2026-10-24",
    "fetched": false,
    "schematized": false,
-   "tries": 1,
+   "tries": 2,
    "lastTryAt": "2026-10-24"
+  },
+  {
+   "id": "auto-notice7doarticleno894852",
+   "name": "2026-2 성적향상장학금 신청안내",
+   "target": "2026-2 성적향상장학금 신청안내",
+   "added": "2026-10-24",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-pnoticedoarticleno367476",
+   "name": "[학부] 2026년 2학기 거창군 지역출신 대학생 등록금 장학금 신청 안내",
+   "target": "2026년 2학기 거창군 지역출신 대학생 등록금 장학금",
+   "added": "2026-10-24",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }

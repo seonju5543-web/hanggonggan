@@ -2,6 +2,29 @@
  "updatedAt": "2026-10-24",
  "items": [
   {
+   "title": "아이들의 상상력이 인공지능을 만나는 첫 경험! 「전 국민 인공지능 경진대회」, 인공지능 창작대회 본선 개최",
+   "url": "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156786340&pWise=sub&pWiseSub=C1",
+   "kind": "공모전",
+   "attachments": [
+    {
+     "name": "261026 조간 (보도) 아이들의 상상력이 AI를 만나는 첫 경험! 「전국민 AI 경진대회」, AI 창작대회 본선 개최.hwpx",
+     "url": "https://www.korea.kr/common/download.do?fileId=198576375&tblKey=GMN"
+    },
+    {
+     "name": "261026 조간 (보도) 아이들의 상상력이 AI를 만나는 첫 경험! 「전국민 AI 경진대회」, AI 창작대회 본선 개최.odt",
+     "url": "https://www.korea.kr/common/download.do?fileId=198576376&tblKey=GMN"
+    }
+   ],
+   "deadlineHint": null,
+   "detailsV": 5,
+   "field": "IT·소프트웨어",
+   "excerptsAt": "2026-10-24",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-24"
+  },
+  {
    "title": "2026 시흥시 청년창업가 네트워킹 행사 참가자 모집",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179480",
    "kind": "대외활동",
@@ -942,7 +965,15 @@
    "excerptsAt": "2026-10-24",
    "school": "한국외국어대학교",
    "campus": "",
-   "foundAt": "2026-10-24"
+   "foundAt": "2026-10-24",
+   "eligibilityLines": [
+    "지원 대상 : 교육 안내",
+    "·29세 이하(97년1월 1일 이후 출생자)",
+    "·4년제 대학,마이스터고 졸업자 및 졸업예정자",
+    "고용노동부",
+    "아이들과미래재단"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)"
   },
   {
    "title": "TIPS · LIPS를 준비하는 스타트업을 위한 IR 전략 - 제10차 DDM 벤처스타트업 아카데미",
@@ -2218,14 +2249,9 @@
      "text": "2026년 10월 20일(화) 13:00 ~ 17:00 장소: 대덕테크비즈센터 B1 스페이스 S (대전 유성구 대덕대로 593)"
     }
    ],
-   "eligibilityLines": [
-    "신청대상 : 글로벌 진출 및 투자유치를 희망하는 딥테크 기업",
-    "대상연령 : 전체",
-    "대상 : 연구기관, 일반기업, 1인 창조기업"
-   ],
-   "detailsV": 4,
+   "detailsV": 5,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-17",
+   "excerptsAt": "2026-10-24",
    "school": "",
    "campus": "",
    "host": "창업진흥원 K-Startup",
@@ -2276,6 +2302,10 @@
      "text": "2026-10-15 ~ 2026-11-12 13:59"
     },
     {
+     "label": "일시",
+     "text": "2026. 11. 12.(목) 13:00~17:30"
+    },
+    {
      "label": "대상",
      "text": "해양수산 분야 창업 및 투자 생태계에 관심 있는 누구나"
     },
@@ -2289,8 +2319,8 @@
     "대상연령 : 전체",
     "참가대상 : 해양수산 분야 창업 및 투자 생태계에 관심 있는 누구나"
    ],
-   "detailsV": 4,
-   "excerptsAt": "2026-10-16",
+   "detailsV": 5,
+   "excerptsAt": "2026-10-24",
    "school": "",
    "campus": "",
    "host": "창업진흥원 K-Startup",
@@ -2318,13 +2348,9 @@
      "text": "2026-10-01 ~ 2026-10-16 16:00"
     }
    ],
-   "eligibilityLines": [
-    "신청대상 : 기후테크에 관심있는 누구나",
-    "대상연령 : 전체"
-   ],
-   "detailsV": 4,
+   "detailsV": 5,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-16",
+   "excerptsAt": "2026-10-24",
    "school": "",
    "campus": "",
    "host": "창업진흥원 K-Startup",
@@ -2336,9 +2362,9 @@
    "kind": "대외활동",
    "attachments": [],
    "deadlineHint": null,
-   "detailsV": 4,
+   "detailsV": 5,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-16",
+   "excerptsAt": "2026-10-24",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-16",
@@ -2369,9 +2395,9 @@
     }
    ],
    "deadlineHint": null,
-   "detailsV": 4,
+   "detailsV": 5,
    "field": "과학·공학",
-   "excerptsAt": "2026-10-16",
+   "excerptsAt": "2026-10-24",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-16",
@@ -2403,8 +2429,8 @@
     }
    ],
    "deadlineHint": null,
-   "detailsV": 4,
-   "excerptsAt": "2026-10-16",
+   "detailsV": 5,
+   "excerptsAt": "2026-10-24",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-16",
@@ -2470,7 +2496,7 @@
     "※ 개인 또는 팀으로 중복 참여 가능 , 기업 및 영리단체는 참여 불가"
    ],
    "eligibilityFrom": "브라우저 본문",
-   "detailsTriedAt": "2026-10-16",
+   "detailsTriedAt": "2026-10-24",
    "excerpts": [
     {
      "label": "대상",
@@ -6117,33 +6143,6 @@
     "행안부장관상, (최우수상) 한국행정연구원장상, (우수상) 한국정책학회장상, 한국자치학회장상"
    ],
    "eligibilityFrom": "브라우저 본문"
-  },
-  {
-   "title": "[기획예산처 복권위원회] 복권기금 아이디어 공모전",
-   "url": "http://www.bokgwon.go.kr/civil/contestInfo.jsp",
-   "kind": "공모전",
-   "attachments": [],
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "상시 접수"
-    },
-    {
-     "label": "대상",
-     "text": "대한민국 국민이면 누구나"
-    }
-   ],
-   "field": "기획·아이디어",
-   "excerptsAt": "2026-10-03",
-   "school": "",
-   "campus": "",
-   "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-01",
-   "eligibilityLines": [
-    "□ 응모자격 : 대한민국 국민이면 누구나"
-   ],
-   "detailsV": 3
   },
   {
    "title": "청년 행정체험연수 운영",

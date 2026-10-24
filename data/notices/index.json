@@ -3,6 +3,10 @@
  "updatedAt": "2026-10-24",
  "schools": 44,
  "files": {
+  "서울과학기술대학교": {
+   "file": "n14kv35j.json",
+   "count": 60
+  },
   "연세대학교": {
    "file": "nz3ew5y.json",
    "count": 46
@@ -126,10 +130,6 @@
   "경기대학교": {
    "file": "ntxxf09.json",
    "count": 18
-  },
-  "서울과학기술대학교": {
-   "file": "n14kv35j.json",
-   "count": 60
   },
   "한국방송통신대학교": {
    "file": "n1uf7bji.json",

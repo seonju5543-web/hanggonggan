@@ -4,8 +4,8 @@
  ],
  "_ocrV": "press-attach-2026-10-16",
  "https://www.youthcenter.go.kr/bbs03View/48/10827": {
-  "at": "2026-10-15",
-  "tries": 1
+  "at": "2026-10-24",
+  "tries": 2
  },
  "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000": {
   "at": "2026-10-15",
@@ -24,12 +24,12 @@
   "tries": 1
  },
  "https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=525&bcd=notice": {
-  "at": "2026-10-15",
-  "tries": 1
+  "at": "2026-10-24",
+  "tries": 2
  },
  "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140536&article.offset=0&articleLimit=10": {
-  "at": "2026-10-15",
-  "tries": 1
+  "at": "2026-10-24",
+  "tries": 2
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/268996/artclView.do": {
   "at": "2026-10-15",
@@ -140,8 +140,8 @@
   "tries": 1
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/269119/artclView.do": {
-  "at": "2026-10-16",
-  "tries": 1
+  "at": "2026-10-24",
+  "tries": 2
  },
  "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179319": {
   "at": "2026-10-17",
@@ -260,6 +260,50 @@
   "tries": 1
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/269599/artclView.do": {
+  "at": "2026-10-24",
+  "tries": 1
+ },
+ "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156786340&pWise=sub&pWiseSub=C1": {
+  "at": "2026-10-24",
+  "tries": 1
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/269382/artclView.do": {
+  "at": "2026-10-24",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3497049": {
+  "at": "2026-10-24",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3535407": {
+  "at": "2026-10-24",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3535411": {
+  "at": "2026-10-24",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3527672": {
+  "at": "2026-10-24",
+  "tries": 1
+ },
+ "https://www.youthcenter.go.kr/bbs03View/48/10841": {
+  "at": "2026-10-24",
+  "tries": 1
+ },
+ "https://www.youthcenter.go.kr/bbs03View/48/10840": {
+  "at": "2026-10-24",
+  "tries": 1
+ },
+ "https://youth.seoul.go.kr/content.do?key=2310100012": {
+  "at": "2026-10-24",
+  "tries": 1
+ },
+ "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179494": {
+  "at": "2026-10-24",
+  "tries": 1
+ },
+ "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179490": {
   "at": "2026-10-24",
   "tries": 1
  }
