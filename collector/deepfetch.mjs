@@ -7,7 +7,7 @@ import { isHtmlPayload } from './attachment-link.mjs';
    "수집기는 받는데 심층 수집은 못 받는" 어긋남이 생긴다 (2026-08-20 신설, 첫머리 주석 참조) */
 import { FETCH_HEADERS } from './http-headers.mjs';
 import { isNoticeDoc, zipNoticeDocs } from './attachment-text.mjs';
-import { canonUrl, normTitle, indexTexts, sourceFor, needsFetch, fillRetired, fillCounts } from './notice-source.mjs';
+import { canonUrl, normTitle, indexTexts, sourceFor, needsFetch, fillRetired, fillCounts, hasText } from './notice-source.mjs';
 import { makeBudget } from './harvest-budget.mjs';
 
 const HERE = new URL('.', import.meta.url);
@@ -215,7 +215,9 @@ for (const v of prev) {
   if (liveKeys.has(k) || liveTitles.has(normTitle(v.title))) out.set(k, v);
 }
 let kept = out.size;
-for (const [k, v] of fresh) out.set(k, v);
+/* 🔴 이번에 못 받은 것(FETCH_FAIL·FETCH_ERROR)으로 지난 멀쩡한 본문을 덮지 않는다(리뷰 2026-10-24 · 첫 예약 실행이 멀쩡한 본문 13건을 FETCH_ERROR 로 바꿨다).
+   실패 수는 fillCounts 가 fresh 에서 따로 세므로 물러서기 회전은 그대로 돈다. */
+for (const [k, v] of fresh) { const had = out.get(k); if (/^FETCH_/.test(v.text || '') && hasText(had)) continue; out.set(k, v); }
 const texts = [...out.values()];
 /* 이번에 받은 것의 물러서기 수 — 받기 실패면 fails, 껍데기면 shells 를 하나 더(상대 수는 이어 둔다 · 리뷰 R6). 메뉴 걷기는 원문 전체가
    있어야 해서 받은 뒤 색인을 한 번 더 잰다(B8 · 실측 0.4초). 브라우저가 그린 본문이 이기면(indexTexts better) 껍데기가 아니다.

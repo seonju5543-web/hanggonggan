@@ -52,7 +52,8 @@ jobs:
           node-version: 20
       - env:
           FORM_TARGETS: ${{ inputs.form_targets || '' }}   # 비우면 run-deepfetch.txt의 targets: 줄 사용
-        run: node collector/deepfetch.mjs
+        # 예약 실행은 첨부 원본만(--forms-only · 2026-10-24 리뷰) — 본문 전문은 수집 로봇의 증분(--fill)이 날마다 받는다. 전체 모드로 매일 돌면 44개교를 밤마다 800번 두드린다.
+        run: node collector/deepfetch.mjs ${{ github.event_name == 'schedule' && '--forms-only' || '' }}
       - name: HWP 미리보기 텍스트 추출 (양식 스키마화 원천 자료)
         run: |
           pip install olefile --quiet

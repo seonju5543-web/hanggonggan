@@ -231,5 +231,12 @@ if (!process.env.FORM_PDF_AS_LIB) {
   const flag = (k) => { const a = argv.find((x) => x === `--${k}` || x.startsWith(`--${k}=`)); return a ? (a.includes('=') ? a.slice(a.indexOf('=') + 1) : true) : null; };
   const root = process.env.FORM_PDF_ROOT ? path.resolve(process.env.FORM_PDF_ROOT) : path.resolve(HERE, '..');
   const kst = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
-  runFormPdf({ root, today: String(flag('today') || kst), dry: flag('dry') === true });
+  const r = runFormPdf({ root, today: String(flag('today') || kst), dry: flag('dry') === true });
+  /* 🔴 변환기가 HWP·HWPX·DOC 를 하나도 못 바꿨는데 못 읽은 것이 있으면 빨간불로 끝낸다(2026-10-24 리뷰) — 보강 단계라 경보 짝이 이슈를 연다.
+     그전엔 '0건 + 초록불'이라 10-12 부터 변환이 한 번도 안 된 것을 아무도 몰랐다. dry 는 제외. */
+  const officeFails = (r.failed || []).filter((f) => /변환기가 못 읽음\((hwpx?|docx?)\)/.test(f.why || '')).length;
+  if (flag('dry') !== true && officeFails > 0 && !(r.done || []).length) {
+    console.error(`::error::신청서 원본 → PDF — 변환기(LibreOffice+H2Orestart)가 HWP·HWPX·DOC 를 ${officeFails}개 못 읽고 한 개도 못 바꿨습니다. 리포트의 '변환기 말' 줄을 보세요.`);
+    process.exit(3);
+  }
 }

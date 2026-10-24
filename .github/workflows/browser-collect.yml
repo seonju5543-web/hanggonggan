@@ -121,6 +121,8 @@ jobs:
       - name: 🚨 발췌 단계 실패 알림
         if: always() && steps.excerpts.outcome == 'failure'
         timeout-minutes: 1
+        # 저장 앞의 여는 경보 — 이슈 API 가 흔들려도 그 실행의 수집분 저장을 막지 않는다(리뷰 2026-10-24 · alerts 관문 '저장 앞에서 경보를 여는 단계')
+        continue-on-error: true
         uses: ./.github/actions/alert-issue
         with:
           token: ${{ github.token }}

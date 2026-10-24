@@ -457,6 +457,13 @@ export default async function gate(eq, ctx) {
   const opensBeforeSave = ns.slice(0, Math.max(saveAt, 0)).filter((s) => modeOf(s) === 'open' && /alert-issue/.test(`${s.uses || ''} ${s.run || ''}`) && s['continue-on-error'] !== 'true').map((s) => s.name);
   eqWf('  경보를 여는 단계는 저장 뒤에(저장 앞이면 continue-on-error) — 경보 하나가 넘어져 그 실행의 소식이 저장되지 않는 일이 없게',
     [saveAt > 0, opensBeforeSave, opensAlert.length], [true, [], 4]);
+  /* 같은 규칙을 장학·브라우저 수집 로봇에도(리뷰 2026-10-24) — 발췌 단계 경보 짝을 저장 앞에 넣으면서 continue-on-error 가 빠졌었다. 소식 로봇만 재면 또 빠진다. */
+  for (const f of ['collect-scholarships.yml', 'browser-collect.yml']) {
+    const cs = stepsOf(wf(f));
+    const sv = cs.findIndex((s) => /git commit/.test(s.run || ''));
+    const bad = cs.slice(0, Math.max(sv, 0)).filter((s) => modeOf(s) === 'open' && /alert-issue/.test(`${s.uses || ''} ${s.run || ''}`) && s['continue-on-error'] !== 'true').map((s) => s.name);
+    eqWf(`  ${f} — 저장 앞에서 경보를 여는 단계는 전부 continue-on-error`, [sv > 0, bad], [true, []]);
+  }
   /* 🔴 '실패 단계가 robot-down 하나뿐'으로 재지 않는다 — 다른 세션이 '못 넣은 수집분 보관(if: failure())' 같은 단계를 더하면 헛빨간불(리뷰 2026-10-05).
      그런 단계를 끼운 표본(진짜 파일 + 한 단계)에도 같은 판정이 나는지 함께 잰다. */
   eqWf('  실패·시간초과는 robot-down(리포트 이슈가 없어도 닿는다) · 결과물 올리기 단계를 끼워도 같은 판정(S3 도 통과)',
