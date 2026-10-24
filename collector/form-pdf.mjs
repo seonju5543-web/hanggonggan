@@ -108,7 +108,13 @@ export function convertOne(src, outPath, { soffice = 'soffice', tmpDir } = {}) {
     const r = spawnSync(soffice, ['--headless', '--norestore', '--convert-to', 'pdf', '--outdir', work, src], { encoding: 'utf8', timeout: SOFFICE_TIMEOUT_MS });
     if (r.error) { done(); return { ok: false, why: r.error.code === 'ETIMEDOUT' ? `변환 시간 초과(${SOFFICE_TIMEOUT_MS / 1000}초)` : `변환기 없음(${soffice})` }; }
     const made = path.join(work, `${path.basename(src).replace(/\.[^.]+$/, '')}.pdf`);
-    if (!fs.existsSync(made)) { done(); return { ok: false, why: `변환기가 못 읽음(${ext})${/could not be loaded/.test(r.stdout + r.stderr) ? ' — 가져오기 확장(H2Orestart) 필요' : ''}` }; }
+    if (!fs.existsSync(made)) {
+      done();
+      /* 🔴 변환기가 한 말을 그대로 남긴다(2026-10-24) — 10-16 부터 HWP 23건이 전부 '못 읽음'인데 이유를 아무도 못 봤다(원인 단정 금지 · CLAUDE.md 매 세션 5).
+         stdout·stderr 의 마지막 160자를 한 줄로(리포트 한 줄에 들어가게). 종료 코드도 적는다. */
+      const said = String((r.stdout || '') + ' ' + (r.stderr || '')).replace(/\s+/g, ' ').trim().slice(-160);
+      return { ok: false, why: `변환기가 못 읽음(${ext})${/could not be loaded/.test(r.stdout + r.stderr) ? ' — 가져오기 확장(H2Orestart) 필요' : ''} · 종료 ${r.status}${said ? ` · 변환기 말: ${said}` : ' · 변환기 말 없음'}` };
+    }
     pdfBuf = fs.readFileSync(made);
     done();
   }
