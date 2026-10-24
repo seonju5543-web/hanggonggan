@@ -151,13 +151,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-13",
-  "lastAt": "2026-10-17",
-  "tries": 3,
+  "lastAt": "2026-10-24",
+  "tries": 4,
   "status": "pending",
   "why": "게시판 목록(100줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-12-31",
-  "nextAt": "2026-10-24"
+  "nextAt": "2026-10-31"
  },
  "kosaf|2000429013|https://scholarship.eumseong.go.kr/www/selectBbsNttView.do?key=33&bbsNo=3&nttNo=792": {
   "ds": "kosaf",
@@ -292,13 +292,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-23",
-  "lastAt": "2026-10-23",
-  "tries": 1,
+  "lastAt": "2026-10-24",
+  "tries": 2,
   "status": "pending",
   "why": "게시판 목록(15줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-10-30",
-  "nextAt": "2026-10-24"
+  "nextAt": "2026-10-27"
  },
  "kosaf|2500058003|https://www.jiles.or.kr/community/notice/notice.htm?act=view&seq=13111": {
   "ds": "kosaf",
@@ -516,13 +516,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-23",
-  "lastAt": "2026-10-23",
-  "tries": 1,
+  "lastAt": "2026-10-24",
+  "tries": 2,
   "status": "pending",
   "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-11-01",
-  "nextAt": "2026-10-24"
+  "nextAt": "2026-10-27"
  },
  "kosaf|2701295001|board:http://www.cbck.or.kr/Board/K7120": {
   "ds": "kosaf",

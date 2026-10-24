@@ -1,12 +1,8 @@
 {
- "updatedAt": "2026-10-23T14:47:48.802Z",
+ "updatedAt": "2026-10-24T12:51:47.516Z",
  "v": 1,
  "bad": {
   "https://blog.naver.com/mopaspr/224399694473?trackingCode=blog_bloghome_searchlist": {
-   "v": "other",
-   "at": "2026-10-22"
-  },
-  "https://naraport.mof.go.kr/info/contest/contestIntroduce.do?subMenu1Nm=%EA%B3%B5%EB%AA%A8%EC%A0%84": {
    "v": "other",
    "at": "2026-10-22"
   },
@@ -50,10 +46,6 @@
    "v": "other",
    "at": "2026-10-22"
   },
-  "https://www.msit.go.kr/bbs/view.do?sCode=user&mId=307&mPid=208&bbsSeqNo=94&nttSeqNo=3187433": {
-   "v": "other",
-   "at": "2026-10-22"
-  },
   "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000": {
    "v": "other",
    "at": "2026-10-21"
@@ -92,10 +84,6 @@
   },
   "https://www.usspc.or.kr/": {
    "v": "home",
-   "at": "2026-10-22"
-  },
-  "https://www.welchon.com/web/lay1/program/S1T31C447/eventNewView.do?menuIdx=&cIdx=evpr&bbsIdx=2214028": {
-   "v": "login",
    "at": "2026-10-22"
   }
  },
