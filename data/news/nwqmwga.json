@@ -1,7 +1,17 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-10-23",
+ "updatedAt": "2026-10-24",
  "items": [
+  {
+   "title": "[모집공고] [GIST, AICA, 전남대학교] NPU 평가·검증 실무 교...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70793",
+   "postedAt": "2026-10-23",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-24",
+   "thumb": "data/news/img/a087a29bff4cce37.webp"
+  },
   {
    "title": "[대학생활] 먼가 크고 귀여운 정보보안 컬로퀴엄 껄 껄",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70792",
@@ -394,16 +404,6 @@
    "campus": "",
    "src": "b7347301",
    "foundAt": "2026-10-20"
-  },
-  {
-   "title": "[취업정보] [2025년 8월 및 2026년 2월 졸업생 대상] 2026년...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70735",
-   "postedAt": "2026-10-20",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-20",
-   "thumb": "data/news/img/7df3fad6c9dcd1fb.webp"
   }
  ]
 }

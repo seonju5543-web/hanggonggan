@@ -1,7 +1,19 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-10-23",
+ "updatedAt": "2026-10-24",
  "items": [
+  {
+   "title": "사회과학대학 제41회 수선포럼 개최 안내: 2026.11.18.(수) 11:30~13:00",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140767&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-24",
+   "kind": "행사",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-24",
+   "thumb": "data/news/img/711769df8cb8d03d.webp",
+   "desc": "일시: 2026년 11월 18일(수) 11:30~13:00 장소: 사회과학연구원 컨퍼런스룸(수선관 901호) 발표: 이종혁 교수(정치외교학과)"
+  },
   {
    "title": "[IDEC] 제14기 시스템반도체설계실무인력양성 교육생 모집 (신청 기간 : 11.02~11.14)",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140763&article.offset=0&articleLimit=10",
@@ -425,17 +437,6 @@
    "src": "45ec8fd1",
    "foundAt": "2026-10-13",
    "desc": "디지털교육혁신원 우리대학 교육혁신팀에서 근무할 자체계약직원을 다음과 같이 채용합니다."
-  },
-  {
-   "title": "[카운슬링센터] ✨가을맞이「관계 속 나 집단상담」참여자를 모집합니다! (인사캠)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140496&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-13",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-13",
-   "thumb": "data/news/img/61b9136366b3ca3e.webp",
-   "desc": "가족, 친구, 연인 관계 속 다양한 나, 쉽게 드러내지 못한 속마음을 함께 나누고, 더 편안한 관계를 위한 마음 연습 함께해요"
   }
  ]
 }

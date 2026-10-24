@@ -1,6 +1,6 @@
 {
  "school": "서강대학교",
- "updatedAt": "2026-10-23",
+ "updatedAt": "2026-10-24",
  "items": [
   {
    "title": "[철학연구소] 10월 해외석학 초청 강연회",
@@ -102,18 +102,6 @@
    "board": "행사특강",
    "foundAt": "2026-10-04",
    "thumb": "data/news/img/132532da21aa0583.webp",
-   "src": "c13ee4bc"
-  },
-  {
-   "title": "[신학대학원] 2027 서울 세계청년대회와 2027 마지스 코리아를 위한 특별 기획 강좌",
-   "url": "https://www.sogang.ac.kr/ko/detail/550977?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
-   "postId": "550977",
-   "postedAt": "2026-08-24",
-   "school": "서강대학교",
-   "campus": "",
-   "board": "행사특강",
-   "foundAt": "2026-10-04",
-   "thumb": "data/news/img/b326278e4cf2b9a2.webp",
    "src": "c13ee4bc"
   }
  ]

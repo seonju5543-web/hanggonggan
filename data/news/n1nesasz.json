@@ -1,7 +1,17 @@
 {
  "school": "부경대학교",
- "updatedAt": "2026-10-23",
+ "updatedAt": "2026-10-24",
  "items": [
+  {
+   "title": "개인정보 유출 사실 안내 및 사과문",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726725",
+   "postedAt": "2026-10-23",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-24",
+   "desc": "국립부경대학교는 등록금 수납관리시스템에 대한 외부인의 비인가 접근으로 학생 및 교직원의 개인정보가 유출된 사실을 확인하였습니다."
+  },
   {
    "title": "★글로벌언어집중강좌(GLIP) 세션4 수강생 모집 안내",
    "url": "https://www.pknu.ac.kr/main/163?action=view&no=726704",
@@ -413,16 +423,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/a15ea44b8e091772.webp"
-  },
-  {
-   "title": "★2026-2학기 재(복)학생 등록금 분할납부(3차) 안내★",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726372",
-   "postedAt": "2026-09-17",
-   "school": "부경대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/13a537a552251ab3.webp",
-   "src": "53a197d6"
   }
  ]
 }

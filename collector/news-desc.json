@@ -8007,10 +8007,10 @@
    "desc": "연세대학교 구성원 여러분께 안내드립니다 . 구성원 여러분께 예상치 못한 개인정보 유출 사고로 안내드리는 점 머리 숙여 깊이 사과드립니다 . 본교는 연세포털서비스에 대한 외부의 비정상적인 접근으로 인해 일부 구성원의…"
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=271517&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-10-23",
+   "at": "2026-10-24",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 2
+   "tries": 3
   },
   "post:동국대학교:26766707": {
    "at": "2026-10-22",
@@ -8133,10 +8133,10 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=271514&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-10-23",
+   "at": "2026-10-24",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 2
+   "tries": 3
   },
   "url:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=813&nttNo=170872&pageUnit=10": {
    "at": "2026-10-22",
@@ -8204,10 +8204,10 @@
    "desc": "어느덧 한 해의 끝을 향해 가는 11월, 스쳐 지나가는 풍경보다 마음속에 오래 머무는 문장 하나가 더 깊은 위로를 줄 때가 있습니다."
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=271513&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-10-23",
+   "at": "2026-10-24",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 2
+   "tries": 3
   },
   "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=140722&mode=view": {
    "at": "2026-10-22",
@@ -8255,10 +8255,10 @@
    "desc": "교무처 학사지원과 2026학년도 동기 계절수업 서울시립대학교 교류수학을 안내하오니, 희망하는 학생은 기한 내 신청하여 주시기 바랍니다."
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=271512&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-10-23",
+   "at": "2026-10-24",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 2
+   "tries": 3
   },
   "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70782": {
    "at": "2026-10-22",
@@ -8576,10 +8576,10 @@
    "desc": "인권센터 성평등가족부에서는 교제폭력·스토킹의 고위험 징후를 조기에 인식하고, 피해자가 신속하게 보호·지원받을 수 있도록「교제폭력·스토킹 레드플래그 10」을 제작하였습니다."
   },
   "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=277033&mode=view": {
-   "at": "2026-10-23",
+   "at": "2026-10-24",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1
+   "tries": 2
   },
   "url:https://www.hanyang.ac.kr/notice_all?_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_action=view_message&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_entryId=121202&p_p_id=kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet&p_p_lifecycle=0&p_p_mode=view&p_p_state=normal": {
    "at": "2026-10-23",
@@ -8602,10 +8602,10 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=271535&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-10-23",
+   "at": "2026-10-24",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1
+   "tries": 2
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367575&mode=view&no=388": {
    "at": "2026-10-23",
@@ -8846,6 +8846,53 @@
    "at": "2026-10-23",
    "v": 2,
    "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=140767&mode=view": {
+   "at": "2026-10-24",
+   "v": 2,
+   "desc": "일시: 2026년 11월 18일(수) 11:30~13:00 장소: 사회과학연구원 컨퍼런스룸(수선관 901호) 발표: 이종혁 교수(정치외교학과)"
+  },
+  "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511736&mCode=MN095&mgr_seq=3&mode=view": {
+   "at": "2026-10-24",
+   "v": 2,
+   "desc": "2026학년도 겨울계절수업 부산외국어대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
+  },
+  "url:https://www.pknu.ac.kr/main/163?action=view&no=726725": {
+   "at": "2026-10-24",
+   "v": 2,
+   "desc": "국립부경대학교는 등록금 수납관리시스템에 대한 외부인의 비인가 접근으로 학생 및 교직원의 개인정보가 유출된 사실을 확인하였습니다."
+  },
+  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70793": {
+   "at": "2026-10-24",
+   "v": 2,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511735&mCode=MN095&mgr_seq=3&mode=view": {
+   "at": "2026-10-24",
+   "v": 2,
+   "desc": "2026학년도 겨울계절수업 동의대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
+  },
+  "url:https://www.kookmin.ac.kr/user/kmuNews/notice/4/12447/view.do?currentPageNo=1": {
+   "at": "2026-10-24",
+   "v": 2,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511734&mCode=MN095&mgr_seq=3&mode=view": {
+   "at": "2026-10-24",
+   "v": 2,
+   "desc": "2026학년도 겨울계절수업 동아대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367245&mode=view&no=388": {
+   "at": "2026-10-24",
+   "v": 2,
+   "err": "글 열기 실패 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
+   "tries": 1
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367238&mode=view&no=388": {
+   "at": "2026-10-24",
+   "v": 2,
+   "err": "글 열기 실패 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
+   "tries": 1
   }
  }
 }

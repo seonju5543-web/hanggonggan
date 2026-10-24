@@ -1,7 +1,40 @@
 {
  "school": "부산대학교",
- "updatedAt": "2026-10-23",
+ "updatedAt": "2026-10-24",
  "items": [
+  {
+   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(부산외국어대학교)",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511736",
+   "postedAt": "2026-10-24",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-24",
+   "desc": "2026학년도 겨울계절수업 부산외국어대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
+  },
+  {
+   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(동의대학교)",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511735",
+   "postedAt": "2026-10-24",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-24",
+   "desc": "2026학년도 겨울계절수업 동의대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
+  },
+  {
+   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(동아대학교)",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511734",
+   "postedAt": "2026-10-24",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-24",
+   "desc": "2026학년도 겨울계절수업 동아대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
+  },
   {
    "title": "[참가 모집] 2026 부산대학교 개교 80주년 기념 「부산시민 동행 걷기대회」...",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511722",
@@ -394,38 +427,6 @@
    "foundAt": "2026-10-16",
    "thumb": "data/news/img/b530ef0e9857eb0f.webp",
    "desc": "부산대상권 유망골목 상권기획자는 외국인 유학생을 대상으로 「PNU 영 페스타- 전국대학생 장끼!자랑(세계유학생편) 참가자를 모집합니다 . 유학생 공연과 시민 참여 프로그램을 통해 학생 · 지역주민 · 상인이…"
-  },
-  {
-   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(전남대학교)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511596",
-   "postedAt": "2026-10-15",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-15",
-   "desc": "2026학년도 겨울계절수업 전남대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
-  },
-  {
-   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(경상국립대학교)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511595",
-   "postedAt": "2026-10-15",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-15",
-   "desc": "2026학년도 겨울계절수업 경상국립대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
-  },
-  {
-   "title": "[언어교육원] 2026학년도 2학기 학부 졸업대체 모의토익 실시 안내",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511576",
-   "postedAt": "2026-10-15",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-15",
-   "thumb": "data/news/img/7ab0de20fff3cc2b.webp"
   }
  ]
 }
