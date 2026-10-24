@@ -3,6 +3,37 @@
  "updatedAt": "2026-10-24",
  "items": [
   {
+   "title": "[박물관] 1만원으로 떠나는 여수여행!! 선착순",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511739",
+   "postedAt": "2026-10-24",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-24"
+  },
+  {
+   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(서울시립대학교)",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511738",
+   "postedAt": "2026-10-24",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-24",
+   "desc": "2026학년도 겨울계절수업 서울시립대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
+  },
+  {
+   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(서강대학교)",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511737",
+   "postedAt": "2026-10-24",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-24",
+   "desc": "2026학년도 겨울계절수업 서강대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
+  },
+  {
    "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(부산외국어대학교)",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511736",
    "postedAt": "2026-10-24",
@@ -165,7 +196,6 @@
    "campus": "",
    "src": "2d0d4013",
    "foundAt": "2026-10-21",
-   "thumb": "data/news/img/e64757fe39b54d71.webp",
    "desc": "우리 박물관에서는 효원인들과 함께 역사 · 문화 나들이를 떠나려 합니다 . 이번에 역사나들이가 이뤄질 곳은 한국의 나폴리 , “ 전남광주통합특별시 여수시 ” 입니다 . 여수는 ‘ 한국의 나폴리 ’ 로 불리며…"
   },
   {
@@ -392,41 +422,6 @@
    "campus": "",
    "src": "2d0d4013",
    "foundAt": "2026-10-16"
-  },
-  {
-   "title": "[도서관] 2026학년도 2학기 노션(Notion) 이용교육 안내 (11월)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511603",
-   "postedAt": "2026-10-16",
-   "kind": "생활",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-16",
-   "thumb": "data/news/img/bdbb0d98924213be.webp",
-   "desc": "📚 도서관과 함께 노션 시작하기 Notion 은 학업의 효율을 높일 수 있는 생산성 향상 도구입니다!"
-  },
-  {
-   "title": "[도서관] 밀양캠퍼스 구성원 대상 찾아가는 노션(Notion) 이용교육 안내 (...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511601",
-   "postedAt": "2026-10-16",
-   "kind": "생활",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-16",
-   "thumb": "data/news/img/80342d6a0dd4cc6c.webp",
-   "desc": "📍 밀양캠퍼스 나노생명과학도서관 📢2026학년도 2학기 찾아가는 NOTION 이용교육 안내 📚 나노생명과학도서관에서 노션 시작하기 Notion 은 학업의 효율을 높일 수 있는 생산성 향상 도구입니다!"
-  },
-  {
-   "title": "[연장 모집] 외국인 유학생 장기자랑 참가 모집(~11.5.)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511600",
-   "postedAt": "2026-10-16",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-16",
-   "thumb": "data/news/img/b530ef0e9857eb0f.webp",
-   "desc": "부산대상권 유망골목 상권기획자는 외국인 유학생을 대상으로 「PNU 영 페스타- 전국대학생 장끼!자랑(세계유학생편) 참가자를 모집합니다 . 유학생 공연과 시민 참여 프로그램을 통해 학생 · 지역주민 · 상인이…"
   }
  ]
 }
