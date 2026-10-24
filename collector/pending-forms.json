@@ -786,7 +786,7 @@
    "added": "2026-10-24",
    "fetched": false,
    "schematized": false,
-   "tries": 3,
+   "tries": 4,
    "lastTryAt": "2026-10-24"
   },
   {
@@ -841,6 +841,14 @@
    "id": "auto-ghaknoticedetail26766650",
    "name": "[창업교육센터] 『2026 학생 창업유망팀 300+』 최종 선발 재학생 대상 장학금 신청 안내(~11/4) (수정)",
    "target": "『2026 학생 창업유망팀 300+』 최종 선발 재학생",
+   "added": "2026-10-24",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-sknou51819378artclviewdo",
+   "name": "[장학] 2026학년도 2학기 학생통합서비스센터(진로심리상담실) 국가근로장학생 추가 모집 안내(~1",
+   "target": "2026학년도 2학기 학생통합서비스센터(진로심리상담실)",
    "added": "2026-10-24",
    "fetched": true,
    "schematized": false

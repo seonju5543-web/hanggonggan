@@ -15117,6 +15117,11 @@
      "school": "서울대학교",
      "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=407",
      "id": "notice:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?category1=장학공지&mod=document&uid=407"
+    },
+    {
+     "school": "경북대학교",
+     "url": "https://home.knu.ac.kr/HOME/knussw/sub.htm?nav_code=knu1619416593&mode=view&mv_data=aWR4PTIxNjEmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=",
+     "id": "notice:https://home.knu.ac.kr/HOME/knussw/sub.htm?mv_data=aWR4PTIxNjEmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=&nav_code=knu1619416593"
     }
    ],
    "scopeFrom": "같은 사업이 서강대학교 게시판에도 올라옴(자동) — 서강대학교 게시판 https://www.sogang.ac.kr/ko/detail/551609?bbsConfigFk=141&namepage=ScholarshipNotice",
@@ -15242,6 +15247,16 @@
      "school": "조선대학교",
      "url": "https://www3.chosun.ac.kr/bbs/scho/332/282200/artclView.do",
      "id": "notice:https://www3.chosun.ac.kr/bbs/scho/332/282200/artclView.do"
+    },
+    {
+     "school": "영남대학교",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=232147869&article.offset=0&articleLimit=10",
+     "id": "notice:https://www.yu.ac.kr/scholar/notice/notice.do?articleno=232147869"
+    },
+    {
+     "school": "전북대학교",
+     "url": "https://www.jbnu.ac.kr/web/Board/218548/detailView.do?category=6",
+     "id": "notice:https://www.jbnu.ac.kr/web/Board/218548/detailView.do?category=6"
     }
    ],
    "scopeFrom": "같은 사업이 가천대학교 게시판에도 올라옴(자동) — 가천대학교 게시판 https://www.gachon.ac.kr/bbs/kor/478/126183/artclView.do",
@@ -16567,6 +16582,21 @@
      "school": "한국항공대학교",
      "url": "https://kau.ac.kr/kaulife/scholnoti.php?code=s1301&page=&mode=read&seq=11378",
      "id": "notice:https://kau.ac.kr/kaulife/scholnoti.php?code=s1301&seq=11378"
+    },
+    {
+     "school": "동국대학교",
+     "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766697",
+     "id": "notice:https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766697"
+    },
+    {
+     "school": "전북대학교",
+     "url": "https://www.jbnu.ac.kr/web/Board/218699/detailView.do?category=6",
+     "id": "notice:https://www.jbnu.ac.kr/web/Board/218699/detailView.do?category=6"
+    },
+    {
+     "school": "충남대학교",
+     "url": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515894&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
+     "id": "notice:https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0713&menu_dvs_cd=0713&no=2515894&site_dvs_cd=kr"
     }
    ],
    "scopeFrom": "같은 사업이 상명대학교 게시판에도 올라옴(자동) — 상명대학교 게시판 https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=769662&article.offset=0&articleLimit=10"
@@ -17871,6 +17901,390 @@
     "min": 500000,
     "max": 500000,
     "raw": "1. 장학금액 : 인당 50 만원(생활비성)"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-hkrwdsfpnos1073sfpnos888-0ux0cqp",
+   "name": "[입학에서 취업까지] [한국장학재단] 2026년 2학기 푸른등대 기부장학금 신청 안내 (2026.10.22.(목)9시 ~ 20",
+   "boardTitle": "[입학에서 취업까지] [한국장학재단] 2026년 2학기 푸른등대 기부장학금 신청 안내 (2026.10.22.(목)9시 ~ 2026.11.12.(목)18시)",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「한국장학재단」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-24",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-11-12",
+   "deadlineFrom": "게시판 요약 · ~ 2026.11.12",
+   "period": "접수 ~2026-11-12",
+   "summary": "경기대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경기대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-24 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626734&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-900bnum5233cate0qidx5233",
+   "name": "(통정시 신청, 2026. 10. 23.~11. 6.) 2026. 2학기 2차 어의 및 가족장학금 신청 안내",
+   "boardTitle": "(통정시 신청, 2026. 10. 23.~11. 6.) 2026. 2학기 2차 어의 및 가족장학금 신청 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "교내 증거 없음 — 기본값"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-10-24",
+   "provider": "주관 기관 원문 확인",
+   "amount": "등록금 전액",
+   "amountValue": 0,
+   "deadline": "2026-11-06",
+   "deadlineFrom": "공고 원문 · (통정시 신청, 2026. 10. 23.~11. 6.) 2026. 2학기 2차 어의 및 가족장학금 신청 안내",
+   "period": "접수 ~2026-11-06",
+   "summary": "서울과학기술대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울과학기술대학교"
+   },
+   "documents": [
+    "신청대상",
+    "국민기초생활수급자 학생",
+    "국민기초생활수급자 증명서(본인 명의)",
+    "시설발급 재원 증명서 1부(복지시설 기수용자)",
+    "제적등본 1부(소년·소녀가정)",
+    "가족관계증명서 1부(소년·소녀가정)",
+    "장애인증명서 1부(본인, 부모 공통)",
+    "가족관계증명서 1부(부모 장애 인 경우)"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-24 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "(붙임1) 2026학년도 2학기 2차 어의장학생 선발 안내문.pdf",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=64E582483A5148479E6FB7FE58077A56_.pdf&ogrfname=%28%EB%B6%99%EC%9E%841%29+2026%ED%95%99%EB%85%84%EB%8F%84+2%ED%95%99%EA%B8%B0+2%EC%B0%A8+%EC%96%B4%EC%9D%98%EC%9E%A5%ED%95%99%EC%83%9D+%EC%84%A0%EB%B0%9C+%EC%95%88%EB%82%B4%EB%AC%B8.pdf"
+    },
+    {
+     "name": "(붙임2) 어의장학금 신청 매뉴얼.pdf",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=74DE52331AB94C1692F3D72D785C1910_.pdf&ogrfname=%28%EB%B6%99%EC%9E%842%29+%EC%96%B4%EC%9D%98%EC%9E%A5%ED%95%99%EA%B8%88+%EC%8B%A0%EC%B2%AD+%EB%A7%A4%EB%89%B4%EC%96%BC.pdf"
+    },
+    {
+     "name": "(붙임3) 2026학년도 2학기 2차 Seoultech 가족장학금 선발 안내문.pdf",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=BD38064B0F1049C0AA453DC8B9FA1DA7_.pdf&ogrfname=%28%EB%B6%99%EC%9E%843%29+2026%ED%95%99%EB%85%84%EB%8F%84+2%ED%95%99%EA%B8%B0+2%EC%B0%A8+Seoultech+%EA%B0%80%EC%A1%B1%EC%9E%A5%ED%95%99%EA%B8%88+%EC%84%A0%EB%B0%9C+%EC%95%88%EB%82%B4%EB%AC%B8.pdf"
+    },
+    {
+     "name": "(붙임4) Seoultech 가족장학금 신청 매뉴얼.pdf",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=D2F052B4CD774F5C90DF80F5F9583EB5_.pdf&ogrfname=%28%EB%B6%99%EC%9E%844%29+Seoultech+%EA%B0%80%EC%A1%B1%EC%9E%A5%ED%95%99%EA%B8%88+%EC%8B%A0%EC%B2%AD+%EB%A7%A4%EB%89%B4%EC%96%BC.pdf"
+    }
+   ],
+   "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=896900&qidx=5233&cate=0&allboard=true&nowpage=1",
+   "sourceKind": "auto",
+   "openDate": "2026-10-23",
+   "documentsFrom": "공고 원문",
+   "eligibilityLines": [
+    "마. 선발기준: 직전학기의 취득학점 12학점 이상, 직전학기 평점평균 B(3.0) 이상",
+    "※ 계절학기 및 방학 중 현장실습취득학점 제외"
+   ],
+   "amountSpec": {
+    "kind": "ratio",
+    "value": 0,
+    "ratio": 1,
+    "min": 0,
+    "max": 0,
+    "raw": "> 지원금액: 수업료 100% 면제"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-4bnum57138cate0qidx57138",
+   "name": "2026학년도 2학기(3차) 국가근로장학금 학생 신청기간 안내",
+   "boardTitle": "2026학년도 2학기(3차) 국가근로장학금 학생 신청기간 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「국가근로」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-24",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-10-29",
+   "deadlineFrom": "공고 원문 · 2026학년도 2학기 1차 및 2차, 그리고 동계방학중 국가근로 를 신청하지 못한 재학생 은 아래와 같이 3차 신청해주시기 바랍니다. 가. 신청 기간 : 2026. 10. 21.(수) 9시 ~ 2026. 10. 29.(목) 18시까지",
+   "period": "접수 ~2026-10-29",
+   "summary": "서울과학기술대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울과학기술대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-24 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "붙임1. 2026년 2학기 국가근로장학금 일반유형(추가) 학생신청 매뉴얼.pdf",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F57138&fname=7102D1E36CB341B0BB8614CE0241852A_.pdf&ogrfname=%EB%B6%99%EC%9E%841.+2026%EB%85%84+2%ED%95%99%EA%B8%B0+%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EA%B8%88+%EC%9D%BC%EB%B0%98%EC%9C%A0%ED%98%95%28%EC%B6%94%EA%B0%80%29+%ED%95%99%EC%83%9D%EC%8B%A0%EC%B2%AD+%EB%A7%A4%EB%89%B4%EC%96%BC.pdf"
+    }
+   ],
+   "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=896774&qidx=57138&cate=0&allboard=true&nowpage=1",
+   "sourceKind": "auto",
+   "openDate": "2026-10-21",
+   "excerpts": [
+    "신청 방법: 한국장학재단 홈페이지(http://www.kosaf.go.kr) 및 모바일 앱을 이용하여 신청",
+    "문의처 : 한국장학재단 국가근로장학금 관련 문의 (☎1599-2290)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-751bnum5233cate0qidx5233",
+   "name": "[주거안정장학금 선발 학생 필독] 장학생 서약서 10/27(화)까지 제출(필수) 및 지급 일정 안내",
+   "boardTitle": "[주거안정장학금 선발 학생 필독] 장학생 서약서 10/27(화)까지 제출(필수) 및 지급 일정 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "교내 증거 없음 — 기본값"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-10-24",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-10-27",
+   "deadlineFrom": "게시판 요약 · ~ 2026. 10. 27",
+   "period": "접수 ~2026-10-27",
+   "summary": "서울과학기술대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울과학기술대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-24 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=896751&qidx=5233&cate=0&allboard=true&nowpage=1",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "<2026학년도 2학기 한국장학재단 주거안정장학금 지원 대상 안내>"
+   ],
+   "excerpts": [
+    "<2026학년도 2학기 한국장학재단 주거안정장학금 지원 대상 안내>"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-811bnum5233cate0qidx5233",
+   "name": "(홍보) 한국장학재단 희망사다리 장학금 신청 안내(마감)",
+   "boardTitle": "(홍보) 한국장학재단 희망사다리 장학금 신청 안내(마감)",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「한국장학재단」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-24",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-10-24",
+   "period": "접수 기간 원문 확인",
+   "summary": "서울과학기술대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울과학기술대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-24 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "중소기업 취업연계(희망사다리 1유형)_(학생용) 장학신청 매뉴얼.pdf",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=3ECECCB0EA3E4D38A1252B5A1E6C5313_.pdf&ogrfname=%EC%A4%91%EC%86%8C%EA%B8%B0%EC%97%85+%EC%B7%A8%EC%97%85%EC%97%B0%EA%B3%84%28%ED%9D%AC%EB%A7%9D%EC%82%AC%EB%8B%A4%EB%A6%AC+1%EC%9C%A0%ED%98%95%29_%28%ED%95%99%EC%83%9D%EC%9A%A9%29+%EC%9E%A5%ED%95%99%EC%8B%A0%EC%B2%AD+%EB%A7%A4%EB%89%B4%EC%96%BC.pdf"
+    },
+    {
+     "name": "중소기업 취업연계(희망사다리 1유형)_(학생용) 장학신청 매뉴얼.pdf",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=FFB1AB188AE8401C895D8008A7AC4728_.jpg&ogrfname=%28%ED%8F%AC%EC%8A%A4%ED%84%B0%29+2026%EB%85%84+2%ED%95%99%EA%B8%B0+%EA%B3%A0%EC%A1%B8%ED%9B%84%ED%95%99%EC%8A%B5%EC%9E%90%EC%9E%A5%ED%95%99%EA%B8%88.jpg"
+    }
+   ],
+   "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=5233&bidx=894811&qidx=5233&cate=0&allboard=true&nowpage=3",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-sknou51819378artclviewdo",
+   "name": "[장학] 2026학년도 2학기 학생통합서비스센터(진로심리상담실) 국가근로장학생 추가 모집 안내(~1",
+   "boardTitle": "[장학] 2026학년도 2학기 학생통합서비스센터(진로심리상담실) 국가근로장학생 추가 모집 안내(~1",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「국가근로」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-24",
+   "provider": "주관 기관 원문 확인",
+   "amount": "시급 10,320원",
+   "amountValue": 0,
+   "deadline": "2026-10-28",
+   "deadlineFrom": "공고 원문 · 2026학년도 2학기 학생통합서비스센터(진로심리상담실) 국가근로장학생 추가 모집 안내(~10/28)",
+   "period": "접수 ~2026-10-28",
+   "summary": "한국방송통신대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국방송통신대학교"
+   },
+   "documents": [
+    "[ 붙임 ] 국가근로장학생지원서 (개인정보수집 동의서 포함) 제출"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-24 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "국가 근로 장학생 지원서 및 개인정보 수집 이용 동의서_진로심리상담실.hwp",
+     "url": "https://www.knou.ac.kr/bbs/knou/51/280951/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.knou.ac.kr/bbs/knou/51/819378/artclView.do",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "자격요건",
+    "2026 학년도 2 학기 한국장학재단 국가근로 신청자 (2026 학년도 2 학기 등록생 )",
+    "직전 학기 성적 70 점 ( C°) 이상 , 학자금지원 소득구간 9 구간 이하에 해당하는 자 ( 신입생 성적 무관 )",
+    "우리 대학 근로장학생 ( 국가 및 교내 포함 ) 근무기간 총 3 년 미만자"
+   ],
+   "excerpts": [
+    "문의 : 진로심리상담실 02-3668-4490"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "hourly",
+    "value": 0,
+    "ratio": 0,
+    "min": 0,
+    "max": 0,
+    "raw": "장학금 : 시급 10,320 원 3. 지원방법"
+   },
+   "amountFrom": "공고 원문",
+   "documentsFrom": "로봇 2026-10-24 · 원문 「제출서류」 절"
+  },
+  {
+   "id": "auto-0713no2515824sitedvscdkr",
+   "name": "2026학년도 2학기 3차 국가근로장학사업 학생 신청기간 안내",
+   "boardTitle": "2026학년도 2학기 3차 국가근로장학사업 학생 신청기간 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「국가근로」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-24",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-10-29",
+   "deadlineFrom": "공고 원문 · ※ 단, 2026학년도 2학기 학자금 지원구간이 확정된 학생에 한하여 신청 가능 2. 신청기간: 2026. 10. 21.(수) 09시 ~ 2026. 10. 29.(목) 18시",
+   "period": "접수 ~2026-10-29",
+   "summary": "충남대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "충남대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-24 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026학년도 2학기 3차 국가근로장학사업 학생 신청기간 안내.pdf",
+     "url": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2515824&atch_no=1"
+    }
+   ],
+   "sourceUrl": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515824&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
+   "sourceKind": "auto",
+   "openDate": "2026-10-21",
+   "eligibilityLines": [
+    "1. 신청대상: 2026학년도 2학기 국가근로장학금 일반유형 근로를 희망하는 학생",
+    "※ 단, 2026학년도 2학기 학자금 지원구간이 확정된 학생에 한하여 신청 가능"
+   ]
+  },
+  {
+   "id": "auto-spxboardid5cate8key70734",
+   "name": "[장학안내] 2026학년도 2학기 도전장학생(비상) 선발 공고",
+   "boardTitle": "[장학안내] 2026학년도 2학기 도전장학생(비상) 선발 공고",
+   "type": "교외",
+   "kindEvidence": [
+    "교내 증거 없음 — 기본값"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-10-24",
+   "provider": "주관 기관 원문 확인",
+   "amount": "180만원",
+   "amountValue": 1800000,
+   "deadline": "2026-10-30",
+   "deadlineFrom": "공고 원문 · 2. 장학금액 : 1 인당 180 만원 3. 접수기간 : 2026. 10. 26.( 월 ) 09:00 ~ 2026. 10. 30.( 금 ) 17:00",
+   "period": "접수 ~2026-10-30",
+   "summary": "전남대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "전남대학교"
+   },
+   "documents": [
+    "지원서 및 도전계획서 작성 儈ȃ 10",
+    "지원자 유의 사항 曨ȃ 11"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-24 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026학년도 2학기 도전장학생(비상) 선발계획(안).hwp",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2587992"
+    }
+   ],
+   "sourceUrl": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70734&cate=8",
+   "sourceKind": "auto",
+   "openDate": "2026-10-26",
+   "documentsFrom": "공고문 첨부",
+   "eligibilityFrom": "공고문 첨부",
+   "eligibilityLines": [
+    "◦ (선발 관련 사전 안내) 2027학년도 1학기 도전장학금은 지원자격, 선발 시기, 선발 횟수, 장학금액 등이 변경될 수 있음",
+    "선발 인원 및 소요 예산"
+   ],
+   "excerpts": [
+    "장학금액 : 1 인당 180 만원",
+    "신청방법 : 전남대학교포털 ( https://portal.jnu.ac.kr) → 교육지원 → 내학사행정 → 장학 → 도전장학 → 장학금신청에서 도전계획서 작성 및 제출"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 1800000,
+    "ratio": 0,
+    "min": 1800000,
+    "max": 1800000,
+    "raw": "2. 장학금액 : 1 인당 180 만원"
    },
    "amountFrom": "공고 원문"
   }
