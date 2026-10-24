@@ -778,6 +778,16 @@
    "added": "2026-10-24",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-15nttno170869searchctgry",
+   "name": "2026년도 2학기 푸른등대 기부장학사업 신규 장학생(2차) 선발 안내",
+   "target": "2026년도 2학기 푸른등대 기부장학사업 신규 장학생(",
+   "added": "2026-10-24",
+   "fetched": false,
+   "schematized": false,
+   "tries": 1,
+   "lastTryAt": "2026-10-24"
   }
  ]
 }
