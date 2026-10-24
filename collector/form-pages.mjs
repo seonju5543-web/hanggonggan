@@ -195,7 +195,8 @@ export function runFormPages({ root, today, dry = false, budgetSec = BUDGET_SEC,
     let any = false;
     t.files.forEach((f, i) => {
       const srcBytes = fs.statSync(f.src).size;
-      const prev = have.find((h) => h.src === f.name && (h.srcBytes || 0) === srcBytes && fs.existsSync(path.join(outDir, h.file)));
+      /* 🔴 '서식 쪽 없음'(none) 항목은 file 이 없다 — path.join(undefined) 로 넘어진다(2026-10-24 첫 예약 실행 · 색인이 처음 생긴 뒤 두 번째 실행부터 매번). file 있는 항목만 본다 */
+      const prev = have.find((h) => h.src === f.name && h.file && !h.none && (h.srcBytes || 0) === srcBytes && fs.existsSync(path.join(outDir, h.file)));
       if (prev) { next.push(prev); skipped += 1; any = true; return; }
       const prevNone = have.find((h) => h.src === f.name && h.none && (h.srcBytes || 0) === srcBytes);
       if (prevNone) { next.push(prevNone); skipped += 1; return; }

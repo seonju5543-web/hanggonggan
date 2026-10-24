@@ -1512,6 +1512,8 @@ console.log('\n■ 공고문 뒷장 서식 쪽 떼기 — 쪽 글자의 표식�
   eq('🔴 공고 끝의 직인 줄(「○○장학재단 이사장 (인)」 + 날짜)은 서식이 아니다 (리뷰 — 거의 모든 공고의 마지막 쪽)',
     FP.classifyPage('6. 문의 : 02-000-0000\n\n2026년 10월 13일\n\n○○장학재단 이사장 (인)', 3), 'notice');
   eq('  대상이 0건인데 색인에 공고가 있으면 지우기를 건너뛴다(색인·사본을 못 읽은 실행이 결과를 통째로 지우지 않게)', /skipPrune/.test(readText(new URL('../collector/form-pages.mjs', import.meta.url))), true);
+  /* 🔴 색인의 '서식 쪽 없음'(none) 항목은 file 이 없다 — 두 번째 실행이 path.join(undefined) 로 넘어졌다(2026-10-24 첫 예약 실행 · 색인이 처음 생긴 다음 실행부터 매번). */
+  eq('  지난 색인 대조는 file 있는 항목만 — none 항목으로 path.join 하지 않는다', /have\.find\(\(h\) => h\.src === f\.name && h\.file && !h\.none && [^\n]*fs\.existsSync\(path\.join\(outDir, h\.file\)\)\)/.test(readText(new URL('../collector/form-pages.mjs', import.meta.url))), true);
   eq('  이어진 쪽은 한 구간으로', [FP.groupRanges([3, 4, 5, 7]), FP.rangeLabel(FP.groupRanges([3, 4, 5, 7]))], [[[3, 5], [7, 7]], '3~5, 7']);
   const fakeFs = { exists: (p) => /elig-a-1\.pdf|elig-b-1\.hwpx|\/kosaf\/777$|\/kosaf\/777\//.test(p) || /\/kosaf\/777/.test(p), readdir: () => ['공고문.pdf', '안내.hwp', '사진.jpg', '글자.txt'] };
   const t = FP.pickPageTargets({
