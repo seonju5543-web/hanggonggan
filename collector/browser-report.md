@@ -1,4 +1,4 @@
-## 🖥 브라우저형 수집 리포트 (2026-10-25 10:03 KST)
+## 🖥 브라우저형 수집 리포트 (2026-10-25 17:19 KST)
 
 ### 한국외국어대학교
 - ✅ 링크 81 · 장학 공고 11 · https://dep.hufs.ac.kr/student/12767/subview.do
@@ -19,8 +19,8 @@
   - ⏭ 남은 후보 1곳은 열지 않음(앞 주소에서 읽었다)
 
 ### 동국대학교
-  - 📄 2페이지에서 장학 공고 39건 더 읽음
-- ✅ 링크 1249 · 장학 공고 21 · 이미 아는 공고 20건은 다시 열지 않음 · https://www.dongguk.edu/article/JANGHAKNOTICE/list
+  - 📄 2페이지에서 장학 공고 20건 더 읽음
+- ✅ 링크 1230 · 장학 공고 2 · 이미 아는 공고 20건은 다시 열지 않음 · https://www.dongguk.edu/article/JANGHAKNOTICE/list
 
 ### 상명대학교
 - ✅ 링크 564 · 장학 공고 5 · https://www.smu.ac.kr/kor/life/notice.do
@@ -34,7 +34,7 @@
 - ✅ 링크 527 · 장학 공고 18 · https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&
 
 ### 부산대학교
-- ❌ 오류(page.goto: Target page, context or browser has been closed) · https://onestop.pusan.ac.kr/page?menuCD=000000000000062
+- ✅ 링크 45 · 장학 공고 1 · 이미 아는 공고 10건은 다시 열지 않음 · https://onestop.pusan.ac.kr/page?menuCD=000000000000062
 
 ### 서울교육대학교
 - ⚪ 링크 371 · 장학 공고 0 · 이미 아는 공고 13건은 다시 열지 않음 · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
@@ -44,21 +44,14 @@
 - ✅ 링크 590 · 장학 공고 38 · https://www.seoultech.ac.kr/service/info/janghak/
 
 ### 건국대학교
-- ❌ 오류(page.goto: Target page, context or browser has been closed) · https://www.konkuk.ac.kr/konkuk/2239/subview.do
+- ✅ 링크 444 · 장학 공고 27 · https://www.konkuk.ac.kr/konkuk/2239/subview.do
 
 ### 명지대학교
 - ✅ 링크 417 · 장학 공고 10 · https://www.mju.ac.kr/mjukr/259/subview.do
 
-### 🔁 실패 학교 재시도 (몇 분 뒤 재접속)
-**부산대학교**
-- ✅ 링크 45 · 장학 공고 1 · 이미 아는 공고 10건은 다시 열지 않음 · https://onestop.pusan.ac.kr/page?menuCD=000000000000062
-
-**건국대학교**
-- ✅ 링크 444 · 장학 공고 27 · https://www.konkuk.ac.kr/konkuk/2239/subview.do
-
 ---
 이번 실행 신규 수집: **0건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
-⏱ 소요 3분 / 예산 22분 · 학교 14/14곳 처리
+⏱ 소요 1분 / 예산 22분 · 학교 14/14곳 처리
 **⏳ 스키마화 대기 중 71건** (원본 확보됨 — collector/pending-forms.json)
 
 ### 🤖 자동 등록 (선조치후보고) — 0건 등록
