@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-24",
+ "updatedAt": "2026-10-25",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -9766,28 +9766,6 @@
     {
      "name": "2026학년도 2학기 국가근로 사전교육자료(요약서).hwp",
      "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F57138&fname=B9FDED6CB8D448E9A9897CBFF7C08DEA_.hwp&ogrfname=2026%ED%95%99%EB%85%84%EB%8F%84+2%ED%95%99%EA%B8%B0+%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C+%EC%82%AC%EC%A0%84%EA%B5%90%EC%9C%A1%EC%9E%90%EB%A3%8C%28%EC%9A%94%EC%95%BD%EC%84%9C%29.hwp"
-    },
-    {
-     "name": "장학금 신청 주요 일정",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
-    },
-    {
-     "name": "장학금 규정 전문(2021. 10. 1.)",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
-    },
-    {
-     "name": "장학금 지침 전문(2026. 02. 04.)",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
-    },
-    {
-     "name": "본문이미지-1920x300.png",
-     "url": "https://www.seoultech.ac.kr/site/ko/2021/res/img/sub_title3444.png",
-     "bodyImage": true
-    },
-    {
-     "name": "본문이미지-509x348.png",
-     "url": "https://www.seoultech.ac.kr/site/ko/res/img/wa_logo.png",
-     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=895210&qidx=57138&cate=0&allboard=true&nowpage=1",
@@ -12414,7 +12392,9 @@
     "scope": "external",
     "raw": "장학금 : 매학기 등록금 전액 + 학업장려금 200만원 ○ 타 장학금과 중복 수혜 불가"
    },
-   "exclusivityFrom": "공고 원문"
+   "exclusivityFrom": "공고 원문",
+   "sameAs": "한국장학재단",
+   "sameAsFrom": "자동"
   },
   {
    "id": "auto-bswj104944023artclviewdo",
@@ -12972,30 +12952,8 @@
    "auto": true,
    "attachments": [
     {
-     "name": "장학금 신청 주요 일정",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
-    },
-    {
-     "name": "장학금 규정 전문(2021. 10. 1.)",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
-    },
-    {
-     "name": "장학금 지침 전문(2026. 02. 04.)",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
-    },
-    {
      "name": "2026년도 2학기 중소기업 취업연계 장학사업(희망사다리1유형) 신규장학생 자체선발기준.pdf",
      "url": "javascript:downloadfile('/storage/www/bbs/5233','B8B54AB92C784540A3CD32E9802F619C_.pdf','2026%EB%85%84%EB%8F%84 2%ED%95%99%EA%B8%B0 %EC%A4%91%EC%86%8C%EA%B8%B0%EC%97%85 %EC%B7%A8%EC%97%85%EC%97%B0%EA%B3%84 %EC%9E%A5%ED%95%99%EC%82%AC%EC%97%85(%ED%9D%AC%EB%A7%9D%EC%82%AC%EB%8B%A4%EB%A6%AC1%EC%9C%A0%ED%98%95) %EC%8B%A0%EA%B7%9C%EC%9E%A5%ED%95%99%EC%83%9D %EC%9E%90%EC%B2%B4%EC%84%A0%EB%B0%9C%EA%B8%B0%EC%A4%80.pdf' );"
-    },
-    {
-     "name": "본문이미지-1920x300.png",
-     "url": "https://www.seoultech.ac.kr/site/ko/2021/res/img/sub_title3444.png",
-     "bodyImage": true
-    },
-    {
-     "name": "본문이미지-509x348.png",
-     "url": "https://www.seoultech.ac.kr/site/ko/res/img/wa_logo.png",
-     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=896418&qidx=5233&cate=0&allboard=true&nowpage=1",
@@ -16132,8 +16090,8 @@
    "kindConfidence": "high",
    "kindFrom": "로봇(원문) 2026-10-24",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "200만원",
+   "amountValue": 2000000,
    "deadline": "2026-11-12",
    "deadlineFrom": "게시판 요약 · 11/12 마감",
    "period": "접수 ~2026-11-12",
@@ -16161,7 +16119,25 @@
     }
    ],
    "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551648?bbsConfigFk=141&namepage=ScholarshipNotice",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "지원대상 : 대한민국 국적의 국내 대학교 재학생",
+    "총 35명 선발",
+    "선발규모"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)",
+   "openDate": "2026-10-22",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 2000000,
+    "ratio": 0,
+    "min": 2000000,
+    "max": 2000000,
+    "raw": "지원금액 : 1인 당 생활비 장학금 200만 원"
+   },
+   "amountFrom": "공고 원문",
+   "sameAs": "한국장학재단",
+   "sameAsFrom": "자동"
   },
   {
    "id": "auto-otice06doarticleno140764",
@@ -16460,8 +16436,8 @@
    "kindConfidence": "high",
    "kindFrom": "로봇(원문) 2026-10-24",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "200만원",
+   "amountValue": 2000000,
    "deadline": "2026-11-12",
    "deadlineFrom": "게시판 요약 · ~ 11. 12",
    "period": "접수 ~2026-11-12",
@@ -16493,7 +16469,25 @@
     }
    ],
    "sourceUrl": "https://www.konkuk.ac.kr/bbs/konkuk/235/1210456/artclView.do",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "지원대상 : 대한민국 국적의 국내 대학교 재학생",
+    "총 35명 선발",
+    "선발규모"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)",
+   "openDate": "2026-10-22",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 2000000,
+    "ratio": 0,
+    "min": 2000000,
+    "max": 2000000,
+    "raw": "지원금액 : 1인 당 생활비 장학금 200만 원"
+   },
+   "amountFrom": "공고 원문",
+   "sameAs": "한국장학재단",
+   "sameAsFrom": "자동"
   },
   {
    "id": "auto-oardid323398menuno200318",
@@ -16506,8 +16500,8 @@
    "kindConfidence": "low",
    "kindFrom": "로봇(원문) 2026-10-24",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "120만원",
+   "amountValue": 1200000,
    "deadline": null,
    "listedAt": "2026-10-24",
    "period": "접수 기간 원문 확인",
@@ -16517,7 +16511,7 @@
     "schoolOnly": "경희대학교"
    },
    "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
+    "가족관계증명서: 1부(신청일로부터 3개월 이내)"
    ],
    "duplicable": true,
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
@@ -16535,7 +16529,34 @@
     }
    ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323398",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "②무상교육대상자: 직전학기 성적 교내 상위 10%",
+    "-기타:기초수급자증명서,차상위계층증명서,한부모가정증명서",
+    "대학생 직전학기 성적 평균2.0이상",
+    "학비(수업료)를 면제받는 경우",
+    "※재학 및 성적증명서는 반드시원본제출(PD로 발급된 문서를 출력 시 사본)",
+    "0고등학생:연간120만원이상 사내 학자금및 타기관 장학금을지원받는경우",
+    "제1순위:순직선원 유가족",
+    "제2순위:장해선원 가족",
+    "ㅇ대학생: 1학기등록금범위를초과하여 사내학자금및타기관장학금을지원 받는경우",
+    "ㅇ제3순위:기초수급자선원가족",
+    "ㅇ선원법(제3조) 적용 제외 선박",
+    "제4순위: 차상위계층 선원가족",
+    "①총톤수5톤미만의선박으로서항해선이 아닌선박",
+    "선발순위 0제5순위: 다자녀가정의 셋째이상 선원가족"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)",
+   "documentsFrom": "공고문 첨부(OCR)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 1200000,
+    "ratio": 0,
+    "min": 1200000,
+    "max": 1200000,
+    "raw": "지급금액 선발인원 : 비고 등록금 납부내역서 또는 교육비 납입증명서 : 1부(2026년도 2학기 발급분) 선발인원 : 및 금액 고등학생 120만원 00명 선발인원은 예산범위 내에 0성적증명서: 1부(직전학기성적/대학생만 해당)-원본제출"
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-oardid323397menuno200318",
@@ -16548,11 +16569,11 @@
    "kindConfidence": "low",
    "kindFrom": "로봇(원문) 2026-10-24",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
-   "deadline": null,
+   "amount": "200만원",
+   "amountValue": 2000000,
+   "deadline": "2026-11-12",
    "listedAt": "2026-10-24",
-   "period": "접수 기간 원문 확인",
+   "period": "접수 기간 ~2026-11-12",
    "summary": "경희대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true
@@ -16642,9 +16663,31 @@
      "school": "충남대학교",
      "url": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515894&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
      "id": "notice:https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0713&menu_dvs_cd=0713&no=2515894&site_dvs_cd=kr"
+    },
+    {
+     "school": "중앙대학교",
+     "url": "https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&pageNo=2&nttId=30125",
+     "id": "notice:https://www.cau.ac.kr/cms/FR_CON/view.do?contents_no=5&menu_id=100&nttid=30125&p_tab_no=5"
     }
    ],
-   "scopeFrom": "같은 사업이 상명대학교 게시판에도 올라옴(자동) — 상명대학교 게시판 https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=769662&article.offset=0&articleLimit=10"
+   "scopeFrom": "같은 사업이 상명대학교 게시판에도 올라옴(자동) — 상명대학교 게시판 https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=769662&article.offset=0&articleLimit=10",
+   "eligibilityLines": [
+    "지원대상 : 대한민국 국적의 국내 대학교 재학생",
+    "총 35명 선발",
+    "선발규모"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)",
+   "deadlineFrom": "공고문 첨부(OCR)",
+   "openDate": "2026-10-22",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 2000000,
+    "ratio": 0,
+    "min": 2000000,
+    "max": 2000000,
+    "raw": "지원금액 : 1인 당 생활비 장학금 200만 원"
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-5menuid100ptabno5siteno2-0xlg0lg",
@@ -16812,7 +16855,14 @@
     }
    ],
    "sourceUrl": "https://www.konkuk.ac.kr/bbs/konkuk/235/1210342/artclView.do",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "지원대상 : 지원금액 : 본인부담 등록금 X 50%(학기당 100만원 한도)",
+    "국민기초생활수급자 학생",
+    "장애인복지법에 따른 장애인 학생",
+    "한부모가족지원법에 따른 법정 한부모가족 학생"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)"
   },
   {
    "id": "auto-4srsearchkeyarticletitle",
@@ -17050,8 +17100,8 @@
    "kindConfidence": "high",
    "kindFrom": "로봇(원문) 2026-10-24",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "200만원",
+   "amountValue": 2000000,
    "deadline": "2026-11-12",
    "deadlineFrom": "게시판 요약 · ~11/12",
    "period": "접수 ~2026-11-12",
@@ -17075,7 +17125,25 @@
     }
    ],
    "sourceUrl": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%ED%95%9C%EA%B5%AD%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8-%ED%91%B8%EB%A5%B8%EB%93%B1%EB%8C%80-%EA%B8%B0%EB%B6%80%EC%9E%A5%ED%95%99%EA%B8%882%EC%B0%A8&keyword=%EC%9E%A5%ED%95%99",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "지원대상 : 대한민국 국적의 국내 대학교 재학생",
+    "총 35명 선발",
+    "선발규모"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)",
+   "openDate": "2026-10-22",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 2000000,
+    "ratio": 0,
+    "min": 2000000,
+    "max": 2000000,
+    "raw": "지원금액 : 1인 당 생활비 장학금 200만 원"
+   },
+   "amountFrom": "공고 원문",
+   "sameAs": "한국장학재단",
+   "sameAsFrom": "자동"
   },
   {
    "id": "auto-rykeywordpaged1slug71029",
@@ -17377,7 +17445,13 @@
     }
    ],
    "sourceUrl": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367570&article.offset=0&articleLimit=10",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "openDate": "2026-10-26",
+   "eligibilityLines": [
+    "∘ 지원자격: 장학금별 상이",
+    "∘ 선발장학생 의무사항: 감사편지 제출 필수",
+    "포탈정보시스템 E-벗 사이버캠퍼스 THE BEST교육지원 중앙도서관 인재개발원 기숙사 국제교류 발전기금 교원 채용 직원 채용 언어교육원 이화동창 학부모 포탈 이화에 바란다 인터넷 증명발급"
+   ]
   },
   {
    "id": "auto-pnoticedoarticleno367476",
@@ -17485,7 +17559,11 @@
    "auto": true,
    "attachments": [],
    "sourceUrl": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626761&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "excerpts": [
+    "2026년 2학기 선원가족 장학생 선발안내(신청기한 연장, ~202610.30.(금))"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
    "id": "auto-ghaknoticedetail26766688",
@@ -18003,8 +18081,8 @@
    "kindConfidence": "high",
    "kindFrom": "로봇(원문) 2026-10-24",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "200만원",
+   "amountValue": 2000000,
    "deadline": "2026-11-12",
    "deadlineFrom": "게시판 요약 · ~ 2026.11.12",
    "period": "접수 ~2026-11-12",
@@ -18028,7 +18106,25 @@
     }
    ],
    "sourceUrl": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626734&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "지원대상 : 대한민국 국적의 국내 대학교 재학생",
+    "총 35명 선발",
+    "선발규모"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)",
+   "openDate": "2026-10-22",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 2000000,
+    "ratio": 0,
+    "min": 2000000,
+    "max": 2000000,
+    "raw": "지원금액 : 1인 당 생활비 장학금 200만 원"
+   },
+   "amountFrom": "공고 원문",
+   "sameAs": "한국장학재단",
+   "sameAsFrom": "자동"
   },
   {
    "id": "auto-900bnum5233cate0qidx5233",
@@ -18133,28 +18229,6 @@
     {
      "name": "붙임1. 2026년 2학기 국가근로장학금 일반유형(추가) 학생신청 매뉴얼.pdf",
      "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F57138&fname=7102D1E36CB341B0BB8614CE0241852A_.pdf&ogrfname=%EB%B6%99%EC%9E%841.+2026%EB%85%84+2%ED%95%99%EA%B8%B0+%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EA%B8%88+%EC%9D%BC%EB%B0%98%EC%9C%A0%ED%98%95%28%EC%B6%94%EA%B0%80%29+%ED%95%99%EC%83%9D%EC%8B%A0%EC%B2%AD+%EB%A7%A4%EB%89%B4%EC%96%BC.pdf"
-    },
-    {
-     "name": "장학금 신청 주요 일정",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
-    },
-    {
-     "name": "장학금 규정 전문(2021. 10. 1.)",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
-    },
-    {
-     "name": "장학금 지침 전문(2026. 02. 04.)",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
-    },
-    {
-     "name": "본문이미지-1920x300.png",
-     "url": "https://www.seoultech.ac.kr/site/ko/2021/res/img/sub_title3444.png",
-     "bodyImage": true
-    },
-    {
-     "name": "본문이미지-509x348.png",
-     "url": "https://www.seoultech.ac.kr/site/ko/res/img/wa_logo.png",
-     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=896774&qidx=57138&cate=0&allboard=true&nowpage=1",
@@ -18194,30 +18268,7 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-24 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [
-    {
-     "name": "장학금 신청 주요 일정",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
-    },
-    {
-     "name": "장학금 규정 전문(2021. 10. 1.)",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
-    },
-    {
-     "name": "장학금 지침 전문(2026. 02. 04.)",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
-    },
-    {
-     "name": "본문이미지-1920x300.png",
-     "url": "https://www.seoultech.ac.kr/site/ko/2021/res/img/sub_title3444.png",
-     "bodyImage": true
-    },
-    {
-     "name": "본문이미지-509x348.png",
-     "url": "https://www.seoultech.ac.kr/site/ko/res/img/wa_logo.png",
-     "bodyImage": true
-    }
-   ],
+   "attachments": [],
    "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=896751&qidx=5233&cate=0&allboard=true&nowpage=1",
    "sourceKind": "auto",
    "eligibilityLines": [
@@ -18266,18 +18317,6 @@
      "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=FFB1AB188AE8401C895D8008A7AC4728_.jpg&ogrfname=%28%ED%8F%AC%EC%8A%A4%ED%84%B0%29+2026%EB%85%84+2%ED%95%99%EA%B8%B0+%EA%B3%A0%EC%A1%B8%ED%9B%84%ED%95%99%EC%8A%B5%EC%9E%90%EC%9E%A5%ED%95%99%EA%B8%88.jpg"
     },
     {
-     "name": "장학금 신청 주요 일정",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
-    },
-    {
-     "name": "장학금 규정 전문(2021. 10. 1.)",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
-    },
-    {
-     "name": "장학금 지침 전문(2026. 02. 04.)",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
-    },
-    {
      "name": "(포스터) 2026년 2학기 중소기업취업연계장학금.jpg",
      "url": "javascript:downloadfile('/storage/www/bbs/5233','03D1B01F82BD4860826EC0D32CB97855_.jpg','(%ED%8F%AC%EC%8A%A4%ED%84%B0) 2026%EB%85%84 2%ED%95%99%EA%B8%B0 %EC%A4%91%EC%86%8C%EA%B8%B0%EC%97%85%EC%B7%A8%EC%97%85%EC%97%B0%EA%B3%84%EC%9E%A5%ED%95%99%EA%B8%88.jpg' );"
     },
@@ -18286,18 +18325,8 @@
      "url": "javascript:downloadfile('/storage/www/bbs/5233','FFB1AB188AE8401C895D8008A7AC4728_.jpg','(%ED%8F%AC%EC%8A%A4%ED%84%B0) 2026%EB%85%84 2%ED%95%99%EA%B8%B0 %EA%B3%A0%EC%A1%B8%ED%9B%84%ED%95%99%EC%8A%B5%EC%9E%90%EC%9E%A5%ED%95%99%EA%B8%88.jpg' );"
     },
     {
-     "name": "본문이미지-1920x300.png",
-     "url": "https://www.seoultech.ac.kr/site/ko/2021/res/img/sub_title3444.png",
-     "bodyImage": true
-    },
-    {
      "name": "본문이미지-1080x1350.png",
      "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/images/86D122F42B694F6FB218EFE7ECA69D91.png",
-     "bodyImage": true
-    },
-    {
-     "name": "본문이미지-509x348.png",
-     "url": "https://www.seoultech.ac.kr/site/ko/res/img/wa_logo.png",
      "bodyImage": true
     }
    ],

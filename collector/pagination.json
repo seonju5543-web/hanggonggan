@@ -5,7 +5,7 @@
    "kind": "page",
    "param": "pageNo"
   },
-  "checkedAt": "2026-10-24"
+  "checkedAt": "2026-10-25"
  },
  "https://www.yonsei.ac.kr/bbs/sc/58/artclList.do?findClSeq=257": {
   "ok": true,
@@ -13,7 +13,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-10-24"
+  "checkedAt": "2026-10-25"
  },
  "https://www.skku.edu/skku/campus/skk_comm/notice06.do": {
   "ok": false,
@@ -89,7 +89,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-10-24"
+  "checkedAt": "2026-10-25"
  },
  "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=list&srCategoryId=22": {
   "ok": false,
@@ -101,7 +101,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-10-24"
+  "checkedAt": "2026-10-25"
  },
  "https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073&pageUnit=10&sf.pnos=1073&sf.pnos=888&searchCnd=WRTER&searchKrwd=%EC%9E%A5%ED%95%99": {
   "ok": false,
@@ -113,7 +113,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-10-24"
+  "checkedAt": "2026-10-25"
  },
  "https://www.knou.ac.kr/bbs/knou/51/artclList.do?bbsClSeq=&bbsOpenWrdSeq=25&isViewMine=false&srchColumn=sj&srchWrd=": {
   "ok": true,
@@ -121,7 +121,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-10-24"
+  "checkedAt": "2026-10-25"
  },
  "https://home.knu.ac.kr/HOME/knussw/index.htm": {
   "ok": false,
@@ -145,7 +145,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-10-24"
+  "checkedAt": "2026-10-25"
  },
  "https://www.cbnu.ac.kr/www/selectBbsNttList.do?bbsNo=8&key=815&searchCtgry=%ED%95%99%EC%82%AC/%EC%9E%A5%ED%95%99": {
   "ok": false,
@@ -242,7 +242,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-10-24"
+  "checkedAt": "2026-10-25"
  },
  "https://www.gachon.ac.kr/kor/7986/subview.do": {
   "ok": false,
@@ -414,7 +414,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-10-24"
+  "checkedAt": "2026-10-25"
  },
  "https://sejong.korea.ac.kr/koreaSejong/7906/subview.do": {
   "ok": false,
@@ -430,7 +430,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-10-24"
+  "checkedAt": "2026-10-25"
  },
  "https://www.hufs.ac.kr/hufs/11302/subview.do": {
   "ok": false,

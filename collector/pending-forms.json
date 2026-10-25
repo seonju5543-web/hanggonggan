@@ -786,8 +786,8 @@
    "added": "2026-10-24",
    "fetched": false,
    "schematized": false,
-   "tries": 4,
-   "lastTryAt": "2026-10-24"
+   "tries": 5,
+   "lastTryAt": "2026-10-25"
   },
   {
    "id": "auto-notice7doarticleno894852",
@@ -852,6 +852,16 @@
    "added": "2026-10-24",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-amepagescholarshipnotice-0zk0x95",
+   "name": "[교외] 한국장학재단 푸른등대 기부장학생 2차 선발 안내(11/12 마감, 생활비 200만원)",
+   "target": "한국장학재단 푸른등대 기부장학생 2차 선발 안내(11/",
+   "added": "2026-10-25",
+   "fetched": false,
+   "schematized": false,
+   "tries": 1,
+   "lastTryAt": "2026-10-25"
   }
  ]
 }
