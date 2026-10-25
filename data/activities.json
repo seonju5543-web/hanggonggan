@@ -3022,9 +3022,9 @@
      "text": "2026-08-31 ~ 2026-10-14 23:59"
     }
    ],
-   "detailsV": 4,
+   "detailsV": 5,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-16",
+   "excerptsAt": "2026-10-25",
    "school": "",
    "campus": "",
    "host": "창업진흥원 K-Startup",
@@ -3048,9 +3048,9 @@
    "kind": "대외활동",
    "attachments": [],
    "deadlineHint": null,
-   "detailsV": 4,
+   "detailsV": 5,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-16",
+   "excerptsAt": "2026-10-25",
    "school": "한국외국어대학교",
    "campus": "",
    "foundAt": "2026-10-14",
@@ -3071,9 +3071,9 @@
    ],
    "deadlineHint": null,
    "deadline": "2026-10-28",
-   "detailsV": 4,
+   "detailsV": 5,
    "field": "멘토링",
-   "excerptsAt": "2026-10-16",
+   "excerptsAt": "2026-10-25",
    "school": "한국외국어대학교",
    "campus": "",
    "foundAt": "2026-10-14",
@@ -3092,6 +3092,10 @@
    "deadlineHint": null,
    "excerpts": [
     {
+     "label": "모집기간",
+     "text": "2026년 11월 2일(월) 오후 6시"
+    },
+    {
      "label": "대상",
      "text": "대학생 및 대학원생"
     }
@@ -3101,9 +3105,9 @@
     "※ 휴학생 및 대학 졸업자 지원 가능",
     "※ 대학 입학 예정자 및 대학 합격 후 재학 이력 없이 휴학한 경우 지원 불가"
    ],
-   "detailsV": 4,
+   "detailsV": 5,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-16",
+   "excerptsAt": "2026-10-25",
    "school": "한국외국어대학교",
    "campus": "",
    "foundAt": "2026-10-14",
@@ -3199,9 +3203,9 @@
      "text": "2026-09-22 ~ 2026-10-13 23:30"
     }
    ],
-   "detailsV": 4,
+   "detailsV": 5,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-16",
+   "excerptsAt": "2026-10-25",
    "school": "",
    "campus": "",
    "host": "창업진흥원 K-Startup",
@@ -3235,9 +3239,9 @@
      "text": "2026-09-18 ~ 2026-10-13 23:59"
     }
    ],
-   "detailsV": 4,
+   "detailsV": 5,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-16",
+   "excerptsAt": "2026-10-25",
    "school": "",
    "campus": "",
    "host": "창업진흥원 K-Startup",
@@ -3264,14 +3268,13 @@
     }
    ],
    "deadlineHint": null,
-   "detailsV": 3,
+   "detailsV": 5,
    "field": "기획·아이디어",
-   "excerptsAt": "2026-10-13",
+   "excerptsAt": "2026-10-25",
    "school": "",
    "campus": "",
    "host": "인천유스톡톡 청년포털",
-   "foundAt": "2026-10-13",
-   "detailsTriedAt": "2026-10-16"
+   "foundAt": "2026-10-13"
   },
   {
    "title": "2026년 성균관대학교 서베이리서치센터 통계 워크숍 안내",
@@ -3279,9 +3282,9 @@
    "kind": "대외활동",
    "attachments": [],
    "deadlineHint": null,
-   "detailsV": 4,
+   "detailsV": 5,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-16",
+   "excerptsAt": "2026-10-25",
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-10-13"
@@ -3307,9 +3310,9 @@
     "신청기한 : 플로깅 진행 1주전 화요일 9시부터 , (예) 9월15일(화) 신청, 9월8일(화) 오전 9시 선착순 신청",
     "신청방법 : https://forms.gle/CEFcHny5kGorRAfe8"
    ],
-   "detailsV": 4,
+   "detailsV": 5,
    "field": "봉사",
-   "excerptsAt": "2026-10-16",
+   "excerptsAt": "2026-10-25",
    "school": "동국대학교 WISE캠퍼스",
    "campus": "",
    "foundAt": "2026-10-13",
@@ -3326,9 +3329,9 @@
    "attachments": [],
    "deadlineHint": null,
    "deadline": "2026-10-30",
-   "detailsV": 4,
+   "detailsV": 5,
    "field": "기획·아이디어",
-   "excerptsAt": "2026-10-17",
+   "excerptsAt": "2026-10-25",
    "school": "한국외국어대학교",
    "campus": "",
    "foundAt": "2026-10-13",
