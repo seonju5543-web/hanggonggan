@@ -9814,15 +9814,6 @@
    "school": "이화여자대학교",
    "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(같은 파일 · 1글) · body: 여러 글에 같은 그림(같은 파일))"
   },
-  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367245&mode=view&no=382": {
-   "at": "2026-10-17",
-   "school": "이화여자대학교",
-   "file": "data/news/img/bd083660ad4ea492.webp",
-   "src": "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEYUgPA9gLwKoBcCyB3ANgDQGsBBfAUQEsATARQDF8BDATQDoAHAOwHMg%20",
-   "from": "body",
-   "v": 2,
-   "side": 360
-  },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367238&mode=view&no=382": {
    "at": "2026-10-17",
    "school": "이화여자대학교",
@@ -13265,10 +13256,9 @@
    "tries": 1
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367207&mode=view&no=383": {
-   "at": "2026-10-24",
+   "at": "2026-10-25",
    "school": "이화여자대학교",
-   "err": "글 열기 실패 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
-   "tries": 1
+   "none": "글에 그림이 없음"
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367123&mode=view&no=383": {
    "at": "2026-10-24",
@@ -13359,6 +13349,31 @@
    "at": "2026-10-25",
    "school": "이화여자대학교",
    "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림))"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367493&mode=view&no=374": {
+   "at": "2026-10-25",
+   "school": "이화여자대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367449&mode=view&no=374": {
+   "at": "2026-10-25",
+   "school": "이화여자대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림))"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367377&mode=view&no=374": {
+   "at": "2026-10-25",
+   "school": "이화여자대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367245&mode=view&no=374": {
+   "at": "2026-10-25",
+   "school": "이화여자대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(같은 파일 · 1글))"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367238&mode=view&no=374": {
+   "at": "2026-10-25",
+   "school": "이화여자대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림) · body: 여러 글에 같은 그림(공통 그림))"
   }
  },
  "srcSeen": {
@@ -16729,6 +16744,9 @@
    "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEYUhDADgK1QSwF4HkCmyDCAYgEYA2AngBIBqALgJKEB0iAdgOZA": [
     "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367598&mode=view&no=384",
     "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367598&mode=view&no=373"
+   ],
+   "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEYUgPA9gLwKoBcCyB3ANgDQGsBBfAUQEsATARQDF8BDATQDoAHAOwHMg%20": [
+    "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367245&mode=view&no=374"
    ]
   },
   "충북대학교": {
@@ -16890,7 +16908,8 @@
    "data/news/img/bf204806e7e1a86c.webp",
    "data/news/img/670b619b440599cb.webp",
    "data/news/img/5e566745b3eed2b0.webp",
-   "data/news/img/3439d588f916f25e.webp"
+   "data/news/img/3439d588f916f25e.webp",
+   "data/news/img/bd083660ad4ea492.webp"
   ],
   "한국외국어대학교": [
    "data/news/img/b8b2dc37a92ecd6e.webp"
