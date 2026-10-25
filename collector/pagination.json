@@ -45,7 +45,7 @@
    "kind": "page",
    "param": "pageNo"
   },
-  "checkedAt": "2026-10-24"
+  "checkedAt": "2026-10-25"
  },
  "https://www.hongik.ac.kr/kr/newscenter/notice.do": {
   "ok": false,
@@ -214,7 +214,7 @@
    "param": "article.offset",
    "limit": 10
   },
-  "checkedAt": "2026-10-24"
+  "checkedAt": "2026-10-25"
  },
  "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100": {
   "ok": false,
