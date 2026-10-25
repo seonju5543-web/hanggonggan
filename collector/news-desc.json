@@ -8576,10 +8576,10 @@
    "desc": "인권센터 성평등가족부에서는 교제폭력·스토킹의 고위험 징후를 조기에 인식하고, 피해자가 신속하게 보호·지원받을 수 있도록「교제폭력·스토킹 레드플래그 10」을 제작하였습니다."
   },
   "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=277033&mode=view": {
-   "at": "2026-10-24",
+   "at": "2026-10-25",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 2
+   "tries": 3
   },
   "url:https://www.hanyang.ac.kr/notice_all?_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_action=view_message&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_entryId=121202&p_p_id=kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet&p_p_lifecycle=0&p_p_mode=view&p_p_state=normal": {
    "at": "2026-10-23",
@@ -8602,10 +8602,10 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=271535&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-10-24",
+   "at": "2026-10-25",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 2
+   "tries": 3
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367575&mode=view&no=388": {
    "at": "2026-10-23",
@@ -8951,6 +8951,46 @@
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367449&mode=view&no=385": {
    "at": "2026-10-24",
+   "v": 2,
+   "desc": "- 모집대상 및 인원: 수도권역 일반대 또는 전문대 재(휴)학생 10명 내외"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367598&mode=view&no=373": {
+   "at": "2026-10-25",
+   "v": 2,
+   "desc": "3. 협조 사항 가 . 크레인 작업 동안 주변 통행 시 신호수의 안내에 따라 통행하여 주시기 바랍니다 . ( 작업 중 종합과학관 A 동 및 C 동 도로의 차량통행은 통제됩니다 .)"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367575&mode=view&no=374": {
+   "at": "2026-10-25",
+   "v": 2,
+   "desc": "3. 장소: ECC 이삼봉홀 가. 현장투표 - 시간: 12:00~13:00 (본 행사 전)"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367597&mode=view&no=372": {
+   "at": "2026-10-25",
+   "v": 2,
+   "desc": "핼러윈 데이('26.10.31.)를 앞두고 '26.10.23.(금)부터 전국 주요 번화가에 인파밀집이 예상됨에 따라 선제적 안전관리를 위해 「도로·광장·공원 다중운집인파재난」위기경보가 아래와 같이 발령되었음을…"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367591&mode=view&no=369": {
+   "at": "2026-10-25",
+   "v": 2,
+   "desc": "중간시험 채플 휴무기간 종료 후, 다음주 월요일(10/26)부터 채플이 재개 됩니다. 대강당 4주차 채플(10/26~10/30)은 ' 말씀채플 '로 진행됩니다."
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367586&mode=view&no=366": {
+   "at": "2026-10-25",
+   "v": 2,
+   "desc": "공과대학 환경공학과에서 근무할 계약직원을 모집하오니 관심 있는 분들의 많은 지원 바랍니다."
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367580&mode=view&no=365": {
+   "at": "2026-10-25",
+   "v": 2,
+   "desc": "학생처 사회봉사팀에서 2026 이화봉사페스티벌 프로그램으로 '사랑의 헌혈'을 시행하오니, 많은 관심과 참여를 부탁드립니다."
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367493&mode=view&no=374": {
+   "at": "2026-10-25",
+   "v": 2,
+   "desc": "안녕하세요. 정보인프라팀입니다. 방화벽 장비 점검으로 인해 아래와 같이 중요 정보서비스가 간헐적으로 중지되오니 이용에 참고하시기 바랍니다."
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367449&mode=view&no=374": {
+   "at": "2026-10-25",
    "v": 2,
    "desc": "- 모집대상 및 인원: 수도권역 일반대 또는 전문대 재(휴)학생 10명 내외"
   }

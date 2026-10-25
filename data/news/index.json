@@ -1,6 +1,6 @@
 {
  "note": "학교별 교내 소식 파일 색인 (data/news/). 앱은 match-engine.js newsFileFor(noticeFileKey) 로 자기 학교 파일을 바로 받는다 — 옛 통짜 파일로 물러나는 길은 없다. check-live.yml 이 이 색인의 학교 전부를 확인한다.",
- "updatedAt": "2026-10-24",
+ "updatedAt": "2026-10-25",
  "schools": 44,
  "files": {
   "이화여자대학교": {
@@ -165,7 +165,7 @@
   },
   "세종대학교": {
    "file": "n1mo5fbn.json",
-   "count": 21
+   "count": 19
   },
   "경북대학교": {
    "file": "nf097dk.json",

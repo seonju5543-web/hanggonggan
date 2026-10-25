@@ -1,6 +1,6 @@
 {
  "school": "세종대학교",
- "updatedAt": "2026-10-24",
+ "updatedAt": "2026-10-25",
  "items": [
   {
    "title": "세종대학교 정규직 채용",
@@ -200,24 +200,6 @@
    "thumb": "data/news/img/102c21ad2b686e58.webp",
    "src": "8a741b47",
    "desc": "학생생활상담소 자기 이해 집단상담 '타로 야-호' 타로카드를 매개로 대학생들이 자신의 타고난 기질 및 현재 감정 상태를 자각하고 자신의 모습을 이해하고 수용하는 경험을 제공하는 집단상담 프로그램"
-  },
-  {
-   "title": "[신청] 2026-2 전공심화학습공동체 (8/26~9/16)",
-   "url": "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=892270&article.offset=0&articleLimit=10",
-   "postedAt": "2026-08-25",
-   "school": "세종대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/a8cf99b1e88772f4.webp"
-  },
-  {
-   "title": "[학생생활상담소] 세종이의 마음지킴이 학생생활상담소 이용 안내",
-   "url": "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=892265&article.offset=0&articleLimit=10",
-   "postedAt": "2026-08-25",
-   "school": "세종대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "desc": "학생생활상담소 안녕하세요, 학생생활상담소입니다. 세종대학교 재학생이라면, 누구나 무료로 심리 상담 및 심리검사를 받아볼 수 있습니다."
   }
  ]
 }

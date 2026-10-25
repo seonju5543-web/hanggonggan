@@ -1,17 +1,18 @@
-## 🗞 교내 소식 수집 리포트 (2026-10-24)
+## 🗞 교내 소식 수집 리포트 (2026-10-25)
 
-새 글 **12건** → 앱 홈 「우리 학교 소식」 (학교별 파일 data/news/ · 44개교 · 게시판 아는 학교 44/44 · 둘째 게시판 3곳)
+새 글 **11건** → 앱 홈 「우리 학교 소식」 (학교별 파일 data/news/ · 44개교 · 게시판 아는 학교 44/44 · 둘째 게시판 3곳)
 
-⏱ 게시판 47곳을 2분 52초에 다 돌았습니다(예산 4분).
+⏰ **시간 예산(4분)에 걸려 게시판 4곳을 이번 실행에서 못 봤습니다** — 경기대학교 · 서울과학기술대학교 · 계명대학교 · 서울교육대학교
+  → 이번에 본 게시판 43/47곳 · 다음 실행은 **경기대학교**부터 시작합니다.
 
 ### 🚨 연속 실패 — 게시판 주소 확인 필요
-- 아주대학교 (8회 연속) — 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
+- 아주대학교 (9회 연속) — 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
 
 ### 한국방송통신대학교
 상태: ✅ 정상 (공지 글 6건 감지 · 새 글 0)
 
 ### 경북대학교
-상태: ✅ 정상 (공지 글 11건 감지 · 새 글 0)
+상태: ⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
 
 ### 영남대학교
 상태: ✅ 정상 (공지 글 9건 감지 · 새 글 0)
@@ -32,7 +33,7 @@
 상태: ✅ 정상 (공지 글 4건 감지 · 새 글 0)
 
 ### 부경대학교
-상태: ✅ 정상 (공지 글 11건 감지 · 새 글 0)
+상태: ✅ 정상 (공지 글 10건 감지 · 새 글 0)
 
 ### 강원대학교
 상태: ✅ 정상 (공지 글 20건 감지 · 새 글 0)
@@ -122,24 +123,24 @@
 상태: ✅ 정상 (공지 글 11건 감지 · 새 글 0)
 
 ### 이화여자대학교
-상태: ✅ 정상 (공지 글 11건 감지 · 새 글 8)
-- [[교육기획팀] 2026 AI4AE DAY 참가 신청 안내 (11. 6.(금))](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367575&article.offset=0&articleLimit=10&no=385) — 2026-10-23
-- [[정보인프라팀] 방화벽 장비 점검에 따른 중요 정보서비스 일시 중지 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367493&article.offset=0&articleLimit=10&no=385) — 2026-10-19
-- [[창업지원단/모집] 2026 스타트업 주니어 애널리스트 4기 모집(~10/28까지)](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367449&article.offset=0&articleLimit=10&no=385) — 2026-10-16
-- [[안전팀] 종합과학관A동 및 C동 주변 도로 작업 안내(10/31(토) 및 11/14(토) 06:00~20:00)](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367598&article.offset=0&articleLimit=10&no=384) — 2026-10-24
-- [생활] [[학생지원팀/교육부]「도로·광장·공원 다중운집인파재난」 위기경보 '주의' 단계 발령 알림 및 안전수칙 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367597&article.offset=0&articleLimit=10&no=383) — 2026-10-23
-- [[교목실] 2026-2 채플 재개 안내 (10/26 월요일부터)](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367591&article.offset=0&articleLimit=10&no=380) — 2026-10-23
-- [채용] [[채용] 공과대학 환경공학과 계약직원 모집](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367586&article.offset=0&articleLimit=10&no=377) — 2026-10-23
-- [행사] [[사회봉사팀] 2026 이화봉사페스티벌 "이화인이 만드는 아름다운 세상" - 사랑의 헌혈 참여 안내(10. 29.(목))](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367580&article.offset=0&articleLimit=10&no=376) — 2026-10-23
+상태: ✅ 정상 (공지 글 11건 감지 · 새 글 11)
+- [[교육기획팀] 2026 AI4AE DAY 참가 신청 안내 (11. 6.(금))](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367575&article.offset=0&articleLimit=10&no=374) — 2026-10-23
+- [[정보인프라팀] 방화벽 장비 점검에 따른 중요 정보서비스 일시 중지 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367493&article.offset=0&articleLimit=10&no=374) — 2026-10-19
+- [[창업지원단/모집] 2026 스타트업 주니어 애널리스트 4기 모집(~10/28까지)](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367449&article.offset=0&articleLimit=10&no=374) — 2026-10-16
+- [학사] [2026학년도 제2학기 학부 및 각 대학원 중간수강소감(중간강의평가) 설문 실시 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367377&article.offset=0&articleLimit=10&no=374) — 2026-10-14
+- [행사] [[사회봉사팀]2026 이화봉사페스티벌 "이화인이 만드는 아름다운 세상" 행사 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367245&article.offset=0&articleLimit=10&no=374) — 2026-10-06
+- [이화여자대학교 창립 140주년 기념 음악회(2026.10.26.(월) 19:00)](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367238&article.offset=0&articleLimit=10&no=374) — 2026-10-06
+- [[안전팀] 종합과학관A동 및 C동 주변 도로 작업 안내(10/31(토) 및 11/14(토) 06:00~20:00)](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367598&article.offset=0&articleLimit=10&no=373) — 2026-10-24
+- [생활] [[학생지원팀/교육부]「도로·광장·공원 다중운집인파재난」 위기경보 '주의' 단계 발령 알림 및 안전수칙 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367597&article.offset=0&articleLimit=10&no=372) — 2026-10-23
+- [[교목실] 2026-2 채플 재개 안내 (10/26 월요일부터)](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367591&article.offset=0&articleLimit=10&no=369) — 2026-10-23
+- [채용] [[채용] 공과대학 환경공학과 계약직원 모집](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367586&article.offset=0&articleLimit=10&no=366) — 2026-10-23
+- [행사] [[사회봉사팀] 2026 이화봉사페스티벌 "이화인이 만드는 아름다운 세상" - 사랑의 헌혈 참여 안내(10. 29.(목))](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367580&article.offset=0&articleLimit=10&no=365) — 2026-10-23
 
 ### 인하대학교
 상태: ✅ 정상 (공지 글 16건 감지 · 새 글 0)
 
 ### 부산대학교
-상태: ✅ 정상 (공지 글 12건 감지 · 새 글 3)
-- [[박물관] 1만원으로 떠나는 여수여행!! 선착순](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511739) — 2026-10-24
-- [학사] [[학사과] 2026학년도 겨울계절수업 교류 수학 안내(서울시립대학교)](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511738) — 2026-10-24
-- [학사] [[학사과] 2026학년도 겨울계절수업 교류 수학 안내(서강대학교)](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511737) — 2026-10-24
+상태: ✅ 정상 (공지 글 12건 감지 · 새 글 0)
 
 ### 가톨릭대학교
 상태: ✅ 정상 (공지 글 6건 감지 · 새 글 0)
@@ -148,17 +149,16 @@
 상태: ✅ 정상 (공지 글 13건 감지 · 새 글 0)
 
 ### 경기대학교
-상태: ✅ 정상 (공지 글 7건 감지 · 새 글 0)
+상태: ⏰ 시간 예산(4분) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다
 
 ### 서울과학기술대학교
-상태: ✅ 정상 (공지 글 9건 감지 · 새 글 1)
-- [2026학년도 공과대학 학부 연구생 학술대회 개최](https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897018&qidx=4691&cate=10&allboard=false&nowpage=1) — 2026-10-24
+상태: ⏰ 시간 예산(4분) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다
 
 ### 계명대학교
-상태: ✅ 정상 (공지 글 23건 감지 · 새 글 0)
+상태: ⏰ 시간 예산(4분) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다
 
 ### 서울교육대학교
-상태: ✅ 정상 (공지 글 9건 감지 · 새 글 0)
+상태: ⏰ 시간 예산(4분) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다
 
 ---
 ⚙️ 설정: `collector/news-sources.json` · 발행: `data/news/<학교키>.json` · 로봇: `collector/collect-news.mjs` · 판정: `collector/news-kind.mjs`
