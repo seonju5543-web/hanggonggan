@@ -92,16 +92,23 @@ const PROFILE = {
   const verdicts = await page.evaluate(() => {
     const ms = getMatches().filter((m) => m.sch.sourceKind === 'kosaf');
     const by = {}; ms.forEach((m) => { const v = fitVerdict(m.fit, m.fd); by[v] = (by[v] || 0) + 1; });
-    const okWrongCity = ms.filter((m) => fitVerdict(m.fit, m.fd) === 'ok')
-      .filter((m) => (m.sch.eligibilityLines || []).some((l) => {
-        const c = (l.match(/([가-힣]{1,6}(?:시|군|구))[에의]\s?(주소|주민등록|거주)/) || [])[1];
-        return c && c !== state.profile.regionCity && c !== state.profile.parentRegionCity;
-      })).map((m) => m.sch.name.slice(0, 30));
-    return { by, okWrongCity };
+    /* 🔴 **다른 길이 열린 지역 요건은 빼고 잰다** (2026-10-25 · 은서 결정 A안). 거창군장학회처럼
+       `거창군에 주민등록` ○ `거창군 소재 중학교 또는 고등학교를 … 졸업` 이 나란히 오면 둘 중 하나로 된다.
+       우리는 학생의 출신 중·고교를 모르니 서울 학생도 '미달'이 아니다 — 틀린 미달은 못 받는 것보다 나쁘다.
+       그 길(같은 시·군의 학교를 다녔다·졸업했다 / 출신)이 **같은 공고의 다른 줄**에 있을 때만 뺀다 —
+       판정은 앱의 해석기(parse-requirements)가 아니라 이 검사의 글자 규칙으로 한다(필터의 눈으로 필터를 재지 않는다). */
+    const altPath = (lines, c) => lines.some((l) => l.includes(c) && !/[에의]\s?(주소|주민등록|거주)/.test(l)
+      && /(소재|관내)[^○]{0,30}(학교)[^○]{0,30}(졸업|재학)|출신/.test(l));
+    const cityHits = (m) => (m.sch.eligibilityLines || []).map((l) => (l.match(/([가-힣]{1,6}(?:시|군|구))[에의]\s?(주소|주민등록|거주)/) || [])[1])
+      .filter((c) => c && c !== state.profile.regionCity && c !== state.profile.parentRegionCity);
+    const oks = ms.filter((m) => fitVerdict(m.fit, m.fd) === 'ok');
+    const okWrongCity = oks.filter((m) => cityHits(m).some((c) => !altPath(m.sch.eligibilityLines || [], c))).map((m) => m.sch.name.slice(0, 30));
+    const okAltPath = oks.filter((m) => { const h = cityHits(m); return h.length && h.every((c) => altPath(m.sch.eligibilityLines || [], c)); }).length;
+    return { by, okWrongCity, okAltPath };
   });
   eq(`판정이 셋으로 갈린다 (${JSON.stringify(verdicts.by)})`,
     Object.keys(verdicts.by).length >= 2, true);
-  eq('사는 시·군이 아닌 곳의 장학금을 「적합」이라고 하지 않는다', verdicts.okWrongCity, []);
+  eq(`사는 시·군이 아닌 곳의 장학금을 「적합」이라고 하지 않는다 (같은 시·군 학교 출신 같은 다른 길이 열린 ${verdicts.okAltPath}건은 미달로 단정하지 않는다)`, verdicts.okWrongCity, []);
 
   console.log('\n■ 🔴 「받을 수 있다」고 세지 않는다');
   /* 자격을 확인 안 한 것을 합계에 더하면 기망이다. evaluate 는 KOSAF 를 `selective`
