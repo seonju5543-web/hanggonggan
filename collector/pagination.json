@@ -24,8 +24,12 @@
   "checkedAt": "2026-10-14"
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318": {
-  "ok": false,
-  "checkedAt": "2026-10-12"
+  "ok": true,
+  "way": {
+   "kind": "page",
+   "param": "pageIndex"
+  },
+  "checkedAt": "2026-10-26"
  },
  "https://dep.hufs.ac.kr/student/12767/subview.do": {
   "ok": true,
@@ -49,7 +53,7 @@
    "kind": "page",
    "param": "pageNo"
   },
-  "checkedAt": "2026-10-25"
+  "checkedAt": "2026-10-26"
  },
  "https://www.hongik.ac.kr/kr/newscenter/notice.do": {
   "ok": false,
@@ -117,7 +121,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-10-25"
+  "checkedAt": "2026-10-26"
  },
  "https://www.knou.ac.kr/bbs/knou/51/artclList.do?bbsClSeq=&bbsOpenWrdSeq=25&isViewMine=false&srchColumn=sj&srchWrd=": {
   "ok": true,
@@ -218,15 +222,19 @@
    "param": "article.offset",
    "limit": 10
   },
-  "checkedAt": "2026-10-25"
+  "checkedAt": "2026-10-26"
  },
  "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100": {
   "ok": false,
   "checkedAt": "2026-10-01"
  },
  "https://onestop.pusan.ac.kr/page?menuCD=000000000000062": {
-  "ok": false,
-  "checkedAt": "2026-10-12"
+  "ok": true,
+  "way": {
+   "kind": "page",
+   "param": "pageNo"
+  },
+  "checkedAt": "2026-10-26"
  },
  "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083": {
   "ok": false,
