@@ -107,10 +107,6 @@
   "at": "2026-10-15",
   "tries": 1
  },
- "https://www.bai.go.kr/bai/etc/popupzone/detail?ppId=120": {
-  "at": "2026-10-24",
-  "tries": 2
- },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53505&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-16",
   "tries": 1
@@ -301,6 +297,10 @@
  },
  "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156786340&pWise=sub&pWiseSub=C3": {
   "at": "2026-10-25",
+  "tries": 1
+ },
+ "https://ntseitc.spectory.net/shorts": {
+  "at": "2026-10-26",
   "tries": 1
  }
 }
