@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-26",
+ "updatedAt": "2026-10-27",
  "items": {
   "auto-oardid323011menuno200318": [
    {
@@ -60,14 +60,6 @@
     "at": "2026-10-23"
    }
   ],
-  "auto-15nttno170504searchctgry": [
-   {
-    "src": "elig-73mcyw-1.pdf",
-    "srcBytes": 155365,
-    "none": true,
-    "at": "2026-10-23"
-   }
-  ],
   "auto-krbbskr845758artclviewdo": [
    {
     "file": "auto-krbbskr845758artclviewdo/1-elig-1a3b1d-1_p7-10.pdf",
@@ -118,26 +110,10 @@
     "at": "2026-10-23"
    }
   ],
-  "auto-amepagescholarshipnotice-0eqesl0": [
-   {
-    "src": "elig-1agiyt-1.pdf",
-    "srcBytes": 157890,
-    "none": true,
-    "at": "2026-10-23"
-   }
-  ],
   "auto-amepagescholarshipnotice-0jq8hoj": [
    {
     "src": "elig-154799-1.pdf",
     "srcBytes": 480703,
-    "none": true,
-    "at": "2026-10-23"
-   }
-  ],
-  "auto-amepagescholarshipnotice-00jgl50": [
-   {
-    "src": "elig-1u9rjj-1.pdf",
-    "srcBytes": 91123,
     "none": true,
     "at": "2026-10-23"
    }
@@ -192,38 +168,6 @@
    {
     "src": "elig-q641o0-1.docx",
     "srcBytes": 21581,
-    "none": true,
-    "at": "2026-10-23"
-   }
-  ],
-  "kosaf-2000477010": [
-   {
-    "src": "2_2027년 대학원_의생명과학분야 대학원 장학생 선발 요강 - 국내.pdf",
-    "srcBytes": 193833,
-    "none": true,
-    "at": "2026-10-23"
-   }
-  ],
-  "kosaf-2000477011": [
-   {
-    "src": "2_2027년 대학원_의생명과학분야 대학원 장학생 선발 요강 - 해외.pdf",
-    "srcBytes": 201902,
-    "none": true,
-    "at": "2026-10-23"
-   }
-  ],
-  "kosaf-2000477012": [
-   {
-    "src": "2027년 아산북한이탈청소년장학생 선발안내.pdf",
-    "srcBytes": 159500,
-    "none": true,
-    "at": "2026-10-23"
-   }
-  ],
-  "kosaf-2000477013": [
-   {
-    "src": "2_2027년 대학원_보건의료정책분야 대학원 장학생 선발 요강.pdf",
-    "srcBytes": 192892,
     "none": true,
     "at": "2026-10-23"
    }
@@ -521,6 +465,38 @@
     "srcBytes": 143423,
     "none": true,
     "at": "2026-10-26"
+   }
+  ],
+  "auto-scho332282329artclviewdo": [
+   {
+    "src": "elig-73bf2p-1.pdf",
+    "srcBytes": 134815,
+    "none": true,
+    "at": "2026-10-27"
+   }
+  ],
+  "auto-scho332282326artclviewdo": [
+   {
+    "src": "elig-1guecu-1.pdf",
+    "srcBytes": 142432,
+    "none": true,
+    "at": "2026-10-27"
+   }
+  ],
+  "auto-scho332282297artclviewdo": [
+   {
+    "src": "elig-v2i6rl-1.pdf",
+    "srcBytes": 147403,
+    "none": true,
+    "at": "2026-10-27"
+   }
+  ],
+  "auto-scho332282304artclviewdo": [
+   {
+    "src": "elig-z4ki38-1.pdf",
+    "srcBytes": 4059486,
+    "none": true,
+    "at": "2026-10-27"
    }
   ]
  }
