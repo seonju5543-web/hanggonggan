@@ -3,6 +3,28 @@
  "updatedAt": "2026-10-26",
  "items": [
   {
+   "title": "[교육인증센터] 「신기술·(첨단)산업분야 포트폴리오 제작하기」 프로그램 안내",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/141/236589/artclView.do",
+   "postedAt": "2026-10-26",
+   "school": "명지대학교",
+   "campus": "",
+   "src": "7f376301",
+   "foundAt": "2026-10-26",
+   "thumb": "data/news/img/6c7e7f6961ca0e88.webp",
+   "desc": "- 문의사항 : 대학교육혁신원 교육인증센터 (02-300-1732, cap@mju.ac.kr) 대학교육혁신원장"
+  },
+  {
+   "title": "[스마트시스템공과대학 교학팀] 인턴사무원(계약직) 채용 공고",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/141/236582/artclView.do",
+   "postedAt": "2026-10-26",
+   "kind": "채용",
+   "school": "명지대학교",
+   "campus": "",
+   "src": "7f376301",
+   "foundAt": "2026-10-26",
+   "desc": "1. 채용분야 및 지원자격 채용부서 주요업무 자격요건 및 우대사항 스마트시스템공과대학 교학팀 학사관리 및 행정업무"
+  },
+  {
    "title": "명지대학교 78주년 기념 서울 클래시컬 심포니 오케스트라 초청 관현악의 밤「Opera Gala Night」공연 안내",
    "url": "https://www.mju.ac.kr/bbs/mjukr/141/236569/artclView.do",
    "postedAt": "2026-08-31",
@@ -411,26 +433,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "desc": "1. 채용분야 및 지원자격 채용부서 주요업무 자격요건 및 우대사항 인공지능 · 소프트웨어융합대학 교학팀 인턴사무원 · 회계업무 · 행정업무 · 대졸 이상 (4 년 ) · 한글 및 엑셀 프로그램 활용 가능자 ·…"
-  },
-  {
-   "title": "[대학교육혁신원] 전임연구원 채용 공고",
-   "url": "https://www.mju.ac.kr/bbs/mjukr/141/235833/artclView.do",
-   "postedAt": "2026-09-29",
-   "kind": "채용",
-   "school": "명지대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "desc": "1. 모집분야 : 대학교육혁신원 소속 전임연구원 채용분야 임용예정일 채용인원 전임연구원"
-  },
-  {
-   "title": "[사회과학대학 교학팀] 계약직(인턴사무원)채용 공고",
-   "url": "https://www.mju.ac.kr/bbs/mjukr/141/235806/artclView.do",
-   "postedAt": "2026-09-28",
-   "kind": "채용",
-   "school": "명지대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "desc": "1. 채용분야 및 지원자격 채용부서 주요업무 자격요건 및 우대사항 사회과학대학 인턴사무원 학사관리 및 행정업무"
   }
  ]
 }

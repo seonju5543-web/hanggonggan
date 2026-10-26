@@ -3,6 +3,91 @@
  "updatedAt": "2026-10-26",
  "items": [
   {
+   "title": "[IR센터] 2026학년도 가톨릭대학교 학생 AI 학습 활용 현황 및 교육요구 조사 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277121&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-26",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-26",
+   "thumb": "data/news/img/5c4e5cf09878a0f1.webp"
+  },
+  {
+   "title": "[중앙도서관] 모바일 APP 서비스 중지 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277106&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-26",
+   "kind": "생활",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-26",
+   "thumb": "data/news/img/01b9eb2d303f14e2.webp"
+  },
+  {
+   "title": "[대학일자리플러스센터] 홈페이지 오픈 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277077&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-26",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-26",
+   "desc": "취업·진로 관련 정보와 서비스를 한곳에서 통합 제공하는 가톨릭대학교 대학일자리플러스센터 홈페이지 가 새롭게 문을 열었습니다."
+  },
+  {
+   "title": "[융합전공학부] 2026-2학기 학생설계전공 홍보 이벤트 '나만의 전공 커스텀' 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277049&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-26",
+   "kind": "학사",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-26",
+   "thumb": "data/news/img/ab9577d99990f4ae.webp"
+  },
+  {
+   "title": "[학생지원팀] 탄소중립에 동참하는 'CUK당근마켓'(상설운영) 참여 및 이용안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277116&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-26",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-26",
+   "thumb": "data/news/img/fe050605aa3837e3.webp",
+   "desc": "탄소중립에 동참하고, 일회성 물품 사용의 근절을 통해 자원절약을 실천하는 'CUK 당근마켓' 의 운영을 아래와 같이 안내합니다. 여러분이 직접 만들어가는 나눔의 장이 활성화될 수 있도록 많은 관심과 참여 바랍니다."
+  },
+  {
+   "title": "[대학일자리플러스센터] 대학일자리플러스센터 홈페이지 오픈 기념 이벤트 운영 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277039&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-26",
+   "kind": "생활",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-26",
+   "thumb": "data/news/img/45b2d378f1b45c84.webp",
+   "desc": "대학일자리플러스센터 홈페이지가 새롭게 오픈했습니다! 진로·취업 정보도 확인하고, 센터에 바라는 점도 자유롭게 들려주세요. 여러분의 소중한 의견이 더 나은 대학일자리플러스센터를 만듭니다!"
+  },
+  {
+   "title": "[대플-추천채용] 모두투어 - 채용 연계형 인턴 모집",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277119&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-26",
+   "kind": "채용",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-26"
+  },
+  {
+   "title": "[대플-추천채용] 이카운트 - 서비스본부 신입 채용",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277117&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-26",
+   "kind": "채용",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-26"
+  },
+  {
    "title": "[학생지원팀] 2026학년도 2학기 동계방학 집중근로 희망근로지 신청 안내",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277033&article.offset=0&articleLimit=10",
    "postedAt": "2026-10-23",
@@ -346,87 +431,6 @@
    "foundAt": "2026-10-12",
    "thumb": "data/news/img/73691d4dca0af3dc.webp",
    "desc": "◎ 장소 : D313 호 ( 다솔관 ) ◎ 발표 : 윤현상 교수 ( 국사학과 ), 박경우 교수 ( 심리학과 ), 박진영 교수 ( 사회학과 ) ◎ 신청대상 : 본교 교원 ◎ 신청방법 : 10/21( 수 ) 까지…"
-  },
-  {
-   "title": "[취업지원팀] 국민연금공단 취업·채용설명회 행사",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276632&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-08",
-   "kind": "행사",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "thumb": "data/news/img/121c0b59fa853414.webp",
-   "desc": "취업 준비부터 4대보험, 국민연금까지! 대학생이라면 꼭 알아야 할 취업·사회보험 정보를 한자리에서 만나보세요. 국민연금공단 채용정보와 함께 취업 후 꼭 알아야 할 4대보험과 연금제도를 쉽고 알차게 알려드립니다.",
-   "src": "5d85d287"
-  },
-  {
-   "title": "[학부대학운영팀] 2026학년도 겨울 계절학기 개설 희망과목 수요조사",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276532&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-06",
-   "kind": "학사",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "foundAt": "2026-10-06",
-   "src": "5d85d287"
-  },
-  {
-   "title": "[인간학연구소]제143차 콜로키움 개최 <대학생 수도원 체험의 영성적 의미>",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276495&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-06",
-   "kind": "학사",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "foundAt": "2026-10-06",
-   "thumb": "data/news/img/ce1d9933ed6a4e7d.webp",
-   "desc": "발표자 : 정태영 교수(가톨릭대학교 학부대학/문화영성대학원/중독학과) 1) 일시 : 2026년 10월 21일(수) 14:00 ~ 16:00"
-  },
-  {
-   "title": "[대학일자리플러스센터] 대학일자리플러스센터 x 총학생회 <백야> 간식행사 진행 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276444&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-02",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "thumb": "data/news/img/571ef9929a708403.webp"
-  },
-  {
-   "title": "[학생생활상담소] 2026년 2학기 집단상담 신청 안내(ELP 비교과 점수 인정) (수정)",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276057&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-02",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "thumb": "data/news/img/67af30d9da25b1f6.webp",
-   "desc": "[학생생활상담소] 2026-2학기 집단상담 참가자 모집 안녕하세요, 학생생활상담소입니다. 학생생활상담소에서는 여러분의 건강한 대학생활을 돕기 위해 다양한 집단상담 프로그램을 운영합니다.",
-   "src": "5d85d287"
-  },
-  {
-   "title": "[취업지원팀] 2026학년도 커리어 마스터 클래스 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276433&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-02",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "thumb": "data/news/img/b9ae3bfa559b5256.webp",
-   "src": "5d85d287"
-  },
-  {
-   "title": "★★ 2026년 가톨릭대학교 창업보육센터 입주기업 모집 공고 ★★",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276113&article.offset=0&articleLimit=10",
-   "postedAt": "2026-09-22",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "desc": "1. 모집공간 ○ 대상공간(가톨릭대학교 성심교정) 2. 모집대상 ○ 자격요건"
-  },
-  {
-   "title": "[IR센터] 2026학년도 2학기 CUK-COCOA 대학생 역량 자가진단 평가 이벤트 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276119&article.offset=0&articleLimit=10",
-   "postedAt": "2026-09-22",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/b448f480376e86bf.webp"
   }
  ]
 }

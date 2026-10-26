@@ -3,6 +3,16 @@
  "updatedAt": "2026-10-26",
  "items": [
   {
+   "title": "2026학년도 2학기 졸업생과 함께하는 전공설계 토크콘서트",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271587&pageOrder=0&cmd=2&parm_bod_uid=271585&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-10-26",
+   "kind": "행사",
+   "school": "계명대학교",
+   "campus": "",
+   "src": "9a241a98",
+   "foundAt": "2026-10-26"
+  },
+  {
    "title": "[학생상담센터] 11월 집단심리검사 안내",
    "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271570&pageOrder=0&cmd=2&parm_bod_uid=271570&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
    "postedAt": "2026-10-26",
@@ -355,15 +365,6 @@
    "title": "[교수학습개발센터] 학습자 참여형 수업 길잡이 프로그램 안내",
    "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271262&pageOrder=0&cmd=2&parm_bod_uid=270938&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
    "postedAt": "2026-09-22",
-   "school": "계명대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "src": "9a241a98"
-  },
-  {
-   "title": "AI 코스웨어(풀리캠퍼스) 기반 수학 기초역량 강화 프로그램 안내",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271262&pageOrder=0&cmd=2&parm_bod_uid=270922&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
-   "postedAt": "2026-09-21",
    "school": "계명대학교",
    "campus": "",
    "foundAt": "2026-10-08",
