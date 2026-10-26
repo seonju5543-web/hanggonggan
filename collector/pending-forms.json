@@ -866,6 +866,14 @@
    "lastTryAt": "2026-10-26",
    "retired": true,
    "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
+  },
+  {
+   "id": "auto-bswj104944472artclviewdo",
+   "name": "[교내] 2027학년도 1학기 어학우수장학금 신청 안내(~11/18)",
+   "target": "2027학년도 1학기 어학우수장학금 신청 안내(~11/",
+   "added": "2026-10-26",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }

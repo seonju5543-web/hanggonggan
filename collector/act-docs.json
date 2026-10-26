@@ -99,10 +99,6 @@
   "at": "2026-10-24",
   "tries": 2
  },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53417&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-10-15",
-  "tries": 1
- },
  "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156784479&pWise=sub&pWiseSub=C2": {
   "at": "2026-10-15",
   "tries": 1
