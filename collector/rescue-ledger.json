@@ -522,7 +522,7 @@
   "name": "(홍보) 한국장학재단 희망사다리 장학금 신청 안내(마감)"
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323355&menuno=200318": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-10-27",
   "minBody": 100,
   "name": "공통 2026-2학기 중소기업취업연계장학사업(희망사다리Ⅰ유형) 신규장학생 대학선발 기준 안내"
@@ -534,7 +534,7 @@
   "name": "2026-2학기 국가근로장학생 3차 선발 안내"
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323410&menuno=200318": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-10-27",
   "minBody": 100,
   "name": "공통 공과대학 특성화 장학 프로그램 참여학생 모집 안내"
