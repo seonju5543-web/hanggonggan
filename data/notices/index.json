@@ -3,6 +3,26 @@
  "updatedAt": "2026-10-26",
  "schools": 44,
  "files": {
+  "경북대학교": {
+   "file": "nf097dk.json",
+   "count": 17
+  },
+  "충남대학교": {
+   "file": "nl1xm19.json",
+   "count": 23
+  },
+  "조선대학교": {
+   "file": "n1qr99q6.json",
+   "count": 17
+  },
+  "충북대학교": {
+   "file": "n16l2078.json",
+   "count": 17
+  },
+  "강원대학교": {
+   "file": "nlzhvsh.json",
+   "count": 29
+  },
   "경희대학교": {
    "file": "n1w4hprp.json",
    "count": 19
@@ -46,18 +66,6 @@
   "서울시립대학교": {
    "file": "n1au199v.json",
    "count": 35
-  },
-  "조선대학교": {
-   "file": "n1qr99q6.json",
-   "count": 13
-  },
-  "충북대학교": {
-   "file": "n16l2078.json",
-   "count": 16
-  },
-  "강원대학교": {
-   "file": "nlzhvsh.json",
-   "count": 27
   },
   "서울대학교": {
    "file": "nsgh1oi.json",
@@ -143,10 +151,6 @@
    "file": "n1uf7bji.json",
    "count": 6
   },
-  "경북대학교": {
-   "file": "nf097dk.json",
-   "count": 16
-  },
   "영남대학교": {
    "file": "n12kfbyt.json",
    "count": 30
@@ -154,10 +158,6 @@
   "전북대학교": {
    "file": "ncuyr4z.json",
    "count": 23
-  },
-  "충남대학교": {
-   "file": "nl1xm19.json",
-   "count": 21
   },
   "전남대학교": {
    "file": "nwqmwga.json",

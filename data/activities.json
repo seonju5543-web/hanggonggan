@@ -2,6 +2,88 @@
  "updatedAt": "2026-10-26",
  "items": [
   {
+   "title": "선문대학교 맞춤형 창업멘토링 참가자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179614",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/Zl2Ln"
+    },
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/P02Ln"
+    }
+   ],
+   "deadlineHint": "접수기간 2026-10-19 ~ 2026-11-20 23:59 주관기관명 조슈아파트너스 주식회사 대상 1인 창조기업 창업업력 예비창업자, 1년미",
+   "deadline": "2026-11-20",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-19 ~ 2026-11-20 23:59"
+    }
+   ],
+   "eligibilityLines": [
+    "신청대상 : • 아산시 소재 7년 이내 창업기업 및 예비창업자",
+    "• 2027년 1월까지 아산시 이전 예정인 7년 이내 창업기업",
+    "• 2027년 1월까지 창업 예정인 예비창업자",
+    "대상연령 : 전체",
+    "대상 : 1인 창조기업"
+   ],
+   "detailsV": 5,
+   "field": "멘토링",
+   "excerptsAt": "2026-10-26",
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-10-26"
+  },
+  {
+   "title": "[제주창조경제혁신센터] 글로벌(중국) 기업 수요기반 비즈캠프형 오픈이노베이션「2026 오픈 아일랜드 부트캠프」참가기업 모집(~11/5)",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179620",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/202Ln"
+    },
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/e02Ln"
+    },
+    {
+     "name": "다운로드",
+     "url": "https://www.k-startup.go.kr/afile/fileDownload/f02Ln"
+    }
+   ],
+   "deadlineHint": "접수기간 2026-10-26 ~ 2026-11-05 23:59 주관기관명 제주창조경제혁신센터 대상 일반기업, 1인 창조기업 창업업력 7년미만 연",
+   "deadline": "2026-11-05",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-26 ~ 2026-11-05 23:59"
+    }
+   ],
+   "eligibilityLines": [
+    "신청대상 : 글로벌 시장 진출 및 글로벌 기업과의 기술협력을 희망하는 7년 이내 국내 물류·자동화 분야 스타트업",
+    "대상연령 : 전체",
+    "대상 : 일반기업, 1인 창조기업"
+   ],
+   "eligibilityExcludes": [
+    "· 신청 자격에 부합하지 않는 기업",
+    "· 신청서 및 제출서류를 허위로 작성하거나 필수서류를 제출하지 않은 기업",
+    "· 국세 또는 지방세 체납 기업(해당 시)",
+    "· 기타 제주창조경제혁신센터장이 사업 참여가 적합하지 않다고 판단하는 경우"
+   ],
+   "detailsV": 5,
+   "field": "해외·교류",
+   "excerptsAt": "2026-10-26",
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-10-26"
+  },
+  {
    "title": "2026년 제6회 SDGs 소셜벤처 챔피언십 참가자 모집 공고",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179241",
    "kind": "대외활동",
@@ -6223,44 +6305,6 @@
    ],
    "eligibilityFrom": "AI(공고 포스터 그림)",
    "eligibilityReviewed": false
-  },
-  {
-   "title": "[일반] [국립대학 육성사업] 감정 및 스트레스 관리 심리특강",
-   "url": "https://www.knou.ac.kr/bbs/knou/51/816545/artclView.do",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "4. 감정 및 스트레스 관리(26년 10월) 포스터.jpg",
-     "url": "https://www.knou.ac.kr/bbs/knou/51/278426/download.do"
-    }
-   ],
-   "deadlineHint": "신청 기간 특강 제목 1 차 2026.10.23.( 금 ) 13:00~15:30 2026.10.02.( 금 ) 10:00 ~ 2026.10.22",
-   "detailsV": 3,
-   "field": "교육·캠프",
-   "excerptsAt": "2026-10-03",
-   "school": "한국방송통신대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "eligibilityLines": [
-    "학생통합서비스센터 진로 ･ 심리상담실에서는 재학생을 대상으로 자기성찰과 치유를 위한"
-   ],
-   "eligibilityFrom": "브라우저 본문"
-  },
-  {
-   "title": "2026.06.15 두산연강재단, '제20회 과학교사 학술시찰' 진행 두산연강재단은 초·중·고 과학교사들을 대상으로 국내외 과학 관련 산업 현장과 교육 현장을 탐방하는 &lsquo;과학교사 학술시찰&rsquo;을 6월 15일부터 22일까지 진행한다.",
-   "url": "https://www.yonkang.org/kr/news/645",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": null,
-   "field": "해외·교류",
-   "excerptsAt": "2026-10-03",
-   "school": "",
-   "campus": "",
-   "host": "두산연강재단",
-   "foundAt": "2026-10-01",
-   "detailsV": 3,
-   "hidden": true,
-   "hiddenBy": "관리자 2026-10-05"
   },
   {
    "title": "청년 행정체험연수 운영",

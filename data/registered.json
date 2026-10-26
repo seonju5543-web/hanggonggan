@@ -18544,6 +18544,284 @@
    "attachments": [],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323355",
    "sourceKind": "auto"
+  },
+  {
+   "id": "auto-scho332282329artclviewdo",
+   "name": "2026-2학기 국가근로장학생 3차 선발 안내",
+   "boardTitle": "2026-2학기 국가근로장학생 3차 선발 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「국가근로」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-26",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-11-04",
+   "deadlineFrom": "공고 원문 · 접수마감일 | 2026.11.04",
+   "period": "접수 ~2026-11-04",
+   "summary": "조선대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "조선대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-26 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "1. 국가근로장학생 배정표(3차).pdf",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/379641/download.do"
+    },
+    {
+     "name": "2. 학생신청 매뉴얼.pdf",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/379642/download.do"
+    },
+    {
+     "name": "3. 국가근로장학생 선발기준(안).pdf",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/379643/download.do"
+    }
+   ],
+   "sourceUrl": "https://www3.chosun.ac.kr/bbs/scho/332/282329/artclView.do",
+   "sourceKind": "auto",
+   "applyPortal": "종합정보시스템",
+   "applyPortalSource": "나 . 신청방법 : 교내 종합정보시스템 (a.chosun.ac.kr) 에서 신청 ( 붙임 2 참고 )",
+   "applyPortalFrom": "공고 원문",
+   "openDate": "2026-10-30",
+   "eligibilityLines": [
+    "3. 국가근로장학생 선발기준(안).pdf",
+    "[장학금 접수] 2026학년도 교내특별 Pride CSU 백학 장학생 선발 공고"
+   ],
+   "excerpts": [
+    "장학금액 : 월 실제 근로시간 * 시급(10,320원)",
+    "문의처 : 장학팀 (062-230-6999 / 6124)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-scho332282326artclviewdo",
+   "name": "2026학년도 교내특별 Pride CSU 백학 장학생 선발 공고",
+   "boardTitle": "2026학년도 교내특별 Pride CSU 백학 장학생 선발 공고",
+   "type": "교내",
+   "kindEvidence": [
+    "제목 표식 「교내」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-26",
+   "provider": "주관 기관 원문 확인",
+   "amount": "100만원",
+   "amountValue": 1000000,
+   "deadline": "2026-12-02",
+   "deadlineFrom": "공고 원문 · 접수마감일 | 2026.12.02",
+   "period": "접수 ~2026-12-02",
+   "summary": "조선대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "조선대학교"
+   },
+   "documents": [
+    "공인외국어 성적표 사본(사진/캡쳐본/열람용 불가 )",
+    "공인외국어 '최고점수' 증빙자료(전체성적 캡쳐본 예시 확인)"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-26 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026학년도 Pride CSU 교내특별 백학장학생 선발계획(안).pdf",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/379639/download.do"
+    },
+    {
+     "name": "전체성적 캡쳐본 예시.pdf",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/379640/download.do"
+    }
+   ],
+   "sourceUrl": "https://www3.chosun.ac.kr/bbs/scho/332/282326/artclView.do",
+   "sourceKind": "auto",
+   "applyPortal": "종합정보시스템",
+   "applyPortalSource": "② 종합정보시스템에서 '백학 장학금' 신청",
+   "applyPortalFrom": "공고 원문",
+   "openDate": "2026-11-30",
+   "documentsFrom": "공고 원문",
+   "eligibilityLines": [
+    "■ 지원자격",
+    "- 2026학년도 2학기 정규학기 재학생(2026-2학기 등록금 납부자)",
+    "* 의과대학(의예과,의학과), 치과대학, 약학대학 재학생은 선발인원 10% 내외로 별도 선발",
+    "- 직전학기 성적 평점평균 3.0이상, 직전학기 이수학점 12학점 이상인 자",
+    "- 공인 외국어 시험 학년별 기준점수 이상 성적 보유자",
+    "지원가능 최저점수",
+    "1 학년",
+    "550 점",
+    "공인외국어 시험에 한함",
+    "2 학년",
+    "650 점",
+    "3 학년",
+    "750 점",
+    "4 학년이상"
+   ],
+   "excerpts": [
+    "- 장학금액: 1인당 100만원(학업보조비성)",
+    "■ 신청방법 : ① → ② 순서로 진행 완료 시 신청 완료",
+    "■ 기타 문의: 장학팀(062-230-6999)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 1000000,
+    "ratio": 0,
+    "min": 1000000,
+    "max": 1000000,
+    "raw": "- 장학금액: 1인당 100만원(학업보조비성) * 선발인원은 Pride CSU 예산과 예비 선발자의 소속 학부(과), 학년 등을 고려하여 조정될 수 있음 * 2026학년도 Pride CSU 서석장학금과 중복지원 및 선발 가능 * 백학장학금 선발 장학생은 추후 진행되는 2026학년도 2학기 외국어 JUMP장학금 선발 불가 (중복지원은 가능하나 중복 선발 시,"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-scho332282297artclviewdo",
+   "name": "2026-2학기 교내 외국어 JUMP 장학생 선발 공고",
+   "boardTitle": "2026-2학기 교내 외국어 JUMP 장학생 선발 공고",
+   "type": "교외",
+   "kindEvidence": [
+    "접수처 「종합정보시스템에서 '외국어성적 입력」"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-10-26",
+   "provider": "주관 기관 원문 확인",
+   "amount": "50만원",
+   "amountValue": 500000,
+   "deadline": "2026-12-07",
+   "deadlineFrom": "공고 원문 · 접수마감일 | 2026.12.07",
+   "period": "접수 ~2026-12-07",
+   "summary": "조선대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "조선대학교"
+   },
+   "documents": [
+    "성적표 사본(최고점, 최저점 각 1부)",
+    "전체성적 캡쳐본 1부",
+    "신청 시 유의사항 안내",
+    "공인외국어성적 입력: 2026. 10월 말 ~ 11월 초부터 입력 가능(별도 공지 예정)",
+    "성적표 사본: 사진으로 찍거나 열람용이 아닌",
+    "정식 성적표 인쇄 후 스캔",
+    "전체성적 캡쳐본: 화면 전체를 캡 쳐 (붙임-예시자료 참고)",
+    "종합정보시스템 미신청 시 신청접수 불가",
+    "온라인 신청만 인정."
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-26 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "(예시) 전체성적 캡쳐본.pdf",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/379628/download.do"
+    },
+    {
+     "name": "2026학년도 2학기 외국어JUMP장학생 선발계획(안).pdf",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/379627/download.do"
+    },
+    {
+     "name": "공인 TOEIC 대비 외국어 환산성적 기준표(장학규정_별표 1).pdf",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/379629/download.do"
+    }
+   ],
+   "sourceUrl": "https://www3.chosun.ac.kr/bbs/scho/332/282297/artclView.do",
+   "sourceKind": "auto",
+   "applyPortal": "종합정보시스템",
+   "applyPortalSource": "② 종합정보시스템에서 '외국어JUMP 장학금' 신청",
+   "applyPortalFrom": "공고 원문",
+   "openDate": "2026-12-03",
+   "documentsFrom": "공고 원문",
+   "eligibilityFrom": "공고문 첨부(OCR)",
+   "eligibilityLines": [
+    "선발대상 : 비고",
+    "선발인원(명) 1인당 장학금액 사업비(원)",
+    "외국어JUMP 외국어 점수 향상",
+    "1인/500,000원",
+    "120,000,000 2학기 기준",
+    "(학업보조비)",
+    "※선발인원은 교내특별장학 예산과 예비 선발자의 소속 학부(과)/학년/등록금 외 장학금 수혜 현황 등을",
+    "고려하여 조정 가능",
+    "3 선발기준",
+    "장학명칭",
+    "외국어JUMP",
+    "①지원자격",
+    "-2026학년 2학기 재학생(정규학기)",
+    "-동일 외국어 및 동일 유형 공인 외국어 시험 점수 보유자"
+   ],
+   "excerpts": [
+    "장학금액 : 1인당 50만원(학업보조비성)",
+    "신청 방법: ① → ② 순서로 진행 완료 시 신청 완료",
+    "문의: 장학팀 062-230-6999"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 500000,
+    "ratio": 0,
+    "min": 500000,
+    "max": 500000,
+    "raw": "3. 장학금액 : 1인당 50만원(학업보조비성)"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-scho332282304artclviewdo",
+   "name": "[장학금 접수] 삼성 청년 SW·AI 아카데미(SSAFY) 모집 안내",
+   "boardTitle": "[장학금 접수] 삼성 청년 SW·AI 아카데미(SSAFY) 모집 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "교내 증거 없음 — 기본값"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-10-26",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-10-26",
+   "period": "접수 기간 원문 확인",
+   "summary": "조선대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "조선대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-26 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "SSAFY 17기 모집 안내 뉴스레터.pdf",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/379636/download.do"
+    }
+   ],
+   "sourceUrl": "https://www3.chosun.ac.kr/bbs/scho/332/282304/artclView.do",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "지원자격 : 및 모집 프로세스",
+    "지원자격 : 29세이하미취업자",
+    "4년제 대학,마이스터고 졸업(예정)자",
+    "(97년1월1일 이후출생재)",
+    "*졸업예정자:27년2월이내 출업가능자",
+    "전공무관",
+    "※내일배움카드가 없어도 SSAFY에지원 가능",
+    "(내일배움카드소지자는정부 훈련장리금 수렁가능)",
+    "모집프로세스",
+    "지원서접수",
+    "SSAFY 적성진단",
+    "교육시작"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)"
   }
  ]
 }
