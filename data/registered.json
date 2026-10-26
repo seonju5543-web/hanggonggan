@@ -18558,7 +18558,13 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-26 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "본문이미지-992x1403.jpg",
+     "url": "https://www.khu.ac.kr/upload/cross/images/000069/2026-2%ED%95%99%EA%B8%B0_%ED%9D%AC%EB%A7%9D%EC%82%AC%EB%8B%A4%EB%A6%AC1%EC%9C%A0%ED%98%95_%EC%8B%A0%EA%B7%9C%EC%9E%A5%ED%95%99%EC%83%9D_%EC%84%A0%EB%B0%9C%EA%B8%B0%EC%A4%80.jpg",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323355",
    "sourceKind": "auto"
   },
@@ -18928,7 +18934,21 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-26 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "공과대학 특성화 장학 프로그램 신청서fv.hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=eab4607fc3644a0f9d081a93889c8e57&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "공과대학 특성화 장학 프로그램 결과보고서fv.hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=eab4607fc3644a0f9d081a93889c8e57&fileSn=2&bbsId=BMSR00040"
+    },
+    {
+     "name": "본문이미지-992x1403.jpg",
+     "url": "https://www.khu.ac.kr/upload/cross/images/000069/20261026151005322_E9WWCZ1Z.jpg",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323410",
    "sourceKind": "auto"
   },
@@ -19316,7 +19336,12 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-26 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "2026학년도 SNUE Brand Up 장학생 선발 공고_최종.hwp (다운로드 : 10회)",
+     "url": "https://portal.snue.ac.kr/common/nttFileDownload.do?fileKey=2a6bd5ad7a34bbe2d6e24135bf6ede20&bbsId=1083"
+    }
+   ],
    "sourceUrl": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=55493",
    "sourceKind": "auto",
    "excerpts": [

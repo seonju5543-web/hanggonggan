@@ -294,8 +294,8 @@
   "name": "「2026 상반기 AI·ICT 인재 장학생 모집」 안내(대상: 서울시 서초구에 주소지를 둔 재학생)"
  },
  "https://www.hongik.ac.kr/kr/newscenter/notice.do?articleno=158449&nocat=501": {
-  "ok": "2026-10-20",
-  "at": "2026-10-20",
+  "ok": "2026-10-27",
+  "at": "2026-10-27",
   "tries": 0,
   "name": "[대전광역시] 2026년 하반기 성취장학생 선발 연장"
  },
@@ -520,5 +520,29 @@
   "at": "2026-10-24",
   "tries": 0,
   "name": "(홍보) 한국장학재단 희망사다리 장학금 신청 안내(마감)"
+ },
+ "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323355&menuno=200318": {
+  "tries": 1,
+  "at": "2026-10-27",
+  "minBody": 100,
+  "name": "공통 2026-2학기 중소기업취업연계장학사업(희망사다리Ⅰ유형) 신규장학생 대학선발 기준 안내"
+ },
+ "https://www3.chosun.ac.kr/bbs/scho/332/282329/artclView.do": {
+  "ok": "2026-10-27",
+  "at": "2026-10-27",
+  "tries": 0,
+  "name": "2026-2학기 국가근로장학생 3차 선발 안내"
+ },
+ "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323410&menuno=200318": {
+  "tries": 1,
+  "at": "2026-10-27",
+  "minBody": 100,
+  "name": "공통 공과대학 특성화 장학 프로그램 참여학생 모집 안내"
+ },
+ "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?bbsid=1083&mi=3004&nttsn=55493": {
+  "ok": "2026-10-27",
+  "at": "2026-10-27",
+  "tries": 0,
+  "name": "2026학년도 SNUE Brand Up 장학생 선발 공고"
  }
 }
