@@ -31,9 +31,10 @@
   "lastOk": "2026-10-26"
  },
  "서울시립대학교": {
-  "fails": 0,
+  "fails": 1,
   "lastOk": "2026-10-26",
-  "browserFails": 0
+  "browserFails": 1,
+  "browserWhy": "열렸지만 장학 공고 0건"
  },
  "건국대학교": {
   "fails": 0,

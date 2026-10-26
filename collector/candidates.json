@@ -1,8 +1,26 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-10-26",
- "count": 1601,
+ "count": 1609,
  "items": [
+  {
+   "title": "[공통][대청교] 2026학년도 2학기 10월 대학생 청소년교육지원장학 출근부 마감 안내",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/269886/artclView.do",
+   "attachments": [],
+   "deadlineHint": "마감 : 2026. 11. 2.(월 ) 오후 2 시 한국장학재단 기관포털 ( http://workstudy.kosaf.go.kr ) * 학생의",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-10-26"
+  },
+  {
+   "title": "[서울][교외]2026-2 CU이문1호점 장학금 장학생 선발(~11/4)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/269893/artclView.do",
+   "attachments": [],
+   "deadlineHint": "지원기간 : 2026. 10. 29(목 ) ~ 11. 4(수 ) 15:00 까지 나 . 선발 : 11 월 중 ( 예정 ) 다 . 선발확인 : H",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-10-26"
+  },
   {
    "title": "(국가근로장학금)2026년도 2학기 한국장학재단 혁신성과부 국가..",
    "url": "https://home.knu.ac.kr/HOME/knussw/sub.htm?nav_code=knu1619416593&mode=view&mv_data=aWR4PTIxNjUmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=",
@@ -47,6 +65,24 @@
   {
    "title": "공통 2026-2학기 중소기업취업연계장학사업(희망사다리Ⅰ유형) 신규장학생 대학선발 기준 안내",
    "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323355",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-10-26"
+  },
+  {
+   "title": "공통 세아해암학술장학재단 제1회 차세대 공학연구자 Alumni 심포지엄 2026 신청 안내",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323404",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-10-26"
+  },
+  {
+   "title": "공통 공과대학 특성화 장학 프로그램 참여학생 모집 안내",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323410",
    "attachments": [],
    "deadlineHint": null,
    "school": "경희대학교",
@@ -204,6 +240,56 @@
    "attachments": [],
    "deadlineHint": "접수기간 연장) 한국선원복지고용센터에서 2026년 2학기 선원가족 장학생을 선발한다고 하오니, 자격은 갖춘 학생은 신청하시기 바랍니다. 가. 선",
    "school": "충북대학교",
+   "campus": "",
+   "foundAt": "2026-10-26"
+  },
+  {
+   "title": "[교외] 2026학년도 국세청 근로·자녀 장려 장학생 선발 안내",
+   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1210663/artclView.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "건국대학교",
+   "campus": "",
+   "foundAt": "2026-10-26"
+  },
+  {
+   "title": "[희망사다리] 희망사다리 1유형 장학생 대상 삼성 청년 SW·AI 아카데미(SSAFY) 17기 교육생 모집 안내",
+   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1210676/artclView.do",
+   "attachments": [
+    {
+     "name": "SSAFY 17기 모집 안내 뉴스레터.pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1229486/download.do"
+    },
+    {
+     "name": "SSAFY 17기 모집 포스터.PNG",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1229487/download.do"
+    }
+   ],
+   "deadlineHint": "모집기간) ’26. 10. 26.(월) ~ ’26. 11. 9.(월) □ ( 지원대상) 4년제 대학 졸업(예정)자(전공무관) ※ 졸업예정자는 2",
+   "school": "건국대학교",
+   "campus": "",
+   "foundAt": "2026-10-26"
+  },
+  {
+   "title": "[교외-11/2]2027학년도 해동과학문화재단 해동장학생 모집 안내(학교지원)",
+   "url": "https://www.korea.ac.kr/ko/568/subview.do?article.offset=10#n-%5B%EA%B5%90%EC%99%B8-11%2F2%5D2027%ED%95%99%EB%85%84%EB%8F%84%20%ED%95%B4%EB%8F%99%EA%B3%BC%ED%95%99%EB%AC%B8%ED%99%94%EC%9E%AC%EB%8B%A8%20%ED%95%B4%EB%8F%99%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4(%ED%95%99%EA%B5%90",
+   "attachments": [],
+   "deadlineHint": "모집 기간 연장 안내(재단지원) 학생지원팀 2026-10-22 109 246 [국가-11/12] 2026학년도 2학기 푸른등대 기부장학금(2차)",
+   "school": "고려대학교",
+   "campus": "",
+   "foundAt": "2026-10-26"
+  },
+  {
+   "title": "2026년 2학기 푸른등대 기부장학금(2차) 신규장학생 선발 안내",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/145/236574/artclView.do",
+   "attachments": [
+    {
+     "name": "붙임1_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/145/181438/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "명지대학교",
    "campus": "",
    "foundAt": "2026-10-26"
   },
