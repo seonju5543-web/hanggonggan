@@ -1,7 +1,19 @@
 {
  "school": "전북대학교",
- "updatedAt": "2026-10-25",
+ "updatedAt": "2026-10-26",
  "items": [
+  {
+   "title": "(정보혁신처) 멀티 LLM 서비스 지속여부 등 조사 협조",
+   "url": "https://www.jbnu.ac.kr/web/Board/218830/detailView.do",
+   "postedAt": "2026-10-26",
+   "postId": "218830",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-10-26",
+   "thumb": "data/news/img/addb593f7bd7da61.webp",
+   "desc": "정보혁신처 AI정보화과 설문응답은 JUMP 앱 의 PUSH 알림창 을 클릭해주세요."
+  },
   {
    "title": "[교육혁신본부] 2026학년도 AI 활용 학습튜터링 튜터-튜티 모집 안내",
    "url": "https://www.jbnu.ac.kr/web/Board/218784/detailView.do",
@@ -452,16 +464,6 @@
    "postedAt": "2026-10-16",
    "postId": "218499",
    "kind": "학사",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-10-16"
-  },
-  {
-   "title": "[교육혁신본부] 2026학년도 AI 활용 학습튜터링 튜터-튜티 모집 안내",
-   "url": "https://www.jbnu.ac.kr/web/Board/218462/detailView.do",
-   "postedAt": "2026-10-16",
-   "postId": "218462",
    "school": "전북대학교",
    "campus": "",
    "src": "e41d3fac",

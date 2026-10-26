@@ -1,7 +1,27 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-10-25",
+ "updatedAt": "2026-10-26",
  "items": [
+  {
+   "title": "인공지능 연구실 BMIL 겨울방학 학부연구생 모집 (~11/1)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140773&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-26",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-26",
+   "desc": "성균관대학교 인공지능 연구실인 BMIL (비밀; Brain and Machine Intelligence Lab, 전자전기컴퓨터공학과)에서는 2026년 겨울방학동안 함께 할 학부생 인턴을 모집합니다."
+  },
+  {
+   "title": "학부생을 위한 의료AI 이론·실습교육 안내(~10/27까지 신청)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140771&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-26",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-26",
+   "desc": "의료인공지능융합인재양성사업단 안녕하세요. 성균관대학교 의료인공지능융합인재양성사업단에서 '의료 인공지능 특화 융합인재 양성 사업'에 참여하는 학부생을 대상으로 의료AI 입문·실습 교육을 실시하오니 관심있는 학생들의…"
+  },
   {
    "title": "사회과학대학 제41회 수선포럼 개최 안내: 2026.11.18.(수) 11:30~13:00",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140767&article.offset=0&articleLimit=10",
@@ -95,7 +115,6 @@
    "campus": "",
    "src": "45ec8fd1",
    "foundAt": "2026-10-22",
-   "thumb": "data/news/img/c9f9989e114cbbdb.webp",
    "desc": "의료인공지능융합인재양성사업단 안녕하세요. 성균관대학교 의료인공지능융합인재양성사업단에서 '의료 인공지능 특화 융합인재 양성 사업'에 참여하는 의과대학 학부생을 대상으로 의료AI 입문·실습 교육을 실시하오니 관심있는…"
   },
   {
@@ -416,27 +435,6 @@
    "src": "45ec8fd1",
    "foundAt": "2026-10-13",
    "desc": "총괄지원팀 직원 경력채용을 위한 서류전형 결과 및 1차 면접전형을 아래와 같이 안내하오니 확인하여 주시기 바랍니다."
-  },
-  {
-   "title": "2026년 졸업앨범 추가 촬영 안내",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140544&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-13",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-13",
-   "desc": "학생지원팀 2026년 졸업앨범 추가 촬영과 관련하여 다음과 같이 안내드리오니, 대상 학우분들께서는 참고해 주시기 바랍니다."
-  },
-  {
-   "title": "디지털교육혁신원 교육혁신팀 자체계약직원(PD 및 디자이너) 채용 공고",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140310&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-13",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-13",
-   "desc": "디지털교육혁신원 우리대학 교육혁신팀에서 근무할 자체계약직원을 다음과 같이 채용합니다."
   }
  ]
 }

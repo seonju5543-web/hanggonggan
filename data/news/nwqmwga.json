@@ -1,7 +1,35 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-10-25",
+ "updatedAt": "2026-10-26",
  "items": [
+  {
+   "title": "[모집공고] 경사원(공인회계사 및 세무사) 입실고사 및 입실 일정 안내",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70796",
+   "postedAt": "2026-10-26",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-26"
+  },
+  {
+   "title": "[취업정보] [BIXPO 2026 참가] 2026년 글로컬대학사업 「제조 ...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70795",
+   "postedAt": "2026-10-26",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-26"
+  },
+  {
+   "title": "[취업정보] 2026년 글로컬대학사업 「빅데이터분석기사, 차근차근 실습하기」",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70794",
+   "postedAt": "2026-10-26",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-26",
+   "thumb": "data/news/img/571db85c2d3df71f.webp"
+  },
   {
    "title": "[모집공고] [GIST, AICA, 전남대학교] NPU 평가·검증 실무 교...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70793",
@@ -28,8 +56,7 @@
    "school": "전남대학교",
    "campus": "",
    "src": "b7347301",
-   "foundAt": "2026-10-23",
-   "thumb": "data/news/img/c514280219b82e45.webp"
+   "foundAt": "2026-10-23"
   },
   {
    "title": "[학사안내] 2026학년도 동계 계절학기 타 대학교(서울시립대) 교류수학 ...",
@@ -375,35 +402,6 @@
    "src": "b7347301",
    "foundAt": "2026-10-20",
    "thumb": "data/news/img/0a1c880acb8c8d43.webp"
-  },
-  {
-   "title": "[취업정보] [메리츠증권] 2026년 대졸 신입사원 공개채용 (~10.30...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70746",
-   "postedAt": "2026-10-20",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-20"
-  },
-  {
-   "title": "[취업정보] [BIXPO 2026 참가] 2026년 글로컬대학사업 「제조 ...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70744",
-   "postedAt": "2026-10-20",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-20"
-  },
-  {
-   "title": "[학사안내] 최근 5년 이내 제적생 중 등록금 반환 대상자 안내",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70736",
-   "postedAt": "2026-10-20",
-   "kind": "학사",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-20"
   }
  ]
 }

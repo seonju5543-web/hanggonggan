@@ -1,7 +1,18 @@
 {
  "school": "동국대학교",
- "updatedAt": "2026-10-25",
+ "updatedAt": "2026-10-26",
  "items": [
+  {
+   "title": "중요 정보시스템 로그인 보안 강화 시행 안내",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766715",
+   "postedAt": "2026-10-23",
+   "postId": "26766715",
+   "school": "동국대학교",
+   "campus": "",
+   "src": "d521f12e",
+   "foundAt": "2026-10-26",
+   "thumb": "data/news/img/4459a68d401622d7.webp"
+  },
   {
    "title": "[학생역량개발팀] 제21기 동국108리더스 모집 안내 [~10/29(금) 마감]",
    "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766707",
@@ -440,17 +451,6 @@
    "postId": "26766440",
    "thumb": "data/news/img/d32d343ecbdd47f9.webp",
    "desc": "중앙도서관에서 다음과 같이 대학도서관 이용자 만족도조사를 실시합니다. 본 만족도조사는 2026년 대학도서관 평가 지표로 활용되며, 만족도조사 참여자를 대상으로 추첨을 통해 소정의 상품을 제공할 예정이오니 재학생…"
-  },
-  {
-   "title": "[카운슬링센터] 2026학년도 2학기 개인상담 및 심리검사 해석상담 신청 안내",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766435",
-   "postedAt": "2026-10-01",
-   "school": "동국대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "postId": "26766435",
-   "thumb": "data/news/img/c5ab107347458cf5.webp",
-   "desc": "안녕하세요. 동국대학교 카운슬링센터입니다. 우리 센터에서는 아래와 같이 개인상담 및 심리검사 해석상담 서비스를 제공하고 있습니다."
   }
  ]
 }

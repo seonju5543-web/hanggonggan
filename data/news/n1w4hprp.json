@@ -1,7 +1,20 @@
 {
  "school": "경희대학교",
- "updatedAt": "2026-10-25",
+ "updatedAt": "2026-10-26",
  "items": [
+  {
+   "title": "국제 [주성엔지니어링] 신입 Engineer(R&D, C/S, 제조, 설계) 직무 추천채용",
+   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323401",
+   "postedAt": "2026-10-26",
+   "postId": "323401",
+   "kind": "채용",
+   "school": "경희대학교",
+   "campus": "",
+   "src": "a92b27ac",
+   "foundAt": "2026-10-26",
+   "thumb": "data/news/img/e13f86782f46e8ac.webp",
+   "desc": "1. 제출방법 ① 채용사이트를 통해 입사지원서 제출 ▶ https://jusung.career.greetinghr.com/ko/o/241242 ② 추천채용 서류 미래인재센터 이메일 제출 ▶…"
+  },
   {
    "title": "서울 [서울C 총무팀] 서울캠퍼스 전기자동차 충전기 교체에 따른 공사일정 안내",
    "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323390",
