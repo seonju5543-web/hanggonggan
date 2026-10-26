@@ -1,22 +1,18 @@
 {
  "v": 1,
  "note": "층2 재단 장학금의 개별 공고 후보 — 로봇(collector/kosaf-hunt.mjs)이 재단 홈페이지를 뒤져 적는다. 사람 후보 파일(link-candidates.json)과 같은 줄 꼴. 원문 링크 확인 로봇이 학생처럼 열어 확인한 것만 앱(data/link-check.json fix)에 실린다. 손으로 고치지 말 것 — 다음 실행이 다시 쓴다.",
- "updatedAt": "2026-10-25",
+ "updatedAt": "2026-10-27",
  "items": [
   {
    "target": {
     "ds": "kosaf",
-    "key": "2000477010"
+    "key": "2000206004"
    },
-   "board": "https://www.asanfoundation.or.kr/af/library/bbs/afLibraryPhotoBbsList.do",
+   "board": "https://www.yw.go.kr/www/selectBbsNttList.do?bbsNo=86&key=524",
    "source": "board",
    "by": "로봇(층2 글 사냥꾼)",
-   "addedAt": "2026-10-16",
-   "note": "게시판처럼 보이는 쪽(공고 4건 · 글 줄 12) — 확인 로봇이 목록을 다시 읽어 고른다",
-   "also": [
-    "2000477011",
-    "2000477012"
-   ]
+   "addedAt": "2026-10-14",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 9) — 확인 로봇이 목록을 다시 읽어 고른다"
   },
   {
    "target": {
@@ -31,6 +27,21 @@
    "also": [
     "2000443003",
     "2000443006"
+   ]
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000279001"
+   },
+   "url": "https://www.hampyeong.go.kr/boardView.do?pageId=www272&boardId=NOTICE&seq=5706153",
+   "title": "[재안내] 2026년 하반기 함평군 인재양성기금 장학생 모집 안내(대학생 대상)",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-27",
+   "note": "https://www.hampyeong.go.kr/boardView.do?pageId=www272&boardId=NOTICE&seq=5837251 목록에서 고름 — 마감 해 +1 · 학기·반기 +1 · 장학 낱말 +1 · 게시일 +1",
+   "also": [
+    "2000279004"
    ]
   },
   {
@@ -103,6 +114,17 @@
    "by": "로봇(층2 글 사냥꾼)",
    "addedAt": "2026-10-23",
    "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2518026001"
+   },
+   "board": "https://gjmed.or.kr/bbs/board.php?bo_table=notice2",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-27",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 15) — 확인 로봇이 목록을 다시 읽어 고른다"
   },
   {
    "target": {
@@ -180,17 +202,6 @@
    "by": "로봇(층2 글 사냥꾼)",
    "addedAt": "2026-10-13",
    "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 100) — 확인 로봇이 목록을 다시 읽어 고른다"
-  },
-  {
-   "target": {
-    "ds": "kosaf",
-    "key": "2000206004"
-   },
-   "board": "https://www.yw.go.kr/www/selectBbsNttList.do?bbsNo=86&key=524",
-   "source": "board",
-   "by": "로봇(층2 글 사냥꾼)",
-   "addedAt": "2026-10-14",
-   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 9) — 확인 로봇이 목록을 다시 읽어 고른다"
   }
  ]
 }
