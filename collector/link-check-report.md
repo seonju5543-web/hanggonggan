@@ -1,22 +1,23 @@
-## 🔗 원문 링크 확인 리포트 (2026-10-27 00:38 KST · 기준일 2026-10-27)
+## 🔗 원문 링크 확인 리포트 (2026-10-27 01:48 KST · 기준일 2026-10-27)
 
 앱이 보여 주는 원문 링크를 **학생처럼**(로그인·리퍼러 없는 새 탭) 열어, 그 공고가 실제로 뜨는지 봤습니다.
 🔴 이 로봇은 주소를 고치지 않습니다 — 확정된 문제만 `data/link-check.json` 에 적고, 앱은 그 링크의 이름을 바꿔 정직하게 보여 줍니다(예: "게시판 목록에서 보기", "원문 공고(확인 필요)").
 
-_이번 실행은 **원문 후보만** 확인했습니다(후보 파일을 고쳐 push 한 실행 · 앱의 링크는 매일 저녁 실행이 봅니다)._
+⏰ 예산(20분)이 다 돼 여기서 멈췄습니다 — 남은 127건은 다음 실행이 이어서 봅니다. 📱 폰 표본은 예산이 모자라 25건을 못 봤습니다.
 
-이번 실행: **0건** 열어 봄 · 공고 확인 0 · 문제로 보임 0 · 판정 못 함 0
-앱에 알린 확정 문제(지금 실린 링크): **25건** · 이번에 새로 확정: **0건**
+이번 실행: **273건** 열어 봄 · 공고 확인 234 · 문제로 보임 25 · 판정 못 함 14
+앱에 알린 확정 문제(지금 실린 링크): **26건** · 이번에 새로 확정: **1건**
 
-### 새로 확정된 문제 링크 (다른 날 두 번 같은 것을 봤습니다) — 0건
-- 없음
-
-### 한 번 본 문제 (다른 날 한 번 더 보고 확정합니다 — 아직 앱 글자를 바꾸지 않습니다) — 1건
+### 새로 확정된 문제 링크 (다른 날 두 번 같은 것을 봤습니다) — 1건
 - [실시간 공고] [교외-11/2]2027학년도 해동과학문화재단 해동장학생 모집 안내(학교지원) — **다른 화면이 열림** (다른 글이 열림(제목 불일치))
   https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjUlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D
 
+### 한 번 본 문제 (다른 날 한 번 더 보고 확정합니다 — 아직 앱 글자를 바꾸지 않습니다) — 1건
+- [대외활동·공모전] api-vol1365-3536347 · (대학생만: 월 5회/1일 4시간까지) (주말10~14시) 11월 송도국제도서관 자원… — **다른 화면이 열림** (공고 화면이 아님(작성일·조회·첨부 표지가 없음))
+  https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3536347 → 실제로 간 곳 https://www.1365.go.kr/vols/P9210/partcptn/timeCptn.do
+
 ### 원문 후보 확인 — 찾아 온 주소가 그 공고·그 회차인지 학생처럼 열어 봤습니다
-이번에 판정한 후보 **4건** · ✅ 원문으로 올림 0 · 🟡 사람 확인 0 · ❌ 맞지 않음 1 · ⏳ 못 엶(다시 봄) 3
+이번에 판정한 후보 **0건** · ✅ 원문으로 올림 0 · 🟡 사람 확인 0 · ❌ 맞지 않음 0 · ⏳ 못 엶(다시 봄) 0
 앱에 실린 로봇 바로잡기(`data/link-check.json` fix): **12건** — 앱은 그 링크를 원문으로 엽니다(지금 링크가 이미 원문이면 바꾸지 않습니다).
 _후보는 `collector/link-candidates.json` 에 적거나(사람·세션), 로봇이 우리 기록에서 찾습니다(같은 사이트·같은 제목의 글 주소 · 층2 재단 장학금과 짝지은 재단 게시판 글)._
 
@@ -41,16 +42,7 @@ _후보는 `collector/link-candidates.json` 에 적거나(사람·세션), 로�
   잣대: 겹침 ✓ · 착지 ? · 사이트 ✓ · 제목 ✓ · 회차 ✓
 
 #### ❌ 맞지 않은 후보 (이번 실행)
-- [층2 재단(바로잡은 원문)] 전라남도 함평군청 함평군청인재양성기금(성적우수) — 재단 이름이 화면에 없음
-  https://www.hampyeong.go.kr/boardView.do?pageId=www272&boardId=NOTICE&seq=5706153 · 후보: 로봇(층2 글 사냥꾼)
-
-#### ⏳ 못 엶 — 며칠 뒤 다시 봅니다 (이번 실행 · 거절이 아닙니다)
-- [층2 재단(바로잡은 원문)] 덕성모아장학회 덕성모아장학금 — 게시판 목록(10줄)에서 그 글을 하나로 못 고름 · 다음 2026-11-03
-  https://sanhak.duksung.ac.kr/support/board/inside · 후보: 로봇(층2 글 사냥꾼)
-- [층2 재단(바로잡은 원문)] 강진의료원 전남 공공 취약지 간호사 장학생 — 게시판 목록(15줄)에서 그 글을 하나로 못 고름 · 다음 2026-10-28
-  https://gjmed.or.kr/bbs/board.php?bo_table=notice2 · 후보: 로봇(층2 글 사냥꾼)
-- [층2 재단(바로잡은 원문)] (재)제주평생교육장학진흥원 제주고씨수남공법환문중회장학생 — 게시판 목록(15줄)에서 그 글을 하나로 못 고름 · 다음 2026-11-03
-  https://www.jiles.or.kr/community/notice/othernews.htm · 후보: 로봇(층2 글 사냥꾼)
+- 없음
 
 #### 확인했지만 지금은 앱에 싣지 않는 바로잡기
 - [층2 재단(바로잡은 원문)] `2701009001` — 공고가 앱에서 내려감
@@ -69,19 +61,29 @@ _후보는 `collector/link-candidates.json` 에 적거나(사람·세션), 로�
 ### 우리를 막는 것으로 보이는 사이트 (이번 결과를 "판정 못 함"으로 돌렸습니다)
 - 없음
 
+### 판정 못 한 링크 (이번 실행 · 사이트별 · 문제로 세지 않습니다)
+- www.hongik.ac.kr — 6건 · 가장 많은 이유: 본문이 안 그려짐(0자 — 판정 불가) (6건)
+- www.ghjanghak.kr — 2건 · 가장 많은 이유: 열기 실패: page.goto: Timeout 20000ms exceeded. (2건)
+- 1365.go.kr — 1건 · 가장 많은 이유: 열기 실패: page.goto: net::ERR_EMPTY_RESPONSE at http…
+- www.cbnu.ac.kr — 1건 · 가장 많은 이유: 열기 실패: page.goto: Timeout 20000ms exceeded.
+- www.kmu.ac.kr — 1건 · 가장 많은 이유: 열기 실패: page.goto: Timeout 20000ms exceeded.
+- www.ewha.ac.kr — 1건 · 가장 많은 이유: 열기 실패: page.goto: Timeout 20000ms exceeded.
+- www.jnu.ac.kr — 1건 · 가장 많은 이유: 열기 실패: page.goto: Timeout 20000ms exceeded.
+- www.ajou.ac.kr — 1건 · 가장 많은 이유: 열기 실패: page.goto: Timeout 20000ms exceeded.
+
 ### 전체 현황 (앱에 실린 링크 × 지금까지 본 결과)
 | 묶음 | 아직 안 봄 | 공고 확인 | 판정 못 함 | 한 번 봄 | 목록 | 첫 화면 | 로그인 | 안 열림 | 다른 화면 |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 정식 등록 | 14 | 264 | 13 | 0 | 0 | 0 | 0 | 1 | 0 |
-| 실시간 공고 | 34 | 1020 | 69 | 1 | 2 | 0 | 0 | 4 | 0 |
+| 정식 등록 | 0 | 278 | 13 | 0 | 0 | 0 | 0 | 1 | 0 |
+| 실시간 공고 | 0 | 1054 | 69 | 0 | 2 | 0 | 0 | 4 | 1 |
 | 재단·지자체 | 0 | 47 | 1 | 0 | 0 | 0 | 1 | 0 | 0 |
-| 대외활동·공모전 | 12 | 131 | 11 | 0 | 0 | 2 | 0 | 0 | 4 |
-| 교내 소식 | 162 | 1090 | 57 | 0 | 0 | 0 | 1 | 4 | 7 |
+| 대외활동·공모전 | 0 | 141 | 12 | 1 | 0 | 2 | 0 | 0 | 4 |
+| 교내 소식 | 34 | 1208 | 67 | 0 | 0 | 0 | 1 | 4 | 7 |
 | 층2 재단(바로잡은 원문) | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
 _한 링크가 두 묶음에 함께 실려 있으면 양쪽에 셉니다. 「한 번 봄」은 다른 날 한 번 더 같은 것을 보면 확정됩니다._
 
-### 확정된 문제 전체 (앱이 받는 파일에 적힌 것) — 25건
+### 확정된 문제 전체 (앱이 받는 파일에 적힌 것) — 26건
 - [대외활동·공모전] [국무조정실] 2026 청년정책 공모전 요즘 청년에게 필요한 정책, 정답은 청년이 아… — **다른 화면이 열림** (다른 글이 열림(제목 불일치))
   https://nysc.or.kr/nysc/pages/notice_view.php?id=288 → 실제로 간 곳 https://nysc.or.kr/nysc/pages/notice_view.php?id=288&ckattempt=1
 - [대외활동·공모전] [국방부] 2026 화이트햇 국방 사이버보안 콘테스트 — **사이트 첫 화면이 열림** (사이트 첫 화면(제목이 안 보임))
@@ -128,6 +130,8 @@ _한 링크가 두 묶음에 함께 실려 있으면 양쪽에 셉니다. 「한
   https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26766513
 - [실시간 공고] 2026학년도 2학기 동진나눔복지재단 장학생 선발(~10/23(금)까지) — **열리지 않음(없는 주소)** (HTTP 404)
   https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26766521
+- [실시간 공고] [교외-11/2]2027학년도 해동과학문화재단 해동장학생 모집 안내(학교지원) — **다른 화면이 열림** (다른 글이 열림(제목 불일치))
+  https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjUlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D
 - [실시간 공고] [한국장학재단] 2026년 2학기 국가장학금 신청자 가구원 동의 안내(~9/16(수까… — **게시판 목록이 열림** (제목은 보이나 다른 공고 제목이 여럿 함께 보임(목록))
   https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=5233&bidx=894871&qidx=5233&cate=0&allboard=true&nowpage=2
 - [정식 등록·실시간 공고] auto-larshipdoarticleno377067 · [국가근로] 2026학년도 2학기 국가근로장학생 추가 모집 안내(교수학습개발센터) — **열리지 않음(없는 주소)** (열기 실패: page.goto: Timeout 20000ms exceeded.)
@@ -138,4 +142,5 @@ _한 링크가 두 묶음에 함께 실려 있으면 양쪽에 셉니다. 「한
 - 층2(한국장학재단에 등록된 재단 장학금): 126건 — 재단 홈페이지 주소뿐이라 앱이 "재단 홈페이지"라고 부릅니다(그중 공고문 사본이 있는 것 93건) · 바로잡은 원문이 있어 연 것 3건은 따로
 - 마감이 지나 앱이 더는 보여 주지 않는 대외활동: 39건
 - 숨긴 글: 5건
-- 앱에 실린 링크 2739건 중 이번 순서에 든 것 0건 (사이트마다 최대 8건 · 학교 서버를 몰아치지 않으려고)
+- 이번 순서에 들었지만 시간이 모자라 못 본 것: 127건 (다음 실행이 이어서 봅니다)
+- 앱에 실린 링크 2739건 중 이번 순서에 든 것 400건 (사이트마다 최대 8건 · 학교 서버를 몰아치지 않으려고)
