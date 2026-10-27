@@ -3,6 +3,14 @@
  "updatedAt": "2026-10-27",
  "schools": 44,
  "files": {
+  "서울시립대학교": {
+   "file": "n1au199v.json",
+   "count": 37
+  },
+  "서울과학기술대학교": {
+   "file": "n14kv35j.json",
+   "count": 60
+  },
   "연세대학교": {
    "file": "nz3ew5y.json",
    "count": 47
@@ -26,10 +34,6 @@
   "한국항공대학교": {
    "file": "n1as48ix.json",
    "count": 28
-  },
-  "서울시립대학교": {
-   "file": "n1au199v.json",
-   "count": 36
   },
   "상명대학교": {
    "file": "n1ozjjw8.json",
@@ -110,10 +114,6 @@
   "동국대학교": {
    "file": "n1or8oiw.json",
    "count": 42
-  },
-  "서울과학기술대학교": {
-   "file": "n14kv35j.json",
-   "count": 60
   },
   "중앙대학교": {
    "file": "n1iz3lr8.json",

@@ -19662,6 +19662,80 @@
    "applyEmailSource": " e메일접수 : ghedu@korea.kr",
    "applyEmailFrom": "공고문 첨부",
    "scopeFrom": "로봇 2026-10-27 · 원문 증거로 전국 — 접수 이메일 도메인 korea.kr (학교 밖) (게시: 이화여자대학교)"
+  },
+  {
+   "id": "auto-116bnum5233cate0qidx5233",
+   "name": "(홍보) 2026년 2학기 푸른등대 기부장학금 신규장학생 신청 안내(~11/12(목)까지)",
+   "boardTitle": "(홍보) 2026년 2학기 푸른등대 기부장학금 신규장학생 신청 안내(~11/12(목)까지)",
+   "type": "교외",
+   "kindEvidence": [
+    "교내 증거 없음 — 기본값"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-10-27",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-11-12",
+   "deadlineFrom": "게시판 요약 · ~11/12",
+   "period": "접수 ~2026-11-12",
+   "summary": "서울과학기술대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울과학기술대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-27 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "붙임1_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=B562E417A45F4C77A83BAA2A246DBF1F_.pdf&ogrfname=%EB%B6%99%EC%9E%841_2026%EB%85%84+2%ED%95%99%EA%B8%B0+%ED%91%B8%EB%A5%B8%EB%93%B1%EB%8C%80+%EA%B8%B0%EB%B6%80%EC%9E%A5%ED%95%99%EA%B8%88%282%EC%B0%A8%29+%EC%82%AC%EC%97%85%EA%B3%84%ED%9A%8D%EC%84%9C+%EB%B0%8F+%EC%97%85%EB%AC%B4%EC%B2%98%EB%A6%AC%EA%B8%B0%EC%A4%80.pdf"
+    }
+   ],
+   "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=897116&qidx=5233&cate=0&allboard=true&nowpage=1",
+   "sourceKind": "auto"
+  },
+  {
+   "id": "auto-097bnum5233cate0qidx5233",
+   "name": "(홍보) 한국장학재단 희망사다리1유형 장학생 대상 삼성 SSFY 교육생 모집(~11/9(월)까지)",
+   "boardTitle": "(홍보) 한국장학재단 희망사다리1유형 장학생 대상 삼성 SSFY 교육생 모집(~11/9(월)까지)",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「한국장학재단」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-10-27",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-11-09",
+   "deadlineFrom": "게시판 요약 · ~11/9",
+   "period": "접수 ~2026-11-09",
+   "summary": "서울과학기술대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울과학기술대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-27 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "SSAFY 17기 모집 안내 뉴스레터.pdf",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=B8BF1578A41340E78596AECE95BA8708_.pdf&ogrfname=SSAFY+17%EA%B8%B0+%EB%AA%A8%EC%A7%91+%EC%95%88%EB%82%B4+%EB%89%B4%EC%8A%A4%EB%A0%88%ED%84%B0.pdf"
+    }
+   ],
+   "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=897097&qidx=5233&cate=0&allboard=true&nowpage=1",
+   "sourceKind": "auto"
   }
  ]
 }

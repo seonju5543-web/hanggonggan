@@ -882,7 +882,7 @@
    "added": "2026-10-27",
    "fetched": false,
    "schematized": false,
-   "tries": 3,
+   "tries": 4,
    "lastTryAt": "2026-10-27"
   },
   {
@@ -892,6 +892,16 @@
    "added": "2026-10-27",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-116bnum5233cate0qidx5233",
+   "name": "(홍보) 2026년 2학기 푸른등대 기부장학금 신규장학생 신청 안내(~11/12(목)까지)",
+   "target": "(홍보) 2026년 2학기 푸른등대 기부장학금 신규장학",
+   "added": "2026-10-27",
+   "fetched": false,
+   "schematized": false,
+   "tries": 1,
+   "lastTryAt": "2026-10-27"
   }
  ]
 }
