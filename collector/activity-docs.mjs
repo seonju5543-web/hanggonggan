@@ -36,6 +36,7 @@ import { htmlToLines } from './html-text.mjs';
 import { decodeEntities } from './clean-title.mjs';
 import { attachmentText, isOcrSource, isNoticeDoc } from './attachment-text.mjs';
 import { activityDetails, eligLineOk } from './activity-excerpts.mjs';
+import { ACT_SIGNAL } from './activity-vocab.mjs';
 const { cutAtNextSection } = await import('./extract-excerpts.mjs');   // activity-excerpts 와 같은 이유로 동적으로(환경변수보다 뒤에)
 
 const HERE = new URL('.', import.meta.url);
@@ -473,14 +474,14 @@ async function aiPhase(acts, write) {
       if (file) {
         const kind = /\.pdf$/i.test(file) ? 'pdf' : 'image';
         calls += 1;
-        v = AI.verifyPdfLines(await AI.askPdf(item, path.join(DIR, file), kind));
+        v = AI.verifyPdfLines(await AI.askPdf(item, path.join(DIR, file), kind), { signal: ACT_SIGNAL });   // 활동 어휘로 검산(activity-vocab)
         from = kind === 'image' ? 'AI(공고 포스터 그림)' : 'AI(공고문 PDF)';
       } else {
         const r = await fetch(n.url, { redirect: 'follow', headers: FETCH_HEADERS, signal: AbortSignal.timeout(15000) });
         const lines = r.ok ? htmlToLines(await r.text()).split('\n').map((l) => l.trim()).filter((l) => l.length >= 2 && l.length <= 200) : [];
         if (!lines.length) continue;
         calls += 1;
-        v = AI.verifyPick(await AI.ask(item, lines), lines);
+        v = AI.verifyPick(await AI.ask(item, lines), lines, { signal: ACT_SIGNAL });
         from = 'AI(원문 줄 그대로)';
       }
     } catch (e) { log(`✕ ${n.title.slice(0, 30)} — 호출 실패(글 탓 아님): ${String(e && e.message || e).slice(0, 300)}`); continue; }

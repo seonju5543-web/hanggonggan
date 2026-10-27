@@ -13033,6 +13033,23 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
     eq('  활동 카드에 원문 링크(card-src-link)가 단추 바깥에 붙는다 · 이름은 같은 sourceLink',
       /link: activityCardLinkHtml\(n\)/.test(appSrc14) && /function activityCardLinkHtml\(n\) \{\s*const link = sourceLink\(n, 'activity'\)/.test(appSrc14)
         && /<\/button>/.test(appSrc14.slice(appSrc14.indexOf('function cardShellHtml'), appSrc14.indexOf('function cardShellHtml') + 900)) && /\$\{save\}\$\{link\}/.test(appSrc14), true);
+    /* ⑭-3 대외활동 어휘 한 곳 (2026-10-27 개발자 "판정기의 어휘도 대외활동 버전으로") — 장학 신호(재학·평점·소득)에 활동 어휘를 더해 읽는다 */
+    {
+      const V = await import('../collector/activity-vocab.mjs');
+      const AI3 = await import('../collector/eligibility-ai.mjs');
+      eq('⑭-3 활동 어휘가 자격 신호를 낸다 — 예비창업자·4인 이하 팀·구민·영어능통자·경력 보유',
+        ['예비창업자 및 창업 3년 이내 기업 대표', '개인 또는 4인 이하 팀', '서초구민이면 누구나', '인천 거주 대학(원)생 중 영어능통자', '관련 분야 경력 2년 이상 보유'].every((l) => V.ACT_SIGNAL.test(l)), true);
+      eq('  자격 절 아래 활동 말투만 있는 줄도 자격이다 (전엔 장학 신호가 없어 통째로 버렸다)',
+        AX4.activityDetails(['3. 참가 자격', '예비창업자 및 창업 3년 이내 기업 대표', '서울시 소재 사업장 보유자', '4. 접수 방법', '온라인 접수'].join('\n')).eligibilityLines.length, 2);
+      eq('  활동 머리글 「봉사대상」(1365) 아래 줄이 자격이다', AX4.activityDetails(['ㅇ 봉사내용 : 관람객 안내', 'ㅇ 봉사대상 : 중학생 ~ 대학생', 'ㅇ 봉사시간 : 09:00~12:00'].join('\n')).eligibilityLines, ['ㅇ 봉사대상 : 중학생 ~ 대학생']);
+      eq('  제목에만 대상이 있는 글 — `[중학생~대학생] …`·`…(대학생)`·`… -대학생만 신청` · 대조군 `… 안내(10월)`',
+        ['[중학생~대학생]현충사 관람객 안내 봉사', '충북교육도서관 도서 정리[주간](대학생)', '나도 한끼 도시락 만들기 봉사활동 (오전)-대학생만 신청', '스타트업 아카데미 일정 안내(10월)'].map(V.targetFromTitle),
+        ['중학생~대학생', '대학생', '대학생', '']);
+      eq('  본문이 비어도 제목의 대상은 읽는다 · 본문이 있으면 본문이 먼저', [AX4.activityDetails('', '도서 정리[주간](대학생)').eligibilityLines, AX4.activityDetails('참가자격 : 성인 누구나', '도서 정리(대학생)').eligibilityLines], [['대학생'], ['참가자격 : 성인 누구나']]);
+      eq('  AI 검산도 활동 어휘로 — 「예비창업자 …」 는 장학 신호만으로는 거절, 활동 신호를 주면 통과',
+        [AI3.verifyPdfLines({ lines: ['예비창업자 및 창업 3년 이내 기업 대표'] }).ok, AI3.verifyPdfLines({ lines: ['예비창업자 및 창업 3년 이내 기업 대표'] }, { signal: V.ACT_SIGNAL }).ok], [false, true]);
+      eq('  activity-docs 가 두 검산에 활동 어휘를 넘긴다', (readText(new URL('../collector/activity-docs.mjs', import.meta.url)).match(/\{ signal: ACT_SIGNAL \}/g) || []).length, 2);
+    }
     eq('  카드 링크 자리는 style.css 에 있다(.card-src-link · has-link 아랫줄 여백)', /\.card-src-link \{/.test(readText(new URL('../style.css', import.meta.url))) && /\.sch-card-wrap\.has-link > \.sch-card \.sch-foot/.test(readText(new URL('../style.css', import.meta.url))), true);
     eq('⑭ 자격 줄 — 안내 문장(`…모집합니다`·`…제공하고 있습니다`·`…하시기 바랍니다`·`첨부파일이(가) 없습니다`·`가능합니다`)은 아니다',
       ['2026 평택시민나눔문화축제에서 합정장애인주간보호센터 홍보부스 운영을 보조해주실 자원봉사자를 모집합니다.', '합정장애인주간보호센터는 사회복지법인 연꽃마을에서 운영하고 있으며, 성인발달장애인을 위한 프로그램을 제공하고 있습니다.',

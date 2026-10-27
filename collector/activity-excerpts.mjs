@@ -64,7 +64,8 @@ const noContact = (lines) => lines.filter((l) => !CONTACT.test(l));
    ③ 사이트 메뉴의 `지원대상`·`신청자격` 같은 짧은 줄이 자격 절 제목으로 뽑혔다(본문보다 위에 있다).
       → 글 제목이 본문에 다시 나오는 **마지막 자리부터** 읽고, 거기서 못 찾으면 전체를 읽는다(atTitle).
    그래도 이름표가 없으면 `대한민국 국민 누구나`·`AI에 관심 있는 누구나` 처럼 **누가 낼 수 있나만 말하는 줄**을 원문 그대로 쓴다(OPEN_LINE). */
-const ACT_HEAD = /공모\s?(?:자격|대상)|교육\s?대상|참가\s?범위|응모\s?범위|지원\s?범위/;
+/* 활동 어휘는 collector/activity-vocab.mjs 한 곳(2026-10-27) — 머리글·요건 신호·'누가' 낱말·제목 속 대상 */
+import { ACT_HEAD, ACT_SIGNAL, ACT_WHO, targetFromTitle } from './activity-vocab.mjs';
 /* 🔴 `누구나` 가 **말의 끝**이어야 한다 — `③ 국민 누구나 찾고 머물며 … 공간`(공모 소재 예시)이 자격으로 뽑혔다(첨부 첫 실측).
    뒤에 붙어도 되는 것: 참여·신청 가능 · 괄호 부연(개인 또는 팀) · 인원(25인) */
 const OPEN_LINE = /(?:(?:국민|세계인|시민|청년|학생|대학생|개인|팀|관심\s?(?:있는|있으신)\s?(?:분|사람)?)\s*(?:이면\s*)?(?:누구나|모두)|누구나)\s*(?:참여|참가|신청|응모|지원)?\s*(?:가능)?\s*(?:\d+\s?(?:인|명))?\s*(?:[(（].*[)）])?\s*[.!]?\s*$|(?:대상|자격|연령|나이)\s*[:：]?\s*제한\s?없음/;
@@ -130,14 +131,14 @@ const HEAD_LIKE = (l) => {
 /* 안내 말투(NOT_OPEN)는 **누가 낼 수 있나를 말하는 앞부분**에서만 본다 — `19~34세 청년이라면 누구나, … 블로그를 통해 쉽게 참여할 수 있다`(보도자료 · 2026-10-16)의 `쉽게` 는 참여 방법 쪽 말이다 */
 const proseLines = (t) => [...new Set(t.split('\n').map((l) => l.trim()).filter((l) => l.length >= 8 && l.length <= 200 && WHO_SENTENCE.test(l) && !NOT_OPEN.test(l.replace(/니다\s*\.?$/, '').split(/누구나/)[0])))].slice(0, 2);
 function qualifyLines(t) {
-  let q = extractQualifyLines(t, { head: ACT_HEAD, trustHead: true });
+  let q = extractQualifyLines(t, { head: ACT_HEAD, trustHead: true, signal: ACT_SIGNAL });
   /* 맨 제목 줄(`지원자격`)은 장학 발췌기가 표 머리글로 보고 빼므로 첫 줄이 내용일 수 있다 — 그 바로 윗줄이 제목이면 맞다(리뷰) */
   if (q.length && !HEAD_LIKE(q[0])) {
     const ls = t.split('\n').map((l) => l.trim()).filter(Boolean);
     const at = ls.indexOf(q[0]);
     if (!(at > 0 && HEAD_LIKE(ls[at - 1]))) q = [];
   }
-  if (!q.length) q = scoopQualifyLines(t);
+  if (!q.length) q = scoopQualifyLines(t, { who: ACT_WHO });
   if (!q.length) q = [...new Set(t.split('\n').map((l) => l.trim()).filter((l) => l.length >= 4 && l.length <= 60 && OPEN_LINE.test(l) && !NOT_OPEN.test(l)))].slice(0, 2);
   return q;
 }
@@ -162,7 +163,7 @@ const HAS_LABEL = /^[^:：]{1,16}(?:대상|자격|요건|조건)\s*[:：]/;
 const LABEL_ONLY = /^(?:[\s\-–·•○●■□◎※ㅇ]|\d{1,2}\s?[.)]|[가-힣]\s?[.)])*\s*[가-힣\s]{2,8}(?:기간|방법|일정|일시|장소|내용|혜택|문의|접수|인원|대상|자격|요건|조건)\s*[:：]?\s*$/;
 const AWARD_ROW = /^(?:대상|최우수상|우수상|장려상|금상|은상|동상|입선|특별상|참가상|상금|상장|시상|부상)\s*(?:[(（]\s*\d+\s*[)）])?\s*$|^[\d,.]+\s*(?:만\s?원|천\s?원|원)\s*$|^[가-힣]{2,10}(?:장관상|시장상|지사상|청장상|실장상|총장상|대표상|회장상|이사장상)\s*$|^-$/;
 const BOARD_CHROME = /^(?:답변\s?등록|처리\s?상태|목록(?:보기)?|이전\s?글|다음\s?글|조회수?|첨부\s?파일|공유(?:하기)?|인쇄(?:하기)?|SNS\s?(?:업로드|공유)|좋아요|신고(?:하기)?|스크랩|담당\s?부서|작성자|등록일|수정일|만족도\s?조사)\s*$/i;
-const NOT_ELIG_LABEL = /^[\sㅇ○●■□▣◆◇▶·•\-–*]*(?:(?:신청|접수|모집|공모|응모|활동|운영)?\s?기간|접수(?:처|방법)?|제출(?:처|방법|서류)?|문의(?:처)?|시상|상금|일시|장소|주최|주관|후원|홈페이지|이메일|전화|(?:참가|참여|신청|응모|선발)\s?방법|발표)\s*[:：]/;
+const NOT_ELIG_LABEL = /^[\sㅇ○●■□▣◆◇▶·•\-–*]*(?:(?:신청|접수|모집|공모|응모|활동|운영)?\s?기간|접수(?:처|방법)?|제출(?:처|방법|서류)?|문의(?:처)?|시상|상금|일시|장소|주최|주관|후원|홈페이지|이메일|전화|(?:참가|참여|신청|응모|선발)\s?방법|발표|(?:모집|선발|참가)\s?인원|(?:활동|봉사|교육|프로그램)\s?(?:내용|시간|장소|일정|지역)|내용|시간|일정)\s*[:：]/;   // 인원·내용·시간 이름표 줄은 자격이 아니다(1365 봉사 글 · 2026-10-27)
 export function eligLineOk(line) {
   const l = String(line || '');
   const age = l.match(AGE_LABEL);
@@ -219,7 +220,7 @@ const inlineLabel = (t) => t
 const normalizeText = (text) => labelColon(inlineLabel(bulletNorm(String(text || ''))));
 export function activityDetails(text, title) {
   const t = normalizeText(text);
-  if (!t.trim()) return { eligibilityLines: [], eligibilityExcludes: [], eligibilityPriority: [], noticeLines: [] };
+  if (!t.trim()) { const tt = targetFromTitle(title); return { eligibilityLines: tt ? [tt] : [], eligibilityExcludes: [], eligibilityPriority: [], noticeLines: [] }; }   // 본문이 없어도 제목의 대상은 읽는다
   /* 어디서부터 읽나 — 글 제목이 나오는 **자리마다** 읽어 보고 자격이 가장 많이 나오는 자리(같으면 뒤쪽).
      🔴 마지막 자리만 보면 두 번 나오는 제목 **사이**의 자격 표를 놓쳤다(K-Startup DMC 캠프 · 제목 191·214줄, 표 195~208줄 · 2026-10-04).
      맨 앞 세 줄(브라우저 제목줄 · 그 아래는 사이트 메뉴)은 제목이 한 번뿐일 때만 시작점으로 쓴다.
@@ -241,6 +242,8 @@ export function activityDetails(text, title) {
   /* 🔴 이름표를 뗀 앞 줄이 **빈 글자**면 비교하지 않는다 — 빈 글자는 어디에나 '들어 있어서' 대상 줄이 빠졌다(`■ 참가자격` 제목 줄 · 2026-10-04 관문) */
   const core = (q) => flat(q).replace(/^.*?(?:대상|자격)/, '');
   if (who && !qual.some((q) => flat(q).includes(flat(who)) || (core(q).length >= 4 && flat(who).includes(core(q))))) qual = [...qual, who];
+  /* 본문·첨부에서 한 줄도 못 뽑았으면 제목 속 대상(`[중학생~대학생] …`·`… 도서 정리(대학생)`·`… -대학생만 신청`) — 1365 봉사 글은 대상을 제목에만 적는다(activity-vocab · 2026-10-27) */
+  if (!qual.length) { const tt = targetFromTitle(title); if (tt) qual = [tt]; }
   if (!qual.length) qual = proseLines(body);
   if (!qual.length && body !== t) qual = proseLines(t);
   qual = cutAtTableLabel(qual);

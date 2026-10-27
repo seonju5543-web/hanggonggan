@@ -123,7 +123,9 @@ const HEADER = /^(등록일|작성일|수정일|조회수?|담당자?|게시기�
 /* 🔴 최후 관문 — 모델이 고른 번호를 **앱이 제 원문에서** 꺼내고, 꺼낸 것을 다시 검사한다.
    범위 밖 번호는 버리고, 요건 신호가 하나도 없으면 통째로 버린다.
    하나도 안 남으면 '아직 못 읽었어요'를 유지한다(지어낸 자격보다 낫다 — 원칙 8-1). */
-export function verifyPick(pick, lines) {
+/* 활동 글의 검산은 장학 신호에 활동 어휘(activity-vocab ACT_SIGNAL)를 더한다 — opts.signal (activity-docs 가 넘긴다 · 2026-10-27) */
+const signalOf = (opts) => (opts && opts.signal ? new RegExp(`${REQ_SIGNAL.source}|${opts.signal.source}`) : REQ_SIGNAL);
+export function verifyPick(pick, lines, opts = {}) {
   if (!pick || pick.none) return { ok: false, why: pick && pick.why ? pick.why : '자격 없음' };
 
   /* 번호 → 앱이 제 원문에서 꺼낸 글자. 모델이 글자를 보내도 여기로 들어올 길이 없다. */
@@ -166,7 +168,7 @@ export function verifyPick(pick, lines) {
 
   const flat = [...new Set([...commonOnly, ...either.flatMap((b) => b.lines), ...grade])].slice(0, 12);
   if (!flat.length) return { ok: false, why: '고른 줄이 범위 밖이거나 자격이 아님' };
-  if (!flat.some((l) => REQ_SIGNAL.test(l))) return { ok: false, why: '요건 신호가 하나도 없음' };
+  if (!flat.some((l) => signalOf(opts).test(l))) return { ok: false, why: '요건 신호가 하나도 없음' };
 
   return {
     ok: true,
@@ -230,7 +232,7 @@ const AMOUNT_ISH = /[\d,]+\s*(원|만\s*원|천\s*원)|등록금|수업료|장�
 
 /* 모델이 보낸 **글자**를 되받아 거른다. 번호 경로의 verifyPick과 같은 낱말 관문을 쓴다 —
    여기만 느슨하면 PDF 경로로 쓰레기가 들어온다. */
-export function verifyPdfLines(pick) {
+export function verifyPdfLines(pick, opts = {}) {
   if (!pick || pick.none) return { ok: false, why: (pick && pick.why) || '자격 없음' };
   const clean = (arr, cap) => [...new Set((arr || [])
     .map((l) => String(l || '').replace(/\s+/g, ' ').trim())
@@ -238,7 +240,7 @@ export function verifyPdfLines(pick) {
     .filter((l) => !NOT_REQ.test(l) && !HEADER.test(l)))].slice(0, cap);
   const out = clean(pick.lines, 8);
   if (!out.length) return { ok: false, why: '고른 줄이 자격이 아님' };
-  if (!out.some((l) => REQ_SIGNAL.test(l))) return { ok: false, why: '요건 신호가 하나도 없음' };
+  if (!out.some((l) => signalOf(opts).test(l))) return { ok: false, why: '요건 신호가 하나도 없음' };
   /* 제외 대상은 자격 줄과 섞지 않는다 — 섞으면 요건이 실제보다 까다로워 보여
      지원할 수 있는 학생이 포기하고, 5줄 상한에 밀려 진짜 요건이 잘려 나간다
      (정읍시민장학재단에서 제외 3줄이 실제로 그렇게 버려졌다). */
