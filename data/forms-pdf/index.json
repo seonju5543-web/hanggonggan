@@ -1,15 +1,16 @@
 {
- "updatedAt": "2026-10-27",
+ "updatedAt": "2026-10-28",
  "items": {
   "auto-ticedoarticleno231977952": [
    {
     "file": "auto-ticedoarticleno231977952/1-2026년_김천시한국전력기술_지역상생지원_장학금_및_취업준비금_신청서식.pdf",
     "name": "2026년 김천시한국전력기술 지역상생지원 장학금 및 취업준비금 신청서식.hwpx",
-    "pages": 12,
-    "bytes": 420031,
+    "pages": 9,
+    "bytes": 511105,
     "srcBytes": 78122,
     "from": "원본 그대로 변환",
-    "at": "2026-10-12"
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
    }
   ],
   "auto-jong659273457artclviewdo": [
@@ -17,21 +18,23 @@
     "file": "auto-jong659273457artclviewdo/1-2026학년도_2학기_세종_CPTA장학금_신청서_소정양식_.pdf",
     "name": "2026학년도 2학기 세종 CPTA장학금 신청서(소정양식).hwp",
     "pages": 2,
-    "bytes": 82925,
+    "bytes": 106622,
     "srcBytes": 95744,
     "from": "원본 그대로 변환",
-    "at": "2026-10-12"
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
    }
   ],
   "auto-leno276603srcategoryid22": [
    {
     "file": "auto-leno276603srcategoryid22/1-2026년_2학기_선원가족장학사업_신청서.pdf",
     "name": "2026년 2학기 선원가족장학사업 신청서.hwp",
-    "pages": 6,
-    "bytes": 240386,
+    "pages": 5,
+    "bytes": 382055,
     "srcBytes": 29696,
     "from": "원본 그대로 변환",
-    "at": "2026-10-12"
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
    },
    {
     "file": "auto-leno276603srcategoryid22/2-2026년_2학기_선원가족장학사업_신청서.pdf",
@@ -48,11 +51,22 @@
    {
     "file": "auto-krbbskr845764artclviewdo/1-01_장학금_신청서.pdf",
     "name": "01_장학금 신청서.hwp",
-    "pages": 6,
-    "bytes": 127951,
+    "pages": 5,
+    "bytes": 157652,
     "srcBytes": 66048,
     "from": "원본 그대로 변환",
-    "at": "2026-10-12"
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   },
+   {
+    "file": "auto-krbbskr845764artclviewdo/2-02_개인정보_제공_동의서.pdf",
+    "name": "02_개인정보 제공 동의서.hwp",
+    "pages": 3,
+    "bytes": 91739,
+    "srcBytes": 26624,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
    }
   ],
   "auto-srchenable1srchvotetype1-159letz": [
@@ -60,10 +74,11 @@
     "file": "auto-srchenable1srchvotetype1-159letz/1-2026년_2학기_재_춘곡장학회_장학금_신청서.pdf",
     "name": "2026년 2학기 (재)춘곡장학회 장학금 신청서.hwp",
     "pages": 5,
-    "bytes": 141054,
+    "bytes": 243176,
     "srcBytes": 159744,
     "from": "원본 그대로 변환",
-    "at": "2026-10-12"
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
    }
   ],
   "auto-srchenable1srchvotetype1-1xgmtcs": [
@@ -71,13 +86,24 @@
     "file": "auto-srchenable1srchvotetype1-1xgmtcs/1-2._2026-2학기_사랑나눔장학금_A_B_신청서_양식_.pdf",
     "name": "2. 2026-2학기 사랑나눔장학금 A, B 신청서(양식).hwp",
     "pages": 1,
-    "bytes": 58203,
+    "bytes": 99383,
     "srcBytes": 49664,
     "from": "원본 그대로 변환",
-    "at": "2026-10-12"
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
    }
   ],
   "auto-0713no2515412sitedvscdkr": [
+   {
+    "file": "auto-0713no2515412sitedvscdkr/1-붙임1._2026년_장학생_선발_공고문_신청서_포함_.pdf",
+    "name": "붙임1. 2026년 장학생 선발 공고문(신청서 포함).hwpx",
+    "pages": 25,
+    "bytes": 808471,
+    "srcBytes": 140875,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   },
    {
     "file": "auto-0713no2515412sitedvscdkr/2-붙임2._2026년_장학생_선발_공고문_신청서_포함_.pdf",
     "name": "붙임2. 2026년 장학생 선발 공고문(신청서 포함).pdf",
@@ -133,6 +159,286 @@
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-10-25"
+   }
+  ],
+  "auto-ent2431266737artclviewdo": [
+   {
+    "file": "auto-ent2431266737artclviewdo/1-붙임1.멘토_활동계획서_양식.pdf",
+    "name": "붙임1.멘토 활동계획서 양식.hwp",
+    "pages": 3,
+    "bytes": 142594,
+    "srcBytes": 65536,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   }
+  ],
+  "auto-0713no2515690sitedvscdkr": [
+   {
+    "file": "auto-0713no2515690sitedvscdkr/1-붙임._충남대학교총동창회_장학생선발공고_신청서식.pdf",
+    "name": "붙임. 충남대학교총동창회 장학생선발공고+신청서식.hwp",
+    "pages": 8,
+    "bytes": 297113,
+    "srcBytes": 105984,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   }
+  ],
+  "auto-ticedoarticleno231554919": [
+   {
+    "file": "auto-ticedoarticleno231554919/1-2026-2학기_다문화가정_장학금_신청서.pdf",
+    "name": "2026-2학기 다문화가정 장학금 신청서.hwp",
+    "pages": 1,
+    "bytes": 99687,
+    "srcBytes": 102912,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   }
+  ],
+  "auto-ticedoarticleno231554921": [
+   {
+    "file": "auto-ticedoarticleno231554921/1-2026-2학기_3대_동문가족_특별장학금_신청서.pdf",
+    "name": "2026-2학기 3대 동문가족 특별장학금 신청서.hwp",
+    "pages": 1,
+    "bytes": 112327,
+    "srcBytes": 59392,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   }
+  ],
+  "auto-otice06doarticleno140538": [
+   {
+    "file": "auto-otice06doarticleno140538/1-2026년_성암육영회_지원서류.pdf",
+    "name": "2026년 성암육영회 지원서류.hwp",
+    "pages": 4,
+    "bytes": 123496,
+    "srcBytes": 46592,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   }
+  ],
+  "auto-otice06doarticleno140575": [
+   {
+    "file": "auto-otice06doarticleno140575/1-서식1_장학생지원서.pdf",
+    "name": "서식1 장학생지원서.hwp",
+    "pages": 2,
+    "bytes": 101929,
+    "srcBytes": 82432,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   },
+   {
+    "file": "auto-otice06doarticleno140575/2-서식4_개인정보수집동의서.pdf",
+    "name": "서식4 개인정보수집동의서.hwp",
+    "pages": 2,
+    "bytes": 143387,
+    "srcBytes": 80384,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   },
+   {
+    "file": "auto-otice06doarticleno140575/3-서식5_개인정보수집동의서_부모_.pdf",
+    "name": "서식5 개인정보수집동의서(부모).hwp",
+    "pages": 2,
+    "bytes": 123874,
+    "srcBytes": 75264,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   }
+  ],
+  "auto-ent2431269173artclviewdo": [
+   {
+    "file": "auto-ent2431269173artclviewdo/1-개인정보수집이용동의서.pdf",
+    "name": "개인정보수집이용동의서.hwp",
+    "pages": 1,
+    "bytes": 78123,
+    "srcBytes": 50688,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   }
+  ],
+  "auto-bbssc58944362artclviewdo": [
+   {
+    "file": "auto-bbssc58944362artclviewdo/1-연세_월든장학금_지원서.pdf",
+    "name": "연세 월든장학금 지원서.hwp",
+    "pages": 2,
+    "bytes": 81393,
+    "srcBytes": 35840,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   }
+  ],
+  "auto-otice06doarticleno140601": [
+   {
+    "file": "auto-otice06doarticleno140601/1-_붙임_1_심산혁신장학금_신청서_양식.pdf",
+    "name": "[붙임_1] 심산혁신장학금 신청서 양식.hwp",
+    "pages": 1,
+    "bytes": 49396,
+    "srcBytes": 25600,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   },
+   {
+    "file": "auto-otice06doarticleno140601/2-_붙임_2_개인정보_수집_및_이용동의서_성균관대학교_.pdf",
+    "name": "[붙임_2] 개인정보 수집 및 이용동의서(성균관대학교).hwp",
+    "pages": 1,
+    "bytes": 74995,
+    "srcBytes": 36864,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   }
+  ],
+  "auto-bswj104944451artclviewdo": [
+   {
+    "file": "auto-bswj104944451artclviewdo/1-2026년_하반기_대한적십자사_헌혈기부권_대학생_장학금_신청서식_연세대_미래.pdf",
+    "name": "2026년 하반기 대한적십자사 헌혈기부권 대학생 장학금 신청서식_연세대 미래.hwp",
+    "pages": 7,
+    "bytes": 242732,
+    "srcBytes": 68096,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   }
+  ],
+  "auto-otice06doarticleno140764": [
+   {
+    "file": "auto-otice06doarticleno140764/1-장학금_신청서_사업참여확약서_개인정보제공활용동의서.pdf",
+    "name": "장학금 신청서, 사업참여확약서, 개인정보제공활용동의서.hwp",
+    "pages": 5,
+    "bytes": 173467,
+    "srcBytes": 48640,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   }
+  ],
+  "auto-otice06doarticleno140739": [
+   {
+    "file": "auto-otice06doarticleno140739/1-성균관대학교_수원장학회_장학금_신청서_2026_.pdf",
+    "name": "성균관대학교 수원장학회 장학금 신청서(2026).hwp",
+    "pages": 2,
+    "bytes": 103258,
+    "srcBytes": 82432,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   }
+  ],
+  "auto-otice06doarticleno140646": [
+   {
+    "file": "auto-otice06doarticleno140646/1-신청서_서식_공지용_.pdf",
+    "name": "신청서 서식(공지용).hwp",
+    "pages": 4,
+    "bytes": 225643,
+    "srcBytes": 58880,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   }
+  ],
+  "auto-kuk2351210566artclviewdo": [
+   {
+    "file": "auto-kuk2351210566artclviewdo/1-2.2026학년도2학기복지장학금신청서류.pdf",
+    "name": "2.2026학년도2학기복지장학금신청서류.hwp",
+    "pages": 3,
+    "bytes": 107875,
+    "srcBytes": 49152,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   },
+   {
+    "file": "auto-kuk2351210566artclviewdo/2-3.2026학년도2학기복지장학금개인정보이용및제공동의서.pdf",
+    "name": "3.2026학년도2학기복지장학금개인정보이용및제공동의서.hwp",
+    "pages": 2,
+    "bytes": 100347,
+    "srcBytes": 55296,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   }
+  ],
+  "auto-notice7doarticleno894852": [
+   {
+    "file": "auto-notice7doarticleno894852/1-_양식_성적향상장학금_신청서.pdf",
+    "name": "(양식)성적향상장학금 신청서.hwp",
+    "pages": 2,
+    "bytes": 105240,
+    "srcBytes": 56320,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   }
+  ],
+  "auto-pnoticedoarticleno367476": [
+   {
+    "file": "auto-pnoticedoarticleno367476/1-신청서_서식.pdf",
+    "name": "신청서 서식.hwpx",
+    "pages": 4,
+    "bytes": 225643,
+    "srcBytes": 69810,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   }
+  ],
+  "auto-ghaknoticedetail26766657": [
+   {
+    "file": "auto-ghaknoticedetail26766657/1-1._신청서류_양식_.pdf",
+    "name": "1. 신청서류(양식).hwp",
+    "pages": 5,
+    "bytes": 188789,
+    "srcBytes": 27648,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   }
+  ],
+  "auto-sknou51819378artclviewdo": [
+   {
+    "file": "auto-sknou51819378artclviewdo/1-국가_근로_장학생_지원서_및_개인정보_수집_이용_동의서_진로심리상담실.pdf",
+    "name": "국가 근로 장학생 지원서 및 개인정보 수집 이용 동의서_진로심리상담실.hwp",
+    "pages": 2,
+    "bytes": 139957,
+    "srcBytes": 52736,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   }
+  ],
+  "auto-bswj104944472artclviewdo": [
+   {
+    "file": "auto-bswj104944472artclviewdo/1-2027-1_어학우수장학금_신청서_양식_.pdf",
+    "name": "2027-1_어학우수장학금_신청서(양식).hwp",
+    "pages": 2,
+    "bytes": 93972,
+    "srcBytes": 122368,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
+   }
+  ],
+  "auto-enoticedoarticleno769738": [
+   {
+    "file": "auto-enoticedoarticleno769738/1-01-04.주거안정장학금_반환서약서.pdf",
+    "name": "01-04.주거안정장학금 반환서약서.hwp",
+    "pages": 2,
+    "bytes": 145027,
+    "srcBytes": 110080,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-28"
    }
   ]
  }
