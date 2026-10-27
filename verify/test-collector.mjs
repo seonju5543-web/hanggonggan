@@ -12652,6 +12652,11 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
   const c2 = FP.convertOne ? FP.convertOne(path.join(tmp, 'fake.pdf'), path.join(tmp, 'out', 'f.pdf')) : {};
   const c3 = FP.convertOne ? FP.convertOne(path.join(tmp, 'none.pdf'), path.join(tmp, 'out', 'n.pdf')) : {};
   const c4 = FP.convertOne ? FP.convertOne(path.join(tmp, 'b.hwp'), path.join(tmp, 'out', 'b.pdf'), { soffice: path.join(tmp, 'no-such-soffice') }) : {};
+  /* 🔴 전용 프로필 (2026-10-27) — root 소유 프로필 폴더 때문에 soffice 가 종료 77 로 못 뜨던 것. 두 변환 자리 모두 -env:UserInstallation 을 넘기고, 설치 스크립트도 임시 프로필 + 소유권 되돌림 */
+  const fpdfSrc = readText(new URL('../collector/form-pdf.mjs', import.meta.url)); const fpgSrc = readText(new URL('../collector/form-pages.mjs', import.meta.url)); const h2o = readText(new URL('../collector/install-h2orestart.sh', import.meta.url));
+  eq('  변환기는 전용 프로필로 띄운다(form-pdf · form-pages 둘 다 loProfileArg) · 설치 스크립트는 임시 프로필로 깔고 root 소유 프로필을 되돌린다',
+    [/spawnSync\(soffice, \['--headless', '--norestore', loProfileArg\(\), '--convert-to'/.test(fpdfSrc), /spawnSync\(soffice, \['--headless', '--norestore', loProfileArg\(\), '--convert-to'/.test(fpgSrc),
+      /^-env:UserInstallation=/m.test(String(FP.loProfileArg ? FP.loProfileArg() : '')), /-env:UserInstallation=file:\/\/\$TMP\/unopkg-profile/.test(h2o) && /chown -R/.test(h2o)], [true, true, true, true]);
   eq('⑥ pdf 는 바이트 그대로 복사 · 가짜 pdf 와 없는 원본은 거절 · 변환기가 없으면 「변환기 없음」',
     [c1.ok, c1.pages, fs.existsSync(path.join(tmp, 'out', 'a.pdf')) && pdfBytes(path.join(tmp, 'out', 'a.pdf')).equals(pdf), c2.why, c3.why, /변환기 없음/.test(c4.why || '')],
     [true, 2, true, 'PDF 가 아님', '원본 파일 없음', true]);

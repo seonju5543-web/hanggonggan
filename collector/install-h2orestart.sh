@@ -13,6 +13,12 @@ if [ "$VER" = "latest" ]; then URL="https://github.com/ebandal/H2Orestart/releas
 else URL="https://github.com/ebandal/H2Orestart/releases/download/${VER}/H2Orestart.oxt"; fi
 TMP="$(mktemp -d)"
 if ! curl -sSL --retry 1 -m 60 -o "$TMP/H2Orestart.oxt" "$URL"; then echo "⚠️ H2Orestart 내려받기 실패 ($URL) — HWP·HWPX 는 이번에 못 바꿉니다"; exit 0; fi
-if ! $UNOPKG add --shared --suppress-license "$TMP/H2Orestart.oxt" >/dev/null 2>&1; then echo "⚠️ H2Orestart 설치 실패 — HWP·HWPX 는 이번에 못 바꿉니다"; exit 0; fi
-if $UNOPKG list --shared 2>/dev/null | grep -qi h2orestart; then echo "✓ H2Orestart 설치됨"; else echo "⚠️ H2Orestart 가 목록에 없음 — HWP·HWPX 는 이번에 못 바꿉니다"; fi
+# 🔴 unopkg 를 root(sudo)로 돌리면 러너 사용자의 프로필 폴더(~/.config/libreoffice)가 root 소유가 되어 soffice 가 '권한 없음'(종료 77)으로 못 뜬다(2026-10-27 실측 · 10-12 부터 HWP 0건).
+#    설치는 임시 프로필로 하고, 혹시 이미 root 소유가 됐으면 되돌린다.
+UPROF="-env:UserInstallation=file://$TMP/unopkg-profile"
+if ! $UNOPKG add --shared --suppress-license "$UPROF" "$TMP/H2Orestart.oxt" >/dev/null 2>&1; then echo "⚠️ H2Orestart 설치 실패 — HWP·HWPX 는 이번에 못 바꿉니다"; exit 0; fi
+if $UNOPKG list --shared "$UPROF" 2>/dev/null | grep -qi h2orestart; then echo "✓ H2Orestart 설치됨"; else echo "⚠️ H2Orestart 가 목록에 없음 — HWP·HWPX 는 이번에 못 바꿉니다"; fi
+if [ -d "$HOME/.config/libreoffice" ] && [ -n "$(find "$HOME/.config/libreoffice" ! -user "$(id -un)" -print -quit 2>/dev/null)" ]; then
+  if sudo -n chown -R "$(id -u):$(id -g)" "$HOME/.config/libreoffice" 2>/dev/null; then echo "프로필 폴더 소유권을 러너 사용자로 되돌림"; else echo "⚠️ 프로필 폴더가 root 소유인데 되돌리지 못함 — 변환기는 전용 프로필로 뜨므로 계속"; fi
+fi
 exit 0

@@ -26,7 +26,7 @@ import path from 'node:path';
 import vm from 'node:vm';
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { sameTitle } from './detail-url.mjs';
 
 const HERE = fileURLToPath(new URL('.', import.meta.url));
@@ -95,6 +95,14 @@ export function pdfPages(buf) {
 
 export const safeName = (name) => String(name || '').replace(/\.[^.]+$/, '').replace(/[^0-9A-Za-z가-힣._-]+/g, '_').slice(0, 60) || 'form';
 
+/* 🔴 LibreOffice 는 **전용 프로필 폴더**로 띄운다(2026-10-27) — 러너에서 확장을 root(sudo unopkg)로 깔면 /home/runner/.config/libreoffice 가 root 소유가 되어
+   runner 의 soffice 가 '권한 없음'(종료 77)으로 시작조차 못 했다(10-12 부터 HWP 변환 0건 · 변환기 말을 리포트에 남겨 알았다).
+   임시 폴더의 프로필은 실행마다 새로 만들어지고(파일마다가 아니라 실행마다 하나 · 첫 기동 2~4초), 공유 확장(--shared)은 어느 프로필에서나 보인다. */
+let LO_PROFILE = null;
+export function loProfileArg() {
+  if (!LO_PROFILE) { LO_PROFILE = fs.mkdtempSync(path.join(os.tmpdir(), 'lo-profile-')); }
+  return `-env:UserInstallation=${pathToFileURL(LO_PROFILE).href}`;
+}
 /** 한 파일을 PDF 로 — pdf 는 복사 · 나머지는 soffice. { ok, out, pages, bytes, why } */
 export function convertOne(src, outPath, { soffice = 'soffice', tmpDir } = {}) {
   if (!fs.existsSync(src)) return { ok: false, why: '원본 파일 없음' };
@@ -105,7 +113,7 @@ export function convertOne(src, outPath, { soffice = 'soffice', tmpDir } = {}) {
     /* 작업 폴더는 시스템 임시 폴더에 — 결과 폴더 안에 두면 단계가 시한에 죽을 때 찌꺼기가 git add 에 실린다(리뷰 2026-10-12) */
     const work = tmpDir || fs.mkdtempSync(path.join(os.tmpdir(), 'form-pdf-'));
     const done = () => { if (!tmpDir) { try { fs.rmSync(work, { recursive: true, force: true }); } catch { /* 무시 */ } } };
-    const r = spawnSync(soffice, ['--headless', '--norestore', '--convert-to', 'pdf', '--outdir', work, src], { encoding: 'utf8', timeout: SOFFICE_TIMEOUT_MS });
+    const r = spawnSync(soffice, ['--headless', '--norestore', loProfileArg(), '--convert-to', 'pdf', '--outdir', work, src], { encoding: 'utf8', timeout: SOFFICE_TIMEOUT_MS });
     if (r.error) { done(); return { ok: false, why: r.error.code === 'ETIMEDOUT' ? `변환 시간 초과(${SOFFICE_TIMEOUT_MS / 1000}초)` : `변환기 없음(${soffice})` }; }
     const made = path.join(work, `${path.basename(src).replace(/\.[^.]+$/, '')}.pdf`);
     if (!fs.existsSync(made)) {
