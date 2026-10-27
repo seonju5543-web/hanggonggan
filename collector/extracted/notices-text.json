@@ -14359,19 +14359,6 @@
   "shells": 2
  },
  {
-  "title": "[교외] 2026년 2학기 푸른등대 기부장학금",
-  "school": "서울시립대학교",
-  "campus": "",
-  "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%5B%EA%B5%90%EC%99%B8%5D%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%ED%91%B8%EB%A5%B8%EB%93%B1%EB%8C%80%20%EA%B8%B0%EB%B6%80%EC%9E%A5%ED%95%99%EA%B8%88",
-  "attachments": [],
-  "foundAt": "2026-10-27",
-  "text": "Redirecting...",
-  "cut": false,
-  "limit": 15000,
-  "bodyChars": 0,
-  "shells": 5
- },
- {
   "title": "희망사다리Ⅰ유형 장학생 대상 삼성 청년 SW·AI 아카데미(SSAFY) 교육생 모집 안내",
   "school": "연세대학교",
   "campus": "",
@@ -14545,7 +14532,7 @@
   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=897116&qidx=5233&cate=0&allboard=true&nowpage=1",
   "text": "FETCH_ERROR TypeError",
   "bodyChars": 0,
-  "fails": 3
+  "fails": 4
  },
  {
   "title": "(홍보) 한국장학재단 희망사다리1유형 장학생 대상 삼성 SSFY 교육생 모집(~11/9(월)까지)",
@@ -14553,7 +14540,7 @@
   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=897097&qidx=5233&cate=0&allboard=true&nowpage=1",
   "text": "FETCH_ERROR TypeError",
   "bodyChars": 0,
-  "fails": 3
+  "fails": 4
  },
  {
   "title": "(홍보) 우양재단 2026년 동행 장학생 모집 안내(마감)",
@@ -14561,7 +14548,7 @@
   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=5233&bidx=896304&qidx=5233&cate=0&allboard=true&nowpage=2",
   "text": "FETCH_ERROR TypeError",
   "bodyChars": 0,
-  "fails": 3
+  "fails": 4
  },
  {
   "title": "(홍보) 희망사다리 장학생 대상 대전 일자리 박람회 안내(마감)",
@@ -14569,7 +14556,7 @@
   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=5233&bidx=896263&qidx=5233&cate=0&allboard=true&nowpage=2",
   "text": "FETCH_ERROR TypeError",
   "bodyChars": 0,
-  "fails": 3
+  "fails": 4
  },
  {
   "title": "★생활비장학금200만원★ KNU창업장학금(창암장학재단) 장학생 모집(~11/13)",
@@ -14595,5 +14582,18 @@
   "cut": false,
   "limit": 15000,
   "bodyChars": 656
+ },
+ {
+  "title": "[교외] 2026년 2학기 푸른등대 기부장학금",
+  "school": "서울시립대학교",
+  "campus": "",
+  "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261026&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
+  "attachments": [],
+  "foundAt": "2026-10-27",
+  "text": "공지사항 > 공지 및 정보 > 장학\n컨텐츠바로가기\nLOGIN\nUOS-KOR l\nUOS-ENG\n장학개요\n학부교내장학\n대학원교내장학\n국가장학\n교외장학\n근로장학\n취업 후 상환 학자금 대출\n일반상환 학자금대출\n농촌출신대학생 학자금융자\n공지사항\n장학캘린더\n내게 맞는 장학찾기\nFAQ\nQ&A\n서식 다운로드\n규정 및 법령\n장학 안내 책자\n담당부서\n공지사항\n장학캘린더\n월별보기\n펼쳐보기(주단위)\n펼쳐보기(월단위)\n내게 맞는 장학찾기\nFAQ\nQ&Amp;A\nHome > 공지 및 정보 > 공지사항\n장학 또는 학자금대출 관련 소식을 알려드립니다.\n제목\n[교외] 2026년 2학기 푸른등대 기부장학금\n작성자\n박선주\n작성일\n2026/10/26\n이메일\nscholarship@uos.ac.kr\n첨부파일 :\n없음\n개인정보처리방침 l 이메일무단수집거부 l 오시는 길\n02504 서울특별시 동대문구 서울시립대로 163(전농동) 서울시립대학교 학생회관 2층 학생과 장학팀 전화: 02-6490-6220~3\nCopyrightⓒ2013 The University of Seoul. All Rights Reserved.\n관련사이트 바로가기\n생활관\n중앙도서관\n총학생회\n인권센터\n스포츠건강진흥원\n대학신문사\n영자신문사\n대학방송국",
+  "cut": false,
+  "limit": 15000,
+  "bodyChars": 0,
+  "shells": 1
  }
 ]

@@ -711,7 +711,12 @@
    "excerptsAt": "2026-10-27",
    "school": "동국대학교 WISE캠퍼스",
    "campus": "",
-   "foundAt": "2026-10-27"
+   "foundAt": "2026-10-27",
+   "eligibilityLines": [
+    "장애학생지원",
+    "장애인 복지시설"
+   ],
+   "eligibilityFrom": "브라우저 본문"
   },
   {
    "title": "[국제교류] 2027 가을학기 SAF 방문학생/IES 해외 인턴십 대면 설명회",
@@ -787,7 +792,12 @@
    "excerptsAt": "2026-10-27",
    "school": "동국대학교 WISE캠퍼스",
    "campus": "",
-   "foundAt": "2026-10-27"
+   "foundAt": "2026-10-27",
+   "eligibilityLines": [
+    "장애학생지원",
+    "장애인 복지시설"
+   ],
+   "eligibilityFrom": "브라우저 본문"
   },
   {
    "title": "[시립문래청소년센터] 2027 인도네시아 해외봉사단 6기 모집",
@@ -807,7 +817,11 @@
    "excerptsAt": "2026-10-27",
    "school": "한국외국어대학교",
    "campus": "",
-   "foundAt": "2026-10-27"
+   "foundAt": "2026-10-27",
+   "eligibilityLines": [
+    "모집 대상 : 중학교 1학년(2013년생)~ 대학생 4학년(2002년생)20명"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)"
   },
   {
    "title": "[SBS] [데이터사이언스와 저널리즘 아카데미 6기 교육생 모집",
@@ -827,7 +841,14 @@
    "excerptsAt": "2026-10-27",
    "school": "한국외국어대학교",
    "campus": "",
-   "foundAt": "2026-10-27"
+   "foundAt": "2026-10-27",
+   "eligibilityLines": [
+    "교육대상 : 데이터 분석 및 저널리즘 분야로 취업을 희망하는자",
+    "QR 코드로 신청하기",
+    "신청자격 : 국민내일배움카드 발급자 또는 발급 가능한자",
+    "* 교육과정 최종 합격자 발표 전 내일배움카드 수령 가능한자"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)"
   },
   {
    "title": "[대구카톨릭대학교] 2026 AI 혁신 아이디어 경진대회 모집",
@@ -847,7 +868,12 @@
    "excerptsAt": "2026-10-27",
    "school": "한국외국어대학교",
    "campus": "",
-   "foundAt": "2026-10-27"
+   "foundAt": "2026-10-27",
+   "eligibilityLines": [
+    "참가대상 : 전 국민 (개인·팀 가능)",
+    "대상 : 1팀"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)"
   },
   {
    "title": "DB손해보험 X 건국대학교 2026 DB KU Startup Match 프로그램 참가기업 모집",
@@ -1469,7 +1495,11 @@
    "detailsV": 6,
    "foundAt": "2026-10-24",
    "seenAt": "2026-10-27",
-   "excerptsAt": "2026-10-27"
+   "excerptsAt": "2026-10-27",
+   "eligibilityLines": [
+    "봉사자유형 : 성인"
+   ],
+   "eligibilityFrom": "브라우저 본문"
   },
   {
    "title": "[중학생~대학생]현충사 충무공이순신기념관 관람객 안내 및 환경 미화 봉사",
