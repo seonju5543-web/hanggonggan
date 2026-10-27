@@ -17283,7 +17283,7 @@
     "이미 이수한 최근 성적 2 개 학기를 작성 .",
     "최근 2 개학기 성적이 없는 자는 신청 불가함 .",
     "2020 학년도 1 학기 성적으로 신청 불가함 .",
-    "성적향상도에 따라 선발하는 장학금으로 모든 성적은 &lsquo; 원성적 &rsquo; 으로 심사함 .",
+    "성적향상도에 따라 선발하는 장학금으로 모든 성적은 ' 원성적 ' 으로 심사함 .",
     "직직전학기 성적",
     "직전학기 성적",
     "신청가능",
@@ -18976,7 +18976,13 @@
     }
    ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323410",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "3.신청대상",
+    "공과대학학부생2~4명으로구성된팀",
+    "팀원 중 최근2년이내현장실습 이수 학생1명이상 필수포함"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)"
   },
   {
    "id": "auto-bswj104944472artclviewdo",
@@ -19412,7 +19418,8 @@
     "schoolOnly": "숭실대학교"
    },
    "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
+    "학교생활지원 장학금(주거비,교통비,근면승실) 간 중복지원 불가",
+    "장학금 종류 및 선발기준,신청방법"
    ],
    "duplicable": true,
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
@@ -19425,7 +19432,16 @@
     }
    ],
    "sourceUrl": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=%E2%98%85-2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%ED%8A%B9%EB%B3%84%EC%9E%A5%ED%95%99%EA%B8%88%EC%A3%BC%EA%B1%B0%EB%B9%84-%EA%B5%90%ED%86%B5%EB%B9%84-%EA%B7%BC%EB%A9%B4%EC%88%AD&keyword=%EC%9E%A5%ED%95%99",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "documentsFrom": "공고문 첨부(OCR)",
+   "eligibilityFrom": "공고문 첨부(OCR)",
+   "eligibilityLines": [
+    "신청 방법 : 신청 자격 : 선발 기준",
+    "※세부사항은 붙임 장학금별 장학금 성격 중복가능",
+    "및 결과 발표",
+    "세부안내자료참조",
+    "-2026-2학기 한국장학 -소득분위상관없이"
+   ]
   },
   {
    "id": "auto-enoticedoarticleno769738",

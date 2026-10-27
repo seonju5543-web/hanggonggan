@@ -87,10 +87,6 @@
   "at": "2026-10-24",
   "tries": 2
  },
- "https://kyf.or.kr/user/boardDetail.do?boardType=notice&bbsId=BBSMSTR_000000000367&nttNo=10054": {
-  "at": "2026-10-15",
-  "tries": 1
- },
  "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156784479&pWise=sub&pWiseSub=C2": {
   "at": "2026-10-15",
   "tries": 1
@@ -141,10 +137,6 @@
  },
  "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179354": {
   "at": "2026-10-17",
-  "tries": 1
- },
- "https://www.yonkang.org/kr/news/652": {
-  "at": "2026-10-23",
   "tries": 1
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/520896": {
@@ -259,10 +251,6 @@
   "at": "2026-10-24",
   "tries": 1
  },
- "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156786340&pWise=sub&pWiseSub=C3": {
-  "at": "2026-10-25",
-  "tries": 1
- },
  "https://ntseitc.spectory.net/shorts": {
   "at": "2026-10-26",
   "tries": 1
@@ -304,6 +292,14 @@
   "tries": 1
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/270037/artclView.do": {
+  "at": "2026-10-27",
+  "tries": 1
+ },
+ "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179241": {
+  "at": "2026-10-27",
+  "tries": 1
+ },
+ "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179560": {
   "at": "2026-10-27",
   "tries": 1
  }
