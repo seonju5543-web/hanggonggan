@@ -16,7 +16,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const HERE = fileURLToPath(new URL('.', import.meta.url));
 export const BUDGET_SEC = Number(process.env.FORM_PAGES_BUDGET_SEC || 240);
@@ -130,10 +130,16 @@ export function extractRanges(src, ranges, outPath) {
 }
 
 /** PDF 가 아닌 공고문 → 임시 PDF (soffice). 돌려주는 경로는 부른 쪽이 지운다 */
+/* 전용 프로필 — form-pdf.mjs 와 같은 이유(러너의 root 소유 프로필 폴더 · 2026-10-27). 실행마다 하나. */
+let LO_PROFILE = null;
+export function loProfileArg() {
+  if (!LO_PROFILE) { LO_PROFILE = fs.mkdtempSync(path.join(os.tmpdir(), 'lo-profile-')); }
+  return `-env:UserInstallation=${pathToFileURL(LO_PROFILE).href}`;
+}
 export function toPdf(src, { soffice = process.env.FORM_PAGES_SOFFICE || 'soffice' } = {}) {
   if (/\.pdf$/i.test(src)) return { ok: true, pdf: src, temp: false };
   const work = fs.mkdtempSync(path.join(os.tmpdir(), 'form-pages-conv-'));
-  const r = spawnSync(soffice, ['--headless', '--norestore', '--convert-to', 'pdf', '--outdir', work, src], { encoding: 'utf8', timeout: SOFFICE_TIMEOUT_MS });
+  const r = spawnSync(soffice, ['--headless', '--norestore', loProfileArg(), '--convert-to', 'pdf', '--outdir', work, src], { encoding: 'utf8', timeout: SOFFICE_TIMEOUT_MS });
   if (r.error) { fs.rmSync(work, { recursive: true, force: true }); return { ok: false, why: r.error.code === 'ETIMEDOUT' ? '변환 시간 초과' : `변환기 없음(${soffice})` }; }
   const made = path.join(work, `${path.basename(src).replace(/\.[^.]+$/, '')}.pdf`);
   if (!fs.existsSync(made)) { fs.rmSync(work, { recursive: true, force: true }); return { ok: false, why: `변환기가 못 읽음(${(src.match(/\.(\w+)$/) || [, '?'])[1]})${/could not be loaded/.test(r.stdout + r.stderr) ? ' — 가져오기 확장(H2Orestart) 필요' : ''}` }; }
