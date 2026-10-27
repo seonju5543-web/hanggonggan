@@ -1,8 +1,36 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-10-27",
- "count": 1498,
+ "count": 1506,
  "items": [
+  {
+   "title": "2027학년도 전기공사공제조합장학회 제22기 장학생 선발 안내",
+   "url": "https://kau.ac.kr/kaulife/scholnoti.php?code=s1301&page=&mode=read&seq=11391",
+   "attachments": [
+    {
+     "name": "[붙임1] 2027년도 제22기 장학생 선발 공고.pdf",
+     "url": "https://kau.ac.kr/upfile/2026/10/27/20261027074902-646f.pdf"
+    },
+    {
+     "name": "[붙임2] 자기소개서.hwp",
+     "url": "https://kau.ac.kr/upfile/2026/10/27/20261027074902-7350.hwp"
+    },
+    {
+     "name": "[붙임3] 체크리스트.hwp",
+     "url": "https://kau.ac.kr/upfile/2026/10/27/20261027074902-7bea.hwp"
+    },
+    {
+     "name": "[붙임4] 2027년 제22기 장학생 지원서 작성요령 및 제출서류 준비 안내.pdf",
+     "url": "https://kau.ac.kr/upfile/2026/10/27/20261027074902-8e93.pdf"
+    }
+   ],
+   "deadlineHint": "접수 기간 : 2026. 11. 2. ( 월 ) 09:00 ~ 11. 13. ( 금 ) 18:00 2. 접수 방법 : 장학회 홈페이지 온라인 원",
+   "school": "한국항공대학교",
+   "campus": "",
+   "foundAt": "2026-10-27",
+   "bodyDeadline": "2026-11-13",
+   "bodyDeadlineText": "전기산업의 미래를 이끌어갈 인재를 양성하기 위해 전기공사공제조합장학회가 장학생을 선발하오니 관련 학생들의 많은 신청 바랍니다 . 1. 접수 기간 : 2026. 11. 2. ( 월 ) 09:00 ~ 11. 13. ( 금 ) 18:00"
+  },
   {
    "title": "장학 ★ 2026학년도 2학기 특별장학금(주거비, 교통비, 근면숭실, 공인어학시험, 특별성적우수(12.5%), 가계곤란) 신청 안내",
    "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=%E2%98%85-2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%ED%8A%B9%EB%B3%84%EC%9E%A5%ED%95%99%EA%B8%88%EC%A3%BC%EA%B1%B0%EB%B9%84-%EA%B5%90%ED%86%B5%EB%B9%84-%EA%B7%BC%EB%A9%B4%EC%88%AD&keyword=%EC%9E%A5%ED%95%99",
@@ -53,6 +81,53 @@
    "foundAt": "2026-10-27"
   },
   {
+   "title": "[학부] 2027년도 방일영문화재단 장학생 선발 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367640&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "붙임1._2027_방일영장학생_지원_신청서.hwp",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367640&attachNo=353699"
+    },
+    {
+     "name": "붙임2._학(과)장_추천서.hwp",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367640&attachNo=353700"
+    },
+    {
+     "name": "붙임3._개인정보동의서 (2).hwp",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367640&attachNo=353701"
+    }
+   ],
+   "deadlineHint": "신청기한 : 2026 년 11 월 3 일 ( 화 ) 17:00 8. 신청방법 : 유레카시스템에서 온라인 신청 및 구비서류 업로드 (6 번 . 구",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-27",
+   "bodyDeadline": "2026-11-03",
+   "bodyDeadlineText": "2026.11.03"
+  },
+  {
+   "title": "[학부] 2026년도 하반기 강화군 대학생 등록금 지원 장학금 신청 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367645&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "공고문(2026년 하반기 강화군 대학생 등록금 지원사업).hwpx",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367645&attachNo=353705"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-27"
+  },
+  {
+   "title": "[한국선원복지고용센터] 2026년 선원가족 장학생 모집 (연장)",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159660&noCat=501",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "홍익대학교",
+   "campus": "",
+   "foundAt": "2026-10-27"
+  },
+  {
    "title": "[장학안내] [강화군] 2026년도 하반기 강화군 대학생 등록금 지원사업 안내",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70812&cate=8",
    "attachments": [
@@ -78,6 +153,77 @@
    "school": "고려대학교",
    "campus": "",
    "foundAt": "2026-10-27"
+  },
+  {
+   "title": "[등록/장학] 2026학년도 2학기 화도 및 동해장학금 2차 신청 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53561&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    },
+    {
+     "name": "광운미디어",
+     "url": "https://www.kw.ac.kr/ko/etc/2018_kw110.pdf"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026. 11. 2.( 월 ) 09:00 – 11 . 18.(수 ) 24:00 2. 신청방법 : KLAS 로그인 후 [ 학습결과",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-10-27",
+   "bodyDeadline": "2026-11-18",
+   "bodyDeadlineText": "- 아 래 - 1. 신청기간 : 2026. 11. 2.( 월 ) 09:00 – 11 . 18.(수 ) 24:00"
+  },
+  {
+   "title": "2026년 2학기 선원가족장학사업 장학생 모집 접수기간 연장 안내",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/145/236605/artclView.do",
+   "attachments": [
+    {
+     "name": "2026년 2학기 선원가족 장학사업 안내.pdf",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/145/181464/download.do"
+    },
+    {
+     "name": "2026년 2학기 선원가족장학사업 선발 모집 요강(변경).hwp",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/145/181465/download.do"
+    }
+   ],
+   "deadlineHint": "모집기간 구 분 당초 변경 접수 기간 2026. 09. 01. ∼ 2026. 10. 23. 2026. 09. 01. ∼ 2026. 10. 30.",
+   "school": "명지대학교",
+   "campus": "",
+   "foundAt": "2026-10-27",
+   "bodyDeadline": "2026-10-23",
+   "bodyDeadlineText": "접수 기간 2026. 09. 01. &sim; 2026. 10. 23."
+  },
+  {
+   "title": "(재)전기공사공제조합장학회 2027년도 제22기 장학생 선발 공고",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/145/236609/artclView.do",
+   "attachments": [],
+   "deadlineHint": "접수기간: 2026. 11. 2.(월) 9시 ~ 2026. 11. 13.(금) 18시 나. 접수방법: 온라인 원서접수(www.ecfcsf.or.",
+   "school": "명지대학교",
+   "campus": "",
+   "foundAt": "2026-10-27",
+   "bodyDeadline": "2026-11-13",
+   "bodyDeadlineText": "1. 선발개요 가. 접수기간: 2026. 11. 2.(월) 9시 ~ 2026. 11. 13.(금) 18시"
   },
   {
    "title": "2027년도 제22기 전기공사공제조합 장학생 선발 공고",
@@ -146,6 +292,20 @@
    ],
    "deadlineHint": null,
    "school": "상명대학교",
+   "campus": "",
+   "foundAt": "2026-10-27"
+  },
+  {
+   "title": "희망사다리Ⅰ유형 장학생 대상 삼성 청년 SW·AI 아카데미(SSAFY) 교육생 모집 안내",
+   "url": "https://www.yonsei.ac.kr/bbs/sc/58/944488/artclView.do",
+   "attachments": [
+    {
+     "name": "SSAFY 17기 모집 안내 뉴스레터.pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015289/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "연세대학교",
    "campus": "",
    "foundAt": "2026-10-27"
   },
