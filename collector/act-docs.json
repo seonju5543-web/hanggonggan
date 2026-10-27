@@ -9,7 +9,7 @@
  },
  "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000": {
   "at": "2026-10-24",
-  "tries": 2
+  "tries": 0
  },
  "https://nysc.or.kr/nysc/pages/notice_view.php?id=288": {
   "at": "2026-10-15",
@@ -25,11 +25,11 @@
  },
  "https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=525&bcd=notice": {
   "at": "2026-10-24",
-  "tries": 2
+  "tries": 0
  },
  "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140536&article.offset=0&articleLimit=10": {
   "at": "2026-10-24",
-  "tries": 2
+  "tries": 0
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/268996/artclView.do": {
   "at": "2026-10-15",
@@ -37,15 +37,15 @@
  },
  "https://www.k-startup.go.kr/web/contents/webNOTICE_MATR.do?page=1&viewCount=18&id=176455&schBdcode=&schGroupCode=&schM=view": {
   "at": "2026-10-24",
-  "tries": 2
+  "tries": 0
  },
  "https://www.culture.go.kr/portal/cltBnf/cltSup/view.do?viewTp=2&rcrtSn=234939&menuNo=200104&sSort=2&pageIndex=1": {
   "at": "2026-10-15",
-  "tries": 1
+  "tries": 0
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/268735/artclView.do": {
   "at": "2026-10-24",
-  "tries": 2
+  "tries": 0
  },
  "https://youth.gyeongnam.go.kr/youth/board.es?mid=a10501020000&bid=0006&list_no=6911&act=view": {
   "at": "2026-10-15",
@@ -57,11 +57,11 @@
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53445&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-24",
-  "tries": 2
+  "tries": 0
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=48133&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-24",
-  "tries": 2
+  "tries": 0
  },
  "https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.ulsan?bbsId=BBS_0000000000000309&mId=008001002000000000&dataId=60769": {
   "at": "2026-10-15",
@@ -69,11 +69,11 @@
  },
  "https://youth.gyeongnam.go.kr/youth/board.es?mid=a10501020000&bid=0006&list_no=6907&act=view": {
   "at": "2026-10-24",
-  "tries": 2
+  "tries": 0
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/268492/artclView.do": {
   "at": "2026-10-24",
-  "tries": 2
+  "tries": 0
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53429&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-15",
@@ -81,11 +81,11 @@
  },
  "https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=519&bcd=notice": {
   "at": "2026-10-24",
-  "tries": 2
+  "tries": 0
  },
  "https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=514&bcd=notice": {
   "at": "2026-10-24",
-  "tries": 2
+  "tries": 0
  },
  "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156784479&pWise=sub&pWiseSub=C2": {
   "at": "2026-10-15",
@@ -121,7 +121,7 @@
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/269119/artclView.do": {
   "at": "2026-10-24",
-  "tries": 2
+  "tries": 0
  },
  "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179319": {
   "at": "2026-10-17",
@@ -133,7 +133,7 @@
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53441&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-24",
-  "tries": 2
+  "tries": 0
  },
  "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179354": {
   "at": "2026-10-17",
@@ -165,7 +165,7 @@
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53516&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-23",
-  "tries": 1
+  "tries": 0
  },
  "https://kfruit.or.kr/board/board_gallery_img_type01/board_detail.asp?scrID=0000000192&pageNum=5&subNum=1&ssubNum=1&bd_num=00000001922026000001&act=view": {
   "at": "2026-10-24",
@@ -177,7 +177,7 @@
  },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3540153": {
   "at": "2026-10-24",
-  "tries": 1
+  "tries": 0
  },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3511658": {
   "at": "2026-10-24",
@@ -225,7 +225,7 @@
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/269599/artclView.do": {
   "at": "2026-10-24",
-  "tries": 1
+  "tries": 0
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/269382/artclView.do": {
   "at": "2026-10-24",
@@ -237,11 +237,11 @@
  },
  "https://www.youthcenter.go.kr/bbs03View/48/10840": {
   "at": "2026-10-24",
-  "tries": 1
+  "tries": 0
  },
  "https://youth.seoul.go.kr/content.do?key=2310100012": {
   "at": "2026-10-24",
-  "tries": 1
+  "tries": 0
  },
  "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179494": {
   "at": "2026-10-24",
@@ -261,7 +261,7 @@
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/520964": {
   "at": "2026-10-27",
-  "tries": 1
+  "tries": 0
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/269933/artclView.do": {
   "at": "2026-10-27",
@@ -281,7 +281,7 @@
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/520976": {
   "at": "2026-10-27",
-  "tries": 1
+  "tries": 0
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53567&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-27",
@@ -289,7 +289,7 @@
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53566&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-27",
-  "tries": 1
+  "tries": 0
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/270037/artclView.do": {
   "at": "2026-10-27",

@@ -2071,6 +2071,7 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
     eq('  문의처는 발췌하지 않는다', r.excerpts.some((x) => /문의/.test(x.label)), false);
     eq('  이름표 없는 글은 비운다 — 날짜가 있어도 마감으로 짐작하지 않는다', ex.activityExcerpts('10월 3일에 행사가 있습니다. 2026.10.03 참고.'), { deadline: null, excerpts: [] });
     eq('  기간이 "상시" 면 마감을 비운다', ex.activityExcerpts('○ 모집기간 : 2026.9.1. ~ 상시').deadline, null);
+    eq('  값 자리에 안내 낱말만(`참가 대상 : 안내`)이면 발췌가 아니다 · 진짜 값은 그대로', [ex.activityExcerpts('참가 대상 : 안내\n참가 자격 : 검증').excerpts, ex.activityExcerpts('참가 대상 : 대학생').excerpts], [[], [{ label: '대상', text: '대학생' }]]);
     /* 2026-10-17 개발자 "원문에서 확인 이렇게 뜨는 게 하나도 없어야" — 모집 안내가 빈 활동 글 96건·마감 없는 90건을 전수로 열어 본 줄 꼴들(글자는 그대로, 콜론만 넣는다) */
     const exOf = (t) => { const r = ex.activityExcerpts(t); return [r.deadline, r.excerpts.map((x) => `${x.label}=${x.text}`)]; };
     eq('  행사·특강의 `일시`는 안내 줄(마감 아님) — `- 일시: 2026. 11. 10. (화) 오후 3시 ~ 4시`·`▶ 대회일시 : 11월 6일(금) 12:30~14:00`',
@@ -12297,6 +12298,27 @@ console.log('\n■ 대외활동·공모전 — 첨부·포스터 읽기 (2026-10
   const it2 = AX.putActivityDetails({ eligibilityLines: ['옛 줄'], eligibilityFrom: '공고문 첨부' }, { eligibilityLines: ['만 19~34세 청년'], noticeLines: [] });
   eq('③ 본문을 다시 읽어도 첨부에서 읽은 자격은 남는다 · 본문에서 자격이 나오면 본문이 이긴다(표식도 뗀다)',
     [it.eligibilityLines, it.eligibilityFrom, it2.eligibilityLines, it2.eligibilityFrom], [['대한민국 국민 누구나'], '공고문 첨부', ['만 19~34세 청년'], undefined]);
+  /* 2026-10-28 클라우드 재읽기 회귀 셋 — 첨부 자격을 더 약한 본문이 덮었다 · 껍데기 페이지가 자격을 지웠다 · 긴 페이지의 메뉴 한 줄이 자격이 됐다 */
+  const it4 = AX.putActivityDetails({ eligibilityLines: ['만 19세 이상 39세 이하 청년'], eligibilityFrom: '포스터 글자(OCR)' }, { eligibilityLines: ['대학생'], eligibilityFromTitle: true, noticeLines: [] });
+  const it7 = AX.putActivityDetails({ eligibilityLines: ['만 19세 이상 39세 이하 청년', '인천 거주자'] }, { eligibilityLines: ['대학생'], eligibilityFromTitle: true, thin: true, noticeLines: [] });
+  eq('③-0 첨부 표식이 없어도 껍데기 페이지의 제목 대상 한 낱말은 읽어 둔 자격을 덮지 않는다(리뷰 #3)', it7.eligibilityLines, ['만 19세 이상 39세 이하 청년', '인천 거주자']);
+  const eB = AD.eligFromFiles({ title: '[대학생] 도서 정리 봉사' }, ['a-B.txt', 'a-0.hwp'], (p) => (/-B\.txt$/.test(p) ? '[대학생] 도서 정리 봉사\n메뉴\n로그인' : '■ 참가자격\n대한민국 국민 누구나(개인 또는 팀)\n■ 접수기간 : 2026. 10. 1.'), '/tmp');
+  eq('  첨부 로봇도 제목 대상뿐인 껍데기 본문에서 멈추지 않고 뒤의 공고문을 연다(리뷰 #4)', [eB && eB.from, eB && eB.eligibilityLines.some((l) => /누구나/.test(l))], ['공고문 첨부', true]);
+  const it5 = AX.putActivityDetails({ eligibilityLines: ['소셜벤처 창업 3년 이내 기업'] }, { eligibilityLines: [], noticeLines: [], thin: true });
+  const it6 = AX.putActivityDetails({ eligibilityLines: ['소셜벤처 창업 3년 이내 기업'] }, { eligibilityLines: [], noticeLines: [], thin: false });
+  eq('③-1 첨부 자격은 제목 대상 한 낱말로 덮이지 않는다 · 껍데기(thin) 재읽기는 자격을 지우지 않고 판만 올린다 · 제대로 읽은 빈 본문은 지운다',
+    [it4.eligibilityLines, it5.eligibilityLines, it5.detailsV === AX.ACT_DETAILS_V, it6.eligibilityLines],
+    [['만 19세 이상 39세 이하 청년'], ['소셜벤처 창업 3년 이내 기업'], true, undefined]);
+  const thinPage = AX.activityDetails('메뉴\n로그인\n공지사항\n「2026 기업지원실 운영」 참여기업 모집', '「2026 기업지원실 운영」 참여기업 모집');
+  eq('  activityDetails 는 한글 300자 미만 껍데기를 thin 으로 표시하고 제목과 같은 줄은 자격으로 주지 않는다 · 제목 대상만 읽으면 eligibilityFromTitle',
+    [thinPage.thin, thinPage.eligibilityLines, AX.activityDetails('', '[대학생] 도서 정리 봉사').eligibilityLines, AX.activityDetails('메뉴\n공지', '[대학생] 도서 정리 봉사').eligibilityFromTitle], [true, [], ['대학생'], true]);
+  const longMenu = ['2026년 국제기구 직업체험 프로그램 참가자 모집', '청년포털', '메뉴'].concat(Array.from({ length: 45 }, (_, i) => `관련 글 ${i} 안내`)).concat(['행복씨앗통장 운영(청년발달장애인)', '첨부파일 포스터.jpg']).join('\n');
+  eq('  활동 글의 한 줄 자격은 40줄 이하 짧은 글(포스터 대체 글)에서만 — 긴 페이지(인천 청년포털 메뉴)의 「행복씨앗통장 운영(청년발달장애인)」 한 줄은 자격이 아니다',
+    [AX.activityDetails('2026 은평 컨퍼런스\n국내 거주 내·외국인 청년\n문의 | x@y.org', '2026 은평 컨퍼런스').eligibilityLines, AX.activityDetails(longMenu, '2026년 국제기구 직업체험 프로그램 참가자 모집').eligibilityLines], [['국내 거주 내·외국인 청년'], []]);
+  eq('  조각 거름 (j)~(m) — 이름표 뒤 요건 없는 짧은 값 · 짧은 낱말 하나 · 날짜뿐 · 기관 이름뿐은 자격이 아니다 · 요건 말이 있는 짧은 값은 남는다',
+    [['참가 자격 : 안내', '참가 대상 : AI·풀이 환경', '팀 구성', '창업업력', '2026년 10월 23일', '조슈아파트너스(주)', '대상연령 : 전체', '참가 자격 : 별도 안내', '참가 대상 : 표시', '대상 : 제도', '모집대상 : 교육비', '참여대상 : 사전신청 QR'].map(AX.eligLineOk),
+      ['지원 대상 : 재학생', '대상 : 청년', '만 19세 이상 39세 이하 청년', '지원대상 : 일반인', '지역기준 : 제주시, 서귀포시', '참가 대상 : 경희대학교/단국대학교', '5학기 이상', '공모대상 국내 소재 대학교', '지원대상 : 중소기업', '참가자격 : 군인', '대상 : 1인 창조기업', '참가 대상 : 여성', '오전 10:00 접수 가능자'].map(AX.eligLineOk)],
+    [[false, false, false, false, false, false, false, false, false, false, false, false], [true, true, true, true, true, true, true, true, true, true, true, true, true]]);
   eq('  `③ 국민 누구나 찾고 머물며 … 공간`(공모 소재 예시)은 자격이 아니다 — 누구나가 말의 끝일 때만',
     AX.activityDetails(['<소재 예시>', '③ 국민 누구나 찾고 머물며 대한민국의 가치와 정체성을 경험할 수 있는 공간'].join('\n')).eligibilityLines, []);
   eq('  AI 가 고른 글 제목 줄은 자격이 아니다(관문의 \'청년\' 신호를 제목이 통과한다)', [AD.isTitleLine('용산 청년지음 <진로 고민 워크숍> 참여자 모집', '용산 청년지음 <진로 고민 워크숍> 참여자 모집'), AD.isTitleLine('만 19~34세 청년', '용산 청년지음 <진로 고민 워크숍> 참여자 모집')], [true, false]);

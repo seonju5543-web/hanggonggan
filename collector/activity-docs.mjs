@@ -393,7 +393,8 @@ export function eligFromFiles(n, files, readText = (p) => (/\.txt$/.test(p) ? fs
     /* 브라우저 본문(`-B.txt`)도 같다 — 글 주소가 포털 첫 화면으로 가서 1,409줄에 제목이 한 번도 없었다(제주도청 · 메뉴 `장애인 복지정책` 이 자격으로 뽑혔다) */
     if ((/-[LB]\d*\.txt$/.test(f) || (ocr && /\di\.\w+$/.test(f))) && !ownsImageText(text, n.title)) continue;
     const d = activityDetails(text, n.title);
-    if (d.eligibilityLines.length) return { ...d, from: /-B\.txt$/.test(f) ? '브라우저 본문' : /\.txt$/.test(f) ? '요강 페이지' : ocr ? '공고문 첨부(OCR)' : '공고문 첨부' };
+    /* 제목에서만 읽은 대상(`[대학생] …`)은 '찾았다'가 아니다 — 껍데기 브라우저 본문이 먼저 와서 뒤의 OCR·HWP 를 못 열게 했다(2026-10-28 리뷰) */
+    if (d.eligibilityLines.length && !d.eligibilityFromTitle) return { ...d, from: /-B\.txt$/.test(f) ? '브라우저 본문' : /\.txt$/.test(f) ? '요강 페이지' : ocr ? '공고문 첨부(OCR)' : '공고문 첨부' };
   }
   return null;
 }
