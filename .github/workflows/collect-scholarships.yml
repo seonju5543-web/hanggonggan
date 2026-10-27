@@ -41,7 +41,7 @@ jobs:
     # 2026-09-29 수집망 2 → 44개교 복원: 「게시판 수집」 단계에 자체 상한 10분(예산 8분 + 마무리 2분)이 생겨
     # 단계 합 4+10+6+5+1+4+3+3+4 = 40 → 상한 44. ⚠️ 상한을 키우는 것으로 때우지 말 것 — 단계가 오래 걸리면
     # 그 단계의 예산(HARVEST_BUDGET_MS)을 줄이고, 상한은 그 합을 담는 그릇으로만 쓴다(8/2~3 사고의 교훈).
-    timeout-minutes: 78   # 단계 합 73 + 여유 5 — 2026-10-23 발췌 단계 시한 6 + 경보 짝 1+1(보강 단계로) · 2026-10-11 관문 다시 재기 3 → 5분(관문 한 번 ~55초 실측) + 끝내 빨간불 경보·닫기 짝 1+1 (2026-10-05 장학 포스터 PaddleOCR 단계 7분 + 2026-10-04 관문 다시 재기 3분 → 61+5 · 2026-10-03 대외활동 첨부·포스터 9분 → 51+5 · 2026-09-30 판정 로봇 2분 → 42+3)
+    timeout-minutes: 80   # 단계 합 75 + 여유 5 — 2026-10-28 PaddleOCR 설치 경보 짝 1+1 · 2026-10-23 발췌 단계 시한 6 + 경보 짝 1+1(보강 단계로) · 2026-10-11 관문 다시 재기 3 → 5분(관문 한 번 ~55초 실측) + 끝내 빨간불 경보·닫기 짝 1+1 (2026-10-05 장학 포스터 PaddleOCR 단계 7분 + 2026-10-04 관문 다시 재기 3분 → 61+5 · 2026-10-03 대외활동 첨부·포스터 9분 → 51+5 · 2026-09-30 판정 로봇 2분 → 42+3)
     steps:
       - uses: actions/checkout@v4
         with:
@@ -205,7 +205,7 @@ jobs:
         run: |
           # 🔴 설치·읽기 실패를 `|| true` 로 삼키지 않는다(아래 대외활동 단계와 같은 규칙 · 2026-10-04 점검 gaps-02) — 엔진 고장은 경고로 남기고,
           #    bash -e 에 끊기지 않아 주인 확인(tesseract 가 읽은 그림 글자도 본다)은 늘 돈다
-          pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3 || echo "::warning::PaddleOCR 설치 실패 — 장학 포스터 읽기는 건너뛰고 주인 확인은 계속"
+          pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3 || { touch /tmp/paddle-install-failed; echo "::warning::PaddleOCR 설치 실패 — 장학 포스터 읽기는 건너뛰고 주인 확인은 계속"; }
           python3 collector/paddle-ocr.py collector/extracted --prefix=elig- --budget-sec=180 || echo "::warning::PaddleOCR 실패(엔진 고장이면 종료 코드 2) — 주인 확인은 계속"
           node collector/elig-ocr-guard.mjs
 
@@ -280,9 +280,39 @@ jobs:
           pip install olefile --quiet
           python3 collector/hwp-bodytext.py collector/act-files || true   # 실패해도 아래 읽기는 돈다(그 글의 무료 기회 두 번 중 하나를 날리지 않게)
           sudo apt-get install -y -qq poppler-utils   # PDF 공고문을 쪽 그림으로(pdftoppm) — 서울문화포털 글은 자격이 PDF 에만 있다
-          pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3 || echo "::warning::PaddleOCR 설치 실패 — 아래 읽기가 엔진 없음으로 적고 HWP·본문으로만 계속"   # 🔴 실패를 삼키지도, 경고 없이 떼지도 말 것 — 떼면 같은 단계의 --apply 가 bash -e 에 끊겨 HWP 로 읽은 자격까지 버려진다(2026-10-04 점검 gaps-02) · 🔴 판 고정 — 3.3.x 는 x86 CPU 에서 첫 그림부터 ConvertPirAttribute2RuntimeAttribute 오류(2026-10-04 첫 클라우드 실행 · PaddleOCR discussions 17350)
+          pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3 || { touch /tmp/paddle-install-failed; echo "::warning::PaddleOCR 설치 실패 — 아래 읽기가 엔진 없음으로 적고 HWP·본문으로만 계속"; }   # 🔴 실패를 삼키지도, 경고 없이 떼지도 말 것 — 떼면 같은 단계의 --apply 가 bash -e 에 끊겨 HWP 로 읽은 자격까지 버려진다(2026-10-04 점검 gaps-02) · 🔴 판 고정 — 3.3.x 는 x86 CPU 에서 첫 그림부터 ConvertPirAttribute2RuntimeAttribute 오류(2026-10-04 첫 클라우드 실행 · PaddleOCR discussions 17350)
           python3 collector/paddle-ocr.py collector/act-files --budget-sec=180 || echo "::warning::PaddleOCR 실패 — 자격 읽기는 HWP·본문으로만 계속(엔진 고장이면 그 글의 기회는 --apply 가 되돌린다)"
           node collector/activity-docs.mjs --apply
+      # 🔴 PaddleOCR 설치 실패는 **소리 내어** 알린다 (2026-10-28) — 10-12부터 보름 넘게 매일 실패했는데 경고 한 줄과 초록불뿐이라 아무도 몰랐고,
+      #    포스터뿐인 글의 자격 읽기가 통째로 비어 있었다(개발자 "저번에 분명 설치했던 것 같은데"). 위 두 단계가 남긴 표식 파일로 경보 짝(열기·닫기 · 같은 제목).
+      - name: PaddleOCR 설치 여부
+        id: paddle
+        if: always()
+        run: echo "failed=$([ -f /tmp/paddle-install-failed ] && echo yes || echo no)" >> "$GITHUB_OUTPUT"
+      - name: 🚨 PaddleOCR 설치 실패 경보
+        if: always() && steps.paddle.outputs.failed == 'yes'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          title: 🚨 포스터 글자 읽기(PaddleOCR)가 설치되지 않아요
+          label: paddle-ocr
+          body: |
+            수집 로봇의 포스터 글자 읽기(PaddleOCR) 설치가 실패했습니다. 그동안 포스터·첨부뿐인 공고·활동 글의 자격은 읽히지 않습니다(HWP·본문만 읽힘).
+            대개 러너 파이썬 판과 paddlepaddle 바퀴(cp39~cp313)가 안 맞는 것입니다 — 워크플로의 setup-python 판과 pip 설치 줄을 보세요. 실행: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      - name: ✅ PaddleOCR 회복 — 경보 닫기
+        if: always() && steps.paddle.outputs.failed == 'no'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          title: 🚨 포스터 글자 읽기(PaddleOCR)가 설치되지 않아요
+          label: paddle-ocr
+          body: 이번 실행에서 PaddleOCR 이 설치됐습니다 — 포스터 글자 읽기가 다시 돕니다.
       # 데이터 관문 (2026-07-30 도입): 로봇이 바꾼 데이터가 규칙을 어기면 저장하지 않고 되돌린다.
       # 잘못된 공고가 앱에 하루라도 노출되는 일을 막는 장치 — 사람이 감사를 기억해서 돌릴 필요가 없다.
       # 위치 규칙 (2026-08-01): 관문은 **저장 직전**에 둔다. 예전엔 양식 스키마화보다 앞에 있어서

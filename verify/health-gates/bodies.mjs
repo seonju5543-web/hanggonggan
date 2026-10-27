@@ -411,7 +411,7 @@ export default async function bodies(eq, ctx) {
         pins.set(pin, [...(pins.get(pin) || []), f]);
       }
       eq(`② ⓒ ${f} — PaddleOCR 설치 ${installs.length}줄·읽기 ${runs.length}줄 전부 실패를 \`|| true\` 로 삼키지도, 경고 없이 bash -e 에 끊기지도 않는다(경고를 남기고 같은 단계 다음 줄은 계속 · gaps-02)`,
-        [...installs, ...runs].filter((l) => /\|\| true/.test(l) || !/\|\| echo "::warning::/.test(l)).map((l) => l.trim().slice(0, 70)), []);
+        [...installs, ...runs].filter((l) => /\|\| true/.test(l) || !/\|\| (?:\{ touch [^;]+; )?echo "::warning::/.test(l)).map((l) => l.trim().slice(0, 70)), []);   // 설치 줄은 표식 파일을 남기고 경고(경보 짝 · 2026-10-28)
     }
     eq(`  PaddleOCR 판 고정은 모든 워크플로·단계가 한 벌 — 두 판이 섞이면 뒤 단계가 다른 판을 다시 깐다(단계가 여럿이라 설치 줄도 여럿 · 지금: ${[...pins.keys()].join(' / ')})`,
       pins.size === 1 && !pins.has('(판 고정 없음)'), true);
