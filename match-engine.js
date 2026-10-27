@@ -19,7 +19,7 @@ const PR = (typeof module !== 'undefined' && module.exports)
   /* 🔴 브라우저에서는 **전역 함수**로 쓴다 — 여기에 이름을 빠뜨리면 Node 검사는 전부
      통과하는데 앱은 첫 카드에서 죽는다. `headRest`(section-head)에 이어 `caseBranch`도
      같은 실수를 했다(2026-08-24). 아래 회귀가 브라우저 순서로 실어 실제로 불러 본다. */
-  : { parseLine, parseDegree, gradOnly, gradTarget, mentionsUndergrad, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, untag, REGIONS, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM, TRAIT_PAT, provincesOfCity };
+  : { parseLine, parseDegree, gradOnly, gradTarget, mentionsUndergrad, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, untag, REGIONS, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM, TRAIT_PAT, provincesOfCity, shortRegion };
 const PR2 = PR;   // requirementLines가 쓰는 별칭 (선언 순서 때문에 이름만 따로 둔다)
 /* 시·도 이름은 parse-requirements 가 갖고 있다 — 여기 베끼면 두 벌이 된다 */
 const PR_REGIONS = PR.REGIONS || [];
@@ -469,6 +469,19 @@ function judgeCond(c, p, ctx) {
             누가 conf 를 올리는 순간 조용히 틀린 미달이 된다. 뜻을 여기에 적어 둔다.
          ⚠️ 그리고 **울산 사는 학생에게 ✓ 를 주지도 않는다** — 그 학생의 학교가 울산에 있는지
             우리는 여전히 모른다. 사는 곳이 맞는 것과 학교가 거기 있는 것은 다른 이야기다. */
+      /* 정식 이름과 짧은 이름을 맞춰 비교한다(시·도) — 아래 거주지 규칙과 출신 지역 규칙이 같이 쓴다 */
+      const prov = PR.shortRegion;   // 규칙은 parse-requirements 한 곳(로봇도 같은 것을 쓴다)
+      /* 🔴 출신 고교 소재지 (2026-10-24 · 온보딩 「적합도 높이기」가 시·도·시·군을 묻는다 — 공고 9곳이 이 줄을 갖는다):
+         학생이 적은 출신 지역과 맞으면 ✓ · 다르거나 안 적었으면 '모름'. **✕ 를 내지 않는다** — 출신 줄은
+         `관내 초·중·고 중 2개 이상 졸업` 같은 예외가 많고 conf 도 LOW 다. 틀린 미달은 못 받는 것보다 나쁘다. */
+      if (c.about === 'origin') {
+        if (c.exclude) return 'unknown';
+        const names = (c.cities || []).concat(c.anyOf || []);
+        const mine = [p.originRegion, p.originCity].filter(Boolean);
+        if (!names.length || !mine.length) return 'unknown';
+        /* 비교는 아래 거주지 줄과 같은 너비 — 공고 안에서 글로 적은 `울산시`·`경기도 용인시` 도 맞춘다 */
+        return names.some((r) => mine.some((x) => x === r || prov(x) === prov(r) || x.includes(r) || r.includes(x))) ? 'pass' : 'unknown';
+      }
       if (c.about && c.about !== 'home') return 'unknown';
       /* 🔴 **제외 줄의 지역 이름은 판정하지 않는다** (2026-09-13 코드 리뷰가 잡은 것을 실측해 고침).
          `(재)영동군민장학회 장학생으로 선발되어 재학 중 2회 이상 장학금을 받은 자` 는
@@ -509,8 +522,6 @@ function judgeCond(c, p, ctx) {
          lineVerdict 가 ✕ 로 만들지 않는다 — 시·군 규칙과 같은 안전장치다. */
       /* 🔴 정식 이름과 짧은 이름을 맞춰 비교한다 — `전라남도` 안에는 `전남` 이라는 글자가 없어서 **전남 학생에게 `전라남도에 주소를 둔 학생` 이
          미달**이 났다(2026-10-04 · 시·도 미달을 켠 날 생긴 틀린 미달 · 충북·충남·전북·전남·경북·경남이 같은 처지였다) */
-      const prov = (x) => String(x).replace(/특별자치도$|특별자치시$|특별시$|광역시$/, '').replace(/^충청북도?$/, '충북').replace(/^충청남도?$/, '충남')
-        .replace(/^전라북도?$/, '전북').replace(/^전라남도?$/, '전남').replace(/^경상북도?$/, '경북').replace(/^경상남도?$/, '경남').replace(/도$/, '');
       return c.anyOf.some((r) => mine.some((x) => prov(x) === prov(r) || x.includes(r) || r.includes(x))) ? 'pass' : 'fail';
     }
     default: return 'unknown';

@@ -48,7 +48,7 @@ const HINT_DATE = /\d{4}\s*[.\-년]|\d{1,2}\s*[.월]\s*\d{1,2}/;
 /* HTML 기호(&nbsp; 등)를 글자로 — 본문 글자에 `&nbsp;` 가 날것으로 남아 있으면 80자 자르기가 그 한가운데를 잘라
    학생 화면에 `16:00 &n` 이 떴다(2026-10-03 실측 20건 · 고려대·서울과기대). 두 번 싼 것(&amp;nbsp;)도 있어 두 번 푼다. */
 /* 이름 기호는 앱(app.js ENTITIES)이 아는 것 전부 — 관문이 두 목록을 대조한다(리뷰 10-03: &middot;·&lsquo; 가 같은 자리에서 `접&middo` 로 잘렸다) · 숫자 기호(&#183; &#xB7;)는 모두 */
-export const HINT_ENT = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", middot: '·', lsquo: '‘', rsquo: '’', bull: '•', sim: '∼', rarr: '→', rArr: '⇒', ge: '≥', le: '≤' };   // rArr·ge — 앱 ENTITIES 와 같은 목록(2026-10-12)
+export const HINT_ENT = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", middot: '·', lsquo: '‘', rsquo: '’', bull: '•', sim: '∼', rarr: '→', rArr: '⇒', ge: '≥', le: '≤', ldquo: '“', rdquo: '”' };   // rArr·ge — 앱 ENTITIES 와 같은 목록(2026-10-12) · ldquo·rdquo(2026-10-24)
 const unentHint = (s) => s
   .replace(/&([a-z]+);/gi, (m, k) => (HINT_ENT[k.toLowerCase()] ?? m))
   .replace(/&#(\d{1,6});/g, (m, d) => String.fromCodePoint(Number(d) === 160 ? 32 : Number(d)))

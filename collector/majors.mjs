@@ -25,7 +25,7 @@
    ============================================================ */
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
-import { publishMajorsBySchool, missingServed, campusNameSuspects } from './publish-majors.mjs';
+import { publishMajorsBySchool, missingServed, campusNameSuspects, cleanMajorName, cleanMajors } from './publish-majors.mjs';
 import { loadSchoolNames } from './school-names.mjs';
 
 const KEY = process.env.CAREERNET_API_KEY;
@@ -68,6 +68,28 @@ const BRANCH_MAP = {
   '홍익대학교 세종캠퍼스': '홍익대학교 세종캠퍼스',
   '상명대학교 천안캠퍼스': '상명대학교 천안캠퍼스',
 };
+/* ── 이원화 캠퍼스별 학과 목록 (2026-10-24 · 개발자 지시 "학과를 학교에 맞춰 — 한국외대 글로벌캠퍼스 GBT학부") ──
+   커리어넷은 캠퍼스를 **이름이 아니라 번호(제1/제2캠퍼스)** 로 주고, 개설 지역(area · 시·도)을 함께 준다.
+   번호가 어느 캠퍼스인지는 학교마다 다르고 확인한 적이 없어, **지역으로** 가른다 — 두 캠퍼스가 서로 다른 시·도에 있는
+   학교만 적었다(앱 CAMPUSES_BY_SCHOOL 의 캠퍼스 이름과 글자가 같아야 한다 — 발행기가 다른 이름은 버린다).
+   🔴 부산대(밀양·양산이 둘 다 경남)·국립한국교통대(충주·증평이 둘 다 충북)는 지역으로 못 가른다 — 적지 않는다(학교 전체 목록).
+   ⚠️ 실제 area 값이 표와 안 맞아 캠퍼스가 둘이 안 나오면 발행기가 **싣지 않고** 리포트에 남긴다 — 짐작으로 가르지 않는다. */
+const CAMPUS_BY_AREA = {
+  '한국외국어대학교': { '서울': '서울캠퍼스', '경기': '글로벌캠퍼스(용인)' },
+  '경희대학교': { '서울': '서울캠퍼스', '경기': '국제캠퍼스(용인)' },
+  '성균관대학교': { '서울': '인문사회과학캠퍼스(서울)', '경기': '자연과학캠퍼스(수원)' },
+  '중앙대학교': { '서울': '서울캠퍼스', '경기': '다빈치캠퍼스(안성)' },
+  '단국대학교': { '경기': '죽전캠퍼스', '충남': '천안캠퍼스' },
+  '명지대학교': { '서울': '인문캠퍼스(서울)', '경기': '자연캠퍼스(용인)' },
+  '경북대학교': { '대구': '대구캠퍼스', '경북': '상주캠퍼스' },
+};
+/* 시·도 짧은 이름은 parse-requirements 의 `shortRegion` 한 곳 — 판정(거주지·출신)과 같은 규칙(베끼지 않는다) */
+const { shortRegion } = createRequire(import.meta.url)('../parse-requirements.js');
+function campusOf(school, area) {
+  const table = CAMPUS_BY_AREA[school];
+  return table ? (table[shortRegion(area)] || null) : null;
+}
+
 function normalizeSchool(raw) {
   const name = raw.replace(/\s+/g, ' ').trim();
   if (/사이버대|디지털대|원격대|방송통신대.*원|대학원대학/.test(name)) {
@@ -87,6 +109,8 @@ console.log(`학과 목록 ${uniq.length}건 — 상세를 하나씩 받습니�
 if (uniq.length < 100) { console.error('목록이 비정상적으로 적습니다 — 저장하지 않고 종료'); process.exit(1); }
 
 const bySchool = new Map();      // 학교명 → Set(학과명)
+const byCampus = new Map();      // 학교명 → Map(캠퍼스 이름 → Set(학과명)) — CAMPUS_BY_AREA 에 있는 학교만
+const areaSeen = new Map();      // 학교명 → Set(area 원문) — 캠퍼스를 못 가른 학교의 증거(리포트)
 /* 진단용 — (커리어넷 원래 학교 이름, campus_nm) 짝마다 학과 이름들. 분교가 무슨 이름·번호로 오는지 리포트에 남긴다
    (2026-10-05 점검 · 연세 미래 학과 파일이 없는데 커리어넷 이름을 확인하지 못했다 — 짐작해 넣지 않고 증거를 모은다). */
 const byRawCampus = new Map();   // '원래이름\t캠퍼스' → Set(학과명)
@@ -97,10 +121,17 @@ for (const seq of uniq) {
     const xml = await api({ svcCode: 'MAJOR_VIEW', majorSeq: seq });
     // 개설대학 블록: area → schoolURL → campus_nm → majorName → schoolName 순서로 온다(실측)
     // campus_nm 값도 잡는다(진단용) — 학과·학교 짝을 잡는 범위는 옛 정규식과 같다(campus_nm 여는 꼬리표부터 schoolName 까지)
-    const blocks = xml.matchAll(/<campus_nm>([\s\S]*?)<\/campus_nm>[\s\S]*?<majorName>([\s\S]*?)<\/majorName>\s*<schoolName>([\s\S]*?)<\/schoolName>/g);
-    for (const [, campusRaw, majorRaw, schoolRaw] of blocks) {
+    /* 개설대학 묶음(<university>…</university>)을 하나씩 떼어 안의 칸을 따로 읽는다 — area 까지 쓰려면 칸 순서에 기대면 안 된다.
+       그 묶음 꼬리표가 안 보이면(응답 꼴이 바뀌면) 옛 정규식으로 물러난다(area 없이 — 캠퍼스는 못 가르지만 학과는 잃지 않는다). */
+    const tag = (blk, name) => { const m = blk.match(new RegExp(`<${name}>([\\s\\S]*?)</${name}>`)); return m ? m[1] : ''; };
+    const units = [...xml.matchAll(/<university>([\s\S]*?)<\/university>/g)].map((m) => m[1]);
+    const blocks = units.length
+      ? units.map((u) => [null, tag(u, 'campus_nm'), tag(u, 'majorName'), tag(u, 'schoolName'), tag(u, 'area')])
+      : [...xml.matchAll(/<campus_nm>([\s\S]*?)<\/campus_nm>[\s\S]*?<majorName>([\s\S]*?)<\/majorName>\s*<schoolName>([\s\S]*?)<\/schoolName>/g)];
+    for (const [, campusRaw, majorRaw, schoolRaw, areaRaw] of blocks) {
       const school = normalizeSchool(schoolRaw);
-      const major = majorRaw.replace(/\s+/g, ' ').trim();
+      /* 이름 정리는 발행기와 같은 함수 — `&amp;` 를 되돌린다(22개 파일에 그대로 실려 있었다) */
+      const major = cleanMajorName(majorRaw);
       if (major) {
         const k = `${squash(schoolRaw)}\t${squash(campusRaw)}`;
         if (!byRawCampus.has(k)) byRawCampus.set(k, new Set());
@@ -109,6 +140,18 @@ for (const seq of uniq) {
       if (!school || !major) continue;
       if (!bySchool.has(school)) bySchool.set(school, new Set());
       bySchool.get(school).add(major);
+      if (CAMPUS_BY_AREA[school]) {
+        const area = squash(areaRaw || '');
+        if (!areaSeen.has(school)) areaSeen.set(school, new Set());
+        areaSeen.get(school).add(area || '(area 칸 없음)');
+        const cname = campusOf(school, area);
+        if (cname) {
+          if (!byCampus.has(school)) byCampus.set(school, new Map());
+          const cm = byCampus.get(school);
+          if (!cm.has(cname)) cm.set(cname, new Set());
+          cm.get(cname).add(major);
+        }
+      }
     }
   } catch { failed += 1; }
   done += 1;
@@ -136,9 +179,18 @@ const out = {
   bySchool: Object.fromEntries(
     [...bySchool.entries()].filter(([k]) => inApp(k))
       .sort((a, b) => a[0].localeCompare(b[0], 'ko'))
-      .map(([k, v]) => [k, [...v].sort((a, b) => a.localeCompare(b, 'ko'))]),
+      .map(([k, v]) => [k, cleanMajors([...v].sort((a, b) => a.localeCompare(b, 'ko')))]),   // 장부도 발행 파일과 같은 정리(모집단위 제거)
+  ),
+  /* 이원화 캠퍼스별 목록 — 지역(area)으로 가른 것만. 발행기(publishMajorsBySchool)가 앱 캠퍼스 이름과 맞춰 학교 파일에 싣는다 */
+  campuses: Object.fromEntries(
+    [...byCampus.entries()].filter(([k]) => inApp(k))
+      .sort((a, b) => a[0].localeCompare(b[0], 'ko'))
+      .map(([k, cm]) => [k, Object.fromEntries([...cm.entries()].map(([c, set]) => [c, cleanMajors([...set].sort((a, b) => a.localeCompare(b, 'ko')))]))]),
   ),
 };
+/* 캠퍼스를 가르기로 한 학교인데 둘이 안 나온 곳 — area 값이 표와 다른 것이다. 짐작해 고치지 말고 리포트의 원문 값을 보고 표를 고친다 */
+const campusUnsplit = Object.keys(CAMPUS_BY_AREA).filter((k) => inApp(k) && bySchool.has(k) && Object.keys(out.campuses[k] || {}).length < 2)
+  .map((k) => `${k} — area 값: ${[...(areaSeen.get(k) || [])].join(' · ') || '(없음)'} · 가른 캠퍼스: ${Object.keys(out.campuses[k] || {}).join(' · ') || '없음'}`);
 
 /* ── 실행 진단 (2026-10-05 점검 · 리포트 + ::warning — 관문이 아니다) ── */
 const ME = createRequire(import.meta.url)('../match-engine.js');
@@ -164,6 +216,9 @@ const writeReport = (missing, skipped, verdict) => {
     '## 앱 이름으로 못 맞춰 건너뛴 이름',
     ...(skipped && skipped.length ? skipped.map((s) => `- ${s}`) : ['- 없음']),
     '',
+    '## 이원화 캠퍼스를 지역으로 못 가른 학교 (CAMPUS_BY_AREA 표와 area 값이 다르다 — 원문 값을 보고 표를 고친다)',
+    ...(campusUnsplit.length ? campusUnsplit.map((s) => `- ${s}`) : ['- 없음']),
+    '',
   ].join('\n');
   fs.writeFileSync(new URL('majors-report.md', HERE), md);
 };
@@ -181,7 +236,12 @@ if (appSchools < MIN_APP_SCHOOLS) {
 fs.writeFileSync(OUT_PATH, JSON.stringify(out, null, 1) + '\n');
 /* 🔴 **앱이 받는 것은 이쪽이다** — 이 줄을 빼면 앱은 새 학과를 영영 못 본다(그리고 조용하다:
    파일이 없으면 전국 공통 목록으로 물러나므로 화면상 아무 일도 안 일어난 것처럼 보인다). */
-const pub = publishMajorsBySchool(out.bySchool, { updatedAt: out.updatedAt });
+const pub = publishMajorsBySchool(
+  Object.fromEntries(Object.entries(out.bySchool).map(([k, majors]) => [k, { majors, campuses: out.campuses[k] || null }])),
+  { updatedAt: out.updatedAt },
+);
+for (const c of pub.campusSkipped) console.log(`::warning::캠퍼스 이름이 앱 칩(CAMPUSES_BY_SCHOOL)과 달라 싣지 않음 — ${c}`);
+for (const u of campusUnsplit) console.log(`::warning::이원화 캠퍼스를 지역으로 못 가름 — ${u}`);
 const majors = Object.values(out.bySchool).reduce((a, v) => a + v.length, 0);
 console.log(`저장 완료: 학교 ${bySchool.size}곳 · 학과 항목 ${majors}건 · 상세 실패 ${failed}건`);
 console.log(`  → data/majors.json (사람용) · data/majors/ 학교별 ${pub.schools}개 파일 (앱이 받는 것)`);

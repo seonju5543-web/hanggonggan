@@ -3096,7 +3096,7 @@ console.log('\n■ 병합 충돌 표식이 파일에 남지 않는다 (2026-09-1
      🔴 이 관문은 **앱이 싣는 파일 전부**를 본다 — 한 파일만 보면 다음엔 옆 파일에서 난다. */
   const files = ['style.css', 'app.js', 'index.html', 'sw.js', 'data.js', 'match-engine.js',
     'boot.js', 'resume.js', 'notify.js', 'notify-rules.js', 'chat.js', 'forms.js',
-    'parse-amount.js', 'section-head.js', 'interactions.js', 'elig-ask.js',
+    'parse-amount.js', 'section-head.js', 'interactions.js', 'elig-ask.js', 'major-track.js',
     'form-plan.js', 'essay.js', 'essay-quality.js', 'essay-submit-check.js',
     '_admin/admin.css', '_admin/admin.js'];
   /* ⚠️ 줄 **처음**에 온 것만 본다 — 본문·주석에 `=======` 같은 구분선을 긋는 파일이 있다
@@ -13045,6 +13045,123 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
       rows2(['지원자격 : 2026-1 학기 학부 재학생', '매일 09:00~18:00 접수', '안내 글자가 길어서 이어지는', 'A. 첫째 항목입니다.']), ['매일 09:00~18:00 접수', 'A. 첫째 항목입니다.']);
     eq('  모집 안내 — 자격 줄이 있으면 「대상」 발췌를 다시 적지 않는다(코드 자리)', /x\.label !== '혜택' && !\(x\.label === '대상' && \(n\.eligibilityLines \|\| \[\]\)\.length\)/.test(appSrc), true);
   }
+}
+
+console.log('\n■ 학적정보 테일러링 (2026-10-24 개발자 지시 1~4 · 설계 docs/designs/academic-info-tailoring.md)');
+{
+  /* 지시 ① 계열·② 학과를 학교에 맞춰 — 학과 이름 → 계열 분류(major-track.js 한 곳) · 로봇 파일 정리(publish-majors)
+     지시 ③ 처음 묻는 학적정보는 장학금만 + 적합도 높이기 클릭 질문(ONBOARD_TRAITS · 출신 지역)
+     지시 ④ 대외활동 탭은 관심을 적어야 열린다(activityGateDone). 화면 동작은 verify-academic-info.js · verify-activities.js ⑦ 가 브라우저로 잰다. */
+  const MT = createRequire(import.meta.url)('../major-track.js');
+  const EA = createRequire(import.meta.url)('../elig-ask.js');
+  const PRq = createRequire(import.meta.url)('../parse-requirements.js');
+  const MEq = createRequire(import.meta.url)('../match-engine.js');
+  const { cleanMajors, cleanMajorName, publishMajorsBySchool } = await import('../collector/publish-majors.mjs');
+  const { loadCampuses, loadSchoolNames } = await import('../collector/school-names.mjs');
+  const dataSrc = readText(new URL('../data.js', import.meta.url));
+  const trackIds = [...(dataSrc.slice(dataSrc.indexOf('const TRACKS = ['), dataSrc.indexOf('];', dataSrc.indexOf('const TRACKS = ['))).matchAll(/id:\s*'(\w+)'/g))].map((m) => m[1]);
+  eq('data.js TRACKS 를 실제로 읽었다', trackIds.length, 8);
+
+  /* ① 분류기 — 확실한 것만 · 모르면 null (틀린 계열은 문↔이 먼 묶음에서 틀린 미달이 된다) */
+  const cases = [
+    ['Global Business & Technology학부', 'business'], ['수학과', 'science'], ['영어교육과', 'education'], ['간호학과', 'medical'],
+    ['컴퓨터공학부', 'engineering'], ['정치외교학과', 'social'], ['스페인어통번역학과', 'humanities'], ['디자인학부', 'arts'],
+    /* 함정 — 글자가 겹치는 이름 */
+    ['영미문학.문화학과', 'humanities'],   // `문화학` 안의 '화학' 은 화학이 아니다
+    ['자유전공학부', null],               // `전공학부` 의 '공학' 은 공학이 아니다 · 자유전공은 모른다
+    ['Language & AI융합학부', 'humanities'], ['Finance & AI융합학부', 'business'], ['AI데이터융합학부', 'engineering'],
+    ['전자상거래학과', 'business'], ['항공서비스학과', null], ['건축학과', 'engineering'], ['바이오메디컬공학부', 'engineering'],
+    ['경영학부(글로벌경영학)', 'business'], ['의예과(자연계열)', 'medical'], ['교양학부', null], ['디지털콘텐츠학부', null], ['', null],
+  ];
+  for (const [name, want] of cases) eq(`  학과 → 계열: ${name || '(빈 이름)'} → ${want}`, MT.trackOfMajor(name), want);
+  eq('  분류기가 내는 계열은 전부 data.js TRACKS 에 있다', MT.MAJOR_TRACK_RULES.map(([id]) => id).filter((id) => !trackIds.includes(id)), []);
+  eq('  목록 → 계열은 많은 순 (못 가른 것은 안 센다)', MT.tracksOfMajors(['수학과', '물리학과', '경영학부', '교양학부']), [{ id: 'science', n: 2 }, { id: 'business', n: 1 }]);
+  eq('  하나도 못 가르면 빈 배열(앱은 여덟 개 전부로 물러난다)', MT.tracksOfMajors(['교양학부']), []);
+
+  /* ② 로봇 파일 정리 — `&amp;` 되돌림 · 모집단위 제거 · 캠퍼스별 목록 */
+  eq('  `&amp;` 를 되돌린다 (두 번 인코딩도)', [cleanMajorName('Global Business &amp; Technology학부'), cleanMajorName('A &amp;amp; B')], ['Global Business & Technology학부', 'A & B']);
+  eq('  모집단위([통합모집]·기타모집단위)는 학과가 아니다 · 같은 이름은 하나로 · 계열모집은 남긴다',
+    cleanMajors(['경상대학[통합모집]', '기타모집단위(글로벌)', '공과계열', '수학과', '수학과 ', '']), ['공과계열', '수학과']);
+  {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'majors-camp-')) + path.sep;
+    const dir = new URL('file://' + tmp);
+    publishMajorsBySchool({
+      '한국외국어대학교': { majors: ['영어학과', 'Global Business &amp; Technology학부', '수학과'],
+        campuses: { '서울캠퍼스': ['영어학과'], '글로벌캠퍼스(용인)': ['Global Business &amp; Technology학부', '수학과'], '없는캠퍼스': ['영어학과'] } },
+      '경희대학교': { majors: ['수학과'], campuses: { '서울캠퍼스': ['수학과'] } },     // 하나뿐이면 싣지 않는다
+      '서울대학교': ['수학과'],                                                          // 옛 꼴(배열)도 그대로
+    }, { dir, updatedAt: '2026-10-24' });
+    const read = (k) => JSON.parse(readText(path.join(tmp, MEq.majorsFileFor(k).split('/').pop())));
+    eq('  캠퍼스별 목록은 앱 캠퍼스 이름만 · 되돌린 이름으로 · 전체 목록에 있는 것만', read('한국외국어대학교').campuses,
+      { '서울캠퍼스': ['영어학과'], '글로벌캠퍼스(용인)': ['Global Business & Technology학부', '수학과'] });
+    eq('  캠퍼스가 하나뿐이면 campuses 를 싣지 않는다', 'campuses' in read('경희대학교'), false);
+    eq('  옛 꼴(배열)도 그대로 발행된다', read('서울대학교').majors, ['수학과']);
+  }
+  /* 로봇의 지역→캠퍼스 표는 앱 캠퍼스 이름과 글자가 같아야 한다(다르면 발행기가 버려 조용히 학교 전체 목록이 된다) */
+  {
+    const camp = loadCampuses(new URL('../data.js', import.meta.url));
+    const { unis } = loadSchoolNames(new URL('../data.js', import.meta.url));
+    const robot = readText(new URL('../collector/majors.mjs', import.meta.url));
+    const block = robot.slice(robot.indexOf('const CAMPUS_BY_AREA = {'), robot.indexOf('\n};', robot.indexOf('const CAMPUS_BY_AREA = {')));
+    const rows = [...block.matchAll(/'([^']+)':\s*\{([^}]*)\}/g)].map((m) => [m[1], [...m[2].matchAll(/:\s*'([^']+)'/g)].map((x) => x[1])]);
+    eq('  로봇 CAMPUS_BY_AREA 를 실제로 읽었다', rows.length >= 5, true);
+    eq('  🔴 표의 학교는 전부 앱 학교 · 캠퍼스 이름은 전부 그 학교의 CAMPUSES_BY_SCHOOL 칩과 같다',
+      rows.filter(([s, cs]) => !unis.has(s) || cs.some((c) => !(camp.get(s) || []).includes(c))).map(([s]) => s), []);
+    eq('  지역으로 못 가르는 학교(부산대 밀양·양산 둘 다 경남 · 교통대 충주·증평 둘 다 충북)는 표에 없다', rows.map(([s]) => s).filter((s) => /부산대학교|국립한국교통대학교/.test(s)), []);
+    eq('  로봇이 캠퍼스별 목록을 발행기에 넘긴다', /campuses:\s*out\.campuses\[k\]/.test(robot), true);
+  }
+  eq('  data.js 에 손으로 적은 학과 목록이 없다 (외대 손목록이 로봇 파일을 가려 GBT학부가 안 떴다)', /const MAJORS_BY_SCHOOL = \{\};/.test(dataSrc), true);
+  /* ⚠️ 발행된 외대 파일에 GBT학부가 실제로 있는가는 **실데이터**라 여기(수집 로봇이 같이 쓰는 관문)에 두지 않는다 — verify-academic-info.js ② 가 브라우저로 잰다 */
+
+  /* 앱 배선 — 글자로 */
+  const app = readText(new URL('../app.js', import.meta.url)).replace(/\/\*[\s\S]*?\*\//g, '');
+  const html = readText(new URL('../index.html', import.meta.url));
+  const sw = readText(new URL('../sw.js', import.meta.url));
+  eq('  index.html 이 major-track.js 를 app.js 보다 먼저 싣는다', html.indexOf('src="major-track.js"') > 0 && html.indexOf('src="major-track.js"') < html.indexOf('src="app.js"'), true);
+  eq('  서비스워커가 major-track.js 를 미리 담는다', /'major-track\.js'/.test(sw), true);
+  eq('  계열 칩은 학교 학과 목록으로 그린다 (tracksOfMajors · majorPool · 목록마다 한 번만 센다)', /function presentTracks[\s\S]{0,300}tracksOfMajors\(pool\)/.test(app) && /function renderTrackChips[\s\S]{0,800}presentTracks\(pool\)/.test(app) && /function majorPool/.test(app), true);
+  eq('  학과 자동추천이 majorPool 을 쓴다 (캠퍼스별 목록 → 학교 → 전국 공통)', /function majorSuggestions[\s\S]{0,900}majorPool\(school, campus\)/.test(app), true);
+  eq('  학과를 고르면 계열이 따라온다 (change → syncTrackFromMajor)', /#in-major'\)\.addEventListener\('change', syncTrackFromMajor\)/.test(app), true);
+  eq('  낯선 계열 id 로 칩을 그리다 넘어지지 않는다 (TRACKS 에 있는 것만 지킨다)', /function renderTrackChips[\s\S]{0,500}TRACKS\.some\(\(t\) => t\.id === raw\)/.test(app), true);
+  eq('  처음 가입은 계열을 미리 켜지 않는다 (틀린 ✕ 의 씨앗)', /renderTrackChips\(p \? p\.track : null\)/.test(app) && !/setChip\('#in-track', 'humanities'\)/.test(app), true);
+  eq('  관문 칸은 한 번 그린 뒤 데이터가 다시 와도 지우지 않는다', /if \(!actGateDrawn\) \{ renderActivityGate\(\); actGateDrawn = true; \}/.test(app), true);
+  const robotSrc2 = readText(new URL('../collector/majors.mjs', import.meta.url));
+  const pubSrc = readText(new URL('../collector/publish-majors.mjs', import.meta.url));
+  eq('  로봇 장부(data/majors.json)도 발행 파일과 같은 정리를 거친다 (cleanMajors)', (robotSrc2.match(/cleanMajors\(/g) || []).length >= 2, true);
+  eq('  엔티티 표는 clean-title 의 decodeEntities 한 곳 · 시·도 짧은 이름은 parse-requirements 의 shortRegion 한 곳',
+    /decodeEntities\(/.test(pubSrc) && !/const ENTITY = /.test(pubSrc) && /shortRegion/.test(robotSrc2) && /PR\.shortRegion/.test(readText(new URL('../match-engine.js', import.meta.url))), true);
+  eq('  (shortRegion 이 실제로 한 규칙이다)', ['서울특별시', '경기도', '충청남도', '강원특별자치도', '전북특별자치도'].map(PRq.shortRegion), ['서울', '경기', '충남', '강원', '전북']);
+
+  /* ③ 적합도 높이기 — 묻는 처지는 TRAIT_LABEL·TRAIT_PAT 에 있어야 한다 · 온보딩에 관심 칸이 없다 */
+  const patKeys = PRq.TRAIT_PAT.map((r) => r[0]);
+  eq('  ONBOARD_TRAITS 가 있고 TRAIT_LABEL·TRAIT_PAT 에 전부 있다', EA.ONBOARD_TRAITS.length >= 5 && EA.ONBOARD_TRAITS.filter((k) => !EA.TRAIT_LABEL[k] || !patKeys.includes(k)), true && []);
+  const onb = html.slice(html.indexOf('<section id="screen-onboarding"'), html.indexOf('</section>', html.indexOf('<section id="screen-onboarding"')));
+  eq('  온보딩에 관심 대외활동 칸이 없다 (장학금만 · 지시 3)', /in-act-kinds|in-act-fields/.test(onb), false);
+  eq('  온보딩 5단계에 처지 알약 그릇과 출신 고교 지역 칸이 있다', /id="in-traits"/.test(onb) && /id="in-origin-region"/.test(onb) && /id="in-origin-city"/.test(onb), true);
+  eq('  5단계 질문 목록은 빈 그릇이다 (ONBOARD_TRAITS 로 그린다 — 두 벌 금지)', /id="in-traits"><\/div>/.test(onb) && /function renderOnboardTraits[\s\S]{0,300}ONBOARD_TRAITS/.test(app), true);
+  eq('  저장은 누른 처지만 · 안 누른 것은 지운다(undefined) — collectProfile 이 onboardTraitAnswers 를 얹는다', /traits:\s*Object\.assign\(\{\},\s*\(state\.profile && state\.profile\.traits\) \|\| \{\},\s*onboardTraitAnswers\(\)\)/.test(app), true);
+  eq('  출신 고교 지역이 프로필 칸이다', /originRegion:\s*\$\('#in-origin-region'\)\.value \|\| null/.test(app) && /originCity:/.test(app), true);
+  eq('  자격 묻기(elig-ask)도 출신 지역 칸을 안다 (FIELD_META·FIELD_PROBE)', ['originRegion', 'originCity'].filter((k) => !EA.FIELD_META[k] || !EA.FIELD_PROBE[k]), []);
+  /* 엔진 — 출신 줄은 맞으면 ✓ · 아니면 모름 · 절대 ✕ 아님 */
+  {
+    const c = PRq.parseLine('울산시 소재 고등학교 졸업자').conds.find((x) => x.kind === 'residence' && x.about === 'origin');
+    eq('  (검사가 헛돌지 않는다 — 출신 줄을 origin 으로 읽는다)', !!c, true);
+    eq('  출신 시·도가 맞으면 ✓', MEq.judgeCond(c, { originRegion: '울산' }), 'pass');
+    eq('  시·군으로도 ✓ (울산 소재 → 출신 시·군 울산)', MEq.judgeCond(c, { originCity: '울산' }), 'pass');
+    eq('  🔴 다르면 ✕ 가 아니라 모름 (출신 줄은 예외가 많다)', MEq.judgeCond(c, { originRegion: '서울', originCity: '종로구' }), 'unknown');
+    eq('  안 적었으면 모름', MEq.judgeCond(c, {}), 'unknown');
+    eq('  제외 줄이면 모름', MEq.judgeCond({ ...c, exclude: true }, { originRegion: '울산' }), 'unknown');
+    eq('  거주지 줄은 그대로 (출신 칸이 거주지 판정에 끼지 않는다)', MEq.judgeCond(PRq.parseLine('울산시에 주소를 둔 학생').conds.find((x) => x.kind === 'residence'), { originRegion: '울산', region: '서울', regionCity: '종로구' }) === 'pass', false);
+  }
+
+  /* ④ 대외활동 관문 — 관심이 없으면 탭·홈 추천이 닫힌다 · 학적정보 수정이 관심을 안 지운다 */
+  eq('  관문 판정은 activityGateDone 한 곳 · 탭(renderActivities)과 홈(homeActivitiesHtml)이 같이 본다',
+    (app.match(/activityGateDone\(/g) || []).length >= 3 && /function renderActivities[\s\S]{0,400}activityGateDone\(p\)/.test(app) && /function homeActivitiesHtml[\s\S]{0,400}activityGateDone\(p\)/.test(app), true);
+  eq('  관심 칸(in-act-kinds·in-act-fields)은 대외활동 화면 안에 있다', /id="activities-gate"[\s\S]{0,1500}id="in-act-kinds"[\s\S]{0,800}id="in-act-fields"/.test(html), true);
+  eq('  종류 없이 저장하면 막는다', /function saveActivityGate[\s\S]{0,200}if \(!kinds\.length\)/.test(app), true);
+  eq('  🔴 학적정보 수정이 관심을 물려받는다 (안 그러면 저장 한 번에 관문이 다시 뜬다)', /interestKinds:\s*\(state\.profile && state\.profile\.interestKinds\) \|\| null/.test(app), true);
+  const wf = readText(new URL('../.github/workflows/verify-ui.yml', import.meta.url));
+  eq('  브라우저 드라이버가 워크플로 목록에 있다', /verify-academic-info\.js/.test(wf) && fs.existsSync(new URL('../verify/verify-academic-info.js', import.meta.url)), true);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

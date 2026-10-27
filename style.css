@@ -351,6 +351,17 @@ a.btn { text-decoration: none; }
   color: var(--primary);
   box-shadow: var(--ring);
 }
+/* 계열 칩 「+n」·「접기」 (2026-10-24 · 학교에 있는 계열만 보이고 나머지는 접는다 — app.js renderTrackChips).
+   .chip 이 아니다 — 칩 그룹 공용 배선이 값으로 삼으면 안 된다. 생김새는 대외활동 분야 칩의 「+n」과 같은 점선. */
+.chip-more {
+  padding: var(--space-8) var(--space-12);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  border: 2px dashed rgba(18, 22, 31, 0.18);
+  font-size: var(--t-md);
+  font-weight: 600;
+  color: var(--accent);
+}
 
 /* 🔴 특별자격은 두 덩어리(#in-flags · #in-extra)로 나뉘어 있어 **그 경계만** 벌어져 있었다
    (칸 사이는 gap 10px인데 덩어리 사이는 margin-bottom 20px — 2026-08-26 개발자 지적).
@@ -2383,7 +2394,7 @@ body::after {
 
 /* ── ③ 상호작용 ── 진단: 2,032줄에 :hover 9개 · :active 9개 · focus-visible 1개.
    누를 수 있는 것 전부에 hover·press·focus 를 준다. 접근성은 선택이 아니다. */
-.btn, .chip, .filter-chip, .icon-btn, .nav-item, .my-menu-item, .wallet-btn,
+.btn, .chip, .chip-more, .filter-chip, .icon-btn, .nav-item, .my-menu-item, .wallet-btn,
 .sch-card, .link-btn, .sort-btn, .btn-ghost, .auth-social-btn, .dock-item {
   transition: background var(--dur) var(--ease), color var(--dur) var(--ease),
               border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
@@ -4914,6 +4925,15 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
    줄바꿈하면 가로 스크롤 상자가 아니므로 위 세로 넘침 문제도 생기지 않는다(overflow 를 되돌린다). */
 #activities-field-filters { flex-wrap: wrap; row-gap: var(--space-8); overflow: visible; }
 #activities-field-filters .field-more { color: var(--accent); border-style: dashed; }
+/* 관심 관문 (2026-10-24 · 지시 4) — 온보딩 단계와 같은 결(제목 · 한 줄 설명 · 체크 목록 · 주 버튼) */
+.act-gate { padding: var(--space-8) 0 var(--space-24); }
+.act-gate h3 { font-size: var(--t-xl); font-weight: 700; line-height: 1.35; margin: 0 0 var(--space-8); }
+.act-gate-sub { font-size: var(--t-sm); color: var(--text-sub); margin: 0 0 var(--space-20); line-height: 1.5; }
+.act-gate .field-label { display: block; margin-bottom: var(--space-8); }
+.act-gate-actions { display: flex; gap: var(--space-8); margin-top: var(--space-16); }
+.act-gate-actions .btn-primary { flex: 1; }
+.act-gate-bar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); margin: 0 0 var(--space-12); font-size: var(--t-sm); color: var(--text-sub); }
+.act-gate-cta { width: 100%; }
 #activities-filters:has(+ #activities-field-filters:not([hidden])) { margin-bottom: 0; }
 #activities-field-filters .filter-chip { position: relative; }
 #activities-field-filters .filter-chip::after {
@@ -4945,6 +4965,10 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
   color: var(--accent); font-weight: 600;
 }
 .elig-yn:active { transform: scale(0.95); }
+/* 온보딩 「적합도 높이기」(2026-10-24) — 같은 알약이지만 공고 시트가 아니라 온보딩 칸이라 조금 크게 */
+#in-traits .elig-ask-row > span:first-child { font-size: var(--t-md); color: var(--text); }
+#in-traits .elig-yn { font-size: var(--t-sm); padding: var(--space-8) var(--space-20); }
+#in-traits { margin-bottom: var(--space-24); }
 
 /* ══ 시작 화면 — 정문 투어링 (2026-09-18 개발자 결정 · 노션 UI-3) ═══════════════════
    승인받은 화면은 컷 A(tools/gate-reel/reel.html 이 그린 390×844)다: 사진이 화면을 다 덮고,

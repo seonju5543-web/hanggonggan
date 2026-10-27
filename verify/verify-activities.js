@@ -58,10 +58,11 @@ const PROFILE = {
   school: '한국외국어대학교', campus: '', track: 'humanities', major: '',
   year: 3, status: '재학', gpa: 3.5, bracket: 5, flags: [], nationality: 'korean',
   birthYear: new Date().getFullYear() - 23, region: '서울', regionCity: '동대문구',   // 나이·지역 — 활동 글 자격 판정(2026-10-01)
+  interestKinds: ['대외활동', '공모전'],   // 관심 관문(2026-10-24 지시 4)을 지난 학생 — 안 고른 학생은 아래 ⑦ 이 따로 잰다
   onboarded: true, common: { studentId: '', birth: '', phone: '', email: '', bank: '', account: '' },
 };
 
-async function fresh(browser, mode, ext = EXT_FIXTURE) {
+async function fresh(browser, mode, ext = EXT_FIXTURE, profile = PROFILE) {
   /* 🔴 서비스워커를 막는다 — 새로고침 뒤에는 워커가 data/*.json 을 받아 오므로 page.route 의 가짜
      응답이 **닿지 않는다**(실측: 픽스처 대신 저장소의 빈 파일이 왔다). 이 검사는 탭의 규칙을 재는
      것이지 워커를 재는 것이 아니다(워커는 verify-resume 등이 잰다). 프로필은 초기 스크립트로
@@ -69,7 +70,7 @@ async function fresh(browser, mode, ext = EXT_FIXTURE) {
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, serviceWorkers: 'block' });
   await ctx.addInitScript((p) => {
     if (!localStorage.getItem('handaejang.v1')) localStorage.setItem('handaejang.v1', JSON.stringify({ profile: p, applications: [], docs: {}, notify: {} }));
-  }, PROFILE);
+  }, profile);
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -359,6 +360,43 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
     await page.waitForTimeout(400);
     eq('⑤ 홈 — 재단 글을 못 받아 왔으면 구역이 비어 있다 (뼈대·빈 문구 없음)', await page.$eval('#external-notices', (e) => e.innerHTML.trim()), '');
     eq('⑤ 페이지 오류 없음', errors, []);
+    await page.context().close();
+  }
+
+  /* ⑦ 관심 관문 (2026-10-24 개발자 지시 4) — 관심 종류를 안 고른 학생은 탭·홈 추천이 닫혀 있고, 고르면 열린다 */
+  {
+    const { page, errors } = await fresh(browser, 'ok', EXT_FIXTURE, { ...PROFILE, interestKinds: null, interestFields: null });
+    eq('⑦ 홈 — 관문 전에는 추천 목록 대신 관문으로 가는 단추', await page.evaluate(() => [!!document.querySelector('#home-activity-list'), !!document.querySelector('.act-gate-cta[data-go="activities"]')]), [false, true]);
+    await page.click('.act-gate-cta');
+    await page.waitForTimeout(400);
+    eq('⑦ 단추가 대외활동 탭을 연다', await page.isVisible('#screen-activities'), true);
+    eq('⑦ 탭은 관문만 보이고 목록·칩·검색은 닫혀 있다', await page.evaluate(() => [
+      !document.querySelector('#activities-gate').hidden, document.querySelector('#activities-list').hidden,
+      document.querySelector('#activities-filters').hidden, document.querySelector('#screen-activities .search-box').hidden]), [true, true, true, true]);
+    eq('⑦ 분야 칸은 데이터의 분야로 채워진다 (빈 그릇)', await page.$$eval('#in-act-fields input', (e) => e.length > 0), true);
+    await page.click('#act-gate-save');
+    await page.waitForTimeout(200);
+    eq('⑦ 종류 없이 저장하면 관문이 그대로다', await page.evaluate(() => !document.querySelector('#activities-gate').hidden && !state.profile.interestKinds), true);
+    await page.check('#in-act-kinds input[value="대외활동"]');
+    await page.click('#act-gate-save');
+    await page.waitForTimeout(400);
+    eq('⑦ 종류를 고르고 저장하면 목록이 열리고 프로필에 남는다', await page.evaluate(() => [
+      document.querySelector('#activities-gate').hidden, !document.querySelector('#activities-list').hidden,
+      JSON.parse(localStorage.getItem('handaejang.v1')).profile.interestKinds]), [true, true, ['대외활동']]);
+    eq('⑦ 목록은 관문 전과 같은 글들', (await cards(page)).length, 3);
+    eq('⑦ 지난 뒤에는 고른 관심 한 줄 + 바꾸기', await page.$eval('#act-gate-summary', (e) => e.textContent.trim()), '관심 대외활동');
+    await page.click('#act-gate-edit');
+    await page.waitForTimeout(200);
+    eq('⑦ 바꾸기는 관문을 다시 열되 취소가 있다(고른 것은 켜진 채)', await page.evaluate(() => [
+      !document.querySelector('#activities-gate').hidden, !document.querySelector('#act-gate-cancel').hidden,
+      document.querySelector('#in-act-kinds input[value="대외활동"]').checked]), [true, true, true]);
+    await page.click('#act-gate-cancel');
+    await page.waitForTimeout(200);
+    eq('⑦ 취소하면 목록으로 돌아온다', await page.evaluate(() => document.querySelector('#activities-gate').hidden && !document.querySelector('#activities-list').hidden), true);
+    await page.click('.nav-item[data-nav="home"]');
+    await page.waitForTimeout(400);
+    eq('⑦ 홈 추천이 열렸다', await page.evaluate(() => !!document.querySelector('#home-activity-list') && !document.querySelector('.act-gate-cta')), true);
+    eq('⑦ 페이지 오류 없음', errors, []);
     await page.context().close();
   }
 

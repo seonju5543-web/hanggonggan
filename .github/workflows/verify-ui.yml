@@ -200,7 +200,7 @@ jobs:
                    verify-admin.js verify-settings.js verify-admin-shape.js \
                    verify-elig-ask.js \
                    verify-apply-prep.js verify-activities.js verify-news.js \
-                   verify-region-city.js; do
+                   verify-region-city.js verify-academic-info.js; do
             left=$((end - SECONDS))
             if [ "$left" -le 0 ]; then unrun="$unrun $f"; continue; fi
             if [ "$left" -gt 300 ]; then left=300; fi

@@ -646,7 +646,7 @@ function esc(s) {
    **데이터에 나오는 기호를 전부 아는지** 세므로, 새 기호가 들어오면 그때 빨간불이 된다.
    2026-09-30 에 여덟 개를 더했다 — 44개교 복원으로 들어온 게시판들이 `&lsquo;`·`&#40;` 등을
    담아 왔다(관문이 잡았다). 숫자 기호도 **보이는 글자인 것만** 이름을 대고 넣는다(위 🔴 그대로). */
-const ENTITIES = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", '#39': "'", '#160': ' ', middot: '·', '#038': '&', '#039': "'", '#40': '(', '#41': ')', lsquo: '‘', rsquo: '’', bull: '•', sim: '∼', rarr: '→', rArr: '⇒', ge: '≥', le: '≤' };   // rArr·ge — 수집 글에 나온 겹화살표·부등호(2026-10-12 ui-tone)
+const ENTITIES = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", '#39': "'", '#160': ' ', middot: '·', '#038': '&', '#039': "'", '#40': '(', '#41': ')', lsquo: '‘', rsquo: '’', bull: '•', sim: '∼', rarr: '→', rArr: '⇒', ge: '≥', le: '≤', ldquo: '“', rdquo: '”' };   // rArr·ge — 수집 글에 나온 겹화살표·부등호(2026-10-12 ui-tone) · ldquo·rdquo — 큰따옴표(2026-10-24 ui-tone)
 /* 🔴 **목록을 두 벌 두지 않는다** (2026-09-13). 예전에는 정규식에 이름이 한 벌 더 박혀 있어서,
    ENTITIES 에 `middot` 를 더해도 정규식이 그걸 몰라 **아무 일도 안 일어났다**(실측).
    이 저장소가 여러 번 데인 자리다 — 목록에서 정규식을 만든다. */
@@ -1080,6 +1080,15 @@ function schoolSuggestions(q) {
   return Array.from(set).sort((a, b) => (b.startsWith(n) ? 1 : 0) - (a.startsWith(n) ? 1 : 0));
 }
 
+/* 학과 자동추천의 **바탕 목록** (2026-10-24 · 개발자 지시 "학과를 학교에 맞춰").
+   학교별 파일이 캠퍼스별 목록(`campuses` · majors.mjs CAMPUS_BY_AREA)을 가지면 **고른 캠퍼스의 목록**,
+   없으면 학교 전체 목록, 그것도 없으면 전국 공통 목록(원래 있던 폴백). 손으로 적은 목록은 없다(data.js 주석). */
+function majorPool(school, campus) {
+  const file = MAJOR_FILES[school];
+  if (file && campus && file.campuses && Array.isArray(file.campuses[campus]) && file.campuses[campus].length) return file.campuses[campus];
+  return MAJORS_BY_SCHOOL[school] || null;
+}
+
 function majorSuggestions(q) {
   const n = q.replace(/\s/g, '');
   if (!n) return [];
@@ -1095,9 +1104,60 @@ function majorSuggestions(q) {
      예전엔 전국 공통 목록을 뒤에 붙여서, 외대에서 '일'을 치면 학교에 없는
      '일어일문학과'가 같이 떴다(2026-08-02 개발자 지적 — 경희대 사례).
      캠퍼스별로 학과가 다른 학교는 '학교 캠퍼스' 열쇠를 먼저 본다. */
-  const own = MAJORS_BY_SCHOOL[`${school} ${campus}`] || MAJORS_BY_SCHOOL[school];
+  const own = majorPool(school, campus);
   const pool = own || MAJORS_COMMON;   // 확보 못 한 학교는 전국 공통 목록을 힌트로
-  return pool.filter((m) => m.replace(/\s/g, '').includes(n));
+  const hits = pool.filter((m) => m.replace(/\s/g, '').toLowerCase().includes(n.toLowerCase()));
+  /* 고른 계열의 학과를 **먼저** 보인다(빼지는 않는다 — 계열을 잘못 눌렀을 수 있다). 분류는 major-track.js 한 곳 */
+  const track = getChip('#in-track');
+  if (!track || typeof trackOfMajor !== 'function') return hits;
+  const rank = (m) => (trackOfMajor(m) === track ? 0 : 1);
+  return hits.map((m, i) => [m, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]).map((x) => x[0]);
+}
+
+/* ── 전공 계열 칩을 **그 학교(캠퍼스)에 있는 계열만, 많은 순으로** 그린다 (2026-10-24 · 개발자 지시) ──
+   학과 목록(majorPool)을 major-track.js 로 갈라 센다. 목록이 아직 안 왔거나 하나도 못 가르면 여덟 개 전부(원래 모양).
+   🔴 없는 계열을 **아주 감추지는 않는다** — 분류가 못 가른 학과(디지털콘텐츠·융합인재…)의 학생은 제 계열을 직접 눌러야
+      하므로 나머지는 「+n」 뒤에 둔다(대외활동 분야 칩과 같은 접기). 고른 계열은 접혀 있어도 늘 보인다.
+   🔴 다시 그려도 고른 것은 지킨다 — 파일이 늦게 도착해 다시 그릴 때 학생이 누른 칩이 날아가면 안 된다. */
+let trackChipsOpen = false;
+const trackCountCache = new WeakMap();   // 학과 목록(배열) → 계열 순서 — 학교 칸 글자마다 300개를 다시 가르지 않는다(코드 리뷰)
+function presentTracks(pool) {
+  if (!pool || typeof tracksOfMajors !== 'function') return [];
+  if (!trackCountCache.has(pool)) trackCountCache.set(pool, tracksOfMajors(pool).map((t) => t.id).filter((id) => TRACKS.some((t) => t.id === id)));
+  return trackCountCache.get(pool);
+}
+function renderTrackChips(selected) {
+  const box = $('#in-track');
+  if (!box) return;
+  /* 아는 계열 id 만 지킨다 — 옛 프로필·서버 사본의 낯선 값이면 아무 칩도 안 켠 채(코드 리뷰: 모르는 id 로 넘어지면 초기화가 중간에 멈춘다) */
+  const raw = selected !== undefined ? selected : getChip('#in-track');
+  const keep = raw && TRACKS.some((t) => t.id === raw) ? raw : null;
+  const school = $('#in-school').value.trim();
+  const pool = majorPool(school, getChip('#in-campus'));
+  const present = presentTracks(pool);
+  const rest = TRACKS.map((t) => t.id).filter((id) => !present.includes(id));
+  let shown = present.length && !trackChipsOpen ? present.slice() : TRACKS.map((t) => t.id);
+  if (keep && !shown.includes(keep)) shown.push(keep);
+  const hidden = TRACKS.length - shown.length;
+  /* 같은 모양이면 다시 그리지 않는다 — 학교 칸은 글자마다 부르므로(초점·누름 상태가 날아간다) */
+  const sig = `${shown.join(',')}|${keep || ''}|${trackChipsOpen ? 1 : 0}|${hidden}`;
+  if (box.dataset.sig === sig) return;
+  box.dataset.sig = sig;
+  box.innerHTML = shown.map((id) => {
+    const t = TRACKS.find((x) => x.id === id);
+    return `<button class="chip${id === keep ? ' active' : ''}" data-value="${t.id}">${t.label}</button>`;
+  }).join('')
+    + (hidden > 0 ? `<button type="button" class="chip-more" data-more="open" aria-label="계열 ${hidden}개 더 보기">+${hidden}</button>`
+      : (trackChipsOpen && present.length && rest.length ? '<button type="button" class="chip-more" data-more="close">접기</button>' : ''));
+}
+
+/* 학과를 고르면 계열이 따라온다 — 분류가 확실한 학과만(모르면 그대로 둔다 · major-track.js 의 규칙). */
+function syncTrackFromMajor() {
+  if (typeof trackOfMajor !== 'function') return;
+  const t = trackOfMajor($('#in-major').value.trim());
+  if (!t || getChip('#in-track') === t) return;
+  if (!$(`#in-track .chip[data-value="${t}"]`)) renderTrackChips(t);
+  setChip('#in-track', t);
 }
 
 /* ---------------- 화면 전환 ---------------- */
@@ -1179,7 +1239,8 @@ function resumeMark() {
 let onboardStep = 0;
 /* 프로필을 **고치러** 들어왔나 (처음 가입이 아니라) — 취소 버튼을 띄울지 정한다 */
 let onboardEditing = false;
-const ONBOARD_STEPS = 7;   /* 2026-08-27 — '지금 받고 있는 장학금'(이중수혜) 단계 추가 · 2026-10-04 — '관심 대외활동·공모전' 단계 추가 */
+const ONBOARD_STEPS = 7;   /* 2026-08-27 — '지금 받고 있는 장학금'(이중수혜) 단계 추가 · 2026-10-04 — '관심 대외활동·공모전' 단계 추가
+                              · 2026-10-24 — 그 단계를 「적합도 높이기」(처지 예/아니요 + 출신 고교 지역)로 바꾸고 관심은 대외활동 탭 관문으로 옮김(개발자 지시 3·4) */
 
 function renderOnboardStep() {
   /* 고치러 들어온 경우에만 취소를 보여 준다 — 처음 가입하는 사람에게는 취소할 것이 없다 */
@@ -1270,9 +1331,9 @@ function whenBootOpen(fn) {
 }
 
 function initOnboarding() {
-  $('#in-track').innerHTML = TRACKS.map(
-    (t) => `<button class="chip" data-value="${t.id}">${t.label}</button>`
-  ).join('');
+  /* 계열 칩은 학교·캠퍼스가 정해진 뒤 그 학교 것으로 다시 그린다(renderTrackChips) — 여기서는 전부 그려 둔다 */
+  trackChipsOpen = false;
+  renderTrackChips(null);
 
   const p = state.profile;
   /* 계좌 칸은 **처음 가입할 때는 감춘다** (2026-08-31). 프로필을 고치러 들어온
@@ -1310,16 +1371,21 @@ function initOnboarding() {
       if ($('#in-schol-none')) $('#in-schol-none').checked = p.scholarships.length === 0;
     }
     $('#in-sensitive-ok').checked = !!(state.consent && state.consent.sensitive);
-    $$('#in-act-kinds input').forEach((cb) => (cb.checked = (p.interestKinds || []).includes(cb.value)));
-    fillInterestFields(p.interestFields || []);
+    /* 적합도 높이기 (2026-10-24) — 답해 둔 처지·출신 지역을 되살린다. 관심 대외활동은 이 화면에 없다(대외활동 탭 관문) */
+    renderOnboardTraits(p.traits || {});
+    $('#in-origin-region').value = p.originRegion || '';
+    fillRegionCities('#in-origin-region', '#in-origin-city', p.originCity);
   } else {
-    setChip('#in-track', 'humanities');
     setChip('#in-year', '1');
     setChip('#in-status', '재학');
     $('#in-nationality').value = 'korean';
+    renderOnboardTraits({});
   }
 
   renderCampusChips(p ? p.campus : null);
+  /* 캠퍼스가 정해진 뒤 그 학교 계열로(파일이 아직이면 여덟 개 전부). 🔴 처음 가입은 **아무 계열도 안 켠다** — 옛 기본값 인문·어문이
+     남으면 분류가 못 가른 학과(융합인재학부…)의 학생이 그대로 저장돼 `공학계열` 공고에 틀린 ✕ 를 받는다(코드 리뷰). 학과를 고르면 따라오고, 모르면 비워 둔다 */
+  renderTrackChips(p ? p.track : null);
   /* 🔴 **고치러 들어온 학생도 자기 학교 학과 파일을 받아야 한다** (2026-09-26 코드 리뷰).
      위에서 `#in-school` 값을 **코드로** 넣었으므로 `input` 이 뜨지 않고, 그래서 학교 입력
      쪽 프리페치가 **한 번도 돌지 않았다** — 그 학생이 학과를 고치려고 '일'을 치면 전국
@@ -1385,7 +1451,9 @@ function onboardSnapshot() {
     const on = $$(`#${g.id} .chip.active`).map((c) => c.dataset.value);
     if (on.length) chips[g.id] = on;
   });
-  return { step: onboardStep, fields: fields, boxes: boxes, chips: chips, at: Date.now() };
+  /* 적합도 높이기의 예/아니요 알약 (2026-10-24) — 누른 것만 {처지: true/false} */
+  const traits = onboardTraitAnswers();
+  return { step: onboardStep, fields: fields, boxes: boxes, chips: chips, traits: traits, at: Date.now() };
 }
 
 function onboardRestore(snap) {
@@ -1396,7 +1464,7 @@ function onboardRestore(snap) {
     if (el.type === 'checkbox' || el.type === 'radio') el.checked = !!snap.fields[id];
     else el.value = snap.fields[id];
   });
-  fillInterestFields((snap.boxes || {})['in-act-fields'] || []);   // 관심 분야 칸은 데이터로 그리는 칸 — 먼저 그려 둬야 아래가 체크할 자리가 있다
+  renderOnboardTraits(snap.traits || {});   // 적합도 높이기 알약 — 눌러 둔 것 그대로(안 누른 것은 안 누른 채)
   Object.keys(snap.boxes || {}).forEach((gid) => {
     const on = snap.boxes[gid] || [];
     $$(`#${gid} input[type="checkbox"]`).forEach((c) => { c.checked = on.indexOf(c.value) >= 0; });
@@ -1404,6 +1472,7 @@ function onboardRestore(snap) {
   /* 시·도를 되돌린 뒤에야 그 아래 시·군·구 목록이 채워진다 — 순서가 있다 */
   fillRegionCities('#in-region', '#in-region-city', (snap.fields || {})['in-region-city']);
   fillRegionCities('#in-parent-region', '#in-parent-region-city', (snap.fields || {})['in-parent-region-city']);
+  fillRegionCities('#in-origin-region', '#in-origin-city', (snap.fields || {})['in-origin-city']);
   /* 🔴 **학교 칸에 값만 넣으면 캠퍼스 칸이 안 생긴다** (2026-09-09 코드 리뷰). 그 칸은
      학교를 고를 때 `renderCampusChips()` 가 만드는데, 여기서는 값을 코드로 넣어 그 함수가
      안 불린다 → `#campus-field` 가 숨은 채라 `collectProfile()` 이 캠퍼스를 빈 값으로 적고,
@@ -1429,6 +1498,32 @@ function onboardProgressSave() {
     if ($('#screen-onboarding').hidden) return;   /* 이미 끝났으면 안 적는다 */
     resumeSave({ onboard: onboardSnapshot() });
   }, 500);
+}
+
+/* ── 적합도 높이기 — 처지 예/아니요 알약 (2026-10-24 · 개발자 지시 3) ─────────────
+   무엇을 묻는지는 elig-ask.js ONBOARD_TRAITS 한 곳 · 이름표는 TRAIT_LABEL(명사형) · 알약 모양은 공고 안 「미확인 자격」과 한 벌(.elig-yn).
+   🔴 안 누른 칸은 저장하지 않는다(false 로 적으면 '아니요'라고 답한 것이 된다 — 설계 문서 eligibility-ask.md 9절). 누른 알약을 다시 누르면 푼다. */
+function renderOnboardTraits(traits) {
+  const box = $('#in-traits');
+  if (!box) return;
+  const keys = typeof ONBOARD_TRAITS !== 'undefined' ? ONBOARD_TRAITS : [];
+  const labels = typeof TRAIT_LABEL !== 'undefined' ? TRAIT_LABEL : {};
+  const tr = traits || {};
+  box.innerHTML = keys.map((k) => {
+    const now = tr[k];
+    const yn = (v, lbl) => `<button type="button" class="elig-yn${now === v ? ' on' : ''}" data-trait="${esc(k)}" data-val="${v ? '1' : '0'}">${lbl}</button>`;
+    return `<div class="elig-ask-row elig-ask-yn"><span>${esc(labels[k] || k)}</span><span class="elig-yn-pair">${yn(true, '예')}${yn(false, '아니요')}</span></div>`;
+  }).join('');
+}
+/* 누른 알약 → { 처지: true/false } · 이 단계가 묻는데 안 누른 처지는 undefined(= 지운다 — 고치러 와서 푼 답이 남지 않게 · JSON 저장에서 빠진다) */
+function onboardTraitAnswers() {
+  const out = {};
+  const keys = typeof ONBOARD_TRAITS !== 'undefined' ? ONBOARD_TRAITS : [];
+  for (const k of keys) {
+    const on = $(`#in-traits [data-trait="${k}"].on`);
+    out[k] = on ? on.dataset.val === '1' : undefined;
+  }
+  return out;
 }
 
 /* 관심 분야 칸 — 수집 로봇이 data/activities.json 에 싣는 fields(ACTIVITY_FIELDS 원본)로 만든다 (2026-10-04).
@@ -1475,7 +1570,10 @@ function collectProfile() {
        리뷰). 학적정보 수정은 이 객체를 **통째로 새로 만들어** 프로필에 넣으므로, 여기 안
        적으면 저장을 누르는 순간 학생이 답해 둔 처지가 전부 사라진다(아래 `common` 을
        Object.assign 으로 물려받는 이유와 같다). */
-    traits: Object.assign({}, (state.profile && state.profile.traits) || {}),
+    traits: Object.assign({}, (state.profile && state.profile.traits) || {}, onboardTraitAnswers()),
+    /* 출신 고교 소재지 (2026-10-24 · 「적합도 높이기」) — 빈 칸은 null(모름) */
+    originRegion: $('#in-origin-region').value || null,
+    originCity: $('#in-origin-city').value || null,
     /* 지금 받고 있는 장학금 (2026-08-27) — 이중수혜 금지 공고를 자격 판정에서 거른다.
        '없음'을 눌렀으면 빈 배열, 아무것도 안 골랐으면 null(= 모른다). 둘은 다르다:
        빈 배열이면 "안 받는다"라 전부 지원 가능이고, null 이면 판정하지 않는다. */
@@ -1484,9 +1582,10 @@ function collectProfile() {
       : (() => { const v = $$('#in-scholarships input:checked').map((c) => c.value); return v.length ? v : null; })(),
     cert: $('#in-cert').checked,
     exchange: $('#in-exchange').checked,
-    /* 관심 대외활동·공모전 (2026-10-04) — 추천 차례에만 쓴다(자격 판정 아님). 안 골랐으면 null = 모름(빈 배열과 다르다 — 빈 배열을 만들 길은 없다) */
-    interestKinds: (() => { const v = $$('#in-act-kinds input:checked').map((c) => c.value); return v.length ? v : null; })(),
-    interestFields: (() => { const v = $$('#in-act-fields input:checked').map((c) => c.value); return v.length ? v : null; })(),
+    /* 관심 대외활동·공모전 (2026-10-04) — 2026-10-24 부터 이 화면이 아니라 **대외활동 탭 관문**(saveActivityGate)이 적는다.
+       🔴 그래서 여기서는 그대로 물려받는다 — 안 그러면 학적정보 수정 한 번에 관심이 지워져 관문이 다시 뜬다(traits·common 과 같은 이유) */
+    interestKinds: (state.profile && state.profile.interestKinds) || null,
+    interestFields: (state.profile && state.profile.interestFields) || null,
     /* 🔴 온보딩 화면에 칸이 없는 값(현주소·긴급연락처·보호자·성별·주민등록번호)은
        신청서를 채우다 학생이 알려 준 것이라, 여기서 통째로 새로 만들면 **사라진다.**
        프로필을 한 번 수정할 때마다 그동안 배운 것을 잃게 되므로 반드시 이어 붙인다. */
@@ -2697,6 +2796,7 @@ function formTplIdFor(sch) {
    ⚠️ 열쇠는 `'학교'` 또는 `'학교 캠퍼스'` 다(캠퍼스마다 학과가 다른 학교가 있다).
       이름 규칙은 `match-engine.js majorsFileFor` 한 곳 — 로봇과 같은 함수다. */
 const majorsAsked = new Set();     // 같은 학교를 두 번 받지 않는다
+const MAJOR_FILES = {};            // 학교 → 받은 파일 그대로({ majors, campuses? }) — 캠퍼스별 목록은 majorPool 이 본다
 function loadMajorsFor(school) {
   if (!school || typeof majorsFileFor !== 'function') return;
   /* 🔴 **실제 학교 이름일 때만 부른다** (2026-09-26 코드 리뷰). 학교 칸은 `input` 마다
@@ -2718,8 +2818,11 @@ function loadMajorsFor(school) {
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         if (!d || !Array.isArray(d.majors) || !d.majors.length) return;
-        /* 손으로 검수해 둔 목록이 있으면 지킨다 — 옛 loadMajors 와 같은 규칙이다. */
-        if (!MAJORS_BY_SCHOOL[key]) MAJORS_BY_SCHOOL[key] = d.majors;
+        /* 로봇 파일이 목록이다 — 손검수 목록은 2026-10-24 에 없앴다(외대 손목록이 로봇 파일을 가려 GBT학부가 안 떴다 · data.js 주석) */
+        MAJOR_FILES[key] = d;
+        MAJORS_BY_SCHOOL[key] = d.majors;
+        /* 계열 칩도 그 학교 것으로 다시 그린다 — 학생이 이미 누른 칩은 지킨다(renderTrackChips) */
+        if (!$('#screen-onboarding').hidden && $('#in-school').value.trim() === key) renderTrackChips();
         /* 🔴 **도착했으면 추천을 다시 그린다** (코드 리뷰에서 잡았다). 받아오기는 비동기라
            학생이 이미 학과를 치고 있으면 화면에는 **전국 공통 목록이 그대로 떠 있다** —
            경희대 학생이 '일'을 치고 `일어일문학과` 를 눌러 버릴 수 있다(2026-08-02 그 사고).
@@ -3306,9 +3409,56 @@ function renderActivityFieldChips(list) {
       : activitiesFieldOpen && fields.length > ACT_FIELD_FOLD ? '<button class="filter-chip field-more" data-more="close">접기</button>' : '');
 }
 
+/* ── 대외활동 탭 관문 (2026-10-24 · 개발자 지시 4) ─────────────────────────────────
+   관심 종류(interestKinds)를 하나 이상 골라야 탭이 열린다. 값은 온보딩 5단계가 적던 그 칸이라(2026-10-04) 이미 고른 학생은 바로 지난다.
+   🔴 '지났나'는 이 함수 한 곳 — 홈 「나에게 맞는 대외활동」(homeActivitiesHtml)도 같은 것을 본다. */
+function activityGateDone(p) {
+  return !!(p && Array.isArray(p.interestKinds) && p.interestKinds.length);
+}
+let actGateEditing = false;   // 「관심 바꾸기」로 다시 연 상태 — 취소가 있다
+function renderActivityGate() {
+  const p = state.profile || {};
+  $$('#in-act-kinds input').forEach((cb) => (cb.checked = (p.interestKinds || []).includes(cb.value)));
+  fillInterestFields(p.interestFields || []);
+  $('#act-gate-cancel').hidden = !actGateEditing;
+}
+/* 관문이 열리면 목록·칩·검색·정렬을 감춘다 — 관문을 지나기 전에는 쓸 수 없다(지시 4) */
+function activityGateShow(on) {
+  $('#activities-gate').hidden = !on;
+  $('#act-gate-bar').hidden = on;
+  ['#screen-activities .search-box', '#activities-filters', '#activities-field-filters', '#activities-list',
+    '#screen-activities .data-note', '#screen-activities .sort-wrap'].forEach((sel) => { const el = $(sel); if (el) el.hidden = on; });
+  if (!on) {
+    const p = state.profile || {};
+    const n = (p.interestFields || []).length;
+    $('#act-gate-summary').textContent = `관심 ${(p.interestKinds || []).join(' · ')}${n ? ` · 분야 ${n}개` : ''}`;
+  }
+}
+function saveActivityGate() {
+  const kinds = $$('#in-act-kinds input:checked').map((c) => c.value);
+  if (!kinds.length) { toast('종류를 하나 이상 골라 주세요'); return; }
+  const fields = $$('#in-act-fields input:checked').map((c) => c.value);
+  state.profile.interestKinds = kinds;
+  state.profile.interestFields = fields.length ? fields : null;
+  saveState();
+  actGateEditing = false;
+  renderActivities();
+  if (!$('#screen-home').hidden) renderHome();
+}
+
+let actGateDrawn = false;     // 관문 칸을 프로필로 그려 둔 상태 — 데이터가 다시 와도(새로고침·복귀) 학생이 고르던 체크를 지우지 않는다(코드 리뷰)
 function renderActivities() {
   const p = state.profile;
   if (!p) return;
+  /* 관문 — 관심을 고르기 전에는 목록을 그리지 않는다(2026-10-24 지시 4) */
+  const gateOn = !activityGateDone(p) || actGateEditing;
+  activityGateShow(gateOn);
+  if (gateOn) {
+    if (!actGateDrawn) { renderActivityGate(); actGateDrawn = true; }
+    else fillInterestFields();   // 분야 목록이 뒤늦게 와도 고른 것은 지킨다(인자 없이 = 체크 유지)
+    return;
+  }
+  actGateDrawn = false;
   const box = $('#activities-list');
   /* 🔴 갱신 날짜는 보이지 않는다(2026-09-30 개발자 지시) — 머리줄 셋째 칸이 정렬 단추를 가운데로 밀었다 */
   if (!liveActivities) {   // 아직 오는 중 — '없다'와 다른 말이다
@@ -3577,6 +3727,11 @@ const HOME_ACT_TOP = 3;
 function homeActivitiesHtml() {
   if (!liveActivities || !state.profile) return '';   // 아직 오는 중 — '없다'고 말하지 않는다
   const p = state.profile;
+  /* 관문을 안 지났으면 추천 대신 관문으로 가는 단추 하나 (2026-10-24 지시 4 — 관련 기능 전부가 관문 뒤에 있다) */
+  if (!activityGateDone(p)) {
+    return `<div class="section-head"><h3>나에게 맞는 대외활동·공모전</h3></div>`
+      + `<button type="button" class="btn btn-ghost btn-empty act-gate-cta" data-go="activities">관심 종류를 고르면 추천이 시작돼요</button>`;
+  }
   const likes = (n) => ((p.interestFields || []).includes(n.field) ? 2 : 0) + ((p.interestKinds || []).includes(n.kind) ? 1 : 0);
   const ms = activitiesForMe()
     .filter((n) => !n.deadline || dday(n.deadline).days >= 0)
@@ -7079,6 +7234,15 @@ function bindEvents() {
   /* 시·도를 바꾸면 그 아래 시·군·구 목록을 다시 채운다 (2026-08-30) */
   $('#in-region').addEventListener('change', () => fillRegionCities('#in-region', '#in-region-city'));
   $('#in-parent-region').addEventListener('change', () => fillRegionCities('#in-parent-region', '#in-parent-region-city'));
+  $('#in-origin-region').addEventListener('change', () => fillRegionCities('#in-origin-region', '#in-origin-city'));
+  /* 적합도 높이기 알약 — 같은 처지의 다른 알약을 끄고 이것을 켠다 · 켜진 것을 다시 누르면 푼다(안 답함) */
+  $('#in-traits').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-trait]');
+    if (!b) return;
+    const was = b.classList.contains('on');
+    $$(`#in-traits [data-trait="${b.dataset.trait}"]`).forEach((o) => o.classList.remove('on'));
+    if (!was) b.classList.add('on');
+  });
 
   /* 히어로 금액을 누르면 '금액 상세' — 그 숫자가 어떻게 나왔는지 줄 단위로 보여 준다 */
   const heroAmt = $('#hero-amount');
@@ -7216,6 +7380,10 @@ function bindEvents() {
     else activitiesField = chip.dataset.filter;
     renderActivities();
   });
+  /* 관심 관문 (2026-10-24) — 저장·취소·바꾸기 */
+  $('#act-gate-save').addEventListener('click', saveActivityGate);
+  $('#act-gate-cancel').addEventListener('click', () => { actGateEditing = false; actGateDrawn = false; renderActivities(); });
+  $('#act-gate-edit').addEventListener('click', () => { actGateEditing = true; actGateDrawn = false; renderActivities(); appScrollTo(0); });
   /* 정렬 버튼은 탐색 화면과 한 벌로 묶었다 — 아래 '정렬 버튼' 블록(SORT_MENUS) 이 둘 다 배선한다 */
   {
     const box = $('#activities-search');
@@ -7584,8 +7752,20 @@ function bindEvents() {
       renderCampusChips(null);
       /* 학과 칸에 닿기 전에 미리 받아 둔다 — 첫 글자에 전국 공통 목록이 보이지 않게 */
       loadMajorsFor($('#in-school').value.trim());
+      renderTrackChips();   // 학교가 바뀌면 계열 칩도 그 학교 것으로(파일이 아직이면 여덟 개 전부)
     })
   );
+  /* 캠퍼스를 바꾸면 그 캠퍼스의 계열로 — 칩 그룹 공용 배선이 .active 를 옮긴 **뒤**에 돌아야 해서 같은 click 을 한 번 더 듣는다 */
+  $('#in-campus').addEventListener('click', (e) => { if (e.target.closest('.chip')) renderTrackChips(); });
+  /* 「+n」·「접기」 — 계열 칩 접기 (2026-10-24). .chip 이 아니라 공용 배선이 값으로 삼지 않는다 */
+  $('#in-track').addEventListener('click', (e) => {
+    const more = e.target.closest('[data-more]');
+    if (!more) return;
+    trackChipsOpen = more.dataset.more === 'open';
+    renderTrackChips();
+  });
+  /* 학과를 고르거나 다 치면 계열이 따라온다 — 자동완성의 pick 은 change 를 보낸다(attachAutocomplete) */
+  $('#in-major').addEventListener('change', syncTrackFromMajor);
 }
 
 /* ---------------- PWA + 자동 업데이트 ----------------

@@ -1257,8 +1257,15 @@ function provincesOfCity(city) {
   return Object.keys(REGION_CITIES).filter((k) => REGION_CITIES[k].includes(city));
 }
 
+/* 시·도 이름을 짧은 꼴로 — `서울특별시`→서울 · `경기도`→경기 · `충청남도`→충남 · `강원특별자치도`→강원 (2026-10-24 한 곳으로).
+   판정(match-engine 거주지·출신 비교)과 로봇(majors.mjs 캠퍼스 지역)이 같이 쓴다 — 베끼면 둘이 갈라져 한쪽만 안 맞는다. */
+function shortRegion(x) {
+  return String(x || '').replace(/\s+/g, '').replace(/특별자치도$|특별자치시$|특별시$|광역시$/, '').replace(/^충청북도?$/, '충북').replace(/^충청남도?$/, '충남')
+    .replace(/^전라북도?$/, '전북').replace(/^전라남도?$/, '전남').replace(/^경상북도?$/, '경북').replace(/^경상남도?$/, '경남').replace(/도$/, '');
+}
+
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { parseLine, REGION_CITIES, provincesOfCity, parseDegree, TRAIT_PAT, TRAIT_DISQUALIFY, gradOnly, gradTarget, mentionsUndergrad, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, REGIONS, untag, BRANCH_TAG};
+  module.exports = { parseLine, shortRegion, REGION_CITIES, provincesOfCity, parseDegree, TRAIT_PAT, TRAIT_DISQUALIFY, gradOnly, gradTarget, mentionsUndergrad, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, REGIONS, untag, BRANCH_TAG};
 }
 
 /* ── 경우별 분기 (2026-08-24 개발자 지적) ─────────────────────────────────

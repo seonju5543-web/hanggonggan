@@ -302,21 +302,31 @@
         </div>
       </div>
 
-      <!-- Step 5: 관심 대외활동·공모전 (2026-10-04 개발자 지시 "대외활동에 맞는 학적정보도 몇 개 추가 — 적합도·추천에 쓰도록").
-           전부 선택 사항이다 — 안 고르면 null(모름)이고 추천 차례만 안 바뀐다(자격 판정에는 쓰지 않는다 · 관심은 자격이 아니다).
-           🔴 분야 칸은 **빈 그릇**이다 — 목록 원본은 collector/activity-kind.mjs ACTIVITY_FIELDS 한 곳이고, 수집 로봇이
-              data/activities.json 의 fields 로 싣는다. app.js fillInterestFields 가 그걸로 채운다(여기 적으면 두 벌이 된다). -->
+      <!-- Step 5: 적합도 높이기 (2026-10-24 개발자 지시 3 — "처음 입력하는 학적정보는 장학금만 · 수집된 공고를 모아 적합도 고도화 질문 · 최대한 클릭형").
+           여기 있던 「관심 대외활동·공모전」은 대외활동 탭의 관문(#activities-gate)으로 옮겼다(지시 4).
+           🔴 질문 목록은 **빈 그릇**이다 — 어떤 처지를 묻는지는 elig-ask.js ONBOARD_TRAITS 한 곳(공고 4곳 이상이 묻는 것 · 실측)이고
+              app.js renderOnboardTraits 가 TRAIT_LABEL 의 명사형 이름표로 예/아니요 알약을 그린다. 여기 적으면 두 벌이 된다.
+           답은 공고 안 「미확인 자격」과 **같은 칸(traits)** 에 저장된다 — 전부 선택 사항 · 안 누른 것은 저장하지 않는다(모름). -->
       <div class="onboard-step" data-step="5" hidden>
         <div class="onboard-body">
-          <h2>관심 있는 대외활동·<br />공모전을 골라 주세요</h2>
-          <p class="onboard-sub">고르면 홈에서 먼저 추천합니다.<br />모두 선택 사항이에요.</p>
-          <span class="field-label">종류</span>
-          <div class="check-list check-grid" id="in-act-kinds">
-            <label class="check-item"><input type="checkbox" value="대외활동" /><span>대외활동</span></label>
-            <label class="check-item"><input type="checkbox" value="공모전" /><span>공모전</span></label>
-          </div>
-          <span class="field-label">분야</span>
-          <div class="check-list check-grid" id="in-act-fields"></div>
+          <h2>해당하는 것이 있으면<br />눌러 주세요</h2>
+          <p class="onboard-sub">공고가 자주 묻는 조건이에요. 답하면 적합도가 더 정확해집니다.<br />모두 선택 사항이에요.</p>
+          <div class="elig-ask-fields" id="in-traits"></div>
+          <!-- 출신 고교 소재지 — `○○시 소재 고등학교 졸업자` 줄(공고 9곳 · 실측)을 판정한다. 시·도를 고르면 app.js 가 REGION_CITIES 로 시·군을 채운다 -->
+          <label class="field">
+            <span class="field-label">출신 고등학교 소재 시·도 (선택)</span>
+            <select id="in-origin-region">
+              <option value="">선택 안 함</option>
+              <option>서울</option><option>부산</option><option>대구</option><option>인천</option>
+              <option>광주</option><option>대전</option><option>울산</option><option>세종</option>
+              <option>경기</option><option>강원</option><option>충북</option><option>충남</option>
+              <option>전북</option><option>전남</option><option>경북</option><option>경남</option><option>제주</option>
+            </select>
+          </label>
+          <label class="field">
+            <span class="field-label">출신 고등학교 시·군·구</span>
+            <select id="in-origin-city"><option value="">선택 안 함</option></select>
+          </label>
         </div>
         <div class="onboard-actions">
         <button class="btn btn-onboard-cancel" data-onboard-cancel hidden>취소</button>
@@ -522,6 +532,31 @@
           <div id="activities-sort-menu" class="sort-menu" role="menu" hidden></div>
         </div>
       </header>
+      <!-- 관심 관문 (2026-10-24 개발자 지시 4 — "대외활동·공모전 기능을 쓰려면 이에 맞는 학적정보를 입력해야 들어갈 수 있게").
+           온보딩 5단계에 있던 「관심 대외활동·공모전」이 여기로 왔다(온보딩은 장학금만 · 지시 3). 종류를 하나 이상 고르기 전에는
+           이 탭의 목록·칩·검색과 홈 「나에게 맞는 대외활동」이 열리지 않는다(app.js activityGateDone · renderActivities).
+           🔴 분야 칸은 **빈 그릇**이다 — 목록 원본은 collector/activity-kind.mjs ACTIVITY_FIELDS 한 곳이고 수집 로봇이 data/activities.json 의
+              fields 로 싣는다. app.js fillInterestFields 가 그걸로 채운다(여기 적으면 두 벌이 된다). -->
+      <div id="activities-gate" class="act-gate" hidden>
+        <h3>관심 있는 대외활동·공모전을<br />골라 주세요</h3>
+        <p class="act-gate-sub">고르면 이 탭과 홈 추천이 열려요. 종류는 하나 이상 골라야 해요.</p>
+        <span class="field-label">종류</span>
+        <div class="check-list check-grid" id="in-act-kinds">
+          <label class="check-item"><input type="checkbox" value="대외활동" /><span>대외활동</span></label>
+          <label class="check-item"><input type="checkbox" value="공모전" /><span>공모전</span></label>
+        </div>
+        <span class="field-label">분야 (선택)</span>
+        <div class="check-list check-grid" id="in-act-fields"></div>
+        <div class="act-gate-actions">
+          <button type="button" class="btn btn-ghost" id="act-gate-cancel" hidden>취소</button>
+          <button type="button" class="btn btn-primary btn-lg" id="act-gate-save">저장하고 보기</button>
+        </div>
+      </div>
+      <!-- 관문을 지난 뒤 — 고른 관심 한 줄 + 바꾸기 -->
+      <div class="act-gate-bar" id="act-gate-bar" hidden>
+        <span id="act-gate-summary"></span>
+        <button type="button" class="link-btn" id="act-gate-edit">관심 바꾸기</button>
+      </div>
       <div class="search-box">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
         <input type="search" id="activities-search" placeholder="활동·공모전 이름으로 찾기" maxlength="40" autocomplete="off" aria-label="대외활동·공모전 검색" />
@@ -849,6 +884,7 @@
        data.js(officialChannel)·app.js·chat.js 가 전역으로 부르므로 반드시 그보다 먼저 실어야 한다 -->
   <script src="source-link.js"></script>
   <script src="data.js"></script>
+  <script src="major-track.js"></script>
   <!-- 절 경계 판정 — match-engine이 전역으로 참조하므로 반드시 먼저 실어야 한다 -->
   <script src="section-head.js"></script>
   <!-- 이어보기 판정 — app.js 가 전역으로 참조하므로 먼저 실어야 한다 -->

@@ -23,6 +23,20 @@ export function loadSchoolNames(dataJsUrl) {
   return { unis, alias, regions };
 }
 
+/* 이원화 캠퍼스 이름(CAMPUSES_BY_SCHOOL) — 학과 발행기가 캠퍼스별 목록의 이름을 앱 칩과 맞출 때 쓴다 (2026-10-24).
+   `'학교': ['캠퍼스', …]` 줄만 읽는다 · 없으면 빈 Map. */
+export function loadCampuses(dataJsUrl) {
+  const src = fs.readFileSync(dataJsUrl, 'utf8');
+  const i = src.indexOf('const CAMPUSES_BY_SCHOOL = {');
+  const out = new Map();
+  if (i < 0) return out;
+  const block = src.slice(i, src.indexOf('\n};', i));
+  for (const m of block.matchAll(/'([^']+)'\s*:\s*\[([^\]]*)\]/g)) {
+    out.set(m[1], [...m[2].matchAll(/'([^']+)'/g)].map((x) => x[1]));
+  }
+  return out;
+}
+
 /* 학교 하나를 가리키는 글자들 — 정식 이름 + 그 학교로 풀리는 별칭 전부 + 이름에서 '대학교'를 뗀 짧은 꼴.
    교내·교외 판정기가 "제목에 이 학교의 이름표가 있나"를 볼 때 쓴다. */
 export function schoolTokens(school, names) {

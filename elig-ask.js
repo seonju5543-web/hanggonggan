@@ -55,6 +55,9 @@ const FIELD_PROBE = {
   regionCity: ['종로구', '무안군'],
   parentRegion: ['서울', '전남'],
   parentRegionCity: ['종로구', '무안군'],
+  /* 출신 고교 소재지 (2026-10-24) — match-engine 이 `about:'origin'` 줄을 이 둘로 본다(맞으면 ✓ · 아니면 모름) */
+  originRegion: ['서울', '전남'],
+  originCity: ['종로구', '무안군'],
 };
 
 /* 🔴 학적정보에 **있는데 여기 없는 칸**과 그 이유 (2026-09-18 개발자 지시):
@@ -98,6 +101,14 @@ const TRAIT_LABEL = {
   kosafApplied: '이번 학기 국가장학금 신청',
 };
 
+/* 🔴 온보딩 「적합도 높이기」 단계가 **처음부터** 묻는 처지 (2026-10-24 · 개발자 지시 "수집된 공고를 모아 적합도 고도화
+   질문을 고안 · 최대한 클릭형"). 공고 안에서 묻는 것(위)과 **같은 칸(p.traits)** 에 저장된다 — 판정 규칙을 새로 만들지 않는다.
+   고른 기준: 지금 열린 공고(정식 등록 107 + 층2 129 + 대외활동 163 · 2026-10-24 실측 · 설계 문서 academic-info-tailoring.md)에서
+   **4곳 이상**이 묻는 처지. 걸린 공고 수 — award 17 · kosafApplied 11 · discipline 10 · job 10 · volunteer 6 · dorm 4 · military 4.
+   ⚠️ 3곳 이하(birthOrder·farm·loan 각 3 · 나머지 1~2)는 공고 안에서만 묻는다 — 온보딩을 길게 만들 만큼 자주 나오지 않는다.
+   ⚠️ 여기 적는 종류는 TRAIT_LABEL·TRAIT_PAT 에 있어야 한다(관문이 대조한다). 순서가 화면 순서다. */
+const ONBOARD_TRAITS = ['award', 'kosafApplied', 'discipline', 'job', 'volunteer', 'dorm', 'military'];
+
 /* 칸 하나를 화면에 그리는 데 필요한 것.
    🔴 `label` 은 칸 이름이지 문장이 아니다. 여기에 설명을 넣지 말 것
       (화면에 새로 넣는 한국어를 늘리지 않는다 — 설계 3-3). */
@@ -112,6 +123,8 @@ const FIELD_META = {
   regionCity:  { label: '거주 시·군·구', kind: 'text' },
   parentRegion:     { label: '부모 거주 시·도', kind: 'text' },
   parentRegionCity: { label: '부모 거주 시·군·구', kind: 'text' },
+  originRegion:     { label: '출신 고교 시·도', kind: 'text' },
+  originCity:       { label: '출신 고교 시·군·구', kind: 'text' },
 };
 
 /* 이 칸에 학생이 **답을 준 적이 있나**.
@@ -200,5 +213,5 @@ function coerceField(key, raw) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { askableFields, askableForSch, coerceField, answered, FIELD_META, FIELD_PROBE, TRAIT_LABEL };
+  module.exports = { askableFields, askableForSch, coerceField, answered, FIELD_META, FIELD_PROBE, TRAIT_LABEL, ONBOARD_TRAITS };
 }
