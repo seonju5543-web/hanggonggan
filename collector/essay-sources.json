@@ -77,7 +77,7 @@
       "url": "https://owlapply.com/ko/jagisogeseo-yangsig",
       "kind": "*",
       "note": "로봇이 스스로 찾음 — 자기소개서 템플릿",
-      "strike": 0,
+      "strike": 1,
       "addedAt": "2026-09-01"
     },
     {
@@ -129,7 +129,7 @@
       "kind": "*",
       "note": "로봇이 스스로 찾음 — 지원서 자동 입력",
       "addedAt": "2026-09-05",
-      "strike": 1
+      "strike": 2
     },
     {
       "url": "https://brunch.co.kr/@icebergw/6",
@@ -364,12 +364,12 @@
     },
     {
       "url": "https://admit-lab.com/ko/%ED%95%84%EB%A6%BD-%EB%B0%94-%EB%B0%95%EC%82%AC-%28%EC%9E%85%ED%95%99-%EC%A0%84%EB%AC%B8%EA%B0%80%29/",
-      "seenAt": "2026-09-21",
+      "seenAt": "2026-10-27",
       "why": "규칙 0종"
     },
     {
       "url": "https://admit-lab.com/ko/%EB%B8%94%EB%A1%9C%EA%B7%B8/%EB%8C%80%ED%95%99%EC%9B%90-%EC%A7%84%ED%95%99-%EB%AA%A9%EC%A0%81%EC%84%9C/",
-      "seenAt": "2026-09-21",
+      "seenAt": "2026-10-27",
       "why": "규칙 0종"
     },
     {
