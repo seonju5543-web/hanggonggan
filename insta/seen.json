@@ -3414,7 +3414,7 @@
    "dates": "absolute"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000477012",
    "org": "(재단법인)아산사회복지재단",
    "name": "북한이탈청소년장학생",
@@ -3424,10 +3424,12 @@
    "cards": 5,
    "dir": "insta/pub/2000477012",
    "at": "2026-10-16",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-27"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000477013",
    "org": "(재단법인)아산사회복지재단",
    "name": "보건의료정책분야대학원장학생",
@@ -3437,10 +3439,12 @@
    "cards": 5,
    "dir": "insta/pub/2000477013",
    "at": "2026-10-16",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-27"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000477010",
    "org": "(재단법인)아산사회복지재단",
    "name": "의생명과학분야대학원장학생",
@@ -3450,10 +3454,12 @@
    "cards": 5,
    "dir": "insta/pub/2000477010",
    "at": "2026-10-16",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-27"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000477011",
    "org": "(재단법인)아산사회복지재단",
    "name": "해외의생명과학분야대학원장학생",
@@ -3463,7 +3469,9 @@
    "cards": 5,
    "dir": "insta/pub/2000477011",
    "at": "2026-10-16",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-27"
   },
   {
    "status": "prepared",
@@ -3743,7 +3751,7 @@
    "expiredAt": "2026-10-23"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2500070002",
    "org": "금강장학회",
    "name": "장학금",
@@ -3753,7 +3761,9 @@
    "cards": 4,
    "dir": "insta/pub/2500070002",
    "at": "2026-10-20",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-27"
   },
   {
    "status": "prepared",
