@@ -348,8 +348,8 @@
   "name": "[입학에서 취업까지] 2026-2학기 2차 교내장학금 신청 안내[가족, 문화예술, 고시, 챌린지]"
  },
  "https://kangwon.ac.kr/ko/bbs/750/detail.do?pageitm=10&pstsn=2499&searchgbn=0&searchordersort=0": {
-  "ok": "2026-10-21",
-  "at": "2026-10-21",
+  "ok": "2026-10-28",
+  "at": "2026-10-28",
   "tries": 0,
   "name": "2026학년도 1학기 주거안정장학금 지급요청서(8월분) 신청 안내"
  },
@@ -360,26 +360,26 @@
   "name": "[학생지원팀] (한국장학재단) 2026-2학기 국가근로장학금 추가신청기간 안내(10/21~10/29)"
  },
  "https://www.seoultech.ac.kr/service/info/janghak/?bidx=896418&bnum=5233&cate=0&qidx=5233": {
-  "ok": "2026-10-21",
-  "at": "2026-10-21",
+  "ok": "2026-10-28",
+  "at": "2026-10-28",
   "tries": 0,
   "name": "서울과학기술대학교 중소기업 취업연계 장학사업 (희망사다리Ⅰ유형) 신규장학생 자체선발 기준 안내"
  },
  "https://sejong.korea.ac.kr/bbs/koreaSejong/659/273624/artclView.do": {
-  "ok": "2026-10-21",
-  "at": "2026-10-21",
+  "ok": "2026-10-28",
+  "at": "2026-10-28",
   "tries": 0,
   "name": "[국가]2026학년도 2학기 한국장학재단 중소기업 취업연계 장학생(희망사다리Ⅰ유형) 추천"
  },
  "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12488/view.do?currentpageno=1": {
-  "ok": "2026-10-21",
-  "at": "2026-10-21",
+  "ok": "2026-10-28",
+  "at": "2026-10-28",
   "tries": 0,
   "name": "2026학년도 2학기 국가근로장학금(일반유형) 3차 신청 안내"
  },
  "https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsno=8&key=815&nttno=170638&searchctgry=학사/장학": {
-  "ok": "2026-10-21",
-  "at": "2026-10-21",
+  "ok": "2026-10-28",
+  "at": "2026-10-28",
   "tries": 0,
   "name": "2026학년도 2학기 국가근로장학금 일반유형 추가신청기간 안내"
  },
@@ -534,8 +534,8 @@
   "name": "2026-2학기 국가근로장학생 3차 선발 안내"
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323410&menuno=200318": {
-  "tries": 2,
-  "at": "2026-10-27",
+  "tries": 3,
+  "at": "2026-10-28",
   "minBody": 100,
   "name": "공통 공과대학 특성화 장학 프로그램 참여학생 모집 안내"
  },
@@ -544,5 +544,29 @@
   "at": "2026-10-27",
   "tries": 0,
   "name": "2026학년도 SNUE Brand Up 장학생 선발 공고"
+ },
+ "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?category=장학&keyword=장학&paged=1&slug=★-2026학년도-2학기-특별장학금주거비-교통비-근면숭": {
+  "ok": "2026-10-28",
+  "at": "2026-10-28",
+  "tries": 0,
+  "name": "장학 ★ 2026학년도 2학기 특별장학금(주거비, 교통비, 근면숭실, 공인어학시험, 특별성적우수(12.5%)"
+ },
+ "https://www.hongik.ac.kr/kr/newscenter/notice.do?articleno=159660&nocat=501": {
+  "ok": "2026-10-28",
+  "at": "2026-10-28",
+  "tries": 0,
+  "name": "[한국선원복지고용센터] 2026년 선원가족 장학생 모집 (연장)"
+ },
+ "https://www.seoultech.ac.kr/service/info/janghak/?bidx=897116&bnum=5233&cate=0&qidx=5233": {
+  "tries": 1,
+  "at": "2026-10-28",
+  "minBody": 100,
+  "name": "(홍보) 2026년 2학기 푸른등대 기부장학금 신규장학생 신청 안내(~11/12(목)까지)"
+ },
+ "https://www.seoultech.ac.kr/service/info/janghak/?bidx=897097&bnum=5233&cate=0&qidx=5233": {
+  "tries": 1,
+  "at": "2026-10-28",
+  "minBody": 100,
+  "name": "(홍보) 한국장학재단 희망사다리1유형 장학생 대상 삼성 SSFY 교육생 모집(~11/9(월)까지)"
  }
 }
