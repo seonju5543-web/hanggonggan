@@ -20,6 +20,7 @@ export function decodeEntities(t) {
     .replace(/&#(\d+);/g, (_, d) => String.fromCharCode(+d))
     .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCharCode(parseInt(h, 16)))
     .replace(/&quot;/g, '"').replace(/&apos;/g, "'")
+    .replace(/&lsquo;|&rsquo;|&#8216;|&#8217;/g, "'").replace(/&ldquo;|&rdquo;|&#8220;|&#8221;/g, '"')   // 둥근 따옴표(두산연강재단 소식 제목 · 2026-10-27)
     .replace(/&lt;/g, '<').replace(/&gt;/g, '>')
     .replace(/&nbsp;/g, ' ')
     .replace(/&rarr;/g, '→').replace(/&rArr;/g, '⇒').replace(/&ge;/g, '≥').replace(/&le;/g, '≤').replace(/&larr;/g, '←')
@@ -118,6 +119,7 @@ function cleanCore(t) {
     .replace(/\s*기간\s*[:：]?\s*20\d{2}[.\-][\s\S]*$/, '')   // `기간 : 2026.10.01 ~ 2026.10.31` (정책브리핑 목록)
     .replace(/신규게시글|Attachment|새글/g, '')
     .replace(/\s+(?:NEW|New|new|N)\s*$/, '')            // 제목 끝의 '새 글' 배지(정책브리핑 `… 탐방로 선택! NEW` · 인천 유스톡톡 `… 공모전 new` · 2026-10-19)
+    .replace(/^\s*20\d{2}\s?\.\s?\d{1,2}\s?\.\s?\d{1,2}\s?\.?\s+(?=\S)/, '')   // 제목 앞의 게시일(소식 게시판 행 `2026.10.23 두산연강재단, …` · 2026-10-27)
     // 구글 머티리얼 아이콘은 글자(check_circle·open_in_new…)로 그려져 제목에 딸려 온다.
     // 강원대에서 '맞춤장학 조회 check_circle'처럼 들어와 메뉴가 공고로 새던 것을 막는다 (2026-08-02).
     // 한글 공고 제목에 snake_case 영문이 들어갈 일은 없으므로 통째로 뗀다.

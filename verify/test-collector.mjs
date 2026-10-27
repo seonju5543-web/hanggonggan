@@ -381,6 +381,8 @@ eq('숫자 표기(&#40;)를 되돌린다',
 eq('제목 끝의 새 글 배지(NEW·new)를 뗀다 — 낱말 속 new 는 그대로 (2026-10-19)',
   [cleanTitle('단풍철 국립공원 안전산행 비법?…체력에 맞는 탐방로 선택! NEW'), cleanTitle('2026년 청년정책 공모전 new'), cleanTitle('New Media 공모전')],
   ['단풍철 국립공원 안전산행 비법?…체력에 맞는 탐방로 선택!', '2026년 청년정책 공모전', 'New Media 공모전']);
+eq('제목 앞의 게시일과 둥근 따옴표 기호(&lsquo;·&rsquo;)를 정리한다 (두산연강재단 소식 행 · 2026-10-27)',
+  cleanTitle('2026.10.23 두산연강재단, &lsquo;2026년 과학교사 학술시찰 견문록 출판기념회&rsquo; 개최'), "두산연강재단, '2026년 과학교사 학술시찰 견문록 출판기념회' 개최");
 eq('부등호(&lt; &gt;)를 되돌린다',
   cleanTitle('2학기 &lt;이원길 장학금&gt; 선발'), '2학기 <이원길 장학금> 선발');
 eq('&amp;를 마지막에 풀어 이중 해제가 안 생긴다', cleanTitle('A &amp;quot; B'), 'A &quot; B');
@@ -6794,6 +6796,12 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
      자격이 뒤집혀 보이는 실패라 잡음보다 나쁘다(실제 21줄 · 14개 카드가 이 상태였다). */
   eq('※ 지원 불가는 제외 칸으로', where('※ 졸업유예자, 휴학생, 대학원생, 세종캠퍼스 학생은 지원 불가'), '제외');
   eq('※ 휴학생 신청 불가도 제외 칸으로', where('※ 2026-2학기 휴학생 신청 불가'), '제외');
+  /* 「참여배제자」 절의 `X가 아닌 자` 는 제외다 — 맨 `아닌 자` 를 긍정으로 읽던 POSITIVE_REQ 가 자격 칸에 올렸다(인천 국제기구 직업체험 · OCR 이라 `라.` 의 점이 빠진 머리글 · 2026-10-27) */
+  {
+    const lines = ['라참여배제자', '①인천시민이 아닌 자', '2 외국인', '③국제기구직업체험 프로그램 참여경력보유자(동일기구 중복 참여불가)'];
+    eq('「라참여배제자」 아래 `인천시민이 아닌 자` 는 자격이 아니라 제외', [ME.requirementLines({}, lines), ME.requirementLines({}, lines, { onlyExclude: true }).length], [[], 3]);
+    eq('  대조군: 제외 절의 `결격 사유가 없는 자` 는 여전히 긍정(제외 칸에 안 간다)', ME.requirementLines({}, ['4. 제외 대상', '결격 사유가 없는 자'], { onlyExclude: true }), []);
+  }
 
   /* 🔴 본문 규칙을 뒤집는 **예외 자격**. 빠지면 되는 학생이 안 된다고 나온다
      (면학장학금은 본문이 `8학기 이하`라 9~10학기 이중전공자가 통째로 탈락해 보였다). */
@@ -12379,6 +12387,11 @@ console.log('\n■ 대외활동 — 남은 글 표본에서 찾은 것 (2026-10-
   eq('  정책브리핑 **정책 뉴스** 글(news/policyNewsView)과 「… 첫 수혜자」 소식 글은 모집 글이 아니다 (2026-10-19)',
     [AK.unreadableSource('https://www.korea.kr/news/policyNewsView.do?newsId=148973658&pWise=sub'), AK.unreadableSource('https://www.korea.kr/briefing/pressReleaseView.do?newsId=1'),
       AK.notActivity('전주시 글로벌 해외연수생 1기 첫 수혜자'), AK.notActivity('2026 글로벌 해외연수생 2기 모집')], [true, false, true, false]);
+  /* 지난 일을 알리는 소식 행 — 두산연강재단 뉴스(제목+요약 한 줄 · `…열었다.`·`… 워크숍 진행`) · 정책브리핑 보도자료 「… 본선 개최」 (2026-10-27) */
+  eq('  소식 글은 모집 글이 아니다 — `…출판기념회를 열었다.` · `… 워크숍 진행` · `… 본선 개최` · 대조군 `워크숍 참가자 모집`',
+    ["두산연강재단, '2026년 과학교사 학술시찰 견문록 출판기념회' 개최 두산연강재단(이사장 박용현)은 22일 호텔에서 출판기념회를 열었다.", '두산연강재단, 대학 장학생 대상 미래역량강화 워크숍 진행',
+      '아이들의 상상력이 인공지능을 만나는 첫 경험! 「전 국민 인공지능 경진대회」, 인공지능 창작대회 본선 개최', '청년 창업 워크숍 참가자 모집', '2026 두산연강 대학생 봉사단 모집'].map(AK.notActivity),
+    [true, true, true, false, false]);
   eq('  인스타그램·페이스북 게시물은 읽을 수 없는 출처 — 기관 홈페이지는 아니다(2026-10-16 개발자 "피드에서 빼")',
     ['https://www.instagram.com/acrc0229/p/DeF3w_FE4Yt/?img_index=1', 'https://m.facebook.com/x/posts/1', 'https://www.korea.kr/briefing/x.do', 'https://instagram.com.example.org/'].map(AK.unreadableSource), [true, true, false, false]);
   eq('⑤ 그림 — 큰 카드뉴스(1920×1080)는 받는다 · 광고 배너(846×510)는 아니다', [AD.posterShaped({ w: 1920, h: 1080 }), AD.posterShaped({ w: 846, h: 510 })], [true, false]);

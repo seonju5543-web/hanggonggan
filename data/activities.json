@@ -1867,7 +1867,6 @@
     "* 참여 신청일 현재 고용보험에 가입되어 있지 않은 사람"
    ],
    "eligibilityExcludes": [
-    "ㅇ(참여제한) 아래 기준 중 하나에 해당하는 경우, 아카데미 참여가 제한됩니다.",
     "① 취업 중이거나 사업자등록 중인 사람",
     "* 아카데미 개시 전까지 참여 제한 사유가 해소되는 경우 참여 가능(증빙서류 제출 필요)",
     "② 「초·중등교육법」에 다른 고등학교 및 「고등교육법」에 따른 대학(원) 재학생",
@@ -2763,29 +2762,6 @@
    "foundAt": "2026-10-26"
   },
   {
-   "title": "아이들의 상상력이 인공지능을 만나는 첫 경험! 「전 국민 인공지능 경진대회」, 인공지능 창작대회 본선 개최",
-   "url": "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156786340&pWise=sub&pWiseSub=C3",
-   "kind": "공모전",
-   "attachments": [
-    {
-     "name": "261026 조간 (보도) 아이들의 상상력이 AI를 만나는 첫 경험! 「전국민 AI 경진대회」, AI 창작대회 본선 개최.hwpx",
-     "url": "https://www.korea.kr/common/download.do?fileId=198576375&tblKey=GMN"
-    },
-    {
-     "name": "261026 조간 (보도) 아이들의 상상력이 AI를 만나는 첫 경험! 「전국민 AI 경진대회」, AI 창작대회 본선 개최.odt",
-     "url": "https://www.korea.kr/common/download.do?fileId=198576376&tblKey=GMN"
-    }
-   ],
-   "deadlineHint": null,
-   "detailsV": 5,
-   "field": "IT·소프트웨어",
-   "excerptsAt": "2026-10-25",
-   "school": "",
-   "campus": "",
-   "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-25"
-  },
-  {
    "title": "[국방부] 2026 화이트햇 국방 사이버보안 콘테스트",
    "url": "https://whitehat2026.kr/",
    "kind": "공모전",
@@ -3211,20 +3187,6 @@
     "아이들과미래재단"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)"
-  },
-  {
-   "title": "2026.10.23 두산연강재단, &lsquo;2026년 과학교사 학술시찰 견문록 출판기념회&rsquo; 개최 두산연강재단(이사장 박용현)은 22일 앰배서더 서울 풀만 호텔에서 과학교사 학술시찰 견문록 발간을 기념하는 출판기념회를 열었다.",
-   "url": "https://www.yonkang.org/kr/news/652",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": null,
-   "detailsV": 5,
-   "field": "서포터즈·기자단",
-   "excerptsAt": "2026-10-23",
-   "school": "",
-   "campus": "",
-   "host": "두산연강재단",
-   "foundAt": "2026-10-23"
   },
   {
    "title": "(신청연장) 2026년 효성전기(주) 기업탐방 프로그램 모집 신청 기간 연장 안내",

@@ -389,9 +389,13 @@ function applyPhase(acts) {
   const found = new Set();
   for (const n of acts.items) {
     const files = manifest[n.url];
-    if (!files || !files.length || !needsElig(n)) continue;
+    /* 본문이 스크립트로 그려져 빈 글(정책브리핑 보도자료 · 2026-10-27)은 첨부(보도자료 hwpx)의 글이 「공고 안내」가 된다 — 자격은 이미 있어도 */
+    const wantElig = needsElig(n), wantNotice = !(n.noticeLines || []).length;
+    if (!files || !files.length || !(wantElig || wantNotice)) continue;
     const d = eligFromFiles(n, files);
     if (!d) continue;
+    if (!BROWSER && wantNotice && (d.noticeLines || []).length) { n.noticeLines = d.noticeLines; n.noticeFrom = d.from; got += 1; }
+    if (!wantElig) continue;
     found.add(n.url);
     if (BROWSER) { bled[n.url] = { ...(bled[n.url] || {}), lines: d.eligibilityLines, excludes: d.eligibilityExcludes, from: d.from }; got += 1; continue; }
     n.eligibilityLines = d.eligibilityLines;

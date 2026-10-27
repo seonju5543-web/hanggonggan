@@ -314,7 +314,9 @@ export function putActivityDetails(it, details) {
   const keepDocs = !!it.eligibilityFrom && !(details.eligibilityLines && details.eligibilityLines.length);
   for (const k of ['eligibilityLines', 'eligibilityExcludes', 'eligibilityPriority', 'noticeLines']) {
     if (keepDocs && k !== 'noticeLines') continue;
-    if (details[k] && details[k].length) it[k] = details[k]; else delete it[k];
+    /* 첨부에서 읽어 둔 공고 안내(noticeFrom · activity-docs)는 빈 본문이 지우지 않는다 — 본문에서 안내가 나오면 본문이 이긴다 */
+    if (k === 'noticeLines' && it.noticeFrom && !(details.noticeLines && details.noticeLines.length)) continue;
+    if (details[k] && details[k].length) { it[k] = details[k]; if (k === 'noticeLines') delete it.noticeFrom; } else delete it[k];
   }
   if (!keepDocs) { delete it.eligibilityFrom; delete it.eligibilityReviewed; }
   it.detailsV = ACT_DETAILS_V;
