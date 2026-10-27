@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-10-27",
- "count": 1493,
+ "count": 1498,
  "items": [
   {
    "title": "장학 ★ 2026학년도 2학기 특별장학금(주거비, 교통비, 근면숭실, 공인어학시험, 특별성적우수(12.5%), 가계곤란) 신청 안내",
@@ -14,6 +14,15 @@
    ],
    "deadlineHint": null,
    "school": "숭실대학교",
+   "campus": "",
+   "foundAt": "2026-10-27"
+  },
+  {
+   "title": "[교외] 2026년 2학기 푸른등대 기부장학금",
+   "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%5B%EA%B5%90%EC%99%B8%5D%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%ED%91%B8%EB%A5%B8%EB%93%B1%EB%8C%80%20%EA%B8%B0%EB%B6%80%EC%9E%A5%ED%95%99%EA%B8%88",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서울시립대학교",
    "campus": "",
    "foundAt": "2026-10-27"
   },
@@ -58,6 +67,85 @@
    ],
    "deadlineHint": null,
    "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-27"
+  },
+  {
+   "title": "[교외-11/2]2027학년도 해동과학문화재단 해동장학생 모집 안내(학교지원)",
+   "url": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4ODglMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "고려대학교",
+   "campus": "",
+   "foundAt": "2026-10-27"
+  },
+  {
+   "title": "2027년도 제22기 전기공사공제조합 장학생 선발 공고",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=769737&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "[붙임1] 2027년도 제22기 장학생 선발 공고.pdf",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=769737&attachNo=563259"
+    },
+    {
+     "name": "[붙임2] 자기소개서.hwp",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=769737&attachNo=563260"
+    },
+    {
+     "name": "[붙임3] 체크리스트.hwp",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=769737&attachNo=563261"
+    },
+    {
+     "name": "[붙임4] 2027년 제22기 장학생 지원서 작성요령 및 제출서류 준비 안내.pdf",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=769737&attachNo=563262"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "",
+   "foundAt": "2026-10-27"
+  },
+  {
+   "title": "[학생복지팀] 2026학년도 2학기 주거안정장학금 선발 및 제출서류 안내",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=769738&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "01-01.2026학년도 2학기 주거안정장학금 우선지원 및 지원제외 기준 안내.hwpx",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=769738&attachNo=563263"
+    },
+    {
+     "name": "01-03.2026년 2학기 주거안정장학금 학생 FAQ.hwp",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=769738&attachNo=563264"
+    },
+    {
+     "name": "01-04.주거안정장학금 반환서약서.hwp",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=769738&attachNo=563265"
+    }
+   ],
+   "deadlineHint": "마감: 11.11.(수) 11월분 제출마감: 12.09.(수) 12월분 제출마감: 01.06.(수) ③ 영수증 제출 매달 학생복지팀 서면 제출(",
+   "school": "상명대학교",
+   "campus": "",
+   "foundAt": "2026-10-27"
+  },
+  {
+   "title": "[학생복지팀] 2026학년도 2학기 주거안정장학금 선발 및 제출서류 안내",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=769739&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "01-01.2026학년도_2학기_주거안정장학금_우선지원_및_지원제외_기준_안내.hwpx",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=769739&attachNo=563266"
+    },
+    {
+     "name": "01-03.2026년_2학기_주거안정장학금_학생_FAQ.hwp",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=769739&attachNo=563267"
+    },
+    {
+     "name": "01-04.주거안정장학금_반환서약서.hwp",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=769739&attachNo=563268"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "상명대학교",
    "campus": "",
    "foundAt": "2026-10-27"
   },
