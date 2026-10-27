@@ -3,6 +3,16 @@
  "updatedAt": "2026-10-27",
  "items": [
   {
+   "title": "[학사안내] 2026학년도 동계 계절학기 타 대학교(고려대 국제동계대학) ...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70813",
+   "postedAt": "2026-10-27",
+   "kind": "학사",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-27"
+  },
+  {
    "title": "[채용공고] 2026년도 제12회 계약직원(사무원, 언론담당관) 경력경쟁채...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70811",
    "postedAt": "2026-10-27",
@@ -387,16 +397,6 @@
    "src": "b7347301",
    "foundAt": "2026-10-21",
    "thumb": "data/news/img/e692187b21c57133.webp"
-  },
-  {
-   "title": "[학사안내] 2026학년도 동계 계절학기 타 대학교(한양대) 교류수학 추천...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70763",
-   "postedAt": "2026-10-21",
-   "kind": "학사",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-21"
   }
  ]
 }

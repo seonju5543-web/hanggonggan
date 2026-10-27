@@ -3,6 +3,29 @@
  "updatedAt": "2026-10-27",
  "items": [
   {
+   "title": "2026 홀로그램 팝업전 '익산, 빛으로 이야기를 잇다' 개최 안내 및 홍보 협조 요청",
+   "url": "https://www.jbnu.ac.kr/web/Board/218993/detailView.do",
+   "postedAt": "2026-10-27",
+   "postId": "218993",
+   "kind": "행사",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-10-27"
+  },
+  {
+   "title": "[전북인문사회연구원] 2026년 제2회 콜로키움 개최 안내(11. 25.)",
+   "url": "https://www.jbnu.ac.kr/web/Board/218948/detailView.do",
+   "postedAt": "2026-10-27",
+   "postId": "218948",
+   "kind": "행사",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-10-27",
+   "desc": "전북인문사회연구원 안녕하십니까 ? 전북대학교 전북인문사회연구원에서 2026 년 제 2 회 콜로키움을 다음과 같이 진행합니다 ."
+  },
+  {
    "title": "[언어교육부] 11월 외국어 강좌 안내/토익,토익스피킹 시험 할인 안내 (강의계획서 붙임 참조)",
    "url": "https://www.jbnu.ac.kr/web/Board/218895/detailView.do",
    "postedAt": "2026-10-26",
@@ -444,29 +467,6 @@
    "src": "e41d3fac",
    "foundAt": "2026-10-19",
    "thumb": "data/news/img/f72813198d043c54.webp"
-  },
-  {
-   "title": "[국립순천대학교] 2026학년도 동기 계절수업 교류수학 안내",
-   "url": "https://www.jbnu.ac.kr/web/Board/218560/detailView.do",
-   "postedAt": "2026-10-19",
-   "postId": "218560",
-   "kind": "학사",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-10-19"
-  },
-  {
-   "title": "[경상국립대학교] 2026학년도 동기 계절수업 교류수학 안내",
-   "url": "https://www.jbnu.ac.kr/web/Board/218559/detailView.do",
-   "postedAt": "2026-10-19",
-   "postId": "218559",
-   "kind": "학사",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-10-19",
-   "desc": "로딩이 오래걸리면 미리보기를 다시 눌러주세요."
   }
  ]
 }

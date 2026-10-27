@@ -3,6 +3,27 @@
  "updatedAt": "2026-10-27",
  "items": [
   {
+   "title": "[일반] 기간제 계약직원 채용 공고(홍보기획실)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53564&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-27",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-27",
+   "desc": "채용 부서 홍보기획실 모집인원 1. 지원 자격 및 우대사항 담당업무 대학 행사 영상촬영 및 사진촬영 등 지원 자격"
+  },
+  {
+   "title": "[국제학생] 2026년 서울생활사박물관 외국인 대학생 대상 무료 체험 교육 프로그램 추가모집 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53563&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-27",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-27",
+   "desc": "서울역사박물관 분관인 서울생활사박물관(노원구 동일로 174길 27)에서는 인근 대학교 소속 외국인 대학생 대상 서울생활문화를 체험하고 이해할 수 있는 'ENJOY! SEOUL URBAN LIFE MUSEUM'…"
+  },
+  {
    "title": "[일반] [로봇특성화대학사업] 2026 'Physical AI, 로봇은 어떻게 보고 생각하고 행동할까?' 강좌 신청 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53559&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "postedAt": "2026-10-26",
@@ -409,29 +430,6 @@
    "src": "b09cb042",
    "foundAt": "2026-10-13",
    "desc": "2026 학년도 2 학기 졸업 예정인 외국인 유학생을 대상으로 아래와 같이 한국어능력평가시험을 시행하오니 , 해당 학생들은 기간 내 반드시 신청해 주시기 바랍니다 ."
-  },
-  {
-   "title": "[일반] 기간제 계약직원 채용 공고(대학원 교학팀)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53466&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-13",
-   "kind": "채용",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-13",
-   "desc": "기간제 계약직원 모집 공고 1. 지원 자격 및 우대사항 모집인원 담당업무 대학원 교학팀 행정업무 등 지원 자격"
-  },
-  {
-   "title": "[일반] [광운대, 동국대, 시립대 캠퍼스타운] 2026 AI+X 커넥트 포럼",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53465&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-13",
-   "kind": "행사",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-13",
-   "thumb": "data/news/img/6fabd28cd1ef7453.webp",
-   "desc": "서울시와 광운대학교·동국대학교·서울시립대학교 캠퍼스타운에서는 AI와 다양한 산업 분야의 융합을 통한 창업의 새로운 가능성을 모색하고자 **「2026 AI+X CONNECT FORUM」**을 개최합니다."
   }
  ]
 }

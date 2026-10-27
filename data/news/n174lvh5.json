@@ -3,6 +3,28 @@
  "updatedAt": "2026-10-27",
  "items": [
   {
+   "title": "[중앙도서관] 모바일 APP 정상이용 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277141&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-27",
+   "kind": "생활",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-27",
+   "thumb": "data/news/img/326a06369497a6b5.webp"
+  },
+  {
+   "title": "[학생지원팀] 천원의 아침밥 11월 메뉴 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277146&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-27",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-27",
+   "thumb": "data/news/img/4a766de9395a8a6d.webp",
+   "desc": "★11월 2일(월)~11월 30일(월) ★ 학생여러분의 많은 관심과 참여로 2학기 천원의 아침밥이 적극적으로 운영되고 있습니다."
+  },
+  {
    "title": "[학생지원팀] 2026년도 하반기 강화군 대학생 등록금 지원사업 안내(10. 26.(월) ~ 11. 9.(월) 18:00)",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277125&article.offset=0&articleLimit=10",
    "postedAt": "2026-10-27",
@@ -409,28 +431,6 @@
    "src": "5d85d287",
    "foundAt": "2026-10-12",
    "desc": "[시설건축팀] 외부 촬영 관련 협조 안내 본교에서 외부 촬영이 아래와 같이 진행될 예정이오니, 교내 구성원 여러분의 협조를 부탁드립니다."
-  },
-  {
-   "title": "[시설건축팀] 김수환관 지하1층 주차장 냉난방 배관 교체공사 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276659&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-12",
-   "kind": "생활",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-12",
-   "desc": "2. 공사기간 : 2026년 10월 19일 월요일 ~ 2026년 10월 31일 토요일"
-  },
-  {
-   "title": "[대플-추천채용] 원테크스탑 한국지점 – IT 엔지니어 부문 신입사원 채용",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276682&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-12",
-   "kind": "채용",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-12",
-   "desc": "* 추천채용 지원자는 서류전형 가산점 부여 ▶ 모집분야 : IT 엔지니어 부문 공통사항"
   }
  ]
 }

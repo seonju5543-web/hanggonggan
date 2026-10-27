@@ -3,6 +3,28 @@
  "updatedAt": "2026-10-27",
  "items": [
   {
+   "title": "★글로벌어학교육센터 행사 안내_Mystery Feel Boxes(10/29-30)",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726768",
+   "postedAt": "2026-10-27",
+   "kind": "행사",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-27",
+   "thumb": "data/news/img/c87a39d6af49e8f1.webp",
+   "desc": "글로벌어학교육센터 ★글로벌어학교육센터 행사 안내 영어로 대화하며 함께 할로윈 행사에 참여해보아요!"
+  },
+  {
+   "title": "2027년 2월 학부 2차 졸업예비사정 실시 안내(11/2~11/13)",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726763",
+   "postedAt": "2026-10-27",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-27",
+   "desc": "학사관리과 1. 2차 졸업예비사정 대상자 ※ 휴학생은 대상자 아님 (휴학생 졸업 불가) < 2학기 수강 중인 학점 및 계절수업 수강신청학점 포함 > < 본인의 1차 졸업예비사정 결과를 참고하여 계절수업 수강 필요…"
+  },
+  {
    "title": "2026학년도 동계 계절수업 개설 교과목 및 수강신청 등 일정 안내",
    "url": "https://www.pknu.ac.kr/main/163?action=view&no=726753",
    "postedAt": "2026-10-26",
@@ -402,28 +424,6 @@
    "thumb": "data/news/img/176486e725bb1c9b.webp",
    "src": "53a197d6",
    "desc": "<생성형 AI로 기획부터 집필, 교정, 출판까지 AI와 함께하는 작가 시스템 실습 과정>"
-  },
-  {
-   "title": "[학생상담센터] 2026-2학기 [학사경고자 및 소수집단학생 집중 심리·정서 지원] 운영 안내",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726550",
-   "postedAt": "2026-10-08",
-   "kind": "학사",
-   "school": "부경대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "thumb": "data/news/img/870b017fcf038ba6.webp",
-   "desc": "심리검사를 통해 나의 적응역량을 파악하고 학업을 방해하는 심리적 요인을 알아볼 수 있는 프로그램입니다. 검사 링크에 접속하여 바로 검사 실시 가능하며, 검사 완료 후 바로 결과 확인이 가능합니다.",
-   "src": "53a197d6"
-  },
-  {
-   "title": "[앵커본부] 무료초청장 안내- 2026 국제해양에너지플랜트산업전 (OFFSHORE KOREA 2026)",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726547",
-   "postedAt": "2026-10-08",
-   "school": "부경대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "desc": "일정 : 2026 년 10 월 14 일 ( 수 ) ~ 10 월 16 일 ( 금 ) 장소 : 부산 벡스코 (BEXCO) 제 1 전시장 주요 분야 : 조선 , 해양 엔지니어링 , 해양 에너지 전환 , 친환경 에너지 ,…",
-   "src": "53a197d6"
   }
  ]
 }

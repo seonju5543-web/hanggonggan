@@ -3,6 +3,16 @@
  "updatedAt": "2026-10-27",
  "items": [
   {
+   "title": "Node.js 취약점 조치 안내",
+   "url": "https://www.yonsei.ac.kr/bbs/sc/58/944486/artclView.do",
+   "postedAt": "2026-10-27",
+   "school": "연세대학교",
+   "campus": "",
+   "src": "d66b0482",
+   "foundAt": "2026-10-27",
+   "desc": "1. 안내 개요 최근 웹서비스 개발에 사용되는 서버 실행 환경인 Node.js에서 접근제어 미흡 및 인증서 미흡 관련 보안 취약점(CVE-2026-105482, CVE-2026-105483,…"
+  },
+  {
    "title": "일반공지 2026학년도 겨울 계절제 수업 안내(학부) 신촌/국제",
    "url": "https://www.yonsei.ac.kr/bbs/sc/58/944481/artclView.do",
    "postedAt": "2026-10-26",
