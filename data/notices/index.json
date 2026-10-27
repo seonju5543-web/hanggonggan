@@ -3,6 +3,10 @@
  "updatedAt": "2026-10-27",
  "schools": 44,
  "files": {
+  "강원대학교": {
+   "file": "nlzhvsh.json",
+   "count": 31
+  },
   "서울시립대학교": {
    "file": "n1au199v.json",
    "count": 37
@@ -74,10 +78,6 @@
   "서울교육대학교": {
    "file": "n18ebv4b.json",
    "count": 13
-  },
-  "강원대학교": {
-   "file": "nlzhvsh.json",
-   "count": 30
   },
   "한국외국어대학교": {
    "file": "n19cz03g.json",

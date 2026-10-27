@@ -302,5 +302,9 @@
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53566&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-27",
   "tries": 1
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/270037/artclView.do": {
+  "at": "2026-10-27",
+  "tries": 1
  }
 }
