@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-26",
+ "updatedAt": "2026-10-27",
  "note": "학교별 신청 시스템 이름 후보 — 정식 등록 공고 원문에서 읽은 것(apply-channel.js PORTAL_SYSTEMS 에 없는 이름만). unique=학교 고유 이름 · 근거 2건 이상. 사람이 확인해 apply-channel.js PORTAL_SYSTEMS·data.js PORTAL_SYSTEM_INFO 에 같은 열쇠로 넣는다(주소는 정찰로 확인한 것만).",
  "items": [
   {

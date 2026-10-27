@@ -1,8 +1,20 @@
 {
  "note": "학교별 실시간 공고 파일 색인. 앱은 noticeFileKey 로 자기 파일을 바로 찾아가고, 그 파일이 없을 때 옛 data/notices.json 을 받을지 말지를 이 색인으로 판단한다(match-engine.js noticeFallbackNeeded). 사람이 어느 파일이 어느 학교인지 보는 데도 쓴다.",
- "updatedAt": "2026-10-26",
+ "updatedAt": "2026-10-27",
  "schools": 44,
  "files": {
+  "고려대학교 세종캠퍼스": {
+   "file": "n1ch7t87.json",
+   "count": 23
+  },
+  "숭실대학교": {
+   "file": "nmljo8t.json",
+   "count": 31
+  },
+  "전남대학교": {
+   "file": "nwqmwga.json",
+   "count": 36
+  },
   "연세대학교 미래캠퍼스": {
    "file": "n1if6uwu.json",
    "count": 38
@@ -22,10 +34,6 @@
   "국민대학교": {
    "file": "n1tasrsl.json",
    "count": 38
-  },
-  "숭실대학교": {
-   "file": "nmljo8t.json",
-   "count": 30
   },
   "이화여자대학교": {
    "file": "n1tk2q9m.json",
@@ -111,10 +119,6 @@
    "file": "nsgh1oi.json",
    "count": 18
   },
-  "고려대학교 세종캠퍼스": {
-   "file": "n1ch7t87.json",
-   "count": 22
-  },
   "서강대학교": {
    "file": "n14n199r.json",
    "count": 40
@@ -158,10 +162,6 @@
   "전북대학교": {
    "file": "ncuyr4z.json",
    "count": 23
-  },
-  "전남대학교": {
-   "file": "nwqmwga.json",
-   "count": 35
   },
   "아주대학교": {
    "file": "n16dvfry.json",

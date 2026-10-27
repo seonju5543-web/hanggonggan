@@ -1,7 +1,25 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-10-26",
+ "updatedAt": "2026-10-27",
  "items": [
+  {
+   "title": "[장학안내] [강화군] 2026년도 하반기 강화군 대학생 등록금 지원사업 안내",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70812&cate=8",
+   "attachments": [
+    {
+     "name": "교육기본시설/부속시설",
+     "url": "https://www.jnu.ac.kr/MainIntro/Institution/AttachedFac"
+    },
+    {
+     "name": "공고문(2026년 하반기 강화군 대학생 등록금 지원사업).hwpx",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2589142"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-27"
+  },
   {
    "title": "[장학안내] [재단법인 안산인재육성재단] 2026년 2학기 안산시 대학생 ...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70787&cate=8",

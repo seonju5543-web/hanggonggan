@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-26",
+ "updatedAt": "2026-10-27",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -18541,8 +18541,8 @@
    "kindConfidence": "high",
    "kindFrom": "로봇(원문) 2026-10-26",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "300만원",
+   "amountValue": 3000000,
    "deadline": null,
    "listedAt": "2026-10-26",
    "period": "접수 기간 원문 확인",
@@ -18566,7 +18566,33 @@
     }
    ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323355",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "1) 신청 자격을 충족한 자",
+    "- 대한민국 국적자로 3학년 이상 재학중인 자",
+    "- 직전학기 19학점 이상 이수 및 백분위 708 이상인 자",
+    "- 중소:중견(매출액 9천억원 미만) 기업 취업-창업 희망자 및 기 취업-창업자",
+    "2) 한국장학재단 홈페이지에서 학생신청 기간 내 신청완료한 자",
+    "학얼성적",
+    "취:창엽준비계획",
+    "유관사엽참여 및 취:창업강의 이수자",
+    "* 취:창업 준비 계획 : 취:창업지원금 사용계획서 제출 여부 및 사용계획서 작성의 충실성 평가",
+    "* 유관사업 참여 및 취:창업강의 이수자 : 현장실습 및 중소기업 탐방 참여, 취:창업 과목 수강 여부",
+    "* 별도 기준 : 관련 자격증, 수상 실적, 취/창업 여부 등",
+    "2) 동점자 기준",
+    "- 1순위 : 기 취:창업자 우선 선정",
+    "- 3순위 : 직건학기 백분위 성적(소수점 절사) 높은 순"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 3000000,
+    "ratio": 0,
+    "min": 3000000,
+    "max": 3000000,
+    "raw": "를 지원내용 1 지원 금액 : 등록금(수업료) 전액 및 취-창업지원금*(학기망 300만원) (*때학기 직무기초교육 이수자에 한함)"
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-scho332282329artclviewdo",
@@ -19363,6 +19389,43 @@
     "raw": "4. ( 장학금액) 1인당 1,000,000 원 ※ 타 장학금과 중복 수혜 가능"
    },
    "exclusivityFrom": "공고 원문"
+  },
+  {
+   "id": "auto-rykeywordpaged1slug20262-0mvhb0o",
+   "name": "장학 ★ 2026학년도 2학기 특별장학금(주거비, 교통비, 근면숭실, 공인어학시험, 특별성적우수(12.5%), 가계곤란) 신청",
+   "boardTitle": "장학 ★ 2026학년도 2학기 특별장학금(주거비, 교통비, 근면숭실, 공인어학시험, 특별성적우수(12.5%), 가계곤란) 신청 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 학교 이름표 「숭실」"
+   ],
+   "kindConfidence": "mid",
+   "kindFrom": "로봇(제목)",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-10-27",
+   "period": "접수 기간 원문 확인",
+   "summary": "숭실대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "숭실대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-10-27 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "공지-2026-2학기-특별장학금-신청-안내_홈페이지-공지.pdf",
+     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs4VeJqF7%2FE%2BaSVwNZDaHglNgkAPkeqw6g70rZ2JN5LcGWuA89e8tUVVtOFznKwp1wmWGgDZRa9FWsIyG6D5zDKKEIjEUSFzwdiKAhbkoz%2Fb%2BTjEF4zlrK7%2FsEaoGtEK94y6ia8iZgarlyCWQTr3UmUJ60ozb%2Bg3ZilqVP5K7krw8K7m1%2BNPqEt4EtX711KWcsu8ai4Z8kfnwHPiXsXcIh1I%3D"
+    }
+   ],
+   "sourceUrl": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=%E2%98%85-2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%ED%8A%B9%EB%B3%84%EC%9E%A5%ED%95%99%EA%B8%88%EC%A3%BC%EA%B1%B0%EB%B9%84-%EA%B5%90%ED%86%B5%EB%B9%84-%EA%B7%BC%EB%A9%B4%EC%88%AD&keyword=%EC%9E%A5%ED%95%99",
+   "sourceKind": "auto"
   }
  ]
 }
