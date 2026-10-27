@@ -417,7 +417,7 @@
    "why": "글은 못 고르고 게시판만"
   },
   "yw.go.kr": {
-   "checkedAt": "2026-10-24",
+   "checkedAt": "2026-10-27",
    "pages": 9,
    "found": 0,
    "lines": 1,
@@ -514,7 +514,7 @@
    "why": "게시판도 글도 못 찾음"
   },
   "yonkang.org": {
-   "checkedAt": "2026-10-24",
+   "checkedAt": "2026-10-27",
    "pages": 10,
    "found": 0,
    "lines": 0,
@@ -670,7 +670,7 @@
    "targets": 1
   },
   "yjdream.kr": {
-   "checkedAt": "2026-10-24",
+   "checkedAt": "2026-10-27",
    "why": "홈페이지 못 엶 (TypeError: ECONNRESET → 브라우저도 실패(page.goto: net::ERR_CONNECTION_RESET at http://)",
    "targets": 1
   }

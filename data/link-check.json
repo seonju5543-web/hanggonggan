@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-26T16:48:25.259Z",
+ "updatedAt": "2026-10-27T14:43:55.765Z",
  "v": 1,
  "bad": {
   "https://nysc.or.kr/nysc/pages/notice_view.php?id=288": {
@@ -50,10 +50,6 @@
    "v": "other",
    "at": "2026-10-27"
   },
-  "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjUlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D": {
-   "v": "other",
-   "at": "2026-10-27"
-  },
   "https://www.motir.go.kr/kor/article/ATCL8764a1224/155119233/view": {
    "v": "other",
    "at": "2026-10-27"
@@ -96,10 +92,6 @@
   },
   "https://www.usspc.or.kr/": {
    "v": "home",
-   "at": "2026-10-27"
-  },
-  "https://www.yonkang.org/kr/news/652": {
-   "v": "other",
    "at": "2026-10-27"
   },
   "https://www.yonsei.ac.kr/bbs/sc/58/944452/artclView.do": {
