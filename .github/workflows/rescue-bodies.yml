@@ -61,6 +61,9 @@ jobs:
           ref: 'claude/nice-heisenberg-WESq5'
       - uses: actions/setup-node@v4
         with: { node-version: '20' }
+      # 파이썬 판 고정 — PaddleOCR 바퀴(cp39~cp313)가 러너 기본 파이썬엔 없어 설치가 매일 실패했다 (2026-10-28 · collect-scholarships.yml 과 같은 수리)
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
       - name: 진짜 크롬 설치
         timeout-minutes: 5
         run: |

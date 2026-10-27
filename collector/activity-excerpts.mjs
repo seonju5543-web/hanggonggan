@@ -65,7 +65,7 @@ const noContact = (lines) => lines.filter((l) => !CONTACT.test(l));
       → 글 제목이 본문에 다시 나오는 **마지막 자리부터** 읽고, 거기서 못 찾으면 전체를 읽는다(atTitle).
    그래도 이름표가 없으면 `대한민국 국민 누구나`·`AI에 관심 있는 누구나` 처럼 **누가 낼 수 있나만 말하는 줄**을 원문 그대로 쓴다(OPEN_LINE). */
 /* 활동 어휘는 collector/activity-vocab.mjs 한 곳(2026-10-27) — 머리글·요건 신호·'누가' 낱말·제목 속 대상 */
-import { ACT_HEAD, ACT_SIGNAL, ACT_WHO, targetFromTitle } from './activity-vocab.mjs';
+import { ACT_HEAD, ACT_SIGNAL, ACT_WHO, ACT_TAIL, targetFromTitle } from './activity-vocab.mjs';
 /* 🔴 `누구나` 가 **말의 끝**이어야 한다 — `③ 국민 누구나 찾고 머물며 … 공간`(공모 소재 예시)이 자격으로 뽑혔다(첨부 첫 실측).
    뒤에 붙어도 되는 것: 참여·신청 가능 · 괄호 부연(개인 또는 팀) · 인원(25인) */
 const OPEN_LINE = /(?:(?:국민|세계인|시민|청년|학생|대학생|개인|팀|관심\s?(?:있는|있으신)\s?(?:분|사람)?)\s*(?:이면\s*)?(?:누구나|모두)|누구나)\s*(?:참여|참가|신청|응모|지원)?\s*(?:가능)?\s*(?:\d+\s?(?:인|명))?\s*(?:[(（].*[)）])?\s*[.!]?\s*$|(?:대상|자격|연령|나이)\s*[:：]?\s*제한\s?없음/;
@@ -138,7 +138,7 @@ function qualifyLines(t) {
     const at = ls.indexOf(q[0]);
     if (!(at > 0 && HEAD_LIKE(ls[at - 1]))) q = [];
   }
-  if (!q.length) q = scoopQualifyLines(t, { who: ACT_WHO });
+  if (!q.length) q = scoopQualifyLines(t, { who: ACT_WHO, tail: ACT_TAIL });
   if (!q.length) q = [...new Set(t.split('\n').map((l) => l.trim()).filter((l) => l.length >= 4 && l.length <= 60 && OPEN_LINE.test(l) && !NOT_OPEN.test(l)))].slice(0, 2);
   return q;
 }
@@ -217,7 +217,8 @@ const inlineLabel = (t) => t
   .replace(/^([ \t]*(?:[ㅇ○●■□▣◆◇▶·•\-*]\s*)?)((?:지원|모집|참가|참여|신청|응모|공모)\s?(?:대상|자격))[ \t]+(?=[^\s:：][^\n:：]{0,40}$)/gm, '$1$2 : ')
   /* `공모기간 2026. 10. 6. – 11. 2.`(지식재산처) · `진행일정 2026-11-07~2027.02.19`(한남대) — 기간·일시 이름표 뒤에 콜론 없이 날짜가 붙은 줄 · `접수 마감 - 2026년 11월 2일`(외대부고)의 대시도 콜론으로 */
   .replace(new RegExp(`^([ \\t]*(?:[ㅇ○●■□▣◆◇▶·•\\-*]\\s*)?)(${PERIODISH})[ \\t]*(?:[-–—][ \\t]*)?(?=(?:20\\d\\d|\\d{1,2})\\s?[.\\-/년월]|상시|수시|연중)`, 'gm'), '$1$2 : ');   // `신청기간 상시`(한남대) 도
-const normalizeText = (text) => labelColon(inlineLabel(bulletNorm(String(text || ''))));
+/* 마크다운 굵게(`**참가대상**` — 온통청년 포스터 대체 글)는 기호만 뗀다 — 안 떼면 머리글·표 머리 판정이 못 알아본다(2026-10-28) */
+const normalizeText = (text) => labelColon(inlineLabel(bulletNorm(String(text || '').replace(/\*\*/g, ''))));
 export function activityDetails(text, title) {
   const t = normalizeText(text);
   if (!t.trim()) { const tt = targetFromTitle(title); return { eligibilityLines: tt ? [tt] : [], eligibilityExcludes: [], eligibilityPriority: [], noticeLines: [] }; }   // 본문이 없어도 제목의 대상은 읽는다
@@ -310,7 +311,7 @@ export function sanitizeBenefit(it) {
 
 /* 글 하나에 위 결과를 붙인다 — 수집 로봇의 세 길(새 글 · 재단 글 · 소급)과 API 로봇이 **같은 함수**를 쓴다.
    빈 칸은 지운다(읽었는데 없으면 옛 값을 남기지 않는다 · 장학 로봇과 같은 규칙). */
-export const ACT_DETAILS_V = 5;   // 5 (2026-10-19): 「자격요건」 머리글·나이 신호·게시판 잡티·기간 이름표 줄 — 전 글 다시 읽기   // 이 판으로 읽은 글은 detailsV 가 같다 — 다르면 수집 로봇이 원문을 다시 읽는다(소급 · 원칙 7) · 3 = 2026-10-03 활동 자격 읽기(제목부터·괄호 이름표·누구나) · 4 = 2026-10-16 안내 문장·시상표 거름 + 자격 절이 참가방법·시상에서 끊김
+export const ACT_DETAILS_V = 6;   // 6 (2026-10-27): 대외활동 어휘(activity-vocab) — 전 글 다시 읽기 · 5 (10-19): 자격요건 머리글·게시판 잡티   // 이 판으로 읽은 글은 detailsV 가 같다 — 다르면 수집 로봇이 원문을 다시 읽는다(소급 · 원칙 7) · 3 = 2026-10-03 활동 자격 읽기(제목부터·괄호 이름표·누구나) · 4 = 2026-10-16 안내 문장·시상표 거름 + 자격 절이 참가방법·시상에서 끊김
 export function putActivityDetails(it, details) {
   /* 🔴 본문에 자격이 없는데 첨부·포스터에서 읽어 둔 자격(eligibilityFrom · collector/activity-docs.mjs)은 지우지 않는다 —
      본문을 다시 읽을 때마다 첨부에서 건진 자격이 빈 본문에 덮여 사라진다. 본문에서 자격이 나오면 본문이 이긴다(출처 표식도 뗀다). */

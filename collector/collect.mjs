@@ -21,6 +21,7 @@ import { isAttachmentEntry, detailAttachments, stripSiteChrome } from './attachm
 import { activityKind, activityField, notActivity, unreadableSource, ACTIVITY_FIELDS } from './activity-kind.mjs';
 import { activityExcerpts, activityDetails, putActivityDetails, ACT_DETAILS_V, sanitizeBenefit, sanitizeElig } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
+import { detailByRule } from './activity-detail-rules.mjs';   // 본문이 스크립트로 그려지는 게시판(온통청년)의 숨은 글 주소 — 첨부 로봇과 같은 함수(2026-10-28)
 import { robotsAllows } from './robots.mjs';
 import { extractLinks, stripSessionId, hrefText } from './board-links.mjs';
 import { tidyExternal, dropReason as externalDropReason, fillDeadlineFromHint } from './external-clean.mjs';
@@ -125,6 +126,9 @@ const UA = FETCH_HEADERS;   // 규칙은 http-headers.mjs 한 곳 (2026-08-20)
 /* 공고 상세 페이지에서 첨부파일과 마감 단서 추출 */
 async function fetchDetail(item) {
   try {
+    /* 규칙이 있는 게시판은 JSON 으로(activity-detail-rules.mjs) — 온통청년은 평문 HTML 이 메뉴뿐이라 글자 0줄이었다(2026-10-28). 규칙이 없으면 예전처럼 */
+    const ruled = await detailByRule(item.url);
+    if (ruled) return { attachments: ruled.attachments, deadlineHint: deadlineHintFrom(ruled.text.replace(/\s+/g, ' ')), text: ruled.text };
     const res = await fetch(item.url, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(15000) });
     if (!res.ok) return { attachments: [], deadlineHint: null };
     const html = await res.text();

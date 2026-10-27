@@ -12530,7 +12530,11 @@ console.log('\n■ 자격요건 로봇 (진짜 브라우저) — 장학·대외�
   /* 🔴 PaddleOCR 판 고정 — 판을 안 적으면 그날 최신(3.3.x)이 깔려 x86 클라우드에서 모든 그림이 오류(2026-10-04 · 맥은 ARM 이라 멀쩡했다) */
   for (const f of ['rescue-bodies.yml', 'collect-scholarships.yml']) {
     const y = readText(new URL('../.github/workflows/' + f, import.meta.url));
-    eq(`  🔴 ${f} — PaddleOCR 은 판을 고정해 깐다`, ((ms) => ms.length > 0 && ms.every((m) => /paddlepaddle==[\d.]+ paddleocr==[\d.]+/.test(m[0])))([...y.matchAll(/pip install[^\n]*paddle[^\n]*/g)]), true);   // 설치 줄이 여럿이어도(장학 포스터 · 대외활동) 전부
+    eq(`  🔴 ${f} — PaddleOCR 은 판을 고정해 깐다`, ((ms) => ms.length > 0 && ms.every((m) => /paddlepaddle==[\d.]+ paddleocr==[\d.]+/.test(m[0])))([...y.matchAll(/pip install[^\n]*paddle[^\n]*/g)]), true);   // 설치 줄이 여럿이어도(장학
+    /* 🔴 파이썬 판도 고정한다 (2026-10-28) — PaddleOCR 바퀴는 cp39~cp313 뿐이라 러너 기본 파이썬이 그 밖이면 `from versions: none` 으로 설치가 조용히 실패한다
+       (10-24~27 매일 · 경고만 남고 초록불 · 포스터 자격 읽기가 통째로 빈 채 "자격 0줄인 활동 글 30건"이 그대로였다). setup-python 이 pip 보다 앞에 있어야 한다 */
+    const ipy = y.search(/uses: actions\/setup-python@v\d[\s\S]{0,120}?python-version: '3\.1[0-3]'/), ipip = y.indexOf('pip install --quiet paddlepaddle');
+    eq(`  🔴 ${f} — PaddleOCR 앞에 파이썬 3.10~3.13 을 고정한다(setup-python)`, ipy >= 0 && ipip > ipy, true);
   }
   const caps = [...wf.matchAll(/^ {8}timeout-minutes: (\d+)/gm)].map((m) => Number(m[1]));
   const job = Number((wf.match(/^ {4}timeout-minutes: (\d+)/m) || [])[1]);
@@ -13049,6 +13053,31 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
       eq('  AI 검산도 활동 어휘로 — 「예비창업자 …」 는 장학 신호만으로는 거절, 활동 신호를 주면 통과',
         [AI3.verifyPdfLines({ lines: ['예비창업자 및 창업 3년 이내 기업 대표'] }).ok, AI3.verifyPdfLines({ lines: ['예비창업자 및 창업 3년 이내 기업 대표'] }, { signal: V.ACT_SIGNAL }).ok], [false, true]);
       eq('  activity-docs 가 두 검산에 활동 어휘를 넘긴다', (readText(new URL('../collector/activity-docs.mjs', import.meta.url)).match(/\{ signal: ACT_SIGNAL \}/g) || []).length, 2);
+    }
+    /* ⑭-4 숨은 글 주소 규칙 (2026-10-28 개발자 "출처는 그대로 두되 최대한 공짜 경로로") — 온통청년 글은 평문 HTML 이 메뉴뿐 · JSON(쿠키 필요)에 본문·포스터 대체 글·그림이 있다 */
+    {
+      const DR = await import('../collector/activity-detail-rules.mjs');
+      const calls = [];
+      const fakeFetch = async (url, init) => {
+        calls.push({ url, cookie: (init && init.headers && init.headers.Cookie) || '' });
+        const json = (o) => ({ ok: true, status: 200, headers: { getSetCookie: () => [] }, json: async () => o, text: async () => JSON.stringify(o) });
+        if (/bbs03View/.test(url)) return { ok: true, status: 200, headers: { getSetCookie: () => ['XSRF-TOKEN=abc; Path=/', 'SCOUTER=z; Path=/'] }, text: async () => '<html>메뉴뿐</html>' };
+        if (!/Cookie|XSRF/.test(JSON.stringify(init && init.headers))) return { ok: false, status: 401, headers: { getSetCookie: () => [] }, json: async () => ({}), text: async () => 'Unauthorized' };
+        if (/\/sur\/cmu\/bbs\/pst\/48\/10827/.test(url)) return json({ result: { bbs: { pstTtl: '「2026 IFWY 은평 컨퍼런스」 참가자 모집 안내', pstWholCn: '<p><a href="https://x">✔️신청안내 바로가기</a></p>', pstAtchFileMngSn: '25220', pstRprsImgSn: '25219' } } });
+        if (/atchFileMngSn=25219/.test(url)) return json({ result: { atchFileDetList: [{ atchFileSn: '1012245', atchFilePath: '/CMU/2026/10/12', exsFileNm: '국문포스터-', atchFileNm: '1012245', atchFileExtnNm: 'png', imgSubTextCn: '2026 IFWY 은평 컨퍼런스\n참가신청 및 자세히 보기\n국내 거주 내·외국인 청년\n문의 | ifwy@debatekorea.org' }] } });
+        if (/atchFileMngSn=25220/.test(url)) return json({ result: { atchFileDetList: [{ atchFileSn: '7', atchFilePath: '/CMU/2026/10/12', exsFileNm: '모집요강', atchFileNm: '7', atchFileExtnNm: 'hwp', imgSubTextCn: '' }] } });
+        return { ok: false, status: 404, headers: { getSetCookie: () => [] }, json: async () => ({}), text: async () => '' };
+      };
+      const r = await DR.detailByRule('https://www.youthcenter.go.kr/bbs03View/48/10827', fakeFetch);
+      eq('⑭-4 온통청년 글은 JSON 으로 본문·포스터 대체 글·그림·첨부를 받는다 (쿠키를 들고)',
+        [!!r && /국내 거주 내·외국인 청년/.test(r.text) && /참가자 모집 안내/.test(r.text), r && r.images.map((i) => i.url), r && r.attachments.length, calls.slice(1).every((c) => /XSRF-TOKEN=abc/.test(c.cookie))],
+        [true, ['https://www.youthcenter.go.kr/image?imageName=/CMU/2026/10/12/1012245.png'], 1, true]);
+      eq('  규칙이 없는 주소는 null · 규칙 여부는 hasDetailRule', [await DR.detailByRule('https://www.kw.ac.kr/ko/life/notice.jsp?DUID=1', fakeFetch), DR.hasDetailRule('https://www.youthcenter.go.kr/bbs03View/48/10827'), DR.hasDetailRule('https://www.youthcenter.go.kr/youthPolicy')], [null, true, false]);
+      eq('  그 글자에서 자격이 읽힌다 — 포스터 한 줄 `국내 거주 내·외국인 청년`(2차 줍기 · 활동 글은 한 줄도 담는다) · `**참가대상**` 굵게 기호는 뗀다',
+        [AX4.activityDetails(r.text, '「2026 IFWY 은평 컨퍼런스」 참가자 모집 안내').eligibilityLines, AX4.activityDetails('**참가대상**\n15세 이상 39세 이하 청년 중 구리시 내 창업을 희망하는 예비창업자\n**공모분야**\n* 관광·로컬 콘텐츠').eligibilityLines],
+        [['국내 거주 내·외국인 청년'], ['참가대상 : 15세 이상 39세 이하 청년 중 구리시 내 창업을 희망하는 예비창업자']]);   // 머리글은 이름표로 붙는다(화면이 뗀다)
+      const cSrc = readText(new URL('../collector/collect.mjs', import.meta.url)), aSrc = readText(new URL('../collector/activity-docs.mjs', import.meta.url));
+      eq('  수집 로봇(fetchDetail)과 첨부 로봇(fetchPost)이 같은 detailByRule 을 먼저 부른다', [/const ruled = await detailByRule\(item\.url\)/.test(cSrc), /const ruled = await detailByRule\(n\.url\)/.test(aSrc) && /-R\.txt/.test(aSrc)], [true, true]);
     }
     eq('  카드 링크 자리는 style.css 에 있다(.card-src-link · has-link 아랫줄 여백)', /\.card-src-link \{/.test(readText(new URL('../style.css', import.meta.url))) && /\.sch-card-wrap\.has-link > \.sch-card \.sch-foot/.test(readText(new URL('../style.css', import.meta.url))), true);
     eq('⑭ 자격 줄 — 안내 문장(`…모집합니다`·`…제공하고 있습니다`·`…하시기 바랍니다`·`첨부파일이(가) 없습니다`·`가능합니다`)은 아니다',

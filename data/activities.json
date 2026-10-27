@@ -1298,10 +1298,15 @@
    "api": "youthContent",
    "apiId": "10853",
    "id": "api-youthContent-10853",
-   "detailsV": 5,
+   "detailsV": 6,
    "foundAt": "2026-10-27",
    "seenAt": "2026-10-27",
-   "excerptsAt": "2026-10-27"
+   "excerptsAt": "2026-10-28",
+   "deadline": "2026-11-10",
+   "eligibilityLines": [
+    "만 15세~만 34세의 미취업 청년",
+    "(개인 or 팀을 이루어 신청 가능)"
+   ]
   },
   {
    "title": "미래내일 일경험 기업 실무 프로젝트 참여자 모집 - 2. 경영사무",
@@ -1317,10 +1322,15 @@
    "api": "youthContent",
    "apiId": "10852",
    "id": "api-youthContent-10852",
-   "detailsV": 5,
+   "detailsV": 6,
    "foundAt": "2026-10-27",
    "seenAt": "2026-10-27",
-   "excerptsAt": "2026-10-27"
+   "excerptsAt": "2026-10-28",
+   "deadline": "2026-11-10",
+   "eligibilityLines": [
+    "만 15세~만 34세의 미취업 청년",
+    "(개인 or 팀을 이루어 신청 가능)"
+   ]
   },
   {
    "title": "미래내일 일경험 기업 실무 프로젝트 참여자 모집 - 1. 광고 마케팅",
@@ -1336,10 +1346,16 @@
    "api": "youthContent",
    "apiId": "10851",
    "id": "api-youthContent-10851",
-   "detailsV": 5,
+   "detailsV": 6,
    "foundAt": "2026-10-27",
    "seenAt": "2026-10-27",
-   "excerptsAt": "2026-10-27"
+   "excerptsAt": "2026-10-28",
+   "deadline": "2026-11-10",
+   "eligibilityLines": [
+    "만 15세~만 34세의 미취업 청년",
+    "(개인 or 팀을 이루어 신청 가능)",
+    "모집 대상 : 만 15세~만 34세의 미취업 청년 (개인 or 팀을 이루어 신청 가능)"
+   ]
   },
   {
    "title": "한국어촌어항공단 - 2026 청년 어촌 창업 아이디어 공모전",
@@ -1382,7 +1398,12 @@
    "kind": "공모전",
    "field": "기획·아이디어",
    "deadlineHint": null,
-   "excerpts": [],
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026. 10. 08.(목) - 11. 05.(목)"
+    }
+   ],
    "attachments": [],
    "school": "",
    "campus": "",
@@ -1390,10 +1411,15 @@
    "api": "youthContent",
    "apiId": "10841",
    "id": "api-youthContent-10841",
-   "detailsV": 5,
+   "detailsV": 6,
    "foundAt": "2026-10-20",
    "seenAt": "2026-10-27",
-   "excerptsAt": "2026-10-27"
+   "excerptsAt": "2026-10-28",
+   "deadline": "2026-11-05",
+   "eligibilityLines": [
+    "15세 이상 39세 이하 청년 중 구리시 내 창업 또는 사업화를 희망하는 예비창업자 및 창업자",
+    "※ 구리시 지역자원을 활용하거나 구리시를 기반으로 창업 사업화를 추진할 수 있는 아이디어 보유자"
+   ]
   },
   {
    "title": "구리시청년내일센터 - 2026 청년교류 프로그램 <내 편, 우리 편 만나기>",
@@ -1409,10 +1435,10 @@
    "api": "youthContent",
    "apiId": "10840",
    "id": "api-youthContent-10840",
-   "detailsV": 5,
+   "detailsV": 6,
    "foundAt": "2026-10-20",
    "seenAt": "2026-10-27",
-   "excerptsAt": "2026-10-27"
+   "excerptsAt": "2026-10-28"
   },
   {
    "title": "국무조정실 - 정부위원회 청년위원 통합공모 안내",
@@ -1450,10 +1476,13 @@
    "api": "youthContent",
    "apiId": "10827",
    "id": "api-youthContent-10827",
-   "detailsV": 5,
+   "detailsV": 6,
    "foundAt": "2026-10-13",
    "seenAt": "2026-10-27",
-   "excerptsAt": "2026-10-27"
+   "excerptsAt": "2026-10-28",
+   "eligibilityLines": [
+    "국내 거주 내·외국인 청년"
+   ]
   },
   {
    "title": "‘나의 광주 정착 키트’ 2기 참여자 모집",

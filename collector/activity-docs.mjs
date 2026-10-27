@@ -37,6 +37,7 @@ import { decodeEntities } from './clean-title.mjs';
 import { attachmentText, isOcrSource, isNoticeDoc } from './attachment-text.mjs';
 import { activityDetails, eligLineOk } from './activity-excerpts.mjs';
 import { ACT_SIGNAL } from './activity-vocab.mjs';
+import { detailByRule } from './activity-detail-rules.mjs';   // 온통청년처럼 글·포스터가 JSON 에 있는 게시판 — 수집 로봇과 같은 함수(2026-10-28)
 const { cutAtNextSection } = await import('./extract-excerpts.mjs');   // activity-excerpts 와 같은 이유로 동적으로(환경변수보다 뒤에)
 
 const HERE = new URL('.', import.meta.url);
@@ -204,10 +205,26 @@ async function browserHtml(url) {
 
 /** 글 하나의 파일을 받는다 → act-files 안의 파일 이름들 */
 async function fetchPost(n, until, common = new Set(), owners = new Map()) {
-  const html = await getHtml(n.url);
-  if (!html) return null;
   const got = [];
   const key = keyOf(n.url);
+  /* 규칙이 있는 게시판(온통청년)은 JSON 에서 본문 + 포스터 대체 글(`-R.txt`)과 포스터 그림을 받는다 — 평문 HTML 은 메뉴뿐이라 후보가 0개였다(2026-10-28) */
+  const ruled = await detailByRule(n.url);
+  if (ruled) {
+    if (ruled.text.trim()) { fs.writeFileSync(path.join(DIR, `${key}-R.txt`), ruled.text); got.push(`${key}-R.txt`); }
+    for (const f of ruled.images.slice(0, FILES_PER_POST)) {
+      if (Date.now() > until) break;
+      try {
+        const d = await download({ ...f, from: 'img' }, n.url);
+        if (!d) continue;
+        const name = `${key}-${got.length}i.${d.ext}`;
+        fs.writeFileSync(path.join(DIR, name), d.buf);
+        got.push(name);
+      } catch { /* 이 그림만 건너뛴다 */ }
+    }
+    return got;
+  }
+  const html = await getHtml(n.url);
+  if (!html) return null;
   /* 브라우저로 그린 본문은 `-B.txt` 로 — 일반 받기로는 글자 0 이던 자바스크립트 페이지의 본문이다 */
   if (BROWSER) { fs.writeFileSync(path.join(DIR, `${key}-B.txt`), htmlToLines(html)); got.push(`${key}-B.txt`); }
   /* 파일 이름 끝의 `i` = 페이지에서 주운 그림(그 글의 것인지 제목 낱말로 확인해야 한다) · 없으면 글에 붙은 첨부 */

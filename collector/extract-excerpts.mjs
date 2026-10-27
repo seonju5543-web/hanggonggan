@@ -722,6 +722,7 @@ function scoopQualifyLines(text, opts = {}) {
   const lines = text.split(/\n+/).map((l) => unent(l).replace(/[ \t　]+/g, ' ').trim()).filter(Boolean);
   const out = [];
   const WHO_ = opts.who ? new RegExp(`${WHO.source}|${opts.who.source}`) : WHO;   // 활동 글의 '누가' 낱말(activity-vocab ACT_WHO · 2026-10-27)
+  const TAIL_ = opts.tail ? new RegExp(`${TAIL.source}|${opts.tail.source}`) : TAIL;   // 활동 포스터의 짧은 대상 줄(`국내 거주 내·외국인 청년`) 꼬리(ACT_TAIL · 2026-10-28)
   for (const l of lines) {
     if (l.length < 6 || l.length > 110) continue;
     if (JUNK.test(l) || NOT_REQ.test(l) || NOT_REQ2.test(l)) continue;
@@ -729,11 +730,12 @@ function scoopQualifyLines(text, opts = {}) {
     if (!/[가-힣]/.test(l)) continue;
     if (/^\d{4}[.\-]\d/.test(l)) continue;                 // 날짜 줄
     const strong = STRONG.test(l);
-    if (!strong && !(WHO_.test(l) && TAIL.test(l))) continue;
+    if (!strong && !(WHO_.test(l) && TAIL_.test(l))) continue;
     if (!out.includes(l)) out.push(l);
     if (out.length >= 6) break;
   }
-  return out.length >= 2 ? out : [];      // 한 줄짜리는 믿지 않는다
+  /* 한 줄짜리는 믿지 않는다 — 단 활동 글(opts.who)은 포스터 한 줄(`국내 거주 내·외국인 청년`)이 자격의 전부인 일이 흔해 한 줄도 담는다(2026-10-28) */
+  return out.length >= (opts.who ? 1 : 2) ? out : [];
 }
 
 /* 규칙 함수를 밖에서 부를 수 있게 내보낸다 (2026-08-20).
