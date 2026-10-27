@@ -1,7 +1,19 @@
 {
  "school": "서울대학교",
- "updatedAt": "2026-10-26",
+ "updatedAt": "2026-10-27",
  "items": [
+  {
+   "title": "학부대학 직원(서무팀_기간제) 채용 공고",
+   "url": "https://snuc.snu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/?mod=document&uid=924",
+   "postedAt": "2026-10-27",
+   "kind": "채용",
+   "school": "서울대학교",
+   "campus": "",
+   "board": "학부대학 공지",
+   "src": "efac1856",
+   "foundAt": "2026-10-27",
+   "desc": "서울대학교 학부대학 직원(기간제)을 채용하고자 아래와 같이 공고하오니 많은 지원 바랍니다."
+  },
   {
    "title": "2026학년도 2학기 리포트 집중지도(2차) 참가자 발표(*첨부파일 필독)",
    "url": "https://snuc.snu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/?mod=document&uid=923",

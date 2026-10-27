@@ -1,7 +1,28 @@
 {
  "school": "홍익대학교",
- "updatedAt": "2026-10-26",
+ "updatedAt": "2026-10-27",
  "items": [
+  {
+   "title": "홍익대학교 영자신문사 Tidings에서 신입기자를 모집합니다!",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159621&noCat=514",
+   "postedAt": "2026-10-27",
+   "school": "홍익대학교",
+   "campus": "",
+   "src": "9c41077f",
+   "foundAt": "2026-10-27",
+   "thumb": "data/news/img/8c85031f0caf9104.webp",
+   "desc": "학생활동 영자신문 📝모집 인원 : 0명 📝모집 부문 : 취재기자 0명 📝주요 업무 &bull; 기자: 연 4회 간행물 발행에 따른 기사 작성 및 그에 필요한 활동 📝지원 자격 : 2026년 2학기 재학생 중…"
+  },
+  {
+   "title": "2026학년도 2학기 천원의 아침밥 운영 기한 안내 (서울캠퍼스)",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159614&noCat=500",
+   "postedAt": "2026-10-27",
+   "school": "홍익대학교",
+   "campus": "",
+   "src": "9c41077f",
+   "foundAt": "2026-10-27",
+   "desc": "홍익대학교 서울캠퍼스 천원의 아침밥 운영 기한을 다음과 같이 안내하오니 재학생들의 많은 이용 바랍니다 ."
+  },
   {
    "title": "[행사 안내] 2026 Light on 세종 개최 및 학생 참여 안내",
    "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159596&noCat=32",
@@ -394,15 +415,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "desc": "세종캠퍼스 학생상담센터(세종) 홍익 SDP(Self Development Plan) 프로그램은 '자기주도의 대학생활 설계도'로 지도교수님의 진로코칭 상담을 받을 수 있으며 대학생활의 적응과 진로목표 달성에 도움을…"
-  },
-  {
-   "title": "문헌관 16층 교직원 식당 위탁운영 계약 만료에 따른 식권 소진 안내",
-   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158468&noCat=500",
-   "postedAt": "2026-09-29",
-   "school": "홍익대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/bc022e2e53d86ed7.webp"
   }
  ]
 }

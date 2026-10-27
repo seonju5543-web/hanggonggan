@@ -1,7 +1,40 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-10-26",
+ "updatedAt": "2026-10-27",
  "items": [
+  {
+   "title": "2026년도 하반기 강화군 대학생 등록금 지원 사업 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140811&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-27",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-27",
+   "thumb": "data/news/img/af2cdde6240eb9a4.webp",
+   "desc": "성균관대학교 장학담당 군민의 고등교육비 부담을 경감 및 지역인재를 육성하고자「강화군 대학생 등록금 지원 조례」에 따라 2026년도 하반기 강화군 대학생 등록금 지원 사업을 다음과 같이 안내하오니 관심 있는 학생들의…"
+  },
+  {
+   "title": "2026년 「천원의 아침밥」만족도 설문조사",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140809&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-27",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-27",
+   "thumb": "data/news/img/a4604760ed96eaa1.webp",
+   "desc": "학생지원팀 안녕하십니까, 학생지원팀입니다. 농림수산식품교육문화정보원에서 '2026 천원의 아침밥 사업'의 운영 성과 및 효과를 분석하기 위해 본교 재학생을 대상으로 설문조사를 실시합니다."
+  },
+  {
+   "title": "[학생인재개발팀/대학일자리플러스센터] 2026 하반기 실전 모의면접",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140807&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-26",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-27",
+   "thumb": "data/news/img/028b510ea33d0705.webp",
+   "desc": "학생인재개발팀에서 2026 하반기 대비 실전 모의면접을 진행합니다. 1. 일 정: 11.2.(월)~11.12.(목), 캠퍼스별 상이"
+  },
   {
    "title": "에듀테크연구소 행정 직원 채용 공고",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140797&article.offset=0&articleLimit=10",
@@ -404,40 +437,6 @@
    "foundAt": "2026-10-15",
    "thumb": "data/news/img/c38c92a9f7ff1a2d.webp",
    "desc": "성균관대학교는 매년 행정·기술·외교관 후보자 시험 및 공인회계사, 변리사 등 각종 전문직 시험에서 꾸준히 우수한 결실을 맺으며 국가 인재 양성의 요람으로서 그 전통을 이어가고 있습니다."
-  },
-  {
-   "title": "외국인유학생지원팀 촉탁직원 채용 공고",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140583&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-15",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-15",
-   "desc": "총괄지원팀 우리대학 외국인유학생지원팀에서 근무할 촉탁직원을 아래와 같이 채용합니다."
-  },
-  {
-   "title": "2026학년도 2학기 미래차 SDV/전동화/자율주행 마이크로디그리 신청 안내 - 10/19(월)~10/23(금)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140577&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-14",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-14",
-   "thumb": "data/news/img/7afde5722a8cf77c.webp",
-   "desc": "게임기술개발지원센터 2026학년도 2학기 (1차) 「미래차 SDV/전동화/자율주행 마이크로디그리」에 대하여 아래와 같이 안내하오니 관심있는 학생들의 많은 신청 바랍니다."
-  },
-  {
-   "title": "[인공지능혁신융합대학사업단] AICOSS 사업단 설명회 참석 안내",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140563&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-14",
-   "kind": "행사",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-14",
-   "thumb": "data/news/img/70729779fd42e300.webp",
-   "desc": "- 일자: 2026년 11월 2일(월) - 장소: 호암관 50106호 <사전 신청 및 참석 혜택>"
   }
  ]
 }

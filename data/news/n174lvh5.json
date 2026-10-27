@@ -1,7 +1,17 @@
 {
  "school": "가톨릭대학교",
- "updatedAt": "2026-10-26",
+ "updatedAt": "2026-10-27",
  "items": [
+  {
+   "title": "[학생지원팀] 2026년도 하반기 강화군 대학생 등록금 지원사업 안내(10. 26.(월) ~ 11. 9.(월) 18:00)",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277125&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-27",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-27",
+   "thumb": "data/news/img/3c88948b8136397c.webp"
+  },
   {
    "title": "[IR센터] 2026학년도 가톨릭대학교 학생 AI 학습 활용 현황 및 교육요구 조사 안내",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277121&article.offset=0&articleLimit=10",
@@ -75,7 +85,8 @@
    "school": "가톨릭대학교",
    "campus": "",
    "src": "5d85d287",
-   "foundAt": "2026-10-26"
+   "foundAt": "2026-10-26",
+   "thumb": "data/news/img/858dab44319b0cbb.webp"
   },
   {
    "title": "[대플-추천채용] 이카운트 - 서비스본부 신입 채용",
@@ -420,17 +431,6 @@
    "src": "5d85d287",
    "foundAt": "2026-10-12",
    "desc": "* 추천채용 지원자는 서류전형 가산점 부여 ▶ 모집분야 : IT 엔지니어 부문 공통사항"
-  },
-  {
-   "title": "[교수학습개발원] '신임교원 리서치 콜로키엄' 5차 신청 안내(교원 대상)",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276649&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-12",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-12",
-   "thumb": "data/news/img/73691d4dca0af3dc.webp",
-   "desc": "◎ 장소 : D313 호 ( 다솔관 ) ◎ 발표 : 윤현상 교수 ( 국사학과 ), 박경우 교수 ( 심리학과 ), 박진영 교수 ( 사회학과 ) ◎ 신청대상 : 본교 교원 ◎ 신청방법 : 10/21( 수 ) 까지…"
   }
  ]
 }

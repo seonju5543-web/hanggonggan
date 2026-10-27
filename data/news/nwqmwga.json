@@ -1,7 +1,56 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-10-26",
+ "updatedAt": "2026-10-27",
  "items": [
+  {
+   "title": "[채용공고] 2026년도 제12회 계약직원(사무원, 언론담당관) 경력경쟁채...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70811",
+   "postedAt": "2026-10-27",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-27"
+  },
+  {
+   "title": "[취업정보] [BIXPO 2026 참가] 2026년 글로컬대학사업 「제조 ...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70810",
+   "postedAt": "2026-10-27",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-27"
+  },
+  {
+   "title": "[취업정보] 2026년 글로컬대학사업 「빅데이터분석기사, 차근차근 실습하기」",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70809",
+   "postedAt": "2026-10-27",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-27"
+  },
+  {
+   "title": "[채용공고] 전남대 서비스디자인융합연구소 인문사회연구소지원사업 2026년...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70808",
+   "postedAt": "2026-10-27",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-27",
+   "thumb": "data/news/img/01ba5a9dc2da0d61.webp"
+  },
+  {
+   "title": "[모집공고] 공직인재 요람 '용봉인재원 행정고시반' 신규 실원 모집",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70807",
+   "postedAt": "2026-10-26",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-27",
+   "thumb": "data/news/img/cc041bf368c535ad.webp"
+  },
   {
    "title": "[행정공고] 법학전문대학원 1,2호관 CCTV 추가설치 행정예고 및 의견조회",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70805",
@@ -69,7 +118,8 @@
    "school": "전남대학교",
    "campus": "",
    "src": "b7347301",
-   "foundAt": "2026-10-26"
+   "foundAt": "2026-10-26",
+   "thumb": "data/news/img/f679a6a4e702d523.webp"
   },
   {
    "title": "[취업정보] [산림조합중앙회]2026년도 산림조합중앙회 임용전형 (~10....",
@@ -116,8 +166,7 @@
    "school": "전남대학교",
    "campus": "",
    "src": "b7347301",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/571db85c2d3df71f.webp"
+   "foundAt": "2026-10-26"
   },
   {
    "title": "[모집공고] [GIST, AICA, 전남대학교] NPU 평가·검증 실무 교...",
@@ -348,56 +397,6 @@
    "campus": "",
    "src": "b7347301",
    "foundAt": "2026-10-21"
-  },
-  {
-   "title": "[채용공고] 2026년도 제2회 전남대학교 기획조정과 국립대학육성사업 계약...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70762",
-   "postedAt": "2026-10-21",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-21"
-  },
-  {
-   "title": "[대학생활] 「2026 HUSS 디지털경제 컨소시엄 인문사회·디지털경제 융...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70761",
-   "postedAt": "2026-10-21",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-21",
-   "thumb": "data/news/img/0417aaca2692dca3.webp"
-  },
-  {
-   "title": "[학사안내] 2026학년도 동계 계절학기 타 대학교(제주대) 교류수학 추천...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70760",
-   "postedAt": "2026-10-21",
-   "kind": "학사",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-21"
-  },
-  {
-   "title": "[학사안내] 2026학년도 동계 계절학기 타 대학교(강원대) 교류수학 추천...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70758",
-   "postedAt": "2026-10-21",
-   "kind": "학사",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-21"
-  },
-  {
-   "title": "[모집공고] [시립서울청소년센터] 2026년 찾아가는 서울시 특수학급 예능...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70757",
-   "postedAt": "2026-10-21",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-21",
-   "thumb": "data/news/img/cc5d25a7de5593d4.webp"
   }
  ]
 }

@@ -1,7 +1,57 @@
 {
  "school": "경기대학교",
- "updatedAt": "2026-10-26",
+ "updatedAt": "2026-10-27",
  "items": [
+  {
+   "title": "[일반] 2026학년도 천원의 아침밥 만족도 설문조사 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626829&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-27",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-10-27",
+   "desc": "안녕하세요. 경기대학교 천원의 아침밥 사업 담당자입니다. 천원의 아침밥을 지원하고 있는 ·농림수산식품교육문화정보원·에서 천원의 아침밥 진행 대학 재학생을 대상으로 설문조사를 실시하고 있습니다."
+  },
+  {
+   "title": "[일반] [사학] 2026-2 사학과 추계학술답사 오픈채팅방 가입 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626828&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-27",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-10-27",
+   "desc": "대학소개 대학·조직 대학생활 맞춤정보 어떤 정보 를 찾고계시나요? 맞춤설정 저장하기 (언제든 변경 가능합니다) 맞춤설정 이란? 소속, 내용, 기간별로 나만의 맞춤 콘텐츠를 찾아보세요."
+  },
+  {
+   "title": "[입학에서 취업까지] 2027학년도 전공선택유연화 시행 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626827&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-27",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-10-27",
+   "thumb": "data/news/img/55c711f97b56110a.webp"
+  },
+  {
+   "title": "[입학에서 취업까지] 2026학년도 2학기 부전공 신청 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626826&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-27",
+   "kind": "학사",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-10-27"
+  },
+  {
+   "title": "[일반] [모집] 2026 제11회 장기려봉사상 청소년 · 대학생 자원봉사 체험수기 발표대회",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626801&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-26",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-10-27",
+   "thumb": "data/news/img/0624e4ca7e3bb0ad.webp"
+  },
   {
    "title": "[입학에서 취업까지] [수학교육전공] 2027년도 전기 신입생 모집요강 안내",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626807&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
@@ -366,59 +416,6 @@
    "foundAt": "2026-10-19",
    "thumb": "data/news/img/a5b82e71eaba213d.webp",
    "desc": "이미지 확대보기 본 집단상담 프로그램은 경기대학교 서울캠퍼스에서 진행합니다. 학생상담센터는 경기대학교 학생들의 일상 속에서 마주하는 어려움과 고민을 함께 나누고, 나타나는 문제를 해결할 수 있도록 조력하는 교내…"
-  },
-  {
-   "title": "[대학생활/업무안내] 2026학년도 2학기 종합시험 합격기원 간식 나눔 행사",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626663&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-18",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-10-18",
-   "thumb": "data/news/img/7a4b564f3d46a99e.webp",
-   "desc": "이미지 확대보기 이미지 확대보기 이미지 확대보기 이미지 확대보기 일시: 2026년 10월 17일 (토) 장소: 경기대학교 종합강의동 건물 앞 경기대학교 일반대학원 제41대 원우회에서 2학기 종합시험을 치르시는…"
-  },
-  {
-   "title": "[수강에서 성적까지] 2026-2학기 학점포기 추가시행 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626650&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-16",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-10-16",
-   "desc": "2026학년도 1학기 학점포기 제도가 학칙 및 학칙 시행세칙 개정에 따른 최초 시행임에 따라 일부 학생들이 학점포기 제도 개정에 대하여 충분히 인지하지 못하여 신청 기간 내 접수하지 못한 사례가 발생함에 따라,…"
-  },
-  {
-   "title": "[입학에서 취업까지] 졸업대상자 전공이수자격원 제출자 대상 복수전공 KUTIS 신청 안내 (오늘 24:00 마감)",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626649&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-16",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-10-16",
-   "desc": "졸업예정자 중 전공이수자격원(서류)만 제출하고 KUTIS 시스템 상에서 복수전공 신청을 완료하지 않은 학생에게 안내드립니다."
-  },
-  {
-   "title": "[일반] <2026 프랑스 교육박람회> 행사 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626648&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-16",
-   "kind": "행사",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-10-16"
-  },
-  {
-   "title": "[입학에서 취업까지] [정치외교학전공] 2026 하반기 전쟁기념관 시민대학과정",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626631&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-15",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-10-15",
-   "desc": "시민대학과정 지식플러스 수강생 모집 공고 전쟁기념관 W-아카데미에서 국내·외 전쟁사를 중심으로 역사·문화·예술·과학 등의 분야를 누구나 재미있고 심도있게 들을 수 있는 시민대학과정 [지식플러스]를 개설하여 수강생을…"
   }
  ]
 }
