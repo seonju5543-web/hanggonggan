@@ -679,7 +679,9 @@ function extractQualifyLines(text, opts = {}) {
      한 줄도 요건 신호가 없으면 짚은 곳이 틀린 것이니 **비워 두고** 2차 경로에 넘긴다.
      '성적증명서'처럼 서류 이름 안에 든 낱말은 신호로 세지 않는다 — 안 그러면 제출서류
      목록이 '성적' 신호로 통과한다(실제로 그랬다). */
-  if (out.some((l) => REQ_SIGNAL.test(l.replace(/\S*증명서/g, '')))) return out;
+  /* 활동 글은 장학 신호에 활동 어휘(collector/activity-vocab.mjs ACT_SIGNAL)를 더해 본다 — opts.signal (2026-10-27) */
+  const SIGNAL = opts.signal ? new RegExp(`${REQ_SIGNAL.source}|${opts.signal.source}`) : REQ_SIGNAL;
+  if (out.some((l) => SIGNAL.test(l.replace(/\S*증명서/g, '')))) return out;
   /* `opts.trustHead` (대외활동만 · 2026-10-04) — 제목 줄이 **이름표뿐**(`1. 모집대상`)이면 그 아래는 대상이다.
      활동 대상은 `만 19세 이상 성인으로 … 부상 병력이 있는 경우` 처럼 장학 신호 낱말이 없어 여기서 버려졌다(성균관대 실측). 장학은 그대로 */
   /* `1. 자격요건`·`참가 요건` 도 이름표뿐인 제목이다(2026-10-19 · 1365 「찾아가는 치과진료소」: 아래 「20세 이상, 65세 이하의 건강한 분」 이 장학 신호가 없어 통째로 버려졌다) */
@@ -715,10 +717,12 @@ const NOT_REQ = /(신청\s?기간|접수\s?기간|지원\s?기간|신청\s?기�
    ③ 증명서 발급 안내("… 증명서 1부(보훈청에서 발급)") — 이건 제출서류지 자격이 아니다 */
 const NOT_REQ2 = /\s\|\s|^.{0,16}(센터|팀|실)$|증명서\s*\d*\s*부|발급\s*\)|에서\s?발급/;
 
-function scoopQualifyLines(text) {
+function scoopQualifyLines(text, opts = {}) {
   if (!text) return [];
   const lines = text.split(/\n+/).map((l) => unent(l).replace(/[ \t　]+/g, ' ').trim()).filter(Boolean);
   const out = [];
+  const WHO_ = opts.who ? new RegExp(`${WHO.source}|${opts.who.source}`) : WHO;   // 활동 글의 '누가' 낱말(activity-vocab ACT_WHO · 2026-10-27)
+  const TAIL_ = opts.tail ? new RegExp(`${TAIL.source}|${opts.tail.source}`) : TAIL;   // 활동 포스터의 짧은 대상 줄(`국내 거주 내·외국인 청년`) 꼬리(ACT_TAIL · 2026-10-28)
   for (const l of lines) {
     if (l.length < 6 || l.length > 110) continue;
     if (JUNK.test(l) || NOT_REQ.test(l) || NOT_REQ2.test(l)) continue;
@@ -726,11 +730,13 @@ function scoopQualifyLines(text) {
     if (!/[가-힣]/.test(l)) continue;
     if (/^\d{4}[.\-]\d/.test(l)) continue;                 // 날짜 줄
     const strong = STRONG.test(l);
-    if (!strong && !(WHO.test(l) && TAIL.test(l))) continue;
+    if (!strong && !(WHO_.test(l) && TAIL_.test(l))) continue;
     if (!out.includes(l)) out.push(l);
     if (out.length >= 6) break;
   }
-  return out.length >= 2 ? out : [];      // 한 줄짜리는 믿지 않는다
+  /* 한 줄짜리는 믿지 않는다 — 단 활동 글(opts.who)의 **짧은 글**(포스터 대체 글 · 40줄 이하)은 한 줄(`국내 거주 내·외국인 청년`)이 자격의 전부인 일이 흔해 담는다(2026-10-28).
+     긴 페이지(메뉴·관련 글이 섞인 것)에서는 한 줄을 믿지 않는다 — 인천 청년포털 메뉴 「행복씨앗통장 운영(청년발달장애인)」 이 자격 한 줄로 들어왔다 */
+  return out.length >= (opts.who && lines.length <= 40 ? 1 : 2) ? out : [];
 }
 
 /* 규칙 함수를 밖에서 부를 수 있게 내보낸다 (2026-08-20).

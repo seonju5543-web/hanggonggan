@@ -9766,28 +9766,6 @@
     {
      "name": "2026학년도 2학기 국가근로 사전교육자료(요약서).hwp",
      "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F57138&fname=B9FDED6CB8D448E9A9897CBFF7C08DEA_.hwp&ogrfname=2026%ED%95%99%EB%85%84%EB%8F%84+2%ED%95%99%EA%B8%B0+%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C+%EC%82%AC%EC%A0%84%EA%B5%90%EC%9C%A1%EC%9E%90%EB%A3%8C%28%EC%9A%94%EC%95%BD%EC%84%9C%29.hwp"
-    },
-    {
-     "name": "장학금 신청 주요 일정",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
-    },
-    {
-     "name": "장학금 규정 전문(2021. 10. 1.)",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
-    },
-    {
-     "name": "장학금 지침 전문(2026. 02. 04.)",
-     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
-    },
-    {
-     "name": "본문이미지-1920x300.png",
-     "url": "https://www.seoultech.ac.kr/site/ko/2021/res/img/sub_title3444.png",
-     "bodyImage": true
-    },
-    {
-     "name": "본문이미지-509x348.png",
-     "url": "https://www.seoultech.ac.kr/site/ko/res/img/wa_logo.png",
-     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=895210&qidx=57138&cate=0&allboard=true&nowpage=1",
@@ -17283,7 +17261,7 @@
     "이미 이수한 최근 성적 2 개 학기를 작성 .",
     "최근 2 개학기 성적이 없는 자는 신청 불가함 .",
     "2020 학년도 1 학기 성적으로 신청 불가함 .",
-    "성적향상도에 따라 선발하는 장학금으로 모든 성적은 &lsquo; 원성적 &rsquo; 으로 심사함 .",
+    "성적향상도에 따라 선발하는 장학금으로 모든 성적은 ' 원성적 ' 으로 심사함 .",
     "직직전학기 성적",
     "직전학기 성적",
     "신청가능",
@@ -18976,7 +18954,13 @@
     }
    ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323410",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "3.신청대상",
+    "공과대학학부생2~4명으로구성된팀",
+    "팀원 중 최근2년이내현장실습 이수 학생1명이상 필수포함"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)"
   },
   {
    "id": "auto-bswj104944472artclviewdo",
@@ -19412,7 +19396,8 @@
     "schoolOnly": "숭실대학교"
    },
    "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
+    "학교생활지원 장학금(주거비,교통비,근면승실) 간 중복지원 불가",
+    "장학금 종류 및 선발기준,신청방법"
    ],
    "duplicable": true,
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
@@ -19422,10 +19407,27 @@
     {
      "name": "공지-2026-2학기-특별장학금-신청-안내_홈페이지-공지.pdf",
      "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs4VeJqF7%2FE%2BaSVwNZDaHglNgkAPkeqw6g70rZ2JN5LcGWuA89e8tUVVtOFznKwp1wmWGgDZRa9FWsIyG6D5zDKKEIjEUSFzwdiKAhbkoz%2Fb%2BTjEF4zlrK7%2FsEaoGtEK94y6ia8iZgarlyCWQTr3UmUJ60ozb%2Bg3ZilqVP5K7krw8K7m1%2BNPqEt4EtX711KWcsu8ai4Z8kfnwHPiXsXcIh1I%3D"
+    },
+    {
+     "name": "공지-2026-2학기-특별장학금-신청-안내_홈페이지-공지-1.pdf",
+     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs4VeJqF7%2FE%2BaSVwNZDaHglNgkAPkeqw6g70rZ2JN5LcGWuA89e8tUVVtOFznKwp1wmWGgDZRa9FWsIyG6D5zDKIZKKFME%2FLzYSKQAO7OVrt0ehAyPrZDFMTPeC3JQnwjFjQX5bDKDkEAMTwKeWw8Ix7i3F8WrwF5ZB5QI4RycAeVA1Klj0OHKeL7USEk7YZ%2BI%2BiI9xHTc5Zt7HS0rE6L5qkapfJtkHop%2BkuYTsUiHRsE"
+    },
+    {
+     "name": "2026학년도-2학기-특별장학금-관련-서류-1.zip",
+     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs5hAuBJz8WiRcRUT5nEhsWBgmZ2FoMGXETfu9rVUX2NKYxV%2BRuIqlqR06%2Fb0sQb82VkWQYSeW4NpFJmSjZdZh9ihfTmOAZy3lTQqvOxwa64Ysel6LE%2BDaqHsjXbDnOXjeoxTvYfDhtG4kqLxHkVlrtED3MY%2FZap8MD%2BsZUeeqiRr"
     }
    ],
    "sourceUrl": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=%E2%98%85-2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%ED%8A%B9%EB%B3%84%EC%9E%A5%ED%95%99%EA%B8%88%EC%A3%BC%EA%B1%B0%EB%B9%84-%EA%B5%90%ED%86%B5%EB%B9%84-%EA%B7%BC%EB%A9%B4%EC%88%AD&keyword=%EC%9E%A5%ED%95%99",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "documentsFrom": "공고문 첨부(OCR)",
+   "eligibilityFrom": "공고문 첨부(OCR)",
+   "eligibilityLines": [
+    "신청 방법 : 신청 자격 : 선발 기준",
+    "※세부사항은 붙임 장학금별 장학금 성격 중복가능",
+    "및 결과 발표",
+    "세부안내자료참조",
+    "-2026-2학기 한국장학 -소득분위상관없이"
+   ]
   },
   {
    "id": "auto-enoticedoarticleno769738",
@@ -19695,6 +19697,15 @@
     {
      "name": "붙임1_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf",
      "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=B562E417A45F4C77A83BAA2A246DBF1F_.pdf&ogrfname=%EB%B6%99%EC%9E%841_2026%EB%85%84+2%ED%95%99%EA%B8%B0+%ED%91%B8%EB%A5%B8%EB%93%B1%EB%8C%80+%EA%B8%B0%EB%B6%80%EC%9E%A5%ED%95%99%EA%B8%88%282%EC%B0%A8%29+%EC%82%AC%EC%97%85%EA%B3%84%ED%9A%8D%EC%84%9C+%EB%B0%8F+%EC%97%85%EB%AC%B4%EC%B2%98%EB%A6%AC%EA%B8%B0%EC%A4%80.pdf"
+    },
+    {
+     "name": "붙임2_2026년 2학기 푸른등대 기부장학금(2차) 신청 홍보 포스터.jpg",
+     "url": "javascript:downloadfile('/storage/www/bbs/5233','D5BD8A0C455743548A5C9F52B98AF6C6_.jpg','%EB%B6%99%EC%9E%842_2026%EB%85%84 2%ED%95%99%EA%B8%B0 %ED%91%B8%EB%A5%B8%EB%93%B1%EB%8C%80 %EA%B8%B0%EB%B6%80%EC%9E%A5%ED%95%99%EA%B8%88(2%EC%B0%A8) %EC%8B%A0%EC%B2%AD %ED%99%8D%EB%B3%B4 %ED%8F%AC%EC%8A%A4%ED%84%B0.jpg' );"
+    },
+    {
+     "name": "본문이미지-2121x3000.jpg",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/images/5FF7449FAE554234A9D142BDD2CE7DFC.jpg",
+     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=897116&qidx=5233&cate=0&allboard=true&nowpage=1",
@@ -19732,6 +19743,11 @@
     {
      "name": "SSAFY 17기 모집 안내 뉴스레터.pdf",
      "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=B8BF1578A41340E78596AECE95BA8708_.pdf&ogrfname=SSAFY+17%EA%B8%B0+%EB%AA%A8%EC%A7%91+%EC%95%88%EB%82%B4+%EB%89%B4%EC%8A%A4%EB%A0%88%ED%84%B0.pdf"
+    },
+    {
+     "name": "본문이미지-2130x3000.PNG",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/images/0892F248EE3240E5AB25B6A0BB9F4281.PNG",
+     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=897097&qidx=5233&cate=0&allboard=true&nowpage=1",

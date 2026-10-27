@@ -3474,7 +3474,7 @@
    "expiredAt": "2026-10-27"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0739001",
    "org": "성암육영회",
    "name": "장학생",
@@ -3484,7 +3484,9 @@
    "cards": 5,
    "dir": "insta/pub/0739001",
    "at": "2026-10-16",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-28"
   },
   {
    "status": "prepared",

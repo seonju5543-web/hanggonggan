@@ -36,6 +36,8 @@ import { htmlToLines } from './html-text.mjs';
 import { decodeEntities } from './clean-title.mjs';
 import { attachmentText, isOcrSource, isNoticeDoc } from './attachment-text.mjs';
 import { activityDetails, eligLineOk } from './activity-excerpts.mjs';
+import { ACT_SIGNAL } from './activity-vocab.mjs';
+import { detailByRule } from './activity-detail-rules.mjs';   // 온통청년처럼 글·포스터가 JSON 에 있는 게시판 — 수집 로봇과 같은 함수(2026-10-28)
 const { cutAtNextSection } = await import('./extract-excerpts.mjs');   // activity-excerpts 와 같은 이유로 동적으로(환경변수보다 뒤에)
 
 const HERE = new URL('.', import.meta.url);
@@ -203,10 +205,26 @@ async function browserHtml(url) {
 
 /** 글 하나의 파일을 받는다 → act-files 안의 파일 이름들 */
 async function fetchPost(n, until, common = new Set(), owners = new Map()) {
-  const html = await getHtml(n.url);
-  if (!html) return null;
   const got = [];
   const key = keyOf(n.url);
+  /* 규칙이 있는 게시판(온통청년)은 JSON 에서 본문 + 포스터 대체 글(`-R.txt`)과 포스터 그림을 받는다 — 평문 HTML 은 메뉴뿐이라 후보가 0개였다(2026-10-28) */
+  const ruled = await detailByRule(n.url);
+  if (ruled) {
+    if (ruled.text.trim()) { fs.writeFileSync(path.join(DIR, `${key}-R.txt`), ruled.text); got.push(`${key}-R.txt`); }
+    for (const f of ruled.images.slice(0, FILES_PER_POST)) {
+      if (Date.now() > until) break;
+      try {
+        const d = await download({ ...f, from: 'img' }, n.url);
+        if (!d) continue;
+        const name = `${key}-${got.length}i.${d.ext}`;
+        fs.writeFileSync(path.join(DIR, name), d.buf);
+        got.push(name);
+      } catch { /* 이 그림만 건너뛴다 */ }
+    }
+    return got;
+  }
+  const html = await getHtml(n.url);
+  if (!html) return null;
   /* 브라우저로 그린 본문은 `-B.txt` 로 — 일반 받기로는 글자 0 이던 자바스크립트 페이지의 본문이다 */
   if (BROWSER) { fs.writeFileSync(path.join(DIR, `${key}-B.txt`), htmlToLines(html)); got.push(`${key}-B.txt`); }
   /* 파일 이름 끝의 `i` = 페이지에서 주운 그림(그 글의 것인지 제목 낱말로 확인해야 한다) · 없으면 글에 붙은 첨부 */
@@ -375,7 +393,8 @@ export function eligFromFiles(n, files, readText = (p) => (/\.txt$/.test(p) ? fs
     /* 브라우저 본문(`-B.txt`)도 같다 — 글 주소가 포털 첫 화면으로 가서 1,409줄에 제목이 한 번도 없었다(제주도청 · 메뉴 `장애인 복지정책` 이 자격으로 뽑혔다) */
     if ((/-[LB]\d*\.txt$/.test(f) || (ocr && /\di\.\w+$/.test(f))) && !ownsImageText(text, n.title)) continue;
     const d = activityDetails(text, n.title);
-    if (d.eligibilityLines.length) return { ...d, from: /-B\.txt$/.test(f) ? '브라우저 본문' : /\.txt$/.test(f) ? '요강 페이지' : ocr ? '공고문 첨부(OCR)' : '공고문 첨부' };
+    /* 제목에서만 읽은 대상(`[대학생] …`)은 '찾았다'가 아니다 — 껍데기 브라우저 본문이 먼저 와서 뒤의 OCR·HWP 를 못 열게 했다(2026-10-28 리뷰) */
+    if (d.eligibilityLines.length && !d.eligibilityFromTitle) return { ...d, from: /-B\.txt$/.test(f) ? '브라우저 본문' : /\.txt$/.test(f) ? '요강 페이지' : ocr ? '공고문 첨부(OCR)' : '공고문 첨부' };
   }
   return null;
 }
@@ -389,9 +408,13 @@ function applyPhase(acts) {
   const found = new Set();
   for (const n of acts.items) {
     const files = manifest[n.url];
-    if (!files || !files.length || !needsElig(n)) continue;
+    /* 본문이 스크립트로 그려져 빈 글(정책브리핑 보도자료 · 2026-10-27)은 첨부(보도자료 hwpx)의 글이 「공고 안내」가 된다 — 자격은 이미 있어도 */
+    const wantElig = needsElig(n), wantNotice = !(n.noticeLines || []).length;
+    if (!files || !files.length || !(wantElig || wantNotice)) continue;
     const d = eligFromFiles(n, files);
     if (!d) continue;
+    if (!BROWSER && wantNotice && (d.noticeLines || []).length) { n.noticeLines = d.noticeLines; n.noticeFrom = d.from; got += 1; }
+    if (!wantElig) continue;
     found.add(n.url);
     if (BROWSER) { bled[n.url] = { ...(bled[n.url] || {}), lines: d.eligibilityLines, excludes: d.eligibilityExcludes, from: d.from }; got += 1; continue; }
     n.eligibilityLines = d.eligibilityLines;
@@ -469,14 +492,14 @@ async function aiPhase(acts, write) {
       if (file) {
         const kind = /\.pdf$/i.test(file) ? 'pdf' : 'image';
         calls += 1;
-        v = AI.verifyPdfLines(await AI.askPdf(item, path.join(DIR, file), kind));
+        v = AI.verifyPdfLines(await AI.askPdf(item, path.join(DIR, file), kind), { signal: ACT_SIGNAL });   // 활동 어휘로 검산(activity-vocab)
         from = kind === 'image' ? 'AI(공고 포스터 그림)' : 'AI(공고문 PDF)';
       } else {
         const r = await fetch(n.url, { redirect: 'follow', headers: FETCH_HEADERS, signal: AbortSignal.timeout(15000) });
         const lines = r.ok ? htmlToLines(await r.text()).split('\n').map((l) => l.trim()).filter((l) => l.length >= 2 && l.length <= 200) : [];
         if (!lines.length) continue;
         calls += 1;
-        v = AI.verifyPick(await AI.ask(item, lines), lines);
+        v = AI.verifyPick(await AI.ask(item, lines), lines, { signal: ACT_SIGNAL });
         from = 'AI(원문 줄 그대로)';
       }
     } catch (e) { log(`✕ ${n.title.slice(0, 30)} — 호출 실패(글 탓 아님): ${String(e && e.message || e).slice(0, 300)}`); continue; }

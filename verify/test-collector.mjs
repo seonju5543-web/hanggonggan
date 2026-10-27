@@ -381,6 +381,8 @@ eq('숫자 표기(&#40;)를 되돌린다',
 eq('제목 끝의 새 글 배지(NEW·new)를 뗀다 — 낱말 속 new 는 그대로 (2026-10-19)',
   [cleanTitle('단풍철 국립공원 안전산행 비법?…체력에 맞는 탐방로 선택! NEW'), cleanTitle('2026년 청년정책 공모전 new'), cleanTitle('New Media 공모전')],
   ['단풍철 국립공원 안전산행 비법?…체력에 맞는 탐방로 선택!', '2026년 청년정책 공모전', 'New Media 공모전']);
+eq('제목 앞의 게시일과 둥근 따옴표 기호(&lsquo;·&rsquo;)를 정리한다 (두산연강재단 소식 행 · 2026-10-27)',
+  cleanTitle('2026.10.23 두산연강재단, &lsquo;2026년 과학교사 학술시찰 견문록 출판기념회&rsquo; 개최'), "두산연강재단, '2026년 과학교사 학술시찰 견문록 출판기념회' 개최");
 eq('부등호(&lt; &gt;)를 되돌린다',
   cleanTitle('2학기 &lt;이원길 장학금&gt; 선발'), '2학기 <이원길 장학금> 선발');
 eq('&amp;를 마지막에 풀어 이중 해제가 안 생긴다', cleanTitle('A &amp;quot; B'), 'A &quot; B');
@@ -2069,6 +2071,7 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
     eq('  문의처는 발췌하지 않는다', r.excerpts.some((x) => /문의/.test(x.label)), false);
     eq('  이름표 없는 글은 비운다 — 날짜가 있어도 마감으로 짐작하지 않는다', ex.activityExcerpts('10월 3일에 행사가 있습니다. 2026.10.03 참고.'), { deadline: null, excerpts: [] });
     eq('  기간이 "상시" 면 마감을 비운다', ex.activityExcerpts('○ 모집기간 : 2026.9.1. ~ 상시').deadline, null);
+    eq('  값 자리에 안내 낱말만(`참가 대상 : 안내`)이면 발췌가 아니다 · 진짜 값은 그대로', [ex.activityExcerpts('참가 대상 : 안내\n참가 자격 : 검증').excerpts, ex.activityExcerpts('참가 대상 : 대학생').excerpts], [[], [{ label: '대상', text: '대학생' }]]);
     /* 2026-10-17 개발자 "원문에서 확인 이렇게 뜨는 게 하나도 없어야" — 모집 안내가 빈 활동 글 96건·마감 없는 90건을 전수로 열어 본 줄 꼴들(글자는 그대로, 콜론만 넣는다) */
     const exOf = (t) => { const r = ex.activityExcerpts(t); return [r.deadline, r.excerpts.map((x) => `${x.label}=${x.text}`)]; };
     eq('  행사·특강의 `일시`는 안내 줄(마감 아님) — `- 일시: 2026. 11. 10. (화) 오후 3시 ~ 4시`·`▶ 대회일시 : 11월 6일(금) 12:30~14:00`',
@@ -6794,6 +6797,12 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
      자격이 뒤집혀 보이는 실패라 잡음보다 나쁘다(실제 21줄 · 14개 카드가 이 상태였다). */
   eq('※ 지원 불가는 제외 칸으로', where('※ 졸업유예자, 휴학생, 대학원생, 세종캠퍼스 학생은 지원 불가'), '제외');
   eq('※ 휴학생 신청 불가도 제외 칸으로', where('※ 2026-2학기 휴학생 신청 불가'), '제외');
+  /* 「참여배제자」 절의 `X가 아닌 자` 는 제외다 — 맨 `아닌 자` 를 긍정으로 읽던 POSITIVE_REQ 가 자격 칸에 올렸다(인천 국제기구 직업체험 · OCR 이라 `라.` 의 점이 빠진 머리글 · 2026-10-27) */
+  {
+    const lines = ['라참여배제자', '①인천시민이 아닌 자', '2 외국인', '③국제기구직업체험 프로그램 참여경력보유자(동일기구 중복 참여불가)'];
+    eq('「라참여배제자」 아래 `인천시민이 아닌 자` 는 자격이 아니라 제외', [ME.requirementLines({}, lines), ME.requirementLines({}, lines, { onlyExclude: true }).length], [[], 3]);
+    eq('  대조군: 제외 절의 `결격 사유가 없는 자` 는 여전히 긍정(제외 칸에 안 간다)', ME.requirementLines({}, ['4. 제외 대상', '결격 사유가 없는 자'], { onlyExclude: true }), []);
+  }
 
   /* 🔴 본문 규칙을 뒤집는 **예외 자격**. 빠지면 되는 학생이 안 된다고 나온다
      (면학장학금은 본문이 `8학기 이하`라 9~10학기 이중전공자가 통째로 탈락해 보였다). */
@@ -12289,6 +12298,27 @@ console.log('\n■ 대외활동·공모전 — 첨부·포스터 읽기 (2026-10
   const it2 = AX.putActivityDetails({ eligibilityLines: ['옛 줄'], eligibilityFrom: '공고문 첨부' }, { eligibilityLines: ['만 19~34세 청년'], noticeLines: [] });
   eq('③ 본문을 다시 읽어도 첨부에서 읽은 자격은 남는다 · 본문에서 자격이 나오면 본문이 이긴다(표식도 뗀다)',
     [it.eligibilityLines, it.eligibilityFrom, it2.eligibilityLines, it2.eligibilityFrom], [['대한민국 국민 누구나'], '공고문 첨부', ['만 19~34세 청년'], undefined]);
+  /* 2026-10-28 클라우드 재읽기 회귀 셋 — 첨부 자격을 더 약한 본문이 덮었다 · 껍데기 페이지가 자격을 지웠다 · 긴 페이지의 메뉴 한 줄이 자격이 됐다 */
+  const it4 = AX.putActivityDetails({ eligibilityLines: ['만 19세 이상 39세 이하 청년'], eligibilityFrom: '포스터 글자(OCR)' }, { eligibilityLines: ['대학생'], eligibilityFromTitle: true, noticeLines: [] });
+  const it7 = AX.putActivityDetails({ eligibilityLines: ['만 19세 이상 39세 이하 청년', '인천 거주자'] }, { eligibilityLines: ['대학생'], eligibilityFromTitle: true, thin: true, noticeLines: [] });
+  eq('③-0 첨부 표식이 없어도 껍데기 페이지의 제목 대상 한 낱말은 읽어 둔 자격을 덮지 않는다(리뷰 #3)', it7.eligibilityLines, ['만 19세 이상 39세 이하 청년', '인천 거주자']);
+  const eB = AD.eligFromFiles({ title: '[대학생] 도서 정리 봉사' }, ['a-B.txt', 'a-0.hwp'], (p) => (/-B\.txt$/.test(p) ? '[대학생] 도서 정리 봉사\n메뉴\n로그인' : '■ 참가자격\n대한민국 국민 누구나(개인 또는 팀)\n■ 접수기간 : 2026. 10. 1.'), '/tmp');
+  eq('  첨부 로봇도 제목 대상뿐인 껍데기 본문에서 멈추지 않고 뒤의 공고문을 연다(리뷰 #4)', [eB && eB.from, eB && eB.eligibilityLines.some((l) => /누구나/.test(l))], ['공고문 첨부', true]);
+  const it5 = AX.putActivityDetails({ eligibilityLines: ['소셜벤처 창업 3년 이내 기업'] }, { eligibilityLines: [], noticeLines: [], thin: true });
+  const it6 = AX.putActivityDetails({ eligibilityLines: ['소셜벤처 창업 3년 이내 기업'] }, { eligibilityLines: [], noticeLines: [], thin: false });
+  eq('③-1 첨부 자격은 제목 대상 한 낱말로 덮이지 않는다 · 껍데기(thin) 재읽기는 자격을 지우지 않고 판만 올린다 · 제대로 읽은 빈 본문은 지운다',
+    [it4.eligibilityLines, it5.eligibilityLines, it5.detailsV === AX.ACT_DETAILS_V, it6.eligibilityLines],
+    [['만 19세 이상 39세 이하 청년'], ['소셜벤처 창업 3년 이내 기업'], true, undefined]);
+  const thinPage = AX.activityDetails('메뉴\n로그인\n공지사항\n「2026 기업지원실 운영」 참여기업 모집', '「2026 기업지원실 운영」 참여기업 모집');
+  eq('  activityDetails 는 한글 300자 미만 껍데기를 thin 으로 표시하고 제목과 같은 줄은 자격으로 주지 않는다 · 제목 대상만 읽으면 eligibilityFromTitle',
+    [thinPage.thin, thinPage.eligibilityLines, AX.activityDetails('', '[대학생] 도서 정리 봉사').eligibilityLines, AX.activityDetails('메뉴\n공지', '[대학생] 도서 정리 봉사').eligibilityFromTitle], [true, [], ['대학생'], true]);
+  const longMenu = ['2026년 국제기구 직업체험 프로그램 참가자 모집', '청년포털', '메뉴'].concat(Array.from({ length: 45 }, (_, i) => `관련 글 ${i} 안내`)).concat(['행복씨앗통장 운영(청년발달장애인)', '첨부파일 포스터.jpg']).join('\n');
+  eq('  활동 글의 한 줄 자격은 40줄 이하 짧은 글(포스터 대체 글)에서만 — 긴 페이지(인천 청년포털 메뉴)의 「행복씨앗통장 운영(청년발달장애인)」 한 줄은 자격이 아니다',
+    [AX.activityDetails('2026 은평 컨퍼런스\n국내 거주 내·외국인 청년\n문의 | x@y.org', '2026 은평 컨퍼런스').eligibilityLines, AX.activityDetails(longMenu, '2026년 국제기구 직업체험 프로그램 참가자 모집').eligibilityLines], [['국내 거주 내·외국인 청년'], []]);
+  eq('  조각 거름 (j)~(m) — 이름표 뒤 요건 없는 짧은 값 · 짧은 낱말 하나 · 날짜뿐 · 기관 이름뿐은 자격이 아니다 · 요건 말이 있는 짧은 값은 남는다',
+    [['참가 자격 : 안내', '참가 대상 : AI·풀이 환경', '팀 구성', '창업업력', '2026년 10월 23일', '조슈아파트너스(주)', '대상연령 : 전체', '참가 자격 : 별도 안내', '참가 대상 : 표시', '대상 : 제도', '모집대상 : 교육비', '참여대상 : 사전신청 QR'].map(AX.eligLineOk),
+      ['지원 대상 : 재학생', '대상 : 청년', '만 19세 이상 39세 이하 청년', '지원대상 : 일반인', '지역기준 : 제주시, 서귀포시', '참가 대상 : 경희대학교/단국대학교', '5학기 이상', '공모대상 국내 소재 대학교', '지원대상 : 중소기업', '참가자격 : 군인', '대상 : 1인 창조기업', '참가 대상 : 여성', '오전 10:00 접수 가능자'].map(AX.eligLineOk)],
+    [[false, false, false, false, false, false, false, false, false, false, false, false], [true, true, true, true, true, true, true, true, true, true, true, true, true]]);
   eq('  `③ 국민 누구나 찾고 머물며 … 공간`(공모 소재 예시)은 자격이 아니다 — 누구나가 말의 끝일 때만',
     AX.activityDetails(['<소재 예시>', '③ 국민 누구나 찾고 머물며 대한민국의 가치와 정체성을 경험할 수 있는 공간'].join('\n')).eligibilityLines, []);
   eq('  AI 가 고른 글 제목 줄은 자격이 아니다(관문의 \'청년\' 신호를 제목이 통과한다)', [AD.isTitleLine('용산 청년지음 <진로 고민 워크숍> 참여자 모집', '용산 청년지음 <진로 고민 워크숍> 참여자 모집'), AD.isTitleLine('만 19~34세 청년', '용산 청년지음 <진로 고민 워크숍> 참여자 모집')], [true, false]);
@@ -12379,6 +12409,11 @@ console.log('\n■ 대외활동 — 남은 글 표본에서 찾은 것 (2026-10-
   eq('  정책브리핑 **정책 뉴스** 글(news/policyNewsView)과 「… 첫 수혜자」 소식 글은 모집 글이 아니다 (2026-10-19)',
     [AK.unreadableSource('https://www.korea.kr/news/policyNewsView.do?newsId=148973658&pWise=sub'), AK.unreadableSource('https://www.korea.kr/briefing/pressReleaseView.do?newsId=1'),
       AK.notActivity('전주시 글로벌 해외연수생 1기 첫 수혜자'), AK.notActivity('2026 글로벌 해외연수생 2기 모집')], [true, false, true, false]);
+  /* 지난 일을 알리는 소식 행 — 두산연강재단 뉴스(제목+요약 한 줄 · `…열었다.`·`… 워크숍 진행`) · 정책브리핑 보도자료 「… 본선 개최」 (2026-10-27) */
+  eq('  소식 글은 모집 글이 아니다 — `…출판기념회를 열었다.` · `… 워크숍 진행` · `… 본선 개최` · 대조군 `워크숍 참가자 모집`',
+    ["두산연강재단, '2026년 과학교사 학술시찰 견문록 출판기념회' 개최 두산연강재단(이사장 박용현)은 22일 호텔에서 출판기념회를 열었다.", '두산연강재단, 대학 장학생 대상 미래역량강화 워크숍 진행',
+      '아이들의 상상력이 인공지능을 만나는 첫 경험! 「전 국민 인공지능 경진대회」, 인공지능 창작대회 본선 개최', '청년 창업 워크숍 참가자 모집', '2026 두산연강 대학생 봉사단 모집'].map(AK.notActivity),
+    [true, true, true, false, false]);
   eq('  인스타그램·페이스북 게시물은 읽을 수 없는 출처 — 기관 홈페이지는 아니다(2026-10-16 개발자 "피드에서 빼")',
     ['https://www.instagram.com/acrc0229/p/DeF3w_FE4Yt/?img_index=1', 'https://m.facebook.com/x/posts/1', 'https://www.korea.kr/briefing/x.do', 'https://instagram.com.example.org/'].map(AK.unreadableSource), [true, true, false, false]);
   eq('⑤ 그림 — 큰 카드뉴스(1920×1080)는 받는다 · 광고 배너(846×510)는 아니다', [AD.posterShaped({ w: 1920, h: 1080 }), AD.posterShaped({ w: 846, h: 510 })], [true, false]);
@@ -12517,7 +12552,11 @@ console.log('\n■ 자격요건 로봇 (진짜 브라우저) — 장학·대외�
   /* 🔴 PaddleOCR 판 고정 — 판을 안 적으면 그날 최신(3.3.x)이 깔려 x86 클라우드에서 모든 그림이 오류(2026-10-04 · 맥은 ARM 이라 멀쩡했다) */
   for (const f of ['rescue-bodies.yml', 'collect-scholarships.yml']) {
     const y = readText(new URL('../.github/workflows/' + f, import.meta.url));
-    eq(`  🔴 ${f} — PaddleOCR 은 판을 고정해 깐다`, ((ms) => ms.length > 0 && ms.every((m) => /paddlepaddle==[\d.]+ paddleocr==[\d.]+/.test(m[0])))([...y.matchAll(/pip install[^\n]*paddle[^\n]*/g)]), true);   // 설치 줄이 여럿이어도(장학 포스터 · 대외활동) 전부
+    eq(`  🔴 ${f} — PaddleOCR 은 판을 고정해 깐다`, ((ms) => ms.length > 0 && ms.every((m) => /paddlepaddle==[\d.]+ paddleocr==[\d.]+/.test(m[0])))([...y.matchAll(/pip install[^\n]*paddle[^\n]*/g)]), true);   // 설치 줄이 여럿이어도(장학
+    /* 🔴 파이썬 판도 고정한다 (2026-10-28) — PaddleOCR 바퀴는 cp39~cp313 뿐이라 러너 기본 파이썬이 그 밖이면 `from versions: none` 으로 설치가 조용히 실패한다
+       (10-24~27 매일 · 경고만 남고 초록불 · 포스터 자격 읽기가 통째로 빈 채 "자격 0줄인 활동 글 30건"이 그대로였다). setup-python 이 pip 보다 앞에 있어야 한다 */
+    const ipy = y.search(/uses: actions\/setup-python@v\d[\s\S]{0,120}?python-version: '3\.1[0-3]'/), ipip = y.indexOf('pip install --quiet paddlepaddle');
+    eq(`  🔴 ${f} — PaddleOCR 앞에 파이썬 3.10~3.13 을 고정한다(setup-python)`, ipy >= 0 && ipip > ipy, true);
   }
   const caps = [...wf.matchAll(/^ {8}timeout-minutes: (\d+)/gm)].map((m) => Number(m[1]));
   const job = Number((wf.match(/^ {4}timeout-minutes: (\d+)/m) || [])[1]);
@@ -12639,6 +12678,11 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
   const c2 = FP.convertOne ? FP.convertOne(path.join(tmp, 'fake.pdf'), path.join(tmp, 'out', 'f.pdf')) : {};
   const c3 = FP.convertOne ? FP.convertOne(path.join(tmp, 'none.pdf'), path.join(tmp, 'out', 'n.pdf')) : {};
   const c4 = FP.convertOne ? FP.convertOne(path.join(tmp, 'b.hwp'), path.join(tmp, 'out', 'b.pdf'), { soffice: path.join(tmp, 'no-such-soffice') }) : {};
+  /* 🔴 전용 프로필 (2026-10-27) — root 소유 프로필 폴더 때문에 soffice 가 종료 77 로 못 뜨던 것. 두 변환 자리 모두 -env:UserInstallation 을 넘기고, 설치 스크립트도 임시 프로필 + 소유권 되돌림 */
+  const fpdfSrc = readText(new URL('../collector/form-pdf.mjs', import.meta.url)); const fpgSrc = readText(new URL('../collector/form-pages.mjs', import.meta.url)); const h2o = readText(new URL('../collector/install-h2orestart.sh', import.meta.url));
+  eq('  변환기는 전용 프로필로 띄운다(form-pdf · form-pages 둘 다 loProfileArg) · 설치 스크립트는 임시 프로필로 깔고 root 소유 프로필을 되돌린다',
+    [/spawnSync\(soffice, \['--headless', '--norestore', loProfileArg\(\), '--convert-to'/.test(fpdfSrc), /spawnSync\(soffice, \['--headless', '--norestore', loProfileArg\(\), '--convert-to'/.test(fpgSrc),
+      /^-env:UserInstallation=/m.test(String(FP.loProfileArg ? FP.loProfileArg() : '')), /-env:UserInstallation=file:\/\/\$TMP\/unopkg-profile/.test(h2o) && /chown -R/.test(h2o)], [true, true, true, true]);
   eq('⑥ pdf 는 바이트 그대로 복사 · 가짜 pdf 와 없는 원본은 거절 · 변환기가 없으면 「변환기 없음」',
     [c1.ok, c1.pages, fs.existsSync(path.join(tmp, 'out', 'a.pdf')) && pdfBytes(path.join(tmp, 'out', 'a.pdf')).equals(pdf), c2.why, c3.why, /변환기 없음/.test(c4.why || '')],
     [true, 2, true, 'PDF 가 아님', '원본 파일 없음', true]);
@@ -13015,6 +13059,48 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
     eq('  활동 카드에 원문 링크(card-src-link)가 단추 바깥에 붙는다 · 이름은 같은 sourceLink',
       /link: activityCardLinkHtml\(n\)/.test(appSrc14) && /function activityCardLinkHtml\(n\) \{\s*const link = sourceLink\(n, 'activity'\)/.test(appSrc14)
         && /<\/button>/.test(appSrc14.slice(appSrc14.indexOf('function cardShellHtml'), appSrc14.indexOf('function cardShellHtml') + 900)) && /\$\{save\}\$\{link\}/.test(appSrc14), true);
+    /* ⑭-3 대외활동 어휘 한 곳 (2026-10-27 개발자 "판정기의 어휘도 대외활동 버전으로") — 장학 신호(재학·평점·소득)에 활동 어휘를 더해 읽는다 */
+    {
+      const V = await import('../collector/activity-vocab.mjs');
+      const AI3 = await import('../collector/eligibility-ai.mjs');
+      eq('⑭-3 활동 어휘가 자격 신호를 낸다 — 예비창업자·4인 이하 팀·구민·영어능통자·경력 보유',
+        ['예비창업자 및 창업 3년 이내 기업 대표', '개인 또는 4인 이하 팀', '서초구민이면 누구나', '인천 거주 대학(원)생 중 영어능통자', '관련 분야 경력 2년 이상 보유'].every((l) => V.ACT_SIGNAL.test(l)), true);
+      eq('  자격 절 아래 활동 말투만 있는 줄도 자격이다 (전엔 장학 신호가 없어 통째로 버렸다)',
+        AX4.activityDetails(['3. 참가 자격', '예비창업자 및 창업 3년 이내 기업 대표', '서울시 소재 사업장 보유자', '4. 접수 방법', '온라인 접수'].join('\n')).eligibilityLines.length, 2);
+      eq('  활동 머리글 「봉사대상」(1365) 아래 줄이 자격이다', AX4.activityDetails(['ㅇ 봉사내용 : 관람객 안내', 'ㅇ 봉사대상 : 중학생 ~ 대학생', 'ㅇ 봉사시간 : 09:00~12:00'].join('\n')).eligibilityLines, ['ㅇ 봉사대상 : 중학생 ~ 대학생']);
+      eq('  제목에만 대상이 있는 글 — `[중학생~대학생] …`·`…(대학생)`·`… -대학생만 신청` · 대조군 `… 안내(10월)`',
+        ['[중학생~대학생]현충사 관람객 안내 봉사', '충북교육도서관 도서 정리[주간](대학생)', '나도 한끼 도시락 만들기 봉사활동 (오전)-대학생만 신청', '스타트업 아카데미 일정 안내(10월)'].map(V.targetFromTitle),
+        ['중학생~대학생', '대학생', '대학생', '']);
+      eq('  본문이 비어도 제목의 대상은 읽는다 · 본문이 있으면 본문이 먼저', [AX4.activityDetails('', '도서 정리[주간](대학생)').eligibilityLines, AX4.activityDetails('참가자격 : 성인 누구나', '도서 정리(대학생)').eligibilityLines], [['대학생'], ['참가자격 : 성인 누구나']]);
+      eq('  AI 검산도 활동 어휘로 — 「예비창업자 …」 는 장학 신호만으로는 거절, 활동 신호를 주면 통과',
+        [AI3.verifyPdfLines({ lines: ['예비창업자 및 창업 3년 이내 기업 대표'] }).ok, AI3.verifyPdfLines({ lines: ['예비창업자 및 창업 3년 이내 기업 대표'] }, { signal: V.ACT_SIGNAL }).ok], [false, true]);
+      eq('  activity-docs 가 두 검산에 활동 어휘를 넘긴다', (readText(new URL('../collector/activity-docs.mjs', import.meta.url)).match(/\{ signal: ACT_SIGNAL \}/g) || []).length, 2);
+    }
+    /* ⑭-4 숨은 글 주소 규칙 (2026-10-28 개발자 "출처는 그대로 두되 최대한 공짜 경로로") — 온통청년 글은 평문 HTML 이 메뉴뿐 · JSON(쿠키 필요)에 본문·포스터 대체 글·그림이 있다 */
+    {
+      const DR = await import('../collector/activity-detail-rules.mjs');
+      const calls = [];
+      const fakeFetch = async (url, init) => {
+        calls.push({ url, cookie: (init && init.headers && init.headers.Cookie) || '' });
+        const json = (o) => ({ ok: true, status: 200, headers: { getSetCookie: () => [] }, json: async () => o, text: async () => JSON.stringify(o) });
+        if (/bbs03View/.test(url)) return { ok: true, status: 200, headers: { getSetCookie: () => ['XSRF-TOKEN=abc; Path=/', 'SCOUTER=z; Path=/'] }, text: async () => '<html>메뉴뿐</html>' };
+        if (!/Cookie|XSRF/.test(JSON.stringify(init && init.headers))) return { ok: false, status: 401, headers: { getSetCookie: () => [] }, json: async () => ({}), text: async () => 'Unauthorized' };
+        if (/\/sur\/cmu\/bbs\/pst\/48\/10827/.test(url)) return json({ result: { bbs: { pstTtl: '「2026 IFWY 은평 컨퍼런스」 참가자 모집 안내', pstWholCn: '<p><a href="https://x">✔️신청안내 바로가기</a></p>', pstAtchFileMngSn: '25220', pstRprsImgSn: '25219' } } });
+        if (/atchFileMngSn=25219/.test(url)) return json({ result: { atchFileDetList: [{ atchFileSn: '1012245', atchFilePath: '/CMU/2026/10/12', exsFileNm: '국문포스터-', atchFileNm: '1012245', atchFileExtnNm: 'png', imgSubTextCn: '2026 IFWY 은평 컨퍼런스\n참가신청 및 자세히 보기\n국내 거주 내·외국인 청년\n문의 | ifwy@debatekorea.org' }] } });
+        if (/atchFileMngSn=25220/.test(url)) return json({ result: { atchFileDetList: [{ atchFileSn: '7', atchFilePath: '/CMU/2026/10/12', exsFileNm: '모집요강', atchFileNm: '7', atchFileExtnNm: 'hwp', imgSubTextCn: '' }] } });
+        return { ok: false, status: 404, headers: { getSetCookie: () => [] }, json: async () => ({}), text: async () => '' };
+      };
+      const r = await DR.detailByRule('https://www.youthcenter.go.kr/bbs03View/48/10827', fakeFetch);
+      eq('⑭-4 온통청년 글은 JSON 으로 본문·포스터 대체 글·그림·첨부를 받는다 (쿠키를 들고)',
+        [!!r && /국내 거주 내·외국인 청년/.test(r.text) && /참가자 모집 안내/.test(r.text), r && r.images.map((i) => i.url), r && r.attachments.length, calls.slice(1).every((c) => /XSRF-TOKEN=abc/.test(c.cookie))],
+        [true, ['https://www.youthcenter.go.kr/image?imageName=/CMU/2026/10/12/1012245.png'], 1, true]);
+      eq('  규칙이 없는 주소는 null · 규칙 여부는 hasDetailRule', [await DR.detailByRule('https://www.kw.ac.kr/ko/life/notice.jsp?DUID=1', fakeFetch), DR.hasDetailRule('https://www.youthcenter.go.kr/bbs03View/48/10827'), DR.hasDetailRule('https://www.youthcenter.go.kr/youthPolicy')], [null, true, false]);
+      eq('  그 글자에서 자격이 읽힌다 — 포스터 한 줄 `국내 거주 내·외국인 청년`(2차 줍기 · 활동 글은 한 줄도 담는다) · `**참가대상**` 굵게 기호는 뗀다',
+        [AX4.activityDetails(r.text, '「2026 IFWY 은평 컨퍼런스」 참가자 모집 안내').eligibilityLines, AX4.activityDetails('**참가대상**\n15세 이상 39세 이하 청년 중 구리시 내 창업을 희망하는 예비창업자\n**공모분야**\n* 관광·로컬 콘텐츠').eligibilityLines],
+        [['국내 거주 내·외국인 청년'], ['참가대상 : 15세 이상 39세 이하 청년 중 구리시 내 창업을 희망하는 예비창업자']]);   // 머리글은 이름표로 붙는다(화면이 뗀다)
+      const cSrc = readText(new URL('../collector/collect.mjs', import.meta.url)), aSrc = readText(new URL('../collector/activity-docs.mjs', import.meta.url));
+      eq('  수집 로봇(fetchDetail)과 첨부 로봇(fetchPost)이 같은 detailByRule 을 먼저 부른다', [/const ruled = await detailByRule\(item\.url\)/.test(cSrc), /const ruled = await detailByRule\(n\.url\)/.test(aSrc) && /-R\.txt/.test(aSrc)], [true, true]);
+    }
     eq('  카드 링크 자리는 style.css 에 있다(.card-src-link · has-link 아랫줄 여백)', /\.card-src-link \{/.test(readText(new URL('../style.css', import.meta.url))) && /\.sch-card-wrap\.has-link > \.sch-card \.sch-foot/.test(readText(new URL('../style.css', import.meta.url))), true);
     eq('⑭ 자격 줄 — 안내 문장(`…모집합니다`·`…제공하고 있습니다`·`…하시기 바랍니다`·`첨부파일이(가) 없습니다`·`가능합니다`)은 아니다',
       ['2026 평택시민나눔문화축제에서 합정장애인주간보호센터 홍보부스 운영을 보조해주실 자원봉사자를 모집합니다.', '합정장애인주간보호센터는 사회복지법인 연꽃마을에서 운영하고 있으며, 성인발달장애인을 위한 프로그램을 제공하고 있습니다.',

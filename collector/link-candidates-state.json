@@ -358,13 +358,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-27",
-  "lastAt": "2026-10-27",
-  "tries": 1,
+  "lastAt": "2026-10-28",
+  "tries": 2,
   "status": "pending",
-  "why": "게시판 목록(15줄)에서 그 글을 하나로 못 고름",
+  "why": "게시판을 못 엶(page.goto: net::ERR_SSL_PROTOCOL_ERROR at https://gjmed.or.…)",
   "checks": {},
   "round": "2026-11-06",
-  "nextAt": "2026-10-28"
+  "nextAt": "2026-10-31"
  },
  "kosaf|2700017001|http://www.hsf.or.kr/bbs/board.php?bo_table=s5_1&wr_id=102": {
   "ds": "kosaf",
@@ -807,6 +807,27 @@
   },
   "decidedAt": "2026-10-04",
   "verifiedAt": "2026-10-04"
+ },
+ "notices|https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%5B%EA%B5%90%EC%99%B8%5D%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%ED%91%B8%EB%A5%B8%EB%93%B1%EB%8C%80%20%EA%B8%B0%EB%B6%80%EC%9E%A5%ED%95%99%EA%B8%88|https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260909&brdSeq=1&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&": {
+  "ds": "notices",
+  "key": "https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%5B%EA%B5%90%EC%99%B8%5D%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%ED%91%B8%EB%A5%B8%EB%93%B1%EB%8C%80%20%EA%B8%B0%EB%B6%80%EC%9E%A5%ED%95%99%EA%B8%88",
+  "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260909&brdSeq=1&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
+  "source": "twin",
+  "by": "로봇(같은 사이트·같은 제목 — 수집 검수 후보)",
+  "title": "[교외] 2026년 2학기 푸른등대 기부장학금 장..",
+  "firstAt": "2026-10-27",
+  "lastAt": "2026-10-27",
+  "tries": 1,
+  "status": "suggest",
+  "why": "제목 자리에서 우리 공고 제목을 통째로 찾지 못함(앞부분만 같을 수 있음)",
+  "checks": {
+   "C": "ok",
+   "L": "weak",
+   "H": "ok",
+   "T": "ok",
+   "R": "ok"
+  },
+  "decidedAt": "2026-10-27"
  },
  "notices|https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EA%B3%B5%ED%86%B5%5D%20%E2%94%94%20RE%3A(%EC%83%9D%ED%99%9C%EB%B9%84)2026-2%ED%95%99%EA%B8%B0%20(%EC%A3%BC)%EC%95%84%EC%9D%B4%EC%98%A4%EC%95%8C%EC%BD%94%EB%A6%AC%EC%95%84%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0|https://www.gachon.ac.kr/bbs/kor/478/125811/artclView.do": {
   "ds": "notices",

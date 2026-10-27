@@ -30,7 +30,7 @@ const cleanValue = (v) => String(v || '').replace(/\s+/g, ' ').replace(/^[\s:：
 function valueFor(text, re) {
   return eachLabeledValue(text, (label) => re.test(label.replace(/\s/g, '').replace(/^\s*[·•\-*]\s*/, '')) || re.test(label), (value) => {
     const v = cleanValue(value);
-    if (v.length < 2) return null;
+    if (v.length < 2 || /^(?:안내|검증|참조|참고|확인)$/.test(v)) return null;   // 값 자리에 안내 낱말만(`참가 대상 : 안내` — 국방부 화이트햇 스크립트 페이지 · 2026-10-28)
     return v.length > MAX_LEN ? `${v.slice(0, MAX_LEN - 1)}…` : v;
   });
 }
@@ -64,7 +64,12 @@ const noContact = (lines) => lines.filter((l) => !CONTACT.test(l));
    ③ 사이트 메뉴의 `지원대상`·`신청자격` 같은 짧은 줄이 자격 절 제목으로 뽑혔다(본문보다 위에 있다).
       → 글 제목이 본문에 다시 나오는 **마지막 자리부터** 읽고, 거기서 못 찾으면 전체를 읽는다(atTitle).
    그래도 이름표가 없으면 `대한민국 국민 누구나`·`AI에 관심 있는 누구나` 처럼 **누가 낼 수 있나만 말하는 줄**을 원문 그대로 쓴다(OPEN_LINE). */
-const ACT_HEAD = /공모\s?(?:자격|대상)|교육\s?대상|참가\s?범위|응모\s?범위|지원\s?범위/;
+/* 활동 어휘는 collector/activity-vocab.mjs 한 곳(2026-10-27) — 머리글·요건 신호·'누가' 낱말·제목 속 대상 */
+import { ACT_HEAD, ACT_SIGNAL, ACT_WHO, ACT_TAIL, targetFromTitle } from './activity-vocab.mjs';
+import { createRequire } from 'node:module';
+/* 지역 이름은 parse-requirements.js 의 REGION_CITIES 한 벌(화면·판정·알림) — 끝글자 `시|군|구|도` 로 짐작하면 `별도`·`표시`·`제도` 가 지역이 된다(2026-10-28 리뷰) */
+const PR = createRequire(import.meta.url)('../parse-requirements.js');
+const REGION_WORDS = [...new Set([...PR.REGIONS, ...Object.keys(PR.REGION_CITIES), ...Object.values(PR.REGION_CITIES).flat()])].sort((a, b) => b.length - a.length).join('|');
 /* 🔴 `누구나` 가 **말의 끝**이어야 한다 — `③ 국민 누구나 찾고 머물며 … 공간`(공모 소재 예시)이 자격으로 뽑혔다(첨부 첫 실측).
    뒤에 붙어도 되는 것: 참여·신청 가능 · 괄호 부연(개인 또는 팀) · 인원(25인) */
 const OPEN_LINE = /(?:(?:국민|세계인|시민|청년|학생|대학생|개인|팀|관심\s?(?:있는|있으신)\s?(?:분|사람)?)\s*(?:이면\s*)?(?:누구나|모두)|누구나)\s*(?:참여|참가|신청|응모|지원)?\s*(?:가능)?\s*(?:\d+\s?(?:인|명))?\s*(?:[(（].*[)）])?\s*[.!]?\s*$|(?:대상|자격|연령|나이)\s*[:：]?\s*제한\s?없음/;
@@ -130,14 +135,14 @@ const HEAD_LIKE = (l) => {
 /* 안내 말투(NOT_OPEN)는 **누가 낼 수 있나를 말하는 앞부분**에서만 본다 — `19~34세 청년이라면 누구나, … 블로그를 통해 쉽게 참여할 수 있다`(보도자료 · 2026-10-16)의 `쉽게` 는 참여 방법 쪽 말이다 */
 const proseLines = (t) => [...new Set(t.split('\n').map((l) => l.trim()).filter((l) => l.length >= 8 && l.length <= 200 && WHO_SENTENCE.test(l) && !NOT_OPEN.test(l.replace(/니다\s*\.?$/, '').split(/누구나/)[0])))].slice(0, 2);
 function qualifyLines(t) {
-  let q = extractQualifyLines(t, { head: ACT_HEAD, trustHead: true });
+  let q = extractQualifyLines(t, { head: ACT_HEAD, trustHead: true, signal: ACT_SIGNAL });
   /* 맨 제목 줄(`지원자격`)은 장학 발췌기가 표 머리글로 보고 빼므로 첫 줄이 내용일 수 있다 — 그 바로 윗줄이 제목이면 맞다(리뷰) */
   if (q.length && !HEAD_LIKE(q[0])) {
     const ls = t.split('\n').map((l) => l.trim()).filter(Boolean);
     const at = ls.indexOf(q[0]);
     if (!(at > 0 && HEAD_LIKE(ls[at - 1]))) q = [];
   }
-  if (!q.length) q = scoopQualifyLines(t);
+  if (!q.length) q = scoopQualifyLines(t, { who: ACT_WHO, tail: ACT_TAIL });
   if (!q.length) q = [...new Set(t.split('\n').map((l) => l.trim()).filter((l) => l.length >= 4 && l.length <= 60 && OPEN_LINE.test(l) && !NOT_OPEN.test(l)))].slice(0, 2);
   return q;
 }
@@ -159,10 +164,12 @@ const POLITE_END = /(?:니다|세요|십시오|습니까|드려요|해요|돼요
 const ELIG_SAY = /누구나|대상으로|불가|제외|한함|한하여|한해|(?:세|학년|학기|점|등급|평점)\s?(?:이상|이하|미만|초과)|\d+\s?세|거주|재학|휴학|졸업|소속|(?:이면|라면|경우)[^.]{0,12}(?:가능|할\s?수\s?있)/;
 const NOT_SAY = /바랍니다|부탁|말씀|오세요|시상|안내받|없습니다|기다립니다|진행됩니다|제공하고|모집합니다|모집하고자|변경될|마감될|반려/;
 const HAS_LABEL = /^[^:：]{1,16}(?:대상|자격|요건|조건)\s*[:：]/;
-const LABEL_ONLY = /^(?:[\s\-–·•○●■□◎※ㅇ]|\d{1,2}\s?[.)]|[가-힣]\s?[.)])*\s*[가-힣\s]{2,8}(?:기간|방법|일정|일시|장소|내용|혜택|문의|접수|인원|대상|자격|요건|조건)\s*[:：]?\s*$/;
+const LABEL_ONLY = /^(?:[\s\-–·•○●■□◎※ㅇ]|\d{1,2}\s?[.)]|[가-힣]\s?[.)])*\s*[가-힣\s]{2,8}(?:기간|방법|일정|일시|장소|내용|혜택|문의|접수|인원|대상|자격|요건|조건|구성|규모|형태)\s*[:：]?\s*$/;   // `팀 구성`·`모집 규모`·`참가 형태` 머리글(국방부 화이트햇 · 2026-10-28)
 const AWARD_ROW = /^(?:대상|최우수상|우수상|장려상|금상|은상|동상|입선|특별상|참가상|상금|상장|시상|부상)\s*(?:[(（]\s*\d+\s*[)）])?\s*$|^[\d,.]+\s*(?:만\s?원|천\s?원|원)\s*$|^[가-힣]{2,10}(?:장관상|시장상|지사상|청장상|실장상|총장상|대표상|회장상|이사장상)\s*$|^-$/;
+/* 요건 낱말 — 장학 신호 + 활동 어휘(activity-vocab) 한 벌. eligLineOk 의 '조각 거름'(j)~(m)이 '이 줄에 요건 말이 있나'를 묻는 데 쓴다 */
+const SIGNAL_ALL = new RegExp(`${ACT_SIGNAL.source}|재학|휴학|복학|신입|편입|졸업|\\d\\s?학년|학부생|성적|평점|학점|분위|수급|차상위|기초생활|한부모|다자녀|자녀|유공|보훈|장애|다문화|북한이탈|거주|출신|일반인|여성|남성|전국|국내|해외|\\d\\s?학기|${REGION_WORDS}`);   // 지역 이름(`제주시, 서귀포시` — REGION_CITIES)·`일반인`도 요건 말이다
 const BOARD_CHROME = /^(?:답변\s?등록|처리\s?상태|목록(?:보기)?|이전\s?글|다음\s?글|조회수?|첨부\s?파일|공유(?:하기)?|인쇄(?:하기)?|SNS\s?(?:업로드|공유)|좋아요|신고(?:하기)?|스크랩|담당\s?부서|작성자|등록일|수정일|만족도\s?조사)\s*$/i;
-const NOT_ELIG_LABEL = /^[\sㅇ○●■□▣◆◇▶·•\-–*]*(?:(?:신청|접수|모집|공모|응모|활동|운영)?\s?기간|접수(?:처|방법)?|제출(?:처|방법|서류)?|문의(?:처)?|시상|상금|일시|장소|주최|주관|후원|홈페이지|이메일|전화|(?:참가|참여|신청|응모|선발)\s?방법|발표)\s*[:：]/;
+const NOT_ELIG_LABEL = /^[\sㅇ○●■□▣◆◇▶·•\-–*]*(?:(?:신청|접수|모집|공모|응모|활동|운영)?\s?기간|접수(?:처|방법)?|제출(?:처|방법|서류)?|문의(?:처)?|시상|상금|일시|장소|주최|주관|후원|홈페이지|이메일|전화|(?:참가|참여|신청|응모|선발)\s?방법|발표|(?:모집|선발|참가)\s?인원|(?:활동|봉사|교육|프로그램)\s?(?:내용|시간|장소|일정|지역)|내용|시간|일정)\s*[:：]/;   // 인원·내용·시간 이름표 줄은 자격이 아니다(1365 봉사 글 · 2026-10-27)
 export function eligLineOk(line) {
   const l = String(line || '');
   const age = l.match(AGE_LABEL);
@@ -175,6 +182,15 @@ export function eligLineOk(line) {
   if (BOARD_CHROME.test(t)) return false;
   /* (i) 자격이 아닌 이름표 줄(`ㅇ 기간 : …`·`접수 : …`·`문의 : …`) — 자격 절 바로 뒤 줄이 같은 글머리로 이어져 블록에 딸려 왔다 */
   if (NOT_ELIG_LABEL.test(t)) return false;
+  /* (j)~(m) 스크립트 페이지·API 표가 납작해져 들어온 조각 (2026-10-28 · 국방부 화이트햇 「참가 자격 : 안내」·「참가 대상 : AI·풀이 환경」 · K-Startup 「창업업력」·「2026년 10월 23일」·「조슈아파트너스(주)」·「대상연령 : 전체」):
+     (j) 이름표 뒤 값이 짧고 요건 낱말이 없다 (k) 요건 낱말 없는 짧은 낱말 하나 (l) 날짜뿐 (m) 기관 이름뿐.
+     사람·대상을 말하는 짧은 값(`중소기업`·`군인`·`1인 창조기업` — VALUE_WORD · joinTablePairs 와 같은 눈)은 요건이다(2026-10-28 리뷰 — `지원대상 : 중소기업` 이 빠졌다) */
+  const reqWord = (v) => SIGNAL_ALL.test(v) || VALUE_WORD.test(v);
+  const lab = t.match(/^[^:：\d]{1,16}[:：]\s*(.*)$/);   // 시각 `10:00` 의 콜론은 이름표가 아니다
+  if (lab && lab[1].trim().length <= 10 && !reqWord(lab[1])) return false;
+  if (t.length <= 6 && !reqWord(t)) return false;
+  if (/^\d{4}\s?년\s?\d{1,2}\s?월\s?\d{1,2}\s?일\.?$|^\d{4}[.\-/]\d{1,2}[.\-/]\d{1,2}\.?$/.test(t)) return false;
+  if (t.length <= 24 && /(?:\(주\)|㈜|주식회사|센터|재단|협회|진흥원|공단|공사|파트너스)\s*$/.test(t) && !SIGNAL_ALL.test(t)) return false;   // 대학교 이름은 빼지 않는다 — `경희대학교/단국대학교` 는 받는 학교 목록이다(소진공 공모전)
   /* (g) 빈 정책 표(지자체 청년정책 상세 — 제주 「체인지메이커」 실측 2026-10-16): `신청자격 : 지원대상 : - 나이`·`: 만 0 세 ~ 만 0 세`·`- 학력기준 :`·`제한없음` 은 칸만 있고 값이 없다 */
   if (/[:：]\s*[-–]?\s*(?:나이|연령|학력\s?기준|소득\s?기준|지역\s?기준|근로\s?기준|결혼\s?기준|전공\s?요건|추가\s?단서)?\s*$/.test(t)) return false;
   if (/만\s?0\s?세\s?~\s?만\s?0\s?세/.test(t) || /^[\s\-–·]*(?:[가-힣\s]{0,8}[:：]\s*)?제한\s?없음\s*$/.test(t)) return false;
@@ -216,10 +232,11 @@ const inlineLabel = (t) => t
   .replace(/^([ \t]*(?:[ㅇ○●■□▣◆◇▶·•\-*]\s*)?)((?:지원|모집|참가|참여|신청|응모|공모)\s?(?:대상|자격))[ \t]+(?=[^\s:：][^\n:：]{0,40}$)/gm, '$1$2 : ')
   /* `공모기간 2026. 10. 6. – 11. 2.`(지식재산처) · `진행일정 2026-11-07~2027.02.19`(한남대) — 기간·일시 이름표 뒤에 콜론 없이 날짜가 붙은 줄 · `접수 마감 - 2026년 11월 2일`(외대부고)의 대시도 콜론으로 */
   .replace(new RegExp(`^([ \\t]*(?:[ㅇ○●■□▣◆◇▶·•\\-*]\\s*)?)(${PERIODISH})[ \\t]*(?:[-–—][ \\t]*)?(?=(?:20\\d\\d|\\d{1,2})\\s?[.\\-/년월]|상시|수시|연중)`, 'gm'), '$1$2 : ');   // `신청기간 상시`(한남대) 도
-const normalizeText = (text) => labelColon(inlineLabel(bulletNorm(String(text || ''))));
+/* 마크다운 굵게(`**참가대상**` — 온통청년 포스터 대체 글)는 기호만 뗀다 — 안 떼면 머리글·표 머리 판정이 못 알아본다(2026-10-28) */
+const normalizeText = (text) => labelColon(inlineLabel(bulletNorm(String(text || '').replace(/\*\*/g, ''))));
 export function activityDetails(text, title) {
   const t = normalizeText(text);
-  if (!t.trim()) return { eligibilityLines: [], eligibilityExcludes: [], eligibilityPriority: [], noticeLines: [] };
+  if (!t.trim()) { const tt = targetFromTitle(title); return { eligibilityLines: tt ? [tt] : [], eligibilityFromTitle: !!tt, thin: true, eligibilityExcludes: [], eligibilityPriority: [], noticeLines: [] }; }   // 본문이 없어도 제목의 대상은 읽는다 — 표식은 본편과 같게
   /* 어디서부터 읽나 — 글 제목이 나오는 **자리마다** 읽어 보고 자격이 가장 많이 나오는 자리(같으면 뒤쪽).
      🔴 마지막 자리만 보면 두 번 나오는 제목 **사이**의 자격 표를 놓쳤다(K-Startup DMC 캠프 · 제목 191·214줄, 표 195~208줄 · 2026-10-04).
      맨 앞 세 줄(브라우저 제목줄 · 그 아래는 사이트 메뉴)은 제목이 한 번뿐일 때만 시작점으로 쓴다.
@@ -241,11 +258,19 @@ export function activityDetails(text, title) {
   /* 🔴 이름표를 뗀 앞 줄이 **빈 글자**면 비교하지 않는다 — 빈 글자는 어디에나 '들어 있어서' 대상 줄이 빠졌다(`■ 참가자격` 제목 줄 · 2026-10-04 관문) */
   const core = (q) => flat(q).replace(/^.*?(?:대상|자격)/, '');
   if (who && !qual.some((q) => flat(q).includes(flat(who)) || (core(q).length >= 4 && flat(who).includes(core(q))))) qual = [...qual, who];
+  /* 본문·첨부에서 한 줄도 못 뽑았으면 제목 속 대상(`[중학생~대학생] …`·`… 도서 정리(대학생)`·`… -대학생만 신청`) — 1365 봉사 글은 대상을 제목에만 적는다(activity-vocab · 2026-10-27) */
+  let fromTitle = false;
+  if (!qual.length) { const tt = targetFromTitle(title); if (tt) { qual = [tt]; fromTitle = true; } }
+  /* 글 제목과 같은 줄은 자격이 아니다(K-Startup API 표가 제목을 한 칸으로 준다 · 2026-10-28) */
+  const flatT = flat(title || '');
+  if (flatT.length >= 6) qual = qual.filter((q) => flat(q) !== flatT);
   if (!qual.length) qual = proseLines(body);
   if (!qual.length && body !== t) qual = proseLines(t);
   qual = cutAtTableLabel(qual);
   return {
     eligibilityLines: noContact(qual).filter(eligLineOk),
+    eligibilityFromTitle: fromTitle,   // 제목에서만 읽은 대상 — 첨부·OCR 에서 읽어 둔 자격을 이것으로 덮지 않는다(putActivityDetails)
+    thin: t.replace(/[^가-힣]/g, '').length < 300,   // 메뉴 수준의 껍데기(한글 300자 미만) — 읽어 둔 자격을 이것으로 지우지 않는다(putActivityDetails)
     eligibilityExcludes: noContact(extractExcludeLines(t)).filter(eligLineOk),
     eligibilityPriority: noContact(extractPriorityLines(t)),
     noticeLines: noContact(extractFrom(t)).slice(0, 8),
@@ -307,14 +332,22 @@ export function sanitizeBenefit(it) {
 
 /* 글 하나에 위 결과를 붙인다 — 수집 로봇의 세 길(새 글 · 재단 글 · 소급)과 API 로봇이 **같은 함수**를 쓴다.
    빈 칸은 지운다(읽었는데 없으면 옛 값을 남기지 않는다 · 장학 로봇과 같은 규칙). */
-export const ACT_DETAILS_V = 5;   // 5 (2026-10-19): 「자격요건」 머리글·나이 신호·게시판 잡티·기간 이름표 줄 — 전 글 다시 읽기   // 이 판으로 읽은 글은 detailsV 가 같다 — 다르면 수집 로봇이 원문을 다시 읽는다(소급 · 원칙 7) · 3 = 2026-10-03 활동 자격 읽기(제목부터·괄호 이름표·누구나) · 4 = 2026-10-16 안내 문장·시상표 거름 + 자격 절이 참가방법·시상에서 끊김
+export const ACT_DETAILS_V = 6;   // 6 (2026-10-27): 대외활동 어휘(activity-vocab) — 전 글 다시 읽기 · 5 (10-19): 자격요건 머리글·게시판 잡티   // 이 판으로 읽은 글은 detailsV 가 같다 — 다르면 수집 로봇이 원문을 다시 읽는다(소급 · 원칙 7) · 3 = 2026-10-03 활동 자격 읽기(제목부터·괄호 이름표·누구나) · 4 = 2026-10-16 안내 문장·시상표 거름 + 자격 절이 참가방법·시상에서 끊김
 export function putActivityDetails(it, details) {
   /* 🔴 본문에 자격이 없는데 첨부·포스터에서 읽어 둔 자격(eligibilityFrom · collector/activity-docs.mjs)은 지우지 않는다 —
      본문을 다시 읽을 때마다 첨부에서 건진 자격이 빈 본문에 덮여 사라진다. 본문에서 자격이 나오면 본문이 이긴다(출처 표식도 뗀다). */
-  const keepDocs = !!it.eligibilityFrom && !(details.eligibilityLines && details.eligibilityLines.length);
+  /* 🔴 첨부·OCR·브라우저에서 읽어 둔 자격(eligibilityFrom)은 본문이 **더 약한 것**(제목의 대상 한 낱말 · 이름표 없는 한 줄)을 줄 때 덮지 않는다
+     (2026-10-28 · 인천 국제기구 직업체험: OCR 10줄이 본문 재읽기의 메뉴 한 줄 「행복씨앗통장 운영(청년발달장애인)」 로 바뀌었다) */
+  const got = details.eligibilityFromTitle ? [] : (details.eligibilityLines || []);   // 제목의 대상 한 낱말은 '읽은 자격'으로 치지 않는다(아래 두 판단 모두)
+  const weak = !got.length;   // 본문이 진짜 자격 줄을 주면 본문이 이긴다(관문 ③) — 긴 페이지의 메뉴 한 줄은 extract-excerpts 2차 줍기가 애초에 안 준다(40줄 규칙)
+  /* 🔴 껍데기만 받은 재읽기(스크립트 껍데기 · 한글 300자 미만)가 자격을 하나도 못 내면 읽어 둔 자격을 둔다 — 판(detailsV)만 올려 다음 실행이 또 지우지 않게
+     (2026-10-28 · K-Startup 상세가 껍데기(한글 37자)로 와 SDGs 소셜벤처·기업지원실의 자격 6줄이 0줄이 됐다) */
+  const keepDocs = (!!it.eligibilityFrom && weak) || (details.thin && !got.length && (it.eligibilityLines || []).length > 0);
   for (const k of ['eligibilityLines', 'eligibilityExcludes', 'eligibilityPriority', 'noticeLines']) {
     if (keepDocs && k !== 'noticeLines') continue;
-    if (details[k] && details[k].length) it[k] = details[k]; else delete it[k];
+    /* 첨부에서 읽어 둔 공고 안내(noticeFrom · activity-docs)는 빈 본문이 지우지 않는다 — 본문에서 안내가 나오면 본문이 이긴다 */
+    if (k === 'noticeLines' && it.noticeFrom && !(details.noticeLines && details.noticeLines.length)) continue;
+    if (details[k] && details[k].length) { it[k] = details[k]; if (k === 'noticeLines') delete it.noticeFrom; } else delete it[k];
   }
   if (!keepDocs) { delete it.eligibilityFrom; delete it.eligibilityReviewed; }
   it.detailsV = ACT_DETAILS_V;

@@ -161,9 +161,13 @@ function linkLines(it, where) {
     out.push(`       활동 시트 단추·안내 「${htmlText(h) || '(없음)'}」`);
     out.push(`       누르면 → ${hrefIn(h) || '(링크 없음)'}`);
     /* 시트의 칸들이 무엇을 그리는가(2026-10-19 개발자 "자격요건이 공고 안내에 들어가 있다") — 자격·모집 안내·공고 안내는 이 세 칸의 글자를 그대로 그린다(없으면 칸을 접는다) */
-    const el = it.eligibilityLines || [], ex = it.excerpts || [], nl = it.noticeLines || [];
-    out.push(`   ─ 지원 자격 (${el.length}줄${el.length ? '' : ' · 칸 접힘'})`);
+    const raw = it.eligibilityLines || [], ex = it.excerpts || [], nl = it.noticeLines || [];
+    /* 시트는 저장된 줄을 그대로 찍지 않고 match-engine 이 절(자격/제외)로 가른 것을 그린다 — 같은 함수로 가른 결과를 보인다(2026-10-27 「라참여배제자」) */
+    const el = ME.requirementLines(it, raw, { all: true }), exl = ME.requirementLines(it, raw, { onlyExclude: true });
+    out.push(`   ─ 지원 자격 (${el.length}줄${el.length ? '' : ' · 칸 접힘'} · 저장된 줄 ${raw.length})`);
     for (const l of el) out.push(`       · ${String(l).slice(0, 84)}`);
+    out.push(`   ─ '이런 경우는 제외돼요' (${exl.length}줄)`);
+    for (const l of exl) out.push(`       ✗ ${String(l).slice(0, 84)}`);
     out.push(`   ─ 모집 안내 (${ex.length}줄${ex.length ? '' : ' · 칸 접힘'})`);
     for (const x of ex) out.push(`       · ${x.label} · ${String(x.text).slice(0, 70)}`);
     out.push(`   ─ 공고 안내 (${nl.length}줄${nl.length ? '' : ' · 칸 접힘'})`);

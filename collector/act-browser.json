@@ -2,26 +2,6 @@
  "_common": [
   "939935e1b1f9556d"
  ],
- "https://wise.dongguk.ac.kr/article/servicenotice/detail/520680": {
-  "at": "2026-10-05",
-  "tries": 1,
-  "lines": [
-   "장애학생지원",
-   "장애인 복지시설"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://wise.dongguk.ac.kr/article/servicenotice/detail/520622": {
-  "at": "2026-10-05",
-  "tries": 1,
-  "lines": [
-   "장애학생지원",
-   "장애인 복지시설"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/520732": {
   "at": "2026-10-06",
   "tries": 1,
@@ -88,15 +68,15 @@
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/269119/artclView.do": {
   "at": "2026-10-22",
-  "tries": 2
+  "tries": 0
  },
  "https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=525&bcd=notice": {
   "at": "2026-10-22",
-  "tries": 2
+  "tries": 0
  },
  "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140536&article.offset=0&articleLimit=10": {
   "at": "2026-10-22",
-  "tries": 2
+  "tries": 0
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/268996/artclView.do": {
   "at": "2026-10-15",
@@ -104,15 +84,15 @@
  },
  "https://www.k-startup.go.kr/web/contents/webNOTICE_MATR.do?page=1&viewCount=18&id=176455&schBdcode=&schGroupCode=&schM=view": {
   "at": "2026-10-22",
-  "tries": 2
+  "tries": 0
  },
  "https://www.culture.go.kr/portal/cltBnf/cltSup/view.do?viewTp=2&rcrtSn=234939&menuNo=200104&sSort=2&pageIndex=1": {
   "at": "2026-10-15",
-  "tries": 1
+  "tries": 0
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/268735/artclView.do": {
   "at": "2026-10-22",
-  "tries": 2
+  "tries": 0
  },
  "https://youth.gyeongnam.go.kr/youth/board.es?mid=a10501020000&bid=0006&list_no=6911&act=view": {
   "at": "2026-10-15",
@@ -129,19 +109,19 @@
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53445&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-22",
-  "tries": 2
+  "tries": 0
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=48133&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-22",
-  "tries": 2
+  "tries": 0
  },
  "https://youth.gyeongnam.go.kr/youth/board.es?mid=a10501020000&bid=0006&list_no=6907&act=view": {
   "at": "2026-10-22",
-  "tries": 2
+  "tries": 0
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/268492/artclView.do": {
   "at": "2026-10-22",
-  "tries": 2
+  "tries": 0
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53429&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-15",
@@ -154,11 +134,11 @@
  },
  "https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=519&bcd=notice": {
   "at": "2026-10-22",
-  "tries": 2
+  "tries": 0
  },
  "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000": {
   "at": "2026-10-23",
-  "tries": 2
+  "tries": 0
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53505&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-16",
@@ -221,19 +201,11 @@
  },
  "https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=514&bcd=notice": {
   "at": "2026-10-23",
-  "tries": 2
+  "tries": 0
  },
  "https://kyf.or.kr/user/boardDetail.do?boardType=notice&bbsId=BBSMSTR_000000000367&nttNo=10054": {
   "at": "2026-10-16",
   "tries": 1
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/267199/artclView.do": {
-  "at": "2026-10-23",
-  "tries": 2
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/267176/artclView.do": {
-  "at": "2026-10-23",
-  "tries": 2
  },
  "https://www.youthcenter.go.kr/bbs03View/48/10836": {
   "at": "2026-10-16",
@@ -276,7 +248,7 @@
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53441&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-24",
-  "tries": 2
+  "tries": 0
  },
  "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179354": {
   "at": "2026-10-17",
@@ -293,10 +265,6 @@
   ],
   "excludes": [],
   "from": "브라우저 본문"
- },
- "https://www.yonkang.org/kr/news/652": {
-  "at": "2026-10-23",
-  "tries": 1
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/520896": {
   "at": "2026-10-23",
@@ -330,11 +298,11 @@
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53516&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-23",
-  "tries": 1
+  "tries": 0
  },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3540153": {
   "at": "2026-10-24",
-  "tries": 1,
+  "tries": 0,
   "lines": [
    "봉사자유형 : 성인"
   ],
@@ -356,15 +324,15 @@
  },
  "https://www.youthcenter.go.kr/bbs03View/48/10840": {
   "at": "2026-10-24",
-  "tries": 1
+  "tries": 0
  },
  "https://youth.seoul.go.kr/content.do?key=2310100012": {
   "at": "2026-10-24",
-  "tries": 1
+  "tries": 0
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/269599/artclView.do": {
   "at": "2026-10-24",
-  "tries": 1
+  "tries": 0
  },
  "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179494": {
   "at": "2026-10-24",
@@ -405,8 +373,63 @@
   "excludes": [],
   "from": "브라우저 본문"
  },
- "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156786340&pWise=sub&pWiseSub=C3": {
-  "at": "2026-10-25",
+ "https://wise.dongguk.ac.kr/article/servicenotice/detail/520976": {
+  "at": "2026-10-27",
+  "tries": 1,
+  "lines": [
+   "장애학생지원",
+   "장애인 복지시설"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53567&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-10-27",
   "tries": 1
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53566&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-10-27",
+  "tries": 1
+ },
+ "https://wise.dongguk.ac.kr/article/servicenotice/detail/520964": {
+  "at": "2026-10-27",
+  "tries": 1,
+  "lines": [
+   "장애학생지원",
+   "장애인 복지시설"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/269933/artclView.do": {
+  "at": "2026-10-27",
+  "tries": 1,
+  "lines": [
+   "모집 대상 : 중학교 1학년(2013년생)~ 대학생 4학년(2002년생)20명"
+  ],
+  "excludes": [],
+  "from": "공고문 첨부(OCR)"
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/269932/artclView.do": {
+  "at": "2026-10-27",
+  "tries": 1,
+  "lines": [
+   "교육대상 : 데이터 분석 및 저널리즘 분야로 취업을 희망하는자",
+   "QR 코드로 신청하기",
+   "신청자격 : 국민내일배움카드 발급자 또는 발급 가능한자",
+   "* 교육과정 최종 합격자 발표 전 내일배움카드 수령 가능한자"
+  ],
+  "excludes": [],
+  "from": "공고문 첨부(OCR)"
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/269931/artclView.do": {
+  "at": "2026-10-27",
+  "tries": 1,
+  "lines": [
+   "참가대상 : 전 국민 (개인·팀 가능)",
+   "대상 : 1팀"
+  ],
+  "excludes": [],
+  "from": "공고문 첨부(OCR)"
  }
 }

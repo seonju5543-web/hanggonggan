@@ -53,7 +53,7 @@ jobs:
     env:
       NODE_EXTRA_CA_CERTS: collector/certs/bundle.pem
     # 재수집 예산 12분 + 브라우저 설치·검증·저장. 상한은 예산의 그릇이지 '넉넉히'가 아니다.
-    timeout-minutes: 50   # 크롬 설치 5 + 장학 11 + 활동 받기 8 + 글자 읽기 8 + 고르기 2 + 관문 5 + 저장 3 = 42 · 체크아웃·알림 여유 8 (2026-10-04)
+    timeout-minutes: 54   # 크롬 설치 5 + 장학 11 + 활동 받기 8 + 글자 읽기 8 + 고르기 2 + PaddleOCR 경보 짝 1+1(2026-10-28) + 관문 5 + 저장 3 = 46 · 수정 전 42 · 체크아웃·알림 여유 8 (2026-10-04)
     steps:
       - uses: actions/checkout@v4
         with:
@@ -61,6 +61,9 @@ jobs:
           ref: 'claude/nice-heisenberg-WESq5'
       - uses: actions/setup-node@v4
         with: { node-version: '20' }
+      # 파이썬 판 고정 — PaddleOCR 바퀴(cp39~cp313)가 러너 기본 파이썬엔 없어 설치가 매일 실패했다 (2026-10-28 · collect-scholarships.yml 과 같은 수리)
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
       - name: 진짜 크롬 설치
         timeout-minutes: 5
         run: |
@@ -94,12 +97,41 @@ jobs:
           pip install olefile --quiet
           python3 collector/hwp-bodytext.py collector/act-files || true
           sudo apt-get install -y -qq poppler-utils
-          pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3 || echo "::warning::PaddleOCR 설치 실패 — 아래 읽기가 엔진 없음으로 적고 HWP·본문으로만 계속"   # 🔴 실패를 삼키지도, 경고 없이 떼지도 말 것 — 떼면 같은 단계의 --apply 가 bash -e 에 끊겨 HWP 로 읽은 자격까지 버려진다(2026-10-04 점검 gaps-02) · 🔴 판 고정 — 3.3.x 는 x86 CPU 에서 첫 그림부터 ConvertPirAttribute2RuntimeAttribute 오류(2026-10-04 첫 클라우드 실행 · PaddleOCR discussions 17350)
+          pip install --quiet paddlepaddle==3.2.0 paddleocr==3.3.3 || { touch /tmp/paddle-install-failed; echo "::warning::PaddleOCR 설치 실패 — 아래 읽기가 엔진 없음으로 적고 HWP·본문으로만 계속"; }   # 🔴 실패를 삼키지도, 경고 없이 떼지도 말 것 — 떼면 같은 단계의 --apply 가 bash -e 에 끊겨 HWP 로 읽은 자격까지 버려진다(2026-10-04 점검 gaps-02) · 🔴 판 고정 — 3.3.x 는 x86 CPU 에서 첫 그림부터 ConvertPirAttribute2RuntimeAttribute 오류(2026-10-04 첫 클라우드 실행 · PaddleOCR discussions 17350)
           python3 collector/paddle-ocr.py collector/act-files --budget-sec=240 || echo "::warning::PaddleOCR 실패 — 자격 읽기는 HWP·본문으로만 계속(엔진 고장이면 그 글의 기회는 --apply 가 되돌린다)"
       - name: 대외활동 — 자격 고르기 (자기 장부에만)
         timeout-minutes: 2
         continue-on-error: true
         run: node collector/activity-docs.mjs --apply --browser
+      # 🔴 PaddleOCR 설치 실패는 소리 내어 알린다 (2026-10-28 · collect-scholarships.yml 과 같은 경보 짝 · 같은 제목이라 한 이슈에 모인다)
+      - name: PaddleOCR 설치 여부
+        id: paddle
+        if: always()
+        run: echo "failed=$([ -f /tmp/paddle-install-failed ] && echo yes || echo no)" >> "$GITHUB_OUTPUT"
+      - name: 🚨 PaddleOCR 설치 실패 경보
+        if: always() && steps.paddle.outputs.failed == 'yes'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          title: 🚨 포스터 글자 읽기(PaddleOCR)가 설치되지 않아요
+          label: paddle-ocr
+          body: |
+            자격요건 로봇(진짜 브라우저)의 포스터 글자 읽기(PaddleOCR) 설치가 실패했습니다. 포스터뿐인 활동 글의 자격이 읽히지 않습니다.
+            러너 파이썬 판과 paddlepaddle 바퀴(cp39~cp313)가 맞는지 워크플로의 setup-python 을 보세요. 실행: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      - name: ✅ PaddleOCR 회복 — 경보 닫기
+        if: always() && steps.paddle.outputs.failed == 'no'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          title: 🚨 포스터 글자 읽기(PaddleOCR)가 설치되지 않아요
+          label: paddle-ocr
+          body: 이번 실행에서 PaddleOCR 이 설치됐습니다 — 포스터 글자 읽기가 다시 돕니다.
 
       - name: 데이터 관문
         id: audit
