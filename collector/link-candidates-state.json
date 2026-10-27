@@ -358,13 +358,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-27",
-  "lastAt": "2026-10-27",
-  "tries": 1,
+  "lastAt": "2026-10-28",
+  "tries": 2,
   "status": "pending",
-  "why": "게시판 목록(15줄)에서 그 글을 하나로 못 고름",
+  "why": "게시판을 못 엶(page.goto: net::ERR_SSL_PROTOCOL_ERROR at https://gjmed.or.…)",
   "checks": {},
   "round": "2026-11-06",
-  "nextAt": "2026-10-28"
+  "nextAt": "2026-10-31"
  },
  "kosaf|2700017001|http://www.hsf.or.kr/bbs/board.php?bo_table=s5_1&wr_id=102": {
   "ds": "kosaf",
