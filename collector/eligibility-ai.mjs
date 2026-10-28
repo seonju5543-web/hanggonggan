@@ -29,7 +29,11 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
+import { closedForStudents } from './rescue-plan.mjs';   // 학생 화면에서 내려간 공고(마감 지남·오래됨) 판정 — 자격요건 로봇과 같은 한 곳
 import { makeStripper } from './page-boilerplate.mjs';
+/* 🔴 마감 지난 공고에 돈을 쓰지 않는다 (2026-10-29 개발자 지시로 돌린 시범 3건이 **전부 마감 지난 공고**였다 — 신문고(재난)·대전청년내일재단 10-08·고졸 후학습자 09-30 ·
+   후보 29건 중 6건이 그랬다). 날짜는 KST 로(자격요건 로봇과 같다) */
+const TODAY = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
 import { attachmentText, readable } from './attachment-text.mjs';
 
 const require = createRequire(import.meta.url);
@@ -272,6 +276,7 @@ export function pickTargets(items, all, only) {
        평평해진 것)은 **이미 자격이 뜨는 공고** 쪽에 있어서 시범으로는 영영 안 나온다.
        한 건을 눈으로 확인하는 데 전수 2,200원을 쓸 이유가 없다. */
     if (only) { if (it.id === only) out.push({ it, lines: linesOf(it) }); continue; }
+    if (closedForStudents(it, TODAY)) continue;   // 학생이 못 보는 공고는 읽어도 아무에게도 안 보인다(위 TODAY 주석)
     /* 평소엔 '무료 경로가 못 읽은 것'만 온다. `--all`은 이미 자격이 뜨는 것까지 다시 읽는다 —
        구조 소실(공통/택일이 평평해진 것)은 **이미 뜨는 카드**에 숨어 있기 때문이다. */
     if (!all && requirementLines(it).length) continue;

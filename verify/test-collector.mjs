@@ -13328,6 +13328,10 @@ console.log('\n■ 읽지 못한 공고 현황 — 원인별 리포트 · 고친
     [names(r.deadline), names(r.elig)], [{ '지금 규칙으로는 읽힘(다음 실행이 채움)': ['a'], '글자 있는데 못 읽음': ['b'], '원문 없음': ['c'] }, { '원문 없음': ['c'] }]);
   const md = UR.render(r);
   eq('  리포트 글자 — 세 절 머리와 「글자 있는데 못 읽음」 공고 이름(규칙 고칠 목록)이 들어간다', [/## 🔎 읽지 못한 공고 현황/.test(md), /### 💰 금액 모름 — 3건/.test(md), /### 📅 마감 없음 — 3건/.test(md), /B 장학 `b`/.test(md)], [true, true, true, true]);
+  /* 유료 자격 읽기는 마감 지난 공고에 돈을 쓰지 않는다 — 2026-10-29 시범 3건이 전부 마감 지난 공고였다(후보 29건 중 6건) */
+  const eaSrc = readText(new URL('../collector/eligibility-ai.mjs', import.meta.url));
+  eq('④ 유료 자격 읽기(eligibility-ai)는 학생 화면에서 내려간 공고를 대상에서 뺀다 — rescue-plan closedForStudents 한 곳 · 날짜는 KST',
+    [/import \{ closedForStudents \} from '\.\/rescue-plan\.mjs'/.test(eaSrc), /if \(closedForStudents\(it, TODAY\)\) continue;/.test(eaSrc), /const TODAY = new Date\(Date\.now\(\) \+ 9 \* 3600000\)/.test(eaSrc)], [true, true, true]);
   eq('  수집 워크플로가 금액 읽기 뒤에 이 리포트를 collector/report.md 끝에 붙인다(이슈에 실린다)',
     /node collector\/extract-amounts\.mjs --write[\s\S]{0,600}?node verify\/unread-report\.mjs >> collector\/report\.md/.test(readText(new URL('../.github/workflows/collect-scholarships.yml', import.meta.url))), true);
 }
