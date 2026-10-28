@@ -1,7 +1,132 @@
 {
  "school": "이화여자대학교",
- "updatedAt": "2026-10-27",
+ "updatedAt": "2026-10-28",
  "items": [
+  {
+   "title": "[학부] 2026학년도 겨울 계절학기 수강안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367643&article.offset=0&articleLimit=10&no=383",
+   "postedAt": "2026-10-27",
+   "kind": "학사",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-28",
+   "desc": "1. 첨부의 수강안내문을 반드시 읽어 보시기 바랍니다. 2. 강의시간표 조회( 2026.10.30.( 금) 09:00부터 ): 홈페이지&rarr;학사안내&rarr; 강의시간표/계획안"
+  },
+  {
+   "title": "[교육기획팀] 2026 AI4AE DAY 참가 신청 안내 (11. 6.(금))",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367575&article.offset=0&articleLimit=10&no=383",
+   "postedAt": "2026-10-23",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-28",
+   "desc": "3. 장소: ECC 이삼봉홀 가. 현장투표 (12:00~13:00 (본 행사 전))"
+  },
+  {
+   "title": "🍂 2026 대학혁신지원사업 홍보데이 <경험을 수확하다> 개최 안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367549&article.offset=0&articleLimit=10&no=383",
+   "postedAt": "2026-10-22",
+   "kind": "행사",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-28"
+  },
+  {
+   "title": "[기계/일반경쟁]정보인프라팀/가상화 서버 고도화 및 재해복구 서버 구입",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367672&article.offset=0&articleLimit=10&no=380",
+   "postedAt": "2026-10-28",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-28"
+  },
+  {
+   "title": "[학부] 2026학년도 제2학기 합격장려금 신청 안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367669&article.offset=0&articleLimit=10&no=379",
+   "postedAt": "2026-10-28",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-28"
+  },
+  {
+   "title": "[도서관/원데이클래스] ✨AI로 완성하는 나만의 커리어 브랜딩(11/11, 17, 24)",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367667&article.offset=0&articleLimit=10&no=378",
+   "postedAt": "2026-10-28",
+   "kind": "생활",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-28",
+   "thumb": "data/news/img/2ae5755cd47bc194.webp"
+  },
+  {
+   "title": "[연장][채용] 이화여자대학교 대학원혁신연구실 연구원 채용 공고(~11/4)",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367657&article.offset=0&articleLimit=10&no=376",
+   "postedAt": "2026-10-28",
+   "kind": "채용",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-28",
+   "desc": "4) 급여: 본교 대학원혁신지원사업 급여 기준에 의함 2. 지원 자격 가. 석사학위 이상 소지자"
+  },
+  {
+   "title": "[채용] 경영대학/경영전문대학원 행정실 계약직원 모집(~11/6)",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367656&article.offset=0&articleLimit=10&no=375",
+   "postedAt": "2026-10-28",
+   "kind": "채용",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-28",
+   "desc": "성실하고 책임감 있는 자세로 함께 근무할 계약 직원을 모집합니다. 관심 있는 분들의 많은 지원 바랍니다."
+  },
+  {
+   "title": "2026 대학혁신지원사업 홍보데이 아르바이트 모집",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367655&article.offset=0&articleLimit=10&no=374",
+   "postedAt": "2026-10-27",
+   "kind": "채용",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-28",
+   "desc": "안녕하세요, 교육·연구혁신단 미래혁신센터입니다. 다가오는 2026 대학혁신지원사업 홍보데이 <경험을 수확하다>에서 행사 보조 아르바이트를 구인 중입니다."
+  },
+  {
+   "title": "[학부] 2026학년도 동계방학 집중근로 희망근로지 신청 안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367651&article.offset=0&articleLimit=10&no=372",
+   "postedAt": "2026-10-27",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-28"
+  },
+  {
+   "title": "[학생지원팀/국토부] 2026년 제9회 찾아가는 청년주거 상담소 개최 안내(11. 5.~ 6.)",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367648&article.offset=0&articleLimit=10&no=371",
+   "postedAt": "2026-10-27",
+   "kind": "행사",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-28",
+   "thumb": "data/news/img/939a9bbbba4545f2.webp",
+   "desc": "국토교통부에서 청년들에게 주택정책 정보를 제공하기 위한 ‘찾아가는 청년주거 상담소’를 아래와 같이 운영한다고 하니, 관심 있는 학생들은 참여하시기 바랍니다."
+  },
+  {
+   "title": "[총무팀] 셔틀버스 운행 변경 관련 안내 (10/30(금) 16:00-18:00)",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367632&article.offset=0&articleLimit=10&no=366",
+   "postedAt": "2026-10-27",
+   "kind": "생활",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-28",
+   "desc": "연구협력관 행사 진행에 따라 아래와 같이 셔틀버스를 변경 운행하오니, 이용에 참고하여 주시기 바랍니다."
+  },
   {
    "title": "[정보인프라팀] 방화벽 장비 점검에 따른 중요 정보서비스 일시 중지 안내",
    "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367493&article.offset=0&articleLimit=10&no=377",
@@ -113,16 +238,6 @@
    "src": "ec6597da",
    "foundAt": "2026-10-27",
    "desc": "나. 입찰참가자격 등록 마감 일시 및 장소: 2026년 11월 5일(목) 10:00, 나라장터(www.g2b.go.kr)"
-  },
-  {
-   "title": "[교육기획팀] 2026 AI4AE DAY 참가 신청 안내 (11. 6.(금))",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367575&article.offset=0&articleLimit=10&no=387",
-   "postedAt": "2026-10-23",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-26",
-   "desc": "3. 장소: ECC 이삼봉홀 가. 현장투표 (12:00~13:00 (본 행사 전))"
   },
   {
    "title": "2026학년도 제2학기 학부 및 각 대학원 중간수강소감(중간강의평가) 설문 실시 안내",
@@ -285,17 +400,6 @@
    "desc": "나 . 입찰서류등록 마감 일시 및 장소 : 2026. 10. 29.( 목 ) 1 1:00, 이비즈포유 ( ebiz4u.co.kr)"
   },
   {
-   "title": "🍂 2026 대학혁신지원사업 홍보데이 <경험을 수확하다> 개최 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367549&article.offset=0&articleLimit=10&no=370",
-   "postedAt": "2026-10-22",
-   "kind": "행사",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-23",
-   "desc": "올해 홍보데이는 가을 수확을 테마로 한 '혁신 농장' 으로 꾸며집니다. 🌾 농장 곳곳의 부스를 방문해 나에게 필요한 프로그램을 알아보고, 미션을 완료해 작물 스티커를 모아보세요!"
-  },
-  {
    "title": "[학부]2026학년도 겨울계절학기 숙명여자대학교 학점교류 수강신청 안내",
    "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367538&article.offset=0&articleLimit=10&no=374",
    "postedAt": "2026-10-21",
@@ -316,110 +420,6 @@
    "src": "ec6597da",
    "foundAt": "2026-10-22",
    "desc": "본교 홈페이지 학사안내 > 학사정보 > 학점인정 > 국내대학학점교류 > 하단게시판에 게시되었으니 2026 학년도 교환겨울계절학기 신청을 희망하는 경우 해당 내용 확인 후 , 접수마감 기한 내에 학적팀으로 신청서를…"
-  },
-  {
-   "title": "[학부]2026학년도 겨울계절학기 경희대학교 학점교류 수강신청 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367536&article.offset=0&articleLimit=10&no=372",
-   "postedAt": "2026-10-21",
-   "kind": "학사",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-22",
-   "desc": "본교 홈페이지 학사안내 > 학사정보 > 학점인정 > 국내대학학점교류 > 하단게시판에 게시되었으니 2026학년도 교환겨울계절학기 신청을 희망하는 경우 해당 내용 확인 후, 접수마감 기한 내에 학적팀으로 신청서를…"
-  },
-  {
-   "title": "[채용] 이화여자대학교 대학원혁신연구실 연구원 채용 공고",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367530&article.offset=0&articleLimit=10&no=370",
-   "postedAt": "2026-10-21",
-   "kind": "채용",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-22",
-   "desc": "4) 급여: 본교 대학원혁신지원사업 급여 기준에 의함 2. 지원 자격 가. 석사학위 이상 소지자"
-  },
-  {
-   "title": "[채용] 의학과 정신건강의학교실 연구원 채용",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367528&article.offset=0&articleLimit=10&no=369",
-   "postedAt": "2026-10-21",
-   "kind": "채용",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-22"
-  },
-  {
-   "title": "[인재개발원] OECD(경제협력개발기구) Career Presentation (11/9(월))",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367524&article.offset=0&articleLimit=10&no=366",
-   "postedAt": "2026-10-21",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-22",
-   "desc": "OECD(경제협력개발기구)에서 본교 학생들을 대상으로 Campus Presentation을 개최합니다."
-  },
-  {
-   "title": "[학부] 2026학년도 제2학기 영어 및 정보인증제 신청 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367207&article.offset=0&articleLimit=10&no=383",
-   "postedAt": "2026-10-01",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-21",
-   "desc": "1. 신청기간 및 신청방법 가. 신청기간: 2026. 10. 19.(월) 09:00 ~ 10. 23.(금) 23:59 (※ 기간 종료 이후 신청 불가)"
-  },
-  {
-   "title": "2026학년도 제2학기 교양과목 중간시험 시간표 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367123&article.offset=0&articleLimit=10&no=383",
-   "postedAt": "2026-09-28",
-   "kind": "학사",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-21"
-  },
-  {
-   "title": "[채용] 이화여자대학교 인권센터 상담연구원 채용공고 (~10/26 마감)",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367513&article.offset=0&articleLimit=10&no=367",
-   "postedAt": "2026-10-20",
-   "kind": "채용",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-21",
-   "desc": "1. 지원자격 및 인원 담당 업무 지원자격 및 우대사항 상담연구원 - 성희롱/성폭력 및 인권침해 문제 상담 및 사건 처리"
-  },
-  {
-   "title": "[대외활동] 한국경제인협회 ‘시슐랭 프렌즈’ 1기 모집",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367507&article.offset=0&articleLimit=10&no=364",
-   "postedAt": "2026-10-20",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-21",
-   "desc": "기업의 사회공헌 활동을 SNS 콘텐츠로 알릴 청년 서포터즈를 모집합니다. 사회공헌과 콘텐츠 제작에 관심 있는 학생 여러분의 많은 참여 바랍니다."
-  },
-  {
-   "title": "[기계/일반경쟁]문회리 교수/로봇 1식 구입",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367498&article.offset=0&articleLimit=10&no=363",
-   "postedAt": "2026-10-20",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-21",
-   "desc": "나 . 입찰서류제출 마감일시 및 장소 : 2026. 10. 27.( 화 ) 11:00, 이비즈포유 (http://www.ebiz4u.co.kr)"
-  },
-  {
-   "title": "[기술지주] 제20회 이화 스타트업 살롱 (10/27, 화) 개최 안내 (연사 : 소풍벤처스 한상엽 대표)",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367497&article.offset=0&articleLimit=10&no=362",
-   "postedAt": "2026-10-20",
-   "kind": "행사",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-21",
-   "desc": "사람을 잇고, 기회를 만들고, 함께 성장하는 이화의 대표 창업·투자 네트워크, '이화 스타트업 살롱' 스무 번째 모임에 여러분을 초대합니다."
   }
  ]
 }

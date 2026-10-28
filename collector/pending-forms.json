@@ -902,8 +902,42 @@
    "added": "2026-10-27",
    "fetched": false,
    "schematized": false,
-   "tries": 4,
-   "lastTryAt": "2026-10-28"
+   "tries": 6,
+   "lastTryAt": "2026-10-28",
+   "retired": true,
+   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
+  },
+  {
+   "id": "auto-ent2431270154artclviewdo",
+   "name": "(공통)(교외)2026-2 제이씨현장학재단 장학생 모집 안내",
+   "target": "(공통)(교외)2026-2 제이씨현장학재단 장학생 모집",
+   "added": "2026-10-28",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-bswj104944500artclviewdo",
+   "name": "2026학년도 2학기 외국인재학생장학금 신청 안내(~11/18)",
+   "target": "2026학년도 2학기 외국인재학생장학금 신청 안내(~1",
+   "added": "2026-10-28",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-jukr145236662artclviewdo",
+   "name": "2026년도 희우장학재단 2기 장학생 선발 공지",
+   "target": "2026년도 희우장학재단 2기 장학생 선발 공지",
+   "added": "2026-10-28",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-scho332282400artclviewdo",
+   "name": "2026학년도 교내 Pride CSU 서석장학금 장학생 선발 공고 안내",
+   "target": "2026학년도 교내 Pride CSU 서석장학금 장학생",
+   "added": "2026-10-28",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }

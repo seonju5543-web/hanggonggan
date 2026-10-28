@@ -1,7 +1,48 @@
 {
  "school": "연세대학교 미래캠퍼스",
- "updatedAt": "2026-10-27",
+ "updatedAt": "2026-10-28",
  "items": [
+  {
+   "title": "[교외] 2026년도 하반기 강화군 대학생 등록금 지원 사업 안내",
+   "url": "https://www.yonsei.ac.kr/bbs/wj/104/944505/artclView.do",
+   "postedAt": "2026-10-28",
+   "school": "연세대학교 미래캠퍼스",
+   "campus": "",
+   "src": "83c7ba87",
+   "foundAt": "2026-10-28",
+   "thumb": "data/news/img/3c88948b8136397c.webp"
+  },
+  {
+   "title": "[앵커사업단] 2026 강원 전략산업육성 비R&D 기업지원사업 4차 참여기업 모집 모집",
+   "url": "https://www.yonsei.ac.kr/bbs/wj/104/944502/artclView.do",
+   "postedAt": "2026-10-28",
+   "school": "연세대학교 미래캠퍼스",
+   "campus": "",
+   "src": "83c7ba87",
+   "foundAt": "2026-10-28",
+   "thumb": "data/news/img/ccc7e4f86aee62d7.webp",
+   "desc": "연세대학교 미래캠퍼스 앵커사업단에서는 대학의 지역 연계 및 산학협력 기능을 확대하고, 지역 산업과의 동반 성장을 도모하고자 강원 전략산업육성 비R&D 수혜기업을 모집하오니 많은 관심과 참여 바랍니다."
+  },
+  {
+   "title": "Node2Shell 취약점 조치 안내",
+   "url": "https://www.yonsei.ac.kr/bbs/wj/104/944508/artclView.do",
+   "postedAt": "2026-10-27",
+   "school": "연세대학교 미래캠퍼스",
+   "campus": "",
+   "src": "83c7ba87",
+   "foundAt": "2026-10-28",
+   "desc": "1. 안내 개요 최근 웹서비스 개발에 사용되는 서버 실행 환경인 Node.js에서 접근제어 미흡 및 인증서 미흡 관련 보안 취약점(CVE-2026-105482, CVE-2026-105483,…"
+  },
+  {
+   "title": "일반공지 2027학년도 1학기 2개 전공 의무화 대상자(2021학번~)의 캠퍼스내 제2전공 신청 안내 신촌/국제",
+   "url": "https://www.yonsei.ac.kr/bbs/wj/104/944496/artclView.do",
+   "postedAt": "2026-10-28",
+   "school": "연세대학교 미래캠퍼스",
+   "campus": "",
+   "src": "83c7ba87",
+   "foundAt": "2026-10-28",
+   "desc": "* 본 공지는 2021 학번 ~ 2 개 전공 의무화 대상자를 대상으로 합니다. ( 공지내용 필독 바랍니다 .) ** 이번 학기에 6 학기 재학중인 학생은 반드시 제 2 전공을 신청하기 바랍니다."
+  },
   {
    "title": "2027-1학기 RC문화체육활동(1) 실습조교(TA) 모집 안내(~11. 15.) 모집",
    "url": "https://www.yonsei.ac.kr/bbs/wj/104/944490/artclView.do",

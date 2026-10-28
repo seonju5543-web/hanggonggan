@@ -1,7 +1,19 @@
 {
  "school": "한국항공대학교",
- "updatedAt": "2026-10-27",
+ "updatedAt": "2026-10-28",
  "items": [
+  {
+   "title": "「제5회 위성전파 및 위성 기술 컨퍼런스」 개최 안내",
+   "url": "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11396",
+   "postedAt": "2026-10-28",
+   "kind": "행사",
+   "school": "한국항공대학교",
+   "campus": "",
+   "src": "9c5122cb",
+   "foundAt": "2026-10-28",
+   "thumb": "data/news/img/8c66db327374da87.webp",
+   "desc": "국내 저궤도 위성통신 서비스 개시 , 6G 표준 기반 저궤도 위성통신 개발 등 우주 경쟁 시대의 위성통신 산업 강국 실현을 위한 「 제 5 회 위성전파 및 위성 기술 컨퍼런스 」 를 다음과 같이 개최하오니 홍보 및…"
+  },
   {
    "title": "대학 구내전화 불통 안내",
    "url": "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11387",

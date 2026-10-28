@@ -558,14 +558,14 @@
   "name": "[한국선원복지고용센터] 2026년 선원가족 장학생 모집 (연장)"
  },
  "https://www.seoultech.ac.kr/service/info/janghak/?bidx=897116&bnum=5233&cate=0&qidx=5233": {
-  "tries": 2,
-  "at": "2026-10-28",
+  "tries": 3,
+  "at": "2026-10-29",
   "minBody": 100,
   "name": "(홍보) 2026년 2학기 푸른등대 기부장학금 신규장학생 신청 안내(~11/12(목)까지)"
  },
  "https://www.seoultech.ac.kr/service/info/janghak/?bidx=897097&bnum=5233&cate=0&qidx=5233": {
-  "tries": 2,
-  "at": "2026-10-28",
+  "tries": 3,
+  "at": "2026-10-29",
   "minBody": 100,
   "name": "(홍보) 한국장학재단 희망사다리1유형 장학생 대상 삼성 SSFY 교육생 모집(~11/9(월)까지)"
  }

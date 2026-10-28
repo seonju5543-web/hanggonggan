@@ -1,7 +1,39 @@
 {
  "school": "인하대학교",
- "updatedAt": "2026-10-27",
+ "updatedAt": "2026-10-28",
  "items": [
+  {
+   "title": "[대학일자리플러스센터] 삼전닉스 현직자 직무 모의면접 신청중!",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45969/artclView.do",
+   "postedAt": "2026-10-28",
+   "school": "인하대학교",
+   "campus": "",
+   "src": "f4141706",
+   "foundAt": "2026-10-28",
+   "thumb": "data/news/img/1561777bf9ba0936.webp"
+  },
+  {
+   "title": "[대학혁신지원사업] 2026학년도 프런티어창의대학 전공탐색 페스티벌",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45967/artclView.do",
+   "postedAt": "2026-10-28",
+   "kind": "행사",
+   "school": "인하대학교",
+   "campus": "",
+   "src": "f4141706",
+   "foundAt": "2026-10-28",
+   "thumb": "data/news/img/602dba0baf513b4e.webp"
+  },
+  {
+   "title": "[SK 하이닉스 면접대기자 대상] 인성 모의면접",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45966/artclView.do",
+   "postedAt": "2026-10-28",
+   "school": "인하대학교",
+   "campus": "",
+   "src": "f4141706",
+   "foundAt": "2026-10-28",
+   "thumb": "data/news/img/e86b0cf9c70f4f83.webp",
+   "desc": "1. 이력서, 자기소개서 첨부 필수 2. 대면으로만 진행 3. 실제면접과 동일하게 진행 * 참여자 최대 2명 * 참여자가 1명이여도 진행됨"
+  },
   {
    "title": "[학사관리팀] 2026-2 학사정보주간 안내 (11/3,11/4)",
    "url": "https://www.inha.ac.kr/bbs/kr/8/45951/artclView.do",
@@ -391,37 +423,6 @@
    "src": "f4141706",
    "foundAt": "2026-10-14",
    "desc": "Global Green Challenger(GGC)는 학생들의 글로벌 기후감수성 제고, 기후위기대응 역량 함양, 국제적 의사소통 능력 및 문제해결 능력 향상을 위해 '팀별 사전학습 및 사전 프로젝트 수행(국가별…"
-  },
-  {
-   "title": "[대학일자리플러스센터] 2026년 대학일자리플러스센터 만족도 및 취업역량 향상도 설문조사",
-   "url": "https://www.inha.ac.kr/bbs/kr/8/45803/artclView.do",
-   "postedAt": "2026-10-14",
-   "school": "인하대학교",
-   "campus": "",
-   "src": "f4141706",
-   "foundAt": "2026-10-14",
-   "thumb": "data/news/img/324c136f5724481a.webp",
-   "desc": "대학일자리플러스센터를 이용해 주신 여러분의 소중한 의견을 듣고자 만족도 조사 를 실시합니다! 여러분의 의견은 앞으로 더 나은 진로·취업 지원 서비스를 제공하는 데 큰 도움이 됩니다."
-  },
-  {
-   "title": "[문과대학 행정실] 사무원(행정조교) 모집 공고",
-   "url": "https://www.inha.ac.kr/bbs/kr/8/45802/artclView.do",
-   "postedAt": "2026-10-14",
-   "kind": "채용",
-   "school": "인하대학교",
-   "campus": "",
-   "src": "f4141706",
-   "foundAt": "2026-10-14",
-   "desc": "인하대학교 문과대학 행정실에서는 아래와 같이 사무원 ( 행정조교 ) 을 채용하오니 많은 관심과 지원 바랍니다 ."
-  },
-  {
-   "title": "2027학년도 1학기 대학원 제1차 신입학(내국인) 일반전형 모집 안내",
-   "url": "https://www.inha.ac.kr/bbs/kr/8/45784/artclView.do",
-   "postedAt": "2026-10-13",
-   "school": "인하대학교",
-   "campus": "",
-   "src": "f4141706",
-   "foundAt": "2026-10-13"
   }
  ]
 }

@@ -1,7 +1,82 @@
 {
  "school": "부산대학교",
- "updatedAt": "2026-10-27",
+ "updatedAt": "2026-10-28",
  "items": [
+  {
+   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(울산대학교)",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511808",
+   "postedAt": "2026-10-28",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-28",
+   "desc": "2026학년도 겨울계절수업 울산대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
+  },
+  {
+   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(성균관대학교)",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511807",
+   "postedAt": "2026-10-28",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-28",
+   "desc": "2026학년도 겨울계절수업 성균관대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
+  },
+  {
+   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(고려대학교 에너지신산업)",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511806",
+   "postedAt": "2026-10-28",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-28"
+  },
+  {
+   "title": "[부산광역시 해운대구] 『제2기 해운대 청년정책네트워크(해청넷)』참여자 추가 모...",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511797",
+   "postedAt": "2026-10-28",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-28",
+   "thumb": "data/news/img/699345b63e1602b7.webp"
+  },
+  {
+   "title": "[세종학당재단] 2027년 세종학당 문화인턴 파견 사업 설명회 개최 안내",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511794",
+   "postedAt": "2026-10-28",
+   "kind": "행사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-28",
+   "thumb": "data/news/img/6b68b3fb2fc2b981.webp",
+   "desc": "2) 행사 일시: 2026. 11. 11.(수) 15:00~16:00 3) 행사 장소: 온라인(재단 공식 유튜브 채널)"
+  },
+  {
+   "title": "2026년 동절기 난방 공급 계획 안내",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511793",
+   "postedAt": "2026-10-28",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-28",
+   "desc": "2026 년 동절기 난방 공급 계획에 대해 아래와 같이 안내드립니다 . ○ 공급기간"
+  },
+  {
+   "title": "[앵커] 2026 파워반도체 공유대학 - 반도체 커리어 인사이트 트랙 교육생 모집",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511792",
+   "postedAt": "2026-10-28",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-28",
+   "thumb": "data/news/img/4dec3151088087d9.webp",
+   "desc": "모집 대상 -파워반도체 공유대학(부산대학교 등 8개 대학) 재학생 및 졸업생 *전공 학년 제한 없음 모집인원: 총 30명( 부산대학교 3~4 명 ) 신청 방법 : 구글폼(포스터 내 QR코드 확인) 교육일시 :…"
+  },
   {
    "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(고려대학교 국제동계대학)",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511791",
@@ -346,81 +421,6 @@
    "foundAt": "2026-10-20",
    "thumb": "data/news/img/07f7cb8eff55e765.webp",
    "desc": "인문대학 부속시설 디지털인문학센터에서는 부산대학교 글로컬대학 30 프로젝트의 세부 추진 과제 중 하나인 ‘Knowledge Base 기반 융합교육 활성화’ 의 일환으로 디지털 · 인공지능(AI) 대전환 시대에…"
-  },
-  {
-   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(한국교원대학교)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511671",
-   "postedAt": "2026-10-20",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-20",
-   "desc": "2026학년도 겨울계절수업 한국교원대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
-  },
-  {
-   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(한양대학교)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511670",
-   "postedAt": "2026-10-20",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-20",
-   "desc": "2026학년도 겨울계절수업 한양대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
-  },
-  {
-   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(충남대학교)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511669",
-   "postedAt": "2026-10-20",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-20",
-   "desc": "2026학년도 겨울계절수업 충남대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
-  },
-  {
-   "title": "[글로컬대학 30] 2026학년도 디지털인문학센터 전공 연계형 교육 프로그램 &...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511666",
-   "postedAt": "2026-10-20",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-20",
-   "thumb": "data/news/img/46600be71b0491b3.webp"
-  },
-  {
-   "title": "[재단법인 부산광역시 글로벌 도시재단] 「평화를 잇다, 원피스(ONE PEACE...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511658",
-   "postedAt": "2026-10-20",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-20",
-   "thumb": "data/news/img/88739f1c3c1f23f0.webp",
-   "desc": "부산광역시 와 부산글로벌도시재단 은 유엔의 날(10월 24일)을 전후하여 세계 유일의 유엔기념공원이 위치한 부산에서 평화의 의미를 시민과 함께 나누기 위해 「부산유엔위크」를 개최해 오고 있습니다."
-  },
-  {
-   "title": "[한국전력거래소] 2026년 11월 KPX교육원 전력산업 인력양성교육 수강신청 ...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511657",
-   "postedAt": "2026-10-20",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-20"
-  },
-  {
-   "title": "[에듀테크센터] 단과대학 계열별 맞춤 AI+X 교육 접수 기간 연장 및 대학원생...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511654",
-   "postedAt": "2026-10-20",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-20",
-   "thumb": "data/news/img/1c479cfd52dd9943.webp",
-   "desc": "단과대학 계열별 AI+X 전공 실무 교육 교육기간 ※ 세션당 2 시간 진행"
   }
  ]
 }

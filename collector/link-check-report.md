@@ -1,24 +1,27 @@
-## 🔗 원문 링크 확인 리포트 (2026-10-28 00:53 KST · 기준일 2026-10-28)
+## 🔗 원문 링크 확인 리포트 (2026-10-29 01:38 KST · 기준일 2026-10-29)
 
 앱이 보여 주는 원문 링크를 **학생처럼**(로그인·리퍼러 없는 새 탭) 열어, 그 공고가 실제로 뜨는지 봤습니다.
 🔴 이 로봇은 주소를 고치지 않습니다 — 확정된 문제만 `data/link-check.json` 에 적고, 앱은 그 링크의 이름을 바꿔 정직하게 보여 줍니다(예: "게시판 목록에서 보기", "원문 공고(확인 필요)").
 
-⏰ 예산(20분)이 다 돼 여기서 멈췄습니다 — 남은 197건은 다음 실행이 이어서 봅니다. 📱 폰 표본은 예산이 모자라 25건을 못 봤습니다.
+⏰ 예산(20분)이 다 돼 여기서 멈췄습니다 — 남은 147건은 다음 실행이 이어서 봅니다. 📱 폰 표본은 예산이 모자라 25건을 못 봤습니다.
 
-이번 실행: **203건** 열어 봄 · 공고 확인 159 · 문제로 보임 24 · 판정 못 함 20
-앱에 알린 확정 문제(지금 실린 링크): **24건** · 이번에 새로 확정: **0건**
+이번 실행: **253건** 열어 봄 · 공고 확인 209 · 문제로 보임 24 · 판정 못 함 20
+앱에 알린 확정 문제(지금 실린 링크): **24건** · 이번에 새로 확정: **1건**
 
-### 새로 확정된 문제 링크 (다른 날 두 번 같은 것을 봤습니다) — 0건
-- 없음
+### 새로 확정된 문제 링크 (다른 날 두 번 같은 것을 봤습니다) — 1건
+- [교내 소식] [학생지원팀] 2026학년도 2학기 동계방학 집중근로 희망근로지 신청 안내 — **열리지 않음(없는 주소)** (HTTP 404)
+  https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277033&article.offset=0&articleLimit=10
 
-### 한 번 본 문제 (다른 날 한 번 더 보고 확정합니다 — 아직 앱 글자를 바꾸지 않습니다) — 2건
-- [대외활동·공모전] api-vol1365-3521994 · 10월(오전) 대전수학문화관 대학생 봉사활동 모집 — **다른 화면이 열림** (공고 화면이 아님(작성일·조회·첨부 표지가 없음))
-  https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521994 → 실제로 간 곳 https://www.1365.go.kr/vols/P9210/partcptn/timeCptn.do
-- [교내 소식] [카운슬링센터][집단상담 홍보]달달한 연애를 꿈꾸는 동국인을 위한 "캠퍼스 연애 심리… — **사이트 첫 화면이 열림** (사이트 첫 화면으로 돌려보내짐)
-  https://www.dongguk.edu/article/GENERALNOTICES/detail/26766499 → 실제로 간 곳 https://www.dongguk.edu/main
+### 한 번 본 문제 (다른 날 한 번 더 보고 확정합니다 — 아직 앱 글자를 바꾸지 않습니다) — 3건
+- [대외활동·공모전] api-vol1365-3519412 · 제32회 충청남도장애인체육대회 대학생 행사 운영지원 모집(주간) — **다른 화면이 열림** (공고 화면이 아님(작성일·조회·첨부 표지가 없음))
+  https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3519412 → 실제로 간 곳 https://www.1365.go.kr/vols/P9210/partcptn/timeCptn.do
+- [교내 소식] [매주 수요일은 후원의 집 가는 날] 안내드립니다. — **다른 화면이 열림** (다른 글이 열림(제목 불일치))
+  https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11581&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0
+- [교내 소식] 보건실 휴무 안내(2026.10.29.) — **다른 화면이 열림** (다른 글이 열림(제목 불일치))
+  https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11585&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0
 
 ### 원문 후보 확인 — 찾아 온 주소가 그 공고·그 회차인지 학생처럼 열어 봤습니다
-이번에 판정한 후보 **1건** · ✅ 원문으로 올림 0 · 🟡 사람 확인 0 · ❌ 맞지 않음 0 · ⏳ 못 엶(다시 봄) 1
+이번에 판정한 후보 **0건** · ✅ 원문으로 올림 0 · 🟡 사람 확인 0 · ❌ 맞지 않음 0 · ⏳ 못 엶(다시 봄) 0
 앱에 실린 로봇 바로잡기(`data/link-check.json` fix): **12건** — 앱은 그 링크를 원문으로 엽니다(지금 링크가 이미 원문이면 바꾸지 않습니다).
 _후보는 `collector/link-candidates.json` 에 적거나(사람·세션), 로봇이 우리 기록에서 찾습니다(같은 사이트·같은 제목의 글 주소 · 층2 재단 장학금과 짝지은 재단 게시판 글)._
 
@@ -38,8 +41,8 @@ _후보는 `collector/link-candidates.json` 에 적거나(사람·세션), 로�
 - [층2 재단(바로잡은 원문)] 재단법인 석성장학회 석성장학생 — 회차를 가릴 날짜가 안 보임
   https://www.seoksung.co.kr/cms/bbs/board.php?bo_table=nanum&wr_id=522 · 후보: 로봇(층2 글 사냥꾼)
   잣대: 겹침 ✓ · 착지 ✓ · 사이트 ✓ · 제목 ✓ · 회차 ? · 기관 ✓ · 사업 ✓
-- [실시간 공고] [교외] 2026년 2학기 푸른등대 기부장학금 — 제목 자리에서 우리 공고 제목을 통째로 찾지 못함(앞부분만 같을 수 있음)
-  https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260909&brdSeq=1&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous& · 후보: 로봇(같은 사이트·같은 제목 — 수집 검수 후보)
+- [실시간 공고] [기금-10/8] 2026학년도 2학기 푸른솔 사회정의 장학금 신청 안내 — 제목이 제목 자리가 아니라 본문에만 보임
+  https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjElMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D · 후보: 로봇(같은 사이트·같은 제목 — 수집 검수 후보)
   잣대: 겹침 ✓ · 착지 ? · 사이트 ✓ · 제목 ✓ · 회차 ✓
 - [실시간 공고] 일반공지 10/2(금) 교외장학재단 제출용 총장 직인 날인 불가 안내 신촌/국제 — 제목이 제목 자리가 아니라 본문에만 보임
   https://www.yonsei.ac.kr/bbs/sc/58/944246/artclView.do · 후보: 로봇(같은 사이트·같은 제목 — 수집 검수 후보)
@@ -47,10 +50,6 @@ _후보는 `collector/link-candidates.json` 에 적거나(사람·세션), 로�
 
 #### ❌ 맞지 않은 후보 (이번 실행)
 - 없음
-
-#### ⏳ 못 엶 — 며칠 뒤 다시 봅니다 (이번 실행 · 거절이 아닙니다)
-- [층2 재단(바로잡은 원문)] 강진의료원 전남 공공 취약지 간호사 장학생 — 게시판을 못 엶(page.goto: net::ERR_SSL_PROTOCOL_ERROR at https://gjmed.or.…) · 다음 2026-10-31
-  https://gjmed.or.kr/bbs/board.php?bo_table=notice2 · 후보: 로봇(층2 글 사냥꾼)
 
 #### 확인했지만 지금은 앱에 싣지 않는 바로잡기
 - [층2 재단(바로잡은 원문)] `2701009001` — 공고가 앱에서 내려감
@@ -70,24 +69,24 @@ _후보는 `collector/link-candidates.json` 에 적거나(사람·세션), 로�
 - 없음
 
 ### 판정 못 한 링크 (이번 실행 · 사이트별 · 문제로 세지 않습니다)
-- www.hongik.ac.kr — 7건 · 가장 많은 이유: 본문이 안 그려짐(0자 — 판정 불가) (7건)
-- www.cbnu.ac.kr — 3건 · 가장 많은 이유: 열기 실패: page.goto: Timeout 20000ms exceeded. (3건)
-- www.ewha.ac.kr — 3건 · 가장 많은 이유: 열기 실패: page.goto: Timeout 20000ms exceeded. (3건)
-- 1365.go.kr — 2건 · 가장 많은 이유: 열기 실패: page.goto: net::ERR_EMPTY_RESPONSE at http… (2건)
-- sejong.korea.ac.kr — 1건 · 가장 많은 이유: 본문이 안 그려짐(13자 — 판정 불가)
+- www.hongik.ac.kr — 5건 · 가장 많은 이유: 본문이 안 그려짐(0자 — 판정 불가) (5건)
+- www.ajou.ac.kr — 5건 · 가장 많은 이유: 열기 실패: page.goto: Timeout 20000ms exceeded. (3건)
+- www.sogang.ac.kr — 2건 · 가장 많은 이유: 본문이 안 그려짐(261자 — 판정 불가) (2건)
+- www.ulsan.go.kr — 2건 · 가장 많은 이유: 열기 실패: page.goto: Timeout 20000ms exceeded.
+- www.kookmin.ac.kr — 2건 · 가장 많은 이유: 열기 실패: page.goto: Timeout 20000ms exceeded. (2건)
+- 1365.go.kr — 1건 · 가장 많은 이유: 열기 실패: page.goto: net::ERR_EMPTY_RESPONSE at http…
+- www.ewha.ac.kr — 1건 · 가장 많은 이유: 열기 실패: page.goto: Timeout 20000ms exceeded.
 - www.jnu.ac.kr — 1건 · 가장 많은 이유: 열기 실패: page.goto: Timeout 20000ms exceeded.
-- www.ajou.ac.kr — 1건 · 가장 많은 이유: 열기 실패: page.goto: Timeout 20000ms exceeded.
-- www.pyeongtaek.go.kr — 1건 · 가장 많은 이유: 열기 실패: page.goto: Timeout 20000ms exceeded.
-- www.jbnu.ac.kr — 1건 · 가장 많은 이유: 열기 실패: page.goto: Timeout 20000ms exceeded.
+- scholarship.eumseong.go.kr — 1건 · 가장 많은 이유: 열기 실패: page.goto: Timeout 20000ms exceeded.
 
 ### 전체 현황 (앱에 실린 링크 × 지금까지 본 결과)
 | 묶음 | 아직 안 봄 | 공고 확인 | 판정 못 함 | 한 번 봄 | 목록 | 첫 화면 | 로그인 | 안 열림 | 다른 화면 |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 정식 등록 | 0 | 284 | 14 | 0 | 0 | 0 | 0 | 1 | 0 |
-| 실시간 공고 | 0 | 1067 | 72 | 0 | 2 | 0 | 0 | 4 | 0 |
+| 정식 등록 | 0 | 292 | 14 | 0 | 0 | 0 | 0 | 1 | 0 |
+| 실시간 공고 | 3 | 1086 | 74 | 0 | 2 | 0 | 0 | 4 | 0 |
 | 재단·지자체 | 0 | 47 | 1 | 0 | 0 | 0 | 1 | 0 | 0 |
-| 대외활동·공모전 | 0 | 150 | 11 | 1 | 0 | 2 | 0 | 0 | 3 |
-| 교내 소식 | 30 | 1220 | 75 | 1 | 0 | 0 | 1 | 4 | 7 |
+| 대외활동·공모전 | 0 | 151 | 12 | 1 | 0 | 2 | 0 | 0 | 3 |
+| 교내 소식 | 40 | 1227 | 75 | 2 | 0 | 0 | 0 | 5 | 7 |
 | 층2 재단(바로잡은 원문) | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
 _한 링크가 두 묶음에 함께 실려 있으면 양쪽에 셉니다. 「한 번 봄」은 다른 날 한 번 더 같은 것을 보면 확정됩니다._
@@ -99,14 +98,14 @@ _한 링크가 두 묶음에 함께 실려 있으면 양쪽에 셉니다. 「한
   https://whitehat2026.kr/
 - [대외활동·공모전] [산업통산부] 5극3특 AI영상 공모전 성장엔진 미래지도 — **다른 화면이 열림** (다른 글이 열림(제목 불일치))
   https://www.motir.go.kr/kor/article/ATCL8764a1224/155119233/view
-- [대외활동·공모전] api-youthPolicy-20260326005400212290 · 2026년 평택시 청년창업도전 아카데미 — **다른 화면이 열림** (열기 실패: page.goto: Timeout 20000ms exceeded.)
+- [대외활동·공모전] api-youthPolicy-20260326005400212290 · 2026년 평택시 청년창업도전 아카데미 — **다른 화면이 열림** (다른 글이 열림(제목 불일치))
   https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000
 - [대외활동·공모전] api-youthPolicy-20260410005400212677 · 청년 생명사랑 서포터즈 운영 — **사이트 첫 화면이 열림** (사이트 첫 화면(제목이 안 보임))
   https://www.usspc.or.kr/
 - [재단·지자체] 후원신청 지역발전은 지역장학생 후원에서 시작됩니다. [전북은행] 520-13-0354… — **로그인을 요구함** (로그인 요구(제목이 안 보이고 비밀번호 칸))
   https://www.jinjae.kr/main/?gc=877EUFQ
-- [교내 소식] [학생지원팀] 2026학년도 2학기 동계방학 집중근로 희망근로지 신청 안내 — **로그인을 요구함** (로그인 요구(제목이 안 보이고 비밀번호 칸))
-  https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277033&article.offset=0&articleLimit=10 → 실제로 간 곳 https://www.catholic.ac.kr/cms/login/login.do;jsessionid=B9AE40254B4B4C17A80F466B61701C1C…
+- [교내 소식] [학생지원팀] 2026학년도 2학기 동계방학 집중근로 희망근로지 신청 안내 — **열리지 않음(없는 주소)** (HTTP 404)
+  https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277033&article.offset=0&articleLimit=10
 - [교내 소식] [생명윤리위원회] 연구자 교육 — **다른 화면이 열림** (다른 글이 열림(제목 불일치))
   https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271444&pageOrder=0&cmd=2&parm_bod_uid=271443&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143& → 실제로 간 곳 https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&hasToken=1&srchEnable=1&srchKeyword=&srchSD…
 - [교내 소식] 🔎 26년 가을학기 멘탈Check↗ 학생상담센터 '내 마음의 보고서' (매달참여가능) — **다른 화면이 열림** (다른 글이 열림(제목 불일치))
@@ -143,9 +142,9 @@ _한 링크가 두 묶음에 함께 실려 있으면 양쪽에 셉니다. 「한
   https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=377067&article.offset=0&articleLimit=10
 
 ### 열어 보지 않은 것 (세기만 했습니다)
-- 게시판 목록 표식(#n-): 실시간 공고 1 · 교내 소식 1 — 원문 주소를 아직 못 찾은 글이라 앱이 이미 "게시판 목록"이라고 부릅니다
+- 게시판 목록 표식(#n-): 교내 소식 1 — 원문 주소를 아직 못 찾은 글이라 앱이 이미 "게시판 목록"이라고 부릅니다
 - 층2(한국장학재단에 등록된 재단 장학금): 126건 — 재단 홈페이지 주소뿐이라 앱이 "재단 홈페이지"라고 부릅니다(그중 공고문 사본이 있는 것 93건) · 바로잡은 원문이 있어 연 것 3건은 따로
-- 마감이 지나 앱이 더는 보여 주지 않는 대외활동: 33건
+- 마감이 지나 앱이 더는 보여 주지 않는 대외활동: 31건
 - 숨긴 글: 5건
-- 이번 순서에 들었지만 시간이 모자라 못 본 것: 197건 (다음 실행이 이어서 봅니다)
-- 앱에 실린 링크 2778건 중 이번 순서에 든 것 400건 (사이트마다 최대 8건 · 학교 서버를 몰아치지 않으려고)
+- 이번 순서에 들었지만 시간이 모자라 못 본 것: 147건 (다음 실행이 이어서 봅니다)
+- 앱에 실린 링크 2824건 중 이번 순서에 든 것 400건 (사이트마다 최대 8건 · 학교 서버를 몰아치지 않으려고)

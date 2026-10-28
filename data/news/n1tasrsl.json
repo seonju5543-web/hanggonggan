@@ -1,7 +1,17 @@
 {
  "school": "국민대학교",
- "updatedAt": "2026-10-27",
+ "updatedAt": "2026-10-28",
  "items": [
+  {
+   "title": "[교양대학]2026학년도 동계 계절학기 개설 희망 교양 교과목 수요조사 안내",
+   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12521/view.do?currentPageNo=1",
+   "postedAt": "2026-10-21",
+   "kind": "학사",
+   "school": "국민대학교",
+   "campus": "",
+   "src": "78d70305",
+   "foundAt": "2026-10-28"
+  },
   {
    "title": "[기후변화대응사업단] 2026학년도 동계계절학기 환경컨소시엄 타대학(덕성여대) 학점교류 수강신청 안내 2026.10.27 기후변화대응사업단 김준희",
    "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12553/view.do?currentPageNo=1",
@@ -168,16 +178,6 @@
    "school": "국민대학교",
    "campus": "",
    "foundAt": "2026-10-01"
-  },
-  {
-   "title": "2026학년도 2학기 1차 폐강 안내",
-   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12294/view.do?currentPageNo=1",
-   "postedAt": "2026-08-28",
-   "kind": "학사",
-   "school": "국민대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/2d7557d0fd3ad9f0.webp"
   },
   {
    "title": "2026학년도 재(휴)학생(학부/대학원) 학생증 발급 안내",
