@@ -30,6 +30,7 @@ import { attachmentText, readableDoc, docOrder } from './attachment-text.mjs';
 import { amountText } from '../tools/edit-diff.mjs';
 
 const require = createRequire(import.meta.url);
+const { decodeEntities } = require('../match-engine.js');   // 앱과 같은 기호 풀기(두 벌로 두지 않는다)
 const PA = require('../parse-amount.js');
 
 const HERE = new URL('.', import.meta.url);
@@ -132,7 +133,8 @@ for (const it of items) {
     const d = amountFromDocs(it);
     if (d) { a = d; fromDoc++; }
   }
-  const e = PA.exclusivityFrom(bodyLines.length ? bodyLines : aiLines);
+  /* HTML 기호(`&#9312;` ①)는 풀고 읽는다 — 근거 줄(raw)이 데이터에 기호째 실려 화면 말투 관문이 잡았다(유흥수 장학금 · 2026-10-29) */
+  const e = PA.exclusivityFrom((bodyLines.length ? bodyLines : aiLines).map((l) => decodeEntities(String(l))));
   stat[a.kind]++; excl[e.kind]++;
   parsed.set(it.id, { a, e });
 }

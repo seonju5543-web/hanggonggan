@@ -25,7 +25,7 @@ import { fileURLToPath } from 'node:url';
 import { cleanEnv, stripComments, stripYamlComments } from './gate.mjs';
 import { browserBodyEntry, clickBodyEntry } from '../../collector/html-text.mjs';
 import { canonUrl } from '../../collector/canon-url.mjs';
-import { restingAfterOk, closedForStudents, orderTargets, ledgerEntry, newAttachments, pruneLedger } from '../../collector/rescue-plan.mjs';
+import { restingAfterOk, closedForStudents, orderTargets, ledgerEntry, newAttachments, pruneLedger, wantsBody } from '../../collector/rescue-plan.mjs';
 import { pickEligTargets } from '../../collector/elig-targets.mjs';
 import { fillRetired, nextShells, fillCounts } from '../../collector/notice-source.mjs';
 
@@ -117,6 +117,12 @@ export default async function bodies(eq, ctx) {
       [closedForStudents({ deadline: '2026-10-03' }, today, now), closedForStudents({ listedAt: shift(today, -70) }, today, now),
         closedForStudents({ deadline: '2026-10-04' }, today, now), closedForStudents({}, today, now)],
       [true, true, false, false]);
+    /* 2026-10-29 — 대상 기준이 '자격 없음'뿐이라 본문이 껍데기인데 자격은 있는 공고 61건(금액·마감 모름)에 로봇이 한 번도 안 갔다 */
+    eq('  열어 볼 이유 — 자격 없으면 늘 · 자격 있어도 본문 껍데기 + 금액 모름 또는 마감 없음이면 · 본문 있으면 안 감 · 등록금 전액·시급은 아는 금액 · 상시 제도는 마감 없어도 안 감',
+      [wantsBody({ amountValue: 0 }, false, true), wantsBody({ amount: '금액 원문 확인', amountValue: 0, deadline: '2026-12-01' }, true, false), wantsBody({ amountValue: 500000, deadline: '' }, true, false),
+        wantsBody({ amount: '금액 원문 확인', amountValue: 0 }, true, true), wantsBody({ amount: '등록금 전액', amountValue: 0, deadline: '2026-12-01' }, true, false), wantsBody({ amount: '시급 12,790원', amountValue: 0, program: true }, true, false)],
+      [true, true, true, false, false, false]);
+    eq('  rescue-bodies 의 대상 고르기가 그 규칙(wantsBody)을 원문 색인과 함께 부른다', /wantsBody\(it, requirementLines\(it\)\.length > 0, hasText\(sourceFor\(it, idx\)\)\)/.test(readText(new URL('../../collector/rescue-bodies.mjs', import.meta.url))), true);
     eq('  차례 — 덜 해 본 것 → 같으면 한 번도 본문을 못 받은 것 → 등록 순서',
       orderTargets([{ id: 'b', tries: 0, everOk: true }, { id: 'g', tries: 1 }, { id: 'e', tries: 0, everOk: false }, { id: 'h', tries: 0 }]).map((t) => t.id),
       ['e', 'h', 'b', 'g']);
@@ -148,7 +154,9 @@ export default async function bodies(eq, ctx) {
     sb.write('data/registered.json', { items: [
       item('A', 'a-ok-recent'), item('B', 'b-ok-old'), item('C', 'c-closed', { deadline: shift(today, -1) }),
       item('D', 'd-stale', { listedAt: shift(today, -70) }), item('E', 'e-new'),
-      item('F', 'f-has-lines', { eligibilityLines: ['직전학기 평점평균 3.0 이상인 재학생'] }), item('G', 'g-tried'),
+      item('F', 'f-has-lines', { eligibilityLines: ['직전학기 평점평균 3.0 이상인 재학생'], amount: '등록금 전액', deadline: shift(today, 10) }), item('G', 'g-tried'),
+      /* H — 자격은 있는데 본문이 껍데기(원문 없음)라 금액을 못 읽은 공고: 2026-10-29부터 간다(wantsBody) */
+      item('H', 'h-shell-no-amount', { eligibilityLines: ['재학생'], amount: '금액 원문 확인', amountValue: 0, deadline: shift(today, 10) }),
     ] });
     sb.write('collector/rescue-ledger.json', {
       [canonUrl(u('a-ok-recent'))]: { ok: shift(today, -3), at: shift(today, -3), tries: 0 },
@@ -156,8 +164,8 @@ export default async function bodies(eq, ctx) {
       [canonUrl(u('g-tried'))]: { tries: 1, at: shift(today, -1), minBody: 100 },
     });
     const pre = sb.run('collector/rescue-bodies.mjs', [], {});
-    eq('① ⓐ 로봇 미리보기의 차례 — 새 공고(E) → 확보한 지 여드레(B) → 한 번 실패(G) · 이레 안 확보(A)·마감 지남(C)·오래됨(D)·자격 줄 있음(F)은 없다',
-      [pre.status, (pre.out.match(/차례: ([^\n]*)/) || [])[1] || pre.out.slice(-300)], [0, 'E · B · G']);
+    eq('① ⓐ 로봇 미리보기의 차례 — 새 공고(E) → 자격 있어도 껍데기·금액 모름(H) → 확보한 지 여드레(B) → 한 번 실패(G) · 이레 안 확보(A)·마감 지남(C)·오래됨(D)·자격 줄 있고 금액·마감 아는 것(F)은 없다',
+      [pre.status, (pre.out.match(/차례: ([^\n]*)/) || [])[1] || pre.out.slice(-300)], [0, 'E · H · B · G']);
 
     /* ⓑ 쓰기 — 늦게 끝나는 공고 · 영영 멈춘 공고 둘 · 열리는 공고 · 여는 순간 강제 종료 */
     const reg = { items: [item('late', 'hang-late'), item('fa', 'hang-forever-a'), item('fb', 'hang-forever-b'), item('ok', 'ok-page'), item('kill', 'kill-page')] };

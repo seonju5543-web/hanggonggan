@@ -28,12 +28,12 @@ import fs from 'node:fs';
 import { htmlToLines } from './html-text.mjs';
 import { chromium } from 'playwright';
 import { createRequire } from 'node:module';
-import { indexTexts, hasText, canonUrl, MIN_BODY } from './notice-source.mjs';
+import { indexTexts, hasText, canonUrl, MIN_BODY, sourceFor } from './notice-source.mjs';
 import { makeStripper } from './page-boilerplate.mjs';
 import { withDeadline, TIMED_OUT, makeBudget } from './harvest-budget.mjs';
 import { readLinkFixes, humanFixUrlBy } from './link-fixes-read.mjs';
 /* 대상 거르기·차례·장부 한 칸·첨부 합치기는 순수 함수 파일 하나에 — 이 파일은 불러오는 순간 돌아 관문이 못 부른다 */
-import { restingAfterOk, closedForStudents, orderTargets, ledgerEntry, newAttachments, pruneLedger } from './rescue-plan.mjs';
+import { restingAfterOk, closedForStudents, orderTargets, ledgerEntry, newAttachments, pruneLedger, wantsBody } from './rescue-plan.mjs';
 import { writeFileAtomic } from './write-atomic.mjs';
 
 const { requirementLines } = createRequire(import.meta.url)('../match-engine.js');
@@ -80,7 +80,7 @@ const report = ['# 자격요건 매칭 · 공고 본문 재수집 리포트', ''
 
 /* ── 대상 고르기 ──
    '#n-' 표식은 게시판 목록 주소라 그 공고 본문이 아니다(detail-url.mjs 참조) — 링크 사냥꾼의 몫. */
-export function pickTargets(items) {
+export function pickTargets(items, idx = indexTexts(texts, bodies)) {
   const out = [];
   for (const it of items) {
     if (it.program) continue;
@@ -92,7 +92,8 @@ export function pickTargets(items) {
        그래서 포스터 그림도 못 찾고 첨부 목록도 안 고쳐졌다 — 43건이 그 상태였다.
        읽을 재료를 찾으러 가는 로봇이므로, **아직 못 읽은 공고면 다시 가 본다.**
        이미 읽은 공고는 건드리지 않는다(요건이 있으면 재료를 더 찾을 이유가 없다). */
-    if (requirementLines(it).length) continue;
+    /* 🔴 자격은 있어도 본문이 껍데기라 금액·마감을 못 읽은 공고도 간다 (2026-10-29 · 규칙은 rescue-plan wantsBody 한 곳) */
+    if (!wantsBody(it, requirementLines(it).length > 0, hasText(sourceFor(it, idx)))) continue;
     /* 통짜 한 줄로 저장된 본문도 다시 받는다 — 줄바꿈이 없으면 AI가 줄 번호를 못 매기고
        표 구조도 사라져 있으나 마나다(위 주석 참조). */
     const led = ledger[canonUrl(url)];

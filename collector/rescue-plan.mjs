@@ -20,6 +20,17 @@ const { notStale } = createRequire(import.meta.url)('../match-engine.js');
 
 /** 본문을 확보한 뒤 다시 안 여는 날 수 */
 export const OK_REST_DAYS = 7;
+/** 이 공고를 열어 볼 이유가 있나 — ① 자격을 아직 못 읽었다(예전 기준 그대로)
+    ② 자격은 있어도 **본문이 껍데기**(메뉴뿐)라 금액·마감을 못 읽었다(2026-10-29 · 마감 전 등록 142건 중 61건이 이 상태인데
+       대상 기준이 자격뿐이라 로봇이 한 번도 안 갔다 — 금액 모름 66건의 절반, 마감 없음 38건의 셋 중 하나).
+    금액은 숫자가 없어도 `등록금 전액·50%·시급` 꼴이면 읽은 것이다. 상시 제도(program)는 마감이 없는 게 정상이다. */
+export function wantsBody(it, hasReq, hasBody) {
+  if (!hasReq) return true;
+  if (hasBody) return false;
+  const amt = String((it && it.amount) || '');
+  const amountKnown = (it && it.amountValue > 0) || /(전액|반액|\d\s?%|시급|시간당)/.test(amt);
+  return !amountKnown || (!(it && it.deadline) && !(it && it.program));
+}
 
 const daysBetween = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 86400000);
 

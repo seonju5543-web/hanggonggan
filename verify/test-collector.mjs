@@ -4245,7 +4245,7 @@ console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
      본문 문턱을 300 → 100 으로 내리자 메뉴만 있는 페이지들이 '본문 있음'으로 보이게 돼
      이 로봇이 아예 안 갔고, 포스터 그림도 못 찾고 첨부 목록도 안 고쳐졌다 — 43건이 그랬다.
      읽을 재료를 찾으러 가는 로봇이므로 못 읽은 공고면 다시 가 본다. */
-  eq('  대상은 아직 자격을 못 읽은 공고다', /if \(requirementLines\(it\)\.length\) continue;/.test(rb), true);
+  eq('  대상은 아직 자격을 못 읽은 공고 + 자격은 있어도 본문이 껍데기라 금액·마감을 못 읽은 공고(rescue-plan wantsBody 한 곳 · 2026-10-29)', /if \(!wantsBody\(it, requirementLines\(it\)\.length > 0, hasText\(sourceFor\(it, idx\)\)\)\) continue;/.test(rb), true);
   /* 🔴 빈 말뭉치로 재면 메뉴를 걷어낼 수 없어 **메뉴 글자가 본문으로 세어진다.**
      실제로 정읍시민장학재단(한글 387자가 전부 메뉴)이 '확보 ✅'로 통과했고,
      되찾았다던 37건 중 24건이 그런 가짜였다. 발췌기·AI와 같은 말뭉치를 써야
@@ -9225,14 +9225,16 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
     const body = od.slice(0, od.indexOf('\n}\n'));
     const facts = body.slice(body.indexOf('<div class="sheet-facts">'), body.indexOf('</div>', body.indexOf('<div class="sheet-facts">')));
     eq('상세 시트: 원문 링크는 한 번만 그린다', (body.match(/srcNote|srcLink,|\$\{srcLink\}/g) || []).length, 1);
-    eq('  마감일 · 문의 · 원문 링크가 맨 아래 묶음(.sheet-facts) 안에 있다',
-      facts.length > 0 && /sheet-deadline/.test(facts) && /`문의 \$\{esc\(sch\.contact\)\}`/.test(facts)
-      && /srcLink,/.test(facts), true);
+    /* 2026-10-29 개발자 지시 — 「마감 · 중복 수혜 가능 · 원문 공고」 점 줄은 빼고(못 읽은 공고까지 '가능'으로 보였다) 그 자리에 한 문장 */
+    eq('  맨 아래 묶음(.sheet-facts)은 「자세한 내용과 접수 방법은 원문 공고 ↗에서 확인하세요.」 한 문장(링크는 .doc-legend 안) + 층2 문의 · 「중복 수혜 가능」·「마감 …」 점 줄은 없다',
+      facts.length > 0 && /sheet-source">자세한 내용과 접수 방법은 \$\{srcLink\}에서 확인하세요\./.test(facts) && /문의 \$\{esc\(sch\.contact\)\}/.test(facts)
+      && !/중복 수혜 가능|sheet-deadline/.test(facts) && /sourceNoteHtml\(sch\)/.test(facts), true);
     eq('  묶음 밖에 문의 줄이 남아 있지 않다', (body.match(/문의 \$\{esc\(sch\.contact\)\}/g) || []).length, 1);
     /* 같은 날 2차 지시: 세 줄을 **한 문단**으로 — 묶음 안에 <p> 가 하나뿐이고 군말('자세한 내용은')이 없다 */
-    eq('  묶음은 한 문단이다 (<p> 하나 · 점으로 잇는다)',
-      (facts.match(/<p[\s>]/g) || []).length === 1 && /\.join\(' · '\)/.test(facts), true);
-    eq("  군말 '자세한 내용은 … 에서 확인' 이 없다", /자세한 내용은/.test(facts), false);
+    /* 2026-10-29 개발자 지시로 바뀜 — 점으로 잇던 한 문단 대신 「자세한 내용과 접수 방법은 원문 공고 ↗에서 확인하세요.」 한 문장(+ 층2 문의 한 줄) */
+    eq('  묶음은 한 문장(+ 층2 문의) — <p> 둘 이내 · 점으로 잇는 줄은 없다',
+      (facts.match(/<p[\s>]/g) || []).length <= 2 && !/\.join\(' · '\)/.test(facts), true);
+    eq("  그 문장이 '자세한 내용과 접수 방법은 … 에서 확인하세요.' 다(개발자가 고른 글자)", /자세한 내용과 접수 방법은 \$\{srcLink\}에서 확인하세요\./.test(facts), true);
   }
 
   /* 🔴 'AI 티' 정리 A·D·E·G·H (2026-10-06 사장님 지시 → 전후 사진 보고 → 은서님이 다섯 개 골랐다).
@@ -13280,6 +13282,53 @@ console.log('\n■ 학적정보 테일러링 (2026-10-24 개발자 지시 1~4 ·
   eq('  🔴 학적정보 수정이 관심을 물려받는다 (안 그러면 저장 한 번에 관문이 다시 뜬다)', /interestKinds:\s*\(state\.profile && state\.profile\.interestKinds\) \|\| null/.test(app), true);
   const wf = readText(new URL('../.github/workflows/verify-ui.yml', import.meta.url));
   eq('  브라우저 드라이버가 워크플로 목록에 있다', /verify-academic-info\.js/.test(wf) && fs.existsSync(new URL('../verify/verify-academic-info.js', import.meta.url)), true);
+}
+
+/* ■ 읽지 못한 공고 현황 (2026-10-29 개발자 "금액이나 자격 혹은 날짜를 확인하지 못한 놈들은 원인을 찾아서 고치고 재발하지 않도록" · "새 유형마다 내가 하나하나 알려줘야 하나")
+   마감 전 정식 등록 142건을 원인별로 가른 실측: 금액 모름 66(원문 없음 14 · 글자 있는데 못 읽음 10 · 원문에 없음 34 · 지금 읽힘 8) · 마감 없음 38(원문 없음 13 · 못 읽음 7 · 날짜만 15).
+   고친 규칙 넷 + 숫자가 사람보다 먼저 말하는 리포트(verify/unread-report.mjs → 수집 리포트 끝). */
+console.log('\n■ 읽지 못한 공고 현황 — 원인별 리포트 · 고친 규칙 넷 (2026-10-29)');
+{
+  const EXu = await import('../collector/extract-excerpts.mjs');
+  const requ = (await import('node:module')).createRequire(import.meta.url);
+  const PAu = requ('../parse-amount.js');
+  const SHu = requ('../section-head.js');
+  eq('① 마감 — `2026. 9. 1.(화) ~ 18.(금) 18시까지` 끝이 날짜 숫자+요일뿐이면 시작한 달의 그날 · 해 없는 꼴도 · `10:00 ~ 18:00` 시각 범위는 그날 그대로(대조군)',
+    [EXu.extractDeadline('1. 학생신청 기간 : 2026. 9. 1.(화) ~ 18.(금) 18시까지 (※신청기간 엄수)'), EXu.extractDeadline('2026년 공고\n신청기간 : 9. 1.(화) ~ 18.(금)'), EXu.extractDeadline('신청기간 : 2026. 8. 24.(월) 10:00 ~ 18:00'), EXu.extractDeadline('신청기간 : 2026. 8. 24.(월) ~ 선발 완료시')],
+    ['2026-09-18', '2026-09-18', '2026-08-24', null]);
+  eq('  이름표 속 괄호 `모집(연장)기간` 은 걷고 본다(선원가족 장학 연장) · `가. 기간: 9.1 ~ 2027.2.12`(일하는 기간)는 여전히 안 읽는다',
+    [EXu.extractDeadline('3. 모집(연장)기간 : 2026년 9월 1일 ~ 2026년 10월 30일'), EXu.extractDeadline('가. 기간: 2026.9.1 ~ 2027.2.12')], ['2026-10-30', null]);
+  eq('② 금액 — `시급(10,320원)` 괄호 꼴 · 머리글 없이 표 칸 `12,790원/H` 만 있어도 시급형 · `장학생 혜택: … 400만 원` 머리글 · 대조군(시각·전화번호)은 모름',
+    [PAu.amountFrom(['다 . 장학금액 : 월 실제 근로시간 * 시급(10,320원)']).kind, PAu.amountFrom(['구분', '시급', '12,790원/H']).kind, PAu.amountFrom(['장학생 혜택: 졸업 시까지 학기당 학업장려금(생활비성) 400만 원 지원']).value, PAu.amountFrom(['접수 10:00 ~ 18:00', '문의 02-1234-5678']).kind, SHu.isAmountHead('장학생 선발 인원: 10명')],
+    ['hourly', 'hourly', 4000000, 'unknown', false]);
+  eq('  이중수혜 — `… 멘토링사업과 중복참여 불가`·`중복 신청 불가` 도 불가다(대청교 멘토 공고가 「중복 수혜 가능」으로 떴다 · 2026-10-29 개발자 지적) · `중복 수혜 가능` 은 그대로',
+    [PAu.exclusivityFrom(['국가근로장학금사업 및 대청교, 다문화·탈북학생 멘토링사업과 중복참여 불가']).kind, PAu.exclusivityFrom(['타 교내 장학금과 중복 신청 불가']).kind, PAu.exclusivityFrom(['타 장학금과 중복 수혜 가능']).kind],
+    ['forbidden', 'forbidden', 'allowed']);
+  const UR = await import('./unread-report.mjs');
+  const NSu = await import('../collector/notice-source.mjs');
+  const texts = [
+    { title: 'A 장학', url: 'https://x.ac.kr/a', text: Array.from({ length: 30 }, (_, i) => `본문 ${i} 장학금을 신청하세요 재학생 대상입니다`).join('\n') + '\n신청기간 : 2026. 11. 1. ~ 11. 20.\n장학금액 : 1인당 100만원' },
+    { title: 'B 장학', url: 'https://x.ac.kr/b', text: Array.from({ length: 30 }, (_, i) => `본문 ${i} 장학금을 신청하세요 재학생 대상입니다`).join('\n') + '\n모집 일정 : 2026. 11. 3.(월) ~ 선발 완료시\n지급: 등록금 범위 내' },
+    { title: 'C 장학', url: 'https://x.ac.kr/c', text: '메뉴\n로그인' },
+  ];
+  const idx = NSu.indexTexts(texts, {});
+  const items = [
+    { id: 'a', name: 'A 장학', sourceUrl: 'https://x.ac.kr/a', amount: '금액 원문 확인', amountValue: 0, eligibilityLines: ['재학생'] },
+    { id: 'b', name: 'B 장학', sourceUrl: 'https://x.ac.kr/b', amount: '금액 원문 확인', amountValue: 0, eligibilityLines: ['재학생'] },
+    { id: 'c', name: 'C 장학', sourceUrl: 'https://x.ac.kr/c', amount: '금액 원문 확인', amountValue: 0, eligibilityLines: [] },
+    { id: 'd', name: 'D 장학', sourceUrl: 'https://x.ac.kr/d', amount: '등록금 전액', amountValue: 0, deadline: '2026-12-01', eligibilityLines: ['재학생'] },
+    { id: 'p', name: '상시', sourceUrl: 'https://x.ac.kr/p', program: true, amountValue: 0, eligibilityLines: [] },
+  ];
+  const r = UR.classify(items, idx, { today: '2026-10-29' });
+  const names = (bag) => Object.fromEntries(Object.entries(bag).map(([k, v]) => [k, v.map((s) => s.id)]));
+  eq('③ 원인별 분류 — 금액: A 는 지금 읽힘 · B 는 글자(만원 없음) 없음 · C 는 원문 없음 · D 는 등록금 전액이라 아는 금액 · 상시 제도는 뺀다',
+    names(r.amount), { '지금 규칙으로는 읽힘(다음 실행이 채움)': ['a'], '원문에 금액 없음·첨부 없음': ['b'], '원문 없음·첨부 없음': ['c'] });
+  eq('  마감: A 는 지금 읽힘 · B 는 `모집 일정 : … ~ 선발 완료시` 이름표+날짜인데 못 읽음(규칙 고칠 목록) · C 는 원문 없음 · 자격: C 만',
+    [names(r.deadline), names(r.elig)], [{ '지금 규칙으로는 읽힘(다음 실행이 채움)': ['a'], '글자 있는데 못 읽음': ['b'], '원문 없음': ['c'] }, { '원문 없음': ['c'] }]);
+  const md = UR.render(r);
+  eq('  리포트 글자 — 세 절 머리와 「글자 있는데 못 읽음」 공고 이름(규칙 고칠 목록)이 들어간다', [/## 🔎 읽지 못한 공고 현황/.test(md), /### 💰 금액 모름 — 3건/.test(md), /### 📅 마감 없음 — 3건/.test(md), /B 장학 `b`/.test(md)], [true, true, true, true]);
+  eq('  수집 워크플로가 금액 읽기 뒤에 이 리포트를 collector/report.md 끝에 붙인다(이슈에 실린다)',
+    /node collector\/extract-amounts\.mjs --write[\s\S]{0,600}?node verify\/unread-report\.mjs >> collector\/report\.md/.test(readText(new URL('../.github/workflows/collect-scholarships.yml', import.meta.url))), true);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

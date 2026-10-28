@@ -4886,13 +4886,12 @@ function openDetail(id) {
            🔴 **한 줄(한 문단)** 이다 — 같은 날 CTO 지시 "한 문단으로, 반복 지우고 간결하게".
               '자세한 내용은 … 에서 확인' 같은 군말 없이 `마감 · 중복 수혜 · 문의 · 링크` 를 점으로 잇는다.
               링크는 `.doc-legend a` 그대로 둔다(verify-source-links 가 그 선택자로 읽는다). */ ''}
+      ${/* 2026-10-29 개발자 지시 — 「마감 · 중복 수혜 … · 원문 공고」 점 줄을 빼고 그 자리에 한 문장(시안 A 의 문장을 시트 안으로).
+           마감은 시트 머리의 D-day 가, 중복 수혜는 금액 상세(합산 규칙)가 말한다 — 여기서 '가능'이라고 적던 것은 못 읽은 공고까지 가능으로 보였다(대청교 멘토 · 원문은 「중복참여 불가」).
+           링크는 `.doc-legend a` 그대로(verify-source-links 가 그 선택자로 읽는다) · 링크가 없는 공고(상시 제도·층2)는 sourceNoteHtml 의 말 그대로 */ ''}
       <div class="sheet-facts">
-        <p class="doc-legend sheet-deadline">${[
-          sch.program ? '신청 기간은 한국장학재단 공지 확인' : `마감 ${sch.deadline || '원문 확인'}`,
-          sch.duplicable ? '중복 수혜 가능' : '중복 수혜 제한',
-          (sch.sourceKind === 'kosaf' && sch.contact) ? `문의 ${esc(sch.contact)}` : '',
-          srcLink,
-        ].filter(Boolean).join(' · ')}${srcHint ? `<br />${srcHint}` : ''}</p>
+        ${srcLink ? `<p class="doc-legend sheet-source">자세한 내용과 접수 방법은 ${srcLink}에서 확인하세요.${srcHint ? `<br />${srcHint}` : ''}</p>` : sourceNoteHtml(sch)}
+        ${(sch.sourceKind === 'kosaf' && sch.contact) ? `<p class="doc-legend">문의 ${esc(sch.contact)}</p>` : ''}
       </div>
 
       ${app && !app.pending ? (() => {

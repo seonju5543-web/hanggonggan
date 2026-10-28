@@ -313,6 +313,8 @@ function dateFrom(value, ctxYear) {
     /* `10월 7일(수) ~ 30일(금)` — 끝에 달이 없으면 시작한 달이다(광운대 다전공 수기 공모 · 2026-10-17). 30일처럼 달이 생략된 날만, 시작일 뒤여야 한다 */
     const dOnly0 = after.match(/^[^0-9]{0,4}(\d{1,2})\s?일(?!\s?[.\-/월]\s?\d)/);
     if (dOnly0) { const end = ymd(ctxYear, b0[1], dOnly0[1]); if (end && end >= first) return end; }
+    const dWk0 = after.match(/^[^0-9]{0,4}(\d{1,2})\s?\.?\s?[(（]\s?[월화수목금토일]/);   // `9. 1.(화) ~ 18.(금)` 해 없는 꼴도 같다
+    if (dWk0) { const end = ymd(ctxYear, b0[1], dWk0[1]); if (end && end >= first) return end; }
     /* `~` 뒤에 날짜가 없으면 시작일을 마감으로 쓰지 않는다 — 같은 날 안의 **시각** 범위(`10. 5. 10:00 ~ 18:00`)만 그날 (아래와 같은 규칙) */
     return /^[^0-9]{0,4}\d{1,2}\s?(:\s?\d{2}|시)/.test(after) ? first : null;
   }
@@ -352,6 +354,9 @@ function dateFrom(value, ctxYear) {
   /* `2026년 10월 7일(수) ~ 30일(금)` — 끝에 달이 없으면 시작한 달(위 해 없는 갈래와 같은 규칙 · 2026-10-17) */
   const dOnly = after.match(/^[^0-9]{0,4}(\d{1,2})\s?일(?!\s?[.\-/월]\s?\d)/);
   if (dOnly) { const end = ymd(m[1], m[2], dOnly[1]); if (end && end >= start) return end; }
+  /* `2026. 9. 1.(화) ~ 18.(금) 18시까지` — 끝이 날짜 숫자 + 요일 괄호뿐이면 시작한 달의 그날(희망사다리 · 2026-10-29). 요일이 있어야 날짜다(`~ 18시` 는 시각) */
+  const dWk = after.match(/^[^0-9]{0,4}(\d{1,2})\s?\.?\s?[(（]\s?[월화수목금토일]/);
+  if (dWk) { const end = ymd(m[1], m[2], dWk[1]); if (end && end >= start) return end; }
   return /^[^0-9]{0,4}\d{1,2}\s?(:\s?\d{2}|시)/.test(after) ? start : null;
 }
 
@@ -392,12 +397,13 @@ export function eachLabeledValue(text, accept, read) {
 
 /** 기간을 말하는 이름표인가 — 마감일과 접수 시작일이 **같은 판정**을 쓴다.
     이름표가 '방법·접수'면 내용이 마감을 말할 때만 연다 (위 PERIOD_VIA 주석). */
-const PERIOD_ACCEPT = (label, value) => PERIOD_LABEL.test(label)
+/* 이름표 속 괄호(`모집(연장)기간`)는 걷고 본다 — 선원가족 장학 연장 공고가 마감 없이 실렸다(2026-10-29) */
+const PERIOD_ACCEPT = (label0, value) => { const label = String(label0 || '').replace(/[(（][^)）]*[)）]/g, ''); return PERIOD_LABEL.test(label)
   /* 맨 이름표(`기간 :`)는 **`까지`로 끝날 때만** — 근로장학생의 `가. 기간: 9.1 ~ 2027.2.12` 이
      일하는 기간이라 범위를 근거로 열면 안 된다(관문이 실제로 이 회귀를 잡았다). */
   || (PERIOD_BARE.test(label.replace(/\s/g, '')) && VALUE_DEADLINE.test(value))
   /* 동사가 든 이름표(`서류 접수`·`접수`)는 날짜 **범위**도 근거로 받는다 */
-  || (PERIOD_VIA.test(label) && (VALUE_DEADLINE.test(value) || (VALUE_RANGE.test(value) && TAIL_OK(value))));
+  || (PERIOD_VIA.test(label) && (VALUE_DEADLINE.test(value) || (VALUE_RANGE.test(value) && TAIL_OK(value)))); };
 
 /** 공고 원문에서 신청 마감일 하나. 못 믿으면 null. */
 function extractDeadline(text) {

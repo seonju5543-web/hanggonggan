@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-27",
+ "updatedAt": "2026-10-28",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -264,7 +264,13 @@
    "applyPortal": "HUFS Ability",
    "applyPortalSource": "3) 지원방법 : 온라인 신청 (HUFS Ability - 학생핵심역량통합시스템 ) - 로그인 ( 학 번 / 비번 ) - 교과 / 비교과 - 장학신청 목록에서 해당 장학금 선택",
    "applyPortalFrom": "공고 원문",
-   "documentsFrom": "로봇 2026-10-17 · 원문 「제출서류」 절"
+   "documentsFrom": "로봇 2026-10-17 · 원문 「제출서류」 절",
+   "exclusivity": {
+    "kind": "forbidden",
+    "scope": "external",
+    "raw": "① 총동문회 장학금 , 청농 장학금 , 동문홍보대사 장학금 , 남가주동문장학회 장학금과 중복신청 금지"
+   },
+   "exclusivityFrom": "공고 원문"
   },
   {
    "id": "reg-hufs-myeonhak",
@@ -556,7 +562,7 @@
    "name": "대학생 청소년교육지원장학금(대청교) 멘토 (2026)",
    "type": "교외",
    "provider": "한국장학재단",
-   "amount": "멘토링 활동 장학금 (활동 시간 기준 · 원문 확인)",
+   "amount": "시급 12,790원",
    "amountValue": 0,
    "deadline": "2026-08-31",
    "period": "상시 모집 (외대 서울캠 기준 ~2026.8.31 · 학교별 마감 상이)",
@@ -624,7 +630,22 @@
     "라 . 대학생 청소년교육지원장학 ( 교 . 사대생 튜터링 ) 사업 기참여자 가산점"
    ],
    "eligibilityFrom": "AI(원문 줄 그대로)",
-   "eligibilityReviewed": false
+   "eligibilityReviewed": false,
+   "amountSpec": {
+    "kind": "hourly",
+    "value": 0,
+    "ratio": 0,
+    "min": 0,
+    "max": 0,
+    "raw": "8. 활동비 : 시간당 12,790 원"
+   },
+   "amountFrom": "공고 원문",
+   "exclusivity": {
+    "kind": "forbidden",
+    "scope": "narrow",
+    "raw": "※ 국가근로장학금사업 및 다문화 ⦁ 탈북학생 멘토링사업과 중복참여 불가"
+   },
+   "exclusivityFrom": "공고 원문"
   },
   {
    "id": "reg-hufs-alumni",
@@ -714,7 +735,13 @@
    "eligibilityReviewed": false,
    "applyPortal": "HUFS Ability",
    "applyPortalSource": "3. 신청방법 : 온라인신청 (HUFS Ability- 학생핵심역량통합시스템 ) - 로그인 ( 학번 / 비번 ) - 교과 / 비교과 – 장학신청목록 - 해당 장학금",
-   "applyPortalFrom": "공고 원문"
+   "applyPortalFrom": "공고 원문",
+   "exclusivity": {
+    "kind": "forbidden",
+    "scope": "external",
+    "raw": "가 . 남가주동문장학회 , 동문홍보대사 , 유흥수 장학금과 중복신청 금지"
+   },
+   "exclusivityFrom": "공고 원문"
   },
   {
    "id": "reg-khu-intern",
@@ -1338,7 +1365,13 @@
    "announceDate": "2026-08-28",
    "applyPortal": "HUFS Ability",
    "applyPortalSource": "4. 지원방법 : 온라인 신청 (HUFS Ability - 학생핵심역량통합시스템 ) - 로그인 ( 학 번 / 비번 ) - 교과 / 비교과 - 해당 장학금 선택",
-   "applyPortalFrom": "공고 원문"
+   "applyPortalFrom": "공고 원문",
+   "exclusivity": {
+    "kind": "forbidden",
+    "scope": "external",
+    "raw": "나 . 총동문회 , 동문홍보대사 , 유흥수 장학금과 중복신청 금지"
+   },
+   "exclusivityFrom": "공고 원문"
   },
   {
    "type": "교외",
@@ -3119,7 +3152,7 @@
    "exclusivity": {
     "kind": "forbidden",
     "scope": "narrow",
-    "raw": "나 . 1 가족당 형제 &middot; 자매 합산하여 총 2 회에 한하여 지급 ( 동일 학기에 2 명 동시 수혜 불가 )"
+    "raw": "나 . 1 가족당 형제 · 자매 합산하여 총 2 회에 한하여 지급 ( 동일 학기에 2 명 동시 수혜 불가 )"
    },
    "amountFrom": "공고 원문",
    "exclusivityFrom": "공고 원문",
@@ -4090,7 +4123,13 @@
     "접수 이메일 도메인 hufs.ac.kr (학교)"
    ],
    "kindConfidence": "low",
-   "kindFrom": "로봇(원문) 2026-10-01"
+   "kindFrom": "로봇(원문) 2026-10-01",
+   "exclusivity": {
+    "kind": "forbidden",
+    "scope": "narrow",
+    "raw": "※ 국가근로장학금사업 및 대청교 , 다문화 ⦁ 탈북학생 멘토링사업과 중복참여 불가"
+   },
+   "exclusivityFrom": "공고 원문"
   },
   {
    "id": "auto-oardid323082menuno200318",
@@ -6536,9 +6575,9 @@
    "provider": "주관 기관 원문 확인",
    "amount": "200만원",
    "amountValue": 2000000,
-   "deadline": null,
+   "deadline": "2026-09-18",
    "listedAt": "2026-09-30",
-   "period": "접수 기간 원문 확인",
+   "period": "접수 기간 ~2026-09-18",
    "summary": "중앙대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
@@ -6593,7 +6632,9 @@
    ],
    "kindConfidence": "high",
    "kindFrom": "로봇(원문) 2026-10-05",
-   "documentsFrom": "로봇 2026-10-17 · 원문 「제출서류」 절"
+   "documentsFrom": "로봇 2026-10-17 · 원문 「제출서류」 절",
+   "deadlineFrom": "공고 원문",
+   "openDate": "2026-09-01"
   },
   {
    "id": "auto-enoticedoarticleno768425",
@@ -9828,7 +9869,8 @@
     "raw": "3. 장학금액 : 40만원 / 1인 (개별 계좌지급), 생활비(학업장려금)명목의 장학금으로 등록금 중복지원에 해당하지 않음"
    },
    "amountFrom": "공고 원문",
-   "documentsFrom": "공고 원문"
+   "documentsFrom": "공고 원문",
+   "openDate": "2026-10-02"
   },
   {
    "id": "auto-bswj104944143artclviewdo",
@@ -11129,7 +11171,7 @@
    "kindConfidence": "high",
    "kindFrom": "로봇(원문) 2026-10-08",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
+   "amount": "시급 12,790원",
    "amountValue": 0,
    "deadline": "2026-10-12",
    "deadlineFrom": "게시판 요약 · ~2026. 10. 12",
@@ -11166,7 +11208,16 @@
     "문의처: 장애학생지원센터 (☏02-970-6059)"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
-   "documentsFrom": "로봇 2026-10-17 · 원문 「제출서류」 절"
+   "documentsFrom": "로봇 2026-10-17 · 원문 「제출서류」 절",
+   "amountSpec": {
+    "kind": "hourly",
+    "value": 0,
+    "ratio": 0,
+    "min": 0,
+    "max": 0,
+    "raw": "2. 근로조건: 시급 12,790원 (교외근로 시급 적용)"
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-270bnum5233cate0qidx5233",
@@ -12889,7 +12940,7 @@
    "kindConfidence": "high",
    "kindFrom": "로봇(원문) 2026-10-12",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
+   "amount": "시급 12,790원",
    "amountValue": 0,
    "deadline": "2026-10-29",
    "deadlineFrom": "게시판 요약 · ~10/29",
@@ -12920,7 +12971,22 @@
     "[장학][학생지원팀] (한국장학재단) 2026-2학기 국가근로장학금 추가신청기간 안내(10/21~10/29) | 가톨릭대학교",
     "[학생지원팀] (한국장학재단) 2026-2학기 국가근로장학금 추가신청기간 안내(10/21~10/29)"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "hourly",
+    "value": 0,
+    "ratio": 0,
+    "min": 0,
+    "max": 0,
+    "raw": "12,790원/H"
+   },
+   "amountFrom": "공고 원문",
+   "exclusivity": {
+    "kind": "forbidden",
+    "scope": "external",
+    "raw": "근로·멘토링사업 간 중복 참여는 불가합니다."
+   },
+   "exclusivityFrom": "공고 원문"
   },
   {
    "id": "auto-418bnum5233cate0qidx5233",
@@ -13919,8 +13985,8 @@
    "kindConfidence": "high",
    "kindFrom": "로봇(원문) 2026-10-14",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "400만원",
+   "amountValue": 4000000,
    "deadline": "2026-11-13",
    "deadlineFrom": "공고 원문 · [교외-11/13]2027학년도 두산연강재단 장학생 선발 안내(재단지원)",
    "period": "접수 ~2026-11-13",
@@ -13942,15 +14008,23 @@
    "openDate": "2026-10-14",
    "eligibilityLines": [
     "지원 자격: 2027년 3월 기준 4년제 대학 2학년 1학기 진학 예정자 중 성적(3.0/4.5 이상) 및 소득분위(6분위 이내) 요건을 충족하는 대한민국 국적 학부생",
-    "단, 4년제 학과의 학생만 지원 가능(6년제 의예과, 한의예과, 수의예과 등, 5년제 건축학과 등은 제외)",
-    "장학생 혜택: 졸업 시까지 학기당 학업장려금(생활비성) 400만 원 지원 및 장학생 워크숍 참여 기회 제공"
+    "단, 4년제 학과의 학생만 지원 가능(6년제 의예과, 한의예과, 수의예과 등, 5년제 건축학과 등은 제외)"
    ],
    "excerpts": [
     "지원 자격: 2027년 3월 기준 4년제 대학 2학년 1학기 진학 예정자 중 성적(3.0/4.5 이상) 및 소득분위(6분위 이내) 요건을 충족하는 대한민국 국적 학부생",
     "접수 기간: 2026년 10월 14일(수) ~ 11월 13일(금) 18시까지",
     "접수 방법: 두산연강재단 홈페이지(www.yonkang.org)를 통한 온라인 신청"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 4000000,
+    "ratio": 0,
+    "min": 4000000,
+    "max": 4000000,
+    "raw": "장학생 혜택: 졸업 시까지 학기당 학업장려금(생활비성) 400만 원 지원 및 장학생 워크숍 참여 기회 제공"
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-archgbn0searchordersort0-0xe0ymd",
@@ -14326,7 +14400,7 @@
    "kindConfidence": "high",
    "kindFrom": "로봇(원문) 2026-10-15",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
+   "amount": "시급 10,320원",
    "amountValue": 0,
    "deadline": "2026-10-19",
    "deadlineFrom": "공고 원문 · (학생과) 2026학년도 2학기 교내 국가근로장학생 모집 공고(~2026.10.19.)",
@@ -14359,7 +14433,16 @@
    "eligibilityLines": [
     "□ 신청대상 : 2026 학년도 2 학기 한국장학재단 국가근로장학생 신청자 중",
     "① 2026 학년도 2 학기 등록생 ( 재학생 ) ② 직전학기 성적 C 0 (70 점 /100 점 ) 이상 ③ 학자금 지원 9 구간 이하를 모두 충족하는 자 ※ 신 · 편입생은 성적무관"
-   ]
+   ],
+   "amountSpec": {
+    "kind": "hourly",
+    "value": 0,
+    "ratio": 0,
+    "min": 0,
+    "max": 0,
+    "raw": "□ 지급단가: 10,320원/시간(1일 8시간, 월 최대 160시간, 학기당 최대 640시간)"
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-zc3cnavcodeknu1619416593",
@@ -16762,7 +16845,13 @@
     "* 한국장학재단 경제적 수준, 우선선발 요건",
     "한국장학재단 경제적 수준 , 우선선발 요건",
     "1 순위"
-   ]
+   ],
+   "exclusivity": {
+    "kind": "forbidden",
+    "scope": "external",
+    "raw": "※ 대학생 청소년교육지원장학금 및 다문화‧탈북학생 멘토링 장학금과 중복 참여 불가 합니다."
+   },
+   "exclusivityFrom": "공고 원문"
   },
   {
    "id": "auto-srchenable1srchvotetype1-0hhsw1d",
@@ -17052,9 +17141,9 @@
    "provider": "주관 기관 원문 확인",
    "amount": "350만원",
    "amountValue": 3500000,
-   "deadline": null,
+   "deadline": "2026-10-30",
    "listedAt": "2026-10-24",
-   "period": "접수 기간 원문 확인",
+   "period": "접수 기간 ~2026-10-30",
    "summary": "가천대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true
@@ -17104,7 +17193,9 @@
    },
    "amountFrom": "공고 원문",
    "scopeFrom": "로봇 2026-10-24 · 원문 증거로 전국 — 본문 「우편 접수」 (게시: 가천대학교)",
-   "documentsFrom": "공고문 첨부"
+   "documentsFrom": "공고문 첨부",
+   "deadlineFrom": "공고 원문",
+   "openDate": "2026-09-01"
   },
   {
    "id": "auto-ykeywordpaged1slug202622",
@@ -18628,7 +18719,16 @@
     "장학금액 : 월 실제 근로시간 * 시급(10,320원)",
     "문의처 : 장학팀 (062-230-6999 / 6124)"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "hourly",
+    "value": 0,
+    "ratio": 0,
+    "min": 0,
+    "max": 0,
+    "raw": "다 . 장학금액 : 월 실제 근로시간 * 시급(10,320원)"
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-scho332282326artclviewdo",
