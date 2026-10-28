@@ -6288,7 +6288,34 @@
    ],
    "kindConfidence": "low",
    "kindFrom": "로봇(원문) 2026-10-01",
-   "documentsFrom": "로봇 2026-10-17 · 원문 「제출서류」 절"
+   "documentsFrom": "로봇 2026-10-17 · 원문 「제출서류」 절",
+   "eligibilityPrev": {
+    "lines": null,
+    "excludes": null,
+    "priority": null,
+    "from": null
+   },
+   "eligibilityLines": [
+    "신문고장학금(재난)은 특별재난지역 선포 지역( 경상남도 거제시와 통영시 )에 발생한 수해로 경제적 어려움을 겪는 학부 재학생들의 생활비 지원을 목적으로 합니다.",
+    "(초과학기생 포함)",
+    "※ 신문고장학금(재난)은 학부생만을 대상으로 합니다. (휴학생, 대학원생 제외)",
+    "※ 대상피해: 본인 또는 부모에게 피해가 발생해 피해사실확인서가 발급되는 경우"
+   ],
+   "eligibilityStruct": {
+    "common": [
+     "신문고장학금(재난)은 특별재난지역 선포 지역( 경상남도 거제시와 통영시 )에 발생한 수해로 경제적 어려움을 겪는 학부 재학생들의 생활비 지원을 목적으로 합니다.",
+     "(초과학기생 포함)",
+     "※ 신문고장학금(재난)은 학부생만을 대상으로 합니다. (휴학생, 대학원생 제외)",
+     "※ 대상피해: 본인 또는 부모에게 피해가 발생해 피해사실확인서가 발급되는 경우"
+    ],
+    "either": [],
+    "grade": []
+   },
+   "eligibilityExcludes": [
+    "※ 신문고장학금(재난)은 학부생만을 대상으로 합니다. (휴학생, 대학원생 제외)"
+   ],
+   "eligibilityFrom": "AI(원문 줄 그대로)",
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-bbssc58944072artclviewdo",
@@ -6945,7 +6972,8 @@
    "amountFrom": "공고 원문",
    "sameAs": "대전청년내일재단",
    "sameAsFrom": "자동",
-   "documentsFrom": "공고문 첨부"
+   "documentsFrom": "공고문 첨부",
+   "aiTries": 1
   },
   {
    "id": "auto-5menuid100ptabno5siteno2",
@@ -7109,7 +7137,8 @@
     "교내 증거 없음 — 기본값"
    ],
    "kindConfidence": "low",
-   "kindFrom": "로봇(원문) 2026-10-01"
+   "kindFrom": "로봇(원문) 2026-10-01",
+   "aiTries": 1
   },
   {
    "id": "auto-ucd000000000000062seq699",
