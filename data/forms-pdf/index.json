@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-28",
+ "updatedAt": "2026-10-29",
  "items": {
   "auto-ticedoarticleno231977952": [
    {
@@ -405,18 +405,6 @@
     "at": "2026-10-28"
    }
   ],
-  "auto-sknou51819378artclviewdo": [
-   {
-    "file": "auto-sknou51819378artclviewdo/1-국가_근로_장학생_지원서_및_개인정보_수집_이용_동의서_진로심리상담실.pdf",
-    "name": "국가 근로 장학생 지원서 및 개인정보 수집 이용 동의서_진로심리상담실.hwp",
-    "pages": 2,
-    "bytes": 139957,
-    "srcBytes": 52736,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-28"
-   }
-  ],
   "auto-bswj104944472artclviewdo": [
    {
     "file": "auto-bswj104944472artclviewdo/1-2027-1_어학우수장학금_신청서_양식_.pdf",
@@ -439,6 +427,52 @@
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-10-28"
+   }
+  ],
+  "auto-ent2431270154artclviewdo": [
+   {
+    "file": "auto-ent2431270154artclviewdo/1-2026-2학기_제이씨현장학금_신청서.pdf",
+    "name": "2026-2학기 제이씨현장학금 신청서.hwp",
+    "pages": 2,
+    "bytes": 47449,
+    "srcBytes": 29184,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-29"
+   },
+   {
+    "file": "auto-ent2431270154artclviewdo/2-개인정보수집이용동의서.pdf",
+    "name": "개인정보수집이용동의서.hwp",
+    "pages": 1,
+    "bytes": 78123,
+    "srcBytes": 50688,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-29"
+   }
+  ],
+  "auto-bswj104944500artclviewdo": [
+   {
+    "file": "auto-bswj104944500artclviewdo/1-외국인재학생_장학금_신청서.pdf",
+    "name": "외국인재학생_장학금_신청서.hwp",
+    "pages": 2,
+    "bytes": 85032,
+    "srcBytes": 15360,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-29"
+   }
+  ],
+  "auto-jukr145236662artclviewdo": [
+   {
+    "file": "auto-jukr145236662artclviewdo/1-2026년도_희우장학재단_2기_장학생_선발_신청서류.pdf",
+    "name": "2026년도 희우장학재단 2기 장학생 선발 신청서류.hwp",
+    "pages": 2,
+    "bytes": 106547,
+    "srcBytes": 81408,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-29"
    }
   ]
  }

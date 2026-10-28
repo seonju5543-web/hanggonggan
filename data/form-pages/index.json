@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-28",
+ "updatedAt": "2026-10-29",
  "items": {
   "auto-oardid323011menuno200318": [
    {
@@ -60,37 +60,11 @@
     "at": "2026-10-23"
    }
   ],
-  "auto-krbbskr845758artclviewdo": [
-   {
-    "file": "auto-krbbskr845758artclviewdo/1-elig-1a3b1d-1_p7-10.pdf",
-    "name": "공고문 안 신청서 서식 (7~10쪽)",
-    "pages": 4,
-    "bytes": 405210,
-    "src": "elig-1a3b1d-1.pdf",
-    "srcBytes": 274648,
-    "srcPages": "7~10",
-    "from": "공고문 서식 쪽 떼기",
-    "at": "2026-10-23"
-   }
-  ],
   "auto-leno276603srcategoryid22": [
    {
     "src": "elig-1oeo0o-1.pdf",
     "srcBytes": 151368,
     "none": true,
-    "at": "2026-10-23"
-   }
-  ],
-  "auto-archgbn0searchordersort0-19hztoz": [
-   {
-    "file": "auto-archgbn0searchordersort0-19hztoz/1-elig-wio1un-1_p7-10.pdf",
-    "name": "공고문 안 신청서 서식 (7~10쪽)",
-    "pages": 4,
-    "bytes": 405210,
-    "src": "elig-wio1un-1.pdf",
-    "srcBytes": 274648,
-    "srcPages": "7~10",
-    "from": "공고문 서식 쪽 떼기",
     "at": "2026-10-23"
    }
   ],
@@ -152,14 +126,6 @@
    {
     "src": "elig-q641o0-1.docx",
     "srcBytes": 21581,
-    "none": true,
-    "at": "2026-10-23"
-   }
-  ],
-  "kosaf-0731001": [
-   {
-    "src": "공문2026년도백양이영복장학금신청자모집안내 (1).pdf",
-    "srcBytes": 113540,
     "none": true,
     "at": "2026-10-23"
    }
@@ -576,27 +542,6 @@
     "at": "2026-10-28"
    }
   ],
-  "kosaf-1768681003": [
-   {
-    "src": "(공고문) 2026년 상반기 「부산지역인재 장학금」 신청 공고.hwp",
-    "srcBytes": 92672,
-    "none": true,
-    "at": "2026-10-28"
-   }
-  ],
-  "kosaf-2000253007": [
-   {
-    "file": "kosaf-2000253007/1-2026년도하반기대학등록금지원사업신청공고_p3-4.pdf",
-    "name": "공고문 안 신청서 서식 (3~4쪽)",
-    "pages": 2,
-    "bytes": 210929,
-    "src": "2026년도하반기대학등록금지원사업신청공고.hwpx",
-    "srcBytes": 78001,
-    "srcPages": "3~4",
-    "from": "공고문 서식 쪽 떼기",
-    "at": "2026-10-28"
-   }
-  ],
   "kosaf-2000279001": [
    {
     "file": "kosaf-2000279001/1-2026년도_하반기_함평군_인재양성기금_장학생_선발요강_공고_1__p8-12.pdf",
@@ -998,6 +943,48 @@
     "srcPages": "9~11",
     "from": "공고문 서식 쪽 떼기",
     "at": "2026-10-28"
+   }
+  ],
+  "auto-bbssc58944506artclviewdo": [
+   {
+    "file": "auto-bbssc58944506artclviewdo/1-elig-1g9py0-1_p3-5.pdf",
+    "name": "공고문 안 신청서 서식 (3, 5쪽)",
+    "pages": 2,
+    "bytes": 246073,
+    "src": "elig-1g9py0-1.hwp",
+    "srcBytes": 75776,
+    "srcPages": "3, 5",
+    "from": "공고문 서식 쪽 떼기",
+    "at": "2026-10-29"
+   }
+  ],
+  "auto-bswj104944500artclviewdo": [
+   {
+    "src": "elig-183jo5-1.hwp",
+    "srcBytes": 15360,
+    "none": true,
+    "at": "2026-10-29"
+   }
+  ],
+  "auto-krbbskr845968artclviewdo": [
+   {
+    "file": "auto-krbbskr845968artclviewdo/1-elig-an5oq9-1_p3-3.pdf",
+    "name": "공고문 안 신청서 서식 (3쪽)",
+    "pages": 1,
+    "bytes": 101127,
+    "src": "elig-an5oq9-1.hwp",
+    "srcBytes": 101888,
+    "srcPages": "3",
+    "from": "공고문 서식 쪽 떼기",
+    "at": "2026-10-29"
+   }
+  ],
+  "auto-scho332282400artclviewdo": [
+   {
+    "src": "elig-yajkef-1.pdf",
+    "srcBytes": 143552,
+    "none": true,
+    "at": "2026-10-29"
    }
   ]
  }
