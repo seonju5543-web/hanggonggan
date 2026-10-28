@@ -12297,6 +12297,18 @@ console.log('\n■ 대외활동·공모전 — 첨부·포스터 읽기 (2026-10
   eq('① 후보 — 서식(신청서)은 빼고 포스터·공고문 · 본문 그림은 글 제목 뒤만(앞의 promo.jpg 는 사이트 그림) · 아이콘 뺌', c, ['/f2', '/f3', '/upload/poster1.jpg']);
   const png = (w, h) => { const b = Buffer.alloc(32); b.writeUInt32BE(0x89504e47, 0); b.writeUInt32BE(w, 16); b.writeUInt32BE(h, 20); return b; };
   eq('  그림 꼴 — 가로로 넓은 배너(846×510)는 포스터가 아니다 · 세로 포스터(1693×2166)는 맞다', [AD.posterShaped(AD.imageSize(png(846, 510))), AD.posterShaped(AD.imageSize(png(1693, 2166)))], [false, true]);
+  /* ①-1 브라우저 본문은 화면에 없는 요소를 떼고 읽는다 — 동국대 WISE 숨은 전체메뉴가 자격 두 줄이 됐다(2026-10-28). 가짜 DOM 으로 함수 자체를 돌려 본다 */
+  {
+    const mk = (display, text, children = []) => { const el = { text, children, removed: false, remove() { this.removed = true; } }; el.cs = { display, visibility: 'visible' }; return el; };
+    const menu = mk('none', '장애학생지원'), body = mk('block', '참가대상 : 재학생'), hidden2 = mk('block', '장애인 복지시설'); hidden2.cs.visibility = 'hidden';
+    const all = [menu, body, hidden2];
+    const g = globalThis; const saved = { document: g.document, getComputedStyle: g.getComputedStyle };
+    g.document = { querySelectorAll: () => all }; g.getComputedStyle = (el) => el.cs;
+    try { AD.DROP_HIDDEN(); } finally { g.document = saved.document; g.getComputedStyle = saved.getComputedStyle; }
+    const src = readText(new URL('../collector/activity-docs.mjs', import.meta.url));
+    eq('①-1 브라우저 본문 — display:none·visibility:hidden 요소는 떼고(DROP_HIDDEN) 보이는 본문만 남긴다 · 프레임 글자를 읽기 **전에** 부른다',
+      [menu.removed, hidden2.removed, body.removed, /await f\.evaluate\(DROP_HIDDEN\); parts\.push\(await f\.content\(\)\)/.test(src)], [true, true, false, true]);
+  }
   const e = AD.eligFromFiles(n, ['a-0.hwp'], () => ['■ 참가자격', '대한민국 국민 누구나(개인 또는 팀)', '■ 접수기간 : 2026. 10. 1. ~ 10. 20.'].join('\n'), '/tmp');
   eq('② 받은 파일 글자 → 본문과 같은 규칙(activityDetails)으로 자격 · 출처 표식', [e && e.eligibilityLines.some((l) => /누구나/.test(l)), e && e.from], [true, '공고문 첨부']);
   const it = AX.putActivityDetails({ eligibilityLines: ['대한민국 국민 누구나'], eligibilityFrom: '공고문 첨부' }, { eligibilityLines: [], noticeLines: ['안내'] });

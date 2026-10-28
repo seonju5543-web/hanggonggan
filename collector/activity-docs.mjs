@@ -179,6 +179,13 @@ let getHtml = plainHtml;
    ① 한 페이지에 절대 시한(PAGE_MS) — goto 가 돌아와도 프레임 읽기가 멈출 수 있다 ② 팝업을 치운다(동국대: 팝업이 본문을 가렸다)
    ③ 프레임 안까지 읽는다 ④ 브라우저가 죽으면 한 번 다시 띄운다 ⑤ 페이지는 반드시 닫는다 */
 const PAGE_MS = 45000;
+/** 페이지 안에서 돈다(Playwright evaluate) — 그려지지 않은 요소를 DOM 에서 뗀다. 관문: test-collector 「대외활동·공모전 — 첨부·포스터 읽기」 ①-1 */
+export const DROP_HIDDEN = () => {
+  for (const el of document.querySelectorAll('body *')) {
+    const cs = getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden') el.remove();
+  }
+};
 let browser = null, bctx = null;
 async function openBrowser() {
   const { chromium } = await import('playwright');
@@ -195,7 +202,9 @@ async function browserHtml(url) {
       try { const el = page.locator(`text=${label}`).first(); if (await el.count()) await el.evaluate((e) => e.click()); } catch { /* 없으면 그만 */ }
     }
     const parts = [];
-    for (const f of page.frames()) { try { parts.push(await f.content()); } catch { /* 죽은 프레임은 건너뛴다 */ } }
+    /* 🔴 화면에 없는 요소(display:none·visibility:hidden)는 떼고 읽는다 — 동국대 WISE 의 숨은 전체메뉴(`장애학생지원`·`장애인 복지시설`)가 본문 줄로 들어와
+       2차 줍기가 그 두 줄을 자격으로 쳤다(10-06부터 7건 · 2026-10-28 실측). 학생 화면에 안 보이는 글자는 본문이 아니다 */
+    for (const f of page.frames()) { try { await f.evaluate(DROP_HIDDEN); parts.push(await f.content()); } catch { /* 죽은 프레임은 건너뛴다 */ } }
     return parts.join('\n');
   })();
   try {
