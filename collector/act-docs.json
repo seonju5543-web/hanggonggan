@@ -175,10 +175,6 @@
   "at": "2026-10-24",
   "tries": 1
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3540153": {
-  "at": "2026-10-24",
-  "tries": 0
- },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3511658": {
   "at": "2026-10-24",
   "tries": 1
@@ -301,6 +297,22 @@
  },
  "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179560": {
   "at": "2026-10-27",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3519412": {
+  "at": "2026-10-28",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3489807": {
+  "at": "2026-10-28",
+  "tries": 1
+ },
+ "https://wise.dongguk.ac.kr/article/servicenotice/detail/520819": {
+  "at": "2026-10-28",
+  "tries": 1
+ },
+ "https://wise.dongguk.ac.kr/article/servicenotice/detail/520732": {
+  "at": "2026-10-28",
   "tries": 1
  }
 }

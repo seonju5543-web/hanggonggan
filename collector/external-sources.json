@@ -7,10 +7,10 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-14",
+    "checkedAt": "2026-10-28",
     "why": "최고 0건 ((홈))",
     "best": {
-     "url": "http://www.haesuk.or.kr/",
+     "url": "http://haeseok.or.kr/",
      "signals": 0
     }
    }
@@ -21,7 +21,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-14",
+    "checkedAt": "2026-10-28",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://gachon.or.kr/",
@@ -35,7 +35,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-14",
+    "checkedAt": "2026-10-28",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://www.uljinsf.kr/",
@@ -49,7 +49,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-14",
+    "checkedAt": "2026-10-28",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.yangcheon.go.kr/site/yangcheon/main.do",
@@ -63,7 +63,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-14",
+    "checkedAt": "2026-10-28",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.mpva.go.kr/",
@@ -109,7 +109,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-14",
+    "checkedAt": "2026-10-28",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://www.mincho.or.kr/",
@@ -123,8 +123,8 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-14",
-    "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
+    "checkedAt": "2026-10-28",
+    "why": "홈페이지 못 엶 (TimeoutError: 23)",
     "best": null
    }
   },
@@ -134,7 +134,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-14",
+    "checkedAt": "2026-10-28",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.pc.go.kr/",

@@ -3,9 +3,17 @@
  "updatedAt": "2026-10-28",
  "schools": 44,
  "files": {
+  "인하대학교": {
+   "file": "nkeh7pq.json",
+   "count": 39
+  },
+  "경북대학교": {
+   "file": "nf097dk.json",
+   "count": 18
+  },
   "강원대학교": {
    "file": "nlzhvsh.json",
-   "count": 31
+   "count": 32
   },
   "서울시립대학교": {
    "file": "n1au199v.json",
@@ -91,10 +99,6 @@
    "file": "nmpm6i7.json",
    "count": 46
   },
-  "경북대학교": {
-   "file": "nf097dk.json",
-   "count": 17
-  },
   "충남대학교": {
    "file": "nl1xm19.json",
    "count": 23
@@ -138,10 +142,6 @@
   "세종대학교": {
    "file": "n1mo5fbn.json",
    "count": 9
-  },
-  "인하대학교": {
-   "file": "nkeh7pq.json",
-   "count": 38
   },
   "가톨릭대학교": {
    "file": "n174lvh5.json",
