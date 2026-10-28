@@ -164,7 +164,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-14",
+    "checkedAt": "2026-10-28",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://www.kwangsankim.co.kr/",
@@ -194,7 +194,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-14",
+    "checkedAt": "2026-10-28",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://injae.gwd.go.kr/",
@@ -208,8 +208,8 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-14",
-    "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
+    "checkedAt": "2026-10-28",
+    "why": "홈페이지 못 엶 (TypeError: ERR_TLS_CERT_ALTNAME_INVALID)",
     "best": null
    }
   },
@@ -219,7 +219,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-14",
+    "checkedAt": "2026-10-28",
     "why": "홈페이지 못 엶 (TypeError: ECONNRESET)",
     "best": null
    }
@@ -230,9 +230,12 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-14",
-    "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
-    "best": null
+    "checkedAt": "2026-10-28",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://www.chungju.go.kr/",
+     "signals": 0
+    }
    }
   },
   {
@@ -257,7 +260,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-14",
+    "checkedAt": "2026-10-28",
     "why": "홈페이지 못 엶 (TypeError: ENOTFOUND)",
     "best": null
    }
@@ -284,12 +287,9 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-14",
-    "why": "최고 0건 ((홈))",
-    "best": {
-     "url": "https://www.tongdosa.or.kr/",
-     "signals": 0
-    }
+    "checkedAt": "2026-10-28",
+    "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
+    "best": null
    }
   },
   {
@@ -298,7 +298,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-14",
+    "checkedAt": "2026-10-28",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://dalseoij.org/",

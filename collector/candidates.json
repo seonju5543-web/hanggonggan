@@ -1,8 +1,28 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-10-28",
- "count": 1474,
+ "count": 1490,
  "items": [
+  {
+   "title": "(공통)(교외)2026-2 제이씨현장학재단 장학생 모집 안내",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/270154/artclView.do",
+   "attachments": [
+    {
+     "name": "2026-2학기 제이씨현장학금 신청서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/152510/download.do"
+    },
+    {
+     "name": "개인정보수집이용동의서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/152511/download.do"
+    }
+   ],
+   "deadlineHint": "지원기간 : 2026. 11. 2( 월 ) ~ 11. 9( 월 ) 15:00 까지 7. 제출서류 가 . 장학금 지원서 1 부 (HUFS Abil",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-10-28",
+   "bodyDeadline": "2026-11-09",
+   "bodyDeadlineText": "6. 지원기간 : 2026. 11. 2( 월 ) ~ 11. 9( 월 ) 15:00 까지"
+  },
   {
    "title": "2026년도 동진장학연구재단 동진장학금 장학생 선발 안내",
    "url": "https://home.knu.ac.kr/HOME/knussw/sub.htm?nav_code=knu1619416593&mode=view&mv_data=aWR4PTIxNjcmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=",
@@ -18,6 +38,22 @@
    "foundAt": "2026-10-28",
    "bodyDeadline": "2026-11-06",
    "bodyDeadlineText": "동진장학연구재단에서 2026년도 동진장학금 장학생을 선발하오니, 관심있는 학생들은 기한 내 신청하시기 바랍니다. 1. 접수 기간: 2026. 10. 15.(목) ~ 11. 6.(금)"
+  },
+  {
+   "title": "2026년도 통영시 저소득 대학생 장학금 지원대상자 선발 안내",
+   "url": "https://home.knu.ac.kr/HOME/knussw/sub.htm?nav_code=knu1619416593&mode=view&mv_data=aWR4PTIxNjgmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=",
+   "attachments": [
+    {
+     "name": "2026년 통영시 저소득 대학생 장학금 지원대상자 선발 공고.hwpx",
+     "url": "https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxNjgmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=0"
+    }
+   ],
+   "deadlineHint": "신청 기간: 2026. 11. 2.(월) ~ 11. 23.(월) 2. 신청 방법: 방문 또는 우편접수(통영시 평생교육과 평생학습팀) 3. 지원",
+   "school": "경북대학교",
+   "campus": "",
+   "foundAt": "2026-10-28",
+   "bodyDeadline": "2026-11-23",
+   "bodyDeadlineText": "통영시에서 2026년도 저소득 대학생 장학금 지원대상자를 선발하오니, 관심있는 학생들은 기한 내 신청하시기 바랍니다. 1. 신청 기간: 2026. 11. 2.(월) ~ 11. 23.(월)"
   },
   {
    "title": "2027학년도 한국지도자육성장학재단 신규장학생 선발 재안내",
@@ -44,6 +80,101 @@
    "bodyDeadlineText": "5) 학자금지원구간이 3분위이하인 자(’26년 2학기 기준) 라. 신청기간: 2026. 11. 2.( 월 ) ~ 11. 3.( 화 ) 17:00"
   },
   {
+   "title": "2026학년도 2학기 다문화가정장학금 신청안내(~11/18)",
+   "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/944499/artclView.do",
+   "attachments": [
+    {
+     "name": "다문화가정장학금 신청서.hwp",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015304/download.do"
+    },
+    {
+     "name": "다문화장학금_신청_매뉴얼.pdf",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015305/download.do"
+    }
+   ],
+   "deadlineHint": "신청기한: 2026. 11. 18.(수) 17:00까지 (기한 엄수, 이후 제출 불가) 6. 신청방법 : 신청서(첨부파일) 작성 → 학생복지처",
+   "school": "연세대학교 미래캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-28",
+   "bodyDeadline": "2026-11-18",
+   "bodyDeadlineText": "2026학년도 2학기 다문화가정장학금 신청안내(~11/18)"
+  },
+  {
+   "title": "2026학년도 2학기 외국인재학생장학금 신청 안내(~11/18)",
+   "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/944500/artclView.do",
+   "attachments": [
+    {
+     "name": "외국인재학생_장학금_신청서.hwp",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015306/download.do"
+    },
+    {
+     "name": "외국인재학생_장학금_심사기준표(종합).hwp",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015307/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 및 신청방법 가. 신청기간: 2026. 11. 18.(수) 17:00까지 (기한 엄수, 이후 제출 불가) 나. 신청방법: 신청서(첨부파",
+   "school": "연세대학교 미래캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-28",
+   "bodyDeadline": "2026-11-18",
+   "bodyDeadlineText": "2026학년도 2학기 외국인재학생장학금 신청 안내(~11/18)"
+  },
+  {
+   "title": "2026년 2학기 푸른등대 기부장학금(2차) 신규장학생 신청 안내",
+   "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520995",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-10-28"
+  },
+  {
+   "title": "[학부] 2027년도 해동과학문화재단 장학생 선발 안내[기간연장~11. 2(월)]",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367674&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2027 해동장학생 신규지원(ㅇㅇ대,ㅇ학년,이름).hwp",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367674&attachNo=353735"
+    }
+   ],
+   "deadlineHint": "신청기한: 2026. 11. 2(월) 17:00 [아래 그림의 지원서 접수 10. 30은 기간 연장 전 기한이므로 무시하셔도 됩니다) 4. 신청",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-28",
+   "bodyDeadline": "2026-11-02",
+   "bodyDeadlineText": "[학부] 2027년도 해동과학문화재단 장학생 선발 안내[기간연장~11. 2(월)]"
+  },
+  {
+   "title": "[공통] 2026년도 통영시 저소득 대학생 장학금 지원대상자 선발 공고",
+   "url": "https://www.gachon.ac.kr/bbs/kor/478/126488/artclView.do",
+   "attachments": [
+    {
+     "name": "2026년 통영시 저소득 대학생 장학금 지원대상자 선발 공고.hwpx",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/157673/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026. 11. 2.(월) ~ 11. 23.(월) 4. 신청방법 : 방문( 업무시간 ( 월 ~ 금 , 09:00~18:00) 중에",
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-10-28",
+   "bodyDeadline": "2026-11-23",
+   "bodyDeadlineText": "통영시 관내 학교를 6년 이상 다닌 자 3. 지원서 신청기간 : 2026. 11. 2.(월) ~ 11. 23.(월)"
+  },
+  {
+   "title": "[통영시] 2026년도 통영시 저소득 대학생 장학금 지원대상자 선발 공고",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159778&noCat=501",
+   "attachments": [
+    {
+     "name": "2026년 통영시 저소득 대학생 장학금 지원대상자 선발 공고.zip",
+     "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=download&articleNo=159778&attachNo=93636"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "홍익대학교",
+   "campus": "",
+   "foundAt": "2026-10-28"
+  },
+  {
    "title": "[학부-교외장학] 2026학년도 2학기 강화군 대학생 등록금 지원 사업 안내",
    "url": "https://www.inha.ac.kr/bbs/kr/8/45964/artclView.do",
    "attachments": [
@@ -66,6 +197,22 @@
    "foundAt": "2026-10-28",
    "bodyDeadline": "2026-11-09",
    "bodyDeadlineText": "2. 신청 기한 : ~ 26. 11. 9. (월) 18:00"
+  },
+  {
+   "title": "[학부-교내장학] 2026학년도 외국어성적우수장학생 선발 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45968/artclView.do",
+   "attachments": [
+    {
+     "name": "2026학년도 외국어성적우수장학생 선발 안내문.hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41651/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026. 10. 29.(목 ) ~ 11. 17.(화 ) <20 일간 > ( 업무시간 9 시 ~ 18 시 접수가능 . 단, 점심시간",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-10-28",
+   "bodyDeadline": "2026-11-17",
+   "bodyDeadlineText": "나 . 제출장소 : 소속 단과대학 행정실 (학생이 직접제출 ) 5. 신청기간 : 2026. 10. 29.(목 ) ~ 11. 17.(화 ) <20 일간 >"
   },
   {
    "title": "[교내근로] 2026학년도 2학기 교내 근로장학생 선발결과 안내",
@@ -392,6 +539,110 @@
    "school": "계명대학교",
    "campus": "",
    "foundAt": "2026-10-28"
+  },
+  {
+   "title": "2026년도 희우장학재단 2기 장학생 선발 공지",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/145/236662/artclView.do",
+   "attachments": [
+    {
+     "name": "2026년도 희우장학재단 2기 장학생 선발 신청서류.hwp",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/145/181507/download.do"
+    }
+   ],
+   "deadlineHint": "제출기한 11월 2일(월)) 나. 합격자에게 개별 안내 예정 6. 제출처 - 인문캠퍼스: dgyu@mju.ac.kr - 자연캠퍼스: csh419",
+   "school": "명지대학교",
+   "campus": "",
+   "foundAt": "2026-10-28",
+   "bodyDeadline": "2026-11-01",
+   "bodyDeadlineText": "4. 제출서류 : 11월 1일(일) 18:00까지 제출"
+  },
+  {
+   "title": "2026-2학기 국가근로장학 동계방학 집중근로 신청 안내",
+   "url": "https://www.sejong.ac.kr/kor/intro/notice7.do?mode=view&articleNo=895306&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "붙임1-1. 2026년 동계방학 집중근로 희망근로지 신청 매뉴얼(홈페이지).pdf",
+     "url": "https://www.sejong.ac.kr/kor/intro/notice7.do?mode=download&articleNo=895306&attachNo=237944"
+    },
+    {
+     "name": "붙임1-2. 2026년 동계방학 집중근로 희망근로지 신청 매뉴얼(모바일).pdf",
+     "url": "https://www.sejong.ac.kr/kor/intro/notice7.do?mode=download&articleNo=895306&attachNo=237945"
+    }
+   ],
+   "deadlineHint": "신청기간 ◦ 2026 년 10월 3 0 일 ~ 11 월 12일 18시까지(기간 경과 후 신청이 불가하니 꼭 기간내에 신청바람) ◦ 2026년 2",
+   "school": "세종대학교",
+   "campus": "",
+   "foundAt": "2026-10-28"
+  },
+  {
+   "title": "2026학년도 2학기 2차 연구우수장학생 선발 결과 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140845&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-28"
+  },
+  {
+   "title": "[발전기금] 서강 나눔의터(여교수회) 장학생 선발 안내(11/5 마감, 학업보조비 100만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551689?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "지원기간: 2026년 10월 29일(목)~11월 5일(목) 오후 11시(마감시한 준수) 5. 지원방법: 장학금 신청서(첨부)를 작성하여 학생지원",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-28",
+   "bodyDeadline": "2026-11-05",
+   "bodyDeadlineText": "[발전기금] 서강 나눔의터(여교수회) 장학생 선발 안내(11/5 마감, 학업보조비 100만원)"
+  },
+  {
+   "title": "2026년도 통영시 저소득 대학생 장학금 지원 대상자 선발 안내",
+   "url": "https://www.yonsei.ac.kr/bbs/sc/58/944506/artclView.do",
+   "attachments": [
+    {
+     "name": "2026년 통영시 저소득 대학생 장학금 지원대상자 선발 공고.hwp",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015315/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간: 2026.11.2.(월)~2026.11.23.(월) 5. 신청방법: 방문 또는 우편 신청 1) 방문: 업무시간(월~금, 09:00~1",
+   "school": "연세대학교",
+   "campus": "",
+   "foundAt": "2026-10-28",
+   "bodyDeadline": "2026-11-23",
+   "bodyDeadlineText": "2026.11.02 ~ 2026.11.23"
+  },
+  {
+   "title": "2026-2학기 교내 특별장학 「장학 홍보영상 공모전」 장학생 선발 결과 및 시상식 안내",
+   "url": "https://www3.chosun.ac.kr/bbs/scho/332/282387/artclView.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "조선대학교",
+   "campus": "",
+   "foundAt": "2026-10-28"
+  },
+  {
+   "title": "2026학년도 교내 Pride CSU 서석장학금 장학생 선발 공고 안내",
+   "url": "https://www3.chosun.ac.kr/bbs/scho/332/282400/artclView.do",
+   "attachments": [
+    {
+     "name": "2026학년도 Pride CSU(서석) 장학생 선발계획(안).pdf",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/379688/download.do"
+    },
+    {
+     "name": "[서식 1,2,3] 2026학년도 Pride CSU(서석) 장학금 신청 제출 서식.hwp",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/379689/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 및 신청방법 - 신청 기간: 2026. 11. 9.(월) 09:00 ~ 11. 11.(수) 17:00 - 신청방법: 온라인 신청(종합정",
+   "school": "조선대학교",
+   "campus": "",
+   "foundAt": "2026-10-28",
+   "bodyDeadline": "2026-11-11",
+   "bodyDeadlineText": "접수마감일 | 2026.11.11"
   },
   {
    "title": "★생활비장학금200만원★ KNU창업장학금(창암장학재단) 장학생 모집(~11/13)",
