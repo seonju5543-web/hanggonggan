@@ -4973,8 +4973,8 @@ function openDetail(id) {
         ? '신청 전에 공고 원문에서 지원 자격을 확인하세요.'
         : '입력한 정보로는 요건이 맞지 않아 보입니다. 판정이 틀릴 수 있으니 원문을 확인한 뒤 신청하세요.'}</p>` : ''}
       <button class="btn btn-primary btn-lg" id="btn-apply-one" ${canApply ? '' : 'disabled'}>${btnLabel}</button>
-      ${/* 단추 밑 한 줄 — 사실만(최종 제출처). '준비를 마치면 … 표시됩니다'·'자유 형식 제출을 받으므로 …' 같은 설명은 뺐다(2026-10-15 개발자 지시 "happy talk 전부 삭제") */ ''}
-      ${canApply ? `<p class="dp-note">최종 제출 · ${esc(ch.label)}</p>` : ''}
+      ${/* 단추 밑에는 아무 줄도 없다 — 「최종 제출 · 제출처」 한 마디도 2026-10-29 개발자 지시로 뺐다(2026-10-15 "happy talk 전부 삭제" 뒤 남아 있던 마지막 줄).
+           제출처는 신청 준비 화면(「최종 제출 방법」 절)이 말한다 */ ''}
     </div>`;
 
   openSheetShell();

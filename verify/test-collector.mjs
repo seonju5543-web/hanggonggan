@@ -12975,7 +12975,7 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
   eq('  ✕ 로 이미 보인 줄은 「내 정보로 확인한 항목」에 또 적지 않는다 (shownBad)', /shownBad\.has\(r\.slice\(FAIL_PREFIX\.length\)\)/.test(appSrc), true);
   eq('  주관·금액의 「원문 확인」 자리 표시는 큰 글씨·주관 줄에 안 나간다 · 본문 사진은 첨부 목록에 안 나간다',
     [/providerUnknown\(sch\.amount\) \? '<p class="sheet-amount sheet-amount-unknown">/.test(appSrc), /providerUnknown\(sch\.provider\) \? \(\(String\(sch\.name/.test(appSrc), /filter\(\(a\) => a && !a\.bodyImage\);\n        if \(!atts\.length\) return '';/.test(appSrc)], [true, true, true]);
-  eq('  단추 밑 설명은 「최종 제출 · 제출처」 한 마디 (준비를 마치면 … 표시됩니다 없음)', [/준비를 마치면 최종 제출처/.test(appSrc), /최종 제출 · \$\{esc\(ch\.label\)\}/.test(appSrc)], [false, true]);
+  eq('  단추 밑에는 아무 줄도 없다 — 「최종 제출 · 제출처」도 뺐다(2026-10-29 개발자 지시) · 「준비를 마치면 … 표시됩니다」 없음', [/준비를 마치면 최종 제출처/.test(appSrc), /최종 제출 · \$\{esc\(ch\.label\)\}/.test(appSrc)], [false, false]);
   /* ⑨ 리뷰(2026-10-15)가 실데이터 전수 비교(등록 226 + 활동 200 × 7 프로필)로 잡은 틀린 미달·틀린 안심·글자 회귀 — 되돌리면 그대로 재현된다 */
   eq('⑨ 「… 3.0/4.5점 또는」 — 이상이 분수 뒤에 없으면 성적 조건이 아니다 (춘곡장학회 · 평점 2.8 에게 ✕ 였다)', kinds('직전 정규학기에 12학점 이상 이수하였으며, 대학 전체학기 성적 평균 3.0/4.5점 또는').includes('grade'), false);
   eq('  「잔여 학기 4학기 이상인 자」·「남은 학기가 4학기 이상인 자」는 이수 학기가 아니다 → 1학년에게 모름', [ME3.requirementMatch('잔여 학기 4학기 이상인 자', { ...st, year: 1 }, null), ME3.requirementMatch('남은 학기가 4학기 이상인 자', { ...st, year: 1 }, null)], [null, null]);
