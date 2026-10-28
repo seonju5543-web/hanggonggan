@@ -23,7 +23,7 @@
     - 179608 · 2026 용인 반도체 스타트업 육성 전략 포럼 참가자  → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179608 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179608(2)
     - 179557 · 2026년 스타트업, 중소기업, 소상공인을 위한 M&A → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179557 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179557(2)
 - ✅ **1365 봉사참여정보** — 받은 행 500 · 실은 글 **15** · 상세 내용 15/15건 · 버림: 대학생·청년 대상 아님 402 · 상한 15건 초과 80 · 같은 글 3
-  - 자격 줄 있는 글 10/15 · 원문 안내 있는 글 15/15
+  - 자격 줄 있는 글 12/15 · 원문 안내 있는 글 15/15
   - 첫 행 칸: `actBeginTm, actEndTm, actPlace, adultPosblAt, gugunCd, nanmmbyNm, noticeBgnde, noticeEndde, progrmBgnde, progrmEndde, progrmRegistNo, progrmSj, progrmSttusSe, sidoCd, srvcClCode, url, yngbgsPosblAt`
   - 코드 칸 값(첫 세 행): gugunCd=4640000|3490000|3230000 · sidoCd=6450000|6280000|6110000
   - 대외활동 · [중학생~대학생]현충사 충무공이순신기념관 관람객 안내 및 환경 미화 봉사 (~2026-10-28) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3511658
@@ -45,7 +45,7 @@
     - 3489807 · [지효초등학교 도서관] 8~10월 대학생 자원봉사자 모 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3489807 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3489807(2)
     - 3508217 · 상명대학교박물관 기획전시실 전시지킴이 및 관리보조 오전 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3508217 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3508217(2)
     - 3512989 · 대학생) 초등, 중등 학습 지도 및 놀이지원 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3512989 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3512989(2)
-- ✅ **온통청년 청년콘텐츠** — 받은 행 30 · 실은 글 **8** · 버림: 공모전·대외활동 아님(소식 글 등) 21 · 원문 주소 없음 1
+- ✅ **온통청년 청년콘텐츠** — 받은 행 30 · 실은 글 **8** · 버림: 공모전·대외활동 아님(소식 글 등) 22
   - 자격 줄 있는 글 1/8 · 원문 안내 있는 글 0/8
   - 첫 행 칸: `bbsSn, pstSn, pstSeSn, pstSeNm, pstTtl, pstWholCn, pstInqCnt, pstUrlAddr, atchFile, frstRgtrNm, frstRegDt, lastMdfrNm, lastMdfcnDt`
   - 대외활동 · 미래내일 일경험 기업 실무 프로젝트 참여자 모집 - 3. IT 직무 — https://www.youthcenter.go.kr/bbs03View/48/10853
@@ -60,10 +60,10 @@
     - 10840 · 구리시청년내일센터 - 2026 청년교류 프로그램 <내  → https://www.youthcenter.go.kr/bbs03View/48/10840 · 살핀 칸: 주소 칸 없음
     - 10836 · 국무조정실 - 정부위원회 청년위원 통합공모 안내 → https://www.youthcenter.go.kr/bbs03View/48/10836 · 살핀 칸: 주소 칸 없음
     - 10827 · 「2026 IFWY 은평 컨퍼런스」 참가자 모집 안내 → https://www.youthcenter.go.kr/bbs03View/48/10827 · 살핀 칸: 주소 칸 없음
-- ✅ **온통청년 청년정책** — 받은 행 3634 · 실은 글 **15** · 버림: 공모전·대외활동 아님(주거·금융 등 정책) 3392 · 마감 지남 95 · 상한 15건 초과 83 · 원문 주소 없음 36 · 같은 글 12 · 같은 기관 홈페이지(원문 주소 없음) 1
+- ✅ **온통청년 청년정책** — 받은 행 3670 · 실은 글 **15** · 버림: 공모전·대외활동 아님(주거·금융 등 정책) 3427 · 마감 지남 96 · 상한 15건 초과 83 · 원문 주소 없음 36 · 같은 글 12 · 같은 기관 홈페이지(원문 주소 없음) 1
   - 자격 줄 있는 글 13/15 · 원문 안내 있는 글 15/15
   - 첫 행 칸: `plcyNo, bscPlanCycl, bscPlanPlcyWayNo, bscPlanFcsAsmtNo, bscPlanAsmtNo, pvsnInstGroupCd, plcyPvsnMthdCd, plcyAprvSttsCd, plcyNm, plcyKywdNm, plcyExplnCn, lclsfNm, mclsfNm, plcySprtCn, sprvsnInstCd, sprvsnInstCdNm, sprvsnInstPicNm, operInstCd, operInstCdNm, operInstPicNm, sprtSclLmtYn, aplyPrdSeCd, bizPrdSeCd, bizPrdBgngYmd, bizPrdEndYmd, bizPrdEtcCn, plcyAplyMthdCn, srngMthdCn, aplyUrlAddr, sbmsnDcmntCn, etcMttrCn, refUrlAddr1, refUrlAddr2, sprtSclCnt, sprtArvlSeqYn, sprtTrgtMinAge, sprtTrgtMaxAge, sprtTrgtAgeLmtYn, mrgSttsCd, earnCndSeCd, earnMinAmt, earnMaxAmt, earnEtcCn, addAplyQlfcCndCn, ptcpPrpTrgtCn, inqCnt, rgtrInstCd, rgtrInstCdNm, rgtrUpInstCd, rgtrUpInstCdNm, rgtrHghrkInstCd, rgtrHghrkInstCdNm, zipCd, plcyMajorCd, jobCd, schoolCd, aplyYmd, frstRegDt, lastMdfcnDt, sbizCd`
-  - 코드 칸 값(첫 세 행): pvsnInstGroupCd=0054002|0054002|0054002 · plcyPvsnMthdCd=0042006|0042013|0042006 · plcyAprvSttsCd=0044002|0044002|0044002 · sprvsnInstCd=4711066|5110251|5110292 · operInstCd=B553534|       |        · aplyPrdSeCd=0057001|0057001|0057002 · bizPrdSeCd=0056001|0056002|0056001 · mrgSttsCd=0055003|0055003|0055003 · earnCndSeCd=0043001|0043001|0043001 · rgtrInstCd=4711000|6470000|6470000 · rgtrUpInstCd=6540000|0000000|0000000 · rgtrHghrkInstCd=6540000|6470000|6470000 · zipCd=52210|11110,11140,11170,11200,11215,11230,1126|47250 · plcyMajorCd=0011009|0011009|0011009 · jobCd=0013006|0013010|0013001,0013006,0013009 · schoolCd=0049010|0049010|0049010 · sbizCd=0014010|0014010|0014010
+  - 코드 칸 값(첫 세 행): pvsnInstGroupCd=0054002|0054002|0054002 · plcyPvsnMthdCd=0042005|0042013|0042006 · plcyAprvSttsCd=0044002|0044002|0044002 · sprvsnInstCd=4711066|4711066|4711066 · operInstCd=       |       |        · aplyPrdSeCd=0057001|0057001|0057001 · bizPrdSeCd=0056001|0056001|0056001 · mrgSttsCd=0055003|0055003|0055003 · earnCndSeCd=0043001|0043001|0043002 · rgtrInstCd=4711000|4711000|4711000 · rgtrUpInstCd=6540000|6540000|6540000 · rgtrHghrkInstCd=6540000|6540000|6540000 · zipCd=52210|52210|52210 · plcyMajorCd=0011009|0011009|0011009 · jobCd=0013010|0013010|0013001 · schoolCd=0049010|0049010|0049010 · sbizCd=0014010|0014010|0014001
   - 대외활동 · ‘나의 광주 정착 키트’ 2기 참여자 모집 (~2026-10-28) — https://spectacular-foe-878.notion.site/338df122937c8008ac28de053bd9ce5d?source=copy_link
   - 대외활동 · 2026 서울시 청년해외봉사단 사업 (~2026-10-31) — https://youth.seoul.go.kr/youthConts.do?key=2311120001&sc_pbancSeCd=020&sc_bbsStngSn=2212200001&sc_bbsCtgrySn=2310200014&sc_qnaCtgryCd=001&sc_faqCtgryCd=001
   - 대외활동 · 청년 생명사랑 서포터즈 운영 (~2026-11-30) — https://www.usspc.or.kr/
@@ -84,6 +84,6 @@
     - 20260430005400212994 · 청년정책 서포터즈 → https://youth.chungnam.go.kr/web/main/customSupp/M060-10/view?bizId=A20260406LC000000000003191 · 살핀 칸: refUrlAddr1=https://youth.chungnam.go.kr/web/main/customSupp/M060-10/view?bizId=A20260406LC000000000003191(2)
     - 20260430005400212977 · 청년정책제안 아이디어 공모 → https://www.cheonan.go.kr/kor/sub06_04_03_05.do · 살핀 칸: refUrlAddr1=https://www.cheonan.go.kr/kor/sub06_04_03_05.do(1)
 
-data/activities.json — API 글 53 → **53건** (전체 200건)
+data/activities.json — API 글 52 → **53건** (전체 200건)
 
 > 열쇠·출처 설명: `collector/open-api.mjs` 머리말 · 바꾸는 규칙: `collector/open-api-map.mjs` · 설계: `docs/designs/external-sources.md` §10
