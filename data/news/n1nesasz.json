@@ -3,6 +3,26 @@
  "updatedAt": "2026-10-28",
  "items": [
   {
+   "title": "☆★ 2027학년도 전기 정시 일반대학원 신입생 모집 안내 ★☆",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726780",
+   "postedAt": "2026-10-28",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-28",
+   "desc": "국립부경대학교 일반대학원에서는 2027학년도 전기 정시 신입생 을 모집하오니 우수한 인재들의 많은 지원 바랍니다."
+  },
+  {
+   "title": "2026 공직진출 역량진단 평가(PSAT 모의고사) 1차 추가 모집 안내(~10/29)",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726770",
+   "postedAt": "2026-10-28",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-28",
+   "desc": "행정 5급·지역인재 7급·외교관후보자 시험을 준비하는 학생들을 위해 PSAT 및 헌법 모의고사를 실시합니다."
+  },
+  {
    "title": "★글로벌어학교육센터 행사 안내_Mystery Feel Boxes(10/29-30)",
    "url": "https://www.pknu.ac.kr/main/163?action=view&no=726768",
    "postedAt": "2026-10-27",
@@ -399,31 +419,7 @@
    "school": "부경대학교",
    "campus": "",
    "src": "53a197d6",
-   "foundAt": "2026-10-12",
-   "thumb": "data/news/img/5967391c35334bfd.webp"
-  },
-  {
-   "title": "#### [한화오션엔지니어링] 채용상담회 안내(10/15(목), 10:00~15:00, 동원장보고관 1층 학생취업설명회실) ####",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726544",
-   "postedAt": "2026-10-08",
-   "kind": "행사",
-   "school": "부경대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "thumb": "data/news/img/03655a00f3d1f542.webp",
-   "desc": "학생성공지원과 ■ 장 소 : 동원장보고관 1층 학생취업설명회실(109호)",
-   "src": "53a197d6"
-  },
-  {
-   "title": "[AI]생성형 AI 를 활용하여 나만의 작가 Agent 만들기(10월 24일(토) 13시~16시(3시간))",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726455",
-   "postedAt": "2026-09-30",
-   "school": "부경대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "thumb": "data/news/img/176486e725bb1c9b.webp",
-   "src": "53a197d6",
-   "desc": "<생성형 AI로 기획부터 집필, 교정, 출판까지 AI와 함께하는 작가 시스템 실습 과정>"
+   "foundAt": "2026-10-12"
   }
  ]
 }

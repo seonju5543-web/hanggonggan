@@ -3,6 +3,25 @@
  "updatedAt": "2026-10-28",
  "items": [
   {
+   "title": "[기업지원센터] 대학 특허역량강화 교육 개최 안내",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271631&pageOrder=0&cmd=2&parm_bod_uid=271630&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-10-28",
+   "kind": "행사",
+   "school": "계명대학교",
+   "campus": "",
+   "src": "9a241a98",
+   "foundAt": "2026-10-28"
+  },
+  {
+   "title": "「2026 대학 중심 딥테크 창업 활성화 기반 조성 사업」 (예비)창업자 모집",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271631&pageOrder=0&cmd=2&parm_bod_uid=271626&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-10-28",
+   "school": "계명대학교",
+   "campus": "",
+   "src": "9a241a98",
+   "foundAt": "2026-10-28"
+  },
+  {
    "title": "AI 에이전트 기반 실무 혁신 역량 강화 프로그램(1회차 선착순) 학생 모집",
    "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271623&pageOrder=0&cmd=2&parm_bod_uid=271623&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
    "postedAt": "2026-10-28",
@@ -348,24 +367,6 @@
    "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271262&pageOrder=0&cmd=2&parm_bod_uid=271157&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
    "postedAt": "2026-10-02",
    "kind": "행사",
-   "school": "계명대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "src": "9a241a98"
-  },
-  {
-   "title": "여성학연구소 뉴스레터 계명여성학 제11호",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271262&pageOrder=0&cmd=2&parm_bod_uid=271134&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
-   "postedAt": "2026-10-01",
-   "school": "계명대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "src": "9a241a98"
-  },
-  {
-   "title": "2026 대학 중심 딥테크 창업 활성화 기반 조성 사업 (예비)창업자 모집",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271262&pageOrder=0&cmd=2&parm_bod_uid=270973&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
-   "postedAt": "2026-09-23",
    "school": "계명대학교",
    "campus": "",
    "foundAt": "2026-10-08",

@@ -3,6 +3,31 @@
  "updatedAt": "2026-10-28",
  "items": [
   {
+   "title": "[평가감사실] 2026학년도 교육수요자 만족도 조사 참여 안내",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766780",
+   "postedAt": "2026-10-28",
+   "postId": "26766780",
+   "school": "동국대학교",
+   "campus": "",
+   "src": "d521f12e",
+   "foundAt": "2026-10-28",
+   "thumb": "data/news/img/5a1cbbcda9e9808d.webp",
+   "desc": "1. 조사일정: 2026. 10. 27.(화) ~ 11. 20.(금) ※ 응답률에 따라 조사기간이 연장될 수 있습니다."
+  },
+  {
+   "title": "[교수학습혁신센터] 2026 XR활용 학습역량 강화 체험 프로그램 신청자 모집",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766767",
+   "postedAt": "2026-10-28",
+   "postId": "26766767",
+   "kind": "채용",
+   "school": "동국대학교",
+   "campus": "",
+   "src": "d521f12e",
+   "foundAt": "2026-10-28",
+   "thumb": "data/news/img/65c8f5b7d8cad24a.webp",
+   "desc": "이미지를 클릭하시면 드림패스 신청페이지로 접속이 가능합니다."
+  },
+  {
    "title": "[취업팀 고시반] 2026 5급(행정·기술)공채 및 외교관후보자 선발시험 1,2,3차 합격자 조사 안내",
    "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766762",
    "postedAt": "2026-10-27",
@@ -386,7 +411,6 @@
    "school": "동국대학교",
    "campus": "",
    "foundAt": "2026-10-08",
-   "thumb": "data/news/img/bd8bc373573ef216.webp",
    "desc": "이미지를 클릭하시면 드림패스 신청페이지로 접속이 가능합니다.",
    "src": "d521f12e"
   },
@@ -435,27 +459,6 @@
    "campus": "",
    "foundAt": "2026-10-07",
    "src": "d521f12e"
-  },
-  {
-   "title": "[카운슬링센터][집단상담 홍보]달달한 연애를 꿈꾸는 동국인을 위한 \"캠퍼스 연애 심리극\" 신청 안내 (3회 모두 참여시 마일리지 10점 지급)",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766499",
-   "postedAt": "2026-10-07",
-   "postId": "26766499",
-   "school": "동국대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "src": "d521f12e"
-  },
-  {
-   "title": "영자신문사 동국포스트 60.5기 신입 추가 모집",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766496",
-   "postedAt": "2026-10-06",
-   "postId": "26766496",
-   "school": "동국대학교",
-   "campus": "",
-   "foundAt": "2026-10-06",
-   "thumb": "data/news/img/811b5cf644b95e75.webp",
-   "desc": "학내 유일 영자 신문사 The Dongguk Post에서 60.5기 신입기자를 모집합니다."
   }
  ]
 }

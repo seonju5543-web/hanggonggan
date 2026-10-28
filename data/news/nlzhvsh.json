@@ -3,6 +3,17 @@
  "updatedAt": "2026-10-28",
  "items": [
   {
+   "title": "보건실 휴무 안내(2026.10.29.)",
+   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11585&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
+   "postedAt": "2026-10-28",
+   "kind": "생활",
+   "school": "강원대학교",
+   "campus": "",
+   "src": "784a7e0d",
+   "foundAt": "2026-10-28",
+   "thumb": "data/news/img/79748ff53c7b99b9.webp"
+  },
+  {
    "title": "도서관 시스템 복구 완료 안내",
    "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11582&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
    "postedAt": "2026-10-28",
@@ -410,15 +421,6 @@
    "campus": "",
    "foundAt": "2026-10-07",
    "desc": "○사유 : 학내사정 ○임시 미운행 기간: 2026.10.13.(화) ○미운행 노선 : 삼척 도계캠퍼스 -삼척출발8회(16:00) / 도계출발9회(18:05) ※도계 18:05(9회)버스 이용자는 교직원…"
-  },
-  {
-   "title": "강원대학교 후원의 집 '주식회사 소온' 10월 한우 할인 이벤트 안내",
-   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11516&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "postedAt": "2026-10-07",
-   "school": "강원대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "desc": "춘천캠퍼스 후원의 집, '주식회사 소온'에서 본교를 위해 직접 홍보하고 진행하는 [10월 한우 할인 이벤트]를 아래와 같이 안내해 드립니다."
   }
  ]
 }
