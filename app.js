@@ -1737,6 +1737,7 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
     footKnown: known,
     due,
     urgent: !sch.program && d.days >= 0 && d.days <= 7,
+    link: cardSrcLinkHtml(sch, 'detail'),   // 원문 아이콘 — 활동 카드와 같은 자리·같은 모양(2026-10-28)
   });
 }
 
@@ -3581,11 +3582,14 @@ function activityCardHtml(n) {
   });
 }
 /* 활동 카드의 원문 링크 — 이름은 시트 단추와 같은 sourceLink(n, 'activity') 한 곳(「원문 공고 ↗」 · 목록·홈페이지면 그 이름) · 안전하지 않은 주소면 안 그린다 */
-function activityCardLinkHtml(n) {
-  const link = sourceLink(n, 'activity');
+/* 카드 왼쪽 아래의 원문 링크(아이콘) — **장학 카드와 활동 카드가 같은 것**(2026-10-28 개발자 "장학금에도 적용해야지 … 다른 영역이 아니야").
+   이름은 sourceLink 한 곳(화면마다의 글자) · 안전하지 않은 주소면 안 그린다(href="" 는 앱 자신을 연다) */
+function cardSrcLinkHtml(n, surface) {
+  const link = sourceLink(n, surface);
   const href = safeUrl(link.href);
-  return href ? `<a class="card-src-link" href="${esc(href)}" target="_blank" rel="noopener">${esc(link.label)}</a>` : '';
+  return href ? `<a class="card-src-link" href="${esc(href)}" target="_blank" rel="noopener" title="${esc(link.label)}">${esc(link.label)}</a>` : '';
 }
+function activityCardLinkHtml(n) { return cardSrcLinkHtml(n, 'activity'); }
 
 /* 활동 시트 맨 아래 — 안내 한 줄 + 원문 단추 (2026-10-03 · 원문 링크 정직성).
    🔴 이름은 sourceLink(n, 'activity') 한 곳이다. 예전엔 `#n-` 표식만 보고 나머지를 전부 '원문에서 신청하기 ↗' 라 불러,

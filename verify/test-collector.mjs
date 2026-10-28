@@ -13073,8 +13073,9 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
     const appSrc14 = readText(new URL('../app.js', import.meta.url));
     const slSrc = readText(new URL('../source-link.js', import.meta.url));
     eq('  활동 시트 단추 이름은 「원문 공고 ↗」 · 안내 줄은 "자세한 내용과 신청은 원문 공고에서 확인"', /activity:\s*\{ page: '원문 공고 ↗'/.test(slSrc) && /자세한 내용과 신청은 원문 공고에서 확인하세요/.test(appSrc14), true);
-    eq('  활동 카드에 원문 링크(card-src-link)가 단추 바깥에 붙는다 · 이름은 같은 sourceLink',
-      /link: activityCardLinkHtml\(n\)/.test(appSrc14) && /function activityCardLinkHtml\(n\) \{\s*const link = sourceLink\(n, 'activity'\)/.test(appSrc14)
+    eq('  활동 카드와 장학 카드에 같은 원문 링크(card-src-link · cardSrcLinkHtml)가 단추 바깥에 붙는다 · 이름은 같은 sourceLink (2026-10-28 개발자 "장학금에도 적용")',
+      /link: activityCardLinkHtml\(n\)/.test(appSrc14) && /function activityCardLinkHtml\(n\) \{ return cardSrcLinkHtml\(n, 'activity'\); \}/.test(appSrc14)
+        && /link: cardSrcLinkHtml\(sch, 'detail'\)/.test(appSrc14) && /function cardSrcLinkHtml\(n, surface\) \{\s*const link = sourceLink\(n, surface\)/.test(appSrc14)
         && /<\/button>/.test(appSrc14.slice(appSrc14.indexOf('function cardShellHtml'), appSrc14.indexOf('function cardShellHtml') + 900)) && /\$\{save\}\$\{link\}/.test(appSrc14), true);
     /* ⑭-3 대외활동 어휘 한 곳 (2026-10-27 개발자 "판정기의 어휘도 대외활동 버전으로") — 장학 신호(재학·평점·소득)에 활동 어휘를 더해 읽는다 */
     {
@@ -13123,12 +13124,12 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
       const cSrc = readText(new URL('../collector/collect.mjs', import.meta.url)), aSrc = readText(new URL('../collector/activity-docs.mjs', import.meta.url));
       eq('  수집 로봇(fetchDetail)과 첨부 로봇(fetchPost)이 같은 detailByRule 을 먼저 부른다', [/const ruled = await detailByRule\(item\.url\)/.test(cSrc), /const ruled = await detailByRule\(n\.url\)/.test(aSrc) && /-R\.txt/.test(aSrc)], [true, true]);
     }
-    /* 2026-10-28 개발자가 고른 시안 H — 구분선 아래 제 줄 · 글자 왼쪽(옅은 색) · 오른쪽 끝 꺾쇠 · 카드 단추는 그 줄만큼 아래 여백(승인 화면 — 드라이버처럼 모양을 잠근다) */
+    /* 2026-10-28 개발자 최종 — 선 없이 카드 왼쪽 아래 **바깥링크 아이콘만**(글자는 읽는 기계용으로 font-size 0) · 카드 단추는 그만큼 아래 여백(승인 화면 — 드라이버처럼 모양을 잠근다) */
     const css = readText(new URL('../style.css', import.meta.url));
     const linkBlock = (css.match(/\.card-src-link \{([\s\S]*?)\}/) || [])[1] || '';
-    eq('  카드 링크 자리는 style.css 에 있다(.card-src-link 아랫줄 · 구분선 · 왼쪽 글자 · 꺾쇠 · has-link 아래 여백)',
-      [/left: 0; right: 0; bottom: 0;/.test(linkBlock), /border-top: 1px solid var\(--line\)/.test(linkBlock), /justify-content: space-between/.test(linkBlock), /color: var\(--text-sub\)/.test(linkBlock), /\.card-src-link::after \{/.test(css), /\.sch-card-wrap\.has-link > \.sch-card \{ padding-bottom:/.test(css)],
-      [true, true, true, true, true, true]);
+    eq('  카드 링크 자리는 style.css 에 있다(.card-src-link 왼쪽 아래 · 선 없음 · 글자 숨김 · 아이콘 마스크 · has-link 아래 여백)',
+      [/left: var\(--space-20\); bottom: var\(--space-16\);/.test(linkBlock), !/border-top/.test(linkBlock), /font-size: 0;/.test(linkBlock), /\.card-src-link::before \{[\s\S]*?mask: url\("data:image\/svg\+xml/.test(css), /\.sch-card-wrap\.has-link > \.sch-card \{ padding-bottom:/.test(css)],
+      [true, true, true, true, true]);
     eq('⑭ 자격 줄 — 안내 문장(`…모집합니다`·`…제공하고 있습니다`·`…하시기 바랍니다`·`첨부파일이(가) 없습니다`·`가능합니다`)은 아니다',
       ['2026 평택시민나눔문화축제에서 합정장애인주간보호센터 홍보부스 운영을 보조해주실 자원봉사자를 모집합니다.', '합정장애인주간보호센터는 사회복지법인 연꽃마을에서 운영하고 있으며, 성인발달장애인을 위한 프로그램을 제공하고 있습니다.',
         '- 기타: 식권제공, 개인사정으로 참여가 어려울 시 사전에 반드시 반려신청하시기 바랍니다.', '첨부파일이(가) 없습니다.', '- 정해진 시간에만 봉사활동 가능합니다.', '장려상 2점 각 50만원을 시상합니다.', '- 꿈빛도서관은 기관장 직인을 찍어주지 않는 점 양해 부탁드립니다.(싸인으로 대체)'].map(ok),
