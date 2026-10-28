@@ -312,7 +312,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-14",
+    "checkedAt": "2026-10-28",
     "why": "홈페이지 못 엶 (TypeError: ECONNRESET)",
     "best": null
    }
@@ -339,7 +339,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-14",
+    "checkedAt": "2026-10-28",
     "why": "홈페이지 못 엶 (TypeError: EAI_AGAIN)",
     "best": null
    }
@@ -350,12 +350,9 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-14",
-    "why": "최고 0건 ((홈))",
-    "best": {
-     "url": "https://www.seogu.gwangju.kr/",
-     "signals": 0
-    }
+    "checkedAt": "2026-10-28",
+    "why": "홈페이지 못 엶 (TimeoutError: 23)",
+    "best": null
    }
   },
   {
@@ -364,7 +361,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-14",
+    "checkedAt": "2026-10-28",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.yanggu.go.kr/",
@@ -378,7 +375,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-14",
+    "checkedAt": "2026-10-28",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.jinan.go.kr/index.jinan",
@@ -392,9 +389,12 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-14",
-    "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
-    "best": null
+    "checkedAt": "2026-10-28",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://www.wando.go.kr/",
+     "signals": 0
+    }
    }
   },
   {

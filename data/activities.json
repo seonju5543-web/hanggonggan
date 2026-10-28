@@ -2515,9 +2515,9 @@
    "kind": "대외활동",
    "attachments": [],
    "deadlineHint": null,
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "봉사",
-   "excerptsAt": "2026-10-24",
+   "excerptsAt": "2026-10-28",
    "school": "한국외국어대학교",
    "campus": "",
    "foundAt": "2026-10-24"
@@ -2528,9 +2528,9 @@
    "kind": "대외활동",
    "attachments": [],
    "deadlineHint": null,
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-24",
+   "excerptsAt": "2026-10-28",
    "school": "한국외국어대학교",
    "campus": "",
    "foundAt": "2026-10-24",
@@ -2636,7 +2636,7 @@
    "excerpts": [
     {
      "label": "모집기간",
-     "text": "’26. 10. 15.(목) ~ ’26. 10. 28.(수) , 14일 간 (10. 29. 선발 예정)"
+     "text": "'26. 10. 15.(목) ~ '26. 10. 28.(수) , 14일 간 (10. 29. 선발 예정)"
     },
     {
      "label": "모집인원",
@@ -2644,16 +2644,17 @@
     }
    ],
    "eligibilityLines": [
-    "다자녀 국가장학금",
-    "다문화·탈북학생 멘토링",
-    "신입생/재학생",
-    "사망·심신장애인 학자금대출 채무면제",
-    "사망·심신장애인 학자금대출 채무면제 신청",
-    "사망·심신장애인 학자금대출 채무면제 조회"
+    "대학자체선발기준 및 선발 현황",
+    "서약서/사이버오리엔테이션",
+    "업무스케줄 관리",
+    "교육 이수보고서 관리",
+    "위치기반 동의 관리",
+    "출근부 입력방식 변경",
+    "근로중지 사전신고(해외여행 등)"
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "해외·교류",
-   "excerptsAt": "2026-10-23",
+   "excerptsAt": "2026-10-28",
    "school": "",
    "campus": "",
    "host": "한국장학재단 공지",
@@ -2669,9 +2670,9 @@
    "eligibilityLines": [
     "□ 지급대상자 : 2026. 11. 10.(화)까지 현장실습 지원금을 최종신청한 현장실습생 중 지원금 지원 적격에 대한 내부심사를 통과한 자"
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "인턴·일경험",
-   "excerptsAt": "2026-10-23",
+   "excerptsAt": "2026-10-28",
    "school": "",
    "campus": "",
    "host": "한국장학재단 공지",
@@ -2710,9 +2711,9 @@
    "noticeLines": [
     "2026년 2학기 국가근로장학금 추가 신청기간 운영 안내"
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "봉사",
-   "excerptsAt": "2026-10-23",
+   "excerptsAt": "2026-10-28",
    "school": "",
    "campus": "",
    "host": "한국장학재단 공지",
@@ -2743,8 +2744,8 @@
     "○ 모집대상: PSAT 스터디 OO개 그룹",
     "* 1개 그룹당 5명 내외 구성 예정"
    ],
-   "detailsV": 5,
-   "excerptsAt": "2026-10-23",
+   "detailsV": 6,
+   "excerptsAt": "2026-10-28",
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-10-23"
@@ -2786,9 +2787,9 @@
     "· 2026 하계 해외봉사 선발자 우대",
     "지원서 접수 및 일정"
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "봉사",
-   "excerptsAt": "2026-10-23",
+   "excerptsAt": "2026-10-28",
    "school": "동국대학교 WISE캠퍼스",
    "campus": "",
    "foundAt": "2026-10-23"
@@ -2813,9 +2814,9 @@
     "신청기한 : 플로깅 진행 1주전 화요일 9시부터 , (예) 9월15일(화) 신청, 9월8일(화) 오전 9시 선착순 신청",
     "신청방법 : https://forms.gle/amAHvjKmiFjb7gBR7"
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "봉사",
-   "excerptsAt": "2026-10-23",
+   "excerptsAt": "2026-10-28",
    "school": "동국대학교 WISE캠퍼스",
    "campus": "",
    "foundAt": "2026-10-23"
@@ -2835,9 +2836,9 @@
    "noticeLines": [
     "신청방법 : https://forms.gle/66PgLdfQUhEdAkyD6"
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "봉사",
-   "excerptsAt": "2026-10-23",
+   "excerptsAt": "2026-10-28",
    "school": "동국대학교 WISE캠퍼스",
    "campus": "",
    "foundAt": "2026-10-23"
@@ -2866,9 +2867,9 @@
     "신청기한 : 2026.10.19.(월) ~ 21.(수) 17:00 (선착순 마감)",
     "신청방법 : https://forms.gle/MUBJHKLVZZMVXGGk7"
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "봉사",
-   "excerptsAt": "2026-10-23",
+   "excerptsAt": "2026-10-28",
    "school": "동국대학교 WISE캠퍼스",
    "campus": "",
    "foundAt": "2026-10-23"
@@ -2906,8 +2907,8 @@
    "eligibilityLines": [
     "□ 지원대상 : 광운대학교 소속 ( 예비 ) 교원창업팀 및 사업화 추진 중인 교원창업기업"
    ],
-   "detailsV": 5,
-   "excerptsAt": "2026-10-23",
+   "detailsV": 6,
+   "excerptsAt": "2026-10-28",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-23"
@@ -2924,9 +2925,9 @@
      "text": "2026.10.29.(목) 15:00"
     }
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-23",
+   "excerptsAt": "2026-10-28",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-23",
@@ -2944,9 +2945,9 @@
    "kind": "대외활동",
    "attachments": [],
    "deadlineHint": null,
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "봉사",
-   "excerptsAt": "2026-10-23",
+   "excerptsAt": "2026-10-28",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-23",
@@ -2980,9 +2981,9 @@
     "교육 대상: 광운대학교 교원 및 학부·대학원생(휴학생 포함)",
     "준비물: 개인 노트북(대면 실습 진행)"
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-23",
+   "excerptsAt": "2026-10-28",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-23"
@@ -2998,9 +2999,9 @@
     }
    ],
    "deadlineHint": null,
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "해외·교류",
-   "excerptsAt": "2026-10-23",
+   "excerptsAt": "2026-10-28",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-23",
@@ -3017,9 +3018,9 @@
    "kind": "대외활동",
    "attachments": [],
    "deadlineHint": null,
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "해외·교류",
-   "excerptsAt": "2026-10-23",
+   "excerptsAt": "2026-10-28",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-23"
@@ -3038,9 +3039,9 @@
     "o 교육기간 : '26. 12. 21.( 월 ) ~ '27. 3. 2.( 화 )",
     "o 주최 / 주관 : 고용노동부 / 한국전파진흥협회"
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-23",
+   "excerptsAt": "2026-10-28",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-23"
@@ -3066,9 +3067,9 @@
    "eligibilityLines": [
     "❍ 참가대상 확정 : 2026. 11. 18.( 수 ) 개별 연락 예정"
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-23",
+   "excerptsAt": "2026-10-28",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-23"
@@ -3107,9 +3108,9 @@
     "접수기간 : 2026.10.1.( 목 ) ~ 10.31.( 토 )",
     "신청방법 : 온라인 신청서 작성 후 작품 제출 ( 신청 : https://and-ai-contest-2026.vercel.app/ )"
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "IT·소프트웨어",
-   "excerptsAt": "2026-10-23",
+   "excerptsAt": "2026-10-28",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-23"
@@ -3130,11 +3131,17 @@
    ],
    "deadlineHint": null,
    "eligibilityLines": [
-    "○ 공모대상 : 최근 6 년 이내 (2021 학년도부터 ) 방송대 진로심리상담실 프로그램 참여 경험이 있는 재학생"
+    "○ 심사 기준",
+    "프로그램 참여를 통한 학생의 인지적 , 정서적 , 행동적 변화가 구체적으로 드러나 있는가 ?",
+    "변화의 과정과 결과를 뒷받침하는 생생한 사례나 경험이 잘 서술 되었는가 ?",
+    "공모 취지의 부합성",
+    "참여 수기가 프로그램의 효과성과 유용성을 다른 참여자들에게 알리는 데 기여할 수 있는가 ?",
+    "글의 구성과 표현이 명확하고 공모전 형식 ( 분량 , 형식 , 제출 기한 등 ) 에 맞게 기술하여 , 메시지가 효과적으로 전달되는가 ?",
+    "Ⅴ . 선정작 발표 및 시상"
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "글쓰기·논문",
-   "excerptsAt": "2026-10-23",
+   "excerptsAt": "2026-10-28",
    "school": "한국방송통신대학교",
    "campus": "",
    "foundAt": "2026-10-23"
@@ -3356,9 +3363,9 @@
      "text": "2026년 10월 20일(화) 13:00 ~ 17:00 장소: 대덕테크비즈센터 B1 스페이스 S (대전 유성구 대덕대로 593)"
     }
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-24",
+   "excerptsAt": "2026-10-28",
    "school": "",
    "campus": "",
    "host": "창업진흥원 K-Startup",
@@ -3429,8 +3436,8 @@
     "신청대상 : 해양수산 분야 창업생태계 관심자 (스타트업, 예비창업자, 투자자, 유관기관, 학생 및 일반인 등)",
     "참가대상 : 해양수산 분야 창업 및 투자 생태계에 관심 있는 누구나"
    ],
-   "detailsV": 5,
-   "excerptsAt": "2026-10-24",
+   "detailsV": 6,
+   "excerptsAt": "2026-10-28",
    "school": "",
    "campus": "",
    "host": "창업진흥원 K-Startup",
@@ -3458,9 +3465,9 @@
      "text": "2026-10-01 ~ 2026-10-16 16:00"
     }
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-24",
+   "excerptsAt": "2026-10-28",
    "school": "",
    "campus": "",
    "host": "창업진흥원 K-Startup",
@@ -3476,9 +3483,9 @@
    "kind": "대외활동",
    "attachments": [],
    "deadlineHint": null,
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-24",
+   "excerptsAt": "2026-10-28",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-16",
@@ -3509,9 +3516,9 @@
     }
    ],
    "deadlineHint": null,
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "과학·공학",
-   "excerptsAt": "2026-10-24",
+   "excerptsAt": "2026-10-28",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-16",
@@ -3543,8 +3550,8 @@
     }
    ],
    "deadlineHint": null,
-   "detailsV": 5,
-   "excerptsAt": "2026-10-24",
+   "detailsV": 6,
+   "excerptsAt": "2026-10-28",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-16",
@@ -3585,9 +3592,9 @@
    "kind": "공모전",
    "attachments": [],
    "deadlineHint": null,
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "광고·마케팅",
-   "excerptsAt": "2026-10-25",
+   "excerptsAt": "2026-10-28",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
@@ -3626,9 +3633,9 @@
     "- 분야 · 계층 구분 없는 단일 트랙으로 운영",
     "- 팀 규모는 팀장 포함 최대 10 인 이내"
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "과학·공학",
-   "excerptsAt": "2026-10-25",
+   "excerptsAt": "2026-10-28",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
@@ -3640,8 +3647,8 @@
    "kind": "공모전",
    "attachments": [],
    "deadlineHint": null,
-   "detailsV": 5,
-   "excerptsAt": "2026-10-25",
+   "detailsV": 6,
+   "excerptsAt": "2026-10-28",
    "school": "",
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
@@ -3684,9 +3691,9 @@
    "eligibilityLines": [
     "다 . 모집대상 : 20~24 세 청소년"
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "서포터즈·기자단",
-   "excerptsAt": "2026-10-25",
+   "excerptsAt": "2026-10-28",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-15"
@@ -3705,9 +3712,9 @@
    "eligibilityLines": [
     "ㅇ 참가자격 : 대한민국 청년 (19~34 세 ) 누구나"
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "기획·아이디어",
-   "excerptsAt": "2026-10-25",
+   "excerptsAt": "2026-10-28",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-15",
@@ -3728,9 +3735,9 @@
    "kind": "공모전",
    "attachments": [],
    "deadlineHint": null,
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "글쓰기·논문",
-   "excerptsAt": "2026-10-25",
+   "excerptsAt": "2026-10-28",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-15",
@@ -3758,9 +3765,9 @@
      "text": "국립한밭대학교 인문사회융합인재양성사업연구소 , 대전광역시 유성구"
     }
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "IT·소프트웨어",
-   "excerptsAt": "2026-10-25",
+   "excerptsAt": "2026-10-28",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-15",
@@ -3787,9 +3794,9 @@
     "ㅇ 주요 내용 : 3 대 프로그램 기획",
     "정기설명회 프로그램"
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "봉사",
-   "excerptsAt": "2026-10-25",
+   "excerptsAt": "2026-10-28",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-15",
@@ -3818,9 +3825,9 @@
    "eligibilityLines": [
     "ㅇ 신청 대상 : 한국외대 구성원(학생, 교직원 등)"
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-25",
+   "excerptsAt": "2026-10-28",
    "school": "한국외국어대학교",
    "campus": "",
    "foundAt": "2026-10-15",
@@ -3853,16 +3860,15 @@
     }
    ],
    "eligibilityLines": [
-    "[봉사] [RISE 사업단] 제4회 발달장애인 블링블링 볼링대회 자원봉사자 모집 안내(~11월 13일)",
     "[제4회 발달장애인 블링블링볼링대회 자원봉사자 모집 안내]"
    ],
    "noticeLines": [
     "신청기간: 2026년 10월 14일(수) ~ 11월 13일(금)",
     "신청방법: 구글폼 링크 신청(신청링크: https://forms.gle/BF8eDEYpB4dJfnVM7 )"
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "봉사",
-   "excerptsAt": "2026-10-25",
+   "excerptsAt": "2026-10-28",
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-15"
@@ -3970,9 +3976,9 @@
     "ㅇ 1:1 컨설팅 혜택 (11월 중 진행)",
     "교육 참여자 중 희망자에 한해 창업 전문가의 1:1 컨설팅 지원! (1인 / 1회 / 1h, 5명 내외)"
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-25",
+   "excerptsAt": "2026-10-28",
    "school": "",
    "campus": "",
    "host": "울산청년정책플랫폼 U-PAGE",
@@ -4000,9 +4006,9 @@
      "text": "2026-08-31 ~ 2026-10-14 23:59"
     }
    ],
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-25",
+   "excerptsAt": "2026-10-28",
    "school": "",
    "campus": "",
    "host": "창업진흥원 K-Startup",
@@ -4026,9 +4032,9 @@
    "kind": "대외활동",
    "attachments": [],
    "deadlineHint": null,
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "교육·캠프",
-   "excerptsAt": "2026-10-25",
+   "excerptsAt": "2026-10-28",
    "school": "한국외국어대학교",
    "campus": "",
    "foundAt": "2026-10-14",
@@ -4049,9 +4055,9 @@
    ],
    "deadlineHint": null,
    "deadline": "2026-10-28",
-   "detailsV": 5,
+   "detailsV": 6,
    "field": "멘토링",
-   "excerptsAt": "2026-10-25",
+   "excerptsAt": "2026-10-28",
    "school": "한국외국어대학교",
    "campus": "",
    "foundAt": "2026-10-14",

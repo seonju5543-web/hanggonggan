@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-10-28",
- "count": 1494,
+ "count": 1495,
  "items": [
   {
    "title": "(공통)(교외)2026-2 제이씨현장학재단 장학생 모집 안내",
@@ -634,6 +634,17 @@
    "foundAt": "2026-10-28",
    "bodyDeadline": "2026-11-05",
    "bodyDeadlineText": "[발전기금] 서강 나눔의터(여교수회) 장학생 선발 안내(11/5 마감, 학업보조비 100만원)"
+  },
+  {
+   "title": "[교외] 통영시 저소득 대학생 장학금 지원대상자 선발 안내(11/23 마감, 최대 100만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551691?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "신청기간: 2026.11.2.(월)~2026.11.23.(월) 5. 신청방법: 방문 또는 우편 신청 1) 방문: 업무시간(월~금, 09:00~1",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-10-28",
+   "bodyDeadline": "2026-11-23",
+   "bodyDeadlineText": "[교외] 통영시 저소득 대학생 장학금 지원대상자 선발 안내(11/23 마감, 최대 100만원)"
   },
   {
    "title": "2026년도 통영시 저소득 대학생 장학금 지원 대상자 선발 안내",
