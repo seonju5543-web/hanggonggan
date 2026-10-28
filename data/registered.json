@@ -2811,9 +2811,9 @@
     "from": null
    },
    "eligibilityLines": [
-    "성적우수/성적향상 - 고등학생",
+    "우수인재(성적우수, 성적향상) - 고등학생",
     "특기적성 - 초·중·고·대학생",
-    "모범 - 초·중고등학생, 대학생",
+    "모범 - 초·중·고등학생, 대학생",
     "공익발전기여 - 중·고·대학생",
     "장애인 모범 - 초·중·고·대학생",
     "장애인 특기적성 - 초·중·고·대학생",
@@ -9132,7 +9132,8 @@
     "전화 : 02-6490-6114 / 서울시통합문의 : 02-120"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
-   "documentsFrom": "로봇 2026-10-17 · 원문 「제출서류」 절"
+   "documentsFrom": "로봇 2026-10-17 · 원문 「제출서류」 절",
+   "aiTries": 2
   },
   {
    "id": "auto-otice06doarticleno140261",
@@ -9410,9 +9411,11 @@
    "sourceUrl": "https://www.sejong.ac.kr/kor/intro/notice7.do?mode=view&articleNo=894170&article.offset=0&articleLimit=10",
    "sourceKind": "auto",
    "eligibilityLines": [
-    "④동점시 우선선발 기준",
-    "- 재수강 또는 학기재수강 이력이 없는 자 > 2026-1학기 이전 2개학기 평점 평균이 높은 순 > 총 이수학점 대비, 전공 이수학점 비율이 높은 자 > 총 이수학점이 높은 자",
-    "※ 학기 : 휴학학기, 계절학기, 해외교환학기 등 제외"
+    "■ 대 상 자 : 재학중 지속적으로 우수한 성적을 취득한 3학년 이상의 정규학기 재학생",
+    "※ 학기 : 휴학학기, 계절학기, 해외교환학기 등 제외",
+    "①2026-1학기 평점 4.5점 취득 및 18학점 이상 취득자",
+    "②2026-1학기 이전 2개학기 각 평점 4.3점 이상인 자",
+    "③2026-1학기 이전 2개학기 평점 평균이 4.4점 이상인 자"
    ],
    "eligibilityPriority": [
     "- 재수강 또는 학기재수강 이력이 없는 자 > 2026-1학기 이전 2개학기 평점 평균이 높은 순 > 총 이수학점 대비, 전공 이수학점 비율이 높은 자 > 총 이수학점이 높은 자"
@@ -9429,7 +9432,33 @@
     "max": 2000000,
     "raw": "■ 장학금액 : 수업료 전액 및 학업보조비 200만원 (단, 타장학금 일부 수혜자는 등록금범위내 차액 지급)"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "eligibilityPrev": {
+    "lines": [
+     "④동점시 우선선발 기준",
+     "- 재수강 또는 학기재수강 이력이 없는 자 > 2026-1학기 이전 2개학기 평점 평균이 높은 순 > 총 이수학점 대비, 전공 이수학점 비율이 높은 자 > 총 이수학점이 높은 자",
+     "※ 학기 : 휴학학기, 계절학기, 해외교환학기 등 제외"
+    ],
+    "excludes": null,
+    "priority": [
+     "- 재수강 또는 학기재수강 이력이 없는 자 > 2026-1학기 이전 2개학기 평점 평균이 높은 순 > 총 이수학점 대비, 전공 이수학점 비율이 높은 자 > 총 이수학점이 높은 자"
+    ],
+    "from": null
+   },
+   "eligibilityStruct": {
+    "common": [
+     "■ 대 상 자 : 재학중 지속적으로 우수한 성적을 취득한 3학년 이상의 정규학기 재학생",
+     "※ 학기 : 휴학학기, 계절학기, 해외교환학기 등 제외"
+    ],
+    "either": [],
+    "grade": [
+     "①2026-1학기 평점 4.5점 취득 및 18학점 이상 취득자",
+     "②2026-1학기 이전 2개학기 각 평점 4.3점 이상인 자",
+     "③2026-1학기 이전 2개학기 평점 평균이 4.4점 이상인 자"
+    ]
+   },
+   "eligibilityFrom": "AI(원문 줄 그대로)",
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-pnoticedoarticleno367225",
@@ -9656,8 +9685,8 @@
    "sourceKind": "auto",
    "deadlineFrom": "공고 원문",
    "eligibilityLines": [
-    "가 . 지원자격 : 유럽언어기준 B1 이상의 독일어 능력을 보유한 학사 및 석사과정 학생",
-    "※ 전공불문 , 장학금 수혜 시점에 학사 2 학년 이상을 마쳐야 하며 대학에 등록되어 있어야 함"
+    "지원자격: 학사 및 석사과정 학생 (전공 불문, 장학금 수혜 시점에 학사 2 학년 이상을 마쳐야 하며 대학에 등록되어 있어야 함)",
+    "B1 이상의 독일어 성적"
    ],
    "excerpts": [
     "문의처 : 주한 독일고등교육진흥원 [( 전화 ) 02-324-0655, ( 이메일 ) info@daad-korea.org]"
@@ -9670,7 +9699,18 @@
      "id": "notice:https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?articleno=367228"
     }
    ],
-   "scopeFrom": "같은 사업이 이화여자대학교 게시판에도 올라옴(자동) — 이화여자대학교 게시판 https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367228&article.offset=0&articleLimit=10"
+   "scopeFrom": "같은 사업이 이화여자대학교 게시판에도 올라옴(자동) — 이화여자대학교 게시판 https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367228&article.offset=0&articleLimit=10",
+   "eligibilityPrev": {
+    "lines": [
+     "가 . 지원자격 : 유럽언어기준 B1 이상의 독일어 능력을 보유한 학사 및 석사과정 학생",
+     "※ 전공불문 , 장학금 수혜 시점에 학사 2 학년 이상을 마쳐야 하며 대학에 등록되어 있어야 함"
+    ],
+    "excludes": null,
+    "priority": null,
+    "from": null
+   },
+   "eligibilityFrom": "AI(공고문 PDF)",
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-notiphpcodes1301seq10610",
@@ -9842,7 +9882,8 @@
    "sourceKind": "auto",
    "applyEmail": "janghak@seoultech.ac.kr",
    "applyEmailSource": "본인 명의의 전자항공권, 탑승권 등 증빙내역을 첨부하여 메일 발송( janghak@seoultech.ac.kr ) 후 반드시 전화(02-970-6054)",
-   "applyEmailFrom": "공고 원문"
+   "applyEmailFrom": "공고 원문",
+   "aiTries": 2
   },
   {
    "id": "auto-bswj104944259artclviewdo",
@@ -10126,7 +10167,8 @@
    "auto": true,
    "attachments": [],
    "sourceUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158449&noCat=501",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "aiTries": 1
   },
   {
    "id": "auto-q1brddate20260930brdseq1",
@@ -10468,7 +10510,9 @@
    "sourceUrl": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515592&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
    "sourceKind": "auto",
    "eligibilityLines": [
-    "3. 선발기준: 학업성적, 취업·창업준비계획, 유관사업 참여, 현장실습 교과목 이수 여부 및 저소득층 우대 가산점을 포함한 총점 고득점자 순으로 선발"
+    "- 대한민국 국적자로 학부 3학년 이상 재학생",
+    "- 희망사다리 장학금 신청 완료, 의무교육(온라인사전교육) 이수 및 진단평가 완료",
+    "- 직전학기 12학점 이상 이수, 백분위 점수 70점 이상"
    ],
    "amountSpec": {
     "kind": "fixed",
@@ -10478,7 +10522,30 @@
     "max": 2000000,
     "raw": "4. 지원금액: 학기당 등록금 전액 및 취·창업지원금 200만원 목록 페이지 관리자 | 관리자메일 주요사이트 대학원 대학·학부 학생시설"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "eligibilityPrev": {
+    "lines": [
+     "3. 선발기준: 학업성적, 취업·창업준비계획, 유관사업 참여, 현장실습 교과목 이수 여부 및 저소득층 우대 가산점을 포함한 총점 고득점자 순으로 선발"
+    ],
+    "excludes": null,
+    "priority": null,
+    "from": null
+   },
+   "eligibilityStruct": {
+    "common": [
+     "- 대한민국 국적자로 학부 3학년 이상 재학생",
+     "- 희망사다리 장학금 신청 완료, 의무교육(온라인사전교육) 이수 및 진단평가 완료"
+    ],
+    "either": [],
+    "grade": [
+     "- 직전학기 12학점 이상 이수, 백분위 점수 70점 이상"
+    ]
+   },
+   "eligibilityPriority": [
+    "3. 선발기준: 학업성적, 취업·창업준비계획, 유관사업 참여, 현장실습 교과목 이수 여부 및 저소득층 우대 가산점을 포함한 총점 고득점자 순으로 선발"
+   ],
+   "eligibilityFrom": "AI(원문 줄 그대로)",
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-ent2431268564artclviewdo",
@@ -11717,15 +11784,41 @@
    ],
    "scopeFrom": "같은 사업이 서강대학교 게시판에도 올라옴(자동) — 서강대학교 게시판 https://www.sogang.ac.kr/ko/detail/550981?bbsConfigFk=141&namepage=ScholarshipNotice",
    "eligibilityLines": [
-    "： - 유상교육대상자: 성적무관",
-    "대 학 생 |직전학기 성적 평균 2.0이상",
-    "○ 학비(수업료)를 면제 받는 경우",
-    "○ 고등학생 : 연간 120만원 이상 사내 학자금 및 타 기관 장학금을 지원받는 경우",
-    "o 대 학 생 : 1학기 등록금 범위를 조과하여 사내 학자금 및 타 기관 장학금을 지원 받는 경우",
-    "○ 선원법(제3조) 적용 제외 선박"
+    "선원법 제3조 적용선박에 승선 및 하선한 선원 및 가족",
+    "선원 가족 범위 : ① 배우자, ②부모, ③자녀, ④선원이 손자·손녀를 직접 부양할 경우, ⑤선원이 세대주이면서 형제 중 가족의 생계를 책임지고 있는 경우 (단 양부모가 없을 시)",
+    "총 승무경력 3년 이상으로 하선한 후 1년 이내인 선원",
+    "연근해어선 부원은 총 승무경력 1년 이상",
+    "1학기 : 2024년 선원 월평균 임금 이하 / 2학기 : 2025년 선원 월 평균 임금 이하",
+    "단, 선원가족 중 2인 이상 고등학생 또는 대학교에 재학 중인 경우 기준금액에 10% 가산 적용",
+    "대학생 : 직전 학기 성적이 평점 2.0 이상 (신입생 성적무관)",
+    "고등학생 : 성적무관"
    ],
-   "eligibilityFrom": "공고문 첨부(OCR)",
-   "documentsFrom": "공고문 첨부(OCR)"
+   "eligibilityFrom": "AI(공고 포스터 그림)",
+   "documentsFrom": "공고문 첨부(OCR)",
+   "eligibilityPrev": {
+    "lines": [
+     "： - 유상교육대상자: 성적무관",
+     "대 학 생 |직전학기 성적 평균 2.0이상",
+     "○ 학비(수업료)를 면제 받는 경우",
+     "○ 고등학생 : 연간 120만원 이상 사내 학자금 및 타 기관 장학금을 지원받는 경우",
+     "o 대 학 생 : 1학기 등록금 범위를 조과하여 사내 학자금 및 타 기관 장학금을 지원 받는 경우",
+     "○ 선원법(제3조) 적용 제외 선박"
+    ],
+    "excludes": null,
+    "priority": null,
+    "from": "공고문 첨부(OCR)"
+   },
+   "eligibilityExcludes": [
+    "선박소유자",
+    "관공선 선원",
+    "학비(수업료)를 면제 받는 경우"
+   ],
+   "amountLines": [
+    "고등학생: 지급금액 120만원",
+    "대학생: 지급금액 본인 부담액 기준 최대 350만원*",
+    "*선발 우선순위 1~6순위(장해 및 순직선원, 기초수급자 등)의 학생은 상한액 없이 실비 전액 지원"
+   ],
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-ghaknoticedetail26766521",
@@ -12048,15 +12141,31 @@
    "applyEmailSource": "가. 방문제출: 장애학생지원센터(바우어관 1220호), 이메일 제출: 72014@kmu.ac.kr",
    "applyEmailFrom": "공고문 첨부(OCR)",
    "openDate": "2026-09-07",
-   "eligibilityFrom": "공고문 첨부(OCR)",
+   "eligibilityFrom": "AI(공고 포스터 그림)",
    "eligibilityLines": [
-    "1. 선발 대상",
-    "나. 2026학년도 2학기 기준 8학기(건축학과 10학기, 약학부(제약학과, 약학과) 12학기)",
-    "이내 재학생",
-    "다. 직전학기에 과목실격([학점) 없이 평균평점 2.0/4.5 이상 취득한 자",
-    "※ 신편입생은 첫 학기에 한하여 성적 기준 미적용"
+    "2026학년도 2학기 기준 8학기(건축학과 10학기, 약학부(제약학과, 약학과) 12학기) 이내 재학생",
+    "직전학기에 과목실격(F학점) 없이 평균평점 2.0/4.5 이상 취득한 자",
+    "※ 신·편입생은 첫 학기에 한하여 성적 기준 미적용"
    ],
-   "documentsFrom": "공고문 첨부(OCR)"
+   "documentsFrom": "공고문 첨부(OCR)",
+   "eligibilityPrev": {
+    "lines": [
+     "1. 선발 대상",
+     "나. 2026학년도 2학기 기준 8학기(건축학과 10학기, 약학부(제약학과, 약학과) 12학기)",
+     "이내 재학생",
+     "다. 직전학기에 과목실격([학점) 없이 평균평점 2.0/4.5 이상 취득한 자",
+     "※ 신편입생은 첫 학기에 한하여 성적 기준 미적용"
+    ],
+    "excludes": null,
+    "priority": null,
+    "from": "공고문 첨부(OCR)"
+   },
+   "amountLines": [
+    "심한장애[사랑나눔장학금(A)] 1,000,000원",
+    "심하지 않은 장애[사랑나눔장학금(B)] 500,000원",
+    "장학금 지원 성격(학업장려비) 등록금 범위 외"
+   ],
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-srchenable1srchvotetype1-0rtcwpw",
@@ -12665,16 +12774,31 @@
    "applyEmailSource": "® 장학지원팀 이메일 : janghak@kgu.ac.kr= 제출",
    "applyEmailFrom": "공고문 첨부(OCR)",
    "openDate": "2026-10-26",
-   "eligibilityFrom": "공고문 첨부(OCR)",
+   "eligibilityFrom": "AI(공고 포스터 그림)",
    "eligibilityLines": [
-    "(2) 신청대상 및 지급방법",
-    "차수 대상자 장학금명 지급방법",
-    "○ 8H 환불",
-    "2차 재학생 6 가족 (학생지급)",
-    "○ 문화예술",
-    "※ 한국장학재단, 공무원연금공단 대출자는 대출 상환 우선"
+    "신청대상: 재학생",
+    "신청자와 가족 모두 해당학기 등록을 완료해야만 신청가능",
+    "신입학 한 학기에는 가족 중 재학생이 신청해야 함",
+    "가족이 대학원생일 경우 학부생이 신청하면 수혜 가능",
+    "수상한 날짜가 해당하는 학기부터 다음 학기까지 가능 (휴학한 학기는 제외)",
+    "재학 중 최대 2회 수혜 가능",
+    "장애인 등급 관련증명서류 (장애인증명서 또는 복지카드 등)"
    ],
-   "documentsFrom": "공고문 첨부(OCR)"
+   "documentsFrom": "공고문 첨부(OCR)",
+   "eligibilityPrev": {
+    "lines": [
+     "(2) 신청대상 및 지급방법",
+     "차수 대상자 장학금명 지급방법",
+     "○ 8H 환불",
+     "2차 재학생 6 가족 (학생지급)",
+     "○ 문화예술",
+     "※ 한국장학재단, 공무원연금공단 대출자는 대출 상환 우선"
+    ],
+    "excludes": null,
+    "priority": null,
+    "from": "공고문 첨부(OCR)"
+   },
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-hkrwdsfpnos1073sfpnos888-123pi0s",
@@ -12849,7 +12973,8 @@
     }
    ],
    "sourceUrl": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2499&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "aiTries": 2
   },
   {
    "id": "auto-amepagescholarshipnotice-07qwoc3",
@@ -13052,7 +13177,8 @@
     }
    ],
    "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=896418&qidx=5233&cate=0&allboard=true&nowpage=1",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "aiTries": 2
   },
   {
    "id": "auto-0713no2515690sitedvscdkr",
@@ -13598,7 +13724,8 @@
    "auto": true,
    "attachments": [],
    "sourceUrl": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/273624/artclView.do",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "aiTries": 1
   },
   {
    "id": "auto-otice06doarticleno140538",
@@ -13969,7 +14096,8 @@
    "excerpts": [
     "국가근로 3차 신청기간 : 2026.10.21.(수) 09:00 ~ 10.29.(목) 18:00 까지"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "aiTries": 2
   },
   {
    "id": "auto-15nttno170638searchctgry",
@@ -14008,7 +14136,8 @@
    ],
    "sourceUrl": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=815&bbsNo=8&nttNo=170638&pageUnit=10&searchCtgry=%ed%95%99%ec%82%ac%2f%ec%9e%a5%ed%95%99&searchCnd=all&pageIndex=1",
    "sourceKind": "auto",
-   "openDate": "2026-10-21"
+   "openDate": "2026-10-21",
+   "aiTries": 2
   },
   {
    "id": "auto-qlmjzmaw5kv29yzcuzrcuyng-0icq1ql",
@@ -14128,7 +14257,8 @@
     "당해학기 성적 ≥(4.5-직전학기 성적)×30%+직전학기 성적",
     "예시: 직전 3.0→ 당해 3.45↑"
    ],
-   "eligibilityFrom": "공고문 첨부(OCR)"
+   "eligibilityFrom": "공고문 첨부(OCR)",
+   "aiTries": 1
   },
   {
    "id": "auto-ent2431269128artclviewdo",
@@ -15104,7 +15234,8 @@
      "id": "notice:https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?articleno=367592"
     }
    ],
-   "scopeFrom": "같은 사업이 성균관대학교 게시판에도 올라옴(자동) — 성균관대학교 게시판 https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140652&article.offset=0&articleLimit=10"
+   "scopeFrom": "같은 사업이 성균관대학교 게시판에도 올라옴(자동) — 성균관대학교 게시판 https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140652&article.offset=0&articleLimit=10",
+   "aiTries": 1
   },
   {
    "id": "auto-bbssc58944387artclviewdo",
@@ -15419,7 +15550,23 @@
     }
    ],
    "sourceUrl": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520867",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityPrev": {
+    "lines": null,
+    "excludes": null,
+    "priority": null,
+    "from": null
+   },
+   "eligibilityLines": [
+    "국내 4년제 대학생 2~3학년 20명 내외"
+   ],
+   "amountLines": [
+    "1년간의 프로그램 교육비 전액",
+    "800만 원 장학금",
+    "Design Thinking Project 최종 우수팀 상금(200만 원)"
+   ],
+   "eligibilityFrom": "AI(공고 포스터 그림)",
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-oarticleno159308nocat501",
@@ -15723,7 +15870,8 @@
     "max": 4000000,
     "raw": "다. 장학금 지급 금액: 연간 400만원(학기별 200만원 분할지급 예정) *2026년도 2학기 및 2027년 1학기를 지급기한으로 함"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "aiTries": 1
   },
   {
    "id": "auto-ent2431269433artclviewdo",
@@ -15763,12 +15911,35 @@
    "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/269433/artclView.do",
    "sourceKind": "auto",
    "eligibilityLines": [
-    "지원대상 : 지원금액 : 국민기초생활수급자 학생",
-    "본인부담 등록금 X 50%(학기당 100만원 한도)",
+    "국민기초생활수급자 학생",
     "장애인복지법에 따른 장애인 학생",
-    "한부모가족지원법에 따른 법정 한부모가족 학생"
+    "한부모가족지원법에 따른 법정 한부모가족 학생",
+    "3자녀 이상 가정의 모든 학생, 차상위계층 학생",
+    "한국장학재단 통지 기준 소득분위 1~6구간 가정 학생",
+    "국내 대학 재학생(한국호텔관광실용전문학교 포함)",
+    "29세 이하 대학생(1997년 1월 1일 이후 출생자)",
+    "공고일 기준 학생과 가족 1인 이상이 안산시에 계속 3년 이상 또는 합산 10년 이상 주민등록을 두고 거주"
    ],
-   "eligibilityFrom": "공고문 첨부(OCR)"
+   "eligibilityFrom": "AI(공고 포스터 그림)",
+   "eligibilityPrev": {
+    "lines": [
+     "지원대상 : 지원금액 : 국민기초생활수급자 학생",
+     "본인부담 등록금 X 50%(학기당 100만원 한도)",
+     "장애인복지법에 따른 장애인 학생",
+     "한부모가족지원법에 따른 법정 한부모가족 학생"
+    ],
+    "excludes": null,
+    "priority": null,
+    "from": "공고문 첨부(OCR)"
+   },
+   "eligibilityExcludes": [
+    "외국대학 및 대학원, 학점은행제 교육훈련기관 제외",
+    "2026년 2학기 국가장학금 미신청 시 안산시 대학생 본인부담 등록금 반값지원 신청불가"
+   ],
+   "amountLines": [
+    "본인부담 등록금 X 50%(학기당 100만원 한도)"
+   ],
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-tegory1moddocumentuid405",
@@ -15953,7 +16124,33 @@
    "auto": true,
    "attachments": [],
    "sourceUrl": "https://www.yonsei.ac.kr/bbs/sc/58/944448/artclView.do",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityPrev": {
+    "lines": null,
+    "excludes": null,
+    "priority": null,
+    "from": null
+   },
+   "eligibilityLines": [
+    "1. 학업성적(백분위): 20점"
+   ],
+   "eligibilityStruct": {
+    "common": [],
+    "either": [],
+    "grade": [
+     "1. 학업성적(백분위): 20점"
+    ]
+   },
+   "eligibilityPriority": [
+    "총점 105점(100점+저소득층우대 가산점 5점)",
+    "- 단, 신·편입생의 경우, 학생 창업 의지 점수를 100점 만점으로 환산하여 적용하며 재입학생의 경우 제적 전 최종 성적을 기준으로 평가",
+    "2. 창업 준비계획: 20점",
+    "3. 창업 진행도: 30점",
+    "4. 유관 사업 참여: 15점",
+    "5. 창업관련 강의 이수: 15점"
+   ],
+   "eligibilityFrom": "AI(원문 줄 그대로)",
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-bswj104944451artclviewdo",
@@ -16170,7 +16367,8 @@
      "id": "notice:https://www.gachon.ac.kr/bbs/kor/478/126358/artclView.do"
     }
    ],
-   "scopeFrom": "같은 사업이 가천대학교 게시판에도 올라옴(자동) — 가천대학교 게시판 https://www.gachon.ac.kr/bbs/kor/478/126358/artclView.do"
+   "scopeFrom": "같은 사업이 가천대학교 게시판에도 올라옴(자동) — 가천대학교 게시판 https://www.gachon.ac.kr/bbs/kor/478/126358/artclView.do",
+   "aiTries": 2
   },
   {
    "id": "auto-amepagescholarshipnotice-1m989gd",
@@ -16208,7 +16406,8 @@
     }
    ],
    "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551657?bbsConfigFk=141&namepage=ScholarshipNotice",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "aiTries": 1
   },
   {
    "id": "auto-amepagescholarshipnotice-0zk0x95",
@@ -17004,12 +17203,35 @@
    "sourceUrl": "https://www.konkuk.ac.kr/bbs/konkuk/235/1210342/artclView.do",
    "sourceKind": "auto",
    "eligibilityLines": [
-    "지원대상 : 지원금액 : 본인부담 등록금 X 50%(학기당 100만원 한도)",
     "국민기초생활수급자 학생",
     "장애인복지법에 따른 장애인 학생",
-    "한부모가족지원법에 따른 법정 한부모가족 학생"
+    "한부모가족지원법에 따른 법정 한부모가족 학생",
+    "3자녀 이상 가정의 모든 학생, 차상위계층 학생",
+    "한국장학재단 통지 기준 소득분위 1~6구간 가정 학생",
+    "국내 대학 재학생(한국호텔관광실용전문학교 포함)",
+    "29세 이하 대학생(1997년 1월 1일 이후 출생자)",
+    "공고일 기준 학생과 가족 1인 이상이 안산시에 계속 3년 이상 또는 합산 10년 이상 주민등록을 두고 거주"
    ],
-   "eligibilityFrom": "공고문 첨부(OCR)"
+   "eligibilityFrom": "AI(공고 포스터 그림)",
+   "eligibilityPrev": {
+    "lines": [
+     "지원대상 : 지원금액 : 본인부담 등록금 X 50%(학기당 100만원 한도)",
+     "국민기초생활수급자 학생",
+     "장애인복지법에 따른 장애인 학생",
+     "한부모가족지원법에 따른 법정 한부모가족 학생"
+    ],
+    "excludes": null,
+    "priority": null,
+    "from": "공고문 첨부(OCR)"
+   },
+   "eligibilityExcludes": [
+    "외국대학 및 대학원, 학점은행제 교육훈련기관 제외",
+    "2026년 2학기 국가장학금 미신청 시 안산시 대학생 본인부담 등록금 반값지원 신청불가"
+   ],
+   "amountLines": [
+    "본인부담 등록금 X 50%(학기당 100만원 한도)"
+   ],
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-4srsearchkeyarticletitle",
@@ -17167,7 +17389,8 @@
     "max": 4000000,
     "raw": "3. 장학금 지급 금액 : 연간 400만원(학기별 200만원 분할지급 예정) [장학금 지급기간은 2026년도 2학기 및 2027년도 1학기(1년)로 함]"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "aiTries": 2
   },
   {
    "id": "auto-skor478126350artclviewdo",
@@ -17600,7 +17823,8 @@
     "∘ 지원자격: 장학금별 상이",
     "∘ 선발장학생 의무사항: 감사편지 제출 필수",
     "포탈정보시스템 E-벗 사이버캠퍼스 THE BEST교육지원 중앙도서관 인재개발원 기숙사 국제교류 발전기금 교원 채용 직원 채용 언어교육원 이화동창 학부모 포탈 이화에 바란다 인터넷 증명발급"
-   ]
+   ],
+   "aiTries": 1
   },
   {
    "id": "auto-pnoticedoarticleno367476",
@@ -17712,7 +17936,8 @@
    "excerpts": [
     "2026년 2학기 선원가족 장학생 선발안내(신청기한 연장, ~202610.30.(금))"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "aiTries": 1
   },
   {
    "id": "auto-ghaknoticedetail26766688",
@@ -18387,7 +18612,8 @@
     "신청 방법: 한국장학재단 홈페이지(http://www.kosaf.go.kr) 및 모바일 앱을 이용하여 신청",
     "문의처 : 한국장학재단 국가근로장학금 관련 문의 (☎1599-2290)"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "aiTries": 1
   },
   {
    "id": "auto-751bnum5233cate0qidx5233",
@@ -18480,7 +18706,8 @@
     }
    ],
    "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=5233&bidx=894811&qidx=5233&cate=0&allboard=true&nowpage=3",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "aiTries": 2
   },
   {
    "id": "auto-sknou51819378artclviewdo",
@@ -18753,8 +18980,11 @@
    "applyPortalFrom": "공고 원문",
    "openDate": "2026-10-30",
    "eligibilityLines": [
-    "3. 국가근로장학생 선발기준(안).pdf",
-    "[장학금 접수] 2026학년도 교내특별 Pride CSU 백학 장학생 선발 공고"
+    "2. 지원자격 : 아래 두 가지 조건을 모두 충족하는 학부 재학생",
+    "가 . 2026-1 학기 한국장학재단 국가근로장학금 신청자",
+    "※ 2026-1 학기 기준 휴학생 , 정규학기 초과자 , 학사학위 취득유예생 , 제적생 등은 참여 불가",
+    "※ 장애대학생 봉사유형 ( 도우미 ), 대학생 청소년교육지원장학생과 중복하여 참여 불가",
+    "나. 학자금지원구간 9 구간 이내이며, 직전학기 성적기준 평점평균이 1.88( 백분위 70 점 ) 이상인 재학생"
    ],
    "excerpts": [
     "장학금액 : 월 실제 근로시간 * 시급(10,320원)",
@@ -18769,7 +18999,34 @@
     "max": 0,
     "raw": "다 . 장학금액 : 월 실제 근로시간 * 시급(10,320원)"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "eligibilityPrev": {
+    "lines": [
+     "3. 국가근로장학생 선발기준(안).pdf",
+     "[장학금 접수] 2026학년도 교내특별 Pride CSU 백학 장학생 선발 공고"
+    ],
+    "excludes": null,
+    "priority": null,
+    "from": null
+   },
+   "eligibilityStruct": {
+    "common": [
+     "2. 지원자격 : 아래 두 가지 조건을 모두 충족하는 학부 재학생",
+     "가 . 2026-1 학기 한국장학재단 국가근로장학금 신청자",
+     "※ 2026-1 학기 기준 휴학생 , 정규학기 초과자 , 학사학위 취득유예생 , 제적생 등은 참여 불가",
+     "※ 장애대학생 봉사유형 ( 도우미 ), 대학생 청소년교육지원장학생과 중복하여 참여 불가"
+    ],
+    "either": [],
+    "grade": [
+     "나. 학자금지원구간 9 구간 이내이며, 직전학기 성적기준 평점평균이 1.88( 백분위 70 점 ) 이상인 재학생"
+    ]
+   },
+   "eligibilityExcludes": [
+    "※ 2026-1 학기 기준 휴학생 , 정규학기 초과자 , 학사학위 취득유예생 , 제적생 등은 참여 불가",
+    "※ 장애대학생 봉사유형 ( 도우미 ), 대학생 청소년교육지원장학생과 중복하여 참여 불가"
+   ],
+   "eligibilityFrom": "AI(원문 줄 그대로)",
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-scho332282326artclviewdo",
@@ -19097,11 +19354,28 @@
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323410",
    "sourceKind": "auto",
    "eligibilityLines": [
-    "3.신청대상",
-    "공과대학학부생2~4명으로구성된팀",
-    "팀원 중 최근2년이내현장실습 이수 학생1명이상 필수포함"
+    "공과대학 학부생 2~4명으로 구성된 팀",
+    "팀원 중 최근 2년 이내 현장실습 이수 학생 1명 이상 필수 포함",
+    "2026학년도 2학기 정규학기 학부 재학생이며, 직전학기 12학점 이상 이수, 평균평점 2.0 이상",
+    "팀으로 신청하더라도 장학금 지급은 위 자격을 충족한 학생을 대상으로 합니다."
    ],
-   "eligibilityFrom": "공고문 첨부(OCR)"
+   "eligibilityFrom": "AI(공고 포스터 그림)",
+   "eligibilityPrev": {
+    "lines": [
+     "3.신청대상",
+     "공과대학학부생2~4명으로구성된팀",
+     "팀원 중 최근2년이내현장실습 이수 학생1명이상 필수포함"
+    ],
+    "excludes": null,
+    "priority": null,
+    "from": "공고문 첨부(OCR)"
+   },
+   "amountLines": [
+    "대상 1팀 1인당 장학금 500,000원 팀당 최대 인원 4명",
+    "최우수상 2팀 1인당 장학금 400,000원 팀당 최대 인원 4명",
+    "우수상 4팀 1인당 장학금 300,000원 팀당 최대 인원 4명"
+   ],
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-bswj104944472artclviewdo",
@@ -19513,7 +19787,28 @@
     "scope": "external",
     "raw": "4. ( 장학금액) 1인당 1,000,000 원 ※ 타 장학금과 중복 수혜 가능"
    },
-   "exclusivityFrom": "공고 원문"
+   "exclusivityFrom": "공고 원문",
+   "eligibilityPrev": {
+    "lines": null,
+    "excludes": null,
+    "priority": null,
+    "from": null
+   },
+   "eligibilityLines": [
+    "2. ( 선발대상 ) 창의적 사고와 도전정신으로 탁월한 성취업적과 바람직한 인성으로 우리 대학의 명예와 위상을 높 인 자",
+    "3. ( 성적기준 ) 재학생 중 직전 학기 평점평균 1.6 이상"
+   ],
+   "eligibilityStruct": {
+    "common": [
+     "2. ( 선발대상 ) 창의적 사고와 도전정신으로 탁월한 성취업적과 바람직한 인성으로 우리 대학의 명예와 위상을 높 인 자"
+    ],
+    "either": [],
+    "grade": [
+     "3. ( 성적기준 ) 재학생 중 직전 학기 평점평균 1.6 이상"
+    ]
+   },
+   "eligibilityFrom": "AI(원문 줄 그대로)",
+   "eligibilityReviewed": false
   },
   {
    "id": "auto-rykeywordpaged1slug20262-0mvhb0o",
@@ -19568,7 +19863,8 @@
     "및 결과 발표",
     "세부안내자료참조",
     "-2026-2학기 한국장학 -소득분위상관없이"
-   ]
+   ],
+   "aiTries": 1
   },
   {
    "id": "auto-enoticedoarticleno769738",
@@ -19676,7 +19972,8 @@
    "auto": true,
    "attachments": [],
    "sourceUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159660&noCat=501",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "aiTries": 1
   },
   {
    "id": "auto-dmodeviewduid53561tpage1",
