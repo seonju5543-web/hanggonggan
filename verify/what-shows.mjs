@@ -132,7 +132,10 @@ vm.runInContext([
     'attachmentLinkHtml', 'sourceLinkHtml', 'sourceNoteHtml', 'amountSourceLinkHtml', 'appLogLinkHtml', 'noticeCardHtml', 'activityLinkHtml'].map(takeFn),
   /* 층2 바꾸기가 읽는 앱 상태 — 이 도구는 저장·신청 내역을 모른다(없음) */
   'var kosafList = []; var kosafUpdatedAt = ""; var state = { applications: [] }; function isSaved() { return false; }',
+  /* 「공고 안내」 블록(NS_LABELS … noticeSummaryHtml) — 활동 시트의 셋째 칸을 앱 함수 그대로 그린다(test-collector 「공고 카드 품질」과 같은 자르기) */
+  appSrc.slice(appSrc.indexOf('const NS_LABELS = ['), appSrc.indexOf('\nfunction sourceNoteHtml(')),
 ].join('\n\n'), linkCtx, { filename: 'app.js(링크 자리)' });
+linkCtx.joinSpacedSyllables = ME.joinSpacedSyllables;   // noticeSummaryHtml 의 tidyChars 가 쓴다(match-engine)
 const linkFn = (n) => vm.runInContext(n, linkCtx);
 const LEDGER = new URL('../data/link-check.json', import.meta.url);
 const ledger = fs.existsSync(LEDGER) ? JSON.parse(fs.readFileSync(LEDGER, 'utf8')) : null;
@@ -170,8 +173,14 @@ function linkLines(it, where) {
     for (const l of exl) out.push(`       ✗ ${String(l).slice(0, 84)}`);
     out.push(`   ─ 모집 안내 (${ex.length}줄${ex.length ? '' : ' · 칸 접힘'})`);
     for (const x of ex) out.push(`       · ${x.label} · ${String(x.text).slice(0, 70)}`);
-    out.push(`   ─ 공고 안내 (${nl.length}줄${nl.length ? '' : ' · 칸 접힘'})`);
-    for (const l of nl.slice(0, 6)) out.push(`       · ${String(l).slice(0, 84)}`);
+    /* 「공고 안내」는 저장된 줄 그대로가 아니다 — 시트(openActivityDetail)가 모집 안내·자격에 이미 나온 문장을 빼고 noticeSummaryHtml 이 조각·머리글을 거른다.
+       그 두 단계를 **앱 함수로** 다시 밟는다(2026-10-28 개발자 "자격요건이 공고 안내에 들어가고 있는데" — 이 도구가 저장된 줄을 찍어 화면과 다르게 말했다) */
+    const flat = linkFn('noticeFlat');   // 비교 열쇠는 앱의 함수 그대로(베끼지 않는다)
+    const seenText = [...ex.map((x) => flat(x.text)), ...raw.map(flat)].filter((x) => x.length >= 6);
+    const noticeHtml = linkFn('noticeSummaryHtml')(nl.filter((l) => !seenText.some((e) => flat(l).includes(e))));
+    const nrows = [...String(noticeHtml).matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => stripTags(m[1].replace(/<b class="ns-k">([^<]*)<\/b>/, '$1 · ')));
+    out.push(`   ─ 공고 안내 (${nrows.length}줄${nrows.length ? '' : ' · 칸 접힘'} · 저장된 줄 ${nl.length})`);
+    for (const l of nrows.slice(0, 8)) out.push(`       · ${String(l).slice(0, 84)}`);
     out.push(`   ─ 첨부 ${(it.attachments || []).length}개 · 마감 ${it.deadline || '(없음)'}`);
   }
   return out;

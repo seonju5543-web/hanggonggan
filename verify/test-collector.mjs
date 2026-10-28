@@ -13088,6 +13088,10 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
       eq('  제목에만 대상이 있는 글 — `[중학생~대학생] …`·`…(대학생)`·`… -대학생만 신청` · 대조군 `… 안내(10월)`',
         ['[중학생~대학생]현충사 관람객 안내 봉사', '충북교육도서관 도서 정리[주간](대학생)', '나도 한끼 도시락 만들기 봉사활동 (오전)-대학생만 신청', '스타트업 아카데미 일정 안내(10월)'].map(V.targetFromTitle),
         ['중학생~대학생', '대학생', '대학생만 신청', '']);   // `-대학생만 신청(가능)` 은 제목 문구 그대로 — 낱말 하나는 화면이 접는다
+      eq('  봉사 글의 존댓말 「…가능한 분」·「…할 수 있는 분」은 화면이 요건으로 보인다 · `면접 30분`(시간)은 아니다 (관악서울대 치과병원 · 2026-10-28 — 3줄 중 1줄만 보였다)',
+        [ME3.requirementLines({ kind: 'activity', eligibilityLines: ['주 1회 이상, 총 5회 이상 꾸준히 봉사가 가능한 분', '20세 이상, 65세 이하의 건강한 분', '자원봉사활동 목적과 의미를 이해하고 제반 규정을 성실히 이행할 수 있는 분', '면접 30분'] }, null, { all: true }).length], [3]);
+      eq('  1365 가 이모지를 바꾼 `？？` 는 글자가 아니다 — 자격·안내 어디에도 남지 않는다(용산청소년문화의집)',
+        (() => { const d = AX4.activityDetails('？？ 용산청소년문화의집 대학생 서포터즈 모집\n？？ 모집대상\n20~24세 대학생 청소년 2명 *회차별 2명\n？？ 활동일시\n10/24(토) 08:30~16:30', '대학생 서포터즈 모집'); return [JSON.stringify([d.eligibilityLines, d.noticeLines]).includes('？'), d.eligibilityLines.some((l) => /20~24세 대학생/.test(l))]; })(), [false, true]);
       eq('    `-대학생만 신청가능!` 은 「대학생만 신청가능」 — 화면(requirementLines)이 보이는 꼴', [V.targetFromTitle('[서북구보건소] 나도 한끼 도시락 만들기 봉사활동 (오전)-대학생만 신청가능!'), ME3.requirementLines({ eligibilityLines: ['대학생만 신청가능'], kind: 'activity' }, null, { all: true })], ['대학생만 신청가능', ['대학생만 신청가능']]);
       eq('  본문이 비어도 제목의 대상은 읽는다 · 본문이 있으면 본문이 먼저', [AX4.activityDetails('', '도서 정리[주간](대학생)').eligibilityLines, AX4.activityDetails('참가자격 : 성인 누구나', '도서 정리(대학생)').eligibilityLines], [['대학생'], ['참가자격 : 성인 누구나']]);
       eq('  AI 검산도 활동 어휘로 — 「예비창업자 …」 는 장학 신호만으로는 거절, 활동 신호를 주면 통과',
@@ -13148,6 +13152,10 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
     eq('  이름표가 있는 줄 뒤의 줄은 그 줄에 붙이지 않는다 · 항목 머리(`A.`·`○`·`1)`)도 새 줄',
       rows2(['지원자격 : 2026-1 학기 학부 재학생', '매일 09:00~18:00 접수', '안내 글자가 길어서 이어지는', 'A. 첫째 항목입니다.']), ['매일 09:00~18:00 접수', 'A. 첫째 항목입니다.']);
     eq('  모집 안내 — 자격 줄이 있으면 「대상」 발췌를 다시 적지 않는다(코드 자리)', /x\.label !== '혜택' && !\(x\.label === '대상' && \(n\.eligibilityLines \|\| \[\]\)\.length\)/.test(appSrc), true);
+    /* 「공고 안내」가 자격에 이미 나온 줄을 빼는 비교 열쇠(noticeFlat) — 글머리 기호 차이(`■ 주 1회 …` vs `주 1회 …`)로 같은 문장이 두 칸에 떴다(관악서울대 치과병원 · 2026-10-28) */
+    const nflat = new Function('esc', 'unent', 'joinSpacedSyllables', `${appSrc.slice(a2, b2)}\nreturn noticeFlat;`)(escS2, ME3.decodeEntities, ME3.joinSpacedSyllables);
+    eq('  공고 안내의 비교 열쇠는 글머리 기호를 뗀다 — `■ 주 1회 이상, 총 5회 이상 꾸준히 봉사가 가능한 분` 과 기호 없는 같은 줄이 같다 · 시트가 그 열쇠(noticeFlat)를 쓴다',
+      [nflat('■ 주 1회 이상, 총 5회 이상 꾸준히 봉사가 가능한 분') === nflat('주 1회 이상, 총 5회 이상 꾸준히 봉사가 가능한 분'), nflat('ㅇ 20세 이상') === nflat('20세 이상'), /\(n\.noticeLines \|\| \[\]\)\.filter\(\(l\) => !seenText\.some\(\(e\) => noticeFlat\(l\)\.includes\(e\)\)\)/.test(appSrc)], [true, true, true]);
   }
 }
 

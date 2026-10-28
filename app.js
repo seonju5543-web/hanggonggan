@@ -3617,9 +3617,8 @@ function openActivityDetail(url) {
   /* 「대상」 발췌는 자격 줄이 있으면 위 「지원 자격」이 이미 보여 준다 — 같은 A·B·C 조건이 「모집 안내」에 한 번 더 떴다(쇼미더임팩트 · 2026-10-16 개발자 지적) */
   const rows = (n.excerpts || []).filter((x) => x.label !== '혜택' && !(x.label === '대상' && (n.eligibilityLines || []).length));
   /* 원문 안내 — 위 '모집 안내'에 이미 나온 문장은 다시 적지 않는다(같은 접수기간이 두 칸에 떴다 · 2026-10-01) */
-  const flat = (x) => String(unent(x || '')).replace(/[\s:：·\-–]/g, '');
-  const seenText = [...(n.excerpts || []).map((x) => flat(x.text)), ...(n.eligibilityLines || []).map(flat)].filter((x) => x.length >= 6);
-  const notice = (n.noticeLines || []).filter((l) => !seenText.some((e) => flat(l).includes(e)));
+  const seenText = [...(n.excerpts || []).map((x) => noticeFlat(x.text)), ...(n.eligibilityLines || []).map(noticeFlat)].filter((x) => x.length >= 6);
+  const notice = (n.noticeLines || []).filter((l) => !seenText.some((e) => noticeFlat(l).includes(e)));
   const eligRows = eligibilityRowsHtml(sch, result).replace(/<li class="r-unk">\? 지원 자격은 [^<]*<\/li>/g, '');   // '원문에서 확인' 한 줄뿐이면 빈 글자 → 칸을 접는다
   const recruitHtml = activityRecruitHtml(n, rows);
   sheetBack = null;   // 이 시트에는 돌아갈 곳이 없다 — 내리면 닫힌다
@@ -4514,6 +4513,11 @@ function tidyChars(s) {
     .replace(/(\d)\s+(인|명|원|점|개|건|회|년|월|일|학기|학년|학점|구간|분위|부|매|쪽)(?![가-힣])/g, '$1$2')   // `1 인 당 1,000,000 원` → `1인 당 1,000,000원`
     .replace(/\s+/g, ' ').trim();
   return typeof joinSpacedSyllables === 'function' ? joinSpacedSyllables(t) : t;   // `온라인 신 청` (match-engine 의 같은 규칙)
+}
+/* '같은 문장인가' — 「공고 안내」가 자격·모집 안내에 이미 나온 줄을 뺄 때 쓰는 비교 열쇠 **한 곳**(verify/what-shows.mjs 도 이 함수로 잰다).
+   🔴 글머리 기호도 뗀다 — 자격 줄은 `■ 주 1회 이상 …`, 안내 줄은 `주 1회 이상 …` 로 저장돼 같은 문장이 두 칸에 떴다(관악서울대 치과병원 · 2026-10-28 개발자 지적) */
+function noticeFlat(x) {
+  return String(unent(x || '')).replace(/[\s:：·\-–■□○●\u25AA\u25B6▷◆◇◎※ㅇ*•]/g, '');
 }
 function noticeSummaryHtml(lines) {
   const rows = []; const seen = new Set();

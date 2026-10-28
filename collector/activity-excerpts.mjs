@@ -237,7 +237,8 @@ const inlineLabel = (t) => t
   /* `공모기간 2026. 10. 6. – 11. 2.`(지식재산처) · `진행일정 2026-11-07~2027.02.19`(한남대) — 기간·일시 이름표 뒤에 콜론 없이 날짜가 붙은 줄 · `접수 마감 - 2026년 11월 2일`(외대부고)의 대시도 콜론으로 */
   .replace(new RegExp(`^([ \\t]*(?:[ㅇ○●■□▣◆◇▶·•\\-*]\\s*)?)(${PERIODISH})[ \\t]*(?:[-–—][ \\t]*)?(?=(?:20\\d\\d|\\d{1,2})\\s?[.\\-/년월]|상시|수시|연중)`, 'gm'), '$1$2 : ');   // `신청기간 상시`(한남대) 도
 /* 마크다운 굵게(`**참가대상**` — 온통청년 포스터 대체 글)는 기호만 뗀다 — 안 떼면 머리글·표 머리 판정이 못 알아본다(2026-10-28) */
-const normalizeText = (text) => labelColon(inlineLabel(bulletNorm(String(text || '').replace(/\*\*/g, ''))));
+/* `？？` — 1365 가 이모지를 물음표 둘로 바꿔 준다(용산청소년문화의집 「？？ 모집대상」 · 2026-10-28). 글자가 아니라 뗀다 */
+const normalizeText = (text) => labelColon(inlineLabel(bulletNorm(String(text || '').replace(/\*\*/g, '').replace(/[?？]{2,}/g, ' '))));
 export function activityDetails(text, title) {
   const t = normalizeText(text);
   if (!t.trim()) { const tt = targetFromTitle(title); return { eligibilityLines: tt ? [tt] : [], eligibilityFromTitle: !!tt, thin: true, eligibilityExcludes: [], eligibilityPriority: [], noticeLines: [] }; }   // 본문이 없어도 제목의 대상은 읽는다 — 표식은 본편과 같게
