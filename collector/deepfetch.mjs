@@ -359,7 +359,7 @@ async function downloadEligDocs() {
      안 걸리므로 여기서 따로 통과시킨다. 무료로는 못 읽지만 AI가 그림째 읽는다.
      실측: 넘기려던 공고 7건 전부에 A4 포스터급 그림이 있었다(최대 5906×8268). */
   /* 고르기는 elig-targets.mjs 한 곳 (2026-10-05 · UI-12) — 줄이 돈다(시도한 날 `at`) · 금액·마감만 빈 공고도 · 안 보이는 공고는 안 받는다 */
-  const { pickEligTargets, pickAttachBacklog, pickDocAttachments } = await import('./elig-targets.mjs');
+  const { pickEligTargets, pickAttachBacklog, pickDocAttachments, repeatedBodyImages } = await import('./elig-targets.mjs');
   /* '학생 화면에 아직 있나'는 자격요건 로봇과 같은 판정 한 곳(rescue-plan.mjs closedForStudents — 마감(한국 날짜) 전 · notStale) — 2026-10-05 병합 때
      여기 따로 적혀 있던 같은 식을 이것으로 바꿨다(둘이 갈라지면 한 로봇은 받고 다른 로봇은 안 여는 공고가 생긴다) */
   const { closedForStudents } = await import('./rescue-plan.mjs');
@@ -369,7 +369,10 @@ async function downloadEligDocs() {
   try { index = JSON.parse(fs.readFileSync(idxPath, 'utf8')); } catch { /* 첫 실행 */ }
   const live = (it) => !closedForStudents(it, today);
   /* 🔴 공고문류가 본문 그림보다 먼저다 — 그림이 앞에 다섯이면 상한 2개가 그림으로 차 PDF 공고문을 영영 안 받았다(미래에셋 해외교환 · 2026-10-17) */
-  const docAtts = (it) => pickDocAttachments(it.attachments, { max: 2, isNoticeDoc });
+  /* 🔴 사이트 장식 그림(접근성 인증 마크·SNS 로고·챗봇·띠 배너)은 받지 않는다 — 판정은 elig-targets isDecorativeImage 한 곳 · 같은 게시판 두 공고에 같은 그림은
+     그 사이트의 공통 그림(2026-10-29 · 10-28 유료 전수에서 보낸 20장 중 9장이 장식이라 돈만 나갔다) */
+  const repeated = repeatedBodyImages(reg.items);
+  const docAtts = (it) => pickDocAttachments(it.attachments, { max: 2, isNoticeDoc, repeated });
   const eligTargets = pickEligTargets(reg.items, index, today, { requirementLines, live, docAtts, max: MAX_NOTICES });
   /* 남는 자리는 '아직 한 번도 안 받은 마감 전 공고'로 (2026-10-13 · elig-targets.mjs pickAttachBacklog) —
      공고문 뒷장에 신청서 서식이 든 첨부를 자격을 다 읽은 공고라서 안 받던 구멍.

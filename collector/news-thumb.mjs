@@ -55,7 +55,9 @@ export function absImg(u, base) {
    🔴 **파일 이름**과 몇 개의 분명한 폴더 이름만 본다 — 학교 CMS 는 진짜 사진도 /file/·/attach/·/upload/ 아래 둔다(그 낱말로 막으면 본문 사진이 다 빠진다).
    🔴 '카카오·인스타·배너·기본' 같은 낱말 하나로 막지 않는다(리뷰 12차) — `KakaoTalk_20261002_….jpg` 는 카톡으로 받은 **진짜 사진**이고
       `…_festival_banner.jpg` 는 행사 포스터다. SNS 는 '단추·아이콘' 꼴(sns_kakao · kakao_icon)일 때만 장식이다. 띠 배너는 가로세로 비율이, 사이트 배너는 여러 글 반복이 잡는다. */
-const CHROME_FILE = /(?:^|[_.\-])(?:logo|logos|emblem|symbol|icon|icons|ico|btn|button|bullet|arrow|blank|spacer|loading|loader|spinner|favicon|noimg|noimage|no_image|no-image|og_?default|ogimage|default_?(?:img|image|og|thumb)|(?:img|image|thumb)_?default)(?:[_.\-0-9]|$)/i;
+/* 2026-10-29 — 장학 본문 그림(elig-targets isDecorativeImage)도 이 규칙을 쓴다. 유료 자격 읽기 전수에서 받힌 장식 9장의 이름: 접근성 인증 마크(wa_logo·2025-wa-logo·
+   img-footer-wa2026·webacc·cuk_webmark·ft_mk2)·챗봇(kw_chatbot_icon2)·기념 엠블럼(120emblem — 숫자 뒤라 앞 경계에 숫자도)·머리 띠(sub_title3444) */
+const CHROME_FILE = /(?:^|[_.\-]|\d)(?:logo|logos|emblem|symbol|icon|icons|ico|btn|button|bullet|arrow|blank|spacer|loading|loader|spinner|favicon|noimg|noimage|no_image|no-image|og_?default|ogimage|default_?(?:img|image|og|thumb)|(?:img|image|thumb)_?default|wa|webacc|webmark|mark|mk|ft|footer|chatbot|sub_?title)(?:[_.\-0-9]|$)/i;
 const SNS_FILE = /(?:^|[_.\-])(?:(?:sns|share)[_\-]?(?:kakao\w*|facebook|fb|twitter|tw|insta\w*|youtube|naver|blog|band|link|url|copy)|(?:kakao|kakaotalk|kakaostory|facebook|fb|twitter|instagram|insta|youtube|naver|band|blog)[_\-]?(?:ico|icon|btn|logo|share|sns))(?:[_.\-0-9]|$)/i;
 const CHROME_DIR = /\/(?:logo|logos|icon|icons|ico|btn|button|banner|banners|bnr|sns|emoticon|emoji)\//i;
 export function looksChrome(src, alt = '', cls = '') {

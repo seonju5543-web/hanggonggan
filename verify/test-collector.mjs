@@ -2696,6 +2696,10 @@ console.log('\n■ 교내 소식 썸네일 (2026-10-03 개발자 지시 "실제 
   eq('    진짜 사진이 사는 폴더(/upload/file/·/_attach/)는 장식으로 보지 않는다 · 파일 이름의 로고·아이콘·단추와 sns 폴더는 장식', ['https://x.ac.kr/upload/file/2026/a.jpg', 'https://x.ac.kr/_attach/image/a.png', 'https://x.ac.kr/img/common/logo.png', 'https://x.ac.kr/images/btn_top.png', 'https://x.ac.kr/sns/kakao.png'].map((u) => TH.looksChrome(u)), [false, false, true, true, true]);
   /* 리뷰 12차 — 낱말 하나로 진짜 사진을 막았다(카톡으로 받은 사진·행사 배너 포스터·기본 방 사진). SNS 는 단추·아이콘 꼴일 때만 장식 */
   eq('    카톡 사진·행사 배너·설치식·기본 방 사진은 진짜 사진 · sns_kakao·kakao_icon·ico_new 는 장식', ['KakaoTalk_20261002_153012345.jpg', 'KakaoTalk_Photo_2026-10-02-15-30-12-001.jpeg', '2026_festival_banner.jpg', 'installation_ceremony.jpg', 'default_room.jpg', 'insta_cardnews_01.jpg', 'sns_kakao.png', 'kakao_icon.png', 'ico_new.gif', 'og_default.jpg'].map((f) => TH.looksChrome(`https://x.ac.kr/wp-content/uploads/2026/10/${f}`)), [false, false, false, false, false, false, true, true, true, true]);
+  /* 2026-10-29 — 장학 본문 그림도 이 규칙을 쓴다(elig-targets isDecorativeImage): 유료 자격 읽기 전수에서 받힌 접근성 인증 마크·꼬리말 마크·기념 엠블럼(숫자 뒤)·머리 띠 */
+  eq('    접근성 인증 마크(wa·webacc·webmark·ft_mk)·꼬리말·챗봇·120emblem·sub_title 은 장식 · 행사 배너·키 비주얼 포스터는 아니다',
+    ['wa_logo.png', '2025-wa-logo.webp', 'img-footer-wa2026.png', 'webacc.gif', 'cuk_webmark.png', 'ft_mk2_260126.png', 'kw_chatbot_icon2.png', '120emblem.png', 'sub_title3444.png', '2026_festival_banner.jpg', 'key_visual_2026.jpg', 'poster_final.jpg']
+      .map((f) => TH.looksChrome(`https://x.ac.kr/res/img/${f}`)), [true, true, true, true, true, true, true, true, true, false, false, false]);
   /* 리뷰 12차 — 날것의 '%'·EUC-KR 바이트 이름·범위 밖 엔티티 하나가 글 하나의 후보를 통째로 날렸다(그 글은 영영 사진 없음) */
   eq('    이상한 이름(날것 %·EUC-KR 바이트·큰 엔티티)이 있어도 던지지 않고 나머지 후보가 산다', (() => { try { return TH.imageCandidates('<div class="view"><img src="/upload/og/50%할인.png"><img src="/upload/editor/2026/참여율 100% 달성.jpg"><img src="/upload/editor/%C2%FC%BF%A9.jpg" alt="&#99999999;"><img src="/upload/editor/2026/real.jpg"></div>', base).length; } catch (e) { return `던짐: ${e.message}`; } })(), 4);
   eq('    JSON 쪽도 던지지 않는다', (() => { try { return TH.jsonImageCandidates({ content: '<img src="/upload/100% 장학.jpg"><img src="/upload/ok.jpg">' }, base).length; } catch (e) { return `던짐: ${e.message}`; } })(), 2);
@@ -4943,7 +4947,7 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
   /* 🔴 공고문류가 본문 그림보다 먼저 (2026-10-17 · 미래에셋 해외교환: 경희대 본문 그림 5장이 앞에 있어 상한 2개가 그림으로 차고 「선발 요강.pdf」는
      한 번도 받히지 않았다 — 자격은 그 PDF 에만 있었다). zip 묶음도 받는다(홍익대 제주 미래이음 — 공고문이 zip 안에만). */
   {
-    const { pickDocAttachments } = await import(new URL('../collector/elig-targets.mjs', import.meta.url));
+    const { pickDocAttachments, isDecorativeImage, repeatedBodyImages } = await import(new URL('../collector/elig-targets.mjs', import.meta.url));
     const { isNoticeDoc, zipNoticeDocs, readableDoc, attachmentText: attText } = await import(new URL('../collector/attachment-text.mjs', import.meta.url));
     const atts = [
       { name: '본문이미지-527x735.png', url: 'i1', bodyImage: true }, { name: '본문이미지-544x728.png', url: 'i2', bodyImage: true },
@@ -4955,6 +4959,43 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
       pickDocAttachments(atts, { max: 2, isNoticeDoc }).map((a) => a.url), ['p1', 'z1']);
     eq('  밀린 첨부 자리(그림 제외 · 상한 3)', pickDocAttachments(atts, { max: 3, images: false, isNoticeDoc }).map((a) => a.url), ['p1', 'z1']);
     eq('  공고문류가 없으면 그림이 남는다', pickDocAttachments(atts.slice(0, 3), { max: 2, isNoticeDoc }).map((a) => a.url), ['i1', 'i2']);
+    /* 🔴 사이트 장식 그림은 받기 전에 빠진다 (2026-10-29 · 10-28 유료 자격 읽기 전수 #40754157899: 보낸 포스터 20장 중 9장이 접근성 인증 마크·인스타그램 로고·
+       챗봇 캐릭터·공원 풍경 띠 배너·기념 엠블럼이라 모델이 "공고문 내용이 없다"고 거절 — 장당 돈만 나갔다). 판정은 isDecorativeImage 한 곳 — 아래 주소·크기는 그날 실제 받힌 것 */
+    const deco = [
+      { name: '본문이미지-511x348.png', url: 'https://www.uos.ac.kr/images/kor2021/main/ft_mk2_260126.png', bodyImage: true },               // 서울시립대 꼬리말 접근성 마크
+      { name: '본문이미지-1638x1163.gif', url: 'https://www.kookmin.ac.kr/content/05sub/style0005/images/common/webacc.gif', bodyImage: true },   // 국민대 접근성 마크
+      { name: '본문이미지-509x348.png', url: 'https://www.smu.ac.kr/_res/kor/img/common/img-footer-wa2026.png', bodyImage: true },
+      { name: '본문이미지-511x348.png', url: 'https://www.catholic.ac.kr/_res/cuk/ko/img/main/cuk_webmark.png', bodyImage: true },
+      { name: '본문이미지-4096x4096.png', url: 'https://kangwon.ac.kr/assets/ko/images/main/sns-instagram.png', bodyImage: true },             // 2.6MB 인스타그램 로고 — 무게로 고르면 진짜 포스터를 이긴다
+      { name: '본문이미지-402x414.png', url: 'https://www.kw.ac.kr/ko/img/kw_chatbot_icon2.png?v=20251021', bodyImage: true },
+      { name: '본문이미지-1920x300.png', url: 'https://www.seoultech.ac.kr/site/ko/2021/res/img/sub_title3444.png', bodyImage: true },       // 공원 다리 풍경 띠
+      { name: '본문이미지-1800x700.jpg', url: 'https://www.hanyang.ac.kr/upload/road.jpg', bodyImage: true },                                  // 이름이 평범해도 가로 2.57배 띠
+      { name: '본문이미지-1002x551.png', url: 'https://www.dongguk.edu/resources/images/site/main/120emblem.png', bodyImage: true },          // 개교 120주년 엠블럼(숫자 뒤)
+    ];
+    const real = [
+      { name: '본문이미지-2480x3507.jpg', url: 'https://dep.hufs.ac.kr/CrossEditor/binary/images/000566/S25C-926101913570.jpg', bodyImage: true },   // 안산시 포스터(8줄 읽었다)
+      { name: '본문이미지-1190x5052.png', url: 'https://www.kyonggi.ac.kr/DATA/bbs/1073/20261006021356333_APR6.png', bodyImage: true },               // 세로로 긴 웹 포스터(7줄)
+      { name: '본문이미지-1192x808.png', url: 'https://www.catholic.ac.kr/_attach/cuk/editor-image/2026/10/JucRUSgZNqbVNwtxXYfabmnrHG.png', bodyImage: true },   // 가로 포스터(8줄)
+      { name: '본문이미지-1024x1028.jpg', url: 'https://www.jbnu.ac.kr/common/file.do?file=jkC7rimuS4', bodyImage: true },                              // 정사각 카드뉴스
+      { name: '본문이미지-1080x1350.png', url: 'https://www.seoultech.ac.kr/storage/www/ckfinder/images/86D122F42B694F6FB218EFE7ECA69D91.png', bodyImage: true },
+    ];
+    eq('장식 그림은 받기 전에 빠진다 — 접근성 마크·SNS 로고·챗봇·띠 배너·엠블럼 · 진짜 포스터(세로 긴 것·가로·정사각)는 남는다',
+      pickDocAttachments([...deco, ...real], { max: 9, isNoticeDoc }).map((a) => a.name), real.map((a) => a.name));
+    eq('  판정 한 곳(isDecorativeImage) — 장식 9장은 전부 참 · 진짜 5장은 전부 거짓', [deco.every((a) => isDecorativeImage(a)), real.some((a) => isDecorativeImage(a))], [true, false]);
+    /* ③ 같은 게시판 두 공고에 같은 그림 — 이름으로 못 가르는 챗봇 마스코트(충북대 NOVA) · 다른 학교 둘이 재단 포스터를 끌어 쓴 것은 아니다 */
+    const nova = 'https://www.cbnu.ac.kr/site/www/images/common/ai_woowang_glass_new_nova.png';
+    const shared = 'https://foundation.or.kr/2026/poster.jpg';
+    const regItems = [
+      { id: 'c1', sourceUrl: 'https://www.cbnu.ac.kr/www/selectBbsNttView.do?nttNo=170638', attachments: [{ name: '본문이미지-500x500.png', url: nova, bodyImage: true }, { name: '본문이미지-992x1403.jpg', url: 'https://www.cbnu.ac.kr/upload/a.jpg', bodyImage: true }] },
+      { id: 'c2', sourceUrl: 'https://www.cbnu.ac.kr/www/selectBbsNttView.do?nttNo=170869', attachments: [{ name: '본문이미지-500x500.png', url: nova, bodyImage: true }] },
+      { id: 'k1', sourceUrl: 'https://www.konkuk.ac.kr/bbs/1', attachments: [{ name: '본문이미지-2480x3508.jpg', url: shared, bodyImage: true }] },
+      { id: 'y1', sourceUrl: 'https://www.yonsei.ac.kr/bbs/2', attachments: [{ name: '본문이미지-2480x3508.jpg', url: shared, bodyImage: true }] },
+    ];
+    const rep = repeatedBodyImages(regItems);
+    eq('  같은 게시판의 두 공고에 같은 그림 주소 = 그 사이트의 공통 그림 · 다른 학교 둘이 끌어 쓴 재단 포스터는 아니다', [...rep], [nova]);
+    eq('    공통 그림은 빠지고 그 공고의 포스터만 남는다', pickDocAttachments(regItems[0].attachments, { max: 2, isNoticeDoc, repeated: rep }).map((a) => a.url), ['https://www.cbnu.ac.kr/upload/a.jpg']);
+    eq('  deepfetch 가 등록분 전체로 공통 그림 표를 만들어 자격용 고르기에 넘긴다(안 넘기면 ③ 이 조용히 꺼진다)',
+      /const repeated = repeatedBodyImages\(reg\.items\)/.test(eligFn) && /pickDocAttachments\(it\.attachments, \{ max: 2, isNoticeDoc, repeated \}\)/.test(eligFn), true);
     /* zip 안 읽기 — 저장(method 0) zip 을 손으로 만든다(UTF-8 이름 깃발 0x800). 동의서·환산표는 빠지고 공고문이 먼저 */
     const makeZip = (entries) => {
       const locals = [], centrals = []; let off = 0;
