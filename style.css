@@ -3535,17 +3535,33 @@ button, input, select, textarea { letter-spacing: inherit; }
 /* 카드 오른쪽 위는 단추 자리 — 배지가 그 아래로 흐르지 않게 자리를 비운다 */
 .sch-card-wrap > .sch-card .sch-top { padding-right: 34px; }
 
-/* 활동 카드 오른쪽 아래의 원문 링크(2026-10-19 개발자) — 북마크처럼 단추 바깥 · 아랫줄 글자와 겹치지 않게 자리를 비운다 */
+/* 활동 카드 맨 아랫줄의 원문 링크(2026-10-19 개발자 "카드에도 원문공고 하이퍼링크" → 2026-10-28 개발자가 시안 H 를 골랐다: 구분선 아래 제 줄 ·
+   글자는 왼쪽(옅은 색) · 오른쪽 끝 꺾쇠 — 목록 줄처럼). 마감 글자 옆에 끼어 있던 모양을 끝냈다. 단추 바깥(단추 안의 링크는 허용되지 않는 구조) */
 .card-src-link {
   position: absolute;
-  right: 14px; bottom: 12px;
+  left: 0; right: 0; bottom: 0;
   z-index: 2;
-  font-size: var(--t-xs);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-12) var(--space-20);
+  border-top: 1px solid var(--line);
+  font-size: var(--t-sm);
   font-weight: 600;
-  color: var(--primary);
+  color: var(--text-sub);
   text-decoration: none;
+  line-height: 1.2;
 }
-.sch-card-wrap.has-link > .sch-card .sch-foot { padding-right: calc(var(--sp-4) * 2 + var(--sp-2)); }   /* 「원문 공고 ↗」 자리 */
+.card-src-link::after {   /* 꺾쇠 — 그림 글자 대신 선 둘(화면 말투 관문이 이모지를 센다) */
+  content: '';
+  width: var(--space-8); height: var(--space-8);
+  margin-right: var(--space-4);
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  opacity: 0.7;
+}
+.sch-card-wrap.has-link > .sch-card { padding-bottom: calc(var(--space-16) + var(--space-40)); }   /* 「원문 공고 ↗」 줄 자리 */
 
 .save-btn {
   position: absolute;
