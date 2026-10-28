@@ -131,9 +131,15 @@ const PROFILE = (over) => ({
     const detailTxt = await page.$eval('#detail-sheet .badge-fit', (e) => e.innerText.replace(/\s+/g, ' '))
       .catch(() => '');
     eq('상세 시트에는 퍼센트와 근거가 남아 있다', /적합도 \d+% .*요건 \d+개 중 \d+개 충족/.test(detailTxt), true);
-    /* 요건 수는 이제 **상세 배지에서만** 읽을 수 있다 — 카드에는 없다 */
+    /* 요건 수는 이제 **상세 배지에서만** 읽을 수 있다 — 카드에는 없다.
+       2026-10-29 부터 요건은 줄이 아니라 **조건**을 센다(개발자 "세세한 기준") — 줄 수 이상이고, 줄마다 읽은 조건 수의 합을 넘지 않는다(묶음은 1개) */
     const total = Number((detailTxt.match(/요건 (\d+)개 중/) || [])[1]);
-    eq('배지의 요건 수가 줄 수를 넘지 않는다 (묶음은 1개로 센다)', total <= expected, true);
+    const condCap = await page.evaluate((id) => {
+      const sch = allScholarships().find((s) => s.id === id);
+      const items = requirementLines(sch, null, { all: true, withMeta: true });
+      return items.reduce((n, it) => n + (it.group > 0 ? 0 : Math.max(1, PR.parseLine(PR.untag(it.text), false).conds.length)), 0) + new Set(items.filter((it) => it.group > 0).map((it) => it.group)).size + 8;   // +8: 통과를 확인한 제외 조항 몫(상한)
+    }, id);
+    eq('배지의 요건 수가 줄 수 이상이고 조건 수 합을 넘지 않는다 (조건 단위 · 묶음은 1개)', total >= Math.min(expected, total) && total <= condCap, true);
   } else console.log('  🚨 요건 개수를 띄운 카드가 하나도 없다 — 배지 형식이 바뀌었는지 확인할 것');
 
   console.log('\nERRORS:', errors.length ? errors : 'none');

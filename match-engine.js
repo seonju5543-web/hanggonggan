@@ -578,7 +578,9 @@ function dropUnchosenOrTraits(text, judged, isExclude) {
   });
 }
 
-function lineVerdict(text, p, isExclude, ctx) {
+/* detail — 있으면 본 경로가 판정한 조건 수(total)와 맞은 조건 수(pass)를 적어 준다(적합도가 조건 단위로 세는 데 쓴다 · 2026-10-29).
+   앞에서 돌아가는 갈래(표 칸·참고 줄·경우별·범위·묶음·묻지 않은 처지)는 적지 않는다 — 그때는 부르는 쪽이 줄 하나로 센다 */
+function lineVerdict(text, p, isExclude, ctx, detail) {
   if (!p) return null;
   /* 🔴 **표의 한 칸만** 건너뛴다 (2026-09-12 · 노션 핵심-4). 예전에는 `gradOnly` 로
      대학원을 말하는 줄을 **전부** 지나쳤다 — 그래서 `국내 … 대학원 석/박사 과정 재학생`
@@ -671,6 +673,7 @@ function lineVerdict(text, p, isExclude, ctx) {
     judged.push([c, judgeCond(c, p, ctx)]);
   }
   const use = dropUnchosenOrTraits(text, judged, isExclude);
+  let passN = 0;
   for (const [c, v] of use) {
     if (v === 'fail' && c.conf === PR.HIGH) return 'no';
     /* 🔴 확신이 낮은 미달은 **사라지는 게 아니라 '모른다'** 다 (2026-08-30 개발자 지적:
@@ -678,11 +681,12 @@ function lineVerdict(text, p, isExclude, ctx) {
        맞으면 ✓ 가 붙었다 — `(외국인 포함)` 때문에 확신이 낮아진 `국제학부 재학생` 줄이
        영어학과 학생에게 충족으로 떴다. ✕ 를 만들지는 않는다(확신이 없으니까). */
     if (v === 'fail') unknown = true;
-    else if (v === 'pass') seen = 'ok';
+    else if (v === 'pass') { seen = 'ok'; passN += 1; }
     else if (v === 'unknown') unknown = true;
   }
-  /* 프로필에 칸이 없는 처지를 물은 줄이면 충족이라고 말하지 않는다 (parse-requirements 참조) */
+  /* 프로필에 칸이 없는 처지를 물은 줄이면 충족이라고 말하지 않는다 (parse-requirements 참조) — 맞은 조건도 점수에 넣지 않는다(틀린 안심) */
   if (seen === 'ok' && PR.unaskedAttr(text, conds, p)) return null;
+  if (detail) { detail.total = use.length; detail.pass = passN; }
   return unknown ? null : seen;
 }
 
@@ -793,10 +797,16 @@ function fitDetail(sch, p) {
   const ctx = noticeCtx(sch);
 
   const fails = [];
-  let met = 0, unknown = 0;
+  let met = 0, unknown = 0, total = 0;
   const groups = new Map();          // 선택지 묶음 → 그 안에서 하나라도 충족했나
+  /* 🔴 줄이 아니라 **조건**을 센다 (2026-10-29 개발자 "적합도는 퍼센트로 — 나름의 세세한 기준이 있으면").
+     한 줄에 조건이 여럿이면(`직전학기 12학점 이상 이수 및 평점 3.0 이상인 재학생` = 학점·성적·재학 셋) 그 수만큼 무게를 준다 —
+     판정은 그대로 lineVerdict 한 곳(조건 전부가 맞아야 ✓)이고, 무게만 달라진다. 예전엔 요건 1~2줄 공고가 절반이라 퍼센트가
+     95·50·33 몇 가지로만 떨어졌다(외대 표본 31건 실측). 조건을 못 읽은 줄은 1 로 센다 · 표의 구간(bracketTable)은 판정과 같이 뺀다 */
+  const weightOf = (text) => Math.max(1, parseLine(PR.untag(text), false).conds.filter((c) => !(ctx.bracketTable && c.kind === 'bracket')).length);
   for (const it of items) {
-    const lv = lineVerdict(it.text, p, false, ctx);
+    const d = {};
+    const lv = lineVerdict(it.text, p, false, ctx, d);
     const verdict = lv === 'no' ? 'fail' : lv === 'ok' ? 'pass' : 'unknown';
     if (it.group > 0) {
       const g = groups.get(it.group) || { any: false };
@@ -804,24 +814,31 @@ function fitDetail(sch, p) {
       groups.set(it.group, g);
       continue;
     }
-    if (verdict === 'pass') met += 1;
+    const w = d.total || weightOf(it.text);
+    total += w;
+    if (verdict === 'pass') met += w;
     else if (verdict === 'fail' && !multi) fails.push(it.text);
-    else unknown += 1;
+    /* 🔴 '모름' 줄 안의 맞은 조건에 부분 점수를 주지 않는다 — 줘 봤더니 `○○대학 재학생`(학교 모름 · 재학 맞음)이 서울 학생에게
+       '충족'으로 뒤집혔다(관문 「학교 위치는 모른다」가 잡았다 · 2026-10-29). 줄의 열쇠 조건을 모르면 그 줄은 통째로 모른다 */
+    else unknown += w;
   }
   /* 선택지 묶음은 통째로 요건 1개로 센다 — 하나만 만족하면 충족이다(설계 조건 ⑤) */
-  for (const [, g] of groups) { if (g.any) met += 1; else unknown += 1; }
+  for (const [, g] of groups) { total += 1; if (g.any) met += 1; else unknown += 1; }
 
-  /* 제외 조항에 걸리면 미달과 같다 */
+  /* 제외 조항에 걸리면 미달과 같다 · 🔴 걸리지 않음을 **확인한** 제외 조항은 충족한 요건 하나로 센다 (2026-10-29 같은 지시 — 학생이 통과한 조건을
+     점수에 넣지 않던 자리) · 판정 못 한 제외 조항은 세지 않는다(모르는 것을 분모에 넣어 깎지 않는다 — '틀린 안심'도 '틀린 미달'도 아니다) */
   for (const line of exLines) {
     const { conds } = parseLine(line, true);
+    let passed = 0, failed = false;
     for (const c of conds) {
       if (c.conf !== PR.HIGH) continue;
       if (ctx.bracketTable && c.kind === 'bracket') continue;
-      if (judgeCond(c, p, ctx) === 'fail' && !multi) fails.push(line);
+      const v = judgeCond(c, p, ctx);
+      if (v === 'fail' && !multi) { fails.push(line); failed = true; }
+      else if (v === 'pass') passed += 1;
     }
+    if (!failed && passed) { total += 1; met += 1; }
   }
-
-  const total = items.filter((it) => it.group === 0).length + groups.size;
   /* 미달이어도 0이 아니라 FIT_MIN — 파싱이 틀렸을 가능성을 남긴다(위 FIT_MIN 주석) */
   if (fails.length) return { pct: FIT_MIN, unread: false, met, total, unknown, fails };
   /* 🔴 **하나도 판정하지 못했으면 '적합'이 아니라 '모른다'** (2026-09-21).

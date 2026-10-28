@@ -3498,10 +3498,11 @@ console.log('\n■ 대학원 전용 공고는 학부 프로필에 미달 (2026-0
      실측(자격 줄 1,011 중 학위를 말하는 줄 157): 축이 잡던 것은 7줄뿐이었다.
      축을 넣은 뒤 적합도가 오른 공고 8건 · 내린 공고 0건(브라우저 전후 대조). */
   const PRq = createRequire(import.meta.url)('../parse-requirements.js');
-  eq('학부 줄은 충족으로 센다 (예전엔 아무 말도 안 했다)',
+  /* 2026-10-29 부터 적합도는 줄이 아니라 **조건**을 센다 — `학부 재학생` 한 줄은 학위·재학 두 조건이라 met 2 (개발자 "세세한 기준") */
+  eq('학부 줄은 충족으로 센다 (예전엔 아무 말도 안 했다) — 학위·재학 두 조건',
     [fd(['2026-2학기 학부 재학생', '대한민국 국적 보유자']).met,
-      fd(['2026-2학기 학부 재학생', '대한민국 국적 보유자']).unknown], [1, 1]);
-  eq('  학부·대학원을 함께 말한 줄도 충족이다', fd(['본교 학부 및 대학원 재학생']).met, 1);
+      fd(['2026-2학기 학부 재학생', '대한민국 국적 보유자']).unknown], [2, 1]);
+  eq('  학부·대학원을 함께 말한 줄도 충족이다', fd(['본교 학부 및 대학원 재학생']).met, 2);
   eq('  대학원만 말한 줄은 미달이다', fd(['국내 의과학 대학원 석/박사 과정 재학생']).fails.length, 1);
   /* 🔴 제외 줄에서는 **판정하지 않는다** — 학위 낱말이 딴 뜻으로 섞여 틀린 미달이 났다(실측) */
   eq('제외 줄의 학위 낱말로는 판정하지 않는다 (틀린 미달을 막는다)',
@@ -3511,7 +3512,7 @@ console.log('\n■ 대학원 전용 공고는 학부 프로필에 미달 (2026-0
   eq('  표의 한 칸도 요건이 아니다', PRq.parseDegree('일반대학원생 : 평점 4.0 이상', false), null);
   eq('  학위를 말하지 않는 줄에는 조건을 만들지 않는다', PRq.parseDegree('소득 8구간 이하', false), null);
   /* 🔴 프로필 쪽 값은 **한 곳**에서 나온다 — 온보딩에 학위 칸이 생기면 그 함수만 고친다 */
-  eq('프로필의 학위는 학부다 (온보딩이 학부만 받는다)', fd(['본교 학부 재학생']).met, 1);
+  eq('프로필의 학위는 학부다 (온보딩이 학부만 받는다) — 학위·재학 두 조건', fd(['본교 학부 재학생']).met, 2);
 
   /* 🔴 **거꾸로도 못 박는다 — 학위 낱말 하나로 ✓ 를 주면 안 된다** (2026-09-12 코드 리뷰).
      첫 판은 `대학생` 만 있으면 충족으로 셌고, 리뷰가 실측으로 18줄을 찾아냈다. 그중 이런 줄들이
@@ -8654,7 +8655,7 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   /* 🔴 2026-09-12 학위 축(핵심-4)으로 바뀐 숫자다 — 예전에는 대학원 줄을 만나면 그 자리에서
      끝내서 분모가 1이었다. 지금은 **모든 줄을 채점하고** 그중 학위 줄이 ✕ 다. 학생 화면에도
      '요건 3개 중 1개 충족'처럼 나머지 요건이 함께 보인다. */
-  eq('  나머지 요건도 함께 채점한다 (그 줄만 ✕)', [gradOnlyFd.met, gradOnlyFd.total, gradOnlyFd.fails.length], [1, 3, 1]);
+  eq('  나머지 요건도 함께 채점한다 (그 줄만 ✕) — 조건 단위라 분모 4(2026-10-29)', [gradOnlyFd.met, gradOnlyFd.total, gradOnlyFd.fails.length], [1, 4, 1]);
 
   /* ② 표의 한 칸(label)은 예전 그대로 — 여기서 막으면 가톨릭대 오탐이 되살아난다 */
   const mixedFd = ME.fitDetail(sch(['일반대학원생 : 2학기 이수자 이상, 평점 4.0 이상',
@@ -8665,8 +8666,8 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   const artLine = sch(['미술관련 학과 재학생']);
   const artHit = ME.fitDetail(artLine, prof('미술학과', 'arts'));
   const artMiss = ME.fitDetail(artLine, prof('컴퓨터공학과', 'engineering'));
-  eq('흐린 학과가 맞으면 충족', [artHit.met, artHit.total], [1, 1]);
-  eq('어긋나면 미달이 아니라 모른다', [artMiss.unknown, artMiss.fails.length], [1, 0]);
+  eq('흐린 학과가 맞으면 충족 — 학과·재학 두 조건(2026-10-29 조건 단위)', [artHit.met, artHit.total], [2, 2]);
+  eq('어긋나면 미달이 아니라 모른다 — 모르는 줄의 조건은 둘 다 모름(부분 점수 없음)', [artMiss.unknown, artMiss.fails.length], [2, 0]);
   /* 🔴 이름이 정확히 적힌 줄은 **미달을 낸다** — 흐린 쪽으로 넓히면 그 판정이 사라진다 */
   const exact = ME.fitDetail(sch(['미술학과 재학생']), prof('컴퓨터공학과', 'engineering'));
   eq('정확한 학과 이름은 여전히 미달을 낸다', exact.fails.length, 1);
@@ -12967,7 +12968,7 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
     ME3.requirementLines({ eligibilityLines: ['공고일 현재 본인 또는 학부모가 계양구에 1년 이상 주민등록 주소지를', '두고 거주하고 있는 구민'] }, null, { all: true }), ['공고일 현재 본인 또는 학부모가 계양구에 1년 이상 주민등록 주소지를 두고 거주하고 있는 구민']);
   /* ⑦ ※ 곁말로 들어온 '…는 신청 가능' 예외는 요건이 아니라 참고다 — 분모에서 뺀다 (면학장학금 「10학기 이하 후기 이중전공자는 … 신청 가능」이 '확인 필요'를 부풀렸다) */
   const myeon = { eligibilityLines: ['가. 2026-2학기 등록자, 2026-2학기를 포함하여 8학기 이하인 자', '※ 10학기 이하 후기 이중전공자는 등록금 전액 납부 시 신청 가능', '나. 직전 정규학기 12학점 이상, 평점평균 2.0 이상인 자'] };
-  eq('⑦ 예외 곁말은 aside 로 표시되고 요건 수에 안 들어간다', [ME3.requirementLines(myeon, null, { all: true, withMeta: true }).map((it) => !!it.aside), ME3.fitDetail(myeon, st).total], [[false, true, false], 2]);
+  eq('⑦ 예외 곁말은 aside 로 표시되고 요건 수에 안 들어간다 (조건 단위 분모 3 · 2026-10-29)', [ME3.requirementLines(myeon, null, { all: true, withMeta: true }).map((it) => !!it.aside), ME3.fitDetail(myeon, st).total], [[false, true, false], 3]);
   /* ⑧ 화면(app.js) — 글자로 잠근다(브라우저 드라이버는 verify-ui.yml 몫). 되돌리면 「원문 그대로」 머리·같은 줄 두 번·자리 표시 글자가 돌아온다 */
   const appSrc = readText(new URL('../app.js', import.meta.url));
   eq('⑧ 「공고 원문 안내 · 원문 그대로」 머리가 없다 — 세 시트(상세·신청 준비·활동)가 noticeSummaryHtml 한 곳을 부른다',
