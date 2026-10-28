@@ -1,7 +1,29 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-10-27",
+ "updatedAt": "2026-10-28",
  "items": [
+  {
+   "title": "첨단산업인재양성 인공지능부트캠프 산학교수 채용 공고(~2026.11.8)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140833&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-28",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-28",
+   "desc": "1. 채용분야 및 지원자격 가. 직종: 산학교수 나. 담당업무: 인공지능 부트 캠프 산학 협력 및 기업 연계 교육 프로그램 개발 및 운영 부트캠프 참여 기업 인프라 활용 및 교육 연계 지원, 사업 모니터링과 성과…"
+  },
+  {
+   "title": "[대학원팀] 4단계 BK21 대학원혁신지원사업 사업추진관리 자체직원 채용 공고",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140832&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-28",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-28",
+   "desc": "- 4단계 BK21 대학원혁신사업 사업성과관리 및 지출 관련 처리 - 기타 국고사업 추진 관련 행정 지원"
+  },
   {
    "title": "2026년 하반기 교직원(정규직) 1차면접전형 결과 발표 및 2차면접전형 안내",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140830&article.offset=0&articleLimit=10",
@@ -413,28 +435,6 @@
    "foundAt": "2026-10-16",
    "thumb": "data/news/img/1274661b29fac9d9.webp",
    "desc": "의료인공지능융합인재양성사업단 의료 인공지능 마이크로디그리와 관련하여 다음과 같이 안내드리오니 확인하시어 많은 신청 바랍니다."
-  },
-  {
-   "title": "삼성서울병원 암환자삶의질연구소 대학생/대학원생/대학교원 자원봉사 모집",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140606&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-15",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-15",
-   "desc": "암을 경험한 이후에도, 우리의 일상은 저마다의 속도로 계속됩니다. 누군가는 새로운 취미를 발견하고, 누군가는 다시 일터로 돌아가고, 또 누군가는 이전과는 다른 나를 만나며 일상을 살아갑니다."
-  },
-  {
-   "title": "[채용/모집] 성균관대학교 배터리학과 행정직원 모집(~10/21 오전 11시까지)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140604&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-15",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-15",
-   "desc": "성균관대학교 성균융합원 배터리학과에서 행정직원을 아래와 같이 채용 공고합니다."
   }
  ]
 }

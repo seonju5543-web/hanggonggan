@@ -1,7 +1,29 @@
 {
  "school": "전북대학교",
- "updatedAt": "2026-10-27",
+ "updatedAt": "2026-10-28",
  "items": [
+  {
+   "title": "[YELLOW BELT 필수선택] 2026 동계 '기업의 달인되기' 참여팀 모집 안내 (11.2.~13. 모집)",
+   "url": "https://www.jbnu.ac.kr/web/Board/219026/detailView.do",
+   "postedAt": "2026-10-28",
+   "postId": "219026",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-10-28"
+  },
+  {
+   "title": "[조선대학교] 2026학년도 동기 계절수업 교류수학 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/219018/detailView.do",
+   "postedAt": "2026-10-28",
+   "postId": "219018",
+   "kind": "학사",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-10-28",
+   "desc": "교무처 학사지원과 2026학년도 동기 계절수업 조선대학교 교류수학을 안내하오니, 희망하는 학생은 기한 내 신청하여 주시기 바랍니다."
+  },
   {
    "title": "2026 홀로그램 팝업전 '익산, 빛으로 이야기를 잇다' 개최 안내 및 홍보 협조 요청",
    "url": "https://www.jbnu.ac.kr/web/Board/218993/detailView.do",
@@ -11,7 +33,8 @@
    "school": "전북대학교",
    "campus": "",
    "src": "e41d3fac",
-   "foundAt": "2026-10-27"
+   "foundAt": "2026-10-27",
+   "desc": "- 홀로그램으로 만나는 빈센트 반 고흐 나 . 행사기간 : 2026. 10. 23.( 금 ) ~ 2026. 11. 15.( 일 ), 매일 10 시 ~ 17 시"
   },
   {
    "title": "[전북인문사회연구원] 2026년 제2회 콜로키움 개최 안내(11. 25.)",
@@ -23,7 +46,8 @@
    "campus": "",
    "src": "e41d3fac",
    "foundAt": "2026-10-27",
-   "desc": "전북인문사회연구원 안녕하십니까 ? 전북대학교 전북인문사회연구원에서 2026 년 제 2 회 콜로키움을 다음과 같이 진행합니다 ."
+   "desc": "전북인문사회연구원 안녕하십니까 ? 전북대학교 전북인문사회연구원에서 2026 년 제 2 회 콜로키움을 다음과 같이 진행합니다 .",
+   "thumb": "data/news/img/8ac6c17018b1d747.webp"
   },
   {
    "title": "[언어교육부] 11월 외국어 강좌 안내/토익,토익스피킹 시험 할인 안내 (강의계획서 붙임 참조)",
@@ -444,29 +468,6 @@
    "foundAt": "2026-10-19",
    "thumb": "data/news/img/1ec6f2152ceaeedc.webp",
    "desc": "학생취업진로처 학생지원과 < 2026 장애 이해 전문강사 초빙 교육 ( 법정의무교육 ) >"
-  },
-  {
-   "title": "제20대 전북대학교 총장임용후보자 선거를 위한 예비후보자 등록 안내",
-   "url": "https://www.jbnu.ac.kr/web/Board/218576/detailView.do",
-   "postedAt": "2026-10-19",
-   "postId": "218576",
-   "kind": "학사",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-10-19",
-   "desc": "- 선거일: 2026. 12. 1.(화) - 예비후보자 등록기간: 10. 19.(월) ~ 후보자등록신청 개시일 전까지"
-  },
-  {
-   "title": "[취업진로지원과] AI JOB@JBNU 참여 이벤트 안내(배민 쿠폰 지급)",
-   "url": "https://www.jbnu.ac.kr/web/Board/218561/detailView.do",
-   "postedAt": "2026-10-19",
-   "postId": "218561",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-10-19",
-   "thumb": "data/news/img/f72813198d043c54.webp"
   }
  ]
 }

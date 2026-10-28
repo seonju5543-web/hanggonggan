@@ -1,7 +1,28 @@
 {
  "school": "조선대학교",
- "updatedAt": "2026-10-27",
+ "updatedAt": "2026-10-28",
  "items": [
+  {
+   "title": "[앵커사업단] 광주앵커사업 1차년도 점검 최우수(S)등급 획득 및 인센티브 국비 364억원 추가 확보",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282380/artclView.do",
+   "postedAt": "2026-10-28",
+   "school": "조선대학교",
+   "campus": "",
+   "src": "c6a7801d",
+   "foundAt": "2026-10-28",
+   "thumb": "data/news/img/5442efcce3e99ef2.webp",
+   "desc": "앵커사업단 광주광역시와 우리 대학을 비롯한 지역 대학들이 함께 추진해 온 ‘광주앵커사업 1차년도 연차점검’에서 광주지역 전체가 최우수(S)등급 을 획득하였습니다."
+  },
+  {
+   "title": "[교육과정관리팀] 2026 카드뉴스 발표대회 본심 진출자 발표",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282379/artclView.do",
+   "postedAt": "2026-10-28",
+   "school": "조선대학교",
+   "campus": "",
+   "src": "c6a7801d",
+   "foundAt": "2026-10-28",
+   "desc": "2026 카드뉴스 발표대회에 참여해 주신 모든 학생 여러분께 감사드립니다. 본심 진출자 여러분께서는 아래 일정을 확인해 주시기 바랍니다."
+  },
   {
    "title": "[대학일자리플러스센터] 청년 구직자 대상 취업사기 피해 예방 안내",
    "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282366/artclView.do",
@@ -412,26 +433,6 @@
    "campus": "",
    "foundAt": "2026-10-01",
    "thumb": "data/news/img/6394493dbcbbdfdd.webp"
-  },
-  {
-   "title": "불법복제 인식개선 및 근절을 위한 홍보",
-   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/281645/artclView.do",
-   "postedAt": "2026-09-30",
-   "school": "조선대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/df45b92d6ebabd93.webp",
-   "desc": "디지털교육지원팀 대학 내 올바른 저작권 문화 확산과 불법 복제 근절을 위해 아래와 같이 홍보영상을 게시합니다."
-  },
-  {
-   "title": "[졸업생특화프로그램] 2026년 10월 프로그램 메뉴판",
-   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/281642/artclView.do",
-   "postedAt": "2026-09-30",
-   "school": "조선대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/383933f949f3ced7.webp",
-   "desc": "일자리지원팀 ※ 잡플래닛 취업 콘텐츠 이용 신청 ※ - 조선대학교 졸업생 이용 가능"
   }
  ]
 }

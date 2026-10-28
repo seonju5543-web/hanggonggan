@@ -1,7 +1,49 @@
 {
  "school": "경기대학교",
- "updatedAt": "2026-10-27",
+ "updatedAt": "2026-10-28",
  "items": [
+  {
+   "title": "[입학에서 취업까지] 2027학년도 전공선택유연화 시행 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626861&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-28",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-10-28"
+  },
+  {
+   "title": "[수강에서 성적까지] 2026학년도 2학기 부전공 신청",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626858&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-28",
+   "kind": "학사",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-10-28",
+   "desc": "가. 신청자격 : 2학년 1학기생부터 등록한 재학생 나. 신청기간 : 2026.11.02(월) ~ 11.06(금)"
+  },
+  {
+   "title": "[일반] [중어중문전공] 2026학년도 2학기 부전공 신청 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626857&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-28",
+   "kind": "학사",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-10-28"
+  },
+  {
+   "title": "[일반] 경기대학교 관광전문대학원 2026 관전의 밤 개최 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626856&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-10-28",
+   "kind": "행사",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-10-28",
+   "thumb": "data/news/img/7f7c2aa5bfb60e4b.webp",
+   "desc": "이미지 확대보기 경기대학교 관광전문대학원 원우회에서는 2026 관전의 밤을 개최하오니 많은 관심과 참석 부탁드립니다."
+  },
   {
    "title": "[입학에서 취업까지] 2026-2학기 부전공 신청 안내",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626842&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
@@ -372,49 +414,6 @@
    "campus": "",
    "src": "bf927d3e",
    "foundAt": "2026-10-20"
-  },
-  {
-   "title": "[일반] 2027년 2월 졸업에 관한 제반 사항 안내(졸업인증제)",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626703&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-20",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-10-20",
-   "desc": "※졸업인증제는 학과 졸업 요건과는 별개이므로 주의. 학과 졸업을 위해 제출하는 어학 성적표로 졸업인증제 요건 충족을 희망하는 경우, 학과 사무실과 인문대학 교학팀 모두에 성적표를 제출해야 함. 학과 사무실에만 어학…"
-  },
-  {
-   "title": "[일반] [국어국문] 2027년 2월 졸업에 관한 제반 사항 안내(졸업인증제)",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626702&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-20",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-10-20",
-   "desc": "1. 외국어시험 성적 제출 기한 : 2027. 1. 14.(목) 2. 졸업인증제 KGU⁺인증은 2027. 1. 14.(목) 까지 전산 입력이 완료된 포인트만 인정 (KGU포인트로 졸업을 희망하는 학생은 반드시 참여…"
-  },
-  {
-   "title": "[수강에서 성적까지] [수학과] 2026학년도 동계 계절수업 전공과목 개설 수요조사",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626700&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-20",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-10-20",
-   "desc": "이미지 확대보기 • 조사 대상: 수학과 전공과목 수강을 희망하는 재학생(복수전공·부전공 및 전과·다전공 이수 희망 학생 포함)"
-  },
-  {
-   "title": "[일반] 2026학년도 전기 졸업예정자(2027년 2월 졸업)를 위한 학위논문 온라인(dCollection) 제출 교육 안내 및 논문 양식 배포",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626696&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-20",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-10-20",
-   "thumb": "data/news/img/21f8a0523fe652b5.webp",
-   "desc": "이미지 확대보기 이미지 확대보기 ☎ 관련문의: 중앙도서관 정보운영팀 031-249-8861"
   }
  ]
 }

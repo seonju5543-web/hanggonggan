@@ -1,7 +1,19 @@
 {
  "school": "가톨릭대학교",
- "updatedAt": "2026-10-27",
+ "updatedAt": "2026-10-28",
  "items": [
+  {
+   "title": "[교수학습개발원] 2026학년도 AI기반 기초과목 진단 및 맞춤형 학습 프로그램(3차) 참여자 추가모집(~11/8)",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277198&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-28",
+   "kind": "채용",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-28",
+   "thumb": "data/news/img/1cadc28704938fd2.webp",
+   "desc": "AI기반 기초과목 진단 및 맞춤형 학습이란 AI를 통해 기초과목에 대한 역량을 진단하고, 역량 향상을 위한 추천 문제, 개념 학습 영상 등을 제공하는 가톨릭대학교 학생 맞춤형 인공지능 온라인 학습 플랫폼입니다."
+  },
   {
    "title": "[중앙도서관] 모바일 APP 정상이용 안내",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277141&article.offset=0&articleLimit=10",
@@ -421,16 +433,6 @@
    "src": "5d85d287",
    "foundAt": "2026-10-12",
    "desc": "2026-2학기에 개설된 학부 교과목을 대상으로 중간 수업평가를 실시하오니, 학생 여러분들의 많은 참여를 부탁드립니다."
-  },
-  {
-   "title": "[시설건축팀] 외부 촬영 관련 협조 안내 (11/14, 11/21, 11/28, 12/12)",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276692&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-12",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-12",
-   "desc": "[시설건축팀] 외부 촬영 관련 협조 안내 본교에서 외부 촬영이 아래와 같이 진행될 예정이오니, 교내 구성원 여러분의 협조를 부탁드립니다."
   }
  ]
 }

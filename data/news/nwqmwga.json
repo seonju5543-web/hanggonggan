@@ -1,7 +1,36 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-10-27",
+ "updatedAt": "2026-10-28",
  "items": [
+  {
+   "title": "[취업정보] [교재/복습제공]「빅데이터분석기사, 차근차근 실습하기」",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70818",
+   "postedAt": "2026-10-28",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-28"
+  },
+  {
+   "title": "[학술연구] 「도서관 리서치 위크」 개최 안내 (11. 2.(월)~11. ...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70817",
+   "postedAt": "2026-10-28",
+   "kind": "행사",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-28"
+  },
+  {
+   "title": "[모집공고] 2026 용봉학술제 「창업페스티벌」 원스톱 창업상담 사전 신청...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70816",
+   "postedAt": "2026-10-27",
+   "kind": "행사",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-28"
+  },
   {
    "title": "[학사안내] 2026학년도 동계 계절학기 타 대학교(고려대 국제동계대학) ...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70813",
@@ -366,37 +395,6 @@
    "src": "b7347301",
    "foundAt": "2026-10-21",
    "thumb": "data/news/img/fb2be06332c47ebc.webp"
-  },
-  {
-   "title": "[취업정보] [미래내일일경험]국민연금공단 동광주지사(~9.2.(수)까지)",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70768",
-   "postedAt": "2026-10-21",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-21",
-   "thumb": "data/news/img/153ec606d0541071.webp"
-  },
-  {
-   "title": "[채용공고] 2026년 전남대학교 제10회 앵커사업단·제3회 서남권공유대학...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70765",
-   "postedAt": "2026-10-21",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-21"
-  },
-  {
-   "title": "[채용공고] 전남대학교 소프트웨어중심대학사업단 제1차 산학협력중점비전임교원...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70764",
-   "postedAt": "2026-10-21",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-21",
-   "thumb": "data/news/img/e692187b21c57133.webp"
   }
  ]
 }
