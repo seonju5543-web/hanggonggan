@@ -314,7 +314,7 @@ export function mapYouthContent(r, { scholarship, today, bad } = {}) {
     deadline: ex.deadline,
     host: r.pstSeNm ? `온통청년 ${r.pstSeNm}` : '온통청년',
     excerpts: ex.excerpts,
-    details: activityDetails(htmlToLines(r.pstWholCn)),
+    details: activityDetails(htmlToLines(r.pstWholCn), title),   // 제목의 대상도 읽는다(수집 로봇과 같게 · 2026-10-28)
     /* 글 화면(bbs03View)은 스크립트 껍데기라 어떤 로봇도 본문을 못 본다(2026-10-16 실측 5건 모두 글자 1451 — 틀 글자뿐). 본문은 API 가 준 pstWholCn 에 있고
        대개 포스터 그림 한 장이다 → 그림 주소를 첨부로 넘겨 첨부·포스터 로봇(activity-docs)이 받아 읽게 한다. 이름은 주소의 파일 이름(지어내지 않는다) */
     attachments: bodyImages(r.pstWholCn),

@@ -12275,6 +12275,11 @@ console.log('\n■ 대외활동·공모전 — 활동 글의 자격 읽기 (2026
     [el('기관명 인문360\n지원대상 일반인\n신청기간\n2026-10-02 ~ 2026-10-12')[0], el('지원대상 : 전국 대학생\n신청기간 : 10.1')], ['지원대상 : 일반인', ['지원대상 : 전국 대학생']]);
   eq('⑥ 소급 — 판(detailsV)을 올려 옛 글도 다시 읽는다 · 수집 로봇은 제목을 넘긴다',
     [AX.ACT_DETAILS_V >= 3, (readText(new URL('../collector/collect.mjs', import.meta.url)).match(/activityDetails\(detail\.text, it\.title\)/g) || []).length], [true, 2]);
+  eq('  API 로봇(1365 상세·온통청년)도 제목을 넘긴다 — 안 넘기면 「… -대학생만 신청가능!」 의 대상이 매 실행 비워진다(2026-10-28 서북구보건소)',
+    [/activityDetails\(htmlToLines\(row\.progrmCn\), it\.title\)/.test(readText(new URL('../collector/open-api.mjs', import.meta.url))), /activityDetails\(htmlToLines\(r\.pstWholCn\), title\)/.test(readText(new URL('../collector/open-api-map.mjs', import.meta.url)))], [true, true]);
+  eq('  (n) 사이트 메뉴·단추·머리글·시상 수는 자격이 아니다 — `장애학생지원`·`장애인 복지시설`(동국대 숨은 전체메뉴) · `QR 코드로 신청하기`·`지금 신청하기` · `[안내 사항]` · `대상 : 1팀`·`대상 : 1명 (팀)` · 진짜 줄은 그대로',
+    [['장애학생지원', '장애인 복지시설', 'QR 코드로 신청하기', '지금 신청하기', '[안내 사항]', '대상 : 1팀', '대상 : 1명 (팀)'].map(AX.eligLineOk), ['장애학생 및 저소득층 학생', '장애인 복지시설 봉사 경험자', '대상 : 장애학생', '[대학생] 봉사자'].map(AX.eligLineOk)],
+    [[false, false, false, false, false, false, false], [true, true, true, true]]);
 }
 
 console.log('\n■ 대외활동·공모전 — 첨부·포스터 읽기 (2026-10-03 · 개발자 "api 잔액 채우고 딸깍 · 무료로 최대한 땜빵")');

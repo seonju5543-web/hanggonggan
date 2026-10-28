@@ -186,7 +186,7 @@ async function vol1365Details(items, refs) {
       const r = await getText('https://apis.data.go.kr/1741000/volunteerPartcptnService/getVltrPartcptnItem', { serviceKey: portalKey, progrmRegistNo: no });
       const row = xmlItems(r.text)[0];
       if (!row || !row.progrmCn) continue;
-      const d = activityDetails(htmlToLines(row.progrmCn));
+      const d = activityDetails(htmlToLines(row.progrmCn), it.title);   // 제목을 넘겨야 「… -대학생만 신청가능!」 의 대상을 읽는다(2026-10-28 · 서북구보건소 2건이 매 실행 비워졌다)
       if (!d.noticeLines.length) d.noticeLines = splitLines(row.progrmCn, 6);
       putActivityDetails(it, d);
       got += 1;
