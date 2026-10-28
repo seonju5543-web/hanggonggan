@@ -321,6 +321,7 @@ export function pickPdfTargets(items) {
     const needAmount = !(it.amountSpec && it.amountSpec.kind && it.amountSpec.kind !== 'unknown')
                        && !(it.amountLines && it.amountLines.length);
     if (it.program || (!needElig && !needAmount)) continue;
+    if (closedForStudents(it, TODAY)) continue;   // 첨부도 마감 지난 공고엔 돈을 안 쓴다(본문과 같은 규칙 · 2026-10-29)
     if ((it.aiTries || 0) >= (cfg.giveUpAfter ?? 3)) continue;
     /* 🔴 **큰 그림을 고른다.** 파일 순서대로 첫 장을 집으면 머리말 배너(1002×551)를
        골라 놓고 진짜 포스터(3368×4768)를 지나친다 — 실제로 그랬다.
@@ -462,7 +463,8 @@ if (!process.env.ELIG_AI_AS_LIB) {
 
   /* 전수에는 한도를 걸지 않는다 — 전수 1회가 소넷 기준 2,229원이라(2026-08-23 실측)
      3건씩 끊으면 169건에 두 달이 걸린다. 평소 실행은 한도를 지킨다. */
-  const cap = (ALL || ONLY) ? Infinity : (cfg.maxApiCallsPerRun ?? 3);
+  /* ELIG_AI_MAX — 워크플로 「못 읽은 것 전부」 모드가 한 실행에 못 읽은 공고를 다 읽을 때 올린다(--all 은 이미 자격이 뜨는 229건까지 다시 읽어 10배 비싸다 · 2026-10-29) */
+  const cap = (ALL || ONLY) ? Infinity : Number(process.env.ELIG_AI_MAX || cfg.maxApiCallsPerRun || 3);
   let calls = 0, got = 0, kept = 0, branched = 0;
   for (const { it, lines } of targets) {
     if (calls >= cap) { log(`이번 실행 한도(${cap}건) 도달 — 나머지는 다음 실행`); break; }

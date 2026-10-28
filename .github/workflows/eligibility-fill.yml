@@ -29,6 +29,7 @@ on:
           - '전부'            # 미리보기 → 시범 3건 → 전수. 권장.
           - '미리보기만'      # 돈 안 씀
           - '시범 3건만'
+          - '못 읽은 것 전부'  # 무료 경로가 못 읽은 공고 본문(상한 100) + 공고문 PDF·포스터 — 대외활동은 안 함 · '전부'는 이미 자격이 뜨는 공고까지 다시 읽어 10배 비싸다(2026-10-29)
           - '공고 하나만'    # 아래 only 칸에 공고 id 를 적는다
           - '첨부만'          # 공고문 PDF·포스터 그림만 읽는다 (본문이 '붙임 참조'뿐인 공고)
           - '대외활동만'      # 대외활동·공모전 글 중 무료로 자격을 못 읽은 것 (포스터·첨부·본문 — collector/activity-docs.mjs)
@@ -153,7 +154,7 @@ jobs:
       # 본문이 '붙임 참조'뿐이고 내용이 공고문 PDF·포스터 그림에만 있는 공고들.
       # 지정 실행을 여러 번 띄우면 서로의 registered.json 을 덮어쓰므로 한 번에 돈다.
       - name: 첨부만 (공고문 PDF · 포스터 그림)
-        if: inputs.mode == '첨부만' && steps.preview.outputs.count != '0'
+        if: (inputs.mode == '첨부만' || inputs.mode == '못 읽은 것 전부') && steps.preview.outputs.count != '0'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ELIG_AI_ENABLE: '1'
@@ -167,11 +168,13 @@ jobs:
           ONLY_ID: ${{ inputs.only }}
         run: node collector/eligibility-ai.mjs --only="$ONLY_ID" --write | tee /tmp/trial.txt
 
+      # 「못 읽은 것 전부」 모드면 같은 단계가 상한 100 으로 돈다(ELIG_AI_MAX) — 단계 이름은 관문(bodies ⑥)이 잠근다
       - name: 시범 3건
-        if: (inputs.mode == '전부' || inputs.mode == '시범 3건만') && steps.preview.outputs.count != '0'
+        if: (inputs.mode == '전부' || inputs.mode == '시범 3건만' || inputs.mode == '못 읽은 것 전부') && steps.preview.outputs.count != '0'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ELIG_AI_ENABLE: '1'
+          ELIG_AI_MAX: ${{ inputs.mode == '못 읽은 것 전부' && '100' || '' }}
         run: node collector/eligibility-ai.mjs --write | tee /tmp/trial.txt
 
       # 시범 결과가 규칙을 어기면 되돌리고 전수로 넘어가지 않는다.
