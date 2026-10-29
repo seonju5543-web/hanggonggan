@@ -2234,7 +2234,7 @@
    "expiredAt": "2026-10-24"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000253007",
    "org": "(재)고창군장학재단",
    "name": "대학 등록금 지원사업",
@@ -2243,7 +2243,9 @@
    "tplNo": 2,
    "cards": 4,
    "dir": "insta/pub/2000253007",
-   "at": "2026-10-01"
+   "at": "2026-10-01",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-29"
   },
   {
    "status": "expired",
@@ -2424,7 +2426,7 @@
    "expiredAt": "2026-10-24"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0731001",
    "org": "대한간호협회",
    "name": "백양이영복장학금",
@@ -2433,7 +2435,9 @@
    "tplNo": 3,
    "cards": 4,
    "dir": "insta/pub/0731001",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-29"
   },
   {
    "status": "prepared",
@@ -3280,7 +3284,7 @@
    "expiredAt": "2026-10-24"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "1768681003",
    "org": "부산광역시청",
    "name": "부산지역인재 장학금",
@@ -3289,7 +3293,9 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/1768681003",
-   "at": "2026-10-09"
+   "at": "2026-10-09",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-29"
   },
   {
    "status": "expired",
