@@ -87,13 +87,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-18",
-  "lastAt": "2026-10-23",
-  "tries": 3,
+  "lastAt": "2026-10-30",
+  "tries": 4,
   "status": "pending",
-  "why": "게시판 목록(9줄)에서 그 글을 하나로 못 고름",
+  "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-12-11",
-  "nextAt": "2026-10-30"
+  "nextAt": "2026-11-06"
  },
  "kosaf|2000206004|board:https://www.yw.go.kr/www/selectBbsNttList.do?bbsNo=86&key=524": {
   "ds": "kosaf",
@@ -182,6 +182,25 @@
   "why": "게시판 목록(100줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-12-31",
+  "nextAt": "2026-10-31"
+ },
+ "kosaf|2000347003|https://gcdream.kr/bbs/board.php?bo_table=scholaship&wr_id=18": {
+  "ds": "kosaf",
+  "key": "2000347003",
+  "url": "https://gcdream.kr/bbs/board.php?bo_table=scholaship&wr_id=18",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "title": "2026년 (재)거창군장학회 장학생 선발 공고",
+  "firstAt": "2026-10-30",
+  "lastAt": "2026-10-30",
+  "tries": 1,
+  "status": "pending",
+  "why": "못 엶(HTTP 500) — 다시 봅니다",
+  "checks": {
+   "C": "ok",
+   "L": "unread"
+  },
+  "round": "2026-11-16",
   "nextAt": "2026-10-31"
  },
  "kosaf|2000429013|https://scholarship.eumseong.go.kr/www/selectBbsNttView.do?key=33&bbsNo=3&nttNo=792": {
@@ -365,6 +384,31 @@
   "checks": {},
   "round": "2026-11-06",
   "nextAt": "2026-10-31"
+ },
+ "kosaf|2518026001|https://www.gjmed.or.kr/bbs/board.php?bo_table=notice3&wr_id=516": {
+  "ds": "kosaf",
+  "key": "2518026001",
+  "url": "https://www.gjmed.or.kr/bbs/board.php?bo_table=notice3&wr_id=516",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "title": "채용공고 [공고 제2026-28호] 전남 공공취약지 간호사 장학생 선발 공고 자세히 보기 →",
+  "firstAt": "2026-10-30",
+  "lastAt": "2026-10-30",
+  "tries": 1,
+  "status": "suggest",
+  "why": "제목이 제목 자리가 아니라 본문에만 보임",
+  "checks": {
+   "C": "ok",
+   "L": "weak",
+   "H": "ok",
+   "T": "ok",
+   "R": "weak",
+   "X": "ok",
+   "P": "ok"
+  },
+  "round": "2026-11-06",
+  "decidedAt": "2026-10-30",
+  "also": []
  },
  "kosaf|2700017001|http://www.hsf.or.kr/bbs/board.php?bo_table=s5_1&wr_id=102": {
   "ds": "kosaf",
