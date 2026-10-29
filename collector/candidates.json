@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-10-29",
- "count": 1530,
+ "count": 1535,
  "items": [
   {
    "title": "[공통][교외]2026년 2학기 선원가족 장학생 선발 기간 연장(~10/30)",
@@ -259,6 +259,24 @@
    "bodyDeadlineText": "[장학][학생지원팀] 2026년도 통영시 저소득 대학생 장학금 지원대상자 선발 안내(11. 2.(월) ~ 11. 23.(월)) | 가톨릭대학교"
   },
   {
+   "title": "제36기 미래에셋 해외교환 장학생 선발 공고",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30146&pageNo=2",
+   "attachments": [],
+   "deadlineHint": "지원기간 : 2027 년 봄학기(한 학기 지원) ※ 파견기간 변경 , 연장 , 취소 사유 발생에 따른 장학금 유예, 추가 지원 등 불가(1년 파",
+   "school": "중앙대학교",
+   "campus": "",
+   "foundAt": "2026-10-29"
+  },
+  {
+   "title": "[2차 안내] 2026학년도 2학기 AI학업장려 학자금대출 관련 안내",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30157&pageNo=2",
+   "attachments": [],
+   "deadlineHint": "신청기간 신청: 2026. 7. 1.(수) 09:00 ~ 11. 17.(화) 18:00 실행: 2026. 7. 1.(수) 09:00 ~ 11.",
+   "school": "중앙대학교",
+   "campus": "",
+   "foundAt": "2026-10-29"
+  },
+  {
    "title": "[2차 안내] 2026학년도 2학기 AI학업장려 학자금대출 관련 안내",
    "url": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&pageNo=2#n-%5B2%EC%B0%A8%20%EC%95%88%EB%82%B4%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20AI%ED%95%99%EC%97%85%EC%9E%A5%EB%A0%A4%20%ED%95%99%EC%9E%90%EA%B8%88%EB%8C%80%EC%B6%9C%20%EA%B4%80%EB%A0%A8%20%EC%95%88%EB%82%B4",
    "attachments": [],
@@ -295,6 +313,15 @@
    "foundAt": "2026-10-29"
   },
   {
+   "title": "미래인재육성재단 2027학년도 신규장학생(미래인재장학생) 선발 공고",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&pageNo=2&nttId=30134",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "중앙대학교",
+   "campus": "",
+   "foundAt": "2026-10-29"
+  },
+  {
    "title": "통영시 2026년도 저소득 대학생 장학금 지원 대상자 신청 안내",
    "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=815&bbsNo=8&nttNo=171044&pageUnit=10&searchCtgry=%ed%95%99%ec%82%ac%2f%ec%9e%a5%ed%95%99&searchCnd=all&pageIndex=1",
    "attachments": [],
@@ -315,6 +342,24 @@
    "foundAt": "2026-10-29",
    "bodyDeadline": "2026-11-12",
    "bodyDeadlineText": "마. 신청내용 - 희망근로지 신청기간: 2026. 10. 30.(금) 09:00 ~ 11. 12.(목) 18:00"
+  },
+  {
+   "title": "[홍보] 2026년도 통영시 저소득 대학생 장학금 지원대상자 선발 안내",
+   "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766785",
+   "attachments": [
+    {
+     "name": "2026년 통영시 저소득 대학생 장학금 지원대상자 선발 공고.hwp",
+     "url": "https://www.dongguk.edu/cmmn/fileDown.do?filename=2026%25EB%2585%2584%20%25ED%2586%25B5%25EC%2598%2581%25EC%258B%259C%20%25EC%25A0%2580%25EC%2586%258C%25EB%2593%259D%20%25EB%258C%2580%25ED%2595%2599%25EC%2583%259D%20%25EC%259E%25A5%25ED%2595%2599%25EA%25B8%2588%20%25EC%25A7%2580%25EC%259B%2590%25EB%258C%2580%25EC%2583%2581%25EC%259E%2590%20%25EC%2584%25A0%25EB%25B0%259C%20%25EA%25B3%25B5%25EA%25B3%25A0.hwp&filepath=/files/article/JANGHAKNOTICE/26766785/&filerealname=E5CE5BF531614567909CDD1845368CCC.hwp"
+    },
+    {
+     "name": "2026년 통영시 저소득 대학생 장학금 지원대상자 선발 공고.hwp",
+     "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766785#n-2026%EB%85%84%20%ED%86%B5%EC%98%81%EC%8B%9C%20%EC%A0%80%EC%86%8C%EB%93%9D%20%EB%8C%80%ED%95%99%EC%83%9D%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%A7%80%EC%9B%90%EB%8C%80%EC%83%81%EC%9E%90%20%EC%84%A0%EB%B0%9C%20%EA%B3%B5%EA%B3%A0.hwp"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026. 11. 2.( 월 )~11. 23.( 월 ) 나 . 신청방법 : 방문 또는 우편 신청 1) 방 문 : 업무시간 ( 월 ~",
+   "school": "동국대학교",
+   "campus": "",
+   "foundAt": "2026-10-29"
   },
   {
    "title": "[홍보] 2026년도 통영시 저소득 대학생 장학금 지원대상자 선발 안내",
@@ -445,6 +490,15 @@
    "attachments": [],
    "deadlineHint": null,
    "school": "국민대학교",
+   "campus": "",
+   "foundAt": "2026-10-29"
+  },
+  {
+   "title": "[교외-11/23]2026년도 통영시 저소득 대학생 장학금 지원대상자 선발 안내(재단지원)",
+   "url": "https://www.korea.ac.kr/ko/568/subview.do?article.offset=10#n-%5B%EA%B5%90%EC%99%B8-11%2F23%5D2026%EB%85%84%EB%8F%84%20%ED%86%B5%EC%98%81%EC%8B%9C%20%EC%A0%80%EC%86%8C%EB%93%9D%20%EB%8C%80%ED%95%99%EC%83%9D%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%A7%80%EC%9B%90%EB%8C%80%EC%83%81%EC%9E%90%20%EC%84%A0",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "고려대학교",
    "campus": "",
    "foundAt": "2026-10-29"
   },
