@@ -538,7 +538,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-15",
+    "checkedAt": "2026-10-29",
     "why": "홈페이지 못 엶 (TypeError: ENOTFOUND)",
     "best": null
    }
@@ -549,7 +549,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-15",
+    "checkedAt": "2026-10-29",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://top.cafe.daum.net/",
@@ -595,7 +595,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-15",
+    "checkedAt": "2026-10-29",
     "why": "홈페이지 못 엶 (HTTP 403)",
     "best": null
    }
@@ -606,7 +606,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-15",
+    "checkedAt": "2026-10-29",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.bsbukgu.go.kr/index.bsbukgu",
@@ -636,11 +636,11 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-15",
-    "why": "최고 1건 ((홈))",
+    "checkedAt": "2026-10-29",
+    "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.mariners.or.kr/",
-     "signals": 1
+     "signals": 0
     }
    }
   },
@@ -650,7 +650,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-15",
+    "checkedAt": "2026-10-29",
     "why": "최고 1건 ((홈))",
     "best": {
      "url": "https://www.britishcouncil.kr/",
@@ -664,7 +664,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-15",
+    "checkedAt": "2026-10-29",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://pjdjkjscholarship.or.kr/",
@@ -678,7 +678,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-15",
+    "checkedAt": "2026-10-29",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://www.surim.or.kr/",
