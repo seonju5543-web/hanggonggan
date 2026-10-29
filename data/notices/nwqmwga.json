@@ -1,7 +1,25 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-10-28",
+ "updatedAt": "2026-10-29",
  "items": [
+  {
+   "title": "[장학안내] [통영시] 2026년도 통영시 저소득 대학생 장학금 지원 안내",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70833&cate=8",
+   "attachments": [
+    {
+     "name": "교육기본시설/부속시설",
+     "url": "https://www.jnu.ac.kr/MainIntro/Institution/AttachedFac"
+    },
+    {
+     "name": "2026년 통영시 저소득 대학생 장학금 지원대상자 선발 공고.hwpx",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2589620"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026. 11. 2.( 월 )~11. 23.( 월 ) 나 . 신청방법 : 방문 또는 우편 신청 1) 방 문 : 업무시간 ( 월 ~",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-10-29"
+  },
   {
    "title": "[장학안내] [강화군] 2026년도 하반기 강화군 대학생 등록금 지원사업 안내",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70812&cate=8",

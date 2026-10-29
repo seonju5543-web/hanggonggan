@@ -1,16 +1,25 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-10-28",
+ "updatedAt": "2026-10-29",
  "items": [
+  {
+   "title": "2026년도 통영시 저소득 대학생 장학금 지원대상자 선발 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=141044&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2026년 통영시 저소득 대학생 장학금 지원대상자 선발 공고(공지용).hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=141044&attachNo=118660"
+    }
+   ],
+   "deadlineHint": "신청기간: 2026년 11월 2일 (월) ~ 11월 23일 (월) 나. 신청방법: 방문 또는 우편접수 (제출처: 통영시 평생교육과 평생학습팀)",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-10-29"
+  },
   {
    "title": "2026학년도 2학기 2차 연구우수장학생 선발 결과 안내",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140845&article.offset=0&articleLimit=10",
-   "attachments": [
-    {
-     "name": "부속기관",
-     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
-    }
-   ],
+   "attachments": [],
    "deadlineHint": null,
    "school": "성균관대학교",
    "campus": "",
@@ -19,12 +28,7 @@
   {
    "title": "2026 세아해암학술장학재단 「제1회 차세대 공학연구자 Alumni 심포지엄」안내",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140778&article.offset=0&articleLimit=10",
-   "attachments": [
-    {
-     "name": "부속기관",
-     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
-    }
-   ],
+   "attachments": [],
    "deadlineHint": "마감: 2026. 11. 15.(일) 자정마감 ※ 마감일 전이라도 계획 대비 초과 신청 시 조기 마감될 수 있음 나. 개최일시: 2026. 12",
    "school": "성균관대학교",
    "campus": "",
