@@ -1,7 +1,18 @@
 {
  "school": "부경대학교",
- "updatedAt": "2026-10-28",
+ "updatedAt": "2026-10-29",
  "items": [
+  {
+   "title": "파도 속에서 나로 있기 : 청년 번아웃 회복 심리프로그램",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726783",
+   "postedAt": "2026-10-29",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-29",
+   "thumb": "data/news/img/271f933802b9cc17.webp",
+   "desc": "요즘 유독 무기력하고 번아웃이 찾아왔다면? 광안리 바다 앞에서 나를 돌보는 반나절의 쉼표를 선물하세요!"
+  },
   {
    "title": "☆★ 2027학년도 전기 정시 일반대학원 신입생 모집 안내 ★☆",
    "url": "https://www.pknu.ac.kr/main/163?action=view&no=726780",
@@ -407,15 +418,6 @@
    "url": "https://www.pknu.ac.kr/main/163?action=view&no=726567",
    "postedAt": "2026-10-12",
    "kind": "학사",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-12"
-  },
-  {
-   "title": "★ 2026학년도 공직진출 역량진단 평가(1차) 실시 안내(지역인재7급 필기시험 모의고사)",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726560",
-   "postedAt": "2026-10-12",
    "school": "부경대학교",
    "campus": "",
    "src": "53a197d6",

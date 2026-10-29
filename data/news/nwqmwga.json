@@ -1,7 +1,17 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-10-28",
+ "updatedAt": "2026-10-29",
  "items": [
+  {
+   "title": "[취업정보] [서민금융진흥원]2026 하반기 금융전문직 채용(~11.9.(...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70834",
+   "postedAt": "2026-10-29",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-29"
+  },
   {
    "title": "[취업정보] [JOB FESAT]상하농원 현장면접★학교 추천채용(~11.4...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70832",
@@ -84,7 +94,8 @@
    "school": "전남대학교",
    "campus": "",
    "src": "b7347301",
-   "foundAt": "2026-10-28"
+   "foundAt": "2026-10-28",
+   "thumb": "data/news/img/f8d14098750708ad.webp"
   },
   {
    "title": "[채용공고] 2026년 제2회 전남대학교 기획조정과 국립대학육성사업 계약직...",
@@ -384,15 +395,6 @@
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70783",
    "postedAt": "2026-10-22",
    "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-22"
-  },
-  {
-   "title": "[취업정보] [코원에너지서비스]2026년 하반기 신입사원(G2) 모집",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70782",
-   "postedAt": "2026-10-22",
    "school": "전남대학교",
    "campus": "",
    "src": "b7347301",

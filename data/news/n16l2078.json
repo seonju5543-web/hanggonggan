@@ -1,7 +1,40 @@
 {
  "school": "충북대학교",
- "updatedAt": "2026-10-28",
+ "updatedAt": "2026-10-29",
  "items": [
+  {
+   "title": "충북대학교RISE사업단 사무계약직 공개 경쟁채용 공고",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171025&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-10-28",
+   "kind": "채용",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-10-29",
+   "desc": "○ 접수기간: 2026.10. 29.(목) ~ 11. 6.(금) ○ 접수방법: 방문접수, 우편접수, 이메일접수"
+  },
+  {
+   "title": "2026학년도 동기 계절수업 다른 대학교 수학 안내(경북대)",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171024&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-10-28",
+   "kind": "학사",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-10-29",
+   "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
+  },
+  {
+   "title": "2026학년도 동기 계절수업 다른 대학교 수학 안내(동국대WISE)",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171020&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-10-28",
+   "kind": "학사",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-10-29",
+   "desc": "국내 대학간 학술교류 협정에 따라 2026학년도 동기 계절수업 동국대WISE 학점 교류 수학에 대하여 다음과 같이 안내하오니 수학을 희망하는 학생들은 기한 내 신청하여 주시기 바랍니다."
+  },
   {
    "title": "2026. 2학기 생협 메가커피, 한빛식당 아르바이트 채용",
    "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170998&pageUnit=10&searchCnd=all&pageIndex=1",
@@ -402,39 +435,6 @@
    "src": "76d254e7",
    "foundAt": "2026-10-13",
    "desc": "1. 모집 대학원 가. 일반대학원 (대학원) - 입학과 : 일반전형(석사과정/석.박사통합과정/박사과정) 학과간협동과정(석사과정/석.박사통합과정/박사과정) 학연산협동과정(석사과정/박사과정) 정부위탁생특별전형(석사과정)"
-  },
-  {
-   "title": "2026학년도 동기 계절수업 다른 대학교 수학 안내(전북대)",
-   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170636&pageUnit=10&searchCnd=all&pageIndex=1",
-   "postedAt": "2026-10-12",
-   "kind": "학사",
-   "school": "충북대학교",
-   "campus": "",
-   "src": "76d254e7",
-   "foundAt": "2026-10-13",
-   "desc": "2. 수학추천자 서식 1부. 3. 국내 다른대학 수학허가 신청서 1부. 4. 다른 대학 수학 허가 신청서 작성법 1부. 끝. 대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
-  },
-  {
-   "title": "2026학년도 동기 계절수업 다른 대학교 수학 안내(국립창원대)",
-   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170633&pageUnit=10&searchCnd=all&pageIndex=1",
-   "postedAt": "2026-10-12",
-   "kind": "학사",
-   "school": "충북대학교",
-   "campus": "",
-   "src": "76d254e7",
-   "foundAt": "2026-10-12",
-   "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
-  },
-  {
-   "title": "2026년 충북대학교 국가공무원 경력경쟁채용(공업 9급) 공고",
-   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170632&pageUnit=10&searchCnd=all&pageIndex=1",
-   "postedAt": "2026-10-12",
-   "kind": "채용",
-   "school": "충북대학교",
-   "campus": "",
-   "src": "76d254e7",
-   "foundAt": "2026-10-12",
-   "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
   }
  ]
 }

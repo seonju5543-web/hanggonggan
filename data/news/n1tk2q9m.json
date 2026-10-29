@@ -1,76 +1,107 @@
 {
  "school": "이화여자대학교",
- "updatedAt": "2026-10-28",
+ "updatedAt": "2026-10-29",
  "items": [
   {
+   "title": "[인사팀] 이화여자대학교 직원 채용 공고(2027.1.1.자)",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367684&article.offset=0&articleLimit=10&no=380",
+   "postedAt": "2026-10-29",
+   "kind": "채용",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-29",
+   "desc": "※ 지원기간 중 ‘ 이화여자대학교 직원 채용 홈페이지 ’ 를 통한 인터넷 지원만 가능함 [ 문의처 ] 이화여자대학교 총무처 인사팀 페이스북"
+  },
+  {
    "title": "[학부] 2026학년도 겨울 계절학기 수강안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367643&article.offset=0&articleLimit=10&no=383",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367643&article.offset=0&articleLimit=10&no=380",
    "postedAt": "2026-10-27",
    "kind": "학사",
    "school": "이화여자대학교",
    "campus": "",
    "src": "ec6597da",
-   "foundAt": "2026-10-28",
+   "foundAt": "2026-10-29",
    "desc": "1. 첨부의 수강안내문을 반드시 읽어 보시기 바랍니다. 2. 강의시간표 조회( 2026.10.30.( 금) 09:00부터 ): 홈페이지&rarr;학사안내&rarr; 강의시간표/계획안"
   },
   {
    "title": "[교육기획팀] 2026 AI4AE DAY 참가 신청 안내 (11. 6.(금))",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367575&article.offset=0&articleLimit=10&no=383",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367575&article.offset=0&articleLimit=10&no=380",
    "postedAt": "2026-10-23",
    "school": "이화여자대학교",
    "campus": "",
    "src": "ec6597da",
-   "foundAt": "2026-10-28",
-   "desc": "3. 장소: ECC 이삼봉홀 가. 현장투표 (12:00~13:00 (본 행사 전))"
+   "foundAt": "2026-10-29"
   },
   {
    "title": "🍂 2026 대학혁신지원사업 홍보데이 <경험을 수확하다> 개최 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367549&article.offset=0&articleLimit=10&no=383",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367549&article.offset=0&articleLimit=10&no=380",
    "postedAt": "2026-10-22",
    "kind": "행사",
    "school": "이화여자대학교",
    "campus": "",
    "src": "ec6597da",
-   "foundAt": "2026-10-28"
+   "foundAt": "2026-10-29"
+  },
+  {
+   "title": "[법학전문대학원] 2027학년도 법학전문대학원 석사 입학전형 조교 모집",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367683&article.offset=0&articleLimit=10&no=379",
+   "postedAt": "2026-10-29",
+   "kind": "채용",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-29",
+   "desc": "5. 임금지급 방식: 계좌이체(근무 종료 후 14일 이내) * 유레카에 등록되어 있는 본인 계좌로 지급 예정"
+  },
+  {
+   "title": "[채용] 국제대학원 이화-코이카 석박사 학위연수사업 담당 특임교수 채용 공고",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367682&article.offset=0&articleLimit=10&no=378",
+   "postedAt": "2026-10-29",
+   "kind": "학사",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-29"
   },
   {
    "title": "[기계/일반경쟁]정보인프라팀/가상화 서버 고도화 및 재해복구 서버 구입",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367672&article.offset=0&articleLimit=10&no=380",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367672&article.offset=0&articleLimit=10&no=374",
    "postedAt": "2026-10-28",
    "school": "이화여자대학교",
    "campus": "",
    "src": "ec6597da",
-   "foundAt": "2026-10-28"
+   "foundAt": "2026-10-29",
+   "desc": "( 상세 사양 및 수량 관련하여 첨부된 규격사양서 확인 必 ) 마 . 납품기간 : 계약체결일로부터 6 개월 이내 납품 및 설치 완료 ( 상세일정은 협의 가능 )"
   },
   {
    "title": "[학부] 2026학년도 제2학기 합격장려금 신청 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367669&article.offset=0&articleLimit=10&no=379",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367669&article.offset=0&articleLimit=10&no=373",
    "postedAt": "2026-10-28",
    "school": "이화여자대학교",
    "campus": "",
    "src": "ec6597da",
-   "foundAt": "2026-10-28"
+   "foundAt": "2026-10-29"
   },
   {
    "title": "[도서관/원데이클래스] ✨AI로 완성하는 나만의 커리어 브랜딩(11/11, 17, 24)",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367667&article.offset=0&articleLimit=10&no=378",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367667&article.offset=0&articleLimit=10&no=372",
    "postedAt": "2026-10-28",
    "kind": "생활",
    "school": "이화여자대학교",
    "campus": "",
    "src": "ec6597da",
-   "foundAt": "2026-10-28",
-   "thumb": "data/news/img/2ae5755cd47bc194.webp"
+   "foundAt": "2026-10-29"
   },
   {
    "title": "[연장][채용] 이화여자대학교 대학원혁신연구실 연구원 채용 공고(~11/4)",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367657&article.offset=0&articleLimit=10&no=376",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367657&article.offset=0&articleLimit=10&no=370",
    "postedAt": "2026-10-28",
    "kind": "채용",
    "school": "이화여자대학교",
    "campus": "",
    "src": "ec6597da",
-   "foundAt": "2026-10-28",
+   "foundAt": "2026-10-29",
    "desc": "4) 급여: 본교 대학원혁신지원사업 급여 기준에 의함 2. 지원 자격 가. 석사학위 이상 소지자"
   },
   {
@@ -388,38 +419,6 @@
    "src": "ec6597da",
    "foundAt": "2026-10-23",
    "desc": "2026년 노벨상 수상작들의 해설을 전문가에게 들을 수 있는 2026 노벨상 해설 강연회가 개최됩니다."
-  },
-  {
-   "title": "[용역/일반경쟁]총무팀/업무용 차량 리스(48개월)",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367564&article.offset=0&articleLimit=10&no=374",
-   "postedAt": "2026-10-22",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-23",
-   "desc": "나 . 입찰서류등록 마감 일시 및 장소 : 2026. 10. 29.( 목 ) 1 1:00, 이비즈포유 ( ebiz4u.co.kr)"
-  },
-  {
-   "title": "[학부]2026학년도 겨울계절학기 숙명여자대학교 학점교류 수강신청 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367538&article.offset=0&articleLimit=10&no=374",
-   "postedAt": "2026-10-21",
-   "kind": "학사",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-22",
-   "desc": "본교 홈페이지 학사안내 > 학사정보 > 학점인정 > 국내대학학점교류 > 하단게시판에 게시되었으니 2026 학년도 교환겨울계절학기 신청을 희망하는 경우 해당 내용 확인 후 , 접수마감 기한 내에 학적팀으로 신청서를…"
-  },
-  {
-   "title": "[학부]2026학년도 겨울계절학기 한국교원대학교 학점교류 수강신청 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367537&article.offset=0&articleLimit=10&no=373",
-   "postedAt": "2026-10-21",
-   "kind": "학사",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-22",
-   "desc": "본교 홈페이지 학사안내 > 학사정보 > 학점인정 > 국내대학학점교류 > 하단게시판에 게시되었으니 2026 학년도 교환겨울계절학기 신청을 희망하는 경우 해당 내용 확인 후 , 접수마감 기한 내에 학적팀으로 신청서를…"
   }
  ]
 }

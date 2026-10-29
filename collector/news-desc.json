@@ -9742,10 +9742,10 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=271600&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-10-28",
+   "at": "2026-10-29",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 2
+   "tries": 3
   },
   "url:https://www.yonsei.ac.kr/bbs/wj/104/944483/artclView.do": {
    "at": "2026-10-27",
@@ -9808,10 +9808,10 @@
    "desc": "법학전문대학원 * 많은 신청 바랍니다. * 감사합니다. #디지털자산"
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=271599&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-10-28",
+   "at": "2026-10-29",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 2
+   "tries": 3
   },
   "url:https://www.hongik.ac.kr/kr/newscenter/notice.do?articleNo=159614&mode=view&noCat=500": {
    "at": "2026-10-27",
@@ -9974,10 +9974,10 @@
    "desc": "글로벌어학교육센터 ★글로벌어학교육센터 행사 안내 영어로 대화하며 함께 할로윈 행사에 참여해보아요!"
   },
   "url:https://www.knou.ac.kr/bbs/knou/51/820060/artclView.do": {
-   "at": "2026-10-28",
+   "at": "2026-10-29",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 2
+   "tries": 3
   },
   "url:https://www3.chosun.ac.kr/bbs/chosun/117/282366/artclView.do": {
    "at": "2026-10-27",
@@ -10235,10 +10235,10 @@
    "desc": "AI기반 기초과목 진단 및 맞춤형 학습이란 AI를 통해 기초과목에 대한 역량을 진단하고, 역량 향상을 위한 추천 문제, 개념 학습 영상 등을 제공하는 가톨릭대학교 학생 맞춤형 인공지능 온라인 학습 플랫폼입니다."
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=271623&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-10-28",
+   "at": "2026-10-29",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1
+   "tries": 2
   },
   "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=140833&mode=view": {
    "at": "2026-10-28",
@@ -10286,10 +10286,9 @@
    "desc": "1. 첨부의 수강안내문을 반드시 읽어 보시기 바랍니다. 2. 강의시간표 조회( 2026.10.30.( 금) 09:00부터 ): 홈페이지&rarr;학사안내&rarr; 강의시간표/계획안"
   },
   "post:전북대학교:219026": {
-   "at": "2026-10-28",
+   "at": "2026-10-29",
    "v": 2,
-   "err": "글 열기 실패 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
-   "tries": 1
+   "desc": "학생취업진로처 취업진로지원과 2026 동계 '기업의 달인되기' 참여팀을 모집합니다. 관심있는 학생들의 많은 참여 바랍니다."
   },
   "url:https://www.kookmin.ac.kr/user/kmuNews/notice/4/12521/view.do?currentPageNo=1": {
    "at": "2026-10-28",
@@ -10432,10 +10431,10 @@
    "desc": "1. 조사일정: 2026. 10. 27.(화) ~ 11. 20.(금) ※ 응답률에 따라 조사기간이 연장될 수 있습니다."
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=271630&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-10-28",
+   "at": "2026-10-29",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1
+   "tries": 2
   },
   "url:https://www.pknu.ac.kr/main/163?action=view&no=726780": {
    "at": "2026-10-28",
@@ -10574,10 +10573,10 @@
    "desc": "행정 5급·지역인재 7급·외교관후보자 시험을 준비하는 학생들을 위해 PSAT 및 헌법 모의고사를 실시합니다."
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=271626&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-10-28",
+   "at": "2026-10-29",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1
+   "tries": 2
   },
   "url:https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53575&tpage=1": {
    "at": "2026-10-28",
@@ -10813,6 +10812,217 @@
    "at": "2026-10-28",
    "v": 2,
    "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511826&mCode=MN095&mgr_seq=3&mode=view": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "2026학년도 겨울계절수업 고려대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
+  },
+  "url:https://www.hufs.ac.kr/bbs/hufs/2180/270254/artclView.do": {
+   "at": "2026-10-29",
+   "v": 2,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=277251&mode=view": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "10월 29일(목) 11:00~16:00 김수환관 1층에서 진행하며, 다양한 선물도 준비되어있으니 많은 참여 부탁드립니다. * 날씨로 인해 안드레아관 데크 &rarr; 김수환관 1층으로 장소가 변경되었습니다."
+  },
+  "url:https://kau.ac.kr/kaulife/notice.php?code=s1101&mode=read&seq=11401": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "2026 학년도 동계 계절학기를 다음과 같이 실시하오니, 수강에 참고하시기 바랍니다 ."
+  },
+  "post:서울시립대학교:31758": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "교수학습개발센터 안녕하세요, 온라인강의실 담당자입니다."
+  },
+  "url:https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?article.offset=0&articleLimit=10&articleNo=232289183&mode=view&ref=calendar&srYearMonth=2026-10": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "1. 신청기간 : 2026.11.04.(수) 17:00 까지 ※ 수업학적팀 신청서 제출 기준"
+  },
+  "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=141041&mode=view": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "1. 채용분야 및 인원 가. 채용분야: 행정 나. 채용인원: 1명 2. 담당업무"
+  },
+  "url:https://www.pknu.ac.kr/main/163?action=view&no=726783": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "요즘 유독 무기력하고 번아웃이 찾아왔다면? 광안리 바다 앞에서 나를 돌보는 반나절의 쉼표를 선물하세요!"
+  },
+  "url:https://www.smu.ac.kr/webzine/today.do?article.offset=0&articleLimit=10&articleNo=769821&mode=view": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "대외협력팀 우리 대학 바이오헬스 혁신융합대학 사업단은 지난 27일 ㈜모빅셀(대표이사 이연태)과 상호협력을 위한 업무협약(MOU)을 체결했다."
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367684&mode=view&no=380": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "※ 지원기간 중 ‘ 이화여자대학교 직원 채용 홈페이지 ’ 를 통한 인터넷 지원만 가능함 [ 문의처 ] 이화여자대학교 총무처 인사팀 페이스북"
+  },
+  "post:전북대학교:219103": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "사무국 총무과 최근 우리 대학 교직원을 사칭하여 물품 납품, 계좌정보 제공, 개인정보 제출 등을 요구하는 피싱 사례가 발생하고 있습니다."
+  },
+  "url:https://www.inha.ac.kr/bbs/kr/8/45975/artclView.do": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "1. 모집부문 및 지원자격 모집대상 분야 및 업무 지원자격 우대사항 촉탁 연구원 &bull; 대학혁신지원사업 관련 프로그램 운영 및 관리 학사학위 소지자 &bull; 교육(공)학 전공자 우대 &bull;…"
+  },
+  "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11586&searchGbn=0&searchOrderSort=0": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "「강원대학교 개교 80주년 기념 디자인 공모전」에 많은 관심과 참여를 보내주셔서 감사드립니다."
+  },
+  "url:https://www.hongik.ac.kr/kr/newscenter/notice.do?articleNo=159791&mode=view&noCat=501": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "한국장학재단에서는 2027 년 1 , 2 월 중 국가근로 동계방학 집중근로 프로그램을 운영합니다 . 이에 [동 계방학 집중근로 희망근로지 신청 기간 및 신청 방법 ] 에 대하여 안내하오니 희망자는 반드시 기간 내에…"
+  },
+  "url:https://snuc.snu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/?mod=document&uid=929": {
+   "at": "2026-10-29",
+   "v": 2,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70834": {
+   "at": "2026-10-29",
+   "v": 2,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=813&nttNo=171025&pageUnit=10": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "○ 접수기간: 2026.10. 29.(목) ~ 11. 6.(금) ○ 접수방법: 방문접수, 우편접수, 이메일접수"
+  },
+  "url:https://www.gachon.ac.kr/bbs/kor/475/126492/artclView.do": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "9학기 이수 후 휴학 11학기 이수 후 휴학 4) 졸업예정자(마지막 학기자), 학기초과자는 한 과목 이상 수강 및 등록한 재학생이어야만 계절학기 신청이 가능함"
+  },
+  "url:https://www.sejong.ac.kr/kor/intro/notice1.do?article.offset=0&articleLimit=10&articleNo=895312&mode=view": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "교수학습개발센터 기초학력증진 프로그램은 온라인 진단평가 결과를 토대로 학습자의 수준을 분석하고 이에 따른 수준별 맞춤 학습 콘텐츠와 체계적인 학습 지원을 통해 기초역량을 강화할 수 있는 프로그램입니다."
+  },
+  "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511825&mCode=MN095&mgr_seq=3&mode=view": {
+   "at": "2026-10-29",
+   "v": 2,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=140635&mode=view": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "재정경제부 주최로 IMF, World Bank 등 국제금융기구 합동 채용을 진행합니다."
+  },
+  "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=277096&mode=view": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "2026학년도 2학기 동계방학 집중근로 참여를 희망하는 학생은 아래 내용을 확인하여 기간 내 신청하시기 바랍니다."
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367683&mode=view&no=379": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "5. 임금지급 방식: 계좌이체(근무 종료 후 14일 이내) * 유레카에 등록되어 있는 본인 계좌로 지급 예정"
+  },
+  "post:전북대학교:219098": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "보건진료소 교내 보건진료소에서는 교내 구성원들에게 구강진료를 무료 로 실시하고 있습니다 . 11 월 중 구강진료를 원하시는 분은 전화 예약 바랍니다 . * 진료내용 : 구강검진 및 상담 , 충치치료 , 간단한 발치…"
+  },
+  "url:https://www.inha.ac.kr/bbs/kr/8/45970/artclView.do": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "『 인하졸업인증제에 관한 규정 』 에 의거 우수자격 취득자에게 다음의 인증을 부여하고자 하니 관심 있는 학생들의 많은 신청 바랍니다 ."
+  },
+  "url:https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53582&tpage=1": {
+   "at": "2026-10-29",
+   "v": 2,
+   "err": "The operation was aborted due to timeout",
+   "tries": 1
+  },
+  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70824": {
+   "at": "2026-10-29",
+   "v": 2,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=813&nttNo=171024&pageUnit=10": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
+  },
+  "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511823&mCode=MN095&mgr_seq=3&mode=view": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "2026학년도 겨울계절수업 경북대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
+  },
+  "url:https://www.sejong.ac.kr/kor/intro/notice1.do?article.offset=0&articleLimit=10&articleNo=895311&mode=view": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "교수학습개발센터 2~4학년 비대면 그룹 학습컨설팅 이 현재 접수 진행 중이며(~11/15) 1학년/2~4학년의 온라인 셀프 학습컨설팅 또한 현재 접수 연장하여 진행 중(~11/30) 입니다."
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367682&mode=view&no=378": {
+   "at": "2026-10-29",
+   "v": 2,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=277250&mode=view": {
+   "at": "2026-10-29",
+   "v": 2,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "post:전북대학교:219093": {
+   "at": "2026-10-29",
+   "v": 2,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=813&nttNo=171020&pageUnit=10": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "국내 대학간 학술교류 협정에 따라 2026학년도 동기 계절수업 동국대WISE 학점 교류 수학에 대하여 다음과 같이 안내하오니 수학을 희망하는 학생들은 기한 내 신청하여 주시기 바랍니다."
+  },
+  "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511817&mCode=MN095&mgr_seq=3&mode=view": {
+   "at": "2026-10-29",
+   "v": 2,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70823": {
+   "at": "2026-10-29",
+   "v": 2,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367672&mode=view&no=374": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "( 상세 사양 및 수량 관련하여 첨부된 규격사양서 확인 必 ) 마 . 납품기간 : 계약체결일로부터 6 개월 이내 납품 및 설치 완료 ( 상세일정은 협의 가능 )"
+  },
+  "post:전북대학교:219092": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "로딩이 오래걸리면 미리보기를 다시 눌러주세요."
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367669&mode=view&no=373": {
+   "at": "2026-10-29",
+   "v": 2,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367667&mode=view&no=372": {
+   "at": "2026-10-29",
+   "v": 2,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367657&mode=view&no=370": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "4) 급여: 본교 대학원혁신지원사업 급여 기준에 의함 2. 지원 자격 가. 석사학위 이상 소지자"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367643&mode=view&no=380": {
+   "at": "2026-10-29",
+   "v": 2,
+   "desc": "1. 첨부의 수강안내문을 반드시 읽어 보시기 바랍니다. 2. 강의시간표 조회( 2026.10.30.( 금) 09:00부터 ): 홈페이지&rarr;학사안내&rarr; 강의시간표/계획안"
   }
  }
 }

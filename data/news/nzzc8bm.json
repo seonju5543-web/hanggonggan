@@ -1,7 +1,18 @@
 {
  "school": "가천대학교",
- "updatedAt": "2026-10-28",
+ "updatedAt": "2026-10-29",
  "items": [
+  {
+   "title": "2026학년도 동계 계절학기 수강신청 안내",
+   "url": "https://www.gachon.ac.kr/bbs/kor/475/126492/artclView.do",
+   "postedAt": "2026-10-29",
+   "kind": "학사",
+   "school": "가천대학교",
+   "campus": "",
+   "src": "02ae4269",
+   "foundAt": "2026-10-29",
+   "desc": "9학기 이수 후 휴학 11학기 이수 후 휴학 4) 졸업예정자(마지막 학기자), 학기초과자는 한 과목 이상 수강 및 등록한 재학생이어야만 계절학기 신청이 가능함"
+  },
   {
    "title": "2027-1학기 전공결정 안내",
    "url": "https://www.gachon.ac.kr/bbs/kor/475/126076/artclView.do",

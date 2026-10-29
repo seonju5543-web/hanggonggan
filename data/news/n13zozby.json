@@ -1,7 +1,49 @@
 {
  "school": "부산대학교",
- "updatedAt": "2026-10-28",
+ "updatedAt": "2026-10-29",
  "items": [
+  {
+   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(고려대학교)",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511826",
+   "postedAt": "2026-10-29",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-29",
+   "desc": "2026학년도 겨울계절수업 고려대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
+  },
+  {
+   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(동국대학교 WISE캠퍼스)",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511825",
+   "postedAt": "2026-10-29",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-29"
+  },
+  {
+   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(경북대학교)",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511823",
+   "postedAt": "2026-10-29",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-29",
+   "desc": "2026학년도 겨울계절수업 경북대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
+  },
+  {
+   "title": "2026 CAMPUS FOUNDER LEAGUE 모집 재안내(10/29 모집마감)",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511817",
+   "postedAt": "2026-10-29",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-29",
+   "thumb": "data/news/img/52224cc91bccdbac.webp"
+  },
   {
    "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(울산대학교)",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511808",
@@ -378,49 +420,6 @@
    "campus": "",
    "src": "2d0d4013",
    "foundAt": "2026-10-21"
-  },
-  {
-   "title": "[박물관] 제22회 PNU역사나들이 안내(여수시)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511685",
-   "postedAt": "2026-10-21",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-21",
-   "desc": "우리 박물관에서는 효원인들과 함께 역사 · 문화 나들이를 떠나려 합니다 . 이번에 역사나들이가 이뤄질 곳은 한국의 나폴리 , “ 전남광주통합특별시 여수시 ” 입니다 . 여수는 ‘ 한국의 나폴리 ’ 로 불리며…"
-  },
-  {
-   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(제주대학교)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511683",
-   "postedAt": "2026-10-21",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-21",
-   "desc": "2026학년도 겨울계절수업 제주대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
-  },
-  {
-   "title": "[효원상담원] 중간고사 이후, 지친 마음을 돌볼 수 있는 심리기술훈련 6차 안내",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511677",
-   "postedAt": "2026-10-21",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-21",
-   "desc": "6 차 주제 내 안의 긍정자원을 찾는 심리안정화 기술 익히기 6 차 일정 : 2026.10.30. ( 금 ) 10:30 &sim; 11:30 6 차 신청기한 : 2026.09.28.~ 2026.10.27. *…"
-  },
-  {
-   "title": "(일정 변경)[글로컬대학 30] 2026학년도 제5회 디지털인문학센터 컬로퀴엄...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511672",
-   "postedAt": "2026-10-20",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-20",
-   "thumb": "data/news/img/07f7cb8eff55e765.webp",
-   "desc": "인문대학 부속시설 디지털인문학센터에서는 부산대학교 글로컬대학 30 프로젝트의 세부 추진 과제 중 하나인 ‘Knowledge Base 기반 융합교육 활성화’ 의 일환으로 디지털 · 인공지능(AI) 대전환 시대에…"
   }
  ]
 }

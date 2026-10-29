@@ -1,7 +1,54 @@
 {
  "school": "전북대학교",
- "updatedAt": "2026-10-28",
+ "updatedAt": "2026-10-29",
  "items": [
+  {
+   "title": "(재안내) 전북대학교 교직원 사칭 사기 주의 및 사기 피해 예방 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/219103/detailView.do",
+   "postedAt": "2026-10-29",
+   "postId": "219103",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-10-29",
+   "thumb": "data/news/img/a96662e113d3767d.webp",
+   "desc": "사무국 총무과 최근 우리 대학 교직원을 사칭하여 물품 납품, 계좌정보 제공, 개인정보 제출 등을 요구하는 피싱 사례가 발생하고 있습니다."
+  },
+  {
+   "title": "교내 보건진료소 11월 구강진료 예약 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/219098/detailView.do",
+   "postedAt": "2026-10-29",
+   "postId": "219098",
+   "kind": "생활",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-10-29",
+   "desc": "보건진료소 교내 보건진료소에서는 교내 구성원들에게 구강진료를 무료 로 실시하고 있습니다 . 11 월 중 구강진료를 원하시는 분은 전화 예약 바랍니다 . * 진료내용 : 구강검진 및 상담 , 충치치료 , 간단한 발치…"
+  },
+  {
+   "title": "[동국대학교 WISE캠퍼스] 2026학년도 동기 계절수업 교류수학 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/219093/detailView.do",
+   "postedAt": "2026-10-29",
+   "postId": "219093",
+   "kind": "학사",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-10-29"
+  },
+  {
+   "title": "[경북대학교] 2026학년도 동기 계절수업 교류수학 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/219092/detailView.do",
+   "postedAt": "2026-10-29",
+   "postId": "219092",
+   "kind": "학사",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-10-29",
+   "desc": "로딩이 오래걸리면 미리보기를 다시 눌러주세요."
+  },
   {
    "title": "[언어교육부] 11월 외국어 강좌 안내/토익,토익스피킹 시험 할인 안내 (강의계획서 붙임 참조)",
    "url": "https://www.jbnu.ac.kr/web/Board/219037/detailView.do",
@@ -78,7 +125,8 @@
    "campus": "",
    "src": "e41d3fac",
    "foundAt": "2026-10-28",
-   "desc": "행복드림센터 \" 찾아가는 마인드케어 프로그램 & 교직원 TCI기질 성격검사 해석상담 프로그램 \" 행복드림센터와 심리학과가 이번에는 전북대학교 특성화 캠퍼스(익산) 에 찾아갑니다 ! 일정: 2026. 11.…"
+   "desc": "행복드림센터 \" 찾아가는 마인드케어 프로그램 & 교직원 TCI기질 성격검사 해석상담 프로그램 \" 행복드림센터와 심리학과가 이번에는 전북대학교 특성화 캠퍼스(익산) 에 찾아갑니다 ! 일정: 2026. 11.…",
+   "thumb": "data/news/img/ec2ba05e3f6a59fe.webp"
   },
   {
    "title": "[YELLOW BELT 필수선택] 2026 동계 '기업의 달인되기' 참여팀 모집 안내 (11.2.~13. 모집)",
@@ -88,7 +136,8 @@
    "school": "전북대학교",
    "campus": "",
    "src": "e41d3fac",
-   "foundAt": "2026-10-28"
+   "foundAt": "2026-10-28",
+   "desc": "학생취업진로처 취업진로지원과 2026 동계 '기업의 달인되기' 참여팀을 모집합니다. 관심있는 학생들의 많은 참여 바랍니다."
   },
   {
    "title": "[조선대학교] 2026학년도 동기 계절수업 교류수학 안내",
@@ -416,52 +465,6 @@
    "src": "e41d3fac",
    "foundAt": "2026-10-21",
    "desc": "로딩이 오래걸리면 미리보기를 다시 눌러주세요."
-  },
-  {
-   "title": "[10월 기획 교육] IEEE Xplore 활용 및 Authorship 교육(큰사람포인트, 도서관마일리지 적립)",
-   "url": "https://www.jbnu.ac.kr/web/Board/218632/detailView.do",
-   "postedAt": "2026-10-20",
-   "postId": "218632",
-   "kind": "생활",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-10-20",
-   "thumb": "data/news/img/97e22f9b987c5fba.webp"
-  },
-  {
-   "title": "[행복드림] 커피 원데이 클래스 프로그램 안내",
-   "url": "https://www.jbnu.ac.kr/web/Board/218630/detailView.do",
-   "postedAt": "2026-10-20",
-   "postId": "218630",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-10-20",
-   "thumb": "data/news/img/0cd24197b2882bef.webp",
-   "desc": "행복드림센터 ● 웰빙증진 프로그램은? - 월별 새로운 주제의 원데이 클래스를 통해 긍정심리학 기반의 '심리적 자원개발'에 중점을 둔 프로그램입니다."
-  },
-  {
-   "title": "[언어교육부] 11월 외국어 강좌 안내/토익,토익스피킹 시험 할인 안내 (강의계획서 붙임 참조)",
-   "url": "https://www.jbnu.ac.kr/web/Board/218629/detailView.do",
-   "postedAt": "2026-10-20",
-   "postId": "218629",
-   "kind": "학사",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-10-20"
-  },
-  {
-   "title": "[충남대학교] 2026학년도 동기 계절수업 교류수학 안내",
-   "url": "https://www.jbnu.ac.kr/web/Board/218616/detailView.do",
-   "postedAt": "2026-10-20",
-   "postId": "218616",
-   "kind": "학사",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-10-20"
   }
  ]
 }

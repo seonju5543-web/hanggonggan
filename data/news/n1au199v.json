@@ -1,7 +1,18 @@
 {
  "school": "서울시립대학교",
- "updatedAt": "2026-10-28",
+ "updatedAt": "2026-10-29",
  "items": [
+  {
+   "title": "대학포털 통합로그인(SSO) 서비스 일시중지에 따른 온라인강의실 접속 불가 재안내(10.30.(금) 18:00~22:00)",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31758&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-10-29",
+   "postId": "31758",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-10-29",
+   "desc": "교수학습개발센터 안녕하세요, 온라인강의실 담당자입니다."
+  },
   {
    "title": "100주년기념관 이룸라운지 주요 서비스 개선 안내(11월 ~ )",
    "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31756&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
@@ -457,18 +468,6 @@
    "foundAt": "2026-10-16",
    "thumb": "data/news/img/51c8c5418a9730d2.webp",
    "desc": "우리가 일상에서 매일 사용하는 한국어와 한글은 다른 언어를 사용하는 사람들에게 어떻게 다가갈까요 ? 서울시립대학교박물관에서는 2026 년 한글날 제정 100 주년과 훈민정음 반포 580 주년을 맞아 후베 교수와…"
-  },
-  {
-   "title": "2027학년도 제1학기 학석사연계과정 모집 안내",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31668&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-16",
-   "postId": "31668",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-10-16",
-   "thumb": "data/news/img/ddb58ca6901d1af7.webp",
-   "desc": "학사과정과 연계하여 석사학위를 조기(최저 5년, 학사 3.5년/석사 1.5년)에 취득할 수 있는 학·석사연계과정을 모집하오니, 관심 있는 학부 학생들의 많은 지원바랍니다."
   }
  ]
 }

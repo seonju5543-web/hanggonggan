@@ -1,7 +1,29 @@
 {
  "school": "세종대학교",
- "updatedAt": "2026-10-28",
+ "updatedAt": "2026-10-29",
  "items": [
+  {
+   "title": "[신청] 26-2 기초학력증진 프로그램 4차 (10/26~11/29)",
+   "url": "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=895312&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-28",
+   "school": "세종대학교",
+   "campus": "",
+   "src": "8a741b47",
+   "foundAt": "2026-10-29",
+   "thumb": "data/news/img/1795362a15e113ef.webp",
+   "desc": "교수학습개발센터 기초학력증진 프로그램은 온라인 진단평가 결과를 토대로 학습자의 수준을 분석하고 이에 따른 수준별 맞춤 학습 콘텐츠와 체계적인 학습 지원을 통해 기초역량을 강화할 수 있는 프로그램입니다."
+  },
+  {
+   "title": "[신청] 26-2 (2~4학년)비대면 그룹컨설팅 (10/19~11/15) / (1~4학년)온라인 셀프 학습컨설팅 프로그램",
+   "url": "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=895311&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-28",
+   "school": "세종대학교",
+   "campus": "",
+   "src": "8a741b47",
+   "foundAt": "2026-10-29",
+   "thumb": "data/news/img/9a050f727cfe51da.webp",
+   "desc": "교수학습개발센터 2~4학년 비대면 그룹 학습컨설팅 이 현재 접수 진행 중이며(~11/15) 1학년/2~4학년의 온라인 셀프 학습컨설팅 또한 현재 접수 연장하여 진행 중(~11/30) 입니다."
+  },
   {
    "title": "세종대학교 정규직 채용",
    "url": "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=894982&article.offset=0&articleLimit=10",

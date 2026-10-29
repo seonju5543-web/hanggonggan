@@ -1,7 +1,30 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-10-28",
+ "updatedAt": "2026-10-29",
  "items": [
+  {
+   "title": "사범대학 에듀테크연구소 행정 직원 채용 공고",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141041&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-29",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-29",
+   "desc": "1. 채용분야 및 인원 가. 채용분야: 행정 나. 채용인원: 1명 2. 담당업무"
+  },
+  {
+   "title": "[학생인재개발팀/대학일자리플러스센터] 제18회 국제금융기구 채용설명회 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140635&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-29",
+   "kind": "행사",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-10-29",
+   "thumb": "data/news/img/0860b29d9692f2a0.webp",
+   "desc": "재정경제부 주최로 IMF, World Bank 등 국제금융기구 합동 채용을 진행합니다."
+  },
   {
    "title": "[성균융합원] 2027학년도 1학기 융합연구학점제 시행 안내(신청 ~11/25)",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140949&article.offset=0&articleLimit=10",
@@ -76,7 +99,8 @@
    "campus": "",
    "src": "45ec8fd1",
    "foundAt": "2026-10-28",
-   "desc": "인공지능대학원 ○ 주최: 소프트웨어융합대학, 정보통신대학 ○주관: 인공지능대학원, AI중심대학사업단, 소프트웨어융합연구원, AI최고급신진연구자지원사업, 생성AI선도인재양성사업, Open-ended Alignment…"
+   "desc": "인공지능대학원 ○ 주최: 소프트웨어융합대학, 정보통신대학 ○주관: 인공지능대학원, AI중심대학사업단, 소프트웨어융합연구원, AI최고급신진연구자지원사업, 생성AI선도인재양성사업, Open-ended Alignment…",
+   "thumb": "data/news/img/7f04f29956cde117.webp"
   },
   {
    "title": "첨단산업인재양성 인공지능부트캠프 산학교수 채용 공고(~2026.11.8)",
@@ -413,28 +437,6 @@
    "src": "45ec8fd1",
    "foundAt": "2026-10-20",
    "desc": "1. 채용분야 및 인원 가. 채용분야: 행정 나. 채용인원: 1명 2. 담당업무"
-  },
-  {
-   "title": "N센터_MRI_[한국한의학연구원] 뇌영상 데이터 수집을 위한 연구대상자 모집",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140666&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-20",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-20",
-   "desc": "안녕하세요. 한국한의학연구원에서 수행하고 있는 \"뇌영상 기반 글림프-신경조절 기전 조사\"연구의 연구 대상자를 모집합니다."
-  },
-  {
-   "title": "법학전문대학원 행정조교 모집 안내(~10.28.(수))",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140659&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-19",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-19",
-   "desc": "2. 근무장소: 성균관대학교 인문사회과학캠퍼스(서울) 법학관 법학전문대학원행정실"
   }
  ]
 }

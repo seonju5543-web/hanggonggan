@@ -1,7 +1,18 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-10-28",
+ "updatedAt": "2026-10-29",
  "items": [
+  {
+   "title": "[일반] [강북청년창업마루] 2026 강북창업포럼(NCI 민/관/학 창업포럼) 참관객 모집 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53582&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-29",
+   "kind": "행사",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-29",
+   "thumb": "data/news/img/35ea4c92fd38650a.webp"
+  },
   {
    "title": "[일반] [채용공고] 광운대학교 산학협력단 직원 채용 공고",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53579&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -414,17 +425,6 @@
    "src": "b09cb042",
    "foundAt": "2026-10-14",
    "desc": "「광운대학교 산학협력단」 에서 유능하고 역량 있는 인재를 다음과 같이 공개 채용합니다. 광운대학교 산학협력단장"
-  },
-  {
-   "title": "[학사] 2026학년도 학부제 입학생 세부전공 선택 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53478&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-14",
-   "kind": "학사",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-14",
-   "desc": "신청 대상 및 세부전공 신청 대상 학부 모집단위로 입학한 전공 미확정 1학년 재학생(해당 학부: 7개 학부) 인공지능융합대학 컴퓨터정보공학부 지능컴퓨팅시스템전공 지능정보전공 소프트웨어학부 소프트웨어전공 인공지능전공…"
   }
  ]
 }

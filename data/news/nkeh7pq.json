@@ -1,7 +1,28 @@
 {
  "school": "인하대학교",
- "updatedAt": "2026-10-28",
+ "updatedAt": "2026-10-29",
  "items": [
+  {
+   "title": "[프런티어창의대학] 촉탁연구원 채용 공고",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45975/artclView.do",
+   "postedAt": "2026-10-29",
+   "kind": "채용",
+   "school": "인하대학교",
+   "campus": "",
+   "src": "f4141706",
+   "foundAt": "2026-10-29",
+   "desc": "1. 모집부문 및 지원자격 모집대상 분야 및 업무 지원자격 우대사항 촉탁 연구원 &bull; 대학혁신지원사업 관련 프로그램 운영 및 관리 학사학위 소지자 &bull; 교육(공)학 전공자 우대 &bull;…"
+  },
+  {
+   "title": "2026학년도 2학기 인하졸업인증(우수인재분야) 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/45970/artclView.do",
+   "postedAt": "2026-10-29",
+   "school": "인하대학교",
+   "campus": "",
+   "src": "f4141706",
+   "foundAt": "2026-10-29",
+   "desc": "『 인하졸업인증제에 관한 규정 』 에 의거 우수자격 취득자에게 다음의 인증을 부여하고자 하니 관심 있는 학생들의 많은 신청 바랍니다 ."
+  },
   {
    "title": "[대학일자리플러스센터] 삼전닉스 현직자 직무 모의면접 신청중!",
    "url": "https://www.inha.ac.kr/bbs/kr/8/45969/artclView.do",
@@ -402,27 +423,6 @@
    "foundAt": "2026-10-14",
    "thumb": "data/news/img/cdfdbabff916d9b2.webp",
    "desc": "본 프로그램은 26.08 인하대 졸업생을 위한 프로그램입니다 모든 신청자는 졸업생 특화사업 서명을 완료해주셔야 합니다 졸업생 특화사업 서명하기 프로그램 신청은 잡인하에서 가능합니다"
-  },
-  {
-   "title": "[시설팀] 각 호관 지하저수조 및 옥상 고가수조 청소로 인한 단수 안내 (2026학년도 하반기)",
-   "url": "https://www.inha.ac.kr/bbs/kr/8/45809/artclView.do",
-   "postedAt": "2026-10-14",
-   "kind": "생활",
-   "school": "인하대학교",
-   "campus": "",
-   "src": "f4141706",
-   "foundAt": "2026-10-14",
-   "desc": "사무처 시설팀에서는 수도법 시행령 제 24조에 따라 각 호관 물탱크 청소 작업으로 인해 각 호관 단수 및 수압강하가 됨을 아래 일정과 같이 안내드리오니 적극적인 협조 부탁드립니다."
-  },
-  {
-   "title": "[기후위기대응사업단]2027년 Global Green Challenger 참가학생 모집",
-   "url": "https://www.inha.ac.kr/bbs/kr/8/45805/artclView.do",
-   "postedAt": "2026-10-14",
-   "school": "인하대학교",
-   "campus": "",
-   "src": "f4141706",
-   "foundAt": "2026-10-14",
-   "desc": "Global Green Challenger(GGC)는 학생들의 글로벌 기후감수성 제고, 기후위기대응 역량 함양, 국제적 의사소통 능력 및 문제해결 능력 향상을 위해 '팀별 사전학습 및 사전 프로젝트 수행(국가별…"
   }
  ]
 }
