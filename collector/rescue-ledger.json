@@ -78,8 +78,8 @@
   "name": "공통 2026년 (재)경주시장학회 장학생 선발 안내"
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323054&menuno=200318": {
-  "tries": 2,
-  "at": "2026-10-29",
+  "tries": 3,
+  "at": "2026-10-30",
   "minBody": 100,
   "name": "공통 [공통] 2026학년도 2학기 반영장학 신청 안내"
  },
@@ -228,8 +228,8 @@
   "name": "[등록/장학] [대전광역시] 2026년 하반기 인재육성(성취) 장학생 선발 안내(기간연장)"
  },
  "https://www.jbnu.ac.kr/web/Board/218051/detailView.do?category=6&menu=2377": {
-  "tries": 2,
-  "at": "2026-10-29",
+  "tries": 3,
+  "at": "2026-10-30",
   "minBody": 100,
   "name": "(재)hy사회복재단 2026년 든든 학업지원 장학생 선발 안내"
  },
@@ -402,8 +402,8 @@
   "name": "2026년 성암육영회 장학생 모집 안내"
  },
  "https://www.yonsei.ac.kr/bbs/sc/58/944388/artclView.do": {
-  "ok": "2026-10-23",
-  "at": "2026-10-23",
+  "ok": "2026-10-30",
+  "at": "2026-10-30",
   "tries": 0,
   "name": "2026학년도 하반기 재단법인 인석장학회 장학생 선발 안내"
  },
@@ -414,8 +414,8 @@
   "name": "[한국고등교육재단] 인재림 장학생 선발 안내"
  },
  "https://dep.hufs.ac.kr/bbs/student/2431/269444/artclView.do": {
-  "ok": "2026-10-23",
-  "at": "2026-10-23",
+  "ok": "2026-10-30",
+  "at": "2026-10-30",
   "tries": 0,
   "name": "[공통][교외]2026학년도 하반기 인석장학금 선발 공고(~11/26)"
  },
@@ -570,8 +570,8 @@
   "name": "(홍보) 한국장학재단 희망사다리1유형 장학생 대상 삼성 SSFY 교육생 모집(~11/9(월)까지)"
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=321881&menuno=200318": {
-  "tries": 1,
-  "at": "2026-10-29",
+  "tries": 2,
+  "at": "2026-10-30",
   "minBody": 100,
   "name": "공통 2026년도 세종연구원 세종이도인재장학금 장학생 모집 안내"
  },
@@ -582,15 +582,27 @@
   "name": "2026년 김천시-한국전력기술 지역상생지원 장학금 및 취업준비금 신청 안내"
  },
  "https://www3.chosun.ac.kr/bbs/scho/332/282304/artclView.do": {
-  "tries": 1,
-  "at": "2026-10-29",
+  "tries": 2,
+  "at": "2026-10-30",
   "minBody": 100,
   "name": "[장학금 접수] 삼성 청년 SW·AI 아카데미(SSAFY) 모집 안내"
  },
  "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?articleno=367645": {
-  "tries": 1,
-  "at": "2026-10-29",
+  "tries": 2,
+  "at": "2026-10-30",
   "minBody": 100,
   "name": "[학부] 2026년도 하반기 강화군 대학생 등록금 지원 장학금 신청 안내"
+ },
+ "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsno=1073&key=7520&nttno=626879&searchkrwd=장학&sf.pnos=1073&sf.pnos=888": {
+  "tries": 1,
+  "at": "2026-10-30",
+  "minBody": 100,
+  "name": "[입학에서 취업까지] [교내] 2026-2 11월 장학사정관장학금 신청 안내[신청"
+ },
+ "https://www.inha.ac.kr/bbs/kr/8/45988/artclView.do": {
+  "ok": "2026-10-30",
+  "at": "2026-10-30",
+  "tries": 0,
+  "name": "[학부-교외장학] 2026년 2학기 벽담재단법인 외국인 유학생 장학생 선발 안내"
  }
 }
