@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-29",
+ "updatedAt": "2026-10-30",
  "items": {
   "auto-oardid323011menuno200318": [
    {
@@ -68,14 +68,6 @@
     "at": "2026-10-23"
    }
   ],
-  "auto-srchenable1srchvotetype1-159letz": [
-   {
-    "src": "elig-1jb9l6-1.pdf",
-    "srcBytes": 233223,
-    "none": true,
-    "at": "2026-10-23"
-   }
-  ],
   "auto-srchenable1srchvotetype1-0rtcwpw": [
    {
     "src": "elig-11bok5-1.pdf",
@@ -100,14 +92,6 @@
     "at": "2026-10-23"
    }
   ],
-  "auto-bbssc58944387artclviewdo": [
-   {
-    "src": "elig-12429n-1.docx",
-    "srcBytes": 21581,
-    "none": true,
-    "at": "2026-10-23"
-   }
-  ],
   "auto-amepagescholarshipnotice-0mbofms": [
    {
     "src": "elig-1ou26f-1.pdf",
@@ -125,14 +109,6 @@
   "auto-oarticleno159308nocat501": [
    {
     "src": "elig-q641o0-1.docx",
-    "srcBytes": 21581,
-    "none": true,
-    "at": "2026-10-23"
-   }
-  ],
-  "kosaf-2700003008": [
-   {
-    "src": "[한국고등교육재단]_인재림_제7기_장학생_선발_모집_요강.docx",
     "srcBytes": 21581,
     "none": true,
     "at": "2026-10-23"
@@ -332,20 +308,6 @@
     "at": "2026-10-24"
    }
   ],
-  "auto-bswj104944405artclviewdo": [
-   {
-    "src": "elig-anevqs-1.docx",
-    "srcBytes": 21581,
-    "none": true,
-    "at": "2026-10-28"
-   },
-   {
-    "src": "elig-anevqs-2.pdf",
-    "srcBytes": 120008,
-    "none": true,
-    "at": "2026-10-24"
-   }
-  ],
   "auto-otice06doarticleno140646": [
    {
     "file": "auto-otice06doarticleno140646/1-elig-sejrs6-1_p6-8.pdf",
@@ -390,14 +352,6 @@
    {
     "src": "elig-81fm40-2.pdf",
     "srcBytes": 83883,
-    "none": true,
-    "at": "2026-10-25"
-   }
-  ],
-  "auto-0713no2515824sitedvscdkr": [
-   {
-    "src": "elig-ujjyp0-1.pdf",
-    "srcBytes": 106847,
     "none": true,
     "at": "2026-10-25"
    }
@@ -497,14 +451,6 @@
     "at": "2026-10-28"
    }
   ],
-  "auto-rykeywordpaged1slug71029": [
-   {
-    "src": "elig-p3qkl4-1.docx",
-    "srcBytes": 21581,
-    "none": true,
-    "at": "2026-10-28"
-   }
-  ],
   "auto-spxboardid5cate8key70734": [
    {
     "src": "elig-1al9rp-1.hwp",
@@ -538,32 +484,6 @@
     "src": "elig-4wlh6j-1.hwpx",
     "srcBytes": 99362,
     "srcPages": "6~7, 10~11",
-    "from": "공고문 서식 쪽 떼기",
-    "at": "2026-10-28"
-   }
-  ],
-  "kosaf-2000279001": [
-   {
-    "file": "kosaf-2000279001/1-2026년도_하반기_함평군_인재양성기금_장학생_선발요강_공고_1__p8-12.pdf",
-    "name": "공고문 안 신청서 서식 (8~9, 11~12쪽)",
-    "pages": 4,
-    "bytes": 1268241,
-    "src": "2026년도 하반기 함평군 인재양성기금 장학생 선발요강 공고 (1).hwpx",
-    "srcBytes": 211509,
-    "srcPages": "8~9, 11~12",
-    "from": "공고문 서식 쪽 떼기",
-    "at": "2026-10-28"
-   }
-  ],
-  "kosaf-2000279004": [
-   {
-    "file": "kosaf-2000279004/1-2026년도_하반기_함평군_인재양성기금_장학생_선발요강_공고_p8-12.pdf",
-    "name": "공고문 안 신청서 서식 (8~9, 11~12쪽)",
-    "pages": 4,
-    "bytes": 1268243,
-    "src": "2026년도 하반기 함평군 인재양성기금 장학생 선발요강 공고.hwpx",
-    "srcBytes": 211509,
-    "srcPages": "8~9, 11~12",
     "from": "공고문 서식 쪽 떼기",
     "at": "2026-10-28"
    }

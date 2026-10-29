@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-29",
+ "updatedAt": "2026-10-30",
  "items": {
   "auto-ticedoarticleno231977952": [
    {
@@ -69,18 +69,6 @@
     "at": "2026-10-28"
    }
   ],
-  "auto-srchenable1srchvotetype1-159letz": [
-   {
-    "file": "auto-srchenable1srchvotetype1-159letz/1-2026년_2학기_재_춘곡장학회_장학금_신청서.pdf",
-    "name": "2026년 2학기 (재)춘곡장학회 장학금 신청서.hwp",
-    "pages": 5,
-    "bytes": 243176,
-    "srcBytes": 159744,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-28"
-   }
-  ],
   "auto-srchenable1srchvotetype1-1xgmtcs": [
    {
     "file": "auto-srchenable1srchvotetype1-1xgmtcs/1-2._2026-2학기_사랑나눔장학금_A_B_신청서_양식_.pdf",
@@ -137,28 +125,6 @@
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-10-24"
-   }
-  ],
-  "auto-ghaknoticedetail26766656": [
-   {
-    "file": "auto-ghaknoticedetail26766656/1-1._장학신청서.pdf",
-    "name": "1. 장학신청서.pdf",
-    "pages": 1,
-    "bytes": 214258,
-    "srcBytes": 214258,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-25"
-   },
-   {
-    "file": "auto-ghaknoticedetail26766656/2-1._장학신청서.pdf",
-    "name": "1. 장학신청서.pdf",
-    "pages": 1,
-    "bytes": 214258,
-    "srcBytes": 214258,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-25"
    }
   ],
   "auto-ent2431266737artclviewdo": [
@@ -393,18 +359,6 @@
     "at": "2026-10-28"
    }
   ],
-  "auto-ghaknoticedetail26766657": [
-   {
-    "file": "auto-ghaknoticedetail26766657/1-1._신청서류_양식_.pdf",
-    "name": "1. 신청서류(양식).hwp",
-    "pages": 5,
-    "bytes": 188789,
-    "srcBytes": 27648,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-28"
-   }
-  ],
   "auto-bswj104944472artclviewdo": [
    {
     "file": "auto-bswj104944472artclviewdo/1-2027-1_어학우수장학금_신청서_양식_.pdf",
@@ -473,6 +427,50 @@
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-10-29"
+   }
+  ],
+  "auto-eywordpaged1slug20262116": [
+   {
+    "file": "auto-eywordpaged1slug20262116/1-붙임1-2026-2학기-제일하이텍-장학금-지원서-자기소개서-및-학업계획서.pdf",
+    "name": "붙임1-2026-2학기-제일하이텍-장학금-지원서-자기소개서-및-학업계획서.hwp",
+    "pages": 3,
+    "bytes": 108664,
+    "srcBytes": 59392,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-30"
+   },
+   {
+    "file": "auto-eywordpaged1slug20262116/2-붙임2-서약서-제일하이텍.pdf",
+    "name": "붙임2-서약서-제일하이텍.hwp",
+    "pages": 1,
+    "bytes": 44077,
+    "srcBytes": 26624,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-30"
+   },
+   {
+    "file": "auto-eywordpaged1slug20262116/3-붙임3-개인정보-수집_이용-및-제3자-제공-동의서_숭실대학생지원팀.pdf",
+    "name": "붙임3-개인정보-수집·이용-및-제3자-제공-동의서_숭실대학생지원팀.hwp",
+    "pages": 2,
+    "bytes": 127113,
+    "srcBytes": 85504,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-30"
+   }
+  ],
+  "auto-krbbskr845988artclviewdo": [
+   {
+    "file": "auto-krbbskr845988artclviewdo/1-3._개인정보_수집.이용_및_제3자_제공_동의서.pdf",
+    "name": "3. 개인정보 수집.이용 및 제3자 제공 동의서.pdf",
+    "pages": 1,
+    "bytes": 96255,
+    "srcBytes": 96255,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-10-30"
    }
   ]
  }
