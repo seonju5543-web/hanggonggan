@@ -3,6 +3,26 @@
  "updatedAt": "2026-10-29",
  "items": [
   {
+   "title": "[학사안내] 2026학년도 동계 계절학기 개설교과목 공고",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70839",
+   "postedAt": "2026-10-29",
+   "kind": "학사",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-29"
+  },
+  {
+   "title": "[채용공고] 2026년도 제13회 계약직원 경력경쟁채용 서류전형 합격자 및...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70838",
+   "postedAt": "2026-10-29",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-29"
+  },
+  {
    "title": "[취업정보] [서민금융진흥원]2026 하반기 금융전문직 채용(~11.9.(...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70834",
    "postedAt": "2026-10-29",
@@ -379,26 +399,6 @@
    "campus": "",
    "src": "b7347301",
    "foundAt": "2026-10-23"
-  },
-  {
-   "title": "[취업정보] [로지스올]27년 로지스올 신입사원 채용공고(~11.01.(일...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70784",
-   "postedAt": "2026-10-22",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-22"
-  },
-  {
-   "title": "[취업정보] [kt is] 2026년 kt is 신입사원 채용(~10.25...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70783",
-   "postedAt": "2026-10-22",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-22"
   }
  ]
 }

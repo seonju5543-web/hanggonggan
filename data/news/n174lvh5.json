@@ -3,6 +3,16 @@
  "updatedAt": "2026-10-29",
  "items": [
   {
+   "title": "2026-겨울계절학기 영남대학교 학점교류 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277274&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-29",
+   "kind": "학사",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-29"
+  },
+  {
    "title": "[인권센터] 2026 인권 및 성문화 캠페인 '성착취 없는 사회, 함께해요' 안내",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277251&article.offset=0&articleLimit=10",
    "postedAt": "2026-10-29",
@@ -421,18 +431,6 @@
    "foundAt": "2026-10-14",
    "thumb": "data/news/img/f4d40816ca6e695c.webp",
    "desc": "연천 1박 2일 여행 코스를 직접 기획하고, 다녀온 뒤 사진·숏폼 콘텐츠로 남기는 재학생 참여 프로그램입니다."
-  },
-  {
-   "title": "[기숙사상담실 마음숲] 2026학년도 2학기 열린상담실 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276754&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-14",
-   "kind": "생활",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-14",
-   "thumb": "data/news/img/d8d3de2d297eeae7.webp",
-   "desc": "혼자 가지고 있기엔 버거운 고민이 있다면 ? 한숨 돌리며 편안한 마음으로 쉬고 싶다면 ? 오직 기숙사생들을 위한 마음 쉼터로 오세요 ! 기숙사 상담실 마음숲에서 매주 화요일 오후 3시~5시 상담실을 엽니다 .…"
   }
  ]
 }

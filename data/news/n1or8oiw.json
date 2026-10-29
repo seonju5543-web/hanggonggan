@@ -3,6 +3,26 @@
  "updatedAt": "2026-10-29",
  "items": [
   {
+   "title": "[카운슬링센터] '온라인 심리검사'로 자기점검 해볼까? - 대학생활 적응 정도 및 학습 전략 장단점에 관하여",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766798",
+   "postId": "26766798",
+   "school": "동국대학교",
+   "campus": "",
+   "src": "d521f12e",
+   "foundAt": "2026-10-29"
+  },
+  {
+   "title": "동국대학교 메인 홈페이지 AI기반 챗봇 서비스 업그레이드 안내(2026.11.01)",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766797",
+   "postedAt": "2026-10-29",
+   "postId": "26766797",
+   "school": "동국대학교",
+   "campus": "",
+   "src": "d521f12e",
+   "foundAt": "2026-10-29",
+   "thumb": "data/news/img/8968b109a47c1c8f.webp"
+  },
+  {
    "title": "[평가감사실] 2026학년도 교육수요자 만족도 조사 참여 안내",
    "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766780",
    "postedAt": "2026-10-28",
@@ -435,28 +455,6 @@
    "campus": "",
    "foundAt": "2026-10-08",
    "desc": "튜터링 운영 교과목 (학수번호+분반 동일)의 수강생이라면 튜티로 참여 가능합니다. 자세한 사항은 아래 이미지 및 첨부파일 참고 바랍니다. 감사합니다. (아래 이미지 클릭 시 드림패스 로 이동합니다.)",
-   "src": "d521f12e"
-  },
-  {
-   "title": "[취업팀] 실전 모의면접 컨설팅 - 나의 유형별 면접 완벽 마스터(마이성공스피치) [신청 ~ 10/12(월) 17시]",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766508",
-   "postedAt": "2026-10-07",
-   "postId": "26766508",
-   "school": "동국대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "thumb": "data/news/img/28f29f5a8a248ddf.webp",
-   "desc": "or \"[10/12~11/5] 실전 모의면접 컨설팅 - 마이성공스피치 [1:1 비대면] (추가신청)\" 공지",
-   "src": "d521f12e"
-  },
-  {
-   "title": "10월 7일(수)~ 10월 8일(목) 헌혈 버스 시행 안내",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766501",
-   "postedAt": "2026-10-07",
-   "postId": "26766501",
-   "school": "동국대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
    "src": "d521f12e"
   }
  ]
