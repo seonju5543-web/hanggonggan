@@ -9538,6 +9538,10 @@
      "name": "본문이미지-1024x1028.jpg",
      "url": "https://www.jbnu.ac.kr/common/file.do?file=jkC7rimuS4SLGUV75ehwNiGuYgzZNR1DlCjrkloLIT/CdGtkeE/in5mUuKe21yZ214+O5/8HK+VyXi3q0dJAcg==",
      "bodyImage": true
+    },
+    {
+     "name": "총동아리연합회",
+     "url": "http://www.jbnudongari.com/file/"
     }
    ],
    "sourceUrl": "https://www.jbnu.ac.kr/web/Board/218051/detailView.do?pageIndex=1&category=6&menu=2377",
@@ -10912,6 +10916,23 @@
     {
      "name": "2026년 김천시한국전력기술 지역상생지원 장학금 및 취업준비금 신청서식.hwpx",
      "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=231977952&attachNo=378790"
+    },
+    {
+     "name": "첨부파일 다운로드",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=231977952&attachNo=378789"
+    },
+    {
+     "name": "첨부파일 보기",
+     "url": "https://www.yu.ac.kr/_attach/f/view.jsp?attach_no=378789"
+    },
+    {
+     "name": "【별표 2] 대항생 지역상생 장학금 경상북도 소재 대학 인정학과.hwpx",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=231977952&attachNo=378791"
+    },
+    {
+     "name": "본문이미지-1080x1350.jpeg",
+     "url": "https://www.yu.ac.kr/_attach/yu/editor-image/2026/10/VwSZbXMdULPMJYuMRkKTqpzniN.jpeg",
+     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=231977952&article.offset=0&articleLimit=10",
@@ -11760,6 +11781,15 @@
     {
      "name": "본문이미지-1192x808.png",
      "url": "https://www.catholic.ac.kr/_attach/cuk/editor-image/2026/10/JucRUSgZNqbVNwtxXYfabmnrHG.png",
+     "bodyImage": true
+    },
+    {
+     "name": "2026년 2학기 선원가족장학사업 선발 모집 요강(변경).hwp",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276603&attachNo=226827"
+    },
+    {
+     "name": "본문이미지-511x348.png",
+     "url": "https://www.catholic.ac.kr/_res/cuk/ko/img/main/cuk_webmark.png",
      "bodyImage": true
     }
    ],
@@ -14247,6 +14277,14 @@
      "name": "본문이미지-640x443.png",
      "url": "https://kangwon.ac.kr/assets/ko/images/main/sns-youtube.png",
      "bodyImage": true
+    },
+    {
+     "name": "신청서 및 개인정보제공동의서(2026.2학기 도전장학금).hwp chevron_forward",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261014102411007.hwp&path=/bbs/34&fn=%EC%8B%A0%EC%B2%AD%EC%84%9C%20%EB%B0%8F%20%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4%EC%A0%9C%EA%B3%B5%EB%8F%99%EC%9D%98%EC%84%9C(2026.2%ED%95%99%EA%B8%B0%20%EB%8F%84%EC%A0%84%EC%9E%A5%ED%95%99%EA%B8%88).hwp"
+    },
+    {
+     "name": "(포스터) 2026. 2학기 도전장학금 신청 안내.png chevron_forward",
+     "url": "https://kangwon.ac.kr/ko/cmmn/download.do?dn=20261014102420825.png&path=/bbs/34&fn=(%ED%8F%AC%EC%8A%A4%ED%84%B0)%202026.%202%ED%95%99%EA%B8%B0%20%EB%8F%84%EC%A0%84%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4.png"
     }
    ],
    "sourceUrl": "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2518&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
@@ -19228,6 +19266,15 @@
     {
      "name": "SSAFY 17기 모집 안내 뉴스레터.pdf",
      "url": "https://www3.chosun.ac.kr/bbs/scho/332/379636/download.do"
+    },
+    {
+     "name": "SSAFY 17기 모집 포스터.PNG",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/379637/download.do"
+    },
+    {
+     "name": "본문이미지-5032x7087.png",
+     "url": "https://www3.chosun.ac.kr/editorUpload/images/000296/SSAFY_17%EA%B8%B0_%EB%AA%A8%EC%A7%91_%ED%8F%AC%EC%8A%A4%ED%84%B0.png",
+     "bodyImage": true
     }
    ],
    "sourceUrl": "https://www3.chosun.ac.kr/bbs/scho/332/282304/artclView.do",

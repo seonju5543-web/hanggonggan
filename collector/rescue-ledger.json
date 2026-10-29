@@ -78,8 +78,8 @@
   "name": "공통 2026년 (재)경주시장학회 장학생 선발 안내"
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323054&menuno=200318": {
-  "tries": 1,
-  "at": "2026-09-21",
+  "tries": 2,
+  "at": "2026-10-29",
   "minBody": 100,
   "name": "공통 [공통] 2026학년도 2학기 반영장학 신청 안내"
  },
@@ -90,8 +90,8 @@
   "name": "공통 2026년도 (재)인천인재평생교육진흥원 하반기 장학생 선발 안내"
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323011&menuno=200318": {
-  "tries": 4,
-  "at": "2026-09-30",
+  "tries": 5,
+  "at": "2026-10-29",
   "minBody": 100,
   "name": "공통 2026년 금신사랑장학생 선발 안내"
  },
@@ -228,8 +228,8 @@
   "name": "[등록/장학] [대전광역시] 2026년 하반기 인재육성(성취) 장학생 선발 안내(기간연장)"
  },
  "https://www.jbnu.ac.kr/web/Board/218051/detailView.do?category=6&menu=2377": {
-  "tries": 1,
-  "at": "2026-10-04",
+  "tries": 2,
+  "at": "2026-10-29",
   "minBody": 100,
   "name": "(재)hy사회복재단 2026년 든든 학업지원 장학생 선발 안내"
  },
@@ -252,8 +252,8 @@
   "name": "2026년도 2학기 중소기업 취업연계 장학사업(희망사다리 1유형) 신규장학생 추천자 선발 공고"
  },
  "https://www.catholic.ac.kr/ko/campuslife/notice.do?articleno=276603&srcategoryid=22": {
-  "tries": 2,
-  "at": "2026-10-09",
+  "tries": 3,
+  "at": "2026-10-29",
   "minBody": 100,
   "name": "[학생지원팀] 2026년 2학기 한국선원복지고용센터 선원가족장학생 선발 안내"
  },
@@ -384,8 +384,8 @@
   "name": "2026학년도 2학기 국가근로장학금 일반유형 추가신청기간 안내"
  },
  "https://kangwon.ac.kr/ko/bbs/750/detail.do?pageitm=10&pstsn=2518&searchgbn=0&searchordersort=0": {
-  "tries": 3,
-  "at": "2026-10-15",
+  "tries": 4,
+  "at": "2026-10-29",
   "minBody": 100,
   "name": "(강릉.원주) 2026. 2학기 도전장학금 신청 안내"
  },
@@ -420,8 +420,8 @@
   "name": "[공통][교외]2026학년도 하반기 인석장학금 선발 공고(~11/26)"
  },
  "https://dep.hufs.ac.kr/bbs/student/2431/269433/artclView.do": {
-  "tries": 2,
-  "at": "2026-10-24",
+  "tries": 3,
+  "at": "2026-10-29",
   "minBody": 100,
   "name": "[공통][교외]2026년 2학기 안산시 대학생 본인부담 등록금 반값지원 장학생 선발(~11"
  },
@@ -456,8 +456,8 @@
   "name": "[교외][생활비] 2026학년도 2학기 한국장학재단 푸른등대기부장학금 2차 신청 안내(10. 22. ~ 11"
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323398&menuno=200318": {
-  "tries": 2,
-  "at": "2026-10-25",
+  "tries": 3,
+  "at": "2026-10-29",
   "minBody": 100,
   "name": "공통 2026-2학기 선원가족 장학생 모집 안내(연장)"
  },
@@ -468,8 +468,8 @@
   "name": "공통 2026-2학기 푸른등대 기부장학금(2차) 신규장학생 모집 안내"
  },
  "https://www.konkuk.ac.kr/bbs/konkuk/235/1210342/artclView.do": {
-  "tries": 2,
-  "at": "2026-10-25",
+  "tries": 3,
+  "at": "2026-10-29",
   "minBody": 100,
   "name": "[교외][등록금] 2026학년도 2학기 안산인재육성재단 안산시 대학생 등록금 반값 지원 장학생 선발 안내(1"
  },
@@ -522,8 +522,8 @@
   "name": "(홍보) 한국장학재단 희망사다리 장학금 신청 안내(마감)"
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323355&menuno=200318": {
-  "tries": 2,
-  "at": "2026-10-27",
+  "tries": 3,
+  "at": "2026-10-29",
   "minBody": 100,
   "name": "공통 2026-2학기 중소기업취업연계장학사업(희망사다리Ⅰ유형) 신규장학생 대학선발 기준 안내"
  },
@@ -568,5 +568,29 @@
   "at": "2026-10-29",
   "minBody": 100,
   "name": "(홍보) 한국장학재단 희망사다리1유형 장학생 대상 삼성 SSFY 교육생 모집(~11/9(월)까지)"
+ },
+ "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=321881&menuno=200318": {
+  "tries": 1,
+  "at": "2026-10-29",
+  "minBody": 100,
+  "name": "공통 2026년도 세종연구원 세종이도인재장학금 장학생 모집 안내"
+ },
+ "https://www.yu.ac.kr/scholar/notice/notice.do?articleno=231977952": {
+  "ok": "2026-10-29",
+  "at": "2026-10-29",
+  "tries": 0,
+  "name": "2026년 김천시-한국전력기술 지역상생지원 장학금 및 취업준비금 신청 안내"
+ },
+ "https://www3.chosun.ac.kr/bbs/scho/332/282304/artclView.do": {
+  "tries": 1,
+  "at": "2026-10-29",
+  "minBody": 100,
+  "name": "[장학금 접수] 삼성 청년 SW·AI 아카데미(SSAFY) 모집 안내"
+ },
+ "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?articleno=367645": {
+  "tries": 1,
+  "at": "2026-10-29",
+  "minBody": 100,
+  "name": "[학부] 2026년도 하반기 강화군 대학생 등록금 지원 장학금 신청 안내"
  }
 }
