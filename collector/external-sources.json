@@ -692,7 +692,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-15",
+    "checkedAt": "2026-10-29",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.jntle.kr/",
@@ -706,7 +706,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-15",
+    "checkedAt": "2026-10-29",
     "why": "최고 1건 ((홈))",
     "best": {
      "url": "https://www.koswec.or.kr/",
@@ -720,7 +720,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-15",
+    "checkedAt": "2026-10-29",
     "why": "최고 1건 ((홈))",
     "best": {
      "url": "https://www.jw-foundation.or.kr/",
@@ -734,7 +734,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-15",
+    "checkedAt": "2026-10-29",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.icheon.go.kr/main.do",
@@ -764,7 +764,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-15",
+    "checkedAt": "2026-10-29",
     "why": "홈페이지 못 엶 (HTTP 400)",
     "best": null
    }
@@ -789,7 +789,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-15",
+    "checkedAt": "2026-10-29",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.inje.go.kr/",
@@ -803,11 +803,11 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-15",
-    "why": "최고 1건 (읍면동 소식)",
+    "checkedAt": "2026-10-29",
+    "why": "최고 0건 ((홈))",
     "best": {
-     "url": "https://www.wonju.go.kr/www/selectBbsNttList.do?bbsNo=1119&key=5251&",
-     "signals": 1
+     "url": "https://www.wonju.go.kr/www/index.do",
+     "signals": 0
     }
    }
   },
@@ -817,7 +817,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-15",
+    "checkedAt": "2026-10-29",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.yeongju.go.kr/open_content/main/index.do",
