@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-30",
+ "updatedAt": "2026-10-31",
  "items": {
   "auto-ticedoarticleno231977952": [
    {
@@ -47,40 +47,6 @@
     "at": "2026-10-17"
    }
   ],
-  "auto-krbbskr845764artclviewdo": [
-   {
-    "file": "auto-krbbskr845764artclviewdo/1-01_장학금_신청서.pdf",
-    "name": "01_장학금 신청서.hwp",
-    "pages": 5,
-    "bytes": 157652,
-    "srcBytes": 66048,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-28"
-   },
-   {
-    "file": "auto-krbbskr845764artclviewdo/2-02_개인정보_제공_동의서.pdf",
-    "name": "02_개인정보 제공 동의서.hwp",
-    "pages": 3,
-    "bytes": 91739,
-    "srcBytes": 26624,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-28"
-   }
-  ],
-  "auto-srchenable1srchvotetype1-1xgmtcs": [
-   {
-    "file": "auto-srchenable1srchvotetype1-1xgmtcs/1-2._2026-2학기_사랑나눔장학금_A_B_신청서_양식_.pdf",
-    "name": "2. 2026-2학기 사랑나눔장학금 A, B 신청서(양식).hwp",
-    "pages": 1,
-    "bytes": 99383,
-    "srcBytes": 49664,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-28"
-   }
-  ],
   "auto-0713no2515412sitedvscdkr": [
    {
     "file": "auto-0713no2515412sitedvscdkr/1-붙임1._2026년_장학생_선발_공고문_신청서_포함_.pdf",
@@ -125,18 +91,6 @@
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-10-24"
-   }
-  ],
-  "auto-ent2431266737artclviewdo": [
-   {
-    "file": "auto-ent2431266737artclviewdo/1-붙임1.멘토_활동계획서_양식.pdf",
-    "name": "붙임1.멘토 활동계획서 양식.hwp",
-    "pages": 3,
-    "bytes": 142594,
-    "srcBytes": 65536,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-28"
    }
   ],
   "auto-0713no2515690sitedvscdkr": [
@@ -187,38 +141,6 @@
     "at": "2026-10-28"
    }
   ],
-  "auto-otice06doarticleno140575": [
-   {
-    "file": "auto-otice06doarticleno140575/1-서식1_장학생지원서.pdf",
-    "name": "서식1 장학생지원서.hwp",
-    "pages": 2,
-    "bytes": 101929,
-    "srcBytes": 82432,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-28"
-   },
-   {
-    "file": "auto-otice06doarticleno140575/2-서식4_개인정보수집동의서.pdf",
-    "name": "서식4 개인정보수집동의서.hwp",
-    "pages": 2,
-    "bytes": 143387,
-    "srcBytes": 80384,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-28"
-   },
-   {
-    "file": "auto-otice06doarticleno140575/3-서식5_개인정보수집동의서_부모_.pdf",
-    "name": "서식5 개인정보수집동의서(부모).hwp",
-    "pages": 2,
-    "bytes": 123874,
-    "srcBytes": 75264,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-28"
-   }
-  ],
   "auto-ent2431269173artclviewdo": [
    {
     "file": "auto-ent2431269173artclviewdo/1-개인정보수집이용동의서.pdf",
@@ -226,18 +148,6 @@
     "pages": 1,
     "bytes": 78123,
     "srcBytes": 50688,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-28"
-   }
-  ],
-  "auto-bbssc58944362artclviewdo": [
-   {
-    "file": "auto-bbssc58944362artclviewdo/1-연세_월든장학금_지원서.pdf",
-    "name": "연세 월든장학금 지원서.hwp",
-    "pages": 2,
-    "bytes": 81393,
-    "srcBytes": 35840,
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-10-28"
