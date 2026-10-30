@@ -197,6 +197,12 @@
    "by": "claude-1030",
    "action": "revert",
    "detail": "6건 제거(312 → 306건) · 재등록 차단 id 6·주소 6"
+  },
+  {
+   "at": "2026-10-31 00:56 KST",
+   "by": "조세현",
+   "action": "edit",
+   "detail": "auto-notice7doarticleno894170 — type, provider"
   }
  ]
 }

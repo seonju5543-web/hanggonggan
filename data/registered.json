@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-30",
+ "updatedAt": "2026-10-31",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -9331,13 +9331,12 @@
    "id": "auto-notice7doarticleno894170",
    "name": "2026-2 학업수석총장장학금 선발 안내",
    "boardTitle": "2026-2 학업수석총장장학금 선발 안내",
-   "type": "교외",
+   "type": "교내",
    "kindEvidence": [
-    "본문 「학생지원처에서 선발」"
+    "관리자(조세현)가 교외 → 교내 로 정함"
    ],
-   "kindConfidence": "low",
-   "kindFrom": "로봇(원문) 2026-10-04",
-   "provider": "주관 기관 원문 확인",
+   "kindFrom": "관리자 2026-10-31",
+   "provider": "세종대학교",
    "amount": "200만원",
    "amountValue": 2000000,
    "deadline": null,
