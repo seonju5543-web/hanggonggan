@@ -3,6 +3,27 @@
  "updatedAt": "2026-10-30",
  "items": [
   {
+   "title": "외국인유학생 [채용] 2026-2학기 국제처 국제팀 학부 외국인 유학생 담당 조교(교육연구조교) 모집",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026-2%ED%95%99%EA%B8%B0-%EA%B5%AD%EC%A0%9C%EC%B2%98-%EA%B5%AD%EC%A0%9C%ED%8C%80-%ED%95%99%EB%B6%80-%EC%99%B8%EA%B5%AD%EC%9D%B8-%EC%9C%A0%ED%95%99%EC%83%9D-%EB%8B%B4%EB%8B%B9-%EC%A1%B0%EA%B5%90-2&keyword",
+   "postedAt": "2026-10-30",
+   "kind": "채용",
+   "school": "숭실대학교",
+   "campus": "",
+   "src": "3b348584",
+   "foundAt": "2026-10-30",
+   "desc": "국제처 국제팀에서 2026-2학기 학부 외국인 유학생 담당 조교를 아래와 같이 모집하오니 많은 지원 바랍니다."
+  },
+  {
+   "title": "채용 2026년 숭실대학교 학생지원팀 계약직 직원 모집",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026%EB%85%84-%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%ED%95%99%EC%83%9D%EC%A7%80%EC%9B%90%ED%8C%80-%EA%B3%84%EC%95%BD%EC%A7%81-%EC%A7%81%EC%9B%90-%EB%AA%A8%EC%A7%91&keyword",
+   "postedAt": "2026-10-30",
+   "kind": "채용",
+   "school": "숭실대학교",
+   "campus": "",
+   "src": "3b348584",
+   "foundAt": "2026-10-30"
+  },
+  {
    "title": "채용 숭실대학교 산학협력단 변리사 채용 공고(앵커사업)",
    "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EC%82%B0%ED%95%99%ED%98%91%EB%A0%A5%EB%8B%A8-%EB%B3%80%EB%A6%AC%EC%82%AC-%EC%B1%84%EC%9A%A9-%EA%B3%B5%EA%B3%A0%EC%95%B5%EC%BB%A4%EC%82%AC%EC%97%85-2&keyword",
    "postedAt": "2026-10-30",
@@ -404,26 +425,6 @@
    "campus": "",
    "foundAt": "2026-10-02",
    "thumb": "data/news/img/74b3734df20116d4.webp"
-  },
-  {
-   "title": "채용 [인문대학] 스포츠학부 학사조교 채용 공고",
-   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%9D%B8%EB%AC%B8%EB%8C%80%ED%95%99-%EC%8A%A4%ED%8F%AC%EC%B8%A0%ED%95%99%EB%B6%80-%ED%95%99%EC%82%AC%EC%A1%B0%EA%B5%90-%EC%B1%84%EC%9A%A9-%EA%B3%B5%EA%B3%A0&keyword",
-   "postedAt": "2026-10-02",
-   "kind": "채용",
-   "school": "숭실대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "src": "3b348584",
-   "desc": "1. 모집요건 가. 모집인원: 1명 나. 지원자격: 학사학위 이상 소지자"
-  },
-  {
-   "title": "학사 교내 IT 서비스 시스템 작업으로 인한 서비스 일시 중단 안내",
-   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EA%B5%90%EB%82%B4-it-%EC%84%9C%EB%B9%84%EC%8A%A4-%EC%8B%9C%EC%8A%A4%ED%85%9C-%EC%9E%91%EC%97%85%EC%9C%BC%EB%A1%9C-%EC%9D%B8%ED%95%9C-%EC%84%9C%EB%B9%84%EC%8A%A4-%EC%9D%BC%EC%8B%9C-%EC%A4%91-4&keyword",
-   "postedAt": "2026-10-02",
-   "school": "숭실대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "desc": "NHN클라우드 방화벽 소프트웨어 업그레이드 작업 대상 NHN클라우드 방화벽 2대 작업 시간 정보화팀 안효민 ( anh1702@ssu.ac.kr ) 대상 시스템 작업 시간 중 교내 전체 IT 서비스 간헐적 끊김(3초…"
   }
  ]
 }

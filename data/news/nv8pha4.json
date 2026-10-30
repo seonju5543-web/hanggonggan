@@ -3,6 +3,28 @@
  "updatedAt": "2026-10-30",
  "items": [
   {
+   "title": "[문정도서관] 교내 정전에 따른 도서관 임시 휴관 및 무인반납기 운영 중지 안내 (11/13~11/16)",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159878&noCat=32",
+   "postedAt": "2026-10-30",
+   "kind": "생활",
+   "school": "홍익대학교",
+   "campus": "",
+   "src": "9c41077f",
+   "foundAt": "2026-10-30",
+   "thumb": "data/news/img/872c9bcb53574b7e.webp"
+  },
+  {
+   "title": "2026학년도 동계계절학기 학점교류 신청 안내 (중앙대학교)",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159872&noCat=500",
+   "postedAt": "2026-10-30",
+   "kind": "학사",
+   "school": "홍익대학교",
+   "campus": "",
+   "src": "9c41077f",
+   "foundAt": "2026-10-30",
+   "desc": "2026학년도 동계계절학기에 중앙대학교에서 개설한 강좌를 수강하고자 하는 학생은 다음 사항을 참고하여 신청하기 바랍니다."
+  },
+  {
    "title": "2026학년도 동계계절학기 학점교류 신청 안내 (한국외국어대학교)",
    "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159823&noCat=500",
    "postedAt": "2026-10-29",
@@ -406,27 +428,6 @@
    "foundAt": "2026-10-07",
    "thumb": "data/news/img/3cb514c1ef5a5d91.webp",
    "desc": "학생활동 산학협력팀(세종) 사업단 국립공주대학교에서 진행하는 국제화 프로그램 「뮤지엄 리믹스: 서울 X 시안 -문화유산의 디지털 전환과 콘텐츠 비즈니스」 참여자를 10월 8일까지 모집합니다."
-  },
-  {
-   "title": "[건강진료센터] 10월 이달의 헌혈 안내",
-   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158989&noCat=514",
-   "postedAt": "2026-10-07",
-   "school": "홍익대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "thumb": "data/news/img/df938a0577892931.webp",
-   "src": "9c41077f"
-  },
-  {
-   "title": "[건강진료센터] 2026-2 대사증후군 이동검진 안내(커피,와플 쿠폰 증정)",
-   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158985&noCat=514",
-   "postedAt": "2026-10-07",
-   "school": "홍익대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "thumb": "data/news/img/8884cb1a02269ec5.webp",
-   "desc": "학생활동 건강진료센터(서울) 신청링크 : https://forms.gle/7AV7CkAK6PQyz4ej6",
-   "src": "9c41077f"
   }
  ]
 }
