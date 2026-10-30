@@ -281,12 +281,6 @@
   "tries": 0,
   "name": "2026-2 학업수석총장장학금 선발 안내"
  },
- "https://www.seoultech.ac.kr/service/info/janghak/?bidx=895210&bnum=57138&cate=0&qidx=57138": {
-  "ok": "2026-10-26",
-  "at": "2026-10-26",
-  "tries": 0,
-  "name": "[필독]2026-2학기 선발된 국가근로장학생 사전교육 알림"
- },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/520607": {
   "ok": "2026-10-12",
   "at": "2026-10-12",
@@ -347,12 +341,6 @@
   "tries": 0,
   "name": "[입학에서 취업까지] 2026-2학기 2차 교내장학금 신청 안내[가족, 문화예술, 고시, 챌린지]"
  },
- "https://kangwon.ac.kr/ko/bbs/750/detail.do?pageitm=10&pstsn=2499&searchgbn=0&searchordersort=0": {
-  "ok": "2026-10-28",
-  "at": "2026-10-28",
-  "tries": 0,
-  "name": "2026학년도 1학기 주거안정장학금 지급요청서(8월분) 신청 안내"
- },
  "https://www.catholic.ac.kr/ko/campuslife/notice.do?articleno=276686&srcategoryid=22": {
   "tries": 3,
   "at": "2026-10-14",
@@ -408,8 +396,8 @@
   "name": "2026학년도 하반기 재단법인 인석장학회 장학생 선발 안내"
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/520867": {
-  "tries": 4,
-  "at": "2026-10-24",
+  "tries": 5,
+  "at": "2026-10-31",
   "minBody": 100,
   "name": "[한국고등교육재단] 인재림 장학생 선발 안내"
  },
@@ -432,16 +420,10 @@
   "name": "희망사다리1유형(중소기업 취업연계 장학금) 선발 기준 안내"
  },
  "https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsno=8&key=815&nttno=170869&searchctgry=학사/장학": {
-  "ok": "2026-10-24",
-  "at": "2026-10-24",
+  "ok": "2026-10-31",
+  "at": "2026-10-31",
   "tries": 0,
   "name": "2026년도 2학기 푸른등대 기부장학사업 신규 장학생(2차) 선발 안내"
- },
- "https://www.sogang.ac.kr/ko/detail/551657?bbsconfigfk=141&namepage=ScholarshipNotice": {
-  "tries": 3,
-  "at": "2026-10-25",
-  "minBody": 100,
-  "name": "[교외] 세아해암학술장학재단 차세대 공학연구자 Alumni 심포지엄 개최 안내(11/15 사전신청 마감)"
  },
  "https://www.sogang.ac.kr/ko/detail/551648?bbsconfigfk=141&namepage=ScholarshipNotice": {
   "tries": 2,
@@ -474,8 +456,8 @@
   "name": "[교외][등록금] 2026학년도 2학기 안산인재육성재단 안산시 대학생 등록금 반값 지원 장학생 선발 안내(1"
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?boardmode=view&duid=53536&tpage=1": {
-  "ok": "2026-10-24",
-  "at": "2026-10-24",
+  "ok": "2026-10-31",
+  "at": "2026-10-31",
   "tries": 0,
   "name": "[일반] 2026학년도 하반기 인석장학금 지원신청 안내"
  },
@@ -508,18 +490,6 @@
   "at": "2026-10-24",
   "tries": 0,
   "name": "2026학년도 2학기(3차) 국가근로장학금 학생 신청기간 안내"
- },
- "https://www.seoultech.ac.kr/service/info/janghak/?bidx=896751&bnum=5233&cate=0&qidx=5233": {
-  "ok": "2026-10-24",
-  "at": "2026-10-24",
-  "tries": 0,
-  "name": "[주거안정장학금 선발 학생 필독] 장학생 서약서 10/27(화)까지 제출(필수) 및 지급 일정 안내"
- },
- "https://www.seoultech.ac.kr/service/info/janghak/?bidx=894811&bnum=5233&cate=0&qidx=5233": {
-  "ok": "2026-10-24",
-  "at": "2026-10-24",
-  "tries": 0,
-  "name": "(홍보) 한국장학재단 희망사다리 장학금 신청 안내(마감)"
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323355&menuno=200318": {
   "tries": 3,
@@ -563,12 +533,6 @@
   "minBody": 100,
   "name": "(홍보) 2026년 2학기 푸른등대 기부장학금 신규장학생 신청 안내(~11/12(목)까지)"
  },
- "https://www.seoultech.ac.kr/service/info/janghak/?bidx=897097&bnum=5233&cate=0&qidx=5233": {
-  "tries": 3,
-  "at": "2026-10-29",
-  "minBody": 100,
-  "name": "(홍보) 한국장학재단 희망사다리1유형 장학생 대상 삼성 SSFY 교육생 모집(~11/9(월)까지)"
- },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=321881&menuno=200318": {
   "tries": 3,
   "at": "2026-10-30",
@@ -594,15 +558,21 @@
   "name": "[학부] 2026년도 하반기 강화군 대학생 등록금 지원 장학금 신청 안내"
  },
  "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsno=1073&key=7520&nttno=626879&searchkrwd=장학&sf.pnos=1073&sf.pnos=888": {
-  "tries": 2,
-  "at": "2026-10-30",
+  "tries": 3,
+  "at": "2026-10-31",
   "minBody": 100,
-  "name": "[입학에서 취업까지] [교내] 2026-2 11월 장학사정관장학금 신청 안내[신청"
+  "name": "[입학에서 취업까지] [교내] 2026-2 11월 장학사정관장학금 신청 안내[신청기간 2026.11.01(일"
  },
  "https://www.inha.ac.kr/bbs/kr/8/45988/artclView.do": {
   "ok": "2026-10-30",
   "at": "2026-10-30",
   "tries": 0,
   "name": "[학부-교외장학] 2026년 2학기 벽담재단법인 외국인 유학생 장학생 선발 안내"
+ },
+ "https://onestop.pusan.ac.kr/page?menucd=000000000000062&seq=705": {
+  "ok": "2026-10-31",
+  "at": "2026-10-31",
+  "tries": 0,
+  "name": "2026년도 2학기 국가근로장학금 동계방학 집중근로(교외) 신청 안내"
  }
 }
