@@ -1,41 +1,8 @@
 {
  "v": 1,
  "note": "층2 재단 장학금의 개별 공고 후보 — 로봇(collector/kosaf-hunt.mjs)이 재단 홈페이지를 뒤져 적는다. 사람 후보 파일(link-candidates.json)과 같은 줄 꼴. 원문 링크 확인 로봇이 학생처럼 열어 확인한 것만 앱(data/link-check.json fix)에 실린다. 손으로 고치지 말 것 — 다음 실행이 다시 쓴다.",
- "updatedAt": "2026-10-30",
+ "updatedAt": "2026-10-31",
  "items": [
-  {
-   "target": {
-    "ds": "kosaf",
-    "key": "2700071007"
-   },
-   "board": "https://www.ycsf.or.kr/open/notice/list.html",
-   "source": "board",
-   "by": "로봇(층2 글 사냥꾼)",
-   "addedAt": "2026-10-14",
-   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 15) — 확인 로봇이 목록을 다시 읽어 고른다"
-  },
-  {
-   "target": {
-    "ds": "kosaf",
-    "key": "2000319002"
-   },
-   "board": "https://www.yeongju.go.kr/check/bbs/board.php?bo_table=yjra0101",
-   "source": "board",
-   "by": "로봇(층2 글 사냥꾼)",
-   "addedAt": "2026-10-13",
-   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 100) — 확인 로봇이 목록을 다시 읽어 고른다"
-  },
-  {
-   "target": {
-    "ds": "kosaf",
-    "key": "2000206004"
-   },
-   "board": "https://www.yw.go.kr/www/selectBbsNttList.do?bbsNo=86&key=524",
-   "source": "board",
-   "by": "로봇(층2 글 사냥꾼)",
-   "addedAt": "2026-10-14",
-   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 9) — 확인 로봇이 목록을 다시 읽어 고른다"
-  },
   {
    "target": {
     "ds": "kosaf",
@@ -49,21 +16,6 @@
    "also": [
     "2000443003",
     "2000443006"
-   ]
-  },
-  {
-   "target": {
-    "ds": "kosaf",
-    "key": "2703156001"
-   },
-   "url": "https://www.jw-foundation.or.kr/notice/228",
-   "title": "2026 JW이종호재단 기초과학자 주거장학사업 장학생 선발",
-   "source": "board",
-   "by": "로봇(층2 글 사냥꾼)",
-   "addedAt": "2026-10-13",
-   "note": "https://www.jw-foundation.or.kr/ 목록에서 고름 — 사업 이름 +1 · 마감 해 +1 · 장학 낱말 +1 · 게시일 +1",
-   "also": [
-    "2704231001"
    ]
   },
   {
@@ -160,17 +112,6 @@
   {
    "target": {
     "ds": "kosaf",
-    "key": "2500058003"
-   },
-   "board": "https://www.jiles.or.kr/community/notice/othernews.htm",
-   "source": "board",
-   "by": "로봇(층2 글 사냥꾼)",
-   "addedAt": "2026-10-23",
-   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 15) — 확인 로봇이 목록을 다시 읽어 고른다"
-  },
-  {
-   "target": {
-    "ds": "kosaf",
     "key": "2000315002"
    },
    "board": "https://www.usc.go.kr/water/main.do",
@@ -189,6 +130,73 @@
    "by": "로봇(층2 글 사냥꾼)",
    "addedAt": "2026-10-18",
    "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "0731002"
+   },
+   "board": "http://www.gbanurse.or.kr/index.php?g_page=notice&m_page=notice01&wd=1",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-31",
+   "note": "게시판처럼 보이는 쪽(공고 2건 · 글 줄 15) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000423012"
+   },
+   "url": "https://www.jincheon.go.kr/jcjh/sub.do?menukey=3464&mode=view&no=1076147380",
+   "title": "2026-10-01 (재)진천군장학회 2026년 하반기 장학생 모집 공고",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-31",
+   "note": "https://www.jincheon.go.kr/jcjh/main.do 목록에서 고름 — 재단 이름 +1 · 마감 해 +1 · 학기·반기 +1 · 장학 낱말 +1 · 게시일 +1"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "1814024001"
+   },
+   "board": "https://www.redcross.or.kr/main/pp/prcplView/selectPrcplView.do?mi=2590",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-31",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2700071007"
+   },
+   "board": "https://www.ycsf.or.kr/open/notice/list.html",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-14",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 15) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000319002"
+   },
+   "board": "https://www.yeongju.go.kr/check/bbs/board.php?bo_table=yjra0101",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-13",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 100) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000206004"
+   },
+   "board": "https://www.yw.go.kr/www/selectBbsNttList.do?bbsNo=86&key=524",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-14",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 9) — 확인 로봇이 목록을 다시 읽어 고른다"
   }
  ]
 }

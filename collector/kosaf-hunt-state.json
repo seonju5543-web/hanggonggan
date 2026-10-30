@@ -1,6 +1,6 @@
 {
  "v": 1,
- "updatedAt": "2026-10-30",
+ "updatedAt": "2026-10-31",
  "hosts": {
   "jntle.kr": {
    "checkedAt": "2026-10-23",
@@ -75,12 +75,12 @@
    "why": "게시판도 글도 못 찾음"
   },
   "jincheon.go.kr": {
-   "checkedAt": "2026-10-23",
-   "pages": 1,
-   "found": 0,
-   "lines": 0,
-   "targets": 3,
-   "why": "게시판도 글도 못 찾음"
+   "checkedAt": "2026-10-31",
+   "pages": 4,
+   "found": 1,
+   "lines": 1,
+   "targets": 1,
+   "why": ""
   },
   "gjjanghak.org": {
    "checkedAt": "2026-10-23",
@@ -196,11 +196,11 @@
    "why": "게시판도 글도 못 찾음"
   },
   "gochang.go.kr": {
-   "checkedAt": "2026-10-27",
+   "checkedAt": "2026-10-31",
    "pages": 1,
    "found": 0,
    "lines": 0,
-   "targets": 1,
+   "targets": 4,
    "why": "게시판도 글도 못 찾음"
   },
   "goseong.go.kr": {
@@ -401,7 +401,7 @@
    "why": "게시판도 글도 못 찾음"
   },
   "ycsf.or.kr": {
-   "checkedAt": "2026-10-27",
+   "checkedAt": "2026-10-31",
    "pages": 4,
    "found": 0,
    "lines": 1,
@@ -409,7 +409,7 @@
    "why": "글은 못 고르고 게시판만"
   },
   "yeongju.go.kr": {
-   "checkedAt": "2026-10-27",
+   "checkedAt": "2026-10-31",
    "pages": 9,
    "found": 0,
    "lines": 1,
@@ -417,7 +417,7 @@
    "why": "글은 못 고르고 게시판만"
   },
   "yw.go.kr": {
-   "checkedAt": "2026-10-27",
+   "checkedAt": "2026-10-31",
    "pages": 9,
    "found": 0,
    "lines": 1,
@@ -514,7 +514,7 @@
    "why": "게시판도 글도 못 찾음"
   },
   "yonkang.org": {
-   "checkedAt": "2026-10-27",
+   "checkedAt": "2026-10-31",
    "pages": 10,
    "found": 0,
    "lines": 0,
@@ -662,14 +662,62 @@
    "targets": 1
   },
   "ycg.kr": {
-   "checkedAt": "2026-10-27",
+   "checkedAt": "2026-10-31",
    "why": "홈페이지 못 엶 (응답 404 → 브라우저도 실패(응답 404))",
    "targets": 1
   },
   "yjdream.kr": {
-   "checkedAt": "2026-10-27",
+   "checkedAt": "2026-10-31",
    "why": "홈페이지 못 엶 (TypeError: ECONNRESET → 브라우저도 실패(page.goto: net::ERR_CONNECTION_RESET at http://)",
    "targets": 1
+  },
+  "dncf.or.kr": {
+   "checkedAt": "2026-10-31",
+   "pages": 3,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "gangbuk.go.kr": {
+   "checkedAt": "2026-10-31",
+   "pages": 1,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "gbanurse.or.kr": {
+   "checkedAt": "2026-10-31",
+   "pages": 2,
+   "found": 0,
+   "lines": 1,
+   "targets": 1,
+   "why": "글은 못 고르고 게시판만"
+  },
+  "jecheon.go.kr": {
+   "checkedAt": "2026-10-31",
+   "pages": 1,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "redcross.or.kr": {
+   "checkedAt": "2026-10-31",
+   "pages": 6,
+   "found": 0,
+   "lines": 1,
+   "targets": 1,
+   "why": "글은 못 고르고 게시판만"
+  },
+  "ygef.or.kr": {
+   "checkedAt": "2026-10-31",
+   "pages": 3,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
   }
  }
 }

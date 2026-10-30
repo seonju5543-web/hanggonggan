@@ -3,6 +3,35 @@
  "updatedAt": "2026-10-30",
  "items": [
   {
+   "title": "[취업정보] 2026학년도 2학기 [미래설계프로그램] 전공계열별 직무탐색 ...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70852",
+   "postedAt": "2026-10-30",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-30",
+   "thumb": "data/news/img/51b059d039f11f1e.webp"
+  },
+  {
+   "title": "[채용공고] 2026년 제10회 전남대학교 앵커사업단·제3회 서남권공유대학...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70845",
+   "postedAt": "2026-10-30",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-30"
+  },
+  {
+   "title": "[취업정보] [교재/녹화 제공] 「빅데이터분석기사, 차근차근 실습하기」",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70844",
+   "postedAt": "2026-10-30",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-30"
+  },
+  {
    "title": "[취업정보] [동성케미칼] 채용설명회/ 채용상담회",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70843",
    "postedAt": "2026-10-30",
@@ -371,34 +400,6 @@
    "campus": "",
    "src": "b7347301",
    "foundAt": "2026-10-26"
-  },
-  {
-   "title": "[취업정보] 2026년 글로컬대학사업 「빅데이터분석기사, 차근차근 실습하기」",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70794",
-   "postedAt": "2026-10-26",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-26"
-  },
-  {
-   "title": "[모집공고] [GIST, AICA, 전남대학교] NPU 평가·검증 실무 교...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70793",
-   "postedAt": "2026-10-23",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-24",
-   "thumb": "data/news/img/a087a29bff4cce37.webp"
-  },
-  {
-   "title": "[대학생활] 먼가 크고 귀여운 정보보안 컬로퀴엄 껄 껄",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70792",
-   "postedAt": "2026-10-23",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-23"
   }
  ]
 }

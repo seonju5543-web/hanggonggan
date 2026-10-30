@@ -3,6 +3,48 @@
  "updatedAt": "2026-10-30",
  "items": [
   {
+   "title": "국립부경대학교 사무국장(별정직 고위공무원단) 채용 공고",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726802",
+   "postedAt": "2026-10-30",
+   "kind": "채용",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-30",
+   "desc": "국립부경대학교에서는 우수 인재의 공직유치를 위해 국가공무원 경력경쟁채용 시험을 다음과 같이 공고하여 시행하오니 역량 있는 분들의 많은 응시 바랍니다 ."
+  },
+  {
+   "title": "2026학년도 2학기 모의토익 경시대회 안내",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726799",
+   "postedAt": "2026-10-30",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-30",
+   "desc": "○ 대상 : 본교 재학생( 휴학생 , 졸업유보생 , 대학원생 응시 불가) 시험일자 시험시간 추후 공지"
+  },
+  {
+   "title": "취업 역량 강화를 위한 「잡다(JOBDA)」서비스 구축 알림 및 이용 안내",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726798",
+   "postedAt": "2026-10-30",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-30",
+   "thumb": "data/news/img/b9a9988cb292bb94.webp"
+  },
+  {
+   "title": "[기간 연장] ♥ 비교과 교육과정 수요조사 ♥ 참여 안내",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726796",
+   "postedAt": "2026-10-30",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-30",
+   "thumb": "data/news/img/38935328ffe162dc.webp",
+   "desc": "교육혁신과 2026학년도 비교과 교육과정 수요조사 기간이 2026. 11. 5.(목)까지 연장 되었습니다."
+  },
+  {
    "title": "2027학년도 전기 교육대학원 신입생 모집 안내",
    "url": "https://www.pknu.ac.kr/main/163?action=view&no=726791",
    "postedAt": "2026-10-29",
@@ -378,50 +420,6 @@
    "src": "53a197d6",
    "foundAt": "2026-10-15",
    "thumb": "data/news/img/24ccfd56ad4e3ffd.webp"
-  },
-  {
-   "title": "★ (기간연장) 글로벌커넥트 카페 [Fall Clothing Swap] 가을·겨울 옷 나눔 행사",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726591",
-   "postedAt": "2026-10-14",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-15",
-   "thumb": "data/news/img/5aabcb7912db4e0c.webp",
-   "desc": "중간고사 준비에 지친 마음을 잠시 쉬게 해줄 작은 쇼핑타임! 나에게 맞는 새로운 옷을 찾아보세요."
-  },
-  {
-   "title": "★ [학부대학] 2026-2학기 전공탐색 주간(전공 박람회) 개최 안내★",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726588",
-   "postedAt": "2026-10-14",
-   "kind": "행사",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-15",
-   "thumb": "data/news/img/f5bdd16c9b021d96.webp",
-   "desc": "2. 주요 행사 일정 1) 전공 박람회: 2026. 11. 3.(화) 11:00~17:00 , 부경컨벤션홀(E23관), 동원장보고관(E22관)"
-  },
-  {
-   "title": "[채용공고] 국립부경대학교 정보융합대학 전자공학전공 조교 채용 공고",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726583",
-   "postedAt": "2026-10-13",
-   "kind": "채용",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-13"
-  },
-  {
-   "title": "[고용노동부, 한국고용정보원] 2026년 대학일자리플러스센터 만족도 조사",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726580",
-   "postedAt": "2026-10-13",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-13",
-   "thumb": "data/news/img/453cd33855f2fba4.webp",
-   "desc": "학생성공지원과 고용노동부와 한국고용정보원에서는 ‘ 2026년 대학일자리플러스센터 만족도 조사 ’를 실시하고 있습니다."
   }
  ]
 }

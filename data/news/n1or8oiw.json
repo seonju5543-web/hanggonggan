@@ -3,6 +3,18 @@
  "updatedAt": "2026-10-30",
  "items": [
   {
+   "title": "AI 리터러시 공통교양 교과목 개발 교원 공모",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766813",
+   "postedAt": "2026-10-30",
+   "postId": "26766813",
+   "kind": "학사",
+   "school": "동국대학교",
+   "campus": "",
+   "src": "d521f12e",
+   "foundAt": "2026-10-30",
+   "thumb": "data/news/img/260eb6f7cc533563.webp"
+  },
+  {
    "title": "[카운슬링센터] '온라인 심리검사'로 자기점검 해볼까? - 대학생활 적응 정도 및 학습 전략 장단점에 관하여",
    "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766798",
    "postId": "26766798",
@@ -444,18 +456,6 @@
    "foundAt": "2026-10-08",
    "thumb": "data/news/img/06720f8a1cb02c65.webp",
    "desc": "본 프로그램은 XR 콘텐츠의 핵심 요소인 3D 그래픽 제작의 원리를 체험해보고, 3D 드로잉앱(Feather)을 활용하여 창업, 창작 아이디어를 표현하고 싶은 분을 위해 운영되는 프로그램입니다.",
-   "src": "d521f12e"
-  },
-  {
-   "title": "[교수학습혁신센터] 2026-2학기 동국 튜터링 튜티 모집",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766522",
-   "postedAt": "2026-10-08",
-   "postId": "26766522",
-   "kind": "채용",
-   "school": "동국대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "desc": "튜터링 운영 교과목 (학수번호+분반 동일)의 수강생이라면 튜티로 참여 가능합니다. 자세한 사항은 아래 이미지 및 첨부파일 참고 바랍니다. 감사합니다. (아래 이미지 클릭 시 드림패스 로 이동합니다.)",
    "src": "d521f12e"
   }
  ]

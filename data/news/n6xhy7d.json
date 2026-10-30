@@ -3,6 +3,16 @@
  "updatedAt": "2026-10-30",
  "items": [
   {
+   "title": "[일반] [광운대학교x노르마] Advanced AI Course 양자컴퓨팅(사전안내)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53588&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-30",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-30",
+   "desc": "광운대학교 RISE사업단(서울캠퍼스타운)에서는, 양자와 AI를 결합한 Advanced AI Course 교육에 대해 사전신청을 받고 있습니다."
+  },
+  {
    "title": "[일반] 기간제 계약직원 채용 공고(경영대학원 교학팀)",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53585&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "postedAt": "2026-10-30",
@@ -416,16 +426,6 @@
    "foundAt": "2026-10-15",
    "thumb": "data/news/img/b59d15699f0d7e9c.webp",
    "desc": "나 : 행사일시 : 2026. 10. 23.( 금 )~10.24.( 토 ), 2 일간 다 : 장 소 : 더서울라이티움 ( 서울시 성동구 소재 )"
-  },
-  {
-   "title": "[학사] KLAS 종합정보서비스 보안 강화 조치 시행 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53483&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-15",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-15",
-   "desc": "1. 최근 AI 를 이용한 해외 해킹 시도가 급증함에 따라 , 학생 여러분의 개인정보를 안전하게 보호하기 위해 KLAS 종합정보서비스 보안 강화 조치를 아래와 같이 시행하오니 양지하여 주시기 바랍니다 ."
   }
  ]
 }

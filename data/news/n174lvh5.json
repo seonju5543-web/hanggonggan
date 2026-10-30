@@ -3,6 +3,29 @@
  "updatedAt": "2026-10-30",
  "items": [
   {
+   "title": "[대플-추천채용] 스탠다드인터내셔널 주식회사 - 구매/재무/NPD/Tech/마케팅 채용",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277316&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-30",
+   "kind": "채용",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-30",
+   "desc": "* 전형절차 : 1차면접(실무진) -> 2차면접(임원) -> 최종합격 - 추천채용 지원자 서류 전형 면제"
+  },
+  {
+   "title": "[김수환추기경연구소] 체험형 전시 ‘사색의 운동회 - 말씀이 몸이 되는 순간’ 개최",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277314&article.offset=0&articleLimit=10",
+   "postedAt": "2026-10-30",
+   "kind": "행사",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-10-30",
+   "thumb": "data/news/img/04b9e51118acea94.webp",
+   "desc": "종교가 있든 없든, 신앙과 관계없이 누구나 즐겁게 참여할 수 있는 참여형 전시회가 열립니다!"
+  },
+  {
    "title": "[중앙도서관] 11월 학술정보이용교육 안내",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277293&article.offset=0&articleLimit=10",
    "postedAt": "2026-10-30",
@@ -409,28 +432,6 @@
    "campus": "",
    "src": "5d85d287",
    "foundAt": "2026-10-16"
-  },
-  {
-   "title": "[대플-추천채용] 한샘 – 2026년 하반기 영업직 신입(TR) 공개채용",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276847&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-16",
-   "kind": "채용",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-16",
-   "desc": "***추천채용을 통해 지원하는 경우 “서류전형 가점” 혜택 부여 1. 세부일정 : *전형절차 : 서류전형 -> 1차면접 -> 인성검사 -> 최종면접 -> 최종합격"
-  },
-  {
-   "title": "[학사행정팀] 2026학년도 겨울계절학기 서울 및 경인지역 대학교 학점교류 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276791&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-15",
-   "kind": "학사",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-15",
-   "desc": "※ 교류대학의 접수 마감일을 확인하고 , 트리니티에서 신청 후 필히 방문 및 서류제출 ( 제출처 : 학사행정팀 / 미카엘관 H104 호 09:00~17:00, 점심시간 12:00~13:00 제외 )"
   }
  ]
 }

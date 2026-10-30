@@ -45,8 +45,8 @@
     - 3522200 · [평일 오후] 10월 글마루한옥도서관 도서 및 서가정리 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3522200 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3522200(2)
     - 3522924 · [사랑샘지역아동센터] 방과후 학습 및 놀이 지도 - 대 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3522924 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3522924(2)
     - 3524271 · [초록봉사단] 사랑의 연탄 나눔(고등학생, 대학생, 일 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3524271 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3524271(2)
-- ✅ **온통청년 청년콘텐츠** — 받은 행 30 · 실은 글 **9** · 버림: 공모전·대외활동 아님(소식 글 등) 21
-  - 자격 줄 있는 글 1/9 · 원문 안내 있는 글 0/9
+- ✅ **온통청년 청년콘텐츠** — 받은 행 30 · 실은 글 **8** · 버림: 공모전·대외활동 아님(소식 글 등) 22
+  - 자격 줄 있는 글 1/8 · 원문 안내 있는 글 0/8
   - 첫 행 칸: `bbsSn, pstSn, pstSeSn, pstSeNm, pstTtl, pstWholCn, pstInqCnt, pstUrlAddr, atchFile, frstRgtrNm, frstRegDt, lastMdfrNm, lastMdfcnDt`
   - 대외활동 · 공주시청년센터 - 「공주 크리에이티브 IP 캠프」 모집 — https://www.youthcenter.go.kr/bbs03View/48/10858
   - 대외활동 · 미래내일 일경험 기업 실무 프로젝트 참여자 모집 - 3. IT 직무 — https://www.youthcenter.go.kr/bbs03View/48/10853
@@ -60,11 +60,10 @@
     - 10841 · 구리시청년내일센터 - 2026 구리시청년내일센터 창업  → https://www.youthcenter.go.kr/bbs03View/48/10841 · 살핀 칸: 주소 칸 없음
     - 10840 · 구리시청년내일센터 - 2026 청년교류 프로그램 <내  → https://www.youthcenter.go.kr/bbs03View/48/10840 · 살핀 칸: 주소 칸 없음
     - 10836 · 국무조정실 - 정부위원회 청년위원 통합공모 안내 → https://www.youthcenter.go.kr/bbs03View/48/10836 · 살핀 칸: 주소 칸 없음
-    - 10827 · 「2026 IFWY 은평 컨퍼런스」 참가자 모집 안내 → https://www.youthcenter.go.kr/bbs03View/48/10827 · 살핀 칸: 주소 칸 없음
-- ✅ **온통청년 청년정책** — 받은 행 3664 · 실은 글 **15** · 버림: 공모전·대외활동 아님(주거·금융 등 정책) 3422 · 마감 지남 97 · 상한 15건 초과 82 · 원문 주소 없음 36 · 같은 글 11 · 같은 기관 홈페이지(원문 주소 없음) 1
+- ✅ **온통청년 청년정책** — 받은 행 3843 · 실은 글 **15** · 버림: 공모전·대외활동 아님(주거·금융 등 정책) 3596 · 마감 지남 98 · 상한 15건 초과 85 · 원문 주소 없음 37 · 같은 글 11 · 같은 기관 홈페이지(원문 주소 없음) 1
   - 자격 줄 있는 글 12/15 · 원문 안내 있는 글 15/15
   - 첫 행 칸: `plcyNo, bscPlanCycl, bscPlanPlcyWayNo, bscPlanFcsAsmtNo, bscPlanAsmtNo, pvsnInstGroupCd, plcyPvsnMthdCd, plcyAprvSttsCd, plcyNm, plcyKywdNm, plcyExplnCn, lclsfNm, mclsfNm, plcySprtCn, sprvsnInstCd, sprvsnInstCdNm, sprvsnInstPicNm, operInstCd, operInstCdNm, operInstPicNm, sprtSclLmtYn, aplyPrdSeCd, bizPrdSeCd, bizPrdBgngYmd, bizPrdEndYmd, bizPrdEtcCn, plcyAplyMthdCn, srngMthdCn, aplyUrlAddr, sbmsnDcmntCn, etcMttrCn, refUrlAddr1, refUrlAddr2, sprtSclCnt, sprtArvlSeqYn, sprtTrgtMinAge, sprtTrgtMaxAge, sprtTrgtAgeLmtYn, mrgSttsCd, earnCndSeCd, earnMinAmt, earnMaxAmt, earnEtcCn, addAplyQlfcCndCn, ptcpPrpTrgtCn, inqCnt, rgtrInstCd, rgtrInstCdNm, rgtrUpInstCd, rgtrUpInstCdNm, rgtrHghrkInstCd, rgtrHghrkInstCdNm, zipCd, plcyMajorCd, jobCd, schoolCd, aplyYmd, frstRegDt, lastMdfcnDt, sbizCd`
-  - 코드 칸 값(첫 세 행): pvsnInstGroupCd=0054002|0054002|0054002 · plcyPvsnMthdCd=0042005|0042013|0042006 · plcyAprvSttsCd=0044002|0044002|0044002 · sprvsnInstCd=4711066|4711066|4711066 · operInstCd=       |       |        · aplyPrdSeCd=0057001|0057001|0057001 · bizPrdSeCd=0056001|0056001|0056001 · mrgSttsCd=0055003|0055003|0055003 · earnCndSeCd=0043001|0043001|0043002 · rgtrInstCd=4711000|4711000|4711000 · rgtrUpInstCd=6540000|6540000|6540000 · rgtrHghrkInstCd=6540000|6540000|6540000 · zipCd=52210|52210|52210 · plcyMajorCd=0011009|0011009|0011009 · jobCd=0013010|0013010|0013001 · schoolCd=0049010|0049010|0049010 · sbizCd=0014010|0014010|0014001
+  - 코드 칸 값(첫 세 행): pvsnInstGroupCd=0054002|0054002|0054002 · plcyPvsnMthdCd=0042006|0042002|0042006 · plcyAprvSttsCd=0044002|0044002|0044002 · sprvsnInstCd=6412659|3340000|6412659 · operInstCd=       |       |B554315 · aplyPrdSeCd=0057002|0057001|0057002 · bizPrdSeCd=0056002|0056002|0056002 · mrgSttsCd=0055003|0055003|0055003 · earnCndSeCd=0043003|0043001|0043003 · rgtrInstCd=6412831|3340178|6412831 · rgtrUpInstCd=6410000|3340000|6410000 · rgtrHghrkInstCd=6410000|6260000|6410000 · zipCd=41111,41113,41115,41117,41131,41133,4113|26380|41111,41113,41115,41117,41131,41133,4113 · plcyMajorCd=0011009|0011009|0011009 · jobCd=0013010|0013010|0013010 · schoolCd=0049010|0049010|0049010 · sbizCd=0014010|0014010|0014010
   - 대외활동 · 2026 서울시 청년해외봉사단 사업 (~2026-10-31) — https://youth.seoul.go.kr/youthConts.do?key=2311120001&sc_pbancSeCd=020&sc_bbsStngSn=2212200001&sc_bbsCtgrySn=2310200014&sc_qnaCtgryCd=001&sc_faqCtgryCd=001
   - 대외활동 · 청년 생명사랑 서포터즈 운영 (~2026-11-30) — https://www.usspc.or.kr/
   - 대외활동 · (연수구) 청년 자격증 응시료 지원 (~2026-11-30) — https://youth.incheon.go.kr/youthpolicy/youthPolicyInfoDetail.do?poly_seq=419
@@ -85,6 +84,6 @@
     - 20260421005400212793 · 청년 체인지메이커 아카데미 운영 → https://jejuyouthdream.com/policy/detail/70 · 살핀 칸: aplyUrlAddr=https://www.jeju.go.kr/index.htm(0) · refUrlAddr1=https://jejuyouthdream.com/policy/detail/70(1)
     - 20260413005400212702 · 대학생 봉사활동 활성화 → https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56236 · 살핀 칸: refUrlAddr1=https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56236(2)
 
-data/activities.json — API 글 54 → **54건** (전체 200건)
+data/activities.json — API 글 53 → **53건** (전체 199건)
 
 > 열쇠·출처 설명: `collector/open-api.mjs` 머리말 · 바꾸는 규칙: `collector/open-api-map.mjs` · 설계: `docs/designs/external-sources.md` §10
