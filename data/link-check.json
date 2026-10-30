@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-29T16:45:18.973Z",
+ "updatedAt": "2026-10-30T15:12:07.192Z",
  "v": 1,
  "bad": {
   "https://nysc.or.kr/nysc/pages/notice_view.php?id=288": {
@@ -90,10 +90,6 @@
    "v": "other",
    "at": "2026-10-30"
   },
-  "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140711&article.offset=0&articleLimit=10": {
-   "v": "gone",
-   "at": "2026-10-30"
-  },
   "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=95279&article.offset=0&articleLimit=10": {
    "v": "other",
    "at": "2026-10-30"
@@ -114,13 +110,6 @@
    "src": "robot",
    "title": "2026년 전입장학금 지원 공고",
    "round": "2026-11-30"
-  },
-  "id:kosaf-2000429014": {
-   "url": "https://scholarship.eumseong.go.kr/www/selectBbsNttView.do?key=33&bbsNo=3&nttNo=838",
-   "at": "2026-10-10",
-   "src": "robot",
-   "title": "2026년 한국가스안전공사 지역상생 특별장학생 선발 공고",
-   "round": "2026-10-23"
   },
   "id:kosaf-2704211001": {
    "url": "https://myungfoundation.or.kr/modules/bbs/bbsView.php?id=28&page=1&&code=bbs_notice&xid=1",
