@@ -296,16 +296,18 @@ async function downloadForms() {
   let backlog = [];
   try {
     const reg = JSON.parse(fs.readFileSync(new URL('../data/registered.json', HERE), 'utf8'));
+    const root = fileURLToPath(new URL('..', HERE));
     const rows = FP.parseFormsIndex(fs.existsSync(new URL('forms-index.txt', OUT)) ? fs.readFileSync(new URL('forms-index.txt', OUT), 'utf8') : '');
-    const { isApplicationForm } = FP.loadFormRules(fileURLToPath(new URL('..', HERE)));
+    const { isApplicationForm } = FP.loadFormRules(root);
     const manualTitles = new Set(capped.map((n) => n.title));
-    backlog = FP.pickFormBacklog(reg.items || [], rows, { today, isApplicationForm, tried, max: Math.max(0, MAX_NOTICES - capped.length) })
-      .filter(({ it }) => !manualTitles.has(it.boardTitle || it.name));
+    /* 대외활동·공모전 글(참가신청서 첨부)도 같은 줄에 선다(2026-10-30) — form-pdf 가 같은 열쇠(id)로 PDF 를 만든다 */
+    backlog = FP.pickFormBacklog([...(reg.items || []), ...FP.loadActivities(root)], rows, { today, isApplicationForm, tried, max: Math.max(0, MAX_NOTICES - capped.length) })
+      .filter(({ it }) => !manualTitles.has(it.boardTitle || it.name || it.title));
   } catch (e) { console.log('신청서 밀린 목록을 못 골랐다 (표적만 받는다):', e.message); }
   console.log(`아직 못 받은 신청서 원본 — 이번에 ${backlog.length}건 (쉬는 중 ${Object.keys(tried).length}건)`);
   /* 표적 공고(피드 행 · title/attachments 전부)와 밀린 공고(등록분 · 신청서 첨부만)를 한 줄로 — 아래 내려받기 고리는 같다 */
   const jobs = [...capped.map((n) => ({ title: n.title, atts: n.attachments || [], regId: null })),
-    ...backlog.map(({ it, atts }) => ({ title: it.boardTitle || it.name, atts, regId: it.id }))];
+    ...backlog.map(({ it, atts }) => ({ title: it.boardTitle || it.name || it.title, atts, regId: it.id }))];
 
   /* 🔴 옛 파일은 **그 공고에 닿았을 때** 갈아끼운다 — 미리 몽땅 지우면 예산에 잘린 공고는 원본·미리보기 글자를 잃은 채 다음 실행까지 간다
      (2026-10-30 1ms 예산 실측: 표적 9건의 파일 17개가 지워지고 하나도 안 받아졌다 · 자격 로봇의 '갈아끼우기' 규칙과 같다).

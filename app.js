@@ -3657,6 +3657,15 @@ function openActivityDetail(url) {
       ${/* 「모집 안내」도 보일 것이 있을 때만 — 없으면 칸을 접는다('모집 기간·대상은 원문에서 확인' 문구 삭제 · 2026-10-17) */ ''}
       ${recruitHtml ? `<h4>모집 안내</h4>${recruitHtml}` : ''}
       ${noticeSummaryHtml(notice)}
+      ${/* 제출 서류(원문 「제출서류」 절 글자 그대로 · collector activityDocuments) · 신청서 원본 PDF(같은 form-pdf 로봇 · 열쇠는 글 id · 줄 꼴은 장학과 같은 formPdfRowsHtml)
+           — 2026-10-30 공동개발자 "공모전 신청 양식이 매우 미흡": 활동 시트엔 원문 단추뿐이었다. 없으면 칸이 없다(지어내지 않는다) */ ''}
+      ${(n.documents || []).length ? `
+      <h4>제출 서류</h4>
+      <ul class="doc-list">${n.documents.map((d) => `<li>${esc(d)}</li>`).join('')}</ul>` : ''}
+      ${formPdfRowsHtml(n) ? `
+      <h4>신청서 양식 <span class="channel-tag">공고 원본</span></h4>
+      <ul class="doc-list">${formPdfRowsHtml(n)}</ul>
+      <p class="dp-note">제출은 이 원본 양식으로 합니다 — 글자 하나 안 바꾼 사본입니다.</p>` : ''}
       ${(n.attachments || []).length ? `
       <h4>공고 원본 첨부</h4>
       <ul class="doc-list">${n.attachments.map((a) => `<li class="att">${attachmentLinkHtml(a, 'color:var(--primary)')}</li>`).join('')}</ul>` : ''}

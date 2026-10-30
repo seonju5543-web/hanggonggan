@@ -5818,6 +5818,46 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
   eq('하나라도 판정했으면 미확인이 아니다', some.unread, false);
 }
 
+/* ■ 대외활동·공모전 — 제출 서류 · 신청서 원본 PDF (2026-10-30 공동개발자 "공모전 신청 양식이 매우 미흡")
+   실측(마감 전 169건): 참가신청서류 첨부 15건(공모전 10) · 활동 시트는 원문 단추뿐 — 서류 목록·원본 양식·준비 흐름이 하나도 없었다.
+   고친 것: ① 제출 서류 목록은 장학과 같은 규칙 한 곳(doc-list.mjs → activityDocuments) ② 신청서 원본 PDF 는 같은 로봇(form-pdf · deepfetch 밀린 목록)이
+   글 id 로 만든다 — 활동 글 id 는 canon-url.mjs idFromUrl('act-') 한 곳 ③ 활동 시트에 「제출 서류」·「신청서 양식」 칸(없으면 칸이 없다). */
+{
+  console.log('■ 대외활동·공모전 — 제출 서류 · 신청서 원본 PDF (2026-10-30)');
+  const AX = await import('../collector/activity-excerpts.mjs');
+  const text = `2026 청년정책 아이디어 공모전\n○ 응모 자격 : 전국 대학생 누구나\n○ 제출서류\n - 참가신청서 1부 (붙임 서식)\n - 개인정보 수집·이용 동의서 1부\n - 작품 설명서 (자유 양식)\n○ 접수 방법 : 이메일 접수\n○ 문의 : 02-000-0000`;
+  eq('① 「제출서류」 절을 서류 이름으로 — 원문 글자 그대로 · 다음 절(접수 방법)에서 끝난다 · 그림 글머리·번호는 뗀다',
+    AX.activityDocuments ? AX.activityDocuments(text) : null, ['참가신청서 1부 (붙임 서식)', '개인정보 수집·이용 동의서 1부', '작품 설명서 (자유 양식)']);
+  eq('  절이 없으면 빈 배열(지어내지 않는다) · 빈 글자도', AX.activityDocuments ? [AX.activityDocuments('○ 응모 자격 : 대학생\n○ 접수 : 이메일'), AX.activityDocuments('')] : null, [[], []]);
+  const cm = readText(new URL('../collector/collect.mjs', import.meta.url));
+  eq('② 수집 로봇 — 본문을 읽는 두 자리(새 글 · 소급 보강) 모두 서류 목록을 적고 · 없으면 칸을 지운다 · 활동 글 id 는 idFromUrl(\'act-\') 한 곳(발행 전 전부에 소급)',
+    [(cm.match(/putActivityDocuments\(it, activityDocuments\(detail\.text\)\)/g) || []).length, /function putActivityDocuments\(it, docs\) \{ if \(docs && docs\.length\) it\.documents = docs; else delete it\.documents; \}/.test(cm),
+      /acts\.items\.forEach\(\(n\) => \{ if \(!n\.id && n\.url\) n\.id = idFromUrl\('act-', n\.url\); \}\);/.test(cm), /import \{ canonUrl, idFromUrl \} from '\.\/canon-url\.mjs'/.test(cm)], [2, true, true, true]);
+  process.env.FORM_PDF_AS_LIB = '1';
+  const FP = await import('../collector/form-pdf.mjs');
+  const isApp = (a) => /신청서|지원서|원서|양식|서식/.test((a && a.name) || '') && /\.(hwp|hwpx|docx?|zip)/i.test((a && a.name) || '');
+  const rows = [{ file: 'form-a-1.hwp', title: '[공모전] 2026 숏폼 공모전 참가자 모집', attach: '참가신청서.hwp', bytes: 10 }];
+  const acts = [
+    { id: 'act-1', title: '[공모전] 2026 숏폼 공모전 참가자 모집', url: 'https://a.ac.kr/1', deadline: '2026-12-01', attachments: [{ name: '참가신청서.hwp', url: 'https://a.ac.kr/f1' }, { name: '포스터.jpg', url: 'https://a.ac.kr/p' }] },
+    { id: 'act-2', title: '숨긴 글', url: 'https://a.ac.kr/2', hidden: true, deadline: '2026-12-01', attachments: [{ name: '참가신청서.hwp', url: 'https://a.ac.kr/f2' }] },
+    { title: 'id 없는 글', url: 'https://a.ac.kr/3', deadline: '2026-12-01', attachments: [{ name: '참가신청서.hwp', url: 'https://a.ac.kr/f3' }] },
+    { id: 'act-4', title: '원본 아직 없음', url: 'https://a.ac.kr/4', deadline: '2026-11-20', attachments: [{ name: '지원서 양식.docx', url: 'https://a.ac.kr/f4' }] },
+  ];
+  const picked = FP.pickFormTargets ? FP.pickFormTargets(acts, rows, { today: '2026-10-30', isApplicationForm: isApp }) : { targets: [], missing: [] };
+  eq('③ PDF 로봇 — 활동 글도 대상(title 로 색인을 찾는다 · 숨긴 글·id 없는 글은 아니다) · 원본 없는 것은 「아직 못 받음」',
+    [picked.targets.map((t) => [t.id, t.name, t.files.map((f) => f.src)]), picked.missing], [[['act-1', '[공모전] 2026 숏폼 공모전 참가자 모집', ['form-a-1.hwp']]], [{ id: 'act-4', name: '지원서 양식.docx' }]]);
+  eq('  밀린 목록도 활동 글을 고른다 (신청서 첨부만 · 포스터는 아니다)', FP.pickFormBacklog ? FP.pickFormBacklog(acts, rows, { today: '2026-10-30', isApplicationForm: isApp }).map(({ it, atts }) => [it.id, atts.map((a) => a.name)]) : null, [['act-4', ['지원서 양식.docx']]]);
+  const fpSrc = readText(new URL('../collector/form-pdf.mjs', import.meta.url)); const dfSrc = readText(new URL('../collector/deepfetch.mjs', import.meta.url));
+  eq('  본편이 활동 피드를 등록분과 한 줄에 세우고(loadActivities) 살아 있는 id 에 활동 글도 넣는다 · 받는 로봇의 밀린 목록도 같다',
+    [/const items = \[\.\.\.\(reg\.items \|\| \[\]\), \.\.\.loadActivities\(root\)\];/.test(fpSrc), /const live = new Set\(items\.filter/.test(fpSrc), /FP\.pickFormBacklog\(\[\.\.\.\(reg\.items \|\| \[\]\), \.\.\.FP\.loadActivities\(root\)\]/.test(dfSrc)], [true, true, true]);
+  const appA = readText(new URL('../app.js', import.meta.url));
+  const sheet = appA.slice(appA.indexOf('function openActivityDetail('), appA.indexOf('function activityRecruitHtml('));
+  eq('④ 활동 시트 — 「제출 서류」 칸(documents 그대로 · esc) · 「신청서 양식」 칸은 장학과 같은 formPdfRowsHtml · 둘 다 없으면 칸이 없다 · 원본 첨부 칸은 그대로',
+    [/\(n\.documents \|\| \[\]\)\.length \? `\s*<h4>제출 서류<\/h4>/.test(sheet), /n\.documents\.map\(\(d\) => `<li>\$\{esc\(d\)\}<\/li>`\)/.test(sheet), /formPdfRowsHtml\(n\) \? `\s*<h4>신청서 양식/.test(sheet), /<h4>공고 원본 첨부<\/h4>/.test(sheet)], [true, true, true, true]);
+  const drv = readText(new URL('./verify-activities.js', import.meta.url));
+  eq('  브라우저 드라이버가 두 칸을 잰다(가짜 색인 FORMS_PDF_FIXTURE · 글 id 열쇠)', [/FORMS_PDF_FIXTURE/.test(drv), /'act-fixture1'/.test(drv), /제출 서류 — 원문 글자 그대로/.test(drv), /신청서 양식 — 로봇이 바꿔 둔 원본 PDF/.test(drv)], [true, true, true, true]);
+}
+
 console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08-25 개발자 지적으로 수리)');
 /* 🔴 예전엔 app.js 첫머리에 `const TODAY = new Date()` 가 있었고 dday() 가 그 값을 썼다.
    이 앱은 홈 화면에 설치해 쓰는 앱이라 한 번 연 화면이 며칠씩 살아 있다 — 그동안 그 값이

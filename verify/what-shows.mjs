@@ -181,7 +181,12 @@ function linkLines(it, where) {
     const nrows = [...String(noticeHtml).matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => stripTags(m[1].replace(/<b class="ns-k">([^<]*)<\/b>/, '$1 · ')));
     out.push(`   ─ 공고 안내 (${nrows.length}줄${nrows.length ? '' : ' · 칸 접힘'} · 저장된 줄 ${nl.length})`);
     for (const l of nrows.slice(0, 8)) out.push(`       · ${String(l).slice(0, 84)}`);
-    out.push(`   ─ 첨부 ${(it.attachments || []).length}개 · 마감 ${it.deadline || '(없음)'}`);
+    /* 제출 서류·신청서 원본 PDF(2026-10-30) — 시트가 그리는 칸 둘 · PDF 는 앱이 받는 색인(data/forms-pdf/index.json)을 글 id 로 본다 */
+    const fpi = (() => { try { return JSON.parse(fs.readFileSync(new URL('../data/forms-pdf/index.json', import.meta.url), 'utf8')).items || {}; } catch { return {}; } })();
+    const pdfs = (it.id && fpi[it.id]) || [];
+    out.push(`   ─ 제출 서류 (${(it.documents || []).length}줄${(it.documents || []).length ? '' : ' · 칸 접힘'})`);
+    for (const d of it.documents || []) out.push(`       · ${String(d).slice(0, 84)}`);
+    out.push(`   ─ 신청서 양식 PDF ${pdfs.length}개${pdfs.length ? ` (${pdfs.map((f) => f.name).join(' · ').slice(0, 80)})` : ' · 칸 접힘'} · 첨부 ${(it.attachments || []).length}개 · 마감 ${it.deadline || '(없음)'}`);
   }
   return out;
 }

@@ -66,6 +66,7 @@ const noContact = (lines) => lines.filter((l) => !CONTACT.test(l));
    그래도 이름표가 없으면 `대한민국 국민 누구나`·`AI에 관심 있는 누구나` 처럼 **누가 낼 수 있나만 말하는 줄**을 원문 그대로 쓴다(OPEN_LINE). */
 /* 활동 어휘는 collector/activity-vocab.mjs 한 곳(2026-10-27) — 머리글·요건 신호·'누가' 낱말·제목 속 대상 */
 import { ACT_HEAD, ACT_SIGNAL, ACT_WHO, ACT_TAIL, targetFromTitle } from './activity-vocab.mjs';
+import { readDocuments } from './doc-list.mjs';   // 제출 서류 목록 — 장학 발췌기와 같은 규칙 한 곳(2026-10-30 · 공모전 참가신청서가 화면에 없던 것)
 import { createRequire } from 'node:module';
 /* 지역 이름은 parse-requirements.js 의 REGION_CITIES 한 벌(화면·판정·알림) — 끝글자 `시|군|구|도` 로 짐작하면 `별도`·`표시`·`제도` 가 지역이 된다(2026-10-28 리뷰) */
 const PR = createRequire(import.meta.url)('../parse-requirements.js');
@@ -357,6 +358,13 @@ export function putActivityDetails(it, details) {
   if (!keepDocs) { delete it.eligibilityFrom; delete it.eligibilityReviewed; }
   it.detailsV = ACT_DETAILS_V;
   return it;
+}
+
+/* ── 제출 서류 목록 (2026-10-30 · 공동개발자 "공모전 신청 양식이 매우 미흡") ────────────────────────
+   공모전·대외활동 글의 「제출서류」 절을 서류 이름으로(원문 글자 그대로 · doc-list.mjs readDocuments 한 곳 — 장학 등록분과 같은 규칙).
+   없으면 빈 배열(지어내지 않는다). '자유 양식' 근거는 활동 글에선 쓰지 않는다(앱 지원문서가 없다). */
+export function activityDocuments(text) {
+  return readDocuments(normalizeText(text)).docs;
 }
 
 export default activityExcerpts;

@@ -256,11 +256,11 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   주소를 짐작해 채우지 말 것 · 열쇠 글자는 `PORTAL_SYSTEMS`↔`PORTAL_SYSTEM_INFO` 같게. 관문 「포털 신청 시스템」.
 - **대외활동·공모전 탭** (2026-09-25 · 노션 UI-34): 판정은 `collector/activity-kind.mjs` `activityKind` 한 곳(장학 제도는 장학 쪽 · 공모전은 장학 낱말이 있어도 공모전) ·
   파일·장부는 장학 피드와 **따로**(`data/activities.json` · 섞으면 알림이 활동 글로 운다) · 학교 범위는 `activityForProfile` · 카드는 `noticeCardHtml` 한 벌 ·
-  출처 `activity-sources.json` 은 주소마다 `evidence`(확인한 곳)를 적는다 · 집계 사이트는 출처가 아니다. 관문 「대외활동·공모전」 · `verify-activities.js`(서비스워커를 막고 잰다).
-  관리자 「활동」 탭(`#activities`): 종류 바꾸기·숨기기(지우지 않고 `hidden` + `activity-config.json`)·출처 추가/보관 — `activityKind`·`activityHide`·`activitySource`. 관문 같은 절 ⑤ · `verify-admin.js`.
-  활동 글의 마감·발췌는 `collector/activity-excerpts.mjs` 한 곳(마감 규칙은 장학과 같은 `extractDeadline` · 나머지는 원문 문장 그대로 · 분야는 `activityField`) · 공공·재단 게시판은 `collector/robots.mjs` 로 robots.txt 를 묻고 읽는다 · 카드 D-day 는 `dday()` 한 곳. 관문 같은 절 ⑥.
-  **공공 API 로봇**(`collector/open-api.mjs` · 규칙 `collector/open-api-map.mjs`): K-Startup·1365(`DATA_GO_KR_KEY`)·온통청년(`YOUTHCENTER_KEY`·`YOUTHCENTER_CONTENT_KEY` — 🔴 포털 열쇠로 안 열린다) → 같은 `data/activities.json`(`api` 칸) · 못 받은 출처의 지난 글은 지우지 않는다 · 60일 삭제는 API 글엔 `seenAt` · 실패는 로봇 리포트 ❌ → 이슈. 관문 「공공 API 로봇」.
-  🔴 발췌기에 넘기는 상세 글자는 **줄을 살린 것**(`collector/html-text.mjs` `htmlToLines` · deepfetch·rescue 도) — 한 줄로 뭉개면 **전부 0건**이 된다. 발췌 없이 실린 글은 다음 실행이 다시 읽는다(`ACT_BACKFILL` · `excerptsAt`).
+  출처 `activity-sources.json` 은 주소마다 `evidence`(확인한 곳)를 적는다 · 집계 사이트는 출처가 아니다. 관문 「대외활동·공모전」 · `verify-activities.js`.
+  관리자 「활동」 탭(`#activities`): 종류 바꾸기·숨기기(`hidden` + `activity-config.json`)·출처 추가/보관 — `activityKind`·`activityHide`·`activitySource`. 관문 같은 절 ⑤ · `verify-admin.js`.
+  활동 글의 마감·발췌는 `collector/activity-excerpts.mjs` 한 곳(마감 규칙은 장학과 같은 `extractDeadline` · 분야는 `activityField` · 제출 서류는 `activityDocuments` — 장학과 같은 규칙) · 신청서 원본 PDF 는 같은 로봇(form-pdf · 열쇠는 글 id `idFromUrl('act-')`) · 관문 「대외활동·공모전 — 제출 서류 · 신청서 원본 PDF」 · 공공·재단 게시판은 `collector/robots.mjs` 로 robots.txt 를 묻고 읽는다 · 카드 D-day 는 `dday()` 한 곳. 관문 같은 절 ⑥.
+  **공공 API 로봇**(`collector/open-api.mjs` · 규칙 `collector/open-api-map.mjs`): K-Startup·1365(`DATA_GO_KR_KEY`)·온통청년(`YOUTHCENTER_KEY`·`YOUTHCENTER_CONTENT_KEY` — 🔴 포털 열쇠로 안 열린다) → 같은 `data/activities.json`(`api` 칸) · 못 받은 출처의 지난 글은 안 지운다 · 60일 삭제는 `seenAt` · 실패는 리포트 ❌ → 이슈. 관문 「공공 API 로봇」.
+  🔴 발췌기에 넘기는 상세 글자는 **줄을 살린 것**(`htmlToLines`) — 한 줄로 뭉개면 **전부 0건**. 발췌 없이 실린 글은 다음 실행이 다시 읽는다(`ACT_BACKFILL` · `excerptsAt`).
 - **재단·지자체 게시판(교외 확대)** (2026-09-26 · 노션 F-13): 링커리어류는 크롤링이 아니라 **주최사 직접 등록**이라 긁지 않는다 — 우리는 주최의 제 게시판을 읽는다.
   출처 `collector/external-sources.json` 은 `kosaf-open.json` 의 재단 홈페이지에서 왔고, `collector/find-boards.mjs` 가 게시판을 찾아 `autoFound` 로 적는다(잘못 찾으면 `parked`).
   글은 `data/external.json`(학교 피드와 따로) → 홈 「재단·지자체 새 공고」(`externalNoticesHtml` · 등록된 주소는 `registeredUrlMatcher` 로 뺀다). 링크 읽는 눈은 `collector/board-links.mjs` 한 곳. 관문 「재단·지자체 게시판」.
@@ -278,8 +278,8 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   이름 낱말은 거들 뿐. 장부 `news-thumbs.json` 을 매 실행 실린 글 전부에 다시 입히고(`applyThumbs`) 안 쓰는 그림은 지운다 · 관리자 「사진 빼기」는 `noThumb` · 전체 스위치 `news-config.json` 의 `thumbs`(on · dry=받아만 두고 카드엔 안 붙임 · off=모두 뗌). 카드는 `opts.thumb` 를 받은 소식 카드만 그린다(꼴 사본은 관문이 대조).
   **학교 대표 사진**(10-03 지시): 글의 사진이 없는 카드만 학교 사진(「학교 사진」 표시는 뺐다 — 다시 붙이지 말 것) · 출처(BY·BY-SA)는 라이선스 화면 「사진 출처」(`photoCreditsHtml`) · 위키미디어 열린 라이선스만 · 기록 `docs/designs/assets/gates/school-photo-picks.json` → `tools/build-school-photos.mjs` → `assets/schools/photos.json`. 관문 「학교 대표 사진」 · `verify-news.js` ⑥⑦.
   🔴 **소식 0건 학교는 없다**(10-03 지시): 학교마다 최근 4건은 기한이 지나도 남기고(`newsFloor`) · 글이 드문 학교는 둘째 게시판(`extraBoards` · 규칙 열쇠 `newsRuleKey`) · 0건이면 리포트 🙋 + 이슈.
-- **학자금대출**은 정식 등록 제외(대출 원금·이자를 지원하는 장학금은 제외 대상 아님 — `LOAN_EXCEPT`) · 피드에선 빼지 않고 장학 공고 뒤로 보낸다(`boardNoticesForMe`).
-- **인스타**: 🔴 게시는 사람만 누른다 · 토큰은 워크플로에만 · 한 실행 최대 6건 · 수정은 다시 그려 **보여 주고 메일 보낼지 물은 뒤** push-to-run(스킬 `insta-revise`).
+- **학자금대출**은 정식 등록 제외(이자 지원 장학금은 제외 아님 — `LOAN_EXCEPT`) · 피드에선 장학 공고 뒤로(`boardNoticesForMe`).
+- **인스타**: 🔴 게시는 사람만 누른다 · 토큰은 워크플로에만 · 한 실행 최대 6건 · 수정은 다시 그려 **보여 주고 물은 뒤** push-to-run(스킬 `insta-revise`).
   관문 `verify-insta.js` · `docs/designs/instagram-pipeline.md`.
 
 ### 화면

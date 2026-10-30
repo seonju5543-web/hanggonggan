@@ -29,10 +29,12 @@ const iso = (days) => { const d = new Date(); d.setDate(d.getDate() + days); ret
 const FIXTURE = {
   updatedAt: '2026-09-25',
   items: [
-    { title: '2026 대학생 해외봉사단 모집', url: 'https://dep.hufs.ac.kr/bbs/x/1', kind: '대외활동', field: '봉사', school: '한국외국어대학교', campus: '', foundAt: '2026-09-25', attachments: [], deadlineHint: '신청기간 : 2026. 10. 1. ~ 10. 15.',
+    { id: 'act-fixture1', title: '2026 대학생 해외봉사단 모집', url: 'https://dep.hufs.ac.kr/bbs/x/1', kind: '대외활동', field: '봉사', school: '한국외국어대학교', campus: '', foundAt: '2026-09-25', attachments: [{ name: '참가신청서.hwp', url: 'https://dep.hufs.ac.kr/bbs/x/1/f1' }], deadlineHint: '신청기간 : 2026. 10. 1. ~ 10. 15.',
       deadline: iso(5), excerpts: [{ label: '모집기간', text: '2026. 10. 1. ~ 10. 15.' }, { label: '혜택', text: '항공료 전액 지원' }],
       /* 자격 줄 (2026-10-01) — 장학과 같은 엔진이 판정한다: 나이 범위 ✓ */
-      eligibilityLines: ['만 19~34세 대한민국 국민'], noticeLines: ['봉사단은 5개국에 파견합니다.'] },
+      eligibilityLines: ['만 19~34세 대한민국 국민'], noticeLines: ['봉사단은 5개국에 파견합니다.'],
+      /* 제출 서류·신청서 원본 PDF (2026-10-30) — 로봇이 원문 「제출서류」 절에서 적은 목록 · forms-pdf 색인은 아래 가짜 응답(FORMS_PDF_FIXTURE)이 준다 */
+      documents: ['참가신청서 1부', '개인정보 수집·이용 동의서 1부'] },
     /* 마감이 지난 글 — 파일에는 있지만 화면에는 없어야 한다 (2026-09-29) */
     { title: '지난 공모전 — 보이면 안 된다', url: 'https://dep.hufs.ac.kr/bbs/x/6', kind: '공모전', school: '한국외국어대학교', campus: '', foundAt: '2026-09-26', attachments: [], deadline: iso(-3) },
     /* 나이가 확실히 안 맞는 글 — 23살 학생에게 '지원 자격 미달' (적합도순에서 맨 아래).
@@ -45,6 +47,9 @@ const FIXTURE = {
     { title: '숨긴 글 — 보이면 안 된다', url: 'https://dep.hufs.ac.kr/bbs/x/5', kind: '대외활동', school: '한국외국어대학교', campus: '', foundAt: '2026-09-27', attachments: [], hidden: true },
   ],
 };
+
+/* 신청서 원본 PDF 색인(data/forms-pdf/index.json) — 활동 글의 열쇠는 글 id · 장학 등록분과 같은 로봇·같은 색인 */
+const FORMS_PDF_FIXTURE = { updatedAt: '2026-10-30', items: { 'act-fixture1': [{ file: 'act-fixture1/1-form.pdf', name: '참가신청서.hwp', pages: 2, bytes: 20480, from: '원본 그대로 변환' }] } };
 
 const EXT_FIXTURE = {
   updatedAt: '2026-09-26',
@@ -81,6 +86,7 @@ async function fresh(browser, mode, ext = EXT_FIXTURE, profile = PROFILE) {
   await page.route('**/data/external.json*', (route) => (mode === 'fail'
     ? route.abort()
     : route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(ext) })));
+  await page.route('**/data/forms-pdf/index.json*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(FORMS_PDF_FIXTURE) }));
   await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(1200);
   await dismissNotify(page);
@@ -159,6 +165,20 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
       ['지원 자격', true, ['✓ 만 19~34세 대한민국 국민']]);
     eq('⑤ 지원 가능 알약은 없다(활동 글엔 구조화 조건이 없어 늘 가능 — 거짓 안심)', await page.$$eval('#detail-sheet .status-pill', (e) => e.length), 0);
     eq('⑤ 공고 원문 안내 — 원문 문장 그대로', await page.$$eval('#detail-sheet .doc-list', (u) => u.map((x) => x.textContent.trim()).some((t) => t.includes('봉사단은 5개국에 파견합니다.'))), true);
+    /* 제출 서류 · 신청서 원본 PDF (2026-10-30 공동개발자 "공모전 신청 양식이 매우 미흡") — 장학 시트와 같은 줄 꼴(formPdfRowsHtml) · 원본 첨부 줄은 그대로 */
+    eq('⑤ 제출 서류 — 원문 글자 그대로 한 줄씩 (칸 머리 「제출 서류」)', await page.$eval('#detail-sheet', (e) => {
+      const h = [...e.querySelectorAll('h4')].find((x) => x.textContent.trim() === '제출 서류');
+      return h ? [...h.nextElementSibling.querySelectorAll('li')].map((li) => li.textContent.trim()) : null;
+    }), ['참가신청서 1부', '개인정보 수집·이용 동의서 1부']);
+    eq('⑤ 신청서 양식 — 로봇이 바꿔 둔 원본 PDF 줄 「원본 양식 그대로 보기」 · 새 탭 · data/forms-pdf/ 주소 · 쪽 수', await page.$eval('#detail-sheet', (e) => {
+      const h = [...e.querySelectorAll('h4')].find((x) => /^신청서 양식/.test(x.textContent.trim()));
+      const a = h && h.nextElementSibling.querySelector('a');
+      return a ? [a.textContent.trim(), a.target, a.getAttribute('href'), /2쪽/.test(h.nextElementSibling.textContent)] : null;
+    }), ['원본 양식 그대로 보기', '_blank', 'data/forms-pdf/act-fixture1/1-form.pdf', true]);
+    eq('⑤ 공고 원본 첨부 줄은 그대로 남는다 (원본 파일 내려받기)', await page.$eval('#detail-sheet', (e) => {
+      const h = [...e.querySelectorAll('h4')].find((x) => x.textContent.trim() === '공고 원본 첨부');
+      return h ? h.nextElementSibling.querySelectorAll('li').length : 0;
+    }), 1);
     eq('⑤ 원문 단추는 그 글 주소를 새 탭으로', await page.$eval('#detail-sheet a.btn-primary', (a) => [a.getAttribute('href'), a.target, a.textContent.trim()]), ['https://dep.hufs.ac.kr/bbs/x/1', '_blank', '원문 공고 ↗']);   // 2026-10-19 개발자: "자세한 공고는 원문 공고에서 확인하라 하면서 … 원문공고 하이퍼링크"
     eq('⑤ 단추 글자에 밑줄이 없다', await page.$eval('#detail-sheet a.btn-primary', (a) => getComputedStyle(a).textDecorationLine), 'none');
     await page.keyboard.press('Escape'); await page.waitForTimeout(500);

@@ -55,6 +55,11 @@ export function loadFormRules(root) {
   return { isApplicationForm: vm.runInContext('isApplicationForm', ctx) };
 }
 
+/* 활동 피드(data/activities.json)의 글 — id 있는 것만(수집 로봇이 idFromUrl('act-') 로 준다 · API 글은 제 id) · 없으면 빈 배열 */
+export function loadActivities(root) {
+  try { const j = JSON.parse(fs.readFileSync(path.join(root, 'data', 'activities.json'), 'utf8')); return (j.items || []).filter((it) => it && it.id && it.url); } catch { return []; }
+}
+
 /* forms-index.txt 줄 → { file, title, attach, bytes } */
 export function parseFormsIndex(text) {
   return String(text || '').split('\n').filter(Boolean).map((line) => {
@@ -70,17 +75,17 @@ export const isOpen = (it, today) => !it.deadline || String(it.deadline) >= toda
 export function pickFormTargets(items, indexRows, { today, isApplicationForm }) {
   const out = []; const missing = [];
   for (const it of items || []) {
-    if (!it || !it.id || it.program || !isOpen(it, today)) continue;
+    if (!it || !it.id || it.program || it.hidden || !isOpen(it, today)) continue;
     const forms = (it.attachments || []).filter((a) => (isApplicationForm(a) || PDF_FORM(a)) && CONVERTIBLE.test(a.name || ''));
     if (!forms.length) continue;
-    const titles = [it.boardTitle, it.name].filter(Boolean);
+    const titles = [it.boardTitle, it.name, it.title].filter(Boolean);   // 활동 글(data/activities.json)은 title 하나 — 같은 줄 꼴로 색인에 적혀 있다(2026-10-30)
     const files = [];
     for (const a of forms) {
       const row = indexRows.find((r) => r.attach === a.name && titles.some((t) => sameTitle(t, r.title)));
       if (row) files.push({ src: row.file, name: a.name, srcBytes: row.bytes || 0 });
       else missing.push({ id: it.id, name: a.name });
     }
-    if (files.length) out.push({ id: it.id, name: it.name || it.id, deadline: it.deadline || '', files });
+    if (files.length) out.push({ id: it.id, name: it.name || it.title || it.id, deadline: it.deadline || '', files });
   }
   return { targets: out, missing };
 }
@@ -216,12 +221,14 @@ export function runFormPdf({ root, today, dry = false, soffice = process.env.FOR
   const indexPath = path.join(outDir, 'index.json');
   const reportPath = path.join(root, 'collector', 'form-pdf-report.md');
   const reg = JSON.parse(fs.readFileSync(regPath, 'utf8'));
+  /* 대외활동·공모전 글도 같은 로봇이 바꾼다(2026-10-30 · 공동개발자 "공모전 신청 양식이 매우 미흡") — 열쇠는 수집 로봇이 준 id('act-…' · api-…) · 숨긴 글은 뺀다 */
+  const items = [...(reg.items || []), ...loadActivities(root)];
   const rows = fs.existsSync(idxPath) ? parseFormsIndex(fs.readFileSync(idxPath, 'utf8')) : [];
   const { isApplicationForm } = loadFormRules(root);
-  const { targets, missing } = pickFormTargets(reg.items || [], rows, { today, isApplicationForm });
+  const { targets, missing } = pickFormTargets(items, rows, { today, isApplicationForm });
   let index = { updatedAt: today, items: {} };
   try { const j = JSON.parse(fs.readFileSync(indexPath, 'utf8')); if (j && j.items && typeof j.items === 'object') index = { ...j, items: j.items }; } catch { /* 첫 실행 */ }
-  const live = new Set((reg.items || []).filter((it) => it && it.id && isOpen(it, today)).map((it) => it.id));
+  const live = new Set(items.filter((it) => it && it.id && !it.hidden && isOpen(it, today)).map((it) => it.id));
   const dropped = dry ? Object.keys(index.items).filter((id) => !live.has(id)) : prune(index, live, outDir);
   const done = []; const failed = []; const left = []; let skippedSame = 0;
   const t0 = Date.now();
