@@ -116,8 +116,8 @@ node verify/audit-data.js                 # 데이터 감사 — 데이터·엔�
 node verify/test-collector.mjs            # 규칙 관문 전부 (인터넷 불필요) — 코드 바꾼 뒤 필수
 node verify/check-deploy-sync.js          # 지금 작업이 main(앱)에 나가 있는가 — 끝내기 전
 node verify/what-shows.mjs <공고>          # 학생 화면에 무엇이 보이는가
-node verify/eligibility-report.mjs --bad  # 자격 줄 전수 재채점 (규칙 전후 숫자 비교가 작업 방식)
-node verify/card-coverage.mjs             # 카드 빈 칸(자격·마감·금액·양식·발췌) 현황 · 보고용
+node verify/eligibility-report.mjs --bad  # 자격 줄 전수 재채점 (규칙 전후 숫자 비교)
+node verify/card-coverage.mjs             # 카드 빈 칸(자격·마감·금액·양식·발췌) 현황
 ACTION=edit ACTOR=<이름> PAYLOAD='{"edits":[{"id":"…","patch":{…}}]}' node tools/admin-apply.mjs   # 데이터 수정 — 관리자 버튼과 같은 길
 ACTION=merge ACTOR=<이름> PAYLOAD='{"keepId":"…","dropId":"…"}' node tools/admin-apply.mjs       # 중복 합치기 (다른 학교끼리면 전국 승격)
 bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 돌릴 때 (클라우드와 동시 실행 방지)
