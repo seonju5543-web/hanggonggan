@@ -121,13 +121,16 @@ for (const seq of uniq) {
     const xml = await api({ svcCode: 'MAJOR_VIEW', majorSeq: seq });
     // 개설대학 블록: area → schoolURL → campus_nm → majorName → schoolName 순서로 온다(실측)
     // campus_nm 값도 잡는다(진단용) — 학과·학교 짝을 잡는 범위는 옛 정규식과 같다(campus_nm 여는 꼬리표부터 schoolName 까지)
-    /* 개설대학 묶음(<university>…</university>)을 하나씩 떼어 안의 칸을 따로 읽는다 — area 까지 쓰려면 칸 순서에 기대면 안 된다.
-       그 묶음 꼬리표가 안 보이면(응답 꼴이 바뀌면) 옛 정규식으로 물러난다(area 없이 — 캠퍼스는 못 가르지만 학과는 잃지 않는다). */
-    const tag = (blk, name) => { const m = blk.match(new RegExp(`<${name}>([\\s\\S]*?)</${name}>`)); return m ? m[1] : ''; };
-    const units = [...xml.matchAll(/<university>([\s\S]*?)<\/university>/g)].map((m) => m[1]);
-    const blocks = units.length
-      ? units.map((u) => [null, tag(u, 'campus_nm'), tag(u, 'majorName'), tag(u, 'schoolName'), tag(u, 'area')])
-      : [...xml.matchAll(/<campus_nm>([\s\S]*?)<\/campus_nm>[\s\S]*?<majorName>([\s\S]*?)<\/majorName>\s*<schoolName>([\s\S]*?)<\/schoolName>/g)];
+    /* 🔴 `<university>` 는 학교 **하나**가 아니라 개설대학 **목록 전체**를 감싼다 (2026-10-27 실행 #7 실측 — 묶음마다 첫 학교만 읽어
+       앱 학교가 209 → 77곳으로 줄었고 바닥값(MIN_APP_SCHOOLS)이 저장을 막았다). 그래서 학교 짝은 **검증된 옛 정규식 그대로** 훑고,
+       area 는 **앞 짝의 끝 ~ 이 짝 사이**에서 마지막 <area> 를 집는다(한 학교의 칸 순서 area → schoolURL → campus_nm → majorName → schoolName). */
+    const blocks = [];
+    let last = 0;
+    for (const m of xml.matchAll(/<campus_nm>([\s\S]*?)<\/campus_nm>[\s\S]*?<majorName>([\s\S]*?)<\/majorName>\s*<schoolName>([\s\S]*?)<\/schoolName>/g)) {
+      const areas = [...xml.slice(last, m.index).matchAll(/<area>([\s\S]*?)<\/area>/g)];
+      blocks.push([m[0], m[1], m[2], m[3], areas.length ? areas[areas.length - 1][1] : '']);
+      last = m.index + m[0].length;
+    }
     for (const [, campusRaw, majorRaw, schoolRaw, areaRaw] of blocks) {
       const school = normalizeSchool(schoolRaw);
       /* 이름 정리는 발행기와 같은 함수 — `&amp;` 를 되돌린다(22개 파일에 그대로 실려 있었다) */
