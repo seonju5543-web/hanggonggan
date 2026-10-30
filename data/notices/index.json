@@ -3,13 +3,29 @@
  "updatedAt": "2026-10-30",
  "schools": 44,
  "files": {
-  "동국대학교": {
-   "file": "n1or8oiw.json",
-   "count": 43
+  "계명대학교": {
+   "file": "n1nel147.json",
+   "count": 51
   },
   "중앙대학교": {
    "file": "n1iz3lr8.json",
-   "count": 34
+   "count": 36
+  },
+  "부산대학교": {
+   "file": "n13zozby.json",
+   "count": 7
+  },
+  "서울과학기술대학교": {
+   "file": "n14kv35j.json",
+   "count": 60
+  },
+  "건국대학교": {
+   "file": "nmpm6i7.json",
+   "count": 48
+  },
+  "동국대학교": {
+   "file": "n1or8oiw.json",
+   "count": 43
   },
   "고려대학교": {
    "file": "n1lw6ycq.json",
@@ -134,22 +150,6 @@
   "조선대학교": {
    "file": "n1qr99q6.json",
    "count": 19
-  },
-  "계명대학교": {
-   "file": "n1nel147.json",
-   "count": 50
-  },
-  "서울과학기술대학교": {
-   "file": "n14kv35j.json",
-   "count": 60
-  },
-  "건국대학교": {
-   "file": "nmpm6i7.json",
-   "count": 46
-  },
-  "부산대학교": {
-   "file": "n13zozby.json",
-   "count": 6
   },
   "서울대학교": {
    "file": "nsgh1oi.json",

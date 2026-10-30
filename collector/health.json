@@ -1,12 +1,12 @@
 {
  "한국외국어대학교": {
   "fails": 0,
-  "lastOk": "2026-10-29",
+  "lastOk": "2026-10-30",
   "browserFails": 0
  },
  "경희대학교": {
   "fails": 0,
-  "lastOk": "2026-10-29",
+  "lastOk": "2026-10-30",
   "browserFails": 0
  },
  "서울대학교": {
@@ -15,7 +15,7 @@
  },
  "연세대학교": {
   "fails": 0,
-  "lastOk": "2026-10-29",
+  "lastOk": "2026-10-30",
   "browserFails": 0
  },
  "서강대학교": {
@@ -32,17 +32,17 @@
  },
  "서울시립대학교": {
   "fails": 0,
-  "lastOk": "2026-10-29",
+  "lastOk": "2026-10-30",
   "browserFails": 0
  },
  "건국대학교": {
   "fails": 0,
-  "lastOk": "2026-10-29",
+  "lastOk": "2026-10-30",
   "browserFails": 0
  },
  "동국대학교": {
   "fails": 0,
-  "lastOk": "2026-10-29",
+  "lastOk": "2026-10-30",
   "browserFails": 0
  },
  "홍익대학교": {
@@ -59,12 +59,12 @@
  },
  "명지대학교": {
   "fails": 0,
-  "lastOk": "2026-10-29",
+  "lastOk": "2026-10-30",
   "browserFails": 0
  },
  "상명대학교": {
   "fails": 0,
-  "lastOk": "2026-10-29",
+  "lastOk": "2026-10-30",
   "browserFails": 0
  },
  "가천대학교": {
@@ -108,13 +108,13 @@
   "lastOk": "2026-10-29"
  },
  "서울과학기술대학교": {
-  "fails": 1,
-  "lastOk": "2026-10-29",
+  "fails": 0,
+  "lastOk": "2026-10-30",
   "browserFails": 0
  },
  "서울교육대학교": {
   "fails": 0,
-  "lastOk": "2026-10-29",
+  "lastOk": "2026-10-30",
   "browserFails": 0
  },
  "한국방송통신대학교": {
@@ -151,22 +151,22 @@
  },
  "중앙대학교": {
   "fails": 0,
-  "lastOk": "2026-10-29",
+  "lastOk": "2026-10-30",
   "browserFails": 0
  },
  "고려대학교": {
   "fails": 0,
-  "lastOk": "2026-10-29",
+  "lastOk": "2026-10-30",
   "browserFails": 0
  },
  "계명대학교": {
   "fails": 0,
-  "lastOk": "2026-10-29",
+  "lastOk": "2026-10-30",
   "browserFails": 0
  },
  "부산대학교": {
   "fails": 0,
-  "lastOk": "2026-10-29",
+  "lastOk": "2026-10-30",
   "browserFails": 0
  },
  "부경대학교": {
