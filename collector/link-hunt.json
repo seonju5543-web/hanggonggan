@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-29",
+ "updatedAt": "2026-10-30",
  "items": {
   "r:auto-082f26ec8898eab98ceca780": {
    "attempts": 0,
@@ -1125,12 +1125,13 @@
    "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30291&pageNo=1"
   },
   "n:https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%5B%EA%B5%90%EC%99%B8%5D%20%EB%8F%99%EC%A7%84%EC%9E%A5%ED%95%99%EC%97%B0%EA%B5%AC%EC%9E%AC%EB%8B%A8%20%EB%8F%99%EC%A7%84%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C": {
-   "attempts": 1,
+   "attempts": 0,
    "title": "[교외] 동진장학연구재단 동진장학금 장학생 선발",
-   "lastTried": "2026-10-29",
-   "lastWhy": "목록에서 못 찾음",
+   "lastTried": "2026-10-30",
+   "lastWhy": "",
    "nextTryAt": "2026-10-30",
-   "status": ""
+   "status": "resolved",
+   "resolvedUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261029&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&"
   },
   "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list?pageNo=2#n-2752%20%5B%ED%99%8D%EB%B3%B4%5D%202026%EB%85%84%EB%8F%84%20%ED%86%B5%EC%98%81%EC%8B%9C%20%EC%A0%80%EC%86%8C%EB%93%9D%20%EB%8C%80%ED%95%99%EC%83%9D%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%A7%80%EC%9B%90%EB%8C%80%EC%83%81%EC%9E%90%20%EC%84%A0": {
    "attempts": 0,
