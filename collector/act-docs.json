@@ -112,12 +112,12 @@
   "tries": 2
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/520895": {
-  "at": "2026-10-23",
-  "tries": 1
+  "at": "2026-10-30",
+  "tries": 2
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/520875": {
-  "at": "2026-10-23",
-  "tries": 1
+  "at": "2026-10-30",
+  "tries": 2
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53546&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-23",
@@ -132,8 +132,8 @@
   "tries": 1
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53516&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-10-23",
-  "tries": 0
+  "at": "2026-10-30",
+  "tries": 1
  },
  "https://kfruit.or.kr/board/board_gallery_img_type01/board_detail.asp?scrID=0000000192&pageNum=5&subNum=1&ssubNum=1&bd_num=00000001922026000001&act=view": {
   "at": "2026-10-24",
