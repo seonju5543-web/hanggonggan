@@ -59,7 +59,10 @@ const PROFILE = {
   const info = await page.evaluate(() => {
     const all = allScholarships().filter((s) => s.sourceKind === 'kosaf');
     const ids = [...document.querySelectorAll('#explore-list .sch-card')].map((e) => e.dataset.detail);
-    const shown = ids.filter((id) => id.startsWith('kosaf-'));
+    /* 🔴 층2는 **출처(sourceKind)** 로 고른다 — id 접두사 `kosaf-` 는 상시 제도(data.js 의 국가장학금 Ⅰ유형 `kosaf-type1` 등)도 쓴다.
+       접두사로 고르면 그 카드가 정렬에서 맨 앞에 오는 날 층2 목록에서 못 찾아 아래 두 검사가 빨개진다(2026-10-23~29 클라우드 6일 연속 · 로컬은 초록). */
+    const isL2 = (id) => { const s = allScholarships().find((x) => x.id === id); return !!s && s.sourceKind === 'kosaf'; };
+    const shown = ids.filter(isL2);
     return {
       made: all.length,
       shown: shown.length,
