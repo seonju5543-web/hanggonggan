@@ -191,6 +191,12 @@
    "by": "조세현",
    "action": "edit",
    "detail": "auto-archgbn0searchordersort0-0i8hia4 — deadline, period"
+  },
+  {
+   "at": "2026-10-30 23:58 KST",
+   "by": "claude-1030",
+   "action": "revert",
+   "detail": "6건 제거(312 → 306건) · 재등록 차단 id 6·주소 6"
   }
  ]
 }

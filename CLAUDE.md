@@ -8,23 +8,23 @@
 전부 **실제로 놓쳐서 사고가 난 것**이다. 세션 시작 점검은 `Skill(skill="session-check")` 하나로 끝난다.
 
 1. **화면 이야기는 `node verify/what-shows.mjs <공고 id 또는 이름> [--school= --campus= --major= …]` 로만 한다.**
-   그 자리에서 짠 스크립트로 재면 틀린다(목록 5줄 상한 · 상세는 전부).
+   그 자리에서 짠 스크립트로 재면 틀린다(목록 5줄 상한).
 2. **브라우저 검사는 `PORT=` 를 준다.** 8123은 다른 워크트리 서버일 수 있다.
 3. **검사가 조용하면 통과가 아니라 무력해진 것부터 의심한다.** 새 검사는 고친 것을 되돌려 실패하는지(red-green) 본다.
 4. **`data/registered.json`·`forms.json` 은 로봇과 같은 형식(`JSON.stringify(x, null, 1)`)으로 저장한다.**
-   다르면 파일 전체가 충돌한다(자동 병합에서 뺀 파일). 끝 개행은 보지 말 것. 손으로 고치기보다 `tools/admin-apply.mjs` 를 쓴다(아래 명령).
+   다르면 파일 전체가 충돌한다(자동 병합에서 뺀 파일). 끝 개행은 보지 말 것. 손으로 고치기보다 `tools/admin-apply.mjs` 를 쓴다.
 5. **확인 안 한 원인을 단정하지 않는다** — 경고 문구에도 보고에도. 원문을 열어 보고 적는다.
 6. **개발 업무 질문에는 답 끝에 `node tools/link-wanted.mjs` 결과를 붙여 링크를 요청한다**
    (학습 로봇은 검색을 못 해 사람이 새 링크를 줘야 넓어진다. 주소는 추천하지 않는다).
 7. **로봇 운영 수리(저장 전 관문·되돌리기·경보 짝 빠짐)는 묻지 않고 즉시 한다**. 규칙 파일(`collector/*.json`)을 쓰는 로봇은 저장 앞에 `test-collector` 를 거친다 — 없는 로봇이 보이면 그 자리에서 붙인다(관문 「층2 재단 글 사냥꾼」 ⑦-1).
-8. 🔴 **돈이 나가는 호출은 개발자가 채팅에서 그 실행을 지시했을 때만.** 유료 워크플로(`eligibility-fill.yml`·`essay-smoke.yml`)를 세션이 돌리거나 `apiEnabled`·`ELIG_AI_ENABLE` 을 켜지 않는다(08-23 세션이 하루 32번 돌렸다). 비용 질문은 `gh run list` 기록으로 답한다.
+8. 🔴 **돈이 나가는 호출은 개발자가 채팅에서 그 실행을 지시했을 때만.** 유료 워크플로(`eligibility-fill.yml`·`essay-smoke.yml`)를 세션이 돌리거나 `apiEnabled`·`ELIG_AI_ENABLE` 을 켜지 않는다. 비용 질문은 `gh run list` 기록으로 답한다.
 
 ## 🔴 수집망 44개교 복원 (2026-09-29 지시 *"죽은 학교들을 모두 다시 살려"*)
 
 - **수집·실시간 피드·대외활동은 44개교**. 고치는 자리는 셋이 한 세트 — `schools.json`·`browser-targets.json`(`parked` 는 안 쓰는 게시판 보관 자리 · 지우지 말 것) + `match-engine.js` `SERVED_SCHOOLS`(앱·알림·발행 공용 — 브라우저가 schools.json 을 못 읽어 한 번 더 · 갈라지면 로봇은 모으는데 앱은 숨긴다). 관문 「수집망 복원」·「화면이 보여 주는 학교 = 로봇이 수집하는 학교」.
 - **정식 등록(자격 진단·양식)도 44개교** — `auto-register-config.json` `schools` 는 빈 배열(= 수집 학교 전부). 🔴 부작용: 자동 등록은 게시 학교로 `schoolOnly` 를 달아 전국 사업이 한 학교에 묶인다(노션 F-5) → 관리자 「할 일」 '교외인데 한 학교에만' 에서 merge 로 승격 · 타교 같은 사업은 컨펌 대기. 좁히는 것은 개발자 지시 때만(관문 「수집망 복원」).
 - **일반 수집 로봇도 예산 안에 스스로 끝낸다** — `collect.mjs` 가 `harvest-budget.mjs` 로 예산 8분·게시판 시한·회전 커서(`collect-cursor.json`)를 쓴다(브라우저 수집기와 같은 규칙). 워크플로 단계 상한 > 예산, 작업 상한 > 단계 합. 관문 「일반 수집 예산」. 상한을 키워 때우지 말 것.
-- 8월 30일에 지운 정식 등록 211건은 되살리지 않는다 — 새로 수집한다. 기술 고문 요청서(`docs/advisor/`)는 좁힌 경위와 되살린 사실을 둘 다 적는다 — 관문 「기술 고문 요청서」 · 건수 `node docs/advisor/check-brief.mjs` · PDF `node docs/advisor/render.js`.
+- 8월 30일에 지운 정식 등록 211건은 되살리지 않는다 — 새로 수집한다. 기술 고문 요청서(`docs/advisor/`)는 좁힌 경위와 되살린 사실을 둘 다 적는다 — 관문 「기술 고문 요청서」 · `node docs/advisor/check-brief.mjs` · `node docs/advisor/render.js`.
 
 ## 🔴 장학금 판정 자동화 (2026-09-30 지시 — *"2번의 이유를 분석하고 장학금 판정을 자동화"*)
 
@@ -117,6 +117,7 @@ node verify/test-collector.mjs            # 규칙 관문 전부 (인터넷 불�
 node verify/check-deploy-sync.js          # 지금 작업이 main(앱)에 나가 있는가 — 끝내기 전
 node verify/what-shows.mjs <공고>          # 학생 화면에 무엇이 보이는가
 node verify/eligibility-report.mjs --bad  # 자격 줄 전수 재채점 (규칙 전후 숫자 비교가 작업 방식)
+node verify/card-coverage.mjs             # 카드 빈 칸(자격·마감·금액·양식·발췌) 현황 · 보고용
 ACTION=edit ACTOR=<이름> PAYLOAD='{"edits":[{"id":"…","patch":{…}}]}' node tools/admin-apply.mjs   # 데이터 수정 — 관리자 버튼과 같은 길
 ACTION=merge ACTOR=<이름> PAYLOAD='{"keepId":"…","dropId":"…"}' node tools/admin-apply.mjs       # 중복 합치기 (다른 학교끼리면 전국 승격)
 bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 돌릴 때 (클라우드와 동시 실행 방지)
