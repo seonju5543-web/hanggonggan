@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-29",
+ "updatedAt": "2026-10-30",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -7493,10 +7493,6 @@
      "name": "본문이미지-800x1132.jpg",
      "url": "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoQTkgFAjgVwMoFlUBMCiAZATwBcApANwHkB7AawEsaBVAWwDoArABwHMg%20",
      "bodyImage": true
-    },
-    {
-     "name": "대학정보공시",
-     "url": "http://www.academyinfo.go.kr/pubinfo/pubinfo0020/list.do?schlId=0000163&svyYr=2018&pageIdx=all&filePath=01&fileName=01&saveName=01"
     }
    ],
    "sourceUrl": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=366829&article.offset=0&articleLimit=10",
@@ -14437,6 +14433,11 @@
      "school": "서울시립대학교",
      "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%5B%EA%B5%90%EC%99%B8%5D%20%EB%8F%99%EC%A7%84%EC%9E%A5%ED%95%99%EC%97%B0%EA%B5%AC%EC%9E%AC%EB%8B%A8%20%EB%8F%99%EC%A7%84%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C",
      "id": "notice:https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdbbsseq=1#n-%5B%EA%B5%90%EC%99%B8%5D%20%EB%8F%99%EC%A7%84%EC%9E%A5%ED%95%99%EC%97%B0%EA%B5%AC%EC%9E%AC%EB%8B%A8%20%EB%8F%99%EC%A7%84%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C"
+    },
+    {
+     "school": "서울시립대학교",
+     "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261029&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
+     "id": "notice:https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdbbsseq=1&brddate=20261029&brdseq=1"
     }
    ]
   },
@@ -17848,12 +17849,7 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-24 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [
-    {
-     "name": "대학정보공시",
-     "url": "http://www.academyinfo.go.kr/pubinfo/pubinfo0020/list.do?schlId=0000163&svyYr=2018&pageIdx=all&filePath=01&fileName=01&saveName=01"
-    }
-   ],
+   "attachments": [],
    "sourceUrl": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367570&article.offset=0&articleLimit=10",
    "sourceKind": "auto",
    "openDate": "2026-10-26",
@@ -20136,10 +20132,6 @@
      "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367645&attachNo=353705"
     },
     {
-     "name": "대학정보공시",
-     "url": "http://www.academyinfo.go.kr/pubinfo/pubinfo0020/list.do?schlId=0000163&svyYr=2018&pageIdx=all&filePath=01&fileName=01&saveName=01"
-    },
-    {
      "name": "본문이미지-1080x1080.jpg",
      "url": "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEYUhRAQgJwCICkAyBJAhgVQEsBZAewA9UAbARwHMAzAWwFcA6ABwDs6g",
      "bodyImage": true
@@ -20942,7 +20934,8 @@
     "schoolOnly": "경기대학교"
    },
    "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
+    "1 A유형 국가장학금 소득심사탈락자",
+    "실질소득 또는 급격한"
    ],
    "duplicable": true,
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
@@ -20956,7 +20949,11 @@
     }
    ],
    "sourceUrl": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626879&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "applyEmail": "janghak@kgu.ac.kr",
+   "applyEmailSource": "제출방법: 이메일(janghak@kgu.ac.kr)",
+   "applyEmailFrom": "공고문 첨부(OCR)",
+   "documentsFrom": "공고문 첨부(OCR)"
   },
   {
    "id": "auto-eywordpaged1slug20262116",
