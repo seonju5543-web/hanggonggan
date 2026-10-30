@@ -71,7 +71,9 @@ const pickMajor = async (page, typed, want) => {
   eq('  펼쳐도 고른 계열은 그대로', await activeTrack(page), 'science');
   await page.click('#in-track .chip-more');
   await page.waitForTimeout(100);
-  eq('  접으면 학교 계열로 돌아온다', (await trackChips(page)).length, present.length);
+  /* 고른 계열(수학과 → 자연과학)은 접혀 있어도 늘 보인다 — 캠퍼스 칩이 기본(서울)인 채 글로벌 학과를 골랐으면
+     서울 목록 계열에 없는 자연과학이 하나 더 남는다(2026-10-30 · 캠퍼스별 목록이 실린 뒤 실측). 수를 박지 않고 그 규칙대로 센다. */
+  eq('  접으면 학교 계열로 돌아온다 (고른 계열은 남는다)', (await trackChips(page)).length, present.length + (present.includes('science') ? 0 : 1));
   await page.click('#in-year .chip[data-value="3"]');
 
   console.log('\n■ ④ 5단계 — 적합도 높이기 (처지 예/아니요 + 출신 고교 지역) · 관심 대외활동은 온보딩에 없다');

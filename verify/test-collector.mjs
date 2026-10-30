@@ -13429,6 +13429,14 @@ console.log('\n■ 학적정보 테일러링 (2026-10-24 개발자 지시 1~4 ·
   eq('  서비스워커가 major-track.js 를 미리 담는다', /'major-track\.js'/.test(sw), true);
   eq('  계열 칩은 학교 학과 목록으로 그린다 (tracksOfMajors · majorPool · 목록마다 한 번만 센다)', /function presentTracks[\s\S]{0,300}tracksOfMajors\(pool\)/.test(app) && /function renderTrackChips[\s\S]{0,800}presentTracks\(pool\)/.test(app) && /function majorPool/.test(app), true);
   eq('  학과 자동추천이 majorPool 을 쓴다 (캠퍼스별 목록 → 학교 → 전국 공통)', /function majorSuggestions[\s\S]{0,900}majorPool\(school, campus\)/.test(app), true);
+  /* 🔴 캠퍼스 목록은 **먼저** 보일 뿐 빼지 않는다 (2026-10-30 · 학과 로봇이 캠퍼스별 목록을 처음 실은 날) — 캠퍼스 칩은 첫 칩이
+     기본으로 켜져 있어, 글로벌캠퍼스 학생이 칩을 안 건드리면 서울 목록만 뒤져 수학과·GBT학부가 안 떴다(화면 검사 둘 빨간불).
+     majorSuggestions 가 캠퍼스 목록 뒤에 학교 전체 목록(MAJORS_BY_SCHOOL)을 잇는지 본다. 계열 칩(majorPool)은 캠퍼스 그대로. */
+  {
+    const fn = (app.match(/function majorSuggestions[\s\S]{0,1400}?\n}/) || [''])[0];
+    eq('  🔴 자동추천은 캠퍼스 목록 뒤에 학교 전체 목록을 잇는다 (먼저 보이되 빼지 않는다)',
+      /majorPool\(school, campus\)/.test(fn) && /MAJORS_BY_SCHOOL\[school\]/.test(fn) && /own\.concat\(/.test(fn), true);
+  }
   eq('  학과를 고르면 계열이 따라온다 (change → syncTrackFromMajor)', /#in-major'\)\.addEventListener\('change', syncTrackFromMajor\)/.test(app), true);
   eq('  낯선 계열 id 로 칩을 그리다 넘어지지 않는다 (TRACKS 에 있는 것만 지킨다)', /function renderTrackChips[\s\S]{0,500}TRACKS\.some\(\(t\) => t\.id === raw\)/.test(app), true);
   eq('  처음 가입은 계열을 미리 켜지 않는다 (틀린 ✕ 의 씨앗)', /renderTrackChips\(p \? p\.track : null\)/.test(app) && !/setChip\('#in-track', 'humanities'\)/.test(app), true);

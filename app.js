@@ -1105,7 +1105,13 @@ function majorSuggestions(q) {
      '일어일문학과'가 같이 떴다(2026-08-02 개발자 지적 — 경희대 사례).
      캠퍼스별로 학과가 다른 학교는 '학교 캠퍼스' 열쇠를 먼저 본다. */
   const own = majorPool(school, campus);
-  const pool = own || MAJORS_COMMON;   // 확보 못 한 학교는 전국 공통 목록을 힌트로
+  /* 🔴 **캠퍼스 목록은 먼저 보일 뿐 빼지 않는다** (2026-10-30). 캠퍼스 칩은 첫 칩이 기본으로 켜져 있어(renderCampusChips)
+     글로벌캠퍼스 학생이 칩을 안 건드린 채 '수학'을 치면 서울 목록만 뒤져 수학과·GBT학부가 안 떴다 — 학과 로봇이
+     캠퍼스별 목록을 처음 실은 날(10-30) 화면 검사 둘이 그걸로 빨간불이었다. 계열 칩과 같은 원칙: 먼저, 그러나 빼지 않는다.
+     (계열 칩은 majorPool 그대로 — 그 캠퍼스에 있는 계열만 보이는 것이 맞다) */
+  const whole = MAJORS_BY_SCHOOL[school] || null;
+  const pool = own ? (whole && whole !== own ? own.concat(whole.filter((m) => !own.includes(m))) : own)
+    : MAJORS_COMMON;   // 확보 못 한 학교는 전국 공통 목록을 힌트로
   const hits = pool.filter((m) => m.replace(/\s/g, '').toLowerCase().includes(n.toLowerCase()));
   /* 고른 계열의 학과를 **먼저** 보인다(빼지는 않는다 — 계열을 잘못 눌렀을 수 있다). 분류는 major-track.js 한 곳 */
   const track = getChip('#in-track');
