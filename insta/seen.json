@@ -2440,7 +2440,7 @@
    "expiredAt": "2026-10-29"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000279004",
    "org": "전라남도 함평군청",
    "name": "함평군청인재양성기금(학업장려금)",
@@ -2449,7 +2449,9 @@
    "tplNo": 4,
    "cards": 5,
    "dir": "insta/pub/2000279004",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-30"
   },
   {
    "status": "prepared",
@@ -2616,7 +2618,7 @@
    "expiredAt": "2026-10-16"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000279001",
    "org": "전라남도 함평군청",
    "name": "함평군청인재양성기금(성적우수)",
@@ -2625,7 +2627,9 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2000279001",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-30"
   },
   {
    "status": "prepared",
@@ -3718,7 +3722,7 @@
    "expiredAt": "2026-10-23"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700003008",
    "org": "(재)한국고등교육재단",
    "name": "인재림 장학",
@@ -3728,7 +3732,9 @@
    "cards": 5,
    "dir": "insta/pub/2700003008",
    "at": "2026-10-20",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-30"
   },
   {
    "status": "prepared",
@@ -4098,6 +4104,84 @@
    "cards": 5,
    "dir": "insta/pub/2700727005",
    "at": "2026-10-23",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2700495001",
+   "org": "한일장학문화재단",
+   "name": "장학생",
+   "due": "2026-11-03",
+   "school": null,
+   "tplNo": 3,
+   "cards": 5,
+   "dir": "insta/pub/2700495001",
+   "at": "2026-10-30",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2704362001",
+   "org": "DN문화재단",
+   "name": "장학생",
+   "due": "2026-11-06",
+   "school": null,
+   "tplNo": 1,
+   "cards": 5,
+   "dir": "insta/pub/2704362001",
+   "at": "2026-10-30",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2701294002",
+   "org": "(재)상지학원발전기금재단",
+   "name": "학생행복장학금",
+   "due": "2026-11-09",
+   "school": null,
+   "tplNo": 1,
+   "cards": 4,
+   "dir": "insta/pub/2701294002",
+   "at": "2026-10-30",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "1814024001",
+   "org": "대한적십자사",
+   "name": "헌혈기부권 대학 장학생",
+   "due": "2026-11-08",
+   "school": null,
+   "tplNo": 2,
+   "cards": 5,
+   "dir": "insta/pub/1814024001",
+   "at": "2026-10-30",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2000253005",
+   "org": "(재)고창군장학재단",
+   "name": "장학생(농어촌활력)",
+   "due": "2026-11-10",
+   "school": null,
+   "tplNo": 4,
+   "cards": 5,
+   "dir": "insta/pub/2000253005",
+   "at": "2026-10-30",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2704364001",
+   "org": "강북구 꿈나무키움 장학재단",
+   "name": "재능장학생",
+   "due": "2026-11-27",
+   "school": null,
+   "tplNo": 2,
+   "cards": 4,
+   "dir": "insta/pub/2704364001",
+   "at": "2026-10-30",
    "dates": "absolute"
   }
  ]
