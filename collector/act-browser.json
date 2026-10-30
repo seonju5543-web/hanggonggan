@@ -115,8 +115,8 @@
   "from": "브라우저 본문"
  },
  "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000": {
-  "at": "2026-10-23",
-  "tries": 0
+  "at": "2026-10-30",
+  "tries": 1
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53505&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-16",
@@ -251,8 +251,8 @@
   "from": "브라우저 본문"
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53516&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-10-23",
-  "tries": 0
+  "at": "2026-10-30",
+  "tries": 1
  },
  "https://www.youthcenter.go.kr/bbs03View/48/10841": {
   "at": "2026-10-24",
@@ -350,39 +350,6 @@
   "excludes": [],
   "from": "공고문 첨부(OCR)"
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3541582": {
-  "at": "2026-10-27",
-  "tries": 1,
-  "lines": [
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3489807": {
-  "at": "2026-10-28",
-  "tries": 1,
-  "lines": [
-   "아동·청소년",
-   "활동구분",
-   "오프라인",
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3512989": {
-  "at": "2026-10-28",
-  "tries": 1,
-  "lines": [
-   "아동·청소년",
-   "활동구분",
-   "오프라인",
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
  "https://dep.hufs.ac.kr/bbs/student/2431/270217/artclView.do": {
   "at": "2026-10-28",
   "tries": 1
@@ -393,46 +360,6 @@
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/270140/artclView.do": {
   "at": "2026-10-28",
-  "tries": 1
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3513334": {
-  "at": "2026-10-29",
-  "tries": 1,
-  "lines": [
-   "신청대상 : 성인",
-   "시간인증",
-   "오프라인",
-   "신청대상 : 성인·청소년"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3521178": {
-  "at": "2026-10-29",
-  "tries": 1,
-  "lines": [
-   "신청대상 : 성인",
-   "시간인증",
-   "오프라인",
-   "신청대상 : 성인·청소년"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3522762": {
-  "at": "2026-10-29",
-  "tries": 1,
-  "lines": [
-   "신청대상 : 성인",
-   "시간인증",
-   "오프라인",
-   "신청대상 : 성인·청소년"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3542738": {
-  "at": "2026-10-29",
   "tries": 1
  },
  "https://blog.naver.com/moeblog/224450331936": {
