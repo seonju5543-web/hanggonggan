@@ -9622,6 +9622,22 @@ console.log('\n■ 층2 첨부 — 상세 화면에서 공고문 링크를 읽�
   eq('  주소를 만들었으면 날것을 담지 않는다', 'raw' in realOut[0], false);
 }
 
+console.log('\n■ 층2 화면 검사는 층2 카드를 id 접두어가 아니라 sourceKind 로 고른다 (2026-10-30 · 이슈 #486)');
+/* 🔴 data.js 상시 제도(`kosaf-type1`·`kosaf-work` …)도 `kosaf-` 로 시작하지만 층2 재단이 아니다(sourceKind 'official').
+   verify-kosaf.js 가 탐색 목록의 `kosaf-` 첫 카드를 층2로 단정해서, 10-22~29 데이터처럼 상시 제도가 맨 앞에 오는 날
+   이레 동안 빨간불이었다 — 코드는 멀쩡했고 검사가 실데이터의 순서에 기대고 있었다. 되돌아가면 여기서 잡는다. */
+{
+  const drv = readText(new URL('../verify/verify-kosaf.js', import.meta.url));
+  const pick = (drv.match(/const shown = ids\.filter\([^\n]*\);/) || [''])[0];
+  eq('  드라이버가 보이는 층2 카드를 고르는 줄이 있다', pick.length > 0, true);
+  eq('  그 줄이 id 접두어(kosaf-)로 고르지 않는다', /startsWith\('kosaf-'\)|\^kosaf-/.test(pick), false);
+  eq('  그 줄이 앱이 매긴 sourceKind 로 고른다', /sourceKind === 'kosaf'/.test(pick), true);
+  /* 대조군 — 상시 제도가 정말 kosaf- 로 시작하고 층2가 아니라는 전제가 살아 있어야 이 관문이 뜻을 가진다 */
+  const dataSrc = readText(new URL('../data.js', import.meta.url));
+  eq('  (전제) data.js 상시 제도 id 가 kosaf- 로 시작한다', /id: 'kosaf-type1'/.test(dataSrc), true);
+  eq('  (전제) 그 상시 제도는 층2(sourceKind kosaf)가 아니다', /sourceKind: 'kosaf'/.test(dataSrc), false);
+}
+
 console.log('\n■ 층2 첨부 — 학생이 실제로 받을 수 있는 주소만 앱에 나간다');
 {
   /* 🔴 KOSAF 첨부 원주소는 Referer 검사가 있어 앱에서 누르면 "비정상적인 접근"이 뜬다.
