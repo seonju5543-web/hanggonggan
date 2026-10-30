@@ -1,6 +1,7 @@
 /* 심층 수집: notices.json의 모든 공고 본문 전문 + 지정 공고의 첨부파일 원본을
    저장소(collector/extracted/)에 저장한다. 정식 등록 큐레이션의 원천 자료. */
 import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { htmlToLines } from './html-text.mjs';
 import { isHtmlPayload } from './attachment-link.mjs';
 /* 요청 머리말은 http-headers.mjs 한 곳에 있다 — 베껴 두면 한쪽만 고쳐져
@@ -280,24 +281,53 @@ async function downloadForms() {
   if (targets.length > capped.length) console.log(`첨부 대상 ${targets.length}건 중 ${capped.length}건만 이번에 받는다 (나머지는 다음 실행)`);
   console.log(`첨부 원본 수집 대상 ${capped.length}건 (표적 ${DOWNLOAD_FORMS_FOR.length}개)`);
 
-  const refreshing = new Set(capped.map((n) => slugOf(n.title)));
-  // 이번에 다시 받는 공고의 예전 파일만 지운다 (다른 공고의 대기 중 원본은 보존)
-  for (const f of fs.readdirSync(OUT)) {
-    const m = f.match(/^form-([a-z0-9]{1,6})-/);
-    if (m && refreshing.has(m[1])) fs.unlinkSync(new URL(f, OUT));
-  }
+  /* ── 남는 자리는 '아직 못 받은 신청서'로 (2026-10-30 · form-pdf.mjs pickFormBacklog) ─────────────
+     사람이 적은 표적만 받던 탓에 매일 돌아도 새 공고의 신청서는 한 건도 안 받았다(10-23~30 실측 · 마감 전 16건이 원본 없음).
+     정식 등록(data/registered.json)의 마감 전 공고 가운데 신청서 첨부(data.js isApplicationForm + PDF 꼴)가 있는데 forms-index 에 원본이
+     없는 것을 마감 가까운 순으로 고른다. 받는 것은 **그 공고의 신청서 첨부만** — 공고문은 자격 로봇(--elig-attach)이 따로 받는다.
+     🔴 못 받은 공고는 forms-tried.json 에 날짜를 적고 사흘 쉰다(로그인 벽·깨진 주소를 매일 두드리지 않는다). 받으면 지운다.
+     표적 공고와 같은 꼴로 색인에 적되 제목은 등록분의 것(boardTitle 또는 name)이라 PDF 로봇(pickFormTargets · sameTitle)이 그대로 찾는다. */
+  process.env.FORM_PDF_AS_LIB = '1';
+  const FP = await import('./form-pdf.mjs');
+  const triedPath = new URL('forms-tried.json', OUT);
+  let tried = {};
+  try { tried = JSON.parse(fs.readFileSync(triedPath, 'utf8')) || {}; } catch { /* 첫 실행 */ }
+  const today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
+  let backlog = [];
+  try {
+    const reg = JSON.parse(fs.readFileSync(new URL('../data/registered.json', HERE), 'utf8'));
+    const rows = FP.parseFormsIndex(fs.existsSync(new URL('forms-index.txt', OUT)) ? fs.readFileSync(new URL('forms-index.txt', OUT), 'utf8') : '');
+    const { isApplicationForm } = FP.loadFormRules(fileURLToPath(new URL('..', HERE)));
+    const manualTitles = new Set(capped.map((n) => n.title));
+    backlog = FP.pickFormBacklog(reg.items || [], rows, { today, isApplicationForm, tried, max: Math.max(0, MAX_NOTICES - capped.length) })
+      .filter(({ it }) => !manualTitles.has(it.boardTitle || it.name));
+  } catch (e) { console.log('신청서 밀린 목록을 못 골랐다 (표적만 받는다):', e.message); }
+  console.log(`아직 못 받은 신청서 원본 — 이번에 ${backlog.length}건 (쉬는 중 ${Object.keys(tried).length}건)`);
+  /* 표적 공고(피드 행 · title/attachments 전부)와 밀린 공고(등록분 · 신청서 첨부만)를 한 줄로 — 아래 내려받기 고리는 같다 */
+  const jobs = [...capped.map((n) => ({ title: n.title, atts: n.attachments || [], regId: null })),
+    ...backlog.map(({ it, atts }) => ({ title: it.boardTitle || it.name, atts, regId: it.id }))];
+
+  /* 🔴 옛 파일은 **그 공고에 닿았을 때** 갈아끼운다 — 미리 몽땅 지우면 예산에 잘린 공고는 원본·미리보기 글자를 잃은 채 다음 실행까지 간다
+     (2026-10-30 1ms 예산 실측: 표적 9건의 파일 17개가 지워지고 하나도 안 받아졌다 · 자격 로봇의 '갈아끼우기' 규칙과 같다).
+     갈아끼우는 것은 표적 공고(피드 행)만 — 밀린 공고(등록분)는 옛 파일을 두고 번호를 그 뒤부터 매겨 덧붙인다(같은 제목의 다른 학교 글이 받아 둔 것일 수 있다). */
   const indexPath = new URL('forms-index.txt', OUT);
   let indexLines = [];
-  try {
-    indexLines = fs.readFileSync(indexPath, 'utf8').split('\n').filter(Boolean)
-      .filter((line) => { const m = line.split('\t')[0].match(/^form-([a-z0-9]{1,6})-/); return m && !refreshing.has(m[1]); });
-  } catch { /* 첫 실행 */ }
+  try { indexLines = fs.readFileSync(indexPath, 'utf8').split('\n').filter(Boolean); } catch { /* 첫 실행 */ }
+  const fileNo = (line) => line.split('\t')[0].match(/^form-[a-z0-9]{1,6}-(\d+)\./);
   let fi = 0;
-  for (const n of capped) {
+  for (const n of jobs) {
     if (Date.now() - startedAt > BUDGET_MS) { console.log('첨부 수집 시간 상한 도달 — 나머지는 다음 실행이 받는다'); break; }
     const slug = slugOf(n.title);
+    const mine = (line) => line.split('\t')[0].startsWith(`form-${slug}-`);
     let ai = 0;
-    for (const a of n.attachments || []) {
+    if (!n.regId) {
+      for (const f of fs.readdirSync(OUT)) if (f.startsWith(`form-${slug}-`)) fs.unlinkSync(new URL(f, OUT));
+      indexLines = indexLines.filter((line) => !mine(line));
+    } else {
+      ai = Math.max(0, ...indexLines.filter(mine).map((line) => { const m = fileNo(line); return m ? Number(m[1]) : 0; }));
+    }
+    const before = fi;
+    for (const a of n.atts) {
       if (/부속기관|부설/.test(a.name)) continue; // 사이트 공통 링크 제외
       if (Date.now() - startedAt > BUDGET_MS) break;
       try {
@@ -316,8 +346,12 @@ async function downloadForms() {
         console.log('attach ok:', a.name, buf.length);
       } catch (e) { console.log('attach err', a.name, e.name || e.message); }
     }
+    /* 밀린 공고의 쉼 장부 — 하나도 못 받았으면 오늘 날짜(사흘 쉼) · 받았으면 지운다 */
+    if (n.regId) { if (fi === before) tried[n.regId] = today; else delete tried[n.regId]; }
   }
   fs.writeFileSync(indexPath, indexLines.join('\n') + (indexLines.length ? '\n' : ''));
+  const keep = Object.fromEntries(Object.entries(tried).filter(([, at]) => /^\d{4}-\d{2}-\d{2}$/.test(String(at)) && (new Date(today) - new Date(at)) / 86400000 < 30));
+  fs.writeFileSync(triedPath, JSON.stringify(keep, null, 1) + '\n');
   return fi;
 }
 

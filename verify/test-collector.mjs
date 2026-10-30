@@ -12881,6 +12881,37 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
   const c5 = FP.convertOne ? FP.convertOne(path.join(tmp, 'obj.pdf'), path.join(tmp, 'out', 'o.pdf')) : {};
   eq('  쪽을 못 세는(객체 스트림) PDF 도 받는다 — pages 0 = 모름 · 결과 폴더 안에 작업 폴더 찌꺼기를 남기지 않는다',
     [c5.ok, c5.pages, fs.readdirSync(path.join(tmp, 'out')).filter((n) => n.startsWith('.conv')).length], [true, 0, 0]);
+  /* ⑧ 아직 못 받은 신청서를 로봇이 스스로 고른다 (2026-10-30) — 사람이 적은 표적만 받던 탓에 매일 돌아도 새 공고 신청서는 0건이었다 */
+  {
+    const rows8 = [{ file: 'form-x-1.hwp', title: '[교외] 2026년 효림장학재단 장학생 선발 안내', attach: '장학생 신청서.hwp', bytes: 10 }];
+    const items8 = [
+      { id: 'have', name: '2026년 효림장학재단 장학생 선발 안내', boardTitle: '[교외] 2026년 효림장학재단 장학생 선발 안내', deadline: '2026-11-01', attachments: [{ name: '장학생 신청서.hwp', url: 'https://a.ac.kr/1' }] },
+      { id: 'late', name: '늦은 마감', deadline: '2026-12-20', attachments: [{ name: '지원서.hwp', url: 'https://a.ac.kr/2' }, { name: '공고문.pdf', url: 'https://a.ac.kr/3' }] },
+      { id: 'soon', name: '가까운 마감', deadline: '2026-11-05', attachments: [{ name: '신청서.docx', url: 'https://a.ac.kr/4' }] },
+      { id: 'nodl', name: '마감 모름', attachments: [{ name: '신청서.hwp', url: 'https://a.ac.kr/5' }] },
+      { id: 'rest', name: '쉬는 중', deadline: '2026-11-02', attachments: [{ name: '신청서.hwp', url: 'https://a.ac.kr/6' }] },
+      { id: 'old', name: '오래전 실패', deadline: '2026-11-03', attachments: [{ name: '신청서.hwp', url: 'https://a.ac.kr/7' }] },
+      { id: 'nourl', name: '주소 없음', deadline: '2026-11-04', attachments: [{ name: '신청서.hwp' }] },
+      { id: 'closed', name: '지난 공고', deadline: '2026-10-01', attachments: [{ name: '신청서.hwp', url: 'https://a.ac.kr/8' }] },
+      { id: 'prog', name: '상시', program: true, attachments: [{ name: '신청서.hwp', url: 'https://a.ac.kr/9' }] },
+    ];
+    const bl = FP.pickFormBacklog ? FP.pickFormBacklog(items8, rows8, { today: '2026-10-30', isApplicationForm: isApp, tried: { rest: '2026-10-29', old: '2026-10-20' }, restDays: 3 }) : [];
+    eq('⑧ 밀린 신청서 — 색인에 원본이 있는 것·마감 지남·상시·주소 없는 첨부·사흘 안에 해 본 것은 빼고, 마감 가까운 순(모름은 뒤) · 신청서 첨부만(공고문은 아니다)',
+      bl.map(({ it, atts }) => [it.id, atts.map((a) => a.name)]),
+      [['old', ['신청서.hwp']], ['soon', ['신청서.docx']], ['late', ['지원서.hwp']], ['nodl', ['신청서.hwp']]]);
+    eq('  max 로 자르고 exclude 는 뺀다 (표적이 이미 받는 공고를 두 번 받지 않는다)',
+      FP.pickFormBacklog ? FP.pickFormBacklog(items8, rows8, { today: '2026-10-30', isApplicationForm: isApp, max: 2, exclude: new Set(['old']) }).map(({ it }) => it.id) : null, ['rest', 'soon']);
+    const dfSrc = readText(new URL('../collector/deepfetch.mjs', import.meta.url));
+    const body = dfSrc.slice(dfSrc.indexOf('async function downloadForms()'), dfSrc.indexOf('async function downloadEligDocs()'));
+    eq('  받는 로봇(deepfetch downloadForms)이 이 목록을 표적 뒤 남는 자리에 넣고(MAX_NOTICES - 표적) · 쉼 장부 forms-tried.json 을 읽고 쓴다 · 등록분 제목(boardTitle 또는 name)으로 색인에 적어 PDF 로봇이 찾는다',
+      [/FP\.pickFormBacklog\(reg\.items \|\| \[\], rows, \{ today, isApplicationForm, tried, max: Math\.max\(0, MAX_NOTICES - capped\.length\) \}\)/.test(body),
+        /forms-tried\.json/.test(body), /title: it\.boardTitle \|\| it\.name, atts, regId: it\.id/.test(body), /if \(n\.regId\) \{ if \(fi === before\) tried\[n\.regId\] = today; else delete tried\[n\.regId\]; \}/.test(body)],
+      [true, true, true, true]);
+    eq('  옛 파일은 그 공고에 닿았을 때만 갈아끼운다(표적만) — 미리 몽땅 지우던 줄(refreshing)이 없다 · 밀린 공고는 번호를 이어 덧붙인다',
+      [/refreshing/.test(body), /if \(!n\.regId\) \{\s*for \(const f of fs\.readdirSync\(OUT\)\) if \(f\.startsWith\(`form-\$\{slug\}-`\)\) fs\.unlinkSync/.test(body), /ai = Math\.max\(0, \.\.\.indexLines\.filter\(mine\)/.test(body)], [false, true, true]);
+    const dfy = readText(new URL('../.github/workflows/deep-fetch.yml', import.meta.url));
+    eq('  예약 실행은 --forms-only 로 이 길을 매일 탄다 · 저장 목록에 collector/extracted(쉼 장부·색인이 거기 있다)', [/--forms-only/.test(dfy), /git add collector\/extracted/.test(dfy)], [true, true]);
+  }
   /* ⑦ 지우기 — 마감 지난 공고와 색인에 없는 폴더는 지우고 살아 있는 것은 둔다 */
   const pd = path.join(tmp, 'forms-pdf');
   for (const d of ['live', 'dead', 'stray']) { fs.mkdirSync(path.join(pd, d), { recursive: true }); fs.writeFileSync(path.join(pd, d, '1-x.pdf'), pdf); }

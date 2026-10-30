@@ -43,7 +43,7 @@ export const SOFFICE_TIMEOUT_MS = 60000;
 export const FONT_STAMP = 'ko-nanum-1';
 
 /* data.js 의 신청서 판정을 **불러 쓴다**(베끼면 앱과 로봇이 다른 첨부를 신청서라 부른다). data.js 는 브라우저 파일이라 함수를 이름으로 떼어 온다. */
-function loadFormRules(root) {
+export function loadFormRules(root) {
   const src = fs.readFileSync(path.join(root, 'data.js'), 'utf8');
   const take = (name) => {
     const m = src.match(new RegExp(`^function ${name}\\([\\s\\S]*?^\\}`, 'm'));
@@ -83,6 +83,32 @@ export function pickFormTargets(items, indexRows, { today, isApplicationForm }) 
     if (files.length) out.push({ id: it.id, name: it.name || it.id, deadline: it.deadline || '', files });
   }
   return { targets: out, missing };
+}
+
+/* ── 아직 못 받은 신청서 원본을 로봇이 스스로 고른다 (2026-10-30) ───────────────────────────
+   🔴 왜: 신청서 원본을 받는 로봇(deepfetch --forms-only · 매일 03:33)은 사람이 run-deepfetch.txt 에 적은 제목만 받았다.
+      그래서 10-23 부터 매일 돌아도 새 공고는 한 건도 안 받았고, 마감 전 등록 공고 136건 중 16건이 '신청서 첨부는 있는데 원본은 없음'으로
+      남아 학생은 앱 지원문서만 봤다(2026-10-30 실측 · 설계 문서 §5 누수 ③). 사람이 적는 표적은 그대로 두고, 남는 자리를 이 목록이 채운다.
+   무엇을: pickFormTargets 가 「아직 못 받음」으로 센 공고(= 마감 전 · 신청서 첨부 있음 · 색인에 원본 없음)를 공고 단위로 묶는다.
+   순서: 마감이 가까운 것부터(마감 모름은 뒤) · 같은 날이면 id 순(실행마다 같은 순서 — 예산에 잘려도 다음 실행이 이어 받는다).
+   쉼: 받아 보려 했는데 못 받은 공고(tried[id] = 날짜)는 restDays 동안 다시 안 두드린다(로그인 벽·깨진 주소를 매일 두드리지 않는다).
+   돌려주는 것: [{ it, atts }] — atts 는 그 공고의 **신청서 첨부만**(공고문·결과보고서는 자격 로봇 몫 · 받는 로봇이 이 목록만 받는다). */
+export function pickFormBacklog(items, indexRows, { today, isApplicationForm, tried = {}, restDays = 3, max = 12, exclude = new Set() } = {}) {
+  const { missing } = pickFormTargets(items, indexRows, { today, isApplicationForm });
+  const byId = new Map();
+  for (const m of missing) { if (!byId.has(m.id)) byId.set(m.id, new Set()); byId.get(m.id).add(m.name); }
+  const days = (a, b) => Math.round((new Date(b + 'T00:00:00') - new Date(a + 'T00:00:00')) / 86400000);
+  const out = [];
+  for (const it of items || []) {
+    if (!it || !byId.has(it.id) || exclude.has(it.id)) continue;
+    const at = tried[it.id];
+    if (at && Number.isFinite(days(at, today)) && days(at, today) < restDays) continue;
+    const names = byId.get(it.id);
+    const atts = (it.attachments || []).filter((a) => a && a.url && names.has(a.name));
+    if (atts.length) out.push({ it, atts });
+  }
+  out.sort((a, b) => (a.it.deadline || '9999').localeCompare(b.it.deadline || '9999') || String(a.it.id).localeCompare(String(b.it.id)));
+  return out.slice(0, Math.max(0, max | 0));
 }
 
 /* PDF 쪽 수 — 뷰어 없이 글자로 센다(`/Type /Page` · `/Pages` 는 뺀다). 객체 스트림(/ObjStm)에 든 PDF 는 글자로 안 보여 0 이 나온다 —

@@ -76,8 +76,8 @@
 4. **양식 = 공고 첨부 신청서 원본 그대로**(2026-10-14 결정 6) — `collector/form-pdf.mjs` 가 PDF 사본을 `data/forms-pdf/` 에 두고 앱은 「원본 양식 그대로 보기」
    (답 얹기는 다음 단계). 앱이 양식을 다시 그리는 스키마화는 멈춤(`schematize-config.json` enabled:false · 있는 앱 양식은 그 공고가 닫힐 때까지).
    글꼴은 `collector/install-form-fonts.sh`(없으면 중국어 글꼴로 표가 깨진다). 관문 「신청서 원본 → PDF」.
-5. **정식 등록은 원본 첨부까지 한 세트** — ① `collector/run-deepfetch.txt` 에 `targets: 키워드` 적어 기본 브랜치 push(첨부 원본+미리보기 텍스트가
-   `collector/extracted/` 에 커밋되고 PDF 로봇이 같은 워크플로에서 잇는다) ② 새 `forms.json` 양식은 만들지 않는다(옛 `formId` 는 `verify/verify-registered.js`·
+5. **정식 등록은 원본 첨부까지 한 세트** — ① 마감 전 등록 공고의 신청서 첨부는 로봇이 스스로 받는다(`pickFormBacklog` · 매일 · 못 받으면 사흘 쉼) ·
+   그 밖은 `collector/run-deepfetch.txt` 에 `targets: 키워드` 적어 기본 브랜치 push(원본이 `collector/extracted/` 에 커밋되고 PDF 로봇이 잇는다) ② 새 `forms.json` 양식은 만들지 않는다(옛 `formId` 는 `verify/verify-registered.js`·
    `verify-forms-data.js` 로 검증) ③ 포털 입력형 등은 모든 수단(상세·첨부·재단 홈·fetch-page·정찰)을 쓴 뒤에만 개발자에게 묻는다. 채울 양식이 없으면 `noForm: "사유"`.
 6. **가짜 공지 금지** — 임의 공지를 보여 주지 않는다. 실존 상시 제도는 임의 마감일 없이 '상시 제도' 배지.
 7. **소급 적용** — 엔진·정책이 바뀌면 기존 데이터 전체에. 강제 장치 `node verify/audit-data.js`(바꾼 뒤 필수).
@@ -272,7 +272,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   🔴 **목록이 보통 링크가 아닌 게시판은 `news-board-rules.mjs` 한 곳**(클릭형 onclick·data-id · 글 주소 없는 목록 표식 listOnly · API json/post) — 두 로봇이 `rowsForBoard` 하나를 부른다.
   상세 주소는 유추하지 않고, 상세가 있는 규칙은 **매번 첫 글의 상세를 열어** 그 글의 화면인지 본다(`verifyRuleDetail` · 목록 표식은 상세가 없어 건너뜀) · API 규칙은 정찰이 본 화면(`page`)만 게시판으로 올린다.
   같은 글은 **게시판의 글 번호**(`postId`)로 알아본다 — 목록 표식 주소(#n-제목)는 제목 다듬기가 바뀌면 달라져 두 번 실렸다(`collapseSamePost` · 발행 때 소급 · 숨김·git 병합도 글 번호 `newsHidden`·`newsDistinct`). 분류·캠퍼스 꼬리표는 떼지 않는다.
-  못 읽는 학교는 정찰(`run-probe.txt` `checkUrl:` — 목록 HTML · 상세 여는 방식과 주소 · 스크립트 요청·응답 · 인증서는 `certHost:`) 결과만으로 규칙을 적는다.
+  못 읽는 학교는 정찰(`run-probe.txt` `checkUrl:` · 인증서는 `certHost:`) 결과만으로 규칙을 적는다.
   **사진 썸네일**(2026-10-03 개발자 지시): 수집 다음 단계(`collect-news-thumbs.mjs` · 보강)가 새 글부터 상세(또는 규칙의 본문 API `postContentRequest`)를 열어 본문 사진 → 첨부 그림 순으로 고르고(`news-thumb.mjs` 한 곳 · og:image 는 안 쓴다 — 전부 학교 로고였다)
   글 화면에 제목이 있는지(`pageHasTitle`)·받아서 진짜 사진인지(크기·가로세로·QR·글자뿐인 문서 그림 `looksLikeTextPage`) 본 뒤 240px WebP 로 `data/news/img/<바이트 해시>.webp` 에 둔다(서비스워커가 캐시 우선이라 이름을 다시 쓰지 않는다). 🔴 **두 글 이상에 같은 그림 = 학교 공통 그림**(로고·기본 공유 그림)이라 막는다 —
   이름 낱말은 거들 뿐. 장부 `news-thumbs.json` 을 매 실행 실린 글 전부에 다시 입히고(`applyThumbs`) 안 쓰는 그림은 지운다 · 관리자 「사진 빼기」는 `noThumb` · 전체 스위치 `news-config.json` 의 `thumbs`(on · dry=받아만 두고 카드엔 안 붙임 · off=모두 뗌). 카드는 `opts.thumb` 를 받은 소식 카드만 그린다(꼴 사본은 관문이 대조).
