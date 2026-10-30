@@ -59,10 +59,13 @@ const PROFILE = {
   const info = await page.evaluate(() => {
     const all = allScholarships().filter((s) => s.sourceKind === 'kosaf');
     const ids = [...document.querySelectorAll('#explore-list .sch-card')].map((e) => e.dataset.detail);
-    /* 🔴 층2는 **출처(sourceKind)** 로 고른다 — id 접두사 `kosaf-` 는 상시 제도(data.js 의 국가장학금 Ⅰ유형 `kosaf-type1` 등)도 쓴다.
-       접두사로 고르면 그 카드가 정렬에서 맨 앞에 오는 날 층2 목록에서 못 찾아 아래 두 검사가 빨개진다(2026-10-23~29 클라우드 6일 연속 · 로컬은 초록). */
-    const isL2 = (id) => { const s = allScholarships().find((x) => x.id === id); return !!s && s.sourceKind === 'kosaf'; };
-    const shown = ids.filter(isL2);
+    /* 🔴 **id 접두어로 고르지 말 것** (2026-10-30) — data.js 상시 제도(`kosaf-type1`·`kosaf-work` …)도
+       `kosaf-` 로 시작하지만 층2 재단이 아니다(sourceKind 'official' · 홈페이지 링크가 한국장학재단).
+       10-22~29 층2 데이터에서는 그 상시 제도가 탐색 목록 맨 앞에 와서, 이 검사가 상시 제도 시트에서
+       「재단 홈페이지 ↗」를 찾고 kosafList 에 없는 code 에 픽스처를 얹으려다 이레 동안 빨간불이었다
+       (이슈 #486). 층2인지는 앱이 매긴 sourceKind 로만 본다. */
+    const byId = Object.fromEntries(allScholarships().map((s) => [s.id, s]));
+    const shown = ids.filter((id) => byId[id] && byId[id].sourceKind === 'kosaf');
     return {
       made: all.length,
       shown: shown.length,
@@ -76,7 +79,7 @@ const PROFILE = {
       amtRatio: all.filter((s) => s.amountSpec && s.amountSpec.kind === 'ratio').length,
       noForm: all.every((s) => !s.formId && !s.prepFormId),
       withElig: all.filter((s) => (s.eligibilityLines || []).length).length,
-      closedShown: shown.filter((id) => dday(allScholarships().find((s) => s.id === id).deadline).days < -7).length,
+      closedShown: shown.filter((id) => dday(byId[id].deadline).days < -7).length,
     };
   });
   eq(`한국장학재단 등록분이 카드로 만들어진다 (${info.made}곳)`, info.made > 0, true);
