@@ -47,6 +47,22 @@
   "round": "2026-11-11",
   "nextAt": "2026-10-27"
  },
+ "kosaf|0731002|board:http://www.gbanurse.or.kr/index.php?g_page=notice&m_page=notice01&wd=1": {
+  "ds": "kosaf",
+  "key": "0731002",
+  "url": "",
+  "board": "http://www.gbanurse.or.kr/index.php?g_page=notice&m_page=notice01&wd=1",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "firstAt": "2026-10-31",
+  "lastAt": "2026-10-31",
+  "tries": 1,
+  "status": "rejected",
+  "why": "그 사이트 robots.txt 가 게시판 훑기를 막음 — 글 주소로 다시 적어 주세요",
+  "checks": {},
+  "round": "2026-12-04",
+  "decidedAt": "2026-10-31"
+ },
  "kosaf|1768681003|board:https://www.busan.go.kr/nbnews": {
   "ds": "kosaf",
   "key": "1768681003",
@@ -62,6 +78,22 @@
   "checks": {},
   "round": "2026-10-28",
   "nextAt": "2026-10-30"
+ },
+ "kosaf|1814024001|board:https://www.redcross.or.kr/main/pp/prcplView/selectPrcplView.do?mi=2590": {
+  "ds": "kosaf",
+  "key": "1814024001",
+  "url": "",
+  "board": "https://www.redcross.or.kr/main/pp/prcplView/selectPrcplView.do?mi=2590",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "firstAt": "2026-10-31",
+  "lastAt": "2026-10-31",
+  "tries": 1,
+  "status": "pending",
+  "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
+  "checks": {},
+  "round": "2026-11-08",
+  "nextAt": "2026-11-01"
  },
  "kosaf|2000204008|board:https://council.wonju.go.kr/content/news/photoGallery.html": {
   "ds": "kosaf",
@@ -176,13 +208,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-13",
-  "lastAt": "2026-10-24",
-  "tries": 4,
-  "status": "pending",
-  "why": "게시판 목록(100줄)에서 그 글을 하나로 못 고름",
+  "lastAt": "2026-10-31",
+  "tries": 5,
+  "status": "rejected",
+  "why": "게시판 목록(100줄)에서 그 글을 하나로 못 고름 — 5번째라 그만 봅니다",
   "checks": {},
   "round": "2026-12-31",
-  "nextAt": "2026-10-31"
+  "decidedAt": "2026-10-31"
  },
  "kosaf|2000347003|https://gcdream.kr/bbs/board.php?bo_table=scholaship&wr_id=18": {
   "ds": "kosaf",
@@ -192,8 +224,8 @@
   "by": "로봇(층2 글 사냥꾼)",
   "title": "2026년 (재)거창군장학회 장학생 선발 공고",
   "firstAt": "2026-10-30",
-  "lastAt": "2026-10-30",
-  "tries": 1,
+  "lastAt": "2026-10-31",
+  "tries": 2,
   "status": "pending",
   "why": "못 엶(HTTP 500) — 다시 봅니다",
   "checks": {
@@ -201,7 +233,32 @@
    "L": "unread"
   },
   "round": "2026-11-16",
-  "nextAt": "2026-10-31"
+  "nextAt": "2026-11-03"
+ },
+ "kosaf|2000423012|https://www.jincheon.go.kr/jcjh/sub.do?menukey=3464&mode=view&no=1076147380": {
+  "ds": "kosaf",
+  "key": "2000423012",
+  "url": "https://www.jincheon.go.kr/jcjh/sub.do?menukey=3464&mode=view&no=1076147380",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "title": "2026-10-01 (재)진천군장학회 2026년 하반기 장학생 모집 공고",
+  "firstAt": "2026-10-31",
+  "lastAt": "2026-10-31",
+  "tries": 1,
+  "status": "rejected",
+  "why": "마감이 다름(글 2026-10-23 · 이번 회차 2026-11-30)",
+  "checks": {
+   "C": "ok",
+   "L": "ok",
+   "H": "ok",
+   "T": "ok",
+   "R": "fail",
+   "X": "ok",
+   "P": "weak"
+  },
+  "round": "2026-11-30",
+  "decidedAt": "2026-10-31",
+  "also": []
  },
  "kosaf|2000429013|https://scholarship.eumseong.go.kr/www/selectBbsNttView.do?key=33&bbsNo=3&nttNo=792": {
   "ds": "kosaf",

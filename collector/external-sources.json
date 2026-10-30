@@ -1053,6 +1053,22 @@
      "(재)거창군장학회 2024년 장학생 선발요강 공고"
     ]
    }
+  },
+  {
+   "host": "(재)진천군장학회",
+   "home": "https://www.jincheon.go.kr/jcjh/",
+   "boardUrl": "https://www.jincheon.go.kr/jcjh/main.do",
+   "seed": "kosaf-open",
+   "autoFound": {
+    "date": "2026-10-31",
+    "signals": 5,
+    "menu": "층2 글 사냥꾼 · 공고 3건 이상 · 진천군 장학회",
+    "sample": [
+     "대학등록금은 국가장학금으로! 국가장학금 신청",
+     "2026-10-01 (재)진천군장학회 2026년 하반기 장학생 모집 공고",
+     "2026-08-07 (재)진천군장학회 2026년 온라인 강의 지원사업 신청자 3차 모집 공고"
+    ]
+   }
   }
  ],
  "_parked": "쓰지 않게 된 곳은 지우지 말고 여기로 옮긴다(schools.json 의 parked 와 같은 규칙). 되돌리려면 항목을 위 sources 로 옮기면 된다.",
