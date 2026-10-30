@@ -1,7 +1,46 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-10-29",
+ "updatedAt": "2026-10-30",
  "items": [
+  {
+   "title": "[취업정보] [동성케미칼] 채용설명회/ 채용상담회",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70843",
+   "postedAt": "2026-10-30",
+   "kind": "행사",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-30"
+  },
+  {
+   "title": "[채용공고] 2026년 제2회 전남대학교 패키지 지원대학 사업 전문 및 사...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70842",
+   "postedAt": "2026-10-30",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-30"
+  },
+  {
+   "title": "[채용공고] 전남대생협 계약직 직원 채용공고",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70841",
+   "postedAt": "2026-10-30",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-30"
+  },
+  {
+   "title": "[취업정보] 2026년 글로컬대학사업 「빅데이터분석기사, 차근차근 실습하기」",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70840",
+   "postedAt": "2026-10-30",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-10-30"
+  },
   {
    "title": "[학사안내] 2026학년도 동계 계절학기 개설교과목 공고",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70839",
@@ -356,45 +395,6 @@
    "title": "[대학생활] 먼가 크고 귀여운 정보보안 컬로퀴엄 껄 껄",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70792",
    "postedAt": "2026-10-23",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-23"
-  },
-  {
-   "title": "[취업정보] [BIXPO 2026 참가] 2026년 글로컬대학사업 「제조 ...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70791",
-   "postedAt": "2026-10-23",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-23"
-  },
-  {
-   "title": "[학사안내] 2026학년도 동계 계절학기 타 대학교(서울시립대) 교류수학 ...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70790",
-   "postedAt": "2026-10-23",
-   "kind": "학사",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-23"
-  },
-  {
-   "title": "[모집공고] [각화청소년문화의집] 2026년 케이팜청소년특화프로그램 결과발...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70789",
-   "postedAt": "2026-10-23",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-23",
-   "thumb": "data/news/img/10f8b7788eefa3f9.webp"
-  },
-  {
-   "title": "[채용공고] 2026년 제6회 국제협력과 기간제 계약직 직원 공개채용시험 ...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70786",
-   "postedAt": "2026-10-23",
-   "kind": "채용",
    "school": "전남대학교",
    "campus": "",
    "src": "b7347301",

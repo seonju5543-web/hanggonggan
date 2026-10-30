@@ -1,7 +1,38 @@
 {
  "school": "부산대학교",
- "updatedAt": "2026-10-29",
+ "updatedAt": "2026-10-30",
  "items": [
+  {
+   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(전남대학교 HUSS)",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511851",
+   "postedAt": "2026-10-30",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-30",
+   "desc": "2026학년도 겨울계절수업 전남대학교(HUSS) 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
+  },
+  {
+   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(영남대학교)",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511850",
+   "postedAt": "2026-10-30",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-30",
+   "desc": "2026학년도 겨울계절수업 영남대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
+  },
+  {
+   "title": "제3회 「자랑스러운 PNU 횃불인」 추천 공고",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511846",
+   "postedAt": "2026-10-30",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-10-30"
+  },
   {
    "title": "[글로컬대학 30] 디지털인문학센터 플랫폼 구축을 위한 자유공모형 인문 데이터 ...",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511842",
@@ -391,39 +422,6 @@
    "campus": "",
    "src": "2d0d4013",
    "foundAt": "2026-10-22"
-  },
-  {
-   "title": "[부산광역시] 「WDC 도시디자인 실험실」(WDC City Design Lab)...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511702",
-   "postedAt": "2026-10-22",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-22",
-   "thumb": "data/news/img/7c1f54a034514528.webp",
-   "desc": "부산광역시는 작년 7월 2028 세계디자인수도(WDC)로 선정됨에 따라 지역 청년들이 일상 속 도시문제를 발견하고 전문가와 함께 디자인 관점 해결방안을 마련하는 「WDC 도시디자인 실험실」사업을 운영 하고자 하니…"
-  },
-  {
-   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(숙명여자대학교)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511699",
-   "postedAt": "2026-10-22",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-22",
-   "desc": "2026학년도 겨울계절수업 숙명여자대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
-  },
-  {
-   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(한국예술종합학교)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511697",
-   "postedAt": "2026-10-22",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-22",
-   "desc": "2026학년도 겨울계절수업 한국예술종합학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
   }
  ]
 }

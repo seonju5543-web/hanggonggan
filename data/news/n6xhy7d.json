@@ -1,7 +1,18 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-10-29",
+ "updatedAt": "2026-10-30",
  "items": [
+  {
+   "title": "[일반] 기간제 계약직원 채용 공고(경영대학원 교학팀)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53585&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-10-30",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-10-30",
+   "desc": "채용 부서 경영대학원 교학팀 모집인원 1. 지원 자격 및 우대사항 담당업무 경영대학원 교학팀 행정업무 등 지원 자격"
+  },
   {
    "title": "[일반] [강북청년창업마루] 2026 강북창업포럼(NCI 민/관/학 창업포럼) 참관객 모집 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53582&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -11,7 +22,8 @@
    "campus": "",
    "src": "b09cb042",
    "foundAt": "2026-10-29",
-   "thumb": "data/news/img/35ea4c92fd38650a.webp"
+   "thumb": "data/news/img/35ea4c92fd38650a.webp",
+   "desc": "2026 강북창업포럼(NCI 민/관/학 창업포럼) 이 \"AI가 바꾸는 창업의 미래\"를주제로 개최됩니다."
   },
   {
    "title": "[일반] [채용공고] 광운대학교 산학협력단 직원 채용 공고",
@@ -414,17 +426,6 @@
    "src": "b09cb042",
    "foundAt": "2026-10-15",
    "desc": "1. 최근 AI 를 이용한 해외 해킹 시도가 급증함에 따라 , 학생 여러분의 개인정보를 안전하게 보호하기 위해 KLAS 종합정보서비스 보안 강화 조치를 아래와 같이 시행하오니 양지하여 주시기 바랍니다 ."
-  },
-  {
-   "title": "[일반] [채용공고] 광운대학교 산학협력단 「RISE 사업단」직원 채용 공고",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53480&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-14",
-   "kind": "채용",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-14",
-   "desc": "「광운대학교 산학협력단」 에서 유능하고 역량 있는 인재를 다음과 같이 공개 채용합니다. 광운대학교 산학협력단장"
   }
  ]
 }

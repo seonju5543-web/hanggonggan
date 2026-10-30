@@ -1,7 +1,39 @@
 {
  "school": "충북대학교",
- "updatedAt": "2026-10-29",
+ "updatedAt": "2026-10-30",
  "items": [
+  {
+   "title": "[인문학연구소] 지금 함께 여는 인문학 강연 개최",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171065&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-10-29",
+   "kind": "행사",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-10-30",
+   "thumb": "data/news/img/748bc2137274e48f.webp",
+   "desc": "이미지 확대보기 안녕하세요, 충북대학교 인문학연구소입니다. 깊어가는 가을, 여섯 분의 교수님과 함께 인문학의 시간을 열어 보려 합니다."
+  },
+  {
+   "title": "[2027학년도 1학기 개신프론티어 교과] 이수학생 선발 안내",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171061&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-10-29",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-10-30",
+   "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
+  },
+  {
+   "title": "2027학년도 1학기 개신프론티어 교과 설명회 안내",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171060&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-10-29",
+   "kind": "행사",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-10-30"
+  },
   {
    "title": "충북대학교RISE사업단 사무계약직 공개 경쟁채용 공고",
    "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171025&pageUnit=10&searchCnd=all&pageIndex=1",
@@ -404,37 +436,6 @@
    "src": "76d254e7",
    "foundAt": "2026-10-14",
    "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
-  },
-  {
-   "title": "환경분야 정부지원금 부정수급 집중신고기간 운영 알림(~ 10.31.)",
-   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170693&pageUnit=10&searchCnd=all&pageIndex=1",
-   "postedAt": "2026-10-14",
-   "school": "충북대학교",
-   "campus": "",
-   "src": "76d254e7",
-   "foundAt": "2026-10-14",
-   "desc": "o 신고대상: 신재생에너지 지원사업, 친환경자동차 구매지원금, 각종 주변지역 지원금 등 환경분야 부정수급 행위 o 신고방법"
-  },
-  {
-   "title": "충북대학교 대학회계 공무직(사무원) 공개경쟁채용시험 필기시험 합격자 및 면접시험 일정 공고",
-   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170674&pageUnit=10&searchCnd=all&pageIndex=1",
-   "postedAt": "2026-10-14",
-   "kind": "학사",
-   "school": "충북대학교",
-   "campus": "",
-   "src": "76d254e7",
-   "foundAt": "2026-10-14",
-   "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
-  },
-  {
-   "title": "2027학년도 전기(정시) 충북대학교 대학원별 입학전형 안내",
-   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170643&pageUnit=10&searchCnd=all&pageIndex=1",
-   "postedAt": "2026-10-13",
-   "school": "충북대학교",
-   "campus": "",
-   "src": "76d254e7",
-   "foundAt": "2026-10-13",
-   "desc": "1. 모집 대학원 가. 일반대학원 (대학원) - 입학과 : 일반전형(석사과정/석.박사통합과정/박사과정) 학과간협동과정(석사과정/석.박사통합과정/박사과정) 학연산협동과정(석사과정/박사과정) 정부위탁생특별전형(석사과정)"
   }
  ]
 }

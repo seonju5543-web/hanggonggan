@@ -1,7 +1,40 @@
 {
  "school": "한국외국어대학교",
- "updatedAt": "2026-10-29",
+ "updatedAt": "2026-10-30",
  "items": [
+  {
+   "title": "한국외대 아프리카연구소, 11월 4~6일 HK3.0 컨소시엄 국제학술대회 개최",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/270407/artclView.do",
+   "postedAt": "2026-10-30",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-10-30",
+   "thumb": "data/news/img/2dac1d41f60a876a.webp",
+   "desc": "- 후원: 한국연구재단 - 진행 언어: 영어 (관심 있는 학생 및 연구자 누구나 참석 가능)"
+  },
+  {
+   "title": "[(서울)학생상담센터] 자살예방교육(Y-생명지기) 안내",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/270400/artclView.do",
+   "postedAt": "2026-10-30",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-10-30",
+   "thumb": "data/news/img/f328b4acceeb364d.webp",
+   "desc": "안녕하세요 :) 한국외국어대학교 ( 서울 ) 학생상담센터입니다 . 본 기관에서는 서울시자살예방센터의 Y- 생명지기 프로그램을 통해 자살예방교육을 실시할 예정입니다 . 많은 관심과 참여 부탁드립니다 . 감사합니다 ."
+  },
+  {
+   "title": "KOCW(대학공개강의) 서비스 종료 및 수강확인증 발급 기한 안내",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/270392/artclView.do",
+   "postedAt": "2026-10-28",
+   "kind": "학사",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-10-30",
+   "desc": "한국교육학술정보원에서 운영하는 KOCW( 대학공개강의 ) 서비스 종료 예정에 따라 다음과 같이 안내드리오니 이용에 참고하시기 바랍니다 ."
+  },
   {
    "title": "김애란 소설가 북토크 '적는 마음, 잇는 마음' 안내",
    "url": "https://www.hufs.ac.kr/bbs/hufs/2180/270254/artclView.do",
@@ -11,17 +44,6 @@
    "src": "54a450a4",
    "foundAt": "2026-10-29",
    "thumb": "data/news/img/e5bd4442c86e287c.webp"
-  },
-  {
-   "title": "KOCW(대학공개강의) 서비스 종료 및 수강확인증 발급 기한 안내",
-   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/270126/artclView.do",
-   "postedAt": "2026-10-28",
-   "kind": "학사",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "src": "54a450a4",
-   "foundAt": "2026-10-28",
-   "desc": "한국교육학술정보원에서 운영하는 KOCW( 대학공개강의 ) 서비스 종료 예정에 따라 다음과 같이 안내드리오니 이용에 참고하시기 바랍니다 ."
   },
   {
    "title": "[글로벌]보건실-사랑의 헌혈 운동 안내(2026. 10. 28.(수)- 학생회관앞 주차장)",

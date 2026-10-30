@@ -1,7 +1,27 @@
 {
  "school": "부경대학교",
- "updatedAt": "2026-10-29",
+ "updatedAt": "2026-10-30",
  "items": [
+  {
+   "title": "2027학년도 전기 교육대학원 신입생 모집 안내",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726791",
+   "postedAt": "2026-10-29",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-30",
+   "desc": "★ 2022 학년도 신입생부터 교원양성과정 폐지 로 인한 교원자격증 취득은 불가능하고 석사 ( 교육학 ) 학위 취득만 가능하오니 유의하시기 바랍니다 ."
+  },
+  {
+   "title": "★2027학년도 전기 글로벌정책대학원 신입생 모집 안내★",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726790",
+   "postedAt": "2026-10-29",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-30",
+   "desc": "국립부경대학교 글로벌정책대학원 의 <2027 학년도 전기 신입생 모집 > 을 아래와 같이 안내 합니다 ."
+  },
   {
    "title": "파도 속에서 나로 있기 : 청년 번아웃 회복 심리프로그램",
    "url": "https://www.pknu.ac.kr/main/163?action=view&no=726783",
@@ -402,26 +422,6 @@
    "foundAt": "2026-10-13",
    "thumb": "data/news/img/453cd33855f2fba4.webp",
    "desc": "학생성공지원과 고용노동부와 한국고용정보원에서는 ‘ 2026년 대학일자리플러스센터 만족도 조사 ’를 실시하고 있습니다."
-  },
-  {
-   "title": "■ 채용공고 ■ 대학입학전형 업무보조 일용직원 채용 공고 - 접수기한 2026.10.19.(월)까지",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726568",
-   "postedAt": "2026-10-12",
-   "kind": "채용",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-12"
-  },
-  {
-   "title": "2026년 제2회 국립부경대학교 국가공무원 경력경쟁채용시험(해양수산) 서류전형 합격자 및 면접시험 일정 공고",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726567",
-   "postedAt": "2026-10-12",
-   "kind": "학사",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-12"
   }
  ]
 }

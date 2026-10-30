@@ -1,7 +1,75 @@
 {
  "school": "서울시립대학교",
- "updatedAt": "2026-10-29",
+ "updatedAt": "2026-10-30",
  "items": [
+  {
+   "title": "[중앙도서관] 자유 열람실 (열람석) 자율배석 운영 안내(10. 30. 18시~22시)",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31768&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-10-30",
+   "postId": "31768",
+   "kind": "생활",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-10-30"
+  },
+  {
+   "title": "[생활관] 2026년 2학기 RC프로그램 [K-POP댄스(2기)] 수강생 모집 공고",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31737&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-10-30",
+   "postId": "31737",
+   "kind": "생활",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-10-30",
+   "desc": "수강생 모집 공고 서울시립대학교 생활관에서는 기숙사생 및 재학생을 비롯하여 , 대학 공동체와 지역사회를 아우르는 2026 학년 2 학기 RC(Residential College) 프로그램 [K-POP 댄스 (2 기…"
+  },
+  {
+   "title": "[생활관] 2026년 2학기 RC프로그램 [버스킹·보컬트레이닝(3기)] 수강생 모집 공고",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31735&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-10-30",
+   "postId": "31735",
+   "kind": "생활",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-10-30",
+   "desc": "수강생 모집 공고 서울시립대학교 생활관에서는 기숙사생 및 재학생을 비롯하여 , 대학 공동체와 지역사회를 아우르는 2026 학년 2 학기 RC(Residential College) 프로그램 [ 보컬트레이닝 · 버스킹…"
+  },
+  {
+   "title": "[청년취업사관학교] 'AI 융합 전문가' 양성 과정 모집 안내",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31736&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-10-30",
+   "postId": "31736",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-10-30",
+   "desc": "■ 교육 안내 서울시 공공데이터 활용 디지털 마케팅 인재 양성 과정 ■ 신청 대상 ① 만 15세 이상 서울 시민·서울 거소자 ② 서울 외 거주자"
+  },
+  {
+   "title": "[학생과 나비스트 프로젝트] [마감 D-4🎁] UOS-Upcycling Lab 팀 -「CAMPUS RE」폐자원 수거 안내 (배달의민족 상품권 증정)",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31660&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-10-30",
+   "postId": "31660",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-10-30",
+   "thumb": "data/news/img/3ffa37e5e81c5638.webp",
+   "desc": "안녕하세요, 서울시립대학교 나비스트 프로젝트 UOS-Upcycling Lab 팀 입니다! 사용하지 않지만 버리기 아까웠던 물건, 하나쯤 있으신가요?"
+  },
+  {
+   "title": "웹메일 계정 보안강화를 위한 일회용인증(OTP) 설정 안내드립니다.",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31767&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-10-30",
+   "postId": "31767",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-10-30"
+  },
   {
    "title": "모바일 학생증 접속 불가 안내(10/30, 금, 18:00~22:00)",
    "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31765&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
@@ -304,7 +372,6 @@
    "campus": "",
    "src": "80d7d3bc",
    "foundAt": "2026-10-22",
-   "thumb": "data/news/img/52d1fc0d08949e79.webp",
    "desc": "■ 교육 안내 서울시 공공데이터 활용 디지털 마케팅 인재 양성 과정 ■ 신청 대상 ① 만 15세 이상 서울 시민·서울 거소자 ② 서울 외 거주자"
   },
   {
@@ -399,74 +466,6 @@
    "src": "80d7d3bc",
    "foundAt": "2026-10-21",
    "desc": "관심있는 학생들은 붙임 브로셔를 참고하셔서 참석등록 하시기 바랍니다. 참석등록 링크 : https://forms.gle/KFFgePKGaKGejj819 일시: 2026. 11. 16. (월) 오후 3시 장소:…"
-  },
-  {
-   "title": "2026년 11월 교내모의테스트(토익, 토익스피킹, 오픽) 응시 및 접수 안내",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31685&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-21",
-   "postId": "31685",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-10-21",
-   "desc": "어학프로그램운영실에서는 11 월 교내모의테스트를 실시합니다 . 1. 시험일시 및 접수 기간"
-  },
-  {
-   "title": "[고시반] 2026년 감정평가사, 관세사 최종 합격자 조사",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31684&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-21",
-   "postId": "31684",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-10-21",
-   "desc": "- 서울시립대학교 졸업생, 재학생, 휴학생 모두 응답해주시면 됩니다. (10.23.(금)까지) https://forms.gle/KBnGfvCBdbi3kGF99 (주소를 복사해주세요.)"
-  },
-  {
-   "title": "🖥[빅데이터/인공지능] UBAI 슈퍼컴퓨터 사용법 교육 프로그램 실시(도시과학빅데이터AI연구원)",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31681&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-20",
-   "postId": "31681",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-10-20",
-   "desc": "서울시립대학교 도시과학빅데이터 ∙AI 연구원에서 교내 연구자 분들을 대상으로 UBAI 슈퍼컴퓨터 활용 교육 프로그램 을 진행합니다 . 슈퍼컴퓨터 사용법이 익숙하지 않은 분들을 위해 , 기본 접속 방법 부터 서버에서…"
-  },
-  {
-   "title": "[인공지능혁신융합대학사업단] Microsoft 인공지능 국제인증자격증 교육과정(MS AI-901) 추가 교육생 모집(선착순)",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31680&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-20",
-   "postId": "31680",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-10-20",
-   "desc": "보다 많은 재학생들에게 교육 참여 기회를 제공하고자 마련된 특별 과정으로, AI 기초 역량을 쌓고 국제공인 자격 취득에 도전하려는 학생들의 많은 신청 바랍니다."
-  },
-  {
-   "title": "🎓 [일반대학원] 2026학년도【 대학원생 참여형 교육과정 개발 공모(2차)】안내 ~ ★",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31679&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-19",
-   "postId": "31679",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-10-20",
-   "desc": "1) 분야별 공모 설명 각 1부. 2) [공통] 개발 공모 신청서 1부."
-  },
-  {
-   "title": "💡 2026년도 제19회 UOS 연구 콜로키움 개최 안내(2026.10.22.(목) 11:00, 창의혁신관 SI 아레나)💡",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31678&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-19",
-   "postId": "31678",
-   "kind": "행사",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-10-19",
-   "thumb": "data/news/img/32b01c4dcd35c355.webp",
-   "desc": "📌 발표주제 및 발표자 - 「 Sartificial Tactile Nerves & Smart Intelligence 」 서울시립대학교 첨단융합학부 이신형 교수"
   }
  ]
 }
