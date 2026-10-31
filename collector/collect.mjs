@@ -28,7 +28,7 @@ import { robotsAllows } from './robots.mjs';
 import { extractLinks, stripSessionId, hrefText } from './board-links.mjs';
 import { tidyExternal, dropReason as externalDropReason, fillDeadlineFromHint } from './external-clean.mjs';
 import { actKeepDate, capActivities } from './open-api-map.mjs';   // 활동 피드 60일·상한이 같은 날짜를 쓴다 (순수 모듈 — 불러도 아무것도 실행하지 않는다)
-import { canonUrl, idFromUrl } from './canon-url.mjs';
+import { canonUrl, activityId } from './canon-url.mjs';
 import { fetchBoard, netReason } from './fetch-board.mjs';
 import { NEWS_BOARD_RULES } from './news-board-rules.mjs';
 import { updateSourceHealth, staleSourcesLine } from './source-health.mjs';
@@ -610,9 +610,19 @@ acts.items = retitleItems(freshActs.concat(acts.items || []));   // 실린 글�
 acts.items = acts.items.filter((n) => (actKeepDate(n) || '9999') >= cutoff);
 acts.items = acts.items.filter((n) => !isAttachmentEntry(n));
 acts.items = acts.items.filter((n) => !notActivity(n.title) && !unreadableSource(n.url));   // 결과·보도·지난 해 글은 모집 글이 아니다 · 인스타그램 게시물은 뺀다 — 이미 실린 글에도 소급(2026-10-04 · 10-16 · activity-kind.mjs)
-/* 🔴 활동 글에도 id — 주소에서 만드는 공식은 canon-url.mjs idFromUrl **한 곳**(등록 공고 'auto-' 와 같은 식 · 접두사만 'act-' · 2026-10-30).
-   신청서 원본 PDF 색인(data/forms-pdf)과 앱 시트가 이 id 로 만난다. API 글은 API 로봇이 준 id 그대로. 이미 실린 글에도 소급(원칙 7). */
-acts.items.forEach((n) => { if (!n.id && n.url) n.id = idFromUrl('act-', n.url); });
+/* 🔴 활동 글에도 id — 공식은 canon-url.mjs activityId **한 곳**(주소 전체 지문 · 2026-10-30 · 리뷰: 끝 24자 공식은 두 학교의 같은 게시판 글이 겹쳤다).
+   신청서 원본 PDF 색인(data/forms-pdf)과 앱 시트가 이 id 로 만난다. API 글은 API 로봇이 준 id 그대로. 이미 실린 글에도 소급(원칙 7).
+   같은 id 가 둘이면(지문 충돌) 뒤 글은 id 를 비워 둔다 — 틀린 양식을 붙이는 것보다 양식 칸이 없는 쪽이 낫다. */
+{
+  const usedIds = new Map();
+  for (const n of acts.items) {
+    if (!n.id && n.url) n.id = activityId(n.url);
+    if (!n.id) continue;
+    const other = usedIds.get(n.id);
+    if (other && other !== n.url) { console.log(`활동 글 id 겹침 — 뒤 글의 id 를 비운다: ${n.id} · ${other} · ${n.url}`); delete n.id; continue; }
+    usedIds.set(n.id, n.url);
+  }
+}
 acts.items.forEach(sanitizeBenefit);   // 「혜택」에 섞인 조건은 자격 줄로 — 출처(본문·API)와 상관없이 매번 모든 글에(2026-10-04 · activity-excerpts.mjs splitBenefit)
 acts.items.forEach(sanitizeElig);   // 자격 줄 거름(여러 갈래 나이·개인정보 안내문)을 실린 글 전부에 매번 — 소급(2026-10-05 점검 api-06 · activity-excerpts.mjs eligLineOk)
 acts.items.forEach((n) => bodyReader.heal(n));   // 껍데기에서 시작한 기간 힌트 소급(위 '껍데기를 걷은 본문' 단락)

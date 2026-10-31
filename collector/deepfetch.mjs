@@ -294,7 +294,9 @@ async function downloadForms() {
   try { tried = JSON.parse(fs.readFileSync(triedPath, 'utf8')) || {}; } catch { /* 첫 실행 */ }
   const today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
   let backlog = [];
-  try {
+  /* 🔴 밀린 목록은 심층 수집 워크플로(deep-fetch.yml · FORMS_BACKLOG=1)에서만 — 수집 로봇 둘도 --forms-only 를 돌리는데 대기줄이 달라 동시에 돌면
+     쉼 장부·색인을 서로 덮는다(리뷰 2026-10-30). 표적(사람이 적은 제목)은 어디서든 받는다. */
+  if (process.env.FORMS_BACKLOG === '1') try {
     const reg = JSON.parse(fs.readFileSync(new URL('../data/registered.json', HERE), 'utf8'));
     const root = fileURLToPath(new URL('..', HERE));
     const rows = FP.parseFormsIndex(fs.existsSync(new URL('forms-index.txt', OUT)) ? fs.readFileSync(new URL('forms-index.txt', OUT), 'utf8') : '');
@@ -304,14 +306,15 @@ async function downloadForms() {
     backlog = FP.pickFormBacklog([...(reg.items || []), ...FP.loadActivities(root)], rows, { today, isApplicationForm, tried, max: Math.max(0, MAX_NOTICES - capped.length) })
       .filter(({ it }) => !manualTitles.has(it.boardTitle || it.name || it.title));
   } catch (e) { console.log('신청서 밀린 목록을 못 골랐다 (표적만 받는다):', e.message); }
-  console.log(`아직 못 받은 신청서 원본 — 이번에 ${backlog.length}건 (쉬는 중 ${Object.keys(tried).length}건)`);
+  console.log(process.env.FORMS_BACKLOG === '1' ? `아직 못 받은 신청서 원본 — 이번에 ${backlog.length}건 (쉬는 중 ${Object.keys(tried).length}건)` : '밀린 신청서 목록은 심층 수집 워크플로만 받는다(FORMS_BACKLOG 없음)');
   /* 표적 공고(피드 행 · title/attachments 전부)와 밀린 공고(등록분 · 신청서 첨부만)를 한 줄로 — 아래 내려받기 고리는 같다 */
   const jobs = [...capped.map((n) => ({ title: n.title, atts: n.attachments || [], regId: null })),
     ...backlog.map(({ it, atts }) => ({ title: it.boardTitle || it.name || it.title, atts, regId: it.id }))];
 
-  /* 🔴 옛 파일은 **그 공고에 닿았을 때** 갈아끼운다 — 미리 몽땅 지우면 예산에 잘린 공고는 원본·미리보기 글자를 잃은 채 다음 실행까지 간다
-     (2026-10-30 1ms 예산 실측: 표적 9건의 파일 17개가 지워지고 하나도 안 받아졌다 · 자격 로봇의 '갈아끼우기' 규칙과 같다).
-     갈아끼우는 것은 표적 공고(피드 행)만 — 밀린 공고(등록분)는 옛 파일을 두고 번호를 그 뒤부터 매겨 덧붙인다(같은 제목의 다른 학교 글이 받아 둔 것일 수 있다). */
+  /* 🔴 옛 파일은 **새 파일을 받은 뒤에만** 갈아끼운다 — 미리 지우면 예산에 잘리거나 전부 실패한 공고는 원본·미리보기 글자를 잃은 채 다음 실행까지 간다
+     (2026-10-30 1ms 예산 실측: 표적 9건의 파일 17개가 지워지고 하나도 안 받아졌다 · 리뷰: 닿은 뒤 지워도 전부 실패하면 같은 구멍).
+     새 파일은 그 제목의 옛 번호 뒤부터 매겨 덮어쓰지 않고, 표적 공고(피드 행)는 하나라도 받았을 때 옛 파일·옛 줄을 지운다 ·
+     밀린 공고(등록분·활동 글)는 옛 파일을 두고 덧붙이며 색인 줄에 제 id 를 적는다(같은 제목의 다른 학교 글과 섞이지 않게 — PDF 로봇은 id 가 적힌 줄을 그 공고에만 쓴다). */
   const indexPath = new URL('forms-index.txt', OUT);
   let indexLines = [];
   try { indexLines = fs.readFileSync(indexPath, 'utf8').split('\n').filter(Boolean); } catch { /* 첫 실행 */ }
@@ -321,17 +324,14 @@ async function downloadForms() {
     if (Date.now() - startedAt > BUDGET_MS) { console.log('첨부 수집 시간 상한 도달 — 나머지는 다음 실행이 받는다'); break; }
     const slug = slugOf(n.title);
     const mine = (line) => line.split('\t')[0].startsWith(`form-${slug}-`);
-    let ai = 0;
-    if (!n.regId) {
-      for (const f of fs.readdirSync(OUT)) if (f.startsWith(`form-${slug}-`)) fs.unlinkSync(new URL(f, OUT));
-      indexLines = indexLines.filter((line) => !mine(line));
-    } else {
-      ai = Math.max(0, ...indexLines.filter(mine).map((line) => { const m = fileNo(line); return m ? Number(m[1]) : 0; }));
-    }
+    let ai = Math.max(0, ...indexLines.filter(mine).map((line) => { const m = fileNo(line); return m ? Number(m[1]) : 0; }));
     const before = fi;
+    const written = new Set();
+    let attempted = false, budgetHit = false;
     for (const a of n.atts) {
       if (/부속기관|부설/.test(a.name)) continue; // 사이트 공통 링크 제외
-      if (Date.now() - startedAt > BUDGET_MS) break;
+      if (Date.now() - startedAt > BUDGET_MS) { budgetHit = true; break; }
+      attempted = true;
       try {
         const res = await fetch(a.url, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(30000) });
         if (!res.ok) { console.log('attach fail', res.status, a.name); continue; }
@@ -344,12 +344,18 @@ async function downloadForms() {
         const ext = (a.name.match(/\.(hwp|hwpx|doc|docx|pdf|xls|xlsx|zip)$/i) || [, 'bin'])[1];
         const fname = `form-${slug}-${ai}.${ext}`;
         fs.writeFileSync(new URL(fname, OUT), buf);
-        indexLines.push(`${fname}\t${n.title}\t${a.name}\t${buf.length}`);
+        written.add(fname);
+        indexLines.push(`${fname}\t${n.title}\t${a.name}\t${buf.length}${n.regId ? `\t${n.regId}` : ''}`);
         console.log('attach ok:', a.name, buf.length);
       } catch (e) { console.log('attach err', a.name, e.name || e.message); }
     }
-    /* 밀린 공고의 쉼 장부 — 하나도 못 받았으면 오늘 날짜(사흘 쉼) · 받았으면 지운다 */
-    if (n.regId) { if (fi === before) tried[n.regId] = today; else delete tried[n.regId]; }
+    if (!n.regId && fi > before) {
+      /* 표적 공고 — 새 파일을 받았으니 옛 파일(이번에 쓴 것 말고)과 옛 줄을 지운다(파생 .txt 도 이름이 같은 묶음으로 지워진다) */
+      for (const f of fs.readdirSync(OUT)) if (f.startsWith(`form-${slug}-`) && !written.has(f) && ![...written].some((w) => f.startsWith(`${w}.`))) fs.unlinkSync(new URL(f, OUT));
+      indexLines = indexLines.filter((line) => !mine(line) || written.has(line.split('\t')[0]));
+    }
+    /* 밀린 공고의 쉼 장부 — **시도했는데** 하나도 못 받았으면 오늘 날짜(사흘 쉼) · 받았으면 지운다 · 예산에 잘려 시작도 못 한 것은 적지 않는다(리뷰) */
+    if (n.regId) { if (fi > before) delete tried[n.regId]; else if (attempted && !budgetHit) tried[n.regId] = today; }
   }
   fs.writeFileSync(indexPath, indexLines.join('\n') + (indexLines.length ? '\n' : ''));
   const keep = Object.fromEntries(Object.entries(tried).filter(([, at]) => /^\d{4}-\d{2}-\d{2}$/.test(String(at)) && (new Date(today) - new Date(at)) / 86400000 < 30));

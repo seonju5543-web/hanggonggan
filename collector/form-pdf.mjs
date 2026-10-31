@@ -60,11 +60,14 @@ export function loadActivities(root) {
   try { const j = JSON.parse(fs.readFileSync(path.join(root, 'data', 'activities.json'), 'utf8')); return (j.items || []).filter((it) => it && it.id && it.url); } catch { return []; }
 }
 
-/* forms-index.txt 줄 → { file, title, attach, bytes } */
+/* forms-index.txt 줄 → { file, title, attach, bytes, id } — 다섯째 칸 id 는 밀린 목록이 받은 줄에만 있다(2026-10-30 리뷰: 같은 제목의 두 학교 글이 한 원본을 나눠 쓰던 것) */
 export function parseFormsIndex(text) {
   return String(text || '').split('\n').filter(Boolean).map((line) => {
-    const [file, title, attach, bytes] = line.split('\t');
-    return file && attach ? { file, title: title || '', attach, bytes: Number(bytes) || 0 } : null;
+    const [file, title, attach, bytes, id] = line.split('\t');
+    if (!file || !attach) return null;
+    const row = { file, title: title || '', attach, bytes: Number(bytes) || 0 };
+    if (id && id.trim()) row.id = id.trim();   // 옛 줄(넷째 칸까지)은 모양 그대로 — id 칸은 있을 때만
+    return row;
   }).filter(Boolean);
 }
 
@@ -81,7 +84,9 @@ export function pickFormTargets(items, indexRows, { today, isApplicationForm }) 
     const titles = [it.boardTitle, it.name, it.title].filter(Boolean);   // 활동 글(data/activities.json)은 title 하나 — 같은 줄 꼴로 색인에 적혀 있다(2026-10-30)
     const files = [];
     for (const a of forms) {
-      const row = indexRows.find((r) => r.attach === a.name && titles.some((t) => sameTitle(t, r.title)));
+      /* id 가 적힌 줄은 **그 공고 것만** 쓴다(제목이 같은 다른 학교 글에 넘기지 않는다) · id 없는 옛 줄(사람 표적)은 제목으로 */
+      const row = indexRows.find((r) => r.attach === a.name && r.id && r.id === it.id)
+        || indexRows.find((r) => r.attach === a.name && !r.id && titles.some((t) => sameTitle(t, r.title)));
       if (row) files.push({ src: row.file, name: a.name, srcBytes: row.bytes || 0 });
       else missing.push({ id: it.id, name: a.name });
     }

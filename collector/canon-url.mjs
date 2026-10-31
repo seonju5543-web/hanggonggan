@@ -117,4 +117,9 @@ export function registerId(prefix, raw, { holderCanon = () => null, blockedIds =
   return out(legacy);
 }
 
+/* 활동 글(data/activities.json)의 id — 2026-10-30. idFromUrl 은 정규화 주소의 **끝 24자**라 같은 게시판 소프트웨어(gnuboard bo_table/wr_id · articleNo …)를 쓰는
+   두 학교의 글이 같은 id 를 받는다(리뷰 실측: a.ac.kr 와 b.ac.kr 의 같은 경로 → 같은 id). 등록분은 auto-register 가 주소로 먼저 거르지만 활동 글은 안 거르므로
+   **주소 전체의 지문**(idHash · FNV-1a 36진 7자)을 쓴다. 신청서 원본 PDF 색인(data/forms-pdf)·쉼 장부·앱 시트가 이 id 로 만난다. */
+export function activityId(raw) { return `act-${idHash(canonUrl(raw))}`; }
+
 export default canonUrl;

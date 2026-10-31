@@ -5830,9 +5830,14 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
     AX.activityDocuments ? AX.activityDocuments(text) : null, ['참가신청서 1부 (붙임 서식)', '개인정보 수집·이용 동의서 1부', '작품 설명서 (자유 양식)']);
   eq('  절이 없으면 빈 배열(지어내지 않는다) · 빈 글자도', AX.activityDocuments ? [AX.activityDocuments('○ 응모 자격 : 대학생\n○ 접수 : 이메일'), AX.activityDocuments('')] : null, [[], []]);
   const cm = readText(new URL('../collector/collect.mjs', import.meta.url));
-  eq('② 수집 로봇 — 본문을 읽는 두 자리(새 글 · 소급 보강) 모두 서류 목록을 적고 · 없으면 칸을 지운다 · 활동 글 id 는 idFromUrl(\'act-\') 한 곳(발행 전 전부에 소급)',
+  eq('② 수집 로봇 — 본문을 읽는 두 자리(새 글 · 소급 보강) 모두 서류 목록을 적고 · 없으면 칸을 지운다 · 활동 글 id 는 canon-url activityId 한 곳(발행 전 전부에 소급 · 겹치면 뒤 글은 비운다)',
     [(cm.match(/putActivityDocuments\(it, activityDocuments\(detail\.text\)\)/g) || []).length, /function putActivityDocuments\(it, docs\) \{ if \(docs && docs\.length\) it\.documents = docs; else delete it\.documents; \}/.test(cm),
-      /acts\.items\.forEach\(\(n\) => \{ if \(!n\.id && n\.url\) n\.id = idFromUrl\('act-', n\.url\); \}\);/.test(cm), /import \{ canonUrl, idFromUrl \} from '\.\/canon-url\.mjs'/.test(cm)], [2, true, true, true]);
+      /if \(!n\.id && n\.url\) n\.id = activityId\(n\.url\);/.test(cm), /import \{ canonUrl, activityId \} from '\.\/canon-url\.mjs'/.test(cm), /if \(other && other !== n\.url\)[^\n]*delete n\.id/.test(cm)], [2, true, true, true, true]);
+  const CU = await import('../collector/canon-url.mjs');
+  const idA = CU.activityId('https://a.ac.kr/bbs/board.php?bo_table=notice&wr_id=1234'), idB = CU.activityId('https://b.ac.kr/bbs/board.php?bo_table=notice&wr_id=1234');
+  eq('  activityId 는 주소 전체의 지문 — 두 학교의 같은 게시판 경로가 다른 id 를 받는다(리뷰: idFromUrl 끝 24자 공식은 같은 id 였다) · 같은 주소는 늘 같은 id · act- 접두사',
+    [idA !== idB, idA === CU.activityId('https://a.ac.kr/bbs/board.php?bo_table=notice&wr_id=1234'), /^act-[0-9a-z]{7}$/.test(idA), CU.idFromUrl('act-', 'https://a.ac.kr/bbs/board.php?bo_table=notice&wr_id=1234') === CU.idFromUrl('act-', 'https://b.ac.kr/bbs/board.php?bo_table=notice&wr_id=1234')],
+    [true, true, true, true]);
   process.env.FORM_PDF_AS_LIB = '1';
   const FP = await import('../collector/form-pdf.mjs');
   const isApp = (a) => /신청서|지원서|원서|양식|서식/.test((a && a.name) || '') && /\.(hwp|hwpx|docx?|zip)/i.test((a && a.name) || '');
@@ -5853,7 +5858,7 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
   const appA = readText(new URL('../app.js', import.meta.url));
   const sheet = appA.slice(appA.indexOf('function openActivityDetail('), appA.indexOf('function activityRecruitHtml('));
   eq('④ 활동 시트 — 「제출 서류」 칸(documents 그대로 · esc) · 「신청서 양식」 칸은 장학과 같은 formPdfRowsHtml · 둘 다 없으면 칸이 없다 · 원본 첨부 칸은 그대로',
-    [/\(n\.documents \|\| \[\]\)\.length \? `\s*<h4>제출 서류<\/h4>/.test(sheet), /n\.documents\.map\(\(d\) => `<li>\$\{esc\(d\)\}<\/li>`\)/.test(sheet), /formPdfRowsHtml\(n\) \? `\s*<h4>신청서 양식/.test(sheet), /<h4>공고 원본 첨부<\/h4>/.test(sheet)], [true, true, true, true]);
+    [/\(n\.documents \|\| \[\]\)\.length \? `\s*<h4>제출 서류<\/h4>/.test(sheet), /n\.documents\.map\(\(d\) => `<li>\$\{esc\(d\)\}<\/li>`\)/.test(sheet), /const actPdfRows = formPdfRowsHtml\(n\);/.test(sheet) && /actPdfRows \? `\s*<h4>신청서 양식/.test(sheet), /<h4>공고 원본 첨부<\/h4>/.test(sheet)], [true, true, true, true]);
   const drv = readText(new URL('./verify-activities.js', import.meta.url));
   eq('  브라우저 드라이버가 두 칸을 잰다(가짜 색인 FORMS_PDF_FIXTURE · 글 id 열쇠)', [/FORMS_PDF_FIXTURE/.test(drv), /'act-fixture1'/.test(drv), /제출 서류 — 원문 글자 그대로/.test(drv), /신청서 양식 — 로봇이 바꿔 둔 원본 PDF/.test(drv)], [true, true, true, true]);
 }
@@ -12960,11 +12965,26 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
     const dfSrc = readText(new URL('../collector/deepfetch.mjs', import.meta.url));
     const body = dfSrc.slice(dfSrc.indexOf('async function downloadForms()'), dfSrc.indexOf('async function downloadEligDocs()'));
     eq('  받는 로봇(deepfetch downloadForms)이 이 목록을 표적 뒤 남는 자리에 넣고(MAX_NOTICES - 표적) · 쉼 장부 forms-tried.json 을 읽고 쓴다 · 등록분 제목(boardTitle 또는 name)으로 색인에 적어 PDF 로봇이 찾는다',
-      [/FP\.pickFormBacklog\(reg\.items \|\| \[\], rows, \{ today, isApplicationForm, tried, max: Math\.max\(0, MAX_NOTICES - capped\.length\) \}\)/.test(body),
-        /forms-tried\.json/.test(body), /title: it\.boardTitle \|\| it\.name, atts, regId: it\.id/.test(body), /if \(n\.regId\) \{ if \(fi === before\) tried\[n\.regId\] = today; else delete tried\[n\.regId\]; \}/.test(body)],
+      [/FP\.pickFormBacklog\(\[\.\.\.\(reg\.items \|\| \[\]\), \.\.\.FP\.loadActivities\(root\)\], rows, \{ today, isApplicationForm, tried, max: Math\.max\(0, MAX_NOTICES - capped\.length\) \}\)/.test(body),
+        /forms-tried\.json/.test(body), /title: it\.boardTitle \|\| it\.name \|\| it\.title, atts, regId: it\.id/.test(body),
+        /if \(n\.regId\) \{ if \(fi > before\) delete tried\[n\.regId\]; else if \(attempted && !budgetHit\) tried\[n\.regId\] = today; \}/.test(body)],
       [true, true, true, true]);
-    eq('  옛 파일은 그 공고에 닿았을 때만 갈아끼운다(표적만) — 미리 몽땅 지우던 줄(refreshing)이 없다 · 밀린 공고는 번호를 이어 덧붙인다',
-      [/refreshing/.test(body), /if \(!n\.regId\) \{\s*for \(const f of fs\.readdirSync\(OUT\)\) if \(f\.startsWith\(`form-\$\{slug\}-`\)\) fs\.unlinkSync/.test(body), /ai = Math\.max\(0, \.\.\.indexLines\.filter\(mine\)/.test(body)], [false, true, true]);
+    eq('  쉼 장부는 **시도했는데** 못 받았을 때만 — 예산에 잘려 시작도 못 한 공고는 적지 않는다(리뷰: 6분 예산·12건이면 늘 생기는 일) · 밀린 목록은 FORMS_BACKLOG=1 일 때만(심층 수집 워크플로 하나)',
+      [/budgetHit = true; break;/.test(body), /attempted = true;/.test(body), /process\.env\.FORMS_BACKLOG === '1'/.test(body)], [true, true, true]);
+    eq('  옛 파일은 **새 파일을 받은 뒤에만** 갈아끼운다(표적만 · fi > before) — 미리 몽땅 지우던 줄(refreshing)이 없다 · 새 번호는 옛 번호 뒤부터 · 밀린 줄엔 id 를 적는다',
+      [/refreshing/.test(body), /if \(!n\.regId && fi > before\) \{/.test(body), /let ai = Math\.max\(0, \.\.\.indexLines\.filter\(mine\)/.test(body), /n\.regId \? `\\t\$\{n\.regId\}` : ''/.test(body)], [false, true, true, true]);
+    const cs2 = readText(new URL('../.github/workflows/collect-scholarships.yml', import.meta.url)); const bc2 = readText(new URL('../.github/workflows/browser-collect.yml', import.meta.url));
+    eq('  FORMS_BACKLOG: \'1\' 은 deep-fetch.yml 에만 — 수집 로봇 둘(--forms-only · 다른 대기줄)은 표적만 받아 쉼 장부·색인을 동시에 쓰지 않는다',
+      [/FORMS_BACKLOG: '1'/.test(readText(new URL('../.github/workflows/deep-fetch.yml', import.meta.url))), /FORMS_BACKLOG/.test(cs2), /FORMS_BACKLOG/.test(bc2)], [true, false, false]);
+    /* 색인 다섯째 칸 id — 같은 제목의 두 학교 글이 한 원본을 나눠 쓰지 않는다 */
+    const rowsId = [{ file: 'form-s-1.hwp', title: '[공통] 2027년도 한국지도자육성장학재단 장학생 선발', attach: '지원서.hwp', bytes: 5, id: 'auto-a' },
+      { file: 'form-t-1.hwp', title: '[공통] 2027년도 한국지도자육성장학재단 장학생 선발', attach: '지원서.hwp', bytes: 6, id: '' }];
+    const twoSchools = [{ id: 'auto-a', name: '[공통] 2027년도 한국지도자육성장학재단 장학생 선발', deadline: '2026-12-01', attachments: [{ name: '지원서.hwp', url: 'u1' }] },
+      { id: 'auto-b', name: '[공통] 2027년도 한국지도자육성장학재단 장학생 선발', deadline: '2026-12-01', attachments: [{ name: '지원서.hwp', url: 'u2' }] }];
+    eq('  색인 줄의 다섯째 칸 id 를 읽는다 · id 가 적힌 줄은 그 공고에만 · id 없는 옛 줄은 제목으로(다른 학교 글이 같은 제목이어도 id 줄은 넘기지 않는다)',
+      [FP.parseFormsIndex ? FP.parseFormsIndex('form-a-1.hwp\tTITLE\t신청서.hwp\t12\tauto-x')[0].id : null,
+        FP.pickFormTargets ? FP.pickFormTargets(twoSchools, rowsId, { today: '2026-10-30', isApplicationForm: isApp }).targets.map((t) => [t.id, t.files[0].src]) : null],
+      ['auto-x', [['auto-a', 'form-s-1.hwp'], ['auto-b', 'form-t-1.hwp']]]);
     const dfy = readText(new URL('../.github/workflows/deep-fetch.yml', import.meta.url));
     eq('  예약 실행은 --forms-only 로 이 길을 매일 탄다 · 저장 목록에 collector/extracted(쉼 장부·색인이 거기 있다)', [/--forms-only/.test(dfy), /git add collector\/extracted/.test(dfy)], [true, true]);
   }

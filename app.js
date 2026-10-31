@@ -3631,6 +3631,7 @@ function openActivityDetail(url) {
   const notice = (n.noticeLines || []).filter((l) => !seenText.some((e) => noticeFlat(l).includes(e)));
   const eligRows = eligibilityRowsHtml(sch, result).replace(/<li class="r-unk">\? 지원 자격은 [^<]*<\/li>/g, '');   // '원문에서 확인' 한 줄뿐이면 빈 글자 → 칸을 접는다
   const recruitHtml = activityRecruitHtml(n, rows);
+  const actPdfRows = formPdfRowsHtml(n);   // 신청서 원본 PDF 줄(글 id 열쇠 · 없으면 빈 글자 → 칸이 없다)
   sheetBack = null;   // 이 시트에는 돌아갈 곳이 없다 — 내리면 닫힌다
   $('#detail-sheet').innerHTML = `
     <div class="sheet-handle"></div>
@@ -3668,9 +3669,9 @@ function openActivityDetail(url) {
       ${(n.documents || []).length ? `
       <h4>제출 서류</h4>
       <ul class="doc-list">${n.documents.map((d) => `<li>${esc(d)}</li>`).join('')}</ul>` : ''}
-      ${formPdfRowsHtml(n) ? `
+      ${actPdfRows ? `
       <h4>신청서 양식 <span class="channel-tag">공고 원본</span></h4>
-      <ul class="doc-list">${formPdfRowsHtml(n)}</ul>
+      <ul class="doc-list">${actPdfRows}</ul>
       <p class="dp-note">제출은 이 원본 양식으로 합니다 — 글자 하나 안 바꾼 사본입니다.</p>` : ''}
       ${(n.attachments || []).length ? `
       <h4>공고 원본 첨부</h4>
