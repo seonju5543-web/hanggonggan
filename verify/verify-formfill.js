@@ -72,30 +72,30 @@ const PROFILE = {
   const applyBtn = await page.$('#detail-sheet .btn-primary');
   eq('상세 시트에 「신청 준비 시작」 단추가 있다', /신청 준비/.test(applyBtn ? await applyBtn.textContent() : ''), true);
   await applyBtn.click();
-  await page.waitForSelector('.ff-slot', { timeout: 4000 });
+  await page.waitForSelector('.fill-slot', { timeout: 4000 });
   await page.waitForTimeout(1200);   // fields.json 도착
-  const slots = await page.$$eval('.ff-slot', (e) => e.map((x) => ({ file: x.dataset.file, hidden: x.hidden, btn: !!x.querySelector('.ff-open') })));
+  const slots = await page.$$eval('.fill-slot', (e) => e.map((x) => ({ file: x.dataset.file, hidden: x.hidden, btn: !!x.querySelector('.fill-open') })));
   eq('「원본 양식 그대로 보기」 줄마다 단추 자리가 있다', slots.length > 0, true);
   eq('🔴 빈칸을 찾은 파일에만 단추가 선다 (못 찾은 파일은 자리가 숨는다 — 칸을 지어내지 않는다)',
     slots.every((s) => (s.file.endsWith(target.rel) ? (!s.hidden && s.btn) : true)) && slots.filter((s) => !s.hidden).every((s) => s.btn), true);
-  const btnText = await page.$eval(`.ff-slot[data-file$="${target.rel}"] .ff-open`, (b) => b.textContent);
+  const btnText = await page.$eval(`.fill-slot[data-file$="${target.rel}"] .fill-open`, (b) => b.textContent);
   eq('  단추가 빈칸 수와 학적정보로 채울 수를 말한다', [new RegExp(`빈칸 ${target.n}개`).test(btnText), target.keyed ? new RegExp(`${target.keyed}개 먼저`).test(btnText) : true], [true, true]);
 
   console.log('\n■ ② 화면 — 쪽 그림 위 칸 · 학적정보로 먼저 채움');
-  await page.click(`.ff-slot[data-file$="${target.rel}"] .ff-open`);
+  await page.click(`.fill-slot[data-file$="${target.rel}"] .fill-open`);
   await page.waitForSelector('#screen-formfill:not([hidden])', { timeout: 4000 });
   await page.waitForTimeout(600);
   const scr = await page.evaluate(() => ({
-    pages: document.querySelectorAll('#ff-pages .ffp-page').length,
-    fields: document.querySelectorAll('#ff-pages .ffp-field').length,
-    list: document.querySelectorAll('#ff-list li').length,
-    imgs: [...document.querySelectorAll('#ff-pages img')].map((i) => i.getAttribute('src')),
+    pages: document.querySelectorAll('#fill-pages .fillp-page').length,
+    fields: document.querySelectorAll('#fill-pages .fillp-field').length,
+    list: document.querySelectorAll('#fill-list li').length,
+    imgs: [...document.querySelectorAll('#fill-pages img')].map((i) => i.getAttribute('src')),
     navHidden: document.querySelector('#bottom-nav').hidden,
     sheetOpen: document.querySelector('#detail-sheet').classList.contains('show'),
-    scale: getComputedStyle(document.querySelector('#ff-pages .ffp-page')).getPropertyValue('--ffpt').trim(),
-    byLabel: [...document.querySelectorAll('#ff-pages .ffp-field')].map((e) => [e.getAttribute('aria-label'), e.value]),
-    left: document.querySelector('#ff-left').textContent,
-    title: document.querySelector('#ff-title').textContent,
+    scale: getComputedStyle(document.querySelector('#fill-pages .fillp-page')).getPropertyValue('--ffpt').trim(),
+    byLabel: [...document.querySelectorAll('#fill-pages .fillp-field')].map((e) => [e.getAttribute('aria-label'), e.value]),
+    left: document.querySelector('#fill-left').textContent,
+    title: document.querySelector('#fill-title').textContent,
   }));
   eq('쪽 그림 수가 장부와 같다', scr.pages, target.pages);
   eq('칸 수가 장부와 같다 (그림 위 · 목록 둘 다)', [scr.fields, scr.list], [target.n, target.n]);
@@ -105,49 +105,49 @@ const PROFILE = {
   eq('  화면 머리에 공고 이름이 있다', scr.title.length > 0, true);
   const nameVals = scr.byLabel.filter(([l]) => l === '이름').map(([, v]) => v);
   if (target.labels.includes('이름')) eq('🔴 이름 칸은 학적정보 이름으로 먼저 채워진다', nameVals.every((v) => v === PROFILE.name), true);
-  const emptyKeyed = await page.evaluate(() => [...document.querySelectorAll('#ff-pages .ffp-field')].filter((e) => !e.value).length);
+  const emptyKeyed = await page.evaluate(() => [...document.querySelectorAll('#fill-pages .fillp-field')].filter((e) => !e.value).length);
   const leftN = Number((scr.left.match(/\d+/) || [0])[0]);
   eq('「남은 칸」 알약이 빈 칸 수를 말한다', scr.left.startsWith('남은 칸') ? leftN : (scr.left === '다 채웠어요' ? 0 : -1), emptyKeyed);
   eq('  학적정보에 없는 칸은 비워 둔다 — 지어내지 않는다', scr.byLabel.filter(([l]) => l === '주소').every(([, v]) => v === ''), true);
 
   console.log('\n■ ③ 목록에서 고치면 그림 위도 바뀐다 · 되돌리기 · 기기 장부');
-  const fid = await page.$eval('#ff-list .ff-pin', (e) => e.dataset.fid);
-  const before = await page.$eval(`#ff-pages .ffp-field[data-fid="${fid}"]`, (e) => e.value);
-  await page.fill('#ff-list .ff-pin', '홍길동');
+  const fid = await page.$eval('#fill-list .fill-pin', (e) => e.dataset.fid);
+  const before = await page.$eval(`#fill-pages .fillp-field[data-fid="${fid}"]`, (e) => e.value);
+  await page.fill('#fill-list .fill-pin', '홍길동');
   await page.waitForTimeout(400);
   const after = await page.evaluate((fid) => ({
-    over: document.querySelector(`#ff-pages .ffp-field[data-fid="${fid}"]`).value,
-    undo: !document.querySelector(`#ff-list .ff-undo[data-fid="${fid}"]`).hidden,
+    over: document.querySelector(`#fill-pages .fillp-field[data-fid="${fid}"]`).value,
+    undo: !document.querySelector(`#fill-list .fill-undo[data-fid="${fid}"]`).hidden,
     saved: (JSON.parse(localStorage.getItem('handaejang.v1')).formFills || {}),
   }), fid);
   eq('목록 칸을 고치면 그림 위 칸이 같은 값이 된다', after.over, '홍길동');
   eq('  자동으로 채운 값과 다르면 「되돌리기」가 뜬다', after.undo, true);
   eq('  기기 장부(state.formFills)에 공고·파일·칸으로 남는다', Object.values(after.saved).some((f) => f[fid] === '홍길동'), true);
-  await page.click(`#ff-list .ff-undo[data-fid="${fid}"]`);
+  await page.click(`#fill-list .fill-undo[data-fid="${fid}"]`);
   await page.waitForTimeout(300);
   eq('  되돌리면 학적정보 값으로 돌아오고 단추가 숨는다',
-    await page.evaluate((fid) => [document.querySelector(`#ff-pages .ffp-field[data-fid="${fid}"]`).value, document.querySelector(`#ff-list .ff-undo[data-fid="${fid}"]`).hidden], fid), [before, true]);
+    await page.evaluate((fid) => [document.querySelector(`#fill-pages .fillp-field[data-fid="${fid}"]`).value, document.querySelector(`#fill-list .fill-undo[data-fid="${fid}"]`).hidden], fid), [before, true]);
   /* 그림 위에서 고쳐도 목록이 따라온다 */
-  await page.fill(`#ff-pages .ffp-field[data-fid="${fid}"]`, '이한장');
+  await page.fill(`#fill-pages .fillp-field[data-fid="${fid}"]`, '이한장');
   await page.waitForTimeout(300);
-  eq('그림 위 칸을 고치면 목록 칸이 같은 값이 된다', await page.$eval(`#ff-list .ff-pin[data-fid="${fid}"]`, (e) => e.value), '이한장');
+  eq('그림 위 칸을 고치면 목록 칸이 같은 값이 된다', await page.$eval(`#fill-list .fill-pin[data-fid="${fid}"]`, (e) => e.value), '이한장');
 
   console.log('\n■ ④ 폰은 서랍 · 넓은 폭은 사이드바 · 인쇄는 쪽 그림만');
-  const drawer = await page.evaluate(() => { const p = document.querySelector('#ff-panel'); const r = p.getBoundingClientRect(); return { pos: getComputedStyle(p).position, open: p.classList.contains('open'), top: Math.round(r.top), vh: window.innerHeight, handle: getComputedStyle(document.querySelector('#ff-handle')).display }; });
+  const drawer = await page.evaluate(() => { const p = document.querySelector('#fill-panel'); const r = p.getBoundingClientRect(); return { pos: getComputedStyle(p).position, open: p.classList.contains('open'), top: Math.round(r.top), vh: window.innerHeight, handle: getComputedStyle(document.querySelector('#fill-handle')).display }; });
   eq('폰(390px)에서 칸 목록은 아래 서랍이다 (접힌 채 · 손잡이만 보인다)', [drawer.pos, drawer.open, drawer.handle !== 'none', drawer.top > drawer.vh * 0.8], ['fixed', false, true, true]);
-  await page.click('#ff-handle');
+  await page.click('#fill-handle');
   await page.waitForTimeout(400);
-  eq('  손잡이를 누르면 펼쳐진다', await page.evaluate(() => { const p = document.querySelector('#ff-panel'); return [p.classList.contains('open'), Math.round(p.getBoundingClientRect().top) < window.innerHeight * 0.6]; }), [true, true]);
+  eq('  손잡이를 누르면 펼쳐진다', await page.evaluate(() => { const p = document.querySelector('#fill-panel'); return [p.classList.contains('open'), Math.round(p.getBoundingClientRect().top) < window.innerHeight * 0.6]; }), [true, true]);
   await page.setViewportSize({ width: 1024, height: 900 });
   await page.waitForTimeout(400);
-  const wide = await page.evaluate(() => { const p = document.querySelector('#ff-panel').getBoundingClientRect(); const g = document.querySelector('#ff-pages').getBoundingClientRect(); return { side: p.left > g.left + g.width - 2, pos: getComputedStyle(document.querySelector('#ff-panel')).position, handle: getComputedStyle(document.querySelector('#ff-handle')).display }; });
+  const wide = await page.evaluate(() => { const p = document.querySelector('#fill-panel').getBoundingClientRect(); const g = document.querySelector('#fill-pages').getBoundingClientRect(); return { side: p.left > g.left + g.width - 2, pos: getComputedStyle(document.querySelector('#fill-panel')).position, handle: getComputedStyle(document.querySelector('#fill-handle')).display }; });
   eq('넓은 폭(1024px)에서는 오른쪽 사이드바다 (손잡이 없음)', [wide.side, wide.pos, wide.handle], [true, 'sticky', 'none']);
   const css = await page.evaluate(async () => (await (await fetch('style.css', { cache: 'no-store' })).text()));
   const printBlock = (css.match(/@media print \{[\s\S]*?\n\}/) || [''])[0];
-  eq('인쇄 CSS 가 쪽 그림만 남기고 쪽마다 넘긴다 (결정 4 · 브라우저 인쇄 → PDF)', [/ff-pages/.test(printBlock), /break-after: page/.test(printBlock), /#bottom-nav/.test(printBlock)], [true, true, true]);
-  eq('  「인쇄 · PDF 저장」 단추가 있다', await page.$eval('#btn-ff-print', (b) => b.textContent.trim()), '인쇄 · PDF 저장');
+  eq('인쇄 CSS 가 쪽 그림만 남기고 쪽마다 넘긴다 (결정 4 · 브라우저 인쇄 → PDF)', [/fill-pages/.test(printBlock), /break-after: page/.test(printBlock), /#bottom-nav/.test(printBlock)], [true, true, true]);
+  eq('  「인쇄 · PDF 저장」 단추가 있다', await page.$eval('#btn-fill-print', (b) => b.textContent.trim()), '인쇄 · PDF 저장');
   eq('  화면 어디에도 「신청 완료」라 적지 않는다 (운영 원칙 1)', /신청 완료|제출 완료/.test(await page.$eval('#screen-formfill', (e) => e.innerText)), false);
-  await page.click('#btn-ff-back');
+  await page.click('#btn-fill-back');
   await page.waitForTimeout(400);
   eq('뒤로 가면 양식 화면이 닫히고 아래 탭이 돌아온다', await page.evaluate(() => [document.querySelector('#screen-formfill').hidden, document.querySelector('#bottom-nav').hidden]), [true, false]);
 

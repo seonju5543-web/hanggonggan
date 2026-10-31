@@ -3,7 +3,7 @@
    ------------------------------------------------------------
    왜 — 앱이 양식을 다시 그리면 원본과 다른 문서가 된다(docs/designs/forms-links-cards.md 5단계 · 10-13 시안 확정 A + B/C).
         그래서 로봇(collector/form-fields.mjs)이 만든 **쪽 그림(WebP)** 위, 로봇이 찾은 **빈칸 자리**에 학생 답을 얹는다. 문서는 한 글자도 안 바뀐다.
-   화면 — 가운데 쪽 그림(#ff-pages · 칸은 쪽 크기에 대한 % 로 놓여 폭이 바뀌어도 제자리) + 칸 목록(#ff-panel):
+   화면 — 가운데 쪽 그림(#fill-pages · 칸은 쪽 크기에 대한 % 로 놓여 폭이 바뀌어도 제자리) + 칸 목록(#fill-panel):
           폰(좁은 폭)은 아래 서랍(B) · 넓은 폭은 오른쪽 사이드바(C). 목록 머리에 「남은 칸 n」 알약. 같은 칸은 그림 위와 목록이 한 값(두 곳 어디서 고쳐도 같이).
    채움 — 로봇이 key 를 매긴 칸(이름·학교·학과·학년·학번·생년월일·연락처·이메일·은행·계좌)은 학적정보로 먼저 채운다(ffAutoValue · 프로필은 기기 안에서만).
           key 가 없는 칸(가족 표 아래 칸·주소 등)은 비워 둔다 — 학생이 적는다. 자동으로 들어간 값을 고치면 「되돌리기」가 뜬다.
@@ -55,16 +55,16 @@ function ffFileEntry(fj, file) {
   return F && Array.isArray(F.fields) && F.fields.length && Array.isArray(F.pages) && F.pages.length ? { rel, F } : null;
 }
 
-/* 신청 준비 시트·지원문서 머리의 「원본 양식 그대로 보기」 줄 밑 자리(li.ff-slot)에 「양식 채우기」 단추를 붙인다 — 빈칸을 찾은 파일만 */
+/* 신청 준비 시트·지원문서 머리의 「원본 양식 그대로 보기」 줄 밑 자리(li.fill-slot)에 「양식 채우기」 단추를 붙인다 — 빈칸을 찾은 파일만 */
 function attachFormFillButtons(sch, root) {
-  const slots = [...(root || document).querySelectorAll('.ff-slot[data-file]')];
+  const slots = [...(root || document).querySelectorAll('.fill-slot[data-file]')];
   if (!slots.length || !sch) return;
   loadFormFields(sch).then((fj) => {
     for (const slot of slots) {
       const e = ffFileEntry(fj, slot.dataset.file);
       if (!e) { slot.hidden = true; continue; }
       const keyed = e.F.fields.filter((f) => f.key).length;
-      slot.innerHTML = `<button type="button" class="btn ff-open" data-id="${esc(sch.id)}" data-file="${esc(slot.dataset.file)}">양식 채우기<span class="ff-open-m">빈칸 ${e.F.fields.length}개${keyed ? ` · 학적정보로 ${keyed}개 먼저 채워요` : ''}</span></button>`;
+      slot.innerHTML = `<button type="button" class="btn fill-open" data-id="${esc(sch.id)}" data-file="${esc(slot.dataset.file)}">양식 채우기<span class="fill-open-m">빈칸 ${e.F.fields.length}개${keyed ? ` · 학적정보로 ${keyed}개 먼저 채워요` : ''}</span></button>`;
       slot.hidden = false;
     }
   });
@@ -84,24 +84,24 @@ function openFormFill(sch, file) {
   const saved = ffSaved(sch, rel);
   const pagesHtml = F.pages.map((pg) => {
     const fields = F.fields.filter((f) => f.page === pg.n);
-    return `<div class="ffp-page" data-page="${pg.n}" style="aspect-ratio:${pg.w}/${pg.h}" data-w="${pg.w}">
+    return `<div class="fillp-page" data-page="${pg.n}" style="aspect-ratio:${pg.w}/${pg.h}" data-w="${pg.w}">
       <img src="data/forms-pdf/${esc(sch.id)}/${esc(F.dir)}/${esc(pg.img)}" alt="${pg.n}쪽" loading="lazy">
-      ${fields.map((f) => `<input class="ffp-field${ffValueOf(f, saved) ? '' : ' ffp-empty'}" data-fid="${esc(f.id)}" aria-label="${esc(f.label)}" value="${esc(ffValueOf(f, saved))}" placeholder="${esc(f.label)}"
+      ${fields.map((f) => `<input class="fillp-field${ffValueOf(f, saved) ? '' : ' fillp-empty'}" data-fid="${esc(f.id)}" aria-label="${esc(f.label)}" value="${esc(ffValueOf(f, saved))}" placeholder="${esc(f.label)}"
         style="left:${ffPct(f.x, pg.w)};top:${ffPct(f.y, pg.h)};width:${ffPct(f.w, pg.w)};height:${ffPct(f.h, pg.h)}">`).join('')}
     </div>`;
   }).join('');
-  $('#ff-pages').innerHTML = pagesHtml;
-  $('#ff-title').textContent = sch.name;
-  $('#ff-file').textContent = F.pages.length === 1 ? rel.replace(/^\d+-/, '') : `${rel.replace(/^\d+-/, '')} · ${F.pages.length}쪽`;
-  $('#ff-list').innerHTML = F.fields.map((f) => `<li data-fid="${esc(f.id)}">
-      <label class="ff-lab">${esc(f.label)}<span class="ff-page-n">${f.page}쪽</span></label>
-      <input class="ff-pin" data-fid="${esc(f.id)}" value="${esc(ffValueOf(f, saved))}" placeholder="${f.key ? '학적정보에 없어요 — 적어 주세요' : '직접 적어요'}">
-      <button type="button" class="link-btn ff-undo" data-fid="${esc(f.id)}" hidden>되돌리기</button>
+  $('#fill-pages').innerHTML = pagesHtml;
+  $('#fill-title').textContent = sch.name;
+  $('#fill-file').textContent = F.pages.length === 1 ? rel.replace(/^\d+-/, '') : `${rel.replace(/^\d+-/, '')} · ${F.pages.length}쪽`;
+  $('#fill-list').innerHTML = F.fields.map((f) => `<li data-fid="${esc(f.id)}">
+      <label class="fill-lab">${esc(f.label)}<span class="fill-page-n">${f.page}쪽</span></label>
+      <input class="fill-pin" data-fid="${esc(f.id)}" value="${esc(ffValueOf(f, saved))}" placeholder="${f.key ? '학적정보에 없어요 — 적어 주세요' : '직접 적어요'}">
+      <button type="button" class="link-btn fill-undo" data-fid="${esc(f.id)}" hidden>되돌리기</button>
     </li>`).join('');
   ffRefresh();
   closeSheet();
   showScreen('formfill');
-  $('#ff-panel').classList.remove('open');
+  $('#fill-panel').classList.remove('open');
   ffScale();
   if (typeof appScrollTo === 'function') appScrollTo(0); else appScroller().scrollTop = 0;
 }
@@ -114,14 +114,14 @@ function ffRefresh() {
   for (const f of ffCur.F.fields) {
     const v = ffValueOf(f, saved);
     if (!v) left++;
-    const pin = $(`#ff-list [data-fid="${f.id}"] .ff-undo`);
+    const pin = $(`#fill-list [data-fid="${f.id}"] .fill-undo`);
     if (pin) pin.hidden = !(Object.prototype.hasOwnProperty.call(saved, f.id) && saved[f.id] !== ffAutoValue(f.key));
-    const el = $(`#ff-pages .ffp-field[data-fid="${f.id}"]`);
-    if (el) el.classList.toggle('ffp-empty', !v);
+    const el = $(`#fill-pages .fillp-field[data-fid="${f.id}"]`);
+    if (el) el.classList.toggle('fillp-empty', !v);
   }
-  $('#ff-left').textContent = left ? `남은 칸 ${left}` : '다 채웠어요';
-  $('#ff-left').classList.toggle('done', !left);
-  $('#ff-handle-n').textContent = left ? `남은 칸 ${left}` : '다 채웠어요';
+  $('#fill-left').textContent = left ? `남은 칸 ${left}` : '다 채웠어요';
+  $('#fill-left').classList.toggle('done', !left);
+  $('#fill-handle-n').textContent = left ? `남은 칸 ${left}` : '다 채웠어요';
 }
 
 function ffSet(fid, value, fromEl) {
@@ -149,7 +149,7 @@ function ffUndo(fid) {
 }
 /* 쪽 그림 폭에 맞춰 글자 크기를 — 1pt 가 화면에서 몇 px 인지 */
 function ffScale() {
-  for (const pg of $$('#ff-pages .ffp-page')) {
+  for (const pg of $$('#fill-pages .fillp-page')) {
     const w = Number(pg.dataset.w) || 595;
     pg.style.setProperty('--ffpt', `${pg.clientWidth / w}px`);
   }
@@ -158,27 +158,27 @@ function ffScale() {
 document.addEventListener('DOMContentLoaded', () => {
   if (!$('#screen-formfill')) return;
   document.addEventListener('click', (ev) => {
-    const open = ev.target.closest('.ff-open');
+    const open = ev.target.closest('.fill-open');
     if (open) {
       const sch = (typeof allScholarships === 'function' ? allScholarships() : []).find((s) => s.id === open.dataset.id);
       if (sch) loadFormFields(sch).then(() => openFormFill(sch, open.dataset.file));
       return;
     }
-    const undo = ev.target.closest('.ff-undo');
+    const undo = ev.target.closest('.fill-undo');
     if (undo) { ffUndo(undo.dataset.fid); return; }
-    const pin = ev.target.closest('#ff-list li');
+    const pin = ev.target.closest('#fill-list li');
     if (pin && !ev.target.closest('input') && ffCur) {
-      const el = $(`#ff-pages .ffp-field[data-fid="${pin.dataset.fid}"]`);
+      const el = $(`#fill-pages .fillp-field[data-fid="${pin.dataset.fid}"]`);
       if (el) { el.scrollIntoView({ block: 'center', behavior: 'smooth' }); el.focus({ preventScroll: true }); }
     }
   });
   document.addEventListener('input', (ev) => {
     const el = ev.target;
-    if (el && el.matches && el.matches('.ffp-field, .ff-pin')) ffSet(el.dataset.fid, el.value, el);
+    if (el && el.matches && el.matches('.fillp-field, .fill-pin')) ffSet(el.dataset.fid, el.value, el);
   });
-  $('#btn-ff-back').addEventListener('click', () => { const from = (ffCur && ffCur.from) || 'applications'; ffCur = null; showScreen(from === 'formfill' ? 'applications' : from, { back: true }); });
-  $('#btn-ff-print').addEventListener('click', () => window.print());
-  $('#ff-handle').addEventListener('click', () => $('#ff-panel').classList.toggle('open'));
-  if (typeof ResizeObserver !== 'undefined') new ResizeObserver(() => ffScale()).observe($('#ff-pages'));
+  $('#btn-fill-back').addEventListener('click', () => { const from = (ffCur && ffCur.from) || 'applications'; ffCur = null; showScreen(from === 'formfill' ? 'applications' : from, { back: true }); });
+  $('#btn-fill-print').addEventListener('click', () => window.print());
+  $('#fill-handle').addEventListener('click', () => $('#fill-panel').classList.toggle('open'));
+  if (typeof ResizeObserver !== 'undefined') new ResizeObserver(() => ffScale()).observe($('#fill-pages'));
   else window.addEventListener('resize', ffScale);
 });

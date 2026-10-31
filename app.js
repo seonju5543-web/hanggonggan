@@ -2977,8 +2977,8 @@ function attachRowHtml(a, { meta = '', go = '↓' } = {}) {
 function formPdfRowsHtml(sch) {
   return formPdfsFor(sch).map((f) => {
     const meta = `${f.pages ? `${f.pages}쪽 · ` : ''}${Math.max(1, Math.round((f.bytes || 0) / 1024))}KB · 글자 하나 안 바꾼 원본 사본${formPdfsFor(sch).length > 1 ? ` · ${f.name}` : ''}`;
-    /* 밑 자리(li.ff-slot)는 formfill.js attachFormFillButtons 가 빈칸을 찾은 파일에만 「양식 채우기」 단추로 채운다(시트·지원문서 머리 둘 다) */
-    return `<li class="att att-row att-row-new"><span class="att-ic att-ic-pdf">PDF</span><span class="att-t"><a href="${esc(`data/forms-pdf/${f.file}`)}" target="_blank" rel="noopener">원본 양식 그대로 보기</a><span class="att-m">${esc(meta)}</span></span><span class="att-go">열기 ›</span></li><li class="ff-slot" data-file="${esc(f.file)}" hidden></li>`;
+    /* 밑 자리(li.fill-slot)는 formfill.js attachFormFillButtons 가 빈칸을 찾은 파일에만 「양식 채우기」 단추로 채운다(시트·지원문서 머리 둘 다) */
+    return `<li class="att att-row att-row-new"><span class="att-ic att-ic-pdf">PDF</span><span class="att-t"><a href="${esc(`data/forms-pdf/${f.file}`)}" target="_blank" rel="noopener">원본 양식 그대로 보기</a><span class="att-m">${esc(meta)}</span></span><span class="att-go">열기 ›</span></li><li class="fill-slot" data-file="${esc(f.file)}" hidden></li>`;
   }).join('');
 }
 

@@ -1547,8 +1547,8 @@ console.log('\n■ 신청서 쪽 그림 · 빈칸 자리 — 이름표 옆·표 
   const html = readText(new URL('../index.html', import.meta.url));
   const css = readText(new URL('../style.css', import.meta.url));
   const sw = readText(new URL('../sw.js', import.meta.url));
-  eq('⑤ 앱 — 「원본 양식 그대로 보기」 줄마다 단추 자리(li.ff-slot)를 두고, 시트·지원문서 머리 둘 다 attachFormFillButtons 로 채운다',
-    [/class="ff-slot" data-file=/.test(app), (app.match(/attachFormFillButtons\(sch, /g) || []).length], [true, 2]);
+  eq('⑤ 앱 — 「원본 양식 그대로 보기」 줄마다 단추 자리(li.fill-slot)를 두고, 시트·지원문서 머리 둘 다 attachFormFillButtons 로 채운다',
+    [/class="fill-slot" data-file=/.test(app), (app.match(/attachFormFillButtons\(sch, /g) || []).length], [true, 2]);
   eq('  빈칸을 찾은 파일에만 단추 — 없으면 자리를 숨긴다(칸을 지어내지 않는다)', /if \(!e\) \{ slot\.hidden = true; continue; \}/.test(ff), true);
   eq('  학적정보 자동 채움은 프로필 칸에서만 · 없는 key 는 빈 글자', /case 'studentId': return c\.studentId \|\| '';/.test(ff) && /default: return '';/.test(ff), true);
   eq('  칸은 쪽 크기에 대한 % 로 놓인다 · 글자 크기는 --ffpt(쪽마다 계산)', /ffPct\(f\.x, pg\.w\)/.test(ff) && /setProperty\('--ffpt'/.test(ff) && /--ffpt: 1px;/.test(css) && /calc\(var\(--ffpt\) \* 9\.5\)/.test(css), true);
