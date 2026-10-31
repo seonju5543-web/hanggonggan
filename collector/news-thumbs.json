@@ -16096,15 +16096,6 @@
    "school": "성균관대학교",
    "none": "글에 그림이 없음"
   },
-  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367707&mode=view&no=381": {
-   "at": "2026-10-30",
-   "school": "이화여자대학교",
-   "file": "data/news/img/ab547139d917df2b.webp",
-   "src": "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEYUh5AKgJQMYC0BmAhbBBAYQEMAJAFzIFE88AjACwFUA6ABwDsBzIA",
-   "from": "body",
-   "v": 2,
-   "side": 360
-  },
   "url:https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53585&tpage=1": {
    "at": "2026-10-30",
    "school": "광운대학교",
@@ -16687,6 +16678,40 @@
    "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림))"
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367717&mode=view&no=373": {
+   "at": "2026-10-31",
+   "school": "이화여자대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367716&mode=view&no=372": {
+   "at": "2026-10-31",
+   "school": "이화여자대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367715&mode=view&no=371": {
+   "at": "2026-10-31",
+   "school": "이화여자대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367714&mode=view&no=370": {
+   "at": "2026-10-31",
+   "school": "이화여자대학교",
+   "file": "data/news/img/2c7e8240e0f3e3ca.webp",
+   "src": "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEYUhXAzgUwMYFUAOBrAjogcXgE9kAPAQQHtEAZADQBUA6AK02QHMg%20",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367707&mode=view&no=369": {
+   "at": "2026-10-31",
+   "school": "이화여자대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(같은 파일 · 1글))"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367684&mode=view&no=379": {
+   "at": "2026-10-31",
+   "school": "이화여자대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367643&mode=view&no=379": {
    "at": "2026-10-31",
    "school": "이화여자대학교",
    "none": "글에 그림이 없음"
@@ -20256,6 +20281,18 @@
    "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEYUgLAxgeQK7INIBsBKBrARQBkj5UB3ACXgCkAXVAOgAcA7AcyA": [
     "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367718&mode=view&no=385",
     "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367718&mode=view&no=374"
+   ],
+   "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEYUhXAzgUwMYFUAOBrAjogcXgE9kAPAQQHtEAZADQBUA6AK02QHMg%20": [
+    "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367714&mode=view&no=370"
+   ],
+   "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEYUhbA5gDwJ4GsCGyAqArAaQGMBJeAMQEUAhcgewFcBxAOjwAcBTRIA%20": [
+    "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367714&mode=view&no=370"
+   ],
+   "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEYUgJAbgSwI4EEDWBpALgUQCcBTAZwDFSBJAKwHkBVAcQAUA6GgB2IHMg": [
+    "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367714&mode=view&no=370"
+   ],
+   "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEYUh5AKgJQMYC0BmAhbBBAYQEMAJAFzIFE88AjACwFUA6ABwDsBzIA": [
+    "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367707&mode=view&no=369"
    ]
   },
   "충북대학교": {
@@ -20428,7 +20465,8 @@
    "data/news/img/5e566745b3eed2b0.webp",
    "data/news/img/3439d588f916f25e.webp",
    "data/news/img/bd083660ad4ea492.webp",
-   "data/news/img/396c12931790b36e.webp"
+   "data/news/img/396c12931790b36e.webp",
+   "data/news/img/ab547139d917df2b.webp"
   ],
   "한국외국어대학교": [
    "data/news/img/b8b2dc37a92ecd6e.webp"
