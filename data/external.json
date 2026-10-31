@@ -1,6 +1,16 @@
 {
- "updatedAt": "2026-10-30",
+ "updatedAt": "2026-10-31",
  "items": [
+  {
+   "title": "대학등록금은 국가장학금으로! 국가장학금 신청",
+   "url": "https://www.kosaf.go.kr/ko/main.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "",
+   "campus": "",
+   "host": "(재)진천군장학회",
+   "foundAt": "2026-10-31"
+  },
   {
    "title": "2026년 (재)거창군장학회 장학생 선발 공고",
    "url": "https://gcdream.kr/bbs/board.php?bo_table=scholaship&wr_id=18",
@@ -28,17 +38,6 @@
    "attachments": [],
    "deadlineHint": "제출 기한 : ~ 2026. 11. 6. (금) 까지 ※ 기한 내 소명자료 미제출 시 ‘26년 12월부터 최대 3개월 장학금 지급이 유예되며,",
    "deadline": "2026-11-06",
-   "school": "",
-   "campus": "",
-   "host": "한국장학재단 공지",
-   "foundAt": "2026-10-23"
-  },
-  {
-   "title": "2026년 2학기 국가근로장학금 추가 신청기간 운영 안내",
-   "url": "https://www.kosaf.go.kr/ko/notice.do?mode=view&searchStr=&searchType=&page=1&ctgrId1=&ctgrId2=&seqNo=21411",
-   "attachments": [],
-   "deadlineHint": "신청기간) 2026. 10. 21.(수) 09:00 ~ 10. 29.(목) 18:00 □ (신청방법) 한국장학재단 홈페이지 및 모바일 앱 ※ 붙",
-   "deadline": "2026-10-29",
    "school": "",
    "campus": "",
    "host": "한국장학재단 공지",

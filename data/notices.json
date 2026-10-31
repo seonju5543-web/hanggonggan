@@ -1,6 +1,30 @@
 {
- "updatedAt": "2026-10-30",
+ "updatedAt": "2026-10-31",
  "items": [
+  {
+   "title": "[학부] 2027년도 두산연강재단 장학생 선발 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367473&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "1. 2027년도 두산연강재단 장학생 선발 공고문.pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367473&attachNo=353578"
+    },
+    {
+     "name": "2. 자주 묻는 질문(Q&amp;A).pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367473&attachNo=353579"
+    },
+    {
+     "name": "3. 추천서(재단 양식).docx",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367473&attachNo=353580"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-10-31",
+   "bodyDeadline": "2026-11-13",
+   "bodyDeadlineText": "2026.11.13"
+  },
   {
    "title": "2026-2학기 주거안정장학금 지급요청서(10월분) 제출 안내(~11/8(일)까지)",
    "url": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766809",
@@ -534,7 +558,7 @@
      "url": "https://kau.ac.kr/upfile/2026/10/29/20261029052706-8d7e.hwpx"
     }
    ],
-   "deadlineHint": "신청 기간: 11. 10.(화) 10:00 ~ 11. 11.(수) 17:00 2026년도 통영시 저소득 대학생 장학금 지원대상자 선발 안내 작성",
+   "deadlineHint": "신청기간 : 2026. 11. 2.( 월 ) ~ 11. 23.( 월 ) 2. 신청방법 : 방문 또는 우편접수 ( 제출처 : 통영시 평생교육과 평",
    "school": "한국항공대학교",
    "campus": "",
    "foundAt": "2026-10-29",
@@ -817,7 +841,7 @@
    "title": "[입학에서 취업까지] [교내] 2026-2 11월 장학사정관장학금 신청 안내[신청",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626879&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888",
    "attachments": [],
-   "deadlineHint": "신청기간 2026.11.01(일)~08(일)] 2026년 10월 29일 09시 15분 59초 [교내] 2026-2 11월 장학사정관장학금 신청",
+   "deadlineHint": null,
    "school": "경기대학교",
    "campus": "",
    "foundAt": "2026-10-29"
@@ -4277,24 +4301,6 @@
     {
      "name": "[한국고등교육재단] 인재림 제7기 장학생 선발 모집 요강.docx",
      "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367479&attachNo=353588"
-    }
-   ],
-   "deadlineHint": null,
-   "school": "이화여자대학교",
-   "campus": "",
-   "foundAt": "2026-10-23"
-  },
-  {
-   "title": "[학부] 2026년 2학기 거창군 지역출신 대학생 등록금 장학금 신청 안내",
-   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367476&article.offset=0&articleLimit=10",
-   "attachments": [
-    {
-     "name": "공고문_2026년 2학기 거창군 지역출신 대학생 등록금 지원사업.pdf",
-     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367476&attachNo=353584"
-    },
-    {
-     "name": "신청서 서식.hwpx",
-     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367476&attachNo=353585"
     }
    ],
    "deadlineHint": null,
