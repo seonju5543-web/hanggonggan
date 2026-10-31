@@ -191,8 +191,8 @@
   "from": "브라우저 본문"
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53441&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-10-24",
-  "tries": 0
+  "at": "2026-10-31",
+  "tries": 1
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/520896": {
   "at": "2026-10-23",
@@ -233,16 +233,21 @@
   "tries": 1
  },
  "https://www.youthcenter.go.kr/bbs03View/48/10840": {
-  "at": "2026-10-24",
-  "tries": 0
+  "at": "2026-10-31",
+  "tries": 1
  },
  "https://youth.seoul.go.kr/content.do?key=2310100012": {
-  "at": "2026-10-24",
-  "tries": 0
+  "at": "2026-10-31",
+  "tries": 1,
+  "lines": [
+   "지원대상 : 18 ~ 34세 서울시 거주 청년 270명"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/269599/artclView.do": {
-  "at": "2026-10-24",
-  "tries": 0
+  "at": "2026-10-31",
+  "tries": 1
  },
  "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179494": {
   "at": "2026-10-24",
@@ -366,6 +371,50 @@
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/270425/artclView.do": {
   "at": "2026-10-30",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3491145": {
+  "at": "2026-10-31",
+  "tries": 1,
+  "lines": [
+   "신청대상 : 성인",
+   "시간인증",
+   "오프라인",
+   "신청대상 : 성인·청소년"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3491147": {
+  "at": "2026-10-31",
+  "tries": 1,
+  "lines": [
+   "신청대상 : 성인",
+   "시간인증",
+   "오프라인",
+   "신청대상 : 성인·청소년"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3498654": {
+  "at": "2026-10-31",
+  "tries": 1,
+  "lines": [
+   "신청대상 : 성인",
+   "시간인증",
+   "오프라인",
+   "신청대상 : 성인·청소년"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3500085": {
+  "at": "2026-10-31",
+  "tries": 1
+ },
+ "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156787394&pWise=sub&pWiseSub=C3": {
+  "at": "2026-10-31",
   "tries": 1
  }
 }

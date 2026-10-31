@@ -21075,7 +21075,13 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-31 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "본문이미지-1122x1587.png",
+     "url": "https://www.khu.ac.kr/upload/cross/images/000069/20261026103411243_MC08CIPX.png",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323404",
    "sourceKind": "auto"
   }
