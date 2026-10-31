@@ -5921,6 +5921,10 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
   const sheet = appA.slice(appA.indexOf('function openActivityDetail('), appA.indexOf('function activityRecruitHtml('));
   eq('④ 활동 시트 — 「제출 서류」 칸(documents 그대로 · esc) · 「신청서 양식」 칸은 장학과 같은 formPdfRowsHtml · 둘 다 없으면 칸이 없다 · 원본 첨부 칸은 그대로',
     [/\(n\.documents \|\| \[\]\)\.length \? `\s*<h4>제출 서류<\/h4>/.test(sheet), /n\.documents\.map\(\(d\) => `<li>\$\{esc\(d\)\}<\/li>`\)/.test(sheet), /const actPdfRows = formPdfRowsHtml\(n\);/.test(sheet) && /actPdfRows \? `\s*<h4>신청서 양식/.test(sheet), /<h4>공고 원본 첨부<\/h4>/.test(sheet)], [true, true, true, true]);
+  const ffSrc = readText(new URL('../formfill.js', import.meta.url));
+  eq('  「양식 채우기」 — 활동 시트가 빈칸 단추를 붙이고(attachFormFillButtons · 글 id·이름만 든 activityFillTarget) · 단추는 fillTargetFor 로 장학 먼저, 없으면 활동 글을 찾는다 (2026-10-31)',
+    [/attachFormFillButtons\(activityFillTarget\(n\), \$\('#detail-sheet'\)\)/.test(sheet), /function fillTargetFor\(id\) \{[\s\S]*?allScholarships\(\)\.find[\s\S]*?activityFillTarget\(/.test(appA),
+      /typeof fillTargetFor === 'function' \? fillTargetFor\(open\.dataset\.id\)/.test(ffSrc)], [true, true, true]);
   const drv = readText(new URL('./verify-activities.js', import.meta.url));
   eq('  브라우저 드라이버가 두 칸을 잰다(가짜 색인 FORMS_PDF_FIXTURE · 글 id 열쇠)', [/FORMS_PDF_FIXTURE/.test(drv), /'act-fixture1'/.test(drv), /제출 서류 — 원문 글자 그대로/.test(drv), /신청서 양식 — 로봇이 바꿔 둔 원본 PDF/.test(drv)], [true, true, true, true]);
 }

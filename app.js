@@ -260,6 +260,14 @@ const isActivityId = (id) => String(id || '').startsWith('act:');
 function findActivity(url) {
   return ((liveActivities && liveActivities.items) || []).find((x) => x && x.url === url) || null;
 }
+/* 「양식 채우기」(formfill.js)가 여는 대상 — 장학(allScholarships)이 먼저, 없으면 활동 글(2026-10-31 · 공모전 참가신청서).
+   활동 글은 신청서 원본 PDF·빈칸 장부가 글 id(collector activityId)에 붙는다 — 화면은 id·이름만 쓴다(장학 엔진 모양 activityAsSch 와 다르다: 그쪽 id 는 act:주소). */
+function activityFillTarget(n) { return n && n.id ? { id: n.id, name: activityTitle(n), activity: true } : null; }
+function fillTargetFor(id) {
+  const s = allScholarships().find((x) => x.id === id);
+  if (s) return s;
+  return activityFillTarget(((liveActivities && liveActivities.items) || []).find((x) => x && x.id === id));
+}
 /* 활동 글 원본(피드 모양) — 피드에 있으면 그것, 없으면 저장할 때 떠 둔 사본 */
 function activityItem(url) {
   const live = findActivity(url);
@@ -3703,6 +3711,8 @@ function openActivityDetail(url) {
       ${activityLinkHtml(n)}
     </div>`;
   openSheetShell();
+  /* 빈칸을 찾은 신청서 PDF 에만 「양식 채우기」(장학 시트와 같은 formfill.js · 2026-10-31 공동개발자 "공모전 신청 양식이 매우 미흡") */
+  if (actPdfRows && typeof attachFormFillButtons === 'function') attachFormFillButtons(activityFillTarget(n), $('#detail-sheet'));
   eligAskWire(sch, () => openActivityDetail(url));   // 묻기 상자 배선 — 다시 그릴 때 이 시트로 돌아온다
 }
 /* 활동 시트 「모집 안내」 본문 — 발췌 줄이 있으면 그것, 없으면 기간 한 토막(deadlineHint), 둘 다 없으면 빈 글자(칸을 접는다) */

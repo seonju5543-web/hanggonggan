@@ -50,6 +50,9 @@ const FIXTURE = {
 
 /* 신청서 원본 PDF 색인(data/forms-pdf/index.json) — 활동 글의 열쇠는 글 id · 장학 등록분과 같은 로봇·같은 색인 */
 const FORMS_PDF_FIXTURE = { updatedAt: '2026-10-30', items: { 'act-fixture1': [{ file: 'act-fixture1/1-form.pdf', name: '참가신청서.hwp', pages: 2, bytes: 20480, from: '원본 그대로 변환' }] } };
+/* 그 PDF 의 빈칸 장부(collector/form-fields.mjs 가 만드는 꼴) — 활동 글도 같은 로봇·같은 장부(2026-10-31). 학교 칸은 학적정보로 먼저 채워진다 */
+const FIELDS_FIXTURE = { updatedAt: '2026-10-31', files: { '1-form.pdf': { dir: '1-pages', pages: [{ n: 1, w: 595, h: 842, img: '1.webp' }],
+  fields: [{ id: 'f1', page: 1, x: 100, y: 120, w: 220, h: 20, label: '소속 학교', key: 'school' }, { id: 'f2', page: 1, x: 100, y: 160, w: 220, h: 20, label: '참가 분야' }] } } };
 
 const EXT_FIXTURE = {
   updatedAt: '2026-09-26',
@@ -87,6 +90,7 @@ async function fresh(browser, mode, ext = EXT_FIXTURE, profile = PROFILE) {
     ? route.abort()
     : route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(ext) })));
   await page.route('**/data/forms-pdf/index.json*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(FORMS_PDF_FIXTURE) }));
+  await page.route('**/data/forms-pdf/act-fixture1/fields.json*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(FIELDS_FIXTURE) }));
   await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(1200);
   await dismissNotify(page);
@@ -179,6 +183,19 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
       const h = [...e.querySelectorAll('h4')].find((x) => x.textContent.trim() === '공고 원본 첨부');
       return h ? h.nextElementSibling.querySelectorAll('li').length : 0;
     }), 1);
+    /* 「양식 채우기」(2026-10-31) — 빈칸 장부가 있는 활동 글 PDF 에도 장학 시트와 같은 단추가 서고, 누르면 같은 화면(formfill.js)이 그 글 이름으로 열린다 */
+    await page.waitForSelector('#detail-sheet .fill-open', { timeout: 4000 }).catch(() => {});
+    eq('⑤ 양식 채우기 — 빈칸을 찾은 활동 글 PDF 밑에 단추(빈칸 수 · 학적정보로 먼저 채울 수)', await page.$eval('#detail-sheet', (e) => {
+      const b = e.querySelector('.fill-open');
+      return b ? [b.dataset.id, /빈칸 2개/.test(b.textContent), /학적정보로 1개/.test(b.textContent)] : null;
+    }), ['act-fixture1', true, true]);
+    await page.click('#detail-sheet .fill-open'); await page.waitForTimeout(600);
+    eq('⑤ 누르면 양식 채우기 화면이 그 글 이름으로 열리고 · 학교 칸이 학적정보로 채워져 있고 · 남은 칸 1',
+      await page.evaluate(() => [!document.querySelector('#screen-formfill').hidden, document.querySelector('#fill-title').textContent.trim(),
+        (document.querySelector('#fill-pages .fillp-field[data-fid="f1"]') || {}).value, document.querySelector('#fill-left').textContent.trim()]),
+      [true, '2026 대학생 해외봉사단 모집', '한국외국어대학교', '남은 칸 1']);
+    await page.click('#btn-fill-back'); await page.waitForTimeout(500);
+    eq('⑤ 돌아가기는 대외활동 화면으로', await page.$$eval('.screen', (sc) => sc.filter((x) => !x.hidden).map((x) => x.id)), ['screen-activities']);
     eq('⑤ 원문 단추는 그 글 주소를 새 탭으로', await page.$eval('#detail-sheet a.btn-primary', (a) => [a.getAttribute('href'), a.target, a.textContent.trim()]), ['https://dep.hufs.ac.kr/bbs/x/1', '_blank', '원문 공고 ↗']);   // 2026-10-19 개발자: "자세한 공고는 원문 공고에서 확인하라 하면서 … 원문공고 하이퍼링크"
     eq('⑤ 단추 글자에 밑줄이 없다', await page.$eval('#detail-sheet a.btn-primary', (a) => getComputedStyle(a).textDecorationLine), 'none');
     await page.keyboard.press('Escape'); await page.waitForTimeout(500);
