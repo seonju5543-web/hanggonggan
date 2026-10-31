@@ -89,6 +89,13 @@ export function publishMajorsBySchool(bySchool, opts = {}) {
        폴더 부분만 떼어 쓴다(이름 규칙을 여기서 다시 쓰지 않는다). */
     const file = ME.majorsFileFor(key).split('/').pop();
     const doc = { school: key, updatedAt, majors };
+    /* 학교 소재 시·도 (2026-10-31) — 로봇이 커리어넷 개설 지역에서 모은 것. 앱은 프로필 schoolRegion 에 적고 엔진이 「○○시 소재 대학」 줄을 ✓/모름으로 본다 */
+    if (!Array.isArray(val) && val && Array.isArray(val.region) && val.region.length) doc.region = val.region;
+    if (!Array.isArray(val) && val && val.campusRegion && Object.keys(val.campusRegion).length) {
+      const allowed = new Set(appCampuses.get(key) || []);
+      const cr = Object.fromEntries(Object.entries(val.campusRegion).filter(([c]) => allowed.has(c)));
+      if (Object.keys(cr).length) doc.campusRegion = cr;
+    }
     /* 캠퍼스별 목록 — 앱이 아는 캠퍼스 이름만 · 그 학교 학과 목록 안에 있는 이름만 · 둘 이상일 때만 싣는다
        (하나뿐이면 학교 전체 목록과 같은 말이라 자리를 안 만든다 — 앱은 없으면 전체 목록을 쓴다) */
     const camps = !Array.isArray(val) && val && val.campuses ? val.campuses : null;
@@ -126,7 +133,7 @@ export function republishFromLedger(ledgerUrl = new URL('../data/majors.json', i
   const ledger = JSON.parse(fs.readFileSync(ledgerUrl, 'utf8'));
   const bySchool = {};
   for (const [school, majors] of Object.entries(ledger.bySchool || {})) {
-    bySchool[school] = { majors, campuses: (ledger.campuses || {})[school] || null };
+    bySchool[school] = { majors, campuses: (ledger.campuses || {})[school] || null, ...((ledger.regions || {})[school] || {}) };
   }
   const pub = publishMajorsBySchool(bySchool, { updatedAt: ledger.updatedAt, ...opts });
   /* 장부의 이름도 같은 규칙으로 정리해 둔다 — 장부와 파일이 다른 이름을 갖지 않게 */

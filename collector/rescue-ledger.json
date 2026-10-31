@@ -574,5 +574,11 @@
   "at": "2026-10-31",
   "tries": 0,
   "name": "2026년도 2학기 국가근로장학금 동계방학 집중근로(교외) 신청 안내"
+ },
+ "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323404&menuno=200318": {
+  "tries": 1,
+  "at": "2026-11-01",
+  "minBody": 100,
+  "name": "공통 세아해암학술장학재단 제1회 차세대 공학연구자 Alumni 심포지엄 2026 신청 안내"
  }
 }

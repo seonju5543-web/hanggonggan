@@ -1500,6 +1500,68 @@ console.log('\n■ 제출 서류 목록 — 원문의 「제출서류」 절을 
 }
 
 /* 2026-10-13 ② — 공고문 뒷장 서식 쪽. 신청서가 따로 첨부되지 않은 공고라도 공고문 PDF 뒷장에 「별지」 서식이 붙는다(층2 재단 37곳) — 아무도 꺼내지 않았다. */
+console.log('\n■ 신청서 쪽 그림 · 빈칸 자리 — 이름표 옆·표 칸으로 빈칸을 찾고 지어내지 않는다 (2026-10-31 · 양식 5단계)');
+/* 로봇 collector/form-fields.mjs 는 원본 PDF 사본의 쪽 그림(WebP)과 이름표 옆 빈칸 자리(fields.json)를 만든다 — 앱 formfill.js 가 그 위에 답을 얹는다.
+   관문은 순수 함수(bbox 읽기 · 이름표 사전 · 빈칸 찾기)를 가짜 줄·선으로 재고, 앱 배선 글자를 본다. 🔴 FORM_FIELDS_AS_LIB=1 이 아니면 불러오는 순간 본편이 돈다. */
+{
+  process.env.FORM_FIELDS_AS_LIB = '1';
+  const FF = await import('../collector/form-fields.mjs').catch(() => ({}));
+  eq('로봇을 불러왔다 (parseBbox · labelOf · detectFields)', ['parseBbox', 'labelOf', 'detectFields'].every((k) => typeof FF[k] === 'function'), true);
+  if (FF.parseBbox) {
+    const xml = `<page width="595.2" height="841.8">
+      <line xMin="87.2" yMin="172.5" xMax="110.7" yMax="184.0"><word xMin="87.2" yMin="172.5" xMax="96.6" yMax="184.0">대</word><word xMin="101.3" yMin="172.5" xMax="110.7" yMax="184.0">학</word></line>
+      <line xMin="323.8" yMin="172.5" xMax="347.3" yMax="184.0"><word xMin="323.8" yMin="172.5" xMax="347.3" yMax="184.0">학과</word></line>
+      <line xMin="87.2" yMin="199.5" xMax="110.7" yMax="211.0"><word xMin="87.2" yMin="199.5" xMax="110.7" yMax="211.0">학번</word></line>
+      <line xMin="323.8" yMin="199.5" xMax="347.3" yMax="211.0"><word xMin="323.8" yMin="199.5" xMax="347.3" yMax="211.0">이름</word></line>
+      <line xMin="60" yMin="330" xMax="400" yMax="341"><word xMin="60" yMin="330" xMax="400" yMax="341">본인의 이름 등 인적 사항은 기재를 금함</word></line>
+      <line xMin="146.8" yMin="262.7" xMax="165.6" yMax="274.2"><word xMin="146.8" yMin="262.7" xMax="165.6" yMax="274.2">성명</word></line>
+      <line xMin="219.4" yMin="262.7" xMax="257.3" yMax="274.2"><word xMin="219.4" yMin="262.7" xMax="257.3" yMax="274.2">생년월일</word></line>
+      <line xMin="389.1" yMin="262.7" xMax="426.9" yMax="274.2"><word xMin="389.1" yMin="262.7" xMax="426.9" yMax="274.2">졸업사항</word></line>
+    </page>`;
+    const pages = FF.parseBbox(xml);
+    eq('① bbox XML 을 쪽·줄·낱말로 읽는다 (낱말이 띄어진 「대 학」도 한 줄)', [pages.length, pages[0].lines.length, pages[0].lines[0].text], [1, 8, '대 학']);
+    eq('② 이름표 사전 — 띄어쓰기·콜론을 걷고 본다 · 문장은 이름표가 아니다 · 프로필 칸 이름을 돌려준다',
+      [FF.labelOf('대 학').key, FF.labelOf('이 름 :').key, FF.labelOf('학부(과), 전공').key, FF.labelOf('학번').key, FF.labelOf('본인의 이름 등 인적 사항은 기재를 금함'), FF.labelOf('주소').key],
+      ['school', 'name', 'major', 'studentId', null, null]);
+    /* 선 없이 — 같은 줄의 다음 낱말 앞까지 · 사전 이름표가 셋 나란하면 머리글 */
+    const noRule = FF.detectFields(pages[0], 1);
+    eq('③ 선이 없으면 이름표 오른쪽부터 같은 줄의 다음 낱말 앞까지 (대학 → 학과 앞 · 이름 → 오른쪽 여백까지)',
+      (() => { const sch = noRule.fields.find((f) => f.label === '학교'); const nm = noRule.fields.find((f) => f.label === '이름' && f.y < 210);
+        return [sch && sch.x > 110 && sch.x + sch.w < 324, nm && nm.x > 347, noRule.fields.some((f) => f.label === '학번' && f.key === 'studentId')]; })(), [true, true, true]);
+    eq('  문장 줄은 빈칸이 되지 않는다', noRule.fields.filter((f) => f.y > 320 && f.y < 350).length, 0);
+    eq('  사전 이름표가 셋 나란한 줄은 머리글로 보고 건너뛴다(성명·생년월일 + 졸업사항은 사전 밖이라 둘뿐 → 머리글 아님)', noRule.headerRows, 0);
+    /* 표의 선이 있을 때 — 오른쪽 칸이 비면 빈칸 · 오른쪽에 글자가 있고 아래 칸이 비면 머리글(아래 칸 · key null) */
+    const rules = { h: [[168, 60, 560], [190, 60, 560], [217, 60, 560], [258, 60, 560], [277, 60, 560], [305, 60, 560]],
+      v: [[60, 168, 305], [120, 168, 217], [300, 168, 217], [360, 168, 217], [560, 168, 305], [140, 258, 305], [210, 258, 305], [370, 258, 305]] };
+    const ruled = FF.detectFields(pages[0], 1, rules);
+    const school = ruled.fields.find((f) => f.label === '학교'); const name1 = ruled.fields.find((f) => f.label === '이름' && f.key === 'name');
+    eq('④ 표의 선이 있으면 이름표 칸의 **오른쪽 칸**이 빈칸이다 (대학 → 120~300 칸 · 이름 → 360~560 칸)',
+      [school && Math.round(school.x), school && Math.round(school.x + school.w), name1 && Math.round(name1.x), name1 && Math.round(name1.x + name1.w)], [123, 297, 363, 557]);
+    const famName = ruled.fields.find((f) => f.label === '이름' && f.key === null); const famBirth = ruled.fields.find((f) => f.label === '생년월일');
+    eq('🔴 오른쪽 칸에 글자가 있고 아래 칸이 비면 표 머리글 — 아래 칸이 빈칸이되 key 는 null (가족 표의 성명에 학생 이름을 넣으면 틀린 값)',
+      [!!famName, famName && famName.y > 277, famBirth && famBirth.key, ruled.below], [true, true, null, 2]);
+    /* red-green: 머리글 아래 칸에 key 를 붙이면 ↑ 가 빨간불 · 오른쪽 칸 규칙을 지우면 ④ 가 빨간불 (2026-10-31 확인) */
+  }
+  const app = readText(new URL('../app.js', import.meta.url));
+  const ff = readText(new URL('../formfill.js', import.meta.url));
+  const html = readText(new URL('../index.html', import.meta.url));
+  const css = readText(new URL('../style.css', import.meta.url));
+  const sw = readText(new URL('../sw.js', import.meta.url));
+  eq('⑤ 앱 — 「원본 양식 그대로 보기」 줄마다 단추 자리(li.fill-slot)를 두고, 시트·지원문서 머리 둘 다 attachFormFillButtons 로 채운다',
+    [/class="fill-slot" data-file=/.test(app), (app.match(/attachFormFillButtons\(sch, /g) || []).length], [true, 2]);
+  eq('  빈칸을 찾은 파일에만 단추 — 없으면 자리를 숨긴다(칸을 지어내지 않는다)', /if \(!e\) \{ slot\.hidden = true; continue; \}/.test(ff), true);
+  eq('  학적정보 자동 채움은 프로필 칸에서만 · 없는 key 는 빈 글자', /case 'studentId': return c\.studentId \|\| '';/.test(ff) && /default: return '';/.test(ff), true);
+  eq('  칸은 쪽 크기에 대한 % 로 놓인다 · 글자 크기는 --ffpt(쪽마다 계산)', /ffPct\(f\.x, pg\.w\)/.test(ff) && /setProperty\('--ffpt'/.test(ff) && /--ffpt: 1px;/.test(css) && /calc\(var\(--ffpt\) \* 9\.5\)/.test(css), true);
+  eq('  화면이 showScreen 목록·안쪽 화면 목록에 있고 아래 탭을 숨긴다', /'perms', 'formfill'\]\.forEach/.test(app) && /'perms', 'formfill'\];/.test(app) && /name === 'onboarding' \|\| name === 'formfill'/.test(app), true);
+  eq('  index.html 에 화면 틀이 있고 formfill.js 를 app.js 뒤에 싣는다 · 서비스워커가 미리 담는다',
+    [/id="screen-formfill"/.test(html), html.indexOf('src="app.js"') < html.indexOf('src="formfill.js"'), /'formfill\.js'/.test(sw)], [true, true, true]);
+  eq('  인쇄 CSS 는 쪽 그림만 남기고 쪽마다 넘긴다 (결정 4) · 화면 글자에 「신청 완료」가 없다(주석은 뺀다)',
+    /@media print \{[\s\S]*?break-after: page/.test(css) && !/신청 완료|제출 완료/.test(ff.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '')) && !/신청 완료|제출 완료/.test((html.match(/<section id="screen-formfill"[\s\S]*?<\/section>/) || [''])[0].replace(/<!--[\s\S]*?-->/g, '')), true);
+  eq('  deep-fetch 워크플로가 PDF 단계 뒤 이 로봇을 돌리고 경보 짝을 둔다 · 리포트를 저장 목록에 넣는다',
+    (() => { const y = readText(new URL('../.github/workflows/deep-fetch.yml', import.meta.url)); return [/node collector\/form-fields\.mjs/.test(y), (y.match(/신청서 쪽 그림 · 빈칸 자리 단계가 넘어졌어요/g) || []).length, /form-fields-report\.md/.test(y)]; })(), [true, 2, true]);
+  eq('  화면 검사 워크플로가 verify-formfill.js 를 돌린다', /verify-formfill\.js/.test(readText(new URL('../.github/workflows/verify-ui.yml', import.meta.url))), true);
+}
+
 console.log('\n■ 공고문 뒷장 서식 쪽 떼기 — 쪽 글자의 표식으로 서식 쪽을 고른다 (2026-10-13)');
 {
   process.env.FORM_PAGES_AS_LIB = '1';
@@ -13539,6 +13601,22 @@ console.log('\n■ 학적정보 테일러링 (2026-10-24 개발자 지시 1~4 ·
     /decodeEntities\(/.test(pubSrc) && !/const ENTITY = /.test(pubSrc) && /shortRegion/.test(robotSrc2) && /PR\.shortRegion/.test(readText(new URL('../match-engine.js', import.meta.url))), true);
   eq('  (shortRegion 이 실제로 한 규칙이다)', ['서울특별시', '경기도', '충청남도', '강원특별자치도', '전북특별자치도'].map(PRq.shortRegion), ['서울', '경기', '충남', '강원', '전북']);
 
+  /* 3단계(2026-10-31) — 학교 소재지: 로봇이 area 로 모아 학교 파일 region·campusRegion 에 싣고, 앱이 프로필 schoolRegion 에 적고, 엔진이 「○○시 소재 대학」 줄을 ✓/모름으로 본다 */
+  {
+    const c = PRq.parseLine('울산시 소재 대학에 재학 중인 학생').conds.find((x) => x.kind === 'residence' && x.about === 'school');
+    eq('  (검사가 헛돌지 않는다 — 소재 줄을 school 로 읽는다)', !!c, true);
+    eq('  학교 소재지가 맞으면 ✓', MEq.judgeCond(c, { schoolRegion: '울산' }), 'pass');
+    eq('  🔴 다르면 ✕ 가 아니라 모름 · 모르면 모름 · 제외 줄이면 모름', [MEq.judgeCond(c, { schoolRegion: '서울' }), MEq.judgeCond(c, {}), MEq.judgeCond({ ...c, exclude: true }, { schoolRegion: '울산' })], ['unknown', 'unknown', 'unknown']);
+    eq('  🔴 학생 거주지로는 판정하지 않는다 (서울 학생이 포항공대에 다닌다)', MEq.judgeCond(c, { region: '울산', regionCity: '남구' }), 'unknown');
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'majors-region-')) + path.sep;
+    publishMajorsBySchool({ '한국외국어대학교': { majors: ['영어학과', '수학과'], campuses: { '서울캠퍼스': ['영어학과'], '글로벌캠퍼스(용인)': ['수학과'] }, region: ['서울', '경기'], campusRegion: { '서울캠퍼스': '서울', '글로벌캠퍼스(용인)': '경기', '없는캠퍼스': '부산' } },
+      '서울대학교': { majors: ['수학과'], region: ['서울'] } }, { dir: new URL('file://' + tmp), updatedAt: '2026-10-31' });
+    const rd = (k) => JSON.parse(readText(path.join(tmp, MEq.majorsFileFor(k).split('/').pop())));
+    eq('  발행기가 region·campusRegion 을 싣는다 (앱 칩 이름만)', [rd('한국외국어대학교').region, rd('한국외국어대학교').campusRegion, rd('서울대학교').region], [['서울', '경기'], { '서울캠퍼스': '서울', '글로벌캠퍼스(용인)': '경기' }, ['서울']]);
+    eq('  로봇이 regions 를 장부에 적고 발행기에 넘긴다', /out\.regions = /.test(robotSrc2) && /\.\.\.\(out\.regions\[k\] \|\| \{\}\)/.test(robotSrc2), true);
+    eq('  앱이 프로필에 schoolRegion 을 적는다 (캠퍼스별 → 학교 하나일 때만 · 묻지 않는다)', /schoolRegion:\s*schoolRegionFor\(/.test(app) && /function schoolRegionFor[\s\S]{0,300}f\.region\.length === 1/.test(app) && !/in-school-region/.test(html), true);
+  }
+
   /* ③ 적합도 높이기 — 묻는 처지는 TRAIT_LABEL·TRAIT_PAT 에 있어야 한다 · 온보딩에 관심 칸이 없다 */
   const patKeys = PRq.TRAIT_PAT.map((r) => r[0]);
   eq('  ONBOARD_TRAITS 가 있고 TRAIT_LABEL·TRAIT_PAT 에 전부 있다', EA.ONBOARD_TRAITS.length >= 5 && EA.ONBOARD_TRAITS.filter((k) => !EA.TRAIT_LABEL[k] || !patKeys.includes(k)), true && []);
@@ -13620,6 +13698,49 @@ console.log('\n■ 읽지 못한 공고 현황 — 원인별 리포트 · 고친
     [/import \{ closedForStudents \} from '\.\/rescue-plan\.mjs'/.test(eaSrc), /if \(closedForStudents\(it, TODAY\)\) continue;/.test(eaSrc), /const TODAY = new Date\(Date\.now\(\) \+ 9 \* 3600000\)/.test(eaSrc)], [true, true, true]);
   eq('  수집 워크플로가 금액 읽기 뒤에 이 리포트를 collector/report.md 끝에 붙인다(이슈에 실린다)',
     /node collector\/extract-amounts\.mjs --write[\s\S]{0,600}?node verify\/unread-report\.mjs >> collector\/report\.md/.test(readText(new URL('../.github/workflows/collect-scholarships.yml', import.meta.url))), true);
+}
+
+console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 신뢰도 고도화 · 열린 공고 전수에서 조건 0인 줄을 유형별로 보고 고친 꼴)');
+{
+  const PRx = createRequire(import.meta.url)('../parse-requirements.js');
+  const MEx = createRequire(import.meta.url)('../match-engine.js');
+  const EAx = createRequire(import.meta.url)('../elig-ask.js');
+  const conds = (l) => PRx.parseLine(l).conds;
+  const one = (l, kind) => conds(l).find((c) => c.kind === kind) || null;
+  eq('`소득분위 0구간 ~ 4구간` — 앞 수에도 단위가 붙은 범위 (상한 4 · 확신 high · 표가 아니다)', (({ max, conf }) => [max, conf])(one('소득분위 0구간 ~ 4구간', 'bracket') || {}), [4, 'high']);
+  eq('  `5분위 이상 ~ 6분위 이하` 지급액 표는 여전히 확신 낮음', (one('5분위 이상 ~ 6분위 이하', 'bracket') || {}).conf, 'low');
+  eq('`학자금 지원구간이 산정된 학생` — 구간이 있기만 하면 되는 줄 (상한 10)', (({ max, conf }) => [max, conf])(one('2026학년도 2학기 학자금 지원구간이 산정된 학생', 'bracket') || {}), [10, 'high']);
+  eq('  구간을 모르는 학생은 모름 · 아는 학생은 ✓', [MEx.judgeCond(one('학자금 지원구간이 산정된 학생', 'bracket'), { bracket: null }), MEx.judgeCond(one('학자금 지원구간이 산정된 학생', 'bracket'), { bracket: 9 })], ['unknown', 'pass']);
+  eq('`취득 학점15학점(졸업 직전 학기 12학점) 이상` — 수와 이상 사이 괄호', (one('직전 학기 취득 학점15학점(졸업 직전 학기 12학점) 이상인 자', 'credits') || {}).min, 15);
+  eq('`평균성적 B(3.0) 이상` — 등급 뒤 괄호 안의 수', (({ min, conf }) => [min, conf])(one('평균성적 B(3.0) 이상인 자', 'grade') || {}), [3, 'high']);
+  eq('`TOPIK 4급 이상` — 어학 조건이되 확신 낮음(외국인 줄 · 한국 학생에게 ✕ 안 냄)', (one('TOPIK 4급 이상인 자', 'cert') || {}).conf, 'low');
+  eq('`중위소득기준 80% 이하자` — 중위소득 구간 표', (one('(개인) 2026년 중위소득기준 80% 이하자', 'bracket') || {}).income, 80);
+  eq('`국민기초생활보장수급 가정의 자녀` — 기초생활수급', (one('국민기초생활보장수급 가정의 자녀', 'flags') || {}).anyOf, ['basicLiving']);
+  eq('자립준비청년 — 처지 종류 careLeaver · 이름표 있음', [((one('자립준비 청년(아래 중 1가지 증빙서류 제출 가능자)', 'trait') || {}).anyOf || [])[0], ((one('아동복지시설 및 가정위탁 보호 종료 또는 연장 대학생', 'trait') || {}).anyOf || [])[0], !!EAx.TRAIT_LABEL.careLeaver], ['careLeaver', 'careLeaver', true]);
+  eq('  `아동양육시설 종사자` 는 자립준비청년이 아니다', one('아동양육시설 종사자 추천을 받은 자', 'trait'), null);
+  /* 외대 글로벌 전수(1단계)에서 나온 틀린 ✕ 하나 — 거주 「…거나」 다른 연고 */
+  const ganghwa = '(대상자) 강화군 출신 만30세 미만 대학생으로 공고일 기준 3년 이상 계속하여 강화군에 주민등록이 되어 있거나, 강화군 내 중학교 또는 고등학교 3년 재학 후 졸업한 사람';
+  eq('🔴 `주민등록이 되어 있거나, … 중·고 졸업` — 다른 연고로도 되는 거주 줄은 확신 낮음(경기 학생에게 ✕ 가 아니라 모름)', (one(ganghwa, 'residence') || {}).conf, 'low');
+  eq('  (대조군) `대구광역시에 주민등록상 주소를 둔 대학교 재학생` 은 그대로 확신 high', (one("공고일('26.10.14.) 기준 대구광역시에 주민등록상 주소를 둔 대학교 재학생", 'residence') || {}).conf, 'high');
+  eq('  줄 판정 — 경기 학생에게 강화군 줄은 ✕ 가 아니다 · 대구 줄은 ✕', [MEx.requirementMatch(ganghwa, { status: '재학', birthYear: 2004, region: '경기', regionCity: '용인시', parentRegion: '경기' }, null), MEx.requirementMatch("공고일('26.10.14.) 기준 대구광역시에 주민등록상 주소를 둔 대학교 재학생", { status: '재학', region: '경기', regionCity: '용인시', parentRegion: '경기' }, null)], [null, 'no']);
+}
+
+console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-31 · 5단계 — 숫자는 도구가 세고 질문 목록은 사람이 고친다)');
+{
+  const yml = readText(new URL('../.github/workflows/collect-scholarships.yml', import.meta.url));
+  eq('수집 워크플로가 전수 집계 한 줄을 리포트에 붙인다 (보강 — 넘어져도 수집은 산다)', /node verify\/eligibility-coverage\.mjs --brief >> collector\/report\.md/.test(yml), true);
+  /* 🔴 실데이터가 아니라 **표본**으로 돌린다(CLAUDE.md — 실데이터에 기댄 관문은 수집 로봇 결과를 되돌린다). 파일이 없어도 빈 묶음으로 끝까지 간다 */
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'coverage-')) + path.sep;
+  fs.writeFileSync(tmp + 'reg.json', JSON.stringify({ items: [{ id: 'x1', name: '표본 장학', deadline: '2099-01-01', eligibilityLines: ['직전학기 평점 3.0 이상인 재학생', '자립준비 청년(증빙 제출 가능자)', '해당 학과 교수의 추천을 받은 자'] }] }));
+  fs.writeFileSync(tmp + 'kosaf.json', JSON.stringify({ items: [{ code: 'k1', name: '표본 재단', fields: { '특정자격': '○ 제한없음\n○ 대회 입상자', '성적기준': '평점 3.5 이상' } }] }));
+  const env = { ...process.env, COVERAGE_REGISTERED: tmp + 'reg.json', COVERAGE_KOSAF: tmp + 'kosaf.json', COVERAGE_ACTIVITIES: tmp + 'none.json' };
+  const r = spawnSync(process.execPath, [fileURLToPath(new URL('../verify/eligibility-coverage.mjs', import.meta.url)), '--brief'], { encoding: 'utf8', timeout: 120000, env });
+  eq('  도구가 표본으로 돌고 한 줄을 낸다 (없는 파일은 빈 묶음 · 제한없음 줄은 세지 않는다)', [r.status, (r.stdout || '').trim().replace(/ · 처지 상위.*$/, '')],
+    [0, '- 자격 줄 전수: 공고 1/1/0 · 조건을 하나도 못 읽는 줄 1/0/0 (등록/재단/활동 · 합 1)']);
+  eq('  처지 집계가 돈다 (자립준비청년 · 수상)', /careLeaver 1/.test(r.stdout || '') && /award 1/.test(r.stdout || ''), true);
+  const EAy = createRequire(import.meta.url)('../elig-ask.js');
+  const PRy = createRequire(import.meta.url)('../parse-requirements.js');
+  eq('  온보딩 질문(ONBOARD_TRAITS)은 전부 처지 종류·이름표가 있다', (EAy.ONBOARD_TRAITS || []).filter((k) => !EAy.TRAIT_LABEL[k] || !PRy.TRAIT_PAT.some((r) => r[0] === k)), []);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
