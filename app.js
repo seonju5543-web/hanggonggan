@@ -1580,6 +1580,9 @@ function collectProfile() {
     /* 출신 고교 소재지 (2026-10-24 · 「적합도 높이기」) — 빈 칸은 null(모름) */
     originRegion: $('#in-origin-region').value || null,
     originCity: $('#in-origin-city').value || null,
+    /* 학교 소재 시·도 (2026-10-31) — 학과 파일(로봇이 커리어넷 개설 지역에서 모은 것)에서 읽는다. 파일이 아직이면 null — 도착하면 loadMajorsFor 가 채운다.
+       엔진이 「○○시 소재 대학 재학생」 줄을 ✓/모름으로 보는 데 쓴다(✕ 없음). 묻지 않는다 — 학생이 적을 일이 아니다 */
+    schoolRegion: schoolRegionFor($('#in-school').value.trim(), $('#campus-field').hidden ? '' : (getChip('#in-campus') || '')),
     /* 지금 받고 있는 장학금 (2026-08-27) — 이중수혜 금지 공고를 자격 판정에서 거른다.
        '없음'을 눌렀으면 빈 배열, 아무것도 안 골랐으면 null(= 모른다). 둘은 다르다:
        빈 배열이면 "안 받는다"라 전부 지원 가능이고, null 이면 판정하지 않는다. */
@@ -2804,6 +2807,13 @@ function formTplIdFor(sch) {
       이름 규칙은 `match-engine.js majorsFileFor` 한 곳 — 로봇과 같은 함수다. */
 const majorsAsked = new Set();     // 같은 학교를 두 번 받지 않는다
 const MAJOR_FILES = {};            // 학교 → 받은 파일 그대로({ majors, campuses? }) — 캠퍼스별 목록은 majorPool 이 본다
+/* 학교(캠퍼스)의 소재 시·도 — 학과 파일의 campusRegion(캠퍼스별) → region(학교 · 하나일 때만). 모르면 null(엔진은 '모름') */
+function schoolRegionFor(school, campus) {
+  const f = MAJOR_FILES[school];
+  if (!f) return null;
+  if (campus && f.campusRegion && f.campusRegion[campus]) return f.campusRegion[campus];
+  return Array.isArray(f.region) && f.region.length === 1 ? f.region[0] : null;
+}
 function loadMajorsFor(school) {
   if (!school || typeof majorsFileFor !== 'function') return;
   /* 🔴 **실제 학교 이름일 때만 부른다** (2026-09-26 코드 리뷰). 학교 칸은 `input` 마다
@@ -2828,6 +2838,11 @@ function loadMajorsFor(school) {
         /* 로봇 파일이 목록이다 — 손검수 목록은 2026-10-24 에 없앴다(외대 손목록이 로봇 파일을 가려 GBT학부가 안 떴다 · data.js 주석) */
         MAJOR_FILES[key] = d;
         MAJORS_BY_SCHOOL[key] = d.majors;
+        /* 이미 저장된 프로필에 소재지가 비어 있으면 지금 채운다(가입 때 파일이 늦게 왔거나 옛 프로필) — 판정이 그 자리에서 넓어진다 */
+        if (state.profile && state.profile.school === key && !state.profile.schoolRegion) {
+          const r = schoolRegionFor(key, state.profile.campus || '');
+          if (r) { state.profile.schoolRegion = r; saveState(); }
+        }
         /* 계열 칩도 그 학교 것으로 다시 그린다 — 학생이 이미 누른 칩은 지킨다(renderTrackChips) */
         if (!$('#screen-onboarding').hidden && $('#in-school').value.trim() === key) renderTrackChips();
         /* 🔴 **도착했으면 추천을 다시 그린다** (코드 리뷰에서 잡았다). 받아오기는 비동기라

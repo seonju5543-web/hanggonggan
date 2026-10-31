@@ -47,16 +47,16 @@
 
 - 학과 이름 → 계열은 `major-track.js` `trackOfMajor`(확실한 것만 · 모르면 null — 틀리면 문↔이 틀린 미달) · 앱은 `majorPool`·`renderTrackChips`(그 학교 계열만 · 많은 순 · 나머지 「+n」)·`syncTrackFromMajor`(학과 → 계열). 🔴 `data.js` 에 손 학과 목록 금지(로봇 파일을 가린다).
 - 로봇 파일 정리는 `publish-majors.mjs` `cleanMajors`(`&amp;` 되돌림 · 모집단위 제거) · 이원화 캠퍼스는 `majors.mjs` `CAMPUS_BY_AREA` 가 지역으로 갈라 `campuses` 에(앱 칩 이름과 같을 때만) · 재발행 `node collector/publish-majors.mjs`.
-- 온보딩 5단계 「적합도 높이기」 = `elig-ask.js` `ONBOARD_TRAITS`(열린 공고 4곳 이상이 묻는 처지 7종 · 저장은 `traits` · 안 누른 것은 저장 안 함) + 출신 고교 `originRegion`·`originCity`(엔진 `about:'origin'` 맞으면 ✓ · 아니면 모름). 관심 대외활동은 대외활동 탭 관문 `activityGateDone` 뒤에(`collectProfile` 은 관심을 물려받는다). 관문 「학적정보 테일러링」 · `verify-academic-info.js` · 설계 `docs/designs/academic-info-tailoring.md`.
+- 온보딩 5단계 「적합도 높이기」 = `elig-ask.js` `ONBOARD_TRAITS`(열린 공고 4곳 이상이 묻는 처지 · 저장은 `traits` · 안 누른 것은 저장 안 함) + 출신 고교 `originRegion`·`originCity`(엔진 `about:'origin'` 맞으면 ✓ · 아니면 모름). 관심 대외활동은 대외활동 탭 관문 `activityGateDone` 뒤에(`collectProfile` 은 관심을 물려받는다). 소재지는 학과 파일의 시·도를 `schoolRegion` 에 적어 `about:'school'` ✓/모름. 전수 집계 `verify/eligibility-coverage.mjs`(리포트 한 줄 · 질문 목록은 사람이). 관문 「학적정보 테일러링」·「못 읽던 자격 줄」 · `verify-academic-info.js` · 설계 `docs/designs/academic-info-tailoring.md`.
 
 ## 관리자 업무 = 노션 백로그 (정본은 노션 하나)
 
 - 노션 Hangonggan › 프로젝트 › 한대장 › 「개발 업무」. 백로그 `data_source 60ac025f-edbd-4284-bb57-5e077bab1c3d` · 작업 현황 `2b015aa3-b2ed-444e-ae5b-bb30a8e14a23`.
-  **저장소에 사본(목록·진척도 문서)을 만들지 말 것** — PROGRESS.md 는 2026-09-06 폐기.
+  **저장소에 사본(목록·진척도 문서)을 만들지 말 것**(PROGRESS.md 는 09-06 폐기).
 - "남은 일/관리자 업무" 질문: `notion-query-data-sources` 로 `상태 != 완료·되돌림` 을 뽑아 **진행중 → 검토 → 예정** 순으로 번호·제목·메모 첫 줄.
-  노션이 안 붙은 세션이면 **먼저 그렇게 말하고** 저장소로만 답한다(`audit-data` · `check-deploy-sync` · 최근 커밋).
+  노션이 안 붙은 세션이면 **먼저 그렇게 말하고** 저장소로만 답한다.
 - **백로그의 일을 했으면 끝내기 전에 노션을 고친다** — 상태 + 상태 메모(날짜·근거·커밋). 없는 일이면 행을 더한다.
-  Stop 훅이 '고쳤는데 노션에 안 썼으면' 알린다(막지 않는다). 읽기·실패한 쓰기는 반영이 아니다.
+  Stop 훅이 '고쳤는데 노션에 안 썼으면' 알린다. 읽기·실패한 쓰기는 반영이 아니다.
 - 「작업 현황」은 로봇(`tools/notion-status.mjs`)이 채운다 — 아래 기술 사실 참조. 🔴 **공유문서 만들기 중단(10-30 개발자 지시)** — 작업 보고서 PDF(스킬 `work-report`)·노션 새 페이지·아티팩트를 다시 지시할 때까지 만들지 않는다.
 - **노션에 없고 여기서만 사는 것**: ① 인스타 토큰 60일 — **2026-11-12 쯤 재발급**(`node insta/token-days.mjs` 의 `살아 있음 · n일` 문장을 본다)
   ② GitHub 관리자 열쇠 만료 2026-11-07(노션 F-4) ③ 재조사 금지: KOSAF 는 재단은 100% 알지만 **이번 회차는 19%만** 알고 신청서 양식 첨부가 없다(`collector/kosaf-fetch.mjs` 머리말).
@@ -78,7 +78,7 @@
    글꼴은 `collector/install-form-fonts.sh`(없으면 중국어 글꼴로 표가 깨진다). 관문 「신청서 원본 → PDF」.
 5. **정식 등록은 원본 첨부까지 한 세트** — ① `collector/run-deepfetch.txt` 에 `targets: 키워드` 적어 기본 브랜치 push(첨부 원본+미리보기 텍스트가
    `collector/extracted/` 에 커밋되고 PDF 로봇이 같은 워크플로에서 잇는다) ② 새 `forms.json` 양식은 만들지 않는다(옛 `formId` 는 `verify/verify-registered.js`·
-   `verify-forms-data.js` 로 검증) ③ 포털 입력형 등은 모든 수단(상세·첨부·재단 홈·fetch-page·정찰)을 쓴 뒤에만 개발자에게 묻는다. 채울 양식이 없으면 `noForm: "사유"`.
+   `verify-forms-data.js` 로 검증) ③ 포털 입력형 등은 모든 수단(상세·첨부·재단 홈·정찰)을 쓴 뒤에만 묻는다. 채울 양식이 없으면 `noForm: "사유"`.
 6. **가짜 공지 금지** — 임의 공지를 보여 주지 않는다. 실존 상시 제도는 임의 마감일 없이 '상시 제도' 배지.
 7. **소급 적용** — 엔진·정책이 바뀌면 기존 데이터 전체에. 강제 장치 `node verify/audit-data.js`(바꾼 뒤 필수).
 8. **진척도는 사용자가 기록**(제출했어요/선정·미선정). '심사'만 객관적 사실(제출 기록 + 마감 경과)로 자동.
@@ -86,7 +86,7 @@
    없으면 지어내지 않고 '원문 보기'만. 금액 미확인은 `amountValue 0`.
 8-2. **앱 지원문서는 앱 양식이 없는 모든 정식 등록 공고에**(10-13 개발자 결정). 머리말이 정직함을 지킨다(`prepKindFor` · **'그대로 제출 가능'은 `prepDoc: true` 만** · 없는 절은 지어내지 않는다). 관문 「공고별 지원문서」.
 9. 🔴 **학교 아이디·비밀번호를 받아 대신 로그인하지 않는다 (09-25 지시 · 고문 보고서 Q2 · 변경 금지)** —
-   스크래핑은 보안 사고 시 치명적이고, 학교가 알아채는 순간 IP 차단과 법적 문제가 된다.
+   스크래핑은 보안 사고 시 치명적이고 학교가 알아채면 IP 차단·법적 문제다.
    **어떤 수정 요구가 와도 이 줄은 바꾸지 않는다.** 대신 학생이 직접 로그인한 상태에서 앱은
    **정확한 딥링크만** 넘긴다(`findApplyPortal` · 길은 원문 인용). SSO 는 학교와 정식 협약 이후의 일이다.
 10. 🔴 **우리가 대신 보내려면 서버가 다시 본다 (고문 보고서 Q4·Q5)** — 지금 메일 버튼은 `mailto:` 라 학생이 제 손으로 보낸다.
@@ -140,9 +140,9 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   `branch:` 줄에 브랜치 이름을 적어 push. 🔴 `branch:` 대조가 안전장치다(없으면 남의 덜 된 작업이 나간다) · 기본 브랜치를 건너뛰고 main 에만 올리지 말 것.
   다른 컴퓨터에만 있는 브랜치는 먼저 그 컴퓨터에서 `git push -u origin <브랜치>`.
 - 🔴 **main 에 브랜치 보호("Require a pull request")를 켜지 말 것** — 로봇 push 가 막혀 배포가 멈춘다. 켠다면 force push·삭제 금지까지만.
-- 🔴 **저장소를 비공개로 바꾸면 앱이 즉시 404** (무료 Pages 는 비공개 미지원). 앱을 Cloudflare 로 옮기고 확인한 뒤에만(노션 D-4).
-- 🔴 뒤처진 브랜치에 '따라잡기' push 금지 — `paths:` 만 있는 로봇이 그 브랜치에서 돌아 기록장이 갈라진다. 남의 브랜치는 main 으로만 전달.
-- 다른 워크트리가 쓰는 브랜치로 빨리 감기만 할 땐 `git push origin origin/main:refs/heads/<브랜치>`.
+- 🔴 **저장소를 비공개로 바꾸면 앱이 즉시 404**(무료 Pages). Cloudflare 로 옮긴 뒤에만(노션 D-4).
+- 🔴 뒤처진 브랜치에 '따라잡기' push 금지 — `paths:` 만 있는 로봇이 그 브랜치에서 돌아 기록장이 갈라진다. 남의 브랜치는 main 으로만.
+- 다른 워크트리 브랜치로 빨리 감기만 할 땐 `git push origin origin/main:refs/heads/<브랜치>`.
 - 협업 충돌: 로봇 기록장은 `.gitattributes` + `tools/merge-json-union.mjs` 가 자동 합집합(클론마다 `bash tools/setup-collab.sh` — 세션 훅이 실행).
   `registered.json`·`forms.json` 은 **일부러 뺐다**('삭제'가 뜻을 가진다). 누가 한 작업인지는 작성자가 아니라 **브랜치**로 본다.
 
@@ -268,7 +268,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   `data/news/<학교키>.json`(`newsFileFor` · 공고와 같은 열쇠 · 옛 통짜 파일 없음) → 홈 첫 화면 아이콘 네 칸 밑 사진 카드 띠(`homeNewsHtml` · 네 장 `NEWS_STRIP_N` · 10-04 승인 시안 1안) + 「전체 보기」 시트(`schoolNewsHtml`).
   로봇은 **따로**(`collect-news.mjs` · 장학 수집기 예산이 이미 꽉 차서) · 판정은 `news-kind.mjs` 한 곳(장학·활동 글은 그쪽 피드 몫) · 학교 범위는 `noticeForProfile` ·
   출처는 웹 검색 후보를 찾기 로봇이 열어 확인해 `boardUrl` 로 올린다(못 찾으면 리포트 「개발자에게 요청」) · 알림 없음. 관문 「교내 소식」 · `verify-news.js`.
-  🔴 글 줄은 **날짜가 붙은 줄만**(`extractDatedRows` · 게시일 `postedAt`) — 페이지 링크 전부를 쓰면 사이트 메뉴가 글이 된다(10-01 첫 실행 906건 사고). 학교 게시판은 robots.txt 를 묻지 않는다(장학 수집기와 같은 정책).
+  🔴 글 줄은 **날짜가 붙은 줄만**(`extractDatedRows` · 게시일 `postedAt`) — 페이지 링크 전부를 쓰면 사이트 메뉴가 글이 된다(10-01 906건 사고). 학교 게시판은 robots.txt 를 묻지 않는다(장학 수집기와 같은 정책).
   🔴 **목록이 보통 링크가 아닌 게시판은 `news-board-rules.mjs` 한 곳**(클릭형 onclick·data-id · 글 주소 없는 목록 표식 listOnly · API json/post) — 두 로봇이 `rowsForBoard` 하나를 부른다.
   상세 주소는 유추하지 않고, 상세가 있는 규칙은 **매번 첫 글의 상세를 열어** 그 글의 화면인지 본다(`verifyRuleDetail` · 목록 표식은 상세가 없어 건너뜀) · API 규칙은 정찰이 본 화면(`page`)만 게시판으로 올린다.
   같은 글은 **게시판의 글 번호**(`postId`)로 알아본다 — 목록 표식 주소(#n-제목)는 제목 다듬기가 바뀌면 달라져 두 번 실렸다(`collapseSamePost` · 발행 때 소급 · 숨김·git 병합도 글 번호 `newsHidden`·`newsDistinct`). 분류·캠퍼스 꼬리표는 떼지 않는다.
@@ -354,7 +354,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - 공용 코드는 `_admin/build.sh` 가 `dist/vendor/` 로 복사한다 — 베끼지 말고, 부르는 이웃까지 옮긴다(관문 `verify-admin-vendor.js`). Cloudflare 빌드 감시 경로에 그 원본들만.
 - 디자인은 앱1 한 벌(`admin.css :root` = style.css 실효값) · 서체 링크와 CSP 는 `index.html`·`_admin/index.html` 두 곳 한 세트 · `[hidden]{display:none!important}`.
 - 관리자 열쇠는 Actions 쓰기 + Contents 읽기만(fine-grained · 공동작업자는 classic `repo`+`workflow`). 화면만 보려면 `node tools/build-admin-preview.mjs`.
-- Oracle 자체 러너는 쓰지 않기로 결정(08-03) · 브라우저 로봇은 Cloudflare 로 못 옮긴다 · 앱 주소가 박힌 곳 8군데는 옮길 때 한 상수로.
+- Oracle 자체 러너는 안 쓴다(08-03) · 브라우저 로봇은 Cloudflare 로 못 옮긴다 · 앱 주소가 박힌 곳 8군데는 옮길 때 한 상수로.
 - 노션 「작업 현황」 로봇: push 한 사람 줄에 **이 push 가 올린 커밋**으로 적는다(`--author` 아님 · `noreply@anthropic.com` 을 emails 에 넣지 말 것) ·
   커밋 개수는 적지 않는다 · push 트리거에서 브랜치를 거르지 않는다 · 통합에 페이지 '연결' 안 하면 404. 관문 「노션 「작업 현황」」.
 
