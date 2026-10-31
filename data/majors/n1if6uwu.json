@@ -1,6 +1,6 @@
 {
  "school": "연세대학교 미래캠퍼스",
- "updatedAt": "2026-10-30",
+ "updatedAt": "2026-10-31",
  "majors": [
   "간호학과",
   "경영학부",
@@ -86,5 +86,8 @@
   "East Asian Politics and Culture",
   "East Asian Politics and Economy",
   "K-Arts전공"
+ ],
+ "region": [
+  "강원"
  ]
 }
