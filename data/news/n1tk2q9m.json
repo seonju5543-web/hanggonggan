@@ -1,45 +1,147 @@
 {
  "school": "이화여자대학교",
- "updatedAt": "2026-10-30",
+ "updatedAt": "2026-10-31",
  "items": [
   {
    "title": "[인사팀] 이화여자대학교 직원 채용 공고(2027.1.1.자)",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367684&article.offset=0&articleLimit=10&no=390",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367684&article.offset=0&articleLimit=10&no=379",
    "postedAt": "2026-10-29",
    "kind": "채용",
    "school": "이화여자대학교",
    "campus": "",
    "src": "ec6597da",
-   "foundAt": "2026-10-30"
+   "foundAt": "2026-10-31"
   },
   {
    "title": "[학부] 2026학년도 겨울 계절학기 수강안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367643&article.offset=0&articleLimit=10&no=390",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367643&article.offset=0&articleLimit=10&no=379",
    "postedAt": "2026-10-27",
    "kind": "학사",
    "school": "이화여자대학교",
    "campus": "",
    "src": "ec6597da",
-   "foundAt": "2026-10-30"
+   "foundAt": "2026-10-31"
   },
   {
    "title": "[교육기획팀] 2026 AI4AE DAY 참가 신청 안내 (11. 6.(금))",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367575&article.offset=0&articleLimit=10&no=390",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367575&article.offset=0&articleLimit=10&no=379",
    "postedAt": "2026-10-23",
    "school": "이화여자대학교",
    "campus": "",
    "src": "ec6597da",
-   "foundAt": "2026-10-30"
+   "foundAt": "2026-10-31"
   },
   {
    "title": "🍂 2026 대학혁신지원사업 홍보데이 <경험을 수확하다> 개최 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367549&article.offset=0&articleLimit=10&no=390",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367549&article.offset=0&articleLimit=10&no=379",
    "postedAt": "2026-10-22",
    "kind": "행사",
    "school": "이화여자대학교",
    "campus": "",
    "src": "ec6597da",
-   "foundAt": "2026-10-30"
+   "foundAt": "2026-10-31"
+  },
+  {
+   "title": "2027학년도 전공(학과)결정 시행안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367723&article.offset=0&articleLimit=10&no=378",
+   "postedAt": "2026-10-30",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-31",
+   "desc": "1. 전공결정 신청 대상 2026-2 학기 현재 재학생으로 가 .2026학년도 호크마교양대학 호크마학부로 입학한 전공(학과) 미결정자 나. 2026학년도 학부별로 입학한 전공 미결정자"
+  },
+  {
+   "title": "2027학년도 전공변경 시행 안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367722&article.offset=0&articleLimit=10&no=377",
+   "postedAt": "2026-10-30",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-31",
+   "desc": "1. 전공변경 신청자격: 2026-2학기 현재 2학년 이상 재학생으로서 다음 요건에 해당하는 학생"
+  },
+  {
+   "title": "2027학년도 전과 시행 안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367721&article.offset=0&articleLimit=10&no=376",
+   "postedAt": "2026-10-30",
+   "kind": "학사",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-31",
+   "desc": "< 전과지원자 유의사항> 1. 전과지원자격 : ① 2026학년도 2학기 현재 3~7학기 이수 중인 재학생 및 이수한 휴학생으로서 40학점 이상 취득(예정)자 ② 2019학년도 입학생부터는 제1전공의…"
+  },
+  {
+   "title": "[스크랜튼학부] 2027학년도 스크랜튼학부 진입생 설명회 개최 안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367719&article.offset=0&articleLimit=10&no=375",
+   "postedAt": "2026-10-30",
+   "kind": "행사",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-31",
+   "desc": "- 일시 : 2026년 11월 11일(수) 오후 6시~7시 30분 - 장소 : 포스코관 B151호"
+  },
+  {
+   "title": "[이화인의 나눔가게] 할인 이벤트!",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367718&article.offset=0&articleLimit=10&no=374",
+   "postedAt": "2026-10-30",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-31"
+  },
+  {
+   "title": "[사범대학 행정실] 계약직원 모집(~11/12까지)",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367717&article.offset=0&articleLimit=10&no=373",
+   "postedAt": "2026-10-30",
+   "kind": "채용",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-31",
+   "desc": "1. 모집개요 &bull; 모집분야 및 인원: 총무처장발령 계약직원 1명 &bull; 업무: 행정실 행정지원(장학업무 등)"
+  },
+  {
+   "title": "[기계/일반경쟁]문회리 교수/로봇(2) 2EA 구입",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367716&article.offset=0&articleLimit=10&no=372",
+   "postedAt": "2026-10-30",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-31",
+   "desc": "나 . 입찰서류제출 마감일시 및 장소 : 2026. 11 9.( 월 ) 11:00, 이비즈포유 (http://www.ebiz4u.co.kr)"
+  },
+  {
+   "title": "[총무팀] (수정) 셔틀버스 운행 변경 관련 안내 (10/30(금) 15:30-17:30)",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367715&article.offset=0&articleLimit=10&no=371",
+   "postedAt": "2026-10-30",
+   "kind": "생활",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-31",
+   "desc": "연구협력관 행사 진행에 따라 아래와 같이 셔틀버스를 변경 운행하오니, 이용에 참고하여 주시기 바랍니다."
+  },
+  {
+   "title": "[학부]2026학년도 전기(2027년 2월) 졸업예정여부 조회 및 졸업의사 신청 관련 안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367714&article.offset=0&articleLimit=10&no=370",
+   "postedAt": "2026-10-30",
+   "kind": "학사",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-31"
+  },
+  {
+   "title": "[건축팀] 대학원관 입구 공사용 자재 상하차 작업 안내 (10.31.(토) 08:00~16:00)",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367707&article.offset=0&articleLimit=10&no=369",
+   "postedAt": "2026-10-30",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-10-31"
   },
   {
    "title": "[정보인프라팀] 방화벽 장비 점검에 따른 중요 정보서비스 일시 중지 안내",
@@ -55,110 +157,6 @@
    "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367377&article.offset=0&articleLimit=10&no=390",
    "postedAt": "2026-10-14",
    "kind": "학사",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-30"
-  },
-  {
-   "title": "2027학년도 전공(학과)결정 시행안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367723&article.offset=0&articleLimit=10&no=389",
-   "postedAt": "2026-10-30",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-30",
-   "desc": "1. 전공결정 신청 대상 2026-2 학기 현재 재학생으로 가 .2026학년도 호크마교양대학 호크마학부로 입학한 전공(학과) 미결정자 나. 2026학년도 학부별로 입학한 전공 미결정자"
-  },
-  {
-   "title": "2027학년도 전공변경 시행 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367722&article.offset=0&articleLimit=10&no=388",
-   "postedAt": "2026-10-30",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-30",
-   "desc": "1. 전공변경 신청자격: 2026-2학기 현재 2학년 이상 재학생으로서 다음 요건에 해당하는 학생"
-  },
-  {
-   "title": "2027학년도 전과 시행 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367721&article.offset=0&articleLimit=10&no=387",
-   "postedAt": "2026-10-30",
-   "kind": "학사",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-30",
-   "desc": "< 전과지원자 유의사항> 1. 전과지원자격 : ① 2026학년도 2학기 현재 3~7학기 이수 중인 재학생 및 이수한 휴학생으로서 40학점 이상 취득(예정)자 ② 2019학년도 입학생부터는 제1전공의…"
-  },
-  {
-   "title": "[스크랜튼학부] 2027학년도 스크랜튼학부 진입생 설명회 개최 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367719&article.offset=0&articleLimit=10&no=386",
-   "postedAt": "2026-10-30",
-   "kind": "행사",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-30",
-   "thumb": "data/news/img/4a2c775ae9b5ed85.webp",
-   "desc": "- 일시 : 2026년 11월 11일(수) 오후 6시~7시 30분 - 장소 : 포스코관 B151호"
-  },
-  {
-   "title": "[이화인의 나눔가게] 할인 이벤트!",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367718&article.offset=0&articleLimit=10&no=385",
-   "postedAt": "2026-10-30",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-30",
-   "thumb": "data/news/img/d58d0cdc915d1072.webp"
-  },
-  {
-   "title": "[사범대학 행정실] 계약직원 모집(~11/12까지)",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367717&article.offset=0&articleLimit=10&no=384",
-   "postedAt": "2026-10-30",
-   "kind": "채용",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-30",
-   "desc": "1. 모집개요 &bull; 모집분야 및 인원: 총무처장발령 계약직원 1명 &bull; 업무: 행정실 행정지원(장학업무 등)"
-  },
-  {
-   "title": "[기계/일반경쟁]문회리 교수/로봇(2) 2EA 구입",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367716&article.offset=0&articleLimit=10&no=383",
-   "postedAt": "2026-10-30",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-30",
-   "desc": "나 . 입찰서류제출 마감일시 및 장소 : 2026. 11 9.( 월 ) 11:00, 이비즈포유 (http://www.ebiz4u.co.kr)"
-  },
-  {
-   "title": "[총무팀] (수정) 셔틀버스 운행 변경 관련 안내 (10/30(금) 15:30-17:30)",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367715&article.offset=0&articleLimit=10&no=382",
-   "postedAt": "2026-10-30",
-   "kind": "생활",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-30",
-   "desc": "연구협력관 행사 진행에 따라 아래와 같이 셔틀버스를 변경 운행하오니, 이용에 참고하여 주시기 바랍니다."
-  },
-  {
-   "title": "[학부]2026학년도 전기(2027년 2월) 졸업예정여부 조회 및 졸업의사 신청 관련 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367714&article.offset=0&articleLimit=10&no=381",
-   "postedAt": "2026-10-30",
-   "kind": "학사",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-30"
-  },
-  {
-   "title": "[건축팀] 대학원관 입구 공사용 자재 상하차 작업 안내 (10.31.(토) 08:00~16:00)",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367707&article.offset=0&articleLimit=10&no=380",
-   "postedAt": "2026-10-30",
    "school": "이화여자대학교",
    "campus": "",
    "src": "ec6597da",
