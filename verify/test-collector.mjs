@@ -1500,6 +1500,68 @@ console.log('\n■ 제출 서류 목록 — 원문의 「제출서류」 절을 
 }
 
 /* 2026-10-13 ② — 공고문 뒷장 서식 쪽. 신청서가 따로 첨부되지 않은 공고라도 공고문 PDF 뒷장에 「별지」 서식이 붙는다(층2 재단 37곳) — 아무도 꺼내지 않았다. */
+console.log('\n■ 신청서 쪽 그림 · 빈칸 자리 — 이름표 옆·표 칸으로 빈칸을 찾고 지어내지 않는다 (2026-10-31 · 양식 5단계)');
+/* 로봇 collector/form-fields.mjs 는 원본 PDF 사본의 쪽 그림(WebP)과 이름표 옆 빈칸 자리(fields.json)를 만든다 — 앱 formfill.js 가 그 위에 답을 얹는다.
+   관문은 순수 함수(bbox 읽기 · 이름표 사전 · 빈칸 찾기)를 가짜 줄·선으로 재고, 앱 배선 글자를 본다. 🔴 FORM_FIELDS_AS_LIB=1 이 아니면 불러오는 순간 본편이 돈다. */
+{
+  process.env.FORM_FIELDS_AS_LIB = '1';
+  const FF = await import('../collector/form-fields.mjs').catch(() => ({}));
+  eq('로봇을 불러왔다 (parseBbox · labelOf · detectFields)', ['parseBbox', 'labelOf', 'detectFields'].every((k) => typeof FF[k] === 'function'), true);
+  if (FF.parseBbox) {
+    const xml = `<page width="595.2" height="841.8">
+      <line xMin="87.2" yMin="172.5" xMax="110.7" yMax="184.0"><word xMin="87.2" yMin="172.5" xMax="96.6" yMax="184.0">대</word><word xMin="101.3" yMin="172.5" xMax="110.7" yMax="184.0">학</word></line>
+      <line xMin="323.8" yMin="172.5" xMax="347.3" yMax="184.0"><word xMin="323.8" yMin="172.5" xMax="347.3" yMax="184.0">학과</word></line>
+      <line xMin="87.2" yMin="199.5" xMax="110.7" yMax="211.0"><word xMin="87.2" yMin="199.5" xMax="110.7" yMax="211.0">학번</word></line>
+      <line xMin="323.8" yMin="199.5" xMax="347.3" yMax="211.0"><word xMin="323.8" yMin="199.5" xMax="347.3" yMax="211.0">이름</word></line>
+      <line xMin="60" yMin="330" xMax="400" yMax="341"><word xMin="60" yMin="330" xMax="400" yMax="341">본인의 이름 등 인적 사항은 기재를 금함</word></line>
+      <line xMin="146.8" yMin="262.7" xMax="165.6" yMax="274.2"><word xMin="146.8" yMin="262.7" xMax="165.6" yMax="274.2">성명</word></line>
+      <line xMin="219.4" yMin="262.7" xMax="257.3" yMax="274.2"><word xMin="219.4" yMin="262.7" xMax="257.3" yMax="274.2">생년월일</word></line>
+      <line xMin="389.1" yMin="262.7" xMax="426.9" yMax="274.2"><word xMin="389.1" yMin="262.7" xMax="426.9" yMax="274.2">졸업사항</word></line>
+    </page>`;
+    const pages = FF.parseBbox(xml);
+    eq('① bbox XML 을 쪽·줄·낱말로 읽는다 (낱말이 띄어진 「대 학」도 한 줄)', [pages.length, pages[0].lines.length, pages[0].lines[0].text], [1, 8, '대 학']);
+    eq('② 이름표 사전 — 띄어쓰기·콜론을 걷고 본다 · 문장은 이름표가 아니다 · 프로필 칸 이름을 돌려준다',
+      [FF.labelOf('대 학').key, FF.labelOf('이 름 :').key, FF.labelOf('학부(과), 전공').key, FF.labelOf('학번').key, FF.labelOf('본인의 이름 등 인적 사항은 기재를 금함'), FF.labelOf('주소').key],
+      ['school', 'name', 'major', 'studentId', null, null]);
+    /* 선 없이 — 같은 줄의 다음 낱말 앞까지 · 사전 이름표가 셋 나란하면 머리글 */
+    const noRule = FF.detectFields(pages[0], 1);
+    eq('③ 선이 없으면 이름표 오른쪽부터 같은 줄의 다음 낱말 앞까지 (대학 → 학과 앞 · 이름 → 오른쪽 여백까지)',
+      (() => { const sch = noRule.fields.find((f) => f.label === '학교'); const nm = noRule.fields.find((f) => f.label === '이름' && f.y < 210);
+        return [sch && sch.x > 110 && sch.x + sch.w < 324, nm && nm.x > 347, noRule.fields.some((f) => f.label === '학번' && f.key === 'studentId')]; })(), [true, true, true]);
+    eq('  문장 줄은 빈칸이 되지 않는다', noRule.fields.filter((f) => f.y > 320 && f.y < 350).length, 0);
+    eq('  사전 이름표가 셋 나란한 줄은 머리글로 보고 건너뛴다(성명·생년월일 + 졸업사항은 사전 밖이라 둘뿐 → 머리글 아님)', noRule.headerRows, 0);
+    /* 표의 선이 있을 때 — 오른쪽 칸이 비면 빈칸 · 오른쪽에 글자가 있고 아래 칸이 비면 머리글(아래 칸 · key null) */
+    const rules = { h: [[168, 60, 560], [190, 60, 560], [217, 60, 560], [258, 60, 560], [277, 60, 560], [305, 60, 560]],
+      v: [[60, 168, 305], [120, 168, 217], [300, 168, 217], [360, 168, 217], [560, 168, 305], [140, 258, 305], [210, 258, 305], [370, 258, 305]] };
+    const ruled = FF.detectFields(pages[0], 1, rules);
+    const school = ruled.fields.find((f) => f.label === '학교'); const name1 = ruled.fields.find((f) => f.label === '이름' && f.key === 'name');
+    eq('④ 표의 선이 있으면 이름표 칸의 **오른쪽 칸**이 빈칸이다 (대학 → 120~300 칸 · 이름 → 360~560 칸)',
+      [school && Math.round(school.x), school && Math.round(school.x + school.w), name1 && Math.round(name1.x), name1 && Math.round(name1.x + name1.w)], [123, 297, 363, 557]);
+    const famName = ruled.fields.find((f) => f.label === '이름' && f.key === null); const famBirth = ruled.fields.find((f) => f.label === '생년월일');
+    eq('🔴 오른쪽 칸에 글자가 있고 아래 칸이 비면 표 머리글 — 아래 칸이 빈칸이되 key 는 null (가족 표의 성명에 학생 이름을 넣으면 틀린 값)',
+      [!!famName, famName && famName.y > 277, famBirth && famBirth.key, ruled.below], [true, true, null, 2]);
+    /* red-green: 머리글 아래 칸에 key 를 붙이면 ↑ 가 빨간불 · 오른쪽 칸 규칙을 지우면 ④ 가 빨간불 (2026-10-31 확인) */
+  }
+  const app = readText(new URL('../app.js', import.meta.url));
+  const ff = readText(new URL('../formfill.js', import.meta.url));
+  const html = readText(new URL('../index.html', import.meta.url));
+  const css = readText(new URL('../style.css', import.meta.url));
+  const sw = readText(new URL('../sw.js', import.meta.url));
+  eq('⑤ 앱 — 「원본 양식 그대로 보기」 줄마다 단추 자리(li.ff-slot)를 두고, 시트·지원문서 머리 둘 다 attachFormFillButtons 로 채운다',
+    [/class="ff-slot" data-file=/.test(app), (app.match(/attachFormFillButtons\(sch, /g) || []).length], [true, 2]);
+  eq('  빈칸을 찾은 파일에만 단추 — 없으면 자리를 숨긴다(칸을 지어내지 않는다)', /if \(!e\) \{ slot\.hidden = true; continue; \}/.test(ff), true);
+  eq('  학적정보 자동 채움은 프로필 칸에서만 · 없는 key 는 빈 글자', /case 'studentId': return c\.studentId \|\| '';/.test(ff) && /default: return '';/.test(ff), true);
+  eq('  칸은 쪽 크기에 대한 % 로 놓인다 · 글자 크기는 --ffpt(쪽마다 계산)', /ffPct\(f\.x, pg\.w\)/.test(ff) && /setProperty\('--ffpt'/.test(ff) && /--ffpt: 1px;/.test(css) && /calc\(var\(--ffpt\) \* 9\.5\)/.test(css), true);
+  eq('  화면이 showScreen 목록·안쪽 화면 목록에 있고 아래 탭을 숨긴다', /'perms', 'formfill'\]\.forEach/.test(app) && /'perms', 'formfill'\];/.test(app) && /name === 'onboarding' \|\| name === 'formfill'/.test(app), true);
+  eq('  index.html 에 화면 틀이 있고 formfill.js 를 app.js 뒤에 싣는다 · 서비스워커가 미리 담는다',
+    [/id="screen-formfill"/.test(html), html.indexOf('src="app.js"') < html.indexOf('src="formfill.js"'), /'formfill\.js'/.test(sw)], [true, true, true]);
+  eq('  인쇄 CSS 는 쪽 그림만 남기고 쪽마다 넘긴다 (결정 4) · 화면 글자에 「신청 완료」가 없다(주석은 뺀다)',
+    /@media print \{[\s\S]*?break-after: page/.test(css) && !/신청 완료|제출 완료/.test(ff.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '')) && !/신청 완료|제출 완료/.test((html.match(/<section id="screen-formfill"[\s\S]*?<\/section>/) || [''])[0].replace(/<!--[\s\S]*?-->/g, '')), true);
+  eq('  deep-fetch 워크플로가 PDF 단계 뒤 이 로봇을 돌리고 경보 짝을 둔다 · 리포트를 저장 목록에 넣는다',
+    (() => { const y = readText(new URL('../.github/workflows/deep-fetch.yml', import.meta.url)); return [/node collector\/form-fields\.mjs/.test(y), (y.match(/신청서 쪽 그림 · 빈칸 자리 단계가 넘어졌어요/g) || []).length, /form-fields-report\.md/.test(y)]; })(), [true, 2, true]);
+  eq('  화면 검사 워크플로가 verify-formfill.js 를 돌린다', /verify-formfill\.js/.test(readText(new URL('../.github/workflows/verify-ui.yml', import.meta.url))), true);
+}
+
 console.log('\n■ 공고문 뒷장 서식 쪽 떼기 — 쪽 글자의 표식으로 서식 쪽을 고른다 (2026-10-13)');
 {
   process.env.FORM_PAGES_AS_LIB = '1';

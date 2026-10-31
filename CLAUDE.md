@@ -24,11 +24,11 @@
 - **수집·실시간 피드·대외활동은 44개교**. 고치는 자리는 셋이 한 세트 — `schools.json`·`browser-targets.json`(`parked` 는 안 쓰는 게시판 보관 자리 · 지우지 말 것) + `match-engine.js` `SERVED_SCHOOLS`(앱·알림·발행 공용 — 브라우저가 schools.json 을 못 읽어 한 번 더 · 갈라지면 로봇은 모으는데 앱은 숨긴다). 관문 「수집망 복원」·「화면이 보여 주는 학교 = 로봇이 수집하는 학교」.
 - **정식 등록(자격 진단·양식)도 44개교** — `auto-register-config.json` `schools` 는 빈 배열(= 수집 학교 전부). 🔴 부작용: 자동 등록은 게시 학교로 `schoolOnly` 를 달아 전국 사업이 한 학교에 묶인다(노션 F-5) → 관리자 「할 일」 '교외인데 한 학교에만' 에서 merge 로 승격 · 타교 같은 사업은 컨펌 대기. 좁히는 것은 개발자 지시 때만(관문 「수집망 복원」).
 - **일반 수집 로봇도 예산 안에 스스로 끝낸다** — `collect.mjs` 가 `harvest-budget.mjs` 로 예산 8분·게시판 시한·회전 커서(`collect-cursor.json`)를 쓴다(브라우저 수집기와 같은 규칙). 워크플로 단계 상한 > 예산, 작업 상한 > 단계 합. 관문 「일반 수집 예산」. 상한을 키워 때우지 말 것.
-- 8월 30일에 지운 정식 등록 211건은 되살리지 않는다 — 새로 수집한다. 기술 고문 요청서(`docs/advisor/`)는 좁힌 경위와 되살린 사실을 둘 다 적는다 — 관문 「기술 고문 요청서」 · `node docs/advisor/check-brief.mjs` · `node docs/advisor/render.js`.
+- 8월 30일에 지운 정식 등록 211건은 되살리지 않는다 — 새로 수집한다. 기술 고문 요청서(`docs/advisor/`)는 좁힌 경위·되살린 사실을 적는다 — 관문 「기술 고문 요청서」 · `node docs/advisor/check-brief.mjs` · `node docs/advisor/render.js`.
 
 ## 🔴 장학금 판정 자동화 (2026-09-30 지시 — *"2번의 이유를 분석하고 장학금 판정을 자동화"*)
 
-- **왜 사람 손이었나**: `noticeKind` 는 제목만 보고, 학교는 제 장학금에 '교내'라고 적지 않아 학교마다 사람이 원문을 읽고 `OWN_PROGRAMS` 를 채워야 했다 (44개교에서 경희대 하나). 낱말 목록으로 교외를 찾는 옛길은 막혔다. 남은 길은 **원문 증거**다.
+- **왜 원문 증거인가**: 학교는 제 장학금에 '교내'라고 안 적고 낱말 목록으로 교외를 찾는 옛길은 막혔다 — 남은 길은 **원문 증거**다(경위 SESSIONS.md).
 - **판정기 `collector/kind-evidence.mjs`**(`classifyKind` · 순수 함수): 제목 표식 → 학교 제도 표(`OWN_PROGRAMS` + 학습 `own-programs.json`) → 제목의 바깥 기관 낱말(`ORG_RE`) → 학교 이름표(`schoolTokens`) + 본문 증거(교비·장학팀 접수·학교 도메인 이메일) 순. 이름표 없이 본문 낱말만으로는 교내로 보지 않는다 (껍데기를 걷어낸 본문만 읽는다 `makeStripperMulti`). 증거 없음 = 교외.
 - **소급 로봇 `collector/kind-classify.mjs`**(원문 도착 뒤 · 두 수집 워크플로의 데이터 관문 앞): 확신 high 면 구분을 고치고 `kindEvidence` 를 남기며 제도 이름을 학습 표에 적는다(다음 등록부터 `noticeKind(title, school, learned)` 셋째 인자로 잡힌다 · 앱 화면은 안 넘긴다). mid 는 `kind-candidates.json` 후보로만. 관리자가 교내→교외로 되돌린 이름은 `blocked` 로(다시 배우지 않는다).
 - **범위 승격 `collector/scope-promote.mjs`**(F-5): 학교 한정·교외·로봇 등록분 중 ① 접수 이메일이 학교 밖 ② 본문 "재단에 직접 제출/재단 홈페이지 신청/우편 접수" ③ 타교 같은 사업(`programKey` · `entry-rules.cjs`)이면 전국으로(`scopeFrom` 에 근거) · 학교 창구(장학팀·포털) 문장이 있으면 안 푼다. 자동 등록도 타교 같은 사업이 오면 기존 것을 승격(`verdict: 'promote'`) · 합치기는 `collector/registered-merge.mjs` 한 곳.
@@ -57,7 +57,7 @@
   노션이 안 붙은 세션이면 **먼저 그렇게 말하고** 저장소로만 답한다(`audit-data` · `check-deploy-sync` · 최근 커밋).
 - **백로그의 일을 했으면 끝내기 전에 노션을 고친다** — 상태 + 상태 메모(날짜·근거·커밋). 없는 일이면 행을 더한다.
   Stop 훅이 '고쳤는데 노션에 안 썼으면' 알린다(막지 않는다). 읽기·실패한 쓰기는 반영이 아니다.
-- 「작업 현황」은 로봇(`tools/notion-status.mjs`)이 채운다 — 아래 기술 사실 참조. 🔴 **공유문서 만들기 중단(10-30 개발자 지시)** — 작업 보고서 PDF(스킬 `work-report`)·노션 새 페이지·아티팩트를 다시 지시할 때까지 만들지 않는다.
+- 「작업 현황」은 로봇(`tools/notion-status.mjs`)이 채운다 — 아래 기술 사실 참조. 🔴 **공유문서 만들기 중단(10-30 지시)** — 보고서 PDF(`work-report`)·노션 새 페이지·아티팩트를 만들지 않는다(다시 지시할 때까지).
 - **노션에 없고 여기서만 사는 것**: ① 인스타 토큰 60일 — **2026-11-12 쯤 재발급**(`node insta/token-days.mjs` 의 `살아 있음 · n일` 문장을 본다)
   ② GitHub 관리자 열쇠 만료 2026-11-07(노션 F-4) ③ 재조사 금지: KOSAF 는 재단은 100% 알지만 **이번 회차는 19%만** 알고 신청서 양식 첨부가 없다(`collector/kosaf-fetch.mjs` 머리말).
 
@@ -73,9 +73,8 @@
    통과한 것만 자동 등록하고 리포트에 선조치후보고(끄기 `auto-register-config.json` `enabled:false` · 제거 `blockIds`). 애매한 건 '컨펌 대기'로
    리포트에만 — 컨펌은 채팅에서 개발자가 한다. 실시간 공고 피드(제목+링크)는 컨펌 없이 게재.
 3. **선조치후보고** — 방향 결정이 필요하면 최적안으로 먼저 조치하고 "어떤 상황에서 어떤 조치"를 보고.
-4. **양식 = 공고 첨부 신청서 원본 그대로**(2026-10-14 결정 6) — `collector/form-pdf.mjs` 가 PDF 사본을 `data/forms-pdf/` 에 두고 앱은 「원본 양식 그대로 보기」
-   (답 얹기는 다음 단계). 앱이 양식을 다시 그리는 스키마화는 멈춤(`schematize-config.json` enabled:false · 있는 앱 양식은 그 공고가 닫힐 때까지).
-   글꼴은 `collector/install-form-fonts.sh`(없으면 중국어 글꼴로 표가 깨진다). 관문 「신청서 원본 → PDF」.
+4. **양식 = 공고 첨부 신청서 원본 그대로**(2026-10-14 결정 6) — `collector/form-pdf.mjs` 가 PDF 사본을 `data/forms-pdf/` 에 두고 앱은 「원본 양식 그대로 보기」·「양식 채우기」(`formfill.js`). 앱이 양식을 다시 그리는 스키마화는 멈춤(`schematize-config.json` enabled:false · 있는 앱 양식은 그 공고가 닫힐 때까지).
+   글꼴은 `collector/install-form-fonts.sh`(없으면 표가 깨진다). 관문 「신청서 원본 → PDF」.
 5. **정식 등록은 원본 첨부까지 한 세트** — ① `collector/run-deepfetch.txt` 에 `targets: 키워드` 적어 기본 브랜치 push(첨부 원본+미리보기 텍스트가
    `collector/extracted/` 에 커밋되고 PDF 로봇이 같은 워크플로에서 잇는다) ② 새 `forms.json` 양식은 만들지 않는다(옛 `formId` 는 `verify/verify-registered.js`·
    `verify-forms-data.js` 로 검증) ③ 포털 입력형 등은 모든 수단(상세·첨부·재단 홈·fetch-page·정찰)을 쓴 뒤에만 개발자에게 묻는다. 채울 양식이 없으면 `noForm: "사유"`.
@@ -161,6 +160,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 | `essay.js` `essay-quality.js` `essay-submit-check.js` | AI 초안(유일하게 AI가 문장을 쓰는 곳 — 금지선은 '사실을 만드는 것') · 품질 검사 · 제출 전 점검 |
 | `chat.js` | 도우미 — 앱이 아는 것만 답하고 못 찾으면 "못 찾았다". 프로필은 절대 안 보낸다 |
 | `interactions.js` | 손짓·움직임(당겨서 새로고침·뼈대) — 판정을 새로 만들지 않는다 |
+| `formfill.js` | 양식 채우기 — 쪽 그림 위 빈칸에 답 얹기(학적정보 먼저 · 서랍/사이드바 · 인쇄→PDF) · `verify-formfill.js` |
 | `apply-channel.js` | 접수 채널 · 포털 시스템(`findApplyPortal`) |
 | `supabase-client.js` `supabase-config.js` | 로그인 — 서버로 나가는 사본은 **`syncSafeProfile()` 한 곳**(주민번호·계좌 제거) |
 | `data.js` | 상시 제도 · 대학/별칭/캠퍼스 · 포털 정보 |
@@ -190,7 +190,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 | `collector/fetch-board.mjs` | 게시판 받기·실패 이유 펴기 — 일반 수집기와 소식 로봇이 같이 쓴다(베끼지 말 것) |
 | `collector/extract-excerpts.mjs` | 원문 발췌 · 마감일 · 메일 접수 주소(`apply-email.mjs`) |
 | `collector/deepfetch.mjs` `rescue-bodies.mjs` | 본문·첨부 원본 받기 · **자격요건 로봇**(`.github/workflows/rescue-bodies.yml` · 진짜 크롬 · 하루 두 번) — 장학 본문 재수집 + 대외활동 `activity-docs.mjs --browser`. 🔴 진짜 브라우저로 자격을 찾는 로봇은 이것 하나(하나 더 만들면 같은 공고를 두 번 두드린다) · `data/activities.json` 은 안 쓰고 장부 act-browser.json 에만(수집 로봇이 합친다) |
-| `collector/schematize-forms.mjs` `schema-from-text.mjs` `form-pdf.mjs` | 양식 스키마화(무료 우선 · 10-12 지시로 멈출 예정) · 신청서 **원본 그대로** → PDF(`data/forms-pdf/` · HWP 는 H2Orestart + 자바 다리 · 관문 「신청서 원본 → PDF」) |
+| `collector/schematize-forms.mjs` `form-pdf.mjs` `form-fields.mjs` | 양식 스키마화(멈춤) · 신청서 **원본 그대로** → PDF(`data/forms-pdf/` · HWP 는 H2Orestart · 관문 「신청서 원본 → PDF」) · 쪽 그림·빈칸 자리(관문 「신청서 쪽 그림 · 빈칸 자리」) |
 | `collector/link-hunter.mjs` `probe-links.mjs` `resolve-detail-urls.mjs` `detail-url.mjs` `kosaf-hunt.mjs` | 원문 주소 찾기 · 정찰 · 주소 규칙 · 층2 → 재단 개별 공고 후보(재단 홈페이지를 뒤져 `kosaf-hunt.json` 에 · 확인은 link-check · 관문 「층2 재단 글 사냥꾼」) |
 | `collector/notice-source.mjs` `canon-url.mjs` `url-key.mjs` `clean-title.mjs` | '같은 공고인가'·'원문이 무엇인가' 규칙 한 곳 |
 | `collector/kosaf-*.mjs` | 층2 수확 · 첨부 사본 |

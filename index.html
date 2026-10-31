@@ -807,6 +807,28 @@
 
     <!-- ============ 상세 바텀시트 ============ -->
     <div id="sheet-backdrop" class="sheet-backdrop" hidden></div>
+    <!-- ============ 양식 채우기 (양식 5단계 · 시안 B/C · 2026-10-31 · formfill.js) ============
+         원본 쪽 그림(#ff-pages) 위 로봇이 찾은 빈칸에 답을 얹는다 · 칸 목록(#ff-panel)은 폰에선 아래 서랍, 넓은 폭에선 오른쪽 사이드바.
+         🔴 문서는 한 글자도 안 바뀐다 · 서명·날인은 비워 둔다(결정 5) · 내보내기는 브라우저 인쇄 → PDF(결정 4). -->
+    <section id="screen-formfill" class="screen" hidden>
+      <header class="sub-header">
+        <button class="sub-back" id="btn-ff-back" aria-label="뒤로">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <h2>양식 채우기</h2>
+      </header>
+      <p class="ff-head"><strong id="ff-title"></strong><span id="ff-file" class="ff-file"></span></p>
+      <p class="set-note">원본 그대로예요 — 학적정보에서 가져온 값은 틀리면 여기서 고치세요. 서명·날인 칸은 비워 두고 인쇄한 뒤 직접 써요.</p>
+      <div class="ff-wrap">
+        <div id="ff-pages" class="ff-pages"></div>
+        <aside id="ff-panel" class="ff-panel">
+          <button type="button" class="ff-handle" id="ff-handle" aria-label="칸 목록 펼치기"><span class="ff-handle-bar"></span><span id="ff-handle-n"></span></button>
+          <div class="ff-panel-head"><span id="ff-left" class="ff-left"></span><button type="button" class="btn btn-primary ff-print" id="btn-ff-print">인쇄 · PDF 저장</button></div>
+          <ul id="ff-list" class="ff-list"></ul>
+          <p class="dp-note">신청내역에 담길 뿐 학교·재단에 접수되지는 않아요.</p>
+        </aside>
+      </div>
+    </section>
     <div id="detail-sheet" class="sheet" hidden></div>
 
     <!-- ============ 장학금 도우미 (챗봇) ============ -->
@@ -906,6 +928,7 @@
   <script src="forms.js"></script>
   <script src="notify.js"></script>
   <script src="app.js"></script>
+  <script src="formfill.js"></script>   <!-- 양식 채우기 — app.js 의 전역을 쓴다(뒤에 싣는다) -->
   <script src="essay-config.js"></script>
   <script src="essay-quality.js"></script>
   <!-- 제출 전 점검표 판정 — essay.js 가 전역으로 참조하므로 먼저 실어야 한다 -->

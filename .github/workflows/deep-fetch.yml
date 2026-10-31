@@ -108,6 +108,38 @@ jobs:
           mode: resolve
           title: 🚨 신청서 원본 → PDF 단계가 넘어졌어요
           label: form-pdf-step
+      # 신청서 쪽 그림 + 빈칸 자리 (양식 5단계 「원본 위에 답 얹기」의 재료 · 2026-10-31 · collector/form-fields.mjs) — 위 PDF 사본마다 쪽 그림(WebP)과
+      # 이름표 옆 빈칸 자리(fields.json)를 만든다. 앱의 「양식 채우기」(formfill.js)가 그 위에 학생 답을 얹는다. 보강 단계(시한 + continue-on-error) · 경보 짝.
+      # 🔴 `|| true` 로 설치 실패를 삼키지 않는다 · Pillow 가 없으면 로봇이 PNG 로 두고 리포트에 센다(멈추지 않는다).
+      - name: 신청서 쪽 그림 · 빈칸 자리
+        id: formfields
+        timeout-minutes: 6
+        continue-on-error: true
+        run: |
+          sudo apt-get install -y -qq poppler-utils
+          pip install pillow --quiet
+          node collector/form-fields.mjs
+      - name: 🚨 신청서 쪽 그림 단계 실패 알림
+        if: always() && steps.formfields.outcome == 'failure'
+        timeout-minutes: 1
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          title: 🚨 신청서 쪽 그림 · 빈칸 자리 단계가 넘어졌어요
+          label: form-fields-step
+          body: |
+            신청서 PDF 사본의 쪽 그림과 빈칸 자리를 만드는 단계가 끝까지 가지 못했습니다. 그동안 앱의 「양식 채우기」는 옛 장부로 남습니다(새 신청서엔 단추가 안 뜹니다). 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      - name: ✅ 신청서 쪽 그림 단계 회복 — 경보 닫기
+        if: always() && steps.formfields.outcome == 'success'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          title: 🚨 신청서 쪽 그림 · 빈칸 자리 단계가 넘어졌어요
+          label: form-fields-step
       # 공고문 뒷장의 신청서 서식 쪽 떼기 (2026-10-13 · collector/form-pages.mjs) — 층1 공고문 첨부 + 층2 재단 공고문 사본의 서식 쪽만 떼어 data/form-pages/ 에.
       # 보강 단계(시한 + continue-on-error) · poppler-utils 는 위 PDF 글자 단계가 깔았다(여기서 한 번 더 — 그 단계가 실패했을 수 있다) · HWP·HWPX 는 위 단계의 LibreOffice+확장을 쓴다.
       - name: 공고문 뒷장 서식 쪽 떼기
@@ -122,6 +154,7 @@ jobs:
           git add collector/extracted
           [ -d data/forms-pdf ] && git add -A data/forms-pdf
           [ -f collector/form-pdf-report.md ] && git add collector/form-pdf-report.md
+          [ -f collector/form-fields-report.md ] && git add collector/form-fields-report.md
           [ -d data/form-pages ] && git add -A data/form-pages
           [ -f collector/form-pages-report.md ] && git add collector/form-pages-report.md
           if ! git diff --cached --quiet; then

@@ -103,6 +103,7 @@
      로 내리지 않고 **그 바닥인 16px** 에 둔다. 아홉 단계 척도(--t-2xs~hero)에 넣지 않는
      이유가 이것이다 — 여기 끼우면 17px 과 1.06배라 '단계마다 1.07배' 관문이 빨간불이 된다. */
   --t-input: 16px;
+  --ffpt: 1px;      /* 양식 채우기 — 쪽 그림 위 1pt 가 화면에서 몇 px 인지(formfill.js ffScale 이 쪽마다 덮어쓴다 · 2026-10-31) */
 
   /* 자간 — 전에는 화면 곳곳에 9가지가 흩어져 있었다. 큰 글자는 좁히고 작은 글자·숫자는 안 좁힌다. */
   --track-display: -0.03em;   /* 24px 이상 */
@@ -5234,3 +5235,59 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 .att-m { font-size: var(--t-xs); color: var(--text-weak); }
 .att-go { flex: none; font-size: var(--t-xs); color: var(--text-sub); }
 
+/* ── 양식 채우기 (양식 5단계 · 시안 B/C · 2026-10-31 · formfill.js) ──────────────────────
+   쪽 그림 위 빈칸은 쪽 크기에 대한 % 로 놓인다(폭이 바뀌어도 제자리) · 글자 크기는 1pt 의 화면 px(--ffpt · formfill.js ffScale).
+   폰(좁은 폭): 칸 목록이 아래 서랍(B) — 손잡이를 누르면 펼친다 · 넓은 폭(≥ 760px): 오른쪽 사이드바(C).
+   🔴 토큰만 쓴다(ui-tone) · 인쇄는 맨 아래 @media print — 쪽 그림만 종이 크기로, 칸은 글자만 남긴다(결정 4). */
+.ff-head { display: flex; flex-direction: column; gap: var(--space-2); margin: 0 0 var(--space-6); }
+.ff-head strong { font-size: var(--t-md); font-weight: 700; }
+.ff-file { font-size: var(--t-xs); color: var(--text-weak); }
+.ff-wrap { display: flex; flex-direction: column; gap: var(--space-12); padding-bottom: calc(var(--space-40) + var(--space-32)); }
+.ff-pages { display: flex; flex-direction: column; gap: var(--space-12); }
+.ffp-page { position: relative; width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-xs); overflow: hidden; }
+.ffp-page img { display: block; width: 100%; height: 100%; }
+.ffp-field {
+  position: absolute; box-sizing: border-box; margin: 0; padding: 0 calc(var(--ffpt) * 2);
+  font: inherit; font-size: calc(var(--ffpt) * 9.5); line-height: 1; color: var(--text);
+  background: var(--accent-soft); border: 1px solid var(--accent-line); border-radius: var(--radius-hair); outline: none;
+}
+.ffp-field:focus { border-color: var(--accent); background: var(--surface); }
+.ffp-field.ffp-empty { background: var(--orange-weak); border-color: var(--orange); border-style: dashed; }
+.ffp-field::placeholder { color: var(--text-weak); opacity: 0.7; }
+.ff-panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: var(--space-12); }
+.ff-handle { display: none; }
+.ff-panel-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); margin-bottom: var(--space-8); }
+.ff-left { font-size: var(--t-sm); font-weight: 700; color: var(--orange); background: var(--orange-weak); border-radius: var(--radius-pill); padding: var(--space-4) var(--space-12); }
+.ff-left.done { color: var(--green); background: var(--green-weak); }
+.ff-print { padding: var(--space-8) var(--space-16); font-size: var(--t-sm); }
+.ff-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-8); }
+.ff-list li { display: grid; grid-template-columns: 1fr auto; gap: var(--space-2) var(--space-8); align-items: center; padding: var(--space-8) 0; border-bottom: 1px solid var(--line); }
+.ff-lab { grid-column: 1 / -1; font-size: var(--t-xs); color: var(--text-sub); font-weight: 600; }
+.ff-page-n { margin-left: var(--space-6); color: var(--text-weak); font-weight: 400; }
+.ff-pin { width: 100%; font: inherit; font-size: var(--t-input); padding: var(--space-8) var(--space-12); border: 1px solid var(--rule); border-radius: var(--radius-xs); background: var(--bg); color: var(--text); }
+.ff-pin:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+.ff-undo { white-space: nowrap; }
+.ff-open { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); width: 100%; margin: var(--space-4) 0 var(--space-8); padding: var(--space-12) var(--space-16); background: var(--accent-soft); color: var(--text); border: 1px solid var(--accent-line); text-align: left; }
+.ff-open-m { font-size: var(--t-xs); color: var(--text-sub); font-weight: 500; }
+.ff-slot { list-style: none; }
+@media (max-width: 759px) {
+  .ff-panel { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; border-radius: var(--radius) var(--radius) 0 0; box-shadow: var(--shadow-sheet); transform: translateY(calc(100% - 52px)); transition: transform 0.22s ease; max-height: 62vh; overflow: auto; padding-top: 0; }
+  .ff-panel.open { transform: translateY(0); }
+  .ff-handle { display: flex; flex-direction: column; align-items: center; gap: var(--space-4); width: 100%; height: 52px; background: none; border: 0; font: inherit; font-size: var(--t-sm); font-weight: 700; color: var(--text); padding: var(--space-8) 0 0; }
+  .ff-handle-bar { width: 38px; height: 4px; border-radius: var(--radius-pill); background: var(--rule); }
+}
+@media (min-width: 760px) {
+  #app.on-formfill { max-width: 1100px; }   /* 앱 틀은 480px(폰 한 벌)이지만 양식 채우기는 쪽 그림 + 사이드바가 나란히 서야 한다(시안 C) */
+  .ff-wrap { flex-direction: row; align-items: flex-start; padding-bottom: 0; }
+  .ff-pages { flex: 1 1 auto; min-width: 0; }
+  .ff-panel { flex: 0 0 300px; position: sticky; top: var(--space-12); max-height: calc(100vh - 120px); overflow: auto; }
+}
+@media print {
+  body, #app { overflow: visible !important; height: auto !important; }
+  #app > *:not(#screen-formfill), #screen-formfill > *:not(.ff-wrap), .ff-wrap > *:not(#ff-pages), #bottom-nav { display: none !important; }
+  #screen-formfill { display: block !important; padding: 0; }
+  .ff-pages { gap: 0; }
+  .ffp-page { width: 210mm; border: 0; border-radius: 0; break-after: page; page-break-after: always; }
+  .ffp-field { background: transparent; border-color: transparent; }
+  .ffp-field::placeholder { color: transparent; }
+}

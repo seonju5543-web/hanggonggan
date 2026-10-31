@@ -1176,13 +1176,13 @@ function showScreen(name, opts) {
   if (typeof resumeSaveScroll === 'function' && currentScreen && currentScreen !== name) {
     resumeSaveScroll(currentScreen, appScroller().scrollTop);
   }
-  ['onboarding', 'home', 'explore', 'activities', 'applications', 'my', 'myinfo', 'mydocs', 'mysaved', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'].forEach((n) => {
+  ['onboarding', 'home', 'explore', 'activities', 'applications', 'my', 'myinfo', 'mydocs', 'mysaved', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms', 'formfill'].forEach((n) => {
     $(`#screen-${n}`).hidden = n !== name;
   });
-  $('#bottom-nav').hidden = name === 'onboarding';
+  $('#bottom-nav').hidden = name === 'onboarding' || name === 'formfill';   // 양식 채우기는 쪽 그림이 화면을 다 써야 한다(formfill.js)
   /* 설정·휴지통은 MY 안쪽 화면이라 아래 탭에서 **MY 가 켜진 채**로 둔다 —
      아무 탭도 안 켜져 있으면 학생이 지금 어디에 있는지 알 수 없다. */
-  const navOn = ['myinfo', 'mydocs', 'mysaved', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'].includes(name) ? 'my' : name;
+  const navOn = ['myinfo', 'mydocs', 'mysaved', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'].includes(name) ? 'my' : (name === 'formfill' ? 'applications' : name);
   $$('.nav-item').forEach((b) => b.classList.toggle('active', b.dataset.nav === navOn));
 
   /* 🔴 안쪽 화면(설정·휴지통)은 **방향이 있는** 움직임으로 들어온다 (2026-09-11 개발자 지시).
@@ -1191,11 +1191,12 @@ function showScreen(name, opts) {
         style.css 에서 **이 규칙이 뒤에 와야** 이긴다(같은 굵기면 나중 것이 이긴다).
      ⚠️ 클래스를 떼었다 붙이는 것만으로는 다시 안 돈다 — 브라우저가 '바뀐 게 없다'고 본다.
         중간에 offsetWidth 를 한 번 읽어 강제로 끊어 준다. */
-  const SUB = ['myinfo', 'mydocs', 'mysaved', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms'];
+  const SUB = ['myinfo', 'mydocs', 'mysaved', 'settings', 'trash', 'terms', 'logins', 'faq', 'support', 'perms', 'formfill'];
   /* 🔴 안쪽 화면에서는 **가로 손짓이 우리 것**이라고 앱 전체에 표시해 둔다 (2026-09-12).
      짧은 화면 아래 빈 자리는 화면이 아니라 `#app` 이라, 화면에만 주면 거기서 시작한
      손짓을 브라우저가 세로 스크롤로 가져간다. 안쪽 화면일 때만 켜는 이유는 style.css 에. */
   $('#app').classList.toggle('on-sub-screen', SUB.includes(name));
+  $('#app').classList.toggle('on-formfill', name === 'formfill');   // 양식 채우기만 넓은 폭(시안 C 사이드바)을 쓴다 — style.css #app.on-formfill
   if (SUB.includes(name) || SUB.includes(currentScreen)) {
     const el = $(`#screen-${name}`);
     if (el) {
@@ -2525,6 +2526,7 @@ function renderFormFill(restore) {
     }
     /* AI 초안 버튼 — essay-config.js 의 endpoint 가 비어 있으면 버튼 자체가 없다 */
     if (typeof essayBind === 'function') essayBind(tpl, sch);
+    if (tpl.unofficial && typeof attachFormFillButtons === 'function') attachFormFillButtons(sch, sheet);   // 「원본 양식 그대로 보기」 밑 「양식 채우기」(formfill.js)
     /* 들어온 순간에도 한 번 적는다 — 자동으로 채운 값부터 남는다.
        치는 동안의 저장은 bindEvents 의 **위임 리스너 하나**가 맡는다:
        여기서 걸면 단계를 오갈 때마다 리스너가 쌓인다(시트는 innerHTML 만 갈린다). */
@@ -2774,7 +2776,7 @@ function prepOriginalsHtml(sch) {
   const attMeta = kosaf ? '재단 공고문 사본 · 내려받기' : '학교 게시판 첨부 · 내려받기';
   const note = kosaf
     ? '접수 방법과 서식은 재단의 공고문이 정합니다 — 아래에서 정리한 내용을 그 서식에 옮겨 적으세요.'
-    : `제출은 이 원본 양식으로 합니다 — 아래에서 정리한 내용을 옮겨 적으세요.${pdfRows ? ' PDF 에 답을 얹는 「양식 채우기」는 다음 단계에서 열립니다.' : ''}`;
+    : `제출은 이 원본 양식으로 합니다 — 아래에서 정리한 내용을 옮겨 적으세요.${pdfRows ? ' 빈칸을 찾은 PDF 는 「양식 채우기」로 답을 얹을 수 있어요.' : ''}`;
   /* 줄 순서 — 원본 PDF 사본 → 첨부 원본 파일 → 공고문에서 뗀 서식 쪽(시안 A 드라이버가 앞 두 묶음의 자리를 잰다) */
   return `<h4>${head}</h4>
       <ul class="doc-list">${pdfRows}${atts.map((a) => attachRowHtml(a, { meta: `${attMeta}${attachKb(a)}` })).join('')}${pageRows}</ul>
@@ -2960,7 +2962,8 @@ function attachRowHtml(a, { meta = '', go = '↓' } = {}) {
 function formPdfRowsHtml(sch) {
   return formPdfsFor(sch).map((f) => {
     const meta = `${f.pages ? `${f.pages}쪽 · ` : ''}${Math.max(1, Math.round((f.bytes || 0) / 1024))}KB · 글자 하나 안 바꾼 원본 사본${formPdfsFor(sch).length > 1 ? ` · ${f.name}` : ''}`;
-    return `<li class="att att-row att-row-new"><span class="att-ic att-ic-pdf">PDF</span><span class="att-t"><a href="${esc(`data/forms-pdf/${f.file}`)}" target="_blank" rel="noopener">원본 양식 그대로 보기</a><span class="att-m">${esc(meta)}</span></span><span class="att-go">열기 ›</span></li>`;
+    /* 밑 자리(li.ff-slot)는 formfill.js attachFormFillButtons 가 빈칸을 찾은 파일에만 「양식 채우기」 단추로 채운다(시트·지원문서 머리 둘 다) */
+    return `<li class="att att-row att-row-new"><span class="att-ic att-ic-pdf">PDF</span><span class="att-t"><a href="${esc(`data/forms-pdf/${f.file}`)}" target="_blank" rel="noopener">원본 양식 그대로 보기</a><span class="att-m">${esc(meta)}</span></span><span class="att-go">열기 ›</span></li><li class="ff-slot" data-file="${esc(f.file)}" hidden></li>`;
   }).join('');
 }
 
@@ -4011,7 +4014,7 @@ function renderApplyPrep(sch) {
       ${(formAtts.length || pdfRows) ? `
       <h4>신청서 양식 <span class="channel-tag">공고 원본</span></h4>
       <ul class="doc-list">${pdfRows}${formAtts.map((a) => attachRowHtml(a, { meta: `학교 게시판 첨부 · 내려받기${kb(a)}` })).join('')}</ul>
-      <p class="dp-note">${pdfRows ? '위 PDF 에 답을 얹는 「양식 채우기」는 다음 단계에서 열립니다.' : '원본 파일을 내려받아 작성해 주세요.'}</p>` : ''}
+      <p class="dp-note">${pdfRows ? '빈칸을 찾은 PDF 는 「양식 채우기」로 답을 얹을 수 있어요 — 문서는 그대로예요.' : '원본 파일을 내려받아 작성해 주세요.'}</p>` : ''}
       ${otherAtts.length ? `
       <h4>${kosaf ? '선발 공고문 <span class="channel-tag">재단 원문</span>' : '공고 첨부 파일'}</h4>
       ${attList(otherAtts, kosaf ? '재단 원문 첨부' : '학교 게시판 첨부')}` : ''}
@@ -4035,6 +4038,7 @@ function renderApplyPrep(sch) {
     finalizeApply(sch, null);
     openDetail(sch.id);
   });
+  if (typeof attachFormFillButtons === 'function') attachFormFillButtons(sch, $('#detail-sheet'));   // 빈칸을 찾은 PDF 에만 「양식 채우기」(formfill.js)
   $('#detail-sheet').scrollTop = 0;
 }
 

@@ -307,7 +307,7 @@ async function swipeDown(page, sel) {
       eq('  그 밑 줄은 학교 게시판 첨부(내려받기 ↓) — 원본 파일 줄은 그대로 남는다 (그 뒤에 공고문에서 뗀 서식 쪽 줄이 올 수 있다 · 10-13 ②)', got.rows.slice(pick.P.pdfs.length, pick.P.pdfs.length + pick.P.formAtts.length).map((r) => [r.go, /^학교 게시판 첨부 · 내려받기/.test(r.meta)]),
         pick.P.formAtts.map(() => ['↓', true]));
       eq('  PDF 줄 주소가 서로 다르다 (같은 사본을 두 번 늘어놓지 않는다)', new Set(pdfRows.map((r) => r.link && r.link.href)).size, pick.P.pdfs.length);
-      eq('  안내 문구 — 제출은 원본 양식으로 · 「양식 채우기」는 다음 단계', got.note, '제출은 이 원본 양식으로 합니다 — 아래에서 정리한 내용을 옮겨 적으세요. PDF 에 답을 얹는 「양식 채우기」는 다음 단계에서 열립니다.');
+      eq('  안내 문구 — 제출은 원본 양식으로 · 빈칸을 찾은 PDF 는 「양식 채우기」(2026-10-31 5단계 착수로 문구 갱신)', got.note, '제출은 이 원본 양식으로 합니다 — 아래에서 정리한 내용을 옮겨 적으세요. 빈칸을 찾은 PDF 는 「양식 채우기」로 답을 얹을 수 있어요.');
       /* 새 탭 링크가 실제로 PDF 를 준다(서비스워커가 index.html 을 대신 주지 않는다) */
       const head = await page.evaluate(async (u) => { const r = await fetch(u, { cache: 'no-store' }); return { ok: r.ok, type: r.headers.get('content-type') || '' }; }, pick.P.pdfs[0].href);
       eq('  그 주소를 받으면 PDF 다 (서비스워커가 앱을 대신 주지 않는다)', head.ok && /pdf/i.test(head.type), true);
