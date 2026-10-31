@@ -11059,10 +11059,10 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=271649&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-10-30",
+   "at": "2026-10-31",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 2
+   "tries": 3
   },
   "url:https://www3.chosun.ac.kr/bbs/chosun/117/282428/artclView.do": {
    "at": "2026-10-29",
@@ -11235,10 +11235,10 @@
    "none": "본문 첫 문장을 확신할 수 없음"
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=271680&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-10-30",
+   "at": "2026-10-31",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1
+   "tries": 2
   },
   "url:https://www.smu.ac.kr/webzine/today.do?article.offset=0&articleLimit=10&articleNo=769843&mode=view": {
    "at": "2026-10-30",
@@ -11311,10 +11311,10 @@
    "desc": "교수학습혁신센터 안녕하세요. 교수학습혁신센터는 2026학년도 생성형 AI 활용 학습 실태 및 인식 조사를 실시합니다. 여러분의 AI 활용 학습 경험을 공유해 주세요!"
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=271678&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-10-30",
+   "at": "2026-10-31",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1
+   "tries": 2
   },
   "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511850&mCode=MN095&mgr_seq=3&mode=view": {
    "at": "2026-10-30",
@@ -11482,10 +11482,10 @@
    "desc": "* 전형절차 : 1차면접(실무진) -> 2차면접(임원) -> 최종합격 - 추천채용 지원자 서류 전형 면제"
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=271688&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-10-30",
+   "at": "2026-10-31",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1
+   "tries": 2
   },
   "url:https://www.pknu.ac.kr/main/163?action=view&no=726802": {
    "at": "2026-10-30",
@@ -11613,10 +11613,10 @@
    "desc": "성균관대학교 양자생명물리과학원에서 근무할 직원을 아래와 같이 모집하오니 많은 관심과 지원을 바랍니다."
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=271682&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-10-30",
+   "at": "2026-10-31",
    "v": 2,
    "err": "글 화면에 그 글의 제목이 없음",
-   "tries": 1
+   "tries": 2
   },
   "url:https://www.inha.ac.kr/bbs/kr/8/45999/artclView.do": {
    "at": "2026-10-30",
@@ -11720,6 +11720,61 @@
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367715&mode=view&no=382": {
    "at": "2026-10-30",
+   "v": 2,
+   "desc": "연구협력관 행사 진행에 따라 아래와 같이 셔틀버스를 변경 운행하오니, 이용에 참고하여 주시기 바랍니다."
+  },
+  "post:전북대학교:219212": {
+   "at": "2026-10-31",
+   "v": 2,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.pknu.ac.kr/main/163?action=view&no=726805": {
+   "at": "2026-10-31",
+   "v": 2,
+   "desc": "글로벌어학교육센터에서 아래와 같이 글로벌언어 집중 강좌 수강생을 아래와 같이 모집 하오니 관심 있는 학생의 많은 지원 바랍니다."
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367723&mode=view&no=378": {
+   "at": "2026-10-31",
+   "v": 2,
+   "desc": "1. 전공결정 신청 대상 2026-2 학기 현재 재학생으로 가 .2026학년도 호크마교양대학 호크마학부로 입학한 전공(학과) 미결정자 나. 2026학년도 학부별로 입학한 전공 미결정자"
+  },
+  "post:전북대학교:219211": {
+   "at": "2026-10-31",
+   "v": 2,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367722&mode=view&no=377": {
+   "at": "2026-10-31",
+   "v": 2,
+   "desc": "1. 전공변경 신청자격: 2026-2학기 현재 2학년 이상 재학생으로서 다음 요건에 해당하는 학생"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367721&mode=view&no=376": {
+   "at": "2026-10-31",
+   "v": 2,
+   "desc": "< 전과지원자 유의사항> 1. 전과지원자격 : ① 2026학년도 2학기 현재 3~7학기 이수 중인 재학생 및 이수한 휴학생으로서 40학점 이상 취득(예정)자 ② 2019학년도 입학생부터는 제1전공의…"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367719&mode=view&no=375": {
+   "at": "2026-10-31",
+   "v": 2,
+   "desc": "- 일시 : 2026년 11월 11일(수) 오후 6시~7시 30분 - 장소 : 포스코관 B151호"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367718&mode=view&no=374": {
+   "at": "2026-10-31",
+   "v": 2,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367717&mode=view&no=373": {
+   "at": "2026-10-31",
+   "v": 2,
+   "desc": "1. 모집개요 &bull; 모집분야 및 인원: 총무처장발령 계약직원 1명 &bull; 업무: 행정실 행정지원(장학업무 등)"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367716&mode=view&no=372": {
+   "at": "2026-10-31",
+   "v": 2,
+   "desc": "나 . 입찰서류제출 마감일시 및 장소 : 2026. 11 9.( 월 ) 11:00, 이비즈포유 (http://www.ebiz4u.co.kr)"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367715&mode=view&no=371": {
+   "at": "2026-10-31",
    "v": 2,
    "desc": "연구협력관 행사 진행에 따라 아래와 같이 셔틀버스를 변경 운행하오니, 이용에 참고하여 주시기 바랍니다."
   }

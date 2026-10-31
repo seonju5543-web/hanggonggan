@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-30",
+ "updatedAt": "2026-10-31",
  "items": {
   "r:auto-082f26ec8898eab98ceca780": {
    "attempts": 0,
@@ -17,17 +17,6 @@
    "nextTryAt": "2026-08-21",
    "status": "resolved",
    "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322949"
-  },
-  "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%20%EC%A0%9C36%EA%B8%B0%20%EB%AF%B8%EB%A0%88%EC%97%90%EC%85%8B%20%ED%95%B4%EC%99%B8%EA%B5%90%ED%99%98%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C": {
-   "attempts": 5,
-   "title": "공통 제36기 미레에셋 해외교환 장학생 선발",
-   "lastTried": "2026-09-30",
-   "lastWhy": "목록에서 못 찾음",
-   "status": "",
-   "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322953",
-   "nextTryAt": "2026-10-14",
-   "escalated": true,
-   "likelyGone": true
   },
   "r:auto-84a0ebb09c20ec9588eb82b4": {
    "attempts": 0,
@@ -154,22 +143,6 @@
    "status": "resolved",
    "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323148"
   },
-  "n:https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-2026-2%ED%95%99%EA%B8%B0%20%EC%9D%98%EA%B3%BC%EB%8C%80%ED%95%99%2081%ED%95%99%EB%B2%88%20%ED%9B%84%EB%B0%B0%20%EC%82%AC%EB%9E%91%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B3%B5%EA%B3%A0": {
-   "attempts": 0,
-   "title": "2026-2학기 의과대학 81학번 후배 사랑 장학생 선발 공고",
-   "lastTried": "2026-09-30",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30202&pageNo=1"
-  },
-  "n:https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-2026-2%ED%95%99%EA%B8%B0%20CAU%20%EB%AF%B8%EB%9E%98%EC%84%A4%EA%B3%84%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EA%B3%B5%EA%B3%A0": {
-   "attempts": 0,
-   "title": "2026-2학기 CAU 미래설계장학금 장학생 모집 공고",
-   "lastTried": "2026-09-30",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30196&pageNo=1"
-  },
   "r:auto-aaa8eca79120eab3b5eab3a0": {
    "attempts": 0,
    "title": "2026-2학기 CAU 미래설계장학금 장학생 모집 공고",
@@ -177,22 +150,6 @@
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30196&pageNo=1"
-  },
-  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%202026-2%ED%95%99%EA%B8%B0%20%EB%8F%99%EA%B5%AD%EB%A6%AC%EB%8D%94%EC%9E%A5%ED%95%99%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4%202026.09.17.%20": {
-   "attempts": 0,
-   "title": "공지 공지 2026-2학기 동국리더장학 신청 안내 2026.09.17. 조회 1640",
-   "lastTried": "2026-09-30",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766275"
-  },
-  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%202027%ED%95%99%EB%85%84%EB%8F%84%20%EB%AF%B8%EB%9E%98%EC%9D%B8%EC%9E%AC%EC%9C%A1%EC%84%B1%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4(~9.22(%ED%99%94": {
-   "attempts": 0,
-   "title": "공지 공지 2027학년도 미래인재육성재단 장학생 신청 안내(~9.22(화)까지) 2026.09.11. 조회 2324",
-   "lastTried": "2026-09-30",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766186"
   },
   "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%20(%EC%9D%80%ED%8F%89)%EC%82%BC%EC%B2%9C%EC%82%AC%20%EC%A7%80%EC%97%AD%EB%AF%B8%EB%9E%98%EB%B6%88%EC%9E%90%EC%9C%A1%EC%84%B1%EC%9E%A5%ED%95%99%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%202026.": {
    "attempts": 3,
@@ -202,54 +159,6 @@
    "nextTryAt": "2026-10-05",
    "status": "",
    "escalated": true
-  },
-  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%202026-2%ED%95%99%EA%B8%B0%20%EA%B5%AD%EA%B0%80%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%EC%9E%90%20%EA%B0%80%EA%B5%AC%EC%9B%90%20%EB%8F%99%EC%9D%98%20%EC%95%88%EB%82%B4(%EB%AF%B8%EB%8F%99%EC%9D%98%20%EC%8B%9C": {
-   "attempts": 0,
-   "title": "공지 공지 2026-2학기 국가장학금 신청자 가구원 동의 안내(미동의 시 장학금 지원 불가, ~9/16(수)) 2026.09.01. 조회 717",
-   "lastTried": "2026-09-30",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766011"
-  },
-  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%20%5B%EA%B8%B0%ED%95%9C%20%EC%97%B0%EC%9E%A5%5D2026-2%ED%95%99%EA%B8%B0%20%EA%B3%A0%EC%A1%B8%20%ED%9B%84%ED%95%99%EC%8A%B5%EC%9E%90%20%EC%9E%A5%ED%95%99%EC%82%AC%EC%97%85(%ED%9D%AC%EB%A7%9D%EC%82%AC%EB%8B%A4%EB%A6%AC": {
-   "attempts": 0,
-   "title": "공지 공지 [기한 연장]2026-2학기 고졸 후학습자 장학사업(희망사다리 Ⅱ유형) 신규장학생 선발 안내(~9/30(수)) 2026.08.26. ",
-   "lastTried": "2026-09-30",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765909"
-  },
-  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2724%20%5B%ED%99%8D%EB%B3%B4%5D%202026%EB%85%84%20%EB%8C%80%EC%A0%84%EC%B2%AD%EB%85%84%EB%82%B4%EC%9D%BC%EC%9E%AC%EB%8B%A8%20%ED%95%98%EB%B0%98%EA%B8%B0%20%EC%9D%B8%EC%9E%AC%EC%9C%A1%EC%84%B1(%EC%84%B1%EC%B7%A8)%20%EC%9E%A5%ED%95%99": {
-   "attempts": 0,
-   "title": "2724 [홍보] 2026년 대전청년내일재단 하반기 인재육성(성취) 장학생 선발 안내(기간 연장) 2026.09.28. 조회 230",
-   "lastTried": "2026-09-30",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766403"
-  },
-  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2723%20%5B%ED%99%8D%EB%B3%B4%5D%202026%EB%85%84%EB%8F%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20(%EC%9E%AC)%EB%85%BC%EC%82%B0%EC%8B%9C%EC%9E%A5%ED%95%99%ED%9A%8C%20%ED%95%99%EC%97%85%EC%9E%A5%EB%A0%A4%20%EC%9E%A5%ED%95%99%EC%83%9D%20": {
-   "attempts": 0,
-   "title": "2723 [홍보] 2026년도 하반기 (재)논산시장학회 학업장려 장학생 선발 안내 2026.09.28. 조회 197",
-   "lastTried": "2026-09-30",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766395"
-  },
-  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2722%20%5B%ED%99%8D%EB%B3%B4%5D%20(%EC%9E%AC)%EC%B6%98%EC%B2%9C%EC%9D%B8%EC%9E%AC%EC%9C%A1%EC%84%B1%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%202026%EB%85%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20%EB%B4%84%EB%82%B4%EC%9E%A5%ED%95%99%EC%83%9D%20": {
-   "attempts": 0,
-   "title": "2722 [홍보] (재)춘천인재육성장학재단 2026년 하반기 봄내장학생 선발 안내 2026.09.17. 조회 563",
-   "lastTried": "2026-09-30",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766280"
-  },
-  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2721%20%5B%ED%99%8D%EB%B3%B4%5D%202026%EB%85%84%20%ED%91%B8%EB%A5%B8%EB%93%B1%EB%8C%80%20%ED%95%9C%EA%B5%AD%EC%88%98%EB%A0%A5%EC%9B%90%EC%9E%90%EB%A0%A5%20K-%EC%9B%90%EC%A0%84%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EA%B7%9C": {
-   "attempts": 0,
-   "title": "2721 [홍보] 2026년 푸른등대 한국수력원자력 K-원전 장학금 신규장학생 선발 안내 2026.09.17. 조회 780",
-   "lastTried": "2026-09-30",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766277"
   },
   "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2719%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%ED%8C%8C%EC%95%88%EC%9E%A5%ED%95%99%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%202026.09.17.%20%EC%A1%B0%ED%9A%8C": {
    "attempts": 3,
@@ -303,22 +212,6 @@
    "status": "resolved",
    "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26765909"
   },
-  "r:auto-84b1ecb7a820ec9ea5ed9599": {
-   "attempts": 0,
-   "title": "[홍보] 2026년 대전청년내일재단 하반기 인재육성(성취) 장학생 선발 안내(기간 연장)",
-   "lastTried": "2026-09-30",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766403"
-  },
-  "r:auto-202026091720eca1b0ed9a8c": {
-   "attempts": 0,
-   "title": "2026년 2학기 파안장학 선발 안내",
-   "lastTried": "2026-09-30",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766270"
-  },
   "r:auto-8eca79120ec9588eb82b4202": {
    "attempts": 0,
    "title": "[홍보] 2026 하반기 AI·ICT 인재 장학생 모집 안내",
@@ -326,22 +219,6 @@
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766256"
-  },
-  "n:https://www.uos.ac.kr/korNotice/list.do?list_id=FA1#n-%5B%EB%B9%85%EB%8D%B0%EC%9D%B4%ED%84%B0%ED%98%81%EC%8B%A0%EC%9C%B5%ED%95%A9%EB%8C%80%ED%95%99%EC%82%AC%EC%97%85%EB%8B%A8%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%84%B1%EA%B3%BC%ED%98%95%20%EC%9E%A5%ED%95%99%EA%B8%88(%EC%9E%90%EA%B2%A9%EC%A6%9D)": {
-   "attempts": 0,
-   "title": "[빅데이터혁신융합대학사업단] 2026학년도 2학기 성과형 장학금(자격증) 신청 안내",
-   "lastTried": "2026-09-30",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31571&sort=7&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&"
-  },
-  "n:https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-%5B%ED%95%9C%EA%B5%AD%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%5D%202027%ED%95%99%EB%85%84%EB%8F%84%20%ED%95%99%EC%9E%90%EA%B8%88%20%EC%A7%80%EC%9B%90%EA%B5%AC%EA%B0%84%20%EC%82%B0%EC%A0%95%EC%B2%B4%EA%B3%84%20%EA%B0%9C%ED%8E%B8%20%EC%95%88%EB%82%B4": {
-   "attempts": 0,
-   "title": "[한국장학재단] 2027학년도 학자금 지원구간 산정체계 개편 안내",
-   "lastTried": "2026-09-30",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30215&pageNo=1"
   },
   "n:https://nano.pknu.ac.kr/nano/2432#n-2026%ED%95%99%EB%85%84%EB%8F%84%20%EA%B3%B5%EA%B3%BC%EB%8C%80%ED%95%99%EC%83%9D%20%EC%96%B4%ED%95%99%2F%EC%A0%84%EA%B3%B5%20%EC%9E%90%EA%B2%A9%EC%A6%9D%20%EC%B7%A8%EB%93%9D%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%A7%80%EC%9B%90(PKNU-%EA%BF%88": {
    "attempts": 3,
