@@ -144,8 +144,10 @@ const pickMajor = async (page, typed, want) => {
   eq('🔴 프로필 — 처지는 누른 둘만(켰다 끈 job 은 없다) · 출신 지역 · 관심 null · 계열은 학과를 따라온 것', await saved(),
     { traits: { award: true, military: false }, originRegion: '울산', originCity: cities[0], interestKinds: null, track: 'science', major: '수학과' });
   /* 학교 소재지 (2026-10-31 · 3단계) — 학과 파일의 campusRegion/region 을 프로필에 적는다. 파일에 아직 없으면 소리 내고 넘어간다 */
-  const regionInfo = await page.evaluate(() => { const f = MAJOR_FILES['한국외국어대학교'] || {}; return { cr: f.campusRegion || null, r: f.region || null, mine: JSON.parse(localStorage.getItem('handaejang.v1')).profile.schoolRegion || null }; });
-  if (regionInfo.cr || regionInfo.r) eq('학교 소재 시·도가 프로필에 적힌다 (글로벌캠퍼스 → 경기)', regionInfo.mine, (regionInfo.cr && regionInfo.cr['글로벌캠퍼스(용인)']) || (regionInfo.r && regionInfo.r[0]) || null);
+  /* 🔴 기대값은 **앱의 기억(MAJOR_FILES)이 아니라 파일을 직접 받아** 정한다 (2026-10-31) — 앱의 기억으로 재면, 되살린 가입에서 파일을 안 받는 구멍이
+     「데이터 없음」으로 조용히 통과했다(실제로 그랬다 · onboardRestore 가 학과 파일을 안 받았다) */
+  const regionInfo = await page.evaluate(async () => { const r = await fetch(majorsFileFor('한국외국어대학교')); const f = r.ok ? await r.json() : {}; return { cr: f.campusRegion || null, r: f.region || null, mine: JSON.parse(localStorage.getItem('handaejang.v1')).profile.schoolRegion || null }; });
+  if (regionInfo.cr || regionInfo.r) eq('🔴 학교 소재 시·도가 프로필에 적힌다 (되살린 가입에서도 · 글로벌캠퍼스 → 경기)', regionInfo.mine, (regionInfo.cr && regionInfo.cr['글로벌캠퍼스(용인)']) || (regionInfo.r && regionInfo.r.length === 1 ? regionInfo.r[0] : null));
   else console.log('  ⚠️ 외대 파일에 region 이 아직 없다 — 학과 로봇이 돈 뒤 schoolRegion 을 잰다 (지금은 null 이 맞다)');
 
   console.log('\n■ ⑦ 학적정보 수정 — 관심·처지가 안 지워진다');

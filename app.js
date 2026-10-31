@@ -1491,6 +1491,11 @@ function onboardRestore(snap) {
     $$(`#${gid} .chip`).forEach((c) => c.classList.toggle('active', on.indexOf(c.dataset.value) >= 0));
   });
   if (typeof syncConsentRow === 'function') syncConsentRow();
+  /* 🔴 되살린 학교의 학과 파일을 **여기서 받는다** (2026-10-31). 학교 칸에 값을 코드로 넣어 `input` 이 안 뜨므로, 안 받으면
+     되살린 뒤 바로 마친 학생은 학교 소재지(schoolRegion)·학교별 계열 칩·캠퍼스별 학과가 모두 빈다 — 검사가 「데이터 없음」으로 조용히 넘기던 길이다.
+     도착하면 loadMajorsFor 가 계열 칩을 그 학교 것으로 다시 그린다(고른 칩은 지킨다). */
+  const restoredSchool = String((snap.fields || {})['in-school'] || '').trim();
+  if (restoredSchool) loadMajorsFor(restoredSchool);
   onboardStep = Math.max(0, Math.min(ONBOARD_STEPS - 1, Number(snap.step) || 0));
   renderOnboardStep();
   return true;
