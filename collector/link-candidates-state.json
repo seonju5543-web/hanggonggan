@@ -87,13 +87,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-31",
-  "lastAt": "2026-10-31",
-  "tries": 1,
+  "lastAt": "2026-11-01",
+  "tries": 2,
   "status": "pending",
   "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-11-08",
-  "nextAt": "2026-11-01"
+  "nextAt": "2026-11-04"
  },
  "kosaf|2000204008|board:https://council.wonju.go.kr/content/news/photoGallery.html": {
   "ds": "kosaf",
@@ -192,13 +192,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-14",
-  "lastAt": "2026-10-25",
-  "tries": 4,
-  "status": "pending",
-  "why": "게시판 목록(7줄)에서 그 글을 하나로 못 고름",
+  "lastAt": "2026-11-01",
+  "tries": 5,
+  "status": "rejected",
+  "why": "게시판 목록(7줄)에서 그 글을 하나로 못 고름 — 5번째라 그만 봅니다",
   "checks": {},
   "round": "2026-11-03",
-  "nextAt": "2026-11-01"
+  "decidedAt": "2026-11-01"
  },
  "kosaf|2000319002|board:https://www.yeongju.go.kr/check/bbs/board.php?bo_table=yjra0101": {
   "ds": "kosaf",
@@ -500,13 +500,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-14",
-  "lastAt": "2026-10-25",
-  "tries": 4,
-  "status": "pending",
-  "why": "게시판 목록(3줄)에서 그 글을 하나로 못 고름",
+  "lastAt": "2026-11-01",
+  "tries": 5,
+  "status": "rejected",
+  "why": "게시판 목록(3줄)에서 그 글을 하나로 못 고름 — 5번째라 그만 봅니다",
   "checks": {},
   "round": "2026-10-31",
-  "nextAt": "2026-11-01"
+  "decidedAt": "2026-11-01"
  },
  "kosaf|2700045011|https://gwangyang.go.kr/fund/board.es?mid=a60401000000&bid=0156&list_no=205387&act=view": {
   "ds": "kosaf",
@@ -541,13 +541,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-14",
-  "lastAt": "2026-10-25",
-  "tries": 4,
-  "status": "pending",
-  "why": "게시판 목록(15줄)에서 그 글을 하나로 못 고름",
+  "lastAt": "2026-11-01",
+  "tries": 5,
+  "status": "rejected",
+  "why": "게시판 목록(15줄)에서 그 글을 하나로 못 고름 — 5번째라 그만 봅니다",
   "checks": {},
   "round": "2026-12-31",
-  "nextAt": "2026-11-01"
+  "decidedAt": "2026-11-01"
  },
  "kosaf|2700388001|https://janghak.songpa.go.kr/22/?q=YToxOntzOjEyOiJrZXl3b3JkX3R5cGUiO3M6MzoiYWxsIjt9&bmode=view&idx=174161241&t=board": {
   "ds": "kosaf",
