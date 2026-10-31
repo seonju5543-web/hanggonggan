@@ -1,7 +1,17 @@
 {
  "school": "부경대학교",
- "updatedAt": "2026-10-30",
+ "updatedAt": "2026-10-31",
  "items": [
+  {
+   "title": "★글로벌언어집중강좌(GLIP) 세션4 수강생 모집 안내",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726805",
+   "postedAt": "2026-10-30",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-10-31",
+   "desc": "글로벌어학교육센터에서 아래와 같이 글로벌언어 집중 강좌 수강생을 아래와 같이 모집 하오니 관심 있는 학생의 많은 지원 바랍니다."
+  },
   {
    "title": "국립부경대학교 사무국장(별정직 고위공무원단) 채용 공고",
    "url": "https://www.pknu.ac.kr/main/163?action=view&no=726802",
@@ -409,17 +419,6 @@
    "campus": "",
    "src": "53a197d6",
    "foundAt": "2026-10-15"
-  },
-  {
-   "title": "[4단계BK21대학원혁신사업] 2026 PAC(PKNU Open Lab, Academic Conference, Connection) 개최 안내(10/28(수)~10/30(금))",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726594",
-   "postedAt": "2026-10-14",
-   "kind": "행사",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-15",
-   "thumb": "data/news/img/24ccfd56ad4e3ffd.webp"
   }
  ]
 }
