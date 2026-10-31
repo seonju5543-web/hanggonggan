@@ -2,6 +2,36 @@
  "updatedAt": "2026-10-31",
  "items": [
   {
+   "title": "외교부 2030 청년자문단 3기 역량강화 연수 개최",
+   "url": "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156787394&pWise=sub&pWiseSub=C3",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "[26-876](보도자료) 외교부 2030 청년자문단 3기 역량강화 연수 개최.hwpx",
+     "url": "https://www.korea.kr/common/download.do?fileId=198581667&tblKey=GMN"
+    },
+    {
+     "name": "[26-876](보도자료) 외교부 2030 청년자문단 3기 역량강화 연수 개최.pdf",
+     "url": "https://www.korea.kr/common/download.do?fileId=198581668&tblKey=GMN"
+    },
+    {
+     "name": "사진 (1).jpeg",
+     "url": "https://www.korea.kr/common/download.do?fileId=198581669&tblKey=GMN"
+    },
+    {
+     "name": "사진 (2).jpeg",
+     "url": "https://www.korea.kr/common/download.do?fileId=198581670&tblKey=GMN"
+    }
+   ],
+   "deadlineHint": null,
+   "detailsV": 6,
+   "excerptsAt": "2026-10-31",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-10-31"
+  },
+  {
    "title": "[성남산업진흥원] 2026년 창업기업 상시 멘토링 참여자(멘티) 모집",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=176190",
    "kind": "대외활동",
@@ -5865,36 +5895,6 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-07"
-  },
-  {
-   "title": "[소상공인시장진흥공단] 전통시장 AI 홍보영상 콘텐츠 공모전",
-   "url": "https://dep.hufs.ac.kr/bbs/student/2436/268648/artclView.do",
-   "kind": "공모전",
-   "attachments": [],
-   "deadlineHint": null,
-   "deadline": "2026-11-01",
-   "detailsV": 6,
-   "field": "광고·마케팅",
-   "excerptsAt": "2026-10-29",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "eligibilityLines": [
-    "참가 대상 : 경희대학교/단국대학교",
-    "한국외국어대학교/명지대학교",
-    "용인예술과학대학교/동서울대학교",
-    "콘텐츠 공모전",
-    "신구대학교/수원여자대학교",
-    "서울예술대학교",
-    "*위 9개 학교 재학생 및 휴학생 대상"
-   ],
-   "eligibilityFrom": "공고문 첨부(OCR)",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026.11.01"
-    }
-   ]
   },
   {
    "title": "청년 생명사랑 서포터즈 운영",
