@@ -1,4 +1,4 @@
-## 🖥 브라우저형 수집 리포트 (2026-11-01 11:08 KST)
+## 🖥 브라우저형 수집 리포트 (2026-11-01 19:20 KST)
 
 ### 한국외국어대학교
 - ✅ 링크 84 · 장학 공고 13 · https://dep.hufs.ac.kr/student/12767/subview.do
@@ -12,7 +12,7 @@
   - ⏭ 남은 후보 1곳은 열지 않음(앞 주소에서 읽었다)
 
 ### 서울시립대학교
-- ⚪ 링크 111 · 장학 공고 0 · 이미 아는 공고 24건은 다시 열지 않음 · https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1
+- ⚪ 링크 0 · 장학 공고 0 · https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1
 
 ### 중앙대학교
 - ⚪ 링크 653 · 장학 공고 0 · 이미 아는 공고 15건은 다시 열지 않음 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5
@@ -39,7 +39,7 @@
 - ✅ 링크 90 · 장학 공고 2 · 이미 아는 공고 10건은 다시 열지 않음 · https://onestop.pusan.ac.kr/page?menuCD=000000000000062
 
 ### 서울교육대학교
-- ❌ 오류(page.goto: Target page, context or browser has been closed) · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
+- ⚪ 링크 371 · 장학 공고 0 · 이미 아는 공고 12건은 다시 열지 않음 · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
 
 ### 서울과학기술대학교
   - 📄 2페이지에서 장학 공고 20건 더 읽음
@@ -51,13 +51,10 @@
 ### 명지대학교
 - ✅ 링크 417 · 장학 공고 9 · https://www.mju.ac.kr/mjukr/259/subview.do
 
-### 🔁 실패 학교 재시도 (몇 분 뒤 재접속)
-**서울교육대학교**
-- ⚪ 링크 371 · 장학 공고 0 · 이미 아는 공고 12건은 다시 열지 않음 · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
-
 ---
 이번 실행 신규 수집: **0건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
-⏱ 소요 2분 / 예산 22분 · 학교 14/14곳 처리
+⏱ 소요 1분 / 예산 22분 · 학교 14/14곳 처리
+⚪ **열렸지만 장학 공고를 하나도 못 알아본 학교 1곳**: 서울시립대학교 — 게시판 화면은 열렸는데 장학 공고로 보이는 줄이 없었어요(무엇을 봤는지는 위 학교 줄의 '본 링크'·'본 글자').
 **⏳ 스키마화 대기 중 79건** (원본 확보됨 — collector/pending-forms.json)
 
 ### 🤖 자동 등록 (선조치후보고) — 0건 등록
