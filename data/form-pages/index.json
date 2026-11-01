@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-01",
+ "updatedAt": "2026-11-02",
  "items": {
   "auto-oardid323011menuno200318": [
    {
@@ -50,6 +50,12 @@
     "srcBytes": 151368,
     "none": true,
     "at": "2026-10-23"
+   },
+   {
+    "src": "elig-1oeo0o-2.hwp",
+    "srcBytes": 48640,
+    "none": true,
+    "at": "2026-11-02"
    }
   ],
   "auto-srchenable1srchvotetype1-0rtcwpw": [
@@ -390,22 +396,6 @@
     "srcBytes": 99362,
     "srcPages": "6~7, 10~11",
     "from": "공고문 서식 쪽 떼기",
-    "at": "2026-10-28"
-   }
-  ],
-  "kosaf-0701002": [
-   {
-    "src": "※_선발_공고문_없음.hwp",
-    "srcBytes": 9216,
-    "none": true,
-    "at": "2026-10-28"
-   }
-  ],
-  "kosaf-2701048001": [
-   {
-    "src": "※_선발_공고문_없음.hwp",
-    "srcBytes": 9216,
-    "none": true,
     "at": "2026-10-28"
    }
   ],
