@@ -1,6 +1,6 @@
 {
  "school": "조선대학교",
- "updatedAt": "2026-10-31",
+ "updatedAt": "2026-11-01",
  "items": [
   {
    "title": "[창업성장지원팀] 2026학년도 앵커 창업동아리 5차 모집",
@@ -374,70 +374,6 @@
    "campus": "",
    "foundAt": "2026-10-02",
    "desc": "프로그램에 대한 자세한 내용 확인 및 프로그램 신청은 THE조아시스템에서 가능합니다!"
-  },
-  {
-   "title": "[G-LAMP사업단] 2026 하반기 블루밍 라운지(Blooming Rounge) 참여교원 모집공고",
-   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/281563/artclView.do",
-   "postedAt": "2026-09-23",
-   "kind": "채용",
-   "school": "조선대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/c57d3dd61e5401f3.webp",
-   "src": "c6a7801d"
-  },
-  {
-   "title": "[G-LAMP사업단] 2026 LAMP 전임교원 선발공고",
-   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/281562/artclView.do",
-   "postedAt": "2026-09-23",
-   "kind": "채용",
-   "school": "조선대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "src": "c6a7801d"
-  },
-  {
-   "title": "YBM 한국토익위원회 주관 본교 특별 TOEIC 시험 실시 안내(10. 24.(토))",
-   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/281464/artclView.do",
-   "postedAt": "2026-09-21",
-   "school": "조선대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "src": "c6a7801d",
-   "desc": "본교에서는 글로벌 인재양성 및 취업률 제고를 위하여 재학생 여러분들의 외국어 실력을 향상 시키고자 YBM 한국토익위원회 주관 본교 TOEIC 특별 시험 (= 모의토익 ) 을 시행 중에 있습니다."
-  },
-  {
-   "title": "[교육과정관리팀] THE조아 설문 이벤트 안내 (경품 추첨)",
-   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/281401/artclView.do",
-   "postedAt": "2026-09-17",
-   "school": "조선대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/e677dd4ae4758f6c.webp",
-   "src": "c6a7801d",
-   "desc": "교육과정관리팀 조선대학교 학생통합지원시스템 'THE조아'에서 설문 이벤트를 진행합니다."
-  },
-  {
-   "title": "[보건진료소] 2026년도 교내헌혈 안내 (10.06)",
-   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/281700/artclView.do",
-   "postedAt": "2026-10-01",
-   "kind": "생활",
-   "school": "조선대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/a82377c7c61941cb.webp",
-   "desc": "조선대학교 구성원을 대상으로 헌혈 참여를 통해 나눔문화를 확산하고 실천하고자 대한적십자사와 연계하여 헌혈사업을 실시합니다 . 구성원들의 많은 참여 부탁드리겠습니다 ."
-  },
-  {
-   "title": "[ 보건진료소 ] 2026년 독감 예방접종 안내",
-   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/281699/artclView.do",
-   "postedAt": "2026-10-01",
-   "kind": "생활",
-   "school": "조선대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/ef791ab793350860.webp",
-   "desc": "조선대 보건진료소에서는 구성원 여러분의 건강한 학교생활을 위하여 독감 예방접종을 실시합니다."
   }
  ]
 }

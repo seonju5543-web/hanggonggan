@@ -1,14 +1,18 @@
 {
  "note": "학교별 교내 소식 파일 색인 (data/news/). 앱은 match-engine.js newsFileFor(noticeFileKey) 로 자기 학교 파일을 바로 받는다 — 옛 통짜 파일로 물러나는 길은 없다. check-live.yml 이 이 색인의 학교 전부를 확인한다.",
- "updatedAt": "2026-10-31",
+ "updatedAt": "2026-11-01",
  "schools": 44,
  "files": {
-  "부경대학교": {
-   "file": "n1nesasz.json",
-   "count": 40
+  "국민대학교": {
+   "file": "n1tasrsl.json",
+   "count": 12
   },
   "이화여자대학교": {
    "file": "n1tk2q9m.json",
+   "count": 40
+  },
+  "부경대학교": {
+   "file": "n1nesasz.json",
    "count": 40
   },
   "전북대학교": {
@@ -29,7 +33,7 @@
   },
   "한국외국어대학교": {
    "file": "n19cz03g.json",
-   "count": 34
+   "count": 26
   },
   "서울시립대학교": {
    "file": "n1au199v.json",
@@ -37,7 +41,7 @@
   },
   "연세대학교 미래캠퍼스": {
    "file": "n1if6uwu.json",
-   "count": 32
+   "count": 23
   },
   "중앙대학교": {
    "file": "n1iz3lr8.json",
@@ -57,11 +61,11 @@
   },
   "상명대학교": {
    "file": "n1ozjjw8.json",
-   "count": 21
+   "count": 13
   },
   "한국방송통신대학교": {
    "file": "n1uf7bji.json",
-   "count": 40
+   "count": 35
   },
   "경희대학교": {
    "file": "n1w4hprp.json",
@@ -77,7 +81,7 @@
   },
   "경북대학교": {
    "file": "nf097dk.json",
-   "count": 22
+   "count": 17
   },
   "인하대학교": {
    "file": "nkeh7pq.json",
@@ -85,7 +89,7 @@
   },
   "충남대학교": {
    "file": "nl1xm19.json",
-   "count": 33
+   "count": 25
   },
   "숭실대학교": {
    "file": "nmljo8t.json",
@@ -93,7 +97,7 @@
   },
   "건국대학교": {
    "file": "nmpm6i7.json",
-   "count": 17
+   "count": 9
   },
   "경기대학교": {
    "file": "ntxxf09.json",
@@ -101,7 +105,7 @@
   },
   "명지대학교": {
    "file": "ntyl0r5.json",
-   "count": 38
+   "count": 32
   },
   "홍익대학교": {
    "file": "nv8pha4.json",
@@ -113,31 +117,31 @@
   },
   "가천대학교": {
    "file": "nzzc8bm.json",
-   "count": 8
+   "count": 4
   },
   "영남대학교": {
    "file": "n12kfbyt.json",
-   "count": 11
+   "count": 6
   },
   "서울교육대학교": {
    "file": "n18ebv4b.json",
-   "count": 19
+   "count": 10
   },
   "한국항공대학교": {
    "file": "n1as48ix.json",
-   "count": 36
+   "count": 25
   },
   "세종대학교": {
    "file": "n1mo5fbn.json",
-   "count": 20
+   "count": 8
   },
   "조선대학교": {
    "file": "n1qr99q6.json",
-   "count": 40
+   "count": 34
   },
   "동국대학교 WISE캠퍼스": {
    "file": "n2we95k.json",
-   "count": 21
+   "count": 14
   },
   "강원대학교": {
    "file": "nlzhvsh.json",
@@ -147,29 +151,25 @@
    "file": "nsgh1oi.json",
    "count": 33
   },
-  "국민대학교": {
-   "file": "n1tasrsl.json",
-   "count": 17
-  },
   "숙명여자대학교": {
    "file": "n1a4mxa4.json",
-   "count": 13
+   "count": 4
   },
   "고려대학교 세종캠퍼스": {
    "file": "n1ch7t87.json",
-   "count": 15
+   "count": 12
   },
   "연세대학교": {
    "file": "nz3ew5y.json",
-   "count": 17
+   "count": 14
   },
   "서울과학기술대학교": {
    "file": "n14kv35j.json",
-   "count": 36
+   "count": 28
   },
   "한양대학교": {
    "file": "n1b3og5n.json",
-   "count": 26
+   "count": 16
   },
   "아주대학교": {
    "file": "n16dvfry.json",
