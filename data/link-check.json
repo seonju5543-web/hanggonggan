@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-31T15:50:17.515Z",
+ "updatedAt": "2026-11-01T15:26:24.947Z",
  "v": 1,
  "bad": {
   "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11401": {
@@ -70,18 +70,6 @@
    "v": "other",
    "at": "2026-11-01"
   },
-  "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=892640&article.offset=0&articleLimit=10": {
-   "v": "gone",
-   "at": "2026-11-01"
-  },
-  "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=893444&article.offset=0&articleLimit=10": {
-   "v": "gone",
-   "at": "2026-11-01"
-  },
-  "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=894138&article.offset=0&articleLimit=10": {
-   "v": "gone",
-   "at": "2026-11-01"
-  },
   "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=894275&article.offset=0&articleLimit=10": {
    "v": "other",
    "at": "2026-11-01"
@@ -91,10 +79,6 @@
    "at": "2026-11-01"
   },
   "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896780&qidx=4691&cate=10&allboard=false&nowpage=1": {
-   "v": "other",
-   "at": "2026-11-01"
-  },
-  "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=95279&article.offset=0&articleLimit=10": {
    "v": "other",
    "at": "2026-11-01"
   },
