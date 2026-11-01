@@ -377,17 +377,6 @@
   "at": "2026-10-31",
   "tries": 1
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3537776": {
-  "at": "2026-11-01",
-  "tries": 1,
-  "lines": [
-   "신청대상 : 성인",
-   "시간인증",
-   "오프라인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3534694": {
   "at": "2026-11-01",
   "tries": 1,
@@ -414,6 +403,26 @@
    "SNS서포터즈 모집공고 포스터_260825.png",
    "〈내 길을 디자인하다〉",
    "느린 학습자 & 발달장애 청소년 디자인 캠프 ― SNS서포터즈 모집"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3532854": {
+  "at": "2026-11-01",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3524276": {
+  "at": "2026-11-01",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인",
+   "아동청소년발달장애인 토요일 프로그램 자원봉사 활동~ (날짜마다 각각 따로 신청 가능합니다~)",
+   "\"제1회 이천시장배 전국장애인탁구대회\" 자원봉사자 모집"
   ],
   "excludes": [],
   "from": "브라우저 본문"
