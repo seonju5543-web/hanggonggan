@@ -3,6 +3,18 @@
  "updatedAt": "2026-11-01",
  "schools": 44,
  "files": {
+  "영남대학교": {
+   "file": "n12kfbyt.json",
+   "count": 7
+  },
+  "전남대학교": {
+   "file": "nwqmwga.json",
+   "count": 40
+  },
+  "서울시립대학교": {
+   "file": "n1au199v.json",
+   "count": 40
+  },
   "국민대학교": {
    "file": "n1tasrsl.json",
    "count": 12
@@ -34,10 +46,6 @@
   "한국외국어대학교": {
    "file": "n19cz03g.json",
    "count": 26
-  },
-  "서울시립대학교": {
-   "file": "n1au199v.json",
-   "count": 40
   },
   "연세대학교 미래캠퍼스": {
    "file": "n1if6uwu.json",
@@ -111,17 +119,9 @@
    "file": "nv8pha4.json",
    "count": 40
   },
-  "전남대학교": {
-   "file": "nwqmwga.json",
-   "count": 40
-  },
   "가천대학교": {
    "file": "nzzc8bm.json",
    "count": 4
-  },
-  "영남대학교": {
-   "file": "n12kfbyt.json",
-   "count": 6
   },
   "서울교육대학교": {
    "file": "n18ebv4b.json",
