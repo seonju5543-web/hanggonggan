@@ -330,5 +330,13 @@
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3532854": {
   "at": "2026-11-01",
   "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3510793": {
+  "at": "2026-11-01",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3524276": {
+  "at": "2026-11-01",
+  "tries": 1
  }
 }
