@@ -214,12 +214,13 @@ const PROFILE = {
   eq('  읽어 낸 금액에는 원문을 덧붙이지 않는다 (같은 말 두 번 금지)', amt.읽은건에원문안붙임, 0);
   /* 상세 시트에 실제로 그려지는지 — 데이터만 보면 렌더가 빠져도 통과한다 */
   eq('  상세 시트가 그 원문을 보여 준다', await page.evaluate(async () => {
-    const s = allScholarships().find((x) => x.sourceKind === 'kosaf' && x.amountNote);
+    const s = allScholarships().find((x) => x.sourceKind === 'kosaf' && x.amountNote && !/확인/.test(x.amountNote));   // 「기관확인필요」 같은 모름 표시는 안 띄운다(2026-11-02)
     if (!s) return 'no-item';
     openDetail(s.id);
     await new Promise((r) => setTimeout(r, 250));
-    const t = document.querySelector('#detail-sheet').innerText;
-    return t.includes('재단이 적어 둔 지원금액') ? 'shown' : 'missing';
+    /* 2026-11-02 승인 시안 — 재단이 적어 둔 금액은 「재단이 적어 둔 지원금액 —」 머리말 없이 금액 자리에 옅게(.sheet-amount-unknown) 그대로 */
+    const el = document.querySelector('#detail-sheet .sheet-amount-unknown');
+    return el && el.textContent.replace(/\s+/g, ' ').includes(String(s.amountNote).replace(/\s+/g, ' ').slice(0, 20)) ? 'shown' : 'missing';
   }), 'shown');
   /* 🔴 **미달 근거 줄에 초록 ✓ 가 붙어 있었다** (2026-09-12 코드 리뷰가 화면에서 잡았다).
      `공고에 적힌 요건에 미달해요: …` 가 ✕ 판정 낱말 어디에도 안 걸려 충족으로 그려졌다 —
@@ -472,7 +473,7 @@ const PROFILE = {
           return {
             links: [...sheet.querySelectorAll('a')]
               .filter((a) => /kosaf-files/.test(a.getAttribute('href') || '')).length,
-            head: /선발 공고문/.test(sheet.textContent),
+            head: [...sheet.querySelectorAll('h4')].some((h) => /선발 공고문/.test(h.textContent)),   // 머리말(h4)만 — 「접수 · 방법」 줄의 '재단 선발 공고문…' 문장은 머리말이 아니다(2026-11-02)
             /* 재단 자체는 그대로 — 홈페이지 링크와 이름이 살아 있어야 한다 */
             title: (sheet.querySelector('h2, h3, .ds-title') || {}).textContent || sheet.textContent.slice(0, 40),
           };

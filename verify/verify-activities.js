@@ -156,7 +156,8 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
       e.querySelector('.sheet-title').textContent.trim(), e.querySelector('.sheet-amount').textContent.trim(),
       e.querySelector('.sheet-top .badge-kind').textContent.trim(), !!e.querySelector('.sheet-top .sch-org'), e.querySelector('.sheet-top .badge-dday').textContent.trim(), !!e.querySelector('.sheet-provider')]),
       ['2026 대학생 해외봉사단 모집', '항공료 전액 지원', '봉사', false, 'D-5', false]);   // 학교 게시판 글 — 머리줄에 주최 글자 없음(2026-11-02 개발자 결정)
-    eq('⑤ 「접수」 절 — 기간은 접수 시작~마감 또는 원문 기간 문구 · 방법은 원문 확인(활동 글은 서류 줄 없음)', await page.$$eval('#detail-sheet .apply-rows li', (li) => li.map((x) => x.textContent.trim().replace(/\s+/g, ' '))), ['기간~ ' + new Date(Date.now() + 5 * 86400000).toISOString().slice(5, 10).replace('-', '.'), '방법원문 확인']);
+    /* 기간은 발췌 「모집기간」 원문 그대로(리뷰 2026-11-02 — 마감만 적으면 시작일이 사라진다) · 없을 때만 ~마감 */
+    eq('⑤ 「접수」 절 — 기간은 발췌 모집기간 원문 그대로 · 방법은 원문 확인(활동 글은 서류 줄 없음)', await page.$$eval('#detail-sheet .apply-rows li', (li) => li.map((x) => x.textContent.trim().replace(/\s+/g, ' '))), ['기간2026. 10. 1. ~ 10. 15.', '방법원문 확인']);
     eq('⑤ 지원 자격 — 장학 시트와 같은 머리(적합도 · 요건 n개 중 n개 충족)와 ✓ 줄',
       await page.$eval('#detail-sheet', (e) => [e.querySelector('.sheet-verdict h4').textContent.trim(), /요건 1개 중 1개 충족/.test(e.querySelector('.sheet-verdict').textContent),
         [...e.querySelectorAll('.reason-list li')].map((li) => li.textContent.trim())]),
@@ -297,8 +298,8 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
     await page.click(`#activities-list .save-btn[data-save="act:${ACT1}"]`); await page.waitForTimeout(300);
     eq('⑥ 누르면 담긴다 · 글 사본도 함께(피드에서 빠져도 남게)', await page.evaluate((u) => { const s = state.saved.find((x) => x.id === `act:${u}`); return [!!s, !!(s && s.snap && s.snap.title)]; }, ACT1), [true, true]);
     eq('⑥ 단추가 켜진다', await page.$eval(`#activities-list .save-btn[data-save="act:${ACT1}"]`, (b) => b.classList.contains('on')), true);
-    eq('⑥ 보관함에 장학과 같은 줄로(둘째 줄은 종류·주최)', await page.evaluate(() => { showScreen('my'); return [...document.querySelectorAll('#my-saved .cal-row')].map((r) => [r.querySelector('.cal-row-name').textContent.trim(), r.querySelector('.cal-row-sub').textContent.trim()]); }),
-      [['2026 대학생 해외봉사단 모집', '대외활동 · 한국외국어대학교 게시판']]);
+    eq('⑥ 보관함에 장학과 같은 줄로(둘째 줄은 종류 · 학교 게시판 글은 주최 없음 — 2026-11-02 개발자 결정)', await page.evaluate(() => { showScreen('my'); return [...document.querySelectorAll('#my-saved .cal-row')].map((r) => [r.querySelector('.cal-row-name').textContent.trim(), r.querySelector('.cal-row-sub').textContent.trim()]); }),
+      [['2026 대학생 해외봉사단 모집', '대외활동']]);
     eq('⑥ 달력에 마감 점(파랑) — 내 공고로 센다', await page.evaluate((u) => { const ctx = calContext(); const d = ctx.mine.find((x) => x.id === `act:${u}`); if (!d) return null;
       const [y, m] = d.deadline.split('-').map(Number); const mk = calMarks(new Date(y, m - 1, 1), ctx.mine)[d.deadline] || []; return mk.filter((k) => k.id === `act:${u}`).map((k) => k.kind); }, ACT1), ['mine']);
     await page.evaluate(() => document.querySelector('#my-saved .cal-row').click()); await page.waitForTimeout(500);
@@ -319,9 +320,9 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
       document.querySelector('#toast .toast-undo').click(); await new Promise((r) => setTimeout(r, 50));
       const s = state.saved.find((x) => x.id === `act:${u}`); liveActivities.items = keep; return [gone, !!(s && s.snap)]; }, ACT1), [true, true]);
     /* 달력 날짜를 열었을 때 '내 공고' 줄로 나오는가 — 점만 재면 줄이 깨져도 모른다(리뷰) */
-    eq('⑥ 달력 날짜를 열면 「내 공고」에 활동 줄(종류·주최 둘째 줄)', await page.evaluate((u) => { const d = calContext().mine.find((x) => x.id === `act:${u}`); const box = document.createElement('div'); box.innerHTML = calDayHtml(d.deadline);
+    eq('⑥ 달력 날짜를 열면 「내 공고」에 활동 줄(종류 둘째 줄 · 학교 게시판 글은 주최 없음)', await page.evaluate((u) => { const d = calContext().mine.find((x) => x.id === `act:${u}`); const box = document.createElement('div'); box.innerHTML = calDayHtml(d.deadline);
       const row = box.querySelector(`.cal-row[data-detail="act:${u}"]`); return row ? [row.querySelector('.cal-row-name').textContent.trim(), row.querySelector('.cal-row-sub').textContent.trim(), /내 공고/.test(box.textContent)] : null; }, ACT1),
-      ['2026 대학생 해외봉사단 모집', '대외활동 · 한국외국어대학교 게시판', true]);
+      ['2026 대학생 해외봉사단 모집', '대외활동', true]);
     eq('⑥ 피드가 새로 오면 담아 둔 사본도 새 글로(옛 마감을 말하지 않게)', await page.evaluate((u) => { const s = state.saved.find((x) => x.id === `act:${u}`); s.snap = { ...s.snap, deadline: '2000-01-01' }; refreshActivitySnaps(); return s.snap.deadline !== '2000-01-01'; }, ACT1), true);
     eq('페이지 오류 없음', errors, []);
     await page.context().close();
