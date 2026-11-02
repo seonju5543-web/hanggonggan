@@ -243,8 +243,8 @@
   "by": "로봇(층2 글 사냥꾼)",
   "title": "2026년 (재)거창군장학회 장학생 선발 공고",
   "firstAt": "2026-10-30",
-  "lastAt": "2026-10-31",
-  "tries": 2,
+  "lastAt": "2026-11-03",
+  "tries": 3,
   "status": "pending",
   "why": "못 엶(HTTP 500) — 다시 봅니다",
   "checks": {
@@ -252,7 +252,7 @@
    "L": "unread"
   },
   "round": "2026-11-16",
-  "nextAt": "2026-11-03"
+  "nextAt": "2026-11-10"
  },
  "kosaf|2000423012|https://www.jincheon.go.kr/jcjh/sub.do?menukey=3464&mode=view&no=1076147380": {
   "ds": "kosaf",
