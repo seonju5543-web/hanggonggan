@@ -288,8 +288,8 @@
   "name": "「2026 상반기 AI·ICT 인재 장학생 모집」 안내(대상: 서울시 서초구에 주소지를 둔 재학생)"
  },
  "https://www.hongik.ac.kr/kr/newscenter/notice.do?articleno=158449&nocat=501": {
-  "ok": "2026-10-27",
-  "at": "2026-10-27",
+  "ok": "2026-11-03",
+  "at": "2026-11-03",
   "tries": 0,
   "name": "[대전광역시] 2026년 하반기 성취장학생 선발 연장"
  },
@@ -580,5 +580,11 @@
   "at": "2026-11-02",
   "minBody": 100,
   "name": "공통 세아해암학술장학재단 제1회 차세대 공학연구자 Alumni 심포지엄 2026 신청 안내"
+ },
+ "https://www.seoultech.ac.kr/service/info/janghak/?bidx=897345&bnum=5233&cate=0&qidx=5233": {
+  "tries": 1,
+  "at": "2026-11-03",
+  "minBody": 100,
+  "name": "(홍보) 통영시 저소득 대학생 장학금 지원대상자 선발 안내(~11/23(월)까지)"
  }
 }
