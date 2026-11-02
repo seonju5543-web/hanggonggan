@@ -1,7 +1,40 @@
 {
  "school": "부산대학교",
- "updatedAt": "2026-11-01",
+ "updatedAt": "2026-11-02",
  "items": [
+  {
+   "title": "[부산광역시] 「국제게임전시회 지스타 2026」 참관 안내",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511876",
+   "postedAt": "2026-11-02",
+   "kind": "행사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/59242950a3efa533.webp",
+   "desc": "부산시는 (사)한국게임산업협회와 함께 국내 게임산업의 성장 및 세계 게임기업과의 교류 협력을 위해 「국제게임전시회 지스타 2026」을 다음과 같이 개최하니, 학생 분들의 많은 관심과 참여 바랍니다."
+  },
+  {
+   "title": "[동래구] 동래구 청년정책위원회 위원 모집 안내",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511875",
+   "postedAt": "2026-11-02",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/2d685ddafdc2b908.webp"
+  },
+  {
+   "title": "[금정구] 2026년 금정구 청소년어울림마당 [금샘런웨이페스타] 개최 및 참가팀...",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511874",
+   "postedAt": "2026-11-02",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/fc1ff66b233357b6.webp",
+   "desc": "금정구 청소년 문화·예술 축제인 금정구 청소년 어울림마당 [금샘런웨이페스타]가 개최되오니 학생 분들의 많은 관심과 참여 바랍니다. 자세한 내용은 포스터와 첨부 파일을 참고하시기 바랍니다."
+  },
   {
    "title": "[AI융합교육원] 2026학년도 'SW융합트랙' 이수자를 위한 겨...",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511855",
@@ -389,39 +422,6 @@
    "src": "2d0d4013",
    "foundAt": "2026-10-24",
    "desc": "2026학년도 겨울계절수업 부산외국어대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
-  },
-  {
-   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(동의대학교)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511735",
-   "postedAt": "2026-10-24",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-24",
-   "desc": "2026학년도 겨울계절수업 동의대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
-  },
-  {
-   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(동아대학교)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511734",
-   "postedAt": "2026-10-24",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-24",
-   "desc": "2026학년도 겨울계절수업 동아대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
-  },
-  {
-   "title": "[참가 모집] 2026 부산대학교 개교 80주년 기념 「부산시민 동행 걷기대회」...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511722",
-   "postedAt": "2026-10-23",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-23",
-   "thumb": "data/news/img/7af34a6a604f1771.webp",
-   "desc": "○ 장소: 부산대학교 넉넉한터 및 온천천~부산교육대학교 운동장 일원 ○ 참여대상: 재학생, 동문, 교직원, 부산시민 등 약 1,000명"
   }
  ]
 }

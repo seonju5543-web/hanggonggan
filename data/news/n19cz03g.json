@@ -1,7 +1,18 @@
 {
  "school": "한국외국어대학교",
- "updatedAt": "2026-11-01",
+ "updatedAt": "2026-11-02",
  "items": [
+  {
+   "title": "[IR센터] HUFS Voice 설문조사 참여 안내 (기프티콘 추첨 지급)",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/270518/artclView.do",
+   "postedAt": "2026-11-02",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/423abdf8d18a1c6c.webp",
+   "desc": "한국외국어대학교는 「2027년 대학혁신지원사업 계획 수립을 위한 수요조사」 와 「AI 리터러시·HUFS 스마트플랫폼 만족도 조사」 를 통합 시행합니다. 재학생 및 교직원 여러분의 많은 관심과 참여 바랍니다."
+  },
   {
    "title": "한국외대 아프리카연구소, 11월 4~6일 HK3.0 컨소시엄 국제학술대회 개최",
    "url": "https://www.hufs.ac.kr/bbs/hufs/2180/270407/artclView.do",
@@ -269,16 +280,6 @@
    "foundAt": "2026-10-06",
    "thumb": "data/news/img/95342edbd2ee63ad.webp",
    "desc": "우리 대학 정치외교학과(학과장 김기동)는 오는 11월 16일(월) 오전 10시 30분부터 12시까지 국제회의실에서 미국 주요 4개 대학원 관계자를 초청해 대학원 입학설명회 를 개최합니다.",
-   "src": "54a450a4"
-  },
-  {
-   "title": "인조잔디 운동장 보수 및 유지관리 안내문",
-   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/268399/artclView.do",
-   "postedAt": "2026-10-02",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "desc": "나. 작업내용 - 인조잔디 표면 보수 및 지반 처짐구간 보강 - 인조잔디 브러싱 및 주변청소 작업",
    "src": "54a450a4"
   }
  ]
