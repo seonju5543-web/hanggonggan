@@ -904,8 +904,11 @@ a.btn { text-decoration: none; }
 .doc-list.doc-badged .doc-auto,
 .doc-list.doc-badged .doc-manual { flex: none; margin-right: 0; }
 /* 판정 표시(✓ ✕ ?)가 이미 앞에 붙는 줄은 점을 빼서 두 겹이 되지 않게 한다 */
-.reason-list .r-ok::before, .reason-list .r-bad::before, .reason-list .r-unk::before { display: none; }
-.reason-list .r-ok, .reason-list .r-bad, .reason-list .r-unk { padding-left: 2px; }
+.reason-list .r-ok::before, .reason-list .r-bad::before, .reason-list .r-unk::before, .reason-list .r-x::before { display: none; }
+.reason-list .r-ok, .reason-list .r-bad, .reason-list .r-unk, .reason-list .r-x { padding-left: 2px; }
+.reason-list .r-x { color: var(--text-weak); }   /* 제외 조건 ✗ 줄 — 같은 「지원 자격」 목록 안(승인 시안 2026-11-02 · 판정 아님) */
+.sheet-top .badge-dday { margin-left: auto; }   /* 시트 머리줄 — 칩·주최 왼쪽, D-day 오른쪽(승인 시안 2026-11-02) */
+.ns-more summary { font-size: var(--t-xs); color: var(--text-sub); cursor: pointer; margin: var(--sp-1) 0; }
 .r-ok  { color: var(--green); }
 .r-bad { color: var(--red); }
 .r-unk { color: var(--orange); }

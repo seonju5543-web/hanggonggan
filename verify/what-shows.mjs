@@ -101,9 +101,9 @@ function takeConst(name) {
 /* 의존 순서대로 — dday 는 todayStart 를, fitBadgeHtml 은 fitTone·fitVerdict 를,
    cardOrgLine 은 cardTitle·bareOrg·orgBase·providerUnknown 을 쓴다 */
 const NEED = ['todayStart', 'dday', 'fitTone', 'fitVerdict', 'fitBadgeHtml', 'applyLock',
-  'cleanCardTitle', 'cardTitle', 'cardOrgLine'];
+  'cleanCardTitle', 'cardTitle', 'cardOrgLine', 'kindChip', 'cardProviderLine', 'splitTitleWho', 'cardTitleParts', 'amountLine'];   // 카드 시안 B(2026-11-02) — 칩·주최·제목 나누기·금액 줄
 const ctx = vm.createContext({ Date, Math, Number, String, JSON, console });
-vm.runInContext([...['bareOrg', 'orgBase', 'providerUnknown', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G'].map(takeConst), ...['isDateBit', 'splitTitleDates'].map(takeFn), ...NEED.map(takeFn)].join('\n\n'),   // 카드 제목 날짜 규칙(2026-10-05) · 기관명 모름 판정(providerUnknown)
+vm.runInContext([...['bareOrg', 'orgBase', 'providerUnknown', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G', 'isActivityItem', 'KIND_CHIP_CLS', 'WHO_PAREN', 'KOSAF_AMOUNT_UNKNOWN'].map(takeConst), ...['isDateBit', 'splitTitleDates'].map(takeFn), ...NEED.map(takeFn)].join('\n\n'),   // 카드 제목 날짜 규칙(2026-10-05) · 기관명 모름 판정(providerUnknown)
   ctx, { filename: 'app.js(발췌)' });
 const appFn = (n) => vm.runInContext(n, ctx);
 const stripTags = (h) => String(h).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -129,7 +129,7 @@ vm.runInContext([
     'CLOSED_KEEP_DAYS', 'KOSAF_ELIG', 'kosafClean', 'KOSAF_AMOUNT_UNKNOWN', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G'].map(takeConst),
   ...['isDateBit', 'splitTitleDates', 'hintShort', 'shortDay'].map(takeFn),   // 카드 제목 날짜·회색 기간 줄(2026-10-04·05) · 카드 윗줄 날짜(10-10)
   ...['esc', 'unent', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'attachPrepTemplate', 'kosafAsScholarships', 'sourceLinkHintHtml',   // attachPrepTemplate: 층2 항목마다 지원문서를 붙인다(2026-10-13 ① · FORM_TEMPLATES 가 없는 자리에선 그대로 돌려준다)
-    'attachmentLinkHtml', 'sourceLinkHtml', 'sourceNoteHtml', 'amountSourceLinkHtml', 'appLogLinkHtml', 'noticeCardHtml', 'activityLinkHtml'].map(takeFn),
+    'attachmentLinkHtml', 'sourceLinkHtml', 'sourceNoteHtml', 'amountSourceLinkHtml', 'appLogLinkHtml', 'noticeCardHtml', 'activityLinkWhy'].map(takeFn),
   /* 층2 바꾸기가 읽는 앱 상태 — 이 도구는 저장·신청 내역을 모른다(없음) */
   'var kosafList = []; var kosafUpdatedAt = ""; var state = { applications: [] }; function isSaved() { return false; }',
   /* 「공고 안내」 블록(NS_LABELS … noticeSummaryHtml) — 활동 시트의 셋째 칸을 앱 함수 그대로 그린다(test-collector 「공고 카드 품질」과 같은 자르기) */
@@ -160,18 +160,19 @@ function linkLines(it, where) {
     out.push(`       카드 아랫줄 「${htmlText((h.match(/<p class="sch-provider">([^<]*수집[^<]*)<\/p>/) || [])[1] || '')}」 · 도우미 「${it.title || ''} ${linkFn('sourceLink')(it, 'chat').label}」`);
     out.push(`       누르면 → ${hrefIn(h) || '(링크 없음)'}`);
   } else if (where === 'activity') {
-    const h = linkFn('activityLinkHtml')(it);
-    out.push(`       활동 시트 단추·안내 「${htmlText(h) || '(없음)'}」`);
-    out.push(`       누르면 → ${hrefIn(h) || '(링크 없음)'}`);
+    /* 활동 시트 단추 — 이름은 source-link.js activityButton 자리(승인 시안 2026-11-02 · openActivityDetail 과 같은 규칙) */
+    const aL = linkFn('sourceLink')(it, 'activityButton');   // 단추 이름은 source-link.js 한 곳(activityButton)
+    out.push(`       활동 시트 단추 「${aL.href ? aL.label : '(없음)'}」 · 안내 「${htmlText(linkFn('activityLinkWhy')(it, aL)) || '(없음)'}」`);
+    out.push(`       누르면 → ${aL.href || '(링크 없음)'}`);
     /* 시트의 칸들이 무엇을 그리는가(2026-10-19 개발자 "자격요건이 공고 안내에 들어가 있다") — 자격·모집 안내·공고 안내는 이 세 칸의 글자를 그대로 그린다(없으면 칸을 접는다) */
     const raw = it.eligibilityLines || [], ex = it.excerpts || [], nl = it.noticeLines || [];
     /* 시트는 저장된 줄을 그대로 찍지 않고 match-engine 이 절(자격/제외)로 가른 것을 그린다 — 같은 함수로 가른 결과를 보인다(2026-10-27 「라참여배제자」) */
     const el = ME.requirementLines(it, raw, { all: true }), exl = ME.requirementLines(it, raw, { onlyExclude: true });
-    out.push(`   ─ 지원 자격 (${el.length}줄${el.length ? '' : ' · 칸 접힘'} · 저장된 줄 ${raw.length})`);
+    out.push(`   ─ 지원 자격 (${el.length}줄${el.length ? '' : ' · 「원문에서 확인 — 공고가 자격을 따로 적지 않았어요」 한 줄'} · 저장된 줄 ${raw.length})`);   // 칸은 늘 있다(승인 시안 2026-11-02)
     for (const l of el) out.push(`       · ${String(l).slice(0, 84)}`);
-    out.push(`   ─ '이런 경우는 제외돼요' (${exl.length}줄)`);
+    out.push(`   ─ 제외 줄 ✗ — 「지원 자격」 칸 안 (${exl.length}줄)`);
     for (const l of exl) out.push(`       ✗ ${String(l).slice(0, 84)}`);
-    out.push(`   ─ 모집 안내 (${ex.length}줄${ex.length ? '' : ' · 칸 접힘'})`);
+    out.push(`   ─ 발췌 이름표 (${ex.length}줄 · 모집기간은 「접수 · 기간」 · 나머지는 「공고 안내」 줄)`);
     for (const x of ex) out.push(`       · ${x.label} · ${String(x.text).slice(0, 70)}`);
     /* 「공고 안내」는 저장된 줄 그대로가 아니다 — 시트(openActivityDetail)가 모집 안내·자격에 이미 나온 문장을 빼고 noticeSummaryHtml 이 조각·머리글을 거른다.
        그 두 단계를 **앱 함수로** 다시 밟는다(2026-10-28 개발자 "자격요건이 공고 안내에 들어가고 있는데" — 이 도구가 저장된 줄을 찍어 화면과 다르게 말했다) */
@@ -286,7 +287,10 @@ for (const sch of hits) {
      그전까지 이 도구는 `sch.name` 원본만 찍어서, 제목을 다듬는 규칙과 윗줄에서 기관명을 빼는
      규칙을 **둘 다 못 봤다.** 「매 세션 이것만은」 1번이 화면 이야기를 이 도구로만 하라고
      하는데 정작 카드 윗줄을 몰랐던 것이다. */
-  console.log(`   카드 윗줄 「${appFn('cardOrgLine')(sch)}」  ·  카드 제목 「${appFn('cardTitle')(sch)}」`);
+  /* 카드 시안 B(2026-11-02) — 윗줄은 칩(kindChip) + 주최(cardProviderLine) · 제목은 cardTitleParts(지우고 나누기만) · 아랫줄 왼쪽은 amountLine */
+  const chip = appFn('kindChip')(sch), prov = appFn('cardProviderLine')(sch), tp = appFn('cardTitleParts')(sch), amt = appFn('amountLine')(sch);
+  console.log(`   카드 윗줄 「${chip.label}${prov ? ' · ' + prov : ''}」  ·  카드 제목 「${tp.title}」${tp.who.length ? `  ·  제목에서 뗀 대상 「${tp.who.join(' · ')}」` : ''}`);
+  console.log(`   카드 아랫줄 왼쪽 「${amt.text || '(줄 없음)'}」${amt.text && !amt.known ? ' (옅게)' : ''}`);
   console.log(`   학생: ${p.school} ${p.track} ${p.year}학년 · 평점 ${p.gpa} · ${p.credits}학점 · ${p.bracket}구간`);
   console.log(`   판정 ${result.status}  ·  배지 「${badge}」`);
   console.log(`   신청 버튼 ${canApply ? '열림' : '잠김'}  (마감: ${d.label || '?'})`);
@@ -305,7 +309,7 @@ for (const sch of hits) {
   console.log(`   ─ 상세 시트에 보이는 자격 줄 (${allLines.length}줄 · 전부)`);
   for (const l of allLines) console.log(`       · ${String(l).slice(0, 84)}`);
   if (allLines.length > listLines.length) console.log(`     ⚠️ 목록에는 ${allLines.length - listLines.length}줄이 안 보인다 — 그건 '숨겨진 것'이 아니라 미리보기 상한이다`);
-  console.log(`   ─ '이런 경우는 제외돼요' (${exLines.length}줄)`);
+  console.log(`   ─ 제외 줄 ✗ — 「지원 자격」 칸 안 (${exLines.length}줄)`);
   for (const l of exLines) console.log(`       ✗ ${String(l).slice(0, 84)}`);
   const why = (result.reasons || []).filter((r) => /미달|없어|불가/.test(r));
   if (why.length) console.log(`   ─ 미달 사유\n       ${why.map((w) => w.slice(0, 90)).join('\n       ')}`);

@@ -90,8 +90,9 @@ async function fresh(browser, mode, ext = EXT_FIXTURE, profile = PROFILE) {
 /* 🔴 2026-10-01 — 카드는 장학 카드와 같은 그림(cardShellHtml · button.sch-card[data-activity])이고 누르면 같은 시트가 열린다 */
 const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) => els.map((e) => ({
   name: e.querySelector('.sch-name').textContent.trim(),
-  org: e.querySelector('.sch-org').textContent.trim(),
-})));
+  org: (e.querySelector('.sch-org') || {}).textContent || '',   // 시안 B(2026-11-02) — 주최는 알 때만 · 갈래는 칩(.badge-kind)
+  chip: (e.querySelector('.sch-top .badge-kind') || {}).textContent || '',
+})).map((c) => ({ ...c, org: c.org.trim(), chip: c.chip.trim() })));
 
 (async () => {
   await assertOwnServer(PORT);
@@ -134,37 +135,40 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
     let seen = await cards(page);
     eq('② 내 학교 글 + 전국 글만 (경희대 글은 안 보인다) · 최근 수집 순', seen.map((c) => c.name),
       ['2026 대학생 해외봉사단 모집', '제3회 장학수기 공모전 공고', '전국 청년 서포터즈 모집']);
-    eq('④ 윗줄은 종류 · 학교 게시판 (장학 카드의 기관 자리)', seen[0].org, '대외활동 · 한국외국어대학교 게시판');
+    /* 2026-11-02 승인 시안 B — 윗줄은 갈래 칩(봉사·대외활동·공모전·청년정책) + 주최 · 아랫줄 왼쪽은 「대상 · …」 · 마감은 아랫줄 오른쪽 그대로(개발자 결정) */
+    /* 2026-11-02 개발자 결정 — 학교 게시판에서 주운 글은 「○○대학교 게시판」을 학생 화면에 적지 않는다(주최가 아니다) · 칩만 */
+    eq('④ 윗줄은 갈래 칩만 (칩은 분야로 「봉사」 · 학교 게시판 글은 주최 글자 없음)', [seen[0].chip, seen[0].org], ['봉사', '']);
     eq('④ 마감을 읽은 글은 아랫줄 오른쪽 D-5 (장학 카드와 같은 자리·같은 글자)', await page.$eval('#activities-list [data-activity] .sch-foot .sch-due', (e) => e.textContent.trim()), 'D-5');
-    eq('④ 아랫줄 왼쪽(장학 카드의 금액 자리)은 짧은 혜택', await page.$eval('#activities-list [data-activity] .sch-foot .sch-amount', (e) => e.textContent.trim()), '항공료 전액 지원');
+    eq('④ 아랫줄 왼쪽(장학 카드의 금액 자리)은 「대상 · …」 — 발췌 대상이 없으면 첫 자격 줄', await page.$eval('#activities-list [data-activity] .sch-foot .sch-amount', (e) => e.textContent.trim()), '대상 · 만 19~34세 대한민국 국민');
     /* 판정 하나 — 장학 카드와 같은 cardBadgeHtml (2026-10-01) */
     /* 자격 줄 없음 → 배지 없음 (2026-10-03 개발자 결정 — 활동 카드에 '자격 미확인' 을 안 단다 · 장학 카드는 그대로) */
     eq('④ 카드 맨 윗줄 판정 — 나이 맞음 → 적합도 % · 나이 넘음 → 미달 · 자격 줄 없음 → 배지 없음',
-      await page.$$eval('#activities-list .sch-card .sch-top', (e) => e.map((x) => (x.querySelector('.sch-fit, .badge') || {}).textContent || '').map((t) => t.trim().replace(/\d+%/, 'N%'))),
+      await page.$$eval('#activities-list .sch-card .sch-top', (e) => e.map((x) => (x.querySelector('.sch-fit, .badge:not(.badge-kind)') || {}).textContent || '').map((t) => t.trim().replace(/\d+%/, 'N%'))),   // 갈래 칩(.badge-kind)은 판정이 아니다(시안 B 2026-11-02)
       ['적합도 N%', '지원 자격 미달', '']);
-    eq('④ 혜택이 없으면 분야를 옅게 — 없으면 빈칸(지어내지 않는다)', await page.$$eval('#activities-list [data-activity] .sch-amount', (e) => e.map((x) => [x.textContent.trim(), x.classList.contains('unknown')])), [['항공료 전액 지원', false], ['', true], ['', true]]);
+    eq('④ 대상을 못 읽은 글은 아랫줄 왼쪽이 빈칸 (혜택·분야로 채우지 않는다 · 시안 B)', await page.$$eval('#activities-list [data-activity] .sch-amount', (e) => e.map((x) => x.textContent.trim().startsWith('대상 · ') || x.textContent.trim() === '')), [true, true, true]);
     eq('④ 카드에 발췌 줄을 쌓지 않는다 (장학 카드처럼 석 줄)', await page.$$eval('#activities-list .sch-provider', (e) => e.length), 0);
     eq('④ 장학 카드와 같은 그릇 (.sch-card-wrap > button.sch-card)', await page.$$eval('#activities-list .sch-card-wrap > button.sch-card[data-activity]', (e) => e.length), 3);
     /* 누르면 앱을 떠나지 않고 장학과 같은 상세 시트(#detail-sheet)가 열린다 */
     await page.click('#activities-list [data-activity]'); await page.waitForTimeout(500);
     eq('⑤ 누르면 상세 시트가 열린다(앱을 떠나지 않는다)', await page.$eval('#detail-sheet', (e) => !e.hidden && e.classList.contains('show')), true);
-    eq('⑤ 시트 — 제목 · 혜택 · 주최/분야 · D-day · 종류', await page.$eval('#detail-sheet', (e) => [
+    /* 2026-11-02 승인 시안 — 머리줄 = 칩 · 주최 · D-day · 저장 (카드와 같은 줄) · 짧은 혜택은 금액 자리 */
+    eq('⑤ 시트 — 제목 · 혜택(금액 자리) · 머리줄 칩/D-day (학교 게시판 글은 주최 없음)', await page.$eval('#detail-sheet', (e) => [
       e.querySelector('.sheet-title').textContent.trim(), e.querySelector('.sheet-amount').textContent.trim(),
-      e.querySelector('.sheet-provider').textContent.trim(), e.querySelector('.badge-dday').textContent.trim(), e.querySelector('.badge-kind').textContent.trim()]),
-      ['2026 대학생 해외봉사단 모집', '항공료 전액 지원', '한국외국어대학교 게시판 · 봉사', 'D-5', '대외활동']);
-    eq('⑤ 모집 안내는 원문 발췌 그대로 (혜택은 위에 한 번만)', await page.$$eval('#detail-sheet .doc-list', (u) => u[0].querySelectorAll('li').length && [...u[0].querySelectorAll('li')].map((x) => x.textContent.trim())), ['모집기간 · 2026. 10. 1. ~ 10. 15.']);
+      e.querySelector('.sheet-top .badge-kind').textContent.trim(), !!e.querySelector('.sheet-top .sch-org'), e.querySelector('.sheet-top .badge-dday').textContent.trim(), !!e.querySelector('.sheet-provider')]),
+      ['2026 대학생 해외봉사단 모집', '항공료 전액 지원', '봉사', false, 'D-5', false]);   // 학교 게시판 글 — 머리줄에 주최 글자 없음(2026-11-02 개발자 결정)
+    eq('⑤ 「접수」 절 — 기간은 접수 시작~마감 또는 원문 기간 문구 · 방법은 원문 확인(활동 글은 서류 줄 없음)', await page.$$eval('#detail-sheet .apply-rows li', (li) => li.map((x) => x.textContent.trim().replace(/\s+/g, ' '))), ['기간~ ' + new Date(Date.now() + 5 * 86400000).toISOString().slice(5, 10).replace('-', '.'), '방법원문 확인']);
     eq('⑤ 지원 자격 — 장학 시트와 같은 머리(적합도 · 요건 n개 중 n개 충족)와 ✓ 줄',
       await page.$eval('#detail-sheet', (e) => [e.querySelector('.sheet-verdict h4').textContent.trim(), /요건 1개 중 1개 충족/.test(e.querySelector('.sheet-verdict').textContent),
         [...e.querySelectorAll('.reason-list li')].map((li) => li.textContent.trim())]),
       ['지원 자격', true, ['✓ 만 19~34세 대한민국 국민']]);
     eq('⑤ 지원 가능 알약은 없다(활동 글엔 구조화 조건이 없어 늘 가능 — 거짓 안심)', await page.$$eval('#detail-sheet .status-pill', (e) => e.length), 0);
     eq('⑤ 공고 원문 안내 — 원문 문장 그대로', await page.$$eval('#detail-sheet .doc-list', (u) => u.map((x) => x.textContent.trim()).some((t) => t.includes('봉사단은 5개국에 파견합니다.'))), true);
-    eq('⑤ 원문 단추는 그 글 주소를 새 탭으로', await page.$eval('#detail-sheet a.btn-primary', (a) => [a.getAttribute('href'), a.target, a.textContent.trim()]), ['https://dep.hufs.ac.kr/bbs/x/1', '_blank', '원문 공고 ↗']);   // 2026-10-19 개발자: "자세한 공고는 원문 공고에서 확인하라 하면서 … 원문공고 하이퍼링크"
+    eq('⑤ 원문 단추는 그 글 주소를 새 탭으로 — 글 하나로 가는 주소라 「원문에서 신청하기 ↗」(시안 2026-11-02)', await page.$eval('#detail-sheet a.btn-primary', (a) => [a.getAttribute('href'), a.target, a.textContent.trim()]), ['https://dep.hufs.ac.kr/bbs/x/1', '_blank', '원문에서 신청하기 ↗']);   // 2026-10-19 개발자: "자세한 공고는 원문 공고에서 확인하라 하면서 … 원문공고 하이퍼링크"
     eq('⑤ 단추 글자에 밑줄이 없다', await page.$eval('#detail-sheet a.btn-primary', (a) => getComputedStyle(a).textDecorationLine), 'none');
     await page.keyboard.press('Escape'); await page.waitForTimeout(500);
     eq('⑤ ESC 로 닫힌다 (장학 시트와 같은 그릇)', await page.$eval('#detail-sheet', (e) => e.hidden || !e.classList.contains('show')), true);
     eq('④ 마감 지난 글은 보이지 않는다', seen.some((c) => /지난 공모전/.test(c.name)), false);
-    eq('④ 전국 글은 주최를 말한다', seen[2].org, '대외활동 · 청년재단');
+    eq('④ 전국 글은 주최를 말한다 (칩은 종류 · 주최는 host)', [seen[2].chip, seen[2].org], ['대외활동', '청년재단']);
     /* 정렬 — 마감 임박순은 마감을 읽은 글이 앞, 못 읽은 글은 뒤 */
     /* 🔴 정렬은 **탐색 화면과 같은 단추·같은 자리·같은 동작**이다 (2026-09-30 개발자 지시) —
        누르면 기준 목록이 뜨고, 골라야 바뀐다. 머리줄 오른쪽 끝에 선다(갱신 날짜 칸이 없어서). */

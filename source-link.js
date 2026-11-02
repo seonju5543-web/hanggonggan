@@ -209,6 +209,8 @@ const SURFACE_LABELS = {
   applog:   { page: '공고 원문 보기 ↗', list: '게시판 목록 열기 ↗', 'foundation-home': '재단 홈페이지 열기 ↗', program: '한국장학재단에서 보기 ↗', home: '홈페이지 열기 ↗', trouble: '공고 원문 보기(확인 필요) ↗' },
   card:     { page: '원문 보기 ↗', list: '게시판 목록에서 보기 ↗', 'foundation-home': '재단 홈페이지에서 보기 ↗', program: '한국장학재단에서 보기 ↗', home: '홈페이지에서 보기 ↗', trouble: '원문 보기(확인 필요) ↗' },
   activity: { page: '원문 공고 ↗', list: '게시판 목록에서 보기 ↗', 'foundation-home': '재단 홈페이지 ↗', program: '한국장학재단 ↗', home: '주최 측 홈페이지 ↗', trouble: '원문 보기(확인 필요) ↗' },
+  /* 활동 시트의 검정 단추(2026-11-02 승인 시안) — 글 하나로 가는 주소(post)만 「원문에서 신청하기 ↗」, 나머지는 활동 시트와 같은 이름(목록·홈페이지에 '신청하기'를 붙이지 않는다 · 2026-10-03) */
+  activityButton: { page: '원문에서 신청하기 ↗', list: '게시판 목록에서 보기 ↗', 'foundation-home': '재단 홈페이지 ↗', program: '한국장학재단 ↗', home: '주최 측 홈페이지 ↗', trouble: '원문 보기(확인 필요) ↗' },
   chat:     { page: '↗', list: '(게시판 목록) ↗', 'foundation-home': '(재단 홈페이지) ↗', program: '(한국장학재단) ↗', home: '(홈페이지) ↗', trouble: '(원문 확인 필요) ↗' },
 };
 /* 문제(trouble)일 때 붙이는 한 줄 — 로봇이 무엇을 봤는지 그대로 말한다(짐작해 덧붙이지 않는다) */
