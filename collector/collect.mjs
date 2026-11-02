@@ -19,7 +19,7 @@ import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry, retitleItems } from './clean-title.mjs';
 import { isAttachmentEntry, detailAttachments, stripSiteChrome } from './attachment-link.mjs';
 import { activityKind, activityField, notActivity, unreadableSource, ACTIVITY_FIELDS } from './activity-kind.mjs';
-import { activityExcerpts, activityDetails, putActivityDetails, ACT_DETAILS_V, sanitizeBenefit, sanitizeElig } from './activity-excerpts.mjs';
+import { activityExcerpts, activityDetails, putActivityDetails, ACT_DETAILS_V, sanitizeBenefit, sanitizeElig, sanitizeSteps } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { detailByRule } from './activity-detail-rules.mjs';   // 본문이 스크립트로 그려지는 게시판(온통청년)의 숨은 글 주소 — 첨부 로봇과 같은 함수(2026-10-28)
 import { robotsAllows } from './robots.mjs';
@@ -608,6 +608,7 @@ acts.items = acts.items.filter((n) => (actKeepDate(n) || '9999') >= cutoff);
 acts.items = acts.items.filter((n) => !isAttachmentEntry(n));
 acts.items = acts.items.filter((n) => !notActivity(n.title) && !unreadableSource(n.url));   // 결과·보도·지난 해 글은 모집 글이 아니다 · 인스타그램 게시물은 뺀다 — 이미 실린 글에도 소급(2026-10-04 · 10-16 · activity-kind.mjs)
 acts.items.forEach(sanitizeBenefit);   // 「혜택」에 섞인 조건은 자격 줄로 — 출처(본문·API)와 상관없이 매번 모든 글에(2026-10-04 · activity-excerpts.mjs splitBenefit)
+acts.items.forEach(sanitizeSteps);   // 「1. 2. 3.」 단계 번호 떼기 — 연락처 단계가 빠지면 「3.」부터 남던 1365 글(2026-11-02 · activity-excerpts.mjs stripStepNumber) · 소급
 acts.items.forEach(sanitizeElig);   // 자격 줄 거름(여러 갈래 나이·개인정보 안내문)을 실린 글 전부에 매번 — 소급(2026-10-05 점검 api-06 · activity-excerpts.mjs eligLineOk)
 acts.items.forEach((n) => bodyReader.heal(n));   // 껍데기에서 시작한 기간 힌트 소급(위 '껍데기를 걷은 본문' 단락)
 acts.items = dedupeNotices(acts.items);

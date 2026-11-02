@@ -12238,6 +12238,18 @@ console.log('\n■ 공공 API 로봇 (2026-10-01)');
   eq('  장학 제도는 활동 글이 아니다(장학 낱말 규칙을 넘긴다)', !!M.mapKstartup({ ...ks, biz_pbanc_nm: '창업 봉사장학생 모집' }, opt).drop, true);
   const v = { progrmSj: '대학생 교육봉사단 모집', url: 'https://www.1365.go.kr/vols/1572247904127/partcptn/timeCptn.do?type=show&progrmRegistNo=1', noticeBgnde: '20260901', noticeEndde: '20261015', progrmBgnde: '20261020', progrmEndde: '20261220', nanmmbyNm: '서울특별시자원봉사센터', adultPosblAt: 'Y', actPlace: '서울' };
   eq('1365 — 대외활동·봉사 · 마감은 모집 종료일', (({ kind, field, deadline, host }) => [kind, field, deadline, host])(M.map1365(v).item), ['대외활동', '봉사', '2026-10-15', '서울특별시자원봉사센터']);
+  /* 🔴 단계 번호 잔재(2026-11-02 개발자 "신청방법에도 3. 부터 들어가있고") — 1365 탈북민대학생멘토링: 「신청방법: 1. 먼저 (메일)… 2. 담당자가 … 3. 학생과 1:1 매칭 … 4. 실제 수업은 …」을
+     단계마다 줄로 끊고 연락처 든 1·2를 뺐더니 「3.」부터 남았다. 번호는 뗀다(글자는 그대로) · 날짜의 「6. 」 뒤에서는 끊지 않는다(K-Startup `1996. 6. 이후 출생자` 가 「6. 이후 출생자)」 조각이 됐다) */
+  const steps = M.splitLines('신청방법: 1. 먼저 abc@example.com 메일로 이름을 보내주세요 2. 기관에서 오티를 실시합니다 3. 학생과 1:1 매칭이 되면 시작됩니다 4. 실제 수업은 노원구 근처 입니다');
+  eq('🔴 단계 번호를 뗀다 — 연락처 든 단계가 빠져도 「3.」 이 남지 않는다 (「담당자」 든 줄은 기존 연락처 규칙대로 빠진다)', steps, ['기관에서 오티를 실시합니다', '학생과 1:1 매칭이 되면 시작됩니다', '실제 수업은 노원구 근처 입니다']);
+  eq('  날짜 속 「6. 」 뒤에서는 끊지 않고 번호로 보지도 않는다', M.splitLines('1996. 6. 이후 출생자 (만 29세 이하) 누구나'), ['1996. 6. 이후 출생자 (만 29세 이하) 누구나']);
+  eq('  이름표 뒤 날짜 「10. 30.」 은 그대로', M.splitLines('신청기간 : 2026. 10. 30.(금) ~ 11. 6.(금) 18시'), ['신청기간 : 2026. 10. 30.(금) ~ 11. 6.(금) 18시']);
+  eq('  글머리 번호 하나뿐인 줄도 번호만 뗀다', M.splitLines('1. 활동기간: 2026년 11월 7일, 14일'), ['활동기간: 2026년 11월 7일, 14일']);
+  const AXs = await import('../collector/activity-excerpts.mjs');
+  const it3 = { noticeLines: ['신청 방법 : 3. 학생과 1:1 매칭이 되면 시작됩니다', '기간 : 최소 한학기'], eligibilityLines: ['1. 모집대상 : 20세이상'] };
+  eq('  이미 실린 글도 같은 함수로 소급(sanitizeSteps) — 바뀌면 true · 두 번째는 false', [AXs.sanitizeSteps(it3), it3.noticeLines, it3.eligibilityLines, AXs.sanitizeSteps(it3)],
+    [true, ['신청 방법 : 학생과 1:1 매칭이 되면 시작됩니다', '기간 : 최소 한학기'], ['모집대상 : 20세이상'], false]);
+  eq('  수집 로봇 발행이 모든 활동 글에 매번 건다 (sanitizeBenefit 과 같은 자리)', /acts\.items\.forEach\(sanitizeSteps\)/.test(readText(new URL('../collector/collect.mjs', import.meta.url))), true);
   eq('  대학생·청년을 부르지 않은 동네 일감은 싣지 않는다', M.map1365({ ...v, progrmSj: '어르신 말벗 도우미' }).drop, '대학생·청년 대상 아님');
   eq('  성인 불가는 싣지 않는다', M.map1365({ ...v, adultPosblAt: 'N' }).drop, '성인 참여 불가');
   const p = { plcyNm: '청년 정책 서포터즈 모집', aplyUrlAddr: 'https://example.go.kr/apply', aplyYmd: '20260101 ~ 20260331\\N20260901 ~ 20261130', aplyPrdSeCd: '0057001', sprvsnInstCdNm: '국무조정실', sprtTrgtMinAge: '19', sprtTrgtMaxAge: '34', sprtTrgtAgeLmtYn: 'Y' };
