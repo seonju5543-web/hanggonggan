@@ -37,7 +37,7 @@ function num(s) { const m = String(s).match(/\d+(\.\d+)?/); return m ? parseFloa
 /* ── 성적 ───────────────────────────────────────────────────────────────
    단위를 **확정할 수 있을 때만** 낸다. `평균 80점 또는 평점 B학점 이상`처럼
    두 단위가 한 줄에 있으면 확신을 낮춘다(둘 중 어느 쪽으로 재야 하는지 모른다). */
-function parseGrade(t) {
+function parseGrade(t, isExclude) {
   const hasPct = /백분위|\/\s*100|100\s*점\s*만점|\d{2,3}\s*점\s*(이상|\/)/.test(t);
   const has45 = /\/\s*4\.5|4\.5\s*만점|평점\s*평균|평균\s*평점|평점이?\s*\d\.\d/.test(t);
   const has43 = /\/\s*4\.3|4\.3\s*만점/.test(t);
@@ -73,7 +73,11 @@ function parseGrade(t) {
     }
   }
   /* `평균성적 B(3.0) 이상` — 등급 뒤 괄호 안의 수(2026-10-31 · 2단계 · 수원지역동문회 줄이 '모름'이었다) */
-  const mDec = t.match(/(\d\.\d{1,2})\s*점?\s*\)?\s*(?:\([^)]{0,8}\))?\s*(?:\/\s*4\.[35])?\s*점?\s*(?:이상|이상인|넘)/);
+  /* 제외 줄의 `학점 3.0(4.5환산)에 미달된 때` 는 '3.0 이상이어야 한다'와 같은 말이다 — 제외 줄에서만 `미달` 을 문턱으로 읽는다
+     (자격 줄의 `3.0 미달` 은 성적 향상 장학처럼 뜻이 반대일 수 있어 안 읽는다 · 2026-11-02 · 2단계 2차) */
+  /* ⚠️ `미달` 로 **줄이 끝나야** 한다(리뷰) — `3.0 미달 학기가 2회 이상`·`미달 시 환수·지급 중단`·`미달로 경고를 받은` 은 횟수·이력·사후 조치라 지금 평점으로 못 가린다 */
+  const mDec = t.match(/(\d\.\d{1,2})\s*점?\s*\)?\s*(?:\([^)]{0,8}\))?\s*(?:\/\s*4\.[35])?\s*점?\s*(?:이상|이상인|넘)/)
+    || (isExclude ? t.match(/(\d\.\d{1,2})\s*점?\s*(?:\([^)]{0,8}\))?\s*에?\s*미달(?:된|인|한)?\s*(?:때|경우|자|학생|사람)?\s*[.)]?\s*$/) : null);
   /* 🔴 **점수와 `이상` 사이의 괄호** (2026-10-12 · 카드 분석 조각 1). `백분위 70점(C0) 이상`·`70점(평점 1.51에 해당) 이상`·
      `70 점 (100 점 만점 ) 이상` — 괄호가 끼면 통째로 못 읽어 줄이 '모름'이었다(실측 4줄). 평점 쪽(mDec)이 이미 허용하는 것과 같다.
      ⚠️ 앞이 숫자·점이면 안 된다 — `3.75점 이상` 의 `75` 를 백분위로 읽지 않게. */
@@ -160,7 +164,7 @@ function parseIncomeBand(t) {
 
 /* ── 어학 성적 ── `IELTS Overall 5.5 이상`·`유럽언어기준 B1 이상의 독일어 능력`·`공인 영어성적 보유자` (2026-10-15 개발자 결정 "어학 성적도 학적정보에서").
    프로필은 보유 여부(온보딩 `#in-cert` 체크)만 안다 → 없다고 적은 학생은 ✕(구조화 needCert 와 같은 규칙) · 있으면 점수를 몰라 모름(judgeCond 'cert') */
-const CERT_RE = /IELTS|TOEIC|TOEFL|TEPS|OPIc|JLPT|HSK|DELF|DELE|CEFR|TOPIK|토픽|한국어\s?능력\s?시험|유럽\s?언어\s?기준|어학\s*(?:성적|능력|점수)|(?:공인\s*)?(?:영어|외국어)\s*(?:성적|능력\s*시험|시험\s*성적)|Overall\s*\d/i;
+const CERT_RE = /IELTS|TOEIC|TOEFL|TEPS|OPIc|JLPT|HSK|DELF|DELE|CEFR|TOPIK|토픽|한국어\s?능력\s?시험|유럽\s?언어\s?기준|어학\s*(?:성적|능력|점수)|(?:공인\s*)?(?:영어|외국어)\s*(?:성적|능력\s*시험|시험\s*성적)|공인\s?(?:영어|외국어)\s?시험|Overall\s*\d/i;   // `공인 외국어 시험 학년별 기준점수 이상 성적 보유자`(2026-11-02)
 function parseCert(t) {
   if (!CERT_RE.test(t) || /무관|불문|관계\s?없/.test(t)) return null;
   /* TOPIK 은 외국인 유학생 줄이다 — 한국 학생의 어학 체크 유무로 ✕ 를 내지 않는다(확신 낮음 · 2026-10-31) */
@@ -171,7 +175,9 @@ function parseCert(t) {
 /* ── 직전학기 이수학점 ── `12학점 이상` */
 function parseCredits(t) {
   /* `15학점(졸업이수학점이 120인 학부는 14학점) 이상` — 수와 `이상` 사이 괄호를 허용한다(2026-10-31 · 2단계 · 가온누리·특별장학 줄이 '모름'이었다) */
-  const m = t.match(/(\d{1,2})\s*학점\s*(?:\([^()]{0,40}\))?\s*(이상|이내|미만)/);
+  /* `매 정규학기 당 최소 12학점 이수한 자`·`최소 이수학점(12학점)` — `최소` 가 앞에 오면 `이상` 과 같은 말이다(2026-11-02 · 2단계 2차) */
+  const mMin = t.match(/최소\s*(?:이수\s?학점\s*[(（]\s*)?(\d{1,2})\s*학점/);
+  const m = t.match(/(\d{1,2})\s*학점\s*(?:\([^()]{0,40}\))?\s*(이상|이내|미만)/) || (mMin ? [mMin[0], mMin[1], '이상'] : null);
   if (!m) return null;
   const v = num(m[1]);
   if (v == null || v < 1 || v > 30) return null;
@@ -593,6 +599,9 @@ function parseAge(t) {
   }
   /* `39세 이하`·`30세 이하` — `만` 없이 적는 공고가 많다(청년 정책은 법이 만 나이). judgeCond 'age' 는 올해−태어난 해(Y)로 재며
      Y == max+1 을 모름으로 두므로 연 나이로 읽어도 틀린 ✕ 가 없다(2026-10-15 · 123줄 진단 ⑥) */
+  /* `만 30세 초과 지원제한` — 초과하면 안 된다는 말이라 `30세 이하` 와 같다. 뒤에 제한·불가·제외가 붙을 때만(2026-11-02 · 2단계 2차) */
+  const mx = t.match(/(?:만\s?)?(?<![\d.])(\d{2})\s*세\s*초과\s*(?:자는?\s*)?(?:지원\s?|신청\s?)?(?:제한|불가|제외)/);
+  if (mx) { const v = num(mx[1]); return v == null ? null : { kind: 'age', max: v, conf: HIGH }; }
   const m = t.match(/(?:만\s?)?(?<![\d.])(\d{2})\s*세\s*(?:\([^()]{0,12}\)\s*)?(이하|미만)/);   // `39세('87년) 이하` 의 괄호
   if (!m) return null;
   const v = num(m[1]);
@@ -613,7 +622,7 @@ const REGIONS = ['서울', '부산', '대구', '인천', '광주', '대전', '�
    으로 자르면 하나도 못 집는다(처음에 그렇게 만들었다가 전부 놓쳤다).
    대신 **뒤에 올 수 있는 것**을 적어 경계를 잡는다 — 안 그러면 `학생구분` 의 `학생구`가
    시·군·구로 잡힌다. */
-const CITY_RE = /([가-힣]{1,6}(?:시|군|구))(?=[에의를을는은이가와과로,·)\s]|$|민|청|내|외)/g;
+const CITY_RE = /([가-힣]{1,6}(?:시|군|구))(?=[에의를을는은이가와과로,·)\s]|$|민|청|내|외|으로)/g;   // `고창군으로 되어있는` 의 `으로` 도 토씨다(2026-11-02)
 /* 시·도 이름이 `시`로 끝나는 것들(대구광역시 등)과 갈래말은 시·군이 아니다 */
 const CITY_NOT = /^(광역시|특별시|자치시|특별자치시|해당시|소재지|거주지|주소지|본인이|우리시|관할시)$/;
 /* 🔴 **지역 이름이 늘 '거주지'인 것은 아니다 — 셋을 가른다** (2026-09-13 · 노션 백로그 G-6).
@@ -806,6 +815,9 @@ function parseResidence(t) {
     /* 시·도 이름은 시·군이 아니다 — `서울특별시`·`대구광역시`·`제주특별자치도` */
     if (CITY_NOT.test(c) || /(특별시|광역시|특별자치시)$/.test(c)) continue;
     if (REGIONS.includes(c.replace(/(시|군|구)$/, ''))) continue;
+    /* 🔴 표(REGION_CITIES)에 있는 시·군·구만 거주지로 판정한다(2026-11-02 리뷰) — `해군으로 복무`·`예비군으로 편성`·`대상군으로 분류` 의 「군」이
+       시·군이 되어 서울 학생에게 ✕ 가 났다. 프로필의 시·군은 이 표에서 고르므로 표 밖 이름은 어차피 맞을 수 없고 ✕ 만 낼 수 있다(수원 영통구 학생에게 `영통구` 줄도 같은 사고). */
+    if (!provincesOfCity(c).length) continue;
     if (!cities.includes(c)) cities.push(c);
   }
   /* `관내`는 **그 재단의 관할**을 뜻한다 — 어느 시·군인지는 줄만 봐서는 모르고
@@ -824,7 +836,8 @@ function parseResidence(t) {
   /* `거주하거나 생활권을 두고`·`부산시 소재 대학 졸업자 또는 주민등록자` — **다른 연고로도 된다**는 줄이다(2026-10-03 · 대외활동 실측).
      시·도가 달라도 미달로 판정하면서(아래 judgeCond) 이 꼴을 예외로 넣었다 — 경기도 학교에 다니는 서울 학생이 틀린 미달이 되지 않게. */
   /* `주민등록이 되어 있거나, 강화군 내 중·고등학교 3년 재학 후 졸업한 사람` — 거주 아닌 다른 연고(출신 학교)로도 되는 줄은 ✕ 를 못 낸다(2026-10-31 · 외대 글로벌 전수에서 틀린 ✕ 1건) */
-  const RES_EXCEPT = /관외[^,.]{0,12}인정|거주\s?(요건)?\s?(을|를)?\s?(면제|제외|미적용)|예외|다만|단\s|무관|해당\s?없|생활권|거나|소재/;
+  /* `그 외: 본인 또는 보호자의 주민등록이 3년이상 … 고창군` — 「그 외」 는 앞 줄(다른 연고)이 아닐 때의 갈래라 이 줄 하나로 ✕ 를 못 낸다(모름 · 맞으면 ✓ · 2026-11-02) */
+  const RES_EXCEPT = /관외[^,.]{0,12}인정|거주\s?(요건)?\s?(을|를)?\s?(면제|제외|미적용)|예외|다만|단\s|무관|해당\s?없|생활권|거나|소재|^\s*그\s?외\s*[:：]/;
   /* 🔴 공용 HAS_EXCEPTION 을 쓰지 않는다 — 거기엔 `포함` 이 들어 있어서
      `공고일 **포함**하여 1년 이상 계속하여 용산구에 주민등록` 이 예외로 오인됐고,
      그래서 다른 구 학생에게도 미달이 안 떴다(2026-08-30 전수 대조에서 잡았다).
@@ -1223,6 +1236,23 @@ function parseOpen(t, isExclude) {
   return rest.length ? null : { kind: 'open', conf: HIGH };
 }
 
+/* ── 학교 유형 제외 ── `방송통신대학 및 사이버대학·직업학교·학점은행제학교 등 제외`·`외국대학/사이버대학/대학원 학생`·`시간제 등록생`
+   (2026-11-02 · 2단계 2차 — 층2 제외 칸 15줄이 '모름'이라 걸리지 않음을 확인한 요건으로 못 세고 있었다).
+   이 앱의 프로필은 정의상 **국내 정규 대학 학부생**이라(parseDegree 머리말 · degreeOf) 이런 제외 조항에는 걸리지 않는다 — judgeCond 가 학교 이름으로 한 번 더 본다.
+   🔴 **제외 줄에서만 · 그 줄이 학교 유형 이야기뿐일 때만** 낸다(degreeRest 와 같은 '남는 글자' 잣대) — `대학원 진학 예정자` 같은 줄은 남는 글자가 있어 안 읽는다. */
+const INSTITUTION_RE = /사이버\s?대학?(?:교)?|방송\s?통신\s?대학?(?:교)?|방통대|디지털\s?대학?|원격\s?대학?|학점\s?은행제?(?:\s?(?:교육원|학교))?|직업\s?(?:전문\s?)?(?:학교|대학)|전문\s?학교|(?:외국|국외|해외)\s?대학(?:교)?|시간제\s?등록생?|대학원|평생\s?교육\s?(?:법|기관|원)?/g;
+function parseSchoolType(t, isExclude) {
+  if (!isExclude || !INSTITUTION_RE.test(t)) { INSTITUTION_RE.lastIndex = 0; return null; }
+  INSTITUTION_RE.lastIndex = 0;
+  /* 🔴 남는 글자가 **하나도 없어야** 한다 — 두 자를 봐주면 `- 대학원생, 휴학생`(휴)·`외국대학 교환학생`(교환)·`대학원 진학자`(진학)가 학교 유형 줄이 된다(실데이터 제외 줄 307개 전수).
+     어미 `자`·`생` 을 홀로 지우지 않는다 — `진학자`·`휴학생` 이 빈 껍데기가 된다 */
+  const rest = t.replace(INSTITUTION_RE, ' ')
+    .replace(/에\s?의한|재학\s?중인\s?자|재학\s?중인|재학생|재학|학생|등록생|수료생|제외|불가|및|등|중인|다니는|소속|에/g, ' ')
+    .replace(/[^가-힣]/g, '');
+  /* 줄이 사이버·방송통신 계열을 말했는가 — 한국방송통신대학교 학생은 그 줄에만 걸리고, `외국대학`·`대학원`·`시간제` 줄은 판단할 수 없다(리뷰 · judgeCond 'schoolType') */
+  return rest.length ? null : { kind: 'schoolType', cyber: /사이버|방송\s?통신|방통대|디지털|원격/.test(t), conf: HIGH };
+}
+
 /* 화면이 줄 앞에 붙이는 갈래 꼬리표 `〔대전 소재 대학〕` (2026-10-12 · 조각 2 · match-engine requirementLines BRANCH_LABEL).
    판정은 꼬리표를 떼고 본다 — 안 떼면 `소재 … 대학` 이 학교 위치 요건으로 읽혀 모든 줄이 '모름'이 되고,
    묻지 않은 처지 검사(unaskedAttr)에는 남는 글자가 되어 ✓ 를 막는다. 줄을 받는 함수는 전부 이걸 먼저 거친다. */
@@ -1234,10 +1264,10 @@ function parseLine(line, isExclude) {
   if (!t.trim()) return { conds: [], multiProgram: false };
   const conds = [];
   const push = (c) => { if (Array.isArray(c)) conds.push(...c); else if (c) conds.push(c); };
-  push(parseGrade(t)); push(parseBracket(t)); push(parseIncomeBand(t)); push(parseCredits(t)); push(parseYear(t)); push(parseSemester(t)); push(parseCert(t));
+  push(parseGrade(t, isExclude)); push(parseBracket(t)); push(parseIncomeBand(t)); push(parseCredits(t)); push(parseYear(t)); push(parseSemester(t)); push(parseCert(t));
   push(parseStatus(t, isExclude)); push(parseFlags(t)); push(parseTrait(t, isExclude)); push(parseNationality(t));
   push(parseAge(t)); push(parseResidence(t)); push(parseSchool(t)); push(parseMajor(t));
-  push(parseDegree(t, isExclude)); push(parseOpen(t, isExclude));
+  push(parseDegree(t, isExclude)); push(parseOpen(t, isExclude)); push(parseSchoolType(t, isExclude));
   /* 🔴 제외 줄의 학년은 **확신을 낮춘다** (2026-10-11 · 조각 B 리뷰). 제외 줄은 조건이 모두 맞아야 걸린다 —
      `3학년 이상 학생 중 이미 수혜받은 자` 에서 학년 하나만 보고 3학년을 ✕ 로 두면, 받은 적 없는 3학년이
      틀린 미달이 된다(나머지 절은 우리가 못 읽는다). 뜻 뒤집기는 judgeCond 'year' 가 한다. */

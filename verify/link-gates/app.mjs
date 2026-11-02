@@ -189,7 +189,7 @@ export default async function gate(eq, ctx) {
   /* app.js 발췌 — 링크를 그리는 자리 + 층2를 학생 화면 모양으로 바꾸는 함수(kosafAsScholarships) 그대로 */
   vm.runInContext([
     T.one('ENTITIES'), T.one('ENTITY_RE'), T.one('PARTIAL_ENTITY_END'), T.one('hintText'), T.one('NEWS_THUMB_RE'), T.one('SCHOOL_PHOTO_RE'), T.one('PHOTO_FOCUS_RE'), T.one('CLOSED_KEEP_DAYS'),
-    T.one('KOSAF_ELIG'), T.one('kosafClean'), T.one('KOSAF_AMOUNT_UNKNOWN'), T.one('TD_DAY'), T.one('TD_DAY_RE'), T.one('TD_DAY_G'), T.fn('isDateBit'), T.fn('splitTitleDates'),
+    T.one('KOSAF_ELIG'), T.one('kosafClean'), T.one('KOSAF_NOISE'), T.one('KOSAF_AMOUNT_UNKNOWN'), T.one('TD_DAY'), T.one('TD_DAY_RE'), T.one('TD_DAY_G'), T.fn('isDateBit'), T.fn('splitTitleDates'),
     ...['esc', 'unent', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'attachPrepTemplate', 'kosafAsScholarships',   // attachPrepTemplate: 층2 지원문서(2026-10-13 ①) — FORM_TEMPLATES 가 없는 자리에선 그대로 돌려준다
       'sourceLinkHintHtml', 'attachmentLinkHtml', 'sourceLinkHtml', 'sourceNoteHtml', 'amountSourceLinkHtml',
       'appLogLinkHtml', 'hintShort', 'shortDay', 'noticeCardHtml', 'activityLinkHtml'].map(T.fn),   // shortDay — 카드 수집 날짜를 「10.08」로 (2026-10-10)   // hintShort — 카드 회색 기간 줄(2026-10-04)
@@ -201,12 +201,16 @@ export default async function gate(eq, ctx) {
 
   /* 층2 — 실제 kosaf-open.json 전부 + 실측 꼴 표본(재단 홈페이지 뿌리 주소 · 2026-10-03 namgu.gwangju.kr) */
   const kosafDoc = JSON.parse(read('data/kosaf-open.json'));
-  const kosafItems = (kosafDoc.items || []).concat([{ code: 'gate-sample', org: '관문표본장학회', name: '표본 장학금', due: '', home: 'https://namgu.gwangju.kr', fields: { 지원금액: '1인당 100만원' }, files: [] }]);
+  const kosafItems = (kosafDoc.items || []).concat([{ code: 'gate-sample', org: '관문표본장학회', name: '표본 장학금', due: '', home: 'https://namgu.gwangju.kr', fields: { 지원금액: '1인당 100만원', 특정자격: '○ 제한없음\n○ 기관확인필요\n○ 해당없음음\n○ 대회 입상자', 자격제한: '○ 기관확인필요요' }, files: [] }]);
   box.kosafList = kosafItems;
   run('dday = function () { return { days: 0, label: "D-0", cls: "" }; };');   // 마감 지난 것까지 전부 — '열린 것'의 상위 집합
   const kosaf = F('kosafAsScholarships')();
   eq('(c) 층2를 앱 함수 그대로 바꿨다 — 모든 재단이 sourceKind kosaf 로 온다 (헛돌지 않는다)',
     [kosaf.length === kosafItems.length, kosaf.every((s) => s.sourceKind === 'kosaf')], [true, true]);
+  /* 재단 칸의 빈말(`제한없음`·`기관확인필요`·`해당없음`)은 자격 줄도 제외 줄도 아니다 — 앱의 KOSAF_NOISE 한 곳(2026-11-02 · 요건으로 세면 적합도 분모가 부푼다) */
+  const sampleSch = kosaf.find((s) => s.id === 'kosaf-gate-sample') || {};
+  eq('(c) 재단 칸의 빈말 줄(제한없음·기관확인필요·해당없음)은 자격·제외 줄에 들지 않는다 — 앱 KOSAF_NOISE',
+    [sampleSch.eligibilityLines, sampleSch.eligibilityExcludes || []], [['대회 입상자'], []]);
   const kosafSay = (s) => ({
     detail: textOf(F('sourceLinkHtml')(s)), note: textOf(F('sourceNoteHtml')(s)), amount: textOf(F('amountSourceLinkHtml')(s)),
     applog: textOf(F('appLogLinkHtml')(s)), channel: F('officialChannel')(s).label,
