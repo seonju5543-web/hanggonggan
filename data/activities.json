@@ -1,6 +1,66 @@
 {
- "updatedAt": "2026-11-02",
+ "updatedAt": "2026-11-03",
  "items": [
+  {
+   "title": "2026 용인 반도체 스타트업 육성 전략 포럼 참가자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179608",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": "접수기간 2026-10-23 ~ 2026-11-03 14:00 주관기관명 카이스트청년창업투자지주 주식회사 대상 전체 창업업력 전체 연락처 02-",
+   "deadline": "2026-11-03",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-23 ~ 2026-11-03 14:00"
+    },
+    {
+     "label": "일시",
+     "text": "2026. 11. 3.(화) 14:30~17:30"
+    }
+   ],
+   "eligibilityLines": [
+    "신청대상 : 반도체 분야 (예비)창업자 및 스타트업, 창업지원기관·연구기관·투자 관계자 등 용인 반도체 스타트업 생태계에 관심 있는 누구나"
+   ],
+   "detailsV": 6,
+   "excerptsAt": "2026-11-02",
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-11-02"
+  },
+  {
+   "title": "[2026 아트 스타트업 데이] 일반 참가자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179646",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": "접수기간 2026-10-21 ~ 2026-11-03 14:00 주관기관명 예술경영지원센터 대상 일반인, 일반기업, 1인 창조기업 창업업력 예비창",
+   "deadline": "2026-11-03",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-21 ~ 2026-11-03 14:00"
+    },
+    {
+     "label": "일시",
+     "text": "2026. 11. 9. (월) ~ 11. 10. (화) 13:00~18:00"
+    },
+    {
+     "label": "주최",
+     "text": "문화체육관광부/(재)예술경영지원센터"
+    }
+   ],
+   "eligibilityLines": [
+    "대상 : 일반인, 일반기업, 1인 창조기업",
+    "예비창업자, 1년미만, 2년미만, 3년미만, 5년미만, 7년미만",
+    "신청대상 : 예술 창업 및 예술산업에 관심 있는 누구나"
+   ],
+   "detailsV": 6,
+   "excerptsAt": "2026-11-02",
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-11-02"
+  },
   {
    "title": "<2026년 AI 활용 온라인 플랫폼 제작 교육> 참여자 모집",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179680",
@@ -2054,45 +2114,6 @@
     "모집프로세스"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)"
-  },
-  {
-   "title": "2026 용인 반도체 스타트업 육성 전략 포럼 참가자 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179608",
-   "kind": "대외활동",
-   "deadline": "2026-11-03",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-23 ~ 2026-11-03"
-    },
-    {
-     "label": "대상",
-     "text": "반도체 분야 (예비)창업자 및 스타트업, 창업지원기관·연구기관·투자 관계자 등 용인 반도체 스타트업 생태계에 관심 있는 누구나"
-    },
-    {
-     "label": "활동지역",
-     "text": "경기"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "카이스트청년창업투자지주 대표이사",
-   "api": "kstartup",
-   "apiId": "179608",
-   "id": "api-kstartup-179608",
-   "eligibilityLines": [
-    "반도체 분야 (예비)창업자 및 스타트업, 창업지원기관·연구기관·투자 관계자 등 용인 반도체 스타트업 생태계에 관심 있는 누구나"
-   ],
-   "noticeLines": [
-    "「2026 용인 반도체 스타트업 육성 전략 포럼」을 다음과 같이 개최하오니, 반도체 스타트업의 성장 기반과 혁신 인프라 조성 방향에 관심 있는 분들의 많은 참여 바랍니다.",
-    "온라인 접수 : https://nextstep.io.kr/2026-yongin-semicon-forum"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-10-28",
-   "seenAt": "2026-11-02",
-   "excerptsAt": "2026-11-02"
   },
   {
    "title": "2026년 스타트업, 중소기업, 소상공인을 위한 M&A 전략 세미나",
@@ -5728,50 +5749,6 @@
     {
      "label": "모집기간",
      "text": "2026.11.17"
-    }
-   ]
-  },
-  {
-   "title": "[해양수산부] 2026 청년 어촌창업 아이디어 공모전",
-   "url": "https://dep.hufs.ac.kr/bbs/student/2436/268730/artclView.do",
-   "kind": "공모전",
-   "attachments": [
-    {
-     "name": "[신청지원서]청년 어촌창업 아이디어 공모전 지원.hwp",
-     "url": "https://dep.hufs.ac.kr/bbs/student/2436/151742/download.do"
-    }
-   ],
-   "deadlineHint": null,
-   "deadline": "2026-11-08",
-   "detailsV": 6,
-   "field": "기획·아이디어",
-   "excerptsAt": "2026-10-29",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "eligibilityLines": [
-    "어촌창업을 희망하거나 어촌과 협력하는 사업에 관심이 많은",
-    "만 19세 이상39세 이하인 청년",
-    "공모주제 및 신청분야",
-    "어촌자원을 활용한 비즈니스 상생모델 제시",
-    "국내산 수산물 활용한 수산식품 사업화",
-    "(수산물 판로개척, 수산가공식품 개발 등)",
-    "어촌 인프라 연계한 공간 사업화",
-    "(어촌시설관광명소화, 유휴공간 소득사업화등)",
-    "3 어촌삶의질서비스개선ESG사업화",
-    "(지역 현안해결 및 서비스개선 사업화등)",
-    "4 기타 어촌을 연결한 자유 주제"
-   ],
-   "eligibilityExcludes": [
-    "팀과 개인 모두공고마감일까지 사업자 등록을 하지 않아야",
-    "하며, 타 공모전 수상이력이 있거나 사업화 중인 사업 아이템,",
-    "지적재산권 분쟁 우려가 있는 아이템 등은 제외함"
-   ],
-   "eligibilityFrom": "공고문 첨부(OCR)",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026.11.08"
     }
    ]
   },

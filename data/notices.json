@@ -1,6 +1,20 @@
 {
- "updatedAt": "2026-11-02",
+ "updatedAt": "2026-11-03",
  "items": [
+  {
+   "title": "장학 2026년도 통영시 저소득 대학생 장학금 지원대상자 선발 안내(~11/23월 18시)",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=2026%EB%85%84%EB%8F%84-%ED%86%B5%EC%98%81%EC%8B%9C-%EC%A0%80%EC%86%8C%EB%93%9D-%EB%8C%80%ED%95%99%EC%83%9D-%EC%9E%A5%ED%95%99%EA%B8%88-%EC%A7%80%EC%9B%90%EB%8C%80%EC%83%81%EC%9E%90-%EC%84%A0%EB%B0%9C&keyword=%EC%9E%A5%ED%95%99",
+   "attachments": [
+    {
+     "name": "2026년-통영시-저소득-대학생-장학금-지원대상자-선발-공고.hwpx",
+     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs%2F6uvbTQNFkRxUisCDZGcLz8P8DFxTUjHrqD%2Fl3svEjijMsA8NuIHWYXxLzbvVGgj0v7lCMq5br1sDN3MTNC4COhbzR42PjnrO5pN06V7lAUa0ctkhF3b3ckKiazPRR4%2B4wzKVS%2FPdTe2FinWwm24z0%2FtnabFIalTrYU7vDHyRMgil6xQIkmVsoNRx9qM1iybh4o4tpk1WsO6R3qNN%2BsZNB6j6uANB8C%2BqUGmWPT9CwS"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "숭실대학교",
+   "campus": "",
+   "foundAt": "2026-11-02"
+  },
   {
    "title": "학자금 중복지원, 미리 확인하고 예방하세요!",
    "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30305&pageNo=1",
@@ -55,7 +69,9 @@
    "school": "고려대학교",
    "campus": "",
    "foundAt": "2026-11-02",
-   "boardTitle": "[교외-마감]2027학년도 해동과학문화재단 해동장학생 모집 안내(학교지원)"
+   "boardTitle": "[교외-마감]2027학년도 해동과학문화재단 해동장학생 모집 안내(학교지원)",
+   "bodyDeadline": "2026-11-02",
+   "bodyDeadlineText": "2026-11-02"
   },
   {
    "title": "(홍보) 대산농촌재단 2027년도 장학생 선발 안내(~11/11(수)까지)",
@@ -8413,20 +8429,6 @@
    "foundAt": "2026-10-06"
   },
   {
-   "title": "장학 2027년 아산사회복지재단 의생명과학분야 대학 장학생 선발 안내(~10.26.월)",
-   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=2027%EB%85%84-%EC%95%84%EC%82%B0%EC%82%AC%ED%9A%8C%EB%B3%B5%EC%A7%80%EC%9E%AC%EB%8B%A8-%EC%9D%98%EC%83%9D%EB%AA%85%EA%B3%BC%ED%95%99%EB%B6%84%EC%95%BC-%EB%8C%80%ED%95%99-%EC%9E%A5%ED%95%99%EC%83%9D&keyword=%EC%9E%A5%ED%95%99",
-   "attachments": [
-    {
-     "name": "별첨1-_2027년-의생명과학분야-대학-장학생-선발안내.pdf",
-     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs6yNYY7rX07ivFgHxgmo7l3kcDxwEy4lUhT%2B53dV9ZwIzZFDueZdJVaZ5QgqPEYxctwwNc3SQCpEIkK1VYm8qymvWQLj2%2Bp2g2v1NDxdy5S6%2FtDNBqC9RCkApsL7XCFNg5aeRSGvcB2X6mP0e3OdxH6qNmJJpcwDLbzgHKcE0HWcn9Z5OoB09cHE4gSjqQX0A3JMN0NFFZLH4wx%2BQ5P64AU%3D"
-    }
-   ],
-   "deadlineHint": null,
-   "school": "숭실대학교",
-   "campus": "",
-   "foundAt": "2026-10-06"
-  },
-  {
    "title": "[교외/신청] 2027년 의생명과학분야 대학 장학..",
    "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261006&brdSeq=3&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
    "attachments": [],
@@ -8870,6 +8872,15 @@
    ],
    "deadlineHint": null,
    "school": "충남대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
+  },
+  {
+   "title": "[교외-11/11]2027년도 대산농촌재단 대산장학생 선발 안내(재단지원)",
+   "url": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjclMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "고려대학교",
    "campus": "",
    "foundAt": "2026-10-06"
   },

@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
- "updatedAt": "2026-11-02",
- "count": 1568,
+ "updatedAt": "2026-11-03",
+ "count": 1569,
  "items": [
   {
    "title": "[글로벌][교내] 2026-2학기 글로벌캠퍼스 HUFS Dream 장학금 신청 안내 (11",
@@ -94,6 +94,20 @@
    ],
    "deadlineHint": null,
    "school": "강원대학교",
+   "campus": "",
+   "foundAt": "2026-11-02"
+  },
+  {
+   "title": "장학 2026년도 통영시 저소득 대학생 장학금 지원대상자 선발 안내(~11/23월 18시)",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=2026%EB%85%84%EB%8F%84-%ED%86%B5%EC%98%81%EC%8B%9C-%EC%A0%80%EC%86%8C%EB%93%9D-%EB%8C%80%ED%95%99%EC%83%9D-%EC%9E%A5%ED%95%99%EA%B8%88-%EC%A7%80%EC%9B%90%EB%8C%80%EC%83%81%EC%9E%90-%EC%84%A0%EB%B0%9C&keyword=%EC%9E%A5%ED%95%99",
+   "attachments": [
+    {
+     "name": "2026년-통영시-저소득-대학생-장학금-지원대상자-선발-공고.hwpx",
+     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs%2F6uvbTQNFkRxUisCDZGcLz8P8DFxTUjHrqD%2Fl3svEjijMsA8NuIHWYXxLzbvVGgj0v7lCMq5br1sDN3MTNC4COhbzR42PjnrO5pN06V7lAUa0ctkhF3b3ckKiazPRR4%2B4wzKVS%2FPdTe2FinWwm24z0%2FtnabFIalTrYU7vDHyRMgil6xQIkmVsoNRx9qM1iybh4o4tpk1WsO6R3qNN%2BsZNB6j6uANB8C%2BqUGmWPT9CwS"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "숭실대학교",
    "campus": "",
    "foundAt": "2026-11-02"
   },
