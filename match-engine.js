@@ -474,11 +474,25 @@ function judgeCond(c, p, ctx) {
       /* 🔴 출신 고교 소재지 (2026-10-24 · 온보딩 「적합도 높이기」가 시·도·시·군을 묻는다 — 공고 9곳이 이 줄을 갖는다):
          학생이 적은 출신 지역과 맞으면 ✓ · 다르거나 안 적었으면 '모름'. **✕ 를 내지 않는다** — 출신 줄은
          `관내 초·중·고 중 2개 이상 졸업` 같은 예외가 많고 conf 도 LOW 다. 틀린 미달은 못 받는 것보다 나쁘다. */
+      /* 🔴 학교 소재지 (2026-10-31 · 「울산시 소재 대학에 재학 중인 학생」 — 등록 6 · 재단 2 · 활동 8곳): 학교 파일의 시·도를 앱이 프로필
+         `schoolRegion` 에 적어 둔 것과 맞으면 ✓ · 다르거나 모르면 '모름'. **✕ 를 내지 않는다** — 소재 줄도 예외(생활권·인근)가 잦고 conf 가 LOW 다.
+         ⚠️ 학생의 거주지로 판정하지 않는다(서울 학생이 포항공대에 다닌다 — 위 주석). 학교 소재지가 프로필에 없으면 예전처럼 '모름'. */
+      if (c.about === 'school') {
+        if (c.exclude) return 'unknown';
+        const names = (c.cities || []).concat(c.anyOf || []);
+        const mine = p.schoolRegion ? [p.schoolRegion] : [];
+        if (!names.length || !mine.length) return 'unknown';
+        /* 🔴 `경기북부 소재 대학`·`경남 서부 소재 대학` — 시·도의 **일부**는 시·도 하나로 ✓ 를 주지 않는다(리뷰 · 거주지 갈래의 북부/남부 규칙과 같다).
+           소재지는 학교 파일의 짧은 시·도(`경기`)라 글자 포함(includes)으로 넓히지도 않는다 — `경기북부`.includes(`경기`) 가 틀린 ✓ 를 만든다 */
+        if (names.some((r) => /(북부|남부|동부|서부|중부)/.test(r))) return 'unknown';
+        return names.some((r) => mine.some((x) => prov(x) === prov(r))) ? 'pass' : 'unknown';
+      }
       if (c.about === 'origin') {
         if (c.exclude) return 'unknown';
         const names = (c.cities || []).concat(c.anyOf || []);
         const mine = [p.originRegion, p.originCity].filter(Boolean);
         if (!names.length || !mine.length) return 'unknown';
+        if (names.some((r) => /(북부|남부|동부|서부|중부)/.test(r))) return 'unknown';   // 시·도의 일부는 ✓ 를 못 준다(소재지와 같은 규칙)
         /* 비교는 아래 거주지 줄과 같은 너비 — 공고 안에서 글로 적은 `울산시`·`경기도 용인시` 도 맞춘다 */
         return names.some((r) => mine.some((x) => x === r || prov(x) === prov(r) || x.includes(r) || r.includes(x))) ? 'pass' : 'unknown';
       }

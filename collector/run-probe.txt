@@ -7,6 +7,12 @@
 #    같은 줄을 다시 보려면 그 줄을 지웠다 다시 넣어 push 하거나, Actions 에서 수동 실행(전부 연다).
 #    답을 받은 줄은 '# (답 받음 날짜 · 근거) ' 를 앞에 붙여 막는다(수동 실행에서도 안 열리게).
 
+# 2026-10-30 (카드 채움 작업) — 마감 전인데 원문 본문을 못 받는 등록 공고 둘. 자격·마감이 '원문 확인'으로만 떠 있다(원인 단정 금지 — 답을 보고 고친다).
+#   서울과기대 푸른등대(~11/12): 수집기 fetch 가 FETCH_ERROR TypeError 로 끝난다 — 열리는 화면·리다이렉트·인증서를 본다.
+#   경기대 장학사정관장학금(11월): 받은 글자가 사이트 메뉴뿐(통합 공지사항 껍데기) — 본문이 어느 요청(프레임·스크립트·API)으로 오는지 본다.
+checkUrl: https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=897116&qidx=5233&cate=0&allboard=true&nowpage=1
+checkUrl: https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626879&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888
+
 # 2026-10-11 (점검 마무리) — 리포트는 '✅ 실공고 15·20건 감지'인데 학생 피드가 0건인 두 학교. 9월 뒤 수집 장부에 새 글이 하나도 없다(한양 seen 09월 이후 0 · 방송대 09월 4).
 #   게시판이 늘 같은 글(고정 공지)만 돌려주는지, 날짜 줄·글 주소가 무엇인지 본다(원인 단정 금지 — 이 답을 보고 고친다).
 checkUrl: https://www.hanyang.ac.kr/notice_all?p_p_id=kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_action=view&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_sCategoryId=224311300

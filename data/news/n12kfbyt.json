@@ -1,50 +1,60 @@
 {
  "school": "영남대학교",
- "updatedAt": "2026-10-30",
+ "updatedAt": "2026-11-01",
  "items": [
   {
-   "title": "[제주대학교] 2026학년도 겨울 계절학기 학점교류 안내(2026.11.05.(목) 17:00)",
-   "url": "https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=232289223&article.offset=0&articleLimit=10&srYearMonth=2026-10&ref=calendar",
-   "postedAt": "2026-10-29",
-   "kind": "학사",
-   "school": "영남대학교",
-   "campus": "",
-   "src": "f3850bcd",
-   "foundAt": "2026-10-29",
-   "desc": "1. 신청기간 : 2026.11.05.(목) 17:00 까지 ※ 수업학적팀 신청서 제출 기준"
-  },
-  {
    "title": "[경북대학교] 2026학년도 겨울 계절학기 학점교류 안내(2026.11.04.(수) 17:00)",
-   "url": "https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=232289183&article.offset=0&articleLimit=10&srYearMonth=2026-10&ref=calendar",
+   "url": "https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=232289183&article.offset=0&articleLimit=10&srYearMonth=2026-11&ref=calendar",
    "postedAt": "2026-10-29",
    "kind": "학사",
    "school": "영남대학교",
    "campus": "",
    "src": "f3850bcd",
-   "foundAt": "2026-10-29",
+   "foundAt": "2026-11-01",
    "desc": "1. 신청기간 : 2026.11.04.(수) 17:00 까지 ※ 수업학적팀 신청서 제출 기준"
   },
   {
+   "title": "[제주대학교] 2026학년도 겨울 계절학기 학점교류 안내(2026.11.05.(목) 17:00)",
+   "url": "https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=232289223&article.offset=0&articleLimit=10&srYearMonth=2026-11&ref=calendar",
+   "postedAt": "2026-10-29",
+   "kind": "학사",
+   "school": "영남대학교",
+   "campus": "",
+   "src": "f3850bcd",
+   "foundAt": "2026-11-01",
+   "desc": "1. 신청기간 : 2026.11.05.(목) 17:00 까지 ※ 수업학적팀 신청서 제출 기준"
+  },
+  {
    "title": "[숙명여자대학교] 2026학년도 겨울 계절학기 학점교류 안내(2026.11.02.(월) 17:00)",
-   "url": "https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=232204486&article.offset=0&articleLimit=10&srYearMonth=2026-10&ref=calendar",
+   "url": "https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=232204486&article.offset=0&articleLimit=10&srYearMonth=2026-11&ref=calendar",
    "postedAt": "2026-10-23",
    "kind": "학사",
    "school": "영남대학교",
    "campus": "",
    "src": "f3850bcd",
-   "foundAt": "2026-10-23",
+   "foundAt": "2026-11-01",
    "desc": "1. 신청기간 : 2026.11.02.(월) 17:00 까지 ※ 수업학적팀 신청서 제출 기준"
   },
   {
    "title": "[부산대학교] 2026학년도 겨울 계절학기 학점교류 안내(2026.11.03.(화) 17:00)",
-   "url": "https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=232204487&article.offset=0&articleLimit=10&srYearMonth=2026-10&ref=calendar",
+   "url": "https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=232204487&article.offset=0&articleLimit=10&srYearMonth=2026-11&ref=calendar",
    "postedAt": "2026-10-23",
    "kind": "학사",
    "school": "영남대학교",
    "campus": "",
    "src": "f3850bcd",
-   "foundAt": "2026-10-23",
+   "foundAt": "2026-11-01",
    "desc": "1. 신청기간 : 2026.11.03.(화) 17:00 까지 ※ 수업학적팀 신청서 제출 기준"
+  },
+  {
+   "title": "2026-2학기 정보전산원 수업 강의실 변경 안내 및 협조 요청 (9월28일부터)",
+   "url": "https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=231766391&article.offset=0&articleLimit=10&srYearMonth=2026-11&ref=calendar",
+   "postedAt": "2026-09-22",
+   "school": "영남대학교",
+   "campus": "",
+   "src": "f3850bcd",
+   "foundAt": "2026-11-01",
+   "desc": "(다운로드 : 3413) 2026-2학기 정보전산원(건물번호 F04) 수업의 강의실을 변경을 붙임 파일과 같이 안내하오니, 해당 학생들께서는 꼭 확인하시기 바라며, 적극적인 협조와 이해를 부탁드립니다."
   },
   {
    "title": "2026학년도 겨울 계절학기 개설 희망강좌 수요조사 안내",
@@ -65,60 +75,6 @@
    "campus": "",
    "foundAt": "2026-10-07",
    "desc": "2026학년도 2학기 분할납부 미납부 대상자는 학칙 제25조에 의거하여 납부기간 종료일 다음날 제적 처리 되오니, 다음의 등록기간 중에 반드시 등록하시기 바랍니다.",
-   "src": "f3850bcd"
-  },
-  {
-   "title": "2026학년도 2학기 중간시험 실시 및 부정행위자 처리 기준 안내",
-   "url": "https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=231893401&article.offset=0&articleLimit=10&srYearMonth=2026-10&ref=calendar",
-   "postedAt": "2026-10-01",
-   "kind": "학사",
-   "school": "영남대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "desc": "(다운로드 : 2871) (다운로드 : 1910) 2026학년도 2학기 중간시험 일정을 다음과 같이 안내하오니, 수강 과목별 시험 시간을 정확히 확인하시어 시험에 응시해 주시기 바랍니다.",
-   "src": "f3850bcd"
-  },
-  {
-   "title": "2026학년도 2학기 교양, 교직, 일반선택 중간시험 시간표 안내(주간, 야간)",
-   "url": "https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=231865021&article.offset=0&articleLimit=10&srYearMonth=2026-10&ref=calendar",
-   "postedAt": "2026-09-29",
-   "kind": "학사",
-   "school": "영남대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "desc": "3. 강의동 번호 1부. 4. 2026학년도 2학기 중간시험 부정행위자 처리 안내문 1부. 끝. 천마학부대학장",
-   "src": "f3850bcd"
-  },
-  {
-   "title": "2026학년도 전기(27년2월) 조기졸업 신청 안내",
-   "url": "https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=231752307&article.offset=0&articleLimit=10&srYearMonth=2026-10&ref=calendar",
-   "postedAt": "2026-09-21",
-   "kind": "학사",
-   "school": "영남대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "src": "f3850bcd",
-   "desc": "(다운로드 : 2337) 2026학년도 전기(2027년 2월 졸업)에 조기졸업을 희망하는 학생은 다음의 신청자격을 확인하고 기간 내 신청 바랍니다."
-  },
-  {
-   "title": "2026-2학기 정보전산원 수업 강의실 변경 안내 및 협조 요청 (9월28일부터)",
-   "url": "https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=231766391&article.offset=0&articleLimit=10&srYearMonth=2026-10&ref=calendar",
-   "postedAt": "2026-09-22",
-   "school": "영남대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "desc": "(다운로드 : 2058) 2026-2학기 정보전산원(건물번호 F04) 수업의 강의실을 변경을 붙임 파일과 같이 안내하오니, 해당 학생들께서는 꼭 확인하시기 바라며, 적극적인 협조와 이해를 부탁드립니다.",
-   "src": "f3850bcd"
-  },
-  {
-   "title": "2026학년도 2학기 중간강의평가 실시 안내",
-   "url": "https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=231752304&article.offset=0&articleLimit=10&srYearMonth=2026-10&ref=calendar",
-   "postedAt": "2026-09-21",
-   "kind": "학사",
-   "school": "영남대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "desc": "1. 목적: 2026학년도 2학기 개설 강좌에 대한 교육 수요자의 다양한 요구와 의견을 조사하고, 그 결과를 담당교수에게 전달하여 학기 중 수업 운영 개선, 학습의 질 및 교육수요자의 만족도를 높이기 위함.",
    "src": "f3850bcd"
   }
  ]

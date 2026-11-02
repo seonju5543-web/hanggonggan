@@ -1388,7 +1388,7 @@
    "expiredAt": "2026-10-24"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2703156001",
    "org": "중외학술복지재단",
    "name": "기초과학자 장학생",
@@ -1397,7 +1397,9 @@
    "tplNo": 1,
    "cards": 4,
    "dir": "insta/pub/2703156001",
-   "at": "2026-09-18"
+   "at": "2026-09-18",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-31"
   },
   {
    "status": "expired",
@@ -1568,7 +1570,7 @@
    "expiredAt": "2026-10-24"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000160001",
    "org": "이천시청",
    "name": "대학생 본인부담 등록금 지원",
@@ -1577,7 +1579,9 @@
    "tplNo": 1,
    "cards": 5,
    "dir": "insta/pub/2000160001",
-   "at": "2026-09-18"
+   "at": "2026-09-18",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-01"
   },
   {
    "status": "expired",
@@ -2014,7 +2018,7 @@
    "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2704211001",
    "org": "명인다문화장학재단",
    "name": "대학장학생",
@@ -2023,7 +2027,9 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2704211001",
-   "at": "2026-09-30"
+   "at": "2026-09-30",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-31"
   },
   {
    "status": "prepared",
@@ -2454,7 +2460,7 @@
    "expiredAt": "2026-10-30"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700045011",
    "org": "백운장학회(광양)",
    "name": "대학생 생활비 장학금",
@@ -2463,7 +2469,9 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2700045011",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-01"
   },
   {
    "status": "prepared",
@@ -2632,7 +2640,7 @@
    "expiredAt": "2026-10-30"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000072004",
    "org": "부산광역시 기장군청",
    "name": "기장군장학금(다자녀장학금)",
@@ -2641,10 +2649,12 @@
    "tplNo": 4,
    "cards": 5,
    "dir": "insta/pub/2000072004",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-31"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000072002",
    "org": "부산광역시 기장군청",
    "name": "기장군장학금(성적우수)",
@@ -2653,10 +2663,12 @@
    "tplNo": 4,
    "cards": 5,
    "dir": "insta/pub/2000072002",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-31"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000072003",
    "org": "부산광역시 기장군청",
    "name": "기장군장학금(특기장학금)",
@@ -2665,10 +2677,12 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2000072003",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-31"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0657001",
    "org": "통영시지속가능발전교육재단",
    "name": "인재육성장학생",
@@ -2677,7 +2691,9 @@
    "tplNo": 4,
    "cards": 5,
    "dir": "insta/pub/0657001",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-01"
   },
   {
    "status": "expired",
@@ -2750,7 +2766,7 @@
    "expiredAt": "2026-10-12"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000072001",
    "org": "부산광역시 기장군청",
    "name": "기장군장학금(복지장학금)",
@@ -2759,7 +2775,9 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/2000072001",
-   "at": "2026-10-06"
+   "at": "2026-10-06",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-31"
   },
   {
    "status": "expired",
@@ -2972,7 +2990,7 @@
    "expiredAt": "2026-10-24"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2704231001",
    "org": "JW이종호재단",
    "name": "기초과학자장학생",
@@ -2981,7 +2999,9 @@
    "tplNo": 2,
    "cards": 5,
    "dir": "insta/pub/2704231001",
-   "at": "2026-10-09"
+   "at": "2026-10-09",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-31"
   },
   {
    "status": "expired",
@@ -3411,7 +3431,7 @@
    "expiredAt": "2026-10-24"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "7491887001",
    "org": "대한산업보건협회",
    "name": "산재 노동자 자녀 성장지원사업",
@@ -3421,7 +3441,9 @@
    "cards": 5,
    "dir": "insta/pub/7491887001",
    "at": "2026-10-16",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-01"
   },
   {
    "status": "expired",
@@ -3499,7 +3521,7 @@
    "expiredAt": "2026-10-28"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2500058003",
    "org": "(재)제주평생교육장학진흥원",
    "name": "제주고씨수남공법환문중회장학생",
@@ -3509,10 +3531,12 @@
    "cards": 5,
    "dir": "insta/pub/2500058003",
    "at": "2026-10-16",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-31"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2704355001",
    "org": "동진장학연구재단",
    "name": "동진장학금",
@@ -3522,10 +3546,12 @@
    "cards": 5,
    "dir": "insta/pub/2704355001",
    "at": "2026-10-16",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-31"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2703494001",
    "org": "한우자조금관리위원회",
    "name": "한우사랑 장학생",
@@ -3535,7 +3561,9 @@
    "cards": 5,
    "dir": "insta/pub/2703494001",
    "at": "2026-10-16",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-31"
   },
   {
    "status": "prepared",
@@ -3603,7 +3631,7 @@
    "dates": "absolute"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2704353001",
    "org": "(재)덕연장학재단",
    "name": "일반장학생",
@@ -3613,10 +3641,12 @@
    "cards": 5,
    "dir": "insta/pub/2704353001",
    "at": "2026-10-16",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-31"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2704353002",
    "org": "(재)덕연장학재단",
    "name": "특별장학생",
@@ -3626,10 +3656,12 @@
    "cards": 5,
    "dir": "insta/pub/2704353002",
    "at": "2026-10-16",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-31"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000463012",
    "org": "김천시인재양성재단",
    "name": "김천시-한국전력기술 지역상생지원 장학금",
@@ -3639,10 +3671,12 @@
    "cards": 5,
    "dir": "insta/pub/2000463012",
    "at": "2026-10-16",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-31"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000463013",
    "org": "김천시인재양성재단",
    "name": "취업준비금",
@@ -3652,7 +3686,9 @@
    "cards": 5,
    "dir": "insta/pub/2000463013",
    "at": "2026-10-16",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-31"
   },
   {
    "status": "prepared",
@@ -3793,7 +3829,7 @@
    "dates": "absolute"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "7430983002",
    "org": "국방부",
    "name": "꿈도전지원금",
@@ -3803,7 +3839,9 @@
    "cards": 4,
    "dir": "insta/pub/7430983002",
    "at": "2026-10-23",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-31"
   },
   {
    "status": "prepared",
@@ -4001,7 +4039,7 @@
    "dates": "absolute"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000062001",
    "org": "서울특별시 성동구청",
    "name": "복지장학생",
@@ -4011,7 +4049,9 @@
    "cards": 5,
    "dir": "insta/pub/2000062001",
    "at": "2026-10-23",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-31"
   },
   {
    "status": "prepared",
@@ -4250,7 +4290,7 @@
    "dates": "absolute"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2704068001",
    "org": "한국세무사회공익재단",
    "name": "생활비 장학금",
@@ -4260,7 +4300,9 @@
    "cards": 4,
    "dir": "insta/pub/2704068001",
    "at": "2026-10-30",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-10-31"
   },
   {
    "status": "prepared",

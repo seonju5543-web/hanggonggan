@@ -1,7 +1,18 @@
 {
  "school": "서울시립대학교",
- "updatedAt": "2026-10-30",
+ "updatedAt": "2026-11-01",
  "items": [
+  {
+   "title": "[3D창작터]검수 업무 대직에 따른 일부 시간대 운영 제한 안내 (~12월 초)",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31770&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-01",
+   "postId": "31770",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-01",
+   "desc": "산학협력단 안녕하세요! 3D창작터 담당자입니다. 3D 창작터 담당자의 물품 검수 업무 대직으로 인해 당분간 일부 시간대의 운영 및 방문 이용이 제한됩니다."
+  },
   {
    "title": "[2026 공학페스티벌] ✅공대생 심사단✅ 모집 안내",
    "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31714&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
@@ -450,17 +461,6 @@
    "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31691&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
    "postedAt": "2026-10-21",
    "postId": "31691",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-10-21",
-   "desc": "1) 분야별 공모 설명 각 1부. 2) [공통] 개발 공모 신청서 1부."
-  },
-  {
-   "title": "🎓 [일반대학원] 2026학년도【 대학원생 참여형 교육과정 개발 공모(2차) 】안내 ~ ★",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31690&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-21",
-   "postId": "31690",
    "school": "서울시립대학교",
    "campus": "",
    "src": "80d7d3bc",

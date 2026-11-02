@@ -1,7 +1,17 @@
 {
  "school": "국민대학교",
- "updatedAt": "2026-10-30",
+ "updatedAt": "2026-11-01",
  "items": [
+  {
+   "title": "2026학년도 2학기 중간 수업평가 시행 안내",
+   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12491/view.do?currentPageNo=1",
+   "postedAt": "2026-10-14",
+   "school": "국민대학교",
+   "campus": "",
+   "src": "78d70305",
+   "foundAt": "2026-11-01",
+   "thumb": "data/news/img/888125654a8e6c20.webp"
+  },
   {
    "title": "[교양대학]2026학년도 동계 계절학기 개설 희망 교양 교과목 수요조사 안내",
    "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12521/view.do?currentPageNo=1",
@@ -108,86 +118,6 @@
    "campus": "",
    "foundAt": "2026-10-02",
    "thumb": "data/news/img/1f013409522242ea.webp"
-  },
-  {
-   "title": "2026학년도 2학기 학부 중간시험 보조감독 모집",
-   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12413/view.do?currentPageNo=1",
-   "postedAt": "2026-09-23",
-   "kind": "학사",
-   "school": "국민대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "src": "78d70305"
-  },
-  {
-   "title": "2026학년도 2학기 2차폐강 안내",
-   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12356/view.do?currentPageNo=1",
-   "postedAt": "2026-09-09",
-   "kind": "학사",
-   "school": "국민대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "src": "78d70305"
-  },
-  {
-   "title": "ISIC 국제학생증 발급비 지원행사 안내",
-   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12340/view.do?currentPageNo=1",
-   "postedAt": "2026-09-04",
-   "kind": "학사",
-   "school": "국민대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "src": "78d70305"
-  },
-  {
-   "title": "2027-1학기 자기설계연계·융합전공 신설 신청 안내",
-   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12333/view.do?currentPageNo=1",
-   "postedAt": "2026-09-03",
-   "kind": "학사",
-   "school": "국민대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/2c9691b8e85f7fb0.webp",
-   "src": "78d70305"
-  },
-  {
-   "title": "2026학년도 2학기 조기졸업 신청 안내",
-   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12329/view.do?currentPageNo=1",
-   "postedAt": "2026-09-02",
-   "kind": "학사",
-   "school": "국민대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "src": "78d70305"
-  },
-  {
-   "title": "2026학년도 2학기 다,부전공 변경 및 포기 신청 안내",
-   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12306/view.do?currentPageNo=1",
-   "postedAt": "2026-08-31",
-   "kind": "학사",
-   "school": "국민대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "src": "78d70305"
-  },
-  {
-   "title": "2026학년도 2학기 부전공 신청 안내",
-   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12305/view.do?currentPageNo=1",
-   "postedAt": "2026-08-31",
-   "kind": "학사",
-   "school": "국민대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
-  },
-  {
-   "title": "2026학년도 재(휴)학생(학부/대학원) 학생증 발급 안내",
-   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/11788/view.do?currentPageNo=1",
-   "postedAt": "2026-10-01",
-   "kind": "학사",
-   "school": "국민대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "src": "78d70305"
   }
  ]
 }

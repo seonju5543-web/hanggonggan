@@ -1,6 +1,6 @@
 {
  "school": "부산외국어대학교",
- "updatedAt": "2026-10-30",
+ "updatedAt": "2026-10-31",
  "majors": [
   "경영전공",
   "경영학과",
@@ -167,5 +167,8 @@
   "Global Studies(영어코스)",
   "International College",
   "K문화교육전공"
+ ],
+ "region": [
+  "부산"
  ]
 }

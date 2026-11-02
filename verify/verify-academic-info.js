@@ -22,6 +22,9 @@ const eq = (label, got, want) => {
 const trackChips = (page) => page.$$eval('#in-track .chip', (els) => els.map((e) => e.dataset.value));
 const activeTrack = (page) => page.$eval('#in-track', (box) => { const a = box.querySelector('.chip.active'); return a ? a.dataset.value : null; });
 const pickMajor = async (page, typed, want) => {
+  /* 칩을 누른 직후 바로 치면 자동완성이 닫힌다(입력창 밖을 눌러 닫히는 지연 타이머가 뒤늦게 든다) — 학생처럼 입력창을 먼저 누르고 잠깐 기다린다 */
+  await page.click('#in-major');
+  await page.waitForTimeout(400);
   await page.fill('#in-major', typed);
   await page.waitForTimeout(300);
   const items = await page.$$eval('#in-major ~ .ac-list:not([hidden]) .ac-item', (els) => els.map((e) => e.textContent.trim()));
@@ -61,6 +64,33 @@ const pickMajor = async (page, typed, want) => {
   eq('🔴 글로벌캠퍼스 GBT학부가 뜬다 (손검수 목록이 가리고 `&amp;` 로 실려 안 뜨던 학과)', gbt.includes('Global Business & Technology학부'), true);
   eq('  `&amp;` 가 글자로 남은 항목이 없다', gbt.filter((m) => m.includes('&amp;')), []);
 
+  /* 캠퍼스별 목록 (2026-10-30 로봇 #8 이 처음 실었다) — 규칙은 「고른 캠퍼스의 학과가 **먼저**, 다른 캠퍼스 학과도 빼지 않는다」(app.js majorSuggestions 주석 ·
+     첫 캠퍼스 칩이 기본으로 켜져 있어 빼면 글로벌 학생이 수학과를 못 찾는다). 그래서 '먼저'를 잰다 — 같은 글자로 양 캠퍼스에 다 있는 '학부'를 쳐서 첫 항목이 어느 목록 것인지 본다.
+     파일에 campuses 가 없으면(로봇이 아직이면) 소리 내고 빨간불 — 조용히 통과하지 않는다. */
+  const hufs = await page.evaluate(() => MAJOR_FILES['한국외국어대학교'] || null);
+  if (hufs && hufs.campuses && hufs.campuses['글로벌캠퍼스(용인)'] && hufs.campuses['서울캠퍼스']) {
+    console.log('\n■ ②-1 캠퍼스별 목록 — 고른 캠퍼스의 학과가 먼저');
+    /* 차례 규칙은 둘이 겹친다: 고른 계열의 학과가 먼저(majorSuggestions) · 그 안에서 고른 캠퍼스 학과가 먼저. 그래서 같은 계열 묶음 안에서 캠퍼스 학과가 다른 캠퍼스 학과보다 앞인지 잰다 */
+    const campusFirst = async (camp) => page.evaluate((c) => {
+      const own = MAJOR_FILES['한국외국어대학교'].campuses[c];
+      const track = getChip('#in-track');
+      const groups = [true, false].map((same) => majorSuggestions('학부').filter((m) => (trackOfMajor(m) === track) === same));
+      return groups.every((g) => { const firstOther = g.findIndex((m) => !own.includes(m)); const lastOwn = g.map((m) => own.includes(m)).lastIndexOf(true); return firstOther === -1 || lastOwn < firstOther; });
+    }, camp);
+    await page.click('#in-campus .chip[data-value="글로벌캠퍼스(용인)"]');
+    eq('글로벌캠퍼스 — 「학부」 목록에서 글로벌 학과가 다른 캠퍼스 학과보다 앞 (같은 계열 묶음 안에서)', await campusFirst('글로벌캠퍼스(용인)'), true);
+    eq('  GBT학부가 뜬다', (await pickMajor(page, 'Glob', '__none__')).includes('Global Business & Technology학부'), true);
+    await page.click('#in-campus .chip[data-value="서울캠퍼스"]');
+    eq('서울캠퍼스 — 「학부」 목록에서 서울 학과가 앞', await campusFirst('서울캠퍼스'), true);
+    eq('  다른 캠퍼스 학과도 빼지는 않는다 (글로벌의 GBT학부가 뒤에 있다)', (await pickMajor(page, 'Glob', '__none__')).includes('Global Business & Technology학부'), true);
+    eq('  계열 칩은 서울캠퍼스 목록으로 다시 센다 (의약 없음 · 사범 있음)', await page.evaluate(() => { const ids = [...document.querySelectorAll('#in-track .chip')].map((c) => c.dataset.value); return [ids.includes('medical'), ids.includes('education')]; }), [false, true]);
+    await page.click('#in-campus .chip[data-value="글로벌캠퍼스(용인)"]');
+    await pickMajor(page, 'Global', 'Global Business & Technology학부');
+  } else {
+    console.log('\n■ ②-1 캠퍼스별 목록 — ⚠️ 외대 파일에 campuses 가 없어 재지 못했다 (학과 로봇 refresh-majors 가 돈 뒤 다시)');
+    fail++;   // 데이터가 없어 못 잰 것은 통과가 아니다 — 로봇이 돌면 풀린다
+  }
+
   console.log('\n■ ③ 학과를 고르면 계열이 따라온다 · 「+n」');
   eq('GBT학부 → 상경·경영', await activeTrack(page), 'business');
   await pickMajor(page, '수학', '수학과');
@@ -71,7 +101,9 @@ const pickMajor = async (page, typed, want) => {
   eq('  펼쳐도 고른 계열은 그대로', await activeTrack(page), 'science');
   await page.click('#in-track .chip-more');
   await page.waitForTimeout(100);
-  eq('  접으면 학교 계열로 돌아온다', (await trackChips(page)).length, present.length);
+  /* 고른 계열(수학과 → 자연과학)은 접혀 있어도 늘 보인다 — 캠퍼스 칩이 기본(서울)인 채 글로벌 학과를 골랐으면
+     서울 목록 계열에 없는 자연과학이 하나 더 남는다(2026-10-30 · 캠퍼스별 목록이 실린 뒤 실측). 수를 박지 않고 그 규칙대로 센다. */
+  eq('  접으면 학교 계열로 돌아온다 (고른 계열은 남는다)', (await trackChips(page)).length, present.length + (present.includes('science') ? 0 : 1));
   await page.click('#in-year .chip[data-value="3"]');
 
   console.log('\n■ ④ 5단계 — 적합도 높이기 (처지 예/아니요 + 출신 고교 지역) · 관심 대외활동은 온보딩에 없다');
@@ -111,6 +143,12 @@ const pickMajor = async (page, typed, want) => {
   const onPills = () => page.$$eval('#in-traits .elig-yn.on', (e) => e.map((x) => `${x.dataset.trait}=${x.dataset.val}`).sort());
   eq('🔴 프로필 — 처지는 누른 둘만(켰다 끈 job 은 없다) · 출신 지역 · 관심 null · 계열은 학과를 따라온 것', await saved(),
     { traits: { award: true, military: false }, originRegion: '울산', originCity: cities[0], interestKinds: null, track: 'science', major: '수학과' });
+  /* 학교 소재지 (2026-10-31 · 3단계) — 학과 파일의 campusRegion/region 을 프로필에 적는다. 파일에 아직 없으면 소리 내고 넘어간다 */
+  /* 🔴 기대값은 **앱의 기억(MAJOR_FILES)이 아니라 파일을 직접 받아** 정한다 (2026-10-31) — 앱의 기억으로 재면, 되살린 가입에서 파일을 안 받는 구멍이
+     「데이터 없음」으로 조용히 통과했다(실제로 그랬다 · onboardRestore 가 학과 파일을 안 받았다) */
+  const regionInfo = await page.evaluate(async () => { const r = await fetch(majorsFileFor('한국외국어대학교')); const f = r.ok ? await r.json() : {}; return { cr: f.campusRegion || null, r: f.region || null, mine: JSON.parse(localStorage.getItem('handaejang.v1')).profile.schoolRegion || null }; });
+  if (regionInfo.cr || regionInfo.r) eq('🔴 학교 소재 시·도가 프로필에 적힌다 (되살린 가입에서도 · 글로벌캠퍼스 → 경기)', regionInfo.mine, (regionInfo.cr && regionInfo.cr['글로벌캠퍼스(용인)']) || (regionInfo.r && regionInfo.r.length === 1 ? regionInfo.r[0] : null));
+  else console.log('  ⚠️ 외대 파일에 region 이 아직 없다 — 학과 로봇이 돈 뒤 schoolRegion 을 잰다 (지금은 null 이 맞다)');
 
   console.log('\n■ ⑦ 학적정보 수정 — 관심·처지가 안 지워진다');
   await page.evaluate(() => { state.profile.interestKinds = ['공모전']; state.profile.traits.dorm = true; saveState(); showScreen('myinfo'); });

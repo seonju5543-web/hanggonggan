@@ -1,6 +1,6 @@
 {
  "school": "동국대학교 WISE캠퍼스",
- "updatedAt": "2026-10-30",
+ "updatedAt": "2026-11-01",
  "items": [
   {
    "title": "[앵커사업추진단] '지역 정주형 스마트스토어 창업 역량 강화과정' 모집",
@@ -159,84 +159,6 @@
    "postId": "520710",
    "thumb": "data/news/img/a6394aa84cc43f62.webp",
    "desc": "※ 이미지를 클릭하시면 만족도조사에 참여하실 수 있습니다. 많은 참여와 관심 부탁드립니다."
-  },
-  {
-   "title": "양산지역 학생통학버스 운행 시간표 변경 안내",
-   "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/520586",
-   "postedAt": "2026-09-17",
-   "kind": "생활",
-   "school": "동국대학교 WISE캠퍼스",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "postId": "520586",
-   "src": "b8e598c1",
-   "desc": "양산지역 통학버스 운행 시간표를 아래와 같이 변경 하여 운영하오니 이용에 참고하시기 바랍니다 ."
-  },
-  {
-   "title": "2026-2학기 비교과 교육과정 안내",
-   "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/520420",
-   "postedAt": "2026-09-02",
-   "school": "동국대학교 WISE캠퍼스",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "postId": "520420",
-   "thumb": "data/news/img/c9988009cce07c09.webp",
-   "src": "b8e598c1",
-   "desc": "2026학년도 2학기 비교과 프로그램 운영에 대한 세부 내용은 Wisian-Road 공지사항에서 확인하세요! (아래 그림 클릭)"
-  },
-  {
-   "title": "[혁신] 교수학습개발센터 2026-2학기 학습법 LXP 시행 안내",
-   "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/520707",
-   "postedAt": "2026-10-01",
-   "school": "동국대학교 WISE캠퍼스",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "postId": "520707",
-   "thumb": "data/news/img/7b58872835a1c8b5.webp",
-   "desc": "안녕하십니까. 교수학습개발센터입니다. 2026학년도 2학기 학습법 LXP를 다음과 같이 시행합니다. 재학생 여러분의 많은 참여바랍니다. 감사합니다. (이수 완료시 참사람 마일리지 2점 부여)"
-  },
-  {
-   "title": "[혁신] 2026학년도 2학기 학습법 콜로키움 개최 안내",
-   "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/520686",
-   "postedAt": "2026-09-30",
-   "kind": "행사",
-   "school": "동국대학교 WISE캠퍼스",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "postId": "520686",
-   "thumb": "data/news/img/a63e1d6a35861ce4.webp",
-   "desc": "안녕하십니까. 교수학습개발센터입니다. 「적게 공부하고 A+ 받기」를 주제로 학습법 콜로키움을 개최합니다."
-  },
-  {
-   "title": "2026학년도 백상체전 개최 안내",
-   "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/520660",
-   "postedAt": "2026-09-28",
-   "kind": "행사",
-   "school": "동국대학교 WISE캠퍼스",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "desc": "1. 행사 개요 가 . 행사명 : 2026 학년도 백상체전 ( RE:CODE )"
-  },
-  {
-   "title": "환절기 건강관리를 위한 「비타민-day」 캠페인 안내 (교내 보건진료센터)",
-   "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/520659",
-   "postedAt": "2026-09-28",
-   "kind": "생활",
-   "school": "동국대학교 WISE캠퍼스",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/8b0c38ba26b0e80f.webp",
-   "desc": "환절기 면역령 증강 및 감염병 ( 코로나 19, 인플루엔자 ) 예방을 위한 『비타민-DAY』 캠페인를 안내드리오니 많은 참여 부탁드립니다."
-  },
-  {
-   "title": "[혁신] 2026학년도 2학기 교양융합교육원 ‘건학이념 기반 인성 비교과 프로그램’ 수강 신청 안내",
-   "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/520653",
-   "postedAt": "2026-09-23",
-   "kind": "학사",
-   "school": "동국대학교 WISE캠퍼스",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "desc": "교양융합교육원에서는 대학 건학이념 구현을 위해 재학생의 행복만족도 향상 및 자비실천 역량 강화를 위한 「건학이념 기반 참사람 인성」 비교과 프로그램을 운영합니다."
   }
  ]
 }

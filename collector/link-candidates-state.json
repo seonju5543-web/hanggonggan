@@ -39,13 +39,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-14",
-  "lastAt": "2026-10-20",
-  "tries": 3,
+  "lastAt": "2026-11-02",
+  "tries": 4,
   "status": "pending",
   "why": "게시판을 못 엶(page.goto: Timeout 20000ms exceeded. Call log: - navigating…)",
   "checks": {},
   "round": "2026-11-11",
-  "nextAt": "2026-10-27"
+  "nextAt": "2026-11-09"
  },
  "kosaf|0731002|board:http://www.gbanurse.or.kr/index.php?g_page=notice&m_page=notice01&wd=1": {
   "ds": "kosaf",
@@ -87,13 +87,32 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-31",
-  "lastAt": "2026-10-31",
-  "tries": 1,
+  "lastAt": "2026-11-01",
+  "tries": 2,
   "status": "pending",
   "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-11-08",
-  "nextAt": "2026-11-01"
+  "nextAt": "2026-11-04"
+ },
+ "kosaf|2000090001|https://info.daegu.go.kr/newshome/mtnmain.php?mtnkey=articleview&mkey=scatelist&mkey2=1&aid=279300": {
+  "ds": "kosaf",
+  "key": "2000090001",
+  "url": "https://info.daegu.go.kr/newshome/mtnmain.php?mtnkey=articleview&mkey=scatelist&mkey2=1&aid=279300",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "title": "시정소식 대구시, 2026년 저소득주민 장학금 지원대상자 모집... 공고일(2026.10.14.) 현재 대구에 거주 중인 저소득 중·고등학생, 대학생 대상",
+  "firstAt": "2026-11-02",
+  "lastAt": "2026-11-02",
+  "tries": 1,
+  "status": "rejected",
+  "why": "다른 화면이 열림(다른 글이 열림(제목 불일치))",
+  "checks": {
+   "C": "ok",
+   "L": "fail"
+  },
+  "round": "2026-11-13",
+  "decidedAt": "2026-11-02"
  },
  "kosaf|2000204008|board:https://council.wonju.go.kr/content/news/photoGallery.html": {
   "ds": "kosaf",
@@ -192,13 +211,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-14",
-  "lastAt": "2026-10-25",
-  "tries": 4,
-  "status": "pending",
-  "why": "게시판 목록(7줄)에서 그 글을 하나로 못 고름",
+  "lastAt": "2026-11-01",
+  "tries": 5,
+  "status": "rejected",
+  "why": "게시판 목록(7줄)에서 그 글을 하나로 못 고름 — 5번째라 그만 봅니다",
   "checks": {},
   "round": "2026-11-03",
-  "nextAt": "2026-11-01"
+  "decidedAt": "2026-11-01"
  },
  "kosaf|2000319002|board:https://www.yeongju.go.kr/check/bbs/board.php?bo_table=yjra0101": {
   "ds": "kosaf",
@@ -442,6 +461,31 @@
   "round": "2026-11-06",
   "nextAt": "2026-10-31"
  },
+ "kosaf|2518026001|https://gjmed.or.kr/bbs/board.php?bo_table=notice3&wr_id=516": {
+  "ds": "kosaf",
+  "key": "2518026001",
+  "url": "https://gjmed.or.kr/bbs/board.php?bo_table=notice3&wr_id=516",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "title": "채용공고 [공고 제2026-28호] 전남 공공취약지 간호사 장학생 선발 공고 자세히 보기 →",
+  "firstAt": "2026-11-02",
+  "lastAt": "2026-11-02",
+  "tries": 1,
+  "status": "suggest",
+  "why": "제목이 제목 자리가 아니라 본문에만 보임",
+  "checks": {
+   "C": "ok",
+   "L": "weak",
+   "H": "ok",
+   "T": "ok",
+   "R": "weak",
+   "X": "ok",
+   "P": "ok"
+  },
+  "round": "2026-11-06",
+  "decidedAt": "2026-11-02",
+  "also": []
+ },
  "kosaf|2518026001|https://www.gjmed.or.kr/bbs/board.php?bo_table=notice3&wr_id=516": {
   "ds": "kosaf",
   "key": "2518026001",
@@ -500,13 +544,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-14",
-  "lastAt": "2026-10-25",
-  "tries": 4,
-  "status": "pending",
-  "why": "게시판 목록(3줄)에서 그 글을 하나로 못 고름",
+  "lastAt": "2026-11-01",
+  "tries": 5,
+  "status": "rejected",
+  "why": "게시판 목록(3줄)에서 그 글을 하나로 못 고름 — 5번째라 그만 봅니다",
   "checks": {},
   "round": "2026-10-31",
-  "nextAt": "2026-11-01"
+  "decidedAt": "2026-11-01"
  },
  "kosaf|2700045011|https://gwangyang.go.kr/fund/board.es?mid=a60401000000&bid=0156&list_no=205387&act=view": {
   "ds": "kosaf",
@@ -541,13 +585,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-14",
-  "lastAt": "2026-10-25",
-  "tries": 4,
-  "status": "pending",
-  "why": "게시판 목록(15줄)에서 그 글을 하나로 못 고름",
+  "lastAt": "2026-11-01",
+  "tries": 5,
+  "status": "rejected",
+  "why": "게시판 목록(15줄)에서 그 글을 하나로 못 고름 — 5번째라 그만 봅니다",
   "checks": {},
   "round": "2026-12-31",
-  "nextAt": "2026-11-01"
+  "decidedAt": "2026-11-01"
  },
  "kosaf|2700388001|https://janghak.songpa.go.kr/22/?q=YToxOntzOjEyOiJrZXl3b3JkX3R5cGUiO3M6MzoiYWxsIjt9&bmode=view&idx=174161241&t=board": {
   "ds": "kosaf",

@@ -61,6 +61,10 @@ const JUNK = /바로가기|사이트맵|SITEMAP|로그인|회원가입|검색어
 /* 포스터 OCR 의 홀로 선 조각 — `스마트폰으로`·`QR코드를` 처럼 조사로 끝나는 짧은 한 낱말은 옆 칸 글의 조각이지 요건이 아니다
    (2026-10-17 · 강원대 청년창업어업인 포스터: 「스마트폰으로 바로 신청 가능!」 안내의 첫 낱말이 자격 줄에 섞였다) */
 const LONE_PARTICLE = /^[가-힣]{2,5}(?:으로|에서|에게|를|을)$/;
+/* 글 끝의 공유·목록 단추 — 여기부터는 **다른 글의 제목·메뉴**라 자격 절이 아니다(2026-10-30 이화 본부기탁: 「∘ 지원자격 : 장학금별 상이」 뒤
+   「페이스북 · 트위터 · 블로그 · URL Copy · 이전글 · [학부] 푸른등대 기부장학금 …」 열 줄이 자격 블록에 딸려 왔다). JUNK 는 그 줄만 건너뛰지만
+   이것은 **끊는다** — 바닥글 뒤에 본문이 이어지는 게시판은 없다 */
+const FOOTER_STOP = /^(?:페이스북|트위터|블로그|카카오톡|카카오스토리|네이버\s?밴드|URL\s?Copy|링크\s?복사|공유하기|인쇄|목록|이전글|다음글|TOP|맨\s?위로)$/i;
 
 function extractFrom(text) {
   if (!text) return [];
@@ -101,7 +105,7 @@ function extractFrom(text) {
 /* 자격 절의 제목으로 실제 쓰이는 표현 (2026-08-02 미확보 80건을 세어 보고 추가).
    **그냥 '자격'이나 '대상'은 넣지 않는다** — 세어 보니 가장 많이 나온 것이
    '교원자격'·'평생교육사자격'처럼 **자격증 이름**이라, 넣으면 엉뚱한 줄이 요건으로 들어온다. */
-const QUALIFY_HEAD = /(신청\s?자격|지원\s?자격|응모\s?자격|자격\s?요건|지원\s?요건|신청\s?요건|장학생\s?기본\s?자격|장학생\s?자격|선발\s?요건|응모\s?요건|자격\s?기준|지원\s?조건|신청\s?조건|지원\s?대상|신청\s?대상|모집\s?대상|선발\s?대상|추천\s?대상|수혜\s?대상|장학\s?대상|지급\s?대상|지원\s?가능\s?대상|선발\s?기준|심사\s?기준|응시\s?자격|추천\s?조건|추천\s?자격|참가\s?자격|참여\s?자격|참가\s?대상|참여\s?대상|응모\s?대상|모집\s?자격|대\s?상\s?자\s*[:：]|^\s*\d+\s*[.)]\s*대\s?상\s*[:：]|^\s*(?:[\-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙❍◎￭·ㆍ*ㅇ]\s*)?대\s?상\s*[:：])/;
+const QUALIFY_HEAD = /(신청\s?자격|지원\s?자격|응모\s?자격|자격\s?요건|지원\s?요건|신청\s?요건|장학생\s?기본\s?자격|장학생\s?자격|선발\s?요건|응모\s?요건|자격\s?기준|지원\s?조건|신청\s?조건|지원\s?대상|신청\s?대상|모집\s?대상|선발\s?대상|추천\s?대상|수혜\s?대상|장학\s?대상|지급\s?대상|지원\s?가능\s?대상|선발\s?기준|심사\s?기준|지원\s?기준|공통\s?(?:기준|자격|요건|조건)|응시\s?자격|추천\s?조건|추천\s?자격|참가\s?자격|참여\s?자격|참가\s?대상|참여\s?대상|응모\s?대상|모집\s?자격|대\s?상\s?자\s*[:：]|^\s*\d+\s*[.)]\s*대\s?상\s*[:：]|^\s*(?:[\-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙❍◎￭·ㆍ*ㅇ]\s*)?대\s?상\s*[:：])/;
 /* 🔴 줄 머리의 맨 `대상 :` 도 이름표다 (2026-10-12 · 카드 분석 조각 2). 우양재단 동행장학(서울교대)은 `대상: 국내 4년제 대학 … 2분위 이하의
    가족 돌봄 청년` 한 줄이 자격의 전부인데, 번호 없는 `대상:` 은 위 목록에 없고 2차 경로는 두 줄 이상만 믿어 자격이 통째로 비었다.
    ⚠️ **줄 머리 + 콜론**일 때만이다 — 본문 가운데의 `대상` 은 여전히 아니다(위 주석의 '자격증 이름' 함정과 같은 이유). */
@@ -124,7 +128,7 @@ const NEXT_SECTION = new RegExp(SECT_PREFIX +
      길이 규칙(짧아야 제목)에 걸리지 않아, 제출기한·양식 안내가 자격 자리에 앉아 있었다
      (한국장학재단 이공계 중간평가 공고로 실증 — 자격 4줄 중 3줄이 이 유형이었다). */
   /* 활동 공고의 다음 절 — `ㅇ 참가방법 :`·`ㅇ 시상규모 :` (2026-10-16 · 중앙청년지원센터 청년정책 공모전: 참가자격 뒤 참가방법·시상표 14줄이 자격에 딸려 왔다) */
-  '(신청\\s?기간|접수\\s?기간|지원\\s?기간|신청\\s?접수|신청\\s?방법|접수\\s?방법|참가\\s?방법|참여\\s?방법|응모\\s?방법|제출\\s?서류|구비\\s?서류|제출\\s?방법|제출\\s?기한|신청\\s?기한|접수\\s?기한|확인\\s?방법|대상자\\s?확인|양식|서식|선발\\s?방법|유의\\s?사항|문의|지급|장학금?\\s?(지급|금액|내용|혜택|종류)|안내|일정|기타|참고|제외\\s?대상|선발\\s?제외|지원\\s?내용|혜택|시상\\s?(?:규모|내역|내용|계획|식)|상금\\s*[:：]|접수처\\s*[:：]|제출처\\s*[:：]|(?:공모|응모|모집|참가|참여)\\s?기간|공모\\s?(?:주제|부문))');   // 공모 글의 다음 절(청년재단 밥상 로그 — `✅ 참여자격` 뒤 `✅ 공모기간`·`✅ 공모주제`·`✅ 시상내용` 이 자격에 딸려 왔다 · 2026-10-16)
+  '(신청\\s?기간|접수\\s?기간|지원\\s?기간|신청\\s?접수|신청\\s?방법|접수\\s?방법|참가\\s?방법|참여\\s?방법|응모\\s?방법|제출\\s?서류|구비\\s?서류|신청\\s?서류|제출\\s?방법|제출\\s?기한|신청\\s?기한|접수\\s?기한|확인\\s?방법|대상자\\s?확인|양식|서식|선발\\s?방법|유의\\s?사항|문의|지급|장학금?\\s?(지급|금액|내용|혜택|종류)|안내|일정|기타|참고|제외\\s?대상|선발\\s?제외|지원\\s?내용|혜택|시상\\s?(?:규모|내역|내용|계획|식)|상금\\s*[:：]|접수처\\s*[:：]|제출처\\s*[:：]|(?:공모|응모|모집|참가|참여)\\s?기간|공모\\s?(?:주제|부문))');   // 공모 글의 다음 절(청년재단 밥상 로그 — `✅ 참여자격` 뒤 `✅ 공모기간`·`✅ 공모주제`·`✅ 시상내용` 이 자격에 딸려 왔다 · 2026-10-16)
 
 /* 자격 절이 끝났는지 판단하는 **구조적** 기준 (2026-08-02 해성문화재단 사례).
    공고는 보통 '가. / 나. / 다. / 라.' 또는 '1. / 2. / 3.'으로 절이 나뉜다.
@@ -158,6 +162,9 @@ const STILL_QUALIFY = /(자격|대상자?|요건|기준)\s*$|(신청|지원|선�
    `선발 기준`에 걸려 "여전히 자격 이야기"로 판정되는 바람에 자격 절이 안 끝나고
    우선순위 항목이 통째로 요건 자리에 앉았다(목포향우회 — 진짜 자격은 한 줄뿐인데 5줄이 떴다). */
 const PRIORITY_PICK = /우선\s?선발|우선\s?순위/;
+/* 「■ 장학금별 자격」·「종류별 선발기준」 도 자격 낱말로 끝나지만 **갈래마다 다른 기준**이라 공고 전체의 요건이 아니다 — 「■ 공통 자격」 뒤에 이어 읽으면
+   성적우수 갈래의 「평점 4.3 이상」 이 가계곤란 갈래로 갈 학생에게 틀린 미달이 된다(2026-10-30 리뷰 재현). 여기서 끊는다(분야를 갈라 담는 구조가 생기기 전까지) */
+const PER_TYPE = /장학금별|종류별|유형별|사업별|분야별/;
 
 /* 표 머리글·표 안의 값 — 요건이 아니라 표를 이루는 부속이라 버린다 */
 const TABLE_NOISE = new RegExp([
@@ -174,6 +181,9 @@ const TABLE_NOISE = new RegExp([
   '^\\d\\.\\d+\\s*이상$',
   '^성적제한\\s*없음$',
   '^(신청대상|장학기준|지원자격|신청자격|지원대상)\\s*(및)?$',   // 두 줄로 쪼개진 제목
+  /* 「신청 방법 : 신청 자격 : 선발 기준」 — OCR 로 납작해진 표 머리글(2026-10-30 숭실 특별장학금 첨부). 이름표가 콜론으로 둘 이상 이어지고
+     칸마다 10자 이하면 요건 문장이 아니다 · 진짜 요건은 「신청자격 : 재학생 중 …」처럼 콜론 하나 뒤에 긴 문장이 온다 */
+  '^(?:[가-힣 ]{0,6}(?:방법|자격|기준|대상|서류|기간|구분|비고|금액|인원|종류|유형|장학금명)\\s*[:：]\\s*){2,}[가-힣 ]{0,6}(?:방법|자격|기준|대상|서류|기간|구분|비고|금액|인원|종류|유형)$',
 ].join('|'));
 
 /* 원문에 남아 있는 HTML 기호를 사람이 읽는 글자로 (&ldquo; → “). 뜻은 바꾸지 않는다.
@@ -374,7 +384,16 @@ export function eachLabeledValue(text, accept, read) {
     if (l.length > 200) continue;
     const i = l.search(/[:：]/);
     let label, value;
-    if (i >= 0) {
+    /* 제목 꼬리의 괄호 토 「… 신청 안내[신청기간 2026.11.01(일)~08(일)]」·「… 선발(접수기간: 10.1~10.20)」 — 이름표와 날짜가 괄호 안에 함께 있다.
+       콜론이 없거나, 있어도 이름표 앞에 제목이 붙어 30자를 넘어 버려졌다(2026-10-30 경기대 장학사정관장학금 · 본문에 제목 줄만 세 번 있고 기간 절이 없어 마감이 비었다).
+       괄호 안 이름표(12자 이하)가 기간·기한·마감으로 끝나고 바로 날짜가 올 때만 */
+    const LAB = '([^\\[\\]()（）:：]{0,10}(?:기\\s?간|기\\s?한|마\\s?감))\\s*[:：]?\\s*((?:\\d{2,4}\\s?[.\\-/년]\\s?)?\\d{1,2}\\s?[.\\-/월]\\s?\\d{1,2}';
+    const br = l.match(new RegExp('\\[\\s*' + LAB + '[^\\]]*)\\]'))          // 「[신청기간 2026.11.01(일)~08(일)]」 — 값 속 (일) 때문에 닫는 대괄호까지
+      || l.match(new RegExp('[(（]\\s*' + LAB + '.*)[)）]\\s*$'));             // 「… 선발(접수기간: 2026.10.14(화) ~ 10.27(화))」 — 줄 끝 닫는 괄호까지
+    if (br) {
+      label = br[1].trim();
+      value = br[2];
+    } else if (i >= 0) {
       label = shHead(l.slice(0, i));                // 기호·번호 떼기는 section-head.js 한 곳
       value = l.slice(i + 1);
     } else {
@@ -533,7 +552,7 @@ function extractPriorityLines(text) {
 /* '이 줄이 누가 받을 수 있나를 말한다'는 신호.
    verify/eligibility-report.mjs의 REQ_SIGNAL과 **같은 낱말이어야 한다** —
    갈라지면 채점기가 통과시킨 것을 발췌기가 버리는(또는 그 반대) 일이 생긴다. */
-const REQ_SIGNAL = /(재학|휴학|복학|신입|편입|졸업|\d\s?학년|학부생|대학생|성적|평점|학점|분위|수급|차상위|기초생활|한부모|다자녀|자녀|유공|보훈|장애|다문화|북한이탈|거주|출신|이상인?\s?자|이하의?\s?(해당\s?)?학생|해당하는\s?자|자격을\s?갖춘|결격\s?사유|결격사유|\d{1,2}\s?세\s?(?:이상|이하|미만)|가능한\s?분)/;   // 나이·'…가능한 분'은 봉사·활동 글의 요건 말투(2026-10-19)
+const REQ_SIGNAL = /(재학|휴학|복학|신입|편입|졸업|\d\s?학년|학부생|대학생|성적|평점|학점|분위|지원\s?구간|소득\s?구간|\d\s?구간|수급|차상위|기초생활|한부모|다자녀|자녀|유공|보훈|장애|다문화|북한이탈|거주|출신|이상인?\s?자|이하의?\s?(해당\s?)?학생|해당하는\s?자|자격을\s?갖춘|결격\s?사유|결격사유|\d{1,2}\s?세\s?(?:이상|이하|미만)|가능한\s?분)/;   // 나이·'…가능한 분'은 봉사·활동 글의 요건 말투(2026-10-19)
 
 /* 🔴 한 줄에 뭉친 번호 항목을 나눈다 (2026-08-20).
    HTML이 납작해지면서 `1) 국내 4년제 대학 재학생 2) 부모가 모두 … 3) 성적 우수자 우대`가
@@ -567,13 +586,32 @@ function extractQualifyLines(text, opts = {}) {
   lines.forEach((l, i) => { if (HEAD.test(l)) cands.push(i); });
   if (!cands.length) return [];
   const headScore = (l) => {
-    const t = l.replace(/^[\s\-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙❍◎￭·ㆍ*]+/, '').replace(/^(?:[가-힣]\s*[.)]|\d+\s*[.)])\s*/, '');
+    const t = l.replace(/^[\s\-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙❍◎￭·ㆍ*]+/, '').replace(/^(?:[가-힣]\s*[.)]|\d+\s*[.)])\s*/, '')
+      /* 제목 꼬리의 괄호 토(「공통 기준 [장학금별 세부 기준은 아래 표 및 붙임 참조]」·「3. 지원 기준 (※ 가. ~ 마. 모두 충족)」)는 제목이 아니다 —
+         토 속 '…은 ' 때문에 서술 문장으로 깎여 표 머리글 「신청 자격」 칸에 밀렸다(2026-10-30 숭실 특별장학금 OCR 첨부 · 공통 기준 8줄을 통째로 놓침) */
+      .replace(/\s*[\[(（【][^\])）】]*[\])）】]\s*$/, '') || l.replace(/^[\s\-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙❍◎￭·ㆍ*]+/, '');   // 「【지원자격】」 처럼 제목이 통째로 괄호면 떼기 전 값(리뷰)
     let s = 0;
     if (HEAD.test(t.slice(0, 12))) s += 3;      // 낱말이 앞머리에 있다
+    /* 🔴 「1. 모집 대상: 4년제 대학교 재학생 (휴학생, 대학원생 및 졸업예정자는 선발 대상에서 제외)」 처럼 **이름표 뒤에 값이 붙은 줄**은
+       이름표 부분(`lab`)으로 길이와 서술 문장 여부를 잰다 — 값까지 세면 길어서 '짧은 제목' 점수를 못 받고, 값 속 '…자는 ' 때문에 3점 더 깎여
+       「4. 선발 기준 및 방법」 같은 **맨 제목**에 늘 1점 밀린다. 그래서 진짜 요건 줄이 통째로 빠졌다(2026-10-30 성암육영회 · 송화재단
+       「나. 지원자격 : …」 · 학업수석 「■ 대 상 자 : …」 실측). */
+    const labelLike = /[:：]/.test(t.slice(0, 16));
+    const lab = labelLike ? t.split(/[:：]/)[0].trim() : t;
     if (t.length <= 12) s += 3;                          // 제목처럼 짧다
-    else if (t.length <= 30) s += 1;
-    if (/[:：]/.test(t.slice(0, 16))) s += 2;            // "신청자격 : …"
-    if (/(는|은|이|가)\s|바랍니다|하시어|합니다/.test(t)) s -= 3;   // 서술 문장이다
+    else if (t.length <= 30 || (labelLike && lab.length <= 30)) s += 1;   // 이름표 줄은 값이 길어도 1점 — 맨 제목과 **동점**이 되어 앞에 있는 쪽이 이긴다
+    if (labelLike) s += 2;                               // "신청자격 : …"
+    if (/(는|은|이|가)\s|바랍니다|하시어|합니다/.test(lab)) s -= 3;   // 서술 문장이다
+    /* ⚠️ 이름표 줄을 맨 제목보다 **높게** 두지 말 것(2026-10-30 넣어 보고 되돌렸다) — 건국가족장학은 제출서류 절의 「✔ 지원 자격 ① : 관계가 증명
+       되어야 함」 다섯 줄이 「5. 지원 자격」 절을 이겨 진짜 요건이 날아갔고, 미래로장학금은 「5. 생활비장학금 › 가. 지급대상: 0분위 수급자」 가
+       「3. 선발 기준」 을 이겨 수급자가 아닌 학생에게 틀린 미달이 붙었다. 동점이면 **먼저 나온 절**이 이기는 지금 규칙이 둘 다 막는다. */
+    /* ⚠️ '자격·대상 제목을 기준 제목보다 앞세우는' 가점은 넣지 말 것(2026-10-30 넣어 보고 되돌렸다) — 미래로장학금의
+       「5. 미래로생활비장학금 › 가. 지급대상: 소득분위 0분위 중 기초생활수급자」 가 「3. 선발 기준」 을 이겨 **공고 전체의 자격**이 되고,
+       수급자가 아닌 학생에게 틀린 미달이 붙는다. 짧은 블록에 다른 절을 **덧붙이는** 쪽(아래 ranked 되풀이)이 안전하다. */
+    /* 첨부 파일 이름 줄(「3. 국가근로장학생 선발기준(안).pdf」)은 절 제목이 아니다 · 우선선발·우선순위 절은 자격이 아니라 자격자 중 순서다
+       (PRIORITY_PICK · 목포향우회) — 둘 다 뒤로 보낸다(2026-10-30 조선대 국가근로 3차 · 중앙대 다빈치 국가근로 실측) */
+    if (/\.(?:pdf|hwpx?|docx?|xlsx?|pptx?|zip|jpe?g|png|gif)\s*$/i.test(t)) s -= 5;
+    if (PRIORITY_PICK.test(t)) s -= 4;
     /* '인원 배정' 표의 제목은 자격 절이 아니다(동국인재육성장학 — 여기서 시작해 학과별
        배정 인원표를 자격으로 읽었다, 2026-08-03).
        🔴 다만 **그 낱말이 제목의 주제일 때만** 깎는다 (2026-08-20 전수 읽기에서 교정).
@@ -595,8 +633,35 @@ function extractQualifyLines(text, opts = {}) {
   /* 점수 순으로 **몇 곳을 실제로 읽어 본다**(위 주석의 약속 — 그동안 코드는 1등 한 곳만 읽고 빈손이면 포기했다 · 2026-10-16 물환경 공모전:
      `■ 참가 대상` 보다 뒤쪽 시상표의 `대상(1팀) : 장관상` 이 1등이 되어 진짜 자격 두 줄을 통째로 놓쳤다). 관문(요건 신호·trustHead)이 자격 아닌 블록을 거르므로 안전하다 */
   const ranked = [...cands].map((i) => [i, headScore(lines[i])]).sort((a, b) => b[1] - a[1] || a[0] - b[0]).slice(0, 4);
-  for (const [i] of ranked) { const got = blockFrom(i); if (got.length) return got; }
-  return [];
+  /* 🔴 첫 블록이 **석 줄 이하**면 남은 후보 중 통과하는 다음 블록을 **덧붙인다**(2026-10-30 · 성암육영회 「4. 선발 기준」 석 줄만 실려
+     「1. 모집 대상: 4년제 재학생(휴학생·대학원생 제외)」 이 통째로 빠졌다 · 어의 가족장학금은 거꾸로 「선발기준」 두 줄에 「신청자격」 이 빠졌다).
+     긴 블록엔 덧붙이지 않는다 — 미래로장학금처럼 다른 소제도의 「지급대상」 이 끼어들면 틀린 미달이 된다(위 headScore 주석).
+     우선선발 절은 자격이 아니라 덧붙이지 않는다 · 같은 줄은 한 번만 · 전체 상한은 blockFrom 과 같은 14줄 · 자격/선발 가르기는 화면이 줄 단위로 한다 */
+  let first = null, firstAt = -1;
+  for (const [i] of ranked) { const got = blockFrom(i); if (got.length) { first = got; firstAt = i; break; } }
+  if (!first) return [];
+  /* 대외활동 로봇(opts.head)은 덧붙이지 않는다 — 그쪽은 '대상:' 줄을 제 규칙으로 함께 보고(activity-excerpts 2026-10-01 · 한쪽이 다른 쪽을 품으면 하나만)
+     제목 낱말도 느슨해서(시상표 「대상 : 1팀」) 여기서 덧붙이면 두 번 실리거나 상이 자격이 된다. 장학만 */
+  if (first.length > 3 || opts.head) return first;
+  const firstMark = markerOf(lines[firstAt]);
+  /* 리뷰(2026-10-30)가 덧붙임으로 틀린 미달이 되는 꼴 넷을 재현했다 — 모두 **다른 단계·다른 소제도의 절**이었다:
+     「5. 생활비장학금 › 가. 지급대상: 0분위 수급자」(소제도) · 「가. 성적우수장학금 › - 선발 기준 : 평점 4.0」(종류별) · 「■ 장학금별 자격」 · 「3. 지원대상 제외 : …」.
+     그래서 ① 첫 블록 제목과 **같은 단계 표식**(1.↔4. · 가.↔마. · ■↔■)인 절만 ② 제목에 지급대상·수혜대상·제외·종류·장학금별·우선이 없을 때만 덧붙인다.
+     표식 없는 줄(「- 선발 기준 : …」)은 절이 아니라 항목이라 안 붙는다 */
+  const NO_APPEND = /지급\s?대상|수혜\s?대상|제외|종류|장학금별|우선/;
+  for (const [i, score] of ranked) {
+    /* 제목처럼 생긴 후보(3점 이상)만 덧붙인다 — 「장학생을 다음과 같이 선발하고자 하오니, 선발기준에 해당되는 학생들은…」 같은 머리말 문장은
+       낱말이 있어도 절이 아니다(2026-10-30 장학사정관·거창군·국가근로 동계 실측 — 머리말·문의·붙임 이름이 딸려 왔다) */
+    if (i === firstAt || score < 3 || PRIORITY_PICK.test(lines[i])) continue;
+    const mk = markerOf(lines[i]);
+    if (!mk.kind || mk.kind !== firstMark.kind || NO_APPEND.test(lines[i])) continue;
+    const more = blockFrom(i);
+    if (!more.length) continue;
+    const seen = new Set(first);
+    const add = more.filter((l) => !seen.has(l));
+    return [...first, ...add].slice(0, 14);
+  }
+  return first;
 
   function blockFrom(start) {
   const startMark = markerOf(lines[start]);
@@ -644,7 +709,7 @@ function extractQualifyLines(text, opts = {}) {
        그래서 시작 줄의 번호 종류를 기억해 두고 **같은 종류를 만났을 때만** 끊는다.
        숫자는 순서까지 본다 — `3. 신청자격` 아래의 `1)` `2)`는 하위 항목이고 `4.`가 다음 절이다.
        시작 줄에 번호가 없으면(`■ 신청자격` 등) 예전처럼 길이로 재되 문턱을 낮춰 둔다. */
-    if (i > start && SECTION_HEAD.test(l) && (!STILL_QUALIFY.test(l) || PRIORITY_PICK.test(l))) {
+    if (i > start && SECTION_HEAD.test(l) && (!STILL_QUALIFY.test(l) || PRIORITY_PICK.test(l) || PER_TYPE.test(l))) {
       const mk = markerOf(l);
       if (startMark.kind) {
         if (mk.kind === startMark.kind
@@ -654,6 +719,7 @@ function extractQualifyLines(text, opts = {}) {
         if (body.length <= 20) break;
       }
     }
+    if (i > start && FOOTER_STOP.test(l)) break;   // 공유 단추·목록부터는 다른 글이다
     if (JUNK.test(l) || LONE_PARTICLE.test(l.trim())) continue;
     /* 🔴 금액 줄은 자격이 아니다 (2026-10-12 · 카드 분석 조각 2). `3 ) 금 액 : 250 만 원`·`- 장학 금액 : 200 만원 / 인`·`○ 선발규모: 60,000천원`·
        `1학년 100만원` 같은 금액 이름표·표 줄이 자격 블록에 담겨, 화면의 잡음 규칙(REQ_NOISE)에만 기대고 있었다.
@@ -809,7 +875,7 @@ function extractDocuments(text) {
 const DOC_PLACEHOLDER = /(원문\s*공고|공고문|재?공고\s*원문)(에서)?\s*확인/;
 const isDocPlaceholder = (doc) => DOC_PLACEHOLDER.test(String(doc || ''));
 
-export { extractQualifyLines, scoopQualifyLines, extractFrom, extractExcludeLines, extractPriorityLines,
+export { REQ_SIGNAL, completeTitle, titleTailDeadline, extractQualifyLines, scoopQualifyLines, extractFrom, extractExcludeLines, extractPriorityLines,
          extractDeadline, extractOpenDate, extractAnnounce, qualFromTitle, AMOUNT_ROW, cutAtNextSection, extractDocuments, isDocPlaceholder };
 
 let browserBodies = {};
@@ -825,6 +891,7 @@ let eligDocs = {};
 try { eligDocs = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
 
 let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, fromTitle = 0, gotDeadline = 0, dlFromDoc = 0, gotOpen = 0, gotAnnounce = 0, gotApplyEmail = 0, droppedApplyEmail = 0, gotApplyPortal = 0, gotDocs = 0, gotFree = 0;
+let titleFixed = 0;   // 잘린 제목을 본문에서 보완한 공고(completeTitle)
 /* 공고문 첨부에서 자격 줄을 읽는다. 본문 경로와 원문 없는 경로가 **같은 함수**를 써야
    "본문 있을 땐 읽고 없을 땐 안 읽는" 어긋남이 안 생긴다. 스캔 PDF 등 글자가 안 나오는
    것은 조용히 건너뛴다(읽은 척하는 것보다 안 읽는 편이 낫다). */
@@ -937,6 +1004,49 @@ const humanOwned = (from) => /^(AI|관리자)/.test(from || '');
 /* 마감일을 채우는 자리 **한 곳** — 본문 경로와 첨부 경로가 같은 규칙을 쓰게 한다.
    🔴 period 는 화면에 그대로 보이는 안내문이다. 통째로 갈아치우면 '2026-2학기 1차 신청'
       같은 맥락이 사라지므로, 몰라서 적어 둔 '원문 확인' 자리에만 날짜를 끼운다. */
+/* ── 잘린 제목 보완 (2026-10-30 카드 채움 작업) ──────────────────────────────
+   게시판 목록은 긴 제목을 자른다(「… 신청 안내(10. 1.(목) 09:0」·「… 학부 교내장학..」·「… 선발(~11」·「… 안내[신청」) — 로봇은 목록 제목으로 등록하므로
+   카드 제목이 잘린 채 나가고, 제목 꼬리의 마감(「(~11/20)」)·기간 이름표도 함께 잘려 마감이 빈다(실측 16건 · 안산시 반값지원 · 경기대 장학사정관).
+   원문 본문엔 제목이 통째로 있다. 로봇 등록분(`auto`)만, 제목이 잘린 꼴(끝 ..·… 또는 괄호 짝이 안 맞음)일 때만, 본문 줄 중 **그 제목으로 시작하고
+   80자 안에서 끝나며 문장이 아닌 줄**(여럿이면 가장 짧은 것)로 바꾼다. 관리자가 고친 제목(`nameFrom` 관리자)은 건드리지 않는다. */
+const TRUNC_TAIL = /(?:\.\.|…)+$/;
+const unbalanced = (s) => s.split('[').length > s.split(']').length || s.split('(').length > s.split(')').length || s.split('（').length > s.split('）').length;
+function completeTitle(it, rawText) {
+  const nm = String(it.name || '').trim();
+  if (!it.auto || /^관리자/.test(it.nameFrom || '') || !nm) return null;
+  const n0 = nm.replace(TRUNC_TAIL, '').trim();
+  if (n0.length < 12 || !(TRUNC_TAIL.test(nm) || unbalanced(nm))) return null;
+  const lines = String(rawText || '').split(/\n+/).map((l) => unent(l).replace(/[ \t　]+/g, ' ').trim());
+  const pick = (head) => {
+    const cands = lines.filter((l) => l.startsWith(head) && l.length > head.length + 1 && l.length <= head.length + 80
+      && !/[|]/.test(l) && !/(?:니다|세요|습니다|입니다)\.?$/.test(l) && !unbalanced(l));
+    return cands.length ? cands.sort((a, b) => a.length - b.length)[0] : null;
+  };
+  const direct = pick(n0);
+  if (direct) return direct;
+  /* 수집기가 붙인 게시판 말머리(「[입학에서 취업까지] 」)는 원문 제목에 없다 — 말머리를 **하나씩** 떼며 몸통으로 찾고 뗀 말머리는 돌려 붙인다
+     (경기대 통합 공지 「[입학에서 취업까지] [교내] 2026-2 …」 — 원문 제목은 「[교내] 2026-2 …」 부터다) */
+  const groups = n0.match(/^(?:\[[^\]]*\]\s*)+/);
+  if (!groups) return null;
+  const heads = [...groups[0].matchAll(/\[[^\]]*\]\s*/g)].map((m) => m[0]);
+  let pre = '';
+  for (const h of heads) {
+    pre += h;
+    const core = n0.slice(pre.length).trim();
+    if (core.length < 12) break;
+    const got = pick(core);
+    if (got) return `${pre}${got}`;
+  }
+  return null;
+}
+/* 제목 꼬리의 「(~11/20)」·「(~2026.11.20)」·「[~11.20]」 — 이름표 없이 물결만 있는 마감. 제목 **끝** 괄호 안, 물결 바로 뒤 날짜일 때만(자동 등록이 제목에서
+   읽는 것과 같은 꼴). 해는 소속 해(`year` — listedAt 의 해)를 빌린다 · 본문·첨부·이름표 꼬리 다음, 마지막 보조 길 */
+function titleTailDeadline(name, year) {
+  const m = String(name || '').match(/[(（\[]\s*~\s*((?:20\d{2}\s?[.\-/년]\s?)?\d{1,2}\s?[.\-/월]\s?\d{1,2}\.?)(?:\s?[(（][^)）]*[)）])?[^)）\]]{0,10}[)）\]]\s*$/);
+  if (!m) return null;
+  return dateFrom(m[1], year);
+}
+
 function putDeadline(it, dl, from) {
   it.deadline = dl;
   it.deadlineFrom = from;
@@ -1111,6 +1221,13 @@ for (const it of reg.items) {
        (받아 놓고 못 쓰는 상태였다 — 2026-08-21에 실제로 그랬다).
        🔴 못 뽑았을 때 기존 값을 지우지 않는 것은 그대로다 — '원문이 없다'는 '모른다'이지
        '자격이 없다'가 아니다(위 2026-08-03 주석과 같은 정신). */
+    /* 껍데기 원문에도 제목 줄은 있다 — 잘린 제목 보완은 여기서도(안산시 반값지원 · 본문 143자) */
+    const fullName0 = completeTitle(it, src && src.text);
+    if (fullName0) {
+      titleFixed += 1;
+      if (WRITE) { it.name = fullName0; it.nameFrom = '공고 원문(잘린 제목 보완)'; }
+      else console.log(`   [제목 보완] ${it.id} — ${it.name} → ${fullName0}`);
+    }
     let got = qualFromDocs(it);
     let gotFrom = got.length ? docLabel(qualFromDocs.lastFile) : null;
     /* 첨부에도 없으면 제목 속 「(대상: …)」 (조각 2 · qualFromTitle) */
@@ -1127,11 +1244,15 @@ for (const it of reg.items) {
        안 하면 '본문 껍데기 + 첨부에 요강' 게시판(경희대 유형)이 이 갈림길에서
        통째로 빠져나가, 첨부를 받아 놓고도 영영 '기한 원문 확인'으로 남는다. */
     if (!it.deadline && !humanOwned(it.deadlineFrom)) {
-      const dl = deadlineFromDocs(it);
+      let dl = deadlineFromDocs(it);
+      let from = dl ? docLabel(fromDocs.lastFile) : null;
+      if (dl) dlFromDoc += 1;
+      /* 첨부에도 없으면 제목 — 이름표 꼬리(「[신청기간 2026.11.01~08]」) 다음 물결 꼬리(「(~11/20)」) · 본문 있는 길과 같은 순서 */
+      if (!dl) { dl = extractDeadline(it.name || '') || titleTailDeadline(it.name, String(it.listedAt || '').slice(0, 4) || undefined); if (dl) from = '공고 제목'; }
       if (dl) {
-        gotDeadline += 1; dlFromDoc += 1;
-        if (WRITE) putDeadline(it, dl, docLabel(fromDocs.lastFile));
-        else console.log(`   [마감] ${it.id} → ${dl} (${docLabel(fromDocs.lastFile)})`);
+        gotDeadline += 1;
+        if (WRITE) putDeadline(it, dl, from);
+        else console.log(`   [마감] ${it.id} → ${dl} (${from})`);
       }
     }
     /* 접수 시작일·발표일도 첨부에서 (2026-09-16 · G-3 ③) — 본문이 있는 길과 **같은 순서 검사**.
@@ -1145,6 +1266,13 @@ for (const it of reg.items) {
   }
 
   const body = strip(src.url, src.text);
+  /* 잘린 제목은 걷어내기 전 원문에서 보완한다(제목 줄이 다른 글에도 보여 공통 문구로 걷히는 게시판이 있다 — 경기대 통합 공지) */
+  const fullName = completeTitle(it, src.text);
+  if (fullName) {
+    titleFixed += 1;
+    if (WRITE) { it.name = fullName; it.nameFrom = '공고 원문(잘린 제목 보완)'; }
+    else console.log(`   [제목 보완] ${it.id} — ${it.name} → ${fullName}`);
+  }
   if (body !== src.text) cleaned += 1;
 
   const ex = extractFrom(body);
@@ -1171,6 +1299,10 @@ for (const it of reg.items) {
     let dl = extractDeadline(body);
     let from = '공고 원문';
     if (!dl) { dl = deadlineFromDocs(it); if (dl) { from = docLabel(fromDocs.lastFile); dlFromDoc += 1; } }
+    /* 본문·첨부에 없으면 **제목 꼬리의 괄호 이름표**(「… 신청 안내[신청기간 2026.11.01(일)~08(일)]」) — 경기대 통합 공지는 제목 줄이 다른 글에도
+       보여 공통 문구로 걷히고 본문엔 기간 절이 없다(2026-10-30 장학사정관장학금). 이름표 없는 「(~11/20)」 같은 꼴은 여기서 읽지 않는다(eachLabeledValue 규칙 그대로) */
+    if (!dl) { dl = extractDeadline(it.name || ''); if (dl) from = '공고 제목'; }
+    if (!dl) { dl = titleTailDeadline(it.name, soleYear(body) || String(it.listedAt || '').slice(0, 4) || undefined); if (dl) from = '공고 제목'; }
     if (dl) {
       gotDeadline += 1;
       if (WRITE) putDeadline(it, dl, from);
@@ -1249,6 +1381,7 @@ console.log(`\n게시판 메뉴를 걷어낸 공고 ${cleaned}건`);
 console.log(`발췌 성공 ${hit}건 · 원문은 읽었으나 발췌 불가 ${none}건 · 원문 미확보라 손대지 않음 ${kept}건`);
 console.log(`자격을 공고문 첨부에서 읽은 공고 ${fromDoc}건 · 제목 속 「(대상: …)」에서 읽은 공고 ${fromTitle}건`);
 console.log(`마감일을 새로 읽은 공고 ${gotDeadline}건 (그중 공고문 첨부에서 ${dlFromDoc}건)`);
+console.log(`잘린 제목을 본문에서 보완한 공고 ${titleFixed}건`);
 console.log(`접수 메일 주소를 새로 읽은 공고 ${gotApplyEmail}건 · 지금 규칙으로 접수처가 아니라 걷은 공고 ${droppedApplyEmail}건`);
 console.log(`포털 신청 시스템을 새로 읽은 공고 ${gotApplyPortal}건`);
 console.log(`제출 서류 목록을 읽은 공고 ${gotDocs}건 · 그중 자유 양식 근거로 앱 지원문서를 그대로 낼 수 있는 공고 ${gotFree}건`);
