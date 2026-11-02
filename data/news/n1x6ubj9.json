@@ -1,7 +1,28 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-11-01",
+ "updatedAt": "2026-11-02",
  "items": [
+  {
+   "title": "[학생성공센터] 대학원 학생성공스토리 공모전(11/11) 진행자 및 알바 모집",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141051&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-02",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-02",
+   "desc": "학생성공센터행정실 학생성공센터에서 2026 대학원 학생성공스토리 공모전 진행자를 다음과 같이 모집 하오니 많은 관심과 지원을 바랍니다."
+  },
+  {
+   "title": "성균관대학교 건설환경공학부 대학원 행정조교 채용(~11.09(월) 17:00까지)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141289&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-02",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-02",
+   "desc": "정보통신/소프트웨어/공과대학행정실 성균관대학교 공과대학 건설환경공학부에서 학사 행정업무를 담당할 대학원 조교를 다음과 같이 모집하오니 많은 지원 바랍니다."
+  },
   {
    "title": "2027년도 제16회 변호사시험 시험관리원(재학생) 모집(~11.8.(일)/조기마감 가능)",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141136&article.offset=0&articleLimit=10",
@@ -411,27 +432,6 @@
    "src": "45ec8fd1",
    "foundAt": "2026-10-22",
    "desc": "보안담당자 네트워크를 더욱 안정적이고 안전하게 운영하기 위한 보안장비 교체 작업을 다음과 같이 실시하고자 하오니 참고하여 주시기 바랍니다."
-  },
-  {
-   "title": "[대학원팀] 4단계 BK21 대학원혁신지원사업 사업추진관리 자체직원 채용 공고",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140715&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-22",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-22",
-   "desc": "- 4단계 BK21 대학원혁신사업 사업성과관리 및 지출 관련 처리 - 기타 국고사업 추진 관련 행정 지원"
-  },
-  {
-   "title": "2027년 2월말 퇴직교원(대학) 정부포상 추천자 공개검증",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140714&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-22",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-22",
-   "desc": "○ 공개기간 : 2026.10.22.(목)~10.26.(월), 5일간 ○ 의견제출 : nohyun95@skku.edu(교원인사팀 노현석 선임)"
   }
  ]
 }

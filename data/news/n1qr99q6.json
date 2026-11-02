@@ -1,7 +1,29 @@
 {
  "school": "조선대학교",
- "updatedAt": "2026-11-01",
+ "updatedAt": "2026-11-02",
  "items": [
+  {
+   "title": "[CSU창작마을센터] 2026년 11월 메이커스페이스 프로그램 운영 안내",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282495/artclView.do",
+   "postedAt": "2026-11-02",
+   "kind": "생활",
+   "school": "조선대학교",
+   "campus": "",
+   "src": "c6a7801d",
+   "foundAt": "2026-11-02",
+   "desc": "창업지원단 CSU창작마을센터에서 11월 메이커스페이스 프로그램을 운영합니다. 창업캠프부터 목공 체험, 다양한 메이킹 체험까지 많은 관심과 참여 바랍니다."
+  },
+  {
+   "title": "[보건진료소] 2026년 11월 금연프로그램 안내",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282494/artclView.do",
+   "postedAt": "2026-11-02",
+   "kind": "생활",
+   "school": "조선대학교",
+   "campus": "",
+   "src": "c6a7801d",
+   "foundAt": "2026-11-02",
+   "desc": "금연을 희망하는 조선대학생들을 위한 금연프로그램을 실시합니다 . 광주금연지원센터와 연계하여 운영하오니 학생들의 많은 참여 부탁드리겠습니다 ."
+  },
   {
    "title": "[창업성장지원팀] 2026학년도 앵커 창업동아리 5차 모집",
    "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282428/artclView.do",
@@ -354,26 +376,6 @@
    "thumb": "data/news/img/73adf4a241fda2cb.webp",
    "desc": "대학혁신지원사업의 일환으로 \"인사·총무부터 플랫폼까지, 경영지원 전문기업\" 이트너스 채용설명회를 실시합니다.",
    "src": "c6a7801d"
-  },
-  {
-   "title": "[홍보팀] 나만의 AI 도우미 ‘CSU AI’ 이용 안내",
-   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/281727/artclView.do",
-   "postedAt": "2026-10-02",
-   "school": "조선대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "thumb": "data/news/img/bf3d9b48de2d410e.webp",
-   "desc": "조선대학교 구성원이라면 누구나 포털시스템에서 GPT·Claude·Gemini 등 다양한 AI를 한곳에서 이용할 수 있습니다.",
-   "src": "c6a7801d"
-  },
-  {
-   "title": "[THE조아] 2026년 10월 비교과 프로그램 안내",
-   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/281719/artclView.do",
-   "postedAt": "2026-10-02",
-   "school": "조선대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "desc": "프로그램에 대한 자세한 내용 확인 및 프로그램 신청은 THE조아시스템에서 가능합니다!"
   }
  ]
 }

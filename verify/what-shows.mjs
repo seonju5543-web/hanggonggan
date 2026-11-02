@@ -126,7 +126,7 @@ vm.runInContext([
   /* 카드가 쓰는 한 줄 const 는 **전부** 여기에 — 하나라도 빠지면 그 꼴의 카드(기간 한 줄·학교 사진)에서만 이 도구가 넘어진다
      (리뷰 G3 · 기간 한 줄 달린 게시판 글에서 `hintText is not defined`). 관문 「원문 링크 정직성」 app 갈래가 실제 글 꼴로 돌려 본다. */
   ...['ENTITIES', 'ENTITY_RE', 'PARTIAL_ENTITY_END', 'hintText', 'NEWS_THUMB_RE', 'SCHOOL_PHOTO_RE', 'PHOTO_FOCUS_RE',
-    'CLOSED_KEEP_DAYS', 'KOSAF_ELIG', 'kosafClean', 'KOSAF_AMOUNT_UNKNOWN', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G'].map(takeConst),
+    'CLOSED_KEEP_DAYS', 'KOSAF_ELIG', 'kosafClean', 'KOSAF_NOISE', 'KOSAF_AMOUNT_UNKNOWN', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G'].map(takeConst),
   ...['isDateBit', 'splitTitleDates', 'hintShort', 'shortDay'].map(takeFn),   // 카드 제목 날짜·회색 기간 줄(2026-10-04·05) · 카드 윗줄 날짜(10-10)
   ...['esc', 'unent', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'attachPrepTemplate', 'kosafAsScholarships', 'sourceLinkHintHtml',   // attachPrepTemplate: 층2 항목마다 지원문서를 붙인다(2026-10-13 ① · FORM_TEMPLATES 가 없는 자리에선 그대로 돌려준다)
     'attachmentLinkHtml', 'sourceLinkHtml', 'sourceNoteHtml', 'amountSourceLinkHtml', 'appLogLinkHtml', 'noticeCardHtml', 'activityLinkWhy'].map(takeFn),

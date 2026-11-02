@@ -5343,6 +5343,32 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
         AL.linkAttachments([{ title: '선발안내.pdf chevron_forward', url: 'https://kangwon.ac.kr/ko/bbs/750/download.do?f=2' }], 'https://kangwon.ac.kr/x')[0].name],
       ['2026년 2학기 선발공고문.pdf', '요강.hwp', '선발공고문.pdf', '선발안내.pdf']);
     eq('  이름 가운데의 보통 낱말은 안 건드린다', AL.cleanAttachName('Download Guide 안내문.pdf'), 'Download Guide 안내문.pdf');
+    /* 🔴 단추 글자 + 보통 내려받기 주소 (2026-11-02 · 경기대·충북대 selectBbsNttView 게시판: `<span>요강.hwp</span> <a href="./downloadBbsFile.do?…">다운로드</a>` —
+       `download\.do` 로는 안 걸리고 단추 글자엔 확장자가 없어 첨부 0건 → 선원가족 요강·푸른등대 계획서를 아무도 안 받았다). 되돌리면 [] */
+    const kgu = 'https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626761';
+    eq('단추 글자 「다운로드」 + downloadBbsFile.do → 앞 요소의 파일 이름이 첨부 이름 · 「미리보기」 링크는 첨부가 아니다',
+      AL.detailAttachments('<span class="text">2026년 2학기 선원가족장학사업 선발 모집 요강（변경）.hwp</span> <a href="./downloadBbsFile.do?atchmnflNo=989598" class="download"><span>다운로드</span></a> <a href="./previewBbsFile.do?atchmnflNo=989598" target="_blank">미리보기</a>', kgu),
+      [{ name: '2026년 2학기 선원가족장학사업 선발 모집 요강（변경）.hwp', url: 'https://www.kyonggi.ac.kr/www/downloadBbsFile.do?atchmnflNo=989598' }]);
+    eq('  앞에 파일 이름이 없으면 지어내지 않는다(단추 글자 그대로 → 첨부가 안 된다) · 이웃 행의 이름을 훔치지 않는다(앞 줄이 jpg 면 그 단추는 버린다) · 메뉴 링크(/downloads/)는 첨부가 아니다',
+      [AL.detailAttachments('<a href="./downloadBbsFile.do?atchmnflNo=1">다운로드</a>', kgu),
+        AL.detailAttachments('<span>A요강.hwp</span><a href="./downloadBbsFile.do?atchmnflNo=1">다운로드</a> <a href="./previewBbsFile.do?atchmnflNo=1">미리보기</a> <span>포스터.jpg</span><a href="./downloadBbsFile.do?atchmnflNo=2">다운로드</a>', kgu).map((a) => `${a.name}|${a.url.slice(-12)}`),
+        AL.detailAttachments('<a href="/ko/downloads/">양식 다운로드</a>', kgu)],
+      [[], ['A요강.hwp|atchmnflNo=1'], []]);
+    /* 🔴 본문이 그림 한 장인 게시판 (2026-11-02 · 홍익대 성취장학·선원가족: `<div class="b-content-box"><img src="/cms/plugin/editorImage.do?$cms$…" data-width="1080" data-height="1920">` —
+       헤드리스 브라우저는 봇 차단에 걸려 그림을 못 적고 일반 fetch 물러서기는 글자만 받아 자격이 영영 비었다). 되돌리면 함수가 없다 */
+    const hongik = 'https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158449&noCat=501';
+    eq('HTML 의 본문 그림 — 크기 표식 300px 넘는 것만 · 로고(크기 없음)·작은 그림·data: 는 안 담는다 · 이름 꼴은 브라우저 길과 같다',
+      (AL.htmlBodyImages || (() => undefined))('<img src="/_res/img-logo.svg"><p><img src="/cms/plugin/editorImage.do?$cms$AbC " data-width="1080" data-height="1920"></p><img src="/x.png" width="200" height="200"><img src="data:image/png;base64,AAAA" width="900" height="900">', hongik),
+      [{ name: '본문이미지-1080x1920.jpg', url: 'https://www.hongik.ac.kr/cms/plugin/editorImage.do?$cms$AbC', bodyImage: true }]);
+    const rb2 = readText(new URL('../collector/rescue-bodies.mjs', import.meta.url));
+    eq('  재수집 로봇: 물러선 HTML 의 첨부 링크·그림을 적고(detailAttachments·htmlBodyImages) 첨부 적기(newAttachments)는 그 **뒤**에 · 브라우저 링크도 단추 글자(BUTTON_WORD)면 앞 요소 이름',
+      [rb2.indexOf('r.found.push(...detailAttachments(html, openUrl), ...htmlBodyImages(html, openUrl))') > 0
+        && rb2.indexOf('r.found.push(...detailAttachments(html, openUrl)') < rb2.indexOf('const add = newAttachments(t.it.attachments, r.found)'),
+        /previousElementSibling/.test(rb2) && /BUTTON_WORD\.source\)/.test(rb2)], [true, true]);
+    /* 🔴 등록 당시 `javascript:` 로 적힌 첨부는 받을 때 푼다 (2026-11-02 · 서울과기대 희망사다리Ⅰ 자체선발기준: 규칙(10-16)보다 먼저 등록(10-12)돼 11-01 자격용 받기가 TypeError → files: []) */
+    const df2 = readText(new URL('../collector/deepfetch.mjs', import.meta.url));
+    eq('  deepfetch 의 두 내려받기(양식·자격용)가 fetchUrlOf 로 스크립트 주소를 풀고 · 오류는 두 경로 모두 cause 까지 적는다(errWhy)',
+      [(df2.match(/const url = fetchUrlOf\(a, /g) || []).length, (df2.match(/console\.log\('(?:attach|elig doc) err', a\.name, errWhy\(e\)\)/g) || []).length, /resolveJsDownload\(a\.url, pageUrl\)/.test(df2)], [2, 2, true]);
     const bc = readText(new URL('../collector/browser-collect.mjs', import.meta.url));
     eq('  브라우저 수집기의 두 길이 모두 linkAttachments 를 쓴다(걸러 내기가 두 벌이 되지 않게)', (bc.match(/linkAttachments\(/g) || []).length, 2);
     const cm = readText(new URL('../collector/collect.mjs', import.meta.url));
@@ -12976,6 +13002,13 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
   eq('  요건 낱말이 든 금액 줄(「소득 8구간 이하: 100만원」)은 자격 블록에 남긴다 · 건너뛴 금액 줄도 상한에 센다',
     [EX2.extractQualifyLines('1. 신청자격\n가. 재학생\n소득 8구간 이하: 100만원\n- 장학 금액 : 200 만원').includes('소득 8구간 이하: 100만원'), /skippedAmt < 14/.test(readText(new URL('../collector/extract-excerpts.mjs', import.meta.url)))], [true, true]);
   eq('  제목 괄호의 「(대상 : 서울시민)」도 읽는다', EX2.qualFromTitle({ name: '장학생 모집(대상 : 서울시민)' }), ['서울시민']);
+  /* ⑤ 「자격사항」 이름표 (2026-11-02 · 서울시립대 경영경제전문도서관 국가근로 추가 모집: 본문의 `2. 자격사항` 이 이름표 목록에 없어 '자격 제목 없음'이었다).
+     발췌기 QUALIFY_HEAD · 채점기(eligibility-report) · 화면 section-head QUALIFY_WORD 셋이 같이 안다. 되돌리면 [].
+     ⚠️ 그 공고의 두 줄(「국가근로장학생 대상자 명단에 있어야 함」·「중복근로 불가」)은 요건 신호가 없어 관문이 여전히 거른다 — 이름표만 고친 것이지 그 공고가 채워지는 것은 아니다 */
+  eq('「2. 자격사항」 도 자격 이름표다 — 발췌기·채점기·화면 한 쌍',
+    [EX2.extractQualifyLines('※ 화, 금 모두 근무 가능해야 함\n2. 자격사항\n- 직전학기 평점 3.0 이상인 자\n3. 접수방법 : 이메일 제출\n- 메일주소 : x@uos.ac.kr'),
+      SH2.isQualifyHead('2. 자격사항'), /자격\\s\?사항/.test(readText(new URL('../verify/eligibility-report.mjs', import.meta.url)))],
+    [['2. 자격사항', '- 직전학기 평점 3.0 이상인 자'], true, true]);
 }
 
 /* ■ 신청서 원본 → PDF (2026-10-12 개발자 지시 "스키마화가 아니라 원본 그대로 · PDF 로 통일")
@@ -13710,6 +13743,50 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
   eq('🔴 `주민등록이 되어 있거나, … 중·고 졸업` — 다른 연고로도 되는 거주 줄은 확신 낮음(경기 학생에게 ✕ 가 아니라 모름)', (one(ganghwa, 'residence') || {}).conf, 'low');
   eq('  (대조군) `대구광역시에 주민등록상 주소를 둔 대학교 재학생` 은 그대로 확신 high', (one("공고일('26.10.14.) 기준 대구광역시에 주민등록상 주소를 둔 대학교 재학생", 'residence') || {}).conf, 'high');
   eq('  줄 판정 — 경기 학생에게 강화군 줄은 ✕ 가 아니다 · 대구 줄은 ✕', [MEx.requirementMatch(ganghwa, { status: '재학', birthYear: 2004, region: '경기', regionCity: '용인시', parentRegion: '경기' }, null), MEx.requirementMatch("공고일('26.10.14.) 기준 대구광역시에 주민등록상 주소를 둔 대학교 재학생", { status: '재학', region: '경기', regionCity: '용인시', parentRegion: '경기' }, null)], [null, 'no']);
+
+  /* ── 2차 (2026-11-02 · 조건 0 줄 301개 전수에서 고른 꼴 — 등록 84 · 재단 157 · 활동 63) ── */
+  const condsEx = (l) => PRx.parseLine(l, true).conds;
+  eq('`만 30세 초과 지원제한` — 30세 이하와 같은 말(뒤에 제한·불가·제외가 붙을 때만)', [(one('만 30세 초과 지원제한', 'age') || {}).max, one('만 30세 초과자 대상', 'age')], [30, null]);
+  eq('`매 정규학기 당 최소 12학점 이수한 자` — 최소 = 이상', (one('매 정규학기 당 최소 12학점 이수한 자', 'credits') || {}).min, 12);
+  eq('제외 줄 `학점 3.0(4.5환산)에 미달된 때` — 3.0 이상이어야 한다(학점 12 도 함께)', condsEx('학기별 성적이 최소 이수학점(12학점)과 학점 3.0(4.5환산)에 미달된 때').map((c) => `${c.kind}:${c.min}`).sort(), ['credits:12', 'grade:3']);
+  eq('  자격 줄의 `3.0 미달` 은 안 읽는다(성적 향상 장학처럼 뜻이 반대일 수 있다)', one('직전학기 평점 3.0 미달인 학생 대상', 'grade'), null);
+  eq('  제외 줄이라도 횟수·이력·사후 조치(`미달 학기가 2회 이상`·`미달 시 환수`·`미달로 경고를 받은`)는 지금 평점으로 못 가린다 — 안 읽는다(리뷰)', ['평점 3.0 미달 학기가 2회 이상인 자', '지급 후 평점 3.0 미달 시 장학금 환수 및 지급 중단', '성적 3.0 미달로 경고를 받은 적이 있는 자'].map((l) => condsEx(l).find((c) => c.kind === 'grade') || null), [null, null, null]);
+  eq('🔴 `서울에 주민등록이 되어 있고 해군으로 복무한 자` — 「해군」은 시·군이 아니다(표에 없는 이름은 거주지로 안 집는다 · 서울 학생에게 ✕ 가 났다 — 리뷰)', [((one('서울에 주민등록이 되어 있고 해군으로 복무한 자', 'residence') || {}).cities || []), MEx.requirementMatch('경기도 거주자로서 예비군으로 편성된 학생', { status: '재학', region: '경기', regionCity: '용인시', parentRegion: '경기' }, null) === 'no'], [[], false]);
+  eq('`고창군으로 되어있는` — `으로` 도 토씨라 시·군을 집는다 · `그 외:` 갈래는 확신 낮음(✕ 못 냄)', (({ cities, conf }) => [cities, conf])(one('그 외: 본인 또는 보호자의 주민등록이 3년이상 계속하여 고창군으로 되어있는 학생', 'residence') || {}), [['고창군'], 'low']);
+  eq('  `그 외:` 가 없으면 그대로 확신 high', (one('본인 또는 보호자의 주민등록이 3년이상 계속하여 고창군으로 되어있는 학생', 'residence') || {}).conf, 'high');
+  eq('  고창군 학생에겐 ✓ · 서울 학생에겐 모름(✕ 아님)', [MEx.requirementMatch('그 외: 본인 또는 보호자의 주민등록이 3년이상 계속하여 고창군으로 되어있는 학생', { status: '재학', region: '전북', regionCity: '고창군', parentRegion: '전북', parentCity: '고창군' }, null), MEx.requirementMatch('그 외: 본인 또는 보호자의 주민등록이 3년이상 계속하여 고창군으로 되어있는 학생', { status: '재학', region: '서울', regionCity: '강서구', parentRegion: '서울' }, null)], ['ok', null]);
+  eq('`공인 외국어 시험 학년별 기준점수 이상 성적 보유자` — 어학 조건(확신 high)', (one('공인 외국어 시험 학년별 기준점수 이상 성적 보유자', 'cert') || {}).conf, 'high');
+  /* 학교 유형 제외 — 층2 제외 칸 15줄. 제외 줄에서만 · 학교 유형 이야기뿐일 때만 */
+  const schoolTypeLines = ['방송통신대학 및 사이버대학·직업학교·학점은행제학교 등 제외', '외국대학에 재학 중인 자', '외국대학/사이버대학/대학원 학생', '평생교육법에 의한 학점은행제 교육원 및 전문학교', '사이버대/디지털대/방통대 등', '시간제 등록생', '대학원/외국대학'];
+  eq('🔴 학교 유형 제외 7꼴 — 제외 줄에서 schoolType 조건(확신 high)', schoolTypeLines.map((l) => (condsEx(l).find((c) => c.kind === 'schoolType') || {}).conf), schoolTypeLines.map(() => 'high'));
+  eq('  자격 줄에서는 안 읽는다 · 다른 요구가 남는 제외 줄(`대학원 진학자`·`- 대학원생, 휴학생`·`외국대학 교환학생`·`생활비를 지원받는 특수대학`)도 안 읽는다 — 남는 글자 0 일 때만', [one('외국대학에 재학 중인 자', 'schoolType'), ...['대학원 진학자', '- 대학원생, 휴학생', '외국대학 교환학생', '생활비를 지원받는 특수대학'].map((l) => condsEx(l).find((c) => c.kind === 'schoolType') || null)], [null, null, null, null, null]);
+  const stCond = (l) => condsEx(l).find((c) => c.kind === 'schoolType');
+  eq('  판정 — 정규 대학 학생은 통과 · 한국방송통신대학교 학생은 사이버·방통 줄엔 걸리고 `외국대학`·`대학원` 줄은 모름(리뷰 — 그 학생에게 ✕ 를 내면 틀린 미달)', [MEx.judgeCond(stCond('외국대학/사이버대학/대학원 학생'), { school: '한국외국어대학교' }), MEx.judgeCond(stCond('방송통신대 및 사이버대학 재학생'), { school: '한국방송통신대학교' }), MEx.judgeCond(stCond('외국대학에 재학 중인 자'), { school: '한국방송통신대학교' }), MEx.judgeCond(stCond('대학원/외국대학'), { school: '한국방송통신대학교' })], ['pass', 'fail', 'unknown', 'unknown']);
+  /* 적합도 — 참고 줄은 분모에서 빠지고, 통과한 제외 조항은 요건 하나로, 자격 줄을 하나도 못 맞히면 '모른다' */
+  const stu = { status: '재학', gpa: 3.5, credits: 15, year: 3, school: '한국외국어대학교', region: '서울', regionCity: '강서구', parentRegion: '서울', birthYear: 2004 };
+  const fd = (lines, ex) => MEx.fitDetail({ id: 't', name: '표본', eligibilityLines: lines, eligibilityExcludes: ex || [] }, stu);
+  eq('🔴 `4.5만점 기준`·`성적기준 없음`·`유급 전 성적이 반영됨` 은 참고 줄 — 분모에서 뺀다 (요건 2개 중 2개 = 95% · 전엔 2/4 = 50%)', (({ met, total, pct }) => [met, total, pct])(fd(['직전학기 평점 3.0 이상인 재학생', '4.5만점 기준', '성적기준 없음', '유급한 학생의 경우 유급 전 성적이 반영됨'])), [2, 2, 95]);
+  eq('  문턱이 남은 줄(`성적 무관, 2학년 이상 재학생`)은 참고가 아니다 — 학년·학적 요건이 분모에 산다(리뷰)', (({ met, total }) => [met, total])(fd(['성적 무관, 2학년 이상 재학생'])), [2, 2]);
+  eq('  ※ 꼬리가 면제 부연인 요건 줄은 참고가 아니다 — 통째로 빠지면 그 공고가 자격 미확인이 된다(교내 국가근로 실측)', (({ met, total, unread }) => [met, total, unread])(fd(['직전학기 평점 3.0 이상인 재학생 ※ 신·편입생은 성적무관'])), [2, 2, false]);
+  eq('  걸리지 않음을 확인한 학교 유형·성적 제외 조항은 충족 요건으로 센다 (2/2 → 4/4)', (({ met, total }) => [met, total])(fd(['직전학기 평점 3.0 이상인 재학생'], ['외국대학/사이버대학/대학원 학생', '학기별 성적이 최소 이수학점(12학점)과 학점 3.0(4.5환산)에 미달된 때'])), [4, 4]);
+  eq('🔴 자격 줄을 하나도 못 맞히고 제외 조항만 통과하면 퍼센트가 아니라 「자격 미확인」(가짜 20% 금지)', (({ unread, met }) => [unread, met])(fd(['해당 학과 교수의 추천을 받은 자'], ['외국대학/사이버대학/대학원 학생'])), [true, 1]);
+
+  /* ── 편입·재입학 첫 학기 (2026-11-02 개발자 "편입이랑 재입학은 학적정보만으로 구분 가능하잖아") ── */
+  const html = readText(new URL('../index.html', import.meta.url));
+  eq('온보딩 학적 칩에 「편입 첫 학기」·「재입학 첫 학기」가 있다 (값 편입학·재입학)', [/data-value="편입학"/.test(html), /data-value="재입학"/.test(html)], [true, true]);
+  eq('`편입생 중 첫 학기인 학생`(제외) — 편입학 금지 · `당해학기 복학생·재입학생·편입학생`(제외) — 둘 다', [((condsEx('편입생 중 첫 학기인 학생').find((c) => c.kind === 'status') || {}).not), ((condsEx('당해학기 복학생·재입학생·편입학생').find((c) => c.kind === 'status') || {}).not)], [['편입학'], ['편입학', '재입학']]);
+  eq('  `편입생:` 경우 분기는 편입학 학생의 것 (전엔 빈 목록 = 모름)', [PRx.caseBranch('편입생: 이전 대학 성적 3.0 이상'), PRx.caseBranch('재입학생: 재입학 전 성적')], [['편입학'], ['재입학']]);
+  eq('  괄호·「단,」 뒤의 편입(`(단, 신입생·편입생 성적제한 없음)`)은 요건이 아니다 — 재학생에게 그 줄이 ✓ 그대로', MEx.requirementMatch('평점평균 2.0 이상인 자 (단, 신입생·편입생 성적제한 없음)', { status: '재학', gpa: 3.0 }, null), 'ok');
+  eq('🔴 제외 줄의 허용 낱말 — `재학생·편입생·재입학생·복학생 모두 가능(단, 휴학생은 제외)` 은 휴학만 금지(편입생에게 ✕ 아님) · `(지원 불가능) … 초과 학기 … 지원 불가` 의 「가능」은 허용이 아니다', [((condsEx('재학생·편입생·재입학생·복학생 모두 가능(단, 휴학생은 제외)/ 첫째, 둘째는 제외').find((c) => c.kind === 'status') || {}).not), ((condsEx('(지원 불가능) 지원 시점 기준, 4학년 재학생 및 초과 학기 이수 예정자 지원 불가').find((c) => c.kind === 'status') || {}).not)], [['휴학'], ['초과학기']]);
+  /* 리뷰(2026-11-02)가 실데이터·합성 줄로 잡은 틀린 ✕ — 면제 문장·절차 문장·괄호 제외 */
+  const stNot = (l, ex) => ((PRx.parseLine(l, ex).conds.find((c) => c.kind === 'status') || {}).not || null);
+  eq('🔴 면제 문장은 편입 금지가 아니다 — `신/편입생은 입학 학기에만 … 성적 기준 적용 제외`(경희인턴 실데이터)·`편입생은 성적 기준 면제, 휴학생 제외`·`편입학생 : 직전학기 성적 없음`', [stNot('* 신 / 편입생은 입학 학기에만 학점 및 성적 기준 적용 제외', false), stNot('편입생은 성적 기준 면제, 휴학생 제외', false), stNot('편입학생 : 직전학기 성적 없음', false)], [null, ['휴학'], null]);
+  eq('  그 면제 줄은 참고 줄이다(적용 제외) — 편입생에게 ✕ 도 ✓ 도 아니다', MEx.requirementMatch('* 신 / 편입생은 입학 학기에만 학점 및 성적 기준 적용 제외', { status: '편입학', gpa: 3.0 }, null), null);
+  eq('🔴 괄호 안 진짜 제외 `재학생 (신·편입생, 복학생, 재입학생 제외)` 는 편입·재입학 금지 (방송대 실데이터 — 전엔 괄호를 통째로 지워 ✓ 였다)', stNot('- 2026. 2 학기 재학생 ( 신 · 편입생 , 복학생 , 재입학생 제외 )', false), ['편입학', '재입학']);
+  eq('  제외 칸의 절차·문의 줄(`편입생은 이전 대학 성적으로 심사`·`편입생·재입학생은 별도 문의`)과 `편입학년도`·`편입학 전형` 은 학적이 아니다', [stNot('편입생은 이전 대학 성적으로 심사', true), stNot('편입생·재입학생은 별도 문의', true), PRx.parseLine('편입학년도 기준 2학년').conds.filter((c) => c.kind === 'status').length, stNot('편입학 전형 합격자 제외', true)], [null, null, 0, null]);
+  eq('  다른 학적의 금지는 그대로 — `초과학기생 …, 휴학생 참여 불가 (… 참여가능)` 초과학기 · `휴학생 우대 제외` 휴학', [stNot('초과학기생 (9학기 이상), 졸업 유예자, 휴학생 참여 불가 (초과학기생의 경우 등록금 전액 납부자는 참여가능)', true), stNot('휴학생 우대 제외', true)], [['초과학기'], ['휴학']]);
+  const tr = (s) => ({ status: s, gpa: 3.5, credits: 15, year: 2, school: '한국외국어대학교', region: '서울', regionCity: '강서구', parentRegion: '서울' });
+  eq('  편입·재입학 첫 학기도 재학생이다 — `정규학기 재학생` ✓ · 제외 줄 `편입생 중 첫 학기인 학생` 은 편입학 학생만 ✕, 재학생은 통과 확인', [MEx.requirementMatch('2026-2학기 정규학기 재학생', tr('편입학'), null), MEx.requirementMatch('2026-2학기 정규학기 재학생', tr('재입학'), null), MEx.fitDetail({ id: 't', name: 't', eligibilityLines: ['직전학기 평점 3.0 이상인 재학생'], eligibilityExcludes: ['편입생 중 첫 학기인 학생'] }, tr('편입학')).fails.length, MEx.fitDetail({ id: 't', name: 't', eligibilityLines: ['직전학기 평점 3.0 이상인 재학생'], eligibilityExcludes: ['편입생 중 첫 학기인 학생'] }, tr('재학')).met], ['ok', 'ok', 1, 3]);
 }
 
 console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-31 · 5단계 — 숫자는 도구가 세고 질문 목록은 사람이 고친다)');
@@ -13719,10 +13796,10 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
   /* 🔴 실데이터가 아니라 **표본**으로 돌린다(CLAUDE.md — 실데이터에 기댄 관문은 수집 로봇 결과를 되돌린다). 파일이 없어도 빈 묶음으로 끝까지 간다 */
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'coverage-')) + path.sep;
   fs.writeFileSync(tmp + 'reg.json', JSON.stringify({ items: [{ id: 'x1', name: '표본 장학', deadline: '2099-01-01', eligibilityLines: ['직전학기 평점 3.0 이상인 재학생', '자립준비 청년(증빙 제출 가능자)', '해당 학과 교수의 추천을 받은 자'] }] }));
-  fs.writeFileSync(tmp + 'kosaf.json', JSON.stringify({ items: [{ code: 'k1', name: '표본 재단', fields: { '특정자격': '○ 제한없음\n○ 대회 입상자', '성적기준': '평점 3.5 이상' } }] }));
+  fs.writeFileSync(tmp + 'kosaf.json', JSON.stringify({ items: [{ code: 'k1', name: '표본 재단', fields: { '특정자격': '○ 제한없음\n○ 기관확인필요\n○ 해당없음음\n○ 대회 입상자', '성적기준': '평점 3.5 이상', '자격제한': '○ 기관확인필요요' } }] }));   // 기관확인필요(요)·해당없음(음) 도 아무것도 말하지 않는 줄 — 앱 KOSAF_NOISE 와 같이 버린다(2026-11-02 · 자격제한 칸도 센다)
   const env = { ...process.env, COVERAGE_REGISTERED: tmp + 'reg.json', COVERAGE_KOSAF: tmp + 'kosaf.json', COVERAGE_ACTIVITIES: tmp + 'none.json' };
   const r = spawnSync(process.execPath, [fileURLToPath(new URL('../verify/eligibility-coverage.mjs', import.meta.url)), '--brief'], { encoding: 'utf8', timeout: 120000, env });
-  eq('  도구가 표본으로 돌고 한 줄을 낸다 (없는 파일은 빈 묶음 · 제한없음 줄은 세지 않는다)', [r.status, (r.stdout || '').trim().replace(/ · 처지 상위.*$/, '')],
+  eq('  도구가 표본으로 돌고 한 줄을 낸다 (없는 파일은 빈 묶음 · 제한없음·기관확인필요·해당없음 줄은 세지 않는다)', [r.status, (r.stdout || '').trim().replace(/ · 처지 상위.*$/, '')],
     [0, '- 자격 줄 전수: 공고 1/1/0 · 조건을 하나도 못 읽는 줄 1/0/0 (등록/재단/활동 · 합 1)']);
   eq('  처지 집계가 돈다 (자립준비청년 · 수상)', /careLeaver 1/.test(r.stdout || '') && /award 1/.test(r.stdout || ''), true);
   const EAy = createRequire(import.meta.url)('../elig-ask.js');

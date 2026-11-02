@@ -213,7 +213,7 @@ function pctToGpa(pct, table) {
 }
 
 /* 🔴 **이 앱의 프로필은 학부다** (2026-09-12 · 노션 핵심-4). 온보딩이 받는 학적은
-   1~4학년 + 재학·신입학·복학예정·휴학·초과학기·졸업유예뿐이라(index.html `#in-year`·
+   1~4학년 + 재학·신입학·편입학·재입학·복학예정·휴학·초과학기·졸업유예뿐이라(index.html `#in-year`·
    `#in-status`) 학위 과정을 따로 묻지 않는다. 그 사실을 **여기 한 곳에서만** 말한다 —
    온보딩에 학위 칸이 생기면 이 함수만 그 값을 읽으면 된다(그때 `p.degree` 를 쓴다).
    ⚠️ 여기서 'unknown' 을 내지 말 것 — 모른다고 하면 학위 축이 통째로 죽어, 대학원 전용
@@ -227,6 +227,13 @@ function judgeCond(c, p, ctx) {
   const S = PR.GRADE_SCALE;
   switch (c.kind) {
     case 'open': return 'pass';          // `국민 누구나` — 다른 요구가 없는 줄만 이 조건이 된다(parse-requirements parseOpen)
+    /* 학교 유형 제외(`사이버대·방통대·학점은행제·외국대학·대학원 … 제외` · parseSchoolType — 제외 줄에서만 온다): 이 앱의 학생은 국내 정규 대학 학부생이라
+       걸리지 않는다('pass' = 통과 확인 → 충족 요건 하나). 학교 이름이 방송통신·사이버·디지털·원격 대학이면 걸린다(UNIVERSITIES 에 한국방송통신대학교가 있다) */
+    case 'schoolType': {
+      const cyberStudent = /방송\s?통신|사이버|디지털|원격/.test(String((p && p.school) || ''));
+      if (!cyberStudent) return 'pass';
+      return c.cyber ? 'fail' : 'unknown';   // 방통대 학생: 사이버·방통 줄엔 걸린다 · `외국대학`·`대학원`·`시간제` 줄은 판단할 수 없다(리뷰 — 그 학생도 외국대학생·대학원생은 아니지만 줄이 묶여 있어 모름)
+    }
     case 'degree': {
       const mine = degreeOf(p);
       if (c.want === 'both') return 'pass';
@@ -331,7 +338,8 @@ function judgeCond(c, p, ctx) {
              (그냥 `재학생`이면 지금은 휴학 중이라 단정할 수 없다 — 모르면 판정하지 않는다)
          `휴학`은 재학생이 아니므로 미달이다 — 이게 헛걸음을 막는 자리다. */
       if (c.anyOf.includes('재학')) {
-        const asEnrolled = c.regularOnly ? ['신입학'] : ['신입학', '초과학기', '졸업유예'];
+        /* 편입·재입학 첫 학기도 재학생이다(2026-11-02 · 온보딩 칩) — 정규학기 재학생에도 든다 */
+        const asEnrolled = c.regularOnly ? ['신입학', '편입학', '재입학'] : ['신입학', '편입학', '재입학', '초과학기', '졸업유예'];
         if (asEnrolled.includes(p.status)) return 'pass';
         if (['휴학', '수료', '졸업', '자퇴'].includes(p.status)) return 'fail';
       }
@@ -811,7 +819,7 @@ function fitDetail(sch, p) {
   const ctx = noticeCtx(sch);
 
   const fails = [];
-  let met = 0, unknown = 0, total = 0;
+  let met = 0, unknown = 0, total = 0, metMain = 0;   // metMain — 제외 조항 통과를 뺀, 자격 줄에서 맞힌 수(아래 '모른다' 판정용)
   const groups = new Map();          // 선택지 묶음 → 그 안에서 하나라도 충족했나
   /* 🔴 줄이 아니라 **조건**을 센다 (2026-10-29 개발자 "적합도는 퍼센트로 — 나름의 세세한 기준이 있으면").
      한 줄에 조건이 여럿이면(`직전학기 12학점 이상 이수 및 평점 3.0 이상인 재학생` = 학점·성적·재학 셋) 그 수만큼 무게를 준다 —
@@ -830,14 +838,14 @@ function fitDetail(sch, p) {
     }
     const w = d.total || weightOf(it.text);
     total += w;
-    if (verdict === 'pass') met += w;
+    if (verdict === 'pass') { met += w; metMain += w; }
     else if (verdict === 'fail' && !multi) fails.push(it.text);
     /* 🔴 '모름' 줄 안의 맞은 조건에 부분 점수를 주지 않는다 — 줘 봤더니 `○○대학 재학생`(학교 모름 · 재학 맞음)이 서울 학생에게
        '충족'으로 뒤집혔다(관문 「학교 위치는 모른다」가 잡았다 · 2026-10-29). 줄의 열쇠 조건을 모르면 그 줄은 통째로 모른다 */
     else unknown += w;
   }
   /* 선택지 묶음은 통째로 요건 1개로 센다 — 하나만 만족하면 충족이다(설계 조건 ⑤) */
-  for (const [, g] of groups) { total += 1; if (g.any) met += 1; else unknown += 1; }
+  for (const [, g] of groups) { total += 1; if (g.any) { met += 1; metMain += 1; } else unknown += 1; }
 
   /* 제외 조항에 걸리면 미달과 같다 · 🔴 걸리지 않음을 **확인한** 제외 조항은 충족한 요건 하나로 센다 (2026-10-29 같은 지시 — 학생이 통과한 조건을
      점수에 넣지 않던 자리) · 판정 못 한 제외 조항은 세지 않는다(모르는 것을 분모에 넣어 깎지 않는다 — '틀린 안심'도 '틀린 미달'도 아니다) */
@@ -866,8 +874,10 @@ function fitDetail(sch, p) {
         화면은 이미 그 값을 '자격 미확인' 배지로 그리고 퍼센트도 FIT_UNREAD 로 맞춘다.
         여기서 내지 않고 app.js 에서 따로 판정하면 **퍼센트와 배지가 다른 말을 한다**
         (감사의 '일관성 축'이 보는 것이 그것이다).
-     ⚠️ `total === 0` 은 위에서 이미 걸러졌고, 하나라도 맞힌 공고는 그대로 지나간다. */
-  if (total > 0 && met === 0) return { pct: FIT_UNREAD, unread: true, met, total, unknown, fails: [] };
+     ⚠️ `total === 0` 은 위에서 이미 걸러졌고, 하나라도 맞힌 공고는 그대로 지나간다.
+     🔴 **자격 줄**에서 하나는 맞혀야 한다(metMain) — 제외 조항 통과(`사이버대 제외` 에 걸리지 않음)만으로는 '모른다'를 벗어나지 않는다.
+        안 그러면 자격 줄 넷을 하나도 못 읽은 공고가 「20%」로 뜬다 — 가짜 숫자다(2026-11-02 · 산청양수·고창군장학재단 실측). */
+  if (total > 0 && metMain === 0) return { pct: FIT_UNREAD, unread: true, met, total, unknown, fails: [] };
   const pct = total ? Math.round((met / total) * 100) : FIT_UNREAD;
   return { pct: Math.min(FIT_MAX, Math.max(FIT_FLOOR, pct)), unread: false, met, total, unknown, fails: [] };
 }
@@ -1323,9 +1333,13 @@ function tidyRequirement(line) {
    🔴 버리면 안 된다 — 그 줄에 진짜 요건이 들어 있다. **다음 줄과 이어 붙인다.** */
 const CONTINUES = /(또는|및|이고|이며|하여|중)\s*$|\s인\s*$|[,·+]\s*$/;
 /* 참고 줄 — `1학년 재학생은 성적 기준을 적용하지 않음` 처럼 요건을 **푸는** 말(2026-10-15 · 123줄 진단 ⑧). 요건이 아니라 옅게 보이고 분모에서 뺀다(aside) */
-const NOTE_LINE = /(?:기준|요건|조건)(?:을|은|는|이)?\s*(?:적용하지\s*않|적용\s*안\s*함|미적용|면제)|(?:학점|성적)\s*(?:기준\s*)?제한\s*없/;   // `마지막 학기 등록자는 이수학점 제한 없음` 도 참고다(2026-10-15 · 3학년에게 ✕ 가 떴다)
+const NOTE_LINE = /(?:기준|요건|조건)(?:을|은|는|이)?\s*(?:적용하지\s*않|적용\s*안\s*함|적용\s*제외|미적용|면제|없음)|(?:학점|성적)\s*(?:기준\s*)?제한\s*없|성적\s?(?:기준\s?)?무관|성적이?\s*반영됨/;   // `마지막 학기 등록자는 이수학점 제한 없음` 도 참고다(2026-10-15 · 3학년에게 ✕ 가 떴다) · `성적기준 없음`·`성적무관`·`유급 전 성적이 반영됨` 도(2026-11-02)
 /* 참고인가는 **괄호 밖**으로 본다 — `평점평균 2.0 이상인 자 (단, 신입생·편입생 성적제한 없음)` 은 요건이고 괄호는 면제 부연이다 */
-const isNoteLine = (t) => NOTE_LINE.test(String(t || '').replace(/[(（][^()（）]*[)）]/g, ' '));
+/* 척도 줄(`4.5만점 기준`·`4.5만점 기준으로 환산 적용`)도 참고다 — 단 문턱(이상·이하…)이 같은 줄에 있으면 요건이다(`4.5만점 기준 3.0 이상` · 2026-11-02) */
+/* ※ 꼬리도 괄호처럼 곁말이다 — `… 9구간 이하를 모두 충족하는 자 ※ 신·편입생은 성적무관` 은 요건이고 ※ 뒤는 면제 부연이다(요건을 통째로 참고로 만들면 그 공고가 '자격 미확인'이 된다 · 2026-11-02 실측).
+   줄이 ※ 로 시작하면(`※ 유급한 학생의 경우 …`) 그 줄 자체가 부연이라 그대로 본다 */
+/* 문턱(이상·이하…)이 남아 있으면 참고가 아니라 요건이다 — `성적 무관, 2학년 이상 재학생` 의 학년 요건을 통째로 떨어뜨리지 않는다(리뷰) */
+const isNoteLine = (t) => { const s = String(t || '').replace(/[(（][^()（）]*[)）]/g, ' ').replace(/^(.{4,}?)\s*※[\s\S]*$/, '$1'); return !/이상|이하|미만|초과|넘/.test(s) && (NOTE_LINE.test(s) || /만점\s*기준/.test(s)); };
 /* 토씨로 끝난 줄(`… 주민등록 주소지를`)은 **뒷줄이 조각일 때만** 잇는다 (2026-10-15 · 리뷰) — 아무 뒷줄이나 이으면 표 머리
    (`드림 장학금 | 학업 ㅣ. …`)가 자격 줄에 붙었다. `학과`·`문의` 의 끝 글자는 토씨가 아니다 */
 const PARTICLE_END = /[가-힣](?:을|를|에|(?<!문)의|와|(?<!학)과|에서|으로|로서)\s*$/;
