@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-11-02",
- "count": 1561,
+ "count": 1568,
  "items": [
   {
    "title": "[글로벌][교내] 2026-2학기 글로벌캠퍼스 HUFS Dream 장학금 신청 안내 (11",
@@ -94,6 +94,15 @@
    ],
    "deadlineHint": null,
    "school": "강원대학교",
+   "campus": "",
+   "foundAt": "2026-11-02"
+  },
+  {
+   "title": "학자금 중복지원, 미리 확인하고 예방하세요!",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-%ED%95%99%EC%9E%90%EA%B8%88%20%EC%A4%91%EB%B3%B5%EC%A7%80%EC%9B%90%2C%20%EB%AF%B8%EB%A6%AC%20%ED%99%95%EC%9D%B8%ED%95%98%EA%B3%A0%20%EC%98%88%EB%B0%A9%ED%95%98%EC%84%B8%EC%9A%94!",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "중앙대학교",
    "campus": "",
    "foundAt": "2026-11-02"
   },
@@ -266,8 +275,26 @@
    "foundAt": "2026-11-02"
   },
   {
+   "title": "[교외-마감]2027학년도 해동과학문화재단 해동장학생 모집 안내(학교지원)",
+   "url": "https://www.korea.ac.kr/ko/568/subview.do?article.offset=10#n-%5B%EA%B5%90%EC%99%B8-%EB%A7%88%EA%B0%90%5D2027%ED%95%99%EB%85%84%EB%8F%84%20%ED%95%B4%EB%8F%99%EA%B3%BC%ED%95%99%EB%AC%B8%ED%99%94%EC%9E%AC%EB%8B%A8%20%ED%95%B4%EB%8F%99%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4(%ED%95%99%EA%B5%90%EC%A7%80%EC%9B%90",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "고려대학교",
+   "campus": "",
+   "foundAt": "2026-11-02"
+  },
+  {
    "title": "[교외-마감]2027학년도 한국지도자육성장학재단 신규장학생 선발 안내(학교지원)",
    "url": "https://www.korea.ac.kr/ko/568/subview.do#n-%5B%EA%B5%90%EC%99%B8-%EB%A7%88%EA%B0%90%5D2027%ED%95%99%EB%85%84%EB%8F%84%20%ED%95%9C%EA%B5%AD%EC%A7%80%EB%8F%84%EC%9E%90%EC%9C%A1%EC%84%B1%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%8B%A0%EA%B7%9C%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4(%ED%95%99",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "고려대학교",
+   "campus": "",
+   "foundAt": "2026-11-02"
+  },
+  {
+   "title": "[교외-마감]2027학년도 해동과학문화재단 해동장학생 모집 안내(학교지원)",
+   "url": "https://www.korea.ac.kr/ko/568/subview.do#n-%5B%EA%B5%90%EC%99%B8-%EB%A7%88%EA%B0%90%5D2027%ED%95%99%EB%85%84%EB%8F%84%20%ED%95%B4%EB%8F%99%EA%B3%BC%ED%95%99%EB%AC%B8%ED%99%94%EC%9E%AC%EB%8B%A8%20%ED%95%B4%EB%8F%99%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4(%ED%95%99%EA%B5%90%EC%A7%80%EC%9B%90",
    "attachments": [],
    "deadlineHint": null,
    "school": "고려대학교",
@@ -317,6 +344,84 @@
    "foundAt": "2026-11-02",
    "bodyDeadline": "2026-11-06",
    "bodyDeadlineText": "가 . 접수기간 : 2026 년 11 월 3 일 ( 화 ) ~ 6 일 ( 금 ) 17 시까지"
+  },
+  {
+   "title": "(홍보) 대산농촌재단 2027년도 장학생 선발 안내(~11/11(수)까지)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=5233&bidx=896321&qidx=5233&cate=0&allboard=true&nowpage=2",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "[붙임2] 2027 대산장학생 선발요강.pdf",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=D8AE50AB6B284AE4B891AD89B83B87D8_.pdf&ogrfname=%5B%EB%B6%99%EC%9E%842%5D+2027+%EB%8C%80%EC%82%B0%EC%9E%A5%ED%95%99%EC%83%9D+%EC%84%A0%EB%B0%9C%EC%9A%94%EA%B0%95.pdf"
+    },
+    {
+     "name": "[붙임2] 2027 대산장학생 선발요강.pdf",
+     "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=5233&bidx=896321&qidx=5233&cate=0&allboard=true&nowpage=2#n-%5B%EB%B6%99%EC%9E%842%5D%202027%20%EB%8C%80%EC%82%B0%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%EC%9A%94%EA%B0%95.pdf"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-11-02"
+  },
+  {
+   "title": "(홍보) 통영시 저소득 대학생 장학금 지원대상자 선발 안내(~11/23(월)까지)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=897345&qidx=5233&cate=0&allboard=true&nowpage=1",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/SNUST1646291479781.hwp"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 02. 04.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/FB58C3E034FC42C989BB59606A9046A7.hwp"
+    },
+    {
+     "name": "2026년 통영시 저소득 대학생 장학금 지원대상자 선발 공고.hwpx",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=0475B80339E144ADBBAAFC8FDB3DFF37_.hwpx&ogrfname=2026%EB%85%84+%ED%86%B5%EC%98%81%EC%8B%9C+%EC%A0%80%EC%86%8C%EB%93%9D+%EB%8C%80%ED%95%99%EC%83%9D+%EC%9E%A5%ED%95%99%EA%B8%88+%EC%A7%80%EC%9B%90%EB%8C%80%EC%83%81%EC%9E%90+%EC%84%A0%EB%B0%9C+%EA%B3%B5%EA%B3%A0.hwpx"
+    },
+    {
+     "name": "2026년 통영시 저소득 대학생 장학금 지원대상자 선발 공고.hwpx",
+     "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=897345&qidx=5233&cate=0&allboard=true&nowpage=1#n-2026%EB%85%84%20%ED%86%B5%EC%98%81%EC%8B%9C%20%EC%A0%80%EC%86%8C%EB%93%9D%20%EB%8C%80%ED%95%99%EC%83%9D%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%A7%80%EC%9B%90%EB%8C%80%EC%83%81%EC%9E%90%20%EC%84%A0%EB%B0%9C%20%EA%B3%B5%EA%B3%A0.hwpx"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-11-02"
+  },
+  {
+   "title": "[한국장학재단] 학자금 중복지원 방지 사업 홍보",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=769901&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "",
+   "foundAt": "2026-11-02"
+  },
+  {
+   "title": "[한국장학재단] 청년지원정보 통합제공 플랫폼 '통학로' 홍보",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=769902&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "",
+   "foundAt": "2026-11-02"
   },
   {
    "title": "[학부] 2027년도 두산연강재단 장학생 선발 안내",
