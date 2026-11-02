@@ -1,7 +1,48 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-11-01",
+ "updatedAt": "2026-11-02",
  "items": [
+  {
+   "title": "[학사안내] 2026학년도 동계 계절학기 수강신청 재안내",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70869",
+   "postedAt": "2026-11-02",
+   "kind": "학사",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-02"
+  },
+  {
+   "title": "[대학생활] [독립기념관] 2026년 제13회 독립기념관 전시콘퍼런스 개최...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70868",
+   "postedAt": "2026-11-02",
+   "kind": "행사",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/88f24b8f49bfac9f.webp"
+  },
+  {
+   "title": "[모집공고] [부천여성청소년재단] 산울림 청소년활동가 미리보기 수료 과정 ...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70867",
+   "postedAt": "2026-11-02",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/c21ccef89cc71a20.webp"
+  },
+  {
+   "title": "[모집공고] [시립청소년문화교류센터] 2027 시드니 글로벌 인재양성 프로...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70866",
+   "postedAt": "2026-11-02",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/2e3cffe21664a12e.webp"
+  },
   {
    "title": "[취업정보] [재학생ㆍ졸업생] 2026학년도 취업성공스토리(취업성공수기)...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70853",
@@ -361,45 +402,6 @@
    "src": "b7347301",
    "foundAt": "2026-10-26",
    "thumb": "data/news/img/8791368776247ff4.webp"
-  },
-  {
-   "title": "[대학생활] [국토교통부] 2026년 제9회 찾아가는 청년주거 상담소 안내",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70799",
-   "postedAt": "2026-10-26",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/f679a6a4e702d523.webp"
-  },
-  {
-   "title": "[취업정보] [산림조합중앙회]2026년도 산림조합중앙회 임용전형 (~10....",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70798",
-   "postedAt": "2026-10-26",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-26"
-  },
-  {
-   "title": "[취업정보] [CR홀딩스/조선내화]2026년도 신입/경력 공개채용★학교 추...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70797",
-   "postedAt": "2026-10-26",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-26"
-  },
-  {
-   "title": "[모집공고] 경사원(공인회계사 및 세무사) 입실고사 및 입실 일정 안내",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70796",
-   "postedAt": "2026-10-26",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-26"
   }
  ]
 }

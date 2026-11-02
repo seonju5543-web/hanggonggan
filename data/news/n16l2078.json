@@ -1,7 +1,28 @@
 {
  "school": "충북대학교",
- "updatedAt": "2026-11-01",
+ "updatedAt": "2026-11-02",
  "items": [
+  {
+   "title": "2027년도 제16회 변호사시험 시험관리원 선발 안내",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171106&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-11-02",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-11-02",
+   "desc": "법무부에서 2027년도 제16회 변호사시험에서 시험관리원으로 근무할 우리 대학 학부생을 선발합니다."
+  },
+  {
+   "title": "2026학년도 동기 계절수업 다른 대학교 수학 안내(강원대_강릉원주)",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171098&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-11-02",
+   "kind": "학사",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-11-02",
+   "desc": "국내 대학간 학술교류 협정에 따라 2026학년도 동기 계절수업 강원대 학점 교류 수학에 대하여 다음과 같이 안내하오니 수학을 희망하는 학생들은 기한 내 신청하여 주시기 바랍니다."
+  },
   {
    "title": "[인문학연구소] 지금 함께 여는 인문학 강연 개최",
    "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171065&pageUnit=10&searchCnd=all&pageIndex=1",
@@ -414,28 +435,6 @@
    "src": "76d254e7",
    "foundAt": "2026-10-15",
    "desc": "1. 모집인원 및 근무기간<총2명> <근무유형A> 1명: 2026. 11. 2.(월) ~ 12. 11.(금) <근무유형B> 1명: 2026. 11. 9.(월) ~ 12. 11.(금)"
-  },
-  {
-   "title": "법학연구소 보조연구원 공개경쟁채용시험 공고",
-   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170710&pageUnit=10&searchCnd=all&pageIndex=1",
-   "postedAt": "2026-10-15",
-   "kind": "채용",
-   "school": "충북대학교",
-   "campus": "",
-   "src": "76d254e7",
-   "foundAt": "2026-10-15",
-   "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
-  },
-  {
-   "title": "(2026-7차)국제교류본부 대학회계 공무직(전문요원,자체) 공개경쟁채용시험 서류심사 합격자 및 면접심사 일정 공고",
-   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170679&pageUnit=10&searchCnd=all&pageIndex=1",
-   "postedAt": "2026-10-14",
-   "kind": "채용",
-   "school": "충북대학교",
-   "campus": "",
-   "src": "76d254e7",
-   "foundAt": "2026-10-14",
-   "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
   }
  ]
 }

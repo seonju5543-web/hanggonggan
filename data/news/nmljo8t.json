@@ -1,7 +1,17 @@
 {
  "school": "숭실대학교",
- "updatedAt": "2026-11-01",
+ "updatedAt": "2026-11-02",
  "items": [
+  {
+   "title": "외국인유학생 법무부 외국인 유학생 불법 취업 단속 강화 안내",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EB%B2%95%EB%AC%B4%EB%B6%80-%EC%99%B8%EA%B5%AD%EC%9D%B8-%EC%9C%A0%ED%95%99%EC%83%9D-%EB%B6%88%EB%B2%95-%EC%B7%A8%EC%97%85-%EB%8B%A8%EC%86%8D-%EA%B0%95%ED%99%94-%EC%95%88%EB%82%B4&keyword",
+   "postedAt": "2026-11-02",
+   "school": "숭실대학교",
+   "campus": "",
+   "src": "3b348584",
+   "foundAt": "2026-11-02",
+   "desc": "법무부의 외국인 유학생 불법 취업 단속 강화와 관련하여 아래와 같이 안내하오니, 외국인 유학생 여러분께서는 관련 내용을 반드시 숙지하시고 불법 취업으로 인한 불이익이 발생하지 않도록 각별히 주의하여 주시기 바랍니다."
+  },
   {
    "title": "외국인유학생 [채용] 2026-2학기 국제처 국제팀 학부 외국인 유학생 담당 조교(교육연구조교) 모집",
    "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026-2%ED%95%99%EA%B8%B0-%EA%B5%AD%EC%A0%9C%EC%B2%98-%EA%B5%AD%EC%A0%9C%ED%8C%80-%ED%95%99%EB%B6%80-%EC%99%B8%EA%B5%AD%EC%9D%B8-%EC%9C%A0%ED%95%99%EC%83%9D-%EB%8B%B4%EB%8B%B9-%EC%A1%B0%EA%B5%90-2&keyword",
@@ -415,16 +425,6 @@
    "thumb": "data/news/img/ccd2695f1628fd12.webp",
    "desc": "2026학년도 2학기 학부 중간 강의평가 를 다음과 같이 실시하니 학부 재학생 여러분의 많은 관심과 적극적인 참여를 바랍니다.",
    "src": "3b348584"
-  },
-  {
-   "title": "채용 [교수학습혁신센터] 2026학년도 2학기 XR 콘텐츠 활용 실감형 수업 운영 보조인력 모집",
-   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EA%B5%90%EC%88%98%ED%95%99%EC%8A%B5%ED%98%81%EC%8B%A0%EC%84%BC%ED%84%B0-2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-xr-%EC%BD%98%ED%85%90%EC%B8%A0-%ED%99%9C%EC%9A%A9-%EC%8B%A4%EA%B0%90&keyword",
-   "postedAt": "2026-10-02",
-   "kind": "채용",
-   "school": "숭실대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "thumb": "data/news/img/74b3734df20116d4.webp"
   }
  ]
 }
