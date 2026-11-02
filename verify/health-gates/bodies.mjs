@@ -552,6 +552,45 @@ globalThis.fetch = async (url) => {
       sb3.done();
     }
   }
+  /* ── ③-b 표적 양식 받기(deepfetch --forms-only)가 등록 공고의 공고문류를 자격 색인에도 올린다 (2026-11-02) ──
+     그 전엔 form-* 와 forms-index.txt 에만 남아 발췌기 qualFromDocs(elig 색인만 읽는다)가 영영 못 봤다 — 10-30·10-31 표적 재수집이 헛돈 이유.
+     되돌리면 색인이 비어 빨간불 */
+  {
+    const FAKE = `import fs from 'node:fs';
+globalThis.fetch = async (url) => {
+  url = String(url);
+  if (process.env.FAKE_FETCH_LOG) fs.appendFileSync(process.env.FAKE_FETCH_LOG, url + '\\n');
+  const body = Buffer.from(('fake ' + url + ' ').repeat(60));
+  return { ok: true, status: 200, headers: new Map(), arrayBuffer: async () => body.buffer.slice(body.byteOffset, body.byteOffset + body.length) };
+};
+`;
+    const today = kstToday();
+    const sb = sandbox(root, 'hdj-formselig-');
+    try {
+      sb.write('fake-fetch.mjs', FAKE);
+      sb.write('collector/run-deepfetch.txt', 'targets: 표적 장학생 선발\n');
+      sb.write('data/notices.json', { items: [
+        { title: '2026 표적 장학생 선발 안내', url: 'https://s.example/view?no=1', attachments: [
+          { name: '2026 표적 장학생 선발 공고문.hwp', url: 'https://f.example/t1.hwp' }, { name: '표적 장학생 신청서.hwp', url: 'https://f.example/t1-form.hwp' }] },
+        { title: '2026 표적 장학생 선발 안내(미등록)', url: 'https://s.example/view?no=2', attachments: [{ name: '선발 공고문.pdf', url: 'https://f.example/t2.pdf' }] },
+      ] });
+      sb.write('data/registered.json', { items: [{ id: 'T', name: '표적 장학생 선발', sourceUrl: 'https://s.example/view?no=1', listedAt: today }] });
+      sb.write('fetch.log', '');
+      const r = sb.run('collector/deepfetch.mjs', ['--forms-only'], { FAKE_FETCH_LOG: sb.abs('fetch.log') }, 25000, ['--import', sb.abs('fake-fetch.mjs')]);
+      const idx = sb.json('collector/extracted/elig-docs.json') || {};
+      const forms = (sb.read('collector/extracted/forms-index.txt') || '').split('\n').filter(Boolean).length;
+      const f = idx.T && idx.T.files;
+      eq('③-b 표적 양식 받기 — 등록 공고의 공고문(hwp)만 자격 색인에 오른다(elig-<표식>-1.hwp · 시도한 날) · 신청서는 안 오른다 · 미등록 공고는 색인에 없다 · 양식 색인엔 셋 다',
+        [r.status, forms, Array.isArray(f) && f.length === 1 && /^elig-[a-z0-9]{1,6}-1\.hwp$/.test(f[0]), idx.T && idx.T.at, Object.keys(idx), !!f && sb.exists(`collector/extracted/${f[0]}`)],
+        [0, 3, true, today, ['T'], true]);
+      /* 같은 바이트로 다시 받으면 파생 글자를 지우지 않는다(keepEligDoc 공용) */
+      if (f) sb.write(`collector/extracted/${f[0]}.body.txt`, '지난 실행이 뽑아 둔 본문 글자');
+      const r2 = sb.run('collector/deepfetch.mjs', ['--forms-only'], { FAKE_FETCH_LOG: sb.abs('fetch.log') }, 25000, ['--import', sb.abs('fake-fetch.mjs')]);
+      eq('  같은 바이트로 다시 받으면 파생 글자(.body.txt)는 남는다 · 색인도 같은 파일 하나', [r2.status, !!f && sb.exists(`collector/extracted/${f[0]}.body.txt`), (sb.json('collector/extracted/elig-docs.json') || {}).T?.files], [0, true, f]);
+    } finally {
+      sb.done();
+    }
+  }
   /* ── ④ 원문 보충(deepfetch --fill) — 껍데기도 세어 물러서고, 받기 전체에 예산 (B8 · bodies-12 ①) ── */
   {
     eq('④ 물러서기 — 받기 실패 3번 또는 껍데기 3번 · 껍데기 2번은 아직',

@@ -265,6 +265,25 @@ function errWhy(e) { return [e && e.name, e && e.message, e && e.cause && (e.cau
    fetch 가 TypeError 로 넘어지고 색인에 files: [] 만 남았다(서울과기대 희망사다리Ⅰ 자체선발기준 · 2026-11-02). 모르는 꼴이면 null — 건너뛴다 */
 function fetchUrlOf(a, pageUrl) { return /^javascript:/i.test(a.url || '') ? resolveJsDownload(a.url, pageUrl) : a.url; }
 
+/* 자격용 첨부 저장 **한 곳** — 🔴 받은 바이트가 지금 파일과 같으면 파생 글자(.txt·.body.txt·.ocr.txt)를 지우지 않는다(점검 bodies-5) · 다르면 그 파일의 파생만 지운다.
+   자격용 받기(downloadEligDocs)와 표적 양식 받기(downloadForms · 2026-11-02)가 같이 쓴다 — 두 벌이면 한쪽만 고쳐져 갈라진다 */
+function keepEligDoc(fname, data, oldNames) {
+  const target = new URL(fname, OUT);
+  const same = fs.existsSync(target) && fs.readFileSync(target).equals(data);
+  if (!same) {
+    for (const d of oldNames) if (d.startsWith(`${fname}.`)) fs.rmSync(new URL(d, OUT), { force: true });
+    fs.writeFileSync(target, data);
+  }
+  return same;
+}
+/* 자격 색인 한 줄 — 이번에 안 받은 옛 파일(번호가 줄었거나 확장자가 바뀐 것)과 그 파생 글자는 지우고 · 같은 표식을 쓰던 다른 공고의 색인은 뺀다(파일이 갈렸다) */
+function settleEligIndex(index, id, slug, files, oldNames, today) {
+  for (const f of oldNames) if (!files.some((x) => f === x || f.startsWith(`${x}.`))) fs.rmSync(new URL(f, OUT), { force: true });
+  for (const k of Object.keys(index)) if (k !== id && index[k].slug === slug) delete index[k];
+  index[id] = { ...(index[id] || {}), slug, files, at: today };
+}
+function kstToday() { return new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10); }   // 마감은 한국 날짜다 (점검 bodies-3) · 🔴 function — 위쪽 경로가 먼저 부른다(TDZ)
+
 async function downloadForms() {
   /* 표적은 '제목 앞부분'이라 짧으면 엉뚱한 공고까지 몽땅 걸린다.
      실제로 대기 큐가 제목을 12자로 잘라 넣는 바람에 "2026학년도 2학기 " 같은 조각이
@@ -300,14 +319,32 @@ async function downloadForms() {
     indexLines = fs.readFileSync(indexPath, 'utf8').split('\n').filter(Boolean)
       .filter((line) => { const m = line.split('\t')[0].match(/^form-([a-z0-9]{1,6})-/); return m && !refreshing.has(m[1]); });
   } catch { /* 첫 실행 */ }
+  /* 🔴 표적으로 받은 **공고문류**는 자격 색인(elig-docs.json)에도 올린다 (2026-11-02). 그 전엔 form-* 파일과 forms-index.txt 에만 남아 발췌기
+     qualFromDocs(elig 색인만 읽는다)가 영영 못 봤다 — 10-30·10-31 에 자격 확보 목적으로 건 재수집(인석·선원가족·계양구·푸른등대)이 헛돈 이유.
+     등록 공고(원문 주소 같음)만 · 신청서·동의서·체크리스트는 안 올린다(isNoticeDoc 한 곳) · 파일 이름(elig-<등록 이름 표식>-n)·갈아끼우기·색인은
+     자격용 받기(downloadEligDocs)와 같은 규칙(keepEligDoc·settleEligIndex) — 그래야 pdf-text·OCR(elig-* 는 글자층이 있어도 읽는다)·발췌기가 똑같이 본다 */
+  let registered = { items: [] };
+  try { registered = JSON.parse(fs.readFileSync(new URL('../data/registered.json', HERE), 'utf8')); } catch { /* 없어도 진행 */ }
+  const regByUrl = new Map(registered.items.filter((it) => it.sourceUrl && !it.program).map((it) => [canonUrl(it.sourceUrl), it]));
+  const eligIdxPath = new URL('elig-docs.json', OUT);
+  let eligIndex = {};
+  try { eligIndex = JSON.parse(fs.readFileSync(eligIdxPath, 'utf8')); } catch { /* 아직 없음 */ }
+  const today = kstToday();
+  let eligDirty = false;
   let fi = 0;
   for (const n of capped) {
     if (Date.now() - startedAt > BUDGET_MS) { console.log('첨부 수집 시간 상한 도달 — 나머지는 다음 실행이 받는다'); break; }
     const slug = slugOf(n.title);
     let ai = 0;
+    const it = regByUrl.get(canonUrl(n.url));
+    const eslug = it ? slugOf(it.name) : '';
+    const eligOld = it ? fs.readdirSync(OUT).filter((f) => f.startsWith(`elig-${eslug}-`)) : [];
+    const eligFiles = [];
+    let ei = 0;
+    let cut = false;
     for (const a of n.attachments || []) {
       if (/부속기관|부설/.test(a.name)) continue; // 사이트 공통 링크 제외
-      if (Date.now() - startedAt > BUDGET_MS) break;
+      if (Date.now() - startedAt > BUDGET_MS) { cut = true; break; }
       try {
         const url = fetchUrlOf(a, n.url);
         if (!url) { console.log('attach skip (스크립트 주소를 못 풀었음):', a.name); continue; }
@@ -324,10 +361,27 @@ async function downloadForms() {
         fs.writeFileSync(new URL(fname, OUT), buf);
         indexLines.push(`${fname}\t${n.title}\t${a.name}\t${buf.length}`);
         console.log('attach ok:', a.name, buf.length);
+        /* 등록 공고의 공고문류 → 자격 색인 사본 (위 머리말) · zip 은 안의 공고문류만(zipNoticeDocs 한 곳 · 없으면 안 올린다) */
+        if (it && /\.(hwp|hwpx|docx?|pdf|zip)$/i.test(a.name) && isNoticeDoc(a.name)) {
+          const inner = /^zip$/i.test(ext) ? zipNoticeDocs(buf) : null;
+          if (!inner || inner.length) {
+            ei += 1;
+            const put = (f, data) => { keepEligDoc(f, data, eligOld); eligFiles.push(f); };
+            if (inner) inner.forEach((d, k) => put(`elig-${eslug}-${ei}-${k + 1}.${d.ext}`, d.buf));
+            else put(`elig-${eslug}-${ei}.${ext.toLowerCase()}`, buf);
+          }
+        }
       } catch (e) { console.log('attach err', a.name, errWhy(e)); }
+    }
+    /* 예산에 잘린 공고는 색인을 안 건드린다(옛 파일·파생을 미리 지우지 않는다 — downloadEligDocs 와 같은 방침) */
+    if (eligFiles.length && !cut) {
+      settleEligIndex(eligIndex, it.id, eslug, eligFiles, eligOld, today);
+      eligDirty = true;
+      console.log('elig index ok (표적 양식 → 자격 색인):', it.id, eligFiles.join(' '));
     }
   }
   fs.writeFileSync(indexPath, indexLines.join('\n') + (indexLines.length ? '\n' : ''));
+  if (eligDirty) fs.writeFileSync(eligIdxPath, JSON.stringify(eligIndex, null, 1));
   return fi;
 }
 
@@ -373,7 +427,7 @@ async function downloadEligDocs() {
   /* '학생 화면에 아직 있나'는 자격요건 로봇과 같은 판정 한 곳(rescue-plan.mjs closedForStudents — 마감(한국 날짜) 전 · notStale) — 2026-10-05 병합 때
      여기 따로 적혀 있던 같은 식을 이것으로 바꿨다(둘이 갈라지면 한 로봇은 받고 다른 로봇은 안 여는 공고가 생긴다) */
   const { closedForStudents } = await import('./rescue-plan.mjs');
-  const today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);   // 마감은 한국 날짜다 (점검 bodies-3)
+  const today = kstToday();
   const idxPath = new URL('elig-docs.json', OUT);
   let index = {};
   try { index = JSON.parse(fs.readFileSync(idxPath, 'utf8')); } catch { /* 첫 실행 */ }
@@ -435,12 +489,7 @@ async function downloadEligDocs() {
         ai += 1; got += 1;
         /* 저장 한 곳 — 🔴 받은 바이트가 지금 파일과 같으면 파생 글자(.txt·.body.txt·.ocr.txt)를 지우지 않는다(bodies-5) · 다르면 그 파일의 파생만 지운다 */
         const keep = (fname, data, label) => {
-          const target = new URL(fname, OUT);
-          const same = fs.existsSync(target) && fs.readFileSync(target).equals(data);
-          if (!same) {
-            for (const d of oldNames) if (d.startsWith(`${fname}.`)) fs.rmSync(new URL(d, OUT), { force: true });
-            fs.writeFileSync(target, data);
-          }
+          const same = keepEligDoc(fname, data, oldNames);   // 저장 한 곳(표적 양식 받기와 공용)
           files.push(fname);
           console.log('elig doc ok:', it.id, label, data.length, same ? '(그대로)' : '');
         };
@@ -454,9 +503,7 @@ async function downloadEligDocs() {
     }
     if (files.length && !cut) {
       /* 이번에 안 받은 옛 파일(번호가 줄었거나 확장자가 바뀐 것)과 그 파생 글자는 지운다 · 같은 표식을 쓰던 다른 공고의 색인은 뺀다(파일이 갈렸다) */
-      for (const f of oldNames) if (!files.some((x) => f === x || f.startsWith(`${x}.`))) fs.rmSync(new URL(f, OUT), { force: true });
-      for (const k of Object.keys(index)) if (k !== it.id && index[k].slug === slug) delete index[k];
-      index[it.id] = { ...index[it.id], slug, files };
+      settleEligIndex(index, it.id, slug, files, oldNames, today);   // 색인 한 곳(표적 양식 받기와 공용)
     } else if (files.length) {
       /* 예산에 잘려 일부만 받았다 — 아직 다시 못 받은 옛 파일은 지우지 않고 색인에도 남긴다(다음 차례에 마저 갈아끼운다) */
       const old = (index[it.id].files || []).filter((f) => !files.includes(f) && fs.existsSync(new URL(f, OUT)));
