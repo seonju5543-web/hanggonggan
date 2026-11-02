@@ -5347,8 +5347,11 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
     eq('단추 글자 「다운로드」 + downloadBbsFile.do → 앞 요소의 파일 이름이 첨부 이름 · 「미리보기」 링크는 첨부가 아니다',
       AL.detailAttachments('<span class="text">2026년 2학기 선원가족장학사업 선발 모집 요강（변경）.hwp</span> <a href="./downloadBbsFile.do?atchmnflNo=989598" class="download"><span>다운로드</span></a> <a href="./previewBbsFile.do?atchmnflNo=989598" target="_blank">미리보기</a>', kgu),
       [{ name: '2026년 2학기 선원가족장학사업 선발 모집 요강（변경）.hwp', url: 'https://www.kyonggi.ac.kr/www/downloadBbsFile.do?atchmnflNo=989598' }]);
-    eq('  앞에 파일 이름이 없으면 지어내지 않는다(단추 글자 그대로 → 이름이 짧아 첨부가 안 된다)',
-      AL.detailAttachments('<a href="./downloadBbsFile.do?atchmnflNo=1">다운로드</a>', kgu), []);
+    eq('  앞에 파일 이름이 없으면 지어내지 않는다(단추 글자 그대로 → 첨부가 안 된다) · 이웃 행의 이름을 훔치지 않는다(앞 줄이 jpg 면 그 단추는 버린다) · 메뉴 링크(/downloads/)는 첨부가 아니다',
+      [AL.detailAttachments('<a href="./downloadBbsFile.do?atchmnflNo=1">다운로드</a>', kgu),
+        AL.detailAttachments('<span>A요강.hwp</span><a href="./downloadBbsFile.do?atchmnflNo=1">다운로드</a> <a href="./previewBbsFile.do?atchmnflNo=1">미리보기</a> <span>포스터.jpg</span><a href="./downloadBbsFile.do?atchmnflNo=2">다운로드</a>', kgu).map((a) => `${a.name}|${a.url.slice(-12)}`),
+        AL.detailAttachments('<a href="/ko/downloads/">양식 다운로드</a>', kgu)],
+      [[], ['A요강.hwp|atchmnflNo=1'], []]);
     /* 🔴 본문이 그림 한 장인 게시판 (2026-11-02 · 홍익대 성취장학·선원가족: `<div class="b-content-box"><img src="/cms/plugin/editorImage.do?$cms$…" data-width="1080" data-height="1920">` —
        헤드리스 브라우저는 봇 차단에 걸려 그림을 못 적고 일반 fetch 물러서기는 글자만 받아 자격이 영영 비었다). 되돌리면 함수가 없다 */
     const hongik = 'https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158449&noCat=501';
@@ -5356,9 +5359,10 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
       (AL.htmlBodyImages || (() => undefined))('<img src="/_res/img-logo.svg"><p><img src="/cms/plugin/editorImage.do?$cms$AbC " data-width="1080" data-height="1920"></p><img src="/x.png" width="200" height="200"><img src="data:image/png;base64,AAAA" width="900" height="900">', hongik),
       [{ name: '본문이미지-1080x1920.jpg', url: 'https://www.hongik.ac.kr/cms/plugin/editorImage.do?$cms$AbC', bodyImage: true }]);
     const rb2 = readText(new URL('../collector/rescue-bodies.mjs', import.meta.url));
-    eq('  재수집 로봇: 물러선 HTML 의 그림을 적고(htmlBodyImages) 첨부 적기(newAttachments)는 그 **뒤**에 · 브라우저 링크도 단추 글자면 앞 요소 이름',
-      [rb2.indexOf('r.found.push(...htmlBodyImages(html, openUrl))') > 0 && rb2.indexOf('r.found.push(...htmlBodyImages(html, openUrl))') < rb2.indexOf('const add = newAttachments(t.it.attachments, r.found)'),
-        /previousElementSibling/.test(rb2)], [true, true]);
+    eq('  재수집 로봇: 물러선 HTML 의 첨부 링크·그림을 적고(detailAttachments·htmlBodyImages) 첨부 적기(newAttachments)는 그 **뒤**에 · 브라우저 링크도 단추 글자(BUTTON_WORD)면 앞 요소 이름',
+      [rb2.indexOf('r.found.push(...detailAttachments(html, openUrl), ...htmlBodyImages(html, openUrl))') > 0
+        && rb2.indexOf('r.found.push(...detailAttachments(html, openUrl)') < rb2.indexOf('const add = newAttachments(t.it.attachments, r.found)'),
+        /previousElementSibling/.test(rb2) && /BUTTON_WORD\.source\)/.test(rb2)], [true, true]);
     /* 🔴 등록 당시 `javascript:` 로 적힌 첨부는 받을 때 푼다 (2026-11-02 · 서울과기대 희망사다리Ⅰ 자체선발기준: 규칙(10-16)보다 먼저 등록(10-12)돼 11-01 자격용 받기가 TypeError → files: []) */
     const df2 = readText(new URL('../collector/deepfetch.mjs', import.meta.url));
     eq('  deepfetch 의 두 내려받기(양식·자격용)가 fetchUrlOf 로 스크립트 주소를 풀고 · 오류는 두 경로 모두 cause 까지 적는다(errWhy)',

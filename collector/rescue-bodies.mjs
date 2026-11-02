@@ -26,7 +26,7 @@
    ============================================================ */
 import fs from 'node:fs';
 import { htmlToLines } from './html-text.mjs';
-import { htmlBodyImages } from './attachment-link.mjs';
+import { htmlBodyImages, detailAttachments, BUTTON_WORD } from './attachment-link.mjs';
 import { chromium } from 'playwright';
 import { createRequire } from 'node:module';
 import { indexTexts, hasText, canonUrl, MIN_BODY, sourceFor } from './notice-source.mjs';
@@ -263,12 +263,12 @@ for (const t of targets) {
       const found = [];
       try {
         for (const f of page.frames()) {
-          const links = await f.$$eval('a[href]', (as) => as.map((a) => {
+          const links = await f.$$eval('a[href]', (as, button) => as.map((a) => {
             let name = (a.textContent || '').replace(/\s+/g, ' ').trim();
-            /* 단추 글자뿐이면(`다운로드`) 파일 이름은 바로 앞 요소에 있다 — 경기대·충북대 selectBbsNttView 게시판(2026-11-02 · HTML 길 detailAttachments 와 같은 규칙) */
-            if (/^(?:다운로드|내려받기|download)$/i.test(name) && a.previousElementSibling) name = (a.previousElementSibling.textContent || '').replace(/\s+/g, ' ').trim();
+            /* 단추 글자뿐이면(`다운로드`) 파일 이름은 바로 앞 요소에 있다 — 경기대·충북대 selectBbsNttView 게시판(2026-11-02 · HTML 길 detailAttachments 와 같은 낱말 BUTTON_WORD) */
+            if (new RegExp(button, 'i').test(name) && a.previousElementSibling) name = (a.previousElementSibling.textContent || '').replace(/\s+/g, ' ').trim();
             return { name, url: a.href };
-          })).catch(() => []);
+          }), BUTTON_WORD.source).catch(() => []);
           for (const l of links) {
             if (!/\.(hwp|hwpx|pdf|docx?|xlsx?|zip)(\?|$)/i.test(l.name) && !/download|file|attach/i.test(l.url)) continue;
             const nm = l.name.replace(/\s*미리보기\s*$/, '').replace(/^\d+\.\s*/, '').trim();
@@ -324,8 +324,8 @@ for (const t of targets) {
           const html = await res.text();
           text = htmlToLines(html);   // HTML → 줄 글자는 html-text.mjs 한 곳 (2026-09-30)
           /* 본문이 그림 한 장인 게시판(홍익대 editorImage.do · 2026-11-02)은 글자가 메뉴뿐이라 '확보'로 보이면서 자격이 영영 비었다 —
-             브라우저가 못 본 그림을 HTML 에서 적는다(attachment-link htmlBodyImages 한 곳 · 아래 첨부 적기가 같이 받는다) */
-          r.found.push(...htmlBodyImages(html, openUrl));
+             브라우저가 못 본 첨부 링크·그림을 HTML 에서 적는다(attachment-link detailAttachments·htmlBodyImages 한 곳 · 아래 첨부 적기가 같이 받는다 · 리뷰: 그림만 적으면 hwp·pdf 는 여전히 빈다) */
+          r.found.push(...detailAttachments(html, openUrl), ...htmlBodyImages(html, openUrl));
         }
       } catch { /* 이쪽도 안 되면 그냥 실패로 둔다 */ }
     }

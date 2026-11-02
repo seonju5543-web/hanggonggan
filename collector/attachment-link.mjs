@@ -93,11 +93,11 @@ const ATTACH_EXT = /\.(hwp|hwpx|doc|docx|pdf|xls|xlsx)(\?|$)/i;
 const JS_NOT_DOWNLOAD = /^javascript:\s*(?:alert|void|;|$)/i;
 /* 화면 틀 글자가 그대로 남은 이름(국민대 `' + fileItem.fileNm + '`) — 스크립트가 채울 자리였다 */
 const TEMPLATE_NAME = /'\s*\+|\+\s*'|fileItem\.|\$\{/;
-/* 내려받기 꼴 주소 — 브라우저 길(linkAttachments)과 같은 낱말. `downloadBbsFile.do`(경기대·충북대 selectBbsNttView 게시판 · 2026-11-02)는
-   `download\.do` 로는 안 걸려 첨부 0건이었다 */
-const DOWNLOAD_URL = /download|fileDown|attach/i;
-/* 단추 글자뿐인 링크 — 파일 이름은 바로 앞 요소에 있다(`<span>요강.hwp</span> <a href="downloadBbsFile.do…">다운로드</a>`) */
-const BUTTON_WORD = /^(?:다운로드|내려받기|파일\s?다운로드|download|첨부\s?파일)$/i;
+/* 내려받기 꼴 주소. `downloadBbsFile.do`(경기대·충북대 selectBbsNttView 게시판 · 2026-11-02)는 `download\.do` 로는 안 걸려 첨부 0건이었다.
+   ⚠️ 맨 `download` 로 넓히지 말 것(리뷰) — `/ko/downloads/`·`/attach/list` 같은 메뉴 링크가 첨부가 되어 상한 8을 먼저 채운다 */
+const DOWNLOAD_URL = /mode=download|download\.do|downloadBbsFile\.do|fileDown|attach|bbs_download/i;
+/* 단추 글자뿐인 링크 — 파일 이름은 바로 앞 요소에 있다(`<span>요강.hwp</span> <a href="downloadBbsFile.do…">다운로드</a>`) · 브라우저 길(rescue-bodies)도 이 낱말을 받는다 */
+export const BUTTON_WORD = /^(?:다운로드|내려받기|파일\s?다운로드|download|첨부\s?파일)$/i;
 
 /** 공고 상세 HTML 에서 첨부 {name, url} — 일반 수집기(collect.mjs fetchDetail)가 쓴다.
     🔴 ① `href="…"` 와 `href='…'` 를 따옴표 짝으로 읽는다 — `[^"']*` 로 읽으면 `javascript:downloadfile(` 에서 끊겼다(22건)
@@ -128,8 +128,10 @@ export function detailAttachments(html, pageUrl, { decode = (s) => s, max = 8 } 
        스크립트 호출(과기정통부)뿐 아니라 보통 내려받기 주소의 단추(경기대·충북대 · 2026-11-02)도 같다 */
     if (!ATTACH_EXT.test(name) && ((/^javascript:/i.test(raw) && url !== raw) || (BUTTON_WORD.test(name) && DOWNLOAD_URL.test(url)))) {
       const before = src.slice(Math.max(0, m.index - 500), m.index).replace(/<[^>]+>/g, '\n').split('\n').map((s) => s.replace(/\s+/g, ' ').trim());
-      const file = before.reverse().find((s) => ATTACH_EXT.test(s) && s.length <= 120);
-      if (file) name = file;
+      /* 🔴 **바로 앞의 글자 줄 하나**만 본다(리뷰 2026-11-02) — 확장자 있는 줄을 거슬러 찾으면 `<span>포스터.jpg</span><a>다운로드</a>` 의 단추가
+         그 앞 행의 `요강.hwp` 이름을 훔쳐 이름·주소 짝이 지어진다. 앞 줄에 파일 이름이 없으면 그대로(아래서 단추 글자로 버려진다) */
+      const file = before.reverse().find(Boolean);
+      if (file && ATTACH_EXT.test(file) && file.length <= 120) name = file;
     }
     if (BUTTON_WORD.test(name)) continue;   // 이름을 못 찾은 단추는 첨부가 아니다 — 「다운로드」 라는 이름의 첨부를 만들지 않는다
     const isFile = ATTACH_EXT.test(url) || ATTACH_EXT.test(name) || DOWNLOAD_URL.test(url);
@@ -146,7 +148,7 @@ export function htmlBodyImages(html, pageUrl, min = 300) {
   const out = [];
   const src = String(html || '').replace(/<!--[\s\S]*?-->/g, ' ');
   for (const m of src.matchAll(/<img\b[^>]*>/gi)) {
-    const attr = (k) => { const a = m[0].match(new RegExp(`\\b${k}\\s*=\\s*"([^"]*)"`, 'i')); return a ? a[1].trim() : ''; };
+    const attr = (k) => { const a = m[0].match(new RegExp(`(?:^|\\s)${k}\\s*=\\s*"([^"]*)"`, 'i')); return a ? a[1].trim() : ''; };   // `\b` 는 data-width 도 width 로 읽는다(리뷰)
     const s = attr('src');
     if (!s || /^data:/i.test(s)) continue;
     const w = Number(attr('data-width') || attr('width')), h = Number(attr('data-height') || attr('height'));
