@@ -400,7 +400,7 @@ const bareOrg = (t) => String(t || '').replace(/^(재단법인|사단법인|학�
    안 떼면 제목이 `(재)가송재단 장학생 (한국외대 접수, 2026-2학기)` 인데도 겹침을 못 알아본다(실측 3건). */
 const orgBase = (t) => String(t || '').replace(/\s*\([^)]*\)\s*$/, '').trim();
 /* 주관 기관 칸이 비었거나 '모름' 표시(`주관 기관 원문 확인`·`미확인` — auto-register PROVIDER_UNKNOWN)인가 — 카드 윗줄·지원서 초안이 같이 쓴다 */
-const providerUnknown = (v) => !String(v || '').trim() || /원문 확인|미확인/.test(String(v));
+const providerUnknown = (v) => !String(v || '').trim() || /원문 확인|미확인|확인\s?필요/.test(String(v));   // 「기관확인필요」 — 재단이 KOSAF 칸에 적어 둔 모름 표시(2026-11-02 실화면)
 function cardOrgLine(sch) {
   const prov = String(sch.provider || '').trim();
   /* 🔴 **'모른다'는 표시는 카드 윗줄에 싣지 않는다** (2026-10-06 사장님 지시 'AI 티' · 개선안 D).
@@ -415,6 +415,68 @@ function cardOrgLine(sch) {
   const dup = [prov, bareOrg(prov), orgBase(prov), bareOrg(orgBase(prov))]
     .some((p) => p.length >= 3 && title.includes(p));
   return dup ? String(sch.type || '') : `${sch.type} · ${prov}`;
+}
+
+/* ── 카드 시안 B · 상세 시트 한 벌 (2026-11-02 개발자 승인 · docs/designs/mockups/card-consistency.html 「시안 B」 · sheet-consistency.html) ──
+   윗줄 = 갈래 칩 + 주최(알 때만) + 적합도 알약 · 제목은 지우고 나누기만 · 핵심 한 줄은 장학 「금액 · …」 / 활동 「대상 · …」 · 마감은 아랫줄 그대로(옛 결정).
+   🔴 글자를 더하지 않는다 — 칩 이름 여섯과 이름표 셋(금액·대상·접수)만 앱의 말이고 나머지는 원문이다. */
+const KIND_CHIP_CLS = { '교내': 'badge-in', '교외': 'badge-out' };
+/* 갈래 칩 — 장학은 교내/교외, 활동은 공모전·봉사·청년정책·대외활동(출처·분야로 · 판정은 activity-kind 그대로) */
+function kindChip(x) {
+  if (isActivityItem(x)) {
+    const label = x.kind === '공모전' ? '공모전' : x.api === 'youthPolicy' ? '청년정책' : (x.field === '봉사' || x.api === 'vol1365') ? '봉사' : '대외활동';
+    return { label, cls: 'badge-kind' };
+  }
+  const type = String(x.type || '').trim();
+  return { label: type ? `장학 · ${type}` : '장학', cls: `badge-kind${KIND_CHIP_CLS[type] ? ' ' + KIND_CHIP_CLS[type] : ''}` };
+}
+function kindChipHtml(x) { const c = kindChip(x); return `<span class="badge ${c.cls}">${esc(c.label)}</span>`; }
+/* 윗줄 주최 — cardOrgLine 과 같은 겹침 규칙(제목이 기관명을 담으면 뺀다 · 모르면 빈 글자). 구분은 칩이 말하므로 여기엔 기관명만 */
+function cardProviderLine(sch) {
+  const prov = String(sch.provider || '').trim();
+  if (providerUnknown(prov)) return '';
+  const title = cardTitle(sch);
+  const dup = [prov, bareOrg(prov), orgBase(prov), bareOrg(orgBase(prov))].some((p) => p.length >= 3 && title.includes(p));
+  return dup ? '' : prov;
+}
+/* 제목 나누기 — 앞머리 괄호의 대상(「(대학생,대학원생만)」·「(성인, 대학생)」)과 「(※…)」 꼬리를 떼어 대상 줄로 옮긴다 · 끝 마침표를 뗀다.
+   🔴 기관 약칭 「(재)」·「(사)」 와 대상 낱말 없는 괄호(「(강릉.원주)」)는 제목에 둔다 — 떼면 남의 제목이 된다. 날짜 괄호는 splitTitleDates 가 먼저 뗀다 */
+const WHO_PAREN = /(?:대학생|대학원생|고등학생|청소년|성인|청년|재학생|졸업생|신입생|\d+\s?세|학년|전공|계열|거주|주민|시민|구민|도민|군민|대상|가능|이공계|여성|남성|외국인|유학생|누구나)(?!처|팀|센터|과|부|실|원)/;
+const NOT_WHO_PAREN = /접수|제출|문의|처\b|팀\b|센터/;   // 「(학생처)」·「(학생지원팀 접수)」·「(※ 신청서는 학생처에 제출)」 은 접수처·안내지 대상이 아니다(리뷰 2026-11-02)
+function splitTitleWho(title) {
+  let t = String(title || '').trim();
+  const who = [];
+  for (;;) {
+    const m = t.match(/^[(（]\s*([^()（）]{2,30})\s*[)）]\s*/);
+    if (!m || !WHO_PAREN.test(m[1]) || NOT_WHO_PAREN.test(m[1]) || t.length - m[0].length < 4) break;
+    who.push(m[1].trim()); t = t.slice(m[0].length).trim();
+  }
+  const tail = t.match(/\s*[(（]\s*※\s*([^()（）]{2,60})\s*[)）]\s*$/);
+  if (tail && t.length - tail[0].length >= 4 && !NOT_WHO_PAREN.test(tail[1])) { who.push(tail[1].trim()); t = t.slice(0, t.length - tail[0].length).trim(); }
+  t = t.replace(/\.\s*$/, '').trim();
+  return { title: t, who };
+}
+/* 정식 등록 공고 — 게시판 머리말이 대괄호와 같은 낱말이면(「공통 [공통] 2026…」) 그 머리말도 뗀다(지우기만) */
+function cardTitleParts(sch) {
+  const raw = String(sch.name || '').trim().replace(/^\s*(\S{2,8})\s+(?=[[【]\s*\1\s*[\]】])/, '').replace(/^공통\s+(?=\d)/, '');   // 「공통 2026-2학기 …」 — 게시판 분류(공통/학부/대학원) 머리말 · 해 앞에 선 것만(실측 경희대)
+  /* 🔴 장학 제목의 괄호는 떼지 않는다 — 장학 카드엔 「대상 · …」 줄이 없어 뗀 글자가 갈 자리가 없다(지우기가 된다 · 리뷰 2026-11-02). 끝 마침표만 */
+  return { title: cleanCardTitle(raw).replace(/\.\s*$/, '').trim(), who: [] };
+}
+/* 활동 글 — 제목에서 뗀 대상 + 발췌 「대상」(없으면 첫 자격 줄) 을 「대상 · …」 한 줄로(겹치면 한 번) */
+function activityWhoLine(n, parts) {
+  const first = (n.eligibilityLines || []).find((l) => !/제외|불가|아닌|없는/.test(String(l))) || '';   // 제외·불가 문장은 대상이 아니다(리뷰 2026-11-02)
+  const ex = ((n.excerpts || []).find((x) => x.label === '대상') || {}).text || first;
+  const bits = [...parts.who, unent(String(ex || '')).replace(/\s+/g, ' ').trim()].filter(Boolean);
+  const out = [];
+  for (const b of bits) if (!out.some((o) => o.replace(/\s/g, '').includes(b.replace(/\s/g, '')))) out.push(b);
+  return out.join(' · ');
+}
+/* 핵심 한 줄(장학) — 금액을 읽었으면 「금액 · 200만원」, 층2 재단이 적어 둔 긴 금액은 옅게, 못 읽었으면 줄 없음(「금액 원문 확인」 글자를 카드에 남기지 않는다) */
+function amountLine(sch) {
+  const a = String(sch.amount || '');
+  if (!providerUnknown(a) && a !== KOSAF_AMOUNT_UNKNOWN) return { text: `금액 · ${a}`, known: /\d/.test(a) && a.length <= 20 };
+  if (sch.amountNote && !providerUnknown(sch.amountNote)) return { text: `금액 · ${sch.amountNote}`, known: false };   // 재단이 「기관확인필요」 라 적은 것도 모름(실화면 2026-11-02 대한간호협회)
+  return { text: '', known: false };
 }
 
 /* 카드 제목에서 **게시판 표식**을 걷어낸다 (2026-09-10 페이스리프트).
@@ -1740,16 +1802,17 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
      '등록금 실납부액에 따라 차등지급 자세한 사항은 첨부파일 또는 홈페이지 참…'(잘린 본문).
      이런 줄을 굵게 쓰면 카드가 확정되지 않은 금액을 확정된 것처럼 말한다.
      그래서 **짧고 숫자가 있는 것만** 굵게 쓴다. 나머지는 지우지 않고 옅게 남긴다(원칙 8-1). */
-  const amountText = String(sch.amount || '');
-  const known = /\d/.test(amountText) && amountText.length <= 20;
+  /* 시안 B (2026-11-02) — 윗줄은 칩(장학 · 교내/교외) + 주최(알 때만) + 알약 · 핵심 한 줄은 「금액 · …」(amountLine 한 곳 · 모르면 줄 없음) */
+  const amt = amountLine(sch);
   return cardShellHtml({
     save: saveBtnHtml(sch.id),
     attrs: `data-detail="${sch.id}"`,
-    org: cardOrgLine(sch),
+    chip: kindChipHtml(sch),
+    org: cardProviderLine(sch),
     badge,
-    name: cardTitle(sch),
-    foot: sch.amount,
-    footKnown: known,
+    name: cardTitleParts(sch).title,
+    foot: amt.text,
+    footKnown: amt.known,
     due,
     urgent: !sch.program && d.days >= 0 && d.days <= 7,
     link: cardSrcLinkHtml(sch, 'detail'),   // 원문 아이콘 — 활동 카드와 같은 자리·같은 모양(2026-10-28)
@@ -1767,14 +1830,14 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
      2026-09-09 에 카드 밑에 두었던 빨간 막대는 같은 지시로 **뺐다**(interactions.js 에서도
      지웠다 — 남겨 두면 다음 사람이 다시 붙인다). 7일 안쪽은 글자를 빨갛게(urgent) 한다.
    · 북마크 단추는 카드 **바깥**(save) — `.sch-card` 가 `<button>` 이라 안에 넣으면 단추 안의 단추가 된다. */
-function cardShellHtml({ save = '', attrs, org, badge = '', name, foot = '', footKnown = true, due = '', urgent = false, link = '' }) {
+function cardShellHtml({ save = '', attrs, chip = '', org, badge = '', name, foot = '', footKnown = true, due = '', urgent = false, link = '' }) {
   /* link — 카드 오른쪽 아래의 작은 원문 링크(활동 카드 · 2026-10-19 개발자 "카드에도 원문공고 하이퍼링크"). 북마크처럼 **단추 바깥**에 둔다(단추 안의 링크는 허용되지 않는 구조) */
   return `
     <div class="sch-card-wrap${link ? ' has-link' : ''}">
     ${save}${link}
     <button class="sch-card" ${attrs}>
       <div class="sch-top">
-        <span class="sch-org">${esc(org)}</span>
+        ${chip}${org ? `<span class="sch-org">${esc(org)}</span>` : ''}
         ${badge}
       </div>
       <p class="sch-name">${esc(name)}</p>
@@ -3165,6 +3228,8 @@ function kosafAsScholarships() {
         /* 층2 줄에 함께 보여 줄 **재단이 적어 둔 칸** (2026-09-07 캘린더).
            자격 판정을 못 붙이는 대신 재단이 쓴 것을 그대로 옮긴다 — 해석하지 않는다. */
         ...(kosafClean(f['선발인원']) ? { headcount: kosafClean(f['선발인원']) } : {}),
+        /* 재단 칸 중 자격·서류·금액·문의 밖의 것(선발방법·선발인원·추천필요여부)은 「공고 안내」 줄로 — 「이름표: 값」 원문 그대로(승인 시안 2026-11-02) · 「해당없음」은 말이 없다 */
+        noticeLines: ['선발방법', '선발인원', '추천필요여부'].map((k) => [k, kosafClean(f[k])]).filter(([, v]) => v && !/해당\s*없음/.test(v)).map(([k, v]) => `${k}: ${v}`),
       };
     })
     /* 층2에도 앱 지원문서 (2026-10-13 ① · 개발자 "남은 것 모두 진행") — 머리말은 forms.js prepKindFor 의 'kosaf'(재단 접수 방법은 공고문 확인) */
@@ -3535,6 +3600,8 @@ function renderActivities() {
    시트**(#detail-sheet)가 열려 발췌·첨부·원문 단추를 보여 준다. 신청은 원문에서 한다(우리가 접수하지 않는다 · 원칙 1).
    🔴 자격·적합도·양식은 붙이지 않는다 — 원문을 읽어 판정한 것이 아니다(원칙 8-1). 발췌는 원문 문장 그대로다. */
 const activityWhere = (n) => (n.school ? `${n.school}${n.campus ? ' ' + n.campus : ''} 게시판` : (n.host || '전국'));
+/* 카드·시트 윗줄의 주최 — 학교 게시판에서 주운 글은 주최를 모른다(「○○대학교 게시판」은 어디에 올라왔는지이지 누가 주는지가 아니다 · 2026-11-02 개발자 결정: 학생 화면에 적지 않는다 · school 칸은 범위 판정에만) · 호스트가 있는 전국 글만 */
+const activityHostLine = (n) => (n.school ? '' : String(n.host || '').trim());
 /* 혜택 줄이 짧으면 카드 아랫줄 왼쪽(장학 카드의 금액 자리)에 굵게 — 길거나 없으면 분야를 옅게 */
 const activityBenefit = (n) => ((n.excerpts || []).find((x) => x.label === '혜택') || {}).text || '';
 
@@ -3582,7 +3649,7 @@ function activityAsSch(n) {
     id: `act:${n.url}`, name: activityTitle(n), type: n.kind || '대외활동', eligibility: {},
     eligibilityLines: [...(n.eligibilityLines || []), ...titleTargetLines(n.title).filter((l) => !(n.eligibilityLines || []).some((x) => String(x).includes(l)))], eligibilityExcludes: n.eligibilityExcludes || [], eligibilityPriority: n.eligibilityPriority || [],
     excerpts: n.noticeLines || [], documents: [], deadline: n.deadline || null,
-    activity: true, amount: `${n.kind || '대외활동'} · ${activityWhere(n)}`,   // 달력·보관함 줄의 둘째 줄(장학은 금액 자리) — 지어낸 값이 아니라 종류·주최
+    activity: true, amount: [n.kind || '대외활동', activityHostLine(n)].filter(Boolean).join(' · '),   // 학교 게시판 글자는 어디에도 안 그린다(2026-11-02 개발자 결정)   // 달력·보관함 줄의 둘째 줄(장학은 금액 자리) — 지어낸 값이 아니라 종류·주최
   };
 }
 /* 카드·정렬·시트가 **같은 값**을 쓴다 — getMatches 와 같은 세 함수(evaluateFor · fitScore · fitDetailFor) */
@@ -3595,18 +3662,21 @@ function activityFit(n) {
 function activityCardHtml(n) {
   const m = activityFit(n);
   const d = n.deadline ? dday(n.deadline) : null;
-  const foot = benefitShort(activityBenefit(n));
+  /* 시안 B (2026-11-02) — 윗줄은 칩(봉사·대외활동·공모전·청년정책) + 주최 · 핵심 한 줄은 「대상 · …」(제목에서 뗀 괄호 + 발췌 대상) · 혜택·분야 줄은 시트로 */
+  const parts = splitTitleWho(activityTitle(n));
+  const who = activityWhoLine(n, parts);
   return cardShellHtml({
     save: saveBtnHtml(`act:${n.url}`),   // 장학 카드와 같은 북마크(카드 바깥 · 2026-10-02)
     attrs: `data-activity="${esc(n.url)}"`,
-    org: `${n.kind || '대외활동'} · ${activityWhere(n)}`,
+    chip: kindChipHtml(n),
+    org: activityHostLine(n),   // 학교 게시판 글은 빈 글자(칩만) · 2026-11-02 개발자 결정
     /* 장학 카드와 같은 판정 하나(적합도 % · 지원 자격 미달). 🔴 **'자격 미확인' 배지는 활동 카드에 안 단다** (2026-10-03 개발자 결정 —
        "왜 대외활동 공모전은 자격 미확인이야 죄다"). 활동 글은 자격이 포스터·첨부에만 있는 것이 많아 대부분의 카드에 같은 회색 배지가 붙어
        아무 말도 안 하는 배지가 됐다. 모른다는 사실은 시트가 말한다(자격 원문·'원문 보기'). 장학 카드의 '자격 미확인'은 그대로다. */
     badge: fitVerdict(m.fit, m.fd) === 'unread' ? '' : cardBadgeHtml(m.fit, m.fd, null),
-    name: activityTitle(n),
-    foot: foot || (n.field || ''),
-    footKnown: !!foot,
+    name: parts.title,
+    foot: who ? `대상 · ${who}` : '',
+    footKnown: false,
     due: d ? ddayWords(d) : '',
     urgent: !!d && d.days >= 0 && d.days <= 7,
     link: activityCardLinkHtml(n),
@@ -3628,19 +3698,20 @@ function activityCardLinkHtml(n) { return cardSrcLinkHtml(n, 'activity'); }
    🔴 '신청은 주최 측 원문 페이지에서 진행돼요' 는 **글 하나로 가는 주소(post)일 때만** — 목록·홈페이지·문제 주소에 붙이면
       열리는 화면과 다른 말을 한다.
    찾기(data-activity)는 저장된 n.url 그대로 · 안전하지 않은 주소면 단추를 안 그린다(href="" 는 앱 자신을 연다) */
-function activityLinkHtml(n) {
-  const link = sourceLink(n, 'activity');
-  const href = safeUrl(link.href);
-  /* 목록 표식(#n-)의 안내 문장은 예전 그대로(승인된 글자) — 로봇이 '목록이 열린다'를 확정한 주소는 그 사실만 말한다 */
-  const why = link.cls === 'list'
+function activityLinkWhy(n, link) {
+  /* 목록 표식(#n-)의 안내 문장은 예전 그대로(승인된 글자) — 「원문」 절의 안내 줄로 쓴다(승인 시안 2026-11-02 · 단추는 검정 하나) */
+  return link.cls === 'list'
     ? (linkShape(n.url) === 'marker'
       ? '이 게시판은 목록에서 글을 눌러야 열리는 방식이라 글 하나로 바로 가는 주소를 확인하지 못했습니다. 열리는 '
       : '이 주소를 열면 게시판 목록이 떠요. ') + sourceLinkHintHtml(link)
     : link.cls === 'home' ? '주최 측 홈페이지 첫 화면이 열려요 — 이 글은 그 사이트에서 제목으로 찾아 주세요.'
     : sourceLinkHintHtml(link);
-  return `${why ? `<p class="doc-legend">${why}</p>` : ''}
-      ${href ? `<a class="btn btn-primary btn-lg" href="${esc(href)}" target="_blank" rel="noopener">${esc(link.label)}</a>
-      ${link.cls === 'post' ? '<p class="dp-note">자세한 내용과 신청은 원문 공고에서 확인하세요.</p>' : ''}` : ''}`;
+}
+/* 활동 시트의 검정 단추 하나 — 이름은 source-link.js 의 activityButton 자리(글 하나로 가는 주소만 「원문에서 신청하기 ↗」) · 안전하지 않은 주소면 안 그린다(href="" 는 앱 자신을 연다) */
+function activityLinkHtml(n) {
+  const link = sourceLink(n, 'activityButton');
+  const href = safeUrl(link.href);
+  return href ? `<a class="btn btn-primary btn-lg" href="${esc(href)}" target="_blank" rel="noopener">${esc(link.label)}</a>` : '';
 }
 
 function openActivityDetail(url) {
@@ -3650,74 +3721,35 @@ function openActivityDetail(url) {
   const d = n.deadline ? dday(n.deadline) : null;
   const benefit = unent(activityBenefit(n));
   /* 「대상」 발췌는 자격 줄이 있으면 위 「지원 자격」이 이미 보여 준다 — 같은 A·B·C 조건이 「모집 안내」에 한 번 더 떴다(쇼미더임팩트 · 2026-10-16 개발자 지적) */
-  const rows = (n.excerpts || []).filter((x) => x.label !== '혜택' && !(x.label === '대상' && (n.eligibilityLines || []).length));
+  const rows = (n.excerpts || []).filter((x) => x.label !== '혜택' && x.label !== '모집기간' && !(x.label === '대상' && (n.eligibilityLines || []).length));   // 모집기간은 「접수 · 기간」 줄이 말한다(승인 시안 2026-11-02)
+  const parts = splitTitleWho(activityTitle(n));
+  const who = activityWhoLine(n, parts);
+  /* 「접수 · 기간」 — 발췌 모집기간(없으면 기간 토막 deadlineHint)을 그대로 넘긴다 · 날짜만 있는 글은 applySectionHtml 이 마감으로 말한다(리뷰 2026-11-02 · 9건이 「원문 확인」으로 떴다) */
+  const recruit = ((n.excerpts || []).find((x) => x.label === '모집기간') || {}).text || (n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? hintText(n.deadlineHint) : '');
+  if (recruit) sch.period = unent(recruit);
   /* 원문 안내 — 위 '모집 안내'에 이미 나온 문장은 다시 적지 않는다(같은 접수기간이 두 칸에 떴다 · 2026-10-01) */
   const seenText = [...(n.excerpts || []).map((x) => noticeFlat(x.text)), ...(n.eligibilityLines || []).map(noticeFlat)].filter((x) => x.length >= 6);
   const notice = (n.noticeLines || []).filter((l) => !seenText.some((e) => noticeFlat(l).includes(e)));
-  const eligRows = eligibilityRowsHtml(sch, result).replace(/<li class="r-unk">\? 지원 자격은 [^<]*<\/li>/g, '');   // '원문에서 확인' 한 줄뿐이면 빈 글자 → 칸을 접는다
-  const recruitHtml = activityRecruitHtml(n, rows);
   sheetBack = null;   // 이 시트에는 돌아갈 곳이 없다 — 내리면 닫힌다
   $('#detail-sheet').innerHTML = `
     <div class="sheet-handle"></div>
     <div class="sheet-body">
-      <div class="sch-top sheet-top">
-        ${d ? `<span class="badge badge-dday ${d.cls}">${esc(d.label)}</span>` : ''}
-        <span class="badge badge-kind">${esc(n.kind || '대외활동')}</span>
-        ${saveBtnHtml(`act:${n.url}`)}
-      </div>
-      <h3 class="sheet-title">${esc(activityTitle(n))}</h3>
-      ${/* 짧은 혜택만 위에 한 줄(파란 글씨) — 긴 혜택은 아래 「혜택」 칸에 항목별로(원문 글자 그대로 · 2026-10-04 개발자 지적) */ ''}
+      ${/* 승인 시안(2026-11-02) — 장학 시트와 같은 머리줄·절 다섯(sheetSectionsHtml). 짧은 혜택은 금액 자리, 긴 혜택·활동기간·지역·원문 줄은 「공고 안내」, 모집기간은 「접수 · 기간」.
+           단추는 검정 하나 — 이름은 source-link.js 의 activityButton 자리(글 하나로 가는 주소만 신청하기 · 목록·홈페이지는 그 이름 그대로 · 2026-10-03 원문 링크 정직성). */ ''}
+      ${sheetHeadHtml({ x: n, d, save: saveBtnHtml(`act:${n.url}`) })}
+      <h3 class="sheet-title">${esc(parts.title)}</h3>
       ${benefit && benefit.length <= 40 ? `<p class="sheet-amount">${esc(benefit)}</p>` : ''}
-      <p class="sheet-provider">${esc(activityWhere(n))}${n.field ? ` · ${esc(n.field)}` : ''}</p>
-
-      ${/* 지원 자격 — 장학 시트와 **같은 함수·같은 모양**(eligibilityRowsHtml · fitBadgeHtml full · 묻기 상자).
-           '지원 가능·선발 심사' 알약(STATUS_META)은 달지 않는다 — 활동 글에는 구조화 조건이 없어 그 알약은 늘 '가능'이라 거짓 안심이 된다. */ ''}
-      ${/* 🔴 읽은 자격이 하나도 없으면 「지원 자격」 칸 자체를 접는다(2026-10-17 개발자 "원문에서 확인 이렇게 뜨는 게 하나도 없어야") — '원문에서 확인하라'는 줄은
-           학생에게 아무 정보도 아니다. 모른다는 사실은 칸이 없는 것으로 말하고, 원문 단추가 아래에 있다. 장학 시트는 그대로(자격 미확인 배지가 그 몫) */ ''}
-      ${eligRows ? `
-      <div class="sheet-verdict">
-        <h4>지원 자격</h4>
-        <span class="verdict-marks">${fitBadgeHtml(fit, fd, { full: true })}</span>
-      </div>
-      <ul class="reason-list">${eligRows}</ul>` : ''}
-      ${eligAskHtml(sch)}
-
-      ${benefit && benefit.length > 40 ? `
-      <h4>혜택</h4>
-      <ul class="doc-list">${benefitItems(benefit).map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
-      ${/* 「모집 안내」도 보일 것이 있을 때만 — 없으면 칸을 접는다('모집 기간·대상은 원문에서 확인' 문구 삭제 · 2026-10-17) */ ''}
-      ${recruitHtml ? `<h4>모집 안내</h4>${recruitHtml}` : ''}
-      ${noticeSummaryHtml(notice)}
-      ${(n.attachments || []).length ? `
-      <h4>공고 원본 첨부</h4>
-      <ul class="doc-list">${n.attachments.map((a) => `<li class="att">${attachmentLinkHtml(a, 'color:var(--primary)')}</li>`).join('')}</ul>` : ''}
-      ${n.deadline ? `<p class="sheet-deadline">마감일 ${esc(n.deadline)}</p>` : ''}
+      ${sheetSectionsHtml({ sch, result, fit, fd, activity: n, noticeLines: [
+        ...(benefit && benefit.length > 40 ? [`혜택: ${benefit}`] : []),
+        ...(!(n.eligibilityLines || []).length && parts.who.length ? [`대상: ${parts.who.join(' · ')}`] : []),   // 제목에서 뗀 조각만 — 발췌 「대상」은 아래 rows 가 적는다(리뷰 2026-11-02)
+        ...rows.map((x) => `${x.label}: ${unent(x.text)}`),
+        ...notice,
+      ] })}
       ${activityLinkHtml(n)}
     </div>`;
   openSheetShell();
   eligAskWire(sch, () => openActivityDetail(url));   // 묻기 상자 배선 — 다시 그릴 때 이 시트로 돌아온다
 }
-/* 활동 시트 「모집 안내」 본문 — 발췌 줄이 있으면 그것, 없으면 기간 한 토막(deadlineHint), 둘 다 없으면 빈 글자(칸을 접는다) */
-function activityRecruitHtml(n, rows) {
-  return rows.length
-        ? `<ul class="doc-list">${rows.flatMap((x) => {
-          /* 한 칸에 여러 항목이 글머리 기호로 붙어 온 것(`2026.8.13 ~ 8.23 ○ (신청방법) 네이버 폼 … ○ (모집대상) 만 19세~39세`)은
-             항목마다 한 줄로 — 뒤 항목의 괄호 이름표가 그 줄의 이름표다(공고 안내 noticeSummaryHtml 과 같은 규칙 · 2026-10-15) */
-          const segs = tidyChars(unent(x.text)).split(/\s+[○●■□\u25B6▷◆◇]\s*(?=\S)/);
-          const first = segs[0].replace(/^[(（]?\s*[가-힣\s]{2,8}[)）]\s*/, (m) => (m.replace(/[()（）\s]/g, '') === String(x.label).replace(/\s/g, '') ? '' : m));
-          return [`<li>${esc(x.label)} · ${esc(first)}</li>`, ...segs.slice(1).map((s) => {
-            const m = s.match(/^[(（]([가-힣A-Za-z0-9\s·]{1,12})[)）]\s*(.+)$/);
-            return m ? `<li>${esc(m[1].trim())} · ${esc(m[2].trim())}</li>` : `<li>${esc(s)}</li>`;
-          })];
-        }).join('')}</ul>`
-        : (n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint)
-          /* 기간 한 토막(deadlineHint)도 글머리 기호로 붙은 항목은 줄을 가르고, 앞이 잘린 괄호 이름표(`모집기간) …`)는 `모집기간 · …` 로(2026-10-15) */
-          ? `<ul class="doc-list">${tidyChars(hintText(n.deadlineHint)).split(/\s+[○●■□\u25B6▷◆◇]\s*(?=\S)/)
-            .map((s) => s.replace(/^[(（]?\s*([가-힣\s]{2,8})[)）]\s*/, '$1 · ').trim()).filter((s) => s.length >= 4)
-            .map((s) => `<li>${esc(s)}</li>`).join('')}</ul>`
-          : '');
-}
-
 /* ---------------- 재단·지자체 새 공고 (2026-09-26 · 노션 F-13 · 교외 확대) ----------------
    재단·지자체 홈페이지의 장학 게시판에서 로봇이 주운 **제목+링크**(data/external.json). 학교 글이 아니라
    '우리 학교 게시판 공고'에는 못 들어간다(그 판정은 학교를 요구한다). 주최(host)는 로봇 설정에서 온
@@ -4559,14 +4591,14 @@ function tidyChars(s) {
 function noticeFlat(x) {
   return String(unent(x || '')).replace(/[\s:：·\-–■□○●\u25AA\u25B6▷◆◇◎※ㅇ*•]/g, '');
 }
-function noticeSummaryHtml(lines) {
+function noticeSummaryRows(lines) {
   const rows = []; const seen = new Set();
   /* 한 줄에 글머리 기호로 여러 항목이 붙어 온 것(`○ (신청방법) 네이버 폼 … ○ (모집대상) 만 19세~39세`)은 항목마다 한 줄로 가른다 — 글자는 그대로 */
   const segs = joinNoticeLines((lines || []).flatMap((raw) => String(raw || '').split(/\s+[○●■□\u25B6▷◆◇]\s*(?=\S)/)));
   for (const raw of segs) {
     let t = tidyChars(unent(String(raw || '')))
       .replace(/[\u2605☆\u261E]+/g, ' ').replace(/!{2,}/g, '!')   // 꾸밈 기호·느낌표 줄 — 뜻이 없다
-      .replace(/^[\s\-–—•\u25AA\u25B6▷◆◇○●■□▣\u2605\u2666⇒‡◦∙❍◎￭·ㆍ*◌◍※]+/, '')   // 그림 기호는 \u 로 적는다(화면 말투 관문 ui-tone 이 이모지로 센다)
+      .replace(/^[\s\-–—•\u25AA\u25AB\u25FD\u25FE\u25B6▷◆◇○●■□▣\u2605\u2666⇒‡◦∙❍◎￭·ㆍ*◌◍※]+/, '')   // \u25FD·\u25FE(작은 네모)도 글머리(성암육영회 서류 줄 · 2026-11-02 실화면 · 글자는 ui-tone 이 이모지로 세므로 코드에 안 적는다)   // 그림 기호는 \u 로 적는다(화면 말투 관문 ui-tone 이 이모지로 센다)
       /* 번호를 뗀다 — ⚠️ `10.22.(목)` 의 `10.` 은 번호가 아니라 날짜다(뒤에 날짜가 이어지면 안 뗀다 · 대외활동 실측) */
       .replace(/^\(?\s*\d{1,2}\s*\)\s*|^\d{1,2}\.(?!\s?\d{1,2}\s?[.(월])\s*|^[①-⑳]\s*|^[가-힣]\s*[.)]\s+/, '')
       .replace(/^[(（][월화수목금토일][)）]\s*[-–]?\s*/, '')   // `12.(월) - 접수방법 :` — 앞 줄에서 떨어져 나온 날짜 꼬리(번호는 위에서 이미 뗐다)
@@ -4595,8 +4627,68 @@ function noticeSummaryHtml(lines) {
     rows.push({ label, body });
     if (rows.length >= 8) break;
   }
+  return rows;
+}
+/* 「공고 안내」 절 — 다섯 줄까지 펼치고 나머지는 「더 보기」 안에(승인 시안 2026-11-02 · 줄 규칙은 위 noticeSummaryRows 그대로) */
+const NS_SHOWN = 5;
+function noticeSummaryHtml(lines) {
+  const rows = noticeSummaryRows(lines);
   if (!rows.length) return '';
-  return `<h4>공고 안내</h4><ul class="doc-list notice-summary">${rows.map((r) => `<li>${r.label ? `<b class="ns-k">${esc(r.label)}</b>` : ''}${esc(r.body)}</li>`).join('')}</ul>`;
+  const li = (r) => `<li>${r.label ? `<b class="ns-k">${esc(r.label)}</b>` : ''}${esc(r.body)}</li>`;
+  const head = rows.slice(0, NS_SHOWN), rest = rows.slice(NS_SHOWN);
+  return `<h4>공고 안내</h4><ul class="doc-list notice-summary">${head.map(li).join('')}</ul>`
+    + (rest.length ? `<details class="ns-more"><summary>더 보기 (${rest.length}줄)</summary><ul class="doc-list notice-summary">${rest.map(li).join('')}</ul></details>` : '');
+}
+
+/* ── 상세 시트 한 벌 (2026-11-02 개발자 승인 · docs/designs/mockups/sheet-consistency.html) ──
+   장학(openDetail)·층2(같은 함수)·대외활동(openActivityDetail)이 머리줄과 절 다섯을 **여기서** 받는다 —
+   지원 자격 → 접수 → 공고 안내 → 첨부 → 원문. 같은 사실은 한 자리에만: 마감은 머리줄 D-day 와 「접수 · 기간」 둘뿐 ·
+   주최는 머리줄 · 「일정」·「마감일」 줄, 「이런 경우는 제외돼요」·「혜택」·「모집 안내」 절은 없다(내용은 자리를 옮겼다). 글자는 원문 그대로, 이름표 셋(기간·방법·서류)만 앱의 말. */
+const fmtDay = (iso) => { const s = String(iso || ''); if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return ''; const y = String(new Date().getFullYear()); return (s.slice(0, 4) === y ? s.slice(5) : s).replace(/-/g, '.'); };   // 올해면 MM.DD · 해가 다르면 YYYY.MM.DD(리뷰 2026-11-02)
+const isActivityItem = (x) => !!(x.activity || x.api || (x.kind && !x.type));   // 활동 글(피드 항목·activityAsSch 사본)인가 — 장학 공고는 type 이 있다
+function sheetHeadHtml({ x, d, save }) {
+  const org = isActivityItem(x) ? activityHostLine(x) : cardProviderLine(x);
+  const dd = x.program ? '<span class="badge badge-dday badge-program">상시 제도</span>' : (d ? `<span class="badge badge-dday ${d.cls}">${esc(ddayWords(d))}</span>` : '');   // 상시 제도는 마감 자리에(카드 아랫줄과 같은 글자)
+  return `<div class="sch-top sheet-top">${kindChipHtml(x)}${org ? `<span class="sch-org">${esc(org)}</span>` : ''}${dd}${save}</div>`;
+}
+/* 「접수」 절의 세 줄 — 기간은 접수 시작~마감(둘 다 날짜일 때만 · 아니면 원문 기간 문구 · 없으면 원문 확인) · 방법은 원문 문장(noApply·메일·포털·재단) · 서류는 읽은 것만 */
+function applySectionHtml(sch, opts) {
+  const activity = !!(opts && opts.activity);   // 활동 글은 서류 줄이 없다(원문이 서류를 적지 않는다)
+  const from = fmtDay(sch.openDate), to = fmtDay(sch.deadline);
+  const rawPeriod = String(sch.period || '').replace(/^접수\s*/, '').replace(/\d{4}-(\d{2})-(\d{2})/g, '$1.$2').trim();   // ISO 날짜는 MM.DD 로(글자를 더하지 않고 줄인다) · 층2 「접수 ~…」 머리는 이름표와 겹친다
+  const period = (from && to) ? `${from} ~ ${to}`
+    : (/\d/.test(rawPeriod) && !providerUnknown(rawPeriod)) ? rawPeriod
+    : to ? `~ ${to}`
+    : /상시/.test(rawPeriod) ? '상시'
+    : '원문 확인';
+  const method = sch.noApply ? sch.noApply
+    : sch.applyEmail ? (sch.applyEmailSource || `메일 ${sch.applyEmail}`)
+    : sch.applyPortalSource ? sch.applyPortalSource
+    : sch.sourceKind === 'kosaf' ? '재단 선발 공고문·홈페이지가 정한 접수 방법'
+    : '원문 확인';
+  const docs = activity ? [] : (sch.documents || []).filter((doc) => !DOC_PLACEHOLDER.test(doc));
+  const row = (k, v) => `<li><b class="ns-k">${k}</b>${esc(v)}</li>`;
+  const docText = docs.map((d) => String(d).replace(/^[\s\-–—•\u25AA\u25AB\u25FD\u25FE■□▣○●◆◇·ㆍ*]+/, '').trim()).filter(Boolean).join(' · ');   // 원문 글머리 기호(■·○)는 뗀다 — 점으로 잇는 한 줄이라 기호가 두 겹(실화면 2026-11-02)
+  return `<h4>접수</h4><ul class="doc-list notice-summary apply-rows">${row('기간', period)}${row('방법', method)}${docText ? row('서류', docText) : ''}</ul>`;
+}
+function sheetSectionsHtml({ sch, result, fit, fd, activity = null, noticeLines = [] }) {
+  /* ① 지원 자격 — 판정은 eligibilityRowsHtml·fitBadgeHtml 그대로(알약 status-pill 은 없다 · 두 축의 말이라). 0줄이면 「원문에서 확인」 한 줄로 칸은 늘 있다(승인 시안 — 자격을 안 봤다는 사실을 숨기지 않는다) */
+  const rows = eligibilityRowsHtml(sch, result).replace(/<li class="r-unk">\? 지원 자격은 [^<]*<\/li>/g, '');
+  const elig = `<div class="sheet-verdict"><h4>지원 자격</h4><span class="verdict-marks">${fitBadgeHtml(fit, fd, { full: true })}</span></div>
+      <ul class="reason-list">${rows || '<li class="r-elig r-req">자격은 원문에서 확인해 주세요</li>'}</ul>
+      ${eligAskHtml(sch)}`;
+  /* ② 접수 ③ 공고 안내 */
+  const apply = applySectionHtml(sch, { activity });
+  const notice = noticeSummaryHtml(noticeLines);
+  /* ④ 첨부 — 본문 사진(bodyImage)은 첨부가 아니다 · 층2 첨부는 재단이 올린 선발 공고문이라 꼬리표로 말한다(신청서 양식이라 부르지 않는다) */
+  const atts = ((activity ? activity.attachments : sch.attachments) || []).filter((a) => a && !a.bodyImage);
+  const att = atts.length ? `<h4>첨부${sch.sourceKind === 'kosaf' ? ' <span class="channel-tag">재단 선발 공고문</span>' : ''}</h4><ul class="doc-list">${atts.map((a) => `<li class="att">${attachmentLinkHtml(a, 'color:var(--primary)')}${a.bytes ? ` <span class="doc-legend">${Math.max(1, Math.round(a.bytes / 1024))}KB</span>` : ''}</li>`).join('')}</ul>` : '';
+  /* ⑤ 원문 — 이름·안내는 source-link.js 한 곳(sourceLinkHtml · sourceLinkHintHtml) · 층2 문의 */
+  const link = activity ? sourceLink(activity, 'activity') : sourceLink(sch, 'detail');
+  const a = activity ? (() => { const href = safeUrl(link.href); return href ? `<a href="${esc(href)}" target="_blank" rel="noopener">${esc(link.label)}</a>` : ''; })() : sourceLinkHtml(sch);   // 장학·층2는 sourceLinkHtml 한 곳(detail 자리)
+  const hint = activity ? activityLinkWhy(activity, link) : sourceLinkHintHtml(link);
+  const src = `<h4>원문</h4><div class="sheet-facts"><p class="doc-legend sheet-source">${a || sourceNoteHtml(sch)}${hint ? `<br />${hint}` : ''}</p>${(sch.sourceKind === 'kosaf' && sch.contact) ? `<p class="doc-legend">문의 ${esc(sch.contact)}</p>` : ''}</div>`;
+  return elig + apply + notice + att + src;
 }
 
 function sourceNoteHtml(sch) {
@@ -4748,9 +4840,9 @@ function eligibilityRowsHtml(sch, result) {
     ...requirementLines(sch, sch.eligibilityExcludes || [], { onlyExclude: true }),
     ...requirementLines(sch, sch.eligibilityLines || [], { onlyExclude: true }),
   ])].filter((t) => !shownReq.has(t));
+  /* 승인 시안(2026-11-02) — 제외 조건은 같은 목록 안 ✗ 줄(머리글 없음). 판정은 안 한다(해당 여부는 학생이 안다) */
   if (exLines.length) {
-    reasonRows += `<li class="r-head">지원 제외 대상</li>`
-      + exLines.map((e) => `<li class="r-req">${esc(e)}</li>`).join('');
+    reasonRows += exLines.map((e) => `<li class="r-elig r-x">✗ ${esc(e)}</li>`).join('');
   }
   /* 🔴 '이 자격은 AI가 공고 원문에서 읽은 것입니다 · 사람 검수 전' 줄을 **뺐다**
      (2026-09-17 개발자 지시 — 앱 내부 사정은 관리자에게만). 누가 읽었고 사람이 검수했는지는
@@ -4785,7 +4877,6 @@ function openDetail(id) {
   const result = evaluateFor(sch, state.profile);   // 카드와 같은 판정을 쓴다(위 주석)
   const fit = fitScore(sch, result, state.profile);
   const fd = fitDetailFor(sch, state.profile);   // 카드와 같은 근거를 쓴다(위 주석)
-  const meta = STATUS_META[result.status];
   const d = dday(sch.deadline);
   const app = state.applications.find((a) => a.id === id);
   const lock = applyLock(result, app, d, sch);
@@ -4795,10 +4886,6 @@ function openDetail(id) {
   const canApply = lock.canApply && !gone;
   const applyCaution = lock.caution;
   const ch = officialChannel(sch);
-
-  /* 지원 자격 줄 — 대외활동 시트도 **같은 함수**를 부른다(2026-10-01 · 베끼지 않는다) */
-  const reasonRows = eligibilityRowsHtml(sch, result);
-  const missingRows = '';
 
   /* 안내는 한 문장으로 (2026-09-01 개발자 지시). 한 화면에 설명이 셋이나 떠 있었는데
      (발췌 출처 설명 · 전국 공고 회색 상자 · 제출 서류 부연) 셋 다 결국 '원문을 보라'였다.
@@ -4811,9 +4898,6 @@ function openDetail(id) {
      KOSAF 를 가리키는 것은 `program`(data.js 의 상시 제도)뿐이다. */
   /* 🔴 2026-10-03 — 이름·안내 둘 다 source-link.js 의 sourceLink 한 곳에서 받는다. 목록이면 '목록에서 ○○을(를)
      찾아 눌러 주세요'(표식 주소든 로봇이 목록으로 확정한 주소든), 로봇이 '그 공고가 아니었다'를 확정했으면 본 것 한 줄. */
-  const srcLink = sourceLinkHtml(sch);
-  const srcHint = sourceLinkHintHtml(sourceLink(sch, 'detail'));
-
   let btnLabel = '신청 준비 시작';
   if (lock.noApply) btnLabel = '별도 신청 없음 — 학교가 선발';
   else if (app && !app.pending) btnLabel = prepStateLabel(app, sch, '신청 준비 완료됨') === '신청 준비 완료됨' ? '신청 준비 완료됨' : `${prepStateLabel(app, sch, '')} — 아래 체크리스트`;
@@ -4825,111 +4909,15 @@ function openDetail(id) {
      `applyCaution` 줄이 말하고, 누를지는 학생이 정한다. 문구를 여기로 되돌리면
      '신청할 수 없음'이라는 **사실이 아닌 말**이 화면에 다시 뜬다. */
 
-  const hasRealDocs = (sch.documents || []).some((doc) => !DOC_PLACEHOLDER.test(doc));   // 자리표시뿐이면 「제출 서류」 칸을 접는다(2026-10-17)
   $('#detail-sheet').innerHTML = `
     <div class="sheet-handle"></div>
     <div class="sheet-body">
-      ${/* 🔴 시트 머리에는 **'이 공고가 무엇인가'만** 둔다 (2026-08-31 재설계).
-           정리 전에는 여기에 교외·D-day·검수전·적합도·판정 다섯이 붙어 두 줄로 흘렀고,
-           그중 둘(적합도 배지와 '지원 가능·선발 심사' 알약)은 **서로 다른 축의 판정**이라
-           학생이 어느 쪽을 믿어야 할지 알 수 없었다.
-           판정은 근거 옆이 제자리다 — 아래 '지원 자격' 머리로 내렸다.
-           ⚠️ `{ full: true }` 는 공동작업자가 넣은 것 — 상세에서는 퍼센트·'확인 필요'까지
-              다 보여 준다는 뜻이라 그대로 살린다(원칙 8-1). */ ''}
-      <div class="sch-top sheet-top">
-        ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
-        ${/* 🔴 '· 검수 전' 을 뗐다 (2026-09-17 개발자 지시). 남는 것은 교내/교외처럼
-             **학생이 쓰는 갈래**뿐이다. 검수 상태는 관리자 화면이 센다. */ ''}
-        <span class="badge badge-kind">${esc(sch.type || '장학금')}</span>
-        ${gone ? '' : saveBtnHtml(sch.id)}
-      </div>
-      ${/* 🔴 순서: 이름 → **금액** → 주관·접수 (2026-09-02 개발자 지시).
-           학생이 카드를 열고 가장 먼저 찾는 것은 얼마를 받느냐다. 주관 기관은 제목에
-           이미 들어 있는 경우가 많아(예: '해외자원개발진흥재단 KOLNG …') 금액을 한 줄
-           아래로 밀고 있었다.
-           그리고 summary 를 지운다 — '해외자원개발진흥재단 — 한국장학재단 등록 장학금.'
-           처럼 바로 윗줄과 같은 말을 두 번 하는 데이터가 많다(개발자 지적). 없앤 정보는
-           없다: 주관은 아랫줄에, '한국장학재단 등록' 이라는 사실은 원문 링크 이름
-           ('한국장학재단 ↗')이 말한다. */ ''}
-      ${/* 🔴 상세 제목도 카드와 **같은 정리**를 거친다 (2026-10-06 사장님 지시 'AI 티' · 개선안 E).
-           예전엔 '게시판에서 찾을 때 쓰는 글자'라며 `[장학공지]` 같은 게시판 표식을 그대로 두었다.
-           게시판에서 찾을 제목은 맨 아래 묶음의 '목록에서 ○○을 찾아' 줄(boardListTitle)이 따로 말하므로
-           제목이 그 일을 겸할 필요가 없다. 지우기만 한다(cleanCardTitle — 한 글자도 더하지 않는다). */ ''}
-      <h3 class="sheet-title">${esc(cardTitle(sch))}</h3>
-      ${/* 🔴 '모른다'는 표시(`금액 원문 확인`·`면학장학금 (세부 원문 확인)`)를 **큰 파란 글씨**로 띄우지 않는다 (2026-10-15 카드 전수 · 24건).
-           자리는 그대로 두되(드라이버가 .sheet-amount 를 읽는다) 옅은 한 줄로 '지원 금액은 원문 공고에서 확인' 이라고만 말한다. */ ''}
-      ${providerUnknown(sch.amount) ? '<p class="sheet-amount sheet-amount-unknown">지원 금액은 원문 공고에서 확인</p>' : `<p class="sheet-amount">${esc(sch.amount)}</p>`}
-      ${/* 금액을 숫자로 못 읽은 층2 공고 — 재단이 그 칸에 적어 둔 말을 그대로 옮긴다.
-           카드 머리에는 안 띄운다(위 kosafAmountLabel 주석). */ ''}
-      ${sch.amountNote ? `<p class="doc-legend">재단이 적어 둔 지원금액 — ${esc(sch.amountNote)}</p>` : ''}
-      ${/* 주관·접수 줄 — 로봇이 못 읽은 칸(`주관 기관 원문 확인`·`접수 기간 원문 확인`)은 적지 않는다(2026-10-15 · 73건이 그 글자였다).
-           주관을 못 읽었으면 제목 앞 대괄호의 기관(`[화성시]` — 카드 제목에선 떼는 글자)이 그 자리를 채운다 · 둘 다 없으면 줄 자체가 없다(마감은 맨 아래 줄이 말한다) */ ''}
-      ${(() => {
-        /* 🔴 제목 앞 대괄호는 대개 **게시판 표식**(`[공통]`·`[교외]`·`[서울]`·`[기한 연장]`)이다 — 기관 꼴(`[화성시]`·`[한국장학재단]`·`[우양재단]`)일 때만 주관으로 쓴다
-           (리뷰 2026-10-15 · 첫 판은 108장에 「주관 · 공통」 같은 지어낸 주관을 띄웠다 — 원칙 8-1). 기간은 날짜가 하나라도 있으면 자리 표시가 아니다(`신청 7.29 ~ 8.4 (…, 원문 확인)`) */
-        const tag = providerUnknown(sch.provider) ? ((String(sch.name || '').match(/^\s*[[【]\s*([^\]】]{2,14})\s*[\]】]/) || [])[1] || '').trim() : '';
-        const ORG_TAIL = /(?:시|군|구|도|청|재단|장학회|진흥원|센터|협회|공단|공사|은행|그룹|위원회|문화원|교육청|대학교|대학|학회|조합|법인)$/;
-        const prov = providerUnknown(sch.provider) ? (ORG_TAIL.test(tag) && !/^(?:서울|글로벌|교외|교내|공통|학부|대학원)$/.test(tag) ? tag : '') : sch.provider;
-        const period = (providerUnknown(sch.period) && !/\d/.test(String(sch.period || ''))) ? '' : sch.period;
-        const bits = [prov, period].filter(Boolean);
-        return bits.length ? `<p class="sheet-provider">${bits.map(esc).join(' · ')}</p>` : '';
-      })()}
-      ${scheduleRowHtml(sch)}
-
-      <div class="sheet-verdict">
-        <h4>지원 자격</h4>
-        <span class="verdict-marks">${fitBadgeHtml(fit, fd, { full: true })}<span class="status-pill pill-${meta.cls}">${meta.label}</span></span>
-      </div>
-      <ul class="reason-list">${reasonRows}${missingRows}</ul>
-      ${eligAskHtml(sch)}
-
-      ${/* 🔴 읽은 서류가 없으면 「제출 서류」 칸을 접는다(2026-10-17 개발자 "원문에서 확인 이렇게 뜨는 게 하나도 없어야") — 자리표시 한 줄은 서류가 아니고,
-           '원문에서 확인하라'는 문장은 학생에게 정보가 아니다. 원문 링크는 맨 아래 sheet-facts 가 준다 */ ''}
-      ${hasRealDocs ? '<h4>제출 서류</h4>' : ''}
-      ${/* 🔴 doc-badged — 줄마다 '자동'·'직접' 배지가 붙는 목록이라는 표시.
-           style.css 가 이 클래스를 보고 **왼쪽 점을 뺀다**(2026-09-17 개발자 지시:
-           배지가 이미 항목을 가르므로 점은 표식이 두 겹). 아래 map 이 배지를 항상
-           하나씩 붙이는 것이 그 전제다 — 배지를 빼면 이 클래스도 같이 빼야 한다. */ ''}
-      ${/* 🔴 '원문에서 확인하라'는 안내 줄(DOC_PLACEHOLDER)은 서류가 아니다 (2026-09-23 리뷰) —
-           '직접' 배지를 달면 그 문장을 챙겨야 할 서류처럼 읽는다. 목록에서 빼고, 남는 서류가
-           없으면 목록 대신 그 안내를 한 줄로 말한다(맨 아래 sheet-facts 의 srcLink 가 링크를 준다). */ ''}
-      ${(() => {
-        const docs = sch.documents.filter((doc) => !DOC_PLACEHOLDER.test(doc));
-        if (!docs.length) return '';   // 칸 자체를 접는다(위 h4 와 같은 조건)
-        return `<ul class="doc-list doc-badged">${docs.map((doc) => {
-          const auto = /자동/.test(doc);
-          return `<li>${auto ? '<span class="doc-auto">자동</span>' : '<span class="doc-manual">직접</span>'} ${esc(doc)}</li>`;
-        }).join('')}</ul>`;
-      })()}
-
-      ${noticeSummaryHtml(sch.excerpts)}
-      ${(() => {
-        /* 본문 사진(bodyImage · `본문이미지-793x1121.jpg`)은 첨부가 아니라 공고 원문 그 자체다 — 신청 준비 시트와 같은 규칙(51건이 이름만 늘어서 있었다 · 2026-10-15) */
-        const atts = (sch.attachments || []).filter((a) => a && !a.bodyImage);
-        if (!atts.length) return '';
-        /* 🔴 머리말이 **그 파일이 실제로 무엇인지**를 말해야 한다 (2026-09-12).
-           층1은 학교 게시판에 붙어 있던 신청서 양식이고, 층2는 재단이 KOSAF 에 올린
-           선발 공고문이다. 둘을 '첨부 양식' 한 이름으로 부르면, 공고문을 받은 학생이
-           신청서인 줄 알고 그 안에서 빈칸을 찾는다(원칙 8-1 — 확인 안 한 것을 말하지 않는다). */
-        return `
-      <h4>${sch.sourceKind === 'kosaf' ? '선발 공고문 <span class="channel-tag">재단 원문</span>' : '공고 원본 첨부 양식'}</h4>
-      <ul class="doc-list">
-        ${atts.map((a) => `<li class="att">${attachmentLinkHtml(a, 'color:var(--primary)')}${a.bytes ? ` <span class="doc-legend">${Math.max(1, Math.round(a.bytes / 1024))}KB</span>` : ''}</li>`).join('')}
-      </ul>`;
-      })()}
-      ${/* 🔴 마감일·중복 수혜 · 문의 · 원문 링크는 **맨 아래 한 묶음**이다 (2026-10-02 CTO 지시).
-           예전엔 문의는 지원 자격 아래, 링크는 제출 서류 아래(공고 원문 안내 아래에 한 번 더),
-           마감일은 첨부 아래로 흩어져 있었다. 원문 링크(srcLink)는 여기서 **한 번만** 쓴다.
-           🔴 **한 줄(한 문단)** 이다 — 같은 날 CTO 지시 "한 문단으로, 반복 지우고 간결하게".
-              '자세한 내용은 … 에서 확인' 같은 군말 없이 `마감 · 중복 수혜 · 문의 · 링크` 를 점으로 잇는다.
-              링크는 `.doc-legend a` 그대로 둔다(verify-source-links 가 그 선택자로 읽는다). */ ''}
-      ${/* 2026-10-29 개발자 지시 — 「마감 · 중복 수혜 … · 원문 공고」 점 줄을 빼고 그 자리에 한 문장(시안 A 의 문장을 시트 안으로).
-           마감은 시트 머리의 D-day 가, 중복 수혜는 금액 상세(합산 규칙)가 말한다 — 여기서 '가능'이라고 적던 것은 못 읽은 공고까지 가능으로 보였다(대청교 멘토 · 원문은 「중복참여 불가」).
-           링크는 `.doc-legend a` 그대로(verify-source-links 가 그 선택자로 읽는다) · 링크가 없는 공고(상시 제도·층2)는 sourceNoteHtml 의 말 그대로 */ ''}
-      <div class="sheet-facts">
-        ${srcLink ? `<p class="doc-legend sheet-source">자세한 내용과 접수 방법은 ${srcLink}에서 확인하세요.${srcHint ? `<br />${srcHint}` : ''}</p>` : sourceNoteHtml(sch)}
-        ${(sch.sourceKind === 'kosaf' && sch.contact) ? `<p class="doc-legend">문의 ${esc(sch.contact)}</p>` : ''}
-      </div>
+      ${/* 승인 시안(2026-11-02 · sheet-consistency.html) — 머리줄(칩·주최·D-day·저장) → 제목 → 금액 → 절 다섯(sheetSectionsHtml 한 곳 · 활동 시트와 같은 함수).
+           🔴 상세 제목도 카드와 같은 정리(cardTitleParts — 지우고 나누기만) · 금액은 읽은 것만 굵게, 재단이 적어 둔 긴 금액은 옅게, 모르면 줄 없음(「원문 확인」 글자를 띄우지 않는다). */ ''}
+      ${sheetHeadHtml({ x: sch, d: sch.program ? null : d, save: gone ? '' : saveBtnHtml(sch.id) })}
+      <h3 class="sheet-title">${esc(cardTitleParts(sch).title)}</h3>
+      ${(() => { const amt = amountLine(sch); const t = amt.text.replace(/^금액 · /, '') || (sch.amountNote && !providerUnknown(sch.amountNote) ? String(sch.amountNote).trim() : ''); return !t ? '' : amt.known ? `<p class="sheet-amount">${esc(t)}</p>` : `<p class="sheet-amount sheet-amount-unknown">${esc(t)}</p>`; })()}   ${/* 시트는 재단이 적어 둔 금액 글자를 버리지 않는다(2026-08-30) — 다만 「기관확인필요」 같은 모름 표시는 금액이 아니라 안 띄운다(리뷰 2026-11-02) */ ''}
+      ${sheetSectionsHtml({ sch, result, fit, fd, noticeLines: [...(sch.noticeLines || []), ...(sch.excerpts || [])] })}
 
       ${app && !app.pending ? (() => {
         const step = effectiveStep(app, sch);
@@ -5842,7 +5830,7 @@ function calMarks(monthStart, mine) {
     /* 🔴 접수 시작일은 **달력에 찍지 않는다** (2026-09-07 개발자 지시 — 표시를 둘로 줄임).
        달력에 남는 것은 '내가 무엇을 해야 하는 날'뿐이다: 마감과 발표.
        접수 시작은 그날 학생이 할 일이 없고(마감 전에 내면 된다), 아직 안 열린 공고라는
-       사실은 상세 시트의 일정 줄(`scheduleRowHtml`)이 그대로 말한다. */
+       사실은 상세 시트의 「접수 · 기간」 줄(applySectionHtml)이 그대로 말한다. */
   }
   return marks;
 }
@@ -5979,13 +5967,6 @@ function calDayHtml(iso) {
 /* 상세 시트에 접수 시작일·발표일을 한 줄로 (개발자 지시 4-1).
    🔴 **원문에서 읽은 것만** 적는다. 없으면 그 자리를 비운다 — 발표일을 짐작해 적으면
       학생이 그날 결과를 보러 갔다가 아무것도 없다(원칙 8-1). */
-function scheduleRowHtml(sch) {
-  const bits = [];
-  if (sch.openDate) bits.push(`접수 시작 ${esc(sch.openDate)}`);
-  if (sch.announceDate) bits.push(`발표 ${esc(sch.announceDate)}`);
-  return bits.length ? `<p class="sheet-schedule">${bits.join(' · ')}</p>` : '';
-}
-
 /* ---------------- 보관함 (MY) ----------------
    저장한 공고를 모아 보는 자리. 🔴 **금액 합계를 내지 않는다** — 합산은 더하기가 아니라
    고르기라(같은 장학금 한 번만 + 배타 그룹에서 최대 하나) 여기서 따로 더하면
