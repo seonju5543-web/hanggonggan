@@ -2,7 +2,7 @@
    저장소(collector/extracted/)에 저장한다. 정식 등록 큐레이션의 원천 자료. */
 import fs from 'node:fs';
 import { htmlToLines } from './html-text.mjs';
-import { isHtmlPayload } from './attachment-link.mjs';
+import { isHtmlPayload, fetchableUrl } from './attachment-link.mjs';
 /* 요청 머리말은 http-headers.mjs 한 곳에 있다 — 베껴 두면 한쪽만 고쳐져
    "수집기는 받는데 심층 수집은 못 받는" 어긋남이 생긴다 (2026-08-20 신설, 첫머리 주석 참조) */
 import { FETCH_HEADERS } from './http-headers.mjs';
@@ -300,8 +300,11 @@ async function downloadForms() {
     for (const a of n.attachments || []) {
       if (/부속기관|부설/.test(a.name)) continue; // 사이트 공통 링크 제외
       if (Date.now() - startedAt > BUDGET_MS) break;
+      /* `javascript:` 첨부는 진짜 주소로 푼다 — 못 풀면 지금처럼 건너뛴다(attachment-link fetchableUrl 한 곳 · 2026-11-02) */
+      const fetchUrl = fetchableUrl(a.url, n.url);
+      if (!fetchUrl) { console.log('attach skip (스크립트 주소를 못 풂):', a.name); continue; }
       try {
-        const res = await fetch(a.url, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(30000) });
+        const res = await fetch(fetchUrl, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(30000) });
         if (!res.ok) { console.log('attach fail', res.status, a.name); continue; }
         const buf = Buffer.from(await res.arrayBuffer());
         if (buf.length < 1000 || buf.length > 15 * 1024 * 1024) continue;
@@ -403,8 +406,12 @@ async function downloadEligDocs() {
     let ai = 0;
     for (const a of atts) {
       if (Date.now() - startedAt > BUDGET_MS) { cut = true; break; }
+      /* 🔴 `javascript:downGO(…)`·`javascript:downloadfile(…)` 첨부(2026-11-02 · 정식 등록 8개)는 fetch 가 주소로 못 읽어 오류로 건너뛰었다 —
+         받기 직전에 진짜 주소로 푼다(attachment-link fetchableUrl → resolveJsDownload 한 곳). 모르는 사이트면 null → 지금처럼 건너뛴다 */
+      const fetchUrl = fetchableUrl(a.url, it.sourceUrl || it.url);
+      if (!fetchUrl) { console.log('elig doc skip (스크립트 주소를 못 풂):', a.name); continue; }
       try {
-        const res = await fetch(a.url, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(20000) });
+        const res = await fetch(fetchUrl, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(20000) });
         if (!res.ok) { console.log('elig doc fail', res.status, a.name); continue; }
         const buf = Buffer.from(await res.arrayBuffer());
         if (buf.length < 1000 || buf.length > MAX_BYTES) continue;   // 5906×8268 포스터도 8MB 안에 든다(실측)
