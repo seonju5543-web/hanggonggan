@@ -3,6 +3,91 @@
  "updatedAt": "2026-11-02",
  "items": [
   {
+   "title": "★2026-2학기 재(복)학생 등록금 분할납부(4차) 안내★",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726818",
+   "postedAt": "2026-11-02",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/bcd400a8b82e115f.webp"
+  },
+  {
+   "title": "탄자니아 잔지바르 여성어업종사자 해양수산업 가치사슬 구축 PMC 사업 프로젝트 실무전문가(PAO) 채용공고",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726827",
+   "postedAt": "2026-11-02",
+   "kind": "채용",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-11-02",
+   "desc": "프로젝트 실무전문가 (PAO) 채용공고 □ 모집개요 - 모집분야 : PAO(Project Action Officer)"
+  },
+  {
+   "title": "[박물관] 2026년 박물관 문화답사 안내",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726826",
+   "postedAt": "2026-11-02",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-11-02",
+   "desc": "우리 박물관은 문화로 행복한 대학 복지 기여를 위해 교내 구성원을 대상으로 우리 문화유산을 심도 있게 살피는 전문 답사를 매년 실시하고 있습니다 . 이번 답사는 < 기원祈願, 바라는 마음 > 이라는 주제로 울산…"
+  },
+  {
+   "title": "[외국인 유학생 참가자 모집] 2026 서울 외국인 취업채용박람회 참가 신청 안내",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726821",
+   "postedAt": "2026-11-02",
+   "kind": "행사",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/d17ff23d40fcbadb.webp",
+   "desc": "장소: SETEC 제1전시실(서울무역전시컨벤션센터) 참가 대상: 국립부경대학교 학부·대학원 외국인 유학생 및 졸업생"
+  },
+  {
+   "title": "[국비무료] 취업 준비의 시작, AI·SW 실무로! 2027 국립부경대학교 취업연계 4개 과정 교육생 모집",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726820",
+   "postedAt": "2026-11-02",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/a7cd539d46d5308b.webp",
+   "desc": "지역산업맞춤형인력양성사업단 <국립부경대학교 인적자원개발센터> 입니다. 노력의 크기에 비해 취업의 문턱이 너무나 높게만 느껴지는 요즘입니다."
+  },
+  {
+   "title": "[26년 11월]개교 80주년 기념 대학 캐릭터(백경이&뿌공이) 디지털 캘린더 배포",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726815",
+   "postedAt": "2026-11-02",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/5bef521d5dc7ffd6.webp",
+   "desc": "이번달은 3길 17경 중 하나 인 '은행나무길'을 담아보았습니다. 후문에서 인문사회과학대학까지 이어지는 황금빛 은행나무길은 늦가을 캠퍼스의 낭만을 잘 느낄 수 있는 명소 중 하나인 듯 합니다."
+  },
+  {
+   "title": "[소프트웨어융합혁신원] 창업 점프업 데이(Jump-up Day)참관 학생 모집 (~11/5)",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726814",
+   "postedAt": "2026-11-02",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-11-02",
+   "desc": "소프트웨어융합혁신원 SW중심대학사업의 일환으로 창업공간 입주팀이 최대 6개월간 수행한 사업 아이디어 개발 등 창업 준비 활동의 성과를 공유하는 「창업 점프업 데이」를 개최합니다."
+  },
+  {
+   "title": "2026-동계 계절수업 OCU/KCU 교과목 수강 안내",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726812",
+   "postedAt": "2026-11-02",
+   "kind": "학사",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-11-02"
+  },
+  {
    "title": "[보건진료소] 체성분분석(인바디) 예약안내-10회차",
    "url": "https://www.pknu.ac.kr/main/163?action=view&no=726809",
    "postedAt": "2026-11-02",
@@ -336,90 +421,6 @@
    "foundAt": "2026-10-19",
    "thumb": "data/news/img/1ee5d90af149da66.webp",
    "desc": "국립부경대학교 박물관은 문화체육관광부가 주최하고 (사)한국박물관협회가 주관하는 K-뮤지엄 지역 순회 전시 및 투어 지원사업 '뮤지엄 이음'의 일환으로 순회전 <우리 곁의 동물 > 을 개최합니다 . 이번 전시는…"
-  },
-  {
-   "title": "◆취업성공을 위한 [6시그마GB+BB통합과정] 3차 직무자격증 교육안내◆",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726643",
-   "postedAt": "2026-10-19",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-19",
-   "thumb": "data/news/img/37b09ef5c61d21f6.webp",
-   "desc": "학생성공지원과 ◆ 6 시그마 (3 차 ) 프로그램 안내 ◆ - 교육일시 : 2026 년 11 월 1 2 일 ( 목 ) ~ 11 월 15 일 ( 일 ) <4 일운영 >"
-  },
-  {
-   "title": "■ 채용공고 ■ 대학입학전형 업무보조 일용직원 채용 공고 - 접수기한 2026.10.19.(월)까지",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726642",
-   "postedAt": "2026-10-19",
-   "kind": "채용",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-19"
-  },
-  {
-   "title": "★[채용공고]지능형로봇혁신융합대학사업단 전임연구원(기간제계약직) 채용★",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726621",
-   "postedAt": "2026-10-16",
-   "kind": "채용",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-16",
-   "desc": "국립부경대학교 지능형로봇혁신융합대학사업단에서는 아래와 같이 전임연구원 ( 기간제 계약직 ) 를 채용합니다 . ** 사업단 홈페이지 : https://icms.pknu.ac.kr/coss"
-  },
-  {
-   "title": "[KIMST]2026년도 찾아가는 진로상담 신청(~10/19(월) 18:00까지 사전등록)",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726615",
-   "postedAt": "2026-10-15",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-15",
-   "thumb": "data/news/img/7d2d48e82a0ff993.webp",
-   "desc": "영남씨그랜트센터 해양수산과학기술진흥원(KIMST)*에서 해양수산 분야 관련 학과 대학(원)생을 대상으로 '2026년도 찾아가는 진로상담'을 개최하오니 관심 있는 학생은 아래 내용과 포스터를 참고하여 신청바랍니다."
-  },
-  {
-   "title": "[후원의집 홍보] 굿모닝내과 '부경대학교 구성원 대상 혜택 안내(Good Morning Internal Medicine(中文))",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726609",
-   "postedAt": "2026-10-15",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-15",
-   "thumb": "data/news/img/5605140be508161a.webp"
-  },
-  {
-   "title": "[후원의집 홍보] 굿모닝내과 '부경대학교 구성원 대상 혜택 안내(수액 15%추가 할인)",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726608",
-   "postedAt": "2026-10-15",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-15",
-   "thumb": "data/news/img/ecad17655ceb617e.webp",
-   "desc": "대외협력과 (재)국립부경대학교발전기금의 후원의 집 \"굿모닝내과\" 부경대학교 구성원 대상 이벤트 혜택을 소개합니다."
-  },
-  {
-   "title": "2026년 10월 모의토익 시험 고사장 안내",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726607",
-   "postedAt": "2026-10-15",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-15",
-   "desc": "* 시험 일자 : 2026년 10 월 15일 ( 목 ) * 시험 장소: 미래관(A21) 2층 소민홀 * 입실 시간 : 18:20 입실시작 , 18:50 이후 절대 입실 금지 * 시험준비물"
-  },
-  {
-   "title": "■ 채용공고 ■ 대학입학전형 업무보조 일용직원 채용 공고 - 접수기한 2026.10.19.(월)까지",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726606",
-   "postedAt": "2026-10-15",
-   "kind": "채용",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-15"
   }
  ]
 }

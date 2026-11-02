@@ -3,6 +3,16 @@
  "updatedAt": "2026-11-02",
  "items": [
   {
+   "title": "(긴급) Synology NAS 랜섬웨어 감염 주의 및 DSM 보안 업데이트 권고",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/270590/artclView.do",
+   "postedAt": "2026-11-02",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-11-02",
+   "desc": "최근 Synology NAS의 운영체제(DSM) 보안 취약점을 악용한 랜섬웨어 감염 피해가 급증하고 있습니다."
+  },
+  {
    "title": "[IR센터] HUFS Voice 설문조사 참여 안내 (기프티콘 추첨 지급)",
    "url": "https://www.hufs.ac.kr/bbs/hufs/2180/270518/artclView.do",
    "postedAt": "2026-11-02",

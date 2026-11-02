@@ -4,7 +4,7 @@
  "items": [
   {
    "title": "[학부]2026학년도 전기(2027년 2월) 졸업예정여부 조회 및 졸업의사 신청 관련 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367714&article.offset=0&articleLimit=10&no=353",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367714&article.offset=0&articleLimit=10&no=362",
    "postedAt": "2026-10-30",
    "kind": "학사",
    "school": "이화여자대학교",
@@ -14,27 +14,29 @@
   },
   {
    "title": "[인사팀] 이화여자대학교 직원 채용 공고(2027.1.1.자)",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367684&article.offset=0&articleLimit=10&no=353",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367684&article.offset=0&articleLimit=10&no=362",
    "postedAt": "2026-10-29",
    "kind": "채용",
    "school": "이화여자대학교",
    "campus": "",
    "src": "ec6597da",
-   "foundAt": "2026-11-02"
+   "foundAt": "2026-11-02",
+   "desc": "※ 지원기간 중 ‘ 이화여자대학교 직원 채용 홈페이지 ’ 를 통한 인터넷 지원만 가능함 [ 문의처 ] 이화여자대학교 총무처 인사팀 페이스북"
   },
   {
    "title": "[학부] 2026학년도 겨울 계절학기 수강안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367643&article.offset=0&articleLimit=10&no=353",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367643&article.offset=0&articleLimit=10&no=362",
    "postedAt": "2026-10-27",
    "kind": "학사",
    "school": "이화여자대학교",
    "campus": "",
    "src": "ec6597da",
-   "foundAt": "2026-11-02"
+   "foundAt": "2026-11-02",
+   "desc": "1. 첨부의 수강안내문을 반드시 읽어 보시기 바랍니다. 2. 강의시간표 조회( 2026.10.30.( 금) 09:00부터 ): 홈페이지&rarr;학사안내&rarr; 강의시간표/계획안"
   },
   {
    "title": "[교육기획팀] 2026 AI4AE DAY 참가 신청 안내 (11. 6.(금))",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367575&article.offset=0&articleLimit=10&no=353",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367575&article.offset=0&articleLimit=10&no=362",
    "postedAt": "2026-10-23",
    "school": "이화여자대학교",
    "campus": "",
@@ -43,13 +45,56 @@
   },
   {
    "title": "🍂 2026 대학혁신지원사업 홍보데이 <경험을 수확하다> 개최 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367549&article.offset=0&articleLimit=10&no=353",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367549&article.offset=0&articleLimit=10&no=362",
    "postedAt": "2026-10-22",
    "kind": "행사",
    "school": "이화여자대학교",
    "campus": "",
    "src": "ec6597da",
    "foundAt": "2026-11-02"
+  },
+  {
+   "title": "[법학전문대학원] 2027년도 제16회 변호사시험 시험관리원 모집",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367757&article.offset=0&articleLimit=10&no=361",
+   "postedAt": "2026-11-02",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-02",
+   "desc": "2027년 1월 전국 시행 예정인 제16회 변호사 시험에서 본교 시험장의 시험관리원으로 근무할 본교 재학생을 아래와 같이 선발하고자 하오니 많은 참여 바랍니다."
+  },
+  {
+   "title": "[학생지원팀] 2026학년도 재학생 교육 만족도 조사 참여하고 커피 기프티콘 받아가자!☕",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367745&article.offset=0&articleLimit=10&no=358",
+   "postedAt": "2026-11-02",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/a3a12c03753c93f1.webp",
+   "desc": "학부 참여 링크 대학원 참여 링크 문의: 학생지원팀(T. 02-3277-3863, 2277 / E. student@ewha.ac.kr ) 페이스북"
+  },
+  {
+   "title": "2026 이화가족 성탄예배 안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367744&article.offset=0&articleLimit=10&no=357",
+   "postedAt": "2026-11-02",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/6b3168fac49cdb24.webp",
+   "desc": "성탄예배는 가족 및 친구와 함께 참석이 가능합니다. 참석을 원하는 학생은 아래 링크에서 신청해주시기 바랍니다. 참여신청 링크: https://forms.gle/2QNDVKNef9euqN3b8"
+  },
+  {
+   "title": "[건축팀] 이화캠퍼스복합단지(ECC) 옥상 조경정비작업 관련 보행로 통제 안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367743&article.offset=0&articleLimit=10&no=356",
+   "postedAt": "2026-11-02",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/f0398d7c1dc194ca.webp",
+   "desc": "2. 내용: 옥상 디딤석 사이 잔디식재 ⦁ 1구간: 2026.11.4.(수)~11.5.(목), 08:00~17:00 ⦁ 2구간: 2026.11.5.(목)~11.6.(금), 08:00~17:00"
   },
   {
    "title": "[학생서비스센터] 잃어버린 물건을 확인하십시오(2026. 10.26(월) ~2026. 10.30.(금))",
@@ -372,47 +417,6 @@
    "foundAt": "2026-10-28",
    "thumb": "data/news/img/939a9bbbba4545f2.webp",
    "desc": "국토교통부에서 청년들에게 주택정책 정보를 제공하기 위한 ‘찾아가는 청년주거 상담소’를 아래와 같이 운영한다고 하니, 관심 있는 학생들은 참여하시기 바랍니다."
-  },
-  {
-   "title": "[총무팀] 셔틀버스 운행 변경 관련 안내 (10/30(금) 16:00-18:00)",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367632&article.offset=0&articleLimit=10&no=366",
-   "postedAt": "2026-10-27",
-   "kind": "생활",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-28",
-   "desc": "연구협력관 행사 진행에 따라 아래와 같이 셔틀버스를 변경 운행하오니, 이용에 참고하여 주시기 바랍니다."
-  },
-  {
-   "title": "[창업지원단/모집] 2026 스타트업 주니어 애널리스트 4기 모집(~10/28까지)",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367449&article.offset=0&articleLimit=10&no=377",
-   "postedAt": "2026-10-16",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-27",
-   "desc": "- 모집대상 및 인원: 수도권역 일반대 또는 전문대 재(휴)학생 10명 내외"
-  },
-  {
-   "title": "[기계/일반경쟁]뇌융합과학연구원/마이크로플레이트 리더 1식 구입",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367631&article.offset=0&articleLimit=10&no=376",
-   "postedAt": "2026-10-27",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-27",
-   "desc": "나. 입찰서류제출 마감일시 및 장소: 2026년 11월 3일(화) 11:00, 이비즈포유(ebiz4u.co.kr)"
-  },
-  {
-   "title": "[출판문화원] 2027 이화플래너 · 이화달력 출시 기념 팝업스토어가 열립니다!",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367630&article.offset=0&articleLimit=10&no=375",
-   "postedAt": "2026-10-27",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-10-27",
-   "thumb": "data/news/img/42180b51868d227c.webp"
   }
  ]
 }

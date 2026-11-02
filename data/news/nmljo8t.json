@@ -3,6 +3,28 @@
  "updatedAt": "2026-11-02",
  "items": [
   {
+   "title": "학사 2027학년도 1학기 복학, 휴학, 유급 신청 안내",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2027%ED%95%99%EB%85%84%EB%8F%84-1%ED%95%99%EA%B8%B0-%EB%B3%B5%ED%95%99-%ED%9C%B4%ED%95%99-%EC%9C%A0%EA%B8%89-%EC%8B%A0%EC%B2%AD-%EC%95%88%EB%82%B4&keyword",
+   "postedAt": "2026-11-02",
+   "kind": "학사",
+   "school": "숭실대학교",
+   "campus": "",
+   "src": "3b348584",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/e6025fe17f41f07c.webp"
+  },
+  {
+   "title": "비교과·행사 [모집] AI & 프롬프트 리터러시(심화) (~11.16.)",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EB%AA%A8%EC%A7%91-ai-%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8-%EB%A6%AC%ED%84%B0%EB%9F%AC%EC%8B%9C%EC%8B%AC%ED%99%94-11-16&keyword",
+   "postedAt": "2026-11-02",
+   "school": "숭실대학교",
+   "campus": "",
+   "src": "3b348584",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/af4ca387621d11b5.webp",
+   "desc": "주제: AI를 잘 쓰는 세 가지 리터러시 장소: 전산관 다솜홀 강연자: 박정훈 박사(한국과학기술정보연구원 책임 연구원, 중부대학교 문헌정보학과 겸임교수)"
+  },
+  {
    "title": "외국인유학생 법무부 외국인 유학생 불법 취업 단속 강화 안내",
    "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EB%B2%95%EB%AC%B4%EB%B6%80-%EC%99%B8%EA%B5%AD%EC%9D%B8-%EC%9C%A0%ED%95%99%EC%83%9D-%EB%B6%88%EB%B2%95-%EC%B7%A8%EC%97%85-%EB%8B%A8%EC%86%8D-%EA%B0%95%ED%99%94-%EC%95%88%EB%82%B4&keyword",
    "postedAt": "2026-11-02",
@@ -401,29 +423,6 @@
    "campus": "",
    "foundAt": "2026-10-06",
    "desc": "주님께서 주시는 평안의 자리로 숭실가족 여러분들을 초대합니다. 많은 관심과 기도, 그리고 참여를 부탁드립니다.",
-   "src": "3b348584"
-  },
-  {
-   "title": "채용 IT대학 전자정보공학부 학사조교 채용 안내",
-   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=it%EB%8C%80%ED%95%99-%EC%A0%84%EC%9E%90%EC%A0%95%EB%B3%B4%EA%B3%B5%ED%95%99%EB%B6%80-%ED%95%99%EC%82%AC%EC%A1%B0%EA%B5%90-%EC%B1%84%EC%9A%A9-%EC%95%88%EB%82%B4-2&keyword",
-   "postedAt": "2026-10-06",
-   "kind": "채용",
-   "school": "숭실대학교",
-   "campus": "",
-   "foundAt": "2026-10-06",
-   "desc": "1. 모집 요건 가. 지원자격 : 대학 4년제 학사 학위 이상 소지자 나. 지원조건 : 조교 임용규정에 결격 사유가 없는 자",
-   "src": "3b348584"
-  },
-  {
-   "title": "학사 2026학년도 2학기 학부 중간 강의평가 실시 안내[2026. 10. 6.(화) ~ 10. 19.(월)]",
-   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%ED%95%99%EB%B6%80-%EC%A4%91%EA%B0%84-%EA%B0%95%EC%9D%98%ED%8F%89%EA%B0%80-%EC%8B%A4%EC%8B%9C-%EC%95%88%EB%82%B42026-10-6-%ED%99%94-10-19&keyword",
-   "postedAt": "2026-10-06",
-   "kind": "학사",
-   "school": "숭실대학교",
-   "campus": "",
-   "foundAt": "2026-10-06",
-   "thumb": "data/news/img/ccd2695f1628fd12.webp",
-   "desc": "2026학년도 2학기 학부 중간 강의평가 를 다음과 같이 실시하니 학부 재학생 여러분의 많은 관심과 적극적인 참여를 바랍니다.",
    "src": "3b348584"
   }
  ]

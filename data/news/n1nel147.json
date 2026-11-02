@@ -3,6 +3,24 @@
  "updatedAt": "2026-11-02",
  "items": [
   {
+   "title": "11월 계명모의토익 안내",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271739&pageOrder=0&cmd=2&parm_bod_uid=271739&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-11-02",
+   "school": "계명대학교",
+   "campus": "",
+   "src": "9a241a98",
+   "foundAt": "2026-11-02"
+  },
+  {
+   "title": "2026 계명대학교 한국학 국제학술대회(KICKS) 개최",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271739&pageOrder=0&cmd=2&parm_bod_uid=271737&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-11-02",
+   "school": "계명대학교",
+   "campus": "",
+   "src": "9a241a98",
+   "foundAt": "2026-11-02"
+  },
+  {
    "title": "[연말정산] 2026년도 강사의 연말정산을 위한 근로소득․세액공제신고서 제출 안내",
    "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=0&pageOrder=0&cmd=2&parm_bod_uid=271722&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
    "postedAt": "2026-11-02",
@@ -352,24 +370,6 @@
    "campus": "",
    "src": "9a241a98",
    "foundAt": "2026-10-12"
-  },
-  {
-   "title": "26학년도 2학기 일대일 컨설팅 프로그램 안내",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271262&pageOrder=0&cmd=2&parm_bod_uid=270606&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
-   "postedAt": "2026-09-14",
-   "school": "계명대학교",
-   "campus": "",
-   "foundAt": "2026-10-09",
-   "src": "9a241a98"
-  },
-  {
-   "title": "[학생상담센터]2026학년도 2학기 주제별 집단상담 안내",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271262&pageOrder=0&cmd=2&parm_bod_uid=271262&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
-   "postedAt": "2026-10-08",
-   "school": "계명대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "src": "9a241a98"
   }
  ]
 }
