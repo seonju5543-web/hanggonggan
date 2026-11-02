@@ -3566,7 +3566,7 @@
    "expiredAt": "2026-10-31"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0701002",
    "org": "방일영문화재단",
    "name": "방일영탈북장학생",
@@ -3576,7 +3576,9 @@
    "cards": 4,
    "dir": "insta/pub/0701002",
    "at": "2026-10-16",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-02"
   },
   {
    "status": "prepared",
@@ -3857,7 +3859,7 @@
    "dates": "absolute"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2701048001",
    "org": "덕성모아장학회",
    "name": "덕성모아장학금",
@@ -3867,7 +3869,9 @@
    "cards": 4,
    "dir": "insta/pub/2701048001",
    "at": "2026-10-23",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-02"
   },
   {
    "status": "prepared",

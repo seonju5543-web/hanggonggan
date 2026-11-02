@@ -1,7 +1,18 @@
 {
  "school": "국민대학교",
- "updatedAt": "2026-11-01",
+ "updatedAt": "2026-11-02",
  "items": [
+  {
+   "title": "학사 수료예정증명서 발급 안내",
+   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12577/view.do?currentPageNo=1",
+   "postedAt": "2026-10-27",
+   "kind": "학사",
+   "school": "국민대학교",
+   "campus": "",
+   "src": "78d70305",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/46649198969ba71f.webp"
+  },
   {
    "title": "2026학년도 2학기 중간 수업평가 시행 안내",
    "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12491/view.do?currentPageNo=1",
@@ -108,16 +119,6 @@
    "campus": "",
    "foundAt": "2026-10-03",
    "src": "78d70305"
-  },
-  {
-   "title": "2026학년도 2학기 글말교실 운영 안내",
-   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12444/view.do?currentPageNo=1",
-   "postedAt": "2026-10-01",
-   "kind": "생활",
-   "school": "국민대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "thumb": "data/news/img/1f013409522242ea.webp"
   }
  ]
 }
