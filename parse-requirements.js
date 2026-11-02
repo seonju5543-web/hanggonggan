@@ -76,7 +76,9 @@ function parseGrade(t, isExclude) {
   /* 제외 줄의 `학점 3.0(4.5환산)에 미달된 때` 는 '3.0 이상이어야 한다'와 같은 말이다 — 제외 줄에서만 `미달` 을 문턱으로 읽는다
      (자격 줄의 `3.0 미달` 은 성적 향상 장학처럼 뜻이 반대일 수 있어 안 읽는다 · 2026-11-02 · 2단계 2차) */
   /* ⚠️ `미달` 로 **줄이 끝나야** 한다(리뷰) — `3.0 미달 학기가 2회 이상`·`미달 시 환수·지급 중단`·`미달로 경고를 받은` 은 횟수·이력·사후 조치라 지금 평점으로 못 가린다 */
-  const mDec = t.match(/(\d\.\d{1,2})\s*점?\s*\)?\s*(?:\([^)]{0,8}\))?\s*(?:\/\s*4\.[35])?\s*점?\s*(?:이상|이상인|넘)/)
+  /* 🔴 척도를 닫는 괄호는 **척도 뒤**에 둔다 (2026-11-02 · 3차) — `85점(2.8/4.3) 이상`·`평점 B(2.8/4.3) 이상` 에서 `\)?` 가 척도 앞에 있어
+     척도 숫자 4.3 을 문턱으로 집었다(4.3 만점 2.9 학생에게 틀린 ✕). 슬래시 바로 뒤 숫자(척도)는 문턱이 아니다 — `(?<!\/\s*)` */
+  const mDec = t.match(/(?<!\/\s*)(\d\.\d{1,2})\s*점?\s*(?:\([^)]{0,8}\))?\s*(?:\/\s*4\.[35])?\s*점?\s*\)?\s*(?:이상|이상인|넘)/)
     || (isExclude ? t.match(/(\d\.\d{1,2})\s*점?\s*(?:\([^)]{0,8}\))?\s*에?\s*미달(?:된|인|한)?\s*(?:때|경우|자|학생|사람)?\s*[.)]?\s*$/) : null);
   /* 🔴 **점수와 `이상` 사이의 괄호** (2026-10-12 · 카드 분석 조각 1). `백분위 70점(C0) 이상`·`70점(평점 1.51에 해당) 이상`·
      `70 점 (100 점 만점 ) 이상` — 괄호가 끼면 통째로 못 읽어 줄이 '모름'이었다(실측 4줄). 평점 쪽(mDec)이 이미 허용하는 것과 같다.
@@ -308,6 +310,14 @@ function parseSemester(t) {
   if (pairs.length) {
     /* 앞으로 올 학년도면 조건은 남기되 판정하지 않는다(ahead → judgeCond 가 '모름') — 조건을 아예 빼면 남은 '재학생' 하나가 맞아 ✓ 가 된다(틀린 안심) */
     if (yearsAhead(t) > 0) return { kind: 'semester', anyOf: [...new Set(pairs)], ahead: true, conf: LOW };
+    /* 🔴 두 쌍 사이가 `~`·`부터 … 까지` 면 **범위**다 (2026-11-02 · 3차) — 인재림 `1학년 2학기 이수 후 ~ 3학년 2학기 이수 후 휴학 중인 학생` 을
+       anyOf [2,6] 으로 읽어 2학년에게 미달이었다(틀린 ✕). `이수 후` 는 마친 학기(done)이고, 그 학년을 다 마치고 쉬는 학생도 있어 위 끝을 한 학기 넓힌다(after) —
+       학년만 아는 프로필이라 경계 학년(1·4학년)은 '모름'이 된다 */
+    if (pairs.length === 2 && pairs[0] < pairs[1]
+        && /(?<!\d)\d\s*학년\s*[12]\s*학기[^~∼～,.]{0,12}(?:[~∼～]|부터)[^~∼～,.]{0,6}?\d\s*학년\s*[12]\s*학기/.test(t)) {
+      return { kind: 'semester', min: pairs[0], max: pairs[1], done: /이수|수료|마친|마치/.test(t),
+               ...(/(?:이수|수료|마친)\s*후/.test(t) ? { after: true } : {}), conf: HAS_EXCEPTION.test(t) ? LOW : HIGH };
+    }
     const tail = t.match(/(?<!\d)\d\s*학년\s*[12]\s*학기\s*(이상|이하|이내|미만|초과)/);
     if (pairs.length === 1 && tail) {
       const v = pairs[0], upper = /이하|이내|미만/.test(tail[1]);
@@ -509,7 +519,13 @@ function parseTrait(t, isExclude) {
 }
 
 /* ── 국적 ── */
-function parseNationality(t) {
+function parseNationality(t, isExclude) {
+  /* 🔴 `외국인 유학생 제외`·`외국인 학생 지원 불가` 는 **한국 학생이 대상**이라는 말이다 (2026-11-02 · 3차) — 이화플러스
+     `직전학기 평점 2.00 이상인 정규등록 재학생 (신·편입생 포함, 외국인 유학생 제외)` 가 낱말만 보고 외국인 조건이 되어 한국 학생 전원에게 미달이었다.
+     아래 외국인 규칙보다 **먼저** 본다. 확신은 낮게 — 복수국적·재외국민 학생에게 ✕ 를 내지 않는다(외국인이 아니라는 것만 안다) */
+  /* ⚠️ 사이에 괄호를 못 넘는다 — `외국인 유학생(정부초청 장학생 제외)` 의 `제외` 는 외국인을 빼는 말이 아니다.
+     ⚠️ 자격 줄에서만 — 제외 줄의 `외국인 유학생 선발 불가` 는 지금처럼 외국인 조건(judgeCond 가 제외 줄에서 뒤집는다)이라야 한국 학생이 통과한다 */
+  if (!isExclude && /외국인\s?(?:유학생|학생)?[^.()（）]{0,12}?(?:제외|(?:지원|신청)\s?불가|불가)/.test(t)) return { kind: 'nationality', eq: 'korean', conf: LOW };
   if (/외국인\s?유학생|유학생으로서|외국인\s?학생/.test(t)) return { kind: 'nationality', eq: 'foreign', conf: HIGH };
   if (/대한민국\s?국적|국적\s?소지|내국인/.test(t)) {
     /* 🔴 `대한민국 국적으로 **외국 대학에 재학 중인** 대학생`(제외)은 국적이 아니라
@@ -822,7 +838,9 @@ function parseResidence(t) {
   }
   /* `관내`는 **그 재단의 관할**을 뜻한다 — 어느 시·군인지는 줄만 봐서는 모르고
      공고를 낸 곳(주관 기관 이름)이 정한다. 판정기가 맥락으로 받는다. */
-  const inArea = /관내|관할/.test(t);
+  /* `관내·외 대학생`·`관내외`·`관내 및 관외` 는 **안팎 모두**라는 말이다 — 관할 거주 요건이 아니다(2026-11-02 · 3차 · 진천군 워킹홀리데이 줄이
+     맨 `거나` 예외에 기대어 '모름'이던 것이, 그 예외를 걷자 모든 학생에게 ✕ 가 되려 했다) */
+  const inArea = /관내|관할/.test(t) && !/관내\s?(?:[·ㆍ/,]\s?)?(?:외|관외)(?![가-힣])|관내\s?(?:및|와|과)\s?관외/.test(t);
   if (!prov.length && !cities.length && !inArea) return unnamedPlace(t, 'home');
   /* 🔴 거주 요건은 **예외를 달고 다닌다.** 실제 원문:
        `부·모 또는 보호자가 광양시에 1년 이상 주소를 둔 자
@@ -837,16 +855,61 @@ function parseResidence(t) {
      시·도가 달라도 미달로 판정하면서(아래 judgeCond) 이 꼴을 예외로 넣었다 — 경기도 학교에 다니는 서울 학생이 틀린 미달이 되지 않게. */
   /* `주민등록이 되어 있거나, 강화군 내 중·고등학교 3년 재학 후 졸업한 사람` — 거주 아닌 다른 연고(출신 학교)로도 되는 줄은 ✕ 를 못 낸다(2026-10-31 · 외대 글로벌 전수에서 틀린 ✕ 1건) */
   /* `그 외: 본인 또는 보호자의 주민등록이 3년이상 … 고창군` — 「그 외」 는 앞 줄(다른 연고)이 아닐 때의 갈래라 이 줄 하나로 ✕ 를 못 낸다(모름 · 맞으면 ✓ · 2026-11-02) */
-  const RES_EXCEPT = /관외[^,.]{0,12}인정|거주\s?(요건)?\s?(을|를)?\s?(면제|제외|미적용)|예외|다만|단\s|무관|해당\s?없|생활권|거나|소재|^\s*그\s?외\s*[:：]/;
+  const RES_EXCEPT = /관외[^,.]{0,12}인정|거주\s?(요건)?\s?(을|를)?\s?(면제|제외|미적용)|예외|다만|단\s|무관|해당\s?없|생활권|소재|^\s*그\s?외\s*[:：]/;
+  /* 🔴 맨 `거나` 는 예외가 아니다 (2026-11-02 · 3차 · 1차에서 넣은 회귀) — `안산시에 3년 이상 계속 주민등록을 두거나 합산 10년이상 주민등록을 두고 거주하는 자`·
+     `(보호자) …강화군에 주민등록이 되어있거나 현재 군에 주민등록이 되어 있고, 과거 합산 10년 …` 은 **두 갈래 모두 거주**라 다른 시·군 학생은 ✕ 가 맞는데 모름이 됐다(틀린 안심).
+     ① 거나 뒤 40자 안에 다른 연고(졸업·재학·출신·학교)가 있고 거주 낱말이 없을 때 ② 줄이 거나로 끝나 뒷갈래를 못 볼 때만 예외로 본다.
+     앞갈래가 다른 연고인 꼴(`본인이 통영시 관할 학교를 6년 이상 재학하거나 주민등록상 6년 이상 통영시에 주소를 두고`)도 같다 — 거나 앞 절(쉼표·앞 거나까지)을 ① 과 같은 잣대로 본다 */
+  const otherTie = (seg) => /졸업|재학|출신|학교/.test(seg) && !/주민등록|주소|거주|전입/.test(seg);
+  const orOtherTie = [...t.matchAll(/거나/g)].some((mo) => {
+    const after = t.slice(mo.index + 2, mo.index + 42);
+    const before = t.slice(Math.max(0, mo.index - 40), mo.index).split(/[,，]|거나/).pop();
+    return /^\s*[,.]?\s*$/.test(after) || otherTie(after) || otherTie(before);
+  });
   /* 🔴 공용 HAS_EXCEPTION 을 쓰지 않는다 — 거기엔 `포함` 이 들어 있어서
      `공고일 **포함**하여 1년 이상 계속하여 용산구에 주민등록` 이 예외로 오인됐고,
      그래서 다른 구 학생에게도 미달이 안 떴다(2026-08-30 전수 대조에서 잡았다).
      거주 요건의 예외는 위 RES_EXCEPT 로만 판단한다. */
   /* about:'home' — 갈래를 **모든 갈래에 적는다**. ②③ 에만 적으면 '없음'이 두 가지 뜻
      (거주지다 / 아직 안 가른 옛 값)을 갖게 되고, 그걸 읽는 쪽이 갈라진다. */
-  return { kind: 'residence', about: 'home', anyOf: prov, cities, inArea,
-    conf: RES_EXCEPT.test(t) ? LOW : HIGH };
+  const out = { kind: 'residence', about: 'home', anyOf: prov, cities, inArea,
+    conf: (RES_EXCEPT.test(t) || orOtherTie) ? LOW : HIGH };
+  /* 🔴 거주 **기간**·**누가**·**어디 안쪽**을 담는다 (2026-11-02 · 3차 · 틀린 ✓ 31곳). 프로필에 거주 기간·읍면동 칸이 없어서
+     시·군만 맞으면 ✓ 를 냈다 — `공고일 기준 1년 이상 계속 기장군에 주소를 둔` 을 이사 온 지 석 달 된 학생도 ✓ 로 봤다(틀린 안심).
+     질문은 더하지 않는다(개발자 결정 대기) — judgeCond 가 이 표식이 있으면 맞아도 ✓ 대신 '모름'을 낸다. 다르면 지금처럼 판정한다 */
+  const months = residenceMonths(t);
+  if (months) out.minMonths = months;
+  if (parentOnlyResidence(t)) out.parentOnly = true;
+  if (SUB_AREA.test(t)) out.subArea = true;
+  return out;
 }
+
+/* 거주 기간 — 거주 낱말과 **같은 절**에 있는 `n년|n개월 이상`·`n개월 전부터` 만 (개월로 돌려준다 · 없으면 0).
+   `3년(36개월)이상`·`6개월(1년) 이상`(익산 · 관내·관외 학교에 따라 다른 기간) 은 괄호 앞 수를 쓴다 — 어느 쪽이든 '모름'이 되는 것은 같다.
+   ⚠️ 재직·활동·재학·체류·졸업·의무복무·수혜 기간, `직전 n년 다른 시군구` 는 거주 기간이 아니다 — 절을 `,`·`거나`·`:` 로 끊고 그 절에서만 본다 */
+const RES_DUR = /(\d{1,2})\s*(년|녀|개월)\s*(?:\(\s*\d+\s*(?:개월|년)\s*\))?\s*(?:이상|미만|(?:이)?전\s*(?:\([^()]{0,20}\))?\s*부터)/g;
+function residenceMonths(t) {
+  let best = 0;
+  for (const m of String(t).matchAll(RES_DUR)) {
+    const before = t.slice(Math.max(0, m.index - 24), m.index).split(/[,，:：;]|거나/).pop();
+    const after = t.slice(m.index + m[0].length, m.index + m[0].length + 24).split(/[,，:：;]|거나/)[0];
+    const clause = before + m[0] + after;
+    if (!/거주|주소|주민등록|전입/.test(clause)) continue;
+    if (/재직|활동|재학|체류|졸업|의무\s?복무|수혜|다른\s?(?:시|군|구|지역)|타\s?(?:시|군|구|지역)/.test(clause)) continue;
+    const n = Number(m[1]) * (m[2] === '개월' ? 1 : 12);
+    if (n > best) best = n;
+  }
+  return best;
+}
+/* 보호자·부모**만** 사는 곳을 말하는 줄 — `보호자가 …`·`(보호자) …`·`부모가 …`·`○○구민의 자녀`. 본인·학생 갈래가 있으면 아니다.
+   ⚠️ `학생의 주소 무관` 의 `학생의` 는 본인 갈래가 아니다(영광군 원문) */
+function parentOnlyResidence(t) {
+  const s = String(t);
+  if (!/^[\s\-–·•○◦*]*\(?\s*보호자\s*\)?|보호자\s?(?:중\s?\d\s?(?:명|인)\s?)?(?:이|가)\s|부모\s?(?:중\s?\d\s?(?:명|인)\s?)?(?:이|가)\s|부\s?또는\s?모(?:가|\s)|(?:시민|군민|구민|도민)의\s?자녀/.test(s)) return false;
+  return !/본인|학생(?!의)|대상자|대학생|자녀\s?또는|또는\s?(?:그\s?)?(?:자녀|자의\s?자녀)|가족|가구원|(?:시민|군민|구민|도민)\s?또는|자\s?또는/.test(s);
+}
+/* 시·군보다 **안쪽**(읍·면·동)이나 특정지역 — 시·군이 맞아도 그 안인지 모른다. 읍면동 이름은 시·군 바로 뒤이거나 `…에 주소·거주` 앞일 때만(보통명사 `활동`·`측면` 을 안 집는다) */
+const SUB_AREA = /(?:시|군|구)\s+[가-힣]{1,4}(?:읍|면|동)(?![가-힣])|[가-힣]{1,4}(?:읍|면|동|리)에\s?(?:[^,]{0,10}\s)?(?:주소|거주|주민등록)|[가-힣]{2,10}(?:전환지역|주변지역|접경지역|폐광지역)/;
 
 /* 🔴 **학교 이름이 걸린 요건** (2026-08-30 개발자 지적: "~대 학생은 제외 이런 요건 정도는
    다 할 수 있잖아"). 실제로 `현재 충남대학교 재학 중인 학부생` 에 한국외대 학생이
@@ -978,6 +1041,10 @@ function parseSchool(t) {
     if (SCHOOL_GENERIC.test(name) || SCHOOL_COLLEGE.test(name) || SCHOOL_ROLE.test(name)) continue;
     const around = t.slice(Math.max(0, m.index - 10), m.index + m[0].length + 10);
     if (SCHOOL_NOT_SELF.test(around)) continue;
+    /* 🔴 `…법 제2조제5호에 따른 기능대학 재학생` — 법이 정한 **학교 종류**지 학교 이름이 아니다 (2026-11-02 · 3차 · 층2 영광군).
+       원문의 학교 종류 줄 셋(고등교육법 학교 · 평생교육법 전공대학 · 기능대학)은 그중 하나라는 뜻인데 줄마다 따로 판정해 일반 대학생에게 ✕ 였다(틀린 미달).
+       이름 바로 앞이 `에 따른`·`에 의한`·`에 해당하는`·`에 규정된` 이면 조건을 만들지 않는다 */
+    if (/(?:에\s?따른|에\s?의한|에\s?해당하는|에\s?규정된)\s*$/.test(t.slice(Math.max(0, m.index - 16), m.index + m[0].indexOf(name)))) continue;
     if (!names.includes(name)) names.push(name);
   }
   if (!names.length) return null;
@@ -1265,7 +1332,7 @@ function parseLine(line, isExclude) {
   const conds = [];
   const push = (c) => { if (Array.isArray(c)) conds.push(...c); else if (c) conds.push(c); };
   push(parseGrade(t, isExclude)); push(parseBracket(t)); push(parseIncomeBand(t)); push(parseCredits(t)); push(parseYear(t)); push(parseSemester(t)); push(parseCert(t));
-  push(parseStatus(t, isExclude)); push(parseFlags(t)); push(parseTrait(t, isExclude)); push(parseNationality(t));
+  push(parseStatus(t, isExclude)); push(parseFlags(t)); push(parseTrait(t, isExclude)); push(parseNationality(t, isExclude));
   push(parseAge(t)); push(parseResidence(t)); push(parseSchool(t)); push(parseMajor(t));
   push(parseDegree(t, isExclude)); push(parseOpen(t, isExclude)); push(parseSchoolType(t, isExclude));
   /* 🔴 제외 줄의 학년은 **확신을 낮춘다** (2026-10-11 · 조각 B 리뷰). 제외 줄은 조건이 모두 맞아야 걸린다 —
