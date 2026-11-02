@@ -4535,10 +4535,9 @@ console.log('\n■ 자격 절 고르기 — 이름표 줄 · 짧은 블록 덧�
     q(['신청자격 및 선발기준', '우수장학금', '⁕등록금성', '- 직전학기 성적 4.0/4.5 이상인 재학생', '※ 선발기준 우선순위', '다자녀장학금', '⁕등록금성', '- 셋째 이상 자녀인 재학생', '※ 선발기준 우선순위', '신청기간 : 10.1~10.10']), []);
   eq('  갈래 이름 줄이 하나뿐이면 예외가 아니다',
     q(['신청자격', '대전 소재 대학', '- 직전학기 성적 3.0 이상인 재학생', '- 직전학기 성적 3.0 이상인 재학생', '신청기간 : 10.1~10.10']), []);
-  /* 갈래 이름 꼴은 match-engine 의 것과 한 글자도 같아야 한다 — 엔진은 내보내지 않는 상수라 발췌기에 사본이 있다(엔진 파일은 이 갈래가 안 건드린다) */
-  const brOf = (src) => (src.match(/^const BRANCH_LABEL = (\/.+\/[a-z]*);$/m) || [])[1] || null;
-  const brEx = brOf(ee2), brMe = brOf(readText(new URL('../match-engine.js', import.meta.url)));
-  eq('  발췌기의 BRANCH_LABEL 사본 = match-engine.js 원본', [!!brEx, brEx === brMe], [true, true]);
+  /* 갈래 이름 꼴은 match-engine 의 것을 불러 쓴다 — 발췌기에 사본(const BRANCH_LABEL = /…/)이 다시 생기면 화면과 갈라진다 */
+  eq('  발췌기는 BRANCH_LABEL 을 match-engine.js 에서 불러 쓴다(사본 없음)',
+    [/^const BRANCH_LABEL = \//m.test(ee2), /const BRANCH_LABEL = _cr\(import\.meta\.url\)\('\.\.\/match-engine\.js'\)\.BRANCH_LABEL;/.test(ee2)], [false, true]);
 
   /* ② 충남대 MEGA CNU hwpx — 「2」 와 「지원 자격」 이 따로 줄로 온다. 번호 없는 시작이라 길이 규칙이 첫 하위 제목 「□ … TRACK: 10명」 에서 끊어 요건이 다 빠졌다 */
   const cnu = q(['○ [2학년/2027년] MEGA CNU GLOBAL 파견 시 장학금 600만원', '※ 일반파견 프로그램 지원 시 우선선발 혜택', '2', '지원 자격', '□ 재학성적우수자 TRACK: 10명',

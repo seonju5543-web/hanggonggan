@@ -1853,7 +1853,7 @@ if (typeof module !== 'undefined' && module.exports) {
                      requirementLines, requirementStruct, requirementMatch, tidyRequirement,
                      REQ_SIGNAL, NOT_A_REQUIREMENT, EXCLUDE_LINE, HARD_THRESHOLD,
                      noticeForProfile, activityForProfile, taggedSchool, SHARED_BOARD_BRANCH, SERVED_SCHOOLS,
-                     noticeKind, NOTICE_CAMPUS_MARK, OWN_PROGRAMS,
+                     noticeKind, NOTICE_CAMPUS_MARK, OWN_PROGRAMS, BRANCH_LABEL,
                      noticeFileKey, noticeFileFor, noticeFilesForProfile,
                      noticeFallbackNeeded, majorsFileFor, newsFileFor, newsFilesForProfile };
 }
