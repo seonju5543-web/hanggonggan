@@ -1883,7 +1883,7 @@ function renderHome() {
      예전엔 자격 판정만 보고 마감을 안 봐서, 히어로의 금액 합계와 '바로 신청 n건'에
      **이미 마감된 공고가 섞여** 실제보다 부풀려져 있었다. */
   const applyable = matches.filter((m) =>
-    ['eligible', 'selective'].includes(m.result.status) && dday(m.sch.deadline).days >= 0 && notStale(m.sch));
+    ['eligible', 'selective'].includes(m.result.status) && dday(m.sch.deadline).days >= 0 && notStale(m.sch) && !m.sch.noApply);
   const notApplied = applyable.filter((m) => !state.applications.some((a) => a.id === m.sch.id));
 
   /* 🔴 합계는 **더하기가 아니라 고르기**다 (2026-08-27 · parse-amount.js).
@@ -2729,7 +2729,7 @@ function loadNotices() {
    공식 양식(formId)과 구분되도록 prepFormId 로만 연결 — 채널 라벨은 그대로 유지. 상시 제도(program)는 제외. */
 function attachPrepTemplate(s) {
   if (typeof FORM_TEMPLATES === 'undefined' || typeof buildPrepTemplate !== 'function') return s;
-  if (s.formId || s.program) return s;
+  if (s.formId || s.program || s.noApply) return s;   // noApply: 신청 절차가 없는 공고(applyLock 참조) — 준비할 문서도 없다
   const pid = 'prep:' + s.id;
   /* 층2 항목은 부를 때마다 새로 만들어지므로(kosafAsScholarships) 템플릿은 한 번만 짓고 다시 쓴다 — 목록을 다시 받으면 loadKosaf 가 지운다 */
   if (!FORM_TEMPLATES[pid] || s.sourceKind !== 'kosaf') FORM_TEMPLATES[pid] = buildPrepTemplate(s);
@@ -4064,7 +4064,7 @@ function bulkTargets() {
   return getMatches()
     .filter((m) => ['eligible', 'selective'].includes(m.result.status))
     .filter((m) => !state.applications.some((a) => a.id === m.sch.id))
-    .filter((m) => dday(m.sch.deadline).days >= 0 && notStale(m.sch))
+    .filter((m) => dday(m.sch.deadline).days >= 0 && notStale(m.sch) && !m.sch.noApply)   // noApply: 신청 절차가 없는 공고(applyLock) — 일괄 시트에도 안 담는다(리뷰 2026-11-02 가 잡았다)
     .map((m) => m.sch)
     .sort((a, b) => deadlineTs(a) - deadlineTs(b));   // 마감일을 겉에 안 써도 급한 것이 위로
 }
@@ -4424,7 +4424,10 @@ function applyAll() {
       (이공계 새터민)에서 실제로 그랬다: 새터민이고 이공계이고 성적도 넘는 학생인데 자격 줄
       셋 중 둘을 못 읽어 unknown 이 됐고, 화면은 그 학생에게 '요건 미충족'이라 단정했다.
       그때는 **버튼 문구만** 갈랐고 잠금은 안 갈라서, 그 학생은 여전히 못 눌렀다. */
-function applyLock(result, app, d) {
+function applyLock(result, app, d, sch) {
+  /* 🔴 원문이 「별도 신청 없이 학교가 선발」이라 적은 공고(noApply = 그 원문 문장 · 관리자가 적는다 · 2026-11-02 세종대 학업수석총장장학금) —
+     자격이 맞아도 버튼을 열지 않는다. 열면 학생이 없는 절차를 준비한다. 홈 「바로 신청」·앱 지원문서도 같은 칸을 본다. */
+  if (sch && sch.noApply) return { canApply: false, caution: '', noApply: true };
   const canApply = (!app || app.pending) && d.days >= 0;
   const unsure = !['eligible', 'selective'].includes((result && result.status) || '');
   return { canApply, caution: canApply && unsure ? result.status : '' };
@@ -4752,7 +4755,7 @@ function openDetail(id) {
   const meta = STATUS_META[result.status];
   const d = dday(sch.deadline);
   const app = state.applications.find((a) => a.id === id);
-  const lock = applyLock(result, app, d);
+  const lock = applyLock(result, app, d, sch);
   /* 데이터에서 내려간 공고(사본으로 연 시트)에서는 신청을 시작·이어가지 않는다 — 양식 흐름이 findSch 로 공고를 다시 찾다 넘어진다(2026-10-02 리뷰).
      기록(제출·결과)은 신청 내역 패널에서 그대로 적을 수 있다 */
   const gone = !findSch(id);
@@ -4779,7 +4782,8 @@ function openDetail(id) {
   const srcHint = sourceLinkHintHtml(sourceLink(sch, 'detail'));
 
   let btnLabel = '신청 준비 시작';
-  if (app && !app.pending) btnLabel = prepStateLabel(app, sch, '신청 준비 완료됨') === '신청 준비 완료됨' ? '신청 준비 완료됨' : `${prepStateLabel(app, sch, '')} — 아래 체크리스트`;
+  if (lock.noApply) btnLabel = '별도 신청 없음 — 학교가 선발';
+  else if (app && !app.pending) btnLabel = prepStateLabel(app, sch, '신청 준비 완료됨') === '신청 준비 완료됨' ? '신청 준비 완료됨' : `${prepStateLabel(app, sch, '')} — 아래 체크리스트`;
   else if (app && app.pending && gone) btnLabel = '이어서 작성할 수 없는 공고';   // 데이터에서 빠진 공고 — 왜 빠졌는지는 단정하지 않는다(원칙 8-1)
   else if (app && app.pending) btnLabel = '서류 작성 이어서 하기';
   else if (d.days < 0) btnLabel = '마감된 장학금';
@@ -4972,6 +4976,7 @@ function openDetail(id) {
       ${applyCaution ? `<p class="dp-note dp-caution">${applyCaution === 'unknown'
         ? '신청 전에 공고 원문에서 지원 자격을 확인하세요.'
         : '입력한 정보로는 요건이 맞지 않아 보입니다. 판정이 틀릴 수 있으니 원문을 확인한 뒤 신청하세요.'}</p>` : ''}
+      ${lock.noApply ? `<p class="dp-note">원문: 「${esc(sch.noApply)}」</p>` : ''}
       <button class="btn btn-primary btn-lg" id="btn-apply-one" ${canApply ? '' : 'disabled'}>${btnLabel}</button>
       ${/* 단추 밑에는 아무 줄도 없다 — 「최종 제출 · 제출처」 한 마디도 2026-10-29 개발자 지시로 뺐다(2026-10-15 "happy talk 전부 삭제" 뒤 남아 있던 마지막 줄).
            제출처는 신청 준비 화면(「최종 제출 방법」 절)이 말한다 */ ''}

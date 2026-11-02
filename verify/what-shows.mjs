@@ -269,7 +269,7 @@ for (const sch of hits) {
      여기에 조건을 손으로 적어 두었더니, 자격 잠금을 푼 뒤에도 이 도구만 계속
      '잠김'이라고 보고했다 — 이 파일 머리말이 경고한 바로 그 갈라짐이다.
      `app` 은 '이미 신청한 기록'인데 이 도구는 저장소 데이터만 보므로 항상 없다(null). */
-  const { canApply, caution } = appFn('applyLock')(result, null, d);
+  const { canApply, caution, noApply } = appFn('applyLock')(result, null, d, sch);
 
   const listLines = ME.requirementLines(sch, null);                    // 목록 카드 — 5줄 상한
   const allLines = ME.requirementLines(sch, null, { all: true });      // 상세 시트 — 전부
@@ -290,6 +290,7 @@ for (const sch of hits) {
   console.log(`   학생: ${p.school} ${p.track} ${p.year}학년 · 평점 ${p.gpa} · ${p.credits}학점 · ${p.bracket}구간`);
   console.log(`   판정 ${result.status}  ·  배지 「${badge}」`);
   console.log(`   신청 버튼 ${canApply ? '열림' : '잠김'}  (마감: ${d.label || '?'})`);
+  if (noApply) console.log(`   신청 절차 없음 — 원문 「${sch.noApply}」 (버튼 잠김 · 홈 바로 신청·일괄 준비·지원문서에서 뺌)`);
   /* 막지 않는 대신 무엇을 알리는가 — 이것까지 보여야 '화면에 무엇이 보이는가'가 완성된다 */
   if (caution) {
     /* 🔴 문구를 **베끼지 않는다** — app.js 에서 그 자리의 두 갈래를 읽어 온다.

@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-31",
+ "updatedAt": "2026-11-02",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -9384,7 +9384,8 @@
     ]
    },
    "eligibilityFrom": "AI(원문 줄 그대로)",
-   "eligibilityReviewed": false
+   "eligibilityReviewed": false,
+   "noApply": "별도의 신청절차없이 매학기 성적 확정 후, 학생지원처에서 선발."
   },
   {
    "id": "auto-pnoticedoarticleno367225",

@@ -1422,8 +1422,8 @@ console.log('\n■ 공고별 지원문서 — 앱 양식이 없는 등록 공고
   /* 앱 연결 — 글자가 아니라 실제 모양을 본다 */
   const appSrc = readText(new URL('../app.js', import.meta.url));
   const attach = appSrc.slice(appSrc.indexOf('function attachPrepTemplate('), appSrc.indexOf('/* 원본 신청서 —'));
-  eq('🔴 앱은 양식(formId)·상시 제도만 빼고 **모든 등록 공고**에 붙인다 (prepDoc 한정으로 되돌리면 빈 준비 시트가 돌아온다)',
-    [/if \(s\.formId \|\| s\.program\) return s;/.test(attach), /!s\.prepDoc/.test(attach), /for \(const s of list\) attachPrepTemplate\(s\);/.test(attach)], [true, false, true]);
+  eq('🔴 앱은 양식(formId)·상시 제도·신청 절차 없는 공고(noApply)만 빼고 **모든 등록 공고**에 붙인다 (prepDoc 한정으로 되돌리면 빈 준비 시트가 돌아온다)',
+    [/if \(s\.formId \|\| s\.program \|\| s\.noApply\) return s;/.test(attach), /!s\.prepDoc/.test(attach), /for \(const s of list\) attachPrepTemplate\(s\);/.test(attach)], [true, false, true]);
   const ff = appSrc.slice(appSrc.indexOf('function renderFormFill('), appSrc.indexOf('/* ---------------- 실시간 공고'));
   eq('  양식 작성 화면이 원본 신청서(첨부 + PDF 사본)를 한 함수(prepOriginalsHtml)로 보여 주고 머리줄은 문서의 lead 를 쓴다',
     [/prepOriginalsHtml\(sch\)/.test(ff), /tpl\.lead/.test(ff), /data\/forms-pdf\/index\.json/.test(appSrc)], [true, true, true]);
@@ -7580,6 +7580,17 @@ console.log('\n■ 신청 잠금 — 자격 판정으로는 막지 않는다 (20
      applyLock(R('ineligible'), null, open).caution !== applyLock(R('unknown'), null, open).caution, true);
   eq('자격 통과에는 안내를 붙이지 않는다 (없는 걱정을 만들지 않는다)',
      applyLock(R('eligible'), null, open).caution, '');
+  /* 🔴 원문이 「별도 신청 없이 학교가 선발」이라 적은 공고(noApply = 그 원문 문장 · 2026-11-02 세종대 학업수석총장장학금)는
+     자격이 맞아도 신청 버튼을 열지 않는다 — 열면 학생이 없는 절차를 준비한다. 같은 값이 홈 '바로 신청'·일괄 준비·앱 지원문서에서도 뺀다 */
+  const noApply = { noApply: '별도의 신청절차없이 매학기 성적 확정 후, 학생지원처에서 선발.' };
+  eq('🔴 신청 절차가 없는 공고는 자격이 맞아도 잠긴다', applyLock(R('eligible'), null, open, noApply).canApply, false);
+  eq('  잠긴 이유를 noApply 로 돌려준다 (버튼 문구가 이걸 본다)', applyLock(R('eligible'), null, open, noApply).noApply, true);
+  eq('  noApply 없는 공고는 그대로 열린다 (sch 를 넘겨도)', applyLock(R('eligible'), null, open, { id: 'x' }).canApply, true);
+  eq('  홈 「바로 신청」 목록이 noApply 를 뺀다', /const applyable = matches\.filter\([\s\S]{0,200}!m\.sch\.noApply/.test(src), true);
+  eq('🔴 일괄 신청 준비 목록(bulkTargets)도 noApply 를 뺀다 — 홈 버튼을 누르면 이 목록이 시트에 체크된 채 들어간다(리뷰가 잡은 구멍)',
+     /function bulkTargets\(\)[\s\S]{0,400}?!m\.sch\.noApply/.test(src), true);
+  eq('  앱 지원문서를 붙이지 않는다', /if \(s\.formId \|\| s\.program \|\| s\.noApply\) return s;/.test(src), true);
+  eq('  상세 시트가 applyLock 에 공고를 넘긴다', /applyLock\(result, app, d, sch\)/.test(src), true);
 
   /* 🔴 **여기는 계속 막힌다** — 우리 판정이 아니라 사실이라서다 */
   eq('마감된 공고는 여전히 잠긴다', applyLock(R('eligible'), null, closed).canApply, false);

@@ -118,7 +118,7 @@ async function swipeDown(page, sel) {
     const regIds = new Set(registeredList.map((s) => s.id));
     const applied = (s) => state.applications.some((a) => a.id === s.id);
     const can = (s) => applyLock(evaluateFor(s, p), state.applications.find((a) => a.id === s.id),
-      dday(s.deadline)).canApply;
+      dday(s.deadline), s).canApply;
     const live = allScholarships().filter((s) => !s.program && dday(s.deadline).days >= 0 && !applied(s) && can(s));
     /* 2026-10-13 개발자 결정 — 앱 양식(formId)이 없는 등록 공고에는 **앱 자체 지원문서**(prep:)가 붙는다.
        층1 대상은 그 문서가 붙은 공고다(formId 만 있고 템플릿이 안 온 공고는 섞지 않는다). */

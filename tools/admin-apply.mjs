@@ -109,6 +109,7 @@ const stampEvidence = (typed) => `${typed ? typed + ' · ' : ''}관리자 화면
 const ALLOWED = new Set([
   'name', 'provider', 'type', 'amount', 'amountValue', 'deadline', 'period',
   'summary', 'note', 'sourceUrl', 'formId', 'noForm', 'applyEmail',
+  'noApply',   // 신청 절차가 없는 공고 — 값은 그 원문 문장(app.js applyLock 이 버튼을 잠근다 · 2026-11-02)
   /* 자격 요건 (2026-08-09 추가) — 학생 앱이 이미 읽는 칸들이라 앱 코드 변경은 필요 없다
      (`app.js`의 qBlock·reasonRows, `match-engine.js`의 tidyRequirement). */
   'eligibilityLines', 'eligibilityVerified', 'eligibility', 'documents',
