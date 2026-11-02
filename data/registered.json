@@ -20279,6 +20279,11 @@
      "school": "서울대학교",
      "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=417",
      "id": "notice:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?category1=장학공지&mod=document&uid=417"
+    },
+    {
+     "school": "이화여자대학교",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367738&article.offset=0&articleLimit=10",
+     "id": "notice:https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?articleno=367738"
     }
    ],
    "scopeFrom": "같은 사업이 홍익대학교 게시판에도 올라옴(자동) — 홍익대학교 게시판 https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159778&noCat=501",
@@ -21083,6 +21088,312 @@
    ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323404",
    "sourceKind": "auto"
+  },
+  {
+   "id": "auto-ent2431270591artclviewdo",
+   "name": "[글로벌][교내] 2026-2학기 글로벌캠퍼스 HUFS Dream 장학금 신청 안내 (11/3~11/27)",
+   "boardTitle": "[글로벌][교내] 2026-2학기 글로벌캠퍼스 HUFS Dream 장학금 신청 안내 (11",
+   "type": "교내",
+   "kindEvidence": [
+    "제목 표식 「교내」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-02",
+   "provider": "주관 기관 원문 확인",
+   "amount": "100만원",
+   "amountValue": 1000000,
+   "deadline": "2026-11-27",
+   "deadlineFrom": "공고 원문 · [글로벌][교내] 2026-2학기 글로벌캠퍼스 HUFS Dream 장학금 신청 안내 (11/3~11/27)",
+   "period": "접수 ~2026-11-27",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "공통 서류 : 장학금 신청서 1 부 ( 첨부 양식 )",
+    "가족 ( 부모 , 형제 ) 중대질병 투병 및 사고",
+    "국가장학금 지원횟수 초과 거절자"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-02 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026학년도 2학기 HUFS Dream 장학금 신청서(공고용).hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/152739/download.do"
+    }
+   ],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/270591/artclView.do",
+   "sourceKind": "auto",
+   "nameFrom": "공고 원문(잘린 제목 보완)",
+   "applyPortal": "HUFS Ability",
+   "applyPortalSource": "6. 신청방법 : 온라인 신청 (HUFS Ability- 학생핵심역량통합시스템 ) → 로그인 ( 학번 / 비번 ) → 교과 / 비교과 → 장학신청 목록 → 해당 장학금",
+   "applyPortalFrom": "공고 원문",
+   "openDate": "2026-11-03",
+   "documentsFrom": "공고 원문",
+   "eligibilityLines": [
+    "3. 지원요건 [ 가 , 나 요건을 모두 충족해야 함 ]",
+    "가 . 학적 및 성적요건",
+    "- 2026-2 학기 재학 중인 자 ( 초과학기 지원가능 )",
+    "- 직전 정규학기 12 학점 이상 , 평점평균 2.0 이상 취득한 자",
+    "* 단 , 8 학기 이상 등록자는 취득학점 수 제한 없음",
+    "* 첫 학기 성적이 없는 신입생 , 편입생 , 재입학생은 성적 기준 적용 제외",
+    "나 . 지원 대상 세부 요건",
+    "- 자립준비청년 ( 보호 종료 아동 ) 및 쉼터 입 · 퇴소 청소년인 대학생",
+    "- 청소년 한부모인 대학생",
+    "- 경제사정 곤란자",
+    "* 부모님의 실직 , 폐업 등으로 가계형편이 곤란한 자",
+    "* 가족의 장기투병 및 갑작스러운 사고 등으로 경제적 어려움을 겪고 있는 자",
+    "* 기타 경제적 어려움을 겪고 있는 자"
+   ],
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 1000000,
+    "ratio": 0,
+    "min": 1000000,
+    "max": 1000000,
+    "raw": "2. 장학 금액 : 최대 100 만원 ( 등록금 범위 내 장학금 ) 3. 지원요건 [ 가 , 나 요건을 모두 충족해야 함 ] 가 . 학적 및 성적요건 - 2026-2 학기 재학 중인 자 ( 초과학기 지원가능 ) - 직전 정규학기 12 학점 이상 , 평점평균 2.0 이상 취득한 자 * 단 , 8 학기 이상 등록자는 취득학점 수 제한 없음 * 첫 학기 성적이 "
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-dmodeviewduid53596tpage1",
+   "name": "[등록/장학] 대한주택건설협회 서울특별시회 2026학년도 장학생 선발 안내(생활비성)",
+   "boardTitle": "[등록/장학] 대한주택건설협회 서울특별시회 2026학년도 장학생 선발 안내(생활비성)",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「협회」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-02",
+   "provider": "주관 기관 원문 확인",
+   "amount": "300만원",
+   "amountValue": 3000000,
+   "deadline": "2026-11-06",
+   "deadlineFrom": "공고 원문 · 가 . 접수기간 : 2026 년 11 월 3 일 ( 화 ) ~ 6 일 ( 금 ) 17 시까지",
+   "period": "접수 ~2026-11-06",
+   "summary": "광운대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "광운대학교"
+   },
+   "documents": [
+    "학업계획서 1 부 .",
+    "개인정보 수집 ∙ 이용 ∙ 제공 동의서 1 부 .",
+    "성적증명서 ( 학적부 성적 ) 1 부 .",
+    "한국장학재단 학자금 지원구간 확인서 (2026-2 학기 또는 직전 학기 기준 )",
+    "장학증서 수여식 ( ※ 장학으로 선발된 학생은 필히 참석하여야 함 . )",
+    "장소 : 대한예수교장로회 장석교회 ( 서울특별시 노원구 월계로 44 길 23)"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-02 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "Attachment 학업계획서.hwpx",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35501&ano=53596"
+    },
+    {
+     "name": "Attachment 개인정보 수집 이용 제공 동의서.hwp",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35503&ano=53596"
+    }
+   ],
+   "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53596&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "sourceKind": "auto",
+   "openDate": "2026-11-03",
+   "documentsFrom": "공고 원문",
+   "eligibilityLines": [
+    "3. 자격요건",
+    "가 . 2026 학년도 2 학기 기준 , 정규학기 재학생 ( 휴학생 , 초과학기생 신청 불가 )",
+    "나 . 2026 학년도 2 학기 학업장려금 ( 생활비성 ) 장학금을 수혜 받지 않은 학생",
+    "다 . 2026 학년도 2 학기 등록금성 장학금 수혜율이 등록금 총액의 50% 이하인 학생",
+    "라 . 직전학기 성적 평점평균 3.5 점 (4.5 만점 ) 이상 , 최소 이수학점 12 학점 이상인 학생 ( 학적부 성적 기준 )",
+    "마 . 한국장학재단 학자금 지원구간 6 분위 이내인 학생"
+   ],
+   "excerpts": [
+    "접수기간 : 2026 년 11 월 3 일 ( 화 ) ~ 6 일 ( 금 ) 17 시까지",
+    "- 문의처 : 학생복지팀 (02-940-5033)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 3000000,
+    "ratio": 0,
+    "min": 3000000,
+    "max": 3000000,
+    "raw": "2. 장학금 : 1 인 300 만원 ( 생활비성 )"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-krbbskr846019artclviewdo",
+   "name": "[학부-교외장학] 2026학년도 (재)농와장인재육성장학재단 장학생 선발 안내",
+   "boardTitle": "[학부-교외장학] 2026학년도 (재)농와장인재육성장학재단 장학생 선발 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "제목 표식 「교외장학」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-02",
+   "provider": "주관 기관 원문 확인",
+   "amount": "200만원",
+   "amountValue": 2000000,
+   "deadline": "2026-11-10",
+   "deadlineFrom": "공고 원문 · 7. 접수기한 : 26. 10. 29.(목) 09:00 ~ 26. 11. 10.(화) 18:00 (토·일·공휴일 제외)",
+   "period": "접수 ~2026-11-10",
+   "summary": "인하대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "인하대학교"
+   },
+   "documents": [
+    "장학생신청서 1부",
+    "개인정보제공동의 및 활용승낙서 1부 (학생, 보호자 각각 제출)",
+    "주소확인 증빙서류 : 주민등록초본(주소이력 포함)",
+    "통장사본 1부 (부모 또는 학생)",
+    "재학증명서 1부",
+    "성적증명서 1부 (참고용 성적표 불가)",
+    "고등학교 졸업증명서 1부",
+    "중복지원 방지 및 상환서약서 1부",
+    "가산점 증명서류 (해당자만 제출)",
+    "장애인 가족 : 장애인 증명서 (부모 또는 학생본인이 장애인인 경우)",
+    "다자녀가족 : 주민등록등본 또는 가족관계증명서 (3자녀 이상)",
+    "다문화 가족 : 해당 부",
+    "모의 기본 증명서",
+    "귀농·귀촌 : 해당 부·모의 주민등록초본(최근 5년 주소변동이력)"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-02 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "(재)농와장인재육성장학재단_2026년장학생선발공고문.hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41690/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.inha.ac.kr/bbs/kr/8/46019/artclView.do",
+   "sourceKind": "auto",
+   "openDate": "2026-10-29",
+   "documentsFrom": "공고 원문",
+   "eligibilityLines": [
+    "3. 자격 기준",
+    "가. 공통사항",
+    "1) 고창지역의 고등학교를 졸업한 대학생",
+    "※ 공고일 기준 1년 전부터 본인 또는 보호자(부모 중 1명)의 주민등록이 고창에 있을 것",
+    "2) 고창지역 외 고등학교를 졸업한 대학생(2년제포함)",
+    "※ 본인 또는 보호자의 주민등록이 3년이상 계속하여 고창군으로 되어 있는 학생",
+    "나. 성적우수 장학생",
+    "1) 대학교 신입생 : 2026. 1학기 전과목 평점 평균 80점 이상",
+    "2) 대학교 재학생 : 전년도 2학기와 2026. 1학기 전과목 평점 평균이 80점 이상",
+    "※ 복학생 및 편입생의 경우: 당해연도 1학기 성적 적용",
+    "※ 정기학기의 성적 및 학점 기준으로 하며 계절학기는 제외",
+    "다. 장학증서 수여식에 참석 가능한 자"
+   ],
+   "eligibilityExcludes": [
+    "1) 사이버대학, 폴리텍대학, 방송통신대학, 전북대 농생명과학과 재학생 등은 제외",
+    "2) 장학생 신청자의 접수서류 등에 허위가 발견된 경우 선발 제외",
+    "3) 학생의 본분을 벗어난 행동으로 사회적 물의를 야기한 학생"
+   ],
+   "excerpts": [
+    "장학금액 : 대학생 2,000,000원 (※ 등록금성 장학금)",
+    "문의처 : 고창군 인재양성과 평생교육팀 063-560-2929"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 2000000,
+    "ratio": 0,
+    "min": 2000000,
+    "max": 2000000,
+    "raw": "2. 장학금액 : 대학생 2,000,000원 (※ 등록금성 장학금) ※ 타 장학금 수령 시 차감 후 지급으로 대상자별 금액 차이가 있을 수 있음"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-zc3cnavcodeknu1619416593-08xvigz",
+   "name": "2026학년도 2학기 경북대학교총동창회 학업장려금 장학생 선발 안내",
+   "boardTitle": "2026학년도 2학기 경북대학교총동창회 학업장려금 장학생 선발 ..",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「동창회」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-02",
+   "provider": "주관 기관 원문 확인",
+   "amount": "200만원",
+   "amountValue": 2000000,
+   "deadline": "2026-11-13",
+   "deadlineFrom": "공고 원문 · 2026학년도 2학기 경북대학교총동창회 학업장려금 장학생을 선발하오니, 관심있는 학생들은 기한내 신청하시기 바랍니다. 1. 신청 기간: 2026. 11. 2.(월) ~ 11. 13.(금)",
+   "period": "접수 ~2026-11-13",
+   "summary": "경북대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경북대학교"
+   },
+   "documents": [
+    "자기소개서 및 학업발전계획서",
+    "개인정보 활용 동의서",
+    "재학증명서",
+    "성적증명서(4.3기준)",
+    "제납부금(동창회비) 납입확인서",
+    "부모님 건강보험 납부 확인서(최근 3개월 기준)",
+    "가족관계증명서"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-02 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "붙임1. 장학생 선발 모집요강.hwp",
+     "url": "https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxNzAmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=0"
+    },
+    {
+     "name": "붙임3. 경북대학교총동창회_장학금 지원서.hwp",
+     "url": "https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxNzAmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=2"
+    },
+    {
+     "name": "붙임4. 경북대학교총동창회_자기소개서_및_학업발전 계획서.hwp",
+     "url": "https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxNzAmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=3"
+    },
+    {
+     "name": "붙임5. 경북대학교총동창회_개인정보활용 동의서.hwp",
+     "url": "https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxNzAmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=4"
+    }
+   ],
+   "sourceUrl": "https://home.knu.ac.kr/HOME/knussw/sub.htm?nav_code=knu1619416593&mode=view&mv_data=aWR4PTIxNzAmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=",
+   "sourceKind": "auto",
+   "nameFrom": "공고 원문(잘린 제목 보완)",
+   "applyEmail": "alumni@knu.ac.kr",
+   "applyEmailSource": "5. 신청 방법: 경북대학교 총동창회 홈페이지 ( https://alumni.knu.ac.kr) 에서 지원 자격 확인 후 , 관련 서류를 PDF 합본하여 alumni@knu.ac.kr 로 제출",
+   "applyEmailFrom": "공고 원문",
+   "openDate": "2026-11-02",
+   "documentsFrom": "공고문 첨부",
+   "eligibilityLines": [
+    "3. 지원 대상: 애교심이 투철한 경북대 재학생",
+    "4. 지원 자격",
+    "가. 동창회비 ( 입회비 ) 기 납부자 ( 2026 년 11월 1 일 까지 납부 )",
+    "나. 성적 우수자 ( 전체학기 평점평균 3.5/4.3 이상",
+    "다. 2026 년 2 학기 기준 한국장학재단 학자금지원구간 6 구간 이내인 자 ( 생활환경이 어려운 학생 우대 )"
+   ],
+   "excerpts": [
+    "신청 방법: 경북대학교 총동창회 홈페이지 ( https://alumni.knu.ac.kr) 에서 지원 자격 확인 후 , 관련 서류를 PDF 합본하여 alumni@knu.ac.kr 로 제출",
+    "문의처: 경북대학교총동창회 사무국 053-943-6992~4"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 2000000,
+    "ratio": 0,
+    "min": 2000000,
+    "max": 2000000,
+    "raw": "2. 지원 금액: 학업장려금 200만원"
+   },
+   "amountFrom": "공고 원문"
   }
  ]
 }

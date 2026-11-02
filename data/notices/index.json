@@ -3,21 +3,45 @@
  "updatedAt": "2026-11-02",
  "schools": 44,
  "files": {
+  "한국외국어대학교": {
+   "file": "n19cz03g.json",
+   "count": 26
+  },
+  "홍익대학교": {
+   "file": "nv8pha4.json",
+   "count": 22
+  },
+  "광운대학교": {
+   "file": "n6xhy7d.json",
+   "count": 24
+  },
+  "이화여자대학교": {
+   "file": "n1tk2q9m.json",
+   "count": 38
+  },
+  "인하대학교": {
+   "file": "nkeh7pq.json",
+   "count": 45
+  },
+  "경북대학교": {
+   "file": "nf097dk.json",
+   "count": 22
+  },
+  "전북대학교": {
+   "file": "ncuyr4z.json",
+   "count": 24
+  },
+  "강원대학교": {
+   "file": "nlzhvsh.json",
+   "count": 34
+  },
   "계명대학교": {
    "file": "n1nel147.json",
    "count": 52
   },
-  "고려대학교": {
-   "file": "n1lw6ycq.json",
-   "count": 23
-  },
   "전남대학교": {
    "file": "nwqmwga.json",
    "count": 38
-  },
-  "이화여자대학교": {
-   "file": "n1tk2q9m.json",
-   "count": 36
   },
   "동국대학교": {
    "file": "n1or8oiw.json",
@@ -59,6 +83,10 @@
    "file": "nmpm6i7.json",
    "count": 48
   },
+  "고려대학교": {
+   "file": "n1lw6ycq.json",
+   "count": 23
+  },
   "연세대학교 미래캠퍼스": {
    "file": "n1if6uwu.json",
    "count": 41
@@ -71,10 +99,6 @@
    "file": "n2we95k.json",
    "count": 22
   },
-  "인하대학교": {
-   "file": "nkeh7pq.json",
-   "count": 44
-  },
   "가톨릭대학교": {
    "file": "n174lvh5.json",
    "count": 30
@@ -86,10 +110,6 @@
   "서울교육대학교": {
    "file": "n18ebv4b.json",
    "count": 16
-  },
-  "경북대학교": {
-   "file": "nf097dk.json",
-   "count": 20
   },
   "충남대학교": {
    "file": "nl1xm19.json",
@@ -107,25 +127,13 @@
    "file": "n1ozjjw8.json",
    "count": 13
   },
-  "한국외국어대학교": {
-   "file": "n19cz03g.json",
-   "count": 25
-  },
   "성균관대학교": {
    "file": "n1x6ubj9.json",
    "count": 30
   },
-  "광운대학교": {
-   "file": "n6xhy7d.json",
-   "count": 23
-  },
   "경기대학교": {
    "file": "ntxxf09.json",
    "count": 20
-  },
-  "강원대학교": {
-   "file": "nlzhvsh.json",
-   "count": 33
   },
   "경희대학교": {
    "file": "n1w4hprp.json",
@@ -134,10 +142,6 @@
   "연세대학교": {
    "file": "nz3ew5y.json",
    "count": 48
-  },
-  "홍익대학교": {
-   "file": "nv8pha4.json",
-   "count": 20
   },
   "명지대학교": {
    "file": "ntyl0r5.json",
@@ -158,10 +162,6 @@
   "한국방송통신대학교": {
    "file": "n1uf7bji.json",
    "count": 6
-  },
-  "전북대학교": {
-   "file": "ncuyr4z.json",
-   "count": 23
   },
   "아주대학교": {
    "file": "n16dvfry.json",
