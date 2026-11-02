@@ -68,7 +68,9 @@ const JS_DOWNLOAD_RULES = [
        호출은 href 가 아니라 onclick 에 있다 — detailAttachments 가 onclick 을 href 자리로 넘긴다 */
     call: /^javascript:\s*fn_download\(\s*'(\d+)'\s*,\s*'(\d+)'/i,
     path: (m) => `/ssm/file/fileDown.do?${new URLSearchParams({ atchFileNo: m[1], fileOrd: m[2] })}` },
-  { host: /(^|\.)dongguk\.edu$/i,
+  /* 경주 WISE 캠퍼스(wise.dongguk.ac.kr)도 같은 함수다 (2026-11-02 · 정식 등록의 javascript: 첨부 6개가 전부 여기였는데 호스트가 dongguk.edu 만이라 null).
+     상세 HTML(servicenotice/detail/520872)의 정의를 열어 보니 한 글자도 같았고, 쿠키 없는 새 요청으로 /cmmn/fileDown.do 에서 HWP 원본(34KB)이 받아졌다 */
+  { host: /(^|\.)dongguk\.edu$|^wise\.dongguk\.ac\.kr$/i,
     /* 정의(공고 상세 HTML): function downGO(file_nm, file_path, file_sys_nm){ location.href="/cmmn/fileDown.do?filename="+encodeURIComponent(file_nm)+"&filepath="+file_path+"&filerealname="+file_sys_nm }
        이름 안의 따옴표는 `\'` 로 적혀 온다(「웰로 \'Wello\' 앱」) — 그래서 인자를 `\'` 를 건너 읽고 되돌린다 */
     call: /^javascript:\s*downGO\(\s*'((?:\\'|[^'])*)'\s*,\s*'([^']+)'\s*,\s*'([^']+)'\s*\)/i,
@@ -85,6 +87,16 @@ export function resolveJsDownload(href, pageUrl) {
     if (m) return new URL(r.path(m), pageUrl).href;
   }
   return null;
+}
+
+/** 내려받기에 쓸 주소 — 보통 주소는 그대로, `javascript:` 호출은 resolveJsDownload 로 푼 진짜 주소, 못 풀면 null(받지 않는다).
+    🔴 받는 로봇(deepfetch 자격용 공고문·양식 원본)은 fetch 직전에 이것을 거친다 (2026-11-02) — 정식 등록에 `javascript:` 로 남은 첨부(서울과기대
+    downloadfile · 동국대 downGO)를 fetch 가 주소로 못 읽어 매 실행 오류로 건너뛰었고, 그 공고문 안의 자격은 영영 못 읽었다.
+    데이터의 주소는 고치지 않는다(받을 때만 푼다 · 수집기가 다음에 담을 때 detailAttachments·linkAttachments 가 같은 함수로 푼다). */
+export function fetchableUrl(url, pageUrl) {
+  const u = String(url || '').trim();
+  if (!u) return null;
+  return /^javascript:/i.test(u) ? resolveJsDownload(u, pageUrl) : u;
 }
 
 /* 첨부로 볼 링크인가 — 확장자·내려받기 꼴 주소이거나 이름이 파일 이름일 때 */

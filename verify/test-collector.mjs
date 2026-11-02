@@ -4519,6 +4519,61 @@ console.log('\n■ 자격 절 고르기 — 이름표 줄 · 짧은 블록 덧�
   eq('  「(10. 26.(월) 09:00 ~ 2026. 11. 9.(월) 09:00)」 처럼 범위는 이 길로 읽지 않는다(이름표 길의 몫) · 괄호 밖 「~11/2까지」 도', [EX.titleTailDeadline('2026년 2학기 장학금 안내(10. 26.(월) 09:00 ~ 2026. 11. 9.(월) 09:00)', '2026'), EX.titleTailDeadline('… 선발(Language & AI 융합학부 재학생)~11/2까지', '2026')], [null, null]);
   const ee2 = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));
   eq('  로봇 본편이 제목 보완 → 이름표 마감 → 꼬리 마감 순으로 부른다', [/const fullName = completeTitle\(it, src\.text\)/.test(ee2), /dl = extractDeadline\(it\.name \|\| ''\)/.test(ee2), /dl = titleTailDeadline\(it\.name,/.test(ee2)], [true, true, true]);
+  /* ── 2026-11-02 자격 미확보 전수 조사 — 발췌기 넷 + 첨부 받기 하나. 표본은 원문 그대로의 짧은 블록(실데이터 파일은 읽지 않는다) ── */
+  /* ① 대전청년내일재단 성취장학 hwpx(정식 등록 11건) — 두 갈래(`대전 소재 대학`/`타지역 소재 대학`)가 ③ 을 똑같이 적어 '같은 줄 두 번 = 분야별 표' 거절에 걸려 자격이 통째로 비었다 */
+  const daejeon = q(['※ 상기 일정은 재단 상황에 따라 변동될 수 있음', '3', '신청자격 및 선발 제외사항', 'ㅇ (신청자격) 아래 ①, ②, ③을 모두 충족하는 자', '구 분', '내 용',
+    '대전 소재 대학', '① 공고일(‘26.9.1.) 기준 본인이 1년 전부터 계속해서 대전광역시에 주소를 두고 있는 대한민국 국적의 학생',
+    '② 대전광역시에 소재한 대학교에 재학 중인 학교(총)장 또는 단과대학장의 추천을 받은 대학교 2학년 이상 학생',
+    '③ 직전 학기까지의 전체 평균 평점 3.5 이상(4.5 만점 기준) 또는 3.3 이상(4.3 만점 기준) 성적을 가진 학생',
+    '타지역 소재 대학', '① 공고일(‘26.9.1.) 기준 본인 또는 부모가 1년 전부터 계속해서 대전광역시에 주소를 두고 있는 대한민국 국적의 학생',
+    '② 타지역에 소재한 국내 대학교에 재학 중인 학교(총)장 또는 단과대학장의 추천을 받은 대학교 2학년 이상 학생',
+    '③ 직전 학기까지의 전체 평균 평점 3.5 이상(4.5 만점 기준) 또는 3.3 이상(4.3 만점 기준) 성적을 가진 학생',
+    'ㅇ (선발 제외사항)', '구 분', '내 용', '제외사항']);
+  eq('갈래 이름 줄이 둘이면 같은 줄 되풀이를 분야별 표로 보지 않는다 — 두 갈래의 ①②③ 이 다 산다 (대전청년내일재단 성취장학)',
+    [daejeon.filter((l) => /평점 3\.5 이상/.test(l)).length, daejeon.includes('대전 소재 대학'), daejeon.includes('타지역 소재 대학'), daejeon.some((l) => /제외사항\)/.test(l))], [2, true, true, false]);
+  eq('  갈래 이름 없이 같은 줄이 되풀이되면 여전히 분야별 표다 — 비운다(울산 꼴)',
+    q(['신청자격 및 선발기준', '우수장학금', '⁕등록금성', '- 직전학기 성적 4.0/4.5 이상인 재학생', '※ 선발기준 우선순위', '다자녀장학금', '⁕등록금성', '- 셋째 이상 자녀인 재학생', '※ 선발기준 우선순위', '신청기간 : 10.1~10.10']), []);
+  eq('  갈래 이름 줄이 하나뿐이면 예외가 아니다',
+    q(['신청자격', '대전 소재 대학', '- 직전학기 성적 3.0 이상인 재학생', '- 직전학기 성적 3.0 이상인 재학생', '신청기간 : 10.1~10.10']), []);
+  /* 갈래 이름 꼴은 match-engine 의 것과 한 글자도 같아야 한다 — 엔진은 내보내지 않는 상수라 발췌기에 사본이 있다(엔진 파일은 이 갈래가 안 건드린다) */
+  const brOf = (src) => (src.match(/^const BRANCH_LABEL = (\/.+\/[a-z]*);$/m) || [])[1] || null;
+  const brEx = brOf(ee2), brMe = brOf(readText(new URL('../match-engine.js', import.meta.url)));
+  eq('  발췌기의 BRANCH_LABEL 사본 = match-engine.js 원본', [!!brEx, brEx === brMe], [true, true]);
+
+  /* ② 충남대 MEGA CNU hwpx — 「2」 와 「지원 자격」 이 따로 줄로 온다. 번호 없는 시작이라 길이 규칙이 첫 하위 제목 「□ … TRACK: 10명」 에서 끊어 요건이 다 빠졌다 */
+  const cnu = q(['○ [2학년/2027년] MEGA CNU GLOBAL 파견 시 장학금 600만원', '※ 일반파견 프로그램 지원 시 우선선발 혜택', '2', '지원 자격', '□ 재학성적우수자 TRACK: 10명',
+    '○ 학부재학생: 2026학번 2학기에 재학중인 학부생(15학점 이상)', '※의예과,수의예과,약학과 제외', '○ 학점 요건: 2026학년도 1학기 15학점 이상 수료자 중 평점 4.0 이상인 자',
+    '○ 어학 요건: 아래 공인어학성적 중 1개 이상 충족자', '○ 지역기준: 지역고교출신(대전, 세종, 충남, 충북)', '3', '선발 기준',
+    '○ 학부성적(50%)+어학성적(40%)+수학계획서(10%) 산정 총점 우수자 순', '4', '선발 방법', '□ 지원서 제출']);
+  eq('홀로 선 절 번호 「2」 — 「3」 이 홀로 선 줄까지 읽는다: 평점·지역 요건이 살고 선발 기준은 안 든다 (충남대 MEGA CNU)',
+    [cnu[0], cnu.some((l) => /평점 4\.0 이상/.test(l)), cnu.some((l) => /지역고교출신/.test(l)), cnu.some((l) => /총점 우수자/.test(l))], ['지원 자격', true, true, false]);
+
+  /* ③ 부산대 동계 집중근로 — 맨 `대상` 이름표는 QUALIFY_HEAD 의 `대상 :` 가지로 짚히는데 마지막 이름표 관문(m[1] = 콜론 앞)에서 떨어졌다 */
+  const pnu = q(['2026년도 2학기 국가근로장학금 동계방학 집중근로(교외) 희망근로기관 신청을 다음과 같이 알려드리니 해당 학생은 신청하여 주시기 바랍니다.',
+    '1. 대상 : 26년 2학기 한국장학재단 국가근로장학 신청 완료된 학생만 신청 가능', '2. 신청 기간 : 2026. 10. 30.(금) 9시 ~ 11. 12.(목) 18시까지']);
+  eq('「1. 대상 : …」 이름표 줄은 신호 낱말이 없어도 자격이다 (부산대 동계 집중근로)', pnu, ['1. 대상 : 26년 2학기 한국장학재단 국가근로장학 신청 완료된 학생만 신청 가능']);
+  eq('  정확히 `대상` 일 때만 — 「응시대상자: 1단계 선발자」 는 새지 않는다', q(['응시대상자: 1단계 선발자', '2. 시험 일정: 11. 3.(화)']), []);
+
+  /* ④ `자격 사항` 도 자격 절 제목이다 */
+  eq('「3. 자격사항」 절을 짚는다', q(['3. 자격사항', '- 2026학년도 2학기 재학생', '- 직전학기 평점 3.0 이상인 자', '4. 신청기간 : 10.1~10.10']),
+    ['3. 자격사항', '- 2026학년도 2학기 재학생', '- 직전학기 평점 3.0 이상인 자']);
+
+  /* ⑤ 자격용 공고문·양식 받기 — `javascript:` 첨부는 받기 직전에 진짜 주소로(attachment-link fetchableUrl → resolveJsDownload 한 곳).
+     정식 등록에 남은 두 꼴(서울과기대 downloadfile · 동국대 WISE downGO)을 원문 그대로 푼다 — 동국대 WISE(wise.dongguk.ac.kr)는 호스트가 dongguk.edu 만이라 null 이었다 */
+  const AL2 = await import(new URL('../collector/attachment-link.mjs', import.meta.url));
+  eq('서울과기대 `javascript:downloadfile(…)` 첨부를 받을 주소로 푼다',
+    AL2.fetchableUrl("javascript:downloadfile('/storage/www/bbs/5233','D5BD8A0C455743548A5C9F52B98AF6C6_.jpg','%EB%B6%99%EC%9E%842_2026%EB%85%84 2%ED%95%99%EA%B8%B0');",
+      'https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&bnum=5233&bidx=897116&qidx=5233'),
+    'https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=D5BD8A0C455743548A5C9F52B98AF6C6_.jpg&ogrfname=%EB%B6%99%EC%9E%842_2026%EB%85%84+2%ED%95%99%EA%B8%B0');
+  eq('  동국대 WISE `javascript:downGO(…)` 첨부를 받을 주소로 푼다',
+    AL2.fetchableUrl("javascript:downGO('복지장학생(부모장애유형) 신청서(양식).hwp','/files/article/servicenotice/520872/','1722741C5C19464AB216CC7AC1190A47.hwp');",
+      'https://wise.dongguk.ac.kr/article/servicenotice/detail/520872'),
+    'https://wise.dongguk.ac.kr/cmmn/fileDown.do?filename=%EB%B3%B5%EC%A7%80%EC%9E%A5%ED%95%99%EC%83%9D(%EB%B6%80%EB%AA%A8%EC%9E%A5%EC%95%A0%EC%9C%A0%ED%98%95)%20%EC%8B%A0%EC%B2%AD%EC%84%9C(%EC%96%91%EC%8B%9D).hwp&filepath=/files/article/servicenotice/520872/&filerealname=1722741C5C19464AB216CC7AC1190A47.hwp');
+  eq('  보통 주소는 그대로 · 모르는 사이트의 스크립트·빈 주소는 null(받지 않는다)', [AL2.fetchableUrl('https://a.ac.kr/down.do?no=1', 'https://a.ac.kr/x'),
+    AL2.fetchableUrl("javascript:downGO('a.hwp','/f/','B.hwp');", 'https://www.example.ac.kr/x'), AL2.fetchableUrl('', 'https://a.ac.kr/x')], ['https://a.ac.kr/down.do?no=1', null, null]);
+  const df2 = readText(new URL('../collector/deepfetch.mjs', import.meta.url)).replace(/\/\*[\s\S]*?\*\//g, '');
+  eq('  deepfetch 의 두 받기(양식 원본 · 자격용 공고문)가 fetch 직전에 fetchableUrl 을 거친다 — `fetch(a.url` 이 남지 않는다',
+    [(df2.match(/const fetchUrl = fetchableUrl\(a\.url, /g) || []).length, (df2.match(/await fetch\(fetchUrl, /g) || []).length, /fetch\(a\.url/.test(df2)], [2, 2, false]);
 }
 
 console.log('\n■ 자격 자리의 잡음을 유형별로 세는가 (2026-08-23)');
