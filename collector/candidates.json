@@ -1,8 +1,34 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
- "updatedAt": "2026-11-01",
+ "updatedAt": "2026-11-02",
  "count": 1547,
  "items": [
+  {
+   "title": "[장학안내] 2026학년도 국가근로장학금 동계방학 집중근로 프로그램 희망근...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70854&cate=8",
+   "attachments": [
+    {
+     "name": "교육기본시설/부속시설",
+     "url": "https://www.jnu.ac.kr/MainIntro/Institution/AttachedFac"
+    },
+    {
+     "name": "2026년 동계방학 집중근로 희망근로지 신청 매뉴얼(홈페이지).pdf",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2590257"
+    },
+    {
+     "name": "2026년 동계방학 집중근로 희망근로지 신청 매뉴얼(모바일).pdf",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2590258"
+    },
+    {
+     "name": "2026년 동계방학 집중근로 근로장학생 사전 선정기준(안).pdf",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2590259"
+    }
+   ],
+   "deadlineHint": "신청기간: '26. 10. 30.(금) 09:00 ~ '26. 11. 12.(목) 18:00까지 ​ 2. 신청자격 : 2026학년도 2학기 국가",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-11-02"
+  },
   {
    "title": "[학부] 2027년도 두산연강재단 장학생 선발 안내",
    "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367473&article.offset=0&articleLimit=10",
@@ -25576,20 +25602,6 @@
    "school": "한국외국어대학교",
    "campus": "",
    "foundAt": "2026-09-04"
-  },
-  {
-   "title": "[공통][대출] 2026년 하반기분 통영시 대학생 학자금 이자 지원 공고(~3/25)",
-   "url": "https://dep.hufs.ac.kr/bbs/student/2431/265069/artclView.do",
-   "attachments": [
-    {
-     "name": "2026년 상반기분 통영시 대학생 학자금 이자 지원 공고(안).hwp",
-     "url": "https://dep.hufs.ac.kr/bbs/student/2431/149795/download.do"
-    }
-   ],
-   "deadlineHint": "신청기간 : 2026. 9. 2.( 수 ) ~ 9. 23.( 수 ) 17:00 나 . 신청방법 : 전자 우편 , 방",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-09-02"
   }
  ]
 }
