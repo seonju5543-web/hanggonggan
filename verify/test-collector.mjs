@@ -5341,6 +5341,28 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
         AL.linkAttachments([{ title: '선발안내.pdf chevron_forward', url: 'https://kangwon.ac.kr/ko/bbs/750/download.do?f=2' }], 'https://kangwon.ac.kr/x')[0].name],
       ['2026년 2학기 선발공고문.pdf', '요강.hwp', '선발공고문.pdf', '선발안내.pdf']);
     eq('  이름 가운데의 보통 낱말은 안 건드린다', AL.cleanAttachName('Download Guide 안내문.pdf'), 'Download Guide 안내문.pdf');
+    /* 🔴 단추 글자 + 보통 내려받기 주소 (2026-11-02 · 경기대·충북대 selectBbsNttView 게시판: `<span>요강.hwp</span> <a href="./downloadBbsFile.do?…">다운로드</a>` —
+       `download\.do` 로는 안 걸리고 단추 글자엔 확장자가 없어 첨부 0건 → 선원가족 요강·푸른등대 계획서를 아무도 안 받았다). 되돌리면 [] */
+    const kgu = 'https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626761';
+    eq('단추 글자 「다운로드」 + downloadBbsFile.do → 앞 요소의 파일 이름이 첨부 이름 · 「미리보기」 링크는 첨부가 아니다',
+      AL.detailAttachments('<span class="text">2026년 2학기 선원가족장학사업 선발 모집 요강（변경）.hwp</span> <a href="./downloadBbsFile.do?atchmnflNo=989598" class="download"><span>다운로드</span></a> <a href="./previewBbsFile.do?atchmnflNo=989598" target="_blank">미리보기</a>', kgu),
+      [{ name: '2026년 2학기 선원가족장학사업 선발 모집 요강（변경）.hwp', url: 'https://www.kyonggi.ac.kr/www/downloadBbsFile.do?atchmnflNo=989598' }]);
+    eq('  앞에 파일 이름이 없으면 지어내지 않는다(단추 글자 그대로 → 이름이 짧아 첨부가 안 된다)',
+      AL.detailAttachments('<a href="./downloadBbsFile.do?atchmnflNo=1">다운로드</a>', kgu), []);
+    /* 🔴 본문이 그림 한 장인 게시판 (2026-11-02 · 홍익대 성취장학·선원가족: `<div class="b-content-box"><img src="/cms/plugin/editorImage.do?$cms$…" data-width="1080" data-height="1920">` —
+       헤드리스 브라우저는 봇 차단에 걸려 그림을 못 적고 일반 fetch 물러서기는 글자만 받아 자격이 영영 비었다). 되돌리면 함수가 없다 */
+    const hongik = 'https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158449&noCat=501';
+    eq('HTML 의 본문 그림 — 크기 표식 300px 넘는 것만 · 로고(크기 없음)·작은 그림·data: 는 안 담는다 · 이름 꼴은 브라우저 길과 같다',
+      (AL.htmlBodyImages || (() => undefined))('<img src="/_res/img-logo.svg"><p><img src="/cms/plugin/editorImage.do?$cms$AbC " data-width="1080" data-height="1920"></p><img src="/x.png" width="200" height="200"><img src="data:image/png;base64,AAAA" width="900" height="900">', hongik),
+      [{ name: '본문이미지-1080x1920.jpg', url: 'https://www.hongik.ac.kr/cms/plugin/editorImage.do?$cms$AbC', bodyImage: true }]);
+    const rb2 = readText(new URL('../collector/rescue-bodies.mjs', import.meta.url));
+    eq('  재수집 로봇: 물러선 HTML 의 그림을 적고(htmlBodyImages) 첨부 적기(newAttachments)는 그 **뒤**에 · 브라우저 링크도 단추 글자면 앞 요소 이름',
+      [rb2.indexOf('r.found.push(...htmlBodyImages(html, openUrl))') > 0 && rb2.indexOf('r.found.push(...htmlBodyImages(html, openUrl))') < rb2.indexOf('const add = newAttachments(t.it.attachments, r.found)'),
+        /previousElementSibling/.test(rb2)], [true, true]);
+    /* 🔴 등록 당시 `javascript:` 로 적힌 첨부는 받을 때 푼다 (2026-11-02 · 서울과기대 희망사다리Ⅰ 자체선발기준: 규칙(10-16)보다 먼저 등록(10-12)돼 11-01 자격용 받기가 TypeError → files: []) */
+    const df2 = readText(new URL('../collector/deepfetch.mjs', import.meta.url));
+    eq('  deepfetch 의 두 내려받기(양식·자격용)가 fetchUrlOf 로 스크립트 주소를 풀고 · 오류는 두 경로 모두 cause 까지 적는다(errWhy)',
+      [(df2.match(/const url = fetchUrlOf\(a, /g) || []).length, (df2.match(/console\.log\('(?:attach|elig doc) err', a\.name, errWhy\(e\)\)/g) || []).length, /resolveJsDownload\(a\.url, pageUrl\)/.test(df2)], [2, 2, true]);
     const bc = readText(new URL('../collector/browser-collect.mjs', import.meta.url));
     eq('  브라우저 수집기의 두 길이 모두 linkAttachments 를 쓴다(걸러 내기가 두 벌이 되지 않게)', (bc.match(/linkAttachments\(/g) || []).length, 2);
     const cm = readText(new URL('../collector/collect.mjs', import.meta.url));
@@ -12924,6 +12946,13 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
   eq('  요건 낱말이 든 금액 줄(「소득 8구간 이하: 100만원」)은 자격 블록에 남긴다 · 건너뛴 금액 줄도 상한에 센다',
     [EX2.extractQualifyLines('1. 신청자격\n가. 재학생\n소득 8구간 이하: 100만원\n- 장학 금액 : 200 만원').includes('소득 8구간 이하: 100만원'), /skippedAmt < 14/.test(readText(new URL('../collector/extract-excerpts.mjs', import.meta.url)))], [true, true]);
   eq('  제목 괄호의 「(대상 : 서울시민)」도 읽는다', EX2.qualFromTitle({ name: '장학생 모집(대상 : 서울시민)' }), ['서울시민']);
+  /* ⑤ 「자격사항」 이름표 (2026-11-02 · 서울시립대 경영경제전문도서관 국가근로 추가 모집: 본문의 `2. 자격사항` 이 이름표 목록에 없어 '자격 제목 없음'이었다).
+     발췌기 QUALIFY_HEAD · 채점기(eligibility-report) · 화면 section-head QUALIFY_WORD 셋이 같이 안다. 되돌리면 [].
+     ⚠️ 그 공고의 두 줄(「국가근로장학생 대상자 명단에 있어야 함」·「중복근로 불가」)은 요건 신호가 없어 관문이 여전히 거른다 — 이름표만 고친 것이지 그 공고가 채워지는 것은 아니다 */
+  eq('「2. 자격사항」 도 자격 이름표다 — 발췌기·채점기·화면 한 쌍',
+    [EX2.extractQualifyLines('※ 화, 금 모두 근무 가능해야 함\n2. 자격사항\n- 직전학기 평점 3.0 이상인 자\n3. 접수방법 : 이메일 제출\n- 메일주소 : x@uos.ac.kr'),
+      SH2.isQualifyHead('2. 자격사항'), /자격\\s\?사항/.test(readText(new URL('../verify/eligibility-report.mjs', import.meta.url)))],
+    [['2. 자격사항', '- 직전학기 평점 3.0 이상인 자'], true, true]);
 }
 
 /* ■ 신청서 원본 → PDF (2026-10-12 개발자 지시 "스키마화가 아니라 원본 그대로 · PDF 로 통일")

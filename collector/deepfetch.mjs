@@ -2,7 +2,7 @@
    저장소(collector/extracted/)에 저장한다. 정식 등록 큐레이션의 원천 자료. */
 import fs from 'node:fs';
 import { htmlToLines } from './html-text.mjs';
-import { isHtmlPayload } from './attachment-link.mjs';
+import { isHtmlPayload, resolveJsDownload } from './attachment-link.mjs';
 /* 요청 머리말은 http-headers.mjs 한 곳에 있다 — 베껴 두면 한쪽만 고쳐져
    "수집기는 받는데 심층 수집은 못 받는" 어긋남이 생긴다 (2026-08-20 신설, 첫머리 주석 참조) */
 import { FETCH_HEADERS } from './http-headers.mjs';
@@ -257,6 +257,14 @@ function slugOf(title) {
   return h.toString(36).slice(0, 6);
 }
 
+/* 🔴 오류를 낱말 하나로 뭉개지 말 것 (2026-08-23 · 아래 자격용 경로 주석). 양식 경로는 `e.name` 만 적어 2026-10-31 충북대 푸른등대 첨부 5개가
+   왜 안 받아졌는지 로그에 `TypeError` 한 낱말뿐이었다 — 두 경로가 같은 꼴로 적는다. */
+/* 🔴 둘 다 `function` 선언 — `--forms-only`·`--elig-attach` 는 모듈 **위쪽**에서 await 로 돌고 process.exit 하므로 아래쪽 `const` 는 아직 없다(TDZ · 관문 bodies ③ 이 잡았다) */
+function errWhy(e) { return [e && e.name, e && e.message, e && e.cause && (e.cause.code || e.cause.message)].filter(Boolean).join(' · ').slice(0, 200); }
+/* 내려받기 스크립트 주소(`javascript:downloadfile(…)`)는 받을 때 진짜 주소로 푼다 — 푸는 규칙(attachment-link)이 생기기 전에 등록된 공고는 아직 그 꼴이라
+   fetch 가 TypeError 로 넘어지고 색인에 files: [] 만 남았다(서울과기대 희망사다리Ⅰ 자체선발기준 · 2026-11-02). 모르는 꼴이면 null — 건너뛴다 */
+function fetchUrlOf(a, pageUrl) { return /^javascript:/i.test(a.url || '') ? resolveJsDownload(a.url, pageUrl) : a.url; }
+
 async function downloadForms() {
   /* 표적은 '제목 앞부분'이라 짧으면 엉뚱한 공고까지 몽땅 걸린다.
      실제로 대기 큐가 제목을 12자로 잘라 넣는 바람에 "2026학년도 2학기 " 같은 조각이
@@ -301,7 +309,9 @@ async function downloadForms() {
       if (/부속기관|부설/.test(a.name)) continue; // 사이트 공통 링크 제외
       if (Date.now() - startedAt > BUDGET_MS) break;
       try {
-        const res = await fetch(a.url, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(30000) });
+        const url = fetchUrlOf(a, n.url);
+        if (!url) { console.log('attach skip (스크립트 주소를 못 풀었음):', a.name); continue; }
+        const res = await fetch(url, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(30000) });
         if (!res.ok) { console.log('attach fail', res.status, a.name); continue; }
         const buf = Buffer.from(await res.arrayBuffer());
         if (buf.length < 1000 || buf.length > 15 * 1024 * 1024) continue;
@@ -314,7 +324,7 @@ async function downloadForms() {
         fs.writeFileSync(new URL(fname, OUT), buf);
         indexLines.push(`${fname}\t${n.title}\t${a.name}\t${buf.length}`);
         console.log('attach ok:', a.name, buf.length);
-      } catch (e) { console.log('attach err', a.name, e.name || e.message); }
+      } catch (e) { console.log('attach err', a.name, errWhy(e)); }
     }
   }
   fs.writeFileSync(indexPath, indexLines.join('\n') + (indexLines.length ? '\n' : ''));
@@ -404,7 +414,9 @@ async function downloadEligDocs() {
     for (const a of atts) {
       if (Date.now() - startedAt > BUDGET_MS) { cut = true; break; }
       try {
-        const res = await fetch(a.url, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(20000) });
+        const url = fetchUrlOf(a, it.sourceUrl);
+        if (!url) { console.log('elig doc skip (스크립트 주소를 못 풀었음):', a.name); continue; }
+        const res = await fetch(url, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(20000) });
         if (!res.ok) { console.log('elig doc fail', res.status, a.name); continue; }
         const buf = Buffer.from(await res.arrayBuffer());
         if (buf.length < 1000 || buf.length > MAX_BYTES) continue;   // 5906×8268 포스터도 8MB 안에 든다(실측)
@@ -438,11 +450,7 @@ async function downloadEligDocs() {
          Node fetch 의 연결 실패를 전부 `TypeError` 한 낱말로 줄여 버려, 조선대 공고문
          PDF가 왜 안 받아지는지 알 수 없었다. 진짜 원인은 `cause` 안에 들어 있다
          (여기서는 UNABLE_TO_VERIFY_LEAF_SIGNATURE — 학교가 중간 인증서를 안 보낸 것). */
-      } catch (e) {
-        const why = [e && e.name, e && e.message, e && e.cause && (e.cause.code || e.cause.message)]
-          .filter(Boolean).join(' · ').slice(0, 200);
-        console.log('elig doc err', a.name, why);
-      }
+      } catch (e) { console.log('elig doc err', a.name, errWhy(e)); }
     }
     if (files.length && !cut) {
       /* 이번에 안 받은 옛 파일(번호가 줄었거나 확장자가 바뀐 것)과 그 파생 글자는 지운다 · 같은 표식을 쓰던 다른 공고의 색인은 뺀다(파일이 갈렸다) */

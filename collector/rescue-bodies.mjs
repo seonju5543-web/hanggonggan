@@ -26,6 +26,7 @@
    ============================================================ */
 import fs from 'node:fs';
 import { htmlToLines } from './html-text.mjs';
+import { htmlBodyImages } from './attachment-link.mjs';
 import { chromium } from 'playwright';
 import { createRequire } from 'node:module';
 import { indexTexts, hasText, canonUrl, MIN_BODY, sourceFor } from './notice-source.mjs';
@@ -262,9 +263,12 @@ for (const t of targets) {
       const found = [];
       try {
         for (const f of page.frames()) {
-          const links = await f.$$eval('a[href]', (as) => as.map((a) => ({
-            name: (a.textContent || '').replace(/\s+/g, ' ').trim(), url: a.href,
-          }))).catch(() => []);
+          const links = await f.$$eval('a[href]', (as) => as.map((a) => {
+            let name = (a.textContent || '').replace(/\s+/g, ' ').trim();
+            /* 단추 글자뿐이면(`다운로드`) 파일 이름은 바로 앞 요소에 있다 — 경기대·충북대 selectBbsNttView 게시판(2026-11-02 · HTML 길 detailAttachments 와 같은 규칙) */
+            if (/^(?:다운로드|내려받기|download)$/i.test(name) && a.previousElementSibling) name = (a.previousElementSibling.textContent || '').replace(/\s+/g, ' ').trim();
+            return { name, url: a.href };
+          })).catch(() => []);
           for (const l of links) {
             if (!/\.(hwp|hwpx|pdf|docx?|xlsx?|zip)(\?|$)/i.test(l.name) && !/download|file|attach/i.test(l.url)) continue;
             const nm = l.name.replace(/\s*미리보기\s*$/, '').replace(/^\d+\.\s*/, '').trim();
@@ -304,13 +308,6 @@ for (const t of targets) {
     const r = await read;
     let { text, finalUrl } = r;
     if (r.error) report.push(`- ✕ ${t.it.name.slice(0, 40)} — 열지 못함: ${r.error.slice(0, 60)}`);
-    const add = newAttachments(t.it.attachments, r.found);
-    if (add.length) {
-      t.it.attachments = [...(t.it.attachments || []), ...add];
-      regDirty = true;
-      const pic = add.filter((a) => a.bodyImage).length;
-      report.push(`- 📎 ${t.it.name.slice(0, 36)} — 첨부 ${add.length}개를 새로 받아 적음${pic ? ` (그중 **본문 그림 ${pic}장**)` : ''}: ${add.map((a) => a.name).join(' , ').slice(0, 90)}`);
-    }
 
     /* 🔴 **봇 차단은 브라우저만 막는다 — 그럴 땐 일반 fetch로 물러선다** (2026-08-23 실측).
        홍익대는 브라우저로 열면 `cdn-botmanager.stclab.com/…/challenge`(제목 `Security
@@ -326,8 +323,19 @@ for (const t of targets) {
         if (res.ok) {
           const html = await res.text();
           text = htmlToLines(html);   // HTML → 줄 글자는 html-text.mjs 한 곳 (2026-09-30)
+          /* 본문이 그림 한 장인 게시판(홍익대 editorImage.do · 2026-11-02)은 글자가 메뉴뿐이라 '확보'로 보이면서 자격이 영영 비었다 —
+             브라우저가 못 본 그림을 HTML 에서 적는다(attachment-link htmlBodyImages 한 곳 · 아래 첨부 적기가 같이 받는다) */
+          r.found.push(...htmlBodyImages(html, openUrl));
         }
       } catch { /* 이쪽도 안 되면 그냥 실패로 둔다 */ }
+    }
+    /* 첨부 적기는 물러서기 **뒤**에 — 물러선 HTML 의 본문 그림도 같이 적는다 */
+    const add = newAttachments(t.it.attachments, r.found);
+    if (add.length) {
+      t.it.attachments = [...(t.it.attachments || []), ...add];
+      regDirty = true;
+      const pic = add.filter((a) => a.bodyImage).length;
+      report.push(`- 📎 ${t.it.name.slice(0, 36)} — 첨부 ${add.length}개를 새로 받아 적음${pic ? ` (그중 **본문 그림 ${pic}장**)` : ''}: ${add.map((a) => a.name).join(' , ').slice(0, 90)}`);
     }
 
     /* 받아 온 글자가 **본문인지**는 notice-source의 규칙 하나로만 판단한다.
