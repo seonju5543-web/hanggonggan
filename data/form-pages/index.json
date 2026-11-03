@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-02",
+ "updatedAt": "2026-11-03",
  "items": {
   "auto-oardid323011menuno200318": [
    {
@@ -870,6 +870,27 @@
     "srcBytes": 85351,
     "none": true,
     "at": "2026-10-31"
+   }
+  ],
+  "auto-krbbskr846019artclviewdo": [
+   {
+    "file": "auto-krbbskr846019artclviewdo/1-elig-1dnxxj-1_p6-6.pdf",
+    "name": "공고문 안 신청서 서식 (6쪽)",
+    "pages": 1,
+    "bytes": 133535,
+    "src": "elig-1dnxxj-1.hwp",
+    "srcBytes": 153088,
+    "srcPages": "6",
+    "from": "공고문 서식 쪽 떼기",
+    "at": "2026-11-03"
+   }
+  ],
+  "auto-zc3cnavcodeknu1619416593-08xvigz": [
+   {
+    "src": "elig-1vi20l-1.hwp",
+    "srcBytes": 48128,
+    "none": true,
+    "at": "2026-11-03"
    }
   ]
  }

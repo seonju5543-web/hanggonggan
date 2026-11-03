@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-02",
+ "updatedAt": "2026-11-03",
  "items": {
   "auto-ticedoarticleno231977952": [
    {
@@ -357,6 +357,72 @@
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-10-30"
+   }
+  ],
+  "auto-ent2431270591artclviewdo": [
+   {
+    "file": "auto-ent2431270591artclviewdo/1-2026학년도_2학기_HUFS_Dream_장학금_신청서_공고용_.pdf",
+    "name": "2026학년도 2학기 HUFS Dream 장학금 신청서(공고용).hwp",
+    "pages": 1,
+    "bytes": 103226,
+    "srcBytes": 132096,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-03"
+   }
+  ],
+  "auto-dmodeviewduid53596tpage1": [
+   {
+    "file": "auto-dmodeviewduid53596tpage1/1-Attachment_학업계획서.pdf",
+    "name": "Attachment 학업계획서.hwpx",
+    "pages": 1,
+    "bytes": 36404,
+    "srcBytes": 24913,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-03"
+   },
+   {
+    "file": "auto-dmodeviewduid53596tpage1/2-Attachment_개인정보_수집_이용_제공_동의서.pdf",
+    "name": "Attachment 개인정보 수집 이용 제공 동의서.hwp",
+    "pages": 1,
+    "bytes": 123332,
+    "srcBytes": 71168,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-03"
+   }
+  ],
+  "auto-zc3cnavcodeknu1619416593-08xvigz": [
+   {
+    "file": "auto-zc3cnavcodeknu1619416593-08xvigz/1-붙임3._경북대학교총동창회_장학금_지원서.pdf",
+    "name": "붙임3. 경북대학교총동창회_장학금 지원서.hwp",
+    "pages": 2,
+    "bytes": 81620,
+    "srcBytes": 58368,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-03"
+   },
+   {
+    "file": "auto-zc3cnavcodeknu1619416593-08xvigz/2-붙임4._경북대학교총동창회_자기소개서_및_학업발전_계획서.pdf",
+    "name": "붙임4. 경북대학교총동창회_자기소개서_및_학업발전 계획서.hwp",
+    "pages": 2,
+    "bytes": 54274,
+    "srcBytes": 38400,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-03"
+   },
+   {
+    "file": "auto-zc3cnavcodeknu1619416593-08xvigz/3-붙임5._경북대학교총동창회_개인정보활용_동의서.pdf",
+    "name": "붙임5. 경북대학교총동창회_개인정보활용 동의서.hwp",
+    "pages": 2,
+    "bytes": 139921,
+    "srcBytes": 94720,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-03"
    }
   ]
  }
