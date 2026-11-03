@@ -1,6 +1,6 @@
-# 작성 규칙 학습 — 2026-10-27
+# 작성 규칙 학습 — 2026-11-03
 
-읽은 곳 20곳 · 못 읽은 곳 2곳 · 규칙에 붙은 출처 3건
+읽은 곳 23곳 · 못 읽은 곳 0곳 · 규칙에 붙은 출처 0건
 
 ## 읽은 곳
   ✓ https://community.linkareer.com/employment_data/4250237
@@ -30,13 +30,14 @@
       줄 269 · 규칙을 뒷받침한 것 2종 (know-the-foundation, character-evidence)
       🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
   ✓ https://linkareer.com/activity/277626
-      줄 217 · 규칙을 뒷받침한 것 1종 (know-the-foundation)
+      줄 216 · 규칙을 뒷받침한 것 1종 (know-the-foundation)
       🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
   ✓ https://linkareer.com/activity/284206
-      줄 204 · 규칙을 뒷받침한 것 4종 (know-the-foundation, proofread, direction, motive-need-then-plan)
-      🆕 어느 규칙에도 안 붙은 문장 5개 — 컨펌 대기
-  ✗ https://owlapply.com/ko/jagisogeseo-yangsig
-      못 읽음: terminated
+      줄 200 · 규칙을 뒷받침한 것 1종 (know-the-foundation)
+      🆕 어느 규칙에도 안 붙은 문장 4개 — 컨펌 대기
+  ✓ https://owlapply.com/ko/jagisogeseo-yangsig
+      줄 483 · 규칙을 뒷받침한 것 1종 (concrete-scene)
+      🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
   ✓ https://owlapply.com/ko/blog/jagisogeseo
       줄 95 · 규칙을 뒷받침한 것 4종 (lead-first, no-cliche, intro-hook, character-evidence)
       🆕 어느 규칙에도 안 붙은 문장 1개 — 컨펌 대기
@@ -53,7 +54,7 @@
       줄 74 · 규칙을 뒷받침한 것 2종 (concrete-scene, lead-first)
       🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
   ✓ https://admit-lab.com/ko/%EB%B8%94%EB%A1%9C%EA%B7%B8/%EC%9E%A5%ED%95%99%EA%B8%88-%EB%AA%A9%EC%A0%81%EC%84%9C/
-      줄 288 · 규칙을 뒷받침한 것 4종 (know-the-foundation, direction, future-steps, concrete-scene)
+      줄 290 · 규칙을 뒷받침한 것 4종 (know-the-foundation, direction, future-steps, concrete-scene)
       🆕 어느 규칙에도 안 붙은 문장 6개 — 컨펌 대기
   ✓ https://www.skillagit.com/people/people_view.php?b_id=008&idx=762
       줄 1540 · 규칙을 뒷받침한 것 4종 (episode-star, concrete-scene, value-evidence, direction)
@@ -61,11 +62,14 @@
   ✓ https://owlapply.com/ko/ai-dogu/ibwon-jadong-ipryeog
       줄 177 · 규칙을 뒷받침한 것 0종
       🆕 어느 규칙에도 안 붙은 문장 1개 — 컨펌 대기
-  ✓ https://admit-lab.com/ko/%ED%95%84%EB%A6%BD-%EB%B0%94-%EB%B0%95%EC%82%AC-%28%EC%9E%85%ED%95%99-%EC%A0%84%EB%AC%B8%EA%B0%80%29/
-      줄 165 · 규칙을 뒷받침한 것 0종
-      🆕 어느 규칙에도 안 붙은 문장 1개 — 컨펌 대기
-  ✗ https://admit-lab.com/ko/%EB%B8%94%EB%A1%9C%EA%B7%B8/%EB%8C%80%ED%95%99%EC%9B%90-%EC%A7%84%ED%95%99-%EB%AA%A9%EC%A0%81%EC%84%9C/
-      못 읽음: HTTP 404
+  ✓ https://community.linkareer.com/employment_data/4227270?page=1
+      줄 413 · 규칙을 뒷받침한 것 0종
+      🆕 어느 규칙에도 안 붙은 문장 5개 — 컨펌 대기
+  ✓ https://pf.kakao.com/_MGgexb
+      줄 2 · 규칙을 뒷받침한 것 0종
+  ✓ https://linkareer.com/activity/283454
+      줄 184 · 규칙을 뒷받침한 것 0종
+      🆕 어느 규칙에도 안 붙은 문장 3개 — 컨펌 대기
 
 ## 🆕 어느 규칙에도 안 붙은 문장 — 개발자 컨펌 대기
 아래는 **규칙 후보**입니다. 규칙집에 넣을지는 사람이 정합니다(운영 원칙 2).
@@ -152,17 +156,20 @@
   <sub>https://community.linkareer.com/employment_data/5118788</sub>
 
 ## 스스로 넓히기 — 로봇이 읽은 글에서 다음에 읽을 곳을 주웠습니다
-주운 곳 2곳 · 이번에 읽은 곳 2곳 · robots.txt 가 막아 건너뛴 곳 0곳
+주운 곳 3곳 · 이번에 읽은 곳 3곳 · robots.txt 가 막아 건너뛴 곳 0곳
 
-- · 규칙 0종 — 30일 뒤 다시 시도 https://admit-lab.com/ko/%ED%95%84%EB%A6%BD-%EB%B0%94-%EB%B0%95%EC%82%AC-%28%EC%9E%85%ED%95%99-%EC%A0%84%EB%AC%B8%EA%B0%80%29/
-  <sub>필립 바 박사의 박사 과정 입학 전형 방식과 지원서 평가 방법에 대해 알아보세요 →</sub>
-- · 규칙 0종 — 30일 뒤 다시 시도 https://admit-lab.com/ko/%EB%B8%94%EB%A1%9C%EA%B7%B8/%EB%8C%80%ED%95%99%EC%9B%90-%EC%A7%84%ED%95%99-%EB%AA%A9%EC%A0%81%EC%84%9C/
-  <sub>대학원 진학 목적서 작성법 | 꿀팁</sub>
+- · 규칙 0종 — 30일 뒤 다시 시도 https://community.linkareer.com/employment_data/4227270?page=1
+  <sub>삼성 SSAFY 합격 후기 모음집 (feat. 합격 스펙, 인재상 등)</sub>
+- · 규칙 0종 — 30일 뒤 다시 시도 https://pf.kakao.com/_MGgexb
+  <sub>자소서봇</sub>
+- · 규칙 0종 — 30일 뒤 다시 시도 https://linkareer.com/activity/283454
+  <sub>2026 T&amp;C재단 공감인재 장학생</sub>
 
 ## 🩺 seed 건강 (지속가능성)
-살아 있는 seed 36개 (상한 60) · 이번 실행에서 규칙을 준 곳 18개
+살아 있는 seed 36개 (상한 60) · 이번 실행에서 규칙을 준 곳 19개
 
-시든 seed 없음.
+**시든 seed — 3회 연속 규칙 0종.** 사람이 확인해 지워 주세요(자동 삭제 안 함):
+- (3회) https://owlapply.com/ko/ai-dogu/ibwon-jadong-ipryeog
 
 
 ## 📌 다음에 크롤링할 출처 — 개발자 확인용 (정직 보고)
