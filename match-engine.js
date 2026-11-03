@@ -213,7 +213,7 @@ function pctToGpa(pct, table) {
 }
 
 /* 🔴 **이 앱의 프로필은 학부다** (2026-09-12 · 노션 핵심-4). 온보딩이 받는 학적은
-   1~4학년 + 재학·신입학·복학예정·휴학·초과학기·졸업유예뿐이라(index.html `#in-year`·
+   1~4학년 + 재학·신입학·편입학·재입학·복학예정·휴학·초과학기·졸업유예뿐이라(index.html `#in-year`·
    `#in-status`) 학위 과정을 따로 묻지 않는다. 그 사실을 **여기 한 곳에서만** 말한다 —
    온보딩에 학위 칸이 생기면 이 함수만 그 값을 읽으면 된다(그때 `p.degree` 를 쓴다).
    ⚠️ 여기서 'unknown' 을 내지 말 것 — 모른다고 하면 학위 축이 통째로 죽어, 대학원 전용
@@ -339,7 +339,8 @@ function judgeCond(c, p, ctx) {
              (그냥 `재학생`이면 지금은 휴학 중이라 단정할 수 없다 — 모르면 판정하지 않는다)
          `휴학`은 재학생이 아니므로 미달이다 — 이게 헛걸음을 막는 자리다. */
       if (c.anyOf.includes('재학')) {
-        const asEnrolled = c.regularOnly ? ['신입학'] : ['신입학', '초과학기', '졸업유예'];
+        /* 편입·재입학 첫 학기도 재학생이다(2026-11-02 · 온보딩 칩) — 정규학기 재학생에도 든다 */
+        const asEnrolled = c.regularOnly ? ['신입학', '편입학', '재입학'] : ['신입학', '편입학', '재입학', '초과학기', '졸업유예'];
         if (asEnrolled.includes(p.status)) return 'pass';
         if (['휴학', '수료', '졸업', '자퇴'].includes(p.status)) return 'fail';
       }
@@ -1349,7 +1350,7 @@ function tidyRequirement(line) {
    🔴 버리면 안 된다 — 그 줄에 진짜 요건이 들어 있다. **다음 줄과 이어 붙인다.** */
 const CONTINUES = /(또는|및|이고|이며|하여|중)\s*$|\s인\s*$|[,·+]\s*$/;
 /* 참고 줄 — `1학년 재학생은 성적 기준을 적용하지 않음` 처럼 요건을 **푸는** 말(2026-10-15 · 123줄 진단 ⑧). 요건이 아니라 옅게 보이고 분모에서 뺀다(aside) */
-const NOTE_LINE = /(?:기준|요건|조건)(?:을|은|는|이)?\s*(?:적용하지\s*않|적용\s*안\s*함|미적용|면제|없음)|(?:기준|요건|조건)\s*적용\s*제외|(?:학점|성적)\s*(?:기준\s*)?제한\s*없|성적\s?(?:기준\s?)?무관|성적이?\s*반영됨/;   // `마지막 학기 등록자는 이수학점 제한 없음` 도 참고다(2026-10-15 · 3학년에게 ✕ 가 떴다) · `성적기준 없음`·`성적무관`·`유급 전 성적이 반영됨` 도(2026-11-02)
+const NOTE_LINE = /(?:기준|요건|조건)(?:을|은|는|이)?\s*(?:적용하지\s*않|적용\s*안\s*함|적용\s*제외|미적용|면제|없음)|(?:학점|성적)\s*(?:기준\s*)?제한\s*없|성적\s?(?:기준\s?)?무관|성적이?\s*반영됨/;   // `마지막 학기 등록자는 이수학점 제한 없음` 도 참고다(2026-10-15 · 3학년에게 ✕ 가 떴다) · `성적기준 없음`·`성적무관`·`유급 전 성적이 반영됨` 도(2026-11-02)
 /* 🔴 `성적기준 적용 제외 가능` 도 면제 안내다 (2026-11-02 · 3차) — 층2 국가근로 「학생이 장애인·자립준비청년((구)보호종료아동)인 경우 성적기준 적용 제외 가능」이
    자립준비청년 처지 조건이 되어 「아니요」 답한 학생에게 ✕ 였다(틀린 미달). ⚠️ 앞에 기준·요건·조건이 붙을 때만 — `적용 제외 대상 : …` 은 진짜 제외 줄이다 */
 /* 참고인가는 **괄호 밖**으로 본다 — `평점평균 2.0 이상인 자 (단, 신입생·편입생 성적제한 없음)` 은 요건이고 괄호는 면제 부연이다 */
@@ -1853,7 +1854,7 @@ if (typeof module !== 'undefined' && module.exports) {
                      requirementLines, requirementStruct, requirementMatch, tidyRequirement,
                      REQ_SIGNAL, NOT_A_REQUIREMENT, EXCLUDE_LINE, HARD_THRESHOLD,
                      noticeForProfile, activityForProfile, taggedSchool, SHARED_BOARD_BRANCH, SERVED_SCHOOLS,
-                     noticeKind, NOTICE_CAMPUS_MARK, OWN_PROGRAMS, BRANCH_LABEL,
+                     noticeKind, NOTICE_CAMPUS_MARK, OWN_PROGRAMS,
                      noticeFileKey, noticeFileFor, noticeFilesForProfile,
-                     noticeFallbackNeeded, majorsFileFor, newsFileFor, newsFilesForProfile };
+                     noticeFallbackNeeded, majorsFileFor, newsFileFor, newsFilesForProfile, BRANCH_LABEL };
 }

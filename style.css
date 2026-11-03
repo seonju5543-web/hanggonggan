@@ -904,8 +904,13 @@ a.btn { text-decoration: none; }
 .doc-list.doc-badged .doc-auto,
 .doc-list.doc-badged .doc-manual { flex: none; margin-right: 0; }
 /* 판정 표시(✓ ✕ ?)가 이미 앞에 붙는 줄은 점을 빼서 두 겹이 되지 않게 한다 */
-.reason-list .r-ok::before, .reason-list .r-bad::before, .reason-list .r-unk::before { display: none; }
-.reason-list .r-ok, .reason-list .r-bad, .reason-list .r-unk { padding-left: 2px; }
+.reason-list .r-ok::before, .reason-list .r-bad::before, .reason-list .r-unk::before, .reason-list .r-x::before { display: none; }
+.reason-list .r-ok, .reason-list .r-bad, .reason-list .r-unk, .reason-list .r-x { padding-left: 2px; }
+.reason-list .r-x { color: var(--text-weak); }   /* 제외 조건 ✗ 줄 — 같은 「지원 자격」 목록 안(승인 시안 2026-11-02 · 판정 아님) */
+.sheet-top .badge-dday { margin-left: auto; }   /* 시트 머리줄 — 칩·주최 왼쪽, D-day 오른쪽(승인 시안 2026-11-02) */
+.ns-more summary { font-size: var(--t-xs); color: var(--text-sub); cursor: pointer; margin: var(--sp-1) 0; list-style: none; }
+.ns-more summary::before { content: '+ '; }
+.ns-more[open] summary::before { content: '– '; }
 .r-ok  { color: var(--green); }
 .r-bad { color: var(--red); }
 .r-unk { color: var(--orange); }
@@ -930,7 +935,7 @@ a.btn { text-decoration: none; }
   padding: 13px;
   margin: 18px 0 8px;
 }
-.sheet-deadline, .sheet-source { font-size: var(--t-xs); color: var(--text-weak); margin-bottom: 20px; }   /* .sheet-source — 「자세한 내용과 접수 방법은 원문 공고 ↗에서 확인하세요.」 한 문장(2026-10-29 · 점 줄을 대신한다) */
+.sheet-source { font-size: var(--t-xs); color: var(--text-weak); margin-bottom: 20px; }   /* .sheet-source — 「자세한 내용과 접수 방법은 원문 공고 ↗에서 확인하세요.」 한 문장(2026-10-29 · 점 줄을 대신한다) */
 
 .app-progress {
   display: flex;
@@ -3578,11 +3583,6 @@ button, input, select, textarea { letter-spacing: inherit; }
 .sheet-top { position: relative; padding-right: 40px; }
 .sheet-top > .save-btn { top: -8px; right: -6px; }
 
-.sheet-schedule {
-  font-size: var(--t-sm);
-  color: var(--text-sub);
-  margin: 2px 0 0;
-}
 
 /* ── 달력 ────────────────────────────────────────────────── */
 .cal { margin-top: 4px; }
@@ -4959,7 +4959,7 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 /* 상세 시트 맨 아래 묶음 — 마감일·중복 수혜 · 문의 · 원문 링크 (2026-10-02 CTO 지시).
    마감일 줄이 혼자일 때 갖던 아래 여백은 묶음이 대신 갖는다(줄 사이는 .doc-legend 의 위 여백). */
 .sheet-facts { margin: var(--sp-3) 0; }
-.sheet-facts .sheet-deadline, .sheet-facts .sheet-source { margin-bottom: 0; }
+.sheet-facts .sheet-source { margin-bottom: 0; }
 
 /* 처지 예/아니요 — 프로필에 칸이 없던 개인 사정 (2026-09-18 · 노션 AI-1) */
 .elig-ask-yn { align-items: flex-start; flex-wrap: wrap; gap: var(--space-8); }

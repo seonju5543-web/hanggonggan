@@ -1,7 +1,32 @@
 {
  "school": "서강대학교",
- "updatedAt": "2026-11-02",
+ "updatedAt": "2026-11-03",
  "items": [
+  {
+   "title": "[앵커사업단] LG CNS Day 행사 안내",
+   "url": "https://www.sogang.ac.kr/ko/detail/551731?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
+   "postId": "551731",
+   "postedAt": "2026-11-02",
+   "kind": "행사",
+   "school": "서강대학교",
+   "campus": "",
+   "board": "행사특강",
+   "src": "c13ee4bc",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/967004fafd24a842.webp"
+  },
+  {
+   "title": "[서강판교캠퍼스사업단] 2026 창업서밋&밋업데이 정부지원사업 제대로 알기 프로그램(11/20)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551726?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
+   "postId": "551726",
+   "postedAt": "2026-11-02",
+   "school": "서강대학교",
+   "campus": "",
+   "board": "행사특강",
+   "src": "c13ee4bc",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/4014bd71224c62f1.webp"
+  },
   {
    "title": "[철학연구소] 10월 해외석학 초청 강연회",
    "url": "https://www.sogang.ac.kr/ko/detail/551601?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
@@ -63,19 +88,6 @@
    "board": "행사특강",
    "foundAt": "2026-10-04",
    "thumb": "data/news/img/9457fbf17617793e.webp",
-   "src": "c13ee4bc"
-  },
-  {
-   "title": "[학군단] 골때녀 우희준의 리더십 특별 강연 (9월10일 오전8시, RA관408호)",
-   "url": "https://www.sogang.ac.kr/ko/detail/551113?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
-   "postId": "551113",
-   "postedAt": "2026-09-03",
-   "kind": "행사",
-   "school": "서강대학교",
-   "campus": "",
-   "board": "행사특강",
-   "foundAt": "2026-10-04",
-   "thumb": "data/news/img/c39fa54f0c461978.webp",
    "src": "c13ee4bc"
   }
  ]

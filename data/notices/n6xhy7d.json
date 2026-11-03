@@ -1,15 +1,49 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-11-02",
+ "updatedAt": "2026-11-03",
  "items": [
+  {
+   "title": "[등록/장학] 대한주택건설협회 서울특별시회 2026학년도 장학생 선발 안내(생활비성)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53596&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    },
+    {
+     "name": "Attachment 학업계획서.hwpx",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35501&ano=53596"
+    },
+    {
+     "name": "Attachment 개인정보 수집 이용 제공 동의서.hwp",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35503&ano=53596"
+    }
+   ],
+   "deadlineHint": "접수기간 : 2026 년 11 월 3 일 ( 화 ) ~ 6 일 ( 금 ) 17 시까지 나 . 제출장소 : 학생복지팀 ( 복지관 202 호 ) 5",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-11-02"
+  },
   {
    "title": "[등록/장학] 2026년도 통영시 저소득 대학생 장학금 지원대상자 선발 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53581&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "attachments": [
-    {
-     "name": "부설연구기관",
-     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
-    },
     {
      "name": "Attachment 2026년 통영시 저소득 대학생 장학금 지원대상자 선발 공고.hwpx",
      "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35497&ano=53581"

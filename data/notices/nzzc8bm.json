@@ -1,7 +1,25 @@
 {
  "school": "가천대학교",
- "updatedAt": "2026-11-02",
+ "updatedAt": "2026-11-03",
  "items": [
+  {
+   "title": "[메디컬] (등록금 전액) 2027학년도 한독제석재단 장학생 후보 선발 안내",
+   "url": "https://www.gachon.ac.kr/bbs/kor/478/126688/artclView.do",
+   "attachments": [
+    {
+     "name": "2027 장학금 및 연구지원금 지원 대상자 선발 공고.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/157987/download.do"
+    },
+    {
+     "name": "2027 자기소개서 및 추천서 양식(장학금 지원자).doc",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/157988/download.do"
+    }
+   ],
+   "deadlineHint": "추천기한: 2026.11.30.(월) 까지 (학과별로 신청 기간이 상이할 수 있으니 소속 학과로 개별 문의) ★ 행정 처리 절차를 거쳐 위 기한",
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-11-03"
+  },
   {
    "title": "[공통] 2026년도 통영시 저소득 대학생 장학금 지원대상자 선발 공고",
    "url": "https://www.gachon.ac.kr/bbs/kor/478/126488/artclView.do",

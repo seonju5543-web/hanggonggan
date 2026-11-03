@@ -1,7 +1,34 @@
 {
  "school": "홍익대학교",
- "updatedAt": "2026-11-02",
+ "updatedAt": "2026-11-03",
  "items": [
+  {
+   "title": "[한국장학재단] 청년지원정보 통합제공 플랫폼 '통학로' 홍보",
+   "url": "https://www.hongik.ac.kr/kr/education/notice-undergrad.do?mode=view&articleNo=159936&article.offset=0&articleLimit=10&srCategoryId=24&srSearchKey=article_title&noCat=24",
+   "attachments": [
+    {
+     "name": "통학로 포스터.jpg",
+     "url": "https://www.hongik.ac.kr/kr/education/notice-undergrad.do?mode=download&articleNo=159936&attachNo=93742"
+    },
+    {
+     "name": "통학로 카드(리플렛_PDF.pdf",
+     "url": "https://www.hongik.ac.kr/kr/education/notice-undergrad.do?mode=download&articleNo=159936&attachNo=93743"
+    }
+   ],
+   "deadlineHint": "제출 기간 변경 안내) 2026.10.21 2026년 동계 전공연계 <독일> 해외파견 프로그램 선발 안내 < 베를린 현지 대면수업 계절학기 >",
+   "school": "홍익대학교",
+   "campus": "",
+   "foundAt": "2026-11-02"
+  },
+  {
+   "title": "[전기공사공제조합장학회] 2027년도 제22기 장학생 선발공고",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159923&noCat=501",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "홍익대학교",
+   "campus": "",
+   "foundAt": "2026-11-02"
+  },
   {
    "title": "[통영시] 2026년도 통영시 저소득 대학생 장학금 지원대상자 선발 공고",
    "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159778&noCat=501",

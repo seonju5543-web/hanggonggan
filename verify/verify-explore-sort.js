@@ -190,8 +190,9 @@ const PROFILE = {
   /* 🔴 2026-09-10 페이스리프트로 교내·교외가 **배지에서 기관명 줄의 글자**로 옮겨졌다
      (한 카드에 배지가 최대 5개 붙던 것을 1개로 줄이면서). 뜻은 그대로라 재는 곳만 바꾼다. */
   eq('필터도 그대로 걸려 있다',
-    await page.$$eval('#explore-list .sch-card .sch-org',
-      (e) => [...new Set(e.map((x) => x.textContent.split('·')[0].trim()))]), ['교외']);
+    /* 2026-11-02 시안 B — 교내·교외는 윗줄 칩(.badge-kind 「장학 · 교외」)이 말한다 · .sch-org 는 주최만 */
+    await page.$$eval('#explore-list .sch-card .sch-top .badge-kind',
+      (e) => [...new Set(e.map((x) => x.textContent.split('·').pop().trim()))]), ['교외']);
 
   /* ══ 홈 '마감 임박' 차례 (2026-09-12 · 노션 UI-14) ═══════════════════════════
      개발자 지적: "적합도가 낮아도 마감이 임박하면 홈에 뜬다 — 학생 입장에서는 '굳이…' 다."

@@ -143,7 +143,7 @@ export default async function gate(eq, ctx) {
   const T = taker(appSrc, 'app.js');
   const calls = {
     sourceLinkHtml: /sourceLink\(sch, 'detail'\)/, amountSourceLinkHtml: /sourceLink\(sch, 'amount'\)/, appLogLinkHtml: /sourceLink\(sch, 'applog'\)/,
-    noticeCardHtml: /sourceLink\(n, 'card'\)/, activityLinkHtml: /sourceLink\(n, 'activity'\)/,
+    noticeCardHtml: /sourceLink\(n, 'card'\)/, activityLinkHtml: /sourceLink\(n, 'activityButton'\)/,   // 활동 시트 단추는 제 자리(activityButton · 2026-11-02) — 안내 줄은 activityLinkWhy 가 'activity' 자리로
   };
   eq('  링크 자리 다섯이 각자 제 화면 이름으로 sourceLink 를 부른다 (상세·금액·신청 내역·카드·활동)',
     Object.entries(calls).filter(([f, re]) => !re.test(stripComments(T.fn(f)))).map(([f]) => f), []);
@@ -152,7 +152,7 @@ export default async function gate(eq, ctx) {
       /* 갈래(cls)와 주소(href) 둘 다 sourceLink 에서 — 바로잡은 원문(⑥)을 제출처도 쓴다(2026-10-04) */
       return /const sl = typeof sourceLink === 'function' \? sourceLink\(sch, 'detail'\)/.test(oc) && /sl\.href/.test(oc) && /sl\.cls/.test(oc) && !/url: sch\.sourceUrl/.test(oc); })()], [true, true]);
   eq('  상세 시트·활동 시트·금액·신청 내역·첨부가 그 함수들을 실제로 쓴다',
-    [/\$\{srcLink\}|srcLink,/.test(stripComments(T.fn('openDetail'))), /activityLinkHtml\(n\)/.test(stripComments(T.fn('openActivityDetail'))),
+    [/sourceLinkHtml\(sch\)/.test(stripComments(T.fn('sheetSectionsHtml'))), /activityLinkHtml\(n\)/.test(stripComments(T.fn('openActivityDetail'))),   // 상세 시트의 「원문」 절은 sheetSectionsHtml 한 곳(2026-11-02)
       /amountSourceLinkHtml\(sch\)/.test(stripComments(T.fn('amountDetailRow'))), /appLogLinkHtml\(sch\)/.test(code['app.js']),
       (code['app.js'].match(/attachmentLinkHtml\(a/g) || []).length >= 3], [true, true, true, true, true]);
   eq('  첨부를 `<a href="${esc(safeUrl(a.url))}"` 로 직접 그리는 자리가 남지 않았다 (빈 href 는 앱 자신을 연다)',

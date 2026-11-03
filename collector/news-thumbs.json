@@ -16809,10 +16809,10 @@
    "none": "글에 그림이 없음"
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=271722&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-11-02",
+   "at": "2026-11-03",
    "school": "계명대학교",
    "err": "글 화면에 그 글의 제목이 없음 — 다음에 다시 (받은 화면: 「계명대학교 - 열린마당 > 공지사항 > 일반」 · 57037자 · utf-8 · https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=0&pageOrder=0&cmd=2&)",
-   "tries": 1
+   "tries": 2
   },
   "post:중앙대학교:30303": {
    "at": "2026-11-02",
@@ -16919,10 +16919,10 @@
    "side": 360
   },
   "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=271730&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
-   "at": "2026-11-02",
+   "at": "2026-11-03",
    "school": "계명대학교",
    "err": "글 화면에 그 글의 제목이 없음 — 다음에 다시 (받은 화면: 「계명대학교 - 열린마당 > 공지사항 > 일반」 · 57057자 · utf-8 · https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271730&pageOrder=0&c)",
-   "tries": 1
+   "tries": 2
   },
   "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=141289&mode=view": {
    "at": "2026-11-02",
@@ -16951,15 +16951,6 @@
    "at": "2026-11-02",
    "school": "조선대학교",
    "none": "글에 그림이 없음"
-  },
-  "post:전북대학교:219317": {
-   "at": "2026-11-02",
-   "school": "전북대학교",
-   "file": "data/news/img/b315304c2dea6b39.webp",
-   "src": "https://www.jbnu.ac.kr/common/file.do?file=vtjeW5bo2afPCeRtu6vbZjk4R10zuGVppEj7sIjhG8EpKuuCeTwb5ORKRtz+wRcnZHHgucvyE9HD1Uuph9lRtA==",
-   "from": "body",
-   "v": 2,
-   "side": 360
   },
   "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=277327&mode=view": {
    "at": "2026-11-02",
@@ -17028,10 +17019,10 @@
    "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림) · body: 여러 글에 같은 그림(공통 그림) · body: 글자뿐인 문서 그림 (흰 바탕 87% · 색 7%))"
   },
   "url:https://www.mju.ac.kr/bbs/mjukr/141/236531/artclView.do": {
-   "at": "2026-11-02",
+   "at": "2026-11-03",
    "school": "명지대학교",
    "err": "글 화면에 그 글의 제목이 없음 — 다음에 다시 (받은 화면: 「관리모드 &gt; 알림메세지」 · 6923자 · UTF-8 · https://www.mju.ac.kr/bbs/mjukr/141/236531/artclView.do)",
-   "tries": 1
+   "tries": 2
   },
   "url:https://www.inha.ac.kr/bbs/kr/8/46007/artclView.do": {
    "at": "2026-11-02",
@@ -17116,58 +17107,899 @@
    "from": "body",
    "v": 2,
    "side": 360
+  },
+  "url:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=813&nttNo=171154&pageUnit=10": {
+   "at": "2026-11-02",
+   "school": "충북대학교",
+   "none": "글에 그림이 없음"
+  },
+  "post:서강대학교:551731": {
+   "at": "2026-11-02",
+   "school": "서강대학교",
+   "file": "data/news/img/967004fafd24a842.webp",
+   "src": "https://www.sogang.ac.kr/dataview/board/142/5ad9b83c-d851-4bf6-8309-f8f8ba0d1294.jpg",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.hufs.ac.kr/bbs/hufs/2180/270590/artclView.do": {
+   "at": "2026-11-02",
+   "school": "한국외국어대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511888&mCode=MN095&mgr_seq=3&mode=view": {
+   "at": "2026-11-02",
+   "school": "부산대학교",
+   "file": "data/news/img/7e68db4de2306e84.webp",
+   "src": "https://www.pusan.ac.kr/_UPLOAD/IMAGE/Board/images/000135/2026_%EC%84%A4%EB%AC%B8%EC%A1%B0%EC%82%AC.png",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=277377&mode=view": {
+   "at": "2026-11-02",
+   "school": "가톨릭대학교",
+   "file": "data/news/img/576f257757e812af.webp",
+   "src": "https://www.catholic.ac.kr/_attach/cuk/editor-image/2026/11/agtWBBxdFKxZMSLenjNIYyuUbT.jpg",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "post:중앙대학교:30304": {
+   "at": "2026-11-02",
+   "school": "중앙대학교",
+   "none": "글에 그림이 없음"
+  },
+  "post:서울시립대학교:30561": {
+   "at": "2026-11-02",
+   "school": "서울시립대학교",
+   "file": "data/news/img/956f38fd9af5e6c0.webp",
+   "src": "https://file.uos.ac.kr/upload/smarteditor/2026/11/20261102141744.png",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=271739&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
+   "at": "2026-11-03",
+   "school": "계명대학교",
+   "err": "글 화면에 그 글의 제목이 없음 — 다음에 다시 (받은 화면: 「계명대학교 - 열린마당 > 공지사항 > 일반」 · 57057자 · utf-8 · https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271739&pageOrder=0&c)",
+   "tries": 2
+  },
+  "post:동국대학교:26766829": {
+   "at": "2026-11-02",
+   "school": "동국대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 글자뿐인 문서 그림 (흰 바탕 86% · 색 6%))"
+  },
+  "url:https://sejong.korea.ac.kr/bbs/koreaSejong/664/274153/artclView.do": {
+   "at": "2026-11-02",
+   "school": "고려대학교 세종캠퍼스",
+   "file": "data/news/img/a5dbdf1aa711bbfd.webp",
+   "src": "https://sejong.korea.ac.kr/bbs/koreaSejong/664/183909/download.do",
+   "from": "attach",
+   "v": 2,
+   "side": 360
+  },
+  "post:고려대학교:000060000000061613": {
+   "at": "2026-11-02",
+   "school": "고려대학교",
+   "file": "data/news/img/99bba2b91d659ad6.webp",
+   "src": "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=Auq8SHjE%2FdyERs6f8qNRQ8xccGjWm2V6HPE4wpGe7Sk5crurBEDiuM4cJa%2Fg8gwxnXhlj8yOZ1FR%0AE9qU70cn%2FDBDCf%2B5QPIlS6sZ1aCsLltzJ4pI9AX%2BrWOo4PFz0fODAbsExsG8mFBH4VXXfBeWJQ%3D%3D",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.pknu.ac.kr/main/163?action=view&no=726818": {
+   "at": "2026-11-02",
+   "school": "부경대학교",
+   "file": "data/news/img/bcd400a8b82e115f.webp",
+   "src": "https://www.pknu.ac.kr/upload/raonkeditordata/2026/11/02/20261102_145144216_00538.jpg",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.knou.ac.kr/bbs/knou/51/820759/artclView.do": {
+   "at": "2026-11-02",
+   "school": "한국방송통신대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367757&mode=view&no=361": {
+   "at": "2026-11-02",
+   "school": "이화여자대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.smu.ac.kr/webzine/today.do?article.offset=0&articleLimit=10&articleNo=769885&mode=view": {
+   "at": "2026-11-02",
+   "school": "상명대학교",
+   "file": "data/news/img/284157a79b595d65.webp",
+   "src": "https://www.smu.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEZsh1A1gJQMoCECCAZAVgQwAsAjYgJwBUARAB2wE9cA7AOlxoHMg%20",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www3.chosun.ac.kr/bbs/chosun/117/282512/artclView.do": {
+   "at": "2026-11-02",
+   "school": "조선대학교",
+   "file": "data/news/img/a65403e65a2332cc.webp",
+   "src": "https://www3.chosun.ac.kr/bbs/chosun/117/379875/download.do",
+   "from": "attach",
+   "v": 2,
+   "side": 360
+  },
+  "post:동국대학교 WISE캠퍼스:521051": {
+   "at": "2026-11-02",
+   "school": "동국대학교 WISE캠퍼스",
+   "none": "사진으로 쓸 그림 없음 (body: 가로세로가 치우침 (1080×5400 · 띠 배너로 보임))"
+  },
+  "url:https://www.inha.ac.kr/bbs/kr/8/46014/artclView.do": {
+   "at": "2026-11-02",
+   "school": "인하대학교",
+   "none": "글에 그림이 없음"
+  },
+  "post:전북대학교:219354": {
+   "at": "2026-11-02",
+   "school": "전북대학교",
+   "file": "data/news/img/2458bebc14c0c187.webp",
+   "src": "https://www.jbnu.ac.kr/common/file.do?file=OStBhNzdjXPlYeNQa1G8e1BrzcW4i8LyeOFkAoTmXHyZVLiAx6Tl74/3fOrrF/RA",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=2027%ED%95%99%EB%85%84%EB%8F%84-1%ED%95%99%EA%B8%B0-%EB%B3%B5%ED%95%99-%ED%9C%B4%ED%95%99-%EC%9C%A0%EA%B8%89-%EC%8B%A0%EC%B2%AD-%EC%95%88%EB%82%B4": {
+   "at": "2026-11-02",
+   "school": "숭실대학교",
+   "file": "data/news/img/e6025fe17f41f07c.webp",
+   "src": "https://scatch.ssu.ac.kr/wp-content/uploads/sites/5/2026/11/%ED%99%88%ED%8E%98%EC%9D%B4%EC%A7%80-%EA%B3%B5%EC%A7%80-2027%ED%95%99%EB%85%84%EB%8F%84-1%ED%95%99%EA%B8%B0-%EB%B3%B5%ED%95%99-%ED%9C%B4%ED%95%99-%EC%9C%A0%EA%B8%89-%EC%8B%A0%EC%B2%AD-%EC%95%88%EB%82%B4_1-2.png",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=141494&mode=view": {
+   "at": "2026-11-02",
+   "school": "성균관대학교",
+   "file": "data/news/img/3c43abd2a1efce25.webp",
+   "src": "https://www.skku.edu/_attach/image/2026/11/DQVYgjuXYCNaeNXUDfCD.png",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626953&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
+   "at": "2026-11-02",
+   "school": "경기대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.mju.ac.kr/bbs/mjukr/141/236814/artclView.do": {
+   "at": "2026-11-02",
+   "school": "명지대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11596&searchGbn=0&searchOrderSort=0": {
+   "at": "2026-11-02",
+   "school": "강원대학교",
+   "file": "data/news/img/f3b6e789fdba8caf.webp",
+   "src": "https://www.kangwon.ac.kr/ckeditorImgfile.do?dn=ckEditor_20261102020315447.png&fn=%EA%B0%95%EC%9B%90%EB%8C%80%ED%95%99%EA%B5%90%20%EB%8B%A4%EC%A0%84%EA%B3%B5%20%EC%97%AD%EB%9F%89%20%EA%B0%95%ED%99%94%20%EB%B9%84%EA%B5%90%EA%B3%BC%20%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%A8%20%EC%95%88%EB%82%B4(11%EC%9B%94).png&siteId=neibis&menuSn=504",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0701&menu_dvs_cd=0701&mode=V&no=2516069&site_dvs_cd=kr": {
+   "at": "2026-11-02",
+   "school": "충남대학교",
+   "file": "data/news/img/c88eb0b6a4eb5e57.webp",
+   "src": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0701&ntt_no=2516069&atch_no=1",
+   "from": "attach",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=813&nttNo=171148&pageUnit=10": {
+   "at": "2026-11-02",
+   "school": "충북대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70876": {
+   "at": "2026-11-02",
+   "school": "전남대학교",
+   "file": "data/news/img/040b00fe9c12fe11.webp",
+   "src": "https://capd.jnu.ac.kr/Common/byteToImage.aspx?Seq=648262&USECD=H09050",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "post:서강대학교:551726": {
+   "at": "2026-11-02",
+   "school": "서강대학교",
+   "file": "data/news/img/4014bd71224c62f1.webp",
+   "src": "https://www.sogang.ac.kr/dataview/board/142/1ced8ab2-385c-4101-a440-c48a96372c7f.png",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "post:서울시립대학교:31774": {
+   "at": "2026-11-02",
+   "school": "서울시립대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림) · body: 그림 파일이 아님)"
+  },
+  "url:https://www.hongik.ac.kr/kr/newscenter/notice.do?articleNo=159926&mode=view&noCat=514": {
+   "at": "2026-11-02",
+   "school": "홍익대학교",
+   "file": "data/news/img/755de167cb75d069.webp",
+   "src": "https://www.hongik.ac.kr/cms/plugin/editorImage.do?$cms$EwBmDYHoEZsgHAtgJwMoHEDCAVAmgVwBMAvRRfAUQDUBTAM2wAUL0ALAVQGsBnAOngB2AcyA",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=277338&mode=view": {
+   "at": "2026-11-02",
+   "school": "가톨릭대학교",
+   "file": "data/news/img/c0f13a853e7b07ab.webp",
+   "src": "https://www.catholic.ac.kr/_attach/cuk/editor-image/2026/11/FsKYgQDHHzcdmckyRoWbnxTubC.png",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.kmu.ac.kr/uni/main/page.jsp?cmd=2&mnu_uid=143&pageNo=1&parm_bod_uid=271737&srchBgpUid=-1&srchEnable=1&srchVoteType=-1": {
+   "at": "2026-11-03",
+   "school": "계명대학교",
+   "err": "글 화면에 그 글의 제목이 없음 — 다음에 다시 (받은 화면: 「계명대학교 - 열린마당 > 공지사항 > 일반」 · 57057자 · utf-8 · https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271739&pageOrder=0&c)",
+   "tries": 2
+  },
+  "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511926&mCode=MN095&mgr_seq=3&mode=view": {
+   "at": "2026-11-02",
+   "school": "부산대학교",
+   "file": "data/news/img/19bb302687b514b1.webp",
+   "src": "https://www.pusan.ac.kr/_UPLOAD/IMAGE/Board/images/000135/960.jpg",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.knou.ac.kr/bbs/knou/51/820684/artclView.do": {
+   "at": "2026-11-02",
+   "school": "한국방송통신대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.pknu.ac.kr/main/163?action=view&no=726827": {
+   "at": "2026-11-02",
+   "school": "부경대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림))"
+  },
+  "post:전북대학교:219353": {
+   "at": "2026-11-02",
+   "school": "전북대학교",
+   "none": "사진으로 쓸 그림 없음 (body: QR 코드로 보임 (검정 48% · 흰색 51%) · body: 그림이 너무 큼 (11MB) · body: 여러 글에 같은 그림(공통 그림))"
+  },
+  "url:https://www3.chosun.ac.kr/bbs/chosun/117/282511/artclView.do": {
+   "at": "2026-11-02",
+   "school": "조선대학교",
+   "file": "data/news/img/81faec49cf6dc4da.webp",
+   "src": "https://www3.chosun.ac.kr/bbs/chosun/117/379873/download.do",
+   "from": "attach",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=141483&mode=view": {
+   "at": "2026-11-02",
+   "school": "성균관대학교",
+   "none": "글에 그림이 없음"
+  },
+  "post:동국대학교 WISE캠퍼스:521048": {
+   "at": "2026-11-02",
+   "school": "동국대학교 WISE캠퍼스",
+   "file": "data/news/img/adda6c950ce328ac.webp",
+   "src": "https://wise.dongguk.ac.kr/cmmn/fileView?path=/ckeditor//generalnotice&physical=1793594647298.jpg",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626952&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
+   "at": "2026-11-02",
+   "school": "경기대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=%EB%AA%A8%EC%A7%91-ai-%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8-%EB%A6%AC%ED%84%B0%EB%9F%AC%EC%8B%9C%EC%8B%AC%ED%99%94-11-16": {
+   "at": "2026-11-02",
+   "school": "숭실대학교",
+   "file": "data/news/img/af4ca387621d11b5.webp",
+   "src": "https://scatch.ssu.ac.kr/wp-content/uploads/sites/5/2026/11/AI%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A6%AC%ED%84%B0%EB%9F%AC%EC%8B%9C%EC%8B%AC%ED%99%94_%ED%8F%AC%EC%8A%A4%ED%84%B0.jpg",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0701&menu_dvs_cd=0701&mode=V&no=2516061&site_dvs_cd=kr": {
+   "at": "2026-11-02",
+   "school": "충남대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=813&nttNo=171146&pageUnit=10": {
+   "at": "2026-11-02",
+   "school": "충북대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=277372&mode=view": {
+   "at": "2026-11-02",
+   "school": "가톨릭대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70875": {
+   "at": "2026-11-02",
+   "school": "전남대학교",
+   "file": "data/news/img/d8267889760546ef.webp",
+   "src": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/byteToImage.aspx?key=2590407",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "post:서울시립대학교:31775": {
+   "at": "2026-11-02",
+   "school": "서울시립대학교",
+   "file": "data/news/img/910c341a69d5a807.webp",
+   "src": "https://file.uos.ac.kr/upload/smarteditor/2026/11/20261102160532.png",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11595&searchGbn=0&searchOrderSort=0": {
+   "at": "2026-11-02",
+   "school": "강원대학교",
+   "file": "data/news/img/53eaf7d49d3a6d1e.webp",
+   "src": "https://www.kangwon.ac.kr/ckeditorImgfile.do?dn=ckEditor_20261102054224129.png&fn=3%ED%9A%8C%20%ED%8F%AC%EC%8A%A4%ED%84%B0.png&siteId=neibis&menuSn=504",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.knou.ac.kr/bbs/knou/51/820731/artclView.do": {
+   "at": "2026-11-02",
+   "school": "한국방송통신대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.pknu.ac.kr/main/163?action=view&no=726826": {
+   "at": "2026-11-02",
+   "school": "부경대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511920&mCode=MN095&mgr_seq=3&mode=view": {
+   "at": "2026-11-02",
+   "school": "부산대학교",
+   "file": "data/news/img/c21166f7d9761cd7.webp",
+   "src": "https://www.pusan.ac.kr/_UPLOAD/IMAGE/Board/images/000135/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7_2026-11-02_162011.png",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "post:전북대학교:219345": {
+   "at": "2026-11-02",
+   "school": "전북대학교",
+   "file": "data/news/img/635b08973f9f0980.webp",
+   "src": "https://www.jbnu.ac.kr/common/file.do?file=zIKMR9dYdKck9jTlEDh4J5H/6ZpdJdGShwhXcg0SXlCqpBaLTjgNmuvgGzMSbUgE4KVvDruKxY9vZUnY36ITWA==",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www3.chosun.ac.kr/bbs/chosun/117/282508/artclView.do": {
+   "at": "2026-11-02",
+   "school": "조선대학교",
+   "file": "data/news/img/615b76c55ba243f3.webp",
+   "src": "https://www3.chosun.ac.kr/editorUpload/images/000297/20261102160323231_2G6ZL68D.png",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626951&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
+   "at": "2026-11-02",
+   "school": "경기대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70874": {
+   "at": "2026-11-02",
+   "school": "전남대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.knou.ac.kr/bbs/knou/51/820726/artclView.do": {
+   "at": "2026-11-02",
+   "school": "한국방송통신대학교",
+   "none": "글에 그림이 없음"
+  },
+  "post:서울시립대학교:31746": {
+   "at": "2026-11-02",
+   "school": "서울시립대학교",
+   "file": "data/news/img/557d82c25bec3eb6.webp",
+   "src": "https://file.uos.ac.kr/upload/smarteditor/2026/10/20261028092805.png",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11598&searchGbn=0&searchOrderSort=0": {
+   "at": "2026-11-02",
+   "school": "강원대학교",
+   "file": "data/news/img/a41c6c0234acad24.webp",
+   "src": "https://www.kangwon.ac.kr/ckeditorImgfile.do?dn=ckEditor_20261102042631100.jpg&fn=2.%20%ED%95%84%EC%A0%84%202026%20%EC%A1%B0%EC%84%A0%EB%B0%B1%EC%9D%BC%EC%9E%A5(%ED%8F%AC%EC%8A%A4%ED%84%B0)%201%EB%B6%80.%20%20%EB%81%9D..jpg&siteId=neibis&menuSn=504",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511918&mCode=MN095&mgr_seq=3&mode=view": {
+   "at": "2026-11-02",
+   "school": "부산대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림))"
+  },
+  "url:https://www.pknu.ac.kr/main/163?action=view&no=726821": {
+   "at": "2026-11-02",
+   "school": "부경대학교",
+   "file": "data/news/img/d17ff23d40fcbadb.webp",
+   "src": "https://lms.pknu.ac.kr/ilosfiles/editor-file/7F5D53CB357C/2026/VVHVZHON2QZJU.jpeg",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367744&mode=view&no=357": {
+   "at": "2026-11-02",
+   "school": "이화여자대학교",
+   "file": "data/news/img/6b3168fac49cdb24.webp",
+   "src": "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEZsgFAFgOQJoE8DqBlAEgEQHdMBhASUQCN0BxAZwCkBHAOgAcA7AcyA",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.knou.ac.kr/bbs/knou/51/820710/artclView.do": {
+   "at": "2026-11-02",
+   "school": "한국방송통신대학교",
+   "none": "글에 그림이 없음"
+  },
+  "post:전북대학교:219344": {
+   "at": "2026-11-02",
+   "school": "전북대학교",
+   "file": "data/news/img/7ce9b5540204d2bd.webp",
+   "src": "https://www.jbnu.ac.kr/common/file.do?file=zIKMR9dYdKck9jTlEDh4J5QdnQnN6H04WpT/QQEMQ13OEC2eg3pcV+lqCuVx1wn/",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626947&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
+   "at": "2026-11-02",
+   "school": "경기대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70873": {
+   "at": "2026-11-02",
+   "school": "전남대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511917&mCode=MN095&mgr_seq=3&mode=view": {
+   "at": "2026-11-02",
+   "school": "부산대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림))"
+  },
+  "post:전북대학교:219341": {
+   "at": "2026-11-02",
+   "school": "전북대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 그림이 너무 큼 (8MB) · body: 여러 글에 같은 그림(공통 그림))"
+  },
+  "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11597&searchGbn=0&searchOrderSort=0": {
+   "at": "2026-11-02",
+   "school": "강원대학교",
+   "file": "data/news/img/74f3abcddeac0c95.webp",
+   "src": "https://www.kangwon.ac.kr/ckeditorImgfile.do?dn=ckEditor_20261102025850562.jpg&fn=4%EB%B6%84%EA%B8%B0%20%EB%8C%80%ED%95%99%20%EC%98%88%EB%B0%A9%ED%8F%AC%EC%8A%A4%ED%84%B0_1.jpg&siteId=neibis&menuSn=504",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626945&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
+   "at": "2026-11-02",
+   "school": "경기대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.pknu.ac.kr/main/163?action=view&no=726820": {
+   "at": "2026-11-02",
+   "school": "부경대학교",
+   "file": "data/news/img/a7cd539d46d5308b.webp",
+   "src": "https://www.pknuhrd.kr/data/pknuhrd/responsive/378/file/1793344422862.jpg",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367743&mode=view&no=356": {
+   "at": "2026-11-02",
+   "school": "이화여자대학교",
+   "file": "data/news/img/f0398d7c1dc194ca.webp",
+   "src": "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEZsgnAngKQHYEMCaB5AxgDwHMAhAFQAUBZAQUoBEAXAdQBkA6AB1UKA%20",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626936&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
+   "at": "2026-11-02",
+   "school": "경기대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11594&searchGbn=0&searchOrderSort=0": {
+   "at": "2026-11-02",
+   "school": "강원대학교",
+   "file": "data/news/img/c495b7063783d121.webp",
+   "src": "https://www.kangwon.ac.kr/ckeditorImgfile.do?dn=ckEditor_20261102112344343.png&fn=image.png&siteId=neibis&menuSn=504",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367714&mode=view&no=362": {
+   "at": "2026-11-02",
+   "school": "이화여자대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림) · body: 여러 글에 같은 그림(공통 그림) · body: 여러 글에 같은 그림(공통 그림))"
+  },
+  "url:https://www.pknu.ac.kr/main/163?action=view&no=726815": {
+   "at": "2026-11-02",
+   "school": "부경대학교",
+   "file": "data/news/img/5bef521d5dc7ffd6.webp",
+   "src": "https://www.pknu.ac.kr/upload/raonkeditordata/2026/11/02/20261102_141225336_88756.jpg",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70872": {
+   "at": "2026-11-02",
+   "school": "전남대학교",
+   "file": "data/news/img/5f61ac083897246d.webp",
+   "src": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/byteToImage.aspx?key=2590308",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367721&mode=view&no=345": {
+   "at": "2026-11-02",
+   "school": "이화여자대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70871": {
+   "at": "2026-11-02",
+   "school": "전남대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림))"
+  },
+  "url:https://www.yonsei.ac.kr/bbs/wj/104/944532/artclView.do": {
+   "at": "2026-11-03",
+   "school": "연세대학교 미래캠퍼스",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.hufs.ac.kr/bbs/hufs/2180/270669/artclView.do": {
+   "at": "2026-11-03",
+   "school": "한국외국어대학교",
+   "none": "글에 그림이 없음"
+  },
+  "post:중앙대학교:30307": {
+   "at": "2026-11-03",
+   "school": "중앙대학교",
+   "none": "글에 그림이 없음"
+  },
+  "post:동국대학교:26766841": {
+   "at": "2026-11-03",
+   "school": "동국대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 글자뿐인 문서 그림 (흰 바탕 88% · 색 5%))"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367774&mode=view&no=351": {
+   "at": "2026-11-03",
+   "school": "이화여자대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511937&mCode=MN095&mgr_seq=3&mode=view": {
+   "at": "2026-11-03",
+   "school": "부산대학교",
+   "file": "data/news/img/ee03dd6a978adbd1.webp",
+   "src": "https://www.pusan.ac.kr/_UPLOAD/IMAGE/Board/images/000135/Microsoft_%EC%B2%AD%EB%85%84_%EC%B7%A8%C2%B7%EC%B0%BD%EC%97%85%EC%9D%84_%EC%9C%84%ED%95%9C_AI%EC%8B%A4%EC%A0%84_%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8_%EA%B3%BC%EC%A0%95_%ED%8F%AC%EC%8A%A4%ED%84%B0.jpg",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www3.chosun.ac.kr/bbs/chosun/117/282530/artclView.do": {
+   "at": "2026-11-03",
+   "school": "조선대학교",
+   "file": "data/news/img/c93bf7a1f224077c.webp",
+   "src": "https://www3.chosun.ac.kr/editorUpload/images/000297/%EC%9D%B8%EC%8A%A4%ED%83%80%EA%B7%B8%EB%9E%A8_%EB%AA%A9%EA%B3%B5_2%ED%9A%8C%EC%B0%A8.jpg",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=141509&mode=view": {
+   "at": "2026-11-03",
+   "school": "성균관대학교",
+   "file": "data/news/img/bccef58f71d6c158.webp",
+   "src": "https://www.skku.edu/_attach/image/2026/11/SHLYnZnpBRoZeMuBvQoc.png",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53599&tpage=1": {
+   "at": "2026-11-03",
+   "school": "광운대학교",
+   "file": "data/news/img/1a5262a81a92f0eb.webp",
+   "src": "https://www.kw.ac.kr/KWData/webeditor/2026/2026_11_03_102211.jpg",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "post:고려대학교:000060000000061619": {
+   "at": "2026-11-03",
+   "school": "고려대학교",
+   "file": "data/news/img/3301204315649148.webp",
+   "src": "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=Auq8SHjE%2FdyERs6f8qNRQ0yFbmrWDH89LgDXb2ecBkM5crurBEDiuM4cJa%2Fg8gwxN8pbTNrc%2FVm4%0AXW%2BTTWumTXr4w4TG84IykRu6c2L8Ocn%2BbF1hbDqtu7DsiCX1%2BrUQQTUmKOcdkQSbGlke02z9fLjq%0ATQU3SjkZd7Hao8PYaAKD7srAPGJUTf7iilIltsaBR%2B2puOnXfhzSeH43lME5tDRuzpY1v8RzfJC2%0Abig%2BzOxJadXD28%2BkoKorYHl3Ep%2BTXH4rQoyhdOJHhUtTVqeN7cCfpWwHK%2Fs1w0FhVTpD97tnsiiw%0AcQgli1xgJ5lY13sKbhepvr6LaFwh1IJRlifI%2B%2FmBVmuI7jGHbJ3M5VMnlMSGh1sWeouJazlks%2F2U%0AQh6y",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.inha.ac.kr/bbs/kr/8/46024/artclView.do": {
+   "at": "2026-11-03",
+   "school": "인하대학교",
+   "none": "글에 그림이 없음"
+  },
+  "post:전북대학교:219380": {
+   "at": "2026-11-03",
+   "school": "전북대학교",
+   "file": "data/news/img/c1530c0da392455a.webp",
+   "src": "https://www.jbnu.ac.kr/common/file.do?file=z+hkmUCefs2raFpcJb4kw6NpCQzhrHVldZnojWFRCECvZVak7Tl3RiRHkl4VGs1b",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=%EC%88%AD%EC%8B%A4%EA%B0%80%EC%A1%B1%EC%88%98%EC%9A%94%EC%98%88%EB%B0%B0-%EC%95%88%EB%82%B411%EC%9B%94-4%EC%9D%BC": {
+   "at": "2026-11-03",
+   "school": "숭실대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.konkuk.ac.kr/bbs/konkuk/234/1211229/artclView.do": {
+   "at": "2026-11-03",
+   "school": "건국대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://snuc.snu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/?mod=document&uid=932": {
+   "at": "2026-11-03",
+   "school": "서울대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626987&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
+   "at": "2026-11-03",
+   "school": "경기대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0701&menu_dvs_cd=0701&mode=V&no=2516082&site_dvs_cd=kr": {
+   "at": "2026-11-03",
+   "school": "충남대학교",
+   "file": "data/news/img/01076c1840d45c68.webp",
+   "src": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0701&ntt_no=2516082&atch_no=1",
+   "from": "attach",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11601&searchGbn=0&searchOrderSort=0": {
+   "at": "2026-11-03",
+   "school": "강원대학교",
+   "file": "data/news/img/7f56346bced2ca95.webp",
+   "src": "https://www.kangwon.ac.kr/ckeditorImgfile.do?dn=ckEditor_20261103104052355.png&fn=ACE%20%ED%8F%AC%EC%8A%A4%ED%84%B0.png&siteId=neibis&menuSn=504",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "post:경희대학교:323467": {
+   "at": "2026-11-03",
+   "school": "경희대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70881": {
+   "at": "2026-11-03",
+   "school": "전남대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 글자뿐인 문서 그림 (흰 바탕 93% · 색 3%) · body: 글자뿐인 문서 그림 (흰 바탕 92% · 색 4%))"
+  },
+  "post:동국대학교:26766846": {
+   "at": "2026-11-03",
+   "school": "동국대학교",
+   "file": "data/news/img/84a78ce2468e2c4d.webp",
+   "src": "https://www.dongguk.edu/cmmn/fileView?path=/ckeditor//GENERALNOTICES&physical=1793676570606.png&contentType=image",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=813&nttNo=171222&pageUnit=10": {
+   "at": "2026-11-03",
+   "school": "충북대학교",
+   "file": "data/news/img/d2a52437ecf3d7f0.webp",
+   "src": "https://www.cbnu.ac.kr/DATA/bbs/104/20261102011945427_Vp6t.jpg",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www3.chosun.ac.kr/bbs/chosun/117/282529/artclView.do": {
+   "at": "2026-11-03",
+   "school": "조선대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.pknu.ac.kr/main/163?action=view&no=726814": {
+   "at": "2026-11-03",
+   "school": "부경대학교",
+   "file": "data/news/img/662e4a3fa1ecaee5.webp",
+   "src": "https://www.pknu.ac.kr/upload/raonkeditordata/2026/11/02/20261102_111134777_85061.png",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "post:전북대학교:219379": {
+   "at": "2026-11-03",
+   "school": "전북대학교",
+   "file": "data/news/img/a831fddca4b77dfb.webp",
+   "src": "https://www.jbnu.ac.kr/common/file.do?file=of2HfYa2XCEWZlpA58bjVuTzNmIGFRHMcMYJjjVhca+JMyvoBktt2Ycloul/3ooU",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EC%A7%80%EC%8B%9D%EC%A0%95%EB%B3%B4%EC%B2%98-%EC%A4%91%EC%95%99%EB%8F%84%EC%84%9C%EA%B4%80-%EA%B3%84%EC%95%BD%EC%A7%81-%EC%A7%81%EC%9B%90-%EB%AA%A8-2": {
+   "at": "2026-11-03",
+   "school": "숭실대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367773&mode=view&no=350": {
+   "at": "2026-11-03",
+   "school": "이화여자대학교",
+   "file": "data/news/img/41676eedb90fb4d7.webp",
+   "src": "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEZshTA8gKwBIBEC2AVAQgaQEUALAZQA0AxYgawC94AZAKQDoAHAOwHMg",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70879": {
+   "at": "2026-11-03",
+   "school": "전남대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림))"
+  },
+  "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11602&searchGbn=0&searchOrderSort=0": {
+   "at": "2026-11-03",
+   "school": "강원대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 글자뿐인 문서 그림 (흰 바탕 88% · 색 7%))"
+  },
+  "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626986&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
+   "at": "2026-11-03",
+   "school": "경기대학교",
+   "file": "data/news/img/b8b59e3fd96c2281.webp",
+   "src": "https://www.kyonggi.ac.kr/DATA/bbs/1073/20261103112952515_3AbB.jpg",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "post:전북대학교:219372": {
+   "at": "2026-11-03",
+   "school": "전북대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림) · body: 여러 글에 같은 그림(공통 그림))"
+  },
+  "url:https://www3.chosun.ac.kr/bbs/chosun/117/282527/artclView.do": {
+   "at": "2026-11-03",
+   "school": "조선대학교",
+   "file": "data/news/img/4cd4d2dfc0d7ec85.webp",
+   "src": "https://www3.chosun.ac.kr/editorUpload/images/000297/%ED%95%84%EC%A0%842026_%EC%A1%B0%EC%84%A0_%EB%B0%B1%EC%9D%BC%EC%9E%A5_%EC%95%88%EB%82%B4%EB%AC%B8_%EC%A1%B0%EC%84%A0%EC%9D%BC%EB%B3%B4_%ED%8E%98%EC%9D%B4%EC%A7%80_1.jpg",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.pknu.ac.kr/main/163?action=view&no=726812": {
+   "at": "2026-11-03",
+   "school": "부경대학교",
+   "file": "data/news/img/c1a0dcaf085cb91a.webp",
+   "src": "https://www.pknu.ac.kr/upload/raonkeditordata/2026/11/02/20261102_105904602_82715.jpg",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=2026-2%EC%B0%A8-%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EC%8B%A0%EC%9E%85%EC%A7%81%EC%9B%90-%EC%B1%84%EC%9A%A9%EA%B3%B5%EA%B3%A0": {
+   "at": "2026-11-03",
+   "school": "숭실대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=813&nttNo=171223&pageUnit=10": {
+   "at": "2026-11-03",
+   "school": "충북대학교",
+   "file": "data/news/img/e31d7e6c528ddbc1.webp",
+   "src": "https://www.cbnu.ac.kr/DATA/bbs/104/20261102055456617_bgaS.jpg",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11599&searchGbn=0&searchOrderSort=0": {
+   "at": "2026-11-03",
+   "school": "강원대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367760&mode=view&no=349": {
+   "at": "2026-11-03",
+   "school": "이화여자대학교",
+   "file": "data/news/img/0a959cb8e317f333.webp",
+   "src": "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEZsgvAygEQA4DkAyBLASgWQCsBFATwHMAxAD2IHVSAFAawDpUA7coA%20",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "post:전북대학교:219317": {
+   "at": "2026-11-03",
+   "school": "전북대학교",
+   "err": "글 화면에 그 글의 제목이 없음 — 다음에 다시 (받은 화면: 「제목 없음」 · 78자 · utf-8 · https://www.jbnu.ac.kr/web/Board/219317/detailView.do)",
+   "tries": 1
+  },
+  "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626985&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
+   "at": "2026-11-03",
+   "school": "경기대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70870": {
+   "at": "2026-11-03",
+   "school": "전남대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 글자뿐인 문서 그림 (흰 바탕 94% · 색 2%))"
+  },
+  "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=%ED%95%B4%EC%99%B8%EC%84%A0%EA%B5%90%EB%B4%89%EC%82%AC-impact-41%EA%B8%B0-%EB%AA%A8%EC%A7%91-%EC%9D%BC%EB%B3%B8-%EB%8F%84%EC%BF%84%EC%8B%9C%EC%A6%88%EC%98%A4%EC%B9%B4-2": {
+   "at": "2026-11-03",
+   "school": "숭실대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www3.chosun.ac.kr/bbs/chosun/117/282523/artclView.do": {
+   "at": "2026-11-03",
+   "school": "조선대학교",
+   "file": "data/news/img/a491edaad14e4b8d.webp",
+   "src": "https://www3.chosun.ac.kr/editorUpload/images/000154/%EA%B1%B4%EA%B0%95%EC%A6%9D%EC%A7%84_%EC%9C%84%EC%B9%98_%EC%95%88%EB%82%B4.jpg",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=813&nttNo=171220&pageUnit=10": {
+   "at": "2026-11-03",
+   "school": "충북대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=%ED%95%B4%EC%99%B8%EC%84%A0%EA%B5%90%EB%B4%89%EC%82%AC-impact-41%EA%B8%B0-%EB%AA%A8%EC%A7%91-%EC%9D%BC%EB%B3%B8-%EB%8F%84%EC%BF%84%EC%8B%9C%EC%A6%88%EC%98%A4%EC%B9%B4": {
+   "at": "2026-11-03",
+   "school": "숭실대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=813&nttNo=171219&pageUnit=10": {
+   "at": "2026-11-03",
+   "school": "충북대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626979&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
+   "at": "2026-11-03",
+   "school": "경기대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=813&nttNo=171218&pageUnit=10": {
+   "at": "2026-11-03",
+   "school": "충북대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367759&mode=view&no=348": {
+   "at": "2026-11-03",
+   "school": "이화여자대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=813&nttNo=171215&pageUnit=10": {
+   "at": "2026-11-03",
+   "school": "충북대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626978&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
+   "at": "2026-11-03",
+   "school": "경기대학교",
+   "none": "글에 그림이 없음"
+  },
+  "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626977&pageUnit=10&sf.pnos=1073&sf.pnos=888": {
+   "at": "2026-11-03",
+   "school": "경기대학교",
+   "file": "data/news/img/614d7dd15b30d5fc.webp",
+   "src": "https://www.kyonggi.ac.kr/DATA/bbs/1073/20261103084734923_19ea.png",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367758&mode=view&no=347": {
+   "at": "2026-11-03",
+   "school": "이화여자대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(같은 파일) · body: 가로세로가 치우침 (1080×7896 · 띠 배너로 보임))"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367745&mode=view&no=352": {
+   "at": "2026-11-03",
+   "school": "이화여자대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림))"
   }
  },
  "srcSeen": {
   "중앙대학교": {
-   "https://www.cau.ac.kr/attach/images/000335/image01.png": [
-    "post:중앙대학교:30221"
-   ],
-   "https://www.cau.ac.kr/attach/images/000335/2026%ED%95%99%EB%85%84%EB%8F%84_2%ED%95%99%EA%B8%B0_%EC%B7%A8%EC%97%85%EC%A7%80%EC%9B%90_%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%A8_%EC%95%88%EB%82%B4_%ED%8F%AC%EC%8A%A4%ED%84%B0.png": [
-    "post:중앙대학교:28391"
-   ],
-   "https://www.cau.ac.kr/attach/images/000335/2026%ED%95%99%EB%85%84%EB%8F%84_2%ED%95%99%EA%B8%B0_ACP_%ED%8F%AC%EC%8A%A4%ED%84%B0.png": [
-    "post:중앙대학교:28391"
-   ],
-   "https://www.cau.ac.kr/attach/images/000335/260618_2026_%ED%96%89%EC%A0%95%EC%9D%B8%ED%84%B4_%EC%B1%84%EC%9A%A9%EA%B3%B5%EA%B3%A0_%ED%8F%AC%EC%8A%A4%ED%84%B0.png": [
-    "post:중앙대학교:28391"
-   ],
-   "https://www.cau.ac.kr/attach/images/000335/2026%EB%85%84_%EC%98%88%EC%88%A0%ED%99%9C%EB%8F%99%EC%A6%9D%EB%AA%85_%EC%A7%80%EC%9B%90_%EC%82%AC%EC%97%85_%ED%8F%AC%EC%8A%A4%ED%84%B0.png": [
-    "post:중앙대학교:28391"
-   ],
-   "https://www.cau.ac.kr/attach/images/000335/260910_2%ED%95%99%EA%B8%B0_1%EB%8C%801_%EC%A7%91%EC%A4%91%EC%BB%A8%EC%84%A4%ED%8C%85_%ED%8F%AC%EC%8A%A4%ED%84%B0.png": [
-    "post:중앙대학교:28391"
-   ],
-   "https://www.cau.ac.kr/namo/crosseditor_4.6.1.06/binary/images/000001/260909_2%ED%95%99%EA%B8%B0_1%EB%8C%801_%EC%A7%91%EC%A4%91%EC%BB%A8%EC%84%A4%ED%8C%85_%ED%8F%AC%EC%8A%A4%ED%84%B0_1.png": [
-    "post:중앙대학교:28391"
-   ],
-   "https://www.cau.ac.kr/attach/images/000335/1_1.png": [
-    "post:중앙대학교:30220"
-   ],
-   "https://www.cau.ac.kr/attach/images/000335/2_1.png": [
-    "post:중앙대학교:30220"
-   ],
-   "https://www.cau.ac.kr/attach/images/000335/3_1.png": [
-    "post:중앙대학교:30220"
-   ],
-   "https://www.cau.ac.kr/attach/images/000335/%EA%B5%90%EC%84%AD%EC%9A%94%EA%B5%AC_%EC%82%AC%EC%8B%A4%EC%9D%98_%EA%B3%B5%EA%B3%A0_%ED%99%88%ED%8E%98%EC%9D%B4%EC%A7%80_%EA%B2%8C%EC%8B%9C%EC%9A%A9.jpg": [
-    "post:중앙대학교:30219"
-   ],
-   "https://www.cau.ac.kr/attach/images/000335/2026_10%EC%9B%94_%EA%B1%B4%EA%B0%95%EC%84%BC%ED%84%B0(%EB%8B%A4%EB%B9%88%EC%B9%98)%ED%96%89%EC%82%AC_%EB%8B%AC%EB%A0%A5.jpg": [
-    "post:중앙대학교:30217"
-   ],
-   "https://www.cau.ac.kr/attach/images/000335/2026_10%EC%9B%94_%EA%B1%B4%EA%B0%95%EC%84%BC%ED%84%B0(%EC%84%9C%EC%9A%B8)%ED%96%89%EC%82%AC_%EB%8B%AC%EB%A0%A5.jpg": [
-    "post:중앙대학교:30216"
-   ],
-   "https://www.cau.ac.kr/attach/images/000334/%EC%9B%B9%ED%8F%AC%EC%8A%A4%ED%84%B0_2026_%EB%9E%9C%EC%84%A0%EC%9C%BC%EB%A1%9C_%EB%A7%8C%EB%82%98%EB%8A%94_%EB%A6%B4%EB%A0%88%EC%9D%B4_%EA%B8%80%EB%A1%9C%EB%B2%8C_%EC%B7%A8%C2%B7%EC%B0%BD%EC%97%85_%ED%86%A1%ED%86%A1%ED%86%A11.png": [
-    "post:중앙대학교:30211"
-   ],
-   "https://www.cau.ac.kr/attach/images/000334/%EC%9B%B9%ED%8F%AC%EC%8A%A4%ED%84%B0_2026_%EB%9E%9C%EC%84%A0%EC%9C%BC%EB%A1%9C_%EB%A7%8C%EB%82%98%EB%8A%94_%EB%A6%B4%EB%A0%88%EC%9D%B4_%EA%B8%80%EB%A1%9C%EB%B2%8C_%EC%B7%A8%C2%B7%EC%B0%BD%EC%97%85_%ED%86%A1%ED%86%A1%ED%86%A12.png": [
-    "post:중앙대학교:30211"
-   ],
-   "https://www.cau.ac.kr/attach/images/000334/[QR]_26-2_%EC%A7%81%EB%AC%B4%EC%A0%81%EC%84%B1%EA%B2%80%EC%82%AC_%EB%8C%80%EB%B9%84_%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%A8.png": [
-    "post:중앙대학교:30208"
-   ],
    "https://www.cau.ac.kr/attach/images/000336/2026_%EC%A0%84%EA%B3%B5%EC%A7%84%EB%A1%9C_%EB%94%94%EC%8A%A4%EC%BB%A4%EB%B2%84%EB%A6%AC_%ED%8F%AC%EC%8A%A4%ED%84%B0.jpg": [
     "post:중앙대학교:30227"
    ],
@@ -17257,59 +18089,17 @@
     "post:고려대학교:000060000000061435",
     "post:고려대학교:000060000000061451"
    ],
-   "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=Auq8SHjE%2FdyERs6f8qNRQ%2FRSzP2rqrUbOU9UxlktBJycaGo5Fy2FexCFYeSP%2Fb%2B6JT2KpRKDmuZt%0Atnv96WD5PU5yxQSXFA7jSObneVbPo%2B2USdUT2tBgAGgFfMX5s%2FquZeQP7BUptPNFkargZ7zgEhXO%0AiQsFVl44zHU9yMU0hG4CzElb8OD8%2BxeTlBxOxKCH": [
-    "post:고려대학교:000060000000061435"
-   ],
    "https://www.korea.ac.kr/Web-home/_UI/images/common/filetype/pdf.gif": [
     "post:고려대학교:000060000000061435",
-    "post:고려대학교:000060000000061451"
-   ],
-   "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=Auq8SHjE%2FdyERs6f8qNRQ9UxDuLOgazdiJhcPDaz4mScaGo5Fy2FexCFYeSP%2Fb%2B67WZUXsOKVUhW%0A5qjep1v2AAN2VNqqDc%2BE4tDktAE2iQ4BBuWxL%2FL%2FjzbvKhIyOXLnQXIeTPdrNpoBGkzpiTrRXOeO%0AAUbGPGVU%2BuyI5DUMTX5snsfLNP5sfUFFN3xccw5sAmr8lLSlD2hTZBIx0p0jVDq%2Fm6cGzdrDwkyK%0Agk5FpqyDauLSQGD8IlOUu6VJyYNeMhHQlIcdlktwP0zmkcU0YfBmbb013dZEGIUHvc9Xnfn9wWRF%0AUqOGdyR9G%2B%2F3ZCwGbAqY3HRMDCKMVrSLuf570MeoBEnoFq4gLU5C28PGo%2Bay9jUsw7hnNHwfQzU3%0Aww5n%2FBlsbMD6w4%2BUqoq4KtKrnxj04%2Bwhz7%2Bd4Oo6%2FRLkUFg5AUF1zU1q421qEoGO1UQZXr7ALRDD%0AcqFlIL4hPJ5HhmMDm84b%2FaA43ZD8B9Z4ql7ibi9WqEYDpxU9l1EJprvak5e9nXviPEJ%2BcimfTpVP%0Ao5CXGVsn64rrct3ghlCZwVYrIHN4tvcBTtQ4W6snWZAv": [
     "post:고려대학교:000060000000061451"
    ],
    "https://www.korea.ac.kr/Web-home/_UI/images/common/filetype/jpg.gif": [
     "post:고려대학교:000060000000061451",
     "post:고려대학교:000060000000061504"
    ],
-   "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=%2B3OiiPIvYWBWZYltoRC1z25ipNa6s86pfhwWEYAEDiw%3D&fs=3": [
-    "post:고려대학교:000060000000061451"
-   ],
-   "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=Auq8SHjE%2FdyERs6f8qNRQ4jp%2Fkjk3OmpeUx2ofy0DuOcaGo5Fy2FexCFYeSP%2Fb%2B6mDwq00uu%2FrZ4%0AzJ4cGGUHu89dITdvvdmh2V4X6gPbzGw%3D": [
-    "post:고려대학교:000060000000061449"
-   ],
-   "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=Auq8SHjE%2FdyERs6f8qNRQ2c9xf9NZeJ9RTwf8hTl7gjDScuIoXN8Gw%2FmryerXzKqxkwAyt1JMl0A%0AyEbns0zMwJRZhSXezjEiNrQ%2BZVCldmY%3D": [
-    "post:고려대학교:000060000000061186"
-   ],
-   "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=Auq8SHjE%2FdyERs6f8qNRQ1w%2FxYX5aOnCFztuPeHq8wCcaGo5Fy2FexCFYeSP%2Fb%2B6L5vdKNAiY1BI%0ACC3QsFL8lr9qNh4vZ5Xeg5V8hD8K2GLN0f8x31zUSE51OGGjLBaCDzEXjHSvJtOlikcHd7MV%2Fzju%0AoJH%2FXXBSohn1tkzuCgR1mRKHuK%2F5mee1GXBLBt027CQxPw6HdwmxG724nUJF6ycWWJu7PBZOTp2J%0As5i%2B2FvDHG3rysO4NlaZK%2BIBQO6Wl%2Fmk5QDAyQDXQzdOs2MctaLdVn%2F%2FXBr6DNksvESRtWQlSm6J%0AwUEA0yfuNpOAYg%2Fz3IpoEILFyJNeLZ%2FGqNIXHQ%3D%3D": [
-    "post:고려대학교:000060000000061445"
-   ],
-   "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=Auq8SHjE%2FdyERs6f8qNRQ6IH2ST4uEDsJ5EPHTPa30WcaGo5Fy2FexCFYeSP%2Fb%2B6R4i094TaCdbW%0Ax1bgRo2r3uWm%2BqxpThp2PwXZAbGIZOHqR595dwJ6P4GILwfDm7ipmDguH2VEaj0gKmetWrNEqAri%0AqvjCmtzKjHNteVH7XiRVihnMh9j5Ob%2B4u2guXfS9%2FHjc2RJd8p47Y64GxCHsO%2BlAshW1R5bZugB6%0AP53Z4Gv54Xrehyl8%2FHdDHo8UWP1iBUeONB9q2bn4PFlkIq5OsvLbyVDGHXXXD51IqGvy2bwfvZHv%0AvrCqFqnHApOCwKOKsF97DYQUd2PyMkLZbABRYbWnq4smO77CC%2F9QWGArGeGcs8Axf7k%2FnQa%2B%2BhLP%0ACBQr0RACUw6hJr%2FMArJY3nTm4qQs1J6vpPJZUcmfm4afYF5w7RVKT2mJeIZ9B4X6XMveJe%2BWepT3%0AAEYg7E%2BTG%2F36oPzMXgXHU41qEyqja3eQIMyBZ%2FtUql2Y3DqYkFmlpGDuEcPvgzOxLFAlY5xNHBEc%0AL%2FIW5YKY2vRXNAEj3WK0zpbT8jMC8JHwsqqh1aqu447kfpjSE9w6steQrYNuA8WYAhL4F%2FsSLZgZ%0AzQDV5S93hyADEUY4YzNHJhdspMvsIrKNp24tZoeB3duCEcqS7%2Bx6PxNEM174IrnKZVIHRZ9dQtiZ%0AnRvfoIJf0RMfHzA%2Bl68qk4jd8DEDe1S%2BIGpJCUexkAdB%2BEEARAljhJMyycNGtjIJow6OspI50ehM%0AZsaIg0M86VeimGnVWV6HMWFBARjDuT%2FoRK4eBbONJ8fbbrd6Nn8IYgX9t8XKcfxDSy8rbGohKzI4%0AdkVUCSg%2BhWblHBfgsygWEomkTK7IhMmruAAKK37Fn%2FEfNkvlt%2Fz0TS5G8uvB": [
-    "post:고려대학교:000060000000061427"
-   ],
    "https://www.korea.ac.kr/Web-home/_UI/images/common/filetype/hwp.gif": [
     "post:고려대학교:000060000000061427",
     "post:고려대학교:000060000000061462"
-   ],
-   "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=Auq8SHjE%2FdyERs6f8qNRQ%2BoZHpkSwfUrTE7%2B0F9a9g7limACfMTdD6ptXQlSQ%2BWlbgmXmKvBTTW3%0AwjRCdTeQwoHMf5xYxeFLLtAG%2BJfV%2Bt3DAEAWp93klo9qCm%2FBoefeVofWC9Rf1sPI6EQjHEVFveA6%0A5c7Lsp3KYUCJ2lklJLC9cl4xKN0ApAhCvcjM8CRRKyBzeLb3AU7UOFurJ1mQLw%3D%3D": [
-    "post:고려대학교:000060000000061309"
-   ],
-   "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=Auq8SHjE%2FdyERs6f8qNRQ3bUxdF01pXZnp%2BirSgpgV6caGo5Fy2FexCFYeSP%2Fb%2B6d2qRPUKxlcV4%0AZp3YGOk4gi5xyT7Y9yWOiBnmb%2BbjCgACzElb8OD8%2BxeTlBxOxKCH": [
-    "post:고려대학교:000060000000061416"
-   ],
-   "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=Auq8SHjE%2FdyERs6f8qNRQ3bUxdF01pXZnp%2BirSgpgV6caGo5Fy2FexCFYeSP%2Fb%2B6ja6sHYv4Ld9B%0AWisNuTRgKtqdyAldu9O78yfgPDyZfTQ%3D": [
-    "post:고려대학교:000060000000061416"
-   ],
-   "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=Auq8SHjE%2FdyERs6f8qNRQ3bUxdF01pXZnp%2BirSgpgV6caGo5Fy2FexCFYeSP%2Fb%2B6fLcv0JNQ51de%0AFPlY0DtNjWSaK6KpuXU3HkcQBRjdK2A%3D": [
-    "post:고려대학교:000060000000061416"
-   ],
-   "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=Auq8SHjE%2FdyERs6f8qNRQ3bUxdF01pXZnp%2BirSgpgV6caGo5Fy2FexCFYeSP%2Fb%2B6pBi16r5g2PuI%0AzpkiJ1yKgJAF4a6hoh3Jy7N4YHff5h8%3D": [
-    "post:고려대학교:000060000000061416"
-   ],
-   "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=Auq8SHjE%2FdyERs6f8qNRQ3bUxdF01pXZnp%2BirSgpgV6caGo5Fy2FexCFYeSP%2Fb%2B6eZnWSykSi96z%0AttrZDgEtGdhwDFgUjuq2BQzvFBHkkqk%3D": [
-    "post:고려대학교:000060000000061416"
-   ],
-   "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=Auq8SHjE%2FdyERs6f8qNRQ3bUxdF01pXZnp%2BirSgpgV6caGo5Fy2FexCFYeSP%2Fb%2B6d0OxOW9zNq4k%0AO7B4%2Fgv8ey5EOLhQCTAB77uRJ71%2FW%2BY%3D": [
-    "post:고려대학교:000060000000061416"
    ],
    "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=Auq8SHjE%2FdyERs6f8qNRQ4gRF%2Bzibgc9ZlnnPSDYiAQ0t43ii0KjCuKtMbvWMTL2qO80Lj1VxZO3%0AaiRRDi9t0tUuhYZBees6uVOwyby5sA8Uwb0yXrXwLaOCFSck4XfNasFha57QlsrT22Fk91ZNTY7M%0An1a%2BbhXnBBflRVahuLwhFbdUPsgQZeqXVcsQ2B4n7Xlxd3w2NtobOc3Uq6w3NJx3YrGYXK3lweXR%0ADjcURS1%2BA1GuYO3pL6lHmPG5WOTQT9QiW4sIVpiRtnSpWwGNQ%2FDl8Hq%2BpagrIQZYDh4eDlMNT01f%0ABUYNpubJYrPzXor58FSIVRFdyGkG0xS6efecuUpywWPXmThXYux3glavSOJtnD2HXarLJyZVsF1B%0AgFP4gRM6w9Yu%2BjA2X88qQCycOteeEalhRM4fa8iI2kJ8k%2FYTqa20KQ8S1lTT%2BuASO1oAH9%2FHW14j%0A9eg7OAQvI8DpaPBw%2BH6VqmU2%2Bsldm0IOC9p1%2FAR56uK3J98qZ8QJaejC2%2FWQVm9txSWb0gE7SJq%2B%0AxlxTMSs3SAVmN6nFlc1%2B5n4G7IkxuhhNVUBKfDT4i%2FbWe%2FwS0yu0Hiz17avohSDRY9J5pqix%2FRat%0AZhyrHNLX8AIDEgmU5KNzsQCiIUELWG19qlCX66iezav%2FTfTo8LdoWGelV%2FYIdU7TmIeIL9SoSjg3%0AoRhwCIDuddeXdzVTeHrKqasPlAKZ1UykVGfhO2Jz%2FYaHWxZ6i4lrOWSz%2FZRCHrI%3D": [
     "post:고려대학교:000060000000061464"
@@ -17425,6 +18215,12 @@
    ],
    "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=Auq8SHjE%2FdyERs6f8qNRQynmjTeBFNDcdEG%2BR1xw6bp7ww1LKsS2daE4Um9a16xoCiMDEWieM3%2Bi%0AxZJ0ggPXeqhLxBpoLBo0IHHjmY3VY4TN20oJ3739UAmEkGkmL9zk43U%2B5EBaS57ZSKKLWbuIuqVF%0APDGAZhsD9GID7HL3JCkJYqHq7SSU3D1TmcuBHFSte2%2FoPTK%2BGrBj73U33goUJHxdx5adwIc5gEBv%0AveW6TFXaVddAScUu6LlD5KtVYSO1weJ1T993e9g4dd8%2FebVQbKrLzZByNxW6jydKfibtoPB034gy%0A0iH35828anC86nTVvBnIgapUxJ3GgB6uOHCJDi6yrliUo9u9gFhjzQ%2BJgCwa8rI1eXmszOMtY9nT%0ACJgVqZ0zSP7JvWqaygIqsuVrkS76vFPENw976dhEjcsNKlin89UR2x%2FpFZG8yqMpXUekgxqPuL10%0AbTCo%2FCqYu63Z%2FxUZIZNRzQdP%2FSbNu4vGDdGbS7AMpNvfy%2FJiG0VrY0jN%2Be%2FBkFZNh2gwH9a%2BME6o%0AXeaU8uV8XhhJXLPgY8c4OsoCzElb8OD8%2BxeTlBxOxKCH": [
     "post:고려대학교:000060000000061565"
+   ],
+   "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=Auq8SHjE%2FdyERs6f8qNRQ8xccGjWm2V6HPE4wpGe7Sk5crurBEDiuM4cJa%2Fg8gwxnXhlj8yOZ1FR%0AE9qU70cn%2FDBDCf%2B5QPIlS6sZ1aCsLltzJ4pI9AX%2BrWOo4PFz0fODAbsExsG8mFBH4VXXfBeWJQ%3D%3D": [
+    "post:고려대학교:000060000000061613"
+   ],
+   "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=Auq8SHjE%2FdyERs6f8qNRQ0yFbmrWDH89LgDXb2ecBkM5crurBEDiuM4cJa%2Fg8gwxN8pbTNrc%2FVm4%0AXW%2BTTWumTXr4w4TG84IykRu6c2L8Ocn%2BbF1hbDqtu7DsiCX1%2BrUQQTUmKOcdkQSbGlke02z9fLjq%0ATQU3SjkZd7Hao8PYaAKD7srAPGJUTf7iilIltsaBR%2B2puOnXfhzSeH43lME5tDRuzpY1v8RzfJC2%0Abig%2BzOxJadXD28%2BkoKorYHl3Ep%2BTXH4rQoyhdOJHhUtTVqeN7cCfpWwHK%2Fs1w0FhVTpD97tnsiiw%0AcQgli1xgJ5lY13sKbhepvr6LaFwh1IJRlifI%2B%2FmBVmuI7jGHbJ3M5VMnlMSGh1sWeouJazlks%2F2U%0AQh6y": [
+    "post:고려대학교:000060000000061619"
    ]
   },
   "부산대학교": {
@@ -17471,9 +18267,6 @@
    ],
    "https://www.pusan.ac.kr/_UPLOAD/IMAGE/Board/images/000134/20261026110335654_NG0APN5G.png": [
     "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511750&mCode=MN095&mgr_seq=3&mode=view"
-   ],
-   "https://www.pusan.ac.kr/_UPLOAD/IMAGE/Board/images/000134/2027_Winter_%EB%AF%B8%EA%B5%AD_%EC%9C%84%EC%8A%A4%EC%BD%98%EC%8B%A0%EB%8C%80%ED%95%99%EA%B5%90_%EA%B8%80%EB%A1%9C%EB%B2%8C_%EB%A6%AC%EB%8D%94%EC%8B%AD_%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%A8_%ED%8F%AC%EC%8A%A4%ED%84%B0.jpg": [
-    "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511746&mCode=MN095&mgr_seq=3&mode=view"
    ],
    "https://www.pusan.ac.kr/_UPLOAD/IMAGE/Board/images/000134/%EB%8F%99%EA%B3%84_%EB%B6%80%EC%82%B0%EB%8C%80%EC%99%80_%ED%95%A8%EA%BB%98%ED%95%98%EB%8A%94_%EB%84%88%EC%9D%98_%EC%9E%AC%EB%8A%A5%EC%9D%B4_%EB%B3%B4%EC%97%AC_%EB%AA%A8%EC%A7%91_%ED%8F%AC%EC%8A%A4%ED%84%B0.png": [
     "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511740&mCode=MN095&mgr_seq=3&mode=view"
@@ -17531,6 +18324,18 @@
    ],
    "https://www.pusan.ac.kr/_UPLOAD/IMAGE/Board/images/000134/%EA%B8%88%EC%83%98%EB%9F%B0%EC%9B%A8%EC%9D%B4%ED%8E%98%EC%8A%A4%ED%83%80_%ED%99%8D%EB%B3%B4%ED%8F%AC%EC%8A%A4%ED%84%B0.png": [
     "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511874&mCode=MN095&mgr_seq=3&mode=view"
+   ],
+   "https://www.pusan.ac.kr/_UPLOAD/IMAGE/Board/images/000135/2026_%EC%84%A4%EB%AC%B8%EC%A1%B0%EC%82%AC.png": [
+    "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511888&mCode=MN095&mgr_seq=3&mode=view"
+   ],
+   "https://www.pusan.ac.kr/_UPLOAD/IMAGE/Board/images/000135/960.jpg": [
+    "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511926&mCode=MN095&mgr_seq=3&mode=view"
+   ],
+   "https://www.pusan.ac.kr/_UPLOAD/IMAGE/Board/images/000135/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7_2026-11-02_162011.png": [
+    "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511920&mCode=MN095&mgr_seq=3&mode=view"
+   ],
+   "https://www.pusan.ac.kr/_UPLOAD/IMAGE/Board/images/000135/Microsoft_%EC%B2%AD%EB%85%84_%EC%B7%A8%C2%B7%EC%B0%BD%EC%97%85%EC%9D%84_%EC%9C%84%ED%95%9C_AI%EC%8B%A4%EC%A0%84_%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8_%EA%B3%BC%EC%A0%95_%ED%8F%AC%EC%8A%A4%ED%84%B0.jpg": [
+    "url:https://www.pusan.ac.kr/kor/CMS/Board/Board.do?board_seq=1511937&mCode=MN095&mgr_seq=3&mode=view"
    ]
   },
   "아주대학교": {
@@ -17828,26 +18633,8 @@
    ]
   },
   "가톨릭대학교": {
-   "https://www.catholic.ac.kr/_attach/cuk/editor-image/2026/10/laFNZpxZcOGSiHsuZhIEwwHBak.png": [
-    "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=276840&mode=view"
-   ],
    "https://www.catholic.ac.kr/_attach/cuk/editor-image/2026/01/dzuefpajwRenlXLtPnOTiKsBbN.png": [
     "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=276862&mode=view"
-   ],
-   "https://www.catholic.ac.kr/_attach/cuk/editor-image/2026/10/oGXKwyJXFFwDiUstHoDUUepyBv.png": [
-    "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=276877&mode=view"
-   ],
-   "https://www.catholic.ac.kr/_attach/cuk/editor-image/2026/10/PPkuNHDRNGCmZViHMcDsXhnUmO.png": [
-    "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=276877&mode=view"
-   ],
-   "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276877&attachNo=226611": [
-    "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=276877&mode=view"
-   ],
-   "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=276877&attachNo=226612": [
-    "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=276877&mode=view"
-   ],
-   "https://www.catholic.ac.kr/_attach/cuk/editor-image/2026/10/zhtCuPMOItHsBxRkxFGyaGSUWH.jpeg": [
-    "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=276875&mode=view"
    ],
    "https://www.catholic.ac.kr/_attach/cuk/editor-image/2026/10/tFZOYodvbyKjnYbNecKleUuGFa.jpg": [
     "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=276914&mode=view"
@@ -17951,6 +18738,12 @@
    ],
    "https://www.catholic.ac.kr/_attach/cuk/editor-image/2026/11/XiDkZzNZErRWVoCsrNbcNQuDoO.png": [
     "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=277327&mode=view"
+   ],
+   "https://www.catholic.ac.kr/_attach/cuk/editor-image/2026/11/agtWBBxdFKxZMSLenjNIYyuUbT.jpg": [
+    "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=277377&mode=view"
+   ],
+   "https://www.catholic.ac.kr/_attach/cuk/editor-image/2026/11/FsKYgQDHHzcdmckyRoWbnxTubC.png": [
+    "url:https://www.catholic.ac.kr/ko/campuslife/notice.do?article.offset=0&articleLimit=10&articleNo=277338&mode=view"
    ]
   },
   "서울시립대학교": {
@@ -17969,15 +18762,6 @@
    "https://file.uos.ac.kr/upload/smarteditor/2026/10/20261001175442.png": [
     "url:https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&menuid=2000005009002000000&seq=31582",
     "post:서울시립대학교:31614"
-   ],
-   "https://webmail.uos.ac.kr/mail/view/embed/image.do?mail_key=6ad8697d3fd08676789d9106&depth=0&mindex=-1&aindex=0&folder=57c7daec3fe6b4eb22c23d4d": [
-    "post:서울시립대학교:31692"
-   ],
-   "https://file.uos.ac.kr/upload/smarteditor/2026/10/20261021173816.png": [
-    "post:서울시립대학교:31693"
-   ],
-   "https://file.uos.ac.kr/upload/smarteditor/2026/10/20261022094223.png": [
-    "post:서울시립대학교:31694"
    ],
    "https://file.uos.ac.kr/upload/smarteditor/2026/10/20261022175839.jpg": [
     "post:서울시립대학교:31700"
@@ -18083,6 +18867,18 @@
    ],
    "https://file.uos.ac.kr/upload/smarteditor/2026/10/20261030101100.png": [
     "post:서울시립대학교:31767"
+   ],
+   "https://file.uos.ac.kr/upload/smarteditor/2026/11/20261102141744.png": [
+    "post:서울시립대학교:30561"
+   ],
+   "https://file.uos.ac.kr/upload/smarteditor/2026/11/20261102154302.hwp": [
+    "post:서울시립대학교:31774"
+   ],
+   "https://file.uos.ac.kr/upload/smarteditor/2026/11/20261102160532.png": [
+    "post:서울시립대학교:31775"
+   ],
+   "https://file.uos.ac.kr/upload/smarteditor/2026/10/20261028092805.png": [
+    "post:서울시립대학교:31746"
    ]
   },
   "세종대학교": {
@@ -18117,33 +18913,12 @@
     "url:https://www.pknu.ac.kr/main/163?action=view&no=726568",
     "url:https://www.pknu.ac.kr/main/163?action=view&no=726606"
    ],
-   "https://www.pknu.ac.kr/upload/raonkeditordata/2026/10/15/20261015_091935023_76698.png": [
-    "url:https://www.pknu.ac.kr/main/163?action=view&no=726609"
-   ],
-   "https://www.pknu.ac.kr/upload/raonkeditordata/2026/10/15/20261015_092007212_59398.png": [
-    "url:https://www.pknu.ac.kr/main/163?action=view&no=726609"
-   ],
-   "https://www.pknu.ac.kr/upload/raonkeditordata/2026/10/15/20261015_091328329_55939.png": [
-    "url:https://www.pknu.ac.kr/main/163?action=view&no=726608"
-   ],
-   "https://www.pknu.ac.kr/upload/raonkeditordata/2026/10/15/20261015_091343238_16458.png": [
-    "url:https://www.pknu.ac.kr/main/163?action=view&no=726608"
-   ],
    "https://www.pknu.ac.kr/upload/raonkeditordata/2026/10/14/20261014_162542525_38454.png": [
     "url:https://www.pknu.ac.kr/main/163?action=view&no=726600",
     "url:https://www.pknu.ac.kr/main/163?action=view&no=726741"
    ],
-   "https://www.pknu.ac.kr/upload/raonkeditordata/2026/10/15/20261015_132912264_80011.jpeg": [
-    "url:https://www.pknu.ac.kr/main/163?action=view&no=726615"
-   ],
    "https://icms.pknu.ac.kr/editor/namo/binary/images/000419/%ED%8A%B9%EB%B3%84%EC%A0%84_'%EC%9A%B0%EB%A6%AC_%EA%B3%81%EC%9D%98_%EB%8F%99%EB%AC%BC'_%ED%8F%AC%EC%8A%A4%ED%84%B0-1(%EC%B6%95%EC%86%8C).jpg": [
     "url:https://www.pknu.ac.kr/main/163?action=view&no=726646"
-   ],
-   "https://www.pknu.ac.kr/upload/raonkeditordata/2026/10/19/20261019_133516804_54661.jpeg": [
-    "url:https://www.pknu.ac.kr/main/163?action=view&no=726643"
-   ],
-   "https://www.pknu.ac.kr/boardDownload.do?no=81097": [
-    "url:https://www.pknu.ac.kr/main/163?action=view&no=726643"
    ],
    "https://www.pknu.ac.kr/upload/raonkeditordata/2026/10/20/20261020_094105720_62039.png": [
     "url:https://www.pknu.ac.kr/main/163?action=view&no=726655"
@@ -18210,6 +18985,60 @@
    ],
    "https://www.pknu.ac.kr/upload/raonkeditordata/2026/11/02/20261102_101328586_63753.png": [
     "url:https://www.pknu.ac.kr/main/163?action=view&no=726809"
+   ],
+   "https://www.pknu.ac.kr/upload/raonkeditordata/2026/11/02/20261102_145144216_00538.jpg": [
+    "url:https://www.pknu.ac.kr/main/163?action=view&no=726818"
+   ],
+   "https://www.pknu.ac.kr/upload/raonkeditordata/2026/11/02/20261102_145207467_24276.jpg": [
+    "url:https://www.pknu.ac.kr/main/163?action=view&no=726818"
+   ],
+   "https://lms.pknu.ac.kr/ilosfiles/editor-file/7F5D53CB357C/2026/VVHVZHON2QZJU.jpeg": [
+    "url:https://www.pknu.ac.kr/main/163?action=view&no=726821"
+   ],
+   "https://www.pknuhrd.kr/data/pknuhrd/responsive/378/file/1793344422862.jpg": [
+    "url:https://www.pknu.ac.kr/main/163?action=view&no=726820"
+   ],
+   "https://www.pknuhrd.kr/data/pknuhrd/responsive/378/file/1793344757853.jpg": [
+    "url:https://www.pknu.ac.kr/main/163?action=view&no=726820"
+   ],
+   "https://www.pknuhrd.kr/data/pknuhrd/responsive/378/file/1793345324548.jpg": [
+    "url:https://www.pknu.ac.kr/main/163?action=view&no=726820"
+   ],
+   "https://www.pknuhrd.kr/data/pknuhrd/responsive/378/file/179334541893.jpg": [
+    "url:https://www.pknu.ac.kr/main/163?action=view&no=726820"
+   ],
+   "https://www.pknuhrd.kr/data/pknuhrd/responsive/378/file/1793345481446.jpg": [
+    "url:https://www.pknu.ac.kr/main/163?action=view&no=726820"
+   ],
+   "https://www.pknuhrd.kr/data/pknuhrd/responsive/378/file/1793345576768.jpg": [
+    "url:https://www.pknu.ac.kr/main/163?action=view&no=726820"
+   ],
+   "https://www.pknuhrd.kr/data/pknuhrd/responsive/378/file/1793345747764.jpg": [
+    "url:https://www.pknu.ac.kr/main/163?action=view&no=726820"
+   ],
+   "https://www.pknuhrd.kr/data/pknuhrd/responsive/378/file/1793345882130.jpg": [
+    "url:https://www.pknu.ac.kr/main/163?action=view&no=726820"
+   ],
+   "https://www.pknu.ac.kr/upload/raonkeditordata/2026/11/02/20261102_141225336_88756.jpg": [
+    "url:https://www.pknu.ac.kr/main/163?action=view&no=726815"
+   ],
+   "https://www.pknu.ac.kr/upload/raonkeditordata/2026/11/02/20261102_141235098_07922.jpg": [
+    "url:https://www.pknu.ac.kr/main/163?action=view&no=726815"
+   ],
+   "https://www.pknu.ac.kr/upload/raonkeditordata/2026/11/02/20261102_141248921_04977.jpg": [
+    "url:https://www.pknu.ac.kr/main/163?action=view&no=726815"
+   ],
+   "https://www.pknu.ac.kr/upload/raonkeditordata/2026/11/02/20261102_141256753_93141.jpg": [
+    "url:https://www.pknu.ac.kr/main/163?action=view&no=726815"
+   ],
+   "https://www.pknu.ac.kr/upload/raonkeditordata/2026/11/02/20261102_111134777_85061.png": [
+    "url:https://www.pknu.ac.kr/main/163?action=view&no=726814"
+   ],
+   "https://www.pknu.ac.kr/upload/raonkeditordata/2026/11/02/20261102_105904602_82715.jpg": [
+    "url:https://www.pknu.ac.kr/main/163?action=view&no=726812"
+   ],
+   "https://www.pknu.ac.kr/boardDownload.do?no=81190": [
+    "url:https://www.pknu.ac.kr/main/163?action=view&no=726812"
    ]
   },
   "동국대학교": {
@@ -18220,15 +19049,6 @@
    "https://www.dongguk.edu/cmmn/fileView?path=/ckeditor//GENERALNOTICES&physical=1790656074091.png&contentType=image": [
     "url:https://www.dongguk.edu/article/GENERALNOTICES/detail/26766416",
     "post:동국대학교:26766499"
-   ],
-   "https://www.dongguk.edu/cmmn/fileView?path=/ckeditor//GENERALNOTICES&physical=1791442546564.png&contentType=image": [
-    "post:동국대학교:26766539"
-   ],
-   "https://www.dongguk.edu/cmmn/fileView?path=/ckeditor//GENERALNOTICES&physical=1791442743071.png&contentType=image": [
-    "post:동국대학교:26766539"
-   ],
-   "https://www.dongguk.edu/cmmn/fileView?path=/ckeditor//GENERALNOTICES&physical=1791438401021.png&contentType=image": [
-    "post:동국대학교:26766523"
    ],
    "https://www.dongguk.edu/cmmn/fileView?path=/ckeditor//GENERALNOTICES&physical=1791789652121.jpg&contentType=image": [
     "post:동국대학교:26766566"
@@ -18244,9 +19064,6 @@
    ],
    "https://www.dongguk.edu/cmmn/fileView?path=/ckeditor//GENERALNOTICES&physical=1791785419212.jpg&contentType=image": [
     "post:동국대학교:26766563"
-   ],
-   "https://www.dongguk.edu/cmmn/fileView?path=/ckeditor//GENERALNOTICES&physical=1791783312861.png&contentType=image": [
-    "post:동국대학교:26766562"
    ],
    "https://www.dongguk.edu/cmmn/fileView?path=/ckeditor//GENERALNOTICES&physical=1791852213006.jpg&contentType=image": [
     "post:동국대학교:26766575"
@@ -18485,6 +19302,15 @@
    ],
    "https://www.dongguk.edu/cmmn/fileView?path=/ckeditor//GENERALNOTICES&physical=1793346674880.png&contentType=image": [
     "post:동국대학교:26766813"
+   ],
+   "https://www.dongguk.edu/cmmn/fileView?path=/ckeditor//GENERALNOTICES&physical=1793585889880.png&contentType=image": [
+    "post:동국대학교:26766829"
+   ],
+   "https://www.dongguk.edu/cmmn/fileView?path=/ckeditor//GENERALNOTICES&physical=1793669629954.png&contentType=image": [
+    "post:동국대학교:26766841"
+   ],
+   "https://www.dongguk.edu/cmmn/fileView?path=/ckeditor//GENERALNOTICES&physical=1793676570606.png&contentType=image": [
+    "post:동국대학교:26766846"
    ]
   },
   "상명대학교": {
@@ -18544,6 +19370,9 @@
    ],
    "https://www.smu.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEYUhnAUgdwNIAsBy8AqATTAdQBcBhABwEMAFPAcwHsBXAOgCty6g%20": [
     "url:https://www.smu.ac.kr/webzine/today.do?article.offset=0&articleLimit=10&articleNo=769843&mode=view"
+   ],
+   "https://www.smu.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEZsh1A1gJQMoCECCAZAVgQwAsAjYgJwBUARAB2wE9cA7AOlxoHMg%20": [
+    "url:https://www.smu.ac.kr/webzine/today.do?article.offset=0&articleLimit=10&articleNo=769885&mode=view"
    ]
   },
   "조선대학교": {
@@ -18558,9 +19387,6 @@
    ],
    "https://www3.chosun.ac.kr/editorUpload/images/000292/20261006160213630_Z2JVCA7M.png": [
     "url:https://www3.chosun.ac.kr/bbs/chosun/117/281777/artclView.do"
-   ],
-   "https://www3.chosun.ac.kr/editorUpload/images/000292/%ED%8F%AC%EC%8A%A4%ED%84%B0_%EC%9D%B4%ED%8A%B8%EB%84%88%EC%8A%A4_%EC%B1%84%EC%9A%A9%EC%84%A4%EB%AA%85%ED%9A%8C_%EC%84%B8%EB%A1%9C.jpg": [
-    "url:https://www3.chosun.ac.kr/bbs/chosun/117/281770/artclView.do"
    ],
    "https://www3.chosun.ac.kr/editorUpload/images/000292/20261007094942310_OTEM01G9.png": [
     "url:https://www3.chosun.ac.kr/bbs/chosun/117/281794/artclView.do"
@@ -18687,6 +19513,36 @@
    ],
    "https://www3.chosun.ac.kr/editorUpload/images/000297/20261102100511835_WMLESHUV.png": [
     "url:https://www3.chosun.ac.kr/bbs/chosun/117/282495/artclView.do"
+   ],
+   "https://www3.chosun.ac.kr/bbs/chosun/117/379875/download.do": [
+    "url:https://www3.chosun.ac.kr/bbs/chosun/117/282512/artclView.do"
+   ],
+   "https://www3.chosun.ac.kr/bbs/chosun/117/379873/download.do": [
+    "url:https://www3.chosun.ac.kr/bbs/chosun/117/282511/artclView.do"
+   ],
+   "https://www3.chosun.ac.kr/editorUpload/images/000297/20261102160323231_2G6ZL68D.png": [
+    "url:https://www3.chosun.ac.kr/bbs/chosun/117/282508/artclView.do"
+   ],
+   "https://www3.chosun.ac.kr/editorUpload/images/000297/%EC%9D%B8%EC%8A%A4%ED%83%80%EA%B7%B8%EB%9E%A8_%EB%AA%A9%EA%B3%B5_2%ED%9A%8C%EC%B0%A8.jpg": [
+    "url:https://www3.chosun.ac.kr/bbs/chosun/117/282530/artclView.do"
+   ],
+   "https://www3.chosun.ac.kr/bbs/chosun/117/379887/download.do": [
+    "url:https://www3.chosun.ac.kr/bbs/chosun/117/282530/artclView.do"
+   ],
+   "https://www3.chosun.ac.kr/editorUpload/images/000297/%ED%95%84%EC%A0%842026_%EC%A1%B0%EC%84%A0_%EB%B0%B1%EC%9D%BC%EC%9E%A5_%EC%95%88%EB%82%B4%EB%AC%B8_%EC%A1%B0%EC%84%A0%EC%9D%BC%EB%B3%B4_%ED%8E%98%EC%9D%B4%EC%A7%80_1.jpg": [
+    "url:https://www3.chosun.ac.kr/bbs/chosun/117/282527/artclView.do"
+   ],
+   "https://www3.chosun.ac.kr/editorUpload/images/000297/%ED%95%84%EC%A0%842026_%EC%A1%B0%EC%84%A0_%EB%B0%B1%EC%9D%BC%EC%9E%A5_%EC%95%88%EB%82%B4%EB%AC%B8_%EC%A1%B0%EC%84%A0%EC%9D%BC%EB%B3%B4_%ED%8E%98%EC%9D%B4%EC%A7%80_2.jpg": [
+    "url:https://www3.chosun.ac.kr/bbs/chosun/117/282527/artclView.do"
+   ],
+   "https://www3.chosun.ac.kr/editorUpload/images/000297/%ED%95%84%EC%A0%842026_%EC%A1%B0%EC%84%A0_%EB%B0%B1%EC%9D%BC%EC%9E%A5_%EC%95%88%EB%82%B4%EB%AC%B8_%EC%A1%B0%EC%84%A0%EC%9D%BC%EB%B3%B4_%ED%8E%98%EC%9D%B4%EC%A7%80_3.jpg": [
+    "url:https://www3.chosun.ac.kr/bbs/chosun/117/282527/artclView.do"
+   ],
+   "https://www3.chosun.ac.kr/editorUpload/images/000297/%ED%95%84%EC%A0%842026_%EC%A1%B0%EC%84%A0_%EB%B0%B1%EC%9D%BC%EC%9E%A5_%EC%95%88%EB%82%B4%EB%AC%B8_%EC%A1%B0%EC%84%A0%EC%9D%BC%EB%B3%B4_%ED%8E%98%EC%9D%B4%EC%A7%80_4.jpg": [
+    "url:https://www3.chosun.ac.kr/bbs/chosun/117/282527/artclView.do"
+   ],
+   "https://www3.chosun.ac.kr/editorUpload/images/000154/%EA%B1%B4%EA%B0%95%EC%A6%9D%EC%A7%84_%EC%9C%84%EC%B9%98_%EC%95%88%EB%82%B4.jpg": [
+    "url:https://www3.chosun.ac.kr/bbs/chosun/117/282523/artclView.do"
    ]
   },
   "한국방송통신대학교": {
@@ -18772,6 +19628,12 @@
    ],
    "https://www.skku.edu/_attach/image/2026/10/LqHAbeOhNKLvnpHRzFvm.png": [
     "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=141138&mode=view"
+   ],
+   "https://www.skku.edu/_attach/image/2026/11/DQVYgjuXYCNaeNXUDfCD.png": [
+    "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=141494&mode=view"
+   ],
+   "https://www.skku.edu/_attach/image/2026/11/SHLYnZnpBRoZeMuBvQoc.png": [
+    "url:https://www.skku.edu/skku/campus/skk_comm/notice01.do?article.offset=0&articleLimit=10&articleNo=141509&mode=view"
    ]
   },
   "광운대학교": {
@@ -18781,9 +19643,6 @@
    ],
    "https://www.kw.ac.kr/KWData/webeditor/2026/2026_10_15_105817.jpg": [
     "url:https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53493&tpage=1"
-   ],
-   "https://www.kw.ac.kr/KWData/webeditor/2026/2026_10_15_103904.png": [
-    "url:https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53489&tpage=1"
    ],
    "https://www.kw.ac.kr/KWData/webeditor/2026/2026_10_19_111102.jpg": [
     "url:https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53514&tpage=1"
@@ -18868,6 +19727,9 @@
    ],
    "https://www.kw.ac.kr/include/Download.jsp?fuid=35500&ano=53588": [
     "url:https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53588&tpage=1"
+   ],
+   "https://www.kw.ac.kr/KWData/webeditor/2026/2026_11_03_102211.jpg": [
+    "url:https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53599&tpage=1"
    ]
   },
   "전북대학교": {
@@ -18911,21 +19773,6 @@
     "post:전북대학교:218499",
     "post:전북대학교:218583"
    ],
-   "https://www.jbnu.ac.kr/common/file.do?file=9rBF71Bn1YjoLVvaHXmofMaKWeufP/8NZezw8UwmA+2//NKXazjsrIgwEWJAK9xi": [
-    "post:전북대학교:218784"
-   ],
-   "https://www.jbnu.ac.kr/common/file.do?file=hA+QjtEIjUmBbKiT2PynZtfWkMEDLCpNFPGR6v5ManB4WQiMmRRvfLPrfbDdjo+CcFOz4z3+gxjDdOWhe/ryGQ==": [
-    "post:전북대학교:218778"
-   ],
-   "https://www.jbnu.ac.kr/common/file.do?file=hA+QjtEIjUmBbKiT2PynZtfWkMEDLCpNFPGR6v5ManA6IdpWfU6wvEd4GCyzbuBV0XKW7T/S8FTxqHk/iXFY2g==": [
-    "post:전북대학교:218778"
-   ],
-   "https://www.jbnu.ac.kr/common/file.do?file=cwHGRpweQYno5D+QumLj83O4EgEgaswm/+SA5O5szVHbffP0lAjn4+s6e8lNXNa8NUzc1NWUwHxVN0rJwir9Pw==": [
-    "post:전북대학교:218830"
-   ],
-   "https://www.jbnu.ac.kr/common/file.do?file=cwHGRpweQYno5D+QumLj83O4EgEgaswm/+SA5O5szVGzFLAZtnAP2RTmzufneLPOXUAcl03JEtPxz7J6XSkT/w==": [
-    "post:전북대학교:218830"
-   ],
    "https://www.jbnu.ac.kr/common/file.do?file=IZ5NfdjzsFXiX5wvDBZimSC9eKRm0Zs8x+fKTAwlHclt/VZPwkCiYnyC+0tfdljg5zrLWedjaN6EZfxyvXOTcQ==": [
     "post:전북대학교:218883"
    ],
@@ -18937,30 +19784,6 @@
    ],
    "https://www.jbnu.ac.kr/common/file.do?file=IZ5NfdjzsFXiX5wvDBZimSC9eKRm0Zs8x+fKTAwlHcnDhrOCeyCxFJKcYLLz3soidJsgzH1oTkVA3IaekyNtFw==": [
     "post:전북대학교:218883"
-   ],
-   "https://www.jbnu.ac.kr/common/file.do?file=zdPoLAe6QtMjQcGIlQmJEekmqtCJdkJu5s56vVxpAJAbTxpsPkq2XKd4oVIJhaTvr1o7C5+HWOIWIP2ySKDNWQ==": [
-    "post:전북대학교:218878"
-   ],
-   "https://www.jbnu.ac.kr/common/file.do?file=zdPoLAe6QtMjQcGIlQmJEekmqtCJdkJu5s56vVxpAJDZOdun8lmfZhtKJwBkIlQT8fknJmXv/7U89a9R+BP8lw==": [
-    "post:전북대학교:218878"
-   ],
-   "https://www.jbnu.ac.kr/common/file.do?file=zdPoLAe6QtMjQcGIlQmJEekmqtCJdkJu5s56vVxpAJBfNbLFRlKrbGbW0QOGUTdrr/+dv7SW4voGuZBSRi2dbg==": [
-    "post:전북대학교:218878"
-   ],
-   "https://www.jbnu.ac.kr/common/file.do?file=zdPoLAe6QtMjQcGIlQmJEekmqtCJdkJu5s56vVxpAJCo/IUhvd46gRQRHIWyoG2CqCYMuAv5JnGM0l9sX8vqBg==": [
-    "post:전북대학교:218878"
-   ],
-   "https://www.jbnu.ac.kr/common/file.do?file=zdPoLAe6QtMjQcGIlQmJEekmqtCJdkJu5s56vVxpAJA5agQxRdqt+UkKMyxHGjW5qAT6S2f96QlZQ445h3m9MA==": [
-    "post:전북대학교:218878"
-   ],
-   "https://www.jbnu.ac.kr/common/file.do?file=zdPoLAe6QtMjQcGIlQmJEXZVWpJLEp8GEY7OLyU2PI5X0QbVi0xpFO2Rq34bz5M1CkVOmzNdv0eOgvYCbDFmmA==": [
-    "post:전북대학교:218875"
-   ],
-   "https://www.jbnu.ac.kr/common/file.do?file=zdPoLAe6QtMjQcGIlQmJEa+9L3DJ4uh7nJ8baWXwpYp5kU6n810Hz0gyLez0lazT": [
-    "post:전북대학교:218872"
-   ],
-   "https://www.jbnu.ac.kr/common/file.do?file=zdPoLAe6QtMjQcGIlQmJEWNxYka5dHbbvRS4F1jjXRzN8gDGFZy81IAhm+ikyMcp": [
-    "post:전북대학교:218871"
    ],
    "https://www.jbnu.ac.kr/common/file.do?file=62k83S4GrOS6Orgi0QL7Je8Aai+TmL5rH/Jc4kmKGebW8Rb2qAoMVacWikLREi6n": [
     "post:전북대학교:218948"
@@ -18993,43 +19816,53 @@
     "post:전북대학교:219116"
    ],
    "https://www.jbnu.ac.kr/common/file.do?file=vtjeW5bo2afPCeRtu6vbZjk4R10zuGVppEj7sIjhG8EpKuuCeTwb5ORKRtz+wRcnZHHgucvyE9HD1Uuph9lRtA==": [
-    "post:전북대학교:219317"
+    "post:전북대학교:219317",
+    "post:전북대학교:219372"
    ],
    "https://www.jbnu.ac.kr/common/file.do?file=5c5mMWo6nd0lbFWNOijL3qw+SqrvyimlS9PONe1u+NTkmbu9jKojJm55werLN3dMMPP2H0rPwfeegYLqr1wFRw==": [
     "post:전북대학교:219312"
    ],
    "https://www.jbnu.ac.kr/common/file.do?file=7H1rqEvLOVqKGBUy373FcceJUhFMTVN6/pP59lRFklzzmdjS3gosXekkR3hH87OjMR2fwUinhPT+jFxRqLRyAA==": [
     "post:전북대학교:219307"
+   ],
+   "https://www.jbnu.ac.kr/common/file.do?file=OStBhNzdjXPlYeNQa1G8e1BrzcW4i8LyeOFkAoTmXHyZVLiAx6Tl74/3fOrrF/RA": [
+    "post:전북대학교:219354"
+   ],
+   "https://www.jbnu.ac.kr/common/file.do?file=OStBhNzdjXPlYeNQa1G8eys+nB7oDoilZHrfzVbxk7vFCUMo+e2daFnLgHreOMnl": [
+    "post:전북대학교:219354"
+   ],
+   "https://www.jbnu.ac.kr/common/file.do?file=OStBhNzdjXPlYeNQa1G8e1BrzcW4i8LyeOFkAoTmXHz+7/h0d389rgtMUqIG/RKF": [
+    "post:전북대학교:219354"
+   ],
+   "https://www.jbnu.ac.kr/common/file.do?file=OStBhNzdjXPlYeNQa1G8e1BrzcW4i8LyeOFkAoTmXHwS8bpeiQUTSc5r75POfTZJ": [
+    "post:전북대학교:219354"
+   ],
+   "https://www.jbnu.ac.kr/common/file.do?file=OStBhNzdjXPlYeNQa1G8eys+nB7oDoilZHrfzVbxk7tIAB6L26SMtg5LOBf0yN53": [
+    "post:전북대학교:219354"
+   ],
+   "https://www.jbnu.ac.kr/common/file.do?file=OStBhNzdjXPlYeNQa1G8e46BdAd9qZH61zIaNJL3Mvw47rWcAb5rvSmTtX79yXBB": [
+    "post:전북대학교:219353"
+   ],
+   "https://www.jbnu.ac.kr/common/file.do?file=OStBhNzdjXPlYeNQa1G8e34ry8ktQ/dFNv5oUIRO04j88vYypB1eZw0/mdN0jHVK": [
+    "post:전북대학교:219353"
+   ],
+   "https://www.jbnu.ac.kr/common/file.do?file=zIKMR9dYdKck9jTlEDh4J5H/6ZpdJdGShwhXcg0SXlCqpBaLTjgNmuvgGzMSbUgE4KVvDruKxY9vZUnY36ITWA==": [
+    "post:전북대학교:219345"
+   ],
+   "https://www.jbnu.ac.kr/common/file.do?file=zIKMR9dYdKck9jTlEDh4J5QdnQnN6H04WpT/QQEMQ13OEC2eg3pcV+lqCuVx1wn/": [
+    "post:전북대학교:219344"
+   ],
+   "https://www.jbnu.ac.kr/common/file.do?file=zIKMR9dYdKck9jTlEDh4J+4M2mctB7kLrNaMyGpsw6MoGd61YxHi6d/ECJe3hOZeRNFGpfRtYrSrhGs8osukrQ==": [
+    "post:전북대학교:219341"
+   ],
+   "https://www.jbnu.ac.kr/common/file.do?file=z+hkmUCefs2raFpcJb4kw6NpCQzhrHVldZnojWFRCECvZVak7Tl3RiRHkl4VGs1b": [
+    "post:전북대학교:219380"
+   ],
+   "https://www.jbnu.ac.kr/common/file.do?file=of2HfYa2XCEWZlpA58bjVuTzNmIGFRHMcMYJjjVhca+JMyvoBktt2Ycloul/3ooU": [
+    "post:전북대학교:219379"
    ]
   },
   "강원대학교": {
-   "https://www.kangwon.ac.kr/ckeditorImgfile.do?dn=ckEditor_20261008035728215.png&fn=[%EB%B6%99%EC%9E%844]%20%EB%8C%80%ED%95%99%EC%9B%90%EC%83%9D%20%EB%85%BC%EB%AC%B8%EA%B2%8C%EC%9E%AC%20%EC%9E%A5%EB%A0%A4%EA%B8%88%20%ED%99%8D%EB%B3%B4%EB%AC%BC.png&siteId=neibis&menuSn=504": [
-    "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11524&searchGbn=0&searchOrderSort=0"
-   ],
-   "https://www.kangwon.ac.kr/ko/cmmn/download.do?dn=20261008035755727.png&path=/bbs/81&fn=[%EB%B6%99%EC%9E%844]%20%EB%8C%80%ED%95%99%EC%9B%90%EC%83%9D%20%EB%85%BC%EB%AC%B8%EA%B2%8C%EC%9E%AC%20%EC%9E%A5%EB%A0%A4%EA%B8%88%20%ED%99%8D%EB%B3%B4%EB%AC%BC.png": [
-    "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11524&searchGbn=0&searchOrderSort=0"
-   ],
-   "https://www.kangwon.ac.kr/ckeditorImgfile.do?dn=ckEditor_20261012085953854.png&fn=%EA%B0%95%EC%9B%90%EB%8C%80%20%EC%A4%91%EA%B0%84%EA%B3%A0%EC%82%AC%20%EC%95%BC%EC%8B%9D%EB%A7%88%EC%B0%A8.png&siteId=neibis&menuSn=504": [
-    "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11526&searchGbn=0&searchOrderSort=0"
-   ],
-   "https://www.kangwon.ac.kr/ckeditorImgfile.do?dn=ckEditor_20261012045652760.png&fn=5%EA%B0%95(QR).png&siteId=neibis&menuSn=504": [
-    "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11531&searchGbn=0&searchOrderSort=0"
-   ],
-   "https://www.kangwon.ac.kr/ckeditorImgfile.do?dn=ckEditor_20261012023402522.jpg&fn=1.jpg&siteId=neibis&menuSn=504": [
-    "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11530&searchGbn=0&searchOrderSort=0"
-   ],
-   "https://www.kangwon.ac.kr/ckeditorImgfile.do?dn=ckEditor_20261012023402525.jpg&fn=2.jpg&siteId=neibis&menuSn=504": [
-    "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11530&searchGbn=0&searchOrderSort=0"
-   ],
-   "https://www.kangwon.ac.kr/ckeditorImgfile.do?dn=ckEditor_20261012023402537.jpg&fn=3.jpg&siteId=neibis&menuSn=504": [
-    "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11530&searchGbn=0&searchOrderSort=0"
-   ],
-   "https://www.kangwon.ac.kr/ckeditorImgfile.do?dn=ckEditor_20261014053046749.png&fn=%EC%B0%BE%EC%95%84%EA%B0%80%EB%8A%94%EC%83%81%EB%8B%B4%ED%99%8D%EB%B3%B4%EB%B6%80%EC%8A%A4%20%EC%82%AC%EC%A0%84%EC%95%88%EB%82%B4.png&siteId=neibis&menuSn=504": [
-    "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11537&searchGbn=0&searchOrderSort=0"
-   ],
-   "https://www.kangwon.ac.kr/ko/cmmn/download.do?dn=20261014053027496.png&path=/bbs/81&fn=%EC%B0%BE%EC%95%84%EA%B0%80%EB%8A%94%EC%83%81%EB%8B%B4%ED%99%8D%EB%B3%B4%EB%B6%80%EC%8A%A4%20%EC%82%AC%EC%A0%84%EC%95%88%EB%82%B4.png": [
-    "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11537&searchGbn=0&searchOrderSort=0"
-   ],
    "https://www.kangwon.ac.kr/ckeditorImgfile.do?dn=ckEditor_20261015044846714.png&fn=26.%EC%98%81%EB%A7%90.png&siteId=neibis&menuSn=504": [
     "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11540&searchGbn=0&searchOrderSort=0"
    ],
@@ -19125,18 +19958,36 @@
    ],
    "https://www.kangwon.ac.kr/ko/cmmn/download.do?dn=20261102093652917.png&path=/bbs/81&fn=2026-2%ED%95%99%EA%B8%B0%20%EC%A0%84%EA%B5%90%EC%83%9D%20%ED%8C%8C%EC%9D%B4%EC%8D%AC%20%EA%B5%90%EC%9C%A1%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4%20%EC%B9%B4%EB%93%9C%EB%89%B4%EC%8A%A4.png": [
     "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11591&searchGbn=0&searchOrderSort=0"
+   ],
+   "https://www.kangwon.ac.kr/ckeditorImgfile.do?dn=ckEditor_20261102020315447.png&fn=%EA%B0%95%EC%9B%90%EB%8C%80%ED%95%99%EA%B5%90%20%EB%8B%A4%EC%A0%84%EA%B3%B5%20%EC%97%AD%EB%9F%89%20%EA%B0%95%ED%99%94%20%EB%B9%84%EA%B5%90%EA%B3%BC%20%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%A8%20%EC%95%88%EB%82%B4(11%EC%9B%94).png&siteId=neibis&menuSn=504": [
+    "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11596&searchGbn=0&searchOrderSort=0"
+   ],
+   "https://www.kangwon.ac.kr/ckeditorImgfile.do?dn=ckEditor_20261102054224129.png&fn=3%ED%9A%8C%20%ED%8F%AC%EC%8A%A4%ED%84%B0.png&siteId=neibis&menuSn=504": [
+    "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11595&searchGbn=0&searchOrderSort=0"
+   ],
+   "https://www.kangwon.ac.kr/ckeditorImgfile.do?dn=ckEditor_20261102042631100.jpg&fn=2.%20%ED%95%84%EC%A0%84%202026%20%EC%A1%B0%EC%84%A0%EB%B0%B1%EC%9D%BC%EC%9E%A5(%ED%8F%AC%EC%8A%A4%ED%84%B0)%201%EB%B6%80.%20%20%EB%81%9D..jpg&siteId=neibis&menuSn=504": [
+    "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11598&searchGbn=0&searchOrderSort=0"
+   ],
+   "https://www.kangwon.ac.kr/ko/cmmn/download.do?dn=20261102043123980.jpg&path=/bbs/81&fn=2.%20%ED%95%84%EC%A0%84%202026%20%EC%A1%B0%EC%84%A0%EB%B0%B1%EC%9D%BC%EC%9E%A5(%ED%8F%AC%EC%8A%A4%ED%84%B0)%201%EB%B6%80.%20%20%EB%81%9D..jpg": [
+    "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11598&searchGbn=0&searchOrderSort=0"
+   ],
+   "https://www.kangwon.ac.kr/ckeditorImgfile.do?dn=ckEditor_20261102025850562.jpg&fn=4%EB%B6%84%EA%B8%B0%20%EB%8C%80%ED%95%99%20%EC%98%88%EB%B0%A9%ED%8F%AC%EC%8A%A4%ED%84%B0_1.jpg&siteId=neibis&menuSn=504": [
+    "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11597&searchGbn=0&searchOrderSort=0"
+   ],
+   "https://www.kangwon.ac.kr/ckeditorImgfile.do?dn=ckEditor_20261102112344343.png&fn=image.png&siteId=neibis&menuSn=504": [
+    "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11594&searchGbn=0&searchOrderSort=0"
+   ],
+   "https://www.kangwon.ac.kr/ckeditorImgfile.do?dn=ckEditor_20261103104052355.png&fn=ACE%20%ED%8F%AC%EC%8A%A4%ED%84%B0.png&siteId=neibis&menuSn=504": [
+    "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11601&searchGbn=0&searchOrderSort=0"
+   ],
+   "https://www.kangwon.ac.kr/ckeditorImgfile.do?dn=ckEditor_20261103104316245.png&fn=ACE%20%EC%9D%BC%EC%A0%95.png&siteId=neibis&menuSn=504": [
+    "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11601&searchGbn=0&searchOrderSort=0"
+   ],
+   "https://www.kangwon.ac.kr/ckeditorImgfile.do?dn=ckEditor_20261103112717526.png&fn=%ED%97%8C%ED%98%88%ED%8F%AC%EC%8A%A4%ED%84%B0(11%EC%9B%94).png&siteId=neibis&menuSn=504": [
+    "url:https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pageItm=10&pstSn=11602&searchGbn=0&searchOrderSort=0"
    ]
   },
   "숭실대학교": {
-   "https://scatch.ssu.ac.kr/wp-content/uploads/sites/5/2026/10/2026-2%ED%95%99%EA%B8%B0-%ED%95%99%EB%B6%80-%EC%A4%91%EA%B0%84-%EA%B0%95%EC%9D%98%ED%8F%89%EA%B0%80-%EC%95%88%EB%82%B4_%ED%99%88%ED%8E%98%EC%9D%B4%EC%A7%80-%EA%B2%8C%EC%8B%9C%EC%9A%A9-723x1024.png": [
-    "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%ED%95%99%EB%B6%80-%EC%A4%91%EA%B0%84-%EA%B0%95%EC%9D%98%ED%8F%89%EA%B0%80-%EC%8B%A4%EC%8B%9C-%EC%95%88%EB%82%B42026-10-6-%ED%99%94-10-19"
-   ],
-   "https://scatch.ssu.ac.kr/wp-content/uploads/sites/5/2026/10/%ED%99%88%ED%8E%98%EC%9D%B4%EC%A7%80-%EA%B3%B5%EC%A7%802026-%EA%B2%A8%EC%9A%B8%EA%B3%84%EC%A0%88%EC%A0%9C-%EC%88%98%EC%97%85-%EC%9D%BC%EC%A0%95-%EC%95%88%EB%82%B4_page-0001.jpg": [
-    "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=2026%ED%95%99%EB%85%84%EB%8F%84-%EA%B2%A8%EC%9A%B8%EA%B3%84%EC%A0%88%EC%A0%9C-%EC%88%98%EC%97%85-%EC%9D%BC%EC%A0%95-%EC%95%88%EB%82%B4"
-   ],
-   "https://scatch.ssu.ac.kr/wp-content/uploads/sites/5/2026/10/%ED%99%88%ED%8E%98%EC%9D%B4%EC%A7%80-%EA%B3%B5%EC%A7%802026-%EA%B2%A8%EC%9A%B8%EA%B3%84%EC%A0%88%EC%A0%9C-%EC%88%98%EC%97%85-%EC%9D%BC%EC%A0%95-%EC%95%88%EB%82%B4_page-0002.jpg": [
-    "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=2026%ED%95%99%EB%85%84%EB%8F%84-%EA%B2%A8%EC%9A%B8%EA%B3%84%EC%A0%88%EC%A0%9C-%EC%88%98%EC%97%85-%EC%9D%BC%EC%A0%95-%EC%95%88%EB%82%B4"
-   ],
    "https://scatch.ssu.ac.kr/wp-content/uploads/sites/5/2026/10/%ED%99%88%ED%8E%98%EC%9D%B4%EC%A7%80-%EA%B3%B5%EC%A7%802026%ED%95%99%EB%85%84%EB%8F%84-%ED%9C%B4%ED%95%99%EC%83%9D-%EA%B2%A8%EC%9A%B8%EA%B3%84%EC%A0%88%EC%A0%9C-%EC%88%98%EC%97%85-%EC%9D%BC%EC%A0%95-%EC%95%88%EB%82%B4_page-0001.jpg": [
     "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=2026%ED%95%99%EB%85%84%EB%8F%84-%ED%9C%B4%ED%95%99%EC%83%9D-%EA%B2%A8%EC%9A%B8%EA%B3%84%EC%A0%88%EC%A0%9C-%EC%88%98%EA%B0%95%EC%8B%A0%EC%B2%AD-%EC%95%88%EB%82%B4"
    ],
@@ -19211,12 +20062,21 @@
    ],
    "https://scatch.ssu.ac.kr/wp-content/uploads/sites/5/2026/10/261028_2026-2%ED%95%99%EA%B8%B0-2%EC%B0%A8-%EB%B0%98%EB%8F%84%EC%B2%B4%EC%BD%9C%EB%A1%9C%ED%82%A4%EC%9B%80-%ED%8F%AC%EC%8A%A4%ED%84%B0_%EC%9A%A9%EB%9F%89-726x1024.jpg": [
     "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EB%B0%98%EB%8F%84%EC%B2%B4%EC%82%B0%ED%95%99%EA%B8%B0%EC%88%A0%EC%84%BC%ED%84%B0-2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%EC%A0%9C2"
+   ],
+   "https://scatch.ssu.ac.kr/wp-content/uploads/sites/5/2026/11/%ED%99%88%ED%8E%98%EC%9D%B4%EC%A7%80-%EA%B3%B5%EC%A7%80-2027%ED%95%99%EB%85%84%EB%8F%84-1%ED%95%99%EA%B8%B0-%EB%B3%B5%ED%95%99-%ED%9C%B4%ED%95%99-%EC%9C%A0%EA%B8%89-%EC%8B%A0%EC%B2%AD-%EC%95%88%EB%82%B4_1-2.png": [
+    "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=2027%ED%95%99%EB%85%84%EB%8F%84-1%ED%95%99%EA%B8%B0-%EB%B3%B5%ED%95%99-%ED%9C%B4%ED%95%99-%EC%9C%A0%EA%B8%89-%EC%8B%A0%EC%B2%AD-%EC%95%88%EB%82%B4"
+   ],
+   "https://scatch.ssu.ac.kr/wp-content/uploads/sites/5/2026/11/%ED%99%88%ED%8E%98%EC%9D%B4%EC%A7%80-%EA%B3%B5%EC%A7%80-2027%ED%95%99%EB%85%84%EB%8F%84-1%ED%95%99%EA%B8%B0-%EB%B3%B5%ED%95%99-%ED%9C%B4%ED%95%99-%EC%9C%A0%EA%B8%89-%EC%8B%A0%EC%B2%AD-%EC%95%88%EB%82%B4_2-2.png": [
+    "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=2027%ED%95%99%EB%85%84%EB%8F%84-1%ED%95%99%EA%B8%B0-%EB%B3%B5%ED%95%99-%ED%9C%B4%ED%95%99-%EC%9C%A0%EA%B8%89-%EC%8B%A0%EC%B2%AD-%EC%95%88%EB%82%B4"
+   ],
+   "https://scatch.ssu.ac.kr/wp-content/uploads/sites/5/2026/11/%ED%99%88%ED%8E%98%EC%9D%B4%EC%A7%80-%EA%B3%B5%EC%A7%80-2027%ED%95%99%EB%85%84%EB%8F%84-1%ED%95%99%EA%B8%B0-%EB%B3%B5%ED%95%99-%ED%9C%B4%ED%95%99-%EC%9C%A0%EA%B8%89-%EC%8B%A0%EC%B2%AD-%EC%95%88%EB%82%B4_3-2.png": [
+    "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=2027%ED%95%99%EB%85%84%EB%8F%84-1%ED%95%99%EA%B8%B0-%EB%B3%B5%ED%95%99-%ED%9C%B4%ED%95%99-%EC%9C%A0%EA%B8%89-%EC%8B%A0%EC%B2%AD-%EC%95%88%EB%82%B4"
+   ],
+   "https://scatch.ssu.ac.kr/wp-content/uploads/sites/5/2026/11/AI%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8%EB%A6%AC%ED%84%B0%EB%9F%AC%EC%8B%9C%EC%8B%AC%ED%99%94_%ED%8F%AC%EC%8A%A4%ED%84%B0.jpg": [
+    "url:https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?paged=1&slug=%EB%AA%A8%EC%A7%91-ai-%ED%94%84%EB%A1%AC%ED%94%84%ED%8A%B8-%EB%A6%AC%ED%84%B0%EB%9F%AC%EC%8B%9C%EC%8B%AC%ED%99%94-11-16"
    ]
   },
   "홍익대학교": {
-   "https://www.hongik.ac.kr/cms/plugin/editorImage.do?%24cms%24EwBmDYHoEYUglAagSQMYHcBeAVAjgBwGEAZAaQC0ArASwA0APReAVwAsBRbMgWwDpL8AUwDmQA%20": [
-    "url:https://www.hongik.ac.kr/kr/newscenter/notice.do?articleNo=159000&mode=view&noCat=514"
-   ],
    "https://www.hongik.ac.kr/cms/plugin/editorImage.do?$cms$EwBmDYHoEYUgxA5gBQA4HUASiAaA1dAeQDMBJAFwEMAZYgEwE8AhAVQC8WBpARzoDoAVqkRA": [
     "url:https://www.hongik.ac.kr/kr/newscenter/notice.do?articleNo=159015&mode=view&noCat=32"
    ],
@@ -19294,6 +20154,9 @@
    ],
    "https://www.hongik.ac.kr/cms/plugin/editorImage.do?$cms$EwBmDYHoEYUhTA9gZwDYHECKBLVA5AcwCkBXANzNQDUArTAIQGlH576AtbAOhoAcCgA": [
     "url:https://www.hongik.ac.kr/kr/newscenter/notice.do?articleNo=159878&mode=view&noCat=32"
+   ],
+   "https://www.hongik.ac.kr/cms/plugin/editorImage.do?$cms$EwBmDYHoEZsgHAtgJwMoHEDCAVAmgVwBMAvRRfAUQDUBTAM2wAUL0ALAVQGsBnAOngB2AcyA": [
+    "url:https://www.hongik.ac.kr/kr/newscenter/notice.do?articleNo=159926&mode=view&noCat=514"
    ]
   },
   "국민대학교": {
@@ -19484,6 +20347,12 @@
    ],
    "https://wise.dongguk.ac.kr/cmmn/fileView?path=/ckeditor//generalnotice&physical=1793242269004.jpg": [
     "post:동국대학교 WISE캠퍼스:520999"
+   ],
+   "https://i.ifh.cc/Ll7Fbo.jpg": [
+    "post:동국대학교 WISE캠퍼스:521051"
+   ],
+   "https://wise.dongguk.ac.kr/cmmn/fileView?path=/ckeditor//generalnotice&physical=1793594647298.jpg": [
+    "post:동국대학교 WISE캠퍼스:521048"
    ]
   },
   "인하대학교": {
@@ -19719,32 +20588,8 @@
     "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70794",
     "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70809"
    ],
-   "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/byteToImage.aspx?key=2588944": [
-    "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70805"
-   ],
-   "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/byteToImage.aspx?key=2588918": [
-    "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70804"
-   ],
-   "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/byteToImage.aspx?key=2588890": [
-    "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70803"
-   ],
-   "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2588888": [
-    "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70802"
-   ],
-   "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/byteToImage.aspx?key=2588882": [
-    "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70800"
-   ],
    "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/byteToImage.aspx?key=2589137": [
     "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70811"
-   ],
-   "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/byteToImage.aspx?key=2589050": [
-    "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70808"
-   ],
-   "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/byteToImage.aspx?key=2589013": [
-    "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70807"
-   ],
-   "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/byteToImage.aspx?key=2589028": [
-    "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70807"
    ],
    "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/byteToImage.aspx?key=2589404": [
     "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70817"
@@ -19809,6 +20654,30 @@
    ],
    "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/byteToImage.aspx?key=2590291": [
     "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70866"
+   ],
+   "https://capd.jnu.ac.kr/Common/byteToImage.aspx?Seq=648262&USECD=H09050": [
+    "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70876"
+   ],
+   "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/byteToImage.aspx?key=2590407": [
+    "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70875"
+   ],
+   "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2590409": [
+    "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70875"
+   ],
+   "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/byteToImage.aspx?key=2590308": [
+    "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70872"
+   ],
+   "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/byteToImage.aspx?key=2590309": [
+    "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70872"
+   ],
+   "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/byteToImage.aspx?key=2590522": [
+    "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70881"
+   ],
+   "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/byteToImage.aspx?key=2590523": [
+    "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70881"
+   ],
+   "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/byteToImage.aspx?key=2590298": [
+    "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70870"
    ]
   },
   "한국외국어대학교": {
@@ -20027,6 +20896,12 @@
    ],
    "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0701&ntt_no=2516035&atch_no=1": [
     "url:https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0701&menu_dvs_cd=0701&mode=V&no=2516035&site_dvs_cd=kr"
+   ],
+   "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0701&ntt_no=2516069&atch_no=1": [
+    "url:https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0701&menu_dvs_cd=0701&mode=V&no=2516069&site_dvs_cd=kr"
+   ],
+   "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0701&ntt_no=2516082&atch_no=1": [
+    "url:https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0701&menu_dvs_cd=0701&mode=V&no=2516082&site_dvs_cd=kr"
    ]
   },
   "고려대학교 세종캠퍼스": {
@@ -20038,7 +20913,8 @@
     "url:https://sejong.korea.ac.kr/bbs/koreaSejong/656/273103/artclView.do"
    ],
    "https://sejong.korea.ac.kr/Web-home/_UI/images/common/filetype/jpg.gif": [
-    "url:https://sejong.korea.ac.kr/bbs/koreaSejong/656/272747/artclView.do"
+    "url:https://sejong.korea.ac.kr/bbs/koreaSejong/656/272747/artclView.do",
+    "url:https://sejong.korea.ac.kr/bbs/koreaSejong/664/274153/artclView.do"
    ],
    "https://sejong.korea.ac.kr/Web-home/_UI/images/common/filetype/hwp.gif": [
     "url:https://sejong.korea.ac.kr/bbs/koreaSejong/656/272747/artclView.do",
@@ -20055,6 +20931,9 @@
    ],
    "https://sejong.korea.ac.kr/CrossEditor/binary/images/000176/KakaoTalk_20261006_095802100_01_1.jpg": [
     "url:https://sejong.korea.ac.kr/bbs/koreaSejong/656/273810/artclView.do"
+   ],
+   "https://sejong.korea.ac.kr/bbs/koreaSejong/664/183909/download.do": [
+    "url:https://sejong.korea.ac.kr/bbs/koreaSejong/664/274153/artclView.do"
    ]
   },
   "연세대학교 미래캠퍼스": {
@@ -20090,9 +20969,6 @@
    ]
   },
   "경기대학교": {
-   "https://www.kyonggi.ac.kr/DATA/bbs/1073/20261023025728331_4asP.jpg": [
-    "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626766&pageUnit=10&sf.pnos=1073&sf.pnos=888"
-   ],
    "https://www.kyonggi.ac.kr/DATA/bbs/1073/20261026041728901_Mfb2.png": [
     "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626807&pageUnit=10&sf.pnos=1073&sf.pnos=888"
    ],
@@ -20135,9 +21011,6 @@
    "https://www.kyonggi.ac.kr/DATA/bbs/1073/20261026032440962_caI4.png": [
     "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626801&pageUnit=10&sf.pnos=1073&sf.pnos=888"
    ],
-   "https://www.kyonggi.ac.kr/DATA/bbs/1073/20261026104639856_Ez8Y.png": [
-    "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626773&pageUnit=10&sf.pnos=1073&sf.pnos=888"
-   ],
    "https://www.kyonggi.ac.kr/DATA/bbs/1073/20261028090106302_SRGp.png": [
     "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626856&pageUnit=10&sf.pnos=1073&sf.pnos=888"
    ],
@@ -20161,6 +21034,24 @@
    ],
    "https://www.kyonggi.ac.kr/DATA/bbs/1073/20261102100132793_dVcQ.png": [
     "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626930&pageUnit=10&sf.pnos=1073&sf.pnos=888"
+   ],
+   "https://www.kyonggi.ac.kr/DATA/bbs/1073/20261103112952515_3AbB.jpg": [
+    "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626986&pageUnit=10&sf.pnos=1073&sf.pnos=888"
+   ],
+   "https://www.kyonggi.ac.kr/DATA/bbs/1073/20261103112952529_3GQh.jpg": [
+    "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626986&pageUnit=10&sf.pnos=1073&sf.pnos=888"
+   ],
+   "https://www.kyonggi.ac.kr/DATA/bbs/1073/20261103112952531_N09p.jpg": [
+    "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626986&pageUnit=10&sf.pnos=1073&sf.pnos=888"
+   ],
+   "https://www.kyonggi.ac.kr/DATA/bbs/1073/20261103084734923_19ea.png": [
+    "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626977&pageUnit=10&sf.pnos=1073&sf.pnos=888"
+   ],
+   "https://www.kyonggi.ac.kr/DATA/bbs/1073/20261103084756974_9kXQ.png": [
+    "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626977&pageUnit=10&sf.pnos=1073&sf.pnos=888"
+   ],
+   "https://www.kyonggi.ac.kr/DATA/bbs/1073/20261103084756982_SVaV.png": [
+    "url:https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsNo=1073&key=7520&nttNo=626977&pageUnit=10&sf.pnos=1073&sf.pnos=888"
    ]
   },
   "이화여자대학교": {
@@ -20332,12 +21223,6 @@
     "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367625&mode=view&no=385",
     "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367625&mode=view&no=373"
    ],
-   "https://rwcms.ewha.ac.kr/sites/ewhapress/event/2027_popup.gif": [
-    "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367630&mode=view&no=375"
-   ],
-   "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEYUhPAlgYQPYGl4DEA2BDAJwFksBXAVQEkBBALwFsA1AdwDoAHAOwHMg": [
-    "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367648&mode=view&no=371"
-   ],
    "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEYUhTAKgNwI4FFUEsASB5ZPASWQA0BFALXMQAcBZAOloDsBzIA%20": [
     "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367667&mode=view&no=378",
     "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367667&mode=view&no=372"
@@ -20372,7 +21257,27 @@
     "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367726&mode=view&no=350"
    ],
    "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEYUgJAbgSwI4EEDWBpALgUQCcBTAZwDFSBJAKwHkBVAcQAUA6GgB2IHMg%20": [
-    "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367714&mode=view&no=353"
+    "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367714&mode=view&no=353",
+    "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367714&mode=view&no=362"
+   ],
+   "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEZsgJAjgTQOoCl0GsDKBXAJQFsAPdABwDsBDInEgcQDoqBzIA%20": [
+    "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367745&mode=view&no=358",
+    "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367745&mode=view&no=352"
+   ],
+   "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEZsgnAngKQHYEMCaB5AxgDwHMAhAFQAUBZAQUoBEAXAdQBkA6AB1UKA%20": [
+    "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367743&mode=view&no=356"
+   ],
+   "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEZshTA8gKwBIBEC2AVAQgaQEUALAZQA0AxYgawC94AZAKQDoAHAOwHMg": [
+    "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367773&mode=view&no=350"
+   ],
+   "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEZsgvAygEQA4DkAyBLASgWQCsBFATwHMAxAD2IHVSAFAawDpUA7coA%20": [
+    "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367760&mode=view&no=349"
+   ],
+   "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEZsgXAlgYQJoCsBuALASgRQHUBDAIQHEBrAUwA0AZAOQAkBjAOgAcA7AcyA": [
+    "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367758&mode=view&no=347"
+   ],
+   "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEZshnAGgaQOIHcBiAZAHgRwBUAFAEQBcBhAVWQAcApAC1wDo6A7AcyA": [
+    "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367758&mode=view&no=347"
    ]
   },
   "충북대학교": {
@@ -20393,6 +21298,12 @@
    ],
    "https://www.cbnu.ac.kr/DATA/bbs/104/20261029035424786_4uBp.jpg": [
     "url:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=813&nttNo=171065&pageUnit=10"
+   ],
+   "https://www.cbnu.ac.kr/DATA/bbs/104/20261102011945427_Vp6t.jpg": [
+    "url:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=813&nttNo=171222&pageUnit=10"
+   ],
+   "https://www.cbnu.ac.kr/DATA/bbs/104/20261102055456617_bgaS.jpg": [
+    "url:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsNo=8&key=813&nttNo=171223&pageUnit=10"
    ]
   },
   "서강대학교": {
@@ -20405,9 +21316,6 @@
    "https://www.sogang.ac.kr/dataview/board/142/1788744410%ED%8F%AC%EC%8A%A4%ED%84%B0%20(1).jpg": [
     "post:서강대학교:551172"
    ],
-   "https://www.sogang.ac.kr/dataview/board/142/17884168241788389012183.png": [
-    "post:서강대학교:551113"
-   ],
    "https://www.sogang.ac.kr/dataview/board/142/24a2da2d-b690-4f6e-ad5d-4563234a42a7.png": [
     "post:서강대학교:551541"
    ],
@@ -20416,6 +21324,12 @@
    ],
    "https://www.sogang.ac.kr/dataview/board/142/0dff31a0-f9af-4eea-9504-c85d5a8a3d53.png": [
     "post:서강대학교:551601"
+   ],
+   "https://www.sogang.ac.kr/dataview/board/142/5ad9b83c-d851-4bf6-8309-f8f8ba0d1294.jpg": [
+    "post:서강대학교:551731"
+   ],
+   "https://www.sogang.ac.kr/dataview/board/142/1ced8ab2-385c-4101-a440-c48a96372c7f.png": [
+    "post:서강대학교:551726"
    ]
   },
   "경희대학교": {

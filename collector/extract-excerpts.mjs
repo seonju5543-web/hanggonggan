@@ -29,6 +29,8 @@ import { makeStripper } from './page-boilerplate.mjs';
    베끼면 '발췌기는 제외 절로 보는데 화면은 자격으로 보는' 어긋남이 생긴다. */
 import { createRequire as _cr } from 'node:module';
 const { isExcludeHead: shExclude, headText: shHead, isAmountHead: shAmount } = _cr(import.meta.url)('../section-head.js');
+/* 갈래 이름 줄 규칙은 화면(match-engine requirementLines)의 것을 불러 쓴다 — 베끼면 발췌기와 화면이 다른 줄을 갈래로 본다 */
+const ME_BRANCH_LABEL = _cr(import.meta.url)('../match-engine.js').BRANCH_LABEL;
 /* 공고문 첨부에서 글자 뽑기 — 본문이 "붙임 참조"뿐인 공고가 있다.
    🔴 **공고문만** 본다(attachment-text.mjs 첫머리 참조) — 신청서·동의서를 읽으면
    개인정보 수집 항목이 지원 자격 자리에 앉는다(실제로 겪고 되돌린 적이 있다). */
@@ -64,7 +66,9 @@ const LONE_PARTICLE = /^[가-힣]{2,5}(?:으로|에서|에게|를|을)$/;
 /* 글 끝의 공유·목록 단추 — 여기부터는 **다른 글의 제목·메뉴**라 자격 절이 아니다(2026-10-30 이화 본부기탁: 「∘ 지원자격 : 장학금별 상이」 뒤
    「페이스북 · 트위터 · 블로그 · URL Copy · 이전글 · [학부] 푸른등대 기부장학금 …」 열 줄이 자격 블록에 딸려 왔다). JUNK 는 그 줄만 건너뛰지만
    이것은 **끊는다** — 바닥글 뒤에 본문이 이어지는 게시판은 없다 */
-const FOOTER_STOP = /^(?:페이스북|트위터|블로그|카카오톡|카카오스토리|네이버\s?밴드|URL\s?Copy|링크\s?복사|공유하기|인쇄|목록|이전글|다음글|TOP|맨\s?위로)$/i;
+/* 공유 단추가 **한 줄에 붙어** 온 꼴(`페이스북 트위터 블로그 URL Copy`)과 바로가기 띠(`EWHA QUICK SERVICE`)도 바닥글이다 —
+   이화 본부기탁 글에서 그 뒤 메뉴 낱말 줄(「포탈정보시스템 E-벗 사이버캠퍼스 …」)이 자격 줄에 섞였다(2026-11-02 · 18건 조사 ⓒ) */
+const FOOTER_STOP = /^(?:(?:페이스북|트위터|블로그|카카오톡|카카오스토리|네이버\s?밴드|URL\s?Copy|링크\s?복사|공유하기|인쇄|목록|이전글|다음글|TOP|맨\s?위로)\s*)+$|^\s*(?:[A-Za-z가-힣]+\s)?QUICK\s?SERVICE\s*$/i;   // 띠 이름 줄 전체일 때만(`EWHA QUICK SERVICE`) — 문장 속 낱말로 끊지 않는다(리뷰)
 
 function extractFrom(text) {
   if (!text) return [];
@@ -165,12 +169,11 @@ const STILL_QUALIFY = /(자격|대상자?|요건|기준)\s*$|(신청|지원|선�
    `선발 기준`에 걸려 "여전히 자격 이야기"로 판정되는 바람에 자격 절이 안 끝나고
    우선순위 항목이 통째로 요건 자리에 앉았다(목포향우회 — 진짜 자격은 한 줄뿐인데 5줄이 떴다). */
 const PRIORITY_PICK = /우선\s?선발|우선\s?순위/;
-/* 갈래 이름 줄 `대전 소재 대학` · `(타지역 소재 대학교)` — match-engine.js BRANCH_LABEL 을 **불러 쓴다** (2026-11-02 · blockFrom 의 '같은 줄 두 번' 예외).
-   화면이 〔갈래〕 꼬리표를 다는 꼴과 발췌기가 갈래로 보는 꼴이 갈라지면 안 된다 — 베끼지 말 것(관문 「자격 절 고르기」가 사본을 막는다). */
-const BRANCH_LABEL = _cr(import.meta.url)('../match-engine.js').BRANCH_LABEL;
 /* 「■ 장학금별 자격」·「종류별 선발기준」 도 자격 낱말로 끝나지만 **갈래마다 다른 기준**이라 공고 전체의 요건이 아니다 — 「■ 공통 자격」 뒤에 이어 읽으면
    성적우수 갈래의 「평점 4.3 이상」 이 가계곤란 갈래로 갈 학생에게 틀린 미달이 된다(2026-10-30 리뷰 재현). 여기서 끊는다(분야를 갈라 담는 구조가 생기기 전까지) */
 const PER_TYPE = /장학금별|종류별|유형별|사업별|분야별/;
+/* 인원만 적은 짧은 줄 — `□ 재학성적우수자 TRACK: 10명`·`○ 선발인원 : 20명 내외`. 콜론 뒤가 인원뿐이어야 한다(`대학생 200명 내외 (휴학생 제외)` 같은 요건 줄은 아니다) */
+const HEADCOUNT_LINE = /^[^:：]{1,24}[:：]\s*(?:총\s?)?\d{1,3}\s?(?:명|팀|개교)(?:\s?(?:내외|이내|정도))?\s*$/;
 
 /* 표 머리글·표 안의 값 — 요건이 아니라 표를 이루는 부속이라 버린다 */
 const TABLE_NOISE = new RegExp([
@@ -727,6 +730,15 @@ function extractQualifyLines(text, opts = {}) {
        그래서 시작 줄의 번호 종류를 기억해 두고 **같은 종류를 만났을 때만** 끊는다.
        숫자는 순서까지 본다 — `3. 신청자격` 아래의 `1)` `2)`는 하위 항목이고 `4.`가 다음 절이다.
        시작 줄에 번호가 없으면(`■ 신청자격` 등) 예전처럼 길이로 재되 문턱을 낮춰 둔다. */
+    /* 인원 줄(`□ 재학성적우수자 TRACK: 10명`)은 절 머리글이 아니라 그 절 안의 소제목이다 — 충남대 MEGA CNU GLOBAL 은 「지원 자격」 바로 아래 이 줄에서
+       끊겨 요건 셋을 통째로 놓쳤다(2026-11-02 · 18건 조사 ⓑ). 끊지 않고 건너뛴다(자격 줄로 담지도 않는다 · 상한엔 센다) */
+    /* ⚠️ 시작 줄과 **같은 단계**의 인원 머리글(`3. 신청자격` 아래 `4. 선발인원: 5명` · `■ 지원 자격` 아래 `■ 선발인원: 20명`)은 다음 절이다 — 건너뛰면 그 절의
+       본문(성과보고서 제출·지급 상계·봉사 의무)이 자격에 딸려 온다(리뷰 재현). 그때는 아래 SECTION_HEAD 끊김으로 흘려보낸다 */
+    if (i > start && HEADCOUNT_LINE.test(l)) {
+      const mk = markerOf(l);
+      const sameLevel = startMark.kind && mk.kind === startMark.kind && (mk.kind !== 'num' || mk.n > startMark.n);
+      if (!sameLevel) { skippedAmt += 1; continue; }
+    }
     if (i > start && SECTION_HEAD.test(l) && (!STILL_QUALIFY.test(l) || PRIORITY_PICK.test(l) || PER_TYPE.test(l))) {
       const mk = markerOf(l);
       /* 홀로 선 번호로 시작한 절도 `3.` 처럼 붙은 다음 번호에서 끝난다 — markerOf 는 'lone' 을 돌려주지 않아 아래 같은 종류 비교가 영영 거짓이었다(3차 회귀 검증) */
@@ -764,12 +776,12 @@ function extractQualifyLines(text, opts = {}) {
   /* 🔴 같은 줄이 두 번 나오는 블록은 **분야별 표**다 (같은 울산 HWP: 「신청자격 및 선발기준」 표가 우수·다자녀·생활… 분야마다 `⁕등록금성`·
      `※ 선발기준 우선순위` 를 되풀이한다). 그 표의 `성적 4.0/4.5 이상` 은 우수장학금 한 분야의 기준이라 공고 전체의 요건으로 보이면
      다자녀 분야로 갈 수 있는 학생에게 틀린 미달이 붙는다(qualFromDocs 머리말의 실측). 분야를 갈라 담는 구조가 생기기 전엔 비워 둔다. */
-  /* 🔴 단, **갈래 이름 줄이 둘 이상**이면 분야별 표가 아니다 (2026-11-02 · 대전청년내일재단 성취장학 hwpx · 정식 등록 11건).
-     `대전 소재 대학` / `타지역 소재 대학` 두 갈래가 ①②③ 을 따로 적어 `③ 직전 학기까지의 전체 평균 평점 3.5 이상 …` 이 두 번 나온다 —
-     같은 줄 되풀이 거절에 걸려 자격이 통째로 비었다. 갈래는 화면이 〔갈래〕 꼬리표로 갈라 보이므로(match-engine requirementLines) 섞이지 않는다.
-     갈래 이름 꼴은 match-engine 의 BRANCH_LABEL 그대로 */
-  if (out.filter((l) => BRANCH_LABEL.test(l.trim())).length < 2
-    && new Set(out.map((l) => l.replace(/\s+/g, ' ').trim())).size < out.length) return [];
+  /* ⚠️ 갈래 이름 줄(`대전 소재 대학` / `타지역 소재 대학`)이 둘 이상이고 되풀이되는 줄이 **번호 항목(①②③)** 이면 표가 아니라 **갈래**다 — 화면은 그 줄에
+     〔갈래〕 꼬리표를 달아 가른다(match-engine BRANCH_LABEL · 같은 규칙을 불러 쓴다). 계명대 대전청년내일재단이 이 꼴로 통째로 비워졌다(2026-11-02 · 18건 조사 ⓑ) */
+  const normed = out.map((l) => l.replace(/\s+/g, ' ').trim());
+  const branches = normed.filter((l) => ME_BRANCH_LABEL.test(l)).length >= 2;
+  const dupPool = branches ? normed.filter((l) => !/^\s*[①-⑳]/.test(l)) : normed;
+  if (new Set(dupPool).size < dupPool.length) return [];
   /* 🔴 마지막 관문 — 이 블록이 정말 '누가 받을 수 있나'를 말하고 있는가 (2026-08-20).
      자격 절 제목을 잘못 짚으면(이화 양영재단: '신청방법' 블록을 자격으로 읽었다) 제출서류·
      유의사항 8줄이 통째로 **지원 자격 자리에** 앉는다. 학생은 그걸 요건으로 읽고 자기가
