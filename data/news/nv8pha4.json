@@ -3,6 +3,39 @@
  "updatedAt": "2026-11-03",
  "items": [
   {
+   "title": "[학생상담센터] 2·3학년 생애진로설계를 위한 학년별 맞춤형 심리검사 안내 📢",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159992&noCat=32",
+   "postedAt": "2026-11-03",
+   "school": "홍익대학교",
+   "campus": "",
+   "src": "9c41077f",
+   "foundAt": "2026-11-03",
+   "thumb": "data/news/img/520e186f9cc2efef.webp",
+   "desc": "세종캠퍼스 학생상담센터(세종) 나의 성격, 흥미, 강점을 이해하고 앞으로의 진로와 삶의 방향을 설계해 보세요. 세종캠퍼스 2·3학년 학생을 대상으로 학년별 심리검사를 실시합니다. 많은 관심과 참여를 바랍니다."
+  },
+  {
+   "title": "2026학년도 동계계절학기 학점교류 신청 안내 (삼육대학교)",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159979&noCat=500",
+   "postedAt": "2026-11-03",
+   "kind": "학사",
+   "school": "홍익대학교",
+   "campus": "",
+   "src": "9c41077f",
+   "foundAt": "2026-11-03",
+   "desc": "2026학년도 동계계절학기에 삼육대학교에서 개설한 강좌를 수강하고자 하는 학생은 다음 사항을 참고하여 신청하기 바랍니다."
+  },
+  {
+   "title": "(세종) 심폐소생술 교육 실시 안내",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159966&noCat=32",
+   "postedAt": "2026-11-03",
+   "school": "홍익대학교",
+   "campus": "",
+   "src": "9c41077f",
+   "foundAt": "2026-11-03",
+   "thumb": "data/news/img/b2f75ce241bcecf1.webp",
+   "desc": "세종캠퍼스 건강진료센터(세종) 세종캠퍼스 건강진료센터에서 교내 및 일상 생활에서 발생하는 심정지 환자에 대하여 즉각적으로 대처 할 수 있기 위한 응급 처지의 일환으로 심폐소생술 교육을 아래와 같이 실시하고자 하오니…"
+  },
+  {
    "title": "[건강진료센터] 11월 사랑의 헌혈 안내",
    "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159926&noCat=514",
    "postedAt": "2026-11-02",
@@ -395,39 +428,6 @@
    "src": "9c41077f",
    "foundAt": "2026-10-15",
    "thumb": "data/news/img/3590611731da301a.webp"
-  },
-  {
-   "title": "2026학년도 동계계절학기 학점교류 신청 안내 (세종대학교)",
-   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159260&noCat=500",
-   "postedAt": "2026-10-15",
-   "kind": "학사",
-   "school": "홍익대학교",
-   "campus": "",
-   "src": "9c41077f",
-   "foundAt": "2026-10-15",
-   "desc": "2026학년도 동계계절학기에 세종대학교에서 개설한 강좌를 수강하고자 하는 학생은 다음 사항을 참고하여 신청하기 바랍니다."
-  },
-  {
-   "title": "2026학년도 동계계절학기 학점교류 신청 안내 (서울대학교)",
-   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159108&noCat=500",
-   "postedAt": "2026-10-12",
-   "kind": "학사",
-   "school": "홍익대학교",
-   "campus": "",
-   "src": "9c41077f",
-   "foundAt": "2026-10-12",
-   "desc": "학사지원팀 2026학년도 동계계절학기에 서울대학교에서 개설한 강좌를 수강하고자 하는 학생은 다음 사항을 참고하여 신청하기 바랍니다."
-  },
-  {
-   "title": "[문정도서관] 교내 정전에 따른 도서관 임시 휴관 및 무인반납기 운영 중지 안내 (10/23~10/26)",
-   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159015&noCat=32",
-   "postedAt": "2026-10-07",
-   "kind": "생활",
-   "school": "홍익대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "thumb": "data/news/img/c7806f760bb84dc6.webp",
-   "src": "9c41077f"
   }
  ]
 }

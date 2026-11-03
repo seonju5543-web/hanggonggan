@@ -3,6 +3,24 @@
  "updatedAt": "2026-11-03",
  "items": [
   {
+   "title": "[생명윤리위원회] 하반기 연구자 교육 안내",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271756&pageOrder=0&cmd=2&parm_bod_uid=271756&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-10-19",
+   "school": "계명대학교",
+   "campus": "",
+   "src": "9a241a98",
+   "foundAt": "2026-11-03"
+  },
+  {
+   "title": "2026 대구 대학(원) AI 드래프톤 학생 모집",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271756&pageOrder=0&cmd=2&parm_bod_uid=271753&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-11-03",
+   "school": "계명대학교",
+   "campus": "",
+   "src": "9a241a98",
+   "foundAt": "2026-11-03"
+  },
+  {
    "title": "11월 계명모의토익 안내",
    "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271739&pageOrder=0&cmd=2&parm_bod_uid=271739&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
    "postedAt": "2026-11-02",
@@ -351,25 +369,6 @@
    "campus": "",
    "src": "9a241a98",
    "foundAt": "2026-10-14"
-  },
-  {
-   "title": "[교수학습개발센터] 맞춤형 학습 컨설팅 운영 안내",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271331&pageOrder=0&cmd=2&parm_bod_uid=271331&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
-   "postedAt": "2026-10-13",
-   "kind": "생활",
-   "school": "계명대학교",
-   "campus": "",
-   "src": "9a241a98",
-   "foundAt": "2026-10-13"
-  },
-  {
-   "title": "2026 대구여성영화제 초대",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271294&pageOrder=0&cmd=2&parm_bod_uid=271294&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
-   "postedAt": "2026-10-12",
-   "school": "계명대학교",
-   "campus": "",
-   "src": "9a241a98",
-   "foundAt": "2026-10-12"
   }
  ]
 }

@@ -3,6 +3,27 @@
  "updatedAt": "2026-11-03",
  "items": [
   {
+   "title": "[일반] [체육지원팀]광운대학교 축구부 2026 KUSF U-리그 왕중왕전 경기 일정 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53603&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-03",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-03",
+   "thumb": "data/news/img/86ed43a3a51ff134.webp",
+   "desc": "우리대학 축구부가 대한축구협회와 한국대학스포츠협의회가 주최하는 「 2026 대학축구 U-리그 왕중왕전 」대회 에 출전합니다."
+  },
+  {
+   "title": "[일반] 2026 국립국제교육원 인지도 조사 참여 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53601&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-03",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-03",
+   "thumb": "data/news/img/85077a9c8b559d86.webp"
+  },
+  {
    "title": "[시설] 한울관 및 아이스링크 주차장 입구 차량 출입 통제 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53599&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "postedAt": "2026-11-03",
@@ -404,28 +425,6 @@
    "src": "b09cb042",
    "foundAt": "2026-10-16",
    "desc": "교수님과 함께 나누는 따뜻한 대화, 더 든든한 대학생활의 시작 학생 여러분의 학업과 진로 고민을 함께 나누고 대학생활 적응을 위해, 지도교수와 학생이 만나는 집중상담기간 「KW All Care Week」 를…"
-  },
-  {
-   "title": "[일반] 기간제 계약직원 채용 공고(정보통신처 통신운영팀)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53495&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-16",
-   "kind": "채용",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-16",
-   "desc": "기간제 계약직원 모집 공고 1. 지원 자격 및 우대사항 모집인원 담당업무 PC실습실 및 행정부서 정보화기자재 관리 등 지원 자격"
-  },
-  {
-   "title": "[외부] [대한민국국회] 2026 국회 입법 박람회 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53493&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-15",
-   "kind": "행사",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-15",
-   "thumb": "data/news/img/76851a49b6960641.webp"
   }
  ]
 }

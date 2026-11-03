@@ -3,6 +3,16 @@
  "updatedAt": "2026-11-03",
  "items": [
   {
+   "title": "[국제처] 2026 동계 KNU in the World Pro...",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511959",
+   "postedAt": "2026-11-03",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-03",
+   "desc": "2026 학년도 동계 서울대와 함께 우리 학생들의 글로벌 경쟁력 강화를 위해 해외 주요 기관에서의 현장학습을 중심으로 하는 국제화 프로그램을 운영하고자 합니다."
+  },
+  {
    "title": "[AI융합교육원][Microsoft] 청년 취·창업을 위한「AI 실전 프로젝트 ...",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511937",
    "postedAt": "2026-11-03",
@@ -411,18 +421,6 @@
    "src": "2d0d4013",
    "foundAt": "2026-10-26",
    "thumb": "data/news/img/de4181410f51b497.webp"
-  },
-  {
-   "title": "단과대학 연합축제'OVER' 행사 관련 차량 통제 및 소음 발생 ...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511750",
-   "postedAt": "2026-10-26",
-   "kind": "행사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/612321711f225fb6.webp",
-   "desc": "- 기간 : 2026. 10. 26.(월) ~ 10. 27.(화) - 장소(내용): 시월광장(연예인 및 동아리 공연, 부스 운영 등), 제6공학관 및 운죽정 앞(낙서 도로)"
   }
  ]
 }

@@ -3,6 +3,28 @@
  "updatedAt": "2026-11-03",
  "items": [
   {
+   "title": "외국인유학생 [캠퍼스타운사업단] 외국인 유학생 대상 취업역량·직무역량 강화 교육 시행",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EC%BA%A0%ED%8D%BC%EC%8A%A4%ED%83%80%EC%9A%B4-%EC%99%B8%EA%B5%AD%EC%9D%B8-%EC%9C%A0%ED%95%99%EC%83%9D-%EB%8C%80%EC%83%81-%EC%B7%A8%EC%97%85%EC%97%AD&keyword",
+   "postedAt": "2026-11-03",
+   "school": "숭실대학교",
+   "campus": "",
+   "src": "3b348584",
+   "foundAt": "2026-11-03",
+   "thumb": "data/news/img/2705541e2ec6a64f.webp",
+   "desc": "숭실대학교 캠퍼스타운 사업단에서 외국인 유학생의 국내 취업 및 직무 역량을 높이기 위한 취업역량/직무역량 강화 교육 을 진행합니다. 본교 외국인 유학생의 많은 관심과 신청 바랍니다."
+  },
+  {
+   "title": "채용 숭실대학교 공과대학 학사조교 (산업정보시스템공학과) 채용 공고",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EA%B3%B5%EA%B3%BC%EB%8C%80%ED%95%99-%ED%95%99%EC%82%AC%EC%A1%B0%EA%B5%90-%EC%82%B0%EC%97%85%EC%A0%95%EB%B3%B4%EC%8B%9C%EC%8A%A4%ED%85%9C%EA%B3%B5-2&keyword",
+   "postedAt": "2026-11-03",
+   "kind": "채용",
+   "school": "숭실대학교",
+   "campus": "",
+   "src": "3b348584",
+   "foundAt": "2026-11-03",
+   "desc": "다. 계약기간 : 1차년도 11개월(재계약시 총 23개월 근무 가능) 라. 근무시작 : 2026.12.1부"
+  },
+  {
    "title": "기타 숭실가족수요예배 안내(11월 4일)",
    "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%88%AD%EC%8B%A4%EA%B0%80%EC%A1%B1%EC%88%98%EC%9A%94%EC%98%88%EB%B0%B0-%EC%95%88%EB%82%B411%EC%9B%94-4%EC%9D%BC&keyword",
    "postedAt": "2026-11-03",
@@ -404,28 +426,6 @@
    "src": "3b348584",
    "foundAt": "2026-10-13",
    "thumb": "data/news/img/441283b3d8a225a0.webp"
-  },
-  {
-   "title": "학사 2026학년도 휴학생 겨울계절제 수강신청 안내",
-   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026%ED%95%99%EB%85%84%EB%8F%84-%ED%9C%B4%ED%95%99%EC%83%9D-%EA%B2%A8%EC%9A%B8%EA%B3%84%EC%A0%88%EC%A0%9C-%EC%88%98%EA%B0%95%EC%8B%A0%EC%B2%AD-%EC%95%88%EB%82%B4&keyword",
-   "postedAt": "2026-10-12",
-   "kind": "학사",
-   "school": "숭실대학교",
-   "campus": "",
-   "src": "3b348584",
-   "foundAt": "2026-10-12",
-   "thumb": "data/news/img/f153c78c916be8e1.webp"
-  },
-  {
-   "title": "학사 2026학년도 겨울계절제 차세대반도체 혁신융합대학 간 학점교류 신청 안내",
-   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026%ED%95%99%EB%85%84%EB%8F%84-%EA%B2%A8%EC%9A%B8%EA%B3%84%EC%A0%88%EC%A0%9C-%EC%B0%A8%EC%84%B8%EB%8C%80%EB%B0%98%EB%8F%84%EC%B2%B4-%ED%98%81%EC%8B%A0%EC%9C%B5%ED%95%A9%EB%8C%80%ED%95%99-%EA%B0%84&keyword",
-   "postedAt": "2026-10-12",
-   "kind": "학사",
-   "school": "숭실대학교",
-   "campus": "",
-   "src": "3b348584",
-   "foundAt": "2026-10-12",
-   "desc": "*해당 공고문은 대학별 학점교류 안내에 따라 업데이트 되므로, 반드시 최신 버전으로 확인 바랍니다."
   }
  ]
 }
