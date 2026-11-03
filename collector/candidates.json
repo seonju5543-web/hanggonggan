@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-11-03",
- "count": 1584,
+ "count": 1587,
  "items": [
   {
    "title": "2027학년도 관정재단 장학생(학부생) 선발 안내_26.11.20.(금) 1..",
@@ -56,6 +56,15 @@
    "attachments": [],
    "deadlineHint": null,
    "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-11-03"
+  },
+  {
+   "title": "2027학년도 관정재단 장학생 선발 공고",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30308&pageNo=1",
+   "attachments": [],
+   "deadlineHint": "지원기간: 2026. 11. 25.(수) 23시 59분까지(이메일 도착시간 기준) □ 지원방법: 첨부 신청서 및 신청서 기재사항 증빙서류, 인적",
+   "school": "중앙대학교",
    "campus": "",
    "foundAt": "2026-11-03"
   },
@@ -167,6 +176,24 @@
    "foundAt": "2026-11-03",
    "bodyDeadline": "2026-11-10",
    "bodyDeadlineText": "조회수 246 ㅇ 학생지원팀 신청마감: 2026 년 11 월 10 일(22:59까지)"
+  },
+  {
+   "title": "[교외-11/24]2027학년도 관정재단 신규장학생 선발 안내(학교지원)",
+   "url": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4OTMlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "고려대학교",
+   "campus": "",
+   "foundAt": "2026-11-03"
+  },
+  {
+   "title": "[교외-11/24]2027학년도 관정재단 신규장학생 선발 안내(학교지원)",
+   "url": "https://www.korea.ac.kr/ko/568/subview.do#n-%5B%EA%B5%90%EC%99%B8-11%2F24%5D2027%ED%95%99%EB%85%84%EB%8F%84%20%EA%B4%80%EC%A0%95%EC%9E%AC%EB%8B%A8%20%EC%8B%A0%EA%B7%9C%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4(%ED%95%99%EA%B5%90%EC%A7%80%EC%9B%90)",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "고려대학교",
+   "campus": "",
+   "foundAt": "2026-11-03"
   },
   {
    "title": "장학금부터 취업까지, 나에게 필요한 청년지원정보 확인하기",
