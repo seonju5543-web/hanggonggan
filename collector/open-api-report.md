@@ -1,15 +1,12 @@
-## 🛰 공공 API 로봇 리포트 (2026-11-03)
+## 🛰 공공 API 로봇 리포트 (2026-11-04)
 
-- ✅ **K-Startup 사업공고** — 받은 행 136 · 실은 글 **15** · 버림: 공모전·대외활동 아님(지원사업 등) 108 · 상한 15건 초과 13
+- ✅ **K-Startup 사업공고** — 받은 행 136 · 실은 글 **15** · 버림: 공모전·대외활동 아님(지원사업 등) 108 · 상한 15건 초과 10 · 마감 지남 3
   - 자격 줄 있는 글 15/15 · 원문 안내 있는 글 15/15
   - 첫 행 칸: `aply_excl_trgt_ctnt, aply_mthd_eml_rcpt_istc, aply_mthd_etc_istc, aply_mthd_fax_rcpt_istc, aply_mthd_onli_rcpt_istc, aply_mthd_pssr_rcpt_istc, aply_mthd_vst_rcpt_istc, aply_trgt, aply_trgt_ctnt, biz_aply_url, biz_enyy, biz_gdnc_url, biz_pbanc_nm, biz_prch_dprt_nm, biz_trgt_age, detl_pg_url, id, intg_pbanc_biz_nm, intg_pbanc_yn, pbanc_ctnt, pbanc_ntrp_nm, pbanc_rcpt_bgng_dt, pbanc_rcpt_end_dt, pbanc_sn, prch_cnpl_no, prfn_matr, rcrt_prgs_yn, sprv_inst, supt_biz_clsfc, supt_regin`
-  - 대외활동 · 스타트업을 위한 정부 R&D 특강 (~2026-11-03) — https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179674
-  - 대외활동 · 2026 용인 반도체 스타트업 육성 전략 포럼 참가자 모집 (~2026-11-03) — https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179608
-  - 대외활동 · [성동구 사회적경제지원센터 x KT&G 상상플래닛] 현장사례 아카데미 <착한 사업을 위해, 되는 사업을 만들었습니다. > (~2026-11-03) — https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179600
+  - 대외활동 · 2026년 스타트업, 중소기업, 소상공인을 위한 M&A 전략 세미나 (~2026-11-04) — https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179557
+  - 공모전 · [구리시 청년내일센터] 2026 창업아이디어 경진대회 참가자 모집 (~2026-11-05) — https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179472
+  - 대외활동 · <2026년 AI 활용 제조창업 올인원 실전 교육> 프로그램 참여자 모집 (~2026-11-06) — https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179593
   - 주소 고르기 (번호 칸 `pbanc_sn` · 점수 2 글 번호 있음 · 1 그 밖 · 0 첫 화면·번호 없는 보기 화면):
-    - 179674 · 스타트업을 위한 정부 R&D 특강 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179674 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179674(2)
-    - 179608 · 2026 용인 반도체 스타트업 육성 전략 포럼 참가자  → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179608 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179608(2)
-    - 179600 · [성동구 사회적경제지원센터 x KT&G 상상플래닛] 현 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179600 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179600(2) · biz_gdnc_url=https://forms.gle/VghWrTd5fSRfT5Dx9(1)
     - 179557 · 2026년 스타트업, 중소기업, 소상공인을 위한 M&A → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179557 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179557(2)
     - 179472 · [구리시 청년내일센터] 2026 창업아이디어 경진대회  → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179472 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179472(2) · biz_gdnc_url=http://guristartup.or.kr/bbs/board.php?bo_table=cnotice&wr_id=1361(2)
     - 179593 · <2026년 AI 활용 제조창업 올인원 실전 교육> 프 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179593 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179593(2)
@@ -22,16 +19,17 @@
     - 179458 · [숭실대학교 캠퍼스타운] 생성형 AI 활용 기초 및 업 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179458 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179458(2) · biz_gdnc_url=https://startup.ssu.ac.kr/board/notice/4067?boardEnName=notice(2)
     - 179552 · AI 활용 소상공인 및 전통시장 매니저 실무 역량 과정 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179552 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179552(2)
     - 179611 · [청년 취창업 특강] 나만의 일을 만들어가는 방법 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179611 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179611(2)
-- ✅ **1365 봉사참여정보** — 받은 행 500 · 실은 글 **15** · 상세 내용 15/15건 · 버림: 대학생·청년 대상 아님 445 · 상한 15건 초과 38 · 같은 글 2
-  - 자격 줄 있는 글 11/15 · 원문 안내 있는 글 15/15
+    - 179680 · <2026년 AI 활용 온라인 플랫폼 제작 교육> 참여 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179680 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179680(2)
+    - 179638 · 2026 서구토탈창업아카데미 참가자 모집 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179638 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179638(2)
+    - 179591 · 2026 논산시 사회적경제 창업 아카데미 참여자 모집 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179591 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179591(2)
+- ✅ **1365 봉사참여정보** — 받은 행 500 · 실은 글 **15** · 상세 내용 15/15건 · 버림: 대학생·청년 대상 아님 445 · 상한 15건 초과 36 · 마감 지남 2 · 같은 글 2
+  - 자격 줄 있는 글 10/15 · 원문 안내 있는 글 15/15
   - 첫 행 칸: `actBeginTm, actEndTm, actPlace, adultPosblAt, gugunCd, nanmmbyNm, noticeBgnde, noticeEndde, progrmBgnde, progrmEndde, progrmRegistNo, progrmSj, progrmSttusSe, sidoCd, srvcClCode, url, yngbgsPosblAt`
   - 코드 칸 값(첫 세 행): gugunCd=5710000|4190000|3140000 · sidoCd=6430000|6420000|6110000
-  - 대외활동 · [경남도박문제예방치유센터]인제대학교 캠퍼스 내 도박문제 예방캠페인 봉사자를 모집합니다. (~2026-11-03) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3543097
-  - 대외활동 · 학장천 청소년 공부방 "달빛공부방" 청소년 멘토링 및 안전지키미( 대학생봉사자 )모집 (~2026-11-03) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3545171
   - 대외활동 · 행사 안전요원으로 활동할 대학생 자원봉사활동 (~2026-11-04) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3532854
+  - 대외활동 · [강남세움복지관] 11/5 동행축제 행사 진행 보조 자원봉사자 모집 (대학생, 주민 누구나 가능) (~2026-11-05) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3526859
+  - 대외활동 · *대학생* 자원봉사자 모집 [제1회 어린이·청소년 축제 「놀이장」] (~2026-11-05) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3543189
   - 주소 고르기 (번호 칸 `progrmRegistNo` · 점수 2 글 번호 있음 · 1 그 밖 · 0 첫 화면·번호 없는 보기 화면):
-    - 3543097 · [경남도박문제예방치유센터]인제대학교 캠퍼스 내 도박문제 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3543097 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3543097(2)
-    - 3545171 · 학장천 청소년 공부방 "달빛공부방" 청소년 멘토링 및  → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3545171 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3545171(2)
     - 3532854 · 행사 안전요원으로 활동할 대학생 자원봉사활동 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3532854 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3532854(2)
     - 3526859 · [강남세움복지관] 11/5 동행축제 행사 진행 보조 자 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3526859 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3526859(2)
     - 3543189 · *대학생* 자원봉사자 모집 [제1회 어린이·청소년 축제 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3543189 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3543189(2)
@@ -45,13 +43,16 @@
     - 3545453 · 청년과 대학생이 바꾸는 지금 1회차 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3545453 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3545453(2)
     - 3502823 · (대학생,성인)평택시 다함께돌봄센터 1호점 방과후 자원 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3502823 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3502823(2)
     - 3541774 · 상상도시숲 무궁화 나무심기(대학생 자원봉사자 모집) → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3541774 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3541774(2)
-- ✅ **온통청년 청년콘텐츠** — 받은 행 30 · 실은 글 **8** · 버림: 공모전·대외활동 아님(소식 글 등) 22
-  - 자격 줄 있는 글 1/8 · 원문 안내 있는 글 0/8
+    - 3519474 · 탈북민대학생멘토링 - 간호학 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3519474 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3519474(2)
+    - 3533799 · (대학생) [어린이 고전 읽기 백일장] 행사 운영 지원 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3533799 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3533799(2)
+- ✅ **온통청년 청년콘텐츠** — 받은 행 30 · 실은 글 **9** · 버림: 공모전·대외활동 아님(소식 글 등) 21
+  - 자격 줄 있는 글 1/9 · 원문 안내 있는 글 0/9
   - 첫 행 칸: `bbsSn, pstSn, pstSeSn, pstSeNm, pstTtl, pstWholCn, pstInqCnt, pstUrlAddr, atchFile, frstRgtrNm, frstRegDt, lastMdfrNm, lastMdfcnDt`
+  - 대외활동 · HD현대삼호- [K-뉴딜 아카데미] HD현대 선박건조 필드테크니션 교육생 모집 — https://www.youthcenter.go.kr/bbs03View/48/10865
   - 대외활동 · 공주시청년센터 - 「공주 크리에이티브 IP 캠프」 모집 — https://www.youthcenter.go.kr/bbs03View/48/10858
   - 대외활동 · 미래내일 일경험 기업 실무 프로젝트 참여자 모집 - 3. IT 직무 — https://www.youthcenter.go.kr/bbs03View/48/10853
-  - 대외활동 · 미래내일 일경험 기업 실무 프로젝트 참여자 모집 - 2. 경영사무 — https://www.youthcenter.go.kr/bbs03View/48/10852
   - 주소 고르기 (번호 칸 `pstSn` · 점수 2 글 번호 있음 · 1 그 밖 · 0 첫 화면·번호 없는 보기 화면):
+    - 10865 · HD현대삼호- [K-뉴딜 아카데미] HD현대 선박건조  → https://www.youthcenter.go.kr/bbs03View/48/10865 · 살핀 칸: 주소 칸 없음
     - 10858 · 공주시청년센터 - 「공주 크리에이티브 IP 캠프」 모집 → https://www.youthcenter.go.kr/bbs03View/48/10858 · 살핀 칸: 주소 칸 없음
     - 10853 · 미래내일 일경험 기업 실무 프로젝트 참여자 모집 - 3 → https://www.youthcenter.go.kr/bbs03View/48/10853 · 살핀 칸: 주소 칸 없음
     - 10852 · 미래내일 일경험 기업 실무 프로젝트 참여자 모집 - 2 → https://www.youthcenter.go.kr/bbs03View/48/10852 · 살핀 칸: 주소 칸 없음
@@ -60,14 +61,15 @@
     - 10841 · 구리시청년내일센터 - 2026 구리시청년내일센터 창업  → https://www.youthcenter.go.kr/bbs03View/48/10841 · 살핀 칸: 주소 칸 없음
     - 10840 · 구리시청년내일센터 - 2026 청년교류 프로그램 <내  → https://www.youthcenter.go.kr/bbs03View/48/10840 · 살핀 칸: 주소 칸 없음
     - 10836 · 국무조정실 - 정부위원회 청년위원 통합공모 안내 → https://www.youthcenter.go.kr/bbs03View/48/10836 · 살핀 칸: 주소 칸 없음
-- ✅ **온통청년 청년정책** — 받은 행 3840 · 실은 글 **15** · 버림: 공모전·대외활동 아님(주거·금융 등 정책) 3591 · 마감 지남 100 · 상한 15건 초과 85 · 원문 주소 없음 37 · 같은 글 11 · 같은 기관 홈페이지(원문 주소 없음) 1
-  - 자격 줄 있는 글 12/15 · 원문 안내 있는 글 15/15
+- ✅ **온통청년 청년정책** — 받은 행 3866 · 실은 글 **15** · 버림: 공모전·대외활동 아님(주거·금융 등 정책) 3615 · 마감 지남 100 · 상한 15건 초과 87 · 원문 주소 없음 37 · 같은 글 11 · 같은 기관 홈페이지(원문 주소 없음) 1
+  - 자격 줄 있는 글 11/15 · 원문 안내 있는 글 15/15
   - 첫 행 칸: `plcyNo, bscPlanCycl, bscPlanPlcyWayNo, bscPlanFcsAsmtNo, bscPlanAsmtNo, pvsnInstGroupCd, plcyPvsnMthdCd, plcyAprvSttsCd, plcyNm, plcyKywdNm, plcyExplnCn, lclsfNm, mclsfNm, plcySprtCn, sprvsnInstCd, sprvsnInstCdNm, sprvsnInstPicNm, operInstCd, operInstCdNm, operInstPicNm, sprtSclLmtYn, aplyPrdSeCd, bizPrdSeCd, bizPrdBgngYmd, bizPrdEndYmd, bizPrdEtcCn, plcyAplyMthdCn, srngMthdCn, aplyUrlAddr, sbmsnDcmntCn, etcMttrCn, refUrlAddr1, refUrlAddr2, sprtSclCnt, sprtArvlSeqYn, sprtTrgtMinAge, sprtTrgtMaxAge, sprtTrgtAgeLmtYn, mrgSttsCd, earnCndSeCd, earnMinAmt, earnMaxAmt, earnEtcCn, addAplyQlfcCndCn, ptcpPrpTrgtCn, inqCnt, rgtrInstCd, rgtrInstCdNm, rgtrUpInstCd, rgtrUpInstCdNm, rgtrHghrkInstCd, rgtrHghrkInstCdNm, zipCd, plcyMajorCd, jobCd, schoolCd, aplyYmd, frstRegDt, lastMdfcnDt, sbizCd`
-  - 코드 칸 값(첫 세 행): pvsnInstGroupCd=0054002|0054002|0054002 · plcyPvsnMthdCd=0042013|0042013|0042013 · plcyAprvSttsCd=0044002|0044002|0044002 · sprvsnInstCd=6271591|6271591|6271591 · operInstCd=       |       |        · aplyPrdSeCd=0057001|0057002|0057001 · bizPrdSeCd=0056001|0056001|0056002 · mrgSttsCd=0055003|0055003|0055003 · earnCndSeCd=0043001|0043001|0043001 · rgtrInstCd=6271246|6271246|6271246 · rgtrUpInstCd=6270000|6270000|6270000 · rgtrHghrkInstCd=6270000|6270000|6270000 · zipCd=27110,27140,27170,27200,27230,27260,2729|27110,27140,27170,27200,27230,27260,2729|27110,27140,27170,27200,27230,27260,2729 · plcyMajorCd=0011009|0011009|0011009 · jobCd=0013010|0013010|0013010 · schoolCd=0049010|0049010|0049010 · sbizCd=0014010|0014010|0014010
+  - 코드 칸 값(첫 세 행): pvsnInstGroupCd=0054001|0054002|0054002 · plcyPvsnMthdCd=0042006|0042013|0042013 · plcyAprvSttsCd=0044002|0044002|0044002 · sprvsnInstCd=B552644|6540000|5890000 · operInstCd=       |       |        · aplyPrdSeCd=0057001|0057002|0057001 · bizPrdSeCd=0056001|0056002|0056001 · mrgSttsCd=0055003|0055003|0055003 · earnCndSeCd=0043001|0043003|0043001 · rgtrInstCd=B552644|6540055|5890000 · rgtrUpInstCd=B000000|0000000|6130000 · rgtrHghrkInstCd=B000000|6540000|6130000 · zipCd=11110,11140,11170,11200,11215,11230,1126|52111,52113,52130,52140,52180,52190,5221|12830 · plcyMajorCd=0011009|0011009|0011009 · jobCd=0013003|0013010|0013010 · schoolCd=0049010|0049010|0049004,0049005,0049006,0049007 · sbizCd=0014010|0014010|0014003,0014004,0014005,0014009
+  - 대외활동 · 2026 우수인재 연계 기업인턴십 (~2026-11-06) — https://www.kocca.kr/kocca/bbs/view/B0000137/2012372.do?searchCnd=1&searchWrd=%EC%9D%B8%ED%84%B4&cateTp1=&cateTp2=&useYn=&menuNo=204802&categorys=0&subcate=0&cateCode=&type=&instNo=0&questionTp=&ufSetting=&recovery=&option1=&option2=&year=&morePage=&qtp=&domainId=&sortCode=&pageIndex=1
   - 대외활동 · 청년 생명사랑 서포터즈 운영 (~2026-11-30) — https://www.usspc.or.kr/
   - 대외활동 · (연수구) 청년 자격증 응시료 지원 (~2026-11-30) — https://youth.incheon.go.kr/youthpolicy/youthPolicyInfoDetail.do?poly_seq=419
-  - 대외활동 · 2026년 평택시 청년창업도전 아카데미 (~2026-11-30) — https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000
   - 주소 고르기 (번호 칸 `plcyNo` · 점수 2 글 번호 있음 · 1 그 밖 · 0 첫 화면·번호 없는 보기 화면):
+    - 20261103005400114715 · 2026 우수인재 연계 기업인턴십 → https://www.kocca.kr/kocca/bbs/view/B0000137/2012372.do?searchCnd=1&searchWrd=%EC%9D%B8%ED%84%B4&cateTp1=&cateTp2=&useYn=&menuNo=204802&categorys=0&subcate=0&cateCode=&type=&instNo=0&questionTp=&ufSetting=&recovery=&option1=&option2=&year=&morePage=&qtp=&domainId=&sortCode=&pageIndex=1 · 살핀 칸: aplyUrlAddr=https://www.kocca.kr/kocca/bbs/view/B0000137/2012372.do?searchCnd=1&searchWrd=%EC%9D%B8%ED%84%B4&cateTp1=&cateTp2=&useYn=&menuNo=204802&categorys=0&subcate=0&cateCode=&type=&instNo=0&questionTp=&ufSetting=&recovery=&option1=&option2=&year=&morePage=&qtp=&domainId=&sortCode=&pageIndex=1(1) · refUrlAddr1=https://www.kocca.kr/kocca/bbs/view/B0000137/2012372.do?searchCnd=1&searchWrd=%EC%9D%B8%ED%84%B4&cateTp1=&cateTp2=&useYn=&menuNo=204802&categorys=0&subcate=0&cateCode=&type=&instNo=0&questionTp=&ufSetting=&recovery=&option1=&option2=&year=&morePage=&qtp=&domainId=&sortCode=&pageIndex=1(1)
     - 20260410005400212677 · 청년 생명사랑 서포터즈 운영 → https://www.usspc.or.kr/ · 살핀 칸: refUrlAddr1=https://www.usspc.or.kr/(0·확인 로봇이 문제로 확정)
     - 20260406005400212441 · (연수구) 청년 자격증 응시료 지원 → https://youth.incheon.go.kr/youthpolicy/youthPolicyInfoDetail.do?poly_seq=419 · 살핀 칸: aplyUrlAddr=https://youth.incheon.go.kr/youthpolicy/youthPolicyInfoDetail.do?poly_seq=419(2) · refUrlAddr1=https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=40&bcd=notice(1)
     - 20260326005400212290 · 2026년 평택시 청년창업도전 아카데미 → https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000 · 살핀 칸: refUrlAddr1=https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000(2·확인 로봇이 문제로 확정)
@@ -82,8 +84,7 @@
     - 20260430005400212977 · 청년정책제안 아이디어 공모 → https://www.cheonan.go.kr/kor/sub06_04_03_05.do · 살핀 칸: refUrlAddr1=https://www.cheonan.go.kr/kor/sub06_04_03_05.do(1)
     - 20260421005400212793 · 청년 체인지메이커 아카데미 운영 → https://jejuyouthdream.com/policy/detail/70 · 살핀 칸: aplyUrlAddr=https://www.jeju.go.kr/index.htm(0) · refUrlAddr1=https://jejuyouthdream.com/policy/detail/70(1)
     - 20260413005400212702 · 대학생 봉사활동 활성화 → https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56236 · 살핀 칸: refUrlAddr1=https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56236(2)
-    - 20260407005400212532 · 이전공공기관 취업아카데미 운영 → https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56147 · 살핀 칸: refUrlAddr1=https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56147(2)
 
-data/activities.json — API 글 53 → **53건** (전체 201건)
+data/activities.json — API 글 52 → **54건** (전체 200건)
 
 > 열쇠·출처 설명: `collector/open-api.mjs` 머리말 · 바꾸는 규칙: `collector/open-api-map.mjs` · 설계: `docs/designs/external-sources.md` §10
