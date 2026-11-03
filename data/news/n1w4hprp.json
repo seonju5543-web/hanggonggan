@@ -1,7 +1,19 @@
 {
  "school": "경희대학교",
- "updatedAt": "2026-11-02",
+ "updatedAt": "2026-11-03",
  "items": [
+  {
+   "title": "공통 [연구처] 경희대학교 연구처 연구진흥팀(국제) 계약직 채용 공고",
+   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323467",
+   "postedAt": "2026-11-02",
+   "postId": "323467",
+   "kind": "채용",
+   "school": "경희대학교",
+   "campus": "",
+   "src": "a92b27ac",
+   "foundAt": "2026-11-03",
+   "desc": "경희대학교 국제캠퍼스 연구처 연구진흥팀에서 함께 근무할 직원을 아래와 같이 모집합니다 ."
+  },
   {
    "title": "공통 긴급 보안 PHP 패치 작업에 따른 정보서비스 중지 안내(11.1(일) 오전 6시 ~ 8시)",
    "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323453",

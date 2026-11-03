@@ -1,7 +1,18 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-11-02",
+ "updatedAt": "2026-11-03",
  "items": [
+  {
+   "title": "[학생성공센터] 자유전공계열 학생 대상 비교과·안내 정보 수요조사 안내(~11.13.)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141509&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-03",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-03",
+   "thumb": "data/news/img/bccef58f71d6c158.webp",
+   "desc": "학생성공센터행정실 학생성공센터에서는 자유전공계열 학생 여러분에게 필요한 비교과 프로그램과 대학생활 안내 정보를 파악하기 위해 수요조사를 진행합니다."
+  },
   {
    "title": "[학생사회공헌단 다소미 X 학생성공센터] 2026 배워서 남 주는 프로젝트 성과공유회 개최 안내",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141494&article.offset=0&articleLimit=10",
@@ -425,16 +436,6 @@
    "src": "45ec8fd1",
    "foundAt": "2026-10-23",
    "desc": "활기찬 삶의 계획속에서 자신의 건강에 관심을 갖고 하루30분 운동은 어떠신지요? 자연과학캠퍼스 학내 구성원들이 언제,어디서나 등록을 할 수 있도록 킹고 포털을 통한 1398피트니스센터 11월 등록방법을 다음과 같이…"
-  },
-  {
-   "title": "Wiley Hybrid Journal OA 논문출판비용(APC) 추가 지원 안내(11/3~)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140738&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-22",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-22",
-   "desc": "Wiley Hybrid Journal 오픈액세스 APC(출판비용) 추가 지원에 대하여 다음과 같이 안내드리오니, 논문 출판 시 참고하시기 바랍니다."
   }
  ]
 }

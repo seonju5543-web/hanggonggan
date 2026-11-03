@@ -1,7 +1,50 @@
 {
  "school": "조선대학교",
- "updatedAt": "2026-11-02",
+ "updatedAt": "2026-11-03",
  "items": [
+  {
+   "title": "[CSU창작마을센터] 창업융합교육 메이커 클래스(목공) — 우드반지 제작 교육 2차",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282530/artclView.do",
+   "postedAt": "2026-11-03",
+   "school": "조선대학교",
+   "campus": "",
+   "src": "c6a7801d",
+   "foundAt": "2026-11-03",
+   "thumb": "data/news/img/c93bf7a1f224077c.webp",
+   "desc": "모집기간: 2026. 11. 03.(화) ~ 11. 16.(월) 교육일시: 2026. 11. 24.(화) 18:00~20:00 교육장소: CSU 창작마을센터 목공실 교육대상: (예비)창업자, 지역 내 메이커,…"
+  },
+  {
+   "title": "[반도체첨단패키징전문인력양성센터] 반도체 첨단패키징 계약정원제 학생 모집 안내",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282529/artclView.do",
+   "postedAt": "2026-11-03",
+   "school": "조선대학교",
+   "campus": "",
+   "src": "c6a7801d",
+   "foundAt": "2026-11-03",
+   "desc": "▶ 모집분야 및 모집인원 모집인원 지원 기간 지원자격 및 운영형태 계약정원 ( 공학석사 / 박사 ) 반도체융합전공 반도체융합전공 석사 / 박사 학위 과정과 동일"
+  },
+  {
+   "title": "[한국공학교육인증원] 전국 대학(전문대학 포함) 학생 대상 백일장",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282527/artclView.do",
+   "postedAt": "2026-11-03",
+   "school": "조선대학교",
+   "campus": "",
+   "src": "c6a7801d",
+   "foundAt": "2026-11-03",
+   "thumb": "data/news/img/4cd4d2dfc0d7ec85.webp"
+  },
+  {
+   "title": "[ 보건진료소 ] 2026년 건강증진 캠페인 실시 안내",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282523/artclView.do",
+   "postedAt": "2026-11-03",
+   "kind": "생활",
+   "school": "조선대학교",
+   "campus": "",
+   "src": "c6a7801d",
+   "foundAt": "2026-11-03",
+   "thumb": "data/news/img/a491edaad14e4b8d.webp",
+   "desc": "보건진료소 보건진료소에서는 2026 학년도 건강증진 사업의 일환으로 결핵 검사 , 금연 상담 , 손위생 캠페인, 예방접종 상담 등 건강증진 캠페인을 다음과 같이 실시합니다 . 여러분의 많은 관심과 참여 바랍니다 ."
+  },
   {
    "title": "【대학원】2027학년도 전기 일반대학원 신입생 모집",
    "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282512/artclView.do",
@@ -395,18 +438,6 @@
    "foundAt": "2026-10-06",
    "thumb": "data/news/img/cf09d0f1cd72f19b.webp",
    "desc": "교육혁신원 교육과정관리팀에서는 재학생들의 핵심역량 진단 결과를 통한 우수 , 취약 역량 파악 및 개선사항 도출을 위해 재학생들의 CSU- 핵심역량 (3C 역량 ) 진단을 아래와 같이 시행하오니 재학생 여러분의 많은…",
-   "src": "c6a7801d"
-  },
-  {
-   "title": "[취업전략팀] 이트너스 취업설명회",
-   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/281770/artclView.do",
-   "postedAt": "2026-10-06",
-   "kind": "행사",
-   "school": "조선대학교",
-   "campus": "",
-   "foundAt": "2026-10-06",
-   "thumb": "data/news/img/73adf4a241fda2cb.webp",
-   "desc": "대학혁신지원사업의 일환으로 \"인사·총무부터 플랫폼까지, 경영지원 전문기업\" 이트너스 채용설명회를 실시합니다.",
    "src": "c6a7801d"
   }
  ]

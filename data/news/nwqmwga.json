@@ -1,7 +1,26 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-11-02",
+ "updatedAt": "2026-11-03",
  "items": [
+  {
+   "title": "[채용공고] 5.18연구소 교육공무원(조교) 육아휴직 대체인력 공개채용 공고",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70881",
+   "postedAt": "2026-11-03",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-03"
+  },
+  {
+   "title": "[취업정보] 2026년 글로컬대학사업 「빅데이터분석기사, 차근차근 실습하기」",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70879",
+   "postedAt": "2026-11-03",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-03"
+  },
   {
    "title": "[취업정보] 2026 거점형 특화프로그램 『2026 스포츠 산업 및 스포츠...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70876",
@@ -382,26 +401,6 @@
    "campus": "",
    "src": "b7347301",
    "foundAt": "2026-10-27"
-  },
-  {
-   "title": "[취업정보] 2026년 글로컬대학사업 「빅데이터분석기사, 차근차근 실습하기」",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70809",
-   "postedAt": "2026-10-27",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-27"
-  },
-  {
-   "title": "[채용공고] 전남대 서비스디자인융합연구소 인문사회연구소지원사업 2026년...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70808",
-   "postedAt": "2026-10-27",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-27",
-   "thumb": "data/news/img/01ba5a9dc2da0d61.webp"
   }
  ]
 }

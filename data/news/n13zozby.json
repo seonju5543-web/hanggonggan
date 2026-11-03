@@ -1,7 +1,17 @@
 {
  "school": "부산대학교",
- "updatedAt": "2026-11-02",
+ "updatedAt": "2026-11-03",
  "items": [
+  {
+   "title": "[AI융합교육원][Microsoft] 청년 취·창업을 위한「AI 실전 프로젝트 ...",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511937",
+   "postedAt": "2026-11-03",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-03",
+   "thumb": "data/news/img/ee03dd6a978adbd1.webp"
+  },
   {
    "title": "[언어교육원]2026학년도 부산대학교 재학생의 외국어 학습 수요에 대한 설문 조...",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511888",
@@ -413,16 +423,6 @@
    "foundAt": "2026-10-26",
    "thumb": "data/news/img/612321711f225fb6.webp",
    "desc": "- 기간 : 2026. 10. 26.(월) ~ 10. 27.(화) - 장소(내용): 시월광장(연예인 및 동아리 공연, 부스 운영 등), 제6공학관 및 운죽정 앞(낙서 도로)"
-  },
-  {
-   "title": "[부산광역시] 「2026 K-GEO Festa」행사 안내",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511747",
-   "postedAt": "2026-10-26",
-   "kind": "행사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-26"
   }
  ]
 }

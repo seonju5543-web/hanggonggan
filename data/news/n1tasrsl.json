@@ -1,6 +1,6 @@
 {
  "school": "국민대학교",
- "updatedAt": "2026-11-02",
+ "updatedAt": "2026-11-03",
  "items": [
   {
    "title": "학사 수료예정증명서 발급 안내",
@@ -91,33 +91,6 @@
    "campus": "",
    "foundAt": "2026-10-10",
    "thumb": "data/news/img/7bba38b74988764a.webp",
-   "src": "78d70305"
-  },
-  {
-   "title": "2026학년도 2학기 제1전공 변경신청 안내",
-   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12465/view.do?currentPageNo=1",
-   "postedAt": "2026-10-03",
-   "school": "국민대학교",
-   "campus": "",
-   "foundAt": "2026-10-03",
-   "src": "78d70305"
-  },
-  {
-   "title": "2026학년도 2학기 제1전공 신청 안내",
-   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12464/view.do?currentPageNo=1",
-   "postedAt": "2026-10-03",
-   "school": "국민대학교",
-   "campus": "",
-   "foundAt": "2026-10-03",
-   "src": "78d70305"
-  },
-  {
-   "title": "2026학년도 2학기 다전공 신청",
-   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12463/view.do?currentPageNo=1",
-   "postedAt": "2026-10-03",
-   "school": "국민대학교",
-   "campus": "",
-   "foundAt": "2026-10-03",
    "src": "78d70305"
   }
  ]
