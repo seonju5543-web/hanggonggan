@@ -1,9 +1,9 @@
-## 📄 신청서 원본 → PDF 리포트 (2026-11-04)
+## 📄 신청서 원본 → PDF 리포트 (2026-11-05)
 
 공고 첨부의 신청서 원본(HWP·HWPX·DOC·DOCX·PDF)을 글자 하나 안 바꾸고 PDF 로 바꿔 `data/forms-pdf/` 에 둡니다(마감 전 공고만 · 마감 뒤 지움).
 🔴 양식을 만들어 내지 않습니다 — 못 바꾼 것은 아래에 이유와 함께 남깁니다.
 
-대상 공고 24건 · 파일 34개 — 이번에 바꿈 0 · 이미 있어 건너뜀 34 · 못 바꿈 0 · 원본을 아직 못 받음 8 · 마감 지나 지움 3건
+대상 공고 24건 · 파일 34개 — 이번에 바꿈 0 · 이미 있어 건너뜀 34 · 못 바꿈 0 · 원본을 아직 못 받음 8 · 마감 지나 지움 0건
 
 ### 원본을 아직 못 받은 신청서 — 8개 (deepfetch 가 받는 몫 · collector/run-deepfetch.txt targets:)
 - auto-oardid323054menuno200318 · 2026-2학기 반영장학 선발 공지문 및 학업계획서 양식.hwpx
@@ -14,9 +14,4 @@
 - auto-amepagescholarshipnotice-0zk0x95 · 붙임1_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf
 - auto-oardid323410menuno200318 · 공과대학 특성화 장학 프로그램 신청서fv.hwp
 - auto-116bnum5233cate0qidx5233 · 붙임1_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf
-
-### 마감이 지나 지운 공고 — 3건
-- auto-0713no2515690sitedvscdkr
-- auto-ent2431269173artclviewdo
-- auto-krbbskr845988artclviewdo
 
