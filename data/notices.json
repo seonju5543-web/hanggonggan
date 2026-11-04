@@ -1,6 +1,44 @@
 {
- "updatedAt": "2026-11-03",
+ "updatedAt": "2026-11-04",
  "items": [
+  {
+   "title": "일반공지 2026년 국가근로장학금 동계방학 집중근로 프로그램 희망근로지 신청 안내 신촌/국제",
+   "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/944552/artclView.do",
+   "attachments": [
+    {
+     "name": "붙임1-1. 2026년 동계방학 집중근로 희망근로지 신청 매뉴얼(홈페이지).pdf",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015402/download.do"
+    },
+    {
+     "name": "붙임1-2. 2026년 동계방학 집중근로 희망근로지 신청 매뉴얼(모바일).pdf",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015403/download.do"
+    },
+    {
+     "name": "붙임2. 2026년 동계방학 집중근로 근로장학생 사전 선정기준(안).pdf",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015404/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "연세대학교 미래캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-04",
+   "bodyDeadline": "2026-11-12",
+   "bodyDeadlineText": "4. 일정 가. 근로장학생 희망기관 신청: 2026. 10. 30.(금) ~ 2026. 11. 12(목) 18시"
+  },
+  {
+   "title": "2026-2학기 주거안정장학 지급요청서 작성 안내",
+   "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/521071",
+   "attachments": [
+    {
+     "name": "주거안정장학금+지급요청서+작성+매뉴얼(학생).pdf",
+     "url": "https://wise.dongguk.ac.kr/cmmn/fileDown.do?filename=%EC%A3%BC%EA%B1%B0%EC%95%88%EC%A0%95%EC%9E%A5%ED%95%99%EA%B8%88%2B%EC%A7%80%EA%B8%89%EC%9A%94%EC%B2%AD%EC%84%9C%2B%EC%9E%91%EC%84%B1%2B%EB%A7%A4%EB%89%B4%EC%96%BC(%ED%95%99%EC%83%9D).pdf&filepath=/files/article/servicenotice/521071/&filerealname=78DC96D217F44F2A94203E30BBCB4069.pdf"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-04"
+  },
   {
    "title": "2027학년도 관정재단 장학생 선발 공고",
    "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30308&pageNo=1",
@@ -8669,20 +8707,6 @@
    "foundAt": "2026-10-06"
   },
   {
-   "title": "[대산농촌재단] 2027년도 대산농촌재단 장학생 선발 안내",
-   "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520733",
-   "attachments": [
-    {
-     "name": "[붙임2] 2027 대산장학생 선발요강.pdf",
-     "url": "javascript:downGO('[붙임2] 2027 대산장학생 선발요강.pdf','/files/article/servicenotice/520733/','43CFD707F49E4E04BECCA25F09F73D39.pdf');"
-    }
-   ],
-   "deadlineHint": null,
-   "school": "동국대학교 WISE캠퍼스",
-   "campus": "",
-   "foundAt": "2026-10-06"
-  },
-  {
    "title": "[아산사회복지재단] 2027년 북한이탈청소년 장학생 선발 안내",
    "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158915&noCat=501",
    "attachments": [],
@@ -8983,22 +9007,6 @@
    "foundAt": "2026-10-05",
    "bodyDeadline": "2026-10-08",
    "bodyDeadlineText": "[교외] [대전청년내일재단] 2026년 하반기 인재육성(성취) 장학생 선발(~10/8)(기간 연장)"
-  },
-  {
-   "title": "[교외] 2026년 상반기분 통영시 대학생 학자금 이자 지원 공고(~9/23)",
-   "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/944083/artclView.do",
-   "attachments": [
-    {
-     "name": "통영시_2026년 상반기분 통영시 대학생 학자금 이자 지원 공고(안).hwp",
-     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1014580/download.do"
-    }
-   ],
-   "deadlineHint": "신청기간: 2026. 9. 2.(수) ~ 9. 23.(수) 17:00 나. 신청방법: 전자 우편, 방문, 등기우편 접수(팩스 불가) 1) 전자",
-   "school": "연세대학교 미래캠퍼스",
-   "campus": "",
-   "foundAt": "2026-10-05",
-   "bodyDeadline": "2026-09-23",
-   "bodyDeadlineText": "[교외] 2026년 상반기분 통영시 대학생 학자금 이자 지원 공고(~9/23)"
   },
   {
    "title": "[우양재단] 2026년 우양재단 동행장학생 모집",
