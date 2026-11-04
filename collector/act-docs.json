@@ -35,10 +35,6 @@
   "at": "2026-10-31",
   "tries": 1
  },
- "https://www.culture.go.kr/portal/cltBnf/cltSup/view.do?viewTp=2&rcrtSn=234939&menuNo=200104&sSort=2&pageIndex=1": {
-  "at": "2026-10-15",
-  "tries": 0
- },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53505&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-16",
   "tries": 1
