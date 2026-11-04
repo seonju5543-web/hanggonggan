@@ -593,24 +593,6 @@
   "round": "2026-12-31",
   "decidedAt": "2026-11-01"
  },
- "kosaf|2700388001|https://janghak.songpa.go.kr/22/?q=YToxOntzOjEyOiJrZXl3b3JkX3R5cGUiO3M6MzoiYWxsIjt9&bmode=view&idx=174161241&t=board": {
-  "ds": "kosaf",
-  "key": "2700388001",
-  "url": "https://janghak.songpa.go.kr/22/?q=YToxOntzOjEyOiJrZXl3b3JkX3R5cGUiO3M6MzoiYWxsIjt9&bmode=view&idx=174161241&t=board",
-  "source": "match",
-  "by": "로봇(재단 게시판 글과 짝 — 마감 같음 +2 · 재단 이름 +1 · 마감 해 +1 · 학기·반기 +1 · 장학 낱말 +1)",
-  "title": "2026년 하반기 송파구인재육성장학재단 장학생 선발 공고",
-  "firstAt": "2026-10-05",
-  "lastAt": "2026-10-05",
-  "tries": 1,
-  "status": "rejected",
-  "why": "다른 공고의 링크와 같은 주소(2026년 하반기 송파구인재육성장학재단 장학생 선발 공고)",
-  "checks": {
-   "C": "fail"
-  },
-  "round": "2026-10-02",
-  "decidedAt": "2026-10-05"
- },
  "kosaf|2700563001|board:https://bukgu.gwangju.kr/board.es?mid=b10201000000&bid=0275": {
   "ds": "kosaf",
   "key": "2700563001",
@@ -761,24 +743,6 @@
   "round": "2026-10-30",
   "decidedAt": "2026-10-13"
  },
- "kosaf|2703469001|https://paan.or.kr/sub/sub02_01.php?boardid=notice&mode=view&idx=46&sk=&sw=&offset=&category=": {
-  "ds": "kosaf",
-  "key": "2703469001",
-  "url": "https://paan.or.kr/sub/sub02_01.php?boardid=notice&mode=view&idx=46&sk=&sw=&offset=&category=",
-  "source": "match",
-  "by": "로봇(재단 게시판 글과 짝 — 재단 이름 +1 · 마감 해 +1 · 학기·반기 +1 · 장학 낱말 +1 · 게시일 +1)",
-  "title": "파안장학문화재단법인이 미래 성공이 기대되는 인재를 2026-2(후기) 장학생으로 선발…",
-  "firstAt": "2026-10-05",
-  "lastAt": "2026-10-05",
-  "tries": 1,
-  "status": "rejected",
-  "why": "다른 공고의 링크와 같은 주소(파안장학문화재단법인이 미래 성공이 기대되는 인재를 2026-2(후기) 장학생으로 선발…)",
-  "checks": {
-   "C": "fail"
-  },
-  "round": "2026-10-02",
-  "decidedAt": "2026-10-05"
- },
  "kosaf|2704211001|https://myungfoundation.or.kr/modules/bbs/bbsView.php?id=28&page=1&&code=bbs_notice&xid=1": {
   "ds": "kosaf",
   "key": "2704211001",
@@ -887,6 +851,27 @@
   "final": "https://www.gachon.ac.kr/kor/1146/subview.do?enc=Zm5jdDF8QEB8JTJGYmJzJTJGa29yJTJGNDc4JTJGMTI1ODA5JTJGYXJ0Y2xWaWV3LmRvJTNG",
   "decidedAt": "2026-10-05",
   "verifiedAt": "2026-10-05"
+ },
+ "notices|https://www.korea.ac.kr/ko/568/subview.do?article.offset=10#n-%5B%EA%B8%B0%EA%B8%88-10%2F8%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%ED%91%B8%EB%A5%B8%EC%86%94%20%EC%82%AC%ED%9A%8C%EC%A0%95%EC%9D%98%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4|https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjElMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D": {
+  "ds": "notices",
+  "key": "https://www.korea.ac.kr/ko/568/subview.do?article.offset=10#n-%5B%EA%B8%B0%EA%B8%88-10%2F8%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%ED%91%B8%EB%A5%B8%EC%86%94%20%EC%82%AC%ED%9A%8C%EC%A0%95%EC%9D%98%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4",
+  "url": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjElMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
+  "source": "twin",
+  "by": "로봇(같은 사이트·같은 제목 — 수집 검수 후보)",
+  "title": "[기금-10/8] 2026학년도 2학기 푸른솔 사회정의 장학금 신청 안내 (심사중) (선발결과는 11월 초중순 별도 메일로 안내 예정)",
+  "firstAt": "2026-11-05",
+  "lastAt": "2026-11-05",
+  "tries": 1,
+  "status": "suggest",
+  "why": "제목이 제목 자리가 아니라 본문에만 보임",
+  "checks": {
+   "C": "ok",
+   "L": "weak",
+   "H": "ok",
+   "T": "ok",
+   "R": "ok"
+  },
+  "decidedAt": "2026-11-05"
  },
  "notices|https://www.korea.ac.kr/ko/568/subview.do?article.offset=10&nttId=000100000000003861|https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjElMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D": {
   "ds": "notices",
