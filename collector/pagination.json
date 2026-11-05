@@ -45,7 +45,7 @@
    "kind": "page",
    "param": "pageNo"
   },
-  "checkedAt": "2026-11-04"
+  "checkedAt": "2026-11-05"
  },
  "https://www.hongik.ac.kr/kr/newscenter/notice.do": {
   "ok": false,
@@ -204,12 +204,8 @@
   "checkedAt": "2026-10-30"
  },
  "https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&": {
-  "ok": true,
-  "way": {
-   "kind": "page",
-   "param": "pageNo"
-  },
-  "checkedAt": "2026-11-04"
+  "ok": false,
+  "checkedAt": "2026-11-05"
  },
  "https://www.korea.ac.kr/ko/568/subview.do": {
   "ok": true,
@@ -218,7 +214,7 @@
    "param": "article.offset",
    "limit": 10
   },
-  "checkedAt": "2026-11-04"
+  "checkedAt": "2026-11-05"
  },
  "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100": {
   "ok": false,
@@ -230,7 +226,7 @@
    "kind": "page",
    "param": "pageNo"
   },
-  "checkedAt": "2026-11-04"
+  "checkedAt": "2026-11-05"
  },
  "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083": {
   "ok": false,

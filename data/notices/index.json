@@ -3,6 +3,14 @@
  "updatedAt": "2026-11-05",
  "schools": 44,
  "files": {
+  "경희대학교": {
+   "file": "n1w4hprp.json",
+   "count": 24
+  },
+  "동국대학교": {
+   "file": "n1or8oiw.json",
+   "count": 49
+  },
   "명지대학교": {
    "file": "ntyl0r5.json",
    "count": 22
@@ -22,10 +30,6 @@
   "상명대학교": {
    "file": "n1ozjjw8.json",
    "count": 16
-  },
-  "동국대학교": {
-   "file": "n1or8oiw.json",
-   "count": 48
   },
   "한국외국어대학교": {
    "file": "n19cz03g.json",
@@ -58,10 +62,6 @@
   "조선대학교": {
    "file": "n1qr99q6.json",
    "count": 22
-  },
-  "경희대학교": {
-   "file": "n1w4hprp.json",
-   "count": 23
   },
   "고려대학교": {
    "file": "n1lw6ycq.json",
