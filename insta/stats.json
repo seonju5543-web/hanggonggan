@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-04T01:43:49.102Z",
+ "updatedAt": "2026-11-05T01:51:27.406Z",
  "account": {
   "username": "handaejang_",
   "followers": 3,
@@ -429,6 +429,14 @@
    "likes": 9,
    "comments": 0,
    "saved": 0
+  },
+  {
+   "at": "2026-11-05",
+   "followers": 3,
+   "media": 3,
+   "likes": 9,
+   "comments": 0,
+   "saved": 0
   }
  ],
  "posts": [
@@ -442,7 +450,7 @@
    "likes": 1,
    "comments": 0,
    "type": "CAROUSEL_ALBUM",
-   "reach": 18,
+   "reach": 19,
    "saved": 0,
    "shares": 1,
    "error": null
@@ -457,7 +465,7 @@
    "likes": 4,
    "comments": 0,
    "type": "CAROUSEL_ALBUM",
-   "reach": 21,
+   "reach": 22,
    "saved": 0,
    "shares": 0,
    "error": null
@@ -472,7 +480,7 @@
    "likes": 4,
    "comments": 0,
    "type": "CAROUSEL_ALBUM",
-   "reach": 16,
+   "reach": 17,
    "saved": 0,
    "shares": 0,
    "error": null
