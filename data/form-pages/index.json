@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-05",
+ "updatedAt": "2026-11-06",
  "items": {
   "auto-oardid323011menuno200318": [
    {
@@ -831,14 +831,6 @@
     "at": "2026-11-04"
    }
   ],
-  "kosaf-2000403004": [
-   {
-    "src": "공고문(2026년 남양주시 재능장학생 선발).hwpx",
-    "srcBytes": 167061,
-    "none": true,
-    "at": "2026-11-04"
-   }
-  ],
   "kosaf-2700220006": [
    {
     "src": "1. (공고 제2026-95호 ) 2026년도 하반기 장학생 선발 공고.hwp",
@@ -1001,6 +993,19 @@
     "srcBytes": 80418,
     "none": true,
     "at": "2026-11-05"
+   }
+  ],
+  "auto-345bnum5233cate0qidx5233": [
+   {
+    "file": "auto-345bnum5233cate0qidx5233/1-elig-1s2isd-1_p3-5.pdf",
+    "name": "공고문 안 신청서 서식 (3, 5쪽)",
+    "pages": 2,
+    "bytes": 255987,
+    "src": "elig-1s2isd-1.hwpx",
+    "srcBytes": 77534,
+    "srcPages": "3, 5",
+    "from": "공고문 서식 쪽 떼기",
+    "at": "2026-11-06"
    }
   ]
  }
