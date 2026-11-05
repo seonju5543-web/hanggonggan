@@ -1,6 +1,43 @@
 {
- "updatedAt": "2026-11-05",
+ "updatedAt": "2026-11-06",
  "items": [
+  {
+   "title": "2026학년도 (재)빛고을장학재단 대학추천 장학생 선발 안내",
+   "url": "https://www3.chosun.ac.kr/bbs/scho/332/282595/artclView.do",
+   "attachments": [
+    {
+     "name": "2026학년도 (재)빛고을장학재단 장학금 대학추천 장학생 선발계획(안).hwp",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/380003/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "조선대학교",
+   "campus": "",
+   "foundAt": "2026-11-05"
+  },
+  {
+   "title": "[한국장학재단] 통학로(路) - 장학금부터 취업까지, 나에게 필요한 청년지원정보 확인하기",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46065/artclView.do",
+   "attachments": [
+    {
+     "name": "통학로 카드(리플렛).pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41743/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-05"
+  },
+  {
+   "title": "[한국장학재단] 학자금 중복지원, 미리 확인하고 예방하세요!",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46064/artclView.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-05"
+  },
   {
    "title": "[교외] 제9기 서울시립대 언론인회 장학생 선발",
    "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261105&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
@@ -5550,39 +5587,6 @@
    "bodyDeadlineText": "6. 접수 기한 : ~ 26. 11. 13. (금) 18:00"
   },
   {
-   "title": "[학부-교외장학] 2027학년도 해동과학문화재단 해동장학생 모집 안내",
-   "url": "https://www.inha.ac.kr/bbs/kr/8/45884/artclView.do",
-   "attachments": [],
-   "deadlineHint": null,
-   "school": "인하대학교",
-   "campus": "",
-   "foundAt": "2026-10-23"
-  },
-  {
-   "title": "[학부-교외장학] 2026학년도 2학기 거창군 지역출신 대학생 등록금 지원사업 안내",
-   "url": "https://www.inha.ac.kr/bbs/kr/8/45854/artclView.do",
-   "attachments": [
-    {
-     "name": "공고문_2026년 2학기 거창군 지역출신 대학생 등록금 지원사업.pdf",
-     "url": "https://www.inha.ac.kr/bbs/kr/8/41551/download.do"
-    },
-    {
-     "name": "2026년 2학기 거창군 지역출신 대학생 등록금 지원사업.jpg",
-     "url": "https://www.inha.ac.kr/bbs/kr/8/41552/download.do"
-    },
-    {
-     "name": "신청서 서식.hwpx",
-     "url": "https://www.inha.ac.kr/bbs/kr/8/41553/download.do"
-    }
-   ],
-   "deadlineHint": "접수 기간 : ~ 26. 11. 16. (월) 18:00 4. 제출 방법 : 가족 또는 학생 방문 신청 또는 우편 접수 (등기 원칙) 5. 제출",
-   "school": "인하대학교",
-   "campus": "",
-   "foundAt": "2026-10-23",
-   "bodyDeadline": "2026-11-16",
-   "bodyDeadlineText": "3. 접수 기간 : ~ 26. 11. 16. (월) 18:00"
-  },
-  {
    "title": "[학생지원팀] 2026학년도 인송문화재단 인송장학생 선발 안내",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276941&article.offset=0&articleLimit=10&srCategoryId=22",
    "attachments": [
@@ -8990,22 +8994,6 @@
    "school": "영남대학교",
    "campus": "",
    "foundAt": "2026-10-06"
-  },
-  {
-   "title": "2026-2학기 대학혁신지원사업 'CSU Pride 청송장학금' 장학생",
-   "url": "https://www3.chosun.ac.kr/bbs/scho/332/281775/artclView.do",
-   "attachments": [
-    {
-     "name": "2026학년도 2학기 대학혁신지원사업 CSU Pride 청송장학금 장학생 선발계획(안).hwp",
-     "url": "https://www3.chosun.ac.kr/bbs/scho/332/379176/download.do"
-    }
-   ],
-   "deadlineHint": "신청기간 : 2026. 10. 19.(월) 09:00 ~ 10. 21.(수) 17:00 4. 신청 방법 가. 온라인 신청 : 종합정보시스템 로그",
-   "school": "조선대학교",
-   "campus": "",
-   "foundAt": "2026-10-06",
-   "bodyDeadline": "2026-10-21",
-   "bodyDeadlineText": "접수마감일 | 2026.10.21"
   },
   {
    "title": "[교외] 2026년 손태희장학재단 장학생 선발 안..",

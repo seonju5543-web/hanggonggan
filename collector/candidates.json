@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
- "updatedAt": "2026-11-05",
- "count": 1653,
+ "updatedAt": "2026-11-06",
+ "count": 1656,
  "items": [
   {
    "title": "[공통][교외]2027년도 1학기 제7회 보림선원 서울선원 장학생 선발 공고(~1/5)",
@@ -182,6 +182,29 @@
    "foundAt": "2026-11-05",
    "bodyDeadline": "2026-11-17",
    "bodyDeadlineText": "아. 2026년도 창암장학생 지원가이드를 꼼꼼히 확인하시기 바랍니다. 7. 접수기한 : ~ 2026. 11. 17. (화)"
+  },
+  {
+   "title": "[한국장학재단] 학자금 중복지원, 미리 확인하고 예방하세요!",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46064/artclView.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-05"
+  },
+  {
+   "title": "[한국장학재단] 통학로(路) - 장학금부터 취업까지, 나에게 필요한 청년지원정보 확인하기",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46065/artclView.do",
+   "attachments": [
+    {
+     "name": "통학로 카드(리플렛).pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41743/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-05"
   },
   {
    "title": "[교외] 2027학년도 1학기 보림선원 서울선원 장학생 선발 공고(~ 2027. 1. 5.)",
@@ -644,6 +667,20 @@
    "foundAt": "2026-11-05",
    "bodyDeadline": "2027-01-05",
    "bodyDeadlineText": "[교외] 보림선원 서울선원 장학생 선발 안내(1/5 마감, 장학금 최대 800만원)"
+  },
+  {
+   "title": "2026학년도 (재)빛고을장학재단 대학추천 장학생 선발 안내",
+   "url": "https://www3.chosun.ac.kr/bbs/scho/332/282595/artclView.do",
+   "attachments": [
+    {
+     "name": "2026학년도 (재)빛고을장학재단 장학금 대학추천 장학생 선발계획(안).hwp",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/380003/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "조선대학교",
+   "campus": "",
+   "foundAt": "2026-11-05"
   },
   {
    "title": "[공통][국가] 학자금 중복지원 방지 안내",

@@ -1,6 +1,183 @@
 {
- "updatedAt": "2026-11-05",
+ "updatedAt": "2026-11-06",
  "items": [
+  {
+   "title": "스타트업 원스톱 지원센터 아카데미 일정 안내(11월)",
+   "url": "https://www.k-startup.go.kr/web/contents/webNOTICE_MATR.do?page=1&viewCount=18&id=176472&schBdcode=&schGroupCode=&schM=view",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": null,
+   "detailsV": 6,
+   "field": "교육·캠프",
+   "excerptsAt": "2026-11-05",
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-11-05"
+  },
+  {
+   "title": "2026 아산 스타트업 Scale-UP 프로그램 참여기업 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179737",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": null,
+   "deadline": "2026-11-13",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-05 ~ 2026-11-13 23:59"
+    }
+   ],
+   "eligibilityLines": [
+    "대상 : 일반기업, 1인 창조기업",
+    "예비창업자, 1년미만, 2년미만, 3년미만, 5년미만, 7년미만",
+    "창업 역량 강화부터 전문가 멘토링, 투자 연계까지,",
+    "신청대상 : - 아산시 소재(예비) 창업자 초기 창업기업"
+   ],
+   "noticeLines": [
+    "- 제출서류 QR주소 : https://drive.google.com/drive/folders/1CLEpC71-DzamiJvG8ibA3IIcaEIEQJDK?usp=drive_link"
+   ],
+   "detailsV": 6,
+   "excerptsAt": "2026-11-05",
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-11-05"
+  },
+  {
+   "title": "2026 아산 투자유치 Build-Up 프로그램 참여기업 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179739",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": null,
+   "deadline": "2026-11-13",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-05 ~ 2026-11-13 23:59"
+    }
+   ],
+   "eligibilityLines": [
+    "대상 : 일반기업, 1인 창조기업",
+    "예비창업자, 1년미만, 2년미만, 3년미만, 5년미만, 7년미만",
+    "신청대상 : • 아산시 소재 사업장을 보유한 기업"
+   ],
+   "noticeLines": [
+    "• 제출서류 링크 : https://drive.google.com/drive/folders/1ERtLhyimt7pbazvQ5voLkPRuK0PqyS36?usp=drive_link"
+   ],
+   "detailsV": 6,
+   "excerptsAt": "2026-11-05",
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-11-05"
+  },
+  {
+   "title": "<2026년 AI 활용 제조창업 올인원 실전 교육> 프로그램 참여자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179593",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": null,
+   "deadline": "2026-11-06",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-21 ~ 2026-11-06 13:00"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026. 10. 27.(화) ~ 11. 06.(금) 중 5회차"
+    }
+   ],
+   "eligibilityLines": [
+    "신청대상 : - 제조창업의 전반적인 과정에 AI를 활용하고자 하는 (예비)창업자",
+    "- AI를 활용한 교육을 희망하는 학생 및 일반인 등"
+   ],
+   "detailsV": 6,
+   "field": "교육·캠프",
+   "excerptsAt": "2026-11-05",
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-11-05"
+  },
+  {
+   "title": "[보건복지부] 발달장애인 인식개선 수기 공모전",
+   "url": "https://blog.naver.com/mohw2016/224463267916",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": null,
+   "detailsV": 6,
+   "field": "글쓰기·논문",
+   "excerptsAt": "2026-11-05",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-11-05"
+  },
+  {
+   "title": "[한국도로공사] 한국도로공사 AI 활용 아이디어 공모전 국민의 상상, AI를 타고 달린다",
+   "url": "https://www.epeople.go.kr/idea/ex/1AE-2610-0000546/detail.npaid",
+   "kind": "공모전",
+   "attachments": [
+    {
+     "name": "붙임1. 공모전 안내문.hwp",
+     "url": "javascript:javaScript:fn_fileDownload('20261019094333908636','20261019094333952547'); return false;"
+    },
+    {
+     "name": "붙임2. (양식) 참가신청서,개인정보수집이용동의서.hwpx",
+     "url": "javascript:javaScript:fn_fileDownload('20261019094333915712','20261019094333952547'); return false;"
+    }
+   ],
+   "deadlineHint": null,
+   "deadline": "2026-11-15",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026. 10. 19.(월) ～ 11. 15.(일) [4주간]"
+    }
+   ],
+   "eligibilityLines": [
+    "음란 또는 청소년에게 부적합한 내용",
+    "부적절한 정보",
+    "개인정보 노출"
+   ],
+   "detailsV": 6,
+   "field": "기획·아이디어",
+   "excerptsAt": "2026-11-05",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-11-05"
+  },
+  {
+   "title": "[식품의약품안전처] 식품의약품안전처 누리소통기자단 15기 모집",
+   "url": "https://blog.naver.com/kfdazzang/224463652864",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": null,
+   "detailsV": 6,
+   "field": "서포터즈·기자단",
+   "excerptsAt": "2026-11-05",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-11-05"
+  },
+  {
+   "title": "[기획예산처] 2026 기획예산처 대국민 재정교육 아이디어 공모전",
+   "url": "https://www.mpb.go.kr/web/main/bbs/b_0001/3125?cp=1&sortOrder=BA_REGDATE&sortDirection=DESC&bcId=b_0001&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": null,
+   "detailsV": 6,
+   "field": "기획·아이디어",
+   "excerptsAt": "2026-11-05",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-11-05"
+  },
   {
    "title": "(부산센터) 2026년 제10회 제대군인 창업 워크숍 개최 안내",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179725",
@@ -2030,48 +2207,6 @@
    "campus": "",
    "host": "문화포털 문화지원사업",
    "foundAt": "2026-10-31"
-  },
-  {
-   "title": "<2026년 AI 활용 제조창업 올인원 실전 교육> 프로그램 참여자 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179593",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-11-06",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-21 ~ 2026-11-06"
-    },
-    {
-     "label": "대상",
-     "text": "- 제조창업의 전반적인 과정에 AI를 활용하고자 하는 (예비)창업자 - AI를 활용한 교육을 희망하는 학생 및 일반인 등"
-    },
-    {
-     "label": "활동지역",
-     "text": "충북"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "충북Pro메이커센터",
-   "api": "kstartup",
-   "apiId": "179593",
-   "id": "api-kstartup-179593",
-   "eligibilityLines": [
-    "제조창업의 전반적인 과정에 AI를 활용하고자 하는 (예비)창업자",
-    "AI를 활용한 교육을 희망하는 학생 및 일반인 등"
-   ],
-   "noticeLines": [
-    "충북Pro메이커센터에서 창업 과정 전반에서 AI를 활용한 실무 교육 역량을 강화하기 위한 을 다음과 같이 진행합니다.",
-    "관심 있는 분들의 많은 참여 신청 바랍니다.",
-    "온라인 접수 : https://forms.gle/hUWxJdH9Lx5fboif7"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-10-30",
-   "seenAt": "2026-11-05",
-   "excerptsAt": "2026-11-05"
   },
   {
    "title": "2026 고양시 자금조달 계획 특강 & 네트워킹",
@@ -5562,185 +5697,6 @@
    "school": "동국대학교 WISE캠퍼스",
    "campus": "",
    "foundAt": "2026-10-13"
-  },
-  {
-   "title": "[국무조정실] 2026 청년정책 공모전 모집",
-   "url": "https://dep.hufs.ac.kr/bbs/student/2436/268998/artclView.do",
-   "kind": "공모전",
-   "attachments": [],
-   "deadlineHint": null,
-   "deadline": "2026-10-30",
-   "detailsV": 6,
-   "field": "기획·아이디어",
-   "excerptsAt": "2026-10-29",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-10-13",
-   "eligibilityLines": [
-    "참가자격 : 시상규모 총 상금 290만원/10명(팀)",
-    "19~34세 청년 누구나",
-    "시상구분 인원(명/팀)"
-   ],
-   "eligibilityFrom": "공고문 첨부(OCR)",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026.10.30"
-    }
-   ]
-  },
-  {
-   "title": "[국립한밭대학교] 2026학년도 전국 대학(원)생 빅데이터 분석 경진대회 모집",
-   "url": "https://dep.hufs.ac.kr/bbs/student/2436/268997/artclView.do",
-   "kind": "공모전",
-   "attachments": [
-    {
-     "name": "1. 경진대회 공고문.hwp",
-     "url": "https://dep.hufs.ac.kr/bbs/student/2436/151880/download.do"
-    }
-   ],
-   "deadlineHint": null,
-   "deadline": "2026-10-30",
-   "detailsV": 6,
-   "field": "IT·소프트웨어",
-   "excerptsAt": "2026-10-29",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-10-13",
-   "eligibilityLines": [
-    "빅데이터 기초지식을 보유한 전국의 대학(원) 재학생"
-   ],
-   "eligibilityFrom": "공고문 첨부",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026.10.30"
-    }
-   ]
-  },
-  {
-   "title": "[농협중앙회] 농심천심 대학(원)생 논문 공모전 모집",
-   "url": "https://dep.hufs.ac.kr/bbs/student/2436/268996/artclView.do",
-   "kind": "공모전",
-   "attachments": [],
-   "deadlineHint": null,
-   "deadline": "2027-02-26",
-   "detailsV": 6,
-   "field": "글쓰기·논문",
-   "excerptsAt": "2026-10-29",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-10-13",
-   "eligibilityLines": [
-    "대학·대학원 재학생 및 휴학생 (접수일 기준, 전공제한 없음)",
-    "개인 또는 팀 (3인 이내)"
-   ],
-   "eligibilityFrom": "AI(공고 포스터 그림)",
-   "eligibilityReviewed": false,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2027.02.26"
-    }
-   ]
-  },
-  {
-   "title": "[스포츠재활 연구실] 발목 운동재활 프로그램 연구 참여자 모집",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140526&article.offset=0&articleLimit=10",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": null,
-   "eligibilityLines": [
-    "- 만 19세 이상 성인으로 최소 1회 이상 발목의 접질림으로 발목 외측 인대 부상 병력이 있는 경우",
-    "- 최근 6개월 이내 최소 2회 이상 발목 관절의 '휘청거림' 경험이 있는 경우",
-    "\"발목의 휘청거림\"은 일시적으로 발목을 통제할 수 없는 불안정성이나 발목이 접질리는 느낌",
-    "- 발목의 반복적인 접질림 때문에 일상생활 및 스포츠 활동에 어려움이 있는 경우"
-   ],
-   "detailsV": 6,
-   "excerptsAt": "2026-10-29",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-13"
-  },
-  {
-   "title": "스타트업 원스톱 지원센터 아카데미 일정 안내(10월)",
-   "url": "https://www.k-startup.go.kr/web/contents/webNOTICE_MATR.do?page=1&viewCount=18&id=176455&schBdcode=&schGroupCode=&schM=view",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": null,
-   "detailsV": 6,
-   "field": "교육·캠프",
-   "excerptsAt": "2026-10-29",
-   "school": "",
-   "campus": "",
-   "host": "창업진흥원 K-Startup",
-   "foundAt": "2026-10-12"
-  },
-  {
-   "title": "디캠프 10월 오피스아워 #벤처투자·#사업협력 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179319",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "다운로드",
-     "url": "https://www.k-startup.go.kr/afile/fileDownload/JdXLn"
-    },
-    {
-     "name": "다운로드",
-     "url": "https://www.k-startup.go.kr/afile/fileDownload/hdXLn"
-    },
-    {
-     "name": "다운로드",
-     "url": "https://www.k-startup.go.kr/afile/fileDownload/KdXLn"
-    },
-    {
-     "name": "다운로드",
-     "url": "https://www.k-startup.go.kr/afile/fileDownload/3dXLn"
-    }
-   ],
-   "deadlineHint": "접수기간 2026-09-21 ~ 2026-10-12 11:59 주관기관명 재단법인 은행권청년창업재단 대상 일반기업, 1인 창조기업 창업업력 전체",
-   "deadline": "2026-10-12",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-09-21 ~ 2026-10-12 11:59"
-    }
-   ],
-   "detailsV": 6,
-   "field": "교육·캠프",
-   "excerptsAt": "2026-10-29",
-   "school": "",
-   "campus": "",
-   "host": "창업진흥원 K-Startup",
-   "foundAt": "2026-10-12",
-   "eligibilityLines": [
-    "신청대상 : 투자유치 또는 사업협력 멘토링이 필요한 스타트업",
-    "대상 : 일반기업, 1인 창조기업"
-   ],
-   "eligibilityFrom": "브라우저 본문"
-  },
-  {
-   "title": "[인공지능 부트캠프] 2026학년도 2학기(1차) 인공지능 모델링/인공지능 하드웨어/인공지능 소프트웨어-하드웨어 융합 마이크로디그리 신청 안내 (10/19(월)~10/23(금))",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140507&article.offset=0&articleLimit=10",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": "신청 기간 2026년 10월 19일(월) ~ 10월 23일(금) ■ 신청 방법 1. 인공지능 부트캠프 참여 신청 「인공지능(AI) 부트캠프 참가",
-   "deadline": "2026-10-23",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026년 10월 19일(월) ~ 10월 23일(금)"
-    }
-   ],
-   "eligibilityLines": [
-    "성균관대학교 학부생"
-   ],
-   "detailsV": 6,
-   "field": "교육·캠프",
-   "excerptsAt": "2026-10-29",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-12"
   },
   {
    "title": "2026년 청년 어촌창업 아이디어 공모전",

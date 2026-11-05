@@ -1,7 +1,30 @@
 {
  "school": "인하대학교",
- "updatedAt": "2026-11-05",
+ "updatedAt": "2026-11-06",
  "items": [
+  {
+   "title": "[한국장학재단] 통학로(路) - 장학금부터 취업까지, 나에게 필요한 청년지원정보 확인하기",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46065/artclView.do",
+   "attachments": [
+    {
+     "name": "통학로 카드(리플렛).pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41743/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-05"
+  },
+  {
+   "title": "[한국장학재단] 학자금 중복지원, 미리 확인하고 예방하세요!",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46064/artclView.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-05"
+  },
   {
    "title": "[학부·대학원-교외장학] 2026학년도 창암장학생 지원 공고 안내",
    "url": "https://www.inha.ac.kr/bbs/kr/8/46061/artclView.do",
