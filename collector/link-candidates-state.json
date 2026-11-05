@@ -138,13 +138,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-18",
-  "lastAt": "2026-10-30",
-  "tries": 4,
-  "status": "pending",
-  "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
+  "lastAt": "2026-11-06",
+  "tries": 5,
+  "status": "rejected",
+  "why": "게시판 목록(9줄)에서 그 글을 하나로 못 고름 — 5번째라 그만 봅니다",
   "checks": {},
   "round": "2026-12-11",
-  "nextAt": "2026-11-06"
+  "decidedAt": "2026-11-06"
  },
  "kosaf|2000206004|board:https://www.yw.go.kr/www/selectBbsNttList.do?bbsNo=86&key=524": {
   "ds": "kosaf",
