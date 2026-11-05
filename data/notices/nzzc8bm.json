@@ -1,7 +1,21 @@
 {
  "school": "가천대학교",
- "updatedAt": "2026-11-04",
+ "updatedAt": "2026-11-05",
  "items": [
+  {
+   "title": "[공통] 2026-2학기 외국인 유학생 다자녀장학금 신청 안내(최종)",
+   "url": "https://www.gachon.ac.kr/bbs/kor/478/126755/artclView.do",
+   "attachments": [
+    {
+     "name": "(붙임2) OECD DAC ODA Recipients List.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/158077/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간: ~ 2026. 11. 16.(월) 4. 제출서류 - 국가별 가족관계를 증명할 수 있는 공적인 서류(공증 불요) - 본인명의 한국 통장",
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-11-05"
+  },
   {
    "title": "[공통] (생활비-학비보조)2027-1학기 (재)이오순장학재단 장학생 선발 안내",
    "url": "https://www.gachon.ac.kr/bbs/kor/478/126731/artclView.do",
