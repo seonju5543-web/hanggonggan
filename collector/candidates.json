@@ -1,8 +1,67 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-11-06",
- "count": 1656,
+ "count": 1660,
  "items": [
+  {
+   "title": "[공통][교외]2026-2 한국외대 민주동문회 장학금 장학생 모집(~11/16)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/270972/artclView.do",
+   "attachments": [],
+   "deadlineHint": "지원기간 : 2026. 11. 9( 월 ) ~ 11. 16( 월 ) 13:00 까지 나 . 장학생 선발 : 2026. 12 초 다 . 선발결과",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-11-06",
+   "bodyDeadline": "2026-11-16",
+   "bodyDeadlineText": "[공통][교외]2026-2 한국외대 민주동문회 장학금 장학생 모집(~11/16)"
+  },
+  {
+   "title": "2027년 (재)관정재단 국내대학 장학생 선발 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/219486/detailView.do?category=6",
+   "attachments": [],
+   "deadlineHint": "접수기간 : 2026. 11. 9.(월) ~ 11. 20.(금) 17:00 까지 7. 제출서류: 장학생지원서, 성적증명서, 소득구간확인서(한국장",
+   "school": "전북대학교",
+   "campus": "",
+   "foundAt": "2026-11-06",
+   "bodyDeadline": "2026-11-20",
+   "bodyDeadlineText": "* 동점자 선발기준: 소득분위 낮은 순 > 학업성적 높은 순 > 이수학점이 높은 순 6. 접수기간 : 2026. 11. 9.(월) ~ 11. 20.(금) 17:00 까지"
+  },
+  {
+   "title": "[교외][생활비] 2026학년도 창암장학생 지원 공고 안내( ~ 11. 17.)",
+   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1211564/artclView.do",
+   "attachments": [],
+   "deadlineHint": "접수기한 : ~ 2026. 11. 17. (화) 8. 접수처 : (재단 우편접수) 경기도 고양시 일산동구 위시티3로 83-11, 202호(식사동",
+   "school": "건국대학교",
+   "campus": "",
+   "foundAt": "2026-11-06",
+   "bodyDeadline": "2026-11-17",
+   "bodyDeadlineText": "[교외][생활비] 2026학년도 창암장학생 지원 공고 안내( ~ 11. 17.)"
+  },
+  {
+   "title": "2026학년도 2학기 국가근로장학생 운영 현황 및 사전교육 자료 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=141627&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    },
+    {
+     "name": "[붙임 1] 2026년 2학기 국가근로장학금 사전교육 자료(근로장학생용).pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=141627&attachNo=118855"
+    },
+    {
+     "name": "[붙임 2] 2026년 2학기 국가근로장학사업 운영계획서(성균관대학교).pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=141627&attachNo=118856"
+    },
+    {
+     "name": "[붙임 3] 2026년 2학기 국가근로장학사업 근로장학생 선발 현황.xlsx",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=141627&attachNo=118857"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-11-06"
+  },
   {
    "title": "[공통][교외]2027년도 1학기 제7회 보림선원 서울선원 장학생 선발 공고(~1/5)",
    "url": "https://dep.hufs.ac.kr/bbs/student/2431/270901/artclView.do",
