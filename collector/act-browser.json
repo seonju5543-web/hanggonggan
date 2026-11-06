@@ -52,8 +52,8 @@
   "tries": 2
  },
  "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000": {
-  "at": "2026-10-30",
-  "tries": 1
+  "at": "2026-11-06",
+  "tries": 2
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53505&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-16",
@@ -164,8 +164,8 @@
   "from": "브라우저 본문"
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53516&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-10-30",
-  "tries": 1
+  "at": "2026-11-06",
+  "tries": 2
  },
  "https://www.youthcenter.go.kr/bbs03View/48/10841": {
   "at": "2026-10-24",
@@ -305,12 +305,12 @@
   "tries": 2
  },
  "https://www.youthcenter.go.kr/bbs03View/48/10858": {
-  "at": "2026-10-30",
-  "tries": 1
+  "at": "2026-11-06",
+  "tries": 2
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/270425/artclView.do": {
-  "at": "2026-10-30",
-  "tries": 1
+  "at": "2026-11-06",
+  "tries": 2
  },
  "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156787394&pWise=sub&pWiseSub=C3": {
   "at": "2026-10-31",
