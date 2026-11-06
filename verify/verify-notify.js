@@ -323,6 +323,16 @@ async function onboard(page) {
   ok(/켜짐/.test(onText), 'MY 상태가 "켜짐"으로 바뀜', onText);
   await page.screenshot({ path: SHOT('06-my-on') });
 
+  /* 🔴 설정 화면에서 **스위치를 직접 눌러** 모양이 따라 바뀌는가 (2026-11-06 신고 — 눌러도 끈 모양 그대로).
+     위 확인들은 화면을 새로 열어 그린 것만 봐서, 누른 뒤 다시 그리는 길(renderMy → 알림 카드 없음)을 못 봤다. */
+  await page.click('#btn-nf-toggle');
+  await page.waitForFunction(() => document.querySelector('#btn-nf-toggle')?.getAttribute('aria-checked') === 'false', null, { timeout: 5000 }).catch(() => {});
+  ok(await page.getAttribute('#btn-nf-toggle', 'aria-checked') === 'false', '설정에서 스위치를 끄면 그 자리에서 꺼짐 모양으로 바뀐다');
+  ok(/켜지 않|꺼 둔/.test(await page.textContent('#my-notify .nf-status')), '끈 뒤 상태 줄도 꺼짐을 말한다');
+  await page.click('#btn-nf-toggle');
+  await page.waitForFunction(() => document.querySelector('#btn-nf-toggle')?.getAttribute('aria-checked') === 'true', null, { timeout: 8000 }).catch(() => {});
+  ok(await page.getAttribute('#btn-nf-toggle', 'aria-checked') === 'true', '다시 켜면 그 자리에서 켜짐 모양으로 바뀐다');
+
   /* 종류별 끄기는 화면에서 사라졌지만 규칙 엔진은 그대로 prefs 를 읽는다 — 장부를 직접 고쳐 엔진이 지키는지 본다 */
   await page.evaluate(async () => { notifyLedger.prefs.deadline = false; await notifySaveLedger(); });
   await page.waitForTimeout(300);

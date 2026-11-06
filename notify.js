@@ -326,6 +326,7 @@ function notifyConsentSheet() {
       toast('앱 안 알림함으로 알립니다. MY에서 언제든 켤 수 있습니다');
     }
     if (!$('#screen-my').hidden) renderMy();
+    notifyRedrawSettings();
     notifyRenderBadge();
   });
 
@@ -335,6 +336,7 @@ function notifyConsentSheet() {
     closeNotifyPanel();
     toast('알림은 MY 화면에서 언제든 켜기 가능');
     if (!$('#screen-my').hidden) renderMy();
+    notifyRedrawSettings();
   });
 }
 
@@ -363,6 +365,11 @@ function notifyMaybeAskConsent(delay = 900) {
 }
 
 /* ---------------- MY 화면의 알림 설정 ---------------- */
+/* 알림 카드(설정 화면 #my-notify)를 다시 그린다 — 켜기/끄기·동의 시트가 장부를 바꾼 뒤 부른다.
+   카드를 그리는 함수는 app.js 의 renderNotifyCard 한 곳이다(여기서 베끼지 않는다). */
+function notifyRedrawSettings() {
+  if (typeof renderNotifyCard === 'function') renderNotifyCard();
+}
 function notifySettingsHtml() {
   if (!notifyLedger) return '';
   const sup = notifySupport();
@@ -427,6 +434,10 @@ function bindNotifySettings() {
       }
       else if (perm === 'denied') toast('브라우저 사이트 설정에서 알림 허용 필요');
     }
+    /* 🔴 스위치는 **설정 화면**에 있다 — renderMy() 는 2026-09-11 이후 알림 카드를 그리지 않아
+       눌러도 스위치가 끈 모양 그대로 굳어 있었다(2026-11-06 신고). 카드를 그리는 곳을 직접 부른다.
+       renderMy() 는 MY 메뉴 줄의 「알림 켜짐/꺼짐」 글자 때문에 남긴다. */
+    notifyRedrawSettings();
     renderMy();
   });
 
