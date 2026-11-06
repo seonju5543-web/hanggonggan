@@ -3,33 +3,23 @@
  "updatedAt": "2026-11-06",
  "items": [
   {
+   "title": "[등록/장학] 2026학년도 2학기 국가장학금 지급 (예정)안내(1차)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53624&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "광운미디어",
+     "url": "https://www.kw.ac.kr/ko/etc/2018_kw110.pdf"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026.11.2.(월) ~ 11.18.(수)> - 2026 학년도 2 학기 등록금 한도 내에서 지급 - 상기 내용은 2026 학년",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-11-06"
+  },
+  {
    "title": "[등록/장학] 2027년도 1학기 제7회 보림선원 서울선원 장학생 선발 공고",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53614&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "attachments": [
-    {
-     "name": "부설기관",
-     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
-    },
-    {
-     "name": "부설연구기관",
-     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
-    },
-    {
-     "name": "연구지원팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
-    },
-    {
-     "name": "연구진흥팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
-    },
-    {
-     "name": "경영관리팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
-    },
-    {
-     "name": "기술지주회사",
-     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
-    },
     {
      "name": "Attachment 붙임1) 보림새말귀장학금신청서.hwp",
      "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35518&ano=53614"
@@ -44,26 +34,6 @@
    "title": "[등록/장학] 대한주택건설협회 서울특별시회 2026학년도 장학생 선발 안내(생활비성)",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53596&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "attachments": [
-    {
-     "name": "부설기관",
-     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
-    },
-    {
-     "name": "연구지원팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
-    },
-    {
-     "name": "연구진흥팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
-    },
-    {
-     "name": "경영관리팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
-    },
-    {
-     "name": "기술지주회사",
-     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
-    },
     {
      "name": "Attachment 학업계획서.hwpx",
      "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35501&ano=53596"

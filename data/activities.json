@@ -379,39 +379,76 @@
    "excerptsAt": "2026-11-06"
   },
   {
-   "title": "[봉사] 2026년도 광운대학교 사회봉사단 「사랑의 김장 나누기 봉사」 참가자 모집",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53619&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "title": "[해외봉사] 2026학년도 동계 해외봉사단 추가 모집 안내",
+   "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/521116",
    "kind": "대외활동",
    "attachments": [
     {
-     "name": "부설기관",
-     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
-    },
-    {
-     "name": "부설연구기관",
-     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
-    },
-    {
-     "name": "연구지원팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
-    },
-    {
-     "name": "연구진흥팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
-    },
-    {
-     "name": "경영관리팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
-    },
-    {
-     "name": "기술지주회사",
-     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
-    },
-    {
-     "name": "광운미디어",
-     "url": "https://www.kw.ac.kr/ko/etc/2018_kw110.pdf"
+     "name": "붙임+지원서(양식).hwp",
+     "url": "https://wise.dongguk.ac.kr/cmmn/fileDown.do?filename=%EB%B6%99%EC%9E%84%2B%EC%A7%80%EC%9B%90%EC%84%9C(%EC%96%91%EC%8B%9D).hwp&filepath=/files/article/servicenotice/521116/&filerealname=7CE3B6EEDF0E4F519F1DCF1611230AE6.hwp"
     }
    ],
+   "deadlineHint": "접수기간 : 2026. 11. 09.( 월 ) 09:00 ~ 11. 13.(금 ) 15:00 까지 ❍ 접수방법 : 방문제출 ( 원칙 ): 학생회",
+   "deadline": "2026-11-13",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026. 11. 09.( 월 ) 09:00 ~ 11. 13.(금 ) 15:00 까지"
+    },
+    {
+     "label": "활동기간",
+     "text": "2027. 1. 3.( 일 ) ~ 10.( 일 ) *6 박 8 일"
+    },
+    {
+     "label": "모집인원",
+     "text": "30 명 ( 학부 재학생 )"
+    }
+   ],
+   "eligibilityLines": [
+    "지원자격 : ❍ 지원자격",
+    "· 우리대학 학부 재학생( ※ 단, 전체 모집 인원 중 특정학과 재학생 1/3 초과 선발 제한함.)",
+    "· 봉사정신이 투철하며 심신이 건강하고 해외봉사활동에 결격사유가 없는 자",
+    "· 사전교육 및 전체 일정 참여 가능자",
+    "· 사진 / 영상 촬영 및 SNS 활용 가능자 우대",
+    "· 봉사실적이 40 시간 이상인 자 우대",
+    "· 외국어 ( 영어 ) 가능자 우대",
+    "· 2026 하계 해외봉사 선발자 우대"
+   ],
+   "detailsV": 6,
+   "field": "봉사",
+   "excerptsAt": "2026-11-06",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-06"
+  },
+  {
+   "title": "[일반] [광운대캠퍼스타운]「Quantum AI 인재 양성 교육」 참가자 모집",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53623&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "활동기간",
+     "text": "2026. 11. 13.(금) ~ 12. 22.(화) / 총 7회"
+    },
+    {
+     "label": "주최",
+     "text": "광운대학교 × 노르마"
+    }
+   ],
+   "detailsV": 6,
+   "field": "교육·캠프",
+   "excerptsAt": "2026-11-06",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-11-06"
+  },
+  {
+   "title": "[봉사] 2026년도 광운대학교 사회봉사단 「사랑의 김장 나누기 봉사」 참가자 모집",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53619&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "kind": "대외활동",
+   "attachments": [],
    "deadlineHint": "모집 기간 : 2026. 11. 5.( 목 ) 18:00~11. 11.( 수 ) 18:00 ※ 모집 정원 충족 시 조기 마감될 수 있습니다 .",
    "deadline": "2026-11-11",
    "excerpts": [
@@ -450,36 +487,7 @@
    "title": "[봉사] [굿네이버스 서울북부사업본부] 온라인 해외봉사 역량강화 프로그램 2기 모집",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53621&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "부설기관",
-     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
-    },
-    {
-     "name": "부설연구기관",
-     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
-    },
-    {
-     "name": "연구지원팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
-    },
-    {
-     "name": "연구진흥팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
-    },
-    {
-     "name": "경영관리팀",
-     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
-    },
-    {
-     "name": "기술지주회사",
-     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
-    },
-    {
-     "name": "광운미디어",
-     "url": "https://www.kw.ac.kr/ko/etc/2018_kw110.pdf"
-    }
-   ],
+   "attachments": [],
    "deadlineHint": null,
    "detailsV": 6,
    "field": "봉사",
@@ -5691,48 +5699,6 @@
     "공고에 명시된 신청 대상 요건에 해당하지 않는 기업"
    ],
    "eligibilityFrom": "브라우저 본문"
-  },
-  {
-   "title": "[서경대학교] 2026년 온라인 하반기 현직자 직무특강+취업특강",
-   "url": "https://dep.hufs.ac.kr/bbs/student/2436/269126/artclView.do",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": null,
-   "detailsV": 6,
-   "field": "교육·캠프",
-   "excerptsAt": "2026-10-28",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-10-14",
-   "eligibilityLines": [
-    "모집대상:서경대재학생·졸업생&지역청년"
-   ],
-   "eligibilityFrom": "공고문 첨부(OCR)"
-  },
-  {
-   "title": "[고용노동부] 2026년 하반기 포스코이앤씨와 함께하는 멘토링 DAY",
-   "url": "https://dep.hufs.ac.kr/bbs/student/2436/269119/artclView.do",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "2026년 하반기 포스코이앤씨와 함께 하는 멘토링 Day 운영 개요(발송용_수도권 대학).pdf",
-     "url": "https://dep.hufs.ac.kr/bbs/student/2436/151943/download.do"
-    }
-   ],
-   "deadlineHint": null,
-   "deadline": "2026-10-28",
-   "detailsV": 6,
-   "field": "멘토링",
-   "excerptsAt": "2026-10-28",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-10-14",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026.10.28"
-    }
-   ]
   },
   {
    "title": "2026년 청년 어촌창업 아이디어 공모전",

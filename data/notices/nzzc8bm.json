@@ -3,6 +3,24 @@
  "updatedAt": "2026-11-06",
  "items": [
   {
+   "title": "[글로벌] 2026-2학기 일반 교내 및 교외 국가근로장학생 추가 모집(2차) 안내",
+   "url": "https://www.gachon.ac.kr/bbs/kor/478/126826/artclView.do",
+   "attachments": [
+    {
+     "name": "(붙임1) 2026-2학기 일반 교내 및 교외 국가근로장학생 추가 모집(2차) 현황.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/158185/download.do"
+    },
+    {
+     "name": "(붙임2) 2026-2학기 국가근로장학금 운영계획서 및 자체선발기준.hwp",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/158186/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간: 2026.11.05.(목) ~ 11.18.(수) 126826 [글로벌] [글로벌] 2026-2학기 일반 교내 및 교외 국가근로장학생",
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-11-06"
+  },
+  {
    "title": "[공통] 2026-2학기 외국인 장학금 추가 신청(최종)",
    "url": "https://www.gachon.ac.kr/bbs/kor/478/126768/artclView.do",
    "attachments": [],
@@ -966,36 +984,6 @@
     }
    ],
    "deadlineHint": null,
-   "school": "가천대학교",
-   "campus": "",
-   "foundAt": "2026-09-30"
-  },
-  {
-   "title": "[글로벌] [글로벌] 2026-2학기 일반 교내 및 교외 국가근로장학생 추가 선발(1차) 결과 및 유의사항 안내",
-   "url": "https://www.gachon.ac.kr/bbs/kor/478/125189/artclView.do",
-   "attachments": [
-    {
-     "name": "붙임12026-2학기일반교내및교외국가근로장학생추가선발1차자명단.pdf",
-     "url": "https://www.gachon.ac.kr/bbs/kor/478/155092/download.do"
-    },
-    {
-     "name": "붙임2국가근로장학생출근부인쇄방법등안내.pdf",
-     "url": "https://www.gachon.ac.kr/bbs/kor/478/155093/download.do"
-    },
-    {
-     "name": "붙임32026-2학기국가근로장학금사전교육자료.pdf",
-     "url": "https://www.gachon.ac.kr/bbs/kor/478/155094/download.do"
-    },
-    {
-     "name": "붙임4국가근로시간변경사유서양식.hwp",
-     "url": "https://www.gachon.ac.kr/bbs/kor/478/155095/download.do"
-    },
-    {
-     "name": "붙임5국가근로사직서양식.hwp",
-     "url": "https://www.gachon.ac.kr/bbs/kor/478/155096/download.do"
-    }
-   ],
-   "deadlineHint": "제출기한: 2026. 9. 16.(수), 15:00까지 * 기한 내 확인서를 제출하지 않을 경우, '근로의사 없음'으로 간주되어 선발 취소될 수",
    "school": "가천대학교",
    "campus": "",
    "foundAt": "2026-09-30"
