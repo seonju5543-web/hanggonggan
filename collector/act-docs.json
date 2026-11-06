@@ -19,10 +19,6 @@
   "at": "2026-10-15",
   "tries": 1
  },
- "https://youth.incheon.go.kr/bbs/bbsMsgDetail.do?msg_seq=525&bcd=notice": {
-  "at": "2026-10-31",
-  "tries": 1
- },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53505&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-10-16",
   "tries": 1
@@ -36,14 +32,6 @@
   "tries": 1
  },
  "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179094": {
-  "at": "2026-10-16",
-  "tries": 1
- },
- "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179331": {
-  "at": "2026-10-16",
-  "tries": 1
- },
- "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179306": {
   "at": "2026-10-16",
   "tries": 1
  },
@@ -348,6 +336,18 @@
   "tries": 1
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53621&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-11-06",
+  "tries": 1
+ },
+ "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000242/articleView.do?searchSeq=17550&commonMenuNo=506_533": {
+  "at": "2026-11-06",
+  "tries": 1
+ },
+ "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000242/articleView.do?searchSeq=17523&commonMenuNo=506_533": {
+  "at": "2026-11-06",
+  "tries": 1
+ },
+ "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000242/articleView.do?searchSeq=17549&commonMenuNo=506_533": {
   "at": "2026-11-06",
   "tries": 1
  }
