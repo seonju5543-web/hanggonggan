@@ -975,43 +975,6 @@
    "excerptsAt": "2026-11-06"
   },
   {
-   "title": "청년과 대학생이 바꾸는 지금 1회차",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3545453",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-11-09",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-02 ~ 2026-11-09"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026-11-11 ~ 2026-11-11"
-    },
-    {
-     "label": "활동지역",
-     "text": "군산시자원봉사센터"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "군산시자원봉사센터",
-   "api": "vol1365",
-   "apiId": "3545453",
-   "id": "api-vol1365-3545453",
-   "detailsV": 6,
-   "noticeLines": [
-    "어르신 프로그램 활동 지원 및 원에,공예 활동 보조",
-    "2회차 13일 14:00~17:00 2회차 신청은 다른 페이지에 있습니다!"
-   ],
-   "foundAt": "2026-11-05",
-   "seenAt": "2026-11-06",
-   "excerptsAt": "2026-11-06"
-  },
-  {
    "title": "(대학생,성인)평택시 다함께돌봄센터 1호점 방과후 자원봉사자 모집(방학중,학기중)",
    "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3502823",
    "kind": "대외활동",
@@ -1096,6 +1059,43 @@
     "(공동체의식제고) 대학생 공공참여 경험 제공으로 지역에 대한 관심 제고",
     "(도시환경개선) 나무심기를 통한 기후위기대응 지속 가능한 도시환경 조성 사회적 책임 기여",
     "활동개요"
+   ],
+   "foundAt": "2026-11-05",
+   "seenAt": "2026-11-06",
+   "excerptsAt": "2026-11-06"
+  },
+  {
+   "title": "청년과 대학생이 바꾸는 지금 1회차 대학생 청년 봉사자 모집",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3545453",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-11-10",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-02 ~ 2026-11-10"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-11-11 ~ 2026-11-11"
+    },
+    {
+     "label": "활동지역",
+     "text": "군산시자원봉사센터"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "군산시자원봉사센터",
+   "api": "vol1365",
+   "apiId": "3545453",
+   "id": "api-vol1365-3545453",
+   "detailsV": 6,
+   "noticeLines": [
+    "어르신 프로그램 활동 지원 및 원에,공예 활동 보조",
+    "2회차 13일 14:00~17:00 2회차 신청은 다른 페이지에 있습니다!"
    ],
    "foundAt": "2026-11-05",
    "seenAt": "2026-11-06",
