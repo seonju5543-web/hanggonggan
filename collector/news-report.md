@@ -1,15 +1,29 @@
 ## 🗞 교내 소식 수집 리포트 (2026-11-07)
 
-새 글 **147건** → 앱 홈 「우리 학교 소식」 (학교별 파일 data/news/ · 44개교 · 게시판 아는 학교 44/44 · 둘째 게시판 3곳)
+새 글 **158건** → 앱 홈 「우리 학교 소식」 (학교별 파일 data/news/ · 44개교 · 게시판 아는 학교 44/44 · 둘째 게시판 3곳)
 
-⏰ **시간 예산(4분)에 걸려 게시판 3곳을 이번 실행에서 못 봤습니다** — 국민대학교 · 숭실대학교 · 세종대학교
-  → 이번에 본 게시판 44/47곳 · 다음 실행은 **국민대학교**부터 시작합니다.
+⏱ 게시판 47곳을 3분 41초에 다 돌았습니다(예산 4분).
 
 ### 🚨 연속 실패 — 게시판 주소 확인 필요
-- 경북대학교 (4회 연속) — 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
-- 강원대학교 (8회 연속) — 오류 (TypeError: UND_ERR_SOCKET) — 주소 확인 필요
-- 한양대학교 (21회 연속) — 접속 실패 (HTTP 403) — 주소 수정 필요
-- 아주대학교 (34회 연속) — 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
+- 강원대학교 (9회 연속) — 오류 (TypeError: UND_ERR_SOCKET) — 주소 확인 필요
+- 한양대학교 (22회 연속) — 접속 실패 (HTTP 403) — 주소 수정 필요
+- 아주대학교 (35회 연속) — 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
+
+### 국민대학교
+상태: ✅ 정상 (공지 글 4건 감지 · 새 글 2)
+- [행사] [2026년도 동계 SGE Global Challenge 프로그램 2차 설명회 신청 (~11/4 오전 9시)](https://www.kookmin.ac.kr/user/kmuNews/notice/4/12583/view.do?currentPageNo=1) — 2026-11-03
+- [[차세대통신사업단] 2026학년도 2학기 마이크로디그리 사전 이수 신청 (10.27~11.3) 2026.10.26 차세대통신사업단 최윤정](https://www.kookmin.ac.kr/user/kmuNews/notice/4/12550/view.do?currentPageNo=1) — 2026-10-26
+
+### 숭실대학교
+상태: ✅ 정상 (공지 글 7건 감지 · 새 글 5)
+- [채용] [채용 (~11/25까지) [사회과학대학] 평생교육학과 학사조교 채용 안내](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=11-25%EA%B9%8C%EC%A7%80-%EC%82%AC%ED%9A%8C%EA%B3%BC%ED%95%99%EB%8C%80%ED%95%99-%ED%8F%89%EC%83%9D%EA%B5%90%EC%9C%A1%ED%95%99%EA%B3%BC-%ED%95%99%EC%82%AC%EC%A1%B0%EA%B5%90-%EC%B1%84%EC%9A%A9&keyword) — 2026-11-06
+- [기타 숭실가족수요예배 안내(11월 11일)](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%88%AD%EC%8B%A4%EA%B0%80%EC%A1%B1%EC%88%98%EC%9A%94%EC%98%88%EB%B0%B0-%EC%95%88%EB%82%B411%EC%9B%94-11%EC%9D%BC&keyword) — 2026-11-06
+- [채용] [채용 2026년 숭실대학교 기초교양교육연구센터 기초교양교육연구팀 계약직 직원 모집](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026%EB%85%84-%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EA%B8%B0%EC%B4%88%EA%B5%90%EC%96%91%EA%B5%90%EC%9C%A1%EC%97%B0%EA%B5%AC%EC%84%BC%ED%84%B0-%EA%B8%B0%EC%B4%88%EA%B5%90%EC%96%91%EA%B5%90&keyword) — 2026-11-06
+- [채용] [채용 자연과학대학 학사조교 모집 공고(물리학과)](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%9E%90%EC%97%B0%EA%B3%BC%ED%95%99%EB%8C%80%ED%95%99-%ED%95%99%EC%82%AC%EC%A1%B0%EA%B5%90-%EB%AA%A8%EC%A7%91-%EA%B3%B5%EA%B3%A0%EB%AC%BC%EB%A6%AC%ED%95%99%EA%B3%BC&keyword) — 2026-11-06
+- [채용] [채용 [교수학습혁신센터] 2026학년도 2학기 XR 콘텐츠 활용 실감형 수업 운영 보조 인력 추가 모집](https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EA%B5%90%EC%88%98%ED%95%99%EC%8A%B5%ED%98%81%EC%8B%A0%EC%84%BC%ED%84%B0-2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-xr-%EC%BD%98%ED%85%90%EC%B8%A0-%ED%99%9C%EC%9A%A9-%EC%8B%A4%EA%B0%90-2&keyword) — 2026-11-05
+
+### 세종대학교
+상태: ✅ 정상 (공지 글 8건 감지 · 새 글 0)
 
 ### 이화여자대학교
 상태: ✅ 정상 (공지 글 12건 감지 · 새 글 12)
@@ -99,7 +113,10 @@
 - [[일반] [2026학년도 재학생 실태조사] 참여를 부탁드립니다 (추첨하여 모바일 상품권 증정)](https://www.knou.ac.kr/bbs/knou/51/821021/artclView.do) — 2026-11-04
 
 ### 경북대학교
-상태: ⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
+상태: ✅ 정상 (공지 글 11건 감지 · 새 글 3)
+- [2026학년도 2학기 교직 적성 및 인성검사(2차) 결과 안내](https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11793926015576&menu_idx=42&bbs_cde=stu_812) — 2026-11-06
+- [2026학년도 2학기 졸업자격인정 신청 안내](https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11793768071704&menu_idx=42&bbs_cde=stu_812) — 2026-11-04
+- [학사] [2026학년도 겨울계절수업, 디딤돌수업 수강신청 안내](https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11793757727585&menu_idx=42&bbs_cde=stu_812) — 2026-11-04
 
 ### 영남대학교
 상태: ✅ 정상 (공지 글 10건 감지 · 새 글 4)
@@ -260,13 +277,14 @@
 상태: ✅ 정상 (공지 글 10건 감지 · 새 글 0)
 
 ### 광운대학교
-상태: ✅ 정상 (공지 글 24건 감지 · 새 글 7)
+상태: ✅ 정상 (공지 글 24건 감지 · 새 글 8)
 - [[국제학생] 외국인 유학생 시간제 취업 금지 분야 불법취업 적발시 처리기준 개정 알림](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53622&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-11-06
 - [행사] [[국제학생] [글로벌전략팀] 글로벌 외국인 유학생 잡페어 안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53620&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-11-06
 - [[학생] [졸업준비위원회] 2026년도 2학기 졸업촬영 안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53611&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-11-04
 - [[국제교류] [대학혁신사업] 2026학년도 Global Challenger 최종선발팀 및 유의사항 안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53609&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-11-04
 - [채용] [[일반] 2027학년도 전반기 전임교원 특별채용 초빙 안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53608&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-11-04
 - [행사] [[일반] [대학혁신지원사업] 2026 광운대학교 취업박람회 개최 안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53605&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-11-04
+- [[일반] 2026 서울영커리언스](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53627&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-11-07
 - [[일반] [원격교육지원센터] 광운대학교 2026년 매치업 X+AI (바이오헬스 분야) 요구도 조사](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53613&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-11-05
 
 ### 명지대학교
@@ -289,15 +307,6 @@
 
 ### 아주대학교
 상태: ⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
-
-### 국민대학교
-상태: ⏰ 시간 예산(4분) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다
-
-### 숭실대학교
-상태: ⏰ 시간 예산(4분) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다
-
-### 세종대학교
-상태: ⏰ 시간 예산(4분) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다
 
 ---
 ⚙️ 설정: `collector/news-sources.json` · 발행: `data/news/<학교키>.json` · 로봇: `collector/collect-news.mjs` · 판정: `collector/news-kind.mjs`
