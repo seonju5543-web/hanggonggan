@@ -41,22 +41,6 @@
   "at": "2026-10-16",
   "tries": 1
  },
- "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179094": {
-  "at": "2026-10-16",
-  "tries": 1,
-  "lines": [
-   "신청대상 : IT 서비스·솔루션 분야의 Pre-money Valuation 100억~300억 원 내외 스타트업",
-   "▪️ 제품·서비스 출시 후 본격적인 스케일업을 준비하는 팀",
-   "▪️ 투자 유치와 후속 성장의 다음 단계가 필요한 팀",
-   "▪️ 사업화 전략과 적절한 파트너 연결이 필요한 팀",
-   "▪️ 대·중견기업 및 공공기관과의 협업 기회를 넓히고 싶은 팀",
-   "▪️ 글로벌 진출을 본격적으로 검토하고 있는 팀"
-  ],
-  "excludes": [
-   "공고에 명시된 신청 대상 요건에 해당하지 않는 기업"
-  ],
-  "from": "브라우저 본문"
- },
  "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179448": {
   "at": "2026-10-17",
   "tries": 1,
@@ -348,5 +332,32 @@
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53623&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-11-07",
   "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3545456": {
+  "at": "2026-11-07",
+  "tries": 1,
+  "lines": [
+   "활동구분",
+   "오프라인",
+   "군산 청바지봉사단 모집 포스터1.png",
+   "어르신 프로그램 활동 지원 및 원예,공예 활동 보조",
+   "[봉사장소 지도] 지도 건너뛰기",
+   "봉사활동 장소[1] 주소 : 전북특별자치도 군산시 둔배미길 29 (중앙로2가, 군산노인종합복지관)",
+   "전북특별자치도 군산시 삼화안길 9 군산시자원봉사센터",
+   "이전 봉사참여",
+   "11-4 부평구청 위생과 우편물 작업(위생관리팀)",
+   "봉사자유형 : 성인"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3538765": {
+  "at": "2026-11-07",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
  }
 }
