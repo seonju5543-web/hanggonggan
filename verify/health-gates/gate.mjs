@@ -472,7 +472,7 @@ export default async function gate(eq, ctx) {
         for (const f of fs.readdirSync(fileURLToPath(new URL('verify/', root)))) if (f.endsWith('.cjs')) fs.copyFileSync(fileURLToPath(new URL(`verify/${f}`, root)), path.join(dir, 'verify', f));
         const w = (rel, body) => fs.writeFileSync(path.join(dir, rel), typeof body === 'string' ? body : J(body));
         w('collector/auto-register-config.json', { enabled: true, schools: [], maxPerRun: 8, blockIds: [], blockUrls: [] });
-        w('data/notices.json', { items: [{ title: '2026학년도 2학기 표본재단 장학생 선발 안내', url: 'https://example.ac.kr/bbs/view.do?seq=777', school: '경희대학교', campus: '', foundAt: '2026-10-04' }] });
+        w('data/notices.json', { items: [{ title: '2026학년도 2학기 표본재단 장학생 선발 안내', url: 'https://example.ac.kr/bbs/view.do?seq=777', school: '경희대학교', campus: '', foundAt: new Date(Date.now() + 9 * 3600e3 - 3 * 86400e3).toISOString().slice(0, 10) }] });   // 사흘 전 — 날짜를 박으면 한 달 뒤 '오래된 글'이 되어 대조군이 0건(2026-11-07 실제로 그랬다)
         w('data/registered.json', { items: [] }); w('data/forms.json', { templates: {} }); w('collector/report.md', '');
         if (ledger) w('collector/auto-held.json', ledger(dir));
         const r = spawnSync(process.execPath, [path.join(dir, 'collector/auto-register.mjs')], { cwd: dir, encoding: 'utf8', env: cleanEnv() });

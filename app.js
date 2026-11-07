@@ -3672,7 +3672,7 @@ function activityCardHtml(n) {
     org: activityHostLine(n),   // 학교 게시판 글은 빈 글자(칩만) · 2026-11-02 개발자 결정
     /* 장학 카드와 같은 판정 하나(적합도 % · 지원 자격 미달). 🔴 **'자격 미확인' 배지는 활동 카드에 안 단다** (2026-10-03 개발자 결정 —
        "왜 대외활동 공모전은 자격 미확인이야 죄다"). 활동 글은 자격이 포스터·첨부에만 있는 것이 많아 대부분의 카드에 같은 회색 배지가 붙어
-       아무 말도 안 하는 배지가 됐다. 모른다는 사실은 시트가 말한다(자격 원문·'원문 보기'). 장학 카드의 '자격 미확인'은 그대로다. */
+       아무 말도 안 하는 배지가 됐다. 장학 카드의 '자격 미확인'은 그대로다. ⚠️ 2026-11-07 부터 시트도 자격 0줄이면 「지원 자격」 칸을 안 그리므로(sheetSectionsHtml) 활동 글은 모른다는 사실을 어디서도 말하지 않는다 — 개발자 지시. */
     badge: fitVerdict(m.fit, m.fd) === 'unread' ? '' : cardBadgeHtml(m.fit, m.fd, null),
     name: parts.title,
     foot: who ? `대상 · ${who}` : '',
@@ -4672,11 +4672,15 @@ function applySectionHtml(sch, opts) {
   return `<h4>접수</h4><ul class="doc-list notice-summary apply-rows">${row('기간', period)}${row('방법', method)}${docText ? row('서류', docText) : ''}</ul>`;
 }
 function sheetSectionsHtml({ sch, result, fit, fd, activity = null, noticeLines = [] }) {
-  /* ① 지원 자격 — 판정은 eligibilityRowsHtml·fitBadgeHtml 그대로(알약 status-pill 은 없다 · 두 축의 말이라). 0줄이면 「원문에서 확인」 한 줄로 칸은 늘 있다(승인 시안 — 자격을 안 봤다는 사실을 숨기지 않는다) */
+  /* ① 지원 자격 — 판정은 eligibilityRowsHtml·fitBadgeHtml 그대로(알약 status-pill 은 없다 · 두 축의 말이라).
+     🔴 넣을 줄이 없고 물을 것도 없으면 **칸 자체를 안 그린다** (2026-11-07 개발자 지시 "지원자격을 못읽은경우에도 내용 없는 지원자격 칸이 있음 … 칸 자체를 없애기" —
+     11-02 시안의 「원문에서 확인」 한 줄(칸은 늘 있음)을 뒤집었다). 장학 카드는 「자격 미확인」 배지가 그 사실을 말하고, 활동 카드엔 그 배지가 없어(아래 noticeCardHtml 10-03 결정)
+     활동 시트는 이제 아무 데서도 말하지 않는다 — 개발자 지시대로다(리뷰 2026-11-07). */
   const rows = eligibilityRowsHtml(sch, result).replace(/<li class="r-unk">\? 지원 자격은 [^<]*<\/li>/g, '');
-  const elig = `<div class="sheet-verdict"><h4>지원 자격</h4><span class="verdict-marks">${fitBadgeHtml(fit, fd, { full: true })}</span></div>
-      <ul class="reason-list">${rows || '<li class="r-elig r-req">자격은 원문에서 확인해 주세요</li>'}</ul>
-      ${eligAskHtml(sch)}`;
+  const ask = eligAskHtml(sch);
+  const elig = (rows || ask) ? `<div class="sheet-verdict"><h4>지원 자격</h4><span class="verdict-marks">${fitBadgeHtml(fit, fd, { full: true })}</span></div>
+      <ul class="reason-list">${rows}</ul>
+      ${ask}` : '';
   /* ② 접수 ③ 공고 안내 */
   const apply = applySectionHtml(sch, { activity });
   const notice = noticeSummaryHtml(noticeLines);

@@ -306,7 +306,9 @@ for (const sch of hits) {
   if (canApply) console.log(`   누르면 → ${pressRoute(sch)}`);
   console.log(`   ─ 목록 카드에 보이는 자격 줄 (${listLines.length}줄 · 5줄 상한)`);
   for (const l of listLines) console.log(`       · ${String(l).slice(0, 84)}`);
-  console.log(`   ─ 상세 시트에 보이는 자격 줄 (${allLines.length}줄 · 전부)`);
+  /* 자격 0줄이면 시트의 「지원 자격」 칸이 아예 없을 수 있다(2026-11-07 개발자 지시 · app.js sheetSectionsHtml). 칸이 남는 경우(우선 선발 기준·발췌 대체 줄·
+     「별도 자격 제한 없음」·판정 근거·빠진 정보·물을 것)는 app.js 의 eligibilityRowsHtml 이 정하고 프로필에 달려 여기서 되풀이하지 않는다 — 유무는 브라우저로 본다(리뷰) */
+  console.log(`   ─ 상세 시트에 보이는 자격 줄 (${allLines.length}줄 · 전부${allLines.length ? '' : ' · 0줄이면 「지원 자격」 칸이 아예 없을 수 있음 — 유무는 app.js eligibilityRowsHtml·브라우저로'})`);
   for (const l of allLines) console.log(`       · ${String(l).slice(0, 84)}`);
   if (allLines.length > listLines.length) console.log(`     ⚠️ 목록에는 ${allLines.length - listLines.length}줄이 안 보인다 — 그건 '숨겨진 것'이 아니라 미리보기 상한이다`);
   console.log(`   ─ 제외 줄 ✗ — 「지원 자격」 칸 안 (${exLines.length}줄)`);

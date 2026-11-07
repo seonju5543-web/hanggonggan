@@ -2145,8 +2145,8 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
       [exOf('접수 기간 2026년 10월 7일(수) ~ 30일(금)')[0], exOf('- 공모 기간 : 2026. 10. 6.( 화 ) ~ 11. 17.( 화 ) 18:00 까지')[0], exOf('ㅇ ( 기간 ) 2026.10.7.( 수 ) ~ 10.30.( 금 )')], ['2026-10-30', '2026-11-17', [null, ['모집기간=2026.10.7.( 수 ) ~ 10.30.( 금 )']]]);
     {
       const appT = readText(new URL('../app.js', import.meta.url));
-      /* 2026-11-02 승인 시안(sheet-consistency.html)으로 바뀐 자리 — 「모집 안내」·「마감일 …」 줄은 없고(접수·공고 안내·머리줄 D-day 로 옮김) 「지원 자격」 칸은 0줄이어도 「원문에서 확인 — 공고가 자격을 따로 적지 않았어요」 한 줄로 늘 있다
-         (10-17 '원문에서 확인 글자 없애기' 결정의 예외 — 개발자가 시안 표의 그 줄을 보고 승인했다 · 자격을 안 봤다는 사실을 숨기지 않는다) */
+      /* 2026-11-02 승인 시안(sheet-consistency.html)으로 바뀐 자리 — 「모집 안내」·「마감일 …」 줄은 없다(접수·공고 안내·머리줄 D-day 로 옮김).
+         「지원 자격」 칸의 「원문에서 확인」 한 줄은 2026-11-07 개발자 지시로 없앴다(0줄이면 칸 자체가 없다 — 관문 「승인받은 화면 그대로인가」) */
       eq('  활동 시트 — 「모집 안내」·「마감일」 줄이 없다 · 장학 시트와 같은 절 다섯(sheetSectionsHtml)을 쓴다',
         [/모집 기간·대상은 공고 원문에서 확인해 주세요/.test(appT), /<h4>모집 안내<\/h4>/.test(appT), /class="sheet-deadline"/.test(appT), /sheetSectionsHtml\(\{ sch, result, fit, fd, activity: n/.test(appT)], [false, false, false, true]);
     }
@@ -12602,7 +12602,9 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
   eq('  순서 — 자격 → 접수 → 공고 안내 → 첨부 → 원문 (return elig + apply + notice + att + src)', /return elig \+ apply \+ notice \+ att \+ src;/.test(sec), true);
   eq('  장학·층2 시트와 활동 시트가 같은 머리줄·절(sheetHeadHtml · sheetSectionsHtml)을 쓴다', [/sheetHeadHtml\(\{ x: sch/.test(od), /sheetSectionsHtml\(\{ sch, result, fit, fd, noticeLines/.test(od), /sheetHeadHtml\(\{ x: n, d/.test(oa), /sheetSectionsHtml\(\{ sch, result, fit, fd, activity: n/.test(oa)], [true, true, true, true]);
   eq('  「지원 가능·선발 심사」 알약(status-pill)은 어느 시트에도 없다', [/status-pill/.test(sec), /status-pill/.test(od), /status-pill/.test(oa)], [false, false, false]);
-  eq('  자격 0줄이면 「자격은 원문에서 확인해 주세요」 한 줄(원인을 단정하지 않는다) · 제외 조건은 같은 목록 안 ✗(r-x)', [/자격은 원문에서 확인해 주세요/.test(sec), /class="r-elig r-x">✗ /.test(fnOf('eligibilityRowsHtml')), /지원 제외 대상/.test(fnOf('eligibilityRowsHtml'))], [true, true, false]);
+  /* 2026-11-07 개발자 지시 "지원자격에 넣을 내용이 없는 경우에는 지원자격 칸 자체를 없애기" — 11-02 의 「원문에서 확인」 한 줄(칸은 늘 있음)을 뒤집었다. 되돌리면 빨갛다 */
+  eq('  자격 0줄이고 물을 것도 없으면 「지원 자격」 칸 자체가 없다(「원문에서 확인」 자리표시 줄 없음 · 2026-11-07) · 제외 조건은 같은 목록 안 ✗(r-x)',
+    [/const elig = \(rows \|\| ask\) \? `<div class="sheet-verdict">/.test(sec), /자격은 원문에서 확인해 주세요/.test(sec), /class="r-elig r-x">✗ /.test(fnOf('eligibilityRowsHtml')), /지원 제외 대상/.test(fnOf('eligibilityRowsHtml'))], [true, false, true, false]);
   eq('  「접수」 = 기간 · 방법 · 서류(읽은 것만) — 방법은 원문 문장(noApply·메일·포털·재단)', [/row\('기간', period\)/, /row\('방법', method\)/, /docText \? row\('서류'/, /sch\.noApply \? sch\.noApply/, /재단 선발 공고문·홈페이지가 정한 접수 방법/].map((r) => r.test(fnOf('applySectionHtml'))), [true, true, true, true, true]);
   eq('  「공고 안내」 는 다섯 줄 뒤 「더 보기」 · 층2 재단 칸(선발방법·선발인원·추천필요여부)도 같은 줄로', [/NS_SHOWN/.test(fnOf('noticeSummaryHtml')), /더 보기 \(\$\{rest\.length\}줄\)/.test(fnOf('noticeSummaryHtml')), /\['선발방법', '선발인원', '추천필요여부'\]/.test(fnOf('kosafAsScholarships'))], [true, true, true]);
   eq('  「첨부」 — 층2는 꼬리표 「재단 선발 공고문」 · 「공고 원본 첨부 양식」 이름은 없다', [/<h4>첨부\$\{sch\.sourceKind === 'kosaf' \? ' <span class="channel-tag">재단 선발 공고문<\/span>' : ''\}<\/h4>/.test(sec), /공고 원본 첨부 양식|공고 원본 첨부</.test(appV)], [true, false]);
