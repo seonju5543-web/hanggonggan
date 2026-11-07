@@ -1,23 +1,21 @@
-## 📄 신청서 원본 → PDF 리포트 (2026-11-07)
+## 📄 신청서 원본 → PDF 리포트 (2026-11-08)
 
 공고 첨부의 신청서 원본(HWP·HWPX·DOC·DOCX·PDF)을 글자 하나 안 바꾸고 PDF 로 바꿔 `data/forms-pdf/` 에 둡니다(마감 전 공고만 · 마감 뒤 지움).
 🔴 양식을 만들어 내지 않습니다 — 못 바꾼 것은 아래에 이유와 함께 남깁니다.
 
-대상 공고 19건 · 파일 25개 — 이번에 바꿈 0 · 이미 있어 건너뜀 25 · 못 바꿈 0 · 원본을 아직 못 받음 8 · 마감 지나 지움 4건
+대상 공고 19건 · 파일 25개 — 이번에 바꿈 0 · 이미 있어 건너뜀 25 · 못 바꿈 0 · 원본을 아직 못 받음 12 · 마감 지나 지움 0건
 
-### 원본을 아직 못 받은 신청서 — 8개 (deepfetch 가 받는 몫 · collector/run-deepfetch.txt targets:)
+### 원본을 아직 못 받은 신청서 — 12개 (deepfetch 가 받는 몫 · collector/run-deepfetch.txt targets:)
 - auto-oardid323054menuno200318 · 2026-2학기 반영장학 선발 공지문 및 학업계획서 양식.hwpx
 - auto-archgbn0searchordersort0-0xe0ymd · 신청서 및 개인정보제공동의서(2026.2학기 도전장학금).hwp
 - auto-ervicenoticedetail520872 · 복지장학생(부모장애유형) 신청서(양식).hwp
 - auto-ervicenoticedetail520869 · 영어(토익)성적장학+신청서(양식).hwp
 - auto-15nttno170869searchctgry · 붙임2_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf
+- auto-15nttno170869searchctgry · 붙임1_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf
 - auto-amepagescholarshipnotice-0zk0x95 · 붙임1_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf
 - auto-oardid323410menuno200318 · 공과대학 특성화 장학 프로그램 신청서fv.hwp
 - auto-116bnum5233cate0qidx5233 · 붙임1_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf
-
-### 마감이 지나 지운 공고 — 4건
-- auto-otice06doarticleno140601
-- auto-notice7doarticleno894852
-- auto-eywordpaged1slug20262116
-- auto-dmodeviewduid53596tpage1
+- auto-hkrwdsfpnos1073sfpnos888-0ihaecn · ★2026-2 장학사정관장학금 신청서（양식）.hwp
+- auto-amepagescholarshipnotice-09j8czz · 관정국내장학생지원서양식 학부.hwp
+- auto-amepagescholarshipnotice-09j8czz · 국내 개인정보수집동의서공통.hwp
 
