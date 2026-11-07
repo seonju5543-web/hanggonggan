@@ -1,4 +1,4 @@
-## 🖥 브라우저형 수집 리포트 (2026-11-06 19:41 KST)
+## 🖥 브라우저형 수집 리포트 (2026-11-07 11:43 KST)
 
 ### 한국외국어대학교
 - ✅ 링크 84 · 장학 공고 14 · https://dep.hufs.ac.kr/student/12767/subview.do
@@ -12,7 +12,11 @@
   - ⏭ 남은 후보 1곳은 열지 않음(앞 주소에서 읽었다)
 
 ### 서울시립대학교
-- ⚪ 링크 110 · 장학 공고 0 · 이미 아는 공고 23건은 다시 열지 않음 · https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1
+  - 📄 2페이지에서 장학 공고 20건 더 읽음
+- ✅ 링크 240 · 장학 공고 18 · 이미 아는 공고 23건은 다시 열지 않음 · https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1
+  - (클릭 예산 초과 — 19/23건까지 채집)
+  - [수집] [국가/안내] 2026-2학기 주거안정장학금 지급..
+- ⛔ 응답이 멈춰 7분 30초에서 강제 중단 — 여기까지 채집한 공고만 저장합니다
 
 ### 중앙대학교
 - ⚪ 링크 652 · 장학 공고 0 · 이미 아는 공고 15건은 다시 열지 않음 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5
@@ -23,19 +27,18 @@
 - ✅ 링크 1234 · 장학 공고 2 · 이미 아는 공고 19건은 다시 열지 않음 · https://www.dongguk.edu/article/JANGHAKNOTICE/list
 
 ### 상명대학교
-- ✅ 링크 694 · 장학 공고 7 · https://www.smu.ac.kr/kor/life/notice.do
+- ✅ 링크 636 · 장학 공고 5 · https://www.smu.ac.kr/kor/life/notice.do
   - ⏭ 남은 후보 2곳은 열지 않음(앞 주소에서 읽었다)
 
 ### 고려대학교
-  - 📄 2페이지에서 장학 공고 7건 더 읽음
-- ✅ 링크 767 · 장학 공고 3 · 이미 아는 공고 6건은 다시 열지 않음 · https://www.korea.ac.kr/ko/568/subview.do
+  - 📄 2페이지에서 장학 공고 6건 더 읽음
+- ✅ 링크 766 · 장학 공고 2 · 이미 아는 공고 6건은 다시 열지 않음 · https://www.korea.ac.kr/ko/568/subview.do
 
 ### 계명대학교
 - ✅ 링크 527 · 장학 공고 16 · https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&
 
 ### 부산대학교
-  - 📄 2페이지에서 장학 공고 10건 더 읽음
-- ✅ 링크 90 · 장학 공고 2 · 이미 아는 공고 10건은 다시 열지 않음 · https://onestop.pusan.ac.kr/page?menuCD=000000000000062
+- ✅ 링크 45 · 장학 공고 1 · 이미 아는 공고 10건은 다시 열지 않음 · https://onestop.pusan.ac.kr/page?menuCD=000000000000062
 
 ### 서울교육대학교
 - ⚪ 링크 371 · 장학 공고 0 · 이미 아는 공고 12건은 다시 열지 않음 · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
@@ -55,8 +58,9 @@
 - ✅ 링크 590 · 장학 공고 37 · https://www.seoultech.ac.kr/service/info/janghak/
 
 ---
-이번 실행 신규 수집: **0건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
-⏱ 소요 2분 / 예산 22분 · 학교 14/14곳 처리
+이번 실행 신규 수집: **1건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
+⏱ 소요 8분 / 예산 22분 · 학교 14/14곳 처리
+⛔ **정한 시한 안에 다 못 읽어 끊은 학교 1곳**: 서울시립대학교 — 정한 시한(7분 30초) 안에 이 학교를 다 읽지 못해 끊었어요(어디서 멈췄는지는 실행 로그의 ▶/◀ 줄). 끊지 않으면 로봇이 그 자리에 멈춰 서고, 강제 종료되면서 **그날 수집분 전체가 버려집니다**(2026-08-15~17에 3회 연속 그렇게 됐어요). 다음 예약 실행에 다시 시도합니다.
 **🧩 양식 원본 자동 확보 예약 1건** — 원본은 이 실행에서 바로 내려받고, 같은 실행의 무료 변환기가 앱 양식으로 옮겨요(못 옮긴 것은 리포트 '보류'에 남아요).
 
 **⏳ 스키마화 대기 중 83건** (원본 확보됨 — collector/pending-forms.json)
@@ -69,6 +73,7 @@
 
 자동 등록분은 앱에 **자동 등록 · 검수 전** 배지로 표시돼요. 잘못 등록된 건이 있으면 채팅으로 알려주시거나 `collector/auto-register-config.json`의 `blockIds`에 id를 넣어주세요.
 
+- `auto-skor478126826artclviewdo` [[글로벌] 2026-2학기 일반 교내 및 교외 국가근로장학생 추가 모집(2차) 안내](https://www.gachon.ac.kr/bbs/kor/478/126826/artclView.do) · 마감 2026-11-18 · 가천대학교
 - `auto-qlmjzmaw5kv29yzcuzrcuyng-07fiyle` [[교외-11/23]송원김영환장학재단 2027학년도 제44기 송원장학생 모집 안내(학교지원)](https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4OTUlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D) · 마감 2026-11-23 · 고려대학교
 - `auto-ent2431270972artclviewdo` [[공통][교외]2026-2 한국외대 민주동문회 장학금 장학생 모집(~11/16)](https://dep.hufs.ac.kr/bbs/student/2431/270972/artclView.do) · 마감 2026-11-16 · 한국외국어대학교
 - `auto-scho332282595artclviewdo` [2026학년도 (재)빛고을장학재단 대학추천 장학생 선발 안내](https://www3.chosun.ac.kr/bbs/scho/332/282595/artclView.do) · 조선대학교
@@ -76,7 +81,6 @@
 - `auto-ghaknoticedetail26766893` [(광주)화엄사 빛고을포교원 지역미래불자육성장학 장학생 선발 안내](https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766893) · 마감 2026-11-12 · 동국대학교
 - `auto-amepagescholarshipnotice-1h5dt8m` [[교외] 보림선원 서울선원 장학생 선발 안내(1/5 마감, 장학금 최대 800만원)](https://www.sogang.ac.kr/ko/detail/551760?bbsConfigFk=141&namepage=ScholarshipNotice) · 마감 2027-01-05 · 서강대학교
 - `auto-skor478126768artclviewdo` [[공통] 2026-2학기 외국인 장학금 추가 신청(최종)](https://www.gachon.ac.kr/bbs/kor/478/126768/artclView.do) · 마감 2026-11-18 · 가천대학교
-- `auto-skor478126763artclviewdo` [[메디컬] 인천광역시체육회 제45회 체육장학생 신청 안내](https://www.gachon.ac.kr/bbs/kor/478/126763/artclView.do) · 마감 2026-11-18 · 가천대학교
 
 **컨펌 대기 (자동 기준 미달 9건)** — 장학 신호는 있지만 선발·모집 신호가 약하거나 등록 규칙에 걸렸어요(괄호에 이유):
 - [한국장학재단] 청년지원정보 통합제공 플랫폼 '통학로' 홍보 (선발·모집·신청 신호 없음 — 개발자 컨펌 대기)
@@ -93,13 +97,14 @@
 
 ⚠️ 차단 id 하나가 여러 공고에 걸림 — 주소(blockUrls)로만 막음: `auto-amepagescholarshipnotice` 16건
 
-**거른 공고 3건 — 이유별**
+**거른 공고 5건 — 이유별**
 
+- 이미 등록(동일 사업) · 2건
+- 국가장학금 상시 제도 — 앱 내 카드로 이미 안내 · 1건
 - 행사·연수·설명회(신청형 장학 아님) · 1건
 - 행정 안내(신청 공고 아님) · 1건
-- 이미 등록(동일 사업) · 1건
 
-⏭ 한 실행 상한(8건)에 걸려 **625건은 보지 않았어요** — 다음 수집에서 이어서 봅니다.
+⏭ 한 실행 상한(8건)에 걸려 **623건은 보지 않았어요** — 다음 수집에서 이어서 봅니다.
 
 
 ### 🌐 범위 승격 (학교 한정 → 전국) — 0건

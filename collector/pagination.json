@@ -45,7 +45,7 @@
    "kind": "page",
    "param": "pageNo"
   },
-  "checkedAt": "2026-11-06"
+  "checkedAt": "2026-11-07"
  },
  "https://www.hongik.ac.kr/kr/newscenter/notice.do": {
   "ok": false,
@@ -214,19 +214,15 @@
    "param": "article.offset",
    "limit": 10
   },
-  "checkedAt": "2026-11-06"
+  "checkedAt": "2026-11-07"
  },
  "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100": {
   "ok": false,
   "checkedAt": "2026-10-01"
  },
  "https://onestop.pusan.ac.kr/page?menuCD=000000000000062": {
-  "ok": true,
-  "way": {
-   "kind": "page",
-   "param": "pageNo"
-  },
-  "checkedAt": "2026-11-06"
+  "ok": false,
+  "checkedAt": "2026-11-07"
  },
  "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083": {
   "ok": false,
@@ -445,8 +441,12 @@
   "checkedAt": "2026-11-07"
  },
  "https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1": {
-  "ok": false,
-  "checkedAt": "2026-10-24"
+  "ok": true,
+  "way": {
+   "kind": "page",
+   "param": "pageNo"
+  },
+  "checkedAt": "2026-11-07"
  },
  "https://gwangyang.go.kr/fund/": {
   "ok": false,
