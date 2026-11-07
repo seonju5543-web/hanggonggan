@@ -5631,6 +5631,15 @@ console.log('\n■ 화면에 나가는 자격 줄 다듬기 (2026-08-20)');
   const joined = R(['2026-2학기 정규학기 학부 재학생 및 복학예정자 중', '기초생활수급자']);
   eq('이어지는 줄을 붙여 문장을 완성한다', joined[0], '2026-2학기 정규학기 학부 재학생 및 복학예정자 중 기초생활수급자');
   eq('  잘린 채로 내보내지 않는다', joined.some((l) => /(또는|및|중)\s*$/.test(l)), false);
+  /* 🔴 `주민등록` 도 거주 요건 신호다 (2026-11-07 · 영광군미래교육재단: 「보호자가 … 영광군에 주민등록을 두고 있어야 함」 이 신호가 없어 화면에서 버려져 서울 학생에게
+     「적합 83%」 — verify-kosaf 「사는 시·군이 아닌 곳의 장학금을 적합이라 하지 않는다」 가 빨갰다). 서류 이름(등본·초본)·동의 안내(주민등록정보)는 그대로 요건이 아니다. 되돌리면 [0,…] */
+  {
+    const seoul = { school: '한국외국어대학교', track: 'humanities', major: '영어학과', year: 3, status: '재학', gpa: 3.2, bracket: 6, credits: 14, region: '서울', parentRegion: '서울', regionCity: '강서구', parentRegionCity: '강서구', nationality: 'korean', birthYear: 2004, flags: [], common: {} };
+    const yg = { type: '교외', sourceKind: 'kosaf', eligibility: { selective: true }, eligibilityLines: ['보호자가 공고일 현재 3년 이상 계속하여 영광군에 주민등록을 두고 있어야 함', '학생의 주소 무관'] };
+    eq('「영광군에 주민등록을 두고 있어야 함」 은 요건 줄이고 서울 학생에게 ✕ · 서류 목록 「신청서, 주민등록등본, …」 은 요건이 아니다',
+      [R(yg.eligibilityLines).length, ME.fitDetail(yg, seoul).fails.length, R(['- 신청서, 주민등록등본, 개인정보 동의서, 통장 사본']).length],
+      [1, 1, 0]);
+  }
   // 표 칸·구분 머리표·배점은 자격이 아니다
   eq('표 칸은 버린다', R(['국가고시', '직전학기 평점평균 3.0 이상인 자']).length, 1);
   eq('  구분 머리표도 버린다', R(['(계속장학생)', '직전학기 평점 3.0 이상인 자']).length, 1);
