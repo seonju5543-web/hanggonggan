@@ -3,6 +3,10 @@
  "updatedAt": "2026-11-07",
  "schools": 44,
  "files": {
+  "서울시립대학교": {
+   "file": "n1au199v.json",
+   "count": 39
+  },
   "서울대학교": {
    "file": "nsgh1oi.json",
    "count": 20
@@ -50,10 +54,6 @@
   "인하대학교": {
    "file": "nkeh7pq.json",
    "count": 51
-  },
-  "서울시립대학교": {
-   "file": "n1au199v.json",
-   "count": 39
   },
   "동국대학교": {
    "file": "n1or8oiw.json",

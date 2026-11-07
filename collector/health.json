@@ -31,10 +31,9 @@
   "lastOk": "2026-10-27"
  },
  "서울시립대학교": {
-  "fails": 1,
-  "lastOk": "2026-11-06",
-  "browserFails": 1,
-  "browserWhy": "시한 안에 못 끝냄"
+  "fails": 0,
+  "lastOk": "2026-11-07",
+  "browserFails": 0
  },
  "건국대학교": {
   "fails": 0,
