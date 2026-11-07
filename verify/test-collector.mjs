@@ -5636,9 +5636,13 @@ console.log('\n■ 화면에 나가는 자격 줄 다듬기 (2026-08-20)');
   {
     const seoul = { school: '한국외국어대학교', track: 'humanities', major: '영어학과', year: 3, status: '재학', gpa: 3.2, bracket: 6, credits: 14, region: '서울', parentRegion: '서울', regionCity: '강서구', parentRegionCity: '강서구', nationality: 'korean', birthYear: 2004, flags: [], common: {} };
     const yg = { type: '교외', sourceKind: 'kosaf', eligibility: { selective: true }, eligibilityLines: ['보호자가 공고일 현재 3년 이상 계속하여 영광군에 주민등록을 두고 있어야 함', '학생의 주소 무관'] };
-    eq('「영광군에 주민등록을 두고 있어야 함」 은 요건 줄이고 서울 학생에게 ✕ · 서류 목록 「신청서, 주민등록등본, …」 은 요건이 아니다',
-      [R(yg.eligibilityLines).length, ME.fitDetail(yg, seoul).fails.length, R(['- 신청서, 주민등록등본, 개인정보 동의서, 통장 사본']).length],
-      [1, 1, 0]);
+    eq('「영광군에 주민등록을 두고 있어야 함」 은 요건 줄이고 서울 학생에게 ✕ · 서류 이름 「주민등록등본」·「주민등록표 등본」·「주민등록 사실증명」 은 요건이 아니다',
+      [R(yg.eligibilityLines).length, ME.fitDetail(yg, seoul).fails.length, R(['- 신청서, 주민등록등본, 개인정보 동의서, 통장 사본']).length, R(['주민등록표 등본 1부']).length, R(['주민등록 사실증명 1부']).length],
+      [1, 1, 0, 0, 0]);
+    /* 🔴 거창군장학회 — 「…거창군에 주민등록을 두고 있는 경우」 ○ 「거창군 소재 중·고교 졸업자」 는 둘 중 하나(2026-10-25 은서 결정 A안 · verify-kosaf 머리말).
+       주민등록 신호로 첫 줄이 살아나면 서울 학생에게 틀린 미달이 된다(리뷰 재현) → 「…경우」 로 끝나는 거주 줄은 모름(RES_EXCEPT). 줄은 보이되 ✕ 는 없다 */
+    const gc = { type: '교외', sourceKind: 'kosaf', eligibility: { selective: true }, eligibilityLines: ['학생과 1명 이상의 가족이 공고일 기준 3년 이상 계속하여 거창군에 주민등록을 두고 있는 경우', '거창군 소재 중학교 또는 고등학교를 3년 동안 재학하고 졸업한 사람'] };
+    eq('  거창군 — 「…주민등록을 두고 있는 경우」 줄은 보이되 서울 학생에게 ✕ 가 아니다(모름 · 다음 줄이 다른 길)', [R(gc.eligibilityLines).length, ME.fitDetail(gc, seoul).fails], [2, []]);
   }
   // 표 칸·구분 머리표·배점은 자격이 아니다
   eq('표 칸은 버린다', R(['국가고시', '직전학기 평점평균 3.0 이상인 자']).length, 1);
