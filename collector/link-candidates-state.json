@@ -114,6 +114,22 @@
   "round": "2026-11-13",
   "decidedAt": "2026-11-02"
  },
+ "kosaf|2000108001|board:https://www.icbp.go.kr/main/participation/news/recruit.jsp": {
+  "ds": "kosaf",
+  "key": "2000108001",
+  "url": "",
+  "board": "https://www.icbp.go.kr/main/participation/news/recruit.jsp",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "firstAt": "2026-11-08",
+  "lastAt": "2026-11-08",
+  "tries": 1,
+  "status": "rejected",
+  "why": "그 사이트 robots.txt 가 게시판 훑기를 막음 — 글 주소로 다시 적어 주세요",
+  "checks": {},
+  "round": "2026-11-13",
+  "decidedAt": "2026-11-08"
+ },
  "kosaf|2000204008|board:https://council.wonju.go.kr/content/news/photoGallery.html": {
   "ds": "kosaf",
   "key": "2000204008",
@@ -253,6 +269,22 @@
   },
   "round": "2026-11-16",
   "nextAt": "2026-11-10"
+ },
+ "kosaf|2000356002|board:https://www.tongyeong.go.kr/00001/00286/00309.web": {
+  "ds": "kosaf",
+  "key": "2000356002",
+  "url": "",
+  "board": "https://www.tongyeong.go.kr/00001/00286/00309.web",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "firstAt": "2026-11-08",
+  "lastAt": "2026-11-08",
+  "tries": 1,
+  "status": "pending",
+  "why": "게시판 목록(0줄)에서 그 글을 하나로 못 고름",
+  "checks": {},
+  "round": "2026-11-23",
+  "nextAt": "2026-11-09"
  },
  "kosaf|2000423012|https://www.jincheon.go.kr/jcjh/sub.do?menukey=3464&mode=view&no=1076147380": {
   "ds": "kosaf",
@@ -768,6 +800,22 @@
   "decidedAt": "2026-10-13",
   "verifiedAt": "2026-10-13",
   "also": []
+ },
+ "kosaf|2704228001|board:https://www.busan.go.kr/nbnews": {
+  "ds": "kosaf",
+  "key": "2704228001",
+  "url": "",
+  "board": "https://www.busan.go.kr/nbnews",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "firstAt": "2026-11-08",
+  "lastAt": "2026-11-08",
+  "tries": 1,
+  "status": "pending",
+  "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
+  "checks": {},
+  "round": "2026-11-16",
+  "nextAt": "2026-11-09"
  },
  "kosaf|2704345001|board:https://yeonje.go.kr/edu/main.do": {
   "ds": "kosaf",

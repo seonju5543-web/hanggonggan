@@ -180,16 +180,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3504654": {
-  "lastAt": "2026-11-07",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "final": "https://www.1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3504654",
-  "v": "post",
-  "at": "2026-11-07",
-  "n": 0,
-  "confirmed": false
- },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3519474": {
   "lastAt": "2026-11-06",
   "lastV": "post",
@@ -309,11 +299,6 @@
   "at": "2026-11-05",
   "n": 0,
   "confirmed": false
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3546415": {
-  "lastAt": "2026-11-07",
-  "lastV": "unread",
-  "why": "열기 실패: page.goto: net::ERR_EMPTY_RESPONSE at https://1365.go.kr/vol"
  },
  "https://asanmirae.or.kr:449/main/index.php?m_cd=32&b_id=20260714107548723": {
   "lastAt": "2026-10-27",
@@ -1088,15 +1073,6 @@
   "confirmed": false
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/270420/artclView.do": {
-  "lastAt": "2026-10-31",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-10-31",
-  "n": 0,
-  "confirmed": false
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/270423/artclView.do": {
   "lastAt": "2026-10-31",
   "lastV": "post",
   "why": "제목 자리에 그 공고 제목",
@@ -4665,15 +4641,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260916&brdSeq=1&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&": {
-  "lastAt": "2026-11-05",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-05",
-  "n": 0,
-  "confirmed": false
- },
  "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260916&brdSeq=2&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&": {
   "lastAt": "2026-10-20",
   "lastV": "post",
@@ -4797,15 +4764,6 @@
   "why": "제목 자리에 그 공고 제목",
   "v": "post",
   "at": "2026-10-29",
-  "n": 0,
-  "confirmed": false
- },
- "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261027&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&": {
-  "lastAt": "2026-10-28",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-10-28",
   "n": 0,
   "confirmed": false
  },
@@ -8263,30 +8221,12 @@
   "lastV": "unread",
   "why": "글 표지도 제목도 없음(판정 불가)"
  },
- "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000239/articleView.do?searchSeq=17164&commonMenuNo=8_30_31": {
-  "lastAt": "2026-10-28",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-10-28",
-  "n": 0,
-  "confirmed": false
- },
  "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000239/articleView.do?searchSeq=17166&commonMenuNo=8_30_31": {
   "lastAt": "2026-10-28",
   "lastV": "post",
   "why": "제목 자리에 그 공고 제목",
   "v": "post",
   "at": "2026-10-28",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000239/articleView.do?searchSeq=17269&commonMenuNo=8_30_31": {
-  "lastAt": "2026-10-31",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-10-31",
   "n": 0,
   "confirmed": false
  },
@@ -9190,48 +9130,18 @@
   "lastV": "unread",
   "why": "열기 실패: page.goto: net::ERR_CONNECTION_TIMED_OUT at https://www.dsa."
  },
- "https://www.dsa.or.kr/ad_link.php?uid=1829&Table=ins_bbs43&link_url=http%3A%2F%2Fwww.cnbizm.com%2Fnews%2FarticleView.html%3Fidxno%3D318675&count_db=5": {
-  "lastAt": "2026-11-07",
-  "lastV": "unread",
-  "why": "열기 실패: page.goto: net::ERR_CONNECTION_TIMED_OUT at https://www.dsa."
- },
- "https://www.dsa.or.kr/ad_link.php?uid=1830&Table=ins_bbs43&link_url=http%3A%2F%2Fwww.popcornnews.net%2Fnews%2FarticleView.html%3Fidxno%3D136724&count_db=1": {
-  "lastAt": "2026-11-03",
-  "lastV": "unread",
-  "why": "열기 실패: page.goto: net::ERR_CONNECTION_TIMED_OUT at https://www.dsa."
- },
  "https://www.dsa.or.kr/ad_link.php?uid=1831&Table=ins_bbs43&link_url=http%3A%2F%2Fwww.globalepic.co.kr%2Fview.php%3Fud%3D2026102109430172967cc35ccc5c_29&count_db=8": {
   "lastAt": "2026-11-07",
   "lastV": "unread",
   "why": "열기 실패: page.goto: net::ERR_CONNECTION_TIMED_OUT at https://www.dsa."
- },
- "https://www.dsa.or.kr/ad_link.php?uid=1833&Table=ins_bbs43&link_url=http%3A%2F%2Fwww.thefairnews.co.kr%2Fnews%2FarticleView.html%3Fidxno%3D91400&count_db=8": {
-  "lastAt": "2026-11-07",
-  "lastV": "unread",
-  "why": "열기 실패: page.goto: Timeout 20000ms exceeded."
  },
  "https://www.dsa.or.kr/ad_link.php?uid=1834&Table=ins_bbs43&link_url=http%3A%2F%2Fwww.newsprime.co.kr%2Fnews%2Farticle%2F%3Fno%3D751833&count_db=7": {
   "lastAt": "2026-11-07",
   "lastV": "unread",
   "why": "열기 실패: page.goto: Timeout 20000ms exceeded."
  },
- "https://www.dsa.or.kr/ad_link.php?uid=1835&Table=ins_bbs43&link_url=http%3A%2F%2Fwww.ziksir.com%2Fnews%2FarticleView.html%3Fidxno%3D150215&count_db=12": {
-  "lastAt": "2026-11-07",
-  "lastV": "unread",
-  "why": "열기 실패: page.goto: Timeout 20000ms exceeded."
- },
  "https://www.dsa.or.kr/ad_link.php?uid=1836&Table=ins_bbs43&link_url=http%3A%2F%2Fwww.g-enews.com%2Fview.php%3Fud%3D202610211057431885a6e8311f64_1&count_db=4": {
   "lastAt": "2026-11-07",
-  "lastV": "unread",
-  "why": "열기 실패: page.goto: Timeout 20000ms exceeded."
- },
- "https://www.dsa.or.kr/ad_link.php?uid=1837&Table=ins_bbs43&link_url=http%3A%2F%2Fwww.agrinet.co.kr%2Fnews%2FarticleView.html%3Fidxno%3D408123&count_db=7": {
-  "lastAt": "2026-11-07",
-  "lastV": "unread",
-  "why": "열기 실패: page.goto: Timeout 20000ms exceeded."
- },
- "https://www.dsa.or.kr/ad_link.php?uid=1838&Table=ins_bbs43&link_url=http%3A%2F%2Fwww.nongmin.com%2Farticle%2F20261021500587&count_db=25": {
-  "lastAt": "2026-11-06",
   "lastV": "unread",
   "why": "열기 실패: page.goto: Timeout 20000ms exceeded."
  },
@@ -13441,15 +13351,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179536": {
-  "lastAt": "2026-10-31",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-10-31",
-  "n": 0,
-  "confirmed": false
- },
  "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179552": {
   "lastAt": "2026-11-03",
   "lastV": "post",
@@ -13528,15 +13429,6 @@
   "why": "제목 자리에 그 공고 제목",
   "v": "post",
   "at": "2026-10-31",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179673": {
-  "lastAt": "2026-11-07",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-07",
   "n": 0,
   "confirmed": false
  },
@@ -19366,15 +19258,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://www.nipa.kr/home/2-1/16975": {
-  "lastAt": "2026-10-30",
-  "lastV": "post",
-  "why": "본문에 그 공고 제목",
-  "v": "post",
-  "at": "2026-10-30",
-  "n": 0,
-  "confirmed": false
- },
  "https://www.nmcpublicedu.or.kr/view.asp?idx=4827&boardcode=notice&go=&field=&keyword=&page=": {
   "lastAt": "2026-11-02",
   "lastV": "post",
@@ -24049,15 +23932,6 @@
   "why": "본문에 그 공고 제목",
   "v": "post",
   "at": "2026-11-04",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.youthcenter.go.kr/bbs03View/48/10836": {
-  "lastAt": "2026-11-05",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-05",
   "n": 0,
   "confirmed": false
  },
