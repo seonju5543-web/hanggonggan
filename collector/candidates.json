@@ -1,8 +1,35 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-11-08",
- "count": 1667,
+ "count": 1670,
  "items": [
+  {
+   "title": "[교외] 방일영 문화재단 탈북대학생 장학생 선발",
+   "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdBbsseq=1&pageNo=2&nttId=20261022",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서울시립대학교",
+   "campus": "",
+   "foundAt": "2026-11-08"
+  },
+  {
+   "title": "[교외] 2026년 2학기 푸른등대 기부장학금",
+   "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdBbsseq=1&pageNo=2&nttId=20261026",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서울시립대학교",
+   "campus": "",
+   "foundAt": "2026-11-08"
+  },
+  {
+   "title": "[교외] 동진장학연구재단 동진장학금 장학생 선발",
+   "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdBbsseq=1&pageNo=2&nttId=20261029",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서울시립대학교",
+   "campus": "",
+   "foundAt": "2026-11-08"
+  },
   {
    "title": "[국가/안내] 2026-2학기 주거안정장학금 지급..",
    "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1&pageNo=2#n-%5B%EA%B5%AD%EA%B0%80%2F%EC%95%88%EB%82%B4%5D%202026-2%ED%95%99%EA%B8%B0%20%EC%A3%BC%EA%B1%B0%EC%95%88%EC%A0%95%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%A7%80%EA%B8%89..",

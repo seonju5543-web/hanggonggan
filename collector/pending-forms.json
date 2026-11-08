@@ -1002,7 +1002,7 @@
    "added": "2026-11-08",
    "fetched": false,
    "schematized": false,
-   "tries": 1,
+   "tries": 2,
    "lastTryAt": "2026-11-08"
   },
   {
@@ -1012,8 +1012,32 @@
    "added": "2026-11-08",
    "fetched": false,
    "schematized": false,
-   "tries": 1,
+   "tries": 2,
    "lastTryAt": "2026-11-08"
+  },
+  {
+   "id": "auto-skor478126763artclviewdo",
+   "name": "[메디컬] 인천광역시체육회 제45회 체육장학생 신청 안내",
+   "target": "인천광역시체육회 제45회 체육장학생 신청 안내",
+   "added": "2026-11-08",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-3bnum57138cate0qidx57138",
+   "name": "2026-2학기 국가근로장학생 교체 선발모집_(주)아이티희망나눔",
+   "target": "2026-2학기 국가근로장학생 교체 선발모집_(주)아이",
+   "added": "2026-11-08",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-skor478126731artclviewdo",
+   "name": "[공통] (생활비-학비보조)2027-1학기 (재)이오순장학재단 장학생 선발 안내",
+   "target": "(생활비-학비보조)2027-1학기 (재)이오순장학재단 ",
+   "added": "2026-11-08",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }
