@@ -368,5 +368,27 @@
   ],
   "excludes": [],
   "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3546415": {
+  "at": "2026-11-08",
+  "tries": 1,
+  "lines": [
+   "아동·청소년",
+   "활동구분",
+   "오프라인",
+   "봉사자유형 : 성인"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156788329&pWise=sub&pWiseSub=C4": {
+  "at": "2026-11-08",
+  "tries": 1,
+  "lines": [
+   "ㅇ ‘ 2030청년자문단 ’은 국토교통부 정책에 관심 있는 만 19~39세 청년 이라면 누구나 ‘ 청년인재 DB ’ (www.2030db.go.kr) 를 통해 신청할 수 있다 . 서류심사 와 면접 을 거쳐 25명 내외를 선발 한다. 활동 기간은 2027년 1월부터 12월 까지다.",
+   "ㅇ ‘ 청년온라인패널 ’ 역시 만 19~39 세 청년 을 대상으로 하며 , 국토교통부 온통광장 (www.molit.go.kr/ontong_plaza)을 통해 신청할 수 있다. 최대 1천 명 을 모집 하며, 선발된 청년들은 월 1 회 이상 주요 정책에 대한 온라인 설문조사 에 참여한다 . 3 회 이상 참여하면 활동 증명서 를 받을 수 있다 ."
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
  }
 }

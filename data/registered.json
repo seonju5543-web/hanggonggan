@@ -22487,7 +22487,21 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-11-08 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "★2026년 국가우수장학금(이공계)_일시지원 3학년 선발 안내문 fvV.pdf",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=df20e239e9fa4e78b609b95d64f57db2&fileSn=1&bbsId=BMSR00040"
+    },
+    {
+     "name": "★2026년 국가우수장학금(이공계) 일시지원(한 학기 지원)유형 양식FV(파일명준수).hwp",
+     "url": "https://news.khu.ac.kr/kor/cmmn/file/fileDown.do?menuNo=200318&atchFileId=df20e239e9fa4e78b609b95d64f57db2&fileSn=2&bbsId=BMSR00040"
+    },
+    {
+     "name": "본문이미지-1240x1753.jpg",
+     "url": "https://www.khu.ac.kr/upload/cross/images/000070/1_2.jpg",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323515",
    "sourceKind": "auto"
   },
