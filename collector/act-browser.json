@@ -41,23 +41,6 @@
   "at": "2026-10-16",
   "tries": 1
  },
- "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179448": {
-  "at": "2026-10-17",
-  "tries": 1,
-  "lines": [
-   "대상 : 대학생, 일반인",
-   "창업업력",
-   "예비창업자",
-   "2026년 청년 어촌창업 아이디어 공모전",
-   "2026년 10월 07일",
-   "한국어촌어항공단",
-   "대상연령 : 만 20세 이상 ~ 만 39세 이하"
-  ],
-  "excludes": [
-   "팀과 개인 모두 공고마감일까지 사업자 등록을 하지 않아야 하며, 타 공모전 수상이력이 있거나 사업화 중인 사업 아이템, 지적재산권 분쟁 우려가 있는 아이템 등은 제외"
-  ],
-  "from": "브라우저 본문"
- },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/520896": {
   "at": "2026-10-23",
   "tries": 1,
