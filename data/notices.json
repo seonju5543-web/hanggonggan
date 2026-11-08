@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-07",
+ "updatedAt": "2026-11-08",
  "items": [
   {
    "title": "[교외] 2026년 인송문화재단 인송장학생 선발 ..",
@@ -1081,7 +1081,9 @@
    "school": "고려대학교",
    "campus": "",
    "foundAt": "2026-11-04",
-   "boardTitle": "[기금-10/8] 2026학년도 2학기 푸른솔 사회정의 장학금 신청 안내 (선발완료_11/3 메일 안내 완료)"
+   "boardTitle": "[기금-10/8] 2026학년도 2학기 푸른솔 사회정의 장학금 신청 안내 (선발완료_11/3 메일 안내 완료)",
+   "bodyDeadline": "2026-10-08",
+   "bodyDeadlineText": "[기금-10/8] 2026학년도 2학기 푸른솔 사회정의 장학금 신청 안내 (심사중) (선발결과는 11월 초중순 별도 메일로 안내 예정)"
   },
   {
    "title": "[한국장학재단] 학자금 중복지원, 미리 확인하고 예방하세요!",
@@ -9050,6 +9052,15 @@
    "foundAt": "2026-10-06",
    "bodyDeadline": "2026-10-30",
    "bodyDeadlineText": "※ 신입생 장학금은 상반기 미신청자에 한해 신청 가능 ❍ 공고 및 접수기간 : 2026 년 9 월 28 일 ( 월 ) ~ 2026 년 10 월 30 일 ( 금 )"
+  },
+  {
+   "title": "[교외-10/26]2027년 아산사회복지재단 의생명과학분야 대학 장학생 선발 안내(재단지원)",
+   "url": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NzAlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
+   "attachments": [],
+   "deadlineHint": "접수 기간: 2026년 10월 6일(화) ~ 10월 26일(월) 23시 59분 - 접수 방법: 아산재단 지원신청 서비스(https://welfa",
+   "school": "고려대학교",
+   "campus": "",
+   "foundAt": "2026-10-06"
   },
   {
    "title": "[교외] [대전청년내일재단] 2026년 하반기 인재육성(성취) 장학생 선발(~10/8)(기간 연장)",
