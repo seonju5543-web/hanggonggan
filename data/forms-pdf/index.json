@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-08",
+ "updatedAt": "2026-11-09",
  "items": {
   "auto-ticedoarticleno231977952": [
    {
@@ -100,18 +100,6 @@
     "pages": 1,
     "bytes": 112327,
     "srcBytes": 59392,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-28"
-   }
-  ],
-  "auto-bswj104944451artclviewdo": [
-   {
-    "file": "auto-bswj104944451artclviewdo/1-2026년_하반기_대한적십자사_헌혈기부권_대학생_장학금_신청서식_연세대_미래.pdf",
-    "name": "2026년 하반기 대한적십자사 헌혈기부권 대학생 장학금 신청서식_연세대 미래.hwp",
-    "pages": 7,
-    "bytes": 242732,
-    "srcBytes": 68096,
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-10-28"
@@ -287,6 +275,30 @@
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-11-03"
+   }
+  ],
+  "auto-skor478126826artclviewdo": [
+   {
+    "file": "auto-skor478126826artclviewdo/1-_붙임2_2026-2학기_국가근로장학금_운영계획서_및_자체선발기준.pdf",
+    "name": "(붙임2) 2026-2학기 국가근로장학금 운영계획서 및 자체선발기준.hwp",
+    "pages": 7,
+    "bytes": 384139,
+    "srcBytes": 150016,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-09"
+   }
+  ],
+  "auto-3bnum57138cate0qidx57138": [
+   {
+    "file": "auto-3bnum57138cate0qidx57138/1-서식1._국가근로장학생_지원서_학생_.pdf",
+    "name": "서식1. 국가근로장학생 지원서(학생).hwp",
+    "pages": 2,
+    "bytes": 69335,
+    "srcBytes": 54272,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-09"
    }
   ]
  }

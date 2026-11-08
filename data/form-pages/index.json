@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-08",
+ "updatedAt": "2026-11-09",
  "items": {
   "auto-oardid323011menuno200318": [
    {
@@ -610,19 +610,6 @@
     "at": "2026-10-31"
    }
   ],
-  "kosaf-1814024001": [
-   {
-    "file": "kosaf-1814024001/1-2026년_하반기_대한적십자사_헌혈기부권_대학생_장학금_신청서식_p2-6.pdf",
-    "name": "공고문 안 신청서 서식 (2~3, 5~6쪽)",
-    "pages": 4,
-    "bytes": 560965,
-    "src": "2026년_하반기_대한적십자사_헌혈기부권_대학생_장학금_신청서식.hwp",
-    "srcBytes": 68096,
-    "srcPages": "2~3, 5~6",
-    "from": "공고문 서식 쪽 떼기",
-    "at": "2026-10-31"
-   }
-  ],
   "kosaf-2701294002": [
    {
     "src": "1. 2026년 상지대 재학생 대상 장학사업 공고문.pdf",
@@ -1026,6 +1013,49 @@
     "srcBytes": 221598,
     "none": true,
     "at": "2026-11-08"
+   }
+  ],
+  "auto-amepagescholarshipnotice-02ghu3o": [
+   {
+    "src": "elig-1yvytc-1.pdf",
+    "srcBytes": 90280,
+    "none": true,
+    "at": "2026-11-09"
+   },
+   {
+    "src": "elig-1yvytc-2.hwp",
+    "srcBytes": 60416,
+    "none": true,
+    "at": "2026-11-09"
+   }
+  ],
+  "auto-amepagescholarshipnotice-09j8czz": [
+   {
+    "src": "elig-rm8ras-1.pdf",
+    "srcBytes": 458360,
+    "none": true,
+    "at": "2026-11-09"
+   }
+  ],
+  "auto-skor478126826artclviewdo": [
+   {
+    "src": "elig-hkpf03-1.pdf",
+    "srcBytes": 111930,
+    "none": true,
+    "at": "2026-11-09"
+   }
+  ],
+  "auto-scho332282595artclviewdo": [
+   {
+    "file": "auto-scho332282595artclviewdo/1-elig-1gdw6t-1_p4-5.pdf",
+    "name": "공고문 안 신청서 서식 (4~5쪽)",
+    "pages": 2,
+    "bytes": 456465,
+    "src": "elig-1gdw6t-1.hwp",
+    "srcBytes": 109056,
+    "srcPages": "4~5",
+    "from": "공고문 서식 쪽 떼기",
+    "at": "2026-11-09"
    }
   ]
  }
