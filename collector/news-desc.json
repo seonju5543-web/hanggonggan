@@ -13972,6 +13972,72 @@
    "v": 2,
    "err": "글 열기 실패 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
    "tries": 1
+  },
+  "url:https://www.seoultech.ac.kr/service/info/notice/?allboard=false&bidx=897342&bnum=4691&cate=10&do=commonview&nowpage=1&nowpage=1&qidx=4691&searchtype=-1": {
+   "at": "2026-11-08",
+   "v": 2,
+   "desc": "※ 당첨자 발표 : 12월 중 도서관 홈페이지 ※ 문의 : 도서관 970-9041 [국제교류처] 2026학년도 하반기 무료 영어 클리닉(English Clinic) 참여자 모집(재학생/교직원, 그룹상담 가능)…"
+  },
+  "url:https://www.seoultech.ac.kr/service/info/notice/?allboard=false&bidx=897275&bnum=4691&cate=10&do=commonview&nowpage=1&nowpage=1&qidx=4691&searchtype=-1": {
+   "at": "2026-11-08",
+   "v": 2,
+   "desc": "\"오늘 공강인데 누구랑 가볍게 수다 떨 사람~?“ \"집단상담? 심리치료? 너무 무겁고 내 깊은 이야기 하기 부담스러웠다면?\" 마음나눔카페로 오세요!"
+  },
+  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70929": {
+   "at": "2026-11-08",
+   "v": 2,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367805&mode=view&no=320": {
+   "at": "2026-11-08",
+   "v": 2,
+   "desc": "포스터 큐알 코드 및 아래 링크 참조 사전신청 후 참석자에게 기념품을, 모든 참석자에게 다과를 드립니다. 페이스북"
+  },
+  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70928": {
+   "at": "2026-11-08",
+   "v": 2,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367803&mode=view&no=318": {
+   "at": "2026-11-08",
+   "v": 2,
+   "desc": "안녕하세요, 이화정치연구소입니다. 2026년 11월 3일 치러진 미국 중간선거를 바탕으로, 선거 결과가 미국 정치 지형에 어떤 변화를 가져올지 함께 살펴보는 콜로키움을 엽니다."
+  },
+  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70927": {
+   "at": "2026-11-08",
+   "v": 2,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?bbsMode=view&boardID=5&key=70883": {
+   "at": "2026-11-08",
+   "v": 2,
+   "err": "글 화면에 그 글의 제목이 없음",
+   "tries": 1
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367797&mode=view&no=317": {
+   "at": "2026-11-08",
+   "v": 2,
+   "desc": "※ 본 프로그램은 금융감독원 2차 필기시험 합격자만 신청 가능 합니다. 금융감독원 2차 필기시험에 합격했다면? 금융감독원의 다양한 직렬에서 재직 중인 이화 선배들을 직접 만나 면접 준비 전략을 듣고, 자기소개서…"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367745&mode=view&no=326": {
+   "at": "2026-11-08",
+   "v": 2,
+   "desc": "학부 참여 링크 대학원 참여 링크 문의: 학생지원팀(T. 02-3277-3863, 2277 / E. student@ewha.ac.kr ) 페이스북"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367714&mode=view&no=326": {
+   "at": "2026-11-08",
+   "v": 2,
+   "none": "본문 첫 문장을 확신할 수 없음"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367684&mode=view&no=326": {
+   "at": "2026-11-08",
+   "v": 2,
+   "desc": "※ 지원기간 중 ‘ 이화여자대학교 직원 채용 홈페이지 ’ 를 통한 인터넷 지원만 가능함 [ 문의처 ] 이화여자대학교 총무처 인사팀 페이스북"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367643&mode=view&no=326": {
+   "at": "2026-11-08",
+   "v": 2,
+   "desc": "1. 첨부의 수강안내문을 반드시 읽어 보시기 바랍니다. 2. 강의시간표 조회( 2026.10.30.( 금) 09:00부터 ): 홈페이지&rarr;학사안내&rarr; 강의시간표/계획안"
   }
  }
 }
