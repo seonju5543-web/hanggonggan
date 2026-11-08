@@ -346,5 +346,9 @@
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3546415": {
   "at": "2026-11-08",
   "tries": 1
+ },
+ "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156788329&pWise=sub&pWiseSub=C4": {
+  "at": "2026-11-08",
+  "tries": 1
  }
 }

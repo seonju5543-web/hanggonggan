@@ -2,6 +2,28 @@
  "updatedAt": "2026-11-08",
  "items": [
   {
+   "title": "청년 의견, 정책부서로 바로 전달한다 \"2030청년자문단·청년온라인패널 신청하세요\"",
+   "url": "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156788329&pWise=sub&pWiseSub=C4",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "261109(조간) 청년의견 정책부서로 바로 전달한다(청년정책총괄팀).hwpx",
+     "url": "https://www.korea.kr/common/download.do?fileId=198585934&tblKey=GMN"
+    },
+    {
+     "name": "261109(조간) 청년의견 정책부서로 바로 전달한다(청년정책총괄팀).pdf",
+     "url": "https://www.korea.kr/common/download.do?fileId=198585935&tblKey=GMN"
+    }
+   ],
+   "deadlineHint": null,
+   "detailsV": 6,
+   "excerptsAt": "2026-11-08",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-11-08"
+  },
+  {
    "title": "대학생) 초등, 중등 학습 지도 및 놀이지원",
    "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3546415",
    "kind": "대외활동",
@@ -5683,36 +5705,6 @@
    "school": "광운대학교",
    "campus": "",
    "foundAt": "2026-10-15"
-  },
-  {
-   "title": "접수중 (울산 남구 일자리종합센터) 2026 여성 창업가 디지털 전환 교육 참여자 모집",
-   "url": "https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.ulsan?bbsId=BBS_0000000000000309&mId=008001002000000000&dataId=60827",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": "모집 기간: 2026. 09. 30.(수) ~ 10. 20.(화) - 교육 기간: 2026. 10. 21.(수) ~ 11. 18.(수) 14:0",
-   "deadline": "2026-10-20",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-09-30 ~ 2026-10-20"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026. 10. 21.(수) ~ 11. 18.(수) 14:00 - 16:00 (총 5회 운영)"
-    }
-   ],
-   "eligibilityLines": [
-    "- 교육 대상: 창업에 관심 있는 초기·예비 여성 창업자 등 20명",
-    "ㅇ 1:1 컨설팅 혜택 (11월 중 진행)",
-    "교육 참여자 중 희망자에 한해 창업 전문가의 1:1 컨설팅 지원! (1인 / 1회 / 1h, 5명 내외)"
-   ],
-   "detailsV": 6,
-   "field": "교육·캠프",
-   "excerptsAt": "2026-10-28",
-   "school": "",
-   "campus": "",
-   "host": "울산청년정책플랫폼 U-PAGE",
-   "foundAt": "2026-10-14"
   },
   {
    "title": "2026년 청년 어촌창업 아이디어 공모전",
