@@ -1,7 +1,28 @@
 {
  "school": "한국항공대학교",
- "updatedAt": "2026-11-03",
+ "updatedAt": "2026-11-08",
  "items": [
+  {
+   "title": "[의료지원실] 2026.11.09.(월) 「사랑의 헌혈」 실시 안내",
+   "url": "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11439",
+   "postedAt": "2026-11-04",
+   "school": "한국항공대학교",
+   "campus": "",
+   "src": "9c5122cb",
+   "foundAt": "2026-11-08",
+   "thumb": "data/news/img/be89b32d2a7a69a8.webp",
+   "desc": "대한적십자사 서울중앙혈액원의 협조 요청으로 「 사랑의 헌혈 」 을 실시합니다. 11월~내년 3월까지는 국내 말라리아 제한지역(파주시, 김포시, 연천군, 철원군, 강화군) 거주자도 전혈이 가능 하니 여러분의 많은…"
+  },
+  {
+   "title": "교내 소방시설 점검 안내",
+   "url": "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11438",
+   "postedAt": "2026-11-04",
+   "school": "한국항공대학교",
+   "campus": "",
+   "src": "9c5122cb",
+   "foundAt": "2026-11-08",
+   "desc": "교내 캠퍼스 ( 건물전체 ) 소방시설 점검 ( 의무사항 ) 을 아래와 같이 실시하오니 대학 구성원들의 많은 협조 부탁드립니다 ."
+  },
   {
    "title": "[대학원] 2026학년도 2학기 오픈랩(Open Lab) 행사 개최 안내 대학원",
    "url": "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11436",
@@ -244,46 +265,6 @@
    "foundAt": "2026-10-12",
    "thumb": "data/news/img/4ecff66abf641214.webp",
    "desc": "서울시에서는 이상동기범죄로부터 시민을 안전하게 보호하기 위해 사회안전약자를 대상으로 동행안심벨 ( 구 안심헬프미 ) 지원사업을 추진하고 있사오니 관심있는 학생들의 신청 바랍니다 ."
-  },
-  {
-   "title": "[의료지원실] 2026.10.12.(월) 「헌혈 X 치킨원정대」 참여 안내",
-   "url": "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11308",
-   "postedAt": "2026-10-08",
-   "school": "한국항공대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "desc": "대한적십자사 서울중앙혈액원의 협조 요청으로 「사랑의 헌혈」을 실시합니다. 생명나눔 헌혈문화를 확산하기 위해 헌혈버스와 멕시카나 치킨트럭 이 함께 온다고 하니 많은 관심과 적극적인 참여 바랍니다.",
-   "src": "9c5122cb"
-  },
-  {
-   "title": "대학 캠퍼스 방송 촬영 안내",
-   "url": "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11303",
-   "postedAt": "2026-10-07",
-   "school": "한국항공대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "src": "9c5122cb"
-  },
-  {
-   "title": "2026년 무장애관광 활성화 ESG캠페인 안내",
-   "url": "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11302",
-   "postedAt": "2026-10-07",
-   "school": "한국항공대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "thumb": "data/news/img/711a4d25866052d3.webp",
-   "desc": "2. 주요내용 - 경기도 31개 시·군 지정 관광지의 무장애 시설 사진 및 이용정보를 볼런트립 앱에 등록",
-   "src": "9c5122cb"
-  },
-  {
-   "title": "2027학년도 1학기 미국 UNLV 해외연구실습 (SURE) 파견 학생 선발 안내",
-   "url": "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11274",
-   "postedAt": "2026-10-01",
-   "school": "한국항공대학교",
-   "campus": "",
-   "foundAt": "2026-10-05",
-   "desc": "미국 University of Nevada, Las Vegas 파견 학생 선발 공고 국제교류팀에서는 본교생에게 해외대학 연구실습 기회를 제공하고자 , 미국 University of Nevada, Las Vegas…",
-   "src": "9c5122cb"
   }
  ]
 }

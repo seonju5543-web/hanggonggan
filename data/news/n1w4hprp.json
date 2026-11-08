@@ -1,7 +1,67 @@
 {
  "school": "경희대학교",
- "updatedAt": "2026-11-03",
+ "updatedAt": "2026-11-08",
  "items": [
+  {
+   "title": "서울 [서울C 총무팀] 서울캠퍼스 교내 금연 안내",
+   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323523",
+   "postedAt": "2026-11-06",
+   "postId": "323523",
+   "school": "경희대학교",
+   "campus": "",
+   "src": "a92b27ac",
+   "foundAt": "2026-11-08",
+   "thumb": "data/news/img/bca223f0f8f2d045.webp",
+   "desc": "서울캠퍼스 내 금연구역을 아래와 같이 안내드리오니 교내 구성원분들께서 지정된 흡연구역을 이용해주시기 바랍니다."
+  },
+  {
+   "title": "공통 [추천채용] [피알봄] PR 부문 채용전환형 인턴 추천채용",
+   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323514",
+   "postedAt": "2026-11-05",
+   "postId": "323514",
+   "kind": "채용",
+   "school": "경희대학교",
+   "campus": "",
+   "src": "a92b27ac",
+   "foundAt": "2026-11-08",
+   "desc": "1. 모집 분야 1) 채용 직무 : PR 2) 담당업무 - 헬스케어 기업 및 제품 PR 전략 기획"
+  },
+  {
+   "title": "서울 [(서울)심리상담센터] 2026 도박문제 예방 교육 안내",
+   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323505",
+   "postedAt": "2026-11-04",
+   "postId": "323505",
+   "school": "경희대학교",
+   "campus": "",
+   "src": "a92b27ac",
+   "foundAt": "2026-11-08",
+   "thumb": "data/news/img/b4603db753644792.webp",
+   "desc": "서울캠퍼스 재학생의 건강한 대학생활과 중독 문제 예방을 위해 심리상담센터에서 온라인 예방 교육을 운영합니다 ."
+  },
+  {
+   "title": "공통 [아남전자(주)] 연구소 회로설계 부문 추천채용",
+   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323502",
+   "postedAt": "2026-11-04",
+   "postId": "323502",
+   "kind": "채용",
+   "school": "경희대학교",
+   "campus": "",
+   "src": "a92b27ac",
+   "foundAt": "2026-11-08",
+   "desc": "1. 제출방법 ① 추천채용 서류 미래인재센터 이메일 제출 ▶ work_register@khu.ac.kr"
+  },
+  {
+   "title": "서울 [(서울)심리상담센터] 2026 인터넷·스마트폰 과의존 예방 교육 안내(법정의무교육)",
+   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323504",
+   "postedAt": "2026-11-04",
+   "postId": "323504",
+   "school": "경희대학교",
+   "campus": "",
+   "src": "a92b27ac",
+   "foundAt": "2026-11-08",
+   "thumb": "data/news/img/900598c5a3402b44.webp",
+   "desc": "서울캠퍼스 재학생의 건강한 대학생활과 중독 문제 예방을 위해 심리상담센터에서 온라인 예방 교육을 운영합니다 ."
+  },
   {
    "title": "공통 [추천채용] [현대백화점] 경영지원(회계/재무)부문 정규직 추천채용",
    "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323491",
@@ -291,38 +351,6 @@
    "src": "a92b27ac",
    "foundAt": "2026-10-13",
    "desc": "1. 제출방법 ① 미래인재센터 이메일 제출 ▶ work_register@khu.ac.kr"
-  },
-  {
-   "title": "국제 [심리상담센터] 타고난 나의 기본 설정인 기질과 성격을 이해하며 성장하는 2026학년도 TCI 기...",
-   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323274",
-   "postedAt": "2026-10-08",
-   "postId": "323274",
-   "school": "경희대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "thumb": "data/news/img/832b5d84dc5e8c6a.webp",
-   "desc": "안녕하세요. 경희대학교 (국제)심리상담센터입니다. 2026학년도 2학기를 맞아 나의 타고난 기질을 이해하는 데 도움을 주는 TCI 워크숍 을 실시합니다!",
-   "src": "a92b27ac"
-  },
-  {
-   "title": "공통 [국제교육원] 이희건 한일교류재단 일본인 유학생 한국문화체험 한국인 도우미 모집",
-   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323250",
-   "postedAt": "2026-10-06",
-   "postId": "323250",
-   "school": "경희대학교",
-   "campus": "",
-   "foundAt": "2026-10-06",
-   "desc": "안녕하세요 . 경희대학교 국제교육원에서 일본인 유학생 문화 체험 프로그램에 함께 참여할 한국인 학부 재학생 도우미를 모집합니다 . 신한은행 창립자이신 故 이희건 명예회장님의 재단 이희건한일교류재단 > 에서 후원하는…"
-  },
-  {
-   "title": "공통 [추천채용] [이트너스] 2027 1차 E-ON 채용연계형 인턴 추천채용",
-   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323207",
-   "postedAt": "2026-09-29",
-   "postId": "323207",
-   "kind": "채용",
-   "school": "경희대학교",
-   "campus": "",
-   "foundAt": "2026-10-06"
   }
  ]
 }

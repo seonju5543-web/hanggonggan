@@ -1,7 +1,20 @@
 {
  "school": "서강대학교",
- "updatedAt": "2026-11-03",
+ "updatedAt": "2026-11-08",
  "items": [
+  {
+   "title": "[유로메나연구소] 제62차 월례세미나 개최",
+   "url": "https://www.sogang.ac.kr/ko/detail/551753?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
+   "postId": "551753",
+   "postedAt": "2026-11-04",
+   "kind": "행사",
+   "school": "서강대학교",
+   "campus": "",
+   "board": "행사특강",
+   "src": "c13ee4bc",
+   "foundAt": "2026-11-08",
+   "thumb": "data/news/img/66c8f2092e31687e.webp"
+  },
   {
    "title": "[트랜스내셔널인문학연구소·역사학연구소] \"인간, 식물/동물, 기술: 농업사를 쓰는 문제의식의 현주소\" 심포지엄 안내 (11/14)",
    "url": "https://www.sogang.ac.kr/ko/detail/551737?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
@@ -66,42 +79,6 @@
    "src": "c13ee4bc",
    "foundAt": "2026-10-14",
    "thumb": "data/news/img/19ebf55ed6587126.webp"
-  },
-  {
-   "title": "[CGSI] 10월 16일 콜로키움 안내",
-   "url": "https://www.sogang.ac.kr/ko/detail/551541?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
-   "postId": "551541",
-   "postedAt": "2026-10-07",
-   "school": "서강대학교",
-   "campus": "",
-   "board": "행사특강",
-   "foundAt": "2026-10-07",
-   "thumb": "data/news/img/77945807d73c0858.webp",
-   "src": "c13ee4bc"
-  },
-  {
-   "title": "[유로메나연구소] 국제학술대회 안내(10/16-10/17)",
-   "url": "https://www.sogang.ac.kr/ko/detail/551482?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
-   "postId": "551482",
-   "postedAt": "2026-10-01",
-   "school": "서강대학교",
-   "campus": "",
-   "board": "행사특강",
-   "foundAt": "2026-10-04",
-   "thumb": "data/news/img/fd6b7e68f141ae29.webp",
-   "src": "c13ee4bc"
-  },
-  {
-   "title": "[철학연구소] 제123회 월례발표회 안내 (9/18)",
-   "url": "https://www.sogang.ac.kr/ko/detail/551172?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
-   "postId": "551172",
-   "postedAt": "2026-09-07",
-   "school": "서강대학교",
-   "campus": "",
-   "board": "행사특강",
-   "foundAt": "2026-10-04",
-   "thumb": "data/news/img/9457fbf17617793e.webp",
-   "src": "c13ee4bc"
   }
  ]
 }

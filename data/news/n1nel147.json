@@ -1,7 +1,16 @@
 {
  "school": "계명대학교",
- "updatedAt": "2026-11-03",
+ "updatedAt": "2026-11-08",
  "items": [
+  {
+   "title": "2026학년도 2학기 K-STAR S단계 2차 통과자 및 3차 면접심사 안내",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271794&pageOrder=0&cmd=2&parm_bod_uid=271790&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-11-05",
+   "school": "계명대학교",
+   "campus": "",
+   "src": "9a241a98",
+   "foundAt": "2026-11-08"
+  },
   {
    "title": "[생명윤리위원회] 하반기 연구자 교육 안내",
    "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271756&pageOrder=0&cmd=2&parm_bod_uid=271756&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
@@ -355,15 +364,6 @@
   {
    "title": "여성학연구소 10월 28일 대학원생 콜로키움 초대",
    "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271376&pageOrder=0&cmd=2&parm_bod_uid=271374&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
-   "postedAt": "2026-10-14",
-   "school": "계명대학교",
-   "campus": "",
-   "src": "9a241a98",
-   "foundAt": "2026-10-14"
-  },
-  {
-   "title": "2026년 대학교내 불법복제 인식개선 정품교재 사용 캠페인 안내",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271376&pageOrder=0&cmd=2&parm_bod_uid=271362&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
    "postedAt": "2026-10-14",
    "school": "계명대학교",
    "campus": "",

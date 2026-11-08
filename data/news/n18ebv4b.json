@@ -1,7 +1,41 @@
 {
  "school": "서울교육대학교",
- "updatedAt": "2026-11-03",
+ "updatedAt": "2026-11-08",
  "items": [
+  {
+   "title": "2026 겨울학기 외국어강좌 수강생 모집",
+   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=1309&bbsId=1082&nttSn=55621",
+   "postedAt": "2026-11-04",
+   "postId": "55621",
+   "school": "서울교육대학교",
+   "campus": "",
+   "src": "4d730c6c",
+   "foundAt": "2026-11-08",
+   "thumb": "data/news/img/51ef175b00c1b11c.webp"
+  },
+  {
+   "title": "2026 겨울학기 한국어 강좌 / Korean Language Course",
+   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=1309&bbsId=1082&nttSn=55620",
+   "postedAt": "2026-11-04",
+   "postId": "55620",
+   "school": "서울교육대학교",
+   "campus": "",
+   "src": "4d730c6c",
+   "foundAt": "2026-11-08",
+   "thumb": "data/news/img/9642b719a6f651b4.webp"
+  },
+  {
+   "title": "제8차 교육혁신미래포럼 개최 안내(AI for All, 모두를 위한 AI 교육과",
+   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=1309&bbsId=1082&nttSn=55662",
+   "postedAt": "2026-11-06",
+   "postId": "55662",
+   "kind": "행사",
+   "school": "서울교육대학교",
+   "campus": "",
+   "src": "4d730c6c",
+   "foundAt": "2026-11-08",
+   "thumb": "data/news/img/a9b0a886a890963f.webp"
+  },
   {
    "title": "교섭요구 노동조합의 확정 공고",
    "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=1309&bbsId=1082&nttSn=55594",
@@ -95,28 +129,6 @@
    "src": "4d730c6c",
    "foundAt": "2026-10-14",
    "thumb": "data/news/img/e19f912d971a7154.webp"
-  },
-  {
-   "title": "[서초1동] \"2026 서일 별빛 페스타\" 축제 안내",
-   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=1309&bbsId=1082&nttSn=55339",
-   "postedAt": "2026-10-06",
-   "postId": "55339",
-   "kind": "행사",
-   "school": "서울교육대학교",
-   "campus": "",
-   "foundAt": "2026-10-06",
-   "thumb": "data/news/img/69329c386961fde0.webp",
-   "src": "4d730c6c"
-  },
-  {
-   "title": "언제나 반짝이는 우리들의 캠퍼스 - 2026 서울교대 사진 공모전 수상작 안내",
-   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=1309&bbsId=1082&nttSn=55328",
-   "postedAt": "2026-10-01",
-   "postId": "55328",
-   "school": "서울교육대학교",
-   "campus": "",
-   "foundAt": "2026-10-04",
-   "src": "4d730c6c"
   }
  ]
 }

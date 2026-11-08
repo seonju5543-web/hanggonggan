@@ -1,7 +1,40 @@
 {
  "school": "동국대학교 WISE캠퍼스",
- "updatedAt": "2026-11-03",
+ "updatedAt": "2026-11-08",
  "items": [
+  {
+   "title": "2027년 GTEP사업단 21기 모집 공고",
+   "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/521113",
+   "postedAt": "2026-11-06",
+   "postId": "521113",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "src": "b8e598c1",
+   "foundAt": "2026-11-08",
+   "desc": "미래 글로벌 비지니스 현장에서 직접 활약할 해외 무역전문가를 양성하기 위해 국가에서 지원해주는 청년무역양성사업단 활동혜택 -1인당 교육지원비 평균 500만원 이상 -해외무역 박람회 평균 2회 참가 지원 -국내…"
+  },
+  {
+   "title": "학사행정정보시스템(nDRIMS) 4년 이상 미접속 계정 삭제 안내",
+   "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/521072",
+   "postedAt": "2026-11-04",
+   "postId": "521072",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "src": "b8e598c1",
+   "foundAt": "2026-11-08",
+   "desc": "3. 재가입 방법: nDRIMS 홈페이지(https://ndrims.dongguk.ac.kr)에서 통합ID 신청"
+  },
+  {
+   "title": "학사행정정보시스템(nDRIMS) 해외 IP 접속 차단 및 임시 허용 안내[2026.11.09(월)부터 시행 예정]",
+   "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/521065",
+   "postedAt": "2026-11-04",
+   "postId": "521065",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "src": "b8e598c1",
+   "foundAt": "2026-11-08",
+   "desc": "이에 학사행정정보시스템(nDRIMS)에 대한 비정상적인 해외 접근 및 사이버 공격을 예방하고, 학생 및 교직원의 개인정보와 학사정보를 안전하게 보호하기 위해 해외 IP 접속 차단 정책을 시행합니다."
+  },
   {
    "title": "[혁신] 2026-2학기 마음건강교육 수강생 모집",
    "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/521051",
@@ -114,39 +147,6 @@
    "foundAt": "2026-10-13",
    "thumb": "data/news/img/dfe63f91bf68dc39.webp",
    "desc": "'총장님이 쏜다!' 학생 응원 간식 이벤트 를 아래와 같이 실시하오니 학생 여러분의 많은 참여 바랍니다."
-  },
-  {
-   "title": "[정각원] 2026-2학기 정각도량 열린법회(2회차) 봉행 안내",
-   "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/520759",
-   "postedAt": "2026-10-07",
-   "postId": "520759",
-   "school": "동국대학교 WISE캠퍼스",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "thumb": "data/news/img/addcc29846d41b91.webp",
-   "src": "b8e598c1"
-  },
-  {
-   "title": "동국의 인연이 예술로... <동국현대작가전> 개최 안내",
-   "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/520755",
-   "postedAt": "2026-10-07",
-   "postId": "520755",
-   "kind": "행사",
-   "school": "동국대학교 WISE캠퍼스",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "src": "b8e598c1"
-  },
-  {
-   "title": "[한국대학교육협의회] 2026년 대학생 취업인식도 설문조사 참여 안내",
-   "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/520723",
-   "postedAt": "2026-10-06",
-   "postId": "520723",
-   "school": "동국대학교 WISE캠퍼스",
-   "campus": "",
-   "foundAt": "2026-10-06",
-   "desc": "한국대학교육협의회와 한국경제인협회 ( 舊 전국경제인연합회 ) 는 대학생들의 취업시장 전망 및 직장 선호도를 파악하기 위해 전년도에 이어 아래와 같이 공동 조사를 진행하고자 합니다 . 본 설문조사는 전국 4 년제…",
-   "src": "b8e598c1"
   }
  ]
 }

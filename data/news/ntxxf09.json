@@ -1,7 +1,78 @@
 {
  "school": "경기대학교",
- "updatedAt": "2026-11-03",
+ "updatedAt": "2026-11-08",
  "items": [
+  {
+   "title": "[일반] 논술고사일(11/27) 교학팀 휴무 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627072&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-06",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-08",
+   "desc": "2027학년도 신입학 수시모집 논술고사 시행(11/27)으로 인해 당일 교학팀 운영이 중단되오니, 참고하시어 문의사항이 있으신 경우에는 11/30 (월)에 연락 부탁드립니다."
+  },
+  {
+   "title": "[일반] 2026-2 졸업작품 기획 PT/ 작품 PT 일정 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627067&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-06",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-08",
+   "desc": "대학소개 대학·조직 대학생활 맞춤정보 어떤 정보 를 찾고계시나요? 맞춤설정 저장하기 (언제든 변경 가능합니다) 맞춤설정 이란? 소속, 내용, 기간별로 나만의 맞춤 콘텐츠를 찾아보세요."
+  },
+  {
+   "title": "[일반] 졸업작품 규정 개정 안내 (2026)",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627065&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-06",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-08",
+   "desc": "작품 제작 예정인 본 전공생, 복수전공생, 전과생 등 개정된 졸업작품 규정 참고하시어 제작 바랍니다. 1작품 1연출자 원칙: 모든 범주에서 한 작품으로 졸업작품을 인정받는 사람은 연출자 1인입니다."
+  },
+  {
+   "title": "[일반] [유아교육]LG전자 평택어린이집 채용 공고 안내 건",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627054&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-05",
+   "kind": "채용",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-08",
+   "desc": "안녕하세요 유아교육 조교입니다. LG전자 평택어린이집에서 보육교사를 채용한다고 합니다. 자세한 내용은 첨부파일 참고 부탁드립니다."
+  },
+  {
+   "title": "[일반] 2026학년도 2학기 부전공 신청 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627029&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-04",
+   "kind": "학사",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-08",
+   "desc": "희망 학과(전공)을 부전공으로 이수하고자 하는 학생은 아래 내용을 참고하여 부전공을 신청하여 주시기 바랍니다."
+  },
+  {
+   "title": "[일반] 2027학년도 학부제 전공배정 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627027&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-04",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-08",
+   "desc": "학생들은 기한 내에 KUTIS에서 신청 후 신청서를 출력하여 1전공 희망 전공 사무실에 제출하시기 바랍니다. ex) 가전공 일문, 희망전공 프문 -> 일어일문전공 사무실에서 도장 날인 후 프랑스어문전공 사무실에 제출"
+  },
+  {
+   "title": "[일반] 제42대 경기대학교 일반대학원 원우회장 선거 공고",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627021&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-04",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-08"
+  },
   {
    "title": "[일반] 학위논문 샘플 안내(2027년 2월 졸업기준)",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627006&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
@@ -341,81 +412,6 @@
    "src": "bf927d3e",
    "foundAt": "2026-10-28",
    "desc": "가. 신청자격 : 2학년 1학기생부터 등록한 재학생 나. 신청기간 : 2026.11.02(월) ~ 11.06(금)"
-  },
-  {
-   "title": "[일반] [중어중문전공] 2026학년도 2학기 부전공 신청 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626857&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-28",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-10-28"
-  },
-  {
-   "title": "[일반] 경기대학교 관광전문대학원 2026 관전의 밤 개최 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626856&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-28",
-   "kind": "행사",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-10-28",
-   "thumb": "data/news/img/7f7c2aa5bfb60e4b.webp",
-   "desc": "이미지 확대보기 경기대학교 관광전문대학원 원우회에서는 2026 관전의 밤을 개최하오니 많은 관심과 참석 부탁드립니다."
-  },
-  {
-   "title": "[입학에서 취업까지] 2026-2학기 부전공 신청 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626842&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-27",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-10-27",
-   "desc": "가. 신청자격 : 2학년 1학기생부터 등록한 재학생 나. 신청기간 : 2026.11.02(월) ~ 11.06(금)"
-  },
-  {
-   "title": "[수강에서 성적까지] [경제학전공] 2027학년도 전공선택유연화 시행 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626834&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-27",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-10-27"
-  },
-  {
-   "title": "[수강에서 성적까지] [경제학전공] 2026학년도 2학기 부전공 신청 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626833&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-27",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-10-27",
-   "desc": "가. 부전공 신청(취소) 및 승인 1) 부전공 신청(취소) 가) 신청기간 : 2026.11.02(월) ~ 11.06(금) 24:00까지"
-  },
-  {
-   "title": "[일반] [국어국문] 2026학년도 2학기 부전공 신청 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626831&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-27",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-10-27"
-  },
-  {
-   "title": "[입학에서 취업까지] < 2026학년도 2학기 부전공 신청 안내 >",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626830&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-27",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-10-27",
-   "desc": "1. 부전공 신청(취소) 1) 신청기간 : 2026.11.02(월) ~ 11.06(금) 24:00까지"
   }
  ]
 }

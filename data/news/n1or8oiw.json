@@ -1,7 +1,52 @@
 {
  "school": "동국대학교",
- "updatedAt": "2026-11-03",
+ "updatedAt": "2026-11-08",
  "items": [
+  {
+   "title": "[글로벌교류팀] 'Dongguk International Week 2026' 개최 안내",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766903",
+   "postedAt": "2026-11-06",
+   "postId": "26766903",
+   "kind": "행사",
+   "school": "동국대학교",
+   "campus": "",
+   "src": "d521f12e",
+   "foundAt": "2026-11-08",
+   "thumb": "data/news/img/c4c8299871726969.webp",
+   "desc": "해외 자매대학 교환학생, 동·하계 단기연수, 국비 유학 등 해외 유학을 위한 준비부터 실제 프로그램을 이수한 선배 멘토와의 만남까지, 다채로운 프로그램과 이벤트를 마련 하였으니, 국제교류에 관심 있는 재학생…"
+  },
+  {
+   "title": "[디지털정보처] 교내 네트워크 장비 펌웨어 업그레이드 및 UTP 스위치 교체 작업 안내(2026.11.08.(일) 09:00~19:00)",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766887",
+   "postedAt": "2026-11-05",
+   "postId": "26766887",
+   "school": "동국대학교",
+   "campus": "",
+   "src": "d521f12e",
+   "foundAt": "2026-11-08",
+   "desc": "3. 영향 범위 - 간헐적으로 교내 시스템 접속 이용 불가, 교내 네트워크 간헐적 끊김."
+  },
+  {
+   "title": "[일정 변경 및 화상 전환][카운슬링센터] 스트레스 관리 특강 신청 안내(드림패스 마일리지 10점)",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766883",
+   "postedAt": "2026-11-05",
+   "postId": "26766883",
+   "kind": "행사",
+   "school": "동국대학교",
+   "campus": "",
+   "src": "d521f12e",
+   "foundAt": "2026-11-08",
+   "desc": "안녕하세요. 동국대학교 카운슬링센터입니다. 우리 센터에서는 스트레스에 대한 이해와 구체적인 해소 방법을 배울 수 있는 특강을 아래와 같이 진행하고자 합니다."
+  },
+  {
+   "title": "[카운슬링센터] '온라인 심리검사'로 자기점검 해볼까? - 대학생활 적응 정도 및 학습 전략 장단점에 관하여",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766877",
+   "postId": "26766877",
+   "school": "동국대학교",
+   "campus": "",
+   "src": "d521f12e",
+   "foundAt": "2026-11-08"
+  },
   {
    "title": "[교수학습혁신센터] 2026학년도 11월 학습상담 진행 안내",
    "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766841",
@@ -411,51 +456,6 @@
    "src": "d521f12e",
    "foundAt": "2026-10-13",
    "thumb": "data/news/img/a8dd7db47035ca1a.webp"
-  },
-  {
-   "title": "[카운슬링센터] '온라인 심리검사'로 자기점검 해볼까? - 대학생활 적응 정도 및 학습 전략 장단점에 관하여",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766566",
-   "postedAt": "2026-10-12",
-   "postId": "26766566",
-   "school": "동국대학교",
-   "campus": "",
-   "src": "d521f12e",
-   "foundAt": "2026-10-12",
-   "thumb": "data/news/img/29742aa699f9a98c.webp"
-  },
-  {
-   "title": "2027학년도 전기 대학원 모집 일정 안내",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766557",
-   "postedAt": "2026-10-12",
-   "postId": "26766557",
-   "school": "동국대학교",
-   "campus": "",
-   "src": "d521f12e",
-   "foundAt": "2026-10-12"
-  },
-  {
-   "title": "동국대학교 DUICA 디자인 아르바이트 학생 모집",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766564",
-   "postedAt": "2026-10-12",
-   "postId": "26766564",
-   "kind": "채용",
-   "school": "동국대학교",
-   "campus": "",
-   "src": "d521f12e",
-   "foundAt": "2026-10-12",
-   "thumb": "data/news/img/2034bd8c982a62da.webp"
-  },
-  {
-   "title": "동국대학교 DUICA 아르바이트 학생 모집",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766563",
-   "postedAt": "2026-10-12",
-   "postId": "26766563",
-   "kind": "채용",
-   "school": "동국대학교",
-   "campus": "",
-   "src": "d521f12e",
-   "foundAt": "2026-10-12",
-   "thumb": "data/news/img/a45d5b237bc21945.webp"
   }
  ]
 }

@@ -1,7 +1,19 @@
 {
  "school": "상명대학교",
- "updatedAt": "2026-11-03",
+ "updatedAt": "2026-11-08",
  "items": [
+  {
+   "title": "伊 단눈치오 키에티-페스카라대학교와 간담회 시행",
+   "url": "https://www.smu.ac.kr/webzine/today.do?mode=view&articleNo=769950&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-04",
+   "kind": "행사",
+   "school": "상명대학교",
+   "campus": "",
+   "src": "f8a29ec6",
+   "foundAt": "2026-11-08",
+   "thumb": "data/news/img/4f3f8d863ee5a492.webp",
+   "desc": "대외협력팀 우리 대학은 지난 3일 이탈리아 단눈치오 키에티-페스카라대학교(이하 단눈치오 대학교)와 간담회를 갖고 양 대학 간 교류협력 강화 방안을 논의했다."
+  },
   {
    "title": "2026학년도 2학기 소동제 ‘VOYAGE: GAMEMODE’ 성료",
    "url": "https://www.smu.ac.kr/webzine/today.do?mode=view&articleNo=769917&article.offset=0&articleLimit=10",
@@ -126,42 +138,6 @@
    "foundAt": "2026-10-13",
    "thumb": "data/news/img/a076cd113b700cb2.webp",
    "desc": "대외협력팀 지난 12일 천안캠퍼스 외국인학생 총장 간담회가 열렸다. 외국인 학생들의 학교생활과 한국생활 적응을 지원하고 학생 간 교류를 돕기 위해 마련된 이번 행사에는 중국, 카자흐스탄 등 5개국 외국인 학생…"
-  },
-  {
-   "title": "2026학년도 2학기 천안캠퍼스 학생자치기구 대표 총장간담회 개최",
-   "url": "https://www.smu.ac.kr/webzine/today.do?mode=view&articleNo=769370&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-08",
-   "kind": "행사",
-   "school": "상명대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "thumb": "data/news/img/71a175220bbd11ba.webp",
-   "desc": "대외협력팀 10월 8일 천안캠퍼스 한누리관에서 학생자치기구 대표들과 ‘총장 주재 학생대표 간담회’가 열렸다. 교육 서비스 만족도 향상을 위한 캠퍼스 환경 및 학사 제도 개선 방안을 논의했다.",
-   "src": "f8a29ec6"
-  },
-  {
-   "title": "외국인 학생 간담회 ‘글로벌 상명인의 밤’ 성료… 유학생 소통 접점 확대",
-   "url": "https://www.smu.ac.kr/webzine/today.do?mode=view&articleNo=769336&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-07",
-   "kind": "행사",
-   "school": "상명대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "thumb": "data/news/img/69b162861d3f314f.webp",
-   "desc": "대외협력팀 우리 대학은 지난 6일 저녁 서울캠퍼스에서 외국인 유학생 및 교환학생 간담회 ‘글로벌 상명인의 밤’을 개최하고 성황리에 마쳤다.",
-   "src": "f8a29ec6"
-  },
-  {
-   "title": "2026학년도 2학기 학생자치기구 대표 총장간담회 개최",
-   "url": "https://www.smu.ac.kr/webzine/today.do?mode=view&articleNo=769312&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-06",
-   "kind": "행사",
-   "school": "상명대학교",
-   "campus": "",
-   "foundAt": "2026-10-06",
-   "thumb": "data/news/img/3398d5cbc57e0c3a.webp",
-   "desc": "대외협력팀 우리 대학은 6일 오후 서울캠퍼스에서 총학생회·단과대학생회 등 학생자치기구 대표와의 간담회를 개최했다.",
-   "src": "f8a29ec6"
   }
  ]
 }

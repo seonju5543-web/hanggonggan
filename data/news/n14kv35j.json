@@ -1,7 +1,107 @@
 {
  "school": "서울과학기술대학교",
- "updatedAt": "2026-11-03",
+ "updatedAt": "2026-11-08",
  "items": [
+  {
+   "title": "[예비군연대] 2026년 예비군 기본훈련 3차 편성입니다.(개별입소)",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897520&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-06",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-08",
+   "desc": "* 2026년 학생예비군 3차 훈련공고 - 훈련일 / 장소 : 12.7(월) / 금곡 예비군 훈련장"
+  },
+  {
+   "title": "[앵커사업단] 2026 랜선으로 만나는 릴레이 글로벌 취·창업 톡톡톡(talk) 신청 안내",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897479&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-04",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-08",
+   "desc": "글로벌 취업·창업·인턴십을 꿈꾸는 재학생을 위한 「2026 랜선으로 만나는 릴레이 글로벌 취·창업 톡톡톡(talk)」을 진행합니다."
+  },
+  {
+   "title": "[공과대학] 2026학년도 공과대학 학부 연구생 학술대회 개최",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897451&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-03",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-08",
+   "thumb": "data/news/img/af086ca5acd235ba.webp",
+   "desc": "공과대학에서는 매년 각 학과(전공)별로 학부 연구생들의 연구 성과를 공유하는 학술대회를 개최하고 있습니다."
+  },
+  {
+   "title": "[예비군연대] 동원훈련II형(이월자) 3차 훈련 편성입니다.(개별입소)",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897522&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-06",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-08",
+   "desc": "- 훈련기간 : 12.7(월)~10(목) - 대상 : 동원훈련II형(이월자) 중 무단불참 및 미참석 대상자"
+  },
+  {
+   "title": "기술사업화 수요발굴 트랙(ST-STARTLINE) 참여연구자 모집",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897475&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-04",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-08",
+   "thumb": "data/news/img/20279e779953a270.webp",
+   "desc": "※ 기술의 사업화 트랙, 「ST-STARTLINE」에서 출발하여 「ST-GRANT(Pre-Track, Fast-Track)」로 연계하여 지원합니다."
+  },
+  {
+   "title": "서울과학기술대학교 학칙 일부개정학칙안 공고",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897462&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-03",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-08"
+  },
+  {
+   "title": "[앵커사업단] 2026학년도 확장형 캡스톤디자인(MINI, PRE, JOINT) 지원사업 추가모집 안내",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897452&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-03",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-08",
+   "desc": "□ 사업기간: 2026. 11. ~ 2027. 2. □ 지원대상: 서울과학기술대학교 1~4학년 재학생으로 구성된 2명 이상의 팀"
+  },
+  {
+   "title": "[학생상담센터] 2026학년도 2학기 대학원생들을 위한 마음나눔 카페 '오늘, 커피한잔' 사전예약 중! (국립대학육성사업)",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897428&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-03",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-08",
+   "desc": "· 그냥 누군가와 소소한 일상을 공유하고 싶을 때 · 따뜻한 차 한잔과 고급 디저트가 필요할 때 · 바쁜 대학원 생활 중 가볍게 들러서 에너지를 채우고 싶을 때 · 마음 맞는 친구들과 편하게 수다 떨면서 힐링하고…"
+  },
+  {
+   "title": "🎁 도서관 첫 대출자를 찾습니다~ 이벤트 안내 (50명에게 문화상품권 2만원권 추첨 증정, ~11/30)",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897342&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-02",
+   "kind": "생활",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-08"
+  },
+  {
+   "title": "[학생상담센터] 2026학년도 2학기 마음나눔 카페 '오늘, 커피한잔' 사전 모집 중!",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897275&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-10-30",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-08"
+  },
   {
    "title": "[홍보실] 가을愛 문을 열다 - SeoulTech Autumn Music Night",
    "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897059&qidx=4691&cate=10&allboard=false&nowpage=1",
@@ -208,77 +308,6 @@
    "thumb": "data/news/img/83e3b226ad20065e.webp",
    "desc": "인공지능혁신융합대학사업단이 참여대학 재학생 여러분의 진로 이야기를 듣기위해 아래와 같이 진로준비 실태조사를 시행하오니 학생 여러분의 많은 참여를 바랍니다.",
    "src": "4da0b96f"
-  },
-  {
-   "title": "[앵커사업단] 2026학년도 확장형 캡스톤디자인(MINI, PRE, JOINT) 지원사업 운영 안내(기간연장)",
-   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896359&qidx=4691&cate=10&allboard=false&nowpage=1",
-   "postedAt": "2026-10-08",
-   "kind": "생활",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "desc": "□ 사업기간: 2026. 9. ~ 2027. 2. □ 지원대상: 서울과학기술대학교 1~4학년 재학생으로 구성된 2명 이상의 팀",
-   "src": "4da0b96f"
-  },
-  {
-   "title": "★서울과학기술대학교 노원영재교육원 2027학년도 미술심화과정 추가신입생 모집★",
-   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896366&qidx=4691&cate=10&allboard=false&nowpage=1",
-   "postedAt": "2026-10-08",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "desc": "1. 선발일정 원서접수 1 차 서류제출 2 차 전형 ( 면접 평가 )- 실기 평가 병행 예정 최종합격자 발표 합격자 등록",
-   "src": "4da0b96f"
-  },
-  {
-   "title": "[신문방송사] 제26회 방송제 개최 안내 10. 7.(수) 19:00",
-   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896272&qidx=4691&cate=10&allboard=false&nowpage=1",
-   "postedAt": "2026-10-06",
-   "kind": "행사",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "thumb": "data/news/img/54f98b882e9f7b74.webp",
-   "desc": "[서울과학기술대학교 신문방송사 STBS 제26회 방송제 개최] 제26회 방송제 <기록: 마치 모든 순간이 우리 것인 듯> 개최를 안내합니다.",
-   "src": "4da0b96f"
-  },
-  {
-   "title": "제17회 융합교양 콜로키움 10월 14일 수요일 16:00~, 서울과기대 어의관 516호",
-   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896269&qidx=4691&cate=10&allboard=false&nowpage=1",
-   "postedAt": "2026-10-06",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "foundAt": "2026-10-07"
-  },
-  {
-   "title": "[앵커사업단] 2026 랜선으로 만나는 릴레이 글로벌 취·창업 톡톡톡(talk) 신청 안내",
-   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896264&qidx=4691&cate=10&allboard=false&nowpage=1",
-   "postedAt": "2026-10-06",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "foundAt": "2026-10-06",
-   "desc": "글로벌 취업·창업·인턴십을 꿈꾸는 재학생을 위한 「2026 랜선으로 만나는 릴레이 글로벌 취·창업 톡톡톡(talk)」을 진행합니다.",
-   "src": "4da0b96f"
-  },
-  {
-   "title": "[예비군연대] 2026년 2학기 예비군 기본훈련 편성입니다.(개별입소)",
-   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896232&qidx=4691&cate=10&allboard=false&nowpage=1",
-   "postedAt": "2026-10-06",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "foundAt": "2026-10-06",
-   "desc": "* 2026년 2학기 학생예비군 훈련공고 - 훈련일 / 장소 : 11.3(화) / 금곡 예비군 훈련장",
-   "src": "4da0b96f"
-  },
-  {
-   "title": "[홍보실]학교 공식 마스코트 '테크뇽'세계관 고도화 아이디어 공모전 수상작 발표",
-   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896116&qidx=4691&cate=10&allboard=false&nowpage=1",
-   "postedAt": "2026-10-01",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "foundAt": "2026-10-04",
-   "thumb": "data/news/img/36248fd565055fcc.webp",
-   "desc": "서울과학기술대학교 마스코트 테크뇽의 새로운 세계관과 이야기를 함께 만들어가는 「테크뇽 세계관 고도화 아이디어 공모전」에 참여해주신 모든 분들께 감사드립니다."
   }
  ]
 }

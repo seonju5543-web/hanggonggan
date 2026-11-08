@@ -1,7 +1,29 @@
 {
  "school": "가천대학교",
- "updatedAt": "2026-11-03",
+ "updatedAt": "2026-11-08",
  "items": [
+  {
+   "title": "2026학년도 2학기 군 입대자 성적인정 안내사항 알림",
+   "url": "https://www.gachon.ac.kr/bbs/kor/475/126753/artclView.do",
+   "postedAt": "2026-10-29",
+   "kind": "학사",
+   "school": "가천대학교",
+   "campus": "",
+   "src": "02ae4269",
+   "foundAt": "2026-11-08",
+   "desc": "1. 성적 인정자 1) 자격 : 수업일수 3/4선 이후 입대자 중, 총 수업일수의 3/4이상 출석한 자 (휴학일자 전까지 수업참여 필수)"
+  },
+  {
+   "title": "2026학년도 동계 계절학기 1차 폐강 교과목 안내",
+   "url": "https://www.gachon.ac.kr/bbs/kor/475/126813/artclView.do",
+   "postedAt": "2026-11-06",
+   "kind": "학사",
+   "school": "가천대학교",
+   "campus": "",
+   "src": "02ae4269",
+   "foundAt": "2026-11-08",
+   "desc": "수강정정기간 [11. 17(화) ~ 11. 19(목)]에 희망교과목을 신청해 주시기 바랍니다."
+  },
   {
    "title": "2027-1학기 전과 신청 안내",
    "url": "https://www.gachon.ac.kr/bbs/kor/475/126632/artclView.do",
@@ -32,17 +54,6 @@
    "campus": "",
    "src": "02ae4269",
    "foundAt": "2026-10-14"
-  },
-  {
-   "title": "2026학년도 동계 계절학기 국내 학점교류 신청 안내",
-   "url": "https://www.gachon.ac.kr/bbs/kor/475/125980/artclView.do",
-   "postedAt": "2026-10-08",
-   "kind": "학사",
-   "school": "가천대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "desc": "★ 반드시 첨부파일을 확인하시고 수강에 불이익이 없도록 유의하시기 바랍니다. ★",
-   "src": "02ae4269"
   }
  ]
 }

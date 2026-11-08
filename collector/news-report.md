@@ -1,13 +1,13 @@
-## 🗞 교내 소식 수집 리포트 (2026-11-07)
+## 🗞 교내 소식 수집 리포트 (2026-11-08)
 
-새 글 **158건** → 앱 홈 「우리 학교 소식」 (학교별 파일 data/news/ · 44개교 · 게시판 아는 학교 44/44 · 둘째 게시판 3곳)
+새 글 **159건** → 앱 홈 「우리 학교 소식」 (학교별 파일 data/news/ · 44개교 · 게시판 아는 학교 44/44 · 둘째 게시판 3곳)
 
-⏱ 게시판 47곳을 3분 41초에 다 돌았습니다(예산 4분).
+⏱ 게시판 47곳을 2분 59초에 다 돌았습니다(예산 4분).
 
 ### 🚨 연속 실패 — 게시판 주소 확인 필요
-- 강원대학교 (9회 연속) — 오류 (TypeError: UND_ERR_SOCKET) — 주소 확인 필요
-- 한양대학교 (22회 연속) — 접속 실패 (HTTP 403) — 주소 수정 필요
-- 아주대학교 (35회 연속) — 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
+- 강원대학교 (10회 연속) — 오류 (TypeError: UND_ERR_SOCKET) — 주소 확인 필요
+- 한양대학교 (23회 연속) — 접속 실패 (HTTP 403) — 주소 수정 필요
+- 아주대학교 (36회 연속) — 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
 
 ### 국민대학교
 상태: ✅ 정상 (공지 글 4건 감지 · 새 글 2)
@@ -27,18 +27,18 @@
 
 ### 이화여자대학교
 상태: ✅ 정상 (공지 글 12건 감지 · 새 글 12)
-- [[학생지원팀] 2026학년도 재학생 교육 만족도 조사 참여하고 커피 기프티콘 받아가자!☕](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367745&article.offset=0&articleLimit=10&no=331) — 2026-11-02
-- [학사] [[학부]2026학년도 전기(2027년 2월) 졸업예정여부 조회 및 졸업의사 신청 관련 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367714&article.offset=0&articleLimit=10&no=331) — 2026-10-30
-- [채용] [[인사팀] 이화여자대학교 직원 채용 공고(2027.1.1.자)](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367684&article.offset=0&articleLimit=10&no=331) — 2026-10-29
-- [학사] [[학부] 2026학년도 겨울 계절학기 수강안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367643&article.offset=0&articleLimit=10&no=331) — 2026-10-27
-- [「교육현장의이해」 교과목 필수 이수 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367820&article.offset=0&articleLimit=10&no=330) — 2026-11-06
-- [[인재개발원] ★금감원 필기 합격자 대상!★ 취트키밋업: 금융감독원 선배님이 알려주는 실전 면접 합격 전략(11/10(화))](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367814&article.offset=0&articleLimit=10&no=329) — 2026-11-06
-- [채용] [[채용] 호크마교양대학 호크마학부 전공결정지원센터 계약직연구원 채용 공고 (~11/16(월))](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367812&article.offset=0&articleLimit=10&no=328) — 2026-11-05
-- [채용] [[입학팀] [조교모집] 2027학년도 수시모집 논술고사 지원조교 모집](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367810&article.offset=0&articleLimit=10&no=327) — 2026-11-05
-- [채용] [[채용] 이화여자대학교 인권센터 상담연구원 채용공고 (~11/10 마감)](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367809&article.offset=0&articleLimit=10&no=326) — 2026-11-05
-- [행사] [[이화유럽인문코어프로그램] 주경철 교수 강연「바다와 역사, 새로운 기억 새로운 상상」](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367805&article.offset=0&articleLimit=10&no=325) — 2026-11-05
-- [[이화정치연구소] 11월 콜로키움 "2026 미국 중간선거와 미국 정치 재편"](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367803&article.offset=0&articleLimit=10&no=323) — 2026-11-05
-- [[인재개발원] 취트키밋업: 금융감독원 선배님이 알려주는 실전 면접 합격 전략(11/10(화))](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367797&article.offset=0&articleLimit=10&no=322) — 2026-11-05
+- [[학생지원팀] 2026학년도 재학생 교육 만족도 조사 참여하고 커피 기프티콘 받아가자!☕](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367745&article.offset=0&articleLimit=10&no=326) — 2026-11-02
+- [학사] [[학부]2026학년도 전기(2027년 2월) 졸업예정여부 조회 및 졸업의사 신청 관련 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367714&article.offset=0&articleLimit=10&no=326) — 2026-10-30
+- [채용] [[인사팀] 이화여자대학교 직원 채용 공고(2027.1.1.자)](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367684&article.offset=0&articleLimit=10&no=326) — 2026-10-29
+- [학사] [[학부] 2026학년도 겨울 계절학기 수강안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367643&article.offset=0&articleLimit=10&no=326) — 2026-10-27
+- [「교육현장의이해」 교과목 필수 이수 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367820&article.offset=0&articleLimit=10&no=325) — 2026-11-06
+- [[인재개발원] ★금감원 필기 합격자 대상!★ 취트키밋업: 금융감독원 선배님이 알려주는 실전 면접 합격 전략(11/10(화))](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367814&article.offset=0&articleLimit=10&no=324) — 2026-11-06
+- [채용] [[채용] 호크마교양대학 호크마학부 전공결정지원센터 계약직연구원 채용 공고 (~11/16(월))](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367812&article.offset=0&articleLimit=10&no=323) — 2026-11-05
+- [채용] [[입학팀] [조교모집] 2027학년도 수시모집 논술고사 지원조교 모집](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367810&article.offset=0&articleLimit=10&no=322) — 2026-11-05
+- [채용] [[채용] 이화여자대학교 인권센터 상담연구원 채용공고 (~11/10 마감)](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367809&article.offset=0&articleLimit=10&no=321) — 2026-11-05
+- [행사] [[이화유럽인문코어프로그램] 주경철 교수 강연「바다와 역사, 새로운 기억 새로운 상상」](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367805&article.offset=0&articleLimit=10&no=320) — 2026-11-05
+- [[이화정치연구소] 11월 콜로키움 "2026 미국 중간선거와 미국 정치 재편"](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367803&article.offset=0&articleLimit=10&no=318) — 2026-11-05
+- [[인재개발원] 취트키밋업: 금융감독원 선배님이 알려주는 실전 면접 합격 전략(11/10(화))](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367797&article.offset=0&articleLimit=10&no=317) — 2026-11-05
 
 ### 인하대학교
 상태: ✅ 정상 (공지 글 16건 감지 · 새 글 8)
@@ -52,10 +52,11 @@
 - [채용] [[국어교육과] 사무원(행정조교) 채용 공고](https://www.inha.ac.kr/bbs/kr/8/46053/artclView.do) — 2026-11-05
 
 ### 부산대학교
-상태: ✅ 정상 (공지 글 8건 감지 · 새 글 3)
+상태: ✅ 정상 (공지 글 8건 감지 · 새 글 4)
 - [[기술사업부] 2026년 저작권 교육 운영 및 신청 안내](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512023) — 2026-11-06
 - [학사] [[학사과] 2026학년도 겨울계절수업 교류 수학 안내(인하대학교 이차전지)](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512024) — 2026-11-06
 - [2026학년도 다중전공 수기공모전 수상자 발표](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512022) — 2026-11-06
+- [학사] [[학사과] 2026학년도 겨울계절수업 교류 수학 안내(신라대학교)](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512000) — 2026-11-05
 
 ### 가톨릭대학교
 상태: ✅ 정상 (공지 글 7건 감지 · 새 글 6)
@@ -251,7 +252,7 @@
 - [생활] [[공고] 2027학년도 수시모집 면접평가 시행에 따른 캠퍼스 및 건물 출입 통제 안내](https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31806&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&) — 2026-11-06
 
 ### 건국대학교
-상태: ✅ 정상 (공지 글 13건 감지 · 새 글 1)
+상태: ✅ 정상 (공지 글 12건 감지 · 새 글 1)
 - [학사] [2026학년도 동계 계절학기 학점교류(타교→건국대) 안내](https://www.konkuk.ac.kr/bbs/konkuk/234/1211436/artclView.do) — 2026-11-04
 
 ### 동국대학교
@@ -310,7 +311,3 @@
 
 ---
 ⚙️ 설정: `collector/news-sources.json` · 발행: `data/news/<학교키>.json` · 로봇: `collector/collect-news.mjs` · 판정: `collector/news-kind.mjs`
-
-> 🚨 **되돌린 뒤에도 데이터 관문이 빨갛습니다** — 이번 실행의 교내 소식 발행분·소식 장부·소식 사진 장부·소식 요약 장부 변경을 되돌려도 통과하지 않았으니 기존 데이터나 이번 실행의 다른 파일을 사람이 봐야 합니다(실행을 빨간불로 끝냅니다).
->
-> 걸린 검사: 「④ 자동 등록 — 장부 없으면 등록(대조군) · 두 번 걸린 공고는 등록하지 않고 '데이터 관문 쉬기' 묶음에 이유를 남긴다(신호가 약하다는 묶음이 아니다) · 30일 넘은 장부 줄은 지운다」

@@ -1,7 +1,47 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-11-03",
+ "updatedAt": "2026-11-08",
  "items": [
+  {
+   "title": "2026년 대한의료정보학회 추계 학술대회 참가 신청 안내(~11/9, 학회등록비 지원)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141677&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-06",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-08",
+   "desc": "1. 일시 : 2026년 11월 25일(수) ~ 27일(금) (온라인 11/25, 오프라인 11/26~27)"
+  },
+  {
+   "title": "2027 SKKU Chinese Creators(SCC) 모집 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141647&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-06",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-08",
+   "desc": "콘텐츠 기획과 디지털 미디어 제작에 관심이 있거나, 영상 촬영·편집 또는 그래픽 디자인 경험이 있는 학생들의 많은 참여를 환영합니다 지원 자격 – 성균관대학교 학부 재/휴학생 (학부 과정 외국인 유학생 포함) –…"
+  },
+  {
+   "title": "2027 SKKU Global Creators (SGC) Recruitment Announcement",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141646&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-06",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-08"
+  },
+  {
+   "title": "[교수학습혁신센터] 대학원 Learning tips 집필 대학원생 모집",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141659&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-06",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-08",
+   "desc": "교수학습혁신센터 교수학습혁신센터는 대학원생을 위한 학습 및 연구 노하우를 담은 「Learning tips」을 정기적으로 발간하고 있습니다."
+  },
   {
    "title": "2026년 하반기 교직원(정규직) 신규채용 1차 면접전형 결과 발표 및 2차 면접전형 안내",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141538&article.offset=0&articleLimit=10",
@@ -389,52 +429,6 @@
    "foundAt": "2026-10-27",
    "thumb": "data/news/img/a4604760ed96eaa1.webp",
    "desc": "학생지원팀 안녕하십니까, 학생지원팀입니다. 농림수산식품교육문화정보원에서 '2026 천원의 아침밥 사업'의 운영 성과 및 효과를 분석하기 위해 본교 재학생을 대상으로 설문조사를 실시합니다."
-  },
-  {
-   "title": "[학생인재개발팀/대학일자리플러스센터] 2026 하반기 실전 모의면접",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140807&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-26",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-27",
-   "thumb": "data/news/img/028b510ea33d0705.webp",
-   "desc": "학생인재개발팀에서 2026 하반기 대비 실전 모의면접을 진행합니다. 1. 일 정: 11.2.(월)~11.12.(목), 캠퍼스별 상이"
-  },
-  {
-   "title": "에듀테크연구소 행정 직원 채용 공고",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140797&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-26",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-26",
-   "desc": "1. 채용분야 및 인원 가. 채용분야: 행정 나. 채용인원: 1명 2. 담당업무"
-  },
-  {
-   "title": "2026 제11회 장기려봉사상 청소년·대학생 자원봉사 체험수기 발표대회 개최 안내",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140796&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-26",
-   "kind": "행사",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/0624e4ca7e3bb0ad.webp",
-   "desc": "◇ 서류접수기간 : 2026년 10월 23일(금) ~11월 30일(월) 자정(밤12시)까지"
-  },
-  {
-   "title": "[학생인재개발팀/대학일자리플러스센터] 삼양그룹 임원 설명회",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140237&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-26",
-   "kind": "행사",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/9e67d6d42f67be36.webp",
-   "desc": "11월 3일 화요일, 삼양그룹의 임원과 채용실무자들이 성균관대학교에 찾아옵니다. 임원이 직접 들려주는 삼양의 다양한 산업소개와 면접 TIP, 채용실무자와 함께하는 면접 경험 기회와 자소서 기반 취업 상담 기회를…"
   }
  ]
 }
