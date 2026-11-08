@@ -39,13 +39,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-14",
-  "lastAt": "2026-11-02",
-  "tries": 4,
-  "status": "pending",
-  "why": "게시판을 못 엶(page.goto: Timeout 20000ms exceeded. Call log: - navigating…)",
+  "lastAt": "2026-11-09",
+  "tries": 5,
+  "status": "rejected",
+  "why": "게시판을 못 엶(page.goto: Timeout 20000ms exceeded. Call log: - navigating…) — 5번째라 그만 봅니다",
   "checks": {},
   "round": "2026-11-11",
-  "nextAt": "2026-11-09"
+  "decidedAt": "2026-11-09"
  },
  "kosaf|0731002|board:http://www.gbanurse.or.kr/index.php?g_page=notice&m_page=notice01&wd=1": {
   "ds": "kosaf",
@@ -278,13 +278,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-11-08",
-  "lastAt": "2026-11-08",
-  "tries": 1,
+  "lastAt": "2026-11-09",
+  "tries": 2,
   "status": "pending",
   "why": "게시판 목록(0줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-11-23",
-  "nextAt": "2026-11-09"
+  "nextAt": "2026-11-12"
  },
  "kosaf|2000423012|https://www.jincheon.go.kr/jcjh/sub.do?menukey=3464&mode=view&no=1076147380": {
   "ds": "kosaf",
@@ -809,13 +809,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-11-08",
-  "lastAt": "2026-11-08",
-  "tries": 1,
+  "lastAt": "2026-11-09",
+  "tries": 2,
   "status": "pending",
   "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-11-16",
-  "nextAt": "2026-11-09"
+  "nextAt": "2026-11-12"
  },
  "kosaf|2704345001|board:https://yeonje.go.kr/edu/main.do": {
   "ds": "kosaf",

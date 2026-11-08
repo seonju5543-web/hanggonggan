@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-07T16:15:36.504Z",
+ "updatedAt": "2026-11-08T15:27:05.817Z",
  "v": 1,
  "bad": {
   "https://blog.naver.com/kfdazzang/224463652864": {
@@ -78,10 +78,6 @@
    "v": "other",
    "at": "2026-11-03"
   },
-  "https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE0ODIlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D": {
-   "v": "other",
-   "at": "2026-11-08"
-  },
   "https://www.kosaf.go.kr/ko/main.do": {
    "v": "home",
    "at": "2026-11-08"
@@ -97,10 +93,6 @@
   "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000": {
    "v": "other",
    "at": "2026-11-07"
-  },
-  "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=894275&article.offset=0&articleLimit=10": {
-   "v": "other",
-   "at": "2026-11-08"
   },
   "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896780&qidx=4691&cate=10&allboard=false&nowpage=1": {
    "v": "other",
