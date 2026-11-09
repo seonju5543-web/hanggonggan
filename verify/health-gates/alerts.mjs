@@ -282,6 +282,10 @@ export default async function gate(eq, ctx) {
   eqWf('  close-old-reports 가 규칙 한 곳(tools/report-retention.mjs)을 부르고 · 옛 두 종류 jq 정규식이 없다 · 목록 상한 1000',
     [/node tools\/report-retention\.mjs/.test(codeOf(cor)), /test\("\^\(🤖 장학공고 수집 리포트\|🖥 브라우저형 수집 리포트\)"\)/.test(cor), /--limit 1000/.test(codeOf(cor))],
     [true, false, true]);
+  /* 🔴 한 건의 잠깐 오류(GraphQL timeout)로 전체가 넘어지면 그날 수백 건이 하나도 안 닫힌다(2026-11-04 #543) — 세 번 다시 하고 그 건만 적고 간다 · 끝내 못 닫은 건이 있을 때만 빨간불 */
+  eqWf('  close-old-reports 는 한 건이 안 닫히면 세 번 다시 하고(if gh issue close … then ok=1) 그 건만 세고 다음으로 간다 · 못 닫은 건이 있으면 그때 exit 1',
+    [/for try in 1 2 3; do/.test(codeOf(cor)), /if gh issue close "\$num"/.test(codeOf(cor)), /failed=\$\(\(failed\+1\)\); continue/.test(codeOf(cor)), /\[ "\$failed" -eq 0 \] \|\| exit 1/.test(codeOf(cor))],
+    [true, true, true, true]);
 
   /* ── ③ 다시 선 로봇의 넘어짐 경보 닫기 — 하트비트 (표본) ── */
   const YML = [

@@ -1560,6 +1560,11 @@ console.log('\n■ 신청서 쪽 그림 · 빈칸 자리 — 이름표 옆·표 
   eq('  deep-fetch 워크플로가 PDF 단계 뒤 이 로봇을 돌리고 경보 짝을 둔다 · 리포트를 저장 목록에 넣는다',
     (() => { const y = readText(new URL('../.github/workflows/deep-fetch.yml', import.meta.url)); return [/node collector\/form-fields\.mjs/.test(y), (y.match(/신청서 쪽 그림 · 빈칸 자리 단계가 넘어졌어요/g) || []).length, /form-fields-report\.md/.test(y)]; })(), [true, 2, true]);
   eq('  화면 검사 워크플로가 verify-formfill.js 를 돌린다', /verify-formfill\.js/.test(readText(new URL('../.github/workflows/verify-ui.yml', import.meta.url))), true);
+  /* 🔴 Pillow 는 apt(python3-pil)로 깐다 — 로봇이 `python3 -I` 로 부르는데 -I 는 pip 가 사용자 폴더에 둔 패키지를 못 본다.
+     pip 로 깔아 둔 10-31~11-08 매일 「Pillow 없어 PNG 로 둔 파일 26 · 표 머리글 아래 칸 0」 이었다 */
+  eq('  🔴 워크플로의 쪽 그림 단계는 Pillow 를 apt(python3-pil)로 깐다 — pip 사용자 설치는 python3 -I 가 못 본다 · 로봇은 -I 로 부른다',
+    (() => { const y = readText(new URL('../.github/workflows/deep-fetch.yml', import.meta.url)); const st = y.slice(y.indexOf('name: 신청서 쪽 그림 · 빈칸 자리'), y.indexOf('🚨 신청서 쪽 그림 단계 실패 알림'));
+      return [/apt-get install[^\n]*python3-pil/.test(st), /pip install/.test(st), /sh\('python3', \['-I'/.test(readText(new URL('../collector/form-fields.mjs', import.meta.url)))]; })(), [true, false, true]);
 }
 
 console.log('\n■ 공고문 뒷장 서식 쪽 떼기 — 쪽 글자의 표식으로 서식 쪽을 고른다 (2026-10-13)');
@@ -13214,8 +13219,14 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
   /* 리뷰 셋: 학교가 같은 이름으로 다시 올리면(원본 크기가 다르면) 다시 바꾼다 · 색인에 없는 고아 파일은 지운다 · 예산이 다 되면 남은 것을 적고 끝낸다 */
   fs.writeFileSync(path.join(fakeRepo, 'collector', 'extracted', 'forms-index.txt'), 'form-r1-1.docx\t우양재단 동행 장학생 모집\t지원서.docx\t101\n');
   fs.writeFileSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '9-옛결과.pdf'), pdf);
+  /* 뒤 단계(form-fields.mjs)의 결과물 — 살아 있는 PDF 의 쪽 폴더와 fields.json 은 고아가 아니다 · 죽은 PDF 의 쪽 폴더는 고아다 */
+  fs.mkdirSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '1-지원서-pages'), { recursive: true }); fs.writeFileSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '1-지원서-pages', '1.webp'), 'img');
+  fs.mkdirSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '9-옛결과-pages'), { recursive: true }); fs.writeFileSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '9-옛결과-pages', '1.webp'), 'img');
+  fs.writeFileSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', 'fields.json'), '{"files":{}}');
   const third = FP.runFormPdf ? FP.runFormPdf({ root: fakeRepo, today: '2026-10-12', soffice: fakeSoffice, log: quiet }) : {};
   eq('  원본 크기가 바뀌면 다시 바꾼다 · 그 공고 폴더의 고아 파일은 지운다', [third.done && third.done.length, fs.existsSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '9-옛결과.pdf')), fs.existsSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '1-지원서.pdf'))], [1, false, true]);
+  eq('  🔴 쪽 그림 로봇의 결과물은 고아가 아니다 — 살아 있는 PDF 의 -pages 폴더·fields.json 은 두고, 죽은 PDF 의 -pages 만 지운다 (지우면 매일 전부 다시 그린다 · 11-09)',
+    [fs.existsSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '1-지원서-pages', '1.webp')), fs.existsSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', 'fields.json')), fs.existsSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '9-옛결과-pages'))], [true, true, false]);
   fs.writeFileSync(path.join(fakeRepo, 'collector', 'extracted', 'forms-index.txt'), 'form-r1-1.docx\t우양재단 동행 장학생 모집\t지원서.docx\t102\n');
   const budget = FP.runFormPdf ? FP.runFormPdf({ root: fakeRepo, today: '2026-10-12', soffice: fakeSoffice, budgetSec: 0, log: quiet }) : {};
   eq('  예산이 다 되면 바꾸지 않고 「남김」으로 적는다 (단계 시한에 죽어 색인을 잃지 않게 스스로 끝낸다)', [budget.done && budget.done.length, budget.left && budget.left.length, /예산\(0초\)이 다 돼 남김 1개/.test(readText(path.join(fakeRepo, 'collector', 'form-pdf-report.md')))], [0, 1, true]);
@@ -13904,8 +13915,8 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
     [one('「국민 평생 직업능력 개발법」제2조제5호에 따른 기능대학 재학생', 'school'), rmx('「국민 평생 직업능력 개발법」제2조제5호에 따른 기능대학 재학생', { status: '재학', school: '한국외국어대학교' }), (one('현재 충남대학교 재학 중인 학부생', 'school') || {}).anyOf], [null, null, ['충남대학교']]);
   /* G. 거주 기간·보호자만·읍면동 — 맞아도 ✓ 를 못 준다(질문은 더하지 않음 · 개발자 결정 대기) */
   const gijang = '공고일 기준 부모 또는 학생 본인이 주민등록상 연속하여 1년 이상 기장군에 계속 거주하고 있는 자';
-  eq('🔴 G. 거주 기간 `1년 이상 기장군에 계속 거주` — minMonths 12 · 기장군 학생 ✓ 가 아니라 모름 · 해운대구 학생은 그대로 ✕ · 기간 없는 줄은 ✓',
-    [(one(gijang, 'residence') || {}).minMonths, rmx(gijang, { region: '부산', regionCity: '기장군' }), rmx(gijang, { region: '부산', regionCity: '해운대구' }), rmx('부모 또는 학생 본인이 기장군에 거주하고 있는 자', { region: '부산', regionCity: '기장군' })], [12, null, 'no', 'ok']);
+  eq('🔴 G. 거주 기간 `1년 이상 기장군에 계속 거주` — minMonths 12 · 기장군 학생 ✓ 가 아니라 모름 · 해운대구 학생(부모도 해운대구)은 그대로 ✕ · 기간 없는 줄은 ✓',
+    [(one(gijang, 'residence') || {}).minMonths, rmx(gijang, { region: '부산', regionCity: '기장군' }), rmx(gijang, { region: '부산', regionCity: '해운대구', parentRegion: '부산', parentRegionCity: '해운대구' }), rmx('부모 또는 학생 본인이 기장군에 거주하고 있는 자', { region: '부산', regionCity: '기장군' })], [12, null, 'no', 'ok']);
   eq('  `6개월 전(’26. 3. 14.이전)부터`·`3년(36개월)이상` 도 기간 · 재직·재학 기간은 거주 기간이 아니다',
     ['선발 공고일 기준 6개월 전(’26. 3. 14.이전)부터 대전 서구에 거주하고, 대전시에 소재한 대학교 재학생', '추천일 기준 본인 또는 부모(보호자)가 주민등록상 3년(36개월)이상 아산시에 계속 거주하는 자', '부산광역시에 주소를 두고 3년 이상 재직 중인 자'].map((l) => (one(l, 'residence') || {}).minMonths || 0), [6, 36, 0]);
   const goheung = '보호자가 공고일 현재 3년 이상 계속하여 고흥군에 주민등록을 두고 있는 자';
@@ -13959,6 +13970,17 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
     ['관내·외 거주 대학생(관내 거주자 우대)', '관내 및 관외 거주 대학생 (관내 거주자 가산점)', '관내/관외 대학 재학생으로 관내에 주소를 둔 자'].map((l) => rmx(l, seoulS, { provider: '(재)광양시장학회', name: '광양 장학' })), [null, null, 'no']);
   eq('🔴 5차 C. `…거나 재직 중인 자는 제외` 는 다른 연고 갈래가 아니다 — 광양 거주 요건은 그대로(서울 학생 ✕)',
     rmx('광양시에 주소를 둔 자로서 근무하거나 재직 중인 자는 제외', seoulS), 'no');
+
+  /* ── 2026-11-09 개발자 결정 "부모 주소를 모를 때 모름으로 표시" — `부모 또는 본인이 …` 줄(parentAlt) ── */
+  const pAlt = '부모 또는 학생 본인이 기장군에 거주하고 있는 자';
+  eq('🔴 부모 갈래가 있는 줄은 부모 주소가 비면 학생이 다른 곳에 살아도 ✕ 가 아니라 모름 · 부모 주소가 다른 곳이면 ✕ · 본인이 맞으면 ✓ · 부모 말이 없는 줄은 그대로 ✕',
+    [!!(one(pAlt, 'residence') || {}).parentAlt, rmx(pAlt, { region: '서울', regionCity: '종로구' }), rmx(pAlt, { region: '서울', regionCity: '종로구', parentRegion: '서울', parentRegionCity: '종로구' }),
+      rmx(pAlt, { region: '부산', regionCity: '기장군' }), rmx('기장군에 거주하고 있는 학생', { region: '서울', regionCity: '종로구' }), rmx('부모 또는 본인이 부산광역시에 거주하는 자', { region: '서울' })],
+    [true, null, 'no', 'ok', 'no', null]);
+  eq('  보호자만 말하는 줄(parentOnly)은 parentAlt 가 아니다 — 부모 칸이 다른 시·도면 그대로 ✕',
+    [!!(one(goheung, 'residence') || {}).parentAlt, rmx(goheung, { region: '서울', regionCity: '종로구', parentRegion: '서울', parentRegionCity: '종로구' })], [false, 'no']);
+  const EAo = createRequire(import.meta.url)('../elig-ask.js');
+  eq('🔴 온보딩 「적합도 높이기」 가 학자금대출 이용·자립준비청년을 묻는다 (2026-11-09 개발자 결정 "질문에 넣어")', ['loan', 'careLeaver'].map((k) => EAo.ONBOARD_TRAITS.includes(k)), [true, true]);
 
   /* ── 편입·재입학 첫 학기 (2026-11-02 개발자 "편입이랑 재입학은 학적정보만으로 구분 가능하잖아") ── */
   const html = readText(new URL('../index.html', import.meta.url));

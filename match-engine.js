@@ -520,7 +520,9 @@ function judgeCond(c, p, ctx) {
            subArea   `산청군 시천면`·`석탄산업전환지역` — 시·군 **안쪽**인지 모른다
          → 맞으면 '모름'. 다르면 지금처럼 판정한다(기간을 채워도 다른 시·군 학생은 못 받는다).
          parentOnly `보호자가 …`·`(보호자) …`·`구민의 자녀` — 학생 본인의 시·군으로 ✓ 를 주지 않고 **부모 칸으로만** 본다 · 부모 칸이 비면 ✕ 가 아니라 '모름' */
-      const soft = (v) => (v === 'pass' && (c.minMonths || c.subArea)) ? 'unknown' : v;
+      /* parentAlt `부모 또는 본인이 …` — 부모 주소 칸이 비었으면 학생 본인이 다른 곳에 살아도 ✕ 가 아니라 '모름'(부모가 그곳에 살 수 있다 · 2026-11-09 개발자 결정) */
+      const parentUnknown = c.parentAlt && !p.parentRegion && !p.parentRegionCity;
+      const soft = (v) => (v === 'pass' && (c.minMonths || c.subArea)) ? 'unknown' : (v === 'fail' && parentUnknown) ? 'unknown' : v;
       const cities = (c.cities || []).concat(c.inArea && ctx && ctx.homeCity ? [ctx.homeCity] : []);
       const myCities = (c.parentOnly ? [p.parentRegionCity] : [p.regionCity, p.parentRegionCity]).filter(Boolean);
       if (cities.length) {
@@ -532,7 +534,7 @@ function judgeCond(c, p, ctx) {
           const mineProv = (c.parentOnly ? [p.parentRegion] : [p.region, p.parentRegion]).filter(Boolean);
           const provs = cities.map((x) => PR.provincesOfCity(x));
           if (!mineProv.length || provs.some((ps) => !ps.length)) return 'unknown';
-          return provs.some((ps) => ps.some((r) => mineProv.includes(r))) ? 'unknown' : 'fail';
+          return provs.some((ps) => ps.some((r) => mineProv.includes(r))) ? 'unknown' : soft('fail');
         }
         if (cities.some((r) => myCities.includes(r))) return soft('pass');
         /* 🔴 학생이 **직접 고른** 시·군과 다르면 미달이다 — 안양시 학생에게 광양시 장학금은
@@ -540,7 +542,7 @@ function judgeCond(c, p, ctx) {
            지역 요건이 판정되지 않았다(실측 102줄 중 2줄만 판정됐다).
            ⚠️ 예외 문구(`단,`·`관외 거주 인정`)가 있는 줄은 conf 가 LOW 라 위 lineVerdict 가
               ✕ 로 만들지 않는다 — 그 안전장치가 이 판정을 감당한다. */
-        return 'fail';
+        return soft('fail');
       }
       if (c.inArea) return 'unknown';                           // 관할을 못 알아냈다
       const mine = (c.parentOnly ? [p.parentRegion] : [p.region, p.parentRegion]).filter(Boolean);
@@ -551,7 +553,7 @@ function judgeCond(c, p, ctx) {
          lineVerdict 가 ✕ 로 만들지 않는다 — 시·군 규칙과 같은 안전장치다. */
       /* 🔴 정식 이름과 짧은 이름을 맞춰 비교한다 — `전라남도` 안에는 `전남` 이라는 글자가 없어서 **전남 학생에게 `전라남도에 주소를 둔 학생` 이
          미달**이 났다(2026-10-04 · 시·도 미달을 켠 날 생긴 틀린 미달 · 충북·충남·전북·전남·경북·경남이 같은 처지였다) */
-      return c.anyOf.some((r) => mine.some((x) => prov(x) === prov(r) || x.includes(r) || r.includes(x))) ? soft('pass') : 'fail';
+      return c.anyOf.some((r) => mine.some((x) => prov(x) === prov(r) || x.includes(r) || r.includes(x))) ? soft('pass') : soft('fail');
     }
     default: return 'unknown';
   }
