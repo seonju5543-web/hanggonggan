@@ -316,7 +316,7 @@ function notifyConsentSheet() {
     closeNotifyPanel();
     if (perm === 'granted') {
       notifyRegisterBackground();
-      const p = await pushEnsure(); // 발송 서버가 있으면 '앱을 안 켜도 오는 알림'까지 한 번에 켠다
+      const p = await nfPushQueue(() => pushEnsure()); // 발송 서버가 있으면 '앱을 안 켜도 오는 알림'까지 한 번에 켠다 · 스위치와 같은 줄에 선다
       toast(p.ok
         ? '알림을 켰습니다. 앱을 켜지 않아도 폰으로 알립니다'
         : '알림을 켰습니다. 새 공고와 마감을 알립니다');
@@ -429,11 +429,12 @@ function bindNotifySettings() {
     /* 🔴 **화면 먼저, 서버는 뒤에** (2026-11-09 신고 — 눌러도 2초쯤 뒤에야 바뀐다).
        스위치·상태 줄이 보는 것은 장부의 켜짐 값과 브라우저 권한 둘뿐이라 누르는 즉시 안다.
        예전에는 푸시 서버 등록·해제(네트워크 왕복)가 끝난 **뒤에** 다시 그려서 그만큼 늦었다.
-       서버 일은 nfPushQueue 로 줄 세운다 — 빨리 껐다 켜도 '해제'가 '등록'보다 늦게 끝나 등록을 지우지 않게. */
+       서버 일은 nfPushQueue 로 줄 세운다 — 빨리 껐다 켜도 '해제'가 '등록'보다 늦게 끝나 등록을 지우지 않게.
+       🔴 켜기/끄기 때 화면 바닥 안내 글(토스트)은 띄우지 않는다 (2026-11-09 개발자 지시 "휴대폰 알림 꺼짐/켜짐 설명 글은 없애줘").
+          켜졌는지는 스위치와 그 옆 상태 줄이 이미 말한다. 브라우저가 막아 **켤 수 없을 때**의 안내만 남긴다. */
     if (notifyLedger.enabled && sup.permission === 'granted') {
       notifyLedger.enabled = false;
       notifyRedrawNow();
-      toast('휴대폰 알림 꺼짐 · 앱 안 알림함에는 계속 쌓여요');
       await notifySaveLedger();
       // 알림을 끄면 서버가 폰을 깨우는 것도 함께 멈춘다 — 그새 다시 켰으면 건너뛴다
       await nfPushQueue(() => (notifyLedger.enabled ? null : pushUnsubscribe()));
@@ -448,10 +449,7 @@ function bindNotifySettings() {
       if (perm === 'granted') {
         notifyRegisterBackground();
         // 알림을 켜면 '앱을 안 켜도 오는 알림'까지 함께 켠다 (별도 스위치 없음 — 2026-08-06) · 그새 껐으면 pushEnsure 가 'off' 로 물러난다
-        const p = await nfPushQueue(() => pushEnsure());
-        if (notifyLedger.enabled) toast(p && p.ok
-          ? '알림을 켰습니다. 앱을 켜지 않아도 폰으로 알립니다'
-          : '알림 켜짐');
+        await nfPushQueue(() => pushEnsure());
       }
       else if (perm === 'denied') toast('브라우저 사이트 설정에서 알림 허용 필요');
     }
@@ -764,8 +762,8 @@ async function notifyInit() {
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState !== 'visible') return;
     setTimeout(() => notifyCheck({ quiet: false }), 1500);
-    // 브라우저 설정에서 알림을 뒤늦게 허용한 경우에도 여기서 등록이 메꿔진다
-    pushEnsure().catch(() => {});
+    // 브라우저 설정에서 알림을 뒤늦게 허용한 경우에도 여기서 등록이 메꿔진다 · 스위치의 해제와 겹치지 않게 같은 줄에 선다
+    nfPushQueue(() => pushEnsure()).catch(() => {});
   });
 
   // 서비스워커에서 알림을 눌렀다는 신호가 오면 해당 화면을 연다
@@ -783,7 +781,7 @@ async function notifyInit() {
   if (notifyLedger.enabled) {
     notifyRegisterBackground();
     // 아직 발송 서버에 등록되지 않았으면 지금 등록하고, 이미 됐으면 학교만 맞춘다
-    pushEnsure().catch(() => {});
+    nfPushQueue(() => pushEnsure()).catch(() => {});
   }
   notifyMaybeAskConsent(1800);
 }
