@@ -4513,6 +4513,84 @@
    "dir": "insta/pub/0723002",
    "at": "2026-11-09",
    "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "0758001",
+   "org": "박신양FUN장학회",
+   "name": "장학생",
+   "due": "2026-12-31",
+   "school": null,
+   "tplNo": 2,
+   "cards": 4,
+   "dir": "insta/pub/0758001",
+   "at": "2026-11-09",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2704228001",
+   "org": "거제1동장학회",
+   "name": "중소상인자녀장학생",
+   "due": "2026-11-16",
+   "school": null,
+   "tplNo": 3,
+   "cards": 4,
+   "dir": "insta/pub/2704228001",
+   "at": "2026-11-09",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2701096002",
+   "org": "(재)이월면장학회",
+   "name": "장학생",
+   "due": "2026-11-18",
+   "school": null,
+   "tplNo": 4,
+   "cards": 5,
+   "dir": "insta/pub/2701096002",
+   "at": "2026-11-09",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2000395002",
+   "org": "(재)옹진군인재육성재단",
+   "name": "예체능 특기장학금",
+   "due": "2026-11-20",
+   "school": null,
+   "tplNo": 4,
+   "cards": 5,
+   "dir": "insta/pub/2000395002",
+   "at": "2026-11-09",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2000395001",
+   "org": "(재)옹진군인재육성재단",
+   "name": "인재장학금",
+   "due": "2026-11-20",
+   "school": null,
+   "tplNo": 4,
+   "cards": 5,
+   "dir": "insta/pub/2000395001",
+   "at": "2026-11-09",
+   "dates": "absolute"
+  },
+  {
+   "status": "prepared",
+   "code": "2000395006",
+   "org": "(재)옹진군인재육성재단",
+   "name": "지역핵심인재장학금",
+   "due": "2026-11-20",
+   "school": null,
+   "tplNo": 2,
+   "cards": 5,
+   "dir": "insta/pub/2000395006",
+   "at": "2026-11-09",
+   "dates": "absolute"
   }
  ]
 }
