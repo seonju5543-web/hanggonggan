@@ -1,0 +1,15 @@
+{
+ "code": "2700016004",
+ "org": "재단법인 STX장학재단",
+ "name": "장학생",
+ "due": "2026-11-16",
+ "school": null,
+ "tpl": "photo",
+ "tplNo": 1,
+ "seed": 1576399772,
+ "skin": "blue",
+ "font": null,
+ "cards": 5,
+ "at": "2026-11-09",
+ "dates": "absolute"
+}
