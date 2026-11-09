@@ -309,10 +309,16 @@ function notifyConsentSheet() {
 
   const finish = async () => { notifyLedger.askedAt = Date.now(); await notifySaveLedger(); };
 
-  $('#btn-nf-allow').addEventListener('click', async () => {
+  $('#btn-nf-allow').addEventListener('click', async (ev) => {
+    /* 두 번 누름을 막는다 — 시트가 닫히는 0.25초 사이·데스크톱의 권한 말풍선이 떠 있는 동안 두 번째 누름이 들어와,
+       먼저 누른 쪽이 '켰습니다'라고 말한 뒤 나중 누름이 실패해 꺼지는 일이 있었다(리뷰 2026-11-09) */
+    if (ev.currentTarget.disabled) return;
+    ev.currentTarget.disabled = true;
     const seq = nfPressed();
     const perm = await notifyRequestPermission();
     notifyLedger.enabled = perm === 'granted';
+    // 화면 먼저 — 밑에 설정 화면이 떠 있으면 서버를 기다리는 동안 스위치가 꺼짐으로 남아, 학생이 눌러 도로 끈다(리뷰 2026-11-09)
+    notifyRedrawSettings();
     await finish();
     closeNotifyPanel();
     if (perm === 'granted') {
@@ -320,7 +326,8 @@ function notifyConsentSheet() {
       // 발송 서버가 있으면 '앱을 안 켜도 오는 알림'까지 한 번에 켠다 · 스위치와 같은 줄에 선다
       // 🔴 등록이 안 되면 알림은 꺼짐으로 돌아가고 **아무 말도 하지 않는다**(2026-11-09 지시) — '켰습니다'라고 하면 거짓말이 된다
       const p = await nfRegisterAfterPress(seq);
-      if (notifyLedger.enabled) toast(p && p.ok
+      // 장부의 켜짐만 보면 안 된다 — 더 늦은 누름이 아직 서버를 기다리는 동안 잠깐 켜짐일 뿐일 수 있다
+      if (seq === nfPressSeq && notifyLedger.enabled && !nfRegisterFailed(p)) toast(p && p.ok
         ? '알림을 켰습니다. 앱을 켜지 않아도 폰으로 알립니다'
         : '알림을 켰습니다. 새 공고와 마감을 알립니다');
     } else if (perm === 'denied') {
@@ -381,9 +388,17 @@ function notifyRedrawNow() {
   setTimeout(() => { if (typeof renderMy === 'function') renderMy(); }, 0);
 }
 /* 푸시 서버 등록·해제를 한 줄로 세운다 — 앞 일이 실패해도 뒤 일은 돈다 */
+/* 🔴 줄의 한 칸마다 시한이 있다 — 서비스워커가 끝내 안 뜨면(사생활 보호 창의 등록 거절·설치 실패) navigator.serviceWorker.ready 가
+   영영 돌아오지 않아, 스위치는 켜짐인데 아무 데도 등록 안 된 채로 굳고 뒤 일도 전부 줄에 갇혔다(리뷰 2026-11-09).
+   시한을 넘기면 { ok:false, reason:'timeout' } 으로 보고 다음 칸으로 넘어간다 — 버튼으로 켠 것이면 꺼짐으로 돌아간다. */
+const NF_PUSH_STEP_MS = 12000;
 let nfPushChain = Promise.resolve();
 function nfPushQueue(fn) {
-  const run = nfPushChain.then(fn, fn);
+  const step = () => Promise.race([
+    Promise.resolve().then(fn),
+    new Promise((r) => setTimeout(() => r({ ok: false, reason: 'timeout' }), NF_PUSH_STEP_MS)),
+  ]);
+  const run = nfPushChain.then(step, step);
   nfPushChain = run.catch(() => {});
   return run;
 }
@@ -534,7 +549,8 @@ function urlB64ToUint8(base64) {
 
 async function pushRegistration() {
   if (typeof swReg !== 'undefined' && swReg) return swReg;
-  try { return await navigator.serviceWorker.ready; } catch (e) { return null; }
+  /* ready 는 서비스워커가 안 뜨면 영영 안 돌아온다 — 8초 넘으면 없는 것으로 본다(부르는 쪽이 'unsupported' 로 받는다) */
+  try { return await Promise.race([navigator.serviceWorker.ready, new Promise((r) => setTimeout(() => r(null), 8000))]); } catch (e) { return null; }
 }
 
 /* 폰을 발송 서버에 등록 — 성공하면 앱을 안 켜도 알림이 온다 */

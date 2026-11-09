@@ -53,9 +53,11 @@ async function routePushServer(ctx) {
   await ctx.route(PUSH_ENDPOINT + '/**', (route) => {
     const u = new URL(route.request().url());
     pushServer.hits.push(u.pathname);
-    route.fulfill(pushServer.mode === 'ok'
+    const mode = pushServer.mode;   // 요청이 들어온 순간의 판으로 답한다
+    const reply = () => route.fulfill(mode === 'ok'
       ? { status: 200, contentType: 'application/json', body: '{"ok":true}' }
       : { status: 500, contentType: 'application/json', body: '{"ok":false}' });
+    if (mode === 'slowfail') setTimeout(reply, 1500); else reply();
   });
 }
 
@@ -416,6 +418,42 @@ async function onboard(page) {
   ok(await page.evaluate(() => notifyLedger.enabled === false), '  장부도 꺼짐 (새로고침해도 켜진 척하지 않는다)');
   ok((await page.evaluate(() => window.__nfToasts.slice())).length === 0, '  학생에게 따로 알리지 않는다 (바닥 안내 글 0건)', await page.evaluate(() => window.__nfToasts.slice()));
   ok(/켜지 않|꺼 둔/.test(await page.textContent('#my-notify .nf-status')), '  상태 줄도 꺼짐 (새 실패 문구를 만들지 않는다)', await page.textContent('#my-notify .nf-status'));
+  {
+    const leftover = await page.evaluate(async () => { await nfPushQueue(() => null); const r = await navigator.serviceWorker.ready; return !!(await r.pushManager.getSubscription()); });
+    ok(leftover === false, '  꺼짐으로 되돌릴 때 폰에 반쯤 생긴 구독도 걷는다 (서버가 못 받은 구독)');
+  }
+
+  /* 마지막 누름이 정한다 — 켜기(서버가 1.5초 뒤 실패) → 그 사이 끄기·켜기(이번엔 받아 줌) → 켜짐이어야 한다 */
+  {
+    pushServer.mode = 'slowfail';
+    await page.evaluate(() => { notifyLedger.pushSyncedAt = 0; });
+    const h0 = pushServer.hits.length;
+    await page.click('#btn-nf-toggle');                       // 켜기 ① — 늦게 실패할 요청
+    for (let i = 0; i < 40 && pushServer.hits.length === h0; i++) await page.waitForTimeout(50);
+    pushServer.mode = 'ok';
+    await page.click('#btn-nf-toggle');                       // 끄기 ②
+    await page.click('#btn-nf-toggle');                       // 켜기 ③ — 받아 줄 요청
+    await page.waitForTimeout(3500);
+    ok(pushServer.hits.length > h0 && await page.getAttribute('#btn-nf-toggle', 'aria-checked') === 'true' && await page.evaluate(() => notifyLedger.enabled === true),
+      '앞 누름의 늦은 실패가 뒤에 다시 켠 것을 끄지 않는다 (마지막 누름이 정한다)');
+    await page.click('#btn-nf-toggle');                       // 다음 확인을 위해 꺼 둔다
+    await waitSwitch('false');
+    await page.waitForTimeout(300);
+  }
+
+  /* 끝내 대답이 없으면(서비스워커가 안 뜬 판 — ready 가 영영 안 돌아온다) 시한(NF_PUSH_STEP_MS) 뒤 실패로 보고 꺼짐 · 줄도 풀린다 */
+  {
+    const stepMs = await page.evaluate(() => NF_PUSH_STEP_MS);
+    await page.evaluate(() => { window.__nfEnsure = window.pushEnsure; window.pushEnsure = () => new Promise(() => {}); });
+    await page.click('#btn-nf-toggle');
+    ok(await page.getAttribute('#btn-nf-toggle', 'aria-checked') === 'true', '  (대답 없는 동안은 켜짐으로 보인다)');
+    await page.waitForTimeout(stepMs + 1500);
+    ok(await page.getAttribute('#btn-nf-toggle', 'aria-checked') === 'false' && await page.evaluate(() => notifyLedger.enabled === false),
+      `등록이 끝내 대답하지 않으면 ${stepMs / 1000}초 뒤 꺼짐으로 돌아간다 (켜짐으로 굳지 않는다)`);
+    await page.evaluate(() => { window.pushEnsure = window.__nfEnsure; });
+    const freed = await page.evaluate(() => Promise.race([nfPushQueue(() => 'free'), new Promise((r) => setTimeout(() => r('stuck'), 3000))]));
+    ok(freed === 'free', '  그 뒤에도 서버 일 줄이 막히지 않는다', freed);
+  }
 
   /* 서버가 돌아오면 다시 켤 수 있다 */
   pushServer.mode = 'ok';
@@ -495,6 +533,7 @@ async function onboard(page) {
     const c2 = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await c2.grantPermissions(['notifications'], { origin: BASE });
     pushServer.mode = 'fail';
+    pushServer.hits = [];
     await routePushServer(c2);
     const pg = await c2.newPage();
     pg.on('dialog', async (d) => { await d.accept(); });
@@ -504,12 +543,16 @@ async function onboard(page) {
     await onboard(pg);
     await pg.waitForSelector('#notify-sheet:not([hidden])', { timeout: 6000 });
     await pg.evaluate(() => { window.__nfToasts = []; const t = window.toast; window.toast = (m, ...r) => { window.__nfToasts.push(String(m)); return t(m, ...r); }; });
-    await pg.click('#btn-nf-allow');
+    /* 두 번 눌러도 한 번으로 — 먼저 누른 쪽이 '켰습니다'라고 말한 뒤 나중 누름이 실패해 꺼지는 일을 막는다(리뷰 2026-11-09) */
+    const seq0 = await pg.evaluate(() => nfPressSeq);
+    await pg.evaluate(() => { const b = document.querySelector('#btn-nf-allow'); b.click(); b.click(); });
+    ok(await pg.evaluate((s0) => nfPressSeq - s0, seq0) === 1, "  '알림 받기'를 연달아 두 번 눌러도 한 번만 처리한다", await pg.evaluate((s0) => nfPressSeq - s0, seq0));
     await pg.waitForFunction(() => notifyLedger && notifyLedger.enabled === false, null, { timeout: 6000 }).catch(() => {});
     await pg.waitForTimeout(500);
     ok(await pg.evaluate(() => notifyLedger.enabled === false), "'알림 받기'를 눌렀는데 서버 등록이 안 되면 알림은 꺼짐");
     const ts = await pg.evaluate(() => window.__nfToasts.slice());
-    ok(!ts.some((t) => /켰습니다/.test(t)), "  '알림을 켰습니다'라고 말하지 않는다 (따로 알리지도 않는다)", ts);
+    ok(ts.length === 0, "  아무 말도 하지 않는다 ('알림을 켰습니다'도, 실패 안내도 — 바닥 안내 글 0건)", ts);
+    ok(pushServer.hits.some((h) => /\/subscribe$/.test(h)), '  (실패 길이 실제로 돌았다 — 서버 대역이 등록 요청을 받았다)', pushServer.hits);
     await pg.click('.nav-item[data-nav="my"]');
     await pg.click('#btn-open-settings');
     await pg.waitForSelector('#my-notify:not([hidden])');
