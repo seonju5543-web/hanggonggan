@@ -324,14 +324,41 @@ async function onboard(page) {
   await page.screenshot({ path: SHOT('06-my-on') });
 
   /* 🔴 설정 화면에서 **스위치를 직접 눌러** 모양이 따라 바뀌는가 (2026-11-06 신고 — 눌러도 끈 모양 그대로).
-     위 확인들은 화면을 새로 열어 그린 것만 봐서, 누른 뒤 다시 그리는 길(renderMy → 알림 카드 없음)을 못 봤다. */
+     위 확인들은 화면을 새로 열어 그린 것만 봐서, 누른 뒤 다시 그리는 길(renderMy → 알림 카드 없음)을 못 봤다.
+     🔴 그리고 **곧바로** 바뀌는가 (2026-11-09 신고 — 2초쯤 뒤에 바뀐다). 푸시 서버 등록·해제를 일부러 2.5초 늦춰 두고,
+        누른 뒤 0.4초 안에 스위치·상태 줄이 바뀌어 있어야 한다 — 서버를 기다린 뒤 그리면 여기서 걸린다.
+        늦춘 가짜는 확인이 끝나면 원래 함수로 되돌린다(뒤 확인들이 진짜 길을 보게). */
+  const NF_SLOW = 2500, NF_FAST = 400;
+  await page.evaluate((ms) => {
+    window.__nfReal = { pushUnsubscribe: window.pushUnsubscribe, pushEnsure: window.pushEnsure };
+    window.__nfServer = [];
+    window.pushUnsubscribe = async () => { await new Promise((r) => setTimeout(r, ms)); window.__nfServer.push('off'); };
+    window.pushEnsure = async () => { await new Promise((r) => setTimeout(r, ms)); window.__nfServer.push(notifyLedger.enabled ? 'on' : 'skip'); return { ok: true }; };
+  }, NF_SLOW);
+  const nfServerDone = (n) => page.waitForFunction((k) => window.__nfServer.length >= k, n, { timeout: 4 * NF_SLOW }).catch(() => {});
+  /* ① 끄기 — 서버 일이 끝날 때까지 기다렸다가 다음으로 (켜기 확인이 끄기의 뒷일과 겹치지 않게) */
   await page.click('#btn-nf-toggle');
-  await page.waitForFunction(() => document.querySelector('#btn-nf-toggle')?.getAttribute('aria-checked') === 'false', null, { timeout: 5000 }).catch(() => {});
-  ok(await page.getAttribute('#btn-nf-toggle', 'aria-checked') === 'false', '설정에서 스위치를 끄면 그 자리에서 꺼짐 모양으로 바뀐다');
-  ok(/켜지 않|꺼 둔/.test(await page.textContent('#my-notify .nf-status')), '끈 뒤 상태 줄도 꺼짐을 말한다');
+  await page.waitForTimeout(NF_FAST);
+  ok(await page.getAttribute('#btn-nf-toggle', 'aria-checked') === 'false', `설정에서 스위치를 끄면 ${NF_FAST / 1000}초 안에 꺼짐 모양으로 바뀐다 (서버가 ${NF_SLOW / 1000}초 걸려도)`);
+  ok(/켜지 않|꺼 둔/.test(await page.textContent('#my-notify .nf-status')), '끈 뒤 상태 줄도 곧바로 꺼짐을 말한다');
+  await nfServerDone(1);
+  /* ② 켜기 */
   await page.click('#btn-nf-toggle');
-  await page.waitForFunction(() => document.querySelector('#btn-nf-toggle')?.getAttribute('aria-checked') === 'true', null, { timeout: 8000 }).catch(() => {});
-  ok(await page.getAttribute('#btn-nf-toggle', 'aria-checked') === 'true', '다시 켜면 그 자리에서 켜짐 모양으로 바뀐다');
+  await page.waitForTimeout(NF_FAST);
+  ok(await page.getAttribute('#btn-nf-toggle', 'aria-checked') === 'true', `다시 켜면 ${NF_FAST / 1000}초 안에 켜짐 모양으로 바뀐다`);
+  ok(/켜짐/.test(await page.textContent('#my-notify .nf-status')), '켠 뒤 상태 줄도 곧바로 켜짐을 말한다');
+  await nfServerDone(2);
+  /* ③ 빨리 껐다 켜기 — 서버 일은 누른 순서대로 끝나야 한다('해제'가 '등록'보다 늦게 끝나 등록을 지우면 안 된다) */
+  await page.click('#btn-nf-toggle');
+  await page.waitForTimeout(150);
+  await page.click('#btn-nf-toggle');
+  await nfServerDone(4);
+  {
+    const order = await page.evaluate(() => window.__nfServer.slice(2));
+    ok(JSON.stringify(order) === JSON.stringify(['off', 'on']) && await page.getAttribute('#btn-nf-toggle', 'aria-checked') === 'true',
+      '빨리 껐다 켜도 서버 일은 누른 순서대로 끝나고(해제 → 등록) 스위치는 켜짐', JSON.stringify(order));
+  }
+  await page.evaluate(() => { Object.assign(window, window.__nfReal); });
 
   /* 종류별 끄기는 화면에서 사라졌지만 규칙 엔진은 그대로 prefs 를 읽는다 — 장부를 직접 고쳐 엔진이 지키는지 본다 */
   await page.evaluate(async () => { notifyLedger.prefs.deadline = false; await notifySaveLedger(); });
