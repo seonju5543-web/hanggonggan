@@ -3,13 +3,23 @@
  "updatedAt": "2026-11-09",
  "items": [
   {
+   "title": "[장학안내] [재단법인 관정재단] 2027년도 관정재단 장학생(학부) 선발...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70948&cate=8",
+   "attachments": [
+    {
+     "name": "2027년 관정재단 국내대학 장학생 선발계획 및 지원서.zip",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2591162"
+    }
+   ],
+   "deadlineHint": "제출기간: 2026. 11. 9.(월) ~ 2026. 11. 19.(목) 18:00까지) ​ 1. 추천인원 : 학부재학생 5 명 내외 ( 최종",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-11-09"
+  },
+  {
    "title": "[장학안내] 2026학년도 2학기 도전장학생(비상) 선발 2단계 면접평가 안내",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70910&cate=8",
    "attachments": [
-    {
-     "name": "교육기본시설/부속시설",
-     "url": "https://www.jnu.ac.kr/MainIntro/Institution/AttachedFac"
-    },
     {
      "name": "2026학년도 2학기 도전장학생(비상) 2단계 심층면접 평가 대상자 명단(게시용)최종.xlsx.pdf",
      "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2590803"
@@ -23,12 +33,7 @@
   {
    "title": "[장학안내] 2026학년도 2학기 도전장학생(비상) 1단계 선발자 공고",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70909&cate=8",
-   "attachments": [
-    {
-     "name": "교육기본시설/부속시설",
-     "url": "https://www.jnu.ac.kr/MainIntro/Institution/AttachedFac"
-    }
-   ],
+   "attachments": [],
    "deadlineHint": null,
    "school": "전남대학교",
    "campus": "",

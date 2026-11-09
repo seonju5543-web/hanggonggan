@@ -2,6 +2,101 @@
  "updatedAt": "2026-11-09",
  "items": [
   {
+   "title": "접수전 [국토교통부] 제5기 국토교통부 2030청년자문단·청년온라인패널 모집 공고",
+   "url": "https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.ulsan?bbsId=BBS_0000000000000309&mId=008001002000000000&dataId=61134",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": "모집기간 · 2026. 11. 9.(월) 09:00 ~ 2026. 11. 22.(일) 18:00 📢모집대상 · 국토교통부 정책에 참여하고 싶은",
+   "deadline": "2026-11-22",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-09 ~ 2026-11-22"
+    }
+   ],
+   "eligibilityLines": [
+    "· 국토교통부 정책에 참여하고 싶은 청년(만 19세 ~ 만 39세)"
+   ],
+   "detailsV": 6,
+   "excerptsAt": "2026-11-09",
+   "school": "",
+   "campus": "",
+   "host": "울산청년정책플랫폼 U-PAGE",
+   "foundAt": "2026-11-09"
+  },
+  {
+   "title": "접수중 [고용노동부] 2026년 청년 미래내일 일경험 지원사업 DESIGN ✕MARKETING 기업 프로젝트 참여자 모집 공고",
+   "url": "https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.ulsan?bbsId=BBS_0000000000000309&mId=008001002000000000&dataId=61132",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": "마감: 26.11.12(목) 16:00 - 프로젝트 기간 : 26.11.23(월) ~ 27.01.15(금) (8주) - 지원내용 : 교육비 전액",
+   "deadline": "2026-11-12",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-22 ~ 2026-11-12"
+    },
+    {
+     "label": "대상",
+     "text": "만 15세 이상 ~ 34세 이하 미취업 청년 (디자인·광고마케팅 분야)"
+    },
+    {
+     "label": "혜택",
+     "text": "교육비 전액 무료, 참여수당 지급(개인 80만원 + 팀 180만원, 조건 충족 시)"
+    },
+    {
+     "label": "주최",
+     "text": "고용노동부"
+    }
+   ],
+   "eligibilityLines": [
+    "- 모집대상 : 만 15세 이상 ~ 34세 이하 미취업 청년 (디자인·광고마케팅 분야)",
+    "- 신청마감: 26.11.12(목) 16:00",
+    "- 프로젝트 기간 : 26.11.23(월) ~ 27.01.15(금) (8주)",
+    "- 지원 링크 : https://buly.kr/BIXosvp",
+    "포스터_DESIGN ✕ MARKETING 기업 프로젝트 참여자 모집.png"
+   ],
+   "detailsV": 6,
+   "field": "인턴·일경험",
+   "excerptsAt": "2026-11-09",
+   "school": "",
+   "campus": "",
+   "host": "울산청년정책플랫폼 U-PAGE",
+   "foundAt": "2026-11-09"
+  },
+  {
+   "title": "접수중 2026년도 미래내일 일경험 (ESG형) 생성형 AI활용 교육 참여자 모집",
+   "url": "https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.ulsan?bbsId=BBS_0000000000000309&mId=008001002000000000&dataId=61129",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": "모집기간 : ~ 11.18(수) 📌면접진행 : 11.19(목) ~ 11.20(금) 📌합격발표 : 11.20(금) 📌오리엔테이션 : 11.2",
+   "deadline": "2026-11-18",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-05 ~ 2026-11-18"
+    },
+    {
+     "label": "활동기간",
+     "text": "11.24(화) ~ 01.27(수)"
+    }
+   ],
+   "eligibilityLines": [
+    "[필수요건 1] 연령",
+    "ㅇ 만 15세~34세 청년",
+    "[필수조건 2] 아래 중 1가지 이상 해당",
+    "ㅇ 부모의 이혼·사별·별거 등으로 한부모가족에 해당하는 청년",
+    "ㅇ 가족 또는 자녀를 돌보고 있는 청년"
+   ],
+   "detailsV": 6,
+   "field": "교육·캠프",
+   "excerptsAt": "2026-11-09",
+   "school": "",
+   "campus": "",
+   "host": "울산청년정책플랫폼 U-PAGE",
+   "foundAt": "2026-11-09"
+  },
+  {
    "title": "경기대학교 2026년 예비창업패키지 KGU 창업준비 아카데미 모집 신청 공고",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179673",
    "kind": "대외활동",
@@ -40,6 +135,154 @@
    "foundAt": "2026-11-09",
    "seenAt": "2026-11-09",
    "excerptsAt": "2026-11-09"
+  },
+  {
+   "title": "[국제학생] 2026경북 k-푸드 세계화 국제요리경연대회 개최 및 참가 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53638&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "kind": "공모전",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    },
+    {
+     "name": "Attachment 레시피(서식).hwpx",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35541&ano=53638"
+    },
+    {
+     "name": "광운미디어",
+     "url": "https://www.kw.ac.kr/ko/etc/2018_kw110.pdf"
+    }
+   ],
+   "deadlineHint": null,
+   "detailsV": 6,
+   "excerptsAt": "2026-11-09",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-11-09",
+   "eligibilityLines": [
+    "경북 농수산 특산물을 활용한 요리·베이커리",
+    "전국 고등학생,대학생,외국인 유학생",
+    "재정지원사업 통합 성과공유회"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)"
+  },
+  {
+   "title": "[일반] [현장실습] 「2026학년도 동계방학 단기 현장실습」 참여 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53636&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    },
+    {
+     "name": "Attachment 첨부1. 광운대학교_현장실습온라인시스템_학생_매뉴얼_240613.pdf",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35539&ano=53636"
+    },
+    {
+     "name": "Attachment 첨부2. 현장실습학기제 운영 규정_20240201.hwp",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35540&ano=53636"
+    }
+   ],
+   "deadlineHint": "모집 기간 2026. 11 월 ~ ( 기업별 상이함 ) ※ 현장실습 온라인 시스템 지원 ( https://internship.kw.ac.kr )",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026. 11 월 ~ ( ※ 기업별 상이 / ‘ 현장실습 온라인 시스템 ’ 에서 기업별 지원서 마감일 확인 요망 )"
+    }
+   ],
+   "detailsV": 6,
+   "field": "인턴·일경험",
+   "excerptsAt": "2026-11-09",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-11-09"
+  },
+  {
+   "title": "[학생지원팀] 2026 영상 콘테스트 「DRIVE in TOKUSHIMA」 참가자 모집",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2436/271208/artclView.do",
+   "kind": "공모전",
+   "attachments": [
+    {
+     "name": "「DRIVE in TOKUSHIMA」 영상 공모전 실시요강(한국어).docx",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2436/153055/download.do"
+    },
+    {
+     "name": "「DRIVE in TOKUSHIMA」 영상 공모전 실시요강(일본어).docx",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2436/153056/download.do"
+    },
+    {
+     "name": "「DRIVE in TOKUSHIMA」 영상 공모전 참가 신청서.docx",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2436/153057/download.do"
+    }
+   ],
+   "deadlineHint": "마감: 2026년 12월 15일(화) - 수상 결과 발표: 2027년 2월 중 3. 주요 지원 사항 - 왕복 항공료: 1인당 50만 원 한도 -",
+   "deadline": "2026-12-15",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026. 11. 9.(월)~11. 13.(금)"
+    },
+    {
+     "label": "대상",
+     "text": "한국외국어대학교 학부 재학생"
+    },
+    {
+     "label": "주최",
+     "text": "도쿠시마현 관광협회"
+    }
+   ],
+   "eligibilityLines": [
+    "- 참가 대상: 한국외국어대학교 학부 재학생",
+    "- 참가 규모: 대학 대표 1팀(3~4명)"
+   ],
+   "detailsV": 6,
+   "field": "영상·사진",
+   "excerptsAt": "2026-11-09",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-11-09"
   },
   {
    "title": "[굿네이버스] 해외봉사 해vol래? 2기 모집",
@@ -5551,180 +5794,6 @@
    "campus": "",
    "host": "대한민국 정책브리핑 이벤트·공모",
    "foundAt": "2026-10-15"
-  },
-  {
-   "title": "[보건복지부] 2026 대국민 공공의료 공모전",
-   "url": "https://www.nmcpublicedu.or.kr/view.asp?idx=4827&boardcode=notice&go=&field=&keyword=&page=",
-   "kind": "공모전",
-   "attachments": [],
-   "deadlineHint": null,
-   "detailsV": 6,
-   "excerptsAt": "2026-10-28",
-   "school": "",
-   "campus": "",
-   "host": "대한민국 정책브리핑 이벤트·공모",
-   "foundAt": "2026-10-15",
-   "eligibilityLines": [
-    "공모자격 : 대한민국 국민 누구나",
-    "※ 개인 또는 4인 이내 팀/기관 단위 참가 가능"
-   ],
-   "eligibilityFrom": "요강 페이지"
-  },
-  {
-   "title": "[봉사] [부평구청소년수련관] 2026 청소년특성화교실 모니터링단 모집",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53492&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": "신청기간 : ~2026. 10. 24.( 토 ) 까지 아 . 신청방법 : 온라인 신청 자 . 문 의 : 청소년활동팀 김화정 ( ☎ 032-500",
-   "deadline": "2026-10-24",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "~2026. 10. 24.( 토 ) 까지"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026. 11. 3.( 화 )~11. 28.( 토 ) 중"
-    },
-    {
-     "label": "대상",
-     "text": "20~24 세 청소년"
-    },
-    {
-     "label": "혜택",
-     "text": "봉사시간 (1 회 4 시간 ) 지급 , 활동키트 제공 , 활동확인서 발급"
-    },
-    {
-     "label": "활동지역",
-     "text": "부평구 내 현장 직업체험처 ( 굴포천 , 부평문화의거리 일대 등 )"
-    }
-   ],
-   "eligibilityLines": [
-    "다 . 모집대상 : 20~24 세 청소년"
-   ],
-   "detailsV": 6,
-   "field": "서포터즈·기자단",
-   "excerptsAt": "2026-10-28",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-15"
-  },
-  {
-   "title": "[외부] [교육부] 2026 청년정책 공모전 개최 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53491&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "kind": "공모전",
-   "attachments": [
-    {
-     "name": "Attachment 1. 2026 청년정책 공모전 공고문.pdf",
-     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35431&ano=53491"
-    }
-   ],
-   "deadlineHint": null,
-   "eligibilityLines": [
-    "ㅇ 참가자격 : 대한민국 청년 (19~34 세 ) 누구나"
-   ],
-   "detailsV": 6,
-   "field": "기획·아이디어",
-   "excerptsAt": "2026-10-28",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-15",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026.10.7.( 수 ) ~ 10.30.( 금 )"
-    },
-    {
-     "label": "대상",
-     "text": "대한민국 청년 (19~34 세 ) 누구나"
-    }
-   ]
-  },
-  {
-   "title": "[외부] [농업협동조합중앙회 미래전략연구소] 농업가치 확산을 위한 농심천심 대학(원)생 논문 공모전 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53490&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "kind": "공모전",
-   "attachments": [],
-   "deadlineHint": null,
-   "detailsV": 6,
-   "field": "글쓰기·논문",
-   "excerptsAt": "2026-10-28",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-15",
-   "eligibilityLines": [
-    "대학·대학원 재학생 및 휴학생 (접수일 기준, 전공제한 없음)",
-    "개인 또는 팀 (3인 이내)"
-   ],
-   "eligibilityFrom": "AI(공고 포스터 그림)",
-   "eligibilityReviewed": false
-  },
-  {
-   "title": "[외부] [국립한밭대학교] 2026학년도 전국 대학(원)생 빅데이터 경진대회 개최 알림",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53488&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "kind": "공모전",
-   "attachments": [
-    {
-     "name": "Attachment 1. 경진대회 공고문.hwp",
-     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35429&ano=53488"
-    }
-   ],
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "주최",
-     "text": "국립한밭대학교 인문사회융합인재양성사업연구소 , 대전광역시 유성구"
-    }
-   ],
-   "detailsV": 6,
-   "field": "IT·소프트웨어",
-   "excerptsAt": "2026-10-28",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-15",
-   "eligibilityLines": [
-    "빅데이터 기초지식을 보유한 전국의 대학(원) 재학생"
-   ],
-   "eligibilityFrom": "공고문 첨부"
-  },
-  {
-   "title": "[봉사] [한국국제협력단] 2026년 KOICA 해외봉사단 정기설명회 개최 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53487&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "Attachment [KOICA] 행사 홍보용 카드뉴스_해외봉사단.pdf",
-     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35428&ano=53487"
-    }
-   ],
-   "deadlineHint": null,
-   "eligibilityLines": [
-    "ㅇ 참가대상 : koica 해외봉사단 및 국제개발협력에 관심 있는 국민 누구나",
-    "ㅇ ( 운영 방식 ) 현장 오프라인 참석 ( 사전 참가신청 병행 , ‘ 붙임 ’ 홍보 자료 참고 )",
-    "- 온라인 생중계는 미실시 ( 단 , 현장 스케치 영상 촬영 후 koica 공식 홍보채널에 게시 예정 )",
-    "ㅇ 주요 내용 : 3 대 프로그램 기획",
-    "정기설명회 프로그램"
-   ],
-   "detailsV": 6,
-   "field": "봉사",
-   "excerptsAt": "2026-10-28",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-10-15",
-   "excerpts": [
-    {
-     "label": "일시",
-     "text": "2026. 11. 6.( 금 ) ~ 11. 7.( 토 ) , 10:00~18:00 (2 일간 )"
-    },
-    {
-     "label": "대상",
-     "text": "koica 해외봉사단 및 국제개발협력에 관심 있는 국민 누구나"
-    },
-    {
-     "label": "주최",
-     "text": "한국국제협력단 (koica)"
-    }
-   ]
   },
   {
    "title": "청년 생명사랑 서포터즈 운영",

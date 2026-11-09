@@ -22903,6 +22903,104 @@
     "raw": "나 . 지급학기 : 2026-2 학기 1 회 ( ※ 기수혜자 중복수혜 가능 )"
    },
    "exclusivityFrom": "공고 원문"
+  },
+  {
+   "id": "auto-otice06doarticleno141703",
+   "name": "2026학년도 한국교육재단 한국사무소 장학생 모집 안내",
+   "boardTitle": "2026학년도 한국교육재단 한국사무소 장학생 모집 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「재단」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-09",
+   "provider": "주관 기관 원문 확인",
+   "amount": "300만원",
+   "amountValue": 3000000,
+   "deadline": "2026-11-20",
+   "deadlineFrom": "공고 원문 · 3. 서류 제출 기간 : ~ 2026. 11. 20. (금)",
+   "period": "접수 ~2026-11-20",
+   "summary": "성균관대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "성균관대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-09 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=141703&article.offset=0&articleLimit=10",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "1. 지원 자격 (해당 조건을 모두 해당하는 자)",
+    "- 한국 국적을 보유하고, 일본에서 영주 또는 특별영주자격을 소지한 자",
+    "※ 이중국적자의 경우 양국 국적을 증명할 수 있는 서류를 제출",
+    "※ 일본으로 귀화한 경우 국적 상실을 증명할 수 있는 서류를 제출",
+    "- 한국의 대학원(석사·박사) 정규과정에 재학 중이거나, 2027학년도 1학기 입학 또는 편입이 확정된 자",
+    "※ 전문대학 및 학부 과정, 어학당 및 1년 미만 단기 유학은 응모 불가",
+    "- 공고일 기준 석사 과정은 만 35세 미만, 박사 과정은 만 40세 미만인 자",
+    "- 한국어 능력시험(TOPIK) 5급 이상인 자"
+   ],
+   "excerpts": [
+    "- 지급 금액: 1인당 300만원",
+    "서류 제출 방법 : 홈페이지(https://www.kref.or.jp/ko) 에서 양식을 다운로드 받아 작성한 후 신청 폼에 업로드",
+    "문의 : 한국교육재단 한국사무소(edukofoun1963@kref.or.jp)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 3000000,
+    "ratio": 0,
+    "min": 3000000,
+    "max": 3000000,
+    "raw": "- 지급 금액: 1인당 300만원"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-orykeywordpaged1slug2026-0ezoyxo",
+   "name": "장학 2026년 숭실대학교 직원 추천 장학생 선발 공고",
+   "boardTitle": "장학 2026년 숭실대학교 직원 추천 장학생 선발 공고",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 학교 이름표 「숭실대학교」"
+   ],
+   "kindConfidence": "mid",
+   "kindFrom": "로봇(제목)",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-11-09",
+   "period": "접수 기간 원문 확인",
+   "summary": "숭실대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "숭실대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-09 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026년-숭실대-직원-추천-장학생-지원서-1.hwp",
+     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs9WNAzeTphgWMnReIxVN4o4fOUGZ%2BljrVdsr0C9bzynV2L8kAdFYBo7PhLgaeQzBPHJt%2BFnPwMUt%2BU0H%2FJOaLHmy7dgqgJs46WscGy84xQr1gXH5RrqcGdR%2FlwfygnmjG0WtYyt7JRQ%2BKPKJHMD5yF08kEn97SPsWe57neR1ThT6"
+    },
+    {
+     "name": "2026년-숭실대-노동조합-직원-추천-장학생-선발관련-개인정보제공-동의서.hwp",
+     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs9WNAzeTphgWMnReIxVN4o5eHUmHFO8uiHbLgqAYg0gHur2pgg%2BElZlbuuxCoBZaop6trxfw3DJyESwHF%2BWV%2FmirzPU8dcFvisRMlJ7kQ%2BPaCBjX%2BrJ3Gz24XgNf2VO7DWvrq1fJHx9vLGOjbw1hZyEl8Rcq4XBrnvspUrdmXoYr4NocXoFSTs1ejWp5%2FSdCAoobF6cwLLVEYK9jtYjY1nzQ5Sk4oF1gV50F5DgO0d9itzXBOgFIv3GV%2ByhGt3aJ4B1odgkEZzefkuCJK0I5nJuxmxgI92ArayMd%2FpKxhMq%2F"
+    }
+   ],
+   "sourceUrl": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=2026%EB%85%84-%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EC%A7%81%EC%9B%90-%EC%B6%94%EC%B2%9C-%EC%9E%A5%ED%95%99%EC%83%9D-%EC%84%A0%EB%B0%9C-%EA%B3%B5%EA%B3%A0&keyword=%EC%9E%A5%ED%95%99",
+   "sourceKind": "auto"
   }
  ]
 }
