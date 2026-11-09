@@ -3,6 +3,27 @@
  "updatedAt": "2026-11-09",
  "items": [
   {
+   "title": "세종캠퍼스 전산 서비스 일시 중단 안내",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=160165&noCat=32",
+   "postedAt": "2026-11-09",
+   "school": "홍익대학교",
+   "campus": "",
+   "src": "9c41077f",
+   "foundAt": "2026-11-09",
+   "desc": "세종캠퍼스 전산관리팀 세종캠퍼스 전기실 공사 및 서버실 분전반 교체 공사로 인한 정전으로 아래와 같이 전산 서비스가 일시 중단되오니 참고하시기 바랍니다."
+  },
+  {
+   "title": "[세종앵커사업단] 3차원 이미징 기술 이론 및 실습 비교과 프로그램 신청 안내",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=160159&noCat=32",
+   "postedAt": "2026-11-09",
+   "school": "홍익대학교",
+   "campus": "",
+   "src": "9c41077f",
+   "foundAt": "2026-11-09",
+   "thumb": "data/news/img/e502336b3b1806c2.webp",
+   "desc": "2. 운영기간 : 11/30(월)~12/11(금) 3. 장소 : 홍익대학교 세종 캠퍼스 교내 연구실 및 실험실"
+  },
+  {
    "title": "2026학년도 동계계절학기 학점교류 신청 안내 (숭실대학교)",
    "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=160143&noCat=500",
    "postedAt": "2026-11-09",
@@ -412,27 +433,6 @@
    "src": "9c41077f",
    "foundAt": "2026-10-21",
    "desc": "2026학년도 동계계절학기에 숙명여자대학교에서 개설한 강좌를 수강하고자 하는 학생은 다음 사항을 참고하여 신청하기 바랍니다."
-  },
-  {
-   "title": "2026학년도 동계계절학기 학점교류 신청 안내 (동덕여자대학교)",
-   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159417&noCat=500",
-   "postedAt": "2026-10-21",
-   "kind": "학사",
-   "school": "홍익대학교",
-   "campus": "",
-   "src": "9c41077f",
-   "foundAt": "2026-10-21",
-   "desc": "2026학년도 동계계절학기에 동덕여자대학교에서 개설한 강좌를 수강하고자 하는 학생은 다음 사항을 참고하여 신청하기 바랍니다."
-  },
-  {
-   "title": "2026학년도 동계계절학기 학점교류 신청 안내 (동국대학교)",
-   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159414&noCat=500",
-   "postedAt": "2026-10-21",
-   "kind": "학사",
-   "school": "홍익대학교",
-   "campus": "",
-   "src": "9c41077f",
-   "foundAt": "2026-10-21"
   }
  ]
 }

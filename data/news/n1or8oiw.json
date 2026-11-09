@@ -3,6 +3,30 @@
  "updatedAt": "2026-11-09",
  "items": [
   {
+   "title": "2027학년도 비교과프로그램 수요조사",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766912",
+   "postedAt": "2026-11-09",
+   "postId": "26766912",
+   "school": "동국대학교",
+   "campus": "",
+   "src": "d521f12e",
+   "foundAt": "2026-11-09",
+   "thumb": "data/news/img/86c450d41162ffbb.webp"
+  },
+  {
+   "title": "[창업교육센터] 겨울방학 집중 창업지원 '2026 루트업(ROOT-UP) 프로젝트' 참여팀 모집(~11/15(일))",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766909",
+   "postedAt": "2026-11-09",
+   "postId": "26766909",
+   "kind": "행사",
+   "school": "동국대학교",
+   "campus": "",
+   "src": "d521f12e",
+   "foundAt": "2026-11-09",
+   "thumb": "data/news/img/2f34278c6625d630.webp",
+   "desc": "- 모집: 2026년 11월 15일(일) 24:00까지 - 신청: 모집폼( https://moaform.com/q/DbO6rt ) [양식] 신청서 업로드"
+  },
+  {
    "title": "동국대학교 홈페이지 만족도 조사 안내",
    "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766898",
    "postedAt": "2026-11-06",
@@ -433,29 +457,6 @@
    "foundAt": "2026-10-13",
    "thumb": "data/news/img/5c1d268d13ba56f4.webp",
    "desc": "설레지만 때로는 어려운 연애, 나는 왜 이런 모습일까요? 심리극으로 나의 연애 패턴과 숨겨진 마음을 알아보세요. <참여안내>"
-  },
-  {
-   "title": "10월 14일(수)~ 10월 15일(목) 헌혈 버스 시행 안내",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766572",
-   "postedAt": "2026-10-13",
-   "postId": "26766572",
-   "school": "동국대학교",
-   "campus": "",
-   "src": "d521f12e",
-   "foundAt": "2026-10-13"
-  },
-  {
-   "title": "제4회 총동창회장배 동국인 한마음 페스티벌 개최 안내",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766570",
-   "postedAt": "2026-10-13",
-   "postId": "26766570",
-   "kind": "행사",
-   "school": "동국대학교",
-   "campus": "",
-   "src": "d521f12e",
-   "foundAt": "2026-10-13",
-   "desc": "개인참가신청 : https://forms.gle/gh2SZhzJBGhdU2WN6 단체참가신청 : 첨부파일 작성 및 이메일(positive265@dongguk.edu) 제출",
-   "thumb": "data/news/img/047f463149a27bdd.webp"
   }
  ]
 }

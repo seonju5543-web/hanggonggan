@@ -3,6 +3,28 @@
  "updatedAt": "2026-11-09",
  "items": [
   {
+   "title": "[고시반] 2026년 행정고시 기술고시 합격자와의 만남 신청 안내",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31791&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-09",
+   "postId": "31791",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-09",
+   "desc": "- 1부 18:00~18:10 - 행사및 고시반 소개, 합격 강연자 소개"
+  },
+  {
+   "title": "[산학협력단] 2026 제5회 AI 스마트워크톤 참가 안내(~11/15)",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31810&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-09",
+   "postId": "31810",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-09",
+   "thumb": "data/news/img/8612679eef9d3da4.webp"
+  },
+  {
    "title": "헌혈하고 치킨먹자! (11월 정기 단체 헌혈 안내)",
    "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31789&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
    "postedAt": "2026-11-09",
@@ -444,28 +466,6 @@
    "foundAt": "2026-10-26",
    "thumb": "data/news/img/e63f8f9863d289ae.webp",
    "desc": "인재개발실 #대학일자리플러스센터 #외국계기업 #글로벌기업"
-  },
-  {
-   "title": "서울시립대학교 복지회 취업규칙 일부 개정(안) 사전 예고",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31726&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-26",
-   "postId": "31726",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-10-26"
-  },
-  {
-   "title": "★박준 시인과 함께하는 저자와의 만남이 개최됩니다!★ (11/10)",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31724&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-26",
-   "postId": "31724",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/1ab2a346de8964c4.webp",
-   "desc": "안녕하세요, 100주년기념도서관입니다. 올해 마지막 저자와의 만남은 박준 시인 님과 함께합니다!"
   }
  ]
 }
