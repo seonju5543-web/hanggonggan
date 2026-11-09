@@ -1560,6 +1560,11 @@ console.log('\n■ 신청서 쪽 그림 · 빈칸 자리 — 이름표 옆·표 
   eq('  deep-fetch 워크플로가 PDF 단계 뒤 이 로봇을 돌리고 경보 짝을 둔다 · 리포트를 저장 목록에 넣는다',
     (() => { const y = readText(new URL('../.github/workflows/deep-fetch.yml', import.meta.url)); return [/node collector\/form-fields\.mjs/.test(y), (y.match(/신청서 쪽 그림 · 빈칸 자리 단계가 넘어졌어요/g) || []).length, /form-fields-report\.md/.test(y)]; })(), [true, 2, true]);
   eq('  화면 검사 워크플로가 verify-formfill.js 를 돌린다', /verify-formfill\.js/.test(readText(new URL('../.github/workflows/verify-ui.yml', import.meta.url))), true);
+  /* 🔴 Pillow 는 apt(python3-pil)로 깐다 — 로봇이 `python3 -I` 로 부르는데 -I 는 pip 가 사용자 폴더에 둔 패키지를 못 본다.
+     pip 로 깔아 둔 10-31~11-08 매일 「Pillow 없어 PNG 로 둔 파일 26 · 표 머리글 아래 칸 0」 이었다 */
+  eq('  🔴 워크플로의 쪽 그림 단계는 Pillow 를 apt(python3-pil)로 깐다 — pip 사용자 설치는 python3 -I 가 못 본다 · 로봇은 -I 로 부른다',
+    (() => { const y = readText(new URL('../.github/workflows/deep-fetch.yml', import.meta.url)); const st = y.slice(y.indexOf('name: 신청서 쪽 그림 · 빈칸 자리'), y.indexOf('🚨 신청서 쪽 그림 단계 실패 알림'));
+      return [/apt-get install[^\n]*python3-pil/.test(st), /pip install/.test(st), /sh\('python3', \['-I'/.test(readText(new URL('../collector/form-fields.mjs', import.meta.url)))]; })(), [true, false, true]);
 }
 
 console.log('\n■ 공고문 뒷장 서식 쪽 떼기 — 쪽 글자의 표식으로 서식 쪽을 고른다 (2026-10-13)');
@@ -13214,8 +13219,14 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
   /* 리뷰 셋: 학교가 같은 이름으로 다시 올리면(원본 크기가 다르면) 다시 바꾼다 · 색인에 없는 고아 파일은 지운다 · 예산이 다 되면 남은 것을 적고 끝낸다 */
   fs.writeFileSync(path.join(fakeRepo, 'collector', 'extracted', 'forms-index.txt'), 'form-r1-1.docx\t우양재단 동행 장학생 모집\t지원서.docx\t101\n');
   fs.writeFileSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '9-옛결과.pdf'), pdf);
+  /* 뒤 단계(form-fields.mjs)의 결과물 — 살아 있는 PDF 의 쪽 폴더와 fields.json 은 고아가 아니다 · 죽은 PDF 의 쪽 폴더는 고아다 */
+  fs.mkdirSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '1-지원서-pages'), { recursive: true }); fs.writeFileSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '1-지원서-pages', '1.webp'), 'img');
+  fs.mkdirSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '9-옛결과-pages'), { recursive: true }); fs.writeFileSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '9-옛결과-pages', '1.webp'), 'img');
+  fs.writeFileSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', 'fields.json'), '{"files":{}}');
   const third = FP.runFormPdf ? FP.runFormPdf({ root: fakeRepo, today: '2026-10-12', soffice: fakeSoffice, log: quiet }) : {};
   eq('  원본 크기가 바뀌면 다시 바꾼다 · 그 공고 폴더의 고아 파일은 지운다', [third.done && third.done.length, fs.existsSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '9-옛결과.pdf')), fs.existsSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '1-지원서.pdf'))], [1, false, true]);
+  eq('  🔴 쪽 그림 로봇의 결과물은 고아가 아니다 — 살아 있는 PDF 의 -pages 폴더·fields.json 은 두고, 죽은 PDF 의 -pages 만 지운다 (지우면 매일 전부 다시 그린다 · 11-09)',
+    [fs.existsSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '1-지원서-pages', '1.webp')), fs.existsSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', 'fields.json')), fs.existsSync(path.join(fakeRepo, 'data', 'forms-pdf', 'r1', '9-옛결과-pages'))], [true, true, false]);
   fs.writeFileSync(path.join(fakeRepo, 'collector', 'extracted', 'forms-index.txt'), 'form-r1-1.docx\t우양재단 동행 장학생 모집\t지원서.docx\t102\n');
   const budget = FP.runFormPdf ? FP.runFormPdf({ root: fakeRepo, today: '2026-10-12', soffice: fakeSoffice, budgetSec: 0, log: quiet }) : {};
   eq('  예산이 다 되면 바꾸지 않고 「남김」으로 적는다 (단계 시한에 죽어 색인을 잃지 않게 스스로 끝낸다)', [budget.done && budget.done.length, budget.left && budget.left.length, /예산\(0초\)이 다 돼 남김 1개/.test(readText(path.join(fakeRepo, 'collector', 'form-pdf-report.md')))], [0, 1, true]);
