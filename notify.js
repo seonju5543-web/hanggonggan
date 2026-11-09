@@ -310,14 +310,17 @@ function notifyConsentSheet() {
   const finish = async () => { notifyLedger.askedAt = Date.now(); await notifySaveLedger(); };
 
   $('#btn-nf-allow').addEventListener('click', async () => {
+    const seq = nfPressed();
     const perm = await notifyRequestPermission();
     notifyLedger.enabled = perm === 'granted';
     await finish();
     closeNotifyPanel();
     if (perm === 'granted') {
       notifyRegisterBackground();
-      const p = await nfPushQueue(() => pushEnsure()); // 발송 서버가 있으면 '앱을 안 켜도 오는 알림'까지 한 번에 켠다 · 스위치와 같은 줄에 선다
-      toast(p.ok
+      // 발송 서버가 있으면 '앱을 안 켜도 오는 알림'까지 한 번에 켠다 · 스위치와 같은 줄에 선다
+      // 🔴 등록이 안 되면 알림은 꺼짐으로 돌아가고 **아무 말도 하지 않는다**(2026-11-09 지시) — '켰습니다'라고 하면 거짓말이 된다
+      const p = await nfRegisterAfterPress(seq);
+      if (notifyLedger.enabled) toast(p && p.ok
         ? '알림을 켰습니다. 앱을 켜지 않아도 폰으로 알립니다'
         : '알림을 켰습니다. 새 공고와 마감을 알립니다');
     } else if (perm === 'denied') {
@@ -384,6 +387,29 @@ function nfPushQueue(fn) {
   nfPushChain = run.catch(() => {});
   return run;
 }
+
+/* 🔴 **버튼으로 켰는데 발송 서버 등록이 안 되면 스위치를 끈 모양으로 되돌린다** (2026-11-09 개발자 지시
+   "서버 등록에 실패했을 때 학생에게 따로 알려주지 말고 … 등록이 안 되었다면 알림 아이콘이 꺼져 있는 상태로").
+   · 따로 알리지 않는다 — 바닥 안내 글도 상태 줄의 새 문구도 없다. 스위치가 꺼짐으로 돌아갈 뿐이다.
+   · **버튼을 눌렀을 때만** — 앱을 켤 때·돌아올 때의 자동 재등록(pushEnsure)이 잠깐 실패했다고 켜 둔 알림을 끄지 않는다.
+   · 발송 서버가 아예 없는 판(push-config.js 가 빈칸)은 등록할 곳이 없으니 켜 둔다 — 그 판은 '앱 안 알림만' 쓰는 게 원래 약속이다.
+   · 그새 다시 눌렀으면(nfPressSeq) 마지막 누름이 정한다 — 앞 누름의 늦은 실패가 뒤에 켠 것을 끄지 않게.
+   · 되돌릴 때 브라우저에 반쯤 생긴 구독(폰은 됐는데 서버가 못 받은 경우)도 같은 줄에서 걷는다. */
+let nfPressSeq = 0;
+function nfPressed() { return ++nfPressSeq; }
+function nfRegisterFailed(res) {
+  return pushConfigured() && !(res && res.ok) && !(res && res.reason === 'off');
+}
+async function nfRegisterAfterPress(seq) {
+  const res = await nfPushQueue(() => pushEnsure());
+  if (seq !== nfPressSeq || !notifyLedger || !notifyLedger.enabled) return res;
+  if (!nfRegisterFailed(res)) return res;
+  notifyLedger.enabled = false;
+  await notifySaveLedger();
+  notifyRedrawNow();
+  nfPushQueue(() => (notifyLedger.enabled ? null : pushUnsubscribe())).catch(() => {});
+  return res;
+}
 function notifySettingsHtml() {
   if (!notifyLedger) return '';
   const sup = notifySupport();
@@ -432,6 +458,7 @@ function bindNotifySettings() {
        서버 일은 nfPushQueue 로 줄 세운다 — 빨리 껐다 켜도 '해제'가 '등록'보다 늦게 끝나 등록을 지우지 않게.
        🔴 켜기/끄기 때 화면 바닥 안내 글(토스트)은 띄우지 않는다 (2026-11-09 개발자 지시 "휴대폰 알림 꺼짐/켜짐 설명 글은 없애줘").
           켜졌는지는 스위치와 그 옆 상태 줄이 이미 말한다. 브라우저가 막아 **켤 수 없을 때**의 안내만 남긴다. */
+    const seq = nfPressed();
     if (notifyLedger.enabled && sup.permission === 'granted') {
       notifyLedger.enabled = false;
       notifyRedrawNow();
@@ -449,7 +476,8 @@ function bindNotifySettings() {
       if (perm === 'granted') {
         notifyRegisterBackground();
         // 알림을 켜면 '앱을 안 켜도 오는 알림'까지 함께 켠다 (별도 스위치 없음 — 2026-08-06) · 그새 껐으면 pushEnsure 가 'off' 로 물러난다
-        await nfPushQueue(() => pushEnsure());
+        // 등록이 안 되면 스위치가 꺼짐으로 돌아간다(nfRegisterAfterPress — 따로 알리지 않는다)
+        await nfRegisterAfterPress(seq);
       }
       else if (perm === 'denied') toast('브라우저 사이트 설정에서 알림 허용 필요');
     }
