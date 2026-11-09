@@ -1,7 +1,18 @@
 {
  "school": "부산대학교",
- "updatedAt": "2026-11-08",
+ "updatedAt": "2026-11-09",
  "items": [
+  {
+   "title": "[부산광역시] 2026 대구 대학(원)생 AI 드래프톤 참가 홍보 요청",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512049",
+   "postedAt": "2026-11-09",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-09",
+   "thumb": "data/news/img/13a2bb499b17243b.webp",
+   "desc": "전국 대학(원)생을 대상으로 아래와 같이 「2026 대구 대학(원) AI 드래프톤」을 개최하니 학생 분들의 많은 관심과 참여 바랍니다. 자세한 내용은 포스터를 참고하시기 바랍니다."
+  },
   {
    "title": "[기술사업부] 2026년 저작권 교육 운영 및 신청 안내",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512023",
@@ -410,17 +421,6 @@
    "campus": "",
    "src": "2d0d4013",
    "foundAt": "2026-10-27"
-  },
-  {
-   "title": "[에듀테크센터] 대학 계열별 맞춤 AI+X 전공 실무 교육 장소 변경 안내(11...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511787",
-   "postedAt": "2026-10-27",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-27",
-   "thumb": "data/news/img/1daf128256d7add5.webp",
-   "desc": "안녕하십니까, 에듀테크센터입니다. '단과대학 계열별 AI+X 전공 실무 교육' 프로그램 중 11월 2일(월)과 3일(화) 장전캠퍼스 교육의 강의실이 아래와 같이 변경 되어 안내드립니다."
   }
  ]
 }

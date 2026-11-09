@@ -1,7 +1,27 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-11-08",
+ "updatedAt": "2026-11-09",
  "items": [
+  {
+   "title": "[취업정보] [재학생 전체] 2026년 전남대학교 진로취업지원 현황조사 참...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70945",
+   "postedAt": "2026-11-09",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-09",
+   "thumb": "data/news/img/9a7f03c2c2b39695.webp"
+  },
+  {
+   "title": "[학사안내] 2026학년도 2학기 재학생 분할납부 4회차 고지서 출력",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70944",
+   "postedAt": "2026-11-09",
+   "kind": "학사",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-09"
+  },
   {
    "title": "[학사안내] 2026학년도 전기(2027년 2월) 학부 졸업(수료) 유보 ...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70929",
@@ -375,26 +395,6 @@
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70843",
    "postedAt": "2026-10-30",
    "kind": "행사",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-30"
-  },
-  {
-   "title": "[채용공고] 2026년 제2회 전남대학교 패키지 지원대학 사업 전문 및 사...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70842",
-   "postedAt": "2026-10-30",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-30"
-  },
-  {
-   "title": "[채용공고] 전남대생협 계약직 직원 채용공고",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70841",
-   "postedAt": "2026-10-30",
-   "kind": "채용",
    "school": "전남대학교",
    "campus": "",
    "src": "b7347301",

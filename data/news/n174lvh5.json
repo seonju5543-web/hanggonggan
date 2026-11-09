@@ -1,7 +1,18 @@
 {
  "school": "가톨릭대학교",
- "updatedAt": "2026-11-08",
+ "updatedAt": "2026-11-09",
  "items": [
+  {
+   "title": "[입학처] 재학생(학부) 설문조사 안내(스타벅스 기프티콘 제공)",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277586&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-09",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-09",
+   "thumb": "data/news/img/9ac77736f78906b2.webp",
+   "desc": "안녕하십니까. 가톨릭대학교 입학팀입니다. 우리 대학은 우수 학생의 선발과 인재 양성을 위하여 지속적인 노력을 기울이고 있습니다."
+  },
   {
    "title": "[교수학습개발원] '신임교원 리서치 콜로키엄' 6차, 7차 신청 안내(교원 대상)",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277455&article.offset=0&articleLimit=10",
@@ -423,16 +434,6 @@
    "src": "5d85d287",
    "foundAt": "2026-10-22",
    "desc": "ISIC(International Student Identity Card) 국제학생증은 해외에서 학생 신분을 증명할 수 있으며 , 이를 통해 전세계적으로 150,000 여 학생 할인 혜택을 이용할 수 있습니다 .…"
-  },
-  {
-   "title": "[학사행정팀] 2026-겨울계절학기 숙명여자대학교 학점교류 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276984&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-22",
-   "kind": "학사",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-22"
   }
  ]
 }

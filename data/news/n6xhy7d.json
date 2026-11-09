@@ -1,7 +1,18 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-11-08",
+ "updatedAt": "2026-11-09",
  "items": [
+  {
+   "title": "[학사] 2027학년도 1학기 전과제도 시행 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53629&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-09",
+   "kind": "학사",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-09",
+   "desc": "2027학년도 1학기 전과제도 시행과 관련하여 아래와 같이 안내하오니, 전과를 희망하는 학생은 일정 및 절차를 숙지하여 기한 내 신청하시기 바랍니다. 신청 기간 09:00 ~ 17:00 (추가 접수 불가) 신청 방법"
+  },
   {
    "title": "[국제학생] 외국인 유학생 시간제 취업 금지 분야 불법취업 적발시 처리기준 개정 알림",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53622&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -417,16 +428,6 @@
    "foundAt": "2026-10-20",
    "thumb": "data/news/img/0d3aaff8149028f4.webp",
    "desc": "가 . 활동명 : 굿네이버스 좋은이웃가게 발굴단 나 . 모집대상 : 재학 또는 휴학 중인 대학생"
-  },
-  {
-   "title": "[일반] 2027년 2월 말 퇴직교원 정부포상 및 장관표창 추천 대상자 공개검증",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53517&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-20",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-20",
-   "desc": "6. 기타 사항 가 . 제출된 의견은 공적심사 자료로만 활용됩니다 . 나 . 허위 및 비방 정보 접수 방지를 위하여 의견 제출자는 실명 , 연락처 및 의견에 대한 사실 관계와 관련 증빙 자료를 제출 하여야 합니다 ."
   }
  ]
 }

@@ -1,7 +1,19 @@
 {
  "school": "동국대학교",
- "updatedAt": "2026-11-08",
+ "updatedAt": "2026-11-09",
  "items": [
+  {
+   "title": "동국대학교 홈페이지 만족도 조사 안내",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766898",
+   "postedAt": "2026-11-06",
+   "postId": "26766898",
+   "school": "동국대학교",
+   "campus": "",
+   "src": "d521f12e",
+   "foundAt": "2026-11-09",
+   "thumb": "data/news/img/84e7b8f04bed23e4.webp",
+   "desc": "여러분의 소중한 의견을 들려주세요! 본 설문조사는 동국대학교 대표홈페이지, 단과대학, 학과·학부, 대학원, 연구소 및 행정부서 홈페이지 이용자를 대상으로 진행됩니다."
+  },
   {
    "title": "[글로벌교류팀] 'Dongguk International Week 2026' 개최 안내",
    "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766903",
@@ -444,18 +456,6 @@
    "foundAt": "2026-10-13",
    "desc": "개인참가신청 : https://forms.gle/gh2SZhzJBGhdU2WN6 단체참가신청 : 첨부파일 작성 및 이메일(positive265@dongguk.edu) 제출",
    "thumb": "data/news/img/047f463149a27bdd.webp"
-  },
-  {
-   "title": "제4회 총동창회장배 동국인 한마음 페스티벌 사진 이벤트 안내",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766583",
-   "postedAt": "2026-10-13",
-   "postId": "26766583",
-   "kind": "행사",
-   "school": "동국대학교",
-   "campus": "",
-   "src": "d521f12e",
-   "foundAt": "2026-10-13",
-   "thumb": "data/news/img/a8dd7db47035ca1a.webp"
   }
  ]
 }

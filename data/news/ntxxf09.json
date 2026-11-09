@@ -1,7 +1,38 @@
 {
  "school": "경기대학교",
- "updatedAt": "2026-11-08",
+ "updatedAt": "2026-11-09",
  "items": [
+  {
+   "title": "[일반] [국어국문] 2026학년도 전기(2027년 2월) 학위수여식 및 졸업사정 관련 일정 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627083&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-09",
+   "kind": "학사",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-09",
+   "desc": "1. 졸업사정 결과 확인(KUTIS) : 2027. 1. 27(수) 2. 졸업사정 결과 열람 및 이의신청 기간"
+  },
+  {
+   "title": "[일반] [조선호텔앤리조트] 26년도 동계 산학실습",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627079&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-09",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-09",
+   "desc": "- 실습일정: 12/21~ 2/21 * 사업부별 일정 상이 - 모집기간: 11/6 (금) ~ 11/15 (일)"
+  },
+  {
+   "title": "[입학에서 취업까지] 2027학년도 1학기 경기 글로벌 학생협력단 (글로벌K) 26기 모집 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627076&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-09",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-09",
+   "desc": "1. 경기 글로벌 학생협력단(글로벌K)이란? 국제교류팀의 *근로장학생으로서 국제교류팀의 업무를 지원하며, 외국어 실력 향상 및 글로벌 역량을 키우는 동시에 외국인 유학생들이 학교 및 한국 생활에 쉽게 적응할 수…"
+  },
   {
    "title": "[일반] 논술고사일(11/27) 교학팀 휴무 안내",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627072&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
@@ -383,36 +414,6 @@
    "campus": "",
    "src": "bf927d3e",
    "foundAt": "2026-10-28"
-  },
-  {
-   "title": "[일반] 2026학년도 2학기 부전공 신청 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626867&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-28",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-10-28"
-  },
-  {
-   "title": "[입학에서 취업까지] 2027학년도 전공선택유연화 시행 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626861&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-28",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-10-28"
-  },
-  {
-   "title": "[수강에서 성적까지] 2026학년도 2학기 부전공 신청",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626858&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-28",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-10-28",
-   "desc": "가. 신청자격 : 2학년 1학기생부터 등록한 재학생 나. 신청기간 : 2026.11.02(월) ~ 11.06(금)"
   }
  ]
 }

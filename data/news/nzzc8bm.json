@@ -1,7 +1,27 @@
 {
  "school": "가천대학교",
- "updatedAt": "2026-11-08",
+ "updatedAt": "2026-11-09",
  "items": [
+  {
+   "title": "2027-1학기 제2전공(부/복수/융합전공) 신청 안내",
+   "url": "https://www.gachon.ac.kr/bbs/kor/475/126868/artclView.do",
+   "postedAt": "2026-10-29",
+   "kind": "학사",
+   "school": "가천대학교",
+   "campus": "",
+   "src": "02ae4269",
+   "foundAt": "2026-11-09"
+  },
+  {
+   "title": "2027-1학기 마이크로디그리(MD) 신청 안내",
+   "url": "https://www.gachon.ac.kr/bbs/kor/475/126870/artclView.do",
+   "postedAt": "2026-11-09",
+   "school": "가천대학교",
+   "campus": "",
+   "src": "02ae4269",
+   "foundAt": "2026-11-09",
+   "desc": "1. 신청 기간 : 2026.11.16(월) ~ 11.20(금) 2. 신청 대상 : 1학년 2학기자 ~ 4학년 1학기 재학생 (4학년 2학기자 및 휴학생 신청 불가)"
+  },
   {
    "title": "2026학년도 2학기 군 입대자 성적인정 안내사항 알림",
    "url": "https://www.gachon.ac.kr/bbs/kor/475/126753/artclView.do",

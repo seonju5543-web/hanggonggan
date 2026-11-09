@@ -1,7 +1,40 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-11-08",
+ "updatedAt": "2026-11-09",
  "items": [
+  {
+   "title": "★ 2026 제2회 성균관대학교 삼성융합의과학원 국제심포지엄 안내 ★(11월 30일(월)까지 홈페이지 사전 등록 )",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141690&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-09",
+   "kind": "행사",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-09",
+   "thumb": "data/news/img/ed8d71efa3299be0.webp",
+   "desc": "삼성융합의과학원 성균관대학교 삼성융합의과학원(SAIHST)에서는 오는 12월 3일(목), ‘Physical AI in Medicine: From Recognition and Reasoning to Embodied…"
+  },
+  {
+   "title": "[운용재] 2026년 변리사반 신입실원 모집안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141576&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-09",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-09",
+   "desc": "성균관대 운용재 2026년도 운용재 변리사반 신입실원을 아래와 같이 모집하오니, 많은 지원 바랍니다."
+  },
+  {
+   "title": "[교내 인성품 봉사 2시간 부여] 2026년도 사회적 장애인식개선교육",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141685&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-09",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-09",
+   "thumb": "data/news/img/16746b109727bfb7.webp",
+   "desc": "장애학생지원센타 장애학생지원센터에서 '2026년도 사회적 장애인식개선교육'을 진행하오니 학생분들의 많은 참여 부탁드립니다."
+  },
   {
    "title": "2026년 대한의료정보학회 추계 학술대회 참가 신청 안내(~11/9, 학회등록비 지원)",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141677&article.offset=0&articleLimit=10",
@@ -396,39 +429,6 @@
    "campus": "",
    "src": "45ec8fd1",
    "foundAt": "2026-10-27"
-  },
-  {
-   "title": "[AI중심대학사업단] 글로벌 IT전문가와 킹고인의 만남 시즌2 여든네 번째 만남 (10/28, 수, 12시)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140821&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-27",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-27",
-   "thumb": "data/news/img/bf1a739a37c5c7dc.webp",
-   "desc": "“미국 유학과 취업, 정말 나도 할 수 있을까?” 유학과 해외 취업을 꿈꾸지만 어디서부터 시작해야 할지 막막한가요?"
-  },
-  {
-   "title": "2026년도 하반기 강화군 대학생 등록금 지원 사업 안내",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140811&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-27",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-27",
-   "thumb": "data/news/img/af2cdde6240eb9a4.webp",
-   "desc": "성균관대학교 장학담당 군민의 고등교육비 부담을 경감 및 지역인재를 육성하고자「강화군 대학생 등록금 지원 조례」에 따라 2026년도 하반기 강화군 대학생 등록금 지원 사업을 다음과 같이 안내하오니 관심 있는 학생들의…"
-  },
-  {
-   "title": "2026년 「천원의 아침밥」만족도 설문조사",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140809&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-27",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-27",
-   "thumb": "data/news/img/a4604760ed96eaa1.webp",
-   "desc": "학생지원팀 안녕하십니까, 학생지원팀입니다. 농림수산식품교육문화정보원에서 '2026 천원의 아침밥 사업'의 운영 성과 및 효과를 분석하기 위해 본교 재학생을 대상으로 설문조사를 실시합니다."
   }
  ]
 }
