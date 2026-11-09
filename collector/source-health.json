@@ -2,78 +2,80 @@
  "https://dep.hufs.ac.kr/student/12769/subview.do": {
   "name": "한국외국어대학교 대외활동·공모전 「학생활동」",
   "fails": 0,
-  "lastOk": "2026-11-09"
+  "lastOk": "2026-11-10"
  },
  "https://www.hufs.ac.kr/hufs/11302/subview.do": {
   "name": "한국외국어대학교 대외활동·공모전 「진로·취업」",
-  "fails": 64,
+  "fails": 65,
   "lastOk": null,
   "why": "🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요"
  },
  "https://isss.khu.ac.kr/globalcenter/user/bbs/BMSR00040/list.do?menuNo=7900041": {
   "name": "경희대학교 대외활동·공모전 「취업/경력」",
-  "fails": 64,
+  "fails": 65,
   "lastOk": null,
   "why": "🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요"
  },
  "https://goodjob.khu.ac.kr/bbs/board.php?bo_table=s2_5": {
   "name": "경희대학교 대외활동·공모전 「사회진출 프로그램 공지」",
-  "fails": 64,
+  "fails": 65,
   "lastOk": null,
   "why": "🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요"
  },
  "https://youth.seoul.go.kr/bbs/list.do?key=2303300002": {
   "name": "서울시 청년몽땅정보통 대외활동·공모전",
-  "fails": 64,
+  "fails": 65,
   "lastOk": null,
   "why": "🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요"
  },
  "https://www.k-startup.go.kr/web/main/mainSection0.do": {
   "name": "창업진흥원 K-Startup 대외활동·공모전",
   "fails": 0,
-  "lastOk": "2026-11-09"
+  "lastOk": "2026-11-10"
  },
  "https://www.korea.kr/etc/byulBeforeList.do": {
   "name": "대한민국 정책브리핑 이벤트·공모 대외활동·공모전",
   "fails": 0,
-  "lastOk": "2026-11-09"
+  "lastOk": "2026-11-10"
  },
  "https://youth.gg.go.kr/gg/intro/notice.do": {
   "name": "경기청년포털 대외활동·공모전",
   "fails": 0,
-  "lastOk": "2026-11-09"
+  "lastOk": "2026-11-10"
  },
  "https://kov.koica.go.kr/ho/cobb/ovhHoCobbBbsNormalList.do?menuId=MENU0000000000000162&bbsSn=1004": {
   "name": "KOICA 봉사단 대외활동·공모전",
-  "fails": 64,
+  "fails": 65,
   "lastOk": null,
   "why": "🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요"
  },
  "https://www.niied.go.kr/web/main/nid/niied_board/list": {
   "name": "국립국제교육원 대외활동·공모전",
   "fails": 0,
-  "lastOk": "2026-11-09"
+  "lastOk": "2026-11-10"
  },
  "https://www.culture.go.kr/portal/cltBnf/cltSup/list.do?menuNo=200104": {
   "name": "문화포털 문화지원사업 대외활동·공모전",
-  "fails": 0,
-  "lastOk": "2026-11-09"
+  "fails": 1,
+  "lastOk": "2026-11-09",
+  "why": "🟡 접속은 되지만 활동·공모전 글을 찾지 못함 — 게시판 종류 확인 필요"
  },
  "https://culture.seoul.go.kr/culture/bbs/B0000014/list.do?menuNo=200118": {
   "name": "서울문화포털 공모소식 대외활동·공모전",
-  "fails": 56,
+  "fails": 57,
   "lastOk": "2026-10-15",
   "why": "⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요"
  },
  "https://young.busan.go.kr/jprog/list.nm": {
   "name": "부산청년플랫폼 대외활동·공모전",
   "fails": 0,
-  "lastOk": "2026-11-09"
+  "lastOk": "2026-11-10"
  },
  "https://youth.incheon.go.kr/bbs/bbsMsgList.do?bcd=notice": {
   "name": "인천유스톡톡 청년포털 대외활동·공모전",
-  "fails": 0,
-  "lastOk": "2026-11-09"
+  "fails": 1,
+  "lastOk": "2026-11-09",
+  "why": "⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요"
  },
  "https://www.daejeonyouthportal.kr/": {
   "name": "대전청년포털 대외활동·공모전",
@@ -177,28 +179,29 @@
  "https://www.asanfoundation.or.kr/af/library/bbs/afLibraryPhotoBbsList.do": {
   "name": "아산사회복지재단",
   "fails": 0,
-  "lastOk": "2026-11-09"
+  "lastOk": "2026-11-10"
  },
  "https://www.kosaf.go.kr/ko/notice.do": {
   "name": "한국장학재단 공지",
   "fails": 0,
-  "lastOk": "2026-11-09"
+  "lastOk": "2026-11-10"
  },
  "https://www.lottefoundation.or.kr/notice": {
   "name": "롯데장학재단",
-  "fails": 64,
+  "fails": 65,
   "lastOk": null,
   "why": "🟡 접속은 되지만 장학 공고를 찾지 못함 — 게시판이 맞는지 확인 필요"
  },
  "https://www.iljufoundation.org/homepage/index.do": {
   "name": "일주학술문화재단",
   "fails": 0,
-  "lastOk": "2026-11-09"
+  "lastOk": "2026-11-10"
  },
  "https://gwangyang.go.kr/fund/": {
   "name": "백운장학회(광양)",
-  "fails": 0,
-  "lastOk": "2026-11-09"
+  "fails": 1,
+  "lastOk": "2026-11-09",
+  "why": "⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요"
  },
  "https://www.jinjae.kr/main/": {
   "name": "전주인재육성재단",
@@ -214,16 +217,18 @@
  "https://gcdream.kr/bbs/board.php?bo_table=scholaship": {
   "name": "재단법인 거창군장학회",
   "fails": 0,
-  "lastOk": "2026-11-09"
+  "lastOk": "2026-11-10"
  },
  "https://www.jincheon.go.kr/jcjh/main.do": {
   "name": "(재)진천군장학회",
-  "fails": 0,
-  "lastOk": "2026-11-09"
+  "fails": 1,
+  "lastOk": "2026-11-09",
+  "why": "⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요"
  },
  "https://www.dsa.or.kr/data.html?Table=ins_bbs43": {
   "name": "대산농촌재단",
-  "fails": 0,
-  "lastOk": "2026-11-09"
+  "fails": 1,
+  "lastOk": "2026-11-09",
+  "why": "⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요"
  }
 }
