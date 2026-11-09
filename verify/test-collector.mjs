@@ -13904,8 +13904,8 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
     [one('「국민 평생 직업능력 개발법」제2조제5호에 따른 기능대학 재학생', 'school'), rmx('「국민 평생 직업능력 개발법」제2조제5호에 따른 기능대학 재학생', { status: '재학', school: '한국외국어대학교' }), (one('현재 충남대학교 재학 중인 학부생', 'school') || {}).anyOf], [null, null, ['충남대학교']]);
   /* G. 거주 기간·보호자만·읍면동 — 맞아도 ✓ 를 못 준다(질문은 더하지 않음 · 개발자 결정 대기) */
   const gijang = '공고일 기준 부모 또는 학생 본인이 주민등록상 연속하여 1년 이상 기장군에 계속 거주하고 있는 자';
-  eq('🔴 G. 거주 기간 `1년 이상 기장군에 계속 거주` — minMonths 12 · 기장군 학생 ✓ 가 아니라 모름 · 해운대구 학생은 그대로 ✕ · 기간 없는 줄은 ✓',
-    [(one(gijang, 'residence') || {}).minMonths, rmx(gijang, { region: '부산', regionCity: '기장군' }), rmx(gijang, { region: '부산', regionCity: '해운대구' }), rmx('부모 또는 학생 본인이 기장군에 거주하고 있는 자', { region: '부산', regionCity: '기장군' })], [12, null, 'no', 'ok']);
+  eq('🔴 G. 거주 기간 `1년 이상 기장군에 계속 거주` — minMonths 12 · 기장군 학생 ✓ 가 아니라 모름 · 해운대구 학생(부모도 해운대구)은 그대로 ✕ · 기간 없는 줄은 ✓',
+    [(one(gijang, 'residence') || {}).minMonths, rmx(gijang, { region: '부산', regionCity: '기장군' }), rmx(gijang, { region: '부산', regionCity: '해운대구', parentRegion: '부산', parentRegionCity: '해운대구' }), rmx('부모 또는 학생 본인이 기장군에 거주하고 있는 자', { region: '부산', regionCity: '기장군' })], [12, null, 'no', 'ok']);
   eq('  `6개월 전(’26. 3. 14.이전)부터`·`3년(36개월)이상` 도 기간 · 재직·재학 기간은 거주 기간이 아니다',
     ['선발 공고일 기준 6개월 전(’26. 3. 14.이전)부터 대전 서구에 거주하고, 대전시에 소재한 대학교 재학생', '추천일 기준 본인 또는 부모(보호자)가 주민등록상 3년(36개월)이상 아산시에 계속 거주하는 자', '부산광역시에 주소를 두고 3년 이상 재직 중인 자'].map((l) => (one(l, 'residence') || {}).minMonths || 0), [6, 36, 0]);
   const goheung = '보호자가 공고일 현재 3년 이상 계속하여 고흥군에 주민등록을 두고 있는 자';
@@ -13959,6 +13959,17 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
     ['관내·외 거주 대학생(관내 거주자 우대)', '관내 및 관외 거주 대학생 (관내 거주자 가산점)', '관내/관외 대학 재학생으로 관내에 주소를 둔 자'].map((l) => rmx(l, seoulS, { provider: '(재)광양시장학회', name: '광양 장학' })), [null, null, 'no']);
   eq('🔴 5차 C. `…거나 재직 중인 자는 제외` 는 다른 연고 갈래가 아니다 — 광양 거주 요건은 그대로(서울 학생 ✕)',
     rmx('광양시에 주소를 둔 자로서 근무하거나 재직 중인 자는 제외', seoulS), 'no');
+
+  /* ── 2026-11-09 개발자 결정 "부모 주소를 모를 때 모름으로 표시" — `부모 또는 본인이 …` 줄(parentAlt) ── */
+  const pAlt = '부모 또는 학생 본인이 기장군에 거주하고 있는 자';
+  eq('🔴 부모 갈래가 있는 줄은 부모 주소가 비면 학생이 다른 곳에 살아도 ✕ 가 아니라 모름 · 부모 주소가 다른 곳이면 ✕ · 본인이 맞으면 ✓ · 부모 말이 없는 줄은 그대로 ✕',
+    [!!(one(pAlt, 'residence') || {}).parentAlt, rmx(pAlt, { region: '서울', regionCity: '종로구' }), rmx(pAlt, { region: '서울', regionCity: '종로구', parentRegion: '서울', parentRegionCity: '종로구' }),
+      rmx(pAlt, { region: '부산', regionCity: '기장군' }), rmx('기장군에 거주하고 있는 학생', { region: '서울', regionCity: '종로구' }), rmx('부모 또는 본인이 부산광역시에 거주하는 자', { region: '서울' })],
+    [true, null, 'no', 'ok', 'no', null]);
+  eq('  보호자만 말하는 줄(parentOnly)은 parentAlt 가 아니다 — 부모 칸이 다른 시·도면 그대로 ✕',
+    [!!(one(goheung, 'residence') || {}).parentAlt, rmx(goheung, { region: '서울', regionCity: '종로구', parentRegion: '서울', parentRegionCity: '종로구' })], [false, 'no']);
+  const EAo = createRequire(import.meta.url)('../elig-ask.js');
+  eq('🔴 온보딩 「적합도 높이기」 가 학자금대출 이용·자립준비청년을 묻는다 (2026-11-09 개발자 결정 "질문에 넣어")', ['loan', 'careLeaver'].map((k) => EAo.ONBOARD_TRAITS.includes(k)), [true, true]);
 
   /* ── 편입·재입학 첫 학기 (2026-11-02 개발자 "편입이랑 재입학은 학적정보만으로 구분 가능하잖아") ── */
   const html = readText(new URL('../index.html', import.meta.url));
