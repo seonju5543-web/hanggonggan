@@ -332,6 +332,10 @@ async function onboard(page) {
   await page.evaluate((ms) => {
     window.__nfReal = { pushUnsubscribe: window.pushUnsubscribe, pushEnsure: window.pushEnsure };
     window.__nfServer = [];
+    /* 바닥 안내 글(토스트)을 센다 — 켜기/끄기 때는 하나도 뜨지 않아야 한다(2026-11-09 개발자 지시) */
+    window.__nfToasts = [];
+    window.__nfRealToast = window.toast;
+    window.toast = (msg, ...rest) => { window.__nfToasts.push(String(msg)); return window.__nfRealToast(msg, ...rest); };
     window.pushUnsubscribe = async () => { await new Promise((r) => setTimeout(r, ms)); window.__nfServer.push('off'); };
     window.pushEnsure = async () => { await new Promise((r) => setTimeout(r, ms)); window.__nfServer.push(notifyLedger.enabled ? 'on' : 'skip'); return { ok: true }; };
   }, NF_SLOW);
@@ -358,7 +362,11 @@ async function onboard(page) {
     ok(JSON.stringify(order) === JSON.stringify(['off', 'on']) && await page.getAttribute('#btn-nf-toggle', 'aria-checked') === 'true',
       '빨리 껐다 켜도 서버 일은 누른 순서대로 끝나고(해제 → 등록) 스위치는 켜짐', JSON.stringify(order));
   }
-  await page.evaluate(() => { Object.assign(window, window.__nfReal); });
+  {
+    const toasts = await page.evaluate(() => window.__nfToasts.slice());
+    ok(toasts.length === 0, '켜기/끄기 때 화면 바닥 안내 글(휴대폰 알림 켜짐/꺼짐)이 뜨지 않는다 — 스위치와 상태 줄이 말한다', JSON.stringify(toasts));
+  }
+  await page.evaluate(() => { Object.assign(window, window.__nfReal); window.toast = window.__nfRealToast; });
 
   /* 종류별 끄기는 화면에서 사라졌지만 규칙 엔진은 그대로 prefs 를 읽는다 — 장부를 직접 고쳐 엔진이 지키는지 본다 */
   await page.evaluate(async () => { notifyLedger.prefs.deadline = false; await notifySaveLedger(); });

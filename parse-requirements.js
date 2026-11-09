@@ -930,6 +930,8 @@ function parseResidence(t) {
   const months = residenceMonths(t);
   if (months) out.minMonths = months;
   if (parentOnlyResidence(t)) out.parentOnly = true;
+  /* 부모·보호자도 갈래인 줄(`부모 또는 본인이 …`·`보호자(또는 본인)가 …`·`세대주`·`직계존속`) — 부모 주소를 모르면 학생 본인이 다른 곳에 살아도 ✕ 를 못 낸다(judgeCond residence · 2026-11-09 개발자 결정 "부모 주소를 모를 때 모름") */
+  else if (/부모|보호자|부\s?[·ㆍ]\s?모|부\s?또는\s?모|세대주|직계\s?존속|가구/.test(t)) out.parentAlt = true;
   if (SUB_AREA.test(t)) out.subArea = true;
   return out;
 }
