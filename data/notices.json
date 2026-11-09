@@ -1,6 +1,78 @@
 {
- "updatedAt": "2026-11-08",
+ "updatedAt": "2026-11-09",
  "items": [
+  {
+   "title": "일반공지 2026학년도 2학기 신문고 장학금 신청 안내(~11/20) 신촌/국제",
+   "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/944586/artclView.do",
+   "attachments": [
+    {
+     "name": "2026학년도_2학기_신문고장학금신청서_학번_이름.hwp",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015441/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간: 2026. 11. 9.(월) ~ 11. 20.(금) 23:59 까지 ※ 기한엄수(기한 내 미 제출 시, 미 인정) 6. 참고사항 가.",
+   "school": "연세대학교 미래캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-09",
+   "bodyDeadline": "2026-11-20",
+   "bodyDeadlineText": "2026학년도 2학기 신문고 장학금 신청 안내(~11/20)"
+  },
+  {
+   "title": "2027-2028 이스라엘 정부초청 장학생 선발 안내",
+   "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/521118",
+   "attachments": [
+    {
+     "name": "지원서 양식 (1).pdf",
+     "url": "https://wise.dongguk.ac.kr/cmmn/fileDown.do?filename=%EC%A7%80%EC%9B%90%EC%84%9C%20%EC%96%91%EC%8B%9D%20(1).pdf&filepath=/files/article/servicenotice/521118/&filerealname=7B75A814CDEC4918B1154F9321861E9F.pdf"
+    },
+    {
+     "name": "2027-2028 이스라엘 정부장학금 안내.pdf",
+     "url": "https://wise.dongguk.ac.kr/cmmn/fileDown.do?filename=2027-2028%20%EC%9D%B4%EC%8A%A4%EB%9D%BC%EC%97%98%20%EC%A0%95%EB%B6%80%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%95%88%EB%82%B4.pdf&filepath=/files/article/servicenotice/521118/&filerealname=8ED2D6F7E954491392C418CCA112902B.pdf"
+    }
+   ],
+   "deadlineHint": "마감일: 2027.1.15.(금) ※ 1.15. 도착분까지 접수. 방문접수 불가 마. 문의처: 주한이스라엘대사관 학술과(02-3210-8510,",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-09",
+   "bodyDeadline": "2027-01-15",
+   "bodyDeadlineText": "※ 우편물 앞면에 \" 정부장학금 지원서 \" 명시 3) 지원 마감일: 2027.1.15.(금) ※ 1.15. 도착분까지 접수. 방문접수 불가"
+  },
+  {
+   "title": "[학부-교외장학] 2026학년도 2학기 IBK기업은행 장학금 장학생 선발 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46077/artclView.do",
+   "attachments": [
+    {
+     "name": "1. IBK기업은행 장학금_필수 개인정보 수집·이용 동의서.pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41758/download.do"
+    },
+    {
+     "name": "2. IBK기업은행 장학금_자기소개서.hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41759/download.do"
+    }
+   ],
+   "deadlineHint": "신청 기간 : ~ 26. 11. 11. (수) 17:00 ※ 재단 일정에 따라 신청 기간이 촉박한 점 양해 바랍니다. 7. 신청 방법 : 인하대",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-09",
+   "bodyDeadline": "2026-11-11",
+   "bodyDeadlineText": "6. 신청 기간 : ~ 26. 11. 11. (수) 17:00"
+  },
+  {
+   "title": "[학부-교내장학] 2026학년도 2학기 장학사정관제 장학금 선발 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46075/artclView.do",
+   "attachments": [
+    {
+     "name": "[별첨1]장학사정관제 장학금 추천서 양식.hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41756/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026.11.09.(월 ) ~ 11.19.(목 ) 18 시까지 ( 기한엄수 ) 6. 신청서류 : 각 학과 사무실로 원본 제출 선발",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-09",
+   "bodyDeadline": "2026-11-19",
+   "bodyDeadlineText": "5. 신청기간 : 2026.11.09.(월 ) ~ 11.19.(목 ) 18 시까지 ( 기한엄수 )"
+  },
   {
    "title": "[교외] 동진장학연구재단 동진장학금 장학생 선발",
    "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdBbsseq=1&pageNo=2&nttId=20261029",
@@ -5623,70 +5695,6 @@
    "bodyDeadlineText": "※ 단, 선원가족 중 2인 이상 고등학교 또는 대학생에 재학 중인 경우 기준금액에 10% 가산 적용 4. 접수 기한 : ~ 2026. 10. 30. (금) (방문 및 우편 접수)"
   },
   {
-   "title": "[학부-교외장학] 2026년 2학기 한국장학재단 푸른등대 기부장학금(2차) 신규 장학생 선발 안내",
-   "url": "https://www.inha.ac.kr/bbs/kr/8/45891/artclView.do",
-   "attachments": [
-    {
-     "name": "붙임2_2026년 2학기 푸른등대 기부장학금(2차) 신청 홍보 포스터.jpg",
-     "url": "https://www.inha.ac.kr/bbs/kr/8/41572/download.do"
-    },
-    {
-     "name": "2026년 2학기 2차 학생신청 매뉴얼(PC).pdf",
-     "url": "https://www.inha.ac.kr/bbs/kr/8/41573/download.do"
-    }
-   ],
-   "deadlineHint": "제출 기한 : 26. 10. 22.(목) 9:00 ~ 11. 12 . (목) 18:00 - 장학금 신청은 학생 본인이 한국장학재단 누리집 또는",
-   "school": "인하대학교",
-   "campus": "",
-   "foundAt": "2026-10-23",
-   "bodyDeadline": "2026-11-12",
-   "bodyDeadlineText": "(단 2026년 푸른등대 2학기 기부장학금 합격자는 심사단계에서 자동 탈락 처리됨) 2. 장학생 신청 및 서류 제출 기한 : 26. 10. 22.(목) 9:00 ~ 11. 12 . (목) 18:00"
-  },
-  {
-   "title": "[학부-교외장학] 2027학년도 (재)엔지니어링인재육성재단 제2기 장학생 선발 안내",
-   "url": "https://www.inha.ac.kr/bbs/kr/8/45890/artclView.do",
-   "attachments": [
-    {
-     "name": "[별표 1] 엔지니어링기술(제3조 관련)(엔지니어링산업 진흥법 시행령).pdf",
-     "url": "https://www.inha.ac.kr/bbs/kr/8/41564/download.do"
-    },
-    {
-     "name": "[별표 2] 국민기초생활수급자 및 차상위계층 확인서류.pdf",
-     "url": "https://www.inha.ac.kr/bbs/kr/8/41565/download.do"
-    },
-    {
-     "name": "01_[공고문]제2기(2027년도) 장학생 선발.pdf",
-     "url": "https://www.inha.ac.kr/bbs/kr/8/41566/download.do"
-    },
-    {
-     "name": "02_[지원서]제2기(2027년도) 장학생 선발_대학생.hwp",
-     "url": "https://www.inha.ac.kr/bbs/kr/8/41567/download.do"
-    },
-    {
-     "name": "03_[추천서]제2기(2027년도) 장학생 선발(공통).hwp",
-     "url": "https://www.inha.ac.kr/bbs/kr/8/41568/download.do"
-    },
-    {
-     "name": "04_[EGISF]개인정보 수집 및 이용 제공 동의서.pdf",
-     "url": "https://www.inha.ac.kr/bbs/kr/8/41569/download.do"
-    },
-    {
-     "name": "05_[FAQ]제2기(2027년도) 장학생 선발.pdf",
-     "url": "https://www.inha.ac.kr/bbs/kr/8/41570/download.do"
-    },
-    {
-     "name": "06_[안내문]제출서류 파일명.pdf",
-     "url": "https://www.inha.ac.kr/bbs/kr/8/41571/download.do"
-    }
-   ],
-   "deadlineHint": "접수 기한 : ~ 26. 11. 13. (금) 18:00 7. 접수 방법 ( 가.~나. 모두 필수 , 둘 중 하나라도 누락될 경우 심사 대상 제",
-   "school": "인하대학교",
-   "campus": "",
-   "foundAt": "2026-10-23",
-   "bodyDeadline": "2026-11-13",
-   "bodyDeadlineText": "6. 접수 기한 : ~ 26. 11. 13. (금) 18:00"
-  },
-  {
    "title": "[학생지원팀] 2026학년도 인송문화재단 인송장학생 선발 안내",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276941&article.offset=0&articleLimit=10&srCategoryId=22",
    "attachments": [
@@ -8656,30 +8664,6 @@
    "bodyDeadlineText": "나. 농업리더양성 프로그램(농업농촌 현장 연수 최대4회) 4. 모집기한: ~ 2026. 11. 11.(수)까지"
   },
   {
-   "title": "2026년 김천시 한국전력기술 대학생 지역상생 장학금 안내(대상: 김천시에 1년 이상 주소를 두고 있는 원자력에너지전기공학과 재학생)",
-   "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520746",
-   "attachments": [
-    {
-     "name": "2026년 김천시한국전력기술 지역상생지원 장학금 및 취업준비금 신청서식.hwp",
-     "url": "javascript:downGO('2026년 김천시한국전력기술 지역상생지원 장학금 및 취업준비금 신청서식.hwp','/files/article/servicenotice/520746/','BA8FFD8BDFDD44B699FD4499581A837B.hwp');"
-    },
-    {
-     "name": "【별표 2] 대항생 지역상생 장학금 경상북도 소재 대학 인정학과 (2).hwp",
-     "url": "javascript:downGO('【별표 2]  대항생 지역상생 장학금 경상북도 소재 대학 인정학과 (2).hwp','/files/article/servicenotice/520746/','0CC828E95E0346C7AB5D349637DD859B.hwp');"
-    },
-    {
-     "name": "2026년 김천시한국전력기술 지역상생지원 장학금 및 취업준비금 지원 공고(재단).pdf",
-     "url": "javascript:downGO('2026년 김천시한국전력기술 지역상생지원 장학금 및 취업준비금 지원 공고(재단).pdf','/files/article/servicenotice/520746/','7D5C8F5A9B7B443D98D558B601549193.pdf');"
-    }
-   ],
-   "deadlineHint": "신청기간: 2026. 10. 6.(화) ~ 10. 30.(금) 18:00까지 2. 지원대상: 경상북도 소재 2년제 이상 대학 인정학과 재학생 등",
-   "school": "동국대학교 WISE캠퍼스",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "bodyDeadline": "2026-10-30",
-   "bodyDeadlineText": "*장학개요 1. 신청기간: 2026. 10. 6.(화) ~ 10. 30.(금) 18:00까지"
-  },
-  {
    "title": "[대산농촌재단] 2027 대산장학생 선발",
    "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=158949&noCat=501",
    "attachments": [],
@@ -9065,22 +9049,6 @@
    "foundAt": "2026-10-06",
    "bodyDeadline": "2026-10-26",
    "bodyDeadlineText": "[교외-10/26]2027년 아산사회복지재단 의생명과학분야 대학 장학생 선발 안내(재단지원)"
-  },
-  {
-   "title": "[교외] [대전청년내일재단] 2026년 하반기 인재육성(성취) 장학생 선발(~10/8)(기간 연장)",
-   "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/944141/artclView.do",
-   "attachments": [
-    {
-     "name": "2026년 성취(대) 장학생 선발계획 연장 공고.hwp",
-     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1014861/download.do"
-    }
-   ],
-   "deadlineHint": "신청기간: 2026. 9. 1.(화) ~ 10. 8.(목) 17:00까지 라. 신청방법: 대전청년포털(https://daejeonyouthpor",
-   "school": "연세대학교 미래캠퍼스",
-   "campus": "",
-   "foundAt": "2026-10-05",
-   "bodyDeadline": "2026-10-08",
-   "bodyDeadlineText": "[교외] [대전청년내일재단] 2026년 하반기 인재육성(성취) 장학생 선발(~10/8)(기간 연장)"
   },
   {
    "title": "[우양재단] 2026년 우양재단 동행장학생 모집",

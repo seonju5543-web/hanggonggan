@@ -1,7 +1,21 @@
 {
  "school": "연세대학교 미래캠퍼스",
- "updatedAt": "2026-11-08",
+ "updatedAt": "2026-11-09",
  "items": [
+  {
+   "title": "일반공지 2026학년도 2학기 신문고 장학금 신청 안내(~11/20) 신촌/국제",
+   "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/944586/artclView.do",
+   "attachments": [
+    {
+     "name": "2026학년도_2학기_신문고장학금신청서_학번_이름.hwp",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015441/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간: 2026. 11. 9.(월) ~ 11. 20.(금) 23:59 까지 ※ 기한엄수(기한 내 미 제출 시, 미 인정) 6. 참고사항 가.",
+   "school": "연세대학교 미래캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-09"
+  },
   {
    "title": "일반공지 2026년 국가근로장학금 동계방학 집중근로 프로그램 희망근로지 신청 안내 신촌/국제",
    "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/944552/artclView.do",

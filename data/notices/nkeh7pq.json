@@ -1,7 +1,39 @@
 {
  "school": "인하대학교",
- "updatedAt": "2026-11-08",
+ "updatedAt": "2026-11-09",
  "items": [
+  {
+   "title": "[학부-교외장학] 2026학년도 2학기 IBK기업은행 장학금 장학생 선발 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46077/artclView.do",
+   "attachments": [
+    {
+     "name": "1. IBK기업은행 장학금_필수 개인정보 수집·이용 동의서.pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41758/download.do"
+    },
+    {
+     "name": "2. IBK기업은행 장학금_자기소개서.hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41759/download.do"
+    }
+   ],
+   "deadlineHint": "신청 기간 : ~ 26. 11. 11. (수) 17:00 ※ 재단 일정에 따라 신청 기간이 촉박한 점 양해 바랍니다. 7. 신청 방법 : 인하대",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-09"
+  },
+  {
+   "title": "[학부-교내장학] 2026학년도 2학기 장학사정관제 장학금 선발 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46075/artclView.do",
+   "attachments": [
+    {
+     "name": "[별첨1]장학사정관제 장학금 추천서 양식.hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41756/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026.11.09.(월 ) ~ 11.19.(목 ) 18 시까지 ( 기한엄수 ) 6. 신청서류 : 각 학과 사무실로 원본 제출 선발",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-09"
+  },
   {
    "title": "[한국장학재단] 통학로(路) - 장학금부터 취업까지, 나에게 필요한 청년지원정보 확인하기",
    "url": "https://www.inha.ac.kr/bbs/kr/8/46065/artclView.do",

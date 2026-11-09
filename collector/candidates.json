@@ -1,8 +1,80 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
- "updatedAt": "2026-11-08",
- "count": 1670,
+ "updatedAt": "2026-11-09",
+ "count": 1671,
  "items": [
+  {
+   "title": "일반공지 2026학년도 2학기 신문고 장학금 신청 안내(~11/20) 신촌/국제",
+   "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/944586/artclView.do",
+   "attachments": [
+    {
+     "name": "2026학년도_2학기_신문고장학금신청서_학번_이름.hwp",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015441/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간: 2026. 11. 9.(월) ~ 11. 20.(금) 23:59 까지 ※ 기한엄수(기한 내 미 제출 시, 미 인정) 6. 참고사항 가.",
+   "school": "연세대학교 미래캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-09",
+   "bodyDeadline": "2026-11-20",
+   "bodyDeadlineText": "2026학년도 2학기 신문고 장학금 신청 안내(~11/20)"
+  },
+  {
+   "title": "2027-2028 이스라엘 정부초청 장학생 선발 안내",
+   "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/521118",
+   "attachments": [
+    {
+     "name": "지원서 양식 (1).pdf",
+     "url": "https://wise.dongguk.ac.kr/cmmn/fileDown.do?filename=%EC%A7%80%EC%9B%90%EC%84%9C%20%EC%96%91%EC%8B%9D%20(1).pdf&filepath=/files/article/servicenotice/521118/&filerealname=7B75A814CDEC4918B1154F9321861E9F.pdf"
+    },
+    {
+     "name": "2027-2028 이스라엘 정부장학금 안내.pdf",
+     "url": "https://wise.dongguk.ac.kr/cmmn/fileDown.do?filename=2027-2028%20%EC%9D%B4%EC%8A%A4%EB%9D%BC%EC%97%98%20%EC%A0%95%EB%B6%80%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%95%88%EB%82%B4.pdf&filepath=/files/article/servicenotice/521118/&filerealname=8ED2D6F7E954491392C418CCA112902B.pdf"
+    }
+   ],
+   "deadlineHint": "마감일: 2027.1.15.(금) ※ 1.15. 도착분까지 접수. 방문접수 불가 마. 문의처: 주한이스라엘대사관 학술과(02-3210-8510,",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-09",
+   "bodyDeadline": "2027-01-15",
+   "bodyDeadlineText": "※ 우편물 앞면에 \" 정부장학금 지원서 \" 명시 3) 지원 마감일: 2027.1.15.(금) ※ 1.15. 도착분까지 접수. 방문접수 불가"
+  },
+  {
+   "title": "[학부-교내장학] 2026학년도 2학기 장학사정관제 장학금 선발 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46075/artclView.do",
+   "attachments": [
+    {
+     "name": "[별첨1]장학사정관제 장학금 추천서 양식.hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41756/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026.11.09.(월 ) ~ 11.19.(목 ) 18 시까지 ( 기한엄수 ) 6. 신청서류 : 각 학과 사무실로 원본 제출 선발",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-09",
+   "bodyDeadline": "2026-11-19",
+   "bodyDeadlineText": "5. 신청기간 : 2026.11.09.(월 ) ~ 11.19.(목 ) 18 시까지 ( 기한엄수 )"
+  },
+  {
+   "title": "[학부-교외장학] 2026학년도 2학기 IBK기업은행 장학금 장학생 선발 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46077/artclView.do",
+   "attachments": [
+    {
+     "name": "1. IBK기업은행 장학금_필수 개인정보 수집·이용 동의서.pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41758/download.do"
+    },
+    {
+     "name": "2. IBK기업은행 장학금_자기소개서.hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41759/download.do"
+    }
+   ],
+   "deadlineHint": "신청 기간 : ~ 26. 11. 11. (수) 17:00 ※ 재단 일정에 따라 신청 기간이 촉박한 점 양해 바랍니다. 7. 신청 방법 : 인하대",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-09",
+   "bodyDeadline": "2026-11-11",
+   "bodyDeadlineText": "6. 신청 기간 : ~ 26. 11. 11. (수) 17:00"
+  },
   {
    "title": "[교외] 방일영 문화재단 탈북대학생 장학생 선발",
    "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdBbsseq=1&pageNo=2&nttId=20261022",
@@ -27696,51 +27768,6 @@
    "school": "경희대학교",
    "campus": "",
    "foundAt": "2026-09-11"
-  },
-  {
-   "title": "[공통][교외] 2026학년도 여성동문회 장학금 장학생 모집 (~ 9. 17)",
-   "url": "https://dep.hufs.ac.kr/bbs/student/2431/266140/artclView.do",
-   "attachments": [
-    {
-     "name": "2026 (여성동문회)장학금+신청서(양식).hwp",
-     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150374/download.do"
-    },
-    {
-     "name": "(서식) 개인정보수집이용동의서.hwp",
-     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150375/download.do"
-    }
-   ],
-   "deadlineHint": "까지 나 . 선발 : 10 월 중순예정 다 . 선발확인 : Hufs Ability 로그인 후 장학금 신청내역에서",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-09-09"
-  },
-  {
-   "title": "[공통][교외] 2026-2학기 정연주 여사 장학금 장학생 모집 (~ 9. 18)",
-   "url": "https://dep.hufs.ac.kr/bbs/student/2431/266142/artclView.do",
-   "attachments": [
-    {
-     "name": "(서식) 개인정보수집이용동의서.hwp",
-     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150377/download.do"
-    },
-    {
-     "name": "2026-2학기 정연주여사장학금 신청서.hwp",
-     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150378/download.do"
-    }
-   ],
-   "deadlineHint": "신청기간 : 2026. 9. 11( 금 ) ~ 9. 18( 금 ) 15:00 까지 나 . 선발 : 10 월 초순 (",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-09-09"
-  },
-  {
-   "title": "서울 (재) 김해시미래인재장학재단 2026 장학생 선발 공고",
-   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EC%84%9C%EC%9A%B8%20(%EC%9E%AC)%20%EA%B9%80%ED%95%B4%EC%8B%9C%EB%AF%B8%EB%9E%98%EC%9D%B8%EC%9E%AC%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%202026%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B3%B5%EA%B3%A0",
-   "attachments": [],
-   "deadlineHint": null,
-   "school": "경희대학교",
-   "campus": "",
-   "foundAt": "2026-09-09"
   }
  ]
 }

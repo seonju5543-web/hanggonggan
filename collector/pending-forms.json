@@ -1002,8 +1002,10 @@
    "added": "2026-11-08",
    "fetched": false,
    "schematized": false,
-   "tries": 5,
-   "lastTryAt": "2026-11-08"
+   "tries": 6,
+   "lastTryAt": "2026-11-09",
+   "retired": true,
+   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
   },
   {
    "id": "auto-amepagescholarshipnotice-09j8czz",
@@ -1012,8 +1014,10 @@
    "added": "2026-11-08",
    "fetched": false,
    "schematized": false,
-   "tries": 5,
-   "lastTryAt": "2026-11-08"
+   "tries": 6,
+   "lastTryAt": "2026-11-09",
+   "retired": true,
+   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
   },
   {
    "id": "auto-skor478126763artclviewdo",
@@ -1038,6 +1042,40 @@
    "added": "2026-11-08",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-bswj104944586artclviewdo",
+   "name": "일반공지 2026학년도 2학기 신문고 장학금 신청 안내(~11/20) 신촌/국제",
+   "target": "일반공지 2026학년도 2학기 신문고 장학금 신청 안내",
+   "added": "2026-11-09",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-krbbskr846077artclviewdo",
+   "name": "[학부-교외장학] 2026학년도 2학기 IBK기업은행 장학금 장학생 선발 안내",
+   "target": "2026학년도 2학기 IBK기업은행 장학금 장학생 선발",
+   "added": "2026-11-09",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-krbbskr846075artclviewdo",
+   "name": "[학부-교내장학] 2026학년도 2학기 장학사정관제 장학금 선발 안내",
+   "target": "2026학년도 2학기 장학사정관제 장학금 선발 안내",
+   "added": "2026-11-09",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-oardid323515menuno200318",
+   "name": "공통 [학부전용][국가우수]2026년 국가우수장학금(이공계) 일시지원(한 학기 지원) 유형 장학생 선발...",
+   "target": "공통 [학부전용][국가우수]2026년 국가우수장학금(이",
+   "added": "2026-11-09",
+   "fetched": false,
+   "schematized": false,
+   "tries": 1,
+   "lastTryAt": "2026-11-09"
   }
  ]
 }
