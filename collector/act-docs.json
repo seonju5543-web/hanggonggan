@@ -7,22 +7,6 @@
   "at": "2026-11-07",
   "tries": 2
  },
- "https://nysc.or.kr/nysc/pages/notice_view.php?id=288": {
-  "at": "2026-10-15",
-  "tries": 1
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53505&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-10-16",
-  "tries": 1
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=51058&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-10-16",
-  "tries": 1
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53498&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-10-16",
-  "tries": 1
- },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/520896": {
   "at": "2026-10-30",
   "tries": 2
@@ -110,14 +94,6 @@
  "https://youth.seoul.go.kr/content.do?key=2310100012": {
   "at": "2026-11-07",
   "tries": 2
- },
- "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179494": {
-  "at": "2026-10-24",
-  "tries": 1
- },
- "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179490": {
-  "at": "2026-10-24",
-  "tries": 1
  },
  "https://ntseitc.spectory.net/shorts": {
   "at": "2026-10-26",
@@ -360,6 +336,18 @@
   "tries": 1
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53641&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-11-10",
+  "tries": 1
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53254&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-11-10",
+  "tries": 1
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53663&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-11-10",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=897685&qidx=5233&cate=0&allboard=true&nowpage=1": {
   "at": "2026-11-10",
   "tries": 1
  }

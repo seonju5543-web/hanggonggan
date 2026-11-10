@@ -23068,6 +23068,195 @@
    "attachments": [],
    "sourceUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323545",
    "sourceKind": "auto"
+  },
+  {
+   "id": "auto-bbssc58944606artclviewdo",
+   "name": "한국고등교육재단 문우림 제6기 장학생 선발 안내",
+   "boardTitle": "한국고등교육재단 문우림 제6기 장학생 선발 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「재단」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-10",
+   "provider": "주관 기관 원문 확인",
+   "amount": "800만원",
+   "amountValue": 8000000,
+   "deadline": "2026-12-11",
+   "deadlineFrom": "공고 원문 · 2026.11.09 ~ 2026.12.11",
+   "period": "접수 ~2026-12-11",
+   "summary": "연세대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-10 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "문우림 제6기 장학생 선발 공고문.hwp",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015467/download.do"
+    },
+    {
+     "name": "문우림 제6기 장학생 선발 모집요강.pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015468/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.yonsei.ac.kr/bbs/sc/58/944606/artclView.do",
+   "sourceKind": "auto",
+   "alsoPostedAt": [
+    {
+     "school": "서강대학교",
+     "url": "https://www.sogang.ac.kr/ko/detail/551805?bbsConfigFk=141&namepage=ScholarshipNotice",
+     "id": "notice:https://www.sogang.ac.kr/ko/detail/551805?bbsconfigfk=141&namepage=ScholarshipNotice"
+    },
+    {
+     "school": "가천대학교",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/126962/artclView.do",
+     "id": "notice:https://www.gachon.ac.kr/bbs/kor/478/126962/artclView.do"
+    },
+    {
+     "school": "인하대학교",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/46108/artclView.do",
+     "id": "notice:https://www.inha.ac.kr/bbs/kr/8/46108/artclView.do"
+    }
+   ],
+   "scopeFrom": "같은 사업이 서강대학교 게시판에도 올라옴(자동) — 서강대학교 게시판 https://www.sogang.ac.kr/ko/detail/551805?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "openDate": "2026-11-09",
+   "announceDate": "2027-02-10",
+   "eligibilityLines": [
+    "1. 지원자격:",
+    "○ 대한민국 국적 보유자",
+    "※복수국적자 지원 가능",
+    "○ 학부 2, 3학년이며 2개 학기 이상 이수자 (학년 수료 기준은 재학 중인 학교 기준을 따름)",
+    "- 이수 학기 개수에 계절 학기는 불포함",
+    "- 2026년 10월 기준, 1학년 2학기 이수 후~3학년 2학기 이수 후 휴학중인 자",
+    "- 학제가 5년 혹은 6년인 전공에 한하여, 각각 2~4학년과 2~5학년에 재학중인 자 (ex. 건축학과 / 한의예과 등)",
+    "○ 평균 학점 3.5 이상인 자(4.5 만점 기준)",
+    "○ 2년간 재단 연수 프로그램에 대면 참여할 수 있는 자",
+    "- 도중 어학연수 및 교환학생, 군 복무 등의 사유로 프로그램 중단이 불가함"
+   ],
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 8000000,
+    "ratio": 0,
+    "min": 8000000,
+    "max": 8000000,
+    "raw": "3. 지원내용: - 문우림 프로그램 교육비 및 답사비 전액 지원 - 교통비 지원(수도권 외 거주자) - 장학금(연간 800만원) 4. 모집 기간: 2026.11.9.(월)~2026.12.11.(금) 5. 지원방법: 온라인 지원서 작성 6. 문 의 처: ○ (문의 접수) https://forms.gle/Mim4Vz5azcy9J1xp9 ○ (전화) 02-631"
+   },
+   "amountFrom": "공고 원문",
+   "sameAs": "한국고등교육재단",
+   "sameAsFrom": "자동"
+  },
+  {
+   "id": "auto-dmodeviewduid53666tpage1",
+   "name": "[일반] [앵커사업] 2026년도 동계 계절수업 Python 교과목 신청 안내 (장학금 지급/전공학점 인정)",
+   "boardTitle": "[일반] [앵커사업] 2026년도 동계 계절수업 Python 교과목 신청 안내 (장학금 지급/전공학점 인정)",
+   "type": "교외",
+   "kindEvidence": [
+    "교내 증거 없음 — 기본값"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-11-10",
+   "provider": "주관 기관 원문 확인",
+   "amount": "54만원",
+   "amountValue": 540000,
+   "deadline": "2026-11-16",
+   "deadlineFrom": "공고 원문 · * 자세한 내용은 첨부된 강의계획서 확인 바랍니다 . ■ 신청 기간 : 2026. 11. 10( 화 ) ~ 11. 16( 월 ) 까지",
+   "period": "접수 ~2026-11-16",
+   "summary": "광운대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "광운대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-10 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "Attachment 강의계획서.pdf",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35620&ano=53666"
+    }
+   ],
+   "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53666&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "sourceKind": "auto",
+   "openDate": "2026-11-10",
+   "eligibilityLines": [
+    "■ 신청자격 : 인공지능융합대학 1~2 학년 학생 , 인융대 제외 전체 학년"
+   ],
+   "excerpts": [
+    "- 선발 완료된 학생은 수강신청기간 (11.18~11.20) 에 반드시 수강신청해야 함",
+    "■ 문의 : 02-940-5653, riseai@kw.ac.kr"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 540000,
+    "ratio": 0,
+    "min": 540000,
+    "max": 540000,
+    "raw": "- 장학 금액 : 590,000 원 ( 내역 : 수강료 54 만원 + 이수장학금 5 만원 )"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-4bnum57138cate0qidx57138-1duciyc",
+   "name": "2026-2학기 국가근로장학생 모집(교체선발)_한국전시산업융합연구원",
+   "boardTitle": "2026-2학기 국가근로장학생 모집(교체선발)_한국전시산업융합연구원",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「국가근로」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-10",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-11-10",
+   "period": "접수 기간 원문 확인",
+   "summary": "서울과학기술대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울과학기술대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-10 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "서식1. 국가근로장학생 지원서(학생).hwp",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F57138&fname=6F2677C7C2714882A84213032D2F6FAE_.hwp&ogrfname=%EC%84%9C%EC%8B%9D1.+%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EC%83%9D+%EC%A7%80%EC%9B%90%EC%84%9C%28%ED%95%99%EC%83%9D%29.hwp"
+    }
+   ],
+   "sourceUrl": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=897664&qidx=57138&cate=0&allboard=true&nowpage=1",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "※ 지원가능대상 : 아래 조건을 모두 충족하는 자",
+    "- 2026학년도 2학기 재학생으로 직전 학기 성적 C0(70점/100점 만점) 이상인 학생",
+    "- 학자금지원구간 9구간 이하에 해당하는 자",
+    "- 재학생 및 수업연한초과자(초과학기생, 학사학위취득유예생) 신청 가능 - (*단, 휴학생은 안됨)",
+    "학자금지원구간 4분위 이하",
+    "(기초생활수급자 및 차상위계층 포함)",
+    "학자금지원구간 5분위 이상 ~ 6분위 이하",
+    "학자금지원구간 7분위 이상 ~ 9분위 이하",
+    "- 근무내용 : 학술지 발간 관련보조",
+    "- 희망사항: 학교인근 거주자 우대 , 컴퓨터활용능력자격증 소지자 우대 (필수사항은 아님)",
+    "- 근무위치 : 서울과학기술대학교 서울테크노파크 423호",
+    "- 근무시간 : 시간표 검토 후, 주 20시간 근무자만 지원바람"
+   ]
   }
  ]
 }

@@ -3,14 +3,47 @@
  "updatedAt": "2026-11-10",
  "items": [
   {
-   "title": "[등록/장학] 2026학년도 2학기 국가장학금 지급 (예정)안내(1차)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53624&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "title": "[일반] [앵커사업] 2026년도 동계 계절수업 Python 교과목 신청 안내 (장학금 지급/전공학점 인정)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53666&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "attachments": [
     {
-     "name": "광운미디어",
-     "url": "https://www.kw.ac.kr/ko/etc/2018_kw110.pdf"
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    },
+    {
+     "name": "Attachment 강의계획서.pdf",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35620&ano=53666"
     }
    ],
+   "deadlineHint": "신청 기간 : 2026. 11. 10( 화 ) ~ 11. 16( 월 ) 까지 ■ 신청 방법 : 신청 폼에서 양식 기재 후 제출 - 신청 폼 :",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-11-10"
+  },
+  {
+   "title": "[등록/장학] 2026학년도 2학기 국가장학금 지급 (예정)안내(1차)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53624&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [],
    "deadlineHint": "신청기간 : 2026.11.2.(월) ~ 11.18.(수)> - 2026 학년도 2 학기 등록금 한도 내에서 지급 - 상기 내용은 2026 학년",
    "school": "광운대학교",
    "campus": "",

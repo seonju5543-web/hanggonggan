@@ -3,6 +3,28 @@
  "updatedAt": "2026-11-10",
  "items": [
   {
+   "title": "[공통] 한국고등교육재단 문우림 제6기 장학생 선발 안내",
+   "url": "https://www.gachon.ac.kr/bbs/kor/478/126962/artclView.do",
+   "attachments": [
+    {
+     "name": "문우림 제6기 장학생 선발 공고문.hwp",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/158439/download.do"
+    },
+    {
+     "name": "문우림 제6기 장학생 선발 모집요강.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/158440/download.do"
+    },
+    {
+     "name": "문우림 제6기 장학생 선발 포스터.jpg",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/158441/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간: 2026.11.05.(목) ~ 11.18.(수) 126962 한국고등교육재단 문우림 제6기 장학생 선발 안내 2026.11.10 94",
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-11-10"
+  },
+  {
    "title": "[글로벌] 2026-2학기 일반 교내 및 교외 국가근로장학생 추가 모집(2차) 안내",
    "url": "https://www.gachon.ac.kr/bbs/kor/478/126826/artclView.do",
    "attachments": [
@@ -970,20 +992,6 @@
     }
    ],
    "deadlineHint": "신청기간 : 2026. 8. 24(월) 09:00 ~ 2026. 9. 22(화) 18:00 4. 접수방법 : 포항시장학회 홈페이지 온라인 접수",
-   "school": "가천대학교",
-   "campus": "",
-   "foundAt": "2026-09-30"
-  },
-  {
-   "title": "[공통] 2026년도 경주시장학회 장학생 선발 계획 안내",
-   "url": "https://www.gachon.ac.kr/bbs/kor/478/125187/artclView.do",
-   "attachments": [
-    {
-     "name": "경주시장학회-선발계획공고.pdf",
-     "url": "https://www.gachon.ac.kr/bbs/kor/478/155088/download.do"
-    }
-   ],
-   "deadlineHint": null,
    "school": "가천대학교",
    "campus": "",
    "foundAt": "2026-09-30"
