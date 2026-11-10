@@ -3931,7 +3931,7 @@
    "expiredAt": "2026-11-09"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000022001",
    "org": "(재)한국지도자육성장학재단",
    "name": "일반장학생",
@@ -3941,7 +3941,9 @@
    "cards": 5,
    "dir": "insta/pub/2000022001",
    "at": "2026-10-23",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-11"
   },
   {
    "status": "expired",
@@ -4231,7 +4233,7 @@
    "expiredAt": "2026-11-09"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000253005",
    "org": "(재)고창군장학재단",
    "name": "장학생(농어촌활력)",
@@ -4241,7 +4243,9 @@
    "cards": 5,
    "dir": "insta/pub/2000253005",
    "at": "2026-10-30",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-11"
   },
   {
    "status": "prepared",
@@ -4283,7 +4287,7 @@
    "dates": "absolute"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000253006",
    "org": "(재)고창군장학재단",
    "name": "장학생(다자녀)",
@@ -4293,10 +4297,12 @@
    "cards": 5,
    "dir": "insta/pub/2000253006",
    "at": "2026-10-30",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-11"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000253001",
    "org": "(재)고창군장학재단",
    "name": "장학생(성적우수)",
@@ -4306,10 +4312,12 @@
    "cards": 5,
    "dir": "insta/pub/2000253001",
    "at": "2026-10-30",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-11"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000253004",
    "org": "(재)고창군장학재단",
    "name": "장학생(특기)",
@@ -4319,7 +4327,9 @@
    "cards": 5,
    "dir": "insta/pub/2000253004",
    "at": "2026-10-30",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-11"
   },
   {
    "status": "expired",
@@ -4610,7 +4620,7 @@
    "dates": "absolute"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2704074001",
    "org": "농와장 인재육성장학재단",
    "name": "성적우수 장학생",
@@ -4620,7 +4630,9 @@
    "cards": 5,
    "dir": "insta/pub/2704074001",
    "at": "2026-11-10",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-11"
   },
   {
    "status": "prepared",
