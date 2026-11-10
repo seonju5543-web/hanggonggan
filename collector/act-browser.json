@@ -3,39 +3,9 @@
   "939935e1b1f9556d"
  ],
  "_ocrV": "press-attach-2026-10-16",
- "https://nysc.or.kr/nysc/pages/notice_view.php?id=288": {
-  "at": "2026-10-15",
-  "tries": 1,
-  "lines": [
-   "ㅇ 참가자격 : 청년 (19~34 세 ) 개인 또는 최대 3 인 구성 팀 단위",
-   "※ 개인 또는 팀으로 중복 참여 가능 , 기업 및 영리단체는 참여 불가",
-   "ㅇ 참가방법 : 온통청년 홈페이지 , 청년정책사용설명서 SNS 동시 접수",
-   "※ 공모전 게시글에 첨부된 링크 ( 공모전 폼 ) 를 통해 제안서 제출",
-   "ㅇ 시상규모 : 10 명 , 상금 총 390 만원 ( 참가상 포함 )",
-   "대상 (1)",
-   "최우수상 (1)",
-   "우수상 (3)",
-   "장려상 (5)",
-   "100 만원",
-   "50 만원",
-   "30 만원",
-   "10 만원",
-   "국무조정실장상"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
  "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000": {
   "at": "2026-11-06",
   "tries": 2
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53505&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-10-16",
-  "tries": 1
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53498&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-10-16",
-  "tries": 1
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/520896": {
   "at": "2026-10-23",
@@ -91,27 +61,6 @@
  "https://dep.hufs.ac.kr/bbs/student/2436/269599/artclView.do": {
   "at": "2026-11-07",
   "tries": 2
- },
- "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179494": {
-  "at": "2026-10-24",
-  "tries": 1,
-  "lines": [
-   "신청대상 : 글로벌 진출 및 투자유치를 희망하는 딥테크 기업",
-   "대상연령 : 전체",
-   "대상 : 연구기관, 일반기업, 1인 창조기업"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179490": {
-  "at": "2026-10-24",
-  "tries": 1,
-  "lines": [
-   "신청대상 : 기후테크에 관심있는 누구나",
-   "대상연령 : 전체"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/520976": {
   "at": "2026-10-27",
@@ -231,24 +180,6 @@
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/521064": {
   "at": "2026-11-10",
   "tries": 2
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3545453": {
-  "at": "2026-11-05",
-  "tries": 1,
-  "lines": [
-   "활동구분",
-   "오프라인",
-   "군산 청바지봉사단 모집 포스터1.png",
-   "어르신 프로그램 활동 지원 및 원에,공예 활동 보조",
-   "[봉사장소 지도] 지도 건너뛰기",
-   "봉사활동 장소[1] 주소 : 전북특별자치도 군산시 삼화안길 9 (문화동, 자원봉사종합센터)",
-   "전북특별자치도 군산시 삼화안길 9 군산시자원봉사센터",
-   "이전 봉사참여",
-   "12월 경의유치원 교육자원봉사자(오전) 모집(월~금, 9:00~13:00)",
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
  },
  "https://www.k-startup.go.kr/web/contents/webNOTICE_MATR.do?page=1&viewCount=18&id=176472&schBdcode=&schGroupCode=&schM=view": {
   "at": "2026-11-05",
@@ -388,6 +319,14 @@
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/271103/artclView.do": {
   "at": "2026-11-09",
+  "tries": 1
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53663&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-11-10",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=897685&qidx=5233&cate=0&allboard=true&nowpage=1": {
+  "at": "2026-11-10",
   "tries": 1
  }
 }
