@@ -1,6 +1,6 @@
 {
  "v": 1,
- "updatedAt": "2026-11-10",
+ "updatedAt": "2026-11-11",
  "hosts": {
   "jntle.kr": {
    "checkedAt": "2026-10-23",
@@ -830,6 +830,30 @@
   "stxfoundation.or.kr": {
    "checkedAt": "2026-11-10",
    "pages": 6,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "gwangju.go.kr": {
+   "checkedAt": "2026-11-11",
+   "pages": 10,
+   "found": 0,
+   "lines": 1,
+   "targets": 4,
+   "why": "글은 못 고르고 게시판만"
+  },
+  "gangseo.seoul.kr": {
+   "checkedAt": "2026-11-11",
+   "pages": 10,
+   "found": 1,
+   "lines": 1,
+   "targets": 1,
+   "why": ""
+  },
+  "ilshinfoundation.com": {
+   "checkedAt": "2026-11-11",
+   "pages": 3,
    "found": 0,
    "lines": 0,
    "targets": 1,

@@ -1,7 +1,7 @@
 {
  "v": 1,
  "note": "층2 재단 장학금의 개별 공고 후보 — 로봇(collector/kosaf-hunt.mjs)이 재단 홈페이지를 뒤져 적는다. 사람 후보 파일(link-candidates.json)과 같은 줄 꼴. 원문 링크 확인 로봇이 학생처럼 열어 확인한 것만 앱(data/link-check.json fix)에 실린다. 손으로 고치지 말 것 — 다음 실행이 다시 쓴다.",
- "updatedAt": "2026-11-10",
+ "updatedAt": "2026-11-11",
  "items": [
   {
    "target": {
@@ -143,6 +143,34 @@
    "by": "로봇(층2 글 사냥꾼)",
    "addedAt": "2026-10-13",
    "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 100) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000398001"
+   },
+   "board": "https://www.gwangju.go.kr/welfare/boardList.do?boardId=BD_0000000594&pageId=welfare86",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-11",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다",
+   "also": [
+    "2000398004",
+    "2000398005",
+    "2000398006"
+   ]
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000053007"
+   },
+   "url": "https://janghak.gangseo.seoul.kr/sc050101/325152?srchCtgry=&srchStdg=&curPage=&srchKey=&srchText=&srchBeginDt=&srchEndDt=",
+   "title": "2026년 2학기 구민한마음 계속장학금 지급 신청 안내",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-11",
+   "note": "https://janghak.gangseo.seoul.kr/sc050101 목록에서 고름 — 공고문 파일 제목 +2 · 마감 해 +1 · 학기·반기 +1 · 장학 낱말 +1 · 게시일 +1"
   }
  ]
 }
