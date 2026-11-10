@@ -1,8 +1,9 @@
 /**
  * 준비된 카드를 **메일 한 통**으로 만든다 (보내는 것은 워크플로의 curl).
  *
- * 🔴 받는 사람은 `insta/team.json` 의 **개발자 셋 전부**다(2026-09-12 개발자 지시 —
- *    "은서뿐만 아니라 개발자 세 명에게 모두 메일로 제시"). `--to` 를 주면 그걸 쓴다.
+ * 🔴 받는 사람은 **개발자 셋 전부**다(2026-09-12 개발자 지시 — "은서뿐만 아니라 개발자 세 명에게 모두 메일로 제시").
+ *    주소는 `--to` 로만 받는다 — 워크플로가 GitHub 비밀 칸 MAIL_TO 에서 넘긴다.
+ *    🔴 저장소(insta/team.json)에 주소를 다시 적지 말 것 (2026-11-10 · 공개 저장소에 팀원 주소 3개가 노출돼 있었다).
  * 🔴 한 실행에서 준비한 게시물이 여럿이면 **한 통에 다 담는다**(`--dirs=a,b,c`).
  *    공고당 한 통씩 보내면 하루 여섯 통이 세 사람에게 가서 아무도 안 읽게 된다.
  * 🔴 그림을 첨부하지 않고 **공개 주소를 <img> 로 건다** — 카드는 이미 Pages 에 올라가 있고,
@@ -11,7 +12,7 @@
  * 🔴 주소는 publish.mjs 에 묻는다 — 여기 베끼면 기다린 주소와 갈라진다.
  * 🔴 판형은 **번호로** 안내한다(`insta/templates.json`) — 개발자가 "3번으로" 라고 답할 수 있게.
  *
- * 쓰기: node insta/mail.mjs --dirs=insta/pub/<코드>[,…] [--to=a@x,b@y] --from=... [--run=URL] [--subject=...]  > mail.txt
+ * 쓰기: node insta/mail.mjs --dirs=insta/pub/<코드>[,…] --to=a@x,b@y --from=... [--run=URL] [--subject=...]  > mail.txt
  *       (예전 `--dir=` 도 받는다)
  */
 import { readFileSync } from 'node:fs';
@@ -26,8 +27,7 @@ const root = new URL('../', import.meta.url);
 const J = (p) => JSON.parse(readFileSync(new URL(p, root), 'utf8'));
 
 const dirs = (arg('dirs') || arg('dir') || '').split(',').map((s) => s.trim()).filter(Boolean);
-const team = J('insta/team.json').people;
-const to = (arg('to') || team.map((p) => p.email).join(',')).split(',').map((s) => s.trim()).filter(Boolean);
+const to = (arg('to') || '').split(',').map((s) => s.trim()).filter(Boolean);   // 비밀 칸 MAIL_TO 에서만
 const from = arg('from', to[0]);
 const run = arg('run', '');
 const kind = arg('kind', 'ready');          // ready(새로 준비) · revised(채팅에서 고침)
