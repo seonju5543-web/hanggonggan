@@ -11,7 +11,14 @@
      · 파일 단계(`a,b,c`): 그 파일·폴더를 HEAD 바이트 그대로 되돌린다(git checkout HEAD -- · 폴더는 새 파일도 지운다 ·
        HEAD 에 없던 파일은 지운다). 🔴 JSON 을 다시 쓰지 않는다 — registered/forms 형식이 바뀌면 파일 전체가 충돌한다(CLAUDE.md 매 세션 4).
    결과(gate): reverted-auto(자동 등록분만 빼서 통과) · reverted-files(파일까지 되돌려 통과) ·
-               still-failing(다 되돌려도 빨간불 — 이번 실행의 그 파일들이 원인이 아니다) · flaky(되돌릴 것 없이 다시 재니 통과).
+               still-failing(다 되돌려도 빨간불 — 이번 실행의 그 파일들이 원인이 아니다) · flaky(되돌릴 것 없이 다시 재니 통과) ·
+               kept-preexisting(--keep-preexisting 일 때만 · 아래).
+   🔴 --keep-preexisting (2026-11-10 · 은서 결정 — 11/4~11/7 기존 데이터의 빨간불 하나 때문에 매 실행 정식 등록 파일 **전체**를 되돌려
+      새 공고 등록·발췌 갱신이 나흘 멈췄다): 다 되돌려도 빨간불이면, 이번 실행의 파일을 **다시 얹고 관문을 한 번 더 잰다.**
+      걸린 검사의 지문(✕ 줄 + 그 아래 받은 값·기대 값 줄 — failSig)이 **전부** 되돌린 판에도 글자 그대로 있으면
+      = 이번 실행이 새로 깨뜨린 것이 없으면 이번 실행분을 저장한다(kept-preexisting). 하나라도 새 줄·바뀐 값이 있으면 다시 되돌린다(still-failing).
+      지문을 못 읽으면(✕ 줄 없이 실패) 지키지 않는다 — 모르면 되돌린다. 빨간불 자체는 그대로라 워크플로가 경보·빨간불로 끝낸다.
+      관문: verify/health-gates/gate.mjs 「데이터 관문 되돌리기」 ㉦(새로 깨뜨린 것은 반드시 되돌린다) · ㉧(원래 있던 빨간불이면 지킨다).
    리포트(--report)의 '자동 등록 — N건 등록' 줄에 '시도 · ↩ 되돌림'을 붙이고 사람이 읽을 단락을 넣는다(이슈 본문에도 그대로 간다).
    🔴 단락은 **실제로 되돌린 파일**에서 만든다(FILE_LABELS 한 곳) — 소식 로봇도 이 도구를 쓰는데 단락이 늘 '정식 등록'을 말해
       소식 리포트에 사실과 반대인 문장이 들어갔다(2026-10-04 리뷰). 워크플로 알림도 이 단락(--note)을 그대로 싣는다(문구를 베끼지 말 것).
@@ -19,11 +26,12 @@
    (두 번 걸린 공고는 3일 쉰다 — auto-held.mjs).
    🔴 늘 exit 0 — 결과는 gate 로 말한다(빨간불은 워크플로의 마지막 단계가 낸다). 예상 못 한 예외만 exit 1(워크플로가 파일을 직접 되돌린다).
 
-   실행: node collector/gate-guard.mjs --report collector/report.md --stage auto --stage data/registered.json,data/forms.json,collector/pending-forms.json [--note /tmp/gate-note.md]
+   실행: node collector/gate-guard.mjs --report collector/report.md --stage auto --stage data/registered.json,data/forms.json,collector/pending-forms.json [--note /tmp/gate-note.md] [--keep-preexisting]
    관문 명령: GATE_CMD (기본 'node verify/test-collector.mjs && node verify/audit-data.js') · 저장소 뿌리 = 지금 폴더.
    관문: verify/health-gates/gate.mjs 「데이터 관문 되돌리기」(임시 git 저장소 · 가짜 관문으로 잰다). */
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { pruneOrphans } from './pending-queue.mjs';
@@ -53,9 +61,10 @@ const labelOf = (p) => FILE_LABELS.find((l) => l.path === p.replace(/\/+$/, ''))
 const names = (paths) => [...new Set(paths.map((p) => labelOf(p).name))].join('·');
 
 export function parseArgs(argv) {
-  const o = { stages: [], report: '', note: '' };
+  const o = { stages: [], report: '', note: '', keepPreexisting: false };
   for (let i = 0; i < argv.length; i++) {
-    if (argv[i] === '--stage') o.stages.push(argv[++i]);
+    if (argv[i] === '--keep-preexisting') o.keepPreexisting = true;
+    else if (argv[i] === '--stage') o.stages.push(argv[++i]);
     else if (argv[i] === '--report') o.report = argv[++i];
     else if (argv[i] === '--note') o.note = argv[++i];
   }
@@ -65,7 +74,28 @@ export function parseArgs(argv) {
 const git = (args, cwd) => spawnSync('git', args, { cwd, encoding: 'utf8', maxBuffer: BIG });
 const inHead = (p, cwd) => git(['cat-file', '-e', `HEAD:${p}`], cwd).status === 0;
 
-/** 관문을 돌린다 — 통과 여부와 걸린 줄(✕ · 요약 줄 빼고 앞 5개) */
+/** 걸린 검사의 지문 — ✕ 줄(요약 줄 빼고)과 그 바로 아래 받은 값·기대 값 줄을 **전부**, 글자 그대로. ✕ 줄이 하나도 없으면 null(못 읽음).
+    🔴 줄 수를 자르지 않는다 — 비교에 쓴다(잘라 내면 뒤쪽의 새 실패를 못 본다). */
+export function failSig(out) {
+  const lines = String(out || '').split('\n').map((l) => l.trim());
+  const sig = [];
+  for (let i = 0; i < lines.length; i++) {
+    if (!/^✕/.test(lines[i]) || /^✕ 실패 \d+건/.test(lines[i])) continue;
+    sig.push(lines[i]);
+    for (let j = i + 1; j < lines.length && /^(받은 값|기대 값)/.test(lines[j]); j++) sig.push(lines[j]);
+  }
+  return sig.length ? sig : null;
+}
+/** 새로 깨뜨린 것이 없는가 — run 의 지문 줄이 **하나도 빠짐없이** base 에 (같은 수만큼) 있다. 어느 쪽이든 못 읽었으면 false(모르면 되돌린다) */
+export function nothingNew(baseSig, runSig) {
+  if (!baseSig || !runSig) return false;
+  const left = new Map();
+  for (const l of baseSig) left.set(l, (left.get(l) || 0) + 1);
+  for (const l of runSig) { const n = left.get(l) || 0; if (!n) return false; left.set(l, n - 1); }
+  return true;
+}
+
+/** 관문을 돌린다 — 통과 여부와 걸린 줄(✕ · 요약 줄 빼고 앞 5개 — 사람이 읽을 것)과 지문(sig — 비교용 전부) */
 export function runGate(cmd, cwd) {
   const r = spawnSync('bash', ['-c', cmd], { cwd, encoding: 'utf8', maxBuffer: BIG });
   const out = `${r.stdout || ''}\n${r.stderr || ''}`;
@@ -73,7 +103,7 @@ export function runGate(cmd, cwd) {
     .filter((l) => /^✕/.test(l) && !/^✕ 실패 \d+건/.test(l))
     .map((l) => l.replace(/^✕\s*/, '').slice(0, 140)).slice(0, 5);
   if (r.status !== 0 && !failing.length) failing.push(`(관문 명령이 ${r.status ?? r.signal} 로 끝남 — 실행 로그 참고)`);
-  return { ok: r.status === 0, failing };
+  return { ok: r.status === 0, failing, sig: r.status === 0 ? null : failSig(out) };
 }
 
 /** auto 단계 — 이번 실행에 새로 들어온 자동 등록분을 뺀다. 뺀 항목들을 돌려준다(못 하면 빈 배열). */
@@ -120,15 +150,42 @@ export function revertFilesStage(paths, cwd) {
   return done;
 }
 
+/** 파일·폴더를 지금 바이트 그대로 떠 둔다 — 없던 것은 '없음'으로 기억한다(되살릴 때 지운다) */
+export function snapshot(paths, cwd) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'gate-snap-'));   // 저장소 밖 — 저장 단계(git add)·관문이 이 사본을 보지 않게
+  const items = [...new Set(paths)].map((p, i) => {
+    const abs = path.join(cwd, p);
+    if (!fs.existsSync(abs)) return { p, exists: false };
+    const copy = path.join(dir, String(i));
+    fs.cpSync(abs, copy, { recursive: true });
+    return { p, exists: true, copy };
+  });
+  return { dir, items };
+}
+/** 떠 둔 그대로 되살린다 — 폴더는 통째로 갈아 끼운다(그 사이 생긴 파일도 지운다) */
+export function restore(snap, cwd) {
+  for (const it of snap.items) {
+    const abs = path.join(cwd, it.p);
+    fs.rmSync(abs, { recursive: true, force: true });
+    if (it.exists) { fs.mkdirSync(path.dirname(abs), { recursive: true }); fs.cpSync(it.copy, abs, { recursive: true }); }
+  }
+}
+const dropSnap = (snap) => { if (snap) fs.rmSync(snap.dir, { recursive: true, force: true }); };
+
 /** 단계를 돌리고 결과를 정한다 — { status, removed, failing, reverted, files, targets }
     files = 실제로 HEAD 판으로 되돌린 파일 · targets = 되돌릴 수 있었던 것 전부('auto' 포함 — 단락이 '무엇이 안 바뀌었나'를 말할 때) */
-export function guard({ stages, gateCmd = DEFAULT_GATE, cwd = process.cwd(), today = todayKst() }) {
+export function guard({ stages, gateCmd = DEFAULT_GATE, cwd = process.cwd(), today = todayKst(), keepPreexisting = false }) {
   let status = 'still-failing';
   let removed = [];
   let failing = [];
-  const files = [];
+  let files = [];
   const targets = stages.flatMap((st) => (st === 'auto' ? ['auto'] : st.split(',').map((x) => x.trim()).filter(Boolean)));
   let reverted = false;     // 무엇이든 되돌렸는가 — 되돌릴 때마다 바로 관문을 재므로 '되돌렸다 = 쟀다'
+  let lastSig = null;       // 마지막으로 잰 관문의 지문(다 되돌린 판)
+  /* 이번 실행의 판을 떠 둔다 — --keep-preexisting 일 때만(되돌린 뒤 다시 얹어 보려고). auto 단계가 고치는 두 파일도 포함 */
+  const snapPaths = [...targets.filter((t) => t !== 'auto'), ...(targets.includes('auto') ? [REG, QUEUE] : [])];
+  const runSnap = keepPreexisting ? snapshot(snapPaths, cwd) : null;
+  try {
   for (const st of stages) {
     let changed;
     if (st === 'auto') { removed = revertAutoStage(cwd); changed = removed.length > 0; } else {
@@ -141,7 +198,28 @@ export function guard({ stages, gateCmd = DEFAULT_GATE, cwd = process.cwd(), tod
     const g = runGate(gateCmd, cwd);
     if (g.ok) { status = st === 'auto' ? 'reverted-auto' : 'reverted-files'; failing = []; break; }
     failing = g.failing;
+    lastSig = g.sig;
   }
+  /* 🔴 다 되돌려도 빨간불 → 이번 실행 판을 다시 얹고 한 번 더 잰다. 새로 깨뜨린 것이 하나도 없을 때만 지킨다 — 아니면 되돌린 판으로 돌아간다 */
+  if (keepPreexisting && reverted && status === 'still-failing' && lastSig) {
+    const backSnap = snapshot(snapPaths, cwd);
+    try {
+      restore(runSnap, cwd);
+      const g = runGate(gateCmd, cwd);
+      if (!g.ok && nothingNew(lastSig, g.sig)) {
+        status = 'kept-preexisting'; failing = g.failing; removed = []; files = [];
+      } else if (g.ok) {
+        /* 이번 판으로 통과 = 되돌린 판의 실패가 다시 안 난다(흔들림) — 이번 판을 지키고 flaky 로 말한다 */
+        status = 'flaky'; failing = []; removed = []; files = [];
+      } else {
+        restore(backSnap, cwd);   // 새로 깨뜨린 것이 있다 → 되돌린 판 그대로
+      }
+    } catch (e) {
+      restore(backSnap, cwd);     // 무엇이 넘어지든 되돌린 판으로 — 모르면 되돌린다
+      throw e;
+    } finally { dropSnap(backSnap); }
+  }
+  } finally { dropSnap(runSnap); }
   /* 아무것도 못 되돌렸으면(= 한 번도 안 쟀으면) 한 번 잰다 — 걸린 검사 이름을 이슈에 적으려고(그리고 재현되는지).
      여기서 통과하면 되돌린 것 없이 통과한 것이라 flaky 다(되돌렸다면 위 고리에서 이미 쟀다). */
   if (!reverted) {
@@ -174,6 +252,7 @@ export function noteFor({ status, removed = [], failing = [], files = [], target
       ? `🚨 **되돌린 뒤에도 데이터 관문이 빨갛습니다** — 이번 실행의 ${did}을 되돌려도 통과하지 않았으니 기존 데이터나 이번 실행의 다른 파일을 사람이 봐야 합니다(실행을 빨간불로 끝냅니다).`
       : `🚨 **데이터 관문이 빨갛습니다** — 되돌릴 수 있는 것(${could || '없음'})이 이번 실행에 바뀌지 않았는데도 빨가니 기존 데이터나 이번 실행의 다른 파일을 사람이 봐야 합니다(실행을 빨간불로 끝냅니다).`,
     flaky: 'ℹ **데이터 관문을 다시 재니 통과했습니다** — 처음 실패가 다시 나지 않았습니다(되돌린 것 없음). 실행 로그의 「데이터 관문」 단계를 보세요.',
+    'kept-preexisting': `⚠ **데이터 관문이 빨갛지만 이번 실행 전부터 있던 빨간불입니다** — 이번 실행분을 되돌려도 똑같이 빨갛고, 다시 얹어도 새로 걸린 검사가 없어 이번 실행분(${could || '결과'})은 저장했습니다. 원래 있던 빨간불은 사람이 봐야 합니다(실행을 빨간불로 끝냅니다).`,
   }[status];
   return `> ${head}${checks}`;
 }
@@ -198,7 +277,7 @@ export function main(argv = process.argv.slice(2), env = process.env) {
   const o = parseArgs(argv);
   if (!o.stages.length) { console.log('쓰는 법: node collector/gate-guard.mjs --report <리포트> --stage auto --stage <파일,파일> [--note <파일>]'); return 0; }
   const cwd = process.cwd();
-  const res = guard({ stages: o.stages, gateCmd: env.GATE_CMD || DEFAULT_GATE, cwd });
+  const res = guard({ stages: o.stages, gateCmd: env.GATE_CMD || DEFAULT_GATE, cwd, keepPreexisting: o.keepPreexisting });
   console.log(`데이터 관문 되돌리기 결과: ${res.status} · 뺀 자동 등록 ${res.removed.length}건`);
   res.removed.forEach((i) => console.log(`  - ${i.id} | ${String(i.name || '').slice(0, 50)}`));
   res.failing.forEach((f) => console.log(`  ✕ ${f}`));

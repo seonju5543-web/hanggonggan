@@ -41,7 +41,7 @@ jobs:
     #    그때의 교훈은 그대로다 — **상한을 키우는 것으로 때우지 말 것**. 단계가 오래 걸리면
     #    그 단계의 예산(HARVEST_BUDGET_MS, 아래 timeout-minutes)을 줄이고, 상한은 그 합을
     #    담는 그릇으로만 쓴다. verify/test-collector.mjs가 이 대소관계를 검사한다.
-    timeout-minutes: 66   # 단계 합 61 + 준비·저장 여유 3 (2026-10-23 발췌 단계 시한 6 + 경보 짝 1+1 — 보강 단계로 · 2026-09-17 OCR 4분 · 2026-09-30 판정 로봇 2분 · 2026-10-04 관문 다시 재기 3분 — gate-guard 새 단계의 몫 · 2026-10-11 그 단계 3 → 5분(관문 한 번 ~55초 실측) + 끝내 빨간불 경보·닫기 짝 1+1)
+    timeout-minutes: 68   # 2026-11-10 되돌리기 단계 5 → 7분(--keep-preexisting 로 관문 한 번 더) · 단계 합 61 + 준비·저장 여유 3 (2026-10-23 발췌 단계 시한 6 + 경보 짝 1+1 — 보강 단계로 · 2026-09-17 OCR 4분 · 2026-09-30 판정 로봇 2분 · 2026-10-04 관문 다시 재기 3분 — gate-guard 새 단계의 몫 · 2026-10-11 그 단계 3 → 5분(관문 한 번 ~55초 실측) + 끝내 빨간불 경보·닫기 짝 1+1)
     steps:
       - uses: actions/checkout@v4
         with:
@@ -208,12 +208,13 @@ jobs:
       #    상한 5분 = 관문 최대 두 번 + 여유. 관문 한 번은 ~55초다(2026-10-11 4코어 실측 — test-collector 51초 + audit-data 4초 ·
       #    옛 주석의 ~25초는 관문이 늘기 전 값). 두 번이면 ~2분이라 3분으로는 느린 러너에서 여유가 1분뿐이었다 — 시간 초과로 이 단계가
       #    죽으면 || 뒤 예비 줄도 안 돌고 아래 저장 단계가 건너뛰어져 그 실행의 수집분이 통째로 안 남는다. 넘어지면 정식 등록 파일만이라도 HEAD 판으로(|| 뒤).
+      #    🔴 --keep-preexisting (2026-11-10 · 은서 결정): 다 되돌려도 빨가면 이번 실행 판을 다시 얹어 재고, 새로 걸린 검사가 하나도 없으면 이번 실행분을 저장한다(kept-preexisting — 원래 있던 빨간불 하나 때문에 새 등록이 며칠씩 멈추던 것). 상한 7분 = 관문 최대 세 번 + 여유.
       - name: 감사 실패 시 자동 등록분 되돌리기
         id: guard
         if: steps.audit.outcome == 'failure'
-        timeout-minutes: 5
+        timeout-minutes: 7
         run: |
-          node collector/gate-guard.mjs --report collector/browser-report.md --note /tmp/gate-note.md --stage auto --stage data/registered.json,data/forms.json,collector/pending-forms.json || git checkout -- data/registered.json data/forms.json collector/pending-forms.json
+          node collector/gate-guard.mjs --report collector/browser-report.md --note /tmp/gate-note.md --keep-preexisting --stage auto --stage data/registered.json,data/forms.json,collector/pending-forms.json || git checkout -- data/registered.json data/forms.json collector/pending-forms.json
       # 저장 위치 원칙 (2026-07-31 두 개발자 판 통합 — 여기를 바꾸기 전에 반드시 읽을 것):
       #   로봇은 **자기가 읽은 브랜치(= 실행된 브랜치, 기본 브랜치)에만** 저장한다.
       #   '이미 본 공고' 기록(collector/seen.json)과 공고 목록을 읽은 곳과 쓰는 곳이 다르면,
@@ -408,7 +409,7 @@ jobs:
       # 🔴 되돌린 뒤에도 관문이 빨가면 초록불로 끝내지 않는다 (2026-10-04 · 로봇·도구 점검).
       #    failure()·cancelled() 알림 **뒤**에 둔다 — 앞에 두면 그 알림이 '이번 수집분은 저장되지 않았습니다'라는 틀린 말을 붙인다(저장은 됐다).
       - name: 🚨 관문이 끝내 빨간불 (되돌린 뒤에도)
-        if: steps.guard.outputs.gate == 'still-failing'
+        if: steps.guard.outputs.gate == 'still-failing' || steps.guard.outputs.gate == 'kept-preexisting'
         timeout-minutes: 1
         env:
           GH_TOKEN: ${{ github.token }}
@@ -424,7 +425,7 @@ jobs:
           if node tools/alert-issue.mjs --mode open --match prefix \
             --title "🚨 데이터 관문이 되돌린 뒤에도 빨간불" \
             --label gate-red --label-description '데이터 관문이 되돌린 뒤에도 빨간불' \
-            --assignee "${{ github.repository_owner }}" --body-file /tmp/gate-issue.md; then
+            --assignee "${{ github.repository_owner }}" --assignee "Se-Hyeon-Jo" --assignee "didinin-wq" --body-file /tmp/gate-issue.md; then
             echo "::error::데이터 관문이 되돌린 뒤에도 빨간불입니다 — 이슈에 적었습니다."
           else
             echo "::error::데이터 관문이 되돌린 뒤에도 빨간불입니다 — 경보 이슈를 열지 못했습니다(이 실행 로그를 보세요)."

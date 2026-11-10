@@ -41,7 +41,7 @@ jobs:
     # 2026-09-29 수집망 2 → 44개교 복원: 「게시판 수집」 단계에 자체 상한 10분(예산 8분 + 마무리 2분)이 생겨
     # 단계 합 4+10+6+5+1+4+3+3+4 = 40 → 상한 44. ⚠️ 상한을 키우는 것으로 때우지 말 것 — 단계가 오래 걸리면
     # 그 단계의 예산(HARVEST_BUDGET_MS)을 줄이고, 상한은 그 합을 담는 그릇으로만 쓴다(8/2~3 사고의 교훈).
-    timeout-minutes: 84   # 단계 합 79 + 여유 5 — 2026-10-31 자격 줄 전수 집계 2 · 2026-10-29 읽지 못한 공고 현황 2 · 2026-10-28 PaddleOCR 설치 경보 짝 1+1 · 2026-10-23 발췌 단계 시한 6 + 경보 짝 1+1(보강 단계로) · 2026-10-11 관문 다시 재기 3 → 5분(관문 한 번 ~55초 실측) + 끝내 빨간불 경보·닫기 짝 1+1 (2026-10-05 장학 포스터 PaddleOCR 단계 7분 + 2026-10-04 관문 다시 재기 3분 → 61+5 · 2026-10-03 대외활동 첨부·포스터 9분 → 51+5 · 2026-09-30 판정 로봇 2분 → 42+3)
+    timeout-minutes: 86   # 2026-11-10 되돌리기 단계 5 → 7분(--keep-preexisting 로 관문 한 번 더) · 단계 합 79 + 여유 5 — 2026-10-31 자격 줄 전수 집계 2 · 2026-10-29 읽지 못한 공고 현황 2 · 2026-10-28 PaddleOCR 설치 경보 짝 1+1 · 2026-10-23 발췌 단계 시한 6 + 경보 짝 1+1(보강 단계로) · 2026-10-11 관문 다시 재기 3 → 5분(관문 한 번 ~55초 실측) + 끝내 빨간불 경보·닫기 짝 1+1 (2026-10-05 장학 포스터 PaddleOCR 단계 7분 + 2026-10-04 관문 다시 재기 3분 → 61+5 · 2026-10-03 대외활동 첨부·포스터 9분 → 51+5 · 2026-09-30 판정 로봇 2분 → 42+3)
     steps:
       - uses: actions/checkout@v4
         with:
@@ -344,12 +344,13 @@ jobs:
       #    상한 5분 = 관문 최대 두 번 + 여유. 관문 한 번은 ~55초다(2026-10-11 4코어 실측 — test-collector 51초 + audit-data 4초 ·
       #    옛 주석의 ~25초는 관문이 늘기 전 값). 두 번이면 ~2분이라 3분으로는 느린 러너에서 여유가 1분뿐이었다 — 시간 초과로 이 단계가
       #    죽으면 || 뒤 예비 줄도 안 돌고 아래 저장 단계가 건너뛰어져 그 실행의 수집분이 통째로 안 남는다. 넘어지면 정식 등록 파일만이라도 HEAD 판으로(|| 뒤).
+      #    🔴 --keep-preexisting (2026-11-10 · 은서 결정): 다 되돌려도 빨가면 이번 실행 판을 다시 얹어 재고, 새로 걸린 검사가 하나도 없으면 이번 실행분을 저장한다(kept-preexisting — 원래 있던 빨간불 하나 때문에 새 등록이 며칠씩 멈추던 것). 상한 7분 = 관문 최대 세 번 + 여유.
       - name: 감사 실패 시 자동 등록분 되돌리기
         id: guard
         if: steps.audit.outcome == 'failure'
-        timeout-minutes: 5
+        timeout-minutes: 7
         run: |
-          node collector/gate-guard.mjs --report collector/report.md --note /tmp/gate-note.md --stage auto --stage data/registered.json,data/forms.json,collector/pending-forms.json || git checkout -- data/registered.json data/forms.json collector/pending-forms.json
+          node collector/gate-guard.mjs --report collector/report.md --note /tmp/gate-note.md --keep-preexisting --stage auto --stage data/registered.json,data/forms.json,collector/pending-forms.json || git checkout -- data/registered.json data/forms.json collector/pending-forms.json
 
       - name: 수집 상태 저장 (중복 방지 기록)
         run: |
@@ -486,6 +487,7 @@ jobs:
               reverted-auto)  gate="**데이터 관문 빨간불** — 새 자동 등록분을 되돌려 통과" ;;
               reverted-files) gate="**데이터 관문 빨간불** — 파일을 직전 판으로 되돌려 통과(무엇인지는 아래 코멘트)" ;;
               still-failing)  gate="**데이터 관문 빨간불** — 되돌려도 빨간불(이 실행은 빨간불로 끝납니다)" ;;
+              kept-preexisting) gate="**데이터 관문 빨간불** — 원래 있던 빨간불이라 이번 실행분은 저장(이 실행은 빨간불로 끝납니다)" ;;
               *)              gate="**데이터 관문 빨간불** — 되돌리기 도구가 결과를 남기지 못함" ;;
             esac
             msg="🤖 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 수집은 정상 · $gate — 새 공고 0건 · 아래 감사 실패 코멘트를 보세요."
@@ -567,7 +569,7 @@ jobs:
       # 🔴 되돌린 뒤에도 관문이 빨가면 초록불로 끝내지 않는다 (2026-10-04 · 로봇·도구 점검).
       #    failure()·cancelled() 알림 **뒤**에 둔다 — 앞에 두면 그 알림이 '이번 수집분은 저장되지 않았습니다'라는 틀린 말을 붙인다(저장은 됐다).
       - name: 🚨 관문이 끝내 빨간불 (되돌린 뒤에도)
-        if: steps.guard.outputs.gate == 'still-failing'
+        if: steps.guard.outputs.gate == 'still-failing' || steps.guard.outputs.gate == 'kept-preexisting'
         timeout-minutes: 1
         env:
           GH_TOKEN: ${{ github.token }}
@@ -583,7 +585,7 @@ jobs:
           if node tools/alert-issue.mjs --mode open --match prefix \
             --title "🚨 데이터 관문이 되돌린 뒤에도 빨간불" \
             --label gate-red --label-description '데이터 관문이 되돌린 뒤에도 빨간불' \
-            --assignee "${{ github.repository_owner }}" --body-file /tmp/gate-issue.md; then
+            --assignee "${{ github.repository_owner }}" --assignee "Se-Hyeon-Jo" --assignee "didinin-wq" --body-file /tmp/gate-issue.md; then
             echo "::error::데이터 관문이 되돌린 뒤에도 빨간불입니다 — 이슈에 적었습니다."
           else
             echo "::error::데이터 관문이 되돌린 뒤에도 빨간불입니다 — 경보 이슈를 열지 못했습니다(이 실행 로그를 보세요)."

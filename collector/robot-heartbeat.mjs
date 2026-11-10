@@ -185,6 +185,30 @@ async function recentSuccessAt(repo, file, token) {
   return latestSuccessIso((await r.json()).workflow_runs, { branches: [BASE_BRANCH, 'main'] });
 }
 
+/* 🔴 **저장은 됐는데 관문만 빨간 실행**을 '조용하다'와 가른다 (2026-11-10 · 은서 — 11/4~11/7 장학공고 수집은 하루 세 번 수집분을 **저장했는데**
+   실행이 데이터 관문 빨간불로 '실패' 표시라 이 하트비트가 「장학공고 수집 로봇 96시간 조용」이라 경보했고, 사람이 '수집이 멈췄다'고 잘못 보고했다).
+   판정: 그 실행의 일(job) 중에 이름에 '저장'이 든 단계가 성공했고, **실패한 단계가 「관문이 끝내 빨간불」 하나뿐**일 때만 '저장됨 · 관문 빨간불'.
+   다른 단계가 하나라도 실패했으면(넘어짐·시간초과·저장 실패) 여기 들지 않는다 — 그건 진짜로 멈춘 것이다. 단계 이름을 못 읽으면 false(모르면 경보 그대로). */
+export function savedThoughGateRed(jobs) {
+  const steps = (jobs || []).flatMap((j) => j.steps || []);
+  if (!steps.length) return false;
+  const saved = steps.some((st) => /저장/.test(st.name || '') && st.conclusion === 'success');
+  const failed = steps.filter((st) => st.conclusion === 'failure' || st.conclusion === 'cancelled' || st.conclusion === 'timed_out');
+  return saved && failed.length > 0 && failed.every((st) => /관문이 끝내 빨간불/.test(st.name || ''));
+}
+/** 최근 실패 실행 중 '저장됨 · 관문 빨간불'인 가장 늦은 시각 — 기본 브랜치 실행만 · 실패 실행 5개까지만 들여다본다(질문 수 상한) */
+async function lastSavedRedAt(repo, file, token) {
+  const H = { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' } };
+  const r = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/${file}/runs?status=failure&per_page=5&branch=${encodeURIComponent(BASE_BRANCH)}`, H);
+  if (!r.ok) return null;
+  for (const run of (await r.json()).workflow_runs || []) {
+    const jr = await fetch(`https://api.github.com/repos/${repo}/actions/runs/${run.id}/jobs`, H);
+    if (!jr.ok) continue;
+    if (savedThoughGateRed((await jr.json()).jobs)) return run.updated_at || run.created_at || null;
+  }
+  return null;
+}
+
 export function isStale(everyHours, lastIso, nowMs) {
   if (everyHours == null) return false;
   if (!lastIso) return true;                       // 성공 기록이 아예 없다
@@ -339,28 +363,38 @@ async function main() {
         last = { at: newerIso(last.at, await recentSuccessAt(repo, w.file, token)) };
       }
     }
+    /* 그래도 조용하면 — 저장은 됐는데 관문만 빨간 실행인가(경보 대신 '저장됨 · 관문 빨간불'로 따로 적는다 · 관문 경보 이슈가 따로 선다) */
+    let savedRed = null;
+    if (repo && token && !last.error && isStale(w.everyHours, last.at, now)) {
+      const at = await lastSavedRedAt(repo, w.file, token);
+      if (at && !isStale(w.everyHours, at, now)) savedRed = at;
+    }
     const ageH = last.at ? Math.round((now - Date.parse(last.at)) / 360000) / 10 : null;
     rows.push({
       file: w.file, name: w.name,
       everyHours: w.everyHours,
       lastOk: last.at || null, ageHours: ageH,
       error: last.error || null,
+      savedRed,
       /* 조회에 실패한 것은 '멈췄다'고 단정하지 않는다 — 못 읽은 것과 없는 것은 다르다
          (이 저장소의 '못 읽음을 사실로 단정하지 말 것' 원칙). */
-      stale: last.error ? false : isStale(w.everyHours, last.at, now),
+      stale: last.error || savedRed ? false : isStale(w.everyHours, last.at, now),
     });
   }
 
   const stale = rows.filter((r) => r.stale);
-  if (asJson) { console.log(JSON.stringify({ rows, stale }, null, 1)); return; }
+  const gateRed = rows.filter((r) => r.savedRed);
+  if (asJson) { console.log(JSON.stringify({ rows, stale, gateRed }, null, 1)); return; }
 
   console.log(`예약 로봇 ${rows.length}대 · 문턱 = 기대 간격 × ${STALE_FACTOR} (최소 ${STALE_MIN_HOURS}시간) · 기본 브랜치·main 의 성공만 셈`);
   for (const r of rows.sort((a, b) => (b.ageHours || 1e9) - (a.ageHours || 1e9))) {
-    const mark = r.stale ? '🚨' : (r.error ? '· ' : '✓ ');
+    const mark = r.stale ? '🚨' : (r.savedRed ? '⚠ ' : (r.error ? '· ' : '✓ '));
     const every = everyWords(r.everyHours);
     const age = r.error ? r.error : (r.ageHours == null ? '성공 기록 없음' : `${r.ageHours}시간 전`);
-    console.log(`${mark} ${r.name.padEnd(24)} ${every.padEnd(10)} 마지막 성공 ${age}`);
+    const red = r.savedRed ? ` · 저장은 됨(${Math.round((now - Date.parse(r.savedRed)) / 360000) / 10}시간 전) — 데이터 관문만 빨간불` : '';
+    console.log(`${mark} ${r.name.padEnd(24)} ${every.padEnd(10)} 마지막 성공 ${age}${red}`);
   }
+  if (gateRed.length) console.log(`\n⚠ 저장은 되는데 데이터 관문이 빨간 로봇 ${gateRed.length}대 — 멈춘 것이 아니다. '데이터 관문이 되돌린 뒤에도 빨간불' 경보 이슈를 보세요.`);
   if (stale.length) {
     console.log(`\n🚨 너무 오래 조용한 로봇 ${stale.length}대 — 예약이 걸러졌거나 멈춰 있습니다.`);
     process.exitCode = 1;
