@@ -125,6 +125,20 @@ export default async function gate(eq, ctx) {
     eq('③ ops-11 두 번째 길은 기본 브랜치·main 의 성공만 센다(작업 브랜치의 더 늦은 성공을 고르지 않는다) · 인자 없으면 옛 동작',
       [HB.BASE_BRANCH, HB.latestSuccessIso(runs, { branches: [HB.BASE_BRANCH, 'main'] }), HB.latestSuccessIso(runs)],
       [BASE, '2026-10-04T10:00:00Z', '2026-10-04T12:00:00Z']);
+    /* 🔴 저장은 됐는데 관문만 빨간 실행 (2026-11-10 · 은서 — 11/4~11/7 수집분은 매번 저장됐는데 '96시간 조용'이라 경보해 '수집이 멈췄다'고 잘못 보고했다).
+       표본은 실제 실행(11/7 장학 42377311075 · 10월 브라우저 넘어짐)의 단계 꼴 그대로 */
+    const job = (...st) => [{ steps: st.map(([name, conclusion]) => ({ name, conclusion })) }];
+    const SAVE = ['수집 상태 저장 (중복 방지 기록)', 'success'];
+    const RED = ['🚨 관문이 끝내 빨간불 (되돌린 뒤에도)', 'failure'];
+    eq('② ⓑ 저장 성공 + 실패한 단계가 「관문이 끝내 빨간불」 하나뿐 → 저장됨·관문 빨간불(조용하다고 경보하지 않는다)',
+      HB.savedThoughGateRed(job(['데이터 관문 (수집기 규칙 테스트 + 데이터 감사)', 'success'], SAVE, RED)), true);
+    eq('  🔴 다른 단계가 하나라도 실패(넘어짐·시간초과·저장 실패)면 아니다 — 진짜로 멈춘 것 · 저장이 안 됐으면 아니다 · 단계를 못 읽으면 아니다(모르면 경보)',
+      [HB.savedThoughGateRed(job(SAVE, ['공고 원문 발췌 갱신 (정직 원칙 — 추론 대신 원문 그대로)', 'failure'])),
+        HB.savedThoughGateRed(job(SAVE, RED, ['게시판 수집', 'cancelled'])),
+        HB.savedThoughGateRed(job(['수집 상태 저장 (중복 방지 기록)', 'failure'], RED)),
+        HB.savedThoughGateRed(job(['수집 상태 저장 (중복 방지 기록)', 'skipped'], RED)),
+        HB.savedThoughGateRed([]), HB.savedThoughGateRed(null), HB.savedThoughGateRed(job(SAVE))],
+      [false, false, false, false, false, false, false]);
     const src = stripComments(read(root, 'collector/robot-heartbeat.mjs'));
     eq('  첫 질문(lastSuccessAt)의 주소가 기본 브랜치로 거르고 · 두 번째 길(recentSuccessAt)이 [기본 브랜치, main] 을 넘긴다',
       [/&branch=\$\{encodeURIComponent\(BASE_BRANCH\)\}/.test(fnBody(src, 'async function lastSuccessAt(')),

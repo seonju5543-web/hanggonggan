@@ -40,7 +40,7 @@ jobs:
     #  되돌리기 1 → 3 — 되돌릴 때마다 관문을 다시 잰다 · collector/gate-guard.mjs · 2026-10-05 경보 짝 셋은 저장·리포트 뒤로 ·
     #  2026-10-11 기본 브랜치의 요약 단계(3)를 합침 — 옛 '수집 단계 실패 알림'·'감사 실패 알림(이슈 생성)'은 위 경보 짝이 대신한다 ·
     #  2026-10-11 요약 단계 경보·닫기 짝(2) · 되돌리기 3 → 5 — 관문 한 번 ~55초 실측이라 두 번 재면 3분이 빠듯했다)
-    timeout-minutes: 49
+    timeout-minutes: 51   # 2026-11-10 되돌리기 단계 5 → 7분(--keep-preexisting 로 관문 한 번 더)
     steps:
       - uses: actions/checkout@v4
         with:
@@ -115,12 +115,13 @@ jobs:
       #    still-failing 이면 맨 끝 단계가 빨간불. 넘어지면 소식 파일만이라도 HEAD 판으로(|| 뒤 — 옛 되돌리기와 같다).
       #    상한 5분 = 관문 최대 두 번 + 여유 — 관문 한 번은 ~55초다(2026-10-11 4코어 실측 · 장학·브라우저 수집의 되돌리기 단계와 같은 값).
       #    3분이던 때는 두 번 재면 느린 러너에서 여유가 1분뿐이었고, 시간 초과면 || 뒤도 안 돌고 아래 저장 단계가 건너뛰어진다.
+      #    🔴 --keep-preexisting (2026-11-10 · 은서 결정): 다 되돌려도 빨가면 이번 실행 판을 다시 얹어 재고, 새로 걸린 검사가 하나도 없으면 이번 실행분을 저장한다(kept-preexisting — 원래 있던 빨간불 하나 때문에 새 등록이 며칠씩 멈추던 것). 상한 7분 = 관문 최대 세 번 + 여유.
       - name: 감사 실패 시 이번 소식 발행분 되돌리기
         id: guard
         if: steps.audit.outcome == 'failure'
-        timeout-minutes: 5
+        timeout-minutes: 7
         run: |
-          node collector/gate-guard.mjs --report collector/news-report.md --note /tmp/gate-note.md --stage data/news,collector/seen-news.json,collector/news-thumbs.json,collector/news-desc.json --stage collector/news-sources.json || {
+          node collector/gate-guard.mjs --report collector/news-report.md --note /tmp/gate-note.md --keep-preexisting --stage data/news,collector/seen-news.json,collector/news-thumbs.json,collector/news-desc.json --stage collector/news-sources.json || {
             git checkout -- data/news collector/seen-news.json 2>/dev/null || true
             # 썸네일 장부는 따로 — 한 줄에 묶으면 장부가 아직 없는 첫 실행에 git checkout 이 통째로 실패해 소식 파일도 안 돌아간다(gate-guard 는 파일마다 따로 본다)
             git checkout -- collector/news-thumbs.json 2>/dev/null || rm -f collector/news-thumbs.json
@@ -286,6 +287,7 @@ jobs:
           case "${{ steps.guard.outputs.gate }}" in
             reverted-auto|reverted-files) result="되돌려서 통과" ;;
             still-failing)                result="되돌려도 빨간불" ;;
+            kept-preexisting)             result="원래 있던 빨간불 — 이번 발행분은 저장" ;;
             flaky)                        result="다시 재니 통과(되돌린 것 없음)" ;;
             *)                            result="되돌리기 도구가 넘어져 소식 파일을 직전 판으로 돌림" ;;
           esac
@@ -300,7 +302,7 @@ jobs:
           node tools/alert-issue.mjs --mode open --match prefix \
             --title "🚨 교내 소식 데이터 감사 실패" \
             --label news-audit --label-description '교내 소식 데이터 감사 실패' \
-            --assignee "${{ github.repository_owner }}" --body-file /tmp/news-gate-issue.md
+            --assignee "${{ github.repository_owner }}" --assignee "Se-Hyeon-Jo" --assignee "didinin-wq" --body-file /tmp/news-gate-issue.md
       - name: 감사가 다시 통과하면 옛 경보를 닫는다
         if: steps.audit.outcome == 'success'
         timeout-minutes: 1
@@ -328,7 +330,7 @@ jobs:
       # 🔴 되돌린 뒤에도 관문이 빨가면 초록불로 끝내지 않는다 (2026-10-04 · 로봇·도구 점검). 이슈는 위 '데이터 감사 실패 알림'이 이미 열었다(또는 코멘트).
       #    failure()·cancelled() 알림 **뒤**에 둔다 — 앞에 두면 그 알림이 '이번 수집분은 저장되지 않았습니다'라는 틀린 말을 붙인다.
       - name: 🚨 관문이 끝내 빨간불 (되돌린 뒤에도)
-        if: steps.guard.outputs.gate == 'still-failing'
+        if: steps.guard.outputs.gate == 'still-failing' || steps.guard.outputs.gate == 'kept-preexisting'
         timeout-minutes: 1
         run: |
           echo "::error::교내 소식 — 되돌리기 단계를 거친 뒤에도 데이터 관문이 빨갛습니다(무엇을 되돌렸는지는 감사 실패 이슈의 단락). 실행을 빨간불로 끝냅니다."
