@@ -3,6 +3,37 @@
  "updatedAt": "2026-11-10",
  "items": [
   {
+   "title": "제3회 다전공 이수자 연말파티 ’다전공의 밤‘ 신청안내",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726949",
+   "postedAt": "2026-11-10",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-11-10",
+   "thumb": "data/news/img/1f2d1e3523c3744f.webp",
+   "desc": "교육혁신과 제3회 다전공 이수자 연말파티 ’다전공의 밤‘ 에 초대합니다. 다전공으로 올 한 해도 정말 수고 많으셨죠? 한 해 동안 열심히 달려온 다전공자 여러분을 위해 CICA가 특별한 연말파티를 준비했습니다!"
+  },
+  {
+   "title": "2026학년도 동계 계절수업 수강신청 안내",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726947",
+   "postedAt": "2026-11-10",
+   "kind": "학사",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-11-10"
+  },
+  {
+   "title": "[후원의집 홍보] 밝은세상안과 '2026년 11~12월 혜택 안내'",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726946",
+   "postedAt": "2026-11-10",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-11-10",
+   "desc": "( 재 ) 국립부경대학교발전기금의 후원의집 \" 밝은세상안과 \" 의 2026년 11~12 월 혜택을 소개합니다."
+  },
+  {
    "title": "[학생상담센터] 부경인의 스트레스 리셋 프로젝트 ♥굿바이 스트레스 진단검사♥",
    "url": "https://www.pknu.ac.kr/main/163?action=view&no=726919",
    "postedAt": "2026-11-09",
@@ -396,37 +427,6 @@
    "src": "53a197d6",
    "foundAt": "2026-10-26",
    "thumb": "data/news/img/6cffc9de1fcdfdf1.webp"
-  },
-  {
-   "title": "2026 MBC 대학가요제에 따른 대연캠퍼스 대운동장 사용 제한 안내",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726745",
-   "postedAt": "2026-10-26",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-26",
-   "desc": "2026년 MBC 대학가요제 무대 설치를 위해 대운동장 사용을 아래와 같이 제한하오니, 협조하여 주시기 바랍니다."
-  },
-  {
-   "title": "2026 MBC 대학가요제 개최에 따른 대연캠퍼스 차량 등 통제 안내",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726744",
-   "postedAt": "2026-10-26",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/59f539a365237a10.webp",
-   "desc": "2026 MBC 대학가요제 개최에 따라 행사 당일 안전확보를 위해 차량, 주차, 보행자를 통제할 예정이니, 참고하여 주시기 바랍니다."
-  },
-  {
-   "title": "(재안내) 2027학년도 전기 전임교원 신규채용 초빙공고 (접수기간: 10. 26.(월)~10. 29.(목))",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726741",
-   "postedAt": "2026-10-26",
-   "kind": "채용",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-26"
   }
  ]
 }
