@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-09",
+ "updatedAt": "2026-11-11",
  "items": {
   "auto-ticedoarticleno231977952": [
    {
@@ -8,18 +8,6 @@
     "pages": 9,
     "bytes": 511105,
     "srcBytes": 78122,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-28"
-   }
-  ],
-  "auto-jong659273457artclviewdo": [
-   {
-    "file": "auto-jong659273457artclviewdo/1-2026학년도_2학기_세종_CPTA장학금_신청서_소정양식_.pdf",
-    "name": "2026학년도 2학기 세종 CPTA장학금 신청서(소정양식).hwp",
-    "pages": 2,
-    "bytes": 106622,
-    "srcBytes": 95744,
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-10-28"
@@ -141,28 +129,6 @@
     "at": "2026-10-28"
    }
   ],
-  "auto-kuk2351210566artclviewdo": [
-   {
-    "file": "auto-kuk2351210566artclviewdo/1-2.2026학년도2학기복지장학금신청서류.pdf",
-    "name": "2.2026학년도2학기복지장학금신청서류.hwp",
-    "pages": 3,
-    "bytes": 107875,
-    "srcBytes": 49152,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-28"
-   },
-   {
-    "file": "auto-kuk2351210566artclviewdo/2-3.2026학년도2학기복지장학금개인정보이용및제공동의서.pdf",
-    "name": "3.2026학년도2학기복지장학금개인정보이용및제공동의서.hwp",
-    "pages": 2,
-    "bytes": 100347,
-    "srcBytes": 55296,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-28"
-   }
-  ],
   "auto-pnoticedoarticleno367476": [
    {
     "file": "auto-pnoticedoarticleno367476/1-신청서_서식.pdf",
@@ -197,28 +163,6 @@
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-10-28"
-   }
-  ],
-  "auto-ent2431270154artclviewdo": [
-   {
-    "file": "auto-ent2431270154artclviewdo/1-2026-2학기_제이씨현장학금_신청서.pdf",
-    "name": "2026-2학기 제이씨현장학금 신청서.hwp",
-    "pages": 2,
-    "bytes": 47449,
-    "srcBytes": 29184,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-29"
-   },
-   {
-    "file": "auto-ent2431270154artclviewdo/2-개인정보수집이용동의서.pdf",
-    "name": "개인정보수집이용동의서.hwp",
-    "pages": 1,
-    "bytes": 78123,
-    "srcBytes": 50688,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-29"
    }
   ],
   "auto-bswj104944500artclviewdo": [
@@ -299,6 +243,76 @@
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-11-09"
+   }
+  ],
+  "auto-bswj104944586artclviewdo": [
+   {
+    "file": "auto-bswj104944586artclviewdo/1-2026학년도_2학기_신문고장학금신청서_학번_이름.pdf",
+    "name": "2026학년도_2학기_신문고장학금신청서_학번_이름.hwp",
+    "pages": 2,
+    "bytes": 79510,
+    "srcBytes": 43008,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-11"
+   }
+  ],
+  "auto-krbbskr846077artclviewdo": [
+   {
+    "file": "auto-krbbskr846077artclviewdo/1-1._IBK기업은행_장학금_필수_개인정보_수집_이용_동의서.pdf",
+    "name": "1. IBK기업은행 장학금_필수 개인정보 수집·이용 동의서.pdf",
+    "pages": 1,
+    "bytes": 67238,
+    "srcBytes": 67238,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-11"
+   }
+  ],
+  "auto-orykeywordpaged1slug2026-0ezoyxo": [
+   {
+    "file": "auto-orykeywordpaged1slug2026-0ezoyxo/1-2026년-숭실대-직원-추천-장학생-지원서-1.pdf",
+    "name": "2026년-숭실대-직원-추천-장학생-지원서-1.hwp",
+    "pages": 3,
+    "bytes": 141463,
+    "srcBytes": 44544,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-11"
+   },
+   {
+    "file": "auto-orykeywordpaged1slug2026-0ezoyxo/2-2026년-숭실대-노동조합-직원-추천-장학생-선발관련-개인정보제공-동의서.pdf",
+    "name": "2026년-숭실대-노동조합-직원-추천-장학생-선발관련-개인정보제공-동의서.hwp",
+    "pages": 1,
+    "bytes": 92210,
+    "srcBytes": 39424,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-11"
+   }
+  ],
+  "auto-dmodeviewduid53666tpage1": [
+   {
+    "file": "auto-dmodeviewduid53666tpage1/1-Attachment_강의계획서.pdf",
+    "name": "Attachment 강의계획서.pdf",
+    "pages": 0,
+    "bytes": 63745,
+    "srcBytes": 63745,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-11"
+   }
+  ],
+  "auto-4bnum57138cate0qidx57138-1duciyc": [
+   {
+    "file": "auto-4bnum57138cate0qidx57138-1duciyc/1-서식1._국가근로장학생_지원서_학생_.pdf",
+    "name": "서식1. 국가근로장학생 지원서(학생).hwp",
+    "pages": 2,
+    "bytes": 69335,
+    "srcBytes": 54272,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-11"
    }
   ]
  }
