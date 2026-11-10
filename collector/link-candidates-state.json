@@ -95,6 +95,25 @@
   "round": "2026-11-08",
   "nextAt": "2026-11-11"
  },
+ "kosaf|2000053007|https://janghak.gangseo.seoul.kr/sc050101/325152?srchCtgry=&srchStdg=&curPage=&srchKey=&srchText=&srchBeginDt=&srchEndDt=": {
+  "ds": "kosaf",
+  "key": "2000053007",
+  "url": "https://janghak.gangseo.seoul.kr/sc050101/325152?srchCtgry=&srchStdg=&curPage=&srchKey=&srchText=&srchBeginDt=&srchEndDt=",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "title": "2026년 2학기 구민한마음 계속장학금 지급 신청 안내",
+  "firstAt": "2026-11-11",
+  "lastAt": "2026-11-11",
+  "tries": 1,
+  "status": "pending",
+  "why": "못 엶(열기 실패: page.goto: Timeout 20000ms exceeded.) — 다시 봅니다",
+  "checks": {
+   "C": "ok",
+   "L": "unread"
+  },
+  "round": "2026-11-20",
+  "nextAt": "2026-11-12"
+ },
  "kosaf|2000090001|https://info.daegu.go.kr/newshome/mtnmain.php?mtnkey=articleview&mkey=scatelist&mkey2=1&aid=279300": {
   "ds": "kosaf",
   "key": "2000090001",
@@ -290,6 +309,22 @@
   "why": "게시판 목록(0줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-11-23",
+  "nextAt": "2026-11-12"
+ },
+ "kosaf|2000398001|board:https://www.gwangju.go.kr/welfare/boardList.do?boardId=BD_0000000594&pageId=welfare86": {
+  "ds": "kosaf",
+  "key": "2000398001",
+  "url": "",
+  "board": "https://www.gwangju.go.kr/welfare/boardList.do?boardId=BD_0000000594&pageId=welfare86",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "firstAt": "2026-11-11",
+  "lastAt": "2026-11-11",
+  "tries": 1,
+  "status": "pending",
+  "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
+  "checks": {},
+  "round": "2026-11-13",
   "nextAt": "2026-11-12"
  },
  "kosaf|2000423012|https://www.jincheon.go.kr/jcjh/sub.do?menukey=3464&mode=view&no=1076147380": {

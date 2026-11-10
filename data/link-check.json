@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-09T20:28:30.006Z",
+ "updatedAt": "2026-11-10T16:32:50.060Z",
  "v": 1,
  "bad": {
   "https://blog.naver.com/kfdazzang/224463652864": {
@@ -10,20 +10,12 @@
    "v": "gone",
    "at": "2026-11-10"
   },
-  "https://nysc.or.kr/nysc/pages/notice_view.php?id=288": {
-   "v": "other",
-   "at": "2026-11-10"
-  },
   "https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=377067&article.offset=0&articleLimit=10": {
    "v": "gone",
    "at": "2026-10-20"
   },
   "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277033&article.offset=0&articleLimit=10": {
    "v": "gone",
-   "at": "2026-11-10"
-  },
-  "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766573": {
-   "v": "home",
    "at": "2026-11-10"
   },
   "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766596": {
@@ -49,10 +41,6 @@
   "https://www.epeople.go.kr/idea/ex/1AE-2610-0000546/detail.npaid": {
    "v": "other",
    "at": "2026-11-10"
-  },
-  "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367718&article.offset=0&articleLimit=10&no=343": {
-   "v": "other",
-   "at": "2026-11-07"
   },
   "https://www.inha.ac.kr/bbs/kr/8/46024/artclView.do": {
    "v": "other",
