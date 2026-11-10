@@ -3,6 +3,14 @@
  "updatedAt": "2026-11-10",
  "schools": 44,
  "files": {
+  "연세대학교": {
+   "file": "nz3ew5y.json",
+   "count": 50
+  },
+  "연세대학교 미래캠퍼스": {
+   "file": "n1if6uwu.json",
+   "count": 44
+  },
   "동국대학교": {
    "file": "n1or8oiw.json",
    "count": 51
@@ -50,10 +58,6 @@
   "계명대학교": {
    "file": "n1nel147.json",
    "count": 53
-  },
-  "연세대학교 미래캠퍼스": {
-   "file": "n1if6uwu.json",
-   "count": 43
   },
   "동국대학교 WISE캠퍼스": {
    "file": "n2we95k.json",
@@ -110,10 +114,6 @@
   "국민대학교": {
    "file": "n1tasrsl.json",
    "count": 44
-  },
-  "연세대학교": {
-   "file": "nz3ew5y.json",
-   "count": 49
   },
   "충남대학교": {
    "file": "nl1xm19.json",

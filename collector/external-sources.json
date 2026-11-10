@@ -775,12 +775,9 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-27",
-    "why": "최고 2건 (나눔과 섬김의 세상)",
-    "best": {
-     "url": "http://www.seoksung.co.kr/cms/bbs/board.php?bo_table=nanum",
-     "signals": 2
-    }
+    "checkedAt": "2026-11-10",
+    "why": "홈페이지 못 엶 (HTTP 403)",
+    "best": null
    }
   },
   {
