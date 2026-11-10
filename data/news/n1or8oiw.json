@@ -1,7 +1,19 @@
 {
  "school": "동국대학교",
- "updatedAt": "2026-11-09",
+ "updatedAt": "2026-11-10",
  "items": [
+  {
+   "title": "[교수학습혁신센터] **외국인 학생 대상** GROW 프로그램 2차 모집 안내",
+   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766931",
+   "postedAt": "2026-11-10",
+   "postId": "26766931",
+   "kind": "채용",
+   "school": "동국대학교",
+   "campus": "",
+   "src": "d521f12e",
+   "foundAt": "2026-11-10",
+   "thumb": "data/news/img/7a1279ff85845384.webp"
+  },
   {
    "title": "2027학년도 비교과프로그램 수요조사",
    "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766912",
@@ -445,18 +457,6 @@
    "src": "d521f12e",
    "foundAt": "2026-10-13",
    "desc": "안녕하세요. 동국대학교 인문사회융합인재양성사업단(HUSS)입니다. 오는 10월 16일(금)부터 11월 13일(금)까지 매주 금요일 동국대학교 인문사회융합인재양상사업단에서 ‘로컬 인문문화 북토크(부체: 책으로 잇는…"
-  },
-  {
-   "title": "[카운슬링센터][집단상담 홍보]심리극으로 알아보는 나의 연애와 관계, \"연애할때 나는 왜 그럴까?\" 신청 안내 (3회 모두 참여시 마일리지 10점 지급)",
-   "url": "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766573",
-   "postedAt": "2026-10-13",
-   "postId": "26766573",
-   "school": "동국대학교",
-   "campus": "",
-   "src": "d521f12e",
-   "foundAt": "2026-10-13",
-   "thumb": "data/news/img/5c1d268d13ba56f4.webp",
-   "desc": "설레지만 때로는 어려운 연애, 나는 왜 이런 모습일까요? 심리극으로 나의 연애 패턴과 숨겨진 마음을 알아보세요. <참여안내>"
   }
  ]
 }

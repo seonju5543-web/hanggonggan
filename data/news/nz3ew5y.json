@@ -1,7 +1,18 @@
 {
  "school": "연세대학교",
- "updatedAt": "2026-11-09",
+ "updatedAt": "2026-11-10",
  "items": [
+  {
+   "title": "2026 연세노벨위크 문학 심포지엄 모집",
+   "url": "https://www.yonsei.ac.kr/bbs/sc/58/944597/artclView.do",
+   "postedAt": "2026-11-10",
+   "kind": "행사",
+   "school": "연세대학교",
+   "campus": "",
+   "src": "d66b0482",
+   "foundAt": "2026-11-10",
+   "thumb": "data/news/img/6fa531467e11b92c.webp"
+  },
   {
    "title": "일반공지 2027학년도 캠퍼스간 소속변경 전형 요강 신촌/국제",
    "url": "https://www.yonsei.ac.kr/bbs/sc/58/944572/artclView.do",

@@ -1,7 +1,29 @@
 {
  "school": "세종대학교",
- "updatedAt": "2026-11-09",
+ "updatedAt": "2026-11-10",
  "items": [
+  {
+   "title": "웹툰으로 알아보는 상담소 이용 가이드 ①탄 - 대인관계 편",
+   "url": "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=896004&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-10",
+   "school": "세종대학교",
+   "campus": "",
+   "src": "8a741b47",
+   "foundAt": "2026-11-10",
+   "thumb": "data/news/img/50fac44196898300.webp",
+   "desc": "학생생활상담소 안녕하세요, 세종대학교 학생 여러분! 학생생활상담소 입니다. 친구/동아리 관계 갈등, 조별 과제 및 팀 활동에서의 어려움, 혹은 \"내 마음을 말하면 관계가 나빠질까?\" 하는 고민을 해본 적이…"
+  },
+  {
+   "title": "[신청] 26-2 기초학력증진 프로그램 with 풀리캠퍼스 (11/09~12/04)",
+   "url": "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=896003&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-10",
+   "school": "세종대학교",
+   "campus": "",
+   "src": "8a741b47",
+   "foundAt": "2026-11-10",
+   "thumb": "data/news/img/884c8d75a0b637fc.webp",
+   "desc": "교수학습개발센터 기초학력증진 프로그램 with 풀리캠퍼스 기초학력증진 프로그램 with 풀리캠퍼스는 기초 과목(수학, 물리, 화학, 생명과학, 파이썬)에 대해 풀리캠퍼스 진단평가 기반의 개인별 맞춤학습을 제공하여…"
+  },
   {
    "title": "[신청] 26-2 기초학력증진 프로그램 4차 (10/26~11/29)",
    "url": "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=895312&article.offset=0&articleLimit=10",

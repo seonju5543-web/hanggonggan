@@ -1,7 +1,29 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-11-09",
+ "updatedAt": "2026-11-10",
  "items": [
+  {
+   "title": "[학술연구] 제2회 CNU AX포럼 -인문사회 AX 융합교육이 왜 필요하며...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70952",
+   "postedAt": "2026-11-10",
+   "kind": "행사",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-10",
+   "thumb": "data/news/img/b760f0b311a8c82d.webp"
+  },
+  {
+   "title": "[취업정보] [BS한양]신입사원 채용★학교 추천채용(~11.17.(화)까지)",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70951",
+   "postedAt": "2026-11-10",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-10",
+   "thumb": "data/news/img/5edcda0d7b57af29.webp"
+  },
   {
    "title": "[모집공고] [시립청소년미디어센터] 2027년도 UN 청소년 대표단 모집 안내",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70950",
@@ -380,25 +402,6 @@
    "src": "b7347301",
    "foundAt": "2026-10-30",
    "thumb": "data/news/img/51b059d039f11f1e.webp"
-  },
-  {
-   "title": "[채용공고] 2026년 제10회 전남대학교 앵커사업단·제3회 서남권공유대학...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70845",
-   "postedAt": "2026-10-30",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-30"
-  },
-  {
-   "title": "[취업정보] [교재/녹화 제공] 「빅데이터분석기사, 차근차근 실습하기」",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70844",
-   "postedAt": "2026-10-30",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-10-30"
   }
  ]
 }

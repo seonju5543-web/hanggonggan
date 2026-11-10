@@ -1,7 +1,17 @@
 {
  "school": "숙명여자대학교",
- "updatedAt": "2026-11-09",
+ "updatedAt": "2026-11-10",
  "items": [
+  {
+   "title": "[학부] 2027학년도 1학기 전공선택 (2026.12.02 ~ 2026.12.18)",
+   "url": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=95960&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-10",
+   "school": "숙명여자대학교",
+   "campus": "",
+   "src": "72128af9",
+   "foundAt": "2026-11-10",
+   "desc": "학사팀에서는 2027학년도 1학기 전공선택을 아래와 같이 실시하오니, 기한내에 신청 바랍니다."
+  },
   {
    "title": "[2026-겨울계절학기] 본수강신청 및 수강료 납부 안내",
    "url": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=95713&article.offset=0&articleLimit=10",
@@ -33,18 +43,6 @@
    "src": "72128af9",
    "foundAt": "2026-10-12",
    "desc": "※본 공지는 학부생 학점교류 에 대한 안내 공지입니다. 대학원생 학점교류는 대학원 교학팀으로 문의하시기 바랍니다."
-  },
-  {
-   "title": "2027-1 전임교원 공개채용 (2027. 3. 1.자)",
-   "url": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=95425&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-07",
-   "kind": "채용",
-   "school": "숙명여자대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "thumb": "data/news/img/ed2e49f4622fba0c.webp",
-   "desc": "숙명이 세상을 선도하는 글로벌 인재를 양성할 교수님을 모십니다. 2027학년도 1학기 전임교원 공개채용 (2027년 3월 1일 자)",
-   "src": "72128af9"
   }
  ]
 }

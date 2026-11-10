@@ -1,7 +1,28 @@
 {
  "school": "충북대학교",
- "updatedAt": "2026-11-09",
+ "updatedAt": "2026-11-10",
  "items": [
+  {
+   "title": "2026학년도 11월 월간 토론회 진행 안내: 작가의 잘못은 작품의 가치까지 훼손하는가?",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171474&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-11-10",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-11-10",
+   "desc": "(예정) 12월 논제: 플랫폼은 이용자의 범죄에 책임을 져야 하는가? (예정) 1월 논제: 지방 소멸은 막아야 하는가, 받아들여야 하는가? 월간 토론회 참여 방법"
+  },
+  {
+   "title": "2026학년도 동기 계절수업 충청권 다른 대학교 수학 안내(한국교통대)",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171475&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-11-10",
+   "kind": "학사",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-11-10",
+   "desc": "국내 대학간 학술교류 협정에 따라 2026학년도 동기 계절수업 충청권 한국교통대학교 학점교류 수학에 대하여 다음과 같이 안내하오니 수학을 희망하는 학생들은 기한 내 신청하여 주시기 바랍니다."
+  },
   {
    "title": "2027학년도 전기 대학원 계약학과 모집 안내",
    "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171437&pageUnit=10&searchCnd=all&pageIndex=1",
@@ -411,28 +432,6 @@
    "src": "76d254e7",
    "foundAt": "2026-10-21",
    "desc": "충북대학교에서는 공무원임용시험령 제3조 및 제47조에 따라 우수 인재의 공직유치를 위한 국가공무원 경력경쟁채용시험을 다음과 같이 공고하여 시행하오니 많은 응시 바랍니다."
-  },
-  {
-   "title": "2026학년도 동기 계절수업 다른 대학교 수학 안내(강원대, 국립부경대, 숙명여대, 제주대)",
-   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170841&pageUnit=10&searchCnd=all&pageIndex=1",
-   "postedAt": "2026-10-21",
-   "kind": "학사",
-   "school": "충북대학교",
-   "campus": "",
-   "src": "76d254e7",
-   "foundAt": "2026-10-21",
-   "desc": "국내 대학간 학술교류 협정에 따라 2026학년도 동기 계절수업 학점 교류 수학에 대하여 다음과 같이 안내하오니 수학을 희망하는 학생들은 기한 내 신청하여 주시기 바랍니다."
-  },
-  {
-   "title": "충북대학교 학생생활관 계약직(사무원-휴직대체인력) 서류전형 합격자 및 면접시험 일정 공고",
-   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170836&pageUnit=10&searchCnd=all&pageIndex=1",
-   "postedAt": "2026-10-21",
-   "kind": "학사",
-   "school": "충북대학교",
-   "campus": "",
-   "src": "76d254e7",
-   "foundAt": "2026-10-21",
-   "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
   }
  ]
 }

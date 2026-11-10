@@ -1,121 +1,115 @@
-## 🖼 교내 소식 썸네일 리포트 (2026-11-09)
+## 🖼 교내 소식 썸네일 리포트 (2026-11-10)
 
 
-이번 실행: 글 63건을 열어 봤습니다 (67초 · 예산 150초 · 학교당 6건)
+이번 실행: 글 58건을 열어 봤습니다 (107초 · 예산 150초 · 학교당 6건)
 
-**실린 글 1227건 중 사진 489건** · 사진 없음 661건 · 실패(다시 시도) 63건 · 아직 안 봄 14건 — 열어 본 글 가운데 사진이 있던 비율 **43%**
-파일: 바뀐 글 26건 · 지운 그림 10개 (피드에서 빠진 글·사진 빼기)
+**실린 글 1235건 중 사진 496건** · 사진 없음 661건 · 실패(다시 시도) 63건 · 아직 안 봄 15건 — 열어 본 글 가운데 사진이 있던 비율 **43%**
+파일: 바뀐 글 25건 · 지운 그림 17개 (피드에서 빠진 글·사진 빼기)
 
 | 학교 | 글 | 사진 | 없음 | 실패 | 안 봄 | 없는 까닭(많은 순) |
 |---|---|---|---|---|---|---|
-| 부산대학교 | 40 | 15 | 25 | 0 | 0 | 사진으로 쓸 그림 없음 25 |
+| 부산대학교 | 40 | 16 | 21 | 2 | 1 | 사진으로 쓸 그림 없음 21 |
 | 아주대학교 | 40 | 22 | 13 | 5 | 0 | 사진으로 쓸 그림 없음 8 · 글에 그림이 없음 5 |
-| 충북대학교 | 40 | 7 | 32 | 1 | 0 | 글에 그림이 없음 32 |
+| 충북대학교 | 40 | 7 | 31 | 2 | 0 | 글에 그림이 없음 31 |
 | 가톨릭대학교 | 40 | 23 | 15 | 2 | 0 | 글에 그림이 없음 11 · 사진으로 쓸 그림 없음 4 |
 | 서울시립대학교 | 40 | 19 | 21 | 0 | 0 | 사진으로 쓸 그림 없음 21 |
 | 계명대학교 | 40 | 0 | 0 | 40 | 0 |  |
 | 부경대학교 | 40 | 19 | 21 | 0 | 0 | 사진으로 쓸 그림 없음 16 · 글에 그림이 없음 5 |
 | 동국대학교 | 40 | 22 | 18 | 0 | 0 | 사진으로 쓸 그림 없음 17 · 글에 그림이 없음 1 |
 | 조선대학교 | 40 | 26 | 14 | 0 | 0 | 글에 그림이 없음 9 · 사진으로 쓸 그림 없음 5 |
-| 이화여자대학교 | 40 | 6 | 20 | 0 | 14 | 글에 그림이 없음 17 · 사진으로 쓸 그림 없음 3 |
+| 이화여자대학교 | 40 | 6 | 20 | 0 | 14 | 글에 그림이 없음 16 · 사진으로 쓸 그림 없음 4 |
 | 한국방송통신대학교 | 40 | 7 | 31 | 2 | 0 | 글에 그림이 없음 30 · 사진으로 쓸 그림 없음 1 |
 | 성균관대학교 | 40 | 12 | 28 | 0 | 0 | 글에 그림이 없음 23 · 사진으로 쓸 그림 없음 5 |
 | 광운대학교 | 40 | 21 | 19 | 0 | 0 | 사진으로 쓸 그림 없음 19 |
 | 전북대학교 | 40 | 16 | 23 | 1 | 0 | 사진으로 쓸 그림 없음 23 |
 | 인하대학교 | 40 | 20 | 20 | 0 | 0 | 글에 그림이 없음 17 · 사진으로 쓸 그림 없음 3 |
 | 강원대학교 | 40 | 24 | 16 | 0 | 0 | 글에 그림이 없음 14 · 사진으로 쓸 그림 없음 2 |
-| 숭실대학교 | 40 | 9 | 31 | 0 | 0 | 글에 그림이 없음 28 · 사진으로 쓸 그림 없음 3 |
+| 숭실대학교 | 40 | 9 | 31 | 0 | 0 | 글에 그림이 없음 27 · 사진으로 쓸 그림 없음 4 |
 | 경기대학교 | 40 | 5 | 35 | 0 | 0 | 글에 그림이 없음 32 · 사진으로 쓸 그림 없음 3 |
 | 홍익대학교 | 40 | 18 | 22 | 0 | 0 | 글에 그림이 없음 20 · 사진으로 쓸 그림 없음 2 |
-| 전남대학교 | 40 | 16 | 23 | 1 | 0 | 사진으로 쓸 그림 없음 16 · 글에 그림이 없음 7 |
+| 전남대학교 | 40 | 18 | 21 | 1 | 0 | 사진으로 쓸 그림 없음 14 · 글에 그림이 없음 7 |
 | 명지대학교 | 35 | 13 | 21 | 1 | 0 | 글에 그림이 없음 18 · 사진으로 쓸 그림 없음 3 |
 | 서울과학기술대학교 | 34 | 20 | 14 | 0 | 0 | 사진으로 쓸 그림 없음 14 |
+| 경희대학교 | 34 | 15 | 19 | 0 | 0 | 글에 그림이 없음 10 · 사진으로 쓸 그림 없음 9 |
 | 중앙대학교 | 31 | 20 | 11 | 0 | 0 | 글에 그림이 없음 8 · 사진으로 쓸 그림 없음 3 |
-| 경희대학교 | 31 | 14 | 17 | 0 | 0 | 글에 그림이 없음 9 · 사진으로 쓸 그림 없음 8 |
+| 고려대학교 | 31 | 24 | 7 | 0 | 0 | 사진으로 쓸 그림 없음 7 |
 | 한국외국어대학교 | 30 | 12 | 16 | 2 | 0 | 글에 그림이 없음 12 · 사진으로 쓸 그림 없음 4 |
-| 고려대학교 | 30 | 24 | 6 | 0 | 0 | 사진으로 쓸 그림 없음 6 |
-| 충남대학교 | 27 | 10 | 14 | 3 | 0 | 글에 그림이 없음 13 · 사진으로 쓸 그림 없음 1 |
+| 충남대학교 | 27 | 11 | 14 | 2 | 0 | 글에 그림이 없음 13 · 사진으로 쓸 그림 없음 1 |
+| 연세대학교 미래캠퍼스 | 26 | 9 | 17 | 0 | 0 | 글에 그림이 없음 16 · 사진으로 쓸 그림 없음 1 |
 | 한국항공대학교 | 25 | 9 | 16 | 0 | 0 | 글에 그림이 없음 12 · 사진으로 쓸 그림 없음 4 |
-| 연세대학교 미래캠퍼스 | 25 | 9 | 16 | 0 | 0 | 글에 그림이 없음 15 · 사진으로 쓸 그림 없음 1 |
-| 서울대학교 | 18 | 2 | 15 | 1 | 0 | 글에 그림이 없음 13 · 사진으로 쓸 그림 없음 2 |
+| 서울대학교 | 19 | 2 | 16 | 1 | 0 | 글에 그림이 없음 14 · 사진으로 쓸 그림 없음 2 |
 | 서울교육대학교 | 14 | 7 | 7 | 0 | 0 | 글에 그림이 없음 4 · 사진으로 쓸 그림 없음 3 |
+| 연세대학교 | 14 | 2 | 11 | 1 | 0 | 글에 그림이 없음 9 · 사진으로 쓸 그림 없음 2 |
 | 동국대학교 WISE캠퍼스 | 13 | 5 | 7 | 1 | 0 | 글에 그림이 없음 6 · 사진으로 쓸 그림 없음 1 |
 | 건국대학교 | 13 | 0 | 13 | 0 | 0 | 글에 그림이 없음 12 · 사진으로 쓸 그림 없음 1 |
-| 연세대학교 | 13 | 1 | 11 | 1 | 0 | 글에 그림이 없음 9 · 사진으로 쓸 그림 없음 2 |
-| 영남대학교 | 12 | 0 | 11 | 1 | 0 | 글에 그림이 없음 11 |
+| 영남대학교 | 12 | 0 | 12 | 0 | 0 | 글에 그림이 없음 12 |
 | 상명대학교 | 12 | 12 | 0 | 0 | 0 |  |
-| 국민대학교 | 12 | 7 | 4 | 1 | 0 | 사진으로 쓸 그림 없음 4 |
 | 한양대학교 | 11 | 5 | 6 | 0 | 0 | 글에 그림이 없음 5 · 사진으로 쓸 그림 없음 1 |
+| 국민대학교 | 11 | 7 | 4 | 0 | 0 | 사진으로 쓸 그림 없음 4 |
 | 고려대학교 세종캠퍼스 | 10 | 2 | 8 | 0 | 0 | 글에 그림이 없음 5 · 사진으로 쓸 그림 없음 3 |
+| 세종대학교 | 8 | 5 | 3 | 0 | 0 | 글에 그림이 없음 2 · 사진으로 쓸 그림 없음 1 |
 | 가천대학교 | 8 | 0 | 8 | 0 | 0 | 글에 그림이 없음 8 |
 | 서강대학교 | 7 | 6 | 1 | 0 | 0 | 사진으로 쓸 그림 없음 1 |
-| 세종대학교 | 6 | 3 | 3 | 0 | 0 | 글에 그림이 없음 2 · 사진으로 쓸 그림 없음 1 |
 | 경북대학교 | 6 | 0 | 6 | 0 | 0 | 사진으로 쓸 그림 없음 6 |
-| 숙명여자대학교 | 4 | 1 | 3 | 0 | 0 | 글에 그림이 없음 3 |
+| 숙명여자대학교 | 4 | 0 | 4 | 0 | 0 | 글에 그림이 없음 4 |
 
 ### 이번 실행에 연 글
 
-- 서울과학기술대학교 · [대외협력처] 공릉동 소상공인 스탬프 투어 이벤트 경품 추첨 당첨자 발표 — — 없음 (사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림) · body: 여러 글에 같은 그림(공통 그림) · body: 여러 글에 같은 그림(공통 그림)))
-- 서강대학교 · [교수학습센터] 서강 K-MOOC 토크콘서트 행사 안내 (11/17~11 — ✅ body (891×1260 → 18KB · data/news/img/130f65c9321f32bd.webp ← https://www.sogang.ac.kr/dataview/board/142/22b8fc6a-fff7-4afc-a537-83717271186a.jpg)
-- 영남대학교 · 2026학년도 2학기 학부생 등록금 4/4회 분할납부 안내 — — 없음 (글에 그림이 없음)
-- 충북대학교 · 2027학년도 전기 대학원 계약학과 모집 안내 — — 없음 (글에 그림이 없음)
-- 한국외국어대학교 · (서울) 2026년도 후반기 학생예비군 기본 3차훈련(안내) — — 없음 (글에 그림이 없음)
-- 서울시립대학교 · [고시반] 2026년 행정고시 기술고시 합격자와의 만남 신청 안내 — — 없음 (사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림)))
-- 중앙대학교 · [학생생활상담센터(다빈치)] '2026학년도 e-Class 예방교육' 안 — ✅ body (1782×2520 → 14KB · data/news/img/2e65d056371783d9.webp ← http://www.cau.ac.kr/attach/images/000309/%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C.png)
-- 연세대학교 미래캠퍼스 · [무료교육] 모두의 창업 제조창업 메이커교육 모집 — ✅ body (1021×1440 → 19KB · data/news/img/fd1e72e967077777.webp ← https://mirae.yonsei.ac.kr/CrossEditor/binary/images/000018/1794200488.8607.png)
+- 숙명여자대학교 · [학부] 2027학년도 1학기 전공선택 (2026.12.02 ~ 2026 — — 없음 (글에 그림이 없음)
+- 서울과학기술대학교 · [메이커] 3D프린터 장비교육 — ✅ body (424×600 → 10KB · data/news/img/c22fa018ecc1a612.webp ← https://www.seoultech.ac.kr/storage/www/ckfinder/images/A596C830601840B58EFAF7B4E52F53C8.png)
+- 연세대학교 미래캠퍼스 · 일반공지 2026년도 미래캠퍼스 위험성평가 실시 안내 신촌/국제 — — 없음 (글에 그림이 없음)
+- 서울시립대학교 · (신청연장: 30명)_[자유전공학부 OTS 개최] 자유전공학부 진학대상  — ✅ body (891×1260 → 19KB · data/news/img/9261e809dcc29237.webp ← https://libe.uos.ac.kr/webdata/upimages/3c6z181z8eez309z1d0z25fzd61z05fz0c3z08dz7f.jpg)
+- 계명대학교 · [앵커 2-4] 참여기업 맞춤형 특화교육프로그램 교육생 3차 모집 안내 — ⚠️ 실패 (글 화면에 그 글의 제목이 없음 — 다음에 다시 (받은 화면: 「계명대학교 - 열린마당 > 공지사항 > 일반」 · 57057자 · utf-8 · https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271862&pa)
+- 부산대학교 · [도서관] 도서관에 하고 싶었던 이야기! 2026 이용자 만족도 조사(~ — ✅ body (2673×3780 → 15KB · data/news/img/b1fa5bb45196f2da.webp ← https://www.pusan.ac.kr/_UPLOAD/IMAGE/Board/images/000135/2026%EB%85%84_%EB%8F%84%EC%84%9C%EA%B4%80_%EC)
+- 동국대학교 · [교수학습혁신센터] **외국인 학생 대상** GROW 프로그램 2차 모집 — ✅ body (800×1150 → 21KB · data/news/img/7a1279ff85845384.webp ← https://www.dongguk.edu/cmmn/fileView?path=/ckeditor//GENERALNOTICES&physical=1794274884638.png&contentT)
+- 이화여자대학교 · [공사/일반경쟁][대혁]국제교육관 흡수식 냉온수기 교체 공사 — — 없음 (글에 그림이 없음)
+- 세종대학교 · 웹툰으로 알아보는 상담소 이용 가이드 ①탄 - 대인관계 편 — ✅ body (2400×1569 → 37KB · data/news/img/50fac44196898300.webp ← https://www.sejong.ac.kr/_attach/sejong/editor-image/2026/11/nPCSzglMWLLRNvbYmhTZLzTCvM.png)
+- 충북대학교 · 2026학년도 11월 월간 토론회 진행 안내: 작가의 잘못은 작품의 가치 — ⚠️ 실패 (잠깐의 실패로 사진을 못 받음 (body: 받기 실패 (TimeoutError: 23)))
+- 성균관대학교 · AI응용공학과(일반대학원) 2027학년도 전기 수시 1차 대학원 신입생  — ✅ body (758×1069 → 26KB · data/news/img/fcab717b905564d5.webp ← https://www.skku.edu/_attach/image/2026/11/huDzmROvRcaPMjbJKNfV.jpg)
+- 경희대학교 · 공통 [교육혁신사업단] 2026년 제3회 융합과 혁신: 학부 연구생 학술 — ✅ body (1414×2000 → 14KB · data/news/img/f10274f8a8f14899.webp ← http://www.khu.ac.kr/upload/cross/images/000070/%EC%A0%9C%EB%AA%A9_%EC%97%86%EB%8A%94_%EB%94%94%EC%9E%9)
+- 광운대학교 · [일반] [교육혁신원] 2026학년도 2학기 다전공 수요조사 참여 안내  — — 없음 (사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림)))
+- 전북대학교 · 2026학년도 2학기 Adobe 생성형 AI 활용 교육 안내 — ✅ body (891×1260 → 14KB · data/news/img/34e823af85c7a8af.webp ← https://www.jbnu.ac.kr/common/file.do?file=tKv0XGe/F+JXZoXY4vvLE1wK+sOzheas6WKq8TBwanmj+Xp9gfxNdYBNfLAFA)
+- 서울대학교 · [2026. 겨울학기] 대학영어 교과목 수강부적격자 1차 (11/10 출 — — 없음 (글에 그림이 없음)
+- 숭실대학교 · 비교과·행사 2026학년도 숭실대학교 캠퍼스 사진공모전 [가을] 심사 결 — — 없음 (사진으로 쓸 그림 없음 (body: 글자뿐인 문서 그림 (흰 바탕 94% · 색 0%)))
+- 홍익대학교 · (서울) 건강진료센터 2026-2 심폐소생술 교육 안내(학생)(봉사시간  — — 없음 (글에 그림이 없음)
+- 경기대학교 · [입학에서 취업까지] 「인권과 성평등교육」 이수 공지 — — 없음 (글에 그림이 없음)
+- 고려대학교 · [교직이수] 2026학년도 서울캠퍼스 교직이수 신청 공고 및 유의사항 안 — — 없음 (사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림) · body: 여러 글에 같은 그림(공통 그림) · body: 여러 글에 같은 그림(공통 그림)))
+- 연세대학교 · 2026 연세노벨위크 문학 심포지엄 모집 — ✅ body (1821×2576 → 16KB · data/news/img/6fa531467e11b92c.webp ← https://www.yonsei.ac.kr/CrossEditor/binary/images/000018/nobelweek_poster_kr.jpg)
+- 전남대학교 · [학술연구] 제2회 CNU AX포럼 -인문사회 AX 융합교육이 왜 필요하 — ✅ body (1278×1742 → 14KB · data/news/img/b760f0b311a8c82d.webp ← https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/byteToImage.aspx?key=2591241)
+- 한국외국어대학교 · 세미오시스 연구센터, <2026 해외학자 초청강연> 개최 안내 — ⚠️ 실패 (글 화면에 그 글의 제목이 없음 — 다음에 다시 (받은 화면: 「한국외국어대학교」 · 12178자 · UTF-8 · https://www.hufs.ac.kr/bbs/hufs/2180/271204/artclView.do))
+- 영남대학교 · [연세대학교] 2026학년도 겨울 계절학기 학점교류 안내(2026.11. — — 없음 (글에 그림이 없음)
+- 가톨릭대학교 · [기숙사운영센터] 2026학년도 동계방학 프란치스코관 모집공고 2026学 — ⚠️ 실패 (후보가 많아 다 못 열어 봄 — 공통 그림을 알게 된 뒤 다시 (body: 글자뿐인 문서 그림 (흰 바탕 93% · 색 5%) · body: 글자뿐인 문서 그림 (흰 바탕 94% · 색 4%) · body: 글자뿐인 문서 그림 (흰 바탕 95% · 색 4%)))
+- 충남대학교 · 2026년 충남대학교 진로취업 서비스 향상을 위한 조사 안내 — ✅ attach (891×1260 → 22KB · data/news/img/1dc78e8eede56b68.webp ← https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0701&ntt_no=2516189&atch_no=1)
+- 국민대학교 · [차세대통신사업단] 2026학년도 2학기 마이크로디그리 사전 이수 신청  — ✅ body (793×1121 → 14KB · data/news/img/6777cd971c4934b1.webp ← https://cms.kookmin.ac.kr/_attach/kookmin/editor-image/2026/10/cJNCLsIVeUdCCsRGgqQkdbuRew.jpg)
 - 계명대학교 · 제15회「계명토론대회」 — ⚠️ 실패 (글 화면에 그 글의 제목이 없음 — 다음에 다시 (받은 화면: 「계명대학교 - 열린마당 > 공지사항 > 일반」 · 57037자 · utf-8 · https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=0&pageOrd)
-- 서울교육대학교 · 『SNUE 피클볼 페스티벌_ 지역사회의 건강을 디자인하다!』 참가 신청 — ✅ body (891×1260 → 25KB · data/news/img/c3a8204faadf45a2.webp ← https://portal.snue.ac.kr/editor/xFree/upload/20261109/IMG_111428.png)
-- 부산대학교 · '원자력 Job담' 공공기관 취업박람회 안내(11/11, 12시... — ✅ body (1587×2245 → 22KB · data/news/img/4b642c04174211ad.webp ← https://www.pusan.ac.kr/_UPLOAD/IMAGE/Board/images/000135/%EC%9B%90%EC%9E%90%EB%A0%A5ETU_JOB%EB%8B%B4_%)
-- 동국대학교 · 2027학년도 비교과프로그램 수요조사 — ✅ body (891×1260 → 17KB · data/news/img/86c450d41162ffbb.webp ← https://www.dongguk.edu/cmmn/fileView?path=/ckeditor//GENERALNOTICES&physical=1794192269685.png&contentT)
-- 한국방송통신대학교 · [일반] 증명서비스 시스템 부분 오픈 안내 (전체 오픈 : 11.10 9 — — 없음 (글에 그림이 없음)
-- 성균관대학교 · 디지털교육혁신원 교육혁신팀 자체계약직원(PD 및 디자이너) 채용 공고 ( — — 없음 (글에 그림이 없음)
-- 이화여자대학교 · [채용] 이화여자대학교 멀티스케일 물질 및 시스템 연구소(IMMS) 학부 — ✅ body (1129×1597 → 32KB · data/news/img/ff7cf3a2938eb13b.webp ← https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEZsgnAjgWwEoGUDGApANgQ0wDcBVACwBMBXAZypIDtEA6A)
-- 광운대학교 · [일반] 기간제 계약직원 채용 공고(상담복지정책대학원 교학팀) — — 없음 (사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림)))
-- 조선대학교 · [취업전략팀] 2026 전남광주 글로벌 커리어 박람회 개최 안내 — ✅ body (4000×5658 → 17KB · data/news/img/28aa3e9a51c2b576.webp ← https://www3.chosun.ac.kr/editorUpload/images/000298/%ED%8F%AC%EC%8A%A4%ED%84%B0.jpg)
-- 전북대학교 · 2026학년도 동계 J-ABLE 참여 학생 글로벌 역량 강화 프로그램(해 — ✅ body (4000×4000 → 21KB · data/news/img/8b31327a2a0be09c.webp ← https://www.jbnu.ac.kr/common/file.do?file=5sivGGTTD9M6WL/S6M9unumEnGRv/plDtYyjS0bPgA6MprfATvdEe405QCyi)
-- 숭실대학교 · 비교과·행사 2026학년도 2학기 진로취업센터 공공인재양성반 모집 안내( — — 없음 (글에 그림이 없음)
-- 건국대학교 · 전공유연화 교육과정 우수사례 공모 추가모집 안내 (소단위전공·자기설계전공 — — 없음 (글에 그림이 없음)
+- 서울시립대학교 · [의사소통교실] 2026학년도 2학기 국어 글쓰기 상담 재안내(상담은!  — ✅ body (1080×1920 → 16KB · data/news/img/0c1d91fa8bd98723.webp ← https://file.uos.ac.kr/upload/smarteditor/2026/11/20261110113929.jpg)
+- 이화여자대학교 · [급구] 2026년 2학기 이화상점.학관카페 아르바이트 모집 — — 없음 (글에 그림이 없음)
+- 한국방송통신대학교 · [일반] 2026년 제8차 서울시복지재단 장애인 자립지원 포럼 개최 안내 — ⚠️ 실패 (잠깐의 실패로 사진을 못 받음 (attach: 받기 실패 (TimeoutError: 23)))
+- 부산대학교 · 2026학년도 2학기 교양교육 만족도 조사 실시 안내 — ✅ body (1920×1080 → 16KB · data/news/img/22880f57e437a225.webp ← http://culedu.pusan.ac.kr/editorFile/images/000185/%EA%B5%90%EC%96%91%EA%B5%90%EC%9C%A1_%EB%A7%8C%EC%A1)
+- 충북대학교 · 2026학년도 동기 계절수업 충청권 다른 대학교 수학 안내(한국교통대) — — 없음 (글에 그림이 없음)
+- 세종대학교 · [신청] 26-2 기초학력증진 프로그램 with 풀리캠퍼스 (11/09~ — ✅ body (1191×1684 → 16KB · data/news/img/884c8d75a0b637fc.webp ← https://www.sejong.ac.kr/_attach/sejong/editor-image/2026/11/tRywbCiorMdhmrObhdJXGiJwVL.jpg)
+- 성균관대학교 · [HUSS] 사회문제 해결 창업 프로젝트: 2026-2027 EF 헐트프 — ✅ body (1191×1684 → 10KB · data/news/img/1eed00774912d096.webp ← https://www.skku.edu/_attach/image/2026/11/xoukspwJAqJeKMVqHkcZ.png)
+- 경희대학교 · 공통 [추천채용] [이삼오구] 커머스 마케터 전환형 인턴 추천채용 — — 없음 (사진으로 쓸 그림 없음 (body: 글자뿐인 문서 그림 (흰 바탕 91% · 색 5%) · body: 글자뿐인 문서 그림 (흰 바탕 95% · 색 3%)))
+- 광운대학교 · [시설] 2026학년도 동절기 난방 운영을 아래와 같이 안내 하오니 참고 — ✅ body (992×1403 → 11KB · data/news/img/9095dc7095c9d380.webp ← https://www.kw.ac.kr/KWData/webeditor/2026/2026_11_10_092152.jpg)
+- 전북대학교 · [최종/ 법정의무교육] 2026 하반기 장애 인식 개선 전문강사 초빙교육 — ✅ body (1191×1684 → 18KB · data/news/img/eb54e1836d335932.webp ← https://www.jbnu.ac.kr/common/file.do?file=tKv0XGe/F+JXZoXY4vvLE4Yv4vOirVYMXBspiAjZLLgrWZQ4xnVupQHh55NX)
+- 연세대학교 · 2026 연세노벨위크 모집 — ⚠️ 실패 (글 화면에 그 글의 제목이 없음 — 다음에 다시 (받은 화면: 「Yonsei University」 · 8248자 · UTF-8 · https://www.yonsei.ac.kr/bbs/sc/58/944571/artclView.do))
 - 서울대학교 · 2027학년도 예비대학(입학전교육) 신청 안내 — ⚠️ 실패 (글 화면에 그 글의 제목이 없음 — 다음에 다시 (받은 화면: 「공지사항 - 서울대학교 학부대학」 · 211804자 · UTF-8 · https://snuc.snu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/?mod=document&uid=943))
-- 홍익대학교 · 세종캠퍼스 전산 서비스 일시 중단 안내 — — 없음 (글에 그림이 없음)
-- 경기대학교 · [일반] 2026 「인권과 성평등교육」실시 및 미이수자 이수독려 안내 — — 없음 (글에 그림이 없음)
-- 전남대학교 · [모집공고] [시립청소년미디어센터] 2027년도 UN 청소년 대표단 모집 — ✅ body (670×947 → 31KB · data/news/img/fc75fb8a98e4558b.webp ← https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/byteToImage.aspx?key=2591180)
-- 서울과학기술대학교 · [학생상담센터] 2026학년도 2학기 마음나눔 카페 '오늘, 커피한잔'  — — 없음 (사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림) · body: 여러 글에 같은 그림(같은 파일) · body: 여러 글에 같은 그림(공통 그림)))
-- 가천대학교 · 일반휴학 “자동휴학연장제도” 시행안내 — — 없음 (글에 그림이 없음)
-- 한국외국어대학교 · 세미오시스 연구센터, <2026 해외학자 초청강연> 개최 안내 — ⚠️ 실패 (글 화면에 그 글의 제목이 없음 — 다음에 다시 (받은 화면: 「한국외국어대학교」 · 11629자 · UTF-8 · https://www.hufs.ac.kr/bbs/hufs/2180/271204/artclView.do))
-- 충남대학교 · 2026년 충남대학교 진로취업 서비스 향상을 위한 조사 안내 — ⚠️ 실패 (잠깐의 실패로 사진을 못 받음 (attach: 받기 실패 (TimeoutError: 23)))
-- 중앙대학교 · 2026-2학기 재학생 분할등록(4차) 안내 — — 없음 (글에 그림이 없음)
-- 서울시립대학교 · [산학협력단] 2026 제5회 AI 스마트워크톤 참가 안내(~11/15) — ✅ body (896×1755 → 21KB · data/news/img/8612679eef9d3da4.webp ← https://file.uos.ac.kr/upload/smarteditor/2026/11/20261109155833.png)
+- 한국외국어대학교 · 2026 로컬 크리에이터 양성 교육 수강생 모집 — ⚠️ 실패 (글 화면에 그 글의 제목이 없음 — 다음에 다시 (받은 화면: 「관리모드 &gt; 알림메세지」 · 6951자 · UTF-8 · https://www.hufs.ac.kr/bbs/hufs/2180/269907/artclView.do))
+- 홍익대학교 · [세종앵커사업단] 하반기 찾아가는 세종한두리캠퍼스 홈페이지 가입 이벤트  — ✅ body (1193×1686 → 17KB · data/news/img/9c671958f9d684ca.webp ← https://www.hongik.ac.kr/cms/plugin/editorImage.do?$cms$EwBmDYHoEZshDAUgCQF4HsDSiDuBXAZQC0AbAWwNQEUAjEg)
 - 계명대학교 · [인권센터] 계명대학교 학부생 및 대학원생 대상 인권실태조사 안내 — ⚠️ 실패 (글 화면에 그 글의 제목이 없음 — 다음에 다시 (받은 화면: 「계명대학교 - 열린마당 > 공지사항 > 일반」 · 57057자 · utf-8 · https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271848&pa)
-- 부산대학교 · [종합교원양성센터] 2026학년도 2학기 AI·디지털 역량 강화 교육 참 — — 없음 (사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림)))
-- 서울교육대학교 · [시설팀]실내테니스장 신축공사 관련 중장비 출입 안내 — — 없음 (글에 그림이 없음)
+- 전남대학교 · [취업정보] [BS한양]신입사원 채용★학교 추천채용(~11.17.(화)까 — ✅ body (850×1202 → 10KB · data/news/img/5edcda0d7b57af29.webp ← https://capd.jnu.ac.kr/Common/byteToImage.aspx?Seq=648870&USECD=H09051)
+- 성균관대학교 · 2026학년도 제16회 성균토론대회 개최 안내(접수마감: 11월 27일) — ✅ body (1587×2245 → 19KB · data/news/img/801ae2589aec486b.webp ← https://www.skku.edu/_attach/image/2026/11/RlJZBLcdBoJKQgtTGdnG.png)
+- 경희대학교 · 공통 [단국대학교부속 소프트웨어고등학교] 2026학년도 교육 봉사 학생  — — 없음 (글에 그림이 없음)
+- 이화여자대학교 · [공연문화연구센터] 11/13(금) 15시 「해외 초청 명사 강연: 샘  — ✅ body (1200×1697 → 18KB · data/news/img/6eba4e3bbe8f8a2a.webp ← https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEYUgLAEgNQB4GECeAtAsu5AGQFsAzAJ1QFcAhdADQCUA6A)
+- 전북대학교 · [국제협력과] 2026 JBNU in Shanghai 프로그램 운영 취소 — — 없음 (사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림)))
+- 계명대학교 · 2026학년도 2학기 K-STAR S단계 2차 통과자 및 3차 면접심사  — ⚠️ 실패 (글 화면에 그 글의 제목이 없음 — 다음에 다시 (받은 화면: 「계명대학교 - 열린마당 > 공지사항 > 일반」 · 57057자 · utf-8 · https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271794&pa)
+- 전남대학교 · [취업정보] [JOB FESTA]📢 2026 전남대학교 JOB FEST — ⚠️ 실패 (글 화면에 그 글의 제목이 없음 — 다음에 다시 (받은 화면: 「런타임 오류」 · 3332자 · utf-8 · https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&ke))
+- 성균관대학교 · 법학전문대학원 글로벌 커머셜 공개과정 운영 조교 모집 — — 없음 (글에 그림이 없음)
+- 부산대학교 · [위스콘신대학교] University of Wisconsin-Stout  — ✅ body (1587×2245 → 22KB · data/news/img/24629090c3a96f10.webp ← https://www.pusan.ac.kr/_UPLOAD/IMAGE/Board/images/000135/2027_Winter_%EB%AF%B8%EA%B5%AD_%EC%9C%84%EC%8)
 - 충북대학교 · 『도서관 속 미술관』 개최 안내 — ⚠️ 실패 (잠깐의 실패로 사진을 못 받음 (body: 받기 실패 (TimeoutError: 23)))
-- 동국대학교 · [창업교육센터] 겨울방학 집중 창업지원 '2026 루트업(ROOT-UP) — ✅ body (1086×1536 → 23KB · data/news/img/2f34278c6625d630.webp ← https://www.dongguk.edu/cmmn/fileView?path=/ckeditor//GENERALNOTICES&physical=1794210121526.png&content)
-- 성균관대학교 · 문과대학 사학과 행정조교 모집 — — 없음 (글에 그림이 없음)
-- 이화여자대학교 · [채용] 이화여자대학교 사회과학대학 행정실 계약직원(육아휴직대체) 모집: — — 없음 (글에 그림이 없음)
-- 전북대학교 · 2026 순창코리아떡볶이페스타 행사 홍보 협조 요청 — ✅ body (329×479 → 18KB · data/news/img/aa46bf6b49cf94d6.webp ← https://www.jbnu.ac.kr/common/file.do?file=5sivGGTTD9M6WL/S6M9unjKWrVb4KYtznlb38KPeMVFG3BK/jvPZol1l87TKQo)
-- 광운대학교 · [학사] 2026학년도 동계 계절수업(브릿지학기제) 수강신청 안내 — ✅ attach (1080×2160 → 6KB · data/news/img/a9ba5d3866a66537.webp ← https://www.kw.ac.kr/include/Download.jsp?fuid=35536&ano=53634)
-- 숭실대학교 · 외국인유학생 [나의 대학생활 적응 상태는?] 온라인 검사 참여 안내 — — 없음 (글에 그림이 없음)
-- 건국대학교 · 2027학년도 1학기 수강신청 운영 절차 변경 안내 — — 없음 (글에 그림이 없음)
-- 한국방송통신대학교 · [일반] (11~12월) 재학생 대사증후군 검사 실시 안내 — — 없음 (사진으로 쓸 그림 없음 (attach: 여러 글에 같은 그림(같은 파일 · 1글)))
-- 한국방송통신대학교 · url:https://www.knou.ac.kr/bbs/knou/51/8 — ↩️ 되돌림 (썸네일이 여러 글의 공통 그림이었음 — 다시 찾음)
-- 중앙대학교 · [디지털교육지원센터] 2026학년도 디지털배지 체험 이벤트 개최 안내 — ✅ body (700×989 → 26KB · data/news/img/e70939c201371124.webp ← https://www.cau.ac.kr/attach/images/000344/%EB%94%94%EC%A7%80%ED%84%B8%EB%B0%B0%EC%A7%80_%EC%B2%B4%ED%97%)
-- 홍익대학교 · [세종앵커사업단] 3차원 이미징 기술 이론 및 실습 비교과 프로그램 신청 — ✅ body (794×1122 → 15KB · data/news/img/e502336b3b1806c2.webp ← https://www.hongik.ac.kr/cms/plugin/editorImage.do?$cms$EwBmDYHoEZsgxAFgOwHIFsBuBzAhgRXgAV4BRAd0wA8BNAY3)
-- 서울과학기술대학교 · 첨단연구동(가칭) 건물 명칭 공모 — ✅ body (1090×761 → 24KB · data/news/img/274d2b9c932c4608.webp ← https://www.seoultech.ac.kr/storage/www/ckfinder/images/BC1BC4DF228E45FBB6AEEF8470C20661.png)
-- 경기대학교 · [일반] [모집] 한국청소년재단 "사랑의 몰래산타 대작전 21기 모집" — ✅ body (2398×3384 → 32KB · data/news/img/53ee46e27f989b68.webp ← https://www.kyonggi.ac.kr/DATA/bbs/1073/20261109114700425_V0g4.jpg)
-- 충북대학교 · 충북대학교 초빙교원 채용공고(공과대학 도시공학과) — — 없음 (글에 그림이 없음)
-- 이화여자대학교 · [공사용역/일반경쟁]건축물 외부 마감재 안전점검 용역(2차) — — 없음 (글에 그림이 없음)
-- 성균관대학교 · 수원 전입 초기 청년 네트워킹 프로그램 행사 안내 — ✅ body (842×1191 → 21KB · data/news/img/5321a0207d28d736.webp ← https://www.skku.edu/_attach/image/2026/11/dDVgEeLhgnIJaonOUONo.png)
-- 광운대학교 · [국제학생] [글로벌전략팀] 2027 롯데그룹 외국인 유학생 채용연계형  — — 없음 (사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림)))
-- 전북대학교 · 2026회계연도 제3회 전북대학교 재정위원회 소집 공고 — — 없음 (사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림)))
-- 부산대학교 · 📣 2026 부산대 교육수요자 만족도 조사 참여 안내(PCSI) — ✅ body (1800×1800 → 15KB · data/news/img/3beebd5bffa3b29b.webp ← https://cea.pusan.ac.kr/dext5editordata/2026/11/20261109_153355518_04700.png)
-- 이화여자대학교 · [공사/일반경쟁][대혁]조형예술관 C동 흡수식 냉온수기 및 온수보일러 교 — — 없음 (글에 그림이 없음)
-- 건국대학교 · 2026학년도 동계 계절학기 본수강신청 안내 — — 없음 (글에 그림이 없음)
-- 서울과학기술대학교 · 2027학년도 직장어린이집(SeoulTech어린이집) 수요조사 실시 안내 — — 없음 (사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림) · body: 가로세로가 치우침 (1051×184 · 띠 배너로 보임) · body: 여러 글에 같은 그림(공통 그림)))
-- 성균관대학교 · 2027학년도 외국인 특별전형 학사과정 입시 업무 보조 단기근로(아르바이 — — 없음 (글에 그림이 없음)
-- 중앙대학교 · 2026학년도 학생성장진단 및 Neo-다빈치 핵심역량진단 참여 이벤트 안 — ✅ body (700×1248 → 16KB · data/news/img/3482c79e6fd0f6a5.webp ← https://www.cau.ac.kr/attach/images/000344/%EB%B6%99%EC%9E%84_1._2026_%EC%A7%84%EB%8B%A8_%EC%B0%B8%EC%97)
-- 광운대학교 · [일반] [학생상담실] "다시 시작하고 싶은데, 어디서부터 해야 할지 모 — ✅ body (891×1260 → 12KB · data/news/img/a20f9655e0f86932.webp ← https://www.kw.ac.kr/KWData/webeditor/2026/2026_11_09_120439.png)
-- 이화여자대학교 · [총무팀] 명예박사 학위수여식 개최에 따른 차량 통제 안내 (11. 11 — ✅ body (468×469 → 13KB · data/news/img/0e464e24c59b60b8.webp ← https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEZsgTAmgEQOoCsBqBBAUgBwDcAFAJ3gEMBLAMwGUAbARwEkA)
-- 이화여자대학교 · ECC 네트워크 서비스 간헐적 중지(11월 29일(일) 9시 ~ 12시) — — 없음 (글에 그림이 없음)
-- 전북대학교 · 2026년 전북대학교 글로컬대학 온라인 비교과 교육콘텐츠 공유 및 수강  — ✅ body (639×847 → 21KB · data/news/img/b82ed0d02510dbcb.webp ← https://www.jbnu.ac.kr/common/file.do?file=SOzyKJVVb1uY5Esnd73KGhTp4LodgfRwJA8Bdv1J0P2n7XLlN2KIOLiDiFOeUq)
-- 광운대학교 · [일반] [초빙공고]2026학년도 2학기 산학협력단 산학협력중점교수 초빙 — ✅ body (673×242 → 18KB · data/news/img/d68966f6febe6476.webp ← https://iacf.kw.ac.kr/upfile/summernote/S261109095829.png)
-- 전북대학교 · [행복드림] '2027 연력 드로잉' 원데이 클래스 프로그램 안내 — ✅ body (1080×3240 → 15KB · data/news/img/d196ca9a9bca58f3.webp ← https://www.jbnu.ac.kr/common/file.do?file=JTtlu4xlADtNHi+YLwZgH56RhEJEriE5Hut+5zCOpI1UhitgOyQRPm+Ka9yl)
+- 이화여자대학교 · [출판문화원 신간안내] <성서, 오늘에 답하다: 혐오의 시대, 성서를 통 — — 없음 (사진으로 쓸 그림 없음 (body: 가로세로가 치우침 (709×4583 · 띠 배너로 보임)))
+- 부산대학교 · [시립청소년미디어센터] 2027년도 UN 청소년 대표단 모집 안내 — ✅ body (1190×1684 → 30KB · data/news/img/10b5538ca11e50ca.webp ← https://www.pusan.ac.kr/_UPLOAD/IMAGE/Board/images/000135/%EB%B6%99%EC%9E%842._2027%EB%85%84%EB%8F%84_U)
+- 이화여자대학교 · [이수매니지먼트] 관리자 채용 공고 — — 없음 (글에 그림이 없음)
+- 이화여자대학교 · [이화정치연구소] 미국 국제대학원 입학 Information Sessio — ✅ body (1200×1552 → 15KB · data/news/img/413ea9231a1b8caa.webp ← https://cmsfox.ewha.ac.kr/_attach/ewha/editor-image/2026/11/luXckSeYqdIdhgQnhVDCIaoRsH.png)
+- 부산대학교 · [효원상담원] 찬바람 같은 스트레스로부터 나를 지켜줄 심리기술훈련 7차  — ⚠️ 실패 (잠깐의 실패로 사진을 못 받음 (body: 여러 글에 같은 그림(공통 그림) · body: 여러 글에 같은 그림(같은 파일) · attach: 받기 실패 (TimeoutError: 23)))
+- 부산대학교 · [앵커사업] 2026-2 글로벌 스타트업 인큐베이터 실리콘밸리 편 학생모 — ⚠️ 실패 (잠깐의 실패로 사진을 못 받음 (body: 여러 글에 같은 그림(공통 그림) · attach: 받기 실패 (TimeoutError: 23)))

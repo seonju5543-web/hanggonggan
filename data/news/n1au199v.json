@@ -1,7 +1,30 @@
 {
  "school": "서울시립대학교",
- "updatedAt": "2026-11-09",
+ "updatedAt": "2026-11-10",
  "items": [
+  {
+   "title": "(신청연장: 30명)_[자유전공학부 OTS 개최] 자유전공학부 진학대상 학부(과) 소속 재학생을 초청합니다.",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31795&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-10",
+   "postId": "31795",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-10",
+   "thumb": "data/news/img/9261e809dcc29237.webp",
+   "desc": "자유전공학부 자유전공학부가 우리대학 재학생을 초대합니다 2026년 자유전공학부 재학생이 우리대학 전공에 대해 탐색할 수 있도록, 많은 참여와 지원을 보내준 서울시립대학교 재학생 여러분을 초대하여 감사의 마음으로…"
+  },
+  {
+   "title": "[의사소통교실] 2026학년도 2학기 국어 글쓰기 상담 재안내(상담은! 쓰기전부터!)",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31819&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-10",
+   "postId": "31819",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-10",
+   "thumb": "data/news/img/0c1d91fa8bd98723.webp"
+  },
   {
    "title": "[고시반] 2026년 행정고시 기술고시 합격자와의 만남 신청 안내",
    "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31791&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
@@ -442,30 +465,6 @@
    "foundAt": "2026-10-26",
    "thumb": "data/news/img/1f69ced34da9e8a6.webp",
    "desc": "< 자유열람실 ( 좌석 , 스터디룸 ) 자율배석 운영 안내 > ※ 운영기간 : 10 월 27 일 ( 화 ) 13:00 ~ 10 월 30 일 ( 금 ) 18:00 서버 보안 (PHP) 취약점 긴급 조치 작업으로 인해…"
-  },
-  {
-   "title": "★누구나 참여 가능★ [세무학과 : 진로탐색 프로그램 안내] 회계·세무·법 분야 현직자의 진짜 일과 진로 이야기",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31722&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-26",
-   "postId": "31722",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/95aab17cf9d96dad.webp",
-   "desc": "□ 기 간 : 10.28(수) ~ 11.10(화) 총 5회 □ 내 용 : 회계·세무·법 분야 현직자들을 모시고 실제 업무와 진로 선택 경험을 나누는 자리"
-  },
-  {
-   "title": "📣11~12회차 접수중🌎외국계기업 취업준비🌎｜AI 활용 면접 준비방법 / 인성 및 영어 면접 노하우 / 영어 PT전략(포트폴리오 작성법 일부)",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31273&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-26",
-   "postId": "31273",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/e63f8f9863d289ae.webp",
-   "desc": "인재개발실 #대학일자리플러스센터 #외국계기업 #글로벌기업"
   }
  ]
 }

@@ -1,7 +1,27 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-11-09",
+ "updatedAt": "2026-11-10",
  "items": [
+  {
+   "title": "[일반] [교육혁신원] 2026학년도 2학기 다전공 수요조사 참여 안내 (참여시, 생성형 AI 크레딧 제공 | ~11/29(일))",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53648&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-10",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-10",
+   "desc": "2026학년도 2학기 다전공 수요조사 참여 안내 설문 참여 혜택 참여 시 ‘광운AI메이트’에서 사용 가능한 생성형 AI 크레딧 제공 우리 대학에서는 학생들의 다전공에 대한 인식과 수요를 파악하고, 향후 다전공 제도…"
+  },
+  {
+   "title": "[시설] 2026학년도 동절기 난방 운영을 아래와 같이 안내 하오니 참고 하시기 바랍니다",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53640&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-10",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-10",
+   "thumb": "data/news/img/9095dc7095c9d380.webp"
+  },
   {
    "title": "[일반] 기간제 계약직원 채용 공고(상담복지정책대학원 교학팀)",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53639&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -409,27 +429,6 @@
    "src": "b09cb042",
    "foundAt": "2026-10-23",
    "desc": "채용 부서 국제처 글로벌전략팀 모집인원 1. 지원 자격 및 우대사항 담당업무"
-  },
-  {
-   "title": "[시설] 2026년 동절기 시스템 냉난방기 난방 전환 일정 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53540&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-23",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-23",
-   "desc": "우리 학교 시스템 냉난방기의 난방 전환 일정을 아래와 같이 안내하오니 양지하여 주시기 바랍니다."
-  },
-  {
-   "title": "[국제학생] [외국인유학생] 조선왕릉골든벨 외국인 부문 참가 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53539&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-22",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-22",
-   "thumb": "data/news/img/3981270baea2a62a.webp",
-   "desc": "2026 조선왕릉 골든벨 「선정릉」 장원급제에 도전하세요! 세계유산 조선왕릉 선정릉에서 특별한 과거 시험이 펼쳐집니다. 시공간을 넘어 지혜를 겨루는 주인공은 누구일까요?"
   }
  ]
 }

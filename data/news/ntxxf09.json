@@ -1,7 +1,17 @@
 {
  "school": "경기대학교",
- "updatedAt": "2026-11-09",
+ "updatedAt": "2026-11-10",
  "items": [
+  {
+   "title": "[입학에서 취업까지] 「인권과 성평등교육」 이수 공지",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627116&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-10",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-10",
+   "desc": "대학소개 대학·조직 대학생활 맞춤정보 어떤 정보 를 찾고계시나요? 맞춤설정 저장하기 (언제든 변경 가능합니다) 맞춤설정 이란? 소속, 내용, 기간별로 나만의 맞춤 콘텐츠를 찾아보세요."
+  },
   {
    "title": "[일반] 2026 「인권과 성평등교육」실시 및 미이수자 이수독려 안내",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627101&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
@@ -403,17 +413,6 @@
    "src": "bf927d3e",
    "foundAt": "2026-10-28",
    "desc": "경기대학교 정치외교학전공에서는 하지현 교수 특별강연 \"불안이 불안한가요?\"와 관련하여 다음과 같이 안내드립니다."
-  },
-  {
-   "title": "[입학에서 취업까지] 2026학년도 2학기 부전공 신청 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626872&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-10-28",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-10-28",
-   "desc": "부전공 신청 관련 일정 안내드립니다. 부전공 신청 희망자는 기간 확인하시어 기간 내에 신청 바랍니다."
   }
  ]
 }
