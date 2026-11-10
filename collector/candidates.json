@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-11-10",
- "count": 1688,
+ "count": 1691,
  "items": [
   {
    "title": "[교외] 2027-2028 이스라엘 정부초청 장학생 선발(~1/15)",
@@ -28,8 +28,35 @@
    "bodyDeadlineText": "[교외] 2027-2028 이스라엘 정부초청 장학생 선발(~1/15)"
   },
   {
+   "title": "공통 2026학년도 2학기 문우림 제6기 장학생 선발 안내",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323545",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-11-10"
+  },
+  {
+   "title": "[학생복지팀] 한국장학재단 2026년 2학기 국가장학금Ⅰ유형(다자녀 포함) 지급 안내_재단 10월 29일 지급실행분",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=770149&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "",
+   "foundAt": "2026-11-10"
+  },
+  {
    "title": "2026년도 2학기 학자금 중복지원 예방 안내",
    "url": "https://www.yonsei.ac.kr/bbs/sc/58/944604/artclView.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "연세대학교",
+   "campus": "",
+   "foundAt": "2026-11-10"
+  },
+  {
+   "title": "한국장학재단 「통학로(路)」 서비스 안내",
+   "url": "https://www.yonsei.ac.kr/bbs/sc/58/944605/artclView.do",
    "attachments": [],
    "deadlineHint": null,
    "school": "연세대학교",

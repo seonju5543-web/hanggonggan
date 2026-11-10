@@ -29,7 +29,7 @@
    "kind": "page",
    "param": "pageNo"
   },
-  "checkedAt": "2026-11-09"
+  "checkedAt": "2026-11-10"
  },
  "https://dep.hufs.ac.kr/student/12767/subview.do": {
   "ok": false,
@@ -49,7 +49,7 @@
    "kind": "page",
    "param": "pageNo"
   },
-  "checkedAt": "2026-11-09"
+  "checkedAt": "2026-11-10"
  },
  "https://www.hongik.ac.kr/kr/newscenter/notice.do": {
   "ok": false,
@@ -218,7 +218,7 @@
    "param": "article.offset",
    "limit": 10
   },
-  "checkedAt": "2026-11-09"
+  "checkedAt": "2026-11-10"
  },
  "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100": {
   "ok": false,
