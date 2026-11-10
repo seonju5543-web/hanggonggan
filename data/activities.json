@@ -83,6 +83,55 @@
    "excerptsAt": "2026-11-10"
   },
   {
+   "title": "전북핀테크지원센터 「핀테크 라이징 스타 챌린지」참가자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179746",
+   "kind": "대외활동",
+   "deadline": "2026-11-12",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-14 ~ 2026-11-12"
+    },
+    {
+     "label": "대상",
+     "text": "혁신적인 금융서비스 및 비즈니스 모델을 보유하고 있으며, 향후 사업화 및 성장이 기대되는 전국 예비창업자 및 창업 5년 이내 기업(팀 포함)"
+    },
+    {
+     "label": "활동지역",
+     "text": "전국"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "(재)전북창조경제혁신센터",
+   "api": "kstartup",
+   "apiId": "179746",
+   "id": "api-kstartup-179746",
+   "eligibilityLines": [
+    "혁신적인 금융서비스 및 비즈니스 모델을 보유하고 있으며, 향후 사업화 및 성장이 기대되는 전국 예비창업자 및 창업 5년 이내 기업(팀 포함)"
+   ],
+   "eligibilityExcludes": [
+    "금융기관 등으로부터 채무불이행 및 규제 중인 자(또는 기업)",
+    "국세 또는 지방세 체납으로 규제 중인 자(또는 기업)",
+    "창업지원기관으로부터 발생한 환수금 반환이 종결되지 않은 자(또는 기업)",
+    "동일·유사 사업에 선정되어 협약 체결 후 중도 포기 또는 참여 제한으로 제재 또는 중단 처분을 받은 자(또는 기업)",
+    "신청 아이템과 동일·유사한 내용으로 타 기관·지자체·중앙부처 등의 사업화 지원금을 지원받았거나 지원받고 있는 자(또는 기업)",
+    "신청일 현재 휴업 또는 폐업 중인 자(또는 기업)",
+    "「중소기업창업 지원법 시행령」 제4조에서 정하는 창업 제외 업종을 영위하고 있거나 영위하고자 하는 자(또는 기업)",
+    "※ 붙임 1 참조"
+   ],
+   "noticeLines": [
+    "(재)전북창조경제혁신센터에서는 혁신적인 금융서비스 및 비즈니스 모델을 보유한 우수 핀테크 기업·예비창업자를 발굴하고, 사업화 및 전북 정착을 지원하기 위한 「핀테크 라이징 스타 챌린지」를 다음과 같이 개최하오니 많은 관심과 참여 바랍니다.",
+    "온라인 접수 : https://event.jbci.or.kr/sub/s1_1_view.html?id=369"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-11-10",
+   "seenAt": "2026-11-10",
+   "excerptsAt": "2026-11-10"
+  },
+  {
    "title": "[해수부] 2026년 해양수산 통합데모데이 참가자 모집",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179533",
    "kind": "대외활동",
@@ -160,6 +209,46 @@
    ],
    "detailsV": 6,
    "foundAt": "2026-11-02",
+   "seenAt": "2026-11-10",
+   "excerptsAt": "2026-11-10"
+  },
+  {
+   "title": "[광운대캠퍼스타운]「Quantum AI 인재 양성 교육」 참가자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179753",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-11-13",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-09 ~ 2026-11-13"
+    },
+    {
+     "label": "대상",
+     "text": "본 교육은 AI 및 양자에 관한 교육으로, 관련지식이 부족한 경우 수강에 한계가 있을 수 있습니다."
+    },
+    {
+     "label": "활동지역",
+     "text": "전국"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "광운대학교 캠퍼스타운",
+   "api": "kstartup",
+   "apiId": "179753",
+   "id": "api-kstartup-179753",
+   "eligibilityLines": [
+    "본 교육은 AI 및 양자에 관한 교육으로, 관련지식이 부족한 경우 수강에 한계가 있을 수 있습니다."
+   ],
+   "noticeLines": [
+    "광운대학교 앵커사업단(서울캠퍼스타운)에서는, 양자컴퓨팅과 AI가 만드는 새로운 가능성을 주제로 Quantum AI 인재 양성 교육인 Advanced AI Course 를 운영합니다",
+    "온라인 접수 : https://forms.gle/54fbcoZwhivDSN3C6"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-11-10",
    "seenAt": "2026-11-10",
    "excerptsAt": "2026-11-10"
   },
@@ -408,6 +497,47 @@
    "excerptsAt": "2026-11-10"
   },
   {
+   "title": "'딸깍 한 번으로 완성하는 AI 업무 자동화' 실전 워크숍 참여자 모집 (『신한 스퀘어브릿지』 11월 브릿지 클럽)",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179752",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-11-19",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-06 ~ 2026-11-19"
+    },
+    {
+     "label": "대상",
+     "text": "스타트업 임직원, 예비창업자, 스타트업 유관기관 관계자 등"
+    },
+    {
+     "label": "활동지역",
+     "text": "전국"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "신한금융희망재단",
+   "api": "kstartup",
+   "apiId": "179752",
+   "id": "api-kstartup-179752",
+   "eligibilityLines": [
+    "스타트업 임직원, 예비창업자, 스타트업 유관기관 관계자 등"
+   ],
+   "noticeLines": [
+    "『신한 스퀘어브릿지』 11월 브릿지 클럽에서는 기초 사용법을 넘어 자신에게 필요한 AI 에이전트를 직접 만들어 보는 실습형 AI(클로드코드) 강연을 준비했습니다.",
+    "AI 에이전트 활용 역량 강화에 관심있는 스타트업 및 유관기관 관계자분들의 많은 관심과 참여 바랍니다.",
+    "온라인 접수 : https://m.site.naver.com/2kk0q"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-11-10",
+   "seenAt": "2026-11-10",
+   "excerptsAt": "2026-11-10"
+  },
+  {
    "title": "국민대학교 청년도약 인재양성 부트캠프 참가자 모집(AI 실무교육)",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179559",
    "kind": "대외활동",
@@ -493,130 +623,6 @@
    ],
    "detailsV": 6,
    "foundAt": "2026-11-06",
-   "seenAt": "2026-11-10",
-   "excerptsAt": "2026-11-10"
-  },
-  {
-   "title": "제9회 원주권 스타트업 커뮤니티 데이 참가자 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179727",
-   "kind": "대외활동",
-   "deadline": "2026-11-23",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-05 ~ 2026-11-23"
-    },
-    {
-     "label": "대상",
-     "text": "창업에 관심있는 누구나"
-    },
-    {
-     "label": "활동지역",
-     "text": "강원"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "상지대학교 벤처창업본부",
-   "api": "kstartup",
-   "apiId": "179727",
-   "id": "api-kstartup-179727",
-   "eligibilityLines": [
-    "창업에 관심있는 누구나"
-   ],
-   "noticeLines": [
-    "상지대학교 벤처창업본부에서는 (예비)창업기업의 네트워크 형성을 통한 사업화 촉진을 돕기 위해",
-    "「 제9회 원주권 스타트업 커뮤니티 데이 참가자 모집 」을 개최합니다.",
-    "많은 관심과 참여 바랍니다.",
-    "온라인 접수 : https://forms.gle/UegLwQTQYpD8AjcW6"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-11-07",
-   "seenAt": "2026-11-10",
-   "excerptsAt": "2026-11-10"
-  },
-  {
-   "title": "경기대학교 2026년 예비창업패키지 KGU 창업준비 아카데미 모집 신청 공고",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179673",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-11-23",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-30 ~ 2026-11-23"
-    },
-    {
-     "label": "대상",
-     "text": "혁신적인 기술 또는 아이디어로 창업을 준비 중인 예비창업자"
-    },
-    {
-     "label": "활동지역",
-     "text": "경기"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "경기대학교 창업지원단",
-   "api": "kstartup",
-   "apiId": "179673",
-   "id": "api-kstartup-179673",
-   "eligibilityLines": [
-    "혁신적인 기술 또는 아이디어로 창업을 준비 중인 예비창업자"
-   ],
-   "noticeLines": [
-    "경기대학교 창업지원단에서 2026 예비창업패키지 KGU 창업준비 아카데미 모집 계획을 공고하오니, 창업을 준비하시는 예비창업자 분들의 많은 관심과 참여 바랍니다.",
-    "온라인 접수 : https://forms.gle/ij95oNbcrqMxXXX56"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-11-09",
-   "seenAt": "2026-11-10",
-   "excerptsAt": "2026-11-10"
-  },
-  {
-   "title": "[창업보육센터]K-Tech 창업성장아카데미 교육프로그램 수강생 모집(~11월)",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179208",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-11-27",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-09-09 ~ 2026-11-27"
-    },
-    {
-     "label": "대상",
-     "text": "예비창업자, 전국 BI 센터 입주기업, 청년창업사관학교 등 창업관련 유관기관 관련자, 기업 임직원 등"
-    },
-    {
-     "label": "활동지역",
-     "text": "전국"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "한국기술교육대학교 산학협력단",
-   "api": "kstartup",
-   "apiId": "179208",
-   "id": "api-kstartup-179208",
-   "eligibilityLines": [
-    "예비창업자, 전국 BI 센터 입주기업, 청년창업사관학교 등 창업관련 유관기관 관련자, 기업 임직원 등"
-   ],
-   "noticeLines": [
-    "창업기업의 실무역량 강화 및 지속적인 성장 지원을 위한 「2026 K-Tech 창업성장아카데미」 수강생을 모집합니다.",
-    "✔ 기업 대표뿐만 아니라 임직원도 참여 가능합니다.",
-    "✔ 창업보육센터 입주기업 외 타 기업 및 예비창업자도 참여 가능합니다.",
-    "창업기업 및 예비창업자 여러분의 많은 관심과 참여 바랍니다.",
-    "온라인 접수 : https://sites.google.com/view/2026k-tech0/%ED%99%88"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-11-10",
    "seenAt": "2026-11-10",
    "excerptsAt": "2026-11-10"
   },
@@ -867,7 +873,7 @@
     "한 해의 봉사를 빛내는 특별한 하루, 함께 만들어 주세요!",
     "한 해 동안 지역사회를 위해 나눔을 실천한 자원봉사자들의 노고를 기념하고",
     "감사의 마음을 나누는 뜻깊은 자리입니다.",
-    "*일 시 : 11월 24일(화) 9시~18시 **봉사시간 8시간 인정",
+    "*일 시 : 11월 24일(화) 9시~18시",
     "*장 소 : 군포문화예술회관 수리홀",
     "*대 상 : 대학생 및 청년(청년기본법 기준 만 19세~34세)"
    ],
@@ -916,42 +922,6 @@
     "자원봉사자 혜택 : 점심식사, 간식 제공, 봉사증 발급"
    ],
    "foundAt": "2026-11-06",
-   "seenAt": "2026-11-10",
-   "excerptsAt": "2026-11-10"
-  },
-  {
-   "title": "청년과 대학생이 바꾸는 지금 2회차 대학생 청년 봉사자 모집",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3545456",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-11-11",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-02 ~ 2026-11-11"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026-11-13 ~ 2026-11-13"
-    },
-    {
-     "label": "활동지역",
-     "text": "군산시 노인종합복지관"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "군산시자원봉사센터",
-   "api": "vol1365",
-   "apiId": "3545456",
-   "id": "api-vol1365-3545456",
-   "detailsV": 6,
-   "noticeLines": [
-    "어르신 프로그램 활동 지원 및 원예,공예 활동 보조"
-   ],
-   "foundAt": "2026-11-07",
    "seenAt": "2026-11-10",
    "excerptsAt": "2026-11-10"
   },
@@ -1040,6 +1010,86 @@
     "활동 내용"
    ],
    "foundAt": "2026-11-07",
+   "seenAt": "2026-11-10",
+   "excerptsAt": "2026-11-10"
+  },
+  {
+   "title": "청년과 대학생이 바꾸는 지금 2회차 대학생 청년 봉사자 모집",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3545456",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-11-12",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-02 ~ 2026-11-12"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-11-13 ~ 2026-11-13"
+    },
+    {
+     "label": "활동지역",
+     "text": "군산시 노인종합복지관"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "군산시자원봉사센터",
+   "api": "vol1365",
+   "apiId": "3545456",
+   "id": "api-vol1365-3545456",
+   "detailsV": 6,
+   "noticeLines": [
+    "어르신 프로그램 활동 지원 및 원예,공예 활동 보조"
+   ],
+   "foundAt": "2026-11-07",
+   "seenAt": "2026-11-10",
+   "excerptsAt": "2026-11-10"
+  },
+  {
+   "title": "[미감도서관] 대학생 자원봉사활동 모집 (11월14일)",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3536811",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-11-13",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-16 ~ 2026-11-13"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-10-30 ~ 2026-11-14"
+    },
+    {
+     "label": "활동지역",
+     "text": "목동중앙남로 57-10 3층 미감도서관"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "양천구립도서관",
+   "api": "vol1365",
+   "apiId": "3536811",
+   "id": "api-vol1365-3536811",
+   "detailsV": 6,
+   "eligibilityLines": [
+    "○ 활동자격: 대학생"
+   ],
+   "noticeLines": [
+    "[미감도서관] 대학생자원봉사자 모집",
+    "봉사요일: 11월14일(토)",
+    "봉사시간: 11월14일(토) 저녁 17:00~ 21:00까지 (4시간)",
+    "내용: 미감도서관 프로그램 행사 지원",
+    "활동자격: 대학생",
+    "활동장소: 양천구 미감도서관"
+   ],
+   "foundAt": "2026-11-10",
    "seenAt": "2026-11-10",
    "excerptsAt": "2026-11-10"
   },
@@ -1205,50 +1255,6 @@
     "중등 1학년 ~ 3학년 : 수학 학습지원"
    ],
    "foundAt": "2026-11-08",
-   "seenAt": "2026-11-10",
-   "excerptsAt": "2026-11-10"
-  },
-  {
-   "title": "[대학생 자원봉사자 15명 모집] 고양 평화통일공감 시민대화 행사 운영 지원",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3548047",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-11-13",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-06 ~ 2026-11-13"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026-11-17 ~ 2026-11-17"
-    },
-    {
-     "label": "활동지역",
-     "text": "고양꽃전시관"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "민주평화통일자문회의고양시협의회",
-   "api": "vol1365",
-   "apiId": "3548047",
-   "id": "api-vol1365-3548047",
-   "detailsV": 6,
-   "eligibilityLines": [
-    "■ 모집 대상: 행사 운영 지원에 관심 있는 대학생"
-   ],
-   "noticeLines": [
-    "「고양 평화통일공감 시민대화」의 원활한 진행을 함께 도울 대학생 자원봉사자를 모집합니다. 행사 준비와 참가자 안내, 현장 운영을 함께할 대학생 여러분의 많은 관심과 신청 바랍니다.",
-    "모집 대상: 행사 운영 지원에 관심 있는 대학생",
-    "모집 인원: 15명",
-    "활동 일자: 2026년 11월 17일(화)",
-    "집결 시간: 오전 11시까지",
-    "활동 장소: 고양국제꽃전시관"
-   ],
-   "foundAt": "2026-11-10",
    "seenAt": "2026-11-10",
    "excerptsAt": "2026-11-10"
   },
