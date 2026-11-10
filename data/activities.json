@@ -1,6 +1,33 @@
 {
- "updatedAt": "2026-11-10",
+ "updatedAt": "2026-11-11",
  "items": [
+  {
+   "title": "2026 의왕시 청년e-Room 창업아이디어 공모전 참가자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179565",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": "접수기간 2026-10-19 ~ 2026-11-11 18:00 주관기관명 의왕시청 대상 대학생, 일반인 창업업력 전체 연락처 031-345-23",
+   "deadline": "2026-11-11",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-19 ~ 2026-11-11 18:00"
+    }
+   ],
+   "eligibilityLines": [
+    "대상 : 대학생, 일반인",
+    "의왕시 공고 제2026-1380호",
+    "의왕시청",
+    "대상연령 : 만 20세 이상 ~ 만 39세 이하"
+   ],
+   "detailsV": 6,
+   "field": "기획·아이디어",
+   "excerptsAt": "2026-11-10",
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-11-10"
+  },
   {
    "title": "2026년 대전 청년농업인4-H와 농업진로 탐방 품앗이 참가자 모집 2026.11 . 10",
    "url": "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000251/articleView.do?searchSeq=17576&commonMenuNo=180_35",
@@ -3112,47 +3139,6 @@
     "(개인/단체,기업,학생,일반 국민)"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)"
-  },
-  {
-   "title": "2026 의왕시 청년e-Room 창업아이디어 공모전 참가자 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179565",
-   "kind": "공모전",
-   "field": "기획·아이디어",
-   "deadline": "2026-11-11",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-19 ~ 2026-11-11"
-    },
-    {
-     "label": "대상",
-     "text": "의왕시의 지속가능발전을 위한 창업아이디어를 보유한 19세~39세 이하 대한민국 청년"
-    },
-    {
-     "label": "활동지역",
-     "text": "전국"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "의왕시청",
-   "api": "kstartup",
-   "apiId": "179565",
-   "id": "api-kstartup-179565",
-   "eligibilityLines": [
-    "의왕시의 지속가능발전을 위한 창업아이디어를 보유한 19세~39세 이하 대한민국 청년",
-    "대상 연령 : 만 20세 이상 ~ 만 39세 이하"
-   ],
-   "noticeLines": [
-    "의왕시의 지속가능발전을 위한 창업아이디어를 보유한 19세~39세 이하 대한민국 청년의 창업역량 증진 및 사업화 지원을 통해 의왕시 창업 생태계를 활성화하기 위한 「의왕시 청년 e-Room 창업아이디어 공모전」참가자(팀)을 모집합니다. 우수한 창업 아이디어를 보유한 분들의 많은 참가 바랍니다.",
-    "온라인 접수 : uiwang-eroom-2026.yhnskyd88.chatgpt.site"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-11-01",
-   "seenAt": "2026-11-10",
-   "excerptsAt": "2026-11-10"
   },
   {
    "title": "[초록봉사단] 사랑의 연탄 나눔(고등학생, 대학생, 일반)",

@@ -1102,6 +1102,16 @@
    "added": "2026-11-10",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-amepagescholarshipnotice-0d1tyil",
+   "name": "[교외] (외국인) 삼성꿈장학재단 글로벌희망장학생 선발 안내(12/31 마감, 등록금전액+학업보조비)",
+   "target": "(외국인) 삼성꿈장학재단 글로벌희망장학생 선발 안내(1",
+   "added": "2026-11-11",
+   "fetched": false,
+   "schematized": false,
+   "tries": 1,
+   "lastTryAt": "2026-11-11"
   }
  ]
 }

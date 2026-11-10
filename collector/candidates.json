@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
- "updatedAt": "2026-11-10",
- "count": 1709,
+ "updatedAt": "2026-11-11",
+ "count": 1710,
  "items": [
   {
    "title": "[교외] 2027-2028 이스라엘 정부초청 장학생 선발(~1/15)",
@@ -407,6 +407,17 @@
    "school": "서강대학교",
    "campus": "",
    "foundAt": "2026-11-10"
+  },
+  {
+   "title": "[교외] (외국인) 삼성꿈장학재단 글로벌희망장학생 선발 안내(12/31 마감, 등록금전액+학업보조비)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551811?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "제출 기한 : 2026년 12월 31일(목) 오후 5시까지, 베르크만스 우정원 209호 학생지원팀 ※ 모든 서류는 원본으로 제출 7. 장학생 선",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-11-10",
+   "bodyDeadline": "2026-12-31",
+   "bodyDeadlineText": "[교외] (외국인) 삼성꿈장학재단 글로벌희망장학생 선발 안내(12/31 마감, 등록금전액+학업보조비)"
   },
   {
    "title": "2026년도 2학기 학자금 중복지원 예방 안내",

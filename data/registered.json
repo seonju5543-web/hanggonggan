@@ -19839,13 +19839,13 @@
    "eligibilityFrom": "공고문 첨부(OCR)",
    "eligibilityLines": [
     "공통 기준 [장학금별 세부 기준은 아래 표 및 붙임 참조]",
-    "-2026학년도2학기 재학생으로 등록금 납부를 완료한 자(등록 대체자 제외)",
-    "-정규 등록8학기이내인자(건축학부 건축학전공: 정규등록10학기 이내인 자)",
+    "-2026학년도 2학기 재학생으로등록금 납부를 완료한 자(등록 대체자 제외)",
+    "-정규 등록8학기이내인자(건축학부 건축학전공: 정규등록10학기 이내인자)",
     "-직전 학기 취득 학점15학점(졸업 직전 학기 12학점) 이상인 자",
     "-신청기간 내 u-SAINT 신청 및 총학생회 서류 제출을 모두 완료한 자(특별성적장학금(12.5%), 가계곤란장학금은 서류 제출 없이 u-SAINT 신청)",
-    "-신청서에기재한 인적 정보가대상과일치한자(학번 불일치시지급 불가)",
+    "-신청서에기재한 인적 정보가대상과일치한자(학번 불일치 시지급 불가)",
     "-사실과 다른서류를 제출하거나, 서류를 정상적으로 열람할수 없는경우 선발 불가(파일 손상, 파일 암호화 등)",
-    "-제출 서류의 날짜 및 서명 오기재 또는 미기재 시 선발 불가",
+    "-제출 서류의 날짜 및 서명 오기재 또는 미기재시 선발 불가",
     "-학교생활지원 장학금(주거비,교통비,근면승실) 간 중복지원 불가"
    ],
    "aiTries": 1
@@ -23123,6 +23123,11 @@
      "school": "인하대학교",
      "url": "https://www.inha.ac.kr/bbs/kr/8/46108/artclView.do",
      "id": "notice:https://www.inha.ac.kr/bbs/kr/8/46108/artclView.do"
+    },
+    {
+     "school": "고려대학교",
+     "url": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4OTYlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
+     "id": "notice:https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4OTYlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg=="
     }
    ],
    "scopeFrom": "같은 사업이 서강대학교 게시판에도 올라옴(자동) — 서강대학교 게시판 https://www.sogang.ac.kr/ko/detail/551805?bbsConfigFk=141&namepage=ScholarshipNotice",
@@ -23257,6 +23262,101 @@
     "- 근무위치 : 서울과학기술대학교 서울테크노파크 423호",
     "- 근무시간 : 시간표 검토 후, 주 20시간 근무자만 지원바람"
    ]
+  },
+  {
+   "id": "auto-amepagescholarshipnotice-0d1tyil",
+   "name": "[교외] (외국인) 삼성꿈장학재단 글로벌희망장학생 선발 안내(12/31 마감, 등록금전액+학업보조비)",
+   "boardTitle": "[교외] (외국인) 삼성꿈장학재단 글로벌희망장학생 선발 안내(12/31 마감, 등록금전액+학업보조비)",
+   "type": "교외",
+   "kindEvidence": [
+    "제목 표식 「[교외」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-11",
+   "provider": "주관 기관 원문 확인",
+   "amount": "480만원",
+   "amountValue": 4800000,
+   "deadline": "2026-12-31",
+   "deadlineFrom": "공고 원문 · [교외] (외국인) 삼성꿈장학재단 글로벌희망장학생 선발 안내(12/31 마감, 등록금전액+학업보조비)",
+   "period": "접수 ~2026-12-31",
+   "summary": "서강대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true
+   },
+   "documents": [
+    "지원신청서 : 국문 또는 영문으로 작성",
+    "개인정보 동의서(지원자용)",
+    "지원신청서",
+    "인적사항 및 주요 이력",
+    "자기소개서",
+    "지원서 Self-Checklist",
+    "증빙서류",
+    "재학증명서",
+    "성적증명서 (고등학교 성적증명서, 대학교 성적증명서)",
+    "장학금 수혜증명서(또는 미수혜 증명서)"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-11 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "[Form]Global Hope Scholarship Program Application(Undergraduate).doc",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41789/download.do"
+    },
+    {
+     "name": "[양식]삼성꿈장학재단 글로벌 희망장학 신청서(학부).hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41790/download.do"
+    },
+    {
+     "name": "(첨부1) DAC List of Aid Recipients - 2025 flows.pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41791/download.do"
+    },
+    {
+     "name": "(첨부3) 삼성꿈장학재단 글로벌 희망장학 홍보 포스터(게재용).pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41792/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551811?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "sourceKind": "auto",
+   "alsoPostedAt": [
+    {
+     "school": "인하대학교",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/46112/artclView.do",
+     "id": "notice:https://www.inha.ac.kr/bbs/kr/8/46112/artclView.do"
+    }
+   ],
+   "scopeFrom": "같은 사업이 인하대학교 게시판에도 올라옴(자동) — 인하대학교 게시판 https://www.inha.ac.kr/bbs/kr/8/46112/artclView.do",
+   "announceDate": "2027-01-28",
+   "documentsFrom": "공고 원문",
+   "eligibilityLines": [
+    "2. 지원자격",
+    "(1) DAC List of ODA Recipients에 있는 개발도상국 출신 학생(붙임 문서1의 국가명 참조)",
+    "(2) 가정 경제 상황이 어려운 자",
+    "(3) 학업수행능력(언어, 성적)이 우수한 자",
+    "※ 필수요건: 한국어능력시험(TOPIK) 2급 이상",
+    "3. 선정 기준",
+    "(1) 경제적 상황에 따른 장학금 필요도",
+    "(2) 학업계획의 구체성 및 수행의지",
+    "(3) 학업(연구) 수행능력(성적, 수상경력, 연구계획 등)",
+    "(4) 진로계획의 구체성",
+    "(5) 어학 준비도(한국어 혹은 영어 말하기 및 글쓰기)",
+    "(6) 사회봉사 경험 및 졸업후의 사회기여 의지",
+    "(7) 한국 대학 진학동기 및 전공선택의 타당성"
+   ],
+   "excerpts": [
+    "(4) 서류 제출 기한 : 2026년 12월 31일(목) 오후 5시까지, 베르크만스 우정원 209호 학생지원팀"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 4800000,
+    "ratio": 0,
+    "min": 4800000,
+    "max": 4800000,
+    "raw": "4. 지원 내용 (1) 서강대학교(서강꿈장학금) : 수업료 전액 (2) 삼성꿈장학재단(삼성꿈 글로벌희망장학금) : 학업보조비 학기당 480만원 (3) 재학학기 기준으로 8학기까지 장학금 지원(9학기부터는 장학금 지원 제외) 5. 선발 인원 : 1명 (본교에서 최대 2명 추천 예정) ※ 베트남 국적 학생 지원 불가 (재단 지침에 의거 학교별 동일 국적 장학생"
+   },
+   "amountFrom": "공고 원문"
   }
  ]
 }
