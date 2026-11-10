@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-09T01:15:22.247Z",
+ "updatedAt": "2026-11-10T03:51:15.540Z",
  "account": {
   "username": "handaejang_",
   "followers": 3,
@@ -464,6 +464,14 @@
   },
   {
    "at": "2026-11-09",
+   "followers": 3,
+   "media": 3,
+   "likes": 9,
+   "comments": 0,
+   "saved": 0
+  },
+  {
+   "at": "2026-11-10",
    "followers": 3,
    "media": 3,
    "likes": 9,
