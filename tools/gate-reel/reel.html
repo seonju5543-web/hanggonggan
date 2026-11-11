@@ -32,20 +32,26 @@
 <script>
 /* ?list=snu-1.jpg,korea-2.jpg,... (docs/designs/assets/gates/ 기준) · ?dur=2500 · manifest 로 학교 이름·출처를 단다 */
 const q = new URLSearchParams(location.search);
-const DUR = Number(q.get('dur') || 2500);
+const DUR = Math.min(Math.max(Number(q.get('dur') || 2500), 500), 10000);
 const list = (q.get('list') || '').split(',').filter(Boolean);
 /* 사진별 초점 — 가로 사진을 세로로 자를 때 정문이 화면에 남는 자리(가로% 세로%). 없으면 50% 45% */
 const FOCUS = { 'khu-1.jpg': '62% 78%', 'hufs-3.jpg': '50% 42%', 'snu-1.jpg': '58% 62%', 'sookmyung-4.jpg': '36% 52%', 'dongguk-5.jpg': '30% 48%', 'sogang-5.jpg': '32% 48%' };
+/* 🔴 2026-11-11 보안(CodeQL #607): 이 페이지는 학생 앱과 같은 주소에 공개돼 있다. 주소 뒤 글자(?list=)를 화면 HTML 로 끼워 넣으면
+   조작한 링크 하나로 그 폰의 앱 저장소(프로필·로그인)를 읽어 갈 수 있었다 → manifest 에 있는 사진 이름만 받고, 글자는 글자로만 넣는다(innerHTML 금지).
+   관문: verify/health-gates/ops.mjs 「⑦ 보안 자동 점검」 */
 fetch('../../docs/designs/assets/gates/manifest.json').then(r => r.json()).then(m => {
   const byFile = {}; m.schools.forEach(s => s.files.forEach(f => { byFile[f.file] = { ...f, school: s.name }; }));
+  const shown = list.filter((file) => Object.prototype.hasOwnProperty.call(byFile, file));
   const stage = document.getElementById('stage');
-  list.forEach((file, i) => {
-    const meta = byFile[file] || { school: file, author: '', license: '' };
-    const d = document.createElement('div'); d.className = 'scene'; d.style.setProperty('--dur', DUR + 'ms'); if (FOCUS[file]) d.style.setProperty('--focus', FOCUS[file]);
-    d.innerHTML = `<img src="../../docs/designs/assets/gates/${file}" alt=""><div class="school">${meta.school}</div><div class="credit">${meta.school} 정문 · 사진 ${meta.author || '작가 미상'} · ${meta.license} · Wikimedia Commons</div>`;
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  shown.forEach((file, i) => {
+    const meta = byFile[file];
+    const d = el('div', 'scene'); d.style.setProperty('--dur', DUR + 'ms'); if (FOCUS[file]) d.style.setProperty('--focus', FOCUS[file]);
+    const img = el('img'); img.src = '../../docs/designs/assets/gates/' + encodeURIComponent(file); img.alt = '';
+    d.append(img, el('div', 'school', meta.school), el('div', 'credit', `${meta.school} 정문 · 사진 ${meta.author || '작가 미상'} · ${meta.license} · Wikimedia Commons`));
     stage.appendChild(d);
-    setTimeout(() => { d.classList.add(i === list.length - 1 ? 'last' : 'run'); }, i * DUR);
+    setTimeout(() => { d.classList.add(i === shown.length - 1 ? 'last' : 'run'); }, i * DUR);
   });
-  document.body.dataset.total = list.length * DUR;
+  document.body.dataset.total = shown.length * DUR;
 });
 </script></body></html>

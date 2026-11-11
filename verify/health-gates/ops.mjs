@@ -466,6 +466,13 @@ export default async function gate(eq, ctx) {
     /* Dependabot 이 actions/checkout@v4 → v5 로 올리면, 실제 워크플로를 판 번호까지 박아 읽는 관문은 빨개진다(11-11 모의로 넷을 찾아 고쳤다).
        정규식 안의 `actions\/이름@v숫자` 를 금지한다 — 표본 글자('actions/checkout@v4')는 괜찮다 */
     const gateFiles = ['verify/test-collector.mjs', ...fs.readdirSync(path.join(rootPath, 'verify/health-gates')).filter((f) => f.endsWith('.mjs')).map((f) => `verify/health-gates/${f}`)];
+    /* 🔴 2026-11-11 CodeQL #607 — tools/gate-reel/reel.html 이 주소 뒤 글자(?list=)를 innerHTML 로 끼워 넣어, 조작한 링크 하나로 앱과 같은 주소의
+       저장소(프로필·로그인)를 읽을 수 있었다(진짜 브라우저로 실행 확인 → 고친 뒤 막힘 확인). 학생 주소에 공개되는 HTML 은 전부 같은 기준 */
+    const servedHtml = spawnSync('git', ['ls-files', '-z', '*.html'], { cwd: rootPath, encoding: 'utf8' }).stdout.split('\0').filter((f) => f && !f.startsWith('_admin/') && fs.existsSync(path.join(rootPath, f)));
+    eq(`  🔴 공개되는 HTML(${servedHtml.length}장)은 주소 뒤 글자(location.search·hash)를 읽으면서 HTML 로 끼워 넣지 않는다(innerHTML·insertAdjacentHTML·document.write)`,
+      servedHtml.filter((f) => { const t = fs.readFileSync(path.join(rootPath, f), 'utf8'); return /location\.(search|hash)|URLSearchParams/.test(t) && /\.innerHTML\s*[+]?=|insertAdjacentHTML|document\.write/.test(t); }), []);
+    const reel = read(root, 'tools/gate-reel/reel.html');
+    eq('  reel.html — manifest 에 있는 사진 이름만 받는다 · 글자는 textContent 로', [/hasOwnProperty\.call\(byFile, file\)/.test(reel), /textContent/.test(reel)], [true, true]);
     eq('  🔴 관문 정규식이 부품 판 번호를 박지 않는다(actions\\/이름@v숫자) — 박으면 Dependabot PR 마다 관문이 빨개진다',
       gateFiles.filter((f) => /actions\\\/[a-z-]+@v\d/.test(read(root, f))), []);
   }
