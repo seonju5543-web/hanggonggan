@@ -62,7 +62,7 @@ function makeEnv(overrides = {}) {
     SUBS: fakeKV(),
     VAPID_JWK: JSON.stringify(jwk),
     VAPID_PUBLIC,
-    VAPID_SUBJECT: 'mailto:seonju5543@gmail.com',
+    VAPID_SUBJECT: 'mailto:handaejang24@gmail.com',
     APP_ORIGIN: 'https://example.test/app',
     ALLOW_ORIGIN: 'https://seonju5543-web.github.io',
     ADMIN_KEY: 'test-admin',

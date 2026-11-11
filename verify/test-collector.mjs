@@ -4189,6 +4189,14 @@ console.log('\n■ 공고를 받아올 때 쓰는 머리말 (2026-08-20)');
   /* 🔴 2026-11-11 출시 전 백엔드 4번 — From 이 팀원 개인 메일이었다(학교 사이트 전부에 남는다). 서비스 주소(고객센터와 같은 것)여야 한다 */
   eq('  From 은 앱 고객센터와 같은 서비스 주소다(support-config.js email) — 개인 메일을 로봇 신원으로 쓰지 않는다',
     H.FETCH_HEADERS.From, (/email:\s*'([^']+)'/.exec(readText(new URL('support-config.js', root))) || [])[1]);
+  /* 출시 전 백엔드 5번 — 푸시 서버의 연락처(VAPID sub 기본값 · 시크릿 안내 · 서버 검사)도 같은 서비스 주소. 서버 코드에 개인 메일을 두지 않는다 */
+  {
+    const supportMail = (/email:\s*'([^']+)'/.exec(readText(new URL('support-config.js', root))) || [])[1];
+    const pushFiles = ['server/push/worker.js', 'server/push/gen-vapid.mjs', 'verify/verify-push-server.mjs'];
+    eq('  푸시 서버 연락처(mailto:)는 전부 서비스 주소 — 개인 메일 없음',
+      pushFiles.map((f) => [...readText(new URL(f, root)).matchAll(/mailto:([^'"\s)]+)/g)].map((m) => m[1]).filter((m) => m !== '...' && m !== supportMail)).flat(), []);
+    eq('  (대조할 것을 실제로 찾았다 — 세 파일 모두 mailto: 가 있다)', pushFiles.every((f) => new RegExp(`mailto:${supportMail.replace(/\./g, '\\.')}`).test(readText(new URL(f, root)))), true);
+  }
   for (const f of ['collector/deepfetch.mjs', 'collector/collect.mjs']) {
     const src = readText(new URL(f, root));
     eq(`  ${f.split('/').pop()} 가 같은 머리말을 쓴다`, /FETCH_HEADERS/.test(src), true);
