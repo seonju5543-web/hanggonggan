@@ -429,4 +429,44 @@ export default async function gate(eq, ctx) {
         /failure\(\) \|\| cancelled\(\)[\s\S]*robot-down/.test(yml)],
       [true, true, true, 2, true, true, true]);
   }
+
+  /* ── ⑦ 보안 자동 점검 (2026-11-11 · 은서 · 출시 전 백엔드 10번 — .github/dependabot.yml · codeql.yml · tools/codeql-alerts.mjs) ──
+     🔴 Security 탭은 아무도 안 본다 → 심각 경고는 경보 이슈로 · Dependabot 판 올림 PR 이 와도 관문이 판 번호 때문에 빨개지지 않는다 */
+  {
+    const CA = await import(new URL('tools/codeql-alerts.mjs', root));
+    const A = (sec, sev, state = 'open') => ({ state, rule: { security_severity_level: sec, severity: sev } });
+    eq('⑦ 심각 경고 — 보안 high·critical 만 · 보안 등급이 없으면 규칙 수준 error 만 · medium·warning·note 는 Security 탭에만',
+      [A('critical'), A('high'), A('medium', 'error'), A('low'), A(null, 'error'), A(null, 'warning'), A(null, 'note')].map(CA.isSerious),
+      [true, true, false, false, true, false, false]);
+    eq('  gh api --paginate 가 쪽마다 이어 붙인 배열(][)도 읽는다 · 빈 응답은 0개',
+      [CA.parseAlerts('[{"a":1}][{"a":2},{"a":3}]').length, CA.parseAlerts('[]').length, CA.parseAlerts('').length], [3, 0, 0]);
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-codeql-'));
+    fs.writeFileSync(path.join(tmp, 'a.json'), JSON.stringify([{ ...A('high'), html_url: 'u1', rule: { id: 'js/xss', security_severity_level: 'high' }, most_recent_instance: { location: { path: 'app.js', start_line: 9 } } }, A('high', null, 'dismissed'), A('low')]));
+    const outF = path.join(tmp, 'out'); fs.writeFileSync(outF, '');
+    CA.main([path.join(tmp, 'a.json'), path.join(tmp, 'b.md')], { GITHUB_OUTPUT: outF });
+    eq('  열린 것만 센다(닫은 것 제외) · GITHUB_OUTPUT 에 serious= · 본문에 규칙·파일:줄',
+      [fs.readFileSync(outF, 'utf8').trim(), /js\/xss/.test(fs.readFileSync(path.join(tmp, 'b.md'), 'utf8')) && /app\.js:9/.test(fs.readFileSync(path.join(tmp, 'b.md'), 'utf8'))], ['serious=1', true]);
+    fs.rmSync(tmp, { recursive: true, force: true });
+    const dep = read(root, '.github/dependabot.yml').replace(/^\s*#.*$/gm, '');
+    eq('  dependabot.yml — 워크플로 부품(github-actions)·푸시 서버(npm /server/push) · 기본 브랜치로 · 한 달에 한 번 · 묶어서 PR 하나 · 열린 PR 상한',
+      [/package-ecosystem: github-actions[^\n]*\n\s+directory: \//.test(dep), /package-ecosystem: npm[^\n]*\n\s+directory: \/server\/push/.test(dep),
+        (dep.match(/target-branch: claude\/nice-heisenberg-WESq5/g) || []).length, (dep.match(/interval: monthly/g) || []).length,
+        (dep.match(/patterns: \['\*'\]/g) || []).length, (dep.match(/open-pull-requests-limit: \d/g) || []).length],
+      [true, true, 2, 2, 2, 2]);
+    const cq = read(root, '.github/workflows/codeql.yml').replace(/^\s*#.*$/gm, '');
+    eq('  codeql.yml — 언어 셋(자바스크립트·파이썬·워크플로) · 기본 브랜치에서만 · 코드가 바뀔 때만 push(데이터 커밋엔 안 돈다) · 홀수 분 예약 · 결과 올리기 권한 · 시한',
+      [/language: \[javascript-typescript, python, actions\]/.test(cq), (cq.match(/github\.ref_name == 'claude\/nice-heisenberg-WESq5'/g) || []).length >= 2,
+        /push:\s+branches: \[claude\/nice-heisenberg-WESq5\]\s+paths:/.test(cq) && !/- 'data\//.test(cq), Number((cq.match(/cron: '(\d+) /) || [])[1]) % 2 === 1,
+        /security-events: write/.test(cq), (cq.match(/^ {4}timeout-minutes: \d+/gm) || []).length],
+      [true, true, true, true, true, 2]);
+    eq('  🔴 심각 경고는 세 사람 경보 이슈로 — 여는·닫는 제목이 같다 · 두 일자리 모두 넘어지면 robot-down',
+      [(cq.match(/🛡 보안 코드 점검에서 고칠 것이 나왔습니다/g) || []).length, /--assignee seonju5543-web --assignee Se-Hyeon-Jo --assignee didinin-wq/.test(cq),
+        (cq.match(/if: failure\(\) \|\| cancelled\(\)\s+uses: \.\/\.github\/actions\/robot-down/g) || []).length],
+      [2, true, 2]);
+    /* Dependabot 이 actions/checkout@v4 → v5 로 올리면, 실제 워크플로를 판 번호까지 박아 읽는 관문은 빨개진다(11-11 모의로 넷을 찾아 고쳤다).
+       정규식 안의 `actions\/이름@v숫자` 를 금지한다 — 표본 글자('actions/checkout@v4')는 괜찮다 */
+    const gateFiles = ['verify/test-collector.mjs', ...fs.readdirSync(path.join(rootPath, 'verify/health-gates')).filter((f) => f.endsWith('.mjs')).map((f) => `verify/health-gates/${f}`)];
+    eq('  🔴 관문 정규식이 부품 판 번호를 박지 않는다(actions\\/이름@v숫자) — 박으면 Dependabot PR 마다 관문이 빨개진다',
+      gateFiles.filter((f) => /actions\\\/[a-z-]+@v\d/.test(read(root, f))), []);
+  }
 }

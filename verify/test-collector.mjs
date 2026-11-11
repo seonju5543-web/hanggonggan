@@ -1768,7 +1768,7 @@ console.log('\n■ 로봇 대기줄 — 옛 커밋에서 시작하지 않는다 
   const stale = queued.filter((f) => {
     const y = readText(new URL(f, wfDir));
     /* 체크아웃 단계 바로 다음 with 블록에 ref 가 있어야 한다 — 다른 단계의 ref 를 세면 통과해 버린다 */
-    return !/- uses: actions\/checkout@v4\n\s+with:\n(?:\s+#[^\n]*\n)*\s+ref: \$\{\{ github\.ref_name \}\}/.test(y);
+    return !/- uses: actions\/checkout@v\d+\n\s+with:\n(?:\s+#[^\n]*\n)*\s+ref: \$\{\{ github\.ref_name \}\}/.test(y);
   });
   eq('  전부 지금 브랜치 끝(ref: github.ref_name)에서 시작한다', stale, []);
   /* 🔴 체크아웃 단계에 with: 가 둘이면 GitHub 이 파일 전체를 「잘못된 워크플로」로 거절한다 — 2026-09-30 실제로 다섯 파일이
@@ -1985,7 +1985,7 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
     eq(`  ${f}: 얹기 충돌은 되돌리고 묶음을 남겨 올린다`,
       /if ! git pull --rebase --autostash origin "\$\{GITHUB_REF_NAME\}"; then\s*git rebase --abort/.test(y)
         && /git bundle create unsaved\/unsaved\.bundle/.test(y)
-        && /if: failure\(\)\s*uses: actions\/upload-artifact@v4\s*with:\s*name: unsaved-[\s\S]{0,80}path: unsaved\//.test(y), true);
+        && /if: failure\(\)\s*uses: actions\/upload-artifact@v\d+\s*with:\s*name: unsaved-[\s\S]{0,80}path: unsaved\//.test(y), true);
   }
   /* ③ 출처 */
   const src = JSON.parse(readText(new URL('../collector/activity-sources.json', import.meta.url)));
@@ -10333,7 +10333,7 @@ console.log('\n■ 관리자 화면 로봇 목록 — 화면이 부를 수 있�
     robots.some((r) => r.f === 'device-deploy.yml'), false);
   eq('일회용 로봇도 목록에 없다', robots.some((r) => r.f === 'two-school-scan.yml'), false);
   eq('  그 둘을 화면이 정직하게 밝힌다 (push-limit-check · push-deploy 도 — 10-12 푸시 서버 배포 확인·배포 · Actions 탭에서만)',
-    ['device-deploy.yml', 'two-school-scan.yml', 'push-limit-check.yml', 'push-deploy.yml', 'rollback.yml', 'key-expiry.yml'].every((f) => notListed.includes(f)), true);
+    ['device-deploy.yml', 'two-school-scan.yml', 'push-limit-check.yml', 'push-deploy.yml', 'rollback.yml', 'key-expiry.yml', 'codeql.yml'].every((f) => notListed.includes(f)), true);
 
   /* ⑥ 화면이 **아예 못 부르는** 워크플로를 센다 — 새 로봇이 생기면 여기서 말해 준다.
      인스타·관리자 조정은 ROBOTS 에 없지만 화면이 다른 자리에서 부른다(파일 이름이 admin.js 에 있다). */
@@ -10347,7 +10347,7 @@ console.log('\n■ 관리자 화면 로봇 목록 — 화면이 부를 수 있�
     .replace(/const ROBOT_NOT_LISTED = \[[^\]]*\]/, '');
   const unreachable = all.filter((f) => !calls.includes(f));
   eq(`화면이 못 부르는 워크플로 (지금 ${unreachable.length}개: ${unreachable.join(' · ')})`,
-    unreachable.sort(), ['device-deploy.yml', 'key-expiry.yml', 'push-deploy.yml', 'push-limit-check.yml', 'rollback.yml', 'two-school-scan.yml']);   // rollback: 11-11 · Actions 탭에서만(관리자 화면 버튼은 나중에)
+    unreachable.sort(), ['codeql.yml', 'device-deploy.yml', 'key-expiry.yml', 'push-deploy.yml', 'push-limit-check.yml', 'rollback.yml', 'two-school-scan.yml']);   // rollback: 11-11 · Actions 탭에서만(관리자 화면 버튼은 나중에)
 }
 
 console.log('\n■ 안내문이 사람을 화면으로 부른다 (채팅으로 되돌아가면 실패)');
