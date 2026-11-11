@@ -23687,6 +23687,106 @@
     "raw": "- 교내근로(ST근로, ST인턴, ST튜터) 장학과의 중복 수혜 불가"
    },
    "exclusivityFrom": "공고 원문"
+  },
+  {
+   "id": "auto-hkrwdsfpnos1073sfpnos888-0hnkqu3",
+   "name": "[입학에서 취업까지] [한국고등교육재단] 문우림 제6기 장학생 모집 안내 ( ~ 2026.12.11.(금))",
+   "boardTitle": "[입학에서 취업까지] [한국고등교육재단] 문우림 제6기 장학생 모집 안내 ( ~ 2026.12.11.(금))",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「재단」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-11",
+   "provider": "주관 기관 원문 확인",
+   "amount": "800만원",
+   "amountValue": 8000000,
+   "deadline": "2026-12-11",
+   "deadlineFrom": "게시판 요약 · ~ 2026.12.11",
+   "period": "접수 ~2026-12-11",
+   "summary": "경기대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "경기대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-11 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "문우림 제6기 장학생 선발 공고문.hwp",
+     "url": "https://www.kyonggi.ac.kr/www/downloadBbsFile.do?atchmnflNo=990303"
+    },
+    {
+     "name": "문우림 제6기 장학생 선발 모집요강.pdf",
+     "url": "https://www.kyonggi.ac.kr/www/downloadBbsFile.do?atchmnflNo=990304"
+    }
+   ],
+   "sourceUrl": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627142&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "1.지원 자격",
+    "O대한민국 국적 보유자※복수국적자 지원 가능",
+    "O 학부 2,3 학년이며 2 개 학기 이상 이수자 (학년 수료 기준은 재학 중인 학교",
+    "기준을따름)",
+    "-이수 학기 개수에 계절 학기는 불포함",
+    "-2026 년 10월 기준, 1 학년2 학기 이수 후~3 학년2 학기 이수 후 휴학중인 자",
+    "-학제가5년 혹은6년인 전공에 한하여, 각각2~4학년과2~5 학년에 재학중인 자(ex.",
+    "건축학과/한의예과 등)",
+    "ㅇ평균 학점 3.5 이상인 자(4.5 만점 기준)",
+    "O2 년간 재단 연수 프로그램에 대면 참여할 수 있는 자",
+    "-도중 어학연수 및 교환학생,군 복무 등의 사유로 프로그램 중단이불가함"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)",
+   "openDate": "2026-11-09",
+   "announceDate": "2027-02-10",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 8000000,
+    "ratio": 0,
+    "min": 8000000,
+    "max": 8000000,
+    "raw": "나. 장학생 혜택 ϨĀ\t문우림 프로그램 교육비 및 답사비 전액 지원 ϨĀ\t장학금 (연간 800만원) ϨĀ\t교통비 지원 (수도권 외 거주자)"
+   },
+   "amountFrom": "공고 원문",
+   "sameAs": "한국고등교육재단",
+   "sameAsFrom": "자동"
+  },
+  {
+   "id": "auto-698detailviewdocategory6",
+   "name": "2026년 전북대동창회장학재단 문화예술장학생 선발 안내",
+   "boardTitle": "2026년 전북대동창회장학재단 문화예술장학생 선발 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「동창회」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-11",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-11-11",
+   "period": "접수 기간 원문 확인",
+   "summary": "전북대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "전북대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-11 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.jbnu.ac.kr/web/Board/219698/detailView.do?category=6",
+   "sourceKind": "auto"
   }
  ]
 }
