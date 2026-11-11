@@ -103,16 +103,23 @@
   "by": "로봇(층2 글 사냥꾼)",
   "title": "2026년 2학기 구민한마음 계속장학금 지급 신청 안내",
   "firstAt": "2026-11-11",
-  "lastAt": "2026-11-11",
-  "tries": 1,
-  "status": "pending",
-  "why": "못 엶(열기 실패: page.goto: Timeout 20000ms exceeded.) — 다시 봅니다",
+  "lastAt": "2026-11-12",
+  "tries": 2,
+  "status": "verified",
+  "why": "그 재단·그 사업·이번 회차 공고로 확인",
   "checks": {
    "C": "ok",
-   "L": "unread"
+   "L": "ok",
+   "H": "ok",
+   "T": "ok",
+   "R": "ok",
+   "X": "ok",
+   "P": "ok"
   },
   "round": "2026-11-20",
-  "nextAt": "2026-11-12"
+  "decidedAt": "2026-11-12",
+  "verifiedAt": "2026-11-12",
+  "also": []
  },
  "kosaf|2000090001|https://info.daegu.go.kr/newshome/mtnmain.php?mtnkey=articleview&mkey=scatelist&mkey2=1&aid=279300": {
   "ds": "kosaf",
@@ -303,13 +310,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-11-08",
-  "lastAt": "2026-11-09",
-  "tries": 2,
+  "lastAt": "2026-11-12",
+  "tries": 3,
   "status": "pending",
   "why": "게시판 목록(0줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-11-23",
-  "nextAt": "2026-11-12"
+  "nextAt": "2026-11-19"
  },
  "kosaf|2000398001|board:https://www.gwangju.go.kr/welfare/boardList.do?boardId=BD_0000000594&pageId=welfare86": {
   "ds": "kosaf",
@@ -319,13 +326,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-11-11",
-  "lastAt": "2026-11-11",
-  "tries": 1,
+  "lastAt": "2026-11-12",
+  "tries": 2,
   "status": "pending",
   "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-11-13",
-  "nextAt": "2026-11-12"
+  "nextAt": "2026-11-15"
  },
  "kosaf|2000423012|https://www.jincheon.go.kr/jcjh/sub.do?menukey=3464&mode=view&no=1076147380": {
   "ds": "kosaf",
@@ -824,13 +831,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-11-08",
-  "lastAt": "2026-11-09",
-  "tries": 2,
+  "lastAt": "2026-11-12",
+  "tries": 3,
   "status": "pending",
   "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-11-16",
-  "nextAt": "2026-11-12"
+  "nextAt": "2026-11-19"
  },
  "kosaf|2704345001|board:https://yeonje.go.kr/edu/main.do": {
   "ds": "kosaf",
