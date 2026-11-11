@@ -3,6 +3,17 @@
  "updatedAt": "2026-11-11",
  "items": [
   {
+   "title": "[일반] 기간제 계약직원 채용 공고(학생군사교육단)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53669&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-11",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-11",
+   "desc": "채용 부서 학생군사교육단 모집인원 1. 지원 자격 및 우대사항 담당업무 학생군사교육단 행정업무 등 지원 자격"
+  },
+  {
    "title": "[일반] 기간제 계약직원 채용 공고(공과대학 환경공학과)",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53667&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "postedAt": "2026-11-11",
@@ -418,17 +429,6 @@
    "src": "b09cb042",
    "foundAt": "2026-10-26",
    "thumb": "data/news/img/f467fb2753f29fac.webp"
-  },
-  {
-   "title": "[일반] [학생상담실] ALL CARE WEEK 뇌파, 맥파 측정 체험 및 해석상담!",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53549&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-26",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/b5e5fc68d6759f94.webp",
-   "desc": "학생상 담실에서는 집중 상담 주간 ALL CARE WEEK(4/28–5/4) 기간 동안 뇌파 맥파 측정을 통한 집중도와 스트레스 상태를 파악하고 해석상담을 진행합니다."
   }
  ]
 }

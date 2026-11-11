@@ -3,6 +3,16 @@
  "updatedAt": "2026-11-11",
  "items": [
   {
+   "title": "[채용공고] 국립부경대학교 이차전지특성화대학지원사업단 계약교수(산학중점) 채용",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726965",
+   "postedAt": "2026-11-11",
+   "kind": "채용",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-11-11"
+  },
+  {
    "title": "제3회 다전공 이수자 연말파티 ’다전공의 밤‘ 신청안내",
    "url": "https://www.pknu.ac.kr/main/163?action=view&no=726949",
    "postedAt": "2026-11-10",
@@ -417,16 +427,6 @@
    "src": "53a197d6",
    "foundAt": "2026-10-26",
    "thumb": "data/news/img/a3fbd8cf0a5696ca.webp"
-  },
-  {
-   "title": "11월 심리검사 일정 안내(2026, 학생상담센터)",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726747",
-   "postedAt": "2026-10-26",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/6cffc9de1fcdfdf1.webp"
   }
  ]
 }

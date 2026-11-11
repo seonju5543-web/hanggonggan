@@ -3,6 +3,83 @@
  "updatedAt": "2026-11-11",
  "items": [
   {
+   "title": "[채용모집] 성균관대 문과대학 비교문화협동과정 연계전공 행정조교 모집",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141802&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-11",
+   "kind": "학사",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-11",
+   "desc": "※ 개인정보는 행정조교 채용 목적으로만 수집/이용되며, 수집한 정보는 모집 종료 후 일괄 폐기합니다"
+  },
+  {
+   "title": "[공학교육혁신센터] 2026 공학페스티벌「청년뉴턴(NEW:TURN) 2026」개최 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141803&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-11",
+   "kind": "행사",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-11",
+   "thumb": "data/news/img/e6dfa384b1172447.webp",
+   "desc": "- 장소: SETEC 제3전시실(서울특별시 강남구 남부순환로 3104 지하철 3호선 학여울역 1번 출구 인근)"
+  },
+  {
+   "title": "[공학교육혁신센터]✨2026 공학페스티벌-성균인event✨우리 학교에 E²가 숨어있다?! 포스터 인증 이벤트(~11/12(목)까지)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141530&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-11",
+   "kind": "행사",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-11",
+   "thumb": "data/news/img/d50f9ae2a286283c.webp",
+   "desc": "2026 공학페스티벌(E²FESTA) 찾고! 찍고! 인증하고! 공학인의 축제! ✨2026 공학페스티벌✨이 다가오는 11월 19일(목)에 개최됩니다."
+  },
+  {
+   "title": "탄소중립연구소 행정인력 모집 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141794&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-11",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-11",
+   "desc": "탄소중립 에너지복지 연구센터 성균관대학교 탄소중립연구소에서 함께 근무할 행정인력을 다음과 같이 모집하오니 많은 관심과 지원을 바랍니다."
+  },
+  {
+   "title": "동아시아학술원 존경각 촉탁직원 채용 공고",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141791&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-11",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-11",
+   "desc": "총괄지원팀 우리대학 존경각에서 근무할 촉탁직원을 다음과 같이 채용하오니 많은 지원 바랍니다."
+  },
+  {
+   "title": "인재교육원행정실(자연과학캠퍼스) 촉탁직원 채용",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141790&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-11",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-11",
+   "desc": "총괄지원팀 우리대학 인재교육원에서 근무할 촉탁직원을 아래와 같이 채용합니다."
+  },
+  {
+   "title": "[동아시아미래가치연구소] 2026 성균 생명학 CLASS 「엔트로피와 생명」 안내 (2026.11.19)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141789&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-11",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-11",
+   "desc": "동아시아미래가치연구소 ◎ 주제 : 엔트로피와 생명 / Entropy and Life ◎ 강연 소개 이번 강연은 열역학 제2법칙과 엔트로피라는 과학적 개념을 바탕으로 생명의 본질과 진화, 그리고 인간과 문명의 위치를…"
+  },
+  {
    "title": "[기숙사] 2026학년도 겨울방학 기숙사 입사생 모집 안내(명륜학사/봉룡학사)",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141767&article.offset=0&articleLimit=10",
    "postedAt": "2026-11-11",
@@ -358,81 +435,6 @@
    "src": "45ec8fd1",
    "foundAt": "2026-10-30",
    "desc": "성균관대학교 양자공학과에서는 다음과 같이 객원교수를 초빙하고자 하오니, 많은 분들의 관심과 지원 요청 드립니다."
-  },
-  {
-   "title": "[맥도날드 기프티콘 증정] 2026년 생성형 AI 활용 학습 실태 및 인식 조사 안내",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141081&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-29",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-30",
-   "desc": "교수학습혁신센터 안녕하세요. 교수학습혁신센터는 2026학년도 생성형 AI 활용 학습 실태 및 인식 조사를 실시합니다. 여러분의 AI 활용 학습 경험을 공유해 주세요!"
-  },
-  {
-   "title": "2026 SKKU 동계 PharmXplore Scholars 선발 안내 (지원기간: 11.2~11.15)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141079&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-29",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-30",
-   "desc": "미래 약학 인재로 성장하는 첫걸음, 제4기 SKKU PharmXplore Scholars를 아래와 같이 선발하오니, 열정 있는 재학생들의 적극적인 참여를 기대합니다."
-  },
-  {
-   "title": "2026학년도 2학기 예비군 훈련 참여 학생 출석 인정처리 안내(2차)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140637&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-29",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-30",
-   "desc": "2026학년도 2학기 성균관대 학생 예비군 훈련에 참석한 학생의 출석 인정처리가 완료되었습니다. 학생 여러분께서는 아래 내용을 참고하시어 본인의 출석 처리사항을 확인하시기 바랍니다."
-  },
-  {
-   "title": "사범대학 에듀테크연구소 행정 직원 채용 공고",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141041&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-29",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-29",
-   "desc": "1. 채용분야 및 인원 가. 채용분야: 행정 나. 채용인원: 1명 2. 담당업무"
-  },
-  {
-   "title": "[학생인재개발팀/대학일자리플러스센터] 제18회 국제금융기구 채용설명회 안내",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140635&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-29",
-   "kind": "행사",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-29",
-   "thumb": "data/news/img/0860b29d9692f2a0.webp",
-   "desc": "재정경제부 주최로 IMF, World Bank 등 국제금융기구 합동 채용을 진행합니다."
-  },
-  {
-   "title": "[성균융합원] 2027학년도 1학기 융합연구학점제 시행 안내(신청 ~11/25)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140949&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-28",
-   "kind": "학사",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-28",
-   "thumb": "data/news/img/a94f3c82b7086b90.webp",
-   "desc": "성균융합원 “다양한 전공의 만남, 새로운 프로젝트의 시작” 성균융합원에서 2027학년도 1학기 융합연구학점제를 실시하오니 많은 관심과 참여 바랍니다."
-  },
-  {
-   "title": "✨(성균인성교육센터) 2026학년도 학부모(동반자) 공감 프로그램 신청 모집",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140924&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-28",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-28",
-   "desc": "2. 장 소: 성균관대학교 인문과학캠퍼스 600주년기념관 5층 조병두홀 3. 참가자 및 모집"
   }
  ]
 }

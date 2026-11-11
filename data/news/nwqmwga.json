@@ -3,6 +3,36 @@
  "updatedAt": "2026-11-11",
  "items": [
   {
+   "title": "[채용공고] 2026년 제3회 전남대학교산학협력단 여수산학협력본부 산학협력...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70970",
+   "postedAt": "2026-11-11",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-11"
+  },
+  {
+   "title": "[채용공고] 2026년도 제2회 전남대학교 대학회계직원 경력경쟁채용시험 공고",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70967",
+   "postedAt": "2026-11-11",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-11"
+  },
+  {
+   "title": "[모집공고] 2026년 서부권창업혁신허브센터 AI 기반 창업 IP 창출 캠...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70965",
+   "postedAt": "2026-11-11",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-11",
+   "thumb": "data/news/img/41b5628f82ab8395.webp"
+  },
+  {
    "title": "[대학생활] [교육부] 2027년 '행복한 교육' 명예기자 모집 안내",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70963",
    "postedAt": "2026-11-11",
@@ -372,37 +402,6 @@
    "src": "b7347301",
    "foundAt": "2026-11-02",
    "thumb": "data/news/img/d8267889760546ef.webp"
-  },
-  {
-   "title": "[학사안내] 2026학년도 동계 계절학기 타 대학교(중앙대학교) 교류수학 ...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70874",
-   "postedAt": "2026-11-02",
-   "kind": "학사",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-02"
-  },
-  {
-   "title": "[취업정보] [추가모집_38명] 2026학년도 공기업 채용 NCS 대비 기...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70873",
-   "postedAt": "2026-11-02",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-02"
-  },
-  {
-   "title": "[취업정보] [동성케미컬] 채용설명회/ 채용상담회*https://ozic....",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70872",
-   "postedAt": "2026-11-02",
-   "kind": "행사",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-02",
-   "thumb": "data/news/img/5f61ac083897246d.webp"
   }
  ]
 }
