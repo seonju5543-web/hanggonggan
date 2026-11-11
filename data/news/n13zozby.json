@@ -1,7 +1,38 @@
 {
  "school": "부산대학교",
- "updatedAt": "2026-11-10",
+ "updatedAt": "2026-11-11",
  "items": [
+  {
+   "title": "[순천시] 「2026 문화콘텐츠 페어 in 순천」 개최 안내",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512117",
+   "postedAt": "2026-11-11",
+   "kind": "행사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-11",
+   "thumb": "data/news/img/01f6cbd93cc946d6.webp"
+  },
+  {
+   "title": "[재단법인 제천문화관광재단] 2026 제천시장배 전국 e-스포츠 대회 참가자 모...",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512109",
+   "postedAt": "2026-11-11",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-11",
+   "thumb": "data/news/img/62d18e76caaca5d9.webp"
+  },
+  {
+   "title": "제5차 부산대학교 산학협력단 및 부산교육대학교 Edu Biz Space 입주기업...",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512107",
+   "postedAt": "2026-11-11",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-11",
+   "desc": "- 모집규모 : 2 개사 - 모집대상 * 에듀테크 분야 예비창업자 및 창업기업 ( 예비 ~ 창업 7 년 이내) * 입주 승인 후 1 개월 이내 해당 공간으로 본사 이전 가능 기업"
+  },
   {
    "title": "[글로컬대학 30] 2026학년도 제6회 디지털인문학센터 컬로퀴엄 개최 및 참가...",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512101",
@@ -390,38 +421,6 @@
    "src": "2d0d4013",
    "foundAt": "2026-10-29",
    "desc": "2026학년도 겨울계절수업 중앙대학교 첨단소재나노융합 혁신융합대학사업 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
-  },
-  {
-   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(고려대학교)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511826",
-   "postedAt": "2026-10-29",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-29",
-   "desc": "2026학년도 겨울계절수업 고려대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
-  },
-  {
-   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(동국대학교 WISE캠퍼스)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511825",
-   "postedAt": "2026-10-29",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-29"
-  },
-  {
-   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(경북대학교)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511823",
-   "postedAt": "2026-10-29",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-29",
-   "desc": "2026학년도 겨울계절수업 경북대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
   }
  ]
 }

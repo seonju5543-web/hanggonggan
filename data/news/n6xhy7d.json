@@ -1,7 +1,61 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-11-10",
+ "updatedAt": "2026-11-11",
  "items": [
+  {
+   "title": "[일반] 기간제 계약직원 채용 공고(공과대학 환경공학과)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53667&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-11",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-11",
+   "desc": "채용 부서 공과대학 환경공학과 모집인원 1. 지원 자격 및 우대사항 담당업무 환경공학과 행정사무업무 등 지원 자격"
+  },
+  {
+   "title": "[일반] [지능형로봇혁신융합대학사업단]2026학년도 동계 계절학기 학점교류 안내(본교→국민대학교)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53665&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-10",
+   "kind": "학사",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-11",
+   "desc": "안녕하세요. 지능형로봇사업단입니다. 2026학년도 동계 계절학기 국민대학교 미래자동차전공 학점교류 신청과 관련하여 아래와 같이 안내드립니다."
+  },
+  {
+   "title": "[일반] [앵커사업] 2026 AI 티키타카 프로젝트 전시회 개최! (프로젝트 관람하고 커피쿠폰 1만원 받아가세요!)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53662&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-10",
+   "kind": "행사",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-11",
+   "thumb": "data/news/img/ff578410cfa0ef8a.webp",
+   "desc": "AI 티키타카 발표평가 전시회 프로젝트 구경하고, AI 전공도 알아보고, 커피쿠폰 받아가자! 앵커사업 (RISE 사업 ) AI 관련 학과 지원 단위과제에서는 비전공자 학생들과 인공지능융합대학 멘토가 한 팀을 이루어…"
+  },
+  {
+   "title": "[외부] [BTF푸른나무재단(청소년폭력예방재단)] 2027년도 UN청소년 대표단 모집 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53664&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-10",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-11",
+   "thumb": "data/news/img/10b5538ca11e50ca.webp"
+  },
+  {
+   "title": "[봉사] [동방사회복지회] 위기아동 지원 기부마라톤 2026 허그런(HUG RUN) 모집 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53655&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-10",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-11",
+   "thumb": "data/news/img/713579ab97950c56.webp"
+  },
   {
    "title": "[일반] [교육혁신원] 2026학년도 2학기 다전공 수요조사 참여 안내 (참여시, 생성형 AI 크레딧 제공 | ~11/29(일))",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53648&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -375,60 +429,6 @@
    "foundAt": "2026-10-26",
    "thumb": "data/news/img/b5e5fc68d6759f94.webp",
    "desc": "학생상 담실에서는 집중 상담 주간 ALL CARE WEEK(4/28–5/4) 기간 동안 뇌파 맥파 측정을 통한 집중도와 스트레스 상태를 파악하고 해석상담을 진행합니다."
-  },
-  {
-   "title": "[외부] [교육부] 2026년 제9회 찾아가는 청년주거 상담소 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53551&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-26",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/cb1de384254791ff.webp"
-  },
-  {
-   "title": "[일반] [채용공고] 광운대학교 산학협력단 「RISE 사업단(회계)」직원 채용 공고",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53547&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-23",
-   "kind": "채용",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-23",
-   "desc": "「광운대학교 산학협력단」 에서 유능하고 역량 있는 인재를 다음과 같이 공개 채용합니다. 광운대학교 산학협력단장"
-  },
-  {
-   "title": "[일반] [HUSS-글로벌공생] AI기반 특허 빅데이터 분석을 통한 글로벌 융합인재 양성 교육 프로그램 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53545&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-23",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-23",
-   "thumb": "data/news/img/fd8f3187a3949a8a.webp",
-   "desc": "광운대학교 인문사회융합인재양성사업단(HUSS)에서 AI 활용 역량과 특허 빅데이터 분석 능력을 키우고, 지식재산 분야의 실무를 경험할 수 있는 「AI기반 특허 빅데이터 분석을 통한 글로벌융합인재 양성 교육…"
-  },
-  {
-   "title": "[일반] 기간제 계약직원 채용 공고(교육혁신원 성과관리팀)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53542&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-23",
-   "kind": "채용",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-23",
-   "desc": "모집인원 1. 지원 자격 및 우대사항 담당업무 1. 교육과정 질관리 및 교육성과 분석 지원"
-  },
-  {
-   "title": "[일반] 기간제 계약직원 채용 공고(국제처 글로벌전략팀)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53541&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-23",
-   "kind": "채용",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-23",
-   "desc": "채용 부서 국제처 글로벌전략팀 모집인원 1. 지원 자격 및 우대사항 담당업무"
   }
  ]
 }

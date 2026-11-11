@@ -1,7 +1,18 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-11-10",
+ "updatedAt": "2026-11-11",
  "items": [
+  {
+   "title": "[기숙사] 2026학년도 겨울방학 기숙사 입사생 모집 안내(명륜학사/봉룡학사)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141767&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-11",
+   "kind": "생활",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-11",
+   "desc": "기숙사 신청 전 상세 모집 내용(기숙사비, 선발원칙, 환불규정 등)을 반드시 기숙사 홈페이지 공지사항에서 확인해주시기 바랍니다."
+  },
   {
    "title": "성균관대 정보통신대학 학사행정업무 담당 행정직원 모집[~11/17(화)]",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141749&article.offset=0&articleLimit=10",
@@ -422,16 +433,6 @@
    "src": "45ec8fd1",
    "foundAt": "2026-10-28",
    "desc": "2. 장 소: 성균관대학교 인문과학캠퍼스 600주년기념관 5층 조병두홀 3. 참가자 및 모집"
-  },
-  {
-   "title": "✅[DS교육센터] 2026-2학기 DS교과지원 TA 모집✅",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140964&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-28",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-28",
-   "desc": "1. 모집대상 및 지원자격 ① 3-5학년 이상 재학생 (재학생만 가능, 휴학생/수료생/DS교과 이론·실습TA로 활동 중인 학생은 동시활동 불가) ② TA활동 기간 중 현장실습, 교환학생, 인턴 중인 학생은 지원불가…"
   }
  ]
 }
