@@ -3,16 +3,46 @@
  "updatedAt": "2026-11-11",
  "items": [
   {
-   "title": "[일반] [앵커사업] 2026년도 동계 계절수업 Python 교과목 신청 안내 (장학금 지급/전공학점 인정)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53666&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "title": "[등록/장학] 2026년 대학생 봉사자 연계 아동돌봄 지원사업(겨울방학) 참여대학 생 모집 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53668&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "attachments": [
     {
      "name": "부설기관",
      "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
     },
     {
-     "name": "부설연구기관",
-     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    },
+    {
+     "name": "광운미디어",
+     "url": "https://www.kw.ac.kr/ko/etc/2018_kw110.pdf"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026.11.12.(목) 13:00 ~ 11.18.(수) 17:00 ​ ○ ​신청방법 : 농어촌희망재단 홈페이지( www.rhof",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-11-11"
+  },
+  {
+   "title": "[일반] [앵커사업] 2026년도 동계 계절수업 Python 교과목 신청 안내 (장학금 지급/전공학점 인정)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53666&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
     },
     {
      "name": "연구지원팀",

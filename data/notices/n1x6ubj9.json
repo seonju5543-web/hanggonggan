@@ -3,14 +3,36 @@
  "updatedAt": "2026-11-11",
  "items": [
   {
-   "title": "2026학년도 한국교육재단 한국사무소 장학생 모집 안내",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=141703&article.offset=0&articleLimit=10",
+   "title": "2026학년도 한국고등교육재단 제6기 문우림 장학생 선발 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=141765&article.offset=0&articleLimit=10",
    "attachments": [
     {
-     "name": "부속기관",
-     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+     "name": "문우림 제6기 장학생 선발 공고문.hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=141765&attachNo=118991"
+    },
+    {
+     "name": "문우림 제6기 장학생 선발 모집요강.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=141765&attachNo=118992"
     }
    ],
+   "deadlineHint": "모집 기간: 2026.11.9.(월)~2026.12.11.(금) 5. 지원방법: 온라인 지원서 작성 6. 문 의 처 ○ (문의 접수) https",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-11-11"
+  },
+  {
+   "title": "2026년 겨울학기 한국농어촌희망재단 한국마사회 대학생 봉사자 연계 지역돌봄 지원사업 (겨울방학) 장학생 선발 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=141760&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "deadlineHint": "신청기간 : 2026.11.12.(목) 13:00 ~ 11.18.(수) 17:00 ○ 대상 : 26.1학기 성적 보유자 중 26.2학기 재학생",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-11-11"
+  },
+  {
+   "title": "2026학년도 한국교육재단 한국사무소 장학생 모집 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=141703&article.offset=0&articleLimit=10",
+   "attachments": [],
    "deadlineHint": "제출 기간 : ~ 2026. 11. 20. (금) 4. 서류 제출 방법 : 홈페이지(https://www.kref.or.jp/ko) 에서 양식을",
    "school": "성균관대학교",
    "campus": "",
@@ -20,10 +42,6 @@
    "title": "2026학년도 2학기 국가근로장학생 운영 현황 및 사전교육 자료 안내",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=141627&article.offset=0&articleLimit=10",
    "attachments": [
-    {
-     "name": "부속기관",
-     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
-    },
     {
      "name": "[붙임 1] 2026년 2학기 국가근로장학금 사전교육 자료(근로장학생용).pdf",
      "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=141627&attachNo=118855"

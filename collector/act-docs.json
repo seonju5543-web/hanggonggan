@@ -31,10 +31,6 @@
   "at": "2026-10-23",
   "tries": 1
  },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53516&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-11-06",
-  "tries": 2
- },
  "https://kfruit.or.kr/board/board_gallery_img_type01/board_detail.asp?scrID=0000000192&pageNum=5&subNum=1&ssubNum=1&bd_num=00000001922026000001&act=view": {
   "at": "2026-10-24",
   "tries": 1
@@ -247,10 +243,6 @@
   "at": "2026-11-04",
   "tries": 1
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3545453": {
-  "at": "2026-11-05",
-  "tries": 1
- },
  "https://www.k-startup.go.kr/web/contents/webNOTICE_MATR.do?page=1&viewCount=18&id=176472&schBdcode=&schGroupCode=&schM=view": {
   "at": "2026-11-05",
   "tries": 1
@@ -349,6 +341,10 @@
  },
  "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=897685&qidx=5233&cate=0&allboard=true&nowpage=1": {
   "at": "2026-11-10",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3504654": {
+  "at": "2026-11-11",
   "tries": 1
  }
 }
