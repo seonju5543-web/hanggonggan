@@ -27,6 +27,7 @@ const ROOT = path.join(__dirname, '..');
 const ON_PORT = 8150;      // 스위치 켠 앱
 const OFF_PORT = 8152;     // 스위치 끈 앱
 const SB_PORT = 8151;      // 가짜 Supabase
+const NOLOCAL_PORT = 8153; // 켰지만 localhost 허락이 없는 앱(= 검사 환경에서 진짜 설정 그대로)
 
 let fail = 0;
 const ok = (cond, label, extra) => {
@@ -59,7 +60,7 @@ function startSupabase() {
 
 /* 앱 복사본 — 원본 저장소는 건드리지 않는다. 값을 **항상 덮어쓴다**(저장소에 무엇이 적혀 있든 검사가 진짜 서버로 보내지 않게) */
 const setStr = (src, key, val) => src.replace(new RegExp(`(\\b${key}:\\s*)'[^']*'`), `$1'${val}'`);
-function makeAppCopy(on) {
+function makeAppCopy(on, local = true) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'handaejang-err-'));
   for (const f of fs.readdirSync(ROOT)) {
     if (['.git', 'node_modules', 'verify', 'proposals', 'collector', 'supabase', '_admin', 'server', 'docs', 'insta'].includes(f)) continue;
@@ -69,8 +70,8 @@ function makeAppCopy(on) {
   let cfg = fs.readFileSync(cfgPath, 'utf8');
   cfg = setStr(cfg, 'url', `http://localhost:${SB_PORT}`);
   cfg = setStr(cfg, 'anonKey', 'anon-test-key');
-  cfg = cfg.replace(/\berrorReport:\s*(true|false)/, `errorReport: ${on}`);
-  if (!new RegExp(`errorReport: ${on}`).test(cfg) || !/url:\s*'http:\/\/localhost/.test(cfg)) {
+  cfg = cfg.replace(/\berrorReport:\s*(true|false),?/, `errorReport: ${on}, errorReportLocal: ${local},`);
+  if (!new RegExp(`errorReport: ${on}, errorReportLocal: ${local},`).test(cfg) || !/url:\s*'http:\/\/localhost/.test(cfg)) {
     throw new Error('supabase-config.js 의 url·errorReport 를 바꾸지 못했습니다 — 파일 모양이 바뀐 것 같습니다');
   }
   fs.writeFileSync(cfgPath, cfg);
@@ -108,6 +109,8 @@ const ALLOWED = ['col', 'device', 'line', 'message', 'screen', 'source', 'versio
   const offDir = makeAppCopy(false);
   const onSrv = await serve(onDir, ON_PORT);
   const offSrv = await serve(offDir, OFF_PORT);
+  const nlDir = makeAppCopy(true, false);
+  const nlSrv = await serve(nlDir, NOLOCAL_PORT);
   const browser = await chromium.launch({ executablePath: EXE });
   const open = async (port) => {
     const ctx = await browser.newContext({ viewport: { width: 390, height: 900 } });
@@ -127,6 +130,15 @@ const ALLOWED = ['col', 'device', 'line', 'message', 'screen', 'source', 'versio
     await page.evaluate(throwLater('꺼진 판의 오류'));
     await wait(800);
     ok(got.length === 0, '오류가 나도 client_errors 로 간 요청 0건', got.length);
+    await ctx.close();
+  }
+
+  console.log('\n[1-2] 켜져 있어도 검사 주소(localhost)에서는 안 보낸다 — 검사 중 오류가 진짜 표에 섞이지 않게');
+  {
+    const { ctx, page } = await open(NOLOCAL_PORT);
+    await page.evaluate(throwLater('검사 환경의 오류'));
+    await wait(800);
+    ok(got.length === 0, '스위치를 켠 진짜 설정 그대로여도 localhost 에서는 0건', got.length);
     await ctx.close();
   }
 
@@ -194,6 +206,8 @@ const ALLOWED = ['col', 'device', 'line', 'message', 'screen', 'source', 'versio
   await browser.close();
   await new Promise((r) => onSrv.close(r));
   await new Promise((r) => offSrv.close(r));
+  await new Promise((r) => nlSrv.close(r));
+  fs.rmSync(nlDir, { recursive: true, force: true });
   await new Promise((r) => sb.close(r));
   fs.rmSync(onDir, { recursive: true, force: true });
   fs.rmSync(offDir, { recursive: true, force: true });

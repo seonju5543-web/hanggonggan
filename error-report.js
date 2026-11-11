@@ -72,7 +72,10 @@
 
   /* ── 브라우저 ─────────────────────────────────────────── */
   const cfg = () => (typeof SUPABASE_CONFIG !== 'undefined' ? SUPABASE_CONFIG : null);
-  const on = () => { const c = cfg(); return !!(c && c.errorReport === true && c.url && c.anonKey); };
+  /* 🔴 배포된 주소에서만 보낸다 — 검사(CI·로컬)는 localhost 에서 앱을 띄우므로, 막지 않으면 검사 중 난 오류가
+     **진짜 표**에 학생 오류와 섞여 쌓인다. 오류 창구 검사만 errorReportLocal 로 연다(검사 복사본에서만 켠다). */
+  const local = () => /^(localhost|127\.0\.0\.1|\[::1\]|0\.0\.0\.0)$/.test(location.hostname);
+  const on = () => { const c = cfg(); return !!(c && c.errorReport === true && c.url && c.anonKey && (!local() || c.errorReportLocal === true)); };
   const sent = new Set();
   let count = 0;
   let busy = false;
