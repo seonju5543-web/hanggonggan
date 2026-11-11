@@ -7436,7 +7436,7 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
 
      ⚠️ 예외 셋은 **자기가 앱 서버를 직접 띄운다**(`http.createServer`). 남의 앱을 잴 수가
         없어 이미 안전하고, 관문을 붙이면 오히려 없는 포트를 확인하다 죽는다. */
-  const SELF_SERVED = ['verify-admin.js', 'verify-supabase.js', 'verify-push-client.js'];
+  const SELF_SERVED = ['verify-admin.js', 'verify-supabase.js', 'verify-push-client.js', 'verify-error-report.js'];
   /* ⚠️ 두 번째 예외 갈래 — **서버를 아예 안 쓰는 드라이버** (2026-09-14 신설).
      `verify-admin-shape.js` 는 CSS 두 벌을 디스크에서 읽어 `page.setContent` 로 직접 넣는다.
      남의 서버를 잴 길이 처음부터 없어 `assertOwnServer` 를 붙일 자리도 없다(없는 포트를
@@ -14043,6 +14043,42 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
   const EAy = createRequire(import.meta.url)('../elig-ask.js');
   const PRy = createRequire(import.meta.url)('../parse-requirements.js');
   eq('  온보딩 질문(ONBOARD_TRAITS)은 전부 처지 종류·이름표가 있다', (EAy.ONBOARD_TRAITS || []).filter((k) => !EAy.TRAIT_LABEL[k] || !PRy.TRAIT_PAT.some((r) => r[0] === k)), []);
+}
+
+/* ■ 앱 오류 수집 창구 (2026-11-10 · 은서 · 출시 전 백엔드 7번 — error-report.js · supabase/migrations/0005_client_errors.sql)
+   학생 폰에서 난 오류를 우리가 알게 한다 — 🔴 누구인지는 담지 않는다. 브라우저로 나가는 본문은 verify-error-report.js 가 센다.
+   여기서는 ① 지우기 규칙(cleanError — 순수 함수) ② 표의 약속(넣기만 · 칸 상한 · 쓰레기 상한 · user_id 없음) ③ 배선(스위치 기본 꺼짐 · 싣는 순서 · 약관 한 줄)을 잰다. */
+{
+  console.log('\n■ 앱 오류 수집 창구 — 누구인지 안 담고 오류만 (2026-11-10)');
+  const ER = createRequire(import.meta.url)('../error-report.js');
+  const row = ER.cleanError({ message: 'x https://a.b/c/d.js?access_token=TT#k k@n.com 010-1111-2222 123456789 eyJabcdefghijk.eyJx.yz', source: 'https://app.test/hang/app.js?v=3', line: 12, col: 'q' },
+    { origin: 'https://app.test', screen: 'screen-home<script>', version: 'v0.3', device: '아이폰 · Safari' });
+  eq('① 지우기 — 주소는 호스트·경로만 · 메일·전화·긴 숫자·토큰 지움 · 파일은 이름만 · 숫자 아닌 칸은 null · 화면 이름은 글자만',
+    [row.message, row.source, row.line, row.col, row.screen],
+    ['x https://a.b/c/d.js [메일] [전화] [숫자] [토큰]', 'app.js', 12, null, 'screen-homescript']);
+  eq('  남의 사이트 파일은 \'바깥\' · 문구가 없으면 \'(문구 없음)\' · 300자 상한 · Script error·ResizeObserver 는 안 보냄',
+    [ER.cleanError({ source: 'https://cdn.x/y.js' }, { origin: 'https://app.test' }).source, ER.cleanError({}, {}).message,
+      ER.cleanError({ message: '가'.repeat(400) }, {}).message.length, ER.worthReporting('Script error.'), ER.worthReporting('ResizeObserver loop limit exceeded'), ER.worthReporting('TypeError: x')],
+    ['바깥', '(문구 없음)', 300, false, false, true]);
+  eq('  내보내는 칸은 일곱 개뿐 (계정·프로필 칸이 생기면 여기서 빨개진다)', Object.keys(row).sort(), ['col', 'device', 'line', 'message', 'screen', 'source', 'version']);
+  const sql = readText(new URL('../supabase/migrations/0005_client_errors.sql', import.meta.url)).replace(/--.*$/gm, '');
+  eq('② 표 — RLS 켬 · 넣기 정책 하나뿐(읽기·고치기·지우기 정책 없음) · user_id 칸 없음 · 칸마다 길이 상한',
+    [/enable row level security/.test(sql), (sql.match(/create policy/gi) || []).length, /for (select|update|delete|all)\b/i.test(sql), /user_id/i.test(sql),
+      ['message', 'source', 'screen', 'version', 'device'].every((c) => new RegExp(`${c}\\s+text[^,]*check \\([^)]*char_length\\(${c}\\)`, 'i').test(sql))],
+    [true, 1, false, false, true]);
+  eq('  쓰레기 상한 — 1분·하루 상한과 30일 정리를 넣기 전에 · SECURITY DEFINER 는 search_path 를 못 박는다 · 함수 실행 권한을 거둔다 · 시각은 서버가',
+    [/interval '1 minute'\) >= \d+/.test(sql), /interval '1 day'\) >= \d+/.test(sql), /delete from public\.client_errors where at < now\(\) - interval '30 days'/.test(sql),
+      /security definer\s+set search_path = public, pg_temp/i.test(sql), /revoke all on function public\.client_errors_guard\(\) from public, anon, authenticated/.test(sql),
+      /before insert on public\.client_errors/.test(sql), /new\.at := now\(\)/.test(sql)],
+    [true, true, true, true, true, true, true]);
+  const cfg = readText(new URL('../supabase-config.js', import.meta.url));
+  const html = readText(new URL('../index.html', import.meta.url));
+  const terms = readText(new URL('../terms.html', import.meta.url));
+  const sw = readText(new URL('../sw.js', import.meta.url));
+  eq('③ 배선 — 스위치 칸이 있다 · 싣는 순서(supabase-config → supabase-client → error-report) · 서비스워커가 싣는다 · 약관에 수집 항목 한 줄(30일 파기)',
+    [/\berrorReport:\s*(true|false)/.test(cfg), html.indexOf('src="supabase-config.js"') < html.indexOf('src="supabase-client.js"') && html.indexOf('src="supabase-client.js"') < html.indexOf('src="error-report.js"'),
+      /'error-report\.js'/.test(sw), /앱 오류가 났을 때/.test(terms) && /30일 뒤 자동 파기/.test(terms)],
+    [true, true, true, true]);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
