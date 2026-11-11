@@ -83,14 +83,27 @@ const CAMPUS_BY_AREA = {
   '명지대학교': { '서울': '인문캠퍼스(서울)', '경기': '자연캠퍼스(용인)' },
   '경북대학교': { '대구': '대구캠퍼스', '경북': '상주캠퍼스' },
 };
+/* ── 번호로 가르는 이원화 학교 (2026-11-11 · 노션 C-6 G4) ──
+   지역으로 못 가르는 둘은 커리어넷 campus_nm 번호로 가른다. 근거는 2026-11-11 학과 로봇 리포트 「캠퍼스 번호별 학과 표본」 — 번호마다 실린 학과가
+   그 캠퍼스 단과대와 하나하나 맞는다(짐작이 아니라 표본 대조):
+     국립한국교통대 제1(충북 · 건축·경영·스포츠 — 충주) · 제2(충북 · 간호·물리치료·응급구조·식품 — 증평 보건생명대학) · 제3(경기 · 철도경영·철도공학·철도차량 — 의왕 철도대학)
+     부산대 제1(부산 · 건축·경영·경제·고고 — 부산) · 제2(경남 · 바이오산업기계·원예생명·식품자원경제·동물생명자원 — 밀양 생명자원과학대학) · 제3(경남 · 의예·의학·간호 — 양산)
+   ⚠️ 앱 칩(CAMPUSES_BY_SCHOOL)에 양산이 없어 부산대 제3(양산)은 **부산캠퍼스** 목록에 넣는다 — 밀양이 아닌 학생이 고르는 칩이다(칩을 새로 만들면 공고 캠퍼스 판정까지 바뀐다).
+   번호 뜻이 바뀌면 리포트 표본이 달라진다 — 표본을 다시 보고 고친다. 이름은 앱 칩과 글자가 같아야 한다(관문이 대조한다). */
+const CAMPUS_BY_NUMBER = {
+  '국립한국교통대학교': { '제1캠퍼스': '충주캠퍼스', '제2캠퍼스': '증평캠퍼스', '제3캠퍼스': '의왕캠퍼스' },
+  '부산대학교': { '제1캠퍼스': '부산캠퍼스', '제2캠퍼스': '밀양캠퍼스', '제3캠퍼스': '부산캠퍼스' },
+};
 /* 시·도 짧은 이름은 parse-requirements 의 `shortRegion` 한 곳 — 판정(거주지·출신)과 같은 규칙(베끼지 않는다) */
 const PRreq = createRequire(import.meta.url)('../parse-requirements.js');
 const shortRegion = PRreq.shortRegion;
 const REGIONS = PRreq.REGIONS;   // 학교 소재 시·도는 이 표 안의 이름만 싣는다
-function campusOf(school, area) {
+function campusOf(school, area, campusNm) {
+  if (CAMPUS_BY_NUMBER[school]) return CAMPUS_BY_NUMBER[school][String(campusNm || '').replace(/\s+/g, '')] || null;
   const table = CAMPUS_BY_AREA[school];
   return table ? (table[shortRegion(area)] || null) : null;
 }
+const splitsCampus = (school) => !!(CAMPUS_BY_AREA[school] || CAMPUS_BY_NUMBER[school]);
 
 function normalizeSchool(raw) {
   const name = raw.replace(/\s+/g, ' ').trim();
@@ -126,7 +139,7 @@ const byRawCampus = new Map();   // '원래이름\t캠퍼스' → Set(학과명)
       대상은 박아 두지 않고 계산한다 — 앱 캠퍼스 칩(CAMPUSES_BY_SCHOOL)이 있는데 CAMPUS_BY_AREA 표에 없는 학교.
    ② 소재지를 못 정한 학교의 area 원문 — 광주·전남 21개교(전남대·조선대 포함)가 region 이 비었는데, 원문 값이 시·도 표(REGIONS)에 없어 버려진 것으로만 안다.
       무슨 글자였는지 남겨야 짐작 없이 고칠 수 있다. */
-const NUMBER_PROBE = new Set([...loadCampuses(new URL('../data.js', import.meta.url)).keys()].filter((k) => !CAMPUS_BY_AREA[k]));
+const NUMBER_PROBE = new Set([...loadCampuses(new URL('../data.js', import.meta.url)).keys()].filter((k) => !CAMPUS_BY_AREA[k]));   // 번호 표(CAMPUS_BY_NUMBER)가 생긴 학교도 표본은 계속 남긴다 — 번호 뜻이 바뀌면 보이게
 const byNumber = new Map();      // '학교\t캠퍼스 번호\tarea' → Set(학과명)
 const areaRawSeen = new Map();   // 학교 → Map(area 원문 → 학과 수)
 const squash = (s) => String(s).replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/\s+/g, ' ').trim();
@@ -173,7 +186,7 @@ for (const seq of uniq) {
         if (r) {
           if (!regionSeen.has(school)) regionSeen.set(school, new Map());
           regionSeen.get(school).set(r, (regionSeen.get(school).get(r) || 0) + 1);
-          const cname = campusOf(school, squash(areaRaw || ''));
+          const cname = campusOf(school, squash(areaRaw || ''), squash(campusRaw || ''));
           if (cname) {
             if (!campusRegion.has(school)) campusRegion.set(school, new Map());
             const cm = campusRegion.get(school);
@@ -182,11 +195,11 @@ for (const seq of uniq) {
           }
         }
       }
-      if (CAMPUS_BY_AREA[school]) {
+      if (splitsCampus(school)) {
         const area = squash(areaRaw || '');
         if (!areaSeen.has(school)) areaSeen.set(school, new Set());
         areaSeen.get(school).add(area || '(area 칸 없음)');
-        const cname = campusOf(school, area);
+        const cname = campusOf(school, area, squash(campusRaw || ''));
         if (cname) {
           if (!byCampus.has(school)) byCampus.set(school, new Map());
           const cm = byCampus.get(school);
@@ -245,7 +258,7 @@ out.regions = Object.fromEntries(
     }]),
 );
 /* 캠퍼스를 가르기로 한 학교인데 둘이 안 나온 곳 — area 값이 표와 다른 것이다. 짐작해 고치지 말고 리포트의 원문 값을 보고 표를 고친다 */
-const campusUnsplit = Object.keys(CAMPUS_BY_AREA).filter((k) => inApp(k) && bySchool.has(k) && Object.keys(out.campuses[k] || {}).length < 2)
+const campusUnsplit = [...Object.keys(CAMPUS_BY_AREA), ...Object.keys(CAMPUS_BY_NUMBER)].filter((k) => inApp(k) && bySchool.has(k) && Object.keys(out.campuses[k] || {}).length < 2)
   .map((k) => `${k} — area 값: ${[...(areaSeen.get(k) || [])].join(' · ') || '(없음)'} · 가른 캠퍼스: ${Object.keys(out.campuses[k] || {}).join(' · ') || '없음'}`);
 
 /* ── 실행 진단 (2026-10-05 점검 · 리포트 + ::warning — 관문이 아니다) ── */

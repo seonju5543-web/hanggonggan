@@ -13733,6 +13733,13 @@ console.log('\n■ 학적정보 테일러링 (2026-10-24 개발자 지시 1~4 ·
     eq('  🔴 표의 학교는 전부 앱 학교 · 캠퍼스 이름은 전부 그 학교의 CAMPUSES_BY_SCHOOL 칩과 같다',
       rows.filter(([s, cs]) => !unis.has(s) || cs.some((c) => !(camp.get(s) || []).includes(c))).map(([s]) => s), []);
     eq('  지역으로 못 가르는 학교(부산대 밀양·양산 둘 다 경남 · 교통대 충주·증평 둘 다 충북)는 표에 없다', rows.map(([s]) => s).filter((s) => /부산대학교|국립한국교통대학교/.test(s)), []);
+    /* 번호 표(2026-11-11 · 리포트 「캠퍼스 번호별 학과 표본」 대조) — 부산대·교통대는 campus_nm 번호로 가른다 · 이름은 앱 칩과 글자가 같다 · 학교마다 칩이 다 쓰인다 */
+    const nblock = robot.slice(robot.indexOf('const CAMPUS_BY_NUMBER = {'), robot.indexOf('\n};', robot.indexOf('const CAMPUS_BY_NUMBER = {')));
+    const nrows = [...nblock.matchAll(/'([^']+)':\s*\{([^}]*)\}/g)].map((m) => [m[1], [...m[2].matchAll(/:\s*'([^']+)'/g)].map((x) => x[1])]);
+    eq('  🔴 번호 표(CAMPUS_BY_NUMBER) — 부산대·교통대 둘 · 이름은 그 학교 칩과 같고 칩을 다 쓴다',
+      [nrows.map(([sc]) => sc).sort(), nrows.filter(([sc, cs]) => !unis.has(sc) || cs.some((c) => !(camp.get(sc) || []).includes(c)) || (camp.get(sc) || []).some((c) => !cs.includes(c))).map(([sc]) => sc)],
+      [['국립한국교통대학교', '부산대학교'], []]);
+    eq('  로봇이 번호 표로 캠퍼스를 고른다(campusOf 가 campus_nm 을 받는다)', /campusOf\(school, area, squash\(campusRaw/.test(robot) && /if \(CAMPUS_BY_NUMBER\[school\]\)/.test(robot), true);
     eq('  로봇이 캠퍼스별 목록을 발행기에 넘긴다', /campuses:\s*out\.campuses\[k\]/.test(robot), true);
   }
   eq('  data.js 에 손으로 적은 학과 목록이 없다 (외대 손목록이 로봇 파일을 가려 GBT학부가 안 떴다)', /const MAJORS_BY_SCHOOL = \{\};/.test(dataSrc), true);
