@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-11-11",
- "count": 1716,
+ "count": 1720,
  "items": [
   {
    "title": "[공통][교외]한국고등교육재단 문우림 제6기 장학생 선발(~12/11)",
@@ -51,6 +51,15 @@
    "foundAt": "2026-11-11",
    "bodyDeadline": "2026-12-11",
    "bodyDeadlineText": "[교외] 2027학년도 한국고등교육재단 문우림 제6기 장학생 선발 안내(11. 9. ~ 12. 11.)"
+  },
+  {
+   "title": "[교외-12/11]한국고등교육재단 문우림 제6기 장학생 선발 안내(재단지원)",
+   "url": "https://www.korea.ac.kr/ko/568/subview.do?article.offset=10#n-%5B%EA%B5%90%EC%99%B8-12%2F11%5D%ED%95%9C%EA%B5%AD%EA%B3%A0%EB%93%B1%EA%B5%90%EC%9C%A1%EC%9E%AC%EB%8B%A8%20%EB%AC%B8%EC%9A%B0%EB%A6%BC%20%EC%A0%9C6%EA%B8%B0%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4(%EC%9E%AC%EB%8B%A8%EC%A7%80",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "고려대학교",
+   "campus": "",
+   "foundAt": "2026-11-11"
   },
   {
    "title": "[등록/장학] 2026년 대학생 봉사자 연계 아동돌봄 지원사업(겨울방학) 참여대학 생 모집 안내",
@@ -109,6 +118,70 @@
    "bodyDeadlineText": "다 . 모집 일정 온라인 지원서 제출 : 2026. 11. 9.( 월 )~2026. 12. 11.( 금 ） 오후 11:59"
   },
   {
+   "title": "(홍보) 2026년 2학기 선원가족장학사업 선발 안내(마감)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=5233&bidx=897008&qidx=5233&cate=0&allboard=true&nowpage=2",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/38060CD67CC14E0BBAFF76DBED5063C4.pdf"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 08. 03.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/A84CAB85EB1B467C8E719DF534E772A9.pdf"
+    },
+    {
+     "name": "2026년 2학기 선원가족장학사업 선발 모집 요강(변경).hwp",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=0E3F209B72434E599A8F97D934625320_.hwp&ogrfname=2026%EB%85%84+2%ED%95%99%EA%B8%B0+%EC%84%A0%EC%9B%90%EA%B0%80%EC%A1%B1%EC%9E%A5%ED%95%99%EC%82%AC%EC%97%85+%EC%84%A0%EB%B0%9C+%EB%AA%A8%EC%A7%91+%EC%9A%94%EA%B0%95%28%EB%B3%80%EA%B2%BD%29.hwp"
+    },
+    {
+     "name": "2026년 2학기 선원가족장학사업 선발 모집 요강(변경).hwp",
+     "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=5233&bidx=897008&qidx=5233&cate=0&allboard=true&nowpage=2#n-2026%EB%85%84%202%ED%95%99%EA%B8%B0%20%EC%84%A0%EC%9B%90%EA%B0%80%EC%A1%B1%EC%9E%A5%ED%95%99%EC%82%AC%EC%97%85%20%EC%84%A0%EB%B0%9C%20%EB%AA%A8%EC%A7%91%20%EC%9A%94%EA%B0%95(%EB%B3%80%EA%B2%BD).hwp"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-11-11"
+  },
+  {
+   "title": "(공동실험실습관)26학년도 2학기 국가근로장학생 모집(교체선발)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=57138&bidx=897699&qidx=57138&cate=0&allboard=true&nowpage=1",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/38060CD67CC14E0BBAFF76DBED5063C4.pdf"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 08. 03.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/A84CAB85EB1B467C8E719DF534E772A9.pdf"
+    },
+    {
+     "name": "서식1. 국가근로장학생 지원서.hwp",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F57138&fname=7A6B52B09A124EE28BDBBC42F33C2341_.hwp&ogrfname=%EC%84%9C%EC%8B%9D1.+%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EC%83%9D+%EC%A7%80%EC%9B%90%EC%84%9C.hwp"
+    },
+    {
+     "name": "서식2. 근로학생 자기소개서.hwp",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F57138&fname=22FF3E6A489C4D1584A16E468ABF993A_.hwp&ogrfname=%EC%84%9C%EC%8B%9D2.+%EA%B7%BC%EB%A1%9C%ED%95%99%EC%83%9D+%EC%9E%90%EA%B8%B0%EC%86%8C%EA%B0%9C%EC%84%9C.hwp"
+    },
+    {
+     "name": "서식3. 근무가능시간표.xlsx",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F57138&fname=FD8E3D4A44B64416868E33E5643378C7_.xlsx&ogrfname=%EC%84%9C%EC%8B%9D3.+%EA%B7%BC%EB%AC%B4%EA%B0%80%EB%8A%A5%EC%8B%9C%EA%B0%84%ED%91%9C.xlsx"
+    }
+   ],
+   "deadlineHint": "모집기간: 2026. 11. 12.(목) 09:00 ~ 18:00 까지 *제출서류 검토 후 적합자 개별 연락 유선 면접 실시 예정 / 선발 완료",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-11-11"
+  },
+  {
    "title": "2026년 겨울학기 한국농어촌희망재단 한국마사회 대학생 봉사자 연계 지역돌봄 지원사업 (겨울방학) 장학생 선발 안내",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=141760&article.offset=0&articleLimit=10",
    "attachments": [
@@ -147,6 +220,20 @@
    "foundAt": "2026-11-11",
    "bodyDeadline": "2026-12-11",
    "bodyDeadlineText": "- 장학금(연간 800만원) 4. 모집 기간: 2026.11.9.(월)~2026.12.11.(금)"
+  },
+  {
+   "title": "2026년 대학생 봉사자 연계 아동돌봄 지원사업(겨울방학) 참여대학생 모집 안내",
+   "url": "https://www.yonsei.ac.kr/bbs/sc/58/944610/artclView.do",
+   "attachments": [
+    {
+     "name": "[붙임]1. 2026년 대학생 봉사자 연계 지역돌봄 지원사업(KRA지역돌봄-겨울방학).hwp",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015474/download.do"
+    }
+   ],
+   "deadlineHint": "신청 기간 - 2026. 11. 12.(목) 13:00 ~ 11. 18.(수) 17:00 3) 선발 인원 및 지원 내용 - 선발 인원: 27명",
+   "school": "연세대학교",
+   "campus": "",
+   "foundAt": "2026-11-11"
   },
   {
    "title": "[교외] 2027-2028 이스라엘 정부초청 장학생 선발(~1/15)",
