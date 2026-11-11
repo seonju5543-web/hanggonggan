@@ -587,40 +587,39 @@
    "excerptsAt": "2026-11-11"
   },
   {
-   "title": "제9회 원주권 스타트업 커뮤니티 데이 참가자 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179727",
+   "title": "[강동구 청년해냄센터] 2027년 정부 지원 사업 대비 성공 창업 스쿨 참가자 모집 공고",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179766",
    "kind": "대외활동",
+   "field": "교육·캠프",
    "deadline": "2026-11-23",
    "deadlineHint": null,
    "excerpts": [
     {
      "label": "모집기간",
-     "text": "2026-11-05 ~ 2026-11-23"
+     "text": "2026-11-09 ~ 2026-11-23"
     },
     {
      "label": "대상",
-     "text": "창업에 관심있는 누구나"
+     "text": "2027년 정부 지원 사업 도전을 희망하는 예비창업자 및 기창업자 24명"
     },
     {
      "label": "활동지역",
-     "text": "강원"
+     "text": "전국"
     }
    ],
    "attachments": [],
    "school": "",
    "campus": "",
-   "host": "상지대학교 벤처창업본부",
+   "host": "강동구 청년해냄센터",
    "api": "kstartup",
-   "apiId": "179727",
-   "id": "api-kstartup-179727",
+   "apiId": "179766",
+   "id": "api-kstartup-179766",
    "eligibilityLines": [
-    "창업에 관심있는 누구나"
+    "2027년 정부 지원 사업 도전을 희망하는 예비창업자 및 기창업자 24명"
    ],
    "noticeLines": [
-    "상지대학교 벤처창업본부에서는 (예비)창업기업의 네트워크 형성을 통한 사업화 촉진을 돕기 위해",
-    "「 제9회 원주권 스타트업 커뮤니티 데이 참가자 모집 」을 개최합니다.",
-    "많은 관심과 참여 바랍니다.",
-    "온라인 접수 : https://forms.gle/UegLwQTQYpD8AjcW6"
+    "강동구 청년해냄센터에서 다음과 같이 공고하오니 참여를 희망하는 창업자는 안내에 따라 신청하시기 바랍니다.",
+    "온라인 접수 : http://www.gdhaenaem.com/?c=168"
    ],
    "detailsV": 6,
    "foundAt": "2026-11-11",

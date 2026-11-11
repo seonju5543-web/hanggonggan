@@ -1,6 +1,6 @@
 ## 🛰 공공 API 로봇 리포트 (2026-11-11)
 
-- ✅ **K-Startup 사업공고** — 받은 행 145 · 실은 글 **15** · 버림: 공모전·대외활동 아님(지원사업 등) 118 · 상한 15건 초과 11 · 마감 지남 1
+- ✅ **K-Startup 사업공고** — 받은 행 149 · 실은 글 **15** · 버림: 공모전·대외활동 아님(지원사업 등) 121 · 상한 15건 초과 13
   - 자격 줄 있는 글 15/15 · 원문 안내 있는 글 15/15
   - 첫 행 칸: `aply_excl_trgt_ctnt, aply_mthd_eml_rcpt_istc, aply_mthd_etc_istc, aply_mthd_fax_rcpt_istc, aply_mthd_onli_rcpt_istc, aply_mthd_pssr_rcpt_istc, aply_mthd_vst_rcpt_istc, aply_trgt, aply_trgt_ctnt, biz_aply_url, biz_enyy, biz_gdnc_url, biz_pbanc_nm, biz_prch_dprt_nm, biz_trgt_age, detl_pg_url, id, intg_pbanc_biz_nm, intg_pbanc_yn, pbanc_ctnt, pbanc_ntrp_nm, pbanc_rcpt_bgng_dt, pbanc_rcpt_end_dt, pbanc_sn, prch_cnpl_no, prfn_matr, rcrt_prgs_yn, sprv_inst, supt_biz_clsfc, supt_regin`
   - 공모전 · 2026 의왕시 청년e-Room 창업아이디어 공모전 참가자 모집 (~2026-11-11) — https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179565
@@ -21,11 +21,11 @@
     - 179752 · '딸깍 한 번으로 완성하는 AI 업무 자동화' 실전 워 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179752 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179752(2)
     - 179559 · 국민대학교 청년도약 인재양성 부트캠프 참가자 모집(AI → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179559 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179559(2)
     - 179695 · 2026년 대전 스타트업 원스톱 지원센터 아카데미 4회 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179695 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179695(2)
-    - 179727 · 제9회 원주권 스타트업 커뮤니티 데이 참가자 모집 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179727 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179727(2)
-- ✅ **1365 봉사참여정보** — 받은 행 500 · 실은 글 **15** · 상세 내용 15/15건 · 버림: 대학생·청년 대상 아님 441 · 상한 15건 초과 40 · 마감 지남 3 · 같은 글 1
+    - 179766 · [강동구 청년해냄센터] 2027년 정부 지원 사업 대비 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179766 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179766(2) · biz_gdnc_url=http://www.gdhaenaem.com/?c=168(1)
+- ✅ **1365 봉사참여정보** — 받은 행 500 · 실은 글 **15** · 상세 내용 15/15건 · 버림: 대학생·청년 대상 아님 442 · 상한 15건 초과 42 · 같은 글 1
   - 자격 줄 있는 글 9/15 · 원문 안내 있는 글 15/15
   - 첫 행 칸: `actBeginTm, actEndTm, actPlace, adultPosblAt, gugunCd, nanmmbyNm, noticeBgnde, noticeEndde, progrmBgnde, progrmEndde, progrmRegistNo, progrmSj, progrmSttusSe, sidoCd, srvcClCode, url, yngbgsPosblAt`
-  - 코드 칸 값(첫 세 행): gugunCd=3330000|5710000|3340000 · sidoCd=6260000|6430000|6260000
+  - 코드 칸 값(첫 세 행): gugunCd=5540000|3530000|3730000 · sidoCd=6410000|6280000|6310000
   - 대외활동 · 탈북민대학생멘토링 - 간호학 (~2026-11-11) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3519474
   - 대외활동 · (대학생) [어린이 고전 읽기 백일장] 행사 운영 지원 (~2026-11-11) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3533799
   - 대외활동 · [대학생 및 청년] 2026 군포시 자원봉사자의 날 기념행사 보조 (~2026-11-11) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3536400
@@ -84,6 +84,6 @@
     - 20260430005400212977 · 청년정책제안 아이디어 공모 → https://www.cheonan.go.kr/kor/sub06_04_03_05.do · 살핀 칸: refUrlAddr1=https://www.cheonan.go.kr/kor/sub06_04_03_05.do(1)
     - 20260421005400212793 · 청년 체인지메이커 아카데미 운영 → https://jejuyouthdream.com/policy/detail/70 · 살핀 칸: aplyUrlAddr=https://www.jeju.go.kr/index.htm(0) · refUrlAddr1=https://jejuyouthdream.com/policy/detail/70(1)
 
-data/activities.json — API 글 52 → **53건** (전체 200건)
+data/activities.json — API 글 53 → **53건** (전체 200건)
 
 > 열쇠·출처 설명: `collector/open-api.mjs` 머리말 · 바꾸는 규칙: `collector/open-api-map.mjs` · 설계: `docs/designs/external-sources.md` §10
