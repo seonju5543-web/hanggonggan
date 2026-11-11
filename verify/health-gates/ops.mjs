@@ -393,4 +393,40 @@ export default async function gate(eq, ctx) {
     eq('  🔴 \'가장 최근 작업 바로 되돌리기\' 길이 없다(2026-11-11 은서 결정) — 되돌리기는 번호를 받아야만 한다',
       [/--latest|최근 것 바로|HEAD~1/.test(yml + src), /revertCommit\(cwd, arg\('--revert'\)\)/.test(src)], [false, true]);
   }
+
+  /* ── ⑥ 열쇠 목록 · 만료 알림 (2026-11-11 · 은서 · 출시 전 백엔드 9번 — docs/backend/keys.json · tools/key-expiry.mjs · key-expiry.yml) ──
+     관리자 열쇠가 아무도 모르게 11/7 에 만료됐다. 🔴 목록에 값은 없다 · 새 열쇠는 목록에 적어야 통과 · 14일 전부터 경보 · 사람용 표는 원본과 같다 */
+  {
+    const KE = await import(new URL('tools/key-expiry.mjs', root));
+    const st = (e) => KE.keyState({ expires: e }, '2026-11-11');
+    eq('⑥ 만료 판정 — 지남 · 14일째까지 임박 · 15일째는 아직 · 없음 · 확인 필요(경보 안 함) · 자동 확인',
+      [st('2026-11-10'), st('2026-11-25'), st('2026-11-26'), st('없음').state, st('확인 필요').state, st('자동 확인').state],
+      [{ state: 'expired', days: -1 }, { state: 'soon', days: 14 }, { state: 'ok', days: 15 }, 'none', 'unknown', 'auto']);
+    eq('  임박 목록 — 지남·임박만, 급한 순 · 확인 필요는 빠진다',
+      KE.dueKeys([{ name: 'a', expires: '2026-12-31' }, { name: 'b', expires: '2026-11-20' }, { name: 'c', expires: '2026-11-01' }, { name: 'd', expires: '확인 필요' }], '2026-11-11').map((k) => k.name), ['c', 'b']);
+    const bad = (k) => { try { KE.loadKeys(JSON.stringify({ keys: [k] })); return '통과'; } catch (e) { return '거절'; } };
+    const base = { name: 'X', where: 'GitHub Secrets', expires: '없음' };
+    eq('  🔴 값처럼 생긴 글자는 거절 — 열쇠 접두어·JWT·긴 덩어리 · 이름·두는 곳 빠짐 · 틀린 날짜 꼴도 거절 · 멀쩡한 줄은 통과',
+      [bad({ ...base, renew: 'sk-ant-api03-abcdefghij' }), bad({ ...base, renew: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOjF9.x' }), bad({ ...base, for: 'AbCdEf0123456789AbCdEf0123456789xy' }),
+        bad({ name: 'X', expires: '없음' }), bad({ ...base, expires: '내년쯤' }), bad(base)],
+      ['거절', '거절', '거절', '거절', '거절', '통과']);
+    const keys = KE.loadKeys(read(root, 'docs/backend/keys.json'));
+    const names = new Set(keys.map((k) => k.name));
+    const wfDir = path.join(rootPath, '.github');
+    const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]));
+    const usedSecrets = [...new Set(walk(wfDir).filter((f) => /\.ya?ml$/.test(f)).flatMap((f) => [...fs.readFileSync(f, 'utf8').matchAll(/secrets\.([A-Z0-9_]+)/g)].map((m) => m[1])))].filter((n) => n !== 'GITHUB_TOKEN');
+    const serverSecrets = [...new Set(walk(path.join(rootPath, 'server')).filter((f) => /\.(md|toml|js|mjs)$/.test(f)).flatMap((f) => [...fs.readFileSync(f, 'utf8').matchAll(/wrangler secret put ([A-Z0-9_]+)/g)].map((m) => m[1])))];
+    eq(`  🔴 로봇(secrets.이름 ${usedSecrets.length}개)·서버(wrangler secret put ${serverSecrets.length}개)가 쓰는 열쇠는 전부 목록에 있다 — 새 열쇠를 쓰면 목록에도 적어야 통과`,
+      [...usedSecrets, ...serverSecrets].filter((n) => !names.has(n)), []);
+    eq('  (대조할 것을 실제로 뽑았다 — 로봇 열쇠 10개 이상 · 서버 열쇠 5개 이상)', [usedSecrets.length >= 10, serverSecrets.length >= 5], [true, true]);
+    eq('  사람용 표(열쇠-목록.md)가 원본(keys.json)과 같다 — 다르면 node tools/key-expiry.mjs --render',
+      KE.renderDoc(read(root, 'docs/backend/열쇠-목록.md'), keys) === read(root, 'docs/backend/열쇠-목록.md'), true);
+    const yml = read(root, '.github/workflows/key-expiry.yml').replace(/^\s*#.*$/gm, '');
+    const cronMin = Number(((yml.match(/cron: '(\d+) /) || [])[1]));
+    eq('  key-expiry.yml — 홀수 분 예약 · 기본 브랜치에서만 · 시한 · 여는·닫는 경보 제목이 같다 · 세 사람 · issues: write · 넘어지면 robot-down',
+      [cronMin % 2 === 1, /if: github\.ref_name == 'claude\/nice-heisenberg-WESq5'/.test(yml), /^ {4}timeout-minutes: \d+/m.test(yml),
+        (yml.match(/🔑 열쇠 만료가 다가옵니다/g) || []).length, /--assignee seonju5543-web --assignee Se-Hyeon-Jo --assignee didinin-wq/.test(yml), /issues: write/.test(yml),
+        /failure\(\) \|\| cancelled\(\)[\s\S]*robot-down/.test(yml)],
+      [true, true, true, 2, true, true, true]);
+  }
 }

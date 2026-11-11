@@ -1,0 +1,70 @@
+name: 열쇠 만료 확인
+
+# 열쇠 목록(docs/backend/keys.json)에서 만료됐거나 14일 안에 만료되는 열쇠를 세 사람에게 알린다 (2026-11-11 · 은서 · 출시 전 백엔드 9번).
+#   · 도구: tools/key-expiry.mjs — 🔴 열쇠 값은 다루지 않는다(이름·만료일만 · 값처럼 생긴 글자가 목록에 있으면 실패)
+#   · 경보는 tools/alert-issue.mjs 한 곳 — 여는·닫는 제목이 같아야 닫힌다(제목에 날짜 금지)
+#   · 만료일을 고치면 다음 실행이 경보를 닫는다
+#   사용법: docs/backend/열쇠-목록.md · 관문: verify/health-gates/ops.mjs 「⑥ 열쇠 목록 · 만료 알림」
+
+on:
+  schedule:
+    - cron: '43 23 * * *'   # 08:43 KST — 홀수 분 · 다른 예약과 겹치지 않는다
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: key-expiry
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    if: github.ref_name == 'claude/nice-heisenberg-WESq5'
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 만료가 다가오는 열쇠 찾기
+        id: keys
+        timeout-minutes: 1
+        run: node tools/key-expiry.mjs --check --body /tmp/keys-due.md
+
+      - name: 🔑 경보 열기 (세 사람에게)
+        if: steps.keys.outputs.due != '0'
+        timeout-minutes: 1
+        run: |
+          node tools/alert-issue.mjs --mode open \
+            --title "🔑 열쇠 만료가 다가옵니다" \
+            --label key-expiry --label-color FBCA04 --label-description '열쇠 만료 14일 전 · 만료됨' \
+            --assignee seonju5543-web --assignee Se-Hyeon-Jo --assignee didinin-wq \
+            --body-file /tmp/keys-due.md
+
+      - name: 다가오는 만료가 없으면 옛 경보를 닫는다
+        if: steps.keys.outputs.due == '0'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          title: 🔑 열쇠 만료가 다가옵니다
+          body: |
+            ✅ 만료됐거나 14일 안에 만료되는 열쇠가 없습니다 — 자동으로 닫습니다.
+
+      - name: 🚨 로봇이 넘어졌다
+        if: failure() || cancelled()
+        uses: ./.github/actions/robot-down
+        with:
+          robot: 열쇠 만료 확인
+          token: ${{ github.token }}
