@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-11-11",
- "count": 1729,
+ "count": 1735,
  "items": [
   {
    "title": "[공통][교외]한국고등교육재단 문우림 제6기 장학생 선발(~12/11)",
@@ -42,6 +42,20 @@
    "bodyDeadlineText": "7. 신청방법 : 온라인 신청 (HUFS Ability- 학생핵심역량통합시스템 ) → 로그인 ( 학번 / 비번 ) → 교과 / 비교과 → 장학신청 목록 → 해당 장학금 ) 8. 신청기한 : 2026. 11. 11( 수 ) ~ 11. 20( 금 ) 15:00 까지"
   },
   {
+   "title": "[공통][교외]2027년도 전기공사공제조합장학회 제22기 장학생 선발(~11/13)",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/271416/artclView.do",
+   "attachments": [
+    {
+     "name": "붙임.장학생 선발 공고문.pdf",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/153165/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-11-11"
+  },
+  {
    "title": "2027년도 제10기 유하푸른재단 장학생 선발 안내문",
    "url": "https://kau.ac.kr/kaulife/scholnoti.php?code=s1301&page=&mode=read&seq=11462",
    "attachments": [
@@ -60,6 +74,61 @@
    "foundAt": "2026-11-11",
    "bodyDeadline": "2026-11-10",
    "bodyDeadlineText": "AeroAI Symposium 2026 참석 신청 안내 신청기간: 2026.11.10(화)까지 (자세히 보기)"
+  },
+  {
+   "title": "공통 2027년도 제 10회 유하푸른재단 장학생 선발",
+   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%202027%EB%85%84%EB%8F%84%20%EC%A0%9C%2010%ED%9A%8C%20%EC%9C%A0%ED%95%98%ED%91%B8%EB%A5%B8%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "경희대학교",
+   "campus": "",
+   "foundAt": "2026-11-11",
+   "postId": "323554"
+  },
+  {
+   "title": "2027학년도 지방 국립대학교 전액장학금 안내(★2027학년도 신입생 필독)",
+   "url": "https://onestop.pusan.ac.kr/page?menuCD=000000000000062&mode=DETAIL&seq=706",
+   "attachments": [
+    {
+     "name": "2027년 지방 국립대학 전액 장학금 안내.pdf",
+     "url": "https://onestop.pusan.ac.kr/file/download.do?s/pHu8BxY3Ed1oqscttlt5jeX7T/ehvD5hyQNM0Jg9Wr0miUo0RXTaX3iCnGITHRa7ST3iIYUykYxrFUJZpeFQ=="
+    },
+    {
+     "name": "★(장학팀) 부산대학교 지방 국립대학교 전액장학금 안내.pdf",
+     "url": "https://onestop.pusan.ac.kr/file/download.do?s/pHu8BxY3Ed1oqscttlt5jeX7T/ehvD5hyQNM0Jg9Xsa5X147Q1oiGhwRBqvBkY3mCFSn8JLQ3ycx3z5k+v1Q=="
+    }
+   ],
+   "deadlineHint": "신청기간 가. 1차 신청기간: 2026. 11. 24.(화) ~ 2027. 1. 7.(목) 나. 2차 신청기간: 2027. 2. 2.(화) ~",
+   "school": "부산대학교",
+   "campus": "",
+   "foundAt": "2026-11-11"
+  },
+  {
+   "title": "2027학년도 지방 국립대학교 전액장학금 안내(★2027학년도 신입생 필독)",
+   "url": "https://onestop.pusan.ac.kr/page?menuCD=000000000000062#n-2027%ED%95%99%EB%85%84%EB%8F%84%20%EC%A7%80%EB%B0%A9%20%EA%B5%AD%EB%A6%BD%EB%8C%80%ED%95%99%EA%B5%90%20%EC%A0%84%EC%95%A1%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%95%88%EB%82%B4(%E2%98%852027%ED%95%99%EB%85%84%EB%8F%84%20%EC%8B%A0%EC%9E%85%EC%83%9D%20%ED%95%84",
+   "attachments": [
+    {
+     "name": "2027년 지방 국립대학 전액 장학금 안내.pdf",
+     "url": "https://onestop.pusan.ac.kr/file/download.do?s/pHu8BxY3Ed1oqscttlt5jeX7T/ehvD5hyQNM0Jg9Wr0miUo0RXTaX3iCnGITHRa7ST3iIYUykYxrFUJZpeFQ=="
+    },
+    {
+     "name": "★(장학팀) 부산대학교 지방 국립대학교 전액장학금 안내.pdf",
+     "url": "https://onestop.pusan.ac.kr/file/download.do?s/pHu8BxY3Ed1oqscttlt5jeX7T/ehvD5hyQNM0Jg9Xsa5X147Q1oiGhwRBqvBkY3mCFSn8JLQ3ycx3z5k+v1Q=="
+    }
+   ],
+   "deadlineHint": "신청기간 가. 1차 신청기간: 2026. 11. 24.(화) ~ 2027. 1. 7.(목) 나. 2차 신청기간: 2027. 2. 2.(화) ~",
+   "school": "부산대학교",
+   "campus": "",
+   "foundAt": "2026-11-11"
+  },
+  {
+   "title": "2026학년도 2학기 국가장학금(Ⅰ유형) 및 중앙사랑 장학금 지급기준 안내",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-2026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EA%B5%AD%EA%B0%80%EC%9E%A5%ED%95%99%EA%B8%88(%E2%85%A0%EC%9C%A0%ED%98%95)%20%EB%B0%8F%20%EC%A4%91%EC%95%99%EC%82%AC%EB%9E%91%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%A7%80%EA%B8%89%EA%B8%B0%EC%A4%80%20%EC%95%88",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "중앙대학교",
+   "campus": "",
+   "foundAt": "2026-11-11"
   },
   {
    "title": "2026년 전북대동창회장학재단 문화예술장학생 선발 안내",
@@ -106,6 +175,15 @@
    "url": "https://www.korea.ac.kr/ko/568/subview.do?article.offset=10#n-%5B%EA%B5%90%EC%99%B8-12%2F11%5D%ED%95%9C%EA%B5%AD%EA%B3%A0%EB%93%B1%EA%B5%90%EC%9C%A1%EC%9E%AC%EB%8B%A8%20%EB%AC%B8%EC%9A%B0%EB%A6%BC%20%EC%A0%9C6%EA%B8%B0%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4(%EC%9E%AC%EB%8B%A8%EC%A7%80",
    "attachments": [],
    "deadlineHint": null,
+   "school": "고려대학교",
+   "campus": "",
+   "foundAt": "2026-11-11"
+  },
+  {
+   "title": "[교외-11/20]2027년도 유하푸른재단 제10기 장학생 선발 안내(재단지원)",
+   "url": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4OTglMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
+   "attachments": [],
+   "deadlineHint": "접수기한: 2026. 11. 20.(금) 23:59까지 접수방법: 지원자 본인이 재단 지정 이메일로 직접 제출 이메일 제목: [2027 장학생",
    "school": "고려대학교",
    "campus": "",
    "foundAt": "2026-11-11"
