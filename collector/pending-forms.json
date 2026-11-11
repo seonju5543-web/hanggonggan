@@ -1110,13 +1110,21 @@
    "added": "2026-11-11",
    "fetched": false,
    "schematized": false,
-   "tries": 2,
+   "tries": 3,
    "lastTryAt": "2026-11-11"
   },
   {
    "id": "auto-ent2431271374artclviewdo",
    "name": "(글로벌)(교외)2026-2학기 영어통번역학부 TESOL영어학 제자사랑 장학생 모집",
    "target": "(글로벌)(교외)2026-2학기 영어통번역학부 TESO",
+   "added": "2026-11-11",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-9bnum57138cate0qidx57138",
+   "name": "(공동실험실습관)26학년도 2학기 국가근로장학생 모집(교체선발)",
+   "target": "(공동실험실습관)26학년도 2학기 국가근로장학생 모집(",
    "added": "2026-11-11",
    "fetched": true,
    "schematized": false
