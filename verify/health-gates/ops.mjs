@@ -337,4 +337,60 @@ export default async function gate(eq, ctx) {
         /^\s*timeout-minutes:\s*\d+/m.test(fetchStep), /^\s*continue-on-error:\s*true\b/m.test(fetchStep)],
       [true, true, true, true]);
   }
+
+  /* ── ⑤ 직전 판으로 되돌리기 (2026-11-11 · 은서 · 출시 전 백엔드 8번 — tools/rollback.mjs · rollback.yml) ──
+     임시 git 저장소에서 진짜로 돌린다: 고른 사람 작업만 취소되고 그 뒤의 로봇 데이터·다른 작업은 남는다 · 로봇 작업·합치기·워크플로 파일은 못 고른다 ·
+     부딪히면 아무것도 안 바꾼다 · 미리보기는 아무것도 안 바꾼다 · 워크플로는 미리보기가 기본·번호 필수·검사 뒤 저장·되감기 없음 */
+  {
+    const RB = await import(new URL('tools/rollback.mjs', root));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-rollback-'));
+    const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => !/^GIT_/.test(k)));
+    const g = (...a) => spawnSync('git', a, { cwd: dir, encoding: 'utf8', env });
+    const w = (f, t) => { fs.mkdirSync(path.dirname(path.join(dir, f)), { recursive: true }); fs.writeFileSync(path.join(dir, f), t); };
+    const r = (f) => (fs.existsSync(path.join(dir, f)) ? fs.readFileSync(path.join(dir, f), 'utf8') : null);
+    const as = (who) => (who === 'bot' ? ['-c', 'user.name=handaejang-bot', '-c', 'user.email=41898282+github-actions[bot]@users.noreply.github.com'] : ['-c', `user.name=${who}`, '-c', `user.email=${who}@example.com`]);
+    const commit = (who, msg) => { g('add', '-A'); g(...as(who), 'commit', '-qm', msg); return g('rev-parse', 'HEAD').stdout.trim(); };
+    try {
+      g('init', '-q', '-b', 'main'); g('config', 'commit.gpgsign', 'false');
+      w('app.js', 'line1\nline2\n'); w('data/notices.json', '[]\n'); commit('은서', '씨앗');
+      w('app.js', 'line1\nBROKEN\n'); const bad = commit('은서', '앱을 망가뜨린 작업');
+      w('data/notices.json', '[{"id":1}]\n'); const botSha = commit('bot', 'collector: seen state update');
+      w('style.css', 'a{}\n'); const later = commit('세현', '뒤의 다른 작업');
+      w('.github/workflows/x.yml', 'name: x\n'); const wf = commit('은서', '워크플로 고침');
+      const list = RB.listHumanCommits(dir).map((c) => c.subject);
+      eq('⑤ 목록 — 사람 작업만(로봇 수집 기록은 뺀다) · 최근 것부터',
+        list, ['워크플로 고침', '뒤의 다른 작업', '앱을 망가뜨린 작업', '씨앗']);
+      const head0 = g('rev-parse', 'HEAD').stdout.trim();
+      const pv = RB.refuseReason(dir, RB.resolveSha(dir, bad.slice(0, 8)));
+      eq('  미리보기·검사는 아무것도 안 바꾼다(HEAD 그대로 · 짧은 번호도 알아본다)', [pv, g('rev-parse', 'HEAD').stdout.trim() === head0], [null, true]);
+      const ok = RB.revertCommit(dir, bad.slice(0, 8));
+      eq('  🔴 고른 작업만 취소 — 앱 파일은 원래대로 · 그 뒤 로봇 데이터·다른 사람 작업은 그대로 · 기록은 지우지 않고 하나 얹는다(되감지 않는다)',
+        [ok.status, r('app.js'), r('data/notices.json'), r('style.css'), g('rev-list', '--count', 'HEAD').stdout.trim(), g('cat-file', '-e', bad).status],
+        ['reverted', 'line1\nline2\n', '[{"id":1}]\n', 'a{}\n', '6', 0]);
+      const head1 = g('rev-parse', 'HEAD').stdout.trim();
+      eq('  🔴 못 고르는 것 — 로봇 작업 · 워크플로 파일을 고친 작업 · 없는 번호 · 합치기 기록(전부 아무것도 안 바꾼다)',
+        [RB.revertCommit(dir, botSha).status, RB.revertCommit(dir, wf).status, RB.revertCommit(dir, 'deadbeef').status, g('rev-parse', 'HEAD').stdout.trim() === head1],
+        ['refused', 'refused', 'refused', true]);
+      g('checkout', '-qb', 'side', `${later}`); w('side.txt', 's\n'); commit('은서', '옆 작업');
+      g('checkout', '-q', 'main'); g(...as('은서'), 'merge', '-q', '--no-ff', '-m', '합치기', 'side');
+      const mergeSha = g('rev-parse', 'HEAD').stdout.trim();
+      eq('  합치기 기록은 못 고른다', RB.revertCommit(dir, mergeSha).status, 'refused');
+      w('style.css', 'b{}\n'); const s1 = commit('세현', '스타일 1');
+      w('style.css', 'c{}\n'); commit('세현', '스타일 2(같은 줄을 또 고침)');
+      const head2 = g('rev-parse', 'HEAD').stdout.trim();
+      const cf = RB.revertCommit(dir, s1);
+      eq('  🔴 부딪히면 멈추고 아무것도 안 바꾼다 — HEAD·파일 그대로 · 되돌리기 진행 중 상태가 남지 않는다 · 부딪힌 파일을 알려 준다',
+        [cf.status, g('rev-parse', 'HEAD').stdout.trim() === head2, r('style.css'), fs.existsSync(path.join(dir, '.git', 'REVERT_HEAD')), cf.files],
+        ['conflict', true, 'c{}\n', false, ['style.css']]);
+    } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+    const yml = read(root, '.github/workflows/rollback.yml').replace(/^\s*#.*$/gm, '');   // 주석은 걷고 잰다(금지된 길을 설명하는 주석에 걸리지 않게)
+    const src = stripComments(read(root, 'tools/rollback.mjs'));
+    eq('  rollback.yml — 미리보기가 기본 · 되돌리기는 번호 없으면 멈춤 · 기본 브랜치에서만 · 검사가 저장보다 앞 · 저장 뒤 배포 동기화를 깨움 · 입력은 환경 변수로만 · 되감기·강제 push 없음 · 시한',
+      [/default: '미리보기'/.test(yml), /if \[ -z "\$COMMIT" \]; then[\s\S]*?exit 1/.test(yml), /if: github\.ref_name == 'claude\/nice-heisenberg-WESq5'/.test(yml),
+        yml.indexOf('node verify/audit-data.js') > 0 && yml.indexOf('node verify/audit-data.js') < yml.indexOf('git push origin'), /gh workflow run deploy-sync\.yml/.test(yml),
+        !/run:[^\n]*\$\{\{\s*inputs\./.test(yml) && /COMMIT: \$\{\{ inputs\.commit \}\}/.test(yml), !/--force|reset --hard|push -f\b/.test(yml + src), /^ {4}timeout-minutes: \d+/m.test(yml)],
+      [true, true, true, true, true, true, true, true]);
+    eq('  🔴 \'가장 최근 작업 바로 되돌리기\' 길이 없다(2026-11-11 은서 결정) — 되돌리기는 번호를 받아야만 한다',
+      [/--latest|최근 것 바로|HEAD~1/.test(yml + src), /revertCommit\(cwd, arg\('--revert'\)\)/.test(src)], [false, true]);
+  }
 }

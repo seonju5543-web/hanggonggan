@@ -10333,7 +10333,7 @@ console.log('\n■ 관리자 화면 로봇 목록 — 화면이 부를 수 있�
     robots.some((r) => r.f === 'device-deploy.yml'), false);
   eq('일회용 로봇도 목록에 없다', robots.some((r) => r.f === 'two-school-scan.yml'), false);
   eq('  그 둘을 화면이 정직하게 밝힌다 (push-limit-check · push-deploy 도 — 10-12 푸시 서버 배포 확인·배포 · Actions 탭에서만)',
-    ['device-deploy.yml', 'two-school-scan.yml', 'push-limit-check.yml', 'push-deploy.yml'].every((f) => notListed.includes(f)), true);
+    ['device-deploy.yml', 'two-school-scan.yml', 'push-limit-check.yml', 'push-deploy.yml', 'rollback.yml'].every((f) => notListed.includes(f)), true);
 
   /* ⑥ 화면이 **아예 못 부르는** 워크플로를 센다 — 새 로봇이 생기면 여기서 말해 준다.
      인스타·관리자 조정은 ROBOTS 에 없지만 화면이 다른 자리에서 부른다(파일 이름이 admin.js 에 있다). */
@@ -10347,7 +10347,7 @@ console.log('\n■ 관리자 화면 로봇 목록 — 화면이 부를 수 있�
     .replace(/const ROBOT_NOT_LISTED = \[[^\]]*\]/, '');
   const unreachable = all.filter((f) => !calls.includes(f));
   eq(`화면이 못 부르는 워크플로 (지금 ${unreachable.length}개: ${unreachable.join(' · ')})`,
-    unreachable.sort(), ['device-deploy.yml', 'push-deploy.yml', 'push-limit-check.yml', 'two-school-scan.yml']);
+    unreachable.sort(), ['device-deploy.yml', 'push-deploy.yml', 'push-limit-check.yml', 'rollback.yml', 'two-school-scan.yml']);   // rollback: 11-11 · Actions 탭에서만(관리자 화면 버튼은 나중에)
 }
 
 console.log('\n■ 안내문이 사람을 화면으로 부른다 (채팅으로 되돌아가면 실패)');
