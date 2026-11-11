@@ -444,8 +444,9 @@ export default async function gate(eq, ctx) {
     fs.writeFileSync(path.join(tmp, 'a.json'), JSON.stringify([{ ...A('high'), html_url: 'u1', rule: { id: 'js/xss', security_severity_level: 'high' }, most_recent_instance: { location: { path: 'app.js', start_line: 9 } } }, A('high', null, 'dismissed'), A('low')]));
     const outF = path.join(tmp, 'out'); fs.writeFileSync(outF, '');
     CA.main([path.join(tmp, 'a.json'), path.join(tmp, 'b.md')], { GITHUB_OUTPUT: outF });
-    eq('  열린 것만 센다(닫은 것 제외) · GITHUB_OUTPUT 에 serious= · 본문에 규칙·파일:줄',
-      [fs.readFileSync(outF, 'utf8').trim(), /js\/xss/.test(fs.readFileSync(path.join(tmp, 'b.md'), 'utf8')) && /app\.js:9/.test(fs.readFileSync(path.join(tmp, 'b.md'), 'utf8'))], ['serious=1', true]);
+    const bodyMd = fs.readFileSync(path.join(tmp, 'b.md'), 'utf8');
+    eq('  열린 것만 센다(닫은 것 제외) · GITHUB_OUTPUT 에 serious= · 🔴 공개 저장소라 본문엔 개수·심각도와 Security 탭 주소만(규칙·파일·줄을 적지 않는다)',
+      [fs.readFileSync(outF, 'utf8').trim(), /1개/.test(bodyMd) && /security\/code-scanning/.test(bodyMd), /js\/xss|app\.js|u1/.test(bodyMd)], ['serious=1', true, false]);
     fs.rmSync(tmp, { recursive: true, force: true });
     const dep = read(root, '.github/dependabot.yml').replace(/^\s*#.*$/gm, '');
     eq('  dependabot.yml — 워크플로 부품(github-actions)·푸시 서버(npm /server/push) · 기본 브랜치로 · 한 달에 한 번 · 묶어서 PR 하나 · 열린 PR 상한',
@@ -466,6 +467,18 @@ export default async function gate(eq, ctx) {
     /* Dependabot 이 actions/checkout@v4 → v5 로 올리면, 실제 워크플로를 판 번호까지 박아 읽는 관문은 빨개진다(11-11 모의로 넷을 찾아 고쳤다).
        정규식 안의 `actions\/이름@v숫자` 를 금지한다 — 표본 글자('actions/checkout@v4')는 괜찮다 */
     const gateFiles = ['verify/test-collector.mjs', ...fs.readdirSync(path.join(rootPath, 'verify/health-gates')).filter((f) => f.endsWith('.mjs')).map((f) => `verify/health-gates/${f}`)];
+    const TR = await import(new URL('tools/codeql-triage.mjs', root));
+    const planOk = (t) => { try { return TR.plan(t).length; } catch { return '거절'; } };
+    eq('  경고 정리 — 닫을 목록: 번호·정해진 이유·짧은 글만 · 틀린 번호·이유·중복·빈 글·빈 목록은 통째로 거절',
+      [planOk('[{"n":3,"reason":"false positive","comment":"검사 파일"}]'), planOk('[{"n":"x","reason":"false positive","comment":"a"}]'), planOk('[{"n":3,"reason":"그냥","comment":"a"}]'),
+        planOk('[{"n":3,"reason":"used in tests","comment":"a"},{"n":3,"reason":"used in tests","comment":"b"}]'), planOk('[{"n":3,"reason":"won\'t fix","comment":""}]'), planOk('[]')],
+      [1, '거절', '거절', '거절', '거절', '거절']);
+    eq('  경고 정리 — 열린 것만 줄인다(닫은 것 제외)', TR.slim([{ number: 1, state: 'open', rule: { id: 'r' }, most_recent_instance: { location: { path: 'a.js', start_line: 2 } } }, { number: 2, state: 'dismissed' }]).map((x) => [x.n, x.path, x.line]), [[1, 'a.js', 2]]);
+    const tri = read(root, '.github/workflows/codeql-triage.yml').replace(/^\s*#.*$/gm, '');
+    eq('  🔴 codeql-triage.yml — 버튼만(예약·push 없음) · 기본 브랜치에서만 · 목록은 공개 열쇠로 잠가서만 싣는다(열쇠 없으면 멈춤 · 잠그지 않은 list.json 을 찍지 않는다) · 입력은 env 로 · 넘어지면 robot-down',
+      [!/schedule:|push:/.test(tri), /if: github\.ref_name == 'claude\/nice-heisenberg-WESq5'/.test(tri), /openssl pkeyutl -encrypt -pubin/.test(tri) && /\[ -n "\$PUBKEY_B64" \] \|\| \{/.test(tri),
+        !/cat [^\n]*list\.json|echo [^\n]*\$\(cat/.test(tri), tri.split('\n').filter((l) => /\$\{\{\s*inputs\./.test(l)).every((l) => /^\s+[A-Z0-9_]+: \$\{\{ inputs\.\w+ \}\}\s*$|^\s+if: inputs\./.test(l)), /failure\(\) \|\| cancelled\(\)\s+uses: \.\/\.github\/actions\/robot-down/.test(tri)],
+      [true, true, true, true, true, true]);
     /* 🔴 2026-11-11 CodeQL #607 — tools/gate-reel/reel.html 이 주소 뒤 글자(?list=)를 innerHTML 로 끼워 넣어, 조작한 링크 하나로 앱과 같은 주소의
        저장소(프로필·로그인)를 읽을 수 있었다(진짜 브라우저로 실행 확인 → 고친 뒤 막힘 확인). 학생 주소에 공개되는 HTML 은 전부 같은 기준 */
     const servedHtml = spawnSync('git', ['ls-files', '-z', '*.html'], { cwd: rootPath, encoding: 'utf8' }).stdout.split('\0').filter((f) => f && !f.startsWith('_admin/') && fs.existsSync(path.join(rootPath, f)));
