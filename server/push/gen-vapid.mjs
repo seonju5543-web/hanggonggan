@@ -39,7 +39,7 @@ npx wrangler secret put VAPID_JWK
 ${JSON.stringify(jwk)}
 
 npx wrangler secret put VAPID_SUBJECT
-mailto:seonju5543@gmail.com
+mailto:handaejang24@gmail.com
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  ⚠️ 위 ②의 VAPID_JWK(개인키)는 이 화면에서만 보고 서버에만 넣으세요.

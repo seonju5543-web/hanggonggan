@@ -187,7 +187,10 @@ const today = new Date();
       //    카드를 넘길 이유도 앱을 열 이유도 사라진다. 개수는 사실이라 써도 된다.
       //    ⚠️ **첫 줄은 뺀다** — 거기는 표지 카드와 같은 후킹이고, 따옴표로 감싼 인용이다.
       //       빼지 않으면 `자격에 딱 한 줄 "세대주가 만 65세 이하"` 가 위반으로 잡힌다.
-      const body = t.split('\n').slice(1).join('\n');
+      //    ⚠️ **기관명·공고명 줄도 뺀다** — 이름은 카드 표지에도 있는 사실이지 옮겨 적은 자격이 아니다.
+      //       숲과나눔 「…장학생(생물다양성 분야 석·박사과정)」 처럼 이름 안에 자격 낱말이 든 공고가
+      //       위반으로 잡혀 인스타 준비가 멈췄다(2026-11-09 #546). 자격 줄을 따로 적으면 여전히 잡힌다.
+      const body = t.split('\n').slice(1).filter((l) => l !== x.org && l !== x.name).join('\n');
       for (const line of [...c0.who, ...c0.traps])
         if (line.length > 12 && body.includes(line.slice(0, 12)))
           fail('C8', x.org, `캡션이 원문을 옮겨 적었다 — ${line.slice(0, 24)}…`);
@@ -497,10 +500,13 @@ const today = new Date();
         }
       }
     }
-    // 팀 셋 — 이슈 담당자(github)와 메일(email) 둘 다
-    const team = JSON.parse(readFileSync(join(ROOT, 'insta/team.json'), 'utf8')).people;
+    // 팀 셋 — 이슈 담당자(github). 🔴 메일 주소는 여기 없어야 한다(2026-11-10 · 공개 저장소에 팀원 주소 3개가 노출돼 있었다) —
+    //    받는 주소는 비밀 칸 MAIL_TO 에만 둔다.
+    const teamRaw = readFileSync(join(ROOT, 'insta/team.json'), 'utf8');
+    const team = JSON.parse(teamRaw).people;
     if (team.length < 3) fail('C11', '-', `팀이 ${team.length}명 — 개발자 셋 전부여야 한다`);
-    for (const p of team) if (!p.github || !/@/.test(p.email || '')) fail('C11', p.name, 'github 또는 email 이 비었다');
+    for (const p of team) if (!p.github) fail('C11', p.name, 'github 이 비었다');
+    if (/[\w.+-]+@[\w-]+\.[\w.]+/.test(teamRaw)) fail('C11', '-', 'insta/team.json 에 메일 주소가 있다 — 공개 저장소다. 비밀 칸 MAIL_TO 로 옮길 것');
     // 워크플로 — 수집 뒤 바로 · 담당자는 team.json 에서 · 예약이 게시까지 안 간다(C9) · 알림 push-to-run
     if (!/workflow_run:/.test(wf) || !/'장학공고 수집 로봇'/.test(wf)) fail('C11', '-', '수집 로봇이 끝나도 카드를 안 그린다 — workflow_run 이 없다');
     if (!/team\.json/.test(wf) || /--assignee didinin-wq/.test(wf)) fail('C11', '-', '담당자를 team.json 에서 읽지 않는다(한 사람만 지정)');
@@ -508,7 +514,9 @@ const today = new Date();
     if (!/ledger\.mjs prepared/.test(wf)) fail('C11', '-', '그린 것을 준비 장부에 안 적는다 — 다음 실행이 같은 공고를 또 그린다');
     if (!/pick\.mjs --new/.test(wf)) fail('C11', '-', '새 공고 전부가 아니라 하나만 고른다');
     const ml = readFileSync(join(ROOT, 'insta/mail.mjs'), 'utf8');
-    if (!/team\.json/.test(ml)) fail('C11', '-', 'mail.mjs 가 받는 사람을 team.json 에서 읽지 않는다');
+    if (/team\.json/.test(ml.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, ''))) fail('C11', '-', 'mail.mjs 가 받는 사람을 저장소 파일에서 읽는다 — 비밀 칸 MAIL_TO(--to)로만 받을 것');
+    if (!/MAIL_TO:\s*\$\{\{ secrets\.MAIL_TO \}\}/.test(wf) || !/--to="\$MAIL_TO"/.test(wf)) fail('C11', '-', '워크플로가 받는 주소를 비밀 칸 MAIL_TO 에서 넘기지 않는다');
+    if (/메일을 보냈습니다 — \$\(sed -n 's\/\^To:/.test(wf)) fail('C11', '-', '보낸 뒤 받는 주소를 실행 기록에 찍는다 — 공개 저장소의 기록은 누구나 본다');
     // 관리자 화면 — step 글자가 워크플로 선택지와 한 글자도 다르지 않은가 (다르면 422 로 조용히 죽는다)
     const adm = readFileSync(join(ROOT, '_admin/admin.js'), 'utf8');
     const opts = (wf.match(/options: \[([^\]]*)\]/) || ['', ''])[1].split(',').map((x) => x.trim());

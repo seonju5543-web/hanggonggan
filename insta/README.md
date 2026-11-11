@@ -9,7 +9,7 @@
 | # | 지시 | 어디에 |
 |---|---|---|
 | ① | 공고당 게시물 하나 | `insta/pub/<공고 코드>/` — 폴더 하나가 게시물 하나. 장부는 `seen.json` (`prepared` 준비 · `posted` 올림). 준비 줄의 상태는 prepared·skipped·failed·posted·**expired**(올리기 전에 마감이 지나 폴더를 지운 것 — 준비 실행마다 `ledger.mjs expire` · 2026-10-04) |
-| ② | 생기면 바로 · 개발자 셋에게 메일 | `insta.yml` 이 수집 로봇 셋이 끝날 때마다(`workflow_run`) 새 공고를 그려 **이슈 담당자 셋**(GitHub 이 메일을 보낸다) + SMTP 메일. 명단 `team.json` |
+| ② | 생기면 바로 · 개발자 셋에게 메일 | `insta.yml` 이 수집 로봇 셋이 끝날 때마다(`workflow_run`) 새 공고를 그려 **이슈 담당자 셋**(GitHub 이 메일을 보낸다) + SMTP 메일. 담당자 명단 `team.json` · 메일 주소는 비밀 칸 `MAIL_TO` |
 | ③ | 채팅에서 수정 · 그림 제시 · 발송 전 물음 | `revise.mjs` 가 다시 그리고 미리보기를 만든다. 보내는 것은 `run-notify.txt` push-to-run. 순서는 스킬 `insta-revise` |
 | ④ | 번호 고정 판형 | `templates.json` — 1 사진 · 2 카톡 · 3 굿노트 · 4 포스터. `--tpl=번호`. 번호는 안 바뀐다 |
 | ⑤ | 예시 붙여넣고 판형 추가 | `new-template.mjs` 가 다음 번호로 시작 파일(`templates/<번호>-<id>.mjs`)을 만든다. 절차는 스킬 `insta-template` |
@@ -138,8 +138,8 @@ node verify/verify-insta.js                      # 사실 관문
 | `caption.mjs` | 캡션 (`ctx` 만 받는 순수 함수 — 🔴 CLI 를 두면 순환 import 로 멈춘다) |
 | `fit.mjs` | 글자를 카드에 맞추는 **한 곳** — 위아래·**옆** 넘침 둘 다 본다. 렌더러와 스윕이 같이 쓴다 |
 | `publish.mjs` | Graph API 캐러셀 2단계 · `--code` 로 폴더 지정 · 기본은 예행연습 |
-| `mail.mjs` | 여러 게시물을 한 통에 · 받는 사람은 `team.json` 셋 |
-| `team.json` | 알림 받는 개발자 셋(github 담당자 · email) |
+| `mail.mjs` | 여러 게시물을 한 통에 · 받는 사람은 `--to`(비밀 칸 `MAIL_TO`) |
+| `team.json` | 알림 받는 개발자 셋(github 담당자) — 🔴 메일 주소는 적지 않는다(공개 저장소 · 2026-11-10) |
 | `stats.mjs` · `stats.json` | 트랙션 수확(팔로워 이력 · 게시물별 반응 · 못 받은 것은 error 칸) |
 | `comments.mjs` · `comments.json` | 댓글 받아 적기 · 답글/숨김/삭제(`--do` 없이는 예행연습) · 우리 표식 `handledAt` |
 | `samples.mjs` · `samples/` | 판형 견본(같은 공고로 판형 전부) |

@@ -101,7 +101,7 @@ async function vapidHeader(env, endpoint) {
   const payload = b64url(new TextEncoder().encode(JSON.stringify({
     aud,
     exp,
-    sub: env.VAPID_SUBJECT || 'mailto:seonju5543@gmail.com',
+    sub: env.VAPID_SUBJECT || 'mailto:handaejang24@gmail.com',   // 시크릿이 없을 때만 — 서비스 주소(support-config.js 와 같게 · 2026-11-11 개인 메일에서 바꿈 · 관문 「로봇 신원」 옆)
   })));
   const data = new TextEncoder().encode(`${header}.${payload}`);
 

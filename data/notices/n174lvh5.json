@@ -1,7 +1,34 @@
 {
  "school": "가톨릭대학교",
- "updatedAt": "2026-10-31",
+ "updatedAt": "2026-11-11",
  "items": [
+  {
+   "title": "[학생지원팀] 2026학년도 인송문화재단 인송장학생 추가 선발 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277612&article.offset=0&articleLimit=10&srCategoryId=22",
+   "attachments": [
+    {
+     "name": "2026년 2학기 인송문화재단 제출 서류(재단양식).hwp",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=277612&attachNo=227398"
+    },
+    {
+     "name": "[양식] 외부장학금 신청 및 추천을 위한 개인정보 수집 및 이용 동의서.hwpx",
+     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=277612&attachNo=227399"
+    }
+   ],
+   "deadlineHint": "제출기한 - 트리니티 신청: 2026. 11. 12.(목)까지 - 원본서류 제출: 2026. 11. 13.(금) 17:00까지 (12-13시 점",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-11-09"
+  },
+  {
+   "title": "[학생지원팀][한국장학재단] 학자금 중복지원, 미리 확인하고 예방하세요!",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277386&article.offset=0&articleLimit=10&srCategoryId=22",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "가톨릭대학교",
+   "campus": "",
+   "foundAt": "2026-11-03"
+  },
   {
    "title": "[학생지원팀] 2026년도 통영시 저소득 대학생 장학금 지원대상자 선발 안내(11. 2.(월) ~ 11. 23.(월))",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277272&article.offset=0&articleLimit=10&srCategoryId=22",

@@ -316,6 +316,21 @@ export function splitBenefit(text) {
   }
   return { benefit: benefit.join(' '), conditions: conditions.filter((x) => x.length >= 4) };
 }
+/* ── 단계 번호 떼기 (2026-11-02 개발자 "신청방법에도 3. 부터 들어가있고") ──
+   1365 글은 「신청방법: 1. 메일로 … 2. 담당자 회신 … 3. 매칭 … 4. 수업 장소」를 단계마다 줄로 끊고 연락처 든 단계를 빼서 「3.」부터 남았다.
+   번호만 뗀다(글자는 그대로 · 원칙 8-1). 🔴 날짜의 「10. 30.」·「6. 이후」는 번호가 아니다 — 번호 뒤에 숫자가 오면 두지 않는다.
+   쓰는 곳: open-api-map splitLines(API 글) · 수집 로봇 발행(모든 활동 글에 매번 — 소급 · sanitizeSteps) */
+export const STEP_NUM = /^((?:[^:：\d\n]{1,16}[:：]\s*)?)\d{1,2}\s?[.)]\s+(?=[^\d\s])/;
+export const stripStepNumber = (l) => String(l).replace(STEP_NUM, '$1');
+/** 활동 글 하나의 줄 칸 넷에서 단계 번호를 뗀다 — 바뀌었으면 true (수집 로봇 발행 때 모든 글에) */
+export function sanitizeSteps(it) {
+  let changed = false;
+  for (const k of ['noticeLines', 'eligibilityLines', 'eligibilityExcludes', 'eligibilityPriority']) {
+    if (!Array.isArray(it[k])) continue;
+    it[k] = it[k].map((l) => { const s = stripStepNumber(l); if (s !== l) changed = true; return s; });
+  }
+  return changed;
+}
 /** 활동 글 하나의 「혜택」에서 조건을 떼어 자격 줄로 — 바뀌었으면 true (수집 로봇 발행 때 모든 글에) */
 export function sanitizeBenefit(it) {
   const ex = it.excerpts || [];

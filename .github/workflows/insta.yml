@@ -5,7 +5,7 @@
 #   ② **생기면 바로** — 수집 로봇 셋이 끝날 때마다(`workflow_run`) 준비 안 한 공고를 그린다.
 #      월·목 예약은 뺐다. 하루 한 번 예약은 남긴다(로봇 push 는 다른 워크플로를 못 깨우는 날의 보정).
 #   ③ **개발자 셋 전부**에게 — 이슈 담당자 셋(GitHub 이 메일을 보낸다) + 시크릿이 있으면 SMTP 메일 한 통.
-#      명단은 `insta/team.json` 한 곳.
+#      담당자 명단은 `insta/team.json` 한 곳 · 메일 주소는 비밀 칸 MAIL_TO 에만(저장소에 적지 않는다 · 2026-11-10).
 #   ④ 판형은 번호(`insta/templates.json`) — `tpl` 칸에 번호를 준다.
 #
 # 🔴 **게시는 여전히 사람만 누른다.** 자동으로 올리면 개발자가 카드를 보는 자리가 사라지고,
@@ -299,14 +299,20 @@ jobs:
             echo '메일은 GitHub 알림으로 갔습니다(이슈 담당자 셋). 우리 주소에서 직접 보내려면 시크릿 MAIL_USER·MAIL_PASS 를 넣으세요.' >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
+          # 🔴 받는 사람은 비밀 칸 MAIL_TO 에만 있다(2026-11-10 · insta/team.json 에서 주소를 뺐다). 없으면 고장이 아니라 건너뜀 —
+          #    알림은 이미 GitHub 이 보냈다(이슈 담당자 셋).
+          if [ -z "$MAIL_TO" ]; then
+            echo '메일은 GitHub 알림으로 갔습니다(이슈 담당자 셋). 직접 메일까지 받으려면 시크릿 MAIL_TO(받는 주소, 쉼표로 구분)를 넣으세요.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
           DIRS=$(echo "$CODES" | tr ' ' '\n' | sed 's|^|insta/pub/|' | paste -sd, -)
           KIND=$([ "$MODE" = notify ] && echo revised || echo ready)
-          # 받는 사람은 team.json 셋이 기본 — MAIL_TO 를 주면 그걸로 덮는다(시험용)
-          node insta/mail.mjs --dirs="$DIRS" ${MAIL_TO:+--to="$MAIL_TO"} --from="$MAIL_USER" --run="$RUN_URL" --kind="$KIND" > /tmp/mail.txt
+          node insta/mail.mjs --dirs="$DIRS" --to="$MAIL_TO" --from="$MAIL_USER" --run="$RUN_URL" --kind="$KIND" > /tmp/mail.txt
           RCPT=$(sed -n 's/^To: //p' /tmp/mail.txt | tr -d '\r' | tr ',' '\n' | sed 's/^ *//;s/ *$//' | sed 's/^/--mail-rcpt /' | paste -sd' ' -)
           curl -sS --ssl-reqd --url "smtps://${MAIL_SMTP:-smtp.gmail.com:465}" \
             --user "$MAIL_USER:$MAIL_PASS" --mail-from "$MAIL_USER" $RCPT --upload-file /tmp/mail.txt
-          echo "✅ 메일을 보냈습니다 — $(sed -n 's/^To: //p' /tmp/mail.txt)"
+          # 🔴 주소는 찍지 않고 몇 명인지만 — 공개 저장소의 실행 기록은 누구나 볼 수 있다(2026-11-10)
+          echo "✅ 메일을 보냈습니다 — 받는 사람 $(echo "$RCPT" | grep -o -- '--mail-rcpt' | wc -l)명"
 
       # 🔴 쓸모없어진 준비 이슈를 닫는다 (2026-10-04 로봇·도구 점검 · insta/ready-issues.mjs).
       #    준비 이슈는 「올리거나 건너뛰면 저절로 닫힙니다」라고 약속하는데, 옛 판은 이슈 안 카드가 1건 이하일 때만 닫고

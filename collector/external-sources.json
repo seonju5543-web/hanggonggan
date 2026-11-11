@@ -7,7 +7,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-28",
+    "checkedAt": "2026-11-11",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://haeseok.or.kr/",
@@ -21,7 +21,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-28",
+    "checkedAt": "2026-11-11",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://gachon.or.kr/",
@@ -35,7 +35,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-28",
+    "checkedAt": "2026-11-11",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://www.uljinsf.kr/",
@@ -49,7 +49,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-28",
+    "checkedAt": "2026-11-11",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.yangcheon.go.kr/site/yangcheon/main.do",
@@ -63,7 +63,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-28",
+    "checkedAt": "2026-11-11",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.mpva.go.kr/",
@@ -109,7 +109,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-28",
+    "checkedAt": "2026-11-11",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://www.mincho.or.kr/",
@@ -123,7 +123,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-28",
+    "checkedAt": "2026-11-11",
     "why": "홈페이지 못 엶 (TimeoutError: 23)",
     "best": null
    }
@@ -134,7 +134,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-28",
+    "checkedAt": "2026-11-11",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.pc.go.kr/",
@@ -164,7 +164,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-28",
+    "checkedAt": "2026-11-11",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://www.kwangsankim.co.kr/",
@@ -194,7 +194,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-28",
+    "checkedAt": "2026-11-11",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://injae.gwd.go.kr/",
@@ -208,8 +208,8 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-28",
-    "why": "홈페이지 못 엶 (TypeError: ERR_TLS_CERT_ALTNAME_INVALID)",
+    "checkedAt": "2026-11-11",
+    "why": "홈페이지 못 엶 (TypeError: UND_ERR_SOCKET)",
     "best": null
    }
   },
@@ -219,9 +219,12 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-28",
-    "why": "홈페이지 못 엶 (TypeError: ECONNRESET)",
-    "best": null
+    "checkedAt": "2026-11-11",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://www.ewp.co.kr/kor/main/",
+     "signals": 0
+    }
    }
   },
   {
@@ -230,7 +233,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-28",
+    "checkedAt": "2026-11-11",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.chungju.go.kr/",
@@ -260,7 +263,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-28",
+    "checkedAt": "2026-11-11",
     "why": "홈페이지 못 엶 (TypeError: ENOTFOUND)",
     "best": null
    }
@@ -287,7 +290,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-28",
+    "checkedAt": "2026-11-11",
     "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
     "best": null
    }
@@ -298,7 +301,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-28",
+    "checkedAt": "2026-11-11",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://dalseoij.org/",
@@ -312,9 +315,12 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-28",
-    "why": "홈페이지 못 엶 (TypeError: ECONNRESET)",
-    "best": null
+    "checkedAt": "2026-11-11",
+    "why": "최고 0건 ((홈))",
+    "best": {
+     "url": "https://hmg-scholar.recruiter.co.kr/career/home",
+     "signals": 0
+    }
    }
   },
   {
@@ -339,7 +345,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-28",
+    "checkedAt": "2026-11-11",
     "why": "홈페이지 못 엶 (TypeError: EAI_AGAIN)",
     "best": null
    }
@@ -350,7 +356,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-28",
+    "checkedAt": "2026-11-11",
     "why": "홈페이지 못 엶 (TimeoutError: 23)",
     "best": null
    }
@@ -361,7 +367,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-28",
+    "checkedAt": "2026-11-11",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.yanggu.go.kr/",
@@ -375,7 +381,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-28",
+    "checkedAt": "2026-11-11",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.jinan.go.kr/index.jinan",
@@ -389,12 +395,9 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-28",
-    "why": "최고 0건 ((홈))",
-    "best": {
-     "url": "https://www.wando.go.kr/",
-     "signals": 0
-    }
+    "checkedAt": "2026-11-11",
+    "why": "홈페이지 못 엶 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
+    "best": null
    }
   },
   {
@@ -775,12 +778,9 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-27",
-    "why": "최고 2건 (나눔과 섬김의 세상)",
-    "best": {
-     "url": "http://www.seoksung.co.kr/cms/bbs/board.php?bo_table=nanum",
-     "signals": 2
-    }
+    "checkedAt": "2026-11-10",
+    "why": "홈페이지 못 엶 (HTTP 403)",
+    "best": null
    }
   },
   {
@@ -1067,6 +1067,38 @@
      "대학등록금은 국가장학금으로! 국가장학금 신청",
      "2026-10-01 (재)진천군장학회 2026년 하반기 장학생 모집 공고",
      "2026-08-07 (재)진천군장학회 2026년 온라인 강의 지원사업 신청자 3차 모집 공고"
+    ]
+   }
+  },
+  {
+   "host": "대산농촌재단",
+   "home": "https://www.dsa.or.kr",
+   "boardUrl": "https://www.dsa.or.kr/data.html?Table=ins_bbs43",
+   "seed": "kosaf-open",
+   "autoFound": {
+    "date": "2026-11-02",
+    "signals": 5,
+    "menu": "층2 글 사냥꾼 · 공고 3건 이상 · 언론에 비친 재단",
+    "sample": [
+     "[농민신문] 차세대 농업 인재양성 ‘대산장학생’ 선발",
+     "[한국농어민신문] 대산농촌재단, 2027년도 대산장학생 모집...11월 11일까지",
+     "[글로벌이코노믹] 대산농촌재단, 농업인재 양성 ‘대산장학생’ 선발"
+    ]
+   }
+  },
+  {
+   "host": "재단법인 강서구장학회(서울)",
+   "home": "http://www.gangseo.seoul.kr/",
+   "boardUrl": "https://janghak.gangseo.seoul.kr/sc050101",
+   "seed": "kosaf-open",
+   "autoFound": {
+    "date": "2026-11-11",
+    "signals": 9,
+    "menu": "층2 글 사냥꾼 · 층2 공고 글을 고른 쪽 · 강서구 장학회 › 장학생 공지사항",
+    "sample": [
+     "2026년 2학기 구민한마음 계속장학금 지급 신청 안내",
+     "2026년 디딤장학생 선발 공고",
+     "2026년 하반기 (재)강서구장학회 장학생 선발 결과 알림"
     ]
    }
   }

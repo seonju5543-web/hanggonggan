@@ -39,13 +39,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-14",
-  "lastAt": "2026-10-20",
-  "tries": 3,
-  "status": "pending",
-  "why": "게시판을 못 엶(page.goto: Timeout 20000ms exceeded. Call log: - navigating…)",
+  "lastAt": "2026-11-09",
+  "tries": 5,
+  "status": "rejected",
+  "why": "게시판을 못 엶(page.goto: Timeout 20000ms exceeded. Call log: - navigating…) — 5번째라 그만 봅니다",
   "checks": {},
   "round": "2026-11-11",
-  "nextAt": "2026-10-27"
+  "decidedAt": "2026-11-09"
  },
  "kosaf|0731002|board:http://www.gbanurse.or.kr/index.php?g_page=notice&m_page=notice01&wd=1": {
   "ds": "kosaf",
@@ -87,13 +87,74 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-31",
-  "lastAt": "2026-11-01",
-  "tries": 2,
+  "lastAt": "2026-11-04",
+  "tries": 3,
   "status": "pending",
   "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-11-08",
-  "nextAt": "2026-11-04"
+  "nextAt": "2026-11-11"
+ },
+ "kosaf|2000053007|https://janghak.gangseo.seoul.kr/sc050101/325152?srchCtgry=&srchStdg=&curPage=&srchKey=&srchText=&srchBeginDt=&srchEndDt=": {
+  "ds": "kosaf",
+  "key": "2000053007",
+  "url": "https://janghak.gangseo.seoul.kr/sc050101/325152?srchCtgry=&srchStdg=&curPage=&srchKey=&srchText=&srchBeginDt=&srchEndDt=",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "title": "2026년 2학기 구민한마음 계속장학금 지급 신청 안내",
+  "firstAt": "2026-11-11",
+  "lastAt": "2026-11-12",
+  "tries": 2,
+  "status": "verified",
+  "why": "그 재단·그 사업·이번 회차 공고로 확인",
+  "checks": {
+   "C": "ok",
+   "L": "ok",
+   "H": "ok",
+   "T": "ok",
+   "R": "ok",
+   "X": "ok",
+   "P": "ok"
+  },
+  "round": "2026-11-20",
+  "decidedAt": "2026-11-12",
+  "verifiedAt": "2026-11-12",
+  "also": []
+ },
+ "kosaf|2000090001|https://info.daegu.go.kr/newshome/mtnmain.php?mtnkey=articleview&mkey=scatelist&mkey2=1&aid=279300": {
+  "ds": "kosaf",
+  "key": "2000090001",
+  "url": "https://info.daegu.go.kr/newshome/mtnmain.php?mtnkey=articleview&mkey=scatelist&mkey2=1&aid=279300",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "title": "시정소식 대구시, 2026년 저소득주민 장학금 지원대상자 모집... 공고일(2026.10.14.) 현재 대구에 거주 중인 저소득 중·고등학생, 대학생 대상",
+  "firstAt": "2026-11-02",
+  "lastAt": "2026-11-02",
+  "tries": 1,
+  "status": "rejected",
+  "why": "다른 화면이 열림(다른 글이 열림(제목 불일치))",
+  "checks": {
+   "C": "ok",
+   "L": "fail"
+  },
+  "round": "2026-11-13",
+  "decidedAt": "2026-11-02"
+ },
+ "kosaf|2000108001|board:https://www.icbp.go.kr/main/participation/news/recruit.jsp": {
+  "ds": "kosaf",
+  "key": "2000108001",
+  "url": "",
+  "board": "https://www.icbp.go.kr/main/participation/news/recruit.jsp",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "firstAt": "2026-11-08",
+  "lastAt": "2026-11-08",
+  "tries": 1,
+  "status": "rejected",
+  "why": "그 사이트 robots.txt 가 게시판 훑기를 막음 — 글 주소로 다시 적어 주세요",
+  "checks": {},
+  "round": "2026-11-13",
+  "decidedAt": "2026-11-08"
  },
  "kosaf|2000204008|board:https://council.wonju.go.kr/content/news/photoGallery.html": {
   "ds": "kosaf",
@@ -119,13 +180,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-18",
-  "lastAt": "2026-10-30",
-  "tries": 4,
-  "status": "pending",
-  "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
+  "lastAt": "2026-11-06",
+  "tries": 5,
+  "status": "rejected",
+  "why": "게시판 목록(9줄)에서 그 글을 하나로 못 고름 — 5번째라 그만 봅니다",
   "checks": {},
   "round": "2026-12-11",
-  "nextAt": "2026-11-06"
+  "decidedAt": "2026-11-06"
  },
  "kosaf|2000206004|board:https://www.yw.go.kr/www/selectBbsNttList.do?bbsNo=86&key=524": {
   "ds": "kosaf",
@@ -224,16 +285,54 @@
   "by": "로봇(층2 글 사냥꾼)",
   "title": "2026년 (재)거창군장학회 장학생 선발 공고",
   "firstAt": "2026-10-30",
-  "lastAt": "2026-10-31",
-  "tries": 2,
-  "status": "pending",
-  "why": "못 엶(HTTP 500) — 다시 봅니다",
+  "lastAt": "2026-11-10",
+  "tries": 4,
+  "status": "rejected",
+  "why": "마감이 다름(글 2026-01-30 · 이번 회차 2026-11-16)",
   "checks": {
    "C": "ok",
-   "L": "unread"
+   "L": "ok",
+   "H": "ok",
+   "T": "ok",
+   "R": "fail",
+   "X": "ok",
+   "P": "weak"
   },
   "round": "2026-11-16",
-  "nextAt": "2026-11-03"
+  "decidedAt": "2026-11-10",
+  "also": []
+ },
+ "kosaf|2000356002|board:https://www.tongyeong.go.kr/00001/00286/00309.web": {
+  "ds": "kosaf",
+  "key": "2000356002",
+  "url": "",
+  "board": "https://www.tongyeong.go.kr/00001/00286/00309.web",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "firstAt": "2026-11-08",
+  "lastAt": "2026-11-12",
+  "tries": 3,
+  "status": "pending",
+  "why": "게시판 목록(0줄)에서 그 글을 하나로 못 고름",
+  "checks": {},
+  "round": "2026-11-23",
+  "nextAt": "2026-11-19"
+ },
+ "kosaf|2000398001|board:https://www.gwangju.go.kr/welfare/boardList.do?boardId=BD_0000000594&pageId=welfare86": {
+  "ds": "kosaf",
+  "key": "2000398001",
+  "url": "",
+  "board": "https://www.gwangju.go.kr/welfare/boardList.do?boardId=BD_0000000594&pageId=welfare86",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "firstAt": "2026-11-11",
+  "lastAt": "2026-11-12",
+  "tries": 2,
+  "status": "pending",
+  "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
+  "checks": {},
+  "round": "2026-11-13",
+  "nextAt": "2026-11-15"
  },
  "kosaf|2000423012|https://www.jincheon.go.kr/jcjh/sub.do?menukey=3464&mode=view&no=1076147380": {
   "ds": "kosaf",
@@ -284,32 +383,6 @@
   "round": "2026-11-30",
   "decidedAt": "2026-10-06",
   "verifiedAt": "2026-10-06",
-  "also": []
- },
- "kosaf|2000429014|https://scholarship.eumseong.go.kr/www/selectBbsNttView.do?key=33&bbsNo=3&nttNo=838": {
-  "ds": "kosaf",
-  "key": "2000429014",
-  "url": "https://scholarship.eumseong.go.kr/www/selectBbsNttView.do?key=33&bbsNo=3&nttNo=838",
-  "source": "match",
-  "by": "로봇(재단 게시판 글과 짝 — 마감 같음 +2 · 공고문 파일 제목 +2 · 사업 이름 +1 · 마감 해 +1 · 장학 낱말 +1)",
-  "title": "2026년 한국가스안전공사 지역상생 특별장학생 선발 공고",
-  "firstAt": "2026-10-10",
-  "lastAt": "2026-10-10",
-  "tries": 1,
-  "status": "verified",
-  "why": "그 재단·그 사업·이번 회차 공고로 확인",
-  "checks": {
-   "C": "ok",
-   "L": "ok",
-   "H": "ok",
-   "T": "ok",
-   "R": "ok",
-   "X": "ok",
-   "P": "ok"
-  },
-  "round": "2026-10-23",
-  "decidedAt": "2026-10-10",
-  "verifiedAt": "2026-10-10",
   "also": []
  },
  "kosaf|2000436005|https://asanmirae.or.kr:449/main/index.php?m_cd=32&b_id=20260714107548723": {
@@ -442,6 +515,31 @@
   "round": "2026-11-06",
   "nextAt": "2026-10-31"
  },
+ "kosaf|2518026001|https://gjmed.or.kr/bbs/board.php?bo_table=notice3&wr_id=516": {
+  "ds": "kosaf",
+  "key": "2518026001",
+  "url": "https://gjmed.or.kr/bbs/board.php?bo_table=notice3&wr_id=516",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "title": "채용공고 [공고 제2026-28호] 전남 공공취약지 간호사 장학생 선발 공고 자세히 보기 →",
+  "firstAt": "2026-11-02",
+  "lastAt": "2026-11-02",
+  "tries": 1,
+  "status": "suggest",
+  "why": "제목이 제목 자리가 아니라 본문에만 보임",
+  "checks": {
+   "C": "ok",
+   "L": "weak",
+   "H": "ok",
+   "T": "ok",
+   "R": "weak",
+   "X": "ok",
+   "P": "ok"
+  },
+  "round": "2026-11-06",
+  "decidedAt": "2026-11-02",
+  "also": []
+ },
  "kosaf|2518026001|https://www.gjmed.or.kr/bbs/board.php?bo_table=notice3&wr_id=516": {
   "ds": "kosaf",
   "key": "2518026001",
@@ -548,24 +646,6 @@
   "checks": {},
   "round": "2026-12-31",
   "decidedAt": "2026-11-01"
- },
- "kosaf|2700388001|https://janghak.songpa.go.kr/22/?q=YToxOntzOjEyOiJrZXl3b3JkX3R5cGUiO3M6MzoiYWxsIjt9&bmode=view&idx=174161241&t=board": {
-  "ds": "kosaf",
-  "key": "2700388001",
-  "url": "https://janghak.songpa.go.kr/22/?q=YToxOntzOjEyOiJrZXl3b3JkX3R5cGUiO3M6MzoiYWxsIjt9&bmode=view&idx=174161241&t=board",
-  "source": "match",
-  "by": "로봇(재단 게시판 글과 짝 — 마감 같음 +2 · 재단 이름 +1 · 마감 해 +1 · 학기·반기 +1 · 장학 낱말 +1)",
-  "title": "2026년 하반기 송파구인재육성장학재단 장학생 선발 공고",
-  "firstAt": "2026-10-05",
-  "lastAt": "2026-10-05",
-  "tries": 1,
-  "status": "rejected",
-  "why": "다른 공고의 링크와 같은 주소(2026년 하반기 송파구인재육성장학재단 장학생 선발 공고)",
-  "checks": {
-   "C": "fail"
-  },
-  "round": "2026-10-02",
-  "decidedAt": "2026-10-05"
  },
  "kosaf|2700563001|board:https://bukgu.gwangju.kr/board.es?mid=b10201000000&bid=0275": {
   "ds": "kosaf",
@@ -717,24 +797,6 @@
   "round": "2026-10-30",
   "decidedAt": "2026-10-13"
  },
- "kosaf|2703469001|https://paan.or.kr/sub/sub02_01.php?boardid=notice&mode=view&idx=46&sk=&sw=&offset=&category=": {
-  "ds": "kosaf",
-  "key": "2703469001",
-  "url": "https://paan.or.kr/sub/sub02_01.php?boardid=notice&mode=view&idx=46&sk=&sw=&offset=&category=",
-  "source": "match",
-  "by": "로봇(재단 게시판 글과 짝 — 재단 이름 +1 · 마감 해 +1 · 학기·반기 +1 · 장학 낱말 +1 · 게시일 +1)",
-  "title": "파안장학문화재단법인이 미래 성공이 기대되는 인재를 2026-2(후기) 장학생으로 선발…",
-  "firstAt": "2026-10-05",
-  "lastAt": "2026-10-05",
-  "tries": 1,
-  "status": "rejected",
-  "why": "다른 공고의 링크와 같은 주소(파안장학문화재단법인이 미래 성공이 기대되는 인재를 2026-2(후기) 장학생으로 선발…)",
-  "checks": {
-   "C": "fail"
-  },
-  "round": "2026-10-02",
-  "decidedAt": "2026-10-05"
- },
  "kosaf|2704211001|https://myungfoundation.or.kr/modules/bbs/bbsView.php?id=28&page=1&&code=bbs_notice&xid=1": {
   "ds": "kosaf",
   "key": "2704211001",
@@ -761,6 +823,22 @@
   "verifiedAt": "2026-10-13",
   "also": []
  },
+ "kosaf|2704228001|board:https://www.busan.go.kr/nbnews": {
+  "ds": "kosaf",
+  "key": "2704228001",
+  "url": "",
+  "board": "https://www.busan.go.kr/nbnews",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "firstAt": "2026-11-08",
+  "lastAt": "2026-11-12",
+  "tries": 3,
+  "status": "pending",
+  "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
+  "checks": {},
+  "round": "2026-11-16",
+  "nextAt": "2026-11-19"
+ },
  "kosaf|2704345001|board:https://yeonje.go.kr/edu/main.do": {
   "ds": "kosaf",
   "key": "2704345001",
@@ -776,138 +854,6 @@
   "checks": {},
   "round": "2026-10-14",
   "nextAt": "2026-10-17"
- },
- "news|경희대학교|공통 [교수학습개발원] AI시대 대학생의 학습 경험과 인식 설문조사 참여 안내|https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323188": {
-  "ds": "news",
-  "key": "경희대학교|공통 [교수학습개발원] AI시대 대학생의 학습 경험과 인식 설문조사 참여 안내",
-  "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323188",
-  "source": "data",
-  "by": "Claude 세션 (2026-10-04 원문 바로잡기)",
-  "title": "공통 [교수학습개발원] AI시대 대학생의 학습 경험과 인식 설문조사 참여 안내",
-  "firstAt": "2026-10-04",
-  "lastAt": "2026-10-04",
-  "tries": 1,
-  "status": "verified",
-  "why": "그 공고로 확인",
-  "checks": {
-   "C": "ok",
-   "L": "ok",
-   "H": "ok",
-   "T": "ok",
-   "R": "ok"
-  },
-  "decidedAt": "2026-10-04",
-  "verifiedAt": "2026-10-04"
- },
- "news|경희대학교|공통 [추천채용] [INVENI] 대표이사 비서 정규직 추천채용|https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323229": {
-  "ds": "news",
-  "key": "경희대학교|공통 [추천채용] [INVENI] 대표이사 비서 정규직 추천채용",
-  "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323229",
-  "source": "data",
-  "by": "Claude 세션 (2026-10-04 원문 바로잡기)",
-  "title": "공통 [추천채용] [INVENI] 대표이사 비서 정규직 추천채용",
-  "firstAt": "2026-10-04",
-  "lastAt": "2026-10-04",
-  "tries": 1,
-  "status": "verified",
-  "why": "그 공고로 확인",
-  "checks": {
-   "C": "ok",
-   "L": "ok",
-   "H": "ok",
-   "T": "ok",
-   "R": "ok"
-  },
-  "decidedAt": "2026-10-04",
-  "verifiedAt": "2026-10-04"
- },
- "news|경희대학교|공통 [추천채용] [새솔다이아몬드공업(주)] 해외영업(중국), 해외영업(미국) 부문 추천채용|https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323208": {
-  "ds": "news",
-  "key": "경희대학교|공통 [추천채용] [새솔다이아몬드공업(주)] 해외영업(중국), 해외영업(미국) 부문 추천채용",
-  "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323208",
-  "source": "data",
-  "by": "Claude 세션 (2026-10-04 원문 바로잡기)",
-  "title": "공통 [추천채용] [새솔다이아몬드공업(주)] 해외영업(중국), 해외영업(미국) 부문 추천채용",
-  "firstAt": "2026-10-04",
-  "lastAt": "2026-10-04",
-  "tries": 1,
-  "status": "verified",
-  "why": "그 공고로 확인",
-  "checks": {
-   "C": "ok",
-   "L": "ok",
-   "H": "ok",
-   "T": "ok",
-   "R": "ok"
-  },
-  "decidedAt": "2026-10-04",
-  "verifiedAt": "2026-10-04"
- },
- "news|경희대학교|공통 [피보탈시스템즈코리아(주)] 반도체 엔지니어&오퍼레이터 추천채용|https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323221": {
-  "ds": "news",
-  "key": "경희대학교|공통 [피보탈시스템즈코리아(주)] 반도체 엔지니어&오퍼레이터 추천채용",
-  "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323221",
-  "source": "data",
-  "by": "Claude 세션 (2026-10-04 원문 바로잡기)",
-  "title": "공통 [피보탈시스템즈코리아(주)] 반도체 엔지니어&오퍼레이터 추천채용",
-  "firstAt": "2026-10-04",
-  "lastAt": "2026-10-04",
-  "tries": 1,
-  "status": "verified",
-  "why": "그 공고로 확인",
-  "checks": {
-   "C": "ok",
-   "L": "ok",
-   "H": "ok",
-   "T": "ok",
-   "R": "ok"
-  },
-  "decidedAt": "2026-10-04",
-  "verifiedAt": "2026-10-04"
- },
- "news|경희대학교|국제 [(주)라엘코리아] 해외영업(일본) 전환형 인턴 추천채용|https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323222": {
-  "ds": "news",
-  "key": "경희대학교|국제 [(주)라엘코리아] 해외영업(일본) 전환형 인턴 추천채용",
-  "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323222",
-  "source": "data",
-  "by": "Claude 세션 (2026-10-04 원문 바로잡기)",
-  "title": "국제 [(주)라엘코리아] 해외영업(일본) 전환형 인턴 추천채용",
-  "firstAt": "2026-10-04",
-  "lastAt": "2026-10-04",
-  "tries": 1,
-  "status": "verified",
-  "why": "그 공고로 확인",
-  "checks": {
-   "C": "ok",
-   "L": "ok",
-   "H": "ok",
-   "T": "ok",
-   "R": "ok"
-  },
-  "decidedAt": "2026-10-04",
-  "verifiedAt": "2026-10-04"
- },
- "news|경희대학교|국제 [교수학습개발원] 국제C 학부생을 위한 학습컨설팅 신청 안내(10월)|https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323083": {
-  "ds": "news",
-  "key": "경희대학교|국제 [교수학습개발원] 국제C 학부생을 위한 학습컨설팅 신청 안내(10월)",
-  "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323083",
-  "source": "data",
-  "by": "Claude 세션 (2026-10-04 원문 바로잡기)",
-  "title": "국제 [교수학습개발원] 국제C 학부생을 위한 학습컨설팅 신청 안내(10월)",
-  "firstAt": "2026-10-04",
-  "lastAt": "2026-10-04",
-  "tries": 1,
-  "status": "verified",
-  "why": "그 공고로 확인",
-  "checks": {
-   "C": "ok",
-   "L": "ok",
-   "H": "ok",
-   "T": "ok",
-   "R": "ok"
-  },
-  "decidedAt": "2026-10-04",
-  "verifiedAt": "2026-10-04"
  },
  "notices|https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%5B%EA%B5%90%EC%99%B8%5D%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%ED%91%B8%EB%A5%B8%EB%93%B1%EB%8C%80%20%EA%B8%B0%EB%B6%80%EC%9E%A5%ED%95%99%EA%B8%88|https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260909&brdSeq=1&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&": {
   "ds": "notices",
@@ -976,27 +922,26 @@
   "decidedAt": "2026-10-05",
   "verifiedAt": "2026-10-05"
  },
- "notices|https://www.kookmin.ac.kr/user/kmuNews/notice/7/index.do#n-%EB%93%B1%EB%A1%9D%EA%B8%88%EC%A7%80%EC%9B%90%2B%EB%93%B1%EB%A1%9D%EA%B8%88%EC%99%B8%EC%A7%80%EC%9B%90%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%EC%A4%91%EC%86%8C%EA%B8%B0%EC%97%85%20%EC%B7%A8%EC%97%85%EC%97%B0%EA%B3%84%20%EC%9E%A5%ED%95%99%EC%82%AC%EC%97%85(%ED%9D%AC%EB%A7%9D|https://www.kookmin.ac.kr/user/kmuNews/notice/7/12307/view.do?currentPageNo=1": {
+ "notices|https://www.korea.ac.kr/ko/568/subview.do?article.offset=10#n-%5B%EA%B8%B0%EA%B8%88-10%2F8%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%ED%91%B8%EB%A5%B8%EC%86%94%20%EC%82%AC%ED%9A%8C%EC%A0%95%EC%9D%98%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4|https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjElMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D": {
   "ds": "notices",
-  "key": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/index.do#n-%EB%93%B1%EB%A1%9D%EA%B8%88%EC%A7%80%EC%9B%90%2B%EB%93%B1%EB%A1%9D%EA%B8%88%EC%99%B8%EC%A7%80%EC%9B%90%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%EC%A4%91%EC%86%8C%EA%B8%B0%EC%97%85%20%EC%B7%A8%EC%97%85%EC%97%B0%EA%B3%84%20%EC%9E%A5%ED%95%99%EC%82%AC%EC%97%85(%ED%9D%AC%EB%A7%9D",
-  "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12307/view.do?currentPageNo=1",
+  "key": "https://www.korea.ac.kr/ko/568/subview.do?article.offset=10#n-%5B%EA%B8%B0%EA%B8%88-10%2F8%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%ED%91%B8%EB%A5%B8%EC%86%94%20%EC%82%AC%ED%9A%8C%EC%A0%95%EC%9D%98%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4",
+  "url": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjElMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
   "source": "twin",
   "by": "로봇(같은 사이트·같은 제목 — 수집 검수 후보)",
-  "title": "등록금지원+등록금외지원 2026년 2학기 중소기업 취업연계 장학사업(희망사다리Ⅰ유형, 취업지원형) 신규장학생 모집(~9/18 18:00까지) 2026.08.31 현장실습지원센터 전소영",
-  "firstAt": "2026-10-04",
-  "lastAt": "2026-10-04",
+  "title": "[기금-10/8] 2026학년도 2학기 푸른솔 사회정의 장학금 신청 안내 (심사중) (선발결과는 11월 초중순 별도 메일로 안내 예정)",
+  "firstAt": "2026-11-05",
+  "lastAt": "2026-11-05",
   "tries": 1,
-  "status": "verified",
-  "why": "그 공고로 확인",
+  "status": "suggest",
+  "why": "제목이 제목 자리가 아니라 본문에만 보임",
   "checks": {
    "C": "ok",
-   "L": "ok",
+   "L": "weak",
    "H": "ok",
    "T": "ok",
    "R": "ok"
   },
-  "decidedAt": "2026-10-04",
-  "verifiedAt": "2026-10-04"
+  "decidedAt": "2026-11-05"
  },
  "notices|https://www.korea.ac.kr/ko/568/subview.do?article.offset=10&nttId=000100000000003861|https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjElMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D": {
   "ds": "notices",
@@ -1018,94 +963,6 @@
    "R": "ok"
   },
   "decidedAt": "2026-10-29"
- },
- "notices|https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-%5B%ED%86%B5%EC%98%81%EC%8B%9C%5D%202026%EB%85%84%20%EC%83%81%EB%B0%98%EA%B8%B0%EB%B6%84%20%ED%86%B5%EC%98%81%EC%8B%9C%20%ED%95%99%EC%9E%90%EA%B8%88%20%EC%9D%B4%EC%9E%90%20%EC%A7%80%EC%9B%90%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4|https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54815": {
-  "ds": "notices",
-  "key": "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-%5B%ED%86%B5%EC%98%81%EC%8B%9C%5D%202026%EB%85%84%20%EC%83%81%EB%B0%98%EA%B8%B0%EB%B6%84%20%ED%86%B5%EC%98%81%EC%8B%9C%20%ED%95%99%EC%9E%90%EA%B8%88%20%EC%9D%B4%EC%9E%90%20%EC%A7%80%EC%9B%90%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4",
-  "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54815",
-  "source": "twin",
-  "by": "로봇(같은 사이트·같은 제목 — 수집 검수 후보)",
-  "title": "[통영시] 2026년 상반기분 통영시 학자금 이자 지원 신청 안내",
-  "firstAt": "2026-10-04",
-  "lastAt": "2026-10-04",
-  "tries": 1,
-  "status": "verified",
-  "why": "그 공고로 확인",
-  "checks": {
-   "C": "ok",
-   "L": "ok",
-   "H": "ok",
-   "T": "ok",
-   "R": "ok"
-  },
-  "decidedAt": "2026-10-04",
-  "verifiedAt": "2026-10-04"
- },
- "notices|https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-%E3%80%8C2026%EB%85%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20%EC%9D%B5%EC%82%B0%EC%8B%9C%20%EB%8C%80%ED%95%99%EC%83%9D%20%ED%95%99%EC%9E%90%EA%B8%88%20%EC%9D%B4%EC%9E%90%20%EC%A7%80%EC%9B%90%20%EC%82%AC%EC%97%85%E3%80%8D%EC%95%88%EB%82%B4|https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54775": {
-  "ds": "notices",
-  "key": "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-%E3%80%8C2026%EB%85%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20%EC%9D%B5%EC%82%B0%EC%8B%9C%20%EB%8C%80%ED%95%99%EC%83%9D%20%ED%95%99%EC%9E%90%EA%B8%88%20%EC%9D%B4%EC%9E%90%20%EC%A7%80%EC%9B%90%20%EC%82%AC%EC%97%85%E3%80%8D%EC%95%88%EB%82%B4",
-  "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54775",
-  "source": "twin",
-  "by": "로봇(같은 사이트·같은 제목 — 수집 검수 후보)",
-  "title": "「2026년 하반기 익산시 대학생 학자금 이자 지원 사업」안내",
-  "firstAt": "2026-10-04",
-  "lastAt": "2026-10-04",
-  "tries": 1,
-  "status": "verified",
-  "why": "그 공고로 확인",
-  "checks": {
-   "C": "ok",
-   "L": "ok",
-   "H": "ok",
-   "T": "ok",
-   "R": "ok"
-  },
-  "decidedAt": "2026-10-04",
-  "verifiedAt": "2026-10-04"
- },
- "notices|https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-2026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B2%B0%EA%B3%BC%20%EB%B0%8F%202%EC%B0%A8%20%EC%B6%94%EA%B0%80%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4|https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54747": {
-  "ds": "notices",
-  "key": "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-2026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B2%B0%EA%B3%BC%20%EB%B0%8F%202%EC%B0%A8%20%EC%B6%94%EA%B0%80%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4",
-  "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54747",
-  "source": "twin",
-  "by": "로봇(같은 사이트·같은 제목 — 수집 검수 후보)",
-  "title": "2026학년도 2학기 국가근로장학생 선발 결과 및 2차 추가 선발 안내",
-  "firstAt": "2026-10-04",
-  "lastAt": "2026-10-04",
-  "tries": 1,
-  "status": "verified",
-  "why": "그 공고로 확인",
-  "checks": {
-   "C": "ok",
-   "L": "ok",
-   "H": "ok",
-   "T": "ok",
-   "R": "ok"
-  },
-  "decidedAt": "2026-10-04",
-  "verifiedAt": "2026-10-04"
- },
- "notices|https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-2026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EC%83%9D%20%ED%9D%AC%EB%A7%9D%EA%B7%BC%EB%A1%9C%EC%A7%80%202%EC%B0%A8%20%EC%8B%A0%EC%B2%AD%EA%B8%B0%EA%B0%84%20%EC%95%88%EB%82%B4|https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54793": {
-  "ds": "notices",
-  "key": "https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-2026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EC%83%9D%20%ED%9D%AC%EB%A7%9D%EA%B7%BC%EB%A1%9C%EC%A7%80%202%EC%B0%A8%20%EC%8B%A0%EC%B2%AD%EA%B8%B0%EA%B0%84%20%EC%95%88%EB%82%B4",
-  "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54793",
-  "source": "twin",
-  "by": "로봇(같은 사이트·같은 제목 — 수집 검수 후보)",
-  "title": "2026학년도 2학기 국가근로장학생 희망근로지 2차 신청기간 안내",
-  "firstAt": "2026-10-04",
-  "lastAt": "2026-10-04",
-  "tries": 1,
-  "status": "verified",
-  "why": "그 공고로 확인",
-  "checks": {
-   "C": "ok",
-   "L": "ok",
-   "H": "ok",
-   "T": "ok",
-   "R": "ok"
-  },
-  "decidedAt": "2026-10-04",
-  "verifiedAt": "2026-10-04"
  },
  "notices|https://www.yonsei.ac.kr/bbs/sc/58/artclList.do?findClSeq=257#n-%EC%9D%BC%EB%B0%98%EA%B3%B5%EC%A7%80%2010%2F2(%EA%B8%88)%20%EA%B5%90%EC%99%B8%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%A0%9C%EC%B6%9C%EC%9A%A9%20%EC%B4%9D%EC%9E%A5%20%EC%A7%81%EC%9D%B8%20%EB%82%A0%EC%9D%B8%20%EB%B6%88%EA%B0%80%20%EC%95%88%EB%82%B4%20%EC%8B%A0|https://www.yonsei.ac.kr/bbs/sc/58/944246/artclView.do": {
   "ds": "notices",

@@ -1,15 +1,84 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-10-31",
+ "updatedAt": "2026-11-11",
  "items": [
   {
-   "title": "[장학안내] [통영시] 2026년도 통영시 저소득 대학생 장학금 지원 안내",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70833&cate=8",
+   "title": "[장학안내] [한국고등교육재단] 문우림 제6기 장학생 선발 안내",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70961&cate=8",
    "attachments": [
     {
      "name": "교육기본시설/부속시설",
      "url": "https://www.jnu.ac.kr/MainIntro/Institution/AttachedFac"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-11-10"
+  },
+  {
+   "title": "[장학안내] [재단법인 관정재단] 2027년도 관정재단 장학생(학부) 선발...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70948&cate=8",
+   "attachments": [
+    {
+     "name": "2027년 관정재단 국내대학 장학생 선발계획 및 지원서.zip",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2591162"
+    }
+   ],
+   "deadlineHint": "제출기간: 2026. 11. 9.(월) ~ 2026. 11. 19.(목) 18:00까지) ​ 1. 추천인원 : 학부재학생 5 명 내외 ( 최종",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-11-09"
+  },
+  {
+   "title": "[장학안내] 2026학년도 2학기 도전장학생(비상) 선발 2단계 면접평가 안내",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70910&cate=8",
+   "attachments": [
+    {
+     "name": "2026학년도 2학기 도전장학생(비상) 2단계 심층면접 평가 대상자 명단(게시용)최종.xlsx.pdf",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2590803"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-11-04"
+  },
+  {
+   "title": "[장학안내] 2026학년도 2학기 도전장학생(비상) 1단계 선발자 공고",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70909&cate=8",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-11-04"
+  },
+  {
+   "title": "[장학안내] 2026학년도 국가근로장학금 동계방학 집중근로 프로그램 희망근...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70854&cate=8",
+   "attachments": [
+    {
+     "name": "2026년 동계방학 집중근로 희망근로지 신청 매뉴얼(홈페이지).pdf",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2590257"
     },
+    {
+     "name": "2026년 동계방학 집중근로 희망근로지 신청 매뉴얼(모바일).pdf",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2590258"
+    },
+    {
+     "name": "2026년 동계방학 집중근로 근로장학생 사전 선정기준(안).pdf",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2590259"
+    }
+   ],
+   "deadlineHint": "신청기간: '26. 10. 30.(금) 09:00 ~ '26. 11. 12.(목) 18:00까지 ​ 2. 신청자격 : 2026학년도 2학기 국가",
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-11-02"
+  },
+  {
+   "title": "[장학안내] [통영시] 2026년도 통영시 저소득 대학생 장학금 지원 안내",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70833&cate=8",
+   "attachments": [
     {
      "name": "2026년 통영시 저소득 대학생 장학금 지원대상자 선발 공고.hwpx",
      "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2589620"
@@ -24,10 +93,6 @@
    "title": "[장학안내] [강화군] 2026년도 하반기 강화군 대학생 등록금 지원사업 안내",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70812&cate=8",
    "attachments": [
-    {
-     "name": "교육기본시설/부속시설",
-     "url": "https://www.jnu.ac.kr/MainIntro/Institution/AttachedFac"
-    },
     {
      "name": "공고문(2026년 하반기 강화군 대학생 등록금 지원사업).hwpx",
      "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2589142"

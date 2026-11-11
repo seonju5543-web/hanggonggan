@@ -1,7 +1,144 @@
 {
  "school": "중앙대학교",
- "updatedAt": "2026-10-31",
+ "updatedAt": "2026-11-11",
  "items": [
+  {
+   "title": "2026학년도 2학기 CAU Global Fair 축제 홍보",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30332&pageNo=1",
+   "postId": "30332",
+   "postedAt": "2026-11-11",
+   "kind": "행사",
+   "school": "중앙대학교",
+   "campus": "",
+   "src": "f4f8bc8f",
+   "foundAt": "2026-11-11",
+   "thumb": "data/news/img/f57e0069959a5317.webp",
+   "desc": "■ 일 시: 2026.11.18.(수) ~ 11.19. (목) [2일 간] ■장 소: 310관 1층 로비 ■참석대상: -본교 재학생(유학생, GKS 정부초청장학생 포함) -초청 교환학생 -기타 교내외 구성원 국가별…"
+  },
+  {
+   "title": "[중앙대학교] 차세대반도체학과 설명회(11/23) 개최 안내",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30331&pageNo=1",
+   "postId": "30331",
+   "postedAt": "2026-11-11",
+   "kind": "행사",
+   "school": "중앙대학교",
+   "campus": "",
+   "src": "f4f8bc8f",
+   "foundAt": "2026-11-11",
+   "thumb": "data/news/img/92d13ac42acb6304.webp",
+   "desc": "- 장소 : 오프라인 ▶ 207관 234호 - 장소 : 온 라 인 ▶ ZOOM 회의로 참여 가능"
+  },
+  {
+   "title": "[학사팀] 2026학년도 융복합전공 만족도조사",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30327&pageNo=1",
+   "postId": "30327",
+   "postedAt": "2026-11-10",
+   "school": "중앙대학교",
+   "campus": "",
+   "src": "f4f8bc8f",
+   "foundAt": "2026-11-10",
+   "thumb": "data/news/img/49791779e6951dbd.webp",
+   "desc": "※성실 답변자(200명)에게 커피쿠폰 지급 -설문 기간: 26. 11. 11.(수) 10:00 ~ 26. 12. 2.(수) 12:30 -참여 대상: 학부 재/휴학생 -참여 방법: QR코드 및 포탈 접속 후 팝업창을…"
+  },
+  {
+   "title": "[미국 대학 학점 이수 및 수료증 발급] University of Wisconsin-Stout 2027 Winter 글로벌 리더십 프로그램(~11/20)",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30325&pageNo=1",
+   "postId": "30325",
+   "postedAt": "2026-11-10",
+   "kind": "학사",
+   "school": "중앙대학교",
+   "campus": "",
+   "src": "f4f8bc8f",
+   "foundAt": "2026-11-10",
+   "thumb": "data/news/img/24629090c3a96f10.webp"
+  },
+  {
+   "title": "[학생생활상담센터(다빈치)] '2026학년도 e-Class 예방교육' 안내",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=29709&pageNo=1",
+   "postId": "29709",
+   "postedAt": "2026-11-09",
+   "school": "중앙대학교",
+   "campus": "",
+   "src": "f4f8bc8f",
+   "foundAt": "2026-11-09",
+   "thumb": "data/news/img/2e65d056371783d9.webp"
+  },
+  {
+   "title": "2026-2학기 재학생 분할등록(4차) 안내",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30322&pageNo=1",
+   "postId": "30322",
+   "postedAt": "2026-11-09",
+   "school": "중앙대학교",
+   "campus": "",
+   "src": "f4f8bc8f",
+   "foundAt": "2026-11-09"
+  },
+  {
+   "title": "[디지털교육지원센터] 2026학년도 디지털배지 체험 이벤트 개최 안내",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30321&pageNo=1",
+   "postId": "30321",
+   "postedAt": "2026-11-09",
+   "kind": "행사",
+   "school": "중앙대학교",
+   "campus": "",
+   "src": "f4f8bc8f",
+   "foundAt": "2026-11-09",
+   "thumb": "data/news/img/e70939c201371124.webp"
+  },
+  {
+   "title": "2026학년도 학생성장진단 및 Neo-다빈치 핵심역량진단 참여 이벤트 안내",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30319&pageNo=1",
+   "postId": "30319",
+   "postedAt": "2026-11-09",
+   "school": "중앙대학교",
+   "campus": "",
+   "src": "f4f8bc8f",
+   "foundAt": "2026-11-09",
+   "thumb": "data/news/img/3482c79e6fd0f6a5.webp"
+  },
+  {
+   "title": "심리서비스대학원 내 심리서비스센터(실습기관)의 상담실습 내담자 경험을 위한 참여자 2차 모집",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30309&pageNo=1",
+   "postId": "30309",
+   "postedAt": "2026-11-03",
+   "school": "중앙대학교",
+   "campus": "",
+   "src": "f4f8bc8f",
+   "foundAt": "2026-11-03",
+   "thumb": "data/news/img/430d6882971fa20c.webp"
+  },
+  {
+   "title": "제16회 변호사시험 시험관리원 모집",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30307&pageNo=1",
+   "postId": "30307",
+   "postedAt": "2026-11-03",
+   "school": "중앙대학교",
+   "campus": "",
+   "src": "f4f8bc8f",
+   "foundAt": "2026-11-03"
+  },
+  {
+   "title": "2026학년도 동계 계절학기 시행 안내",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30304&pageNo=1",
+   "postId": "30304",
+   "postedAt": "2026-11-02",
+   "kind": "학사",
+   "school": "중앙대학교",
+   "campus": "",
+   "src": "f4f8bc8f",
+   "foundAt": "2026-11-02"
+  },
+  {
+   "title": "중앙대학교 인권센터 2026 인권지기 선정 공고",
+   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30303&pageNo=1",
+   "postId": "30303",
+   "postedAt": "2026-11-02",
+   "school": "중앙대학교",
+   "campus": "",
+   "src": "f4f8bc8f",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/cbbdc7423c391b52.webp"
+  },
   {
    "title": "2026학년도 11월 건강센터 (서울) 행사 안내 캘린더",
    "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30302&pageNo=1",
@@ -260,165 +397,6 @@
    "campus": "",
    "src": "f4f8bc8f",
    "foundAt": "2026-10-12"
-  },
-  {
-   "title": "[학생생활상담센터(다빈치)] '2026학년도 걱정 함께하세 토크콘서트 - 내 마음의 나침반 찾기: 진로 불안과 우울을 다루는 마음챙김' 안내",
-   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30232&pageNo=1",
-   "postId": "30232",
-   "postedAt": "2026-10-08",
-   "kind": "행사",
-   "school": "중앙대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "thumb": "data/news/img/5ee2b7b42d131e8f.webp",
-   "src": "f4f8bc8f"
-  },
-  {
-   "title": "ISIC 국제학생증 인증비 지원행사 안내",
-   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30231&pageNo=1",
-   "postId": "30231",
-   "postedAt": "2026-10-08",
-   "kind": "학사",
-   "school": "중앙대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "src": "f4f8bc8f"
-  },
-  {
-   "title": "2026년 하반기 캠퍼스리크루팅 개최 안내",
-   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30093&pageNo=1",
-   "postId": "30093",
-   "postedAt": "2026-10-07",
-   "kind": "행사",
-   "school": "중앙대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "src": "f4f8bc8f"
-  },
-  {
-   "title": "2027학년도 전반기 일반대학원 신입생 모집 안내",
-   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30229&pageNo=1",
-   "postId": "30229",
-   "postedAt": "2026-10-07",
-   "school": "중앙대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "src": "f4f8bc8f"
-  },
-  {
-   "title": "전공진로 디스커버리(교수님과 1:1 상담) 신청 안내(~10.30)",
-   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30227&pageNo=1",
-   "postId": "30227",
-   "postedAt": "2026-10-07",
-   "school": "중앙대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "thumb": "data/news/img/4dcb6663a0c2f250.webp",
-   "src": "f4f8bc8f"
-  },
-  {
-   "title": "2026-2 재학생 분할등록(3차) 안내",
-   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30226&pageNo=1",
-   "postId": "30226",
-   "postedAt": "2026-10-07",
-   "school": "중앙대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "src": "f4f8bc8f"
-  },
-  {
-   "title": "2027학년도 수시 논술고사 관련 캠퍼스 출입 통제 안내(10월 10일~11일)",
-   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30221&pageNo=1",
-   "postId": "30221",
-   "postedAt": "2026-10-02",
-   "school": "중앙대학교",
-   "campus": "",
-   "foundAt": "2026-10-03",
-   "src": "f4f8bc8f"
-  },
-  {
-   "title": "2학기 취업지원 프로그램 / ACP 그래픽 자격증 취득 과정",
-   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=28391&pageNo=1",
-   "postId": "28391",
-   "postedAt": "2026-10-02",
-   "school": "중앙대학교",
-   "campus": "",
-   "foundAt": "2026-10-03",
-   "thumb": "data/news/img/2504c24a2f1e8308.webp",
-   "desc": "● 다빈치캠퍼스 행정인턴 채용공고 ● 2026년도 예술활동증명 지원사업 ● 성공 취업을 위한 1:1 집중 컨설팅",
-   "src": "f4f8bc8f"
-  },
-  {
-   "title": "HY사회복지재단 취약계층 학비보조 지원사업 2026년 든든 학업지원금 선발 공고",
-   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30220&pageNo=1",
-   "postId": "30220",
-   "postedAt": "2026-10-01",
-   "school": "중앙대학교",
-   "campus": "",
-   "foundAt": "2026-10-03",
-   "thumb": "data/news/img/f3b69db638fddc3c.webp",
-   "src": "f4f8bc8f"
-  },
-  {
-   "title": "교섭 요구 사실의 공고",
-   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30219&pageNo=1",
-   "postId": "30219",
-   "postedAt": "2026-10-01",
-   "school": "중앙대학교",
-   "campus": "",
-   "foundAt": "2026-10-03"
-  },
-  {
-   "title": "2026학년도 10월 건강센터 (다빈치) 행사 안내 캘린더",
-   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30217&pageNo=1",
-   "postId": "30217",
-   "postedAt": "2026-10-01",
-   "kind": "행사",
-   "school": "중앙대학교",
-   "campus": "",
-   "foundAt": "2026-10-03",
-   "thumb": "data/news/img/bf86e4d328bab750.webp"
-  },
-  {
-   "title": "2026학년도 10월 건강센터 (서울) 행사 안내 캘린더",
-   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30216&pageNo=1",
-   "postId": "30216",
-   "postedAt": "2026-10-01",
-   "kind": "행사",
-   "school": "중앙대학교",
-   "campus": "",
-   "foundAt": "2026-10-03",
-   "thumb": "data/news/img/a8a369d598ab73e6.webp"
-  },
-  {
-   "title": "2026년 동작구 금연지도원(자원봉사자) 모집안내",
-   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30212&pageNo=1",
-   "postId": "30212",
-   "postedAt": "2026-09-30",
-   "school": "중앙대학교",
-   "campus": "",
-   "foundAt": "2026-10-03",
-   "desc": "모집인원 100 명 ( 선착순 마감 ) 관내 대학생 및 지역 주민 신청기간 2026. 10. 6.( 화 ) ∼ 10. 19.( 월 ) (14 일간 ) 활동시간 2 시간 / 일 , 20 시간 / 월 제한 : 봉사시간…"
-  },
-  {
-   "title": "2026 랜선으로 만나는 릴레이 글로벌 취·창업 톡톡톡",
-   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30211&pageNo=1",
-   "postId": "30211",
-   "postedAt": "2026-09-29",
-   "school": "중앙대학교",
-   "campus": "",
-   "foundAt": "2026-10-03",
-   "thumb": "data/news/img/e40baf790d619fbd.webp"
-  },
-  {
-   "title": "2026학년도 2학기 직무적성검사 대비 프로그램:10/1(목)~10/6(화)",
-   "url": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30208&pageNo=1",
-   "postId": "30208",
-   "postedAt": "2026-09-29",
-   "school": "중앙대학교",
-   "campus": "",
-   "foundAt": "2026-10-03",
-   "thumb": "data/news/img/dfd0d47f49579a63.webp"
   }
  ]
 }

@@ -258,9 +258,11 @@ export function runFormPdf({ root, today, dry = false, soffice = process.env.FOR
     });
     if (next.length) index.items[t.id] = next;
     else if (!dry) delete index.items[t.id];
-    /* 그 공고 폴더에서 색인에 없는 파일(첨부가 빠지거나 순서가 바뀐 옛 결과)은 지운다 — 폴더째 지우는 prune 이 못 보는 고아 */
+    /* 그 공고 폴더에서 색인에 없는 파일(첨부가 빠지거나 순서가 바뀐 옛 결과)은 지운다 — 폴더째 지우는 prune 이 못 보는 고아.
+       🔴 뒤 단계(form-fields.mjs)의 결과물은 고아가 아니다 — fields.json 과 살아 있는 PDF 의 「<이름>-pages」 폴더는 둔다.
+          여기서 지우면 그 로봇이 **매일 26개 전부를 다시 그린다**(2026-11-09 실측 · 리포트 「그대로 0」) · 죽은 PDF 의 쪽 폴더는 그 로봇이 스스로 지운다. */
     if (!dry && fs.existsSync(path.join(outDir, t.id))) {
-      const keep = new Set(next.map((h) => path.basename(h.file)));
+      const keep = new Set(next.flatMap((h) => [path.basename(h.file), `${path.basename(h.file).replace(/\.pdf$/i, '')}-pages`]).concat(['fields.json']));
       for (const fn of fs.readdirSync(path.join(outDir, t.id))) if (!keep.has(fn)) { try { fs.rmSync(path.join(outDir, t.id, fn), { recursive: true, force: true }); } catch { /* 무시 */ } }
       if (!next.length) { try { fs.rmSync(path.join(outDir, t.id), { recursive: true, force: true }); } catch { /* 무시 */ } }
     }

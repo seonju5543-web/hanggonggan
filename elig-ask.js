@@ -99,7 +99,7 @@ const TRAIT_LABEL = {
   diabetes:   '당뇨 진단',
   /* 2026-10-15 · 노션 G-14 결정 ② — 「이번 학기 국가장학금을 신청했나요」를 명사형으로. 걸리는 줄은 parse-requirements TRAIT_PAT 참조 */
   kosafApplied: '이번 학기 국가장학금 신청',
-  careLeaver:   '자립준비청년 (보호 종료)',   // 2026-10-31 · 2단계 전수 — 진짜 요건 3곳(등록 1 · 재단 1 · 활동 1) · 온보딩엔 안 넣는다(위 ONBOARD_TRAITS 주석)
+  careLeaver:   '자립준비청년 (보호 종료)',   // 2026-10-31 · 2단계 전수 — 진짜 요건 3곳(등록 1 · 재단 1 · 활동 1) · 2026-11-09 개발자 결정으로 온보딩에도(위 ONBOARD_TRAITS)
 };
 
 /* 🔴 온보딩 「적합도 높이기」 단계가 **처음부터** 묻는 처지 (2026-10-24 · 개발자 지시 "수집된 공고를 모아 적합도 고도화
@@ -108,8 +108,10 @@ const TRAIT_LABEL = {
    **4곳 이상**이 묻는 처지. 걸린 공고 수 — award 17 · kosafApplied 11 · discipline 10 · job 10 · volunteer 6 · dorm 4 · military 4.
    ⚠️ 3곳 이하(birthOrder·farm·loan 각 3 · 나머지 1~2)는 공고 안에서만 묻는다 — 온보딩을 길게 만들 만큼 자주 나오지 않는다.
    ⚠️ 여기 적는 종류는 TRAIT_LABEL·TRAIT_PAT 에 있어야 한다(관문이 대조한다). 순서가 화면 순서다. */
-const ONBOARD_TRAITS = ['award', 'kosafApplied', 'discipline', 'job', 'volunteer', 'dorm', 'military'];
-/* 2026-10-31 — careLeaver(자립준비청년) 종류를 더했지만 온보딩에는 **넣지 않는다**: 집계가 4곳으로 셌으나 그중 하나는 국가근로의
+const ONBOARD_TRAITS = ['award', 'kosafApplied', 'discipline', 'job', 'volunteer', 'dorm', 'military', 'loan', 'careLeaver'];
+/* 2026-11-09 개발자 결정("질문에 넣어") — 전수 집계가 「4곳 이상인데 안 묻는 것: loan 5 · careLeaver 4」 를 알린 뒤 둘을 더했다(loan 은 대출 이자 지원 장학 · careLeaver 는 자립준비청년 전용).
+   careLeaver 는 그 뒤 3곳으로 줄었지만 개발자가 직접 넣으라 한 것이라 둔다 — 집계가 「4곳 미만인데 묻는 것」으로 적으면 사람이 다시 본다. */
+/* (옛 판단 · 2026-11-09 개발자 결정으로 바뀜) 2026-10-31 — careLeaver(자립준비청년) 종류를 더했지만 온보딩에는 넣지 않았다: 집계가 4곳으로 셌으나 그중 하나는 국가근로의
    「자립준비청년인 경우 성적 기준 적용 제외」(면제 안내)라 진짜 요건은 3곳이다(리뷰). 공고 안에서만 묻는다.
    `node verify/eligibility-coverage.mjs --brief` 가 수집 리포트에 「4곳 이상인데 안 묻는 것 / 4곳 미만인데 묻는 것」을 ⚠️ 로 적는다 — 목록을 고치는 것은 사람이다. */
 

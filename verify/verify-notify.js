@@ -29,6 +29,38 @@ const ok = (cond, label, extra) => {
   if (!cond) fail++;
 };
 
+/* 🔴 **헤드리스 크로미움엔 진짜 푸시 서비스가 없다** — 그대로 두면 켜는 순간 폰 등록이 실패하고,
+   2026-11-09 부터는 '등록이 안 되면 스위치가 꺼짐으로 돌아간다'(notify.js nfRegisterAfterPress)라
+   이 검사의 '켠 뒤' 확인이 전부 꺼진 채로 돌게 된다. verify-push-client.js 와 같은 꼴로 PushManager 를 흉내 내고,
+   발송 서버 주소는 **push-config.js 에서 읽어** 가로챈다(주소를 박지 않는다 — 진짜 서버로 나가지 않게). */
+const PUSH_STUB = () => {
+  const FAKE_ENDPOINT = 'https://fcm.googleapis.com/fcm/send/TEST-NOTIFY-1';
+  let current = null;
+  const fakeSub = { endpoint: FAKE_ENDPOINT, unsubscribe: async () => { current = null; return true; }, toJSON() { return { endpoint: FAKE_ENDPOINT }; } };
+  Object.defineProperty(ServiceWorkerRegistration.prototype, 'pushManager', {
+    configurable: true,
+    get: () => ({ getSubscription: async () => current, subscribe: async () => { current = fakeSub; return fakeSub; } }),
+  });
+};
+const PUSH_ENDPOINT = (() => {
+  const m = require('fs').readFileSync(require('path').join(__dirname, '..', 'push-config.js'), 'utf8').match(/endpoint:\s*'([^']*)'/);
+  return m ? m[1].replace(/\/+$/, '') : '';
+})();
+/* 발송 서버 대역 — 'ok' 면 받아 주고 'fail' 이면 500 */
+const pushServer = { mode: 'ok', hits: [] };
+async function routePushServer(ctx) {
+  if (!PUSH_ENDPOINT) return;
+  await ctx.route(PUSH_ENDPOINT + '/**', (route) => {
+    const u = new URL(route.request().url());
+    pushServer.hits.push(u.pathname);
+    const mode = pushServer.mode;   // 요청이 들어온 순간의 판으로 답한다
+    const reply = () => route.fulfill(mode === 'ok'
+      ? { status: 200, contentType: 'application/json', body: '{"ok":true}' }
+      : { status: 500, contentType: 'application/json', body: '{"ok":false}' });
+    if (mode === 'slowfail') setTimeout(reply, 1500); else reply();
+  });
+}
+
 /* 휴대폰 알림이 실제로 호출됐는지 잡아내는 스파이 (헤드리스에선 알림 UI가 안 보이므로) */
 const SPY = () => {
   window.__notifs = [];
@@ -169,12 +201,14 @@ async function onboard(page) {
   console.log('\n[B] 알림을 허용한 사용자 — 조건별 발송 · 알림함 · 설정');
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await ctx.grantPermissions(['notifications'], { origin: BASE });
+  await routePushServer(ctx);
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
   page.on('console', (m) => { if (m.type() === 'error' && !IGNORE_CONSOLE.test(m.text())) errors.push('CONSOLE: ' + m.text()); });
   page.on('dialog', async (d) => { await d.accept(); });
   await page.addInitScript(SPY);
+  await page.addInitScript(PUSH_STUB);
 
   await page.goto(BASE + '/', { waitUntil: 'domcontentloaded' });
   await onboard(page);
@@ -323,6 +357,128 @@ async function onboard(page) {
   ok(/켜짐/.test(onText), 'MY 상태가 "켜짐"으로 바뀜', onText);
   await page.screenshot({ path: SHOT('06-my-on') });
 
+  /* 🔴 설정 화면에서 **스위치를 직접 눌러** 모양이 따라 바뀌는가 (2026-11-06 신고 — 눌러도 끈 모양 그대로).
+     위 확인들은 화면을 새로 열어 그린 것만 봐서, 누른 뒤 다시 그리는 길(renderMy → 알림 카드 없음)을 못 봤다.
+     🔴 그리고 **곧바로** 바뀌는가 (2026-11-09 신고 — 2초쯤 뒤에 바뀐다). 푸시 서버 등록·해제를 일부러 3초 늦춰 두고,
+        누른 뒤 1초 안에 스위치·상태 줄이 바뀌어 있어야 한다 — 서버를 기다린 뒤 그리면 여기서 걸린다.
+        늦춘 가짜는 확인이 끝나면 원래 함수로 되돌린다(뒤 확인들이 진짜 길을 보게). */
+  const NF_SLOW = 3000, NF_FAST = 1000;   // 서버가 3초 걸려도 1초 안에 — 화면은 거의 즉시라 여유는 1초 가까이 남고, 옛 코드(3초)와는 2초 벌어진다
+  await page.evaluate((ms) => {
+    window.__nfReal = { pushUnsubscribe: window.pushUnsubscribe, pushEnsure: window.pushEnsure };
+    window.__nfServer = [];
+    /* 바닥 안내 글(토스트)을 센다 — 켜기/끄기 때는 하나도 뜨지 않아야 한다(2026-11-09 개발자 지시) */
+    window.__nfToasts = [];
+    window.__nfRealToast = window.toast;
+    window.toast = (msg, ...rest) => { window.__nfToasts.push(String(msg)); return window.__nfRealToast(msg, ...rest); };
+    window.pushUnsubscribe = async () => { await new Promise((r) => setTimeout(r, ms)); window.__nfServer.push('off'); };
+    window.pushEnsure = async () => { await new Promise((r) => setTimeout(r, ms)); window.__nfServer.push(notifyLedger.enabled ? 'on' : 'skip'); return { ok: true }; };
+  }, NF_SLOW);
+  const nfServerDone = (n) => page.waitForFunction((k) => window.__nfServer.length >= k, n, { timeout: 4 * NF_SLOW }).catch(() => {});
+  /* ① 끄기 — 서버 일이 끝날 때까지 기다렸다가 다음으로 (켜기 확인이 끄기의 뒷일과 겹치지 않게) */
+  await page.click('#btn-nf-toggle');
+  await page.waitForTimeout(NF_FAST);
+  ok(await page.getAttribute('#btn-nf-toggle', 'aria-checked') === 'false', `설정에서 스위치를 끄면 ${NF_FAST / 1000}초 안에 꺼짐 모양으로 바뀐다 (서버가 ${NF_SLOW / 1000}초 걸려도)`);
+  ok(/켜지 않|꺼 둔/.test(await page.textContent('#my-notify .nf-status')), '끈 뒤 상태 줄도 곧바로 꺼짐을 말한다');
+  await nfServerDone(1);
+  /* ② 켜기 */
+  await page.click('#btn-nf-toggle');
+  await page.waitForTimeout(NF_FAST);
+  ok(await page.getAttribute('#btn-nf-toggle', 'aria-checked') === 'true', `다시 켜면 ${NF_FAST / 1000}초 안에 켜짐 모양으로 바뀐다`);
+  ok(/켜짐/.test(await page.textContent('#my-notify .nf-status')), '켠 뒤 상태 줄도 곧바로 켜짐을 말한다');
+  await nfServerDone(2);
+  /* ③ 빨리 껐다 켜기 — 서버 일은 누른 순서대로 끝나야 한다('해제'가 '등록'보다 늦게 끝나 등록을 지우면 안 된다) */
+  await page.click('#btn-nf-toggle');
+  await page.waitForTimeout(150);
+  await page.click('#btn-nf-toggle');
+  await nfServerDone(4);
+  {
+    const order = await page.evaluate(() => window.__nfServer.slice(2));
+    ok(JSON.stringify(order) === JSON.stringify(['off', 'on']) && await page.getAttribute('#btn-nf-toggle', 'aria-checked') === 'true',
+      '빨리 껐다 켜도 서버 일은 누른 순서대로 끝나고(해제 → 등록) 스위치는 켜짐', JSON.stringify(order));
+  }
+  {
+    const toasts = await page.evaluate(() => window.__nfToasts.slice());
+    ok(toasts.length === 0, '켜기/끄기 때 화면 바닥 안내 글(휴대폰 알림 켜짐/꺼짐)이 뜨지 않는다 — 스위치와 상태 줄이 말한다', JSON.stringify(toasts));
+  }
+  await page.evaluate(() => { Object.assign(window, window.__nfReal); window.toast = window.__nfRealToast; });
+
+  /* 🔴 **버튼으로 켰는데 발송 서버 등록이 안 되면 → 스위치가 꺼짐으로 돌아간다 · 따로 알리지 않는다** (2026-11-09 개발자 지시).
+     진짜 함수 길(pushEnsure → pushSubscribe → 서버 500)로 잰다. */
+  console.log('\n  [설정] 서버 등록이 안 되면 꺼짐으로 (2026-11-09)');
+  const waitSwitch = (want, ms = 5000) => page.waitForFunction((w) => document.querySelector('#btn-nf-toggle')?.getAttribute('aria-checked') === w, want, { timeout: ms }).catch(() => {});
+  await page.evaluate(() => { window.__nfToasts = []; window.__nfRealToast = window.toast; window.toast = (m, ...r) => { window.__nfToasts.push(String(m)); return window.__nfRealToast(m, ...r); }; });
+  await page.click('#btn-nf-toggle');           // 끄기 (서버 정상)
+  await waitSwitch('false');
+  await page.waitForTimeout(300);
+  pushServer.mode = 'fail';
+  await page.evaluate(() => { notifyLedger.pushSyncedAt = 0; });
+  await page.click('#btn-nf-toggle');           // 켜기 — 서버가 500
+  await waitSwitch('false');
+  ok(await page.getAttribute('#btn-nf-toggle', 'aria-checked') === 'false', '켰는데 서버 등록이 안 되면 스위치가 꺼짐으로 돌아간다');
+  ok(await page.evaluate(() => notifyLedger.enabled === false), '  장부도 꺼짐 (새로고침해도 켜진 척하지 않는다)');
+  ok((await page.evaluate(() => window.__nfToasts.slice())).length === 0, '  학생에게 따로 알리지 않는다 (바닥 안내 글 0건)', await page.evaluate(() => window.__nfToasts.slice()));
+  ok(/켜지 않|꺼 둔/.test(await page.textContent('#my-notify .nf-status')), '  상태 줄도 꺼짐 (새 실패 문구를 만들지 않는다)', await page.textContent('#my-notify .nf-status'));
+  {
+    const leftover = await page.evaluate(async () => { await nfPushQueue(() => null); const r = await navigator.serviceWorker.ready; return !!(await r.pushManager.getSubscription()); });
+    ok(leftover === false, '  꺼짐으로 되돌릴 때 폰에 반쯤 생긴 구독도 걷는다 (서버가 못 받은 구독)');
+  }
+
+  /* 마지막 누름이 정한다 — 켜기(서버가 1.5초 뒤 실패) → 그 사이 끄기·켜기(이번엔 받아 줌) → 켜짐이어야 한다 */
+  {
+    pushServer.mode = 'slowfail';
+    await page.evaluate(() => { notifyLedger.pushSyncedAt = 0; });
+    const h0 = pushServer.hits.length;
+    await page.click('#btn-nf-toggle');                       // 켜기 ① — 늦게 실패할 요청
+    for (let i = 0; i < 40 && pushServer.hits.length === h0; i++) await page.waitForTimeout(50);
+    pushServer.mode = 'ok';
+    await page.click('#btn-nf-toggle');                       // 끄기 ②
+    await page.click('#btn-nf-toggle');                       // 켜기 ③ — 받아 줄 요청
+    await page.waitForTimeout(3500);
+    ok(pushServer.hits.length > h0 && await page.getAttribute('#btn-nf-toggle', 'aria-checked') === 'true' && await page.evaluate(() => notifyLedger.enabled === true),
+      '앞 누름의 늦은 실패가 뒤에 다시 켠 것을 끄지 않는다 (마지막 누름이 정한다)');
+    await page.click('#btn-nf-toggle');                       // 다음 확인을 위해 꺼 둔다
+    await waitSwitch('false');
+    await page.waitForTimeout(300);
+  }
+
+  /* 끝내 대답이 없으면(서비스워커가 안 뜬 판 — ready 가 영영 안 돌아온다) 시한(NF_PUSH_STEP_MS) 뒤 실패로 보고 꺼짐 · 줄도 풀린다 */
+  {
+    const stepMs = await page.evaluate(() => NF_PUSH_STEP_MS);
+    await page.evaluate(() => { window.__nfEnsure = window.pushEnsure; window.pushEnsure = () => new Promise(() => {}); });
+    await page.click('#btn-nf-toggle');
+    ok(await page.getAttribute('#btn-nf-toggle', 'aria-checked') === 'true', '  (대답 없는 동안은 켜짐으로 보인다)');
+    await page.waitForTimeout(stepMs + 1500);
+    ok(await page.getAttribute('#btn-nf-toggle', 'aria-checked') === 'false' && await page.evaluate(() => notifyLedger.enabled === false),
+      `등록이 끝내 대답하지 않으면 ${stepMs / 1000}초 뒤 꺼짐으로 돌아간다 (켜짐으로 굳지 않는다)`);
+    await page.evaluate(() => { window.pushEnsure = window.__nfEnsure; });
+    const freed = await page.evaluate(() => Promise.race([nfPushQueue(() => 'free'), new Promise((r) => setTimeout(() => r('stuck'), 3000))]));
+    ok(freed === 'free', '  그 뒤에도 서버 일 줄이 막히지 않는다', freed);
+  }
+
+  /* 서버가 돌아오면 다시 켤 수 있다 */
+  pushServer.mode = 'ok';
+  await page.click('#btn-nf-toggle');
+  await page.waitForTimeout(1500);
+  ok(await page.getAttribute('#btn-nf-toggle', 'aria-checked') === 'true' && await page.evaluate(() => notifyLedger.enabled === true), '서버가 받아 주면 켜짐 그대로 남는다');
+
+  /* 버튼을 누르지 않은 자동 재등록(앱으로 돌아올 때)이 실패했다고 켜 둔 알림을 끄지 않는다 */
+  pushServer.mode = 'fail';
+  const hitsBefore = pushServer.hits.length;
+  await page.evaluate(async () => { notifyLedger.pushSyncedAt = 0; await nfPushQueue(() => pushEnsure()); });
+  ok(pushServer.hits.length > hitsBefore, '  (자동 재등록이 실제로 서버를 두드렸다 — 이 확인이 헛돌지 않는다)');
+  ok(await page.evaluate(() => notifyLedger.enabled === true) && await page.getAttribute('#btn-nf-toggle', 'aria-checked') === 'true', '버튼 없이 도는 자동 재등록이 실패해도 켜 둔 알림은 그대로');
+
+  /* 발송 서버가 아예 없는 판(push-config.js 빈칸)은 등록할 곳이 없으니 켜 둔다 — 앱 안 알림만 쓰는 원래 약속 */
+  await page.click('#btn-nf-toggle');
+  await waitSwitch('false');
+  await page.waitForTimeout(300);
+  await page.evaluate(() => { window.__nfCfg = PUSH_CONFIG.endpoint; PUSH_CONFIG.endpoint = ''; });
+  await page.click('#btn-nf-toggle');
+  await page.waitForTimeout(1500);
+  ok(await page.getAttribute('#btn-nf-toggle', 'aria-checked') === 'true', '발송 서버가 없는 판에서는 켜면 켜짐 그대로 (등록할 곳이 없다)');
+  await page.evaluate(() => { PUSH_CONFIG.endpoint = window.__nfCfg; window.toast = window.__nfRealToast; });
+  pushServer.mode = 'ok';
+
   /* 종류별 끄기는 화면에서 사라졌지만 규칙 엔진은 그대로 prefs 를 읽는다 — 장부를 직접 고쳐 엔진이 지키는지 본다 */
   await page.evaluate(async () => { notifyLedger.prefs.deadline = false; await notifySaveLedger(); });
   await page.waitForTimeout(300);
@@ -370,6 +526,41 @@ async function onboard(page) {
 
   ok(errors.length === 0, '콘솔 오류 없음', errors);
   await ctx.close();
+
+  /* ============ C. 동의 시트의 '알림 받기' — 서버 등록이 안 되면 꺼짐 · 아무 말 없음 (2026-11-09 개발자 지시) ============ */
+  console.log('\n[C] 동의 시트 — 서버 등록이 안 되면 꺼짐으로 (따로 알리지 않는다)');
+  {
+    const c2 = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    await c2.grantPermissions(['notifications'], { origin: BASE });
+    pushServer.mode = 'fail';
+    pushServer.hits = [];
+    await routePushServer(c2);
+    const pg = await c2.newPage();
+    pg.on('dialog', async (d) => { await d.accept(); });
+    await pg.addInitScript(SPY);
+    await pg.addInitScript(PUSH_STUB);
+    await pg.goto(BASE + '/', { waitUntil: 'domcontentloaded' });
+    await onboard(pg);
+    await pg.waitForSelector('#notify-sheet:not([hidden])', { timeout: 6000 });
+    await pg.evaluate(() => { window.__nfToasts = []; const t = window.toast; window.toast = (m, ...r) => { window.__nfToasts.push(String(m)); return t(m, ...r); }; });
+    /* 두 번 눌러도 한 번으로 — 먼저 누른 쪽이 '켰습니다'라고 말한 뒤 나중 누름이 실패해 꺼지는 일을 막는다(리뷰 2026-11-09) */
+    const seq0 = await pg.evaluate(() => nfPressSeq);
+    await pg.evaluate(() => { const b = document.querySelector('#btn-nf-allow'); b.click(); b.click(); });
+    ok(await pg.evaluate((s0) => nfPressSeq - s0, seq0) === 1, "  '알림 받기'를 연달아 두 번 눌러도 한 번만 처리한다", await pg.evaluate((s0) => nfPressSeq - s0, seq0));
+    await pg.waitForFunction(() => notifyLedger && notifyLedger.enabled === false, null, { timeout: 6000 }).catch(() => {});
+    await pg.waitForTimeout(500);
+    ok(await pg.evaluate(() => notifyLedger.enabled === false), "'알림 받기'를 눌렀는데 서버 등록이 안 되면 알림은 꺼짐");
+    const ts = await pg.evaluate(() => window.__nfToasts.slice());
+    ok(ts.length === 0, "  아무 말도 하지 않는다 ('알림을 켰습니다'도, 실패 안내도 — 바닥 안내 글 0건)", ts);
+    ok(pushServer.hits.some((h) => /\/subscribe$/.test(h)), '  (실패 길이 실제로 돌았다 — 서버 대역이 등록 요청을 받았다)', pushServer.hits);
+    await pg.click('.nav-item[data-nav="my"]');
+    await pg.click('#btn-open-settings');
+    await pg.waitForSelector('#my-notify:not([hidden])');
+    ok(await pg.getAttribute('#btn-nf-toggle', 'aria-checked') === 'false', '  설정의 스위치도 꺼짐으로 보인다');
+    pushServer.mode = 'ok';
+    await c2.close();
+  }
+
   await browser.close();
 
   console.log(fail ? `\n❌ 실패 ${fail}건\n` : '\n✅ 알림 시스템 브라우저 검증 전부 통과\n');

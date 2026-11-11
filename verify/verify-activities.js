@@ -100,8 +100,9 @@ async function fresh(browser, mode, ext = EXT_FIXTURE, profile = PROFILE) {
 /* 🔴 2026-10-01 — 카드는 장학 카드와 같은 그림(cardShellHtml · button.sch-card[data-activity])이고 누르면 같은 시트가 열린다 */
 const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) => els.map((e) => ({
   name: e.querySelector('.sch-name').textContent.trim(),
-  org: e.querySelector('.sch-org').textContent.trim(),
-})));
+  org: (e.querySelector('.sch-org') || {}).textContent || '',   // 시안 B(2026-11-02) — 주최는 알 때만 · 갈래는 칩(.badge-kind)
+  chip: (e.querySelector('.sch-top .badge-kind') || {}).textContent || '',
+})).map((c) => ({ ...c, org: c.org.trim(), chip: c.chip.trim() })));
 
 (async () => {
   await assertOwnServer(PORT);
@@ -144,46 +145,47 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
     let seen = await cards(page);
     eq('② 내 학교 글 + 전국 글만 (경희대 글은 안 보인다) · 최근 수집 순', seen.map((c) => c.name),
       ['2026 대학생 해외봉사단 모집', '제3회 장학수기 공모전 공고', '전국 청년 서포터즈 모집']);
-    eq('④ 윗줄은 종류 · 학교 게시판 (장학 카드의 기관 자리)', seen[0].org, '대외활동 · 한국외국어대학교 게시판');
+    /* 2026-11-02 승인 시안 B — 윗줄은 갈래 칩(봉사·대외활동·공모전·청년정책) + 주최 · 아랫줄 왼쪽은 「대상 · …」 · 마감은 아랫줄 오른쪽 그대로(개발자 결정) */
+    /* 2026-11-02 개발자 결정 — 학교 게시판에서 주운 글은 「○○대학교 게시판」을 학생 화면에 적지 않는다(주최가 아니다) · 칩만 */
+    eq('④ 윗줄은 갈래 칩만 (칩은 분야로 「봉사」 · 학교 게시판 글은 주최 글자 없음)', [seen[0].chip, seen[0].org], ['봉사', '']);
     eq('④ 마감을 읽은 글은 아랫줄 오른쪽 D-5 (장학 카드와 같은 자리·같은 글자)', await page.$eval('#activities-list [data-activity] .sch-foot .sch-due', (e) => e.textContent.trim()), 'D-5');
-    eq('④ 아랫줄 왼쪽(장학 카드의 금액 자리)은 짧은 혜택', await page.$eval('#activities-list [data-activity] .sch-foot .sch-amount', (e) => e.textContent.trim()), '항공료 전액 지원');
+    eq('④ 아랫줄 왼쪽(장학 카드의 금액 자리)은 「대상 · …」 — 발췌 대상이 없으면 첫 자격 줄', await page.$eval('#activities-list [data-activity] .sch-foot .sch-amount', (e) => e.textContent.trim()), '대상 · 만 19~34세 대한민국 국민');
     /* 판정 하나 — 장학 카드와 같은 cardBadgeHtml (2026-10-01) */
     /* 자격 줄 없음 → 배지 없음 (2026-10-03 개발자 결정 — 활동 카드에 '자격 미확인' 을 안 단다 · 장학 카드는 그대로) */
     eq('④ 카드 맨 윗줄 판정 — 나이 맞음 → 적합도 % · 나이 넘음 → 미달 · 자격 줄 없음 → 배지 없음',
-      await page.$$eval('#activities-list .sch-card .sch-top', (e) => e.map((x) => (x.querySelector('.sch-fit, .badge') || {}).textContent || '').map((t) => t.trim().replace(/\d+%/, 'N%'))),
+      await page.$$eval('#activities-list .sch-card .sch-top', (e) => e.map((x) => (x.querySelector('.sch-fit, .badge:not(.badge-kind)') || {}).textContent || '').map((t) => t.trim().replace(/\d+%/, 'N%'))),   // 갈래 칩(.badge-kind)은 판정이 아니다(시안 B 2026-11-02)
       ['적합도 N%', '지원 자격 미달', '']);
-    eq('④ 혜택이 없으면 분야를 옅게 — 없으면 빈칸(지어내지 않는다)', await page.$$eval('#activities-list [data-activity] .sch-amount', (e) => e.map((x) => [x.textContent.trim(), x.classList.contains('unknown')])), [['항공료 전액 지원', false], ['', true], ['', true]]);
+    eq('④ 대상을 못 읽은 글은 아랫줄 왼쪽이 빈칸 (혜택·분야로 채우지 않는다 · 시안 B)', await page.$$eval('#activities-list [data-activity] .sch-amount', (e) => e.map((x) => x.textContent.trim().startsWith('대상 · ') || x.textContent.trim() === '')), [true, true, true]);
     eq('④ 카드에 발췌 줄을 쌓지 않는다 (장학 카드처럼 석 줄)', await page.$$eval('#activities-list .sch-provider', (e) => e.length), 0);
     eq('④ 장학 카드와 같은 그릇 (.sch-card-wrap > button.sch-card)', await page.$$eval('#activities-list .sch-card-wrap > button.sch-card[data-activity]', (e) => e.length), 3);
     /* 누르면 앱을 떠나지 않고 장학과 같은 상세 시트(#detail-sheet)가 열린다 */
     await page.click('#activities-list [data-activity]'); await page.waitForTimeout(500);
     eq('⑤ 누르면 상세 시트가 열린다(앱을 떠나지 않는다)', await page.$eval('#detail-sheet', (e) => !e.hidden && e.classList.contains('show')), true);
-    eq('⑤ 시트 — 제목 · 혜택 · 주최/분야 · D-day · 종류', await page.$eval('#detail-sheet', (e) => [
+    /* 2026-11-02 승인 시안 — 머리줄 = 칩 · 주최 · D-day · 저장 (카드와 같은 줄) · 짧은 혜택은 금액 자리 */
+    eq('⑤ 시트 — 제목 · 혜택(금액 자리) · 머리줄 칩/D-day (학교 게시판 글은 주최 없음)', await page.$eval('#detail-sheet', (e) => [
       e.querySelector('.sheet-title').textContent.trim(), e.querySelector('.sheet-amount').textContent.trim(),
-      e.querySelector('.sheet-provider').textContent.trim(), e.querySelector('.badge-dday').textContent.trim(), e.querySelector('.badge-kind').textContent.trim()]),
-      ['2026 대학생 해외봉사단 모집', '항공료 전액 지원', '한국외국어대학교 게시판 · 봉사', 'D-5', '대외활동']);
-    eq('⑤ 모집 안내는 원문 발췌 그대로 (혜택은 위에 한 번만)', await page.$$eval('#detail-sheet .doc-list', (u) => u[0].querySelectorAll('li').length && [...u[0].querySelectorAll('li')].map((x) => x.textContent.trim())), ['모집기간 · 2026. 10. 1. ~ 10. 15.']);
+      e.querySelector('.sheet-top .badge-kind').textContent.trim(), !!e.querySelector('.sheet-top .sch-org'), e.querySelector('.sheet-top .badge-dday').textContent.trim(), !!e.querySelector('.sheet-provider')]),
+      ['2026 대학생 해외봉사단 모집', '항공료 전액 지원', '봉사', false, 'D-5', false]);   // 학교 게시판 글 — 머리줄에 주최 글자 없음(2026-11-02 개발자 결정)
+    /* 기간은 발췌 「모집기간」 원문 그대로(리뷰 2026-11-02 — 마감만 적으면 시작일이 사라진다) · 없을 때만 ~마감 */
+    eq('⑤ 「접수」 절 — 기간은 발췌 모집기간 원문 그대로 · 방법은 원문 확인(활동 글은 서류 줄 없음)', await page.$$eval('#detail-sheet .apply-rows li', (li) => li.map((x) => x.textContent.trim().replace(/\s+/g, ' '))), ['기간2026. 10. 1. ~ 10. 15.', '방법원문 확인']);
     eq('⑤ 지원 자격 — 장학 시트와 같은 머리(적합도 · 요건 n개 중 n개 충족)와 ✓ 줄',
       await page.$eval('#detail-sheet', (e) => [e.querySelector('.sheet-verdict h4').textContent.trim(), /요건 1개 중 1개 충족/.test(e.querySelector('.sheet-verdict').textContent),
         [...e.querySelectorAll('.reason-list li')].map((li) => li.textContent.trim())]),
       ['지원 자격', true, ['✓ 만 19~34세 대한민국 국민']]);
     eq('⑤ 지원 가능 알약은 없다(활동 글엔 구조화 조건이 없어 늘 가능 — 거짓 안심)', await page.$$eval('#detail-sheet .status-pill', (e) => e.length), 0);
     eq('⑤ 공고 원문 안내 — 원문 문장 그대로', await page.$$eval('#detail-sheet .doc-list', (u) => u.map((x) => x.textContent.trim()).some((t) => t.includes('봉사단은 5개국에 파견합니다.'))), true);
-    /* 제출 서류 · 신청서 원본 PDF (2026-10-30 공동개발자 "공모전 신청 양식이 매우 미흡") — 장학 시트와 같은 줄 꼴(formPdfRowsHtml) · 원본 첨부 줄은 그대로 */
-    eq('⑤ 제출 서류 — 원문 글자 그대로 한 줄씩 (칸 머리 「제출 서류」)', await page.$eval('#detail-sheet', (e) => {
-      const h = [...e.querySelectorAll('h4')].find((x) => x.textContent.trim() === '제출 서류');
-      return h ? [...h.nextElementSibling.querySelectorAll('li')].map((li) => li.textContent.trim()) : null;
-    }), ['참가신청서 1부', '개인정보 수집·이용 동의서 1부']);
-    eq('⑤ 신청서 양식 — 로봇이 바꿔 둔 원본 PDF 줄 「원본 양식 그대로 보기」 · 새 탭 · data/forms-pdf/ 주소 · 쪽 수', await page.$eval('#detail-sheet', (e) => {
-      const h = [...e.querySelectorAll('h4')].find((x) => /^신청서 양식/.test(x.textContent.trim()));
-      const a = h && h.nextElementSibling.querySelector('a');
-      return a ? [a.textContent.trim(), a.target, a.getAttribute('href'), /2쪽/.test(h.nextElementSibling.textContent)] : null;
-    }), ['원본 양식 그대로 보기', '_blank', 'data/forms-pdf/act-fixture1/1-form.pdf', true]);
-    eq('⑤ 공고 원본 첨부 줄은 그대로 남는다 (원본 파일 내려받기)', await page.$eval('#detail-sheet', (e) => {
-      const h = [...e.querySelectorAll('h4')].find((x) => x.textContent.trim() === '공고 원본 첨부');
-      return h ? h.nextElementSibling.querySelectorAll('li').length : 0;
-    }), 1);
-    /* 「양식 채우기」(2026-10-31) — 빈칸 장부가 있는 활동 글 PDF 에도 장학 시트와 같은 단추가 서고, 누르면 같은 화면(formfill.js)이 그 글 이름으로 열린다 */
+    /* 제출 서류 · 신청서 원본 PDF · 양식 채우기 (2026-10-30~31 공동개발자 "공모전 신청 양식이 매우 미흡") — 승인 시트(11-02)의 자리 둘: 「접수 · 서류」 줄 · 「첨부」 맨 위 */
+    eq('⑤ 접수 · 서류 — 활동 글이 원문 「제출서류」 절에서 읽은 서류를 장학 시트와 같은 줄에 (점으로 잇는다)', await page.$eval('#detail-sheet', (e) => {
+      const li = [...e.querySelectorAll('.apply-rows li')].find((x) => (x.querySelector('.ns-k') || {}).textContent === '서류');
+      return li ? li.textContent.replace(/^서류/, '').trim() : null;
+    }), '참가신청서 1부 · 개인정보 수집·이용 동의서 1부');
+    eq('⑤ 첨부 맨 위 — 로봇이 바꿔 둔 원본 PDF 줄 「원본 양식 그대로 보기」 · 새 탭 · data/forms-pdf/ 주소 · 쪽 수 · 그 아래 원본 첨부 줄은 그대로', await page.$eval('#detail-sheet', (e) => {
+      const h = [...e.querySelectorAll('h4')].find((x) => /^첨부/.test(x.textContent.trim()));
+      if (!h) return null;
+      const ul = h.nextElementSibling; const a = ul.querySelector('li a');
+      return [a.textContent.trim(), a.target, a.getAttribute('href'), /2쪽/.test(ul.textContent), ul.querySelectorAll('li.att:not(.att-row)').length];
+    }), ['원본 양식 그대로 보기', '_blank', 'data/forms-pdf/act-fixture1/1-form.pdf', true, 1]);
+    /* 「양식 채우기」(2026-10-31) — 빈칸 장부가 있는 활동 글 PDF 에도 장학과 같은 단추가 서고, 누르면 같은 화면(formfill.js)이 그 글 이름으로 열린다 */
     await page.waitForSelector('#detail-sheet .fill-open', { timeout: 4000 }).catch(() => {});
     eq('⑤ 양식 채우기 — 빈칸을 찾은 활동 글 PDF 밑에 단추(빈칸 수 · 학적정보로 먼저 채울 수)', await page.$eval('#detail-sheet', (e) => {
       const b = e.querySelector('.fill-open');
@@ -196,12 +198,14 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
       [true, '2026 대학생 해외봉사단 모집', '한국외국어대학교', '남은 칸 1']);
     await page.click('#btn-fill-back'); await page.waitForTimeout(500);
     eq('⑤ 돌아가기는 대외활동 화면으로', await page.$$eval('.screen', (sc) => sc.filter((x) => !x.hidden).map((x) => x.id)), ['screen-activities']);
-    eq('⑤ 원문 단추는 그 글 주소를 새 탭으로', await page.$eval('#detail-sheet a.btn-primary', (a) => [a.getAttribute('href'), a.target, a.textContent.trim()]), ['https://dep.hufs.ac.kr/bbs/x/1', '_blank', '원문 공고 ↗']);   // 2026-10-19 개발자: "자세한 공고는 원문 공고에서 확인하라 하면서 … 원문공고 하이퍼링크"
+    /* 아래 줄들은 시트를 다시 연 상태에서 잰다 — 양식 채우기가 시트를 닫았다 */
+    await page.click('#activities-list [data-activity]'); await page.waitForTimeout(500);
+    eq('⑤ 원문 단추는 그 글 주소를 새 탭으로 — 글 하나로 가는 주소라 「원문에서 신청하기 ↗」(시안 2026-11-02)', await page.$eval('#detail-sheet a.btn-primary', (a) => [a.getAttribute('href'), a.target, a.textContent.trim()]), ['https://dep.hufs.ac.kr/bbs/x/1', '_blank', '원문에서 신청하기 ↗']);   // 2026-10-19 개발자: "자세한 공고는 원문 공고에서 확인하라 하면서 … 원문공고 하이퍼링크"
     eq('⑤ 단추 글자에 밑줄이 없다', await page.$eval('#detail-sheet a.btn-primary', (a) => getComputedStyle(a).textDecorationLine), 'none');
     await page.keyboard.press('Escape'); await page.waitForTimeout(500);
     eq('⑤ ESC 로 닫힌다 (장학 시트와 같은 그릇)', await page.$eval('#detail-sheet', (e) => e.hidden || !e.classList.contains('show')), true);
     eq('④ 마감 지난 글은 보이지 않는다', seen.some((c) => /지난 공모전/.test(c.name)), false);
-    eq('④ 전국 글은 주최를 말한다', seen[2].org, '대외활동 · 청년재단');
+    eq('④ 전국 글은 주최를 말한다 (칩은 종류 · 주최는 host)', [seen[2].chip, seen[2].org], ['대외활동', '청년재단']);
     /* 정렬 — 마감 임박순은 마감을 읽은 글이 앞, 못 읽은 글은 뒤 */
     /* 🔴 정렬은 **탐색 화면과 같은 단추·같은 자리·같은 동작**이다 (2026-09-30 개발자 지시) —
        누르면 기준 목록이 뜨고, 골라야 바뀐다. 머리줄 오른쪽 끝에 선다(갱신 날짜 칸이 없어서). */
@@ -330,8 +334,8 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
     await page.click(`#activities-list .save-btn[data-save="act:${ACT1}"]`); await page.waitForTimeout(300);
     eq('⑥ 누르면 담긴다 · 글 사본도 함께(피드에서 빠져도 남게)', await page.evaluate((u) => { const s = state.saved.find((x) => x.id === `act:${u}`); return [!!s, !!(s && s.snap && s.snap.title)]; }, ACT1), [true, true]);
     eq('⑥ 단추가 켜진다', await page.$eval(`#activities-list .save-btn[data-save="act:${ACT1}"]`, (b) => b.classList.contains('on')), true);
-    eq('⑥ 보관함에 장학과 같은 줄로(둘째 줄은 종류·주최)', await page.evaluate(() => { showScreen('my'); return [...document.querySelectorAll('#my-saved .cal-row')].map((r) => [r.querySelector('.cal-row-name').textContent.trim(), r.querySelector('.cal-row-sub').textContent.trim()]); }),
-      [['2026 대학생 해외봉사단 모집', '대외활동 · 한국외국어대학교 게시판']]);
+    eq('⑥ 보관함에 장학과 같은 줄로(둘째 줄은 종류 · 학교 게시판 글은 주최 없음 — 2026-11-02 개발자 결정)', await page.evaluate(() => { showScreen('my'); return [...document.querySelectorAll('#my-saved .cal-row')].map((r) => [r.querySelector('.cal-row-name').textContent.trim(), r.querySelector('.cal-row-sub').textContent.trim()]); }),
+      [['2026 대학생 해외봉사단 모집', '대외활동']]);
     eq('⑥ 달력에 마감 점(파랑) — 내 공고로 센다', await page.evaluate((u) => { const ctx = calContext(); const d = ctx.mine.find((x) => x.id === `act:${u}`); if (!d) return null;
       const [y, m] = d.deadline.split('-').map(Number); const mk = calMarks(new Date(y, m - 1, 1), ctx.mine)[d.deadline] || []; return mk.filter((k) => k.id === `act:${u}`).map((k) => k.kind); }, ACT1), ['mine']);
     await page.evaluate(() => document.querySelector('#my-saved .cal-row').click()); await page.waitForTimeout(500);
@@ -352,9 +356,9 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
       document.querySelector('#toast .toast-undo').click(); await new Promise((r) => setTimeout(r, 50));
       const s = state.saved.find((x) => x.id === `act:${u}`); liveActivities.items = keep; return [gone, !!(s && s.snap)]; }, ACT1), [true, true]);
     /* 달력 날짜를 열었을 때 '내 공고' 줄로 나오는가 — 점만 재면 줄이 깨져도 모른다(리뷰) */
-    eq('⑥ 달력 날짜를 열면 「내 공고」에 활동 줄(종류·주최 둘째 줄)', await page.evaluate((u) => { const d = calContext().mine.find((x) => x.id === `act:${u}`); const box = document.createElement('div'); box.innerHTML = calDayHtml(d.deadline);
+    eq('⑥ 달력 날짜를 열면 「내 공고」에 활동 줄(종류 둘째 줄 · 학교 게시판 글은 주최 없음)', await page.evaluate((u) => { const d = calContext().mine.find((x) => x.id === `act:${u}`); const box = document.createElement('div'); box.innerHTML = calDayHtml(d.deadline);
       const row = box.querySelector(`.cal-row[data-detail="act:${u}"]`); return row ? [row.querySelector('.cal-row-name').textContent.trim(), row.querySelector('.cal-row-sub').textContent.trim(), /내 공고/.test(box.textContent)] : null; }, ACT1),
-      ['2026 대학생 해외봉사단 모집', '대외활동 · 한국외국어대학교 게시판', true]);
+      ['2026 대학생 해외봉사단 모집', '대외활동', true]);
     eq('⑥ 피드가 새로 오면 담아 둔 사본도 새 글로(옛 마감을 말하지 않게)', await page.evaluate((u) => { const s = state.saved.find((x) => x.id === `act:${u}`); s.snap = { ...s.snap, deadline: '2000-01-01' }; refreshActivitySnaps(); return s.snap.deadline !== '2000-01-01'; }, ACT1), true);
     eq('페이지 오류 없음', errors, []);
     await page.context().close();

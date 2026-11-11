@@ -1,0 +1,126 @@
+name: 보안 코드 점검 (CodeQL)
+
+# 코드에서 보안 구멍(화면에 남의 글을 그대로 끼워 넣기 · 워크플로에 바깥 글자를 명령으로 넣기 등)을 GitHub 의 CodeQL 로 찾는다
+# (2026-11-11 · 은서 · 출시 전 백엔드 10번 · 공개 저장소라 무료).
+#   · 언어 셋: 자바스크립트(앱·로봇·서버) · 파이썬(첨부 글자 뽑기) · 워크플로(actions)
+#   · 언제: 매주 월요일 02:51 KST + 기본 브랜치에 **코드**가 바뀔 때(로봇 데이터 커밋에는 안 돈다) + 버튼
+#   · 결과는 저장소 Security 탭에 쌓이고, 🔴 **심각(high·critical)·오류 수준이 열려 있으면 세 사람에게 경보 이슈** —
+#     Security 탭은 아무도 안 들여다본다(감사 출력이 CI 로그에만 남아 아무도 안 본 것과 같은 꼴).
+#   사용법: docs/backend/보안-점검.md · 관문: verify/health-gates/ops.mjs 「⑦ 보안 자동 점검」
+
+on:
+  schedule:
+    - cron: '51 17 * * 0'   # UTC 일요일 17:51 = KST 월요일 02:51 — 홀수 분 · 다른 예약과 겹치지 않는다
+  push:
+    branches: [claude/nice-heisenberg-WESq5]
+    paths:
+      - '**.js'
+      - '**.mjs'
+      - '**.cjs'
+      - '**.py'
+      - '.github/workflows/**'
+      - '.github/actions/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codeql
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    if: github.ref_name == 'claude/nice-heisenberg-WESq5'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+      issues: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [javascript-typescript, python, actions]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - name: CodeQL 준비
+        timeout-minutes: 5
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+          # 남이 만든 것·받아 둔 것은 우리 코드가 아니다
+          config: |
+            paths-ignore:
+              - node_modules
+              - data
+              - collector/extracted
+              - docs/designs/mockups
+      - name: CodeQL 분석
+        timeout-minutes: 20
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: /language:${{ matrix.language }}
+      - name: 🚨 로봇이 넘어졌다
+        if: failure() || cancelled()
+        uses: ./.github/actions/robot-down
+        with:
+          robot: 보안 코드 점검 (CodeQL · ${{ matrix.language }})
+          token: ${{ github.token }}
+
+  alert:
+    # 세 언어가 다 올린 뒤 한 번 — 열린 경고 중 심각한 것만 센다
+    needs: analyze
+    if: always() && github.ref_name == 'claude/nice-heisenberg-WESq5' && needs.analyze.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      security-events: read
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 열린 심각 경고 세기
+        id: count
+        timeout-minutes: 2
+        run: |
+          gh api --paginate "repos/$GITHUB_REPOSITORY/code-scanning/alerts?state=open&per_page=100" > /tmp/alerts.json
+          node tools/codeql-alerts.mjs /tmp/alerts.json /tmp/codeql-body.md
+      - name: 🛡 경보 열기 (세 사람에게)
+        if: steps.count.outputs.serious != '0'
+        timeout-minutes: 1
+        run: |
+          node tools/alert-issue.mjs --mode open \
+            --title "🛡 보안 코드 점검에서 고칠 것이 나왔습니다" \
+            --label codeql --label-color B60205 --label-description 'CodeQL 심각 경고' \
+            --assignee seonju5543-web --assignee Se-Hyeon-Jo --assignee didinin-wq \
+            --body-file /tmp/codeql-body.md
+      - name: 심각 경고가 없으면 옛 경보를 닫는다
+        if: steps.count.outputs.serious == '0'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          title: 🛡 보안 코드 점검에서 고칠 것이 나왔습니다
+          body: |
+            ✅ 열린 심각(high·critical)·오류 수준 경고가 없습니다 — 자동으로 닫습니다.
+      - name: 🚨 로봇이 넘어졌다
+        if: failure() || cancelled()
+        uses: ./.github/actions/robot-down
+        with:
+          robot: 보안 코드 점검 (CodeQL 경보)
+          token: ${{ github.token }}

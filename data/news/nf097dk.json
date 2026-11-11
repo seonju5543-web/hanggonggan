@@ -1,7 +1,72 @@
 {
  "school": "경북대학교",
- "updatedAt": "2026-10-31",
+ "updatedAt": "2026-11-11",
  "items": [
+  {
+   "title": "첨단산업특성화대학원(로봇)사업 신입생 모집 안내",
+   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11794301164462&menu_idx=42&bbs_cde=stu_812",
+   "postedAt": "2026-11-10",
+   "postId": "11794301164462",
+   "school": "경북대학교",
+   "campus": "",
+   "src": "c12a564f",
+   "foundAt": "2026-11-10"
+  },
+  {
+   "title": "2027학년도 대학 전과 선발 안내(선발인원 공지)",
+   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11794287947649&menu_idx=42&bbs_cde=stu_812",
+   "postedAt": "2026-11-10",
+   "postId": "11794287947649",
+   "kind": "학사",
+   "school": "경북대학교",
+   "campus": "",
+   "src": "c12a564f",
+   "foundAt": "2026-11-10"
+  },
+  {
+   "title": "2026학년도 2학기 교직 적성 및 인성검사(3차) 신청 안내",
+   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11794275897669&menu_idx=42&bbs_cde=stu_812",
+   "postedAt": "2026-11-10",
+   "postId": "11794275897669",
+   "school": "경북대학교",
+   "campus": "",
+   "src": "c12a564f",
+   "foundAt": "2026-11-10"
+  },
+  {
+   "title": "2026학년도 2학기 교직 적성 및 인성검사(2차) 결과 안내",
+   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11793926015576&menu_idx=42&bbs_cde=stu_812",
+   "postedAt": "2026-11-06",
+   "postId": "11793926015576",
+   "school": "경북대학교",
+   "campus": "",
+   "src": "c12a564f",
+   "foundAt": "2026-11-08",
+   "desc": "2026. 10. 29.(목) 19:00~19:50 시행한 2026학년도 2학기 교직 적성 및 인정검사(2차) 결과에 대하여 아래와 같이 확인할 수 있습니다."
+  },
+  {
+   "title": "2026학년도 2학기 졸업자격인정 신청 안내",
+   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11793768071704&menu_idx=42&bbs_cde=stu_812",
+   "postedAt": "2026-11-04",
+   "postId": "11793768071704",
+   "school": "경북대학교",
+   "campus": "",
+   "src": "c12a564f",
+   "foundAt": "2026-11-08",
+   "desc": "2026학년도 2학기 졸업자격인정원 신청을 아래와 같이 안내하오니 해당 학생들은 기간 내에 신청하기 바랍니다."
+  },
+  {
+   "title": "2026학년도 겨울계절수업, 디딤돌수업 수강신청 안내",
+   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11793757727585&menu_idx=42&bbs_cde=stu_812",
+   "postedAt": "2026-11-04",
+   "postId": "11793757727585",
+   "kind": "학사",
+   "school": "경북대학교",
+   "campus": "",
+   "src": "c12a564f",
+   "foundAt": "2026-11-08",
+   "desc": "* 디딤돌수업 : 전공자율선택제 학생들의 전공탐색 및 전공 수학능력 향상을 위해 여름계절수업과 동일한 기간에 운영"
+  },
   {
    "title": "2027학년도 1학기 복수전공 이수 대상자 선발 안내",
    "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11793326789313&menu_idx=42&bbs_cde=stu_812",
@@ -35,211 +100,6 @@
    "src": "c12a564f",
    "foundAt": "2026-10-20",
    "desc": "2026년도 학생예비군 2차훈련(10.13~14), 동원훈련 Ⅱ형 2차(10.26~29) 이후 추가 훈련 일정을 아래와 같이 공지하니 참고 바랍니다. (부대사정 등으로 훈련일정 변경시 별도 공지)."
-  },
-  {
-   "title": "2026학년도 겨울계절수업 타대학 수학 안내문(통합)",
-   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11791447922667&menu_idx=42&bbs_cde=stu_812",
-   "postedAt": "2026-10-08",
-   "postId": "11791447922667",
-   "kind": "학사",
-   "school": "경북대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "desc": "수학을 희망하는 학생은 참고하시기 바랍니다 . 1. 신청 자격 가 . 본교 재적생",
-   "src": "c12a564f"
-  },
-  {
-   "title": "2026학년도 2학기 교직 적성 및 인성검사(2차) 신청 안내",
-   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11791247468001&menu_idx=42&bbs_cde=stu_812",
-   "postedAt": "2026-10-06",
-   "postId": "11791247468001",
-   "school": "경북대학교",
-   "campus": "",
-   "foundAt": "2026-10-06",
-   "src": "c12a564f"
-  },
-  {
-   "title": "2026학년도 2학기 학사학위취득유예자 수강신청에 따른 등록금 추가 납부 안내",
-   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11790921912463&menu_idx=42&bbs_cde=stu_812",
-   "postedAt": "2026-10-02",
-   "postId": "11790921912463",
-   "kind": "학사",
-   "school": "경북대학교",
-   "campus": "",
-   "foundAt": "2026-10-04",
-   "desc": "○ 납부기간: 10.13.(화) 09:00 ~ 10.14.(수) 16:00 (납부기간 경과 후 납부 불가)",
-   "src": "c12a564f"
-  },
-  {
-   "title": "2026학년도 2학기 교직 적성 및 인성검사(1차) 결과 안내",
-   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11790744244900&menu_idx=42&bbs_cde=stu_812",
-   "postedAt": "2026-09-30",
-   "postId": "11790744244900",
-   "school": "경북대학교",
-   "campus": "",
-   "foundAt": "2026-10-04",
-   "desc": "2026. 9. 28.(월) 19:00~19:50 시행한 2026학년도 2학기 교직 적성 및 인정검사(1차) 결과 에 대하여 아래와 같이 확인할 수 있습니다."
-  },
-  {
-   "title": "2026학년도 2학기 강의개선을 위한 중간 설문 실시 안내",
-   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11790644315187&menu_idx=42&bbs_cde=stu_812",
-   "postedAt": "2026-09-29",
-   "postId": "11790644315187",
-   "school": "경북대학교",
-   "campus": "",
-   "foundAt": "2026-10-04",
-   "src": "c12a564f"
-  },
-  {
-   "title": "2026학년도 겨울계절수업 희망과목 수요조사 실시 안내",
-   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11790037102438&menu_idx=42&bbs_cde=stu_812",
-   "postedAt": "2026-09-22",
-   "postId": "11790037102438",
-   "kind": "학사",
-   "school": "경북대학교",
-   "campus": "",
-   "foundAt": "2026-10-04"
-  },
-  {
-   "title": "2026년도 제4차 평생교육사 자격증 신규 발급 신청 안내",
-   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11790036688409&menu_idx=42&bbs_cde=stu_812",
-   "postedAt": "2026-09-22",
-   "postId": "11790036688409",
-   "school": "경북대학교",
-   "campus": "",
-   "foundAt": "2026-10-04",
-   "src": "c12a564f",
-   "desc": "2026년도 제 4 차 평생교육사 자격증 발급 신청기간 을 다음과 같이 공지하오니 , 대상자는 기간 내 신청하여주시기 바랍니다."
-  },
-  {
-   "title": "2026학년도 겨울계절수업 및 디딤돌수업 실시 안내",
-   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11790036258344&menu_idx=42&bbs_cde=stu_812",
-   "postedAt": "2026-09-22",
-   "postId": "11790036258344",
-   "kind": "학사",
-   "school": "경북대학교",
-   "campus": "",
-   "foundAt": "2026-10-04",
-   "src": "c12a564f",
-   "desc": "1. 주요 일정 업 무 내 용 계절수업 희망과목 수요조사 ( 온라인 ) 수업시간표 확정 공고 ( 학사공지 ) 수강신청 기간 폐강강좌 목록 공고 ( 학사공지 ) 수강변경 기간 수강료 납부 (3 일간 ) 수업기간…"
-  },
-  {
-   "title": "2026학년도 2학기 응급처치 및 심폐소생술 실습 신청 안내",
-   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11789626757245&menu_idx=42&bbs_cde=stu_812",
-   "postedAt": "2026-09-17",
-   "postId": "11789626757245",
-   "school": "경북대학교",
-   "campus": "",
-   "foundAt": "2026-10-04"
-  },
-  {
-   "title": "[대구캠퍼스] 2026년 예비군 기본 2차훈련 안내",
-   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11788418937924&menu_idx=42&bbs_cde=stu_812",
-   "postedAt": "2026-09-03",
-   "postId": "11788418937924",
-   "school": "경북대학교",
-   "campus": "",
-   "foundAt": "2026-10-04",
-   "desc": "‘26 년 예비군 기본훈련 2 차 일정 안내 ( 대구캠퍼스 ) 1. 훈련 대상 및 일정 안내"
-  },
-  {
-   "title": "군 입대 휴학자에 대한 취득학점 인정 및 학점인정 신청서 제출 안내",
-   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=top&bltn_no=11788338616576&menu_idx=42&bbs_cde=stu_812",
-   "postedAt": "2026-09-02",
-   "postId": "11788338616576",
-   "kind": "학사",
-   "school": "경북대학교",
-   "campus": "",
-   "foundAt": "2026-10-04",
-   "src": "c12a564f",
-   "desc": "군 입대 휴학자의 입영 또는 복무 중 아래의 방법으로 취득한 학점을 본교 이수학점으로 인정하고자 하오니 해당 학생들은 기간 내에 신청하시기 바랍니다."
-  },
-  {
-   "title": "[상주캠퍼스] 예비군훈련(기본훈련, 동원훈련 Ⅱ형) 2차 일정",
-   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=row&bltn_no=11789974286924&menu_idx=42&bbs_cde=stu_812",
-   "postedAt": "2026-09-21",
-   "postId": "11789974286924",
-   "school": "경북대학교",
-   "campus": "",
-   "foundAt": "2026-10-04",
-   "src": "c12a564f",
-   "desc": "안녕하세요. 경북대학교 상주캠퍼스 기본훈련 2차 및 동원훈련 Ⅱ형 2 차 일정을 아래와 같이 공지하니 참고 바랍니다. (부대사정 등으로 훈련일정 변경시 별도 공지)."
-  },
-  {
-   "title": "2026학년도 2학기 수강변경 후 폐강과목 안내",
-   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=row&bltn_no=11789375936295&menu_idx=42&bbs_cde=stu_812",
-   "postedAt": "2026-09-14",
-   "postId": "11789375936295",
-   "kind": "학사",
-   "school": "경북대학교",
-   "campus": "",
-   "foundAt": "2026-10-04",
-   "desc": "해당 과목을 신청한 학생께서는 필요한 경우, 수강정정기간(수강정정 관련 학사 공지 참조)을 이용하여 다른 과목으로 수강신청 해 주시기 바랍니다. 기타 자세한 사항은 개설학과 사무실로 문의 부탁 드립니다."
-  },
-  {
-   "title": "2026학년도 2학기 수강정정 안내",
-   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/stdViewBtin.action?search_type=&search_text=&popupDeco=&note_div=row&bltn_no=11788857835013&menu_idx=42&bbs_cde=stu_812",
-   "postedAt": "2026-09-08",
-   "postId": "11788857835013",
-   "kind": "학사",
-   "school": "경북대학교",
-   "campus": "",
-   "foundAt": "2026-10-04"
-  },
-  {
-   "title": "포토뉴스 대현119안전센터와 교내 어린이집에서 합동소방훈련 실시 경북대는 9월 30일 교내 어린이집에서 교직원과 원아, 대현119안전센터 소방관 등 300여명이 참여한 가운데 2026년도 합동소방훈련을 실시했다.",
-   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?bbs_cde=28&btin.bbs_cde=28&btin.doc_no=1338474&btin.appl_no=000000&btin.page=1&btin.search_type=&btin.search_text=&popupDeco=&btin.note_div=row&menu_idx=214",
-   "postedAt": "2026-10-01",
-   "school": "경북대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "desc": "이번 훈련은 스스로 대피하기 어려운 영유아가 생활하는 시설의 재난 대응 체계를 점검하기 위해 마련됐다. 훈련은 어린이집 2층 식당에서 화재가 발생한 상황을 가정해 진행됐다.",
-   "hidden": true,
-   "hiddenBy": "관리자 2026-10-12"
-  },
-  {
-   "title": "포토뉴스 수의과대학 김규태 교수, 제자 위해 발전기금 1천만원 전달 수의과대학 김규태 교수가 제자들을 위해 써달라며 발전기금 1천만원을 경북대에 전달했다.",
-   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?bbs_cde=28&btin.bbs_cde=28&btin.doc_no=1338469&btin.appl_no=000000&btin.page=1&btin.search_type=&btin.search_text=&popupDeco=&btin.note_div=row&menu_idx=214",
-   "postedAt": "2026-10-01",
-   "school": "경북대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "desc": "경북대는 9월 30일 본관 총장실에서 발전기금 전달식 및 감사패 수여식을 가졌다. 이날 전달된 발전기금은 ‘김규태장학기금’으로 적립되어 수의과대학 소속 재학생을 위한 장학금으로 사용될 예정이다.",
-   "hidden": true,
-   "hiddenBy": "관리자 2026-10-12"
-  },
-  {
-   "title": "포토뉴스 교육부 글로컬랩 2개 연구소 선정… 9년간 총 사업비 377억원 확보 교육부와 한국연구재단이 추진하는 ‘글로컬랩(거점형) 사업’에 지능형건설자동화연구센터와 세포·기질연구소가 각각 최종 선정됐다.",
-   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?bbs_cde=28&btin.bbs_cde=28&btin.doc_no=1338438&btin.appl_no=000000&btin.page=1&btin.search_type=&btin.search_text=&popupDeco=&btin.note_div=row&menu_idx=214",
-   "postedAt": "2026-09-29",
-   "school": "경북대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "desc": "글로컬랩 사업은 지역거점대학의 우수 연구역량을 집중 육성해 세계적 연구거점으로 성장시키고, 지역 산업 및 글로벌 네트워크와 연계해 지속 가능한 연구 생태계를 조성하는 대형 국가 R&D 지원 사업이다.",
-   "hidden": true,
-   "hiddenBy": "관리자 2026-10-12"
-  },
-  {
-   "title": "포토뉴스 통계학과 고규형 교수, 국제통계기구(ISI) 선출회원 선정 통계학과 고규형 교수가 국제통계기구(International Statistical Institute, ISI)의 선출회원(Elected Member)으로 선정됐다.",
-   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?bbs_cde=28&btin.bbs_cde=28&btin.doc_no=1338436&btin.appl_no=000000&btin.page=1&btin.search_type=&btin.search_text=&popupDeco=&btin.note_div=row&menu_idx=214",
-   "postedAt": "2026-09-29",
-   "school": "경북대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "desc": "1885년 설립된 국제통계기구(ISI)는 전 세계 150여 개국의 개인 및 기관 회원이 참여하는 통계학 분야의 권위 있는 비영리·비정부 국제기구다.",
-   "hidden": true,
-   "hiddenBy": "관리자 2026-10-12"
-  },
-  {
-   "title": "포토뉴스 지역민 대상 특별강연 ‘겸재와 그의 시대’ 개최 사학과와 박물관은 대구·경북 지역민과 함께하는 특별강연 ‘겸재와 그의 시대’를 개최한다.",
-   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?bbs_cde=28&btin.bbs_cde=28&btin.doc_no=1338432&btin.appl_no=000000&btin.page=1&btin.search_type=&btin.search_text=&popupDeco=&btin.note_div=row&menu_idx=214",
-   "postedAt": "2026-09-28",
-   "kind": "행사",
-   "school": "경북대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "hidden": true,
-   "hiddenBy": "관리자 2026-10-12"
   }
  ]
 }

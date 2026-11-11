@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>상세 시트 일관성 시안</title>
+<!-- 2026-11-02 · 개발자 "나는 메인 카드가 아니라 공고를 눌렀을 때 나오는 카드의 일관성을 말한거긴해" — 공고를 눌렀을 때 뜨는 시트 세 갈래
+     (장학 openDetail · 층2 재단 openDetail+kosafAsScholarships · 대외활동 openActivityDetail)를 실데이터로 지금 그대로 / 시안 으로.
+     시안은 목록 카드 시안 B 와 같은 윗줄을 쓰고, 절 이름·순서·마감 표시·버튼을 한 벌로 맞춘다. 글자는 지우거나 옮기기만(원칙 8-1). -->
+<style>
+  :root {
+    --bg:#f6f4f0; --surface:#fffefc; --text:#191713; --text-sub:#57524a; --text-weak:#8b857b; --line:rgba(25,23,19,.09); --rule:rgba(25,23,19,.14);
+    --primary:#23201a; --primary-weak:rgba(25,23,19,.06); --green:#3d6b47; --green-weak:#e9efe8; --orange:#8a5a12; --orange-weak:#f4ede0; --red:#8f3a2e; --red-weak:#f5e9e6;
+    --radius-xs:9px; --radius-lg:27px; --shadow-sheet:0 -14px 48px rgba(40,33,20,.22);
+    --t-2xs:11.5px; --t-xs:12.5px; --t-sm:13.5px; --t-md:14.5px; --t-lg:17px; --t-xl:18.5px;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:Pretendard,'Pretendard Variable','Apple SD Gothic Neo','Noto Sans KR',system-ui,sans-serif; font-size:15px; line-height:1.55; word-break:keep-all; }
+  .wrap { max-width:1240px; margin:0 auto; padding:36px 20px 80px; }
+  h1 { font-size:24px; margin:0 0 6px; letter-spacing:-.02em; }
+  .lead { color:var(--text-sub); margin:0 0 20px; max-width:76ch; }
+  .diff { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px 18px; font-size:14px; margin-bottom:28px; }
+  .diff h3 { margin:0 0 8px; font-size:15px; }
+  .diff table { border-collapse:collapse; width:100%; font-size:13.5px; }
+  .diff th, .diff td { text-align:left; padding:6px 8px; border-top:1px solid var(--line); vertical-align:top; }
+  .diff th { color:var(--text-weak); font-weight:600; white-space:nowrap; }
+  .diff td.new { color:var(--green); font-weight:600; }
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; align-items:start; }
+  .head { font-size:12.5px; font-weight:700; color:var(--text-weak); margin:26px 0 8px; letter-spacing:.02em; }
+  .head.now::before { content:'지금 · '; } .head.new::before { content:'시안 · '; color:var(--green); }
+  /* 시트 — style.css 의 시트 값 */
+  .sheet { background:var(--surface); border-radius:var(--radius-lg) var(--radius-lg) 0 0; box-shadow:var(--shadow-sheet); padding:10px 20px 22px; min-height:120px; }
+  .handle { width:40px; height:4px; border-radius:2px; background:var(--rule); margin:0 auto 14px; }
+  .top { display:flex; gap:6px; align-items:center; margin-bottom:9px; flex-wrap:wrap; }
+  .badge { font-size:var(--t-2xs); font-weight:700; padding:3.5px 9px; border-radius:var(--radius-xs); background:rgba(18,22,31,.05); color:var(--text-sub); }
+  .badge.in { background:var(--green-weak); color:var(--green); } .badge.out { background:#f0ecfd; color:#6247d6; }
+  .badge.urgent { background:var(--red-weak); color:var(--red); } .badge.closed { color:var(--text-weak); }
+  .org { font-size:var(--t-xs); color:var(--text-sub); font-weight:600; }
+  .save { margin-left:auto; width:22px; height:22px; border-radius:6px; border:1.5px solid var(--rule); }
+  h3.title { font-size:var(--t-xl); font-weight:700; letter-spacing:-.015em; margin:0 0 4px; }
+  .amount { font-size:var(--t-lg); font-weight:700; color:var(--primary); margin:0 0 2px; }
+  .amount.unknown { font-size:var(--t-sm); font-weight:500; color:var(--text-weak); }
+  .prov { font-size:var(--t-sm); color:var(--text-weak); margin:0; }
+  h4 { font-size:var(--t-sm); font-weight:700; margin:16px 0 6px; color:var(--text); }
+  h4 .tag { font-size:11px; font-weight:600; color:var(--text-sub); background:rgba(18,22,31,.05); border-radius:6px; padding:2px 7px; margin-left:6px; vertical-align:1px; }
+  .verdict { display:flex; align-items:center; justify-content:space-between; margin-top:16px; }
+  .verdict h4 { margin:0; }
+  .marks { display:flex; gap:6px; }
+  .fit { font-size:var(--t-2xs); font-weight:700; padding:3.5px 9px; border-radius:var(--radius-xs); background:var(--primary); color:#fff; }
+  .pill { font-size:var(--t-2xs); font-weight:700; padding:3.5px 9px; border-radius:999px; background:rgba(18,22,31,.05); color:var(--text-sub); }
+  .pill.no { color:var(--text-weak); }
+  ul { margin:4px 0 0; padding-left:0; list-style:none; }
+  li { font-size:var(--t-sm); color:var(--text-sub); padding:3px 0; border-bottom:1px solid var(--line); }
+  li.x { color:var(--text-weak); } li.x::before { content:'✗ '; color:var(--red); }
+  li.ok::before { content:'✓ '; color:var(--green); } li.no::before { content:'✕ '; color:var(--red); } li.unk::before { content:'? '; color:var(--text-weak); }
+  li b { color:var(--text-sub); font-weight:600; }
+  .legend { font-size:var(--t-xs); color:var(--text-weak); margin:6px 0 0; }
+  .more { font-size:var(--t-xs); color:var(--text-sub); margin-top:4px; }
+  .btn { display:block; width:100%; margin-top:18px; padding:14px; border-radius:14px; border:0; background:var(--primary); color:#fff; font-weight:700; font-size:var(--t-md); text-align:center; }
+  .btn.ghost { background:transparent; border:1.5px solid var(--rule); color:var(--text); }
+  .btn.off { background:rgba(18,22,31,.08); color:var(--text-weak); }
+  .note { font-size:12.5px; color:var(--red); margin-top:6px; }
+  .mark { font-size:11.5px; color:#fff; background:var(--red); border-radius:5px; padding:1px 6px; margin-left:6px; vertical-align:2px; font-weight:700; }
+  .end { margin-top:34px; padding-top:22px; border-top:1px solid var(--line); font-size:14px; color:var(--text-sub); max-width:80ch; }
+  .end h2 { font-size:17px; color:var(--text); margin:0 0 8px; } .end li { border:0; padding:3px 0; font-size:14px; }
+  @media (max-width:980px) { .grid{grid-template-columns:1fr} }
+</style>
+<div class="wrap">
+  <h1>상세 시트 일관성 시안</h1>
+  <p class="lead">(2026-11-02 개발자 결정 반영: 마감 D-day 는 머리줄에 · 학교 게시판에서 주운 활동 글은 머리줄에 주최를 적지 않고 칩만 — 「○○대학교 게시판」은 주최가 아니다.) 공고를 눌렀을 때 올라오는 시트입니다. 지금은 <b>세 갈래가 세 벌</b>이에요 — 장학 공고(학교 게시판) · 층2 재단(한국장학재단이 아는 재단) · 대외활동(1365·K-Startup·온통청년·학교 활동 게시판). 같은 사실을 다른 이름·다른 자리·다른 모양으로 적고 있어서, 학생은 시트마다 어디를 봐야 하는지 다시 배웁니다. 시안은 <b>절 이름·순서·마감 표시·버튼을 한 벌</b>로 맞추고, 글자는 지우거나 옮기기만 합니다.</p>
+
+  <div class="diff"><h3>세 시트가 지금 다르게 하는 것 · 시안이 하나로 맞추는 것</h3>
+    <table>
+      <tr><th></th><th>장학 공고</th><th>층2 재단</th><th>대외활동</th><th>시안 (한 벌)</th></tr>
+      <tr><th>머리줄</th><td>교내/교외 배지 · 저장</td><td>교외 배지 · 저장</td><td>D-day · 종류 배지 · 저장</td><td class="new">갈래 칩 + 주최 + D-day + 저장 — 목록 카드 B 와 같은 줄</td></tr>
+      <tr><th>마감</th><td>맨 아래 「일정」 줄 · 버튼 문구</td><td>같음</td><td>맨 위 D-day 배지 + 맨 아래 「마감일 2026-11-11」 줄</td><td class="new">머리줄 D-day 하나 + 「접수」 절의 기간 한 줄 — 두 곳 고정</td></tr>
+      <tr><th>주최</th><td>금액 밑 회색 줄</td><td>같음</td><td>「어디서 · 분야」 회색 줄</td><td class="new">머리줄(칩 옆) 한 자리</td></tr>
+      <tr><th>지원 자격</th><td>적합도 배지 + 「지원 가능/선발 심사」 알약 + 줄</td><td>같음 (재단 칸을 줄로)</td><td>적합도 배지만 · 0줄이면 칸 자체가 없음</td><td class="new">적합도 배지 + 줄 · 제외 조건은 같은 칸 안 ✗ · <b>0줄이고 물을 것도 없으면 칸 자체가 없음</b>(2026-11-07 개발자 지시 — 11-02 의 「원문에서 확인」 한 줄을 뒤집음)</td></tr>
+      <tr><th>안내 절 이름</th><td>「공고 안내」</td><td>「공고 안내」</td><td>「혜택」·「모집 안내」·「공고 안내」 셋</td><td class="new">「접수」(기간·방법·서류) 와 「공고 안내」(그 밖 원문 줄) 둘뿐 · 혜택은 금액 자리</td></tr>
+      <tr><th>첨부</th><td>「공고 원본 첨부 양식」</td><td>「선발 공고문 <i>재단 원문</i>」</td><td>「공고 원본 첨부」</td><td class="new">「첨부」 하나 · 층2는 꼬리표로 '재단 선발 공고문'</td></tr>
+      <tr><th>버튼</th><td>「신청 준비 시작」(검정)</td><td>「신청 준비 시작」</td><td>「원문 공고 ↗」(테두리) + 안내문</td><td class="new">검정 버튼 하나 — 할 수 있는 일을 말한다: 신청 준비 시작 / 원문에서 신청하기 ↗ / 별도 신청 없음</td></tr>
+    </table>
+  </div>
+
+  <div class="grid">
+    <div><div class="head now">장학 공고 — 세종대 학업수석총장장학금</div>
+      <div class="sheet"><div class="handle"></div>
+        <div class="top"><span class="badge in">교내</span><span class="save"></span></div>
+        <h3 class="title">2026-2 학업수석총장장학금 선발 안내</h3>
+        <p class="amount">200만원</p>
+        <p class="prov">세종대학교</p>
+        <div class="verdict"><h4>지원 자격</h4><div class="marks"><span class="fit">지원 자격 미달</span><span class="pill no">선발 심사</span></div></div>
+        <ul><li class="unk">재학중 지속적으로 우수한 성적을 취득한 3학년 이상의 정규학기 재학생</li><li class="no">2026-1학기 평점 4.5점 취득 및 18학점 이상 취득자</li><li class="no">2026-1학기 이전 2개학기 각 평점 4.3점 이상인 자</li><li class="no">2026-1학기 이전 2개학기 평점 평균이 4.4점 이상인 자</li></ul>
+        <h4>이런 경우는 제외돼요</h4><ul><li class="x">학기 : 휴학학기, 계절학기, 해외교환학기 등 제외</li></ul>
+        <h4>공고 안내</h4><ul><li><b>장학금액</b> · 수업료 전액 및 학업보조비 200만원</li></ul>
+        <p class="legend" style="margin-top:14px">자세한 내용과 접수 방법은 원문 공고 ↗에서 확인하세요.</p>
+        <p class="legend">원문: 「별도의 신청절차없이 매학기 성적 확정 후, 학생지원처에서 선발.」</p>
+        <button class="btn off">별도 신청 없음 — 학교가 선발</button>
+      </div></div>
+    <div><div class="head now">층2 재단 — 의성군청 다자녀장학금</div>
+      <div class="sheet"><div class="handle"></div>
+        <div class="top"><span class="badge out">교외</span><span class="save"></span></div>
+        <h3 class="title">경상북도 의성군청 다자녀장학금</h3>
+        <p class="amount unknown">지원 금액은 원문 공고에서 확인</p>
+        <p class="legend">재단이 적어 둔 지원금액 — 학기별 등록금액(본인 부담금)의 1/2(최대 150만원)</p>
+        <p class="prov">경상북도 의성군청 · 2026-09-30~2026-11-03</p>
+        <div class="verdict"><h4>지원 자격</h4><div class="marks"><span class="fit">확인 필요 2</span><span class="pill">선발 심사</span></div></div>
+        <ul><li class="unk">둘째아 이상의 대학교 재학생</li><li class="unk">등록금 납부일 현재 부모와 함께 관내에 주민등록을 두고 거주하는 자</li></ul>
+        <h4>제출 서류</h4><ul><li>다자녀 장학금 지원신청서</li><li>주민등록등본</li><li>가족관계증명서</li><li>재학증명서</li><li>등록금 납입증명서 또는 납입 영수증</li><li>지원대상자 또는 부모명의 예금통장 사본</li><li>개인정보 수집·이용·제공 동의서</li></ul>
+        <h4>선발 공고문 <span class="tag">재단 원문</span></h4><ul><li>[다운로드] <span class="legend">HWP</span></li></ul>
+        <p class="legend" style="margin-top:14px">자세한 내용과 접수 방법은 재단 홈페이지 ↗에서 확인하세요.</p>
+        <p class="legend">문의 054-830-6292</p>
+        <button class="btn">신청 준비 시작</button>
+      </div></div>
+    <div><div class="head now">대외활동 — 1365 탈북민대학생멘토링</div>
+      <div class="sheet"><div class="handle"></div>
+        <div class="top"><span class="badge">D-9</span><span class="badge">대외활동</span><span class="save"></span></div>
+        <h3 class="title">탈북민대학생멘토링 - 간호학</h3>
+        <p class="prov">성서대학 인근 · 봉사</p>
+        <h4>모집 안내</h4><ul><li><b>모집기간</b> · 2026-09-11 ~ 2026-11-11</li><li><b>활동기간</b> · 2026-09-14 ~ 2026-11-13</li><li><b>활동지역</b> · 성서대학 인근</li></ul>
+        <h4>공고 안내</h4><ul><li>탈북민 대학생 멘토링 해주실 선생님을 구합니다.</li><li><b>기간</b> · 최소 한학기 이상</li><li><b>과목</b> · 대학교 전공과목(간호학 - 기초간호과학</li><li><b>신청 방법</b> · 학생과 1:1 매칭이 되면 멘토링이 시작됩니다.</li><li>실제 수업은 노원구 성서대학 근처 입니다.</li></ul>
+        <p class="legend" style="margin-top:14px">마감일 2026-11-11</p>
+        <button class="btn ghost">원문 공고 ↗</button>
+        <p class="legend">자세한 내용과 신청은 원문 공고에서 확인하세요.</p>
+        <p class="note">지원 자격 칸이 아예 없다 — 자격 0줄이면 칸을 접는다. 마감은 위 D-9 와 아래 「마감일」 두 번.</p>
+      </div></div>
+  </div>
+
+  <div class="grid">
+    <div><div class="head new">장학 공고</div>
+      <div class="sheet"><div class="handle"></div>
+        <div class="top"><span class="badge in">장학 · 교내</span><span class="org">세종대학교</span><span class="badge" style="margin-left:auto">기한 확인 중</span><span class="save" style="margin-left:6px"></span></div>
+        <h3 class="title">2026-2 학업수석총장장학금 선발 안내</h3>
+        <p class="amount">200만원</p>
+        <div class="verdict"><h4>지원 자격</h4><div class="marks"><span class="fit">지원 자격 미달</span></div></div>
+        <ul><li class="unk">재학중 지속적으로 우수한 성적을 취득한 3학년 이상의 정규학기 재학생</li><li class="no">2026-1학기 평점 4.5점 취득 및 18학점 이상 취득자</li><li class="no">2026-1학기 이전 2개학기 각 평점 4.3점 이상인 자</li><li class="no">2026-1학기 이전 2개학기 평점 평균이 4.4점 이상인 자</li><li class="x">학기 : 휴학학기, 계절학기, 해외교환학기 등 제외</li></ul>
+        <h4>접수</h4><ul><li><b>기간</b> · 원문 확인</li><li><b>방법</b> · 별도의 신청절차없이 매학기 성적 확정 후, 학생지원처에서 선발.</li></ul>
+        <h4>공고 안내</h4><ul><li><b>장학금액</b> · 수업료 전액 및 학업보조비 200만원</li><li><b>결과조회</b> · 학사정보시스템 로그인하여 "장학이력조회"에서 '학업수석총장장학금' 확인</li></ul>
+        <h4>원문</h4><ul><li>세종대학교 공지 ↗ <span class="legend">그 공고 하나로 가는 주소</span></li></ul>
+        <button class="btn off">별도 신청 없음 — 학교가 선발</button>
+      </div></div>
+    <div><div class="head new">층2 재단</div>
+      <div class="sheet"><div class="handle"></div>
+        <div class="top"><span class="badge out">장학 · 교외</span><span class="org">경상북도 의성군청</span><span class="badge urgent" style="margin-left:auto">D-1</span><span class="save" style="margin-left:6px"></span></div>
+        <h3 class="title">다자녀장학금</h3>
+        <p class="amount unknown">학기별 등록금액(본인 부담금)의 1/2(최대 150만원)</p>
+        <div class="verdict"><h4>지원 자격</h4><div class="marks"><span class="fit">확인 필요 2</span></div></div>
+        <ul><li class="unk">둘째아 이상의 대학교 재학생</li><li class="unk">등록금 납부일 현재 부모와 함께 관내에 주민등록을 두고 거주하는 자</li><li class="x">국가 등 행정기관으로부터 지원을 받은 경우 중복지원 금지 (다만타 장학금을 수혜받았으나 본인부담금이 있는 경우 지원 가능)</li><li class="x">자퇴 또는 퇴학 등의 사유로 학업을 중단한 경우</li></ul>
+        <h4>접수</h4><ul><li><b>기간</b> · 09.30 ~ 11.03</li><li><b>방법</b> · 재단 선발 공고문·홈페이지가 정한 접수 방법</li><li><b>서류</b> · 다자녀 장학금 지원신청서 · 주민등록등본 · 가족관계증명서 · 재학증명서 · 등록금 납입증명서 또는 납입 영수증 · 예금통장 사본 · 개인정보 동의서</li></ul>
+        <h4>공고 안내</h4><ul><li><b>선발방법</b> · 서류심사</li><li><b>선발인원</b> · 기관확인필요</li></ul>
+        <h4>첨부 <span class="tag">재단 선발 공고문</span></h4><ul><li>다자녀 장학금 공고문.hwp</li></ul>
+        <h4>원문</h4><ul><li>재단 홈페이지 ↗ <span class="legend">문의 054-830-6292</span></li></ul>
+        <button class="btn">신청 준비 시작</button>
+      </div></div>
+    <div><div class="head new">대외활동</div>
+      <div class="sheet"><div class="handle"></div>
+        <div class="top"><span class="badge">봉사</span><span class="org">사단법인 새일</span><span class="badge" style="margin-left:auto">D-9</span><span class="save" style="margin-left:6px"></span></div>
+        <h3 class="title">탈북민대학생멘토링 - 간호학</h3>
+        <!-- 자격 0줄 · 물을 것 없음 → 「지원 자격」 칸 자체가 없다 (2026-11-07 개발자 지시 · 그 전엔 「원문에서 확인 — …」 한 줄이 여기 있었다) -->
+        <h4>접수</h4><ul><li><b>기간</b> · 09.11 ~ 11.11</li><li><b>방법</b> · 원문 확인 <span class="legend">(연락처가 든 단계는 싣지 않아요)</span></li></ul>
+        <h4>공고 안내</h4><ul><li>탈북민 대학생 멘토링 해주실 선생님을 구합니다.</li><li><b>활동기간</b> · 09.14 ~ 11.13</li><li><b>활동지역</b> · 성서대학 인근</li><li><b>기간</b> · 최소 한학기 이상</li><li><b>과목</b> · 대학교 전공과목(간호학 - 기초간호과학</li></ul>
+        <p class="more">더 보기 (2줄)</p>
+        <h4>원문</h4><ul><li>1365 자원봉사포털 ↗ <span class="legend">그 글 하나로 가는 주소</span></li></ul>
+        <button class="btn">원문에서 신청하기 ↗</button>
+      </div></div>
+  </div>
+
+  <div class="end">
+    <h2>시안이 정하는 규칙 — 코드로 가면 이렇게 됩니다</h2>
+    <ul>
+      <li><b>절 다섯 개 고정 순서</b>: 지원 자격 → 접수 → 공고 안내 → 첨부 → 원문. 없는 절은 안 그린다 — 「지원 자격」도 0줄이고 물을 것이 없으면 칸 자체를 안 그린다(2026-11-07 개발자 지시 "내용 없는 지원자격 칸 … 칸 자체를 없애기" · 장학 카드는 「자격 미확인」 배지가 그 사실을 말하고 활동 카드·시트는 말하지 않는다). 11-02 시안의 「원문에서 확인」 한 줄은 없앴다.</li>
+      <li><b>마감은 두 곳에만</b>: 머리줄 D-day 배지 + 「접수 · 기간」 줄. 「일정」 줄·「마감일 2026-11-11」 줄·버튼 속 「마감된」 글자는 뺀다(버튼은 D-day 가 「마감」이면 비활성).</li>
+      <li><b>「접수」 절이 접수 기간·방법·서류를 모은다</b> — 지금 장학 시트의 「제출 서류」·메일/포털 안내·대외활동의 「모집 안내」 기간 줄이 여기로. 방법은 원문 문장 그대로(메일 주소·포털 이름은 지금 규칙대로 근거 문장이 있을 때만).</li>
+      <li><b>「공고 안내」는 그 밖의 원문 줄</b> — 장학 excerpts · 층2 재단 칸(선발방법·선발인원 등) · 활동 noticeLines 가 전부 「이름표 · 값」 한 꼴. 5줄 뒤 「더 보기」.</li>
+      <li><b>적합도 배지 하나</b> — 「지원 가능·선발 심사」 알약은 뺀다(대외활동엔 없고, 장학에선 배지와 다른 축의 말이라 2026-08-31 재설계 때도 문제였다). 선발 여부는 「접수 · 방법」 줄이 원문으로 말한다.</li>
+      <li><b>제외 조건은 지원 자격 칸 안에 ✗ 줄</b> — 「이런 경우는 제외돼요」 절을 따로 두지 않는다(같은 질문 "나는 되나" 의 답이라서).</li>
+      <li><b>버튼 한 벌</b> — 신청 준비 시작(장학·층2) / 원문에서 신청하기 ↗(대외활동) / 별도 신청 없음(noApply) / 마감(비활성). 활동 시트의 테두리 버튼 + 안내문 두 줄은 검정 버튼 하나로.</li>
+      <li><b>바뀌는 코드</b>: app.js openDetail·openActivityDetail 이 절을 그리는 부분을 한 함수(절 다섯)로 모으고, 층2는 kosafAsScholarships 가 재단 칸을 「접수·공고 안내」 줄로 넘긴다. 드라이버(verify-apply-prep·verify-activities·verify-kosaf)와 what-shows 의 절 이름을 같이 옮긴다.</li>
+      <li><b>이 시안이 안 바꾸는 것</b>: 자격 판정·적합도·원문 링크 이름·신청 준비 흐름·진척도 기록(신청한 공고의 체크리스트·제출 기록은 버튼 아래 지금 그대로).</li>
+    </ul>
+  </div>
+</div>
+</html>

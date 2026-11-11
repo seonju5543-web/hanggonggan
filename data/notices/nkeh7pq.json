@@ -1,7 +1,200 @@
 {
  "school": "인하대학교",
- "updatedAt": "2026-10-31",
+ "updatedAt": "2026-11-11",
  "items": [
+  {
+   "title": "[학부-교외장학] 2027년 1학기 삼성꿈장학재단 글로벌 희망장학생 선발 공고",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46112/artclView.do",
+   "attachments": [
+    {
+     "name": "[Form]Global Hope Scholarship Program Application(Undergraduate).doc",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41789/download.do"
+    },
+    {
+     "name": "[양식]삼성꿈장학재단 글로벌 희망장학 신청서(학부).hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41790/download.do"
+    },
+    {
+     "name": "(첨부1) DAC List of Aid Recipients - 2025 flows.pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41791/download.do"
+    },
+    {
+     "name": "(첨부3) 삼성꿈장학재단 글로벌 희망장학 홍보 포스터(게재용).pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41792/download.do"
+    }
+   ],
+   "deadlineHint": "접수 기한 : ~ 26. 12. 24. (목) 16:00 (주말, 공휴일 제외) 7. 접수처 : 인하대학교 장학복지팀 방문 접수 (학생회관 3층",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-10"
+  },
+  {
+   "title": "[학부-교외장학] 한국고등교육재단 문우림 제6기 장학생 모집 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46108/artclView.do",
+   "attachments": [
+    {
+     "name": "문우림 제6기 장학생 선발 모집요강.pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41786/download.do"
+    },
+    {
+     "name": "문우림 제6기 장학생 선발 포스터.jpg",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41787/download.do"
+    }
+   ],
+   "deadlineHint": "접수기한 : 2026년 11월 9일 (월) ~ 12월 11일 (금) ※ 온라인 지원서 마감과 함께 추천서 제출 마감 8. 접수처 : 홈페이지 가",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-10"
+  },
+  {
+   "title": "[학부-교외장학] 2026학년도 2학기 IBK기업은행 장학금 장학생 선발 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46077/artclView.do",
+   "attachments": [
+    {
+     "name": "1. IBK기업은행 장학금_필수 개인정보 수집·이용 동의서.pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41758/download.do"
+    },
+    {
+     "name": "2. IBK기업은행 장학금_자기소개서.hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41759/download.do"
+    }
+   ],
+   "deadlineHint": "신청 기간 : ~ 26. 11. 11. (수) 17:00 ※ 재단 일정에 따라 신청 기간이 촉박한 점 양해 바랍니다. 7. 신청 방법 : 인하대",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-09"
+  },
+  {
+   "title": "[학부-교내장학] 2026학년도 2학기 장학사정관제 장학금 선발 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46075/artclView.do",
+   "attachments": [
+    {
+     "name": "[별첨1]장학사정관제 장학금 추천서 양식.hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41756/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026.11.09.(월 ) ~ 11.19.(목 ) 18 시까지 ( 기한엄수 ) 6. 신청서류 : 각 학과 사무실로 원본 제출 선발",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-09"
+  },
+  {
+   "title": "[한국장학재단] 통학로(路) - 장학금부터 취업까지, 나에게 필요한 청년지원정보 확인하기",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46065/artclView.do",
+   "attachments": [
+    {
+     "name": "통학로 카드(리플렛).pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41743/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-05"
+  },
+  {
+   "title": "[한국장학재단] 학자금 중복지원, 미리 확인하고 예방하세요!",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46064/artclView.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-05"
+  },
+  {
+   "title": "[학부·대학원-교외장학] 2026학년도 창암장학생 지원 공고 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46061/artclView.do",
+   "attachments": [
+    {
+     "name": "2026년도_창암장학생_지원가이드(공고모집).pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41731/download.do"
+    },
+    {
+     "name": "2026년도_창암장학생_신청양식(공고모집).hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41732/download.do"
+    }
+   ],
+   "deadlineHint": "접수기한 : ~ 2026. 11. 17. (화) 8. 접수처 : (재단 우편접수) 경기도 고양시 일산동구 위시티3로 83-11, 202호(식사동",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-05"
+  },
+  {
+   "title": "[학부-교외장학] 2026학년도 하반기 30기 인석장학회 장학생 선발 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46058/artclView.do",
+   "attachments": [
+    {
+     "name": "유형I [등록금] 온라인 체크리스트.hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41725/download.do"
+    },
+    {
+     "name": "유형II [생활비] 온라인 체크리스트.hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41726/download.do"
+    }
+   ],
+   "deadlineHint": "접수 기한 : 26. 11. 18.(수) 10:00 ~ 11. 26. (목) 16:00 6. 접수 방법 : 인석장학회 홈페이지 온라인 접수 7.",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-05"
+  },
+  {
+   "title": "[학부-국가근로] 2026학년도 국가근로장학사업 동계방학 집중근로 프로그램 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46047/artclView.do",
+   "attachments": [
+    {
+     "name": "1. 2026년 동계방학 집중근로 근로장학생 사전 선정 기준(안).pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41704/download.do"
+    },
+    {
+     "name": "2-1. 2026년 동계방학 집중근로 희망근로지 신청 매뉴얼(홈페이지).pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41705/download.do"
+    },
+    {
+     "name": "2-2. 2026년 동계방학 집중근로 희망근로지 신청 매뉴얼(모바일).pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41706/download.do"
+    },
+    {
+     "name": "3. 2026년 동계방학 집중근로 프로그램 학기당 최대 근로시간 예외 대상자 제출서류.pdf",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41707/download.do"
+    }
+   ],
+   "deadlineHint": "신청 기간 : 2026년 10월 30일(금) 9시 ~ 11월 12일(목) 18시 까지 5. 방학 집중근로와 기존 국가근로 차이 방학 집중근로와",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-04"
+  },
+  {
+   "title": "[학부-교외장학] 2027년도 관정재단 국내대학 장학생 선발 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46034/artclView.do",
+   "attachments": [
+    {
+     "name": "1. 관정_ 지원자 인적사항.xlsx",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41698/download.do"
+    },
+    {
+     "name": "2. 관정_개인정보수집동의서.hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41699/download.do"
+    }
+   ],
+   "deadlineHint": "마감 : ~ 26. 11. 18. (수) 17:00 나. 1차 온라인 심사 업로드 : 26. 12. 16. (수) (예정) ※ (학생→재단) 학",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-03"
+  },
+  {
+   "title": "[학부-교외장학] 2026학년도 (재)농와장인재육성장학재단 장학생 선발 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46019/artclView.do",
+   "attachments": [
+    {
+     "name": "(재)농와장인재육성장학재단_2026년장학생선발공고문.hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41690/download.do"
+    }
+   ],
+   "deadlineHint": "접수기한 : 26. 10. 29.(목) 09:00 ~ 26. 11. 10.(화) 18:00 (토·일·공휴일 제외) 8. 접수처 : 고창군청 1층",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-02"
+  },
   {
    "title": "[학부-교외장학] 2026년 2학기 벽담재단법인 외국인 유학생 장학생 선발 안내",
    "url": "https://www.inha.ac.kr/bbs/kr/8/45988/artclView.do",

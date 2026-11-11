@@ -34,6 +34,7 @@ export const EDIT_LABEL = {
   sourceUrl: '원문 공고 주소',
   formId: '연결된 양식',
   noForm: '양식 없는 사유',
+  noApply: '신청 절차 없음 (원문 문장)',
   applyEmail: '이메일 접수 주소',
   eligibility: '자격 — 기계 판정용',
   eligibilityLines: '학생에게 보여 줄 자격 문장',

@@ -1,7 +1,25 @@
 {
  "school": "경기대학교",
- "updatedAt": "2026-10-31",
+ "updatedAt": "2026-11-11",
  "items": [
+  {
+   "title": "[입학에서 취업까지] [한국고등교육재단] 문우림 제6기 장학생 모집 안내 ( ~ 2026.12.11.(금))",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627142&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888",
+   "attachments": [
+    {
+     "name": "문우림 제6기 장학생 선발 공고문.hwp",
+     "url": "https://www.kyonggi.ac.kr/www/downloadBbsFile.do?atchmnflNo=990303"
+    },
+    {
+     "name": "문우림 제6기 장학생 선발 모집요강.pdf",
+     "url": "https://www.kyonggi.ac.kr/www/downloadBbsFile.do?atchmnflNo=990304"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "경기대학교",
+   "campus": "",
+   "foundAt": "2026-11-11"
+  },
   {
    "title": "[입학에서 취업까지] [통영시] 2026년 통영시 저소득 대학생 장학금 지원대상자 선발 안내 (2026.11.02.(월) ~ 2026.11.23.(월))",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626890&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888",

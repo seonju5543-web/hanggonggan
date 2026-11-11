@@ -193,7 +193,7 @@ jobs:
           unrun=""
           for f in verify-fit-badge.js verify-explore-sort.js verify-onboard-gaps.js \
                    verify-registered.js verify-chat.js verify-apps-manage.js \
-                   verify-supabase.js verify-essay-ui.js verify-forms-data.js \
+                   verify-supabase.js verify-error-report.js verify-essay-ui.js verify-forms-data.js \
                    verify-new-forms.js verify-source-links.js verify-push-client.js \
                    verify-notify.js verify-sheet-back.js verify-kosaf.js \
                    verify-calendar.js verify-resume.js verify-interactions.js \

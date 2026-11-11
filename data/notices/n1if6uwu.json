@@ -1,7 +1,87 @@
 {
  "school": "연세대학교 미래캠퍼스",
- "updatedAt": "2026-10-31",
+ "updatedAt": "2026-11-11",
  "items": [
+  {
+   "title": "[교외] 문우림 제6기 장학생 선발안내",
+   "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/944611/artclView.do",
+   "attachments": [
+    {
+     "name": "문우림 제6기 장학생 선발 공고문.hwp",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015475/download.do"
+    },
+    {
+     "name": "문우림 제6기 장학생 선발 포스터.jpg",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015476/download.do"
+    },
+    {
+     "name": "문우림 제6기 장학생 선발 모집요강.pdf",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015477/download.do"
+    }
+   ],
+   "deadlineHint": "지원 기간) 2026 년 11 월 9 일(월)~12 월 11 일(금) 23 시 59 분까지 3. 제출 서류 ○ (필수) △온라인 지원서 1 부",
+   "school": "연세대학교 미래캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-11"
+  },
+  {
+   "title": "[교외] 2027-2028 이스라엘 정부초청 장학생 선발(~1/15)",
+   "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/944595/artclView.do",
+   "attachments": [
+    {
+     "name": "[본문] 2027-2028 이스라엘 정부초청 장학생 선발 안내.pdf",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015451/download.do"
+    },
+    {
+     "name": "2027-2028 이스라엘 정부장학금 안내.pdf",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015452/download.do"
+    },
+    {
+     "name": "지원서 양식.pdf",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015453/download.do"
+    }
+   ],
+   "deadlineHint": "마감일: 2027년 1월15일 금요일 (1월 15일 도착분 까지 접수, 방문접수 불가) • 면접일: 2027년 2월 2일 화요일(서류합격 후 구",
+   "school": "연세대학교 미래캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-10"
+  },
+  {
+   "title": "일반공지 2026학년도 2학기 신문고 장학금 신청 안내(~11/20) 신촌/국제",
+   "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/944586/artclView.do",
+   "attachments": [
+    {
+     "name": "2026학년도_2학기_신문고장학금신청서_학번_이름.hwp",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015441/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간: 2026. 11. 9.(월) ~ 11. 20.(금) 23:59 까지 ※ 기한엄수(기한 내 미 제출 시, 미 인정) 6. 참고사항 가.",
+   "school": "연세대학교 미래캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-09"
+  },
+  {
+   "title": "일반공지 2026년 국가근로장학금 동계방학 집중근로 프로그램 희망근로지 신청 안내 신촌/국제",
+   "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/944552/artclView.do",
+   "attachments": [
+    {
+     "name": "붙임1-1. 2026년 동계방학 집중근로 희망근로지 신청 매뉴얼(홈페이지).pdf",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015402/download.do"
+    },
+    {
+     "name": "붙임1-2. 2026년 동계방학 집중근로 희망근로지 신청 매뉴얼(모바일).pdf",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015403/download.do"
+    },
+    {
+     "name": "붙임2. 2026년 동계방학 집중근로 근로장학생 사전 선정기준(안).pdf",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015404/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "연세대학교 미래캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-04"
+  },
   {
    "title": "[교외]2026학년도 통영시 저소득 대학생 장학금 신청 안내",
    "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/944511/artclView.do",

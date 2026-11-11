@@ -68,7 +68,9 @@ const JS_DOWNLOAD_RULES = [
        호출은 href 가 아니라 onclick 에 있다 — detailAttachments 가 onclick 을 href 자리로 넘긴다 */
     call: /^javascript:\s*fn_download\(\s*'(\d+)'\s*,\s*'(\d+)'/i,
     path: (m) => `/ssm/file/fileDown.do?${new URLSearchParams({ atchFileNo: m[1], fileOrd: m[2] })}` },
-  { host: /(^|\.)dongguk\.edu$/i,
+  /* 경주 WISE 캠퍼스(wise.dongguk.ac.kr)도 같은 함수다 (2026-11-02 · 정식 등록의 javascript: 첨부 6개가 전부 여기였는데 호스트가 dongguk.edu 만이라 null).
+     상세 HTML(servicenotice/detail/520872)의 정의를 열어 보니 한 글자도 같았고, 쿠키 없는 새 요청으로 /cmmn/fileDown.do 에서 HWP 원본(34KB)이 받아졌다 */
+  { host: /(^|\.)dongguk\.edu$|^wise\.dongguk\.ac\.kr$/i,
     /* 정의(공고 상세 HTML): function downGO(file_nm, file_path, file_sys_nm){ location.href="/cmmn/fileDown.do?filename="+encodeURIComponent(file_nm)+"&filepath="+file_path+"&filerealname="+file_sys_nm }
        이름 안의 따옴표는 `\'` 로 적혀 온다(「웰로 \'Wello\' 앱」) — 그래서 인자를 `\'` 를 건너 읽고 되돌린다 */
     call: /^javascript:\s*downGO\(\s*'((?:\\'|[^'])*)'\s*,\s*'([^']+)'\s*,\s*'([^']+)'\s*\)/i,
@@ -93,6 +95,11 @@ const ATTACH_EXT = /\.(hwp|hwpx|doc|docx|pdf|xls|xlsx)(\?|$)/i;
 const JS_NOT_DOWNLOAD = /^javascript:\s*(?:alert|void|;|$)/i;
 /* 화면 틀 글자가 그대로 남은 이름(국민대 `' + fileItem.fileNm + '`) — 스크립트가 채울 자리였다 */
 const TEMPLATE_NAME = /'\s*\+|\+\s*'|fileItem\.|\$\{/;
+/* 내려받기 꼴 주소. `downloadBbsFile.do`(경기대·충북대 selectBbsNttView 게시판 · 2026-11-02)는 `download\.do` 로는 안 걸려 첨부 0건이었다.
+   ⚠️ 맨 `download` 로 넓히지 말 것(리뷰) — `/ko/downloads/`·`/attach/list` 같은 메뉴 링크가 첨부가 되어 상한 8을 먼저 채운다 */
+const DOWNLOAD_URL = /mode=download|download\.do|downloadBbsFile\.do|fileDown|attach|bbs_download/i;
+/* 단추 글자뿐인 링크 — 파일 이름은 바로 앞 요소에 있다(`<span>요강.hwp</span> <a href="downloadBbsFile.do…">다운로드</a>`) · 브라우저 길(rescue-bodies)도 이 낱말을 받는다 */
+export const BUTTON_WORD = /^(?:다운로드|내려받기|파일\s?다운로드|download|첨부\s?파일)$/i;
 
 /** 공고 상세 HTML 에서 첨부 {name, url} — 일반 수집기(collect.mjs fetchDetail)가 쓴다.
     🔴 ① `href="…"` 와 `href='…'` 를 따옴표 짝으로 읽는다 — `[^"']*` 로 읽으면 `javascript:downloadfile(` 에서 끊겼다(22건)
@@ -119,16 +126,41 @@ export function detailAttachments(html, pageUrl, { decode = (s) => s, max = 8 } 
     let name = cleanAttachName(m[5].replace(/<[^>]+>/g, ' '));
     let url = /^javascript:/i.test(raw) ? resolveJsDownload(raw, pageUrl) || raw : null;
     if (!url) { try { url = new URL(raw, pageUrl).href; } catch { continue; } }
-    /* 단추 글자(`다운로드`)뿐이면 파일 이름은 바로 앞 요소에 있다 — 태그를 줄로 바꿔 마지막 파일 이름 줄을 쓴다(지어내지 않는다 · 없으면 그대로) */
-    if (!ATTACH_EXT.test(name) && /^javascript:/i.test(raw) && url !== raw) {
+    /* 단추 글자(`다운로드`)뿐이면 파일 이름은 바로 앞 요소에 있다 — 태그를 줄로 바꿔 마지막 파일 이름 줄을 쓴다(지어내지 않는다 · 없으면 그대로).
+       스크립트 호출(과기정통부)뿐 아니라 보통 내려받기 주소의 단추(경기대·충북대 · 2026-11-02)도 같다 */
+    if (!ATTACH_EXT.test(name) && ((/^javascript:/i.test(raw) && url !== raw) || (BUTTON_WORD.test(name) && DOWNLOAD_URL.test(url)))) {
       const before = src.slice(Math.max(0, m.index - 500), m.index).replace(/<[^>]+>/g, '\n').split('\n').map((s) => s.replace(/\s+/g, ' ').trim());
-      const file = before.reverse().find((s) => ATTACH_EXT.test(s) && s.length <= 120);
-      if (file) name = file;
+      /* 🔴 **바로 앞의 글자 줄 하나**만 본다(리뷰 2026-11-02) — 확장자 있는 줄을 거슬러 찾으면 `<span>포스터.jpg</span><a>다운로드</a>` 의 단추가
+         그 앞 행의 `요강.hwp` 이름을 훔쳐 이름·주소 짝이 지어진다. 앞 줄에 파일 이름이 없으면 그대로(아래서 단추 글자로 버려진다) */
+      const file = before.reverse().find(Boolean);
+      if (file && ATTACH_EXT.test(file) && file.length <= 120) name = file;
     }
-    const isFile = ATTACH_EXT.test(url) || ATTACH_EXT.test(name) || /mode=download|download\.do|fileDown|attach|bbs_download/i.test(url);
+    if (BUTTON_WORD.test(name)) continue;   // 이름을 못 찾은 단추는 첨부가 아니다 — 「다운로드」 라는 이름의 첨부를 만들지 않는다
+    const isFile = ATTACH_EXT.test(url) || ATTACH_EXT.test(name) || DOWNLOAD_URL.test(url);
     if (isFile && name.length >= 4 && name.length <= 120 && !TEMPLATE_NAME.test(name) && !out.has(url)) out.set(url, { name: name.slice(0, 100), url });
   }
   return [...out.values()];
+}
+
+/** 공고 상세 HTML 의 **본문 그림** {name, url, bodyImage} — 재수집 로봇이 봇 차단에 걸려 일반 fetch 로 물러섰을 때 쓴다 (2026-11-02).
+    홍익대는 본문이 editorImage.do 그림 한 장(1080×1920)이고 헤드리스 브라우저는 봇 차단에 걸려 그림을 못 적었다 — 글자는 메뉴뿐이라 '본문 확보'로
+    보이면서 자격은 영영 비었다(성취장학·선원가족). 이름 꼴은 브라우저 길(`본문이미지-WxH`)과 같아 elig-targets 가 같은 규칙으로 고른다.
+    🔴 크기 표식(data-width/height · width/height)이 있는 그림만 — 받아 보기 전엔 로고인지 포스터인지 몰라 지어내지 않는다. */
+export function htmlBodyImages(html, pageUrl, min = 300) {
+  const out = [];
+  const src = String(html || '').replace(/<!--[\s\S]*?-->/g, ' ');
+  for (const m of src.matchAll(/<img\b[^>]*>/gi)) {
+    const attr = (k) => { const a = m[0].match(new RegExp(`(?:^|\\s)${k}\\s*=\\s*"([^"]*)"`, 'i')); return a ? a[1].trim() : ''; };   // `\b` 는 data-width 도 width 로 읽는다(리뷰)
+    const s = attr('src');
+    if (!s || /^data:/i.test(s)) continue;
+    const w = Number(attr('data-width') || attr('width')), h = Number(attr('data-height') || attr('height'));
+    if (!(w >= min && h >= min)) continue;
+    let url;
+    try { url = new URL(s, pageUrl).href; } catch { continue; }
+    const ext = (url.match(/\.(png|jpe?g|gif|webp)(\?|$)/i) || [, 'jpg'])[1];
+    if (!out.some((x) => x.url === url)) out.push({ name: `본문이미지-${w}x${h}.${ext}`, url, bodyImage: true });
+  }
+  return out;
 }
 
 /** 브라우저가 읽은 링크 [{title, url}] → 첨부 {name, url} — 브라우저 수집기의 두 길(상세 방문 · 클릭 수집)이 같이 쓴다.

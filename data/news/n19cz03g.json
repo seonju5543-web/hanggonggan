@@ -1,7 +1,111 @@
 {
  "school": "한국외국어대학교",
- "updatedAt": "2026-10-31",
+ "updatedAt": "2026-11-11",
  "items": [
+  {
+   "title": "교내 건물별 난방 운영기준 안내",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/271371/artclView.do",
+   "postedAt": "2026-11-11",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-11-11",
+   "desc": "가동 시간 난방 가동 요일 (가동:○ / 정지:&times;) 사이버관 교수회관 열람실 제외 사회과학관 동아리실(자치공간 ) 국제학사, 지하복합시설 학 생회관 및 동아리실(자치공간) 교수학습개발원 동아리실(자치공간)"
+  },
+  {
+   "title": "(서울) 2026년도 후반기 학생예비군 기본 3차훈련(안내)",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/271180/artclView.do",
+   "postedAt": "2026-11-09",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-11-09",
+   "desc": "한국외국어대학교 서울캠퍼스 예비군연대입니다. 2026년도 후반기 학생예비군 기본 3차훈련을 다음과 같이 실시하니 대상자는 착오 없이 참석하여 주시기 바랍니다."
+  },
+  {
+   "title": "세미오시스 연구센터, <2026 해외학자 초청강연> 개최 안내",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/271204/artclView.do",
+   "postedAt": "2026-11-09",
+   "kind": "행사",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-11-09"
+  },
+  {
+   "title": "[서울]보건실 - 찾아가는 금연상담 안내",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/271108/artclView.do",
+   "postedAt": "2026-11-09",
+   "kind": "생활",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-11-09",
+   "desc": "2026년도 금연문화 바로 세우기의 일환으로 서울캠퍼스 보건실에서는 [찾아가는 금연 클리닉]을 운영하고자 하오니 많은 관심 및 참여 부탁드립니다."
+  },
+  {
+   "title": "[글로벌] 보건실 - 11월 심폐소생술 교육일정 안내(2026.11.12(목)10시 -백년관 207호강의실)",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/270900/artclView.do",
+   "postedAt": "2026-11-02",
+   "kind": "생활",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-11-08",
+   "desc": "2026년 11월 심폐소생술 교육 일정 안내 글로벌 캠퍼스 보건실에서는 학생들의 응급처치 능력을 향상하고자 응급처치 및 심폐소생술 교육을 진행할 예정으로 많은 관심과 참여 부탁드립니다."
+  },
+  {
+   "title": "2026 로컬 크리에이터 양성 교육 수강생 모집 (모집 연장 ~11.09)",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/270943/artclView.do",
+   "postedAt": "2026-10-26",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-11-08",
+   "desc": "[모집] 2026 한국외대 서울앵커사업단 「로컬 크리에이터 양성 교육」 참가자 모집 지역의 발견이 창업의 시작이 되다!"
+  },
+  {
+   "title": "서울캠퍼스 감염병 예방을 위한 소독 시행 알림",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/270772/artclView.do",
+   "postedAt": "2026-11-04",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-11-08",
+   "desc": "가. 감염병의 예방 및 관리에 관한 법률 제51조(소독의무) 나. 동법 시행령 제24조(소독을 하여야하는 시설)"
+  },
+  {
+   "title": "[서울]보건실-11월 심폐소생술 교육일정 안내",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/270669/artclView.do",
+   "postedAt": "2026-11-03",
+   "kind": "생활",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-11-03",
+   "desc": "서울캠퍼스 보건실에서는 교내 구성원의 응급처치 능력을 향상시키고자 심폐소생술 교육을 실시하오니 많은 관심 및 참여 부탁드립니다."
+  },
+  {
+   "title": "(긴급) Synology NAS 랜섬웨어 감염 주의 및 DSM 보안 업데이트 권고",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/270590/artclView.do",
+   "postedAt": "2026-11-02",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-11-02",
+   "desc": "최근 Synology NAS의 운영체제(DSM) 보안 취약점을 악용한 랜섬웨어 감염 피해가 급증하고 있습니다."
+  },
+  {
+   "title": "[IR센터] HUFS Voice 설문조사 참여 안내 (기프티콘 추첨 지급)",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/270518/artclView.do",
+   "postedAt": "2026-11-02",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/423abdf8d18a1c6c.webp",
+   "desc": "한국외국어대학교는 「2027년 대학혁신지원사업 계획 수립을 위한 수요조사」 와 「AI 리터러시·HUFS 스마트플랫폼 만족도 조사」 를 통합 시행합니다. 재학생 및 교직원 여러분의 많은 관심과 참여 바랍니다."
+  },
   {
    "title": "한국외대 아프리카연구소, 11월 4~6일 HK3.0 컨소시엄 국제학술대회 개최",
    "url": "https://www.hufs.ac.kr/bbs/hufs/2180/270407/artclView.do",
@@ -74,7 +178,6 @@
    "campus": "",
    "src": "54a450a4",
    "foundAt": "2026-10-26",
-   "thumb": "data/news/img/0c4c16beaaf2b24e.webp",
    "desc": "[모집] 2026 한국외대 서울앵커사업단 「로컬 크리에이터 양성 교육」 참가자 모집 지역의 발견이 창업의 시작이 되다!"
   },
   {
@@ -224,139 +327,6 @@
    "foundAt": "2026-10-12",
    "thumb": "data/news/img/3d74647ae18f52c3.webp",
    "desc": "한국외국어대학교 명수당의 아름다운 가을 단풍을 관람하기 위해 방문하시는 분들께 안내드립니다."
-  },
-  {
-   "title": "[행사 안내] 1st Asia-Africa Network International Conference 및 특별 문화 행사(영화",
-   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/268757/artclView.do",
-   "postedAt": "2026-09-28",
-   "kind": "행사",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "thumb": "data/news/img/c4981acf71a9f96a.webp",
-   "desc": "아시아 주요국의 아프리카학 연구자들과 국내 청년 연구자들이 함께 아프리카의 정치·경제·사회·기후변화 및 청년 문제를 다각도로 논의합니다.",
-   "src": "54a450a4"
-  },
-  {
-   "title": "세계문화예술경영연구소 초청강연 안내",
-   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/268645/artclView.do",
-   "postedAt": "2026-10-07",
-   "kind": "행사",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-10-07",
-   "thumb": "data/news/img/74383d6a291987bb.webp",
-   "src": "54a450a4"
-  },
-  {
-   "title": "[(서울)학생상담센터] 유학생 및 이주배경 대학생을 위한 집단상담 안내",
-   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/268501/artclView.do",
-   "postedAt": "2026-09-30",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-10-06",
-   "thumb": "data/news/img/a8f8fc8ef5c833e7.webp",
-   "desc": "안녕하세요. 한국외국어대학교(서울) 학생상담센터입니다. 유학생과 이주배경 대학생을 위한 두 개의 집단상담 프로그램 진행이 예정되어 안내드립니다.",
-   "src": "54a450a4"
-  },
-  {
-   "title": "정치외교학과, 4개 미국 대학원 입학설명회 개최",
-   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/268451/artclView.do",
-   "postedAt": "2026-10-06",
-   "kind": "행사",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-10-06",
-   "thumb": "data/news/img/95342edbd2ee63ad.webp",
-   "desc": "우리 대학 정치외교학과(학과장 김기동)는 오는 11월 16일(월) 오전 10시 30분부터 12시까지 국제회의실에서 미국 주요 4개 대학원 관계자를 초청해 대학원 입학설명회 를 개최합니다.",
-   "src": "54a450a4"
-  },
-  {
-   "title": "인조잔디 운동장 보수 및 유지관리 안내문",
-   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/268399/artclView.do",
-   "postedAt": "2026-10-02",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-10-02",
-   "desc": "나. 작업내용 - 인조잔디 표면 보수 및 지반 처짐구간 보강 - 인조잔디 브러싱 및 주변청소 작업",
-   "src": "54a450a4"
-  },
-  {
-   "title": "[글로벌] 보건실 - 10월 심폐소생술 교육일정 안내(2026.10.8(목)10시 - 백년관 207호 강의실)",
-   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/268064/artclView.do",
-   "postedAt": "2026-09-28",
-   "kind": "생활",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "desc": "2026년 10월 심폐소생술 교육 일정 안내 글로벌 캠퍼스 보건실에서는 학생들의 응급처치 능력을 향상하고자 응급처치 및 심폐소생술 교육을 진행할 예정으로 많은 관심과 참여 부탁드립니다."
-  },
-  {
-   "title": "2026학년도 서울캠퍼스 재학생 대상 법정의무교육 이수 안내",
-   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/267820/artclView.do",
-   "postedAt": "2026-09-28",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "src": "54a450a4"
-  },
-  {
-   "title": "2027학년도 전기 글로벌미디어커뮤니케이션대학원 신입생 모집(특별/일반)",
-   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/266477/artclView.do",
-   "postedAt": "2026-09-08",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "src": "54a450a4",
-   "desc": "한국외국어대학교 글로벌미디어커뮤니케이션대학원 2027 학년도 전기 석사학위과정 신입생 모집(특별/일반)"
-  },
-  {
-   "title": "(서울) 2026년도 후반기 학생예비군 기본 2차훈련(안내)",
-   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/268279/artclView.do",
-   "postedAt": "2026-10-01",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "desc": "한국외국어대학교 서울캠퍼스 예비군연대입니다. 2026년도 후반기 학생예비군 기본 2차훈련을 다음과 같이 실시하니 대상자는 착오 없이 참석하여 주시기 바랍니다.",
-   "src": "54a450a4"
-  },
-  {
-   "title": "[사업지원처]2026년 의료통역예비과정(인니어.스페인어) 교육안내",
-   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/268138/artclView.do",
-   "postedAt": "2026-09-30",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "thumb": "data/news/img/4a6127433de76216.webp",
-   "src": "54a450a4"
-  },
-  {
-   "title": "[서울]보건실 - 10월 심폐소생술 교육일정 안내",
-   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/268105/artclView.do",
-   "postedAt": "2026-09-30",
-   "kind": "생활",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "src": "54a450a4",
-   "desc": "서울캠퍼스 보건실에서는 교내 구성원의 응급처치 능력을 향상시키고자 심폐소생술 교육을 실시하오니 많은 관심 및 참여 부탁드립니다."
-  },
-  {
-   "title": "[G-앵커사업단] 2026 랜선으로 만나는 릴레이 글로벌 취·창업 톡톡톡(talk)",
-   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/267648/artclView.do",
-   "postedAt": "2026-09-23",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "desc": "한국외국어대학교 G-앵커사업단에서는 아주대학교와 함께 글로벌 취업·창업·인턴십을 꿈꾸는 재학생을 위한 「2026 랜선으로 만나는 릴레이 글로벌 취·창업 톡톡톡(talk)」을 진행합니다."
-  },
-  {
-   "title": "교원 인사발령",
-   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/267596/artclView.do",
-   "postedAt": "2026-09-22",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-10-01"
   }
  ]
 }

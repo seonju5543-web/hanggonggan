@@ -44,7 +44,7 @@ import { stepsOf } from './ci.mjs';
 import { actionBeforeCheckout, codeOf, softEq } from './alerts.mjs';
 import { verdict as pushVerdict, slotTime } from '../../tools/push-health-verdict.mjs';
 import { stamp as buildStamp, bundleFiles } from '../../tools/push-build-stamp.mjs';
-import { readSupabaseConfig, verdict as sbVerdict, probe as sbProbe, run as sbRun } from '../../tools/supabase-health.mjs';
+import { readSupabaseConfig, verdict as sbVerdict, probe as sbProbe, run as sbRun, readErrorReport as sbErrOn, tableVerdict as sbTable } from '../../tools/supabase-health.mjs';
 
 const require = createRequire(import.meta.url);
 
@@ -589,6 +589,14 @@ export default async function gate(eq, ctx) {
       eq('  명령줄 본체 — 정상 설정은 묻고(ok · 0) · 빈 설정은 off(0) · 못 읽는 설정은 판정 없이 실패(1 — off 로 두면 워크플로가 경보를 닫는다)',
         await Promise.all([SB_GOOD, SB_EMPTY, SB_BROKEN[0]].map(async (src) => (({ verdict, exit }) => [verdict, exit])(await sbRun(src, { probeImpl: stub })))),
         [['ok', 0], ['off', 0], [null, 1]]);
+      /* 앱 오류 수집 창구(2026-11-10) — 스위치를 켰으면 표가 있는지도 본다 · 끈 설정은 표를 묻지 않는다 */
+      const SB_ERR = SB_GOOD.replace("providers: []", "providers: [], errorReport: true");
+      const tbl = (code) => async () => ({ ok: true, code });
+      eq('  ⑨ 오류 수집 표 — 켠 설정에서 표가 없으면(404) misconfig + 0005 실행 안내 · 있으면(200) ok · 끈 설정은 표를 안 묻는다(표 없어도 ok) · 스위치 읽기',
+        [(await sbRun(SB_ERR, { probeImpl: stub, tableImpl: tbl(404) })).verdict, /0005_client_errors\.sql/.test((await sbRun(SB_ERR, { probeImpl: stub, tableImpl: tbl(404) })).why),
+          (await sbRun(SB_ERR, { probeImpl: stub, tableImpl: tbl(200) })).verdict, (await sbRun(SB_GOOD, { probeImpl: stub, tableImpl: tbl(404) })).verdict,
+          sbErrOn(SB_ERR), sbErrOn(SB_GOOD), sbErrOn('const SUPABASE_CONFIG = {'), sbTable({ ok: false }).verdict],
+        ['misconfig', true, 'ok', 'ok', true, false, false, 'down']);
       const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'sb-health-'));
       try {
         const cli = (text) => {

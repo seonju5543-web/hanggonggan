@@ -1,0 +1,35 @@
+# 부품 판 올림 제안 — Dependabot (2026-11-11 · 은서 · 출시 전 백엔드 10번)
+#   · 한 달에 한 번, 종류마다 **묶어서 PR 하나**로 제안한다(하나씩 열면 PR 이 수십 개). 합치는 것은 사람(또는 Claude 세션이 관문을 돌린 뒤)이다 — 저절로 합쳐지지 않는다.
+#   · 보안 구멍이 알려진 부품은 이 일정과 상관없이 즉시 PR 이 온다(저장소 설정의 Dependabot security updates 스위치가 켜져 있을 때).
+#   · 🔴 PR 이 와도 검사는 기본 브랜치·main 에 들어간 뒤에야 돈다(verify-ui 는 PR 에서 돌지 않는다) — 합치기 전에 Claude 세션에서
+#     DOC_GATES=1 node verify/test-collector.mjs · node verify/health-gates.mjs 를 돌린다. 사용법: docs/backend/보안-점검.md
+#   관문: verify/health-gates/ops.mjs 「⑦ 보안 자동 점검」
+version: 2
+updates:
+  - package-ecosystem: github-actions        # 워크플로가 쓰는 actions/checkout 등
+    directory: /
+    target-branch: claude/nice-heisenberg-WESq5
+    schedule:
+      interval: monthly
+      time: '10:17'
+      timezone: Asia/Seoul
+    open-pull-requests-limit: 2
+    groups:
+      actions:
+        patterns: ['*']
+    commit-message:
+      prefix: '부품 판 올림(actions)'
+
+  - package-ecosystem: npm                   # 푸시 서버 배포 도구(wrangler)
+    directory: /server/push
+    target-branch: claude/nice-heisenberg-WESq5
+    schedule:
+      interval: monthly
+      time: '10:19'
+      timezone: Asia/Seoul
+    open-pull-requests-limit: 2
+    groups:
+      push-server:
+        patterns: ['*']
+    commit-message:
+      prefix: '부품 판 올림(push 서버)'

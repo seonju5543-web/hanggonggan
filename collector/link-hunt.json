@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-10-31",
+ "updatedAt": "2026-11-11",
  "items": {
   "r:auto-082f26ec8898eab98ceca780": {
    "attempts": 0,
@@ -151,51 +151,6 @@
    "status": "resolved",
    "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30196&pageNo=1"
   },
-  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-%EA%B3%B5%EC%A7%80%20%EA%B3%B5%EC%A7%80%20(%EC%9D%80%ED%8F%89)%EC%82%BC%EC%B2%9C%EC%82%AC%20%EC%A7%80%EC%97%AD%EB%AF%B8%EB%9E%98%EB%B6%88%EC%9E%90%EC%9C%A1%EC%84%B1%EC%9E%A5%ED%95%99%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%202026.": {
-   "attempts": 3,
-   "title": "공지 공지 (은평)삼천사 지역미래불자육성장학 장학생 선발 안내 2026.09.02. 조회 2614",
-   "lastTried": "2026-10-02",
-   "lastWhy": "본문이 안 그려짐(판정 불가 — 다음에 다시 봅니다)",
-   "nextTryAt": "2026-10-05",
-   "status": "",
-   "escalated": true
-  },
-  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2719%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%ED%8C%8C%EC%95%88%EC%9E%A5%ED%95%99%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%202026.09.17.%20%EC%A1%B0%ED%9A%8C": {
-   "attempts": 3,
-   "title": "2719 2026년 2학기 파안장학 선발 안내 2026.09.17. 조회 1130",
-   "lastTried": "2026-10-02",
-   "lastWhy": "HTTP 404",
-   "nextTryAt": "2026-10-05",
-   "status": "",
-   "escalated": true
-  },
-  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2718%202026%EB%85%84%20%EA%B3%A0%EC%86%8D%EB%8F%84%EB%A1%9C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%202026.09.17.%20%EC%A1%B0%ED%9A%8C": {
-   "attempts": 3,
-   "title": "2718 2026년 고속도로 장학생 선발 안내 2026.09.17. 조회 954",
-   "lastTried": "2026-10-02",
-   "lastWhy": "HTTP 404",
-   "nextTryAt": "2026-10-05",
-   "status": "",
-   "escalated": true
-  },
-  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2717%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%EB%8F%99%EC%82%B0%EC%9E%A5%ED%95%99%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%202026.09.17.%20%EC%A1%B0%ED%9A%8C": {
-   "attempts": 3,
-   "title": "2717 2026년 2학기 동산장학 선발 안내 2026.09.17. 조회 936",
-   "lastTried": "2026-10-02",
-   "lastWhy": "HTTP 404",
-   "nextTryAt": "2026-10-05",
-   "status": "",
-   "escalated": true
-  },
-  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2716%20%5B%ED%99%8D%EB%B3%B4%5D%202026%20%ED%95%98%EB%B0%98%EA%B8%B0%20AI%C2%B7ICT%20%EC%9D%B8%EC%9E%AC%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4%202": {
-   "attempts": 3,
-   "title": "2716 [홍보] 2026 하반기 AI·ICT 인재 장학생 모집 안내 2026.09.16. 조회 697",
-   "lastTried": "2026-10-02",
-   "lastWhy": "HTTP 404",
-   "nextTryAt": "2026-10-05",
-   "status": "",
-   "escalated": true
-  },
   "r:auto-ec9588eb82b4202026091720": {
    "attempts": 0,
    "title": "2026-2학기 동국리더장학 신청 안내",
@@ -219,166 +174,6 @@
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://www.dongguk.edu/article/JANGHAKNOTICE/detail/26766256"
-  },
-  "n:https://nano.pknu.ac.kr/nano/2432#n-2026%ED%95%99%EB%85%84%EB%8F%84%20%EA%B3%B5%EA%B3%BC%EB%8C%80%ED%95%99%EC%83%9D%20%EC%96%B4%ED%95%99%2F%EC%A0%84%EA%B3%B5%20%EC%9E%90%EA%B2%A9%EC%A6%9D%20%EC%B7%A8%EB%93%9D%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%A7%80%EC%9B%90(PKNU-%EA%BF%88": {
-   "attempts": 3,
-   "title": "2026학년도 공과대학생 어학/전공 자격증 취득 장학금 지원(PKNU-꿈·미래) 신청 안내",
-   "lastTried": "2026-10-02",
-   "lastWhy": "로그인 요구(학생이 못 봄)",
-   "nextTryAt": "2026-10-05",
-   "status": "",
-   "escalated": true
-  },
-  "n:https://www.yonsei.ac.kr/bbs/sc/58/artclList.do?findClSeq=257#n-%EC%9D%BC%EB%B0%98%EA%B3%B5%EC%A7%80%2010%2F2(%EA%B8%88)%20%EA%B5%90%EC%99%B8%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%A0%9C%EC%B6%9C%EC%9A%A9%20%EC%B4%9D%EC%9E%A5%20%EC%A7%81%EC%9D%B8%20%EB%82%A0%EC%9D%B8%20%EB%B6%88%EA%B0%80%20%EC%95%88%EB%82%B4%20%EC%8B%A0": {
-   "attempts": 3,
-   "title": "일반공지 10/2(금) 교외장학재단 제출용 총장 직인 날인 불가 안내 신촌/국제 조회수64 작성일2026.09.30 학생지원팀",
-   "lastTried": "2026-10-02",
-   "lastWhy": "HTTP 404",
-   "nextTryAt": "2026-10-05",
-   "status": "",
-   "escalated": true
-  },
-  "n:https://www.jbnu.ac.kr/web/news/notice/sub01.do?category=6#n-2026%EB%85%84%EB%8F%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20(%EC%9E%AC)%EB%85%BC%EC%82%B0%EC%8B%9C%EC%9E%A5%ED%95%99%ED%9A%8C%20%ED%95%99%EC%97%85%EC%9E%A5%EB%A0%A4%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4": {
-   "attempts": 3,
-   "title": "2026년도 하반기 (재)논산시장학회 학업장려 장학생 선발 안내",
-   "lastTried": "2026-10-03",
-   "lastWhy": "로그인 요구(학생이 못 봄)",
-   "nextTryAt": "2026-10-06",
-   "status": "",
-   "escalated": true
-  },
-  "n:https://www.jbnu.ac.kr/web/news/notice/sub01.do?category=6#n-2026%EB%85%84%20%EC%A0%84%EB%B6%81%ED%8A%B9%EB%B3%84%EC%9E%90%EC%B9%98%EB%8F%84%20%ED%86%A0%EB%B0%95%EC%9D%B4%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4": {
-   "attempts": 3,
-   "title": "2026년 전북특별자치도 토박이장학생 선발 안내",
-   "lastTried": "2026-10-03",
-   "lastWhy": "로그인 요구(학생이 못 봄)",
-   "nextTryAt": "2026-10-06",
-   "status": "",
-   "escalated": true
-  },
-  "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%20%EC%A0%9C36%EA%B8%B0%20%EB%AF%B8%EB%9E%98%EC%97%90%EC%85%8B%20%ED%95%B4%EC%99%B8%EA%B5%90%ED%99%98%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C": {
-   "attempts": 0,
-   "title": "공통 제36기 미래에셋 해외교환 장학생 선발",
-   "lastTried": "2026-10-01",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322953"
-  },
-  "n:https://www.uos.ac.kr/korNotice/list.do?list_id=FA1#n-%EA%B2%BD%EC%98%81%EA%B2%BD%EC%A0%9C%EC%A0%84%EB%AC%B8%EB%8F%84%EC%84%9C%EA%B4%80%20%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%B6%94%EA%B0%80%20%EB%AA%A8%EC%A7%91": {
-   "attempts": 0,
-   "title": "경영경제전문도서관 국가근로장학생 추가 모집",
-   "lastTried": "2026-10-01",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31569&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&"
-  },
-  "n:https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-2026-2%ED%95%99%EA%B8%B0%20%EA%B3%A0%EC%A1%B8%20%ED%9B%84%ED%95%99%EC%8A%B5%EC%9E%90%20%EC%9E%A5%ED%95%99%EC%82%AC%EC%97%85(%ED%9D%AC%EB%A7%9D%EC%82%AC%EB%8B%A4%EB%A6%AC%20II%EC%9C%A0%ED%98%95)%20%EC%8B%A0%EA%B7%9C%EC%9E%A5%ED%95%99%EC%83%9D%20": {
-   "attempts": 0,
-   "title": "2026-2학기 고졸 후학습자 장학사업(희망사다리 II유형) 신규장학생 선발(신청) 안내",
-   "lastTried": "2026-10-01",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30129&pageNo=1"
-  },
-  "n:https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-%5B%ED%95%9C%EA%B5%AD%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%5D%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%ED%91%B8%EB%A5%B8%EB%93%B1%EB%8C%80%20%EA%B8%B0%EB%B6%80%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EA%B7%9C%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88": {
-   "attempts": 0,
-   "title": "[한국장학재단] 2026년 2학기 푸른등대 기부장학금 신규장학생 선발 안내",
-   "lastTried": "2026-10-01",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30125&pageNo=1"
-  },
-  "n:https://www.kookmin.ac.kr/user/kmuNews/notice/7/index.do#n-%EB%93%B1%EB%A1%9D%EA%B8%88%EC%A7%80%EC%9B%90%2B%EB%93%B1%EB%A1%9D%EA%B8%88%EC%99%B8%EC%A7%80%EC%9B%90%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%EC%A4%91%EC%86%8C%EA%B8%B0%EC%97%85%20%EC%B7%A8%EC%97%85%EC%97%B0%EA%B3%84%20%EC%9E%A5%ED%95%99%EC%82%AC%EC%97%85(%ED%9D%AC%EB%A7%9D": {
-   "attempts": 0,
-   "title": "등록금지원+등록금외지원 2026년 2학기 중소기업 취업연계 장학사업(희망사다리Ⅰ유형, 취업지원형) 신규장학생 모집(~9/18 18:00까지) 2",
-   "lastTried": "2026-10-06",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-06",
-   "status": "resolved",
-   "resolvedUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12307/view.do?currentPageNo=2"
-  },
-  "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%20%5B%EA%B3%B5%ED%86%B5%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EA%B2%BD%ED%9D%AC%EB%AA%A9%EB%A0%A8%EC%9E%A5%ED%95%99%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4_10.02(%EA%B8%88": {
-   "attempts": 0,
-   "title": "공통 [공통] 2026학년도 2학기 경희목련장학 신청 안내_10.02(금)~10.25(일)",
-   "lastTried": "2026-10-01",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323225"
-  },
-  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2726%20%5B%ED%99%8D%EB%B3%B4%5D%202027%EB%85%84%EB%8F%84%20%EB%8C%80%EC%82%B0%EB%86%8D%EC%B4%8C%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%202026.1": {
-   "attempts": 3,
-   "title": "2726 [홍보] 2027년도 대산농촌재단 장학생 선발 안내 2026.10.01. 조회 44",
-   "lastTried": "2026-10-03",
-   "lastWhy": "HTTP 404",
-   "nextTryAt": "2026-10-06",
-   "status": "",
-   "escalated": true
-  },
-  "n:https://www.dongguk.edu/article/JANGHAKNOTICE/list#n-2725%20%5B%ED%99%8D%EB%B3%B4%5D%20%EC%9A%B0%EC%96%91%EC%9E%AC%EB%8B%A8%202026%EB%85%84%20%EB%8F%99%ED%96%89%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4%202026.1": {
-   "attempts": 3,
-   "title": "2725 [홍보] 우양재단 2026년 동행 장학생 모집 안내 2026.10.01. 조회 131",
-   "lastTried": "2026-10-03",
-   "lastWhy": "HTTP 404",
-   "nextTryAt": "2026-10-06",
-   "status": "",
-   "escalated": true
-  },
-  "n:https://www.skku.edu/skku/campus/skk_comm/notice06.do#n-2026%EB%85%84%202%ED%95%99%EA%B8%B0%20%EC%86%A1%ED%99%94%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4(~2026.10.07%20%EC%98%A4%ED%9B%84%20": {
-   "attempts": 3,
-   "title": "2026년 2학기 송화재단 장학생 선발 안내(~2026.10.07 오후 1시까지)",
-   "lastTried": "2026-10-03",
-   "lastWhy": "제목 불일치(다른 글이 열림)",
-   "nextTryAt": "2026-10-06",
-   "status": "",
-   "escalated": true
-  },
-  "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EA%B3%B5%ED%86%B5%5D%20%E2%94%94%20RE%3A(%EC%83%9D%ED%99%9C%EB%B9%84)2027%ED%95%99%EB%85%84%EB%8F%84%20(%EC%9E%AC)%EB%AF%B8%EB%9E%98%EC%9D%B8%EC%9E%AC%EC%9C%A1%EC%84%B1%EC%9E%AC%EB%8B%A8%20%EC%8B%A0%EA%B7%9C%EC%9E%A5%ED%95%99%EC%83%9D": {
-   "attempts": 3,
-   "title": "[공통] └ RE:(생활비)2027학년도 (재)미래인재육성재단 신규장학생 선발결과 안내 N",
-   "lastTried": "2026-10-03",
-   "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-10-06",
-   "status": "",
-   "escalated": true,
-   "likelyGone": true
-  },
-  "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EA%B3%B5%ED%86%B5%5D%20%E2%94%94%20RE%3A(%EC%83%9D%ED%99%9C%EB%B9%84)2026-2%ED%95%99%EA%B8%B0%20(%EC%A3%BC)%EC%95%84%EC%9D%B4%EC%98%A4%EC%95%8C%EC%BD%94%EB%A6%AC%EC%95%84%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0": {
-   "attempts": 3,
-   "title": "[공통] └ RE:(생활비)2026-2학기 (주)아이오알코리아 장학생 선발결과 안내 N",
-   "lastTried": "2026-10-03",
-   "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-10-06",
-   "status": "",
-   "escalated": true,
-   "likelyGone": true
-  },
-  "n:https://kau.ac.kr/kaulife/scholnoti.php#n-2026%EB%85%84%202%ED%95%99%EA%B8%B0%20%EC%B2%AD%EB%85%84%EC%B0%BD%EC%97%85%EB%86%8D%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4%20%ED%95%99%EC%83%9D%EC%A7%80%EC%9B%90%ED%8C%80%202026-05-2": {
-   "attempts": 3,
-   "title": "2026년 2학기 청년창업농장학금 신청 안내 학생지원팀 2026-05-22 658",
-   "lastTried": "2026-10-03",
-   "lastWhy": "제목 불일치(다른 글이 열림)",
-   "nextTryAt": "2026-10-06",
-   "status": "",
-   "escalated": true
-  },
-  "n:https://kau.ac.kr/kaulife/scholnoti.php#n-2026%ED%95%99%EB%85%84%EB%8F%84%20%EC%82%B0%ED%95%99%ED%98%91%EB%8F%99%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%20%ED%95%99%EC%83%9D%EC%A7%80%EC%9B%90%ED%8C%80%202026-05-1": {
-   "attempts": 3,
-   "title": "2026학년도 산학협동재단 장학생 선발 안내 학생지원팀 2026-05-19 738",
-   "lastTried": "2026-10-03",
-   "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-10-06",
-   "status": "",
-   "escalated": true,
-   "likelyGone": true
-  },
-  "n:https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073&pageUnit=10&sf.pnos=1073&sf.pnos=888&searchCnd=WRTER&searchKrwd=%EC%9E%A5%ED%95%99#n-%5B%EC%9E%85%ED%95%99%EC%97%90%EC%84%9C%20%EC%B7%A8%EC%97%85%EA%B9%8C%EC%A7%80%5D%20%5B%EB%8C%80%EC%A0%84%EC%B2%AD%EB%85%84%EB%82%B4%EC%9D%BC%EC%9E%AC%EB%8B%A8%5D%202026%EB%85%84%20%EC%84%B1%EC%B7%A8(%EB%8C%80)%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0": {
-   "attempts": 3,
-   "title": "[입학에서 취업까지] [대전청년내일재단] 2026년 성취(대) 장학생 선발 안내 ( ~ 2026.10.08.(목) 17:00)",
-   "lastTried": "2026-10-03",
-   "lastWhy": "제목 불일치(다른 글이 열림)",
-   "nextTryAt": "2026-10-06",
-   "status": "",
-   "escalated": true
   },
   "r:auto-2026100720ec98a4ed9b8420": {
    "attempts": 3,
@@ -414,49 +209,6 @@
    "nextTryAt": "2026-10-04",
    "status": "resolved",
    "resolvedUrl": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NTYlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D"
-  },
-  "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%20%E3%80%8C2027%EB%85%84%EB%8F%84%20%EB%8C%80%EC%82%B0%EC%9E%A5%ED%95%99%EC%83%9D%E3%80%8D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4": {
-   "attempts": 0,
-   "title": "공통 「2027년도 대산장학생」 선발 안내",
-   "lastTried": "2026-10-02",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323231"
-  },
-  "n:https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-2026%ED%95%99%EB%85%84%EB%8F%84%20AX%EB%AF%B8%EB%9E%98%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B2%B0%EA%B3%BC%20%EA%B3%B5%EA%B3%A0": {
-   "attempts": 0,
-   "title": "2026학년도 AX미래장학금 장학생 선발 결과 공고",
-   "lastTried": "2026-10-02",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30223&pageNo=1"
-  },
-  "n:https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073&pageUnit=10&sf.pnos=1073&sf.pnos=888&searchCnd=WRTER&searchKrwd=%EC%9E%A5%ED%95%99#n-%5B%EC%9E%85%ED%95%99%EC%97%90%EC%84%9C%20%EC%B7%A8%EC%97%85%EA%B9%8C%EC%A7%80%5D%20%5B%EB%8C%80%EC%82%B0%EB%86%8D%EC%B4%8C%EC%9E%AC%EB%8B%A8%5D%202027%EB%85%84%EB%8F%84%20%EB%8C%80%EC%82%B0%EB%86%8D%EC%B4%8C%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0": {
-   "attempts": 0,
-   "title": "[입학에서 취업까지] [대산농촌재단] 2027년도 대산농촌재단 장학생 선발 안내(~2026.11.11.(수))",
-   "lastTried": "2026-10-04",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do;jsessionid=369F3939369AECB846B945E2D38E1967?key=7520&bbsNo=1073&nttNo=626377&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888"
-  },
-  "n:https://www.kyonggi.ac.kr/www/selectBbsNttList.do?key=7520&bbsNo=1073&pageUnit=10&sf.pnos=1073&sf.pnos=888&searchCnd=WRTER&searchKrwd=%EC%9E%A5%ED%95%99#n-%5B%EC%9E%85%ED%95%99%EC%97%90%EC%84%9C%20%EC%B7%A8%EC%97%85%EA%B9%8C%EC%A7%80%5D%20%5B%EC%9A%B0%EC%96%91%EC%9E%AC%EB%8B%A8%5D%202026%EB%85%84%20%EC%9A%B0%EC%96%91%EC%9E%AC%EB%8B%A8%20%EB%8F%99%ED%96%89%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20": {
-   "attempts": 0,
-   "title": "[입학에서 취업까지] [우양재단] 2026년 우양재단 동행 장학생 모집 안내(~2026.10.18.(일))",
-   "lastTried": "2026-10-04",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626375&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888"
-  },
-  "n:https://www.jbnu.ac.kr/web/news/notice/sub01.do?category=6#n-(%EC%9E%AC)hy%EC%82%AC%ED%9A%8C%EB%B3%B5%EC%9E%AC%EB%8B%A8%202026%EB%85%84%20%EB%93%A0%EB%93%A0%20%ED%95%99%EC%97%85%EC%A7%80%EC%9B%90%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4": {
-   "attempts": 0,
-   "title": "(재)hy사회복재단 2026년 든든 학업지원 장학생 선발 안내",
-   "lastTried": "2026-10-04",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.jbnu.ac.kr/web/Board/218051/detailView.do?pageIndex=1&category=6&menu=2377"
   },
   "r:auto-o2432actionviewno9994682": {
    "lastWhy": "로그인 요구(학생이 못 봄)",
@@ -511,69 +263,6 @@
    "resolvedUrl": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjMlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
    "attempts": 0
   },
-  "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80%5D%202026%EB%85%84%20%EC%9A%B0%EC%96%91%EC%9E%AC%EB%8B%A8%20%EB%8F%99%ED%96%89%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4(%EA%B0%80%EC%A1%B1%20%EB%8F%8C%EB%B4%84%20%EC%B2%AD%EB%85%84%20": {
-   "attempts": 0,
-   "title": "[장학공지] 2026년 우양재단 동행 장학생 모집 안내(가족 돌봄 청년 대상)",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.gachon.ac.kr/bbs/kor/478/125843/artclView.do"
-  },
-  "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80%5D%202027%EB%85%84%EB%8F%84%20%EB%8C%80%EC%82%B0%EB%86%8D%EC%B4%8C%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4": {
-   "attempts": 0,
-   "title": "[장학공지] 2027년도 대산농촌재단 장학생 선발 안내",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.gachon.ac.kr/bbs/kor/478/125842/artclView.do"
-  },
-  "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80%5D%20RE%3A(%EC%83%9D%ED%99%9C%EB%B9%84)2026-2%ED%95%99%EA%B8%B0%20(%EC%A3%BC)%EC%95%84%EC%9D%B4%EC%98%A4%EC%95%8C%EC%BD%94%EB%A6%AC%EC%95%84%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0": {
-   "attempts": 0,
-   "title": "[장학공지] RE:(생활비)2026-2학기 (주)아이오알코리아 장학생 선발결과 안내",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.gachon.ac.kr/bbs/kor/478/125811/artclView.do"
-  },
-  "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80%5D%20RE%3A(%EC%83%9D%ED%99%9C%EB%B9%84)2027%ED%95%99%EB%85%84%EB%8F%84%20(%EC%9E%AC)%EB%AF%B8%EB%9E%98%EC%9D%B8%EC%9E%AC%EC%9C%A1%EC%84%B1%EC%9E%AC%EB%8B%A8%20%EC%8B%A0%EA%B7%9C%EC%9E%A5%ED%95%99%EC%83%9D": {
-   "attempts": 0,
-   "title": "[장학공지] RE:(생활비)2027학년도 (재)미래인재육성재단 신규장학생 선발결과 안내",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.gachon.ac.kr/bbs/kor/478/125809/artclView.do"
-  },
-  "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80%5D%20(%EA%B8%B4%EA%B8%89-%EC%83%9D%ED%99%9C%EB%B9%84)2026-2%ED%95%99%EA%B8%B0%20(%EC%9E%AC)%ED%9A%A8%EB%A6%BC%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%B6%94%EA%B0%80": {
-   "attempts": 0,
-   "title": "[장학공지] (긴급-생활비)2026-2학기 (재)효림장학재단 장학생 추가 선발 안내(화공생명, 바이오, 식품생명, 생명과학, 화학, 약학, 바이",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.gachon.ac.kr/bbs/kor/478/125845/artclView.do"
-  },
-  "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80%5D%20(%EC%83%9D%ED%99%9C%EB%B9%84)2026%EB%85%84%20hy%EC%82%AC%ED%9A%8C%EB%B3%B5%EC%A7%80%EC%9E%AC%EB%8B%A8%20%EB%93%A0%EB%93%A0%20%ED%95%99%EC%97%85%EC%A7%80%EC%9B%90%EA%B8%88%20%EC%84%A0%EB%B0%9C%20%EA%B3%B5": {
-   "attempts": 0,
-   "title": "[장학공지] (생활비)2026년 hy사회복지재단 든든 학업지원금 선발 공고",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.gachon.ac.kr/bbs/kor/478/125837/artclView.do"
-  },
-  "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%ED%95%98%EB%82%98%EA%B8%88%EC%9C%B5%EB%82%98%EB%88%94%EC%9E%AC%EB%8B%A8%20%ED%95%98%EB%82%98%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4": {
-   "attempts": 0,
-   "title": "[장학공지] 2026학년도 2학기 하나금융나눔재단 하나장학생 선발 안내",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.gachon.ac.kr/bbs/kor/478/125712/artclView.do"
-  },
   "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD-%EB%B9%84%EA%B5%90%EA%B3%BC%5D%20%5BArTechne%5D%202026%20%EB%B9%84%EA%B5%90%EA%B3%BC%20%EB%A7%88%EC%9D%BC%EB%A6%AC%EC%A7%80%20%EC%9E%A5%ED%95%99%EC%A0%9C%EB%8F%84": {
    "attempts": 5,
    "title": "[공지사항-비교과] [ArTechne] 2026 비교과 마일리지 장학제도 안내",
@@ -582,327 +271,6 @@
    "nextTryAt": "2026-10-29",
    "status": "",
    "escalated": true
-  },
-  "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80%5D%20(%EC%83%9D%ED%99%9C%EB%B9%84)2026%EB%85%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20%EB%8C%80%EC%A0%84%EC%B2%AD%EB%85%84%EB%82%B4%EC%9D%BC%EC%9E%AC%EB%8B%A8%20%EC%9D%B8%EC%9E%AC%EC%9C%A1%EC%84%B1%20%EC%84%B1%EC%B7%A8%20%EC%9E%A5": {
-   "attempts": 0,
-   "title": "[장학공지] (생활비)2026년 하반기 대전청년내일재단 인재육성 성취 장학생 선발 연장 안내",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.gachon.ac.kr/bbs/kor/478/125659/artclView.do"
-  },
-  "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80%5D%20(%EC%83%9D%ED%99%9C%EB%B9%84)2026%EB%85%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20(%EC%9E%AC)%EB%85%BC%EC%82%B0%EC%8B%9C%EC%9E%A5%ED%95%99%ED%9A%8C%20%ED%95%99%EC%97%85%EC%9E%A5%EB%A0%A4%20%EC%9E%A5%ED%95%99%EC%83%9D": {
-   "attempts": 0,
-   "title": "[장학공지] (생활비)2026년 하반기 (재)논산시장학회 학업장려 장학생 선발계획 안내",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.gachon.ac.kr/bbs/kor/478/125614/artclView.do"
-  },
-  "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80%5D%20(%EA%B8%B4%EA%B8%89-%EC%83%9D%ED%99%9C%EB%B9%84)2026-2%ED%95%99%EA%B8%B0%20(%EC%9E%AC)%ED%9A%A8%EB%A6%BC%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C": {
-   "attempts": 0,
-   "title": "[장학공지] (긴급-생활비)2026-2학기 (재)효림장학재단 장학생 선발 안내(공과,바이오나노,약학대학)",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.gachon.ac.kr/bbs/kor/478/125531/artclView.do"
-  },
-  "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80%5D%202026%EB%85%84%EB%8F%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20%EC%B6%98%EC%B2%9C%EC%9D%B8%EC%9E%AC%EC%9C%A1%EC%84%B1%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EB%B4%84%EB%82%B4%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4": {
-   "attempts": 0,
-   "title": "[장학공지] 2026년도 하반기 춘천인재육성장학재단 봄내장학생 선발 안내",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.gachon.ac.kr/bbs/kor/478/125417/artclView.do"
-  },
-  "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80%5D%202026-2%ED%95%99%EA%B8%B0%20%EC%99%B8%EA%B5%AD%EC%9D%B8%20%EC%9C%A0%ED%95%99%EC%83%9D%20%EB%8B%A4%EC%9E%90%EB%85%80%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4": {
-   "attempts": 0,
-   "title": "[장학공지] 2026-2학기 외국인 유학생 다자녀장학금 신청 안내",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.gachon.ac.kr/bbs/kor/478/125413/artclView.do"
-  },
-  "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80%5D%202026%EB%85%84%EB%8F%84%20%EB%8C%80%ED%95%9C%EC%82%B0%EC%97%85%EB%B3%B4%EA%B1%B4%ED%98%91%ED%9A%8C%20%E3%80%8C%EC%82%B0%EC%9E%AC%20%EB%85%B8%EB%8F%99%EC%9E%90%20%EC%9E%90%EB%85%80%20%EC%84%B1%EC%9E%A5%EC%A7%80%EC%9B%90%EC%82%AC%EC%97%85": {
-   "attempts": 0,
-   "title": "[장학공지] 2026년도 대한산업보건협회 「산재 노동자 자녀 성장지원사업」 안내",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.gachon.ac.kr/bbs/kor/478/125394/artclView.do"
-  },
-  "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80%5D%202027%20%EB%8F%85%EC%9D%BC%20%EC%A0%95%EB%B6%80%EC%B4%88%EC%B2%AD(DAAD)%20%EC%84%AC%EB%A8%B8%EC%BD%94%EC%8A%A4%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4": {
-   "attempts": 0,
-   "title": "[장학공지] 2027 독일 정부초청(DAAD) 섬머코스 장학생 선발 안내",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.gachon.ac.kr/bbs/kor/478/125365/artclView.do"
-  },
-  "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80%5D%20%EB%91%90%EC%9D%84%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%A0%9C29%EA%B8%B0%20%EB%91%90%EC%9D%84%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4(1%ED%95%99%EB%85%84%202%ED%95%99%EA%B8%B0%20%EC%9E%AC": {
-   "attempts": 0,
-   "title": "[장학공지] 두을장학재단 제29기 두을장학생 선발 안내(1학년 2학기 재학중인 여자 대학생)",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.gachon.ac.kr/bbs/kor/478/125214/artclView.do"
-  },
-  "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80%5D%20(%EC%83%9D%ED%99%9C%EB%B9%84)2026%EB%85%84%20%EA%B3%A0%EC%86%8D%EB%8F%84%EB%A1%9C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4": {
-   "attempts": 0,
-   "title": "[장학공지] (생활비)2026년 고속도로 장학생 선발 안내",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.gachon.ac.kr/bbs/kor/478/125311/artclView.do"
-  },
-  "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80%5D%20(%EC%83%9D%ED%99%9C%EB%B9%84)2027%ED%95%99%EB%85%84%EB%8F%84%20(%EC%9E%AC)%EB%AF%B8%EB%9E%98%EC%9D%B8%EC%9E%AC%EC%9C%A1%EC%84%B1%EC%9E%AC%EB%8B%A8%20%EC%8B%A0%EA%B7%9C%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C": {
-   "attempts": 0,
-   "title": "[장학공지] (생활비)2027학년도 (재)미래인재육성재단 신규장학생 선발 안내",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.gachon.ac.kr/bbs/kor/478/125269/artclView.do"
-  },
-  "n:https://www.korea.ac.kr/ko/568/subview.do#n-%5B%EA%B5%90%EC%99%B8-11%2F3%5D2027%ED%95%99%EB%85%84%EB%8F%84%20%ED%95%B4%EB%8F%99%EA%B3%BC%ED%95%99%EB%AC%B8%ED%99%94%EC%9E%AC%EB%8B%A8%20%ED%95%B4%EB%8F%99%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4(%ED%95%99%EA%B5%90": {
-   "attempts": 0,
-   "title": "[교외-11/3]2027학년도 해동과학문화재단 해동장학생 모집 안내(학교지원)",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjUlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D"
-  },
-  "n:https://www.korea.ac.kr/ko/568/subview.do#n-%5B%EA%B5%90%EC%99%B8-10%2F18%5D2026%EB%85%84%20%EC%9A%B0%EC%96%91%EC%9E%AC%EB%8B%A8%20%EB%8F%99%ED%96%89%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4(%EC%9E%AC%EB%8B%A8%EC%A7%80%EC%9B%90)": {
-   "attempts": 0,
-   "title": "[교외-10/18]2026년 우양재단 동행장학생 모집 안내(재단지원)",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjQlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D"
-  },
-  "n:https://www.korea.ac.kr/ko/568/subview.do#n-%5B%EA%B5%90%EC%99%B8-10%2F12%5D2026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%86%A1%ED%99%94%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4(%ED%95%99%EA%B5%90%EC%A7%80": {
-   "attempts": 0,
-   "title": "[교외-10/12]2026학년도 2학기 송화재단 장학생 선발 안내(학교지원)",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjMlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D"
-  },
-  "n:https://www.korea.ac.kr/ko/568/subview.do#n-%5B%EA%B5%90%EB%82%B4-10%2F22%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EB%8C%80%ED%95%99%EB%B4%89%EC%82%AC%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4": {
-   "attempts": 0,
-   "title": "[교내-10/22] 2026학년도 2학기 대학봉사장학금 신청 안내",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjIlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D"
-  },
-  "n:https://www.korea.ac.kr/ko/568/subview.do#n-%5B%EA%B8%B0%EA%B8%88-10%2F13%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%A0%95%EC%9D%B8%EC%9E%A5%ED%95%99%EA%B8%88(%EA%B5%AC%20%EC%9A%B4%EB%AA%BD%20%ED%97%88%EC%B2%9C%EA%B5%AC)%20%EC%8B%A0": {
-   "attempts": 0,
-   "title": "[기금-10/13] 2026학년도 2학기 정인장학금(구 운몽 허천구) 신청 안내 (생활비)",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM2ODIlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D"
-  },
-  "n:https://www.korea.ac.kr/ko/568/subview.do#n-%5B%EA%B8%B0%EA%B8%88-10%2F8%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%ED%91%B8%EB%A5%B8%EC%86%94%20%EC%82%AC%ED%9A%8C%EC%A0%95%EC%9D%98%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4": {
-   "attempts": 0,
-   "title": "[기금-10/8] 2026학년도 2학기 푸른솔 사회정의 장학금 신청 안내",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjElMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D"
-  },
-  "n:https://www.korea.ac.kr/ko/568/subview.do#n-%5B%EA%B5%90%EB%82%B4-10%2F30%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%86%8C%EB%A7%9D%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4": {
-   "attempts": 0,
-   "title": "[교내-10/30] 2026학년도 2학기 소망장학금 신청 안내",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NTYlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D"
-  },
-  "n:https://www.korea.ac.kr/ko/568/subview.do#n-%5B%EA%B5%90%EB%82%B4-10%2F30%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%9E%AC%ED%95%B4%EA%B7%B9%EB%B3%B5%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4": {
-   "attempts": 0,
-   "title": "[교내-10/30] 2026학년도 2학기 재해극복장학금 신청 안내",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjAlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D"
-  },
-  "n:https://www.korea.ac.kr/ko/568/subview.do#n-%5B%EA%B5%90%EB%82%B4-10%2F30%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EB%93%9C%EB%A6%BC%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4": {
-   "attempts": 0,
-   "title": "[교내-10/30] 2026학년도 2학기 드림장학금 신청 안내",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NTglMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D"
-  },
-  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-%5B(%EC%9E%AC)%EB%8C%80%EC%A0%84%EC%B2%AD%EB%85%84%EB%82%B4%EC%9D%BC%EC%9E%AC%EB%8B%A8%5D%202026%EB%85%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20%EC%9D%B8%EC%9E%AC%EC%9C%A1%EC%84%B1(%EC%84%B1%EC%B7%A8)%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20": {
-   "attempts": 0,
-   "title": "[(재)대전청년내일재단] 2026년 하반기 인재육성(성취) 장학생 선발 안내",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54977"
-  },
-  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-(%EC%9E%AC)%EB%85%BC%EC%82%B0%EC%8B%9C%EC%9E%A5%ED%95%99%ED%9A%8C%20%ED%95%99%EC%97%85%EC%9E%A5%EB%A0%A4%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C": {
-   "attempts": 0,
-   "title": "(재)논산시장학회 학업장려 장학생 선발",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=55272"
-  },
-  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-%5B(%EC%9E%AC)%20%EC%B6%98%EC%B2%9C%EC%9D%B8%EC%9E%AC%EC%9C%A1%EC%84%B1%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%5D%202026%EB%85%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20%EB%B4%84%EB%82%B4%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4": {
-   "attempts": 0,
-   "title": "[(재) 춘천인재육성장학재단] 2026년 하반기 봄내장학생 선발 안내",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=55215"
-  },
-  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-%5B(%EC%9E%AC)%EA%B3%A0%EC%86%8D%EB%8F%84%EB%A1%9C%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%5D%202026%EB%85%84%20%EA%B3%A0%EC%86%8D%EB%8F%84%EB%A1%9C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4": {
-   "attempts": 0,
-   "title": "[(재)고속도로장학재단] 2026년 고속도로 장학생 선발 안내",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=55088"
-  },
-  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-%5B(%EC%9E%AC)%ED%8F%AC%ED%95%AD%EC%8B%9C%EC%9E%A5%ED%95%99%ED%9A%8C%5D2026%EB%85%84%EB%8F%84%20%EB%8C%80%ED%95%99%EA%B5%90%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B3%84%ED%9A%8D": {
-   "attempts": 0,
-   "title": "[(재)포항시장학회]2026년도 대학교 장학생 선발 계획",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54978"
-  },
-  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-%5B(%EC%9E%AC)%EC%9D%B8%EC%B2%9C%EC%9D%B8%EC%9E%AC%ED%8F%89%EC%83%9D%EA%B5%90%EC%9C%A1%EC%A7%84%ED%9D%A5%EC%9B%90%5D%202026%EB%85%84%EB%8F%84%20(%EC%9E%AC)%EC%9D%B8%EC%B2%9C%EC%9D%B8%EC%9E%AC%ED%8F%89%EC%83%9D%EA%B5%90%EC%9C%A1%EC%A7%84%ED%9D%A5%EC%9B%90%20%ED%95%98": {
-   "attempts": 0,
-   "title": "[(재)인천인재평생교육진흥원] 2026년도 (재)인천인재평생교육진흥원 하반기 장학···",
-   "lastTried": "2026-10-03",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-04",
-   "status": "resolved",
-   "resolvedUrl": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54842"
-  },
-  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-%5B%ED%86%B5%EC%98%81%EC%8B%9C%5D%202026%EB%85%84%20%EC%83%81%EB%B0%98%EA%B8%B0%EB%B6%84%20%ED%86%B5%EC%98%81%EC%8B%9C%20%ED%95%99%EC%9E%90%EA%B8%88%20%EC%9D%B4%EC%9E%90%20%EC%A7%80%EC%9B%90%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4": {
-   "attempts": 0,
-   "title": "[통영시] 2026년 상반기분 통영시 학자금 이자 지원 신청 안내",
-   "lastTried": "2026-10-05",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-05",
-   "status": "resolved",
-   "resolvedUrl": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54815"
-  },
-  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-2026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EC%83%9D%20%ED%9D%AC%EB%A7%9D%EA%B7%BC%EB%A1%9C%EC%A7%80%202%EC%B0%A8%20%EC%8B%A0%EC%B2%AD%EA%B8%B0%EA%B0%84%20%EC%95%88%EB%82%B4": {
-   "attempts": 0,
-   "title": "2026학년도 2학기 국가근로장학생 희망근로지 2차 신청기간 안내",
-   "lastTried": "2026-10-05",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-05",
-   "status": "resolved",
-   "resolvedUrl": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54793"
-  },
-  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-%E3%80%8C2026%EB%85%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20%EC%9D%B5%EC%82%B0%EC%8B%9C%20%EB%8C%80%ED%95%99%EC%83%9D%20%ED%95%99%EC%9E%90%EA%B8%88%20%EC%9D%B4%EC%9E%90%20%EC%A7%80%EC%9B%90%20%EC%82%AC%EC%97%85%E3%80%8D%EC%95%88%EB%82%B4": {
-   "attempts": 0,
-   "title": "「2026년 하반기 익산시 대학생 학자금 이자 지원 사업」안내",
-   "lastTried": "2026-10-05",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-05",
-   "status": "resolved",
-   "resolvedUrl": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54775"
-  },
-  "n:https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083#n-2026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B2%B0%EA%B3%BC%20%EB%B0%8F%202%EC%B0%A8%20%EC%B6%94%EA%B0%80%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4": {
-   "attempts": 0,
-   "title": "2026학년도 2학기 국가근로장학생 선발 결과 및 2차 추가 선발 안내",
-   "lastTried": "2026-10-05",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-05",
-   "status": "resolved",
-   "resolvedUrl": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=3004&bbsId=1083&nttSn=54793"
-  },
-  "n:https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%5B%EA%B5%90%EC%99%B8%5D%202026%EB%85%84%20%EC%9A%B0%EC%96%91%EC%9E%AC%EB%8B%A8%20%EB%8F%99%ED%96%89%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88..": {
-   "attempts": 0,
-   "title": "[교외] 2026년 우양재단 동행 장학생 모집 안..",
-   "lastTried": "2026-10-06",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-06",
-   "status": "resolved",
-   "resolvedUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261001&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&"
-  },
-  "n:https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%5B%EA%B5%90%EC%99%B8%5D%20%EC%A0%9C29%EA%B8%B0%20%EB%91%90%EC%9D%84%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C": {
-   "attempts": 0,
-   "title": "[교외] 제29기 두을장학생 선발",
-   "lastTried": "2026-10-06",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-06",
-   "status": "resolved",
-   "resolvedUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260916&brdSeq=3&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&"
-  },
-  "n:https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%EB%AF%B8%EB%9E%98%EC%97%90%EC%85%8B%20%ED%95%B4%EC%99%B8%EA%B5%90%ED%99%98%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%20%EB%B0%8F%20%ED%99%8D%EB%B3%B4": {
-   "attempts": 0,
-   "title": "미래에셋 해외교환 장학생 선발 안내 및 홍보",
-   "lastTried": "2026-10-06",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-06",
-   "status": "resolved",
-   "resolvedUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260916&brdSeq=2&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&"
-  },
-  "n:https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%5B%EA%B5%90%EC%99%B8%2F%EC%8B%A0%EC%B2%AD%5D%202026%EB%85%84%202%ED%95%99%EA%B8%B0%20%EB%8C%80%ED%95%98%EC%9E%A5%ED%95%99%ED%9A%8C%20%EC%84%9D%EB%B0%95%EC%82%AC..": {
-   "attempts": 0,
-   "title": "[교외/신청] 2026년 2학기 대하장학회 석박사..",
-   "lastTried": "2026-10-05",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260914&brdSeq=2&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&"
-  },
-  "n:https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%5B%EA%B5%90%EC%99%B8%2F%EC%8B%A0%EC%B2%AD%5D%202026%EB%85%84%20%EA%B3%A0%EC%86%8D%EB%8F%84%EB%A1%9C%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C": {
-   "attempts": 0,
-   "title": "[교외/신청] 2026년 고속도로 장학생 선발",
-   "lastTried": "2026-10-05",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260914&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&"
-  },
-  "n:https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1&pageIndex=2#n-%5B%EA%B5%90%EC%99%B8%5D%202026%EB%85%84%20%EC%86%90%ED%83%9C%ED%9D%AC%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88..": {
-   "attempts": 0,
-   "title": "[교외] 2026년 손태희장학재단 장학생 선발 안..",
-   "lastTried": "2026-10-07",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-07",
-   "status": "resolved",
-   "resolvedUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260821&brdSeq=3&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&"
-  },
-  "n:https://www.gachon.ac.kr/kor/7986/subview.do#n-%5B%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80%5D%20(%EC%83%9D%ED%99%9C%EB%B9%84)2027%EB%85%84%20%EC%95%84%EC%82%B0%EC%82%AC%ED%9A%8C%EB%B3%B5%EC%A7%80%EC%9E%AC%EB%8B%A8%20%EB%B6%81%ED%95%9C%EC%9D%B4%ED%83%88%EC%B2%AD%EC%86%8C%EB%85%84%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C": {
-   "attempts": 0,
-   "title": "[장학공지] (생활비)2027년 아산사회복지재단 북한이탈청소년장학생 선발 안내",
-   "lastTried": "2026-10-06",
-   "lastWhy": "",
-   "nextTryAt": "2026-10-07",
-   "status": "resolved",
-   "resolvedUrl": "https://www.gachon.ac.kr/bbs/kor/478/125899/artclView.do"
-  },
-  "n:https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-2026%EB%85%84%20%EC%9A%B0%EC%96%91%EC%9E%AC%EB%8B%A8%20%EB%8F%99%ED%96%89%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91": {
-   "attempts": 0,
-   "title": "2026년 우양재단 동행 장학생 모집",
-   "lastTried": "2026-10-07",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30230&pageNo=1"
   },
   "n:https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-2027%ED%95%99%EB%85%84%EB%8F%84%20STX%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B3%B5%EA%B3%A0": {
    "attempts": 0,
@@ -1066,6 +434,70 @@
    "lastWhy": "",
    "status": "resolved",
    "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30299&pageNo=1"
+  },
+  "n:https://www.korea.ac.kr/ko/568/subview.do#n-%5B%EA%B5%90%EC%99%B8-%EB%A7%88%EA%B0%90%5D2027%ED%95%99%EB%85%84%EB%8F%84%20%ED%95%9C%EA%B5%AD%EC%A7%80%EB%8F%84%EC%9E%90%EC%9C%A1%EC%84%B1%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EC%8B%A0%EA%B7%9C%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4(%ED%95%99": {
+   "attempts": 0,
+   "title": "[교외-마감]2027학년도 한국지도자육성장학재단 신규장학생 선발 안내(학교지원)",
+   "lastTried": "2026-11-02",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NzglMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D"
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-%ED%95%99%EC%9E%90%EA%B8%88%20%EC%A4%91%EB%B3%B5%EC%A7%80%EC%9B%90%2C%20%EB%AF%B8%EB%A6%AC%20%ED%99%95%EC%9D%B8%ED%95%98%EA%B3%A0%20%EC%98%88%EB%B0%A9%ED%95%98%EC%84%B8%EC%9A%94!": {
+   "attempts": 0,
+   "title": "학자금 중복지원, 미리 확인하고 예방하세요!",
+   "lastTried": "2026-11-02",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30305&pageNo=1"
+  },
+  "n:https://www.korea.ac.kr/ko/568/subview.do#n-%5B%EA%B5%90%EC%99%B8-%EB%A7%88%EA%B0%90%5D2027%ED%95%99%EB%85%84%EB%8F%84%20%ED%95%B4%EB%8F%99%EA%B3%BC%ED%95%99%EB%AC%B8%ED%99%94%EC%9E%AC%EB%8B%A8%20%ED%95%B4%EB%8F%99%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%20%EC%95%88%EB%82%B4(%ED%95%99%EA%B5%90%EC%A7%80%EC%9B%90": {
+   "attempts": 0,
+   "title": "[교외-마감]2027학년도 해동과학문화재단 해동장학생 모집 안내(학교지원)",
+   "lastTried": "2026-11-02",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4ODglMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D"
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-%5B%ED%95%9C%EA%B5%AD%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%5D%20%EC%B2%AD%EB%85%84%EC%A7%80%EC%9B%90%EC%A0%95%EB%B3%B4%20%ED%86%B5%ED%95%A9%EC%A0%9C%EA%B3%B5%20%ED%94%8C%EB%9E%AB%ED%8F%BC%20'%ED%86%B5%ED%95%99%EB%A1%9C'%20%ED%99%8D%EB%B3%B4": {
+   "attempts": 0,
+   "title": "[한국장학재단] 청년지원정보 통합제공 플랫폼 '통학로' 홍보",
+   "lastTried": "2026-11-08",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30313&pageNo=1"
+  },
+  "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%202027%EB%85%84%EB%8F%84%20%EA%B4%80%EC%A0%95%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4": {
+   "attempts": 0,
+   "title": "공통 2027년도 관정재단 장학생 선발 안내",
+   "lastTried": "2026-11-08",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323498"
+  },
+  "n:https://www.korea.ac.kr/ko/568/subview.do?article.offset=10#n-%5B%EA%B8%B0%EA%B8%88-10%2F8%5D%202026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%ED%91%B8%EB%A5%B8%EC%86%94%20%EC%82%AC%ED%9A%8C%EC%A0%95%EC%9D%98%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%20%EC%95%88%EB%82%B4": {
+   "attempts": 0,
+   "title": "[기금-10/8] 2026학년도 2학기 푸른솔 사회정의 장학금 신청 안내 (선발완료_11/3 메일 안내 완료)",
+   "lastTried": "2026-11-08",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjElMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D"
+  },
+  "n:https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5#n-2026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EA%B5%AD%EA%B0%80%EC%9E%A5%ED%95%99%EA%B8%88(%E2%85%A0%EC%9C%A0%ED%98%95)%20%EB%B0%8F%20%EC%A4%91%EC%95%99%EC%82%AC%EB%9E%91%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%A7%80%EA%B8%89%EA%B8%B0%EC%A4%80%20%EC%95%88": {
+   "attempts": 0,
+   "title": "2026학년도 2학기 국가장학금(Ⅰ유형) 및 중앙사랑 장학금 지급기준 안내",
+   "lastTried": "2026-11-11",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=5&SITE_NO=2&P_TAB_NO=5&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=11&BBS_SEQ=30330&pageNo=1"
+  },
+  "n:https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%202027%EB%85%84%EB%8F%84%20%EC%A0%9C%2010%ED%9A%8C%20%EC%9C%A0%ED%95%98%ED%91%B8%EB%A5%B8%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C": {
+   "attempts": 0,
+   "title": "공통 2027년도 제 10회 유하푸른재단 장학생 선발",
+   "lastTried": "2026-11-11",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323554"
   }
  }
 }

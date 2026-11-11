@@ -1,7 +1,161 @@
 {
  "school": "가톨릭대학교",
- "updatedAt": "2026-10-31",
+ "updatedAt": "2026-11-11",
  "items": [
+  {
+   "title": "2026학년도 동계 계절학기 사랑나누기 안내사항",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277691&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-11",
+   "kind": "학사",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-11",
+   "desc": "2026학년도 동계 계절학기 사랑나누기는 본교연계 봉사활동과 자율선택 봉사활동으로 정상 운영됩니다."
+  },
+  {
+   "title": "[입학처] 재학생(학부) 설문조사 안내(스타벅스 기프티콘 제공)",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277586&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-09",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-09",
+   "thumb": "data/news/img/9ac77736f78906b2.webp",
+   "desc": "안녕하십니까. 가톨릭대학교 입학팀입니다. 우리 대학은 우수 학생의 선발과 인재 양성을 위하여 지속적인 노력을 기울이고 있습니다."
+  },
+  {
+   "title": "[교수학습개발원] '신임교원 리서치 콜로키엄' 6차, 7차 신청 안내(교원 대상)",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277455&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-05",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-08",
+   "thumb": "data/news/img/1c72b81b00f4fe3b.webp",
+   "desc": "◎ 일시 : [6 차 ] 2026.11.19.( 목 ) 11:00 ◎ 장소 : T108 호 ( 미카엘관 교수동 ) ◎ 발표 : [6 차 ] 김용일 교수 ( 인공지능학과 ), 오종원 교수 ( 바이오메디컬화학공학과 ),"
+  },
+  {
+   "title": "[가톨릭공유대학(CU12)] 2026학년도 겨울 계절학기 수강신청 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277473&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-05",
+   "kind": "학사",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-08",
+   "thumb": "data/news/img/e63225deadcaa9b3.webp",
+   "desc": "2026학년도 겨울 계절학기 공유대학(CU12) 교과목 수강을 희망하는 학생은 아래 내용 및 첨부파일을 반드시 확인하시기 바랍니다."
+  },
+  {
+   "title": "[기숙사운영센터] 2026학년도 동계방학 프란치스코관 모집공고 2026学年度 寒假 方济各馆 招生公告",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277444&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-04",
+   "kind": "생활",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-08"
+  },
+  {
+   "title": "[학사행정팀] 2027-1학기 예비 수강신청 안내 (교과목 선호도 조사)",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277453&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-04",
+   "kind": "학사",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-08",
+   "desc": "우리 대학은 학생 수요 중심의 교육과정을 수립하기 위해 매 학기 예비 수강신청을 통해 편제 교과목에 대한 선호도 조사를 실시하고 있습니다."
+  },
+  {
+   "title": "[학사행정팀] 2026-겨울계학기 성공회대학교 학점교류 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277528&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-06",
+   "kind": "학사",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-08"
+  },
+  {
+   "title": "[학사행정팀] 2026학년도 겨울계절학기 타대학 소속 학점교류생 안내사항",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277389&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-05",
+   "kind": "학사",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-08",
+   "desc": "※ 본 안내문은 타대학에서 가톨릭대학교로 학점교류를 희망하는 학생들을 위해 게시한 것으로 본교생은 해당 없음"
+  },
+  {
+   "title": "[대학일자리플러스센터] 인천글로벌캠퍼스운영재단 미래내일 일경험(공공행정 인턴형) 지원자 모집 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277422&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-03",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-03",
+   "thumb": "data/news/img/9cbb9499ec9bd6d7.webp",
+   "desc": "자세한 내용은 아래와 첨부파일을 참고해주시기 바랍니다. 감사합니다. 1. 프로그램명: 국취연계형 공공행정 5차 인턴(미래내일 일경험(인턴형))"
+  },
+  {
+   "title": "[학생지원팀] 부천시장님과 가톨릭대 청년이 함께하는 '영톡스클럽' 행사 개최 안내(사전신청링크)",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277377&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-02",
+   "kind": "행사",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/576f257757e812af.webp",
+   "desc": "가톨릭대학교 청춘이 전하는 요즘 트렌드, 요즘 고민을 시장님과 함께 대화하며 나누고 청년들이 꿈꾸는 미래와 지역사회가 함께 만드는 부천시를 그리며, 특별한 대화의 장을 개최합니다!"
+  },
+  {
+   "title": "[인권센터] 2026학년도 2학기 성적확인 필수교육 '재학생 폭력예방교육' 재안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277338&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-02",
+   "kind": "학사",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/c0f13a853e7b07ab.webp"
+  },
+  {
+   "title": "2026학년도 겨울 계절학기 수강신청 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277372&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-02",
+   "kind": "학사",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-02",
+   "desc": "1. 수강신청 일정 및 방법 ‣대상: 본교 재학생(휴학생 포함) ※휴학생은 타대학 학점교류 불가하며 휴학생 신분으로 졸업불가(복학 후 한학기 이상 등록필요)"
+  },
+  {
+   "title": "[학생지원팀] 국제학생증 ISIC 발급비 지원행사 안내(온라인)",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277324&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-02",
+   "kind": "학사",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-02",
+   "desc": "ISIC(International Student Identity Card) 국제학생증은 해외에서 학생 신분을 증명할 수 있으며 , 이를 통해 전세계적으로 150,000 여 학생 할인 혜택을 이용할 수 있습니다 .…"
+  },
+  {
+   "title": "[교수학습개발원] 2026학년도 2학기 학습클리닉 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277327&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-02",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/04f06225e5e2fdff.webp",
+   "desc": "늦가을로 접어드는 11월, 학생 여러분이 26학년도 2학기의 남은 시간들을 의미있게 마무리하길 응원하는 마음으로 [학습클리닉] 프로그램을 안내합니다."
+  },
   {
    "title": "[대플-추천채용] 스탠다드인터내셔널 주식회사 - 구매/재무/NPD/Tech/마케팅 채용",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277316&article.offset=0&articleLimit=10",
@@ -280,158 +434,6 @@
    "src": "5d85d287",
    "foundAt": "2026-10-22",
    "desc": "2026-2학기 일반휴학원 제출은 수업일수 1/2선까지만 가능함을 알려드리오니 참고하시기 바랍니다. 일반휴학원 제출 마감일 질병휴학(4주이상 종합병원진단서 첨부) 및 입대휴학 제외 교 무 처 장"
-  },
-  {
-   "title": "[학생지원팀] 국제학생증 ISIC 발급비 지원행사 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277002&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-22",
-   "kind": "학사",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-22",
-   "desc": "ISIC(International Student Identity Card) 국제학생증은 해외에서 학생 신분을 증명할 수 있으며 , 이를 통해 전세계적으로 150,000 여 학생 할인 혜택을 이용할 수 있습니다 .…"
-  },
-  {
-   "title": "[학사행정팀] 2026-겨울계절학기 숙명여자대학교 학점교류 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276984&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-22",
-   "kind": "학사",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-22"
-  },
-  {
-   "title": "[교수학습개발원] 2026년 10월-11월 학습지원 프로그램 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276969&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-21",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-21",
-   "thumb": "data/news/img/d41d48ad35912474.webp"
-  },
-  {
-   "title": "[기숙사 상담실 마음숲] 2026-2 글로벌 마인드 스캐닝 안내 (기숙사생 대상)",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276947&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-21",
-   "kind": "생활",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-21",
-   "desc": "안녕하세요, 학생생활상담소 기숙사 상담실 마음숲입니다. \"기숙사생의 마음건강케어를 위한 마음 검진 프로그램\" 2026년 2학기 참여를 안내해 드립니다."
-  },
-  {
-   "title": "[대학일자리플러스센터] KOREC 일본 취업 설명회 진행 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276942&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-21",
-   "kind": "행사",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-21",
-   "thumb": "data/news/img/927b608a8b0fc893.webp",
-   "desc": "안녕하세요, 대학일자리플러스센터입니다. 비웰코리아 에서 일본 취업 설명회 를 진행합니다. 일본 취업을 희망하는 학생분들의 많은 신청과 관심 부탁드리며, 자세한 내용은 아래 본문을 참고해주세요. 감사합니다."
-  },
-  {
-   "title": "[학생생활상담소] 2026 마음건강케어 3차 신청 안내(心理健康关怀申请指南)",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276935&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-21",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-21",
-   "thumb": "data/news/img/552999987ffc8a35.webp",
-   "desc": "안녕하세요^^ 학생생활상담소입니다. 학생생활상담소에서 마음건강케어 '한국 유학생활 생존 가이드: 아무도 가르쳐주지 않았던 유학생활의 소소한 것들'를 실시합니다."
-  },
-  {
-   "title": "[융합전공학부] 2026-2학기 학생설계전공 신규·변경·포기 신청 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276928&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-21",
-   "kind": "학사",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-21"
-  },
-  {
-   "title": "[AI전자정보융합대학] 2026 AI전자정보융합대학 신설 기념 포럼 개최",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276914&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-20",
-   "kind": "행사",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-20",
-   "thumb": "data/news/img/60d7098a29e59f19.webp",
-   "desc": "○ 일시: 2026년 10월 29일(목), 13:00~18:00 ○ 장소: 가톨릭대학교 김수환관 컨퍼런스룸(K366)"
-  },
-  {
-   "title": "[입학처] 2027학년도 수시 음악과 실기고사 건물 출입통제 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276862&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-19",
-   "kind": "생활",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-19",
-   "desc": "2027학년도 수시모집 음악과 실기고사 진행을 위해 아래와 같이 건물 출입을 통제하오니 많은 양해와 협조 부탁드립니다."
-  },
-  {
-   "title": "[대학일자리플러스센터] 2026 글로벌 커리어 리스타트 채용박람회 개최 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276877&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-19",
-   "kind": "행사",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-19",
-   "thumb": "data/news/img/48962d03fdf1fc03.webp",
-   "desc": "해외 경험을 토대로 맞춤형 기업 매칭과 실질적인 취업지원 등을 제공해드리니, 관심 있는 학생들의 많은 신청과 참여 바랍니다. 자세한 내용은 첨부 포스터를 참고해주세요. 감사합니다."
-  },
-  {
-   "title": "[대학일자리플러스센터] 청년고용정책 참여 인증 이벤트 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276875&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-19",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-19",
-   "thumb": "data/news/img/ceb4ee5d83bbddeb.webp",
-   "desc": "대학일자리플러스센터에서 재학생 및 졸업생 여러분의 취업 역량 강화와 정책 참여를 지원하기 위해 '청년고용정책 참여 인증 이벤트' 를 진행합니다."
-  },
-  {
-   "title": "경기·인천 지역 대학의 지속가능한 발전을 위한 정책토론회 개최 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276840&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-16",
-   "kind": "행사",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-16",
-   "thumb": "data/news/img/0e908fc74342ab4f.webp",
-   "desc": "경기·인천 지역 대학의 정책적 소외 문제를 살펴보고 지속가능한 발전 방안을 논의하는 정책토론회가 개최됩니다. 관심 있는 분들의 많은 참여 바랍니다."
-  },
-  {
-   "title": "[학생지원팀] 2026년 2학기 거창군 지역출신 대학생 등록금 지원사업 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276848&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-16",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-16",
-   "thumb": "data/news/img/38b095bdd78297a8.webp"
-  },
-  {
-   "title": "[교무행정팀] 2027년 2월 말 퇴직교원 정부포상 추천대상자 공개검증",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=276819&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-16",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-16"
   }
  ]
 }

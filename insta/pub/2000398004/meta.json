@@ -1,0 +1,15 @@
+{
+ "code": "2000398004",
+ "org": "빛고을장학재단",
+ "name": "이사장 추천 장학생",
+ "due": "2026-11-13",
+ "school": null,
+ "tpl": "photo",
+ "tplNo": 1,
+ "seed": 2021226412,
+ "skin": "blue",
+ "font": null,
+ "cards": 5,
+ "at": "2026-11-10",
+ "dates": "absolute"
+}

@@ -1,0 +1,91 @@
+name: 보안 경고 정리 (CodeQL)
+
+# CodeQL 경고를 Claude 세션이 정리할 때 쓰는 버튼 (2026-11-11 · 은서 · 출시 전 백엔드 10번 후속).
+#   · 목록: 열린 경고 전부를 세션이 준 **공개 열쇠로 잠가** 로그에 싣는다 — 🔴 공개 저장소라 로그는 누구나 본다. 잠그지 않은 목록을 찍지 말 것.
+#   · 닫기: 경고 번호 + 정해진 이유(false positive · won't fix · used in tests) + 짧은 이유 글로 Dismiss 한다(이유 글은 로그에 보인다 — 위치·수법을 적지 않는다).
+#   예약 없음(버튼만) · 도구 tools/codeql-triage.mjs · 관문 verify/health-gates/ops.mjs 「⑦ 보안 자동 점검」
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: '목록 = 잠근 목록을 로그에 · 닫기 = 번호로 Dismiss'
+        type: choice
+        options: [목록, 닫기]
+        default: 목록
+      pubkey:
+        description: '(목록) RSA 공개 열쇠 PEM 을 base64 한 줄로'
+        required: false
+        default: ''
+      dismiss:
+        description: '(닫기) [{"n":번호,"reason":"false positive","comment":"짧은 이유"}]'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codeql-triage
+  cancel-in-progress: false
+
+jobs:
+  triage:
+    if: github.ref_name == 'claude/nice-heisenberg-WESq5'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 잠근 목록
+        if: inputs.mode == '목록'
+        timeout-minutes: 3
+        env:
+          PUBKEY_B64: ${{ inputs.pubkey }}
+        run: |
+          set -euo pipefail
+          [ -n "$PUBKEY_B64" ] || { echo "::error::공개 열쇠가 없습니다 — 잠그지 않은 목록은 싣지 않습니다"; exit 1; }
+          W=$(mktemp -d)
+          echo "$PUBKEY_B64" | base64 -d > "$W/pub.pem"
+          gh api --paginate "repos/$GITHUB_REPOSITORY/code-scanning/alerts?state=open&per_page=100" > "$W/raw.json"
+          node tools/codeql-triage.mjs slim "$W/raw.json" "$W/list.json"
+          openssl rand -hex 32 > "$W/k"
+          openssl enc -aes-256-cbc -pbkdf2 -salt -in "$W/list.json" -out "$W/list.enc" -pass file:"$W/k"
+          openssl pkeyutl -encrypt -pubin -inkey "$W/pub.pem" -pkeyopt rsa_padding_mode:oaep -in "$W/k" -out "$W/k.enc"
+          echo "KEY_ENC=$(base64 -w0 "$W/k.enc")"
+          echo "LIST_ENC=$(base64 -w0 "$W/list.enc")"
+          rm -rf "$W"
+
+      - name: 번호로 닫기
+        if: inputs.mode == '닫기'
+        timeout-minutes: 5
+        env:
+          DISMISS: ${{ inputs.dismiss }}
+        run: |
+          set -euo pipefail
+          node tools/codeql-triage.mjs plan "$DISMISS" > /tmp/plan.tsv
+          ok=0; bad=0
+          while IFS=$'\t' read -r n reason comment; do
+            if gh api -X PATCH "repos/$GITHUB_REPOSITORY/code-scanning/alerts/$n" -f state=dismissed -f dismissed_reason="$reason" -f dismissed_comment="$comment" >/dev/null; then ok=$((ok+1)); else bad=$((bad+1)); echo "::warning::경고 $n 을 닫지 못했습니다"; fi
+          done < /tmp/plan.tsv
+          echo "닫음 $ok · 못 닫음 $bad" | tee -a "$GITHUB_STEP_SUMMARY"
+          [ "$bad" = 0 ]
+
+      - name: 🚨 로봇이 넘어졌다
+        if: failure() || cancelled()
+        uses: ./.github/actions/robot-down
+        with:
+          robot: 보안 경고 정리 (CodeQL)
+          token: ${{ github.token }}

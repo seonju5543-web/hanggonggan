@@ -118,7 +118,7 @@ async function swipeDown(page, sel) {
     const regIds = new Set(registeredList.map((s) => s.id));
     const applied = (s) => state.applications.some((a) => a.id === s.id);
     const can = (s) => applyLock(evaluateFor(s, p), state.applications.find((a) => a.id === s.id),
-      dday(s.deadline)).canApply;
+      dday(s.deadline), s).canApply;
     const live = allScholarships().filter((s) => !s.program && dday(s.deadline).days >= 0 && !applied(s) && can(s));
     /* 2026-10-13 개발자 결정 — 앱 양식(formId)이 없는 등록 공고에는 **앱 자체 지원문서**(prep:)가 붙는다.
        층1 대상은 그 문서가 붙은 공고다(formId 만 있고 템플릿이 안 온 공고는 섞지 않는다). */
@@ -340,7 +340,7 @@ async function swipeDown(page, sel) {
       eq('  둘째 줄이 재단 접수(선발 공고문의 서식·방법)를 말한다', /재단 접수|선발 공고문/.test(c.lead), true);
       /* 🔴 재단 첨부는 선발 공고문이다 — '신청서 양식'이라 부르면 학생이 그 안에서 빈칸을 찾는다 */
       eq('  「원본 신청서 양식」 이라고 부르지 않는다', c.heads.some((h) => h.startsWith('원본 신청서 양식')), false);
-      if (pick.C.atts) eq('  첨부 머리가 「선발 공고문」 이다', c.heads.some((h) => h.startsWith('선발 공고문')), true);
+      if (pick.C.atts) eq('  첨부 머리가 「선발 공고문」 이다', c.heads.some((h) => h.startsWith('선발 공고문')), true);   // 이 화면(지원문서 작성 · prepOriginalsHtml)은 승인 시안 밖 — 머리말 그대로
       else console.log('  · 첨부가 있는 층2 공고가 지금 없어 머리 이름 항목은 건너뜀');
       eq('  KOSAF 첨부 내려받기 원주소가 없다', c.kosafDl, 0);
 

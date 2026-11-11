@@ -38,10 +38,11 @@ const open = (d) => !d || d >= today;
 const appSrc = fs.readFileSync(new URL('../app.js', HERE), 'utf8');
 const takeConst = (name) => { const m = appSrc.match(new RegExp(`^const ${name} = .*$`, 'm')); if (!m) throw new Error(`app.js 에서 ${name} 을 못 찾았습니다`); return m[0]; };
 const appCtx = vm.createContext({ String, RegExp, Array });
-vm.runInContext([takeConst('KOSAF_ELIG'), takeConst('kosafClean')].join('\n'), appCtx);
+vm.runInContext([takeConst('KOSAF_ELIG'), takeConst('kosafClean'), takeConst('KOSAF_NOISE')].join('\n'), appCtx);
 const KOSAF_ELIG = vm.runInContext('KOSAF_ELIG', appCtx);
 const kosafClean = vm.runInContext('kosafClean', appCtx);
-const split = (v) => String(v || '').split(/\n|\s*[○◦•·▪]\s+/).map((s) => kosafClean(s.trim())).filter((s) => s.length >= 4 && !/^제한\s?없음/.test(s));
+const KOSAF_NOISE = vm.runInContext('KOSAF_NOISE', appCtx);   // 앱이 버리는 줄(`제한없음`·`기관확인필요`·`해당없음`)은 여기서도 버린다 — 규칙은 app.js 한 곳
+const split = (v) => String(v || '').split(/\n|\s*[○◦•·▪]\s+/).map((s) => kosafClean(s.trim())).filter((s) => s.length >= 4 && !KOSAF_NOISE.test(s));
 const screenLines = (it, raw) => { try { return ME.requirementLines(it, raw, { all: true }) || []; } catch { return raw || []; } };
 
 const SETS = {

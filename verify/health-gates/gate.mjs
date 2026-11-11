@@ -367,6 +367,60 @@ export default async function gate(eq, ctx) {
         [0, 'still-failing', true, false, true]);
       S.done();
     }
+    /* ㉦ 🔴 못 박기 (2026-11-10 · 은서 결정 — --keep-preexisting) — 직전 판부터 빨강이어도 **이번 실행이 새로 깨뜨린 것은 반드시 되돌린다.**
+       직전 판의 old 가 bad 인데 이번 실행이 bad 항목(n5)을 하나 더 넣었다 → 지문이 달라진다(bad 항목 old,n5) → 지키지 않고 HEAD 판 그대로 */
+    {
+      const KEEP = [...STAGES, '--keep-preexisting'];
+      const S = scenario({ ...HEAD, 'data/registered.json': { items: [{ id: 'old', auto: true, bad: true }] } },
+        { 'data/registered.json': { items: [{ id: 'old', auto: true, bad: true }, { id: 'n5', auto: false, bad: true }, { id: 'n6', auto: true }] } }, { stages: KEEP });
+      eq('④ ㉦ 🔴 못 박기 — 원래 빨간불이어도 이번 실행이 새로 깨뜨린 것(bad 항목 하나 더)은 반드시 되돌린다(still-failing · 정식 등록 = 직전 판 바이트)',
+        [S.status, S.out.gate, S.read('data/registered.json') === S.headReg],
+        [0, 'still-failing', true]);
+      S.done();
+      /* 같은 실패 줄인데 **받은 값**만 달라진 경우도 새로 깨뜨린 것이다 — ✕ 줄만 보지 않고 값 줄까지 지문에 든다 */
+      const VAL = [
+        "const fs = require('fs'); const r = JSON.parse(fs.readFileSync('data/registered.json', 'utf8'));",
+        "const bad = (r.items || []).filter((i) => i.bad).map((i) => i.id);",
+        "if (bad.length) { console.log('  ✕ 표본 관문 — bad 항목이 없다'); console.log('      받은 값: ' + JSON.stringify(bad)); console.log('      기대 값: []'); process.exit(1); }",
+        "process.exit(0);",
+      ].join('\n');
+      const V = scenario({ ...HEAD, 'check.cjs': VAL, 'data/registered.json': { items: [{ id: 'old', auto: true, bad: true }] } },
+        { 'data/registered.json': { items: [{ id: 'old', auto: true, bad: true }, { id: 'n8', auto: false, bad: true }] } }, { stages: KEEP });
+      eq('  ㉦ 같은 ✕ 줄이라도 받은 값이 달라지면 새로 깨뜨린 것 — 되돌린다(지문에 값 줄까지 든다)',
+        [V.out.gate, V.read('data/registered.json') === V.headReg], ['still-failing', true]);
+      V.done();
+      /* 지문을 못 읽는 실패(✕ 줄 없이 exit 1)는 지키지 않는다 — 모르면 되돌린다 */
+      const MUTE = "const fs = require('fs'); const r = JSON.parse(fs.readFileSync('data/registered.json', 'utf8')); process.exit((r.items || []).some((i) => i.bad) ? 1 : 0);";
+      const M = scenario({ ...HEAD, 'check.cjs': MUTE, 'data/registered.json': { items: [{ id: 'old', auto: true, bad: true }] } },
+        { 'data/registered.json': { items: [{ id: 'old', auto: true, bad: true, v: 2 }] } }, { stages: KEEP });
+      eq('  ㉦ 걸린 검사를 못 읽는 실패(✕ 줄 없음)면 지키지 않는다 — 모르면 되돌린다',
+        [M.out.gate, M.read('data/registered.json') === M.headReg], ['still-failing', true]);
+      M.done();
+    }
+    /* ㉧ 원래 있던 빨간불이면 이번 실행분을 지킨다(--keep-preexisting) — 지문이 글자 그대로 같고(bad 항목 old) 새 등록 n7·기존 개선 v:2 는 무고 →
+       kept-preexisting · 정식 등록에 n7 이 남는다 · 대기열도 이번 판 · 쉬기 장부 없음 · 단락은 '원래 있던 빨간불' · 리포트 'N건 등록'을 시도로 고치지 않는다.
+       --keep-preexisting 가 없으면(옛 동작) 그대로 되돌린다 */
+    {
+      const KEEP = [...STAGES, '--keep-preexisting'];
+      const snaps = () => fs.readdirSync(os.tmpdir()).filter((f) => f.startsWith('gate-snap-')).length;
+      const snapsBefore = snaps();
+      const H2 = { ...HEAD, 'data/registered.json': { items: [{ id: 'old', auto: true, bad: true }, { id: 'good', auto: true, v: 1 }] } };
+      const W2 = { 'data/registered.json': { items: [{ id: 'old', auto: true, bad: true }, { id: 'good', auto: true, v: 2 }, { id: 'n7', auto: true }] },
+        'collector/pending-forms.json': { items: [{ id: 'old', fetched: true }, { id: 'n7' }] } };
+      const S = scenario(H2, W2, { stages: KEEP });
+      const reg = JSON.parse(S.read('data/registered.json'));
+      const note = S.read('note.md');
+      eq('④ ㉧ 원래 있던 빨간불(지문이 글자 그대로 같음) → 이번 실행분을 지킨다(kept-preexisting) · 새 등록·기존 개선·대기열 그대로 · 쉬기 장부 없음',
+        [S.status, S.out.gate, reg.items.map((i) => `${i.id}:${i.v || ''}`), JSON.parse(S.read('collector/pending-forms.json')).items.map((i) => i.id), S.read('collector/auto-held.json'), S.out.removed],
+        [0, 'kept-preexisting', ['old:', 'good:2', 'n7:'], ['old', 'n7'], null, '0']);
+      eq('  ㉧ 단락은 \'원래 있던 빨간불 · 이번 실행분 저장\'과 걸린 검사 · 리포트 \'N건 등록\'을 시도로 고치지 않는다 · 사본 폴더를 남기지 않는다',
+        [/이번 실행 전부터 있던 빨간불입니다/.test(note), /걸린 검사: 「표본 관문 — bad 항목 old」/.test(note), /등록 시도/.test(S.read('r.md')), snaps() - snapsBefore],
+        [true, true, false, 0]);
+      S.done();
+      const O = scenario(H2, W2);
+      eq('  ㉧ --keep-preexisting 가 없으면 옛 동작 그대로(정식 등록을 직전 판으로 · still-failing)', [O.out.gate, O.read('data/registered.json') === O.headReg], ['still-failing', true]);
+      O.done();
+    }
     /* 되돌릴 것 없이 다시 재니 통과 → flaky (still-failing 이라 하지 않는다) */
     {
       const S = scenario(HEAD, {});
@@ -448,6 +502,11 @@ export default async function gate(eq, ctx) {
       const fail = t.indexOf("failure() || cancelled()");
       return !!st && /exit 1\s*$/.test(st.trimEnd()) && !/continue-on-error/.test(st) && fail > 0 && t.indexOf(st) > fail;
     };
+    /* 🔴 --keep-preexisting 를 켠 로봇 셋 — 지킨 실행(kept-preexisting)도 끝내 빨간불 단계(경보 + exit 1)를 탄다. 빨간불 자체를 숨기지 않는다 (2026-11-10) */
+    eq('④ ㉧ --keep-preexisting 를 켠 로봇(장학·브라우저·소식)은 kept-preexisting 도 끝내 빨간불 단계를 탄다 · 관문 경보 담당자 셋',
+      ['collect-scholarships.yml', 'browser-collect.yml', 'collect-news.yml'].map((f) => { const t = wfText(f); return [/gate-guard\.mjs [^\n]*--keep-preexisting/.test(t),
+        /if: steps\.guard\.outputs\.gate == 'still-failing' \|\| steps\.guard\.outputs\.gate == 'kept-preexisting'/.test(t), /--assignee "Se-Hyeon-Jo" --assignee "didinin-wq"/.test(t)]; }),
+      [[true, true, true], [true, true, true], [true, true, true]]);
     eq('④ 장학·브라우저 수집 — gate-guard 로 되돌리고(리포트 단락) · 끝내 빨가면 실패 알림 뒤에서 exit 1',
       ['collect-scholarships.yml', 'browser-collect.yml'].map((f) => [/node collector\/gate-guard\.mjs --report collector\/(browser-)?report\.md/.test(wfText(f)), /id: guard/.test(stepWith(wfText(f), /gate-guard\.mjs/)), lastStepExit(f), /git add collector\/auto-held\.json/.test(wfText(f))]),
       [[true, true, true, true], [true, true, true, true]]);
@@ -456,7 +515,7 @@ export default async function gate(eq, ctx) {
       const st = steps(lh).filter((s) => /steps\.audit\.outcome == 'failure'/.test(s) && /exit 1\s*$/.test(s.trimEnd()) && !/continue-on-error/.test(s));
       const cn = wfText('collect-news.yml');
       eq('④ 링크 사냥꾼 — 감사에 걸려 결과를 버리면 빨간불(continue-on-error 없는 exit 1) · 소식 로봇 — gate-guard + 끝내 빨가면 exit 1',
-        [st.length >= 1, /node collector\/gate-guard\.mjs --report collector\/news-report\.md (--note \S+ )?--stage data\/news,/.test(cn), lastStepExit('collect-news.yml')], [true, true, true]);
+        [st.length >= 1, /node collector\/gate-guard\.mjs --report collector\/news-report\.md (--note \S+ )?(--keep-preexisting )?--stage data\/news,/.test(cn), lastStepExit('collect-news.yml')], [true, true, true]);
     }
     const ar = stripComments(fs.readFileSync(new URL('collector/auto-register.mjs', root), 'utf8'));
     eq('④ 자동 등록이 쉬기 장부를 불러 쓴다 (isHeld · pruneRegistered — 베끼지 않는다)',
@@ -472,7 +531,7 @@ export default async function gate(eq, ctx) {
         for (const f of fs.readdirSync(fileURLToPath(new URL('verify/', root)))) if (f.endsWith('.cjs')) fs.copyFileSync(fileURLToPath(new URL(`verify/${f}`, root)), path.join(dir, 'verify', f));
         const w = (rel, body) => fs.writeFileSync(path.join(dir, rel), typeof body === 'string' ? body : J(body));
         w('collector/auto-register-config.json', { enabled: true, schools: [], maxPerRun: 8, blockIds: [], blockUrls: [] });
-        w('data/notices.json', { items: [{ title: '2026학년도 2학기 표본재단 장학생 선발 안내', url: 'https://example.ac.kr/bbs/view.do?seq=777', school: '경희대학교', campus: '', foundAt: '2026-10-04' }] });
+        w('data/notices.json', { items: [{ title: '2026학년도 2학기 표본재단 장학생 선발 안내', url: 'https://example.ac.kr/bbs/view.do?seq=777', school: '경희대학교', campus: '', foundAt: new Date(Date.now() + 9 * 3600e3 - 3 * 86400e3).toISOString().slice(0, 10) }] });   // 사흘 전 — 날짜를 박으면 한 달 뒤 '오래된 글'이 되어 대조군이 0건(2026-11-07 실제로 그랬다)
         w('data/registered.json', { items: [] }); w('data/forms.json', { templates: {} }); w('collector/report.md', '');
         if (ledger) w('collector/auto-held.json', ledger(dir));
         const r = spawnSync(process.execPath, [path.join(dir, 'collector/auto-register.mjs')], { cwd: dir, encoding: 'utf8', env: cleanEnv() });

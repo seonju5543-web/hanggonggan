@@ -309,15 +309,25 @@ function notifyConsentSheet() {
 
   const finish = async () => { notifyLedger.askedAt = Date.now(); await notifySaveLedger(); };
 
-  $('#btn-nf-allow').addEventListener('click', async () => {
+  $('#btn-nf-allow').addEventListener('click', async (ev) => {
+    /* 두 번 누름을 막는다 — 시트가 닫히는 0.25초 사이·데스크톱의 권한 말풍선이 떠 있는 동안 두 번째 누름이 들어와,
+       먼저 누른 쪽이 '켰습니다'라고 말한 뒤 나중 누름이 실패해 꺼지는 일이 있었다(리뷰 2026-11-09) */
+    if (ev.currentTarget.disabled) return;
+    ev.currentTarget.disabled = true;
+    const seq = nfPressed();
     const perm = await notifyRequestPermission();
     notifyLedger.enabled = perm === 'granted';
+    // 화면 먼저 — 밑에 설정 화면이 떠 있으면 서버를 기다리는 동안 스위치가 꺼짐으로 남아, 학생이 눌러 도로 끈다(리뷰 2026-11-09)
+    notifyRedrawSettings();
     await finish();
     closeNotifyPanel();
     if (perm === 'granted') {
       notifyRegisterBackground();
-      const p = await pushEnsure(); // 발송 서버가 있으면 '앱을 안 켜도 오는 알림'까지 한 번에 켠다
-      toast(p.ok
+      // 발송 서버가 있으면 '앱을 안 켜도 오는 알림'까지 한 번에 켠다 · 스위치와 같은 줄에 선다
+      // 🔴 등록이 안 되면 알림은 꺼짐으로 돌아가고 **아무 말도 하지 않는다**(2026-11-09 지시) — '켰습니다'라고 하면 거짓말이 된다
+      const p = await nfRegisterAfterPress(seq);
+      // 장부의 켜짐만 보면 안 된다 — 더 늦은 누름이 아직 서버를 기다리는 동안 잠깐 켜짐일 뿐일 수 있다
+      if (seq === nfPressSeq && notifyLedger.enabled && !nfRegisterFailed(p)) toast(p && p.ok
         ? '알림을 켰습니다. 앱을 켜지 않아도 폰으로 알립니다'
         : '알림을 켰습니다. 새 공고와 마감을 알립니다');
     } else if (perm === 'denied') {
@@ -326,6 +336,7 @@ function notifyConsentSheet() {
       toast('앱 안 알림함으로 알립니다. MY에서 언제든 켤 수 있습니다');
     }
     if (!$('#screen-my').hidden) renderMy();
+    notifyRedrawSettings();
     notifyRenderBadge();
   });
 
@@ -335,6 +346,7 @@ function notifyConsentSheet() {
     closeNotifyPanel();
     toast('알림은 MY 화면에서 언제든 켜기 가능');
     if (!$('#screen-my').hidden) renderMy();
+    notifyRedrawSettings();
   });
 }
 
@@ -363,6 +375,56 @@ function notifyMaybeAskConsent(delay = 900) {
 }
 
 /* ---------------- MY 화면의 알림 설정 ---------------- */
+/* 알림 카드(설정 화면 #my-notify)를 다시 그린다 — 켜기/끄기·동의 시트가 장부를 바꾼 뒤 부른다.
+   카드를 그리는 함수는 app.js 의 renderNotifyCard 한 곳이다(여기서 베끼지 않는다). */
+function notifyRedrawSettings() {
+  if (typeof renderNotifyCard === 'function') renderNotifyCard();
+}
+/* 스위치를 누른 직후 — 🔴 스위치는 **설정 화면**에 있다(renderMy() 는 2026-09-11 이후 알림 카드를 그리지 않아
+   눌러도 끈 모양 그대로 굳어 있었다 · 2026-11-06). 카드를 먼저 그리고, MY 메뉴 줄의 「알림 켜짐/꺼짐」 글자(renderMy)는
+   다음 판에 고친다 — MY 전체를 다시 그리는 동안 스위치가 기다리지 않게. */
+function notifyRedrawNow() {
+  notifyRedrawSettings();
+  setTimeout(() => { if (typeof renderMy === 'function') renderMy(); }, 0);
+}
+/* 푸시 서버 등록·해제를 한 줄로 세운다 — 앞 일이 실패해도 뒤 일은 돈다 */
+/* 🔴 줄의 한 칸마다 시한이 있다 — 서비스워커가 끝내 안 뜨면(사생활 보호 창의 등록 거절·설치 실패) navigator.serviceWorker.ready 가
+   영영 돌아오지 않아, 스위치는 켜짐인데 아무 데도 등록 안 된 채로 굳고 뒤 일도 전부 줄에 갇혔다(리뷰 2026-11-09).
+   시한을 넘기면 { ok:false, reason:'timeout' } 으로 보고 다음 칸으로 넘어간다 — 버튼으로 켠 것이면 꺼짐으로 돌아간다. */
+const NF_PUSH_STEP_MS = 12000;
+let nfPushChain = Promise.resolve();
+function nfPushQueue(fn) {
+  const step = () => Promise.race([
+    Promise.resolve().then(fn),
+    new Promise((r) => setTimeout(() => r({ ok: false, reason: 'timeout' }), NF_PUSH_STEP_MS)),
+  ]);
+  const run = nfPushChain.then(step, step);
+  nfPushChain = run.catch(() => {});
+  return run;
+}
+
+/* 🔴 **버튼으로 켰는데 발송 서버 등록이 안 되면 스위치를 끈 모양으로 되돌린다** (2026-11-09 개발자 지시
+   "서버 등록에 실패했을 때 학생에게 따로 알려주지 말고 … 등록이 안 되었다면 알림 아이콘이 꺼져 있는 상태로").
+   · 따로 알리지 않는다 — 바닥 안내 글도 상태 줄의 새 문구도 없다. 스위치가 꺼짐으로 돌아갈 뿐이다.
+   · **버튼을 눌렀을 때만** — 앱을 켤 때·돌아올 때의 자동 재등록(pushEnsure)이 잠깐 실패했다고 켜 둔 알림을 끄지 않는다.
+   · 발송 서버가 아예 없는 판(push-config.js 가 빈칸)은 등록할 곳이 없으니 켜 둔다 — 그 판은 '앱 안 알림만' 쓰는 게 원래 약속이다.
+   · 그새 다시 눌렀으면(nfPressSeq) 마지막 누름이 정한다 — 앞 누름의 늦은 실패가 뒤에 켠 것을 끄지 않게.
+   · 되돌릴 때 브라우저에 반쯤 생긴 구독(폰은 됐는데 서버가 못 받은 경우)도 같은 줄에서 걷는다. */
+let nfPressSeq = 0;
+function nfPressed() { return ++nfPressSeq; }
+function nfRegisterFailed(res) {
+  return pushConfigured() && !(res && res.ok) && !(res && res.reason === 'off');
+}
+async function nfRegisterAfterPress(seq) {
+  const res = await nfPushQueue(() => pushEnsure());
+  if (seq !== nfPressSeq || !notifyLedger || !notifyLedger.enabled) return res;
+  if (!nfRegisterFailed(res)) return res;
+  notifyLedger.enabled = false;
+  await notifySaveLedger();
+  notifyRedrawNow();
+  nfPushQueue(() => (notifyLedger.enabled ? null : pushUnsubscribe())).catch(() => {});
+  return res;
+}
 function notifySettingsHtml() {
   if (!notifyLedger) return '';
   const sup = notifySupport();
@@ -405,29 +467,35 @@ function bindNotifySettings() {
 
   toggle.addEventListener('click', async () => {
     const sup = notifySupport();
+    /* 🔴 **화면 먼저, 서버는 뒤에** (2026-11-09 신고 — 눌러도 2초쯤 뒤에야 바뀐다).
+       스위치·상태 줄이 보는 것은 장부의 켜짐 값과 브라우저 권한 둘뿐이라 누르는 즉시 안다.
+       예전에는 푸시 서버 등록·해제(네트워크 왕복)가 끝난 **뒤에** 다시 그려서 그만큼 늦었다.
+       서버 일은 nfPushQueue 로 줄 세운다 — 빨리 껐다 켜도 '해제'가 '등록'보다 늦게 끝나 등록을 지우지 않게.
+       🔴 켜기/끄기 때 화면 바닥 안내 글(토스트)은 띄우지 않는다 (2026-11-09 개발자 지시 "휴대폰 알림 꺼짐/켜짐 설명 글은 없애줘").
+          켜졌는지는 스위치와 그 옆 상태 줄이 이미 말한다. 브라우저가 막아 **켤 수 없을 때**의 안내만 남긴다. */
+    const seq = nfPressed();
     if (notifyLedger.enabled && sup.permission === 'granted') {
       notifyLedger.enabled = false;
+      notifyRedrawNow();
       await notifySaveLedger();
-      await pushUnsubscribe(); // 알림을 끄면 서버가 폰을 깨우는 것도 함께 멈춘다
-      toast('휴대폰 알림 꺼짐 · 앱 안 알림함에는 계속 쌓여요');
+      // 알림을 끄면 서버가 폰을 깨우는 것도 함께 멈춘다 — 그새 다시 켰으면 건너뛴다
+      await nfPushQueue(() => (notifyLedger.enabled ? null : pushUnsubscribe()));
     } else {
-      const perm = await notifyRequestPermission();
+      const perm = await notifyRequestPermission();   // 권한 창이 뜨면 학생이 답할 때까지는 기다릴 수밖에 없다
       notifyLedger.askedAt = notifyLedger.askedAt || Date.now();
       notifyLedger.enabled = perm === 'granted';
       /* 스위치 하나가 전부다 — 켜면 종류별 알림을 모두 켠다(예전에 종류별로 꺼 둔 것이 보이지 않는 채 남지 않게) */
       if (notifyLedger.enabled) for (const t of NOTIFY_RULES.TYPES) notifyLedger.prefs[t.id] = true;
+      notifyRedrawNow();
       await notifySaveLedger();
       if (perm === 'granted') {
         notifyRegisterBackground();
-        // 알림을 켜면 '앱을 안 켜도 오는 알림'까지 함께 켠다 (별도 스위치 없음 — 2026-08-06)
-        const p = await pushEnsure();
-        toast(p && p.ok
-          ? '알림을 켰습니다. 앱을 켜지 않아도 폰으로 알립니다'
-          : '알림 켜짐');
+        // 알림을 켜면 '앱을 안 켜도 오는 알림'까지 함께 켠다 (별도 스위치 없음 — 2026-08-06) · 그새 껐으면 pushEnsure 가 'off' 로 물러난다
+        // 등록이 안 되면 스위치가 꺼짐으로 돌아간다(nfRegisterAfterPress — 따로 알리지 않는다)
+        await nfRegisterAfterPress(seq);
       }
       else if (perm === 'denied') toast('브라우저 사이트 설정에서 알림 허용 필요');
     }
-    renderMy();
   });
 
   $$('[data-nf-pref]').forEach((el) => el.addEventListener('change', async () => {
@@ -481,7 +549,8 @@ function urlB64ToUint8(base64) {
 
 async function pushRegistration() {
   if (typeof swReg !== 'undefined' && swReg) return swReg;
-  try { return await navigator.serviceWorker.ready; } catch (e) { return null; }
+  /* ready 는 서비스워커가 안 뜨면 영영 안 돌아온다 — 8초 넘으면 없는 것으로 본다(부르는 쪽이 'unsupported' 로 받는다) */
+  try { return await Promise.race([navigator.serviceWorker.ready, new Promise((r) => setTimeout(() => r(null), 8000))]); } catch (e) { return null; }
 }
 
 /* 폰을 발송 서버에 등록 — 성공하면 앱을 안 켜도 알림이 온다 */
@@ -737,8 +806,8 @@ async function notifyInit() {
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState !== 'visible') return;
     setTimeout(() => notifyCheck({ quiet: false }), 1500);
-    // 브라우저 설정에서 알림을 뒤늦게 허용한 경우에도 여기서 등록이 메꿔진다
-    pushEnsure().catch(() => {});
+    // 브라우저 설정에서 알림을 뒤늦게 허용한 경우에도 여기서 등록이 메꿔진다 · 스위치의 해제와 겹치지 않게 같은 줄에 선다
+    nfPushQueue(() => pushEnsure()).catch(() => {});
   });
 
   // 서비스워커에서 알림을 눌렀다는 신호가 오면 해당 화면을 연다
@@ -756,7 +825,7 @@ async function notifyInit() {
   if (notifyLedger.enabled) {
     notifyRegisterBackground();
     // 아직 발송 서버에 등록되지 않았으면 지금 등록하고, 이미 됐으면 학교만 맞춘다
-    pushEnsure().catch(() => {});
+    nfPushQueue(() => pushEnsure()).catch(() => {});
   }
   notifyMaybeAskConsent(1800);
 }

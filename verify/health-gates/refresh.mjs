@@ -124,6 +124,10 @@ export default async function gate(eq, ctx) {
         [pub.published, pub.skipped], [['KAIST'], ['없는대학교']]);
     } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
     const mj = stripComments(read(root, 'collector/majors.mjs'));
+    /* 2026-10-31 — 사람이 확인할 근거 둘(리포트만): 캠퍼스 번호별 학과 표본 · 소재지를 못 정한 학교의 area 원문. 대상 학교는 계산한다(박아 두지 않는다) */
+    eq('  리포트에 「캠퍼스 번호별 학과 표본」·「소재지를 못 정한 학교」 절이 있고 대상은 계산한다 (NUMBER_PROBE 는 CAMPUSES_BY_SCHOOL − CAMPUS_BY_AREA · areaRawSeen 은 모든 학교)',
+      [/## 캠퍼스 번호별 학과 표본/.test(mj), /## 소재지를 못 정한 학교/.test(mj), /NUMBER_PROBE = new Set\(\[\.\.\.loadCampuses\([^)]*\)\)\.keys\(\)\]\.filter\(\(k\) => !CAMPUS_BY_AREA\[k\]\)\)/.test(mj), /areaRawSeen\.get\(school\)\.set\(raw/.test(mj)],
+      [true, true, true, true]);
     eq('  로봇이 진단을 부르고 리포트를 쓴다 · 앱 학교가 바닥값보다 적으면 저장 전에 멈춘다 (missingServed( · campusNameSuspects( · majors-report.md · MIN_APP_SCHOOLS 가 data/majors.json 쓰기 앞)',
       [/missingServed\(pub\.published, ME\.SERVED_SCHOOLS\)/.test(mj), /campusNameSuspects\(/.test(mj), /majors-report\.md/.test(mj),
         mj.indexOf('appSchools < MIN_APP_SCHOOLS') > 0 && mj.indexOf('appSchools < MIN_APP_SCHOOLS') < mj.indexOf('fs.writeFileSync(OUT_PATH')],
@@ -139,7 +143,7 @@ export default async function gate(eq, ctx) {
     eqWf('ⓔ 학과·등록금 로봇은 수집 대기줄(collector)이 아닌 제 줄에 선다 (줄 이름 · 서로 다름)',
       [groups.map((g) => g && g !== 'collector'), new Set(groups).size], [[true, true], 2]);
     eqWf('  체크아웃은 기본 브랜치 끝(ref: claude/nice-heisenberg-WESq5)',
-      ys.map((y) => ((/- uses: actions\/checkout@v4\n\s+with:\n(?:\s+#[^\n]*\n)*\s+ref: (\S+)/.exec(y)) || [])[1] || ''),
+      ys.map((y) => ((/- uses: actions\/checkout@v\d+\n\s+with:\n(?:\s+#[^\n]*\n)*\s+ref: (\S+)/.exec(y)) || [])[1] || ''),
       ['claude/nice-heisenberg-WESq5', 'claude/nice-heisenberg-WESq5']);
     eqWf('  넘어짐 알림(robot-down · failure() || cancelled())이 있고 이슈 권한(issues: write)이 있다',
       ys.map((y) => [jobsOf(y).some((j) => coversDown(stepsOf(j.text))), /^permissions:\n(?:\s+[a-z-]+:\s*\w+\n)*?\s+issues:\s*write/m.test(codeOf(y))]),

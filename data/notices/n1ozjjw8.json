@@ -1,7 +1,102 @@
 {
  "school": "상명대학교",
- "updatedAt": "2026-10-31",
+ "updatedAt": "2026-11-11",
  "items": [
+  {
+   "title": "문우림 제6기 장학생 선발 안내",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=770186&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "문우림 제6기 장학생 선발 공고문.hwp",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770186&attachNo=563847"
+    },
+    {
+     "name": "문우림 제6기 장학생 선발 모집요강.pdf",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770186&attachNo=563848"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "",
+   "foundAt": "2026-11-10"
+  },
+  {
+   "title": "[학생복지팀] 한국장학재단 2026년 2학기 국가장학금Ⅰ유형(다자녀 포함) 지급 안내_재단 10월 29일 지급실행분",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=770149&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "",
+   "foundAt": "2026-11-10"
+  },
+  {
+   "title": "국제언어문화교육원 두레장학생(두레조교) 채용 공고",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=770095&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "",
+   "foundAt": "2026-11-09"
+  },
+  {
+   "title": "2027-2028 이스라엘 정부초청 장학생 선발 안내",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=770100&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2027-2028_이스라엘_정부장학금_안내.pdf",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770100&attachNo=563758"
+    },
+    {
+     "name": "지원서_양식.pdf",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770100&attachNo=563759"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "",
+   "foundAt": "2026-11-09"
+  },
+  {
+   "title": "[학생상담센터] 2026학년도 상담 및 프로그램 참여 수기 공모전 안내(장학금 총140만원)",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=770062&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "2026학년도 상담 및 프로그램 참여 수기 공모전 양식.hwp",
+     "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770062&attachNo=563682"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "",
+   "foundAt": "2026-11-06"
+  },
+  {
+   "title": "(재)전기공사공제조합장학회 2027년도 제22기 장학생 선발 공고(전기관련학과)",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=769960&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "",
+   "foundAt": "2026-11-04"
+  },
+  {
+   "title": "[한국장학재단] 청년지원정보 통합제공 플랫폼 '통학로' 홍보",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=769902&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "",
+   "foundAt": "2026-11-02"
+  },
+  {
+   "title": "[한국장학재단] 학자금 중복지원 방지 사업 홍보",
+   "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=769901&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "상명대학교",
+   "campus": "",
+   "foundAt": "2026-11-02"
+  },
   {
    "title": "2026년 통영시 저소득 대학생 장학금 지원대상자 선발 안내",
    "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=769819&article.offset=0&articleLimit=10",

@@ -1,7 +1,85 @@
 {
  "school": "서강대학교",
- "updatedAt": "2026-10-31",
+ "updatedAt": "2026-11-11",
  "items": [
+  {
+   "title": "[국제대학원·국제지역연구소] Orange the World 캠페인 특별강연 안내 (11/25)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551812?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
+   "postId": "551812",
+   "postedAt": "2026-11-11",
+   "kind": "행사",
+   "school": "서강대학교",
+   "campus": "",
+   "board": "행사특강",
+   "src": "c13ee4bc",
+   "foundAt": "2026-11-11",
+   "thumb": "data/news/img/6262c3e90db91548.webp",
+   "desc": "ㆍ장소: 정하상관 J118호 ㆍ특강 연사: Hawon Jung / Digital Investigation Editor, Agence France-Presse (AFP) ㆍ주최: 주한 오스트리아 대사관,…"
+  },
+  {
+   "title": "[교수학습센터] 서강 K-MOOC 토크콘서트 행사 안내 (11/17~11/19)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551794?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
+   "postId": "551794",
+   "postedAt": "2026-11-09",
+   "kind": "행사",
+   "school": "서강대학교",
+   "campus": "",
+   "board": "행사특강",
+   "src": "c13ee4bc",
+   "foundAt": "2026-11-09",
+   "thumb": "data/news/img/130f65c9321f32bd.webp"
+  },
+  {
+   "title": "[유로메나연구소] 제62차 월례세미나 개최",
+   "url": "https://www.sogang.ac.kr/ko/detail/551753?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
+   "postId": "551753",
+   "postedAt": "2026-11-04",
+   "kind": "행사",
+   "school": "서강대학교",
+   "campus": "",
+   "board": "행사특강",
+   "src": "c13ee4bc",
+   "foundAt": "2026-11-08",
+   "thumb": "data/news/img/66c8f2092e31687e.webp"
+  },
+  {
+   "title": "[트랜스내셔널인문학연구소·역사학연구소] \"인간, 식물/동물, 기술: 농업사를 쓰는 문제의식의 현주소\" 심포지엄 안내 (11/14)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551737?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
+   "postId": "551737",
+   "postedAt": "2026-11-03",
+   "kind": "행사",
+   "school": "서강대학교",
+   "campus": "",
+   "board": "행사특강",
+   "src": "c13ee4bc",
+   "foundAt": "2026-11-03",
+   "desc": "발표: 노성룡(공주대) 토론: 이명학(교원대) 발표: 이대열(고려대) 토론: 김일환(서울과학기술대) 발표: 류일환(서강대) 토론: 김민지(서강대) 발표: 정윤영(연세대) 토론: 김동주(고려대)"
+  },
+  {
+   "title": "[앵커사업단] LG CNS Day 행사 안내",
+   "url": "https://www.sogang.ac.kr/ko/detail/551731?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
+   "postId": "551731",
+   "postedAt": "2026-11-02",
+   "kind": "행사",
+   "school": "서강대학교",
+   "campus": "",
+   "board": "행사특강",
+   "src": "c13ee4bc",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/967004fafd24a842.webp"
+  },
+  {
+   "title": "[서강판교캠퍼스사업단] 2026 창업서밋&밋업데이 정부지원사업 제대로 알기 프로그램(11/20)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551726?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
+   "postId": "551726",
+   "postedAt": "2026-11-02",
+   "school": "서강대학교",
+   "campus": "",
+   "board": "행사특강",
+   "src": "c13ee4bc",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/4014bd71224c62f1.webp"
+  },
   {
    "title": "[철학연구소] 10월 해외석학 초청 강연회",
    "url": "https://www.sogang.ac.kr/ko/detail/551601?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
@@ -28,55 +106,6 @@
    "src": "c13ee4bc",
    "foundAt": "2026-10-14",
    "thumb": "data/news/img/19ebf55ed6587126.webp"
-  },
-  {
-   "title": "[CGSI] 10월 16일 콜로키움 안내",
-   "url": "https://www.sogang.ac.kr/ko/detail/551541?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
-   "postId": "551541",
-   "postedAt": "2026-10-07",
-   "school": "서강대학교",
-   "campus": "",
-   "board": "행사특강",
-   "foundAt": "2026-10-07",
-   "thumb": "data/news/img/77945807d73c0858.webp",
-   "src": "c13ee4bc"
-  },
-  {
-   "title": "[유로메나연구소] 국제학술대회 안내(10/16-10/17)",
-   "url": "https://www.sogang.ac.kr/ko/detail/551482?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
-   "postId": "551482",
-   "postedAt": "2026-10-01",
-   "school": "서강대학교",
-   "campus": "",
-   "board": "행사특강",
-   "foundAt": "2026-10-04",
-   "thumb": "data/news/img/fd6b7e68f141ae29.webp",
-   "src": "c13ee4bc"
-  },
-  {
-   "title": "[철학연구소] 제123회 월례발표회 안내 (9/18)",
-   "url": "https://www.sogang.ac.kr/ko/detail/551172?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
-   "postId": "551172",
-   "postedAt": "2026-09-07",
-   "school": "서강대학교",
-   "campus": "",
-   "board": "행사특강",
-   "foundAt": "2026-10-04",
-   "thumb": "data/news/img/9457fbf17617793e.webp",
-   "src": "c13ee4bc"
-  },
-  {
-   "title": "[학군단] 골때녀 우희준의 리더십 특별 강연 (9월10일 오전8시, RA관408호)",
-   "url": "https://www.sogang.ac.kr/ko/detail/551113?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event",
-   "postId": "551113",
-   "postedAt": "2026-09-03",
-   "kind": "행사",
-   "school": "서강대학교",
-   "campus": "",
-   "board": "행사특강",
-   "foundAt": "2026-10-04",
-   "thumb": "data/news/img/c39fa54f0c461978.webp",
-   "src": "c13ee4bc"
   }
  ]
 }

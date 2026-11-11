@@ -1,7 +1,48 @@
 {
  "school": "고려대학교 세종캠퍼스",
- "updatedAt": "2026-10-31",
+ "updatedAt": "2026-11-11",
  "items": [
+  {
+   "title": "제648차 법인이사회 소집",
+   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/664/274361/artclView.do",
+   "postedAt": "2026-11-11",
+   "school": "고려대학교 세종캠퍼스",
+   "campus": "",
+   "src": "9d83aebf",
+   "foundAt": "2026-11-11",
+   "desc": "학교법인 고려중앙학원 제 648 차 이사회를 아래와 같이 소집합니다 . ○ 소집일자 : 2026 년 11 월 19 일"
+  },
+  {
+   "title": "[세종] 휘트니스센터 12월 종일 회원권 온라인 접수 안내",
+   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/664/274330/artclView.do",
+   "postedAt": "2026-11-10",
+   "school": "고려대학교 세종캠퍼스",
+   "campus": "",
+   "src": "9d83aebf",
+   "foundAt": "2026-11-10"
+  },
+  {
+   "title": "[학부] 2027학년도 제1학기 이중전공 전형 시행 안내",
+   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/656/274181/artclView.do",
+   "postedAt": "2026-11-03",
+   "school": "고려대학교 세종캠퍼스",
+   "campus": "",
+   "board": "학사공지",
+   "src": "6d929437",
+   "foundAt": "2026-11-03"
+  },
+  {
+   "title": "2026년 ISIC 국제학생증 인증비 지원행사 안내 (무료발급)",
+   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/664/274153/artclView.do",
+   "postedAt": "2026-11-02",
+   "kind": "학사",
+   "school": "고려대학교 세종캠퍼스",
+   "campus": "",
+   "src": "9d83aebf",
+   "foundAt": "2026-11-02",
+   "thumb": "data/news/img/a5dbdf1aa711bbfd.webp",
+   "desc": "해외여행, 어학연수, 교환학생, 배낭여행 필수템! ISIC 국제학생증 으로 전 세계 15만여 개 학생 할인 혜택 을 누려보세요. 행사 기간 동안 인증비 19,000원을 전액 지원하여 무료로 발급받을 수 있습니다."
+  },
   {
    "title": "[세종] 휘트니스센터 11월 종일권 2차 온라인 접수 안내",
    "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/664/274001/artclView.do",
@@ -80,17 +121,6 @@
    "desc": "강의개선을 위한 중간 수강소감설문 실시 안내 1. 해당 학기 수업 운영 개선 목적으로, 개강 후 학기의 1/2 이전 시점에 중간 강의평가(수강소감설문)을 실시합니다."
   },
   {
-   "title": "[세종RISE사업단]2027 충청하계유니버시아드대회 D-1년 연계 대학생 생성형 AI 창작",
-   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/656/272386/artclView.do",
-   "postedAt": "2026-09-04",
-   "school": "고려대학교 세종캠퍼스",
-   "campus": "",
-   "board": "학사공지",
-   "src": "6d929437",
-   "foundAt": "2026-10-13",
-   "thumb": "data/news/img/d8c5847aa07ccc3b.webp"
-  },
-  {
    "title": "[세종] 휘트니스센터 11월 종일 회원권 온라인 접수 안내",
    "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/664/273539/artclView.do",
    "postedAt": "2026-10-12",
@@ -98,67 +128,6 @@
    "campus": "",
    "src": "9d83aebf",
    "foundAt": "2026-10-12"
-  },
-  {
-   "title": "[세종앵커사업단] 2026 랜선으로 만나는 릴레이 글로벌 취·창업 톡톡톡(talk) 모집",
-   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/656/273103/artclView.do",
-   "postedAt": "2026-09-23",
-   "school": "고려대학교 세종캠퍼스",
-   "campus": "",
-   "board": "학사공지",
-   "foundAt": "2026-10-04",
-   "src": "6d929437"
-  },
-  {
-   "title": "[학부] 2027년도 제1학기 복수전공전형 시행 안내",
-   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/656/272747/artclView.do",
-   "postedAt": "2026-09-11",
-   "kind": "학사",
-   "school": "고려대학교 세종캠퍼스",
-   "campus": "",
-   "board": "학사공지",
-   "foundAt": "2026-10-04",
-   "thumb": "data/news/img/343daf2bf013dac1.webp",
-   "src": "6d929437"
-  },
-  {
-   "title": "[학부] 2026학년도 2학기 세종캠퍼스 학부 폐강과목",
-   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/656/272717/artclView.do",
-   "postedAt": "2026-09-10",
-   "kind": "학사",
-   "school": "고려대학교 세종캠퍼스",
-   "campus": "",
-   "board": "학사공지",
-   "foundAt": "2026-10-04",
-   "src": "6d929437"
-  },
-  {
-   "title": "[세종] 휘트니스센터 10월 종일 회원권 2차 온라인 접수 안내",
-   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/664/273087/artclView.do",
-   "postedAt": "2026-09-22",
-   "school": "고려대학교 세종캠퍼스",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "src": "9d83aebf"
-  },
-  {
-   "title": "2026학년도 2학기 학생 셔틀버스 운행 시간 변경 안내",
-   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/664/272847/artclView.do",
-   "postedAt": "2026-09-15",
-   "kind": "생활",
-   "school": "고려대학교 세종캠퍼스",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "src": "9d83aebf"
-  },
-  {
-   "title": "[세종] 휘트니스센터 10월 종일 회원권 온라인 접수 안내",
-   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/664/272785/artclView.do",
-   "postedAt": "2026-09-14",
-   "school": "고려대학교 세종캠퍼스",
-   "campus": "",
-   "foundAt": "2026-10-01",
-   "src": "9d83aebf"
   }
  ]
 }

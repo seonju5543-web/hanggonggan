@@ -28,6 +28,13 @@ const SUPABASE_CONFIG = {
   url: 'https://ffnzmiorcojbhpqwqgcy.supabase.co',
   anonKey: 'sb_publishable_kWvjVknBPO8V6ktPEHOlvA_-CTXhCAA',
 
+  /* 앱 오류 수집 창구 (2026-11-10 · error-report.js) — 학생 폰에서 난 오류를 우리가 알게 한다(누구인지는 담지 않는다).
+     🔴 `supabase/migrations/0005_client_errors.sql` 을 SQL Editor 에서 실행해 표를 만든 **뒤에** true 로 바꾼다.
+        (표 없이 켜도 앱은 멀쩡하다 — 요청이 404 로 끝날 뿐이다.) 보는 곳: Table Editor → client_errors
+     ✅ 2026-11-11 켬 — 개발자가 SQL Editor 에서 0005 를 실행했다. 표가 있는지는 매일 supabase-health.yml 이 확인한다(없으면 경보).
+     ⚠️ 배포된 주소에서만 보낸다(localhost 검사 환경은 안 보낸다 — error-report.js). */
+  errorReport: true,
+
   /* 소셜 로그인 — 여기 적은 것만 화면에 버튼으로 나온다. **비워 두면 소셜 버튼이 없다.**
      ⚠️ 여기에 적는 것만으로는 안 되고, Supabase 대시보드에서 그 제공자를 켜고
         구글/카카오 쪽에서 발급받은 열쇠를 넣어야 실제로 동작한다:

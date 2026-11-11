@@ -47,6 +47,30 @@ export function readSupabaseConfig(src) {
   return url && anonKey ? { url, anonKey } : null;
 }
 
+/** 앱 오류 수집 창구가 켜져 있나 — supabase-config.js 의 errorReport === true (2026-11-10 · error-report.js) */
+export function readErrorReport(src) {
+  const box = { module: { exports: {} } };
+  try {
+    vm.runInNewContext(`${String(src || '')}\n;globalThis.__on = (typeof SUPABASE_CONFIG !== 'undefined') && SUPABASE_CONFIG.errorReport === true;`, box, { timeout: 1000 });
+  } catch (e) { return false; }
+  return box.__on === true;
+}
+/** 오류 수집 표가 있는가 — 읽기 정책이 없어 늘 빈 목록이지만, 표가 **있으면 200 · 없으면 404**(PostgREST) */
+export function tableVerdict({ ok, code } = {}) {
+  if (ok && Number(code) === 200) return { verdict: 'ok', why: '' };
+  if (ok && Number(code) === 404) return { verdict: 'misconfig', why: '앱 오류 수집 표(client_errors)가 없습니다 — Supabase SQL Editor 에서 supabase/migrations/0005_client_errors.sql 을 실행하세요(그전까지 앱의 오류 보고는 버려집니다)' };
+  if (!ok) return { verdict: 'down', why: '앱 오류 수집 표를 확인하지 못했습니다 (응답 없음)' };
+  return { verdict: 'misconfig', why: `앱 오류 수집 표를 확인하지 못했습니다 (HTTP ${code})` };
+}
+export async function probeTable(cfg, { fetchImpl = fetch, timeoutMs = 20000 } = {}) {
+  try {
+    const r = await fetchImpl(`${cfg.url}/rest/v1/client_errors?select=id&limit=1`, {
+      headers: { apikey: cfg.anonKey, Authorization: `Bearer ${cfg.anonKey}` }, signal: AbortSignal.timeout(timeoutMs),
+    });
+    return { ok: true, code: r.status };
+  } catch (e) { return { ok: false, code: 0, error: String((e && e.message) || e) }; }
+}
+
 /** 순수 판정 — { ok: 요청이 응답을 받았나, code: HTTP 코드 } → { verdict, why } */
 export function verdict({ ok, code } = {}) {
   const c = Number(code);
@@ -87,7 +111,7 @@ export async function probe(cfg, { fetchImpl = fetch, tries = 3, waits = [10000,
 
 /** 명령줄 본체 — 설정 글자 → { verdict, why, exit }
     못 읽으면 { verdict: null, exit: 1 } (판정을 적지 않는다 — 'off' 로 두면 워크플로가 경보를 닫는다) */
-export async function run(src, { probeImpl = probe, log = () => {} } = {}) {
+export async function run(src, { probeImpl = probe, tableImpl = probeTable, log = () => {} } = {}) {
   let cfg;
   try { cfg = readSupabaseConfig(src); } catch (e) { return { verdict: null, why: e.message, exit: 1 }; }
   if (!cfg) {
@@ -96,6 +120,12 @@ export async function run(src, { probeImpl = probe, log = () => {} } = {}) {
   }
   log(`로그인 서버 확인: ${new URL(cfg.url).host}/auth/v1/health`);
   const v = await probeImpl(cfg, { log });
+  /* 오류 수집 창구를 켰으면 표가 정말 있는지도 본다 — 없으면 학생 폰의 오류 보고가 404 로 조용히 버려진다 (2026-11-10) */
+  if (v.verdict === 'ok' && readErrorReport(src)) {
+    const t = tableVerdict(await tableImpl(cfg));
+    log(`앱 오류 수집 표 확인: ${t.verdict}${t.why ? ` — ${t.why}` : ''}`);
+    if (t.verdict !== 'ok') return { verdict: t.verdict, why: t.why, exit: 0 };
+  }
   return { verdict: v.verdict, why: v.why || '', exit: 0 };
 }
 

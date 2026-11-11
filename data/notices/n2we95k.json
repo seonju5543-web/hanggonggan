@@ -1,7 +1,39 @@
 {
  "school": "동국대학교 WISE캠퍼스",
- "updatedAt": "2026-10-31",
+ "updatedAt": "2026-11-11",
  "items": [
+  {
+   "title": "2027-2028 이스라엘 정부초청 장학생 선발 안내",
+   "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/521118",
+   "attachments": [
+    {
+     "name": "지원서 양식 (1).pdf",
+     "url": "https://wise.dongguk.ac.kr/cmmn/fileDown.do?filename=%EC%A7%80%EC%9B%90%EC%84%9C%20%EC%96%91%EC%8B%9D%20(1).pdf&filepath=/files/article/servicenotice/521118/&filerealname=7B75A814CDEC4918B1154F9321861E9F.pdf"
+    },
+    {
+     "name": "2027-2028 이스라엘 정부장학금 안내.pdf",
+     "url": "https://wise.dongguk.ac.kr/cmmn/fileDown.do?filename=2027-2028%20%EC%9D%B4%EC%8A%A4%EB%9D%BC%EC%97%98%20%EC%A0%95%EB%B6%80%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%95%88%EB%82%B4.pdf&filepath=/files/article/servicenotice/521118/&filerealname=8ED2D6F7E954491392C418CCA112902B.pdf"
+    }
+   ],
+   "deadlineHint": "마감일: 2027.1.15.(금) ※ 1.15. 도착분까지 접수. 방문접수 불가 마. 문의처: 주한이스라엘대사관 학술과(02-3210-8510,",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-09"
+  },
+  {
+   "title": "2026-2학기 주거안정장학 지급요청서 작성 안내",
+   "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/521071",
+   "attachments": [
+    {
+     "name": "주거안정장학금+지급요청서+작성+매뉴얼(학생).pdf",
+     "url": "https://wise.dongguk.ac.kr/cmmn/fileDown.do?filename=%EC%A3%BC%EA%B1%B0%EC%95%88%EC%A0%95%EC%9E%A5%ED%95%99%EA%B8%88%2B%EC%A7%80%EA%B8%89%EC%9A%94%EC%B2%AD%EC%84%9C%2B%EC%9E%91%EC%84%B1%2B%EB%A7%A4%EB%89%B4%EC%96%BC(%ED%95%99%EC%83%9D).pdf&filepath=/files/article/servicenotice/521071/&filerealname=78DC96D217F44F2A94203E30BBCB4069.pdf"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-04"
+  },
   {
    "title": "2026년도 통영시 저소득 대학생 장학금 지원사업 안내(대상: 통영시 관내 고등학교 졸업자 등)",
    "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/521012",

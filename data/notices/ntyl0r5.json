@@ -1,7 +1,48 @@
 {
  "school": "명지대학교",
- "updatedAt": "2026-10-31",
+ "updatedAt": "2026-11-11",
  "items": [
+  {
+   "title": "한국고등교육재단 문우림 제6기 장학생 선발 안내",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/145/237091/artclView.do",
+   "attachments": [
+    {
+     "name": "문우림 제6기 장학생 선발 모집요강.pdf",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/145/181762/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "명지대학교",
+   "campus": "",
+   "foundAt": "2026-11-11"
+  },
+  {
+   "title": "[한국장학재단] 2026 동계방학 집중근로 희망근로지 신청 안내",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/145/236891/artclView.do",
+   "attachments": [
+    {
+     "name": "붙임1-1. 2026년 동계방학 집중근로 희망근로지 신청 매뉴얼(홈페이지).pdf",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/145/181663/download.do"
+    },
+    {
+     "name": "붙임1-2. 2026년 동계방학 집중근로 희망근로지 신청 매뉴얼(모바일).pdf",
+     "url": "https://www.mju.ac.kr/bbs/mjukr/145/181664/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "명지대학교",
+   "campus": "",
+   "foundAt": "2026-11-05"
+  },
+  {
+   "title": "장학금부터 취업까지, 나에게 필요한 청년지원정보 확인하기",
+   "url": "https://www.mju.ac.kr/bbs/mjukr/145/236829/artclView.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "명지대학교",
+   "campus": "",
+   "foundAt": "2026-11-03"
+  },
   {
    "title": "2026년도 희우장학재단 2기 장학생 선발 공지",
    "url": "https://www.mju.ac.kr/bbs/mjukr/145/236662/artclView.do",

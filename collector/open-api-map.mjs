@@ -18,7 +18,7 @@
      · 한 출처를 **못 받아 온 날은 그 출처의 지난 글을 그대로 둔다** — 네트워크가 잠깐 끊겼다고 글이 사라지지 않게.
    ============================================================ */
 import { activityKind, activityField } from './activity-kind.mjs';
-import { activityExcerpts, activityDetails, putActivityDetails, CONTACT, splitBenefit } from './activity-excerpts.mjs';
+import { activityExcerpts, activityDetails, putActivityDetails, CONTACT, splitBenefit, stripStepNumber } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { decodeEntities } from './clean-title.mjs';
 import { canonUrl } from './canon-url.mjs';
@@ -151,8 +151,9 @@ const excerpt = (label, text) => (text ? { label, text: clip(text) } : null);
 const NOTHING = /^(?:해당\s*(?:사항\s*)?없음|없음|무|N\/?A)\.?$/i;
 export function splitLines(raw, max = 8) {
   const t = htmlToLines(String(raw ?? ''));
-  const parts = t.split('\n').flatMap((l) => l.split(/\s(?=[○•◦▪■□◎※]\s?)|(?<=\S)\s(?=\d{1,2}[.)]\s)/))
-    .map((l) => l.replace(/^[\s\-–·•○◦▪■□◎]+/, '').trim())
+  /* 「1. … 2. …」 단계는 글자(또는 닫는 괄호) 뒤에서만 끊는다 — 숫자·점 뒤(`1996. 6. 이후`·`10. 30.`)는 날짜다(2026-11-02) · 끊은 뒤 번호는 뗀다(stripStepNumber — 연락처 단계가 빠져도 「3.」이 남지 않게) */
+  const parts = t.split('\n').flatMap((l) => l.split(/\s(?=[○•◦▪■□◎※]\s?)|(?<=[가-힣A-Za-z)\]」』>])\s(?=\d{1,2}[.)]\s)/))
+    .map((l) => stripStepNumber(l.replace(/^[\s\-–·•○◦▪■□◎]+/, '').trim()))
     .filter((l) => l.length >= 3 && /[가-힣A-Za-z]/.test(l))   // 3자 — `공무원`·`재직자` 같은 제외 대상이 한 낱말로 온다
     .map((l) => (l.length > 240 ? `${l.slice(0, 239)}…` : l));
   return parts.filter((l) => !CONTACT.test(l) && !NOTHING.test(l)).slice(0, max);

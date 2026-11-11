@@ -125,6 +125,20 @@ export default async function gate(eq, ctx) {
     eq('③ ops-11 두 번째 길은 기본 브랜치·main 의 성공만 센다(작업 브랜치의 더 늦은 성공을 고르지 않는다) · 인자 없으면 옛 동작',
       [HB.BASE_BRANCH, HB.latestSuccessIso(runs, { branches: [HB.BASE_BRANCH, 'main'] }), HB.latestSuccessIso(runs)],
       [BASE, '2026-10-04T10:00:00Z', '2026-10-04T12:00:00Z']);
+    /* 🔴 저장은 됐는데 관문만 빨간 실행 (2026-11-10 · 은서 — 11/4~11/7 수집분은 매번 저장됐는데 '96시간 조용'이라 경보해 '수집이 멈췄다'고 잘못 보고했다).
+       표본은 실제 실행(11/7 장학 42377311075 · 10월 브라우저 넘어짐)의 단계 꼴 그대로 */
+    const job = (...st) => [{ steps: st.map(([name, conclusion]) => ({ name, conclusion })) }];
+    const SAVE = ['수집 상태 저장 (중복 방지 기록)', 'success'];
+    const RED = ['🚨 관문이 끝내 빨간불 (되돌린 뒤에도)', 'failure'];
+    eq('② ⓑ 저장 성공 + 실패한 단계가 「관문이 끝내 빨간불」 하나뿐 → 저장됨·관문 빨간불(조용하다고 경보하지 않는다)',
+      HB.savedThoughGateRed(job(['데이터 관문 (수집기 규칙 테스트 + 데이터 감사)', 'success'], SAVE, RED)), true);
+    eq('  🔴 다른 단계가 하나라도 실패(넘어짐·시간초과·저장 실패)면 아니다 — 진짜로 멈춘 것 · 저장이 안 됐으면 아니다 · 단계를 못 읽으면 아니다(모르면 경보)',
+      [HB.savedThoughGateRed(job(SAVE, ['공고 원문 발췌 갱신 (정직 원칙 — 추론 대신 원문 그대로)', 'failure'])),
+        HB.savedThoughGateRed(job(SAVE, RED, ['게시판 수집', 'cancelled'])),
+        HB.savedThoughGateRed(job(['수집 상태 저장 (중복 방지 기록)', 'failure'], RED)),
+        HB.savedThoughGateRed(job(['수집 상태 저장 (중복 방지 기록)', 'skipped'], RED)),
+        HB.savedThoughGateRed([]), HB.savedThoughGateRed(null), HB.savedThoughGateRed(job(SAVE))],
+      [false, false, false, false, false, false, false]);
     const src = stripComments(read(root, 'collector/robot-heartbeat.mjs'));
     eq('  첫 질문(lastSuccessAt)의 주소가 기본 브랜치로 거르고 · 두 번째 길(recentSuccessAt)이 [기본 브랜치, main] 을 넘긴다',
       [/&branch=\$\{encodeURIComponent\(BASE_BRANCH\)\}/.test(fnBody(src, 'async function lastSuccessAt(')),
@@ -322,5 +336,182 @@ export default async function gate(eq, ctx) {
       [/PROBE_BEFORE:\s*\$\{\{[^}]*github\.event\.before[^}]*\}\}/.test(yml), /git fetch --no-tags --depth=1 origin "\$PROBE_BEFORE"/.test(fetchStep),
         /^\s*timeout-minutes:\s*\d+/m.test(fetchStep), /^\s*continue-on-error:\s*true\b/m.test(fetchStep)],
       [true, true, true, true]);
+  }
+
+  /* ── ⑤ 직전 판으로 되돌리기 (2026-11-11 · 은서 · 출시 전 백엔드 8번 — tools/rollback.mjs · rollback.yml) ──
+     임시 git 저장소에서 진짜로 돌린다: 고른 사람 작업만 취소되고 그 뒤의 로봇 데이터·다른 작업은 남는다 · 로봇 작업·합치기·워크플로 파일은 못 고른다 ·
+     부딪히면 아무것도 안 바꾼다 · 미리보기는 아무것도 안 바꾼다 · 워크플로는 미리보기가 기본·번호 필수·검사 뒤 저장·되감기 없음 */
+  {
+    const RB = await import(new URL('tools/rollback.mjs', root));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-rollback-'));
+    const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => !/^GIT_/.test(k)));
+    const g = (...a) => spawnSync('git', a, { cwd: dir, encoding: 'utf8', env });
+    const w = (f, t) => { fs.mkdirSync(path.dirname(path.join(dir, f)), { recursive: true }); fs.writeFileSync(path.join(dir, f), t); };
+    const r = (f) => (fs.existsSync(path.join(dir, f)) ? fs.readFileSync(path.join(dir, f), 'utf8') : null);
+    const as = (who) => (who === 'bot' ? ['-c', 'user.name=handaejang-bot', '-c', 'user.email=41898282+github-actions[bot]@users.noreply.github.com'] : ['-c', `user.name=${who}`, '-c', `user.email=${who}@example.com`]);
+    const commit = (who, msg) => { g('add', '-A'); g(...as(who), 'commit', '-qm', msg); return g('rev-parse', 'HEAD').stdout.trim(); };
+    try {
+      g('init', '-q', '-b', 'main'); g('config', 'commit.gpgsign', 'false');
+      g('config', 'user.name', 'handaejang-bot'); g('config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com');   // rollback.yml 이 하는 것과 같게(2026-11-11 — 이게 없어 GitHub 기계에서만 빨갰다)
+      w('app.js', 'line1\nline2\n'); w('data/notices.json', '[]\n'); commit('은서', '씨앗');
+      w('app.js', 'line1\nBROKEN\n'); const bad = commit('은서', '앱을 망가뜨린 작업');
+      w('data/notices.json', '[{"id":1}]\n'); const botSha = commit('bot', 'collector: seen state update');
+      w('style.css', 'a{}\n'); const later = commit('세현', '뒤의 다른 작업');
+      w('.github/workflows/x.yml', 'name: x\n'); const wf = commit('은서', '워크플로 고침');
+      const list = RB.listHumanCommits(dir).map((c) => c.subject);
+      eq('⑤ 목록 — 사람 작업만(로봇 수집 기록은 뺀다) · 최근 것부터',
+        list, ['워크플로 고침', '뒤의 다른 작업', '앱을 망가뜨린 작업', '씨앗']);
+      const head0 = g('rev-parse', 'HEAD').stdout.trim();
+      const pv = RB.refuseReason(dir, RB.resolveSha(dir, bad.slice(0, 8)));
+      eq('  미리보기·검사는 아무것도 안 바꾼다(HEAD 그대로 · 짧은 번호도 알아본다)', [pv, g('rev-parse', 'HEAD').stdout.trim() === head0], [null, true]);
+      const ok = RB.revertCommit(dir, bad.slice(0, 8));
+      eq('  🔴 고른 작업만 취소 — 앱 파일은 원래대로 · 그 뒤 로봇 데이터·다른 사람 작업은 그대로 · 기록은 지우지 않고 하나 얹는다(되감지 않는다)',
+        [ok.status, r('app.js'), r('data/notices.json'), r('style.css'), g('rev-list', '--count', 'HEAD').stdout.trim(), g('cat-file', '-e', bad).status],
+        ['reverted', 'line1\nline2\n', '[{"id":1}]\n', 'a{}\n', '6', 0]);
+      const head1 = g('rev-parse', 'HEAD').stdout.trim();
+      eq('  🔴 못 고르는 것 — 로봇 작업 · 워크플로 파일을 고친 작업 · 없는 번호 · 합치기 기록(전부 아무것도 안 바꾼다)',
+        [RB.revertCommit(dir, botSha).status, RB.revertCommit(dir, wf).status, RB.revertCommit(dir, 'deadbeef').status, g('rev-parse', 'HEAD').stdout.trim() === head1],
+        ['refused', 'refused', 'refused', true]);
+      g('checkout', '-qb', 'side', `${later}`); w('side.txt', 's\n'); commit('은서', '옆 작업');
+      g('checkout', '-q', 'main'); g(...as('은서'), 'merge', '-q', '--no-ff', '-m', '합치기', 'side');
+      const mergeSha = g('rev-parse', 'HEAD').stdout.trim();
+      eq('  합치기 기록은 못 고른다', RB.revertCommit(dir, mergeSha).status, 'refused');
+      w('style.css', 'b{}\n'); const s1 = commit('세현', '스타일 1');
+      w('style.css', 'c{}\n'); commit('세현', '스타일 2(같은 줄을 또 고침)');
+      const head2 = g('rev-parse', 'HEAD').stdout.trim();
+      const cf = RB.revertCommit(dir, s1);
+      eq('  🔴 부딪히면 멈추고 아무것도 안 바꾼다 — HEAD·파일 그대로 · 되돌리기 진행 중 상태가 남지 않는다 · 부딪힌 파일을 알려 준다',
+        [cf.status, g('rev-parse', 'HEAD').stdout.trim() === head2, r('style.css'), fs.existsSync(path.join(dir, '.git', 'REVERT_HEAD')), cf.files],
+        ['conflict', true, 'c{}\n', false, ['style.css']]);
+      /* 2026-11-11 — GitHub 기계엔 커밋 이름이 없어 git 이 거절했는데 도구가 '부딪힘'이라 적었다. 이름 없는 기계를 흉내 낸다 */
+      g('config', '--unset', 'user.name'); g('config', '--unset', 'user.email'); g('config', 'user.useConfigOnly', 'true');
+      const saved = { G: process.env.GIT_CONFIG_GLOBAL, S: process.env.GIT_CONFIG_NOSYSTEM };
+      process.env.GIT_CONFIG_GLOBAL = '/dev/null'; process.env.GIT_CONFIG_NOSYSTEM = '1';
+      const head3 = g('rev-parse', 'HEAD').stdout.trim();
+      let noName; try { noName = RB.revertCommit(dir, bad); } finally {
+        if (saved.G === undefined) delete process.env.GIT_CONFIG_GLOBAL; else process.env.GIT_CONFIG_GLOBAL = saved.G;
+        if (saved.S === undefined) delete process.env.GIT_CONFIG_NOSYSTEM; else process.env.GIT_CONFIG_NOSYSTEM = saved.S;
+      }
+      eq('  git 이 다른 이유로 거절하면(커밋 이름 없음) 부딪힘이라 하지 않고 그 이유를 말한다 · 아무것도 안 바꾼다',
+        [noName.status, /거절/.test(noName.reason || ''), g('rev-parse', 'HEAD').stdout.trim() === head3, fs.existsSync(path.join(dir, '.git', 'REVERT_HEAD'))],
+        ['error', true, true, false]);
+    } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+    const yml = read(root, '.github/workflows/rollback.yml').replace(/^\s*#.*$/gm, '');   // 주석은 걷고 잰다(금지된 길을 설명하는 주석에 걸리지 않게)
+    const src = stripComments(read(root, 'tools/rollback.mjs'));
+    eq('  rollback.yml — 미리보기가 기본 · 되돌리기는 번호 없으면 멈춤 · 기본 브랜치에서만 · 검사가 저장보다 앞 · 저장 뒤 배포 동기화를 깨움 · 입력은 환경 변수로만 · 되감기·강제 push 없음 · 시한',
+      [/default: '미리보기'/.test(yml), /if \[ -z "\$COMMIT" \]; then[\s\S]*?exit 1/.test(yml), /if: github\.ref_name == 'claude\/nice-heisenberg-WESq5'/.test(yml),
+        yml.indexOf('node verify/audit-data.js') > 0 && yml.indexOf('node verify/audit-data.js') < yml.indexOf('git push origin'), /gh workflow run deploy-sync\.yml/.test(yml),
+        !/run:[^\n]*\$\{\{\s*inputs\./.test(yml) && /COMMIT: \$\{\{ inputs\.commit \}\}/.test(yml), !/--force|reset --hard|push -f\b/.test(yml + src), /^ {4}timeout-minutes: \d+/m.test(yml)],
+      [true, true, true, true, true, true, true, true]);
+    eq('  🔴 \'가장 최근 작업 바로 되돌리기\' 길이 없다(2026-11-11 은서 결정) — 되돌리기는 번호를 받아야만 한다',
+      [/--latest|최근 것 바로|HEAD~1/.test(yml + src), /revertCommit\(cwd, arg\('--revert'\)\)/.test(src)], [false, true]);
+  }
+
+  /* ── ⑥ 열쇠 목록 · 만료 알림 (2026-11-11 · 은서 · 출시 전 백엔드 9번 — docs/backend/keys.json · tools/key-expiry.mjs · key-expiry.yml) ──
+     관리자 열쇠가 아무도 모르게 11/7 에 만료됐다. 🔴 목록에 값은 없다 · 새 열쇠는 목록에 적어야 통과 · 14일 전부터 경보 · 사람용 표는 원본과 같다 */
+  {
+    const KE = await import(new URL('tools/key-expiry.mjs', root));
+    const st = (e) => KE.keyState({ expires: e }, '2026-11-11');
+    eq('⑥ 만료 판정 — 지남 · 14일째까지 임박 · 15일째는 아직 · 없음 · 확인 필요(경보 안 함) · 자동 확인',
+      [st('2026-11-10'), st('2026-11-25'), st('2026-11-26'), st('없음').state, st('확인 필요').state, st('자동 확인').state],
+      [{ state: 'expired', days: -1 }, { state: 'soon', days: 14 }, { state: 'ok', days: 15 }, 'none', 'unknown', 'auto']);
+    eq('  임박 목록 — 지남·임박만, 급한 순 · 확인 필요는 빠진다',
+      KE.dueKeys([{ name: 'a', expires: '2026-12-31' }, { name: 'b', expires: '2026-11-20' }, { name: 'c', expires: '2026-11-01' }, { name: 'd', expires: '확인 필요' }], '2026-11-11').map((k) => k.name), ['c', 'b']);
+    const bad = (k) => { try { KE.loadKeys(JSON.stringify({ keys: [k] })); return '통과'; } catch (e) { return '거절'; } };
+    const base = { name: 'X', where: 'GitHub Secrets', expires: '없음' };
+    eq('  🔴 값처럼 생긴 글자는 거절 — 열쇠 접두어·JWT·긴 덩어리 · 이름·두는 곳 빠짐 · 틀린 날짜 꼴도 거절 · 멀쩡한 줄은 통과',
+      [bad({ ...base, renew: 'sk-ant-api03-abcdefghij' }), bad({ ...base, renew: 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOjF9.x' }), bad({ ...base, for: 'AbCdEf0123456789AbCdEf0123456789xy' }),
+        bad({ name: 'X', expires: '없음' }), bad({ ...base, expires: '내년쯤' }), bad(base)],
+      ['거절', '거절', '거절', '거절', '거절', '통과']);
+    const keys = KE.loadKeys(read(root, 'docs/backend/keys.json'));
+    const names = new Set(keys.map((k) => k.name));
+    const wfDir = path.join(rootPath, '.github');
+    const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]));
+    const usedSecrets = [...new Set(walk(wfDir).filter((f) => /\.ya?ml$/.test(f)).flatMap((f) => [...fs.readFileSync(f, 'utf8').matchAll(/secrets\.([A-Z0-9_]+)/g)].map((m) => m[1])))].filter((n) => n !== 'GITHUB_TOKEN');
+    const serverSecrets = [...new Set(walk(path.join(rootPath, 'server')).filter((f) => /\.(md|toml|js|mjs)$/.test(f)).flatMap((f) => [...fs.readFileSync(f, 'utf8').matchAll(/wrangler secret put ([A-Z0-9_]+)/g)].map((m) => m[1])))];
+    eq(`  🔴 로봇(secrets.이름 ${usedSecrets.length}개)·서버(wrangler secret put ${serverSecrets.length}개)가 쓰는 열쇠는 전부 목록에 있다 — 새 열쇠를 쓰면 목록에도 적어야 통과`,
+      [...usedSecrets, ...serverSecrets].filter((n) => !names.has(n)), []);
+    eq('  (대조할 것을 실제로 뽑았다 — 로봇 열쇠 10개 이상 · 서버 열쇠 5개 이상)', [usedSecrets.length >= 10, serverSecrets.length >= 5], [true, true]);
+    eq('  사람용 표(열쇠-목록.md)가 원본(keys.json)과 같다 — 다르면 node tools/key-expiry.mjs --render',
+      KE.renderDoc(read(root, 'docs/backend/열쇠-목록.md'), keys) === read(root, 'docs/backend/열쇠-목록.md'), true);
+    const yml = read(root, '.github/workflows/key-expiry.yml').replace(/^\s*#.*$/gm, '');
+    const cronMin = Number(((yml.match(/cron: '(\d+) /) || [])[1]));
+    eq('  key-expiry.yml — 홀수 분 예약 · 기본 브랜치에서만 · 시한 · 여는·닫는 경보 제목이 같다 · 세 사람 · issues: write · 넘어지면 robot-down',
+      [cronMin % 2 === 1, /if: github\.ref_name == 'claude\/nice-heisenberg-WESq5'/.test(yml), /^ {4}timeout-minutes: \d+/m.test(yml),
+        (yml.match(/🔑 열쇠 만료가 다가옵니다/g) || []).length, /--assignee seonju5543-web --assignee Se-Hyeon-Jo --assignee didinin-wq/.test(yml), /issues: write/.test(yml),
+        /failure\(\) \|\| cancelled\(\)[\s\S]*robot-down/.test(yml)],
+      [true, true, true, 2, true, true, true]);
+  }
+
+  /* ── ⑦ 보안 자동 점검 (2026-11-11 · 은서 · 출시 전 백엔드 10번 — .github/dependabot.yml · codeql.yml · tools/codeql-alerts.mjs) ──
+     🔴 Security 탭은 아무도 안 본다 → 심각 경고는 경보 이슈로 · Dependabot 판 올림 PR 이 와도 관문이 판 번호 때문에 빨개지지 않는다 */
+  {
+    const CA = await import(new URL('tools/codeql-alerts.mjs', root));
+    const A = (sec, sev, state = 'open') => ({ state, rule: { security_severity_level: sec, severity: sev } });
+    eq('⑦ 심각 경고 — 보안 high·critical 만 · 보안 등급이 없으면 규칙 수준 error 만 · medium·warning·note 는 Security 탭에만',
+      [A('critical'), A('high'), A('medium', 'error'), A('low'), A(null, 'error'), A(null, 'warning'), A(null, 'note')].map(CA.isSerious),
+      [true, true, false, false, true, false, false]);
+    eq('  gh api --paginate 가 쪽마다 이어 붙인 배열(][)도 읽는다 · 빈 응답은 0개',
+      [CA.parseAlerts('[{"a":1}][{"a":2},{"a":3}]').length, CA.parseAlerts('[]').length, CA.parseAlerts('').length], [3, 0, 0]);
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'hdj-codeql-'));
+    fs.writeFileSync(path.join(tmp, 'a.json'), JSON.stringify([{ ...A('high'), html_url: 'u1', rule: { id: 'js/xss', security_severity_level: 'high' }, most_recent_instance: { location: { path: 'app.js', start_line: 9 } } }, A('high', null, 'dismissed'), A('low')]));
+    const outF = path.join(tmp, 'out'); fs.writeFileSync(outF, '');
+    CA.main([path.join(tmp, 'a.json'), path.join(tmp, 'b.md')], { GITHUB_OUTPUT: outF });
+    const bodyMd = fs.readFileSync(path.join(tmp, 'b.md'), 'utf8');
+    eq('  열린 것만 센다(닫은 것 제외) · GITHUB_OUTPUT 에 serious= · 🔴 공개 저장소라 본문엔 개수·심각도와 Security 탭 주소만(규칙·파일·줄을 적지 않는다)',
+      [fs.readFileSync(outF, 'utf8').trim(), /1개/.test(bodyMd) && /security\/code-scanning/.test(bodyMd), /js\/xss|app\.js|u1/.test(bodyMd)], ['serious=1', true, false]);
+    fs.rmSync(tmp, { recursive: true, force: true });
+    const dep = read(root, '.github/dependabot.yml').replace(/^\s*#.*$/gm, '');
+    eq('  dependabot.yml — 워크플로 부품(github-actions)·푸시 서버(npm /server/push) · 기본 브랜치로 · 한 달에 한 번 · 묶어서 PR 하나 · 열린 PR 상한',
+      [/package-ecosystem: github-actions[^\n]*\n\s+directory: \//.test(dep), /package-ecosystem: npm[^\n]*\n\s+directory: \/server\/push/.test(dep),
+        (dep.match(/target-branch: claude\/nice-heisenberg-WESq5/g) || []).length, (dep.match(/interval: monthly/g) || []).length,
+        (dep.match(/patterns: \['\*'\]/g) || []).length, (dep.match(/open-pull-requests-limit: \d/g) || []).length],
+      [true, true, 2, 2, 2, 2]);
+    const cq = read(root, '.github/workflows/codeql.yml').replace(/^\s*#.*$/gm, '');
+    eq('  codeql.yml — 언어 셋(자바스크립트·파이썬·워크플로) · 기본 브랜치에서만 · 코드가 바뀔 때만 push(데이터 커밋엔 안 돈다) · 홀수 분 예약 · 결과 올리기 권한 · 시한',
+      [/language: \[javascript-typescript, python, actions\]/.test(cq), (cq.match(/github\.ref_name == 'claude\/nice-heisenberg-WESq5'/g) || []).length >= 2,
+        /push:\s+branches: \[claude\/nice-heisenberg-WESq5\]\s+paths:/.test(cq) && !/- 'data\//.test(cq), Number((cq.match(/cron: '(\d+) /) || [])[1]) % 2 === 1,
+        /security-events: write/.test(cq), (cq.match(/^ {4}timeout-minutes: \d+/gm) || []).length],
+      [true, true, true, true, true, 2]);
+    eq('  🔴 심각 경고는 세 사람 경보 이슈로 — 여는·닫는 제목이 같다 · 두 일자리 모두 넘어지면 robot-down',
+      [(cq.match(/🛡 보안 코드 점검에서 고칠 것이 나왔습니다/g) || []).length, /--assignee seonju5543-web --assignee Se-Hyeon-Jo --assignee didinin-wq/.test(cq),
+        (cq.match(/if: failure\(\) \|\| cancelled\(\)\s+uses: \.\/\.github\/actions\/robot-down/g) || []).length],
+      [2, true, 2]);
+    /* Dependabot 이 actions/checkout@v4 → v5 로 올리면, 실제 워크플로를 판 번호까지 박아 읽는 관문은 빨개진다(11-11 모의로 넷을 찾아 고쳤다).
+       정규식 안의 `actions\/이름@v숫자` 를 금지한다 — 표본 글자('actions/checkout@v4')는 괜찮다 */
+    const gateFiles = ['verify/test-collector.mjs', ...fs.readdirSync(path.join(rootPath, 'verify/health-gates')).filter((f) => f.endsWith('.mjs')).map((f) => `verify/health-gates/${f}`)];
+    const TR = await import(new URL('tools/codeql-triage.mjs', root));
+    const planOk = (t) => { try { return TR.plan(t).length; } catch { return '거절'; } };
+    eq('  경고 정리 — 닫을 목록: 번호·정해진 이유·짧은 글만 · 틀린 번호·이유·중복·빈 글·빈 목록은 통째로 거절',
+      [planOk('[{"n":3,"reason":"false positive","comment":"검사 파일"}]'), planOk('[{"n":"x","reason":"false positive","comment":"a"}]'), planOk('[{"n":3,"reason":"그냥","comment":"a"}]'),
+        planOk('[{"n":3,"reason":"used in tests","comment":"a"},{"n":3,"reason":"used in tests","comment":"b"}]'), planOk('[{"n":3,"reason":"won\'t fix","comment":""}]'), planOk('[]')],
+      [1, '거절', '거절', '거절', '거절', '거절']);
+    eq('  경고 정리 — 열린 것만 줄인다(닫은 것 제외)', TR.slim([{ number: 1, state: 'open', rule: { id: 'r' }, most_recent_instance: { location: { path: 'a.js', start_line: 2 } } }, { number: 2, state: 'dismissed' }]).map((x) => [x.n, x.path, x.line]), [[1, 'a.js', 2]]);
+    const tri = read(root, '.github/workflows/codeql-triage.yml').replace(/^\s*#.*$/gm, '');
+    eq('  🔴 codeql-triage.yml — 버튼만(예약·push 없음) · 기본 브랜치에서만 · 목록은 공개 열쇠로 잠가서만 싣는다(열쇠 없으면 멈춤 · 잠그지 않은 list.json 을 찍지 않는다) · 입력은 env 로 · 넘어지면 robot-down',
+      [!/schedule:|push:/.test(tri), /if: github\.ref_name == 'claude\/nice-heisenberg-WESq5'/.test(tri), /openssl pkeyutl -encrypt -pubin/.test(tri) && /\[ -n "\$PUBKEY_B64" \] \|\| \{/.test(tri),
+        !/cat [^\n]*list\.json|echo [^\n]*\$\(cat/.test(tri), tri.split('\n').filter((l) => /\$\{\{\s*inputs\./.test(l)).every((l) => /^\s+[A-Z0-9_]+: \$\{\{ inputs\.\w+ \}\}\s*$|^\s+if: inputs\./.test(l)), /failure\(\) \|\| cancelled\(\)\s+uses: \.\/\.github\/actions\/robot-down/.test(tri)],
+      [true, true, true, true, true, true]);
+    /* CodeQL js/redos — 등록 로봇의 붙박이 말 판정이 겹치는 말(장학+생=장학생) 때문에 길이마다 두 배로 느려졌다(73자 0.7초 실측) → 자리별 표로 바꿨다 */
+    {
+      const RT = await import(new URL('collector/register-timing.mjs', root));
+      const W = ['장학', '장학생', '생', '대학', '대학생', '대학원', '학년', '학년도', '년도', '공통', '서울'];
+      let seed = 7; const rnd = () => { seed = (seed * 48271) % 2147483647; return seed; };
+      const samples = ['', '가', '대산', '장학생가', '하반기신규장학생', '교외장학금안내', '서울대학교'];
+      for (let i = 0; i < 300; i += 1) { let t = ''; const k = 1 + (rnd() % 6); for (let j = 0; j < k; j += 1) t += W[rnd() % W.length]; if (rnd() % 3 === 0) t += '가'; samples.push(t); }
+      eq('  🔴 붙박이 말 판정(STOCK)이 예전 정규식과 같은 답 — 표본 307개(짧은 것만 · 정규식이 느려지기 전)',
+        samples.filter((t) => RT.STOCK.test(t) !== RT.STOCK_RE_FOR_GATE.test(t)), []);
+      const t0 = Date.now(); RT.STOCK.test('장학생'.repeat(26) + '가'); const ms = Date.now() - t0;
+      eq('  🔴 79자 최악 덩어리도 즉시 끝난다(200ms 안 — 예전 정규식은 몇 초 · 12자 늘 때마다 약 16배)', ms < 200, true);
+    }
+    /* 🔴 2026-11-11 CodeQL #607 — tools/gate-reel/reel.html 이 주소 뒤 글자(?list=)를 innerHTML 로 끼워 넣어, 조작한 링크 하나로 앱과 같은 주소의
+       저장소(프로필·로그인)를 읽을 수 있었다(진짜 브라우저로 실행 확인 → 고친 뒤 막힘 확인). 학생 주소에 공개되는 HTML 은 전부 같은 기준 */
+    const servedHtml = spawnSync('git', ['ls-files', '-z', '*.html'], { cwd: rootPath, encoding: 'utf8' }).stdout.split('\0').filter((f) => f && !f.startsWith('_admin/') && fs.existsSync(path.join(rootPath, f)));
+    eq(`  🔴 공개되는 HTML(${servedHtml.length}장)은 주소 뒤 글자(location.search·hash)를 읽으면서 HTML 로 끼워 넣지 않는다(innerHTML·insertAdjacentHTML·document.write)`,
+      servedHtml.filter((f) => { const t = fs.readFileSync(path.join(rootPath, f), 'utf8'); return /location\.(search|hash)|URLSearchParams/.test(t) && /\.innerHTML\s*[+]?=|insertAdjacentHTML|document\.write/.test(t); }), []);
+    const reel = read(root, 'tools/gate-reel/reel.html');
+    eq('  reel.html — manifest 에 있는 사진 이름만 받는다 · 글자는 textContent 로', [/hasOwnProperty\.call\(byFile, file\)/.test(reel), /textContent/.test(reel)], [true, true]);
+    eq('  🔴 관문 정규식이 부품 판 번호를 박지 않는다(actions\\/이름@v숫자) — 박으면 Dependabot PR 마다 관문이 빨개진다',
+      gateFiles.filter((f) => /actions\\\/[a-z-]+@v\d/.test(read(root, f))), []);
   }
 }
