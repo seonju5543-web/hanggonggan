@@ -25,8 +25,10 @@
 const BROWSER_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
   + 'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
-/* 운영자 연락처 — 학교가 문의·차단할 수 있게 숨기지 않는다 */
-export const CONTACT = 'seonju5543@gmail.com';
+/* 운영자 연락처 — 학교가 문의·차단할 수 있게 숨기지 않는다.
+   🔴 2026-11-11(출시 전 백엔드 4번) 팀원 개인 메일이었다 → 앱 고객센터와 같은 **서비스 주소**로(support-config.js email · 관문이 둘을 대조한다).
+   개인 메일을 적으면 로봇이 두드리는 학교 사이트 전부에 그 사람 주소가 남는다. 도메인을 사면 contact@ 로 둘을 같이 바꾼다. */
+export const CONTACT = 'handaejang24@gmail.com';
 
 export const FETCH_HEADERS = {
   'User-Agent': BROWSER_UA,

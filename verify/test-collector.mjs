@@ -4186,6 +4186,9 @@ console.log('\n■ 공고를 받아올 때 쓰는 머리말 (2026-08-20)');
   // 🔴 UA 꼬리에 봇 이름을 붙이면 중앙대가 실제로 거부했다(UND_ERR_SOCKET) — 신원은 From에 담는다
   eq('  UA에 봇 이름을 붙이지 않는다', /bot/i.test(H.FETCH_HEADERS['User-Agent']), false);
   eq('  대신 From 헤더로 신원을 밝힌다', /@/.test(H.FETCH_HEADERS.From || ''), true);
+  /* 🔴 2026-11-11 출시 전 백엔드 4번 — From 이 팀원 개인 메일이었다(학교 사이트 전부에 남는다). 서비스 주소(고객센터와 같은 것)여야 한다 */
+  eq('  From 은 앱 고객센터와 같은 서비스 주소다(support-config.js email) — 개인 메일을 로봇 신원으로 쓰지 않는다',
+    H.FETCH_HEADERS.From, (/email:\s*'([^']+)'/.exec(readText(new URL('support-config.js', root))) || [])[1]);
   for (const f of ['collector/deepfetch.mjs', 'collector/collect.mjs']) {
     const src = readText(new URL(f, root));
     eq(`  ${f.split('/').pop()} 가 같은 머리말을 쓴다`, /FETCH_HEADERS/.test(src), true);
