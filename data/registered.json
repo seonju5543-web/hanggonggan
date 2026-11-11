@@ -23785,7 +23785,17 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-11-11 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "총동아리연합회",
+     "url": "http://www.jbnudongari.com/file/"
+    },
+    {
+     "name": "본문이미지-1241x1755.jpg",
+     "url": "https://www.jbnu.ac.kr/common/file.do?file=4Gi651BuWks9/9M2ei5v+TEBKn6PPKy9OHY4EfVRcXcRCXH7uboDTXcEiUpw8de8cCa9v8l1OJdYcG4tnpFO5w==",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://www.jbnu.ac.kr/web/Board/219698/detailView.do?category=6",
    "sourceKind": "auto"
   }

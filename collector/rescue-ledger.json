@@ -616,5 +616,11 @@
   "at": "2026-11-11",
   "minBody": 100,
   "name": "공통 2026학년도 2학기 문우림 제6기 장학생 선발 안내"
+ },
+ "https://www.jbnu.ac.kr/web/Board/219698/detailView.do?category=6": {
+  "tries": 1,
+  "at": "2026-11-12",
+  "minBody": 100,
+  "name": "2026년 전북대동창회장학재단 문화예술장학생 선발 안내"
  }
 }
