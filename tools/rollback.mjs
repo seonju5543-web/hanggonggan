@@ -78,6 +78,8 @@ export function revertCommit(cwd, ref) {
   if (r.status !== 0) {
     const conflicted = git(['diff', '--name-only', '--diff-filter=U'], cwd).stdout.split('\n').filter(Boolean);
     git(['revert', '--abort'], cwd);   // 되돌리기를 시작하기 전 그대로(HEAD·파일) — 기록을 되감는 것이 아니다
+    /* 부딪힌 파일이 없으면 부딪힘이 아니다(2026-11-11 — 커밋 이름이 없는 기계에서 git 이 거절한 것을 '부딪힘'으로 적었다) — git 이 한 말을 그대로 */
+    if (!conflicted.length) return { status: 'error', reason: `git 이 되돌리기를 거절했어요(아무것도 바꾸지 않았어요): ${(r.stderr || r.stdout || '').trim().split('\n').slice(-2).join(' ').slice(0, 300)}` };
     return { status: 'conflict', reason: '그 뒤에 같은 곳을 또 고쳐서 자동으로 되돌릴 수 없어요 — 사람이 봐야 해요(아무것도 바꾸지 않았어요)', files: conflicted };
   }
   const newSha = git(['rev-parse', 'HEAD'], cwd).stdout.trim();

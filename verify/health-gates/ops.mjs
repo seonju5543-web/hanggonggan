@@ -352,6 +352,7 @@ export default async function gate(eq, ctx) {
     const commit = (who, msg) => { g('add', '-A'); g(...as(who), 'commit', '-qm', msg); return g('rev-parse', 'HEAD').stdout.trim(); };
     try {
       g('init', '-q', '-b', 'main'); g('config', 'commit.gpgsign', 'false');
+      g('config', 'user.name', 'handaejang-bot'); g('config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com');   // rollback.yml 이 하는 것과 같게(2026-11-11 — 이게 없어 GitHub 기계에서만 빨갰다)
       w('app.js', 'line1\nline2\n'); w('data/notices.json', '[]\n'); commit('은서', '씨앗');
       w('app.js', 'line1\nBROKEN\n'); const bad = commit('은서', '앱을 망가뜨린 작업');
       w('data/notices.json', '[{"id":1}]\n'); const botSha = commit('bot', 'collector: seen state update');
@@ -382,6 +383,18 @@ export default async function gate(eq, ctx) {
       eq('  🔴 부딪히면 멈추고 아무것도 안 바꾼다 — HEAD·파일 그대로 · 되돌리기 진행 중 상태가 남지 않는다 · 부딪힌 파일을 알려 준다',
         [cf.status, g('rev-parse', 'HEAD').stdout.trim() === head2, r('style.css'), fs.existsSync(path.join(dir, '.git', 'REVERT_HEAD')), cf.files],
         ['conflict', true, 'c{}\n', false, ['style.css']]);
+      /* 2026-11-11 — GitHub 기계엔 커밋 이름이 없어 git 이 거절했는데 도구가 '부딪힘'이라 적었다. 이름 없는 기계를 흉내 낸다 */
+      g('config', '--unset', 'user.name'); g('config', '--unset', 'user.email'); g('config', 'user.useConfigOnly', 'true');
+      const saved = { G: process.env.GIT_CONFIG_GLOBAL, S: process.env.GIT_CONFIG_NOSYSTEM };
+      process.env.GIT_CONFIG_GLOBAL = '/dev/null'; process.env.GIT_CONFIG_NOSYSTEM = '1';
+      const head3 = g('rev-parse', 'HEAD').stdout.trim();
+      let noName; try { noName = RB.revertCommit(dir, bad); } finally {
+        if (saved.G === undefined) delete process.env.GIT_CONFIG_GLOBAL; else process.env.GIT_CONFIG_GLOBAL = saved.G;
+        if (saved.S === undefined) delete process.env.GIT_CONFIG_NOSYSTEM; else process.env.GIT_CONFIG_NOSYSTEM = saved.S;
+      }
+      eq('  git 이 다른 이유로 거절하면(커밋 이름 없음) 부딪힘이라 하지 않고 그 이유를 말한다 · 아무것도 안 바꾼다',
+        [noName.status, /거절/.test(noName.reason || ''), g('rev-parse', 'HEAD').stdout.trim() === head3, fs.existsSync(path.join(dir, '.git', 'REVERT_HEAD'))],
+        ['error', true, true, false]);
     } finally { fs.rmSync(dir, { recursive: true, force: true }); }
     const yml = read(root, '.github/workflows/rollback.yml').replace(/^\s*#.*$/gm, '');   // 주석은 걷고 잰다(금지된 길을 설명하는 주석에 걸리지 않게)
     const src = stripComments(read(root, 'tools/rollback.mjs'));
