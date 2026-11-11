@@ -1,7 +1,17 @@
 {
  "school": "한국외국어대학교",
- "updatedAt": "2026-11-10",
+ "updatedAt": "2026-11-11",
  "items": [
+  {
+   "title": "교내 건물별 난방 운영기준 안내",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/271371/artclView.do",
+   "postedAt": "2026-11-11",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-11-11",
+   "desc": "가동 시간 난방 가동 요일 (가동:○ / 정지:&times;) 사이버관 교수회관 열람실 제외 사회과학관 동아리실(자치공간 ) 국제학사, 지하복합시설 학 생회관 및 동아리실(자치공간) 교수학습개발원 동아리실(자치공간)"
+  },
   {
    "title": "(서울) 2026년도 후반기 학생예비군 기본 3차훈련(안내)",
    "url": "https://www.hufs.ac.kr/bbs/hufs/2180/271180/artclView.do",

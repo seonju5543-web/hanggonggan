@@ -1,7 +1,17 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-11-10",
+ "updatedAt": "2026-11-11",
  "items": [
+  {
+   "title": "[대학생활] [교육부] 2027년 '행복한 교육' 명예기자 모집 안내",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70963",
+   "postedAt": "2026-11-11",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-11",
+   "thumb": "data/news/img/ac6b7ab317aec3f4.webp"
+  },
   {
    "title": "[학사안내] 2026학년도 동계 계절학기 자유학기제 운영 계획 안내",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70962",
@@ -393,15 +403,6 @@
    "src": "b7347301",
    "foundAt": "2026-11-02",
    "thumb": "data/news/img/5f61ac083897246d.webp"
-  },
-  {
-   "title": "[취업정보] 열렬히모집중「빅데이터분석기사, 차근차근 실습하기」",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70871",
-   "postedAt": "2026-11-02",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-02"
   }
  ]
 }

@@ -1,7 +1,32 @@
 {
  "school": "서울시립대학교",
- "updatedAt": "2026-11-10",
+ "updatedAt": "2026-11-11",
  "items": [
+  {
+   "title": "💡 2026년도 제22회 UOS 연구 콜로키움(교원창업 특별세션) 개최 안내(2026.11.12.(목) 14:00, 창의혁신관 SI 아레나)💡",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31822&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-11",
+   "postId": "31822",
+   "kind": "행사",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-11",
+   "thumb": "data/news/img/1be3f51430e4e590.webp",
+   "desc": "※ 이번 콜로키움은 오후 2시 에 시작합니다. 시간에 착오 없으시기 바랍니다. 📌 진행 순서 (14:00 ~ 14:05) 서울시립대학교 창업지원단 소개 및 창업지원 안내 / 황지은 창업지원단장 (14:05 ~…"
+  },
+  {
+   "title": "[융복합 극장] 뮤지컬 '닥터 두리틀' 참가신청 안내 (대학원생 대상)",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31813&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-11",
+   "postId": "31813",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-11",
+   "thumb": "data/news/img/1de67400c1ba43c3.webp",
+   "desc": "영어영문학과 [ 융복합 극장 ] 뮤지컬 ' 닥터 두리틀 ' 이 프로그램은 대학원생을 위하여 기획된 비교과 운영프로그램입니다 . 2026 년 융복합 극장 프로그램의 두 번째 작품은 < 닥터 두리틀 > 입니다"
+  },
   {
    "title": "(신청연장: 30명)_[자유전공학부 OTS 개최] 자유전공학부 진학대상 학부(과) 소속 재학생을 초청합니다.",
    "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31795&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
@@ -441,30 +466,6 @@
    "foundAt": "2026-10-27",
    "thumb": "data/news/img/38cd22931e9f9617.webp",
    "desc": "법학전문대학원 * 많은 신청 바랍니다. * 감사합니다. #디지털자산"
-  },
-  {
-   "title": "⭐기프티콘 증정⭐ [빅데이터혁신융합대학사업단] COSS Play 수강 인증 이벤트 [10/26(월)~ 11/8(일) 23:59까지]",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31728&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-26",
-   "postId": "31728",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/7ce8ee8ae2df9a98.webp"
-  },
-  {
-   "title": "[중앙/분관도서관] 자유열람실 자율배석 운영안내(10/27.13시~10/30)",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31727&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-26",
-   "postId": "31727",
-   "kind": "생활",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/1f69ced34da9e8a6.webp",
-   "desc": "< 자유열람실 ( 좌석 , 스터디룸 ) 자율배석 운영 안내 > ※ 운영기간 : 10 월 27 일 ( 화 ) 13:00 ~ 10 월 30 일 ( 금 ) 18:00 서버 보안 (PHP) 취약점 긴급 조치 작업으로 인해…"
   }
  ]
 }
