@@ -7,18 +7,6 @@
   "at": "2026-11-07",
   "tries": 2
  },
- "https://wise.dongguk.ac.kr/article/servicenotice/detail/520896": {
-  "at": "2026-10-30",
-  "tries": 2
- },
- "https://wise.dongguk.ac.kr/article/servicenotice/detail/520895": {
-  "at": "2026-10-30",
-  "tries": 2
- },
- "https://wise.dongguk.ac.kr/article/servicenotice/detail/520875": {
-  "at": "2026-10-30",
-  "tries": 2
- },
  "https://kfruit.or.kr/board/board_gallery_img_type01/board_detail.asp?scrID=0000000192&pageNum=5&subNum=1&ssubNum=1&bd_num=00000001922026000001&act=view": {
   "at": "2026-10-24",
   "tries": 1
@@ -344,6 +332,10 @@
   "tries": 1
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/271342/artclView.do": {
+  "at": "2026-11-11",
+  "tries": 1
+ },
+ "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=141798&article.offset=0&articleLimit=10": {
   "at": "2026-11-11",
   "tries": 1
  }

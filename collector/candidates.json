@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-11-11",
- "count": 1735,
+ "count": 1740,
  "items": [
   {
    "title": "[공통][교외]한국고등교육재단 문우림 제6기 장학생 선발(~12/11)",
@@ -76,6 +76,30 @@
    "bodyDeadlineText": "AeroAI Symposium 2026 참석 신청 안내 신청기간: 2026.11.10(화)까지 (자세히 보기)"
   },
   {
+   "title": "[교외] 문우림 제6기 장학생 선발안내",
+   "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/944611/artclView.do",
+   "attachments": [
+    {
+     "name": "문우림 제6기 장학생 선발 공고문.hwp",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015475/download.do"
+    },
+    {
+     "name": "문우림 제6기 장학생 선발 포스터.jpg",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015476/download.do"
+    },
+    {
+     "name": "문우림 제6기 장학생 선발 모집요강.pdf",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015477/download.do"
+    }
+   ],
+   "deadlineHint": "지원 기간) 2026 년 11 월 9 일(월)~12 월 11 일(금) 23 시 59 분까지 3. 제출 서류 ○ (필수) △온라인 지원서 1 부",
+   "school": "연세대학교 미래캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-11",
+   "bodyDeadline": "2026-12-11",
+   "bodyDeadlineText": "2026.11.09 ~ 2026.12.11"
+  },
+  {
    "title": "공통 2027년도 제 10회 유하푸른재단 장학생 선발",
    "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%202027%EB%85%84%EB%8F%84%20%EC%A0%9C%2010%ED%9A%8C%20%EC%9C%A0%ED%95%98%ED%91%B8%EB%A5%B8%EC%9E%AC%EB%8B%A8%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C",
    "attachments": [],
@@ -131,6 +155,44 @@
    "foundAt": "2026-11-11"
   },
   {
+   "title": "[학부] 관정재단 2027년도 국내대학 장학생 선발 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367891&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "첨부1. 2027년 국내대학 장학생 선발계획.pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367891&attachNo=353869"
+    },
+    {
+     "name": "첨부3. 국내대학장학생선발및장학금지급규정(10차 개정).pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367891&attachNo=353870"
+    },
+    {
+     "name": "2027 장학금지원서.hwp",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367891&attachNo=353871"
+    }
+   ],
+   "deadlineHint": "마감: 2026. 11. 20(금) 17:00 6. 제출서류 1. 장학금지원서 1부(서식 첨부) 2. 어학능력증명서 사본 1부(해당자에 한함)",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-11-11",
+   "bodyDeadline": "2026-11-20",
+   "bodyDeadlineText": "2026.11.20"
+  },
+  {
+   "title": "[학부] 제6기 한국고등교육재단 문우림 장학생 선발 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367894&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "문우림 제6기 장학생 선발 모집요강 (2).pdf",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367894&attachNo=353875"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-11-11"
+  },
+  {
    "title": "2026년 전북대동창회장학재단 문화예술장학생 선발 안내",
    "url": "https://www.jbnu.ac.kr/web/Board/219698/detailView.do?category=6",
    "attachments": [],
@@ -169,6 +231,17 @@
    "foundAt": "2026-11-11",
    "bodyDeadline": "2026-12-11",
    "bodyDeadlineText": "[교외] 2027학년도 한국고등교육재단 문우림 제6기 장학생 선발 안내(11. 9. ~ 12. 11.)"
+  },
+  {
+   "title": "2027년 해동과학문화재단 해동장학생 모집 공고(공학계열 선발)",
+   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12614/view.do?currentPageNo=1",
+   "attachments": [],
+   "deadlineHint": "마감: 2026년 11월 17일(22:59까지) ㅇ 신청방법: ON국민 - 포털 - 학생서비스 - 장학정보 - 장학신청 ㅇ 제출양식은 장학신청",
+   "school": "국민대학교",
+   "campus": "",
+   "foundAt": "2026-11-11",
+   "bodyDeadline": "2026-11-17",
+   "bodyDeadlineText": "조회수 234 ㅇ 학생지원팀 신청마감: 2026년 11월 17일(22:59까지)"
   },
   {
    "title": "[교외-12/11]한국고등교육재단 문우림 제6기 장학생 선발 안내(재단지원)",
@@ -449,6 +522,30 @@
    "foundAt": "2026-11-11",
    "bodyDeadline": "2026-12-11",
    "bodyDeadlineText": "- 장학금(연간 800만원) 4. 모집 기간: 2026.11.9.(월)~2026.12.11.(금)"
+  },
+  {
+   "title": "2027년도 유하푸른장학재단 10기 장학생 선발 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=141782&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    },
+    {
+     "name": "2027년도 재단법인 유하푸른재단 장학생 선발 안내문.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=141782&attachNo=119046"
+    },
+    {
+     "name": "2. 유하푸른재단 제 10기 장학생 지원서 (학교명, 지원자명).docx",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=141782&attachNo=119047"
+    }
+   ],
+   "deadlineHint": "접수 기간 : ~ 2026년 11월 20일(금) 23:59 까지 재단 지정 이메일 수신분에 한하여 접수 ※ 마감 이후 수신분 불인정 나. 서류",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-11-11",
+   "bodyDeadline": "2026-11-20",
+   "bodyDeadlineText": "2) 세부 선발 일정 가. 원서접수 기간 : ~ 2026년 11월 20일(금) 23:59 까지 재단 지정 이메일 수신분에 한하여 접수"
   },
   {
    "title": "2026년 대학생 봉사자 연계 아동돌봄 지원사업(겨울방학) 참여대학생 모집 안내",
