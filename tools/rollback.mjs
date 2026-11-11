@@ -98,7 +98,7 @@ export function main(argv = process.argv.slice(2), env = process.env, cwd = proc
     const list = listHumanCommits(cwd, { n: Number(arg('--n')) || 10 });
     say('### 최근 사람 작업 (로봇 기록·합치기 기록은 뺐어요)\n');
     say('| 번호 | 날짜 | 누가 | 무엇을 |\n| --- | --- | --- | --- |');
-    for (const c of list) say(`| \`${c.short}\` | ${c.date} | ${c.name} | ${c.subject.replace(/\|/g, '\\|').slice(0, 90)} |`);
+    for (const c of list) say(`| \`${c.short}\` | ${c.date} | ${c.name} | ${c.subject.slice(0, 90).replace(/\\/g, '\\\\').replace(/\|/g, '\\|')} |`);
     if (!list.length) say('| — | — | — | 사람 작업을 찾지 못했어요 |');
     say('\n되돌리려면: 같은 버튼을 다시 눌러 **모드 = 되돌리기**, **작업 번호** 칸에 위 번호를 넣으세요.');
   } else if (arg('--preview')) {

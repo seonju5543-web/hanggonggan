@@ -68,7 +68,7 @@ const STATE_WORD = (s) => ({
   expired: (d) => `🔴 만료됨(${-d}일 지남)`, soon: (d) => `🟠 ${d}일 남음`, ok: (d) => `${d}일 남음`,
   none: () => '만료 없음', unknown: () => '❓ 확인 필요', auto: () => '자동 확인(로봇)',
 }[s.state](s.days));
-const cell = (v) => String(v || '').replace(/\|/g, '\\|').replace(/\n/g, ' ');
+const cell = (v) => String(v || '').replace(/\\/g, '\\\\').replace(/\|/g, '\\|').replace(/\n/g, ' ');
 
 export function renderTable(keys, today = kstToday()) {
   const rows = keys.map((k) => `| ${cell(k.name)} | ${cell(k.where)} | ${cell(k.for)} | ${cell(k.owner)} | ${cell(k.expires)} | ${cell(k.renew)} |`);

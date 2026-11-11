@@ -479,6 +479,18 @@ export default async function gate(eq, ctx) {
       [!/schedule:|push:/.test(tri), /if: github\.ref_name == 'claude\/nice-heisenberg-WESq5'/.test(tri), /openssl pkeyutl -encrypt -pubin/.test(tri) && /\[ -n "\$PUBKEY_B64" \] \|\| \{/.test(tri),
         !/cat [^\n]*list\.json|echo [^\n]*\$\(cat/.test(tri), tri.split('\n').filter((l) => /\$\{\{\s*inputs\./.test(l)).every((l) => /^\s+[A-Z0-9_]+: \$\{\{ inputs\.\w+ \}\}\s*$|^\s+if: inputs\./.test(l)), /failure\(\) \|\| cancelled\(\)\s+uses: \.\/\.github\/actions\/robot-down/.test(tri)],
       [true, true, true, true, true, true]);
+    /* CodeQL js/redos — 등록 로봇의 붙박이 말 판정이 겹치는 말(장학+생=장학생) 때문에 길이마다 두 배로 느려졌다(73자 0.7초 실측) → 자리별 표로 바꿨다 */
+    {
+      const RT = await import(new URL('collector/register-timing.mjs', root));
+      const W = ['장학', '장학생', '생', '대학', '대학생', '대학원', '학년', '학년도', '년도', '공통', '서울'];
+      let seed = 7; const rnd = () => { seed = (seed * 48271) % 2147483647; return seed; };
+      const samples = ['', '가', '대산', '장학생가', '하반기신규장학생', '교외장학금안내', '서울대학교'];
+      for (let i = 0; i < 300; i += 1) { let t = ''; const k = 1 + (rnd() % 6); for (let j = 0; j < k; j += 1) t += W[rnd() % W.length]; if (rnd() % 3 === 0) t += '가'; samples.push(t); }
+      eq('  🔴 붙박이 말 판정(STOCK)이 예전 정규식과 같은 답 — 표본 307개(짧은 것만 · 정규식이 느려지기 전)',
+        samples.filter((t) => RT.STOCK.test(t) !== RT.STOCK_RE_FOR_GATE.test(t)), []);
+      const t0 = Date.now(); RT.STOCK.test('장학생'.repeat(26) + '가'); const ms = Date.now() - t0;
+      eq('  🔴 79자 최악 덩어리도 즉시 끝난다(200ms 안 — 예전 정규식은 몇 초 · 12자 늘 때마다 약 16배)', ms < 200, true);
+    }
     /* 🔴 2026-11-11 CodeQL #607 — tools/gate-reel/reel.html 이 주소 뒤 글자(?list=)를 innerHTML 로 끼워 넣어, 조작한 링크 하나로 앱과 같은 주소의
        저장소(프로필·로그인)를 읽을 수 있었다(진짜 브라우저로 실행 확인 → 고친 뒤 막힘 확인). 학생 주소에 공개되는 HTML 은 전부 같은 기준 */
     const servedHtml = spawnSync('git', ['ls-files', '-z', '*.html'], { cwd: rootPath, encoding: 'utf8' }).stdout.split('\0').filter((f) => f && !f.startsWith('_admin/') && fs.existsSync(path.join(rootPath, f)));
