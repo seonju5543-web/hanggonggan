@@ -14081,6 +14081,40 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
   eq('  다른 학적의 금지는 그대로 — `초과학기생 …, 휴학생 참여 불가 (… 참여가능)` 초과학기 · `휴학생 우대 제외` 휴학', [stNot('초과학기생 (9학기 이상), 졸업 유예자, 휴학생 참여 불가 (초과학기생의 경우 등록금 전액 납부자는 참여가능)', true), stNot('휴학생 우대 제외', true)], [['초과학기'], ['휴학']]);
   const tr = (s) => ({ status: s, gpa: 3.5, credits: 15, year: 2, school: '한국외국어대학교', region: '서울', regionCity: '강서구', parentRegion: '서울' });
   eq('  편입·재입학 첫 학기도 재학생이다 — `정규학기 재학생` ✓ · 제외 줄 `편입생 중 첫 학기인 학생` 은 편입학 학생만 ✕, 재학생은 통과 확인', [MEx.requirementMatch('2026-2학기 정규학기 재학생', tr('편입학'), null), MEx.requirementMatch('2026-2학기 정규학기 재학생', tr('재입학'), null), MEx.fitDetail({ id: 't', name: 't', eligibilityLines: ['직전학기 평점 3.0 이상인 재학생'], eligibilityExcludes: ['편입생 중 첫 학기인 학생'] }, tr('편입학')).fails.length, MEx.fitDetail({ id: 't', name: 't', eligibilityLines: ['직전학기 평점 3.0 이상인 재학생'], eligibilityExcludes: ['편입생 중 첫 학기인 학생'] }, tr('재학')).met], ['ok', 'ok', 1, 3]);
+  /* ── 6차 (2026-11-11 · 1단계 M1 분모 위생 · M2 파서 표기 — 마감 전 등록의 '조건 못 집은 줄' 89개를 한 줄씩 읽고 고른 꼴) ── */
+  const RL = (l) => MEx.requirementLines({}, [l], { withMeta: true, all: true });
+  const dropped = ['공지사항 게시판읽기 ([한국장학재단] 2026학년도) · 성균관대학교', '신규장학생 선발을 위한 자체기준을 다음과 같이 안내합니다.', '기납부금에 대한 환급 등은 추후 9월 말 일괄 개별 지급 예정 입니다.',
+    '학업성적(백분위): 20점', '2026학년도 2학기 총 장학금액이 등록금액을 초과할 수 없습니다.', '2025년도 근로소득원천징수영수증 회사 직인 필', '외국인을 말함 (초·중·고 전 과정 해외 이수자)',
+    '금학기 무료복학자도 신청 가능한가요 ?', '> 네, 무료복학자도 신청 가능 합니다.', '학자금지원구간, 직전학기 성적 등 종합적인 점수를 반영하여 선발 (상세내용 붙임2 참조)', '이수학점 및 평균평점',
+    '󰊱 신청자격 (이수학점 및 평균평점)', '© 아래 기준 충족자', '2026학년도 2학기 국가근로장학금 신청을 희망하는 학생', '특기적성 - 초·중·고·대학생', '모범 - 초·중·고등학생, 대학생', '추천대상자 요약서(양식 1)'];
+  eq('🔴 M1 학생 자격이 아닌 줄 17꼴은 자격 칸에서 사라진다 — 게시판 제목·안내 문장·지급 예정·배점·수혜 한도·직인·낱말 풀이·문답·심사 서술·표 머리·사설 글머리·©·희망하는 학생·분야표·요약서', dropped.map((l) => RL(l).length), dropped.map(() => 0));
+  eq('  (대조군) 요건 줄은 그대로 남는다 — `직전학기 평점 3.0 이상인 재학생`·`수여식 참석 가능한 자`·`신청서 제출 가능한 자`', ['직전학기 평점 3.0 이상인 재학생', '장학증서 수여식에 참석 가능한 자', '재학증명서 제출 가능한 자'].map((l) => RL(l).length), [1, 1, 1]);
+  eq('  참고 줄(aside) — `…아니라도 지원 가능`(요건을 푸는 말) · `선정시, … 기부에 참가할 자`(선정 뒤 의무)는 옅게 보이고 분모에서 빠진다',
+    ['현재 거주지는 위 지역이 아니라도 지원 가능', '선정시, 수원장학회의 회원으로 가입하며, 졸업 후 월 1만원씩 자동이체로 장학금 기부에 참가할 자'].map((l) => (RL(l)[0] || {}).aside), [true, true]);
+  eq('  꼬리 쉼표가 붙은 제외 줄(`… 이중국적자 제외,`)은 제외 칸으로 간다 — 전엔 자격 칸에 모름으로 남았다', [RL('주민등록상 해외이주 신고자, 영주권자 및 이중국적자 제외,').length, MEx.requirementLines({}, ['주민등록상 해외이주 신고자, 영주권자 및 이중국적자 제외,'], { onlyExclude: true }).length], [0, 1]);
+  eq('  `…학생은 다음 3 가지 중 1 가지에 해당되어야 함` — 주어가 앞에 붙은 가리킴 줄도 선택지 묶음을 연다(그 줄은 안 보이고 아래 줄이 한 묶음)',
+    MEx.requirementLines({}, ['가족장학금을 신청할 수 있는 학생은 다음 3 가지 중 1 가지에 해당되어야 함', '부모 중 1인이 재직자인 학생', '형제가 재학 중인 학생', '조부모가 동문인 학생'], { withMeta: true, all: true }).map((x) => x.group), [1, 1, 1]);
+  const stu6 = (o) => ({ school: '한국외국어대학교', track: 'humanities', major: '영어학과', year: 3, status: '재학', gpa: 3.8, bracket: 5, credits: 15, region: '서울', parentRegion: '서울', nationality: 'korean', birthYear: 2004, flags: [], common: {}, scholarships: [], ...o });
+  const judge6 = (l, p, ex) => conds(l, ex).map((c) => MEx.judgeCond(c, p, {}));
+  const condsEx6 = (l) => PRx.parseLine(l, true).conds;
+  eq('🔴 M2 `최종학년, 최종학년 직전학년 대학생` — 4년제 기준 3·4학년(확신 high) · `졸업학년` 하나면 4학년 · 고등학교 이야기는 안 읽는다',
+    [(one('지원요건을 충족하는 최종학년, 최종학년 직전학년 대학생', 'year') || {}).anyOf, (one('졸업학년 대학생', 'year') || {}).anyOf, one('고등학교 최종학년 재학생', 'year'), one('최종학년: 직전학기 9학점 이상 이수', 'year')], [[3, 4], [4], null, null]);   // 마지막은 갈래 이름표(전후 대조 · 3학년 틀린 ✕)
+  eq('  3학년 ✓ · 1학년 ✕', [judge6('지원요건을 충족하는 최종학년, 최종학년 직전학년 대학생', stu6({}))[0], judge6('지원요건을 충족하는 최종학년, 최종학년 직전학년 대학생', stu6({ year: 1 }))[0]], ['pass', 'fail']);
+  eq('  `성적표에 2개 학기 이상(계절 학기 불포함) 교과목 이수 기록이 있는 학생` — 마친 학기 2 이상(괄호 부연은 예외가 아니다 · 확신 high) · 3학년 ✓ · 1학년 ✕',
+    [(({ min, done, conf }) => [min, done, conf])(one('(지원 가능) 성적표에 2개 학기 이상(계절 학기 불포함) 교과목 이수 기록이 있는 학생', 'semester') || {}), judge6('성적표에 2개 학기 이상(계절 학기 불포함) 교과목 이수 기록이 있는 학생', stu6({}))[0], judge6('성적표에 2개 학기 이상 교과목 이수 기록이 있는 학생', stu6({ year: 1 }))[0]], [[2, true, 'high'], 'pass', 'fail']);
+  const creditsLine = '직전학기 취득학점 (계절학기 제외) 이 15학점 (졸업이수학점이 120인 대상 학부 (과) 는 14학점 / 최종직전학기는 9학점) 이상';
+  eq('  괄호가 겹친 학점 줄 — 갈래 [15,14,9] 를 남기고(alts · 확신 high) 전부 넘으면 ✓ · 전부 못 미치면 ✕ · 사이는 모름',
+    [(one(creditsLine, 'credits') || {}).alts, judge6(creditsLine, stu6({ credits: 15 }))[0], judge6(creditsLine, stu6({ credits: 8 }))[0], judge6(creditsLine, stu6({ credits: 12 }))[0]], [[15, 14, 9], 'pass', 'fail', 'unknown']);
+  eq('    `15학점(4학년 12학점) 이상` 도 같은 갈래 규칙(alts [15,12] · 15 이상 ✓ · 12 미만 ✕ · 사이 모름 — 전엔 통째로 모름) · `이하` 가 섞인 갈래는 alts 없이 전처럼 확신 낮음', [(one('15학점(4학년 12학점) 이상', 'credits') || {}).alts, judge6('15학점(4학년 12학점) 이상', stu6({ credits: 13 }))[0], (one('12학점 이상 (단, 18학점 이하) 이수', 'credits') || {}).alts, (one('12학점 이상 (단, 18학점 이하) 이수', 'credits') || {}).conf], [[15, 12], 'unknown', undefined, 'low']);
+  eq('🔴 M2 이중수혜 줄 `타 재단 장학금을 수혜하지 않은 학생` — 종류 scholarship · 외부 재단을 받고 있으면 ✕ · 없으면 ✓ · 안 물었으면 모름 · `타 생활비성 장학금` 처럼 안팎을 안 가린 줄은 안 읽는다',
+    [(one('타 재단 장학금을 수혜하지 않은 학생', 'scholarship') || {}).conf, judge6('타 재단 장학금을 수혜하지 않은 학생', stu6({ scholarships: ['external'] }))[0], judge6('타 재단 장학금을 수혜하지 않은 학생', stu6({}))[0], judge6('타 재단 장학금을 수혜하지 않은 학생', stu6({ scholarships: null }))[0], one('타 생활비성 장학금을 수혜하지 않은 학생', 'scholarship')],
+    ['high', 'fail', 'pass', 'unknown', null]);
+  /* 리뷰(2026-11-11)가 잡은 넷 — 요건 줄을 잘못 버리거나 틀린 ✕ 를 낼 꼴 */
+  eq('  리뷰 — `(… 참조)` 꼬리·`성적 기준: 85점`·`선발 시 재학 중이어야 함`·`전공 30학점 이상 및 교양 15학점 이상` 은 요건 줄로 남는다(버리거나 참고로 돌리지 않는다)',
+    [RL('학자금 지원구간 8구간 이하 (상세 붙임 참조)').length, RL('백분위 환산 성적: 85점').length, (RL('선발 시 재학 중이어야 함')[0] || {}).aside, (one('전공 30학점 이상 및 교양 15학점 이상 이수', 'credits') || {}).alts], [1, 1, false, undefined]);
+  eq('  리뷰 — `졸업학년도` 는 연도라 학년 조건이 아니다 · 이중수혜 판정은 evaluate 와 같은 함수(holdsExternalScholarship)', [one('2027 졸업학년도 기준 등록자', 'year'), typeof MEx.holdsExternalScholarship === 'function' ? [MEx.holdsExternalScholarship({ scholarships: ['external'] }), MEx.holdsExternalScholarship({}), MEx.holdsExternalScholarship({ scholarships: ['kosaf'] })] : null], [null, [true, null, false]]);
+  eq('    제외 줄 `타 민간재단 장학금 수혜자` 도 같은 종류(exclude) · 국가장학금·교내는 막지 않는다', [(condsEx6('타 민간재단 장학금 수혜자').find((c) => c.kind === 'scholarship') || {}).exclude, MEx.judgeCond(condsEx6('타 민간재단 장학금 수혜자').find((c) => c.kind === 'scholarship'), stu6({ scholarships: ['kosaf', 'internal'] }), {})], [true, 'pass']);
+
 }
 
 console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-31 · 5단계 — 숫자는 도구가 세고 질문 목록은 사람이 고친다)');
