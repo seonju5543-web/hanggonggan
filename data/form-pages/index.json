@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-11",
+ "updatedAt": "2026-11-12",
  "items": {
   "auto-oardid323011menuno200318": [
    {
@@ -52,26 +52,10 @@
     "at": "2026-10-23"
    }
   ],
-  "auto-amepagescholarshipnotice-0jq8hoj": [
-   {
-    "src": "elig-154799-1.pdf",
-    "srcBytes": 480703,
-    "none": true,
-    "at": "2026-10-23"
-   }
-  ],
   "auto-oarticleno159308nocat501": [
    {
     "src": "elig-q641o0-1.docx",
     "srcBytes": 21581,
-    "none": true,
-    "at": "2026-10-23"
-   }
-  ],
-  "kosaf-0641001": [
-   {
-    "src": "[붙임1]2027년도 대산장학생 선발요강.pdf",
-    "srcBytes": 480703,
     "none": true,
     "at": "2026-10-23"
    }
@@ -328,14 +312,6 @@
     "at": "2026-11-11"
    }
   ],
-  "auto-enoticedoarticleno769738": [
-   {
-    "src": "elig-jb0lvl-1.hwpx",
-    "srcBytes": 60988,
-    "none": true,
-    "at": "2026-10-28"
-   }
-  ],
   "kosaf-2000090001": [
    {
     "file": "kosaf-2000090001/1-2026년_대구광역시_저소득주민_장학생_선발계획_공고문_p4-8.pdf",
@@ -570,14 +546,6 @@
     "srcBytes": 101888,
     "srcPages": "3",
     "from": "공고문 서식 쪽 떼기",
-    "at": "2026-10-29"
-   }
-  ],
-  "auto-scho332282400artclviewdo": [
-   {
-    "src": "elig-yajkef-1.pdf",
-    "srcBytes": 143552,
-    "none": true,
     "at": "2026-10-29"
    }
   ],
@@ -925,19 +893,6 @@
     "at": "2026-11-09"
    }
   ],
-  "auto-scho332282595artclviewdo": [
-   {
-    "file": "auto-scho332282595artclviewdo/1-elig-1gdw6t-1_p4-5.pdf",
-    "name": "공고문 안 신청서 서식 (4~5쪽)",
-    "pages": 2,
-    "bytes": 456465,
-    "src": "elig-1gdw6t-1.hwp",
-    "srcBytes": 109056,
-    "srcPages": "4~5",
-    "from": "공고문 서식 쪽 떼기",
-    "at": "2026-11-09"
-   }
-  ],
   "auto-oardid323515menuno200318": [
    {
     "src": "elig-cav05w-1.pdf",
@@ -1018,6 +973,34 @@
     "srcBytes": 99780,
     "none": true,
     "at": "2026-11-11"
+   }
+  ],
+  "auto-oardid323545menuno200318": [
+   {
+    "src": "elig-19mmu8-1.hwp",
+    "srcBytes": 16384,
+    "none": true,
+    "at": "2026-11-12"
+   },
+   {
+    "src": "elig-19mmu8-2.pdf",
+    "srcBytes": 2764328,
+    "none": true,
+    "at": "2026-11-12"
+   }
+  ],
+  "auto-hkrwdsfpnos1073sfpnos888-0hnkqu3": [
+   {
+    "src": "elig-x7aw5h-1.hwp",
+    "srcBytes": 16384,
+    "none": true,
+    "at": "2026-11-12"
+   },
+   {
+    "src": "elig-x7aw5h-2.pdf",
+    "srcBytes": 2764328,
+    "none": true,
+    "at": "2026-11-12"
    }
   ]
  }
