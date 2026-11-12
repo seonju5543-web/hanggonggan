@@ -414,8 +414,8 @@
   "name": "[공통][교외]2026년 2학기 안산시 대학생 본인부담 등록금 반값지원 장학생 선발(~11"
  },
  "https://www.yonsei.ac.kr/bbs/sc/58/944448/artclView.do": {
-  "ok": "2026-10-23",
-  "at": "2026-10-23",
+  "ok": "2026-11-12",
+  "at": "2026-11-12",
   "tries": 0,
   "name": "희망사다리1유형(중소기업 취업연계 장학금) 선발 기준 안내"
  },
@@ -618,9 +618,27 @@
   "name": "공통 2026학년도 2학기 문우림 제6기 장학생 선발 안내"
  },
  "https://www.jbnu.ac.kr/web/Board/219698/detailView.do?category=6": {
-  "tries": 1,
+  "tries": 2,
   "at": "2026-11-12",
   "minBody": 100,
   "name": "2026년 전북대동창회장학재단 문화예술장학생 선발 안내"
+ },
+ "https://www.skku.edu/skku/campus/skk_comm/notice06.do?articleno=140261": {
+  "ok": "2026-11-12",
+  "at": "2026-11-12",
+  "tries": 0,
+  "name": "[한국장학재단] 2026학년도 2학기 중소기업 취업연계(희망사다리1유형) 신규장학생 선발기준 안내"
+ },
+ "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdbbsseq=1&brddate=20260807&brdseq=2": {
+  "ok": "2026-11-12",
+  "at": "2026-11-12",
+  "tries": 0,
+  "name": "[교내/선발] 2026학년도 2학기 학부 교내장학 선발완료 안내"
+ },
+ "https://www.gachon.ac.kr/bbs/kor/478/126763/artclView.do": {
+  "ok": "2026-11-12",
+  "at": "2026-11-12",
+  "tries": 0,
+  "name": "[메디컬] 인천광역시체육회 제45회 체육장학생 신청 안내"
  }
 }
