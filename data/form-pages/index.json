@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-12",
+ "updatedAt": "2026-11-13",
  "items": {
   "auto-oardid323011menuno200318": [
    {
@@ -549,14 +549,6 @@
     "at": "2026-10-29"
    }
   ],
-  "auto-ucd000000000000062seq705": [
-   {
-    "src": "elig-1macmv-1.pdf",
-    "srcBytes": 178438,
-    "none": true,
-    "at": "2026-10-31"
-   }
-  ],
   "kosaf-2704219001": [
    {
     "file": "kosaf-2704219001/1-2026년_2학기_영광군_대학생등록금_지원사업_공고_안__p7-7.pdf",
@@ -1001,6 +993,22 @@
     "srcBytes": 2764328,
     "none": true,
     "at": "2026-11-12"
+   }
+  ],
+  "auto-spxboardid5cate8key70976": [
+   {
+    "src": "elig-1kgmcf-1.hwp",
+    "srcBytes": 76288,
+    "none": true,
+    "at": "2026-11-13"
+   }
+  ],
+  "auto-skor478127041artclviewdo": [
+   {
+    "src": "elig-1rbz5n-1.pdf",
+    "srcBytes": 60053,
+    "none": true,
+    "at": "2026-11-13"
    }
   ]
  }
