@@ -2,37 +2,126 @@
  "updatedAt": "2026-11-13",
  "items": [
   {
-   "title": "[숭실대학교 캠퍼스타운] 생성형 AI 활용 기초 및 업무 자동화 과정 참여자 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179458",
+   "title": "[광운대캠퍼스타운]「Quantum AI 인재 양성 교육」 참가자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179753",
    "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": "접수기간 2026-10-08 ~ 2026-11-12 23:59 주관기관명 숭실대학교산학협력단 대상 대학생, 일반인, 대학, 연구기관, 일반기업,",
-   "deadline": "2026-11-12",
+   "field": "교육·캠프",
+   "deadline": "2026-11-13",
+   "deadlineHint": null,
    "excerpts": [
     {
      "label": "모집기간",
-     "text": "2026-10-08 ~ 2026-11-12 23:59"
+     "text": "2026-11-09 ~ 2026-11-13"
     },
     {
      "label": "대상",
-     "text": "지역주민, 대학생, 예비 창업자, 일반인 등 AI 활용에 관심 있는 누구나"
+     "text": "본 교육은 AI 및 양자에 관한 교육으로, 관련지식이 부족한 경우 수강에 한계가 있을 수 있습니다."
     },
     {
-     "label": "모집인원",
-     "text": "회차당 30명"
+     "label": "활동지역",
+     "text": "전국"
     }
    ],
-   "eligibilityLines": [
-    "- 대상 : 지역주민, 대학생, 예비 창업자, 일반인 등 AI 활용에 관심 있는 누구나",
-    "- 준비물 : *개인 노트북 지참"
-   ],
-   "detailsV": 6,
-   "excerptsAt": "2026-11-12",
+   "attachments": [],
    "school": "",
    "campus": "",
-   "host": "창업진흥원 K-Startup",
-   "foundAt": "2026-11-12",
-   "id": "act-15o3yvg"
+   "host": "광운대학교 캠퍼스타운",
+   "api": "kstartup",
+   "apiId": "179753",
+   "id": "api-kstartup-179753",
+   "eligibilityLines": [
+    "본 교육은 AI 및 양자에 관한 교육으로, 관련지식이 부족한 경우 수강에 한계가 있을 수 있습니다."
+   ],
+   "noticeLines": [
+    "광운대학교 앵커사업단(서울캠퍼스타운)에서는, 양자컴퓨팅과 AI가 만드는 새로운 가능성을 주제로 Quantum AI 인재 양성 교육인 Advanced AI Course 를 운영합니다",
+    "온라인 접수 : https://forms.gle/54fbcoZwhivDSN3C6"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-11-10",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "AI 활용 소상공인 및 전통시장 매니저 실무 역량 과정 참가자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179552",
+   "kind": "대외활동",
+   "deadline": "2026-11-13",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-21 ~ 2026-11-13"
+    },
+    {
+     "label": "대상",
+     "text": "경상남도 소재 (예비)소상공인 및 전통시장 매니저로서 AI를 활용한 경영개선, 매출 향상, 마케팅 및 업무 효율화에 관심이 있는 자."
+    },
+    {
+     "label": "활동지역",
+     "text": "경남"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "경남지방중소벤처기업청",
+   "api": "kstartup",
+   "apiId": "179552",
+   "id": "api-kstartup-179552",
+   "eligibilityLines": [
+    "경상남도 소재 (예비)소상공인 및 전통시장 매니저로서 AI를 활용한 경영개선, 매출 향상, 마케팅 및 업무 효율화에 관심이 있는 자."
+   ],
+   "noticeLines": [
+    "경남지방중소벤처기업청과 재도전사관학교는 경남지역 (예비)소상공인 전통시장 매니저의 AI 활용능력 배양을 위한",
+    "실무교육을 개최하고자 합니다.",
+    "참여를 희망하시는 (예비)소상공인 및 전통시장 매니저께서는 아래 내용을 참고하여 적극적인 참여를 부탁드립니다.",
+    "온라인 접수 : http://forms.gle/9jDmZDob7Tq8yFjY9"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-11-03",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "[청년 취창업 특강] 나만의 일을 만들어가는 방법",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179611",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-11-16",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-23 ~ 2026-11-16"
+    },
+    {
+     "label": "대상",
+     "text": "만 19세~ 만 39세 청년 (1987년 이후 출생자)"
+    },
+    {
+     "label": "활동지역",
+     "text": "서울"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "관악구청",
+   "api": "kstartup",
+   "apiId": "179611",
+   "id": "api-kstartup-179611",
+   "eligibilityLines": [
+    "만 19세~ 만 39세 청년 (1987년 이후 출생자)",
+    "대상 연령 : 만 20세 이상 ~ 만 39세 이하"
+   ],
+   "noticeLines": [
+    "나의 일과 브랜드 창업에 대해 고민하고 있다면 이번 특강을 통해 인사이트를 얻어가시기 바랍니다.",
+    "온라인 접수 : https://www.checkin-gwanak.or.kr/core/?cid=58&role=programvopn&pSeq=1258&tab="
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-11-03",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
   },
   {
    "title": "스타트업을 위한 B2B 영업 전략 특강",
@@ -71,8 +160,806 @@
    ],
    "detailsV": 6,
    "foundAt": "2026-11-12",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "2026년도 제4차 북부창업아카데미 및 북부창업멘토링 DAY 참가자 모집(주제 : 2027 정부지원사업 합격을 위한 실전 전략)",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179741",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-11-18",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-06 ~ 2026-11-18"
+    },
+    {
+     "label": "대상",
+     "text": "정부지원사업 지원(예정) 여성(예비)창업자"
+    },
+    {
+     "label": "활동지역",
+     "text": "전국"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "북부여성새일센터",
+   "api": "kstartup",
+   "apiId": "179741",
+   "id": "api-kstartup-179741",
+   "eligibilityLines": [
+    "정부지원사업 지원(예정) 여성(예비)창업자"
+   ],
+   "noticeLines": [
+    "정부지원 사업 지원을 위한 사업계획서 작성법에 대한 교육 참여를 희망하는 경우 안내에 따라 신청하기 바랍니다.",
+    "온라인 접수 : https://naver.me/FAAqPh8u"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-11-06",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "<2026년 AI 활용 온라인 플랫폼 제작 교육> 참여자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179680",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-11-18",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-30 ~ 2026-11-18"
+    },
+    {
+     "label": "대상",
+     "text": "- AI를 활용해 온라인 플랫폼을 제작하고자 하는 (예비)창업자 - AI를 활용한 웹페이지 제작에 관심 있는 일반인 등"
+    },
+    {
+     "label": "활동지역",
+     "text": "충북"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "충북Pro메이커센터",
+   "api": "kstartup",
+   "apiId": "179680",
+   "id": "api-kstartup-179680",
+   "eligibilityLines": [
+    "AI를 활용해 온라인 플랫폼을 제작하고자 하는 (예비)창업자",
+    "AI를 활용한 웹페이지 제작에 관심 있는 일반인 등"
+   ],
+   "noticeLines": [
+    "충북Pro메이커센터에서는 다음과 같이 AI를 활용한 온라인 플랫폼 제작 교육을 진행합니다.",
+    "관심있는 분들의 많은 참여 신청 바랍니다.",
+    "온라인 접수 : https://forms.gle/UbLPVojyhPL9fTx28"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-11-02",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "2026 서구토탈창업아카데미 참가자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179638",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-11-18",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-27 ~ 2026-11-18"
+    },
+    {
+     "label": "대상",
+     "text": "예비창업자 및 업력 3년 이내 초기창업기업 관계자 등"
+    },
+    {
+     "label": "활동지역",
+     "text": "전국"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "온랩",
+   "api": "kstartup",
+   "apiId": "179638",
+   "id": "api-kstartup-179638",
+   "eligibilityLines": [
+    "예비창업자 및 업력 3년 이내 초기창업기업 관계자 등"
+   ],
+   "noticeLines": [
+    "예비·초기창업자의 사업모델 고도화와 실전 창업역량 강화를 지원하고, 분야별 전문가 멘토링 및 창업경진대회를 통해 창업아이템의 사업화 가능성을 높이기 위한 「2026 서구토탈창업아카데미」 참가자를 다음과 같이 모집하오니 많은 관심과 참여 바랍니다.",
+    "온라인 접수 : https://docs.google.com/forms/d/e/1FAIpQLSfSf8JshcFHUXPzlBSCaz1n2jxvFAO_nsNxGdgqZohX00L6NA/viewform"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-11-04",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "2026 논산시 사회적경제 창업 아카데미 참여자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179591",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-11-18",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-22 ~ 2026-11-18"
+    },
+    {
+     "label": "대상",
+     "text": "사회문제 해결 아이디어를 가진 시민 및 창업3년 이내 기업 등"
+    },
+    {
+     "label": "활동지역",
+     "text": "전국"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "논산시 사회적경제통합지원센터",
+   "api": "kstartup",
+   "apiId": "179591",
+   "id": "api-kstartup-179591",
+   "eligibilityLines": [
+    "사회문제 해결 아이디어를 가진 시민 및 창업3년 이내 기업 등"
+   ],
+   "noticeLines": [
+    "사회적기업 전환을 준비하는 초기 창업기업 및 창업예정자에게 다음과 같이 아카데미를 진행하고자 공고하오니 참여를 희망하는 기업 또는 개인은 안내를 따라 신청하기 바랍니다.",
+    "온라인 접수 : https://forms.gle/gajTpPkJ5PjP5R8a8"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-11-04",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "'딸깍 한 번으로 완성하는 AI 업무 자동화' 실전 워크숍 참여자 모집 (『신한 스퀘어브릿지』 11월 브릿지 클럽)",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179752",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-11-19",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-06 ~ 2026-11-19"
+    },
+    {
+     "label": "대상",
+     "text": "스타트업 임직원, 예비창업자, 스타트업 유관기관 관계자 등"
+    },
+    {
+     "label": "활동지역",
+     "text": "전국"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "신한금융희망재단",
+   "api": "kstartup",
+   "apiId": "179752",
+   "id": "api-kstartup-179752",
+   "eligibilityLines": [
+    "스타트업 임직원, 예비창업자, 스타트업 유관기관 관계자 등"
+   ],
+   "noticeLines": [
+    "『신한 스퀘어브릿지』 11월 브릿지 클럽에서는 기초 사용법을 넘어 자신에게 필요한 AI 에이전트를 직접 만들어 보는 실습형 AI(클로드코드) 강연을 준비했습니다.",
+    "AI 에이전트 활용 역량 강화에 관심있는 스타트업 및 유관기관 관계자분들의 많은 관심과 참여 바랍니다.",
+    "온라인 접수 : https://m.site.naver.com/2kk0q"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-11-10",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "국민대학교 청년도약 인재양성 부트캠프 참가자 모집(AI 실무교육)",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179559",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-11-19",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-19 ~ 2026-11-19"
+    },
+    {
+     "label": "대상",
+     "text": "전공·지역 무관, 만 19세 ~ 34세 이하 미취업 청년(군 복무시간 산정 시 39세까지 가능) □ 취업준비생 □ 예비창업자 □ 장기 휴학생(1년 이상)"
+    },
+    {
+     "label": "활동지역",
+     "text": "서울"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "국민대학교 글로벌창업벤처대학원",
+   "api": "kstartup",
+   "apiId": "179559",
+   "id": "api-kstartup-179559",
+   "eligibilityLines": [
+    "전공·지역 무관, 만 19세 ~ 34세 이하 미취업 청년(군 복무시간 산정 시 39세까지 가능)",
+    "취업준비생",
+    "예비창업자",
+    "장기 휴학생(1년 이상)",
+    "대상 연령 : 만 20세 이상 ~ 만 39세 이하"
+   ],
+   "eligibilityExcludes": [
+    "재학생(1년 이상 장기휴학생은 가능), 재직자 불가능"
+   ],
+   "noticeLines": [
+    "국민대학교 글로벌창업벤처대학원 창업학과(참여: 경영대학 AI빅데이터융합경영학과)는 「청년도약 인재양성 부트캠프(실전인재형)」 교육생을 아래와 같이 모집합니다. 본 부트캠프는 일자리 밖 청년을 스타트업·벤처 생태계의 AX(AI 전환) 실무 인재로 양성하는 전액 무료 교육 프로그램입니다.",
+    "직무분야: 스타트업·벤처 생태계 실무 기획 및 운영(AX 기반)",
+    "참여기업: ㈜메인콘텐츠, ㈜인포뱅크, ㈜씨엔티테크, ㈜와이앤아처, 한국엔젤투자협회 등 1,285개사",
+    "온라인 접수 : https://axkookmin.com/"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-11-05",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "2026년 대전 스타트업 원스톱 지원센터 아카데미 4회차",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179695",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-11-22",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-02 ~ 2026-11-22"
+    },
+    {
+     "label": "대상",
+     "text": "대전 지역 예비/초기 창업자"
+    },
+    {
+     "label": "활동지역",
+     "text": "대전"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "대전창조경제혁신센터",
+   "api": "kstartup",
+   "apiId": "179695",
+   "id": "api-kstartup-179695",
+   "eligibilityLines": [
+    "대전 지역 예비/초기 창업자"
+   ],
+   "noticeLines": [
+    "대전창조경제혁신센터의 창업 교육 계획을 다음과 같이 공고하오니 참여를 희망하는 기업은 안내에 따라 신청해주시기 바랍니다.",
+    "온라인 접수 : https://moaform.com/q/m1RhhZ"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-11-06",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "2026 전북콘텐츠코리아랩 AI 활용 콘텐츠(캐릭터) 아이디어 발굴 캠프",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179772",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-11-23",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-10 ~ 2026-11-23"
+    },
+    {
+     "label": "대상",
+     "text": "도내 청년 15명"
+    },
+    {
+     "label": "활동지역",
+     "text": "전북"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "(재)전북특별자치도 콘텐츠융합진흥원",
+   "api": "kstartup",
+   "apiId": "179772",
+   "id": "api-kstartup-179772",
+   "eligibilityLines": [
+    "도내 청년 15명",
+    "대상 연령 : 만 20세 이상 ~ 만 39세 이하"
+   ],
+   "noticeLines": [
+    "우리원에서는 아이디어를 보유한 창·제작자 발굴 및 디지털 역량 강화를 위해 “AI 활용 캐릭터(콘텐츠) 아이디어 발굴 캠프”참가자를 모집하오니 많은 관심과 참여 바랍니다.",
+    "온라인 접수 : https://forms.gle/pqE4dQ3izE16pCVC9"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-11-11",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "[강동구 청년해냄센터] 2027년 정부 지원 사업 대비 성공 창업 스쿨 참가자 모집 공고",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179766",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-11-23",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-09 ~ 2026-11-23"
+    },
+    {
+     "label": "대상",
+     "text": "2027년 정부 지원 사업 도전을 희망하는 예비창업자 및 기창업자 24명"
+    },
+    {
+     "label": "활동지역",
+     "text": "전국"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "강동구 청년해냄센터",
+   "api": "kstartup",
+   "apiId": "179766",
+   "id": "api-kstartup-179766",
+   "eligibilityLines": [
+    "2027년 정부 지원 사업 도전을 희망하는 예비창업자 및 기창업자 24명"
+   ],
+   "noticeLines": [
+    "강동구 청년해냄센터에서 다음과 같이 공고하오니 참여를 희망하는 창업자는 안내에 따라 신청하시기 바랍니다.",
+    "온라인 접수 : http://www.gdhaenaem.com/?c=168"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-11-13",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "제9회 원주권 스타트업 커뮤니티 데이 참가자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179727",
+   "kind": "대외활동",
+   "deadline": "2026-11-23",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-05 ~ 2026-11-23"
+    },
+    {
+     "label": "대상",
+     "text": "창업에 관심있는 누구나"
+    },
+    {
+     "label": "활동지역",
+     "text": "강원"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "상지대학교 벤처창업본부",
+   "api": "kstartup",
+   "apiId": "179727",
+   "id": "api-kstartup-179727",
+   "eligibilityLines": [
+    "창업에 관심있는 누구나"
+   ],
+   "noticeLines": [
+    "상지대학교 벤처창업본부에서는 (예비)창업기업의 네트워크 형성을 통한 사업화 촉진을 돕기 위해",
+    "「 제9회 원주권 스타트업 커뮤니티 데이 참가자 모집 」을 개최합니다.",
+    "많은 관심과 참여 바랍니다.",
+    "온라인 접수 : https://forms.gle/UegLwQTQYpD8AjcW6"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-11-13",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "경기대학교 2026년 예비창업패키지 KGU 창업준비 아카데미 모집 신청 공고",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179673",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-11-23",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-30 ~ 2026-11-23"
+    },
+    {
+     "label": "대상",
+     "text": "혁신적인 기술 또는 아이디어로 창업을 준비 중인 예비창업자"
+    },
+    {
+     "label": "활동지역",
+     "text": "경기"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "경기대학교 창업지원단",
+   "api": "kstartup",
+   "apiId": "179673",
+   "id": "api-kstartup-179673",
+   "eligibilityLines": [
+    "혁신적인 기술 또는 아이디어로 창업을 준비 중인 예비창업자"
+   ],
+   "noticeLines": [
+    "경기대학교 창업지원단에서 2026 예비창업패키지 KGU 창업준비 아카데미 모집 계획을 공고하오니, 창업을 준비하시는 예비창업자 분들의 많은 관심과 참여 바랍니다.",
+    "온라인 접수 : https://forms.gle/ij95oNbcrqMxXXX56"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-11-13",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "[미감도서관] 대학생 자원봉사활동 모집 (11월14일)",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3536811",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-11-13",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-16 ~ 2026-11-13"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-10-30 ~ 2026-11-14"
+    },
+    {
+     "label": "활동지역",
+     "text": "목동중앙남로 57-10 3층 미감도서관"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "양천구립도서관",
+   "api": "vol1365",
+   "apiId": "3536811",
+   "id": "api-vol1365-3536811",
+   "detailsV": 6,
+   "eligibilityLines": [
+    "○ 활동자격: 대학생"
+   ],
+   "noticeLines": [
+    "[미감도서관] 대학생자원봉사자 모집",
+    "봉사요일: 11월14일(토)",
+    "봉사시간: 11월14일(토) 저녁 17:00~ 21:00까지 (4시간)",
+    "내용: 미감도서관 프로그램 행사 지원",
+    "활동자격: 대학생",
+    "활동장소: 양천구 미감도서관"
+   ],
+   "foundAt": "2026-11-10",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "2026 희망+ 김장나눔 한마당 행사 보조 대학생 모집",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3538765",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-11-13",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-20 ~ 2026-11-13"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-11-14 ~ 2026-11-14"
+    },
+    {
+     "label": "활동지역",
+     "text": "달서구청 광장(대구광역시 달서구 학산로 45)"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "달서구자원봉사센터",
+   "api": "vol1365",
+   "apiId": "3538765",
+   "id": "api-vol1365-3538765",
+   "detailsV": 6,
+   "noticeLines": [
+    "일시 : 2026.11.14.(토) 8:00~14:00 (봉사시간 6시간 인정)",
+    "내용 : 홀몸어르신과 저소득 취약계층을 위한 희망+ 김장나눔 한마당 행사보조(배추, 양념 박스 이동 및 부스 진행 등)",
+    "장소 : 달서구청 광장(대구광역시 달서구 학산로 45)",
+    "인원 : 20대 대학생 70명(남녀무관)"
+   ],
+   "foundAt": "2026-11-07",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "[청년] 어린이 동요대회 봉사자 모집합니다.",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3542968",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-11-13",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-28 ~ 2026-11-13"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-11-14 ~ 2026-11-14"
+    },
+    {
+     "label": "활동지역",
+     "text": "은평구청"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "죠이풀 사회적협동조합",
+   "api": "vol1365",
+   "apiId": "3542968",
+   "id": "api-vol1365-3542968",
+   "detailsV": 6,
+   "eligibilityLines": [
+    "모집 대상: 대학생 및 청년층(20~30대)"
+   ],
+   "noticeLines": [
+    "？？ 11월 14일 진행되는 봉사활동 참여자를 모집합니다.",
+    "일시: 11월 14일(토) 12:00~18:00",
+    "집합 장소: 은평구청 1층 로비",
+    "서울특별시 은평구 은평로 195 (녹번동)",
+    "모집 대상: 대학생 및 청년층(20~30대)",
+    "활동 내용: 행사장 세팅 및 행사 안내 등"
+   ],
+   "foundAt": "2026-11-07",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "대학생) 초등, 중등 학습 지도 및 놀이지원",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3546415",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-11-13",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-03 ~ 2026-11-13"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-11-09 ~ 2026-11-27"
+    },
+    {
+     "label": "활동지역",
+     "text": "경기도 평택시 이충로100번길 73 (서정동) 1층, 사랑꿈터지역아동센터"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "사랑꿈터지역아동센터",
+   "api": "vol1365",
+   "apiId": "3546415",
+   "id": "api-vol1365-3546415",
+   "detailsV": 6,
+   "noticeLines": [
+    "안녕하세요.",
+    ". 사랑꿈터지역아동센터내 아동 학습지도 및 놀이지도 봉사입니다.",
+    ". 센터 특성상 대학생 자원봉사 선생님을 기다립니다.",
+    "봉사활동내용.",
+    "초등학교 1학년 ~6학년 : 기초학습 및 놀이지도 지원",
+    "중등 1학년 ~ 3학년 : 수학 학습지원"
+   ],
+   "foundAt": "2026-11-08",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "[대학생 자원봉사자 15명 모집] 고양 평화통일공감 시민대화 행사 운영 지원",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3548047",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-11-13",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-06 ~ 2026-11-13"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-11-17 ~ 2026-11-17"
+    },
+    {
+     "label": "활동지역",
+     "text": "고양꽃전시관"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "민주평화통일자문회의고양시협의회",
+   "api": "vol1365",
+   "apiId": "3548047",
+   "id": "api-vol1365-3548047",
+   "detailsV": 6,
+   "eligibilityLines": [
+    "■ 모집 대상: 행사 운영 지원에 관심 있는 대학생"
+   ],
+   "noticeLines": [
+    "「고양 평화통일공감 시민대화」의 원활한 진행을 함께 도울 대학생 자원봉사자를 모집합니다. 행사 준비와 참가자 안내, 현장 운영을 함께할 대학생 여러분의 많은 관심과 신청 바랍니다.",
+    "모집 대상: 행사 운영 지원에 관심 있는 대학생",
+    "모집 인원: 15명",
+    "활동 일자: 2026년 11월 17일(화)",
+    "집결 시간: 오전 11시까지",
+    "활동 장소: 고양국제꽃전시관"
+   ],
+   "foundAt": "2026-11-11",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "어르신 말벗, 식사지원, 프로그램 활동보조 자원봉사 모집 (대학생 이상부터 신청 가능합니다)",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3504654",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-11-14",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-08-15 ~ 2026-11-14"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-08-15 ~ 2026-11-14"
+    },
+    {
+     "label": "활동지역",
+     "text": "상일데이케어센터 6층, 2층, 지하1층"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "상일데이케어센터",
+   "api": "vol1365",
+   "apiId": "3504654",
+   "id": "api-vol1365-3504654",
+   "detailsV": 6,
+   "noticeLines": [
+    "* 봉사활동은 한 만큼 인정됩니다. 사정에 따라 시간이 변경될 수 있음을 양해 바랍니다.",
+    "활동장소 : 상일데이케어센터 6층, 2층, 지하",
+    "주 소 : 서울 광진구 자양동42(동남빌딩) · 국시원 맞은편",
+    "활동인원 : 일 최대 3명 (대학생부터 신청 가능)",
+    "활동요일 : 주중, 토요일 (13:30 ~ 17:30 최대 4시간) - 시간 협의 가능 (*봉사활동은 한 만큼 인정됩니다.*)",
+    "※ 참고사항"
+   ],
+   "foundAt": "2026-11-11",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "제5회 부울경대학생스피치대회 안내 및 진행보조 봉사자 모집",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3547051",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-11-14",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-05 ~ 2026-11-14"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-11-21 ~ 2026-11-21"
+    },
+    {
+     "label": "활동지역",
+     "text": "부산 부경대학교 미래관 소민홀"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "사단법인미래교육문화진흥원",
+   "api": "vol1365",
+   "apiId": "3547051",
+   "id": "api-vol1365-3547051",
+   "detailsV": 6,
+   "eligibilityLines": [
+    "0 지원자격 : 대학생, 단정한 복장",
+    "0 활동내용 : 대회준비(명단점검, 자리배치 등), 대회진행 보조, 마무리 점검 등",
+    "0 지원방법:1365봉사포털사이트",
+    "(변경사항이나 활동 안내는 등록된 전화번호로 문자 발송됩니다! 미확인시 책임지지 않음)"
+   ],
+   "noticeLines": [
+    "※ 제5회부울경대학생스피치대회 안내 및 진행 보조 봉사자모집※",
+    "0 봉사기간 : 2026.11.21. 토요일 13:00~18:00(5시간)",
+    "0 행사장소 : 부경대학교 미래관",
+    "0 봉사인원 : 3명",
+    "0 지원자격 : 대학생, 단정한 복장",
+    "0 활동내용 : 대회준비(명단점검, 자리배치 등), 대회진행 보조, 마무리 점검 등"
+   ],
+   "foundAt": "2026-11-11",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "11월(오전) 대전수학문화관 대학생 봉사활동 모집",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3540321",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-11-16",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-23 ~ 2026-11-16"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-11-02 ~ 2026-11-30"
+    },
+    {
+     "label": "활동지역",
+     "text": "대전수학문화관"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "대전교육정보원 대전수학문화관",
+   "api": "vol1365",
+   "apiId": "3540321",
+   "id": "api-vol1365-3540321",
+   "detailsV": 6,
+   "eligibilityLines": [
+    "3. 대상: 교육봉사활동에 관심 있는 대학생"
+   ],
+   "noticeLines": [
+    "일부 대학에서 요구하는 기관장 날인된 봉사활동 확인서를 개별 발급하지 않습니다.",
+    "(봉사활동 확인서는 월말에 1365 자원봉사포털에서 개별 발급)",
+    "일시: 2026년 11월 (오전) 09:00~12:00",
+    "장소: 대전수학문화관",
+    "대상: 교육봉사활동에 관심 있는 대학생",
+    "활동 내용"
+   ],
+   "foundAt": "2026-11-07",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
   },
   {
    "title": "청소년 자원봉사스쿨 한지공예소품 만들기(중,고, 대학생 신청 가능)",
@@ -115,8 +1002,8 @@
     "만들어진 소품은 지역내 어려운 이웃에게 전달됩니다. 사용할 수 있도록 성의있게 만들어주셔야합니다."
    ],
    "foundAt": "2026-11-12",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
   },
   {
    "title": "2026년 대학수학능력시험 격려 키트 만들기 대학생 봉사자 모집",
@@ -156,8 +1043,8 @@
     "※ 실적은 활동 종료 후 당일 18시 전으로 입력될 예정입니다."
    ],
    "foundAt": "2026-11-12",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
   },
   {
    "title": "2026년 대학수학능력시험 격려 활동보조 대학생 봉사자 모집",
@@ -197,8 +1084,8 @@
     "※ 실적은 활동 종료 후 당일 18시 전으로 입력될 예정입니다."
    ],
    "foundAt": "2026-11-12",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
   },
   {
    "title": "대학생과 함께하는 태안 볼런투어",
@@ -238,8 +1125,8 @@
     "※ 봉사시간 4시간 인정(10:00~14:00)"
    ],
    "foundAt": "2026-11-12",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
   },
   {
    "title": "[사상구도시재생지원센터] 삼덕 레스토랑 행사 안내 및 도우미(대학생 이상)(저녁)",
@@ -271,7 +1158,7 @@
    "id": "api-vol1365-3546123",
    "detailsV": 6,
    "eligibilityLines": [
-    "모집대상: 대학생 5명 (저녁 제공)"
+    "6. 모집대상: 대학생 5명 (저녁 제공)"
    ],
    "noticeLines": [
     "행 사 명: 삼덕 레스토랑",
@@ -282,8 +1169,758 @@
     "모집대상: 대학생 5명 (저녁 제공)"
    ],
    "foundAt": "2026-11-12",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "지역아동센터 김장봉사 및 오리엔테이션 (동국제강 임직원 대학생자녀)",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3542952",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-11-19",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-28 ~ 2026-11-19"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-11-19 ~ 2026-11-19"
+    },
+    {
+     "label": "활동지역",
+     "text": "신당꿈구립지역아동센터"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "신당꿈 구립 지역아동센터",
+   "api": "vol1365",
+   "apiId": "3542952",
+   "id": "api-vol1365-3542952",
+   "detailsV": 6,
+   "noticeLines": [
+    "봉사활동 오리엔테이션",
+    "지역아동센터 가정 배부 김장 봉사",
+    "* 동국제강 임직원 대학생 자녀분들만 신청가능합니다"
+   ],
+   "foundAt": "2026-11-13",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "2026년 K-김장문화축제 행사 지원자(대학생) 모집:11.21(토)~11.22(일)",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3545510",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-11-19",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-02 ~ 2026-11-19"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-11-21 ~ 2026-11-22"
+    },
+    {
+     "label": "활동지역",
+     "text": "익산시중앙체육공원"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "전북특별자치도 익산시",
+   "api": "vol1365",
+   "apiId": "3545510",
+   "id": "api-vol1365-3545510",
+   "detailsV": 6,
+   "eligibilityLines": [
+    "대학생"
+   ],
+   "noticeLines": [
+    "*행 사 : 2026년 'K-김장문화축제 익산'",
+    "*주 최 : 익산시농촌활력지원센터",
+    "*일 시 : 26.11.21(토), 26.11.22(일) 08:00-17:00(8시간 인정)",
+    "*집결장소 : 익산시중앙체육공원 종합안내소",
+    "*내 용 : 행사 진행 보조 및 뒷정리",
+    "(김장체험 부스관리, 안내 부스 관리, 김장꾸러미 이동, 행사장 안내, 청소 등)"
+   ],
+   "foundAt": "2026-11-13",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "HD현대삼호- [K-뉴딜 아카데미] HD현대 선박건조 필드테크니션 교육생 모집",
+   "url": "https://www.youthcenter.go.kr/bbs03View/48/10865",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadlineHint": null,
+   "excerpts": [],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "온통청년 직업훈련",
+   "api": "youthContent",
+   "apiId": "10865",
+   "id": "api-youthContent-10865",
+   "detailsV": 6,
+   "eligibilityLines": [
+    "• 만 15세 이상 ~ 만 34세 이하 미취업 청년",
+    "*군필자는 의무복무기간만큼 연령 상한 적용(최대 만 39세)",
+    "• 성별·병역·학력·전공 제한 없음",
+    "• 재직자 및 타 직업능력개발교육 참여자 불가",
+    "- 교육비 전액 무료",
+    "- 수료 후 조선업 분야 우수기업 취업 지원",
+    "- 훈련수당 지급 (약 100만원/월)",
+    "- HD현대삼호 야드 투어",
+    "- 현직자 강의",
+    "- 국제 선급자격 취득 지원",
+    "- 기숙사 무료 제공 (조/중/석식 포함)"
+   ],
+   "foundAt": "2026-11-04",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "공주시청년센터 - 「공주 크리에이티브 IP 캠프」 모집",
+   "url": "https://www.youthcenter.go.kr/bbs03View/48/10858",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadlineHint": null,
+   "excerpts": [],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "온통청년 취업지원",
+   "api": "youthContent",
+   "apiId": "10858",
+   "id": "api-youthContent-10858",
+   "detailsV": 6,
+   "foundAt": "2026-10-29",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "미래내일 일경험 기업 실무 프로젝트 참여자 모집 - 3. IT 직무",
+   "url": "https://www.youthcenter.go.kr/bbs03View/48/10853",
+   "kind": "대외활동",
+   "field": "인턴·일경험",
+   "deadlineHint": null,
+   "excerpts": [],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "온통청년 취업지원",
+   "api": "youthContent",
+   "apiId": "10853",
+   "id": "api-youthContent-10853",
+   "detailsV": 6,
+   "eligibilityLines": [
+    "만 15세~만 34세의 미취업 청년",
+    "(개인 or 팀을 이루어 신청 가능)"
+   ],
+   "foundAt": "2026-10-27",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "미래내일 일경험 기업 실무 프로젝트 참여자 모집 - 2. 경영사무",
+   "url": "https://www.youthcenter.go.kr/bbs03View/48/10852",
+   "kind": "대외활동",
+   "field": "인턴·일경험",
+   "deadlineHint": null,
+   "excerpts": [],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "온통청년 취업지원",
+   "api": "youthContent",
+   "apiId": "10852",
+   "id": "api-youthContent-10852",
+   "detailsV": 6,
+   "eligibilityLines": [
+    "만 15세~만 34세의 미취업 청년",
+    "(개인 or 팀을 이루어 신청 가능)"
+   ],
+   "foundAt": "2026-10-27",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "미래내일 일경험 기업 실무 프로젝트 참여자 모집 - 1. 광고 마케팅",
+   "url": "https://www.youthcenter.go.kr/bbs03View/48/10851",
+   "kind": "대외활동",
+   "field": "인턴·일경험",
+   "deadlineHint": null,
+   "excerpts": [],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "온통청년 취업지원",
+   "api": "youthContent",
+   "apiId": "10851",
+   "id": "api-youthContent-10851",
+   "detailsV": 6,
+   "eligibilityLines": [
+    "만 15세~만 34세의 미취업 청년",
+    "(개인 or 팀을 이루어 신청 가능)",
+    "모집 대상 : 만 15세~만 34세의 미취업 청년 (개인 or 팀을 이루어 신청 가능)"
+   ],
+   "foundAt": "2026-10-27",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "청년 생명사랑 서포터즈 운영",
+   "url": "https://www.usspc.or.kr/",
+   "kind": "대외활동",
+   "field": "서포터즈·기자단",
+   "deadline": "2026-11-30",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-02-01 ~ 2026-11-30"
+    },
+    {
+     "label": "혜택",
+     "text": "주요내용 - (청년 생명사랑 서포터즈) 자살예방․청년 정신건강 관련 카드뉴스· 영상홍보 포스터 제작 및 온·오프라인 홍보 - (미디어 모니터링) 자살유발(유해)정보 미디어 모니터링 및 신고"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "울산광역시",
+   "api": "youthPolicy",
+   "apiId": "20260410005400212677",
+   "id": "api-youthPolicy-20260410005400212677",
+   "eligibilityLines": [
+    "대 상 : 울산 거주 및 울산 소재 대학교 재(휴)학생 및 청년"
+   ],
+   "noticeLines": [
+    "청년 참여형 자살예방활동 및 미디어 모니터링 활동을 통해 청년세대 자살예방을 위한 사회적 안전망 구축"
+   ],
+   "detailsV": 6,
+   "avoidUrls": [
+    "https://www.usspc.or.kr/"
+   ],
+   "foundAt": "2026-10-04",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "(연수구) 청년 자격증 응시료 지원",
+   "url": "https://youth.incheon.go.kr/youthpolicy/youthPolicyInfoDetail.do?poly_seq=419",
+   "kind": "대외활동",
+   "deadline": "2026-11-30",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-02-01 ~ 2026-11-30"
+    },
+    {
+     "label": "대상",
+     "text": "만 18~39세"
+    },
+    {
+     "label": "혜택",
+     "text": "1인 연 1회, 최대 10만원 범위 자격증시험 응시료 지원 자격증 한 종목 당 필기, 실기로 나뉘어져 있거나 여러 단계로 이루어져 있는 경우 그 중 1건만 지원 가능 여러 건의 시험영수증 및 응시증빙자료 첨부한 경우 금액이 가장 높은 1만 지원 가능(시험 1건만 신청바랍니다) 실제 본…"
+    },
+    {
+     "label": "주최",
+     "text": "인천광역시 연수구 송도행정지원국 일자리정책과"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "인천광역시 청년정책담당관",
+   "api": "youthPolicy",
+   "apiId": "20260406005400212441",
+   "id": "api-youthPolicy-20260406005400212441",
+   "eligibilityLines": [
+    "만 18세 ~ 만 39세"
+   ],
+   "eligibilityExcludes": [
+    "건강보험 직장가입자 및 개인사업자는 제외"
+   ],
+   "noticeLines": [
+    "취업에 어려움을 겪고 있는 인천 청년에게 자격증 응시료 지원을 통한 경제적 부담 경감 및 사회진입 활성화 도모",
+    "제출 서류 : 시험 결제영수증(시험 1건만 지원 가능)(필수) 시험응시 증빙서류(성적표, 응시확인서 등)(필수) 통장사본(본인명의)(필수)",
+    "기타 : 신청방법, 제출서류, 지원가능한 자격증 안내 등 사업 전반에 관한 문의는 미추홀콜센터(032-120)에서 안내"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-10-02",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "2026년 평택시 청년창업도전 아카데미",
+   "url": "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-11-30",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-03-30 ~ 2026-11-30"
+    },
+    {
+     "label": "혜택",
+     "text": "창업을 준비하는 청년에게 필요한 실무교육과 창업에 관심있는 청년들이 쉽게 도전할 수 있도록 맞춤형 창업 특강을 제공"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "경기도 평택시 기획항만경제실",
+   "api": "youthPolicy",
+   "apiId": "20260326005400212290",
+   "id": "api-youthPolicy-20260326005400212290",
+   "noticeLines": [
+    "예비창업자부터 청년ceo까지 단계별 교육과정 수요를 반영하여 청년(예비)창업자의 역량강화를 위한 교육프로그램 제공"
+   ],
+   "detailsV": 6,
+   "avoidUrls": [
+    "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000"
+   ],
+   "foundAt": "2026-10-02",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "청년 행정체험연수 운영",
+   "url": "https://www.daejeonyouthportal.kr/content/CT_000000000070/cntPage.do?commonMenuNo=79_92&dpmSectionScd=10&dpmSectionFst=2",
+   "kind": "대외활동",
+   "deadline": "2026-11-30",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-01 ~ 2026-11-30"
+    },
+    {
+     "label": "혜택",
+     "text": "대전 거주 청년들에게 행정업무 및 경제활동 참여 기회를 제공하는 공공부문 진로탐색의 행정체험형 연수 근무조건 가. 근무시간: 09:00~16:00(1일 6시간, 점심시간 1시간 제외), 주 5일 근무 * 근무부서에 따라 휴일 1일 근무(월요일 휴무) 및 근무시간 조정 가능 나. 근무기…"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "대전광역시 교육정책전략국 청년정책과",
+   "api": "youthPolicy",
+   "apiId": "20260107005400212077",
+   "id": "api-youthPolicy-20260107005400212077",
+   "eligibilityLines": [
+    "사업대상: 본인 또는 직계존속이 대전에 거주하는 만 18세 이상 39세 이하 청년"
+   ],
+   "eligibilityExcludes": [
+    "※ 제외자 : 대전광역시 대학생 아르바이트 근무 경험자"
+   ],
+   "noticeLines": [
+    "관내 청년들의 시정 전반에 대한 이해를 높이고, 행정체험을 통한 실무 역량 및 사회진출 기반 강화를 위한 청년 행정체험연수(동·하계) 운영",
+    "신청 방법 : 대전청년포털 홈페이지 (www.daejeonyouthportal.kr) 신청",
+    "심사 방법 : https://www.daejeonyouthportal.kr/content/CT_000000000070/cntPage.do?commonMenuNo=79_92&dpmSectionScd=10&dpmSectionFst=2",
+    "제출 서류 : (공통) 신청서, 개인정보 수집·이용(제공) 동의서, 행정정보 공동이용 사전동의서, 주민등록등본 (해당자) 특별선발(국민기초생활수급자, 차상위계층, 등록장애인, 등록한부모가족, 국가유공자) 해당 증빙서류 (해당자) 가족관계증명서, 부모의 주민등록등본"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-09-30",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "게임아카데미 운영",
+   "url": "https://dcoe.or.kr/main",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-12-31",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-05-01 ~ 2026-12-31"
+    },
+    {
+     "label": "혜택",
+     "text": "ㆍ(교육지원) 게임개발 및 그래픽 분야 중급 이상 정규교육 운영 -기획 : 게임기획 및 분석, 스토리텔링, 시스템 기획 -프로그래밍 : 유니티 실전, AI 활용 코드 및 데이터 관리 -그래픽 : 3D Z-Brush 모델링, 유니티 UI, 컨셉아트 - AI : AI 툴깃, 생성형 AI …"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "대구광역시 문화체육관광국 콘텐츠산업과",
+   "api": "youthPolicy",
+   "apiId": "20261102005400214695",
+   "id": "api-youthPolicy-20261102005400214695",
+   "eligibilityLines": [
+    "지역 게임기업 재직자 및 업계 종사자 등"
+   ],
+   "noticeLines": [
+    "지역 게임분야 종사자 전문성 향상을 위한 역량 맞춤별 실무 교육 지원",
+    "신청 방법 : 대구콘텐츠밸리 통합누리집(dcoe.or.kr) 공고문 확인 후 온라인 신청"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-11-06",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "청년 취업 아카데미",
+   "url": "https://www.saha.go.kr/startup/program/list.do?mId=0302000000",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-12-31",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-03-01 ~ 2026-12-31"
+    },
+    {
+     "label": "혜택",
+     "text": "❍ 기 간: 연 8회(스피치 3회, 퍼스널브랜딩 3회, 지역향토기업탐방 2회) ❍ 대 상: 18~39세 사하구 거주‧활동 청년 80명 ▸ 클래스별 10명 ❍ 내 용: 스피치‧퍼스널브랜딩 교육 및 지역 우수기업 탐방 프로그램 - 성공 면접을 위한 스피치 컨설팅 & 커리어 코칭 - 인사담…"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "부산광역시 사하구 경제환경국",
+   "api": "youthPolicy",
+   "apiId": "20261030005400214639",
+   "id": "api-youthPolicy-20261030005400214639",
+   "noticeLines": [
+    "❍ 청년의 노동시장 조기 진입을 위한 취업역량 강화 및 능력 개발 지원",
+    "❍ 면접, 채용 트렌드를 반영한 참여자별 맞춤 컨설팅 진행"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-11-06",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "2026 서울형 청년인턴 직무캠프",
+   "url": "https://youth.seoul.go.kr/content.do?key=2310100012",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-12-31",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-03-01 ~ 2026-12-31"
+    },
+    {
+     "label": "혜택",
+     "text": "실무중심 직무교육과 인턴십 과정의 접목으로 청년 구직자에게 일경험 및 취업역량 강화 지원"
+    },
+    {
+     "label": "주최",
+     "text": "재단법인서울경제진흥원"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "서울특별시 미래청년기획관 청년정책담당관",
+   "api": "youthPolicy",
+   "apiId": "20261018005400213991",
+   "id": "api-youthPolicy-20261018005400213991",
+   "noticeLines": [
+    "사전직무교육 ✚ 인턴십(4개월) 및 직장적응교육 ➔ 취업연계",
+    "신청 방법 : 참여기업 모집·선정 후 참여자 모집·선발"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-10-20",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "2026 서울영커리언스 캠프",
+   "url": "https://youth.seoul.go.kr/youthConts.do?key=2602120001&sc_pbancSeCd=030&sc_bbsStngSn=2212200001&sc_bbsCtgrySn=2602120020&sc_faqCtgryCd=027",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-12-31",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-03-01 ~ 2026-12-31"
+    },
+    {
+     "label": "혜택",
+     "text": "AI역량검사, 직무과제 수행 등을 통한 ‘커리어 로드맵’ 작성"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "서울특별시 미래청년기획관 청년정책담당관",
+   "api": "youthPolicy",
+   "apiId": "20261018005400213983",
+   "id": "api-youthPolicy-20261018005400213983",
+   "eligibilityLines": [
+    "비진학 청년 포함"
+   ],
+   "noticeLines": [
+    "나를 찾는 진로·직무 탐색 부트캠프",
+    "신청 방법 : ‘서울영커리언스 대학협의체’를 통한 참여 학생 모집"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-10-20",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "2026년 청년정책 종합상담 참여자 모집(기존 전라남도 22개 시·군 대상)",
+   "url": "https://nysc.or.kr/nysc/",
+   "kind": "대외활동",
+   "deadline": "2026-12-31",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-06-29 ~ 2026-12-31"
+    },
+    {
+     "label": "대상",
+     "text": "만 18~45세"
+    },
+    {
+     "label": "혜택",
+     "text": "맞춤형 정책상담 · 일자리, 주거, 교육, 문화·복지, 금융, 참여·권리 등 1시간 내외의 맞춤형 청년정책 상담 제공 참여혜택 · 대면 상담 참여자 선착순 50명 대상 소정의 기념품 제공"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "전남광주통합특별시",
+   "api": "youthPolicy",
+   "apiId": "20260812005400213331",
+   "id": "api-youthPolicy-20260812005400213331",
+   "eligibilityLines": [
+    "만 18세 ~ 만 45세"
+   ],
+   "noticeLines": [
+    "청년 개인 상황에 맞는 맞춤형 1:1 정책 상담 진행",
+    "신청 방법 : 중앙청년지원센터 홈페이지 상단 메뉴에서 「청년정책종합상담」 메뉴 선택 상담 신청 페이지에서 신청서를 작성"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-10-02",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "2026년 찬찬히 청년 사회생활(정서·심리)지원 캠퍼스 참여자 모집",
+   "url": "https://form.naver.com/response/2RU8EfZleUt",
+   "kind": "대외활동",
+   "deadline": "2026-12-31",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-07-20 ~ 2026-12-31"
+    },
+    {
+     "label": "대상",
+     "text": "만 18~34세"
+    },
+    {
+     "label": "혜택",
+     "text": "그룹형 교육과정 운영 및 통합 힐링 워크샵 병행 · 자아존중감 향상 · 정서 및 스트레스 조절 · 의사소통 · 대인관계 · 문제해결 역량 강화 필요시 개인의 성향·특성에 맞는 개별 개입 병행"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "전남광주통합특별시",
+   "api": "youthPolicy",
+   "apiId": "20260728005400213309",
+   "id": "api-youthPolicy-20260728005400213309",
+   "eligibilityLines": [
+    "만 18세 ~ 만 34세"
+   ],
+   "noticeLines": [
+    "찬찬히 청년을 위한 맞춤형 평생학습 프로그램",
+    "또래 친구들과 소그룹으로 함께하며 자기 이해 및 사회생활에 필요한 소통법 학습",
+    "정서조절, 대인관계, 문제해결 등 사회생활 역량 강화",
+    "신청 방법 : 네이버폼을 통한 온라인 접수 https://naver.me/x3cfS0qQ",
+    "심사 방법 : ☞ 자세한 내용은 붙임파일을 확인해주시기 바랍니다"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-10-02",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "k-뉴딜 아카데미",
+   "url": "https://www.work24.go.kr/cm/c/f/1100/selecSystInfo.do?currentPageNo=1&recordCountPerPage=10&systId=SI00000512&systClId=SC00000391",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-12-31",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-07-07 ~ 2026-12-31"
+    },
+    {
+     "label": "혜택",
+     "text": "ㅇ 참여 청년에게는 참여수당(최대 월 50만원까지)과 훈련비 전액 지원(자부담 없음) - 수료 후에는 고용센터를 통해 취업지원 등 고용서비스 연계 가능 ⁎︎ 아카데미 개시일 기준 연도에 최대 2회까지 참여 가능하며, 동시에 여러 아카데미에 참여하거나, 동일한 아카데미에 재참여할 수 없…"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "고용노동부",
+   "api": "youthPolicy",
+   "apiId": "20260714005400113258",
+   "id": "api-youthPolicy-20260714005400113258",
+   "eligibilityLines": [
+    "ㅇ미취업 청년(만 15세 이상~만 34세 이하)",
+    "* 참여 신청일 현재 고용보험에 가입되어 있지 않은 사람"
+   ],
+   "eligibilityExcludes": [
+    "ㅇ(참여제한) 아래 기준 중 하나에 해당하는 경우, 아카데미 참여가 제한됩니다.",
+    "① 취업 중이거나 사업자등록 중인 사람",
+    "* 아카데미 개시 전까지 참여 제한 사유가 해소되는 경우 참여 가능(증빙서류 제출 필요)",
+    "② 「초·중등교육법」에 다른 고등학교 및 「고등교육법」에 따른 대학(원) 재학생",
+    "⁎︎ 대학(원) 졸업예정자(4학년 2학기 이상 또는 마지막 학기 등록자)이거나 졸업예정자가 아니더라도 신청일 현재 휴학 중으로 및 장기 휴학생(연속 1년 이상 또는 통산 2년 이상 휴학 중인 자)임을 증명한 경우에는 참여 가능",
+    "③ 「직업안정법」에 다른 직업안정기관에 구직등록을 하지 않은 사람",
+    "④ 국가 또는 지방자치단체가 실시하거나 비용을 지원하는 직업능력개발훈련을 수강하고 있는 사람",
+    "⑤ 대한민국 국적을 보유하지 않은 사람"
+   ],
+   "noticeLines": [
+    "청년이 선호하는 대기업 등이 주도로 청년이 선호하는 분야의 프로그램을 설계·운영하여 직무역량 향상과 사회·직장 적응 지원 등을 통해 자신감 회복과 새로운 도약을 지원",
+    "신청 방법 : ㅇ 고용24(www.work24.go.kr)에서 'K-뉴딜 아카데미' 검색 후 아카데미 정보 확인 → 연계된 개별 기업 모집 페이지에서 수강 신청 * 아카데미는 2026년 6월말부터 순차개설 예정"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-10-02",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "첨단산업 인재양성 부트캠프",
+   "url": "https://youth.chungnam.go.kr/web/main/customSupp/M030-02/view?bizId=A20260309CT000000000003021",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-12-31",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-01-01 ~ 2026-12-31"
+    },
+    {
+     "label": "혜택",
+     "text": "ㅇ 반도체 패키징 소재‧공정 중심으로 특화된 교육과정 및 인프라 확보 ㅇ 디스플레이 소재․부품, 공정․장비 분야 핵심 인재 양성을 위한 전공심화 교육 및 실습 프로그램 운영 ㅇ 산업체 연계 현장실습, 산학프로젝트실습, 기업특강 등을 통한 실무역량 강화 ㅇ 채용박람회 및 전시회 참관 지…"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "고등교육정책담당관",
+   "api": "youthPolicy",
+   "apiId": "20260504005400113095",
+   "id": "api-youthPolicy-20260504005400113095",
+   "eligibilityLines": [
+    "반도체·디스플레이 관련 공과계열 대학생 2~4학년",
+    "선문대(반도체) : 전자공학, 반도체소재공학, 스마트정보통신공학",
+    "순천향대(디스플레이) : 디스플레이신소재공학, 전자정보공학, 나노화학공학, 기계공학"
+   ],
+   "eligibilityExcludes": [
+    "반도체·디스플레이 관련 공과계열 대학생 2~4학년",
+    "선문대(반도체) : 전자공학, 반도체소재공학, 스마트정보통신공학",
+    "순천향대(디스플레이) : 디스플레이신소재공학, 전자정보공학, 나노화학공학, 기계공학"
+   ],
+   "noticeLines": [
+    "반도체·디스플레이 산업수요 맞춤형 전문인력 양성",
+    "신청 방법 : 별도 문의",
+    "심사 방법 : 별도 문의",
+    "제출 서류 : 별도 문의"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-10-02",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "청년정책 서포터즈",
+   "url": "https://youth.chungnam.go.kr/web/main/customSupp/M060-10/view?bizId=A20260406LC000000000003191",
+   "kind": "대외활동",
+   "field": "서포터즈·기자단",
+   "deadline": "2026-12-31",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-01-01 ~ 2026-12-31"
+    },
+    {
+     "label": "대상",
+     "text": "만 15~39세"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "지역경제과",
+   "api": "youthPolicy",
+   "apiId": "20260430005400212994",
+   "id": "api-youthPolicy-20260430005400212994",
+   "eligibilityLines": [
+    "만 15세 ~ 만 39세"
+   ],
+   "noticeLines": [
+    "청년정책에 대한 의견 및 방안 제시 등 시정에 참여",
+    "신청 방법 : 이메일 및 현장 접수",
+    "심사 방법 : 공고문에 따라",
+    "제출 서류 : 공고문에 따라"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-10-02",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "청년 체인지메이커 아카데미 운영",
+   "url": "https://jejuyouthdream.com/policy/detail/70",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-12-31",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-01-01 ~ 2026-12-31"
+    },
+    {
+     "label": "혜택",
+     "text": "청년의 멘토가 되어 줄 각분야 유명인·명사 강연 지원"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "제주특별자치도 기획조정실 청년정책담당관",
+   "api": "youthPolicy",
+   "apiId": "20260421005400212793",
+   "id": "api-youthPolicy-20260421005400212793",
+   "noticeLines": [
+    "생애전환기 인생의 진로 설계 등으로 고민하는 청년에게 유명인 및 명사의 강연 참여 기회를 제공하여 안정적인 사회진입 지원",
+    "신청 방법 : QR코드 신청 예정",
+    "기타 : ※ 신청 및 사업기간 추후 공지"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-11-07",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
   },
   {
    "title": "대학생 봉사활동 활성화",
@@ -318,8 +1955,41 @@
    ],
    "detailsV": 6,
    "foundAt": "2026-11-12",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
+   "title": "[숭실대학교 캠퍼스타운] 생성형 AI 활용 기초 및 업무 자동화 과정 참여자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179458",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": "접수기간 2026-10-08 ~ 2026-11-12 23:59 주관기관명 숭실대학교산학협력단 대상 대학생, 일반인, 대학, 연구기관, 일반기업,",
+   "deadline": "2026-11-12",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-08 ~ 2026-11-12 23:59"
+    },
+    {
+     "label": "대상",
+     "text": "지역주민, 대학생, 예비 창업자, 일반인 등 AI 활용에 관심 있는 누구나"
+    },
+    {
+     "label": "모집인원",
+     "text": "회차당 30명"
+    }
+   ],
+   "eligibilityLines": [
+    "- 대상 : 지역주민, 대학생, 예비 창업자, 일반인 등 AI 활용에 관심 있는 누구나",
+    "- 준비물 : *개인 노트북 지참"
+   ],
+   "detailsV": 6,
+   "excerptsAt": "2026-11-12",
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-11-12",
+   "id": "act-15o3yvg"
   },
   {
    "title": "[일반] [2026 실험실 특화형 창업선도대학] 「Lab-Startup 밋업(4차)」 참가자 모집 (11.18.(수) 10:30~13:00)",
@@ -407,237 +2077,6 @@
    "campus": "",
    "foundAt": "2026-11-12",
    "id": "act-0qi7gcp"
-  },
-  {
-   "title": "전북핀테크지원센터 「핀테크 라이징 스타 챌린지」참가자 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179746",
-   "kind": "대외활동",
-   "deadline": "2026-11-12",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-14 ~ 2026-11-12"
-    },
-    {
-     "label": "대상",
-     "text": "혁신적인 금융서비스 및 비즈니스 모델을 보유하고 있으며, 향후 사업화 및 성장이 기대되는 전국 예비창업자 및 창업 5년 이내 기업(팀 포함)"
-    },
-    {
-     "label": "활동지역",
-     "text": "전국"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "(재)전북창조경제혁신센터",
-   "api": "kstartup",
-   "apiId": "179746",
-   "id": "api-kstartup-179746",
-   "eligibilityLines": [
-    "혁신적인 금융서비스 및 비즈니스 모델을 보유하고 있으며, 향후 사업화 및 성장이 기대되는 전국 예비창업자 및 창업 5년 이내 기업(팀 포함)"
-   ],
-   "eligibilityExcludes": [
-    "금융기관 등으로부터 채무불이행 및 규제 중인 자(또는 기업)",
-    "국세 또는 지방세 체납으로 규제 중인 자(또는 기업)",
-    "창업지원기관으로부터 발생한 환수금 반환이 종결되지 않은 자(또는 기업)",
-    "동일·유사 사업에 선정되어 협약 체결 후 중도 포기 또는 참여 제한으로 제재 또는 중단 처분을 받은 자(또는 기업)",
-    "신청 아이템과 동일·유사한 내용으로 타 기관·지자체·중앙부처 등의 사업화 지원금을 지원받았거나 지원받고 있는 자(또는 기업)",
-    "신청일 현재 휴업 또는 폐업 중인 자(또는 기업)",
-    "「중소기업창업 지원법 시행령」 제4조에서 정하는 창업 제외 업종을 영위하고 있거나 영위하고자 하는 자(또는 기업)",
-    "※ 붙임 1 참조"
-   ],
-   "noticeLines": [
-    "(재)전북창조경제혁신센터에서는 혁신적인 금융서비스 및 비즈니스 모델을 보유한 우수 핀테크 기업·예비창업자를 발굴하고, 사업화 및 전북 정착을 지원하기 위한 「핀테크 라이징 스타 챌린지」를 다음과 같이 개최하오니 많은 관심과 참여 바랍니다.",
-    "온라인 접수 : https://event.jbci.or.kr/sub/s1_1_view.html?id=369"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-11-11",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "2026 전북콘텐츠코리아랩 AI 활용 콘텐츠(캐릭터) 아이디어 발굴 캠프",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179772",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-11-23",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-10 ~ 2026-11-23"
-    },
-    {
-     "label": "대상",
-     "text": "도내 청년 15명"
-    },
-    {
-     "label": "활동지역",
-     "text": "전북"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "(재)전북특별자치도 콘텐츠융합진흥원",
-   "api": "kstartup",
-   "apiId": "179772",
-   "id": "api-kstartup-179772",
-   "eligibilityLines": [
-    "도내 청년 15명",
-    "대상 연령 : 만 20세 이상 ~ 만 39세 이하"
-   ],
-   "noticeLines": [
-    "우리원에서는 아이디어를 보유한 창·제작자 발굴 및 디지털 역량 강화를 위해 “AI 활용 캐릭터(콘텐츠) 아이디어 발굴 캠프”참가자를 모집하오니 많은 관심과 참여 바랍니다.",
-    "온라인 접수 : https://forms.gle/pqE4dQ3izE16pCVC9"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-11-11",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "[대학생 자원봉사자 15명 모집] 고양 평화통일공감 시민대화 행사 운영 지원",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3548047",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-11-13",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-06 ~ 2026-11-13"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026-11-17 ~ 2026-11-17"
-    },
-    {
-     "label": "활동지역",
-     "text": "고양꽃전시관"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "민주평화통일자문회의고양시협의회",
-   "api": "vol1365",
-   "apiId": "3548047",
-   "id": "api-vol1365-3548047",
-   "detailsV": 6,
-   "eligibilityLines": [
-    "■ 모집 대상: 행사 운영 지원에 관심 있는 대학생"
-   ],
-   "noticeLines": [
-    "「고양 평화통일공감 시민대화」의 원활한 진행을 함께 도울 대학생 자원봉사자를 모집합니다. 행사 준비와 참가자 안내, 현장 운영을 함께할 대학생 여러분의 많은 관심과 신청 바랍니다.",
-    "모집 대상: 행사 운영 지원에 관심 있는 대학생",
-    "모집 인원: 15명",
-    "활동 일자: 2026년 11월 17일(화)",
-    "집결 시간: 오전 11시까지",
-    "활동 장소: 고양국제꽃전시관"
-   ],
-   "foundAt": "2026-11-11",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "어르신 말벗, 식사지원, 프로그램 활동보조 자원봉사 모집 (대학생 이상부터 신청 가능합니다)",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3504654",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-11-14",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-08-15 ~ 2026-11-14"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026-08-15 ~ 2026-11-14"
-    },
-    {
-     "label": "활동지역",
-     "text": "상일데이케어센터 6층, 2층, 지하1층"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "상일데이케어센터",
-   "api": "vol1365",
-   "apiId": "3504654",
-   "id": "api-vol1365-3504654",
-   "detailsV": 6,
-   "noticeLines": [
-    "* 봉사활동은 한 만큼 인정됩니다. 사정에 따라 시간이 변경될 수 있음을 양해 바랍니다.",
-    "활동장소 : 상일데이케어센터 6층, 2층, 지하",
-    "주 소 : 서울 광진구 자양동42(동남빌딩) · 국시원 맞은편",
-    "활동인원 : 일 최대 3명 (대학생부터 신청 가능)",
-    "활동요일 : 주중, 토요일 (13:30 ~ 17:30 최대 4시간) - 시간 협의 가능 (*봉사활동은 한 만큼 인정됩니다.*)",
-    "※ 참고사항"
-   ],
-   "foundAt": "2026-11-11",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12",
-   "eligibilityLines": [
-    "활동구분",
-    "오프라인",
-    "-주 소 : 서울 광진구 자양동42(동남빌딩) · 국시원 맞은편",
-    "-활동인원 : 일 최대 3명 (대학생부터 신청 가능)",
-    "-활동요일 : 주중, 토요일 (13:30 ~ 17:30 최대 4시간) - 시간 협의 가능 (*봉사활동은 한 만큼 인정됩니다.*)",
-    "봉사자유형 : 성인"
-   ],
-   "eligibilityFrom": "브라우저 본문"
-  },
-  {
-   "title": "제5회 부울경대학생스피치대회 안내 및 진행보조 봉사자 모집",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3547051",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-11-14",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-05 ~ 2026-11-14"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026-11-21 ~ 2026-11-21"
-    },
-    {
-     "label": "활동지역",
-     "text": "부산 부경대학교 미래관 소민홀"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "사단법인미래교육문화진흥원",
-   "api": "vol1365",
-   "apiId": "3547051",
-   "id": "api-vol1365-3547051",
-   "detailsV": 6,
-   "eligibilityLines": [
-    "0 지원자격 : 대학생, 단정한 복장",
-    "0 활동내용 : 대회준비(명단점검, 자리배치 등), 대회진행 보조, 마무리 점검 등",
-    "0 지원방법:1365봉사포털사이트",
-    "(변경사항이나 활동 안내는 등록된 전화번호로 문자 발송됩니다! 미확인시 책임지지 않음)"
-   ],
-   "noticeLines": [
-    "※ 제5회부울경대학생스피치대회 안내 및 진행 보조 봉사자모집※",
-    "0 봉사기간 : 2026.11.21. 토요일 13:00~18:00(5시간)",
-    "0 행사장소 : 부경대학교 미래관",
-    "0 봉사인원 : 3명",
-    "0 지원자격 : 대학생, 단정한 복장",
-    "0 활동내용 : 대회준비(명단점검, 자리배치 등), 대회진행 보조, 마무리 점검 등"
-   ],
-   "foundAt": "2026-11-11",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
   },
   {
    "title": "2026 여성벤처활성화사업 「여성벤처&스타트업 혁신성장 포럼」참여자 모집",
@@ -914,128 +2353,6 @@
    "campus": "",
    "foundAt": "2026-11-11",
    "id": "act-15w36jo"
-  },
-  {
-   "title": "[광운대캠퍼스타운]「Quantum AI 인재 양성 교육」 참가자 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179753",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-11-13",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-09 ~ 2026-11-13"
-    },
-    {
-     "label": "대상",
-     "text": "본 교육은 AI 및 양자에 관한 교육으로, 관련지식이 부족한 경우 수강에 한계가 있을 수 있습니다."
-    },
-    {
-     "label": "활동지역",
-     "text": "전국"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "광운대학교 캠퍼스타운",
-   "api": "kstartup",
-   "apiId": "179753",
-   "id": "api-kstartup-179753",
-   "noticeLines": [
-    "광운대학교 앵커사업단(서울캠퍼스타운)에서는, 양자컴퓨팅과 AI가 만드는 새로운 가능성을 주제로 Quantum AI 인재 양성 교육인 Advanced AI Course 를 운영합니다",
-    "온라인 접수 : https://forms.gle/54fbcoZwhivDSN3C6"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-11-10",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "'딸깍 한 번으로 완성하는 AI 업무 자동화' 실전 워크숍 참여자 모집 (『신한 스퀘어브릿지』 11월 브릿지 클럽)",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179752",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-11-19",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-06 ~ 2026-11-19"
-    },
-    {
-     "label": "대상",
-     "text": "스타트업 임직원, 예비창업자, 스타트업 유관기관 관계자 등"
-    },
-    {
-     "label": "활동지역",
-     "text": "전국"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "신한금융희망재단",
-   "api": "kstartup",
-   "apiId": "179752",
-   "id": "api-kstartup-179752",
-   "eligibilityLines": [
-    "스타트업 임직원, 예비창업자, 스타트업 유관기관 관계자 등"
-   ],
-   "noticeLines": [
-    "『신한 스퀘어브릿지』 11월 브릿지 클럽에서는 기초 사용법을 넘어 자신에게 필요한 AI 에이전트를 직접 만들어 보는 실습형 AI(클로드코드) 강연을 준비했습니다.",
-    "AI 에이전트 활용 역량 강화에 관심있는 스타트업 및 유관기관 관계자분들의 많은 관심과 참여 바랍니다.",
-    "온라인 접수 : https://m.site.naver.com/2kk0q"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-11-10",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "[미감도서관] 대학생 자원봉사활동 모집 (11월14일)",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3536811",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-11-13",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-16 ~ 2026-11-13"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026-10-30 ~ 2026-11-14"
-    },
-    {
-     "label": "활동지역",
-     "text": "목동중앙남로 57-10 3층 미감도서관"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "양천구립도서관",
-   "api": "vol1365",
-   "apiId": "3536811",
-   "id": "api-vol1365-3536811",
-   "detailsV": 6,
-   "eligibilityLines": [
-    "○ 활동자격: 대학생"
-   ],
-   "noticeLines": [
-    "[미감도서관] 대학생자원봉사자 모집",
-    "봉사요일: 11월14일(토)",
-    "봉사시간: 11월14일(토) 저녁 17:00~ 21:00까지 (4시간)",
-    "내용: 미감도서관 프로그램 행사 지원",
-    "활동자격: 대학생",
-    "활동장소: 양천구 미감도서관"
-   ],
-   "foundAt": "2026-11-10",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
   },
   {
    "title": "2026년 대전 청년농업인4-H와 농업진로 탐방 품앗이 참가자 모집 2026.11 . 10",
@@ -1595,54 +2912,6 @@
    "id": "act-15cmdfm"
   },
   {
-   "title": "대학생) 초등, 중등 학습 지도 및 놀이지원",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3546415",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-11-13",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-03 ~ 2026-11-13"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026-11-09 ~ 2026-11-27"
-    },
-    {
-     "label": "활동지역",
-     "text": "경기도 평택시 이충로100번길 73 (서정동) 1층, 사랑꿈터지역아동센터"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "사랑꿈터지역아동센터",
-   "api": "vol1365",
-   "apiId": "3546415",
-   "id": "api-vol1365-3546415",
-   "detailsV": 6,
-   "noticeLines": [
-    "안녕하세요.",
-    ". 사랑꿈터지역아동센터내 아동 학습지도 및 놀이지도 봉사입니다.",
-    ". 센터 특성상 대학생 자원봉사 선생님을 기다립니다.",
-    "봉사활동내용.",
-    "초등학교 1학년 ~6학년 : 기초학습 및 놀이지도 지원",
-    "중등 1학년 ~ 3학년 : 수학 학습지원"
-   ],
-   "foundAt": "2026-11-08",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12",
-   "eligibilityLines": [
-    "아동·청소년",
-    "활동구분",
-    "오프라인",
-    "봉사자유형 : 성인"
-   ],
-   "eligibilityFrom": "브라우저 본문"
-  },
-  {
    "title": "청년 의견, 정책부서로 바로 전달한다 \"2030청년자문단·청년온라인패널 신청하세요\"",
    "url": "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156788329&pWise=sub&pWiseSub=C4",
    "kind": "대외활동",
@@ -1669,264 +2938,6 @@
    ],
    "eligibilityFrom": "브라우저 본문",
    "id": "act-16bmej6"
-  },
-  {
-   "title": "11월(토요일 오후) 대전수학문화관 대학생 봉사활동 모집",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3540318",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-11-12",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-23 ~ 2026-11-12"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026-11-07 ~ 2026-11-28"
-    },
-    {
-     "label": "활동지역",
-     "text": "대전수학문화관"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "대전교육정보원 대전수학문화관",
-   "api": "vol1365",
-   "apiId": "3540318",
-   "id": "api-vol1365-3540318",
-   "detailsV": 6,
-   "eligibilityLines": [
-    "대상: 교육봉사활동에 관심 있는 대학생"
-   ],
-   "noticeLines": [
-    "일부 대학에서 요구하는 기관장 날인된 봉사활동 확인서를 개별 발급하지 않습니다.",
-    "(봉사활동 확인서는 월말에 1365 자원봉사포털에서 개별 발급)",
-    "일시: 2026년 11월 (토요일 오후) 13:00~17:00",
-    "장소: 대전수학문화관",
-    "대상: 교육봉사활동에 관심 있는 대학생",
-    "활동 내용"
-   ],
-   "foundAt": "2026-11-07",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "청년과 대학생이 바꾸는 지금 2회차 대학생 청년 봉사자 모집",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3545456",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-11-12",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-02 ~ 2026-11-12"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026-11-13 ~ 2026-11-13"
-    },
-    {
-     "label": "활동지역",
-     "text": "군산시 노인종합복지관"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "군산시자원봉사센터",
-   "api": "vol1365",
-   "apiId": "3545456",
-   "id": "api-vol1365-3545456",
-   "detailsV": 6,
-   "noticeLines": [
-    "어르신 프로그램 활동 지원 및 원예,공예 활동 보조"
-   ],
-   "foundAt": "2026-11-07",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12",
-   "eligibilityLines": [
-    "활동구분",
-    "오프라인",
-    "군산 청바지봉사단 모집 포스터1.png",
-    "어르신 프로그램 활동 지원 및 원예,공예 활동 보조",
-    "[봉사장소 지도] 지도 건너뛰기",
-    "봉사활동 장소[1] 주소 : 전북특별자치도 군산시 둔배미길 29 (중앙로2가, 군산노인종합복지관)",
-    "전북특별자치도 군산시 삼화안길 9 군산시자원봉사센터",
-    "이전 봉사참여",
-    "11-4 부평구청 위생과 우편물 작업(위생관리팀)",
-    "봉사자유형 : 성인"
-   ],
-   "eligibilityFrom": "브라우저 본문"
-  },
-  {
-   "title": "2026 희망+ 김장나눔 한마당 행사 보조 대학생 모집",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3538765",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-11-13",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-20 ~ 2026-11-13"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026-11-14 ~ 2026-11-14"
-    },
-    {
-     "label": "활동지역",
-     "text": "달서구청 광장(대구광역시 달서구 학산로 45)"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "달서구자원봉사센터",
-   "api": "vol1365",
-   "apiId": "3538765",
-   "id": "api-vol1365-3538765",
-   "detailsV": 6,
-   "noticeLines": [
-    "일시 : 2026.11.14.(토) 8:00~14:00 (봉사시간 6시간 인정)",
-    "내용 : 홀몸어르신과 저소득 취약계층을 위한 희망+ 김장나눔 한마당 행사보조(배추, 양념 박스 이동 및 부스 진행 등)",
-    "장소 : 달서구청 광장(대구광역시 달서구 학산로 45)",
-    "인원 : 20대 대학생 70명(남녀무관)"
-   ],
-   "foundAt": "2026-11-07",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12",
-   "eligibilityLines": [
-    "봉사자유형 : 성인"
-   ],
-   "eligibilityFrom": "브라우저 본문"
-  },
-  {
-   "title": "[청년] 어린이 동요대회 봉사자 모집합니다.",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3542968",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-11-13",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-28 ~ 2026-11-13"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026-11-14 ~ 2026-11-14"
-    },
-    {
-     "label": "활동지역",
-     "text": "은평구청"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "죠이풀 사회적협동조합",
-   "api": "vol1365",
-   "apiId": "3542968",
-   "id": "api-vol1365-3542968",
-   "detailsV": 6,
-   "eligibilityLines": [
-    "모집 대상: 대학생 및 청년층(20~30대)"
-   ],
-   "noticeLines": [
-    "？？ 11월 14일 진행되는 봉사활동 참여자를 모집합니다.",
-    "일시: 11월 14일(토) 12:00~18:00",
-    "집합 장소: 은평구청 1층 로비",
-    "서울특별시 은평구 은평로 195 (녹번동)",
-    "모집 대상: 대학생 및 청년층(20~30대)",
-    "활동 내용: 행사장 세팅 및 행사 안내 등"
-   ],
-   "foundAt": "2026-11-07",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "11월(오전) 대전수학문화관 대학생 봉사활동 모집",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3540321",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-11-16",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-23 ~ 2026-11-16"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026-11-02 ~ 2026-11-30"
-    },
-    {
-     "label": "활동지역",
-     "text": "대전수학문화관"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "대전교육정보원 대전수학문화관",
-   "api": "vol1365",
-   "apiId": "3540321",
-   "id": "api-vol1365-3540321",
-   "detailsV": 6,
-   "eligibilityLines": [
-    "대상: 교육봉사활동에 관심 있는 대학생"
-   ],
-   "noticeLines": [
-    "일부 대학에서 요구하는 기관장 날인된 봉사활동 확인서를 개별 발급하지 않습니다.",
-    "(봉사활동 확인서는 월말에 1365 자원봉사포털에서 개별 발급)",
-    "일시: 2026년 11월 (오전) 09:00~12:00",
-    "장소: 대전수학문화관",
-    "대상: 교육봉사활동에 관심 있는 대학생",
-    "활동 내용"
-   ],
-   "foundAt": "2026-11-07",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "청년 체인지메이커 아카데미 운영",
-   "url": "https://jejuyouthdream.com/policy/detail/70",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-12-31",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-01-01 ~ 2026-12-31"
-    },
-    {
-     "label": "혜택",
-     "text": "청년의 멘토가 되어 줄 각분야 유명인·명사 강연 지원"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "제주특별자치도 기획조정실 청년정책담당관",
-   "api": "youthPolicy",
-   "apiId": "20260421005400212793",
-   "id": "api-youthPolicy-20260421005400212793",
-   "noticeLines": [
-    "생애전환기 인생의 진로 설계 등으로 고민하는 청년에게 유명인 및 명사의 강연 참여 기회를 제공하여 안정적인 사회진입 지원",
-    "신청 방법 : QR코드 신청 예정",
-    "기타 : ※ 신청 및 사업기간 추후 공지"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-11-07",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
   },
   {
    "title": "[동아사이언스 과학동아] 2026 SF스토리 공모전 지원대상 일반인",
@@ -1999,155 +3010,6 @@
    "host": "문화포털 문화지원사업",
    "foundAt": "2026-11-07",
    "id": "act-1sddjcu"
-  },
-  {
-   "title": "2026년도 제4차 북부창업아카데미 및 북부창업멘토링 DAY 참가자 모집(주제 : 2027 정부지원사업 합격을 위한 실전 전략)",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179741",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-11-18",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-06 ~ 2026-11-18"
-    },
-    {
-     "label": "대상",
-     "text": "정부지원사업 지원(예정) 여성(예비)창업자"
-    },
-    {
-     "label": "활동지역",
-     "text": "전국"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "북부여성새일센터",
-   "api": "kstartup",
-   "apiId": "179741",
-   "id": "api-kstartup-179741",
-   "eligibilityLines": [
-    "정부지원사업 지원(예정) 여성(예비)창업자"
-   ],
-   "noticeLines": [
-    "정부지원 사업 지원을 위한 사업계획서 작성법에 대한 교육 참여를 희망하는 경우 안내에 따라 신청하기 바랍니다.",
-    "온라인 접수 : https://naver.me/FAAqPh8u"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-11-06",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "2026년 대전 스타트업 원스톱 지원센터 아카데미 4회차",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179695",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-11-22",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-02 ~ 2026-11-22"
-    },
-    {
-     "label": "대상",
-     "text": "대전 지역 예비/초기 창업자"
-    },
-    {
-     "label": "활동지역",
-     "text": "대전"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "대전창조경제혁신센터",
-   "api": "kstartup",
-   "apiId": "179695",
-   "id": "api-kstartup-179695",
-   "eligibilityLines": [
-    "대전 지역 예비/초기 창업자"
-   ],
-   "noticeLines": [
-    "대전창조경제혁신센터의 창업 교육 계획을 다음과 같이 공고하오니 참여를 희망하는 기업은 안내에 따라 신청해주시기 바랍니다.",
-    "온라인 접수 : https://moaform.com/q/m1RhhZ"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-11-06",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "게임아카데미 운영",
-   "url": "https://dcoe.or.kr/main",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-12-31",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-05-01 ~ 2026-12-31"
-    },
-    {
-     "label": "혜택",
-     "text": "ㆍ(교육지원) 게임개발 및 그래픽 분야 중급 이상 정규교육 운영 -기획 : 게임기획 및 분석, 스토리텔링, 시스템 기획 -프로그래밍 : 유니티 실전, AI 활용 코드 및 데이터 관리 -그래픽 : 3D Z-Brush 모델링, 유니티 UI, 컨셉아트 - AI : AI 툴깃, 생성형 AI …"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "대구광역시 문화체육관광국 콘텐츠산업과",
-   "api": "youthPolicy",
-   "apiId": "20261102005400214695",
-   "id": "api-youthPolicy-20261102005400214695",
-   "eligibilityLines": [
-    "지역 게임기업 재직자 및 업계 종사자 등"
-   ],
-   "noticeLines": [
-    "지역 게임분야 종사자 전문성 향상을 위한 역량 맞춤별 실무 교육 지원",
-    "신청 방법 : 대구콘텐츠밸리 통합누리집(dcoe.or.kr) 공고문 확인 후 온라인 신청"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-11-06",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "청년 취업 아카데미",
-   "url": "https://www.saha.go.kr/startup/program/list.do?mId=0302000000",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-12-31",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-03-01 ~ 2026-12-31"
-    },
-    {
-     "label": "혜택",
-     "text": "❍ 기 간: 연 8회(스피치 3회, 퍼스널브랜딩 3회, 지역향토기업탐방 2회) ❍ 대 상: 18~39세 사하구 거주‧활동 청년 80명 ▸ 클래스별 10명 ❍ 내 용: 스피치‧퍼스널브랜딩 교육 및 지역 우수기업 탐방 프로그램 - 성공 면접을 위한 스피치 컨설팅 & 커리어 코칭 - 인사담…"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "부산광역시 사하구 경제환경국",
-   "api": "youthPolicy",
-   "apiId": "20261030005400214639",
-   "id": "api-youthPolicy-20261030005400214639",
-   "noticeLines": [
-    "❍ 청년의 노동시장 조기 진입을 위한 취업역량 강화 및 능력 개발 지원",
-    "❍ 면접, 채용 트렌드를 반영한 참여자별 맞춤 컨설팅 진행"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-11-06",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
   },
   {
    "title": "대전청년내일재단, 2026년 아카데미 졸업식 개최(11.01.) 2026.11 . 6",
@@ -2351,55 +3213,6 @@
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
    "id": "act-12jgg65"
-  },
-  {
-   "title": "국민대학교 청년도약 인재양성 부트캠프 참가자 모집(AI 실무교육)",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179559",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-11-19",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-19 ~ 2026-11-19"
-    },
-    {
-     "label": "대상",
-     "text": "전공·지역 무관, 만 19세 ~ 34세 이하 미취업 청년(군 복무시간 산정 시 39세까지 가능) □ 취업준비생 □ 예비창업자 □ 장기 휴학생(1년 이상)"
-    },
-    {
-     "label": "활동지역",
-     "text": "서울"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "국민대학교 글로벌창업벤처대학원",
-   "api": "kstartup",
-   "apiId": "179559",
-   "id": "api-kstartup-179559",
-   "eligibilityLines": [
-    "전공·지역 무관, 만 19세 ~ 34세 이하 미취업 청년(군 복무시간 산정 시 39세까지 가능)",
-    "취업준비생",
-    "예비창업자",
-    "장기 휴학생(1년 이상)",
-    "대상 연령 : 만 20세 이상 ~ 만 39세 이하"
-   ],
-   "eligibilityExcludes": [
-    "재학생(1년 이상 장기휴학생은 가능), 재직자 불가능"
-   ],
-   "noticeLines": [
-    "국민대학교 글로벌창업벤처대학원 창업학과(참여: 경영대학 AI빅데이터융합경영학과)는 「청년도약 인재양성 부트캠프(실전인재형)」 교육생을 아래와 같이 모집합니다. 본 부트캠프는 일자리 밖 청년을 스타트업·벤처 생태계의 AX(AI 전환) 실무 인재로 양성하는 전액 무료 교육 프로그램입니다.",
-    "직무분야: 스타트업·벤처 생태계 실무 기획 및 운영(AX 기반)",
-    "참여기업: ㈜메인콘텐츠, ㈜인포뱅크, ㈜씨엔티테크, ㈜와이앤아처, 한국엔젤투자협회 등 1,285개사",
-    "온라인 접수 : https://axkookmin.com/"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-11-05",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
   },
   {
    "title": "스타트업 원스톱 지원센터 아카데미 일정 안내(11월)",
@@ -2661,118 +3474,6 @@
    "id": "act-0op92zv"
   },
   {
-   "title": "2026 서구토탈창업아카데미 참가자 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179638",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-11-18",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-27 ~ 2026-11-18"
-    },
-    {
-     "label": "대상",
-     "text": "예비창업자 및 업력 3년 이내 초기창업기업 관계자 등"
-    },
-    {
-     "label": "활동지역",
-     "text": "전국"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "온랩",
-   "api": "kstartup",
-   "apiId": "179638",
-   "id": "api-kstartup-179638",
-   "eligibilityLines": [
-    "예비창업자 및 업력 3년 이내 초기창업기업 관계자 등"
-   ],
-   "noticeLines": [
-    "예비·초기창업자의 사업모델 고도화와 실전 창업역량 강화를 지원하고, 분야별 전문가 멘토링 및 창업경진대회를 통해 창업아이템의 사업화 가능성을 높이기 위한 「2026 서구토탈창업아카데미」 참가자를 다음과 같이 모집하오니 많은 관심과 참여 바랍니다.",
-    "온라인 접수 : https://docs.google.com/forms/d/e/1FAIpQLSfSf8JshcFHUXPzlBSCaz1n2jxvFAO_nsNxGdgqZohX00L6NA/viewform"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-11-04",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "2026 논산시 사회적경제 창업 아카데미 참여자 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179591",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-11-18",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-22 ~ 2026-11-18"
-    },
-    {
-     "label": "대상",
-     "text": "사회문제 해결 아이디어를 가진 시민 및 창업3년 이내 기업 등"
-    },
-    {
-     "label": "활동지역",
-     "text": "전국"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "논산시 사회적경제통합지원센터",
-   "api": "kstartup",
-   "apiId": "179591",
-   "id": "api-kstartup-179591",
-   "eligibilityLines": [
-    "사회문제 해결 아이디어를 가진 시민 및 창업3년 이내 기업 등"
-   ],
-   "noticeLines": [
-    "사회적기업 전환을 준비하는 초기 창업기업 및 창업예정자에게 다음과 같이 아카데미를 진행하고자 공고하오니 참여를 희망하는 기업 또는 개인은 안내를 따라 신청하기 바랍니다.",
-    "온라인 접수 : https://forms.gle/gajTpPkJ5PjP5R8a8"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-11-04",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "HD현대삼호- [K-뉴딜 아카데미] HD현대 선박건조 필드테크니션 교육생 모집",
-   "url": "https://www.youthcenter.go.kr/bbs03View/48/10865",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadlineHint": null,
-   "excerpts": [],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "온통청년 직업훈련",
-   "api": "youthContent",
-   "apiId": "10865",
-   "id": "api-youthContent-10865",
-   "detailsV": 6,
-   "eligibilityLines": [
-    "• 만 15세 이상 ~ 만 34세 이하 미취업 청년",
-    "*군필자는 의무복무기간만큼 연령 상한 적용(최대 만 39세)",
-    "• 성별·병역·학력·전공 제한 없음",
-    "• 재직자 및 타 직업능력개발교육 참여자 불가",
-    "- 교육비 전액 무료",
-    "- 수료 후 조선업 분야 우수기업 취업 지원",
-    "- 훈련수당 지급 (약 100만원/월)",
-    "- HD현대삼호 야드 투어",
-    "- 현직자 강의",
-    "- 국제 선급자격 취득 지원",
-    "- 기숙사 무료 제공 (조/중/석식 포함)"
-   ],
-   "foundAt": "2026-11-04",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
    "title": "접수중 [울산청년지원센터, BNK경남은행] 울산 청년 금육교육 「슬기로운 금융생활」 참여자 모집",
    "url": "https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.ulsan?bbsId=BBS_0000000000000309&mId=008001002000000000&dataId=61071",
    "kind": "대외활동",
@@ -2977,88 +3678,6 @@
    "id": "act-0cjc2ex"
   },
   {
-   "title": "AI 활용 소상공인 및 전통시장 매니저 실무 역량 과정 참가자 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179552",
-   "kind": "대외활동",
-   "deadline": "2026-11-13",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-21 ~ 2026-11-13"
-    },
-    {
-     "label": "대상",
-     "text": "경상남도 소재 (예비)소상공인 및 전통시장 매니저로서 AI를 활용한 경영개선, 매출 향상, 마케팅 및 업무 효율화에 관심이 있는 자."
-    },
-    {
-     "label": "활동지역",
-     "text": "경남"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "경남지방중소벤처기업청",
-   "api": "kstartup",
-   "apiId": "179552",
-   "id": "api-kstartup-179552",
-   "eligibilityLines": [
-    "경상남도 소재 (예비)소상공인 및 전통시장 매니저로서 AI를 활용한 경영개선, 매출 향상, 마케팅 및 업무 효율화에 관심이 있는 자."
-   ],
-   "noticeLines": [
-    "경남지방중소벤처기업청과 재도전사관학교는 경남지역 (예비)소상공인 전통시장 매니저의 AI 활용능력 배양을 위한",
-    "실무교육을 개최하고자 합니다.",
-    "참여를 희망하시는 (예비)소상공인 및 전통시장 매니저께서는 아래 내용을 참고하여 적극적인 참여를 부탁드립니다.",
-    "온라인 접수 : http://forms.gle/9jDmZDob7Tq8yFjY9"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-11-03",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "[청년 취창업 특강] 나만의 일을 만들어가는 방법",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179611",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-11-16",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-23 ~ 2026-11-16"
-    },
-    {
-     "label": "대상",
-     "text": "만 19세~ 만 39세 청년 (1987년 이후 출생자)"
-    },
-    {
-     "label": "활동지역",
-     "text": "서울"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "관악구청",
-   "api": "kstartup",
-   "apiId": "179611",
-   "id": "api-kstartup-179611",
-   "eligibilityLines": [
-    "만 19세~ 만 39세 청년 (1987년 이후 출생자)",
-    "대상 연령 : 만 20세 이상 ~ 만 39세 이하"
-   ],
-   "noticeLines": [
-    "나의 일과 브랜드 창업에 대해 고민하고 있다면 이번 특강을 통해 인사이트를 얻어가시기 바랍니다.",
-    "온라인 접수 : https://www.checkin-gwanak.or.kr/core/?cid=58&role=programvopn&pSeq=1258&tab="
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-11-03",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
    "title": "2026년 여성CEO 비즈니스 아카데미 경상권역 시즌 2",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179538",
    "kind": "대외활동",
@@ -3190,48 +3809,6 @@
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
    "id": "act-0e5bilj"
-  },
-  {
-   "title": "<2026년 AI 활용 온라인 플랫폼 제작 교육> 참여자 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179680",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-11-18",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-30 ~ 2026-11-18"
-    },
-    {
-     "label": "대상",
-     "text": "- AI를 활용해 온라인 플랫폼을 제작하고자 하는 (예비)창업자 - AI를 활용한 웹페이지 제작에 관심 있는 일반인 등"
-    },
-    {
-     "label": "활동지역",
-     "text": "충북"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "충북Pro메이커센터",
-   "api": "kstartup",
-   "apiId": "179680",
-   "id": "api-kstartup-179680",
-   "eligibilityLines": [
-    "AI를 활용해 온라인 플랫폼을 제작하고자 하는 (예비)창업자",
-    "AI를 활용한 웹페이지 제작에 관심 있는 일반인 등"
-   ],
-   "noticeLines": [
-    "충북Pro메이커센터에서는 다음과 같이 AI를 활용한 온라인 플랫폼 제작 교육을 진행합니다.",
-    "관심있는 분들의 많은 참여 신청 바랍니다.",
-    "온라인 접수 : https://forms.gle/UbLPVojyhPL9fTx28"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-11-02",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
   },
   {
    "title": "[2026 아트 스타트업 데이] 일반 참가자 모집",
@@ -3880,25 +4457,6 @@
    "id": "act-1150iwx"
   },
   {
-   "title": "공주시청년센터 - 「공주 크리에이티브 IP 캠프」 모집",
-   "url": "https://www.youthcenter.go.kr/bbs03View/48/10858",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadlineHint": null,
-   "excerpts": [],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "온통청년 취업지원",
-   "api": "youthContent",
-   "apiId": "10858",
-   "id": "api-youthContent-10858",
-   "detailsV": 6,
-   "foundAt": "2026-10-29",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
    "title": "2026 중소기업AI훈련 맞춤 컨설팅 100% 정부지원 프로그램 참여기업 모집모집",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=177466",
    "kind": "대외활동",
@@ -4402,76 +4960,6 @@
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
    "id": "act-0ovp7g6"
-  },
-  {
-   "title": "미래내일 일경험 기업 실무 프로젝트 참여자 모집 - 3. IT 직무",
-   "url": "https://www.youthcenter.go.kr/bbs03View/48/10853",
-   "kind": "대외활동",
-   "field": "인턴·일경험",
-   "deadlineHint": null,
-   "excerpts": [],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "온통청년 취업지원",
-   "api": "youthContent",
-   "apiId": "10853",
-   "id": "api-youthContent-10853",
-   "detailsV": 6,
-   "eligibilityLines": [
-    "만 15세~만 34세의 미취업 청년",
-    "(개인 or 팀을 이루어 신청 가능)"
-   ],
-   "foundAt": "2026-10-27",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "미래내일 일경험 기업 실무 프로젝트 참여자 모집 - 2. 경영사무",
-   "url": "https://www.youthcenter.go.kr/bbs03View/48/10852",
-   "kind": "대외활동",
-   "field": "인턴·일경험",
-   "deadlineHint": null,
-   "excerpts": [],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "온통청년 취업지원",
-   "api": "youthContent",
-   "apiId": "10852",
-   "id": "api-youthContent-10852",
-   "detailsV": 6,
-   "eligibilityLines": [
-    "만 15세~만 34세의 미취업 청년",
-    "(개인 or 팀을 이루어 신청 가능)"
-   ],
-   "foundAt": "2026-10-27",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "미래내일 일경험 기업 실무 프로젝트 참여자 모집 - 1. 광고 마케팅",
-   "url": "https://www.youthcenter.go.kr/bbs03View/48/10851",
-   "kind": "대외활동",
-   "field": "인턴·일경험",
-   "deadlineHint": null,
-   "excerpts": [],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "온통청년 취업지원",
-   "api": "youthContent",
-   "apiId": "10851",
-   "id": "api-youthContent-10851",
-   "detailsV": 6,
-   "eligibilityLines": [
-    "만 15세~만 34세의 미취업 청년",
-    "(개인 or 팀을 이루어 신청 가능)",
-    "모집 대상 : 만 15세~만 34세의 미취업 청년 (개인 or 팀을 이루어 신청 가능)"
-   ],
-   "foundAt": "2026-10-27",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
   },
   {
    "title": "2026년 청년만남지원사업 8~10회차 프로그램 모집 공고 2026.10 . 27",
@@ -5800,493 +6288,6 @@
    "campus": "",
    "foundAt": "2026-10-23",
    "id": "act-0ox6bkk"
-  },
-  {
-   "title": "2026 서울형 청년인턴 직무캠프",
-   "url": "https://youth.seoul.go.kr/content.do?key=2310100012",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-12-31",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-03-01 ~ 2026-12-31"
-    },
-    {
-     "label": "혜택",
-     "text": "실무중심 직무교육과 인턴십 과정의 접목으로 청년 구직자에게 일경험 및 취업역량 강화 지원"
-    },
-    {
-     "label": "주최",
-     "text": "재단법인서울경제진흥원"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "서울특별시 미래청년기획관 청년정책담당관",
-   "api": "youthPolicy",
-   "apiId": "20261018005400213991",
-   "id": "api-youthPolicy-20261018005400213991",
-   "noticeLines": [
-    "사전직무교육 ✚ 인턴십(4개월) 및 직장적응교육 ➔ 취업연계",
-    "신청 방법 : 참여기업 모집·선정 후 참여자 모집·선발"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-10-20",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12",
-   "eligibilityLines": [
-    "지원대상 : 18 ~ 34세 서울시 거주 청년 270명"
-   ],
-   "eligibilityFrom": "브라우저 본문"
-  },
-  {
-   "title": "2026 서울영커리언스 캠프",
-   "url": "https://youth.seoul.go.kr/youthConts.do?key=2602120001&sc_pbancSeCd=030&sc_bbsStngSn=2212200001&sc_bbsCtgrySn=2602120020&sc_faqCtgryCd=027",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-12-31",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-03-01 ~ 2026-12-31"
-    },
-    {
-     "label": "혜택",
-     "text": "AI역량검사, 직무과제 수행 등을 통한 ‘커리어 로드맵’ 작성"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "서울특별시 미래청년기획관 청년정책담당관",
-   "api": "youthPolicy",
-   "apiId": "20261018005400213983",
-   "id": "api-youthPolicy-20261018005400213983",
-   "eligibilityLines": [
-    "비진학 청년 포함"
-   ],
-   "noticeLines": [
-    "나를 찾는 진로·직무 탐색 부트캠프",
-    "신청 방법 : ‘서울영커리언스 대학협의체’를 통한 참여 학생 모집"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-10-20",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "[해수부] 2026년 해양수산 통합데모데이 참가자 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179533",
-   "kind": "대외활동",
-   "deadline": "2026-11-12",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-15 ~ 2026-11-12"
-    },
-    {
-     "label": "대상",
-     "text": "해양수산 분야 창업생태계 관심자 (스타트업, 예비창업자, 투자자, 유관기관, 학생 및 일반인 등)"
-    },
-    {
-     "label": "활동지역",
-     "text": "전국"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "부산지역대학연합기술지주(주)",
-   "api": "kstartup",
-   "apiId": "179533",
-   "id": "api-kstartup-179533",
-   "eligibilityLines": [
-    "해양수산 분야 창업생태계 관심자 (스타트업, 예비창업자, 투자자, 유관기관, 학생 및 일반인 등)"
-   ],
-   "noticeLines": [
-    "?해양수산부와 해양수산과학기술진흥원(KIMST)이 주관하는「2026 해양수산 액셀러레이터 운영프로그램 통합데모데이」가 11월 12일 아스티호텔 부산에서 개최됩니다.",
-    "이번 행사는 전국 6개 액셀러레이터와 해양수산 분야 보육기업, 투자자 및 산업 관계자가 함께하는 자리로, 해양수산·조선·항만 산업 간 협력을 도모하고 유망 스타트업의 투자 유치와 사업화 확대를 지원하고자 마련되었습니다.해양수산 스타트업의 성장 가능성을 만나고 새로운 협력 기회를 모색할 이번 행사에 관심 있는 여러분의 많은 참여 바랍니다.",
-    "온라인 접수 : https://forms.gle/2PkaAnHxgo3wC56CA"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-10-16",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "청년 생명사랑 서포터즈 운영",
-   "url": "https://www.usspc.or.kr/",
-   "kind": "대외활동",
-   "field": "서포터즈·기자단",
-   "deadline": "2026-11-30",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-02-01 ~ 2026-11-30"
-    },
-    {
-     "label": "혜택",
-     "text": "주요내용 - (청년 생명사랑 서포터즈) 자살예방․청년 정신건강 관련 카드뉴스· 영상홍보 포스터 제작 및 온·오프라인 홍보 - (미디어 모니터링) 자살유발(유해)정보 미디어 모니터링 및 신고"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "울산광역시",
-   "api": "youthPolicy",
-   "apiId": "20260410005400212677",
-   "id": "api-youthPolicy-20260410005400212677",
-   "eligibilityLines": [
-    "대 상 : 울산 거주 및 울산 소재 대학교 재(휴)학생 및 청년"
-   ],
-   "noticeLines": [
-    "청년 참여형 자살예방활동 및 미디어 모니터링 활동을 통해 청년세대 자살예방을 위한 사회적 안전망 구축"
-   ],
-   "detailsV": 6,
-   "avoidUrls": [
-    "https://www.usspc.or.kr/"
-   ],
-   "foundAt": "2026-10-04",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "(연수구) 청년 자격증 응시료 지원",
-   "url": "https://youth.incheon.go.kr/youthpolicy/youthPolicyInfoDetail.do?poly_seq=419",
-   "kind": "대외활동",
-   "deadline": "2026-11-30",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-02-01 ~ 2026-11-30"
-    },
-    {
-     "label": "대상",
-     "text": "만 18~39세"
-    },
-    {
-     "label": "혜택",
-     "text": "1인 연 1회, 최대 10만원 범위 자격증시험 응시료 지원 자격증 한 종목 당 필기, 실기로 나뉘어져 있거나 여러 단계로 이루어져 있는 경우 그 중 1건만 지원 가능 여러 건의 시험영수증 및 응시증빙자료 첨부한 경우 금액이 가장 높은 1만 지원 가능(시험 1건만 신청바랍니다) 실제 본…"
-    },
-    {
-     "label": "주최",
-     "text": "인천광역시 연수구 송도행정지원국 일자리정책과"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "인천광역시 청년정책담당관",
-   "api": "youthPolicy",
-   "apiId": "20260406005400212441",
-   "id": "api-youthPolicy-20260406005400212441",
-   "eligibilityLines": [
-    "만 18세 ~ 만 39세"
-   ],
-   "eligibilityExcludes": [
-    "건강보험 직장가입자 및 개인사업자는 제외"
-   ],
-   "noticeLines": [
-    "취업에 어려움을 겪고 있는 인천 청년에게 자격증 응시료 지원을 통한 경제적 부담 경감 및 사회진입 활성화 도모",
-    "제출 서류 : 시험 결제영수증(시험 1건만 지원 가능)(필수) 시험응시 증빙서류(성적표, 응시확인서 등)(필수) 통장사본(본인명의)(필수)",
-    "기타 : 신청방법, 제출서류, 지원가능한 자격증 안내 등 사업 전반에 관한 문의는 미추홀콜센터(032-120)에서 안내"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-10-02",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "2026년 평택시 청년창업도전 아카데미",
-   "url": "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-11-30",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-03-30 ~ 2026-11-30"
-    },
-    {
-     "label": "혜택",
-     "text": "창업을 준비하는 청년에게 필요한 실무교육과 창업에 관심있는 청년들이 쉽게 도전할 수 있도록 맞춤형 창업 특강을 제공"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "경기도 평택시 기획항만경제실",
-   "api": "youthPolicy",
-   "apiId": "20260326005400212290",
-   "id": "api-youthPolicy-20260326005400212290",
-   "noticeLines": [
-    "예비창업자부터 청년ceo까지 단계별 교육과정 수요를 반영하여 청년(예비)창업자의 역량강화를 위한 교육프로그램 제공"
-   ],
-   "detailsV": 6,
-   "avoidUrls": [
-    "https://www.pyeongtaek.go.kr/pyeongtaek/board/post/view.do?idx=344708&bcIdx=41&mid=0401010000"
-   ],
-   "foundAt": "2026-10-02",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "2026년 청년정책 종합상담 참여자 모집(기존 전라남도 22개 시·군 대상)",
-   "url": "https://nysc.or.kr/nysc/",
-   "kind": "대외활동",
-   "deadline": "2026-12-31",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-06-29 ~ 2026-12-31"
-    },
-    {
-     "label": "대상",
-     "text": "만 18~45세"
-    },
-    {
-     "label": "혜택",
-     "text": "맞춤형 정책상담 · 일자리, 주거, 교육, 문화·복지, 금융, 참여·권리 등 1시간 내외의 맞춤형 청년정책 상담 제공 참여혜택 · 대면 상담 참여자 선착순 50명 대상 소정의 기념품 제공"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "전남광주통합특별시",
-   "api": "youthPolicy",
-   "apiId": "20260812005400213331",
-   "id": "api-youthPolicy-20260812005400213331",
-   "eligibilityLines": [
-    "만 18세 ~ 만 45세"
-   ],
-   "noticeLines": [
-    "청년 개인 상황에 맞는 맞춤형 1:1 정책 상담 진행",
-    "신청 방법 : 중앙청년지원센터 홈페이지 상단 메뉴에서 「청년정책종합상담」 메뉴 선택 상담 신청 페이지에서 신청서를 작성"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-10-02",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "2026년 찬찬히 청년 사회생활(정서·심리)지원 캠퍼스 참여자 모집",
-   "url": "https://form.naver.com/response/2RU8EfZleUt",
-   "kind": "대외활동",
-   "deadline": "2026-12-31",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-07-20 ~ 2026-12-31"
-    },
-    {
-     "label": "대상",
-     "text": "만 18~34세"
-    },
-    {
-     "label": "혜택",
-     "text": "그룹형 교육과정 운영 및 통합 힐링 워크샵 병행 · 자아존중감 향상 · 정서 및 스트레스 조절 · 의사소통 · 대인관계 · 문제해결 역량 강화 필요시 개인의 성향·특성에 맞는 개별 개입 병행"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "전남광주통합특별시",
-   "api": "youthPolicy",
-   "apiId": "20260728005400213309",
-   "id": "api-youthPolicy-20260728005400213309",
-   "eligibilityLines": [
-    "만 18세 ~ 만 34세"
-   ],
-   "noticeLines": [
-    "찬찬히 청년을 위한 맞춤형 평생학습 프로그램",
-    "또래 친구들과 소그룹으로 함께하며 자기 이해 및 사회생활에 필요한 소통법 학습",
-    "정서조절, 대인관계, 문제해결 등 사회생활 역량 강화",
-    "신청 방법 : 네이버폼을 통한 온라인 접수 https://naver.me/x3cfS0qQ",
-    "심사 방법 : ☞ 자세한 내용은 붙임파일을 확인해주시기 바랍니다"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-10-02",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "k-뉴딜 아카데미",
-   "url": "https://www.work24.go.kr/cm/c/f/1100/selecSystInfo.do?currentPageNo=1&recordCountPerPage=10&systId=SI00000512&systClId=SC00000391",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-12-31",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-07-07 ~ 2026-12-31"
-    },
-    {
-     "label": "혜택",
-     "text": "ㅇ 참여 청년에게는 참여수당(최대 월 50만원까지)과 훈련비 전액 지원(자부담 없음) - 수료 후에는 고용센터를 통해 취업지원 등 고용서비스 연계 가능 ⁎︎ 아카데미 개시일 기준 연도에 최대 2회까지 참여 가능하며, 동시에 여러 아카데미에 참여하거나, 동일한 아카데미에 재참여할 수 없…"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "고용노동부",
-   "api": "youthPolicy",
-   "apiId": "20260714005400113258",
-   "id": "api-youthPolicy-20260714005400113258",
-   "eligibilityLines": [
-    "ㅇ미취업 청년(만 15세 이상~만 34세 이하)",
-    "* 참여 신청일 현재 고용보험에 가입되어 있지 않은 사람"
-   ],
-   "eligibilityExcludes": [
-    "① 취업 중이거나 사업자등록 중인 사람",
-    "* 아카데미 개시 전까지 참여 제한 사유가 해소되는 경우 참여 가능(증빙서류 제출 필요)",
-    "② 「초·중등교육법」에 다른 고등학교 및 「고등교육법」에 따른 대학(원) 재학생",
-    "⁎︎ 대학(원) 졸업예정자(4학년 2학기 이상 또는 마지막 학기 등록자)이거나 졸업예정자가 아니더라도 신청일 현재 휴학 중으로 및 장기 휴학생(연속 1년 이상 또는 통산 2년 이상 휴학 중인 자)임을 증명한 경우에는 참여 가능",
-    "③ 「직업안정법」에 다른 직업안정기관에 구직등록을 하지 않은 사람",
-    "④ 국가 또는 지방자치단체가 실시하거나 비용을 지원하는 직업능력개발훈련을 수강하고 있는 사람",
-    "⑤ 대한민국 국적을 보유하지 않은 사람"
-   ],
-   "noticeLines": [
-    "청년이 선호하는 대기업 등이 주도로 청년이 선호하는 분야의 프로그램을 설계·운영하여 직무역량 향상과 사회·직장 적응 지원 등을 통해 자신감 회복과 새로운 도약을 지원",
-    "신청 방법 : ㅇ 고용24(www.work24.go.kr)에서 'K-뉴딜 아카데미' 검색 후 아카데미 정보 확인 → 연계된 개별 기업 모집 페이지에서 수강 신청 * 아카데미는 2026년 6월말부터 순차개설 예정"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-10-02",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "첨단산업 인재양성 부트캠프",
-   "url": "https://youth.chungnam.go.kr/web/main/customSupp/M030-02/view?bizId=A20260309CT000000000003021",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-12-31",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-01-01 ~ 2026-12-31"
-    },
-    {
-     "label": "혜택",
-     "text": "ㅇ 반도체 패키징 소재‧공정 중심으로 특화된 교육과정 및 인프라 확보 ㅇ 디스플레이 소재․부품, 공정․장비 분야 핵심 인재 양성을 위한 전공심화 교육 및 실습 프로그램 운영 ㅇ 산업체 연계 현장실습, 산학프로젝트실습, 기업특강 등을 통한 실무역량 강화 ㅇ 채용박람회 및 전시회 참관 지…"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "고등교육정책담당관",
-   "api": "youthPolicy",
-   "apiId": "20260504005400113095",
-   "id": "api-youthPolicy-20260504005400113095",
-   "eligibilityLines": [
-    "반도체·디스플레이 관련 공과계열 대학생 2~4학년",
-    "선문대(반도체) : 전자공학, 반도체소재공학, 스마트정보통신공학",
-    "순천향대(디스플레이) : 디스플레이신소재공학, 전자정보공학, 나노화학공학, 기계공학"
-   ],
-   "eligibilityExcludes": [
-    "반도체·디스플레이 관련 공과계열 대학생 2~4학년",
-    "선문대(반도체) : 전자공학, 반도체소재공학, 스마트정보통신공학",
-    "순천향대(디스플레이) : 디스플레이신소재공학, 전자정보공학, 나노화학공학, 기계공학"
-   ],
-   "noticeLines": [
-    "반도체·디스플레이 산업수요 맞춤형 전문인력 양성",
-    "신청 방법 : 별도 문의",
-    "심사 방법 : 별도 문의",
-    "제출 서류 : 별도 문의"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-10-02",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "청년정책 서포터즈",
-   "url": "https://youth.chungnam.go.kr/web/main/customSupp/M060-10/view?bizId=A20260406LC000000000003191",
-   "kind": "대외활동",
-   "field": "서포터즈·기자단",
-   "deadline": "2026-12-31",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-01-01 ~ 2026-12-31"
-    },
-    {
-     "label": "대상",
-     "text": "만 15~39세"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "지역경제과",
-   "api": "youthPolicy",
-   "apiId": "20260430005400212994",
-   "id": "api-youthPolicy-20260430005400212994",
-   "eligibilityLines": [
-    "만 15세 ~ 만 39세"
-   ],
-   "noticeLines": [
-    "청년정책에 대한 의견 및 방안 제시 등 시정에 참여",
-    "신청 방법 : 이메일 및 현장 접수",
-    "심사 방법 : 공고문에 따라",
-    "제출 서류 : 공고문에 따라"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-10-02",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "청년 행정체험연수 운영",
-   "url": "https://www.daejeonyouthportal.kr/content/CT_000000000070/cntPage.do?commonMenuNo=79_92&dpmSectionScd=10&dpmSectionFst=2",
-   "kind": "대외활동",
-   "deadline": "2026-11-30",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-01 ~ 2026-11-30"
-    },
-    {
-     "label": "혜택",
-     "text": "대전 거주 청년들에게 행정업무 및 경제활동 참여 기회를 제공하는 공공부문 진로탐색의 행정체험형 연수 근무조건 가. 근무시간: 09:00~16:00(1일 6시간, 점심시간 1시간 제외), 주 5일 근무 * 근무부서에 따라 휴일 1일 근무(월요일 휴무) 및 근무시간 조정 가능 나. 근무기…"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "대전광역시 교육정책전략국 청년정책과",
-   "api": "youthPolicy",
-   "apiId": "20260107005400212077",
-   "id": "api-youthPolicy-20260107005400212077",
-   "eligibilityLines": [
-    "사업대상: 본인 또는 직계존속이 대전에 거주하는 만 18세 이상 39세 이하 청년"
-   ],
-   "eligibilityExcludes": [
-    "※ 제외자 : 대전광역시 대학생 아르바이트 근무 경험자"
-   ],
-   "noticeLines": [
-    "관내 청년들의 시정 전반에 대한 이해를 높이고, 행정체험을 통한 실무 역량 및 사회진출 기반 강화를 위한 청년 행정체험연수(동·하계) 운영",
-    "신청 방법 : 대전청년포털 홈페이지 (www.daejeonyouthportal.kr) 신청",
-    "심사 방법 : https://www.daejeonyouthportal.kr/content/CT_000000000070/cntPage.do?commonMenuNo=79_92&dpmSectionScd=10&dpmSectionFst=2",
-    "제출 서류 : (공통) 신청서, 개인정보 수집·이용(제공) 동의서, 행정정보 공동이용 사전동의서, 주민등록등본 (해당자) 특별선발(국민기초생활수급자, 차상위계층, 등록장애인, 등록한부모가족, 국가유공자) 해당 증빙서류 (해당자) 가족관계증명서, 부모의 주민등록등본"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-09-30",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
   }
  ],
  "fields": {
