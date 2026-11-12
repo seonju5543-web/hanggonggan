@@ -22,15 +22,15 @@ on:
   workflow_dispatch:
     inputs:
       days:
-        description: '며칠 지난 리포트를 닫을까요 (기본 14)'
+        description: '며칠 지난 리포트를 닫을까요 (기본 3)'
         required: false
-        default: '14'
+        default: '3'
       dry_run:
         description: '진짜로 닫지 않고 목록만 보기 (true/false)'
         required: false
         default: 'false'
   schedule:
-    - cron: '40 6 * * 1'   # 월요일 15:40 KST
+    - cron: '47 6 * * *'   # 매일 15:47 KST — 2026-11-12 주 1회·14일에서 매일·3일로(열린 이슈 99건 중 리포트 87건이라 경보가 묻혔다 · 유형별 최신 3건·사람 코멘트 달린 것은 그대로 남는다)
 
 permissions:
   contents: read
@@ -51,7 +51,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
-          DAYS: ${{ inputs.days || '14' }}
+          DAYS: ${{ inputs.days || '3' }}
           DRY: ${{ inputs.dry_run || 'false' }}
         run: |
           set -euo pipefail

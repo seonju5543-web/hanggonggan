@@ -27,7 +27,8 @@ permissions:
 
 concurrency:
   group: codeql
-  cancel-in-progress: true
+  # 🔴 2026-11-12 true 였더니 새 push 가 돌던 점검을 취소해 '로봇이 넘어졌어요'가 셋씩 열렸다(#619~621) — 줄을 서게 한다(기다리던 것만 새 것으로 바뀐다)
+  cancel-in-progress: false
 
 jobs:
   analyze:
