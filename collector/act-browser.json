@@ -192,24 +192,6 @@
   "at": "2026-11-07",
   "tries": 1
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3545456": {
-  "at": "2026-11-07",
-  "tries": 1,
-  "lines": [
-   "활동구분",
-   "오프라인",
-   "군산 청바지봉사단 모집 포스터1.png",
-   "어르신 프로그램 활동 지원 및 원예,공예 활동 보조",
-   "[봉사장소 지도] 지도 건너뛰기",
-   "봉사활동 장소[1] 주소 : 전북특별자치도 군산시 둔배미길 29 (중앙로2가, 군산노인종합복지관)",
-   "전북특별자치도 군산시 삼화안길 9 군산시자원봉사센터",
-   "이전 봉사참여",
-   "11-4 부평구청 위생과 우편물 작업(위생관리팀)",
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3538765": {
   "at": "2026-11-07",
   "tries": 1,
@@ -293,6 +275,36 @@
  },
  "https://dep.hufs.ac.kr/bbs/student/2436/271342/artclView.do": {
   "at": "2026-11-11",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3544547": {
+  "at": "2026-11-12",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3544550": {
+  "at": "2026-11-12",
+  "tries": 1,
+  "lines": [
+   "아동·청소년",
+   "활동구분",
+   "오프라인",
+   "1. 활동 일시 : 2026.11.19.(목) 06:30~09:30 (※집결시간 :6시20분까지)",
+   "2. 활동 장소 : 대구상원고등학교, 영남고등학교 정문 일대 (※집결: 대구상원고등학교 정문 앞)",
+   "3. 활동 인원 : 20대 대학생 20명(남녀무관)",
+   "4. 활동 내용 : 수능 격려 물품 전달 등",
+   "[봉사장소 지도] 지도 건너뛰기",
+   "봉사자유형 : 성인"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=141810&article.offset=0&articleLimit=10": {
+  "at": "2026-11-12",
   "tries": 1
  }
 }

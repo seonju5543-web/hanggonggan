@@ -23977,7 +23977,17 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-11-12 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "미래 건설교통신기술인 장학사업 안내.pdf",
+     "url": "https://www.sogang.ac.kr/file-fe-prd/board/141/551820_1.pdf?sg=%EB%AF%B8%EB%9E%98%20%EA%B1%B4%EC%84%A4%EA%B5%90%ED%86%B5%EC%8B%A0%EA%B8%B0%EC%88%A0%EC%9D%B8%20%EC%9E%A5%ED%95%99%EC%82%AC%EC%97%85%20%EC%95%88%EB%82%B4.pdf"
+    },
+    {
+     "name": "본문이미지-1190x1682.png",
+     "url": "https://www.sogang.ac.kr/dataview/board/141/7d0441fa-46b2-45f2-a8f1-c115a91e5b8f.png",
+     "bodyImage": true
+    }
+   ],
    "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551820?bbsConfigFk=141&namepage=ScholarshipNotice",
    "sourceKind": "auto"
   },
