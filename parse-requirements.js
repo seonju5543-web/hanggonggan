@@ -1224,6 +1224,9 @@ function parseMajor(t) {
       if (n.length < 2 || MAJOR_GENERIC.test(n) || fields.includes(n)) continue;
       if (MAJOR_TRACK.some(([re]) => re.test(n))) continue;
       if (/(대학교|대학|대)$/.test(n)) continue;
+      /* `AI, SW 컴퓨터 관련 전공 아니어도 활동 가능` — 뒤가 **부정·무관**이면 그 분야는 요건이 아니다(2026-11-12 · 외대 AI교육지원 멘토:
+         컴퓨터공학과 학생에게만 ✓ 가 붙었다 — 「아니어도 된다」를 「컴퓨터 관련 전공이어야 한다」로 읽은 틀린 안심) */
+      if (/^\s*(?:자|생)?\s*(?:이|가)?\s*(?:아니어도|아니더라도|아닌\s?경우에도|무관|불문|관계\s?없|상관\s?없)/.test(t.slice(FIELD_RELATED.lastIndex))) continue;
       fields.push(n);
     }
     /* `field` — 이 이름은 학과명이 아니라 **분야**다. 판정은 '학과명에 그 분야가 들어 있는가'로 한다
