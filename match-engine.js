@@ -19,7 +19,7 @@ const PR = (typeof module !== 'undefined' && module.exports)
   /* 🔴 브라우저에서는 **전역 함수**로 쓴다 — 여기에 이름을 빠뜨리면 Node 검사는 전부
      통과하는데 앱은 첫 카드에서 죽는다. `headRest`(section-head)에 이어 `caseBranch`도
      같은 실수를 했다(2026-08-24). 아래 회귀가 브라우저 순서로 실어 실제로 불러 본다. */
-  : { parseLine, parseDegree, gradOnly, gradTarget, mentionsUndergrad, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, untag, REGIONS, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM, TRAIT_PAT, provincesOfCity, shortRegion };
+  : { parseLine, parseDegree, gradOnly, gradTarget, mentionsUndergrad, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, untag, REGIONS, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM, TRAIT_PAT, provincesOfCity, shortRegion, schoolKindAlt };
 const PR2 = PR;   // requirementLines가 쓰는 별칭 (선언 순서 때문에 이름만 따로 둔다)
 /* 시·도 이름은 parse-requirements 가 갖고 있다 — 여기 베끼면 두 벌이 된다 */
 const PR_REGIONS = PR.REGIONS || [];
@@ -232,7 +232,7 @@ function judgeCond(c, p, ctx) {
     case 'schoolType': {
       const cyberStudent = /방송\s?통신|사이버|디지털|원격/.test(String((p && p.school) || ''));
       if (!cyberStudent) return 'pass';
-      return c.cyber ? 'fail' : 'unknown';   // 방통대 학생: 사이버·방통 줄엔 걸린다 · `외국대학`·`대학원`·`시간제` 줄은 판단할 수 없다(리뷰 — 그 학생도 외국대학생·대학원생은 아니지만 줄이 묶여 있어 모름)
+      return c.cyber ? 'fail' : 'unknown';   // 방통대 학생: 방송통신·원격대학을 말한 줄엔 걸린다(사이버·디지털만 적은 줄은 모름 — 방통대는 사이버대학이 아니다 · parseSchoolType) · `외국대학`·`대학원`·`시간제` 줄은 판단할 수 없다(리뷰 — 그 학생도 외국대학생·대학원생은 아니지만 줄이 묶여 있어 모름)
     }
     case 'degree': {
       const mine = degreeOf(p);
@@ -289,6 +289,17 @@ function judgeCond(c, p, ctx) {
          그 사이는 모름. 줄은 확신이 낮아 미달도 화면에선 '모름'이 된다. */
       const ahead = c.ahead > 0 ? c.ahead : 0;
       let v = 'unknown';
+      /* `최종학년, 최종학년 직전학년` (parse-requirements parseYearBody finalPair · 2026-11-11 · 6차) — 마지막 두 학년이다. 프로필은 학제(2·3·4·5·6년제)를 모른다.
+         🔴 1·2학년에 ✕ 를 내지 않는다 — 학교 목록(data.js UNIVERSITIES)에 2·3년제 전문대(서일대·두원공대·서울예대·동아방송예대·제주한라대·웅지세무대 …)가 있어
+            그 학교 1·2학년은 마지막 두 학년이다(거창군장학회 원문도 `3년제 23학년 · 2년제 12학년` 을 적는다) → 모름.
+         3·4학년은 2·3·4년제 어디서든 마지막 두 학년 안이다(3년제 3학년 · 4년제 3·4학년) → ✓ · 단 학과가 5·6년제 꼴(의·치·한의·약·수의·건축학)이거나 학과를 모르면 모름 ·
+         5학년 이상은 5·6년제의 마지막 두 학년 → ✓ */
+      if (c.finalPair) {
+        const longProgram = /의예|의학|치의|치과|한의|약학|수의|건축학(?!.*공학)/.test(String(p.major || ''));
+        v = y <= 2 ? 'unknown' : y >= 5 ? 'pass' : (p.major && !longProgram) ? 'pass' : 'unknown';
+        if (c.exclude) return v === 'pass' ? 'fail' : v === 'fail' ? 'pass' : v;
+        return v;
+      }
       /* `3~4학년` 은 min·max 가 함께 온다(2026-10-12 · 조각 1) — 둘 다 맞아야 통과, 하나라도 벗어나면 미달, 그 밖은 모름 */
       const vMin = c.min == null ? null : (y >= c.min ? 'pass' : (y + ahead >= c.min ? 'unknown' : 'fail'));
       const vMax = c.max == null ? null : (y + ahead <= c.max ? 'pass' : (y <= c.max ? 'unknown' : 'fail'));
@@ -1236,7 +1247,7 @@ const REQ_NOISE = new RegExp([
   // 제출서류가 자격 자리에 앉는다 — 중앙대 교내장학금은 **자격 5줄이 전부 서류 이름**이었다
   // (`가족관계증명서` `중앙나래장학금 신청서`…). 자격이 없는데 **있는 척** 보이는 것이라 가장 나쁘다.
   // 줄이 서류 이름으로 **끝날 때만** 버린다 — '증명서 제출 가능한 자'처럼 요건인 문장은 살린다.
-  '(증명서|확인서|증빙\\s?서류|서류\\s?사본|신청서|동의서)\\s*(\\([^)]*\\))?\\s*$',
+  '(증명서|확인서|증빙\\s?서류|서류\\s?사본|신청서|동의서|요약서)\\s*(\\([^)]*\\))?\\s*$',   // `추천대상자 요약서(양식 1)`(2026-11-11)
   // 행사 안내 — 조각만 버린다. '수여식 참석 가능한 자'는 진짜 요건이라 살린다
   '^(장학증서\\s?)?(수여식|시상식)\\s*$|^일\\s?시\\s*[:：]|^장\\s?소\\s*[:：]|미\\s?참석.{0,12}(취소|제외)',
   '^시\\s?간\\s*(및\\s*장소)?\\s*[:：]|(수여식|시상식).{0,14}(변경|취소)될',   // 행사 진행 안내
@@ -1249,6 +1260,13 @@ const REQ_NOISE = new RegExp([
   '\\.(hwp|hwpx|pdf|docx?|xlsx?|zip|png|jpg)$',    // 첨부 파일 이름이 섞여 들어온 것
   '신청\\s?(일정|안내)\\s*$',                       // "…국가장학금 1차 신청 안내"
   '지급\\s*$|근무 기준 월|원 지급',                  // 금액·지급 안내
+  /* 자격 칸에 섞여 든 웹 화면 글자·묻고 답하기·안내 문장 (2026-11-11 · 6차 · 못 읽는 줄 280줄 전수 — 학생 화면에 자격처럼 떠 있던 것만) */
+  '게시판\\s?읽기|새\\s?창\\s?열기',                     // `공지사항 게시판읽기 (…) · 성균관대학교` · `… 인스타그램 새창 열기`
+  /* `무료복학자도 신청 가능한가요 ?` · `> 네, 무료복학자도 신청 가능 합니다` — 묻고 답하기의 물음과 「네」 답(누가 더 되는지 알리는 말)만. ⚠️ `> 아니오, 복수전공 이수자만 신청 대상입니다` 는 제한이라 남긴다 */
+  '(?:가요|나요|까요|니까)\\s*\\?\\s*$|^>?\\s*네\\s*,',
+  '다음과\\s?같이\\s?안내(?:합니다|드립니다)',           // `… 자체기준을 다음과 같이 안내합니다.`
+  '^합격\\s?(?:자\\s?)?발표\\s*[:：]',                    // `합격발표 : 11월 13일(금)(예정)` — 일정
+  '^자세한\\s?사항은[^.]{0,20}참고\\s*$',              // 층2 칸 꼬리 `자세한 사항은 첨부파일 또는 홈페이지 참고` 만 남은 줄
 ].join('|'));
 
 /* 🔴 '우선선발'은 자격이 **아니지만 버릴 것도 아니다** — 자격을 갖춘 사람 중 누구를
@@ -1733,6 +1751,17 @@ function requirementLines(sch, lines, opts) {
      되살려** 놓았다 — '종합적으로 평가하여 선발', '기참여자 가산점'이 자격으로 떴다.
      자격이 원문에 없으면 없다고 말하는 편이 맞다(원칙 8-1) — 앱이 '아직 읽지 못했어요'로
      정직하게 표시하고, 이 줄들은 '먼저 뽑는 기준' 블록에서 따로 보여 준다. */
+  /* 🔴 **법이 정한 학교 종류를 나란히 적은 줄은 셋 중 하나다** (2026-11-11 · 6차 · 세현 세션 11-10 노션 메모 '남김').
+     층2 영광군미래교육재단 특정자격 칸 `○「고등교육법」제2조에 해당하는 학교 재학생 ○「평생교육법」… 평생교육시설 재학생 ○「국민 평생 직업능력 개발법」… 기능대학 재학생` 은
+     학생이 다니는 학교가 **그중 한 종류**면 된다는 말인데, 줄마다 '재학' 이 맞아 ✓ 셋으로 세어 적합도가 부풀었다(요건 하나를 셋으로 셌다).
+     연달아 오는 그런 줄(둘 이상)을 기존 택1 묶음(`group` · fitDetail 이 한 요건으로 센다 · lineVerdict 의 inAnyOf 갈래)으로 묶는다 — 새 판정을 만들지 않는다.
+     화면의 ✓ 는 그대로다(묶음 갈래도 조건이 다 맞으면 ✓) · 판정 꼴은 parse-requirements schoolKindAlt 한 곳 */
+  for (let i = 0; i < out.length;) {
+    let j = i;
+    while (j < out.length && !meta[j] && PR.schoolKindAlt && PR.schoolKindAlt(out[j])) j += 1;
+    if (j - i >= 2) { anyGroup += 1; for (let k = i; k < j; k++) meta[k] = anyGroup; }
+    i = Math.max(j, i + 1);
+  }
   /* `withMeta`를 달라고 한 쪽(적합도 계산)에만 묶음 정보를 준다 — 화면은 예전 그대로 문자열이다 */
   if (opts && opts.withMeta) return out.map((text, i) => ({ text, group: meta[i] || 0, aside: !!aside[i] }));
   return out;

@@ -3128,6 +3128,10 @@ const KOSAF_ELIG = ['특정자격', '성적기준', '소득기준', '지역거�
    글자가 된다. 지우는 것도 지어내는 것과 같다(원칙 8-1). */
 const kosafClean = (t) => String(t || '').replace(/(^|\s)[○ㅇ●◦※]+/g, '$1').replace(/\s+/g, ' ').trim();
 const KOSAF_NOISE = /제한없음|^(?:기관\s?확인\s?필요|해당\s?없음)[요음]*$/;   // 아무것도 말하지 않는 줄 — kosafAsScholarships · verify/eligibility-coverage.mjs 가 같이 쓴다(한 줄로 둘 것 · 도구가 글자로 읽는다)
+/* 한 칸에 여러 항목이 `○` 로 붙어 있다 — 재단이 쓴 대로 줄만 나눈다(`※ 자세한 사항은 …` 꼬리도 따로 한 줄이 된다).
+   🔴 이 한 줄을 kosafAsScholarships·verify/eligibility-coverage.mjs·what-shows 가 같이 쓴다 (2026-11-11 · 6차) — 집계 도구가 따로 쪼갰더니(`○` 와 줄바꿈만)
+   `※` 꼬리가 앞 줄에 붙어 **앱에 없는 줄**을 '못 읽는 줄'로 세고 있었다(`외국대학/사이버대학/대학원 학생 자세한 사항은 …`). 한 줄로 둘 것 · 도구가 글자로 읽는다 */
+const kosafSplit = (t) => String(t || '').split(/\s*[○ㅇ※]\s*/).map((x) => kosafClean(x)).filter((x) => x.length >= 4 && !KOSAF_NOISE.test(x));
 
 /* 카드·시트에 보이는 **혜택 한 줄**. 원문 문단을 통째로 띄우지 않는다 —
    금액은 이미 parse-amount 가 읽어 뒀으니 그 숫자로 짧게 말하고, 조건은 상세 칸에서 본다.
@@ -3167,13 +3171,12 @@ function kosafAsScholarships() {
     .filter((i) => !i.due || dday(i.due).days >= -CLOSED_KEEP_DAYS || isSaved(`kosaf-${i.code}`) || state.applications.some((a) => a.id === `kosaf-${i.code}`))
     .map((i) => {
       const f = i.fields || {};
-      /* 한 칸에 여러 항목이 `○` 로 붙어 있다 — 재단이 쓴 대로 줄만 나눈다 */
+      /* 한 칸에 여러 항목이 `○` 로 붙어 있다 — 재단이 쓴 대로 줄만 나눈다(kosafSplit 한 곳) */
       /* 🔴 `제한없음` 이 든 칸은 **제한이 없다는 뜻**이라 자격 요건이 아니다 (2026-08-30).
          재단이 체크박스를 통째로 적어 놓은 것(`제한없음 인문계열 사회계열 …`)이 자격 요건
          자리를 차지하고 있었다 — 116곳 중 107줄. 아무것도 말하지 않는 줄이다. */
       /* `기관확인필요`·`해당없음` 만 적힌 줄도 아무것도 말하지 않는다 — 요건으로 세면 '확인 필요'가 부풀어 적합도가 깎인다(층2 16줄 · 2026-11-02). 규칙은 KOSAF_NOISE 한 곳(집계 도구가 글자로 읽어 쓴다) */
-      const split = (t) => String(t || '').split(/\s*[○ㅇ※]\s*/).map((x) => kosafClean(x))
-        .filter((x) => x.length >= 4 && !KOSAF_NOISE.test(x));
+      const split = kosafSplit;
       /* 🔴 `특정자격: ` 같은 **칸 이름을 붙이지 않는다** — 자격 요건 자리에는 요건만 적는다
          (개발자 지적). 어느 칸에서 왔는지는 학생에게 아무 뜻이 없다. */
       const lines = KOSAF_ELIG.flatMap((k) => split(f[k]));

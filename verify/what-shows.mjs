@@ -59,7 +59,9 @@ const p = {
   year: num('year', 3), status: arg('status', '재학'),
   gpa: num('gpa', 3.2), bracket: num('bracket', 6),
   credits: num('credits', 14), region: arg('region', '서울'),
-  parentRegion: arg('parentRegion', arg('region', '서울')), nationality: 'korean', birthYear: 2004,
+  parentRegion: arg('parentRegion', arg('region', '서울')), nationality: 'korean', birthYear: num('birthYear', 2004),
+  /* 시·군 칸은 줄 때만(2026-11-11 · 층2 시·군 장학금을 재려고) — 안 주면 예전처럼 없는 칸이다 */
+  ...(arg('regionCity', '') ? { regionCity: arg('regionCity', '') } : {}), ...(arg('parentRegionCity', '') ? { parentRegionCity: arg('parentRegionCity', '') } : {}),
   flags: [], common: {}, ...(Object.keys(traits).length ? { traits } : {}),
 };
 
@@ -126,7 +128,7 @@ vm.runInContext([
   /* 카드가 쓰는 한 줄 const 는 **전부** 여기에 — 하나라도 빠지면 그 꼴의 카드(기간 한 줄·학교 사진)에서만 이 도구가 넘어진다
      (리뷰 G3 · 기간 한 줄 달린 게시판 글에서 `hintText is not defined`). 관문 「원문 링크 정직성」 app 갈래가 실제 글 꼴로 돌려 본다. */
   ...['ENTITIES', 'ENTITY_RE', 'PARTIAL_ENTITY_END', 'hintText', 'NEWS_THUMB_RE', 'SCHOOL_PHOTO_RE', 'PHOTO_FOCUS_RE',
-    'CLOSED_KEEP_DAYS', 'KOSAF_ELIG', 'kosafClean', 'KOSAF_NOISE', 'KOSAF_AMOUNT_UNKNOWN', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G'].map(takeConst),
+    'CLOSED_KEEP_DAYS', 'KOSAF_ELIG', 'kosafClean', 'KOSAF_NOISE', 'kosafSplit', 'KOSAF_AMOUNT_UNKNOWN', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G'].map(takeConst),
   ...['isDateBit', 'splitTitleDates', 'hintShort', 'shortDay'].map(takeFn),   // 카드 제목 날짜·회색 기간 줄(2026-10-04·05) · 카드 윗줄 날짜(10-10)
   ...['esc', 'unent', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'attachPrepTemplate', 'kosafAsScholarships', 'sourceLinkHintHtml',   // attachPrepTemplate: 층2 항목마다 지원문서를 붙인다(2026-10-13 ① · FORM_TEMPLATES 가 없는 자리에선 그대로 돌려준다)
     'attachmentLinkHtml', 'sourceLinkHtml', 'sourceNoteHtml', 'amountSourceLinkHtml', 'appLogLinkHtml', 'noticeCardHtml', 'activityLinkWhy'].map(takeFn),
@@ -187,6 +189,23 @@ function linkLines(it, where) {
   return out;
 }
 
+/* 층2 카드·시트의 적합도 배지 (2026-11-11 · 6차 — 「셋 중 하나」 줄의 분모를 재려고) — 앱처럼 evaluateFor(층2는 미달이 아니면 '모름')·fitScore·fitDetail 을 부르고
+   배지는 fitBadgeHtml 이 낸 그대로다. 줄마다 ✓ ✕ ? 는 requirementMatch(화면 줄 표시와 같은 판정) · 「택1 n」 은 한 요건으로 세는 묶음(requirementLines withMeta) */
+vm.runInContext(takeFn('evaluateFor'), Object.assign(ctx, { evaluate: ME.evaluate }), { filename: 'app.js(evaluateFor)' });
+function kosafFitLines(sch) {
+  const result = appFn('evaluateFor')(sch, p);
+  const fd = ME.fitDetail(sch, p);
+  const badge = stripTags(appFn('fitBadgeHtml')(ME.fitScore(sch, result, p), fd)) || '(배지 없음)';
+  const out = [`   학생: ${p.school} ${p.year}학년 ${p.status} · 평점 ${p.gpa} · ${p.credits}학점 · ${p.bracket}구간 · ${p.birthYear}년생 · 거주 ${p.region}${p.regionCity ? ' ' + p.regionCity : ''} · 부모 ${p.parentRegion || '-'}${p.parentRegionCity ? ' ' + p.parentRegionCity : ''}`,
+    `   판정 ${result.status}  ·  배지 「${badge}」  ·  요건 ${fd.met}/${fd.total} 충족${fd.unknown ? ` · 모름 ${fd.unknown}` : ''}${fd.unread ? ' · 자격 미확인' : ''}`,
+    '   ─ 상세 시트 자격 줄'];
+  for (const { text, group } of ME.requirementLines(sch, null, { all: true, withMeta: true })) {
+    const v = ME.requirementMatch(text, p, sch);
+    out.push(`       ${v === 'ok' ? '✓' : v === 'no' ? '✕' : '?'} ${group ? `[택1 ${group}] ` : ''}${String(text).slice(0, 84)}`);
+  }
+  return out;
+}
+
 /* 정식 등록에 없는 이름 — 앱이 실제로 받는 파일에서 찾는다(공고·소식은 학교별 파일 · 층2는 앱 함수로 바꾼 모양) */
 function showFeedLinks(query) {
   const read = (p) => { try { return JSON.parse(fs.readFileSync(new URL(p, import.meta.url), 'utf8')).items || []; } catch (e) { return []; } };
@@ -204,6 +223,7 @@ function showFeedLinks(query) {
     const found = list.filter((x) => x.id === query || x.url === query || String(nameOf(x) || '').includes(query));
     for (const it of found.slice(0, CAP)) {
       console.log(`\n■ [${label}] ${String(nameOf(it) || '').slice(0, 80)}`);
+      if (where === 'sch') for (const l of kosafFitLines(it)) console.log(l);
       for (const l of linkLines(it, where)) console.log(l);
       shown += 1;
     }
