@@ -47,7 +47,7 @@ jobs:
           ref: ${{ github.ref_name }}
       - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
 
       - name: 잠근 목록
         if: inputs.mode == '목록'

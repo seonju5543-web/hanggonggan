@@ -34,7 +34,7 @@ jobs:
           ref: claude/nice-heisenberg-WESq5
       - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
       - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
       - run: npx playwright@1 install --with-deps chromium
       - name: 판형마다 표지 한 장

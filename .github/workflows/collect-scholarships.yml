@@ -55,7 +55,7 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
       # 🔴 파이썬 판을 고정한다 (2026-10-28) — PaddleOCR 바퀴는 cp39~cp313 뿐인데 러너 기본 파이썬이 그 밖이라 `paddlepaddle==3.2.0 (from versions: none)`
       #    으로 설치가 매일 실패했고(10-24~27 실측 · 경고만 남고 초록불), 포스터·첨부 자격 읽기가 통째로 비어 있었다(활동 글 자격 빈 30건의 주된 원인).
       - uses: actions/setup-python@v7

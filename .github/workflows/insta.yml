@@ -87,7 +87,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
       - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
       - run: npx playwright@1 install --with-deps chromium
 
@@ -408,7 +408,7 @@ jobs:
           ref: claude/nice-heisenberg-WESq5
       - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
 
       - name: 준비된 것이 있는지
         id: dir
@@ -575,7 +575,7 @@ jobs:
           ref: claude/nice-heisenberg-WESq5
       - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
       - name: 장부에 적고 이슈 정리
         env:
           GH_TOKEN: ${{ github.token }}

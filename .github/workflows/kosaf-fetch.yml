@@ -61,7 +61,7 @@ jobs:
         run: bash tools/setup-collab.sh
       - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
 
       # 🔴 정찰 — 첨부 칸이 실제로 어떻게 생겼는지 **눈으로 본다**. 짐작으로 주소를 만들면
       #    조용히 0건이 되고 원인을 토큰·헤더로 잘못 짚게 된다(CLAUDE.md '정찰' 규칙).
@@ -162,7 +162,7 @@ jobs:
       # 🔴 상한을 넘긴 작업은 '실패'가 아니라 '취소'라 if: failure() 만으로는 안 잡힌다
       - name: 넘어졌으면 알린다
         if: failure() || cancelled()
-        uses: actions/github-script@v9
+        uses: actions/github-script@v8
         with:
           script: |
             const title = '🚨 한국장학재단 수확 로봇이 넘어졌습니다';

@@ -51,7 +51,7 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
 
       # 게시판 찾기 (보강 — 실패해도 수집은 나간다). 수집 **앞**에 두어 이번에 찾은 게시판을 같은 실행이 바로 읽는다.
       # 첫 실행은 44곳을 다 보므로 넉넉히(50곳 · 5분). 다음부터는 boardUrl 이 비고 14일 지난 학교만 본다.

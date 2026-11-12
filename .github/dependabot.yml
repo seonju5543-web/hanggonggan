@@ -17,6 +17,11 @@ updates:
     groups:
       actions:
         patterns: ['*']
+    ignore:
+      # 2026-11-11 — github-script 9 는 내부 모듈을 ESM 으로 바꿔 require('@actions/github')·getOctokit 선언이 깨진다고 했고,
+      # 우리 스크립트 다섯 곳이 쓰는 require('fs') 가 되는지는 공지가 말하지 않는다 → 8 에 둔다. 확인하고 풀 때 이 줄을 지운다.
+      - dependency-name: actions/github-script
+        versions: ['>= 9']
     commit-message:
       prefix: '부품 판 올림(actions)'
 

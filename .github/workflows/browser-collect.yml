@@ -54,7 +54,7 @@ jobs:
         run: bash tools/setup-collab.sh
       - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
       - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
       # 안전망 (2026-08-05) — 스크립트는 22분 예산에 맞춰 스스로 끝내야 하지만,

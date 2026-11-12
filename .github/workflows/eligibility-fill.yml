@@ -69,7 +69,7 @@ jobs:
           #    기본값(GITHUB_SHA)은 큐에 들어간 시점에 굳어서, 기다리는 사이 다른 로봇이 저장한 커밋 위로 rebase 하다 충돌할 수 있다.
           ref: ${{ github.ref_name }}
       - uses: actions/setup-node@v7
-        with: { node-version: '20' }
+        with: { node-version: '22' }
 
       # ① 돈 쓰기 전에 안전장치부터. 가짜 응답으로 '지어냄이 정말 막히는가'를 확인한다.
       #    여기서 실패하면 API를 아예 부르지 않는다.
@@ -260,7 +260,7 @@ jobs:
       - name: 결과 리포트 이슈
         if: always() && inputs.mode != '미리보기만'
         continue-on-error: true
-        uses: actions/github-script@v9
+        uses: actions/github-script@v8
         env:
           RESULT: ${{ job.status }}
         with:

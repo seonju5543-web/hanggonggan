@@ -46,7 +46,7 @@ jobs:
           ref: ${{ github.ref_name }}
       - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
 
       - name: 공공 API 받기
         env:

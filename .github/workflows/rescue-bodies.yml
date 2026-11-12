@@ -60,7 +60,7 @@ jobs:
           # 로봇은 자기가 읽은 브랜치(= 기본 브랜치)에만 저장한다. 배포는 deploy-sync의 몫.
           ref: 'claude/nice-heisenberg-WESq5'
       - uses: actions/setup-node@v7
-        with: { node-version: '20' }
+        with: { node-version: '22' }
       # 파이썬 판 고정 — PaddleOCR 바퀴(cp39~cp313)가 러너 기본 파이썬엔 없어 설치가 매일 실패했다 (2026-10-28 · collect-scholarships.yml 과 같은 수리)
       - uses: actions/setup-python@v7
         with: { python-version: '3.12' }
@@ -198,7 +198,7 @@ jobs:
       - name: 실패하면 이슈로 알린다
         if: failure() || cancelled()
         continue-on-error: true
-        uses: actions/github-script@v9
+        uses: actions/github-script@v8
         with:
           script: |
             const fs = require('fs');
@@ -225,7 +225,7 @@ jobs:
         if: success()
         timeout-minutes: 1
         continue-on-error: true
-        uses: actions/github-script@v9
+        uses: actions/github-script@v8
         with:
           script: |
             const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;

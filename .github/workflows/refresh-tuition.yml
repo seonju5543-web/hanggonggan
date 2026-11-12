@@ -34,7 +34,7 @@ jobs:
           ref: claude/nice-heisenberg-WESq5
       - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
 
       - name: 등록금 수확
         env:

@@ -91,7 +91,7 @@ jobs:
           ref: ${{ github.ref_name }}
       - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
       - name: 열린 심각 경고 세기
         id: count
         timeout-minutes: 2
