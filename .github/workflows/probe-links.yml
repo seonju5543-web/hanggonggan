@@ -29,14 +29,14 @@ jobs:
     env:
       PROBE_BEFORE: ${{ github.event_name == 'push' && github.event.before || '' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # 기본 fetch-depth 1 이면 push 직전 판이 없다 — 그 커밋 하나만 받아 둔다(못 받으면 정찰이 전부 열고 리포트에 그렇게 적는다)
       - name: push 직전 판 받기 (새 줄 가리기용)
         if: env.PROBE_BEFORE != ''
         timeout-minutes: 2
         continue-on-error: true   # 보강 단계 — 멈추거나 시한을 넘겨도 정찰은 돈다(옛 판이 없으면 전부 열고 리포트에 그렇게 적는다)
         run: git fetch --no-tags --depth=1 origin "$PROBE_BEFORE" || true
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 20
       - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
@@ -50,7 +50,7 @@ jobs:
         if: always()
         timeout-minutes: 3
         run: bash collector/certs/probe-chain.sh collector/run-probe.txt
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: probe-report

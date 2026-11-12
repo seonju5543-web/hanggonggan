@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: claude/nice-heisenberg-WESq5     # 운영에 올라가야 할 판은 기본 브랜치의 것이다
           sparse-checkout: |

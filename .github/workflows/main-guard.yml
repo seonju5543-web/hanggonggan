@@ -49,12 +49,12 @@ jobs:
     # 기본 브랜치로 안 돌아와 **다음 세션이 옛 코드 위에서** 작업하게 된다.
     steps:
       - name: 기본 브랜치 체크아웃
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: claude/nice-heisenberg-WESq5
           fetch-depth: 0        # 병합 판단에 전체 이력이 필요하다
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 20
 

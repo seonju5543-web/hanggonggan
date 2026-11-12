@@ -51,12 +51,12 @@ jobs:
     # 상한 > 단계 합: 준비(checkout·playwright) ~3 + 사냥 예산 9 + 관문 4 + 되돌리기 5 + 저장·경보 ~3 = 24 → 여유 두고 28 (관문이 느린 날 저장·경보가 잘리지 않게)
     timeout-minutes: 28
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.ref_name }}
       - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
         run: bash tools/setup-collab.sh
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 20
       - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
