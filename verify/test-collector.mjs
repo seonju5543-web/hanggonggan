@@ -3832,6 +3832,18 @@ console.log('\n■ 학과·전공·계열 요건 (2026-08-30)');
 
   /* ④ 계열 낱말을 지명·학교 이름에서 줍지 않는다 — 전수 대조에서 실제로 틀렸던 줄이다 */
   eq('「경상남도」는 상경계열이 아니다', of('경상남도 청년 기본 조례에 따른 39세 이하'), null);
+  /* ④-2 계열 낱말이 학생의 계열이 아닌 자리에 든 줄 (2026-11-11 · 학과→계열 분류를 넓히며 전수 대조로 잡았다 — 계열을 가진 학생에게 틀린 ✕ 였다)
+          NOT_TRACK_CTX 한 곳. 반례: 진짜 계열 줄은 그대로 읽는다 */
+  for (const t of ['학업(연구) 수행능력(성적, 수상경력, 연구계획 등)', '역대 중국언어문화경진대회‘대상’수상자', '식·의약 정책에 관심이 많고 적극적인 취재 활동이 가능한 분',
+    '[식품의약품안전처] 누리소통기자단 모집', '전국규모의 예체능계 경연대회에서 3위 이내 입상자', '국가우수장학생(이공계)으로 선발된 이력이 없는 자']) {
+    eq(`  계열이 아니다: ${t}`, (of(t) || {}).tracks || null, null);
+  }
+  eq('  …그래서 문과 학생에게 ✕ 가 아니다 (상경·인문·의약·예체능·이공계 오독)',
+    ['학업(연구) 수행능력(성적, 수상경력, 연구계획 등)', '역대 중국언어문화경진대회‘대상’수상자', '식·의약 정책에 관심이 많고 적극적인 취재 활동이 가능한 분', '국가우수장학생(이공계)으로 선발된 이력이 없는 자']
+      .map((t) => mark(t, { track: 'arts', major: '판화과' })), [null, null, null, null]);
+  eq('  반례 — 진짜 계열 줄은 그대로 (상경계열 · 인문계열 · 의약계열 · 이공계 · 「국가우수장학금(이공계)」 옆의 「공학계열」)',
+    ['상경계열 재학생', '인문계열 재학생', '의약계열 재학생', '4년제 대학교 이공계 전공 새터민', '자연과학 및 공학계열 학과 재학생으로 국가우수장학금(이공계) 선발 이력이 없는 자']
+      .map((t) => ((of(t) || {}).tracks || []).join('+')), ['business', 'humanities', 'medical', 'science+engineering', 'science+engineering']);
   eq('  대회 입상은 우리가 묻지 않는다 (계열만 맞았다고 ✓ 를 치면 안 된다)',
     mark('예체능(미술/음악/체육/기타) 분야에 소질과 재능이 뛰어나고 전국대회에서 입상한 자',
       { track: 'arts' }), null);
@@ -3965,6 +3977,10 @@ console.log('\n■ 마감일을 원문에서 읽는다 (2026-08-30)');
   eq('  문장은 이름표가 아니다', D('신청기간을 꼭 확인하세요\n2026.10.01 까지'), null);
   eq('  지급 기간은 줄을 이어도 마감이 아니다', D('지급기간\n2026. 9. 1. ~ 2027. 2. 28.'), null);
   eq('  맨 「기간」은 까지가 있어야', D('기간\n2026. 9. 1. ~ 2027. 2. 12.'), null);
+  /* 이름표 끝의 괄호 토는 걷고 본다 — 국가근로 추가신청 3차 `1. 신청기간(3차)` ↵ `- 2026. 10. 21.(수) 09:00 ~ 10. 29.(목) 18:00` 이 마감 없이 실렸다(2026-11-11 G-3) */
+  eq('  이름표 끝 괄호 토(`신청기간(3차)`·`접수기간(연장)`)는 걷고 잇는다 · 줄머리 `-` 도 날짜로 본다',
+    [D('2026학년도 2학기\n1. 신청기간(3차)\n- 2026. 10. 21.(수) 09:00 ~ 10. 29.(목) 18:00\n2. 신청방법'), D('접수기간(연장)\n2026.10.26.(월) 23:59 까지')], ['2026-10-29', '2026-10-26']);
+  eq('    괄호를 걷어도 일하는 기간(`근무기간(예정)`)·지급 기간은 마감이 아니다', [D('근무기간(예정)\n2026.10.26.(월) ~ 2027.2.12'), D('지급기간(예정)\n2026. 9. 1. ~ 2027. 2. 28.')], [null, null]);
 
   /* ── 접수 시작일 · 발표일 (2026-09-07 · 캘린더 UI-21) ──
      🔴 이 둘은 마감일과 **같은 줄**에서 와야 한다. 끝을 못 읽는 줄에서 시작만 주우면
@@ -13811,7 +13827,29 @@ console.log('\n■ 학적정보 테일러링 (2026-10-24 개발자 지시 1~4 ·
     ['전자상거래학과', 'business'], ['항공서비스학과', null], ['건축학과', 'engineering'], ['바이오메디컬공학부', 'engineering'],
     ['경영학부(글로벌경영학)', 'business'], ['의예과(자연계열)', 'medical'], ['교양학부', null], ['디지털콘텐츠학부', null], ['', null],
   ];
+  /* 2026-11-11 덧붙인 낱말(MORE_TRACK_RULES · 44개교 못 가른 이름 408개 검수) — 꼴마다 대표 이름 · 넘으면 안 되는 반례 */
+  cases.push(
+    /* ① 계열 표지 · ② 단과대 이름 — 이름이 계열을 스스로 말한다 */
+    ['자유전공학부(자연)', 'science'], ['자유전공(이공계열)', 'science'], ['지리학과(자연계열)', 'science'], ['자유전공학과(자연ㆍ생활)', 'science'],
+    ['자유전공(예체능계열)', 'arts'], ['자율융합계열(사회)', 'social'], ['공과대학자유전공학부', 'engineering'], ['(공과대학)광역', 'engineering'],
+    ['자율전공(공과대)', 'engineering'], ['이과대학자유전공학부', 'science'], ['문과대학자유전공학부', 'humanities'], ['상경계열', 'business'],
+    ['어문계열', 'humanities'], ['법과대학', 'social'], ['간호대학', 'medical'], ['의과대학', 'medical'],
+    /* ③ 어느 학교에서나 같은 쪽인 전공 낱말 */
+    ['간호전공', 'medical'], ['환경보건전공', 'medical'], ['판화과', 'arts'], ['바둑학과', 'arts'], ['도자예술전공(신)', 'arts'],
+    ['지능기전공학부', 'engineering'], ['발전공학과', 'engineering'], ['첨단컴퓨팅학부', 'engineering'], ['이차전지융합학과', 'engineering'], ['건축시스템전공', 'engineering'],
+    ['목재ㆍ종이과학부', 'science'], ['해양생산학전공', 'science'], ['동물응용과학과', 'science'], ['미래농업융합학부', 'science'], ['한약자원학과', 'science'],
+    ['스타트업 전공', 'business'], ['앙트러프러너십전공', 'business'], ['청소년지도학과', 'social'], ['아동ㆍ청소년학과', 'social'], ['국제법무학과', 'social'],
+    ['국가안보학과', 'social'], ['독일학과', 'humanities'], ['일어일본문화학과', 'humanities'], ['프랑스언어ㆍ문화학과', 'humanities'], ['언어정보학과', 'humanities'],
+    /* 반례 — 문↔이 를 넘으면 틀린 미달이다 */
+    ['언어재활학과', null], ['언어청각치료학과', null],          // `언어` 지만 보건(이) — 인문(문)으로 가르면 안 된다
+    ['철도자율전공학부', null],                                // `도자` 가 들어 있어도 도자예술이 아니다
+    ['바이오소재과학과', 'science'], ['국방안보드론학과', 'engineering'],   // 넓은 이과 낱말이 이미 가른 이름은 덧붙인 낱말이 바꾸지 않는다
+    /* 그대로 null — 학교마다 쪽이 다르다 */
+    ['지리학과', null], ['문화콘텐츠학과', null], ['자율전공학부', null], ['글로벌인재학부', null], ['도시계획학과', null], ['뇌ㆍ인지과학부', null],
+    ['교직과', null], ['지능ㆍ데이터융합학부 핀테크전공', null], ['문화예술학과', null], ['ISE학과', null],
+  );
   for (const [name, want] of cases) eq(`  학과 → 계열: ${name || '(빈 이름)'} → ${want}`, MT.trackOfMajor(name), want);
+  eq('  덧붙인 낱말이 내는 계열도 전부 data.js TRACKS 에 있다', MT.MORE_TRACK_RULES.map(([id]) => id).filter((id) => !trackIds.includes(id)), []);
   eq('  분류기가 내는 계열은 전부 data.js TRACKS 에 있다', MT.MAJOR_TRACK_RULES.map(([id]) => id).filter((id) => !trackIds.includes(id)), []);
   eq('  목록 → 계열은 많은 순 (못 가른 것은 안 센다)', MT.tracksOfMajors(['수학과', '물리학과', '경영학부', '교양학부']), [{ id: 'science', n: 2 }, { id: 'business', n: 1 }]);
   eq('  하나도 못 가르면 빈 배열(앱은 여덟 개 전부로 물러난다)', MT.tracksOfMajors(['교양학부']), []);
@@ -13846,6 +13884,13 @@ console.log('\n■ 학적정보 테일러링 (2026-10-24 개발자 지시 1~4 ·
     eq('  🔴 표의 학교는 전부 앱 학교 · 캠퍼스 이름은 전부 그 학교의 CAMPUSES_BY_SCHOOL 칩과 같다',
       rows.filter(([s, cs]) => !unis.has(s) || cs.some((c) => !(camp.get(s) || []).includes(c))).map(([s]) => s), []);
     eq('  지역으로 못 가르는 학교(부산대 밀양·양산 둘 다 경남 · 교통대 충주·증평 둘 다 충북)는 표에 없다', rows.map(([s]) => s).filter((s) => /부산대학교|국립한국교통대학교/.test(s)), []);
+    /* 번호 표(2026-11-11 · 리포트 「캠퍼스 번호별 학과 표본」 대조) — 부산대·교통대는 campus_nm 번호로 가른다 · 이름은 앱 칩과 글자가 같다 · 학교마다 칩이 다 쓰인다 */
+    const nblock = robot.slice(robot.indexOf('const CAMPUS_BY_NUMBER = {'), robot.indexOf('\n};', robot.indexOf('const CAMPUS_BY_NUMBER = {')));
+    const nrows = [...nblock.matchAll(/'([^']+)':\s*\{([^}]*)\}/g)].map((m) => [m[1], [...m[2].matchAll(/:\s*'([^']+)'/g)].map((x) => x[1])]);
+    eq('  🔴 번호 표(CAMPUS_BY_NUMBER) — 부산대·교통대 둘 · 이름은 그 학교 칩과 같고 칩을 다 쓴다',
+      [nrows.map(([sc]) => sc).sort(), nrows.filter(([sc, cs]) => !unis.has(sc) || cs.some((c) => !(camp.get(sc) || []).includes(c)) || (camp.get(sc) || []).some((c) => !cs.includes(c))).map(([sc]) => sc)],
+      [['국립한국교통대학교', '부산대학교'], []]);
+    eq('  로봇이 번호 표로 캠퍼스를 고른다(campusOf 가 campus_nm 을 받는다)', /campusOf\(school, area, squash\(campusRaw/.test(robot) && /if \(CAMPUS_BY_NUMBER\[school\]\)/.test(robot), true);
     eq('  로봇이 캠퍼스별 목록을 발행기에 넘긴다', /campuses:\s*out\.campuses\[k\]/.test(robot), true);
   }
   eq('  data.js 에 손으로 적은 학과 목록이 없다 (외대 손목록이 로봇 파일을 가려 GBT학부가 안 떴다)', /const MAJORS_BY_SCHOOL = \{\};/.test(dataSrc), true);
@@ -14149,6 +14194,40 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
   eq('  다른 학적의 금지는 그대로 — `초과학기생 …, 휴학생 참여 불가 (… 참여가능)` 초과학기 · `휴학생 우대 제외` 휴학', [stNot('초과학기생 (9학기 이상), 졸업 유예자, 휴학생 참여 불가 (초과학기생의 경우 등록금 전액 납부자는 참여가능)', true), stNot('휴학생 우대 제외', true)], [['초과학기'], ['휴학']]);
   const tr = (s) => ({ status: s, gpa: 3.5, credits: 15, year: 2, school: '한국외국어대학교', region: '서울', regionCity: '강서구', parentRegion: '서울' });
   eq('  편입·재입학 첫 학기도 재학생이다 — `정규학기 재학생` ✓ · 제외 줄 `편입생 중 첫 학기인 학생` 은 편입학 학생만 ✕, 재학생은 통과 확인', [MEx.requirementMatch('2026-2학기 정규학기 재학생', tr('편입학'), null), MEx.requirementMatch('2026-2학기 정규학기 재학생', tr('재입학'), null), MEx.fitDetail({ id: 't', name: 't', eligibilityLines: ['직전학기 평점 3.0 이상인 재학생'], eligibilityExcludes: ['편입생 중 첫 학기인 학생'] }, tr('편입학')).fails.length, MEx.fitDetail({ id: 't', name: 't', eligibilityLines: ['직전학기 평점 3.0 이상인 재학생'], eligibilityExcludes: ['편입생 중 첫 학기인 학생'] }, tr('재학')).met], ['ok', 'ok', 1, 3]);
+  /* ── 6차 (2026-11-11 · 1단계 M1 분모 위생 · M2 파서 표기 — 마감 전 등록의 '조건 못 집은 줄' 89개를 한 줄씩 읽고 고른 꼴) ── */
+  const RL = (l) => MEx.requirementLines({}, [l], { withMeta: true, all: true });
+  const dropped = ['공지사항 게시판읽기 ([한국장학재단] 2026학년도) · 성균관대학교', '신규장학생 선발을 위한 자체기준을 다음과 같이 안내합니다.', '기납부금에 대한 환급 등은 추후 9월 말 일괄 개별 지급 예정 입니다.',
+    '학업성적(백분위): 20점', '2026학년도 2학기 총 장학금액이 등록금액을 초과할 수 없습니다.', '2025년도 근로소득원천징수영수증 회사 직인 필', '외국인을 말함 (초·중·고 전 과정 해외 이수자)',
+    '금학기 무료복학자도 신청 가능한가요 ?', '> 네, 무료복학자도 신청 가능 합니다.', '학자금지원구간, 직전학기 성적 등 종합적인 점수를 반영하여 선발 (상세내용 붙임2 참조)', '이수학점 및 평균평점',
+    '󰊱 신청자격 (이수학점 및 평균평점)', '© 아래 기준 충족자', '2026학년도 2학기 국가근로장학금 신청을 희망하는 학생', '특기적성 - 초·중·고·대학생', '모범 - 초·중·고등학생, 대학생', '추천대상자 요약서(양식 1)'];
+  eq('🔴 M1 학생 자격이 아닌 줄 17꼴은 자격 칸에서 사라진다 — 게시판 제목·안내 문장·지급 예정·배점·수혜 한도·직인·낱말 풀이·문답·심사 서술·표 머리·사설 글머리·©·희망하는 학생·분야표·요약서', dropped.map((l) => RL(l).length), dropped.map(() => 0));
+  eq('  (대조군) 요건 줄은 그대로 남는다 — `직전학기 평점 3.0 이상인 재학생`·`수여식 참석 가능한 자`·`신청서 제출 가능한 자`', ['직전학기 평점 3.0 이상인 재학생', '장학증서 수여식에 참석 가능한 자', '재학증명서 제출 가능한 자'].map((l) => RL(l).length), [1, 1, 1]);
+  eq('  참고 줄(aside) — `…아니라도 지원 가능`(요건을 푸는 말) · `선정시, … 기부에 참가할 자`(선정 뒤 의무)는 옅게 보이고 분모에서 빠진다',
+    ['현재 거주지는 위 지역이 아니라도 지원 가능', '선정시, 수원장학회의 회원으로 가입하며, 졸업 후 월 1만원씩 자동이체로 장학금 기부에 참가할 자'].map((l) => (RL(l)[0] || {}).aside), [true, true]);
+  eq('  꼬리 쉼표가 붙은 제외 줄(`… 이중국적자 제외,`)은 제외 칸으로 간다 — 전엔 자격 칸에 모름으로 남았다', [RL('주민등록상 해외이주 신고자, 영주권자 및 이중국적자 제외,').length, MEx.requirementLines({}, ['주민등록상 해외이주 신고자, 영주권자 및 이중국적자 제외,'], { onlyExclude: true }).length], [0, 1]);
+  eq('  `…학생은 다음 3 가지 중 1 가지에 해당되어야 함` — 주어가 앞에 붙은 가리킴 줄도 선택지 묶음을 연다(그 줄은 안 보이고 아래 줄이 한 묶음)',
+    MEx.requirementLines({}, ['가족장학금을 신청할 수 있는 학생은 다음 3 가지 중 1 가지에 해당되어야 함', '부모 중 1인이 재직자인 학생', '형제가 재학 중인 학생', '조부모가 동문인 학생'], { withMeta: true, all: true }).map((x) => x.group), [1, 1, 1]);
+  const stu6 = (o) => ({ school: '한국외국어대학교', track: 'humanities', major: '영어학과', year: 3, status: '재학', gpa: 3.8, bracket: 5, credits: 15, region: '서울', parentRegion: '서울', nationality: 'korean', birthYear: 2004, flags: [], common: {}, scholarships: [], ...o });
+  const judge6 = (l, p, ex) => conds(l, ex).map((c) => MEx.judgeCond(c, p, {}));
+  const condsEx6 = (l) => PRx.parseLine(l, true).conds;
+  eq('🔴 M2 `최종학년, 최종학년 직전학년 대학생` — 4년제 기준 3·4학년(확신 high) · `졸업학년` 하나면 4학년 · 고등학교 이야기는 안 읽는다',
+    [(one('지원요건을 충족하는 최종학년, 최종학년 직전학년 대학생', 'year') || {}).anyOf, (one('졸업학년 대학생', 'year') || {}).anyOf, one('고등학교 최종학년 재학생', 'year'), one('최종학년: 직전학기 9학점 이상 이수', 'year')], [[3, 4], [4], null, null]);   // 마지막은 갈래 이름표(전후 대조 · 3학년 틀린 ✕)
+  eq('  3학년 ✓ · 1학년 ✕', [judge6('지원요건을 충족하는 최종학년, 최종학년 직전학년 대학생', stu6({}))[0], judge6('지원요건을 충족하는 최종학년, 최종학년 직전학년 대학생', stu6({ year: 1 }))[0]], ['pass', 'fail']);
+  eq('  `성적표에 2개 학기 이상(계절 학기 불포함) 교과목 이수 기록이 있는 학생` — 마친 학기 2 이상(괄호 부연은 예외가 아니다 · 확신 high) · 3학년 ✓ · 1학년 ✕',
+    [(({ min, done, conf }) => [min, done, conf])(one('(지원 가능) 성적표에 2개 학기 이상(계절 학기 불포함) 교과목 이수 기록이 있는 학생', 'semester') || {}), judge6('성적표에 2개 학기 이상(계절 학기 불포함) 교과목 이수 기록이 있는 학생', stu6({}))[0], judge6('성적표에 2개 학기 이상 교과목 이수 기록이 있는 학생', stu6({ year: 1 }))[0]], [[2, true, 'high'], 'pass', 'fail']);
+  const creditsLine = '직전학기 취득학점 (계절학기 제외) 이 15학점 (졸업이수학점이 120인 대상 학부 (과) 는 14학점 / 최종직전학기는 9학점) 이상';
+  eq('  괄호가 겹친 학점 줄 — 갈래 [15,14,9] 를 남기고(alts · 확신 high) 전부 넘으면 ✓ · 전부 못 미치면 ✕ · 사이는 모름',
+    [(one(creditsLine, 'credits') || {}).alts, judge6(creditsLine, stu6({ credits: 15 }))[0], judge6(creditsLine, stu6({ credits: 8 }))[0], judge6(creditsLine, stu6({ credits: 12 }))[0]], [[15, 14, 9], 'pass', 'fail', 'unknown']);
+  eq('    `15학점(4학년 12학점) 이상` 도 같은 갈래 규칙(alts [15,12] · 15 이상 ✓ · 12 미만 ✕ · 사이 모름 — 전엔 통째로 모름) · `이하` 가 섞인 갈래는 alts 없이 전처럼 확신 낮음', [(one('15학점(4학년 12학점) 이상', 'credits') || {}).alts, judge6('15학점(4학년 12학점) 이상', stu6({ credits: 13 }))[0], (one('12학점 이상 (단, 18학점 이하) 이수', 'credits') || {}).alts, (one('12학점 이상 (단, 18학점 이하) 이수', 'credits') || {}).conf], [[15, 12], 'unknown', undefined, 'low']);
+  eq('🔴 M2 이중수혜 줄 `타 재단 장학금을 수혜하지 않은 학생` — 종류 scholarship · 외부 재단을 받고 있으면 ✕ · 없으면 ✓ · 안 물었으면 모름 · `타 생활비성 장학금` 처럼 안팎을 안 가린 줄은 안 읽는다',
+    [(one('타 재단 장학금을 수혜하지 않은 학생', 'scholarship') || {}).conf, judge6('타 재단 장학금을 수혜하지 않은 학생', stu6({ scholarships: ['external'] }))[0], judge6('타 재단 장학금을 수혜하지 않은 학생', stu6({}))[0], judge6('타 재단 장학금을 수혜하지 않은 학생', stu6({ scholarships: null }))[0], one('타 생활비성 장학금을 수혜하지 않은 학생', 'scholarship')],
+    ['high', 'fail', 'pass', 'unknown', null]);
+  /* 리뷰(2026-11-11)가 잡은 넷 — 요건 줄을 잘못 버리거나 틀린 ✕ 를 낼 꼴 */
+  eq('  리뷰 — `(… 참조)` 꼬리·`성적 기준: 85점`·`선발 시 재학 중이어야 함`·`전공 30학점 이상 및 교양 15학점 이상` 은 요건 줄로 남는다(버리거나 참고로 돌리지 않는다)',
+    [RL('학자금 지원구간 8구간 이하 (상세 붙임 참조)').length, RL('백분위 환산 성적: 85점').length, (RL('선발 시 재학 중이어야 함')[0] || {}).aside, (one('전공 30학점 이상 및 교양 15학점 이상 이수', 'credits') || {}).alts], [1, 1, false, undefined]);
+  eq('  리뷰 — `졸업학년도` 는 연도라 학년 조건이 아니다 · 이중수혜 판정은 evaluate 와 같은 함수(holdsExternalScholarship)', [one('2027 졸업학년도 기준 등록자', 'year'), typeof MEx.holdsExternalScholarship === 'function' ? [MEx.holdsExternalScholarship({ scholarships: ['external'] }), MEx.holdsExternalScholarship({}), MEx.holdsExternalScholarship({ scholarships: ['kosaf'] })] : null], [null, [true, null, false]]);
+  eq('    제외 줄 `타 민간재단 장학금 수혜자` 도 같은 종류(exclude) · 국가장학금·교내는 막지 않는다', [(condsEx6('타 민간재단 장학금 수혜자').find((c) => c.kind === 'scholarship') || {}).exclude, MEx.judgeCond(condsEx6('타 민간재단 장학금 수혜자').find((c) => c.kind === 'scholarship'), stu6({ scholarships: ['kosaf', 'internal'] }), {})], [true, 'pass']);
+
 }
 
 console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-31 · 5단계 — 숫자는 도구가 세고 질문 목록은 사람이 고친다)');
