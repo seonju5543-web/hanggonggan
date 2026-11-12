@@ -4211,7 +4211,7 @@ console.log('\n■ 공고를 받아올 때 쓰는 머리말 (2026-08-20)');
     const pushFiles = ['server/push/worker.js', 'server/push/gen-vapid.mjs', 'verify/verify-push-server.mjs'];
     eq('  푸시 서버 연락처(mailto:)는 전부 서비스 주소 — 개인 메일 없음',
       pushFiles.map((f) => [...readText(new URL(f, root)).matchAll(/mailto:([^'"\s)]+)/g)].map((m) => m[1]).filter((m) => m !== '...' && m !== supportMail)).flat(), []);
-    eq('  (대조할 것을 실제로 찾았다 — 세 파일 모두 mailto: 가 있다)', pushFiles.every((f) => new RegExp(`mailto:${supportMail.replace(/\./g, '\\.')}`).test(readText(new URL(f, root)))), true);
+    eq('  (대조할 것을 실제로 찾았다 — 세 파일 모두 mailto: 가 있다)', pushFiles.every((f) => readText(new URL(f, root)).includes(`mailto:${supportMail}`)), true);
   }
   for (const f of ['collector/deepfetch.mjs', 'collector/collect.mjs']) {
     const src = readText(new URL(f, root));
