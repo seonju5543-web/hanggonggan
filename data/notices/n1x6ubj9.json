@@ -1,7 +1,29 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-11-11",
+ "updatedAt": "2026-11-12",
  "items": [
+  {
+   "title": "2027-2028 이스라엘 정부초청 장학생 선발 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=141811&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    },
+    {
+     "name": "2027-2028 이스라엘 정부장학금 안내.pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=141811&attachNo=119081"
+    },
+    {
+     "name": "지원서 양식 (2).pdf",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=141811&attachNo=119082"
+    }
+   ],
+   "deadlineHint": "마감일: 2027.1.15.(금) ※ 1.15. 도착분까지 접수. 방문접수 불가 마. 문의처: 주한이스라엘대사관 학술과(02-3210-8510,",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-11-12"
+  },
   {
    "title": "2027년도 유하푸른장학재단 10기 장학생 선발 안내",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=141782&article.offset=0&articleLimit=10",
