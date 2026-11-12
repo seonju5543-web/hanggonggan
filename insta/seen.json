@@ -2032,7 +2032,7 @@
    "expiredAt": "2026-10-31"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0641001",
    "org": "대산농촌재단",
    "name": "대산농업리더장학생",
@@ -2041,7 +2041,9 @@
    "tplNo": 2,
    "cards": 4,
    "dir": "insta/pub/0641001",
-   "at": "2026-09-30"
+   "at": "2026-09-30",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-12"
   },
   {
    "status": "expired",
