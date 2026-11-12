@@ -319,9 +319,9 @@ async function downloadForms() {
   let tried = {};
   try { tried = JSON.parse(fs.readFileSync(triedPath, 'utf8')) || {}; } catch { /* 첫 실행 */ }
   let backlog = [];
+  process.env.FORM_PDF_AS_LIB = '1';
+  const FP = await import('./form-pdf.mjs');   // 순수 함수 묶음(밀린 목록 고르기 · 갈아끼울 옛 줄 고르기) — AS_LIB 라 본편은 안 돈다
   if (process.env.FORMS_BACKLOG === '1') try {
-    process.env.FORM_PDF_AS_LIB = '1';
-    const FP = await import('./form-pdf.mjs');
     const reg = JSON.parse(fs.readFileSync(new URL('../data/registered.json', HERE), 'utf8'));
     const root = fileURLToPath(new URL('..', HERE));
     const rows = FP.parseFormsIndex(fs.existsSync(new URL('forms-index.txt', OUT)) ? fs.readFileSync(new URL('forms-index.txt', OUT), 'utf8') : '');
@@ -401,10 +401,17 @@ async function downloadForms() {
         }
       } catch (e) { console.log('attach err', a.name, errWhy(e)); }
     }
-    if (!n.regId && fi > before) {
-      /* 표적 공고 — 새 파일을 받았으니 옛 파일(이번에 쓴 것 말고)과 옛 줄을 지운다(파생 .txt 도 이름이 같은 묶음으로 지워진다) */
-      for (const f of fs.readdirSync(OUT)) if (f.startsWith(`form-${slug}-`) && !written.has(f) && ![...written].some((w) => f.startsWith(`${w}.`))) fs.unlinkSync(new URL(f, OUT));
-      indexLines = indexLines.filter((line) => !mine(line) || written.has(line.split('\t')[0]));
+    /* 표적 공고의 갈아끼우기 — **이 일이 같은 첨부 이름으로 새로 받은 원본만** 옛 것을 대신한다(2026-11-12 리뷰 확정 둘):
+       ① 지우는 줄은 제목이 이 공고와 **똑같고** id 칸이 없는 옛 줄 가운데, 첨부 이름이 이번에 새로 저장한 것과 같은 줄뿐이다 —
+          파일 이름 머리(form-<제목 지문>-)로 지우면 같은 제목을 쓴 다른 학교 글(통영시 장학금 6개교 등)과 밀린 목록이 id 를 달아 받은 원본까지 지웠다.
+       ② 예산에 잘렸거나 일부 첨부를 못 받았으면 못 받은 첨부의 옛 원본은 그대로 둔다(전엔 하나만 받아도 옛 셋을 다 지웠다).
+       지운 줄의 파일은 파생 글자(<파일>.txt · .body.txt · .ocr.txt)와 같이 지운다. */
+    if (!n.regId) {
+      const stale = FP.staleFormRows(indexLines, { title: n.title, written, budgetHit });
+      const staleFiles = stale.map((line) => line.split('\t')[0]);
+      for (const f of fs.readdirSync(OUT)) if (staleFiles.some((sf) => f === sf || f.startsWith(`${sf}.`))) fs.unlinkSync(new URL(f, OUT));
+      const gone = new Set(stale);
+      indexLines = indexLines.filter((line) => !gone.has(line));
     }
     /* 예산에 잘린 공고는 자격 색인을 안 건드린다(옛 파일·파생을 미리 지우지 않는다 — downloadEligDocs 와 같은 방침) */
     if (eligFiles.length && !budgetHit) {

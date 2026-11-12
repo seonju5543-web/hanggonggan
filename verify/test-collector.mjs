@@ -13285,8 +13285,24 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
       [true, true, true, true]);
     eq('  쉼 장부는 **시도했는데** 못 받았을 때만 — 예산에 잘려 시작도 못 한 공고는 적지 않는다(리뷰: 6분 예산·12건이면 늘 생기는 일) · 밀린 목록은 FORMS_BACKLOG=1 일 때만(심층 수집 워크플로 하나)',
       [/budgetHit = true; break;/.test(body), /attempted = true;/.test(body), /process\.env\.FORMS_BACKLOG === '1'/.test(body)], [true, true, true]);
-    eq('  옛 파일은 **새 파일을 받은 뒤에만** 갈아끼운다(표적만 · fi > before) — 미리 몽땅 지우던 줄(refreshing)이 없다 · 새 번호는 옛 번호 뒤부터 · 밀린 줄엔 id 를 적는다',
-      [/refreshing/.test(body), /if \(!n\.regId && fi > before\) \{/.test(body), /let ai = Math\.max\(0, \.\.\.indexLines\.filter\(mine\)/.test(body), /n\.regId \? `\\t\$\{n\.regId\}` : ''/.test(body)], [false, true, true, true]);
+    eq('  옛 파일은 **새 파일을 받은 뒤에만** 갈아끼운다(표적만 · staleFormRows 한 곳) — 미리 몽땅 지우던 줄(refreshing)이 없다 · 새 번호는 옛 번호 뒤부터 · 밀린 줄엔 id 를 적는다',
+      [/refreshing/.test(body), /if \(!n\.regId\) \{\s*const stale = FP\.staleFormRows\(indexLines, \{ title: n\.title, written, budgetHit \}\);/.test(body), /let ai = Math\.max\(0, \.\.\.indexLines\.filter\(mine\)/.test(body), /n\.regId \? `\\t\$\{n\.regId\}` : ''/.test(body), /startsWith\(`form-\$\{slug\}-`\) && !written\.has/.test(body)], [false, true, true, true, false]);
+    /* 갈아끼울 옛 줄 고르기 (2026-11-12 리뷰 확정 둘) — 같은 제목의 다른 학교 글 · id 달린 밀린 줄 · 못 받은 첨부 · 예산에 잘린 일은 안 지운다 */
+    {
+      const T = '2026년도 통영시 저소득 대학생 장학금 지원대상자 선발 안내';
+      const L = [
+        `form-s-1.hwp\t${T}\t신청서.hwp\t10`,            // 이 공고의 옛 신청서 — 새로 받았으니 지운다
+        `form-s-2.hwp\t${T}\t동의서.hwp\t10`,            // 이 공고의 옛 동의서 — 이번에 못 받았다 → 남긴다
+        `form-s-3.hwp\t${T}\t신청서.hwp\t10\tauto-other`, // 같은 제목 · 다른 공고 id(밀린 목록) → 남긴다
+        `form-s-4.hwp\t[다른 학교] ${T}\t신청서.hwp\t10`, // 제목이 다른 줄(다른 학교 게시판 꼴) → 남긴다
+        `form-s-9.hwp\t${T}\t신청서.hwp\t12`,            // 이번에 새로 받은 줄
+      ];
+      const pick = (o) => (FP.staleFormRows ? FP.staleFormRows(L, o).map((l) => l.split('\t')[0]) : null);
+      eq('  갈아끼우기 — 같은 첨부 이름으로 새로 받은 옛 줄만 지운다(못 받은 첨부 · id 달린 다른 공고 · 제목 다른 줄은 둔다)',
+        pick({ title: T, written: new Set(['form-s-9.hwp']) }), ['form-s-1.hwp']);
+      eq('  예산에 잘렸거나 하나도 못 받았으면 아무것도 안 지운다',
+        [pick({ title: T, written: new Set(['form-s-9.hwp']), budgetHit: true }), pick({ title: T, written: new Set() })], [[], []]);
+    }
     const cs2 = readText(new URL('../.github/workflows/collect-scholarships.yml', import.meta.url)); const bc2 = readText(new URL('../.github/workflows/browser-collect.yml', import.meta.url));
     eq('  FORMS_BACKLOG: \'1\' 은 deep-fetch.yml 에만 — 수집 로봇 둘(--forms-only · 다른 대기줄)은 표적만 받아 쉼 장부·색인을 동시에 쓰지 않는다',
       [/FORMS_BACKLOG: '1'/.test(readText(new URL('../.github/workflows/deep-fetch.yml', import.meta.url))), /FORMS_BACKLOG/.test(cs2), /FORMS_BACKLOG/.test(bc2)], [true, false, false]);

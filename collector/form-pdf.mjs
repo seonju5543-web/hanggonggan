@@ -121,6 +121,21 @@ export function pickFormBacklog(items, indexRows, { today, isApplicationForm, tr
   return out.slice(0, Math.max(0, max | 0));
 }
 
+/* 표적 공고 갈아끼우기에서 지울 옛 색인 줄 (2026-11-12 리뷰 확정 둘 · deepfetch downloadForms 가 부른다 · 순수 함수라 관문이 직접 잰다).
+   지우는 것은 **제목이 그 공고와 똑같고 id 칸이 없는** 옛 줄 가운데, 첨부 이름이 이번에 새로 저장한 것(written)과 같은 줄뿐이다.
+   ① 파일 이름 머리(form-<제목 지문>-)로 지우면 같은 제목의 다른 학교 글·밀린 목록이 id 를 달아 받은 원본까지 지운다.
+   ② 예산에 잘렸거나(budgetHit) 하나도 못 받았으면 아무것도 안 지운다 · 못 받은 첨부의 옛 원본은 남긴다. */
+export function staleFormRows(indexLines, { title, written, budgetHit = false } = {}) {
+  const w = written instanceof Set ? written : new Set(written || []);
+  if (budgetHit || !w.size) return [];
+  const cols = (line) => String(line).split('\t');
+  const savedAttach = new Set(indexLines.filter((l) => w.has(cols(l)[0])).map((l) => cols(l)[2]));
+  return indexLines.filter((l) => {
+    const [file, t, attach, , id] = cols(l);
+    return !w.has(file) && t === title && !(id || '').trim() && savedAttach.has(attach);
+  });
+}
+
 /* PDF 쪽 수 — 뷰어 없이 글자로 센다(`/Type /Page` · `/Pages` 는 뺀다). 객체 스트림(/ObjStm)에 든 PDF 는 글자로 안 보여 0 이 나온다 —
    0 은 '모름'이지 '빈 PDF'가 아니다(리뷰 2026-10-12: 받아 둔 원본 25개 중 7개가 0 으로 세어졌다 — 거절하면 멀쩡한 양식을 버린다) */
 export function pdfPages(buf) {
