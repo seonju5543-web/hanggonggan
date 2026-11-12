@@ -326,7 +326,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-11-11"
+  "checkedAt": "2026-11-12"
  },
  "https://foundation.miraeasset.com/ko/news/notice/list.do": {
   "ok": false,
@@ -386,11 +386,11 @@
  },
  "https://asanmirae.or.kr:449/main/": {
   "ok": false,
-  "checkedAt": "2026-10-29"
+  "checkedAt": "2026-11-12"
  },
  "https://www.yonkang.org/kr": {
   "ok": false,
-  "checkedAt": "2026-10-29"
+  "checkedAt": "2026-11-12"
  },
  "https://www.asanfoundation.or.kr/af/library/bbs/afLibraryPhotoBbsList.do": {
   "ok": true,
@@ -398,7 +398,7 @@
    "kind": "page",
    "param": "pageIndex"
   },
-  "checkedAt": "2026-11-11"
+  "checkedAt": "2026-11-12"
  },
  "https://www.iljufoundation.org/homepage/index.do": {
   "ok": false,
@@ -466,6 +466,6 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-11-11"
+  "checkedAt": "2026-11-12"
  }
 }

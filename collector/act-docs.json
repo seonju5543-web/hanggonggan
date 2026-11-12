@@ -334,5 +334,9 @@
  "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=141810&article.offset=0&articleLimit=10": {
   "at": "2026-11-12",
   "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3549461": {
+  "at": "2026-11-12",
+  "tries": 1
  }
 }

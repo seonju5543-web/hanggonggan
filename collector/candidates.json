@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-11-12",
- "count": 1746,
+ "count": 1753,
  "items": [
   {
    "title": "장학 한국고등교육재단 문우림 제6기 장학생 선발 안내(~12/11 금)",
@@ -20,6 +20,30 @@
    "school": "숭실대학교",
    "campus": "",
    "foundAt": "2026-11-12"
+  },
+  {
+   "title": "[집중근로] 2026년 국가근로장학금 동계방학 집중근로 프로그램 희망근로지 학생 신청 안내",
+   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/274426/artclView.do",
+   "attachments": [
+    {
+     "name": "붙임1-2. 2026년 동계방학 집중근로 희망근로지 신청 매뉴얼(모바일).pdf",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/184251/download.do"
+    },
+    {
+     "name": "붙임2. 2026년 동계방학 집중근로 근로장학생 사전 선정기준(안).pdf",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/184252/download.do"
+    },
+    {
+     "name": "붙임1-1. 2026년 동계방학 집중근로 희망근로지 신청 매뉴얼(홈페이지).pdf",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/184253/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026. 10. 30.(금) 9시 ~ 2026. 11. 12.(목) 18시 ※ 마감일 신청자 증가로 인해 신청이 어려울 수 있으므",
+   "school": "고려대학교 세종캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-12",
+   "bodyDeadline": "2026-11-12",
+   "bodyDeadlineText": "2026.11.12"
   },
   {
    "title": "(재)유하푸른재단 2027년도 제10기 장학생 선발 안내",
@@ -42,6 +66,54 @@
    "bodyDeadlineText": "라. 신청기간 및 신청 방법 - 신청기간: ~ 2026년 11월 20일(금) 23:59까지 도착분에 한합"
   },
   {
+   "title": "[학부] [유하푸른재단] 2027년도 제10기 장학생 선발 안내",
+   "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367924&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "99376923_[유하푸른재단] 2027년도 제10기 장학생 선발 안내 및 홍보 협조 요청_20261111.zip",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=download&articleNo=367924&attachNo=353887"
+    }
+   ],
+   "deadlineHint": "접수기한: 2026. 11. 20.(금) 23:59까지 접수방법: 지원자 본인이 재단 지정 이메일로 직접 제출 이메일 제목: [2027 장학생",
+   "school": "이화여자대학교",
+   "campus": "",
+   "foundAt": "2026-11-12",
+   "bodyDeadline": "2026-11-20",
+   "bodyDeadlineText": "2026.11.20"
+  },
+  {
+   "title": "[메디컬] 2026-2학기 일반(교내, 교외) 국가근로장학생 2차 추가모집",
+   "url": "https://www.gachon.ac.kr/bbs/kor/478/127041/artclView.do",
+   "attachments": [
+    {
+     "name": "26-2학기 2차 추가모집 안내.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/158615/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간: 2026.11.05.(목) ~ 11.18.(수) 127041 [메디컬] [메디컬] 2026-2학기 일반(교내, 교외) 국가근로장학생",
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-11-12",
+   "bodyDeadline": "2026-11-18",
+   "bodyDeadlineText": "2026년 가천대학교 재학생 심층면접토론(FGD) 참여학생 모집 ○ 신청기간: 2026.11.05.(목) ~ 11.18.(수)"
+  },
+  {
+   "title": "[유하푸른재단] 2027년도 제 10기 유하푸른재단 장학생 선발",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=160291&noCat=501",
+   "attachments": [
+    {
+     "name": "2. 유하푸른재단 제 10기 장학생 지원서 (학교명, 지원자명).zip",
+     "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=download&articleNo=160291&attachNo=93946"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "홍익대학교",
+   "campus": "",
+   "foundAt": "2026-11-12",
+   "bodyDeadline": "2026-11-20",
+   "bodyDeadlineText": "4. 선발일정 1) 원서접수 : 2026. 11. 20.(금) 23:59까지 재단 지정 이메일 수신분에 한하여 접수"
+  },
+  {
    "title": "[장학안내] 2026학년도 미래성장 장학생 선발 안내",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70976&cate=8",
    "attachments": [
@@ -60,6 +132,29 @@
    "foundAt": "2026-11-12",
    "bodyDeadline": "2026-11-20",
    "bodyDeadlineText": "마. 평가방법: 심층면접(1단계) → 서류평가(2단계) 바. 접수기간: 2026. 11. 16.(월) 09:00 ～ 11. 20.(금) 17:00 ※ 온라인 접수(전남대 포털) ​ 자세한 내용은 첨부파일 공고문 참고 바랍니다. ​"
+  },
+  {
+   "title": "2026 한국건설교통신기술협회 미래 건설교통신기술인 장학사업 안내",
+   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12621/view.do?currentPageNo=1",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "국민대학교",
+   "campus": "",
+   "foundAt": "2026-11-12"
+  },
+  {
+   "title": "[입학에서 취업까지] [한국건설교통신기술협회] 미래 건설교통신기술인 장학사업 안내 ( ~ 2026.11.18.(수))",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627186&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888",
+   "attachments": [
+    {
+     "name": "미래 건설교통신기술인 장학사업 안내.pdf",
+     "url": "https://www.kyonggi.ac.kr/www/downloadBbsFile.do?atchmnflNo=990402"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "경기대학교",
+   "campus": "",
+   "foundAt": "2026-11-12"
   },
   {
    "title": "2027-2028 이스라엘 정부초청 장학생 선발 안내",
@@ -104,6 +199,15 @@
    "foundAt": "2026-11-12",
    "bodyDeadline": "2026-11-20",
    "bodyDeadlineText": "[교외] 유하푸른재단 장학생 선발 안내(11/20 마감, 이공계열 1학년, 등록금 및 자기개발비, 교환학생 장학금)"
+  },
+  {
+   "title": "[교외] 한국건설교통신기술협회 미래 건설교통신기술인 장학생 선발 안내(11/18 마감, 장학금 100만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551820?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-11-12"
   },
   {
    "title": "[공통][교외]한국고등교육재단 문우림 제6기 장학생 선발(~12/11)",
