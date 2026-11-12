@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-11",
+ "updatedAt": "2026-11-12",
  "items": {
   "auto-ticedoarticleno231977952": [
    {
@@ -153,18 +153,6 @@
     "at": "2026-10-28"
    }
   ],
-  "auto-enoticedoarticleno769738": [
-   {
-    "file": "auto-enoticedoarticleno769738/1-01-04.주거안정장학금_반환서약서.pdf",
-    "name": "01-04.주거안정장학금 반환서약서.hwp",
-    "pages": 2,
-    "bytes": 145027,
-    "srcBytes": 110080,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-28"
-   }
-  ],
   "auto-bswj104944500artclviewdo": [
    {
     "file": "auto-bswj104944500artclviewdo/1-외국인재학생_장학금_신청서.pdf",
@@ -257,18 +245,6 @@
     "at": "2026-11-11"
    }
   ],
-  "auto-krbbskr846077artclviewdo": [
-   {
-    "file": "auto-krbbskr846077artclviewdo/1-1._IBK기업은행_장학금_필수_개인정보_수집_이용_동의서.pdf",
-    "name": "1. IBK기업은행 장학금_필수 개인정보 수집·이용 동의서.pdf",
-    "pages": 1,
-    "bytes": 67238,
-    "srcBytes": 67238,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-11"
-   }
-  ],
   "auto-orykeywordpaged1slug2026-0ezoyxo": [
    {
     "file": "auto-orykeywordpaged1slug2026-0ezoyxo/1-2026년-숭실대-직원-추천-장학생-지원서-1.pdf",
@@ -313,6 +289,40 @@
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-11-11"
+   }
+  ],
+  "auto-ent2431271374artclviewdo": [
+   {
+    "file": "auto-ent2431271374artclviewdo/1-TESOL_영어학_장학금_신청서_자기소개서포함_1_.pdf",
+    "name": "TESOL+영어학+장학금+신청서(자기소개서포함) (1).hwp",
+    "pages": 1,
+    "bytes": 69958,
+    "srcBytes": 38912,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-12"
+   },
+   {
+    "file": "auto-ent2431271374artclviewdo/2-개인정보수집이용동의서_3_.pdf",
+    "name": "개인정보수집이용동의서 (3).hwp",
+    "pages": 1,
+    "bytes": 78371,
+    "srcBytes": 50176,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-12"
+   }
+  ],
+  "auto-9bnum57138cate0qidx57138": [
+   {
+    "file": "auto-9bnum57138cate0qidx57138/1-서식1._국가근로장학생_지원서.pdf",
+    "name": "서식1. 국가근로장학생 지원서.hwp",
+    "pages": 2,
+    "bytes": 71753,
+    "srcBytes": 92672,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-12"
    }
   ]
  }
