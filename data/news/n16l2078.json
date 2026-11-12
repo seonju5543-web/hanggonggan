@@ -1,7 +1,40 @@
 {
  "school": "충북대학교",
- "updatedAt": "2026-11-11",
+ "updatedAt": "2026-11-12",
  "items": [
+  {
+   "title": "깊이 있는 배움의 시간, 온라인 심화교육주간 안내",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171556&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-11-12",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-11-12",
+   "thumb": "data/news/img/0ca046878667d8ef.webp",
+   "desc": "이미지 확대보기 도서관에서는 연구자 여러분의 깊이 있는 학술 활동을 응원하며 ‘온라인 심화교육주간’을 준비했습니다."
+  },
+  {
+   "title": "2026. 2학기 생협 메가커피 평일 아르바이트 채용",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171555&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-11-12",
+   "kind": "채용",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-11-12",
+   "desc": "2026. 2학기 아르바이트 학생 채용 안내 1. 근무기간 : 2026.12.01. ~ 2026.12.18."
+  },
+  {
+   "title": "2026학년도 동기 계절수업 다른 대학교 수학 안내(국립경국대)",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171551&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-11-11",
+   "kind": "학사",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-11-12",
+   "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
+  },
   {
    "title": "[박물관] 청주 근대 선교기지 역사문화적 의미와 세계유산가치",
    "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171549&pageUnit=10&searchCnd=all&pageIndex=1",
@@ -396,38 +429,6 @@
    "src": "76d254e7",
    "foundAt": "2026-10-27",
    "desc": "2026. 2학기 아르바이트 학생 채용 안내 1. 근무기간 : 채용 시 ~ 2026.12.18."
-  },
-  {
-   "title": "[천원의 아침밥] 2026 만족도 설문조사 이벤트 안내",
-   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170989&pageUnit=10&searchCnd=all&pageIndex=1",
-   "postedAt": "2026-10-27",
-   "school": "충북대학교",
-   "campus": "",
-   "src": "76d254e7",
-   "foundAt": "2026-10-27",
-   "thumb": "data/news/img/1d6e44145894c658.webp",
-   "desc": "이미지 확대보기 < 2026 천원의 아침밥 만족도 설문조사 > □ 설문기간: 2026. 10. 26.(월) ~ 11. 30.(월)"
-  },
-  {
-   "title": "2026 충북대학교 하반기 온라인 생활과학교실 모집",
-   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170988&pageUnit=10&searchCnd=all&pageIndex=1",
-   "postedAt": "2026-10-26",
-   "school": "충북대학교",
-   "campus": "",
-   "src": "76d254e7",
-   "foundAt": "2026-10-27",
-   "thumb": "data/news/img/e08a007144812050.webp",
-   "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
-  },
-  {
-   "title": "2027학년도 충북대학교 직장어린이집 원아모집 공고",
-   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=170965&pageUnit=10&searchCnd=all&pageIndex=1",
-   "postedAt": "2026-10-26",
-   "school": "충북대학교",
-   "campus": "",
-   "src": "76d254e7",
-   "foundAt": "2026-10-26",
-   "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
   }
  ]
 }

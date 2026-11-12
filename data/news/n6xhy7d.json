@@ -1,7 +1,28 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-11-11",
+ "updatedAt": "2026-11-12",
  "items": [
+  {
+   "title": "[국제학생] 2026학년도 2학기 외국인 유학생 한국어능력 향상 장려금 지원 안내(1차)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53672&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-12",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-12",
+   "desc": "향상 장려금 지원 안내(1차) - 한국어능력 향상 장려금 지원 1. 대상 : 학부 외국인 유학생 (대학원생, 교환학생, 어학연수생 제외)"
+  },
+  {
+   "title": "[일반] 기간제 계약직원 채용 공고(전자정보공과대학 전자공학과)",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53670&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-12",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-12",
+   "desc": "지원 자격 1. 대학교(4년제) 졸업자 이상 2. 남자의 경우 병역필 또는 면제자"
+  },
   {
    "title": "[일반] 기간제 계약직원 채용 공고(학생군사교육단)",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53669&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -408,27 +429,6 @@
    "src": "b09cb042",
    "foundAt": "2026-10-26",
    "desc": "식단 안내 알림광장 공지사항 자유게시판 취업정보 광운미디어 광운소식 뉴스레터 광운Story 브로슈어 홍보아이템 제보 최신연구성과 세계2%과학자 AI 활용 수업 사례 지금 광운대 학부모서비스"
-  },
-  {
-   "title": "[학사] 2026학년도 동계계절학기 타대학 학점교류 안내 (본교→타교)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53557&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-26",
-   "kind": "학사",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-26",
-   "desc": "자격 요건 신청 방법 수강료 납부 유의사항 교류대학일정 ✅ 교류 자격 지원 자격 : 1학년(2개 학기) 이상 이수한 재학생 신청 불가 : 2027. 2월 졸업예정자 및 현재 휴학 중인 학생 🚀 신청 방법 01…"
-  },
-  {
-   "title": "[일반] 신임교원 맞춤 프로그램 \"KW 수업 동행\"",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53550&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-26",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/f467fb2753f29fac.webp"
   }
  ]
 }

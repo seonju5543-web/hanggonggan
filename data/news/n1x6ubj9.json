@@ -1,7 +1,30 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-11-11",
+ "updatedAt": "2026-11-12",
  "items": [
+  {
+   "title": "2026년 제2회 수원청년 틈 페스티벌 행사 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141818&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-12",
+   "kind": "행사",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-12",
+   "thumb": "data/news/img/73364ee328678ddd.webp",
+   "desc": "- 진행일시: 11/21(토) 오전 10시 30분 ~ 오후 5시 - 진행장소: 복합문화공간111CM (수원시 장안구 수성로195)"
+  },
+  {
+   "title": "성균관대학교 배터리학과 행정직원 모집(~11/20(금)까지)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141813&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-12",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-12",
+   "desc": "성균관대학교 성균융합원 배터리학과에서 행정직원을 아래와 같이 채용 공고합니다."
+  },
   {
    "title": "[채용모집] 성균관대 문과대학 비교문화협동과정 연계전공 행정조교 모집",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141802&article.offset=0&articleLimit=10",
@@ -77,7 +100,8 @@
    "campus": "",
    "src": "45ec8fd1",
    "foundAt": "2026-11-11",
-   "desc": "동아시아미래가치연구소 ◎ 주제 : 엔트로피와 생명 / Entropy and Life ◎ 강연 소개 이번 강연은 열역학 제2법칙과 엔트로피라는 과학적 개념을 바탕으로 생명의 본질과 진화, 그리고 인간과 문명의 위치를…"
+   "desc": "동아시아미래가치연구소 ◎ 주제 : 엔트로피와 생명 / Entropy and Life ◎ 강연 소개 이번 강연은 열역학 제2법칙과 엔트로피라는 과학적 개념을 바탕으로 생명의 본질과 진화, 그리고 인간과 문명의 위치를…",
+   "thumb": "data/news/img/c54d760921317016.webp"
   },
   {
    "title": "[기숙사] 2026학년도 겨울방학 기숙사 입사생 모집 안내(명륜학사/봉룡학사)",
@@ -414,27 +438,6 @@
    "foundAt": "2026-10-30",
    "thumb": "data/news/img/ef4c1a63e7a44465.webp",
    "desc": "보안담당자 시놀로지(Synology)社 NAS의 취약점을 악용한 공격이 급증하여 이를 방어하기 위한 보안 업데이트를 안내해 드리오니, 해당 제품을 사용하시는 구성원 분들은 아래 내용을 참고하여 조치해 주시기…"
-  },
-  {
-   "title": "PHP의 중대한 취약점 공개에 따른 학내 홈페이지 긴급 점검 및 조치 요청",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141137&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-30",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-30",
-   "desc": "보안담당자 홈페이지를 만들기 위한 도구 PHP에서 심각한 취약점(PHP2SHELL)이 공개되어 긴급한 조치가 요구됩니다. 구성원 여러분들의 협조 부탁 드립니다."
-  },
-  {
-   "title": "성균관대학교 양자공학과 객원교수 채용 공고",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141105&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-30",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-30",
-   "desc": "성균관대학교 양자공학과에서는 다음과 같이 객원교수를 초빙하고자 하오니, 많은 분들의 관심과 지원 요청 드립니다."
   }
  ]
 }

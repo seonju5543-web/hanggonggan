@@ -1,7 +1,20 @@
 {
  "school": "동국대학교 WISE캠퍼스",
- "updatedAt": "2026-11-11",
+ "updatedAt": "2026-11-12",
  "items": [
+  {
+   "title": "[혁신] 2026 대학혁신지원사업 우수성과 포럼 개최 안내 '간식과 선물 받아가세요'",
+   "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/521165",
+   "postedAt": "2026-11-12",
+   "postId": "521165",
+   "kind": "행사",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "src": "b8e598c1",
+   "foundAt": "2026-11-12",
+   "thumb": "data/news/img/ba55c079c82b70e9.webp",
+   "desc": "동국대학교 WISE캠퍼스 대학혁신지원사업 우수성과포럼을 개최합니다. 이번 포럼에서는 대학혁신지원사업의 우수성과와 우수사례 공모전 수상작을 함께 공유하며, 우리 대학의 변화와 성과를 만나볼 수 있습니다."
+  },
   {
    "title": "제19대 외국인 유학생 학생회 선거 후보자 등록 공고",
    "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/521161",

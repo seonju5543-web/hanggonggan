@@ -1,6 +1,6 @@
 {
  "school": "세종대학교",
- "updatedAt": "2026-11-11",
+ "updatedAt": "2026-11-12",
  "items": [
   {
    "title": "웹툰으로 알아보는 상담소 이용 가이드 ①탄 - 대인관계 편",
@@ -77,16 +77,6 @@
    "foundAt": "2026-10-14",
    "thumb": "data/news/img/fffa7685df4f1a03.webp",
    "desc": "국민건강보험공단의 \"짝수년생을 위한 자궁암검진 이벤트\" 및 \"국가암검진 제도\"를 알려드립니다."
-  },
-  {
-   "title": "[학생생활상담소] 세종이의 마음지킴이 학생생활상담소 이용 안내",
-   "url": "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=894503&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-12",
-   "school": "세종대학교",
-   "campus": "",
-   "src": "8a741b47",
-   "foundAt": "2026-10-12",
-   "desc": "학생생활상담소 안녕하세요, 학생생활상담소입니다. 세종대학교 재학생이라면, 누구나 무료로 심리 상담 및 심리검사를 받아볼 수 있습니다."
   }
  ]
 }
