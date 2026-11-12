@@ -3,6 +3,45 @@
  "updatedAt": "2026-11-12",
  "items": [
   {
+   "title": "[채용공고] 전남대학교 미래전략본부 졸업생 취업결과 실태 조사원 채용 공고",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70981",
+   "postedAt": "2026-11-12",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-12"
+  },
+  {
+   "title": "[취업정보] [이랜드파크]27년 상반기 호텔경영자 Fast-Track채용전...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70980",
+   "postedAt": "2026-11-12",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-12"
+  },
+  {
+   "title": "[취업정보] [Johnson&Johnson MedTech]의료기기 영업사원...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70979",
+   "postedAt": "2026-11-12",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-12"
+  },
+  {
+   "title": "[채용공고] 전남광주통합특별시 광주감염병관리지원단 선임연구원 채용 공고",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70978",
+   "postedAt": "2026-11-12",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-12"
+  },
+  {
    "title": "[채용공고] 2026년 전남대학교 공정혁신시뮬레이션센터 학술연구교수 채용 공고",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70975",
    "postedAt": "2026-11-12",
@@ -365,46 +404,6 @@
    "src": "b7347301",
    "foundAt": "2026-11-03",
    "thumb": "data/news/img/b87f8195cb7bc996.webp"
-  },
-  {
-   "title": "[취업정보] [디팜스테크]각 부문 신입경력 채용(~11.15.(일)까지)",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70887",
-   "postedAt": "2026-11-03",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-03"
-  },
-  {
-   "title": "[취업정보] [H&L Advanced]2026 하반기 신입채용(~11.10...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70886",
-   "postedAt": "2026-11-03",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-03"
-  },
-  {
-   "title": "[취업정보] [KIA]하반기 전환형 인턴_국내사업(판매/마케팅/상품/경영지...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70885",
-   "postedAt": "2026-11-03",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-03",
-   "thumb": "data/news/img/b73bafa5ff2a495b.webp"
-  },
-  {
-   "title": "[취업정보] [현대백화점]회계/재무 限★학교 추천채용(~11.10.(화)까지)",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70884",
-   "postedAt": "2026-11-03",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-03"
   }
  ]
 }

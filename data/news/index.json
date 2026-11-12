@@ -9,7 +9,23 @@
   },
   "명지대학교": {
    "file": "ntyl0r5.json",
-   "count": 37
+   "count": 38
+  },
+  "가천대학교": {
+   "file": "nzzc8bm.json",
+   "count": 10
+  },
+  "국민대학교": {
+   "file": "n1tasrsl.json",
+   "count": 11
+  },
+  "숭실대학교": {
+   "file": "nmljo8t.json",
+   "count": 40
+  },
+  "세종대학교": {
+   "file": "n1mo5fbn.json",
+   "count": 8
   },
   "이화여자대학교": {
    "file": "n1tk2q9m.json",
@@ -23,17 +39,21 @@
    "file": "n13zozby.json",
    "count": 40
   },
+  "가톨릭대학교": {
+   "file": "n174lvh5.json",
+   "count": 40
+  },
+  "한국항공대학교": {
+   "file": "n1as48ix.json",
+   "count": 25
+  },
   "경기대학교": {
    "file": "ntxxf09.json",
    "count": 40
   },
-  "계명대학교": {
-   "file": "n1nel147.json",
-   "count": 40
-  },
-  "영남대학교": {
-   "file": "n12kfbyt.json",
-   "count": 14
+  "서울과학기술대학교": {
+   "file": "n14kv35j.json",
+   "count": 34
   },
   "전북대학교": {
    "file": "ncuyr4z.json",
@@ -43,17 +63,33 @@
    "file": "nwqmwga.json",
    "count": 40
   },
+  "조선대학교": {
+   "file": "n1qr99q6.json",
+   "count": 40
+  },
   "충북대학교": {
    "file": "n16l2078.json",
    "count": 40
   },
+  "부경대학교": {
+   "file": "n1nesasz.json",
+   "count": 40
+  },
+  "경희대학교": {
+   "file": "n1w4hprp.json",
+   "count": 37
+  },
+  "서울대학교": {
+   "file": "nsgh1oi.json",
+   "count": 21
+  },
+  "연세대학교": {
+   "file": "nz3ew5y.json",
+   "count": 15
+  },
   "성균관대학교": {
    "file": "n1x6ubj9.json",
    "count": 40
-  },
-  "중앙대학교": {
-   "file": "n1iz3lr8.json",
-   "count": 35
   },
   "서울시립대학교": {
    "file": "n1au199v.json",
@@ -61,15 +97,23 @@
   },
   "동국대학교 WISE캠퍼스": {
    "file": "n2we95k.json",
-   "count": 16
+   "count": 18
+  },
+  "영남대학교": {
+   "file": "n12kfbyt.json",
+   "count": 14
+  },
+  "중앙대학교": {
+   "file": "n1iz3lr8.json",
+   "count": 35
+  },
+  "계명대학교": {
+   "file": "n1nel147.json",
+   "count": 40
   },
   "서강대학교": {
    "file": "n14n199r.json",
    "count": 8
-  },
-  "가톨릭대학교": {
-   "file": "n174lvh5.json",
-   "count": 40
   },
   "서울교육대학교": {
    "file": "n18ebv4b.json",
@@ -79,10 +123,6 @@
    "file": "n19cz03g.json",
    "count": 30
   },
-  "한국항공대학교": {
-   "file": "n1as48ix.json",
-   "count": 24
-  },
   "고려대학교 세종캠퍼스": {
    "file": "n1ch7t87.json",
    "count": 11
@@ -90,10 +130,6 @@
   "고려대학교": {
    "file": "n1lw6ycq.json",
    "count": 30
-  },
-  "부경대학교": {
-   "file": "n1nesasz.json",
-   "count": 40
   },
   "동국대학교": {
    "file": "n1or8oiw.json",
@@ -103,21 +139,9 @@
    "file": "n1ozjjw8.json",
    "count": 14
   },
-  "조선대학교": {
-   "file": "n1qr99q6.json",
-   "count": 40
-  },
-  "경희대학교": {
-   "file": "n1w4hprp.json",
-   "count": 35
-  },
   "충남대학교": {
    "file": "nl1xm19.json",
    "count": 26
-  },
-  "숭실대학교": {
-   "file": "nmljo8t.json",
-   "count": 40
   },
   "건국대학교": {
    "file": "nmpm6i7.json",
@@ -127,14 +151,6 @@
    "file": "nv8pha4.json",
    "count": 40
   },
-  "가천대학교": {
-   "file": "nzzc8bm.json",
-   "count": 9
-  },
-  "서울과학기술대학교": {
-   "file": "n14kv35j.json",
-   "count": 33
-  },
   "숙명여자대학교": {
    "file": "n1a4mxa4.json",
    "count": 4
@@ -143,10 +159,6 @@
    "file": "n1if6uwu.json",
    "count": 26
   },
-  "세종대학교": {
-   "file": "n1mo5fbn.json",
-   "count": 7
-  },
   "한국방송통신대학교": {
    "file": "n1uf7bji.json",
    "count": 40
@@ -154,18 +166,6 @@
   "경북대학교": {
    "file": "nf097dk.json",
    "count": 9
-  },
-  "서울대학교": {
-   "file": "nsgh1oi.json",
-   "count": 20
-  },
-  "연세대학교": {
-   "file": "nz3ew5y.json",
-   "count": 14
-  },
-  "국민대학교": {
-   "file": "n1tasrsl.json",
-   "count": 10
   },
   "강원대학교": {
    "file": "nlzhvsh.json",

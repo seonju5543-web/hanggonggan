@@ -3,6 +3,26 @@
  "updatedAt": "2026-11-12",
  "items": [
   {
+   "title": "비교과·행사 2026학년도 교육수요자만족도조사 참여 안내",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026%ED%95%99%EB%85%84%EB%8F%84-%EA%B5%90%EC%9C%A1%EC%88%98%EC%9A%94%EC%9E%90%EB%A7%8C%EC%A1%B1%EB%8F%84%EC%A1%B0%EC%82%AC-%EC%B0%B8%EC%97%AC-%EC%95%88%EB%82%B4&keyword",
+   "postedAt": "2026-11-12",
+   "school": "숭실대학교",
+   "campus": "",
+   "src": "3b348584",
+   "foundAt": "2026-11-12",
+   "thumb": "data/news/img/85d8ca7742be529b.webp"
+  },
+  {
+   "title": "채용 2026년 숭실학술원 행정팀 일반계약직 채용 공고",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026%EB%85%84-%EC%88%AD%EC%8B%A4%ED%95%99%EC%88%A0%EC%9B%90-%ED%96%89%EC%A0%95%ED%8C%80-%EC%9D%BC%EB%B0%98%EA%B3%84%EC%95%BD%EC%A7%81-%EC%B1%84%EC%9A%A9-%EA%B3%B5%EA%B3%A0-2&keyword",
+   "postedAt": "2026-11-12",
+   "kind": "채용",
+   "school": "숭실대학교",
+   "campus": "",
+   "src": "3b348584",
+   "foundAt": "2026-11-12"
+  },
+  {
    "title": "채용 숭실대학교 기독교학대학원 교학팀 계약직 직원 모집",
    "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EA%B8%B0%EB%8F%85%EA%B5%90%ED%95%99%EB%8C%80%ED%95%99%EC%9B%90-%EA%B5%90%ED%95%99%ED%8C%80-%EA%B3%84%EC%95%BD%EC%A7%81-%EC%A7%81%EC%9B%90-%EB%AA%A8-2&keyword",
    "postedAt": "2026-11-11",
@@ -403,27 +423,6 @@
    "campus": "",
    "src": "3b348584",
    "foundAt": "2026-10-26"
-  },
-  {
-   "title": "학사 2026년 기본 훈련 3차(당해년도 / 이월) 및 후반기 작계 훈련 편성 계획",
-   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026%EB%85%84-%EA%B8%B0%EB%B3%B8-%ED%9B%88%EB%A0%A8-3%EC%B0%A8%EB%8B%B9%ED%95%B4%EB%85%84%EB%8F%84-%EC%9D%B4%EC%9B%94-%EB%B0%8F-%ED%9B%84%EB%B0%98%EA%B8%B0-%EC%9E%91%EA%B3%84-%ED%9B%88%EB%A0%A8&keyword",
-   "postedAt": "2026-10-26",
-   "school": "숭실대학교",
-   "campus": "",
-   "src": "3b348584",
-   "foundAt": "2026-10-26",
-   "desc": "1. 학생 예비군 기본훈련23~25년 불참자(당해년도 / 이월 보충) 및 후반기 작계 훈련 계획을 아래와 같이 통보 하니 대학(원)별 수업 일정 및 업무에 참고 하시기 바랍니다."
-  },
-  {
-   "title": "외국인유학생 2026학년도 2학기 외국인 유학생 TOPIK 4급 대비반 모집 안내",
-   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%EC%99%B8%EA%B5%AD%EC%9D%B8-%EC%9C%A0%ED%95%99%EC%83%9D-topik-4%EA%B8%89-%EB%8C%80%EB%B9%84%EB%B0%98-%EB%AA%A8%EC%A7%91-%EC%95%88%EB%82%B4&keyword",
-   "postedAt": "2026-10-23",
-   "school": "숭실대학교",
-   "campus": "",
-   "src": "3b348584",
-   "foundAt": "2026-10-23",
-   "thumb": "data/news/img/ff12fbbb0fe22baa.webp",
-   "desc": "2. 운영 내용 1) 영역별 기출문제 분석 및 문항 유형 학습 2) 한국어교원자격증 보유 및 강의 경험이 풍부한 외부 강사 1인이 수업 진행"
   }
  ]
 }

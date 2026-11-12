@@ -3,6 +3,28 @@
  "updatedAt": "2026-11-12",
  "items": [
   {
+   "title": "[채용공고] 국립부경대학교 인문사회과학대학 국어국문학과 조교 채용 공고",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726972",
+   "postedAt": "2026-11-12",
+   "kind": "채용",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-11-12"
+  },
+  {
+   "title": "#### [현대자동차] 채용설명회 안내(11/19(목), 14:00~15:30, 동원장보고관 1층 동원아카데미홀) ####",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726971",
+   "postedAt": "2026-11-12",
+   "kind": "행사",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-11-12",
+   "thumb": "data/news/img/8d509f586dfd5107.webp",
+   "desc": "학생성공지원과 [2027 현대자동차 서비스엔지니어 채용설명회(국립부경대학교 High-Tech Talent Day)]"
+  },
+  {
    "title": "[채용공고] 국립부경대학교 이차전지특성화대학지원사업단 계약교수(산학중점) 채용",
    "url": "https://www.pknu.ac.kr/main/163?action=view&no=726965",
    "postedAt": "2026-11-11",
@@ -406,27 +428,6 @@
    "src": "53a197d6",
    "foundAt": "2026-10-27",
    "desc": "학사관리과 1. 2차 졸업예비사정 대상자 ※ 휴학생은 대상자 아님 (휴학생 졸업 불가) < 2학기 수강 중인 학점 및 계절수업 수강신청학점 포함 > < 본인의 1차 졸업예비사정 결과를 참고하여 계절수업 수강 필요…"
-  },
-  {
-   "title": "2026학년도 동계 계절수업 개설 교과목 및 수강신청 등 일정 안내",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726753",
-   "postedAt": "2026-10-26",
-   "kind": "학사",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-26"
-  },
-  {
-   "title": "2026학년도 하반기 2차 국제교류본부 한국어강사 채용 공고",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726749",
-   "postedAt": "2026-10-26",
-   "kind": "채용",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/a3fbd8cf0a5696ca.webp"
   }
  ]
 }
