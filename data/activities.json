@@ -254,6 +254,46 @@
    "excerptsAt": "2026-11-12"
   },
   {
+   "title": "스타트업을 위한 B2B 영업 전략 특강",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179769",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-11-17",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-10 ~ 2026-11-17"
+    },
+    {
+     "label": "대상",
+     "text": "교육에 관심 있는 충남 지역 예비창업자 및 초기창업자"
+    },
+    {
+     "label": "활동지역",
+     "text": "충남"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "한국기술교육대학교 앵커사업단",
+   "api": "kstartup",
+   "apiId": "179769",
+   "id": "api-kstartup-179769",
+   "eligibilityLines": [
+    "교육에 관심 있는 충남 지역 예비창업자 및 초기창업자"
+   ],
+   "noticeLines": [
+    "충남 지역 예비·초기 창업자의 첫 B2B 고객 확보를 지원하기 위한 「스타트업을 위한 B2B 영업 전략 특강」을 다음과 같이 안내하오니, 관심 있는 창업자의 많은 참여 바랍니다.",
+    "온라인 접수 : https://forms.gle/QnDxFp1p3BAmkMeF8"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-11-12",
+   "seenAt": "2026-11-12",
+   "excerptsAt": "2026-11-12"
+  },
+  {
    "title": "2026년도 제4차 북부창업아카데미 및 북부창업멘토링 DAY 참가자 모집(주제 : 2027 정부지원사업 합격을 위한 실전 전략)",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179741",
    "kind": "대외활동",
@@ -546,8 +586,8 @@
    "excerptsAt": "2026-11-12"
   },
   {
-   "title": "[강동구 청년해냄센터] 2027년 정부 지원 사업 대비 성공 창업 스쿨 참가자 모집 공고",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179766",
+   "title": "2026 전북콘텐츠코리아랩 AI 활용 콘텐츠(캐릭터) 아이디어 발굴 캠프",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179772",
    "kind": "대외활동",
    "field": "교육·캠프",
    "deadline": "2026-11-23",
@@ -555,74 +595,34 @@
    "excerpts": [
     {
      "label": "모집기간",
-     "text": "2026-11-09 ~ 2026-11-23"
+     "text": "2026-11-10 ~ 2026-11-23"
     },
     {
      "label": "대상",
-     "text": "2027년 정부 지원 사업 도전을 희망하는 예비창업자 및 기창업자 24명"
+     "text": "도내 청년 15명"
     },
     {
      "label": "활동지역",
-     "text": "전국"
+     "text": "전북"
     }
    ],
    "attachments": [],
    "school": "",
    "campus": "",
-   "host": "강동구 청년해냄센터",
+   "host": "(재)전북특별자치도 콘텐츠융합진흥원",
    "api": "kstartup",
-   "apiId": "179766",
-   "id": "api-kstartup-179766",
+   "apiId": "179772",
+   "id": "api-kstartup-179772",
    "eligibilityLines": [
-    "2027년 정부 지원 사업 도전을 희망하는 예비창업자 및 기창업자 24명"
+    "도내 청년 15명",
+    "대상 연령 : 만 20세 이상 ~ 만 39세 이하"
    ],
    "noticeLines": [
-    "강동구 청년해냄센터에서 다음과 같이 공고하오니 참여를 희망하는 창업자는 안내에 따라 신청하시기 바랍니다.",
-    "온라인 접수 : http://www.gdhaenaem.com/?c=168"
+    "우리원에서는 아이디어를 보유한 창·제작자 발굴 및 디지털 역량 강화를 위해 “AI 활용 캐릭터(콘텐츠) 아이디어 발굴 캠프”참가자를 모집하오니 많은 관심과 참여 바랍니다.",
+    "온라인 접수 : https://forms.gle/pqE4dQ3izE16pCVC9"
    ],
    "detailsV": 6,
    "foundAt": "2026-11-11",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "제9회 원주권 스타트업 커뮤니티 데이 참가자 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179727",
-   "kind": "대외활동",
-   "deadline": "2026-11-23",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-05 ~ 2026-11-23"
-    },
-    {
-     "label": "대상",
-     "text": "창업에 관심있는 누구나"
-    },
-    {
-     "label": "활동지역",
-     "text": "강원"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "상지대학교 벤처창업본부",
-   "api": "kstartup",
-   "apiId": "179727",
-   "id": "api-kstartup-179727",
-   "eligibilityLines": [
-    "창업에 관심있는 누구나"
-   ],
-   "noticeLines": [
-    "상지대학교 벤처창업본부에서는 (예비)창업기업의 네트워크 형성을 통한 사업화 촉진을 돕기 위해",
-    "「 제9회 원주권 스타트업 커뮤니티 데이 참가자 모집 」을 개최합니다.",
-    "많은 관심과 참여 바랍니다.",
-    "온라인 접수 : https://forms.gle/UegLwQTQYpD8AjcW6"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-11-12",
    "seenAt": "2026-11-12",
    "excerptsAt": "2026-11-12"
   },
@@ -662,50 +662,6 @@
     "일부 대학에서 요구하는 기관장 날인된 봉사활동 확인서를 개별 발급하지 않습니다.",
     "(봉사활동 확인서는 월말에 1365 자원봉사포털에서 개별 발급)",
     "일시: 2026년 11월 (토요일 오후) 13:00~17:00",
-    "장소: 대전수학문화관",
-    "대상: 교육봉사활동에 관심 있는 대학생",
-    "활동 내용"
-   ],
-   "foundAt": "2026-11-07",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "11월(오전) 대전수학문화관 대학생 봉사활동 모집",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3540321",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-11-12",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-23 ~ 2026-11-12"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026-11-02 ~ 2026-11-30"
-    },
-    {
-     "label": "활동지역",
-     "text": "대전수학문화관"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "대전교육정보원 대전수학문화관",
-   "api": "vol1365",
-   "apiId": "3540321",
-   "id": "api-vol1365-3540321",
-   "detailsV": 6,
-   "eligibilityLines": [
-    "3. 대상: 교육봉사활동에 관심 있는 대학생"
-   ],
-   "noticeLines": [
-    "일부 대학에서 요구하는 기관장 날인된 봉사활동 확인서를 개별 발급하지 않습니다.",
-    "(봉사활동 확인서는 월말에 1365 자원봉사포털에서 개별 발급)",
-    "일시: 2026년 11월 (오전) 09:00~12:00",
     "장소: 대전수학문화관",
     "대상: 교육봉사활동에 관심 있는 대학생",
     "활동 내용"
@@ -791,47 +747,6 @@
     "활동장소: 양천구 미감도서관"
    ],
    "foundAt": "2026-11-10",
-   "seenAt": "2026-11-12",
-   "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "[초록봉사단] 사랑의 연탄 나눔(고등학생, 대학생, 일반)",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3538407",
-   "kind": "대외활동",
-   "field": "봉사",
-   "deadline": "2026-11-13",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-20 ~ 2026-11-13"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026-11-14 ~ 2026-11-14"
-    },
-    {
-     "label": "활동지역",
-     "text": "부산진구 부암동"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "부산광역시 부산진구",
-   "api": "vol1365",
-   "apiId": "3538407",
-   "id": "api-vol1365-3538407",
-   "detailsV": 6,
-   "noticeLines": [
-    "초록봉사단에서 성인 자원봉사자를 모집합니다.",
-    "★★집결장소 확인 필수★★",
-    "활동내용 : 저소득가정 연탄 나눔 활동",
-    "활동일시 : 11/14(토) 9:00~15:00",
-    "★★★집결장소 : 부암1동 주민센터★★★",
-    "활동장소 : 부산진구 부암동"
-   ],
-   "foundAt": "2026-11-01",
    "seenAt": "2026-11-12",
    "excerptsAt": "2026-11-12"
   },
@@ -1092,6 +1007,50 @@
    "excerptsAt": "2026-11-12"
   },
   {
+   "title": "11월(오전) 대전수학문화관 대학생 봉사활동 모집",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3540321",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-11-16",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-23 ~ 2026-11-16"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-11-02 ~ 2026-11-30"
+    },
+    {
+     "label": "활동지역",
+     "text": "대전수학문화관"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "대전교육정보원 대전수학문화관",
+   "api": "vol1365",
+   "apiId": "3540321",
+   "id": "api-vol1365-3540321",
+   "detailsV": 6,
+   "eligibilityLines": [
+    "3. 대상: 교육봉사활동에 관심 있는 대학생"
+   ],
+   "noticeLines": [
+    "일부 대학에서 요구하는 기관장 날인된 봉사활동 확인서를 개별 발급하지 않습니다.",
+    "(봉사활동 확인서는 월말에 1365 자원봉사포털에서 개별 발급)",
+    "일시: 2026년 11월 (오전) 09:00~12:00",
+    "장소: 대전수학문화관",
+    "대상: 교육봉사활동에 관심 있는 대학생",
+    "활동 내용"
+   ],
+   "foundAt": "2026-11-07",
+   "seenAt": "2026-11-12",
+   "excerptsAt": "2026-11-12"
+  },
+  {
    "title": "청소년 자원봉사스쿨 한지공예소품 만들기(중,고, 대학생 신청 가능)",
    "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3541198",
    "kind": "대외활동",
@@ -1253,6 +1212,50 @@
     "태안의 이야기를 배우고 함께 자원봉사의 힘을 실천할 대학생 여러분의 많은 참여를 바랍니다.",
     "▶ 일시: 2026. 11. 20.(금) 9:00~16:00",
     "※ 봉사시간 4시간 인정(10:00~14:00)"
+   ],
+   "foundAt": "2026-11-12",
+   "seenAt": "2026-11-12",
+   "excerptsAt": "2026-11-12"
+  },
+  {
+   "title": "[사상구도시재생지원센터] 삼덕 레스토랑 행사 안내 및 도우미(대학생 이상)(저녁)",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3546123",
+   "kind": "대외활동",
+   "field": "봉사",
+   "deadline": "2026-11-18",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-04 ~ 2026-11-18"
+    },
+    {
+     "label": "활동기간",
+     "text": "2026-11-20 ~ 2026-11-21"
+    },
+    {
+     "label": "활동지역",
+     "text": "덕포시장 일원"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "사상구 도시재생지원센터",
+   "api": "vol1365",
+   "apiId": "3546123",
+   "id": "api-vol1365-3546123",
+   "detailsV": 6,
+   "eligibilityLines": [
+    "6. 모집대상: 대학생 5명 (저녁 제공)"
+   ],
+   "noticeLines": [
+    "행 사 명: 삼덕 레스토랑",
+    "활동일시: 2026년 11월 20일(금) ~21일(토)",
+    "집결장소: 삼락덕포동 도시재생현장지원센터 (덕포시장 고객쉼터 1층)",
+    "활동장소: 덕포전통시장 일원",
+    "활동내용: 운영 보조, 도로 통제 안내, 환경 정화, 행사 마무리 등",
+    "모집대상: 대학생 5명 (저녁 제공)"
    ],
    "foundAt": "2026-11-12",
    "seenAt": "2026-11-12",
@@ -1961,35 +1964,6 @@
    "foundAt": "2026-11-12",
    "seenAt": "2026-11-12",
    "excerptsAt": "2026-11-12"
-  },
-  {
-   "title": "2026 전북콘텐츠코리아랩 AI 활용 콘텐츠(캐릭터) 아이디어 발굴 캠프",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179772",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": null,
-   "deadline": "2026-11-23",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-10 ~ 2026-11-23 15:00"
-    }
-   ],
-   "eligibilityLines": [
-    "대상 : 대학생, 일반인",
-    "예비창업자",
-    "공고 제2026-151호",
-    "(재)전북특별자치도 콘텐츠융합진흥원",
-    "대상연령 : 만 20세 이상 ~ 만 39세 이하",
-    "신청대상 : 도내 청년 15명"
-   ],
-   "detailsV": 6,
-   "field": "교육·캠프",
-   "excerptsAt": "2026-11-11",
-   "school": "",
-   "campus": "",
-   "host": "창업진흥원 K-Startup",
-   "foundAt": "2026-11-11"
   },
   {
    "title": "2026 여성벤처활성화사업 「여성벤처&스타트업 혁신성장 포럼」참여자 모집",
