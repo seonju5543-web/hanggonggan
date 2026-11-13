@@ -83,6 +83,49 @@
    "excerptsAt": "2026-11-13"
   },
   {
+   "title": "[창업중심대학]2026 대학연합 지역관광 창업경진대회(K-TOURISM STARTUP CHALLENGE)",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179781",
+   "kind": "공모전",
+   "field": "창업",
+   "deadline": "2026-11-15",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-11 ~ 2026-11-15"
+    },
+    {
+     "label": "대상",
+     "text": "예비창업자"
+    },
+    {
+     "label": "활동지역",
+     "text": "서울"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "한양대 창업지원단",
+   "api": "kstartup",
+   "apiId": "179781",
+   "id": "api-kstartup-179781",
+   "eligibilityLines": [
+    "예비창업자"
+   ],
+   "eligibilityExcludes": [
+    "기창업자"
+   ],
+   "noticeLines": [
+    "2026 대학연합 지역관광 창업경진대회(K-TOURISM STARTUP CHALLENGE)를 개최하오니 관광분야 아이템을 가진 예비창업자들의 많은 관심 부탁드립니다.",
+    "온라인 접수 : https://hyu-tour-contest.netlify.app"
+   ],
+   "detailsV": 6,
+   "foundAt": "2026-11-13",
+   "seenAt": "2026-11-13",
+   "excerptsAt": "2026-11-13"
+  },
+  {
    "title": "[청년 취창업 특강] 나만의 일을 만들어가는 방법",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179611",
    "kind": "대외활동",
@@ -571,46 +614,6 @@
     "「 제9회 원주권 스타트업 커뮤니티 데이 참가자 모집 」을 개최합니다.",
     "많은 관심과 참여 바랍니다.",
     "온라인 접수 : https://forms.gle/UegLwQTQYpD8AjcW6"
-   ],
-   "detailsV": 6,
-   "foundAt": "2026-11-13",
-   "seenAt": "2026-11-13",
-   "excerptsAt": "2026-11-13"
-  },
-  {
-   "title": "경기대학교 2026년 예비창업패키지 KGU 창업준비 아카데미 모집 신청 공고",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179673",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-11-23",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-30 ~ 2026-11-23"
-    },
-    {
-     "label": "대상",
-     "text": "혁신적인 기술 또는 아이디어로 창업을 준비 중인 예비창업자"
-    },
-    {
-     "label": "활동지역",
-     "text": "경기"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "경기대학교 창업지원단",
-   "api": "kstartup",
-   "apiId": "179673",
-   "id": "api-kstartup-179673",
-   "eligibilityLines": [
-    "혁신적인 기술 또는 아이디어로 창업을 준비 중인 예비창업자"
-   ],
-   "noticeLines": [
-    "경기대학교 창업지원단에서 2026 예비창업패키지 KGU 창업준비 아카데미 모집 계획을 공고하오니, 창업을 준비하시는 예비창업자 분들의 많은 관심과 참여 바랍니다.",
-    "온라인 접수 : https://forms.gle/ij95oNbcrqMxXXX56"
    ],
    "detailsV": 6,
    "foundAt": "2026-11-13",
@@ -1211,8 +1214,8 @@
    "excerptsAt": "2026-11-13"
   },
   {
-   "title": "2026년 K-김장문화축제 행사 지원자(대학생) 모집:11.21(토)~11.22(일)",
-   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3545510",
+   "title": "푸른나눔 자원봉사 기본교육(대학생 및 성인)",
+   "url": "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3545702",
    "kind": "대외활동",
    "field": "봉사",
    "deadline": "2026-11-19",
@@ -1220,35 +1223,32 @@
    "excerpts": [
     {
      "label": "모집기간",
-     "text": "2026-11-02 ~ 2026-11-19"
+     "text": "2026-11-03 ~ 2026-11-19"
     },
     {
      "label": "활동기간",
-     "text": "2026-11-21 ~ 2026-11-22"
+     "text": "2026-11-20 ~ 2026-11-20"
     },
     {
      "label": "활동지역",
-     "text": "익산시중앙체육공원"
+     "text": "천안시자원봉사센터 교육실"
     }
    ],
    "attachments": [],
    "school": "",
    "campus": "",
-   "host": "전북특별자치도 익산시",
+   "host": "천안시자원봉사센터",
    "api": "vol1365",
-   "apiId": "3545510",
-   "id": "api-vol1365-3545510",
+   "apiId": "3545702",
+   "id": "api-vol1365-3545702",
    "detailsV": 6,
-   "eligibilityLines": [
-    "대학생"
-   ],
    "noticeLines": [
-    "*행 사 : 2026년 'K-김장문화축제 익산'",
-    "*주 최 : 익산시농촌활력지원센터",
-    "*일 시 : 26.11.21(토), 26.11.22(일) 08:00-17:00(8시간 인정)",
-    "*집결장소 : 익산시중앙체육공원 종합안내소",
-    "*내 용 : 행사 진행 보조 및 뒷정리",
-    "(김장체험 부스관리, 안내 부스 관리, 김장꾸러미 이동, 행사장 안내, 청소 등)"
+    "[푸른나눔 자원봉사 기본교육(대학생 및 성인)]",
+    "일시 : 2026년 11월 20일(금) 14:00~15:00(1시간) ***시간엄수",
+    "내용 : 자원봉사 기본교육",
+    "인원 : 25명(대학생 및 성인)",
+    "장소 : 천안시자원봉사센터 교육실 (천안시 동남구 신촌로24 공구상가 1층)",
+    "(구 홈플러스 신방점 옆 공구상가1층 남천안 농협 오른쪽 입구)"
    ],
    "foundAt": "2026-11-13",
    "seenAt": "2026-11-13",
