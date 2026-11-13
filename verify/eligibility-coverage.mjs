@@ -34,21 +34,26 @@ const acts = readItems('COVERAGE_ACTIVITIES', '../data/activities.json');
 const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);   // KST
 const open = (d) => !d || d >= today;
 /* 층2 는 자격 줄이 재단 칸에 들어 있다 — **앱의 상수를 글자로 읽어 쓴다**(app.js `KOSAF_ELIG`·`kosafClean` 한 줄짜리 const · 베끼면 칸 수가 갈라진다 — 리뷰가 잡았다).
-   줄 쪼개기는 앱이 쪼개는 모양(줄바꿈·○ 글머리)과 같게 두고, 앱이 버리는 `제한없음` 줄도 버린다 */
+   줄 쪼개기도 앱의 한 줄(`kosafSplit` · ○ㅇ※ 글머리 · 앱이 버리는 `제한없음` 줄도 버린다)을 그대로 쓴다 — 따로 쪼갰더니 `※ 자세한 사항은 …` 꼬리가
+   앞 줄에 붙어 **앱에 없는 줄**을 못 읽는 줄로 세고 있었다(2026-11-11 · 6차) */
 const appSrc = fs.readFileSync(new URL('../app.js', HERE), 'utf8');
 const takeConst = (name) => { const m = appSrc.match(new RegExp(`^const ${name} = .*$`, 'm')); if (!m) throw new Error(`app.js 에서 ${name} 을 못 찾았습니다`); return m[0]; };
 const appCtx = vm.createContext({ String, RegExp, Array });
-vm.runInContext([takeConst('KOSAF_ELIG'), takeConst('kosafClean'), takeConst('KOSAF_NOISE')].join('\n'), appCtx);
+vm.runInContext([takeConst('KOSAF_ELIG'), takeConst('kosafClean'), takeConst('KOSAF_NOISE'), takeConst('kosafSplit')].join('\n'), appCtx);
 const KOSAF_ELIG = vm.runInContext('KOSAF_ELIG', appCtx);
 const kosafClean = vm.runInContext('kosafClean', appCtx);
 const KOSAF_NOISE = vm.runInContext('KOSAF_NOISE', appCtx);   // 앱이 버리는 줄(`제한없음`·`기관확인필요`·`해당없음`)은 여기서도 버린다 — 규칙은 app.js 한 곳
-const split = (v) => String(v || '').split(/\n|\s*[○◦•·▪]\s+/).map((s) => kosafClean(s.trim())).filter((s) => s.length >= 4 && !KOSAF_NOISE.test(s));
+const split = vm.runInContext('kosafSplit', appCtx);   // 앱 kosafAsScholarships 와 같은 줄 — kosafClean·KOSAF_NOISE 는 이 안에서 쓰인다
 const screenLines = (it, raw) => { try { return ME.requirementLines(it, raw, { all: true }) || []; } catch { return raw || []; } };
 
 const SETS = {
   '정식 등록(마감 전)': reg.filter((s) => open(s.deadline)).map((s) => ({ name: s.name, lines: screenLines(s, null) })),
   /* 앱은 자격 칸(KOSAF_ELIG) + 제외 칸(`자격제한` → eligibilityExcludes · 화면 「이런 경우는 제외돼요」)을 학생에게 보인다 — 둘 다 센다(징계·중복수혜 줄이 제외 칸에 있다) */
-  '층2 한국장학재단': kosaf.map((k) => ({ name: k.name, lines: [...KOSAF_ELIG, '자격제한'].flatMap((f) => split((k.fields || {})[f])) })),
+  /* 제외 칸 줄은 앱처럼 **제외 줄로** 읽는다(parseLine(…, true) · 2026-11-11 · 6차) — 학교 유형·국적 같은 제외 조항은 제외 줄에서만 조건이 나와, 자격 줄로 읽으면 다 '못 읽는 줄'로 셌다.
+     자격 칸 줄도 다른 두 묶음처럼 화면 줄(requirementLines)을 거친다 — 앱이 버리는 잡음 줄(`자세한 사항은 … 참고`)을 못 읽는 줄로 세지 않게 */
+  '층2 한국장학재단': kosaf.map((k) => ({ name: k.name,
+    lines: screenLines({ name: `${k.org} ${k.name}`, provider: k.org }, KOSAF_ELIG.flatMap((f) => split((k.fields || {})[f]))),
+    exLines: split((k.fields || {})['자격제한']) })),
   '대외활동·공모전(마감 전)': acts.filter((a) => open(a.deadline)).map((a) => ({ name: a.title, lines: screenLines(a, a.eligibilityLines || []) })),
 };
 
@@ -59,10 +64,10 @@ export function coverage(sets = SETS) {
     let lines = 0;
     for (const it of items) {
       const k = new Set(), t = new Set(), a = new Set();
-      for (const line of it.lines) {
+      for (const [line, ex] of [...it.lines.map((l) => [l, false]), ...(it.exLines || []).map((l) => [l, true])]) {
         lines += 1;
         let conds = [];
-        try { conds = PR.parseLine(line).conds || []; } catch { /* 못 읽는 줄은 아래 noCond 로 */ }
+        try { conds = PR.parseLine(line, ex).conds || []; } catch { /* 못 읽는 줄은 아래 noCond 로 */ }
         if (!conds.length) { noCond.set(line, (noCond.get(line) || []).concat(it.name)); continue; }
         for (const c of conds) {
           k.add(c.kind);
