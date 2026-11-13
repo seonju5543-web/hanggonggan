@@ -1,7 +1,18 @@
 {
  "school": "부산대학교",
- "updatedAt": "2026-11-12",
+ "updatedAt": "2026-11-13",
  "items": [
+  {
+   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(동명대학교)",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512180",
+   "postedAt": "2026-11-13",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-13",
+   "desc": "2026학년도 겨울계절수업 동명대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
+  },
   {
    "title": "[BK21 대학원혁신] 2026학년도 2학기 대학원생 핵심역량 진단 실시(~12...",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512171",
@@ -412,17 +423,6 @@
    "src": "2d0d4013",
    "foundAt": "2026-10-30",
    "desc": "7 차 주제 신체감각 및 이완을 통한 심리안정화 기술 익히기 7 차 일정 : 2026.11.20. ( 금 ) 10:30 &sim; 11:30 7 차 신청기한 : 2026.10.19.~ 2026.11.17. *…"
-  },
-  {
-   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(전남대학교 HUSS)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511851",
-   "postedAt": "2026-10-30",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-30",
-   "desc": "2026학년도 겨울계절수업 전남대학교(HUSS) 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
   }
  ]
 }

@@ -1,7 +1,29 @@
 {
  "school": "고려대학교",
- "updatedAt": "2026-11-12",
+ "updatedAt": "2026-11-13",
  "items": [
+  {
+   "title": "[한국어센터] 입학식 단기근로학생 모집(12/3, 12/10)",
+   "url": "https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE2ODklMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
+   "postedAt": "2026-11-12",
+   "postId": "000060000000061689",
+   "kind": "학사",
+   "school": "고려대학교",
+   "campus": "",
+   "src": "26a9afc2",
+   "foundAt": "2026-11-13"
+  },
+  {
+   "title": "[지속가능원] 교내 행사 다회용기 무료 대여 안내 — 찾아가는 다회용기 ‘찾다’",
+   "url": "https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE2ODclMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
+   "postedAt": "2026-11-12",
+   "postId": "000060000000061687",
+   "school": "고려대학교",
+   "campus": "",
+   "src": "26a9afc2",
+   "foundAt": "2026-11-13",
+   "thumb": "data/news/img/7a2d492e9bd120d8.webp"
+  },
   {
    "title": "[심포지엄] 노화의 뇌과학 연구에서 실천적 개입까지 (11월19일 목 오후4시)",
    "url": "https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE2ODIlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
@@ -324,17 +346,6 @@
    "src": "26a9afc2",
    "foundAt": "2026-10-14",
    "thumb": "data/news/img/f4b41f26fea198ca.webp"
-  },
-  {
-   "title": "(어학강좌) OPIc IH+ Challenge 모집 안내",
-   "url": "https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE1MDQlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
-   "postedAt": "2026-10-13",
-   "postId": "000060000000061504",
-   "school": "고려대학교",
-   "campus": "",
-   "src": "26a9afc2",
-   "foundAt": "2026-10-13",
-   "thumb": "data/news/img/209ddc734c64963a.webp"
   }
  ]
 }

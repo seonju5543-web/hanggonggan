@@ -1,7 +1,47 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-11-12",
+ "updatedAt": "2026-11-13",
  "items": [
+  {
+   "title": "[취업정보] [신한캐피탈]투자금융사무지원(보훈) 채용(~11.23.(월)1...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70986",
+   "postedAt": "2026-11-13",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-13"
+  },
+  {
+   "title": "[취업정보] 2026「CAREER REBRANDING」경험 기반 협업 프로...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70985",
+   "postedAt": "2026-11-13",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-13",
+   "thumb": "data/news/img/268f522e302405f4.webp"
+  },
+  {
+   "title": "[채용공고] 국제처 국제협력과 교육공무원(조교) 공개채용 공고",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70984",
+   "postedAt": "2026-11-13",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-13"
+  },
+  {
+   "title": "[학사안내] 2025학년도 동계 계절학기 타 대학교(호남대) 교류수학 신청...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70983",
+   "postedAt": "2026-11-13",
+   "kind": "학사",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-13"
+  },
   {
    "title": "[채용공고] 전남대학교 미래전략본부 졸업생 취업결과 실태 조사원 채용 공고",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70981",
@@ -363,47 +403,6 @@
    "campus": "",
    "src": "b7347301",
    "foundAt": "2026-11-08"
-  },
-  {
-   "title": "[취업정보] [한국예술인복지재단]2027년 제1차 직원채용~(11.5.(목...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70891",
-   "postedAt": "2026-11-03",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-03"
-  },
-  {
-   "title": "[취업정보] [앤비젼]2026년 하반기 공개채용(~11.8.(일)까지)",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70890",
-   "postedAt": "2026-11-03",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-03"
-  },
-  {
-   "title": "[취업정보] [iM증권]2026 신입사원 채용(~11.8.(일)까지)",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70889",
-   "postedAt": "2026-11-03",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-03"
-  },
-  {
-   "title": "[취업정보] [가비아]채용연계형인턴채용(~11.15.(일)까지)",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70888",
-   "postedAt": "2026-11-03",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-03",
-   "thumb": "data/news/img/b87f8195cb7bc996.webp"
   }
  ]
 }

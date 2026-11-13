@@ -1,6 +1,6 @@
 {
  "school": "조선대학교",
- "updatedAt": "2026-11-12",
+ "updatedAt": "2026-11-13",
  "items": [
   {
    "title": "[보건진료소] 2026년도 교내헌혈 안내 (11.17)",
@@ -424,18 +424,6 @@
    "foundAt": "2026-10-14",
    "thumb": "data/news/img/4ef0b746cf78be93.webp",
    "desc": "📝 신청 대상 및 신청 방법 신청 대상: 누구나 무료로 참여 가능 (참가비 무료) ① 홈페이지 예약 CSU창작마을센터 홈페이지 접속 사용신청 &rarr; 투어 &rarr; 예약신청 홈페이지:…"
-  },
-  {
-   "title": "[중앙도서관] 학생 자율 독서토론클럽「읽는사이」모집",
-   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/281995/artclView.do",
-   "postedAt": "2026-10-13",
-   "kind": "생활",
-   "school": "조선대학교",
-   "campus": "",
-   "src": "c6a7801d",
-   "foundAt": "2026-10-13",
-   "thumb": "data/news/img/88b312934a713ce9.webp",
-   "desc": "◦ 운영 기간 : 2026. 10. 26.(월) ~ 11. 30.(월) ◦ 참여 대상 : 학부생 약 60여명"
   }
  ]
 }

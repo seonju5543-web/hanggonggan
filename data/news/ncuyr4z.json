@@ -1,7 +1,18 @@
 {
  "school": "전북대학교",
- "updatedAt": "2026-11-12",
+ "updatedAt": "2026-11-13",
  "items": [
+  {
+   "title": "[RED/BLUE필수]2026년 2차 직무 자격증 과정 추가모집(※중복신청가능※)",
+   "url": "https://www.jbnu.ac.kr/web/Board/219797/detailView.do",
+   "postedAt": "2026-11-13",
+   "postId": "219797",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-11-13",
+   "desc": "학생취업진로처 취업진로지원과 추가모집 과정: 비즈니스엑셀(15명), 통계적공정관리(10명) 추가모집 기간: ~11/13. 13시까지 서로 다른 날짜에 운영하는 자격증의 경우 중복신청 가능!!!"
+  },
   {
    "title": "[RED/BLUE필수]2026년 2차 직무 자격증 과정 추가모집(※중복신청가능※)",
    "url": "https://www.jbnu.ac.kr/web/Board/219768/detailView.do",
@@ -457,16 +468,6 @@
    "src": "e41d3fac",
    "foundAt": "2026-11-02",
    "desc": "학생취업진로처 학생지원과 < 2026 장애 이해 전문강사 초빙 교육 ( 법정의무교육 ) >"
-  },
-  {
-   "title": "전북대학교 온라인 취업 지원 시스템 이용 안내(종합)",
-   "url": "https://www.jbnu.ac.kr/web/Board/219312/detailView.do",
-   "postedAt": "2026-11-02",
-   "postId": "219312",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-11-02"
   }
  ]
 }

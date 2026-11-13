@@ -1,7 +1,88 @@
 {
  "school": "이화여자대학교",
- "updatedAt": "2026-11-12",
+ "updatedAt": "2026-11-13",
  "items": [
+  {
+   "title": "[교목실] 2026 이화가족 성탄예배 안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367744&article.offset=0&articleLimit=10&no=337",
+   "postedAt": "2026-11-02",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-13"
+  },
+  {
+   "title": "[출판문화원] 2027 이화달력 · 이화플래너 퀴즈 이벤트!",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367930&article.offset=0&articleLimit=10&no=336",
+   "postedAt": "2026-11-13",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-13",
+   "thumb": "data/news/img/e030c4aafbafb169.webp"
+  },
+  {
+   "title": "[채용] 이화여자대학교 안전팀 계약직원(행정) 채용",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367923&article.offset=0&articleLimit=10&no=333",
+   "postedAt": "2026-11-12",
+   "kind": "채용",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-13",
+   "desc": "이화여자대학교 안전팀 사무실에서 근무할 계약직원(행정)을 다음과 같이 모집하오니 관심 있는 분들의 많은 지원 바랍니다."
+  },
+  {
+   "title": "[중앙도서관] 2027년 2월 졸업 석·박사학위논문 온라인 제출 사전 안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367922&article.offset=0&articleLimit=10&no=332",
+   "postedAt": "2026-11-12",
+   "kind": "학사",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-13",
+   "desc": "■ 제출기간 : 2026. 12. 21.(월) ~ 12. 28.(월) ■ 제출방법 : 온라인 제출 (완제본 책자 제출 없음)"
+  },
+  {
+   "title": "[기업가센터/창업지원단] 2026년 이화여자대학교 학생창업자를 찾습니다!",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367907&article.offset=0&articleLimit=10&no=331",
+   "postedAt": "2026-11-12",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-13",
+   "desc": "\"2026년 1월 1일 ~ 12월 31일\" 기간 내 창업한 이화여자대학교 대학(원)생은 사업자등록증을 제출하시면 기프티콘을 드립니다!"
+  },
+  {
+   "title": "[마감] 11월 13일(금) 다우리데이 행사 보조 아르바이트 모집",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367905&article.offset=0&articleLimit=10&no=329",
+   "postedAt": "2026-11-12",
+   "kind": "채용",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-13",
+   "desc": "안녕하세요. 학생처 사회봉사팀입니다. 사회봉사팀에서 다우리데이 행사 보조 아르바이트생을 모집합니다."
+  },
+  {
+   "title": "[이화과자] 크리스마스 쿠키박스로 사랑을 전하세요!",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367904&article.offset=0&articleLimit=10&no=328",
+   "postedAt": "2026-11-12",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-13"
+  },
+  {
+   "title": "[다문화연구소] 네팔, 제37회 상호문화대화(Intercultural Dialogue) 개최 / 11월 26일(목) 학생문화관 B101 소극장",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367901&article.offset=0&articleLimit=10&no=327",
+   "postedAt": "2026-11-11",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-13",
+   "desc": "상호문화대화는 이화여자대학교 다문화연구소와 국제처가 공동으로 주최하고 있습니다. 상호문화대화 는 민족적, 문화적, 언어적 배경이 다른 개인들이나 집단들이 상호 이해와 존중을 바탕으로 개방적이고 예의 바른 의견…"
+  },
   {
    "title": "[인권센터] 2026학년도「인권 및 폭력예방교육」이수자 이화굿즈 뽑기 이벤트🍀",
    "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367875&article.offset=0&articleLimit=10&no=336",
@@ -19,7 +100,8 @@
    "school": "이화여자대학교",
    "campus": "",
    "src": "ec6597da",
-   "foundAt": "2026-11-12"
+   "foundAt": "2026-11-12",
+   "desc": "이화여대 창지단 마스코트 데뷔조 최종 2인, 여러분의 선택은? 데뷔시키고, 이름 짓고, 에어팟 · 디지털 카메라 받아가자! https://forms.gle/C9X9o2mBbWmtxFYi6 반짝이는 아이디어로 세상을…"
   },
   {
    "title": "[글로벌소통교육실] 2026 겨울 고급영어글쓰기, 스피킹 마스터 프로그램 신청 안내",
@@ -49,15 +131,6 @@
    "foundAt": "2026-11-12"
   },
   {
-   "title": "[교목실] 2026 이화가족 성탄예배 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367744&article.offset=0&articleLimit=10&no=336",
-   "postedAt": "2026-11-02",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-11-12"
-  },
-  {
    "title": "[학부]2026학년도 전기(2027년 2월) 졸업예정여부 조회 및 졸업의사 신청 관련 안내",
    "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367714&article.offset=0&articleLimit=10&no=336",
    "postedAt": "2026-10-30",
@@ -66,68 +139,6 @@
    "campus": "",
    "src": "ec6597da",
    "foundAt": "2026-11-12"
-  },
-  {
-   "title": "[채용] 이화여자대학교 안전팀 계약직원(행정) 채용",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367923&article.offset=0&articleLimit=10&no=334",
-   "postedAt": "2026-11-12",
-   "kind": "채용",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-11-12",
-   "desc": "이화여자대학교 안전팀 사무실에서 근무할 계약직원(행정)을 다음과 같이 모집하오니 관심 있는 분들의 많은 지원 바랍니다."
-  },
-  {
-   "title": "[중앙도서관] 2027년 2월 졸업 석·박사학위논문 온라인 제출 사전 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367922&article.offset=0&articleLimit=10&no=333",
-   "postedAt": "2026-11-12",
-   "kind": "학사",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-11-12",
-   "desc": "■ 제출기간 : 2026. 12. 21.(월) ~ 12. 28.(월) ■ 제출방법 : 온라인 제출 (완제본 책자 제출 없음)"
-  },
-  {
-   "title": "[기업가센터/창업지원단] 2026년 이화여자대학교 학생창업자를 찾습니다!",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367907&article.offset=0&articleLimit=10&no=332",
-   "postedAt": "2026-11-12",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-11-12",
-   "desc": "\"2026년 1월 1일 ~ 12월 31일\" 기간 내 창업한 이화여자대학교 대학(원)생은 사업자등록증을 제출하시면 기프티콘을 드립니다!"
-  },
-  {
-   "title": "[마감] 11월 13일(금) 다우리데이 행사 보조 아르바이트 모집",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367905&article.offset=0&articleLimit=10&no=330",
-   "postedAt": "2026-11-12",
-   "kind": "채용",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-11-12",
-   "desc": "안녕하세요. 학생처 사회봉사팀입니다. 사회봉사팀에서 다우리데이 행사 보조 아르바이트생을 모집합니다."
-  },
-  {
-   "title": "[이화과자] 크리스마스 쿠키박스로 사랑을 전하세요!",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367904&article.offset=0&articleLimit=10&no=329",
-   "postedAt": "2026-11-12",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-11-12"
-  },
-  {
-   "title": "[다문화연구소] 네팔, 제37회 상호문화대화(Intercultural Dialogue) 개최 / 11월 26일(목) 학생문화관 B101 소극장",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367901&article.offset=0&articleLimit=10&no=328",
-   "postedAt": "2026-11-11",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-11-12",
-   "desc": "상호문화대화는 이화여자대학교 다문화연구소와 국제처가 공동으로 주최하고 있습니다. 상호문화대화 는 민족적, 문화적, 언어적 배경이 다른 개인들이나 집단들이 상호 이해와 존중을 바탕으로 개방적이고 예의 바른 의견…"
   },
   {
    "title": "[인재개발원] KOREC 일본취업 설명회 (11/19(목))",
@@ -399,17 +410,6 @@
    "src": "ec6597da",
    "foundAt": "2026-11-09",
    "desc": "1. 지원자격 및 인원 담당 업무 지원자격 및 우대사항 상담연구원 - 성희롱/성폭력 및 인권침해 문제 상담 및 사건 처리"
-  },
-  {
-   "title": "[이화유럽인문코어프로그램] 주경철 교수 강연「바다와 역사, 새로운 기억 새로운 상상」",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367805&article.offset=0&articleLimit=10&no=313",
-   "postedAt": "2026-11-05",
-   "kind": "행사",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-11-09",
-   "desc": "포스터 큐알 코드 및 아래 링크 참조 사전신청 후 참석자에게 기념품을, 모든 참석자에게 다과를 드립니다. 페이스북"
   }
  ]
 }

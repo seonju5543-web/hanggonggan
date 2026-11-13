@@ -1,7 +1,19 @@
 {
  "school": "경희대학교",
- "updatedAt": "2026-11-12",
+ "updatedAt": "2026-11-13",
  "items": [
+  {
+   "title": "국제 [(주)선일다이파스]2027년 정기 공채사원 추천채용",
+   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323570",
+   "postedAt": "2026-11-13",
+   "postId": "323570",
+   "kind": "채용",
+   "school": "경희대학교",
+   "campus": "",
+   "src": "a92b27ac",
+   "foundAt": "2026-11-13",
+   "desc": "1. 제출방법 ① 추천채용 서류 미래인재센터 이메일 제출 ▶ work_register@khu.ac.kr"
+  },
   {
    "title": "공통 KHU:VOICE(쿠:보이스) 시행 안내(2차)",
    "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323568",
@@ -421,18 +433,6 @@
    "foundAt": "2026-10-15",
    "thumb": "data/news/img/95e04c0e85f21a43.webp",
    "desc": "경기도와 함께하는 2026 찾아가는 공정거래 교육을 안내드리오니 관심있는 학생들의 많은 참여 바랍니다."
-  },
-  {
-   "title": "공통 [원테크스탑 한국지점] IT 엔지니어 부문 추천채용",
-   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323297",
-   "postedAt": "2026-10-13",
-   "postId": "323297",
-   "kind": "채용",
-   "school": "경희대학교",
-   "campus": "",
-   "src": "a92b27ac",
-   "foundAt": "2026-10-13",
-   "desc": "1. 제출방법 ① 미래인재센터 이메일 제출 ▶ work_register@khu.ac.kr"
   }
  ]
 }

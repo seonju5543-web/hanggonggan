@@ -1,7 +1,18 @@
 {
  "school": "상명대학교",
- "updatedAt": "2026-11-12",
+ "updatedAt": "2026-11-13",
  "items": [
+  {
+   "title": "대한법무사협회와 교류협력협약 체결... 법무 분야 교류 확장",
+   "url": "https://www.smu.ac.kr/webzine/today.do?mode=view&articleNo=770253&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-13",
+   "school": "상명대학교",
+   "campus": "",
+   "src": "f8a29ec6",
+   "foundAt": "2026-11-13",
+   "thumb": "data/news/img/09270404b18e01c3.webp",
+   "desc": "대외협력팀 우리 대학은 지난 12일 대한법무사협회(회장 이강천)와 교류협력협약(MOU)을 체결하고 법무 분야에 대한 교류 확장에 나섰다."
+  },
   {
    "title": "바이오헬스 혁신융합대학 사업단, NHN클라우드와 바이오헬스 분야 클라우드 활용 및 인재 양성 협력",
    "url": "https://www.smu.ac.kr/webzine/today.do?mode=view&articleNo=770213&article.offset=0&articleLimit=10",
@@ -148,18 +159,6 @@
    "foundAt": "2026-10-15",
    "thumb": "data/news/img/14f70cc3af3c21d0.webp",
    "desc": "대외협력팀 우리 대학 화학에너지공학과 강상욱 교수 연구팀이 친환경 바이오 기반 고분자인 하이드록시에틸셀룰로오스(Hydroxyethyl Cellulose, HEC)를 활용해 기존 고분자 분리막에서 발생하는 불균일한…"
-  },
-  {
-   "title": "2026학년도 천안캠퍼스 외국인학생 총장 간담회 개최",
-   "url": "https://www.smu.ac.kr/webzine/today.do?mode=view&articleNo=769425&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-13",
-   "kind": "행사",
-   "school": "상명대학교",
-   "campus": "",
-   "src": "f8a29ec6",
-   "foundAt": "2026-10-13",
-   "thumb": "data/news/img/a076cd113b700cb2.webp",
-   "desc": "대외협력팀 지난 12일 천안캠퍼스 외국인학생 총장 간담회가 열렸다. 외국인 학생들의 학교생활과 한국생활 적응을 지원하고 학생 간 교류를 돕기 위해 마련된 이번 행사에는 중국, 카자흐스탄 등 5개국 외국인 학생…"
   }
  ]
 }

@@ -1,8 +1,189 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-11-13",
- "count": 1753,
+ "count": 1762,
  "items": [
+  {
+   "title": "2026학년도 충남대학교 백마봉사단「사회 재환원 장학금」대상자 추천 안내",
+   "url": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2516266&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
+   "attachments": [
+    {
+     "name": "대학(원)별 훈련일정",
+     "url": "https://plus.cnu.ac.kr/Upl/kr/20200818_2.hwp"
+    },
+    {
+     "name": "마이크로디그리과정",
+     "url": "https://plus.cnu.ac.kr/html/kr/26file/2026_di_2010.pdf"
+    },
+    {
+     "name": "★2026학년도 충남대학교 백마봉사단「사회 재환원 장학금」대상자 추천 요청.pdf",
+     "url": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2516266&atch_no=1"
+    },
+    {
+     "name": "[서식] 1~3.hwp",
+     "url": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2516266&atch_no=2"
+    },
+    {
+     "name": "학교홈페이지관리규정",
+     "url": "https://plus.cnu.ac.kr/Upl/kr/2025_homepage_3020.hwp"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "충남대학교",
+   "campus": "",
+   "foundAt": "2026-11-13"
+  },
+  {
+   "title": "장학 ★ 2027학년도 재단법인 관정재단 장학생 선발 공고(~11/24 화 15시)",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=%E2%98%85-2027%ED%95%99%EB%85%84%EB%8F%84-%EC%9E%AC%EB%8B%A8%EB%B2%95%EC%9D%B8-%EA%B4%80%EC%A0%95%EC%9E%AC%EB%8B%A8-%EC%9E%A5%ED%95%99%EC%83%9D-%EC%84%A0%EB%B0%9C-%EA%B3%B5%EA%B3%A011-24-%ED%99%94-1&keyword=%EC%9E%A5%ED%95%99",
+   "attachments": [
+    {
+     "name": "붙임1.-2027년-국내대학-장학생-선발계획.pdf",
+     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs4wNYABI8bxZtSDCVQnFd5I%2BD320p0pF4pJUpZvbKZtBfJhpUWizlaSkgP6qvqf%2FKw2jHzomIHE9w3savprXdy3FTSTtYI%2BV0Z66aXCqFrjSGtQEo%2F6RBmhH%2BkAWHv%2BcXNvzltfu%2F9UiHOEWiE93NNRkzET3EUSQwngEEd896i4Y"
+    },
+    {
+     "name": "붙임3.-개인정보-수집·이용-및-제3자-제공-동의서_숭실대학생지원팀_개정후.hwp",
+     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbszKsoys8%2FvHMB1ywvgPrMDA%2F51sJJFqM%2BbkZiifmHkOYDf5EER6lvWjoUQPeFUakBMHP98WJQZCHoxmF3Ra93TzrMtVX6Sdc36f58J7Kd%2F4Mw4%2Be3CsZLdGXLAd%2BrHzRRVrONNBOdOeH0fzZJ72R7EzH%2FTeYVih6Uc7gEgOE8LZxfCn4WtPHntbU29g%2F2RWZirlcWyD4T27P3iLorn30BBv2u%2FEL9utvk6yQ2XtCBVfxxbKnVdtBLNF2gzkq%2FEbktLijspoeX%2Br%2F%2BrzXqDGbrGUYFzqi2utJaq3i5y7hXCSD"
+    },
+    {
+     "name": "붙임4.-국내대학장학생선발및장학금지급규정10차-개정.pdf",
+     "url": "https://scatch.ssu.ac.kr/download.php?data=1iZBAEYP01G24N2v6wVl9s5jGa0smQ8%2B8HVba1YhOwKiKp0Ym%2FP%2FpR0dBOZOTbHzGy%2BTusAioC15PqvrQTvbs7HW1t6odCi1UaBqbn7KbROdywoavOfhBPBLVZNF0n26ywJ3QZ0gb2AMVCXZQspal%2BLRXPDHrD5MipasbFpBrdgkG0%2Fa5ey%2BNIVXWZgD%2BTcyw3iq7ybisZuQ8rnMyl3%2Fc8eiPlGOHfNJ5p8Hjvl1qwiENEwN8AwLY%2F2TA1LShg%2Fw9AogByN3uyUEaYdK8JB%2FhQdVFCuSMmiGdo%2BmEsMZSg4qPyADXhVszVKdRtbvGJ7x"
+    }
+   ],
+   "deadlineHint": "신청기한: 2026.11.24.( 화 ) 15:00 까지 신청방법: 이메일 제출(학생지원팀 ser@ssu.ac.kr ) 가. 메일제목: 관정재단",
+   "school": "숭실대학교",
+   "campus": "",
+   "foundAt": "2026-11-13",
+   "bodyDeadline": "2026-11-24",
+   "bodyDeadlineText": "★ 2027학년도 재단법인 관정재단 장학생 선발 공고(~11/24 화 15시)"
+  },
+  {
+   "title": "미래 건설교통신기술인 장학사업 신청 안내(대상: 건설교통관련 학과 학부 재학생)",
+   "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/521183",
+   "attachments": [
+    {
+     "name": "미래 건설교통기술인 장학사업 포스터.pdf",
+     "url": "https://wise.dongguk.ac.kr/cmmn/fileDown.do?filename=%EB%AF%B8%EB%9E%98%20%EA%B1%B4%EC%84%A4%EA%B5%90%ED%86%B5%EA%B8%B0%EC%88%A0%EC%9D%B8%20%EC%9E%A5%ED%95%99%EC%82%AC%EC%97%85%20%ED%8F%AC%EC%8A%A4%ED%84%B0.pdf&filepath=/files/article/servicenotice/521183/&filerealname=19713399E7C243238CBB9DF53E22E9C5.pdf"
+    },
+    {
+     "name": "미래 건설교통신기술인 장학사업 안내.pdf",
+     "url": "https://wise.dongguk.ac.kr/cmmn/fileDown.do?filename=%EB%AF%B8%EB%9E%98%20%EA%B1%B4%EC%84%A4%EA%B5%90%ED%86%B5%EC%8B%A0%EA%B8%B0%EC%88%A0%EC%9D%B8%20%EC%9E%A5%ED%95%99%EC%82%AC%EC%97%85%20%EC%95%88%EB%82%B4.pdf&filepath=/files/article/servicenotice/521183/&filerealname=77D01445CB5246059F180C4C0F5BAA10.pdf"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-13"
+  },
+  {
+   "title": "[글로벌] 2026-2학기 일반 교내 및 교외 국가근로장학생 추가 선발(2차) 결과 및 유의사항 안내",
+   "url": "https://www.gachon.ac.kr/bbs/kor/478/127077/artclView.do",
+   "attachments": [
+    {
+     "name": "(붙임1) 2026-2학기 일반 교내 및 교외 국가근로장학생 추가 선발(2차)자 명단.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/158709/download.do"
+    },
+    {
+     "name": "(붙임2) 국가근로장학생 출근부 인쇄방법 등 안내.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/158710/download.do"
+    },
+    {
+     "name": "(붙임3) 2026-2학기 국가근로장학금 사전교육 자료.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/158711/download.do"
+    },
+    {
+     "name": "(붙임4) 국가근로 시간변경 사유서(양식).hwp",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/158712/download.do"
+    },
+    {
+     "name": "(붙임5) 국가근로 사직서(양식).hwp",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/158713/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간: 2026.11.05.(목) ~ 11.18.(수) 127077 [글로벌] [글로벌] 2026-2학기 일반 교내 및 교외 국가근로장학생",
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-11-13",
+   "bodyDeadline": "2026-11-18",
+   "bodyDeadlineText": "2026년 가천대학교 재학생 심층면접토론(FGD) 참여학생 모집 ○ 신청기간: 2026.11.05.(목) ~ 11.18.(수)"
+  },
+  {
+   "title": "[글로벌] 2027학년도 대학수학능력시험 관련 일반 교내 국가근로장학생 근로 시작시간 조정 안내",
+   "url": "https://www.gachon.ac.kr/bbs/kor/478/127094/artclView.do",
+   "attachments": [],
+   "deadlineHint": "신청기간: 2026.11.05.(목) ~ 11.18.(수) 127094 [글로벌] [글로벌] 2027학년도 대학수학능력시험 관련 일반 교내 국가",
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-11-13",
+   "bodyDeadline": "2026-11-18",
+   "bodyDeadlineText": "2026년 가천대학교 재학생 심층면접토론(FGD) 참여학생 모집 ○ 신청기간: 2026.11.05.(목) ~ 11.18.(수)"
+  },
+  {
+   "title": "[장학팀] 2026학년도 2학기 신용카드수수료장학금 신청 안내",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=160317&noCat=501",
+   "attachments": [
+    {
+     "name": "신용카드수수료장학금 신청서 및 사유서(양식).hwp",
+     "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=download&articleNo=160317&attachNo=93962"
+    }
+   ],
+   "deadlineHint": "접수기간 : 2026. 11. 16(월) ~ 12. 1(월) 5. 접수방법 : 방문 또는 등기우편 제출 * 우편제출 : 04066 서울 마포구",
+   "school": "홍익대학교",
+   "campus": "",
+   "foundAt": "2026-11-13",
+   "bodyDeadline": "2026-12-01",
+   "bodyDeadlineText": "4. 접수기간 : 2026. 11. 16(월) ~ 12. 1(월)"
+  },
+  {
+   "title": "[장학안내] 2026학년도 2학기 도전장학생(비상) 최종 선발 공고",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70982&cate=8",
+   "attachments": [
+    {
+     "name": "교육기본시설/부속시설",
+     "url": "https://www.jnu.ac.kr/MainIntro/Institution/AttachedFac"
+    },
+    {
+     "name": "2026학년도 2학기 도전장학생(비상) 최종 선발 공고문.hwp",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2591602"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-11-13"
+  },
+  {
+   "title": "[교외] 2026학년도 2학기 한국건설교통신기술협회 장학사업 신청 안내(11. 5. ~ 11. 18.)",
+   "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1212035/artclView.do",
+   "attachments": [
+    {
+     "name": "공문_붙임) 미래 건설교통신기술인 장학사업 안내.pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1230638/download.do"
+    },
+    {
+     "name": "공문_붙임) 미래 건설교통기술인 장학사업 포스터.pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1230639/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "건국대학교",
+   "campus": "",
+   "foundAt": "2026-11-13"
+  },
+  {
+   "title": "미래 건설교통신기술인 장학사업 안내",
+   "url": "https://www.yonsei.ac.kr/bbs/sc/58/944641/artclView.do",
+   "attachments": [
+    {
+     "name": "미래 건설교통신기술인 장학사업 안내.pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015533/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간: 2026.11.5.(목)~2026.11.18.(수) 24:00 5. 신청방법: 이메일 또는 등기우편 6. 문의처: 한국건설교통신기술협",
+   "school": "연세대학교",
+   "campus": "",
+   "foundAt": "2026-11-13"
+  },
   {
    "title": "장학 한국고등교육재단 문우림 제6기 장학생 선발 안내(~12/11 금)",
    "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category=%EC%9E%A5%ED%95%99&paged=1&slug=%ED%95%9C%EA%B5%AD%EA%B3%A0%EB%93%B1%EA%B5%90%EC%9C%A1%EC%9E%AC%EB%8B%A8-%EB%AC%B8%EC%9A%B0%EB%A6%BC-%EC%A0%9C6%EA%B8%B0-%EC%9E%A5%ED%95%99%EC%83%9D-%EC%84%A0%EB%B0%9C-%EC%95%88%EB%82%B412-11&keyword=%EC%9E%A5%ED%95%99",

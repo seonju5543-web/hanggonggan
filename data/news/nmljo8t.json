@@ -1,7 +1,18 @@
 {
  "school": "숭실대학교",
- "updatedAt": "2026-11-12",
+ "updatedAt": "2026-11-13",
  "items": [
+  {
+   "title": "채용 숭실대학교 산학협력단 계약직 직원 채용 공고(연구관리)",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EC%82%B0%ED%95%99%ED%98%91%EB%A0%A5%EB%8B%A8-%EA%B3%84%EC%95%BD%EC%A7%81-%EC%A7%81%EC%9B%90-%EC%B1%84%EC%9A%A9-%EA%B3%B5%EA%B3%A0%EC%97%B0%EA%B5%AC-33&keyword",
+   "postedAt": "2026-11-13",
+   "kind": "채용",
+   "school": "숭실대학교",
+   "campus": "",
+   "src": "3b348584",
+   "foundAt": "2026-11-13",
+   "desc": "숭실대학교 산학협력단에서 ‘진리와 봉사’의 교훈을 바탕으로 다음과 같이 역량 있는 인재를 모집합니다."
+  },
   {
    "title": "비교과·행사 2026학년도 교육수요자만족도조사 참여 안내",
    "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026%ED%95%99%EB%85%84%EB%8F%84-%EA%B5%90%EC%9C%A1%EC%88%98%EC%9A%94%EC%9E%90%EB%A7%8C%EC%A1%B1%EB%8F%84%EC%A1%B0%EC%82%AC-%EC%B0%B8%EC%97%AC-%EC%95%88%EB%82%B4&keyword",
@@ -413,16 +424,6 @@
    "src": "3b348584",
    "foundAt": "2026-10-26",
    "desc": "본교 숭실대학교 국제처 국제팀에서 아래와 같이 육아휴직 대체 계약직 직원을 모집합니다. 모집 관련 자세한 사항은 아래의 모집공고를 참고하여 주시기 바랍니다."
-  },
-  {
-   "title": "채용 2026년 숭실학술원 행정팀 일반계약직 채용 공고",
-   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026%EB%85%84-%EC%88%AD%EC%8B%A4%ED%95%99%EC%88%A0%EC%9B%90-%ED%96%89%EC%A0%95%ED%8C%80-%EC%9D%BC%EB%B0%98%EA%B3%84%EC%95%BD%EC%A7%81-%EC%B1%84%EC%9A%A9-%EA%B3%B5%EA%B3%A0&keyword",
-   "postedAt": "2026-10-26",
-   "kind": "채용",
-   "school": "숭실대학교",
-   "campus": "",
-   "src": "3b348584",
-   "foundAt": "2026-10-26"
   }
  ]
 }

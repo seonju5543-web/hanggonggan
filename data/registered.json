@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-12",
+ "updatedAt": "2026-11-13",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -9115,7 +9115,12 @@
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "documentsFrom": "로봇 2026-10-17 · 원문 「제출서류」 절",
-   "aiTries": 2
+   "aiTries": 2,
+   "eligibilityLines": [
+    "2. 자격사항",
+    "- 현재 학생과의 2026.2 학기 국가근로장학생 대상자 명단 에 있어야 함 ( 필수사항 )",
+    "-현재 국가근로장학, 직장체험인턴 , 교수지원장학 등 중복근로 불가"
+   ]
   },
   {
    "id": "auto-otice06doarticleno140261",
@@ -23971,7 +23976,16 @@
     "schoolOnly": "서강대학교"
    },
    "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
+    "협회 서식 |@ 자기소개서 공백 포함 1.500자 이내",
+    "신청 서약 및 필수 개인정보 수집:이용 동의서",
+    "자격 확인 ※ 공고일 이후 발급된",
+    "© 학자금 지원구간 통지서 학자글 지원구간",
+    "통지서만 인정",
+    "선택자료 _ | 자기소개서 기재 사항의 증빙자료",
+    "회원사 확인 ㅣ) 회원사 임직원 재직증명서",
+    "회원사 임직원과 신청인과의 관계 서류 가족관계증명서 등",
+    "| 지원자 유의사항",
+    "서류 미비자는 심사 대상에서 제외됩니다."
    ],
    "duplicable": true,
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
@@ -23989,7 +24003,25 @@
     }
    ],
    "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551820?bbsConfigFk=141&namepage=ScholarshipNotice",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "| 선발 대상",
+    "○ 신청자격(공통)",
+    "- 국내 소재 일반산업전문대학의 건설교통관련 학과* 학부 재학생",
+    "- 직전 정규학기 성적 백분위 80점 이상(최소 12학점 이상 이수)",
+    "- 장학금 공고일 기준 잔여 정규학기가 1학기 이상인 자",
+    "- 신입생 등 직전 대학 정규학기 성적이 없는 자, 휴학생ㆍ대학원생은",
+    "초년도 대상에서 제외",
+    "○ 부문별 신청자격",
+    "- (협회 회원사 자녀) 부 또는 모가 한국건설교통신기술협회 회원사",
+    "임직원인 자",
+    "※ 관련 학과 범위 예시 : 토목-건축교통「도시-조경-환경-기계-전기전자-안전 등.",
+    "여 공고한 기준에 따라 결정",
+    "| 선발 절차"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)",
+   "openDate": "2026-11-05",
+   "documentsFrom": "공고문 첨부(OCR)"
   },
   {
    "id": "auto-skor478127041artclviewdo",
@@ -24043,6 +24075,261 @@
     "신청방법: 네이버 폼 제출 [ https://naver.me/GrgraOja ]"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-kuk2351212035artclviewdo",
+   "name": "[교외] 2026학년도 2학기 한국건설교통신기술협회 장학사업 신청 안내(11. 5. ~ 11. 18.)",
+   "boardTitle": "[교외] 2026학년도 2학기 한국건설교통신기술협회 장학사업 신청 안내(11. 5. ~ 11. 18.)",
+   "type": "교외",
+   "kindEvidence": [
+    "제목 표식 「[교외」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-13",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-11-18",
+   "deadlineFrom": "게시판 요약 · ~ 11. 18",
+   "period": "접수 ~2026-11-18",
+   "summary": "건국대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "건국대학교"
+   },
+   "documents": [
+    "협회 서식 |@ 자기소개서 공백 포함 1.500자 이내",
+    "신청 서약 및 필수 개인정보 수집:이용 동의서",
+    "자격 확인 ※ 공고일 이후 발급된",
+    "© 학자금 지원구간 통지서 학자글 지원구간",
+    "통지서만 인정",
+    "선택자료 _ | 자기소개서 기재 사항의 증빙자료",
+    "회원사 확인 ㅣ) 회원사 임직원 재직증명서",
+    "회원사 임직원과 신청인과의 관계 서류 가족관계증명서 등",
+    "| 지원자 유의사항",
+    "서류 미비자는 심사 대상에서 제외됩니다."
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-13 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "공문_붙임) 미래 건설교통신기술인 장학사업 안내.pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1230638/download.do"
+    },
+    {
+     "name": "공문_붙임) 미래 건설교통기술인 장학사업 포스터.pdf",
+     "url": "https://www.konkuk.ac.kr/bbs/konkuk/235/1230639/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.konkuk.ac.kr/bbs/konkuk/235/1212035/artclView.do",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "| 선발 대상",
+    "○ 신청자격(공통)",
+    "- 국내 소재 일반산업전문대학의 건설교통관련 학과* 학부 재학생",
+    "- 직전 정규학기 성적 백분위 80점 이상(최소 12학점 이상 이수)",
+    "- 장학금 공고일 기준 잔여 정규학기가 1학기 이상인 자",
+    "- 신입생 등 직전 대학 정규학기 성적이 없는 자, 휴학생ㆍ대학원생은",
+    "초년도 대상에서 제외",
+    "○ 부문별 신청자격",
+    "- (협회 회원사 자녀) 부 또는 모가 한국건설교통신기술협회 회원사",
+    "임직원인 자",
+    "※ 관련 학과 범위 예시 : 토목-건축교통「도시-조경-환경-기계-전기전자-안전 등.",
+    "여 공고한 기준에 따라 결정",
+    "| 선발 절차"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)",
+   "openDate": "2026-11-05",
+   "documentsFrom": "공고문 첨부(OCR)"
+  },
+  {
+   "id": "auto-ervicenoticedetail521183",
+   "name": "미래 건설교통신기술인 장학사업 신청 안내(대상: 건설교통관련 학과 학부 재학생)",
+   "boardTitle": "미래 건설교통신기술인 장학사업 신청 안내(대상: 건설교통관련 학과 학부 재학생)",
+   "type": "교외",
+   "kindEvidence": [
+    "교내 증거 없음 — 기본값"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-11-13",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-11-18",
+   "listedAt": "2026-11-13",
+   "period": "접수 기간 ~2026-11-18",
+   "summary": "동국대학교 WISE캠퍼스 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교 WISE캠퍼스"
+   },
+   "documents": [
+    "협회 서식 |@ 자기소개서 공백 포함 1.500자 이내",
+    "신청 서약 및 필수 개인정보 수집:이용 동의서",
+    "자격 확인 ※ 공고일 이후 발급된",
+    "© 학자금 지원구간 통지서 학자글 지원구간",
+    "통지서만 인정",
+    "선택자료 _ | 자기소개서 기재 사항의 증빙자료",
+    "회원사 확인 ㅣ) 회원사 임직원 재직증명서",
+    "회원사 임직원과 신청인과의 관계 서류 가족관계증명서 등",
+    "| 지원자 유의사항",
+    "서류 미비자는 심사 대상에서 제외됩니다."
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-13 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "미래 건설교통기술인 장학사업 포스터.pdf",
+     "url": "https://wise.dongguk.ac.kr/cmmn/fileDown.do?filename=%EB%AF%B8%EB%9E%98%20%EA%B1%B4%EC%84%A4%EA%B5%90%ED%86%B5%EA%B8%B0%EC%88%A0%EC%9D%B8%20%EC%9E%A5%ED%95%99%EC%82%AC%EC%97%85%20%ED%8F%AC%EC%8A%A4%ED%84%B0.pdf&filepath=/files/article/servicenotice/521183/&filerealname=19713399E7C243238CBB9DF53E22E9C5.pdf"
+    },
+    {
+     "name": "미래 건설교통신기술인 장학사업 안내.pdf",
+     "url": "https://wise.dongguk.ac.kr/cmmn/fileDown.do?filename=%EB%AF%B8%EB%9E%98%20%EA%B1%B4%EC%84%A4%EA%B5%90%ED%86%B5%EC%8B%A0%EA%B8%B0%EC%88%A0%EC%9D%B8%20%EC%9E%A5%ED%95%99%EC%82%AC%EC%97%85%20%EC%95%88%EB%82%B4.pdf&filepath=/files/article/servicenotice/521183/&filerealname=77D01445CB5246059F180C4C0F5BAA10.pdf"
+    }
+   ],
+   "sourceUrl": "https://wise.dongguk.ac.kr/article/servicenotice/detail/521183",
+   "sourceKind": "auto",
+   "deadlineFrom": "공고문 첨부(OCR)",
+   "openDate": "2026-11-05",
+   "documentsFrom": "공고문 첨부(OCR)",
+   "eligibilityFrom": "공고문 첨부(OCR)",
+   "eligibilityLines": [
+    "| 선발 대상",
+    "○ 신청자격(공통)",
+    "- 국내 소재 일반산업전문대학의 건설교통관련 학과* 학부 재학생",
+    "- 직전 정규학기 성적 백분위 80점 이상(최소 12학점 이상 이수)",
+    "- 장학금 공고일 기준 잔여 정규학기가 1학기 이상인 자",
+    "- 신입생 등 직전 대학 정규학기 성적이 없는 자, 휴학생ㆍ대학원생은",
+    "초년도 대상에서 제외",
+    "○ 부문별 신청자격",
+    "- (협회 회원사 자녀) 부 또는 모가 한국건설교통신기술협회 회원사",
+    "임직원인 자",
+    "※ 관련 학과 범위 예시 : 토목-건축교통「도시-조경-환경-기계-전기전자-안전 등.",
+    "여 공고한 기준에 따라 결정",
+    "| 선발 절차"
+   ]
+  },
+  {
+   "id": "auto-oarticleno160317nocat501",
+   "name": "[장학팀] 2026학년도 2학기 신용카드수수료장학금 신청 안내",
+   "boardTitle": "[장학팀] 2026학년도 2학기 신용카드수수료장학금 신청 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "본문 「등기우편」"
+   ],
+   "kindConfidence": "mid",
+   "kindFrom": "로봇(원문) 2026-11-13",
+   "provider": "주관 기관 원문 확인",
+   "amount": "등록금 60%",
+   "amountValue": 0,
+   "deadline": "2026-12-01",
+   "deadlineFrom": "공고 원문 · 4. 접수기간 : 2026. 11. 16(월) ~ 12. 1(월)",
+   "period": "접수 ~2026-12-01",
+   "summary": "홍익대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true
+   },
+   "documents": [
+    "신용카드수수료장학금 신청서(소정양식) 1부",
+    "신청 사유서(소정양식) 1부",
+    "가족관계증명서 1부",
+    "[서울 학부생] 2026-2학기 학생 포상 추천 접수(~12.4(금)까지)",
+    "[조교 채용] 홍익대학교(서울캠퍼스) 전자전기공학부 조교 모집",
+    "[도서관] 도서관 문화살롱 #3 '나만의 에세이 써보기' ~11.30."
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-13 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "신용카드수수료장학금 신청서 및 사유서(양식).hwp",
+     "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=download&articleNo=160317&attachNo=93962"
+    }
+   ],
+   "sourceUrl": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=160317&noCat=501",
+   "sourceKind": "auto",
+   "openDate": "2026-11-16",
+   "documentsFrom": "공고 원문",
+   "eligibilityLines": [
+    "2. 신청대상",
+    "가. 본인 및 생계를 같이 하는 가족이 2026년 6월 1일 이후에 아래 중 어느 하나에 해당하고, 그 사실을 입증하는 서류를 제출한 학부 재학생",
+    "※ 신용카드수수료장학금은 재학중 3회까지만 수혜 가능함",
+    "1) 신용회복/개인회생/파산/면책이 진행중이거나 결정을 받은 경우",
+    "2) 운영사업체가 부도/파산된 경우",
+    "3) 중증질병(암 등)이나 지속적인 치료를 요하는 질병 또는 상해(교통/일반)를 입은 경우",
+    "4) 화재 등의 재해를 입은 경우",
+    "나. 직전학기 이수학점이 15학점 이상이고 성적경고가 아닌 자"
+   ],
+   "amountSpec": {
+    "kind": "ratio",
+    "value": 0,
+    "ratio": 0.6,
+    "min": 0,
+    "max": 0,
+    "raw": "3. 장학금액 : 수업료 60% 이내 차등지급 (단, 수업료 범위 내에서 교내장학금 간 이중수혜 허용) ※ 장학금 지급시 한국장학재단 중복지원 심사후 대출이 있는 경우에는 우선 대출 상환 처리함."
+   },
+   "amountFrom": "공고 원문",
+   "exclusivity": {
+    "kind": "allowed",
+    "scope": "narrow",
+    "raw": "3. 장학금액 : 수업료 60% 이내 차등지급 (단, 수업료 범위 내에서 교내장학금 간 이중수혜 허용)"
+   },
+   "exclusivityFrom": "공고 원문",
+   "scopeFrom": "로봇 2026-11-13 · 원문 증거로 전국 — 본문 「등기우편」 (게시: 홍익대학교)"
+  },
+  {
+   "id": "auto-0713no2516266sitedvscdkr",
+   "name": "2026학년도 충남대학교 백마봉사단「사회 재환원 장학금」대상자 추천 안내",
+   "boardTitle": "2026학년도 충남대학교 백마봉사단「사회 재환원 장학금」대상자 추천 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 학교 이름표 「충남대학교」"
+   ],
+   "kindConfidence": "mid",
+   "kindFrom": "로봇(제목)",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-11-13",
+   "period": "접수 기간 원문 확인",
+   "summary": "충남대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "충남대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-13 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "대학(원)별 훈련일정",
+     "url": "https://plus.cnu.ac.kr/Upl/kr/20200818_2.hwp"
+    },
+    {
+     "name": "★2026학년도 충남대학교 백마봉사단「사회 재환원 장학금」대상자 추천 요청.pdf",
+     "url": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2516266&atch_no=1"
+    },
+    {
+     "name": "[서식] 1~3.hwp",
+     "url": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2516266&atch_no=2"
+    },
+    {
+     "name": "학교홈페이지관리규정",
+     "url": "https://plus.cnu.ac.kr/Upl/kr/2025_homepage_3020.hwp"
+    }
+   ],
+   "sourceUrl": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2516266&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
+   "sourceKind": "auto"
   }
  ]
 }
