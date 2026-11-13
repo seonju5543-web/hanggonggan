@@ -14410,6 +14410,49 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
       [null, null, null, 'ok', 'ok', null]);
   }
 
+  /* ── 6차 병합 리뷰 B (2026-11-13) — 거주 갈래 셋: 거주 기간 ✓ 하나로 고적합이 되던 자리(성적 줄을 잡음으로 버림 · 동 목록 · 같은 이름 구) ──
+     줄은 원문 꼴을 그대로 박는다(실데이터를 읽지 않는다 · 강서구장학회(서울) 구민한마음 · 진주시청 특기장학생 · 검단장학재단 꼴) */
+  {
+    const gsB = '2026년도 1학기 과락 없이 12학점(최종 학기 직전학기의 경우 9학점)이상 이수하고 평점 평균이 4.5점 만점에 3.5점 이상이어야 함 (4.3 만점의 경우 3.3점 이상)';
+    const resB = '장학생 선발 공고일 현재 강서구에 1년 이상 계속 거주';
+    const whoB = '2022 ~ 2026년 선발 구민한마음 4년 장학생 8명';
+    const pB = (o) => ({ ...stu, region: '서울', regionCity: '강서구', ...o });
+    const keptB = (l) => MEx.requirementLines({ id: 'b', name: 'b' }, [l], { all: true }).length;
+    eq('🔴 B① 만점 + 문턱은 요건이다 — `4.5점 만점에 3.5점 이상`·`4.5 만점에 3.5 이상`·`4.5만점 기준 3.5학점 이상`·`평점 3.3이상/ 4.3만점` 은 살리고(전엔 잡음으로 버려 층2 칸에 거주 줄만 남았다) · 환산 규칙·배점 줄은 그대로 잡음',
+      [keptB(gsB), keptB('직전 2개학기 학업성적 평균이 각각 4.5 만점에 3.5 이상인 자'), keptB('직전학기 12학점이상 이수 및 성적 4.5만점 기준 3.5학점 이상인 자'), keptB('총 평균 백분위 87점 이상 또는 평점 3.3이상/ 4.3만점'),
+        keptB('만점 기준이 다른 대학의 경우 4.5 만점으로 환산하여 적용'), keptB('Dream PATH 마일리지 점수 적용 : 매학기 70점 만점 적용')], [1, 1, 1, 1, 0, 0]);
+    eq('🔴 B① 살린 성적 줄은 4.5 척도로 잰다 — 만점 바로 앞 `4.5점 만점에` 가 괄호 속 `4.3 만점의 경우` 보다 먼저(전엔 4.3 척도 3.5 로 읽어 평점 3.6 학생 ✕ · 틀린 미달) · 소수 뒤 `학점` 은 평점(전엔 학점 수만 읽어 평점 3.0 학생 ✓)',
+      [rmx(gsB, pB({ gpa: 3.4 })), rmx(gsB, pB({ gpa: 3.6 })), rmx('직전학기 12학점이상 이수 및 성적 4.5만점 기준 3.5학점 이상인 자', pB({ gpa: 3.0 })), rmx('직전학기 12학점이상 이수 및 성적 4.5만점 기준 3.5학점 이상인 자', pB({ gpa: 3.6 }))],
+      ['no', 'ok', 'no', 'ok']);
+    const jinB = '문화·예술·체육·과학·수학·외국어·전산·기능 등의 분야에 소질과 재능이 뛰어난 자 중 유형 선택하여 지원';
+    const jinRes = '공고일 기준 학생 또는 보호자가 진주시에 1년 이상 주소를 두고 계속하여 거주중인 자';
+    const kJin = { id: 'kosaf-jb', name: '진주시청 특기장학생', provider: '진주시청', sourceKind: 'kosaf', eligibility: { selective: true }, eligibilityLines: [jinB, jinRes], kosafCoreLines: [jinB] };
+    const pJin = pB({ region: '경남', regionCity: '진주시', parentRegion: '경남', parentRegionCity: '진주시', residenceMonths: 12 });
+    const kGs = { id: 'kosaf-gb', name: '재단법인 강서구장학회(서울) 구민한마음 4년 장학금', provider: '재단법인 강서구장학회(서울)', sourceKind: 'kosaf', eligibility: { selective: true }, eligibilityLines: [whoB, gsB, resB], kosafCoreLines: [whoB, gsB] };
+    const fB = (s, p) => { const d = MEx.fitDetail(s, p); return [d.unread, d.fails.length]; };
+    eq('🔴 B① 층2 「누가·성적」 칸(특정자격·성적기준) 줄이 전부 버려지고 거주 줄만 남으면 거주 ✓ 하나로 적합도를 주지 않는다 — 자격 미확인(전엔 95%) · 같은 줄의 층1 공고는 그대로 · 칸 줄이 살아 있으면 쉰다(평점 3.4 ✕ · 3.6 은 미확인 아님)',
+      [fB(kJin, pJin), fB({ ...kJin, sourceKind: undefined }, pJin), fB(kGs, pB({ gpa: 3.4, residenceMonths: 12 })), fB(kGs, pB({ gpa: 3.6, residenceMonths: 12 })), fB({ ...kGs, eligibilityLines: [whoB, resB], kosafCoreLines: [whoB] }, pB({ gpa: 3.6, residenceMonths: 12 }))],
+      [[true, 0], [false, 0], [false, 1], [false, 0], [true, 0]]);
+    eq('  B① 앱이 층2 「누가·성적」 칸 줄을 kosafCoreLines 로 넘긴다(app.js kosafAsScholarships · KOSAF_CORE 가 특정자격·성적기준)',
+      (() => { const aj = readText(new URL('../app.js', import.meta.url)); const body = aj.slice(aj.indexOf('function kosafAsScholarships(')); return [/^const KOSAF_CORE = \['특정자격', '성적기준'\];/m.test(aj), /kosafCoreLines: KOSAF_CORE\.flatMap\(\(k\) => split\(f\[k\]\)\)/.test(body.slice(0, body.indexOf('\n}\n')))]; })(), [true, true]);
+    const dongB = '인천 검단동·불로대곡동·원당동·당하동·오류왕길동·마전동·아라동 거주 5년 이상인 자';
+    eq('🔴 B② 시·도 뒤 동 목록(`인천 검단동·불로대곡동…`)은 시·군 안쪽이다 — 인천 남동구·서구 학생 5년 이상이어도 모름(전엔 남동구 ✓ · 틀린 안심) · 서울 학생 ✕ 는 그대로 · `서울 화곡동·등촌동·가양동` 양천구 1년 모름',
+      [rmx(dongB, pB({ region: '인천', regionCity: '남동구', parentRegion: '인천', parentRegionCity: '남동구', residenceMonths: 60 })), rmx(dongB, pB({ region: '인천', regionCity: '서구', residenceMonths: 60 })),
+        rmx(dongB, pB({ residenceMonths: 60 })), rmx('서울 화곡동·등촌동·가양동 거주 1년 이상인 자', pB({ regionCity: '양천구', residenceMonths: 12 })), !!one(dongB, 'residence').subArea, !!one('인천 검단동 거주자', 'residence').subArea],
+      [null, null, 'no', null, true, true]);
+    const gsSch = { id: 'kosaf-gb', name: kGs.name, provider: kGs.provider };
+    eq('🔴 B③ 같은 이름 구(강서구 서울·부산)는 시·도까지 — 강서구장학회(서울) 줄에 부산 강서구 1년 모름(전엔 ✓ · 틀린 안심) · 서울 강서구 ✓ · 공고 이름을 모르면 서울 강서구도 모름 · 줄이 `서울특별시 강서구` 면 부산 강서구 ✕ · 서울 ✓',
+      [rmx(resB, pB({ region: '부산', regionCity: '강서구', parentRegion: '부산', residenceMonths: 12 }), gsSch), rmx(resB, pB({ residenceMonths: 12 }), gsSch), rmx(resB, pB({ residenceMonths: 12 })),
+        rmx('서울특별시 강서구에 거주하는 대학생', pB({ region: '부산', parentRegion: '부산' })), rmx('서울특별시 강서구에 거주하는 대학생', pB({}))],
+      [null, 'ok', null, 'no', 'ok']);
+    eq('  B③ 고성군(강원·경남) · 부모 갈래도 같다 — 공고 이름(경남)과 다른 강원 고성군은 모름 · 경남 고성군 ✓ · 하나뿐인 이름(진주시)은 그대로 ✓',
+      [rmx('고성군에 1년 이상 주소를 둔 자', pB({ region: '강원', regionCity: '고성군', parentRegion: '강원', residenceMonths: 12 }), { id: 'g', name: '경남 고성군장학회 장학생', provider: '경남 고성군장학회' }),
+        rmx('고성군에 1년 이상 주소를 둔 자', pB({ region: '경남', regionCity: '고성군', parentRegion: '경남', residenceMonths: 12 }), { id: 'g', name: '경남 고성군장학회 장학생', provider: '경남 고성군장학회' }),
+        rmx('보호자가 고성군에 주소를 둔 자', pB({ parentRegion: '강원', parentRegionCity: '고성군' }), { id: 'g', name: '경남 고성군장학회 장학생', provider: '경남 고성군장학회' }),
+        rmx(jinRes, pJin)],
+      [null, 'ok', null, 'ok']);
+  }
+
   /* ── 편입·재입학 첫 학기 (2026-11-02 개발자 "편입이랑 재입학은 학적정보만으로 구분 가능하잖아") ── */
   const html = readText(new URL('../index.html', import.meta.url));
   eq('온보딩 학적 칩에 「편입 첫 학기」·「재입학 첫 학기」가 있다 (값 편입학·재입학)', [/data-value="편입학"/.test(html), /data-value="재입학"/.test(html)], [true, true]);

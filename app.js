@@ -3129,6 +3129,7 @@ function refreshAllData() {
    그대로 띄우면 요건 칸이 데이터 덤프가 된다. 나열형 칸은 화면에서 뺀다.
    ⚠️ 뺀다고 판정이 나빠지지 않는다 — 어차피 적합도는 이 공고들에 대해 단정하지 않는다. */
 const KOSAF_ELIG = ['특정자격', '성적기준', '소득기준', '지역거주구분'];
+const KOSAF_CORE = ['특정자격', '성적기준'];   // 그중 「누가·성적」 칸 — 이 줄이 모두 버려지면 거주 ✓ 하나로 적합도를 주지 않는다(fitDetail · kosafCoreLines)
 
 /* 🔴 재단이 쓴 글에는 `○`·`ㅇ`·`※` 같은 **머리 기호**가 그대로 들어 있다. 뜻이 아니라
    서식이므로 화면에서는 떼어낸다(문장 자체는 한 글자도 바꾸지 않는다).
@@ -3223,6 +3224,9 @@ function kosafAsScholarships() {
         summary: `${i.org} — 한국장학재단 등록 장학금.`,
         eligibility: { selective: true },     // 구조화된 조건이 없으니 판정하지 않는다(=unknown)
         ...(lines.length ? { eligibilityLines: lines } : {}),
+        /* 「누가」·「성적」 칸(특정자격·성적기준)의 줄 — 이 칸의 줄이 **전부** 요건으로 못 읽혀 버려지고 거주 줄만 남으면 적합도는 「자격 미확인」이다
+           (match-engine fitDetail 한 곳 · 2026-11-13 병합 리뷰 · 강서구장학회 「구민한마음」이 거주 기간 ✓ 하나로 95% 였다). 줄 글자는 eligibilityLines 와 같은 것 */
+        ...(KOSAF_CORE.flatMap((k) => split(f[k])).length ? { kosafCoreLines: KOSAF_CORE.flatMap((k) => split(f[k])) } : {}),
         ...(split(f['자격제한']).length ? { eligibilityExcludes: split(f['자격제한']) } : {}),
         documents: docs.length ? docs : ['재단 공고문에서 확인'],
         sourceUrl: i.home || '',

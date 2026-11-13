@@ -626,7 +626,25 @@ function judgeCond(c, p, ctx) {
           if (!mineProv.length || provs.some((ps) => !ps.length)) return 'unknown';
           return provs.some((ps) => ps.some((r) => mineProv.includes(r))) ? 'unknown' : soft('fail');
         }
-        if (cities.some((r) => myCities.includes(r))) return soft('pass', !c.parentOnly && !!p.regionCity && cities.includes(p.regionCity));
+        /* 🔴 **같은 이름의 구·군**(`강서구` 서울·부산 · `중구`·`동구`·`서구`·`남구`·`북구` · `고성군` 강원·경남)은 이름만으로 맞았다고 하지 않는다
+           (2026-11-13 · 병합 리뷰 qui) — 강서구장학회(서울)의 `강서구에 1년 이상 계속 거주` 가 **부산 강서구** 학생에게 거주 기간 ✓ 로 ✓ · 95% 였다(틀린 안심).
+           시·도는 ① 줄이 적은 시·도(`서울특별시 강서구`) → 다르면 다른 곳이라 아래 시·군 미달 규칙으로 간다(줄이 시·도를 말했다) ·
+           ② 줄이 안 적었으면 공고를 낸 곳의 이름(`재단법인 강서구장학회(서울)` · noticeCtx homeProvs) → 맞으면 맞음 · 다르거나 못 가르면 기간이 길어도 '모름'
+           (기관 이름에서 짐작한 시·도로 ✕ 를 내지 않는다) */
+        const placeOf = (city, region) => {   // 'hit' 맞음 · 'miss' 다른 곳 · 'unsure' 못 가름
+          if (!city || !cities.includes(city)) return 'miss';
+          const ps = PR.provincesOfCity(city);
+          if (ps.length <= 1) return 'hit';
+          const mine = region ? prov(region) : '';
+          const named = (c.anyOf || []).map(prov).filter((x) => ps.includes(x));
+          if (named.length) return !mine ? 'unsure' : named.includes(mine) ? 'hit' : 'miss';
+          const told = ((ctx && ctx.homeProvs) || []).filter((x) => ps.includes(x));
+          return told.length === 1 && mine && told[0] === mine ? 'hit' : 'unsure';
+        };
+        const selfAt = c.parentOnly ? 'miss' : placeOf(p.regionCity, p.region);
+        const parentAt = placeOf(p.parentRegionCity, p.parentRegion);
+        if (selfAt === 'hit' || parentAt === 'hit') return soft('pass', selfAt === 'hit');
+        if (selfAt === 'unsure' || parentAt === 'unsure') return 'unknown';
         /* 🔴 학생이 **직접 고른** 시·군과 다르면 미달이다 — 안양시 학생에게 광양시 장학금은
            받을 수 없는 것이다. 예전에는 여기서도 'unknown' 을 내서, 시·군을 받아 놓고도
            지역 요건이 판정되지 않았다(실측 102줄 중 2줄만 판정됐다).
@@ -847,6 +865,12 @@ function homeCityOf(sch) {
   return null;
 }
 
+/* 공고를 낸 곳 이름에 적힌 시·도(짧은 꼴) — `재단법인 강서구장학회(서울)` → ['서울']. 같은 이름 구·군(강서구 서울·부산)을 가를 때만 쓴다(judgeCond residence placeOf) */
+function homeProvsOf(sch) {
+  const name = `${(sch && sch.provider) || ''} ${(sch && sch.name) || ''}`;
+  return [...new Set(PR_REGIONS.filter((r) => name.includes(r)).map((r) => PR.shortRegion(r)))];
+}
+
 function noticeCtx(sch) {
   const lines = (sch && sch.eligibilityLines) || [];
   const items = requirementLines(sch, lines, { withMeta: true });
@@ -874,7 +898,7 @@ function noticeCtx(sch) {
   /* ※ 거주 요건으로 통과한 줄(requirementLines 의 ASIDE_RESIDENCE 증명) — lineVerdict 가 ✕ 대신 모름을 낸다(위 softNo 주석) */
   const softRaw = lines.filter((l) => /^\s*※/.test(String(l || '')) && ASIDE_RESIDENCE.test(l) && !ASIDE_RES_NOT.test(l)).map((l) => tidyRequirement(l));
   const softNo = new Set(softRaw.length ? items.map((it) => it.text).filter((t) => softRaw.some((s) => s && PR.untag(t).startsWith(s))) : []);
-  return { bracketTable: brackets.size > 1, inAnyOf, multi, anyUndergrad, homeCity: homeCityOf(sch), oneSchool, softNo };
+  return { bracketTable: brackets.size > 1, inAnyOf, multi, anyUndergrad, homeCity: homeCityOf(sch), homeProvs: homeProvsOf(sch), oneSchool, softNo };
 }
 
 /* 공고 하나에 대한 적합도 **내역**. 카드가 "요건 6개 중 4개 충족"을 띄우려면 숫자가 필요하다. */
@@ -982,6 +1006,18 @@ function fitDetail(sch, p) {
   }
   /* 미달이어도 0이 아니라 FIT_MIN — 파싱이 틀렸을 가능성을 남긴다(위 FIT_MIN 주석) */
   if (fails.length) return { pct: FIT_MIN, unread: false, met, total, unknown, fails };
+  /* 🔴 **층2의 「누가·성적」 칸이 통째로 버려지고 거주 줄만 남았으면 '모른다'** (2026-11-13 · 병합 리뷰 wrongx — 선조치 후 보고).
+     강서구장학회 「구민한마음 4년 장학금」은 `2022 ~ 2026년 선발 구민한마음 4년 장학생 8명`(이미 뽑힌 장학생만) · 성적 3.5/4.5 를 요구하는데,
+     두 칸의 줄이 요건으로 못 읽혀 버려지고 `강서구에 1년 이상 계속 거주` 한 줄만 남아 거주 기간 ✓ 하나로 「적합도 95%」였다(진주시청 특기장학생 —
+     핵심 요건 '분야 재능'이 버려진 채 95% · 틀린 안심). 거주 줄은 **어디에 사는가**만 말한다 — 그것 하나로 '받을 수 있다'를 말하지 않는다.
+     ⚠️ 리뷰가 낸 두 안 중 **덜 넓은 쪽**이다: 버린 줄 수를 모든 공고의 분모에 '모름'으로 넣는 안은 층1 공고에서 잡음 줄(일정·서류·배점)까지
+        분모에 넣어 멀쩡한 적합도를 깎는다. 층2 는 재단이 칸을 나눠 적어 '누가' 칸을 가려낼 수 있고, 칸 줄이 하나라도 살아남으면 이 규칙은 쉰다.
+     ✕ 는 위에서 이미 냈다 — 여기는 ✓ 를 '모름'으로 낮추기만 한다 */
+  const core = (sch && sch.sourceKind === 'kosaf' && sch.kosafCoreLines) || [];
+  if (core.length && !requirementLines(sch, core, { all: true }).length
+      && items.every((it) => { const cs = parseLine(PR.untag(it.text), false).conds; return cs.length && cs.every((c) => c.kind === 'residence'); })) {
+    return { pct: FIT_UNREAD, unread: true, met, total, unknown, fails: [] };
+  }
   /* 🔴 **하나도 판정하지 못했으면 '적합'이 아니라 '모른다'** (2026-09-21).
      예전에는 `fails` 가 비면 곧바로 적합이라, 요건을 **0개 판정**하고도 카드가 '적합'이라고
      말했다. 실측으로 걸린 것: 울산 남구 장학금(`남구에 주민등록`)과 전남 장학금
@@ -1278,7 +1314,12 @@ const NOT_A_REQUIREMENT = new RegExp([
   /* 🔴 `만점` 뒤에 문턱 낱말이 오면 그건 배점표가 아니라 **진짜 요건**이다 (2026-08-24).
      `직전학기 성적기준: 80점/100점 만점 이상을 충족하는 자`가 이 가지에 걸려
      시립대 활동도우미의 성적 요건이 통째로 사라져 있었다 — 잡음보다 나쁜 실패다. */
-  '(만점(?!\\s*(이상|이하|미만|초과|충족))|배점|가점|점수\\s*적용|반영\\s*비율)',
+  /* 🔴 `4.5점 만점에 3.5점 이상`·`4.5만점 기준 3.5학점 이상`·`평점 3.3이상/ 4.3만점` 도 척도 + 문턱이라 **요건**이다 (2026-11-13 · 병합 리뷰 wrongx) —
+     문턱 낱말이 `만점` 바로 뒤에만 있다고 봐서 강서구장학회 성적 요건(`평점 평균이 4.5점 만점에 3.5점 이상이어야 함`)이 잡음으로 버려졌고,
+     층2 칸에 거주 줄 하나만 남아 거주 기간 ✓ 하나로 「적합도 95%」가 됐다(틀린 안심).
+     만점 뒤 `에`·`기준(으로)`·`으로` 다음 14자 안(쉼표·문장 마침표 전 · `3.5` 의 소수점은 넘는다)에 문턱 낱말이 오거나, 만점 바로 앞이 `이상/ 4.3` 꼴이면 버리지 않는다.
+     ⚠️ `만점 기준이 다른 대학의 경우 4.5 만점으로 환산하여 적용`(환산 규칙)·`매학기 70점 만점 적용`(배점)은 그대로 잡음이다 */
+  '((?<!(?:이상|이하)\\s*\\/\\s*[\\d.]+\\s*)만점(?!\\s*(?:(?:에|기준(?:으로)?|으로)\\s*(?:[^,.]|\\.(?=\\d)){0,14}?)?(?:이상|이하|미만|초과|충족))|배점|가점|점수\\s*적용|반영\\s*비율)',
   /* 배점표의 한 행 — `학자금 지원구간 (40 점): …에 따라 평정`. 요건 낱말(구간)을 갖고 있어
      통과 조건을 뚫는다. 괄호 안 점수 + '평정'이 배점표의 표지다 (2026-08-24) */
   '\\(\\s*\\d{1,3}\\s*점\\s*\\)|따라\\s*평정|평정\\s*(기준|결과)',
