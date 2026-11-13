@@ -19,7 +19,7 @@ const PR = (typeof module !== 'undefined' && module.exports)
   /* 🔴 브라우저에서는 **전역 함수**로 쓴다 — 여기에 이름을 빠뜨리면 Node 검사는 전부
      통과하는데 앱은 첫 카드에서 죽는다. `headRest`(section-head)에 이어 `caseBranch`도
      같은 실수를 했다(2026-08-24). 아래 회귀가 브라우저 순서로 실어 실제로 불러 본다. */
-  : { parseLine, parseDegree, gradOnly, gradTarget, mentionsUndergrad, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, untag, REGIONS, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM, TRAIT_PAT, provincesOfCity, shortRegion, schoolKindAlt };
+  : { parseLine, parseDegree, gradOnly, gradTarget, mentionsUndergrad, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, untag, REGIONS, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM, TRAIT_PAT, provincesOfCity, shortRegion, schoolKindAlt, yearBranchLabels };
 const PR2 = PR;   // requirementLines가 쓰는 별칭 (선언 순서 때문에 이름만 따로 둔다)
 /* 시·도 이름은 parse-requirements 가 갖고 있다 — 여기 베끼면 두 벌이 된다 */
 const PR_REGIONS = PR.REGIONS || [];
@@ -746,6 +746,54 @@ function dropUnchosenOrTraits(text, judged, isExclude) {
   });
 }
 
+/* 🔴 **줄 가운데 학년 갈래 이름표** (2026-11-13 · 2회차 수리) — `재학생(4학년은 직전학기 평점 3.0 이상)`·`2학년 이상 재학생 (4학년은 10학점 이상)`.
+   parse-requirements 는 갈래 학년을 학년 조건으로 안 읽지만 그 갈래의 조건(평점 3.0)은 줄 전체에 남아 1학년에게 ✕ 였다(틀린 미달).
+   갈래는 괄호 안에서 닫는 괄호(또는 다음 이름표)까지만 걷는다 — 괄호 밖이거나 갈래 안에 쉼표·`그 외` 가 있으면 어디까지가 갈래인지 몰라 모름.
+   · 갈래에 **안 드는** 학생 — 갈래를 걷은 줄로 판정한다
+   · 갈래에 **드는** 학생 — 갈래 조건이 줄의 다른 조건과 축이 겹치면(`평점 3.0 이상 (4학년은 2.5 이상)`) 어느 쪽이 이기는지 몰라 모름(학점처럼 갈래 수를 다 아는 축은 그대로) ·
+     안 겹치면 더해진 조건이라 줄 그대로 판정한다 · 드는지 모르면 모름 */
+function midYearBranch(text, yb, p, isExclude, ctx) {
+  const t = PR.untag(text);
+  const OPEN = '([{（', CLOSE = ')]}）';
+  const segs = [];
+  let rest = '', last = 0;
+  for (let i = 0; i < yb.length; i++) {
+    const b = yb[i];
+    let depth = 0;
+    for (const ch of t.slice(0, b.start)) { if (OPEN.includes(ch)) depth++; else if (CLOSE.includes(ch)) depth = Math.max(0, depth - 1); }
+    if (depth <= 0) return null;
+    let end = b.body, d = 0;
+    for (; end < t.length; end++) {
+      const ch = t[end];
+      if (OPEN.includes(ch)) d++;
+      else if (CLOSE.includes(ch)) { if (d === 0) break; d--; }
+    }
+    if (i + 1 < yb.length && yb[i + 1].start < end) end = yb[i + 1].start;
+    const seg = t.slice(b.body, end);
+    if (/[,，;；]\s*\S/.test(seg) || /그\s?외|나머지|이외|그\s?밖/.test(seg)) return null;
+    segs.push(seg);
+    rest += t.slice(last, b.start); last = end;
+  }
+  rest = (rest + t.slice(last)).replace(/[(（]\s*(?:(?:단|다만)\s*[,，]?)?[\s,，;；]*[)）]/g, ' ').replace(/\s+/g, ' ').trim();
+  let mine = -1;
+  for (let i = 0; i < yb.length; i++) {
+    const { conds: sc } = PR.parseLine(yb[i].scope, false);
+    if (!sc.length) return null;
+    const vs = sc.map((c) => judgeCond(c, p, ctx));
+    if (vs.every((v) => v === 'pass')) { if (mine >= 0) return null; mine = i; }
+    else if (!vs.includes('fail')) return null;
+  }
+  if (mine < 0) return rest ? lineVerdict(rest, p, isExclude, ctx) : null;
+  if (yb.length > 1) return null;
+  const segConds = PR.parseLine(segs[mine], !!isExclude).conds;
+  const restKinds = new Set(PR.parseLine(rest, !!isExclude).conds.map((c) => c.kind));
+  const whole = PR.parseLine(text, !!isExclude).conds;
+  const allAlts = (kind) => whole.some((w) => w.kind === kind && w.alts);   // 갈래 수를 다 아는 축(`12학점(4학년의 경우 9학점) 이상` 의 학점 12·9)
+  /* 갈래 글자만으론 못 읽는 꼴(`(4학년의 경우 9학점)` 뒤 `이상` 이 괄호 밖)은 줄이 그 수를 갈래로 이미 읽었을 때만 */
+  if (!segConds.length ? !whole.some((w) => w.alts) : segConds.some((c) => restKinds.has(c.kind) && !allAlts(c.kind))) return null;
+  return lineVerdict(text, p, isExclude, { ...ctx, wholeYearBranch: true });
+}
+
 /* detail — 있으면 본 경로가 판정한 조건 수(total)와 맞은 조건 수(pass)를 적어 준다(적합도가 조건 단위로 세는 데 쓴다 · 2026-10-29).
    앞에서 돌아가는 갈래(표 칸·참고 줄·경우별·범위·묶음·묻지 않은 처지)는 적지 않는다 — 그때는 부르는 쪽이 줄 하나로 센다 */
 function lineVerdict(text, p, isExclude, ctx, detail) {
@@ -764,10 +812,28 @@ function lineVerdict(text, p, isExclude, ctx, detail) {
   /* 🔴 `○○의 경우 …` 로 **범위를 좁힌 줄**은 그 범위 밖 학생에게 아무 말도 안 한다 (2026-10-15 카드 전수 — 산청양수장학회
      `의과대학 재학생의 경우 … 20학점 이상` 이 영어학과 14학점 학생에게 ✕ 였다 · 틀린 미달). 범위 글자를 먼저 판정해
      하나라도 어긋나거나 읽을 수 없으면 '모름', 범위가 나와 맞으면 뒤 조건을 그대로 판정한다. */
-  /* 학년 갈래 이름표(`4학년은 10학점 이상 이수`·`1~3학년은 12학점`·`최종학년: 9학점 이상`)도 같은 범위다 — 학년 조건은 parse-requirements 가 안 내고(YEAR_BRANCH_TAIL), 여기서 그 학년 학생에게만 뒤를 판정한다
-     (2026-11-13 · 1회차 수리 · 3학년에게 4학년 갈래의 학점 ✓·✕ 를 내지 않는다) */
-  const scoped = PR.untag(text).match(/^([^,.:：()]{2,20}?)(?:의|인)\s?경우[,:：]?\s+(\S[\s\S]*)$/)
-    || PR.untag(text).match(/^\s*((?:(?:\d\s*(?:학년\s*)?[~∼～\-–]\s*)?\d\s*학년|(?:최종|졸업)\s?학년)(?:생)?)\s*(?:은|[:：])\s*(?![^,.]{0,8}제외)(\S[\s\S]*)$/);   // `최종학년은 제외` 는 갈래가 아니라 빼는 말
+  /* 학년 갈래 이름표(`4학년은 10학점 이상 이수`·`1~3학년은 12학점`·`3, 4학년:`·`최종학년: 9학점 이상`)도 같은 범위다 — 학년 조건은 parse-requirements 가 안 내고(YEAR_BRANCH_TAIL), 여기서 그 학년 학생에게만 뒤를 판정한다
+     (2026-11-13 · 1회차 수리 · 3학년에게 4학년 갈래의 학점 ✓·✕ 를 내지 않는다)
+     🔴 이름표 찾기는 parse-requirements yearBranchLabels **한 곳** (2회차 수리) — 전엔 여기 따로 짠 꼴이 열거(`3, 4학년:`·`2·3·4학년은`)를 못 받아 그 갈래 조건이 1학년에게 걸렸다.
+     갈래가 여럿(`1학년: 입학성적 우수자, 2~4학년: 평점 3.5 이상`)이면 **내 갈래 하나**만 다음 이름표 앞까지 판정한다(전엔 뒤 갈래 평점이 1학년에게 ✕) —
+     내 갈래를 못 짚거나 둘 이상이면 모름 · 이름표가 줄 가운데(`재학생(4학년은 평점 3.0 이상)`)면 아래 midYearBranch 가 본다 */
+  const yb = (cases || (ctx && ctx.wholeYearBranch)) ? [] : PR.yearBranchLabels(text);
+  if (yb.length && yb.lineStart) {
+    const t = PR.untag(text);
+    let mine = -1;
+    for (let i = 0; i < yb.length; i++) {
+      const { conds: sc } = PR.parseLine(yb[i].scope, false);
+      if (!sc.length) return null;
+      const vs = sc.map((c) => judgeCond(c, p, ctx));
+      if (vs.every((v) => v === 'pass')) { if (mine >= 0) return null; mine = i; }
+      else if (!vs.includes('fail')) return null;          // 이 갈래에 드는지 모른다
+    }
+    if (mine < 0) return null;
+    const body = t.slice(yb[mine].body, mine + 1 < yb.length ? yb[mine + 1].start : t.length).replace(/[\s,，;；·/]+$/, '');
+    return body ? lineVerdict(body, p, isExclude, ctx) : null;
+  }
+  if (yb.length) return midYearBranch(text, yb, p, isExclude, ctx);
+  const scoped = PR.untag(text).match(/^([^,.:：()]{2,20}?)(?:의|인)\s?경우[,:：]?\s+(\S[\s\S]*)$/);
   if (scoped && !cases) {
     const { conds: sc } = PR.parseLine(scoped[1], false);
     if (!sc.length) return null;

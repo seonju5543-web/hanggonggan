@@ -47,14 +47,26 @@ function num(s) { const m = String(s).match(/\d+(\.\d+)?/); return m ? parseFloa
    ⚠️ 괄호가 4.5 면 괄호 안 수 · 4.3 이면 괄호 밖 수가 4.5 눈금이다 — 바깥 수 앞에 적힌 눈금(`4.3 만점 기준 3.3 이상(4.5 만점 기준 3.5 이상)`)과도 같은 답이다
       (전엔 그 꼴을 일반 규칙으로 넘겨 4.3 눈금 3.3 으로 읽어 평점 3.48 학생에게 ✓ 였다 · 틀린 안심)
    ⚠️ 분수의 척도(`3.0/4.5(…)` 의 4.5)는 바깥 수가 아니다 · 괄호가 안 닫혀도(`(4.3 만점 학교는 3.3 이상 / 4.0 만점 학교는 3.1 이상)`) 같은 꼴이다 */
-const ALT_SCALE = /(?<!\d\s*\/\s*)(\d\.\d{1,2})\s*점?\s*(이상(?:인|이어야\s*함)?\s*(?:자|학생|사람)?)?\s*(?:([(（])|[,，]|※)\s*4\.([35])\s*점?\s*만점\s*((?:학교|대학|기준)?\s*(?:은|는|의\s*경우|일\s*경우|인\s*경우)?)\s*(\d\.\d{1,2})\s*점?\s*(?:이상)?\s*[)）]?\s*(?:점\s*)?(이상)?/;
-function altScaleGrade(t) {
+/* 2회차 수리(2026-11-13) — 같은 뜻 다른 말을 한 곳에서 받는다:
+   ① 분수 바깥 수 `3.0/4.5(4.3 만점은 2.87) 이상` — 분자가 4.5 눈금이다(전엔 이 꼴을 놓쳐 아래 일반 규칙이 괄호 속 2.87 을 4.3 눈금으로 읽었다 · 평점 3.0 경계 ✕ · 2.94 ✓)
+      `3.3/4.3 이상(4.5 만점 기준 3.5 이상)` — 바깥이 4.3 분수면 괄호 안 4.5 수(전엔 분수 가드가 괄호 4.5 를 버려 4.3 눈금 3.3 · 평점 3.48 ✓)
+      바깥 분수와 괄호가 같은 눈금이면 문턱 하나로 못 읽는다(false)
+   ② 이름표 `대학교는`·`시`·`환산`·`:`·`학교:` · 대괄호 `[…]` · 괄호 속 `(※…)` · 등급 괄호 `B+(3.5) 이상(…)`
+   ③ 쉼표·※·빗금 꼴은 4.3 쪽이면 `기준`·`시`·`환산`·`:` 도 받는다(4.5 쪽은 지금처럼 `학교·대학·경우` 만 — `…, 4.5 만점 기준 3.5 이상 우대` 는 딴 마디)
+      빗금(` / 4.3 만점 학교는 …`)도 마디를 가른다 — 분수 `3.5/4.3 만점 기준 3.3 이상` 은 `이상` 이 없어 위 첫 줄이 거른다 */
+const ALT_SCALE = /(?<!\d\s*\/\s*)(\d\.\d{1,2})(?:\s*\/\s*4\.([35])(?!\d))?\s*점?\s*(이상(?:인|이어야\s*함)?\s*(?:자|학생|사람)?)?\s*(?:([(（])|([,，]|※|\/))\s*4\.([35])\s*점?\s*만점\s*((?:학교|대학교?|기준|환산|시)?\s*(?:은|는|의\s*경우|일\s*경우|인\s*경우|[:：])?)\s*(\d\.\d{1,2})\s*점?\s*(?:이상)?\s*[)）]?\s*(?:점\s*)?(이상)?/;
+function altScaleGrade(t0) {
+  /* 같은 말의 다른 표기를 한 꼴로 — 대괄호는 괄호 · 괄호 속 ※ 는 괄호 · 등급 괄호 `B+(3.5)` 는 그 수(문턱을 두 번 적은 것) */
+  const t = String(t0).replace(/\[/g, '(').replace(/\]/g, ')').replace(/([(（])\s*※\s*/g, '$1')
+    .replace(/(?<![A-Za-z])([ABC][+0]?)\s*[(（]\s*(\d\.\d{1,2})\s*점?\s*[)）]/g, '$1 $2');
   const m = t.match(ALT_SCALE);
   if (!m) return null;
-  const [, outer, upBefore, open, sc, marker, inner, upAfter] = m;
+  const [, outer, fracSc, upBefore, open, sep, sc, marker, inner, upAfter] = m;
   if (!(upBefore || upAfter)) return null;                       // `이상` 없는 꼴은 문턱이 아니다
-  if (!open && !/학교|대학|경우/.test(marker)) return null;        // 쉼표·※ 꼴은 '다른 눈금 학교는' 이라고 적을 때만(`…, 4.5 만점 기준 3.5 이상 우대` 는 딴 마디)
+  /* 쉼표·※·빗금 꼴은 '다른 눈금 학교는' 이라고 적을 때만 — 4.3 쪽은 `기준`·`시`·`환산`·`:` 도 같은 말(`…, 4.5 만점 기준 3.5 이상 우대` 는 딴 마디) */
+  if (!open && !(/학교|대학|경우/.test(marker) || (sc === '3' && /기준|환산|시|[:：]/.test(marker)))) return null;
   if (/^\s*\d(?:\.\d{1,2})?\s*점?\s*(?:미만|이하)/.test(t.slice(m.index + m[0].length))) return false;
+  if (fracSc) return fracSc === sc ? false : parseFloat(fracSc === '5' ? outer : inner);   // 바깥 분수의 눈금이 정한다
   return parseFloat(sc === '5' ? inner : outer);
 }
 function parseGrade(t, isExclude) {
@@ -116,7 +128,7 @@ function parseGrade(t, isExclude) {
   /* `3.5점(4.5점 만점 기준) 이상` — 척도만 적은 괄호는 여덟 자를 넘어도 넘는다(2026-11-11 · 6차 · 창암장학재단 두 줄이 '모름'이었다) */
   /* 🔴 수 앞이 숫자·점이면 평점이 아니다 (2026-11-13 · 1회차 수리) — 위 `학?` 를 더하자 `12.5학점`·`12.0학점` 의 뒤 `2.5`·`2.0` 을 평점으로 읽어
      평점 2.9 학생 ✓(틀린 안심) · `13.5학점` 을 평점 3.5 로 읽어 평점 3.2 학생 ✕(틀린 미달)였다 — `(?<![\d.])` */
-  const mDec = t.match(/(?<!(?<![\d.])[0-3]\s?\.\s?\d{1,2}\s*\)?\s*\/\s*)(?!(?<=\/\s*)4\.[35](?!\d))(?<![\d.])(\d\.\d{1,2})\s*학?점?\s*\)?\s*(?:\([^)]{0,8}\)|[(（]\s*4\.[35]\s*점?\s*만점\s*(?:기준)?\s*[)）])?\s*(?:\/\s*4\.[35])?\s*점?\s*\)?\s*(?:이상|이상인|넘)/)
+  const mDec = t.match(/(?<!(?<![\d.])[0-3]\s?\.\s?\d{1,2}\s*\)?\s*\/\s*)(?!(?<=\/\s*)4\.[35](?!\d))(?<![\d.])(\d\.\d{1,2})\s*학?점?\s*\)?\s*(?:\([^)]{0,8}\)|[(（]\s*4\.[35]\s*점?\s*만점\s*(?:기준)?\s*[)）])?\s*(?:\/\s*4\.[35])?\s*학?점?\s*\)?\s*(?:이상|이상인|넘)/)
     || (isExclude ? t.match(/(\d\.\d{1,2})\s*점?\s*(?:\([^)]{0,8}\))?\s*에?\s*미달(?:된|인|한)?\s*(?:때|경우|자|학생|사람)?\s*[.)]?\s*$/) : null);
   /* 🔴 **점수와 `이상` 사이의 괄호** (2026-10-12 · 카드 분석 조각 1). `백분위 70점(C0) 이상`·`70점(평점 1.51에 해당) 이상`·
      `70 점 (100 점 만점 ) 이상` — 괄호가 끼면 통째로 못 읽어 줄이 '모름'이었다(실측 4줄). 평점 쪽(mDec)이 이미 허용하는 것과 같다.
@@ -137,6 +149,15 @@ function parseGrade(t, isExclude) {
        줄 어딘가의 4.3 을 보고 4.3 척도 3.5 로 읽어 평점 3.6(4.5 만점) 학생이 ✕ 였다(2026-11-13 · 만점 잡음 가지를 좁혀 이 줄이 살아나자 드러난 틀린 미달) */
     const lead = t.slice(Math.max(0, mDec.index + mDec[0].indexOf(mDec[1]) - 22), mDec.index + mDec[0].indexOf(mDec[1])).match(/4\.([35])\s*점?\s*만점\s*(?:에|기준(?:으로)?|으로|의\s*경우)?[^\d]{0,10}$/);
     const scale43 = /4\.3/.test(own) ? true : /4\.5/.test(own) ? false : lead ? lead[1] === '3' : has43;
+    /* 🔴 줄의 4.3 이 **제 문턱 수를 따로 단 대안 마디**(`4.3 만점 대학교는 3.3`)뿐이면 이 수의 눈금이 아니다 (2026-11-13 · 2회차 수리) —
+       altScaleGrade 가 못 받은 꼴(`평점 3.5 이상 ; 4.3 만점 학교 3.3` 같은 다른 이름표)을 줄의 4.3 으로 4.3 눈금 3.5 로 읽어 평점 3.6 학생 HIGH ✕ 였다(틀린 미달).
+       눈금을 이 수에 붙여 적지 않았으면(바로 뒤 `/4.3`·바로 앞 `4.3 만점`) 문턱 하나로 못 잰다 — 성적 조건 없음 */
+    if (scale43 && !/4\.3/.test(own) && !lead) {
+      const at = mDec.index + mDec[0].indexOf(mDec[1]);
+      const altOnly = [...t.matchAll(/4\.3\s*점?\s*만점[^\d]{0,14}?(\d\.\d{1,2})/g)];
+      const bare43 = (t.match(/\/\s*4\.3|4\.3\s*만점/g) || []).length;
+      if (altOnly.length && altOnly.length === bare43 && altOnly.every((x) => x.index + x[0].length - x[1].length !== at)) return null;
+    }
     return { kind: 'grade', scale: scale43 ? GRADE_SCALE.gpa43 : GRADE_SCALE.gpa45, min: v,
              conf: (kinds > 1 || HAS_EXCEPTION.test(t)) ? LOW : HIGH };
   }
@@ -239,15 +260,18 @@ function parseCert(t) {
 function parseCredits(t) {
   /* `15학점(졸업이수학점이 120인 학부는 14학점) 이상` — 수와 `이상` 사이 괄호를 허용한다(2026-10-31 · 2단계 · 가온누리·특별장학 줄이 '모름'이었다) */
   /* `매 정규학기 당 최소 12학점 이수한 자`·`최소 이수학점(12학점)` — `최소` 가 앞에 오면 `이상` 과 같은 말이다(2026-11-02 · 2단계 2차) */
-  const mMin = t.match(/최소\s*(?:이수\s?학점\s*[(（]\s*)?(\d{1,2})\s*학점/);
+  /* 🔴 학점 수는 **앞이 숫자·점이 아니고 뒤에 소수가 안 붙은** 수다 (2026-11-13 · 2회차 수리 · 원래 있던 결함) — `3.5/4.5학점 이상`(홍천군 층2 성적기준)의 `5학점`·`13.5학점` 의 `5학점` 을
+     5학점으로 읽어 평점 2.6 학생이 ✓(틀린 안심)였다. 소수 학점(`13.5학점`·`15.0 학점`)은 그 수로 읽는다 — 5 아래 소수는 평점이다(`3.5학점 이상` · parseGrade 몫) */
+  const N = '(?<![\\d.])((?:[1-9]\\d|[5-9])(?:\\.\\d)?|\\d{1,2})(?!\\.?\\d)';
+  const mMin = t.match(new RegExp(`최소\\s*(?:이수\\s?학점\\s*[(（]\\s*)?${N}\\s*학점`));
   /* 괄호가 겹친 긴 부연(`15학점 (졸업이수학점이 120인 대상 학부 (과) 는 14학점 / 최종직전학기는 9학점) 이상`)은 걷어 내고 본다 — 갈래 수는 아래 alts 로 남긴다(2026-11-11 · 1단계 M2) */
   const flat = t.replace(/[(（](?:[^()（）]|[(（][^()（）]*[)）])*[)）]/g, ' ').replace(/\s+/g, ' ');
-  const m = t.match(/(\d{1,2})\s*학점\s*(?:\([^()]{0,40}\))?\s*(이상|이내|미만)/) || flat.match(/(\d{1,2})\s*학점\s*(?:이|은|는)?\s*(이상|이내|미만)/) || (mMin ? [mMin[0], mMin[1], '이상'] : null);
+  const m = t.match(new RegExp(`${N}\\s*학점\\s*(?:\\([^()]{0,40}\\))?\\s*(이상|이내|미만)`)) || flat.match(new RegExp(`${N}\\s*학점\\s*(?:이|은|는)?\\s*(이상|이내|미만)`)) || (mMin ? [mMin[0], mMin[1], '이상'] : null);
   if (!m) return null;
-  const v = num(m[1]);
-  if (v == null || v < 1 || v > 30) return null;
+  const v = parseFloat(m[1]);
+  if (v == null || Number.isNaN(v) || v < 1 || v > 30) return null;
   /* 여러 개가 한 줄에 있으면(`15학점(4학년 12학점)`) 어느 쪽인지 모른다 */
-  const nums = (t.match(/\d{1,2}\s*학점/g) || []).map((x) => num(x)).filter((n) => n != null && n >= 1 && n <= 30);
+  const nums = [...t.matchAll(new RegExp(`${N}\\s*학점`, 'g'))].map((x) => parseFloat(x[1])).filter((n) => n != null && n >= 1 && n <= 30);
   const many = nums.length > 1;
   /* 갈래가 여럿이라도 전부 `이상` 꼴이면 전부를 넘는 학생은 ✓ · 전부에 못 미치면 ✕ (judgeCond credits alts · `이하`·`미만` 이 섞이면 그대로 모름) */
   /* ⚠️ `이하`·`단,`·`다만` 은 괄호 안에 있어도 본다(`12학점 이상 (단, 18학점 이하)` 은 범위이지 갈래가 아니다) · 괄호 안 `계절학기 제외/불포함` 같은 부연만 걷는다 */
@@ -340,9 +364,33 @@ const YEAR_ENUM = /(?<!\d)(\d)(?:\s*학년)?(?:\s*(?:[,·、/]|또는|이나)\s*
    `3학년 15학점 이상 이수자` 의 숫자 학년은 요건일 수 있다 · `최종학년 1학기 재학생` 의 학기는 갈래가 아니다(전엔 `\d` 하나로 갈래가 되어 1학년 틀린 ✓) */
 const YEAR_BRANCH_TAIL = /^\s*(?:[:：]|의\s*경우|생?\s*은\s*[^,.]{0,12}?\d)/;   // 학년 뒤 조사는 `은`(받침) · `4학년생은`
 const FINAL_BRANCH_CREDITS = /^\s*\d{1,2}\s*(?:학점|점)/;
+/* 🔴 **학년을 빼는 말 — 최종학년과 숫자 학년이 같이 쓰는 한 곳** (2026-11-13 · 2회차 수리) — 학년 낱말 바로 뒤 짧은 이름(`생`·`재학생`·`학생`·`자`·`해당자`·괄호)을 넘어 `(을|은|는) 제외`·`이 아닌`.
+   `최종학년생을 제외한 재학생`·`최종학년 재학생을 제외한 학부생`·`최종학년(4학년)을 제외한`·`4학년을 제외한 재학생` 을 '그 학년이어야' 로 읽어 1학년 ✕ · 4학년 ✓ 로 뒤집혔다 */
+const YEAR_EXCLUDE_TAIL = /^\s*(?:생|\s*재학생|\s*학생|자|\s*해당자)?\s*(?:[(（][^()（）]{0,8}[)）])?\s*(?:을|은|는|이)?\s*제외|^\s*(?:생|자)?\s*(?:이|가)\s*아닌/;
 /* 숫자 학년 언급(`4학년`·`1~3학년`·`3, 4학년`)이 **전부** 갈래 이름표면 학년 조건이 아니다 */
 const YEAR_MENTION = /(?<!\d)\d(?:\s*학년)?(?:\s*(?:[~∼～\-–,·、/]|또는|이나)\s*\d(?:\s*학년)?)*\s*학년/g;
 const yearMentionsAllBranches = (t) => { const at = [...t.matchAll(YEAR_MENTION)]; return at.length > 0 && at.every((m) => YEAR_BRANCH_TAIL.test(t.slice(m.index + m[0].length))); };
+/* 🔴 **학년 갈래 이름표 찾기 — lineVerdict 범위가 부르는 한 곳** (2026-11-13 · 2회차 수리) — 숫자 학년(`4학년`·`1~3학년`·`3, 4학년`·`3학년 또는 4학년`·`2·3·4학년`)과
+   최종·졸업학년 뒤에 갈래 꼬리(YEAR_BRANCH_TAIL)가 오면 이름표다. parseYear 가 학년 조건을 버리는 것과 **같은 판단**이라
+   범위를 따로 짜지 않는다(전엔 lineVerdict 가 범위 꼴만 받아 `3, 4학년은 12학점` 의 학점이 1학년에게 걸렸다).
+   돌려주는 값: [{ start, scope, body }] (start = 이름표 자리 · scope = 학년 글자 · body = 갈래 내용이 시작하는 자리) · lineStart = 첫 이름표가 줄 맨 앞인가 */
+function yearBranchLabels(text) {
+  const t = untag(text);
+  const out = [];
+  const head = (after) => (after.match(/^\s*(?:생)?\s*(?:[:：]|의\s*경우\s*[,:：]?|은|는)?\s*/) || [''])[0].length;
+  for (const m of t.matchAll(YEAR_MENTION)) {
+    const end = m.index + m[0].length, after = t.slice(end);
+    if (YEAR_BRANCH_TAIL.test(after)) out.push({ start: m.index, scope: m[0], body: end + head(after) });
+  }
+  for (const m of t.matchAll(/(?:최종|졸업)\s?학년(?!\s*도)/g)) {
+    const end = m.index + m[0].length, after = t.slice(end);
+    if (/\d\s*(?:학년\s*)?(?:[~∼～\-–]|부터|에서)\s*$/.test(t.slice(0, m.index))) continue;   // `1~졸업학년` 은 범위
+    if (YEAR_BRANCH_TAIL.test(after)) out.push({ start: m.index, scope: m[0], body: end + head(after) });   // `최종학년 10학점` 꼴은 이름표로 안 본다(parse 가 학점만 읽는다 · 1회차 그대로)
+  }
+  out.sort((a, b) => a.start - b.start);
+  out.lineStart = out.length > 0 && /^[\s\-–·•○◦*▶►□■◇◆]*(?:\d{1,2}[.)]\s*|[가-하][.)]\s*)?$/.test(t.slice(0, out[0].start));
+  return out;
+}
 function parseFinalYear(t) {
   const FIN = '(?:최종|졸업)\\s?학년';
   if (!new RegExp(FIN + '(?!\\s*도)').test(t)) return undefined;
@@ -361,8 +409,10 @@ function parseFinalYear(t) {
   if (branch) return numYear ? undefined : null;
   /* `최종학년을 제외한 재학생`·`최종학년 제외`·`최종학년은 제외`·`최종학년이 아닌` — 마지막 학년을 **빼는** 말이다(1회차 수리 · 전엔 '최종학년이어야' 로 읽어 1학년 ✕ · 4학년 ✓ 로 뒤집혔다).
      판정은 final 갈래를 뒤집어(exclude) 쓴다 · 학제를 몰라 확신은 낮다(1학년 ✓ · 마지막일 수 있는 학년 모름 · ✕ 는 안 낸다) */
-  if (at.some((m) => /^\s*(?:(?:을|은)\s*)?제외|^\s*이\s*아닌/.test(body.slice(m.index + m[0].length)))) {
-    return numYear ? undefined : { kind: 'year', final: 'last', exclude: true, conf: LOW };
+  /* 숫자 학년이 `최종학년(4학년)` 처럼 최종학년에 붙은 괄호 안에만 있으면 같은 말을 두 번 적은 것이다(빼는 말 그대로) */
+  if (at.some((m) => YEAR_EXCLUDE_TAIL.test(body.slice(m.index + m[0].length)))) {
+    const numOutside = YEAR_NUM_IN_PAREN.test(t.replace(new RegExp(FIN + '\\s*[(（][^()（）]{0,8}[)）]', 'g'), ' '));
+    return numOutside ? undefined : { kind: 'year', final: 'last', exclude: true, conf: LOW };
   }
   if (numYear) return undefined;
   const pair = new RegExp(FIN + '\\s*(?:[,/·]|및|과|와|또는|이나)?\\s*(?:' + FIN + '\\s*(?:의\\s*)?)?직전\\s*학년').exec(body);
@@ -389,6 +439,13 @@ function parseYearBody(t) {
   if (/^\s*대학\s?입학\s?예정자\s*$/.test(t)) return { kind: 'year', eq: 1, conf: LOW };
   /* `4학년은 10학점 이상 이수`·`1학년 : 본인부담금의 반값` — 숫자 학년이 전부 갈래 이름표면 학년 조건이 아니다(YEAR_BRANCH_TAIL 한 곳 · 최종학년 갈래와 같은 규칙) */
   if (yearMentionsAllBranches(t)) return null;
+  /* `4학년을 제외한 재학생`·`재학생(4학년 제외)`·`3, 4학년은 제외` — 학년 언급이 하나이고 빼는 말이 붙으면 그 학년을 **뺀다**(YEAR_EXCLUDE_TAIL 한 곳 · 최종학년과 같은 규칙).
+     확신은 낮다 — 다른 학년은 ✓ · 그 학년은 ✕ 대신 모름(2회차 수리 · 전엔 '그 학년이어야' 로 읽어 1학년 ✕ · 4학년 ✓) */
+  const ment = [...t.matchAll(YEAR_MENTION)];
+  if (ment.length === 1 && YEAR_EXCLUDE_TAIL.test(t.slice(ment[0].index + ment[0][0].length)) && !/고등|중학|초등/.test(t)) {
+    const r = parseYearBody(ment[0][0]);
+    return r && !r.final ? { ...r, exclude: true, conf: LOW } : null;
+  }
   const mr = t.match(YEAR_RANGE);
   const me = !mr && t.match(YEAR_ENUM);   // 범위(`3~4학년`)가 있으면 범위 길로 — `3~4학년 또는 1학년 편입생` 은 그 길이 확신을 낮춘다
   if (me) {
@@ -724,8 +781,9 @@ function foreignInList(t) {
        `학부생·대학원생 외국인 유학생` 은 그 무리 **가운데** 외국인 유학생만이다. 나열 표지를 보고 목록으로 읽어 한국 학생에게 ✓ 였다(틀린 안심).
        외국인 바로 앞이 한정어(중·인)이거나 무리 낱말(나열 표지 없이)이면 목록 아님 · `… 중 외국인 유학생도 신청 가능` 의 `도` 는 그대로 받는다 */
     if (/^\s*(?:도\s?(?:신청|지원|참가|참여|응모|접수)|(?:을|를)?\s?포함)/.test(post)) return true;
-    if (new RegExp(`(?:중|인|${PEOPLE_GROUP})\\s*$`).test(pre)) continue;
-    if (new RegExp(`${PEOPLE_GROUP}\\s*${LIST_SEP}\\s*[^,、·/.()（）]{0,10}$`).test(pre)) return true;
+    /* ⚠️ 한정어는 **앞쪽 목록만** 막는다 (2회차 수리) — `재학 중인 외국인 유학생 및 한국 학생`·`재학생 중 외국인 유학생 및 한국인 학생` 은 뒤쪽이 목록이다(전엔 `continue` 로 뒤를 안 봐 한국 학생 ✕ · 틀린 미달) */
+    const qualified = new RegExp(`(?:중|인|${PEOPLE_GROUP})\\s*$`).test(pre);
+    if (!qualified && new RegExp(`${PEOPLE_GROUP}\\s*${LIST_SEP}\\s*[^,、·/.()（）]{0,10}$`).test(pre)) return true;
     if (new RegExp(`^\\s*(?:들)?\\s*${LIST_SEP}\\s*[^,、·/.()（）]{0,10}?${PEOPLE_GROUP}`).test(post)) return true;
   }
   return false;
@@ -1199,11 +1257,14 @@ function parentOnlyResidence(t) {
 /* 🔴 읍면동 이름 한 칸 — 보통 낱말 `…활동`·`공동`·`협동`·`행동`·`노동`·`자동` 은 동 이름이 아니다(`운동`·`이동` 은 청운동·안산 이동 같은 진짜 이름이 있어 안 뺀다) (2026-11-13 · 1회차 수리) —
    `서울 거주자로 지역사회 공동·협동 활동 참여자`·`경남 거주자로서 봉사활동, 동아리활동 경험자` 를 동 목록으로 읽어 시·도 전체 줄의 맞던 ✓ 가 '모름'이 됐다.
    목록 꼴은 **거주·주소·주민등록 바로 앞**에서만 본다(`검단동·불로대곡동 거주`) */
-const DONG = (n) => `(?![가-힣]*(?:활|협|행|노|공|자)동(?![가-힣]))[가-힣]{1,${n}}(?:읍|면|동)(?![가-힣])`;
+/* 🔴 보통 낱말은 **낱말 전체**로만 뺀다 (2026-11-13 · 2회차 수리) — 끝말(`…자동`)로 빼니 진짜 동네 `효자동`·`대자동`·`청운효자동` 이 빠져
+   `전주시 효자동 거주자` 가 시 전체 줄이 되어 전주 다른 동 학생에게 ✓ 였다(틀린 안심). `…활동`(봉사활동·동아리활동)만 끝말로 뺀다 · 낱말은 앞이 한글이 아닌 데서 시작한다 */
+const DONG = (n, end = '(?![가-힣])') => `(?<![가-힣])(?!(?:활|협|행|노|공|자)동(?![가-힣]))(?![가-힣]*활동(?![가-힣]))[가-힣]{1,${n}}(?:읍|면|동)${end}`;
 const SUB_AREA = new RegExp([
   `(?:시|군|구)\\s+${DONG(4)}`,
   `(?:서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충북|충남|전북|전남|경북|경남|제주)(?:특별시|광역시|특별자치시|특별자치도|도|시)?\\s+${DONG(6)}`,
-  `${DONG(6)}(?:\\s?[·ㆍ,]\\s?${DONG(6)})+(?:\\s?등)?\\s?(?:거주|주소|주민등록)`,   // `…동에 주소` 는 아래 가지가 본다
+  /* 목록은 바로 뒤가 거주 낱말이거나 한정하는 말(`…에 한함`·`한정`·`지역`·`일대`·`출신`·닫는 괄호)일 때 — `인천광역시 거주자(검단동·불로대곡동·원당동에 한함)`·`경남 고성군 거주(하일면·하이면)` (2회차 수리 · 전엔 거주 낱말만 받아 인천 남동구 학생 ✓) */
+  `${DONG(6)}(?:\\s?[·ㆍ,]\\s?${DONG(6, '(?=에|(?![가-힣]))')})+(?:\\s?등)?\\s?(?:에\\s?)?(?:거주|주소|주민등록|한함|한정|지역|일대|출신|[)）])`,   // `…동에 주소` 는 아래 가지가 본다
   '[가-힣]{1,4}(?:읍|면|동|리)에\\s?(?:[^,]{0,10}\\s)?(?:주소|거주|주민등록)',
   '[가-힣]{2,10}(?:전환지역|주변지역|접경지역|폐광지역)',
 ].join('|'));
@@ -1759,7 +1820,7 @@ function shortRegion(x) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { schoolKindAlt, parseLine, shortRegion, REGION_CITIES, provincesOfCity, parseDegree, TRAIT_PAT, TRAIT_DISQUALIFY, gradOnly, gradTarget, mentionsUndergrad, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, REGIONS, untag, BRANCH_TAG};
+  module.exports = { schoolKindAlt, parseLine, shortRegion, REGION_CITIES, provincesOfCity, parseDegree, TRAIT_PAT, TRAIT_DISQUALIFY, gradOnly, gradTarget, mentionsUndergrad, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, REGIONS, untag, BRANCH_TAG, yearBranchLabels};
 }
 
 /* ── 경우별 분기 (2026-08-24 개발자 지적) ─────────────────────────────────
