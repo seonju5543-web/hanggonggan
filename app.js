@@ -3238,6 +3238,8 @@ function kosafAsScholarships() {
         /* 「누가」·「성적」 칸(특정자격·성적기준)의 줄 — 이 칸의 줄이 **전부** 요건으로 못 읽혀 버려지고 거주 줄만 남으면 적합도는 「자격 미확인」이다
            (match-engine fitDetail 한 곳 · 2026-11-13 병합 리뷰 · 강서구장학회 「구민한마음」이 거주 기간 ✓ 하나로 95% 였다). 줄 글자는 eligibilityLines 와 같은 것 */
         ...(KOSAF_CORE.flatMap((k) => split(f[k])).length ? { kosafCoreLines: KOSAF_CORE.flatMap((k) => split(f[k])) } : {}),
+        /* 「누가」 칸(특정자격)만 따로 — 이 칸의 줄이 **전부** 버려지면 성적 칸이 살아도 「자격 미확인」(fitDetail · 2026-11-13 · 1회차 수리 · 구민한마음 `2022 ~ 2026년 선발 … 장학생 8명`) */
+        ...(split(f['특정자격']).length ? { kosafWhoLines: split(f['특정자격']) } : {}),
         ...(split(f['자격제한']).length ? { eligibilityExcludes: split(f['자격제한']) } : {}),
         documents: docs.length ? docs : ['재단 공고문에서 확인'],
         sourceUrl: i.home || '',
