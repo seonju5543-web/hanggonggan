@@ -237,6 +237,16 @@ function judgeCond(c, p, ctx) {
     case 'degree': {
       const mine = degreeOf(p);
       if (c.want === 'both') return 'pass';
+      /* 대상 목록 줄(`대학생, 일반인` · parse-requirements audienceWithStudents)은 대학생이 **여러 길 중 하나**다 — 대학원생은 `일반인` 으로 낼 수도 있어 ✕ 가 아니라 모름 ·
+         나이 괄호(`청년층(20~30대)`)가 있고 나이가 밖이면 그 괄호가 대학생에게도 걸리는지 몰라 모름(2026-11-13 · 6차 리뷰 — 둘 다 틀린 ✕·✓ 였다) */
+      if (c.audience) {
+        if (mine !== 'undergrad') return 'unknown';
+        if (c.ageBand && p.birthYear) {
+          const age = new Date().getFullYear() - Number(p.birthYear);
+          if (age <= c.ageBand[0] || age > c.ageBand[1]) return 'unknown';
+        }
+        return 'pass';
+      }
       /* 공고의 다른 줄이 학부를 대상으로 말했으면, 이 줄만 보고 떨어뜨리지 않는다(noticeCtx) */
       if (c.want === 'grad' && ctx && ctx.anyUndergrad) return 'unknown';
       return c.want === mine ? 'pass' : 'fail';
