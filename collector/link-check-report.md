@@ -1,21 +1,26 @@
-## 🔗 원문 링크 확인 리포트 (2026-11-13 03:05 KST · 기준일 2026-11-13)
+## 🔗 원문 링크 확인 리포트 (2026-11-14 02:43 KST · 기준일 2026-11-14)
 
 앱이 보여 주는 원문 링크를 **학생처럼**(로그인·리퍼러 없는 새 탭) 열어, 그 공고가 실제로 뜨는지 봤습니다.
 🔴 이 로봇은 주소를 고치지 않습니다 — 확정된 문제만 `data/link-check.json` 에 적고, 앱은 그 링크의 이름을 바꿔 정직하게 보여 줍니다(예: "게시판 목록에서 보기", "원문 공고(확인 필요)").
 
-⏰ 예산(20분)이 다 돼 여기서 멈췄습니다 — 남은 167건은 다음 실행이 이어서 봅니다. 📱 폰 표본은 예산이 모자라 25건을 못 봤습니다.
+⏰ 예산(20분)이 다 돼 여기서 멈췄습니다 — 남은 112건은 다음 실행이 이어서 봅니다. 📱 폰 표본은 예산이 모자라 25건을 못 봤습니다.
 
-이번 실행: **233건** 열어 봄 · 공고 확인 174 · 문제로 보임 22 · 판정 못 함 37
-앱에 알린 확정 문제(지금 실린 링크): **25건** · 이번에 새로 확정: **0건**
+이번 실행: **288건** 열어 봄 · 공고 확인 232 · 문제로 보임 25 · 판정 못 함 31
+앱에 알린 확정 문제(지금 실린 링크): **27건** · 이번에 새로 확정: **2건**
 
-### 새로 확정된 문제 링크 (다른 날 두 번 같은 것을 봤습니다) — 0건
-- 없음
-
-### 한 번 본 문제 (다른 날 한 번 더 보고 확정합니다 — 아직 앱 글자를 바꾸지 않습니다) — 2건
+### 새로 확정된 문제 링크 (다른 날 두 번 같은 것을 봤습니다) — 2건
 - [교내 소식] 2027년도 2월 말 퇴직교원 정부포상 추천대상자 공개 검증 안내 — **사이트 첫 화면이 열림** (사이트 첫 화면으로 돌려보내짐)
   https://www.dongguk.edu/article/GENERALNOTICES/detail/26766635 → 실제로 간 곳 https://www.dongguk.edu/main
 - [정식 등록·실시간 공고] auto-amepagescholarshipnotice-00jgl50 · [교외] 해동과학문화재단 장학생 선발 안내(10/26 마감, 공학계열, 생활비 연 1… — **다른 화면이 열림** (다른 글이 열림(제목 불일치))
   https://www.sogang.ac.kr/ko/detail/551490?bbsConfigFk=141&namepage=ScholarshipNotice
+
+### 한 번 본 문제 (다른 날 한 번 더 보고 확정합니다 — 아직 앱 글자를 바꾸지 않습니다) — 3건
+- [교내 소식] [카운슬링센터] '온라인 심리검사'로 자기점검 해볼까? - 대학생활 적응 정도 및 학… — **사이트 첫 화면이 열림** (사이트 첫 화면으로 돌려보내짐)
+  https://www.dongguk.edu/article/GENERALNOTICES/detail/26766606 → 실제로 간 곳 https://www.dongguk.edu/main
+- [교내 소식] [한국어센터] 입학식 단기근로학생 모집(12/3, 12/10) — **다른 화면이 열림** (다른 글이 열림(제목 불일치))
+  https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE2ODklMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D
+- [교내 소식] [일반] [원격교육지원센터] 2026년 광운대학교 모집 — **다른 화면이 열림** (다른 글이 열림(제목 불일치))
+  https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53682&tpage=1&searchKey=1&searchVal=&srCategoryId=
 
 ### 원문 후보 확인 — 찾아 온 주소가 그 공고·그 회차인지 학생처럼 열어 봤습니다
 이번에 판정한 후보 **0건** · ✅ 원문으로 올림 0 · 🟡 사람 확인 0 · ❌ 맞지 않음 0 · ⏳ 못 엶(다시 봄) 0
@@ -54,33 +59,29 @@ _후보는 `collector/link-candidates.json` 에 적거나(사람·세션), 로�
 - 없음
 
 ### 판정 못 한 링크 (이번 실행 · 사이트별 · 문제로 세지 않습니다)
-- www.ajou.ac.kr — 7건 · 가장 많은 이유: 열기 실패: page.goto: net::ERR_CONNECTION_REFUSED at … (4건)
-- www.kmu.ac.kr — 7건 · 가장 많은 이유: 열기 실패: page.goto: Timeout 20000ms exceeded. (5건)
-- www.kangwon.ac.kr — 5건 · 가장 많은 이유: 열기 실패: page.goto: net::ERR_EMPTY_RESPONSE at http… (5건)
-- kangwon.ac.kr — 5건 · 가장 많은 이유: 열기 실패: page.goto: net::ERR_EMPTY_RESPONSE at http… (5건)
-- www.hongik.ac.kr — 2건 · 가장 많은 이유: 본문이 안 그려짐(165자 — 판정 불가) (2건)
+- www.hongik.ac.kr — 8건 · 가장 많은 이유: 본문이 안 그려짐(179자 — 판정 불가) (5건)
+- kangwon.ac.kr — 8건 · 가장 많은 이유: 열기 실패: page.goto: net::ERR_EMPTY_RESPONSE at http… (8건)
+- www.kmu.ac.kr — 7건 · 가장 많은 이유: 열기 실패: page.goto: Timeout 20000ms exceeded. (6건)
 - 1365.go.kr — 2건 · 가장 많은 이유: 열기 실패: page.goto: net::ERR_EMPTY_RESPONSE at http… (2건)
-- student.snu.ac.kr — 2건 · 가장 많은 이유: 열기 실패: 시한 45초 초과 (2건)
-- www.hanyang.ac.kr — 2건 · 가장 많은 이유: HTTP 403 (2건)
+- www.kangwon.ac.kr — 2건 · 가장 많은 이유: 열기 실패: page.goto: net::ERR_EMPTY_RESPONSE at http… (2건)
 - www.jnu.ac.kr — 1건 · 가장 많은 이유: 열기 실패: page.goto: Timeout 20000ms exceeded.
-- www.dsa.or.kr — 1건 · 가장 많은 이유: 열기 실패: page.goto: Timeout 20000ms exceeded.
+- www.ajou.ac.kr — 1건 · 가장 많은 이유: 열기 실패: page.goto: Timeout 20000ms exceeded.
 - www.inha.ac.kr — 1건 · 가장 많은 이유: 본문이 안 그려짐(18자 — 판정 불가)
-- www.catholic.ac.kr — 1건 · 가장 많은 이유: 열기 실패: page.goto: Timeout 20000ms exceeded.
-- www.mju.ac.kr — 1건 · 가장 많은 이유: 본문이 안 그려짐(18자 — 판정 불가)
+- news.khu.ac.kr — 1건 · 가장 많은 이유: 본문이 안 그려짐(0자 — 판정 불가)
 
 ### 전체 현황 (앱에 실린 링크 × 지금까지 본 결과)
 | 묶음 | 아직 안 봄 | 공고 확인 | 판정 못 함 | 한 번 봄 | 목록 | 첫 화면 | 로그인 | 안 열림 | 다른 화면 |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 정식 등록 | 0 | 334 | 13 | 1 | 0 | 0 | 0 | 1 | 0 |
-| 실시간 공고 | 0 | 1283 | 82 | 1 | 1 | 0 | 0 | 4 | 0 |
-| 재단·지자체 | 0 | 51 | 9 | 0 | 0 | 1 | 1 | 0 | 0 |
-| 대외활동·공모전 | 0 | 137 | 13 | 0 | 0 | 1 | 0 | 0 | 4 |
-| 교내 소식 | 38 | 1129 | 73 | 1 | 0 | 0 | 2 | 3 | 8 |
+| 정식 등록 | 0 | 339 | 14 | 0 | 0 | 0 | 0 | 1 | 1 |
+| 실시간 공고 | 0 | 1296 | 83 | 0 | 1 | 0 | 0 | 4 | 1 |
+| 재단·지자체 | 0 | 50 | 9 | 0 | 0 | 1 | 1 | 0 | 0 |
+| 대외활동·공모전 | 0 | 131 | 14 | 0 | 0 | 1 | 0 | 0 | 4 |
+| 교내 소식 | 36 | 1122 | 75 | 3 | 0 | 1 | 2 | 3 | 8 |
 | 층2 재단(바로잡은 원문) | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
 _한 링크가 두 묶음에 함께 실려 있으면 양쪽에 셉니다. 「한 번 봄」은 다른 날 한 번 더 같은 것을 보면 확정됩니다._
 
-### 확정된 문제 전체 (앱이 받는 파일에 적힌 것) — 25건
+### 확정된 문제 전체 (앱이 받는 파일에 적힌 것) — 27건
 - [대외활동·공모전] act-0fi52mv · [식품의약품안전처] 식품의약품안전처 누리소통기자단 15기 모집 — **다른 화면이 열림** (다른 글이 열림(제목 불일치))
   https://blog.naver.com/kfdazzang/224463652864
 - [대외활동·공모전] act-12p27x0 · [한국도로공사] 한국도로공사 AI 활용 아이디어 공모전 국민의 상상, AI를 타고 달… — **다른 화면이 열림** (다른 글이 열림(제목 불일치))
@@ -101,6 +102,8 @@ _한 링크가 두 묶음에 함께 실려 있으면 양쪽에 셉니다. 「한
   https://snuc.snu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/?mod=document&uid=943
 - [교내 소식] [학생지원팀] 2026학년도 2학기 동계방학 집중근로 희망근로지 신청 안내 — **열리지 않음(없는 주소)** (HTTP 404)
   https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277033&article.offset=0&articleLimit=10
+- [교내 소식] 2027년도 2월 말 퇴직교원 정부포상 추천대상자 공개 검증 안내 — **사이트 첫 화면이 열림** (사이트 첫 화면으로 돌려보내짐)
+  https://www.dongguk.edu/article/GENERALNOTICES/detail/26766635 → 실제로 간 곳 https://www.dongguk.edu/main
 - [교내 소식] [총무팀] 육아휴직 대체자 채용 공고 — **다른 화면이 열림** (본문이 안 그려짐(18자 — 판정 불가))
   https://www.inha.ac.kr/bbs/kr/8/46024/artclView.do
 - [교내 소식] [전북국제개발협력센터] 제4회 전북 개발협력 포럼 개최 (11/16) - 참여자 선착… — **로그인을 요구함** (로그인 요구(제목이 안 보이고 비밀번호 칸))
@@ -131,10 +134,12 @@ _한 링크가 두 묶음에 함께 실려 있으면 양쪽에 셉니다. 「한
   https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26766521
 - [정식 등록·실시간 공고] auto-larshipdoarticleno377067 · [국가근로] 2026학년도 2학기 국가근로장학생 추가 모집 안내(교수학습개발센터) — **열리지 않음(없는 주소)** (열기 실패: page.goto: Timeout 20000ms exceeded.)
   https://www.ajou.ac.kr/kr/ajou/notice_scholarship.do?mode=view&articleNo=377067&article.offset=0&articleLimit=10
+- [정식 등록·실시간 공고] auto-amepagescholarshipnotice-00jgl50 · [교외] 해동과학문화재단 장학생 선발 안내(10/26 마감, 공학계열, 생활비 연 1… — **다른 화면이 열림** (다른 글이 열림(제목 불일치))
+  https://www.sogang.ac.kr/ko/detail/551490?bbsConfigFk=141&namepage=ScholarshipNotice
 
 ### 열어 보지 않은 것 (세기만 했습니다)
 - 게시판 목록 표식(#n-): 없음 — 원문 주소를 아직 못 찾은 글이라 앱이 이미 "게시판 목록"이라고 부릅니다
-- 층2(한국장학재단에 등록된 재단 장학금): 79건 — 재단 홈페이지 주소뿐이라 앱이 "재단 홈페이지"라고 부릅니다(그중 공고문 사본이 있는 것 67건) · 바로잡은 원문이 있어 연 것 2건은 따로
-- 마감이 지나 앱이 더는 보여 주지 않는 대외활동: 45건
-- 이번 순서에 들었지만 시간이 모자라 못 본 것: 167건 (다음 실행이 이어서 봅니다)
-- 앱에 실린 링크 2923건 중 이번 순서에 든 것 400건 (사이트마다 최대 8건 · 학교 서버를 몰아치지 않으려고)
+- 층2(한국장학재단에 등록된 재단 장학금): 91건 — 재단 홈페이지 주소뿐이라 앱이 "재단 홈페이지"라고 부릅니다(그중 공고문 사본이 있는 것 79건) · 바로잡은 원문이 있어 연 것 2건은 따로
+- 마감이 지나 앱이 더는 보여 주지 않는 대외활동: 48건
+- 이번 순서에 들었지만 시간이 모자라 못 본 것: 112건 (다음 실행이 이어서 봅니다)
+- 앱에 실린 링크 2927건 중 이번 순서에 든 것 400건 (사이트마다 최대 8건 · 학교 서버를 몰아치지 않으려고)

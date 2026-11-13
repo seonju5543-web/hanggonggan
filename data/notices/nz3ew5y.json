@@ -1,7 +1,25 @@
 {
  "school": "연세대학교",
- "updatedAt": "2026-11-13",
+ "updatedAt": "2026-11-14",
  "items": [
+  {
+   "title": "2027학년도 강남장학회 장학생 모집 안내",
+   "url": "https://www.yonsei.ac.kr/bbs/sc/58/944647/artclView.do",
+   "attachments": [
+    {
+     "name": "2027학년도 강남장학회 19기 모집 포스터.png",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015542/download.do"
+    },
+    {
+     "name": "2027학년도 강남장학회 모집 공고(19기).pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015543/download.do"
+    }
+   ],
+   "deadlineHint": "모집기간: 2026년 11월 23일(월) ~ 12월 13일(일) 22:00까지 21일간 - 모집대상: 서울·경기 소재의 사립대학교 (학부·대학원",
+   "school": "연세대학교",
+   "campus": "",
+   "foundAt": "2026-11-13"
+  },
   {
    "title": "미래 건설교통신기술인 장학사업 안내",
    "url": "https://www.yonsei.ac.kr/bbs/sc/58/944641/artclView.do",

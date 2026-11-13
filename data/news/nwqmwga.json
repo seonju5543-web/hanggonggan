@@ -3,6 +3,56 @@
  "updatedAt": "2026-11-13",
  "items": [
   {
+   "title": "[취업정보] [올포랜드]2027 신입사원(SW개발, 측량 및 공간정보부문)...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70993",
+   "postedAt": "2026-11-13",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-13"
+  },
+  {
+   "title": "[학사안내] 2026학년도 동계 계절학기 대체교과목 신청 안내",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70991",
+   "postedAt": "2026-11-13",
+   "kind": "학사",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-13"
+  },
+  {
+   "title": "[취업정보] [미원상사]연구보조(1년계약직) 채용(~11.2.(일)까지)",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70989",
+   "postedAt": "2026-11-13",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-13"
+  },
+  {
+   "title": "[취업정보] [아이패밀리SC] 피플&컬쳐팀 채용/조직문화(인턴) 채용(~1...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70988",
+   "postedAt": "2026-11-13",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-13"
+  },
+  {
+   "title": "[취업정보] [에어퍼스트]2027년 동계 인턴십 채용공고(11.26.(목)...",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70987",
+   "postedAt": "2026-11-13",
+   "kind": "채용",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-13",
+   "thumb": "data/news/img/f0e51200504ff659.webp"
+  },
+  {
    "title": "[취업정보] [신한캐피탈]투자금융사무지원(보훈) 채용(~11.23.(월)1...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70986",
    "postedAt": "2026-11-13",
@@ -347,57 +397,6 @@
    "title": "[채용공고] 제10회 앵커사업단 ‧ 제3회 서남권 공유대학사업단 직원 채...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70936",
    "postedAt": "2026-11-06",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-08"
-  },
-  {
-   "title": "[취업정보] [신영증권]2026 하반기 신입사원 채용(~11.16.(월) ...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70935",
-   "postedAt": "2026-11-06",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-08",
-   "thumb": "data/news/img/906231bd3456fa88.webp"
-  },
-  {
-   "title": "[취업정보] [JOB FESTA]📢 2026 전남대학교 JOB FESTA...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70934",
-   "postedAt": "2026-11-06",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-08",
-   "thumb": "data/news/img/32f2ac31877d65cc.webp"
-  },
-  {
-   "title": "[취업정보] [조기마감] 2026 강점탐색 집단상담 『자기탐색과 강점브랜딩...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70931",
-   "postedAt": "2026-11-06",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-08",
-   "thumb": "data/news/img/97d7d3969598cd74.webp"
-  },
-  {
-   "title": "[취업정보] 「현직자와의 AI 토크토크(2차)」",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70928",
-   "postedAt": "2026-11-05",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-08",
-   "thumb": "data/news/img/db67038aedf65e5d.webp"
-  },
-  {
-   "title": "[취업정보] [엔테크서비스] 지도DB제작 직무별 채용공고(~11.30.(월...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70927",
-   "postedAt": "2026-11-05",
    "kind": "채용",
    "school": "전남대학교",
    "campus": "",

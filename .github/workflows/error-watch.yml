@@ -1,0 +1,89 @@
+name: 앱 오류 급증 감시
+
+# 학생 폰의 앱 오류가 갑자기 늘면 세 사람에게 알린다 (2026-11-13 · 은서 · 출시 전 백엔드 11번).
+#   · 도구 tools/error-watch.mjs — Supabase 의 개수 함수(client_error_stats · supabase/migrations/0006)를 공개 열쇠로 부른다
+#   · 🔴 경보에는 개수만(공개 저장소) — 오류 문구는 Supabase 대시보드에서만 본다
+#   · 함수가 아직 없으면(SQL 미실행) '숫자를 못 읽습니다' 경보 — 조용히 두지 않는다
+#   관문: verify/health-gates/ops.mjs 「⑨ 앱 오류 급증 감시」
+
+on:
+  schedule:
+    - cron: '35 */2 * * *'   # 2시간마다 :35 — 홀수 분 · 다른 예약과 겹치지 않는다
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: error-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    if: github.ref_name == 'claude/nice-heisenberg-WESq5'
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: 오류 개수 보기
+        id: watch
+        timeout-minutes: 2
+        run: node tools/error-watch.mjs --body /tmp/error-watch.md
+
+      - name: 🚨 급증 경보 (세 사람에게)
+        if: steps.watch.outputs.verdict == 'spike'
+        timeout-minutes: 1
+        run: |
+          node tools/alert-issue.mjs --mode open --title "🚨 앱 오류가 갑자기 늘었습니다" \
+            --label error-spike --label-description '학생 폰 앱 오류 급증' \
+            --assignee seonju5543-web --assignee Se-Hyeon-Jo --assignee didinin-wq \
+            --body-file /tmp/error-watch.md
+
+      - name: 평소 수준이면 급증 경보를 닫는다
+        if: steps.watch.outputs.verdict == 'ok' || steps.watch.outputs.verdict == 'off'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          title: 🚨 앱 오류가 갑자기 늘었습니다
+          body: |
+            ✅ 앱 오류가 평소 수준으로 돌아왔습니다 — 자동으로 닫습니다.
+
+      - name: ⚠️ 숫자를 못 읽는다 (설정 필요)
+        if: steps.watch.outputs.verdict == 'setup'
+        timeout-minutes: 1
+        run: |
+          node tools/alert-issue.mjs --mode open --title "🚨 앱 오류 감시가 숫자를 못 읽습니다" \
+            --label error-spike --label-description '학생 폰 앱 오류 급증' \
+            --assignee seonju5543-web --body-file /tmp/error-watch.md
+
+      - name: 숫자를 읽으면 '못 읽습니다' 경보를 닫는다
+        if: steps.watch.outputs.verdict == 'ok' || steps.watch.outputs.verdict == 'spike' || steps.watch.outputs.verdict == 'off'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          title: 🚨 앱 오류 감시가 숫자를 못 읽습니다
+          body: |
+            ✅ 오류 개수를 다시 읽습니다 — 자동으로 닫습니다.
+
+      - name: 🚨 로봇이 넘어졌다
+        if: failure() || cancelled()
+        uses: ./.github/actions/robot-down
+        with:
+          robot: 앱 오류 급증 감시
+          token: ${{ github.token }}

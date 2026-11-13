@@ -192,27 +192,6 @@
   "at": "2026-11-07",
   "tries": 1
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3538765": {
-  "at": "2026-11-07",
-  "tries": 1,
-  "lines": [
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3546415": {
-  "at": "2026-11-08",
-  "tries": 1,
-  "lines": [
-   "아동·청소년",
-   "활동구분",
-   "오프라인",
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
  "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156788329&pWise=sub&pWiseSub=C4": {
   "at": "2026-11-08",
   "tries": 1,
@@ -318,5 +297,20 @@
   ],
   "excludes": [],
   "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3542952": {
+  "at": "2026-11-13",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인",
+   "아동·청소년",
+   "[경기북부하나센터] 북한이탈주민 취약계층 지원 '사랑의 김장나눔 ' 봉사활동 (사전)"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53683&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
+  "at": "2026-11-13",
+  "tries": 1
  }
 }

@@ -518,4 +518,82 @@ export default async function gate(eq, ctx) {
     eq('  🔴 관문 정규식이 부품 판 번호를 박지 않는다(actions\\/이름@v숫자) — 박으면 Dependabot PR 마다 관문이 빨개진다',
       gateFiles.filter((f) => /actions\\\/[a-z-]+@v\d/.test(read(root, f))), []);
   }
+
+  /* ── ⑧ 경보 짝 — 회복하면 닫힌다 (2026-11-13 · 은서 · 출시 전 백엔드 마무리) ──
+     #501(한국장학재단)·#546(인스타 준비)은 여는 단계만 있어 회복한 뒤에도 몇 주씩 열려 있었고, 배포 동기화는 제목에 날짜를 붙여
+     실패마다 새 이슈를 만들고 닫지 않았다(CLAUDE.md '제목에 날짜 금지'). 상태 경보는 여는 제목 = 닫는 제목이어야 한다 */
+  {
+    const wfDir = path.join(rootPath, '.github/workflows');
+    const files = fs.readdirSync(wfDir).filter((f) => f.endsWith('.yml'));
+    const opens = []; const closes = new Set(); const labelClosers = new Set();
+    for (const f of files) {
+      const t = fs.readFileSync(path.join(wfDir, f), 'utf8').replace(/^\s*#.*$/gm, '');
+      for (const m of t.matchAll(/gh issue create[^\n]*(?:\\\n[^\n]*)*?--title\s+(['"])(.+?)\1/g)) opens.push({ f, title: m[2] });
+      for (const m of t.matchAll(/const title = (['"`])(.+?)\1/g)) opens.push({ f, title: m[2] });
+      for (const m of t.matchAll(/mode: resolve\s+title:\s*(.+)/g)) closes.add(m[1].trim());
+      for (const m of t.matchAll(/--mode resolve[^\n]*?--title\s+(['"])(.+?)\1/g)) closes.add(m[2]);
+      /* 라벨로 닫는 로봇 — 상태 하나만 다루는 셋만(insta.yml 처럼 다른 작업이 라벨로 닫는 파일 전체를 '닫힘'으로 치면 짝 빠짐을 못 본다 · 11-13 red-green 에서 실제로 놓쳤다) */
+      if (/gh issue close "\$n"/.test(t) && ['robot-heartbeat.yml', 'push-health.yml', 'admin-lock-check.yml'].includes(f)) labelClosers.add(f);
+    }
+    const alarms = opens.filter((o) => /^🚨/.test(o.title));
+    /* 날짜를 붙인 제목 — 사람이 누른 한 번의 일(실패 기록)만 허용 · 상태 경보는 고정 제목 + 닫기 */
+    const DATED_OK = new Set(['main-guard.yml', 'admin-apply.yml', 'device-deploy.yml', 'push-health.yml', 'admin-lock-check.yml', 'check-live.yml']);
+    eq('⑧ 🔴 제목에 날짜를 붙인 🚨 경보는 정해진 곳만(사람이 누른 일 · 라벨로 닫는 곳) — 새로 만들면 고정 제목 + 회복 때 닫기',
+      alarms.filter((o) => /\$\(TZ=|date '/.test(o.title) && !DATED_OK.has(o.f)).map((o) => o.f), []);
+    /* 고정 제목인데 닫는 단계가 없는 것 — 사람이 닫는 한 번의 일만 허용(각 이유는 그 워크플로 주석) */
+    const MANUAL_OK = new Set(['🚨 인스타 게시가 실패했습니다', '🚨 인스타 건너뛰기 기록에 실패했습니다', '🚨 인스타 수정본 알림을 못 깨웠습니다']);
+    eq('  🔴 고정 제목 🚨 경보는 같은 제목으로 닫는 단계가 있다(또는 라벨로 닫는 로봇) — 사람이 닫는 한 번의 일 셋만 예외',
+      alarms.filter((o) => !/\$/.test(o.title) && !closes.has(o.title) && !labelClosers.has(o.f) && !MANUAL_OK.has(o.title)).map((o) => `${o.f}: ${o.title}`), []);
+    eq('  (대조할 것을 실제로 뽑았다 — 🚨 경보 10개 이상 · 닫는 제목 10개 이상)', [alarms.length >= 10, closes.size >= 10], [true, true]);
+    const ds = read(root, '.github/workflows/deploy-sync.yml').replace(/^\s*#.*$/gm, '');
+    eq('  배포 동기화 — 실패는 경보 하나(옛 날짜 제목도 prefix 로) · 다시 되면 닫는다',
+      [/alert-issue\.mjs --mode open --title "🚨 앱 배포 동기화 실패" --match prefix/.test(ds), /mode: resolve\s+title: 🚨 앱 배포 동기화 실패\s+match: prefix/.test(ds)], [true, true]);
+  }
+
+  /* ── ⑨ 앱 오류 급증 감시 (2026-11-13 · 은서 · 출시 전 백엔드 11번 — tools/error-watch.mjs · error-watch.yml · 0006_client_error_stats.sql) ──
+     오류는 모이기만 하고 아무도 숫자를 안 봤다 → 개수만 주는 함수 + 2시간마다 판정 + 세 사람 경보 */
+  {
+    const EW = await import(new URL('tools/error-watch.mjs', root));
+    const V = (st) => EW.verdictOf({ state: 'ok', stats: { last_hour: 0, last_day: 0, prev_week_daily_avg: 0, day_cap: 3000, ...st } }).verdict;
+    eq('⑨ 급증 판정 — 1시간 59 아님·60 급증 · 하루 299 아님 · 하루 300(평균 0→바닥 20의 3배=60 넘음) 급증 · 하루 400 이라도 평균 200 이면 평소 · 상한 90%(2700) 급증',
+      [V({ last_hour: 59 }), V({ last_hour: 60 }), V({ last_day: 299 }), V({ last_day: 300 }), V({ last_day: 400, prev_week_daily_avg: 200 }), V({ last_day: 2700, prev_week_daily_avg: 2000 })],
+      ['ok', 'spike', 'ok', 'spike', 'ok', 'spike']);
+    eq('  함수 없음(404) → setup · 꺼짐 → off · 답 없음 → unknown(실패로 끝낸다)',
+      [EW.verdictOf({ state: 'missing' }).verdict, EW.verdictOf({ state: 'off' }).verdict, EW.verdictOf({ state: 'down', why: 'x' }).verdict], ['setup', 'off', 'unknown']);
+    const fake = (codes) => { let i = 0; return async () => { const c = codes[Math.min(i++, codes.length - 1)]; return { status: c, json: async () => ({ last_hour: 1, last_day: 2 }) }; }; };
+    const fs3 = async (codes) => (await EW.fetchStats({ url: 'https://x', anonKey: 'k' }, { fetchImpl: fake(codes), sleep: async () => {} })).state;
+    eq('  서버 응답 — 200 읽음 · 404 함수 없음 · 500 이 세 번이면 down · 500 뒤 200 이면 읽음(다시 묻는다)',
+      [await fs3([200]), await fs3([404]), await fs3([500, 500, 500]), await fs3([500, 200])], ['ok', 'missing', 'down', 'ok']);
+    const body = EW.bodyOf({ verdict: 'spike', why: 'w' }, { last_hour: 61, last_day: 70, prev_week_daily_avg: 3, kinds_day: 4 });
+    eq('  경보 본문은 개수와 되돌리기 안내만(오류 문구 칸이 없다)', [/61/.test(body), /되돌리기/.test(body), /message|문구:/.test(body)], [true, true, false]);
+    const sql = read(root, 'supabase/migrations/0006_client_error_stats.sql').replace(/--.*$/gm, '');
+    eq('  🔴 개수 함수 — SECURITY DEFINER + search_path 고정 · 실행 권한 public 회수·anon 부여 · count 만 꺼낸다(오류 칸을 그대로 돌려주지 않는다)',
+      [/security definer/i.test(sql) && /set search_path = public, pg_temp/.test(sql), /revoke all on function public\.client_error_stats\(\) from public/.test(sql), /grant execute on function public\.client_error_stats\(\) to anon/.test(sql),
+        [...sql.matchAll(/select\s+([^\n]+?)\s+from public\.client_errors/g)].every((m) => /^(count\(\*\)|count\(distinct message\)|round\(count\(\*\)::numeric \/ 7, 1\))$/.test(m[1].trim()))],
+      [true, true, true, true]);
+    const ew = read(root, '.github/workflows/error-watch.yml').replace(/^\s*#.*$/gm, '');
+    eq('  error-watch.yml — 홀수 분 · 기본 브랜치에서만 · 시한 · 급증 경보 여닫는 제목 같음 · 못 읽음 경보 여닫는 제목 같음 · 세 사람 · 넘어지면 robot-down',
+      [Number((ew.match(/cron: '(\d+) /) || [])[1]) % 2 === 1, /if: github\.ref_name == 'claude\/nice-heisenberg-WESq5'/.test(ew), /^ {4}timeout-minutes: \d+/m.test(ew),
+        (ew.match(/🚨 앱 오류가 갑자기 늘었습니다/g) || []).length, (ew.match(/🚨 앱 오류 감시가 숫자를 못 읽습니다/g) || []).length,
+        /--assignee seonju5543-web --assignee Se-Hyeon-Jo --assignee didinin-wq/.test(ew), /failure\(\) \|\| cancelled\(\)\s+uses: \.\/\.github\/actions\/robot-down/.test(ew)],
+      [true, true, true, 2, 2, true, true]);
+  }
+
+  /* ── ⑩ 사고 대응 한 장 (2026-11-13 · 은서 · 출시 전 백엔드 12번 — docs/backend/사고-대응.md) ──
+     급할 때 펴는 문서가 없는 파일·없는 버튼·바뀐 경보 제목을 가리키면 그날 헛걸음한다 → 가리키는 것이 실제로 있는지 잰다 */
+  {
+    const doc = read(root, 'docs/backend/사고-대응.md');
+    const wfDir = path.join(rootPath, '.github/workflows');
+    const wfText = fs.readdirSync(wfDir).filter((f) => f.endsWith('.yml')).map((f) => fs.readFileSync(path.join(wfDir, f), 'utf8')).join('\n');
+    const wfNames = [...wfText.matchAll(/^name: (.+)$/gm)].map((m) => m[1]);
+    const paths = [...doc.matchAll(/`([\w./가-힣-]+\.(?:md|mjs|js|json|yml))`/g)].map((m) => m[1]);
+    const MUST_NOT = ['_config.yml'];   // '생겼으면 지운다'로 적은 파일 — 있으면 관리자 화면이 공개된다(CLAUDE.md) · 그래서 없어야 맞다
+    eq(`⑩ 문서가 가리키는 파일(${paths.length}개)이 실제로 있다 · '생기면 지운다'는 파일은 없다`,
+      [paths.filter((p) => !MUST_NOT.includes(p) && !fs.existsSync(path.join(rootPath, p))), MUST_NOT.filter((p) => fs.existsSync(path.join(rootPath, p)))], [[], []]);
+    const titles = [...doc.matchAll(/「((?:🚨|🔑|🛡)[^」]+)」/g)].map((m) => m[1].replace(/…$/, ''));
+    eq(`  가리키는 경보 제목(${titles.length}개)이 워크플로에 있다(제목을 바꾸면 이 문서도)`, titles.filter((t) => !wfText.includes(t)), []);
+    const buttons = [...doc.matchAll(/Actions › 「([^」]+)」/g)].map((m) => m[1]);
+    eq(`  가리키는 Actions 버튼(${buttons.length}개)이 워크플로 이름에 있다`, buttons.filter((b) => !wfNames.some((n) => n.startsWith(b))), []);
+    eq('  (대조할 것을 실제로 뽑았다 — 파일 4·경보 8·버튼 3 이상)', [paths.length >= 4, titles.length >= 8, buttons.length >= 3], [true, true, true]);
+  }
 }
