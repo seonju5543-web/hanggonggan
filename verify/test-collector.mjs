@@ -4639,6 +4639,10 @@ console.log('\n■ 자격 절 고르기 — 이름표 줄 · 짧은 블록 덧�
      수상 실적 없는 학생 전부에게 ✕ 가 붙었다(특기장학금 말고 다른 소제도로 낼 수 있는데) */
   eq('  🔴 `…있는 자(특기장학금)` 처럼 꼬리 괄호가 소제도 이름인 줄은 괄호를 떼고 살리지 않는다 (틀린 미달 방지)',
     shownQ(['예술‧체육‧과학‧기능 분야의 전국규모 이상 대회에서 3위 이상 수상실적이 있는 자(특기장학금)']).length, 0);
+  /* G1 검토 재현(2026-11-13) — 소제도 이름 뒤 `지원 시` 꼬리·`가형`·`특기`, 그리고 요건을 풀어 주는 꼬리 괄호(필수 아님·선택·가점·해당 시) */
+  eq('  🔴 꼬리 괄호가 `(특기장학금 지원 시)`·`(가형)` 이거나 `(필수 아님)`·`(선택)` 이면 살리지 않는다 · 부연 괄호(`(일정 별도 안내)`·`(수업연한 초과자 제외)`)는 그대로 산다',
+    [shownQ(['교내 수상실적이 있는 자(특기장학금 지원 시)', '수상실적이 있는 자(가형)', '봉사활동 실적이 있는 자(필수 아님)', '자격증 소지자(선택)']).length,
+      shownQ(['면접 참석이 가능한 자(일정 별도 안내)', '정규학기 등록자(수업연한 초과자 제외)']).length], [0, 2]);
   /* 살아난 줄의 괄호 속 「…관련 전공 아니어도 활동 가능」 을 학과 요건으로 읽으면 컴퓨터공학과에만 ✓ 가 붙는다(틀린 안심 · 외대 AI교육지원 멘토) */
   const PRq = createRequire(import.meta.url)('../parse-requirements.js');
   const majorOf = (l) => (PRq.parseLine(l).conds || []).filter((c) => c.kind === 'major').length;
@@ -4695,7 +4699,7 @@ console.log('\n■ 자격 자리의 잡음을 유형별로 세는가 (2026-08-23
   /* 화면 문 자체가 줄마다 '요건임'을 묻는가 — 이게 없으면 좋은 줄에 잡음이 얹혀 간다 */
   const eng = readText(new URL('../match-engine.js', import.meta.url));
   /* 2026-11-12: 괄호를 뗀 줄로도 한 번 더 묻는다(충북대 푸른등대 2차 · 「자격 절 고르기」 ⑦) — 여전히 신호가 없으면 버린다 */
-  eq('화면 문이 줄마다 요건 신호를 확인한다', /if \(!REQ_SIGNAL\.test\(t\)(?: && !\(bareAll\.length >= 6 && REQ_SIGNAL\.test\(bareAll\) && !PAREN_SUBPROGRAM\.test\(t\)\))?\) continue;/.test(eng), true);
+  eq('화면 문이 줄마다 요건 신호를 확인한다', /if \(!REQ_SIGNAL\.test\(t\)(?: && !\(bareAll\.length >= 6 && REQ_SIGNAL\.test\(bareAll\) && !PAREN_SUBPROGRAM\.test\(t\)(?: && !PAREN_SOFT\.test\(t\))?\))?\) continue;/.test(eng), true);
   /* 🔴 잣대는 그대로 줄 단위다. 다만 **괄호 안은 부연**이라 떼고 본다 (2026-08-28) —
      `직전학기 C⁰ 수준(70/100점 만점) 이상인 재학생` 의 '만점'이 배점표 표지로 읽혀
      진짜 성적 요건이 사라지고 있었다. 괄호를 떼고도 잡음이면 그대로 버린다. */
@@ -14090,6 +14094,10 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
     [!!(one(goheung, 'residence') || {}).parentAlt, rmx(goheung, { region: '서울', regionCity: '종로구', parentRegion: '서울', parentRegionCity: '종로구' })], [false, 'no']);
   const EAo = createRequire(import.meta.url)('../elig-ask.js');
   eq('🔴 온보딩 「적합도 높이기」 가 학자금대출 이용·자립준비청년을 묻는다 (2026-11-09 개발자 결정 "질문에 넣어")', ['loan', 'careLeaver'].map((k) => EAo.ONBOARD_TRAITS.includes(k)), [true, true]);
+
+  /* ── 2026-11-13 · G1 검토가 화면에서 재현한 기존 틀린 미달 — 괄호 안 `(○○전공: 다른 기준)` 은 학과 요건이 아니다(숭실 특별장학금) ── */
+  eq('🔴 `정규 등록8학기이내인자(건축학부 건축학전공: 정규등록10학기 이내인자)` 에 학과 조건이 없다 · `건축학과 재학생` 은 그대로 학과 조건',
+    [one('-정규 등록8학기이내인자(건축학부 건축학전공: 정규등록10학기 이내인자)', 'major'), !!one('건축학과 재학생', 'major')], [null, true]);
 
   /* ── 편입·재입학 첫 학기 (2026-11-02 개발자 "편입이랑 재입학은 학적정보만으로 구분 가능하잖아") ── */
   const html = readText(new URL('../index.html', import.meta.url));
