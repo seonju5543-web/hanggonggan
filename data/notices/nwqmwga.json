@@ -3,13 +3,23 @@
  "updatedAt": "2026-11-13",
  "items": [
   {
+   "title": "[장학안내] 2026학년도 2학기 도전장학생(비상) 최종 선발 공고",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70982&cate=8",
+   "attachments": [
+    {
+     "name": "2026학년도 2학기 도전장학생(비상) 최종 선발 공고문.hwp",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2591602"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "전남대학교",
+   "campus": "",
+   "foundAt": "2026-11-13"
+  },
+  {
    "title": "[장학안내] 2026학년도 미래성장 장학생 선발 안내",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70976&cate=8",
    "attachments": [
-    {
-     "name": "교육기본시설/부속시설",
-     "url": "https://www.jnu.ac.kr/MainIntro/Institution/AttachedFac"
-    },
     {
      "name": "2026학년도 2학기 미래성장 장학생 선발 공고문.hwp",
      "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2591542"
@@ -23,12 +33,7 @@
   {
    "title": "[장학안내] [한국고등교육재단] 문우림 제6기 장학생 선발 안내",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70961&cate=8",
-   "attachments": [
-    {
-     "name": "교육기본시설/부속시설",
-     "url": "https://www.jnu.ac.kr/MainIntro/Institution/AttachedFac"
-    }
-   ],
+   "attachments": [],
    "deadlineHint": null,
    "school": "전남대학교",
    "campus": "",

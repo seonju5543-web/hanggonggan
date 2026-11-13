@@ -2311,5 +2311,46 @@
   "hangul": 45,
   "lines": 3,
   "why": "살아남은 한글 45자 < 200"
+ },
+ "elig-1qarmj-1.pdf": {
+  "sig": "127019:cd3ef65a6531",
+  "gate": "0.9/200/0.6/v2",
+  "ok": true,
+  "at": "2026-11-13",
+  "pages": 2,
+  "ratio": 0.955,
+  "hangul": 755,
+  "lines": 55
+ },
+ "elig-1qarmj-2.png": {
+  "sig": "765237:28b88a984c8b",
+  "gate": "0.9/200/0.6/v2",
+  "ok": false,
+  "at": "2026-11-13",
+  "pages": 1,
+  "ratio": 0.834,
+  "hangul": 113,
+  "lines": 9,
+  "why": "한글 비율 0.83 < 0.9 — 포스터·장식 글자로 본다"
+ },
+ "elig-lju9ao-1.pdf": {
+  "sig": "127019:cd3ef65a6531",
+  "gate": "0.9/200/0.6/v2",
+  "ok": true,
+  "at": "2026-11-13",
+  "pages": 2,
+  "ratio": 0.955,
+  "hangul": 755,
+  "lines": 55
+ },
+ "elig-mijtko-1.pdf": {
+  "sig": "127019:cd3ef65a6531",
+  "gate": "0.9/200/0.6/v2",
+  "ok": true,
+  "at": "2026-11-13",
+  "pages": 2,
+  "ratio": 0.955,
+  "hangul": 755,
+  "lines": 55
  }
 }
