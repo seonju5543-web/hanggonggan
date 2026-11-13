@@ -61,6 +61,10 @@ const p = {
   credits: num('credits', 14), region: arg('region', '서울'),
   parentRegion: arg('parentRegion', arg('region', '서울')), nationality: 'korean', birthYear: 2004,
   flags: [], common: {}, ...(Object.keys(traits).length ? { traits } : {}),
+  /* 시·군과 「지금 주소에 산 지」(2026-11-13) — 안 주면 비워 둔다(온보딩에서 안 고른 학생). 거주 기간은 칸의 하한 개월(0·12·36·60·120) */
+  ...(arg('regionCity') ? { regionCity: arg('regionCity') } : {}),
+  ...(arg('parentRegionCity') ? { parentRegionCity: arg('parentRegionCity') } : {}),
+  ...(arg('residenceMonths') != null ? { residenceMonths: num('residenceMonths', 0) } : {}),
 };
 
 let hits = reg.items.filter((x) => x.id === q || (x.name || '').includes(q));

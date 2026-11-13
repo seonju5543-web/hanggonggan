@@ -48,7 +48,8 @@ const screenLines = (it, raw) => { try { return ME.requirementLines(it, raw, { a
 const SETS = {
   '정식 등록(마감 전)': reg.filter((s) => open(s.deadline)).map((s) => ({ name: s.name, lines: screenLines(s, null) })),
   /* 앱은 자격 칸(KOSAF_ELIG) + 제외 칸(`자격제한` → eligibilityExcludes · 화면 「이런 경우는 제외돼요」)을 학생에게 보인다 — 둘 다 센다(징계·중복수혜 줄이 제외 칸에 있다) */
-  '층2 한국장학재단': kosaf.map((k) => ({ name: k.name, lines: [...KOSAF_ELIG, '자격제한'].flatMap((f) => split((k.fields || {})[f])) })),
+  /* 🔴 제외 칸 줄은 **제외 줄로** 읽는다(exLines — 앱·엔진이 isExclude 로 읽는 것과 같게 · 2026-11-13). 자격 줄로 읽으면 늘 결격인 처지(`등록금 전액 지원 등으로 실 납부액이 없는 대학생` → fullTuition)를 못 센다 */
+  '층2 한국장학재단': kosaf.map((k) => ({ name: k.name, lines: KOSAF_ELIG.flatMap((f) => split((k.fields || {})[f])), exLines: split((k.fields || {})['자격제한']) })),
   '대외활동·공모전(마감 전)': acts.filter((a) => open(a.deadline)).map((a) => ({ name: a.title, lines: screenLines(a, a.eligibilityLines || []) })),
 };
 
@@ -59,10 +60,10 @@ export function coverage(sets = SETS) {
     let lines = 0;
     for (const it of items) {
       const k = new Set(), t = new Set(), a = new Set();
-      for (const line of it.lines) {
+      for (const [line, isEx] of it.lines.map((l) => [l, false]).concat((it.exLines || []).map((l) => [l, true]))) {
         lines += 1;
         let conds = [];
-        try { conds = PR.parseLine(line).conds || []; } catch { /* 못 읽는 줄은 아래 noCond 로 */ }
+        try { conds = PR.parseLine(line, isEx).conds || []; } catch { /* 못 읽는 줄은 아래 noCond 로 */ }
         if (!conds.length) { noCond.set(line, (noCond.get(line) || []).concat(it.name)); continue; }
         for (const c of conds) {
           k.add(c.kind);

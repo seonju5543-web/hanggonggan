@@ -88,6 +88,9 @@ export const PROFILE_BOUNDS = {
   bracket: [1, 10],       // 학자금지원구간
   credits: [0, 30],       // index.html #in-credits    min=0    max=30
   birthYear: [1940, 2020],// index.html #in-birth-year min=1940 max=2020
+  /* 지금 주소에 산 지 (2026-11-13) — 칩 값(칸의 하한 개월 0·12·36·60·120 · match-engine RESIDENCE_SPANS). `999` 면 `n년 이상 계속 거주` 를 뭐라고 적어도 통과한다.
+     🔴 0 은 「1년 미만」이라는 **답**이다 — ZERO_IS_UNKNOWN 에 넣지 않는다 */
+  residenceMonths: [0, 120],
 };
 /* 🔴 위 넷(`gpa`·`credits`·`birthYear`)의 숫자는 **`index.html` 의 입력칸 min/max 와 같다.**
    입력칸을 넓히면서 여기를 안 넓히면 **정상 학생의 저장이 거절된다** — 관문
@@ -128,7 +131,7 @@ export function profileOutOfRange(p) {
 }
 
 const BOUND_LABEL = { gpa: '성적(학점)', year: '학년', bracket: '학자금지원구간',
-                      credits: '이수학점', birthYear: '출생연도' };
+                      credits: '이수학점', birthYear: '출생연도', residenceMonths: '거주 기간' };
 
 /**
  * 보내도 되는가 — 보낼 주소까지 **여기서** 정해 돌려준다.

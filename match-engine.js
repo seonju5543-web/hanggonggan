@@ -230,6 +230,21 @@ function degreeOf(p) {
   return (d === 'grad' || d === 'undergrad') ? d : 'undergrad';
 }
 
+/* 🔴 「지금 주소에 산 지」 칸 — **값은 칸의 하한(개월)** 이다 (2026-11-13 · 온보딩·공고 안 묻기·MY 수정이 같은 칸 · 안 누르면 저장 안 함).
+   칸은 여기 한 곳 — index.html 칩 값·elig-ask FIELD_META 선택지·서버 PROFILE_BOUNDS·DB CHECK 가 이 표와 같아야 한다(관문 「못 읽던 자격 줄 — 2단계」 Q 묶음).
+   판정은 칸 **전체**로 한다(residenceSpan): 1~3년(12)을 고른 학생은 2년일 수도 있어 `2년 이상` 에 ✓ 도 ✕ 도 아니다 */
+const RESIDENCE_SPANS = [
+  { months: 0, label: '1년 미만' }, { months: 12, label: '1~3년' }, { months: 36, label: '3~5년' },
+  { months: 60, label: '5~10년' }, { months: 120, label: '10년 이상' },
+];
+function residenceSpan(v) {
+  if (v === null || v === undefined || v === '') return null;
+  const n = Number(v);
+  if (!Number.isFinite(n) || n < 0) return null;
+  const next = RESIDENCE_SPANS.find((s) => s.months > n);
+  return { lo: n, hi: next ? next.months : Infinity };
+}
+
 function judgeCond(c, p, ctx) {
   const S = PR.GRADE_SCALE;
   switch (c.kind) {
@@ -538,7 +553,22 @@ function judgeCond(c, p, ctx) {
          parentOnly `보호자가 …`·`(보호자) …`·`구민의 자녀` — 학생 본인의 시·군으로 ✓ 를 주지 않고 **부모 칸으로만** 본다 · 부모 칸이 비면 ✕ 가 아니라 '모름' */
       /* parentAlt `부모 또는 본인이 …` — 부모 주소 칸이 비었으면 학생 본인이 다른 곳에 살아도 ✕ 가 아니라 '모름'(부모가 그곳에 살 수 있다 · 2026-11-09 개발자 결정) */
       const parentUnknown = c.parentAlt && !p.parentRegion && !p.parentRegionCity;
-      const soft = (v) => (v === 'pass' && (c.minMonths || c.subArea)) ? 'unknown' : (v === 'fail' && parentUnknown) ? 'unknown' : v;
+      /* 🔴 거주 **기간** (2026-11-13 · 선조치 후 보고 — 온보딩 「지금 주소에 산 지」 · 프로필 residenceMonths = 고른 칸의 하한 개월).
+         본인 시·군(시·도)이 맞은 줄에서만 본다(own) — 부모 시·군으로 맞았으면 학생의 기간은 아무 말도 안 한다.
+           고른 칸 전체가 기간 이상(하한 ≥ minMonths)   → ✓   (monthsBy 'self'·'either' — 본인 기간으로 되는 줄)
+           고른 칸 전체가 기간 미만(상한 ≤ minMonths)   → ✕   (monthsBy 'self' 만 — 부모·합산·전입 갈래가 있으면 모름 · 확신 HIGH 일 때만 ✕ 는 lineVerdict)
+           칸에 걸치면(1~3년 학생에게 `2년 이상`)        → 모름 — 하한만 보고 ✕ 를 내면 2년 반 산 학생이 틀린 미달이다
+         칸이 비었으면 예전처럼 모름 · 읍면동(subArea)은 기간과 상관없이 모름 */
+      const monthsVerdict = (own) => {
+        if (!own || c.subArea) return 'unknown';
+        const span = residenceSpan(p.residenceMonths);
+        if (!span) return 'unknown';
+        if (span.lo >= c.minMonths && (c.monthsBy === 'self' || c.monthsBy === 'either')) return 'pass';
+        if (span.hi <= c.minMonths && c.monthsBy === 'self') return 'fail';
+        return 'unknown';
+      };
+      const soft = (v, own) => (v === 'pass' && c.minMonths) ? monthsVerdict(own)
+        : (v === 'pass' && c.subArea) ? 'unknown' : (v === 'fail' && parentUnknown) ? 'unknown' : v;
       const cities = (c.cities || []).concat(c.inArea && ctx && ctx.homeCity ? [ctx.homeCity] : []);
       const myCities = (c.parentOnly ? [p.parentRegionCity] : [p.regionCity, p.parentRegionCity]).filter(Boolean);
       if (cities.length) {
@@ -552,7 +582,7 @@ function judgeCond(c, p, ctx) {
           if (!mineProv.length || provs.some((ps) => !ps.length)) return 'unknown';
           return provs.some((ps) => ps.some((r) => mineProv.includes(r))) ? 'unknown' : soft('fail');
         }
-        if (cities.some((r) => myCities.includes(r))) return soft('pass');
+        if (cities.some((r) => myCities.includes(r))) return soft('pass', !c.parentOnly && !!p.regionCity && cities.includes(p.regionCity));
         /* 🔴 학생이 **직접 고른** 시·군과 다르면 미달이다 — 안양시 학생에게 광양시 장학금은
            받을 수 없는 것이다. 예전에는 여기서도 'unknown' 을 내서, 시·군을 받아 놓고도
            지역 요건이 판정되지 않았다(실측 102줄 중 2줄만 판정됐다).
@@ -569,7 +599,8 @@ function judgeCond(c, p, ctx) {
          lineVerdict 가 ✕ 로 만들지 않는다 — 시·군 규칙과 같은 안전장치다. */
       /* 🔴 정식 이름과 짧은 이름을 맞춰 비교한다 — `전라남도` 안에는 `전남` 이라는 글자가 없어서 **전남 학생에게 `전라남도에 주소를 둔 학생` 이
          미달**이 났다(2026-10-04 · 시·도 미달을 켠 날 생긴 틀린 미달 · 충북·충남·전북·전남·경북·경남이 같은 처지였다) */
-      return c.anyOf.some((r) => mine.some((x) => prov(x) === prov(r) || x.includes(r) || r.includes(x))) ? soft('pass') : soft('fail');
+      const provHit = (x) => !!x && c.anyOf.some((r) => prov(x) === prov(r) || x.includes(r) || r.includes(x));
+      return mine.some(provHit) ? soft('pass', !c.parentOnly && provHit(p.region)) : soft('fail');
     }
     default: return 'unknown';
   }
@@ -1906,6 +1937,7 @@ function requirementStruct(sch) {
 /* Node(검증 스크립트)에서도 같은 엔진을 불러 쓸 수 있게 — 브라우저·서비스워커에는 영향 없음 */
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { evaluate, fitScore, fitDetail, judgeCond, holdsExternalScholarship, FIT_UNREAD, FIT_FLOOR, FIT_MAX, FIT_MIN,
+                     RESIDENCE_SPANS, residenceSpan,
                      joinSpacedSyllables, decodeEntities, looksFragment,
                      scopedToProfile, inSchoolsAny, notStale, STALE_DAYS,
                      requirementLines, requirementStruct, requirementMatch, tidyRequirement,

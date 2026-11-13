@@ -106,6 +106,22 @@ const pickMajor = async (page, typed, want) => {
   eq('  접으면 학교 계열로 돌아온다 (고른 계열은 남는다)', (await trackChips(page)).length, present.length + (present.includes('science') ? 0 : 1));
   await page.click('#in-year .chip[data-value="3"]');
 
+  console.log('\n■ ③-1 2단계 — 지금 주소에 산 지 (2026-11-13 · 거주 시·군 옆 칩 · 안 누르면 저장 안 함 · 다시 누르면 푼다)');
+  eq('거주 기간 칩이 거주 시·군 칸과 같은 단계에 있다', await nextUntil(page, '#in-residence-months'), true);
+  eq('  칩 이름표·값은 RESIDENCE_SPANS 그대로 · 처음엔 아무것도 안 켜져 있다',
+    await page.evaluate(() => [[...document.querySelectorAll('#in-residence-months .chip')].map((c) => `${c.dataset.value}:${c.textContent.trim()}`), RESIDENCE_SPANS.map((x) => `${x.months}:${x.label}`), document.querySelectorAll('#in-residence-months .chip.active').length, !!document.querySelector('#in-region-city').closest('.onboard-step').querySelector('#in-residence-months')])
+      .then(([a, b, n, same]) => [JSON.stringify(a) === JSON.stringify(b), n, same]), [true, 0, true]);
+  await page.selectOption('#in-region', '인천');
+  await page.waitForTimeout(100);
+  await page.selectOption('#in-region-city', '옹진군');
+  await page.click('#in-residence-months .chip[data-value="12"]');
+  await page.click('#in-residence-months .chip[data-value="12"]');   // 켰다 다시 누르면 푼다
+  eq('  다시 누르면 풀린다 (안 답함)', await page.$$eval('#in-residence-months .chip.active', (e) => e.length), 0);
+  await page.click('#in-residence-months .chip[data-value="36"]');
+  await page.click('#in-residence-months .chip[data-value="60"]');
+  eq('  하나만 켜진다 (마지막에 누른 5~10년)', await page.$$eval('#in-residence-months .chip.active', (e) => e.map((x) => x.dataset.value)), ['60']);
+  await page.click('#in-residence-months .chip[data-value="36"]');
+
   console.log('\n■ ④ 5단계 — 적합도 높이기 (처지 예/아니요 + 출신 고교 지역) · 관심 대외활동은 온보딩에 없다');
   eq('온보딩 안에 관심 대외활동 칸이 없다 (대외활동 탭 관문으로 옮김)', await page.$('#screen-onboarding #in-act-kinds'), null);
   eq('처지 알약 단계가 온다', await nextUntil(page, '#in-traits'), true);
@@ -130,6 +146,7 @@ const pickMajor = async (page, typed, want) => {
   eq('되살린 단계에 알약이 그대로다', await page.$$eval('#in-traits .elig-yn.on', (e) => e.map((x) => `${x.dataset.trait}=${x.dataset.val}`)), ['award=1', 'military=0']);
   eq('  출신 지역도 그대로', await page.evaluate(() => [document.querySelector('#in-origin-region').value, document.querySelector('#in-origin-city').value]), ['울산', cities[0]]);
   eq('  학교·학과·계열도 그대로', await page.evaluate(() => [document.querySelector('#in-school').value, document.querySelector('#in-major').value, getChip('#in-track')]), ['한국외국어대학교', '수학과', 'science']);
+  eq('  거주 시·군과 거주 기간 칩도 그대로', await page.evaluate(() => [document.querySelector('#in-region-city').value, getChip('#in-residence-months')]), ['옹진군', '36']);
 
   console.log('\n■ ⑤ 저장 — 누른 처지만 · 출신 지역 · 관심은 아직 없음');
   eq('마지막 단계까지 간다', await nextUntil(page, '#btn-finish-onboard'), true);
@@ -138,11 +155,11 @@ const pickMajor = async (page, typed, want) => {
   await dismissNotify(page);
   /* 처지는 열쇠 순서가 뜻이 아니다 — 정렬해 비교한다 */
   const sortKeys = (o) => Object.fromEntries(Object.entries(o || {}).sort((a, b) => a[0].localeCompare(b[0])));
-  const saved = () => page.evaluate(() => { const p = JSON.parse(localStorage.getItem('handaejang.v1')).profile; return { traits: p.traits, originRegion: p.originRegion, originCity: p.originCity, interestKinds: p.interestKinds, track: p.track, major: p.major }; })
+  const saved = () => page.evaluate(() => { const p = JSON.parse(localStorage.getItem('handaejang.v1')).profile; return { traits: p.traits, originRegion: p.originRegion, originCity: p.originCity, interestKinds: p.interestKinds, track: p.track, major: p.major, regionCity: p.regionCity, residenceMonths: p.residenceMonths }; })
     .then((r) => ({ ...r, traits: sortKeys(r.traits) }));
   const onPills = () => page.$$eval('#in-traits .elig-yn.on', (e) => e.map((x) => `${x.dataset.trait}=${x.dataset.val}`).sort());
   eq('🔴 프로필 — 처지는 누른 둘만(켰다 끈 job 은 없다) · 출신 지역 · 관심 null · 계열은 학과를 따라온 것', await saved(),
-    { traits: { award: true, military: false }, originRegion: '울산', originCity: cities[0], interestKinds: null, track: 'science', major: '수학과' });
+    { traits: { award: true, military: false }, originRegion: '울산', originCity: cities[0], interestKinds: null, track: 'science', major: '수학과', regionCity: '옹진군', residenceMonths: 36 });
   /* 학교 소재지 (2026-10-31 · 3단계) — 학과 파일의 campusRegion/region 을 프로필에 적는다. 파일에 아직 없으면 소리 내고 넘어간다 */
   /* 🔴 기대값은 **앱의 기억(MAJOR_FILES)이 아니라 파일을 직접 받아** 정한다 (2026-10-31) — 앱의 기억으로 재면, 되살린 가입에서 파일을 안 받는 구멍이
      「데이터 없음」으로 조용히 통과했다(실제로 그랬다 · onboardRestore 가 학과 파일을 안 받았다) */
@@ -156,12 +173,13 @@ const pickMajor = async (page, typed, want) => {
   await page.click('.my-edit-hint');   // MY 의 「학적정보 수정 ›」 — 학생이 누르는 그 단추
   await page.waitForTimeout(500);
   eq('고치러 들어오면 알약이 답한 대로 켜져 있다', await onPills(), ['award=1', 'dorm=1', 'military=0']);
+  eq('  거주 기간 칩도 답한 대로 켜져 있다 (3~5년)', await page.evaluate(() => getChip('#in-residence-months')), '36');
   eq('  그 학교 계열 칩으로 그려진다 (고른 계열 켜진 채)', [await activeTrack(page), (await trackChips(page)).length <= present.length + 1], ['science', true]);
   eq('마지막 단계까지 간다', await nextUntil(page, '#btn-finish-onboard'), true);
   await page.click('#btn-finish-onboard');
   await page.waitForTimeout(400);
   eq('🔴 저장해도 관심(관문이 적은 것)·처지가 그대로다', await saved(),
-    { traits: { award: true, dorm: true, military: false }, originRegion: '울산', originCity: cities[0], interestKinds: ['공모전'], track: 'science', major: '수학과' });
+    { traits: { award: true, dorm: true, military: false }, originRegion: '울산', originCity: cities[0], interestKinds: ['공모전'], track: 'science', major: '수학과', regionCity: '옹진군', residenceMonths: 36 });
 
   console.log('\nERRORS:', errors.length ? errors : 'none');
   if (errors.length) fail++;

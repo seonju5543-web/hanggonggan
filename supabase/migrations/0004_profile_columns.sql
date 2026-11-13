@@ -5,7 +5,7 @@
 --          여러 번 붙여넣어도 안전하다(같은 것을 다시 만들지 않는다).
 --
 -- 무엇을 하는가: 지금까지 `profile` jsonb 한 칸에만 있던 **학교·캠퍼스·학과·계열·학적상태·
--- 성별·학년·성적·소득구간·이수학점·출생연도** 열하나를 각각의 칸으로 꺼내고, 그 칸에
+-- 성별·학년·성적·소득구간·이수학점·출생연도·거주 기간** 열둘을 각각의 칸으로 꺼내고, 그 칸에
 -- **DB 가 직접 값을 검사하는 제약(CHECK)** 을 건다. 앱이 무엇을 보내든 DB 가 한 번 더 본다.
 --
 -- ============================================================
@@ -130,6 +130,17 @@ alter table public.profiles
         when btrim(profile->>'birthYear') ~ '^[0-9]{1,4}$'     then (btrim(profile->>'birthYear'))::smallint
         else -1
       end
+    ) stored,
+  -- 지금 주소에 산 지 (2026-11-13) — 칩 값(칸의 하한 개월). `999` 면 `n년 이상 계속 거주` 를 뭐라고 적어도 통과한다.
+  -- ⚠️ 0 은 「1년 미만」이라는 **답**이다 — 학년·소득구간처럼 NULL 로 바꾸지 않는다.
+  -- 🔴 이미 붙여넣은 DB 는 이 파일을 **다시 한 번** 붙여넣는다(`if not exists`·`drop … if exists` 라 두 번 붙여도 된다).
+  add column if not exists residence_months smallint
+    generated always as (
+      case
+        when nullif(btrim(profile->>'residenceMonths'), '') is null  then null
+        when btrim(profile->>'residenceMonths') ~ '^[0-9]{1,4}$'     then (btrim(profile->>'residenceMonths'))::smallint
+        else -1
+      end
     ) stored;
 
 -- ------------------------------------------------------------
@@ -162,6 +173,10 @@ alter table public.profiles add  constraint profiles_birth_year_range
 -- ⚠️ 위 상한이 '미래 출생연도'도 함께 막는다 — 나이가 음수가 되면 '만 n세 이하'를 통과한다.
 --    `now()` 는 generated 칸에 쓸 수 없으므로(불변 함수만) 입력칸과 같은 고정값으로 둔다.
 
+alter table public.profiles drop constraint if exists profiles_residence_months_range;
+alter table public.profiles add  constraint profiles_residence_months_range
+  check (residence_months is null or residence_months between 0 and 120);   -- #in-residence-months 칩 0~120(개월)
+
 alter table public.profiles drop constraint if exists profiles_text_len;
 alter table public.profiles add  constraint profiles_text_len
   check (
@@ -182,12 +197,12 @@ alter table public.profiles add  constraint profiles_text_len
 -- ============================================================
 -- 붙여넣은 뒤 눈으로 확인 (한 줄씩 Run)
 -- ============================================================
--- 칸 열하나가 생겼는가 (회원이 없으면 `(0 rows)` 로 나온다 — 칸 이름 줄만 보면 된다):
+-- 칸 열둘이 생겼는가 (회원이 없으면 `(0 rows)` 로 나온다 — 칸 이름 줄만 보면 된다):
 --   select school, campus, major, track, enroll_status, gender,
---          grade, gpa, income_bracket, credits, birth_year
+--          grade, gpa, income_bracket, credits, birth_year, residence_months
 --     from public.profiles limit 20;
 --
--- 제약이 걸렸는가 (🔴 **여섯 줄**이 나와야 한다 — 실제로 돌려 확인한 숫자다):
+-- 제약이 걸렸는가 (🔴 **일곱 줄**이 나와야 한다 — 2026-11-13 거주 기간을 더하기 전에 돌려 확인한 숫자는 여섯이었다):
 --   select conname from pg_constraint
 --    where conrelid = 'public.profiles'::regclass and contype = 'c' order by conname;
 --   ⚠️ `contype = 'c'`(검사 제약만)로 좁힌다. `conname like 'profiles_%'` 로 보면
