@@ -3,6 +3,14 @@
  "updatedAt": "2026-11-13",
  "schools": 44,
  "files": {
+  "계명대학교": {
+   "file": "n1nel147.json",
+   "count": 54
+  },
+  "동국대학교": {
+   "file": "n1or8oiw.json",
+   "count": 52
+  },
   "연세대학교": {
    "file": "nz3ew5y.json",
    "count": 55
@@ -131,17 +139,9 @@
    "file": "n1mo5fbn.json",
    "count": 12
   },
-  "동국대학교": {
-   "file": "n1or8oiw.json",
-   "count": 51
-  },
   "서울시립대학교": {
    "file": "n1au199v.json",
    "count": 40
-  },
-  "계명대학교": {
-   "file": "n1nel147.json",
-   "count": 53
   },
   "서울대학교": {
    "file": "nsgh1oi.json",
