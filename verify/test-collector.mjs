@@ -14384,6 +14384,32 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
         MEx.fitDetail(ftSch, ftP(true)).fails.length, MEx.fitDetail(ftSch, ftP(false)).fails.length, MEx.fitDetail(ftSch, ftP()).fails.length], ['no', 'ok', null, 1, 0, 0]);
   }
 
+  /* ── 6차 병합 리뷰 A (2026-11-13) — 학년 갈래 셋: 최종·졸업학년이 학년 요건이 아닌 자리 · 같은 뜻 같은 판정 · 앞으로 올 학년의 ✓ ──
+     줄은 원문 꼴을 그대로 박는다(실데이터를 읽지 않는다 · 세종 성적향상 · 희망장학금 · 수림 동교인재상 · 두산연강 꼴) */
+  {
+    const yA = (o) => ({ ...stu, school: '세종대학교', major: '경영학과', gpa: 4.0, credits: 18, ...o });
+    const notYearA = ['직전학기 성적 : 15학점 (최종학년 10학점) 이상 취득하고, 평점 3.5점 이상인 자', '대학교(1~졸업학년) 재학생', '최근 이수 학기 이수 학점이 12학점 이상인 자 ※ 최종학년의 경우 최소 이수학점 6학점', '관내고 졸업생 : 1학년 ~ 졸업 학년'];
+    eq('🔴 A① 학년 요건이 아닌 최종학년 — 학점 괄호 `(최종학년 10학점)`·범위 `1~졸업학년`·※ `최종학년의 경우` 는 학년 조건을 만들지 않는다 · 1~4학년 모두 ✕ 아님(전엔 1~3학년 틀린 미달)',
+      notYearA.map((l) => [one(l, 'year'), [1, 2, 3, 4].map((y) => rmx(l, yA({ year: y })) === 'no')]), notYearA.map(() => [null, [false, false, false, false]]));
+    eq('  `2학년 ~ 졸업학년` 은 2학년 이상이다 — 1학년 ✕ · 2·3학년 ✓', [1, 2, 3].map((y) => rmx('대학교 2학년 ~ 졸업학년 재학생', yA({ year: y }))), ['no', 'ok', 'ok']);
+    /* 프로필 여덟: 경영 1~5학년 · 건축학과 4·5학년 · 의예과 4학년 · 서일대(2·3년제 전문대) 2학년 */
+    const wideA = [1, 2, 3, 4, 5].map((y) => yA({ year: y })).concat([yA({ year: 4, major: '건축학과' }), yA({ year: 5, major: '건축학과' }), yA({ year: 4, major: '의예과' }), yA({ year: 2, school: '서일대학교', major: '컴퓨터전자공학과' })]);
+    const rowA = (l) => wideA.map((p) => rmx(l, p));
+    const pairA = ['최종학년, 최종학년 직전학년 대학생', '최종학년 및 직전학년 대학생', '최종학년/ 최종학년 직전 학년 대학생'];
+    const lastA = ['졸업학년 대학생', '최종학년 대학생', '최종 학년 대학생'];
+    eq('🔴 A② 같은 뜻은 같은 판정(judgeCond final 한 곳) — 마지막 두 학년 세 꼴: 1·2학년 모름(전문대면 해당) · 3·4학년 ✓ · 건축 4학년·의예 4학년 모름 · 5학년 ✓ · 서일대 2학년 모름',
+      pairA.map(rowA), pairA.map(() => [null, null, 'ok', 'ok', 'ok', null, 'ok', null, null]));
+    eq('🔴 A② 마지막 학년 세 꼴(`졸업학년`·`최종학년`) — 1학년 ✕ · 2·3학년 모름(2·3년제면 마지막) · 4학년 ✓ · 경영 5학년 모름 · 건축 4학년 모름·5학년 ✓ · 의예 4학년 모름 · 서일대 2학년 모름(전엔 ✕)',
+      lastA.map(rowA), lastA.map(() => ['no', null, null, 'ok', null, null, 'ok', null, null]));
+    eq('  `4년제` 를 적은 줄만 1~3학년이 확실히 아니다(수림 꼴 · 마지막 학년 2·3학년 ✕ · 마지막 두 학년 2학년 ✕) · `최종학년 직전학년` 하나는 학제마다 달라 늘 모름',
+      [rowA('국내 4년제 이상 대학의 최종 학년 재학생(휴학생을 포함)으로서 공적이 있는 개인'), rowA('4년제 대학의 최종학년, 최종학년 직전학년 대학생').slice(0, 3), rowA('최종학년 직전학년 대학생').every((v) => v === null)],
+      [['no', 'no', 'no', 'ok', null, null, 'ok', null, 'no'], ['no', 'no', 'ok'], true]);
+    eq('🔴 A③ 「n학년 1학기 진학 예정」의 ✓ 는 학년이 오를 때만 — 휴학 3학년 · 서일대 3학년(3년제 마지막) · 서일대 2학년(2년제 마지막) 은 모름(전엔 ✓) · `4년제` 줄의 재학 3학년 ✓ · 2학년 진학은 어느 학제든 ✓ · 휴학 1학년 모름',
+      [rmx('4학년 1학기 진학 예정자', yA({ year: 3, status: '휴학' })), rmx('4학년 1학기 진학 예정자', yA({ year: 3, school: '서일대학교', major: '컴퓨터전자공학과' })), rmx('3학년 1학기 진학예정자', yA({ year: 2, school: '서일대학교', major: '컴퓨터전자공학과' })),
+        rmx('2027년 3월 기준 4년제 대학 4학년 1학기 진학 예정자', yA({ year: 3 })), rmx('2027년 3월(1학기) 기준 2학년 1학기 진학 예정자', yA({ year: 1, school: '서일대학교', major: '컴퓨터전자공학과' })), rmx('2027년 3월(1학기) 기준 2학년 1학기 진학 예정자', yA({ year: 1, status: '휴학' }))],
+      [null, null, null, 'ok', 'ok', null]);
+  }
+
   /* ── 편입·재입학 첫 학기 (2026-11-02 개발자 "편입이랑 재입학은 학적정보만으로 구분 가능하잖아") ── */
   const html = readText(new URL('../index.html', import.meta.url));
   eq('온보딩 학적 칩에 「편입 첫 학기」·「재입학 첫 학기」가 있다 (값 편입학·재입학)', [/data-value="편입학"/.test(html), /data-value="재입학"/.test(html)], [true, true]);
@@ -14416,8 +14442,8 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
   const stu6 = (o) => ({ school: '한국외국어대학교', track: 'humanities', major: '영어학과', year: 3, status: '재학', gpa: 3.8, bracket: 5, credits: 15, region: '서울', parentRegion: '서울', nationality: 'korean', birthYear: 2004, flags: [], common: {}, scholarships: [], ...o });
   const judge6 = (l, p, ex) => conds(l, ex).map((c) => MEx.judgeCond(c, p, {}));
   const condsEx6 = (l) => PRx.parseLine(l, true).conds;
-  eq('🔴 M2 `최종학년, 최종학년 직전학년 대학생` — 4년제 기준 3·4학년(확신 high) · `졸업학년` 하나면 4학년 · 고등학교 이야기는 안 읽는다',
-    [(one('지원요건을 충족하는 최종학년, 최종학년 직전학년 대학생', 'year') || {}).finalPair, (one('졸업학년 대학생', 'year') || {}).anyOf, one('고등학교 최종학년 재학생', 'year'), one('최종학년: 직전학기 9학점 이상 이수', 'year')], [true, [4], null, null]);   // 두 학년 꼴은 6차 finalPair 가 읽는다(학제를 몰라 1·2학년은 모름 — 병합 2026-11-13)   // 마지막은 갈래 이름표(전후 대조 · 3학년 틀린 ✕)
+  eq('🔴 M2 `최종학년, 최종학년 직전학년 대학생` — 마지막 두 학년(final pair · 확신 high) · `졸업학년` 하나면 마지막 학년(final last — 숫자 4학년이 아니다) · 고등학교 이야기는 안 읽는다',
+    [(one('지원요건을 충족하는 최종학년, 최종학년 직전학년 대학생', 'year') || {}).final, (one('졸업학년 대학생', 'year') || {}).final, one('고등학교 최종학년 재학생', 'year'), one('최종학년: 직전학기 9학점 이상 이수', 'year')], ['pair', 'last', null, null]);   // 판정은 judgeCond 'year' final 갈래 한 곳(학제를 몰라 숫자 학년으로 안 바꾼다 — 병합 리뷰 2026-11-13)   // 마지막은 갈래 이름표(전후 대조 · 3학년 틀린 ✕)
   eq('  3학년 ✓ · 1학년 모름(전문대면 해당)', [judge6('지원요건을 충족하는 최종학년, 최종학년 직전학년 대학생', stu6({}))[0], judge6('지원요건을 충족하는 최종학년, 최종학년 직전학년 대학생', stu6({ year: 1 }))[0]], ['pass', 'unknown']);   // 2·3년제 전문대 1학년은 마지막 두 학년이라 ✕ 아님(6차 finalPair)
   eq('  `성적표에 2개 학기 이상(계절 학기 불포함) 교과목 이수 기록이 있는 학생` — 마친 학기 2 이상(괄호 부연은 예외가 아니다 · 확신 high) · 3학년 ✓ · 1학년 ✕',
     [(({ min, done, conf }) => [min, done, conf])(one('(지원 가능) 성적표에 2개 학기 이상(계절 학기 불포함) 교과목 이수 기록이 있는 학생', 'semester') || {}), judge6('성적표에 2개 학기 이상(계절 학기 불포함) 교과목 이수 기록이 있는 학생', stu6({}))[0], judge6('성적표에 2개 학기 이상 교과목 이수 기록이 있는 학생', stu6({ year: 1 }))[0]], [[2, true, 'high'], 'pass', 'fail']);

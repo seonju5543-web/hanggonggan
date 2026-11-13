@@ -265,6 +265,8 @@ function yearsAhead(t) {
   }
   return top ? Math.max(0, top - academicYearNow()) : 0;
 }
+/* 줄이 4년제(이상) 대학만 말하는가 — `4년제 34학년 · 3년제 23학년` 처럼 다른 학제를 함께 적었으면 아니다 (최종학년·앞으로 올 학년 판정이 학제를 쓴다) */
+function fourYearOnly(t) { return /4\s*년제/.test(t) && !/전문대|[23]\s*년제/.test(t); }
 function parseYear(t) {
   const dropped = [];
   const body = String(t).replace(YEAR_EXCEPT_PAREN, (x) => { dropped.push(x); return ' '; });
@@ -277,6 +279,7 @@ function parseYear(t) {
   if (r && soften) r.conf = LOW;
   const ahead = r ? yearsAhead(t) : 0;
   if (r && ahead) { r.conf = LOW; r.ahead = ahead; }
+  if (r && (r.ahead || r.final) && fourYearOnly(t)) r.fourUp = true;   // 앞으로 올 학년·최종학년은 학제를 알아야 ✓·✕ 를 말한다(judgeCond 'year')
   return r;
 }
 /* 🔴 **`3~4학년` 은 범위다 — `3학년 이상`+`4학년 이하`** (2026-10-12 · 카드 분석 조각 1). 범위 꼴을 못 읽어
@@ -287,16 +290,47 @@ const YEAR_RANGE = /(?<!\d)(\d)\s*(?:학년\s*)?[~∼～\-–]\s*(\d)\s*학년/;
 /* 🔴 **열거는 범위와 같이 확신이 높다** — `1학년 또는 2학년`·`3, 4학년`·`2·3학년` 은 '그중 하나'라는 뜻이 분명하다(2026-10-15 카드 전수 ·
    3학년에게 `1학년 또는2학년` 이 '모름'이었다). 열거 밖에 다른 학년 말이 또 있으면 단정하지 않는다(아래 others). */
 const YEAR_ENUM = /(?<!\d)(\d)(?:\s*학년)?(?:\s*(?:[,·、/]|또는|이나)\s*(\d)(?:\s*학년)?)+\s*학년/;
+/* 🔴 **최종·졸업학년 — 읽는 곳 한 곳** (2026-11-13 · 병합 리뷰 · 1단계 M2 와 6차 finalPair 를 합쳤다).
+   숫자 없이 학년을 말한 줄이다: `최종학년 재학생`·`졸업학년 대학생`(마지막 학년 last) · `최종학년, 최종학년 직전학년`·`최종학년 및 직전학년`(마지막 두 학년 pair)
+   · `최종학년 직전학년`(그 앞 학년 하나 penult). 학년 숫자로 바꾸지 않는다 — **프로필은 학제(2·3·4·5·6년제)를 모른다**
+   (판정은 match-engine judgeCond 'year' 의 final 갈래 한 곳 · 같은 뜻의 다른 낱말이 다른 판정을 받지 않게).
+   줄에 `4년제` 가 적혔으면 fourUp — 그때만 1·2학년(pair)·2·3학년(last) 이 확실히 아니다.
+   🔴 학년 요건이 아닌 최종학년은 읽지 않는다(전엔 '4학년이어야' 로 읽어 1~3학년이 틀린 미달이었다):
+     · 괄호 안·※ 꼬리 — `15학점(최종학년 10학점)`·`※ 최종학년의 경우 최소 이수학점 6학점` 은 최종학년에게 주는 예외다
+     · 갈래 이름표 — `최종학년: 직전학기 9학점 이상` · `최종학년의 경우 …` · `최종학년은 9학점` (뒤에 같은 마디 안 숫자)
+     · 범위 — `1~졸업학년`·`1학년 ~ 졸업 학년` 은 모든 학년이다(`2학년~졸업학년` 은 2학년 이상)
+     · `졸업학년도` 는 연도 · 고등학교 이야기(전문대·2·3년제는 학제를 가리지 않는 판정이라 그대로 읽는다)
+   돌려주는 값: undefined = 이 줄은 최종학년 꼴이 아니다(다음 규칙으로) · null = 학년 조건 없음 · 조건 */
+function parseFinalYear(t) {
+  const FIN = '(?:최종|졸업)\\s?학년';
+  if (!new RegExp(FIN + '(?!\\s*도)').test(t)) return undefined;
+  const numYear = YEAR_NUM_IN_PAREN.test(t);   // 숫자 학년(`최종학년(4학년)`·`2학년 이상`)이 함께 있으면 숫자 학년 규칙이 읽는다 · `34학년` 같은 붙은 숫자는 아니다
+  const range = t.match(new RegExp('(?<!\\d)(\\d)\\s*(?:학년\\s*)?[~∼～\\-–]\\s*' + FIN));
+  if (range) { const lo = num(range[1]); return lo != null && lo >= 2 && lo <= 6 ? { kind: 'year', min: lo, conf: HIGH } : null; }
+  if (/고등|중학|초등/.test(t)) return numYear ? undefined : null;
+  /* 괄호 안·※ 꼬리를 걷은 본문에서만 — 그 안의 최종학년은 예외 안내다 */
+  const body = t.replace(/[(（][^()（）]*[)）]/g, ' ').replace(/※.*$/, ' ');
+  const hit = new RegExp(FIN + '(?!\\s*도)', 'g');
+  const at = [...body.matchAll(hit)];
+  if (!at.length) return numYear ? undefined : null;
+  /* 갈래 이름표 — 뒤에 콜론·`의 경우`·`은/는 …숫자` 가 오면 그 학년의 경우를 적은 말이다 */
+  const branch = at.some((m) => /^\s*(?:[:：]|의\s*경우|\d|(?:생|의)?\s*(?:은|는)\s*[^,.]{0,12}?\d)/.test(body.slice(m.index + m[0].length)));
+  if (branch) return numYear ? undefined : null;
+  if (numYear) return undefined;
+  const pair = new RegExp(FIN + '\\s*(?:[,/·]|및|과|와|또는|이나)?\\s*(?:' + FIN + '\\s*(?:의\\s*)?)?직전\\s*학년').exec(body);
+  if (pair) {
+    /* `최종학년 직전학년` 만(앞에 따로 선 최종학년이 없다) — 그 앞 학년 하나다 */
+    const solo = !/[,/·]|및|과|와|또는|이나/.test(pair[0]) && !new RegExp(FIN + '[\\s\\S]*' + FIN).test(pair[0]);
+    return { kind: 'year', final: solo ? 'penult' : 'pair', conf: HIGH };
+  }
+  return { kind: 'year', final: 'last', conf: HIGH };
+}
 function parseYearBody(t) {
   /* `신입생 및 재학생`·`재학생 또는 신입생` 은 둘 다 된다는 말 — 학년 조건이 아니다(2026-10-15 · 「만 30세 이하이면서 국내 대학교 신입생 및 재학생」이 '모름'이었다) */
   if (/신입생\s*(?:및|또는|[,·/])\s*(?:재학생|편입생|재입학생)|재학생\s*(?:및|또는|[,·/])\s*신입생/.test(t)) return null;
   /* `2027년 3월(1학기) 기준 2학년 1학기 진학 예정자`·`2027년도 봄에 5학기(3학년1학기)진학을 예정하고 있는 자` — **다음 학년도 첫 학기**의 학년이다(2026-11-11 · 6차 · 두산연강·관정 층2).
-     앞으로 올 학년도의 학년과 같은 규약으로 낸다(ahead 1 · 확신 낮음) — 지금 그 바로 아래 학년이면 ✓, 아니면 모름(judgeCond 'year' · 휴학하면 안 오르므로 ✕ 를 안 낸다).
+     앞으로 올 학년도의 학년과 같은 규약으로 낸다(ahead 1 · 확신 낮음) — 지금 그 바로 아래 학년이고 학년이 오를 때만(재학 꼴 학적 · 그 학년이 있는 학제) ✓, 아니면 모름(judgeCond 'year' · ✕ 를 안 낸다).
      ⚠️ 1학기만 — 2학기 진학 예정은 같은 학년도 안일 수 있다(지금 학기를 프로필이 모른다) */
-  /* `최종학년, 최종학년 직전학년 대학생`·`최종학년/ 최종학년 직전 학년 대학생` (2026-11-11 · 6차 · 거창군장학회 등록·층2 3줄) — 마지막 두 학년이다.
-     프로필은 학제(2·3·4·5·6년제)를 모른다: 1·2학년은 2·3년제 전문대면 해당이라 모름, 3·4학년은 학과가 5·6년제 꼴이 아니면 ✓, 5학년 이상 ✓
-     — 판정은 judgeCond 'year' 의 finalPair 갈래 한 곳 */
-  if (/최종\s?학년\s*[,/·]?\s*(?:및\s*)?최종\s?학년\s*(?:의\s*)?직전\s*학년/.test(t)) return { kind: 'year', min: 3, finalPair: true, conf: HIGH };
   const goNext = t.match(/(?<!\d)([2-6])\s*학년\s*1\s*학기\s*[)）]?\s*진학\s*(?:을\s*)?예정/);
   if (goNext) return { kind: 'year', eq: num(goNext[1]), ahead: 1, conf: LOW };
   /* `2학년 2학기 이상`·`2학년 1학기, 2학년 2학기, 3학년 1학기 재학생` 은 학기 축(parseSemester)이 읽는다 — 여기서 `2학년` 하나를 집으면 줄 전체가 '모름'이 된다 */
@@ -326,13 +360,10 @@ function parseYearBody(t) {
       return { kind: 'year', min: lo, max: hi, conf: (others || school) ? LOW : HIGH };
     }
   }
+  /* 최종·졸업학년은 숫자 없이 학년을 말한 줄이다 — 읽는 곳은 위 parseFinalYear 한 곳(판정은 judgeCond 'year' 의 final 갈래 한 곳) */
+  const fin = parseFinalYear(t);
+  if (fin !== undefined) return fin;
   const m = t.match(YEAR_NUM);
-  /* `최종학년, 최종학년 직전학년 대학생`·`졸업학년` — 숫자 없이 학년을 말한 줄(2026-11-11 · 1단계 M2). 4년제 기준 최종학년 = 4학년, 직전학년 = 3학년.
-     고등학교·전문대 이야기가 섞이면 안 읽는다 · 괄호 밖에서만 */
-  /* ⚠️ `최종학년: 직전학기 9학점 이상 이수` 는 최종학년**의 경우**를 적은 갈래 이름표지 '최종학년이어야 한다'가 아니다 — 콜론이 붙은 꼴은 안 읽는다(전후 대조에서 3학년에게 틀린 ✕ 가 났다) */
-  if (!m && /(?:최종|졸업)\s?학년(?!\s*[:：]|도)/.test(t) && !/(?:최종|졸업)\s?학년\s*[:：]/.test(t) && !/고등|중학|초등|전문대|2년제|3년제/.test(t)) {   // `졸업학년도` 는 연도다(리뷰)
-    return { kind: 'year', anyOf: /직전\s?학년/.test(t) ? [3, 4] : [4], conf: HIGH };   // 괄호 예외·앞으로 올 학년도는 바깥 parseYear 가 확신을 낮춘다
-  }
   if (!m) return null;
   const v = num(m[1]);
   if (v == null || v < 1 || v > 6) return null;

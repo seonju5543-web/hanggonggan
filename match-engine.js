@@ -330,14 +330,22 @@ function judgeCond(c, p, ctx) {
          그 사이는 모름. 줄은 확신이 낮아 미달도 화면에선 '모름'이 된다. */
       const ahead = c.ahead > 0 ? c.ahead : 0;
       let v = 'unknown';
-      /* `최종학년, 최종학년 직전학년` (parse-requirements parseYearBody finalPair · 2026-11-11 · 6차) — 마지막 두 학년이다. 프로필은 학제(2·3·4·5·6년제)를 모른다.
-         🔴 1·2학년에 ✕ 를 내지 않는다 — 학교 목록(data.js UNIVERSITIES)에 2·3년제 전문대(서일대·두원공대·서울예대·동아방송예대·제주한라대·웅지세무대 …)가 있어
-            그 학교 1·2학년은 마지막 두 학년이다(거창군장학회 원문도 `3년제 23학년 · 2년제 12학년` 을 적는다) → 모름.
-         3·4학년은 2·3·4년제 어디서든 마지막 두 학년 안이다(3년제 3학년 · 4년제 3·4학년) → ✓ · 단 학과가 5·6년제 꼴(의·치·한의·약·수의·건축학)이거나 학과를 모르면 모름 ·
-         5학년 이상은 5·6년제의 마지막 두 학년 → ✓ */
-      if (c.finalPair) {
-        const longProgram = /의예|의학|치의|치과|한의|약학|수의|건축학(?!.*공학)/.test(String(p.major || ''));
-        v = y <= 2 ? 'unknown' : y >= 5 ? 'pass' : (p.major && !longProgram) ? 'pass' : 'unknown';
+      /* 🔴 **최종·졸업학년 — 판정 한 곳** (parse-requirements parseFinalYear · 2026-11-13 병합 리뷰 · 6차 finalPair 와 1단계 M2 를 합쳤다).
+         `final` = last(마지막 학년) · pair(마지막 두 학년) · penult(그 앞 학년). 프로필은 학제(2·3·4·5·6년제)를 모른다 —
+         학교 목록(data.js UNIVERSITIES)에 2·3년제 전문대(서일대·두원공대·서울예대·동아방송예대·제주한라대·웅지세무대 …)가 있고
+         (거창군장학회 원문도 `3년제 23학년 · 2년제 12학년` 을 적는다) 학과는 5·6년제(의·치·한의·약·수의 · 건축학)일 수 있다.
+         확실한 것만 말한다:
+           pair — 1·2학년은 2·3년제면 해당이라 모름(줄에 `4년제` 가 적혔으면 ✕) · 3·4학년은 학과를 알고 5·6년제 꼴이 아니면 ✓ · 5학년 이상 ✓
+           last — 1학년 ✕(1년제는 없다) · 2·3학년은 2·3년제면 마지막이라 모름(`4년제` 면 ✕) · 4학년은 학과를 알고 5·6년제 꼴이 아니면 ✓ ·
+                  5학년은 건축학(5년제)만 ✓ · 6학년 ✓ · 그 밖은 모름
+           penult — 학제마다 다른 학년이라 늘 모름
+         🔴 숫자 학년(anyOf [4])으로 바꾸지 말 것 — 같은 뜻의 다른 낱말이 다른 판정을 받는다(전엔 `졸업학년` 만 2년제 2학년·건축학과 5학년이 ✕) */
+      const major = String(p.major || '');
+      const longProgram = /의예|의학|치의|치과|한의|약학|수의|건축학(?!.*공학)/.test(major);
+      const fiveYear = /건축학(?!.*공학)/.test(major);
+      if (c.final) {
+        if (c.final === 'pair') v = y <= 2 ? (c.fourUp ? 'fail' : 'unknown') : y >= 5 ? 'pass' : (p.major && !longProgram) ? 'pass' : 'unknown';
+        else if (c.final === 'last') v = y <= 1 ? 'fail' : y <= 3 ? (c.fourUp ? 'fail' : 'unknown') : y === 4 ? ((p.major && !longProgram) ? 'pass' : 'unknown') : y === 5 ? (fiveYear ? 'pass' : 'unknown') : 'pass';
         if (c.exclude) return v === 'pass' ? 'fail' : v === 'fail' ? 'pass' : v;
         return v;
       }
@@ -349,7 +357,16 @@ function judgeCond(c, p, ctx) {
         v = both.includes('fail') ? 'fail' : both.every((x) => x === 'pass') ? 'pass' : 'unknown';
       }
       else if (c.anyOf) v = ahead ? 'unknown' : (c.anyOf.includes(y) ? 'pass' : 'fail');   // `1학년 또는 2학년`·`3, 4학년` — 그중 하나(2026-10-15)
-      else if (c.eq != null) v = ahead ? (y + ahead === c.eq ? 'pass' : 'unknown') : (y === c.eq ? 'pass' : 'fail');   // `기준 1학년`은 그 학년(2026-10-15 개발자 결정) · 확신이 낮은 줄(다른 학년 함께·예외 괄호)은 lineVerdict 가 ✕ 를 안 낸다
+      else if (c.eq != null) {
+        /* 🔴 **앞으로 올 학년(ahead)의 ✓ 는 학년이 오를 때만** (2026-11-13 병합 리뷰 · `4학년 1학기 진학 예정자`) — 지금 그 바로 아래 학년이어도
+           ① 휴학·복학예정·초과학기·졸업유예는 다음 학기에 학년이 안 오를 수 있다(학적이 재학 꼴일 때만 ✓)
+           ② 그 학년이 그 학교에 있는지 프로필은 모른다(위 final 갈래와 같은 근거 — 2년제엔 3학년이, 3년제엔 4학년이 없다):
+              2학년까지는 어느 학제에나 있다 · 3·4학년은 줄에 `4년제` 가 적혔거나(fourUp) 학과가 5·6년제 꼴일 때 · 5학년은 5·6년제 · 6학년은 6년제 학과만
+           그 밖은 모름(✕ 는 안 낸다) */
+        const rises = ['재학', '신입학', '편입학', '재입학'].includes(p.status);
+        const exists = c.eq <= 2 || (c.eq <= 4 ? (c.fourUp || longProgram) : c.eq === 5 ? longProgram : (longProgram && !fiveYear));
+        v = ahead ? (y + ahead === c.eq && rises && exists ? 'pass' : 'unknown') : (y === c.eq ? 'pass' : 'fail');
+      }   // `기준 1학년`은 그 학년(2026-10-15 개발자 결정) · 확신이 낮은 줄(다른 학년 함께·예외 괄호)은 lineVerdict 가 ✕ 를 안 낸다
       /* 🔴 **제외 줄에서는 뜻이 뒤집힌다** (2026-10-11 · 조각 B 리뷰 — 원래부터 있던 결함). `4학년 이상 재학생`
          이 제외 줄이면 **4학년이** 걸린다. 안 뒤집으면 1~3학년이 미달이고 정작 4학년이 통과했다.
          flags·nationality·school 과 같은 규약(제외 줄에서 fail = 그 학생이 걸린 것) · 모름은 그대로. */
