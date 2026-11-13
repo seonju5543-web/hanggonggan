@@ -578,4 +578,22 @@ export default async function gate(eq, ctx) {
         /--assignee seonju5543-web --assignee Se-Hyeon-Jo --assignee didinin-wq/.test(ew), /failure\(\) \|\| cancelled\(\)\s+uses: \.\/\.github\/actions\/robot-down/.test(ew)],
       [true, true, true, 2, 2, true, true]);
   }
+
+  /* ── ⑩ 사고 대응 한 장 (2026-11-13 · 은서 · 출시 전 백엔드 12번 — docs/backend/사고-대응.md) ──
+     급할 때 펴는 문서가 없는 파일·없는 버튼·바뀐 경보 제목을 가리키면 그날 헛걸음한다 → 가리키는 것이 실제로 있는지 잰다 */
+  {
+    const doc = read(root, 'docs/backend/사고-대응.md');
+    const wfDir = path.join(rootPath, '.github/workflows');
+    const wfText = fs.readdirSync(wfDir).filter((f) => f.endsWith('.yml')).map((f) => fs.readFileSync(path.join(wfDir, f), 'utf8')).join('\n');
+    const wfNames = [...wfText.matchAll(/^name: (.+)$/gm)].map((m) => m[1]);
+    const paths = [...doc.matchAll(/`([\w./가-힣-]+\.(?:md|mjs|js|json|yml))`/g)].map((m) => m[1]);
+    const MUST_NOT = ['_config.yml'];   // '생겼으면 지운다'로 적은 파일 — 있으면 관리자 화면이 공개된다(CLAUDE.md) · 그래서 없어야 맞다
+    eq(`⑩ 문서가 가리키는 파일(${paths.length}개)이 실제로 있다 · '생기면 지운다'는 파일은 없다`,
+      [paths.filter((p) => !MUST_NOT.includes(p) && !fs.existsSync(path.join(rootPath, p))), MUST_NOT.filter((p) => fs.existsSync(path.join(rootPath, p)))], [[], []]);
+    const titles = [...doc.matchAll(/「((?:🚨|🔑|🛡)[^」]+)」/g)].map((m) => m[1].replace(/…$/, ''));
+    eq(`  가리키는 경보 제목(${titles.length}개)이 워크플로에 있다(제목을 바꾸면 이 문서도)`, titles.filter((t) => !wfText.includes(t)), []);
+    const buttons = [...doc.matchAll(/Actions › 「([^」]+)」/g)].map((m) => m[1]);
+    eq(`  가리키는 Actions 버튼(${buttons.length}개)이 워크플로 이름에 있다`, buttons.filter((b) => !wfNames.some((n) => n.startsWith(b))), []);
+    eq('  (대조할 것을 실제로 뽑았다 — 파일 4·경보 8·버튼 3 이상)', [paths.length >= 4, titles.length >= 8, buttons.length >= 3], [true, true, true]);
+  }
 }
