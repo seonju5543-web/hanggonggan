@@ -556,15 +556,21 @@ function judgeCond(c, p, ctx) {
       /* 🔴 거주 **기간** (2026-11-13 · 선조치 후 보고 — 온보딩 「지금 주소에 산 지」 · 프로필 residenceMonths = 고른 칸의 하한 개월).
          본인 시·군(시·도)이 맞은 줄에서만 본다(own) — 부모 시·군으로 맞았으면 학생의 기간은 아무 말도 안 한다.
            고른 칸 전체가 기간 이상(하한 ≥ minMonths)   → ✓   (monthsBy 'self'·'either' — 본인 기간으로 되는 줄)
-           고른 칸 전체가 기간 미만(상한 ≤ minMonths)   → ✕   (monthsBy 'self' 만 — 부모·합산·전입 갈래가 있으면 모름 · 확신 HIGH 일 때만 ✕ 는 lineVerdict)
-           칸에 걸치면(1~3년 학생에게 `2년 이상`)        → 모름 — 하한만 보고 ✕ 를 내면 2년 반 산 학생이 틀린 미달이다
+           그 밖(모자라거나 칸에 걸치면)                 → 모름 — **✕ 는 내지 않는다**
+         🔴 ✕ 를 내지 않는 까닭 (2026-11-13 리뷰가 실데이터로 재현 · 틀린 미달 넷):
+           ① 질문은 「지금 **주소**에 산 지」이고 요건은 「그 시·군(시·도)에 산 지」다 — 같은 통영시 안에서 4년 전에 이사한 학생은
+              통영에 20년을 살았어도 「3~5년」을 고른다. 주소 기간 ≤ 지역 기간이라 ✓ 는 맞는 추론이지만 ✕ 는 아니다.
+           ② 칩 이름표 「1~3년」은 3년을 포함한다 — 상한으로 ✕ 를 내면 딱 3년 산 학생이 미달이다.
+           ③ 〔○○ 소재 대학〕 꼬리표 줄은 다른 갈래 학생에게 걸리지 않는다 · ④ 한 줄에 기간이 여럿(`6개월 이상(관내)/1년 이상(관외)`)이면 minMonths 는 큰 값이다 ·
+           ⑤ `(단, 군복무 기간은 거주기간으로 인정)` 처럼 기간을 채우는 다른 길이 있다.
+         ✕ 를 다시 켜려면 질문을 「지금 사는 시·군·구에 계속 산 지」로 바꾸고(저장된 값의 뜻이 바뀐다 — 개발자 결정) 위 ②~⑤ 를 막은 뒤에 시·군 줄만 —
+         관문 「못 읽던 자격 줄 — 2단계」 Q① 이 ✕ 가 다시 나오면 실패한다.
          칸이 비었으면 예전처럼 모름 · 읍면동(subArea)은 기간과 상관없이 모름 */
       const monthsVerdict = (own) => {
         if (!own || c.subArea) return 'unknown';
         const span = residenceSpan(p.residenceMonths);
         if (!span) return 'unknown';
         if (span.lo >= c.minMonths && (c.monthsBy === 'self' || c.monthsBy === 'either')) return 'pass';
-        if (span.hi <= c.minMonths && c.monthsBy === 'self') return 'fail';
         return 'unknown';
       };
       const soft = (v, own) => (v === 'pass' && c.minMonths) ? monthsVerdict(own)

@@ -14185,7 +14185,7 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
   eq('🔴 온보딩 「적합도 높이기」 가 학자금대출 이용·자립준비청년을 묻는다 (2026-11-09 개발자 결정 "질문에 넣어")', ['loan', 'careLeaver'].map((k) => EAo.ONBOARD_TRAITS.includes(k)), [true, true]);
 
   /* ── Q. 거주 기간 · 등록금 전액 장학·면제 (2026-11-13 · 선조치 후 보고 — 결정을 요청해 둔 질문 둘) ──
-     ① 「지금 주소에 산 지」(residenceMonths = 칸의 하한 개월): 본인 시·군이 맞은 `n년 이상 계속 거주` 줄만 — 칸 전체가 기간 이상이면 ✓ · 칸 전체가 미만이고 본인만 말하는 줄(self)이면 ✕ · 칸이 걸치거나 부모·합산·전입 갈래면 모름
+     ① 「지금 주소에 산 지」(residenceMonths = 칸의 하한 개월): 본인 시·군이 맞은 `n년 이상 계속 거주` 줄만 — 칸 전체가 기간 이상이면 ✓ · 그 밖은 모름 · 🔴 **✕ 는 내지 않는다**(같은 날 리뷰 — 주소 기간 ≤ 그 시·군에 산 기간 · 칩 경계 · 꼬리표 갈래 · 기간 여럿 · 「단,」 예외)
      ② fullTuition: 늘 결격(TRAIT_DISQUALIFY) — 「예」 ✕ · 「아니요」 통과 · 뜻이 반대거나 한 칸으로 못 가르는 꼴은 안 읽는다 */
   {
     const spans = (MEx.RESIDENCE_SPANS || []).map((s) => [String(s.months), s.label]);
@@ -14214,16 +14214,30 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
     };
     eq('Q① 누구의 기간인가(monthsBy) — 본인만 self · 본인 또는 부모/합산 either · 학생과 가족 joint · 부모만 parent · 전입·직전 다른 시군 odd',
       ['ongjin', 'djSelf', 'djAlt', 'ansanSum', 'ansanJoint', 'jeongeup', 'eumseong'].map((k) => (one(LQ[k], 'residence') || {}).monthsBy), ['self', 'self', 'either', 'either', 'joint', 'parent', 'odd']);
+    const RESIDENCE_PROBE_MONTHS = [6, 12, 24, 36, 60, 72, 120];
     const stQ = (city, prov, m, extra) => Object.assign({ status: '재학', year: 3, birthYear: 2004, nationality: 'korean', region: prov, regionCity: city }, m === undefined ? {} : { residenceMonths: m }, extra || {});
-    eq('🔴 Q① 옹진군 `3년 이상 연속 실거주`(self) — 안 채움 모름 · 1년 미만·1~3년 ✕ · 3~5년·10년 이상 ✓ · 다른 시·군은 기간과 상관없이 ✕',
-      [undefined, 0, 12, 36, 120].map((m) => rmx(LQ.ongjin, stQ('옹진군', '인천', m))).concat([rmx(LQ.ongjin, stQ('종로구', '서울', 120))]), [null, 'no', 'no', 'ok', 'ok', 'no']);
-    eq('🔴 Q① 칸이 걸치면 모름 — `6개월 이상` 에 1년 미만(0~11개월) · `2년 이상` 에 1~3년 은 ✕ 가 아니다(틀린 미달) · 은평 1년 미만은 ✕',
-      [rmx(LQ.mapo, stQ('마포구', '서울', 0)), rmx(LQ.mapo, stQ('마포구', '서울', 12)), rmx(LQ.eunpyeong, stQ('은평구', '서울', 12)), rmx(LQ.eunpyeong, stQ('은평구', '서울', 0)), rmx(LQ.eunpyeong, stQ('은평구', '서울', 36))], [null, 'ok', null, 'no', 'ok']);
-    eq('🔴 Q① 본인 또는 부모(either)는 차면 ✓ 모자라면 모름(부모 기간은 묻지 않는다) · 본인만(self)은 모자라면 ✕ · 시·도 줄도 같다',
-      [rmx(LQ.djAlt, stQ('유성구', '대전', 0)), rmx(LQ.djAlt, stQ('유성구', '대전', 12)), rmx(LQ.djSelf, stQ('유성구', '대전', 0)), rmx(LQ.djSelf, stQ('유성구', '대전', 12))], [null, 'ok', 'no', 'ok']);
+    eq('🔴 Q① 옹진군 `3년 이상 연속 실거주`(self) — 안 채움 모름 · 1년 미만·1~3년도 모름(✕ 아님 — 「1~3년」은 딱 3년을 포함한다) · 3~5년·10년 이상 ✓ · 다른 시·군은 기간과 상관없이 ✕',
+      [undefined, 0, 12, 36, 120].map((m) => rmx(LQ.ongjin, stQ('옹진군', '인천', m))).concat([rmx(LQ.ongjin, stQ('종로구', '서울', 120))]), [null, null, null, 'ok', 'ok', 'no']);
+    eq('🔴 Q① 칸이 걸치거나 모자라면 모름 — `6개월 이상` 에 1년 미만(0~11개월) · `2년 이상` 에 1~3년·1년 미만 은 ✕ 가 아니다(틀린 미달)',
+      [rmx(LQ.mapo, stQ('마포구', '서울', 0)), rmx(LQ.mapo, stQ('마포구', '서울', 12)), rmx(LQ.eunpyeong, stQ('은평구', '서울', 12)), rmx(LQ.eunpyeong, stQ('은평구', '서울', 0)), rmx(LQ.eunpyeong, stQ('은평구', '서울', 36))], [null, 'ok', null, null, 'ok']);
+    eq('🔴 Q① 본인 또는 부모(either)는 차면 ✓ 모자라면 모름(부모 기간은 묻지 않는다) · 본인만(self)도 모자라면 모름 · 시·도 줄도 같다',
+      [rmx(LQ.djAlt, stQ('유성구', '대전', 0)), rmx(LQ.djAlt, stQ('유성구', '대전', 12)), rmx(LQ.djSelf, stQ('유성구', '대전', 0)), rmx(LQ.djSelf, stQ('유성구', '대전', 12))], [null, 'ok', null, 'ok']);
     eq('🔴 Q① 학생 기간으로 말하지 않는 줄 — 부모만(정읍)·학생과 가족(안산)·전입(음성)·읍면동(산청 시천면)은 10년 이상이어도 ✓ 아님 · 합산 갈래(안산)는 모자라도 ✕ 아님 · 확신 낮은 줄은 모자라도 ✕ 아님',
       [rmx(LQ.jeongeup, stQ('정읍시', '전북', 120)), rmx(LQ.ansanJoint, stQ('안산시', '경기', 120)), rmx(LQ.eumseong, stQ('음성군', '충북', 120)), rmx(LQ.sancheong, stQ('산청군', '경남', 120)),
         rmx(LQ.ansanSum, stQ('안산시', '경기', 60)), rmx(LQ.ansanSum, stQ('안산시', '경기', 120)), rmx(LQ.djLow, stQ('유성구', '대전', 0))], [null, null, null, null, null, 'ok', null]);
+    /* 🔴 리뷰가 재현한 틀린 미달 다섯(2026-11-13) — 기간이 모자라 보여도 ✕ 를 내면 안 되는 꼴. 줄은 원문 꼴을 그대로 적어 둔다(실데이터를 읽지 않는다) */
+    const LR = {
+      tongyeong: '다. 관내 고등학교 졸업자로, 공고일 현재 주민등록상 6년 이상 통영시에 주소를 두고, 통영시 관내 학교를 6년 이상 다닌 자',
+      djTag: '〔대전 소재 대학〕 공고일(‘26.9.1.) 기준 본인이 1년 전부터 계속해서 대전광역시에 주소를 두고 있는 대한민국 국적의 학생',
+      iksan: '공고일 기준 6개월 이상(관내 대학교 학생)/1년 이상(관외 대학교 학생) 익산시에 주소를 연속하여 두고 있는 자',
+      eunpyeongMil: '공고일 기준 2년 이상 은평구에 거주한 대학생 (단, 군복무 기간은 거주기간으로 인정)',
+    };
+    eq('🔴 Q① 틀린 미달 다섯 — ① 지금 주소 기간이 그 시·군(시·도) 기간보다 짧을 수 있다(통영 6년·3~5년 · 대전 시·도 1년·1년 미만) ② 「1~3년」 은 딱 3년을 포함(옹진 3년) ③ 〔대전 소재 대학〕 꼬리표 줄 · 외대 학생 ④ 기간 여럿(익산 6개월/1년) ⑤ `(단, 군복무 … 인정)` — 모두 ✕ 아님',
+      [rmx(LR.tongyeong, stQ('통영시', '경남', 36)), rmx(LQ.djSelf, stQ('유성구', '대전', 0)), rmx(LQ.ongjin, stQ('옹진군', '인천', 12)),
+        rmx(LR.djTag, stQ('유성구', '대전', 0, { school: '한국외국어대학교' })), rmx(LR.iksan, stQ('익산시', '전북', 0)), rmx(LR.eunpyeongMil, stQ('은평구', '서울', 0))].map((v) => v === 'no'),
+      [false, false, false, false, false, false]);
+    eq('🔴 Q① 어느 칸 × 어느 기간이든 거주 기간만으로 ✕ 는 없다 (칸 다섯 × 6개월~10년 · 본인만 말하는 줄) — ✕ 를 다시 켜려면 질문부터 바꾼다',
+      RESIDENCE_PROBE_MONTHS.flatMap((n) => (MEx.RESIDENCE_SPANS || []).map((sp) => rmx(`공고일 현재 ${n % 12 ? n + '개월' : n / 12 + '년'} 이상 계속하여 옹진군에 주소를 두고 있는 자`, stQ('옹진군', '인천', sp.months)))).filter((v) => v === 'no').length, 0);
     eq('🔴 Q① 부모 시·군으로만 맞았으면 학생 기간은 아무 말도 안 한다 — 학생 종로구 · 부모 옹진군 · 10년 이상 → ✓ 아님',
       rmx(LQ.ongjin, stQ('종로구', '서울', 120, { parentRegion: '인천', parentRegionCity: '옹진군' })), null);
     eq('Q① 공고 안에서도 묻는다 — 시·군이 맞고 기간을 안 채운 학생에게 「지금 주소 거주 기간」 · 시·군을 모르면 거주 칸부터 · 「1년 미만」(0)은 답이다',

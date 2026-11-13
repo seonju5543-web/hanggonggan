@@ -58,7 +58,7 @@ const FIELD_PROBE = {
   /* 출신 고교 소재지 (2026-10-24) — match-engine 이 `about:'origin'` 줄을 이 둘로 본다(맞으면 ✓ · 아니면 모름) */
   originRegion: ['서울', '전남'],
   originCity: ['종로구', '무안군'],
-  /* 지금 주소에 산 지 (2026-11-13) — 칸의 하한 개월. 양 끝(1년 미만 · 10년 이상)이면 `n년 이상 계속 거주` 줄이 ✓ 또는 ✕ 로 풀리는지 본다(match-engine RESIDENCE_SPANS) */
+  /* 지금 주소에 산 지 (2026-11-13) — 칸의 하한 개월. 양 끝(1년 미만 · 10년 이상)으로 `n년 이상 계속 거주` 줄이 풀리는지 본다(match-engine RESIDENCE_SPANS) — 풀리는 것은 10년 이상의 ✓ 뿐이다(모자라도 ✕ 는 안 낸다 · 2026-11-13 리뷰) */
   residenceMonths: [0, 120],
 };
 

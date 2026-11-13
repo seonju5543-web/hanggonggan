@@ -290,7 +290,8 @@ async function seed(page) {
   ok('  답하기 전에는 그 줄에 표시가 없다 (시·군만 맞으면 모름)', r36.before.length > 0 && r36.before.every((c) => /r-req/.test(c)), r36.before.join(' / ') || '줄 없음');
   ok('  「3~5년」 으로 저장하면 그 줄이 ✓ 가 되고 프로필에 숫자 36 으로 남는다', r36.after.some((c) => /r-ok/.test(c)) && r36.saved === 36, `${r36.after.join(' / ')} · ${JSON.stringify(r36.saved)}`);
   const r0 = await residAnswer('0');
-  ok('  「1년 미만」 으로 저장하면 ✕ 가 되고 0 으로 남는다 (0 은 답이다 — 비운 것과 다르다)', r0.after.some((c) => /r-bad/.test(c)) && r0.saved === 0, `${r0.after.join(' / ')} · ${JSON.stringify(r0.saved)}`);
+  /* 🔴 모자라도 ✕ 는 아니다 (2026-11-13 리뷰) — 질문은 「지금 주소」, 요건은 「옹진군에 산 지」라 같은 군 안에서 이사한 학생은 더 오래 살았을 수 있다 */
+  ok('  「1년 미만」 으로 저장해도 ✕ 가 아니라 모름(표시 없음)이고 0 으로 남는다 (0 은 답이다 — 비운 것과 다르다)', r0.after.length > 0 && r0.after.every((c) => !/r-bad|r-ok/.test(c)) && r0.saved === 0, `${r0.after.join(' / ')} · ${JSON.stringify(r0.saved)}`);
 
   console.log(`\n${fails.length ? `✕ 실패 ${fails.length}건` : `✓ 전부 통과 (${pass}항목)`}`);
   fails.forEach((f) => console.log(`   - ${f}`));
