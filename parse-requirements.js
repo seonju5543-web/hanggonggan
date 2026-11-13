@@ -277,6 +277,9 @@ function parseCredits(t) {
   const flat = t.replace(/[(（](?:[^()（）]|[(（][^()（）]*[)）])*[)）]/g, ' ').replace(/\s+/g, ' ');
   const m = t.match(new RegExp(`${N}\\s*학점\\s*(?:\\([^()]{0,40}\\))?\\s*(이상|이내|미만)`)) || flat.match(new RegExp(`${N}\\s*학점\\s*(?:이|은|는)?\\s*(이상|이내|미만)`)) || (mMin ? [mMin[0], mMin[1], '이상'] : null);
   if (!m) return null;
+  /* 🔴 세 자리 학점(`누적 120학점 이상`·`졸업이수학점이 120 학점인 학부(과)는 14 학점`)이 있는 줄은 직전학기 학점 하나로 판정하지 않는다 —
+     누적 요건이거나 학부(과) 갈래 조각이다(그린나래 조각 줄이 14학점 학생에게 ✓ · 2026-11-13 수렴 마무리 · 넓히지 않고 모름으로) */
+  if (/(?<![\d.])\d{3}\s*학점/.test(t)) return null;
   const v = parseFloat(m[1]);
   if (v == null || Number.isNaN(v) || v < 1 || v > 30) return null;
   /* 여러 개가 한 줄에 있으면(`15학점(4학년 12학점)`) 어느 쪽인지 모른다 */
@@ -431,7 +434,10 @@ function yearBranchDoubt(text) {
   return ms.some((m) => {
     const after = t.slice(m.index + m[0].length);
     if (/\d\s*(?:학년\s*)?(?:[~∼～\-–]|부터|에서)\s*$/.test(t.slice(0, m.index))) return false;   // `1학년~졸업학년은` 은 범위(모든 학년 · yearBranchLabels 와 같다)
-    return !YEAR_EXCLUDE_TAIL.test(after) && YEAR_DOUBT_HEAD.test(after);
+    if (!YEAR_EXCLUDE_TAIL.test(after) && YEAR_DOUBT_HEAD.test(after)) return true;
+    /* `3학년(편입생 포함)은 …`·`3학년(휴학생 제외)은 …` — 학년과 이름표 꼬리 사이 괄호(수렴 마무리 · 의심만 · 갈래로 읽게 넓히지 않는다) */
+    const paren = after.match(/^\s*[(（][^()（）]{0,20}[)）]/);
+    return !!paren && YEAR_DOUBT_HEAD.test(after.slice(paren[0].length));
   }) || yearCreditParenUnsure(t);
 }
 const yearMentionsAllBranches = (t) => { const at = [...t.matchAll(YEAR_MENTION)]; return at.length > 0 && at.every((m) => yearBranchAt(t, m.index, m.index + m[0].length, true)); };
@@ -511,6 +517,8 @@ function parseYearBody(t) {
     /* `고등학교 3학년 제외`·`대학생(고등학교 3학년 제외)` 의 학년은 고등학생 이야기다 — 대학 학년 조건이 없다(전엔 아래로 흘러 '3학년이어야' HIGH 로 대학 1학년 ✕ · 3학년 ✓) */
     /* 🔴 (수렴 1회차) 학교급은 **학년 바로 앞**만 본다 — `고등학교 졸업예정자 및 대학 재학생(4학년 제외)` 은 대학 4학년을 뺀다(전엔 줄 어딘가의 `고등` 을 보고 학년 조건을 버려 4학년 ✓ · 틀린 안심) */
     if (/(?:고등학교|고등학생|고교|(?<![가-힣])고|중학교|중학생|초등학교|초등학생)\s*$/.test(t.slice(0, ment[0].index))) return null;
+    /* `고등학생(3학년 제외)`·`특성화고 재학생(3학년 제외)` — 괄호를 연 무리(마지막 쉼표·및·또는 뒤)가 학교급이면 그 학년도 고등학생 이야기다(수렴 마무리 · 넓히지 않고 조건을 안 낸다) */
+    { const pre = t.slice(0, ment[0].index); if (/[(（]\s*$/.test(pre)) { const seg = pre.replace(/[(（]\s*$/, '').split(/[,，·ㆍ]|및|또는/).pop(); if (/고등|고교|고(?=\s|$)|중학|초등/.test(seg) && !/대학/.test(seg)) return { kind: 'year', unsure: true, conf: LOW }; } }
     const range = t.slice(ment[0].index + ment[0][0].length).match(/^\s*(이상|이하)/);
     const r = parseYearBody(yearMentionText(ment[0][0]) + (range ? ' ' + range[1] : ''));
     return r && !r.final ? { ...r, exclude: true, conf: LOW } : null;
@@ -1855,6 +1863,16 @@ function parseScholarship(t, isExclude) {
 }
 
 const TRACK_HEAD = /^\s*[^:：()（）]{8,40}?(?:학생|전형|유형)\s*[:：]\s*\S/;
+/* 4.3 만점 대안 문턱 — 줄에 `4.5(4.3)만점에 a(b)` · `4.3 만점(학교)은/의 경우/기준 b` 가 있으면 b 를 4.5 눈금으로 바꾼 값(넓히지 않고 낮추기만: judgeCond 'grade' 가 그 사이를 모름으로 · 2026-11-13) */
+function altMin43(t) {
+  const vals = [];
+  const pair = t.match(/4\.5\s*[(（]\s*4\.3\s*[)）]\s*점?\s*만점에?\s*\d\.\d{1,2}\s*[(（]\s*(\d\.\d{1,2})\s*[)）]/);
+  if (pair) vals.push(parseFloat(pair[1]));
+  for (const m of t.matchAll(/4\.3\s*점?\s*만점[^\d()（）]{0,14}?(?<![\d.])(\d\.\d{1,2})(?!\s*점?\s*만점)/g)) vals.push(parseFloat(m[1]));
+  const ok = vals.filter((v) => v > 0 && v < 4.3);
+  return ok.length ? Math.round(Math.min(...ok) * 4.5 / 4.3 * 1000) / 1000 : null;
+}
+
 function parseLine(line, isExclude) {
   const t = untag(line);
   if (!t.trim()) return { conds: [], multiProgram: false };
@@ -1872,6 +1890,7 @@ function parseLine(line, isExclude) {
      갈래(트랙)마다 다른 문턱이다 — 평점 3.7 학생에게 둘째 줄로 ✕ 를 내면 첫째 갈래로 되는 학생이 틀린 미달이 된다.
      우리는 학생이 어느 갈래로 내는지 모르므로 이 줄의 조건은 **확신을 낮춘다**(맞으면 ✓ · 어긋나면 모름).
      ⚠️ 학적 분기(`재학생:`·`신입생:` — caseBranch)는 내 경우만 판정하는 길이 따로 있어 건드리지 않는다 · 짧은 이름표(`성적:`·`일반전형:`)는 갈래 설명이 아니라 칸 이름이라 안 본다 */
+  { const am = altMin43(t); if (am != null) conds.forEach((c) => { if (c.kind === 'grade' && c.scale === 'gpa45' && c.min != null && am < c.min) c.altMin = am; }); }
   if (TRACK_HEAD.test(t) && !caseBranch(t)) conds.forEach((c) => { c.conf = LOW; });
   if (isExclude) conds.forEach((c) => { c.exclude = true; if (c.kind === 'year' || c.kind === 'semester') c.conf = LOW; });   // 학기도 같은 이유(`7학기 이상 등록자 중 졸업유예자는 제외` · 리뷰 2026-10-15)
   return { conds, multiProgram: MULTI_PROGRAM.test(t) };

@@ -302,7 +302,9 @@ function judgeCond(c, p, ctx) {
       if (p.gpa == null) return 'unknown';
       /* 🔴 단위가 다르면 **떨어뜨리지 않는다**(설계 조건 ⑥). 백분위 70을 평점 70으로 읽으면
          거의 모든 학생이 0%가 된다. 넉넉히 넘을 때만 통과로 보고, 미달 판정은 안 낸다. */
-      if (c.scale === S.gpa45) return p.gpa >= c.min ? 'pass' : 'fail';
+      /* 🔴 4.3 만점 대안 문턱이 함께 적힌 줄(`4.5(4.3)만점에 3.5(3.0)` · `(4.3 만점 학교는 3.3 이상)` — parse-requirements altMin)은
+         4.3 학교 학생이 환산해 넣은 평점일 수 있어, 4.5 문턱 아래라도 대안 문턱(4.5 로 바꾼 값) 이상이면 모름(2026-11-13 · 수렴 마무리 · 김해 의대 장학 틀린 미달) */
+      if (c.scale === S.gpa45) return p.gpa >= c.min ? 'pass' : (c.altMin != null && p.gpa >= c.altMin ? 'unknown' : 'fail');
       if (c.scale === S.gpa43) return (p.gpa / 4.5 * 4.3) >= c.min ? 'pass' : 'fail';
       if (c.scale === S.percent) {
         /* 🔴 백분위는 **등급 띠**로 잰다 (2026-10-15 개발자 결정 "성적도 학적정보에서 알 수 있잖아"). 환산표가 학교마다 달라 두 표의 안전한 쪽만 쓴다 —
@@ -658,7 +660,8 @@ function judgeCond(c, p, ctx) {
           /* 🔴 (수렴 2회차 · 2026-11-13) 구 이름에 **붙은** 시·도(parse-requirements cityProvs — `부산 강서구`·`강서구(부산)`)만 그 구의 시·도다.
              줄의 다른 시·도(`… 중 부산·경남 지역 출신 제외`·`(대구·부산 지역 대학 포함)`)는 다른 역할일 수 있어 'miss' 를 내지 않는다(전엔 서울 강서구 학생 ✕ · 틀린 미달) */
           const named = (c.cityProvs || []).map(prov).filter((x) => ps.includes(x));
-          if (named.length) return !mine ? 'unsure' : named.includes(mine) ? 'hit' : 'miss';
+          /* 🔴 (수렴 마무리 · 2026-11-13) 학생의 시·도가 줄의 시·도 목록에 따로 있으면(`부산광역시 또는 서울 강서구` 의 부산 강서구 학생) 'miss' 가 아니다 — 모름(넓히지 않고 낮추기만) */
+          if (named.length) return !mine ? 'unsure' : named.includes(mine) ? 'hit' : ((c.anyOf || []).map(prov).includes(mine) ? 'unsure' : 'miss');
           const told = ((ctx && ctx.homeProvs) || []).filter((x) => ps.includes(x));
           return told.length === 1 && mine && told[0] === mine ? 'hit' : 'unsure';
         };
