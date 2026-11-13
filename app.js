@@ -110,6 +110,17 @@ function fillRegionCities(provSel, citySel, keep) {
   el.disabled = !list.length;
 }
 
+/* 이사하면 「지금 주소에 산 지」 답은 옛 주소의 것이다 (2026-11-13 · 리뷰) — 저장해 둔 시·도나 시·군을
+   다른 값으로 바꾸면 거주 기간 칩을 끈다(저장하면 null = 모름). 안 끄면 옹진군 「10년 이상」이 이사 간
+   서초구에 그대로 붙어 「1년 이상 ○○구 거주」 줄이 틀린 ✓ 가 된다. 처음 적는 칸(저장값이 비어 있음)은
+   이사가 아니라서 건드리지 않는다 · 끈 뒤 학생이 다시 고르면 그 답을 쓴다. */
+function residenceMovedOff() {
+  const p = state.profile;
+  if (!p) return;
+  const moved = (saved, now) => !!saved && now !== saved;
+  if (moved(p.region, $('#in-region').value) || moved(p.regionCity, $('#in-region-city').value)) setChip('#in-residence-months', null);
+}
+
 function loadState() {
   try {
     let raw = localStorage.getItem(STORAGE_KEY);
@@ -7285,7 +7296,8 @@ function bindEvents() {
 
   $('#in-flags').addEventListener('change', syncConsentRow);
   /* 시·도를 바꾸면 그 아래 시·군·구 목록을 다시 채운다 (2026-08-30) */
-  $('#in-region').addEventListener('change', () => fillRegionCities('#in-region', '#in-region-city'));
+  $('#in-region').addEventListener('change', () => { fillRegionCities('#in-region', '#in-region-city'); residenceMovedOff(); });
+  $('#in-region-city').addEventListener('change', residenceMovedOff);
   $('#in-parent-region').addEventListener('change', () => fillRegionCities('#in-parent-region', '#in-parent-region-city'));
   $('#in-origin-region').addEventListener('change', () => fillRegionCities('#in-origin-region', '#in-origin-city'));
   /* 적합도 높이기 알약 — 같은 처지의 다른 알약을 끄고 이것을 켠다 · 켜진 것을 다시 누르면 푼다(안 답함) */

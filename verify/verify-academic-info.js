@@ -6,7 +6,9 @@
      ④ 5단계는 「적합도 높이기」 — 처지 예/아니요 알약(ONBOARD_TRAITS 수만큼 · 명사형 이름표) + 출신 고교 지역 · 관심 대외활동 칸은 온보딩에 없다
      ⑤ 저장하면 누른 처지만 traits 에 남고(안 누른 것은 없다 · 켰다 끈 것도 없다) · 출신 지역이 남는다 · 관심은 null
      ⑥ 쓰다 만 온보딩을 되살릴 때 알약도 그대로다(새로고침)
-     ⑦ 학적정보 수정으로 다시 저장해도 관심(대외활동 탭 관문이 적은 것)·처지가 안 지워진다
+     ⑦ 학적정보 수정으로 다시 저장해도 관심(대외활동 탭 관문이 적은 것)·처지가 안 지워진다 — 🔴 **새로고침 뒤에** 연다(안 하면 온보딩 화면이 켜 둔 칩이 남아 되살리기를 못 잰다)
+     ⑦-1 고치는 화면에서 시·도·시·군을 바꾸면(이사) 거주 기간 칩이 꺼지고 저장하면 null(모름)
+     ⑧ 칩을 안 고르고 끝내면 residenceMonths 는 null — 0(「1년 미만」)이 아니다
    🔴 **PORT= 를 반드시 준다** (8123 은 남의 워크트리일 수 있다 — CLAUDE.md 매 세션 2).
    실행: python3 -m http.server <포트> 를 띄운 뒤  CHROME_PATH=... PORT=<포트> node verify/verify-academic-info.js */
 const { chromium } = require('playwright-core');
@@ -167,9 +169,20 @@ const pickMajor = async (page, typed, want) => {
   if (regionInfo.cr || regionInfo.r) eq('🔴 학교 소재 시·도가 프로필에 적힌다 (되살린 가입에서도 · 글로벌캠퍼스 → 경기)', regionInfo.mine, (regionInfo.cr && regionInfo.cr['글로벌캠퍼스(용인)']) || (regionInfo.r && regionInfo.r.length === 1 ? regionInfo.r[0] : null));
   else console.log('  ⚠️ 외대 파일에 region 이 아직 없다 — 학과 로봇이 돈 뒤 schoolRegion 을 잰다 (지금은 null 이 맞다)');
 
-  console.log('\n■ ⑦ 학적정보 수정 — 관심·처지가 안 지워진다');
-  await page.evaluate(() => { state.profile.interestKinds = ['공모전']; state.profile.traits.dorm = true; saveState(); showScreen('myinfo'); });
-  await page.waitForTimeout(300);
+  console.log('\n■ ⑦ 학적정보 수정 — 관심·처지가 안 지워진다 (새로고침 뒤 · 온보딩 화면이 켜 둔 칩이 남지 않게)');
+  await page.evaluate(() => { state.profile.interestKinds = ['공모전']; state.profile.traits.dorm = true; saveState(); });
+  /* 🔴 다시 연 앱에서 잰다 (2026-11-13 리뷰) — 새로고침 없이 열면 방금 끝낸 온보딩의 칩·알약이 그대로 켜져 있어,
+     고치는 화면이 프로필에서 되살리는 줄을 지워도 이 항목이 초록이었다(실측) */
+  const openMyEdit = async () => {
+    await page.evaluate(() => { window.__beforeReload = true; });
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(1200);
+    await dismissNotify(page);
+    await page.evaluate(() => showScreen('myinfo'));
+    await page.waitForTimeout(300);
+  };
+  await openMyEdit();
+  eq('  (새로 연 앱이다 — 방금 끝낸 온보딩 화면이 아니다)', await page.evaluate(() => window.__beforeReload === undefined), true);
   await page.click('.my-edit-hint');   // MY 의 「학적정보 수정 ›」 — 학생이 누르는 그 단추
   await page.waitForTimeout(500);
   eq('고치러 들어오면 알약이 답한 대로 켜져 있다', await onPills(), ['award=1', 'dorm=1', 'military=0']);
@@ -180,6 +193,50 @@ const pickMajor = async (page, typed, want) => {
   await page.waitForTimeout(400);
   eq('🔴 저장해도 관심(관문이 적은 것)·처지가 그대로다', await saved(),
     { traits: { award: true, dorm: true, military: false }, originRegion: '울산', originCity: cities[0], interestKinds: ['공모전'], track: 'science', major: '수학과', regionCity: '옹진군', residenceMonths: 36 });
+
+  console.log('\n■ ⑦-1 이사 — 고치는 화면에서 시·도·시·군을 바꾸면 거주 기간 칩이 꺼진다 (옛 주소의 답이 새 주소에 붙지 않게)');
+  await openMyEdit();
+  await page.click('.my-edit-hint');
+  await page.waitForTimeout(500);
+  eq('고치러 들어오면 옹진군 3~5년이 켜져 있다', await page.evaluate(() => [document.querySelector('#in-region-city').value, getChip('#in-residence-months')]), ['옹진군', '36']);
+  await nextUntil(page, '#in-residence-months');
+  await page.selectOption('#in-region-city', '강화군');   // 같은 시·도 안에서 시·군만 바꿔도 이사다
+  await page.waitForTimeout(100);
+  eq('🔴 시·군만 바꿔도 칩이 꺼진다', await page.evaluate(() => getChip('#in-residence-months')), null);
+  await page.click('#in-residence-months .chip[data-value="12"]');
+  await page.selectOption('#in-region', '서울');          // 바꾼 뒤 다시 고른 답도 시·도를 또 바꾸면 꺼진다
+  await page.waitForTimeout(100);
+  await page.selectOption('#in-region-city', '서초구');
+  await page.waitForTimeout(100);
+  eq('  시·도를 바꿔도 꺼진다', await page.evaluate(() => getChip('#in-residence-months')), null);
+  eq('마지막 단계까지 간다', await nextUntil(page, '#btn-finish-onboard'), true);
+  await page.click('#btn-finish-onboard');
+  await page.waitForTimeout(400);
+  eq('🔴 저장하면 새 주소 · 거주 기간은 null (모름 — 옛 주소의 3~5년이 남지 않는다)', await page.evaluate(() => { const p = JSON.parse(localStorage.getItem('handaejang.v1')).profile; return [p.region, p.regionCity, p.residenceMonths]; }), ['서울', '서초구', null]);
+
+  console.log('\n■ ⑧ 칩을 안 고르고 끝내면 — residenceMonths 는 null (0 = 「1년 미만」이 아니다)');
+  {
+    const ctx2 = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true });
+    const p2 = await ctx2.newPage();
+    p2.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
+    await p2.goto(`http://localhost:${PORT}/`, { waitUntil: 'domcontentloaded' });
+    await p2.click('.onboard-step[data-step="0"] [data-next]');
+    await p2.waitForTimeout(300);
+    await p2.fill('#in-school', '한국외국어대학교');
+    await p2.waitForTimeout(200);
+    await p2.click('.ac-list:not([hidden]) .ac-item');
+    await p2.waitForTimeout(600);
+    await p2.click('#in-year .chip[data-value="3"]');
+    eq('거주 기간 칩 단계를 지난다 (아무것도 안 누름)', await nextUntil(p2, '#in-residence-months'), true);
+    await p2.selectOption('#in-region', '인천');           // 처음 적는 시·도·시·군은 이사가 아니다 — 고르기만 하고 칩은 안 누른다
+    await p2.waitForTimeout(100);
+    await p2.selectOption('#in-region-city', '옹진군');
+    eq('마지막 단계까지 간다', await nextUntil(p2, '#btn-finish-onboard'), true);
+    await p2.click('#btn-finish-onboard');
+    await p2.waitForTimeout(400);
+    eq('🔴 residenceMonths 는 null (0 아님)', await p2.evaluate(() => { const p = JSON.parse(localStorage.getItem('handaejang.v1')).profile; return [p.regionCity, p.residenceMonths]; }), ['옹진군', null]);
+    await ctx2.close();
+  }
 
   console.log('\nERRORS:', errors.length ? errors : 'none');
   if (errors.length) fail++;
