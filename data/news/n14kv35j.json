@@ -1,7 +1,17 @@
 {
  "school": "서울과학기술대학교",
- "updatedAt": "2026-11-12",
+ "updatedAt": "2026-11-13",
  "items": [
+  {
+   "title": "[정보전산원](긴급) Google Chrome 업데이트 권고",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897768&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-13",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-13",
+   "desc": "ㅇGoogle Chrome에서 원격 코드 실행, 인증 우회를 유발할 수 있는 보안 취약점에 대해서 업데이트 권고 ㅇGoogle Chrome의 처리 과정에서 이미 해제된 메모리를 다시 사용하는…"
+  },
   {
    "title": "[국제대학] K-로컬 문화 기행 〈팔도유람:부산편〉 로컬 메이트 모집 안내",
    "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897750&qidx=4691&cate=10&allboard=false&nowpage=1",

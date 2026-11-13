@@ -1,7 +1,18 @@
 {
  "school": "인하대학교",
- "updatedAt": "2026-11-12",
+ "updatedAt": "2026-11-13",
  "items": [
+  {
+   "title": "[연수구 어린이·사회복지급식관리지원센터] 직원(팀장) 채용 공고",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46130/artclView.do",
+   "postedAt": "2026-11-13",
+   "kind": "채용",
+   "school": "인하대학교",
+   "campus": "",
+   "src": "f4141706",
+   "foundAt": "2026-11-13",
+   "desc": "연수구청으로부터 인하대학교 산학협력단이 수탁 운영 중에 있는 「 연수구 어린이 · 사회복지급식관리지원센터 」 에서 아래와 같이 직원 ( 팀장 ) 을 모집합니다 . 연수구 어린이 · 사회복지급식관리지원센터에서는…"
+  },
   {
    "title": "[교수학습개발센터] 전문연구원 채용 (~11/22(일) 자정까지)",
    "url": "https://www.inha.ac.kr/bbs/kr/8/46126/artclView.do",
@@ -419,17 +430,6 @@
    "src": "f4141706",
    "foundAt": "2026-10-28",
    "thumb": "data/news/img/602dba0baf513b4e.webp"
-  },
-  {
-   "title": "[SK 하이닉스 면접대기자 대상] 인성 모의면접",
-   "url": "https://www.inha.ac.kr/bbs/kr/8/45966/artclView.do",
-   "postedAt": "2026-10-28",
-   "school": "인하대학교",
-   "campus": "",
-   "src": "f4141706",
-   "foundAt": "2026-10-28",
-   "thumb": "data/news/img/e86b0cf9c70f4f83.webp",
-   "desc": "1. 이력서, 자기소개서 첨부 필수 2. 대면으로만 진행 3. 실제면접과 동일하게 진행 * 참여자 최대 2명 * 참여자가 1명이여도 진행됨"
   }
  ]
 }

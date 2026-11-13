@@ -1,7 +1,51 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-11-12",
+ "updatedAt": "2026-11-13",
  "items": [
+  {
+   "title": "한국연구재단 KCI 등재지 『trans-』 제22권 논문 모집",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141913&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-13",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-13",
+   "desc": "트랜스미디어연구소 성균관대학교 트랜스미디어연구소에서 발행하는 KCI 등재지 『trans-』가 제22권 논문을 모집합니다."
+  },
+  {
+   "title": "[채용/모집] 자연과학대학 행정조교 채용(~11/26(목))",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141910&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-13",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-13",
+   "desc": "자연과학대학 성균관대학교 자연과학대학에서 행정업무를 담당할 행정조교를 다음과 같이 모집합니다."
+  },
+  {
+   "title": "[서울특별시] BIG 기획전시 「MATERIALISM(머티리얼리즘)」 관람 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141904&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-13",
+   "kind": "행사",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-13",
+   "thumb": "data/news/img/6b069539037f620a.webp",
+   "desc": "학생지원팀 서울특별시에서는 건축설계그룹 BIG의 기획전시 「MATERIALISM(머티리얼리즘)」을 개최합니다. 이번 전시는 건축재료를 중심으로 설계 아이디어가 실제 공간으로 구현되는 과정을 소개합니다."
+  },
+  {
+   "title": "성균관대학교 전자전기공학부 자체계약직원 채용(~ 2026.11.20.(금) 14시 까지)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=140837&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-13",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-13",
+   "desc": "정보통신/소프트웨어/공과대학행정실 성균관대학교 정보통신대학 전자전기공학부 사무실 행정인력을 아래와 같이 모집하오니 많은 관심과 지원을 바랍니다."
+  },
   {
    "title": "대학원혁신센터 촉탁직원 채용 공고",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141887&article.offset=0&articleLimit=10",
@@ -395,50 +439,6 @@
    "foundAt": "2026-11-03",
    "thumb": "data/news/img/bccef58f71d6c158.webp",
    "desc": "학생성공센터행정실 학생성공센터에서는 자유전공계열 학생 여러분에게 필요한 비교과 프로그램과 대학생활 안내 정보를 파악하기 위해 수요조사를 진행합니다."
-  },
-  {
-   "title": "[학생사회공헌단 다소미 X 학생성공센터] 2026 배워서 남 주는 프로젝트 성과공유회 개최 안내",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141494&article.offset=0&articleLimit=10",
-   "postedAt": "2026-11-02",
-   "kind": "행사",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-11-02",
-   "thumb": "data/news/img/3c43abd2a1efce25.webp",
-   "desc": "\"사랑을 이웃에게, 지혜를 사회에\" 학우 여러분, 안녕하세요! 학생사회공헌단 다소미 X 학생성공센터입니다."
-  },
-  {
-   "title": "SKKU AI Colloquium 2026 행사 지원 아르바이트 모집 안내 (11/6 금)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141483&article.offset=0&articleLimit=10",
-   "postedAt": "2026-11-02",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-11-02",
-   "desc": "인공지능대학원 11/6(금) 인공지능학과에서 주관하는 SKKU AI Colloquium 2026 행사 지원 아르바이트 모집하오니 관심있는 분들의 지원 바랍니다."
-  },
-  {
-   "title": "[학생성공센터] 대학원 학생성공스토리 공모전(11/11) 진행자 및 알바 모집",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141051&article.offset=0&articleLimit=10",
-   "postedAt": "2026-11-02",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-11-02",
-   "desc": "학생성공센터행정실 학생성공센터에서 2026 대학원 학생성공스토리 공모전 진행자를 다음과 같이 모집 하오니 많은 관심과 지원을 바랍니다."
-  },
-  {
-   "title": "성균관대학교 건설환경공학부 대학원 행정조교 채용(~11.09(월) 17:00까지)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141289&article.offset=0&articleLimit=10",
-   "postedAt": "2026-11-02",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-11-02",
-   "desc": "정보통신/소프트웨어/공과대학행정실 성균관대학교 공과대학 건설환경공학부에서 학사 행정업무를 담당할 대학원 조교를 다음과 같이 모집하오니 많은 지원 바랍니다."
   }
  ]
 }

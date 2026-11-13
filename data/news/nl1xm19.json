@@ -1,7 +1,17 @@
 {
  "school": "충남대학교",
- "updatedAt": "2026-11-12",
+ "updatedAt": "2026-11-13",
  "items": [
+  {
+   "title": "교육부 종합감사 관련 공익제보 안내",
+   "url": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2516263&code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
+   "postedAt": "2026-11-13",
+   "school": "충남대학교",
+   "campus": "",
+   "src": "fb93d66a",
+   "foundAt": "2026-11-13",
+   "desc": "□ 제 목 : 충남대학교 종합감사 관련 제보 안내 □ 감사대상 : 충남대학교"
+  },
   {
    "title": "2026년 11월 방역소독 일정 안내",
    "url": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2516238&code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
@@ -257,16 +267,6 @@
    "campus": "",
    "src": "fb93d66a",
    "foundAt": "2026-10-14"
-  },
-  {
-   "title": "2026학년도 2학기 학생생활관 보결 4차 모집 안내",
-   "url": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515707&code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
-   "postedAt": "2026-10-13",
-   "kind": "생활",
-   "school": "충남대학교",
-   "campus": "",
-   "src": "fb93d66a",
-   "foundAt": "2026-10-13"
   }
  ]
 }

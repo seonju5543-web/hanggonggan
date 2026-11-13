@@ -1,7 +1,38 @@
 {
  "school": "경기대학교",
- "updatedAt": "2026-11-12",
+ "updatedAt": "2026-11-13",
  "items": [
+  {
+   "title": "[입학에서 취업까지] 2026-동계 미시간 주립대학교 프로그램(2주) 참가자 추가 모집",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627203&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-13",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-13",
+   "desc": "이미지 확대보기 Michigan State University에서 주관하는 Global Academic/Professional Immersion Program(GAPI) 참가자를 모집하오니 관심 있는 학생들은 아래…"
+  },
+  {
+   "title": "[일반] 학부생 대상「인권과 성평등교육」실시 안내 및 미이수자 이수독려",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627201&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-13",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-13",
+   "desc": "대학소개 대학·조직 대학생활 맞춤정보 어떤 정보 를 찾고계시나요? 맞춤설정 저장하기 (언제든 변경 가능합니다) 맞춤설정 이란? 소속, 내용, 기간별로 나만의 맞춤 콘텐츠를 찾아보세요."
+  },
+  {
+   "title": "[일반] [경제학전공] 2026학년도 제1회 사회과학대학 학술제 최우수상 수상",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627200&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-13",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-13",
+   "thumb": "data/news/img/abb87a299e32be62.webp",
+   "desc": "안녕하세요. 경제학과사무실입니다. 올해 처음 개최된 사회과학대학 학술제에서 경제학전공 학생들이 논문발표분야(총 12개팀), 포스터분야(총 12개팀)에서 각각 \"최우수상\"을 수상했다는 기쁜 소식을 전달해드립니다…"
+  },
   {
    "title": "[일반] 2027년학년도 국립중앙도서관 실습생 모집",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627180&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
@@ -383,35 +414,6 @@
    "src": "bf927d3e",
    "foundAt": "2026-11-02",
    "desc": "이번 학기 추계학술답사 참여 학생들과의 소통을 위한 카카오톡 오픈채팅방을 운영 중에 있고,"
-  },
-  {
-   "title": "[일반] 2026-2학기 본심사 서류 / 논문 및 사례연구 완성본 제출 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626951&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-11-02",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-11-02",
-   "desc": "2026학년도 2학기 본심사 서류 / 논문 및 사례연구 완성본 제출기한을 아래와 같이 공지하오니 해당 학생들은 확인하시어 제출하여 주시기 바랍니다."
-  },
-  {
-   "title": "[일반] KGU AI ONE 서비스 이용 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626947&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-11-02",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-11-02",
-   "desc": "경기대학교의 다양한 생성형 AI 모델을 통합 제공하는 KGU AI ONE 서비스를 아래와 같이 운영하오니, 이용 대상자는 참고하시기 바랍니다."
-  },
-  {
-   "title": "[일반] [국어국문] 2027학년도 전공선택유연화 시행 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626945&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-11-02",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-11-02"
   }
  ]
 }

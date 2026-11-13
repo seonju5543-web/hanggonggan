@@ -1,7 +1,17 @@
 {
  "school": "부경대학교",
- "updatedAt": "2026-11-12",
+ "updatedAt": "2026-11-13",
  "items": [
+  {
+   "title": "남부소방서 청장년의용소방대 모집 안내",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726983",
+   "postedAt": "2026-11-13",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-11-13",
+   "thumb": "data/news/img/f68795440e5983f2.webp"
+  },
   {
    "title": "[채용공고] 국립부경대학교 인문사회과학대학 국어국문학과 조교 채용 공고",
    "url": "https://www.pknu.ac.kr/main/163?action=view&no=726972",
@@ -418,16 +428,6 @@
    "foundAt": "2026-10-27",
    "thumb": "data/news/img/c87a39d6af49e8f1.webp",
    "desc": "글로벌어학교육센터 ★글로벌어학교육센터 행사 안내 영어로 대화하며 함께 할로윈 행사에 참여해보아요!"
-  },
-  {
-   "title": "2027년 2월 학부 2차 졸업예비사정 실시 안내(11/2~11/13)",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726763",
-   "postedAt": "2026-10-27",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-27",
-   "desc": "학사관리과 1. 2차 졸업예비사정 대상자 ※ 휴학생은 대상자 아님 (휴학생 졸업 불가) < 2학기 수강 중인 학점 및 계절수업 수강신청학점 포함 > < 본인의 1차 졸업예비사정 결과를 참고하여 계절수업 수강 필요…"
   }
  ]
 }

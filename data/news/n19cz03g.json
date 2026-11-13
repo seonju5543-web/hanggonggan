@@ -1,7 +1,17 @@
 {
  "school": "한국외국어대학교",
- "updatedAt": "2026-11-12",
+ "updatedAt": "2026-11-13",
  "items": [
+  {
+   "title": "홈페이지 가짜 ‘로봇 인증’ 공격 주의사항 안내",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/271590/artclView.do",
+   "postedAt": "2026-11-13",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-11-13",
+   "desc": "최근 타 대학 홈페이지에서 정상 보안 인증처럼 보이는 가짜 ‘ 로봇 인증 ’ 화면이 나타나 , 사용자가 직접 악성 명령어를 실행하도록 유도한 사례가 확인되었습니다 . 같은 수법의 피해를 예방하고자 다음과 같이…"
+  },
   {
    "title": "교내 건물별 난방 운영기준 안내",
    "url": "https://www.hufs.ac.kr/bbs/hufs/2180/271371/artclView.do",

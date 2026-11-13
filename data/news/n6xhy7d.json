@@ -1,7 +1,39 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-11-12",
+ "updatedAt": "2026-11-13",
  "items": [
+  {
+   "title": "[일반] [학생상담실] 내 멘탈 점검, 지금은 몇%? -우울 불안 온라인검사 / 뇌파맥파 스트레스 오프라인검사",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53681&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-13",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-13",
+   "thumb": "data/news/img/8a14b1af95835e47.webp"
+  },
+  {
+   "title": "[학사] 2026학년도 학부제 입학생 세부전공 1차 선택 결과 공고",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53680&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-13",
+   "kind": "학사",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-13",
+   "desc": "아래와 같이 공고합니다. 세부전공 변경 희망자 및 1차 기간 내 미선택 학생은 후속 일정에 따라 기간 내에 신청하시기 바랍니다."
+  },
+  {
+   "title": "[일반] [원격교육지원센터] 2026년 광운대학교 모집",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53682&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-13",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-13",
+   "thumb": "data/news/img/39ff8cbe47cbde7c.webp",
+   "desc": "안녕하세요 광운대학교 교육혁신원 원격교육지원센터 입니다. 광운대학교 <무크선도대학 서포터즈 1> 를 모집하오니 많은 신청바랍니다"
+  },
   {
    "title": "[학사] [대학혁신지원사업] 2026학년도 2학기 글쓰기 대회 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53676&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -399,36 +431,6 @@
    "src": "b09cb042",
    "foundAt": "2026-10-28",
    "thumb": "data/news/img/6b68b3fb2fc2b981.webp"
-  },
-  {
-   "title": "[일반] 기간제 계약직원 채용 공고(홍보기획실)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53564&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-27",
-   "kind": "채용",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-27",
-   "desc": "채용 부서 홍보기획실 모집인원 1. 지원 자격 및 우대사항 담당업무 대학 행사 영상촬영 및 사진촬영 등 지원 자격"
-  },
-  {
-   "title": "[국제학생] 2026년 서울생활사박물관 외국인 대학생 대상 무료 체험 교육 프로그램 추가모집 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53563&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-27",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-27",
-   "desc": "서울역사박물관 분관인 서울생활사박물관(노원구 동일로 174길 27)에서는 인근 대학교 소속 외국인 대학생 대상 서울생활문화를 체험하고 이해할 수 있는 'ENJOY! SEOUL URBAN LIFE MUSEUM'…"
-  },
-  {
-   "title": "[일반] [로봇특성화대학사업] 2026 'Physical AI, 로봇은 어떻게 보고 생각하고 행동할까?' 강좌 신청 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53559&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-26",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-26"
   }
  ]
 }

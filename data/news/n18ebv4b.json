@@ -1,7 +1,17 @@
 {
  "school": "서울교육대학교",
- "updatedAt": "2026-11-12",
+ "updatedAt": "2026-11-13",
  "items": [
+  {
+   "title": "긴급 네트워크 작업으로 인한 홈페이지 및 학내 정보시스템 순단 안내",
+   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=1309&bbsId=1082&nttSn=55786",
+   "postedAt": "2026-11-13",
+   "postId": "55786",
+   "school": "서울교육대학교",
+   "campus": "",
+   "src": "4d730c6c",
+   "foundAt": "2026-11-13"
+  },
   {
    "title": "[서울특별시강남서초교육지원청] 2026 강남서초 사례나눔축제 안내",
    "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=1309&bbsId=1082&nttSn=55755",
