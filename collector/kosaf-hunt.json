@@ -1,24 +1,8 @@
 {
  "v": 1,
  "note": "층2 재단 장학금의 개별 공고 후보 — 로봇(collector/kosaf-hunt.mjs)이 재단 홈페이지를 뒤져 적는다. 사람 후보 파일(link-candidates.json)과 같은 줄 꼴. 원문 링크 확인 로봇이 학생처럼 열어 확인한 것만 앱(data/link-check.json fix)에 실린다. 손으로 고치지 말 것 — 다음 실행이 다시 쓴다.",
- "updatedAt": "2026-11-13",
+ "updatedAt": "2026-11-14",
  "items": [
-  {
-   "target": {
-    "ds": "kosaf",
-    "key": "2000398001"
-   },
-   "board": "https://www.gwangju.go.kr/welfare/boardList.do?boardId=BD_0000000594&pageId=welfare86",
-   "source": "board",
-   "by": "로봇(층2 글 사냥꾼)",
-   "addedAt": "2026-11-11",
-   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다",
-   "also": [
-    "2000398004",
-    "2000398005",
-    "2000398006"
-   ]
-  },
   {
    "target": {
     "ds": "kosaf",
@@ -33,36 +17,6 @@
     "2000395002",
     "2000395003",
     "2000395006"
-   ]
-  },
-  {
-   "target": {
-    "ds": "kosaf",
-    "key": "2000443001"
-   },
-   "board": "https://www.jangsu.go.kr/board/list.jangsu?boardId=BBS_0000128&menuCd=DOM_000000101001003000&contentsSid=10&cpath=",
-   "source": "board",
-   "by": "로봇(층2 글 사냥꾼)",
-   "addedAt": "2026-10-20",
-   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다",
-   "also": [
-    "2000443003",
-    "2000443006"
-   ]
-  },
-  {
-   "target": {
-    "ds": "kosaf",
-    "key": "2000090001"
-   },
-   "url": "https://info.daegu.go.kr/newshome/mtnmain.php?mtnkey=articleview&mkey=scatelist&mkey2=1&aid=279300",
-   "title": "시정소식 대구시, 2026년 저소득주민 장학금 지원대상자 모집... 공고일(2026.10.14.) 현재 대구에 거주 중인 저소득 중·고등학생, 대학생 대상",
-   "source": "board",
-   "by": "로봇(층2 글 사냥꾼)",
-   "addedAt": "2026-11-13",
-   "note": "https://info.daegu.go.kr/newshome/mtnmain.php 목록에서 고름 — 사업 이름 +1 · 마감 해 +1 · 접수일 +1 · 장학 낱말 +1 · 게시일 +1",
-   "also": [
-    "2000090002"
    ]
   },
   {
@@ -150,17 +104,6 @@
   {
    "target": {
     "ds": "kosaf",
-    "key": "2000108001"
-   },
-   "board": "https://www.icbp.go.kr/main/participation/news/recruit.jsp",
-   "source": "board",
-   "by": "로봇(층2 글 사냥꾼)",
-   "addedAt": "2026-11-07",
-   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다"
-  },
-  {
-   "target": {
-    "ds": "kosaf",
     "key": "2000204008"
    },
    "board": "https://council.wonju.go.kr/content/news/photoGallery.html",
@@ -190,6 +133,91 @@
    "by": "로봇(층2 글 사냥꾼)",
    "addedAt": "2026-10-13",
    "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 100) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2701277003"
+   },
+   "board": "https://enter.pcu.ac.kr/enter",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-14",
+   "note": "게시판처럼 보이는 쪽(공고 1건 · 글 줄 14) — 확인 로봇이 목록을 다시 읽어 고른다",
+   "also": [
+    "2701277006",
+    "2701277007"
+   ]
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000193001"
+   },
+   "board": "https://www.hongcheon.go.kr/mayor2022/selectBbsNttList.do?bbsNo=111&key=2532",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-14",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다",
+   "also": [
+    "2000193002"
+   ]
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2700003009"
+   },
+   "url": "https://apply.kfas.or.kr/apply_board/view.php?seq=3363&types=103",
+   "title": "--> 2 2026-11-02 [문우림]문우림 제6기 선발 내용 관련 (11/9~12/11)",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-14",
+   "note": "https://apply.kfas.or.kr/ 목록에서 고름 — 사업 이름 +1 · 마감 해 +1 · 게시일 +1"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000398006"
+   },
+   "board": "https://www.gwangju.go.kr/welfare/boardList.do?boardId=BD_0000000594&pageId=welfare86",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-14",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "0774003"
+   },
+   "board": "https://www.kspo.or.kr/kspo/bbs/B0000056/list.do?menuNo=200047",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-14",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2700058001"
+   },
+   "board": "http://www.songwon.or.kr/pc/news/gallery",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-14",
+   "note": "게시판처럼 보이는 쪽(공고 2건 · 글 줄 9) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2703603001"
+   },
+   "board": "https://www.yuha.or.kr/News_Notice.aspx",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-14",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 7) — 확인 로봇이 목록을 다시 읽어 고른다"
   }
  ]
 }
