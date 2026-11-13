@@ -211,6 +211,18 @@
             <span class="field-label">본인 거주 시·군·구</span>
             <select id="in-region-city"><option value="">선택 안 함</option></select>
           </label>
+          <!-- 지금 주소에 산 지 (2026-11-13 · 선조치 후 보고) — `공고일 기준 1년 이상 계속 ○○시에 주소를 둔` 줄을 판정한다(전에는 시·군이 맞아도 '모름').
+               값은 칸의 하한 개월 — 칸 목록은 match-engine.js RESIDENCE_SPANS 한 곳이고 관문이 이 칩들과 대조한다. 선택 사항 · 다시 누르면 푼다(data-toggle) -->
+          <div class="field">
+            <span class="field-label">지금 주소에 산 지 (선택)</span>
+            <div class="chip-group" id="in-residence-months" data-toggle>
+              <button class="chip" data-value="0">1년 미만</button>
+              <button class="chip" data-value="12">1~3년</button>
+              <button class="chip" data-value="36">3~5년</button>
+              <button class="chip" data-value="60">5~10년</button>
+              <button class="chip" data-value="120">10년 이상</button>
+            </div>
+          </div>
           <label class="field">
             <span class="field-label">부모님 거주 지역</span>
             <select id="in-parent-region">

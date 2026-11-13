@@ -6514,7 +6514,7 @@ console.log('■ 프로필 개별 칸 · DB 검증 (0004 · 2026-09-26 · 고문
 
   /* 🔴 ① 앱이 칸마다 따로 써 넣는 꼴로 되돌리지 말 것 — 그러면 두 곳이 갈라지고,
      옛 앱이 깔린 폰이 쪼갠 칸을 제 옛 값으로 덮는다(docs/designs/sync-overwrite.md). */
-  const cols = ['school', 'campus', 'major', 'track', 'enroll_status', 'gender', 'grade', 'gpa', 'income_bracket'];
+  const cols = ['school', 'campus', 'major', 'track', 'enroll_status', 'gender', 'grade', 'gpa', 'income_bracket', 'residence_months'];
   /* 🔴 **칸 하나씩 따로 본다.** 처음에는 `add column … [\s\S]{0,400}? generated always as` 로
      재다가, 칸을 보통 칸으로 바꿔도 **초록불이었다**(2026-09-26 red-green 에서 잡았다) —
      정규식이 쉼표를 넘어 **옆 칸의** generated 절을 물었기 때문이다. 그래서 괄호 깊이를
@@ -6598,6 +6598,12 @@ console.log('■ 프로필 개별 칸 · DB 검증 (0004 · 2026-09-26 · 고문
       JSON.stringify([attr('in-gpa', 'min'), attr('in-gpa', 'max')]));
     eq('  in-gpa 의 min/max 를 서버도 그대로 받는다',
       JSON.stringify(GB.gpa), JSON.stringify([attr('in-gpa', 'min'), attr('in-gpa', 'max')]));
+    /* 지금 주소에 산 지 (2026-11-13) — 입력칸이 아니라 **칩**이다. 칩 값의 가장 작은 것·큰 것을 두 겹이 그대로 받아야 한다 */
+    const chipBox = /<div[^>]*id="in-residence-months"[^>]*>([\s\S]*?)<\/div>/.exec(html);
+    const chipVals = chipBox ? [...chipBox[1].matchAll(/data-value="(\d+)"/g)].map((m) => Number(m[1])) : [];
+    const chipRange = chipVals.length ? [Math.min(...chipVals), Math.max(...chipVals)] : null;
+    eq('  in-residence-months 칩 값을 DB CHECK 가 그대로 받는다', JSON.stringify(sqlRange('residence_months')), JSON.stringify(chipRange));
+    eq('  in-residence-months 칩 값을 서버도 그대로 받는다', JSON.stringify(GB.residenceMonths), JSON.stringify(chipRange));
   }
 
   /* 🔴 ⑦ 거절이 학생에게 보이는가 — 조용히 실패하면 프로필이 영영 안 올라간다 */
@@ -14298,6 +14304,85 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
     [rmx('대한민국 국민으로서 해외 거주 중인 자', kr6), rmx('한국 국적을 가진 해외 거주 동포', kr6), rmx('대한민국 국적을 가진 재외동포', kr6), rmx('대한민국 국민인 자의 자녀', kr6),
       rmx('대한민국 국민으로 국내에 거주 중인 만 18세 이상', kr6)],
     [null, null, null, null, 'ok']);
+  /* ── Q. 거주 기간 · 등록금 전액 장학·면제 (2026-11-13 · 선조치 후 보고 — 결정을 요청해 둔 질문 둘) ──
+     ① 「지금 주소에 산 지」(residenceMonths = 칸의 하한 개월): 본인 시·군이 맞은 `n년 이상 계속 거주` 줄만 — 칸 전체가 기간 이상이면 ✓ · 그 밖은 모름 · 🔴 **✕ 는 내지 않는다**(같은 날 리뷰 — 주소 기간 ≤ 그 시·군에 산 기간 · 칩 경계 · 꼬리표 갈래 · 기간 여럿 · 「단,」 예외)
+     ② fullTuition: 늘 결격(TRAIT_DISQUALIFY) — 「예」 ✕ · 「아니요」 통과 · 뜻이 반대거나 한 칸으로 못 가르는 꼴은 안 읽는다 */
+  {
+    const spans = (MEx.RESIDENCE_SPANS || []).map((s) => [String(s.months), s.label]);
+    const chipBox = /<div[^>]*id="in-residence-months"[^>]*>([\s\S]*?)<\/div>/.exec(readText(new URL('../index.html', import.meta.url)));
+    const chips = chipBox ? [...chipBox[1].matchAll(/data-value="(\d+)"[^>]*>([^<]+)</g)].map((m) => [m[1], m[2].trim()]) : [];
+    eq('Q① 온보딩 칩(값·이름표)·공고 안 묻기 선택지가 RESIDENCE_SPANS 한 곳과 같다 (0·12·36·60·120 · 다시 누르면 푸는 묶음)',
+      [chips, ((EAx.FIELD_META.residenceMonths || {}).options || []).map((o) => [o.value, o.label]), !!chipBox && /data-toggle/.test(chipBox[0])], [spans, spans, true]);
+    eq('  값은 0·12·36·60·120 개월이다', spans.map((s) => Number(s[0])), [0, 12, 36, 60, 120]);
+    const app = readText(new URL('../app.js', import.meta.url));
+    eq('  collectProfile 이 칩을 residenceMonths 로 적고(안 골랐으면 null) · 고치러 온 화면이 되살린다 · data-toggle 묶음만 다시 누르면 푼다',
+      [/residenceMonths:\s*\(\(\)\s*=>\s*\{\s*const v = getChip\('#in-residence-months'\);\s*return v == null \? null : Number\(v\);/.test(app),
+        /setChip\('#in-residence-months', p\.residenceMonths != null \? String\(p\.residenceMonths\) : null\)/.test(app),
+        /hasAttribute\('data-toggle'\)/.test(app)], [true, true, true]);
+    const LQ = {
+      ongjin: '선발 공고일 기준 옹진군에 주민등록을 두고 3년 이상 연속적으로 실거주 하고 있는 자',
+      mapo: '공고일 현재 6개월 이상 마포구에 거주하고 있는 만 30세 미만의 대학교 재학생',
+      eunpyeong: '라. 공통 자격 : 공고일 현재 주민등록 기준 은평구 2년 이상 계속 거주',
+      djAlt: '① 공고일(‘26.9.1.) 기준 본인 또는 부모가 1년 전부터 계속해서 대전광역시에 주소를 두고 있는 대한민국 국적의 학생',
+      djSelf: '① 공고일(‘26.9.1.) 기준 본인이 1년 전부터 계속해서 대전광역시에 주소를 두고 있는 대한민국 국적의 학생',
+      jeongeup: '공고일 현재 부 또는 모가 1년 이상 계속하여 정읍시에 주소를 두고 있는 국내 대학(고등교육법 제2조의 학교)의 재학생',
+      ansanJoint: '공고일 기준 학생과 가족 1인 이상이 안산시에 계속 3년 이상 또는 합산 10년 이상 주민등록을 두고 거주',
+      eumseong: '다른 시,군,구에서 직전 1년 이상 주민등록을 두고 있다가 2025-11-01 이후 음성군으로 전입한 학생',
+      ansanSum: '공고일 기준 안산시에 3년 이상 계속 주민등록을 두거나 합산 10년이상 주민등록을 두고 거주하는 자',
+      djLow: '(대전 소재 대학) 본인이 1년 전부터 계속해서 대전에 주소를 둔, 학업성적이 우수하고 모범적인 2학년 이상 학생',
+      sancheong: '발전소주변지역 지원에 관한 법률 제2조에 정한 발전소주변지역에 공고일 포함 2년 이상 계속 거주하는 주민 또는 그 자녀 발전소 주변지역:산청군 시천면',
+    };
+    eq('Q① 누구의 기간인가(monthsBy) — 본인만 self · 본인 또는 부모/합산 either · 학생과 가족 joint · 부모만 parent · 전입·직전 다른 시군 odd',
+      ['ongjin', 'djSelf', 'djAlt', 'ansanSum', 'ansanJoint', 'jeongeup', 'eumseong'].map((k) => (one(LQ[k], 'residence') || {}).monthsBy), ['self', 'self', 'either', 'either', 'joint', 'parent', 'odd']);
+    const RESIDENCE_PROBE_MONTHS = [6, 12, 24, 36, 60, 72, 120];
+    const stQ = (city, prov, m, extra) => Object.assign({ status: '재학', year: 3, birthYear: 2004, nationality: 'korean', region: prov, regionCity: city }, m === undefined ? {} : { residenceMonths: m }, extra || {});
+    eq('🔴 Q① 옹진군 `3년 이상 연속 실거주`(self) — 안 채움 모름 · 1년 미만·1~3년도 모름(✕ 아님 — 「1~3년」은 딱 3년을 포함한다) · 3~5년·10년 이상 ✓ · 다른 시·군은 기간과 상관없이 ✕',
+      [undefined, 0, 12, 36, 120].map((m) => rmx(LQ.ongjin, stQ('옹진군', '인천', m))).concat([rmx(LQ.ongjin, stQ('종로구', '서울', 120))]), [null, null, null, 'ok', 'ok', 'no']);
+    eq('🔴 Q① 칸이 걸치거나 모자라면 모름 — `6개월 이상` 에 1년 미만(0~11개월) · `2년 이상` 에 1~3년·1년 미만 은 ✕ 가 아니다(틀린 미달)',
+      [rmx(LQ.mapo, stQ('마포구', '서울', 0)), rmx(LQ.mapo, stQ('마포구', '서울', 12)), rmx(LQ.eunpyeong, stQ('은평구', '서울', 12)), rmx(LQ.eunpyeong, stQ('은평구', '서울', 0)), rmx(LQ.eunpyeong, stQ('은평구', '서울', 36))], [null, 'ok', null, null, 'ok']);
+    eq('🔴 Q① 본인 또는 부모(either)는 차면 ✓ 모자라면 모름(부모 기간은 묻지 않는다) · 본인만(self)도 모자라면 모름 · 시·도 줄도 같다',
+      [rmx(LQ.djAlt, stQ('유성구', '대전', 0)), rmx(LQ.djAlt, stQ('유성구', '대전', 12)), rmx(LQ.djSelf, stQ('유성구', '대전', 0)), rmx(LQ.djSelf, stQ('유성구', '대전', 12))], [null, 'ok', null, 'ok']);
+    eq('🔴 Q① 학생 기간으로 말하지 않는 줄 — 부모만(정읍)·학생과 가족(안산)·전입(음성)·읍면동(산청 시천면)은 10년 이상이어도 ✓ 아님 · 합산 갈래(안산)는 모자라도 ✕ 아님 · 확신 낮은 줄은 모자라도 ✕ 아님',
+      [rmx(LQ.jeongeup, stQ('정읍시', '전북', 120)), rmx(LQ.ansanJoint, stQ('안산시', '경기', 120)), rmx(LQ.eumseong, stQ('음성군', '충북', 120)), rmx(LQ.sancheong, stQ('산청군', '경남', 120)),
+        rmx(LQ.ansanSum, stQ('안산시', '경기', 60)), rmx(LQ.ansanSum, stQ('안산시', '경기', 120)), rmx(LQ.djLow, stQ('유성구', '대전', 0))], [null, null, null, null, null, 'ok', null]);
+    /* 🔴 리뷰가 재현한 틀린 미달 다섯(2026-11-13) — 기간이 모자라 보여도 ✕ 를 내면 안 되는 꼴. 줄은 원문 꼴을 그대로 적어 둔다(실데이터를 읽지 않는다) */
+    const LR = {
+      tongyeong: '다. 관내 고등학교 졸업자로, 공고일 현재 주민등록상 6년 이상 통영시에 주소를 두고, 통영시 관내 학교를 6년 이상 다닌 자',
+      djTag: '〔대전 소재 대학〕 공고일(‘26.9.1.) 기준 본인이 1년 전부터 계속해서 대전광역시에 주소를 두고 있는 대한민국 국적의 학생',
+      iksan: '공고일 기준 6개월 이상(관내 대학교 학생)/1년 이상(관외 대학교 학생) 익산시에 주소를 연속하여 두고 있는 자',
+      eunpyeongMil: '공고일 기준 2년 이상 은평구에 거주한 대학생 (단, 군복무 기간은 거주기간으로 인정)',
+    };
+    eq('🔴 Q① 틀린 미달 다섯 — ① 지금 주소 기간이 그 시·군(시·도) 기간보다 짧을 수 있다(통영 6년·3~5년 · 대전 시·도 1년·1년 미만) ② 「1~3년」 은 딱 3년을 포함(옹진 3년) ③ 〔대전 소재 대학〕 꼬리표 줄 · 외대 학생 ④ 기간 여럿(익산 6개월/1년) ⑤ `(단, 군복무 … 인정)` — 모두 ✕ 아님',
+      [rmx(LR.tongyeong, stQ('통영시', '경남', 36)), rmx(LQ.djSelf, stQ('유성구', '대전', 0)), rmx(LQ.ongjin, stQ('옹진군', '인천', 12)),
+        rmx(LR.djTag, stQ('유성구', '대전', 0, { school: '한국외국어대학교' })), rmx(LR.iksan, stQ('익산시', '전북', 0)), rmx(LR.eunpyeongMil, stQ('은평구', '서울', 0))].map((v) => v === 'no'),
+      [false, false, false, false, false, false]);
+    eq('🔴 Q① 어느 칸 × 어느 기간이든 거주 기간만으로 ✕ 는 없다 (칸 다섯 × 6개월~10년 · 본인만 말하는 줄) — ✕ 를 다시 켜려면 질문부터 바꾼다',
+      RESIDENCE_PROBE_MONTHS.flatMap((n) => (MEx.RESIDENCE_SPANS || []).map((sp) => rmx(`공고일 현재 ${n % 12 ? n + '개월' : n / 12 + '년'} 이상 계속하여 옹진군에 주소를 두고 있는 자`, stQ('옹진군', '인천', sp.months)))).filter((v) => v === 'no').length, 0);
+    eq('🔴 Q① 부모 시·군으로만 맞았으면 학생 기간은 아무 말도 안 한다 — 학생 종로구 · 부모 옹진군 · 10년 이상 → ✓ 아님',
+      rmx(LQ.ongjin, stQ('종로구', '서울', 120, { parentRegion: '인천', parentRegionCity: '옹진군' })), null);
+    eq('Q① 공고 안에서도 묻는다 — 시·군이 맞고 기간을 안 채운 학생에게 「지금 주소 거주 기간」 · 시·군을 모르면 거주 칸부터 · 「1년 미만」(0)은 답이다',
+      [EAx.askableFields(LQ.ongjin, stQ('옹진군', '인천'), null), EAx.askableFields(LQ.ongjin, { status: '재학' }, null).includes('residenceMonths'), EAx.FIELD_META.residenceMonths.label,
+        EAx.coerceField('residenceMonths', '36'), EAx.coerceField('residenceMonths', '0'), EAx.coerceField('residenceMonths', '7'), EAx.coerceField('residenceMonths', ''), EAx.answered({ residenceMonths: 0 }, 'residenceMonths')],
+      [['residenceMonths'], false, '지금 주소 거주 기간', 36, 0, null, null, true]);
+
+    const ftEx = (l) => (condsEx(l).find((c) => c.kind === 'trait' && c.anyOf.includes('fullTuition')) || null);
+    const ftEl = (l) => (one(l, 'trait') && one(l, 'trait').anyOf.includes('fullTuition')) ? one(l, 'trait') : null;
+    eq('Q② fullTuition 은 늘 결격이고 이름표·온보딩 질문이 있다 (열린 공고 4곳 · 잣대 4곳 이상)',
+      [PRx.TRAIT_DISQUALIFY.has('fullTuition'), EAx.TRAIT_LABEL.fullTuition, EAx.ONBOARD_TRAITS.includes('fullTuition')], [true, '이번 학기 등록금 전액 장학·면제', true]);
+    eq('Q② 읽는 꼴 — 제외 칸 `실 납부액이 없는`·`본인부담 등록금이 발생하지 않은`·`학자금을 전액 지원 받은`·`장학금 전액 수혜자` · 자격 칸은 `제외`·`불가` 가 붙을 때만',
+      ['등록금 전액 지원 등으로 실 납부액이 없는 대학생', '전액 장학금 수혜 등으로 본인부담 등록금이 발생하지 않은 경우', '명칭 불구 한국장학재단 또는 국가기관 및 지방자치단체와 민간단체 등에서 학자금을 전액 지원 받은 경우', '2026-2학기 장학금 전액 수혜자'].map((l) => !!ftEx(l))
+        .concat([!!ftEl('등록금 전액 면제(감면)자 제외'), !!ftEl('이번 학기 등록금 전액 장학금 수혜자는 신청 불가')]), [true, true, true, true, true, true]);
+    eq('🔴 Q② 안 읽는 꼴 — 뜻이 반대(`전액 장학금 포함 신청 가능`·`등록금 전액 납부 시 신청 가능`·`장학금 전액 반환`) · 전액이 아니어도 걸림(`1만원 미만`) · 출처·학교 종류(`국비`·`지원 대학`) · 지난 해(`2026년도`·`과거`)',
+      [ftEl('타 장학금 수혜자(전액 장학금 포함) 신청 가능'), ftEl('※ 10 학기 이하 후기 이중전공자는 등록금 전액 납부 시 신청 가능'), ftEx('재학 학적 유지 ※ 휴학, 자퇴, 제적 등 지원 불가, 해당 학기 장학금 전액 반환'),
+        ftEx('본인부담금이 없거나 본인부담금이 1만원 미만인 경우'), ftEx('육사, 해사, 공사, 경찰대 등 등록금 전액 국비지원을 받는 자'), ftEx('직업학교, 원격대학(사이버대 및 방통대), 평생교육원 교육과정, 시간제 과정, 학비 전액 지원 대학 등 재학생'),
+        ftEl('2) 2026년도 타 기관 전액장학금(국가장학금 포함) 수혜자 제외'), ftEx('과거 본 장학재단 선발 대학생 중 전액(200만원) 장학금을 받은 학생'), ftEl('- 참가비: 전액지원(단, 일부활동에서 사비 필요)')],
+      [null, null, null, null, null, null, null, null, null]);
+    const ftP = (v) => Object.assign({ status: '재학', gpa: 3.5 }, v === undefined ? {} : { traits: { fullTuition: v } });
+    const ftSch = { id: 'q2', name: 'q2', eligibilityLines: ['직전학기 평점 3.0 이상인 재학생'], eligibilityExcludes: ['등록금 전액 지원 등으로 실 납부액이 없는 대학생'] };
+    eq('🔴 Q② 「예」 ✕ · 「아니요」 통과 · 안 답함 모름 — 자격 칸 줄과 제외 칸(fitDetail 미달 수)이 같은 말을 한다',
+      [rmx('등록금 전액 면제(감면)자 제외', ftP(true)), rmx('등록금 전액 면제(감면)자 제외', ftP(false)), rmx('등록금 전액 면제(감면)자 제외', ftP()),
+        MEx.fitDetail(ftSch, ftP(true)).fails.length, MEx.fitDetail(ftSch, ftP(false)).fails.length, MEx.fitDetail(ftSch, ftP()).fails.length], ['no', 'ok', null, 1, 0, 0]);
+  }
 
   /* ── 편입·재입학 첫 학기 (2026-11-02 개발자 "편입이랑 재입학은 학적정보만으로 구분 가능하잖아") ── */
   const html = readText(new URL('../index.html', import.meta.url));

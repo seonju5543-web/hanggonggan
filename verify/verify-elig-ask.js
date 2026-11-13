@@ -252,6 +252,47 @@ async function seed(page) {
     ok('  답이 프로필 traits 에 false 로 남는다', no.saved === false, String(no.saved));
   }
 
+  /* ⑨ 지금 주소에 산 지 (2026-11-13 · 선조치 후 보고) — 값이 숫자인 선택 칸(선택지 = RESIDENCE_SPANS · 저장값 = 칸의 하한 개월).
+     🔴 데이터 파일을 고치지 않고 **화면 안에서만** 표본 공고 하나를 상시 제도 목록 끝에 붙여 잰다(마감·실데이터에 안 기댄다) — 판정은 앱 그대로 */
+  const RESID_LINE = '선발 공고일 기준 옹진군에 주민등록을 두고 3년 이상 연속적으로 실거주 하고 있는 자';
+  const residAnswer = async (val) => {
+    await page.evaluate((prof) => {
+      localStorage.setItem('handaejang.v1', JSON.stringify({ profile: prof, consent: { sensitive: false }, applications: [], saved: [] }));
+      localStorage.removeItem('handaejang.resume');
+    }, Object.assign({}, PROFILE, { region: '인천', regionCity: '옹진군' }));
+    await page.reload({ waitUntil: 'networkidle' });
+    await page.waitForSelector('#bottom-nav:not([hidden])');
+    await dismissNotify(page);
+    await page.evaluate((line) => {
+      NATIONAL_SCHOLARSHIPS.push(Object.assign({}, NATIONAL_SCHOLARSHIPS[0], { id: 'zz-resid-probe', name: '거주 기간 표본', program: false, eligibility: {}, eligibilityLines: [line] }));
+      openDetail('zz-resid-probe');
+    }, RESID_LINE);
+    await page.waitForSelector('#detail-sheet:not([hidden])');
+    const row = () => page.evaluate(() => [...document.querySelectorAll('#detail-sheet .r-elig')].filter((li) => /옹진군/.test(li.textContent)).map((li) => li.className));
+    const before = await row();
+    await page.click('#detail-sheet [data-elig-open]');
+    await page.waitForSelector('#detail-sheet .elig-ask-on');
+    const sel = await page.evaluate(() => {
+      const s = document.querySelector('select[data-elig-field="residenceMonths"]');
+      return s ? { label: s.closest('.elig-ask-row').querySelector('span').textContent, opts: [...s.options].map((o) => `${o.value}:${o.textContent}`) } : null;
+    });
+    if (sel) await page.selectOption('select[data-elig-field="residenceMonths"]', val);
+    await page.click('[data-elig-save]');
+    await page.waitForTimeout(400);
+    const after = await row();
+    const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('handaejang.v1')).profile.residenceMonths);
+    return { before, sel, after, saved };
+  };
+  const r36 = await residAnswer('36');
+  const wantOpts = await page.evaluate(() => [':'].concat(RESIDENCE_SPANS.map((x) => `${x.months}:${x.label}`)));
+  ok('거주 기간 — 시·군이 맞은 `3년 이상 연속 실거주` 줄에 「지금 주소 거주 기간」 선택 칸이 뜬다 (선택지 = RESIDENCE_SPANS)',
+    !!r36.sel && r36.sel.label === '지금 주소 거주 기간' && JSON.stringify(r36.sel.opts) === JSON.stringify(wantOpts), JSON.stringify(r36.sel));
+  ok('  답하기 전에는 그 줄에 표시가 없다 (시·군만 맞으면 모름)', r36.before.length > 0 && r36.before.every((c) => /r-req/.test(c)), r36.before.join(' / ') || '줄 없음');
+  ok('  「3~5년」 으로 저장하면 그 줄이 ✓ 가 되고 프로필에 숫자 36 으로 남는다', r36.after.some((c) => /r-ok/.test(c)) && r36.saved === 36, `${r36.after.join(' / ')} · ${JSON.stringify(r36.saved)}`);
+  const r0 = await residAnswer('0');
+  /* 🔴 모자라도 ✕ 는 아니다 (2026-11-13 리뷰) — 질문은 「지금 주소」, 요건은 「옹진군에 산 지」라 같은 군 안에서 이사한 학생은 더 오래 살았을 수 있다 */
+  ok('  「1년 미만」 으로 저장해도 ✕ 가 아니라 모름(표시 없음)이고 0 으로 남는다 (0 은 답이다 — 비운 것과 다르다)', r0.after.length > 0 && r0.after.every((c) => !/r-bad|r-ok/.test(c)) && r0.saved === 0, `${r0.after.join(' / ')} · ${JSON.stringify(r0.saved)}`);
+
   console.log(`\n${fails.length ? `✕ 실패 ${fails.length}건` : `✓ 전부 통과 (${pass}항목)`}`);
   fails.forEach((f) => console.log(`   - ${f}`));
   await browser.close();

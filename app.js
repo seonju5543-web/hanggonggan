@@ -1439,6 +1439,7 @@ function initOnboarding() {
     $('#in-parent-region').value = p.parentRegion || '';
     fillRegionCities('#in-region', '#in-region-city', p.regionCity);
     fillRegionCities('#in-parent-region', '#in-parent-region-city', p.parentRegionCity);
+    setChip('#in-residence-months', p.residenceMonths != null ? String(p.residenceMonths) : null);   // 지금 주소에 산 지 — 안 골랐으면 아무 칩도 안 켠다
     $('#in-nationality').value = p.nationality || 'korean';
     $('#in-credits').value = p.credits != null ? p.credits : '';
     $('#in-birth-year').value = p.birthYear || '';
@@ -1642,6 +1643,8 @@ function collectProfile() {
        넣으면 안 된다(엉뚱한 0% 판정이 난다). 설계: docs/designs/fit-score.md */
     region: $('#in-region').value || null,
     regionCity: $('#in-region-city').value || null,
+    /* 지금 주소에 산 지 (2026-11-13) — 고른 칸의 하한 개월(0·12·36·60·120 · match-engine RESIDENCE_SPANS). 🔴 안 골랐으면 null(모름) — 0 은 「1년 미만」이라는 답이다 */
+    residenceMonths: (() => { const v = getChip('#in-residence-months'); return v == null ? null : Number(v); })(),
     parentRegion: $('#in-parent-region').value || null,
     parentRegionCity: $('#in-parent-region-city').value || null,
     nationality: $('#in-nationality').value || null,
@@ -5399,7 +5402,12 @@ function eligAskHtml(sch) {
     const val = pv[k] != null ? String(pv[k]) : '';
     const input = f.kind === 'select'
       ? `<select class="elig-ask-in" data-elig-field="${k}"><option value=""></option>`
-        + f.options.map((o) => `<option${o === val ? ' selected' : ''}>${esc(o)}</option>`).join('')
+        /* 선택지는 글자(`대한민국`) 또는 {value, label}(거주 기간 — 값은 개월 · elig-ask FIELD_META) */
+        + f.options.map((o) => {
+          const v = o && o.value != null ? String(o.value) : String(o);
+          const l = o && o.label != null ? o.label : o;
+          return `<option value="${esc(v)}"${v === val ? ' selected' : ''}>${esc(l)}</option>`;
+        }).join('')
         + `</select>`
       : `<input class="elig-ask-in" data-elig-field="${k}" value="${esc(val)}" placeholder="—"`
         + (f.kind === 'number'
@@ -7322,8 +7330,10 @@ function bindEvents() {
     group.addEventListener('click', (e) => {
       const chip = e.target.closest('.chip');
       if (!chip) return;
+      const was = chip.classList.contains('active');
       group.querySelectorAll('.chip').forEach((c) => c.classList.remove('active'));
-      chip.classList.add('active');
+      /* `data-toggle` 묶음(선택 사항 — 지금 주소에 산 지)은 켜진 칩을 다시 누르면 푼다(안 답함) · 나머지(학년·학적)는 늘 하나가 켜져 있다 */
+      if (!(was && group.hasAttribute('data-toggle'))) chip.classList.add('active');
     })
   );
   // 서류 도우미의 동적 칩 그룹 (이벤트 위임)

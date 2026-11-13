@@ -194,10 +194,15 @@ console.log('\n■ 🔴 있을 수 없는 값 · DB 제약과 같은 숫자인�
     '🔴 이수학점 범위가 0004 의 CHECK 와 같다', { sql: sqlCredits, js: PROFILE_BOUNDS.credits });
   ok(sqlBirth && sqlBirth[0] === PROFILE_BOUNDS.birthYear[0] && sqlBirth[1] === PROFILE_BOUNDS.birthYear[1],
     '🔴 출생연도 범위가 0004 의 CHECK 와 같다', { sql: sqlBirth, js: PROFILE_BOUNDS.birthYear });
+  const sqlResid = num(/residence_months\s+between\s+([0-9.]+)\s+and\s+([0-9.]+)/);
+  ok(sqlResid && sqlResid[0] === PROFILE_BOUNDS.residenceMonths[0] && sqlResid[1] === PROFILE_BOUNDS.residenceMonths[1],
+    '🔴 거주 기간 범위가 0004 의 CHECK 와 같다 (2026-11-13)', { sql: sqlResid, js: PROFILE_BOUNDS.residenceMonths });
+  ok(profileOutOfRange({ residenceMonths: 0 }) === '', "거주 기간 0 은 「1년 미만」이라는 답이다 — 막지 않는다");
+  ok(profileOutOfRange({ residenceMonths: 999 }) === 'residenceMonths', '🔴 거주 기간 999 개월은 막는다 (`n년 이상 거주` 를 뭐라고 적어도 통과한다)');
   /* 🔴 **칸을 더했으면 여기도 늘어야 한다** — 새 칸을 PROFILE_BOUNDS 에 넣고 SQL 을
      잊으면(또는 그 반대면) 위 대조가 `null` 로 잡는다. 개수까지 못 박아 한쪽만 늘지 않게 한다. */
-  ok(Object.keys(PROFILE_BOUNDS).length === 5,
-    '범위를 재는 칸이 다섯이다 (늘렸으면 SQL·관문도 같이 늘린다)', Object.keys(PROFILE_BOUNDS));
+  ok(Object.keys(PROFILE_BOUNDS).length === 6,
+    '범위를 재는 칸이 여섯이다 (늘렸으면 SQL·관문도 같이 늘린다 · 2026-11-13 residenceMonths)', Object.keys(PROFILE_BOUNDS));
 }
 
 console.log('\n■ 판정을 베끼지 않았는가 (갈라지면 화면과 서버가 다른 말을 한다)');

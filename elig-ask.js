@@ -34,7 +34,7 @@
       선택지 묶음 관문을 건너뛰어, 재학생에게 `신입생:` 줄의 평점을 묻게 된다. */
 const EA_ME = (typeof module !== 'undefined' && module.exports)
   ? require('./match-engine.js')
-  : { requirementMatch };
+  : { requirementMatch, RESIDENCE_SPANS };
 
 /* 물어볼 수 있는 칸과 그 **탐침 값**.
    🔴 칸 이름은 app.js `collectProfile()` 이 만드는 이름과 반드시 같아야 한다 —
@@ -58,6 +58,8 @@ const FIELD_PROBE = {
   /* 출신 고교 소재지 (2026-10-24) — match-engine 이 `about:'origin'` 줄을 이 둘로 본다(맞으면 ✓ · 아니면 모름) */
   originRegion: ['서울', '전남'],
   originCity: ['종로구', '무안군'],
+  /* 지금 주소에 산 지 (2026-11-13) — 칸의 하한 개월. 양 끝(1년 미만 · 10년 이상)으로 `n년 이상 계속 거주` 줄이 풀리는지 본다(match-engine RESIDENCE_SPANS) — 풀리는 것은 10년 이상의 ✓ 뿐이다(모자라도 ✕ 는 안 낸다 · 2026-11-13 리뷰) */
+  residenceMonths: [0, 120],
 };
 
 /* 🔴 학적정보에 **있는데 여기 없는 칸**과 그 이유 (2026-09-18 개발자 지시):
@@ -99,6 +101,7 @@ const TRAIT_LABEL = {
   diabetes:   '당뇨 진단',
   /* 2026-10-15 · 노션 G-14 결정 ② — 「이번 학기 국가장학금을 신청했나요」를 명사형으로. 걸리는 줄은 parse-requirements TRAIT_PAT 참조 */
   kosafApplied: '이번 학기 국가장학금 신청',
+  fullTuition:  '이번 학기 등록금 전액 장학·면제',   // 2026-11-13 · 선조치 후 보고 — 늘 결격(「예」 ✕ · 「아니요」 통과 · parse-requirements TRAIT_DISQUALIFY)
   careLeaver:   '자립준비청년 (보호 종료)',   // 2026-10-31 · 2단계 전수 — 진짜 요건 3곳(등록 1 · 재단 1 · 활동 1) · 2026-11-09 개발자 결정으로 온보딩에도(위 ONBOARD_TRAITS)
 };
 
@@ -108,7 +111,9 @@ const TRAIT_LABEL = {
    **4곳 이상**이 묻는 처지. 걸린 공고 수 — award 17 · kosafApplied 11 · discipline 10 · job 10 · volunteer 6 · dorm 4 · military 4.
    ⚠️ 3곳 이하(birthOrder·farm·loan 각 3 · 나머지 1~2)는 공고 안에서만 묻는다 — 온보딩을 길게 만들 만큼 자주 나오지 않는다.
    ⚠️ 여기 적는 종류는 TRAIT_LABEL·TRAIT_PAT 에 있어야 한다(관문이 대조한다). 순서가 화면 순서다. */
-const ONBOARD_TRAITS = ['award', 'kosafApplied', 'discipline', 'job', 'volunteer', 'dorm', 'military', 'loan', 'careLeaver'];
+const ONBOARD_TRAITS = ['award', 'kosafApplied', 'discipline', 'job', 'volunteer', 'dorm', 'military', 'loan', 'careLeaver', 'fullTuition'];
+/* 2026-11-13 fullTuition(이번 학기 등록금 전액 장학·면제 · 선조치 후 보고) — 열린 공고 4곳(층2 거창군·안산 반값·등록금 지원사업·다자녀가정 — 모두 제외 칸)이라 위 잣대 「4곳 이상」에 들어 더했다.
+   ⚠️ 넷 다 **제외 칸**이라 공고 안 「미확인 자격」(자격 줄만 탐침)에서는 안 물린다 — 온보딩이 이 처지를 묻는 유일한 자리다. 3곳 이하로 줄면 집계가 「4곳 미만인데 묻는 것」으로 알린다 */
 /* 2026-11-09 개발자 결정("질문에 넣어") — 전수 집계가 「4곳 이상인데 안 묻는 것: loan 5 · careLeaver 4」 를 알린 뒤 둘을 더했다(loan 은 대출 이자 지원 장학 · careLeaver 는 자립준비청년 전용).
    careLeaver 는 그 뒤 3곳으로 줄었지만 개발자가 직접 넣으라 한 것이라 둔다 — 집계가 「4곳 미만인데 묻는 것」으로 적으면 사람이 다시 본다. */
 /* (옛 판단 · 2026-11-09 개발자 결정으로 바뀜) 2026-10-31 — careLeaver(자립준비청년) 종류를 더했지만 온보딩에는 넣지 않았다: 집계가 4곳으로 셌으나 그중 하나는 국가근로의
@@ -131,6 +136,9 @@ const FIELD_META = {
   parentRegionCity: { label: '부모 거주 시·군·구', kind: 'text' },
   originRegion:     { label: '출신 고교 시·도', kind: 'text' },
   originCity:       { label: '출신 고교 시·군·구', kind: 'text' },
+  /* 🔴 값이 **숫자**인 선택 칸 — 선택지는 match-engine RESIDENCE_SPANS 한 곳(온보딩 칩과 같은 칸 · 베끼면 칸이 갈라진다). 저장값은 칸의 하한 개월 */
+  residenceMonths:  { label: '지금 주소 거주 기간', kind: 'select', numeric: true,
+    options: (EA_ME.RESIDENCE_SPANS || []).map((s) => ({ value: String(s.months), label: s.label })) },
 };
 
 /* 이 칸에 학생이 **답을 준 적이 있나**.
@@ -207,6 +215,10 @@ function coerceField(key, raw) {
   if (meta.kind === 'checks') return Array.isArray(raw) ? raw.slice() : [];
   const s = String(raw == null ? '' : raw).trim();
   if (s === '') return null;
+  /* 숫자 값 선택 칸(거주 기간) — 선택지에 있는 값만 받는다(없는 값은 null = 모름) */
+  if (meta.kind === 'select' && meta.numeric) {
+    return meta.options.some((o) => (o.value != null ? o.value : o) === s) ? Number(s) : null;
+  }
   if (meta.kind === 'number') {
     const n = parseFloat(s);
     if (Number.isNaN(n)) return null;
