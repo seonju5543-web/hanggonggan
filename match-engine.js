@@ -245,6 +245,31 @@ function residenceSpan(v) {
   return { lo: n, hi: next ? next.months : Infinity };
 }
 
+/* 학과가 5·6년제 꼴인가(의·치·한의·약·수의 · 건축학) — 최종학년·앞으로 올 학년 판정이 같이 쓴다 */
+function programLength(p) {
+  const major = String(p.major || '');
+  return { longProgram: /의예|의학|치의|치과|한의|약학|수의|건축학(?!.*공학)/.test(major), fiveYear: /건축학(?!.*공학)/.test(major) };
+}
+/* 🔴 **최종·졸업학년 — 판정 한 곳** (parse-requirements parseFinalYear · 2026-11-13 병합 리뷰 · 6차 finalPair 와 1단계 M2 를 합쳤다).
+   `final` = last(마지막 학년) · pair(마지막 두 학년) · penult(그 앞 학년). 프로필은 학제(2·3·4·5·6년제)를 모른다 —
+   학교 목록(data.js UNIVERSITIES)에 2·3년제 전문대(서일대·두원공대·서울예대·동아방송예대·제주한라대·웅지세무대 …)가 있고
+   (거창군장학회 원문도 `3년제 23학년 · 2년제 12학년` 을 적는다) 학과는 5·6년제(의·치·한의·약·수의 · 건축학)일 수 있다.
+   확실한 것만 말한다:
+     pair — 1·2학년은 2·3년제면 해당이라 모름(줄에 `4년제` 가 적혔으면 ✕) · 3·4학년은 학과를 알고 5·6년제 꼴이 아니면 ✓ · 5학년 이상 ✓
+     last — 1학년 ✕(1년제는 없다) · 2·3학년은 2·3년제면 마지막이라 모름(`4년제` 면 ✕) · 4학년은 학과를 알고 5·6년제 꼴이 아니면 ✓ ·
+            5학년은 건축학(5년제)만 ✓ · 6학년 ✓ · 그 밖은 모름
+     penult — 학제마다 다른 학년이라 늘 모름
+   🔴 숫자 학년(anyOf [4])으로 바꾸지 말 것 — 같은 뜻의 다른 낱말이 다른 판정을 받는다(전엔 `졸업학년` 만 2년제 2학년·건축학과 5학년이 ✕).
+   학적 'status' 의 졸업예정 금지도 이 함수로 '마지막 학년일 수 있나'를 잰다(베끼지 말 것) */
+function finalYearVerdict(final, p, fourUp) {
+  const y = p.year == null ? null : Number(p.year);
+  if (y == null || Number.isNaN(y)) return 'unknown';
+  const { longProgram, fiveYear } = programLength(p);
+  if (final === 'pair') return y <= 2 ? (fourUp ? 'fail' : 'unknown') : y >= 5 ? 'pass' : (p.major && !longProgram) ? 'pass' : 'unknown';
+  if (final === 'last') return y <= 1 ? 'fail' : y <= 3 ? (fourUp ? 'fail' : 'unknown') : y === 4 ? ((p.major && !longProgram) ? 'pass' : 'unknown') : y === 5 ? (fiveYear ? 'pass' : 'unknown') : 'pass';
+  return 'unknown';
+}
+
 function judgeCond(c, p, ctx) {
   const S = PR.GRADE_SCALE;
   switch (c.kind) {
@@ -330,22 +355,10 @@ function judgeCond(c, p, ctx) {
          그 사이는 모름. 줄은 확신이 낮아 미달도 화면에선 '모름'이 된다. */
       const ahead = c.ahead > 0 ? c.ahead : 0;
       let v = 'unknown';
-      /* 🔴 **최종·졸업학년 — 판정 한 곳** (parse-requirements parseFinalYear · 2026-11-13 병합 리뷰 · 6차 finalPair 와 1단계 M2 를 합쳤다).
-         `final` = last(마지막 학년) · pair(마지막 두 학년) · penult(그 앞 학년). 프로필은 학제(2·3·4·5·6년제)를 모른다 —
-         학교 목록(data.js UNIVERSITIES)에 2·3년제 전문대(서일대·두원공대·서울예대·동아방송예대·제주한라대·웅지세무대 …)가 있고
-         (거창군장학회 원문도 `3년제 23학년 · 2년제 12학년` 을 적는다) 학과는 5·6년제(의·치·한의·약·수의 · 건축학)일 수 있다.
-         확실한 것만 말한다:
-           pair — 1·2학년은 2·3년제면 해당이라 모름(줄에 `4년제` 가 적혔으면 ✕) · 3·4학년은 학과를 알고 5·6년제 꼴이 아니면 ✓ · 5학년 이상 ✓
-           last — 1학년 ✕(1년제는 없다) · 2·3학년은 2·3년제면 마지막이라 모름(`4년제` 면 ✕) · 4학년은 학과를 알고 5·6년제 꼴이 아니면 ✓ ·
-                  5학년은 건축학(5년제)만 ✓ · 6학년 ✓ · 그 밖은 모름
-           penult — 학제마다 다른 학년이라 늘 모름
-         🔴 숫자 학년(anyOf [4])으로 바꾸지 말 것 — 같은 뜻의 다른 낱말이 다른 판정을 받는다(전엔 `졸업학년` 만 2년제 2학년·건축학과 5학년이 ✕) */
-      const major = String(p.major || '');
-      const longProgram = /의예|의학|치의|치과|한의|약학|수의|건축학(?!.*공학)/.test(major);
-      const fiveYear = /건축학(?!.*공학)/.test(major);
+      /* 최종·졸업학년(`final`)은 finalYearVerdict 한 곳이 판정한다 — 학제를 모르는 이유와 갈래는 그 함수 머리말 */
+      const { longProgram, fiveYear } = programLength(p);
       if (c.final) {
-        if (c.final === 'pair') v = y <= 2 ? (c.fourUp ? 'fail' : 'unknown') : y >= 5 ? 'pass' : (p.major && !longProgram) ? 'pass' : 'unknown';
-        else if (c.final === 'last') v = y <= 1 ? 'fail' : y <= 3 ? (c.fourUp ? 'fail' : 'unknown') : y === 4 ? ((p.major && !longProgram) ? 'pass' : 'unknown') : y === 5 ? (fiveYear ? 'pass' : 'unknown') : 'pass';
+        v = finalYearVerdict(c.final, p, c.fourUp);
         if (c.exclude) return v === 'pass' ? 'fail' : v === 'fail' ? 'pass' : v;
         return v;
       }
@@ -397,6 +410,11 @@ function judgeCond(c, p, ctx) {
       if (!p.status) return 'unknown';
       /* 금지 목록에 있으면 미달. 허용 목록이 같이 있으면(`재학생(휴학생 제외)`) 그쪽도 본다 */
       if (c.not && c.not.includes(p.status)) return 'fail';
+      /* 🔴 **졸업예정자를 빼는 줄은 마지막 학년일 수 있는 학생에게 모름** (2026-11-13 · 병합 리뷰 C) — 학적 칩에 '졸업예정'이 없어
+         `대학 졸업(예정)자`(제외 줄)·`재학생 (졸업(예정)자 제외)` 를 11월의 4학년 재학생이 '통과'로 세어 ✓ 가 붙었다(틀린 안심 · 그가 바로 졸업예정자일 수 있다).
+         마지막 학년인지는 최종학년 판정 한 곳(finalYearVerdict 'last' — 학제를 몰라 전문대 2·3학년도 모름)이 정한다 · 1학년(✕)·이미 졸업·자퇴·대학원생은 졸업예정자가 아니다 */
+      if (c.not && c.not.includes('졸업예정') && !['졸업', '자퇴', '대학원'].includes(p.status)
+          && finalYearVerdict('last', p, false) !== 'fail') return 'unknown';
       if (!c.anyOf) return c.not ? 'pass' : 'unknown';
       if (c.anyOf.includes(p.status)) return 'pass';
       /* 🔴 학적상태는 **평평한 이름표가 아니라 포함 관계**다 (2026-08-24 개발자 지적):
