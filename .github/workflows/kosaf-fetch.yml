@@ -159,6 +159,19 @@ jobs:
             echo "바뀐 것 없음"
           fi
 
+      # 🔴 2026-11-13 경보 짝 — 여는 단계만 있어 회복해도 #501 이 10-27 부터 열려 있었다(그 뒤 실행은 전부 성공). 같은 제목으로 닫는다
+      - name: 회복했으면 옛 경보를 닫는다
+        if: success()
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          title: 🚨 한국장학재단 수확 로봇이 넘어졌습니다
+          body: |
+            ✅ 한국장학재단 수확이 다시 성공했습니다 — 자동으로 닫습니다.
+
       # 🔴 상한을 넘긴 작업은 '실패'가 아니라 '취소'라 if: failure() 만으로는 안 잡힌다
       - name: 넘어졌으면 알린다
         if: failure() || cancelled()

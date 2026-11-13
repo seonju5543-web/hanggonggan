@@ -518,4 +518,35 @@ export default async function gate(eq, ctx) {
     eq('  🔴 관문 정규식이 부품 판 번호를 박지 않는다(actions\\/이름@v숫자) — 박으면 Dependabot PR 마다 관문이 빨개진다',
       gateFiles.filter((f) => /actions\\\/[a-z-]+@v\d/.test(read(root, f))), []);
   }
+
+  /* ── ⑧ 경보 짝 — 회복하면 닫힌다 (2026-11-13 · 은서 · 출시 전 백엔드 마무리) ──
+     #501(한국장학재단)·#546(인스타 준비)은 여는 단계만 있어 회복한 뒤에도 몇 주씩 열려 있었고, 배포 동기화는 제목에 날짜를 붙여
+     실패마다 새 이슈를 만들고 닫지 않았다(CLAUDE.md '제목에 날짜 금지'). 상태 경보는 여는 제목 = 닫는 제목이어야 한다 */
+  {
+    const wfDir = path.join(rootPath, '.github/workflows');
+    const files = fs.readdirSync(wfDir).filter((f) => f.endsWith('.yml'));
+    const opens = []; const closes = new Set(); const labelClosers = new Set();
+    for (const f of files) {
+      const t = fs.readFileSync(path.join(wfDir, f), 'utf8').replace(/^\s*#.*$/gm, '');
+      for (const m of t.matchAll(/gh issue create[^\n]*(?:\\\n[^\n]*)*?--title\s+(['"])(.+?)\1/g)) opens.push({ f, title: m[2] });
+      for (const m of t.matchAll(/const title = (['"`])(.+?)\1/g)) opens.push({ f, title: m[2] });
+      for (const m of t.matchAll(/mode: resolve\s+title:\s*(.+)/g)) closes.add(m[1].trim());
+      for (const m of t.matchAll(/--mode resolve[^\n]*?--title\s+(['"])(.+?)\1/g)) closes.add(m[2]);
+      /* 라벨로 닫는 로봇 — 상태 하나만 다루는 셋만(insta.yml 처럼 다른 작업이 라벨로 닫는 파일 전체를 '닫힘'으로 치면 짝 빠짐을 못 본다 · 11-13 red-green 에서 실제로 놓쳤다) */
+      if (/gh issue close "\$n"/.test(t) && ['robot-heartbeat.yml', 'push-health.yml', 'admin-lock-check.yml'].includes(f)) labelClosers.add(f);
+    }
+    const alarms = opens.filter((o) => /^🚨/.test(o.title));
+    /* 날짜를 붙인 제목 — 사람이 누른 한 번의 일(실패 기록)만 허용 · 상태 경보는 고정 제목 + 닫기 */
+    const DATED_OK = new Set(['main-guard.yml', 'admin-apply.yml', 'device-deploy.yml', 'push-health.yml', 'admin-lock-check.yml', 'check-live.yml']);
+    eq('⑧ 🔴 제목에 날짜를 붙인 🚨 경보는 정해진 곳만(사람이 누른 일 · 라벨로 닫는 곳) — 새로 만들면 고정 제목 + 회복 때 닫기',
+      alarms.filter((o) => /\$\(TZ=|date '/.test(o.title) && !DATED_OK.has(o.f)).map((o) => o.f), []);
+    /* 고정 제목인데 닫는 단계가 없는 것 — 사람이 닫는 한 번의 일만 허용(각 이유는 그 워크플로 주석) */
+    const MANUAL_OK = new Set(['🚨 인스타 게시가 실패했습니다', '🚨 인스타 건너뛰기 기록에 실패했습니다', '🚨 인스타 수정본 알림을 못 깨웠습니다']);
+    eq('  🔴 고정 제목 🚨 경보는 같은 제목으로 닫는 단계가 있다(또는 라벨로 닫는 로봇) — 사람이 닫는 한 번의 일 셋만 예외',
+      alarms.filter((o) => !/\$/.test(o.title) && !closes.has(o.title) && !labelClosers.has(o.f) && !MANUAL_OK.has(o.title)).map((o) => `${o.f}: ${o.title}`), []);
+    eq('  (대조할 것을 실제로 뽑았다 — 🚨 경보 10개 이상 · 닫는 제목 10개 이상)', [alarms.length >= 10, closes.size >= 10], [true, true]);
+    const ds = read(root, '.github/workflows/deploy-sync.yml').replace(/^\s*#.*$/gm, '');
+    eq('  배포 동기화 — 실패는 경보 하나(옛 날짜 제목도 prefix 로) · 다시 되면 닫는다',
+      [/alert-issue\.mjs --mode open --title "🚨 앱 배포 동기화 실패" --match prefix/.test(ds), /mode: resolve\s+title: 🚨 앱 배포 동기화 실패\s+match: prefix/.test(ds)], [true, true]);
+  }
 }
