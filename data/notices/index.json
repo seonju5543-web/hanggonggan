@@ -5,11 +5,23 @@
  "files": {
   "연세대학교": {
    "file": "nz3ew5y.json",
-   "count": 54
+   "count": 55
   },
   "건국대학교": {
    "file": "nmpm6i7.json",
-   "count": 54
+   "count": 55
+  },
+  "인하대학교": {
+   "file": "nkeh7pq.json",
+   "count": 56
+  },
+  "가톨릭대학교": {
+   "file": "n174lvh5.json",
+   "count": 33
+  },
+  "서울교육대학교": {
+   "file": "n18ebv4b.json",
+   "count": 17
   },
   "동국대학교 WISE캠퍼스": {
    "file": "n2we95k.json",
@@ -119,10 +131,6 @@
    "file": "n1mo5fbn.json",
    "count": 12
   },
-  "인하대학교": {
-   "file": "nkeh7pq.json",
-   "count": 55
-  },
   "동국대학교": {
    "file": "n1or8oiw.json",
    "count": 51
@@ -130,10 +138,6 @@
   "서울시립대학교": {
    "file": "n1au199v.json",
    "count": 40
-  },
-  "가톨릭대학교": {
-   "file": "n174lvh5.json",
-   "count": 32
   },
   "계명대학교": {
    "file": "n1nel147.json",
@@ -158,10 +162,6 @@
   "강원대학교": {
    "file": "nlzhvsh.json",
    "count": 34
-  },
-  "서울교육대학교": {
-   "file": "n18ebv4b.json",
-   "count": 16
   },
   "아주대학교": {
    "file": "n16dvfry.json",

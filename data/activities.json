@@ -2,6 +2,71 @@
  "updatedAt": "2026-11-13",
  "items": [
   {
+   "title": "접수중 [성평등가족부] 제4차 「성평등 언박싱 토크」 청년 참여자 모집",
+   "url": "https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.ulsan?bbsId=BBS_0000000000000309&mId=008001002000000000&dataId=61205",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": "모집기간) 2026.11.9.(월) ~ 2026.11.20.(금) ○ (신청방법) 온라인 신청( https://naver.me/GM3hWy89)",
+   "deadline": "2026-11-20",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-09 ~ 2026-11-20"
+    },
+    {
+     "label": "일시",
+     "text": "2026.11.25.(수), 16:00~18:00"
+    },
+    {
+     "label": "대상",
+     "text": "20·30청년 누구나(50명 내외)"
+    }
+   ],
+   "eligibilityLines": [
+    "○ 모집대상 : 20·30청년 누구나(50명 내외)",
+    "* 선정자 개별 안내 예정"
+   ],
+   "noticeLines": [
+    "○ 신청방법 : 온라인 신청( https://naver.me/GM3hWy89)"
+   ],
+   "detailsV": 6,
+   "excerptsAt": "2026-11-13",
+   "school": "",
+   "campus": "",
+   "host": "울산청년정책플랫폼 U-PAGE",
+   "foundAt": "2026-11-13",
+   "id": "act-0bp0gxz"
+  },
+  {
+   "title": "접수중 [고용노동부] 2026 미래내일 일경험 지원사업 비수도권 로컬 AI 메이커스랩 참가자 모집",
+   "url": "https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.ulsan?bbsId=BBS_0000000000000309&mId=008001002000000000&dataId=61201",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": "모집 기간 : 11월 9일(월) ~ 12월 6일(일) - 오프라인 OT : 12월 18일(금) 오프라인 진행 - 사전교육 : 12월 28일(월)",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-09 ~ 2026-12-06"
+    }
+   ],
+   "eligibilityLines": [
+    "- 만 19세 이상 34세 이하 미취업 청년(군필자 만 39세 한정)",
+    "- 비수도권 거주 또는 비수도권 소재 대학생",
+    "* 비수도권 : 서울/경기/인천을 제외한 대한민국 소재지",
+    "* 등본/재학증명서로 증빙 가능해야 함",
+    "- 사전교육 및 오프라인 발표 일정에 참여 가능한 자",
+    "- 일경험 시작일로부터 최대 4주의 팀 프로젝트 활동이 가능한 자"
+   ],
+   "detailsV": 6,
+   "field": "인턴·일경험",
+   "excerptsAt": "2026-11-13",
+   "school": "",
+   "campus": "",
+   "host": "울산청년정책플랫폼 U-PAGE",
+   "foundAt": "2026-11-13",
+   "id": "act-1ogrivf"
+  },
+  {
    "title": "[창업중심대학]2026 대학연합 지역관광 창업경진대회(K-TOURISM STARTUP CHALLENGE)",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179781",
    "kind": "공모전",
@@ -205,6 +270,49 @@
    "excerptsAt": "2026-11-13"
   },
   {
+   "title": "[국제학생] 서울시립미술관 2026 외국어 전시해설 12월 참여자 모집 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53683&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "kind": "대외활동",
+   "attachments": [
+    {
+     "name": "부설기관",
+     "url": "https://www.kw.ac.kr/ko/department/attach01.jsp"
+    },
+    {
+     "name": "부설연구기관",
+     "url": "https://www.kw.ac.kr/ko/department/research_attach.jsp"
+    },
+    {
+     "name": "연구지원팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach03.jsp"
+    },
+    {
+     "name": "연구진흥팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach04.jsp"
+    },
+    {
+     "name": "경영관리팀",
+     "url": "https://www.kw.ac.kr/ko/department/attach02.jsp"
+    },
+    {
+     "name": "기술지주회사",
+     "url": "https://www.kw.ac.kr/ko/department/attach05.jsp"
+    },
+    {
+     "name": "광운미디어",
+     "url": "https://www.kw.ac.kr/ko/etc/2018_kw110.pdf"
+    }
+   ],
+   "deadlineHint": null,
+   "detailsV": 6,
+   "field": "해외·교류",
+   "excerptsAt": "2026-11-13",
+   "school": "광운대학교",
+   "campus": "",
+   "foundAt": "2026-11-13",
+   "id": "act-1wg5qjh"
+  },
+  {
    "title": "스타트업을 위한 B2B 영업 전략 특강",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179769",
    "kind": "대외활동",
@@ -377,10 +485,8 @@
     "아동·청소년",
     "활동구분",
     "오프라인",
-    "1. 활동 일시 : 2026.11.19.(목) 06:30~09:30 (※집결시간 :6시20분까지)",
-    "2. 활동 장소 : 대구상원고등학교, 영남고등학교 정문 일대 (※집결: 대구상원고등학교 정문 앞)",
-    "3. 활동 인원 : 20대 대학생 20명(남녀무관)",
-    "4. 활동 내용 : 수능 격려 물품 전달 등",
+    "활동 일시 : 2026.11.19.(목) 06:30~09:30 (※집결시간 :6시20분까지)",
+    "활동 인원 : 20대 대학생 20명(남녀무관)",
     "[봉사장소 지도] 지도 건너뛰기",
     "봉사자유형 : 성인"
    ],
@@ -5765,125 +5871,6 @@
    "host": "한국장학재단 공지",
    "foundAt": "2026-10-23",
    "id": "act-0kw9xvo"
-  },
-  {
-   "title": "2026학년도 동계[제34기] 대학생 재능봉사 캠프 참여 기관 모집 안내",
-   "url": "https://www.kosaf.go.kr/ko/notice.do?mode=view&searchStr=&searchType=&page=1&ctgrId1=&ctgrId2=&seqNo=21410",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": "신청 기한: ~ 2026. 11. 30.(월) 까지 □ 신청 서류: ①캠프 사업 신청서[붙임 1], ②참여 서약서 및 동의서(서명 필수)[붙임",
-   "deadline": "2026-11-30",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "~ 2026. 11. 30.(월) 까지"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026학년도 동계 방학('26년 12월 ∼ '27년 2월)"
-    },
-    {
-     "label": "혜택",
-     "text": "멘티 전원 보험 가입(캠프 운영 기간)"
-    },
-    {
-     "label": "활동지역",
-     "text": "참여기관 및 대학, 멘토 간 협의가 이루어진 계획된 장소"
-    }
-   ],
-   "eligibilityLines": [
-    "ㅇ 멘토: 사업 참여대학 소속 대학(원)생",
-    "ㅇ 멘티: 전국 초·중·고등학교(특수학교 포함) 재학생 및 지역아동센터, 학교 밖 청소년 지원센터, 다함께돌봄센터, VMS·1365(정부인증포털) 등록기관 등 소속 학생",
-    "※ 다문화ㆍ북향민ㆍ보훈 가정, 특수아동, 기초생활수급자 및 차상위 계층, 한부모, 조손 가정 등 우선 선발 권장"
-   ],
-   "noticeLines": [
-    "2026년 2학기 국가근로장학금 추가 신청기간 운영 안내"
-   ],
-   "detailsV": 6,
-   "field": "봉사",
-   "excerptsAt": "2026-10-28",
-   "school": "",
-   "campus": "",
-   "host": "한국장학재단 공지",
-   "foundAt": "2026-10-23",
-   "id": "act-1n70k3r"
-  },
-  {
-   "title": "[학생인재개발팀] 2026학년도 2학기 PSAT 스터디 모집",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140720&article.offset=0&articleLimit=10",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": "신청 기간: 2026. 10. 22.(목) ~ 11. 1.(일)까지 ○신청 방법:네이버 폼 https://naver.me/F2LkShhq [인공",
-   "deadline": "2026-11-01",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026. 10. 22.(목) ~ 11. 1.(일)까지"
-    },
-    {
-     "label": "활동기간",
-     "text": "2026년 11월 中 ~ 2027년 2월까지 약 3~4개월"
-    },
-    {
-     "label": "대상",
-     "text": "국가고시 및 PSAT에 관심 있는 학사과정 재학생"
-    }
-   ],
-   "eligibilityLines": [
-    "○ 모집대상: PSAT 스터디 OO개 그룹",
-    "* 1개 그룹당 5명 내외 구성 예정"
-   ],
-   "detailsV": 6,
-   "excerptsAt": "2026-10-28",
-   "school": "성균관대학교",
-   "campus": "",
-   "foundAt": "2026-10-23",
-   "id": "act-11fhp46"
-  },
-  {
-   "title": "[해외봉사] 2026학년도 동계 해외봉사단 모집 안내",
-   "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520942",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "붙임 지원서(양식).hwp",
-     "url": "javascript:downGO('붙임 지원서(양식).hwp','/files/article/servicenotice/520942/','64CBE84E537140289B07D3E2BECBC55F.hwp');"
-    }
-   ],
-   "deadlineHint": "접수기간 : 2026. 10. 26.( 월 ) 09:00 ~ 11. 05.( 목 ) 17:00 까지 ❍ 접수방법 : 방문제출 ( 원칙 ): 학생",
-   "deadline": "2026-11-05",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026. 10. 26.( 월 ) 09:00 ~ 11. 05.( 목 ) 17:00 까지"
-    },
-    {
-     "label": "활동기간",
-     "text": "2027. 1. 3.( 일 ) ~ 10.( 일 ) *6 박 8 일"
-    },
-    {
-     "label": "모집인원",
-     "text": "30 명 ( 학부 재학생 )"
-    }
-   ],
-   "eligibilityLines": [
-    "지원자격 : ❍ 지원자격",
-    "· 우리대학 학부 재학생",
-    "· 봉사정신이 투철하며 심신이 건강하고 해외봉사활동에 결격사유가 없는 자",
-    "· 사전교육 및 전체 일정 참여 가능자",
-    "· 사진 / 영상 촬영 및 SNS 활용 가능자 우대",
-    "· 봉사실적이 40 시간 이상인 자 우대",
-    "· 외국어 ( 영어 ) 가능자 우대",
-    "· 2026 하계 해외봉사 선발자 우대",
-    "지원서 접수 및 일정"
-   ],
-   "detailsV": 6,
-   "field": "봉사",
-   "excerptsAt": "2026-10-28",
-   "school": "동국대학교 WISE캠퍼스",
-   "campus": "",
-   "foundAt": "2026-10-23",
-   "id": "act-0ox6bkk"
   },
   {
    "title": "2026 서울형 청년인턴 직무캠프",
