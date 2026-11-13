@@ -19,14 +19,16 @@ import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry, retitleItems } from './clean-title.mjs';
 import { isAttachmentEntry, detailAttachments, stripSiteChrome } from './attachment-link.mjs';
 import { activityKind, activityField, notActivity, unreadableSource, ACTIVITY_FIELDS } from './activity-kind.mjs';
-import { activityExcerpts, activityDetails, putActivityDetails, ACT_DETAILS_V, sanitizeBenefit, sanitizeElig, sanitizeSteps } from './activity-excerpts.mjs';
+import { activityExcerpts, activityDetails, putActivityDetails, activityDocuments, ACT_DETAILS_V, sanitizeBenefit, sanitizeElig, sanitizeSteps } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
+/* 활동 글의 제출 서류 — 본문이 준 목록이 있으면 그것, 없으면 칸을 지운다(원문에 없는 것을 남기지 않는다 · 사람이 적은 칸은 아직 없다) */
+function putActivityDocuments(it, docs) { if (docs && docs.length) it.documents = docs; else delete it.documents; }
 import { detailByRule } from './activity-detail-rules.mjs';   // 본문이 스크립트로 그려지는 게시판(온통청년)의 숨은 글 주소 — 첨부 로봇과 같은 함수(2026-10-28)
 import { robotsAllows } from './robots.mjs';
 import { extractLinks, stripSessionId, hrefText } from './board-links.mjs';
 import { tidyExternal, dropReason as externalDropReason, fillDeadlineFromHint } from './external-clean.mjs';
 import { actKeepDate, capActivities } from './open-api-map.mjs';   // 활동 피드 60일·상한이 같은 날짜를 쓴다 (순수 모듈 — 불러도 아무것도 실행하지 않는다)
-import { canonUrl } from './canon-url.mjs';
+import { canonUrl, activityId } from './canon-url.mjs';
 import { fetchBoard, netReason } from './fetch-board.mjs';
 import { NEWS_BOARD_RULES } from './news-board-rules.mjs';
 import { updateSourceHealth, staleSourcesLine } from './source-health.mjs';
@@ -380,6 +382,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
         if (ex.excerpts.length) it.excerpts = ex.excerpts;
         /* 자격·제외·우선 선발·원문 안내 (2026-10-01) — 장학 발췌기 규칙 그대로(activityDetails). 앱이 장학과 같은 엔진으로 적합도를 낸다 */
         if (detail.text) putActivityDetails(it, activityDetails(detail.text, it.title));
+        if (detail.text) putActivityDocuments(it, activityDocuments(detail.text));   // 제출 서류 목록(2026-10-30 · 원문 글자 그대로 · 없으면 칸이 없다)
         const field = activityField(it.title, it.kind);
         if (field) it.field = field;
         it.excerptsAt = new Date().toISOString().slice(0, 10);   // 원문을 읽은 날 — 아래 소급 보강이 다시 읽지 않게
@@ -607,6 +610,19 @@ acts.items = retitleItems(freshActs.concat(acts.items || []));   // 실린 글�
 acts.items = acts.items.filter((n) => (actKeepDate(n) || '9999') >= cutoff);
 acts.items = acts.items.filter((n) => !isAttachmentEntry(n));
 acts.items = acts.items.filter((n) => !notActivity(n.title) && !unreadableSource(n.url));   // 결과·보도·지난 해 글은 모집 글이 아니다 · 인스타그램 게시물은 뺀다 — 이미 실린 글에도 소급(2026-10-04 · 10-16 · activity-kind.mjs)
+/* 🔴 활동 글에도 id — 공식은 canon-url.mjs activityId **한 곳**(주소 전체 지문 · 2026-10-30 · 리뷰: 끝 24자 공식은 두 학교의 같은 게시판 글이 겹쳤다).
+   신청서 원본 PDF 색인(data/forms-pdf)과 앱 시트가 이 id 로 만난다. API 글은 API 로봇이 준 id 그대로. 이미 실린 글에도 소급(원칙 7).
+   같은 id 가 둘이면(지문 충돌) 뒤 글은 id 를 비워 둔다 — 틀린 양식을 붙이는 것보다 양식 칸이 없는 쪽이 낫다. */
+{
+  const usedIds = new Map();
+  for (const n of acts.items) {
+    if (!n.id && n.url) n.id = activityId(n.url);
+    if (!n.id) continue;
+    const other = usedIds.get(n.id);
+    if (other && other !== n.url) { console.log(`활동 글 id 겹침 — 뒤 글의 id 를 비운다: ${n.id} · ${other} · ${n.url}`); delete n.id; continue; }
+    usedIds.set(n.id, n.url);
+  }
+}
 acts.items.forEach(sanitizeBenefit);   // 「혜택」에 섞인 조건은 자격 줄로 — 출처(본문·API)와 상관없이 매번 모든 글에(2026-10-04 · activity-excerpts.mjs splitBenefit)
 acts.items.forEach(sanitizeSteps);   // 「1. 2. 3.」 단계 번호 떼기 — 연락처 단계가 빠지면 「3.」부터 남던 1365 글(2026-11-02 · activity-excerpts.mjs stripStepNumber) · 소급
 acts.items.forEach(sanitizeElig);   // 자격 줄 거름(여러 갈래 나이·개인정보 안내문)을 실린 글 전부에 매번 — 소급(2026-10-05 점검 api-06 · activity-excerpts.mjs eligLineOk)
@@ -638,6 +654,7 @@ for (const it of acts.items) {
   if (ex.excerpts.length) it.excerpts = ex.excerpts;
   if (!it.field) { const f = activityField(it.title, it.kind); if (f) it.field = f; }
   if (detail.text) putActivityDetails(it, activityDetails(detail.text, it.title));
+  if (detail.text) putActivityDocuments(it, activityDocuments(detail.text));
   if (detail.text) it.excerptsAt = new Date().toISOString().slice(0, 10);   // 못 받아 온 날은 적지 않는다 — 잠깐 끊긴 것을 영영 '읽었다'로 굳히지 않게
   if (detail.text) delete it.detailsTriedAt; else it.detailsTriedAt = todayIso;   // 못 받았으면 이레 뒤에 다시
   actBackfilled += 1;

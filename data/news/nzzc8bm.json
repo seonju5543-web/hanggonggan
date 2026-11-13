@@ -1,7 +1,18 @@
 {
  "school": "가천대학교",
- "updatedAt": "2026-11-11",
+ "updatedAt": "2026-11-12",
  "items": [
+  {
+   "title": "2026학년도 2학기 성적공시 및 정정 기간 안내(12주 수업)",
+   "url": "https://www.gachon.ac.kr/bbs/kor/475/127069/artclView.do",
+   "postedAt": "2026-11-09",
+   "kind": "학사",
+   "school": "가천대학교",
+   "campus": "",
+   "src": "02ae4269",
+   "foundAt": "2026-11-12",
+   "desc": "1. 수업만족도 조사 참여 - 수업만족도 조사기간 : 2026.11.17.(화) ~ 2026.12.29.(화)"
+  },
   {
    "title": "2027-1학기 조기졸업 신청 안내",
    "url": "https://www.gachon.ac.kr/bbs/kor/475/127028/artclView.do",

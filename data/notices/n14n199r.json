@@ -1,7 +1,34 @@
 {
  "school": "서강대학교",
- "updatedAt": "2026-11-11",
+ "updatedAt": "2026-11-13",
  "items": [
+  {
+   "title": "[교외] 한국건설교통신기술협회 미래 건설교통신기술인 장학생 선발 안내(11/18 마감, 장학금 100만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551820?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-11-12"
+  },
+  {
+   "title": "[교외] 유하푸른재단 장학생 선발 안내(11/20 마감, 이공계열 1학년, 등록금 및 자기개발비, 교환학생 장학금)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551816?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": "신청기한 및 접수처: 2026년 11월 20일(금) 23:59까지 재단 지정 이메일 수신분에 한하여 접수, 우편/방문/팩스 접수 불가 이메일 접",
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-11-12"
+  },
+  {
+   "title": "[교외] 농어촌희망재단 한국마사회와 함께하는 지역돌봄 지원사업 참여 대학생 모집 안내(11/18 마감, 학업장려금 130만원)",
+   "url": "https://www.sogang.ac.kr/ko/detail/551815?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서강대학교",
+   "campus": "",
+   "foundAt": "2026-11-12"
+  },
   {
    "title": "[교외] (외국인) 삼성꿈장학재단 글로벌희망장학생 선발 안내(12/31 마감, 등록금전액+학업보조비)",
    "url": "https://www.sogang.ac.kr/ko/detail/551811?bbsConfigFk=141&namepage=ScholarshipNotice",

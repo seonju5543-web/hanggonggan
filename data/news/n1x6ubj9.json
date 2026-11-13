@@ -1,7 +1,74 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-11-11",
+ "updatedAt": "2026-11-12",
  "items": [
+  {
+   "title": "대학원혁신센터 촉탁직원 채용 공고",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141887&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-12",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-12",
+   "desc": "총괄지원팀 우리대학 대학원혁신센터에서 BK대학원혁신지원사업을 담당할 촉탁직원을 아래와 같이 채용합니다."
+  },
+  {
+   "title": "[채용/모집] 자연과학대학 수학과사무실 행정업무 조교 채용 (~11/18(수)까지)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141604&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-12",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-12",
+   "desc": "성균관대학교 자연과학대학 수학과사무실에서 행정업무를 담당할 행정조교를 다음과 같이 채용합니다."
+  },
+  {
+   "title": "[입학처] 2027학년도 수시모집 논술시험 교내 차량진입 및 건물출입 통제 안내 (2026. 11. 21.(토) ~ 22.(일),인문사회과학캠퍼스)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141870&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-12",
+   "kind": "생활",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-12",
+   "desc": "공정한 입시 진행을 위하여 학부모, 동반자 및 일반인(학부생 등 교내구성원 포함)의 캠퍼스 출입을 엄격히 제한합니다."
+  },
+  {
+   "title": "성균관대학교 소프트웨어융합대학 자체계약직원 채용(2026년 11월 19일 15시 까지 )",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141861&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-12",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-12",
+   "desc": "2. 근무지: 성균관대학교 자연과학캠퍼스 3. 담당업무: 소프트웨어학과 제반 업무"
+  },
+  {
+   "title": "2026년 제2회 수원청년 틈 페스티벌 행사 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141818&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-12",
+   "kind": "행사",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-12",
+   "thumb": "data/news/img/73364ee328678ddd.webp",
+   "desc": "- 진행일시: 11/21(토) 오전 10시 30분 ~ 오후 5시 - 진행장소: 복합문화공간111CM (수원시 장안구 수성로195)"
+  },
+  {
+   "title": "성균관대학교 배터리학과 행정직원 모집(~11/20(금)까지)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141813&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-12",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-12",
+   "desc": "성균관대학교 성균융합원 배터리학과에서 행정직원을 아래와 같이 채용 공고합니다."
+  },
   {
    "title": "[채용모집] 성균관대 문과대학 비교문화협동과정 연계전공 행정조교 모집",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141802&article.offset=0&articleLimit=10",
@@ -77,7 +144,8 @@
    "campus": "",
    "src": "45ec8fd1",
    "foundAt": "2026-11-11",
-   "desc": "동아시아미래가치연구소 ◎ 주제 : 엔트로피와 생명 / Entropy and Life ◎ 강연 소개 이번 강연은 열역학 제2법칙과 엔트로피라는 과학적 개념을 바탕으로 생명의 본질과 진화, 그리고 인간과 문명의 위치를…"
+   "desc": "동아시아미래가치연구소 ◎ 주제 : 엔트로피와 생명 / Entropy and Life ◎ 강연 소개 이번 강연은 열역학 제2법칙과 엔트로피라는 과학적 개념을 바탕으로 생명의 본질과 진화, 그리고 인간과 문명의 위치를…",
+   "thumb": "data/news/img/c54d760921317016.webp"
   },
   {
    "title": "[기숙사] 2026학년도 겨울방학 기숙사 입사생 모집 안내(명륜학사/봉룡학사)",
@@ -371,70 +439,6 @@
    "src": "45ec8fd1",
    "foundAt": "2026-11-02",
    "desc": "정보통신/소프트웨어/공과대학행정실 성균관대학교 공과대학 건설환경공학부에서 학사 행정업무를 담당할 대학원 조교를 다음과 같이 모집하오니 많은 지원 바랍니다."
-  },
-  {
-   "title": "2027년도 제16회 변호사시험 시험관리원(재학생) 모집(~11.8.(일)/조기마감 가능)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141136&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-30",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-30",
-   "desc": "법학전문대학원행정실 2027년도 제16회 변호사시험이 2027. 1. 12.(화)∼1. 16.(토)까지 4일간(※ 1. 14. 목요일은 휴식일) 본교 법학관에서 시행될 예정인 바, 시험관리원으로 본교 재학생을…"
-  },
-  {
-   "title": "양자생명물리과학원 행정직원 모집",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141131&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-30",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-30",
-   "desc": "성균관대학교 양자생명물리과학원에서 근무할 직원을 아래와 같이 모집하오니 많은 관심과 지원을 바랍니다."
-  },
-  {
-   "title": "[성균인문아카데미] 제14기 졸업례 행사 스케치 영상 촬영 아르바이트 학생 모집(11/3화, 1일)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141142&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-30",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-30",
-   "desc": "성균인문아카데미 성균인문아카데미에서 행사 스케치 영상 촬영을 지원할 아르바이트 학생을 모집합니다."
-  },
-  {
-   "title": "시놀로지(Synology) NAS 보안 취약점 업데이트 권고",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141138&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-30",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-30",
-   "thumb": "data/news/img/ef4c1a63e7a44465.webp",
-   "desc": "보안담당자 시놀로지(Synology)社 NAS의 취약점을 악용한 공격이 급증하여 이를 방어하기 위한 보안 업데이트를 안내해 드리오니, 해당 제품을 사용하시는 구성원 분들은 아래 내용을 참고하여 조치해 주시기…"
-  },
-  {
-   "title": "PHP의 중대한 취약점 공개에 따른 학내 홈페이지 긴급 점검 및 조치 요청",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141137&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-30",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-30",
-   "desc": "보안담당자 홈페이지를 만들기 위한 도구 PHP에서 심각한 취약점(PHP2SHELL)이 공개되어 긴급한 조치가 요구됩니다. 구성원 여러분들의 협조 부탁 드립니다."
-  },
-  {
-   "title": "성균관대학교 양자공학과 객원교수 채용 공고",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141105&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-30",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-10-30",
-   "desc": "성균관대학교 양자공학과에서는 다음과 같이 객원교수를 초빙하고자 하오니, 많은 분들의 관심과 지원 요청 드립니다."
   }
  ]
 }

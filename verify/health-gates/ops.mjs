@@ -473,6 +473,10 @@ export default async function gate(eq, ctx) {
         /push:\s+branches: \[claude\/nice-heisenberg-WESq5\]\s+paths:/.test(cq) && !/- 'data\//.test(cq), Number((cq.match(/cron: '(\d+) /) || [])[1]) % 2 === 1,
         /security-events: write/.test(cq), (cq.match(/^ {4}timeout-minutes: \d+/gm) || []).length],
       [true, true, true, true, true, 2]);
+    eq('  🔴 CodeQL 은 새 push 에 돌던 점검을 취소하지 않는다 — 취소가 robot-down 경보 셋을 열었다(2026-11-12 #619~621)', /cancel-in-progress: false/.test(cq) && !/cancel-in-progress: true/.test(cq), true);
+    const cor = read(root, '.github/workflows/close-old-reports.yml').replace(/^\s*#.*$/gm, '');
+    eq('  지난 리포트 정리 — 매일 · 기본 3일(2026-11-12 · 주 1회·14일이라 리포트 87건이 경보를 묻었다) · 수동 입력 기본값도 3',
+      [/cron: '\d+ \d+ \* \* \*'/.test(cor), /DAYS: \$\{\{ inputs\.days \|\| '3' \}\}/.test(cor), /default: '3'\n\s+dry_run:/.test(cor)], [true, true, true]);
     eq('  🔴 심각 경고는 세 사람 경보 이슈로 — 여는·닫는 제목이 같다 · 두 일자리 모두 넘어지면 robot-down',
       [(cq.match(/🛡 보안 코드 점검에서 고칠 것이 나왔습니다/g) || []).length, /--assignee seonju5543-web --assignee Se-Hyeon-Jo --assignee didinin-wq/.test(cq),
         (cq.match(/if: failure\(\) \|\| cancelled\(\)\s+uses: \.\/\.github\/actions\/robot-down/g) || []).length],

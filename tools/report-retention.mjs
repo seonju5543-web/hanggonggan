@@ -9,7 +9,7 @@
      · 사람 댓글이 있는 리포트는 워크플로가 한 번 더 걸러 남긴다(컨펌 지시가 적혀 있을 수 있다).
    🔴 경보·사냥꾼·인스타(🚨 · 🔧 · 📸 · 🛰 · 🎨)는 **규칙에 아예 없다** — 각자 회복하면 닫는 길이 따로 있다
       (tools/alert-issue.mjs resolve · 하트비트 · insta/ready-issues.mjs). 여기에 넣지 말 것(관문 alerts ②).
-   실행:  node tools/report-retention.mjs /tmp/open.json [--days 14]
+   실행:  node tools/report-retention.mjs /tmp/open.json [--days 3]   (2026-11-12 워크플로 기본 14 → 3 · 매일)
           (open.json = gh issue list --json number,title,createdAt) → '번호<TAB>제목' 줄
    ============================================================ */
 import fs from 'node:fs';

@@ -1,7 +1,38 @@
 {
  "school": "경기대학교",
- "updatedAt": "2026-11-11",
+ "updatedAt": "2026-11-12",
  "items": [
+  {
+   "title": "[일반] 2027년학년도 국립중앙도서관 실습생 모집",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627180&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-12",
+   "kind": "생활",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-12",
+   "desc": "대학소개 대학·조직 대학생활 맞춤정보 어떤 정보 를 찾고계시나요? 맞춤설정 저장하기 (언제든 변경 가능합니다) 맞춤설정 이란? 소속, 내용, 기간별로 나만의 맞춤 콘텐츠를 찾아보세요."
+  },
+  {
+   "title": "[입학에서 취업까지] 학부생 대상「인권과 성평등교육」실시 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627178&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-12",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-12",
+   "desc": "안녕하세요~! 인권과 성평등 교육 안내입니다. 인권과 성평등 교육 미이수로 인해 졸업사정에 불이익이 발생하지 않도록 학생분들은 확인 부탁드립니다."
+  },
+  {
+   "title": "[입학에서 취업까지] (※중요)< 학부생 대상「인권과 성평등교육」실시 안내 및 미이수자 이수독려(2차) 공지 >",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627172&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-12",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-12",
+   "desc": "인권과 성평등 교육 미이수로 인해 졸업사정에 불이익이 발생하지 않도록 학생분들은 확인 부탁드립니다."
+  },
   {
    "title": "[입학에서 취업까지] [국가근로] 2026학년도 2학기 방학 중 일반교내외 선발 일정 안내",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627148&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
@@ -381,37 +412,6 @@
    "campus": "",
    "src": "bf927d3e",
    "foundAt": "2026-11-02"
-  },
-  {
-   "title": "[일반] KGU AI ONE 서비스 운영 및 이용 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626936&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-11-02",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-11-02",
-   "desc": "서비스명 : KGU AI ONE(케이지유 에이아이 원) 이용대상 : 학부 재학생 월별 크레딧 이용 한도 : 1인당 월 3,000 크레딧 이용 기간: 2026.11.01. ~ 2027.02.28. 제공 모델:…"
-  },
-  {
-   "title": "[입학에서 취업까지] [중요] 2027년 2월 졸업대상자 졸업시험(2차) 일정 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626932&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-11-02",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-11-02",
-   "desc": "<출제 교과목> 1. 인간행동과 사회환경 : 김욱 교수님 2. 사회복지실천론 : 김형모 교수님"
-  },
-  {
-   "title": "[일반] 2026-2학기 논문지도교수 제청 및 학위논문 계획서 제출 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626930&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-11-02",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-11-02",
-   "desc": "이미지 확대보기 ※ 공지사항 확인 후 문의 시 ☎ 031.249.9062"
   }
  ]
 }

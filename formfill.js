@@ -160,7 +160,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('click', (ev) => {
     const open = ev.target.closest('.fill-open');
     if (open) {
-      const sch = (typeof allScholarships === 'function' ? allScholarships() : []).find((s) => s.id === open.dataset.id);
+      /* 장학이 먼저, 없으면 활동 글(app.js fillTargetFor · 2026-10-31) — 공모전 참가신청서도 같은 화면에서 채운다 */
+      const sch = typeof fillTargetFor === 'function' ? fillTargetFor(open.dataset.id)
+        : (typeof allScholarships === 'function' ? allScholarships() : []).find((s) => s.id === open.dataset.id);
       if (sch) loadFormFields(sch).then(() => openFormFill(sch, open.dataset.file));
       return;
     }

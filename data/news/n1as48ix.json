@@ -1,7 +1,17 @@
 {
  "school": "한국항공대학교",
- "updatedAt": "2026-11-11",
+ "updatedAt": "2026-11-12",
  "items": [
+  {
+   "title": "2027학년도 수시모집 논술고사 대학원생 고사 감독자 모집 안내",
+   "url": "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11465",
+   "postedAt": "2026-11-12",
+   "school": "한국항공대학교",
+   "campus": "",
+   "src": "9c5122cb",
+   "foundAt": "2026-11-12",
+   "desc": "2027 학년도 수시모집 논술고사의 원활한 운영을 위하여 다음과 같이 대학원생 고사 감독자를 모집하오니 , 대학원생 여러분의 많은 참여 바랍니다 ."
+  },
   {
    "title": "2026학년도 동계방학 생활관생 모집 안내",
    "url": "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11459",
@@ -253,29 +263,6 @@
    "src": "9c5122cb",
    "foundAt": "2026-10-13",
    "thumb": "data/news/img/2c254d35b9cbd161.webp"
-  },
-  {
-   "title": "[항공·드론 혁신융합대학사업단] 2026년 GADLEX 채용박람회 참가자 모집(~10/16까지)",
-   "url": "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11319",
-   "postedAt": "2026-10-12",
-   "kind": "행사",
-   "school": "한국항공대학교",
-   "campus": "",
-   "src": "9c5122cb",
-   "foundAt": "2026-10-12",
-   "thumb": "data/news/img/8d7445d0ce5756b4.webp",
-   "desc": "■ 모집기간: 2026. 10. 16.(금)까지 ■ 모집대상: 항공·드론 분야 취업에 관심있는 한국항공대학교 재학생"
-  },
-  {
-   "title": "2026년 하반기 동행안심벨(구 안심헬프미) 지원사업 안내",
-   "url": "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11313",
-   "postedAt": "2026-10-12",
-   "school": "한국항공대학교",
-   "campus": "",
-   "src": "9c5122cb",
-   "foundAt": "2026-10-12",
-   "thumb": "data/news/img/4ecff66abf641214.webp",
-   "desc": "서울시에서는 이상동기범죄로부터 시민을 안전하게 보호하기 위해 사회안전약자를 대상으로 동행안심벨 ( 구 안심헬프미 ) 지원사업을 추진하고 있사오니 관심있는 학생들의 신청 바랍니다 ."
   }
  ]
 }

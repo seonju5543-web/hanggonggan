@@ -1,7 +1,31 @@
 {
  "school": "경희대학교",
- "updatedAt": "2026-11-11",
+ "updatedAt": "2026-11-12",
  "items": [
+  {
+   "title": "공통 KHU:VOICE(쿠:보이스) 시행 안내(2차)",
+   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323568",
+   "postedAt": "2026-11-12",
+   "postId": "323568",
+   "school": "경희대학교",
+   "campus": "",
+   "src": "a92b27ac",
+   "foundAt": "2026-11-12",
+   "thumb": "data/news/img/8fb600843ce872fc.webp",
+   "desc": "핵심 정의 신청 분야 대학의 유 · 무형 자원을 자산화하여 새로운 가치 · 수입 창출 &bull; 각 영역의 지출 합리화 ( 최적화 ) 방안 &bull; 발전기금 모금 , 지식사업화 활성화 등 각 영역 재정 수입…"
+  },
+  {
+   "title": "공통 [텐테(TENTE)] 기술영업/마케팅 직무 추천채용",
+   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323566",
+   "postedAt": "2026-11-12",
+   "postId": "323566",
+   "kind": "채용",
+   "school": "경희대학교",
+   "campus": "",
+   "src": "a92b27ac",
+   "foundAt": "2026-11-12",
+   "desc": "1. 제출방법 ① 채용 담당자 이메일 입사지원서 접수 ▶ skim@tente.com ② 추천채용 서류 미래인재센터 이메일 제출 ▶ work_register@khu.ac.kr"
+  },
   {
    "title": "서울 [(서울)심리상담센터] 2026-11월 성격유형검사 실시 (신규 검사·11월 한정 운영)",
    "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323555",

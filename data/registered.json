@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-11",
+ "updatedAt": "2026-11-12",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -13583,9 +13583,9 @@
    "provider": "주관 기관 원문 확인",
    "amount": "금액 원문 확인",
    "amountValue": 0,
-   "deadline": null,
+   "deadline": "2026-10-29",
    "listedAt": "2026-10-13",
-   "period": "접수 기간 원문 확인",
+   "period": "접수 기간 ~2026-10-29",
    "summary": "영남대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
@@ -13610,7 +13610,9 @@
    "excerpts": [
     "2026-2학기 한국장학재단 국가근로장학금 추가신청기간(3차) 안내"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "deadlineFrom": "공고 원문",
+   "openDate": "2026-10-21"
   },
   {
    "id": "auto-bbssc58944344artclviewdo",
@@ -23189,6 +23191,11 @@
      "school": "명지대학교",
      "url": "https://www.mju.ac.kr/bbs/mjukr/145/237091/artclView.do",
      "id": "notice:https://www.mju.ac.kr/bbs/mjukr/145/237091/artclView.do"
+    },
+    {
+     "school": "이화여자대학교",
+     "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367894&article.offset=0&articleLimit=10",
+     "id": "notice:https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?articleno=367894"
     }
    ],
    "scopeFrom": "같은 사업이 서강대학교 게시판에도 올라옴(자동) — 서강대학교 게시판 https://www.sogang.ac.kr/ko/detail/551805?bbsConfigFk=141&namepage=ScholarshipNotice",
@@ -23768,8 +23775,8 @@
    "kindConfidence": "high",
    "kindFrom": "로봇(원문) 2026-11-11",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "500만원",
+   "amountValue": 5000000,
    "deadline": null,
    "listedAt": "2026-11-11",
    "period": "접수 기간 원문 확인",
@@ -23779,7 +23786,13 @@
     "schoolOnly": "전북대학교"
    },
    "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
+    "전북대학교 재학생",
+    "장학금 프로젝트 수행계획서를 작성하여",
+    "지원인원 : 필요 서류)",
+    "장학생 지원서",
+    "재학증명서",
+    "성적증명서",
+    "통장사본"
    ],
    "duplicable": true,
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
@@ -23797,7 +23810,239 @@
     }
    ],
    "sourceUrl": "https://www.jbnu.ac.kr/web/Board/219698/detailView.do?category=6",
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "접수기간 : 자격요건",
+    "2026년 11월 11일(수)~11월 27일(금)",
+    "1)동창회비를 2026년도 1학기까지 납부 완료한 자",
+    "(1학년은 2026년도 2학기까지 납부한 자)",
+    "접수메일",
+    "2)기존 총동창회 장학재단 장학금 미수혜자",
+    "'2026년 문화예술 장학금 이름 학과(학번)'과",
+    "1팀 당 최대 500만원,총 1000만원",
+    "PDF 파일로 제출",
+    "학생이 직접 기획한 문화예술 프로젝트의 소요 예산",
+    "을 산출하여 맞춤형 편딩 방식으로 지원 예정",
+    "심사 절차",
+    "사후서류"
+   ],
+   "eligibilityFrom": "공고문 첨부(OCR)",
+   "documentsFrom": "공고문 첨부(OCR)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 5000000,
+    "ratio": 0,
+    "min": 5000000,
+    "max": 5000000,
+    "raw": "지원금액 : '2026년 문화예술 장학금_팀 이름_수행계획서'첨부 1팀 당 최대 500만원,총 1000만원 PDF 파일로 제출 학생이 직접 기획한 문화예술 프로젝트의 소요 예산 을 산출하여 맞춤형 편딩 방식으로 지원 예정 심사 절차 사후서류 장학생은 프로젝트 종료 후'결과 보고서'&"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-amepagescholarshipnotice-12u2guu",
+   "name": "[교외] 유하푸른재단 장학생 선발 안내(11/20 마감, 이공계열 1학년, 등록금 및 자기개발비, 교환학생 장학금)",
+   "boardTitle": "[교외] 유하푸른재단 장학생 선발 안내(11/20 마감, 이공계열 1학년, 등록금 및 자기개발비, 교환학생 장학금)",
+   "type": "교외",
+   "kindEvidence": [
+    "제목 표식 「[교외」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-12",
+   "provider": "주관 기관 원문 확인",
+   "amount": "200만원",
+   "amountValue": 2000000,
+   "deadline": "2026-11-20",
+   "deadlineFrom": "공고 원문 · [교외] 유하푸른재단 장학생 선발 안내(11/20 마감, 이공계열 1학년, 등록금 및 자기개발비, 교환학생 장학금)",
+   "period": "접수 ~2026-11-20",
+   "summary": "서강대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서강대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-12 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551816?bbsConfigFk=141&namepage=ScholarshipNotice",
+   "sourceKind": "auto",
+   "applyEmail": "rhdrudfla2@oneduksan.com",
+   "applyEmailSource": "이메일 접수처: rhdrudfla2@oneduksan.com",
+   "applyEmailFrom": "공고 원문",
+   "eligibilityLines": [
+    "2. 지원대상",
+    "2027-1학기 기준 3학기 해당하는 현재 1학년 재학생",
+    "선발 우대학과: 반도체 신소재, 기계공학, 전기전자 관련 학과",
+    "1학년 1학기 평균학점 3.8/4.5 이상 또는 3.6/4.3 이상, 정규학기 12학점 이상 이수",
+    "타 재단 장학금 중복수혜는 재단 규정에 따름"
+   ],
+   "excerpts": [
+    "신청기한 및 접수처: 2026년 11월 20일(금) 23:59까지",
+    "문의: 유하푸른재단 사무국 052-283-9004"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 2000000,
+    "ratio": 0,
+    "min": 2000000,
+    "max": 2000000,
+    "raw": "1. 장학금 선발장학금: 200만원(1인 1회 지급) 등록금: 2학년부터 졸업 시 까지 최대 6개 학기 자기개발비: 학기당 50만원 학습지원비: 등록금 고지서상 실납부액 및 교내장학금 등 재단 지급 기준에 따른 차등 지원 해외교환학생 장학금: 아시아 250만원, 미주 유럽 및 기타 400만원 *파견교에서 이수한 학기와 학점을 모교에서 인정받을 수 있는 자 "
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-spxboardid5cate8key70976",
+   "name": "[장학안내] 2026학년도 미래성장 장학생 선발 안내",
+   "boardTitle": "[장학안내] 2026학년도 미래성장 장학생 선발 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "교내 증거 없음 — 기본값"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-11-12",
+   "provider": "주관 기관 원문 확인",
+   "amount": "120만원 ~ 180만원",
+   "amountValue": 1800000,
+   "deadline": "2026-11-20",
+   "deadlineFrom": "공고 원문 · 마. 평가방법: 심층면접(1단계) → 서류평가(2단계) 바. 접수기간: 2026. 11. 16.(월) 09:00 ～ 11. 20.(금) 17:00 ※ 온라인 접수(전남대 포털) ​ 자세한 내용은 첨부파일 공고문 참고 바랍니다. ​",
+   "period": "접수 ~2026-11-20",
+   "summary": "전남대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "전남대학교"
+   },
+   "documents": [
+    "1단계: 장학금 활용계획서 1부.",
+    "2단계: 장학금 실행보고서(PDF) 1부. (1단계 합격자에 한함)"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-12 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026학년도 2학기 미래성장 장학생 선발 공고문.hwp",
+     "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=download&fileCode=2591542"
+    }
+   ],
+   "sourceUrl": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70976&cate=8",
+   "sourceKind": "auto",
+   "openDate": "2026-11-16",
+   "announceDate": "2026-12-11",
+   "documentsFrom": "공고문 첨부",
+   "eligibilityLines": [
+    "나. 지원대상: 본교 학부 2~3학년 재학생",
+    "※ 공고문(붙임)의 영역별 대학 및 선발예정인원 확인",
+    "다. 지원자격: '26. 2학기 기준 직전 학기 평균평점 1.75 이상, 12학점 이상 이수한 자"
+   ],
+   "amountSpec": {
+    "kind": "range",
+    "value": 1800000,
+    "ratio": 0,
+    "min": 1200000,
+    "max": 1800000,
+    "raw": "라. 장학금액: 1,200천원 ~ 1,800천원 ※ 평가에 따른 차등지급"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-amepagescholarshipnotice-1naazn9",
+   "name": "[교외] 한국건설교통신기술협회 미래 건설교통신기술인 장학생 선발 안내(11/18 마감, 장학금 100만원)",
+   "boardTitle": "[교외] 한국건설교통신기술협회 미래 건설교통신기술인 장학생 선발 안내(11/18 마감, 장학금 100만원)",
+   "type": "교외",
+   "kindEvidence": [
+    "제목 표식 「[교외」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-12",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-11-18",
+   "deadlineFrom": "게시판 요약 · 11/18 마감",
+   "period": "접수 ~2026-11-18",
+   "summary": "서강대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서강대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-12 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "미래 건설교통신기술인 장학사업 안내.pdf",
+     "url": "https://www.sogang.ac.kr/file-fe-prd/board/141/551820_1.pdf?sg=%EB%AF%B8%EB%9E%98%20%EA%B1%B4%EC%84%A4%EA%B5%90%ED%86%B5%EC%8B%A0%EA%B8%B0%EC%88%A0%EC%9D%B8%20%EC%9E%A5%ED%95%99%EC%82%AC%EC%97%85%20%EC%95%88%EB%82%B4.pdf"
+    },
+    {
+     "name": "본문이미지-1190x1682.png",
+     "url": "https://www.sogang.ac.kr/dataview/board/141/7d0441fa-46b2-45f2-a8f1-c115a91e5b8f.png",
+     "bodyImage": true
+    }
+   ],
+   "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551820?bbsConfigFk=141&namepage=ScholarshipNotice",
    "sourceKind": "auto"
+  },
+  {
+   "id": "auto-skor478127041artclviewdo",
+   "name": "[메디컬] 2026-2학기 일반(교내, 교외) 국가근로장학생 2차 추가모집",
+   "boardTitle": "[메디컬] 2026-2학기 일반(교내, 교외) 국가근로장학생 2차 추가모집",
+   "type": "교내",
+   "kindEvidence": [
+    "제목 표식 「교내」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-12",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-11-18",
+   "deadlineFrom": "공고 원문 · 2026년 가천대학교 재학생 심층면접토론(FGD) 참여학생 모집 ○ 신청기간: 2026.11.05.(목) ~ 11.18.(수)",
+   "period": "접수 ~2026-11-18",
+   "summary": "가천대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "가천대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-12 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "26-2학기 2차 추가모집 안내.pdf",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/158615/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.gachon.ac.kr/bbs/kor/478/127041/artclView.do",
+   "sourceKind": "auto",
+   "openDate": "2026-11-05",
+   "eligibilityLines": [
+    "3. 신청대상: 26-2학기 한국장학재단 국가근로장학금 신청 학생",
+    "5. 선발기준",
+    "가. 공통사항: 2026학년도 2학기 국가근로장학사업 신청 완료자 중 한국장학재단의 기본 요건 통과자",
+    "- 각 희망근로지 신청자 중 학자금지원구간 순 선발(기초생활수급자, 차상위 ······ 8구간, 9구간 순)",
+    "- 동점 시 직전학기 성적 - 우선선발권장 사유자(다자녀,장애인,자립준비청년만 해당) - 직전학기 미선발자 - 전체학기 성적 순",
+    "나. 선발 심사 당시의 학자금 지원구간, 학적상태(휴학 등) 반영 예정"
+   ],
+   "excerpts": [
+    "○ 신청기간: 2026.11.05.(목) ~ 11.18.(수)",
+    "신청대상: 26-2학기 한국장학재단 국가근로장학금 신청 학생",
+    "신청기간: ~11.15.(일) 23:59 까지 [기한엄수]",
+    "신청방법: 네이버 폼 제출 [ https://naver.me/GrgraOja ]"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   }
  ]
 }

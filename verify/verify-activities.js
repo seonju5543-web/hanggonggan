@@ -29,10 +29,12 @@ const iso = (days) => { const d = new Date(); d.setDate(d.getDate() + days); ret
 const FIXTURE = {
   updatedAt: '2026-09-25',
   items: [
-    { title: '2026 대학생 해외봉사단 모집', url: 'https://dep.hufs.ac.kr/bbs/x/1', kind: '대외활동', field: '봉사', school: '한국외국어대학교', campus: '', foundAt: '2026-09-25', attachments: [], deadlineHint: '신청기간 : 2026. 10. 1. ~ 10. 15.',
+    { id: 'act-fixture1', title: '2026 대학생 해외봉사단 모집', url: 'https://dep.hufs.ac.kr/bbs/x/1', kind: '대외활동', field: '봉사', school: '한국외국어대학교', campus: '', foundAt: '2026-09-25', attachments: [{ name: '참가신청서.hwp', url: 'https://dep.hufs.ac.kr/bbs/x/1/f1' }], deadlineHint: '신청기간 : 2026. 10. 1. ~ 10. 15.',
       deadline: iso(5), excerpts: [{ label: '모집기간', text: '2026. 10. 1. ~ 10. 15.' }, { label: '혜택', text: '항공료 전액 지원' }],
       /* 자격 줄 (2026-10-01) — 장학과 같은 엔진이 판정한다: 나이 범위 ✓ */
-      eligibilityLines: ['만 19~34세 대한민국 국민'], noticeLines: ['봉사단은 5개국에 파견합니다.'] },
+      eligibilityLines: ['만 19~34세 대한민국 국민'], noticeLines: ['봉사단은 5개국에 파견합니다.'],
+      /* 제출 서류·신청서 원본 PDF (2026-10-30) — 로봇이 원문 「제출서류」 절에서 적은 목록 · forms-pdf 색인은 아래 가짜 응답(FORMS_PDF_FIXTURE)이 준다 */
+      documents: ['참가신청서 1부', '개인정보 수집·이용 동의서 1부'] },
     /* 마감이 지난 글 — 파일에는 있지만 화면에는 없어야 한다 (2026-09-29) */
     { title: '지난 공모전 — 보이면 안 된다', url: 'https://dep.hufs.ac.kr/bbs/x/6', kind: '공모전', school: '한국외국어대학교', campus: '', foundAt: '2026-09-26', attachments: [], deadline: iso(-3) },
     /* 나이가 확실히 안 맞는 글 — 23살 학생에게 '지원 자격 미달' (적합도순에서 맨 아래).
@@ -45,6 +47,12 @@ const FIXTURE = {
     { title: '숨긴 글 — 보이면 안 된다', url: 'https://dep.hufs.ac.kr/bbs/x/5', kind: '대외활동', school: '한국외국어대학교', campus: '', foundAt: '2026-09-27', attachments: [], hidden: true },
   ],
 };
+
+/* 신청서 원본 PDF 색인(data/forms-pdf/index.json) — 활동 글의 열쇠는 글 id · 장학 등록분과 같은 로봇·같은 색인 */
+const FORMS_PDF_FIXTURE = { updatedAt: '2026-10-30', items: { 'act-fixture1': [{ file: 'act-fixture1/1-form.pdf', name: '참가신청서.hwp', pages: 2, bytes: 20480, from: '원본 그대로 변환' }] } };
+/* 그 PDF 의 빈칸 장부(collector/form-fields.mjs 가 만드는 꼴) — 활동 글도 같은 로봇·같은 장부(2026-10-31). 학교 칸은 학적정보로 먼저 채워진다 */
+const FIELDS_FIXTURE = { updatedAt: '2026-10-31', files: { '1-form.pdf': { dir: '1-pages', pages: [{ n: 1, w: 595, h: 842, img: '1.webp' }],
+  fields: [{ id: 'f1', page: 1, x: 100, y: 120, w: 220, h: 20, label: '소속 학교', key: 'school' }, { id: 'f2', page: 1, x: 100, y: 160, w: 220, h: 20, label: '참가 분야' }] } } };
 
 const EXT_FIXTURE = {
   updatedAt: '2026-09-26',
@@ -81,6 +89,8 @@ async function fresh(browser, mode, ext = EXT_FIXTURE, profile = PROFILE) {
   await page.route('**/data/external.json*', (route) => (mode === 'fail'
     ? route.abort()
     : route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(ext) })));
+  await page.route('**/data/forms-pdf/index.json*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(FORMS_PDF_FIXTURE) }));
+  await page.route('**/data/forms-pdf/act-fixture1/fields.json*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(FIELDS_FIXTURE) }));
   await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(1200);
   await dismissNotify(page);
@@ -157,13 +167,39 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
       e.querySelector('.sheet-top .badge-kind').textContent.trim(), !!e.querySelector('.sheet-top .sch-org'), e.querySelector('.sheet-top .badge-dday').textContent.trim(), !!e.querySelector('.sheet-provider')]),
       ['2026 대학생 해외봉사단 모집', '항공료 전액 지원', '봉사', false, 'D-5', false]);   // 학교 게시판 글 — 머리줄에 주최 글자 없음(2026-11-02 개발자 결정)
     /* 기간은 발췌 「모집기간」 원문 그대로(리뷰 2026-11-02 — 마감만 적으면 시작일이 사라진다) · 없을 때만 ~마감 */
-    eq('⑤ 「접수」 절 — 기간은 발췌 모집기간 원문 그대로 · 방법은 원문 확인(활동 글은 서류 줄 없음)', await page.$$eval('#detail-sheet .apply-rows li', (li) => li.map((x) => x.textContent.trim().replace(/\s+/g, ' '))), ['기간2026. 10. 1. ~ 10. 15.', '방법원문 확인']);
+    eq('⑤ 「접수」 절 — 기간은 발췌 모집기간 원문 그대로 · 방법은 원문 확인 · 서류는 원문에서 읽은 제출 서류(11-11 · activityDocuments)', await page.$$eval('#detail-sheet .apply-rows li', (li) => li.map((x) => x.textContent.trim().replace(/\s+/g, ' '))), ['기간2026. 10. 1. ~ 10. 15.', '방법원문 확인', '서류참가신청서 1부 · 개인정보 수집·이용 동의서 1부']);
     eq('⑤ 지원 자격 — 장학 시트와 같은 머리(적합도 · 요건 n개 중 n개 충족)와 ✓ 줄',
       await page.$eval('#detail-sheet', (e) => [e.querySelector('.sheet-verdict h4').textContent.trim(), /요건 1개 중 1개 충족/.test(e.querySelector('.sheet-verdict').textContent),
         [...e.querySelectorAll('.reason-list li')].map((li) => li.textContent.trim())]),
       ['지원 자격', true, ['✓ 만 19~34세 대한민국 국민']]);
     eq('⑤ 지원 가능 알약은 없다(활동 글엔 구조화 조건이 없어 늘 가능 — 거짓 안심)', await page.$$eval('#detail-sheet .status-pill', (e) => e.length), 0);
     eq('⑤ 공고 원문 안내 — 원문 문장 그대로', await page.$$eval('#detail-sheet .doc-list', (u) => u.map((x) => x.textContent.trim()).some((t) => t.includes('봉사단은 5개국에 파견합니다.'))), true);
+    /* 제출 서류 · 신청서 원본 PDF · 양식 채우기 (2026-10-30~31 공동개발자 "공모전 신청 양식이 매우 미흡") — 승인 시트(11-02)의 자리 둘: 「접수 · 서류」 줄 · 「첨부」 맨 위 */
+    eq('⑤ 접수 · 서류 — 활동 글이 원문 「제출서류」 절에서 읽은 서류를 장학 시트와 같은 줄에 (점으로 잇는다)', await page.$eval('#detail-sheet', (e) => {
+      const li = [...e.querySelectorAll('.apply-rows li')].find((x) => (x.querySelector('.ns-k') || {}).textContent === '서류');
+      return li ? li.textContent.replace(/^서류/, '').trim() : null;
+    }), '참가신청서 1부 · 개인정보 수집·이용 동의서 1부');
+    eq('⑤ 첨부 맨 위 — 로봇이 바꿔 둔 원본 PDF 줄 「원본 양식 그대로 보기」 · 새 탭 · data/forms-pdf/ 주소 · 쪽 수 · 그 아래 원본 첨부 줄은 그대로', await page.$eval('#detail-sheet', (e) => {
+      const h = [...e.querySelectorAll('h4')].find((x) => /^첨부/.test(x.textContent.trim()));
+      if (!h) return null;
+      const ul = h.nextElementSibling; const a = ul.querySelector('li a');
+      return [a.textContent.trim(), a.target, a.getAttribute('href'), /2쪽/.test(ul.textContent), ul.querySelectorAll('li.att:not(.att-row)').length];
+    }), ['원본 양식 그대로 보기', '_blank', 'data/forms-pdf/act-fixture1/1-form.pdf', true, 1]);
+    /* 「양식 채우기」(2026-10-31) — 빈칸 장부가 있는 활동 글 PDF 에도 장학과 같은 단추가 서고, 누르면 같은 화면(formfill.js)이 그 글 이름으로 열린다 */
+    await page.waitForSelector('#detail-sheet .fill-open', { timeout: 4000 }).catch(() => {});
+    eq('⑤ 양식 채우기 — 빈칸을 찾은 활동 글 PDF 밑에 단추(빈칸 수 · 학적정보로 먼저 채울 수)', await page.$eval('#detail-sheet', (e) => {
+      const b = e.querySelector('.fill-open');
+      return b ? [b.dataset.id, /빈칸 2개/.test(b.textContent), /학적정보로 1개/.test(b.textContent)] : null;
+    }), ['act-fixture1', true, true]);
+    await page.click('#detail-sheet .fill-open'); await page.waitForTimeout(600);
+    eq('⑤ 누르면 양식 채우기 화면이 그 글 이름으로 열리고 · 학교 칸이 학적정보로 채워져 있고 · 남은 칸 1',
+      await page.evaluate(() => [!document.querySelector('#screen-formfill').hidden, document.querySelector('#fill-title').textContent.trim(),
+        (document.querySelector('#fill-pages .fillp-field[data-fid="f1"]') || {}).value, document.querySelector('#fill-left').textContent.trim()]),
+      [true, '2026 대학생 해외봉사단 모집', '한국외국어대학교', '남은 칸 1']);
+    await page.click('#btn-fill-back'); await page.waitForTimeout(500);
+    eq('⑤ 돌아가기는 대외활동 화면으로', await page.$$eval('.screen', (sc) => sc.filter((x) => !x.hidden).map((x) => x.id)), ['screen-activities']);
+    /* 아래 줄들은 시트를 다시 연 상태에서 잰다 — 양식 채우기가 시트를 닫았다 */
+    await page.click('#activities-list [data-activity]'); await page.waitForTimeout(500);
     eq('⑤ 원문 단추는 그 글 주소를 새 탭으로 — 글 하나로 가는 주소라 「원문에서 신청하기 ↗」(시안 2026-11-02)', await page.$eval('#detail-sheet a.btn-primary', (a) => [a.getAttribute('href'), a.target, a.textContent.trim()]), ['https://dep.hufs.ac.kr/bbs/x/1', '_blank', '원문에서 신청하기 ↗']);   // 2026-10-19 개발자: "자세한 공고는 원문 공고에서 확인하라 하면서 … 원문공고 하이퍼링크"
     eq('⑤ 단추 글자에 밑줄이 없다', await page.$eval('#detail-sheet a.btn-primary', (a) => getComputedStyle(a).textDecorationLine), 'none');
     await page.keyboard.press('Escape'); await page.waitForTimeout(500);

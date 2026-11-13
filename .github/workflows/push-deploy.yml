@@ -45,7 +45,7 @@ jobs:
     env:
       HEALTH_URL: https://handaejang-push.seonju5543.workers.dev/health
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: claude/nice-heisenberg-WESq5     # 버튼으로 눌러도 기본 브랜치의 판을 올린다(다른 브랜치의 덜 된 판이 운영에 가지 않게)
           sparse-checkout: |
@@ -54,9 +54,9 @@ jobs:
             server/push
             server/shared
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
 
       - name: 판 도장
         id: stamp

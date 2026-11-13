@@ -1,7 +1,44 @@
 {
  "school": "동국대학교 WISE캠퍼스",
- "updatedAt": "2026-11-11",
+ "updatedAt": "2026-11-12",
  "items": [
+  {
+   "title": "2026학년도 겨울학기(동계방학) 금장생활관 이용 안내",
+   "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/521170",
+   "postedAt": "2026-11-12",
+   "postId": "521170",
+   "kind": "생활",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "src": "b8e598c1",
+   "foundAt": "2026-11-12",
+   "desc": "[ 동계방학 / 계절학기 패키지 ]- 재학용 전용 1) 2026- 겨울학기 ( 동계방학 ) 기간 중 계절학기 수강 등 학습목적의 생활관 이용 기회 제공"
+  },
+  {
+   "title": "[동국미디어센터] 12월의 담벼락톡 \"병오를 보내고 정미를 맞으며\" 사연모집",
+   "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/521168",
+   "postedAt": "2026-11-12",
+   "postId": "521168",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "src": "b8e598c1",
+   "foundAt": "2026-11-12",
+   "thumb": "data/news/img/cda4aa0f902e5a74.webp",
+   "desc": "2026 년은 붉은 말의 해인 병오년이고 , 다가올 2027 년은 붉은 양의 해인 정미년입니다."
+  },
+  {
+   "title": "[혁신] 2026 대학혁신지원사업 우수성과 포럼 개최 안내 '간식과 선물 받아가세요'",
+   "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/521165",
+   "postedAt": "2026-11-12",
+   "postId": "521165",
+   "kind": "행사",
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "src": "b8e598c1",
+   "foundAt": "2026-11-12",
+   "thumb": "data/news/img/ba55c079c82b70e9.webp",
+   "desc": "동국대학교 WISE캠퍼스 대학혁신지원사업 우수성과포럼을 개최합니다. 이번 포럼에서는 대학혁신지원사업의 우수성과와 우수사례 공모전 수상작을 함께 공유하며, 우리 대학의 변화와 성과를 만나볼 수 있습니다."
+  },
   {
    "title": "제19대 외국인 유학생 학생회 선거 후보자 등록 공고",
    "url": "https://wise.dongguk.ac.kr/article/generalnotice/detail/521161",

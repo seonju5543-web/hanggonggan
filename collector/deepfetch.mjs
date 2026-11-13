@@ -1,6 +1,7 @@
 /* 심층 수집: notices.json의 모든 공고 본문 전문 + 지정 공고의 첨부파일 원본을
    저장소(collector/extracted/)에 저장한다. 정식 등록 큐레이션의 원천 자료. */
 import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { htmlToLines } from './html-text.mjs';
 import { isHtmlPayload, resolveJsDownload } from './attachment-link.mjs';
 /* 요청 머리말은 http-headers.mjs 한 곳에 있다 — 베껴 두면 한쪽만 고쳐져
@@ -307,18 +308,40 @@ async function downloadForms() {
   if (targets.length > capped.length) console.log(`첨부 대상 ${targets.length}건 중 ${capped.length}건만 이번에 받는다 (나머지는 다음 실행)`);
   console.log(`첨부 원본 수집 대상 ${capped.length}건 (표적 ${DOWNLOAD_FORMS_FOR.length}개)`);
 
-  const refreshing = new Set(capped.map((n) => slugOf(n.title)));
-  // 이번에 다시 받는 공고의 예전 파일만 지운다 (다른 공고의 대기 중 원본은 보존)
-  for (const f of fs.readdirSync(OUT)) {
-    const m = f.match(/^form-([a-z0-9]{1,6})-/);
-    if (m && refreshing.has(m[1])) fs.unlinkSync(new URL(f, OUT));
-  }
+  /* ── 남는 자리는 '아직 못 받은 신청서'로 (2026-10-30 · form-pdf.mjs pickFormBacklog) ─────────────
+     사람이 적은 표적만 받던 탓에 매일 돌아도 새 공고의 신청서는 한 건도 안 받았다(10-23~30 실측 · 마감 전 16건이 원본 없음).
+     정식 등록(data/registered.json)·대외활동(data/activities.json · 글 id)의 마감 전 글 가운데 신청서 첨부(data.js isApplicationForm + PDF 꼴)가 있는데
+     forms-index 에 원본이 없는 것을 마감 가까운 순으로 고른다. 받는 것은 **그 글의 신청서 첨부만** — 공고문은 자격 로봇(--elig-attach)이 따로 받는다.
+     🔴 시도했는데 못 받은 글은 forms-tried.json 에 날짜를 적고 사흘 쉰다(로그인 벽·깨진 주소를 매일 두드리지 않는다 · 예산에 잘린 것은 안 적는다). 받으면 지운다.
+     🔴 밀린 목록은 심층 수집 워크플로(deep-fetch.yml · FORMS_BACKLOG=1)에서만 — 수집 로봇 둘도 --forms-only 를 도는데 대기줄이 달라 동시에 돌면 장부를 서로 덮는다. */
+  const today = kstToday();
+  const triedPath = new URL('forms-tried.json', OUT);
+  let tried = {};
+  try { tried = JSON.parse(fs.readFileSync(triedPath, 'utf8')) || {}; } catch { /* 첫 실행 */ }
+  let backlog = [];
+  process.env.FORM_PDF_AS_LIB = '1';
+  const FP = await import('./form-pdf.mjs');   // 순수 함수 묶음(밀린 목록 고르기 · 갈아끼울 옛 줄 고르기) — AS_LIB 라 본편은 안 돈다
+  if (process.env.FORMS_BACKLOG === '1') try {
+    const reg = JSON.parse(fs.readFileSync(new URL('../data/registered.json', HERE), 'utf8'));
+    const root = fileURLToPath(new URL('..', HERE));
+    const rows = FP.parseFormsIndex(fs.existsSync(new URL('forms-index.txt', OUT)) ? fs.readFileSync(new URL('forms-index.txt', OUT), 'utf8') : '');
+    const { isApplicationForm } = FP.loadFormRules(root);
+    const manualTitles = new Set(capped.map((n) => n.title));
+    backlog = FP.pickFormBacklog([...(reg.items || []), ...FP.loadActivities(root)], rows, { today, isApplicationForm, tried, max: Math.max(0, MAX_NOTICES - capped.length) })
+      .filter(({ it }) => !manualTitles.has(it.boardTitle || it.name || it.title));
+  } catch (e) { console.log('신청서 밀린 목록을 못 골랐다 (표적만 받는다):', e.message); }
+  console.log(process.env.FORMS_BACKLOG === '1' ? `아직 못 받은 신청서 원본 — 이번에 ${backlog.length}건 (쉬는 중 ${Object.keys(tried).length}건)` : '밀린 신청서 목록은 심층 수집 워크플로만 받는다(FORMS_BACKLOG 없음)');
+  /* 표적 공고(피드 행 · 첨부 전부)와 밀린 글(등록분·활동 글 · 신청서 첨부만)을 한 줄로 — 아래 내려받기 고리는 같다 */
+  const jobs = [...capped.map((n) => ({ title: n.title, url: n.url, atts: n.attachments || [], regId: null })),
+    ...backlog.map(({ it, atts }) => ({ title: it.boardTitle || it.name || it.title, url: it.sourceUrl || it.url || '', atts, regId: it.id }))];
+
+  /* 🔴 옛 파일은 **새 파일을 받은 뒤에만** 갈아끼운다 — 미리 지우면 예산에 잘리거나 전부 실패한 공고는 원본·미리보기 글자를 잃은 채 다음 실행까지 간다
+     (2026-10-30 1ms 예산 실측: 표적 9건의 파일 17개가 지워지고 하나도 안 받아졌다). 새 파일은 그 제목의 옛 번호 뒤부터 매겨 덮어쓰지 않고,
+     표적 공고는 하나라도 받았을 때 옛 파일·옛 줄을 지운다 · 밀린 글은 옛 파일을 두고 덧붙이며 색인 줄에 제 id 를 적는다(같은 제목의 다른 학교 글과 섞이지 않게). */
   const indexPath = new URL('forms-index.txt', OUT);
   let indexLines = [];
-  try {
-    indexLines = fs.readFileSync(indexPath, 'utf8').split('\n').filter(Boolean)
-      .filter((line) => { const m = line.split('\t')[0].match(/^form-([a-z0-9]{1,6})-/); return m && !refreshing.has(m[1]); });
-  } catch { /* 첫 실행 */ }
+  try { indexLines = fs.readFileSync(indexPath, 'utf8').split('\n').filter(Boolean); } catch { /* 첫 실행 */ }
+  const fileNo = (line) => line.split('\t')[0].match(/^form-[a-z0-9]{1,6}-(\d+)\./);
   /* 🔴 표적으로 받은 **공고문류**는 자격 색인(elig-docs.json)에도 올린다 (2026-11-02). 그 전엔 form-* 파일과 forms-index.txt 에만 남아 발췌기
      qualFromDocs(elig 색인만 읽는다)가 영영 못 봤다 — 10-30·10-31 에 자격 확보 목적으로 건 재수집(인석·선원가족·계양구·푸른등대)이 헛돈 이유.
      등록 공고(원문 주소 같음)만 · 신청서·동의서·체크리스트는 안 올린다(isNoticeDoc 한 곳) · 파일 이름(elig-<등록 이름 표식>-n)·갈아끼우기·색인은
@@ -329,22 +352,26 @@ async function downloadForms() {
   const eligIdxPath = new URL('elig-docs.json', OUT);
   let eligIndex = {};
   try { eligIndex = JSON.parse(fs.readFileSync(eligIdxPath, 'utf8')); } catch { /* 아직 없음 */ }
-  const today = kstToday();
   let eligDirty = false;
   let fi = 0;
-  for (const n of capped) {
+  for (const n of jobs) {
     if (Date.now() - startedAt > BUDGET_MS) { console.log('첨부 수집 시간 상한 도달 — 나머지는 다음 실행이 받는다'); break; }
     const slug = slugOf(n.title);
-    let ai = 0;
-    const it = regByUrl.get(canonUrl(n.url));
+    const mine = (line) => line.split('\t')[0].startsWith(`form-${slug}-`);
+    let ai = Math.max(0, ...indexLines.filter(mine).map((line) => { const m = fileNo(line); return m ? Number(m[1]) : 0; }));
+    const before = fi;
+    const written = new Set();
+    let attempted = false, budgetHit = false;
+    /* 자격 색인 사본은 표적 공고만(밀린 글은 신청서 첨부만 받아 공고문류가 없다) */
+    const it = n.regId ? null : regByUrl.get(canonUrl(n.url));
     const eslug = it ? slugOf(it.name) : '';
     const eligOld = it ? fs.readdirSync(OUT).filter((f) => f.startsWith(`elig-${eslug}-`)) : [];
     const eligFiles = [];
     let ei = 0;
-    let cut = false;
-    for (const a of n.attachments || []) {
+    for (const a of n.atts) {
       if (/부속기관|부설/.test(a.name)) continue; // 사이트 공통 링크 제외
-      if (Date.now() - startedAt > BUDGET_MS) { cut = true; break; }
+      if (Date.now() - startedAt > BUDGET_MS) { budgetHit = true; break; }
+      attempted = true;
       try {
         const url = fetchUrlOf(a, n.url);
         if (!url) { console.log('attach skip (스크립트 주소를 못 풀었음):', a.name); continue; }
@@ -359,7 +386,8 @@ async function downloadForms() {
         const ext = (a.name.match(/\.(hwp|hwpx|doc|docx|pdf|xls|xlsx|zip)$/i) || [, 'bin'])[1];
         const fname = `form-${slug}-${ai}.${ext}`;
         fs.writeFileSync(new URL(fname, OUT), buf);
-        indexLines.push(`${fname}\t${n.title}\t${a.name}\t${buf.length}`);
+        written.add(fname);
+        indexLines.push(`${fname}\t${n.title}\t${a.name}\t${buf.length}${n.regId ? `\t${n.regId}` : ''}`);
         console.log('attach ok:', a.name, buf.length);
         /* 등록 공고의 공고문류 → 자격 색인 사본 (위 머리말) · zip 은 안의 공고문류만(zipNoticeDocs 한 곳 · 없으면 안 올린다) */
         if (it && /\.(hwp|hwpx|docx?|pdf|zip)$/i.test(a.name) && isNoticeDoc(a.name)) {
@@ -373,15 +401,31 @@ async function downloadForms() {
         }
       } catch (e) { console.log('attach err', a.name, errWhy(e)); }
     }
-    /* 예산에 잘린 공고는 색인을 안 건드린다(옛 파일·파생을 미리 지우지 않는다 — downloadEligDocs 와 같은 방침) */
-    if (eligFiles.length && !cut) {
+    /* 표적 공고의 갈아끼우기 — **이 일이 같은 첨부 이름으로 새로 받은 원본만** 옛 것을 대신한다(2026-11-12 리뷰 확정 둘):
+       ① 지우는 줄은 제목이 이 공고와 **똑같고** id 칸이 없는 옛 줄 가운데, 첨부 이름이 이번에 새로 저장한 것과 같은 줄뿐이다 —
+          파일 이름 머리(form-<제목 지문>-)로 지우면 같은 제목을 쓴 다른 학교 글(통영시 장학금 6개교 등)과 밀린 목록이 id 를 달아 받은 원본까지 지웠다.
+       ② 예산에 잘렸거나 일부 첨부를 못 받았으면 못 받은 첨부의 옛 원본은 그대로 둔다(전엔 하나만 받아도 옛 셋을 다 지웠다).
+       지운 줄의 파일은 파생 글자(<파일>.txt · .body.txt · .ocr.txt)와 같이 지운다. */
+    if (!n.regId) {
+      const stale = FP.staleFormRows(indexLines, { title: n.title, written, budgetHit });
+      const staleFiles = stale.map((line) => line.split('\t')[0]);
+      for (const f of fs.readdirSync(OUT)) if (staleFiles.some((sf) => f === sf || f.startsWith(`${sf}.`))) fs.unlinkSync(new URL(f, OUT));
+      const gone = new Set(stale);
+      indexLines = indexLines.filter((line) => !gone.has(line));
+    }
+    /* 예산에 잘린 공고는 자격 색인을 안 건드린다(옛 파일·파생을 미리 지우지 않는다 — downloadEligDocs 와 같은 방침) */
+    if (eligFiles.length && !budgetHit) {
       settleEligIndex(eligIndex, it.id, eslug, eligFiles, eligOld, today);
       eligDirty = true;
       console.log('elig index ok (표적 양식 → 자격 색인):', it.id, eligFiles.join(' '));
     }
+    /* 밀린 글의 쉼 장부 — **시도했는데** 하나도 못 받았으면 오늘 날짜(사흘 쉼) · 받았으면 지운다 · 예산에 잘려 시작도 못 한 것은 적지 않는다 */
+    if (n.regId) { if (fi > before) delete tried[n.regId]; else if (attempted && !budgetHit) tried[n.regId] = today; }
   }
   fs.writeFileSync(indexPath, indexLines.join('\n') + (indexLines.length ? '\n' : ''));
   if (eligDirty) fs.writeFileSync(eligIdxPath, JSON.stringify(eligIndex, null, 1));
+  const keep = Object.fromEntries(Object.entries(tried).filter(([, at]) => /^\d{4}-\d{2}-\d{2}$/.test(String(at)) && (new Date(today) - new Date(at)) / 86400000 < 30));
+  fs.writeFileSync(triedPath, JSON.stringify(keep, null, 1) + '\n');
   return fi;
 }
 

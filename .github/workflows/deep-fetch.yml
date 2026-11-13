@@ -43,15 +43,16 @@ jobs:
     # 학교를 더 붙일수록 '한 곳이 안 열려 멈추는' 확률도 같이 오른다.
     timeout-minutes: 42   # 첨부 원본 내려받기 + OCR 4분 (2026-09-17) + 신청서 PDF 8분 (2026-10-12)
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
         run: bash tools/setup-collab.sh
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
       - env:
           FORM_TARGETS: ${{ inputs.form_targets || '' }}   # 비우면 run-deepfetch.txt의 targets: 줄 사용
+          FORMS_BACKLOG: '1'   # 밀린 신청서 원본(마감 전 등록·활동 글의 신청서 첨부)은 이 워크플로만 받는다 — 수집 로봇 둘의 --forms-only 는 표적만(쉼 장부·색인 동시 쓰기 방지 · 2026-10-30)
         # 예약 실행은 첨부 원본만(--forms-only · 2026-10-24 리뷰) — 본문 전문은 수집 로봇의 증분(--fill)이 날마다 받는다. 전체 모드로 매일 돌면 44개교를 밤마다 800번 두드린다.
         run: node collector/deepfetch.mjs ${{ github.event_name == 'schedule' && '--forms-only' || '' }}
       - name: HWP 미리보기 텍스트 추출 (양식 스키마화 원천 자료)

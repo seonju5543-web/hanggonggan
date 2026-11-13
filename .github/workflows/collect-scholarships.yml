@@ -43,7 +43,7 @@ jobs:
     # 그 단계의 예산(HARVEST_BUDGET_MS)을 줄이고, 상한은 그 합을 담는 그릇으로만 쓴다(8/2~3 사고의 교훈).
     timeout-minutes: 86   # 2026-11-10 되돌리기 단계 5 → 7분(--keep-preexisting 로 관문 한 번 더) · 단계 합 79 + 여유 5 — 2026-10-31 자격 줄 전수 집계 2 · 2026-10-29 읽지 못한 공고 현황 2 · 2026-10-28 PaddleOCR 설치 경보 짝 1+1 · 2026-10-23 발췌 단계 시한 6 + 경보 짝 1+1(보강 단계로) · 2026-10-11 관문 다시 재기 3 → 5분(관문 한 번 ~55초 실측) + 끝내 빨간불 경보·닫기 짝 1+1 (2026-10-05 장학 포스터 PaddleOCR 단계 7분 + 2026-10-04 관문 다시 재기 3분 → 61+5 · 2026-10-03 대외활동 첨부·포스터 9분 → 51+5 · 2026-09-30 판정 로봇 2분 → 42+3)
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # 🔴 대기줄(collector)에서 기다린 뒤에는 **지금 브랜치 끝**에서 시작한다 (2026-09-30).
           #    기본값(GITHUB_SHA)은 큐에 들어간 시점에 굳어서, 앞 로봇이 저장한 커밋 위로 rebase 하다
@@ -53,12 +53,12 @@ jobs:
       - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
         run: bash tools/setup-collab.sh
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
       # 🔴 파이썬 판을 고정한다 (2026-10-28) — PaddleOCR 바퀴는 cp39~cp313 뿐인데 러너 기본 파이썬이 그 밖이라 `paddlepaddle==3.2.0 (from versions: none)`
       #    으로 설치가 매일 실패했고(10-24~27 실측 · 경고만 남고 초록불), 포스터·첨부 자격 읽기가 통째로 비어 있었다(활동 글 자격 빈 30건의 주된 원인).
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
 
@@ -433,7 +433,7 @@ jobs:
 
       - name: 못 넣은 수집분 보관 (저장 실패 때만)
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: unsaved-${{ github.run_id }}
           path: unsaved/

@@ -43,7 +43,7 @@ export const SOFFICE_TIMEOUT_MS = 60000;
 export const FONT_STAMP = 'ko-nanum-1';
 
 /* data.js 의 신청서 판정을 **불러 쓴다**(베끼면 앱과 로봇이 다른 첨부를 신청서라 부른다). data.js 는 브라우저 파일이라 함수를 이름으로 떼어 온다. */
-function loadFormRules(root) {
+export function loadFormRules(root) {
   const src = fs.readFileSync(path.join(root, 'data.js'), 'utf8');
   const take = (name) => {
     const m = src.match(new RegExp(`^function ${name}\\([\\s\\S]*?^\\}`, 'm'));
@@ -55,11 +55,19 @@ function loadFormRules(root) {
   return { isApplicationForm: vm.runInContext('isApplicationForm', ctx) };
 }
 
-/* forms-index.txt 줄 → { file, title, attach, bytes } */
+/* 활동 피드(data/activities.json)의 글 — id 있는 것만(수집 로봇이 idFromUrl('act-') 로 준다 · API 글은 제 id) · 없으면 빈 배열 */
+export function loadActivities(root) {
+  try { const j = JSON.parse(fs.readFileSync(path.join(root, 'data', 'activities.json'), 'utf8')); return (j.items || []).filter((it) => it && it.id && it.url); } catch { return []; }
+}
+
+/* forms-index.txt 줄 → { file, title, attach, bytes, id } — 다섯째 칸 id 는 밀린 목록이 받은 줄에만 있다(2026-10-30 리뷰: 같은 제목의 두 학교 글이 한 원본을 나눠 쓰던 것) */
 export function parseFormsIndex(text) {
   return String(text || '').split('\n').filter(Boolean).map((line) => {
-    const [file, title, attach, bytes] = line.split('\t');
-    return file && attach ? { file, title: title || '', attach, bytes: Number(bytes) || 0 } : null;
+    const [file, title, attach, bytes, id] = line.split('\t');
+    if (!file || !attach) return null;
+    const row = { file, title: title || '', attach, bytes: Number(bytes) || 0 };
+    if (id && id.trim()) row.id = id.trim();   // 옛 줄(넷째 칸까지)은 모양 그대로 — id 칸은 있을 때만
+    return row;
   }).filter(Boolean);
 }
 
@@ -70,19 +78,62 @@ export const isOpen = (it, today) => !it.deadline || String(it.deadline) >= toda
 export function pickFormTargets(items, indexRows, { today, isApplicationForm }) {
   const out = []; const missing = [];
   for (const it of items || []) {
-    if (!it || !it.id || it.program || !isOpen(it, today)) continue;
+    if (!it || !it.id || it.program || it.hidden || !isOpen(it, today)) continue;
     const forms = (it.attachments || []).filter((a) => (isApplicationForm(a) || PDF_FORM(a)) && CONVERTIBLE.test(a.name || ''));
     if (!forms.length) continue;
-    const titles = [it.boardTitle, it.name].filter(Boolean);
+    const titles = [it.boardTitle, it.name, it.title].filter(Boolean);   // 활동 글(data/activities.json)은 title 하나 — 같은 줄 꼴로 색인에 적혀 있다(2026-10-30)
     const files = [];
     for (const a of forms) {
-      const row = indexRows.find((r) => r.attach === a.name && titles.some((t) => sameTitle(t, r.title)));
+      /* id 가 적힌 줄은 **그 공고 것만** 쓴다(제목이 같은 다른 학교 글에 넘기지 않는다) · id 없는 옛 줄(사람 표적)은 제목으로 */
+      const row = indexRows.find((r) => r.attach === a.name && r.id && r.id === it.id)
+        || indexRows.find((r) => r.attach === a.name && !r.id && titles.some((t) => sameTitle(t, r.title)));
       if (row) files.push({ src: row.file, name: a.name, srcBytes: row.bytes || 0 });
       else missing.push({ id: it.id, name: a.name });
     }
-    if (files.length) out.push({ id: it.id, name: it.name || it.id, deadline: it.deadline || '', files });
+    if (files.length) out.push({ id: it.id, name: it.name || it.title || it.id, deadline: it.deadline || '', files });
   }
   return { targets: out, missing };
+}
+
+/* ── 아직 못 받은 신청서 원본을 로봇이 스스로 고른다 (2026-10-30) ───────────────────────────
+   🔴 왜: 신청서 원본을 받는 로봇(deepfetch --forms-only · 매일 03:33)은 사람이 run-deepfetch.txt 에 적은 제목만 받았다.
+      그래서 10-23 부터 매일 돌아도 새 공고는 한 건도 안 받았고, 마감 전 등록 공고 136건 중 16건이 '신청서 첨부는 있는데 원본은 없음'으로
+      남아 학생은 앱 지원문서만 봤다(2026-10-30 실측 · 설계 문서 §5 누수 ③). 사람이 적는 표적은 그대로 두고, 남는 자리를 이 목록이 채운다.
+   무엇을: pickFormTargets 가 「아직 못 받음」으로 센 공고(= 마감 전 · 신청서 첨부 있음 · 색인에 원본 없음)를 공고 단위로 묶는다.
+   순서: 마감이 가까운 것부터(마감 모름은 뒤) · 같은 날이면 id 순(실행마다 같은 순서 — 예산에 잘려도 다음 실행이 이어 받는다).
+   쉼: 받아 보려 했는데 못 받은 공고(tried[id] = 날짜)는 restDays 동안 다시 안 두드린다(로그인 벽·깨진 주소를 매일 두드리지 않는다).
+   돌려주는 것: [{ it, atts }] — atts 는 그 공고의 **신청서 첨부만**(공고문·결과보고서는 자격 로봇 몫 · 받는 로봇이 이 목록만 받는다). */
+export function pickFormBacklog(items, indexRows, { today, isApplicationForm, tried = {}, restDays = 3, max = 12, exclude = new Set() } = {}) {
+  const { missing } = pickFormTargets(items, indexRows, { today, isApplicationForm });
+  const byId = new Map();
+  for (const m of missing) { if (!byId.has(m.id)) byId.set(m.id, new Set()); byId.get(m.id).add(m.name); }
+  const days = (a, b) => Math.round((new Date(b + 'T00:00:00') - new Date(a + 'T00:00:00')) / 86400000);
+  const out = [];
+  for (const it of items || []) {
+    if (!it || !byId.has(it.id) || exclude.has(it.id)) continue;
+    const at = tried[it.id];
+    if (at && Number.isFinite(days(at, today)) && days(at, today) < restDays) continue;
+    const names = byId.get(it.id);
+    const atts = (it.attachments || []).filter((a) => a && a.url && names.has(a.name));
+    if (atts.length) out.push({ it, atts });
+  }
+  out.sort((a, b) => (a.it.deadline || '9999').localeCompare(b.it.deadline || '9999') || String(a.it.id).localeCompare(String(b.it.id)));
+  return out.slice(0, Math.max(0, max | 0));
+}
+
+/* 표적 공고 갈아끼우기에서 지울 옛 색인 줄 (2026-11-12 리뷰 확정 둘 · deepfetch downloadForms 가 부른다 · 순수 함수라 관문이 직접 잰다).
+   지우는 것은 **제목이 그 공고와 똑같고 id 칸이 없는** 옛 줄 가운데, 첨부 이름이 이번에 새로 저장한 것(written)과 같은 줄뿐이다.
+   ① 파일 이름 머리(form-<제목 지문>-)로 지우면 같은 제목의 다른 학교 글·밀린 목록이 id 를 달아 받은 원본까지 지운다.
+   ② 예산에 잘렸거나(budgetHit) 하나도 못 받았으면 아무것도 안 지운다 · 못 받은 첨부의 옛 원본은 남긴다. */
+export function staleFormRows(indexLines, { title, written, budgetHit = false } = {}) {
+  const w = written instanceof Set ? written : new Set(written || []);
+  if (budgetHit || !w.size) return [];
+  const cols = (line) => String(line).split('\t');
+  const savedAttach = new Set(indexLines.filter((l) => w.has(cols(l)[0])).map((l) => cols(l)[2]));
+  return indexLines.filter((l) => {
+    const [file, t, attach, , id] = cols(l);
+    return !w.has(file) && t === title && !(id || '').trim() && savedAttach.has(attach);
+  });
 }
 
 /* PDF 쪽 수 — 뷰어 없이 글자로 센다(`/Type /Page` · `/Pages` 는 뺀다). 객체 스트림(/ObjStm)에 든 PDF 는 글자로 안 보여 0 이 나온다 —
@@ -190,12 +241,14 @@ export function runFormPdf({ root, today, dry = false, soffice = process.env.FOR
   const indexPath = path.join(outDir, 'index.json');
   const reportPath = path.join(root, 'collector', 'form-pdf-report.md');
   const reg = JSON.parse(fs.readFileSync(regPath, 'utf8'));
+  /* 대외활동·공모전 글도 같은 로봇이 바꾼다(2026-10-30 · 공동개발자 "공모전 신청 양식이 매우 미흡") — 열쇠는 수집 로봇이 준 id('act-…' · api-…) · 숨긴 글은 뺀다 */
+  const items = [...(reg.items || []), ...loadActivities(root)];
   const rows = fs.existsSync(idxPath) ? parseFormsIndex(fs.readFileSync(idxPath, 'utf8')) : [];
   const { isApplicationForm } = loadFormRules(root);
-  const { targets, missing } = pickFormTargets(reg.items || [], rows, { today, isApplicationForm });
+  const { targets, missing } = pickFormTargets(items, rows, { today, isApplicationForm });
   let index = { updatedAt: today, items: {} };
   try { const j = JSON.parse(fs.readFileSync(indexPath, 'utf8')); if (j && j.items && typeof j.items === 'object') index = { ...j, items: j.items }; } catch { /* 첫 실행 */ }
-  const live = new Set((reg.items || []).filter((it) => it && it.id && isOpen(it, today)).map((it) => it.id));
+  const live = new Set(items.filter((it) => it && it.id && !it.hidden && isOpen(it, today)).map((it) => it.id));
   const dropped = dry ? Object.keys(index.items).filter((id) => !live.has(id)) : prune(index, live, outDir);
   const done = []; const failed = []; const left = []; let skippedSame = 0;
   const t0 = Date.now();

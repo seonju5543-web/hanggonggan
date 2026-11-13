@@ -75,8 +75,8 @@
 3. **선조치후보고** — 방향 결정이 필요하면 최적안으로 먼저 조치하고 "어떤 상황에서 어떤 조치"를 보고.
 4. **양식 = 공고 첨부 신청서 원본 그대로**(2026-10-14 결정 6) — `collector/form-pdf.mjs` 가 PDF 사본을 `data/forms-pdf/` 에 두고 앱은 「원본 양식 그대로 보기」·「양식 채우기」(`formfill.js`). 앱이 양식을 다시 그리는 스키마화는 멈춤(`schematize-config.json` enabled:false · 있는 앱 양식은 그 공고가 닫힐 때까지).
    글꼴은 `collector/install-form-fonts.sh`(없으면 표가 깨진다). 관문 「신청서 원본 → PDF」.
-5. **정식 등록은 원본 첨부까지 한 세트** — ① `collector/run-deepfetch.txt` 에 `targets: 키워드` 적어 기본 브랜치 push(첨부 원본+미리보기 텍스트가
-   `collector/extracted/` 에 커밋되고 PDF 로봇이 같은 워크플로에서 잇는다) ② 새 `forms.json` 양식은 만들지 않는다(옛 `formId` 는 `verify/verify-registered.js`·
+5. **정식 등록은 원본 첨부까지 한 세트** — ① 마감 전 등록 공고의 신청서 첨부는 로봇이 스스로 받는다(`pickFormBacklog` · 매일 · 못 받으면 사흘 쉼) ·
+   그 밖은 `collector/run-deepfetch.txt` 에 `targets: 키워드` 적어 기본 브랜치 push(원본이 `collector/extracted/` 에 커밋되고 PDF 로봇이 잇는다) ② 새 `forms.json` 양식은 만들지 않는다(옛 `formId` 는 `verify/verify-registered.js`·
    `verify-forms-data.js` 로 검증) ③ 포털 입력형 등은 모든 수단(상세·첨부·재단 홈·정찰)을 쓴 뒤에만 묻는다. 채울 양식이 없으면 `noForm: "사유"`.
 6. **가짜 공지 금지** — 임의 공지를 보여 주지 않는다. 실존 상시 제도는 임의 마감일 없이 '상시 제도' 배지.
 7. **소급 적용** — 엔진·정책이 바뀌면 기존 데이터 전체에. 강제 장치 `node verify/audit-data.js`(바꾼 뒤 필수).
@@ -256,11 +256,11 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   주소를 짐작해 채우지 말 것 · 열쇠 글자는 `PORTAL_SYSTEMS`↔`PORTAL_SYSTEM_INFO` 같게. 관문 「포털 신청 시스템」.
 - **대외활동·공모전 탭** (2026-09-25 · 노션 UI-34): 판정은 `collector/activity-kind.mjs` `activityKind` 한 곳(장학 제도는 장학 쪽 · 공모전은 장학 낱말이 있어도 공모전) ·
   파일·장부는 장학 피드와 **따로**(`data/activities.json` · 섞으면 알림이 활동 글로 운다) · 학교 범위는 `activityForProfile` · 카드는 `noticeCardHtml` 한 벌 ·
-  출처 `activity-sources.json` 은 주소마다 `evidence`(확인한 곳)를 적는다 · 집계 사이트는 출처가 아니다. 관문 「대외활동·공모전」 · `verify-activities.js`(서비스워커를 막고 잰다).
-  관리자 「활동」 탭(`#activities`): 종류 바꾸기·숨기기(지우지 않고 `hidden` + `activity-config.json`)·출처 추가/보관 — `activityKind`·`activityHide`·`activitySource`. 관문 같은 절 ⑤ · `verify-admin.js`.
-  활동 글의 마감·발췌는 `collector/activity-excerpts.mjs` 한 곳(마감 규칙은 장학과 같은 `extractDeadline` · 나머지는 원문 문장 그대로 · 분야는 `activityField`) · 공공·재단 게시판은 `collector/robots.mjs` 로 robots.txt 를 묻고 읽는다 · 카드 D-day 는 `dday()` 한 곳. 관문 같은 절 ⑥.
-  **공공 API 로봇**(`collector/open-api.mjs` · 규칙 `collector/open-api-map.mjs`): K-Startup·1365(`DATA_GO_KR_KEY`)·온통청년(`YOUTHCENTER_KEY`·`YOUTHCENTER_CONTENT_KEY` — 🔴 포털 열쇠로 안 열린다) → 같은 `data/activities.json`(`api` 칸) · 못 받은 출처의 지난 글은 지우지 않는다 · 60일 삭제는 API 글엔 `seenAt` · 실패는 로봇 리포트 ❌ → 이슈. 관문 「공공 API 로봇」.
-  🔴 발췌기에 넘기는 상세 글자는 **줄을 살린 것**(`collector/html-text.mjs` `htmlToLines` · deepfetch·rescue 도) — 한 줄로 뭉개면 **전부 0건**이 된다. 발췌 없이 실린 글은 다음 실행이 다시 읽는다(`ACT_BACKFILL` · `excerptsAt`).
+  출처 `activity-sources.json` 은 주소마다 `evidence` · 집계 사이트는 출처가 아니다. 관문 「대외활동·공모전」 · `verify-activities.js`.
+  관리자 「활동」 탭(`#activities`): 종류 바꾸기·숨기기(`hidden` + `activity-config.json`)·출처 추가/보관 — `activityKind`·`activityHide`·`activitySource`. 관문 같은 절 ⑤ · `verify-admin.js`.
+  활동 글의 마감·발췌는 `collector/activity-excerpts.mjs` 한 곳(마감 규칙은 장학과 같은 `extractDeadline` · 분야는 `activityField` · 제출 서류는 `activityDocuments` — 장학과 같은 규칙) · 신청서 원본 PDF·「양식 채우기」는 장학과 같은 로봇·화면(열쇠는 글 id `activityId` · `fillTargetFor`) · 관문 「대외활동·공모전 — 제출 서류 · 신청서 원본 PDF」 · 공공·재단 게시판은 `collector/robots.mjs` 로 robots.txt 를 묻고 읽는다 · 카드 D-day 는 `dday()` 한 곳. 관문 같은 절 ⑥.
+  **공공 API 로봇**(`collector/open-api.mjs` · 규칙 `collector/open-api-map.mjs`): K-Startup·1365(`DATA_GO_KR_KEY`)·온통청년(`YOUTHCENTER_KEY`·`YOUTHCENTER_CONTENT_KEY` — 🔴 포털 열쇠로 안 열린다) → 같은 `data/activities.json`(`api` 칸) · 못 받은 출처의 지난 글은 안 지운다 · 60일 삭제는 `seenAt` · 실패는 리포트 ❌ → 이슈. 관문 「공공 API 로봇」.
+  🔴 발췌기에 넘기는 상세 글자는 **줄을 살린 것**(`htmlToLines`) — 뭉개면 **전부 0건**. 발췌 없는 글은 다음 실행이 다시 읽는다(`ACT_BACKFILL`).
 - **재단·지자체 게시판(교외 확대)** (2026-09-26 · 노션 F-13): 링커리어류는 크롤링이 아니라 **주최사 직접 등록**이라 긁지 않는다 — 우리는 주최의 제 게시판을 읽는다.
   출처 `collector/external-sources.json` 은 `kosaf-open.json` 의 재단 홈페이지에서 왔고, `collector/find-boards.mjs` 가 게시판을 찾아 `autoFound` 로 적는다(잘못 찾으면 `parked`).
   글은 `data/external.json`(학교 피드와 따로) → 홈 「재단·지자체 새 공고」(`externalNoticesHtml` · 등록된 주소는 `registeredUrlMatcher` 로 뺀다). 링크 읽는 눈은 `collector/board-links.mjs` 한 곳. 관문 「재단·지자체 게시판」.
@@ -272,14 +272,14 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   🔴 **목록이 보통 링크가 아닌 게시판은 `news-board-rules.mjs` 한 곳**(클릭형 onclick·data-id · 글 주소 없는 목록 표식 listOnly · API json/post) — 두 로봇이 `rowsForBoard` 하나를 부른다.
   상세 주소는 유추하지 않고, 상세가 있는 규칙은 **매번 첫 글의 상세를 열어** 그 글의 화면인지 본다(`verifyRuleDetail` · 목록 표식은 상세가 없어 건너뜀) · API 규칙은 정찰이 본 화면(`page`)만 게시판으로 올린다.
   같은 글은 **게시판의 글 번호**(`postId`)로 알아본다 — 목록 표식 주소(#n-제목)는 제목 다듬기가 바뀌면 달라져 두 번 실렸다(`collapseSamePost` · 발행 때 소급 · 숨김·git 병합도 글 번호 `newsHidden`·`newsDistinct`). 분류·캠퍼스 꼬리표는 떼지 않는다.
-  못 읽는 학교는 정찰(`run-probe.txt` `checkUrl:` — 목록 HTML · 상세 여는 방식과 주소 · 스크립트 요청·응답 · 인증서는 `certHost:`) 결과만으로 규칙을 적는다.
-  **사진 썸네일**(2026-10-03 개발자 지시): 수집 다음 단계(`collect-news-thumbs.mjs` · 보강)가 새 글부터 상세(또는 규칙의 본문 API `postContentRequest`)를 열어 본문 사진 → 첨부 그림 순으로 고르고(`news-thumb.mjs` 한 곳 · og:image 는 안 쓴다)
+  못 읽는 학교는 정찰(`run-probe.txt` `checkUrl:` · 인증서는 `certHost:`) 결과만으로 규칙을 적는다.
+  **사진 썸네일**(2026-10-03 개발자 지시): 수집 다음 단계(`collect-news-thumbs.mjs` · 보강)가 새 글부터 상세(또는 규칙의 본문 API `postContentRequest`)를 열어 본문 사진 → 첨부 그림 순으로 고르고(`news-thumb.mjs` 한 곳 · og:image 는 안 쓴다 — 전부 학교 로고였다)
   글 화면에 제목이 있는지(`pageHasTitle`)·받아서 진짜 사진인지(크기·가로세로·QR·글자뿐인 문서 그림 `looksLikeTextPage`) 본 뒤 240px WebP 로 `data/news/img/<바이트 해시>.webp` 에 둔다(서비스워커가 캐시 우선이라 이름을 다시 쓰지 않는다). 🔴 **두 글 이상에 같은 그림 = 학교 공통 그림**(로고·기본 공유 그림)이라 막는다 —
   이름 낱말은 거들 뿐. 장부 `news-thumbs.json` 을 매 실행 실린 글 전부에 다시 입히고(`applyThumbs`) 안 쓰는 그림은 지운다 · 관리자 「사진 빼기」는 `noThumb` · 전체 스위치 `news-config.json` 의 `thumbs`(on · dry=받아만 두고 카드엔 안 붙임 · off=모두 뗌). 카드는 `opts.thumb` 를 받은 소식 카드만 그린다(꼴 사본은 관문이 대조).
   **학교 대표 사진**(10-03 지시): 글의 사진이 없는 카드만 학교 사진(「학교 사진」 표시는 뺐다 — 다시 붙이지 말 것) · 출처(BY·BY-SA)는 라이선스 화면 「사진 출처」(`photoCreditsHtml`) · 위키미디어 열린 라이선스만 · 기록 `docs/designs/assets/gates/school-photo-picks.json` → `tools/build-school-photos.mjs` → `assets/schools/photos.json`. 관문 「학교 대표 사진」 · `verify-news.js` ⑥⑦.
   🔴 **소식 0건 학교는 없다**(10-03 지시): 학교마다 최근 4건은 기한이 지나도 남기고(`newsFloor`) · 글이 드문 학교는 둘째 게시판(`extraBoards` · 규칙 열쇠 `newsRuleKey`) · 0건이면 리포트 🙋 + 이슈.
-- **학자금대출**은 정식 등록 제외(대출 원금·이자를 지원하는 장학금은 제외 대상 아님 — `LOAN_EXCEPT`) · 피드에선 빼지 않고 장학 공고 뒤로 보낸다(`boardNoticesForMe`).
-- **인스타**: 🔴 게시는 사람만 누른다 · 토큰은 워크플로에만 · 한 실행 최대 6건 · 수정은 다시 그려 **보여 주고 메일 보낼지 물은 뒤** push-to-run(스킬 `insta-revise`).
+- **학자금대출**은 정식 등록 제외(이자 지원 장학금은 제외 아님 — `LOAN_EXCEPT`) · 피드에선 장학 공고 뒤로(`boardNoticesForMe`).
+- **인스타**: 🔴 게시는 사람만 누른다 · 토큰은 워크플로에만 · 한 실행 최대 6건 · 수정은 다시 그려 **보여 주고 물은 뒤** push-to-run(스킬 `insta-revise`).
   관문 `verify-insta.js` · `docs/designs/instagram-pipeline.md`.
 
 ### 화면

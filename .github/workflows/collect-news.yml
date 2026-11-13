@@ -42,16 +42,16 @@ jobs:
     #  2026-10-11 요약 단계 경보·닫기 짝(2) · 되돌리기 3 → 5 — 관문 한 번 ~55초 실측이라 두 번 재면 3분이 빠듯했다)
     timeout-minutes: 51   # 2026-11-10 되돌리기 단계 5 → 7분(--keep-preexisting 로 관문 한 번 더)
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.ref_name }}   # 대기줄에서 기다린 뒤에는 지금 브랜치 끝에서 시작한다 (collect-scholarships 와 같은 이유)
 
       - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
         run: bash tools/setup-collab.sh
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
 
       # 게시판 찾기 (보강 — 실패해도 수집은 나간다). 수집 **앞**에 두어 이번에 찾은 게시판을 같은 실행이 바로 읽는다.
       # 첫 실행은 44곳을 다 보므로 넉넉히(50곳 · 5분). 다음부터는 boardUrl 이 비고 14일 지난 학교만 본다.

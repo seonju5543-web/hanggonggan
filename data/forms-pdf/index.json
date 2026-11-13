@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-11",
+ "updatedAt": "2026-11-13",
  "items": {
   "auto-ticedoarticleno231977952": [
    {
@@ -55,18 +55,6 @@
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-10-17"
-   }
-  ],
-  "auto-kuk2351210456artclviewdo": [
-   {
-    "file": "auto-kuk2351210456artclviewdo/1-공문_붙임1_2026년_2학기_푸른등대_기부장학금_2차_사업계획서_및_업무처리기준.pdf",
-    "name": "공문_붙임1_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf",
-    "pages": 37,
-    "bytes": 742637,
-    "srcBytes": 742637,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-24"
    }
   ],
   "auto-ticedoarticleno231554919": [
@@ -148,18 +136,6 @@
     "pages": 2,
     "bytes": 93972,
     "srcBytes": 122368,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-28"
-   }
-  ],
-  "auto-enoticedoarticleno769738": [
-   {
-    "file": "auto-enoticedoarticleno769738/1-01-04.주거안정장학금_반환서약서.pdf",
-    "name": "01-04.주거안정장학금 반환서약서.hwp",
-    "pages": 2,
-    "bytes": 145027,
-    "srcBytes": 110080,
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-10-28"
@@ -257,18 +233,6 @@
     "at": "2026-11-11"
    }
   ],
-  "auto-krbbskr846077artclviewdo": [
-   {
-    "file": "auto-krbbskr846077artclviewdo/1-1._IBK기업은행_장학금_필수_개인정보_수집_이용_동의서.pdf",
-    "name": "1. IBK기업은행 장학금_필수 개인정보 수집·이용 동의서.pdf",
-    "pages": 1,
-    "bytes": 67238,
-    "srcBytes": 67238,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-11"
-   }
-  ],
   "auto-orykeywordpaged1slug2026-0ezoyxo": [
    {
     "file": "auto-orykeywordpaged1slug2026-0ezoyxo/1-2026년-숭실대-직원-추천-장학생-지원서-1.pdf",
@@ -313,6 +277,144 @@
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-11-11"
+   }
+  ],
+  "auto-ent2431271374artclviewdo": [
+   {
+    "file": "auto-ent2431271374artclviewdo/1-TESOL_영어학_장학금_신청서_자기소개서포함_1_.pdf",
+    "name": "TESOL+영어학+장학금+신청서(자기소개서포함) (1).hwp",
+    "pages": 1,
+    "bytes": 69958,
+    "srcBytes": 38912,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-12"
+   },
+   {
+    "file": "auto-ent2431271374artclviewdo/2-개인정보수집이용동의서_3_.pdf",
+    "name": "개인정보수집이용동의서 (3).hwp",
+    "pages": 1,
+    "bytes": 78371,
+    "srcBytes": 50176,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-12"
+   }
+  ],
+  "auto-ervicenoticedetail520872": [
+   {
+    "file": "auto-ervicenoticedetail520872/1-복지장학생_부모장애유형_신청서_양식_.pdf",
+    "name": "복지장학생(부모장애유형) 신청서(양식).hwp",
+    "pages": 2,
+    "bytes": 55452,
+    "srcBytes": 34304,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-13"
+   }
+  ],
+  "auto-ervicenoticedetail520869": [
+   {
+    "file": "auto-ervicenoticedetail520869/1-영어_토익_성적장학_신청서_양식_.pdf",
+    "name": "영어(토익)성적장학+신청서(양식).hwp",
+    "pages": 1,
+    "bytes": 74084,
+    "srcBytes": 37376,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-13"
+   }
+  ],
+  "auto-amepagescholarshipnotice-09j8czz": [
+   {
+    "file": "auto-amepagescholarshipnotice-09j8czz/1-관정국내장학생지원서양식_학부.pdf",
+    "name": "관정국내장학생지원서양식 학부.hwp",
+    "pages": 2,
+    "bytes": 164544,
+    "srcBytes": 54272,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-13"
+   },
+   {
+    "file": "auto-amepagescholarshipnotice-09j8czz/2-국내_개인정보수집동의서공통.pdf",
+    "name": "국내 개인정보수집동의서공통.hwp",
+    "pages": 2,
+    "bytes": 103773,
+    "srcBytes": 60928,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-13"
+   }
+  ],
+  "act-1onjwjn": [
+   {
+    "file": "act-1onjwjn/1-붙임_3._신청서_등_지원_서류.pdf",
+    "name": "붙임 3. 신청서 등 지원 서류.hwp",
+    "pages": 13,
+    "bytes": 485494,
+    "srcBytes": 140800,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-13"
+   }
+  ],
+  "act-1s5i4tu": [
+   {
+    "file": "act-1s5i4tu/1-_DRIVE_in_TOKUSHIMA_영상_공모전_참가_신청서.pdf",
+    "name": "「DRIVE in TOKUSHIMA」 영상 공모전 참가 신청서.docx",
+    "pages": 1,
+    "bytes": 132450,
+    "srcBytes": 22698,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-13"
+   }
+  ],
+  "act-07fnkog": [
+   {
+    "file": "act-07fnkog/1-붙임_지원서_양식_.pdf",
+    "name": "붙임+지원서(양식).hwp",
+    "pages": 6,
+    "bytes": 303915,
+    "srcBytes": 132096,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-13"
+   }
+  ],
+  "act-0m0311p": [
+   {
+    "file": "act-0m0311p/1-프리_텍스코어_사업계획서_양식_.pdf",
+    "name": "프리 텍스코어 사업계획서(양식).docx",
+    "pages": 2,
+    "bytes": 81713,
+    "srcBytes": 15977,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-13"
+   },
+   {
+    "file": "act-0m0311p/2-프리_텍스코어_사업계획서_양식_.pdf",
+    "name": "프리 텍스코어 사업계획서(양식).hwp",
+    "pages": 2,
+    "bytes": 69121,
+    "srcBytes": 76288,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-13"
+   }
+  ],
+  "act-0mnrtv1": [
+   {
+    "file": "act-0mnrtv1/1-_참가신청서_2026년_전남광주통합특별시_중국언어문화경진대회.pdf",
+    "name": "(참가신청서) 2026년 전남광주통합특별시 중국언어문화경진대회.hwp",
+    "pages": 4,
+    "bytes": 216725,
+    "srcBytes": 60928,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-13"
    }
   ]
  }

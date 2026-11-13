@@ -81,13 +81,13 @@ jobs:
       group: ${{ inputs.code && format('insta-code-{0}', inputs.code) || github.event_name == 'push' && format('insta-push-{0}', github.sha) || 'insta-prepare' }}
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: claude/nice-heisenberg-WESq5
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
       - run: npm init -y >/dev/null && npm i playwright@1 --no-audit --no-fund
       - run: npx playwright@1 install --with-deps chromium
 
@@ -185,7 +185,7 @@ jobs:
           for c in $CODES; do
             if [ -d "insta/pub/$c" ]; then cp -r "insta/pub/$c" "$DEST/$c"; else echo "($c 폴더 없음)"; fi
           done
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: ${{ steps.plan.outputs.codes != '' }}
         with:
           name: 카드
@@ -403,12 +403,12 @@ jobs:
       group: ${{ format('insta-code-{0}', inputs.code) }}
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: claude/nice-heisenberg-WESq5
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
 
       - name: 준비된 것이 있는지
         id: dir
@@ -570,12 +570,12 @@ jobs:
       group: ${{ format('insta-code-{0}', inputs.code) }}
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: claude/nice-heisenberg-WESq5
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
       - name: 장부에 적고 이슈 정리
         env:
           GH_TOKEN: ${{ github.token }}

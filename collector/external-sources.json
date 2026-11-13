@@ -406,7 +406,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
+    "checkedAt": "2026-11-12",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://www.dooeul.or.kr/home/main/index.do",
@@ -420,7 +420,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
+    "checkedAt": "2026-11-12",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.sri.re.kr/nuri/",
@@ -434,7 +434,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
+    "checkedAt": "2026-11-12",
     "why": "홈페이지 못 엶 (TypeError: UNABLE_TO_VERIFY_LEAF_SIGNATURE)",
     "best": null
    }
@@ -445,7 +445,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
+    "checkedAt": "2026-11-12",
     "why": "홈페이지 못 엶 (HTTP 404)",
     "best": null
    }
@@ -472,7 +472,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
+    "checkedAt": "2026-11-12",
     "why": "홈페이지 못 엶 (TypeError: ERR_TLS_CERT_ALTNAME_INVALID)",
     "best": null
    }
@@ -483,7 +483,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
+    "checkedAt": "2026-11-12",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.namgu.gwangju.kr/",
@@ -497,7 +497,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
+    "checkedAt": "2026-11-12",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.gyeongnam.go.kr/",
@@ -511,7 +511,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
+    "checkedAt": "2026-11-12",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.buan.go.kr/index.buan",
@@ -541,7 +541,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
+    "checkedAt": "2026-11-12",
     "why": "홈페이지 못 엶 (TypeError: ENOTFOUND)",
     "best": null
    }
@@ -552,7 +552,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
+    "checkedAt": "2026-11-12",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://top.cafe.daum.net/",
@@ -598,7 +598,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
+    "checkedAt": "2026-11-12",
     "why": "홈페이지 못 엶 (HTTP 403)",
     "best": null
    }
@@ -609,7 +609,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
+    "checkedAt": "2026-11-12",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.bsbukgu.go.kr/index.bsbukgu",
@@ -639,10 +639,10 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
+    "checkedAt": "2026-11-12",
     "why": "최고 0건 ((홈))",
     "best": {
-     "url": "https://www.mariners.or.kr/",
+     "url": "http://www.mariners.or.kr/",
      "signals": 0
     }
    }
@@ -653,7 +653,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
+    "checkedAt": "2026-11-12",
     "why": "최고 1건 ((홈))",
     "best": {
      "url": "https://www.britishcouncil.kr/",
@@ -667,7 +667,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
+    "checkedAt": "2026-11-12",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://pjdjkjscholarship.or.kr/",
@@ -681,7 +681,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
+    "checkedAt": "2026-11-12",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "http://www.surim.or.kr/",
@@ -695,7 +695,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
+    "checkedAt": "2026-11-13",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.jntle.kr/",
@@ -709,11 +709,11 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
-    "why": "최고 1건 ((홈))",
+    "checkedAt": "2026-11-13",
+    "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.koswec.or.kr/",
-     "signals": 1
+     "signals": 0
     }
    }
   },
@@ -723,7 +723,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
+    "checkedAt": "2026-11-13",
     "why": "최고 1건 ((홈))",
     "best": {
      "url": "https://www.jw-foundation.or.kr/",
@@ -737,7 +737,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
+    "checkedAt": "2026-11-13",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.icheon.go.kr/main.do",
@@ -767,7 +767,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
+    "checkedAt": "2026-11-13",
     "why": "홈페이지 못 엶 (HTTP 400)",
     "best": null
    }
@@ -789,7 +789,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
+    "checkedAt": "2026-11-13",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.inje.go.kr/",
@@ -803,7 +803,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
+    "checkedAt": "2026-11-13",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.wonju.go.kr/www/index.do",
@@ -817,7 +817,7 @@
    "boardUrl": null,
    "seed": "kosaf-open",
    "probe": {
-    "checkedAt": "2026-10-29",
+    "checkedAt": "2026-11-13",
     "why": "최고 0건 ((홈))",
     "best": {
      "url": "https://www.yeongju.go.kr/open_content/main/index.do",

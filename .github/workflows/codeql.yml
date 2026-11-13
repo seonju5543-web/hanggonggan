@@ -27,7 +27,8 @@ permissions:
 
 concurrency:
   group: codeql
-  cancel-in-progress: true
+  # 🔴 2026-11-12 true 였더니 새 push 가 돌던 점검을 취소해 '로봇이 넘어졌어요'가 셋씩 열렸다(#619~621) — 줄을 서게 한다(기다리던 것만 새 것으로 바뀐다)
+  cancel-in-progress: false
 
 jobs:
   analyze:
@@ -44,12 +45,12 @@ jobs:
       matrix:
         language: [javascript-typescript, python, actions]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.ref_name }}
       - name: CodeQL 준비
         timeout-minutes: 5
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
           build-mode: none
@@ -62,7 +63,7 @@ jobs:
               - docs/designs/mockups
       - name: CodeQL 분석
         timeout-minutes: 20
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
         with:
           category: /language:${{ matrix.language }}
       - name: 🚨 로봇이 넘어졌다
@@ -86,12 +87,12 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       GITHUB_REPOSITORY: ${{ github.repository }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.ref_name }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
       - name: 열린 심각 경고 세기
         id: count
         timeout-minutes: 2

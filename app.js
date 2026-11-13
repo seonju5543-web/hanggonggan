@@ -260,6 +260,14 @@ const isActivityId = (id) => String(id || '').startsWith('act:');
 function findActivity(url) {
   return ((liveActivities && liveActivities.items) || []).find((x) => x && x.url === url) || null;
 }
+/* 「양식 채우기」(formfill.js)가 여는 대상 — 장학(allScholarships)이 먼저, 없으면 활동 글(2026-10-31 · 공모전 참가신청서).
+   활동 글은 신청서 원본 PDF·빈칸 장부가 글 id(collector activityId)에 붙는다 — 화면은 id·이름만 쓴다(장학 엔진 모양 activityAsSch 와 다르다: 그쪽 id 는 act:주소). */
+function activityFillTarget(n) { return n && n.id ? { id: n.id, name: activityTitle(n), activity: true } : null; }
+function fillTargetFor(id) {
+  const s = allScholarships().find((x) => x.id === id);
+  if (s) return s;
+  return activityFillTarget(((liveActivities && liveActivities.items) || []).find((x) => x && x.id === id));
+}
 /* 활동 글 원본(피드 모양) — 피드에 있으면 그것, 없으면 저장할 때 떠 둔 사본 */
 function activityItem(url) {
   const live = findActivity(url);
@@ -3748,6 +3756,8 @@ function openActivityDetail(url) {
       ${activityLinkHtml(n)}
     </div>`;
   openSheetShell();
+  /* 빈칸을 찾은 신청서 PDF 에만 「양식 채우기」(장학 시트와 같은 formfill.js · 2026-10-31 공동개발자 "공모전 신청 양식이 매우 미흡") */
+  if (n.id && typeof attachFormFillButtons === 'function') attachFormFillButtons(activityFillTarget(n), $('#detail-sheet'));
   eligAskWire(sch, () => openActivityDetail(url));   // 묻기 상자 배선 — 다시 그릴 때 이 시트로 돌아온다
 }
 /* ---------------- 재단·지자체 새 공고 (2026-09-26 · 노션 F-13 · 교외 확대) ----------------
@@ -4653,7 +4663,7 @@ function sheetHeadHtml({ x, d, save }) {
 }
 /* 「접수」 절의 세 줄 — 기간은 접수 시작~마감(둘 다 날짜일 때만 · 아니면 원문 기간 문구 · 없으면 원문 확인) · 방법은 원문 문장(noApply·메일·포털·재단) · 서류는 읽은 것만 */
 function applySectionHtml(sch, opts) {
-  const activity = !!(opts && opts.activity);   // 활동 글은 서류 줄이 없다(원문이 서류를 적지 않는다)
+  const act = (opts && opts.activity) || null;   // 활동 글의 서류는 그 글이 원문 「제출서류」 절에서 읽은 것(collector activityDocuments · 2026-10-30) — 없으면 서류 줄이 없다
   const from = fmtDay(sch.openDate), to = fmtDay(sch.deadline);
   const rawPeriod = String(sch.period || '').replace(/^접수\s*/, '').replace(/\d{4}-(\d{2})-(\d{2})/g, '$1.$2').trim();   // ISO 날짜는 MM.DD 로(글자를 더하지 않고 줄인다) · 층2 「접수 ~…」 머리는 이름표와 겹친다
   const period = (from && to) ? `${from} ~ ${to}`
@@ -4666,7 +4676,7 @@ function applySectionHtml(sch, opts) {
     : sch.applyPortalSource ? sch.applyPortalSource
     : sch.sourceKind === 'kosaf' ? '재단 선발 공고문·홈페이지가 정한 접수 방법'
     : '원문 확인';
-  const docs = activity ? [] : (sch.documents || []).filter((doc) => !DOC_PLACEHOLDER.test(doc));
+  const docs = (act ? act.documents || [] : sch.documents || []).filter((doc) => !DOC_PLACEHOLDER.test(doc));
   const row = (k, v) => `<li><b class="ns-k">${k}</b>${esc(v)}</li>`;
   const docText = docs.map((d) => String(d).replace(/^[\s\-–—•\u25AA\u25AB\u25FD\u25FE■□▣○●◆◇·ㆍ*]+/, '').trim()).filter(Boolean).join(' · ');   // 원문 글머리 기호(■·○)는 뗀다 — 점으로 잇는 한 줄이라 기호가 두 겹(실화면 2026-11-02)
   return `<h4>접수</h4><ul class="doc-list notice-summary apply-rows">${row('기간', period)}${row('방법', method)}${docText ? row('서류', docText) : ''}</ul>`;
@@ -4685,8 +4695,10 @@ function sheetSectionsHtml({ sch, result, fit, fd, activity = null, noticeLines 
   const apply = applySectionHtml(sch, { activity });
   const notice = noticeSummaryHtml(noticeLines);
   /* ④ 첨부 — 본문 사진(bodyImage)은 첨부가 아니다 · 층2 첨부는 재단이 올린 선발 공고문이라 꼬리표로 말한다(신청서 양식이라 부르지 않는다) */
+  /* 활동 글은 신청 준비 화면이 없어(접수는 주최 사이트) 로봇이 바꿔 둔 신청서 원본 PDF 줄(+ 「양식 채우기」 자리)을 첨부 맨 위에 둔다 — 장학과 같은 줄 꼴 formPdfRowsHtml · 열쇠는 글 id(2026-10-30 공동개발자 "공모전 신청 양식이 매우 미흡") */
+  const pdfRows = activity && activity.id ? formPdfRowsHtml(activity) : '';
   const atts = ((activity ? activity.attachments : sch.attachments) || []).filter((a) => a && !a.bodyImage);
-  const att = atts.length ? `<h4>첨부${sch.sourceKind === 'kosaf' ? ' <span class="channel-tag">재단 선발 공고문</span>' : ''}</h4><ul class="doc-list">${atts.map((a) => `<li class="att">${attachmentLinkHtml(a, 'color:var(--primary)')}${a.bytes ? ` <span class="doc-legend">${Math.max(1, Math.round(a.bytes / 1024))}KB</span>` : ''}</li>`).join('')}</ul>` : '';
+  const att = atts.length ? `<h4>첨부${sch.sourceKind === 'kosaf' ? ' <span class="channel-tag">재단 선발 공고문</span>' : ''}</h4><ul class="doc-list">${pdfRows}${atts.map((a) => `<li class="att">${attachmentLinkHtml(a, 'color:var(--primary)')}${a.bytes ? ` <span class="doc-legend">${Math.max(1, Math.round(a.bytes / 1024))}KB</span>` : ''}</li>`).join('')}</ul>`  : (pdfRows ? `<h4>첨부</h4><ul class="doc-list">${pdfRows}</ul>` : '');
   /* ⑤ 원문 — 이름·안내는 source-link.js 한 곳(sourceLinkHtml · sourceLinkHintHtml) · 층2 문의 */
   const link = activity ? sourceLink(activity, 'activity') : sourceLink(sch, 'detail');
   const a = activity ? (() => { const href = safeUrl(link.href); return href ? `<a href="${esc(href)}" target="_blank" rel="noopener">${esc(link.label)}</a>` : ''; })() : sourceLinkHtml(sch);   // 장학·층2는 sourceLinkHtml 한 곳(detail 자리)

@@ -46,7 +46,7 @@ jobs:
             curl -sL --max-time 30 -A "Mozilla/5.0" "$u" -o "out/attach-$i" || true
           done < out/attachments.txt
           ls -la out/
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: fetched-page
           path: out/
