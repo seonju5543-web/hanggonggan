@@ -752,6 +752,20 @@ function dropUnchosenOrTraits(text, judged, isExclude) {
    · 갈래에 **안 드는** 학생 — 갈래를 걷은 줄로 판정한다
    · 갈래에 **드는** 학생 — 갈래 조건이 줄의 다른 조건과 축이 겹치면(`평점 3.0 이상 (4학년은 2.5 이상)`) 어느 쪽이 이기는지 몰라 모름(학점처럼 갈래 수를 다 아는 축은 그대로) ·
      안 겹치면 더해진 조건이라 줄 그대로 판정한다 · 드는지 모르면 모름 */
+/* 🔴 (3회차 수리) 갈래를 여는 괄호와 이름표 사이에 `단,`·`다만` 말고 다른 글자가 있으면 모름 — `재학생(3학년 및 4학년은 …)`·`재학생(편입생 및 4학년은 …)`·`(휴학생·4학년은 …)` 의
+   공동 주어(`편입생 및`·`휴학생·`)를 갈래 밖에 남겨 편입생·휴학생에게 갈래 조건을 걷어 ✓ 였다(틀린 안심).
+   갈래 끝을 모르는 표지도 모름 — 빗금·가운뎃점·`및`·`그리고`·`※`·`단`·빼는 말, 그리고 갈래 안에 다른 축의 조건이 함께 있을 때
+   (`재학생(4학년은 9학점 이상 / 서울 거주자에 한함)` 의 거주 요건까지 4학년 갈래로 걷어 부산 학생이 ✓ 였다) */
+const MID_BRANCH_LEAD = /^[\s,，]*(?:(?:단|다만)\s*[,，]?\s*)?$/;
+const MID_BRANCH_OPEN_END = /[,，;；/／·ㆍ※]\s*\S|\s(?:및|그리고|또한|단|다만)[\s,，]|그\s?외|나머지|이외|그\s?밖|제외|불가|한함|한정/;
+/* 이름표에 드는가 — 'pass' 전부면 든다 · 'fail' 이 있으면 안 든다 · 그 밖(모름)은 null (줄머리 갈래와 줄 가운데 갈래가 같이 쓴다) */
+function branchScopeIn(scope, p, ctx) {
+  const { conds: sc } = PR.parseLine(scope, false);
+  if (!sc.length) return null;
+  const vs = sc.map((c) => judgeCond(c, p, ctx));
+  if (vs.every((v) => v === 'pass')) return true;
+  return vs.includes('fail') ? false : null;
+}
 function midYearBranch(text, yb, p, isExclude, ctx) {
   const t = PR.untag(text);
   const OPEN = '([{（', CLOSE = ')]}）';
@@ -759,9 +773,11 @@ function midYearBranch(text, yb, p, isExclude, ctx) {
   let rest = '', last = 0;
   for (let i = 0; i < yb.length; i++) {
     const b = yb[i];
-    let depth = 0;
-    for (const ch of t.slice(0, b.start)) { if (OPEN.includes(ch)) depth++; else if (CLOSE.includes(ch)) depth = Math.max(0, depth - 1); }
-    if (depth <= 0) return null;
+    const opens = [];
+    const pre = t.slice(0, b.start);
+    for (let k = 0; k < pre.length; k++) { if (OPEN.includes(pre[k])) opens.push(k); else if (CLOSE.includes(pre[k])) opens.pop(); }
+    /* 이름표 앞(여는 괄호 뒤 · 괄호가 없으면 줄 머리부터)은 `단,`·`다만` 뿐이어야 한다 — 괄호 밖 갈래(`재학생 중 4학년은 …`·`평점 3.0 이상, 4학년은 …`)도 여기서 모름이 된다 */
+    if (!MID_BRANCH_LEAD.test(t.slice(Math.max(opens.length ? opens[opens.length - 1] + 1 : 0, last), b.start))) return null;
     let end = b.body, d = 0;
     for (; end < t.length; end++) {
       const ch = t[end];
@@ -770,18 +786,17 @@ function midYearBranch(text, yb, p, isExclude, ctx) {
     }
     if (i + 1 < yb.length && yb[i + 1].start < end) end = yb[i + 1].start;
     const seg = t.slice(b.body, end);
-    if (/[,，;；]\s*\S/.test(seg) || /그\s?외|나머지|이외|그\s?밖/.test(seg)) return null;
+    if (MID_BRANCH_OPEN_END.test(seg)) return null;
+    if (new Set(PR.parseLine(seg, !!isExclude).conds.map((c) => c.kind)).size > 1) return null;
     segs.push(seg);
     rest += t.slice(last, b.start); last = end;
   }
   rest = (rest + t.slice(last)).replace(/[(（]\s*(?:(?:단|다만)\s*[,，]?)?[\s,，;；]*[)）]/g, ' ').replace(/\s+/g, ' ').trim();
   let mine = -1;
   for (let i = 0; i < yb.length; i++) {
-    const { conds: sc } = PR.parseLine(yb[i].scope, false);
-    if (!sc.length) return null;
-    const vs = sc.map((c) => judgeCond(c, p, ctx));
-    if (vs.every((v) => v === 'pass')) { if (mine >= 0) return null; mine = i; }
-    else if (!vs.includes('fail')) return null;
+    const inb = branchScopeIn(yb[i].scope, p, ctx);
+    if (inb === null) return null;
+    if (inb) { if (mine >= 0) return null; mine = i; }
   }
   if (mine < 0) return rest ? lineVerdict(rest, p, isExclude, ctx) : null;
   if (yb.length > 1) return null;
@@ -822,11 +837,9 @@ function lineVerdict(text, p, isExclude, ctx, detail) {
     const t = PR.untag(text);
     let mine = -1;
     for (let i = 0; i < yb.length; i++) {
-      const { conds: sc } = PR.parseLine(yb[i].scope, false);
-      if (!sc.length) return null;
-      const vs = sc.map((c) => judgeCond(c, p, ctx));
-      if (vs.every((v) => v === 'pass')) { if (mine >= 0) return null; mine = i; }
-      else if (!vs.includes('fail')) return null;          // 이 갈래에 드는지 모른다
+      const inb = branchScopeIn(yb[i].scope, p, ctx);
+      if (inb === null) return null;                       // 이 갈래에 드는지 모른다
+      if (inb) { if (mine >= 0) return null; mine = i; }
     }
     if (mine < 0) return null;
     const body = t.slice(yb[mine].body, mine + 1 < yb.length ? yb[mine + 1].start : t.length).replace(/[\s,，;；·/]+$/, '');
