@@ -549,4 +549,33 @@ export default async function gate(eq, ctx) {
     eq('  배포 동기화 — 실패는 경보 하나(옛 날짜 제목도 prefix 로) · 다시 되면 닫는다',
       [/alert-issue\.mjs --mode open --title "🚨 앱 배포 동기화 실패" --match prefix/.test(ds), /mode: resolve\s+title: 🚨 앱 배포 동기화 실패\s+match: prefix/.test(ds)], [true, true]);
   }
+
+  /* ── ⑨ 앱 오류 급증 감시 (2026-11-13 · 은서 · 출시 전 백엔드 11번 — tools/error-watch.mjs · error-watch.yml · 0006_client_error_stats.sql) ──
+     오류는 모이기만 하고 아무도 숫자를 안 봤다 → 개수만 주는 함수 + 2시간마다 판정 + 세 사람 경보 */
+  {
+    const EW = await import(new URL('tools/error-watch.mjs', root));
+    const V = (st) => EW.verdictOf({ state: 'ok', stats: { last_hour: 0, last_day: 0, prev_week_daily_avg: 0, day_cap: 3000, ...st } }).verdict;
+    eq('⑨ 급증 판정 — 1시간 59 아님·60 급증 · 하루 299 아님 · 하루 300(평균 0→바닥 20의 3배=60 넘음) 급증 · 하루 400 이라도 평균 200 이면 평소 · 상한 90%(2700) 급증',
+      [V({ last_hour: 59 }), V({ last_hour: 60 }), V({ last_day: 299 }), V({ last_day: 300 }), V({ last_day: 400, prev_week_daily_avg: 200 }), V({ last_day: 2700, prev_week_daily_avg: 2000 })],
+      ['ok', 'spike', 'ok', 'spike', 'ok', 'spike']);
+    eq('  함수 없음(404) → setup · 꺼짐 → off · 답 없음 → unknown(실패로 끝낸다)',
+      [EW.verdictOf({ state: 'missing' }).verdict, EW.verdictOf({ state: 'off' }).verdict, EW.verdictOf({ state: 'down', why: 'x' }).verdict], ['setup', 'off', 'unknown']);
+    const fake = (codes) => { let i = 0; return async () => { const c = codes[Math.min(i++, codes.length - 1)]; return { status: c, json: async () => ({ last_hour: 1, last_day: 2 }) }; }; };
+    const fs3 = async (codes) => (await EW.fetchStats({ url: 'https://x', anonKey: 'k' }, { fetchImpl: fake(codes), sleep: async () => {} })).state;
+    eq('  서버 응답 — 200 읽음 · 404 함수 없음 · 500 이 세 번이면 down · 500 뒤 200 이면 읽음(다시 묻는다)',
+      [await fs3([200]), await fs3([404]), await fs3([500, 500, 500]), await fs3([500, 200])], ['ok', 'missing', 'down', 'ok']);
+    const body = EW.bodyOf({ verdict: 'spike', why: 'w' }, { last_hour: 61, last_day: 70, prev_week_daily_avg: 3, kinds_day: 4 });
+    eq('  경보 본문은 개수와 되돌리기 안내만(오류 문구 칸이 없다)', [/61/.test(body), /되돌리기/.test(body), /message|문구:/.test(body)], [true, true, false]);
+    const sql = read(root, 'supabase/migrations/0006_client_error_stats.sql').replace(/--.*$/gm, '');
+    eq('  🔴 개수 함수 — SECURITY DEFINER + search_path 고정 · 실행 권한 public 회수·anon 부여 · count 만 꺼낸다(오류 칸을 그대로 돌려주지 않는다)',
+      [/security definer/i.test(sql) && /set search_path = public, pg_temp/.test(sql), /revoke all on function public\.client_error_stats\(\) from public/.test(sql), /grant execute on function public\.client_error_stats\(\) to anon/.test(sql),
+        [...sql.matchAll(/select\s+([^\n]+?)\s+from public\.client_errors/g)].every((m) => /^(count\(\*\)|count\(distinct message\)|round\(count\(\*\)::numeric \/ 7, 1\))$/.test(m[1].trim()))],
+      [true, true, true, true]);
+    const ew = read(root, '.github/workflows/error-watch.yml').replace(/^\s*#.*$/gm, '');
+    eq('  error-watch.yml — 홀수 분 · 기본 브랜치에서만 · 시한 · 급증 경보 여닫는 제목 같음 · 못 읽음 경보 여닫는 제목 같음 · 세 사람 · 넘어지면 robot-down',
+      [Number((ew.match(/cron: '(\d+) /) || [])[1]) % 2 === 1, /if: github\.ref_name == 'claude\/nice-heisenberg-WESq5'/.test(ew), /^ {4}timeout-minutes: \d+/m.test(ew),
+        (ew.match(/🚨 앱 오류가 갑자기 늘었습니다/g) || []).length, (ew.match(/🚨 앱 오류 감시가 숫자를 못 읽습니다/g) || []).length,
+        /--assignee seonju5543-web --assignee Se-Hyeon-Jo --assignee didinin-wq/.test(ew), /failure\(\) \|\| cancelled\(\)\s+uses: \.\/\.github\/actions\/robot-down/.test(ew)],
+      [true, true, true, 2, 2, true, true]);
+  }
 }
