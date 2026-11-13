@@ -19,7 +19,7 @@ const PR = (typeof module !== 'undefined' && module.exports)
   /* 🔴 브라우저에서는 **전역 함수**로 쓴다 — 여기에 이름을 빠뜨리면 Node 검사는 전부
      통과하는데 앱은 첫 카드에서 죽는다. `headRest`(section-head)에 이어 `caseBranch`도
      같은 실수를 했다(2026-08-24). 아래 회귀가 브라우저 순서로 실어 실제로 불러 본다. */
-  : { parseLine, parseDegree, gradOnly, gradTarget, mentionsUndergrad, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, untag, REGIONS, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM, TRAIT_PAT, provincesOfCity, shortRegion, schoolKindAlt, yearBranchLabels };
+  : { parseLine, parseDegree, gradOnly, gradTarget, mentionsUndergrad, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, untag, REGIONS, GRADE_SCALE, HIGH, LOW, MULTI_PROGRAM, TRAIT_PAT, provincesOfCity, shortRegion, schoolKindAlt, yearBranchLabels, yearBranchDoubt };
 const PR2 = PR;   // requirementLines가 쓰는 별칭 (선언 순서 때문에 이름만 따로 둔다)
 /* 시·도 이름은 parse-requirements 가 갖고 있다 — 여기 베끼면 두 벌이 된다 */
 const PR_REGIONS = PR.REGIONS || [];
@@ -350,6 +350,7 @@ function judgeCond(c, p, ctx) {
     case 'year': {
       const y = p.year == null ? null : Number(p.year);
       if (y == null || Number.isNaN(y)) return 'unknown';
+      if (c.unsure) return 'unknown';   // 빼는 말이 걸렸는지 모르는 학년(`4학년, 휴학생 제외`·`4학년 지원 제한` · parse-requirements parseYear unsure · 수렴 1회차)
       /* 🔴 **앞으로 올 학년도의 학년** (`ahead` · parse-requirements parseYear) — 그때 학생은 지금 학년부터
          지금+ahead 사이다(휴학하면 안 오른다). 확실한 것만 말한다: 지금 이미 넘으면 통과, 그때까지 못 닿으면 미달,
          그 사이는 모름. 줄은 확신이 낮아 미달도 화면에선 '모름'이 된다. */
@@ -654,7 +655,9 @@ function judgeCond(c, p, ctx) {
           const ps = PR.provincesOfCity(city);
           if (ps.length <= 1) return 'hit';
           const mine = region ? prov(region) : '';
-          const named = (c.anyOf || []).map(prov).filter((x) => ps.includes(x));
+          /* 🔴 (수렴 2회차 · 2026-11-13) 구 이름에 **붙은** 시·도(parse-requirements cityProvs — `부산 강서구`·`강서구(부산)`)만 그 구의 시·도다.
+             줄의 다른 시·도(`… 중 부산·경남 지역 출신 제외`·`(대구·부산 지역 대학 포함)`)는 다른 역할일 수 있어 'miss' 를 내지 않는다(전엔 서울 강서구 학생 ✕ · 틀린 미달) */
+          const named = (c.cityProvs || []).map(prov).filter((x) => ps.includes(x));
           if (named.length) return !mine ? 'unsure' : named.includes(mine) ? 'hit' : 'miss';
           const told = ((ctx && ctx.homeProvs) || []).filter((x) => ps.includes(x));
           return told.length === 1 && mine && told[0] === mine ? 'hit' : 'unsure';
@@ -758,6 +761,16 @@ function dropUnchosenOrTraits(text, judged, isExclude) {
    (`재학생(4학년은 9학점 이상 / 서울 거주자에 한함)` 의 거주 요건까지 4학년 갈래로 걷어 부산 학생이 ✓ 였다) */
 const MID_BRANCH_LEAD = /^[\s,，]*(?:(?:단|다만)\s*[,，]?\s*)?$/;
 const MID_BRANCH_OPEN_END = /[,，;；/／·ㆍ※]\s*\S|\s(?:및|그리고|또한|단|다만)[\s,，]|그\s?외|나머지|이외|그\s?밖|제외|불가|한함|한정/;
+/* 🔴 (수렴 2회차 · 2026-11-13) 갈래 조각 안에 문턱이 둘이거나(`4학년은 평점 3.0 이상 저학년은 3.5 이상`) 첫 문턱 뒤에 또 주어(`○○은/는`)가 오면
+   갈래가 어디서 끝나는지 모른다 — 줄 전체를 모름으로 둔다. 전엔 닫는 괄호까지를 통째로 4학년 갈래로 걷어 2학년 평점 3.2 가 ✓ 였다(틀린 안심).
+   ⚠️ 갈래 끝 낱말(저학년·타 학년·그 밖…)을 목록에 더해 읽게 넓히지 않는다 — 꼴만 보고 의심한다 */
+const MID_BRANCH_THRESHOLD = /\d+(?:\.\d+)?\s*(?:점|학점|%)?\s*(?:이상|이하|미만|초과)/g;
+function midBranchTwoHeads(seg) {
+  const th = [...seg.matchAll(MID_BRANCH_THRESHOLD)];
+  if (th.length >= 2) return true;
+  if (!th.length) return false;
+  return /[가-힣](?:은|는)(?![가-힣])/.test(seg.slice(th[0].index + th[0][0].length));
+}
 /* 이름표에 드는가 — 'pass' 전부면 든다 · 'fail' 이 있으면 안 든다 · 그 밖(모름)은 null (줄머리 갈래와 줄 가운데 갈래가 같이 쓴다) */
 function branchScopeIn(scope, p, ctx) {
   const { conds: sc } = PR.parseLine(scope, false);
@@ -787,6 +800,7 @@ function midYearBranch(text, yb, p, isExclude, ctx) {
     if (i + 1 < yb.length && yb[i + 1].start < end) end = yb[i + 1].start;
     const seg = t.slice(b.body, end);
     if (MID_BRANCH_OPEN_END.test(seg)) return null;
+    if (midBranchTwoHeads(seg)) return null;
     if (new Set(PR.parseLine(seg, !!isExclude).conds.map((c) => c.kind)).size > 1) return null;
     segs.push(seg);
     rest += t.slice(last, b.start); last = end;
@@ -807,6 +821,26 @@ function midYearBranch(text, yb, p, isExclude, ctx) {
   /* 갈래 글자만으론 못 읽는 꼴(`(4학년의 경우 9학점)` 뒤 `이상` 이 괄호 밖)은 줄이 그 수를 갈래로 이미 읽었을 때만 */
   if (!segConds.length ? !whole.some((w) => w.alts) : segConds.some((c) => restKinds.has(c.kind) && !allAlts(c.kind))) return null;
   return lineVerdict(text, p, isExclude, { ...ctx, wholeYearBranch: true });
+}
+
+/* 🔴 (수렴 2회차 · 2026-11-13) 미달이지만 확신할 수 없는 자리 — 미달(✕)을 모름으로만 낮춘다(✓ 는 건드리지 않는다 · 새 꼴을 읽게 넓히지 않는다)
+   ① 다른 줄의 학년 갈래가 같은 축을 말하고 학생이 그 갈래에 들거나 학년을 모른다(noticeCtx yearAxisBranches)
+   ② 공고가 성적을 다른 기준과 택1 로 받는다(noticeCtx gradeAlt)
+   ③ 배포판이 잡음으로 버리던 만점 줄(NOT_A_REQUIREMENT 의 옛 만점 가지)인데 문턱 뒤가 우대·우선·등급·배점·`그 외` 다 —
+      `4.5 만점에 4.0 이상인 자 우선 선발`·`학업성적: 4.5 만점 기준 3.5 이상 – 20점` 이 만점 가지를 좁힌 뒤 성적 요건 HIGH 로 살아나 평점 3.6 학생 ✕ 였다(틀린 미달) */
+const OLD_MANJEOM_NOISE = /만점(?!\s*(?:이상|이하|미만|초과|충족))/;
+const MANJEOM_RANK_TAIL = /우대|우선|가산|가점|순위|등급|그\s?외|유지\s?조건|[:：\-–→]\s*\d{1,3}\s*점|[(（]\s*\d{1,3}\s*점|만\s?원/;
+function failInDoubt(text, c, p, ctx) {
+  const branchLine = !!(ctx && (ctx.inYearBranch || ctx.wholeYearBranch));   // 학년 갈래 자신의 판정(그 갈래의 조건)은 그대로 둔다
+  if (!branchLine && ctx && (c.kind === 'credits' || c.kind === 'grade')
+      && (ctx.yearAxisBranches || []).some((b) => b.text !== text && b.kinds.includes(c.kind) && branchScopeIn(b.scope, p, ctx) !== false)) return true;
+  if (c.kind === 'grade' && ctx && ctx.gradeAlt) return true;
+  if (c.kind === 'grade') {
+    const t = PR.untag(text), bare = t.replace(/\s*[(（][^)）]*[)）]\s*/g, ' ');
+    const at = t.search(/이상|이하|미만|초과/);
+    if (OLD_MANJEOM_NOISE.test(bare) && at >= 0 && MANJEOM_RANK_TAIL.test(t.slice(at))) return true;
+  }
+  return false;
 }
 
 /* detail — 있으면 본 경로가 판정한 조건 수(total)와 맞은 조건 수(pass)를 적어 준다(적합도가 조건 단위로 세는 데 쓴다 · 2026-10-29).
@@ -843,9 +877,12 @@ function lineVerdict(text, p, isExclude, ctx, detail) {
     }
     if (mine < 0) return null;
     const body = t.slice(yb[mine].body, mine + 1 < yb.length ? yb[mine + 1].start : t.length).replace(/[\s,，;；·/]+$/, '');
-    return body ? lineVerdict(body, p, isExclude, ctx) : null;
+    return body ? lineVerdict(body, p, isExclude, { ...ctx, inYearBranch: true }) : null;
   }
   if (yb.length) return midYearBranch(text, yb, p, isExclude, ctx);
+  /* 🔴 (수렴 1회차 · 2026-11-13) 학년 갈래 이름표 같은데 이름표 규칙이 못 받은 꼴(`단, 4학년은 …`·`4학년 재학생은 …`·`4학년일 경우 …`·`3학년 이상은 …`·`2학년부터는 …`)은
+     어디까지 누구에게 걸리는지 몰라 줄 전체를 모름으로 둔다(parse-requirements yearBranchDoubt 한 곳 · 전엔 '그 학년이어야' 로 남아 갈래 밖 학년 ✕) */
+  if (!(ctx && ctx.wholeYearBranch) && PR.yearBranchDoubt(text)) return null;
   const scoped = PR.untag(text).match(/^([^,.:：()]{2,20}?)(?:의|인)\s?경우[,:：]?\s+(\S[\s\S]*)$/);
   if (scoped && !cases) {
     const { conds: sc } = PR.parseLine(scoped[1], false);
@@ -930,7 +967,8 @@ function lineVerdict(text, p, isExclude, ctx, detail) {
   }
   const use = dropUnchosenOrTraits(text, judged, isExclude);
   let passN = 0;
-  for (const [c, v] of use) {
+  for (const [c, v0] of use) {
+    const v = v0 === 'fail' && failInDoubt(text, c, p, ctx) ? 'unknown' : v0;
     if (v === 'fail' && c.conf === PR.HIGH) return 'no';
     /* 🔴 확신이 낮은 미달은 **사라지는 게 아니라 '모른다'** 다 (2026-08-30 개발자 지적:
        "무지성 체크"). 예전에는 그냥 흘려버려서, 어긋난 절이 있는데도 같은 줄의 다른 절이
@@ -998,8 +1036,27 @@ function noticeCtx(sch) {
   /* ※ 거주 요건으로 통과한 줄(requirementLines 의 ASIDE_RESIDENCE 증명) — lineVerdict 가 ✕ 대신 모름을 낸다(위 softNo 주석) */
   const softRaw = lines.filter((l) => /^\s*※/.test(String(l || '')) && ASIDE_RESIDENCE.test(l) && !ASIDE_RES_NOT.test(l)).map((l) => tidyRequirement(l));
   const softNo = new Set(softRaw.length ? items.map((it) => it.text).filter((t) => softRaw.some((s) => s && PR.untag(t).startsWith(s))) : []);
-  return { bracketTable: brackets.size > 1, inAnyOf, multi, anyUndergrad, homeCity: homeCityOf(sch), homeProvs: homeProvsOf(sch), oneSchool, softNo };
+  /* 🔴 (수렴 2회차 · 2026-11-13) 다른 줄의 학년 갈래가 어느 축을 말하는가 — `4학년은 10학점 이상 이수`(층2 옹진군 두 공고: 성적기준 칸에 `직전학기 12학점 이상 …` 과 나란히).
+     그 갈래에 드는(또는 학년을 모르는) 학생에게 다른 줄의 같은 축(학점·성적) 미달은 어느 줄이 이기는지 몰라 모름이다(lineVerdict) — 전엔 4학년 10학점 학생이 12학점 줄로 ✕ 였다(틀린 미달).
+     갈래 밖 학년(3학년 11학점)은 그대로 ✕ */
+  const yearAxisBranches = [];
+  for (const it of items) {
+    const yb = PR.yearBranchLabels(it.text);
+    if (!yb.length || !yb.lineStart) continue;
+    const t = PR.untag(it.text);
+    yb.forEach((b, i) => {
+      const body = t.slice(b.body, i + 1 < yb.length ? yb[i + 1].start : t.length);
+      const kinds = PR.parseLine(body, false).conds.map((c) => c.kind).filter((k) => k === 'credits' || k === 'grade');
+      if (kinds.length) yearAxisBranches.push({ text: it.text, scope: b.scope, kinds });
+    });
+  }
+  /* 🔴 (수렴 2회차) 공고가 성적을 다른 기준과 **택1** 로 받는다(`아래 기준과 성적기준 중 택1`·`또는 성적` — 층2 홍천군 저소득주민자녀장학금(특별)의 특정자격 칸) —
+     성적 줄 미달은 다른 갈래(대회 입상)로 될 수 있어 모름이다(lineVerdict · 전엔 평점 2.9 학생 ✕). 성적 ✓ 는 그대로 */
+  const whoLines = (sch && sch.kosafWhoLines) || [];
+  const gradeAlt = [...lines, ...whoLines].some((l) => GRADE_ALT_MARK.test(PR.untag(String(l || ''))));
+  return { bracketTable: brackets.size > 1, inAnyOf, multi, anyUndergrad, homeCity: homeCityOf(sch), homeProvs: homeProvsOf(sch), oneSchool, softNo, yearAxisBranches, gradeAlt };
 }
+const GRADE_ALT_MARK = /성적\s?기준\s?(?:과|와)?\s?(?:[^.]{0,30}?\s)?중\s?택\s?(?:1|일|하나)|(?:또는|이거나)\s?(?:학업\s?)?성적/;
 
 /* 공고 하나에 대한 적합도 **내역**. 카드가 "요건 6개 중 4개 충족"을 띄우려면 숫자가 필요하다. */
 function fitDetail(sch, p) {
