@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-11-13",
- "count": 1761,
+ "count": 1762,
  "items": [
   {
    "title": "2026학년도 충남대학교 백마봉사단「사회 재환원 장학금」대상자 추천 안내",
@@ -167,6 +167,20 @@
    ],
    "deadlineHint": null,
    "school": "건국대학교",
+   "campus": "",
+   "foundAt": "2026-11-13"
+  },
+  {
+   "title": "미래 건설교통신기술인 장학사업 안내",
+   "url": "https://www.yonsei.ac.kr/bbs/sc/58/944641/artclView.do",
+   "attachments": [
+    {
+     "name": "미래 건설교통신기술인 장학사업 안내.pdf",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015533/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간: 2026.11.5.(목)~2026.11.18.(수) 24:00 5. 신청방법: 이메일 또는 등기우편 6. 문의처: 한국건설교통신기술협",
+   "school": "연세대학교",
    "campus": "",
    "foundAt": "2026-11-13"
   },

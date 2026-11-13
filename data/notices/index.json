@@ -3,6 +3,10 @@
  "updatedAt": "2026-11-13",
  "schools": 44,
  "files": {
+  "연세대학교": {
+   "file": "nz3ew5y.json",
+   "count": 54
+  },
   "건국대학교": {
    "file": "nmpm6i7.json",
    "count": 54
@@ -98,10 +102,6 @@
   "전북대학교": {
    "file": "ncuyr4z.json",
    "count": 28
-  },
-  "연세대학교": {
-   "file": "nz3ew5y.json",
-   "count": 53
   },
   "광운대학교": {
    "file": "n6xhy7d.json",
