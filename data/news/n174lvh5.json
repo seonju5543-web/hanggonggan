@@ -3,6 +3,17 @@
  "updatedAt": "2026-11-13",
  "items": [
   {
+   "title": "[학생지원팀] 단과대학 개편 관련 학생 설명회 개최 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277777&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-13",
+   "kind": "행사",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-13",
+   "desc": "우리 대학의 미래 경쟁력 강화 및 교육 환경 혁신을 위한 ‘단과대학 개편’과 관련하여, 개편 배경과 주요 내용을 공유하고 학우 여러분의 궁금증을 해소하고자 아래와 같이 설명회를 개최합니다."
+  },
+  {
    "title": "[학부대학운영팀] 제18차 사랑의 연탄나눔 일정 변경 및 봉사자 재모집",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277753&article.offset=0&articleLimit=10",
    "postedAt": "2026-11-12",
@@ -423,17 +434,6 @@
    "src": "5d85d287",
    "foundAt": "2026-10-23",
    "desc": "1. 학점교류 제도 안내 신청절차 1) [ 트리니티 ] – [ 학사정보 ] – [ 수업 / 성적 ] – [ 수업 ] – [ 국내학점교류신청 ( 가톨릭계대학 )] 에서 지원사항 작성"
-  },
-  {
-   "title": "[대학일자리플러스센터] 이노진 – 품질관리 및 제형업무 채용",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277011&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-23",
-   "kind": "채용",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-23",
-   "desc": "1. 세부일정 : *전형절차 : 서류전형 -> 1차 실무자 면접 -> 2차 임원 면접 -> 최종합격"
   }
  ]
 }

@@ -3,6 +3,25 @@
  "updatedAt": "2026-11-13",
  "items": [
   {
+   "title": "2026학년도 학생성공 전공설계 Follow-up 프로그램 안내",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271943&pageOrder=0&cmd=2&parm_bod_uid=271943&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-11-13",
+   "school": "계명대학교",
+   "campus": "",
+   "src": "9a241a98",
+   "foundAt": "2026-11-13"
+  },
+  {
+   "title": "실크로드연구원 '실크로드의 누들과 신라의 음식 문화' 학술회의 개최 안내",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271943&pageOrder=0&cmd=2&parm_bod_uid=271940&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-11-13",
+   "kind": "행사",
+   "school": "계명대학교",
+   "campus": "",
+   "src": "9a241a98",
+   "foundAt": "2026-11-13"
+  },
+  {
    "title": "2026학년도 하반기 계명가족 사랑의 헌혈 안내",
    "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=0&pageOrder=0&cmd=2&parm_bod_uid=271933&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
    "postedAt": "2026-11-13",
@@ -350,25 +369,6 @@
    "campus": "",
    "src": "9a241a98",
    "foundAt": "2026-10-19"
-  },
-  {
-   "title": "2027년 2월말 퇴직교원 정부포상 추천 대상자 사전 공개",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271410&pageOrder=0&cmd=2&parm_bod_uid=271410&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
-   "postedAt": "2026-10-16",
-   "school": "계명대학교",
-   "campus": "",
-   "src": "9a241a98",
-   "foundAt": "2026-10-16"
-  },
-  {
-   "title": "2026학년도 이민다문화센터 인문사회연구소지원사업 제27회『열린 이민다문화포럼』개최 안내",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271408&pageOrder=0&cmd=2&parm_bod_uid=271408&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
-   "postedAt": "2026-10-16",
-   "kind": "행사",
-   "school": "계명대학교",
-   "campus": "",
-   "src": "9a241a98",
-   "foundAt": "2026-10-16"
   }
  ]
 }
