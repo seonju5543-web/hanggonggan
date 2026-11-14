@@ -19,11 +19,12 @@
 import fs from 'node:fs';
 import worker from './worker.js';
 import { createRequire } from 'node:module';
+import { APP_ORIGIN } from '../shared/app-address.mjs';
 
 const KEY = process.env.ANTHROPIC_API_KEY;
 if (!KEY) { console.error('ANTHROPIC_API_KEY 가 없습니다.'); process.exit(1); }
 
-const ORIGIN = 'https://seonju5543-web.github.io';
+const ORIGIN = APP_ORIGIN;   // 앱 주소 한 곳
 const DEMO = process.argv.includes('--demo');
 
 /* 학생이 준 재료는 일부러 짧게 둔다 — 실제로 학생이 쓰는 만큼만 준다.

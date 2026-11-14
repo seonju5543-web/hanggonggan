@@ -22,6 +22,7 @@
    ============================================================ */
 
 import { clientIp, limitCheck } from '../shared/guard.mjs';
+import { APP_ORIGIN } from '../shared/app-address.mjs';
 
 const MODEL = 'claude-haiku-4-5-20251001';   // 고르기만 하므로 가장 싼 모델로 충분하다
 const MAX_ITEMS = 8;
@@ -29,7 +30,7 @@ const MAX_QUOTES = 6;
 
 /* 앱이 어디서 부를 수 있는지 — 이 주소가 아니면 받지 않는다 */
 const ALLOWED_ORIGINS = [
-  'https://seonju5543-web.github.io',
+  APP_ORIGIN,
   'http://localhost:8123',
 ];
 

@@ -25,10 +25,12 @@ jobs:
         with:
           ref: main
 
+      # 앱 주소는 한 곳(server/shared/app-address.mjs)에서 읽는다 — 도메인을 옮겨도 여기를 따로 고치지 않는다(2026-11-14)
+      - name: 앱 주소 읽기
+        run: echo "SITE=$(node --input-type=module -e "import { APP_BASE } from './server/shared/app-address.mjs'; process.stdout.write(APP_BASE)")" >> "$GITHUB_ENV"
+
       - name: 배포된 앱과 저장소(main) 대조
         id: check
-        env:
-          SITE: https://seonju5543-web.github.io/hanggonggan
         run: |
           # 🔴 **두 번까지 본다** (2026-10-04 로봇·도구 점검). 배포 직후에 돌면 Pages 가 아직 옛 판을 내보내는 사이일 수 있다
           #    (#384 — 배포 1분 뒤 실행 ❌ · 5분 뒤 다시 돌리니 통과). 처음에 어긋나면 3분 쉬고
@@ -198,8 +200,6 @@ jobs:
       # 조용히 새는 것을 막기 위해 '정말 404인지'를 로봇이 매일 대신 확인한다.
       - name: 관리자 페이지가 학생용 주소에 노출되지 않았는지 확인
         id: admin
-        env:
-          SITE: https://seonju5543-web.github.io/hanggonggan
         run: |
           leaked=0
           for p in _admin/ _admin/index.html _admin/admin.js; do
@@ -224,7 +224,7 @@ jobs:
         run: |
           # 본문에 역따옴표·중괄호가 들어가므로 셸이 건드리지 못하게 따옴표 친 heredoc으로 쓴다
           cat > /tmp/admin-leak.md <<'EOF'
-          `_admin/`이 학생용 주소(https://seonju5543-web.github.io/hanggonggan)에서 열립니다.
+          `_admin/`이 학생용 주소(${{ env.SITE }})에서 열립니다.
           관리자 화면은 Cloudflare(Access 뒤)에만 있어야 하고, 이 주소에서는 열리면 안 됩니다.
 
           확인할 것: 저장소에 `.nojekyll`이나 `_config.yml`이 새로 생겼는지 —
@@ -251,7 +251,7 @@ jobs:
           label-description: 배포된 앱이 저장소 main 과 다름
           assignee: ${{ github.repository_owner }}
           body: |
-            배포된 앱(https://seonju5543-web.github.io/hanggonggan)이 저장소 main과 다르거나, 대조를 끝까지 하지 못했습니다(어긋나면 3분 뒤 한 번 더 봅니다).
+            배포된 앱(${{ env.SITE }})이 저장소 main과 다르거나, 대조를 끝까지 하지 못했습니다(어긋나면 3분 뒤 한 번 더 봅니다).
             계속 다르면 배포 동기화를 확인하세요. 다음 점검에서 같아지면 이 이슈는 저절로 닫힙니다.
 
             어긋난 항목(비어 있으면 대조 단계가 끝까지 못 간 것 — 실행 기록을 보세요):

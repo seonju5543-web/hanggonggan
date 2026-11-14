@@ -39,7 +39,7 @@ const SUPABASE_CONFIG = {
      ⚠️ 여기에 적는 것만으로는 안 되고, Supabase 대시보드에서 그 제공자를 켜고
         구글/카카오 쪽에서 발급받은 열쇠를 넣어야 실제로 동작한다:
           Authentication → Providers → Google / Kakao → Enable + Client ID·Secret
-        그리고 Authentication → URL Configuration 에 아래 두 곳을 등록해야 돌아온다:
+        그리고 Authentication → URL Configuration 에 아래 두 곳을 등록해야 돌아온다(앱 주소 = server/shared/app-address.mjs 의 APP_BASE · 도메인을 옮기면 새 주소를 추가):
           Site URL          https://seonju5543-web.github.io/hanggonggan/
           Redirect URLs     https://seonju5543-web.github.io/hanggonggan/
      쓸 수 있는 값: 'google' · 'kakao' (Supabase 가 공식 지원한다) */

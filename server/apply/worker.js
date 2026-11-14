@@ -21,7 +21,7 @@
 import { validateSubmission } from './apply-guard.mjs';
 import { recordSend, applyWebhook, verifySvix, logConfigured, resolveUser, loadProfile } from './send-log.mjs';
 
-const APP_ORIGIN = 'https://seonju5543-web.github.io';
+import { APP_ORIGIN } from '../shared/app-address.mjs';   // 앱 주소 한 곳
 /* 발행물은 앱과 같은 곳에서 읽는다 — 사본을 서버에 두면 두 벌이 되어 갈라진다. */
 const REGISTERED_URL = APP_ORIGIN + '/hanggonggan/data/registered.json';
 

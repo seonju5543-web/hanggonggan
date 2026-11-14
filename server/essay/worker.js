@@ -29,6 +29,7 @@
 
 import { scanOutgoing, checkDraft, mayDraft, materialText, qualityCheck, rulesFor, scrubSchool } from './draft-guard.mjs';
 import { resolveUser, limitCheck } from '../shared/guard.mjs';
+import { APP_ORIGIN } from '../shared/app-address.mjs';
 /* 🔴 규칙집은 **저장소에 한 벌만** 둔다 (data/essay-playbook.json). 여기로 베껴 오면
    앱이 보여 주는 '고칠 곳'과 서버가 검사하는 기준이 갈라진다. wrangler 가 번들할 때
    이 JSON 을 코드 안에 넣어 준다 — 실행 중에 파일을 읽지 않는다. */
@@ -46,7 +47,7 @@ const MAX_ASKS = 8;        // 키워드 질문은 종류당 2~4개다
 const MAX_TOKENS = 12000;  // 가장 긴 양식(A4 2장짜리가 여러 칸) 까지 담는 그릇
 
 const ALLOWED_ORIGINS = [
-  'https://seonju5543-web.github.io',
+  APP_ORIGIN,
   'http://localhost:8123',
 ];
 

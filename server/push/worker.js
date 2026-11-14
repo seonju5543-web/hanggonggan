@@ -36,6 +36,7 @@
    ============================================================ */
 
 import { clientIp, limitCheck } from '../shared/guard.mjs';
+import { APP_BASE } from '../shared/app-address.mjs';
 
 const SEND_PER_TICK = 25;         // 한 걸음에 깨울 폰 수 (무료 등급 외부 요청 50건/실행 — 절반만 쓴다)
 const MAX_SUBS_PER_WAKE = 2000;   // 한 번의 '알릴 거리'에 깨울 총 상한 (그 이상은 유료 등급 검토)
@@ -278,7 +279,7 @@ async function readSeen(env) {
 }
 
 function fetchData(env, path) {
-  const origin = env.APP_ORIGIN || 'https://seonju5543-web.github.io/hanggonggan';
+  const origin = env.APP_ORIGIN || APP_BASE;
   return fetch(`${origin}/${path}`, { cf: { cacheTtl: 0 } })
     .then((r) => (r.ok ? r.json() : null))
     .catch(() => null);

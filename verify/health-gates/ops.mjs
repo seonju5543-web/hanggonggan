@@ -596,4 +596,27 @@ export default async function gate(eq, ctx) {
     eq(`  가리키는 Actions 버튼(${buttons.length}개)이 워크플로 이름에 있다`, buttons.filter((b) => !wfNames.some((n) => n.startsWith(b))), []);
     eq('  (대조할 것을 실제로 뽑았다 — 파일 4·경보 8·버튼 3 이상)', [paths.length >= 4, titles.length >= 8, buttons.length >= 3], [true, true, true]);
   }
+
+  /* ── ⑪ 앱 주소 한 곳 (2026-11-14 · 은서 · 출시 준비 — server/shared/app-address.mjs) ──
+     앱 주소가 서버 넷·인스타 로봇·점검 로봇에 글자로 박혀 있어, 도메인을 옮길 때 하나만 빠져도 그 기능이 조용히 깨질 구조였다 */
+  {
+    const AA = await import(new URL('server/shared/app-address.mjs', root));
+    const HOST = new URL(AA.APP_ORIGIN).host;
+    const listed = spawnSync('git', ['ls-files', '-z', '*.js', '*.mjs', '*.cjs', '*.yml', '*.yaml', '*.toml', '*.html'], { cwd: rootPath, encoding: 'utf8' }).stdout.split('\0').filter(Boolean);
+    /* 허용: 한 곳 파일 · 검사(verify/ — 표본 주소) · 쓰지 않는 옛 서버(mail-worker — 문제 기록용) · 설정 파일 둘(아래에서 같은지 대조) · 받아 둔 데이터 */
+    const ALLOW = (f) => f === 'server/shared/app-address.mjs' || f.startsWith('verify/') || f === 'server/mail-worker.js'
+      || f === 'server/push/wrangler.toml' || f === 'supabase-config.js' || f.startsWith('data/') || f.startsWith('collector/extracted/') || f.startsWith('docs/') || f.startsWith('proposals/');
+    const stray = listed.filter((f) => !ALLOW(f) && fs.existsSync(path.join(rootPath, f)) && fs.readFileSync(path.join(rootPath, f), 'utf8').includes(HOST));
+    eq(`⑪ 🔴 앱 주소(${HOST})를 글자로 박은 실행 코드가 없다 — 쓰는 곳은 server/shared/app-address.mjs 를 불러 쓴다`, stray, []);
+    eq('  (대조할 것을 실제로 뽑았다 — 파일 300개 이상)', listed.length >= 300, true);
+    const toml = read(root, 'server/push/wrangler.toml');
+    eq('  push 서버 설정(wrangler.toml)의 APP_ORIGIN·ALLOW_ORIGIN 이 한 곳 값과 같다',
+      [(toml.match(/^APP_ORIGIN = "([^"]+)"/m) || [])[1], (toml.match(/^ALLOW_ORIGIN = "([^"]+)"/m) || [])[1]], [AA.APP_BASE, AA.APP_ORIGIN]);
+    const users = { 'server/push/worker.js': 'APP_BASE', 'server/chat/worker.js': 'APP_ORIGIN', 'server/essay/worker.js': 'APP_ORIGIN', 'server/apply/worker.js': 'APP_ORIGIN', 'insta/publish.mjs': 'APP_BASE' };
+    eq('  서버 넷·인스타 게시 로봇이 한 곳 파일을 불러 쓴다',
+      Object.entries(users).filter(([f, name]) => !new RegExp(`import \\{ ${name} \\} from '\\.\\.(?:/server)?/shared/app-address\\.mjs'`).test(read(root, f))).map(([f]) => f), []);
+    const cl = read(root, '.github/workflows/check-live.yml').replace(/^\s*#.*$/gm, '');
+    eq('  실제 앱 점검(check-live)은 주소를 한 곳에서 읽는다 · 경보 본문도 그 값을 쓴다',
+      [/import \{ APP_BASE \} from '\.\/server\/shared\/app-address\.mjs'/.test(cl) && /SITE=\$\(/.test(cl), (cl.match(/\$\{\{ env\.SITE \}\}/g) || []).length >= 2], [true, true]);
+  }
 }

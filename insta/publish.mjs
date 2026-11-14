@@ -21,13 +21,14 @@
  */
 import { readFileSync, existsSync, readdirSync, appendFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { APP_BASE } from '../server/shared/app-address.mjs';
 
 // 🔴 Instagram Login 경로 — **페이스북 페이지가 필요 없다**(2026-09-11 문서 확인).
 //    엔드포인트 경로는 Facebook Login 과 똑같고 호스트만 다르다.
 const API = process.env.IG_API_BASE || 'https://graph.instagram.com';
 const ROOT = new URL('../', import.meta.url);
 /** 🔴 주소를 여기 한 곳에만 둔다 — 앱 주소가 여덟 군데 박혀 있어서 옮길 때 샜던 전례가 있다. */
-const SITE = process.env.INSTA_PUBLIC_BASE || 'https://seonju5543-web.github.io/hanggonggan';
+const SITE = process.env.INSTA_PUBLIC_BASE || APP_BASE;   // 앱 주소 한 곳(server/shared/app-address.mjs)
 
 /** 🔴 기다림의 길이를 **한 곳에** 모은다 — 시험에서 0으로 줄여 쓴다(실제 값으로 시험하면 몇 분 걸린다).
  *  그래서 시험이 진짜 코드를 돌리면서도 빨리 끝난다(규칙을 베껴 재는 시험은 원본이 바뀌어도 통과한다). */
