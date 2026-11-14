@@ -1,6 +1,6 @@
 {
  "school": "명지대학교",
- "updatedAt": "2026-11-13",
+ "updatedAt": "2026-11-14",
  "items": [
   {
    "title": "2027학년도 1학기 수강 희망 교과목 사전조사 실시 안내",
@@ -381,17 +381,6 @@
    "src": "7f376301",
    "foundAt": "2026-10-15",
    "thumb": "data/news/img/d9d56d1ab7328204.webp"
-  },
-  {
-   "title": "[IR센터] 자연캠퍼스 전임연구원 채용 공고",
-   "url": "https://www.mju.ac.kr/bbs/mjukr/141/236311/artclView.do",
-   "postedAt": "2026-10-14",
-   "kind": "채용",
-   "school": "명지대학교",
-   "campus": "",
-   "src": "7f376301",
-   "foundAt": "2026-10-14",
-   "desc": "명지대학교 자연캠퍼스 ( 용인 ) 기획조정실 IR 센터 전임연구원 채용을 아래와 같이 공고하오니 많은 지원 바랍니다 ."
   }
  ]
 }

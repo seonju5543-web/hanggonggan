@@ -1,6 +1,6 @@
 {
  "school": "세종대학교",
- "updatedAt": "2026-11-13",
+ "updatedAt": "2026-11-14",
  "items": [
   {
    "title": "웹툰으로 알아보는 상담소 이용 가이드 ③탄 - 진로",
@@ -88,17 +88,6 @@
    "src": "8a741b47",
    "foundAt": "2026-10-19",
    "desc": "제19차 세종대학교 한국어능력시험(TOPIK) 결과는 아래 링크에서 확인하시기 바랍니다."
-  },
-  {
-   "title": "국가암검진(자궁경부암검진) 제도 안내",
-   "url": "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=894694&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-14",
-   "school": "세종대학교",
-   "campus": "",
-   "src": "8a741b47",
-   "foundAt": "2026-10-14",
-   "thumb": "data/news/img/fffa7685df4f1a03.webp",
-   "desc": "국민건강보험공단의 \"짝수년생을 위한 자궁암검진 이벤트\" 및 \"국가암검진 제도\"를 알려드립니다."
   }
  ]
 }

@@ -1,6 +1,6 @@
 {
  "school": "서울과학기술대학교",
- "updatedAt": "2026-11-13",
+ "updatedAt": "2026-11-14",
  "items": [
   {
    "title": "[학사지원과] 연계융합전공 활성화 및 제도 개선을 위한 설문조사 안내",
@@ -387,17 +387,6 @@
    "foundAt": "2026-10-15",
    "thumb": "data/news/img/7b6f797459ddc625.webp",
    "desc": "서울과기대 교양대학 융합교양학부 정기 콜로키엄 참가 안내 2026년 서울과기대 융합교양학부 정기 콜로키엄은 <AI와 함께 만드는, 맞춤형 로봇 -몸의 모양부터 움직이는 방법까지> 을 주제로 진행합니다."
-  },
-  {
-   "title": "[메이커장비교육] SLA 3D프린터 장비교육",
-   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896533&qidx=4691&cate=10&allboard=false&nowpage=1",
-   "postedAt": "2026-10-14",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "src": "4da0b96f",
-   "foundAt": "2026-10-14",
-   "thumb": "data/news/img/ca1f88138cbac485.webp",
-   "desc": "장비교육 신청시 신청서 양식이 미흡한경우 (디지털서명 누락, 작성해야하는 부분 누락, 교육명 누락 등 ) 먼저 신청하셨더라도 후순위로 선발될수있습니다. 이전 내용이 없습니다."
   }
  ]
 }

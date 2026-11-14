@@ -1,6 +1,6 @@
 {
  "school": "한국외국어대학교",
- "updatedAt": "2026-11-13",
+ "updatedAt": "2026-11-14",
  "items": [
   {
    "title": "홈페이지 가짜 ‘로봇 인증’ 공격 주의사항 안내",
@@ -304,28 +304,6 @@
    "src": "54a450a4",
    "foundAt": "2026-10-16",
    "thumb": "data/news/img/0789a0f0292fd3fb.webp"
-  },
-  {
-   "title": "[중국연구소] 제21회 청년학자국제학술대회 개최",
-   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/269145/artclView.do",
-   "postedAt": "2026-10-14",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "src": "54a450a4",
-   "foundAt": "2026-10-14",
-   "thumb": "data/news/img/8796fe5bb27dd6b9.webp",
-   "desc": "한국외국어대학교 중국연구소(최재영 소장)와 한국외국어대학교 공자학원은 오는 10월 24일, 제21회 청년학자 국제학술대회를 공동 개최한다."
-  },
-  {
-   "title": "제7회 EU Certificate Course 수강생 모집 안내",
-   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/269047/artclView.do",
-   "postedAt": "2026-10-14",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "src": "54a450a4",
-   "foundAt": "2026-10-14",
-   "thumb": "data/news/img/f594f942e9f67f61.webp",
-   "desc": "\"지리, 와인부터 안보에서 축구까지, 6가지 키워드로 읽는 다채로운 유럽!\" 한국외국어대학교 장모네 EU센터(Jean Monnet Centre of Excellence)에서 주관하는 2026 제6회 EU…"
   }
  ]
 }

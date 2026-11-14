@@ -1,6 +1,6 @@
 {
  "school": "서울교육대학교",
- "updatedAt": "2026-11-13",
+ "updatedAt": "2026-11-14",
  "items": [
   {
    "title": "긴급 네트워크 작업으로 인한 홈페이지 및 학내 정보시스템 순단 안내",
@@ -172,18 +172,6 @@
    "src": "4d730c6c",
    "foundAt": "2026-10-20",
    "thumb": "data/news/img/ecd68a4aff51aa41.webp"
-  },
-  {
-   "title": "[국민건강보험공단] 국가암검진(자궁경부암검진) 제도 안내 (검진대상자 20세부터~",
-   "url": "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=1309&bbsId=1082&nttSn=55380",
-   "postedAt": "2026-10-14",
-   "postId": "55380",
-   "kind": "생활",
-   "school": "서울교육대학교",
-   "campus": "",
-   "src": "4d730c6c",
-   "foundAt": "2026-10-14",
-   "thumb": "data/news/img/e19f912d971a7154.webp"
   }
  ]
 }
