@@ -1,4 +1,4 @@
-## 🛰 공공 API 로봇 리포트 (2026-11-14)
+## 🛰 공공 API 로봇 리포트 (2026-11-15)
 
 - ✅ **K-Startup 사업공고** — 받은 행 146 · 실은 글 **15** · 버림: 공모전·대외활동 아님(지원사업 등) 119 · 상한 15건 초과 12
   - 자격 줄 있는 글 15/15 · 원문 안내 있는 글 15/15
@@ -22,16 +22,14 @@
     - 179727 · 제9회 원주권 스타트업 커뮤니티 데이 참가자 모집 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179727 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179727(2)
     - 179673 · 경기대학교 2026년 예비창업패키지 KGU 창업준비 아 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179673 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179673(2)
     - 179793 · [경과원 X 나이스디앤비] 스타트업 공공시장 진출 실전 → https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179793 · 살핀 칸: detl_pg_url=https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179793(2)
-- ✅ **1365 봉사참여정보** — 받은 행 500 · 실은 글 **15** · 상세 내용 15/15건 · 버림: 대학생·청년 대상 아님 442 · 상한 15건 초과 41 · 같은 글 2
-  - 자격 줄 있는 글 6/15 · 원문 안내 있는 글 15/15
+- ✅ **1365 봉사참여정보** — 받은 행 500 · 실은 글 **15** · 상세 내용 15/15건 · 버림: 대학생·청년 대상 아님 439 · 상한 15건 초과 44 · 같은 글 2
+  - 자격 줄 있는 글 5/15 · 원문 안내 있는 글 15/15
   - 첫 행 칸: `actBeginTm, actEndTm, actPlace, adultPosblAt, gugunCd, nanmmbyNm, noticeBgnde, noticeEndde, progrmBgnde, progrmEndde, progrmRegistNo, progrmSj, progrmSttusSe, sidoCd, srvcClCode, url, yngbgsPosblAt`
-  - 코드 칸 값(첫 세 행): gugunCd=3780000|3780000|5710000 · sidoCd=6410000|6410000|6430000
-  - 대외활동 · 어르신 말벗, 식사지원, 프로그램 활동보조 자원봉사 모집 (대학생 이상부터 신청 가능합니다) (~2026-11-14) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3504654
-  - 대외활동 · 제5회 부울경대학생스피치대회 안내 및 진행보조 봉사자 모집 (~2026-11-14) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3547051
+  - 코드 칸 값(첫 세 행): gugunCd=3040000|3040000|3160000 · sidoCd=6110000|6110000|6110000
   - 대외활동 · 11월(오전) 대전수학문화관 대학생 봉사활동 모집 (~2026-11-16) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3540321
+  - 대외활동 · 2026년 대학수학능력시험 격려 키트 만들기 대학생 봉사자 모집 (~2026-11-16) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3544547
+  - 대외활동 · 2026년 대학수학능력시험 격려 활동보조 대학생 봉사자 모집 (~2026-11-17) — https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3544550
   - 주소 고르기 (번호 칸 `progrmRegistNo` · 점수 2 글 번호 있음 · 1 그 밖 · 0 첫 화면·번호 없는 보기 화면):
-    - 3504654 · 어르신 말벗, 식사지원, 프로그램 활동보조 자원봉사 모 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3504654 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3504654(2)
-    - 3547051 · 제5회 부울경대학생스피치대회 안내 및 진행보조 봉사자  → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3547051 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3547051(2)
     - 3540321 · 11월(오전) 대전수학문화관 대학생 봉사활동 모집 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3540321 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3540321(2)
     - 3544547 · 2026년 대학수학능력시험 격려 키트 만들기 대학생 봉 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3544547 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3544547(2)
     - 3544550 · 2026년 대학수학능력시험 격려 활동보조 대학생 봉사자 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3544550 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3544550(2)
@@ -45,6 +43,8 @@
     - 3513893 · 2026년 우리고장 현충시설 서포터즈 활동 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3513893 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3513893(2)
     - 3540291 · 2026년 서동지역아동센터 대학생 교육봉사자를 모집합니 → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3540291 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3540291(2)
     - 3541967 · 2026년 읍면동체육대회 대학생 자원봉사자 모집(오전) → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3541967 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3541967(2)
+    - 3541969 · 2026년 읍면동체육대회 대학생 자원봉사자 모집(오후) → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3541969 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3541969(2)
+    - 3542419 · 국립망향의동산 잡초제거 등 환경 정비(오전타임)월,화, → https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3542419 · 살핀 칸: url=https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3542419(2)
 - ✅ **온통청년 청년콘텐츠** — 받은 행 30 · 실은 글 **3** · 버림: 공모전·대외활동 아님(소식 글 등) 27
   - 자격 줄 있는 글 0/3 · 원문 안내 있는 글 0/3
   - 첫 행 칸: `bbsSn, pstSn, pstSeSn, pstSeNm, pstTtl, pstWholCn, pstInqCnt, pstUrlAddr, atchFile, frstRgtrNm, frstRegDt, lastMdfrNm, lastMdfcnDt`
