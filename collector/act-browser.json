@@ -173,24 +173,24 @@
   "tries": 2
  },
  "https://www.saha.go.kr/startup/program/list.do?mId=0302000000": {
-  "at": "2026-11-07",
-  "tries": 1
+  "at": "2026-11-14",
+  "tries": 2
  },
  "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000242/articleView.do?searchSeq=17550&commonMenuNo=506_533": {
-  "at": "2026-11-07",
-  "tries": 1
+  "at": "2026-11-14",
+  "tries": 2
  },
  "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000242/articleView.do?searchSeq=17523&commonMenuNo=506_533": {
-  "at": "2026-11-07",
-  "tries": 1
+  "at": "2026-11-14",
+  "tries": 2
  },
  "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000242/articleView.do?searchSeq=17549&commonMenuNo=506_533": {
-  "at": "2026-11-07",
-  "tries": 1
+  "at": "2026-11-14",
+  "tries": 2
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53623&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-11-07",
-  "tries": 1
+  "at": "2026-11-14",
+  "tries": 2
  },
  "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156788329&pWise=sub&pWiseSub=C4": {
   "at": "2026-11-08",
