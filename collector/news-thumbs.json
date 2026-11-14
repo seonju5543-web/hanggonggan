@@ -17818,15 +17818,6 @@
    "school": "강원대학교",
    "none": "글에 그림이 없음"
   },
-  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367760&mode=view&no=349": {
-   "at": "2026-11-03",
-   "school": "이화여자대학교",
-   "file": "data/news/img/0a959cb8e317f333.webp",
-   "src": "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEZsgvAygEQA4DkAyBLASgWQCsBFATwHMAxAD2IHVSAFAawDpUA7coA%20",
-   "from": "body",
-   "v": 2,
-   "side": 360
-  },
   "post:전북대학교:219317": {
    "at": "2026-11-09",
    "school": "전북대학교",
@@ -22211,6 +22202,54 @@
    "at": "2026-11-14",
    "school": "이화여자대학교",
    "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림))"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367907&mode=view&no=325": {
+   "at": "2026-11-14",
+   "school": "이화여자대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림))"
+  },
+  "post:전북대학교:219851": {
+   "at": "2026-11-14",
+   "school": "전북대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(같은 파일) · body: 여러 글에 같은 그림(공통 그림))"
+  },
+  "url:https://www3.chosun.ac.kr/bbs/chosun/117/282800/artclView.do": {
+   "at": "2026-11-14",
+   "school": "조선대학교",
+   "file": "data/news/img/b317a1407fb54e9c.webp",
+   "src": "https://www3.chosun.ac.kr/editorUpload/images/000299/%ED%8F%AC%EC%8A%A4%ED%84%B0.jpg",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367870&mode=view&no=335": {
+   "at": "2026-11-14",
+   "school": "이화여자대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림) · attach: 여러 글에 같은 그림(공통 그림))"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367779&mode=view&no=335": {
+   "at": "2026-11-14",
+   "school": "이화여자대학교",
+   "file": "data/news/img/f5c7f0b7f02c2abf.webp",
+   "src": "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEZshBAXgVQOKIA4FcBuA7AWwAsB3AMwA0BNAKyoEk8cA6GjAcyA%20",
+   "from": "body",
+   "v": 2,
+   "side": 360
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367760&mode=view&no=335": {
+   "at": "2026-11-14",
+   "school": "이화여자대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(같은 파일 · 1글))"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367745&mode=view&no=335": {
+   "at": "2026-11-14",
+   "school": "이화여자대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(공통 그림))"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367744&mode=view&no=335": {
+   "at": "2026-11-14",
+   "school": "이화여자대학교",
+   "none": "사진으로 쓸 그림 없음 (body: 여러 글에 같은 그림(같은 파일))"
   }
  },
  "srcSeen": {
@@ -23757,6 +23796,9 @@
    ],
    "https://www3.chosun.ac.kr/editorUpload/images/000299/2026_%EC%B9%B4%EB%93%9C%EB%89%B4%EC%8A%A4_%EB%B0%9C%ED%91%9C%EB%8C%80%ED%9A%8C_%EC%8B%AC%EC%82%AC_%EA%B2%B0%EA%B3%BC_%EB%B0%9C%ED%91%9C001_1.jpg": [
     "url:https://www3.chosun.ac.kr/bbs/chosun/117/282778/artclView.do"
+   ],
+   "https://www3.chosun.ac.kr/editorUpload/images/000299/%ED%8F%AC%EC%8A%A4%ED%84%B0.jpg": [
+    "url:https://www3.chosun.ac.kr/bbs/chosun/117/282800/artclView.do"
    ]
   },
   "한국방송통신대학교": {
@@ -24113,6 +24155,9 @@
    ],
    "https://www.jbnu.ac.kr/common/file.do?file=hlV94A2RbmAIO5hwEa3/p6A/GpeqUd1KiOeOBU8OxREcPOtLC/rMqhiwV/bWmFgd": [
     "post:전북대학교:219797"
+   ],
+   "https://www.jbnu.ac.kr/common/file.do?file=IhUtdXKfyYXn+XivE3IYR75S844msy45dVppDFtHQ2sBWkyTxBYhezLu3XlnpvLd": [
+    "post:전북대학교:219851"
    ]
   },
   "강원대학교": {
@@ -25489,6 +25534,15 @@
    "https://rwcms.ewha.ac.kr/sites/ewhapress/mail_image/event_2027quiz.jpg": [
     "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367930&mode=view&no=336",
     "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367930&mode=view&no=337"
+   ],
+   "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEZshBAXgVQOKIA4FcBuA7AWwAsB3AMwA0BNAKyoEk8cA6GjAcyA%20": [
+    "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367779&mode=view&no=335"
+   ],
+   "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEZsgvAygEQA4DkAyBLASgWQCsBFATwHMAxAD2IHVSAFAawDpUA7coA%20": [
+    "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367760&mode=view&no=335"
+   ],
+   "https://www.ewha.ac.kr/cms/plugin/editorImage.do?EwBmDYHoEZsgFAFgOQJoE8DqBlAEgEQHdMBhASUQCN0BxAZwCkBHAOgAcA7AcyA%20": [
+    "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367744&mode=view&no=335"
    ]
   },
   "충북대학교": {
@@ -25724,7 +25778,8 @@
    "data/news/img/ab547139d917df2b.webp",
    "data/news/img/2c7e8240e0f3e3ca.webp",
    "data/news/img/6b3168fac49cdb24.webp",
-   "data/news/img/93785b0808f03bbb.webp"
+   "data/news/img/93785b0808f03bbb.webp",
+   "data/news/img/0a959cb8e317f333.webp"
   ],
   "한국외국어대학교": [
    "data/news/img/b8b2dc37a92ecd6e.webp"

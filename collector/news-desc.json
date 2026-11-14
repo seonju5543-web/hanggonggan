@@ -11533,16 +11533,14 @@
    "tries": 1
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367684&mode=view&no=334": {
-   "at": "2026-11-10",
+   "at": "2026-11-14",
    "v": 2,
-   "err": "글 열기 실패 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
-   "tries": 1
+   "desc": "※ 지원기간 중 ‘ 이화여자대학교 직원 채용 홈페이지 ’ 를 통한 인터넷 지원만 가능함 [ 문의처 ] 이화여자대학교 총무처 인사팀 페이스북"
   },
   "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367643&mode=view&no=334": {
-   "at": "2026-11-10",
+   "at": "2026-11-14",
    "v": 2,
-   "err": "글 열기 실패 (TypeError: UND_ERR_CONNECT_TIMEOUT)",
-   "tries": 1
+   "desc": "1. 첨부의 수강안내문을 반드시 읽어 보시기 바랍니다. 2. 강의시간표 조회( 2026.10.30.( 금) 09:00부터 ): 홈페이지&rarr;학사안내&rarr; 강의시간표/계획안"
   },
   "post:서울시립대학교:31822": {
    "at": "2026-11-11",
@@ -12817,6 +12815,46 @@
    "at": "2026-11-14",
    "v": 2,
    "desc": "이화여대 창지단 마스코트 데뷔조 최종 2인, 여러분의 선택은? 데뷔시키고, 이름 짓고, 에어팟 · 디지털 카메라 받아가자! https://forms.gle/C9X9o2mBbWmtxFYi6 반짝이는 아이디어로 세상을…"
+  },
+  "url:https://www3.chosun.ac.kr/bbs/chosun/117/282800/artclView.do": {
+   "at": "2026-11-14",
+   "v": 2,
+   "desc": "일자리지원팀 >>>>>>>>>>>> 신청 링크: https://forms.gle/CJEsrVzcj4qCK5Xv7 새로 단장한 일자리지원팀 상담 공간에서 융복합전공 이수 학생과 관심 있는 학생을 위한 1:1 맞춤…"
+  },
+  "post:전북대학교:219851": {
+   "at": "2026-11-14",
+   "v": 2,
+   "desc": "학생취업진로처 취업진로지원과 추가모집 과정(인원): 6시그마GB(15명) 추가모집 기간: 11.16.(월) 11시 ~ 11.19.(목) 18시까지 서로 다른 날짜에 운영하는 자격증의 경우 중복신청 가능!!!"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367779&mode=view&no=335": {
+   "at": "2026-11-14",
+   "v": 2,
+   "desc": "호크마교양대학 글로벌소통교육실에서 겨울 영어 프로그램을 아래와 같이 진행합니다 ."
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367760&mode=view&no=335": {
+   "at": "2026-11-14",
+   "v": 2,
+   "desc": "기술사업화센터에서는 지식재산처 국제지식재산연수원과 함께 본교 구성원의 지식재산 경쟁력 및 역량을 강화하고자 「2026년 지식재산 맞춤형 교육」을 실시하고자 하오니, 많은 관심과 참여 부탁드립니다. <운영개요>"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367745&mode=view&no=335": {
+   "at": "2026-11-14",
+   "v": 2,
+   "desc": "학부 참여 링크 대학원 참여 링크 문의: 학생지원팀(T. 02-3277-3863, 2277 / E. student@ewha.ac.kr ) 페이스북"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367744&mode=view&no=335": {
+   "at": "2026-11-14",
+   "v": 2,
+   "desc": "성탄예배는 가족 및 친구와 함께 참석이 가능합니다. 참석을 원하는 학생은 아래 링크에서 신청해주시기 바랍니다. 참여신청 링크: https://forms.gle/2QNDVKNef9euqN3b8"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367744&mode=view&no=334": {
+   "at": "2026-11-14",
+   "v": 2,
+   "desc": "성탄예배는 가족 및 친구와 함께 참석이 가능합니다. 참석을 원하는 학생은 아래 링크에서 신청해주시기 바랍니다. 참여신청 링크: https://forms.gle/2QNDVKNef9euqN3b8"
+  },
+  "url:https://www.ewha.ac.kr/ewha/news/notice.do?article.offset=0&articleLimit=10&articleNo=367714&mode=view&no=335": {
+   "at": "2026-11-14",
+   "v": 2,
+   "none": "본문 첫 문장을 확신할 수 없음"
   }
  }
 }
