@@ -220,16 +220,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3541198": {
-  "lastAt": "2026-11-12",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "final": "https://www.1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3541198",
-  "v": "post",
-  "at": "2026-11-12",
-  "n": 0,
-  "confirmed": false
- },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3542952": {
   "lastAt": "2026-11-13",
   "lastV": "unread",
@@ -1722,24 +1712,6 @@
   "why": "본문에 그 공고 제목",
   "v": "post",
   "at": "2026-11-03",
-  "n": 0,
-  "confirmed": false
- },
- "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11328": {
-  "lastAt": "2026-11-01",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-01",
-  "n": 0,
-  "confirmed": false
- },
- "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11331": {
-  "lastAt": "2026-11-01",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-01",
   "n": 0,
   "confirmed": false
  },
@@ -3361,24 +3333,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515737&code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=": {
-  "lastAt": "2026-11-02",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-02",
-  "n": 0,
-  "confirmed": false
- },
- "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515747&code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=": {
-  "lastAt": "2026-11-02",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-02",
-  "n": 0,
-  "confirmed": false
- },
  "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515755&code=sub07_0701&site_dvs_cd=kr&menu_dvs_cd=0701&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=": {
   "lastAt": "2026-11-02",
   "lastV": "post",
@@ -4918,15 +4872,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://sejong.korea.ac.kr/bbs/koreaSejong/656/273619/artclView.do": {
-  "lastAt": "2026-11-01",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-01",
-  "n": 0,
-  "confirmed": false
- },
  "https://sejong.korea.ac.kr/bbs/koreaSejong/656/273810/artclView.do": {
   "lastAt": "2026-11-10",
   "lastV": "post",
@@ -5929,15 +5874,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://wise.dongguk.ac.kr/article/servicenotice/detail/521116": {
-  "lastAt": "2026-11-07",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-07",
-  "n": 0,
-  "confirmed": false
- },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/521118": {
   "lastAt": "2026-11-10",
   "lastV": "post",
@@ -5953,51 +5889,6 @@
   "why": "제목 자리에 그 공고 제목",
   "v": "post",
   "at": "2026-11-14",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377449&article.offset=0&articleLimit=10": {
-  "lastAt": "2026-11-02",
-  "lastV": "unread",
-  "why": "열기 실패: page.goto: Timeout 20000ms exceeded.",
-  "v": "post",
-  "at": "2026-10-14",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377460&article.offset=0&articleLimit=10": {
-  "lastAt": "2026-11-02",
-  "lastV": "unread",
-  "why": "열기 실패: page.goto: net::ERR_CONNECTION_REFUSED at https://www.ajou.a",
-  "v": "post",
-  "at": "2026-10-14",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377463&article.offset=0&articleLimit=10": {
-  "lastAt": "2026-11-02",
-  "lastV": "unread",
-  "why": "열기 실패: page.goto: Timeout 20000ms exceeded.",
-  "v": "post",
-  "at": "2026-10-14",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377479&article.offset=0&articleLimit=10": {
-  "lastAt": "2026-11-01",
-  "lastV": "unread",
-  "why": "열기 실패: page.goto: Timeout 20000ms exceeded.",
-  "v": "post",
-  "at": "2026-10-14",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377499&article.offset=0&articleLimit=10": {
-  "lastAt": "2026-11-01",
-  "lastV": "unread",
-  "why": "열기 실패: page.goto: Timeout 20000ms exceeded.",
-  "v": "post",
-  "at": "2026-10-14",
   "n": 0,
   "confirmed": false
  },
@@ -7077,15 +6968,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30183&pageNo=1": {
-  "lastAt": "2026-11-02",
-  "lastV": "post",
-  "why": "본문에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-02",
-  "n": 0,
-  "confirmed": false
- },
  "https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30196&pageNo=2": {
   "lastAt": "2026-11-14",
   "lastV": "post",
@@ -7623,11 +7505,6 @@
   "confirmed": false
  },
  "https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&page=2&nttId=30154": {
-  "lastAt": "2026-11-06",
-  "lastV": "unread",
-  "why": "본문이 안 그려짐(70자 — 판정 불가)"
- },
- "https://www.cau.ac.kr/cms/FR_CON/view.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5&page=2&nttId=30159": {
   "lastAt": "2026-11-06",
   "lastV": "unread",
   "why": "본문이 안 그려짐(70자 — 판정 불가)"
@@ -9514,42 +9391,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367714&article.offset=0&articleLimit=10&no=342": {
-  "lastAt": "2026-11-14",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-14",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367745&article.offset=0&articleLimit=10&no=342": {
-  "lastAt": "2026-11-14",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-14",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367760&article.offset=0&articleLimit=10&no=342": {
-  "lastAt": "2026-11-14",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-14",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367779&article.offset=0&articleLimit=10&no=342": {
-  "lastAt": "2026-11-14",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-14",
-  "n": 0,
-  "confirmed": false
- },
  "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367858&article.offset=0&articleLimit=10&no=332": {
   "lastAt": "2026-11-10",
   "lastV": "post",
@@ -9559,58 +9400,12 @@
   "n": 0,
   "confirmed": false
  },
- "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367870&article.offset=0&articleLimit=10&no=342": {
-  "lastAt": "2026-11-14",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-14",
-  "n": 0,
-  "confirmed": false
- },
  "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367875&article.offset=0&articleLimit=10&no=336": {
   "lastAt": "2026-11-13",
   "lastV": "post",
   "why": "제목 자리에 그 공고 제목",
   "v": "post",
   "at": "2026-11-13",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367932&article.offset=0&articleLimit=10&no=338": {
-  "lastAt": "2026-11-14",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-14",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367933&article.offset=0&articleLimit=10&no=339": {
-  "lastAt": "2026-11-14",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-14",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367934&article.offset=0&articleLimit=10&no=340": {
-  "lastAt": "2026-11-14",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-14",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.gachon.ac.kr/bbs/kor/475/126076/artclView.do": {
-  "lastAt": "2026-11-02",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "final": "https://www.gachon.ac.kr/kor/3104/subview.do?enc=Zm5jdDF8QEB8JTJGYmJzJTJGa29yJTJGNDc1JTJGMTI2MDc2JTJGYXJ0Y2xWaWV3LmRvJTNG",
-  "v": "post",
-  "at": "2026-11-02",
   "n": 0,
   "confirmed": false
  },
@@ -10305,15 +10100,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://www.hanyang.ac.kr/notice_all?p_p_id=kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_action=view_message&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_entryId=120602": {
-  "lastAt": "2026-11-01",
-  "lastV": "unread",
-  "why": "HTTP 403",
-  "v": "post",
-  "at": "2026-10-14",
-  "n": 0,
-  "confirmed": false
- },
  "https://www.hanyang.ac.kr/notice_all?p_p_id=kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet&p_p_lifecycle=0&p_p_state=normal&p_p_mode=view&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_action=view_message&_kr_ac_hanyang_noticeBoard_web_portlet_NoticeBoardPortlet_entryId=120701": {
   "lastAt": "2026-11-08",
   "lastV": "unread",
@@ -10802,24 +10588,6 @@
   "lastV": "unread",
   "why": "본문이 안 그려짐(165자 — 판정 불가)",
   "final": "https://cdn-botmanager.stclab.com/sample/deny/index.html"
- },
- "https://www.hufs.ac.kr/bbs/hufs/2180/269047/artclView.do": {
-  "lastAt": "2026-11-01",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-01",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.hufs.ac.kr/bbs/hufs/2180/269145/artclView.do": {
-  "lastAt": "2026-11-01",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-01",
-  "n": 0,
-  "confirmed": false
  },
  "https://www.hufs.ac.kr/bbs/hufs/2180/269264/artclView.do": {
   "lastAt": "2026-11-05",
@@ -12214,15 +11982,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://www.jbnu.ac.kr/web/Board/219319/detailView.do": {
-  "lastAt": "2026-11-03",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-03",
-  "n": 0,
-  "confirmed": false
- },
  "https://www.jbnu.ac.kr/web/Board/219326/detailView.do?category=6": {
   "lastAt": "2026-11-03",
   "lastV": "post",
@@ -13417,24 +13176,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179737": {
-  "lastAt": "2026-11-06",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-06",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179739": {
-  "lastAt": "2026-11-06",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-06",
-  "n": 0,
-  "confirmed": false
- },
  "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179741": {
   "lastAt": "2026-11-07",
   "lastV": "post",
@@ -13513,15 +13254,6 @@
   "why": "제목 자리에 그 공고 제목",
   "v": "post",
   "at": "2026-11-06",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11538&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0": {
-  "lastAt": "2026-11-02",
-  "lastV": "post",
-  "why": "본문에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-02",
   "n": 0,
   "confirmed": false
  },
@@ -16263,15 +15995,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12482/view.do?currentPageNo=1": {
-  "lastAt": "2026-11-02",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-02",
-  "n": 0,
-  "confirmed": false
- },
  "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12491/view.do?currentPageNo=1": {
   "lastAt": "2026-11-02",
   "lastV": "post",
@@ -16751,24 +16474,6 @@
   "why": "제목 자리에 그 공고 제목",
   "v": "post",
   "at": "2026-11-13",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE1MTElMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D": {
-  "lastAt": "2026-11-02",
-  "lastV": "post",
-  "why": "본문에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-02",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE1MTIlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D": {
-  "lastAt": "2026-11-02",
-  "lastV": "post",
-  "why": "본문에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-02",
   "n": 0,
   "confirmed": false
  },
@@ -18773,15 +18478,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://www.mju.ac.kr/bbs/mjukr/141/236311/artclView.do": {
-  "lastAt": "2026-11-02",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-02",
-  "n": 0,
-  "confirmed": false
- },
  "https://www.mju.ac.kr/bbs/mjukr/141/236348/artclView.do": {
   "lastAt": "2026-11-02",
   "lastV": "post",
@@ -20068,15 +19764,6 @@
   "lastV": "unread",
   "why": "글 표지도 제목도 없음(판정 불가)"
  },
- "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=894694&article.offset=0&articleLimit=10": {
-  "lastAt": "2026-11-02",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-02",
-  "n": 0,
-  "confirmed": false
- },
  "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=894881&article.offset=0&articleLimit=10": {
   "lastAt": "2026-11-08",
   "lastV": "post",
@@ -20831,15 +20518,6 @@
   "why": "제목 자리에 그 공고 제목",
   "v": "post",
   "at": "2026-11-06",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896533&qidx=4691&cate=10&allboard=false&nowpage=1": {
-  "lastAt": "2026-11-01",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-01",
   "n": 0,
   "confirmed": false
  },
@@ -22257,15 +21935,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=1309&bbsId=1082&nttSn=55380": {
-  "lastAt": "2026-11-01",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-01",
-  "n": 0,
-  "confirmed": false
- },
  "https://www.snue.ac.kr/snue/na/ntt/selectNttInfo.do?mi=1309&bbsId=1082&nttSn=55438": {
   "lastAt": "2026-11-08",
   "lastV": "post",
@@ -22840,15 +22509,6 @@
   "why": "제목 자리에 그 공고 제목",
   "v": "post",
   "at": "2026-10-31",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.sogang.ac.kr/ko/detail/551590?bbsConfigFk=142&namepage=StoryNotificationEvent&text=%EC%84%9C%EA%B0%95+Story&title=%ED%96%89%EC%82%AC%ED%8A%B9%EA%B0%95&redirect=/ko/story/notification-event": {
-  "lastAt": "2026-11-01",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-01",
   "n": 0,
   "confirmed": false
  },
@@ -23926,15 +23586,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://www.yonsei.ac.kr/bbs/sc/58/944360/artclView.do": {
-  "lastAt": "2026-11-02",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-02",
-  "n": 0,
-  "confirmed": false
- },
  "https://www.yonsei.ac.kr/bbs/sc/58/944361/artclView.do": {
   "lastAt": "2026-11-02",
   "lastV": "post",
@@ -24245,15 +23896,6 @@
   "why": "제목 자리에 그 공고 제목",
   "v": "post",
   "at": "2026-11-14",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.yonsei.ac.kr/bbs/wj/104/944348/artclView.do": {
-  "lastAt": "2026-11-01",
-  "lastV": "post",
-  "why": "본문에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-01",
   "n": 0,
   "confirmed": false
  },
@@ -24929,24 +24571,6 @@
   "why": "제목 자리에 그 공고 제목",
   "v": "post",
   "at": "2026-11-12",
-  "n": 0,
-  "confirmed": false
- },
- "https://www3.chosun.ac.kr/bbs/chosun/117/282021/artclView.do": {
-  "lastAt": "2026-11-02",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-02",
-  "n": 0,
-  "confirmed": false
- },
- "https://www3.chosun.ac.kr/bbs/chosun/117/282034/artclView.do": {
-  "lastAt": "2026-11-02",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-02",
   "n": 0,
   "confirmed": false
  },

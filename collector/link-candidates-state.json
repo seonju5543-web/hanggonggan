@@ -148,13 +148,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-11-14",
-  "lastAt": "2026-11-14",
-  "tries": 1,
+  "lastAt": "2026-11-15",
+  "tries": 2,
   "status": "pending",
-  "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
+  "why": "게시판을 못 엶(page.goto: net::ERR_CONNECTION_REFUSED at https://www.hongc…)",
   "checks": {},
   "round": "2026-11-20",
-  "nextAt": "2026-11-15"
+  "nextAt": "2026-11-18"
  },
  "kosaf|2000204008|board:https://council.wonju.go.kr/content/news/photoGallery.html": {
   "ds": "kosaf",
@@ -342,13 +342,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-11-14",
-  "lastAt": "2026-11-14",
-  "tries": 1,
+  "lastAt": "2026-11-15",
+  "tries": 2,
   "status": "pending",
   "why": "게시판 목록(10줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-11-18",
-  "nextAt": "2026-11-15"
+  "nextAt": "2026-11-18"
  },
  "kosaf|2000423012|https://www.jincheon.go.kr/jcjh/sub.do?menukey=3464&mode=view&no=1076147380": {
   "ds": "kosaf",
@@ -624,13 +624,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-11-14",
-  "lastAt": "2026-11-14",
-  "tries": 1,
+  "lastAt": "2026-11-15",
+  "tries": 2,
   "status": "pending",
   "why": "게시판 목록(9줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-11-15",
-  "nextAt": "2026-11-15"
+  "nextAt": "2026-11-18"
  },
  "kosaf|2700071007|board:https://www.ycsf.or.kr/open/notice/list.html": {
   "ds": "kosaf",
@@ -713,13 +713,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-11-14",
-  "lastAt": "2026-11-14",
-  "tries": 1,
+  "lastAt": "2026-11-15",
+  "tries": 2,
   "status": "pending",
   "why": "게시판 목록(14줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-11-27",
-  "nextAt": "2026-11-15"
+  "nextAt": "2026-11-18"
  },
  "kosaf|2701295001|board:http://www.cbck.or.kr/Board/K7120": {
   "ds": "kosaf",
@@ -761,13 +761,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-11-14",
-  "lastAt": "2026-11-14",
-  "tries": 1,
+  "lastAt": "2026-11-15",
+  "tries": 2,
   "status": "pending",
   "why": "게시판 목록(7줄)에서 그 글을 하나로 못 고름",
   "checks": {},
   "round": "2026-11-20",
-  "nextAt": "2026-11-15"
+  "nextAt": "2026-11-18"
  },
  "kosaf|2704228001|board:https://www.busan.go.kr/nbnews": {
   "ds": "kosaf",
