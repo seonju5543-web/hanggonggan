@@ -1,4 +1,4 @@
-## 🖥 브라우저형 수집 리포트 (2026-11-14 12:06 KST)
+## 🖥 브라우저형 수집 리포트 (2026-11-14 19:04 KST)
 
 ### 한국외국어대학교
 - ✅ 링크 83 · 장학 공고 11 · https://dep.hufs.ac.kr/student/12767/subview.do
@@ -18,12 +18,10 @@
   - 📄 2페이지에서 장학 공고 2건 더 읽음
 - ✅ 링크 1306 · 장학 공고 2 · 이미 아는 공고 14건은 다시 열지 않음 · https://www.cau.ac.kr/cms/FR_CON/index.do?MENU_ID=100&CONTENTS_NO=5&P_TAB_NO=5
   - ⏭ 남은 후보 1곳은 열지 않음(앞 주소에서 읽었다)
-  - [수집] 2026년 고속도로 장학생 선발 공고
-  - [수집] 2026학년도 AX미래장학금 장학생 선발 공고
 
 ### 동국대학교
-  - 📄 2페이지에서 장학 공고 20건 더 읽음
-- ✅ 링크 1233 · 장학 공고 3 · 이미 아는 공고 19건은 다시 열지 않음 · https://www.dongguk.edu/article/JANGHAKNOTICE/list
+  - 📄 2페이지에서 장학 공고 19건 더 읽음
+- ✅ 링크 1232 · 장학 공고 2 · 이미 아는 공고 19건은 다시 열지 않음 · https://www.dongguk.edu/article/JANGHAKNOTICE/list
 
 ### 상명대학교
 - ✅ 링크 630 · 장학 공고 5 · https://www.smu.ac.kr/kor/life/notice.do
@@ -34,13 +32,13 @@
 - ✅ 링크 766 · 장학 공고 2 · 이미 아는 공고 5건은 다시 열지 않음 · https://www.korea.ac.kr/ko/568/subview.do
 
 ### 계명대학교
-- ✅ 링크 526 · 장학 공고 15 · https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&
+- ❌ 오류(page.goto: Target page, context or browser has been closed) · https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&
 
 ### 부산대학교
 - ✅ 링크 45 · 장학 공고 1 · 이미 아는 공고 10건은 다시 열지 않음 · https://onestop.pusan.ac.kr/page?menuCD=000000000000062
 
 ### 서울교육대학교
-- ⚪ 링크 371 · 장학 공고 0 · 이미 아는 공고 12건은 다시 열지 않음 · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
+- ❌ 오류(page.goto: Target page, context or browser has been closed) · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
 
 ### 서울과학기술대학교
   - 📄 2페이지에서 장학 공고 18건 더 읽음
@@ -52,9 +50,16 @@
 ### 명지대학교
 - ✅ 링크 416 · 장학 공고 9 · https://www.mju.ac.kr/mjukr/259/subview.do
 
+### 🔁 실패 학교 재시도 (몇 분 뒤 재접속)
+**계명대학교**
+- ✅ 링크 526 · 장학 공고 15 · https://www.kmu.ac.kr/uni/main/page.jsp?mnu_uid=145&
+
+**서울교육대학교**
+- ⚪ 링크 371 · 장학 공고 0 · 이미 아는 공고 12건은 다시 열지 않음 · https://www.snue.ac.kr/snue/na/ntt/selectNttList.do?mi=3004&bbsId=1083
+
 ---
-이번 실행 신규 수집: **2건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
-⏱ 소요 3분 / 예산 22분 · 학교 14/14곳 처리
+이번 실행 신규 수집: **0건** · 브라우저로도 수집 실패한 학교는 게시판 주소 확인이 필요합니다.
+⏱ 소요 2분 / 예산 22분 · 학교 14/14곳 처리
 **⏳ 스키마화 대기 중 98건** (원본 확보됨 — collector/pending-forms.json)
 
 ### 🤖 자동 등록 (선조치후보고) — 0건 등록
