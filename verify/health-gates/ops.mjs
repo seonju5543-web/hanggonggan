@@ -672,4 +672,13 @@ export default async function gate(eq, ctx) {
         /esc\(x\.message\)/.test(mj), /cp _admin\/morning\.html _admin\/morning\.js _admin\/morning-off\.js/.test(bs) && /cp usage-report\.js "\$OUT\/vendor\/usage-report\.js"/.test(bs)],
       [true, true, true, true, true]);
   }
+
+  /* ── ⑭ 상세 시트 점 — 활동 시트만 뺀다 (2026-11-15 은서) ──
+     활동 시트의 점을 빼 달라는 지시를 공용 그릇 #detail-sheet 에 걸어 장학 시트의 「접수」 점까지 사라졌고, 은서가 "원래대로"라고 했다 */
+  {
+    const css = read(root, 'style.css'); const app = read(root, 'app.js');
+    eq('⑭ 🔴 점 빼기는 활동 시트(.act-sheet)에만 · 공용 그릇(#detail-sheet) 전체에 점을 빼는 규칙이 없다 · 활동 시트가 표식을 단다',
+      [/\.act-sheet \.doc-list li::before, \.act-sheet \.reason-list li::before \{ display: none; \}/.test(css), !/#detail-sheet \.doc-list li::before/.test(css), /<div class="sheet-body act-sheet">/.test(app)],
+      [true, true, true]);
+  }
 }

@@ -3810,7 +3810,8 @@ function openActivityDetail(url) {
   sheetBack = null;   // 이 시트에는 돌아갈 곳이 없다 — 내리면 닫힌다
   $('#detail-sheet').innerHTML = `
     <div class="sheet-handle"></div>
-    <div class="sheet-body">
+    <div class="sheet-body act-sheet">
+      ${/* act-sheet — 활동 시트만의 표식(2026-11-15 은서: 활동 시트는 목록 앞 점 없이 · 장학 시트는 그대로 — style.css) */ ''}
       ${/* 승인 시안(2026-11-02) — 장학 시트와 같은 머리줄·절 다섯(sheetSectionsHtml). 짧은 혜택은 금액 자리, 긴 혜택·활동기간·지역·원문 줄은 「공고 안내」, 모집기간은 「접수 · 기간」.
            단추는 검정 하나 — 이름은 source-link.js 의 activityButton 자리(글 하나로 가는 주소만 신청하기 · 목록·홈페이지는 그 이름 그대로 · 2026-10-03 원문 링크 정직성). */ ''}
       ${sheetHeadHtml({ x: n, d, save: saveBtnHtml(`act:${n.url}`) })}
