@@ -1818,8 +1818,9 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
      '등록금 실납부액에 따라 차등지급 자세한 사항은 첨부파일 또는 홈페이지 참…'(잘린 본문).
      이런 줄을 굵게 쓰면 카드가 확정되지 않은 금액을 확정된 것처럼 말한다.
      그래서 **짧고 숫자가 있는 것만** 굵게 쓴다. 나머지는 지우지 않고 옅게 남긴다(원칙 8-1). */
-  /* 시안 B (2026-11-02) — 윗줄은 칩(장학 · 교내/교외) + 주최(알 때만) + 알약 · 핵심 한 줄은 「금액 · …」(amountLine 한 곳 · 모르면 줄 없음) */
-  const amt = amountLine(sch);
+  /* 시안 B (2026-11-02) — 윗줄은 칩(장학 · 교내/교외) + 주최(알 때만) + 알약.
+     🔴 아랫줄 왼쪽의 회색 「금액 · …」 줄은 뺐다 (2026-11-15 개발자 지시 "회색으로 금액 뜨는거 빼라 … 장학금이랑 대외활동 다 같이 말하는거야" —
+     같은 날 활동 카드의 「대상 · …」 줄을 뺀 것과 한 짝이다). 금액은 시트 머리(amountLine)가 그대로 말한다 */
   return cardShellHtml({
     save: saveBtnHtml(sch.id),
     attrs: `data-detail="${sch.id}"`,
@@ -1827,8 +1828,8 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
     org: cardProviderLine(sch),
     badge,
     name: cardTitleParts(sch).title,
-    foot: amt.text,
-    footKnown: amt.known,
+    foot: '',
+    footKnown: false,
     due,
     urgent: !sch.program && d.days >= 0 && d.days <= 7,
     link: cardSrcLinkHtml(sch, 'detail'),   // 원문 아이콘 — 활동 카드와 같은 자리·같은 모양(2026-10-28)

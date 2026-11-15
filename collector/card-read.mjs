@@ -309,6 +309,7 @@ if (process.argv[1] && ranDirectly()) {
         if (r.entry) { data.items[t.it.id] = { ...r.entry, hash: t.hash, readAt: TODAY }; filled += 1; }
         else delete data.items[t.it.id];
         done += 1;
+        save();   // 건마다 저장 — 중간에 강제 종료돼도(단계 시한) 돈을 쓴 결과를 잃지 않는다
         log(`  ✓ ${t.it.id} · ${String(t.it.name).slice(0, 30)} · ${r.entry ? `자격 ${r.entry.eligibility.length} · 제외 ${r.entry.excludes.length} · 마감 ${r.entry.deadline ? r.entry.deadline.date : '—'} · 금액 ${r.entry.head || '—'}` : '실을 것 없음(무료 길 그대로)'} · 보류 ${r.held.length} · 버림 ${r.dropped.length}`);
       } catch (e) {
         failed += 1; led.tries = (led.tries || 0) + 1; led.error = String((e && e.message) || e).slice(0, 200);

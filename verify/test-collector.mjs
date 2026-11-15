@@ -12846,7 +12846,8 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
     [{ text: '금액 · 200만원', known: true }, { text: '금액 · 학기별 등록금액의 1/2', known: false }, { text: '', known: false }, { text: '', known: false }]);
   /* 카드 한 벌 — schCard·activityCardHtml 이 칩·주최·제목 나누기·핵심 한 줄을 쓴다 · 마감은 아랫줄 그대로(개발자 결정) */
   const sc = fnOf('schCard'), ac = fnOf('activityCardHtml'), shell = fnOf('cardShellHtml');
-  eq('장학 카드 — 칩 · 주최 · 알약 · 제목 나누기 · 금액 줄', [/chip: kindChipHtml\(sch\)/.test(sc), /org: cardProviderLine\(sch\)/.test(sc), /badge,/.test(sc), /name: cardTitleParts\(sch\)\.title/.test(sc), /const amt = amountLine\(sch\)/.test(sc)], [true, true, true, true, true]);
+  /* 2026-11-15 개발자 지시 — 아랫줄 왼쪽의 회색 「금액 · …」 줄을 뺐다(활동 카드의 「대상 · …」 줄과 한 짝 · 금액은 시트 머리가 말한다). 되돌리면 빨갛다 */
+  eq('장학 카드 — 칩 · 주최 · 알약 · 제목 나누기 · 아랫줄 왼쪽은 빈칸(금액 줄 없음 · 2026-11-15)', [/chip: kindChipHtml\(sch\)/.test(sc), /org: cardProviderLine\(sch\)/.test(sc), /badge,/.test(sc), /name: cardTitleParts\(sch\)\.title/.test(sc), /foot: '',/.test(sc), /amountLine\(sch\)/.test(sc), /const amt = amountLine\(sch\)/.test(fnOf('openDetail'))], [true, true, true, true, true, false, true]);
   eq('활동 카드 — 칩 · 주최(호스트만 · 학교 게시판 글은 빈 글자 — 2026-11-02 개발자 결정) · 제목 나누기 · 대상 줄 없음(2026-11-15 개발자 결정) · 혜택·분야 줄 없음', [/chip: kindChipHtml\(n\)/.test(ac), /org: activityHostLine\(n\)/.test(ac) && /const activityHostLine = \(n\) => \(n\.school \? '' : /.test(appV), /name: parts\.title/.test(ac), /foot: '',/.test(ac), /benefitShort|n\.field|대상/.test(ac)], [true, true, true, true, false]);
   eq('  제목에서 뗀 괄호 대상은 시트 「공고 안내」에 남는다 — 카드에 대상 줄이 없어 여기가 유일한 자리', /const titleWho = parts\.who\.filter/.test(fnOf('openActivityDetail')) && /titleWho\.length \? \[`대상: \$\{titleWho\.join\(' · '\)\}`\]/.test(fnOf('openActivityDetail')), true);
   eq('  그릇 윗줄 = 칩 + 주최(있을 때만) + 알약 · 마감은 아랫줄(.sch-foot)', [/<div class="sch-top">\s*\$\{chip\}\$\{org \? `<span class="sch-org">/.test(shell), /class="sch-foot">[\s\S]*?sch-due/.test(shell)], [true, true]);

@@ -1,10 +1,10 @@
 {
- "enabled": true,
+ "enabled": false,
  "maxPerRun": 20,
  "maxUsdPerRun": 3,
  "giveUpAfter": 3,
  "effort": "medium",
  "_무엇인가": "유료 카드 읽기 로봇(collector/card-read.mjs)의 스위치와 한 실행의 상한. 설계 docs/designs/paid-card-reading.md.",
- "_enabled": "true 라고 적혀 있고 워크플로가 CARD_READ_ENABLE=1 을 줄 때만 유료 API 를 부른다(둘 중 하나라도 없으면 미리보기와 같다). 2026-11-15 개발자 지시(\"카드 관련한 모든 부분을 유료로 켜서\")로 켰다 — 끄려면 false.",
+ "_enabled": "true 라고 적혀 있고 워크플로가 CARD_READ_ENABLE=1 을 줄 때만 유료 API 를 부른다. 2026-11-15 리뷰가 심각한 문제 넷을 찾아 다시 껐다 — 고친 뒤 개발자 지시대로 켠다.",
  "_상한": "실측(2026-11-15 · 표본 6건) 공고 1건에 두 번 읽기 합쳐 약 0.07달러. maxPerRun 20 · maxUsdPerRun 3 이면 한 실행이 3달러를 넘지 못한다. 원문 해시가 같은 공고는 다시 읽지 않는다."
 }

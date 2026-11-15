@@ -324,7 +324,7 @@ for (const sch of hits) {
   /* 카드 시안 B(2026-11-02) — 윗줄은 칩(kindChip) + 주최(cardProviderLine) · 제목은 cardTitleParts(지우고 나누기만) · 아랫줄 왼쪽은 amountLine */
   const chip = appFn('kindChip')(sch), prov = appFn('cardProviderLine')(sch), tp = appFn('cardTitleParts')(sch), amt = appFn('amountLine')(sch);
   console.log(`   카드 윗줄 「${chip.label}${prov ? ' · ' + prov : ''}」  ·  카드 제목 「${tp.title}」${tp.who.length ? `  ·  제목에서 뗀 대상 「${tp.who.join(' · ')}」` : ''}`);
-  console.log(`   카드 아랫줄 왼쪽 「${amt.text || '(줄 없음)'}」${amt.text && !amt.known ? ' (옅게)' : ''}`);
+  console.log(`   카드 아랫줄 왼쪽 (비어 있음 — 2026-11-15 개발자 지시 · 금액은 시트 머리 「${amt.text.replace(/^금액 · /, '') || '줄 없음'}」${amt.text && !amt.known ? ' (옅게)' : ''})`);
   console.log(`   학생: ${p.school} ${p.track} ${p.year}학년 · 평점 ${p.gpa} · ${p.credits}학점 · ${p.bracket}구간`);
   console.log(`   판정 ${result.status}  ·  배지 「${badge}」`);
   console.log(`   신청 버튼 ${canApply ? '열림' : '잠김'}  (마감: ${d.label || '?'})`);
