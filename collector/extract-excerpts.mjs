@@ -49,7 +49,8 @@ const reg = JSON.parse(fs.readFileSync(regPath, 'utf8'));
 const WRITE = process.argv.includes('--write');
 
 /* 발췌 규칙: 신청 안내 신호가 있는 문장만, 메뉴·잡음 문장은 제외, 원문 그대로 */
-const MARK = /(신청\s?기간|접수\s?기간|신청\s?방법|접수\s?방법|제출\s?서류|구비\s?서류|제출\s?방법|제출\s?기한|신청\s?기한|선발\s?인원|지급\s?금액|장학금액|문의처|문의\s?:|신청\s?자격|지원\s?자격|응모\s?자격|자격\s?요건|지원\s?대상|신청\s?대상|모집\s?대상|선발\s?대상|추천\s?대상)/;
+/* 2026-11-15: `모집기간`·`접수처`·`제출처`·`신청 마감`·`결과 발표` 도 안내 이름표다(카드 빈칸 비평 — 그 줄만 있는 공고는 발췌가 비었다) */
+const MARK = /(신청\s?기간|접수\s?기간|모집\s?기간|지원\s?기간|접수\s?처|제출\s?처|신청\s?마감|접수\s?마감|결과\s?발표|신청\s?방법|접수\s?방법|제출\s?서류|구비\s?서류|제출\s?방법|제출\s?기한|신청\s?기한|선발\s?인원|지급\s?금액|장학금액|문의처|문의\s?:|신청\s?자격|지원\s?자격|응모\s?자격|자격\s?요건|지원\s?대상|신청\s?대상|모집\s?대상|선발\s?대상|추천\s?대상)/;
 /* 자격 신호(2026-08-02 개발자 지시로 추가) — 앞으로 들어오는 공고는 자격 요건 문장도 함께 발췌한다.
    예전엔 신청기간·서류만 뽑아서, 앱이 자격을 "별도 제한 없음"으로 단정하는 원인이 됐다.
    추론이 아니라 **원문 문장 그대로**이므로 원칙 8-1을 지킨다. */
@@ -70,16 +71,83 @@ const LONE_PARTICLE = /^[가-힣]{2,5}(?:으로|에서|에게|를|을)$/;
    이화 본부기탁 글에서 그 뒤 메뉴 낱말 줄(「포탈정보시스템 E-벗 사이버캠퍼스 …」)이 자격 줄에 섞였다(2026-11-02 · 18건 조사 ⓒ) */
 const FOOTER_STOP = /^(?:(?:페이스북|트위터|블로그|카카오톡|카카오스토리|네이버\s?밴드|URL\s?Copy|링크\s?복사|공유하기|인쇄|목록|이전글|다음글|TOP|맨\s?위로)\s*)+$|^\s*(?:[A-Za-z가-힣]+\s)?QUICK\s?SERVICE\s*$/i;   // 띠 이름 줄 전체일 때만(`EWHA QUICK SERVICE`) — 문장 속 낱말로 끊지 않는다(리뷰)
 
+/* 🔴 문장 자르기 (2026-11-15 · 카드 빈칸 비평 — 날짜가 잘린 발췌)
+   예전엔 `.` 뒤 빈칸마다 잘라 `신청기간 : 2026. 9. 1.(화) ~ 9. 30.` 이 `신청기간 : 2026.` 조각이 되어 버려졌다(날짜 잘린 조각 거름에 걸렸다).
+   ① `.` 앞이 숫자이고 뒤가 숫자·괄호·물결이면 날짜의 점이다 — 자르지 않는다(`09:00 – 11 . 18.` 처럼 칸이 벌어진 날짜도).
+   ② 한 줄에 항목이 이어 붙은 꼴(`… 18:00까지 7. 접수방법: 이메일 …`)은 **항목 번호 앞**에서 자른다 — 번호는 그 항목에 남는다.
+      번호 뒤에 이름표(짧은 말 + 콜론)가 올 때만이고, 앞이 `9.` 같은 날짜 조각이면 아니다(`~ 9. 30. 접수` 의 30 은 날이다).
+      ⚠️ 한글 항목 기호는 **가 나 다 … 하 열넷뿐**이다 — `[가-하]` 로 쓰면 그 사이 모든 글자가 들어가 `300만 원)` 의 `원)` 이 항목 기호가 된다. */
+const ITEM_LABEL = '\\s?[.)]\\s*[가-힣][가-힣 ]{0,12}[:：]';
+const ITEM_SPLIT = new RegExp(`(?<!\\d\\s?\\.)\\s+(?=\\d{1,2}${ITEM_LABEL})|\\s+(?=[가나다라마바사아자차카타파하]${ITEM_LABEL})`, 'g');   // 숫자 번호만 앞 날짜 조각을 본다(한글 기호는 날이 될 수 없다)
+export function splitSentences(text) {
+  const out = [];
+  for (const line of String(text || '').split(/\n+/)) {
+    const cut = line.replace(/([.다요함음])(\s+)(?=(\S))/g, (m, ch, sp, nx, off, str) => {
+      if (ch === '.' && /\d\s*$/.test(str.slice(Math.max(0, off - 4), off)) && /[\d(（~∼〜～–—-]/.test(nx)) return m;   // 날짜의 점
+      if (ch === '.' && /(?:^|\s)(?:\d{1,2}|[가나다라마바사아자차카타파하])$/.test(str.slice(Math.max(0, off - 3), off))
+        && !/\d\s?\.\s+\d{1,2}$/.test(str.slice(Math.max(0, off - 8), off))) return m;   // 항목 번호의 점(`7. 접수방법`) — `9. 30.` 의 30 은 날이라 아니다
+      return `${ch}\n`;
+    }).replace(ITEM_SPLIT, '\n');
+    for (const piece of cut.split('\n')) { const t = unent(piece).trim(); if (t) out.push(t); }
+  }
+  return out;
+}
+/* 발췌로 안 담는 줄 — 바닥글 연락처 띠(`(우)02841 … 대표전화 02-…`·`Copyright`)와 첨부 파일 이름 줄(`… 선발 공고문.hwp (52KB)`) */
+const EXCERPT_FOOTER = /대표\s?전화|copyright|all\s?rights|[(（]\s?우\s?[)）]?\s?\d{5}|우편\s?번호|사업자\s?등록/i;
+const EXCERPT_FILE = /\.(?:hwpx?|pdf|docx?|xlsx?|zip|jpe?g|png)\s*(?:[(（\[][^)）\]]*[)）\]])?\s*$/i;
+
+/* 🔴 첨부에서 뽑은 발췌는 **이름표와 값이 짝이 맞을 때만** 담는다 (2026-11-15). OCR·납작해진 표는 이름표 칸과 옆 칸 글자를 한 줄로 붙인다 —
+   `신청기간 : ※재혼선원배우자의 자녀일 경우 주민등록등본 추가1부`(선원가족 요강) · `문의처 : 2026. 9. 1. ~ 9. 30.` 처럼 **다른 칸의 값**이 이름표 뒤에 앉는다.
+   기간 이름표는 값에 달·날이 · 문의 이름표는 전화·메일이 · 금액 이름표는 원·%·전액이 있어야 한다. 이름표 없는 문장은 그대로 둔다(본문 규칙이 이미 걸렀다) */
+export function docExcerptOk(line) {
+  const t = String(line || '');
+  /* 옆 칸 글의 꼬리로 시작하는 조각(`금액) 지급하며 …`) · OCR 이 깨뜨린 메일 주소(`이메일 접수(/4111</0/(@히04.80.1[)`)는 원문 문장이 아니다 */
+  if (/^[^(（]{0,8}[)）]/.test(t)) return false;
+  if (/@/.test(t) && !/[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+/.test(t)) return false;
+  const at = t.search(/[:：|｜]/);
+  if (at < 0) return true;
+  const label = t.slice(0, at), value = t.slice(at + 1);
+  if (/[가-힣]{2,}\s?[:：]/.test(value.slice(0, 12)) && !/\d/.test(value.slice(0, 12))) return false;   // 값 자리가 또 다른 이름표(`신청 기간 : 장학금액 : …`)
+  if (/(기\s?간|기\s?한|마\s?감|일\s?정|발\s?표)/.test(label)) return /\d{1,2}\s?[.\-/월]\s?\d{1,2}/.test(value);
+  if (/문\s?의/.test(label)) return /@|☎|\d{2,4}\s?[-)]\s?\d{3,4}/.test(value);
+  if (/(금\s?액|지급액|장학금)/.test(label)) return /\d\s?(?:만|천)?\s?원|%|전액/.test(value);
+  return true;
+}
+/* 공고문 첨부에서 발췌 — 본문에서 한 줄도 못 뽑았을 때(본문 갈래) · 원문이 껍데기일 때(첨부만 갈래) 둘 다 이것을 부른다.
+   규칙은 본문과 같은 extractFrom + 위 짝 맞춤 · 붙임 서식 뒤는 자른다(annexCut — 견본 날짜) · 첫 첨부부터 */
+function excerptsFromDocs(texts) {
+  for (let i = 0; i < (texts || []).length; i += 1) {
+    const got = extractFrom(annexCut(texts[i])).filter(docExcerptOk);
+    if (got.length) return { lines: got, file: (texts.files || [])[i] || null };
+  }
+  return null;
+}
+const EXCERPT_NOTE = '공고 원문에서 그대로 발췌 (자동)';
+const EXCERPT_NOTE_DOC = '공고문 첨부에서 그대로 발췌 (자동)';
+/* 본문에 다른 글의 띠(배너·팝업 — 항공대 「정규직 신규직원 채용 · 지원기간 : …」)가 제목보다 **앞에** 붙어 오는 게시판이 있다.
+   공고 제목 줄이 본문에 있으면 그 줄부터 발췌한다(제목 앞은 그 글이 아니다) · 못 찾거나 그 뒤에서 한 줄도 못 뽑으면 본문 전체(예전 그대로) */
+function excerptsFromBody(body, it) {
+  const all = () => extractFrom(body);
+  const core = String(it.name || '').replace(/^(?:\[[^\]]*\]\s*|공통\s+)+/, '').replace(/\s+/g, '');
+  if (core.length < 10) return all();
+  const lines = String(body || '').split('\n');
+  const at = lines.findIndex((l) => l.replace(/\s+/g, '').includes(core.slice(0, 20)));
+  if (at <= 0) return all();
+  const got = extractFrom(lines.slice(at).join('\n'));
+  return got.length ? got : all();
+}
+
 function extractFrom(text) {
   if (!text) return [];
   // 문장 단위로 자르되 원문 표기를 보존한다.
   // HTML 기호는 사람이 읽는 글자로 바꾼다 — 안 하면 앱에 'nDRIMS &rarr; 대표'처럼 그대로 보인다
   // (2026-08-02: 자격 블록에만 적용하고 여기엔 안 걸어서 실제로 노출됐다).
-  const parts = text.split(/(?<=[.다요함음])\s+|\n+/).map((s) => unent(s).trim()).filter(Boolean);
+  const parts = splitSentences(text);
   const out = [];
   for (const p of parts) {
     if (!MARK.test(p)) continue;
     if (JUNK.test(p)) continue;
+    if (EXCERPT_FOOTER.test(p) || EXCERPT_FILE.test(p)) continue;
     if (p.length < 8 || p.length > 240) continue;
     if (!/[0-9가-힣]/.test(p)) continue;
     if (/[:：]\s*2?0?2?6?\.?$/.test(p)) continue;          // 날짜가 잘려나간 조각
@@ -95,6 +163,7 @@ function extractFrom(text) {
        없으면 담지 않는다 — 조각을 늘어놓느니 '원문 보기' 링크 하나가 낫다(원칙 8-1). */
     if (!HAS_SUBSTANCE.test(p)) continue;
     if (DANGLING.test(p)) continue;                        // 뒷말이 잘린 문장
+    if (out.includes(p)) continue;                         // 같은 줄은 한 번(요강이 같은 안내를 되풀이한다)
 
     out.push(p);
     if (out.length >= 5) break;
@@ -1540,6 +1609,11 @@ for (const it of reg.items) {
     fillApplyEmail(it, null);          // 본문이 없으니 첨부에서만 — 본문 경로와 같은 함수
     fillApplyPortal(it, null);
     fillDocuments(it, null, docsOnce(it, false));     // 제출 서류 목록도 첨부에서 (2026-10-13 ④) — 신청서 쪽 공고문은 안 본다(noticeDocFiles formPath:false)
+    /* 발췌도 첨부에서 — 껍데기 공고는 안내 블록이 통째로 비었다. 예전 본문에서 뽑아 둔 발췌(원문 표식)는 덮지 않는다(원문이 없다 ≠ 발췌가 틀렸다) */
+    if (!(it.excerpts || []).length || it.excerptNote === EXCERPT_NOTE_DOC) {
+      const dx = excerptsFromDocs(docs());
+      if (dx) { hit += 1; if (WRITE) { it.excerpts = dx.lines; it.excerptNote = EXCERPT_NOTE_DOC; } else console.log(`   [발췌 첨부] ${it.id} → ${dx.lines.join(' / ').slice(0, 120)}`); }
+    }
     kept += 1; continue;
   }
 
@@ -1553,7 +1627,8 @@ for (const it of reg.items) {
   }
   if (body !== src.text) cleaned += 1;
 
-  const ex = extractFrom(body);
+  let ex = excerptsFromBody(body, it);
+  let exNote = EXCERPT_NOTE;
   // 자격 절을 못 찾았을 때만 2차 경로로 물러난다 (절이 있으면 그쪽이 언제나 정확하다)
   let qual = extractQualifyLines(body).length
     ? extractQualifyLines(body)
@@ -1602,6 +1677,8 @@ for (const it of reg.items) {
         어느 쪽이든 고쳐 주지 않고 버린다(해를 고쳐 주지 않는 dateFrom 과 같은 정신). */
   /* 본문이 먼저 · 못 읽으면 공고문 첨부 (2026-09-16 · G-3 ③ — 마감일과 같은 순서) */
   const docs = docsOnce(it);
+  /* 본문에서 발췌를 한 줄도 못 뽑았으면 공고문 첨부에서(첨부만 갈래와 같은 excerptsFromDocs) */
+  if (!ex.length) { const dx = excerptsFromDocs(docs()); if (dx) { ex = dx.lines; exNote = EXCERPT_NOTE_DOC; } }
   fillCalendarDates(it,
     () => extractOpenDate(body) || openDateFromDocs(it, docs()),
     () => extractAnnounce(body) || announceFromDocs(it, docs()));
@@ -1645,7 +1722,7 @@ for (const it of reg.items) {
   }
   if (ex.length) {
     hit++;
-    if (WRITE) { it.excerpts = ex; it.excerptNote = '공고 원문에서 그대로 발췌 (자동)'; }
+    if (WRITE) { it.excerpts = ex; it.excerptNote = exNote; }
     if (!WRITE) {
       console.log(`\n■ ${it.id} | ${it.name.slice(0, 40)}`);
       ex.forEach((e) => console.log('   →', e.slice(0, 110)));
