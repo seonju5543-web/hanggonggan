@@ -15006,5 +15006,85 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
     [true, true, true, true]);
 }
 
+/* ══ 활동 글의 틀린 미달 — 처지 낱말 · 열거 속 처지 · 「참가제한」 절 (2026-11-15 개발자 "네, 고쳐 주세요") ══
+   전수(등록 · 층2 · 활동 화면 줄): 처지로 읽히는 줄 69 → 61 · 「아니요」에 ✕ 63 → 50. 사라진 13줄은 전부 실적 요구가 아닌 줄이었다
+   (앞으로 할 봉사 · 관심 · 활동 이름 · 태그 · 열거 속 한 갈래 · 평가 항목 예시). 원인 셋과 그 자리:
+     ① parse-requirements TRAIT_PAT — `봉사활동`·`공모전` 낱말만으로 '실적 요구'로 읽었다
+     ② parse-requirements parseTrait — `…등` 열린 목록·「및 그 자녀」의 처지를 높은 확신으로 냈다
+     ③ section-head EXCLUDE_WORD — `참가제한` 을 제외 절로도, 절 머리글로도 못 알아봤다(제한 항목이 자격 줄이 됐다)
+   🔴 표본만 잰다(실데이터에 기댄 고정 검사 금지). 판정은 화면이 쓰는 fitDetail 로 — 줄 하나 · 「예」/「아니요」. */
+{
+  console.log('\n■ 활동 글의 틀린 미달 — 처지 낱말 · 열거 속 처지 · 「참가제한」 절 (2026-11-15)');
+  const req = createRequire(import.meta.url);
+  const ME = req('../match-engine.js'), PR = req('../parse-requirements.js'), SH = req('../section-head.js');
+  const AX = await import('../collector/activity-excerpts.mjs');
+  const AD = await import('../collector/activity-docs.mjs');
+  const base = { school: '한국외국어대학교', track: 'humanities', major: '영어학과', year: 3, status: '재학', gpa: 3.8, bracket: 5, credits: 15, region: '서울', parentRegion: '서울', nationality: 'korean', birthYear: 2004, flags: [] };
+  const one = (line, traits) => { const fd = ME.fitDetail({ eligibilityLines: [line], eligibility: {} }, { ...base, traits }); return fd.unread ? '?' : fd.fails.length ? 'X' : (fd.met === fd.total && fd.total > 0) ? 'O' : '?'; };
+  const noYes = (line, k) => one(line, { [k]: false }) + one(line, { [k]: true });   // 「아니요」·「예」 순
+  const traitsOf = (line) => (PR.parseLine(line, false).conds || []).filter((c) => c.kind === 'trait').flatMap((c) => c.anyOf || []);
+  /* ① 봉사 — 해 둔 실적일 때만 */
+  eq('① 봉사 — 앞으로 할 일·관심·활동 이름·혜택은 처지가 아니다 (「아니요」 학생에게 봉사자 모집 글이 미달이었다)',
+    ['겨울방학 중 경기도 내 지역아동센터에서 봉사활동 가능자', '겨울방학 기간 중 경기도 내 지역아동센터에서 100시간 이상의 자원봉사 활동을 수행할 수 있는 자', '봉사활동 100시간 및 사전교육 5시간 이수가 가능한 학생',
+      '교육봉사활동에 관심 있는 대학생', "[경기북부하나센터] 북한이탈주민 취약계층 지원 '사랑의 김장나눔' 봉사활동 (사전)", '- 혜택 : 1365 자원봉사시간 부여(4시간)', '자원봉사자는 아동학대 관련 범죄경력조회 후 봉사활동 진행',
+      '사회봉사 경험 및 졸업후의 사회기여 의지', '봉사자 교육 4시간 이상 이수한 자', '봉사활동 100시간 이상 이수해야 함', '활동내용 : 경기도 지역아동센터 봉사활동 100시간 이상'].map((l) => traitsOf(l).includes('volunteer')),
+    [false, false, false, false, false, false, false, false, false, false, false]);
+  eq('  실적을 말하는 줄은 그대로 읽는다 — 「아니요」 ✕ · 「예」 ✓',
+    ['공고일 현재, 1365 또는 VMS 사회봉사실적 30 시간 이상 자', '1365포털에서 자원봉사 시간이 100시간 이상이며 2026년 자원봉사활동 실적이 3회 이상 있는 자', '자원봉사활동 우수자', '사회봉사활동에 적극적으로 참여한 학생',
+      '봉사활동 30시간 이상 이수자', '교내외 봉사활동 50시간 이상 수행자', '봉사활동 2회 이상 참여자', '봉사활동 시간이 30시간 이상인 자', '봉사활동 참여 실적이 우수한 학생'].map((l) => noYes(l, 'volunteer')), ['XO', 'XO', 'XO', 'XO', 'XO', 'XO', 'XO', 'XO', 'XO']);
+  eq('  수상 — `공모전` 낱말만 있는 줄(태그·접수 일정·파일 이름)은 처지가 아니다 · 입상·순위가 있으면 그대로',
+    [traitsOf('태그 #교육부 #2026년 #우수사례 #공모전'), traitsOf('숏폼공모전 접수 일정'), noYes('전국규모의 예체능계 경연대회에서 3위 이내 입상자', 'award'), noYes('각종 공모전 수상 실적이 있는 자', 'award'), noYes('전국 규모 공모전 당선자', 'award')], [[], [], 'XO', 'XO', 'XO']);
+  /* ② 열거·예시 속의 처지 — 「아니요」여도 ✕ 가 아니다(모름) · 단정한 줄은 그대로 ✕ · 결격 처지는 열린 목록이어도 그대로 */
+  eq('② `…등` 열린 목록·괄호 속 예시·「및 그 자녀」 의 처지는 「아니요」에 ✕ 가 아니다',
+    [noYes('예비창업자, 창업기업 대표 및 임직원, 대학(원)생, 유관기관 등', 'job')[0], noYes('실험실 혁신창업동아리, 혁신창업실험실 및 창업·기술사업화에 관심 있는 대학생·대학원생 등', 'club')[0],
+      noYes('학업(연구) 수행능력(성적, 수상경력, 연구계획 등)', 'award'), noYes('조합원 대표와 임직원 및 그 자녀', 'job')[0]], ['?', '?', '?O', '?']);
+  eq('  우대·가산·「필수는 아님」 줄과 `임직원의 자녀` 도 「아니요」에 ✕ 가 아니다 (우대는 요건이 아니다 · 자녀는 본인이 재직자가 아니다)',
+    [noYes('봉사실적이 40 시간 이상인 자 우대', 'volunteer')[0], noYes('컴퓨터활용능력자격증 소지자 우대 (필수사항은 아님)', 'cert')[0], noYes('회사 임직원의 자녀', 'job')[0]], ['?', '?', '?']);
+  eq('  단정한 줄은 그대로 — `임직원인 자`·`울산 소재 중소기업 재직자` 는 「아니요」 ✕',
+    [noYes('임직원인 자', 'job'), noYes('울산 소재 중소기업 재직자', 'job')[0]], ['XO', 'X']);
+  eq('  결격 처지(징계)는 열린 목록이어도 확신을 낮추지 않는다 — 「징계 예」 는 ✕',
+    (PR.parseLine('학칙에 의한 징계 처분을 받은 자 등', true).conds || []).filter((c) => c.kind === 'trait').map((c) => [c.anyOf.join(), c.conf, !!c.exclude]), [['discipline', 'high', true]]);
+  /* ③ 제한 절 */
+  eq('③ `참가제한`·`참여 제한 대상`·`응모 제한 사항` 은 제외 절 머리글 (이름표가 정확히 그 말일 때만 · 번호·글머리는 뗀다 · 같은 줄의 내용은 있어도 된다)',
+    ['참가제한', '참가 제한', '■ 참가제한', '2. 참가제한', '참여 제한 대상', '응모 제한 사항', '참가제한 :', '참가 제한: 과거 대상 수상자'].map((h) => SH.isExcludeHead(h)), [true, true, true, true, true, true, true, true]);
+  /* 🔴 코드 리뷰가 잡은 넓힘 — 머리글로 읽으면 그 **아래 자격 줄이 제외 칸으로** 넘어간다(평점 3.0 이상인 학생이 「평점 3.0 이상」 줄로 미달 · 반대로 요건이 잘려 틀린 충족) */
+  eq('  값이 없음·인원·횟수면 머리글이 아니다 · 앞뒤에 다른 말이 붙어도 아니다 · `신청 제한`·`지원 제한` 은 넣지 않았다(장학 공고에서 뜻이 갈린다 — 순천시 「한 분야만 신청 가능」)',
+    ['참가 제한 없음', '참가 제한: 제한 없음', '참가제한 대상 : 없음', '참가제한 : 해당 없음', '응모 제한 : 1인 1작품', '참가 제한 : 선착순 30명', '참가 제한 인원 : 20명', '참가 제한 연령 : 만 39세', '사업참여 제한', '→ 확정일로부터 1년 근로 참여 제한',
+      '신청제한', '신청 제한 : 없음', '지원 제한 사항 없음', '4) 지원제한: 타 재단 장학금 등 중복수혜 제한은 재단 장학금 지급 규정에 따름', '학자금 지원 제한 대학', '재정지원제한대학', '중복지원제한', '연령 제한'].map((h) => SH.isExcludeHead(h)).includes(true), false);
+  const voidHead = AX.activityDetails(['2026 청년 캠프 참가자 모집', '참가자격', '- 대학 재학생', '- 참가 제한 : 없음', '- 직전학기 평점 3.0 이상인 자', '- 만 19세 이상 34세 이하인 자', '신청방법', '- 누리집 접수'].join('\n'), '2026 청년 캠프 참가자 모집');
+  eq('  `참가 제한 : 없음` 뒤의 자격 줄은 자격 칸에 남는다 — 제외 칸으로 넘어가지 않는다',
+    [voidHead.eligibilityLines.some((l) => /평점 3\.0/.test(l)), voidHead.eligibilityLines.some((l) => /만 19세/.test(l)), voidHead.eligibilityExcludes], [true, true, []]);
+  eq('  `주제` 는 다음 절 머리글(자격 절이 끝난다) · `자유주제` 같은 내용은 아니다', ['주제', '발표주제', '공모 주제 : 탄소중립', '자유주제'].map((h) => SH.isSectionBreak(h)), [true, true, true, false]);
+  const guide = ['2026 중국언어문화 경진대회', '참가자격', '·대한민국 국민 누구나', '참가제한', '·중화권 국가에서 총 5년 이상 체류한 자', '·중화권 국가 국적자 및 중화권 국가 출신 귀화자', '·역대 중국언어문화경진대회‘대상’수상자',
+    '·타 대회 참가 원고로 신청한 자', '·기타 부정한 방법으로 대회에 참가한 자', '주제', '·중국과 관련된 자유주제(반드시 참가자가 직접 창작한 내용)', '□ 제출방법', '신청기간', '·2026. 10. 19.(월) ~ 11. 18.(수)'].join('\n');
+  const gd = AX.activityDetails(guide, '2026 중국언어문화 경진대회');
+  eq('  안내문 표본 — 자격 줄은 「누구나」 하나 · 제한 다섯은 제외 칸 · 주제 줄은 어디에도 없다',
+    [gd.eligibilityLines.length, /대한민국 국민 누구나/.test(gd.eligibilityLines[0] || ''), gd.eligibilityLines.some((l) => /체류|수상자|자유주제/.test(l)), gd.eligibilityExcludes.length, gd.eligibilityExcludes.some((l) => /자유주제/.test(l)), gd.eligibilityExcludes.some((l) => /대상’수상자/.test(l))], [1, true, false, 5, false, true]);
+  eq('  그 글은 「수상 아니요」·「수상 예」 어느 쪽에도 미달이 아니다 (제외 칸의 처지는 결격만 ✕)',
+    [false, true].map((v) => ME.fitDetail({ eligibilityLines: gd.eligibilityLines, eligibilityExcludes: gd.eligibilityExcludes, eligibility: {} }, { ...base, traits: { award: v } }).fails.length), [0, 0]);
+  /* 장학 원문 889건 전후 비교에서 달라진 두 꼴 — 제한 머리글에 붙은 내용은 제외 줄로 남고(중복수혜 조항을 잃지 않는다) · 제외 절은 다음 절 머리글에서 끝난다 */
+  eq('  `참가 제한: 역대 대상 수상자` — 머리글과 같은 줄에 붙은 내용이 제외 줄로 남는다 · 장학 공고의 `지원제한: … 중복수혜 …` 줄은 예전대로 자격 줄(머리글이 아니다)',
+    [AWAIT_EE.extractExcludeLines(['참가자격: 대학생 누구나', '참가 제한: 역대 대상 수상자', '시상내역'].join('\n')), AWAIT_EE.extractExcludeLines(['3) 지원자격: 이공계열 1학년 재학생', '4) 지원제한: 타 재단 장학금 등 중복수혜 제한은 재단 장학금 지급 규정에 따름', '2. 장학생 지원사항'].join('\n'))],
+    [['역대 대상 수상자'], []]);
+  eq('  제외 절은 다음 절 머리글(`선발기준:`·`주제`)에서 끝난다 — 그 아래 줄이 「이런 경우는 제외돼요」 에 딸려 오지 않는다',
+    AWAIT_EE.extractExcludeLines(['제외대상', '- 대학원생 및 휴학생', '선발기준: 학업성적이 평균 C학점 이상 (2026년 1학기 성적 기준)', '- 지원신청'].join('\n')), ['- 대학원생 및 휴학생']);
+  eq('  글머리 달린 항목은 절 낱말(`안내`·`기타`)이 있어도 항목이다 — 거기서 끊으면 뒤의 진짜 항목을 잃는다',
+    AWAIT_EE.extractExcludeLines(['참가제한', '·휴학 예정자 안내 대상', '·기타 부정한 방법으로 참가한 자', '·역대 대상 수상자', '유의사항', '·원고를 보지 않고 발표'].join('\n')).length, 3);
+  /* 태그·파일 이름 줄 — 수집 때도, 이미 실린 글에도(sanitizeElig) */
+  eq('해시태그 줄·첨부 파일 이름은 자격 줄이 아니다 (실린 글도 발행 때 걷는다) · 보통 자격 줄은 그대로',
+    [AX.eligLineOk('태그 #발달장애인 #수기공모전 #2026공모전 #국민참여'), AX.eligLineOk('2026년 발달장애인 인식개선 수기 공모전_안내 .pdf'), AX.eligLineOk('포스터_DESIGN MARKETING 기업 프로젝트 참여자 모집.png'), AX.eligLineOk('만 19세 이상 39세 이하 청년 누구나'),
+      (() => { const it = { eligibilityLines: ['대한민국 국민 누구나', '태그 #교육부 #2026년 #우수사례 #공모전'], eligibilityFrom: '브라우저 본문' }; AX.sanitizeElig(it); return it.eligibilityLines; })()],
+    [false, false, false, true, ['대한민국 국민 누구나']]);
+  /* 첨부에서 읽어 둔 줄의 소급 — 본문 다시 읽기(판)는 첨부 줄을 그대로 두므로 무료 모드가 한 번 더 읽는다 */
+  eq('첨부에서 읽어 둔 자격이 옛 판이면 다시 읽을 글이다 · 이 판으로 읽었거나 · 본문에서 온 줄 · 관리자 줄 · 숨긴 글은 아니다',
+    [AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '공고문 첨부' }), AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '공고문 첨부(OCR)', docsV: AX.ACT_DETAILS_V - 1 }),
+      AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '공고문 첨부', docsV: AX.ACT_DETAILS_V }), AD.staleDocs({ eligibilityLines: ['x'] }), AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '브라우저 본문' }),
+      AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '관리자 2026-11-15' }), AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '공고문 첨부', hidden: true })],
+    [true, true, false, false, false, false, false]);
+  const docsSrc = readText(new URL('../collector/activity-docs.mjs', import.meta.url));
+  eq('  무료 모드만 다시 읽는다(브라우저 모드는 자격 0줄인 글만) · 읽은 판을 docsV 에 적는다 · 다시 읽은 글은 옛 제외 줄을 남기지 않는다',
+    [/needsElig\(n\) \|\| \(!BROWSER && staleDocs\(n\)\)\) \|\| !dueFree/.test(docsSrc), /n\.docsV = ACT_DETAILS_V;/.test(docsSrc), /else delete n\.eligibilityExcludes;/.test(docsSrc)], [true, true, true]);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
