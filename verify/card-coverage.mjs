@@ -16,16 +16,23 @@ const read = (p, fb) => { try { return JSON.parse(fs.readFileSync(path.join(ROOT
 const STRUCT_KEYS = ['years', 'minGpa', 'maxBracket', 'tracks'];   // 구조화 자격 칸 — admin-apply ELIG_KEYS 의 자격 칸(schoolOnly·campusOnly·schoolsAny 는 범위라 안 센다 · 리뷰 2026-10-30)
 export const hasStruct = (e) => !!e && STRUCT_KEYS.some((k) => e[k] != null && (!Array.isArray(e[k]) || e[k].length));
 const FORM_ATT = /신청서|지원서|원서|계획서/;
+/* 카드가 금액 줄을 그리는가 — app.js amountLine 과 같은 판정(문구가 '모름' 표시가 아니면 그 문구를 그린다 · 재단이 적은 긴 금액은 amountNote).
+   🔴 2026-11-15 전엔 `amountValue` 만 셌다 — 「등록금 30%」·「시급 10,320원」 처럼 원으로 못 바꾸는 금액(amountValue 0)을 카드가 그려도 '빈 칸'으로 셌다. */
+const AMOUNT_UNKNOWN = /원문 확인|미확인|확인\s?필요/;
+export const amountShown = (x) => Number(x.amountValue) > 0
+  || (!!String(x.amount || '').trim() && !AMOUNT_UNKNOWN.test(String(x.amount)))
+  || (!!String(x.amountNote || '').trim() && !AMOUNT_UNKNOWN.test(String(x.amountNote)));
 
-/** 순수 함수 — 공고 하나의 빈 칸 목록. 관문이 표본으로 잰다. */
-export function gaps(x, { formsPdf = {}, formPages = {} } = {}) {
+/** 순수 함수 — 공고 하나의 빈 칸 목록. 관문이 표본으로 잰다.
+ *  isApplicationForm — 양식 로봇(form-pdf)과 같은 신청서 판정(data.js · form-rules loadFormRules) · 없으면 옛 낱말 규칙 */
+export function gaps(x, { formsPdf = {}, formPages = {}, isApplicationForm = null } = {}) {
   const g = [];
   if (!(x.eligibilityLines || []).length && !hasStruct(x.eligibility)) g.push('자격');
   if (!x.deadline) g.push('마감');
-  if (!x.amountValue) g.push('금액');
+  if (!amountShown(x)) g.push('금액');
   if (!(x.excerpts || []).length) g.push('신청방법');
   const hasForm = x.formId || (formsPdf[x.id] || []).length || (formPages[x.id] || []).some((f) => f && f.file);
-  const formAtt = (x.attachments || []).some((a) => FORM_ATT.test(a.name || ''));
+  const formAtt = (x.attachments || []).some((a) => (isApplicationForm ? isApplicationForm(a) : FORM_ATT.test(a.name || '')));
   if (!hasForm && formAtt) g.push('양식');
   return g;
 }
@@ -45,7 +52,8 @@ export function coverage(items, ctx, day = today) {
 
 if (process.argv[1] && fileURLToPath(new URL(import.meta.url)) === path.resolve(process.argv[1])) {
   const items = (read('data/registered.json', { items: [] }).items) || [];
-  const ctx = { formsPdf: read('data/forms-pdf/index.json', {}).items || {}, formPages: read('data/form-pages/index.json', {}).items || {} };
+  const { loadFormRules } = await import('../collector/form-rules.mjs');
+  const ctx = { formsPdf: read('data/forms-pdf/index.json', {}).items || {}, formPages: read('data/form-pages/index.json', {}).items || {}, isApplicationForm: loadFormRules(ROOT).isApplicationForm };
   const { counts, rows } = coverage(items, ctx);
   console.log(`■ 카드 채움 현황 (${today} · 마감 전 정식 등록 ${counts.마감전}건)`);
   console.log(`   빈 칸 — 자격 ${counts.자격} · 마감 ${counts.마감} · 금액 ${counts.금액} · 양식(신청서 첨부가 있는데 PDF 없음) ${counts.양식} · 신청 방법 발췌 ${counts.신청방법}`);
