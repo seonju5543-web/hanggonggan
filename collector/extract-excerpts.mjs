@@ -1275,6 +1275,27 @@ function titleTailDeadline(name, year) {
   return dateFrom(m[1], year);
 }
 
+/* 🔴 **로봇이 첨부에서 읽어 둔 마감은 지금 규칙으로 다시 읽는다** (2026-11-15 · 원칙 7 소급).
+   마감은 '비어 있을 때만' 채워서, 옛 규칙이 틀리게 읽은 첨부 마감이 규칙을 고친 뒤에도 남았다 — 인재림 제7기 요강 docx 는
+   진짜 접수 줄 `[지원 기간] 2026. 10. 8.(목) ~ 10. 29.(목) 15:00까지` 를 못 읽고 일정표의 `온라인 서류 접수 기간` ↵ (다음 칸) `26. 12. 21.(월)`
+   (= 면접 대상자 발표일)을 마감으로 집어, 10-29 에 끝난 공고가 12-21 까지 열린 것으로 남았다(같은 공고의 다른 학교 등록 셋은 10-29).
+   출처가 **로봇의 첨부 표식**(`공고문 첨부…`)일 때만 · 다시 읽어 **날짜가 나왔고 다를 때만** 바꾼다 — 못 읽으면 그대로 둔다(모른다 ≠ 틀렸다).
+   사람(관리자·AI)이 정한 마감과 본문·제목에서 읽은 마감은 건드리지 않는다. 관문 「첨부에서 마감일」 ① 의 왕복이 이 소급을 잰다. */
+let dlRechecked = 0;
+function recheckDocDeadline(it, heading = '') {
+  if (!it.deadline || !/^공고문 첨부/.test(it.deadlineFrom || '')) return;
+  const again = deadlineFromDocs(it, undefined, heading);
+  if (!again || again === it.deadline) return;
+  const from = docLabel(fromDocs.lastFile, fromDocs.lastVia);
+  dlRechecked += 1;
+  console.log(`   [마감 다시 읽음] ${it.id} — ${it.deadline} → ${again} (${from})`);
+  if (!WRITE) return;
+  const old = it.deadline;
+  it.deadline = again;
+  it.deadlineFrom = from;
+  if (it.period && it.period.includes(`~${old}`)) it.period = it.period.replace(`~${old}`, `~${again}`);
+}
+
 function putDeadline(it, dl, from) {
   it.deadline = dl;
   it.deadlineFrom = from;
@@ -1489,11 +1510,12 @@ for (const it of reg.items) {
     /* 🔴 원문이 없어도 **첨부는 있을 수 있다** — 마감일도 여기서 채운다.
        안 하면 '본문 껍데기 + 첨부에 요강' 게시판(경희대 유형)이 이 갈림길에서
        통째로 빠져나가, 첨부를 받아 놓고도 영영 '기한 원문 확인'으로 남는다. */
+    const heading = pageHeading(it, src && src.text);
+    recheckDocDeadline(it, heading || '');   // 로봇이 첨부에서 읽어 둔 마감은 지금 규칙으로 다시(위 함수 머리말)
     if (!it.deadline && !humanOwned(it.deadlineFrom)) {
       /* 🔴 껍데기에도 **원문 제목 줄**은 있고, 고친 꼬리가 거기에만 있다 — 「…선발 안내(~10.30 접수기간 연장)」(가톨릭 선원가족 · 2026-11-15).
          로봇 등록 제목(it.name)은 연장 전 목록 제목이라 꼬리가 없고, 첨부는 **연장 전 요강**일 수 있다. 그래서 첨부보다 **먼저** 읽는다.
          원문 제목이 연장·변경을 말하면 연장을 모르는 첨부의 (이른) 마감은 deadlineFromDocs 가 거절한다(heading 을 넘긴다) */
-      const heading = pageHeading(it, src && src.text);
       let dl = heading ? (extractDeadline(heading) || titleTailDeadline(heading, soleYear(heading) || String(it.listedAt || '').slice(0, 4) || undefined)) : null;
       let from = dl ? HEADING_LABEL : null;
       if (!dl) { dl = deadlineFromDocs(it, undefined, heading || ''); from = dl ? docLabel(fromDocs.lastFile, fromDocs.lastVia) : null; if (dl) dlFromDoc += 1; }
@@ -1544,6 +1566,7 @@ for (const it of reg.items) {
   }
   /* 마감일 — **비어 있을 때만** 채운다. 사람이 넣은 값도, auto-register 가 제목에서
      읽은 값도 덮지 않는다(더 많이 본 쪽이 이기는 게 아니라 먼저 정해진 쪽이 이긴다). */
+  recheckDocDeadline(it);   // 로봇이 첨부에서 읽어 둔 마감은 지금 규칙으로 다시(위 함수 머리말)
   if (!it.deadline && !humanOwned(it.deadlineFrom)) {
     /* 본문이 먼저 · 못 읽으면 공고문 첨부 (2026-09-15 · G-3) */
     let dl = extractDeadline(body);
@@ -1630,7 +1653,7 @@ for (const it of reg.items) {
 console.log(`\n게시판 메뉴를 걷어낸 공고 ${cleaned}건`);
 console.log(`발췌 성공 ${hit}건 · 원문은 읽었으나 발췌 불가 ${none}건 · 원문 미확보라 손대지 않음 ${kept}건`);
 console.log(`자격을 공고문 첨부에서 읽은 공고 ${fromDoc}건 · 제목 속 「(대상: …)」에서 읽은 공고 ${fromTitle}건`);
-console.log(`마감일을 새로 읽은 공고 ${gotDeadline}건 (그중 공고문 첨부에서 ${dlFromDoc}건)`);
+console.log(`마감일을 새로 읽은 공고 ${gotDeadline}건 (그중 공고문 첨부에서 ${dlFromDoc}건) · 첨부 마감을 지금 규칙으로 다시 읽어 고친 공고 ${dlRechecked}건`);
 console.log(`잘린 제목을 본문에서 보완한 공고 ${titleFixed}건`);
 console.log(`접수 메일 주소를 새로 읽은 공고 ${gotApplyEmail}건 · 지금 규칙으로 접수처가 아니라 걷은 공고 ${droppedApplyEmail}건`);
 console.log(`포털 신청 시스템을 새로 읽은 공고 ${gotApplyPortal}건`);

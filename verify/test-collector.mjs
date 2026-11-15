@@ -1492,7 +1492,8 @@ console.log('\n■ 제출 서류 목록 — 원문의 「제출서류」 절을 
   /* 발췌기가 이 규칙으로 documents 를 채우고 prepDoc 을 켠다 — 사람 것은 덮지 않고, 신청서 첨부가 있으면 prepDoc 을 켜지 않는다 */
   const ee = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));
   const fd = ee.slice(ee.indexOf('function fillDocuments('), ee.indexOf('function main()'));
-  eq('  발췌기가 두 갈래(본문 · 첨부만)에서 모두 부른다', (ee.match(/fillDocuments\(it, (body|null), docs\);/g) || []).length, 2);
+  /* 2026-11-15: 서류 목록은 신청서 쪽 공고문을 안 본다 — 두 갈래 모두 docsOnce(it, false)(noticeDocFiles formPath:false) */
+  eq('  발췌기가 두 갈래(본문 · 첨부만)에서 모두 부른다', (ee.match(/fillDocuments\(it, (body|null), docsOnce\(it, false\)\);/g) || []).length, 2);
   eq('  사람(관리자·AI)이 적은 목록과 자리표시가 아닌 옛 목록은 덮지 않는다',
     [/\/\^\(관리자\|AI\)\/\.test\(it\.documentsFrom/.test(fd), /docsPlaceholderOnly\(it\.documents\) && !robotOwned\) return/.test(fd)], [true, true]);
   eq('  prepDoc 은 근거 있음 · 신청서 첨부 없음 · 양식·상시 제도 아님 · 관리자가 끄지 않음 일 때만 · 근거는 300자 상한 · 출처 표식(prepDocFrom 로봇)',
@@ -7479,8 +7480,9 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
      이 로봇은 2026-09-15 까지 첨부를 한 번도 안 열었다 — 게시판 본문이 '붙임 참조'뿐인 공고는
      영영 '금액 원문 확인'이었다. 자격 발췌기와 **같은 색인(elig-docs)·같은 함수(attachmentText)**
      를 써야 "발췌기는 읽는데 금액 로봇은 못 읽는" 어긋남이 안 생긴다. */
-  eq('금액 로봇이 공고문 첨부 색인을 연다', /elig-docs\.json/.test(ex), true);
-  eq('  첨부 글자는 발췌기와 같은 함수로 읽는다 (readableDoc — OCR 포스터 문턱도 같다)', /import \{ attachmentText, readableDoc, docOrder \} from '\.\/attachment-text\.mjs'/.test(ex), true);
+  /* 2026-11-15: 색인은 attachment-text.mjs noticeDocFiles 한 곳이 연다 — 금액은 자격 색인만(formPath:false) */
+  eq('금액 로봇이 공고문 첨부 색인을 연다', /noticeDocFiles\(it, \{ formPath: false \}\)/.test(ex), true);
+  eq('  첨부 글자는 발췌기와 같은 함수로 읽는다 (readableDoc — OCR 포스터 문턱도 같다)', /import \{ attachmentText, readableDoc, noticeDocFiles \} from '\.\/attachment-text\.mjs'/.test(ex), true);
   eq('  본문·AI 줄로 못 읽었을 때만 첨부를 본다', /a\.kind === 'unknown' && hasDocs/.test(ex), true);
   eq('  첨부 금액도 parse-amount 가 정한다', /PA\.amountFrom\(t\.split/.test(ex), true);
 
@@ -10975,12 +10977,13 @@ console.log('■ 첨부에서 마감일 — 본문이 껍데기인 게시판 (20
     본문먼저 > 0 && ee.indexOf('deadlineFromDocs(it)', 본문먼저) > 본문먼저, true);
   /* 본문이 아예 없는 길(= `if (!hasText(src))` 블록) 안에서도 불러야 한다 */
   const noBody = ee.slice(ee.indexOf('if (!hasText(src)) {'), ee.indexOf('const body = strip('));
-  eq('  본문이 아예 없는 길에서도 첨부를 본다', /deadlineFromDocs\(it\)/.test(noBody), true);
+  eq('  본문이 아예 없는 길에서도 첨부를 본다', /deadlineFromDocs\(it[,)]/.test(noBody), true);
   eq('  채우는 자리는 한 곳이다 (period 처리가 갈라지지 않게)',
     (ee.match(/function putDeadline\(/g) || []).length, 1);
   /* 2026-09-17: 표식은 docLabel 이 정한다 — 원문 글자면 '공고문 첨부', OCR 이면 '공고문 첨부(OCR)' */
   /* 2026-10-30: 첨부 뒤에 제목 보조 길이 생겨 표식을 `from` 에 모아 넘긴다 — 첨부에서 읽은 날은 여전히 docLabel 이 표식이다 */
-  eq('  출처를 정직하게 적는다', /let from = dl \? docLabel\(fromDocs\.lastFile\) : null;/.test(noBody) && /putDeadline\(it, dl, from\)/.test(noBody) && /'공고문 첨부\(OCR\)' : '공고문 첨부'/.test(ee), true);
+  /* 2026-11-15: 원문 제목 꼬리가 첨부보다 먼저라 `from` 을 두 번 정한다 · 글자층 칸 읽기는 lastVia 가 표식을 바꾼다 */
+  eq('  출처를 정직하게 적는다', /from = dl \? docLabel\(fromDocs\.lastFile, fromDocs\.lastVia\) : null;/.test(noBody) && /putDeadline\(it, dl, from\)/.test(noBody) && /'공고문 첨부\(OCR\)' : '공고문 첨부'/.test(ee), true);
   eq('  첨부에도 없을 때만 제목(이름표 꼬리 → 물결 꼬리)을 본다 · 표식은 「공고 제목」', /if \(!dl\) \{ dl = extractDeadline\(it\.name \|\| ''\) \|\| titleTailDeadline\(it\.name,[^\n]*from = '공고 제목'/.test(noBody), true);
 
   /* ③ 🔴 **동사가 든 이름표는 날짜 '범위'도 근거로 받는다** (2026-09-15 · G-3 이어서).
@@ -11510,9 +11513,11 @@ console.log('\n■ OCR — 그림·스캔 첨부 글자 읽기 (2026-09-17)');
   }
   const exSrc2 = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));
   eq('발췌기가 그 차례로 읽고 OCR 출처를 「공고문 첨부(OCR)」로 적는다',
-    (exSrc2.match(/docOrder\(/g) || []).length >= 2 && (exSrc2.match(/docLabel\(/g) || []).length >= 4 && /'공고문 첨부\(OCR\)'/.test(exSrc2), true);
+    /* 2026-11-15: 차례(docOrder)는 첨부 고르기 한 곳(noticeDocFiles)이 정한다 — 발췌기는 그것만 부른다 */
+    (exSrc2.match(/noticeDocFiles\(/g) || []).length >= 2 && /return docOrder\(out\);/.test(readText(new URL('../collector/attachment-text.mjs', import.meta.url)))
+      && (exSrc2.match(/docLabel\(/g) || []).length >= 4 && /'공고문 첨부\(OCR\)'/.test(exSrc2), true);
   eq('  옛 표식을 지울 때 (OCR) 판도 같이 본다', /\/\^공고문 첨부\/\.test\(it\.eligibilityFrom/.test(exSrc2), true);
-  eq('  금액 로봇도 같은 차례', /docOrder\(/.test(readText(new URL('../collector/extract-amounts.mjs', import.meta.url))), true);
+  eq('  금액 로봇도 같은 차례', /noticeDocFiles\(/.test(readText(new URL('../collector/extract-amounts.mjs', import.meta.url))), true);
   /* KOSAF 쪽 — 사본 정리가 장부를 지우지 않고, 빈 껍데기 판정이 .ocr.txt 도 연다 */
   eq('KOSAF 사본 정리가 재단 폴더만 지운다 (장부는 남긴다)', /isDirectory\(\)\) continue;/.test(readText(new URL('../collector/kosaf-attach.mjs', import.meta.url))), true);
   eq('  KOSAF 빈 껍데기 판정이 .ocr.txt 도 연다', /'\.ocr\.txt'/.test(readText(new URL('../collector/kosaf-empty.mjs', import.meta.url))), true);
