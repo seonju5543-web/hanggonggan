@@ -23,12 +23,8 @@ export const REVERT_RE = /\bcollector\/gate-guard\.mjs\b|\bgit\s+(checkout|resto
 
 /** 관문이 없는 저장 job — `파일#job` → 이유 한 줄. 🔴 줄기만 한다(관문을 붙였으면 여기서 지운다 · 새로 더하지 말 것) */
 export const SAVE_GATE_EXCEPTIONS = {
-  'admin-apply.yml#apply': '관리자 저장 — 감사만 돈다(11-15 기준 · G-16 남은 일)',
-  'audit-coverage.yml#audit': '커버리지 장부(collector/coverage-*.json)를 관문 없이 저장(11-15 기준 · G-16 남은 일)',
-  'deep-fetch.yml#deepfetch': '원본 첨부·PDF 사본을 관문 없이 저장(11-15 기준 · G-16 남은 일)',
-  'essay-playbook.yml#learn': '작성 규칙집 — 감사만 돈다(11-15 기준 · G-16 남은 일)',
-  'kosaf-fetch.yml#fetch': '층2 — 자체 점검(kosaf-check)만 돈다(11-15 기준 · G-16 남은 일)',
-  'resolve-detail-urls.yml#resolve': '상세 주소 찾기 — 감사만 돈다(11-15 기준 · G-16 남은 일)',
+  'admin-apply.yml#apply': '관리자 버튼 — 감사만 돈다: test-collector 만 알던 규칙은 감사·저장소 거절로 옮겼다(관문 gate ② · 10-04) · 남의 빨간불에 관리자 수정이 막히지 않게',
+  'audit-coverage.yml#audit': '쓰는 json 은 제 기록장(coverage-history·coverage-cursor)뿐 — 관문·감사·다른 로봇이 읽지 않는다(11-15 grep) · 걸면 남의 빨간불에 감사만 멈춘다',
 };
 
 const codeLines = (t) => String(t || '').split('\n').filter((l) => !/^\s*#/.test(l));
