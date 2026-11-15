@@ -23,7 +23,7 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
-import { attachmentText, readableDoc, docOrder } from './attachment-text.mjs';
+import { attachmentText, readableDoc, noticeDocFiles } from './attachment-text.mjs';
 /* 🔴 금액 문구(`500만원`)를 만드는 규칙은 **한 곳**이다 — 관리자 화면이 손으로 금액을 적을
    때도 같은 문구가 붙어야 한다(2026-09-17 · F-9 컨펌 2). 여기에 다시 적으면 로봇이 쓴 카드와
    사람이 쓴 카드가 다른 꼴로 뜬다. */
@@ -52,12 +52,13 @@ const idx = indexTexts(texts, browserBodies);
    붙임·서식이 섞인다). 신청서·동의서는 색인 단계(deepfetch `isNoticeDoc`)에서 이미 걸러져 있다.
    ⚠️ 여기서도 얼마인지는 parse-amount 가 정한다 — 예산표(`115명 180백만원`)를 1인당으로
       읽지 않는 관문(`TOTAL_TABLE` — 표의 합계 행)이 첨부에서 처음 걸렸다. */
-let eligDocs = {};
-try { eligDocs = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
+/* 고르는 규칙은 attachment-text.mjs noticeDocFiles 한 곳 — 🔴 금액은 **formPath:false**(자격 색인만): 신청서 쪽 공고문까지 넓혔을 때
+   틀린 금액이 나왔다(달서 80만원 · 2026-11-15). 넓히려면 전후 대조부터 */
+const docFiles = (it) => noticeDocFiles(it, { formPath: false });
 /* 🔴 첨부 공고문이 **서로 다른 금액**을 말하면 하나로 못 적는다 — 고르는 규칙은 parse-amount.js `pickDocAmount` 한 곳 (2026-11-15) */
 function amountFromDocs(it) {
   const results = [];
-  for (const f of docOrder((eligDocs[it.id] || {}).files)) {   // 원문 글자(HWP)가 OCR 보다 먼저
+  for (const f of docFiles(it)) {   // 원문 글자(HWP)가 OCR 보다 먼저(docOrder)
     const p = fileURLToPath(new URL(`extracted/${f}`, HERE));
     const t = attachmentText(p);
     if (!readableDoc(p, t)) continue;   // OCR 포스터는 문턱이 낮다(attachment-text readableDoc 한 곳 — 발췌기와 같다)
@@ -118,7 +119,7 @@ for (const it of items) {
         총액/1인당 가르기·유의사항 절 차단·'전액'의 닻·자릿수 관문이 그대로 걸린다. */
   const aiLines = Array.isArray(it.amountLines) ? it.amountLines : [];
   const bodyLines = hasText(src) ? String(src.text).split('\n').map((s) => s.trim()).filter(Boolean) : [];
-  const hasDocs = ((eligDocs[it.id] || {}).files || []).length > 0;
+  const hasDocs = docFiles(it).length > 0;
   if (!bodyLines.length && !aiLines.length && !hasDocs) { noText++; continue; }
   read++;
   /* 본문이 있으면 본문이 먼저다. 본문으로 못 읽었을 때만 AI 가 옮겨 둔 줄로 한 번 더 본다 —
