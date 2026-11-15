@@ -181,7 +181,7 @@ async function swipeDown(page, sel) {
       await page.evaluate(() => {
         const t = document.querySelector('#detail-sheet .sheet-title');
         const p = document.querySelector('#detail-sheet .sheet-provider');
-        return [t && t.textContent.trim(), !!(p && /원본 양식|붙여 넣을|원문에서 확인|그대로 제출|보낼 내용/.test(p.textContent))];
+        return [t && t.textContent.trim(), !!(p && /원본 양식|붙여 넣을|공고가 정한 방법|그대로 제출|보낼 내용/.test(p.textContent) && !/원문에서 확인|원문 확인|확인 필요/.test(p.textContent))];   // 2026-11-15 — 모르는 공고의 둘째 줄은 「공고에 낼 내용을 정리합니다 — 제출은 공고가 정한 방법으로」(예전 「… 원문에서 확인」)
       }), ['지원문서 작성', true]);
     /* 🔴 이게 핵심이다 — 예전 버그는 바로 이 순간 '신청 준비 완료'를 찍었다 */
     eq('  🔴 그 순간 신청내역(state.applications)에 없다', await appsOf(pick.A.id), { mem: [], disk: [] });

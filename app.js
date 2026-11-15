@@ -6251,7 +6251,7 @@ function renderApplications() {
               예전엔 `… · 서류 작성 필요 1건 · 선정된 장학금` 처럼 한 줄에 가운뎃점으로
               붙어 있어, 아래 금액의 이름표가 **네 번째 건수처럼** 읽혔다. */ ''}
          <p>준비 완료 ${prepared.length}건${inPrep.length ? ` · 준비 중 ${inPrep.length}건` : ''}${submitted.length ? ` · 제출·심사 중 ${submitted.length}건` : ''}${wonApps.length ? ` · 선정 ${wonApps.length}건` : ''}${pending.length ? ` · 서류 작성 필요 ${pending.length}건` : ''}</p>
-         ${/* 합이 0 이면 금액 두 줄을 안 그린다(2026-11-15 · 예전 '금액 미확인' — '0원'도 쓰지 않는다: 한 푼도 못 받는다로 읽힌다) */ ''}
+         ${/* 합이 0 이면 금액 두 줄을 안 그린다(2026-11-15 · 예전 「금액 미확인」 — '0원'도 쓰지 않는다: 한 푼도 못 받는다로 읽힌다) */ ''}
          ${shownAmount ? `<p class="summary-label">${wonApps.length ? '선정된 장학금' : '예상 최대 수혜액'}</p>
          <p class="summary-amount">${won(shownAmount)}</p>` : ''}
          <p class="summary-note">제출·발표는 각 공식 채널에서 · 결과는 여기에 기록${

@@ -1375,11 +1375,12 @@ console.log('\n■ 공고별 지원문서 — 앱 양식이 없는 등록 공고
     documents: ['지원 자격·제출 서류는 원문 공고에서 확인'], attachments: [], eligibilityLines: [] };
   const heads = (t) => t.sections.map((s) => s.heading);
   const t0 = eng.buildPrepTemplate(base);
-  eq('🔴 서류를 모르는 공고 — 머리말은 "양식을 찾지 못했다 · 제출 전 원문 확인" (그대로 제출 가능이라 말하지 않는다)',
-    [t0.prepKind, /찾지 못했습니다/.test(t0.tag), /그대로 제출/.test(t0.tag), t0.unofficial], ['unknown', true, false, true]);
-  eq('  자리표시 안내 줄은 제출 서류 절에 서류로 올라가지 않는다', t0.sections.find((s) => s.heading === '제출 서류 확인').note, '제출 서류는 원문 공고에서 확인하세요.');
+  /* 2026-11-15 개발자 결정 11-02 — 머리말은 참인 말만(「양식을 찾지 못했다 · 제출 전 원문에서 확인」 → 「정리한 문서이고 이 문서 자체를 내는 것은 아니다」) */
+  eq('🔴 서류를 모르는 공고 — 머리말은 "정리한 문서 · 이 문서 자체를 내는 것은 아니다" (그대로 제출 가능이라 말하지 않는다 · \'모름\'류 글자 없음)',
+    [t0.prepKind, /이 문서 자체를 내는 것은 아닙니다/.test(t0.tag), /그대로 제출/.test(t0.tag), /찾지 못했|원문에서 확인|원문 확인|확인 필요/.test(t0.tag + t0.lead), t0.unofficial], ['unknown', true, false, false, true]);
+  eq('  자리표시 안내 줄은 제출 서류 절에 서류로 올라가지 않는다 — 서류를 못 읽었으면 절 자체가 없다(「원문 공고에서 확인하세요」 줄 없음)', t0.sections.some((s) => s.heading === '제출 서류 확인'), false);
   eq('  작성형 서류 이름이 없으면 기본 세 절(지원 동기·학업/활동·계획) — 자격 줄이 없으면 자격 절도 없다',
-    heads(t0), ['신청 개요', '지원 동기 및 신청 사유', '학업 및 활동 요약', '향후 계획', '제출 서류 확인', '제출 안내']);
+    heads(t0), ['신청 개요', '지원 동기 및 신청 사유', '학업 및 활동 요약', '향후 계획', '제출 안내']);
   eq('  원문이 자유 양식이라 확인한 공고(prepDoc)만 "그대로 제출할 수 있다"',
     (() => { const t = eng.buildPrepTemplate({ ...base, prepDoc: true }); return [t.prepKind, /그대로 제출할 수 있습니다/.test(t.tag)]; })(), ['free', true]);
   const withAtt = { ...base, attachments: [{ name: '붙임1 장학생 신청서.hwp', url: 'https://e.ac.kr/f.hwp' }] };
@@ -1411,13 +1412,13 @@ console.log('\n■ 공고별 지원문서 — 앱 양식이 없는 등록 공고
     ec && ec.fields[0].type === 'checks' && ec.fields[0].options, ['재학생 중 직전 학기 12학점 이상 이수', '평점 3.0 이상']);
   eq('  제출 안내 절은 마감과 "실제 접수 아님"을 말한다',
     /2099-01-01/.test(t4.sections.at(-1).note) && /실제로 접수되는 것은 아니/.test(t4.sections.at(-1).note), true);
-  eq('  마감을 모르면 지어내지 않는다 ("마감은 원문 확인")', /마감은 원문 확인/.test(eng.buildPrepTemplate({ ...base, deadline: '' }).sections.at(-1).note), true);
+  eq('  마감을 모르면 지어내지 않고 말하지도 않는다 (예전 "마감은 원문 확인" · 2026-11-15)', (() => { const n = eng.buildPrepTemplate({ ...base, deadline: '' }).sections.at(-1).note; return [/마감/.test(n), /원문 확인/.test(n), /실제로 접수되는 것은 아니/.test(n)]; })(), [false, false, true]);
   /* 문서가 실제로 그려진다 — 모르는 타입 없이 · 공고 이름·머리말·절·서약 */
   const ans = {};
   t4.sections.forEach((s) => (s.fields || []).forEach((f) => { ans[f.id] = f.type === 'checks' ? { checks: [f.options[0]], text: '' } : '«답»'; }));
   const html = eng.renderFormDoc(t4, FORM_SAMPLE_PROFILE, ans);
   eq('  문서에 공고 이름 · 머리말 · 자격 체크(☑) · 서약이 들어간다',
-    [/테스트장학 2026-2 — 지원문서/.test(html), /첨부된 신청서 양식을 찾지 못했습니다/.test(html), /☑ 재학생 중 직전 학기 12학점 이상 이수/.test(html), /사실과 다름이 없습니다/.test(html)],
+    [/테스트장학 2026-2 — 지원문서/.test(html), /이 문서 자체를 내는 것은 아닙니다/.test(html), /☑ 재학생 중 직전 학기 12학점 이상 이수/.test(html), /사실과 다름이 없습니다/.test(html)],
     [true, true, true, true]);
   /* 앱 연결 — 글자가 아니라 실제 모양을 본다 */
   const appSrc = readText(new URL('../app.js', import.meta.url));
@@ -6288,8 +6289,9 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
 
   /* 합이 0 일 때 '0원'이라고 말하지 않는다 — 금액 미확인 공고가 많아(실측 68건 중 41건)
      그중 하나를 선정으로 기록하면 '선정된 장학금 0원'이 떴다. */
-  eq("합이 0 이면 '금액 미확인'이라고 적는다",
-    appsSrc.includes("shownAmount ? won(shownAmount) : '금액 미확인'"), true);
+  /* 2026-11-15 개발자 결정 11-02 — '금액 미확인'도 쓰지 않는다: 합이 0 이면 금액 두 줄(이름표·금액)을 안 그린다 */
+  eq("합이 0 이면 '0원'도 '금액 미확인'도 아니라 금액 줄을 안 그린다",
+    [/\$\{shownAmount \? `<p class="summary-label">/.test(appsSrc), /'금액 미확인'|· 금액 미확인/.test(appsSrc)], [true, false]);
 
   /* ── 🔴 차례 — 할 일이 있는 것부터 (2026-09-20 개발자 지적) ──
      예전엔 담은 순서를 뒤집기만 해서, 실측으로 위 세 장이 전부 끝난 일이고 '서류 작성
@@ -6349,8 +6351,9 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
   eq('구조로 저장된 자격만 단어로 옮긴다',
     bulkTags({ eligibility: { minGpa: 3, maxBracket: 8, years: [2, 3], flagsAny: ['basicLiving'] } }),
     ['기초생활수급자', '평점 3 이상', '소득 8구간 이하', '2·3학년']);
-  eq('자격을 모르면 지어내지 않는다', bulkTags({ eligibility: {} }), ['자격 원문 확인']);
-  eq('자격 칸이 아예 없어도 지어내지 않는다', bulkTags({}), ['자격 원문 확인']);
+  /* 2026-11-15 개발자 결정 11-02 — 못 읽은 자격은 칩을 안 그린다(예전 '자격 원문 확인') */
+  eq('자격을 모르면 지어내지 않는다 — 칩 없음', bulkTags({ eligibility: {} }), []);
+  eq('자격 칸이 아예 없어도 지어내지 않는다 — 칩 없음', bulkTags({}), []);
 
   /* ── 🔴 홈 차례 — 적합도와 마감일을 한 점수로 (2026-09-17 개발자 지시) ──
      "홈화면 장학금 적합도순으로 된것같은데 제목은 마감임박이야. 마감임박이라는 수치를 지우고
@@ -7110,7 +7113,8 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
   eq('renderAmountDetail 이 있다', body.length > 200, true);
 
   // ① 갈래 넷 — 이름은 개발자가 '명사형으로 조이기'로 정한 것이다
-  for (const t of ['합산', '중복 수혜 불가', '등록금 비율 환산', '금액 미확인']) {
+  //    넷째 '금액 미확인' → '금액을 못 읽은 공고' (2026-11-15 · 개발자 결정 11-02 '미확인'류 글자 없음 — 히어로 아랫줄 「금액을 못 읽은 n건」과 같은 말 · 갈래 수는 그대로 넷)
+  for (const t of ['합산', '중복 수혜 불가', '등록금 비율 환산', '금액을 못 읽은 공고']) {
     eq(`갈래 '${t}' 가 있다`, body.includes(`grp('${t}'`), true);
   }
   eq('제목은 금액 상세다', body.includes('금액 상세'), true);
@@ -8877,7 +8881,7 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
     eq('D-DAY 는 D-DAY 그대로', ddayWords({ label: 'D-DAY', cls: 'urgent', days: 0 }), 'D-DAY');
     eq('D-3 은 D-3 그대로 (풀어 쓰지 않는다)', ddayWords({ label: 'D-3', cls: 'urgent', days: 3 }), 'D-3');
     eq('지난 것은 마감', ddayWords({ label: '마감', cls: 'closed', days: -2 }), '마감');
-    eq('못 읽은 것은 지어내지 않는다', ddayWords({ label: '기한 원문 확인', cls: '', days: 14 }), '기한 확인 중');
+    eq('못 읽은 것은 지어내지 않고 말하지도 않는다 (2026-11-15 · 예전 「기한 확인 중」)', ddayWords({ label: '', cls: '', days: 14, unknown: true }), '');
   }
   /* 마감 자리는 맨 아랫줄(.sch-foot) — 맨 윗줄(.sch-top)은 적합도 자리라 거기 두면 안 된다(개발자 지시) */
   {
@@ -9813,8 +9817,10 @@ console.log('\n■ 앱 내부 사정은 학생 화면에 적지 않는다 (2026-
     /금액 미확인/.test(adm) && /마감일 없음/.test(adm) && /지원 자격 미확보/.test(adm), true);
 
   /* ③ 🔴 지워서는 안 되는 것 — 여기까지 지우면 앱이 '확인해 줬다'고 말하는 셈이 된다 */
-  eq('그래도 「자격 미확인」 배지는 남아 있다 (원칙 8-1)',
-    /badge-fit-unknown">자격 미확인</.test(appCode), true);
+  /* 2026-11-15 개발자 결정 11-02 — 「자격 미확인」 배지도 뺐다(학생 화면에 '모름'류 글자 없음). 못 읽은 공고는 알약이 없고 순서는 아래(fitRank) ·
+     신청 전 안내(아래)는 남는다 — 그것까지 지우면 앱이 '확인해 줬다'고 말하는 셈이다 */
+  eq('「자격 미확인」 배지는 없다 — 못 읽은 공고는 알약 없음 (2026-11-15)',
+    [/badge-fit-unknown">자격 미확인</.test(appCode), /if \(verdict === 'unread'\) return '';/.test(appCode)], [false, true]);
   eq('  자격을 못 읽은 공고는 신청 전에 원문을 보라고 말한다',
     /공고 원문에서 지원 자격을 확인하세요/.test(appCode), true);
 }
@@ -13588,6 +13594,15 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
   eq('  .gitattributes 에 리포트·장부 줄(merge=ours) — 없으면 배포 동기화가 충돌로 멈춘다', [/^collector\/kosaf-hunt-report\.md\s+merge=ours$/m.test(ga), /^collector\/kosaf-hunt-state\.json\s+merge=ours$/m.test(ga), /^collector\/kosaf-hunt\.json\s+merge=ours$/m.test(ga)], [true, true, true]);
 }
 
+
+console.log("\n■ 학생 화면에 '모름'류 글자가 없다 (2026-11-15)");
+/* 개발자 결정(2026-11-02) — '모름' 같은 말이 앱에 보이면 신뢰가 떨어진다 → 학생 화면에서 모르는 것을 말하는 글자를 전부 뺀다(모르면 아무것도 그리지 않는다 · 지어내지 않는다 · 판정 코드 무변경).
+   표본을 앱 함수 그대로 그려 세고(verify/app-vm.cjs) · 결정 1(기한·자격을 다 모르는 정식 공고는 게시판 글로 · feedOnlyFormal) · app.js·index.html·match-engine.js 문자열 훑기.
+   절 본문은 verify/no-unknown-gate.mjs · 낱말은 verify/no-unknown-words.cjs 한 곳 · 실데이터 전수는 verify/verify-no-unknown.js(브라우저) */
+{
+  const { runNoUnknownGate } = await import('./no-unknown-gate.mjs');
+  runNoUnknownGate(eq, readText);
+}
 
 /* ■ 공고 카드 품질 (2026-10-15 개발자 지시 — "공고 카드를 눌렀을 때 … 사용자 입장에서 다 완벽했으면")
    상세 200건을 브라우저로 전수 열어 본 결과를 한 절로 잠근다. 틀린 미달(8) · 학적정보로 판정할 수 있는데 모름(2) ·

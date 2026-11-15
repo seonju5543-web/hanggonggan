@@ -50,7 +50,8 @@ const BASE = {
       const parts = {};
       /* ① 카드 — 홈·탐색이 실제로 그리는 공고만(결정 1: 기한·자격을 다 모르는 정식 공고는 카드가 아니라 게시판 글로 간다) */
       const listed = getMatches().some((m) => m.sch.id === s.id);
-      parts.listed = listed;
+      /* 결정 1 — 카드에서 빠진 정식 공고는 게시판 새 공고(제목+링크)에 있어야 한다(사라지면 안 된다) */
+      parts.inFeed = !listed && where === 'registered' ? boardNoticesForMe().some((n) => n.url === s.sourceUrl || String(n.url).startsWith(s.sourceUrl) || String(s.sourceUrl).startsWith(n.url)) : null;
       parts.card = listed ? textOf(schCard(s, result, { fit, fd })) : '';
       /* ② 상세 시트 */
       openDetail(s.id);
@@ -94,13 +95,16 @@ const BASE = {
     const key = `${r.where}·${k}·${w}`; tally[key] = (tally[key] || 0) + n;
   }
   const listed = out.rows.filter((r) => r.where === 'registered' && r.listed).length;
+  /* 결정 1 — 카드에서 뺀 공고가 게시판 새 공고에도 없으면 학생은 그 공고를 영영 못 본다 */
+  const lost = out.rows.filter((r) => r.where === 'registered' && !r.listed && r.parts.inFeed === false);
+  for (const r of lost) console.log(`   ✕ 카드에서 뺐는데 게시판 새 공고에도 없다 — ${r.id} ${String(r.name).slice(0, 40)}`);
   console.log(`■ 학생 화면 '모름'류 글자 전수 — 열린 정식 등록 ${out.reg}건(카드로 뜨는 것 ${listed} · 게시판 글로 가는 것 ${out.reg - listed}) · 층2 ${out.kosaf}줄`);
   for (const [k, n] of Object.entries(tally).sort((a, b) => b[1] - a[1])) console.log(`   ${k}  ${n}`);
   const show = Number(arg('show') || 6);
   for (const r of bad.slice(0, show)) console.log(`   ✕ ${r.id} ${String(r.name).slice(0, 40)} — ${JSON.stringify(r.sample).slice(0, 300)}`);
   if (arg('json')) fs.writeFileSync(arg('json'), JSON.stringify(out, null, 1));
   if (errors.length) console.log(errors.slice(0, 5).join('\n'));
-  const ok = bad.length === 0 && !errors.length && out.reg > 0;
+  const ok = bad.length === 0 && !lost.length && !errors.length && out.reg > 0;
   console.log(ok ? `  ✓ 공고 ${out.rows.length}건 화면 어디에도 '모름'류 글자가 없다` : `  ✕ '모름'류 글자가 남은 공고 ${bad.length}건${errors.length ? ` · 페이지 오류 ${errors.length}` : ''}${out.reg ? '' : ' · 정식 등록을 하나도 못 읽었다(무력해진 검사)'}`);
   await browser.close();
   process.exit(ok ? 0 : 1);

@@ -167,9 +167,10 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
       e.querySelector('.sheet-top .badge-kind').textContent.trim(), !!e.querySelector('.sheet-top .sch-org'), e.querySelector('.sheet-top .badge-dday').textContent.trim(), !!e.querySelector('.sheet-provider')]),
       ['2026 대학생 해외봉사단 모집', '항공료 전액 지원', '봉사', false, 'D-5', false]);   // 학교 게시판 글 — 머리줄에 주최 글자 없음(2026-11-02 개발자 결정)
     /* 기간은 발췌 「모집기간」 원문 그대로(리뷰 2026-11-02 — 마감만 적으면 시작일이 사라진다) · 없을 때만 ~마감 */
-    eq('⑤ 「접수」 절 — 기간은 발췌 모집기간 원문 그대로 · 방법은 원문 확인 · 서류는 원문에서 읽은 제출 서류(11-11 · activityDocuments)', await page.$$eval('#detail-sheet .apply-rows li', (li) => li.map((x) => x.textContent.trim().replace(/\s+/g, ' '))), ['기간2026. 10. 1. ~ 10. 15.', '방법원문 확인', '서류참가신청서 1부 · 개인정보 수집·이용 동의서 1부']);
-    eq('⑤ 지원 자격 — 장학 시트와 같은 머리(적합도 · 요건 n개 중 n개 충족)와 ✓ 줄',
-      await page.$eval('#detail-sheet', (e) => [e.querySelector('.sheet-verdict h4').textContent.trim(), /요건 1개 중 1개 충족/.test(e.querySelector('.sheet-verdict').textContent),
+    /* 2026-11-15 개발자 결정 11-02 — 모르는 방법 줄은 안 그린다(예전 「방법 원문 확인」) */
+    eq('⑤ 「접수」 절 — 기간은 발췌 모집기간 원문 그대로 · 방법을 모르면 줄 없음 · 서류는 원문에서 읽은 제출 서류(11-11 · activityDocuments)', await page.$$eval('#detail-sheet .apply-rows li', (li) => li.map((x) => x.textContent.trim().replace(/\s+/g, ' '))), ['기간2026. 10. 1. ~ 10. 15.', '서류참가신청서 1부 · 개인정보 수집·이용 동의서 1부']);
+    eq('⑤ 지원 자격 — 장학 시트와 같은 머리(적합도 · 맞는 요건 n개 · 어긋난 요건 없음 — 2026-11-15)와 ✓ 줄',
+      await page.$eval('#detail-sheet', (e) => [e.querySelector('.sheet-verdict h4').textContent.trim(), /맞는 요건 1개 · 어긋난 요건 없음/.test(e.querySelector('.sheet-verdict').textContent),
         [...e.querySelectorAll('.reason-list li')].map((li) => li.textContent.trim())]),
       ['지원 자격', true, ['✓ 만 19~34세 대한민국 국민']]);
     eq('⑤ 지원 가능 알약은 없다(활동 글엔 구조화 조건이 없어 늘 가능 — 거짓 안심)', await page.$$eval('#detail-sheet .status-pill', (e) => e.length), 0);
