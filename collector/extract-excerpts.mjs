@@ -34,7 +34,7 @@ const ME_BRANCH_LABEL = _cr(import.meta.url)('../match-engine.js').BRANCH_LABEL;
 /* 공고문 첨부에서 글자 뽑기 — 본문이 "붙임 참조"뿐인 공고가 있다.
    🔴 **공고문만** 본다(attachment-text.mjs 첫머리 참조) — 신청서·동의서를 읽으면
    개인정보 수집 항목이 지원 자격 자리에 앉는다(실제로 겪고 되돌린 적이 있다). */
-import { attachmentText, readableDoc, docOrder, isOcrSource } from './attachment-text.mjs';
+import { attachmentText, readableDoc, isOcrSource, noticeDocFiles, pdfLayerText } from './attachment-text.mjs';
 import { findApplyEmail, humanOwnedEmail, staleApplyEmail } from './apply-email.mjs';
 import { decodeEntities } from './clean-title.mjs';
 import { readDocuments, placeholderOnly as docsPlaceholderOnly } from './doc-list.mjs';
@@ -934,9 +934,8 @@ const idx = indexTexts(texts, browserBodies);
    걷어낸 결과가 앙상하면 stripBoilerplate가 원문을 그대로 돌려준다(안전판). */
 const strip = makeStripper(texts);
 
-/* 공고문 첨부 색인 (deepfetch --elig-attach 가 만든다) */
-let eligDocs = {};
-try { eligDocs = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
+/* 공고문 첨부 — 고르는 규칙은 attachment-text.mjs noticeDocFiles 한 곳(자격 색인 + 신청서 쪽에 섞여 온 공고문 · 2026-11-15).
+   🔴 여기서 색인 파일을 직접 열지 말 것 — 길이 둘이 되면 마감은 읽는데 자격은 못 읽는 어긋남이 생긴다(관문 「발췌기 글자 읽기」). */
 
 let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, fromTitle = 0, gotDeadline = 0, dlFromDoc = 0, gotOpen = 0, gotAnnounce = 0, gotApplyEmail = 0, droppedApplyEmail = 0, gotApplyPortal = 0, gotDocs = 0, gotFree = 0;
 let titleFixed = 0;   // 잘린 제목을 본문에서 보완한 공고(completeTitle)
@@ -1001,10 +1000,11 @@ export function annexCut(text) {
 }
 
 /** 공고문 첨부의 글자들 — 못 읽는 것(스캔·그림)은 조용히 뺀다. */
-function docTexts(it) {
+/* formPath — 신청서 쪽에 섞여 온 공고문도 읽는가(마감·접수 시작·발표·접수처 · 기본 켬). 제출 서류 목록은 끈다(noticeDocFiles 머리말) */
+function docTexts(it, formPath = true) {
   const out = [];
   out.files = [];                       // 글자와 같은 차례의 파일 이름 — 어느 첨부에서 읽었는지 표식에 쓴다
-  for (const f of docOrder((eligDocs[it.id] || {}).files)) {   // 원문 글자(HWP)가 OCR 보다 먼저
+  for (const f of noticeDocFiles(it, { formPath })) {   // 원문 글자(HWP)가 OCR 보다 먼저(docOrder)
     const p = fileURLToPath(new URL(`extracted/${f}`, HERE));
     const t = attachmentText(p);
     if (readableDoc(p, t)) { out.push(t); out.files.push(f); }   // OCR 포스터는 문턱이 낮다(attachment-text readableDoc 한 곳)
@@ -1028,7 +1028,7 @@ function fromDocs(it, extract, texts = docTexts(it)) {
   return null;
 }
 /** 한 공고의 첨부 글자를 **한 번만** 뽑아 두는 게으른 상자 — 마감·접수 시작·발표가 나눠 쓴다. */
-function docsOnce(it) { let memo; return () => (memo ??= docTexts(it)); }
+function docsOnce(it, formPath = true) { let memo; return () => (memo ??= docTexts(it, formPath)); }
 /* 🔴 제목이 '연장'인데 첨부 글에 '연장'이 없으면 그 첨부는 **연장 전 원래 공고문**이다 — 그 마감은 지난 기간이라
    읽지 않는다 (2026-10-05 · UI-12 · 상명대 「…(기간 연장)」 첨부가 원래 공고문이라 10.8 까지 열린 공고가 9.23 으로 닫힐 뻔했다) */
 export function deadlineFromDocs(it, texts) {
@@ -1168,7 +1168,9 @@ function qualFromDocs(it) {
      (`다자녀`·`대학생`)로 채점기도 판정하기 때문이다. 눈으로 보기 전엔 아무도 모른다.
      분야별 요건을 제대로 다루려면 절이 아니라 **분야를 갈라 담는 구조**가 먼저 필요하다. */
   qualFromDocs.lastFile = null;
-  for (const f of docOrder((eligDocs[it.id] || {}).files)) {   // 원문 글자(HWP)가 OCR 보다 먼저
+  /* 자격은 신청서 쪽 공고문을 아직 안 본다(formPath:false) — 긴 요강의 분야별 기준이 공고 전체 요건이 되는 위 사고가 그 길에서 다시 날 수 있어
+     전후 대조로 보기 전엔 넓히지 않는다 */
+  for (const f of noticeDocFiles(it, { formPath: false })) {   // 원문 글자(HWP)가 OCR 보다 먼저(docOrder)
     const p = fileURLToPath(new URL(`extracted/${f}`, HERE));
     const t = attachmentText(p);
     if (!readableDoc(p, t)) continue;   // OCR 포스터는 문턱이 낮다(attachment-text readableDoc 한 곳 · 2026-10-17 강원대 어업인 포스터)
@@ -1309,7 +1311,7 @@ for (const it of reg.items) {
     fillCalendarDates(it, () => openDateFromDocs(it, docs()), () => announceFromDocs(it, docs()));
     fillApplyEmail(it, null);          // 본문이 없으니 첨부에서만 — 본문 경로와 같은 함수
     fillApplyPortal(it, null);
-    fillDocuments(it, null, docs);     // 제출 서류 목록도 첨부에서 (2026-10-13 ④)
+    fillDocuments(it, null, docsOnce(it, false));     // 제출 서류 목록도 첨부에서 (2026-10-13 ④) — 신청서 쪽 공고문은 안 본다(noticeDocFiles formPath:false)
     kept += 1; continue;
   }
 
@@ -1375,7 +1377,7 @@ for (const it of reg.items) {
     () => extractOpenDate(body) || openDateFromDocs(it, docs()),
     () => extractAnnounce(body) || announceFromDocs(it, docs()));
   /* 제출 서류 목록 · 자유 양식 근거 — 본문 먼저, 못 읽으면 공고문 첨부 (2026-10-13 ④ · 규칙은 doc-list.mjs) */
-  fillDocuments(it, body, docs);
+  fillDocuments(it, body, docsOnce(it, false));   // 신청서 쪽 공고문은 안 본다(noticeDocFiles formPath:false)
 
   /* 🔴 **AI가 다른 출처에서 읽은 자격은 건드리지 않는다** (2026-08-23).
      아래 `delete it.eligibilityLines`는 '원문은 읽었는데 못 뽑았다 → 낡은 발췌를 남기지 않는다'는

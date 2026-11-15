@@ -20,15 +20,23 @@
    ============================================================ */
 import fs from 'node:fs';
 import zlib from 'node:zlib';
+import crypto from 'node:crypto';
+import { fileURLToPath } from 'node:url';
 import { pdfText } from './pdf-text.mjs';
+import { sameTitle } from './detail-url.mjs';
 
 /* 학생이 '채우는' 문서가 아니라 '읽는' 문서인가.
    ⚠️ 이름에 신청서·서식이 들어가면 공고문이 아니다 — 자격이 아니라 빈칸이 들어 있다. */
 const FORMISH = /서식|양식|신청서|지원서|선발원서|동의서|서약서|추천서|계획서|증명|이력서|환산/;
 const NOTICEISH = /공고|안내|계획|모집|선발|요강|기준/;
+/* 🔴 「공고문(신청서 포함)」 처럼 **공고문에 신청서가 붙은 한 파일**은 공고문이다 (2026-11-15 · 대전 서구인재육성장학재단 「붙임1. 2026년 장학생 선발
+   공고문(신청서 포함).hwpx」 — 접수기간·신청마감이 그 파일에만 있는데 이름 속 '신청서' 때문에 영영 안 읽혔다). 괄호 속 「…포함」 만 걷고 다시 본다 —
+   맨 「장학금 신청서.hwp」 는 그대로 서식이다(빈칸뿐인 파일을 공고문으로 읽으면 개인정보 동의 문구가 자격이 된다 · 위 머리말).
+   뒤에 붙은 서식의 견본 날짜는 발췌기의 annexCut 이 자른다. */
+const WITH_FORM = /\s*[(（\[]\s*[^)）\]]{0,20}포함\s*[)）\]]/g;
 export const isNoticeDoc = (name) => {
   const n = String(name || '');
-  return NOTICEISH.test(n) && !FORMISH.test(n);
+  return NOTICEISH.test(n) && !FORMISH.test(n.replace(WITH_FORM, ''));
 };
 
 /* zip(=docx·hwpx·첨부 묶음) 안을 직접 읽는다 — 바깥 라이브러리 없이.
@@ -185,7 +193,27 @@ export function attachmentText(filePath) {
    알아보도록 **줄 머리 이름표 뒤에만** 콜론을 둔다(2026-10-17 · 강원대 청년창업어업인 포스터: 자격 줄이 있는데 못 읽었다). */
 const OCR_LABEL = /^((?:신청|지원|선발|모집|참가|참여)\s?(?:대상|자격|인원|금액|기간|방법|문의)|접수\s?(?:기간|방법)|문의처?)\s+(?=\S)/gm;
 function ocrText(filePath) {
-  try { return fs.readFileSync(filePath + '.ocr.txt', 'utf8').replace(OCR_LABEL, '$1 : '); } catch { return ''; }
+  try { return ocrPeriodFix(fs.readFileSync(filePath + '.ocr.txt', 'utf8').replace(OCR_LABEL, '$1 : ')); } catch { return ''; }
+}
+
+/* OCR 이 **기간 줄**에서 흔히 내는 두 오독을 되돌린다 (2026-11-15 · 카드 빈칸 비평).
+   ① 날짜와 시각이 붙는다 — `신청 기간 : 10.26~11. 0615:00까지`(경희 공과대학 특성화 장학 포스터 · 원문 `11. 06. 15:00`)
+      → `11. 06 15:00` (날짜 읽기의 `(?!\d)` 가 `0615` 를 통째로 거절해 마감이 비었다)
+   ② 물결 뒤 `1` 이 괄호로 읽힌다 — `신청기간 : 2026.10.15.(목)~]0.22.(목)`(강원 도전장학금 포스터) → `~10.22.(목)`
+   🔴 **기간 줄에서만**(기간·기한·마감·까지가 든 줄) — 다른 줄의 `]0` 은 글자 그대로 둔다(고쳐 읽는 것은 원문 손대기다).
+   ②는 달 자리(0·1·2 + 점)일 때만이다 — 끝이 달력에 없는 날이면 날짜 읽기(ymd)가 어차피 버린다. */
+const OCR_PERIOD_LINE = /(기\s?간|기\s?한|마\s?감|까지)/;
+export function ocrPeriodFix(text) {
+  return String(text || '').split('\n').map((l) => (!OCR_PERIOD_LINE.test(l) ? l : l
+    .replace(/(\d{1,2}\.\s?)(0[1-9]|[12]\d|3[01])(\d{1,2}\s?:\s?\d{2})/g, '$1$2 $3')
+    .replace(/([~∼〜～])\s?[\]\[|!lI]([0-2])(?=\s?\.)/g, '$11$2'))).join('\n');
+}
+
+/* PDF 의 **글자층**(pdf-text.py 가 칸 자리를 살려 둔 `.pdf.txt`) — 자격 경로는 숫자가 빠져서 안 쓴다(위 attachmentText 주석).
+   마감 하나만 읽는 발췌기 칸 읽기(columnDeadline)가 쓴다 · 없으면 '' */
+export function pdfLayerText(filePath) {
+  if (!/\.pdf$/i.test(String(filePath))) return '';
+  try { return fs.readFileSync(filePath + '.txt', 'utf8'); } catch { return ''; }
 }
 
 /* 이 파일의 글자가 OCR 에서 온 것인가 — 출처 표식(`공고문 첨부(OCR)`)을 붙이는 데 쓴다.
@@ -211,3 +239,57 @@ export const readable = (text, min = 300) => String(text || '').replace(/[^가-�
    OCR 글자는 이미 품질 관문(ocr-text.py)을 넘은 것만 남아 있으므로 짧다고 못 믿을 이유가 없다. 첨부를 읽는 로봇은 readable 대신 이것을 쓴다. */
 export const OCR_MIN = 80;
 export const readableDoc = (filePath, text = attachmentText(filePath)) => readable(text, isOcrSource(filePath) ? OCR_MIN : 300);
+
+/* ============================================================================
+   공고문 첨부 고르기 — **한 곳** (2026-11-15 · noticeDocFiles)
+
+   공고문 글자는 두 길로 들어온다:
+     · 자격 로봇(deepfetch --elig-attach)이 받은 공고문류 → `elig-docs.json` 색인
+     · 신청서 로봇(deepfetch --forms-only)이 받은 첨부 → `forms-index.txt` (form-*.*)
+   신청서 쪽에도 공고문이 섞여 온다 — 「…선발 공고.hwp」 · 「…공고문(신청서 포함).hwpx」. 그 파일에만 접수 메일·발표일·접수기간이
+   있는 공고가 있는데(국가유산진흥원 · 대전 서구인재육성) 발췌기는 elig-docs.json 만 열어 받아 놓고 못 읽었다.
+   🔴 발췌기·금액 로봇은 색인 파일을 직접 열지 말고 이것을 부른다(관문이 발췌기 원본에서 `elig-docs.json` 글자를 찾는다).
+   🔴 신청서 쪽 파일은 **공고문류(isNoticeDoc)만** · 그 공고의 줄만(id 칸이 있으면 id · 없으면 같은 제목 + 그 공고의 첨부 이름) ·
+      이미 든 파일과 **바이트가 같으면** 뺀다(elig-1xmn1p-1.docx ≡ form-1xmn1p-1.docx 같은 사본을 두 번 읽지 않는다).
+   ⚠️ `formPath:false` — 제출 서류 목록(fillDocuments)·금액 로봇은 예전 그대로 자격 색인만 본다. 넓혀 봤을 때 틀린 값이 나왔다
+      (달서 80만원 · 자격 줄이 서류 목록에 섞임). 넓히려면 그 두 길을 전후 대조로 먼저 볼 것.
+   ============================================================================ */
+const EXTRACTED_DIR = fileURLToPath(new URL('./extracted/', import.meta.url));
+function parseFormsIndexRows(text) {
+  return String(text || '').split('\n').filter(Boolean).map((line) => {
+    const [file, title, attach, , id] = line.split('\t');
+    return file && attach ? { file, title: title || '', attach, id: (id || '').trim() } : null;
+  }).filter(Boolean);
+}
+/** 두 색인을 읽는다 — 관문이 합성 색인을 넘길 수 있게 dir 를 받는다 */
+export function loadNoticeDocIndex(dir = EXTRACTED_DIR) {
+  let elig = {}, forms = [];
+  try { elig = JSON.parse(fs.readFileSync(`${dir}/elig-docs.json`, 'utf8')); } catch { /* 아직 없음 */ }
+  try { forms = parseFormsIndexRows(fs.readFileSync(`${dir}/forms-index.txt`, 'utf8')); } catch { /* 아직 없음 */ }
+  return { dir, elig, forms };
+}
+let defaultIndex = null;
+const hashMemo = new Map();
+function fileHash(p) {
+  if (!hashMemo.has(p)) { let h = null; try { h = crypto.createHash('sha1').update(fs.readFileSync(p)).digest('hex'); } catch { /* 없음 */ } hashMemo.set(p, h); }
+  return hashMemo.get(p);
+}
+/** 이 공고의 공고문 첨부 파일 이름들(extracted/ 기준) — 원문 글자(HWP·DOCX)가 먼저(docOrder) */
+export function noticeDocFiles(it, { index, formPath = true } = {}) {
+  const idx = index || (defaultIndex ??= loadNoticeDocIndex());
+  const out = [...(((idx.elig || {})[it && it.id] || {}).files || [])];
+  if (formPath && it) {
+    const attNames = new Set((it.attachments || []).map((a) => a && a.name).filter(Boolean));
+    const titles = [it.boardTitle, it.name, it.title].filter(Boolean);
+    const seen = new Set(out.map((f) => fileHash(`${idx.dir}/${f}`)).filter(Boolean));
+    for (const r of idx.forms || []) {
+      if (out.includes(r.file) || !isNoticeDoc(r.attach)) continue;
+      const mine = r.id ? r.id === it.id : (attNames.has(r.attach) && titles.some((t) => sameTitle(t, r.title)));
+      if (!mine) continue;
+      const h = fileHash(`${idx.dir}/${r.file}`);
+      if (!h || seen.has(h)) continue;   // 파일이 없거나 이미 든 파일의 사본
+      seen.add(h); out.push(r.file);
+    }
+  }
+  return docOrder(out);
+}
