@@ -4788,7 +4788,11 @@ function missingReqText(m, sch) {
   const e = (sch && sch.eligibility) || {};
   if (m === '직전학기 평점' && e.minGpa != null) return `직전학기 평점 ${e.minGpa} 이상`;
   if (m === '학자금 지원구간' && e.maxBracket != null) return `학자금 지원구간 ${e.maxBracket}구간 이내`;
-  if (m === '지금 받고 있는 장학금') return sch.exclusivity && sch.exclusivity.raw ? unent(String(sch.exclusivity.raw)).replace(/\s+/g, ' ').trim() : '';
+  /* 중복 수혜 — 원문 칸에서 **그 조항 한 마디만**(○·※ 로 나뉜 항목 중 중복·타 장학금을 말하는 것) · 재단 칸 전체를 쏟지 않는다(2026-08-30 개발자 지적과 같은 이유) */
+  if (m === '지금 받고 있는 장학금') {
+    const raw = sch.exclusivity && sch.exclusivity.raw ? unent(String(sch.exclusivity.raw)) : '';
+    return raw.split(/\s*[○ㅇ●◦※]\s*/).map((x) => x.replace(/\s+/g, ' ').trim()).find((x) => x.length >= 4 && /중복|타\s?(?:장학|재단|기관)|외부\s?장학/.test(x)) || '';
+  }
   return '';
 }
 
@@ -4833,10 +4837,10 @@ function eligibilityRowsHtml(sch, result) {
           '확인 필요'(모름)를 ✓ 로 두지 않으려던 장치라, 미달을 먼저 본다. */
     const bad = /미달/.test(r) || (/필요|아니에요|가능$/.test(r) && !/충족|확인/.test(r));
     return `<li class="${bad ? 'r-bad' : 'r-ok'}">${bad ? '✕' : '✓'} ${esc(r)}</li>`;
-  }).join('')
-    /* 🔴 판정 못 한 요건은 **표시 없이 요건 그대로** (2026-11-15 · 개발자 결정 11-02 — 예전 「? ○○ 정보를 입력하면 정확히 판단할 수 있습니다」).
-       줄은 버리지 않는다(요건이 사라지면 학생이 모른 채 지원한다) — 글자는 그 공고의 조건 값·원문 문장이다(missingReqText) */
-    + result.missing.map((m) => missingReqText(m, sch)).filter(Boolean).map((t) => `<li class="r-req">${esc(t)}</li>`).join('');
+  }).join('');
+  /* 🔴 판정 못 한 요건은 **표시 없이 요건 그대로** (2026-11-15 · 개발자 결정 11-02 — 예전 「? ○○ 정보를 입력하면 정확히 판단할 수 있습니다」).
+     줄은 버리지 않는다(요건이 사라지면 학생이 모른 채 지원한다) — 글자는 그 공고의 조건 값·원문 문장이다(missingReqText) · 그리는 자리는 아래 「내 정보로 확인한 항목」 */
+  const missTexts = result.missing.map((m) => missingReqText(m, sch)).filter(Boolean);
 
   /* 지원 자격 한 덩어리 — 원문 요건을 먼저 보여 주고, 그 아래에 '내 정보로 확인한 것'을 붙인다.
      앱이 판정할 수 있는 건 성적·소득구간·학년 같은 숫자 조건뿐이고, 원문의 '유자녀' 같은 항목은
@@ -4933,8 +4937,13 @@ function eligibilityRowsHtml(sch, result) {
      ⚠️ 그 줄을 만들던 `aiRead` 상수도 함께 지웠다 — 여기서 쓰는 곳이 더는 없다.
         판정식(`/^AI/.test(eligibilityFrom) && eligibilityReviewed !== true`)의 원본은
         이제 관리자 쪽 한 곳이다. 되살린다면 베끼지 말고 그 함수를 부를 것. */
-  if (checkRows) {
-    reasonRows += `<li class="r-head">내 정보로 확인한 항목</li>` + checkRows;
+  /* 못 맞춘 요건 한 줄(missingReqText) — 위 자격·제외 줄에 이미 보인 문장이면 또 적지 않는다(같은 줄 두 번 · 2026-10-15 카드 전수와 같은 규칙) */
+  const flatT = (t) => String(t || '').replace(/[\s.·,]/g, '');
+  const shownFlat = [...reqLines, ...exLines].map(flatT);
+  const missRows = missTexts.filter((t) => !shownFlat.some((x) => x.includes(flatT(t)) || flatT(t).includes(x)))
+    .map((t) => `<li class="r-req">${esc(t)}</li>`).join('');
+  if (checkRows || missRows) {
+    reasonRows += `<li class="r-head">내 정보로 확인한 항목</li>` + checkRows + missRows;
   }
   if (!reasonRows) {
     /* 원문 요건도 못 읽었고 판정할 조건도 없는 경우 — '제한이 없다'가 아니라 **모른다**는 뜻이다.

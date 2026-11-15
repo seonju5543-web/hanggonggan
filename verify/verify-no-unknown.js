@@ -78,8 +78,11 @@ const BASE = {
     state.profile = base;
     const kos = kosafAsScholarships().filter(open);
     for (const s of kos) one(s, base, 'kosaf');
+    /* data.js 의 상시 제도·국가 공고도 같은 카드·시트로 나온다 */
+    const nat = NATIONAL_SCHOLARSHIPS.filter(open);
+    for (const s of nat) one(s, base, 'national');
     state.profile = keep;
-    return { rows, reg: reg.length, kosaf: kos.length };
+    return { rows, reg: reg.length, kosaf: kos.length, nat: nat.length };
   }, { base: BASE });
   for (const r of out.rows) {
     r.hit = {}; r.sample = {};
@@ -98,7 +101,7 @@ const BASE = {
   /* 결정 1 — 카드에서 뺀 공고가 게시판 새 공고에도 없으면 학생은 그 공고를 영영 못 본다 */
   const lost = out.rows.filter((r) => r.where === 'registered' && !r.listed && r.parts.inFeed === false);
   for (const r of lost) console.log(`   ✕ 카드에서 뺐는데 게시판 새 공고에도 없다 — ${r.id} ${String(r.name).slice(0, 40)}`);
-  console.log(`■ 학생 화면 '모름'류 글자 전수 — 열린 정식 등록 ${out.reg}건(카드로 뜨는 것 ${listed} · 게시판 글로 가는 것 ${out.reg - listed}) · 층2 ${out.kosaf}줄`);
+  console.log(`■ 학생 화면 '모름'류 글자 전수 — 열린 정식 등록 ${out.reg}건(카드로 뜨는 것 ${listed} · 게시판 글로 가는 것 ${out.reg - listed}) · 층2 ${out.kosaf}줄 · 상시 제도·국가 ${out.nat}건`);
   for (const [k, n] of Object.entries(tally).sort((a, b) => b[1] - a[1])) console.log(`   ${k}  ${n}`);
   const show = Number(arg('show') || 6);
   for (const r of bad.slice(0, show)) console.log(`   ✕ ${r.id} ${String(r.name).slice(0, 40)} — ${JSON.stringify(r.sample).slice(0, 300)}`);
