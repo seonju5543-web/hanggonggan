@@ -41,6 +41,18 @@ export function makeTitleLine(corpus) {
   };
 }
 
+/* 물러서서 받은 화면이 **그 글인가** (2026-11-15 · 1단계 B5) — 봇 차단 뒤 일반 내려받기로 받은 HTML 은 게시판 목록·메뉴 화면일 수 있다.
+   그 글 제목이 보이고(normTitle 포함 관계) 다른 등록 공고 제목이 3개 미만일 때만 그 글로 본다. 재수집 로봇이 '본문 확보 ✅' 앞에 한 번 더 묻는다 —
+   홍익대 성취장학생(10-24 분석)이 목록 화면을 본문으로 적고 이레를 쉬었다. 규칙 두 벌을 막기 위해 여기 한 곳에 둔다. */
+export function fallbackIsThisNotice(text, title, otherTitles = [], { maxOthers = 3 } = {}) {
+  const body = normTitle(String(text || ''));
+  const want = normTitle(title);
+  if (want.length < 6 || !body.includes(want)) return { ok: false, why: '제목 없음' };
+  const others = (otherTitles || []).map(normTitle).filter((t) => t.length >= 10 && t !== want && body.includes(t)).length;
+  if (others >= maxOthers) return { ok: false, why: `다른 글 제목 ${others}개` };
+  return { ok: true, others };
+}
+
 /* 저장된 원문 배열을 주소·제목 두 갈래로 색인한다 */
 export function indexTexts(texts, browserBodies) {
   const byUrl = new Map();

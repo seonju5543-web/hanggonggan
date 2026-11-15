@@ -4336,6 +4336,17 @@ console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
      37건을 그렇게 저장했다가 전부 다시 받았다. */
   const rb = readText(new URL('collector/rescue-bodies.mjs', root));
   eq('재수집은 화면에 그려진 줄바꿈을 그대로 받는다', /innerText\(/.test(rb), true);
+  /* 1단계 B5 (2026-11-15) — 봇 차단 뒤 물러서서 받은 화면이 그 글인지 묻는다 · 삭제 안내 꼴도 내려간 글 */
+  {
+    const NS = await import(new URL('collector/notice-source.mjs', root));
+    const others = ['2026학년도 2학기 성취장학생 선발 안내', '2026-2학기 국가근로장학금 신청 안내', '2026학년도 교내 봉사장학금 모집 공고', '2026년 하반기 글로벌 장학생 선발'];
+    eq('  물러선 화면 — 제목이 있고 다른 글 제목이 셋 미만이면 그 글 · 제목이 없으면 아니다 · 다른 등록 공고 제목이 셋 이상 보이면 목록 화면이다',
+      [NS.fallbackIsThisNotice('공지사항\n2026학년도 2학기 성취장학생 선발 안내\n1. 지원자격 …', '2026학년도 2학기 성취장학생 선발 안내', others).ok,
+        NS.fallbackIsThisNotice('공지사항 목록\n2026-2학기 국가근로장학금 신청 안내\n…', '2026학년도 2학기 성취장학생 선발 안내', others).ok,
+        NS.fallbackIsThisNotice(`공지사항\n${others.join('\n')}\n이전글 다음글`, '2026학년도 2학기 성취장학생 선발 안내', others).why], [true, false, '다른 글 제목 3개']);
+    eq('  재수집 로봇은 물러섰을 때만 그 판정을 거치고(fellBack) · `삭제된글·삭제사유·관리자 삭제` 는 내려간 글로 적는다',
+      [/fellBack \? fallbackIsThisNotice\(text, t\.it\.name/.test(rb), /same\.ok && hasText/.test(rb), /삭제된\\s\?글\|삭제\\s\?사유\|관리자\\s\?삭제/.test(rb)], [true, true, true]);
+  }
   /* 본문을 다듬을 때 **가로 공백만** 누른다 — `\s+`로 누르면 줄바꿈까지 사라진다.
      ⚠️ '파일 어디에도 \s+ 가 없다'로 검사하면 안 된다. 첨부 **이름**을 다듬는
      `textContent.replace(/\s+/g,' ')`는 정상이고 본문과 무관한데 거기 걸린다
