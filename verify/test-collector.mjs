@@ -4726,6 +4726,117 @@ console.log('\n■ 자격 자리의 잡음을 유형별로 세는가 (2026-08-23
    🟢 `forms.json` 도 2026-08-29 개발자 승인으로 1칸으로 되돌렸다(내용 변경 0).
    2026-08-15 에 한 세션이 2칸으로 저장해 놓은 것이었고, 그 파일을 쓰는 로봇
    (`schematize-forms.mjs`)은 줄곧 1칸이었다 — 다음 실행에 6천 줄이 뒤집힐 상태였다. */
+/* ── 금액·양식 카드 빈 칸 (2026-11-15 · 승인 계획 11-02·11-11: 마감 전 정식 등록 카드의 금액·양식을 원문 값으로 · 없으면 그리지 않는다 · 지어내지 않는다) ──
+   실데이터를 읽지 않는다 — 원문에서 옮긴 줄을 표본으로 잰다(실데이터에 기댄 고정 검사 금지 · CLAUDE.md).
+   🔴 과장 다섯 갈래(한 갈래 고르기·상한 문구를 비율로·'못 받는 경우' 줄·첨부 한 장·문턱 금액)와 못 읽던 꼴(풀이 괄호·도형 글머리·1인당 줄),
+      양식 넷(운영 규칙 문서·자기소개서·아이콘 꼬리·.bin)과 대기줄을 하루 여섯 번 세던 것. */
+console.log('\n■ 금액·양식 카드 빈 칸 (2026-11-15)');
+{
+  const PA = createRequire(import.meta.url)('../parse-amount.js');
+  const af = (lines) => { const a = PA.amountFrom(lines); return [a.kind, a.value, a.ratio]; };
+  /* ① 못 읽던 꼴 — 원문 줄 그대로 */
+  eq('상한 문구는 비율이 아니다 — 「수업료의 30% (수업료 전액 범위 내 지급)」 은 30% (영남대 3건)',
+    af(['나. 지급금액: 수업료의 30% (수업료 전액 범위 내 지급)']), ['ratio', 0, 0.3]);
+  eq('  풀이 괄호 — 「등록금 ( 수업료 ) 반액」 50% · 「등록금(수업료) 전액」 전액 (연세 어학우수 · 경희 국가우수)',
+    [af(['2. 장학금액: 한 학기 등록금 ( 수업료 ) 반액'])[2], af(['1) 지원 금액 : 등록금(수업료) 전액'])[2]], [0.5, 1]);
+  eq('  「등록금 범위 내 장학금 전액 지급」 은 등록금 전액 (한독제석재단)',
+    af(['나. 장학금액: 3년 또는 1년간 등록금 범위 내 장학금 전액 지급(재단 최종 선발 결과에 따름)']), ['ratio', 0, 1]);
+  eq('  표 칸의 상한 풀이 줄 「(등록금 범위 내 지급)」 에서 금액 절이 끝나지 않는다 (국민대 가온누리)',
+    af(['2. 장학금액', '소득분위', '장학금', '(등록금 범위 내 지급)', '생활비', '(등록금 범위 외 지급)', '0 분위 ( 기초생활수급자 )', '수업료의 100%']), ['ratio', 0, 1]);
+  eq('  도형 글머리 「◤ 2. 장학금액 및 선발인원」 도 금액 머리글 (국민대 여성리더)',
+    af(['◤ 2. 장학금액 및 선발인원', '300 만원 지급 , 1 명']), ['fixed', 3000000, 0]);
+  eq('  머리글 없는 1인당 줄 — 줄 전체 「1인당 100 만원」 · 이름표 값 「A] 급 액: 1인 100만원(…)」 (건설교통신기술협회 포스터 · 김천 공고문 OCR)',
+    [af(['총장학금', '20 명선발', '1인당 100 만원', '2,000만원']), af(['○ A] 급 액: 1인 100만원(학생 본인 계좌 입금)'])],
+    [['fixed', 1000000, 0], ['fixed', 1000000, 0]]);
+  eq('  앞 숫자에 단위 없는 범위 「100~150만원」 은 범위다',
+    (() => { const a = PA.amountFrom(['지급금액 : 1인 100~150만원']); return [a.kind, a.min, a.max]; })(), ['range', 1000000, 1500000]);
+  /* ② 과장 — 한 갈래를 고르지 않는다 */
+  eq('갈린다는 말 + 범위 없음 → 비운다 · 「분야별 상이」 (전남인재육성 — 첨부 표의 「최대 250만원」 이 카드에 떴다)',
+    (() => { const a = PA.amountFrom(['- 지급금액: 장학금 분야별 상이']); return [a.kind, a.refused]; })(), ['unknown', 'tiered']);
+  eq('  「못 받는 경우」 줄의 전액은 이 장학금의 금액이 아니다 · 「차등 금액 지급」 은 비운다 (부산대 장학사정관 — 「등록금 전액」 이었다)',
+    (() => { const a = PA.amountFrom(['2. 지원금액 : 가계곤란 정도에 따라 차등 금액 지급 ( 등록금에 한함 )', '※ 2026 학년도 2 학기 등록금을 전액 감면 ( 등록금 전액 장학생 ) 받은 경우 지원 불가']); return [a.kind, a.ratio, a.refused]; })(),
+    ['unknown', 0, 'tiered']);
+  eq('  값 없는 표 머리글 「지급금액」 의 다른 행이 다른 비율이면 비운다 — 화도 50% / 동해 25% (광운대)',
+    PA.amountFrom(['지급금액', '소득기준', '비고', '화도', '등록금의 50%', '소득 0~6 구간', '* 0~6 구간은 화도장학 선발 확정이며 , 7~9 구간은 추후 결정됨 .',
+      '【 장학생 선발절차 】', '1. 1 차 신청 재학생 및 1,2 차 신청 복학생을 대상으로', '동해', '등록금의 25%', '소득 7 구간부터 최대 9 구간까지', '5. 장학금 지급 방식']).kind, 'unknown');
+  eq('  금액만 있는 칸이 둘 이상 다른 값이면 비운다 — 최대1,000,000원 / 500,000원 (계명 3종 장학)',
+    PA.amountFrom(['장학금액', '최대1,000,000원', '최대1,000,000원', '500,000원']).kind, 'unknown');
+  eq('  「최대 N원」 이 여럿이고 1인당 조각이 첫 금액이 아니면 비운다 — 부양자녀 1인당 100만원을 고르지 않는다 (국세청 근로·자녀 장려)',
+    PA.amountFrom(['3. 장학금액', '-근로장려금 : 연간 최대 300만원', '단독가구: 최대 165만원', '-자녀장려금 : 연간 최대 100만원 (부양자녀 1인당)']).kind, 'unknown');
+  eq('  대조군: 첫 금액이 1인당이면 그대로 (세종이도 · 1인당 최대 1,000,000원) · 대학생 몫(봄내장학생 100만원)도 그대로',
+    [PA.amountFrom(['장학금액', '1인당 최대 1,000,000원', '(인당 지원액) 개인별 상이(최대 500천원) ※대출이자 금액에 따라 상이']).value,
+      PA.amountFrom(['❍ 장 학 금: 고등학생 50만 원, 대학생 최대 100만 원 * 원격대학장학생: 최대 50만원']).value], [1000000, 1000000]);
+  eq('  문턱 금액 「지원액이 20만원 미만일 경우 미지원」 은 금액이 아니다 (순천시인재육성장학회)',
+    PA.amountFrom(['지급 액:등록금에서 당해 학기(2학기) 수령액을 제외한 금액', '중복수혜 제외 후 지원액이 20만원 미만일 경우 미지원']).value, 0);
+  eq('  학교급이 줄로 나뉜 표는 대학생 줄 — 고등학생 120만원이 아니다 (선원가족 장학)',
+    (() => { const a = PA.amountFrom(['선발인원 : 지급금액', '비고', '선발인원 : 및금액 고등학생', '120만원', '00명', '선발인원은예산범위 내에', '대학생 본인 부담액기준최대350만원']); return [a.value, !!a.upTo]; })(),
+    [3500000, true]);
+  eq('  「지원내역:」 이름표도 금액 절 · 한 줄에 100%·50%면 비운다 (서울과기대 어의장학금)',
+    (() => { const a = PA.amountFrom(['라. 지원내역: 수업료 100% 면제 (단, 학자금 지원구간 차상위~5구간 학생 중 국가장학 Ⅰ유형 미수혜 학생은 50%만 면제)']); return [a.kind, a.refused]; })(),
+    ['unknown', 'mixed']);
+  eq('  상한 비율 「수업료 60% 이내 차등지급」 → 비율 0.6 · 상한 표시 · 합계에는 안 넣는다 (신용카드수수료장학금)',
+    (() => { const a = PA.amountFrom(['3. 장학금액 : 수업료 60% 이내 차등지급 (단, 수업료 범위 내에서 교내장학금 간 이중수혜 허용)']); return [a.kind, a.ratio, !!a.upTo, PA.amountWon({ amountSpec: a }, 4000000)]; })(),
+    ['ratio', 0.6, true, 0]);
+  eq('첨부끼리 금액이 다르면 비운다 · 사본(같은 값)은 그대로 · 한 장이라도 일부러 비웠으면 비운다 (pickDocAmount)',
+    [PA.pickDocAmount([{ kind: 'ratio', value: 0, ratio: 1, min: 0, max: 0 }, { kind: 'ratio', value: 0, ratio: 0.5, min: 0, max: 0 }]),
+      PA.pickDocAmount([{ kind: 'fixed', value: 1e6, ratio: 0, min: 1e6, max: 1e6 }, { kind: 'fixed', value: 1e6, ratio: 0, min: 1e6, max: 1e6 }]).value,
+      PA.pickDocAmount([{ kind: 'fixed', value: 1e6, ratio: 0, min: 1e6, max: 1e6 }, { kind: 'unknown', refused: 'tiered' }])], [null, 1000000, null]);
+  const exSrc = readText(new URL('../collector/extract-amounts.mjs', import.meta.url));
+  eq('  금액 로봇: 본문이 일부러 비운 공고는 AI 줄·첨부로 되채우지 않는다 · 첨부는 pickDocAmount 로 고른다',
+    [(exSrc.match(/!bodyRefused &&/g) || []).length, /PA\.pickDocAmount\(results\)/.test(exSrc)], [2, true]);
+  eq('  금액 로봇: 제가 적었던 절대액을 비울 때 amountValue·문구도 걷는다 (전엔 「250만원」·합계가 남았다)',
+    /prevSpec\.kind === 'fixed' \|\| prevSpec\.kind === 'range'\) && Number\(it\.amountValue\) === Number\(prevSpec\.value\)\) it\.amountValue = 0/.test(exSrc), true);
+  const { amountText } = await import('../tools/edit-diff.mjs');
+  eq('카드 문구 — 시급 괄호 꼴 「시급(10,320원)」 · 「최대 350만원」 · 「등록금 60% 이내」 (조선대 국가근로 3차가 시급으로 읽고도 「금액 원문 확인」 이었다)',
+    [amountText({ kind: 'hourly', raw: '다 . 장학금액 : 월 실제 근로시간 * 시급(10,320원)' }), amountText({ kind: 'fixed', value: 3500000, upTo: true }), amountText({ kind: 'ratio', ratio: 0.6, upTo: true })],
+    ['시급 10,320원', '최대 350만원', '등록금 60% 이내']);
+  /* ③ 카드 채움 현황이 카드가 그리는 것으로 센다 */
+  const CC = await import('./card-coverage.mjs');
+  eq('카드 채움 현황: 금액은 카드 문구로 센다 — 「등록금 30%」(amountValue 0)는 찬 칸 · 「금액 원문 확인」 은 빈 칸',
+    [CC.amountShown({ amount: '등록금 30%', amountValue: 0 }), CC.amountShown({ amount: '금액 원문 확인', amountValue: 0 }), CC.amountShown({ amount: '', amountNote: '기관확인필요' })], [true, false, false]);
+  /* ④ 양식 — 신청서 판정(data.js) · 이름 꼬리 · .bin · 대기줄 */
+  let FR = null;
+  try { FR = await import('../collector/form-rules.mjs'); } catch (e) { eq('양식 규칙 한 곳(collector/form-rules.mjs)을 불러온다', e.message, '(있음)'); }
+  if (FR) {
+    const { isApplicationForm } = FR.loadFormRules(fileURLToPath(new URL('..', import.meta.url)));
+    const nm = (n) => isApplicationForm({ name: n });
+    eq('신청서 판정: 운영 규칙 문서는 양식이 아니다 — 업무처리기준·운영계획서 및 자체선발기준·강의계획서 (푸른등대 사업계획서 PDF 가 양식으로 붙었다)',
+      [nm('공문_붙임1_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf'), nm('(붙임2) 2026-2학기 국가근로장학금 운영계획서 및 자체선발기준.hwp'), nm('Attachment 강의계획서.pdf')], [false, false, false]);
+    eq('  자기소개서는 학생 서식 · 자기소개서가 같이 적힌 추천서 양식도 · 추천서 신청서양식은 여전히 아니다',
+      [nm('사회봉사활동 자기소개서-이오순장학재단(2027-1).hwp'), nm('2027 자기소개서 및 추천서 양식(장학금 지원자).doc'), nm('[서식 2] 장학생 추천서 신청서양식.hwp'), nm('붙임1.멘토 활동계획서 양식.hwp')], [true, true, false, true]);
+    eq('첨부 확장자: 아이콘 꼬리를 떼고 · 이름에 없으면 바이트 머리(PDF·PNG) · OLE 는 이름 없이 가르지 않는다 (강원대 원본이 .bin)',
+      [FR.attachExt('신청서 및 개인정보제공동의서(2026.2학기 도전장학금).hwp chevron_forward'), FR.attachExt('download.do', Buffer.from('%PDF-1.4 xx')),
+        FR.attachExt('x', Buffer.from([0x89, 0x50, 0x4e, 0x47, 0, 0, 0, 0])), FR.attachExt('x', Buffer.from([0xd0, 0xcf, 0x11, 0xe0, 0, 0, 0, 0]))], ['hwp', 'pdf', 'png', 'bin']);
+    const dfSrc = readText(new URL('../collector/deepfetch.mjs', import.meta.url));
+    eq('  deepfetch 두 자리(신청서·자격 첨부)가 attachExt 한 곳을 쓴다', (dfSrc.match(/const ext = attachExt\(a\.name, buf\)/g) || []).length, 2);
+    process.env.FORM_PDF_AS_LIB = '1';
+    const FP = await import('../collector/form-pdf.mjs');
+    const items = [{ id: 'a1', name: 'T', attachments: [{ name: '신청서.hwp', url: 'u' }, { name: '신청서.hwp chevron_forward', url: 'u' }] }];
+    const rows = [{ file: 'form-x-1.bin', title: 'T', attach: '신청서.hwp chevron_forward', bytes: 9, id: 'a1' }];
+    const picked = FP.pickFormTargets(items, rows, { today: '2026-11-15', isApplicationForm });
+    eq('양식 PDF 로봇: 꼬리 붙은 색인 줄과 꼬리 없는 첨부를 같은 것으로 · 두 줄로 실린 같은 첨부는 하나로',
+      [picked.targets.length, (picked.targets[0] || { files: [] }).files.length, picked.missing.length], [1, 1, 0]);
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'form-bin-gate-'));
+    fs.writeFileSync(path.join(tmp, 'form-x-1.bin'), Buffer.concat([Buffer.from('%PDF-1.4\n'), Buffer.alloc(200, 32), Buffer.from('/Type /Page\n%%EOF')]));
+    const conv = FP.convertOne(path.join(tmp, 'form-x-1.bin'), path.join(tmp, 'out.pdf'), { soffice: '/nonexistent-soffice', name: '신청서.pdf chevron_forward' });
+    eq('  .bin 원본은 첨부 이름·바이트 머리로 꼴을 찾아 바꾼다 (PDF 는 변환기 없이 복사)', [conv.ok, fs.existsSync(path.join(tmp, 'out.pdf'))], [true, true]);
+    fs.rmSync(tmp, { recursive: true, force: true });
+    const q = { items: [
+      { id: 'got', target: '반영장학 신청 안내', added: '2026-09-25', tries: 6, lastTryAt: '2026-09-26', retired: true, retiredReason: 'x' },
+      { id: 'quick', target: '없는 제목', added: '2026-10-27', tries: 6, lastTryAt: '2026-10-28', retired: true, retiredReason: 'x' },
+      { id: 'closed', target: '없는 제목2', added: '2026-10-16', tries: 6, lastTryAt: '2026-10-17', retired: true, retiredReason: 'x' },
+      { id: 'new', target: '새 표적', added: '2026-11-15' },
+    ] };
+    const idxText = 'form-k-1.hwpx\t공통 [공통] 다른 글자 제목\t반영장학 양식.hwpx\t42588\tgot\n';
+    const live = (id) => id !== 'closed';
+    FR.markFetchedQueue(q, idxText, '2026-11-15', { isLive: live });
+    FR.markFetchedQueue(q, idxText, '2026-11-15', { isLive: live });   // 같은 날 두 번째 실행
+    const by = Object.fromEntries(q.items.map((x) => [x.id, x]));
+    eq('양식 대기줄: 색인 id 칸으로 받은 것은 내렸어도 fetched 로 · 하루 한 번만 센다 · 이틀 만에 내린 옛 기록은 마감 전이면 되살린다 (경희 323054·323410 · 동국 WISE)',
+      [by.got.fetched === true && !by.got.retired, !!by.quick.retired, by.quick.tries, !!by.closed.retired, by.new.tries], [true, false, 3, true, 1]);
+  }
+}
+
 /* ── 🔴 CLAUDE.md 가 다시 불어나지 못하게 (2026-08-29 개발자 지시) ──
    이 문서는 **매 세션 통째로 실린다.** 1,560줄까지 불어나자 개발자가 지적했다 —
    *"써 있는데도 못 읽는 경우가 많고 줄이 엄청 늘어났다."* 그날 641줄로 줄였다
@@ -5259,7 +5370,9 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
     ...extsOf(etSrc, /DOC_EXT = \/\\\.\(([^)]+)\)\$\/i/),
     ...extsOf(etSrc, /IMG_EXT = \/\\\.\(([^)]+)\)\$\/i/),
   ])];
-  const mapping = extsOf(eligFn, /const ext = \(a\.name\.match\(\/\\\.\(([^)]+)\)\$\/i\)/);
+  /* 확장자를 정하는 규칙은 2026-11-15 부터 form-rules.mjs attachExt 한 곳(아이콘 꼬리 떼기 · 바이트 머리) — 자격 함수가 그것을 부르는지와 그 목록을 잰다 */
+  const frSrc = readText(new URL('../collector/form-rules.mjs', import.meta.url));
+  const mapping = /const ext = attachExt\(a\.name, buf\)/.test(eligFn) ? extsOf(frSrc, /const EXT_RE = \/\\\.\(([^)]+)\)\$\/i/) : [];
   const gap = wanted.filter((e) => !mapping.includes(e));
   eq(`받는 확장자 ${wanted.length}종이 모두 파일 이름 규칙에 있다`, gap.join(',') || '(없음)', '(없음)');
   eq('  deepfetch 의 두 자리(자격용·밀린 첨부)가 pickDocAttachments 를 쓴다 · 직접 거르는 OK_EXT 는 없다',
@@ -7481,7 +7594,7 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
      를 써야 "발췌기는 읽는데 금액 로봇은 못 읽는" 어긋남이 안 생긴다. */
   eq('금액 로봇이 공고문 첨부 색인을 연다', /elig-docs\.json/.test(ex), true);
   eq('  첨부 글자는 발췌기와 같은 함수로 읽는다 (readableDoc — OCR 포스터 문턱도 같다)', /import \{ attachmentText, readableDoc, docOrder \} from '\.\/attachment-text\.mjs'/.test(ex), true);
-  eq('  본문·AI 줄로 못 읽었을 때만 첨부를 본다', /a\.kind === 'unknown' && hasDocs/.test(ex), true);
+  eq('  본문·AI 줄로 못 읽었을 때만 첨부를 본다', /a\.kind === 'unknown' && (?:!bodyRefused && )?hasDocs/.test(ex), true);
   eq('  첨부 금액도 parse-amount 가 정한다', /PA\.amountFrom\(t\.split/.test(ex), true);
 
   /* 검산기가 금액 줄을 실제로 돌려주는지 — 가짜 응답으로 돌려 본다(돈 0원) */

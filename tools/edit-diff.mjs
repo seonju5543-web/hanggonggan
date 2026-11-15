@@ -262,11 +262,14 @@ export function wonText(n) {
 /* 등록금 비율·시급도 원문 그대로 짧게 (2026-10-05 · UI-12) — 읽어 두고 카드에 '금액 원문 확인' 이라 적던 10건.
    시급은 원문 근거 줄(raw)의 숫자만 쓴다 — 못 찾으면 '' (부르는 쪽이 문구를 그대로 둔다). */
 export function amountText(a) {
-  if (a && a.kind === 'ratio') return a.ratio === 1 ? '등록금 전액' : `등록금 ${Math.round(a.ratio * 100)}%`;
+  /* 상한으로 적힌 비율(`수업료 60% 이내 차등지급`)은 상한 그대로 — 「등록금 60%」 라 적으면 다 받는 것처럼 읽힌다 (2026-11-15) */
+  if (a && a.kind === 'ratio') return a.ratio === 1 ? (a.upTo ? '등록금 전액 이내' : '등록금 전액') : `등록금 ${Math.round(a.ratio * 100)}%${a.upTo ? ' 이내' : ''}`;
   if (a && a.kind === 'hourly') {
-    const m = String(a.raw || '').match(/(?:시급|시간당)\s*[:：]?\s*([\d,]+)\s*원|([\d,]+)\s*원\s*\/\s*(?:시간|시|h)/i);
+    /* `시급(10,320원)` 괄호 꼴도 (조선대 국가근로 3차 · 2026-11-15 — 시급형으로 읽고도 문구가 비어 '금액 원문 확인'이었다) */
+    const m = String(a.raw || '').match(/(?:시급|시간당)\s*[:：(（]?\s*([\d,]+)\s*원|([\d,]+)\s*원\s*\/\s*(?:시간|시|h)/i);
     return m ? `시급 ${m[1] || m[2]}원` : '';
   }
+  if (a && a.kind === 'fixed' && a.upTo && a.value) return `최대 ${wonText(a.value)}`;   // 원문이 상한으로 적은 금액(`최대 350만원`)
   return a && a.kind === 'range' ? `${wonText(a.min)} ~ ${wonText(a.max)}` : wonText(a && a.value);
 }
 

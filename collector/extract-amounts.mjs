@@ -54,15 +54,16 @@ const idx = indexTexts(texts, browserBodies);
       읽지 않는 관문(`TOTAL_TABLE` — 표의 합계 행)이 첨부에서 처음 걸렸다. */
 let eligDocs = {};
 try { eligDocs = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
+/* 🔴 첨부 공고문이 **서로 다른 금액**을 말하면 하나로 못 적는다 — 고르는 규칙은 parse-amount.js `pickDocAmount` 한 곳 (2026-11-15) */
 function amountFromDocs(it) {
+  const results = [];
   for (const f of docOrder((eligDocs[it.id] || {}).files)) {   // 원문 글자(HWP)가 OCR 보다 먼저
     const p = fileURLToPath(new URL(`extracted/${f}`, HERE));
     const t = attachmentText(p);
     if (!readableDoc(p, t)) continue;   // OCR 포스터는 문턱이 낮다(attachment-text readableDoc 한 곳 — 발췌기와 같다)
-    const got = PA.amountFrom(t.split('\n').map((s) => s.trim()).filter(Boolean));
-    if (got.kind !== 'unknown') return got;
+    results.push(PA.amountFrom(t.split('\n').map((s) => s.trim()).filter(Boolean)));
   }
-  return null;
+  return PA.pickDocAmount(results);
 }
 
 /* ── 동일성 ────────────────────────────────────────────────────
@@ -123,13 +124,17 @@ for (const it of items) {
   /* 본문이 있으면 본문이 먼저다. 본문으로 못 읽었을 때만 AI 가 옮겨 둔 줄로 한 번 더 본다 —
      읽어 둔 것을 안 쓰는 것이 지금까지 같은 그림을 두 번 읽게 만든 원인이었다. */
   let a = bodyLines.length ? PA.amountFrom(bodyLines) : { kind: 'unknown', value: 0, ratio: 0, min: 0, max: 0, raw: '' };
-  if (a.kind === 'unknown' && aiLines.length) {
+  /* 🔴 본문이 '갈린다·총액이다'라고 **일부러 비운** 공고는 AI 줄·첨부로 되채우지 않는다 (2026-11-15) —
+     첨부는 대개 그 갈래 중 하나(한 사업의 공고문·한 구간의 표)라, 되채우면 본문이 막은 과장이 그대로 돌아온다
+     (전남인재육성 `지급금액: 장학금 분야별 상이` → 첨부 표의 `최대 250만원` · 서울과기대 어의 `100% (단, … 50%만)` → 붙임1 의 100%). */
+  const bodyRefused = !!a.refused;
+  if (a.kind === 'unknown' && !bodyRefused && aiLines.length) {
     /* 금액 절만 뽑아 온 줄이라 머리글이 없을 수 있다 — 머리글을 붙여 절로 읽히게 한다 */
     const b = PA.amountFrom(['장학금액', ...aiLines]);
     if (b.kind !== 'unknown') { a = b; fromAi++; }
   }
   /* 본문으로도 AI 줄로도 못 읽었으면 공고문 첨부를 연다 (위 amountFromDocs 주석) */
-  if (a.kind === 'unknown' && hasDocs) {
+  if (a.kind === 'unknown' && !bodyRefused && hasDocs) {
     const d = amountFromDocs(it);
     if (d) { a = d; fromDoc++; }
   }
@@ -230,11 +235,18 @@ for (const it of items) {
     const humanAmount = amountCleared
       || ((it.amountSpec || Number(it.amountValue) > 0) && it.amountFrom !== OWN_AMOUNT);
 
+    /* 로봇이 지난번에 적은 카드 문구 — 이것과 같으면 이번에 읽은 값으로 고쳐 쓴다(사람이 다듬은 문구는 이것과 다르다) */
+    const prevSpec = it.amountFrom === OWN_AMOUNT ? it.amountSpec : null;
+    const robotText = prevSpec ? amountText(prevSpec) : '';
     if (humanAmount) keptHuman += 1;
     else if (a.kind === 'unknown') {
-      /* 로봇이 적은 비율·시급 문구는 근거와 함께 걷는다 — 남기면 '갈리는 비율'로 비운 공고가 카드엔 '등록금 전액'이다 */
-      const prev = it.amountSpec;
-      if (prev && (prev.kind === 'ratio' || prev.kind === 'hourly') && it.amount === amountText(prev)) it.amount = '금액 원문 확인';
+      /* 로봇이 적은 문구는 근거와 함께 걷는다 — 남기면 '갈리는 비율'로 비운 공고가 카드엔 '등록금 전액'이다.
+         🔴 절대액도 같다 (2026-11-15) — 예전엔 비율·시급만 걷어 amountValue·`250만원` 문구가 남았다:
+            규칙이 '분야별 상이'라 비워도 카드·합계는 옛 과장을 그대로 말했다(전남인재육성). 로봇 표식이 붙은 값만 걷는다. */
+      if (prevSpec) {
+        if (robotText && it.amount === robotText) it.amount = '금액 원문 확인';
+        if ((prevSpec.kind === 'fixed' || prevSpec.kind === 'range') && Number(it.amountValue) === Number(prevSpec.value)) it.amountValue = 0;
+      }
       delete it.amountSpec; delete it.amountFrom;
     }
     else { it.amountSpec = a; it.amountFrom = OWN_AMOUNT; wrote++; }
@@ -250,13 +262,14 @@ for (const it of items) {
          감사(entry-rules.cjs)가 바로 이걸 오류로 잡는다 — 처음에 그 상태로 저장했다가 걸렸다.
          ⚠️ 이미 숫자가 든 문구는 건드리지 않는다. 사람이 손으로 다듬어 넣은 것
             (`등록금 + 영농정착 지원` 같은)을 맨 숫자로 덮으면 뜻이 사라진다. */
-      if (!/\d/.test(String(it.amount || ''))) it.amount = amountText(a);
+      if (!/\d/.test(String(it.amount || '')) || (robotText && it.amount === robotText)) it.amount = amountText(a);
     }
     /* 등록금 비율·시급은 원으로 못 바꾸지만(amountValue 0) 카드 문구는 원문대로 적는다 (2026-10-05 · UI-12) —
        읽어 두고 '금액 원문 확인' 이라 적으면 학생에겐 못 읽은 것과 같다. 빈 칸·'원문 확인' 문구만 고친다. */
     if (!humanAmount && (a.kind === 'ratio' || a.kind === 'hourly')) {
       const t = amountText(a);
-      if (t && (!it.amount || /원문\s*확인/.test(it.amount))) it.amount = t;
+      if (t && (!it.amount || /원문\s*확인/.test(it.amount) || (robotText && it.amount === robotText))) it.amount = t;
+      it.amountValue = 0;   // 비율·시급은 원으로 못 바꾼다 — 지난번 절대액이 남아 합계에 들어가지 않게
     }
 
     /* 이중수혜도 같은 규칙 — 사람이 넣은 것은 그대로 둔다.

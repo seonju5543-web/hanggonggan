@@ -53,7 +53,33 @@ var WON_PATTERNS = [
 
 /* 등록금 비율 — `전액`은 100%, `반액`은 50%로 읽는다(원문이 그 뜻으로 쓴다). */
 /* `등록금액의 50%` 처럼 `액` 이 붙어도 같다 (2026-10-05 · UI-12) — 갈래 번호가 바뀌지 않게 비포획 */
-var RATIO_RE = /(등록금|수업료)(?:\s*액)?\s*(의)?\s*(전액|반액|절반|(\d{1,3})\s*%)|(전액)\s*(면제|감면|지원)/;
+/* `등록금(수업료) 전액`·`등록금 ( 수업료 ) 반액` 처럼 풀이 괄호가 끼어도 같다 (2026-11-15 · 경희 국가우수 첨부 · 연세 어학우수 본문) — 비포획 */
+var RATIO_RE = /(등록금|수업료)(?:\s*액)?\s*(?:[(（]\s*(?:등록금|수업료)\s*[)）]\s*)?(의)?\s*(전액|반액|절반|(\d{1,3})\s*%)|(전액)\s*(면제|감면|지원)/;
+/* 🔴 `수업료 전액 범위 내 지급`·`등록금 범위 내에서` 는 **상한**이지 비율이 아니다 (2026-11-15 · 영남대 다문화·3대 동문·천마가족 3건).
+   `지급금액: 수업료의 30% (수업료 전액 범위 내 지급)` 이 비율 둘(30%·전액)로 세어져 '갈리는 비율'로 비워졌다.
+   비율을 세기 전에 이 상한 문구만 걷어 낸다 — 아래 TUITION_CAP_FULL 은 먼저 본다. */
+var TUITION_CAP = /(등록금|수업료)(?:\s*액)?\s*(?:[(（][^)）]{0,10}[)）]\s*)?(전액\s*)?(범위|한도)\s*(내|이내)(에서)?/g;
+/* `등록금 범위 내 장학금 전액 지급` 은 등록금 전액이다(가천 한독제석재단 · 2026-11-15) — 상한 뒤에 '전액 지급·지원'이 바로 올 때만 */
+var TUITION_CAP_FULL = /(등록금|수업료)\s*(범위|한도)\s*(내|이내)(에서)?\s*(장학금\s*)?전액\s*(지급|지원)/;
+/* 🔴 '못 받는 경우'를 말하는 줄의 금액·비율은 이 장학금의 금액이 아니다 (2026-11-15 · 부산대 장학사정관 추천).
+   `※ 2026학년도 2학기 등록금을 전액 감면 받은 경우 지원 불가` 가 **등록금 전액**으로 읽혀 차등 지급 공고가 '등록금 전액'이었다. */
+var EXCL_COND_LINE = /(경우|자는?|학생은?)\s*(지원\s*|신청\s*|선발\s*|수혜\s*|지급\s*)?(불가|제외|대상\s*아님|미지급|미지원)/;
+/* 🔴 대상·구간·분야마다 금액이 **갈린다**는 말 — 한 값으로 적으면 덜 받는 학생에게 과장이다 (2026-11-15 · 원칙: 한 갈래를 고르지 않는다).
+   원문이 범위(`100~150만원`)나 상한(`60% 이내`)을 스스로 적었으면 그것을 쓰고, 아니면 모른다고 답한다. */
+var TIER_RE = /차등|상이|분야별|구간별|등급별|유형별|급수에\s*따라|정도에\s*따라|따라\s*(다름|다르|달리)/;
+/* 비율 뒤 `이내`·`까지`, 앞 `최대` — 원문이 상한으로 적은 비율(`수업료 60% 이내 차등지급`) */
+var RATIO_UPTO = /(최대\s*(등록금|수업료)?[^\d]{0,4}\d{1,3}\s*%|\d{1,3}\s*%\s*(이내|까지|한도))/;
+/* 값 없는 표 머리글(`지급금액` 한 칸) — 표의 다른 행이 다른 금액을 말할 수 있다 (2026-11-15 · 광운대 화도 50%/동해 25%) */
+var TABLE_HEAD_ONLY = /^[\s\-•·○●■□▶▷❍◎ㅇ*※]*((지급|지원|장학)\s*금\s*액|금\s*액)\s*$/;
+var NEXT_MAJOR = /^\s*\d+\s*[.)]\s*\S/;
+/* 금액만 있는 표 칸(`최대1,000,000원`·`500,000원`) */
+var AMOUNT_CELL = /^(최대\s*)?[\d,.]+\s*[백천]?\s*만?\s*원$/;
+/* 머리글 앞의 도형 글머리(`◤ 2. 장학금액 및 선발인원` · 국민대 여성리더 2건) — 절 판정(section-head)이 못 떼는 것만 금액 읽기에서 뗀다 */
+var SHAPE_BULLET = /^[■-◿⬀-⯿]+\s*/;
+/* 금액 머리글이 없는 공고의 1인당 줄 — 줄 **전체**가 `1인당 100 만원` 이거나 이름표 값이 `1인 100만원…` 으로 시작할 때만
+   (한국건설교통신기술협회 포스터 · 김천시인재양성재단 공고문 OCR `A] 급 액: 1인 100만원` · 2026-11-15) */
+var PERSON_ONLY_LINE = /^(1\s*인\s*당|인\s*당)\s*(최대\s*)?[\d,.]+\s*[백천]?\s*만?\s*원(씩)?$/;
+var PERSON_LABEL_LINE = /^[^:：]{1,12}[:：]\s*(1\s*인\s*당?|인\s*당)\s*(최대\s*)?[\d,.]+\s*[백천]?\s*만?\s*원/;
 /* 금액 이름표의 값이 **통째로** `등록금액` 이면 등록금 전액이다(`4. 장학금액 (1 인당) : 등록금액 (…)` · 의대
    81학번 후배 사랑 · 2026-10-05 UI-12). 괄호 풀이를 뗀 값 전체가 그 낱말일 때만 —
    `등록금액 범위 내`·`등록금액 이내` 는 얼마인지 모르는 말이라 안 받는다. */
@@ -177,7 +203,13 @@ function ratioIn(text) {
    false 를 돌려준다 — 금액 절은 자격 머리글에서도 끝나야 하므로 따로 본다.
    🔴 이 확인이 없으면 중앙대 성림장학금에서 `4. 장학금액: 1백만원 ~ 2백만원` 다음 줄인
    `5. 신청자격: … 건강보험료 지역 17만원 이하`의 **17만원을 금액으로 줍는다**. */
+/* 표 칸의 상한 풀이(`(등록금 범위 내 지급)` · 국민대 가온누리 2026-11-15)는 절 경계가 아니다 — 절 판정은 괄호 줄을 경계로 보지만 금액 표 안에서는 칸 머리다 */
+var CAP_NOTE_LINE = /^[(（][^)）]{0,20}(범위|한도)\s*(내|외|이내)[^)）]{0,10}[)）]$/;
+/* `라. 지원내역: 수업료 100% 면제` — 이름표가 통째로 `지원내역` 인 줄도 금액 머리글이다(서울과기대 어의·가족장학금 · 2026-11-15).
+   절 판정(section-head)은 건드리지 않고 금액 읽기에서만 더한다 — 콜론이 바로 붙은 이름표만 */
+var AMOUNT_HEAD_LOCAL = /^[\s\-•·○●■□▶▷❍◎ㅇ*※>]*(?:[가-힣]\s*\.\s*|\d+\s*[.)]\s*)?지원\s*내역\s*[:：]/;
 function paEndsAmount(line) {
+  if (CAP_NOTE_LINE.test(String(line || '').trim())) return false;
   return PA_SH.isQualifyHead(line) || PA_SH.isExcludeHead(line)
       || PA_SH.isSelectHead(line) || PA_SH.isSectionBreak(line);
 }
@@ -191,7 +223,7 @@ function paEndsAmount(line) {
 function amountBlock(lines, maxLines) {
   var arr = lines || [], cap = maxLines || 8, first = null;
   for (var i = 0; i < arr.length; i++) {
-    if (!PA_SH.isAmountHead(arr[i])) continue;
+    if (!PA_SH.isAmountHead(arr[i]) && !AMOUNT_HEAD_LOCAL.test(String(arr[i]))) continue;
     var out = [arr[i]];
     for (var j = i + 1; j < arr.length && out.length < cap; j++) {
       if (paEndsAmount(arr[j])) break;
@@ -213,12 +245,22 @@ function amountBlock(lines, maxLines) {
 /* 대상별 금액 줄에서 대학생 몫 (위 LOWER_SCHOOL 주석) */
 function collegeTierWon(blockLines) {
   var arr = blockLines || [];
+  var lower = false;
   for (var i = 0; i < arr.length; i++) {
     var line = String(arr[i]);
     if (!LOWER_SCHOOL.test(line)) continue;
-    var segs = line.split(/,(?!\d{3})|·|\/|;/);
+    lower = true;
+    var segs = line.split(/,(?!\d{3})|·|\/|;|(?=대학생)/);
     for (var j = 0; j < segs.length; j++) {
       if (COLLEGE_SEG.test(segs[j]) && !LOWER_SCHOOL.test(segs[j])) { var v = wonIn(segs[j]); if (v) return v; }
+    }
+  }
+  /* 학교급이 다른 줄에 나뉘어 적힌 표(`고등학생` / `120만원` / `대학생 본인부담액 기준 최대 350만원` · 선원가족 장학 · 2026-11-15) —
+     학교급 낱말이 있는 블록에서만, `대학생` 으로 시작하는 줄의 금액을 대학생 몫으로 본다 */
+  if (lower) {
+    for (var k = 0; k < arr.length; k++) {
+      var cl = String(arr[k]).replace(/^[\s\-•·○●■□▶▷❍◎ㅇ*※]*/, '');
+      if (/^대학생/.test(cl) && !LOWER_SCHOOL.test(cl)) { var cv = wonIn(cl); if (cv) return cv; }
     }
   }
   return 0;
@@ -226,6 +268,9 @@ function collegeTierWon(blockLines) {
 
 function amountFrom(lines) {
   var none = { kind: 'unknown', value: 0, ratio: 0, min: 0, max: 0, raw: '' };
+  /* 일부러 비운 것(갈린다·총액·예산)에는 `refused` 를 단다 — 부르는 쪽(extract-amounts)이 첨부의 **한 갈래**로 되채우지 않게 (2026-11-15) */
+  var nope = function (why, raw) { return { kind: 'unknown', value: 0, ratio: 0, min: 0, max: 0, raw: String(raw || '').slice(0, 200), refused: why }; };
+  lines = (lines || []).map(function (l) { return String(l).replace(SHAPE_BULLET, ''); });
   var blk = amountBlock(lines);
   if (!blk) {
     /* 금액 머리글이 없으면 인원 줄의 1인당 조각만 본다 (위 HEADCOUNT_LABEL 주석) */
@@ -237,6 +282,14 @@ function amountFrom(lines) {
       var hw = perPersonWon([hl]);
       if (hw) return { kind: 'fixed', value: hw, ratio: 0, min: hw, max: hw, raw: hl.trim().slice(0, 200) };
     }
+    /* 1인당 줄 자체(위 PERSON_ONLY_LINE 주석) — 줄 전체가 1인당 금액이거나 이름표 값이 1인 금액으로 시작할 때만 */
+    for (var pi = 0; pi < arr.length; pi++) {
+      var pl = String(arr[pi]).replace(/^[\s\-•·○●■□▶▷❍◎ㅇ*※]*\s*/, '').trim();
+      if (!(PERSON_ONLY_LINE.test(pl) || PERSON_LABEL_LINE.test(pl))) continue;
+      if (TOTAL_RE.test(pl) || TOTAL_TABLE.test(pl) || TIER_RE.test(pl)) continue;
+      var pw = wonIn(pl.split(/[:：]/).pop());
+      if (pw) return { kind: 'fixed', value: pw, ratio: 0, min: pw, max: pw, raw: pl.slice(0, 200) };
+    }
     /* 머리글 없이 시급 줄만 있는 공고(국가근로 표) — 시급형(합산 불가)으로 읽는다 (위 HOURLY_LINE 주석) */
     for (var q = 0; q < arr.length; q++) {
       var ql = String(arr[q]);
@@ -245,14 +298,47 @@ function amountFrom(lines) {
     return none;
   }
   var body = blk.lines.join(' ');
+  /* 비율은 '못 받는 경우' 조각(※·단서)을 뺀 글에서, 등록금 상한 문구를 걷어 낸 뒤 읽는다 (위 EXCL_COND_LINE·TUITION_CAP 주석) */
+  /* 금액도 같다 — `지원액이 20만원 미만일 경우 미지원` 의 20만원은 문턱이지 금액이 아니다(순천시인재육성장학회 · 2026-11-15) */
+  var keptLines = [];
+  for (var si = 0; si < blk.lines.length; si++) {
+    var segs = String(blk.lines[si]).split(/(?=※)|(?=[(（]\s*단\s*[,，])/), keep = [];
+    for (var sj = 0; sj < segs.length; sj++) if (!EXCL_COND_LINE.test(segs[sj])) keep.push(segs[sj]);
+    if (keep.length) keptLines.push(keep.join(' '));
+  }
+  var readBody = keptLines.join(' ');
+  var capFull = TUITION_CAP_FULL.test(readBody);
+  var ratioBody = readBody.replace(TUITION_CAP, ' ');
+  /* 갈린다는 말은 **머리글 줄**이나 **금액을 읽은 그 줄**에 있을 때만 — 블록의 다른 항목(`학습지원비 … 차등 지원`)이 정해진 금액(`선발장학금: 200만원`)까지 지우면 안 된다 */
+  var lineOf = function (test) { for (var li = 0; li < keptLines.length; li++) if (test(keptLines[li])) return keptLines[li]; return ''; };
 
   /* 비율형이 먼저다. `등록금 전액`에는 숫자가 없어서 금액 읽기로는 0이 나오고,
      `한학기 2,500,000원 등록금 한도내`처럼 둘 다 있으면 **적힌 절대액이 실제 지급액**이다.
      그래서 '절대액이 있으면 절대액, 없으면 비율'로 가른다. */
   /* 1인당 표시가 있으면 그게 이긴다 (위 PERSON_RE 주석 참조) */
-  var perWon = perPersonWon(blk.lines);
-  var won = perWon || collegeTierWon(blk.lines) || wonIn(body);
-  var ratio = ratioIn(body);
+  var perWon = perPersonWon(keptLines);
+  var collegeWon = perWon ? 0 : collegeTierWon(keptLines);
+  var won = perWon || collegeWon || wonIn(readBody);
+  var ratio = ratioIn(ratioBody) || (capFull ? 1 : 0);
+  var wonLine = won ? lineOf(function (l) { return wonIn(l) === won || (perWon && perPersonWon([l]) === won); }) : '';
+  var ratioLine = ratio ? lineOf(function (l) { return ratioIn(l.replace(TUITION_CAP, ' ')) === ratio || TUITION_CAP_FULL.test(l); }) : '';
+  var tiered = TIER_RE.test(String(blk.head)) || TIER_RE.test(won ? wonLine : ratioLine);
+  /* 갈래마다 다른 금액이 **나란히** 적힌 절도 갈리는 금액이다 (2026-11-15) — 낱말 없이 값만 늘어놓는다:
+     · 금액만 있는 칸이 둘 이상 다른 값(`최대1,000,000원` / `500,000원` · 계명 3종 장학)
+     · `최대 N원` 이 둘 이상 다른 값(`단독가구: 최대 165만원 · 맞벌이 가구: 최대 330만원 · 자녀장려금 최대 100만원 (부양자녀 1인당)` ·
+       `가. 10명: 최대 100만원 · 나. 60명: 최대 75만원`) — 첫 값이나 `1인당` 조각을 고르면 남의 갈래 금액이 된다 */
+  var cellVals = {}, nCellVals = 0, maxVals = {}, nMaxVals = 0, mm;
+  for (var ci = 0; ci < keptLines.length; ci++) {
+    var cl = keptLines[ci].trim();
+    if (AMOUNT_CELL.test(cl)) { var cv = wonIn(cl); if (cv && !cellVals[cv]) { cellVals[cv] = 1; nCellVals++; } }
+  }
+  var MAX_ALL = /최대\s*([\d,.]+\s*[백천]?\s*만?\s*원)/g;
+  while ((mm = MAX_ALL.exec(readBody))) { var mv = wonIn(mm[1]); if (mv && !maxVals[mv]) { maxVals[mv] = 1; nMaxVals++; } }
+  /* 대학생 몫을 원문이 따로 적은 것(collegeTierWon)은 이미 이 학생의 갈래다 — 다른 학교급·과정 금액이 나란해도 갈래 고르기가 아니다(봄내장학생) */
+  /* 절의 **첫 금액**이 `1인당` 금액이면 원문이 이 장학금의 1인당 몫을 먼저 밝힌 것이다(`1인당 최대 1,000,000원` 뒤의 다른 항목 `최대 500천원` · 세종이도) —
+     뒤쪽 줄의 `(부양자녀 1인당)` 처럼 첫 금액이 아닌 1인당 조각은 이 예외가 아니다(국세청 근로·자녀 장려 장학 · 2026-11-15) */
+  var firstPer = perWon && perWon === wonIn(readBody);
+  if (!collegeWon && !firstPer && (nCellVals > 1 || nMaxVals > 1)) tiered = true;
   if (!won && !ratio) {
     var headVal = String(blk.head).split(/[:：]/).slice(1).join(':').replace(/[(（][^)）]*[)）]/g, ' ').replace(/\s+/g, ' ').trim();
     if (TUITION_WHOLE.test(headVal)) ratio = 1;
@@ -261,7 +347,7 @@ function amountFrom(lines) {
   /* 인원은 머리글 **그 줄**에서만 본다 — 다음 절(`다. 선발인원 : 0명`)이 절에 딸려 와도 예산 신호가 아니다(송화재단) */
   if (!perWon && SCALE_HEAD.test(String(blk.head).split(/[:：]/)[0])
       && (/\d\s*명/.test(String(blk.head)) || won > SCALE_MAX_WON)) {
-    return { kind: 'unknown', value: 0, ratio: 0, min: 0, max: 0, raw: body.slice(0, 200) };
+    return nope('scale', body);
   }
 
   if (HOURLY_RE.test(body) && !won) {
@@ -271,19 +357,42 @@ function amountFrom(lines) {
   /* 1인당을 못 찾았는데 총액 표현이 있으면 **읽지 않는다.**
      사업 전체 규모를 학생 한 명이 받는 금액으로 내보내는 것이 이 파일에서 가장 위험한 실패다. */
   if (!perWon && (TOTAL_RE.test(body) || TOTAL_TABLE.test(body))) {
-    return { kind: 'unknown', value: 0, ratio: 0, min: 0, max: 0, raw: body.slice(0, 200) };
+    return nope('total', body);
+  }
+
+  /* 값 없는 표 머리글이면 그 표의 다른 행까지 본다 — 짧은 칸에 다른 금액·비율이 또 있으면 갈리는 금액이다 (위 TABLE_HEAD_ONLY 주석) */
+  if (TABLE_HEAD_ONLY.test(String(blk.head)) && typeof blk.at === 'number') {
+    /* 비율끼리·금액끼리 따로 센다 — `수업료의 100%` + `학기당 100만원`(생활비 별도)은 갈래가 아니라 더해 주는 것이다 */
+    var cells = {}, nRatio = 0, nWon = 0;
+    for (var ti = blk.at + 1; ti < lines.length && ti <= blk.at + 40; ti++) {
+      var tl = String(lines[ti]).trim();
+      /* 다음 큰 절(`5. 장학금 지급 방식`)에서 멈춘다 — 긴 번호 줄(`1. 1차 신청 재학생 및 …`)은 표 안의 풀이다 */
+      if (ti > blk.at + 1 && NEXT_MAJOR.test(tl) && tl.length <= 24) break;
+      if (tl.length > 24) continue;
+      var tr = ratioIn(tl), tw = tr ? 0 : wonIn(tl);
+      var key = tr ? 'r' + tr : tw ? 'w' + tw : '';
+      if (key && !cells[key]) { cells[key] = 1; if (tr) nRatio++; else nWon++; }
+    }
+    if (nRatio > 1 || nWon > 1) return nope('tiered', body);
   }
 
   if (won) {
     /* 범위 — `1백만원 ~ 2백만원`. 뒤쪽(큰 값)도 읽어 둔다. */
     /* 소수점도 범위다 — `2.5백만원 ~ 3백만원` (2026-09-15 코드 리뷰) */
-    var rangeM = body.match(/([\d,]+(?:\.\d+)?\s*[백천]?\s*만?\s*원)\s*[~〜∼\-–—]\s*([\d,]+(?:\.\d+)?\s*[백천]?\s*만?\s*원)/);
-    if (rangeM) {
-      var lo = wonIn(rangeM[1]), hi = wonIn(rangeM[2]);
-      if (lo && hi && hi > lo) {
-        return { kind: 'range', value: hi, ratio: 0, min: lo, max: hi, raw: body.slice(0, 200) };
-      }
+    /* `100~150만원` 처럼 앞 숫자에 단위가 없는 꼴도 범위다 — 뒤 단위를 앞에도 붙여 읽는다 (2026-11-15) */
+    var rangeM = readBody.match(/([\d,]+(?:\.\d+)?\s*[백천]?\s*만?\s*원)\s*[~〜∼\-–—]\s*([\d,]+(?:\.\d+)?\s*[백천]?\s*만?\s*원)/);
+    var bareM = rangeM ? null : readBody.match(/(^|[^\d,.])([\d,]+(?:\.\d+)?)\s*[~〜∼]\s*([\d,]+(?:\.\d+)?)\s*([백천]?\s*만\s*원)/);
+    var lo = 0, hi = 0;
+    if (rangeM) { lo = wonIn(rangeM[1]); hi = wonIn(rangeM[2]); }
+    else if (bareM) { lo = wonIn(bareM[2] + bareM[4]); hi = wonIn(bareM[3] + bareM[4]); }
+    if (lo && hi && hi > lo) {
+      return { kind: 'range', value: hi, ratio: 0, min: lo, max: hi, raw: body.slice(0, 200) };
     }
+    /* 갈린다는 말이 있는데 범위가 없으면 한 갈래를 고르지 않는다 (위 TIER_RE 주석) */
+    if (tiered) return nope('tiered', body);
+    /* 원문이 `최대 350만원` 이라 적은 금액은 상한이다 — 카드 문구가 「최대 350만원」 이 되게 표시만 단다(합계 몫은 그대로 · 범위의 큰 값과 같은 규칙) */
+    var upToM = wonLine.match(/최대\s*([\d,.]+\s*[백천]?\s*만?\s*원)/);
+    if (upToM && wonIn(upToM[1]) === won) return { kind: 'fixed', value: won, ratio: 0, min: won, max: won, upTo: true, raw: body.slice(0, 200) };
     return { kind: 'fixed', value: won, ratio: 0, min: won, max: won, raw: body.slice(0, 200) };
   }
 
@@ -293,14 +402,31 @@ function amountFrom(lines) {
        절 안의 비율 표기를 전부 모아 값이 둘 이상이면 모른다고 답한다. */
     var seenRatio = {}, kinds = 0;
     var RATIO_ALL = /전액|반액|절반|(\d{1,3})\s*%|의\s*(\d)\s*\/\s*(\d)/g, rm;
-    while ((rm = RATIO_ALL.exec(body))) {
+    var ratioScan = capFull ? ratioBody + ' 전액' : ratioBody;
+    while ((rm = RATIO_ALL.exec(ratioScan))) {
       var rv = rm[1] ? Math.min(100, paNum(rm[1])) / 100 : rm[2] ? paNum(rm[2]) / paNum(rm[3]) : /전액/.test(rm[0]) ? 1 : 0.5;
       if (!seenRatio[rv]) { seenRatio[rv] = 1; kinds++; }
     }
-    if (kinds > 1) return { kind: 'unknown', value: 0, ratio: 0, min: 0, max: 0, raw: body.slice(0, 200) };
+    if (kinds > 1) return nope('mixed', body);
+    /* 원문이 상한으로 적은 비율(`60% 이내 차등지급`)은 상한 그대로 — 카드는 「등록금 60% 이내」, 합계에는 안 넣는다(amountWon) */
+    if (RATIO_UPTO.test(ratioBody)) return { kind: 'ratio', value: 0, ratio: ratio, min: 0, max: 0, upTo: true, raw: body.slice(0, 200) };
+    if (tiered) return nope('tiered', body);
     return { kind: 'ratio', value: 0, ratio: ratio, min: 0, max: 0, raw: body.slice(0, 200) };
   }
-  return { kind: 'unknown', value: 0, ratio: 0, min: 0, max: 0, raw: body.slice(0, 200) };
+  return tiered ? nope('tiered', body) : { kind: 'unknown', value: 0, ratio: 0, min: 0, max: 0, raw: body.slice(0, 200) };
+}
+
+/* 🔴 첨부 공고문 여러 개의 금액을 하나로 고른다 (2026-11-15 · 서울과기대 어의(수업료 100%)·가족(50%) 장학금이 한 공고).
+   예전엔 첫 문서의 값을 썼다 — 붙임1·붙임3 이 다른 사업이면 첫 사업의 금액이 공고 전체의 금액이 됐다.
+   같은 공고문의 사본(PDF + 그림)은 값이 같아 그대로 읽힌다. 한 문서라도 일부러 비웠으면(`refused`) 그 판단을 따른다.
+   @param results amountFrom 결과 배열(문서 순서) · @returns 고른 결과 또는 null */
+function pickDocAmount(results) {
+  var got = (results || []).filter(function (r) { return r && (r.kind !== 'unknown' || r.refused); });
+  if (!got.length) return null;
+  for (var i = 0; i < got.length; i++) if (got[i].refused) return null;
+  var key = function (r) { return [r.kind, r.value, r.ratio, r.min, r.max, r.upTo ? 1 : 0].join(':'); };
+  for (var j = 1; j < got.length; j++) if (key(got[j]) !== key(got[0])) return null;
+  return got[0];
 }
 
 /* ── 이중수혜 ────────────────────────────────────────────────
@@ -484,7 +610,7 @@ function amountWon(item, tuition) {
   var a = item && item.amountSpec;
   if (!a) return Number(item && item.amountValue) || 0;
   if (a.kind === 'fixed' || a.kind === 'range') return a.value || 0;
-  if (a.kind === 'ratio') return ratioWon(a, tuition);
+  if (a.kind === 'ratio') return a.upTo ? 0 : ratioWon(a, tuition);   // 상한(`60% 이내`)은 얼마일지 몰라 합계에 안 넣는다
   return 0;
 }
 
@@ -593,7 +719,7 @@ function sumAmounts(items, opts) {
    section-head.js·match-engine.js 와 같은 겸용 방식. */
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
-    wonIn: wonIn, ratioIn: ratioIn, amountBlock: amountBlock, amountFrom: amountFrom,
+    wonIn: wonIn, ratioIn: ratioIn, amountBlock: amountBlock, amountFrom: amountFrom, pickDocAmount: pickDocAmount,
     exclusivityFrom: exclusivityFrom, ratioWon: ratioWon, amountWon: amountWon, sumAmounts: sumAmounts,
     tuitionFor: tuitionFor, tuitionSource: tuitionSource, TRACK_TO_FIELD: TRACK_TO_FIELD,
     MIN_WON: MIN_WON
