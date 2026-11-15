@@ -22,6 +22,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 import { softEq } from './alerts.mjs';
 import { stripComments } from './servers.mjs';
 
@@ -632,5 +633,43 @@ export default async function gate(eq, ctx) {
     eq('  국외 이전 — 보유·이용 기간과 받는 곳의 개인정보처리방침(연락처)을 적는다', [/보유·이용 기간/.test(sec), /supabase\.com\/privacy/.test(sec) && /cloudflare\.com\/privacypolicy/.test(sec)], [true, true]);
     eq('  기기에 남은 정보 지우는 법(공용 기기면 서류까지)을 약관이 알려 주고 · 그 선택칸이 앱에 실제로 있다',
       [/데이터 초기화/.test(terms) && /서류 보관함 파일과 휴지통도 지우기/.test(terms), /id="wp-wipe-docs"/.test(read(root, 'app.js')) && /서류 보관함 파일과 휴지통도 지우기/.test(read(root, 'app.js'))], [true, true]);
+  }
+
+  /* ── ⑬ 이용 횟수 세기 (2026-11-15 · 은서 · 사용자 트랙션 — usage-report.js · 0007_usage_counts.sql · _admin/morning.*) ──
+     🔴 누가는 담지 않는다 · 낱낱 기록 없이 하루 합계만 · 학교는 학년·계열과 섞지 않는다 · 보고서는 열쇠로만 · 5건 미만 가림 */
+  {
+    const req = createRequire(import.meta.url);
+    const UR = req(path.join(rootPath, 'usage-report.js'));
+    const sql = read(root, 'supabase/migrations/0007_usage_counts.sql').replace(/--.*$/gm, '');
+    const sqlEvents = ((sql.match(/p_event not in \(([^)]+)\)/) || [])[1] || '').match(/'([a-z_]+)'/g)?.map((x) => x.slice(1, -1)) || [];
+    eq('⑬ 🔴 앱이 보내는 행동 목록 = 서버가 받는 행동 목록(usage-report.js USAGE_EVENTS ↔ 0007 track_usage)', [...UR.USAGE_EVENTS].sort(), [...sqlEvents].sort());
+    const cat = UR.usageCategory({ year: 3, track: 'engineering', region: '서울', school: '연세대학교', flags: ['basicLiving'], gpa: 4.1, bracket: 2, name: '김한장' });
+    eq('  카테고리는 학년·계열·지역·학교 넷뿐 — 특별자격·성적·소득·이름은 안 담는다 · 5학년 이상은 「5+」 · 이상한 계열 값은 「?」',
+      [Object.keys(cat).sort(), cat.grade, UR.usageCategory({ year: 6 }).grade, UR.usageCategory({ track: 'x y' }).track, UR.usageCategory(null).school],
+      [['grade', 'region', 'school', 'track'], '3', '5+', '?', '?']);
+    const h1 = UR.usageItem('https://a.kr/1'); const h2 = UR.usageItem('https://a.kr/1');
+    eq('  활동은 주소를 보내지 않고 짧은 지문으로(같은 주소 = 같은 지문) · 장학 id 는 그대로', [/^a:[0-9a-z]+$/.test(h1), h1 === h2, UR.usageItem('reg-x'), /https?:/.test(h1)], [true, true, 'reg-x', false]);
+    eq('  🔴 서버 — 두 표 RLS 켬 · 정책 없음(직접 읽기·쓰기 불가) · SECURITY DEFINER + search_path 고정 · 지역·학교는 공고 없이(item \'\') 따로 · 하루 상한 · 1년 정리',
+      [(sql.match(/enable row level security/g) || []).length, /create policy/i.test(sql), (sql.match(/security definer/g) || []).length === 2 && (sql.match(/set search_path = public, pg_temp/g) || []).length === 2,
+        /\(d, p_event, '', 'region',\s+rg, 1\)/.test(sql) && /\(d, p_event, '', 'school',\s+sc, 1\)/.test(sql), />= 50000/.test(sql), /day < d - 365/.test(sql)],
+      [2, false, true, true, true, true]);
+    eq('  🔴 보고서는 열쇠가 맞을 때만 · 5건 미만은 가린다(having ≥ gate · case when ≥ gate) · 열쇠는 무작위 UUID 둘',
+      [/if p_key is null or not exists \(select 1 from public\.report_keys where key = p_key\)/.test(sql), /gate integer := 5/.test(sql) && /having sum\(n\) >= gate/.test(sql) && /case when sum\(n\) >= gate/.test(sql), /gen_random_uuid\(\)::text \|\| gen_random_uuid\(\)/.test(sql)],
+      [true, true, true]);
+    const app = read(root, 'app.js'); const ff = read(root, 'formfill.js'); const ur = read(root, 'usage-report.js');
+    const fired = ['detail', 'save', 'submitted', 'prep', 'onboard'].filter((e) => !new RegExp(`trackUse\\('${e}'`).test(app));
+    eq('  배선 — 앱이 행동마다 센다(상세·저장·제출·신청 준비·온보딩 · 양식 열기·작성 · 원문 열기·하루 방문)',
+      [fired, /trackUse\('form_open'/.test(ff) && /trackUse\('form_edit'/.test(ff), /trackUse\('source'/.test(ur) && /trackUse\('open'/.test(ur)], [[], true, true]);
+    const idx = read(root, 'index.html');
+    eq('  싣는 순서(supabase-config → usage-report) · 서비스워커가 싣는다 · 스위치 칸 · 약관 수집 항목 한 줄(1년 파기)·국외 이전에 이용 횟수',
+      [idx.indexOf('src="supabase-config.js"') > -1 && idx.indexOf('src="supabase-config.js"') < idx.indexOf('src="usage-report.js"'), /'usage-report\.js'/.test(read(root, 'sw.js')), /usageReport:\s*(true|false)/.test(read(root, 'supabase-config.js')),
+        /앱을 쓸 때\(계정 없이도 해당\)/.test(read(root, 'terms.html')) && /1년 뒤 자동 파기/.test(read(root, 'terms.html')), /로그인 기록, 앱 오류 기록, 이용 횟수/.test(read(root, 'terms.html'))],
+      [true, true, true, true, true]);
+    const mh = read(root, '_admin/morning.html'); const mj = read(root, '_admin/morning.js'); const bs = read(root, '_admin/build.sh');
+    const sbHost = new URL((read(root, 'supabase-config.js').match(/url:\s*'([^']+)'/) || [])[1]).host;
+    eq('  아침 지표 — CSP 의 Supabase 주소 = supabase-config · 인라인 스크립트 없음 · 세기 끔이 먼저 실린다 · 화면 글자는 esc · 빌드가 옮긴다',
+      [mh.includes(`https://${sbHost}`), !/<script>(?!<\/script>)/.test(mh) && !/onclick=/.test(mh), mh.indexOf('morning-off.js') > -1 && mh.indexOf('morning-off.js') < mh.indexOf('vendor/usage-report.js'),
+        /esc\(x\.message\)/.test(mj), /cp _admin\/morning\.html _admin\/morning\.js _admin\/morning-off\.js/.test(bs) && /cp usage-report\.js "\$OUT\/vendor\/usage-report\.js"/.test(bs)],
+      [true, true, true, true, true]);
   }
 }

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>한대장 아침 지표</title>
+  <!-- 아침 지표 (2026-11-15 · 은서) — 매일 아침 이 한 장을 보고 업무를 시작한다: 이용 횟수(누가는 없음 · 5건 미만 가림) · 앱 오류 · 로봇 경보.
+       관리자 사이트와 같이 Cloudflare Access 뒤에 있다(팀만 연다). 이용 횟수는 Supabase 보고서 열쇠가 있어야 나온다(이 기기에만 저장).
+       🔴 script-src 는 self 뿐 — 인라인 스크립트·onclick 금지. Supabase 주소는 아래 connect-src 와 vendor/supabase-config.js 가 같아야 한다(관문 대조). -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://ffnzmiorcojbhpqwqgcy.supabase.co; object-src 'none'; base-uri 'self'; form-action 'none'" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+  <link rel="stylesheet" href="admin.css" />
+  <style>
+    .mo { max-width: 960px; margin: 0 auto; padding: 24px 16px 64px; }
+    .mo h1 { font-size: 22px; margin: 0 0 4px; }
+    .mo .sub { color: var(--text-sub, #666); font-size: 13px; margin: 0 0 20px; }
+    .mo h2 { font-size: 16px; margin: 28px 0 10px; }
+    .mo .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+    .mo .tile { border: 1px solid var(--line, #e5e5e5); border-radius: 12px; padding: 12px; }
+    .mo .tile b { display: block; font-size: 22px; }
+    .mo .tile span { font-size: 12px; color: var(--text-sub, #666); }
+    .mo .tile em { font-style: normal; font-size: 12px; color: var(--text-sub, #666); }
+    .mo table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .mo th, .mo td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line, #eee); vertical-align: top; }
+    .mo td.n { text-align: right; white-space: nowrap; }
+    .mo .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    .mo .muted { color: var(--text-sub, #888); font-size: 12px; }
+    .mo .warn { color: #b3261e; }
+    .mo .keybox { display: flex; gap: 8px; margin: 8px 0 0; }
+    .mo .keybox input { flex: 1; padding: 8px; border: 1px solid var(--line, #ddd); border-radius: 8px; }
+    .mo button { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line, #ddd); background: #fff; cursor: pointer; }
+    .mo select { padding: 6px; border-radius: 8px; }
+    .mo .alerts li { margin: 4px 0; }
+  </style>
+</head>
+<body>
+  <main class="mo">
+    <h1>아침 지표</h1>
+    <p class="sub" id="mo-when">불러오는 중…</p>
+
+    <section id="mo-key" hidden>
+      <h2>보고서 열쇠</h2>
+      <p class="muted">Supabase SQL Editor 에서 <code>0007_usage_counts.sql</code> 을 실행하면 마지막에 열쇠가 나옵니다. 여기에만 붙여넣으세요(이 기기에만 저장 · 채팅·저장소에 붙여넣지 마세요).</p>
+      <div class="keybox"><input id="mo-key-in" type="password" autocomplete="off" placeholder="아침 지표 열쇠" /><button id="mo-key-save" type="button">저장</button></div>
+    </section>
+
+    <section>
+      <h2>어제 · 최근 7일 <select id="mo-days"><option value="7">7일</option><option value="30">30일</option></select></h2>
+      <div class="tiles" id="mo-tiles"></div>
+      <p class="muted">누가 했는지는 모으지 않습니다 · 하루 단위 합계 · 카테고리별 5건 미만은 가립니다.</p>
+    </section>
+
+    <section>
+      <h2>많이 본 공고</h2>
+      <table><thead><tr><th>공고</th><th class="n">상세</th><th class="n">저장</th><th class="n">원문</th><th class="n">신청 준비</th><th class="n">제출</th></tr></thead><tbody id="mo-items"></tbody></table>
+    </section>
+
+    <section>
+      <h2>카테고리별 <select id="mo-ev"></select></h2>
+      <div class="cols">
+        <div><h3 class="muted">학년 × 계열</h3><table><tbody id="mo-g-gt"></tbody></table></div>
+        <div><h3 class="muted">지역</h3><table><tbody id="mo-g-rg"></tbody></table></div>
+        <div><h3 class="muted">학교</h3><table><tbody id="mo-g-sc"></tbody></table></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>앱 오류</h2>
+      <div class="tiles" id="mo-err-tiles"></div>
+      <h3 class="muted">최근 24시간 많이 난 오류</h3>
+      <table><thead><tr><th>오류</th><th>파일</th><th class="n">횟수</th></tr></thead><tbody id="mo-err-top"></tbody></table>
+    </section>
+
+    <section>
+      <h2>로봇 경보 (열린 것)</h2>
+      <ul class="alerts" id="mo-alerts"></ul>
+      <p class="muted">문제가 생겼으면: <a href="https://github.com/seonju5543-web/hanggonggan/actions/workflows/rollback.yml" target="_blank" rel="noopener">직전 판으로 되돌리기</a> ·
+        <a href="https://github.com/seonju5543-web/hanggonggan/blob/claude/nice-heisenberg-WESq5/docs/backend/%EC%82%AC%EA%B3%A0-%EB%8C%80%EC%9D%91.md" target="_blank" rel="noopener">사고 대응 한 장</a> ·
+        <a href="./">관리자 화면</a></p>
+    </section>
+  </main>
+  <script src="morning-off.js"></script>
+  <script src="vendor/supabase-config.js"></script>
+  <script src="vendor/usage-report.js"></script>
+  <script src="morning.js"></script>
+</body>
+</html>
