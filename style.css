@@ -908,6 +908,11 @@ a.btn { text-decoration: none; }
 .reason-list .r-ok, .reason-list .r-bad, .reason-list .r-unk, .reason-list .r-x { padding-left: 2px; }
 .reason-list .r-x { color: var(--text-weak); }   /* 제외 조건 ✗ 줄 — 같은 「지원 자격」 목록 안(승인 시안 2026-11-02 · 판정 아님) */
 .sheet-top .badge-dday { margin-left: auto; }   /* 시트 머리줄 — 칩·주최 왼쪽, D-day 오른쪽(승인 시안 2026-11-02) */
+/* 상세 시트(장학·활동 공용 #detail-sheet) — 목록 앞 점을 빼고 줄 사이를 좁힌다 (2026-11-15 은서 지시: 「동그라미 다 없애 줘」·「문장 사이 간격이 너무 커」).
+   시트의 줄은 굵은 칸 이름(기간·방법·활동기간…)이나 ✓✕ 표시가 앞에 붙어 점 없이도 갈린다. 시트 밖 목록(신청 준비 체크리스트 등)은 그대로. */
+#detail-sheet .doc-list li::before, #detail-sheet .reason-list li::before { display: none; }
+#detail-sheet .doc-list li, #detail-sheet .reason-list li { padding: var(--space-2) 0; line-height: 1.5; }
+#detail-sheet .doc-list, #detail-sheet .reason-list { gap: 0; }
 .ns-more summary { font-size: var(--t-xs); color: var(--text-sub); cursor: pointer; margin: var(--sp-1) 0; list-style: none; }
 .ns-more summary::before { content: '+ '; }
 .ns-more[open] summary::before { content: '– '; }

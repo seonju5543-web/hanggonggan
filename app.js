@@ -4670,7 +4670,7 @@ function noticeSummaryHtml(lines) {
   const li = (r) => `<li>${r.label ? `<b class="ns-k">${esc(r.label)}</b>` : ''}${esc(r.body)}</li>`;
   const head = rows.slice(0, NS_SHOWN), rest = rows.slice(NS_SHOWN);
   return `<h4>공고 안내</h4><ul class="doc-list notice-summary">${head.map(li).join('')}</ul>`
-    + (rest.length ? `<details class="ns-more"><summary>더 보기 (${rest.length}줄)</summary><ul class="doc-list notice-summary">${rest.map(li).join('')}</ul></details>` : '');
+    + (rest.length ? `<details class="ns-more"><summary>더 보기</summary><ul class="doc-list notice-summary">${rest.map(li).join('')}</ul></details>` : '');
 }
 
 /* ── 상세 시트 한 벌 (2026-11-02 개발자 승인 · docs/designs/mockups/sheet-consistency.html) ──
