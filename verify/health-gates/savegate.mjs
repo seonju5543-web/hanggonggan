@@ -28,10 +28,7 @@ export const SAVE_GATE_EXCEPTIONS = {
   'deep-fetch.yml#deepfetch': '원본 첨부·PDF 사본을 관문 없이 저장(11-15 기준 · G-16 남은 일)',
   'essay-playbook.yml#learn': '작성 규칙집 — 감사만 돈다(11-15 기준 · G-16 남은 일)',
   'kosaf-fetch.yml#fetch': '층2 — 자체 점검(kosaf-check)만 돈다(11-15 기준 · G-16 남은 일)',
-  'link-check.yml#check': '원문 링크 확인 — 감사만 돈다(11-15 기준 · G-16 남은 일)',
-  'open-api.yml#fetch': '공공 API — 감사만 돈다(11-15 기준 · G-16 남은 일)',
   'resolve-detail-urls.yml#resolve': '상세 주소 찾기 — 감사만 돈다(11-15 기준 · G-16 남은 일)',
-  'search-index.yml#build': '검색용 요약 — 관문 없이 저장(11-15 기준 · G-16 남은 일)',
 };
 
 const codeLines = (t) => String(t || '').split('\n').filter((l) => !/^\s*#/.test(l));
