@@ -485,6 +485,32 @@ async function seed(page) {
   }
   await page.click('.nav-item[data-nav="home"]'); await page.waitForTimeout(300);
 
+  /* 🔴 **시트가 뜨면 뒤 화면이 잠긴다** (2026-11-15 개발자 제보 — "공고 카드를 눌렀을 때 공고 내용이 아니라 뒤의 카드 나열 화면이 스크롤된다").
+     시트는 #app 안에 있고 굴러가는 것도 #app 이라, 시트 내용이 짧거나 끝에 닿으면 아이폰에서는 손짓이 뒤 목록으로 넘어간다.
+     크롬은 fixed 요소의 손짓을 #app 으로 넘기지 않아 그 증상이 재현되지 않는다 — 그래서 비켜 가는 **조건**을 잰다:
+     시트가 보이는 동안 #app 은 사용자 손짓으로 굴러가지 않고(overflow-y: hidden) 위치는 그대로이며, 닫으면 다시 굴러간다. */
+  console.log('\n■ 시트가 뜨면 뒤 화면이 잠긴다');
+  {
+    await page.click('.nav-item[data-nav="explore"]'); await page.waitForTimeout(400);
+    await page.waitForSelector('#explore-list .sch-card');
+    const lock = await page.evaluate(async () => {
+      const app = appScroller();
+      const ov = () => getComputedStyle(app).overflowY;
+      appScrollTo(200);
+      const before = { ov: ov(), y: Math.round(app.scrollTop) };
+      document.querySelector('#explore-list .sch-card').click();
+      await new Promise((r) => setTimeout(r, 500));
+      const open = { ov: ov(), y: Math.round(app.scrollTop), sheet: !document.querySelector('#detail-sheet').hidden };
+      closeSheet();
+      await new Promise((r) => setTimeout(r, 500));
+      return { before, open, after: { ov: ov(), y: Math.round(app.scrollTop) } };
+    });
+    ok('시트가 열려 있는 동안 #app 은 굴러가지 않는다 (overflow-y: hidden)', lock.open.sheet && lock.open.ov === 'hidden', JSON.stringify(lock));
+    ok('잠그고 풀어도 목록 위치는 그대로다', lock.before.y > 0 && lock.open.y === lock.before.y && lock.after.y === lock.before.y, JSON.stringify(lock));
+    ok('시트를 닫으면 다시 굴러간다', lock.before.ov === 'auto' && lock.after.ov === 'auto', JSON.stringify(lock));
+    await page.click('.nav-item[data-nav="home"]'); await page.waitForTimeout(300);
+  }
+
   console.log('\n■ 움직임 줄이기를 켠 학생');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.reload({ waitUntil: 'networkidle' });

@@ -341,6 +341,40 @@ async function openWith(ctx, resume) {
     await ctx9.close();
   }
 
+  /* ── ⑩ 공용 기기 — 초기화할 때 서류까지 지울지 학생이 고른다 (2026-11-15 · 은서 · 남은 개인정보 위험) ──
+     🔴 초기화는 프로필만 지우고 서류 보관함(증명서 스캔)은 남겼다 — 공용 기기에서는 가장 민감한 것이 그대로 남는다.
+        기본은 그대로 남긴다(증명서는 다시 떼기 어렵다 · 09-11 휴지통 결정) · 체크하면 서류와 휴지통까지 **영구히** 지운다. */
+  console.log('\n■ ⑩ 초기화 — 체크하면 서류 보관함·휴지통까지, 안 하면 서류는 그대로');
+  for (const tick of [false, true]) {
+    const ctxA = await browser.newContext({ viewport: { width: 400, height: 860 } });
+    const pa = await ctxA.newPage();
+    await pa.addInitScript((prof) => {
+      localStorage.setItem('handaejang.v1', JSON.stringify({ profile: prof, applications: [], saved: [], consent: { sensitive: false }, updatedAt: null }));
+    }, PROFILE);
+    await pa.goto(URLBASE, { waitUntil: 'load' });
+    await pa.waitForTimeout(2600);
+    await dismissNotify(pa).catch(() => {});
+    await pa.evaluate(async () => {
+      await walletPut('transcript', new File(['x'], 'a.pdf', { type: 'application/pdf' }));
+      await walletPut('family', new File(['y'], 'b.pdf', { type: 'application/pdf' }));
+      await walletDeleteSlot('family');
+    });
+    const count = () => pa.evaluate(async () => [await walletTx('readonly', (st) => st.count()), await trashTx('readonly', (st) => st.count())]);
+    const before = await count();
+    await pa.click('[data-nav="my"]');
+    await pa.waitForTimeout(600);
+    await pa.click('#btn-reset');
+    await pa.waitForTimeout(500);
+    const hasBox = await pa.$('#wp-wipe-docs');
+    if (tick && hasBox) await hasBox.click();
+    await pa.click('.wp-go');
+    await pa.waitForTimeout(1200);
+    const after = await count();
+    if (tick) ok('체크하면 서류 보관함과 휴지통이 비고, 초기화 창에 그 선택칸이 있다', !!hasBox && before.join() === '1,1' && after.join() === '0,0', `${before} → ${after}`);
+    else ok('체크하지 않으면 서류 보관함·휴지통은 그대로다(기본 — 증명서는 다시 떼기 어렵다)', before.join() === '1,1' && after.join() === '1,1', `${before} → ${after}`);
+    await ctxA.close();
+  }
+
   ok('콘솔 오류 없음', errors.length === 0, errors.slice(0, 2).join(' | '));
 
   await browser.close();

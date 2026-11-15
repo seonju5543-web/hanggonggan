@@ -40,6 +40,7 @@
   /* 뜻을 가진 색만 남기고 전부 채도를 낮췄다 (원래는 형광에 가까웠다) */
   --green:      #3d6b47;  --green-weak:  #e9efe8;
   --orange:     #8a5a12;  --orange-weak: #f4ede0;
+  --purple:     #6247d6;  --purple-weak: #f0ecfd;   /* 공모전 칩(2026-11-15 승인 시안 1) — 옛 .badge-out 이 직접 쓰던 값을 토큰으로 */
   --red:        #8f3a2e;  --red-weak:    #f5e9e6;
   --navy-1:     #23201a;  --navy-2:      #3a352c;
 
@@ -911,6 +912,11 @@ a.btn { text-decoration: none; }
 .reason-list .r-ok, .reason-list .r-bad, .reason-list .r-unk, .reason-list .r-x { padding-left: 2px; }
 .reason-list .r-x { color: var(--text-weak); }   /* 제외 조건 ✗ 줄 — 같은 「지원 자격」 목록 안(승인 시안 2026-11-02 · 판정 아님) */
 .sheet-top .badge-dday { margin-left: auto; }   /* 시트 머리줄 — 칩·주최 왼쪽, D-day 오른쪽(승인 시안 2026-11-02) */
+/* 상세 시트(장학·활동 공용 #detail-sheet) — 목록 앞 점을 빼고 줄 사이를 좁힌다 (2026-11-15 은서 지시: 「동그라미 다 없애 줘」·「문장 사이 간격이 너무 커」).
+   시트의 줄은 굵은 칸 이름(기간·방법·활동기간…)이나 ✓✕ 표시가 앞에 붙어 점 없이도 갈린다. 시트 밖 목록(신청 준비 체크리스트 등)은 그대로. */
+#detail-sheet .doc-list li::before, #detail-sheet .reason-list li::before { display: none; }
+#detail-sheet .doc-list li, #detail-sheet .reason-list li { padding: var(--space-2) 0; line-height: 1.5; }
+#detail-sheet .doc-list, #detail-sheet .reason-list { gap: 0; }
 .ns-more summary { font-size: var(--t-xs); color: var(--text-sub); cursor: pointer; margin: var(--sp-1) 0; list-style: none; }
 .ns-more summary::before { content: '+ '; }
 .ns-more[open] summary::before { content: '– '; }
@@ -2862,6 +2868,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .wp-list { margin: 12px 0 0; padding-left: 18px; }
 .wp-list li { font-size: var(--t-sm); color: var(--text-sub); line-height: 1.75; }
 .wp-note { font-size: var(--t-xs); color: var(--text-weak); margin-top: 12px; }
+.wp-wipe { margin-top: 12px; }   /* 초기화 창의 '서류도 지우기' 선택칸 (2026-11-15 · 공용 기기) */
 .wp-actions { display: flex; gap: 8px; margin-top: 18px; }
 .wp-cancel, .wp-go {
   flex: 1;
@@ -3548,7 +3555,7 @@ button, input, select, textarea { letter-spacing: inherit; }
    글자 「원문 공고 ↗」는 읽는 기계를 위해 남기되(font-size 0) 눈에는 아이콘 하나다. 단추 바깥(단추 안의 링크는 허용되지 않는 구조) */
 .card-src-link {
   position: absolute;
-  left: var(--space-20); bottom: var(--space-16);
+  right: var(--space-20); bottom: var(--space-16);   /* 2026-11-15 승인 시안 1 — 왼쪽 아래 혼자 한 줄 → 마감 옆(아랫줄 오른쪽 끝) */
   z-index: 2;
   display: block;
   width: 18px; height: 18px;
@@ -3563,7 +3570,14 @@ button, input, select, textarea { letter-spacing: inherit; }
   -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M14 4h6v6'/><path d='M20 4l-9 9'/><path d='M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5'/></svg>") center / contain no-repeat;
   mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M14 4h6v6'/><path d='M20 4l-9 9'/><path d='M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5'/></svg>") center / contain no-repeat;
 }
-.sch-card-wrap.has-link > .sch-card { padding-bottom: calc(var(--space-16) + var(--space-24)); }   /* 아이콘 줄 자리 */
+/* 2026-11-15 개발자 승인 시안 1(docs/designs/mockups/activity-card-options.html) — 원문 아이콘을 **마감 옆(아랫줄 오른쪽 끝)** 으로 올린다.
+   아이콘 혼자 한 줄을 쓰던 자리(아래 여백 24px)를 없애 카드가 한 줄 낮아진다 · 장학 카드도 같은 자리(2026-10-28 "다른 영역이 아니야").
+   아랫줄은 아이콘 폭만큼 오른쪽을 비운다(마감 글자와 겹치지 않게) · 마감이 없는 카드도 아이콘 높이만큼은 줄이 선다 */
+.sch-card-wrap.has-link > .sch-card .sch-foot { padding-right: calc(var(--space-24) + var(--space-4)); min-height: 18px; }
+/* 활동 칩의 갈래 색 (같은 시안) — 봉사 초록 · 공모전 보라 · 대외활동 남색. 청년정책은 회색 그대로(시안에 없던 갈래 · --orange 는 빨강 색조라 '떨어진다'로 읽힌다 — DESIGN.md 12번). 장학 칩(교내·교외)은 그대로 */
+.badge-kind.badge-vol { background: var(--green-weak); color: var(--green); }
+.badge-kind.badge-contest { background: var(--purple-weak); color: var(--purple); }
+.badge-kind.badge-act { background: var(--primary-weak); color: var(--accent); }
 
 .save-btn {
   position: absolute;
@@ -4561,6 +4575,12 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
    ⚠️ 이때 뒤로 쓸기를 잃지 않는다 — 시트 안 손짓은 어차피 우리가 안 맡는다
       (app.js 가 `.sheet` 를 걸러낸다). 시트 밖은 배경이라 쓸 일이 없다. */
 #app.on-sub-screen:has(.sheet:not([hidden])) { touch-action: auto; }
+/* 🔴 **시트가 떠 있는 동안 뒤 화면은 굴러가지 않는다** (2026-11-15 개발자 지적 — "공고 카드를 눌렀을 때 공고 내용이 아니라
+   뒤의 카드 나열 화면이 스크롤된다"). 시트는 `#app` 안에 있고 굴러가는 것도 `#app` 이라, 시트 내용이 짧아 굴릴 것이 없거나
+   끝에 닿으면 손짓이 뒤 목록으로 넘어갔다(`overscroll-behavior` 는 실제로 넘치는 상자에서만 막는다 · 어두운 배경을 쓸어도 같다).
+   그래서 시트가 보이는 동안은 `#app` 을 잠근다 — 위치(scrollTop)는 그대로 남고, 스크립트로 옮기는 것(appScrollTo)은 여전히 된다.
+   scrollbar-gutter 는 데스크톱에서 스크롤 막대가 사라지며 화면이 옆으로 튀지 않게. 관문 verify-interactions.js 「시트가 뜨면 뒤 화면이 잠긴다」. */
+#app:has(> .sheet:not([hidden])) { overflow-y: hidden; }
 
 /* ============================================================
    고객센터 · 자주 묻는 질문 강화 (2026-09-13 개발자 지시 · 아파트너 참고안)
@@ -4940,11 +4960,19 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 #activities-field-filters .field-more { color: var(--accent); border-style: dashed; }
 /* 관심 관문 (2026-10-24 · 지시 4) — 온보딩 단계와 같은 결(제목 · 한 줄 설명 · 체크 목록 · 주 버튼) */
 .act-gate { padding: var(--space-8) 0 var(--space-24); }
-.act-gate h3 { font-size: var(--t-xl); font-weight: 700; line-height: 1.35; margin: 0 0 var(--space-8); }
-.act-gate-sub { font-size: var(--t-sm); color: var(--text-sub); margin: 0 0 var(--space-20); line-height: 1.5; }
+.act-gate h3 { font-size: var(--t-xl); font-weight: 700; line-height: 1.35; margin: 0 0 var(--space-20); }
 .act-gate .field-label { display: block; margin-bottom: var(--space-8); }
-.act-gate-actions { display: flex; gap: var(--space-8); margin-top: var(--space-16); }
-.act-gate-actions .btn-primary { flex: 1; }
+/* 종류 묶음과 「분야」 이름표 사이 한 줄 (2026-11-15 개발자 지시 "종류와 분야 사이에 엔터키 하나") — 체크 목록 바로 뒤 이름표에만 */
+.act-gate .check-list + .field-label { margin-top: var(--space-24); }
+/* 취소 · 저장하고 보기 (2026-11-15 개발자 지적 "레이아웃이 이상함") — .btn 의 width:100% 가 둘 다에 걸려 취소가 넓고 저장이 두 줄로 찌그러졌다.
+   취소는 제 글자만큼(같은 높이) · 저장이 남은 폭을 한 줄로 */
+.act-gate-actions { display: flex; align-items: stretch; gap: var(--space-8); margin-top: var(--space-24); }
+.act-gate-actions .btn { width: auto; white-space: nowrap; }
+.act-gate-actions .btn-ghost { flex: 0 0 auto; padding: 0 var(--space-24); font-size: var(--t-md); }
+.act-gate-actions .btn-primary { flex: 1 1 0; min-width: 0; }
+/* 「내 정보」 (2026-11-15) — 학적정보에서 온 한 줄(+ 수정) · 묻는 칸들(공고 안 「미확인 자격」과 같은 줄 .elig-ask-row) · 설명 문단은 두지 않는다(같은 날 개발자 "happy talk 다 없애고") */
+.act-gate-me { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); font-size: var(--t-sm); color: var(--text); margin-bottom: var(--space-12); }
+.act-gate #act-gate-ask { margin-bottom: 0; }
 .act-gate-bar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); margin: 0 0 var(--space-12); font-size: var(--t-sm); color: var(--text-sub); }
 .act-gate-cta { width: 100%; }
 #activities-filters:has(+ #activities-field-filters:not([hidden])) { margin-bottom: 0; }

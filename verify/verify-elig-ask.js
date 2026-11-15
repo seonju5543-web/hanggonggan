@@ -144,7 +144,7 @@ async function seed(page) {
   /* ④ 적고 저장하면 그 줄이 **자리를 지키며 색만** 바뀐다 */
   const filled = await page.evaluate(() => {
     const VAL = { gpa: '4.0', credits: '18', bracket: '3', birthYear: '2003',
-      nationality: '대한민국', major: '경영학과', regionCity: '동대문구' };
+      nationality: 'korean', major: '경영학과', regionCity: '동대문구', region: '서울', parentRegion: '서울', originRegion: '서울' };
     const els = [...document.querySelectorAll('[data-elig-field]')];
     els.forEach((el) => { el.value = VAL[el.dataset.eligField] || '1'; });
     /* 🔴 처지 칸도 **같이** 답해야 「물을 것이 없다」가 된다 — 여기를 빠뜨리면
