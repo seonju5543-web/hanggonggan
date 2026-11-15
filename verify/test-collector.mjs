@@ -1348,6 +1348,8 @@ console.log('\n■ 신청 준비 시작 버튼 — 양식이 없어도 곧장 \'
     ['붙임2 장학_신청서.pdf', '[서식1] 활동계획서.hwp', '개인정보 수집·이용 동의서.docx'].map((n) => D.isApplicationForm({ name: n })), [true, true, true]);
   eq('  추천서·결과보고서·포스터 그림은 신청서가 아니다',
     ['[서식 2] 장학생 추천서.hwp', '활동 결과보고서.pdf', '포스터.png'].map((n) => D.isApplicationForm({ name: n })), [false, false, false]);
+  eq('  B3 공고문은 신청서가 아니다 — `사업계획서 및 업무처리기준.pdf`·`선발 공고문(신청서 포함).hwpx`·`모집요강.pdf` (2026-11-15 · 양식 로봇의 못 받음 목록에서 빠진다)',
+    ['붙임2_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf', '붙임1. 2026년 장학생 선발 공고문(신청서 포함).hwpx', '2027 모집요강.pdf'].map((n) => D.isApplicationForm({ name: n })), [false, false, false]);
   eq('🔴 층2 첨부는 이름에 신청서가 있어도 \'양식 다운로드형\'이라 부르지 않는다 (화면이 \'선발 공고문\'이라 부른다)',
     D.submitChannelKind({ sourceKind: 'kosaf', provider: '원주시청', attachments: [{ name: '지원신청서.hwp' }] }) === 'download', false);
   eq('  층1 은 그대로 다운로드형이다', D.submitChannelKind({ attachments: [{ name: '장학금 신청서.hwp' }] }), 'download');
@@ -5538,6 +5540,9 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
   eq('  신청서는 읽지 않는다', AT.isNoticeDoc('장학금 신청서.hwp'), false);
   eq('  개인정보 동의서도 읽지 않는다', AT.isNoticeDoc('개인정보 수집·이용 동의서.hwp'), false);
   eq('  선발원서도 서식이다', AT.isNoticeDoc('F_장학생 선발원서(제24기).docx'), false);
+  /* 1단계 B3 (2026-11-15) — 서식 낱말이 섞여도 공고문인 것이 분명한 꼴은 읽는다 */
+  eq('  B3 `사업계획서 및 업무처리기준.pdf`·`선발 공고문(신청서 포함).hwpx`·`선발계획` 은 공고문이다(계획서·신청서 낱말보다 공고문 낱말이 이긴다) · 맨 `활동계획서`·`신청서식` 은 여전히 서식',
+    ['붙임2_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf', '붙임1. 2026년 장학생 선발 공고문(신청서 포함).hwpx', '2026년 하반기 장학생 선발계획.hwp', '붙임1.멘토 활동계획서 양식.hwp', '신청서식.hwpx'].map((n) => AT.isNoticeDoc(n)), [true, true, true, false, false]);
   /* ② PDF는 자격 경로에서 쓰지 않는다 — 글자가 정확히 안 나온다.
         실측: 원문 `3년 이상`이 `년이상`으로 뽑혔다. 숫자 하나가 결론을 바꾸는 글이다. */
   eq('  PDF는 자격 경로에서 쓰지 않는다', AT.attachmentText('없는파일.pdf'), '');
