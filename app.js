@@ -7790,7 +7790,6 @@ function bindEvents() {
         <li>신청 내역과 진행 기록</li>
         <li>알림 설정과 알림함</li>
       </ul>
-      <p class="wp-note">서류 보관함의 파일은 아래를 체크하지 않으면 그대로 남습니다.</p>
       <label class="auth-remember wp-wipe"><input type="checkbox" id="wp-wipe-docs" /> 서류 보관함 파일과 휴지통도 지우기 (공용 기기라면 체크)</label>
       <div class="wp-actions">
         <button class="wp-cancel" type="button">취소</button>
