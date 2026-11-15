@@ -207,6 +207,7 @@ function fitDetailFor(s, p) {
 
 function getMatches() {
   const p = state.profile;
+  /* 기한도 자격도 모르는 정식 공고는 카드가 아니라 게시판 글로 간다 — 판정은 match-engine feedOnlyFormal 한 곳(알림과 같다 · 2026-11-15 결정 1) */
   return allScholarships().map((s) => {
     const result = evaluateFor(s, p);
     /* 🔴 한국장학재단 등록분은 **적합도를 단정하지 않는다** (2026-08-30).
@@ -217,7 +218,7 @@ function getMatches() {
        그래서 배지·정렬이 보는 fd 를 '아직 못 읽음'으로 준다(자격 줄은 그대로 보여 준다).
        판정 규칙은 fitVerdict 한 곳 그대로다 — 여기서는 근거만 정직하게 넘긴다. */
     return { sch: s, result, fit: fitScore(s, result, p), fd: fitDetailFor(s, p) };
-  });
+  }).filter((m) => !feedOnlyFormal(m.sch, p, { status: m.result.status, fd: m.fd }));
 }
 
 /* ---------------- 공고 저장(북마크) ----------------
@@ -3310,7 +3311,9 @@ function liveNoticesHead(updatedAt) {
 /* '이 주소는 이미 정식 등록됐나' — 학교 게시판 구역과 재단·지자체 구역이 **같은 잣대**를 쓴다 (2026-09-26 분리).
    URL 뒤에 목록 파라미터가 붙는 경우가 있어 전방일치로 비교한다. */
 function registeredUrlMatcher() {
-  const regUrls = registeredList.map((s) => s.sourceUrl)
+  /* 카드로 안 그리는 정식 공고(feedOnlyFormal — 기한·자격을 다 모름)의 주소는 빼지 않는다 — 그 글은 게시판 새 공고로 보여야 한다(2026-11-15 결정 1) */
+  const p = state.profile;
+  const regUrls = registeredList.filter((s) => !feedOnlyFormal(s, p)).map((s) => s.sourceUrl)
     .concat(NATIONAL_SCHOLARSHIPS.filter((s) => s.sourceKind === 'official' && s.sourceUrl).map((s) => s.sourceUrl))
     .filter(Boolean);
   return (url) => regUrls.some((u) => url.startsWith(u) || u.startsWith(url));
@@ -3323,7 +3326,13 @@ function boardNoticesForMe() {
   // URL 뒤에 목록 파라미터가 붙는 경우가 있어 전방일치로 비교한다
   const isRegistered = registeredUrlMatcher();
   /* 내 학교 공고인지는 match-engine이 정한다 — 알림(notify-rules)도 같은 함수를 쓴다 */
-  const forMe = (liveNotices.items || []).filter((n) => noticeForProfile(n, p) && !isRegistered(n.url));
+  const fromFeed = (liveNotices.items || []).filter((n) => noticeForProfile(n, p) && !isRegistered(n.url));
+  /* 카드로 안 그리는 정식 공고(feedOnlyFormal — 기한·자격을 다 모름 · 2026-11-15 결정 1)가 이 학교 게시판 글에 없으면(다른 게시판에서 온 공고) 여기 한 줄로 싣는다.
+     🔴 지어내지 않는다 — 제목·주소·날짜는 그 공고의 것 그대로(name·sourceUrl·listedAt). 게시판 글이 이미 있으면 그 글이 그 자리다(두 번 안 싣는다) */
+  const sameUrl = (a, b) => !!a && !!b && (a.startsWith(b) || b.startsWith(a));
+  const demoted = registeredFor(p).filter((s) => s.sourceUrl && notStale(s) && feedOnlyFormal(s, p) && !fromFeed.some((n) => sameUrl(n.url, s.sourceUrl)))
+    .map((s) => ({ title: s.name, url: s.sourceUrl, school: (s.eligibility && s.eligibility.schoolOnly) || p.school, foundAt: s.listedAt || '' }));
+  const forMe = fromFeed.concat(demoted);
   /* 학자금 대출·융자는 장학금이 아니라서 매칭 카드로는 만들지 않는다(정직 원칙).
      그렇다고 피드에서까지 밀려 잘리면 학생이 대출 정보를 아예 볼 곳이 없어지므로,
      장학 공고를 앞에 두되 대출 공고는 뒤에 둔다 (2026-07-30 조정). */

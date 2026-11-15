@@ -1208,6 +1208,21 @@ function fitScore(sch, result, p) {
   return fitDetail(sch, p).pct;
 }
 
+/* ── 기한도 자격도 모르는 정식 공고는 카드가 아니라 게시판 글로 (2026-11-15 · 개발자 결정 1 — 11-02 「학생 화면에 '모름'류 글자 없음」 계획) ──
+   마감을 못 읽었고(deadline 없음) 자격도 못 읽은(fitDetail unread · 확정 미달 아님) 정식 등록 공고는 카드로 그릴 것이 제목뿐이다 —
+   그래서 카드(홈·탐색·일괄 준비·도우미)에서 빼고 게시판 새 공고(제목+링크)로만 보인다(app.js registeredUrlMatcher 가 그 주소를 피드에서 안 뺀다).
+   🔴 판정을 새로 만들지 않는다 — 미달은 evaluate, 못 읽음은 fitDetail 그대로(카드의 fitVerdict 'unread' 와 같은 갈래).
+   🔴 화면(getMatches)·알림(notify-rules 「새 장학 공고」)이 **이 한 함수**를 쓴다 — 갈라지면 카드에 없는 공고를 알림이 운다.
+   상시 제도(program)·층2(kosaf — 마감 빈 재단을 버리지 말 것)는 대상이 아니다. 찾기(findSch)·저장·신청 내역은 그대로 연다.
+   known 은 이미 잰 { status, fd } — 같은 계산을 두 번 하지 않게(없으면 여기서 잰다) */
+function feedOnlyFormal(sch, p, known) {
+  if (!sch || !p || sch.program || sch.sourceKind === 'kosaf' || sch.deadline) return false;
+  const status = (known && known.status) || evaluate(sch, p).status;
+  if (status === 'ineligible') return false;
+  const fd = (known && known.fd) || fitDetail(sch, p);
+  return !!(fd && fd.unread);
+}
+
 /* 마감일을 확정하지 못한 공고(원문에 마감이 없거나 못 읽은 경우)는 dday가 '기한 원문 확인'이라
    목록에서 영영 사라지지 않는다 — 지난 학기 공고가 계속 떠 있는 문제가 있었다(2026-07-30 발견).
    그래서 등록일(listedAt)로부터 60일이 지나면 숨긴다. 실시간 공고의 60일 규칙과 같은 기준이다.
@@ -2224,7 +2239,7 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = { evaluate, fitScore, fitDetail, judgeCond, holdsExternalScholarship, FIT_UNREAD, FIT_FLOOR, FIT_MAX, FIT_MIN,
                      RESIDENCE_SPANS, residenceSpan,
                      joinSpacedSyllables, decodeEntities, looksFragment,
-                     scopedToProfile, inSchoolsAny, notStale, STALE_DAYS,
+                     scopedToProfile, inSchoolsAny, notStale, STALE_DAYS, feedOnlyFormal,
                      requirementLines, requirementStruct, requirementMatch, tidyRequirement,
                      REQ_SIGNAL, NOT_A_REQUIREMENT, EXCLUDE_LINE, HARD_THRESHOLD,
                      noticeForProfile, activityForProfile, taggedSchool, SHARED_BOARD_BRANCH, SERVED_SCHOOLS,
