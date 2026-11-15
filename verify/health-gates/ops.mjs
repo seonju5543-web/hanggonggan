@@ -673,12 +673,11 @@ export default async function gate(eq, ctx) {
       [true, true, true, true, true]);
   }
 
-  /* ── ⑭ 상세 시트 점 — 활동 시트만 뺀다 (2026-11-15 은서) ──
-     활동 시트의 점을 빼 달라는 지시를 공용 그릇 #detail-sheet 에 걸어 장학 시트의 「접수」 점까지 사라졌고, 은서가 "원래대로"라고 했다 */
+  /* ── ⑭ 상세 시트 점 — 장학·활동 시트 모두 점 없이 · 줄 간격 좁게 (2026-11-15 은서 — 활동 시트 먼저, 같은 날 장학 시트도) ── */
   {
-    const css = read(root, 'style.css'); const app = read(root, 'app.js');
-    eq('⑭ 🔴 점 빼기는 활동 시트(.act-sheet)에만 · 공용 그릇(#detail-sheet) 전체에 점을 빼는 규칙이 없다 · 활동 시트가 표식을 단다',
-      [/\.act-sheet \.doc-list li::before, \.act-sheet \.reason-list li::before \{ display: none; \}/.test(css), !/#detail-sheet \.doc-list li::before/.test(css), /<div class="sheet-body act-sheet">/.test(app)],
-      [true, true, true]);
+    const css = read(root, 'style.css');
+    eq('⑭ 상세 시트(#detail-sheet) 목록은 점 없이 · 줄 위아래 여백 var(--space-2)',
+      [/#detail-sheet \.doc-list li::before, #detail-sheet \.reason-list li::before \{ display: none; \}/.test(css), /#detail-sheet \.doc-list li, #detail-sheet \.reason-list li \{ padding: var\(--space-2\) 0; line-height: 1\.5; \}/.test(css)],
+      [true, true]);
   }
 }
