@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-14",
+ "updatedAt": "2026-11-15",
  "items": {
   "r:auto-082f26ec8898eab98ceca780": {
    "attempts": 0,
@@ -262,23 +262,6 @@
    "status": "resolved",
    "resolvedUrl": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjMlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
    "attempts": 0
-  },
-  "n:https://www.gachon.ac.kr/bbs/kor/475/artclList.do#n-%5B%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD-%EB%B9%84%EA%B5%90%EA%B3%BC%5D%20%5BArTechne%5D%202026%20%EB%B9%84%EA%B5%90%EA%B3%BC%20%EB%A7%88%EC%9D%BC%EB%A6%AC%EC%A7%80%20%EC%9E%A5%ED%95%99%EC%A0%9C%EB%8F%84": {
-   "attempts": 5,
-   "title": "[공지사항-비교과] [ArTechne] 2026 비교과 마일리지 장학제도 안내",
-   "lastTried": "2026-10-15",
-   "lastWhy": "목록에서 못 찾음",
-   "nextTryAt": "2026-10-29",
-   "status": "",
-   "escalated": true
-  },
-  "n:https://onestop.pusan.ac.kr/page?menuCD=000000000000062#n-2026%ED%95%99%EB%85%84%EB%8F%84%202%ED%95%99%EA%B8%B0%20%EC%9E%A5%ED%95%99%EC%82%AC%EC%A0%95%EA%B4%80%20%EC%B6%94%EC%B2%9C%20%ED%95%99%EC%97%85%EC%A7%80%EC%9B%90%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4": {
-   "attempts": 0,
-   "title": "2026학년도 2학기 장학사정관 추천 학업지원장학생 선발 안내",
-   "lastTried": "2026-10-15",
-   "lastWhy": "",
-   "status": "resolved",
-   "resolvedUrl": "https://onestop.pusan.ac.kr/page?menuCD=000000000000062&mode=DETAIL&seq=702"
   },
   "r:auto-84a0ebb09c20ec9588eb82b4-0o16i5v": {
    "attempts": 0,
