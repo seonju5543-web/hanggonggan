@@ -7790,7 +7790,8 @@ function bindEvents() {
         <li>신청 내역과 진행 기록</li>
         <li>알림 설정과 알림함</li>
       </ul>
-      <p class="wp-note">서류 보관함의 파일은 그대로 남습니다.</p>
+      <p class="wp-note">서류 보관함의 파일은 아래를 체크하지 않으면 그대로 남습니다.</p>
+      <label class="auth-remember wp-wipe"><input type="checkbox" id="wp-wipe-docs" /> 서류 보관함 파일과 휴지통도 지우기 (공용 기기라면 체크)</label>
       <div class="wp-actions">
         <button class="wp-cancel" type="button">취소</button>
         <button class="wp-go" type="button">초기화</button>
@@ -7800,7 +7801,16 @@ function bindEvents() {
     requestAnimationFrame(() => pop.classList.add('show'));
     pop.querySelector('.wp-cancel').addEventListener('click', close);
     pop.querySelector('.wp-go').addEventListener('click', () => {
+      /* 🔴 서류(증명서 스캔)는 기본으로 남긴다 — 다시 떼려면 주민센터·학교에 가야 한다(09-11 휴지통 결정과 같은 이유).
+         공용 기기라면 학생이 골라서 서류·휴지통까지 **영구히** 지운다(휴지통으로 옮기지 않는다 — 남기면 공용 기기에 그대로 있다). (2026-11-15) */
+      const wipeDocs = !!(pop.querySelector('#wp-wipe-docs') || {}).checked;
       close();
+      if (wipeDocs) {
+        Promise.all([walletTx('readwrite', (st) => st.clear()), trashTx('readwrite', (st) => st.clear())])
+          .then(() => walletRefresh())
+          .then(() => toast('서류 보관함과 휴지통도 지웠어요'))
+          .catch(() => toast('서류를 지우지 못했어요 · 서류 보관함에서 직접 지워 주세요'));
+      }
       [STORAGE_KEY, ...LEGACY_KEYS].forEach((k) => localStorage.removeItem(k));
       /* 🔴 **이어보기 장부도 함께 지운다** (2026-09-09 코드 리뷰 — 안 지우면 초기화가 거짓말이 된다).
          그 장부에는 쓰다 만 온보딩(이름·학번·전화·계좌번호)과 신청서에 쓴 글이 들어 있어서,

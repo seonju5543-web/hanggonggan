@@ -2859,6 +2859,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .wp-list { margin: 12px 0 0; padding-left: 18px; }
 .wp-list li { font-size: var(--t-sm); color: var(--text-sub); line-height: 1.75; }
 .wp-note { font-size: var(--t-xs); color: var(--text-weak); margin-top: 12px; }
+.wp-wipe { margin-top: 12px; }   /* 초기화 창의 '서류도 지우기' 선택칸 (2026-11-15 · 공용 기기) */
 .wp-actions { display: flex; gap: 8px; margin-top: 18px; }
 .wp-cancel, .wp-go {
   flex: 1;
