@@ -6295,7 +6295,7 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
   }
   eq('  사본으로 연 시트에서는 신청을 시작·이어가지 않는다(양식 흐름이 넘어진다)', /const gone = !findSch\(id\);\s*const canApply = lock\.canApply && !gone;/.test(allApp), true);
   eq('  사본은 공고 목록을 다 받았을 때만 뜨고, 바뀌었을 때만 적는다', /function snapApplications\(resolve\) \{\s*if \(appsDataState\(\) !== 'ok'\) return false;/.test(allApp) && /if \(a\.snap && JSON\.stringify\(a\.snap\) === json\) continue;/.test(allApp), true);
-  eq('  상세 시트·패널의 제출/결과 단추가 사본으로도 찾는다(appSch)', /function openDetail\(id\) \{[\s\S]{0,200}?const sch = appSch\(id\);/.test(allApp) && /const sch = appSch\(id\);   \/\/ 사본으로 보이는 줄의 단추도/.test(allApp), true);
+  eq('  상세 시트·패널의 제출/결과 단추가 사본으로도 찾는다(appSch)', /function openDetail\(id\) \{[\s\S]{0,500}?const sch = appSch\(id\);/.test(allApp)   /* 창 200 → 500자: 2026-11-15 이용 횟수 두 줄(trackUse)이 앞에 끼어 200자를 넘겼다 — 동작은 그대로 */ && /const sch = appSch\(id\);   \/\/ 사본으로 보이는 줄의 단추도/.test(allApp), true);
   eq('  내려간 공고에 결과를 적으면 줄이 사라지므로 실행 취소를 준다', /if \(!findSch\(sch\.id\)\) toast\([^\n]*\{ label: '실행 취소', run: \(\) => undoProgress\(sch\.id\) \}\)/.test(allApp), true);
   eq("  '목록에서 내려감' 카드는 없다", /appCardGone|badge-gone/.test(readText(new URL('../app.js', import.meta.url))), false);
   /* 되돌리기는 공고를 요구하면 안 된다 — 요구하면 사라진 공고의 기록이 영영 안 지워진다
@@ -15068,6 +15068,98 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
     [/\berrorReport:\s*(true|false)/.test(cfg), html.indexOf('src="supabase-config.js"') < html.indexOf('src="supabase-client.js"') && html.indexOf('src="supabase-client.js"') < html.indexOf('src="error-report.js"'),
       /'error-report\.js'/.test(sw), /앱 오류가 났을 때/.test(terms) && /30일 뒤 자동 파기/.test(terms)],
     [true, true, true, true]);
+}
+
+/* ── 2026-11-15 · 유료 카드 읽기 (개발자 지시 — 설계 docs/designs/paid-card-reading.md) ──
+   공고 한 건을 통째로 모델 둘에게 읽혀 카드의 모든 칸을 채우는 로봇. 지어냄을 막는 것은 지시문이 아니라 **기계 대조(verify)** 와 **두 번 읽기 일치(agree)** 다 —
+   이 절은 가짜 응답으로(돈 0) 그 둘이 실제로 막는지 잰다. 표본은 전부 여기 적은 글자다(실데이터·네트워크에 안 기댄다). */
+{
+  console.log('\n■ 유료 카드 읽기 — 기계 대조 · 두 번 읽기 일치 · 스위치 (2026-11-15)');
+  const CR = await import(new URL('../collector/card-read.mjs', import.meta.url));
+  const { sandbox: crSandbox } = await import(new URL('./health-gates/bodies.mjs', import.meta.url));
+  const SRC = [
+    '===== 게시판 본문 =====', '통영시 저소득 대학생 장학금 지원 대상자 선발 안내', '3. 지원자격',
+    '가.「국민기초생활 보장법」에 따른 기초생활수급자 및 차상위 계층 대학생으로,',
+    '나. 학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득하고,',
+    '다. 관내 고등학교 졸업자로, 공고일 현재 주민등록상 6년 이상 통영시에 주소를 두고, 통영시 관내 학교를 6년 이상 다닌 자',
+    '라. 타 장학금을 수혜하지 않고, 학업에 성실한 자', '4. 지원제외: 대학원생, 휴학생',
+    '5. 신청기간: 2026.11.2.(월)~2026.11.23.(월)', '6. 지원금액: 1인당 상한액 100만 원', '7. 신청방법: 방문 또는 우편 신청',
+    '===== 첨부 1.jpg =====', '학자금 지원구간', '사이버대제외/기존학생제외', '5구간 이내',
+  ].join('\n');
+  const ITEM = { id: 'x-1', name: '[교외] 2026년도 통영시 저소득 대학생 장학금 지원 대상자 선발 안내(~11/23)', amountValue: 0, attachments: [] };
+  const base = { title: '', host: '', eligibility: [], excludes: [], priority: [], amount: [], deadline: { date: '', quote: '' }, apply: [], documents: [], notes: [], multi: false, unreadable: false };
+  const v = (over) => CR.verify({ ...base, ...over }, SRC, ITEM);
+
+  /* ① 기계 대조 */
+  const r1 = v({ eligibility: ['「국민기초생활 보장법」에 따른 기초생활수급자 및 차상위 계층 대학생', '학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 자',
+    '관내 고등학교 졸업자로, 공고일 현재 주민등록상 6년 이상 통영시에 주소를 두고, 통영시 관내 학교를 6년 이상 다닌 자', '직전 학기 평점 3.5 이상인 자'] });
+  eq('① 번호를 뗀 줄·끝말만 고친 줄(「…취득하고,」→「…취득한 자」)은 통과하고, 원문에 없는 요건(평점 3.5)은 버린다',
+    [r1.kept.eligibility.length, r1.dropped.map((d) => d.line)], [3, ['직전 학기 평점 3.5 이상인 자']]);
+  eq('  🔴 끝말 고침이 뜻을 뒤집으면 버린다 — 원문 「수혜하지 않고,」 를 「수혜한 자」 로', v({ eligibility: ['타 장학금을 수혜한 자'] }).kept.eligibility, []);
+  eq('  끝말 고침은 자격·제외 줄에만 — 신청 방법·유의 줄은 글자가 그대로 원문에 있어야 한다',
+    [v({ apply: ['방문 또는 우편 신청'] }).kept.apply.length, v({ notes: ['학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 자'] }).kept.notes.length], [1, 0]);
+  eq('  낱말을 바꾼 줄(「차상위 계층」→「저소득층」)·요약한 줄은 버린다', v({ eligibility: ['「국민기초생활 보장법」에 따른 기초생활수급자 및 저소득층 대학생', '기초수급·차상위 대학생'] }).kept.eligibility, []);
+  eq('  깨진 띄어쓰기를 고친 줄 · 포스터에서 두 줄로 갈라진 문장을 이은 줄은 통과한다',
+    v({ eligibility: ['「국민기초생활보장법」에 따른 기초생활 수급자 및 차상위 계층 대학생', '학자금 지원구간 5구간 이내'] }).kept.eligibility.length, 2);
+  eq('  마감 — 근거 문구가 원문에 있고 그 문구에 그 월·일이 있어야 한다 (접수 시작일 11.2 는 문구에 있으니 통과 — 그건 ② 가 잡는다 · 없는 날짜 11.30 · 원문에 없는 문구는 버린다)',
+    [v({ deadline: { date: '2026-11-23', quote: '신청기간: 2026.11.2.(월)~2026.11.23.(월)' } }).kept.deadline?.date || null,
+      v({ deadline: { date: '2026-11-30', quote: '신청기간: 2026.11.2.(월)~2026.11.23.(월)' } }).kept.deadline,
+      v({ deadline: { date: '2026-11-23', quote: '접수 마감 2026.11.23.' } }).kept.deadline], ['2026-11-23', null, null]);
+  eq('  제목은 공고 제목에서 온 글자만(말머리·꼬리 날짜를 뗀 것은 통과 · 지어낸 제목은 버림) · 주최는 원문·제목에 있는 이름만',
+    [v({ title: '2026년도 통영시 저소득 대학생 장학금 지원 대상자 선발 안내' }).kept.title !== '', v({ title: '통영시 장학금 안내' }).kept.title, v({ host: '통영시' }).kept.host, v({ host: '통영시청 평생교육과' }).kept.host], [true, '', '통영시', '']);
+  eq('  응답 꼴이 깨져도 넘어지지 않고 전부 버린다', [CR.verify(null, SRC, ITEM).kept.eligibility, CR.verify({ eligibility: 'x', deadline: 3 }, SRC, ITEM).kept.deadline], [[], null]);
+
+  /* ② 두 번 읽기 일치 */
+  const A1 = v({ eligibility: ['학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 자', '「국민기초생활 보장법」에 따른 기초생활수급자 및 차상위 계층 대학생'], excludes: ['대학원생, 휴학생'],
+    amount: ['1인당 상한액 100만 원'], deadline: { date: '2026-11-23', quote: '신청기간: 2026.11.2.(월)~2026.11.23.(월)' } });
+  const B1 = v({ eligibility: ['학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 학생'], notes: ['대학원생, 휴학생'],
+    amount: ['1인당 상한액 100만 원'], deadline: { date: '2026-11-02', quote: '신청기간: 2026.11.2.(월)~2026.11.23.(월)' } });
+  const ag = CR.agree(A1, B1, ITEM);
+  eq('② 끝말만 다른 줄은 같은 줄로 싣고, 한쪽에만 있는 줄·칸이 갈린 줄(제외 ↔ 유의)·마감이 다른 것은 싣지 않고 넘긴다',
+    [ag.final.eligibility.length, ag.final.excludes, ag.final.notes, ag.final.amount.length, ag.final.deadline, ag.held.length >= 4], [1, [], [], 1, null, true]);
+  eq('  「연장」 공고는 두 읽기가 같아도 마감을 싣지 않는다 (받아 두지 못한 연장 공고문이 진짜 마감을 갖고 있을 수 있다)',
+    [CR.agree(A1, A1, ITEM).final.deadline?.date || null, CR.agree(A1, A1, { ...ITEM, attachments: [{ name: '2026년 든든 학업지원금 연장 공고문.pdf' }] }).final.deadline], ['2026-11-23', null]);
+  const wonIn = createRequire(import.meta.url)('../parse-amount.js').wonIn;
+  const be = CR.buildEntry(ITEM, SRC, { ...base, eligibility: A1.kept.eligibility, amount: ['1인당 상한액 100만 원'] }, { ...base, eligibility: A1.kept.eligibility, amount: ['1인당 상한액 100만 원'] }, wonIn);
+  eq('  한 건 만들기 — 맨 위 금액은 문구에서 숫자만 · 둘 다 「읽을 내용 없음」이거나 실을 줄이 없으면 싣지 않는다(무료 길 그대로)',
+    [be.entry.head, be.entry.eligibility.length, CR.buildEntry(ITEM, SRC, { ...base, unreadable: true }, { ...base, unreadable: true }, wonIn).entry, CR.buildEntry(ITEM, SRC, base, base, wonIn).entry], [1000000, 2, null, null]);
+  eq('  지시문이 바뀌면 원문이 같아도 해시가 달라진다(다시 읽는다) · 같은 원문은 같은 해시', [CR.sourceHash('가') === CR.sourceHash('가'), CR.sourceHash('가') === CR.sourceHash('나'), /update\(SYSTEM\)/.test(readText(new URL('../collector/card-read.mjs', import.meta.url)))], [true, false, true]);
+
+  /* ③ 진짜 로봇을 임시 폴더에서 — 스위치 · 가짜 응답 · 같은 원문 다시 안 읽기 · registered.json 안 건드림 */
+  const soon = new Date(Date.now() + 20 * 86400000).toISOString().slice(0, 10);
+  const body = `${SRC}\n${'장학금 지원 대상자 선발 안내 본문입니다 '.repeat(12)}`;
+  const regItem = { id: 'x-1', name: ITEM.name, type: '교외', sourceUrl: 'https://example.ac.kr/notice?no=1', deadline: soon, listedAt: new Date().toISOString().slice(0, 10), amountValue: 0, attachments: [], eligibility: {} };
+  const regText = `${JSON.stringify({ items: [regItem] }, null, 1)}\n`;
+  const sb = crSandbox(new URL('../', import.meta.url), 'hdj-card-read-');
+  try {
+    sb.write('data/registered.json', regText);
+    sb.write('collector/extracted/notices-text.json', [{ title: ITEM.name, school: '시험대학교', url: regItem.sourceUrl, text: body }]);
+    const off = sb.run('collector/card-read.mjs', ['--write'], {}, 30000);
+    eq('③ 스위치가 꺼져 있으면(설정 파일 없음 = 꺼짐 · CARD_READ_ENABLE 없음) --write 여도 부르지 않고 0 으로 끝난다 · 결과 파일을 만들지 않는다',
+      [off.status, /부르지 않았습니다/.test(off.out), sb.exists('data/card-read.json')], [0, true, false]);
+    sb.write('collector/card-read-config.json', { enabled: true });
+    const half = sb.run('collector/card-read.mjs', ['--write'], {}, 30000);
+    eq('  설정만 켜져 있고 환경 변수가 없으면 여전히 부르지 않는다 (스위치는 둘 다여야 한다)', [half.status, /부르지 않았습니다/.test(half.out), sb.exists('data/card-read.json')], [0, true, false]);
+    const good = { ...base, title: '2026년도 통영시 저소득 대학생 장학금 지원 대상자 선발 안내', host: '통영시',
+      eligibility: ['학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 자', '재산 3억 이하인 자'], excludes: ['대학원생, 휴학생'], amount: ['1인당 상한액 100만 원'],
+      deadline: { date: '2026-11-23', quote: '신청기간: 2026.11.2.(월)~2026.11.23.(월)' }, apply: ['방문 또는 우편 신청'] };
+    sb.write('fake.json', { 'x-1': { a: good, b: { ...good, eligibility: good.eligibility.slice(0, 1) } } });
+    const run1 = sb.run('collector/card-read.mjs', ['--write'], { CARD_READ_FAKE: sb.abs('fake.json') }, 30000);
+    const got = (sb.json('data/card-read.json') || {}).items || {}, led = sb.json('collector/card-read-ledger.json') || {};
+    eq('  가짜 응답으로 돌리면 결과 파일에 그 공고가 실린다 — 지어낸 줄(「재산 3억 이하」)은 빠지고 · 금액 숫자 · 마감 · 장부에 버린 줄이 남는다',
+      [run1.status, (got['x-1'] || {}).eligibility, (got['x-1'] || {}).head, ((got['x-1'] || {}).deadline || {}).date, (led['x-1'] || {}).done, ((led['x-1'] || {}).dropped || []).length],
+      [0, ['학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 자'], 1000000, '2026-11-23', true, 1]);
+    if (run1.status !== 0) console.log(run1.out.slice(-800));
+    eq('  🔴 registered.json 은 한 글자도 안 바뀐다 (무료 길 값이 비상망으로 남는다)', sb.read('data/registered.json') === regText, true);
+    const run2 = sb.run('collector/card-read.mjs', ['--write'], { CARD_READ_FAKE: sb.abs('fake.json') }, 30000);
+    eq('  같은 원문은 다시 읽지 않는다 (대상 0건) · 실린 것은 그대로', [/대상 0건/.test(run2.out), Object.keys((sb.json('data/card-read.json') || {}).items || {})], [true, ['x-1']]);
+    sb.write('data/registered.json', { items: [{ ...regItem, deadline: '2020-01-01' }] });
+    sb.run('collector/card-read.mjs', ['--write'], { CARD_READ_FAKE: sb.abs('fake.json') }, 30000);
+    eq('  마감이 지나 학생 화면에서 내려간 공고는 결과 파일에서도 뺀다', Object.keys((sb.json('data/card-read.json') || {}).items || {}), []);
+  } finally { sb.done(); }
+  const robot = readText(new URL('../collector/card-read.mjs', import.meta.url));
+  eq('  로봇이 registered.json 에 쓰는 줄이 없다 · 유료 호출은 스위치 둘 뒤에만 · 넘어져도 저장(finally save)',
+    [/writeFileSync\([^)]*registered/.test(robot), /cfg\.enabled === true && process\.env\.CARD_READ_ENABLE === '1'/.test(robot), /finally \{\s*data\.updatedAt = TODAY;\s*save\(\);/.test(robot)], [false, true, true]);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
