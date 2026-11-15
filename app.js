@@ -350,7 +350,10 @@ function deadlineTs(sch) {
 const CLOSED_KEEP_DAYS = 1;
 
 function dday(dateStr) {
-  if (!dateStr) return { label: '기한 원문 확인', cls: '', days: 14 }; // 마감을 확정 못 한 공고 — 목록에 유지
+  /* 마감을 확정 못 한 공고 — 목록에 유지(days 14 는 목록에서 안 사라지게 하는 값일 뿐 · 순서에 쓰지 말 것 — homeScore).
+     🔴 글자는 비운다 (2026-11-15 · 개발자 결정 11-02 "'모름' 같은 말이 보이면 신뢰가 떨어진다") — 예전 '기한 원문 확인'·'기한 확인 중'.
+        모르는 마감은 **아무것도 그리지 않는다**(지어내지 않는다). 모른다는 표시는 unknown 하나 — 글자로 판정하지 말 것 */
+  if (!dateStr) return { label: '', cls: '', days: 14, unknown: true };
   // 날짜끼리 비교해야 마감 다음 날 새벽에 D-DAY로 잘못 뜨지 않는다 (마감 당일=D-DAY, 지난 날=마감)
   const startOfToday = todayStart();
   const d = Math.round((new Date(dateStr + 'T00:00:00') - startOfToday) / 86400000);
@@ -372,8 +375,7 @@ function dday(dateStr) {
       맞췄다 — 목록과 상세가 마감을 다른 글자로 말하지 않는다.
    ⚠️ 달력은 날짜 자체가 내용이라 이 말을 쓰지 않는다(isoOf 그대로). */
 function ddayWords(d) {
-  if (!d) return '';
-  if (d.label === '기한 원문 확인') return '기한 확인 중';
+  if (!d || d.unknown) return '';   // 마감을 모르면 말하지 않는다(2026-11-15 · 예전 '기한 확인 중')
   return d.label;   // '마감' · 'D-DAY' · 'D-n' — dday() 가 낸 글자 그대로
 }
 
@@ -567,12 +569,9 @@ function splitTitleDates(title) {
 /* notStale(오래된 공고 숨김)은 match-engine.js에 있다 — 화면에서 숨긴 공고를
    알림으로는 알리는 모순이 생기지 않도록 알림 규칙도 같은 함수를 쓴다. */
 
-const STATUS_META = {
-  eligible:   { label: '신청 가능',        cls: 'ok' },
-  selective:  { label: '지원 가능 · 선발 심사', cls: 'sel' },
-  unknown:    { label: '정보 입력 필요',     cls: 'unk' },
-  ineligible: { label: '요건 미충족',       cls: 'no' },
-};
+/* 판정 알약 이름표(STATUS_META · '신청 가능'·'지원 가능 · 선발 심사'·'정보 입력 필요'·'요건 미충족')는 **지웠다** (2026-11-15) —
+   2026-11-02 시안 B 부터 어느 화면도 그리지 않는 죽은 표였고, '정보 입력 필요'는 개발자 결정 11-02(학생 화면에 '모름'류 글자 없음)에 걸린다.
+   되살리지 말 것 — 판정은 fitVerdict·cardBadgeHtml 이 말한다. */
 
 const APP_STEPS = ['신청 준비 완료', '공식 제출', '심사', '선정 발표'];
 
@@ -1724,6 +1723,11 @@ function fitTone(pct) {
   if (pct >= 20) return 'orange';
   return 'red';
 }
+/* 어긋난 요건이 없는 공고의 색 — 빨강·주황(경고색)은 미달에만 쓴다 (2026-11-15). 낮은 퍼센트는 노랑까지만 */
+function fitToneNoFail(pct) {
+  const t = fitTone(pct);
+  return t === 'red' || t === 'orange' ? 'yellow' : t;
+}
 
 /* 🔴 '미달인가'를 정하는 **단 한 곳** (2026-08-29 신설).
    배지는 여기를 보고, 목록 정렬도 여기를 본다. 예전에는 배지가 `fd.fails` 로,
@@ -1751,7 +1755,9 @@ function fitBadgeHtml(fit, fd, { full = false } = {}) {
      `eligibilityLines`만 읽어 구조화된 자격(flagsAny·tracks)을 못 봐서 '자격 미확인'이 떴다
      (2026-08-26 정렬 검증에서 발견). 미달을 모른다고 말하면 학생이 헛걸음한다. */
   const verdict = fitVerdict(fit, fd);
-  if (verdict === 'unread') return '<span class="badge badge-fit-unknown">자격 미확인</span>';
+  /* 🔴 자격을 못 읽었으면 **배지를 안 그린다** (2026-11-15 · 개발자 결정 11-02 — 예전 「자격 미확인」).
+     빈 글자를 돌려준다 — 이 갈래의 퍼센트(FIT_UNREAD 35%)는 정렬용이라 화면에 새면 지어낸 숫자가 된다. 순서(fitRank)는 그대로 아래다 */
+  if (verdict === 'unread') return '';
   if (verdict === 'no') return '<span class="badge badge-fit-no">지원 자격 미달</span>';
   /* 🔴 미달은 **숫자가 아니라 fails로** 판정한다 (2026-08-24). 0%를 안 쓰기로 하면서
      `pct === 0`이 영영 참이 되지 않아 '지원 자격 미달' 배지가 통째로 사라졌었다.
@@ -1771,9 +1777,13 @@ function fitBadgeHtml(fit, fd, { full = false } = {}) {
         `요건 6개 중 3개 충족 · 확인 필요 3`을 그대로 낸다.
      ⚠️ 색(fit-*)만으로 뜻을 전하지 않는다 — 퍼센트 숫자가 늘 함께 간다
         (색각 이상이 있는 학생에게 색은 아무 말도 하지 않는다). */
-  if (!full) return `<span class="badge badge-fit fit-${fitTone(fd.pct)}">적합도 ${fd.pct}%</span>`;
-  const note = fd.unknown > 0 ? ` · 확인 필요 ${fd.unknown}` : '';
-  return `<span class="badge badge-fit fit-${fitTone(fd.pct)}">적합도 ${fd.pct}% <em>요건 ${fd.total}개 중 ${fd.met}개 충족${note}</em></span>`;
+  /* 🔴 어긋난 요건이 없으면(여기 오는 것은 늘 그렇다 — 미달은 위에서 빠졌다) 빨강·주황을 쓰지 않는다 (2026-11-15) —
+     판정 못 한 요건이 분모에 있어 퍼센트가 낮을 뿐인데 경고색이면 '안 맞는다'로 읽힌다(틀린 미달처럼 보인다) */
+  const tone = fitToneNoFail(fd.pct);
+  if (!full) return `<span class="badge badge-fit fit-${tone}">적합도 ${fd.pct}%</span>`;
+  /* 상세 — 「적합도 n% · 맞는 요건 M개 · 어긋난 요건 없음」 (2026-11-15 · 예전 「요건 n개 중 m개 충족 · 확인 필요 k」).
+     판정 못 한 요건 수는 말하지 않는다(개발자 결정 11-02) — 그 줄들은 표시 없이 목록에 그대로 있다(eligibilityRowsHtml) */
+  return `<span class="badge badge-fit fit-${tone}">적합도 ${fd.pct}% <em>${fd.met > 0 ? `맞는 요건 ${fd.met}개 · ` : ''}어긋난 요건 없음</em></span>`;
 }
 
 /* 카드에 붙는 판정은 **하나뿐**이다 (2026-09-10 페이스리프트).
@@ -1794,17 +1804,16 @@ function cardBadgeHtml(fit, fd, myApp, sch) {
       : '<span class="badge badge-applied">신청 완료</span>');
   const v = fitVerdict(fit, fd);
   if (v === 'no') return '<span class="badge badge-fit-no">지원 자격 미달</span>';
-  if (v === 'unread') return '<span class="badge badge-fit-unknown">자격 미확인</span>';
+  if (v === 'unread') return '';   // 자격을 못 읽었으면 카드 알약도 없다(2026-11-15 · fitBadgeHtml 과 같은 규칙)
   /* 퍼센트 — 2026-08-31 개발자 지시('요건 없애고 퍼센테이지로')대로 숫자만.
      2026-09-10 페이스리프트가 이것을 알약이 아닌 **글자**로 낮췄는데(다섯 장 연속 같은 알약이
      제목보다 먼저 읽혔다), **2026-09-11 개발자 지시로 다시 알약**이 됐다 — "옅은 회색으로 잘
      보이지 않음". 모양은 style.css 파일 끝 '적합도 알약' 절이 정한다(여기 클래스 이름은 그대로). */
-  return fd ? '<span class="sch-fit fit-' + fitTone(fd.pct) + '">적합도 ' + fd.pct + '%</span>' : '';
+  return fd ? '<span class="sch-fit fit-' + fitToneNoFail(fd.pct) + '">적합도 ' + fd.pct + '%</span>' : '';
 }
 
 /* ---------------- 카드 렌더링 ---------------- */
 function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
-  const meta = STATUS_META[result.status];
   const d = dday(sch.deadline);
   /* 🔴 **'담았다'와 '다 했다'를 가른다** (2026-09-10 코드 리뷰에서 잡았다).
      예전에는 신청내역에 있기만 하면 '신청 완료' 배지를 달았다. 그런데 '한 번에 신청 준비'로
@@ -2688,7 +2697,7 @@ function renderFormFill(restore) {
       toast(!tpl.unofficial || tpl.prepKind === 'free'
         ? `양식 작성 완료 · 문서를 저장해 ${ch.label}에 제출하세요`
         : tpl.prepKind === 'unknown'
-          ? '지원문서 작성 완료 · 제출 양식·방법은 원문에서 확인한 뒤 내용을 옮기세요'
+          ? `지원문서 작성 완료 · 내용을 ${ch.label}의 접수 방법에 맞춰 옮겨 제출하세요`
           : `지원문서 작성 완료 · 내용을 ${ch.label}의 양식·입력 칸에 옮겨 제출하세요`);
       formFill = null;
       formProgressClear();   /* 신청내역에 정식으로 들어갔으니 '쓰던 것' 표시를 지운다 */
@@ -3156,6 +3165,16 @@ const KOSAF_NOISE = /제한없음|^(?:기관\s?확인\s?필요|해당\s?없음)[
    `※` 꼬리가 앞 줄에 붙어 **앱에 없는 줄**을 '못 읽는 줄'로 세고 있었다(`외국대학/사이버대학/대학원 학생 자세한 사항은 …`). 한 줄로 둘 것 · 도구가 글자로 읽는다 */
 const kosafSplit = (t) => String(t || '').split(/\s*[○ㅇ※]\s*/).map((x) => kosafClean(x)).filter((x) => x.length >= 4 && !KOSAF_NOISE.test(x));
 
+/* 층2 「공고 안내」 칸 값 (2026-11-15 · 개발자 결정 11-02) — 재단이 적어 둔 '모름' 표시(`기관확인필요`·`대학 확인 필요`·`… 각 대학 홈페이지 확인 필요`)는 화면에 싣지 않는다.
+   🔴 지우기만 한다 — 「확인 필요」 로 끝나는 마디(앞 세 낱말까지)를 떼고, 남는 말이 없으면 줄째 뺀다. 글자를 더하거나 고치지 않는다(남의 오타도 그대로) */
+function kosafNoticeValue(v) {
+  const t = kosafClean(v);
+  if (!t || KOSAF_NOISE.test(t)) return '';
+  if (!/확인\s?필요/.test(t)) return t;
+  const rest = t.replace(/(?:\S+\s){0,3}\S*확인\s?필요[요음]*/g, ' ').replace(/\s+/g, ' ').replace(/^[\s·,\-–]+|[\s·,\-–]+$/g, '').trim();
+  return rest.replace(/\s/g, '').length >= 4 ? rest : '';
+}
+
 /* 카드·시트에 보이는 **혜택 한 줄**. 원문 문단을 통째로 띄우지 않는다 —
    금액은 이미 parse-amount 가 읽어 뒀으니 그 숫자로 짧게 말하고, 조건은 상세 칸에서 본다.
    개발자 지적: "받을 수 있는 혜택만 간편하게 적어놔야지 원문 그대로 배껴놨네." */
@@ -3231,7 +3250,7 @@ function kosafAsScholarships() {
         ...(aExcl && aExcl.kind ? { exclusivity: aExcl } : {}),
         deadline: i.due || null,
         listedAt: (kosafUpdatedAt || '').slice(0, 10) || null,   // 마감 미상일 때 60일 규칙이 걸리게
-        period: i.due ? `접수 ~${i.due}` : (kosafClean(f['신청기간']) || '접수 기간 원문 확인'),
+        period: i.due ? `접수 ~${i.due}` : (kosafClean(f['신청기간']) || ''),   // 모르면 비운다(2026-11-15 · 예전 '접수 기간 원문 확인' — 「접수」 절이 기간 줄을 안 그린다)
         summary: `${i.org} — 한국장학재단 등록 장학금.`,
         eligibility: { selective: true },     // 구조화된 조건이 없으니 판정하지 않는다(=unknown)
         ...(lines.length ? { eligibilityLines: lines } : {}),
@@ -3260,7 +3279,7 @@ function kosafAsScholarships() {
            자격 판정을 못 붙이는 대신 재단이 쓴 것을 그대로 옮긴다 — 해석하지 않는다. */
         ...(kosafClean(f['선발인원']) ? { headcount: kosafClean(f['선발인원']) } : {}),
         /* 재단 칸 중 자격·서류·금액·문의 밖의 것(선발방법·선발인원·추천필요여부)은 「공고 안내」 줄로 — 「이름표: 값」 원문 그대로(승인 시안 2026-11-02) · 「해당없음」은 말이 없다 */
-        noticeLines: ['선발방법', '선발인원', '추천필요여부'].map((k) => [k, kosafClean(f[k])]).filter(([, v]) => v && !/해당\s*없음/.test(v)).map(([k, v]) => `${k}: ${v}`),
+        noticeLines: ['선발방법', '선발인원', '추천필요여부'].map((k) => [k, kosafNoticeValue(f[k])]).filter(([, v]) => v && !/해당\s*없음/.test(v)).map(([k, v]) => `${k}: ${v}`),
       };
     })
     /* 층2에도 앱 지원문서 (2026-10-13 ① · 개발자 "남은 것 모두 진행") — 머리말은 forms.js prepKindFor 의 'kosaf'(재단 접수 방법은 공고문 확인) */
@@ -4248,7 +4267,7 @@ function bulkTags(sch) {
       for (const c of (parseLine(line).conds || [])) bulkCondWords(c, L).forEach(add);
     }
   }
-  return out.length ? out.slice(0, BULK_TAG_MAX) : ['자격 원문 확인'];
+  return out.slice(0, BULK_TAG_MAX);   // 못 읽었으면 칩 없음(2026-11-15 · 예전 '자격 원문 확인')
 }
 
 /* 목록 한 줄. 겉은 넷(체크·제목·자격 단어·금액)이고 나머지는 <details> 안이다.
@@ -4264,24 +4283,22 @@ function bulkRowHtml(sch) {
       <div class="bulk-main">
         <p class="bulk-name">${esc(sch.name)}${bulkNeedsWork(sch) ? '<span class="badge badge-pending">서류 작성 필요</span>' : ''}</p>
         <p class="bulk-tags">${bulkTags(sch).map((x) => `<span class="chip-sm">${esc(x)}</span>`).join('')}</p>
-        <p class="bulk-amount">${esc(sch.amount || '금액 원문 확인')}</p>
+        ${amountLine(sch).text ? `<p class="bulk-amount">${esc(amountLine(sch).text.replace(/^금액 · /, ''))}</p>` : ''}${/* 모르는 금액은 줄 없음(2026-11-15 · amountLine 한 곳 · 예전 '금액 원문 확인') */ ''}
         <details class="bulk-more">
           <summary>더보기</summary>
           <div class="bulk-badges">
             <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${esc(sch.type)}</span>
-            ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
+            ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : (ddayWords(d) ? `<span class="badge badge-dday ${d.cls}">${esc(ddayWords(d))}</span>` : '')}
             ${/* 🔴 '자동 등록 · 검수 전' 배지를 뺐다 (2026-09-17 개발자 지시 — 내부 공정은
                  관리자에게만). 운영 원칙 2 의 '정직한 표시'는 **학생이 판단에 쓸 수 있는 것**을
                  감추지 말라는 뜻이고, 우리 검수 공정의 단계는 거기 해당하지 않는다.
                  세는 곳은 관리자 '오늘 할 일'의 검수 전 카드 둘이다(_admin/admin.js). */ ''}
           </div>
-          <p class="bulk-meta">${sch.deadline
-            ? `마감 ${esc(sch.deadline.replace(/-/g, '.'))}`
-            : '마감 기한 미확인 — 공고 원문에서 꼭 확인하세요'}</p>
+          ${sch.deadline ? `<p class="bulk-meta">마감 ${esc(sch.deadline.replace(/-/g, '.'))}</p>` : ''}${/* 마감을 모르면 줄 없음(2026-11-15) */ ''}
           <p class="bulk-meta">${esc(submitChannelLabel(sch))}</p>
           ${reqs.length
             ? `<p class="bulk-meta-head">지원자격 (공고 원문)</p><ul class="bulk-reqs">${reqs.map((r) => `<li>${esc(r)}</li>`).join('')}</ul>`
-            : '<p class="bulk-meta">지원 자격은 공고 원문에서 확인하세요</p>'}
+            : ''}
         </details>
       </div>
     </div>`;
@@ -4311,7 +4328,7 @@ function estOpt(m, opt) {
 function amountDetailRow(m, opt) {
   const o = opt || {};
   const sch = m.ref, a = sch.amountSpec || null;
-  const val = o.text || (m.won ? won(m.won) : '금액 원문 확인');
+  const val = o.text || (m.won ? won(m.won) : '');   // 모르는 금액은 비운다(2026-11-15 · 예전 '금액 원문 확인' — 갈래 이름이 이미 그 사실을 말한다)
   /* 줄을 누르면 **그 공고의 상세 시트**가 뜬다 (2026-08-27 개발자 지시로 변경).
      처음엔 장학금 탭으로 옮겨 그 카드를 찾아 스크롤했는데, 카드를 못 찾으면(필터·정렬·
      마감 숨김) 아무 일도 안 일어난 것처럼 보였다. 지금은 찾아가지 않고 **바로 연다** —
@@ -4330,7 +4347,7 @@ function amountDetailRow(m, opt) {
   const exRaw = sch.exclusivity && sch.exclusivity.raw ? unent(sch.exclusivity.raw) : '';
   return `<div class="${cls}" data-goto="${esc(sch.id)}" role="button" tabindex="0">
     <div class="ad-top"><p class="ad-name">${esc(sch.name || '')}</p>
-      <p class="ad-val ${o.tone || ''}">${o.check ? '<span class="ad-chk">✓</span>' : ''}${esc(val)}</p></div>
+      ${val || o.check ? `<p class="ad-val ${o.tone || ''}">${o.check ? '<span class="ad-chk">✓</span>' : ''}${esc(val)}</p>` : ''}</div>
     ${o.note ? `<p class="ad-note">${esc(o.note)}</p>` : ''}
     ${merged ? `<details><summary>${esc(schoolOfNotice(m.mergedFrom[0]) || '다른 학교')} 외 ${merged}건</summary>
       <div class="ad-list"><span>같은 재단이 여러 학교에서 접수하는 공고. 1건으로 합산.</span>
@@ -4342,7 +4359,7 @@ function amountDetailRow(m, opt) {
        금액이 첨부파일이나 제목에만 있어 사람이 손으로 넣은 공고가 있다 — 화면에 금액이
        뜨는데 근거를 하나도 못 보여 주는 상태로 두면 안 된다(개발자 지적 2026-08-27).
        게시판 목록 주소인 공고는 '원문 공고'라고 쓰면 거짓말이라 라벨을 바꾼다. */
-    : (o.text || m.won ? amountSourceLinkHtml(sch) : '')}
+    : (o.text || m.won || o.srcLink ? amountSourceLinkHtml(sch) : '')}
   </div>`;
 }
 
@@ -4392,7 +4409,7 @@ function renderAmountDetail(keepScroll) {
         <p class="ad-total-amt">${bill.assumedWon > 0 ? '약' : '최대'} ${won(bill.total)}</p>
         <p class="ad-total-sub">${bill.assumedWon > 0
           ? `금액을 못 읽은 ${bill.assumed.length}건은 어림잡아 더함`
-          : `확인된 금액만 합산${bill.unknown.length ? ` · 미확인 ${bill.unknown.length}건 제외` : ''}`}</p>
+          : `금액을 읽은 공고만 합산${bill.unknown.length ? ` · 못 읽은 ${bill.unknown.length}건 제외` : ''}`}</p>
       </div>
       ${grp('합산', `${bill.added.length}건 · ${won(sum(bill.added))}`, '',
         bill.added.map((m) => amountDetailRow(m, estOpt(m, { tone: 'on' }))).join(''),
@@ -4409,16 +4426,17 @@ function renderAmountDetail(keepScroll) {
         '등록금 비율로 적힌 공고는 없어요')}
       ${/* 🔴 홈 히어로가 이 몫을 어림잡아 더하므로(2026-09-17 개발자 지시) 이 칸도 그렇게
            적어야 한다 — 합계에 넣어 놓고 '0원'이라고 적으면 두 숫자가 서로 다른 말을 한다.
-           🔴 줄마다의 금액은 여전히 '금액 원문 확인'이다: 어림잡은 것은 **합계 한 곳**이지
+           🔴 줄마다의 금액은 여전히 비어 있다(2026-11-15 · 예전 '금액 원문 확인'): 어림잡은 것은 **합계 한 곳**이지
               그 공고의 금액이 아니다(원칙 8-1 · parse-amount.js sumAmounts ④). */ ''}
-      ${grp('금액 미확인', bill.assumedWon > 0
+      ${/* 갈래 이름 '금액 미확인' → '금액을 못 읽은 공고' (2026-11-15 · 개발자 결정 11-02 '미확인'류 글자 없음 · 히어로 아랫줄 「금액을 못 읽은 n건」과 같은 말) */ ''}
+      ${grp('금액을 못 읽은 공고', bill.assumedWon > 0
           ? `${bill.unknown.length}건 · 어림 ${won(bill.assumedWon)}`
           : `${bill.unknown.length}건 · 0원`,
         bill.assumedWon > 0
           ? `원문에 금액이 없거나 첨부파일에만 있는 공고입니다. 이 중 ${bill.assumed.length}건은 위 합계에 한 건당 ${won(bill.assumedEach)}(확인된 공고들의 중앙값)으로 어림잡아 더했습니다 — 실제 금액과 다를 수 있습니다.`
           : '원문에 금액이 없거나 첨부파일에만 있는 공고입니다.',
         bill.unknown.length ? `<details><summary>공고 ${bill.unknown.length}건 보기</summary>
-          ${bill.unknown.map((m) => amountDetailRow(m, { dim: true, tone: 'off', text: '금액 원문 확인' })).join('')}</details>` : '',
+          ${bill.unknown.map((m) => amountDetailRow(m, { dim: true, tone: 'off', srcLink: true })).join('')}</details>` : '',
         '모든 공고의 금액을 확인했습니다.')}
       <p class="ad-foot">모든 금액은 공고 원문 기준입니다.<br>선발 결과에 따라 실제 수혜액은 달라질 수 있습니다.</p>
     </div>`;
@@ -4454,7 +4472,7 @@ function bulkRefresh() {
   /* 금액을 확인 못 한 공고는 합계에 넣지 않는다 — 지어낸 숫자를 섞지 않는다(원칙 8-1).
      홈 히어로의 '금액 미확인 n건 제외'와 같은 규칙이다. */
   const unknown = picked.filter((sch) => !sch.amountValue).length;
-  $('#bulk-sum').textContent = `선택 ${picked.length}건 · 최대 ${won(total)}${unknown ? ` · 금액 미확인 ${unknown}건 제외` : ''}`;
+  $('#bulk-sum').textContent = `선택 ${picked.length}건 · 최대 ${won(total)}${unknown ? ` · 금액을 못 읽은 ${unknown}건 제외` : ''}`;
   const all = $('#bulk-all');
   if (all) all.checked = picked.length === bulkPrep.list.length;
   $$('#detail-sheet [data-bulk]').forEach((box) => {
@@ -4681,10 +4699,12 @@ const fmtDay = (iso) => { const s = String(iso || ''); if (!/^\d{4}-\d{2}-\d{2}$
 const isActivityItem = (x) => !!(x.activity || x.api || (x.kind && !x.type));   // 활동 글(피드 항목·activityAsSch 사본)인가 — 장학 공고는 type 이 있다
 function sheetHeadHtml({ x, d, save }) {
   const org = isActivityItem(x) ? activityHostLine(x) : cardProviderLine(x);
-  const dd = x.program ? '<span class="badge badge-dday badge-program">상시 제도</span>' : (d ? `<span class="badge badge-dday ${d.cls}">${esc(ddayWords(d))}</span>` : '');   // 상시 제도는 마감 자리에(카드 아랫줄과 같은 글자)
+  const dw = d ? ddayWords(d) : '';   // 마감을 모르면 빈 글자 — 배지를 안 그린다(2026-11-15 · 예전 「기한 확인 중」)
+  const dd = x.program ? '<span class="badge badge-dday badge-program">상시 제도</span>' : (dw ? `<span class="badge badge-dday ${d.cls}">${esc(dw)}</span>` : '');   // 상시 제도는 마감 자리에(카드 아랫줄과 같은 글자)
   return `<div class="sch-top sheet-top">${kindChipHtml(x)}${org ? `<span class="sch-org">${esc(org)}</span>` : ''}${dd}${save}</div>`;
 }
-/* 「접수」 절의 세 줄 — 기간은 접수 시작~마감(둘 다 날짜일 때만 · 아니면 원문 기간 문구 · 없으면 원문 확인) · 방법은 원문 문장(noApply·메일·포털·재단) · 서류는 읽은 것만 */
+/* 「접수」 절의 세 줄 — 기간은 접수 시작~마감(둘 다 날짜일 때만 · 아니면 원문 기간 문구) · 방법은 원문 문장(noApply·메일·포털·재단) · 서류는 읽은 것만.
+   🔴 모르는 줄은 **안 그린다** (2026-11-15 · 개발자 결정 11-02 — 예전 「기간 원문 확인」·「방법 원문 확인」). 세 줄 다 없으면 「접수」 절이 통째로 없다(「지원 자격」 칸과 같은 규칙 · 2026-11-07) */
 function applySectionHtml(sch, opts) {
   const act = (opts && opts.activity) || null;   // 활동 글의 서류는 그 글이 원문 「제출서류」 절에서 읽은 것(collector activityDocuments · 2026-10-30) — 없으면 서류 줄이 없다
   const from = fmtDay(sch.openDate), to = fmtDay(sch.deadline);
@@ -4693,23 +4713,24 @@ function applySectionHtml(sch, opts) {
     : (/\d/.test(rawPeriod) && !providerUnknown(rawPeriod)) ? rawPeriod
     : to ? `~ ${to}`
     : /상시/.test(rawPeriod) ? '상시'
-    : '원문 확인';
+    : '';
   const method = sch.noApply ? sch.noApply
     : sch.applyEmail ? (sch.applyEmailSource || `메일 ${sch.applyEmail}`)
     : sch.applyPortalSource ? sch.applyPortalSource
     : sch.sourceKind === 'kosaf' ? '재단 선발 공고문·홈페이지가 정한 접수 방법'
-    : '원문 확인';
+    : '';
   const docs = (act ? act.documents || [] : sch.documents || []).filter((doc) => !DOC_PLACEHOLDER.test(doc));
   const row = (k, v) => `<li><b class="ns-k">${k}</b>${esc(v)}</li>`;
   const docText = docs.map((d) => String(d).replace(/^[\s\-–—•\u25AA\u25AB\u25FD\u25FE■□▣○●◆◇·ㆍ*]+/, '').trim()).filter(Boolean).join(' · ');   // 원문 글머리 기호(■·○)는 뗀다 — 점으로 잇는 한 줄이라 기호가 두 겹(실화면 2026-11-02)
-  return `<h4>접수</h4><ul class="doc-list notice-summary apply-rows">${row('기간', period)}${row('방법', method)}${docText ? row('서류', docText) : ''}</ul>`;
+  const rows = `${period ? row('기간', period) : ''}${method ? row('방법', method) : ''}${docText ? row('서류', docText) : ''}`;
+  return rows ? `<h4>접수</h4><ul class="doc-list notice-summary apply-rows">${rows}</ul>` : '';
 }
 function sheetSectionsHtml({ sch, result, fit, fd, activity = null, noticeLines = [] }) {
   /* ① 지원 자격 — 판정은 eligibilityRowsHtml·fitBadgeHtml 그대로(알약 status-pill 은 없다 · 두 축의 말이라).
      🔴 넣을 줄이 없고 물을 것도 없으면 **칸 자체를 안 그린다** (2026-11-07 개발자 지시 "지원자격을 못읽은경우에도 내용 없는 지원자격 칸이 있음 … 칸 자체를 없애기" —
      11-02 시안의 「원문에서 확인」 한 줄(칸은 늘 있음)을 뒤집었다). 장학 카드는 「자격 미확인」 배지가 그 사실을 말하고, 활동 카드엔 그 배지가 없어(아래 noticeCardHtml 10-03 결정)
      활동 시트는 이제 아무 데서도 말하지 않는다 — 개발자 지시대로다(리뷰 2026-11-07). */
-  const rows = eligibilityRowsHtml(sch, result).replace(/<li class="r-unk">\? 지원 자격은 [^<]*<\/li>/g, '');
+  const rows = eligibilityRowsHtml(sch, result);   // 못 읽은 공고는 빈 글자(2026-11-15 · 예전엔 「? 지원 자격은 …」 줄을 여기서 걷어냈다)
   const ask = eligAskHtml(sch);
   const elig = (rows || ask) ? `<div class="sheet-verdict"><h4>지원 자격</h4><span class="verdict-marks">${fitBadgeHtml(fit, fd, { full: true })}</span></div>
       <ul class="reason-list">${rows}</ul>
@@ -4750,6 +4771,16 @@ function sourceLinkHtml(sch) {
   const href = safeUrl(link.href);
   if (href) return `<a href="${esc(href)}" target="_blank" rel="noopener">${esc(link.label)}</a>`;
   return sch.sourceKind === 'kosaf' ? '' : '원문 공고 확인';
+}
+
+/* 판정에 쓸 학생 정보가 없어 못 맞춰 본 요건 → 그 요건 한 줄 (2026-11-15). 이름은 match-engine evaluate 의 missing 그대로 받는다.
+   🔴 지어내지 않는다 — 숫자는 공고의 조건 값, 중복 수혜는 원문 문장(exclusivity.raw)이다. 모르는 이름이면 줄을 만들지 않는다 */
+function missingReqText(m, sch) {
+  const e = (sch && sch.eligibility) || {};
+  if (m === '직전학기 평점' && e.minGpa != null) return `직전학기 평점 ${e.minGpa} 이상`;
+  if (m === '학자금 지원구간' && e.maxBracket != null) return `학자금 지원구간 ${e.maxBracket}구간 이내`;
+  if (m === '지금 받고 있는 장학금') return sch.exclusivity && sch.exclusivity.raw ? unent(String(sch.exclusivity.raw)).replace(/\s+/g, ' ').trim() : '';
+  return '';
 }
 
 /* 상세 시트의 '지원 자격' 줄들 — 장학(openDetail)과 대외활동·공모전(openActivityDetail)이 **한 함수**를 쓴다 (2026-10-01 개발자 지시:
@@ -4794,7 +4825,9 @@ function eligibilityRowsHtml(sch, result) {
     const bad = /미달/.test(r) || (/필요|아니에요|가능$/.test(r) && !/충족|확인/.test(r));
     return `<li class="${bad ? 'r-bad' : 'r-ok'}">${bad ? '✕' : '✓'} ${esc(r)}</li>`;
   }).join('')
-    + result.missing.map((m) => `<li class="r-unk">? ${esc(m)} 정보를 입력하면 정확히 판단할 수 있습니다</li>`).join('');
+    /* 🔴 판정 못 한 요건은 **표시 없이 요건 그대로** (2026-11-15 · 개발자 결정 11-02 — 예전 「? ○○ 정보를 입력하면 정확히 판단할 수 있습니다」).
+       줄은 버리지 않는다(요건이 사라지면 학생이 모른 채 지원한다) — 글자는 그 공고의 조건 값·원문 문장이다(missingReqText) */
+    + result.missing.map((m) => missingReqText(m, sch)).filter(Boolean).map((t) => `<li class="r-req">${esc(t)}</li>`).join('');
 
   /* 지원 자격 한 덩어리 — 원문 요건을 먼저 보여 주고, 그 아래에 '내 정보로 확인한 것'을 붙인다.
      앱이 판정할 수 있는 건 성적·소득구간·학년 같은 숫자 조건뿐이고, 원문의 '유자녀' 같은 항목은
@@ -4896,14 +4929,12 @@ function eligibilityRowsHtml(sch, result) {
   }
   if (!reasonRows) {
     /* 원문 요건도 못 읽었고 판정할 조건도 없는 경우 — '제한이 없다'가 아니라 **모른다**는 뜻이다.
-       원문에서 '제한 없음'을 확인한 공고만 eligibilityVerified로 확신 문구를 낸다. */
-    /* '아래 공고 원문'은 아래 링크가 **그 공고로 갈 때만** (2026-10-03 · 원문 링크 정직성) — 재단 홈페이지(층2)·게시판 목록·
-       기관 첫 화면이면 '아래 링크'라고만 한다. 종류는 sourceLink 한 곳(활동 시트는 id 의 'act:' 뒤가 그 글 주소다 · activityAsSch). */
-    const actUrl = String(sch.id || '').replace(/^act:/, '');
-    const below = sourceLink(sch.activity ? (activityItem(actUrl) || { url: actUrl }) : sch, 'detail').cls === 'post' ? '아래 공고 원문' : '아래 링크';   // 글 원본(id 포함)으로 — id 열쇠 바로잡기도 같이 본다
+       원문에서 '제한 없음'을 확인한 공고만 eligibilityVerified로 확신 문구를 낸다.
+       🔴 못 읽었으면 **아무 줄도 없다** (2026-11-15 · 개발자 결정 11-02 — 예전 「? 지원 자격은 아래 링크에서 확인해 주세요 (지원자 중 선발 심사로 결정됩니다)」).
+       줄이 없으면 「지원 자격」 칸 자체가 안 그려진다(sheetSectionsHtml · 2026-11-07 지시) */
     reasonRows = sch.eligibilityVerified
       ? `<li class="r-ok">✓ 별도 자격 제한이 없는 공고입니다${result.status === 'selective' ? ' — 지원자 중 선발 심사로 결정됩니다' : ''}</li>`
-      : `<li class="r-unk">? 지원 자격은 ${below}에서 확인해 주세요${result.status === 'selective' ? ' (지원자 중 선발 심사로 결정됩니다)' : ''}</li>`;
+      : '';
   }
   return reasonRows;
 }
@@ -5365,7 +5396,7 @@ function rememberAmountBack() {
 }
 
 /* ── 자격 확인 도우미 — 못 읽은 자격을 그 자리에서 묻는다 (2026-09-17 · 노션 AI-1) ──
-   🔴 앱이 하는 말은 「미확인 자격 n」 하나다. 설명·약속 문장을 넣지 말 것 —
+   🔴 앱이 하는 말은 「맞춰 볼 자격 n」 하나다(2026-11-15 이름 바꿈 · 예전 「미확인 자격 n」 — 개발자 결정 11-02). 설명·약속 문장을 넣지 말 것 —
       앱이 아는 것은 공고에 적힌 요건 중 **자기가 읽어낸 것**뿐이고, 적는다고
       좋은 소식이 는 것도 아니다(적은 결과가 ✕ 일 수 있다). 설계 3-2.
    🔴 재사용을 화면이 말하지 않는다 (2026-09-17 개발자 결정) — 그렇게 동작하되
@@ -5400,7 +5431,7 @@ function eligAskHtml(sch) {
   if (!open) {
     return `<div class="elig-ask"><button type="button" class="elig-ask-open"`
       + ` data-elig-open="${esc(sch.id)}" aria-expanded="false">`
-      + `미확인 자격 <b>${left}</b>${ELIG_CHEV}</button></div>`;
+      + `맞춰 볼 자격 <b>${left}</b>${ELIG_CHEV}</button></div>`;   // 이름 「미확인 자격」 → 「맞춰 볼 자격」(2026-11-15 · 개발자 결정 11-02)
   }
   const rows = keys.map((k) => {
     const pv = state.profile || {};
@@ -5450,7 +5481,7 @@ function eligAskHtml(sch) {
     : '';
   return `<div class="elig-ask elig-ask-on">`
     + `<button type="button" class="elig-ask-head" data-elig-close="${esc(sch.id)}"`
-    + ` aria-expanded="true">미확인 자격 <b>${left}</b>${ELIG_CHEV}</button>`
+    + ` aria-expanded="true">맞춰 볼 자격 <b>${left}</b>${ELIG_CHEV}</button>`
     + `<div class="elig-ask-fields">${rows}</div>` + foot
     + `</div>`;
 }
@@ -5615,7 +5646,7 @@ function nextAction(app, sch, step, d, closed) {
     return closed
       ? { text: '접수가 마감됐어요. 제출하셨나요?',
           btn: `<button class="app-next-btn" data-mark-submit="${esc(app.id)}">제출했다고 기록</button>` }
-      : { text: `아직 제출 기록이 없어요 · ${sch.deadline ? '마감 ' + esc(d.label) : '마감 기한 미확인'}`,
+      : { text: `아직 제출 기록이 없어요${sch.deadline ? ' · 마감 ' + esc(d.label) : ''}`,   // 마감을 모르면 말하지 않는다(2026-11-15)
           btn: go('제출하러 가기') };
   }
   if (step === 1) return { text: '제출 기록됨 · 접수가 마감되면 심사로 넘어가요', btn: '' };
@@ -5648,12 +5679,10 @@ function docChecklistHtml(sch) {
      그래서 갈라서, 이런 항목은 세지 않고 '원문 확인' 한 줄로만 내놓는다. */
   const known = all.filter((doc) => !isUnknownDoc(doc));
   const unknown = all.length - known.length;
-  const note = unknown
-    ? '<p class="dc-unknown">이 밖의 제출 서류는 공고 원문에서 확인</p>'
-    : '';
-  if (!known.length) {
-    return '<p class="dc-unknown dc-only">제출 서류는 공고 원문에서 확인</p>';
-  }
+  /* 🔴 못 읽은 서류는 **아무 줄도 없다** (2026-11-15 · 개발자 결정 11-02 — 예전 「(이 밖의) 제출 서류는 공고 원문에서 확인」) — 세지도 않는다(위 주석 그대로) */
+  void unknown;
+  const note = '';
+  if (!known.length) return '';
   const certDocs = known;
   const marks = certDocs.map((doc) => ({ doc, st: docWalletStatus(doc) }));
   const tracked = marks.filter((m) => m.st);
@@ -5706,7 +5735,7 @@ function appLogHtml(app, sch, step) {
       </div>
       ${docChecklistHtml(sch)}
       <ul class="app-log-list">
-        ${row(!!closed, '접수 마감', sch.deadline ? esc(sch.deadline) + (closed ? ' 지남' : ' · ' + esc(d.label)) : '기한 미확인')}
+        ${sch.deadline ? row(!!closed, '접수 마감', esc(sch.deadline) + (closed ? ' 지남' : ' · ' + esc(d.label))) : ''}
         ${row(step >= 2, '심사', app.submittedAt && closed ? '진행 중' : '제출 기록과 마감 경과 후 표시')}
         ${row(!!app.result, '선정 발표',
           app.result ? (app.result === 'won' ? '선정 · ' : '미선정 · ') + esc(app.resultAt || '')
@@ -5982,7 +6011,7 @@ function calDayHtml(iso) {
        날짜를 열었을 때는 그 공고가 지금 어떤 상태인지 한 줄로 밝힌다. */
     const why = k.kind === 'wait' ? '발표 예정'
       : (calAwaiting(sch.id) && sch.deadline && dday(sch.deadline).days < 0)
-        ? (sch.announceDate ? '접수 마감 · 결과 대기' : '접수 마감 · 결과 대기 (발표일은 원문 확인)')
+        ? '접수 마감 · 결과 대기'   // 발표일을 모르면 말하지 않는다(2026-11-15 · 예전 「(발표일은 원문 확인)」)
         : '접수 마감';
     return `<p class="cal-why">${why}</p>` + calRowHtml(sch, { badge: false });
   }).join('');
@@ -6038,7 +6067,8 @@ function renderSaved() {
          사라지면 학생은 그 공고가 없는 줄 안다. 여기가 그 자리다. */ ''}
     ${/* 🔴 '날짜를 아직 읽지 못한' → '기한은 원문에서 확인' (2026-09-17 개발자 지시).
          앞은 우리가 못 한 일이고 뒤는 학생이 할 일이다. 건수는 관리자 '마감일 없음'이 센다. */ ''}
-    ${undated.length ? `<h5 class="cal-sec">마감일 확인 필요 ${undated.length}개</h5>
+    ${/* 이름 '마감일 확인 필요' → '날짜 없는 저장 공고' (2026-11-15 · 개발자 결정 11-02) — 달력에 못 찍는 저장 공고라는 사실만 말한다 */ ''}
+    ${undated.length ? `<h5 class="cal-sec">날짜 없는 저장 공고 ${undated.length}개</h5>
       ${undated.map((s) => calRowHtml(s, { save: true })).join('')}` : ''}
     ${closed.length ? `<details class="cal-kosaf">
         <summary>이미 마감된 저장 공고 ${closed.length}건</summary>
@@ -6212,10 +6242,11 @@ function renderApplications() {
               예전엔 `… · 서류 작성 필요 1건 · 선정된 장학금` 처럼 한 줄에 가운뎃점으로
               붙어 있어, 아래 금액의 이름표가 **네 번째 건수처럼** 읽혔다. */ ''}
          <p>준비 완료 ${prepared.length}건${inPrep.length ? ` · 준비 중 ${inPrep.length}건` : ''}${submitted.length ? ` · 제출·심사 중 ${submitted.length}건` : ''}${wonApps.length ? ` · 선정 ${wonApps.length}건` : ''}${pending.length ? ` · 서류 작성 필요 ${pending.length}건` : ''}</p>
-         <p class="summary-label">${wonApps.length ? '선정된 장학금' : '예상 최대 수혜액'}</p>
-         <p class="summary-amount">${shownAmount ? won(shownAmount) : '금액 미확인'}</p>
+         ${/* 합이 0 이면 금액 두 줄을 안 그린다(2026-11-15 · 예전 '금액 미확인' — '0원'도 쓰지 않는다: 한 푼도 못 받는다로 읽힌다) */ ''}
+         ${shownAmount ? `<p class="summary-label">${wonApps.length ? '선정된 장학금' : '예상 최대 수혜액'}</p>
+         <p class="summary-amount">${won(shownAmount)}</p>` : ''}
          <p class="summary-note">제출·발표는 각 공식 채널에서 · 결과는 여기에 기록${
-           shownAmount && unknownAmount ? ` · 금액 미확인 ${unknownAmount}건 제외` : ''}</p>
+           shownAmount && unknownAmount ? ` · 금액을 못 읽은 ${unknownAmount}건 제외` : ''}</p>
        </div>`
     : '';
 
@@ -6385,7 +6416,7 @@ function renderMy() {
     <div class="my-grid">
       <div><span>학년</span><strong>${p.year}학년 (${esc(p.status || '미설정')})</strong></div>
       <div><span>직전학기 평점</span><strong>${p.gpa != null ? p.gpa.toFixed(2) : '미입력'}</strong></div>
-      <div><span>지원구간</span><strong>${p.bracket != null ? p.bracket + '구간' : '모름'}</strong></div>
+      <div><span>지원구간</span><strong>${p.bracket != null ? p.bracket + '구간' : '미입력'}</strong></div>
       <div><span>공통 서류정보</span><strong>${commonFilled}/5 입력됨</strong></div>
     </div>
     ${/* 🔴 줄 셋을 뺐다 (2026-09-12 개발자 지시) — '특별자격: 해당 없음' · 공통 서류정보
@@ -6413,7 +6444,7 @@ function renderMyMenu(p, trackLabel) {
   }
   const info = $('#my-sub-info');
   /* 🔴 작은 글씨는 **상태·숫자만** (2026-10-10 은서 「멘트들이 너무 AI 같애」) — 설명을 덧붙이지 않는다 */
-  if (info) info.textContent = [p.gpa != null ? p.gpa.toFixed(2) : '평점 없음', p.bracket != null ? `${p.bracket}구간` : '구간 모름', p.status || ''].filter(Boolean).join(' · ');
+  if (info) info.textContent = [p.gpa != null ? p.gpa.toFixed(2) : '평점 없음', p.bracket != null ? `${p.bracket}구간` : '', p.status || ''].filter(Boolean).join(' · ');
   const set = $('#my-sub-settings');
   if (set) {
     const on = typeof notifyLedger !== 'undefined' && notifyLedger && notifyLedger.enabled && typeof Notification !== 'undefined' && Notification.permission === 'granted';
@@ -6514,8 +6545,8 @@ const FAQ_ITEMS = [
     '지금 공고 원문을 모으고 있는 학교가 정해져 있어요. 그 밖의 학교라도 <strong>전국 대상 공고</strong>와 <strong>한국장학재단이 아는 재단 장학금</strong>은 그대로 보입니다.'],
   ['공고·매칭', '자격 요건이 안 적힌 공고가 있어요.',
     '그 공고에서는 자격 요건을 <strong>공고 원문에서 직접 확인</strong>해 주세요. 앱이 짐작해서 채우지 않습니다 — 틀린 자격 판정은 모른다고 말하는 것보다 나쁘기 때문이에요.'],
-  ['공고·매칭', '금액이 "원문 확인"인 공고가 있어요.',
-    '공고 원문에 금액이 적혀 있지 않거나 첨부파일에만 있는 경우입니다. 그 공고의 카드에는 지어낸 숫자를 적지 않고 <strong>"금액 원문 확인"</strong> 그대로 둡니다. 다만 홈의 합계는 이런 공고를 빼 버리면 실제보다 작아지므로, <strong>금액을 확인한 공고들의 중앙값</strong>으로 어림잡아 더하고 숫자 앞에 "약"을 붙입니다. 자세한 내역은 홈의 금액을 눌러 <strong>금액 상세</strong>에서 볼 수 있어요.'],
+  ['공고·매칭', '금액이 안 보이는 공고가 있어요.',
+    '공고 원문에 금액이 적혀 있지 않거나 첨부파일에만 있는 경우입니다. 그 공고의 카드에는 지어낸 숫자를 적지 않고 <strong>금액 줄을 비워</strong> 둡니다. 다만 홈의 합계는 이런 공고를 빼 버리면 실제보다 작아지므로, <strong>금액을 확인한 공고들의 중앙값</strong>으로 어림잡아 더하고 숫자 앞에 "약"을 붙입니다. 자세한 내역은 홈의 금액을 눌러 <strong>금액 상세</strong>에서 볼 수 있어요.'],
   ['공고·매칭', '저장(북마크)한 공고는 어디에 남나요?',
     '<strong>이 기기에만</strong> 남습니다. 로그인해도 저장 목록은 서버로 올라가지 않아서, 기기를 바꾸면 다시 저장하셔야 해요.'],
   ['공고·매칭', '달력에 왜 몇 개만 표시되나요?',
