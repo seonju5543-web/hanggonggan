@@ -1348,6 +1348,8 @@ console.log('\n■ 신청 준비 시작 버튼 — 양식이 없어도 곧장 \'
     ['붙임2 장학_신청서.pdf', '[서식1] 활동계획서.hwp', '개인정보 수집·이용 동의서.docx'].map((n) => D.isApplicationForm({ name: n })), [true, true, true]);
   eq('  추천서·결과보고서·포스터 그림은 신청서가 아니다',
     ['[서식 2] 장학생 추천서.hwp', '활동 결과보고서.pdf', '포스터.png'].map((n) => D.isApplicationForm({ name: n })), [false, false, false]);
+  eq('  B3 공고문은 신청서가 아니다 — `사업계획서 및 업무처리기준.pdf`·`선발 공고문(신청서 포함).hwpx`·`모집요강.pdf` (2026-11-15 · 양식 로봇의 못 받음 목록에서 빠진다)',
+    ['붙임2_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf', '붙임1. 2026년 장학생 선발 공고문(신청서 포함).hwpx', '2027 모집요강.pdf'].map((n) => D.isApplicationForm({ name: n })), [false, false, false]);
   eq('🔴 층2 첨부는 이름에 신청서가 있어도 \'양식 다운로드형\'이라 부르지 않는다 (화면이 \'선발 공고문\'이라 부른다)',
     D.submitChannelKind({ sourceKind: 'kosaf', provider: '원주시청', attachments: [{ name: '지원신청서.hwp' }] }) === 'download', false);
   eq('  층1 은 그대로 다운로드형이다', D.submitChannelKind({ attachments: [{ name: '장학금 신청서.hwp' }] }), 'download');
@@ -4334,6 +4336,17 @@ console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
      37건을 그렇게 저장했다가 전부 다시 받았다. */
   const rb = readText(new URL('collector/rescue-bodies.mjs', root));
   eq('재수집은 화면에 그려진 줄바꿈을 그대로 받는다', /innerText\(/.test(rb), true);
+  /* 1단계 B5 (2026-11-15) — 봇 차단 뒤 물러서서 받은 화면이 그 글인지 묻는다 · 삭제 안내 꼴도 내려간 글 */
+  {
+    const NS = await import(new URL('collector/notice-source.mjs', root));
+    const others = ['2026학년도 2학기 성취장학생 선발 안내', '2026-2학기 국가근로장학금 신청 안내', '2026학년도 교내 봉사장학금 모집 공고', '2026년 하반기 글로벌 장학생 선발'];
+    eq('  물러선 화면 — 제목이 있고 다른 글 제목이 셋 미만이면 그 글 · 제목이 없으면 아니다 · 다른 등록 공고 제목이 셋 이상 보이면 목록 화면이다',
+      [NS.fallbackIsThisNotice('공지사항\n2026학년도 2학기 성취장학생 선발 안내\n1. 지원자격 …', '2026학년도 2학기 성취장학생 선발 안내', others).ok,
+        NS.fallbackIsThisNotice('공지사항 목록\n2026-2학기 국가근로장학금 신청 안내\n…', '2026학년도 2학기 성취장학생 선발 안내', others).ok,
+        NS.fallbackIsThisNotice(`공지사항\n${others.join('\n')}\n이전글 다음글`, '2026학년도 2학기 성취장학생 선발 안내', others).why], [true, false, '다른 글 제목 3개']);
+    eq('  재수집 로봇은 물러섰을 때만 그 판정을 거치고(fellBack) · `삭제된글·삭제사유·관리자 삭제` 는 내려간 글로 적는다',
+      [/fellBack \? fallbackIsThisNotice\(text, t\.it\.name/.test(rb), /same\.ok && hasText/.test(rb), /삭제된\\s\?글\|삭제\\s\?사유\|관리자\\s\?삭제/.test(rb)], [true, true, true]);
+  }
   /* 본문을 다듬을 때 **가로 공백만** 누른다 — `\s+`로 누르면 줄바꿈까지 사라진다.
      ⚠️ '파일 어디에도 \s+ 가 없다'로 검사하면 안 된다. 첨부 **이름**을 다듬는
      `textContent.replace(/\s+/g,' ')`는 정상이고 본문과 무관한데 거기 걸린다
@@ -5538,6 +5551,9 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
   eq('  신청서는 읽지 않는다', AT.isNoticeDoc('장학금 신청서.hwp'), false);
   eq('  개인정보 동의서도 읽지 않는다', AT.isNoticeDoc('개인정보 수집·이용 동의서.hwp'), false);
   eq('  선발원서도 서식이다', AT.isNoticeDoc('F_장학생 선발원서(제24기).docx'), false);
+  /* 1단계 B3 (2026-11-15) — 서식 낱말이 섞여도 공고문인 것이 분명한 꼴은 읽는다 */
+  eq('  B3 `사업계획서 및 업무처리기준.pdf`·`선발 공고문(신청서 포함).hwpx`·`선발계획` 은 공고문이다(계획서·신청서 낱말보다 공고문 낱말이 이긴다) · 맨 `활동계획서`·`신청서식` 은 여전히 서식',
+    ['붙임2_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf', '붙임1. 2026년 장학생 선발 공고문(신청서 포함).hwpx', '2026년 하반기 장학생 선발계획.hwp', '붙임1.멘토 활동계획서 양식.hwp', '신청서식.hwpx'].map((n) => AT.isNoticeDoc(n)), [true, true, true, false, false]);
   /* ② PDF는 자격 경로에서 쓰지 않는다 — 글자가 정확히 안 나온다.
         실측: 원문 `3년 이상`이 `년이상`으로 뽑혔다. 숫자 하나가 결론을 바꾸는 글이다. */
   eq('  PDF는 자격 경로에서 쓰지 않는다', AT.attachmentText('없는파일.pdf'), '');
@@ -12781,7 +12797,8 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
   eq('  자격 0줄이고 물을 것도 없으면 「지원 자격」 칸 자체가 없다(「원문에서 확인」 자리표시 줄 없음 · 2026-11-07) · 제외 조건은 같은 목록 안 ✗(r-x)',
     [/const elig = \(rows \|\| ask\) \? `<div class="sheet-verdict">/.test(sec), /자격은 원문에서 확인해 주세요/.test(sec), /class="r-elig r-x">✗ /.test(fnOf('eligibilityRowsHtml')), /지원 제외 대상/.test(fnOf('eligibilityRowsHtml'))], [true, false, true, false]);
   eq('  「접수」 = 기간 · 방법 · 서류(읽은 것만) — 방법은 원문 문장(noApply·메일·포털·재단)', [/row\('기간', period\)/, /row\('방법', method\)/, /docText \? row\('서류'/, /sch\.noApply \? sch\.noApply/, /재단 선발 공고문·홈페이지가 정한 접수 방법/].map((r) => r.test(fnOf('applySectionHtml'))), [true, true, true, true, true]);
-  eq('  「공고 안내」 는 다섯 줄 뒤 「더 보기」 · 층2 재단 칸(선발방법·선발인원·추천필요여부)도 같은 줄로', [/NS_SHOWN/.test(fnOf('noticeSummaryHtml')), /더 보기 \(\$\{rest\.length\}줄\)/.test(fnOf('noticeSummaryHtml')), /\['선발방법', '선발인원', '추천필요여부'\]/.test(fnOf('kosafAsScholarships'))], [true, true, true]);
+  /* 2026-11-15 은서 지시 — 「더 보기」 뒤 줄 수(「(2줄)」)는 뺀다 · 시트 목록 앞 점도 뺀다(style.css #detail-sheet 블록) */
+  eq('  「공고 안내」 는 다섯 줄 뒤 「더 보기」(줄 수 없이) · 층2 재단 칸(선발방법·선발인원·추천필요여부)도 같은 줄로', [/NS_SHOWN/.test(fnOf('noticeSummaryHtml')), /<summary>더 보기<\/summary>/.test(fnOf('noticeSummaryHtml')) && !/더 보기 \(/.test(fnOf('noticeSummaryHtml')), /\['선발방법', '선발인원', '추천필요여부'\]/.test(fnOf('kosafAsScholarships'))], [true, true, true]);
   eq('  「첨부」 — 층2는 꼬리표 「재단 선발 공고문」 · 「공고 원본 첨부 양식」 이름은 없다', [/<h4>첨부\$\{sch\.sourceKind === 'kosaf' \? ' <span class="channel-tag">재단 선발 공고문<\/span>' : ''\}<\/h4>/.test(sec), /공고 원본 첨부 양식|공고 원본 첨부</.test(appV)], [true, false]);
   eq('  없앤 것 — 「일정」 줄(scheduleRowHtml) · 「마감일 …」 줄(sheet-deadline) · 「이런 경우는 제외돼요」 · 「모집 안내」 · 「혜택」 절 · 「제출 서류」 절', [/function scheduleRowHtml|scheduleRowHtml\(/.test(appV), /class="sheet-deadline"/.test(appV), /<h4>모집 안내<\/h4>|<h4>혜택<\/h4>|<h4>제출 서류<\/h4>/.test(appV)], [false, false, false]);
   eq('  단추 한 벌 — 신청 준비 시작 / 원문에서 신청하기 ↗(source-link activityButton · 글 하나로 가는 주소일 때만) / 별도 신청 없음', [/'신청 준비 시작'/.test(od), /sourceLink\(n, 'activityButton'\)/.test(fnOf('activityLinkHtml')) && /\$\{activityLinkHtml\(n\)\}/.test(oa) && /activityButton: \{ page: '원문에서 신청하기 ↗'/.test(readText(new URL('../source-link.js', import.meta.url))), /별도 신청 없음 — 학교가 선발/.test(od)], [true, true, true]);

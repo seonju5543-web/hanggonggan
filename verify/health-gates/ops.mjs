@@ -619,4 +619,18 @@ export default async function gate(eq, ctx) {
     eq('  실제 앱 점검(check-live)은 주소를 한 곳에서 읽는다 · 경보 본문도 그 값을 쓴다',
       [/import \{ APP_BASE \} from '\.\/server\/shared\/app-address\.mjs'/.test(cl) && /SITE=\$\(/.test(cl), (cl.match(/\$\{\{ env\.SITE \}\}/g) || []).length >= 2], [true, true]);
   }
+
+  /* ── ⑫ 개인정보 고지가 실제와 같다 (2026-11-15 · 은서 · 남은 개인정보 위험) ──
+     앱 오류 기록을 Supabase(미국)로 보내기 시작했는데 약관 4번 '국외 이전' 표에는 없었고, '원하지 않으면 계정을 만들지 않으면 된다'는
+     문장이 틀린 말이 됐다(오류 기록은 계정 없이도 간다). 법이 요구하는 보유 기간·받는 곳 연락처도 빠져 있었다 */
+  {
+    const terms = read(root, 'terms.html');
+    const sec = (terms.split('4. 개인정보의 국외 이전')[1] || '').split('5. 개인정보의 파기')[0];
+    const errOn = /errorReport:\s*true/.test(read(root, 'supabase-config.js'));
+    eq('⑫ 🔴 오류 수집을 켰으면 국외 이전 표에 앱 오류 기록이 있고 · 계정 없이도 간다는 것을 적는다',
+      [!errOn || /앱 오류 기록/.test(sec), !errOn || /계정과 관계없이 전송/.test(sec)], [true, true]);
+    eq('  국외 이전 — 보유·이용 기간과 받는 곳의 개인정보처리방침(연락처)을 적는다', [/보유·이용 기간/.test(sec), /supabase\.com\/privacy/.test(sec) && /cloudflare\.com\/privacypolicy/.test(sec)], [true, true]);
+    eq('  기기에 남은 정보 지우는 법(공용 기기면 서류까지)을 약관이 알려 주고 · 그 선택칸이 앱에 실제로 있다',
+      [/데이터 초기화/.test(terms) && /서류 보관함 파일과 휴지통도 지우기/.test(terms), /id="wp-wipe-docs"/.test(read(root, 'app.js')) && /서류 보관함 파일과 휴지통도 지우기/.test(read(root, 'app.js'))], [true, true]);
+  }
 }
