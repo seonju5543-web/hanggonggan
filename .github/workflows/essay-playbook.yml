@@ -44,8 +44,8 @@ concurrency:
 jobs:
   learn:
     runs-on: ubuntu-latest
-    # 주소 10곳 × 넉넉히 30초 = 5분. 감사·저장까지 담는 그릇으로 15분.
-    timeout-minutes: 15
+    # 주소 10곳 × 넉넉히 30초 = 5분. 감사·저장까지 담는 그릇으로 15분 + 저장 앞 규칙 관문 5 (2026-11-15 G-16).
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
         with:
@@ -73,12 +73,16 @@ jobs:
 
       # 데이터 관문은 **저장 직전**에 둔다 (이슈 #79 의 교훈 — 앞에 두면 그 실행에서 안 잡히고
       # 다음 날 터진다). 규칙집이 깨지면 초안 서버가 통째로 못 뜬다.
+      # 🔴 규칙 관문(test-collector)도 저장 앞에 (2026-11-15 · 노션 G-16 · 관문 「로봇·도구 점검 관문」 savegate) — 이 로봇은 data/ 와
+      #    collector/essay-sources.json 을 쓴다. 감사만 거치면 test-collector 만 아는 규칙을 어긴 저장이 통과해 다른 로봇의 관문이 빨개진다.
       - name: 데이터 관문 (저장 직전)
         id: gate
         continue-on-error: true
+        timeout-minutes: 5
         run: |
           node -e "JSON.parse(require('fs').readFileSync('data/essay-playbook.json','utf8'))"
           node verify/verify-essay-guard.mjs
+          node verify/test-collector.mjs
           node verify/audit-data.js
 
       - name: 관문에 걸리면 되돌린다
