@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-14T16:27:15.624Z",
+ "updatedAt": "2026-11-15T15:50:52.238Z",
  "v": 1,
  "bad": {
   "https://blog.naver.com/kfdazzang/224463652864": {
@@ -20,10 +20,6 @@
   },
   "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277033&article.offset=0&articleLimit=10": {
    "v": "gone",
-   "at": "2026-11-15"
-  },
-  "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766606": {
-   "v": "home",
    "at": "2026-11-15"
   },
   "https://www.dongguk.edu/article/GENERALNOTICES/detail/26766635": {
@@ -83,10 +79,6 @@
    "at": "2026-11-15"
   },
   "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53682&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-   "v": "other",
-   "at": "2026-11-15"
-  },
-  "https://www.motir.go.kr/kor/article/ATCL8764a1224/155119233/view": {
    "v": "other",
    "at": "2026-11-15"
   },
