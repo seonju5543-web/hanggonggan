@@ -230,20 +230,6 @@
   "at": "2026-11-10",
   "tries": 1
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3504654": {
-  "at": "2026-11-11",
-  "tries": 1,
-  "lines": [
-   "활동구분",
-   "오프라인",
-   "-주 소 : 서울 광진구 자양동42(동남빌딩) · 국시원 맞은편",
-   "-활동인원 : 일 최대 3명 (대학생부터 신청 가능)",
-   "-활동요일 : 주중, 토요일 (13:30 ~ 17:30 최대 4시간) - 시간 협의 가능 (*봉사활동은 한 만큼 인정됩니다.*)",
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
  "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=141798&article.offset=0&articleLimit=10": {
   "at": "2026-11-11",
   "tries": 1
