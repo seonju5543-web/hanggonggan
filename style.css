@@ -3570,7 +3570,7 @@ button, input, select, textarea { letter-spacing: inherit; }
 /* 2026-11-15 개발자 승인 시안 1(docs/designs/mockups/activity-card-options.html) — 원문 아이콘을 **마감 옆(아랫줄 오른쪽 끝)** 으로 올린다.
    아이콘 혼자 한 줄을 쓰던 자리(아래 여백 24px)를 없애 카드가 한 줄 낮아진다 · 장학 카드도 같은 자리(2026-10-28 "다른 영역이 아니야").
    아랫줄은 아이콘 폭만큼 오른쪽을 비운다(마감 글자와 겹치지 않게) · 마감이 없는 카드도 아이콘 높이만큼은 줄이 선다 */
-.sch-card-wrap.has-link > .sch-card .sch-foot { padding-right: 28px; min-height: 18px; }
+.sch-card-wrap.has-link > .sch-card .sch-foot { padding-right: calc(var(--space-24) + var(--space-4)); min-height: 18px; }
 /* 활동 칩의 갈래 색 (같은 시안) — 봉사 초록 · 공모전 보라 · 대외활동 남색. 청년정책은 회색 그대로(시안에 없던 갈래 · --orange 는 빨강 색조라 '떨어진다'로 읽힌다 — DESIGN.md 12번). 장학 칩(교내·교외)은 그대로 */
 .badge-kind.badge-vol { background: var(--green-weak); color: var(--green); }
 .badge-kind.badge-contest { background: var(--purple-weak); color: var(--purple); }

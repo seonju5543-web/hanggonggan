@@ -13835,7 +13835,7 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
     const linkBlock = (css.match(/\.card-src-link \{([\s\S]*?)\}/) || [])[1] || '';
     eq('  카드 링크 자리는 style.css 에 있다(.card-src-link 오른쪽 아래 = 마감 옆 · 선 없음 · 글자 숨김 · 아이콘 마스크 · 아랫줄 오른쪽 비움 · 아이콘만의 아래 여백 없음)',
       [/right: var\(--space-20\); bottom: var\(--space-16\);/.test(linkBlock) && !/left:/.test(linkBlock), !/border-top/.test(linkBlock), /font-size: 0;/.test(linkBlock), /\.card-src-link::before \{[\s\S]*?mask: url\("data:image\/svg\+xml/.test(css),
-        /\.sch-card-wrap\.has-link > \.sch-card \.sch-foot \{ padding-right: 28px;/.test(css), /\.sch-card-wrap\.has-link > \.sch-card \{ padding-bottom:/.test(css)],
+        /\.sch-card-wrap\.has-link > \.sch-card \.sch-foot \{ padding-right: calc\(var\(--space-24\) \+ var\(--space-4\)\);/.test(css), /\.sch-card-wrap\.has-link > \.sch-card \{ padding-bottom:/.test(css)],
       [true, true, true, true, true, false]);
     eq('⑭ 자격 줄 — 안내 문장(`…모집합니다`·`…제공하고 있습니다`·`…하시기 바랍니다`·`첨부파일이(가) 없습니다`·`가능합니다`)은 아니다',
       ['2026 평택시민나눔문화축제에서 합정장애인주간보호센터 홍보부스 운영을 보조해주실 자원봉사자를 모집합니다.', '합정장애인주간보호센터는 사회복지법인 연꽃마을에서 운영하고 있으며, 성인발달장애인을 위한 프로그램을 제공하고 있습니다.',
