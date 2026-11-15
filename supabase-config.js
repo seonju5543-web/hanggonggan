@@ -35,6 +35,12 @@ const SUPABASE_CONFIG = {
      ⚠️ 배포된 주소에서만 보낸다(localhost 검사 환경은 안 보낸다 — error-report.js). */
   errorReport: true,
 
+  /* 이용 횟수 세기 (2026-11-15 · usage-report.js) — 어떤 공고를 보고 어떤 기능을 썼는지의 **횟수**만, 학년·계열·지역·학교 카테고리로.
+     누가 했는지는 담지 않는다 · 서버는 하루 합계에 1을 더할 뿐이다(supabase/migrations/0007_usage_counts.sql).
+     🔴 0007 을 SQL Editor 에서 실행하기 전에도 켜 둬도 앱은 멀쩡하다(요청이 404 로 끝날 뿐) · 배포 주소에서만 보낸다.
+     보는 곳: 관리자 사이트 「아침 지표」(_admin/morning.html) · terms.html 수집 항목 표와 한 세트. */
+  usageReport: true,
+
   /* 소셜 로그인 — 여기 적은 것만 화면에 버튼으로 나온다. **비워 두면 소셜 버튼이 없다.**
      ⚠️ 여기에 적는 것만으로는 안 되고, Supabase 대시보드에서 그 제공자를 켜고
         구글/카카오 쪽에서 발급받은 열쇠를 넣어야 실제로 동작한다:
