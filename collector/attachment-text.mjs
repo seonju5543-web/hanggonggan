@@ -26,8 +26,12 @@ import { pdfText } from './pdf-text.mjs';
    ⚠️ 이름에 신청서·서식이 들어가면 공고문이 아니다 — 자격이 아니라 빈칸이 들어 있다. */
 const FORMISH = /서식|양식|신청서|지원서|선발원서|동의서|서약서|추천서|계획서|증명|이력서|환산/;
 const NOTICEISH = /공고|안내|계획|모집|선발|요강|기준/;
+/* 🔴 이름에 서식 낱말이 섞여도 **공고문인 것이 분명한 꼴**(2026-11-15 · 1단계 B3): `사업계획서 및 업무처리기준.pdf`(푸른등대 — 본문이 '사업별 지원기준 상이'라 이 PDF 가 자격의 원문)
+   · `선발 공고문(신청서 포함).hwpx` · `장학생 선발계획`. `계획서` 하나로 신청서류에 밀려 자격 경로가 한 번도 안 읽었다(마감 전 첨부 9개). 서식 쪽은 annexCut 이 자른다. */
+const NOTICE_STRONG = /공고문|요강|선발\s?계획|시행\s?계획|지원\s?계획|업무\s?처리\s?기준|사업\s?계획서|(?:모집|선발)\s?공고/;
 export const isNoticeDoc = (name) => {
   const n = String(name || '');
+  if (NOTICE_STRONG.test(n)) return true;
   return NOTICEISH.test(n) && !FORMISH.test(n);
 };
 
