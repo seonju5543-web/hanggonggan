@@ -1,6 +1,6 @@
 {
  "school": "강원대학교",
- "updatedAt": "2026-11-14",
+ "updatedAt": "2026-11-15",
  "items": [
   {
    "title": "2026 문화예술·공과대학 ACE Festival 행사 안내",
@@ -392,29 +392,6 @@
    "foundAt": "2026-10-16",
    "thumb": "data/news/img/0cef514e6e10d70b.webp",
    "desc": "강원대학교 중앙박물관에서는 \"모두의 박물관 누구나 큐레이터\" (재학생 진로 탐색 프로그램)교육 참가자를 다음과 같이 모집하오니 희망자는 참여하시기 바랍니다."
-  },
-  {
-   "title": "2026년 제16회 영어말하기 대회 운영안내",
-   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11540&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "postedAt": "2026-10-15",
-   "kind": "생활",
-   "school": "강원대학교",
-   "campus": "",
-   "src": "784a7e0d",
-   "foundAt": "2026-10-15",
-   "thumb": "data/news/img/d0bed00369b8dc87.webp",
-   "desc": "강릉교양교육센터 주관 2026년 제16회 영어말하기 대회를 아래와 같이 개최하오니, 여러분들의 많은 참여바랍니다. ★ 신청 및 일정 관련 내용"
-  },
-  {
-   "title": "「2026년 강릉해람시민대학」 운영 (사전신청: ~11.4)",
-   "url": "https://www.kangwon.ac.kr/ko/bbs/504/detail.do?pstSn=11539&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0",
-   "postedAt": "2026-10-15",
-   "school": "강원대학교",
-   "campus": "",
-   "src": "784a7e0d",
-   "foundAt": "2026-10-15",
-   "thumb": "data/news/img/a5ee49b836fb28cd.webp",
-   "desc": "(운영대상) 강릉시 지역주민 및 대학구성원 (운영기간) 2026. 11. 10.(화) ~ 12.(목), 17.(화) ~ 18.(수) / 매일 18:30~21:00"
   }
  ]
 }

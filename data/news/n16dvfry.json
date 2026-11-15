@@ -1,6 +1,6 @@
 {
  "school": "아주대학교",
- "updatedAt": "2026-11-14",
+ "updatedAt": "2026-11-15",
  "items": [
   {
    "title": "[일자리+센터] 26하반기 모의면접 실전반-인성/역량 면접",
@@ -173,51 +173,6 @@
    "foundAt": "2026-10-16",
    "thumb": "data/news/img/f93b37c17c5dfa51.webp",
    "desc": "사회과학대학 교학팀 사회과학대학에서 공직진출설명회를 개최하오니 참여를 희망하시는 경우, 아래 링크를 통해 신청하여 주시기 바랍니다."
-  },
-  {
-   "title": "[공지] 2026-2학기 미등록자 구제등록 안내(10.26. ~ 10.30.)",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377523&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-15",
-   "kind": "학사",
-   "school": "아주대학교",
-   "campus": "",
-   "src": "e5299528",
-   "foundAt": "2026-10-15"
-  },
-  {
-   "title": "[앵커] 「G-FAIR KOREA 2026」 경기앵커 성과 홍보관 및 기업 단체관 운영 안내",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377534&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-15",
-   "kind": "생활",
-   "school": "아주대학교",
-   "campus": "",
-   "src": "e5299528",
-   "foundAt": "2026-10-15",
-   "thumb": "data/news/img/6157d06f43c051af.webp",
-   "desc": "- 운영 규모: 총 17부스(성과 홍보관 4부스, 기업 단체관 13부스)"
-  },
-  {
-   "title": "[홍보] 수원시 팔색길 걷기문화행사에 학생 여러분을 초대합니다~",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377512&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-15",
-   "school": "아주대학교",
-   "campus": "",
-   "src": "e5299528",
-   "foundAt": "2026-10-15",
-   "desc": "「제2회 팔색길 걷기 문화행사」 개요 # 집결장소: 광교호수공원 마당극장 (영통구 광교호수공원로 102)",
-   "thumb": "data/news/img/9bcc64be145a7fa8.webp"
-  },
-  {
-   "title": "[일자리+센터] 중간고사 준비 잠시 쉬어가기! 15분 투자로 챙기는 청년고용 혜택 설명회 개최",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377501&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-14",
-   "kind": "학사",
-   "school": "아주대학교",
-   "campus": "",
-   "src": "e5299528",
-   "foundAt": "2026-10-15",
-   "thumb": "data/news/img/ce8133fa0786c12e.webp",
-   "desc": "안녕하세요. 대학일자리플러스센터 입니다. 중간고사 준비로 지치고 몸도 마음도 지쳐가는 시기일텐데요."
   }
  ]
 }
