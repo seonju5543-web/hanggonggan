@@ -37,7 +37,7 @@ const ME_BRANCH_LABEL = _cr(import.meta.url)('../match-engine.js').BRANCH_LABEL;
 import { attachmentText, readableDoc, docOrder, isOcrSource } from './attachment-text.mjs';
 import { findApplyEmail, humanOwnedEmail, staleApplyEmail } from './apply-email.mjs';
 import { decodeEntities } from './clean-title.mjs';
-import { readDocuments, placeholderOnly as docsPlaceholderOnly } from './doc-list.mjs';
+import { readDocuments, placeholderOnly as docsPlaceholderOnly, DOC_PLACEHOLDER_LINE } from './doc-list.mjs';
 /* 포털 판정은 `apply-channel.js` 한 곳 — 앱·관리자 화면도 같은 파일을 쓴다(베끼지 말 것).
    ⚠️ `_cr` 는 위에서 이미 들여왔다 — 다시 import 하면 그 자리에서 죽는다(실제로 그랬다). */
 const { findApplyPortal } = _cr(import.meta.url)('../apply-channel.js');
@@ -938,7 +938,7 @@ const strip = makeStripper(texts);
 let eligDocs = {};
 try { eligDocs = JSON.parse(fs.readFileSync(new URL('extracted/elig-docs.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
 
-let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, fromTitle = 0, gotDeadline = 0, dlFromDoc = 0, gotOpen = 0, gotAnnounce = 0, gotApplyEmail = 0, droppedApplyEmail = 0, gotApplyPortal = 0, gotDocs = 0, gotFree = 0;
+let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, fromTitle = 0, gotDeadline = 0, dlFromDoc = 0, gotOpen = 0, gotAnnounce = 0, gotApplyEmail = 0, droppedApplyEmail = 0, gotApplyPortal = 0, gotDocs = 0, gotFree = 0, resetDocs = 0;
 let titleFixed = 0;   // 잘린 제목을 본문에서 보완한 공고(completeTitle)
 /* 공고문 첨부에서 자격 줄을 읽는다. 본문 경로와 원문 없는 경로가 **같은 함수**를 써야
    "본문 있을 땐 읽고 없을 땐 안 읽는" 어긋남이 안 생긴다. 스캔 PDF 등 글자가 안 나오는
@@ -1225,7 +1225,19 @@ function fillDocuments(it, body, docsFn) {
       if (r.docs.length) { got = r; from = docLabel((texts.files || [])[i]); break; }
     }
   }
-  if (!got.docs.length) return;
+  if (!got.docs.length) {
+    /* 🔴 로봇이 적은 옛 목록인데 지금 규칙으로 원문을 다시 읽으니 서류 목록이 없다 → 옛 목록은 안내 문장·심사 단계를 담은 잡음이었다(2026-11-15 doc-list 절 경계).
+       원문을 실제로 읽었을 때만(본문 또는 첨부 글자가 있을 때) 자리표시로 되돌린다 — 못 읽은 날 지우지 않는다. 사람이 적은 목록은 위에서 이미 걸렀다. */
+    const readSomething = !!(body && body.trim()) || (docsFn ? docsFn() : []).some((t) => String(t || '').trim());
+    if (robotOwned && readSomething) {
+      resetDocs += 1;
+      if (!WRITE) { console.log(`   [서류 되돌림] ${it.id} — 로봇 목록 ${(it.documents || []).length}줄 → 자리표시`); return; }
+      it.documents = [DOC_PLACEHOLDER_LINE];
+      delete it.documentsFrom;
+      if (it.prepDoc && /^로봇/.test(it.prepDocFrom || '')) { delete it.prepDoc; delete it.prepDocBasis; delete it.prepDocFrom; }
+    }
+    return;
+  }
   gotDocs += 1;
   if (!WRITE) { console.log(`   [서류 ${from}] ${it.id} → ${got.docs.join(' · ').slice(0, 120)}${got.basis ? `  ⟶ 자유 양식: ${got.basis.slice(0, 60)}` : ''}`); return; }
   it.documents = got.docs;
@@ -1432,7 +1444,7 @@ console.log(`마감일을 새로 읽은 공고 ${gotDeadline}건 (그중 공고�
 console.log(`잘린 제목을 본문에서 보완한 공고 ${titleFixed}건`);
 console.log(`접수 메일 주소를 새로 읽은 공고 ${gotApplyEmail}건 · 지금 규칙으로 접수처가 아니라 걷은 공고 ${droppedApplyEmail}건`);
 console.log(`포털 신청 시스템을 새로 읽은 공고 ${gotApplyPortal}건`);
-console.log(`제출 서류 목록을 읽은 공고 ${gotDocs}건 · 그중 자유 양식 근거로 앱 지원문서를 그대로 낼 수 있는 공고 ${gotFree}건`);
+console.log(`제출 서류 목록을 읽은 공고 ${gotDocs}건 · 그중 자유 양식 근거로 앱 지원문서를 그대로 낼 수 있는 공고 ${gotFree}건 · 지금 규칙으로 목록이 없어 자리표시로 되돌린 로봇 목록 ${resetDocs}건`);
 console.log(`접수 시작일 ${gotOpen}건 · 발표일 ${gotAnnounce}건 (캘린더용 — 원문에 있을 때만)`);
 if (WRITE) {
   fs.writeFileSync(regPath, JSON.stringify(reg, null, 1) + '\n');

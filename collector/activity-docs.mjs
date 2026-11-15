@@ -35,7 +35,7 @@ import { FETCH_HEADERS } from './http-headers.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { decodeEntities } from './clean-title.mjs';
 import { attachmentText, isOcrSource, isNoticeDoc } from './attachment-text.mjs';
-import { activityDetails, eligLineOk } from './activity-excerpts.mjs';
+import { activityDetails, eligLineOk, activityDocuments, putActivityDocuments } from './activity-excerpts.mjs';
 import { ACT_SIGNAL } from './activity-vocab.mjs';
 import { detailByRule } from './activity-detail-rules.mjs';   // 온통청년처럼 글·포스터가 JSON 에 있는 게시판 — 수집 로봇과 같은 함수(2026-10-28)
 const { cutAtNextSection } = await import('./extract-excerpts.mjs');   // activity-excerpts 와 같은 이유로 동적으로(환경변수보다 뒤에)
@@ -403,7 +403,8 @@ export function eligFromFiles(n, files, readText = (p) => (/\.txt$/.test(p) ? fs
     if ((/-[LB]\d*\.txt$/.test(f) || (ocr && /\di\.\w+$/.test(f))) && !ownsImageText(text, n.title)) continue;
     const d = activityDetails(text, n.title);
     /* 제목에서만 읽은 대상(`[대학생] …`)은 '찾았다'가 아니다 — 껍데기 브라우저 본문이 먼저 와서 뒤의 OCR·HWP 를 못 열게 했다(2026-10-28 리뷰) */
-    if (d.eligibilityLines.length && !d.eligibilityFromTitle) return { ...d, from: /-B\.txt$/.test(f) ? '브라우저 본문' : /\.txt$/.test(f) ? '요강 페이지' : ocr ? '공고문 첨부(OCR)' : '공고문 첨부' };
+    /* 제출 서류도 자격을 준 그 글자에서 — 규칙은 activityDocuments 한 곳(2026-11-15 · 전엔 본문 일반 수집만 서류를 읽어 브라우저·첨부로만 읽히는 글은 늘 빈칸이었다) */
+    if (d.eligibilityLines.length && !d.eligibilityFromTitle) return { ...d, documents: activityDocuments(text), from: /-B\.txt$/.test(f) ? '브라우저 본문' : /\.txt$/.test(f) ? '요강 페이지' : ocr ? '공고문 첨부(OCR)' : '공고문 첨부' };
   }
   return null;
 }
@@ -425,7 +426,8 @@ function applyPhase(acts) {
     if (!BROWSER && wantNotice && (d.noticeLines || []).length) { n.noticeLines = d.noticeLines; n.noticeFrom = d.from; got += 1; }
     if (!wantElig) continue;
     found.add(n.url);
-    if (BROWSER) { bled[n.url] = { ...(bled[n.url] || {}), lines: d.eligibilityLines, excludes: d.eligibilityExcludes, from: d.from }; got += 1; continue; }
+    if (BROWSER) { bled[n.url] = { ...(bled[n.url] || {}), lines: d.eligibilityLines, excludes: d.eligibilityExcludes, from: d.from, ...((d.documents || []).length ? { documents: d.documents } : {}) }; got += 1; continue; }
+    if ((d.documents || []).length && !(n.documents || []).length) putActivityDocuments(n, d.documents, d.from);   // 본문이 준 목록이 있으면 본문이 이긴다
     n.eligibilityLines = d.eligibilityLines;
     if (d.eligibilityExcludes.length) n.eligibilityExcludes = d.eligibilityExcludes;
     n.eligibilityFrom = d.from;
@@ -457,6 +459,8 @@ export function mergeBrowserResults(acts, bled = readJson(BROWSER_LEDGER, {})) {
     const r = bled[n.url];
     /* 장부의 줄은 적힌 날의 자르기로 뽑힌 것 — 합칠 때 절 끝(참가방법·시상규모)에서 한 번 더 자른다(extract-excerpts cutAtNextSection · 2026-10-16) */
     const lines = cutAtNextSection((r && r.lines) || []).filter(eligLineOk);
+    /* 브라우저가 읽은 제출 서류 — 글에 목록이 없을 때만(본문 일반 수집이 준 목록이 이긴다) · 자격과 따로 본다 */
+    if (r && (r.documents || []).length && !(n.documents || []).length) putActivityDocuments(n, r.documents, r.from);
     if (!lines.length || !needsElig(n)) continue;
     n.eligibilityLines = lines;
     const excludes = (r.excludes || []).filter(eligLineOk);

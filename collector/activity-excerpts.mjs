@@ -382,4 +382,27 @@ export function activityDocuments(text) {
   return readDocuments(normalizeText(text)).docs;
 }
 
+/* 제출 서류 판(docsV) — 서류 규칙이 바뀌면 올린다. 다르면 수집 로봇이 원문을 다시 읽어 **서류 칸만** 고친다(자격 칸은 건드리지 않는다 —
+   자격 판(detailsV)을 올리면 주소가 목록 화면으로 바뀐 글의 자격 줄까지 지워질 수 있다 · 2026-11-15 추적).
+   1 (2026-11-15): 10-30 에 서류 칸을 더하고 판을 안 올려 이미 읽은 글 199건 중 1건만 서류가 있었다 + doc-list 절 경계 */
+export const ACT_DOCS_V = 1;
+/* 글 하나에 서류 목록을 붙인다 — 수집 로봇(새 글 · 소급) · 첨부 로봇(activity-docs) · API 로봇이 **같은 함수**.
+   목록이 없으면 칸을 지우되, 첨부·브라우저에서 읽어 둔 목록(documentsFrom)은 본문 재읽기가 비었다고 지우지 않는다(껍데기 본문이 덮지 않게). */
+export function putActivityDocuments(it, docs, from) {
+  if (docs && docs.length) {
+    it.documents = docs;
+    if (from) it.documentsFrom = from; else delete it.documentsFrom;
+  } else if (!it.documentsFrom || from) { delete it.documents; delete it.documentsFrom; }
+  it.docsV = ACT_DOCS_V;
+  return it;
+}
+/* 이 글을 다시 읽어야 하나 — 수집 로봇의 소급 반복문과 리포트의 「남은」 수가 같은 판단을 쓴다.
+   'details' = 자격까지 다시(옛 판) · 'docs' = 서류 칸만 · null = 안 읽는다. API 글은 API 로봇이 채운다(자격이 없는 글만 원문 페이지 — 2026-10-16). */
+export function actRereadNeed(it) {
+  if (it.api && (it.eligibilityLines || []).length) return null;
+  if (!(it.excerptsAt && it.detailsV === ACT_DETAILS_V)) return 'details';
+  if (!it.api && it.docsV !== ACT_DOCS_V) return 'docs';
+  return null;
+}
+
 export default activityExcerpts;

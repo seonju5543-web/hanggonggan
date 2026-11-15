@@ -18,7 +18,7 @@
      · 한 출처를 **못 받아 온 날은 그 출처의 지난 글을 그대로 둔다** — 네트워크가 잠깐 끊겼다고 글이 사라지지 않게.
    ============================================================ */
 import { activityKind, activityField } from './activity-kind.mjs';
-import { activityExcerpts, activityDetails, putActivityDetails, CONTACT, splitBenefit, stripStepNumber } from './activity-excerpts.mjs';
+import { activityExcerpts, activityDetails, putActivityDetails, activityDocuments, CONTACT, splitBenefit, stripStepNumber } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { decodeEntities } from './clean-title.mjs';
 import { canonUrl } from './canon-url.mjs';
@@ -166,7 +166,7 @@ const labeled = (label, raw) => {
 };
 
 /* 같은 모양의 글 하나 — 학교가 빈 전국 글(앱이 모든 학생에게 보인다) */
-function item({ title, url, kind, field, deadline, host, excerpts, api, details, apiId, attachments }) {
+function item({ title, url, kind, field, deadline, host, excerpts, api, details, apiId, attachments, documents }) {
   /* 카드 윗줄에 주최가 이미 나온다 — 같은 이름을 발췌 '주최'로 또 적지 않는다 (리뷰 M4) */
   const h = clip(host);
   excerpts = (excerpts || []).filter((x) => x && !(x.label === '주최' && x.text === h));
@@ -187,6 +187,8 @@ function item({ title, url, kind, field, deadline, host, excerpts, api, details,
     ...(apiId ? { apiId, id: `api-${api}-${apiId}` } : {}),
     /* 자격·제외·우선 선발·원문 안내 — 앱이 장학과 같은 엔진으로 적합도를 낸다(2026-10-01). 없으면 칸을 안 만든다 */
     ...putActivityDetails({}, details || {}),
+    /* 제출 서류 — API 가 서류 칸을 주는 출처만(온통청년 정책 sbmsnDcmntCn) · 규칙은 activityDocuments 한 곳 · 없으면 칸을 안 만든다 */
+    ...((documents || []).length ? { documents } : {}),
   };
 }
 
@@ -289,6 +291,8 @@ export function mapYouthPolicy(r, { scholarship, bad } = {}) {
         ...labeled('제출 서류', r.sbmsnDcmntCn), ...labeled('기타', r.etcMttrCn)].slice(0, 8),
     },
     api: 'youthPolicy',
+    /* API 의 「제출 서류」 칸 — 이름표 한 줄을 앞에 붙여 장학·활동과 같은 서류 규칙으로 읽는다(쉼표 목록은 가른다 · 문장은 버린다) */
+    documents: r.sbmsnDcmntCn ? activityDocuments(`제출서류\n${decodeEntities(String(r.sbmsnDcmntCn))}`) : [],
   }), ...(note ? { note } : {}) };
 }
 
