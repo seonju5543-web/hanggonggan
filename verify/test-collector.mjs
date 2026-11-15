@@ -14939,8 +14939,13 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
   fs.writeFileSync(tmp + 'kosaf.json', JSON.stringify({ items: [{ code: 'k1', name: '표본 재단', fields: { '특정자격': '○ 제한없음\n○ 기관확인필요\n○ 해당없음음\n○ 대회 입상자', '성적기준': '평점 3.5 이상', '자격제한': '○ 기관확인필요요' } }] }));   // 기관확인필요(요)·해당없음(음) 도 아무것도 말하지 않는 줄 — 앱 KOSAF_NOISE 와 같이 버린다(2026-11-02 · 자격제한 칸도 센다)
   const env = { ...process.env, COVERAGE_REGISTERED: tmp + 'reg.json', COVERAGE_KOSAF: tmp + 'kosaf.json', COVERAGE_ACTIVITIES: tmp + 'none.json' };
   const r = spawnSync(process.execPath, [fileURLToPath(new URL('../verify/eligibility-coverage.mjs', import.meta.url)), '--brief'], { encoding: 'utf8', timeout: 120000, env });
-  eq('  도구가 표본으로 돌고 한 줄을 낸다 (없는 파일은 빈 묶음 · 제한없음·기관확인필요·해당없음 줄은 세지 않는다)', [r.status, (r.stdout || '').trim().replace(/ · 처지 상위.*$/, '')],
+  eq('  도구가 표본으로 돌고 한 줄을 낸다 (없는 파일은 빈 묶음 · 제한없음·기관확인필요·해당없음 줄은 세지 않는다)', [r.status, ((r.stdout || '').trim().split('\n')[0] || '').replace(/ · 처지 상위.*$/, '')],
     [0, '- 자격 줄 전수: 공고 1/1/0 · 조건을 하나도 못 읽는 줄 1/0/0 (등록/재단/활동 · 합 1)']);
+  /* 1단계 측정(2026-11-15) — 둘째 줄: 가상 학생 셋의 카드·줄 판정 분포. 표본 공고 1건 · 완전한 학생(3학년·3.8)은 평점 줄 ✓ · 자립준비·교수 추천 줄은 모름 */
+  const line2 = ((r.stdout || '').trim().split('\n')[1] || '');
+  eq('  둘째 줄 — 가상 학생 셋(완전/약한/이과)의 자격미확인·미달·전부충족·모름 줄·조건 못 집음을 한 줄로', /^- 가상 학생 판정\(마감 전 등록 1건 · 완전\(외대3\)\/약한\(경희1\)\/이과\(연세2\)\): 자격미확인 \d+\/\d+\/\d+ · 미달 \d+\/\d+\/\d+ · 전부충족 \d+\/\d+\/\d+ · 일부\/모름 \d+\/\d+\/\d+ · 자격 줄 \d+개 중 모름 \d+\/\d+\/\d+ \(\d+%\/\d+%\/\d+%\) · 조건 못 집음 \d+\/\d+\/\d+$/.test(line2), true);
+  const COV = await import(new URL('../verify/eligibility-coverage.mjs', import.meta.url)).catch(() => ({}));
+  eq('  verdictDist 는 앱 함수로 센다 — 표본(평점 3.0 이상 ✓ · 1학년 2.0 은 ✕ · 참고 줄은 안 센다)', COV.verdictDist ? (({ a, b }) => [a.ok, a.no, b.no, a.lines])((() => { const d = COV.verdictDist([{ name: 's', deadline: '2099-01-01', eligibilityLines: ['직전학기 평점 3.0 이상인 재학생', '성적기준 없음'] }]); return { a: d['완전(외대3)'], b: d['약한(경희1)'] }; })()) : null, [1, 0, 1, 1]);
   eq('  처지 집계가 돈다 (자립준비청년 · 수상)', /careLeaver 1/.test(r.stdout || '') && /award 1/.test(r.stdout || ''), true);
   const EAy = createRequire(import.meta.url)('../elig-ask.js');
   const PRy = createRequire(import.meta.url)('../parse-requirements.js');
