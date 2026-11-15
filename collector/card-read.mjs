@@ -163,10 +163,13 @@ export function sameLine(line, otherLines) {
   return otherLines.some((o) => { const m = norm(o); const [sh, lg] = m.length < n.length ? [m, n] : [n, m]; return sh.length >= 8 && sh.length / lg.length >= 0.6 && subseq(sh, lg); });
 }
 /* 「연장」 공고 — 받아 두지 못한 연장 공고문이 진짜 마감을 갖고 있을 수 있다(hy사회복지재단 「든든 학업지원금 연장 공고문.pdf」 — 포스터엔 옛 마감) */
-export const isExtension = (item) => /연장/.test([item.name, item.boardTitle, ...(item.attachments || []).map((a) => a && a.name)].filter(Boolean).join(' '));
+/* ⚠️ 첨부 이름이 공고 데이터에 안 실려 있고 **본문 글자에만** 있는 경우가 있다(hy재단이 그랬다) — 원문 글자에서도 찾는다.
+   사이트 메뉴의 「로그인 연장하기」 는 아니다 — 공고·기간·접수에 붙은 연장만 */
+const EXT_IN_TEXT = /연장\s?공고|공고\s?연장|(?:접수|신청|모집)\s?기간\s?(?:을\s?)?연장|기간\s?연장|[(（]\s?연장\s?[)）]|연장\s?(?:모집|접수|안내)/;
+export const isExtension = (item, source = '') => /연장/.test([item.name, item.boardTitle, ...(item.attachments || []).map((a) => a && a.name)].filter(Boolean).join(' ')) || EXT_IN_TEXT.test(String(source));
 
 /* 두 읽기(va·vb = verify 결과) → 실을 것(final) · 사람에게 넘길 것(held). 첫째 읽기의 글자를 싣는다 */
-export function agree(va, vb, item) {
+export function agree(va, vb, item, source = '') {
   const final = {}, held = [];
   for (const k of LIST_FIELDS) {
     final[k] = [];
@@ -176,7 +179,7 @@ export function agree(va, vb, item) {
   const da = va.kept.deadline, db = vb.kept.deadline;
   final.deadline = da && db && da.date === db.date ? da : null;
   if ((da || db) && !final.deadline) held.push({ field: 'deadline', line: `${da ? da.date : '없음'} / ${db ? db.date : '없음'}`, why: '두 읽기의 마감이 다름' });
-  if (final.deadline && isExtension(item)) { held.push({ field: 'deadline', line: `${final.deadline.date} ← ${final.deadline.quote}`, why: '「연장」 공고 — 연장된 마감을 사람이 확인' }); final.deadline = null; }
+  if (final.deadline && isExtension(item, source)) { held.push({ field: 'deadline', line: `${final.deadline.date} ← ${final.deadline.quote}`, why: '「연장」 공고 — 연장된 마감을 사람이 확인' }); final.deadline = null; }
   final.title = va.kept.title && norm(va.kept.title) === norm(vb.kept.title) ? va.kept.title : '';
   final.host = va.kept.host && norm(va.kept.host) === norm(vb.kept.host) ? va.kept.host : '';
   if ((va.kept.host || vb.kept.host) && !final.host) held.push({ field: 'host', line: `${va.kept.host || '없음'} / ${vb.kept.host || '없음'}`, why: '두 읽기의 주최가 다름' });
@@ -192,7 +195,7 @@ export function headAmount(final, item, wonIn) {
 /* 한 공고의 두 응답 → 앱에 실을 한 건(entry) 과 장부에 남길 것. 실을 것이 하나도 없으면 entry 는 null(무료 길 그대로) */
 export function buildEntry(item, source, outA, outB, wonIn) {
   const va = verify(outA, source, item), vb = verify(outB, source, item);
-  const { final, held, unreadable } = agree(va, vb, item);
+  const { final, held, unreadable } = agree(va, vb, item, source);
   const dropped = [...va.dropped.map((x) => ({ ...x, by: 'a' })), ...vb.dropped.map((x) => ({ ...x, by: 'b' }))];
   const filled = LIST_FIELDS.some((k) => final[k].length) || !!final.deadline;
   if (unreadable || !filled) return { entry: null, held, dropped, unreadable: true };

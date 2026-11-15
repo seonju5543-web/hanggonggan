@@ -203,6 +203,7 @@ jobs:
                    verify-calendar.js verify-resume.js verify-interactions.js \
                    verify-admin.js verify-settings.js verify-admin-shape.js \
                    verify-elig-ask.js \
+                   verify-card-read.js \
                    verify-apply-prep.js verify-formfill.js verify-activities.js verify-news.js \
                    verify-region-city.js verify-academic-info.js; do
             left=$((end - SECONDS))

@@ -10477,7 +10477,7 @@ console.log('\n■ 관리자 화면 로봇 목록 — 화면이 부를 수 있�
     .replace(/const ROBOT_NOT_LISTED = \[[^\]]*\]/, '');
   const unreachable = all.filter((f) => !calls.includes(f));
   eq(`화면이 못 부르는 워크플로 (지금 ${unreachable.length}개: ${unreachable.join(' · ')})`,
-    unreachable.sort(), ['codeql-triage.yml', 'codeql.yml', 'device-deploy.yml', 'error-watch.yml', 'key-expiry.yml', 'push-deploy.yml', 'push-limit-check.yml', 'rollback.yml', 'two-school-scan.yml']);   // rollback: 11-11 · Actions 탭에서만(관리자 화면 버튼은 나중에)
+    unreachable.sort(), ['card-read.yml', 'codeql-triage.yml', 'codeql.yml', 'device-deploy.yml', 'error-watch.yml', 'key-expiry.yml', 'push-deploy.yml', 'push-limit-check.yml', 'rollback.yml', 'two-school-scan.yml']);   // rollback: 11-11 · Actions 탭에서만(관리자 화면 버튼은 나중에)
 }
 
 console.log('\n■ 안내문이 사람을 화면으로 부른다 (채팅으로 되돌아가면 실패)');
@@ -15119,6 +15119,8 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
     [ag.final.eligibility.length, ag.final.excludes, ag.final.notes, ag.final.amount.length, ag.final.deadline, ag.held.length >= 4], [1, [], [], 1, null, true]);
   eq('  「연장」 공고는 두 읽기가 같아도 마감을 싣지 않는다 (받아 두지 못한 연장 공고문이 진짜 마감을 갖고 있을 수 있다)',
     [CR.agree(A1, A1, ITEM).final.deadline?.date || null, CR.agree(A1, A1, { ...ITEM, attachments: [{ name: '2026년 든든 학업지원금 연장 공고문.pdf' }] }).final.deadline], ['2026-11-23', null]);
+  eq('    첨부 이름이 본문 글자에만 있어도 잡는다 · 사이트 메뉴의 「로그인 연장하기」 는 연장 공고가 아니다',
+    [CR.agree(A1, A1, ITEM, '첨부파일\n2026년 든든 학업지원금 연장 공고문.pdf (72.7KB)').final.deadline, CR.agree(A1, A1, ITEM, '로그인 시간을 연장하시려면 로그인 연장하기 버튼을 클릭').final.deadline?.date || null], [null, '2026-11-23']);
   const wonIn = createRequire(import.meta.url)('../parse-amount.js').wonIn;
   const be = CR.buildEntry(ITEM, SRC, { ...base, eligibility: A1.kept.eligibility, amount: ['1인당 상한액 100만 원'] }, { ...base, eligibility: A1.kept.eligibility, amount: ['1인당 상한액 100만 원'] }, wonIn);
   eq('  한 건 만들기 — 맨 위 금액은 문구에서 숫자만 · 둘 다 「읽을 내용 없음」이거나 실을 줄이 없으면 싣지 않는다(무료 길 그대로)',

@@ -1190,6 +1190,9 @@ function fitDetail(sch, p) {
     for (const c of conds) {
       if (c.conf !== PR.HIGH) continue;
       if (ctx.bracketTable && c.kind === 'bracket') continue;
+      /* 유료 읽기의 제외 줄은 「…수혜자」「…등록자」 같은 사람 명사라 낱말이 엉뚱한 축으로 읽힐 수 있다(「지역대학생 장학금 수혜자」→ 학교 '지역대') —
+         학적·학위·학교 종류·학년·결격 처지·타 장학금 축만 미달로 센다. 나머지는 화면에 ✗ 줄로 보이기만 한다(모르면 모름) */
+      if (sch && sch.cardRead && !CARD_EXCLUDE_KINDS.has(c.kind)) continue;
       const v = judgeCond(c, p, ctx);
       if (v === 'fail' && !multi) { fails.push(line); failed = true; }
       else if (v === 'pass') passed += 1;
@@ -1848,6 +1851,18 @@ const isTableCell = (t) => BARE_CELL.test(t) && !REAL_CATEGORY.test(t);
 const BRANCH_LABEL = /^[(（]?\s*[가-힣·]{2,8}\s?소재\s?대학교?\s*[)）]?\s*[:：]?$/;
 const ENUM_START = /^\s*(?:[①-⑳]|[가-하]\s*[.)]|\d+\s*[.)]|[-·•]\s)/;
 function requirementLines(sch, lines, opts) {
+  /* 🔴 유료 카드 읽기가 읽은 공고(`sch.cardRead` · applyCardRead)는 **거르지 않고 그대로** 낸다 (2026-11-15 · 설계 paid-card-reading.md 4절).
+     그 줄들은 모델 둘이 칸을 나눠 읽고 기계 대조·일치 검사를 통과한 것이다 — 아래 무료 길의 잡음 규칙을 다시 걸면 「받을 수 없는 경우」 4줄이
+     통째로 숨는다(시안에서 실제로 그랬다). 자격·제외·우선 줄은 이미 칸이 갈려 있어서, 자격 줄에서 제외·우선을 다시 골라내지 않는다.
+     ⚠️ 그 공고의 제 줄 배열을 넘겼을 때만이다 — 다른 줄 묶음(층2 칸 등)을 넘기면 아래 무료 길로 간다 */
+  if (sch && sch.cardRead) {
+    const own = !lines || lines === sch.eligibilityLines;
+    const asIs = (arr) => (arr || []).map((x) => String(x || '').trim()).filter(Boolean);
+    if (opts && opts.onlyPriority && own) return [];
+    if (opts && opts.onlyExclude && own) return [];
+    if (lines && (lines === sch.eligibilityExcludes || lines === sch.eligibilityPriority)) return asIs(lines);
+    if (own) { const out = asIs(sch.eligibilityLines); return opts && opts.withMeta ? out.map((text) => ({ text, group: 0, aside: false })) : out; }
+  }
   const keepPriority = !!(opts && opts.keepPriority);   // '먼저 뽑는 기준' 블록을 그릴 때만 참
   /* `loose` — '제외 대상'·'먼저 뽑는 기준' 블록을 그릴 때만 참.
      그 블록들은 애초에 자격이 아니므로 '요건임을 증명하라'를 적용하면 통째로 사라진다. */
@@ -2251,6 +2266,42 @@ function requirementStruct(sch) {
   return { common: clean(st.common).slice(0, 4), either, grade: clean(st.grade).slice(0, 2) };
 }
 
+/* ---------------- 유료 카드 읽기 결과를 공고에 얹는다 (2026-11-15 · 설계 docs/designs/paid-card-reading.md) ----------------
+   `data/card-read.json` 은 로봇(collector/card-read.mjs)이 공고 한 건을 통째로 모델 둘에게 읽혀, 글자가 원문에 있고 둘이 같은 말을 한 줄만 실은 파일이다.
+   그 공고는 유료 결과만 싣는다(무료 값은 남기지 않는다 — 남기면 무료 길의 틀린 값이 그대로 보인다). 파일에 없는 공고는 손대지 않는다 = 무료 길이 비상망.
+   🔴 화면(app.js)·알림(sw.js)·도구(what-shows)가 **이 함수 하나**를 부른다 — 따로 얹으면 화면의 마감과 알림의 마감이 갈린다.
+   ⚠️ 원본 공고 객체를 고치지 않는다(새 객체) · 이름(name)은 안 바꾼다(다른 장부가 이름으로 잇는다 — 카드 제목은 cardTitle 이 다듬는다).
+   ⚠️ 금액·마감은 유료 결과가 **있을 때만** 덮는다 — 둘 다 숫자·날짜 규칙(parse-amount · extractDeadline)이 따로 지키는 칸이라, 유료 길이 못 읽었다고 비우지 않는다. */
+const CARD_EXCLUDE_KINDS = new Set(['status', 'degree', 'schoolType', 'year', 'trait', 'scholarship']);
+function cardWon(v) { return v % 10000 === 0 ? `${(v / 10000).toLocaleString('ko-KR')}만원` : `${v.toLocaleString('ko-KR')}원`; }
+function withCardRead(sch, cr) {
+  const arr = (x) => (Array.isArray(x) ? x.filter((l) => typeof l === 'string' && l.trim()) : []);
+  const out = Object.assign({}, sch, { cardRead: cr });
+  delete out.eligibilityStruct; delete out.eligibilityFrom;
+  if (cr.host) out.provider = cr.host;
+  out.eligibilityLines = arr(cr.eligibility);
+  out.eligibilityExcludes = arr(cr.excludes);
+  out.eligibilityPriority = arr(cr.priority);
+  out.documents = arr(cr.documents);
+  if (cr.deadline && /^\d{4}-\d{2}-\d{2}$/.test(String(cr.deadline.date || ''))) {
+    if (out.deadline !== cr.deadline.date) delete out.openDate;   // 마감이 달라졌으면 옛 접수 시작일도 못 믿는다
+    out.deadline = cr.deadline.date;
+    out.period = `접수 ~${cr.deadline.date}`;
+    out.deadlineFrom = `유료 읽기 · ${cr.deadline.quote || ''}`;
+  }
+  if (cr.head > 0) {
+    if (out.amountValue !== cr.head) delete out.amountSpec;
+    out.amountValue = cr.head; out.amount = cardWon(cr.head);
+  }
+  out.excerpts = [...arr(cr.amount).map((x) => `장학금액: ${x}`), ...arr(cr.notes).map((x) => `유의사항: ${x}`)];
+  return out;
+}
+function applyCardRead(list, doc) {
+  const items = doc && doc.items;
+  if (!items || typeof items !== 'object') return list || [];
+  return (list || []).map((sch) => { const cr = sch && items[sch.id]; return cr && typeof cr === 'object' ? withCardRead(sch, cr) : sch; });
+}
+
 /* Node(검증 스크립트)에서도 같은 엔진을 불러 쓸 수 있게 — 브라우저·서비스워커에는 영향 없음 */
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { evaluate, fitScore, fitDetail, judgeCond, holdsExternalScholarship, FIT_UNREAD, FIT_FLOOR, FIT_MAX, FIT_MIN,
@@ -2262,5 +2313,6 @@ if (typeof module !== 'undefined' && module.exports) {
                      noticeForProfile, activityForProfile, taggedSchool, SHARED_BOARD_BRANCH, SERVED_SCHOOLS,
                      noticeKind, NOTICE_CAMPUS_MARK, OWN_PROGRAMS,
                      noticeFileKey, noticeFileFor, noticeFilesForProfile,
-                     noticeFallbackNeeded, majorsFileFor, newsFileFor, newsFilesForProfile, BRANCH_LABEL };
+                     noticeFallbackNeeded, majorsFileFor, newsFileFor, newsFilesForProfile, BRANCH_LABEL,
+                     applyCardRead, withCardRead };
 }

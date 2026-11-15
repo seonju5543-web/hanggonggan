@@ -27,6 +27,11 @@ const ME = require('../match-engine.js');
 /* WHAT_SHOWS_REGISTERED — 관문 표본용(2026-10-04): 실데이터 대신 표본 정식 등록 파일로 돈다(test-collector 가 이 도구를 실제로 돌려 잴 때).
    평소에는 쓰지 않는다 — 화면 이야기는 진짜 데이터로 한다. */
 const reg = JSON.parse(fs.readFileSync(process.env.WHAT_SHOWS_REGISTERED || new URL('../data/registered.json', import.meta.url), 'utf8'));
+/* 유료 카드 읽기 결과를 앱과 같은 함수로 얹는다(2026-11-15 · match-engine applyCardRead) — 안 얹으면 이 도구가 학생 화면과 다른 줄을 말한다.
+   표본 파일로 돌 때(WHAT_SHOWS_REGISTERED)는 얹지 않는다 · 파일이 없으면 그대로(무료 길) */
+if (!process.env.WHAT_SHOWS_REGISTERED) {
+  try { reg.items = ME.applyCardRead(reg.items, JSON.parse(fs.readFileSync(new URL('../data/card-read.json', import.meta.url), 'utf8'))); } catch { /* 아직 없음 */ }
+}
 
 const arg = (k, d) => {
   const hit = process.argv.find((a) => a.startsWith(`--${k}=`));

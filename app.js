@@ -3071,11 +3071,13 @@ function loadRegistered() {
   return Promise.all([
     fetch('data/registered.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)),
     linkChecksWait(),
+    /* 유료 카드 읽기 결과(2026-11-15) — 못 받으면 null 이고 그때는 무료 길 값 그대로다(비상망). 받기 실패가 공고 목록을 막지 않는다 */
+    fetch('data/card-read.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
   ])
-    .then(([d]) => {
+    .then(([d, , cardRead]) => {
       if (!d) { if (appsData.registered !== 'ok') appsData.registered = 'fail'; return; }   // 한 번 받았으면 다시 받기 실패에도 'ok'(목록은 메모리에 그대로)
       appsData.registered = 'ok';
-      registeredList = d.items || [];
+      registeredList = typeof applyCardRead === 'function' ? applyCardRead(d.items || [], cardRead) : (d.items || []);   // match-engine.js — 알림도 같은 함수로 얹는다
       regUpdatedAt = d.updatedAt || '';
       dataFetchedAt = new Date();
       attachPrepTemplates(registeredList);
@@ -4742,6 +4744,8 @@ function applySectionHtml(sch, opts) {
     : to ? `~ ${to}`
     : /상시/.test(rawPeriod) ? '상시'
     : '원문 확인';
+  /* 유료 카드 읽기가 읽은 신청 방법(원문 문장 · 줄머리 이름표를 뗀 것)이 있으면 그것을 줄마다 보인다(2026-11-15) */
+  const paidApply = (!act && sch.cardRead && Array.isArray(sch.cardRead.apply)) ? sch.cardRead.apply.filter((l) => typeof l === 'string' && l.trim()) : [];
   const method = sch.noApply ? sch.noApply
     : sch.applyEmail ? (sch.applyEmailSource || `메일 ${sch.applyEmail}`)
     : sch.applyPortalSource ? sch.applyPortalSource
@@ -4750,7 +4754,8 @@ function applySectionHtml(sch, opts) {
   const docs = (act ? act.documents || [] : sch.documents || []).filter((doc) => !DOC_PLACEHOLDER.test(doc));
   const row = (k, v) => `<li><b class="ns-k">${k}</b>${esc(v)}</li>`;
   const docText = docs.map((d) => String(d).replace(/^[\s\-–—•\u25AA\u25AB\u25FD\u25FE■□▣○●◆◇·ㆍ*]+/, '').trim()).filter(Boolean).join(' · ');   // 원문 글머리 기호(■·○)는 뗀다 — 점으로 잇는 한 줄이라 기호가 두 겹(실화면 2026-11-02)
-  return `<h4>접수</h4><ul class="doc-list notice-summary apply-rows">${row('기간', period)}${row('방법', method)}${docText ? row('서류', docText) : ''}</ul>`;
+  const methodRow = paidApply.length ? `<li><b class="ns-k">방법</b>${paidApply.map(esc).join('<br>')}</li>` : row('방법', method);
+  return `<h4>접수</h4><ul class="doc-list notice-summary apply-rows">${row('기간', period)}${methodRow}${docText ? row('서류', docText) : ''}</ul>`;
 }
 function sheetSectionsHtml({ sch, result, fit, fd, activity = null, noticeLines = [] }) {
   /* ① 지원 자격 — 판정은 eligibilityRowsHtml·fitBadgeHtml 그대로(알약 status-pill 은 없다 · 두 축의 말이라).
