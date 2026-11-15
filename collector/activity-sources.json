@@ -134,6 +134,92 @@
    "evidence": "2026-10-04 재단 첫 화면 메뉴 「공지사항」 → /user/board.do?boardType=notice (200 · 공모전·참여청년 모집 글이 행으로 보임: 「2026년 청년다다름사업 참여수기 공모전 안내」 등). 옛 주소 boardList.do?bbsId=…367 은 404",
    "note": "행이 fn_detail(번호, 게시판) 클릭이라 collect.mjs BOARD_RULES[청년재단] 이 읽는다",
    "host": "청년재단"
+  },
+  {
+   "school": "서울과학기술대학교",
+   "campus": "공통",
+   "boardUrl": "https://www.seoultech.ac.kr/service/board/rec",
+   "evidence": "웹 확인 2026-11-15(저장소 fetchBoard+extractLinks+activityKind · 1페이지): 대학 누리집 「공모/외부행사」 게시판(장학공지 옆 탭) 200 · 최근 글 2026-11-10 · 「[문화체육관광부] 문화체육관광부 대학생기자단 울림 22기 모집 안내」「[금융감독원] 제21회 금융공모전 참여 안내」 · 관리자 화면에서 등록 (2026-11-15 16:40 KST)",
+   "note": "「공모/외부행사」 게시판 — 외부 기관 공모전·서포터즈·기자단 모집"
+  },
+  {
+   "school": "성균관대학교",
+   "campus": "공통",
+   "boardUrl": "https://www.skku.edu/skku/campus/skk_comm/notice05.do",
+   "evidence": "웹 확인 2026-11-15(저장소 fetchBoard+extractLinks+activityKind · 1페이지): 공지사항 「채용/모집」 탭(장학은 notice06) 200 · 최근 글 2026-11-13 · 「[대학혁신과공유센터] 2026학년도 해외융합프로젝트 참가자 모집(스위스 제네바 국제기구 탐방)」「제7회 크리에이티브 브릿지 페스티벌 작품 공모」 · 관리자 화면에서 등록 (2026-11-15 16:40 KST)",
+   "note": "공지사항 「채용/모집」 탭 — 교내 프로그램 참가자·공모·봉사자 모집(채용 글은 판정이 거른다)"
+  },
+  {
+   "school": "국민대학교",
+   "campus": "공통",
+   "boardUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/9/index.do",
+   "evidence": "웹 확인 2026-11-15(저장소 fetchBoard+extractLinks+activityKind · 1페이지): 공지사항 「공모∙행사」 분류(장학은 notice/7) 200 · 최근 글 2026.11.13 · 「[성북구] 2027년 상반기 청년 행정체험단 모집(~11/27)」「[문화체육관광부] 대학생 기자단 울림 22기 모집(~11/9)」 · 관리자 화면에서 등록 (2026-11-15 16:40 KST)",
+   "note": "공지사항 「공모∙행사」 분류 — 외부 기관·교내 사업단의 공모전·캠프·기자단"
+  },
+  {
+   "school": "한국항공대학교",
+   "campus": "공통",
+   "boardUrl": "https://kau.ac.kr/kaulife/event.php",
+   "evidence": "웹 확인 2026-11-15(저장소 fetchBoard+extractLinks+activityKind · 1페이지): 대학생활 「행사공지」(장학/대출공지 scholnoti.php 옆) 200 · 최근 글 2026-11-05 · 「2026 KAU 리빙랩 아이디어 공모전 실시」「2026년 Boeing Day 프로그램 참가팀 모집 안내」 · 관리자 화면에서 등록 (2026-11-15 16:40 KST)",
+   "note": "「행사공지」 게시판 — 교내 공모전·프로그램 참가 모집"
+  },
+  {
+   "school": "가톨릭대학교",
+   "campus": "공통",
+   "boardUrl": "https://www.catholic.ac.kr/ko/campuslife/notice_outside.do",
+   "evidence": "웹 확인 2026-11-15(저장소 fetchBoard+extractLinks+activityKind · 1페이지): 대학생활 「외부기관공지」(공지사항 notice.do 의 이웃) 200 · 최근 글 2026.11.12 · 「2026 청년 수출물류 도약 캠프 참가자 모집」「「부산 동구 AI 숏폼 영상 공모전」 개최 안내」 · 관리자 화면에서 등록 (2026-11-15 16:40 KST)",
+   "note": "「외부기관공지」 게시판 — 외부 기관 공모전·봉사자·캠프 모집"
+  },
+  {
+   "school": "강원대학교",
+   "campus": "공통",
+   "boardUrl": "https://kangwon.ac.kr/ko/bbs/719/list.do",
+   "evidence": "웹 확인 2026-11-15(저장소 fetchBoard+extractLinks+activityKind · 1페이지): 공지사항 「공모안내」(bbs/719 · 장학공지 750 과 다른 게시판) 200 · 최근 글 2026.11.13 · 「2026년도 공공데이터 활용 경진대회」「문화체육관광부 대학생기자단 울림 22기 모집안내」 · 관리자 화면에서 등록 (2026-11-15 16:40 KST)",
+   "note": "「공모안내」 게시판 — 외부·교내 공모전과 기자단 모집"
+  },
+  {
+   "school": "홍익대학교",
+   "campus": "공통",
+   "boardUrl": "https://www.hongik.ac.kr/kr/newscenter/event-contest.do?mode=list&srCategoryId=85&srSearchKey=&srSearchVal=",
+   "evidence": "웹 확인 2026-11-15(저장소 fetchBoard+extractLinks+activityKind · 1페이지): 뉴스센터 「행사·공모전」의 「행사/공모전공지」 분류(srCategoryId=85) 200 · 최근 글 2026.11.10 · 「[모집][롯데지주] 밸유 for ESG 5기 대학생 봉사단 모집」「[모집][컴투스] 대학생 서포터즈 컴투스 플레이어 16기 모집」 · 관리자 화면에서 등록 (2026-11-15 16:40 KST)",
+   "note": "「행사/공모전공지」 게시판 — 기업·기관 서포터즈·봉사단·경진대회"
+  },
+  {
+   "school": "충북대학교",
+   "campus": "공통",
+   "boardUrl": "https://www.cbnu.ac.kr/www/selectBbsNttList.do?bbsNo=8&key=819&searchCtgry=%EB%AA%A8%EC%A7%91/%EA%B3%B5%EB%AA%A8",
+   "evidence": "웹 확인 2026-11-15(저장소 fetchBoard+extractLinks+activityKind · 1페이지): 공지사항의 「모집/공모」 분류(key=819 · 장학은 key=815 학사/장학) 200 · 최근 글 2026-11-13 · 「[2026 모두의 창업] 리부트(Reboot) 캠프 참여자 모집 안내」「<2026년 제조공정 마스터 클래스> 프로그램 참여자 모집」 · 관리자 화면에서 등록 (2026-11-15 16:40 KST)",
+   "note": "공지사항 「모집/공모」 분류 — 캠프·프로그램 참여자·봉사자 모집"
+  },
+  {
+   "school": "가천대학교",
+   "campus": "공통",
+   "boardUrl": "https://www.gachon.ac.kr/kor/1147/subview.do",
+   "evidence": "웹 확인 2026-11-15(저장소 fetchBoard+extractLinks+activityKind · 1페이지): 대학생활 「대외활동안내」(kor/1147 · 장학공지 1146 의 이웃) 200 · 최근 글 2026.11.05 · 「[공통] 「2026 청년정책 공모전」개최 안내」「[공통] 2026년도 학생 대상 안전한 개인정보보호 사례 공모전 안내」 · 관리자 화면에서 등록 (2026-11-15 16:40 KST)",
+   "note": "「대외활동안내」 게시판 — 외부 공모전·학생 참여 모집"
+  },
+  {
+   "school": "숙명여자대학교",
+   "campus": "공통",
+   "boardUrl": "https://www.sookmyung.ac.kr/kr/news/event.do",
+   "evidence": "웹 확인 2026-11-15(저장소 fetchBoard+extractLinks+activityKind · 1페이지): 숙명뉴스 「주요 행사」(event.do · 장학 줄 important-notice.do 와 다른 게시판) 200 · 행사 날짜 2026.11.11~12.18 · 「「숙명사랑 김장나눔봉사」 참여자 모집」「2026 SNOWCHAT AI 서비스 경진대회 참가 신청 기간 연장 안내」 · 관리자 화면에서 등록 (2026-11-15 16:40 KST)",
+   "note": "「주요 행사」 게시판 — 교내 봉사·경진대회·공모전"
+  },
+  {
+   "school": "",
+   "campus": "",
+   "boardUrl": "https://youth.chungnam.go.kr/web/main/bbs/cnyouth_notice/list",
+   "evidence": "웹 확인 2026-11-15(저장소 fetchBoard+extractLinks+activityKind · 1페이지): 충청남도 청년포털 「충남청년 소식 › 공지사항」 200 · 최근 글 2026. 11. 4 · 「2026 공주 크리에이티브 IP 캠프 참여자 모집!」「2026 미래내일 일경험 기업 실무 프로젝트 참여자 모집」 · 관리자 화면에서 등록 (2026-11-15 16:40 KST)",
+   "note": "충청남도 청년 사업 모집 — 충남권 학생용",
+   "host": "충남청년포털"
+  },
+  {
+   "school": "",
+   "campus": "",
+   "boardUrl": "https://kucss.or.kr/dp_notice",
+   "evidence": "웹 확인 2026-11-15(저장소 fetchBoard+extractLinks+activityKind · 1페이지): 협의회 누리집 「공지사항」 200 · 최근 글 2026-11-12 · 「[대외협력사업팀] SK Telecom과 한국대학사회봉사협의회의 스마트 라이프 교육 대학생 봉사팀 모집」「[대외협력사업팀] 농협중앙회 × 한국대학사회봉사협의회 대학생 농촌 봉사활동 '농심천심'」 · 관리자 화면에서 등록 (2026-11-15 16:40 KST)",
+   "note": "대학생 봉사단·해외봉사·NGO 인턴십 모집",
+   "host": "한국대학사회봉사협의회"
   }
  ],
  "_parked": "쓰지 않게 된 게시판은 지우지 말고 여기로 옮긴다(schools.json 의 parked 와 같은 규칙 — 주소를 알아내는 데 든 시간을 버리지 않는다). 되돌리려면 항목을 위 sources 로 옮기면 된다.",

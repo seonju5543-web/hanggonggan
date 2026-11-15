@@ -552,8 +552,7 @@
            🔴 분야 칸은 **빈 그릇**이다 — 목록 원본은 collector/activity-kind.mjs ACTIVITY_FIELDS 한 곳이고 수집 로봇이 data/activities.json 의
               fields 로 싣는다. app.js fillInterestFields 가 그걸로 채운다(여기 적으면 두 벌이 된다). -->
       <div id="activities-gate" class="act-gate" hidden>
-        <h3>관심 있는 대외활동·공모전을<br />골라 주세요</h3>
-        <p class="act-gate-sub">고르면 이 탭과 홈 추천이 열려요. 종류는 하나 이상 골라야 해요.</p>
+        <h3>관심 대외활동·공모전</h3>
         <span class="field-label">종류</span>
         <div class="check-list check-grid" id="in-act-kinds">
           <label class="check-item"><input type="checkbox" value="대외활동" /><span>대외활동</span></label>
@@ -561,6 +560,12 @@
         </div>
         <span class="field-label">분야 (선택)</span>
         <div class="check-list check-grid" id="in-act-fields"></div>
+        <!-- 「내 정보」 (2026-11-15 개발자 지시 — 장학금 학적정보와 연동 · 입력 다각화). 학교·학년·학적 한 줄은 학적정보에서 오고,
+             아래 칸들은 **지금 보이는 활동 글의 자격 줄이 실제로 쓰는** 학적정보 칸이다(app.js activityAskKeys — 빈 그릇 · 여기 적으면 두 벌).
+             저장하는 곳은 장학금과 같은 프로필 칸이라 어느 쪽에서 적어도 양쪽 적합도에 쓰인다. -->
+        <span class="field-label">내 정보</span>
+        <div class="act-gate-me"><span id="act-gate-me"></span><button type="button" class="link-btn" id="act-gate-profile">학적정보 수정</button></div>
+        <div class="elig-ask-fields" id="act-gate-ask" hidden></div>
         <div class="act-gate-actions">
           <button type="button" class="btn btn-ghost" id="act-gate-cancel" hidden>취소</button>
           <button type="button" class="btn btn-primary btn-lg" id="act-gate-save">저장하고 보기</button>
