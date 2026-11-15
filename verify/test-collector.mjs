@@ -4651,6 +4651,171 @@ console.log('\n■ 자격 절 고르기 — 이름표 줄 · 짧은 블록 덧�
     [majorOf('기본 선발 요건을 충족한 학생 (AI, SW 컴퓨터 관련 전공 아니어도 활동 가능)'), majorOf('원자력 관련 학과 재학생')], [0, 1]);
 }
 
+console.log('\n■ 발췌기 글자 읽기 — 카드 빈칸 비평의 이름표 꼴·해·첨부 한 곳·발췌·자격 절 (2026-11-15)');
+{
+  /* 카드 빈칸 비평(2026-11-11 승인 계획 — 원문에 있는 값은 채우고, 없으면 그리지 않는다)에서 원문을 열어 보고 고친 발췌기 규칙 묶음.
+     🔴 아래 글자는 전부 **실제 원문 줄**을 옮긴 것이다(collector/extracted/ 의 OCR·HWP·PDF 글자층 · 어느 공고인지 줄 옆에 적었다).
+        저장된 첨부는 60일마다 갈리므로 파일을 읽지 않고 줄을 여기 박아 둔다(실데이터에 기댄 관문 금지 — CLAUDE.md).
+     🔴 함수가 없으면(옛 코드) 값이 '(없음)' 이 되어 빨간불이다 — 넘어지지 않고 센다. */
+  process.env.EXCERPTS_AS_LIB = '1';
+  const EX = await import(new URL('../collector/extract-excerpts.mjs', import.meta.url));
+  const AT = await import(new URL('../collector/attachment-text.mjs', import.meta.url));
+  const SH = createRequire(import.meta.url)('../section-head.js');
+  const DU = await import(new URL('../collector/detail-url.mjs', import.meta.url));
+  const call = (o, k, ...a) => { try { return typeof o[k] === 'function' ? o[k](...a) : '(없음)'; } catch (e) { return `(오류 ${e.message})`; } };
+  const dl = (...lines) => call(EX, 'extractDeadline', lines.join('\n'));
+  const od = (...lines) => call(EX, 'extractOpenDate', lines.join('\n'));
+
+  /* ① 이름표 꼴 */
+  eq('① `|` 칸 가름 — 경희 반영장학 포스터 OCR 「\' 신청기간 | 2026.9.11.(금)-9.22.(화) \'」 → 마감 09-22 · 접수 시작 09-11',
+    [dl("' 신청기간 | 2026.9.11.(금)-9.22.(화) '"), od("' 신청기간 | 2026.9.11.(금)-9.22.(화) '")], ['2026-09-22', '2026-09-11']);
+  eq('  `모집기간| 2026.10.19.(월)~11.13.(금)`(엔지니어링인재육성재단 홍보물) → 11-13 · 표 머리 줄 「구분 | 신청기간 | 비고」 는 날짜가 아니다',
+    [dl('모집기간| 2026.10.19.(월)~11.13.(금)'), dl('구분 | 신청기간 | 비고')], ['2026-11-13', null]);
+  eq('  줄 머리 괄호 이름표 「❍ (접수기간) 2026. 9. 16.(수) 09:00 ~ 2026. 10. 8.(목) 18:00 / 23일간」(대전 서구인재육성 공고문) → 10-08 · 「(공고기간)」 은 아니다',
+    [dl('❍ (접수기간) 2026. 9. 16.(수) 09:00 ~ 2026. 10. 8.(목) 18:00 / 23일간'), dl('❍ (공고기간) 2026. 9. 15.(화) ~ 2026. 9. 30.(수) / 16일간')], ['2026-10-08', null]);
+  /* 인재림 제7기 요강 docx — 진짜 접수 줄을 못 읽고 일정표 칸 「온라인 서류 접수 기간」 ↵ (다음 칸) 「26. 12. 21.(월)」(= 면접 대상자 발표)을 마감으로 읽었다 */
+  eq('  「[지원 기간] 2026. 10. 8.(목) ~ 10. 29.(목) 15:00까지」 가 일정표의 엉뚱한 칸(12-21)보다 먼저 읽힌다 (인재림 요강)',
+    dl('[지원 기간] 2026. 10. 8.(목) ~ 10. 29.(목) 15:00까지', '[지원 방법] 한국고등교육재단 지원 홈페이지(클릭) 회원가입 후 인재림 모집공고 확인',
+      '선발 절차 및 프로그램 주요 일정', '2026년', '26. 10. 8.(목)~29.(목) 15:00', '온라인 서류 접수 기간', '26. 12. 21.(월)', '면접 대상자 발표'), '2026-10-29');
+  eq('  제목 꼬리 괄호 이름표(예전 규칙)는 그대로 — 「… 선발(접수기간: 2026.10.14(화) ~ 10.27(화))」',
+    dl('2026학년도 장학생 선발(접수기간: 2026.10.14(화) ~ 10.27(화))'), '2026-10-27');
+  /* 금신사랑 공고 PDF OCR — 「6. 신청기간 및 방법」 ↵ 「기간 : 2026. ?. 15. (화) ~ 2026. 9. 21. (월)」(시작 달을 OCR 이 못 읽었다) */
+  eq('  기간 절 제목 아래 맨 「기간 :」 의 범위 → 끝 09-21 · 시작은 못 읽었으니 접수 시작일은 없다 (금신사랑)',
+    [dl('6. 신청기간 및 방법', '기간 : 2026. ?. 15. (화) ~ 2026. 9. 21. (월)'), od('6. 신청기간 및 방법', '기간 : 2026. ?. 15. (화) ~ 2026. 9. 21. (월)')], ['2026-09-21', null]);
+  eq('  🔴 `근로기간` 은 제목 아래여도 아니다 · 제목 없는 맨 `기간` 범위도 여전히 아니다(근로장학생의 일하는 기간)',
+    [dl('6. 신청기간 및 방법', '근로기간 : 2026. 9. 1. ~ 2027. 2. 12.'), dl('3. 근로 안내', '가. 기간: 2026. 9. 1. ~ 2027. 2. 12.')], [null, null]);
+  eq('  「○ 선발기간: 2026. 10. 6.(화) ~ 10. 30.(금) 18:00까지…」(김천시-한국전력기술) → 10-30 · `까지` 없는 「선발기간 : 2026년 10월 19일(월)~2026년 11월 13일(금)」 은 뽑는 기간이라 아니다',
+    [dl('○ 선발기간: 2026. 10. 6.(화) ~ 10. 30.(금) 18:00까지토일공휴일 제외)'), dl('선발기간 : 2026년 10월 19일(월)~2026년 11월 13일(금)')], ['2026-10-30', null]);
+  /* 숭실 특별장학금 — 표 칸이 「2026.10.28(수) 9:00」 ↵ 「~ 11.10(화) 17:30」 두 줄. 안 이으면 시작일을 마감으로 읽는다(열린 공고가 닫힌다) */
+  eq('  다음 줄의 「~ 날짜」 를 잇는다 — 이름표 줄·이름표만 있는 줄 둘 다 11-10 (숭실 · 시작일 10-28 을 마감으로 읽지 않는다)',
+    [dl('신청기간 : 2026.10.28(수) 9:00', '~ 11.10(화) 17:30'), dl('신청 기간', '2026.10.28(수) 9:00', '~ 11.10(화) 17:30')], ['2026-11-10', '2026-11-10']);
+  /* 세종이도인재장학금 포스터 OCR — 이름표 줄은 「분야별상이」, 갈래마다 기간이 따로 */
+  const sejong = ['·신청기간· 분야별상이', '디딤돌(학자금대출 외),무지개:2026.5.6.(수)~2026.7.10.(금),18:00까지', '※디담돌-학자금 대출관련 분야는 7월 중 별도 공고 예정',
+    '핵심인재육성(우수인재, 특기적성):2026.8.10.(월) ~9.30.(수), 18:00까지', '선발분야·'];
+  eq('  한 이름표 아래 갈래 여럿(분야별 상이) → **가장 늦은 끝** 09-30 · 갈래별 시작이 달라 접수 시작일은 비운다 (세종이도인재)',
+    [dl(...sejong), od(...sejong)], ['2026-09-30', null]);
+  eq('    갈래가 하나만 읽히면 쓰지 않는다(다른 갈래의 끝이 더 늦을 수 있다)', dl(sejong[0], sejong[1], sejong[2], '선발분야·'), null);
+
+  /* ② 해 — 참고 연도 · 해 둘 */
+  eq('② 참고 연도(연간 소득·임금·원천징수·출생)는 해로 세지 않는다 — 「2025년도 선원월평균임금」 + 「2026년 2학기」 → 2026 하나',
+    ((r) => (r instanceof Set ? [...r] : r))(call(EX, 'yearsOf', '2026년 2학기 선원가족 장학생 선발 요강(변경)\n소득기준 2025년도 선원월평균임금 이하\n2025년도 근로소득원천징수영수증 1부')), ['2026']);
+  eq('  🔴 참고 연도 하나뿐인 글은 해 없는 `까지` 날짜에 그 해를 찍지 않는다(지난해 마감이 된다)',
+    dl('소득 기준 : 2025년도 연간 소득 기준 중위소득 100% 이하', '신청기간 : 10. 23.(금)까지'), null);
+  eq('  해가 둘이면 같은 글이 그 달·날을 해와 함께 적은 곳의 해를 쓴다 — 「4. 제출방법: 10/23(금)까지」 + 「2026.10.13 ~ 2026.10.23」 (연세 외수한일)',
+    dl('2026학년도 2학기 외수한일교류장학회 장학생 추천 안내', '2025년 선발 결과 안내', '2026.10.13 ~ 2026.10.23', '4. 제출방법: 10/23(금)까지 scholar2@yonsei.ac.kr로 제출'), '2026-10-23');
+  eq('  🔴 그런 해가 둘이면 고르지 않는다 — `2025. 10. 23.` 과 `05.10.23` 이 함께면 2025 도 2005 도 아니다(첫 승자로 고르던 잠복 버그)',
+    [call(EX, 'yearByMonthDay', '2025. 10. 23. 결과 발표 · 05.10.23 기준', 10, 23), call(EX, 'yearByMonthDay', '2026.10.13 ~ 2026.10.23', 10, 23)], [null, 2026]);
+
+  /* ③ PDF 글자층 칸 읽기 — 마감만 */
+  const seawon = ['2026년 2학기 선원가족 장학생 선발 요강(변경)', '소득기준                      2025년도 선원월평균임금 이하 (「한국선원통계연보」기준)',
+    '신청기간                                                                              ※ 재혼선원 배우자의 자녀일 경우 주민등록등본 추가',
+    '           기    간       9월 1일 ∼ 10월 30일     11월 中    당해 연도 학생당 2회 가능'].join('\n');
+  const ssu = ['2026학년도 2학기 특별장학금 신청 안내', '        장학금      신청 기간                            장학금액 및', '              2026.10.28(수) 9:00                  600,000원/인     청, 소득',
+    '                                     (SSUport)', '              ~ 11.10(화) 17:30                                   된 자'].join('\n');
+  eq('③ 글자층 칸 읽기 — 같은 줄 옆 칸(선원가족 「기    간 │ 9월 1일 ∼ 10월 30일」 · 2025년도 임금은 참고 연도) 10-30 · 아래 같은 열(숭실 「신청 기간」 열) 11-10',
+    [call(EX, 'columnDeadline', seawon), call(EX, 'columnDeadline', ssu)], ['2026-10-30', '2026-11-10']);
+  eq('  자간 벌린 낱글자는 한 칸 — 「기    간」 → 「기간」(자리는 그대로)', ((r) => (Array.isArray(r) ? r.map((c) => c.text) : r))(call(EX, 'layoutCells', '           기    간       9월 1일 ∼ 10월 30일')), ['기간', '9월 1일 ∼ 10월 30일']);
+  eq('  🔴 칸 읽기도 `근로기간` 칸은 아니다 · OCR 과 맞춰 보는 눈(달·날이 OCR 에도 있나)',
+    [call(EX, 'columnDeadline', seawon.replace('기    간', '근로기간')), call(EX, 'mentionsMonthDay', '9월 1일 ~ 10월 30일', '2026-10-30'), call(EX, 'mentionsMonthDay', '9월 1일 ~ 10월 23일', '2026-10-30')],
+    [null, true, false]);
+  const eeSrc = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));
+  eq('  칸 읽기는 첨부 마감에만 · 같은 파일 OCR 이 있으면 그 날이 OCR 에도 있어야 · 표식 「공고문 첨부(PDF 글자층)」',
+    /function columnDeadlineFromDocs[\s\S]*?mentionsMonthDay\(ocr, d\)/.test(eeSrc) && /'공고문 첨부\(PDF 글자층\)'/.test(eeSrc)
+      && !/columnDeadline/.test(eeSrc.slice(eeSrc.indexOf('function extractOpenDate'), eeSrc.indexOf('function extractOpenDate') + 200)), true);
+
+  /* ④ 껍데기 원문의 제목 줄 꼬리 — 가톨릭 선원가족 「…선발 안내(~10.30 접수기간 연장)」 */
+  const cuk = { name: '[학생지원팀] 2026년 2학기 한국선원복지고용센터 선원가족장학생 선발 안내' };
+  const cukRaw = ['[장학][학생지원팀] 2026년 2학기 한국선원복지고용센터 선원가족장학생 선발 안내(~10.30 접수기간 연장) | 가톨릭대학교',
+    '[학생지원팀] 2026년 2학기 한국선원복지고용센터 선원가족장학생 선발 안내(~10.30 접수기간 연장)', '조회수 120'].join('\n');
+  const head = call(EX, 'pageHeading', cuk, cukRaw);
+  eq('④ 껍데기 원문의 제목 줄(등록 제목 + 꼬리)을 찾고 꼬리 마감 10-30 을 읽는다 · 꼬리 없는 같은 제목 줄은 고친 제목이 아니다',
+    [head, call(EX, 'titleTailDeadline', head, '2026'), call(EX, 'pageHeading', cuk, `${cuk.name}\n조회수 3`)],
+    ['[학생지원팀] 2026년 2학기 한국선원복지고용센터 선원가족장학생 선발 안내(~10.30 접수기간 연장)', '2026-10-30', null]);
+  const noBody = eeSrc.slice(eeSrc.indexOf('if (!hasText(src)) {'), eeSrc.indexOf('const body = strip('));
+  eq('  첨부보다 **먼저** 읽고 출처는 「공고 원문 제목」 · 제목이 연장을 말하면 첨부 판정에 넘긴다',
+    noBody.indexOf('pageHeading(it') > 0 && noBody.indexOf('pageHeading(it') < noBody.indexOf('deadlineFromDocs(it') && /deadlineFromDocs\(it, undefined, heading/.test(noBody)
+      && EX.HEADING_LABEL === '공고 원문 제목', true);
+  const oldReq = '2026년 2학기 선원가족장학사업 선발 요강\n신청기간 : 2026. 9. 1.(월) ~ 10. 23.(목)';
+  eq('  🔴 연장 제목인데 연장·변경을 모르는 첨부(연장 전 요강)의 이른 마감은 안 읽는다 · `[변경]` 판 요강은 읽는다',
+    [call(EX, 'deadlineFromDocs', { id: 'x', name: '선원가족 장학생 모집 안내' }, [oldReq], '… 선발 안내(~10.30 접수기간 연장)'),
+      call(EX, 'deadlineFromDocs', { id: 'x', name: '선원가족 장학생 모집 안내(연장)' }, [oldReq.replace('요강', '요강[변경]').replace('10. 23.(목)', '10. 30.(목)')])],
+    [null, '2026-10-30']);
+
+  /* ⑤ OCR 기간 줄 오독 — 기간 줄에서만 */
+  const fixed = call(AT, 'ocrPeriodFix', '신청 기간 : 10.26~11. 0615:00까지[기한 엄수]\n신청기간 : 2026.10.15.(목)~]0.22.(목)\n합계 ~]0.22. 처리');
+  eq('⑤ OCR 기간 줄 — 「11. 0615:00」 → 「11. 06 15:00」(경희 공과대학 포스터) · 「~]0.22.」 → 「~10.22.」(강원 도전장학금) · 기간 줄이 아니면 그대로',
+    String(fixed).split('\n'), ['신청 기간 : 10.26~11. 06 15:00까지[기한 엄수]', '신청기간 : 2026.10.15.(목)~10.22.(목)', '합계 ~]0.22. 처리']);
+  eq('  고친 줄은 마감으로 읽힌다 (11-06 · 10-22)', [dl('2026학년도 공과대학 특성화 장학 프로그램 모집 공고', String(fixed).split('\n')[0]), dl(String(fixed).split('\n')[1])], ['2026-11-06', '2026-10-22']);
+
+  /* ⑥ 공고문 첨부 고르기 한 곳 — noticeDocFiles */
+  eq('⑥ 「…공고문(신청서 포함).hwpx」 는 공고문 · 「장학금 신청서(서약서 포함).hwp」·「…신청서.hwp」 는 아니다',
+    ['붙임1. 2026년 장학생 선발 공고문(신청서 포함).hwpx', '장학금 신청서(서약서 포함).hwp', '2026년 2학기 선원가족장학사업 신청서.hwp'].map((n) => AT.isNoticeDoc(n)), [true, false, false]);
+  {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ndoc-'));
+    const put = (f, body) => fs.writeFileSync(path.join(tmp, f), body);
+    put('elig-a-1.png', 'poster'); put('form-a-1.hwpx', 'NOTICE-WITH-FORM'); put('form-a-2.hwp', 'FORM'); put('form-a-3.hwp', 'poster');
+    put('form-b-1.hwp', 'OTHER-NOTICE'); put('form-c-1.hwp', 'TITLE-MATCH');
+    fs.writeFileSync(path.join(tmp, 'elig-docs.json'), JSON.stringify({ A: { files: ['elig-a-1.png'] } }));
+    fs.writeFileSync(path.join(tmp, 'forms-index.txt'), [
+      'form-a-1.hwpx\t선발 안내\t붙임1. 2026년 장학생 선발 공고문(신청서 포함).hwpx\t10\tA',
+      'form-a-2.hwp\t선발 안내\t2026 장학금 신청서.hwp\t10\tA',
+      'form-a-3.hwp\t선발 안내\t2026 장학생 선발 공고(사본).hwp\t10\tA',
+      'form-b-1.hwp\t선발 안내\t2026 장학생 선발 공고.hwp\t10\tB',
+      'form-c-1.hwp\t2026년도 국가유산진흥원 우수 장학생 선발 안내\t1.2026년 국가유산진흥원 우수 장학생 선발 공고.hwp\t10'].join('\n'));
+    const idx = call(AT, 'loadNoticeDocIndex', tmp);
+    const C = { id: 'C', name: '2026년도 국가유산진흥원 우수 장학생 선발 안내', attachments: [{ name: '1.2026년 국가유산진흥원 우수 장학생 선발 공고.hwp' }] };
+    eq('  신청서 쪽 공고문을 더한다 · 신청서만인 파일·다른 공고(id 가 다른 줄)·같은 바이트 사본은 뺀다 · 공고문이 먼저(docOrder)',
+      call(AT, 'noticeDocFiles', { id: 'A' }, { index: idx }), ['form-a-1.hwpx', 'elig-a-1.png']);
+    eq('  id 칸 없는 옛 줄은 같은 제목 + 그 공고의 첨부 이름일 때만 · formPath:false 면 자격 색인만',
+      [call(AT, 'noticeDocFiles', C, { index: idx, sameTitle: DU.sameTitle }), call(AT, 'noticeDocFiles', { ...C, attachments: [] }, { index: idx, sameTitle: DU.sameTitle }),
+        call(AT, 'noticeDocFiles', C, { index: idx }), call(AT, 'noticeDocFiles', { id: 'A' }, { index: idx, formPath: false })],
+      [['form-c-1.hwp'], [], [], ['elig-a-1.png']]);
+    /* 이 파일은 양식 로봇 사본 관문(「양식 변환 로봇의 두 스위치」)이 몇 파일만 복사해 돌린다 — 무거운 import 를 들이면 그 관문이 넘어진다 */
+    eq('    attachment-text.mjs 는 이웃 모듈을 pdf-text.mjs 하나만 불러온다(같은 제목 판정은 부르는 쪽이 넘긴다)',
+      [...readText(new URL('../collector/attachment-text.mjs', import.meta.url)).matchAll(/^import .* from '\.\/([^']+)'/gm)].map((m) => m[1]), ['pdf-text.mjs']);
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+  const amSrc = readText(new URL('../collector/extract-amounts.mjs', import.meta.url));
+  eq('  🔴 발췌기·금액 로봇은 색인 파일을 직접 열지 않는다(noticeDocFiles 한 곳) · 서류 목록·금액·자격은 formPath:false(넓혔을 때 달서 80만원 · 자격 줄이 서류에 섞였다)',
+    [/elig-docs\.json/.test(eeSrc), /elig-docs\.json/.test(amSrc), /noticeDocFiles\(it, \{ formPath: false \}\)/.test(amSrc),
+      (eeSrc.match(/fillDocuments\(it, (?:body|null), docsOnce\(it, false\)\)/g) || []).length, /function qualFromDocs[\s\S]*?noticeDocFiles\(it, \{ formPath: false \}\)/.test(eeSrc)],
+    [false, false, true, 2, true]);
+
+  /* ⑦ 발췌 — 문장 가르기 · 이름표 · 첨부 발췌 */
+  eq('⑦ 날짜의 점에서 자르지 않는다 · 항목 번호 앞에서 자르고 번호는 남긴다 (서울과기대 「4. 신청기간 : 2026.10.1.(목) ~ 10. 14.(수) 18:00까지」 가 「~ 10.」 에서 잘렸다)',
+    call(EX, 'splitSentences', '4. 신청기간 : 2026.10.1.(목) ~ 10. 14.(수) 18:00까지 5. 장학금액 : 1인당 100만원(최대1학기만 지원)'),
+    ['4. 신청기간 : 2026.10.1.(목) ~ 10. 14.(수) 18:00까지', '5. 장학금액 : 1인당 100만원(최대1학기만 지원)']);
+  eq('  🔴 한글 항목 기호는 가 나 다 … 하 열넷뿐 — 「300만 원)」 의 `원)` 은 항목이 아니다 · 칸 벌린 날짜 「09:00 – 11 . 18.」 는 한 덩어리',
+    [call(EX, 'splitSentences', '장학금액 : 300만 원) 다. 신청기간: 9. 1. ~ 9. 30.'), call(EX, 'splitSentences', '신청기간 : 2026 년 11 월 4 일 09:00 – 11 . 18.(수) 17:00')],
+    [['장학금액 : 300만 원)', '다. 신청기간: 9. 1. ~ 9. 30.'], ['신청기간 : 2026 년 11 월 4 일 09:00 – 11 . 18.(수) 17:00']]);
+  eq('  새 이름표(모집기간·접수처) · 같은 줄은 한 번 · 바닥글 연락처 띠·첨부 파일 이름 줄은 안 담는다',
+    EX.extractFrom(['모집기간: 10.26(월) ~11.9(월)', '- 각 분야별 신청마감일 18:00 까지 도착한 서류만 인정', '- 각 분야별 신청마감일 18:00 까지 도착한 서류만 인정',
+      '(우)02841 서울특별시 성북구 안암로 145 대표전화 02-3290-1114 문의처 장학팀', '붙임1. 2026년 신청기간 안내.hwp', '▷ 접수처 : www.ybz.or.kr/'].join('\n')),
+    ['모집기간: 10.26(월) ~11.9(월)', '- 각 분야별 신청마감일 18:00 까지 도착한 서류만 인정', '▷ 접수처 : www.ybz.or.kr/']);
+  eq('  첨부 발췌는 이름표와 값의 짝이 맞을 때만 — 선원가족 OCR 「신청기간 : ※재혼선원배우자의 자녀일 경우 …」 · 깨진 메일 · 옆 칸 꼬리 「금액) 지급하며」 는 버린다',
+    ['신청기간 : ※재혼선원배우자의 자녀일 경우 주민등록등본 추가1부', '- 신청방법: 이메일 접수(/4111</0/(@히04.80.1[)', '금액) 지급하며 실 납부금액이 100만원 미만일 시 지원 대상 제외',
+      '신청기간 : 2026.10.15.(목)~10.22.(목)', '문의 : 이메일 forest.talent@kfas.or.kr'].map((l) => call(EX, 'docExcerptOk', l)), [false, false, false, true, true]);
+  const bodyPart = eeSrc.slice(eeSrc.indexOf('const body = strip('));
+  eq('  첨부 발췌는 두 갈래(본문에서 0줄 · 껍데기) 모두 · 본문은 제목 줄부터(제목 앞 다른 글 띠 — 가천 「FGD 참여학생 모집 ○ 신청기간」)',
+    [/excerptsFromDocs\(docs\(\)\)/.test(noBody), /if \(!ex\.length\) \{ const dx = excerptsFromDocs\(docs\(\)\)/.test(bodyPart), /let ex = excerptsFromBody\(body, it\)/.test(bodyPart)], [true, true, true]);
+
+  /* ⑧ 자격 절 */
+  const kmu = ['◤ 1. 지원자격', '2026 학년도 현재 국민대학교에 재학 중인 여성 외국인 학생 ( 학부생 / 대학원생 ) 중 평점 평균이 4.0 이상으로 지도자로서의 품성을 갖추고 가정형편이 어려운 학생',
+    '◤ 2. 장학금액 및 선발인원', '300 만원 지급 , 1 명', '◤ 3. 장학생 선발방법', '가 . 1 차 : 서류 및 에세이 (Essay) 심사'];
+  eq('⑧ 「◤ 2. 장학금액 및 선발인원」 에서 자격 절이 끝난다 (국민대 글로벌 여성리더 — 금액·선발방법 줄이 자격에 딸려 왔다)',
+    EX.extractQualifyLines(kmu.join('\n')), kmu.slice(0, 2));
+  eq('  section-head 가 `◤` 를 떼고 본다 — 금액 머리 · 다른 절(선발방법) · 자격 머리',
+    [SH.isAmountHead('◤ 2. 장학금액 및 선발인원'), SH.isSectionBreak('◤ 3. 장학생 선발방법'), SH.isQualifyHead('◤ 1. 지원자격')], [true, true, true]);
+  eq('  `지원내역 :` 도 금액 머리다', SH.isAmountHead('3. 지원내역 : 1인 300만원'), true);
+  eq('  🔴 `응시대상자 :` 는 자격 절 제목이 아니다(시험 안내) · 줄 머리 「■ 대 상 자 :」 는 그대로',
+    [EX.extractQualifyLines(['- 응시대상자 : 2026학년도 재학생 중 1단계 합격자', '- 시험일 : 2026. 10. 3.(토)'].join('\n')).length,
+      EX.extractQualifyLines(['■ 대 상 자 : 2026학년도 2학기 재학생 중 직전학기 평점 3.0 이상인 자', '■ 신청기간 : 2026. 10. 1. ~ 10. 8.'].join('\n')).length], [0, 1]);
+  eq('  줄 머리 「2.대상자및 장학금액」(장학사정관 포스터 OCR)은 자격 절 제목 · 문장 가운데 「…차상위계층대상자 및 …」 는 아니다',
+    [EX.extractQualifyLines(['2.대상자및 장학금액', ':국가장학금 미수혜자 중 직전학기 12학점 이상 이수한 재학생', '3.신청기간 : 11.1~11.8'].join('\n')),
+      EX.extractQualifyLines(['1. 지급목적', ':기초생활수급자, 차상위계층대상자 및 한부모 재학생을 지원', '2. 신청방법 : 포털'].join('\n')).length],
+    [[':국가장학금 미수혜자 중 직전학기 12학점 이상 이수한 재학생'], 0]);   // 제목 줄 자체는 금액 낱말(장학금액) 때문에 담지 않는다 — 그 아래 요건이 담긴다
+}
+
 console.log('\n■ 자격 자리의 잡음을 유형별로 세는가 (2026-08-23)');
 {
   const rep = readText(new URL('../verify/eligibility-report.mjs', import.meta.url));
@@ -10902,7 +11067,8 @@ console.log('■ 첨부에서 마감일 — 본문이 껍데기인 게시판 (20
   const 첨부마감 = reg.filter((i) => i.deadlineFrom === '공고문 첨부' && i.deadline);
   if (첨부마감.length) {
     eq(`첨부에서 읽었다고 적힌 공고 ${첨부마감.length}건이 실제로 다시 읽힌다`,
-      첨부마감.filter((i) => AWAIT_EE.deadlineFromDocs({ id: i.id }) !== i.deadline).map((i) => i.id), []);
+      /* 2026-11-15: 공고 **전체**를 넘긴다 — 신청서 쪽에 섞여 온 공고문(noticeDocFiles)은 id 칸 없는 옛 색인 줄을 제목·첨부 이름으로 찾는다(발췌기가 부르는 그대로) */
+      첨부마감.filter((i) => AWAIT_EE.deadlineFromDocs(i) !== i.deadline).map((i) => i.id), []);
   } else {
     /* 표본이 없다 — 그래도 **함수가 살아 있는지**는 잰다(첨부가 60일마다 갈려 0건일 수 있다) */
     const 색인 = JSON.parse(readText(new URL('../collector/extracted/elig-docs.json', import.meta.url)));

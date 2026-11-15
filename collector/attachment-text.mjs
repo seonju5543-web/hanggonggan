@@ -23,7 +23,6 @@ import zlib from 'node:zlib';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { pdfText } from './pdf-text.mjs';
-import { sameTitle } from './detail-url.mjs';
 
 /* 학생이 '채우는' 문서가 아니라 '읽는' 문서인가.
    ⚠️ 이름에 신청서·서식이 들어가면 공고문이 아니다 — 자격이 아니라 빈칸이 들어 있다. */
@@ -251,6 +250,8 @@ export const readableDoc = (filePath, text = attachmentText(filePath)) => readab
    🔴 발췌기·금액 로봇은 색인 파일을 직접 열지 말고 이것을 부른다(관문이 발췌기 원본에서 `elig-docs.json` 글자를 찾는다).
    🔴 신청서 쪽 파일은 **공고문류(isNoticeDoc)만** · 그 공고의 줄만(id 칸이 있으면 id · 없으면 같은 제목 + 그 공고의 첨부 이름) ·
       이미 든 파일과 **바이트가 같으면** 뺀다(elig-1xmn1p-1.docx ≡ form-1xmn1p-1.docx 같은 사본을 두 번 읽지 않는다).
+   ⚠️ id 칸 없는 옛 줄의 '같은 제목' 판정은 **부르는 쪽이 넘긴다**(`sameTitle` — detail-url.mjs 한 곳). 이 파일은 양식 로봇 사본 관문이
+      파일 몇 개만 복사해 돌리므로 무거운 import 를 들이면 그 관문이 넘어진다(2026-11-15 실제로 그랬다) · 안 넘기면 id 줄만 본다.
    ⚠️ `formPath:false` — 제출 서류 목록(fillDocuments)·금액 로봇은 예전 그대로 자격 색인만 본다. 넓혀 봤을 때 틀린 값이 나왔다
       (달서 80만원 · 자격 줄이 서류 목록에 섞임). 넓히려면 그 두 길을 전후 대조로 먼저 볼 것.
    ============================================================================ */
@@ -275,7 +276,7 @@ function fileHash(p) {
   return hashMemo.get(p);
 }
 /** 이 공고의 공고문 첨부 파일 이름들(extracted/ 기준) — 원문 글자(HWP·DOCX)가 먼저(docOrder) */
-export function noticeDocFiles(it, { index, formPath = true } = {}) {
+export function noticeDocFiles(it, { index, formPath = true, sameTitle = null } = {}) {
   const idx = index || (defaultIndex ??= loadNoticeDocIndex());
   const out = [...(((idx.elig || {})[it && it.id] || {}).files || [])];
   if (formPath && it) {
@@ -284,7 +285,7 @@ export function noticeDocFiles(it, { index, formPath = true } = {}) {
     const seen = new Set(out.map((f) => fileHash(`${idx.dir}/${f}`)).filter(Boolean));
     for (const r of idx.forms || []) {
       if (out.includes(r.file) || !isNoticeDoc(r.attach)) continue;
-      const mine = r.id ? r.id === it.id : (attNames.has(r.attach) && titles.some((t) => sameTitle(t, r.title)));
+      const mine = r.id ? r.id === it.id : (!!sameTitle && attNames.has(r.attach) && titles.some((t) => sameTitle(t, r.title)));
       if (!mine) continue;
       const h = fileHash(`${idx.dir}/${r.file}`);
       if (!h || seen.has(h)) continue;   // 파일이 없거나 이미 든 파일의 사본

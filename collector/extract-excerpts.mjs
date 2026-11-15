@@ -34,7 +34,10 @@ const ME_BRANCH_LABEL = _cr(import.meta.url)('../match-engine.js').BRANCH_LABEL;
 /* 공고문 첨부에서 글자 뽑기 — 본문이 "붙임 참조"뿐인 공고가 있다.
    🔴 **공고문만** 본다(attachment-text.mjs 첫머리 참조) — 신청서·동의서를 읽으면
    개인정보 수집 항목이 지원 자격 자리에 앉는다(실제로 겪고 되돌린 적이 있다). */
-import { attachmentText, readableDoc, isOcrSource, noticeDocFiles, pdfLayerText } from './attachment-text.mjs';
+import { attachmentText, readableDoc, isOcrSource, noticeDocFiles as noticeDocFiles0, pdfLayerText } from './attachment-text.mjs';
+/* id 칸 없는 옛 신청서 색인 줄의 '같은 제목' 판정 — 규칙은 detail-url.mjs sameTitle 한 곳(베끼지 않는다) */
+import { sameTitle } from './detail-url.mjs';
+const noticeDocFiles = (it, opts = {}) => noticeDocFiles0(it, { sameTitle, ...opts });
 import { findApplyEmail, humanOwnedEmail, staleApplyEmail } from './apply-email.mjs';
 import { decodeEntities } from './clean-title.mjs';
 import { readDocuments, placeholderOnly as docsPlaceholderOnly } from './doc-list.mjs';
@@ -1158,7 +1161,8 @@ const DOC_PLACEHOLDER = /(원문\s*공고|공고문|재?공고\s*원문)(에서)
 const isDocPlaceholder = (doc) => DOC_PLACEHOLDER.test(String(doc || ''));
 
 export { REQ_SIGNAL, completeTitle, titleTailDeadline, extractQualifyLines, scoopQualifyLines, extractFrom, extractExcludeLines, extractPriorityLines,
-         extractDeadline, extractOpenDate, extractAnnounce, qualFromTitle, AMOUNT_ROW, cutAtNextSection, extractDocuments, isDocPlaceholder };
+         extractDeadline, extractOpenDate, extractAnnounce, qualFromTitle, AMOUNT_ROW, cutAtNextSection, extractDocuments, isDocPlaceholder,
+         pageHeading, excerptsFromDocs, HEADING_LABEL };
 
 let browserBodies = {};
 try { browserBodies = JSON.parse(fs.readFileSync(new URL('extracted/browser-bodies.json', HERE), 'utf8')); } catch { /* 아직 없음 */ }
