@@ -5392,6 +5392,10 @@ function eligAskHtml(sch) {
   const keys = askableForSch(sch, state.profile);
   const mine = eligAsk && eligAsk.id === sch.id ? eligAsk : null;
   if (!keys.length && !mine) return '';        /* 물을 것이 없으면 자리도 안 만든다 */
+  /* 🔴 화면에 보일 자격 줄이 없으면 묻지도 않는다 (2026-11-15 개발자 재제보 — 실측 4건: 「지원 자격 — 미확인 자격 0」 만 남은 빈 칸).
+     질문 거리(askableForSch)는 **저장된 줄 전부**에서 잡고 화면 줄(requirementLines)은 서류 안내·※ 조각을 걸러서, 줄은 0개인데 질문만 남았다 —
+     답해도 바뀔 줄이 없다(답하면 칸이 통째로 사라졌다). 제외 줄(✗)만 있는 시트도 같다(리뷰). 관문 `verify-elig-ask.js` ⑩ */
+  if (!requirementLines(sch, null, { all: true }).length) return '';
   const open = !!(mine && mine.open);
   const shown = (mine && mine.shown) || requirementLines(sch, null, { all: true })
     .filter((l) => !requirementMatch(l, state.profile, sch));
