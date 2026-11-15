@@ -4959,9 +4959,9 @@ function eligibilityRowsHtml(sch, result) {
 function openDetail(id) {
   /* 대외활동 줄(달력·보관함)은 활동 시트로 — 같은 [data-detail] 길로 들어온다(2026-10-02) */
   if (isActivityId(id)) { openActivityDetail(id.slice(4)); return; }
+  const sch = appSch(id);   // 데이터에서 내려갔어도 결과를 적기 전이면 떠 둔 사본으로 연다(2026-10-02)
   if (typeof trackUse === 'function') trackUse('detail', id);   // 이용 횟수 — 누가는 안 담는다(usage-report.js)
   { const dsh = document.getElementById('detail-sheet'); if (dsh) dsh.dataset.useItem = id; }
-  const sch = appSch(id);   // 데이터에서 내려갔어도 결과를 적기 전이면 떠 둔 사본으로 연다(2026-10-02)
   if (!sch) return;
   const result = evaluateFor(sch, state.profile);   // 카드와 같은 판정을 쓴다(위 주석)
   const fit = fitScore(sch, result, state.profile);
