@@ -335,7 +335,10 @@ function amountFrom(lines) {
   var MAX_ALL = /최대\s*([\d,.]+\s*[백천]?\s*만?\s*원)/g;
   while ((mm = MAX_ALL.exec(readBody))) { var mv = wonIn(mm[1]); if (mv && !maxVals[mv]) { maxVals[mv] = 1; nMaxVals++; } }
   /* 대학생 몫을 원문이 따로 적은 것(collegeTierWon)은 이미 이 학생의 갈래다 — 다른 학교급·과정 금액이 나란해도 갈래 고르기가 아니다(봄내장학생) */
-  if (!collegeWon && (nCellVals > 1 || nMaxVals > 1)) tiered = true;
+  /* 절의 **첫 금액**이 `1인당` 금액이면 원문이 이 장학금의 1인당 몫을 먼저 밝힌 것이다(`1인당 최대 1,000,000원` 뒤의 다른 항목 `최대 500천원` · 세종이도) —
+     뒤쪽 줄의 `(부양자녀 1인당)` 처럼 첫 금액이 아닌 1인당 조각은 이 예외가 아니다(국세청 근로·자녀 장려 장학 · 2026-11-15) */
+  var firstPer = perWon && perWon === wonIn(readBody);
+  if (!collegeWon && !firstPer && (nCellVals > 1 || nMaxVals > 1)) tiered = true;
   if (!won && !ratio) {
     var headVal = String(blk.head).split(/[:：]/).slice(1).join(':').replace(/[(（][^)）]*[)）]/g, ' ').replace(/\s+/g, ' ').trim();
     if (TUITION_WHOLE.test(headVal)) ratio = 1;
