@@ -467,5 +467,37 @@
    "param": "page"
   },
   "checkedAt": "2026-11-14"
+ },
+ "https://www.sookmyung.ac.kr/kr/news/event.do": {
+  "ok": false,
+  "checkedAt": "2026-11-15"
+ },
+ "https://youth.chungnam.go.kr/web/main/bbs/cnyouth_notice/list": {
+  "ok": false,
+  "checkedAt": "2026-11-15"
+ },
+ "https://kucss.or.kr/dp_notice": {
+  "ok": true,
+  "way": {
+   "kind": "page",
+   "param": "page"
+  },
+  "checkedAt": "2026-11-15"
+ },
+ "https://www.seoultech.ac.kr/service/board/rec": {
+  "ok": true,
+  "way": {
+   "kind": "page",
+   "param": "page"
+  },
+  "checkedAt": "2026-11-15"
+ },
+ "https://www.skku.edu/skku/campus/skk_comm/notice05.do": {
+  "ok": false,
+  "checkedAt": "2026-11-15"
+ },
+ "https://www.kookmin.ac.kr/user/kmuNews/notice/9/index.do": {
+  "ok": false,
+  "checkedAt": "2026-11-15"
  }
 }
