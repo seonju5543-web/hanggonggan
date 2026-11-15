@@ -252,6 +252,7 @@ function toggleSave(id) {
     const act = isActivityId(id) ? findActivity(id.slice(4)) : null;
     state.saved.push(act ? { id, savedAt: nowStamp(), snap: JSON.parse(JSON.stringify(act)) } : { id, savedAt: nowStamp() });
     saveState();
+    if (typeof trackUse === 'function') trackUse('save', isActivityId(id) ? id.slice(4) : id);
     toast('보관함에 저장했어요', { label: '보관함', run: () => showScreen('my') });
   }
   refreshSaveViews(id);
@@ -592,6 +593,7 @@ function recordSubmitted(sch) {
   if (!confirm(`${officialChannel(sch).label}에서 공식 제출을 마치셨나요?\n\n제출 완료로 기록하면 진행 단계가 '공식 제출'로 넘어가요.`)) return;
   app.submittedAt = nowStamp();
   saveState();
+  if (typeof trackUse === 'function') trackUse('submitted', sch.id);
   /* 손끝에도 한 번 (2026-09-09). 여기까지만 울린다 — 진동은 **되돌리기 어려운 일이 방금
      일어났다**는 신호로만 쓴다(저장·새로고침·이 기록 셋). 화면이 바뀔 때마다 울리면
      알림처럼 느껴져서 학생이 폰 설정에서 앱 진동을 통째로 꺼 버린다. */
@@ -2674,6 +2676,7 @@ function renderFormFill(restore) {
       const existing = state.applications.find((a) => a.id === sch.id);
       if (existing) { existing.pending = false; existing.formAns = formFill.ans; existing.appliedAt = nowStamp(); }
       else state.applications.push({ id: sch.id, name: sch.name, appliedAt: nowStamp(), step: 0, formAns: formFill.ans, pending: false, prep: {} });
+    if (typeof trackUse === 'function') trackUse('prep', sch.id);
       saveState();
       const ch = officialChannel(sch);
       /* 문서의 성격대로 말한다 (리뷰 2026-10-13) — 모르는 공고에 '양식·입력 칸이 있다'고 단정하지 않는다 */
@@ -3786,6 +3789,8 @@ function activityLinkHtml(n) {
 }
 
 function openActivityDetail(url) {
+  if (typeof trackUse === 'function') trackUse('detail', url);   // 이용 횟수 — 주소는 보내지 않고 지문으로(usage-report.js)
+  { const dsh = document.getElementById('detail-sheet'); if (dsh) dsh.dataset.useItem = url; }
   const n = activityItem(url);   // 피드에서 빠졌어도 저장해 둔 글이면 사본으로 연다
   if (!n) return;
   const { sch, result, fit, fd } = activityFit(n);
@@ -4085,6 +4090,7 @@ function finalizeApply(sch, docs) {
     existing.appliedAt = nowStamp();
   } else {
     state.applications.push({ id: sch.id, name: sch.name, appliedAt: nowStamp(), step: 0, docs, pending: false, prep: {} });
+    if (typeof trackUse === 'function') trackUse('prep', sch.id);
   }
   saveState();
   const ch = officialChannel(sch);
@@ -4524,6 +4530,7 @@ function bulkStart() {
     id: sch.id, name: sch.name, appliedAt: nowStamp(), step: 0, docs: null, pending: bulkNeedsWork(sch), prep: {},
   }));
   saveState();
+  if (typeof trackUse === 'function') go.forEach((sch) => trackUse('prep', sch.id));   // 일괄 신청 준비도 공고마다 한 번
   closeSheet();
   const goneMsg = gone.length ? ` · ${gone.length}건은 그 사이 마감돼 제외` : '';
   toast(need.length
@@ -4952,6 +4959,8 @@ function eligibilityRowsHtml(sch, result) {
 function openDetail(id) {
   /* 대외활동 줄(달력·보관함)은 활동 시트로 — 같은 [data-detail] 길로 들어온다(2026-10-02) */
   if (isActivityId(id)) { openActivityDetail(id.slice(4)); return; }
+  if (typeof trackUse === 'function') trackUse('detail', id);   // 이용 횟수 — 누가는 안 담는다(usage-report.js)
+  { const dsh = document.getElementById('detail-sheet'); if (dsh) dsh.dataset.useItem = id; }
   const sch = appSch(id);   // 데이터에서 내려갔어도 결과를 적기 전이면 떠 둔 사본으로 연다(2026-10-02)
   if (!sch) return;
   const result = evaluateFor(sch, state.profile);   // 카드와 같은 판정을 쓴다(위 주석)
@@ -7371,6 +7380,7 @@ function bindEvents() {
     // 프로필을 처음 만든 직후에 알림 동의를 딱 한 번 묻는다 (이후에는 MY 화면에서만)
     // 저장 완료 토스트가 사라진 뒤에 물어본다 (문구가 겹치지 않게)
     if (isFirstTime && typeof notifyMaybeAskConsent === 'function') notifyMaybeAskConsent(2900);
+    if (isFirstTime) if (typeof trackUse === 'function') trackUse('onboard', '');
   });
 
   $('#in-flags').addEventListener('change', syncConsentRow);

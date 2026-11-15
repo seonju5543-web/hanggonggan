@@ -17,6 +17,10 @@ mkdir -p "$OUT/vendor"
 
 # 화면 자체 (_headers는 Cloudflare가 응답 헤더로 실어 보내는 보안 설정)
 cp _admin/index.html _admin/admin.css _admin/admin.js _admin/_headers "$OUT/"
+# 아침 지표 (2026-11-15 · 은서) — 이용 횟수·앱 오류·로봇 경보를 한 화면에. Supabase 설정과 지문 규칙은 원본을 그대로 옮긴다(베끼지 않는다)
+cp _admin/morning.html _admin/morning.js _admin/morning-off.js "$OUT/"
+cp supabase-config.js "$OUT/vendor/supabase-config.js"
+cp usage-report.js "$OUT/vendor/usage-report.js"
 
 # 검색엔진 수집 차단 (주소가 검색으로 새지 않게 — 잠금은 Cloudflare Access가 한다)
 printf 'User-agent: *\nDisallow: /\n' > "$OUT/robots.txt"
