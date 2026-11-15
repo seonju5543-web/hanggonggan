@@ -61,7 +61,8 @@
       const y = sumBy(daily, (x) => x.event === ev && String(x.day) === yday);
       const t = sumBy(daily, (x) => x.event === ev && String(x.day) === today);
       const all = sumBy(daily, (x) => x.event === ev);
-      return `<div class="tile"><span>${esc(EV[ev])}</span><b>${num(y)}</b><em>어제 · 오늘 ${num(t)} · 기간 ${num(all)}</em></div>`;
+      const grp = (ev === 'open' || ev === 'onboard') ? 't-reach' : (['prep', 'form_open', 'form_edit', 'submitted'].includes(ev) ? 't-apply' : '');
+      return `<div class="tile ${grp}"><span>${esc(EV[ev])}</span><b>${num(y)}</b><em>오늘 ${num(t)} · 기간 ${num(all)}</em></div>`;
     }).join('');
   }
 
@@ -69,7 +70,7 @@
     const by = {};
     for (const x of report.items || []) { (by[x.item] = by[x.item] || {})[x.event] = x.n; }
     const rows = Object.entries(by).sort((a, b) => (b[1].detail || 0) - (a[1].detail || 0)).slice(0, 15);
-    $('#mo-items').innerHTML = rows.length ? rows.map(([item, v]) => `<tr><td>${esc(names[item] || item)}</td>${['detail', 'save', 'source', 'prep', 'submitted'].map((e) => `<td class="n">${v[e] == null ? '–' : num(v[e])}</td>`).join('')}</tr>`).join('')
+    $('#mo-items').innerHTML = rows.length ? rows.map(([item, v]) => `<tr><td class="name" title="${esc(names[item] || item)}">${esc(names[item] || item)}</td>${['detail', 'save', 'source', 'prep', 'submitted'].map((e) => `<td class="n${v[e] == null ? ' dim' : ''}">${v[e] == null ? '–' : num(v[e])}</td>`).join('')}</tr>`).join('')
       : '<tr><td colspan="6" class="muted">아직 5건 넘는 공고가 없습니다</td></tr>';
   }
 
@@ -83,7 +84,7 @@
     };
     const fill = (sel, dim) => {
       const rows = g.filter((x) => x.dim === dim).sort((a, b) => (b.n || 0) - (a.n || 0));
-      $(sel).innerHTML = rows.length ? rows.map((x) => `<tr><td>${esc(label(dim, x.val))}</td><td class="n">${num(x.n)}</td></tr>`).join('') : '<tr><td class="muted">없음</td></tr>';
+      $(sel).innerHTML = rows.length ? rows.map((x) => `<tr><td class="name">${esc(label(dim, x.val))}</td><td class="n${x.n == null ? ' dim' : ''}">${num(x.n)}</td></tr>`).join('') : '<tr><td class="muted">없음</td></tr>';
     };
     fill('#mo-g-gt', 'grade_track'); fill('#mo-g-rg', 'region'); fill('#mo-g-sc', 'school');
   }
@@ -95,9 +96,9 @@
     const y = sumBy(d, (x) => String(x.day) === yday);
     const t = sumBy(d, (x) => String(x.day) === today);
     const all = sumBy(d, () => true);
-    $('#mo-err-tiles').innerHTML = `<div class="tile"><span>어제 오류</span><b class="${y > 0 ? 'warn' : ''}">${y}</b><em>오늘 ${t} · 기간 ${all}</em></div>`;
+    $('#mo-err-tiles').innerHTML = `<div class="tile ${y > 0 ? 't-err' : 't-ok'}"><span>어제 오류</span><b>${y}</b><em>오늘 ${t} · 기간 ${all}</em></div>`;
     const top = report.errors_top || [];
-    $('#mo-err-top').innerHTML = top.length ? top.map((x) => `<tr><td>${esc(x.message)}</td><td>${esc(x.source || '')}</td><td class="n">${x.n}</td></tr>`).join('') : '<tr><td colspan="3" class="muted">최근 24시간 오류 없음</td></tr>';
+    $('#mo-err-top').innerHTML = top.length ? top.map((x) => `<tr><td>${esc(x.message)}</td><td class="name">${esc(x.source || '')}</td><td class="n">${x.n}</td></tr>`).join('') : '<tr><td colspan="3" class="muted">최근 24시간 오류 없음</td></tr>';
   }
 
   async function renderAlerts() {
@@ -108,7 +109,7 @@
       const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/issues?state=open&per_page=100`, { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' } });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const list = (await r.json()).filter((i) => !i.pull_request && /^(🚨|🛡|🔑)/.test(i.title || ''));
-      box.innerHTML = list.length ? list.map((i) => `<li><a href="${esc(i.html_url)}" target="_blank" rel="noopener">#${i.number}</a> ${esc(i.title)} <span class="muted">· ${esc(String(i.updated_at).slice(0, 10))}</span></li>`).join('') : '<li>열린 경보 없음 ✅</li>';
+      box.innerHTML = list.length ? list.map((i) => `<li><a href="${esc(i.html_url)}" target="_blank" rel="noopener">#${i.number}</a> ${esc(i.title)} <span class="muted">· ${esc(String(i.updated_at).slice(0, 10))}</span></li>`).join('') : '<li class="ok">열린 경보 없음</li>';
     } catch (e) { box.innerHTML = `<li class="muted">경보를 못 읽었습니다(${esc(e.message)}) · <a href="https://github.com/${OWNER}/${REPO}/issues" target="_blank" rel="noopener">이슈 목록 열기</a></li>`; }
   }
 
@@ -125,7 +126,7 @@
     }
     report = rep;
     $('#mo-key').hidden = true;
-    $('#mo-when').textContent = `${rep.today} 기준 · 최근 ${days}일`;
+    $('#mo-when').textContent = `${rep.today} 기준 · 최근 ${days}일 합계`;
     renderTiles(); renderItems(); renderGroups(); renderErrors();
   }
 
