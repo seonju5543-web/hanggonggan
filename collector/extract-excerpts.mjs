@@ -262,6 +262,8 @@ const VALUE_DEADLINE = /(까지|마감)/;
       `까지` 밖에 안 붙는다. 한글 산문이 남으면 그 줄은 조건을 말하는 것이다.
    관문: `test-collector.mjs` '첨부에서 마감일' 절 ③. */
 const VALUE_RANGE = /\d\s?[.\-/월]\s?\d[^~∼〜～–—]{0,20}[~∼〜～–—][^0-9]{0,12}\d/;
+/* 물결 뒤에 날짜가 오는가 — 끝 날짜가 있는 범위(시작 쪽이 OCR 로 깨져도) */
+const RANGE_TO_DATE = /[~∼〜～–—]\s*(?:\d{2,4}\s?[.\-/년]\s?)?\d{1,2}\s?[.\-/월]\s?\d{1,2}/;
 /* 끝 날짜 뒤 꼬리에 한글 산문이 없는가 — 요일·시각·`까지`·`오전/오후` 만 허용한다 */
 const TAIL_OK = (value) => {
   const v = String(value);
@@ -295,9 +297,42 @@ function ymd(y, m, d) {
    `3. 모집기간: ~ 7월 31일(금) 24:00까지` 처럼 해를 아예 안 적는 공고가 있는데,
    그걸 못 읽어 '기한 원문 확인'으로 내보내고 있었다. **지어내는 것이 아니라 원문에서
    가져오는 것이다** — 해가 둘 이상 나오면(2025·2026 혼재) 고르지 않고 포기한다. */
+/* 🔴 **참고 연도는 해가 아니다** (2026-11-15 · 카드 빈칸 비평). `2025년도 연간 소득`·`2025년도 선원월평균임금`·`2025년도 근로소득원천징수영수증`·
+   `2007년 출생` 은 공고가 **따지는 기준 해**라 접수 해가 아니다 — 그것 때문에 해가 '둘'이 되어 해 없는 마감을 못 읽었고(선원가족 요강),
+   그것만 있는 글에서는 거꾸로 **지난해를 마감에 찍을** 뻔했다. 그 해가 **참고 꼴로만** 나올 때 뺀다(같은 해가 다른 데서 그냥 나오면 센다). */
+const REF_YEAR_AFTER = /^\s?(?:년|학년도)\s?도?[^0-9\n]{0,12}?(?:연간\s?소득|소득\s?금액|근로\s?소득|종합\s?소득|원천\s?징수|귀속|임금|출생|건강\s?보험료)/;
+export function yearsOf(text) {
+  const src = String(text || '');
+  const ys = new Set();
+  for (const m of src.matchAll(/(20\d{2})(?=\s?(?:년|학년도))/g)) {
+    if (REF_YEAR_AFTER.test(src.slice(m.index + 4, m.index + 40))) continue;
+    ys.add(m[1]);
+  }
+  return ys;
+}
 function soleYear(text) {
-  const ys = [...new Set([...String(text).matchAll(/(20\d{2})\s?(?:년|학년도)/g)].map((m) => m[1]))];
+  const ys = [...yearsOf(text)];
   return ys.length === 1 ? Number(ys[0]) : null;
+}
+/* 해가 둘 이상이면(또는 없으면) 해 없는 날짜에 해를 주지 않는다 — 단 **같은 글이 그 달·날을 해와 함께 적어 둔** 때만 그 해를 쓴다
+   (연세 외수한일 「4. 제출방법: 10/23(금)까지」 · 같은 글 위쪽에 `2026.10.13 ~ 2026.10.23`). 그런 해가 **둘 이상이면 고르지 않는다** —
+   `2025. 10. 23.` 과 `05.10.23` 이 함께 있으면 2025 도 2005 도 아니다(첫 승자로 고르면 틀린 해가 조용히 찍힌다). */
+export function yearByMonthDay(text, m, d) {
+  const ys = new Set();
+  for (const x of String(text || '').matchAll(new RegExp(FULL_DATE.source, 'g'))) {
+    const v = ymd(x[1], x[2], x[3]);
+    if (v && Number(x[2]) === Number(m) && Number(x[3]) === Number(d)) ys.add(v.slice(0, 4));
+  }
+  return ys.size === 1 ? Number([...ys][0]) : null;
+}
+/* 값 속 첫 해 없는 날짜로 그 해를 찾는다(위 yearByMonthDay) — 값에 해가 있으면 쓸 일이 없다 */
+function yearForValue(text, value) {
+  const s = unent(String(value || ''));
+  FULL_DATE.lastIndex = 0;
+  if (FULL_DATE.exec(s)) return null;
+  BARE_DATE.lastIndex = 0;
+  const b = BARE_DATE.exec(s);
+  return b ? yearByMonthDay(text, b[1], b[2]) : null;
 }
 
 /** 이름표 뒤 내용에서 **끝나는 날**을 읽는다. 범위면 뒤쪽, 하나면 그것. */
@@ -384,6 +419,22 @@ function dateFrom(value, ctxYear) {
        대개 **같은 줄**에서 온다. 훑는 규칙이 두 벌이 되면 시작과 끝이 서로 다른 줄에서
        와 짝이 안 맞는다(다른 공고의 날짜가 섞이는 그 사고 유형이다).
     `accept(label, value)` 가 이름표를 고르고, `read(value, ctxYear)` 가 날짜를 읽는다. */
+/* 값이 날짜 하나로 끝나고 **다음 줄이 `~ 날짜`** 면 이어 붙인다 (2026-11-15 · 숭실 특별장학금 「2026.10.28(수) 9:00」 ↵ 「~ 11.10(화) 17:30」).
+   안 이으면 시작일 하나만 보고 **그날을 마감으로** 읽는다(열린 공고가 일찍 닫힌다). */
+const TILDE_DATE_LINE = /^\s*[~∼〜～]\s*(?:\d{2,4}\s?[.\-/년]\s?)?\d{1,2}\s?[.\-/월]\s?\d{1,2}/;
+function withTildeLine(value, nextLine) {
+  const v = unent(String(value || ''));
+  FULL_DATE.lastIndex = 0; BARE_DATE.lastIndex = 0;
+  const m = FULL_DATE.exec(v) || BARE_DATE.exec(v);
+  if (!m || RANGE_SEP.test(v.slice(m.index + m[0].length))) return value;
+  return TILDE_DATE_LINE.test(nextLine || '') ? `${value} ${nextLine}` : value;
+}
+/* 위 줄이 **기간 절 제목**인가 — `6. 신청기간 및 방법` ↵ `기간 : 2026. ?. 15. (화) ~ 2026. 9. 21. (월)`(금신사랑 · 맨 `기간` 이름표를 연다).
+   바로 위 줄이거나, 그 사이 줄이 이름표 줄이 아닐 때 두 줄 위까지 */
+const PERIOD_HEAD_LINE = /^(?:신청|접수|모집|지원|응모|제출)\s?기\s?간(?:\s?및\s?(?:방법|절차|장소|서류))?$/;
+const underPeriodHead = (lines, k) => [lines[k - 1], lines[k - 2]].some((x, j) => x && (j === 0 || !/[:：|｜]/.test(lines[k - 1] || ''))
+  && PERIOD_HEAD_LINE.test(shHead(x).replace(/[\s·•]+$/, '')));
+
 export function eachLabeledValue(text, accept, read) {
   if (!text) return null;
   const lines = String(text).split(/\n+/).map((l) => unent(l).replace(/[ \t　]+/g, ' ').trim()).filter(Boolean);
@@ -392,36 +443,42 @@ export function eachLabeledValue(text, accept, read) {
     const l = lines[k];
     if (l.length > 200) continue;
     const i = l.search(/[:：]/);
-    let label, value;
+    /* 한 줄에서 이름표·값 짝을 **여럿** 본다 — 앞의 짝(예전 규칙)이 먼저고, 못 읽었을 때만 뒤의 짝을 본다(예전에 읽던 것은 그대로 읽힌다) */
+    const pairs = [];   // [label, value, 값이 있는 줄]
     /* 제목 꼬리의 괄호 토 「… 신청 안내[신청기간 2026.11.01(일)~08(일)]」·「… 선발(접수기간: 10.1~10.20)」 — 이름표와 날짜가 괄호 안에 함께 있다.
        콜론이 없거나, 있어도 이름표 앞에 제목이 붙어 30자를 넘어 버려졌다(2026-10-30 경기대 장학사정관장학금 · 본문에 제목 줄만 세 번 있고 기간 절이 없어 마감이 비었다).
        괄호 안 이름표(12자 이하)가 기간·기한·마감으로 끝나고 바로 날짜가 올 때만 */
     const LAB = '([^\\[\\]()（）:：]{0,10}(?:기\\s?간|기\\s?한|마\\s?감))\\s*[:：]?\\s*((?:\\d{2,4}\\s?[.\\-/년]\\s?)?\\d{1,2}\\s?[.\\-/월]\\s?\\d{1,2}';
     const br = l.match(new RegExp('\\[\\s*' + LAB + '[^\\]]*)\\]'))          // 「[신청기간 2026.11.01(일)~08(일)]」 — 값 속 (일) 때문에 닫는 대괄호까지
       || l.match(new RegExp('[(（]\\s*' + LAB + '.*)[)）]\\s*$'));             // 「… 선발(접수기간: 2026.10.14(화) ~ 10.27(화))」 — 줄 끝 닫는 괄호까지
-    if (br) {
-      label = br[1].trim();
-      value = br[2];
-    } else if (i >= 0) {
-      label = shHead(l.slice(0, i));                // 기호·번호 떼기는 section-head.js 한 곳
-      value = l.slice(i + 1);
-    } else {
+    if (br) pairs.push([br[1].trim(), br[2], k]);
+    else if (i >= 0) pairs.push([shHead(l.slice(0, i)), l.slice(i + 1), k]);   // 기호·번호 떼기는 section-head.js 한 곳
+    /* 칸 가름이 `|` 인 꼴 — `' 신청기간 | 2026.9.11.(금)-9.22.(화) '`(경희 반영장학 포스터 OCR) · `모집기간| 2026.10.19.(월)~11.13.(금)`(엔지니어링인재육성재단 홍보물) */
+    const pi = l.search(/[|｜]/);
+    if (pi > 0) pairs.push([shHead(l.slice(0, pi)).replace(/^['"‘’“”`]+\s*/, ''), l.slice(pi + 1), k]);
+    /* 줄 머리의 괄호 이름표 — `❍ (접수기간) 2026. 9. 16.(수) 09:00 ~ 2026. 10. 8.(목) 18:00 / 23일간`(대전 서구인재육성 공고문 · 공공기관 꼴) */
+    const hp = l.match(/^[^0-9가-힣(（[]{0,3}[(（[]\s*([가-힣 ]{2,12})\s*[)）\]]\s*(\S.*)$/);
+    if (hp) pairs.push([hp[1].trim(), hp[2], k]);
+    if (!br && i < 0) {
       /* 콜론 없는 줄 — 표 칸이 줄로 갈라진 꼴(`접수기한` ↵ `2026.10.26.(월) 23:59 까지` · 2026-10-05 G-3).
          줄 전체가 이름표(기간·기한·마감·일시·일정·발표로 끝나는 짧은 말)이고 **바로 다음 줄이 날짜로
          시작**할 때만 잇는다 — 문장(`신청기간을 꼭 확인하세요`)·다음 절 제목은 잇지 않는다. */
-      label = shHead(l);
+      const label = shHead(l);
       const next = lines[k + 1] || '';
       /* 이름표 끝의 괄호 토(`신청기간(3차)` · `접수기간(연장)`)는 걷고 끝을 본다 — 국가근로 추가신청 3차 공고가
          `1. 신청기간(3차)` ↵ `- 2026. 10. 21.(수) 09:00 ~ 10. 29.(목) 18:00` 꼴이라 마감이 비었다(2026-11-11 G-3) */
       const bare = label.replace(/\s*[(（][^)）]*[)）]\s*$/, '');
-      if (bare.length > 15 || !/(기\s?간|기\s?한|마\s?감(일시?)?|일\s?시|일\s?정|발\s?표(일자?|예정일)?)$/.test(bare)
-        || !/^[^0-9가-힣]{0,3}(\d{2,4}\s?[.\-/년]\s?)?\d{1,2}\s?[.\-/월]\s?\d{1,2}/.test(next)) continue;
-      value = next;
+      if (bare.length <= 15 && /(기\s?간|기\s?한|마\s?감(일시?)?|일\s?시|일\s?정|발\s?표(일자?|예정일)?)$/.test(bare)
+        && /^[^0-9가-힣]{0,3}(\d{2,4}\s?[.\-/년]\s?)?\d{1,2}\s?[.\-/월]\s?\d{1,2}/.test(next)) pairs.push([label, next, k + 1]);
     }
-    if (label.length > 30) continue;                // 이름표는 짧다. 길면 문장이다
-    if (!accept(label, value)) continue;
-    const got = read(value, ctxYear);
-    if (got) return got;
+    const ctx = { under: underPeriodHead(lines, k) };
+    for (const [label, v0, vk] of pairs) {
+      if (label.length > 30) continue;                // 이름표는 짧다. 길면 문장이다
+      const value = withTildeLine(v0, lines[vk + 1]);
+      if (!accept(label, value, ctx)) continue;
+      const got = read(value, ctxYear ?? yearForValue(text, value));
+      if (got) return got;
+    }
   }
   return null;
 }
@@ -429,16 +486,118 @@ export function eachLabeledValue(text, accept, read) {
 /** 기간을 말하는 이름표인가 — 마감일과 접수 시작일이 **같은 판정**을 쓴다.
     이름표가 '방법·접수'면 내용이 마감을 말할 때만 연다 (위 PERIOD_VIA 주석). */
 /* 이름표 속 괄호(`모집(연장)기간`)는 걷고 본다 — 선원가족 장학 연장 공고가 마감 없이 실렸다(2026-10-29) */
-const PERIOD_ACCEPT = (label0, value) => { const label = String(label0 || '').replace(/[(（][^)）]*[)）]/g, ''); return PERIOD_LABEL.test(label)
+const PERIOD_ACCEPT = (label0, value, ctx) => { const label = String(label0 || '').replace(/[(（][^)）]*[)）]/g, ''); return PERIOD_LABEL.test(label)
   /* 맨 이름표(`기간 :`)는 **`까지`로 끝날 때만** — 근로장학생의 `가. 기간: 9.1 ~ 2027.2.12` 이
      일하는 기간이라 범위를 근거로 열면 안 된다(관문이 실제로 이 회귀를 잡았다). */
   || (PERIOD_BARE.test(label.replace(/\s/g, '')) && VALUE_DEADLINE.test(value))
+  /* …단 바로 위 줄이 **기간 절 제목**(`6. 신청기간 및 방법`)이면 맨 `기간` 의 범위도 접수 기간이다(2026-11-15 · 금신사랑). `근로기간` 처럼 말이 붙은 이름표는 여전히 아니다 */
+  /* ⚠️ 범위의 **끝**만 날짜이면 된다 — OCR 이 시작 달을 못 읽은 `2026. ?. 15. (화) ~ 2026. 9. 21. (월)` 도 끝은 읽힌다(시작일은 rangeStart 가 안 읽는다) */
+  || (ctx && ctx.under && PERIOD_BARE.test(label.replace(/\s/g, '')) && RANGE_TO_DATE.test(value) && TAIL_OK(value))
+  /* `○ 선발기간: 2026. 10. 6.(화) ~ 10. 30.(금) 18:00까지`(김천시-한국전력기술 공고문) — `선발기간` 은 대개 **뽑는** 기간이라 `까지` 로 접수 끝을 말할 때만 */
+  || (/선발\s?기간$/.test(label.trim()) && /까지/.test(value))
   /* 동사가 든 이름표(`서류 접수`·`접수`)는 날짜 **범위**도 근거로 받는다 */
   || (PERIOD_VIA.test(label) && (VALUE_DEADLINE.test(value) || (VALUE_RANGE.test(value) && TAIL_OK(value)))); };
 
 /** 공고 원문에서 신청 마감일 하나. 못 믿으면 null. */
 function extractDeadline(text) {
-  return eachLabeledValue(text, PERIOD_ACCEPT, dateFrom);
+  return eachLabeledValue(text, PERIOD_ACCEPT, dateFrom) || tracksDeadline(text);
+}
+
+/* ── 한 이름표 아래 갈래가 여럿인 기간 (2026-11-15 · 세종이도인재장학금 포스터) ─────────────────────
+   `·신청기간· 분야별상이` ↵ `디딤돌(학자금대출 외),무지개:2026.5.6.(수)~2026.7.10.(금),18:00까지` ↵ `※ …` ↵ `핵심인재육성(…):2026.8.10.(월) ~9.30.(수), 18:00까지`
+   이름표 줄엔 날짜가 없고 '분야별 상이'라고만 적는다 — 위 eachLabeledValue 는 이름표 뒤 날짜만 읽으므로 비었다.
+   🔴 **가장 늦은 끝**을 마감으로 쓴다 — 어느 갈래로든 그날까지는 낼 수 있다. 이른 끝을 쓰면 늦은 갈래로 낼 학생에게 끝난 공고가 된다.
+   🔴 갈래가 **둘 이상** 읽힐 때만 — 하나뿐이면 다른 갈래를 못 읽은 것일 수 있다(그 갈래의 끝이 더 늦을 수 있다).
+   ⚠️ 접수 시작일(rangeStart)은 이 길로 읽지 않는다 — 갈래마다 시작이 달라 '공고의 시작'이 없다. 이 길은 extractDeadline 에만 붙는다. */
+const TRACKS_VARY = /(?:분야|유형|트랙|사업|과정|전형|장학금|종류)\s?별|상이/;
+const TRACKS_HEAD = /^((?:신청|접수|모집|지원|응모|제출)\s?기\s?간)/;
+function tracksDeadline(text) {
+  if (!text) return null;
+  const lines = String(text).split(/\n+/).map((l) => unent(l).replace(/[ \t　]+/g, ' ').trim()).filter(Boolean);
+  const ctxYear = soleYear(text);
+  for (let k = 0; k < lines.length; k += 1) {
+    const t = shHead(lines[k]).replace(/^[·•\s]+/, '');
+    const m = t.match(TRACKS_HEAD);
+    if (!m || t.length > 40) continue;
+    const rest = t.slice(m[0].length);
+    if (/\d\s?[.\-/월]\s?\d/.test(rest) || !TRACKS_VARY.test(rest)) continue;
+    const ends = [];
+    for (let j = k + 1; j < lines.length && j <= k + 8; j += 1) {
+      const x = lines[j];
+      if (/^※/.test(x)) continue;
+      /* 다음 절(번호 머리·다른 기간 이름표)에서 멈춘다 */
+      if (j > k + 1 && (/^\s*(?:\d+\s*[.)]|[가나다라마바사아자차카타파하]\s*[.)]|[■□▣◇◆])/.test(x) || TRACKS_HEAD.test(shHead(x)))) break;
+      const c = x.search(/[:：]/);
+      FULL_DATE.lastIndex = 0; BARE_DATE.lastIndex = 0;
+      const d0 = FULL_DATE.exec(x) || BARE_DATE.exec(x);
+      if (!d0) continue;
+      const v = c >= 0 && c < d0.index ? x.slice(c + 1) : x;
+      if (!((VALUE_RANGE.test(v) && TAIL_OK(v)) || /까지/.test(v))) continue;
+      const end = dateFrom(v, ctxYear ?? yearForValue(text, v));
+      if (end) ends.push(end);
+    }
+    if (ends.length >= 2) return ends.sort().pop();
+  }
+  return null;
+}
+
+/* ── PDF 글자층의 칸 읽기 (2026-11-15 · 선원가족 요강 · 숭실 특별장학금) ─────────────────────────────
+   표로 된 기간은 OCR 이 칸을 뒤섞어 이름표와 날짜가 떨어진다(`신청기간 : ※재혼선원배우자의 …` · `신청 기간 : 장학금액및`).
+   PDF 글자층(`.pdf.txt`)은 칸 **자리**를 빈칸으로 살려 둔다 —
+     `신청기간                ※ 재혼선원 배우자의 …`
+     `         기    간       9월 1일 ∼ 10월 30일     11월 中 …`          ← 같은 줄의 옆 칸(가)
+     `        장학금      신청 기간                            장학금액 및`
+     `              2026.10.28(수) 9:00                  600,000원/인 …`  ← 같은 열의 아래 칸(나)
+     `              ~ 11.10(화) 17:30 …`
+   그래서 칸(두 칸 이상 빈칸으로 갈린 덩어리)과 그 가로 자리를 보고 (가) 이름표 칸 바로 옆 칸 · (나) 이름표 칸 아래 같은 열의 칸들을 값으로 읽는다.
+   🔴 **마감 하나에만** 쓴다 — 글자층은 숫자가 빠지는 일이 있어(attachment-text.mjs 2026-08-20 결정) 자격·서류엔 안 쓴다.
+   🔴 같은 첨부의 OCR 글자가 있으면 **그 날(달·날)이 OCR 에도 있어야** 쓴다(두 판독이 서로를 확인한다 · columnDeadlineFromDocs).
+   맨 `기간` 칸은 바로 위 줄 첫 칸이 기간 이름표일 때만(`근로기간` 같은 말 붙은 칸은 아니다 — 위 PERIOD_BARE 방어선과 같다). */
+export function layoutCells(line) {
+  /* 자간을 벌린 낱글자(`기    간`·`선   발   기   준`)는 한 칸으로 붙인다 — 자리(가로 위치)는 그대로 둔다 */
+  const s = String(line || '').replace(/(?<!\S)[가-힣](?: {1,6}[가-힣](?!\S))+/g, (w) => { const j = w.replace(/ +/g, ''); return j + ' '.repeat(w.length - j.length); });
+  const out = [];
+  for (const m of s.matchAll(/\S+(?: \S+)*/g)) out.push({ text: m[0], start: m.index, end: m.index + m[0].length });
+  return out;
+}
+const COL_LABEL = /^(?:신청|접수|모집|응모|제출)(?:기간|기한)$/;
+const colValueOk = (v) => (VALUE_RANGE.test(v) && TAIL_OK(v)) || /까지/.test(v);
+export function columnDeadline(layer) {
+  if (!layer) return null;
+  const rows = String(layer).split('\n').map(layoutCells);
+  const ctxYear = soleYear(layer);
+  const read = (v) => (colValueOk(v) ? dateFrom(v, ctxYear ?? yearForValue(layer, v)) : null);
+  let prevFirst = '';
+  for (let r = 0; r < rows.length; r += 1) {
+    const cells = rows[r];
+    if (!cells.length) continue;
+    for (let ci = 0; ci < cells.length; ci += 1) {
+      const c = cells[ci];
+      const lab = c.text.replace(/\s+/g, '');
+      const isLabel = COL_LABEL.test(lab);
+      const isBare = lab === '기간' && COL_LABEL.test(prevFirst);
+      if (!isLabel && !isBare) continue;
+      /* (가) 같은 줄의 바로 옆 칸 */
+      if (cells[ci + 1]) { const got = read(cells[ci + 1].text); if (got) return got; }
+      if (!isLabel) continue;
+      /* (나) 아래 같은 열 — 이름표 칸과 가로로 겹치는 칸만, 네 칸·열 줄까지 */
+      const acc = [];
+      for (let j = r + 1; j < rows.length && j <= r + 10 && acc.length < 4; j += 1) {
+        if (rows[j].some((x) => COL_LABEL.test(x.text.replace(/\s+/g, '')))) break;   // 다음 표 머리
+        for (const x of rows[j]) if (x.start <= c.end + 4 && x.end >= c.start - 4) acc.push(x.text);
+        const got = acc.length ? read(acc.join(' ')) : null;
+        if (got) return got;
+      }
+    }
+    prevFirst = cells[0].text.replace(/\s+/g, '');
+  }
+  return null;
+}
+/* 이 날(달·날)이 글에 적혀 있는가 — 칸 읽기를 OCR 로 맞춰 보는 데 쓴다(`10월 30일` · `10.30` · `10. 30`) */
+export function mentionsMonthDay(text, iso) {
+  const [, m, d] = String(iso || '').split('-').map(Number);
+  if (!m || !d) return false;
+  return new RegExp(`(?<!\\d)0?${m}\\s?[.\\-/월]\\s?0?${d}(?!\\d)`).test(String(text || ''));
 }
 
 /* ============================================================================
@@ -1014,7 +1173,8 @@ function docTexts(it, formPath = true) {
 
 /* OCR 로 읽은 첨부는 출처에 그렇게 적는다(`공고문 첨부(OCR)`) — 관리자·감사가 오독 가능성을
    알아보게. 같은 이름표를 읽는 곳(아래 923행 · 감사)은 앞머리 `공고문 첨부` 로 맞춘다. */
-const docLabel = (file) => (file && isOcrSource(fileURLToPath(new URL(`extracted/${file}`, HERE))) ? '공고문 첨부(OCR)' : '공고문 첨부');
+const docLabel = (file, via) => (via === 'layer' ? '공고문 첨부(PDF 글자층)'
+  : file && isOcrSource(fileURLToPath(new URL(`extracted/${file}`, HERE))) ? '공고문 첨부(OCR)' : '공고문 첨부');
 
 /** 첨부들에서 하나를 읽는 공통 골격 — 마감·접수 시작·발표가 **같은 자르기**를 거친다.
     `texts` 를 주면 파일 대신 그것을 읽는다(관문이 합성 글로 빨간불을 확인하는 자리).
@@ -1031,9 +1191,29 @@ function fromDocs(it, extract, texts = docTexts(it)) {
 function docsOnce(it, formPath = true) { let memo; return () => (memo ??= docTexts(it, formPath)); }
 /* 🔴 제목이 '연장'인데 첨부 글에 '연장'이 없으면 그 첨부는 **연장 전 원래 공고문**이다 — 그 마감은 지난 기간이라
    읽지 않는다 (2026-10-05 · UI-12 · 상명대 「…(기간 연장)」 첨부가 원래 공고문이라 10.8 까지 열린 공고가 9.23 으로 닫힐 뻔했다) */
-export function deadlineFromDocs(it, texts) {
-  const extended = /연장/.test(`${it.name || ''} ${it.boardTitle || ''}`);
-  return fromDocs(it, (t) => (extended && !/연장/.test(t) ? null : extractDeadline(t)), texts);
+/* `(변경)` 판 요강도 연장 뒤 공고문이다(경희 「선원가족 장학생 모집 안내(연장)」 첨부 = 「선발 요강[변경]」 · 2026-11-15). 원문 제목(heading)이 연장을 말해도 같다 */
+const EXTENDED = /연장|변경/;
+export function deadlineFromDocs(it, texts, heading = '') {
+  const extended = /연장/.test(`${it.name || ''} ${it.boardTitle || ''} ${heading}`);
+  const got = fromDocs(it, (t) => (extended && !EXTENDED.test(t) ? null : extractDeadline(t)), texts);
+  fromDocs.lastVia = null;
+  if (got || texts) return got;          // 합성 글(관문)을 받았으면 파일의 칸 읽기는 하지 않는다
+  return columnDeadlineFromDocs(it, extended);
+}
+/* 공고문 PDF 의 글자층 칸 읽기(columnDeadline) — 글자 판독(OCR·HWP)으로 못 읽었을 때만. 같은 파일의 OCR 이 있으면 그 날이 OCR 에도 있어야 한다 */
+function columnDeadlineFromDocs(it, extended) {
+  for (const f of noticeDocFiles(it)) {
+    const p = fileURLToPath(new URL(`extracted/${f}`, HERE));
+    const layer = pdfLayerText(p);
+    if (!layer || (extended && !EXTENDED.test(layer))) continue;
+    const d = columnDeadline(annexCut(layer));
+    if (!d) continue;
+    const ocr = attachmentText(p);
+    if (ocr && !mentionsMonthDay(ocr, d)) continue;   // 두 판독이 다르면 쓰지 않는다
+    fromDocs.lastFile = f; fromDocs.lastVia = 'layer';
+    return d;
+  }
+  return null;
 }
 export function openDateFromDocs(it, texts) { return fromDocs(it, extractOpenDate, texts); }
 export function announceFromDocs(it, texts) { return fromDocs(it, extractAnnounce, texts); }
@@ -1137,6 +1317,22 @@ function fillApplyPortal(it, body) {
    🔴 본문·첨부에서 **한 줄도 못 뽑았을 때만** 쓴다 — 제목은 요약이라 본문이 있으면 본문이 정확하다.
    요건 신호(REQ_SIGNAL)가 있는 괄호만 — `(대상: 전 학년)` 같은 빈 말은 안 담는다. 출처는 `eligibilityFrom = '공고 제목'`. */
 const TITLE_LABEL = '공고 제목';
+/* 원문 화면의 제목 줄 — 로봇 등록 제목(it.name)으로 **시작하고 꼬리에 날짜가 더 붙은** 줄(40자 안)만. 게시판 말머리(「공통 」·「[…] 」)를 뗀 몸통으로도 찾는다.
+   꼬리에 날짜가 없으면 고친 제목이 아니라 같은 제목이라 쓰지 않는다(그건 it.name 이 이미 말한다) */
+const HEADING_LABEL = '공고 원문 제목';
+function pageHeading(it, raw) {
+  const nm = String(it.name || '').trim();
+  if (!raw || nm.length < 10) return null;
+  const cores = [...new Set([nm, nm.replace(/^(?:\[[^\]]*\]\s*|공통\s+)+/, '')])].filter((c) => c.length >= 10);
+  const lines = String(raw).split(/\n+/).map((l) => unent(l).replace(/[ \t　]+/g, ' ').trim());
+  for (const core of cores) {
+    for (const l of lines) {
+      if (l.length <= core.length || l.length > core.length + 40 || !l.startsWith(core)) continue;
+      if (/\d{1,2}\s?[.\-/월]\s?\d{1,2}/.test(l.slice(core.length))) return l;
+    }
+  }
+  return null;
+}
 function qualFromTitle(it) {
   const m = String(it.name || it.title || '').match(/[(（]\s*(?:지원|신청|모집|선발)?\s?대상\s*[:：]\s*([^()（）]{4,80}?)\s*[)）]/);
   if (!m) return [];
@@ -1294,9 +1490,13 @@ for (const it of reg.items) {
        안 하면 '본문 껍데기 + 첨부에 요강' 게시판(경희대 유형)이 이 갈림길에서
        통째로 빠져나가, 첨부를 받아 놓고도 영영 '기한 원문 확인'으로 남는다. */
     if (!it.deadline && !humanOwned(it.deadlineFrom)) {
-      let dl = deadlineFromDocs(it);
-      let from = dl ? docLabel(fromDocs.lastFile) : null;
-      if (dl) dlFromDoc += 1;
+      /* 🔴 껍데기에도 **원문 제목 줄**은 있고, 고친 꼬리가 거기에만 있다 — 「…선발 안내(~10.30 접수기간 연장)」(가톨릭 선원가족 · 2026-11-15).
+         로봇 등록 제목(it.name)은 연장 전 목록 제목이라 꼬리가 없고, 첨부는 **연장 전 요강**일 수 있다. 그래서 첨부보다 **먼저** 읽는다.
+         원문 제목이 연장·변경을 말하면 연장을 모르는 첨부의 (이른) 마감은 deadlineFromDocs 가 거절한다(heading 을 넘긴다) */
+      const heading = pageHeading(it, src && src.text);
+      let dl = heading ? (extractDeadline(heading) || titleTailDeadline(heading, soleYear(heading) || String(it.listedAt || '').slice(0, 4) || undefined)) : null;
+      let from = dl ? HEADING_LABEL : null;
+      if (!dl) { dl = deadlineFromDocs(it, undefined, heading || ''); from = dl ? docLabel(fromDocs.lastFile, fromDocs.lastVia) : null; if (dl) dlFromDoc += 1; }
       /* 첨부에도 없으면 제목 — 이름표 꼬리(「[신청기간 2026.11.01~08]」) 다음 물결 꼬리(「(~11/20)」) · 본문 있는 길과 같은 순서 */
       if (!dl) { dl = extractDeadline(it.name || '') || titleTailDeadline(it.name, String(it.listedAt || '').slice(0, 4) || undefined); if (dl) from = '공고 제목'; }
       if (dl) {
@@ -1348,7 +1548,7 @@ for (const it of reg.items) {
     /* 본문이 먼저 · 못 읽으면 공고문 첨부 (2026-09-15 · G-3) */
     let dl = extractDeadline(body);
     let from = '공고 원문';
-    if (!dl) { dl = deadlineFromDocs(it); if (dl) { from = docLabel(fromDocs.lastFile); dlFromDoc += 1; } }
+    if (!dl) { dl = deadlineFromDocs(it); if (dl) { from = docLabel(fromDocs.lastFile, fromDocs.lastVia); dlFromDoc += 1; } }
     /* 본문·첨부에 없으면 **제목 꼬리의 괄호 이름표**(「… 신청 안내[신청기간 2026.11.01(일)~08(일)]」) — 경기대 통합 공지는 제목 줄이 다른 글에도
        보여 공통 문구로 걷히고 본문엔 기간 절이 없다(2026-10-30 장학사정관장학금). 이름표 없는 「(~11/20)」 같은 꼴은 여기서 읽지 않는다(eachLabeledValue 규칙 그대로) */
     if (!dl) { dl = extractDeadline(it.name || ''); if (dl) from = '공고 제목'; }
