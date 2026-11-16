@@ -52,7 +52,7 @@ jobs:
     # (수확 20 + 사본 8 + 글자 4 + 앱 파일 다시 만들기 2 + 여유).
     # 이게 깨지면 마지막 단계(저장·리포트)가 시작도 못 하고 취소되고, 취소는 그날 결과를
     # 통째로 버린다 — 2026-08-04에 실제로 이렇게 이틀치가 사라졌다.
-    timeout-minutes: 49   # OCR 단계 4분 추가 (2026-09-17) · 저장 앞 데이터 관문 5분 추가 (2026-11-15 G-16)
+    timeout-minutes: 61   # OCR 단계 4분 추가 (2026-09-17) · 저장 앞 데이터 관문 5분 추가 (2026-11-15 G-16) · 되돌리기 7 + 관문 경보 짝 1+1+1 + 끝내 빨간불 1 (2026-11-16 G-16 리뷰)
     steps:
       - uses: actions/checkout@v7
         with:
@@ -128,18 +128,33 @@ jobs:
       # 🔴 저장 직전 규칙 관문 + 데이터 감사 (2026-11-15 · 노션 G-16 · 관문 「로봇·도구 점검 관문」 savegate) —
       #    test-collector 는 이 로봇이 쓰는 collector/kosaf-block.json 을 직접 읽어 모양을 잰다(층2 제외 장부 절). 관문 없이 저장하면
       #    그 장부가 어긋나는 순간 그날 돈 다른 로봇 전부가 관문에 걸려 제 결과를 되돌린다(10-13 사냥꾼과 같은 꼴).
-      #    이 로봇의 원래 규칙 그대로 — 실패하면 **저장하지 않는다**(continue-on-error·always() 없음 · 다음 실행에 다시 받는다).
+      #    🔴 2026-11-16 (노션 G-16 리뷰): 처음엔 관문이 넘어지면 그대로 멈췄다(continue-on-error 없음) — 그러면 **다른 로봇이 남긴** 빨간불 하나에도
+      #    층2 저장이 매 실행 막혀 목록이 1주에 43곳씩 빈다(11/4~11/7 수집 로봇이 겪은 일 — --keep-preexisting 의 이유). 이제 다른 저장 로봇과 같은 장치:
+      #    관문(continue-on-error) → gate-guard 가 이번 실행의 층2 파일을 되돌려 다시 잰다 → 초록이거나 원래 있던 빨간불일 때만 저장 · 경보 짝(아래).
       - name: 데이터 관문 (규칙 관문 + 데이터 감사)
+        id: audit
         if: inputs.mode != 'probe'
+        continue-on-error: true
         timeout-minutes: 5
         run: |
           node verify/test-collector.mjs
           node verify/audit-data.js
 
-      # 🔴 관문이 실패하면 **저장하지 않는다**(always() 를 쓰지 말 것) — 이미 올라가 있는
-      #    멀쩡한 데이터가 이긴다. 이 로봇은 한 번 걸러도 다음 실행에 다시 받으면 그만이다.
+      # 되돌리고 **관문을 다시 잰다** (collector/gate-guard.mjs 한 곳 · 수집·사냥꾼 로봇과 같은 장치) — 되돌릴 것은 이 로봇이 저장하는 넷(장부·앱 파일·내려 둔 목록·사본 폴더).
+      # --keep-preexisting: 되돌려도 빨가고 새로 걸린 검사가 없으면(원래 있던 빨간불) 이번 수확분은 저장한다(2026-11-10 수집 로봇과 같은 결정).
+      # 도구가 넘어지면(|| 뒤) 그 넷을 직전 판으로 — 사본 폴더는 새로 받은 파일도 지운다. 상한 7분 = 관문 최대 세 번 + 여유.
+      - name: 관문 실패 시 층2 파일 되돌리기
+        id: guard
+        if: inputs.mode != 'probe' && steps.audit.outcome == 'failure'
+        timeout-minutes: 7
+        run: |
+          node collector/gate-guard.mjs --note /tmp/gate-note.md --keep-preexisting --stage data/kosaf.json,data/kosaf-open.json,collector/kosaf-block.json,data/kosaf-files \
+            || { git checkout -- data/kosaf.json data/kosaf-open.json collector/kosaf-block.json data/kosaf-files 2>/dev/null; git clean -fdq -- data/kosaf-files; }
+
+      # 🔴 저장은 관문이 초록일 때만 — 처음 통과 · 되돌려서 통과 · 다시 재니 통과(flaky) · 원래 있던 빨간불(kept-preexisting).
+      #    끝내 빨가면 **저장하지 않는다**(always() 를 쓰지 말 것) — 이미 올라가 있는 멀쩡한 데이터가 이긴다. 한 번 걸러도 다음 실행에 다시 받으면 그만이다.
       - name: 저장
-        if: inputs.mode != 'probe'
+        if: inputs.mode != 'probe' && (steps.audit.outcome == 'success' || steps.guard.outputs.gate == 'reverted-files' || steps.guard.outputs.gate == 'flaky' || steps.guard.outputs.gate == 'kept-preexisting')
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -169,6 +184,54 @@ jobs:
           else
             echo "바뀐 것 없음"
           fi
+
+      # 🔴 관문 실패는 조용히 넘어가지 않는다 — 무엇을 되돌렸는지는 gate-guard 의 단락(/tmp/gate-note.md)을 그대로 싣는다(검색용 요약·공공 API 로봇과 같은 꼴).
+      #    이슈 **하나**에 모은다(제목에 날짜·결과 없음 · prefix) · 관문이 다시 통과하면 아래 짝이 닫는다(tools/alert-issue.mjs).
+      #    '로봇이 넘어졌습니다' 이슈와 따로 둔다 — 관문 빨간불은 수확이 넘어진 것이 아니다.
+      - name: 🚨 데이터 관문 실패 알림
+        if: always() && steps.audit.outcome == 'failure'
+        timeout-minutes: 1
+        run: |
+          case "${{ steps.guard.outputs.gate }}" in
+            reverted-files)   result="층2 파일을 되돌려서 통과 — 이번 수확분은 저장하지 않음(다음 실행에 다시 받음)" ;;
+            kept-preexisting) result="원래 있던 빨간불 — 이번 수확분은 저장" ;;
+            still-failing)    result="되돌려도 빨간불 — 이번 수확분은 저장하지 않음" ;;
+            flaky)            result="다시 재니 통과(되돌린 것 없음)" ;;
+            *)                result="되돌리기 단계가 결과를 남기지 못함(넘어짐·건너뜀·시간 초과) — 이번 수확분은 저장하지 않음" ;;
+          esac
+          {
+            echo "🎓 한국장학재단 수확 로봇: 🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **데이터 관문(test-collector · audit-data) 실패** — $result"
+            echo
+            if [ -n "${{ steps.guard.outputs.gate }}" ] && [ -s /tmp/gate-note.md ]; then cat /tmp/gate-note.md
+            else echo "> 되돌리기 단계가 결과를 남기지 못했습니다(넘어짐·건너뜀·시간 초과) — 이번 수확분은 저장하지 않았습니다."; fi
+            echo
+            echo "실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '층2 수확 관문 실패 확인해줘'라고 지시하세요."
+          } > /tmp/gate-issue.md
+      - name: 🚨 데이터 관문 실패 — 경보 이슈
+        if: always() && steps.audit.outcome == 'failure'
+        timeout-minutes: 1
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          match: prefix
+          title: 🚨 한국장학재단 수확 로봇 — 데이터 관문 실패
+          label: kosaf-gate
+          label-description: 한국장학재단 수확 로봇 — 데이터 관문 실패
+          body-file: /tmp/gate-issue.md
+      - name: ✅ 데이터 관문 회복 — 경보 닫기
+        if: always() && steps.audit.outcome == 'success'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          match: prefix
+          title: 🚨 한국장학재단 수확 로봇 — 데이터 관문 실패
+          body: |
+            ✅ 데이터 관문이 다시 통과했습니다 — 이번 수확분은 저장됩니다. 자동으로 닫습니다.
+            실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       # 🔴 2026-11-13 경보 짝 — 여는 단계만 있어 회복해도 #501 이 10-27 부터 열려 있었다(그 뒤 실행은 전부 성공). 같은 제목으로 닫는다
       - name: 회복했으면 옛 경보를 닫는다
@@ -208,3 +271,12 @@ jobs:
                 title, body, labels: ['kosaf'],
               });
             }
+
+      # 🔴 관문이 끝내 빨가면 초록불로 끝내지 않는다 — 이슈는 위 「데이터 관문 실패 — 경보 이슈」가 이미 열었다.
+      #    failure()·cancelled() 알림 **뒤**에 둔다(앞에 두면 '로봇이 넘어졌습니다'라는 틀린 말이 붙는다 · 검색용 요약·수집 로봇과 같은 순서).
+      - name: 🚨 관문이 끝내 빨간불 (되돌린 뒤에도 · 원래 있던 빨간불 · 되돌리기 도구가 넘어짐)
+        if: always() && steps.audit.outcome == 'failure' && steps.guard.outputs.gate != 'reverted-files' && steps.guard.outputs.gate != 'flaky'
+        timeout-minutes: 1
+        run: |
+          echo "::error::데이터 관문이 빨갛습니다(결과: '${{ steps.guard.outputs.gate }}') — 이슈에 적었습니다."
+          exit 1
