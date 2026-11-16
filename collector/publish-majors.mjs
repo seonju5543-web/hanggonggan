@@ -32,7 +32,9 @@ export function cleanMajorName(raw) {
   /* 엔티티 표는 clean-title.mjs `decodeEntities` 한 곳(베끼지 않는다) · 두 번 인코딩된 `&amp;amp;` 도 있을 수 있어 두 번 되돌린다 */
   return decodeEntities(decodeEntities(String(raw || ''))).replace(/\s+/g, ' ').trim();
 }
-const NOT_A_MAJOR = /\[통합모집\]|^기타\s*모집\s*단위/;
+/* 입시 모집단위는 학과가 아니다 — `[통합모집]`·`기타모집단위` 에 더해 이름 어디든 `모집단위`(`인문계열 통합 모집단위`·`바이오시스템대학(광역화 모집단위)`·`자연계열 성인통합모집단위`)
+   (2026-11-16 개발자 결정 "빼 주세요" · 동국·경운·대구한의 9개) · 맨 `공과계열` 같은 계열모집은 그대로 남긴다 */
+const NOT_A_MAJOR = /\[통합모집\]|모집\s*단위/;
 export function isMajorName(name) {
   return !!name && !NOT_A_MAJOR.test(name);
 }

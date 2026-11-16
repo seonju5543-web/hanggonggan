@@ -14421,6 +14421,8 @@ console.log('\n■ 학적정보 테일러링 (2026-10-24 개발자 지시 1~4 ·
   eq('  `&amp;` 를 되돌린다 (두 번 인코딩도)', [cleanMajorName('Global Business &amp; Technology학부'), cleanMajorName('A &amp;amp; B')], ['Global Business & Technology학부', 'A & B']);
   eq('  모집단위([통합모집]·기타모집단위)는 학과가 아니다 · 같은 이름은 하나로 · 계열모집은 남긴다',
     cleanMajors(['경상대학[통합모집]', '기타모집단위(글로벌)', '공과계열', '수학과', '수학과 ', '']), ['공과계열', '수학과']);
+  eq('  이름 어디든 `모집단위` 면 학과가 아니다(2026-11-16 개발자 결정 · 동국·경운·대구한의) · 계열모집·보통 학과는 남는다',
+    cleanMajors(['바이오시스템대학(광역화 모집단위)', '사회안전대학 인문계열 통합 모집단위', '자연계열 성인통합모집단위', '인문계열', '모집디자인학과']), ['인문계열', '모집디자인학과']);
   {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'majors-camp-')) + path.sep;
     const dir = new URL('file://' + tmp);
