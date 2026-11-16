@@ -373,8 +373,17 @@ function chatAnswerDocuments(q) {
   /* 특정 공고를 물었으면 그 공고의 서류를, 아니면 자주 필요한 서류를 모아서.
      "그거 서류 뭐야?"처럼 앞에서 말한 공고를 가리키는 경우도 chatPickTarget이 받는다. */
   const hit = chatPickTarget(q);
-  if (hit && (hit.sch.documents || []).length) {
-    const rows = hit.sch.documents.map((doc) => {
+  /* 자리표시 줄(「지원 자격·제출 서류는 원문 공고에서 확인」)은 서류가 아니다 — 앱 화면과 같은 꼴(app.js DOC_PLACEHOLDER · 2026-11-15 리뷰) */
+  const realDocs = (sch) => (sch.documents || []).filter((doc) => !DOC_PLACEHOLDER.test(String(doc || '')));
+  if (hit && !realDocs(hit.sch).length && (hit.sch.documents || []).length) {
+    return {
+      text: `'${hit.sch.name}'의 제출 서류는 앱이 원문에서 아직 읽지 못했어요. 공고 원문에서 확인해 주세요.`,
+      cards: [hit],
+      actions: [{ act: 'detail:' + hit.sch.id, label: '공고 자세히 보기' }],
+    };
+  }
+  if (hit && realDocs(hit.sch).length) {
+    const rows = realDocs(hit.sch).map((doc) => {
       const st = chatSafe(() => docWalletStatus(doc), null);
       const name = String(doc).replace(/\s*\(.*\)$/, '');
       if (st && st.ok) return `✓ ${name} — 보관함에 있어요`;
@@ -390,7 +399,7 @@ function chatAnswerDocuments(q) {
   }
 
   const count = {};
-  chatApplyable().forEach((m) => (m.sch.documents || []).forEach((doc) => {
+  chatApplyable().forEach((m) => realDocs(m.sch).forEach((doc) => {
     const name = String(doc).replace(/\s*\(.*\)$/, '');
     count[name] = (count[name] || 0) + 1;
   }));

@@ -1214,7 +1214,7 @@ function fillCalendarDates(it, readOpen, readAnnounce) {
 const FORM_ATT_NAME = /신청서|지원서|원서|계획서|동의서|서약서/;
 function fillDocuments(it, body, docsFn) {
   if (/^(관리자|AI)/.test(it.documentsFrom || '')) return;
-  const robotOwned = /^(공고 원문|공고문 첨부)/.test(it.documentsFrom || '');
+  const robotOwned = /^(공고 원문|공고문 첨부|로봇 )/.test(it.documentsFrom || '');   // 「로봇 날짜 · 원문 「제출서류」 절」 = docs-fill — 같은 규칙으로 다시 읽는다(리뷰 2026-11-15)
   if (!docsPlaceholderOnly(it.documents) && !robotOwned) return;
   let got = body ? readDocuments(body) : { docs: [], basis: null };
   let from = '공고 원문';
@@ -1228,7 +1228,10 @@ function fillDocuments(it, body, docsFn) {
   if (!got.docs.length) {
     /* 🔴 로봇이 적은 옛 목록인데 지금 규칙으로 원문을 다시 읽으니 서류 목록이 없다 → 옛 목록은 안내 문장·심사 단계를 담은 잡음이었다(2026-11-15 doc-list 절 경계).
        원문을 실제로 읽었을 때만(본문 또는 첨부 글자가 있을 때) 자리표시로 되돌린다 — 못 읽은 날 지우지 않는다. 사람이 적은 목록은 위에서 이미 걸렀다. */
-    const readSomething = !!(body && body.trim()) || (docsFn ? docsFn() : []).some((t) => String(t || '').trim());
+    /* 목록이 나온 **그 출처**를 실제로 읽었을 때만 — 첨부에서 읽은 목록을 첨부를 못 읽은 날 본문(껍데기일 수 있다)만 보고 지우지 않는다(리뷰 2026-11-15) */
+    const readBody = !!(body && body.trim());
+    const readAttach = (docsFn ? docsFn() : []).some((t) => String(t || '').trim());
+    const readSomething = /^공고문 첨부/.test(it.documentsFrom || '') ? readAttach : readBody;
     if (robotOwned && readSomething) {
       resetDocs += 1;
       if (!WRITE) { console.log(`   [서류 되돌림] ${it.id} — 로봇 목록 ${(it.documents || []).length}줄 → 자리표시`); return; }

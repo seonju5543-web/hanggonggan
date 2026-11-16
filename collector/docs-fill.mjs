@@ -13,7 +13,8 @@
    관문: verify/test-collector.mjs 「공고 카드 품질」 ⑮.
    ============================================================ */
 import fs from 'node:fs';
-import { extractDocuments, isDocPlaceholder } from './extract-excerpts.mjs';
+import { isDocPlaceholder } from './extract-excerpts.mjs';
+import { readDocuments } from './doc-list.mjs';   // 🔴 서류 목록 규칙은 doc-list 한 곳(2026-11-15 리뷰 — 이 로봇만 옛 규칙 사본 extractDocuments 를 써서 고친 규칙이 74건에 안 닿았다)
 import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
 
 const HERE = new URL('.', import.meta.url);
@@ -34,7 +35,7 @@ export function fillDocuments(items, idx, today = TODAY) {
     if (!needsDocs(it)) continue;
     const src = sourceFor(it, idx);
     if (!hasText(src)) continue;
-    const docs = extractDocuments(src.text);
+    const docs = readDocuments(src.text).docs;
     if (!docs.length) continue;
     it.documents = docs;
     it.documentsFrom = `로봇 ${today} · 원문 「제출서류」 절`;

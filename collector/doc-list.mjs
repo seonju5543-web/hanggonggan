@@ -22,6 +22,8 @@ const DOC_WORD = /서|증명|사본|원본|통장|신분증|사진|등본|확인
 export const WRITE_DOC = /자기소개서|자소서|학업계획서|수학계획서|연구계획서|활동계획서|사유서|지원\s*동기|에세이|포부|소개서|계획서/;
 export const FREE_FORM = /자유\s*(양식|서식|형식)|별도\s*(의\s*)?(양식|서식)(은|이)?\s*(없|무)|(양식|서식)\s*(은|이)?\s*(없음|없습니다|무)|서식\s*자유|자유롭게\s*작성|양식\s*자유|형식\s*자유/;
 const MAX_DOCS = 14;
+/* 활동 글의 제출물 — 작품·영상·발표 자료·캡처도 서류다(공모전 · 리뷰 2026-11-15) */
+const MEDIA_DOC = /작품|출품|영상|동영상|PPT|ppt|발표\s*자료|에세이|원고|캡처|캡쳐|이미지\s*파일|사진\s*파일|파일\s*\(|포트폴리오|시안|기획안|제안서/;
 /* 서류가 아닌 줄 — 전화·주소·날짜·지시문(…하세요·…제출·…금지) · 꼬리 괄호를 떼고 본다 */
 const NOT_DOC = /☎|https?:\/\/|www\.|\d{2,4}-\d{3,4}-\d{4}|(기일|기간|마감|선정|지급|발표|통보)\s*[:：]|^\d{1,2}\/\d{1,2}|^\d{4}\s*[.년]/;
 const INSTRUCTION_END = /(합니다|하세요|하시기\s*바랍니다|바람|할\s*것|필요|금지|제출|참조|참고|확인)\s*\.?\s*$/;   // 끝 마침표가 있어도 지시문이다(2026-11-15)
@@ -41,7 +43,7 @@ const isNoteSentence = (core) => {
 const DOC_NOUN = /증명|증빙|사본|원본|신청서|지원서|원서|확인서|동의서|추천서|계획서|소개서|사유서|서약서|통장|등본|초본|신분증|사진|성적표|통지서|통보서|이력서|진단서|신고서|명세서|영수증|기록부|자격증|수료증|합격증|기획서|설명서|제안서|포트폴리오|증$|[가-힣](?<!에|로|부터|으로)서(?=\s*(\d\s*[부매통]|[(\[<【〈]|$))/;   // …서로 끝나는 서류 이름(내역서·기술서·진술서) — 「…에서」「…로서」는 아니다
 const isSubHead = (c) => { const bare = (/^[\[(【〔]/.test(c) && /[\])】〕]$/.test(c)) ? c.slice(1, -1).trim() : c; const core = bare.replace(/\s*[\[(【〔][^\])】〕]*[\])】〕]\s*$/, '').trim(); return /(서류|자료)$/.test(core) && !DOC_NOUN.test(core); };
 const isDocLike = (c) => {
-  if (!DOC_WORD.test(c)) return false;
+  if (!DOC_WORD.test(c) && !MEDIA_DOC.test(c)) return false;            // 공모전 제출물(작품·영상·PPT)도 서류다
   if (c.replace(/\s/g, '').length < 4 && !DOC_NOUN.test(c)) return false;   // 「신청서」「등본」 같은 짧은 이름은 두고 OCR 조각(「서재다」)만 뺀다
   if (/^[(（]/.test(c)) return false;                                   // 괄호로 시작하는 줄은 앞 서류의 설명이다
   if (HEAD_ONLY.test(c) || FILE_NOTE.test(c) || isSubHead(c)) return false;
@@ -50,10 +52,12 @@ const isDocLike = (c) => {
   if (INSTRUCTION_END.test(core)) return false;
   const core2 = core.replace(/[\s|ㆍ·•]+$/, '').replace(/\s*[(（][^)）]*$/, '').trim();   // 끝의 표 칸 막대·닫히지 않은 괄호는 떼고 본다
   if (isNoteSentence(core) || isNoteSentence(core2)) return false;
+  /* 「신청서와 함께 증빙자료 첨부」「아래 서류를 모두 PDF 로 업로드」 — 무엇을 어떻게 내라는 지시(리뷰 2026-11-15 · 이 줄이 본문 목록이 되어 첨부의 진짜 표를 못 읽었다) */
+  if (/(함께|아래|별도로?|모두|일괄|각각|하나의)\s.*(첨부|업로드|제출)\s*\.?$/.test(core2)) return false;
   if (/서류(는|를|가|만|도|에)\s/.test(core) && !DOC_NOUN.test(core.split(/서류(는|를|가|만|도|에)\s/)[0])) return false;   // 「모든 서류는 …」「선정되지 않은 서류는 …」 — 서류를 두고 하는 말
   if (CATEGORY_END.test(core) && !DOC_NOUN.test(core)) return false;
   if (/[한인된는은던할]\s*(학생|자|사람|분)$/.test(core)) return false;   // 「…을 충실히 작성한 학생」「…에 재학 중인 자」 — 누가 받는가(자격)이지 서류가 아니다
-  if (PURE_HEAD.test(c.replace(/[\[(（【〔<〈「『][^\])）】〕>〉」』]*[\])）】〕>〉」』]/g, '').replace(/[\s·]/g, ''))) return false;   // 서류 절 머리 자체
+  if (PURE_HEAD.test(stripLead(c).replace(/[\[(（【〔<〈「『][^\])）】〕>〉」』]*[\])）】〕>〉」』]/g, '').replace(/[\s·]/g, ''))) return false;   // 서류 절 머리 자체
   /* 꼬리 괄호 안이 안내 문장이고 앞에 서류 명사가 없다(「… 구비서류에 관련 필독(… 참고하시기 바랍니다.)」) */
   const tailIn = c.match(/[(（]([^()（）]*)[)）]\s*$/);
   if (tailIn && /(니다|바랍니다)\s*\.?\s*$/.test(tailIn[1]) && !DOC_NOUN.test(core)) return false;
@@ -105,6 +109,8 @@ export function isDocHeadLabel(l) {
   let bare = stripLead(l);
   const one = bare.match(/^[\[(（【〔<〈「『]\s*([^\])）】〕>〉」』]*)\s*[\])）】〕>〉」』]$/);
   if (one) bare = stripLead(one[1]);
+  /* 괄호 이름표 뒤에 곁말이 붙은 줄 「❍ (구비서류) [공고일 이후 발급한 서류만 인정]」 — 괄호 안이 이름표면 머리다(리뷰 2026-11-15) */
+  if (/^[\[(（【〔<〈「『]\s*(필수\s*)?(제출|구비|신청|접수|필요|첨부)\s*서\s*류\s*[\])）】〕>〉」』]/.test(bare)) return true;
   /* 표가 무너진 OCR 줄 「지원자격 : 구비서류」 — 콜론 뒤가 이름표뿐이면 머리다 */
   const lastSeg = bare.split(/[:：]/).pop().replace(/\s/g, '');
   if (/[:：]/.test(bare) && /^(제출(할)?|구비|신청|필요|첨부|접수)서류$/.test(lastSeg)) return true;
@@ -136,7 +142,11 @@ const NOTE_HEAD = (bare) => {
 
 function listFrom(lines, start, inline, headMark) {
   const out = [];
-  const push = (s) => { for (const p of splitInline(s)) { const c = cleanDoc(p); if (c.length >= 2 && c.length <= 80 && isDocLike(c) && !out.includes(c)) out.push(c); } };
+  const push = (s) => { for (const p of splitInline(s)) {
+    let c = cleanDoc(p);
+    if (c.length > 80 && /[(（]/.test(c)) c = c.slice(0, c.search(/[(（]/)).trim();   // 「라. 일시적 가계곤란 입증서류(채무변제 상환내역 확인서, …, 진단서 등)」 — 괄호 앞 이름은 살린다(리뷰)
+    if (c.length >= 2 && c.length <= 80 && isDocLike(c) && !out.includes(c)) out.push(c);
+  } };
   if (inline) push(inline);
   const inlineHit = out.length > 0;   // ④ 한 줄 목록이 실제로 서류를 냈을 때만 '아래는 서류 이름만' — 「6. 신청서류 : 각 학과 사무실로 원본 제출」 아래 표는 그대로 읽는다
   let blanks = 0;
@@ -149,11 +159,14 @@ function listFrom(lines, start, inline, headMark) {
     if (NEXT_HEAD_BARE.test(bare) && !DOC_WORD.test(bare.replace(NEXT_HEAD_BARE, '').slice(0, 2))) break;   // ③ 기호를 뗀 다음 절 머리
     if (NOTE_HEAD(bare)) { if (out.length) break; continue; }                                 // ③ …사항·비고 (머리 바로 아래 표 머리면 건너뛴다)
     if (isDocHeadLabel(l)) continue;                                                         // 또 다른 서류 머리(우대 증빙 표 뒤의 본 목록 등) — 이어 읽는다
-    if (sameStep(headMark, leadMark(l)) && !DOC_NOUN.test(bare)) break;                     // ② 같은 단계의 새 절
+    if (sameStep(headMark, leadMark(l)) && !DOC_NOUN.test(bare)) { if (out.length) break; continue; }   // ② 같은 단계의 새 절(머리 바로 아래 같은 단계 안내·소제목이면 건너뛴다 · 리뷰)
+    if (bare.replace(/\s/g, '').length <= 12 && NEXT_HEAD_BARE.test(bare.replace(/\s/g, ''))) break;   // 띄어 쓴 표 머리 「1. 신 청 자 격」
+    if (/^(이전\s*글|다음\s*글|윗\s*글|아랫\s*글|목록|최근\s*게시물|최신\s*글|관련\s*게시물)(\s|[:：]|$)/.test(bare)) break;   // 게시판 아래 탐색 줄 — 그 아래는 다른 글 제목이다
+    if (out.length && /^\[[^\]]{2,14}\]\s*\S/.test(bare) && !DOC_NOUN.test(bare)) break;       // 이웃 글 제목 「[조교 채용] … 모집」「[도서관] …」(리뷰 · 홍익 신용카드수수료장학금)
     if (l.length > 120) break;                                                                 // 문단 — 목록이 아니다
     if (/^(※|\*|☞|▶|⇒)/.test(l)) continue;                                                   // 주석·지시 줄은 서류가 아니다
     if (!DOC_WORD.test(l) && cleanDoc(l).length > 30) break;                                   // 서류 낱말이 없는 긴 줄 — 목록이 끝났다
-    if (inlineHit && !DOC_NOUN.test(bare)) break;                                             // ④ 한 줄 목록 아래는 서류 이름만
+    if (inlineHit && !(DOC_NOUN.test(bare) || WRITE_DOC.test(bare) || MEDIA_DOC.test(bare))) continue;   // ④ 한 줄 목록 아래는 서류·제출물 이름만(아닌 줄은 건너뛴다 — 끊으면 「작품(이미지 파일)」 뒤가 사라졌다 · 리뷰)
     push(l);
   }
   /* 「원문 공고에서 확인」 같은 안내 줄은 서류가 아니다 */
@@ -171,8 +184,11 @@ export function extractDocumentList(text) {
     const inline = (m && m[4] && m[4].length >= 4 && !/^(아래|하단|다음|별첨|첨부\s*참)/.test(m[4])) ? m[4] : null;
     const got = listFrom(lines, i, inline, leadMark(l));
     /* 목록의 절반 이상은 서류 명사(증명서·신청서·사본·등본·계획서…)여야 목록이다 — 무너진 OCR 표의 칸 머리 「제출 서류」 아래 조각들을 서류로 내지 않는다 */
-    const nouns = got.filter((d) => DOC_NOUN.test(d)).length;
-    if (nouns && (nouns * 2 >= got.length || nouns >= 3)) return got;   // 못 건지면 다음 머리 후보로
+    /* 서류 명사가 하나도 없으면 목록이 아니다(무너진 OCR 표의 칸 머리 아래 조각) · 있으면 **버리지 않고 마지막 서류 명사 뒤 꼬리만 자른다**
+       (리뷰 2026-11-15 — 절반 규칙이 「참가신청서 / 팀 소개 영상 / 발표 PPT / 에세이」 같은 활동 목록을 통째로 버리고, 인하대 공고에선 다음 장학금의 목록으로 넘어갔다) */
+    const isNoun = (d) => DOC_NOUN.test(d) || WRITE_DOC.test(d) || MEDIA_DOC.test(d);
+    let last = -1; got.forEach((d, k) => { if (isNoun(d)) last = k; });
+    if (last >= 0) return got.slice(0, last + 1);   // 못 건지면 다음 머리 후보로
   }
   return [];
 }
