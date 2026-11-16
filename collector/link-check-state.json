@@ -200,16 +200,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3540321": {
-  "lastAt": "2026-11-08",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "final": "https://www.1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3540321",
-  "v": "post",
-  "at": "2026-11-08",
-  "n": 0,
-  "confirmed": false
- },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3541967": {
   "lastAt": "2026-11-15",
   "lastV": "post",
@@ -234,16 +224,6 @@
   "lastAt": "2026-11-13",
   "lastV": "unread",
   "why": "열기 실패: page.goto: net::ERR_EMPTY_RESPONSE at https://1365.go.kr/vol"
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3544547": {
-  "lastAt": "2026-11-12",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "final": "https://www.1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3544547",
-  "v": "post",
-  "at": "2026-11-12",
-  "n": 0,
-  "confirmed": false
  },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3544550": {
   "lastAt": "2026-11-12",
@@ -12323,15 +12303,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179611": {
-  "lastAt": "2026-11-03",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-03",
-  "n": 0,
-  "confirmed": false
- },
  "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179638": {
   "lastAt": "2026-11-04",
   "lastV": "post",
@@ -12414,15 +12385,6 @@
   "confirmed": false
  },
  "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179772": {
-  "lastAt": "2026-11-12",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-12",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179775": {
   "lastAt": "2026-11-12",
   "lastV": "post",
   "why": "제목 자리에 그 공고 제목",
@@ -16203,15 +16165,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53254&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "lastAt": "2026-11-11",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-11",
-  "n": 0,
-  "confirmed": false
- },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53285&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "lastAt": "2026-11-14",
   "lastV": "post",
@@ -16635,15 +16588,6 @@
   "n": 0,
   "confirmed": false
  },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53663&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "lastAt": "2026-11-11",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-11",
-  "n": 0,
-  "confirmed": false
- },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53664&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "lastAt": "2026-11-12",
   "lastV": "post",
@@ -16708,15 +16652,6 @@
   "confirmed": false
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53672&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "lastAt": "2026-11-13",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-13",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53674&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "lastAt": "2026-11-13",
   "lastV": "post",
   "why": "제목 자리에 그 공고 제목",
@@ -20161,15 +20096,6 @@
   "why": "제목 자리에 그 공고 제목",
   "v": "post",
   "at": "2026-11-04",
-  "n": 0,
-  "confirmed": false
- },
- "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=141542&article.offset=0&articleLimit=10": {
-  "lastAt": "2026-11-11",
-  "lastV": "post",
-  "why": "제목 자리에 그 공고 제목",
-  "v": "post",
-  "at": "2026-11-11",
   "n": 0,
   "confirmed": false
  },
