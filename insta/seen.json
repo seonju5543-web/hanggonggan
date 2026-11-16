@@ -3152,7 +3152,7 @@
    "expiredAt": "2026-11-10"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0596010",
    "org": "횡성인재육성장학회",
    "name": "대학생등록금지원사업",
@@ -3161,7 +3161,9 @@
    "tplNo": 3,
    "cards": 5,
    "dir": "insta/pub/0596010",
-   "at": "2026-10-09"
+   "at": "2026-10-09",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-17"
   },
   {
    "status": "expired",
@@ -4168,7 +4170,7 @@
    "dates": "absolute"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000347003",
    "org": "재단법인 거창군장학회",
    "name": "거창군지역출신대학생등록금지원",
@@ -4178,7 +4180,9 @@
    "cards": 5,
    "dir": "insta/pub/2000347003",
    "at": "2026-10-23",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-17"
   },
   {
    "status": "expired",
@@ -4437,7 +4441,7 @@
    "expiredAt": "2026-11-14"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2700016004",
    "org": "재단법인 STX장학재단",
    "name": "장학생",
@@ -4447,10 +4451,12 @@
    "cards": 5,
    "dir": "insta/pub/2700016004",
    "at": "2026-11-09",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-17"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2703692003",
    "org": "재단법인 숲과나눔",
    "name": "숲과나눔 인재양성 프로그램 장학생(공익활동가)",
@@ -4460,10 +4466,12 @@
    "cards": 5,
    "dir": "insta/pub/2703692003",
    "at": "2026-11-09",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-17"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2703692004",
    "org": "재단법인 숲과나눔",
    "name": "숲과나눔 인재양성 프로그램 장학생(생물다양성 분야 석·박사과정)",
@@ -4473,10 +4481,12 @@
    "cards": 5,
    "dir": "insta/pub/2703692004",
    "at": "2026-11-09",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-17"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2703692001",
    "org": "재단법인 숲과나눔",
    "name": "숲과나눔 인재양성 프로그램 장학생(석·박사과정)",
@@ -4486,7 +4496,9 @@
    "cards": 5,
    "dir": "insta/pub/2703692001",
    "at": "2026-11-09",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-17"
   },
   {
    "status": "prepared",
@@ -4530,7 +4542,7 @@
    "expiredAt": "2026-11-14"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0571003",
    "org": "(재)인제군장학회",
    "name": "저소득주민자녀 장학생(일반)",
@@ -4540,7 +4552,9 @@
    "cards": 5,
    "dir": "insta/pub/0571003",
    "at": "2026-11-09",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-17"
   },
   {
    "status": "prepared",
@@ -4582,7 +4596,7 @@
    "dates": "absolute"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2704228001",
    "org": "거제1동장학회",
    "name": "중소상인자녀장학생",
@@ -4592,7 +4606,9 @@
    "cards": 4,
    "dir": "insta/pub/2704228001",
    "at": "2026-11-09",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-17"
   },
   {
    "status": "prepared",
@@ -4690,7 +4706,7 @@
    "expiredAt": "2026-11-14"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "0571004",
    "org": "(재)인제군장학회",
    "name": "저소득주민자녀 장학생(특별)",
@@ -4700,7 +4716,9 @@
    "cards": 5,
    "dir": "insta/pub/0571004",
    "at": "2026-11-10",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-17"
   },
   {
    "status": "prepared",
