@@ -4885,6 +4885,27 @@ console.log('\n■ 발췌기 글자 읽기 — 카드 빈칸 비평의 이름표
       call(EX, 'docExcerptOk', qkLine), call(EX, 'docExcerptOk', '제출서류 _ 소정양식은 홈페이지 (wwwsamwonsfor.kr) 참조'),
       ['1-@) 한국장학재단', '서류 제출 ㆍ)7@)17', 'khwc5770@khu,ac.kr', 'wwwybzor.kr/', 'www2.khu.ac.kr'].map((l) => (EX.ADDR_BROKEN ? EX.ADDR_BROKEN.test(l) : '(없음)'))],
     [null, null, 'abc@gmail.com', false, false, [false, false, true, true, false]]);
+  /* 3차 리뷰 (2026-11-16) — OCR 이 **한글 자체를** 영문 찌꺼기로 읽은 줄. 아래는 collector/extracted 의 실제 두 판독 그대로
+     (한국지도자육성장학재단 elig-1ou26f-1 · 하이패스 장학 elig-176ryo-1 · 삼원 elig-lwbap6-1) */
+  const kosfflOcr = '다. 제출처 : StH A) EAS AAS A Ct (http://Awww.kosffl.or.kr, 02-595-6817)';
+  const kosfflLay = ' 다. 제출처 : 한국지도자육성장학재단(http://www.kosffl.or.kr, 02-595-6817)';
+  eq('  🔴 한글을 영문 찌꺼기로 읽은 OCR 줄은 글자층 줄로(이름표 하나뿐 · OCR 한글이 전부 글자층에 · 찌꺼기 자리 · 숫자 같음 · 주소 아주 닮음) — 하나라도 어긋나면 OCR 줄 그대로',
+    [call(EX, 'crossCheckOcr', ['가. 제출기한 : 2026. 10. 31.(금)', kosfflOcr].join('\n'), ['가. 제출기한 : 2026. 10. 31.(금)', kosfflLay].join('\n')),
+      call(EX, 'crossCheckOcr', kosfflOcr, kosfflLay.replace('6817', '6818')),                                   // 전화 번호가 다르다
+      call(EX, 'crossCheckOcr', kosfflOcr.replace('StH', '협회 StH'), kosfflLay),                               // OCR 이 글자층에 없는 한글(협회)을 가졌다
+      call(EX, 'crossCheckOcr', kosfflOcr.replace('Awww.kosffl', 'Awww.kosaf'), kosfflLay.replace('www.kosffl', 'www.kosaf.go.kr/other')),   // 주소가 덜 닮았다
+      call(EX, 'crossCheckOcr', kosfflOcr, kosfflLay.replace('재단(', '재단 KLF(')),                             // 글자층 줄에도 영문이 있다 — 찌꺼기 자리를 못 가린다
+      call(EX, 'crossCheckOcr', kosfflOcr, [kosfflLay, ' 다. 제출처 : 한국장학재단(http://www.kosaf.go.kr, 1599-2000)'].join('\n')),   // 이름표가 둘
+      call(EX, 'crossCheckOcr', '다. 제출처 : 한국 (http://Awww.kosffl.or.kr, 02-595-6817)', kosfflLay)],      // 찌꺼기가 없다(빠진 한글만) — 같은 줄이라 할 근거가 없다
+    [['가. 제출기한 : 2026. 10. 31.(금)', '다. 제출처 : 한국지도자육성장학재단(http://www.kosffl.or.kr, 02-595-6817)'].join('\n'),
+      kosfflOcr, kosfflOcr.replace('StH', '협회 StH'), kosfflOcr.replace('Awww.kosffl', 'Awww.kosaf'), kosfflOcr, kosfflOcr, '다. 제출처 : 한국 (http://Awww.kosffl.or.kr, 02-595-6817)']);
+  eq('    🔴 못 맞춘 찌꺼기 줄은 첨부 발췌로 보이지 않는다(찌꺼기가 붙은 `Awww.`·영문 찌꺼기 줄) · 약어 줄·기록 줄·영문이 낀 멀쩡한 줄은 그대로 · 이름표 없는 삼원 OCR 줄은 바꾸지 않는다',
+    [kosfflOcr, 'ㆍ발급처 : 한국장학재단 SH 0A] Wwww.kosaf.go.kr)', '다. 제출처 : 한국 StH A EAS Ct 재단',
+      '다. 제출처 : 한국지도자육성장학재단(http://www.kosffl.or.kr, 02-595-6817)', '-주요 방송사: EBS, KBS, MBC, SBS', '4×400mR 1위, 4×100mR 2위, 100m 1위',
+      '어학 : TOEIC 800점 이상 또는 TOEFL iBT 90점 이상', '(2) 담당자 : 김대호팀장(010-7182-3150) E-mail : dh_kim@samwonpaper.com', '(3) 홈페이지 : www.samwonsf.or.kr']
+      .map((l) => call(EX, 'docExcerptOk', l))
+      .concat([call(EX, 'crossCheckOcr', '6) 제출서류 _ 소정양식은 홈페이지 (wwwsamwonsfor.kr) 참조', '6) 제출서류 _ 소정양식은 홈페이지 (www.samwonsf.or.kr) 참조')]),
+    [false, false, false, true, true, true, true, true, true, '6) 제출서류 _ 소정양식은 홈페이지 (wwwsamwonsfor.kr) 참조']);
   eq('    배선 — 첨부 글자를 읽는 자리(docTexts)가 OCR 첨부에 글자층을 맞춘다 · OCR 첨부에서 읽은 접수 메일은 다시 읽는다',
     [/const t = isOcrSource\(p\) \? crossCheckOcr\(t0, pdfLayerText\(p\)\) : t0;/.test(eeSrc), /it\.applyEmail && \/\^공고문 첨부\\\(OCR\\\)\/\.test\(it\.applyEmailFrom/.test(eeSrc)], [true, true]);
   const bodyPart = eeSrc.slice(eeSrc.indexOf('const body = strip('));
