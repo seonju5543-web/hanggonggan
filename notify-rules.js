@@ -293,11 +293,14 @@ var NOTIFY_RULES = (function () {
       return !!ledger.lastCheck && !isNaN(t) && t + 2 * 864e5 <= ledger.lastCheck;
     };
     var freshNotices = [];
-    notices.forEach(function (n) {
+    // 내 학교 공고인지는 match-engine이 정한다 — 화면(app.js)과 같은 판정이어야
+    // 화면에 없는 공고를 알림으로 알리는 일이 없다. 분교(한양 ERICA 등)도 여기서 처리된다.
+    var mineFeed = notices.filter(function (n) { return n && n.url && noticeMine(n, profile); });
+    /* 카드로 안 그리는 정식 공고(1번이 건너뛴 feedOnly)는 화면이 게시판 새 공고 한 줄로 싣는다 — 알림도 **같은 함수**(match-engine feedOnlyBoardRows)로 같은 줄을 센다
+       (2026-11-16 리뷰 — 예전엔 화면에만 있어 그 공고는 어디서도 안 울었다). 옛 캐시 엔진에 함수가 없으면 예전처럼 게시판 글만 */
+    var demoted = (typeof feedOnlyBoardRows === 'function') ? feedOnlyBoardRows(list, mineFeed, profile, now) : [];
+    mineFeed.concat(demoted).forEach(function (n) {
       if (!n || !n.url) return;
-      // 내 학교 공고인지는 match-engine이 정한다 — 화면(app.js)과 같은 판정이어야
-      // 화면에 없는 공고를 알림으로 알리는 일이 없다. 분교(한양 ERICA 등)도 여기서 처리된다.
-      if (!noticeMine(n, profile)) return;
       var tk = titleSeenKey(n);
       var seen = seenNotice[n.url] || seenNotice[tk] || foundBeforeLastCheck(n);
       seenNotice[n.url] = 1;

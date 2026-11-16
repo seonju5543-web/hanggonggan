@@ -49,7 +49,7 @@ function auditLinks(sets, checks, fixes) {
     if (c.listPlusId) warns.push(`${s.ds} — 게시판 목록 주소에 글 번호만 붙인 꼴 ${c.listPlusId}건 — 서버가 번호를 무시하고 목록을 주는 게시판입니다(가천·고려·서울교대 실측): ${eg(ex.listPlusId)}`);
     if (c.home) warns.push(`${s.ds} — 원문 링크가 사이트 첫 화면 꼴인 것 ${c.home}건 — 앱은 '홈페이지'라고 부릅니다(그 공고 주소를 찾으면 바꿔 주세요): ${eg(ex.home)}`);
     if (c.scriptAttach) warns.push(`${s.ds} — 첨부가 javascript: 내려받기 스크립트인 공고 ${c.scriptAttach}건 — 앱은 링크 없이 이름만 보입니다: ${eg(ex.scriptAttach)}`);
-    if (c.confirmedBad) warns.push(`${s.ds} — 원문 링크 확인 로봇이 '그 공고가 아니다'를 확정한 링크 ${c.confirmedBad}건 — 앱은 (확인 필요)·게시판 목록 등으로 부릅니다: ${eg(ex.confirmedBad)}`);
+    if (c.confirmedBad) warns.push(`${s.ds} — 원문 링크 확인 로봇이 '그 공고가 아니다'를 확정한 링크 ${c.confirmedBad}건 — 앱은 (열리지 않음·로그인 필요·다른 화면)·게시판 목록 등으로 부릅니다: ${eg(ex.confirmedBad)}`);
   }
   } finally { L.setLinkChecks(null); L.setLinkFixes(null); }
   return { warns, counts };

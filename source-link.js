@@ -202,16 +202,25 @@ function linkClass(kind) {
    🔴 page·list·foundation-home·program 의 글자는 **2026-10-03 이전 화면 글자 그대로**다
       (detail = sourceLinkHtml · amount = 금액 상세 · applog = 신청 내역 · card = 게시판·소식 카드 ·
        activity = 활동 시트 단추 · chat = 도우미). 새로 생긴 것은 home(일반 홈페이지)과
-      trouble(로봇이 '공고가 아니다'를 확정) 두 갈래의 글자뿐이다 — 개발자 확인 대상(보고서에 화면 첨부). */
+      trouble(로봇이 '공고가 아니다'를 확정) 두 갈래의 글자뿐이다 — 개발자 확인 대상(보고서에 화면 첨부).
+   ⚠️ trouble 의 {t} 는 로봇이 본 것(TROUBLE_TAG — 로그인 필요·열리지 않음·다른 화면)으로 바뀐다(2026-11-16 · 예전 「(확인 필요)」 · 결정 11-02) */
 const SURFACE_LABELS = {
-  detail:   { page: '원문 공고 ↗', list: '게시판 목록 ↗', 'foundation-home': '재단 홈페이지 ↗', program: '한국장학재단 ↗', home: '홈페이지 ↗', trouble: '원문 공고(확인 필요) ↗' },
-  amount:   { page: '원문 공고 ↗', list: '게시판 목록 ↗', 'foundation-home': '재단 홈페이지 ↗', program: '한국장학재단 ↗', home: '홈페이지 ↗', trouble: '원문 공고(확인 필요) ↗' },
-  applog:   { page: '공고 원문 보기 ↗', list: '게시판 목록 열기 ↗', 'foundation-home': '재단 홈페이지 열기 ↗', program: '한국장학재단에서 보기 ↗', home: '홈페이지 열기 ↗', trouble: '공고 원문 보기(확인 필요) ↗' },
-  card:     { page: '원문 보기 ↗', list: '게시판 목록에서 보기 ↗', 'foundation-home': '재단 홈페이지에서 보기 ↗', program: '한국장학재단에서 보기 ↗', home: '홈페이지에서 보기 ↗', trouble: '원문 보기(확인 필요) ↗' },
-  activity: { page: '원문 공고 ↗', list: '게시판 목록에서 보기 ↗', 'foundation-home': '재단 홈페이지 ↗', program: '한국장학재단 ↗', home: '주최 측 홈페이지 ↗', trouble: '원문 보기(확인 필요) ↗' },
+  detail:   { page: '원문 공고 ↗', list: '게시판 목록 ↗', 'foundation-home': '재단 홈페이지 ↗', program: '한국장학재단 ↗', home: '홈페이지 ↗', trouble: '원문 공고({t}) ↗' },
+  amount:   { page: '원문 공고 ↗', list: '게시판 목록 ↗', 'foundation-home': '재단 홈페이지 ↗', program: '한국장학재단 ↗', home: '홈페이지 ↗', trouble: '원문 공고({t}) ↗' },
+  applog:   { page: '공고 원문 보기 ↗', list: '게시판 목록 열기 ↗', 'foundation-home': '재단 홈페이지 열기 ↗', program: '한국장학재단에서 보기 ↗', home: '홈페이지 열기 ↗', trouble: '공고 원문 보기({t}) ↗' },
+  card:     { page: '원문 보기 ↗', list: '게시판 목록에서 보기 ↗', 'foundation-home': '재단 홈페이지에서 보기 ↗', program: '한국장학재단에서 보기 ↗', home: '홈페이지에서 보기 ↗', trouble: '원문 보기({t}) ↗' },
+  activity: { page: '원문 공고 ↗', list: '게시판 목록에서 보기 ↗', 'foundation-home': '재단 홈페이지 ↗', program: '한국장학재단 ↗', home: '주최 측 홈페이지 ↗', trouble: '원문 보기({t}) ↗' },
   /* 활동 시트의 검정 단추(2026-11-02 승인 시안) — 글 하나로 가는 주소(post)만 「원문에서 신청하기 ↗」, 나머지는 활동 시트와 같은 이름(목록·홈페이지에 '신청하기'를 붙이지 않는다 · 2026-10-03) */
-  activityButton: { page: '원문에서 신청하기 ↗', list: '게시판 목록에서 보기 ↗', 'foundation-home': '재단 홈페이지 ↗', program: '한국장학재단 ↗', home: '주최 측 홈페이지 ↗', trouble: '원문 보기(확인 필요) ↗' },
-  chat:     { page: '↗', list: '(게시판 목록) ↗', 'foundation-home': '(재단 홈페이지) ↗', program: '(한국장학재단) ↗', home: '(홈페이지) ↗', trouble: '(원문 확인 필요) ↗' },
+  activityButton: { page: '원문에서 신청하기 ↗', list: '게시판 목록에서 보기 ↗', 'foundation-home': '재단 홈페이지 ↗', program: '한국장학재단 ↗', home: '주최 측 홈페이지 ↗', trouble: '원문 보기({t}) ↗' },
+  chat:     { page: '↗', list: '(게시판 목록) ↗', 'foundation-home': '(재단 홈페이지) ↗', program: '(한국장학재단) ↗', home: '(홈페이지) ↗', trouble: '(원문 {t}) ↗' },
+};
+/* 문제(trouble) 이름의 {t} 자리 — 로봇이 본 것을 짧게 (2026-11-16 · 개발자 결정 11-02 — 예전 「(확인 필요)」).
+   🔴 '모름'류 낱말(verify/no-unknown-words.cjs)을 쓰지 않고도 **무엇이 잘못됐는지** 말한다 — 이름만 보이는 자리(카드·소식 띠·도우미)에서도
+      이 주소가 그 공고를 보여 주지 않는다는 사실이 남아야 한다(원문 링크 정직성 · 지우기만 하면 멀쩡한 원문처럼 읽힌다). 아래 한 줄과 같은 사실 */
+const TROUBLE_TAG = {
+  login: '로그인 필요',
+  gone: '열리지 않음',
+  other: '다른 화면',
 };
 /* 문제(trouble)일 때 붙이는 한 줄 — 로봇이 무엇을 봤는지 그대로 말한다(짐작해 덧붙이지 않는다) */
 const TROUBLE_CAUTION = {
@@ -242,7 +251,7 @@ function sourceLink(item, surface) {
   if (cls === 'post') label = labels.page;
   else if (cls === 'list') label = labels.list;
   else if (cls === 'home') label = labels[kind] || labels.home;
-  else if (cls === 'trouble') label = labels.trouble;
+  else if (cls === 'trouble') label = labels.trouble.replace('{t}', TROUBLE_TAG[kind] || TROUBLE_TAG.other);
   const hint = cls === 'list'
     ? (markerTitleOf(raw) || String(it.boardTitle || it.title || it.name || '')).trim()
     : '';
@@ -258,7 +267,7 @@ function sourceLink(item, surface) {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     decodeUrlEntities, linkShape, isListPlusId, setLinkChecks, linkCheckFor, linkKind, linkClass, sourceLink,
-    markerTitleOf, SURFACE_LABELS, LINK_BAD, TROUBLE_CAUTION,
+    markerTitleOf, SURFACE_LABELS, LINK_BAD, TROUBLE_CAUTION, TROUBLE_TAG,
     setLinkFixes, rawLinkKind, itemRound, fixKeys, fixUrlUsable, linkFixFor, effectiveLinkUrl,
   };
 }

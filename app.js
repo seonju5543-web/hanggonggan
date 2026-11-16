@@ -423,7 +423,14 @@ const bareOrg = (t) => String(t || '').replace(/^(재단법인|사단법인|학�
    안 떼면 제목이 `(재)가송재단 장학생 (한국외대 접수, 2026-2학기)` 인데도 겹침을 못 알아본다(실측 3건). */
 const orgBase = (t) => String(t || '').replace(/\s*\([^)]*\)\s*$/, '').trim();
 /* 주관 기관 칸이 비었거나 '모름' 표시(`주관 기관 원문 확인`·`미확인` — auto-register PROVIDER_UNKNOWN)인가 — 카드 윗줄·지원서 초안이 같이 쓴다 */
-const providerUnknown = (v) => !String(v || '').trim() || /원문 확인|미확인|확인\s?필요/.test(String(v));   // 「기관확인필요」 — 재단이 KOSAF 칸에 적어 둔 모름 표시(2026-11-02 실화면)
+const providerUnknown = (v) => !String(v || '').trim() || /원문 확인|미확인|확인\s?필요/.test(String(v));
+/* 칸 하나의 '아는 것만' (2026-11-16 리뷰 — 달력 줄·지원서 초안이 칸을 그대로 옮겨 「금액 원문 확인」·「기관확인필요」가 샜다) — 모름 판정은 위 providerUnknown,
+   재단이 적어 둔 긴 칸(「… 각 대학 홈페이지 확인 필요」)은 층2 공고 안내와 같은 kosafNoticeValue 로 그 마디만 뗀다. 로봇 표시(원문 확인·미확인)는 통째로 뺀다 · 글자를 더하지 않는다 */
+function knownValue(v) {
+  const t = String(v || '').trim();
+  if (!providerUnknown(t)) return t;
+  return /원문 확인|미확인/.test(t) ? '' : kosafNoticeValue(t);
+}   // 「기관확인필요」 — 재단이 KOSAF 칸에 적어 둔 모름 표시(2026-11-02 실화면)
 function cardOrgLine(sch) {
   const prov = String(sch.provider || '').trim();
   /* 🔴 **'모른다'는 표시는 카드 윗줄에 싣지 않는다** (2026-10-06 사장님 지시 'AI 티' · 개선안 D).
@@ -1776,9 +1783,13 @@ function fitBadgeHtml(fit, fd, { full = false } = {}) {
      판정 못 한 요건이 분모에 있어 퍼센트가 낮을 뿐인데 경고색이면 '안 맞는다'로 읽힌다(틀린 미달처럼 보인다) */
   const tone = fitToneNoFail(fd.pct);
   if (!full) return `<span class="badge badge-fit fit-${tone}">적합도 ${fd.pct}%</span>`;
-  /* 상세 — 「적합도 n% · 맞는 요건 M개 · 어긋난 요건 없음」 (2026-11-15 · 예전 「요건 n개 중 m개 충족 · 확인 필요 k」).
-     판정 못 한 요건 수는 말하지 않는다(개발자 결정 11-02) — 그 줄들은 표시 없이 목록에 그대로 있다(eligibilityRowsHtml) */
-  return `<span class="badge badge-fit fit-${tone}">적합도 ${fd.pct}% <em>${fd.met > 0 ? `맞는 요건 ${fd.met}개 · ` : ''}어긋난 요건 없음</em></span>`;
+  /* 상세 — 「적합도 n% · 맞는 요건 M개」 (2026-11-15 · 예전 「요건 n개 중 m개 충족 · 확인 필요 k」).
+     판정 못 한 요건 수는 말하지 않는다(개발자 결정 11-02) — 그 줄들은 표시 없이 목록에 그대로 있다(eligibilityRowsHtml).
+     🔴 「어긋난 요건 없음」은 **요건을 전부 판정했을 때만**(fd.unknown === 0 · 2026-11-16 리뷰) — 판정 못 한 줄이 있는데 이 말을 하면
+        모르는 줄까지 '괜찮다'고 단정하는 틀린 안심이 된다. 모르는 줄이 있으면 **확인한 것만** 말한다(맞는 요건 M개 · 0개면 퍼센트만) */
+  const judgedAll = !(fd.unknown > 0);
+  const why = judgedAll ? `${fd.met > 0 ? `맞는 요건 ${fd.met}개 · ` : ''}어긋난 요건 없음` : (fd.met > 0 ? `맞는 요건 ${fd.met}개` : '');
+  return `<span class="badge badge-fit fit-${tone}">적합도 ${fd.pct}%${why ? ` <em>${why}</em>` : ''}</span>`;
 }
 
 /* 카드에 붙는 판정은 **하나뿐**이다 (2026-09-10 페이스리프트).
@@ -2454,7 +2465,7 @@ function generateEssay(def, sch, p, ans, extra) {
     );
   } else if (def.kind === 'plan') {
     paras.push(
-      `[학업 계획]\n${sch.period} 동안 ${ans.goal}. ${gpaTxt ? '현재 ' + gpaTxt + '을 바탕으로 학점 관리도 병행하겠습니다.' : ''}`,
+      `[학업 계획]\n${knownValue(sch.period) ? knownValue(sch.period) + ' 동안 ' : ''}${ans.goal}. ${gpaTxt ? '현재 ' + gpaTxt + '을 바탕으로 학점 관리도 병행하겠습니다.' : ''}`,
       `[진로 계획]\n중장기적으로는 ${ans.career}을(를) 목표로 하고 있습니다. 이번 학기의 계획은 그 목표로 가는 구체적인 발판입니다.`,
       `[장학금 활용]\n지원받는 장학금은 학업 관련 비용에 우선 사용하여 계획 실행에 온전히 집중하겠습니다.`
     );
@@ -3323,10 +3334,8 @@ function boardNoticesForMe() {
   /* 내 학교 공고인지는 match-engine이 정한다 — 알림(notify-rules)도 같은 함수를 쓴다 */
   const fromFeed = (liveNotices.items || []).filter((n) => noticeForProfile(n, p) && !isRegistered(n.url));
   /* 카드로 안 그리는 정식 공고(feedOnlyFormal — 기한·자격을 다 모름 · 2026-11-15 결정 1)가 이 학교 게시판 글에 없으면(다른 게시판에서 온 공고) 여기 한 줄로 싣는다.
-     🔴 지어내지 않는다 — 제목·주소·날짜는 그 공고의 것 그대로(name·sourceUrl·listedAt). 게시판 글이 이미 있으면 그 글이 그 자리다(두 번 안 싣는다) */
-  const sameUrl = (a, b) => !!a && !!b && (a.startsWith(b) || b.startsWith(a));
-  const demoted = registeredFor(p).filter((s) => s.sourceUrl && notStale(s) && feedOnlyFormal(s, p) && !fromFeed.some((n) => sameUrl(n.url, s.sourceUrl)))
-    .map((s) => ({ title: s.name, url: s.sourceUrl, school: (s.eligibility && s.eligibility.schoolOnly) || p.school, foundAt: s.listedAt || '' }));
+     🔴 판정은 match-engine feedOnlyBoardRows 한 곳 — 알림(notify-rules 「4. 실시간 공고」)도 같은 함수에 같은 목록(allScholarships — notify.js 가 넘기는 것)을 넘긴다 */
+  const demoted = feedOnlyBoardRows(allScholarships(), fromFeed, p);
   const forMe = fromFeed.concat(demoted);
   /* 학자금 대출·융자는 장학금이 아니라서 매칭 카드로는 만들지 않는다(정직 원칙).
      그렇다고 피드에서까지 밀려 잘리면 학생이 대출 정보를 아예 볼 곳이 없어지므로,
@@ -4400,15 +4409,16 @@ function amountDetailRow(m, opt) {
      ⚠️ 순서를 뒤집지 말 것 — `esc()` 뒤에 되돌리면 `&amp;middot;` 가 돼 영영 안 풀린다.
      (2026-09-11 에 `n.title`·`n.deadlineHint` 에서 같은 사고가 있었다. 그때 관문은
       **칸 이름 두 개만** 보는 손 목록이라 이 자리를 못 잡았다 — 관문도 함께 넓혔다.) */
-  const raw = a && a.raw ? unent(a.raw) : '';
-  const exRaw = sch.exclusivity && sch.exclusivity.raw ? unent(sch.exclusivity.raw) : '';
+  /* 재단이 금액 칸에 '모름' 표시만 적어 둔 것(「지원금액: ※ 기관확인필요」)은 인용하지 않는다 — 층2 공고 안내와 같은 규칙(knownValue → kosafNoticeValue · 2026-11-16 리뷰) */
+  const raw = a && a.raw ? knownValue(unent(a.raw)) : '';
+  const exRaw = sch.exclusivity && sch.exclusivity.raw ? knownValue(unent(sch.exclusivity.raw)) : '';
   return `<div class="${cls}" data-goto="${esc(sch.id)}" role="button" tabindex="0">
     <div class="ad-top"><p class="ad-name">${esc(sch.name || '')}</p>
       ${val || o.check ? `<p class="ad-val ${o.tone || ''}">${o.check ? '<span class="ad-chk">✓</span>' : ''}${esc(val)}</p>` : ''}</div>
     ${o.note ? `<p class="ad-note">${esc(o.note)}</p>` : ''}
     ${merged ? `<details><summary>${esc(schoolOfNotice(m.mergedFrom[0]) || '다른 학교')} 외 ${merged}건</summary>
       <div class="ad-list"><span>같은 재단이 여러 학교에서 접수하는 공고. 1건으로 합산.</span>
-      ${[sch, ...m.mergedFrom].map((x) => `<span>${esc(x.provider || x.name || '')}</span>`).join('')}</div></details>` : ''}
+      ${[sch, ...m.mergedFrom].map((x) => `<span>${esc(providerUnknown(x.provider) ? (x.name || '') : x.provider)}</span>`).join('')}</div></details>` : ''}
     ${/* 층2는 우리가 읽은 공고 원문이 아니라 재단이 한국장학재단에 적어 둔 칸이다 — '원문'이라 부르지 않는다 (2026-10-03) */ ''}
     ${raw || exRaw ? `<details><summary>${sch.sourceKind === 'kosaf' ? '재단이 적어 둔 글' : '원문 보기'}</summary>
       <p class="ad-src">"${esc(raw || exRaw)}"<em>${esc(noticeSourceLabel(sch))}</em></p></details>`
@@ -4598,13 +4608,17 @@ function applyAll() {
       (이공계 새터민)에서 실제로 그랬다: 새터민이고 이공계이고 성적도 넘는 학생인데 자격 줄
       셋 중 둘을 못 읽어 unknown 이 됐고, 화면은 그 학생에게 '요건 미충족'이라 단정했다.
       그때는 **버튼 문구만** 갈랐고 잠금은 안 갈라서, 그 학생은 여전히 못 눌렀다. */
-function applyLock(result, app, d, sch) {
+/* 🔴 fd(fitDetailFor) — 자격 줄을 한 줄도 못 읽은 공고(fd.unread)도 「원문에서 자격을 보라」 한 문장을 단다 (2026-11-16 리뷰). 정식 등록 공고는 거의 다
+   status 'selective' 라 status 갈래로는 안내가 영영 안 붙고, 「자격 미확인」 배지도 뺐으니(11-02 결정) 앱이 자격을 확인해 준 공고와 똑같아 보인다.
+   문장은 'unknown' 갈래와 같은 것(모르는 것을 말하는 낱말이 없는 할 일 안내) · 판정은 바꾸지 않는다(버튼은 그대로 열린다) */
+function applyLock(result, app, d, sch, fd) {
   /* 🔴 원문이 「별도 신청 없이 학교가 선발」이라 적은 공고(noApply = 그 원문 문장 · 관리자가 적는다 · 2026-11-02 세종대 학업수석총장장학금) —
      자격이 맞아도 버튼을 열지 않는다. 열면 학생이 없는 절차를 준비한다. 홈 「바로 신청」·앱 지원문서도 같은 칸을 본다. */
   if (sch && sch.noApply) return { canApply: false, caution: '', noApply: true };
   const canApply = (!app || app.pending) && d.days >= 0;
   const unsure = !['eligible', 'selective'].includes((result && result.status) || '');
-  return { canApply, caution: canApply && unsure ? result.status : '' };
+  const caution = !canApply ? '' : unsure ? result.status : (fd && fd.unread ? 'unknown' : '');
+  return { canApply, caution };
 }
 
 /* ---------------- 상세 바텀시트 ---------------- */
@@ -5018,7 +5032,7 @@ function openDetail(id) {
   const fd = fitDetailFor(sch, state.profile);   // 카드와 같은 근거를 쓴다(위 주석)
   const d = dday(sch.deadline);
   const app = state.applications.find((a) => a.id === id);
-  const lock = applyLock(result, app, d, sch);
+  const lock = applyLock(result, app, d, sch, fd);
   /* 데이터에서 내려간 공고(사본으로 연 시트)에서는 신청을 시작·이어가지 않는다 — 양식 흐름이 findSch 로 공고를 다시 찾다 넘어진다(2026-10-02 리뷰).
      기록(제출·결과)은 신청 내역 패널에서 그대로 적을 수 있다 */
   const gone = !findSch(id);
@@ -5079,7 +5093,7 @@ function openDetail(id) {
               it.key === 'write' && !it.done ? ' <span class="doc-legend">「서류 작성 이어서 하기」로</span>' : ''}</li>`).join('')}
           </ul>`;
         })()}
-        <p class="applied-at">${app.appliedAt} ${prepChecklist(app, sch).complete || step > 0 ? '준비 완료' : '신청내역에 담김 · 준비 중'} · 최종 제출처: ${ch.url ? `<a href="${esc(safeUrl(ch.url))}" target="_blank" rel="noopener">${esc(ch.label)}</a>` : esc(ch.label)}</p>
+        <p class="applied-at">${app.appliedAt} ${prepChecklist(app, sch).complete || step > 0 ? '준비 완료' : '신청내역에 담김 · 준비 중'} · 최종 제출처: ${ch.url ? `<a href="${esc(safeUrl(ch.url))}" target="_blank" rel="noopener">${esc(ch.label)}</a>` : esc(ch.label)}${ch.note ? ` <span class="doc-legend">${esc(ch.note)}</span>` : ''}</p>
         ${step === 0 ? `
           <button class="btn btn-outline" id="btn-mark-submitted" style="width:100%;margin-bottom:6px">공식 제출 완료로 기록</button>
           <p class="dp-note">최종 제출은 ${esc(ch.label)}에서 이루어집니다. 제출을 마친 뒤 누르면 다음 단계로 넘어갑니다.</p>` : ''}
@@ -5094,7 +5108,7 @@ function openDetail(id) {
           </div>` : ''}
         ${step === 3 ? `
           <p class="progress-note ${app.result === 'won' ? 'progress-won' : ''}">${app.result === 'won'
-            ? `${esc(app.resultAt)} 선정 · ${esc(sch.amount)}`
+            ? `${esc(app.resultAt)} 선정${(() => { const t = amountLine(sch).text.replace(/^금액 · /, ''); return t ? ` · ${esc(t)}` : ''; })()}`   /* 금액은 카드와 같은 amountLine — 모르면 「선정」까지만(예전 「선정 · 금액 원문 확인」 · 2026-11-16) */
             : `${esc(app.resultAt)} 미선정으로 기록됨`}</p>
           <button class="link-btn" id="btn-undo-progress" style="margin-bottom:10px">결과 기록 취소</button>` : ''}
         ${app.docs && app.docs.length ? `
@@ -6088,7 +6102,7 @@ function calRowHtml(sch, { badge = true, save = false } = {}) {
   const row = `<button class="cal-row" data-detail="${esc(sch.id)}">
       <span class="cal-row-top">${mark}${d ? `<span class="badge badge-dday ${d.cls}">${d.label}</span>` : ''}${sch.formId ? '<span class="badge badge-form">앱에서 작성</span>' : ''}</span>
       <span class="cal-row-name">${esc(sch.name)}</span>
-      <span class="cal-row-sub">${esc(sch.amount)}${sch.headcount ? ` · ${esc(sch.headcount)}` : ''}</span>
+      ${(() => { const sub = [amountLine(sch).text.replace(/^금액 · /, ''), knownValue(sch.headcount)].filter(Boolean).join(' · '); return sub ? `<span class="cal-row-sub">${esc(sub)}</span>` : ''; })()}
     </button>`;
   /* 보관함에서는 **여기서 바로 해제**할 수 있어야 한다 — 담는 곳과 빼는 곳이 다르면
      학생이 뺄 방법을 못 찾는다. 카드와 같은 이유로 단추는 줄 **바깥**에 둔다. */

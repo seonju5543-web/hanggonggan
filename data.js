@@ -572,11 +572,12 @@ function officialChannel(sch) {
     const name = (what) => (knownProvider ? `${sch.provider} (${what})` : what);
     /* 🔴 이름은 **명사**로 — 'OO에서 공식 제출을 마치셨나요?'·'최종 제출처: OO' 처럼 문장 안에 들어간다(리뷰 APP-3 ·
        '…찾기에서 공식 제출을' 이 됐다). 할 일(제목으로 찾기)은 링크 옆 안내 문장(sourceLink hint)이 말한다. */
+    /* 🔴 문제 주소(trouble)도 이름은 「원문 공고의 접수 방법」 — 제출처는 여전히 원문 공고가 정한다(2026-11-16 · 예전 「… · 주소 확인 필요」 · 결정 11-02 '모름'류 낱말 빼기).
+       주소가 그 공고를 안 보여 준다는 사실은 note(로봇이 본 한 줄 · sourceLink caution — 「이 주소가 열리지 않았어요 …」)로 함께 넘긴다 — 링크로 그리는 자리(신청 내역 「최종 제출처」)가 옆에 붙인다 */
     const label = cls === 'list' ? name('게시판 목록')
       : cls === 'home' ? name('홈페이지')
-      : cls === 'trouble' ? name('원문 공고의 접수 방법 · 주소 확인 필요')   // 괄호를 쓰지 않는다 — '최종 제출처(…)가 표시됩니다' 안에서 괄호가 겹친다(화면 실측)
       : name('원문 공고의 접수 방법');
-    return { label, url: linkUrl, guide };
+    return cls === 'trouble' && sl && sl.caution ? { label, url: linkUrl, guide, note: sl.caution } : { label, url: linkUrl, guide };
   }
   return { label: knownProvider ? `${sch.provider} 장학공지 (학교 포털)` : '원문 공고의 접수 방법',
     guide: SUBMIT_GUIDES.campus };
