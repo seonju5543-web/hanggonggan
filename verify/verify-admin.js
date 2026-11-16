@@ -143,6 +143,10 @@ function serve() {
     badUrl: 'https://example.ac.kr/view.do?seq=990',
     /* ⑥ 넣어 둔 주소인데 로봇이 그 주소도 문제로 확정한 것(열리지 않음) — 그 줄이 학생 이름을 화면과 같게 말하는지 본다(2026-11-16 2차 리뷰) */
     fixBadUrl: 'https://example.ac.kr/view.do?seq=991',
+    /* ⑥ 대상 글이 **있는** 넣어 둔 주소인데 로봇이 그 주소를 문제로 확정한 것(로그인 필요) — 그 줄은 학생이 실제로 보는 이름을 말해야 한다.
+       위 seq=991 은 대상 글이 없는 열쇠라 '보는 학생이 없다'고 말해야 한다(2026-11-16 3차 리뷰 — 대상 없는 줄이 지은 이름을 학생 화면이라 말했다) */
+    fixedRegUrl: 'https://example.ac.kr/view.do?seq=994',
+    fixTargetBadUrl: 'https://example.ac.kr/view.do?seq=992',
     newsMark: 'https://news.example.ac.kr/bbs/list.do#n-%EC%86%8C%EC%8B%9D',
     newsFile: 'verify-linkfix-news.json',
     due: new Date(Date.now() + 9 * 3600e3 + 20 * 86400e3).toISOString().slice(0, 10),
@@ -219,6 +223,9 @@ function serve() {
         }, {
           ...base, id: 'verify-linkfix-bad', name: '검사용 확정 문제 공고', amount: '100만원', amountValue: 1000000,
           deadline: LFX.due, period: '접수 기간 원문 확인', sourceUrl: LFX.badUrl,
+        }, {
+          ...base, id: 'verify-linkfix-fixed', name: '검사용 넣어 둔 주소 공고', amount: '100만원', amountValue: 1000000,
+          deadline: LFX.due, period: '접수 기간 원문 확인', sourceUrl: LFX.fixedRegUrl,
         });
         body = JSON.stringify(db2);
       }
@@ -249,12 +256,13 @@ function serve() {
     }
     if (rel === 'data/link-check.json') {
       const db = JSON.parse(body);
-      db.bad = { ...(db.bad || {}), [LFX.badUrl]: { v: 'other', at: '2026-10-03' }, [LFX.fixBadUrl]: { v: 'gone', at: '2026-10-03' } };
+      db.bad = { ...(db.bad || {}), [LFX.badUrl]: { v: 'other', at: '2026-10-03' }, [LFX.fixBadUrl]: { v: 'gone', at: '2026-10-03' }, [LFX.fixTargetBadUrl]: { v: 'login', at: '2026-10-03' } };
       body = JSON.stringify(db);
     }
     if (rel === 'data/link-fixes.json') {
       const db = JSON.parse(body);
-      db.fix = { ...(db.fix || {}), 'id:verify-linkfix-gone': { url: LFX.fixBadUrl, by: '검사', at: '2026-10-03', title: '검사용 넣어 둔 주소' } };
+      db.fix = { ...(db.fix || {}), 'id:verify-linkfix-gone': { url: LFX.fixBadUrl, by: '검사', at: '2026-10-03', title: '검사용 넣어 둔 주소' },
+        'id:verify-linkfix-fixed': { url: LFX.fixTargetBadUrl, by: '검사', at: '2026-10-03', title: '검사용 넣어 둔 주소(대상 있음)' } };
       body = JSON.stringify(db);
     }
     if (rel === 'data/news/index.json') {
@@ -2286,11 +2294,23 @@ function serve() {
     const want = troubleTags.map((t) => SLX.SURFACE_LABELS.detail.trouble.replace('{t}', t));
     const lfTexts = await page.evaluate(() => {
       const t = (sel) => (document.querySelector(sel) || {}).textContent || '';
-      const fixed = [...document.querySelectorAll('#link-fix-slot [data-lf-fixed]')].find((x) => x.dataset.lfFixed === 'id:verify-linkfix-gone');
-      return { bad: t('#link-fix-slot [data-lf-group="bad"] p.muted'), note: t('#link-fix-slot [data-lf-note]'), fixed: fixed ? fixed.textContent : '', all: t('#link-fix-slot') };
+      const fixedRow = (k) => [...document.querySelectorAll('#link-fix-slot [data-lf-fixed]')].find((x) => x.dataset.lfFixed === k);
+      const badLine = (k) => { const r = fixedRow(k); const b = r && r.querySelector('[data-lf-fixed-bad]'); return { status: r ? r.dataset.lfStatus : '', bad: b ? b.textContent : '' }; };
+      return { bad: t('#link-fix-slot [data-lf-group="bad"] p.muted'), note: t('#link-fix-slot [data-lf-note]'), gone: badLine('id:verify-linkfix-gone'), tgt: badLine('id:verify-linkfix-fixed'), all: t('#link-fix-slot') };
     });
-    ok(want.every((w) => lfTexts.bad.includes(w) && lfTexts.note.includes(w)) && /학생에게는 「원문 공고\(열리지 않음\) ↗」로 보입니다/.test(lfTexts.fixed) && !/확인 필요/.test(lfTexts.all),
-      `  관리자 설명도 학생 화면과 같은 이름 — ⑤ 설명·안내 문단에 ${want.join('·')} · 문제로 확정된 넣어 둔 주소(⑥)는 그 줄의 이름 그대로 · 「확인 필요」 없음`, JSON.stringify({ bad: lfTexts.bad.slice(-160), note: lfTexts.note.slice(0, 200), fixed: lfTexts.fixed.slice(0, 300) }));
+    ok(want.every((w) => lfTexts.bad.includes(w) && lfTexts.note.includes(w)) && !/확인 필요/.test(lfTexts.all),
+      `  관리자 설명도 학생 화면과 같은 이름 — ⑤ 설명·안내 문단에 ${want.join('·')} · 「확인 필요」 없음`, JSON.stringify({ bad: lfTexts.bad.slice(-160), note: lfTexts.note.slice(0, 200) }));
+    /* ⑥ 넣어 둔 주소가 문제로 확정됐을 때 — 대상 글이 있으면 학생이 실제로 보는 이름(그 글로 source-link.js 를 불러 만든다 · 베껴 적지 않는다),
+       대상 글이 없으면 학생 이름을 말하지 않고 '보는 학생이 없다'고 말한다(2026-11-16 3차 리뷰) */
+    SLX.setLinkChecks({ bad: { [LFX.fixTargetBadUrl]: { v: 'login', at: '2026-10-03' } } });
+    SLX.setLinkFixes({ fix: { 'id:verify-linkfix-fixed': { url: LFX.fixTargetBadUrl, by: '검사', at: '2026-10-03' } } });
+    const tgtItem = PAGE_ITEMS.find((x) => x.id === 'verify-linkfix-fixed');
+    const wantTgt = tgtItem ? SLX.sourceLink(tgtItem, 'detail').label : '';
+    SLX.setLinkChecks({}); SLX.setLinkFixes({});
+    ok(/로그인 필요/.test(wantTgt) && lfTexts.tgt.status === 'applied' && lfTexts.tgt.bad.includes(`학생에게는 「${wantTgt}」로 보입니다`),
+      `  ⑥ 대상 글이 있는 넣어 둔 주소가 문제로 확정됨 — 학생이 실제로 보는 이름(「${wantTgt}」)을 말한다`, JSON.stringify(lfTexts.tgt));
+    ok(lfTexts.gone.status === 'none' && /보는 학생은 없습니다/.test(lfTexts.gone.bad) && !/학생에게는/.test(lfTexts.gone.bad) && !/↗/.test(lfTexts.gone.bad),
+      '  ⑥ 대상 글이 없는 넣어 둔 주소가 문제로 확정됨 — 학생 이름을 짓지 않고 「보는 학생은 없습니다」라고 말한다', JSON.stringify(lfTexts.gone));
     ok(reg && /noreferrer/.test(reg.now || ''), '  「지금 링크 열기」는 학생처럼 리퍼러 없이 연다');
     const regSel = '#link-fix-slot [data-lf-row="id:verify-linkfix-reg"]';
     await page.fill(`${regSel} [data-lf-url]`, 'https://example.ac.kr/bbs/list.do#n-%EB%8B%A4%EB%A5%B8');
