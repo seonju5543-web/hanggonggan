@@ -8133,6 +8133,8 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
     { ...wsBase, id: 'sample-many-lines', name: '표본 장학금 (자격 줄 일곱)', deadline: '2099-12-31',
       eligibilityLines: ['대한민국 국적을 가진 자', '직전학기 평점 2.5 이상인 자', '직전학기 12학점 이상 이수한 자', '학부 재학생', '소득 8구간 이하인 자', '서울시에 거주하는 자', '2학년 이상 재학생'] },
     { ...wsBase, id: 'sample-closed', name: '표본 장학금 (마감 지남)', deadline: '2020-01-31', eligibilityLines: ['직전학기 평점 2.5 이상인 자'] },
+    /* 기한도 자격도 못 읽은 정식 공고(2026-11-16) — 앱은 카드로 안 그리고 게시판 새 공고 한 줄로 싣는다(match-engine feedOnlyFormal) */
+    { ...wsBase, id: 'sample-feed-only', name: '표본 장학금 (기한·자격 못 읽음)', listedAt: new Date().toISOString().slice(0, 10), sourceUrl: 'https://example.ac.kr/notice/feed-only-1', eligibilityLines: [] },
   ] }));
   const run = (args) => {
     try {
@@ -8197,6 +8199,21 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
     const out = run([closed.id]);
     eq('마감 지난 공고는 신청 버튼 잠김이라고 말한다', /신청 버튼 잠김/.test(out), true);
   }
+
+  /* 🔴 카드로 안 그리는 정식 공고 (2026-11-16 리뷰) — 앱(getMatches)은 기한도 자격도 못 읽은 정식 공고를 카드에서 빼고
+     게시판 새 공고 한 줄(제목 + 링크)로만 싣는데(feedOnlyFormal·feedOnlyBoardRows), 이 도구는 카드·「판정 selective」·
+     「신청 버튼 열림 (마감: ?)」을 말했다(상명대 auto-enoticedoarticleno770333 실측). 도구가 같은 함수를 불러 '카드 없음'이라 말하는지 실제로 돌려 본다 */
+  const fo = reg2.items.find((x) => x.id === 'sample-feed-only');
+  eq('  기한·자격을 못 읽은 표본은 앱 규칙으로 카드가 없다 (이 검사의 전제 · match-engine feedOnlyFormal)', !!fo && ME4.feedOnlyFormal(fo, WS_P), true);
+  if (fo) {
+    const out = run([fo.id]);
+    eq('기한·자격을 못 읽은 정식 공고는 「카드 없음」 · 게시판 새 공고 한 줄(제목 + 링크)이라고 말한다 — 카드·판정·신청 버튼을 말하지 않는다',
+      [/카드 없음/.test(out), /게시판 새 공고 한 줄\(제목 \+ 링크\)로 보인다 — 「표본 장학금 \(기한·자격 못 읽음\)」/.test(out),
+        /카드 윗줄|판정 selective|신청 버튼/.test(out), out.includes('누르면 → https://example.ac.kr/notice/feed-only-1')],
+      [true, true, false, true]);
+  }
+  eq('  모르는 마감을 「마감: ?」로 찍지 않는다', /마감: \?|\|\| '\?'\}\)/.test(readText(new URL('../verify/what-shows.mjs', import.meta.url))), false);
+  eq('  카드 판정은 match-engine feedOnlyFormal 을 부른다 (사본이 아니다)', /ME\.feedOnlyFormal\(/.test(readText(new URL('../verify/what-shows.mjs', import.meta.url))), true);
 
   /* 배지 문구를 손으로 옮겨 적으면 갈라진다 — 앱 함수를 가져다 쓰는지 소스로도 못 박는다 */
   const ws = readText(new URL('../verify/what-shows.mjs', import.meta.url));
