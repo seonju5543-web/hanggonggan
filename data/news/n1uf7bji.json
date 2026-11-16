@@ -1,7 +1,28 @@
 {
  "school": "한국방송통신대학교",
- "updatedAt": "2026-11-15",
+ "updatedAt": "2026-11-16",
  "items": [
+  {
+   "title": "[일반] [방송대 학보] KNOU위클리 308호 (2026년 11월 16일 발행) 지면안내",
+   "url": "https://www.knou.ac.kr/bbs/knou/51/822423/artclView.do",
+   "postedAt": "2026-11-16",
+   "school": "한국방송통신대학교",
+   "campus": "",
+   "src": "6cb89020",
+   "foundAt": "2026-11-16",
+   "thumb": "data/news/img/be607b769f74a372.webp"
+  },
+  {
+   "title": "[일반] 2026년 맞춤배움길 서비스 만족도 설문조사 참여 안내",
+   "url": "https://www.knou.ac.kr/bbs/knou/51/822434/artclView.do",
+   "postedAt": "2026-11-16",
+   "school": "한국방송통신대학교",
+   "campus": "",
+   "src": "6cb89020",
+   "foundAt": "2026-11-16",
+   "thumb": "data/news/img/b07d07eef121a2e0.webp",
+   "desc": "한국교육학술정보원은 성인학습자의 자기주도적 온라인 평생학습 지원을 위한 원격대학 교육과정 추천서비스 및 학습조회 서비스 \" 맞춤배움길 (cures.kr)\"과 \"맞춤배움길…"
+  },
   {
    "title": "[시험성적] 2026.2학기 기말시험 계산기 사용 가능 교과목 (스포츠의학검사론) 추가 안내",
    "url": "https://www.knou.ac.kr/bbs/knou/51/821892/artclView.do",
@@ -384,36 +405,6 @@
    "campus": "",
    "src": "6cb89020",
    "foundAt": "2026-10-19"
-  },
-  {
-   "title": "[시험성적] 2026학년도 2학기 출석수업대체시험 시행 공고",
-   "url": "https://www.knou.ac.kr/bbs/knou/51/818437/artclView.do",
-   "postedAt": "2026-10-16",
-   "kind": "학사",
-   "school": "한국방송통신대학교",
-   "campus": "",
-   "src": "6cb89020",
-   "foundAt": "2026-10-16"
-  },
-  {
-   "title": "[일반] 장애학생 기초학력 증진을 위한 온라인 학습지원 사업 안내",
-   "url": "https://www.knou.ac.kr/bbs/knou/51/818522/artclView.do",
-   "postedAt": "2026-10-16",
-   "school": "한국방송통신대학교",
-   "campus": "",
-   "src": "6cb89020",
-   "foundAt": "2026-10-16"
-  },
-  {
-   "title": "[일반] [중앙도서관] 2026. 2학기 온라인 학술정보 활용교육 안내 : 로앤비/Westlaw(법",
-   "url": "https://www.knou.ac.kr/bbs/knou/51/818400/artclView.do",
-   "postedAt": "2026-10-16",
-   "kind": "생활",
-   "school": "한국방송통신대학교",
-   "campus": "",
-   "src": "6cb89020",
-   "foundAt": "2026-10-16",
-   "desc": "중앙도서관에서는 2026학년도 2학기 온라인 학술정보 활용 교육으로, 로앤비(LAWnB) / Westlaw 활용 교육 을 진행합니다."
   }
  ]
 }

@@ -1,7 +1,38 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-11-15",
+ "updatedAt": "2026-11-16",
  "items": [
+  {
+   "title": "[국제학생] [한국무역협회] 외국인유학생 채용지원 교육과정 KITA K-커리어마스터 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53685&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-16",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-16",
+   "thumb": "data/news/img/112a0d4a9493c469.webp"
+  },
+  {
+   "title": "[일반] 내PC지키미를 이용한 PC보안 및 알약 점검 협조 요청",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53688&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-16",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-16",
+   "desc": "사이버 보안 침해 사고의 교내 발생을 예방하기 위하여 PC보안 점검사항을 안내하오니 적극 동참하여 주시기 바랍니다. 요청사항 업무용 PC에는 반드시 ‘내PC 지키미’ 를 설치하여 주시기 바랍니다."
+  },
+  {
+   "title": "[일반] 불법 소프트웨어, 이미지, 폰트 사용 및 배포 방지를 위한 협조 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53686&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-16",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-16",
+   "desc": "최근 S/W업체들이 경영여건 변화와 실적개선 필요성 등으로 인해 라이선스 준수 여부 점검을 강화하고 있으며, 관련 법무법인을 통한 저작권 침해 경고 및 내용증명 발송 사례도 발생하고 있사오니 각 부서 및 학과에서는…"
+  },
   {
    "title": "[일반] [학생상담실] 내 멘탈 점검, 지금은 몇%? -우울 불안 온라인검사 / 뇌파맥파 스트레스 오프라인검사",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53681&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -398,39 +429,6 @@
    "src": "b09cb042",
    "foundAt": "2026-10-28",
    "desc": "2026학년도 2학기 다전공 수요조사 참여 안내 우리 대학에서는 학생들의 다전공에 대한 인식과 수요를 파악하고, 향후 다전공 제도 및 학생 지원 방안 개선을 위한 기초자료를 수집하고자 ‘다전공 수요조사’ 를…"
-  },
-  {
-   "title": "[국제학생] 2026 서울마이소울 웰컴데이 행사 참여 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53568&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-28",
-   "kind": "행사",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-28",
-   "thumb": "data/news/img/5cdde3c713a4568f.webp"
-  },
-  {
-   "title": "[외부] [한국스카우트연맹] 제20회 Youth Hero Prize 후보자 추천 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53577&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-28",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-28",
-   "thumb": "data/news/img/d5b67df4edf0d666.webp",
-   "desc": "2) 추천부문 : 5 개부문 가 ) 학술 ( 인문 · 과학 ), 체육 , 사회봉사 · 진로개척 , 문화 · 예술 , 스카우트"
-  },
-  {
-   "title": "[외부] [세종학당재단] 2027 세종학당 문화인턴 파견 사업 설명회 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53576&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-28",
-   "kind": "행사",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-28",
-   "thumb": "data/news/img/6b68b3fb2fc2b981.webp"
   }
  ]
 }
