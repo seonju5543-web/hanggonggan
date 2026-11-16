@@ -19,71 +19,15 @@
   "at": "2026-11-04",
   "tries": 1
  },
- "https://www.k-startup.go.kr/web/contents/webNOTICE_MATR.do?page=1&viewCount=18&id=176472&schBdcode=&schGroupCode=&schM=view": {
-  "at": "2026-11-12",
-  "tries": 2
- },
- "https://blog.naver.com/mohw2016/224463267916": {
-  "at": "2026-11-05",
-  "tries": 1
- },
  "https://www.saha.go.kr/startup/program/list.do?mId=0302000000": {
   "at": "2026-11-13",
   "tries": 2
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53621&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-11-06",
-  "tries": 1
- },
- "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000242/articleView.do?searchSeq=17550&commonMenuNo=506_533": {
-  "at": "2026-11-13",
-  "tries": 2
- },
- "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000242/articleView.do?searchSeq=17523&commonMenuNo=506_533": {
-  "at": "2026-11-13",
-  "tries": 2
- },
- "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000242/articleView.do?searchSeq=17549&commonMenuNo=506_533": {
-  "at": "2026-11-13",
-  "tries": 2
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53623&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-11-13",
-  "tries": 2
- },
- "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156788329&pWise=sub&pWiseSub=C4": {
-  "at": "2026-11-08",
-  "tries": 1
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/271109/artclView.do": {
-  "at": "2026-11-09",
-  "tries": 1
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/271103/artclView.do": {
-  "at": "2026-11-09",
-  "tries": 1
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53638&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-11-09",
-  "tries": 1
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53636&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-11-09",
-  "tries": 1
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53641&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-11-10",
-  "tries": 1
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53254&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
   "at": "2026-11-10",
   "tries": 1
  },
  "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53663&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-11-10",
-  "tries": 1
- },
- "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=897685&qidx=5233&cate=0&allboard=true&nowpage=1": {
   "at": "2026-11-10",
   "tries": 1
  },
@@ -268,6 +212,66 @@
   "tries": 1
  },
  "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=819&bbsNo=8&nttNo=171537&pageUnit=10&searchCtgry=%eb%aa%a8%ec%a7%91%2f%ea%b3%b5%eb%aa%a8&searchCnd=all&pageIndex=1": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=6302&bidx=888344&qidx=6302&cate=10&allboard=false&nowpage=2": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=6302&bidx=888112&qidx=6302&cate=10&allboard=false&nowpage=2": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=6302&bidx=887927&qidx=6302&cate=10&allboard=false&nowpage=2": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=6302&bidx=887926&qidx=6302&cate=10&allboard=false&nowpage=2": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=6302&bidx=887903&qidx=6302&cate=10&allboard=false&nowpage=2": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=6302&bidx=887860&qidx=6302&cate=10&allboard=false&nowpage=2": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=6302&bidx=887462&qidx=6302&cate=10&allboard=false&nowpage=2": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=2&bnum=6302&bidx=887461&qidx=6302&cate=10&allboard=false&nowpage=2": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=6302&bidx=893642&qidx=6302&cate=10&allboard=false&nowpage=3": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=6302&bidx=887443&qidx=6302&cate=10&allboard=false&nowpage=3": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=6302&bidx=839594&qidx=6302&cate=10&allboard=false&nowpage=3": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=6302&bidx=839589&qidx=6302&cate=10&allboard=false&nowpage=3": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=6302&bidx=838568&qidx=6302&cate=10&allboard=false&nowpage=3": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=6302&bidx=834679&qidx=6302&cate=10&allboard=false&nowpage=3": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=142007&article.offset=0&articleLimit=10": {
   "at": "2026-11-16",
   "tries": 1
  }

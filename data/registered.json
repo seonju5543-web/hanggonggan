@@ -23209,6 +23209,11 @@
      "school": "이화여자대학교",
      "url": "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?mode=view&articleNo=367894&article.offset=0&articleLimit=10",
      "id": "notice:https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?articleno=367894"
+    },
+    {
+     "school": "경북대학교",
+     "url": "https://home.knu.ac.kr/HOME/knussw/sub.htm?nav_code=knu1619416593&mode=view&mv_data=aWR4PTIxNzQmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=",
+     "id": "notice:https://home.knu.ac.kr/HOME/knussw/sub.htm?mv_data=aWR4PTIxNzQmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=&nav_code=knu1619416593"
     }
    ],
    "scopeFrom": "같은 사업이 서강대학교 게시판에도 올라옴(자동) — 서강대학교 게시판 https://www.sogang.ac.kr/ko/detail/551805?bbsConfigFk=141&namepage=ScholarshipNotice",
@@ -24230,8 +24235,7 @@
    "period": "접수 기간 ~2026-11-18",
    "summary": "동국대학교 WISE캠퍼스 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "동국대학교 WISE캠퍼스"
+    "selective": true
    },
    "documents": [
     "협회 서식 |@ 자기소개서 공백 포함 1.500자 이내",
@@ -24288,7 +24292,15 @@
    "amountFrom": "관리자 2026-11-16",
    "applyEmail": "kcna@kcna.or.kr",
    "applyEmailSource": "ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편(등기)",
-   "applyEmailFrom": "공고문 첨부(OCR)"
+   "applyEmailFrom": "공고문 첨부(OCR)",
+   "alsoPostedAt": [
+    {
+     "school": "연세대학교 미래캠퍼스",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/944653/artclView.do",
+     "id": "notice:https://mirae.yonsei.ac.kr/bbs/wj/104/944653/artclView.do"
+    }
+   ],
+   "scopeFrom": "같은 사업이 연세대학교 미래캠퍼스 게시판에도 올라옴(자동) — 연세대학교 미래캠퍼스 게시판 https://mirae.yonsei.ac.kr/bbs/wj/104/944653/artclView.do"
   },
   {
    "id": "auto-oarticleno160317nocat501",
@@ -24450,8 +24462,7 @@
    "period": "접수 ~2026-11-18",
    "summary": "인하대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "인하대학교"
+    "selective": true
    },
    "documents": [
     "협회 서식 (※ 제출양식은 협회 홈페이지 다운로드 가능)",
@@ -24518,7 +24529,15 @@
     "scope": "external",
     "raw": "※ 부문별 중복 신청 불가(1인 1부문 신청)"
    },
-   "exclusivityFrom": "공고 원문"
+   "exclusivityFrom": "공고 원문",
+   "alsoPostedAt": [
+    {
+     "school": "충북대학교",
+     "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=815&bbsNo=8&nttNo=171635&pageUnit=10&searchCtgry=%ed%95%99%ec%82%ac%2f%ec%9e%a5%ed%95%99&searchCnd=all&pageIndex=1",
+     "id": "notice:https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsno=8&key=815&nttno=171635&searchctgry=학사/장학"
+    }
+   ],
+   "scopeFrom": "같은 사업이 충북대학교 게시판에도 올라옴(자동) — 충북대학교 게시판 https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=815&bbsNo=8&nttNo=171635&pageUnit=10&searchCtgry=%ed%95%99%ec%82%ac%2f%ec%9e%a5%ed%95%99&searchCnd=all&pageIndex=1"
   },
   {
    "id": "auto-leno277782srcategoryid22",
@@ -24707,6 +24726,97 @@
     "raw": "2) 금액: 수업료의 50% 이내"
    },
    "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-ervicenoticedetail521206",
+   "name": "2026학년도 교촌장학생 선발 안내(장학금액: 100만원/생활비지원)",
+   "boardTitle": "2026학년도 교촌장학생 선발 안내(장학금액: 100만원/생활비지원)",
+   "type": "교외",
+   "kindEvidence": [
+    "본문 「교내장학」"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-11-16",
+   "provider": "주관 기관 원문 확인",
+   "amount": "100만원",
+   "amountValue": 1000000,
+   "deadline": "2026-11-25",
+   "deadlineFrom": "공고 원문 · 가 . 신청기간 : 11.16.(월 ) ~ 11.25.(수) 23:59 까지(기한 엄수)",
+   "period": "접수 ~2026-11-25",
+   "summary": "동국대학교 WISE캠퍼스 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교 WISE캠퍼스"
+   },
+   "documents": [
+    "장학금 신청서(개인정보동의서, 장학금수여식 참석 확인서 포함)(첨부파일 양식 다운로드 후, PDF 1장으로 제출 )"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-16 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026-2학기 (재)교촌장학회 장학금신청서.hwp",
+     "url": "https://wise.dongguk.ac.kr/cmmn/fileDown.do?filename=2026-2%ED%95%99%EA%B8%B0%20(%EC%9E%AC)%EA%B5%90%EC%B4%8C%EC%9E%A5%ED%95%99%ED%9A%8C%20%EC%9E%A5%ED%95%99%EA%B8%88%EC%8B%A0%EC%B2%AD%EC%84%9C.hwp&filepath=/files/article/servicenotice/521206/&filerealname=397C66CFA8C849609A39EF6B7C8F5A5B.hwp"
+    }
+   ],
+   "sourceUrl": "https://wise.dongguk.ac.kr/article/servicenotice/detail/521206",
+   "sourceKind": "auto",
+   "announceDate": "2026-11-27",
+   "documentsFrom": "공고 원문",
+   "eligibilityLines": [
+    "(★신청대상: 2026-2학기에 학자금 대출을 통해 등록금 납부를 완료한 정규학기 재학생)"
+   ],
+   "excerpts": [
+    "2026학년도 교촌장학생 선발 안내(장학금액: 100만원/생활비지원)",
+    "(★신청대상: 2026-2학기에 학자금 대출을 통해 등록금 납부를 완료한 정규학기 재학생)",
+    "2. 지급금액 : 1 인당 100 만원",
+    "신청기간 : 11.16.(월 ) ~ 11.25.(수) 23:59 까지(기한 엄수)",
+    "10. 문의: 학생서비스팀(054-770-2047)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 1000000,
+    "ratio": 0,
+    "min": 1000000,
+    "max": 1000000,
+    "raw": "2. 지급금액 : 1 인당 100 만원"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-obrdbbsseq1nttid20260807",
+   "name": "[교내/선발] 2026학년도 2학기 학부 교내장학..",
+   "boardTitle": "[교내/선발] 2026학년도 2학기 학부 교내장학..",
+   "type": "교내",
+   "kindEvidence": [
+    "제목 표식 「교내」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-16",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-11-16",
+   "period": "접수 기간 원문 확인",
+   "summary": "서울시립대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "서울시립대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-16 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdBbsseq=1&pageNo=2&nttId=20260807",
+   "sourceKind": "auto"
   }
  ]
 }
