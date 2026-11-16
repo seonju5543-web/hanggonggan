@@ -40,7 +40,7 @@ import { publishBySchool, splitBySchool } from '../collector/publish-notices.mjs
 /* ⚠️ 발행만 든 모듈이다 — `collector/majors.mjs` 는 **불러오는 순간 커리어넷을 두드린다.** */
 import { publishMajorsBySchool } from '../collector/publish-majors.mjs';
 import { pageCandidates, pageUrl, existingPageParam, samePage, shouldRetry } from '../collector/paginate.mjs';
-import { looseCandidate, sameNotice, findMissing, classifyMiss, coverageOf, looksLikeBoardChrome, looksLikeAttachmentName, dedupeNear } from '../collector/coverage-rules.mjs';
+import { looseCandidate, sameNotice, findMissing, classifyMiss, coverageOf, rollingCoverage, looksLikeBoardChrome, looksLikeAttachmentName, dedupeNear } from '../collector/coverage-rules.mjs';
 import { createRequire } from 'node:module';
 import { isAttachmentEntry, isHtmlPayload } from '../collector/attachment-link.mjs';
 import { isDetailUrl, isMarkerUrl, markerTitle, sameTitle, titleCore, rowByCore, detailCandidates, looksLikeLoginWall, rowDetailCandidates } from '../collector/detail-url.mjs';
@@ -691,6 +691,17 @@ console.log('\n■ 누락 감사 (감사가 수집기의 맹점을 물려받지 
     classifyMiss('2026학년도 2학기 성적우수장학금 선발 공고', { ...deps, page: 1 }), '원인 미상');
   eq('게시판을 못 읽었으면 비율을 말하지 않는다', coverageOf(0, 0), null);
   eq('비율 계산', coverageOf(10, 2), 80);
+  {
+    /* (2026-11-16 · 로드맵 C1) 회전 감사의 합친 비율 — 학교마다 가장 최근 결과 · 못 읽은 날(0)은 앞선 결과를 덮지 않음 · 옛 이력(비율뿐)은 안 셈 · 최근 n번만 */
+    const H = {
+      '2026-10-20': { coverage: 50, bySchool: { 가: 50 } },
+      '2026-10-27': { bySchoolCounts: { 가: [10, 5], 나: [20, 2] } },
+      '2026-11-03': { bySchoolCounts: { 가: [10, 1], 다: [0, 0] } },
+      '2026-11-10': { bySchoolCounts: { 다: [10, 4] } },
+    };
+    eq('합친 인식 비율: 가는 최근(10·1) · 나(20·2) · 다(10·4) → 40중 7 누락', rollingCoverage(H), { runs: 3, from: '2026-10-27', schools: 3, board: 40, missing: 7, coverage: 83 });
+    eq('  최근 n번만 · 재료(bySchoolCounts) 없으면 null', [rollingCoverage(H, { runs: 1 }).schools, rollingCoverage({ '2026-10-20': { coverage: 50 } })], [1, null]);
+  }
 
   /* 🔴 첫 실행(2026-08-17)의 실제 잡음을 고정 자료로 박아 둔다.
      그때 '원인 미상 60건' 중 **37건이 게시판 옆 메뉴 덩어리, 9건이 첨부 파일 이름**이었다.
