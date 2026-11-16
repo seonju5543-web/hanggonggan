@@ -4811,7 +4811,8 @@ else {
   /* ③ "관문 「X」" — 이 파일의 절 이름이어야 한다(「」 는 떼고 대조) */
   const strip = (s) => s.replace(/[「」]/g, '').trim();
   const self = readText(new URL(import.meta.url));
-  const sections = [...self.matchAll(/console\.log\('\\?n?■ ([^']+)'\)/g)].map((m) => strip(m[1]));
+  /* 절 이름에 작은따옴표가 든 절(「학생 화면에 '모름'류 글자가 없다」 · 2026-11-15)은 큰따옴표로 적는다 — 둘 다 읽는다 */
+  const sections = [...self.matchAll(/console\.log\('\\?n?■ ([^']+)'\)|console\.log\("\\?n?■ ([^"]+)"\)/g)].map((m) => strip(m[1] || m[2]));
   const gates = [...md.matchAll(/관문[^「\n]{0,30}「((?:[^「」]|「[^」]*」)+)」/g)].map((m) => strip(m[1]))
     .filter((g) => g !== 'X');   // 찾는 법을 설명하는 줄의 자리표시
   eq('관문 이름이 가리키는 절이 전부 있다', gates.filter((g) => !sections.some((s) => s.includes(g))), []);
