@@ -262,6 +262,12 @@ async function backgroundCheck() {
     notices = { items: [] };                         // 우리에게 그 학교 공고가 없다
   }
 
+  /* 유료 카드 읽기 결과를 화면과 **같은 함수**로 얹는다(match-engine applyCardRead · 2026-11-15) — 안 얹으면 화면은 고친 마감을, 알림은 옛 마감을 말한다.
+     못 받으면 그대로(무료 길) · 옛 엔진이 캐시에서 올 수 있어 typeof 로 감싼다 */
+  if (reg && typeof applyCardRead === 'function') {
+    const cardRead = await readJson('data/card-read.json').catch(() => null);
+    if (cardRead) reg.items = applyCardRead(reg.items || [], cardRead);
+  }
   const out = NOTIFY_RULES.evaluate({
     now: Date.now(),
     profile,

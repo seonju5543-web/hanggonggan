@@ -1842,8 +1842,9 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
      '등록금 실납부액에 따라 차등지급 자세한 사항은 첨부파일 또는 홈페이지 참…'(잘린 본문).
      이런 줄을 굵게 쓰면 카드가 확정되지 않은 금액을 확정된 것처럼 말한다.
      그래서 **짧고 숫자가 있는 것만** 굵게 쓴다. 나머지는 지우지 않고 옅게 남긴다(원칙 8-1). */
-  /* 시안 B (2026-11-02) — 윗줄은 칩(장학 · 교내/교외) + 주최(알 때만) + 알약 · 핵심 한 줄은 「금액 · …」(amountLine 한 곳 · 모르면 줄 없음) */
-  const amt = amountLine(sch);
+  /* 시안 B (2026-11-02) — 윗줄은 칩(장학 · 교내/교외) + 주최(알 때만) + 알약.
+     🔴 아랫줄 왼쪽의 회색 「금액 · …」 줄은 뺐다 (2026-11-15 개발자 지시 "회색으로 금액 뜨는거 빼라 … 장학금이랑 대외활동 다 같이 말하는거야" —
+     같은 날 활동 카드의 「대상 · …」 줄을 뺀 것과 한 짝이다). 금액은 시트 머리(amountLine)가 그대로 말한다 */
   return cardShellHtml({
     save: saveBtnHtml(sch.id),
     attrs: `data-detail="${sch.id}"`,
@@ -1851,8 +1852,8 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
     org: cardProviderLine(sch),
     badge,
     name: cardTitleParts(sch).title,
-    foot: amt.text,
-    footKnown: amt.known,
+    foot: '',
+    footKnown: false,
     due,
     urgent: !sch.program && d.days >= 0 && d.days <= 7,
     link: cardSrcLinkHtml(sch, 'detail'),   // 원문 아이콘 — 활동 카드와 같은 자리·같은 모양(2026-10-28)
@@ -3095,11 +3096,13 @@ function loadRegistered() {
   return Promise.all([
     fetch('data/registered.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)),
     linkChecksWait(),
+    /* 유료 카드 읽기 결과(2026-11-15) — 못 받으면 null 이고 그때는 무료 길 값 그대로다(비상망). 받기 실패가 공고 목록을 막지 않는다 */
+    fetch('data/card-read.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
   ])
-    .then(([d]) => {
+    .then(([d, , cardRead]) => {
       if (!d) { if (appsData.registered !== 'ok') appsData.registered = 'fail'; return; }   // 한 번 받았으면 다시 받기 실패에도 'ok'(목록은 메모리에 그대로)
       appsData.registered = 'ok';
-      registeredList = d.items || [];
+      registeredList = typeof applyCardRead === 'function' ? applyCardRead(d.items || [], cardRead) : (d.items || []);   // match-engine.js — 알림도 같은 함수로 얹는다
       regUpdatedAt = d.updatedAt || '';
       dataFetchedAt = new Date();
       attachPrepTemplates(registeredList);
@@ -4789,6 +4792,8 @@ function applySectionHtml(sch, opts) {
     : to ? `~ ${to}`
     : /상시/.test(rawPeriod) ? '상시'
     : '';
+  /* 유료 카드 읽기가 읽은 신청 방법(원문 문장 · 줄머리 이름표를 뗀 것)이 있으면 그것을 줄마다 보인다(2026-11-15) */
+  const paidApply = (!act && sch.cardRead && Array.isArray(sch.cardRead.apply)) ? sch.cardRead.apply.filter((l) => typeof l === 'string' && l.trim()) : [];
   const method = sch.noApply ? sch.noApply
     : sch.applyEmail ? (sch.applyEmailSource || `메일 ${sch.applyEmail}`)
     : sch.applyPortalSource ? sch.applyPortalSource
@@ -4797,7 +4802,8 @@ function applySectionHtml(sch, opts) {
   const docs = (act ? act.documents || [] : sch.documents || []).filter((doc) => !DOC_PLACEHOLDER.test(doc));
   const row = (k, v) => `<li><b class="ns-k">${k}</b>${esc(v)}</li>`;
   const docText = docs.map((d) => String(d).replace(/^[\s\-–—•\u25AA\u25AB\u25FD\u25FE■□▣○●◆◇·ㆍ*]+/, '').trim()).filter(Boolean).join(' · ');   // 원문 글머리 기호(■·○)는 뗀다 — 점으로 잇는 한 줄이라 기호가 두 겹(실화면 2026-11-02)
-  const rows = `${period ? row('기간', period) : ''}${method ? row('방법', method) : ''}${docText ? row('서류', docText) : ''}`;
+  const methodRow = paidApply.length ? `<li><b class="ns-k">방법</b>${paidApply.map(esc).join('<br>')}</li>` : (method ? row('방법', method) : '');
+  const rows = `${period ? row('기간', period) : ''}${methodRow}${docText ? row('서류', docText) : ''}`;
   return rows ? `<h4>접수</h4><ul class="doc-list notice-summary apply-rows">${rows}</ul>` : '';
 }
 function sheetSectionsHtml({ sch, result, fit, fd, activity = null, noticeLines = [] }) {

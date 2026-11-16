@@ -196,12 +196,9 @@
    "name": "공통 [공통] 2026학년도 2학기 반영장학 신청 안내",
    "target": "공통 [공통] 2026학년도 2학기 반영장학 신청 안내",
    "added": "2026-09-25",
-   "fetched": false,
+   "fetched": true,
    "schematized": false,
-   "tries": 6,
-   "lastTryAt": "2026-09-26",
-   "retired": true,
-   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
+   "lastTryAt": "2026-09-26"
   },
   {
    "id": "auto-20ec9588eb82b40922ed9994",
@@ -712,24 +709,18 @@
    "name": "2026-2학기 복지장학생(부모장애) 선발 안내",
    "target": "2026-2학기 복지장학생(부모장애) 선발 안내",
    "added": "2026-10-16",
-   "fetched": false,
+   "fetched": true,
    "schematized": false,
-   "tries": 6,
-   "lastTryAt": "2026-10-17",
-   "retired": true,
-   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
+   "lastTryAt": "2026-10-17"
   },
   {
    "id": "auto-ervicenoticedetail520869",
    "name": "2026-2학기 영어(토익)성적장학 신청 안내",
    "target": "2026-2학기 영어(토익)성적장학 신청 안내",
    "added": "2026-10-16",
-   "fetched": false,
+   "fetched": true,
    "schematized": false,
-   "tries": 6,
-   "lastTryAt": "2026-10-17",
-   "retired": true,
-   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
+   "lastTryAt": "2026-10-17"
   },
   {
    "id": "auto-bswj104944451artclviewdo",
@@ -880,12 +871,9 @@
    "name": "공통 공과대학 특성화 장학 프로그램 참여학생 모집 안내",
    "target": "공통 공과대학 특성화 장학 프로그램 참여학생 모집 안내",
    "added": "2026-10-27",
-   "fetched": false,
+   "fetched": true,
    "schematized": false,
-   "tries": 6,
-   "lastTryAt": "2026-10-28",
-   "retired": true,
-   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
+   "lastTryAt": "2026-10-28"
   },
   {
    "id": "auto-enoticedoarticleno769738",
@@ -1012,12 +1000,9 @@
    "name": "[교외] 관정이종환교육재단 장학생 선발 안내(11/23 마감, 등록금 전액 or 학업장려금 400만원)",
    "target": "관정이종환교육재단 장학생 선발 안내(11/23 마감, ",
    "added": "2026-11-08",
-   "fetched": false,
+   "fetched": true,
    "schematized": false,
-   "tries": 6,
-   "lastTryAt": "2026-11-09",
-   "retired": true,
-   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
+   "lastTryAt": "2026-11-09"
   },
   {
    "id": "auto-skor478126763artclviewdo",
@@ -1108,12 +1093,9 @@
    "name": "[교외] (외국인) 삼성꿈장학재단 글로벌희망장학생 선발 안내(12/31 마감, 등록금전액+학업보조비)",
    "target": "(외국인) 삼성꿈장학재단 글로벌희망장학생 선발 안내(1",
    "added": "2026-11-11",
-   "fetched": false,
+   "fetched": true,
    "schematized": false,
-   "tries": 6,
-   "lastTryAt": "2026-11-11",
-   "retired": true,
-   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
+   "lastTryAt": "2026-11-11"
   },
   {
    "id": "auto-ent2431271374artclviewdo",
@@ -1159,6 +1141,22 @@
    "id": "auto-skor478127125artclviewdo",
    "name": "2026-2학기 장학사정관(릴레이쉽) 장학금 신청 안내",
    "target": "2026-2학기 장학사정관(릴레이쉽) 장학금 신청 안내",
+   "added": "2026-11-16",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-ervicenoticedetail521206",
+   "name": "2026학년도 교촌장학생 선발 안내(장학금액: 100만원/생활비지원)",
+   "target": "2026학년도 교촌장학생 선발 안내(장학금액: 100만",
+   "added": "2026-11-16",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-enoticedoarticleno770333",
+   "name": "[학생복지팀] (2026-동계) 근로장학생(방학중) 신청 안내",
+   "target": "(2026-동계) 근로장학생(방학중) 신청 안내",
    "added": "2026-11-16",
    "fetched": true,
    "schematized": false

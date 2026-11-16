@@ -17,9 +17,9 @@
 6. **개발 업무 질문에는 답 끝에 `node tools/link-wanted.mjs` 결과를 붙여 링크를 요청한다**
    (학습 로봇은 검색을 못 해 사람이 새 링크를 줘야 넓어진다. 주소는 추천하지 않는다).
 7. **로봇 운영 수리(저장 전 관문·되돌리기·경보 짝 빠짐)는 묻지 않고 즉시 한다**. 규칙 파일(`collector/*.json`)을 쓰는 로봇은 저장 앞에 `test-collector` 를 거친다 — 없는 로봇이 보이면 그 자리에서 붙인다(관문 「층2 재단 글 사냥꾼」 ⑦-1).
-8. 🔴 **돈이 나가는 호출은 개발자가 채팅에서 그 실행을 지시했을 때만.** 유료 워크플로(`eligibility-fill.yml`·`essay-smoke.yml`)를 세션이 돌리거나 `apiEnabled`·`ELIG_AI_ENABLE` 을 켜지 않는다. 비용 질문은 `gh run list` 기록으로 답한다.
+8. 🔴 **돈이 나가는 호출은 개발자가 채팅에서 그 실행을 지시했을 때만.** 유료 워크플로(`eligibility-fill.yml`·`essay-smoke.yml`)를 세션이 돌리거나 `apiEnabled`·`ELIG_AI_ENABLE` 을 켜지 않는다(`card-read.yml` 만 11-15 지시로 켜 둠 — 상한 `card-read-config.json`). 비용 질문은 `gh run list` 기록으로 답한다.
 
-## 🔴 수집망 44개교 복원 (2026-09-29 지시 *"죽은 학교들을 모두 다시 살려"*)
+## 🔴 수집망 44개교 복원 (2026-09-29 지시)
 
 - **수집·실시간 피드·대외활동은 44개교**. 고치는 자리는 셋이 한 세트 — `schools.json`·`browser-targets.json`(`parked` 는 안 쓰는 게시판 보관 자리 · 지우지 말 것) + `match-engine.js` `SERVED_SCHOOLS`(앱·알림·발행 공용 — 브라우저가 schools.json 을 못 읽어 한 번 더 · 갈라지면 로봇은 모으는데 앱은 숨긴다). 관문 「수집망 복원」·「화면이 보여 주는 학교 = 로봇이 수집하는 학교」.
 - **정식 등록(자격 진단·양식)도 44개교** — `auto-register-config.json` `schools` 는 빈 배열(= 수집 학교 전부). 🔴 부작용: 자동 등록은 게시 학교로 `schoolOnly` 를 달아 전국 사업이 한 학교에 묶인다(노션 F-5) → 관리자 「할 일」 '교외인데 한 학교에만' 에서 merge 로 승격 · 타교 같은 사업은 컨펌 대기. 좁히는 것은 개발자 지시 때만(관문 「수집망 복원」).
@@ -42,6 +42,11 @@
 - **원문 링크 확인 로봇** `collector/link-check.mjs`(매일 · 판정은 `collector/link-landing.mjs` 한 곳 · 학생처럼 새 탭) — 🔴 **주소를 고치지 않는다.** 다른 날 두 번 같은 문제여야 `data/link-check.json` 에 싣는다(앱이 받는다). 제목 먼저·로그인 벽은 나중 · 다른 글 제목을 반드시 넘긴다.
 - 🔴 **고치는 로봇은 멀쩡한 주소를 표식으로 덮어쓰지 않는다**. 병합 순위 `preferNotice`: 진짜 주소 > 목록 표식 > 목록+번호.
 - **원문 바로잡기**(`source-link.js` ⑥ · 로봇 데이터에 고쳐 쓰면 사라진다): 사람 `data/link-fixes.json`(관리자 「원문 링크 손볼 것」 → `tools/admin-apply.mjs` `linkFix` · 늘 이긴다) · 로봇 `data/link-check.json` `fix`(후보 `collector/link-candidates.json` 을 학생처럼 열어 `acceptCandidate` 통과분만). 열쇠 `id:`·`u:` · 회차(`round`)는 층2만. 관문 같은 절 fixes·candidates·admin.
+
+## 🔴 유료 카드 읽기 (2026-11-15 지시 · 설계 `docs/designs/paid-card-reading.md`)
+
+- 로봇 `collector/card-read.mjs` 가 본문+첨부를 모델 둘에게 따로 읽혀, 글자가 원문에 있고(`verify`) 둘이 같은 말을 한 줄(`agree`)만 `data/card-read.json` 에 싣는다. 🔴 `registered.json` 은 안 고친다(무료 길 = 비상망) · 지어냄을 막는 것은 지시문이 아니라 `verify` 다.
+- 앱·알림·`what-shows` 는 `applyCardRead`(match-engine) 한 곳으로 얹는다 — 얹힌 공고(`cardRead`)는 `requirementLines` 의 거르기를 건너뛴다. 스위치 `enabled`+`CARD_READ_ENABLE`. 관문 「유료 카드 읽기」 · `verify-card-read.js`.
 
 ## 🔴 학적정보 테일러링 (2026-10-24 개발자 지시 넷 — 원문은 설계 문서 0절)
 
@@ -126,7 +131,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - push-to-run(GitHub 연결 없는 세션): `collector/run-*.txt`·`tools/run-gate-photos.txt`·`insta/run-notify.txt`·`deploy/run-deploy.txt` 를 고쳐 기본 브랜치에 push.
   🔴 저장하는 push-to-run 로봇은 push 트리거에 `branches:` 를 건다 — 없으면 그 파일을 고친 커밋이 main·작업 브랜치에 올라갈 때 **그 브랜치에서** 돌아 저장한다(관문 「원문 링크 정직성」 robot ⓩ).
 - 라이브 앱 확인은 샌드박스에서 github.io 가 막혀 `.github/workflows/check-live.yml` 로그로만 한다.
-  🔴 그 점검은 **앱이 실제로 받는 파일**을 봐야 한다 — 옛 통짜 파일만 보고 학교별 공고·학과 파일은 **아무도 안 보고 있었다**(404 여도 조용히 물러난다).
+  🔴 그 점검은 **앱이 실제로 받는 파일**을 봐야 한다(404 여도 앱은 조용히 물러난다).
   파일 이름은 `match-engine.js` 규칙으로 뽑는다(박아 두지 말 것). 새 데이터 파일을 앱이 받게 하면 이 점검에도 넣는다.
 
 ## 브랜치 · 배포
@@ -307,7 +312,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 
 - **🔴 로봇이 고친 파일은 전부 `git add` 에** · 없을 수 있는 파일은 `[ -f … ] && git add` · 데이터 관문(감사)은 저장 직전 · 빨가면 `collector/gate-guard.mjs` 가 단계별로 되돌리며 다시 잰다(끝내 빨가면 이슈 + 빨간불 · 두 번 걸린 자동 등록은 3일 쉼).
 - **🔴 모든 워크플로에 `timeout-minutes`** · 보강 단계는 `timeout-minutes` + `continue-on-error: true` · 실패 알림은 `if: failure() || cancelled()` ·
-  학교마다 `withDeadline()` 절대 시한 · 전역 예산(`harvest-budget.mjs`) 안에 스스로 끝낸다(상한을 올리는 건 해법 아님) · 넘어져도 `saveAll()`.
+  학교마다 `withDeadline()` 절대 시한 · 전역 예산(`harvest-budget.mjs`) 안에 스스로 끝낸다(상한 올리기는 해법 아님) · 넘어져도 `saveAll()`.
 - 대기줄(concurrency)을 하나로 합치지 말 것(대기 실행이 취소된다) · 예약은 정각·UTC 자정을 피한다(관례는 홀수 분) · 새 공고 0건이면 이슈 대신 코멘트.
 - 문법 검사는 `node --check` — `import('./x.mjs')` 는 **실행된다**. 불러오는 순간 실행되는 파일(auto-register·schematize)은 가져다 쓰지 말 것.
 - **원문 링크는 그 공고 하나로** — 주소를 유추하지 말고 게시판 폼을 그대로 · 세션 없는 새 탭에서 열어 확인 · '못 읽음'과 '다른 글'을 구분 ·
@@ -318,16 +323,16 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   그 길도 색인(`data/notices/index.json`)으로 **알 때는 안 받는다**(`noticeFallbackNeeded` 한 곳 — 화면·알림 공용).
   프로필이 없으면 아무것도 안 받고, 학교가 정해지거나 바뀌면 다시 받는다(`loadNoticesIfSchoolChanged`). 관문 「학교별 공고 파일」.
 - **학과 목록도 학교별 파일뿐이다**(2026-09-26 · `majorsFileFor` — 공고와 **같은 이름 규칙을 불러 쓴다**).
-  `data/majors.json`(209개교 407KB)은 사람·도구용이고 앱은 안 받는다 · 발행 `collector/publish-majors.mjs`
+  `data/majors.json` 은 사람·도구용이고 앱은 안 받는다 · 발행 `collector/publish-majors.mjs`
   (majors.mjs 는 **불러오는 순간 API 를 두드려서** 발행만 떼어 놨다) · 앱은 첫 화면에서 안 받고 학교가 정해질 때 받는다.
-  🔴 끊기면 **조용하다** — 전국 공통 목록으로 물러나 "경희대에 '일'→일어일문학과" 사고로 돌아간다.
-  🔴 발행 열쇠는 **`UNIVERSITIES` 의 이름**이어야 한다 — 커리어넷 이름은 다르다(`한국과학기술원`↔`KAIST` 등 7곳).
+  🔴 끊기면 **조용하다**(전국 공통 목록으로 물러난다).
+  🔴 발행 열쇠는 **`UNIVERSITIES` 의 이름**이어야 한다 — 커리어넷 이름은 다르다(`한국과학기술원`↔`KAIST`).
   이어 주는 표를 새로 만들지 말고 `UNIV_ALIASES` 를 통과시킨다 · `'학교 캠퍼스'` 꼴은 로봇이 발행하지 않는다(부르면 404).
   관문 「분교 이름이 로봇과 앱에서 같은가」 · `verify-onboard-gaps.js`(경희대로 내용을 잰다 — 외대는 손검수 목록이 있어 헛돈다).
-- `kosaf-open.json`·`registered.json` 은 못 줄였다(층2 `fields` 는 카드 값 · 정식 등록 전국분은 모두가 받는다) — 학교별로 나누면 **자라는 것만** 막힌다.
-- 🔴 **학교가 늘면 정식 등록도 나누라고 데이터가 스스로 말한다**(09-26 지시 — *"그때 다시 얘기해줘"*).
+- `kosaf-open.json`·`registered.json` 은 못 줄였다 — 학교별로 나누면 **자라는 것만** 막힌다.
+- 🔴 **학교가 늘면 정식 등록도 나누라고 데이터가 스스로 말한다**(09-26 지시).
   재는 곳은 `verify/data-weight.cjs` 의 `registeredSplitAdvice` **한 곳**(감사와 수집 리포트가 같이 쓴다 · 선을 베껴 적지 말 것) ·
-  뜨는 곳은 수집 리포트 → GitHub 이슈(감사 출력은 CI 로그에만 남아 아무도 안 본다) · 경고다(오류로 두면 자동 등록이 멈춘다).
+  뜨는 곳은 수집 리포트 → GitHub 이슈· 경고다(오류로 두면 자동 등록이 멈춘다).
   관문 「학교가 늘면 「정식 등록도 나눌 때」라고 말하는가」.
 - 브라우저 수집 게시판 연결이 안 되면 리포트의 진단(프레임·클릭·본 글자)부터 본다. 짐작 말고 스킬 `probe-run`.
 
@@ -342,9 +347,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   🔴 **잠금 획득에 시한이 있어야 한다**(`authLockWaitMs` · 넘으면 `{steal:true}` 로 빼앗는다) — 잠금을 쥔 탭이 죽으면 `locks.request` 가
   **영영 돌아오지 않아** 그 기기가 다시는 갱신하지 못한다(`.catch` 는 '거절'만 받는다). 관문 `verify-supabase.js` [14].
   🔴 시한을 **SDK 기본값 5초로 베끼지 말 것** — 우리 요청 시한이 8초라 정상 갱신 중인 탭의 잠금을 빼앗는다. `timeoutMs` 에서 유도한다.
-- 🔴 **Supabase SDK 를 들여오지 않기로 했다 (2026-09-28 · 고문 보고서)** — 다중 탭 로그아웃은 이미 고쳐져 있고(관문 [10]),
-  SDK 의 Mutex Lock 은 **우리와 같은 `navigator.locks`** 이며, UMD 54KB(gzip)는 첫 화면 예산 75KB 의 3분의 2다.
-  SDK 가 나은 점 하나(고아 잠금 회수)만 가져왔다. 들여오게 되면 번들러 없이 npm 의 UMD 한 장을 저장소에(`script-src 'self'` 유지 · `SESSIONS.md` 「SDK 를 번들로…」).
+- 🔴 **Supabase SDK 를 들여오지 않기로 했다 (2026-09-28 · 고문 보고서 · 경위 `SESSIONS.md` 「SDK 를 번들로…」)** — 들여오게 되면 번들러 없이 npm 의 UMD 한 장을 저장소에(`script-src 'self'` 유지).
 - 🔴 **기기 사이 덮어쓰기**: push 는 **내가 본 판이 아직 서버에 있을 때만** 고친다(조건부 PATCH · 0행이면 `conflict`). 🔴 고문 보고서 Q6 의 '칸을 쪼개라'로는 안 고쳐진다. 합치는 규칙은 `syncApplyRemote` 한 곳 · 충돌 때는 `{quiet:true}`(프로필은 이 기기 것 · 신청내역은 합침). ⚠️ 진짜 Postgres 의 시각 비교는 아직 안 눌러 봤다. `docs/designs/sync-overwrite.md` · 관문 `verify-supabase.js` [9].
 
 ### 관리자 화면 · 외부 서비스
@@ -361,8 +364,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 
 ### 훅 · 검사 운영
 
-- 🔴 **배포 감시는 `git add data/…` 하는 워크플로 전부를 본다**(`check-deploy-sync.js`) — 파일 이름을 하나씩 적었더니
-  2026-09-26까지 워크플로 넷을 **초록불인 채로** 놓쳤다.
+- 🔴 **배포 감시는 `git add data/…` 하는 워크플로 전부를 본다**(`check-deploy-sync.js`).
   새 로봇이 앱 데이터를 쓰면 `deploy-sync.yml` 의 `workflows:` 목록에도 이름을 넣는다(안 넣으면 최대 12시간 안 나간다).
 - 검사는 '돌리라고 적어 두면' 안 돈다 — 워크플로·훅에 걸어야 돈다. 새 사고는 **먼저 관문을 만들고** 여기엔 그 위치만 적는다.
 - **로봇·도구 점검**(2026-10-04~11 · 규칙 전체 `docs/designs/robot-health.md`): 고친 것마다 `verify/health-gates/` 묶음 — 관문 「로봇·도구 점검 관문」. 🔴 표본만 잰다(실데이터 단정은 `REAL_READ_ALLOW` 톱니로 잠김) · 워크플로·문서 글자는 `softEq`(로봇에선 경고) · 셸은 가짜 node·gh 로 실제로 돌린다.
