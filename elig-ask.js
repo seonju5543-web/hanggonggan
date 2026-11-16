@@ -186,6 +186,13 @@ function probeKeysFor(line) {
   return out;
 }
 
+/* 처지 칸 이름 — 단체 회원은 그 단체 이름으로(parse-requirements memberOrgOf · `member:<단체>` 열쇠) */
+function traitLabel(key) {
+  if (TRAIT_LABEL[key]) return TRAIT_LABEL[key];
+  const m = /^member:(.+)$/.exec(String(key || ''));
+  return m ? `${m[1]} 회원·소속 (본인·부모)` : String(key || '');
+}
+
 function askableFields(line, profile, sch, only) {
   const p = profile || {};
   if (only && !only.length) return [];                    // 좁혔더니 물을 칸이 없는 줄 — 판정기를 부르지 않는다
@@ -209,7 +216,9 @@ function askableFields(line, profile, sch, only) {
         「예」는 여전히 '모름'이고 「아니요」만 미달이 된다. 실측으로 수상 15줄 중 12줄이
         그 꼴이었다. 학생에게 자기를 떨어뜨리는 것밖에 못 하는 단추를 주지 않는다. */
   const tr = (p.traits && typeof p.traits === 'object') ? p.traits : {};
-  for (const key of Object.keys(TRAIT_LABEL)) {
+  /* 단체 회원 열쇠(`member:<단체>`)는 줄마다 다르다 — 이 줄이 읽는 열쇠를 더한다 */
+  const lineKeys = (probeKeysFor(line) || []).filter((k) => k.indexOf('trait:member:') === 0).map((k) => k.slice(6));
+  for (const key of Object.keys(TRAIT_LABEL).concat(lineKeys)) {
     if (only && only.indexOf('trait:' + key) === -1) continue;
     if (typeof tr[key] === 'boolean') continue;            // 이미 답했다
     const verdicts = [true, false].map((v) => EA_ME.requirementMatch(
@@ -260,5 +269,5 @@ function coerceField(key, raw) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { askableFields, askableForSch, probeKeysFor, coerceField, answered, FIELD_META, FIELD_PROBE, TRAIT_LABEL, ONBOARD_TRAITS };
+  module.exports = { askableFields, askableForSch, probeKeysFor, coerceField, answered, FIELD_META, FIELD_PROBE, TRAIT_LABEL, ONBOARD_TRAITS, traitLabel };
 }

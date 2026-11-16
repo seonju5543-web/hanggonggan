@@ -54,8 +54,9 @@ const num = (k, d) => {
    숫자 칸과 같은 규칙으로 **틀린 입력이면 멈춘다** — 모르는 종류나 0·1 이 아닌 값을 조용히 '아니요'로 읽으면 그럴듯한 틀린 답이 된다. */
 const TRAIT_KEYS = Object.keys(require('../elig-ask.js').TRAIT_LABEL);
 const traits = Object.fromEntries(arg('traits', '').split(',').filter(Boolean).map((kv) => {
-  const [k, val] = kv.split(':');
-  if (!TRAIT_KEYS.includes(k) || !['0', '1'].includes(val)) { console.error(`--traits=${kv} 는 읽을 수 없습니다 — <종류>:1 또는 <종류>:0 (종류: ${TRAIT_KEYS.join(' ')})`); process.exit(1); }
+  const cut = kv.lastIndexOf(':');   // 단체 회원 열쇠(`member:<단체>:1`)는 가운데에도 쌍점이 있다
+  const k = kv.slice(0, cut), val = kv.slice(cut + 1);
+  if (!(TRAIT_KEYS.includes(k) || /^member:./.test(k)) || !['0', '1'].includes(val)) { console.error(`--traits=${kv} 는 읽을 수 없습니다 — <종류>:1 또는 <종류>:0 (종류: ${TRAIT_KEYS.join(' ')})`); process.exit(1); }
   return [k, val === '1'];
 }));
 const p = {

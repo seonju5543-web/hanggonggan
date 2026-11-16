@@ -869,11 +869,24 @@ const TRAIT_DISQUALIFY = new Set(['discipline', 'fullTuition']);   // fullTuitio
 const TRAIT_OPEN_LIST = /등\s*[)）]?\s*[.。]?\s*$|(?:및|또는|와|과|,)\s*그?\s*자녀|(?:임직원|재직자|근로자|직원)의?\s?자녀|우대|가산점?|필수[^.]{0,6}아님/;
 /* 같은 계열(코드 리뷰 실측): `봉사실적이 40 시간 이상인 자 우대`·`자격증 소지자 우대 (필수사항은 아님)` 는 **우대**지 요건이 아니고,
    `회사 임직원의 자녀` 는 본인이 재직자가 아니어도 된다 — 모두 「아니요」에 미달이 났다. 확신을 낮춘다(모름) */
+/* ── 단체 회원은 **그 단체 이름으로** 묻고 저장한다 (2026-11-16 개발자 결정 1번) ──
+   예전엔 처지 `member` 하나라, 한국건설교통신기술협회 공고에서 「예」라고 답하면 전기공사공제조합 공고에도 ✓ 가 떴다(틀린 안심).
+   줄에서 단체 이름을 읽으면 처지 열쇠를 `member:<단체>` 로 쓴다 — 답도 단체마다 따로다. 못 읽으면 예전처럼 `member`.
+   ⚠️ 이름은 '협회·조합·향우회…' 로 끝나는 네 글자 이상 고유 이름만(맨 `협회`·`조합` 은 단체 이름이 아니다) · 둘 이상이면 가장 긴 것 */
+const MEMBER_ORG = /([가-힣A-Za-z0-9]{2,30}(?:공제조합|조합|협회|향우회|동문회|총연합회|연합회|중앙회))(?=\s*(?:의\s*)?(?:회원|조합원|에\s*가입|소속))/g;
+const MEMBER_ORG_GENERIC = /^(?:협회|조합|공제조합|향우회|동문회|연합회|총연합회|중앙회|회원사협회)$/;
+function memberOrgOf(t) {
+  const names = [...String(t || '').matchAll(MEMBER_ORG)].map((m) => m[1]).filter((n) => n.length >= 4 && !MEMBER_ORG_GENERIC.test(n));
+  return names.length ? names.sort((a, b) => b.length - a.length)[0] : null;
+}
+const memberKeyOf = (t) => { const o = memberOrgOf(t); return o ? `member:${o}` : 'member'; };
+
 function parseTrait(t, isExclude) {
   const hit = TRAIT_PAT.filter(([, re]) => re.test(t)).map(([k]) => k)
     /* 전액 장학·면제는 **빼는 말일 때만** — 제외 칸이거나 줄에 `제외`·`불가` 가 있어야 한다(`타 장학금 수혜자(전액 장학금 포함) 신청 가능` 은 받는다는 말이다) */
     .filter((k) => k !== 'fullTuition' || (!FULL_TUITION_NOT.test(t) && (isExclude || /제외|불가|제한|할\s?수\s?없/.test(t))));
   if (!hit.length) return [];
+  for (let i = 0; i < hit.length; i += 1) if (hit[i] === 'member') hit[i] = memberKeyOf(t);   // 단체 이름으로(위 memberOrgOf)
   const conf = HAS_EXCEPTION.test(t) ? LOW : HIGH;
   const out = [];
   const bad = hit.filter((k) => TRAIT_DISQUALIFY.has(k));
@@ -2005,7 +2018,7 @@ function shortRegion(x) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { schoolKindAlt, parseLine, shortRegion, REGION_CITIES, provincesOfCity, parseDegree, TRAIT_PAT, TRAIT_DISQUALIFY, gradOnly, gradTarget, mentionsUndergrad, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, REGIONS, untag, BRANCH_TAG, yearBranchLabels, yearBranchDoubt};
+  module.exports = { schoolKindAlt, parseLine, shortRegion, REGION_CITIES, provincesOfCity, parseDegree, TRAIT_PAT, TRAIT_DISQUALIFY, gradOnly, gradTarget, mentionsUndergrad, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, REGIONS, untag, BRANCH_TAG, yearBranchLabels, yearBranchDoubt, memberOrgOf};
 }
 
 /* ── 경우별 분기 (2026-08-24 개발자 지적) ─────────────────────────────────
