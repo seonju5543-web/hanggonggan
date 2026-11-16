@@ -356,6 +356,10 @@ const BARE_DATE = /(?<!\d)(\d{1,2})\s?[.\-/월]\s?(\d{1,2})(?!\d)/g;
 /* 🔴 `-`는 범위 기호이기도 하고 전화번호의 일부이기도 하다. **숫자 사이에 낀 `-`는 아니다** —
    `문의 02-940-5114`를 범위로 읽으면 그 뒤에 날짜가 없다는 이유로 멀쩡한 마감일이 버려진다. */
 const RANGE_SEP = /[~∼〜～–—]|(?<!\d)-|-(?!\d)/;
+/* `2026. 11. 18（수）오전 10시부터 2026. 11. 26.（목） 오후 4시까지`(인석장학회 · 2026-11-16) — 물결 없이 「부터」로 이은 범위.
+   안 보면 시작일을 마감으로 읽어 열린 공고가 일찍 닫힌다. 「부터」 **바로 뒤에 날짜가 올 때만** 범위로 본다(`8. 10.부터 접수` 는 그대로) */
+const FROM_TO_SEP = /부터\s*(?=[^0-9]{0,6}(?:\d{2,4}\s?[.\-/년]\s?)?\d{1,2}\s?[.\-/월]\s?\d{1,2})/;
+const rangeSepAt = (t) => { const i = t.search(RANGE_SEP); if (i >= 0) return i; const m = t.match(FROM_TO_SEP); return m ? m.index + m[0].length - 1 : -1; };
 
 /** 달력에 실제로 있는 날인가 (2월 31일 같은 것을 거른다) */
 function ymd(y, m, d) {
@@ -426,7 +430,7 @@ function dateFrom(value, ctxYear) {
        `신청기간: 10.12.(월) ~ 10.28.(수) 18:00까지`(동국 WISE)가 10-12 로, 자동 등록의 요약 `접수기간 : 10. 5.(월) ~ 10. 30.(금) 2026학년도 2학기` 가
        10-05 로 읽혀 열려 있는 공고가 '마감 경과'로 조용히 걸러지거나 일찍 닫혔다(저장 원문 1,631건 중 5건 · 전부 시작일 → 끝일). */
     const rest = s.slice(b0.index + b0[0].length);
-    const at = rest.search(RANGE_SEP);
+    const at = rangeSepAt(rest);
     if (at < 0) return first;                        // `~` 없이 날짜 하나 = 그날이 마감
     const after = rest.slice(at + 1);
     BARE_DATE.lastIndex = 0;
@@ -450,7 +454,7 @@ function dateFrom(value, ctxYear) {
   if (!start) return null;
 
   const tail = s.slice(m.index + m[0].length);
-  const sep = tail.search(RANGE_SEP);
+  const sep = rangeSepAt(tail);
   if (sep < 0) return start;                       // `~` 없이 날짜 하나 = 그날이 마감
   const after = tail.slice(sep + 1);
 
@@ -703,7 +707,7 @@ function rangeStart(value, ctxYear) {
   const start = ymd(m[1], m[2], m[3]);
   if (!start) return null;
   const tail = s.slice(m.index + m[0].length);
-  if (tail.search(RANGE_SEP) < 0) return null;      // `~` 없이 날짜 하나 = 그날이 마감
+  if (rangeSepAt(tail) < 0) return null;           // `~`(또는 날짜 앞 `부터`) 없이 날짜 하나 = 그날이 마감
   const end = dateFrom(value, ctxYear);             // 끝을 읽는 규칙은 한 곳뿐이다
   if (!end || end === start) return null;
   return start;
@@ -1375,6 +1379,28 @@ function recheckDocDeadline(it, heading = '') {
   if (it.period && it.period.includes(`~${old}`)) it.period = it.period.replace(`~${old}`, `~${again}`);
 }
 
+/* 🔴 **로봇이 본문에서 읽어 둔 마감도 그 근거 문장을 지금 규칙으로 다시 읽는다** (2026-11-16 · 원칙 7 소급).
+   `deadlineFrom = '공고 원문 · <근거 문장>'` 은 그날 읽은 줄을 그대로 들고 있다 — 인석장학회 「제출 기한 : 2026. 11. 18（수）오전 10시부터 2026. 11. 26.（목）…까지」 를
+   옛 규칙(「부터」 범위를 몰랐다)이 시작일 11-18 로 읽어, 11-26 까지 받는 공고가 18일에 닫힐 뻔했다.
+   **그 문장 하나만** 다시 읽고(다른 줄을 새로 줍지 않는다) · 날짜가 나왔고 다를 때만 바꾼다 — 못 읽으면 그대로 둔다(모른다 ≠ 틀렸다 · 근거 문장은 잘려 있는 일이 많다).
+   사람이 정한 마감(관리자·AI)·첨부·제목 표식은 건드리지 않는다. 관문 「발췌기 글자 읽기」 의 「부터」 줄이 잰다. */
+const QUOTED_DEADLINE_FROM = /^(공고 원문|게시판 요약) · /;
+export function recheckQuotedDeadline(it) {
+  if (!it || !it.deadline || !QUOTED_DEADLINE_FROM.test(it.deadlineFrom || '')) return null;
+  const again = extractDeadline(String(it.deadlineFrom).replace(QUOTED_DEADLINE_FROM, ''));
+  return again && again !== it.deadline ? again : null;
+}
+function recheckBodyDeadline(it) {
+  const again = recheckQuotedDeadline(it);
+  if (!again) return;
+  dlRechecked += 1;
+  console.log(`   [마감 다시 읽음] ${it.id} — ${it.deadline} → ${again} (근거 문장)`);
+  if (!WRITE) return;
+  const old = it.deadline;
+  it.deadline = again;
+  if (it.period && it.period.includes(`~${old}`)) it.period = it.period.replace(`~${old}`, `~${again}`);
+}
+
 function putDeadline(it, dl, from) {
   it.deadline = dl;
   it.deadlineFrom = from;
@@ -1591,6 +1617,7 @@ for (const it of reg.items) {
        통째로 빠져나가, 첨부를 받아 놓고도 영영 '기한 원문 확인'으로 남는다. */
     const heading = pageHeading(it, src && src.text);
     recheckDocDeadline(it, heading || '');   // 로봇이 첨부에서 읽어 둔 마감은 지금 규칙으로 다시(위 함수 머리말)
+    recheckBodyDeadline(it);                  // 본문 근거 문장도 지금 규칙으로 다시(위 함수 머리말)
     if (!it.deadline && !humanOwned(it.deadlineFrom)) {
       /* 🔴 껍데기에도 **원문 제목 줄**은 있고, 고친 꼬리가 거기에만 있다 — 「…선발 안내(~10.30 접수기간 연장)」(가톨릭 선원가족 · 2026-11-15).
          로봇 등록 제목(it.name)은 연장 전 목록 제목이라 꼬리가 없고, 첨부는 **연장 전 요강**일 수 있다. 그래서 첨부보다 **먼저** 읽는다.
@@ -1652,6 +1679,7 @@ for (const it of reg.items) {
   /* 마감일 — **비어 있을 때만** 채운다. 사람이 넣은 값도, auto-register 가 제목에서
      읽은 값도 덮지 않는다(더 많이 본 쪽이 이기는 게 아니라 먼저 정해진 쪽이 이긴다). */
   recheckDocDeadline(it);   // 로봇이 첨부에서 읽어 둔 마감은 지금 규칙으로 다시(위 함수 머리말)
+  recheckBodyDeadline(it);  // 본문 근거 문장도 지금 규칙으로 다시(위 함수 머리말)
   if (!it.deadline && !humanOwned(it.deadlineFrom)) {
     /* 본문이 먼저 · 못 읽으면 공고문 첨부 (2026-09-15 · G-3) */
     let dl = extractDeadline(body);

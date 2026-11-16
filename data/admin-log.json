@@ -209,6 +209,24 @@
    "by": "조세현",
    "action": "edit",
    "detail": "auto-notice7doarticleno894170 — noApply"
+  },
+  {
+   "at": "2026-11-16 12:29 KST",
+   "by": "claude-session",
+   "action": "revert",
+   "detail": "9건 제거(355 → 346건) · 재등록 차단 id 9·주소 9"
+  },
+  {
+   "at": "2026-11-16 12:38 KST",
+   "by": "claude-session",
+   "action": "edit",
+   "detail": "8건 — auto-698detailviewdocategory6 — deadline, period / auto-0713no2516266sitedvscdkr — deadline, period, amount, amountValue / auto-kuk2351212035artclviewdo — amount, amountValue / auto-ervicenoticedetail521183 — amount, amountValue / auto-lviewdocategory6menu2377 — deadline, period / auto-oarticleno159660nocat501 — deadline, period / auto-srchenable1srchvotetype1-0rtcwpw — deadline, period / auto-oardid323515menuno200318 — deadline, period"
+  },
+  {
+   "at": "2026-11-16 12:39 KST",
+   "by": "claude-session",
+   "action": "edit",
+   "detail": "auto-0713no2516266sitedvscdkr — eligibilityLines"
   }
  ]
 }
