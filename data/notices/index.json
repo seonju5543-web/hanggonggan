@@ -3,6 +3,10 @@
  "updatedAt": "2026-11-16",
  "schools": 44,
  "files": {
+  "고려대학교": {
+   "file": "n1lw6ycq.json",
+   "count": 29
+  },
   "서울대학교": {
    "file": "nsgh1oi.json",
    "count": 21
@@ -118,10 +122,6 @@
   "부산대학교": {
    "file": "n13zozby.json",
    "count": 8
-  },
-  "고려대학교": {
-   "file": "n1lw6ycq.json",
-   "count": 27
   },
   "한국항공대학교": {
    "file": "n1as48ix.json",

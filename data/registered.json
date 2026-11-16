@@ -24484,6 +24484,76 @@
     "신청기한 : 2027.1.15(금) 16시 까지"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-qlmjzmaw5kv29yzcuzrcuyng-0d8bhds",
+   "name": "[교내-11/25] 2026학년도 2학기 미래로장학금 재심 신청 안내",
+   "boardTitle": "[교내-11/25] 2026학년도 2학기 미래로장학금 재심 신청 안내",
+   "type": "교내",
+   "kindEvidence": [
+    "제목 표식 「교내」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-16",
+   "provider": "주관 기관 원문 확인",
+   "amount": "등록금 50%",
+   "amountValue": 0,
+   "deadline": "2026-11-25",
+   "deadlineFrom": "공고 원문 · [교내-11/25] 2026학년도 2학기 미래로장학금 재심 신청 안내",
+   "period": "접수 ~2026-11-25",
+   "summary": "고려대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "고려대학교"
+   },
+   "documents": [
+    "신청서(붙임 파일)",
+    "지도교수 추천서 혹은 학과장 추천서 중 택 1(붙임 파일)",
+    "가족관계 확인서",
+    "긴급가계곤란 증빙 서류 - ①~④ 중 해당 되는 내용 택 1",
+    "폐업: 폐업사실증명서 및 사실증명(사업자등록 사실 여부) - 폐업일 이후",
+    "퇴직: 고용보험 수급자격 인정 명세서",
+    "가정폭력으로 인한 가족관계 단절: 가정폭력 증빙서류(신고접수증, 가정폭력 사건처분결과증명서, 가정폭력소장 사본 등)",
+    "대상: 형제·자매·남매가 대학에 재학 중 인 경우(단, 정규학기 재학 에 한하여 인정)",
+    "신청서(붙임파일)",
+    "지도교수 혹은 학과장 추천서(붙임파일)",
+    "형제·자매·남매 재학증명서(정규학기 재학 확인용)",
+    "형제·자매·남매 등록금 납입 증명서(정규학기 재학 확인용)",
+    "비고: 고대가족장학금 수혜자 지원 제외"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-16 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4OTklMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
+   "sourceKind": "auto",
+   "applyPortal": "KUPID",
+   "applyPortalSource": "3. 신청방법: KUPID - 등록 / 장학 - 장학금 신청에서 미래로장학금 재심(1차) 신청",
+   "applyPortalFrom": "공고 원문",
+   "documentsFrom": "공고 원문",
+   "eligibilityLines": [
+    "1. 선발 기준",
+    "※ 공통 자격: 2026학년도 2학기 국가장학금을 신청하여 학자금 지원구간이 산정된 내국인 재학생",
+    "(단, 국가장학금 미신청자 또는 학자금 지원구간 미산정자의 경우 긴급가계곤란 유형 예외 인정, 학비부담 유형 불가)",
+    "정규학기 재학생 또는 복수전공 진입 이후 2개학기 이내인 자 (초과학기생 불가)",
+    "계약학과 재학생 지원 불가",
+    "가. 긴급가계곤란 유형",
+    "1) 대상: 당해년도 부모님이 폐업, 파산, 퇴직한 경우 (단, 최소 1년 이상 근로기간이 있는 자) 또는 가정폭력으로 가족관계가 단절된 자"
+   ],
+   "excerpts": [
+    "신청기간: 2026학년도 11월 16일(월) 10시 ~ 11월 25일(수) 16시"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "ratio",
+    "value": 0,
+    "ratio": 0.5,
+    "min": 0,
+    "max": 0,
+    "raw": "2) 금액: 수업료의 50% 이내"
+   },
+   "amountFrom": "공고 원문"
   }
  ]
 }

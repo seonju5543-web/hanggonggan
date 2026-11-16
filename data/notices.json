@@ -2,6 +2,26 @@
  "updatedAt": "2026-11-16",
  "items": [
   {
+   "title": "[교외-12/13]2027학년도 강남장학회 19기 장학생 모집 안내(재단지원)",
+   "url": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM5MDAlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "고려대학교",
+   "campus": "",
+   "foundAt": "2026-11-16"
+  },
+  {
+   "title": "[교내-11/25] 2026학년도 2학기 미래로장학금 재심 신청 안내",
+   "url": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4OTklMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
+   "attachments": [],
+   "deadlineHint": "신청기간: 2026학년도 11월 16일(월) 10시 ~ 11월 25일(수) 16시 3. 신청방법: KUPID - 등록 / 장학 - 장학금 신청에",
+   "school": "고려대학교",
+   "campus": "",
+   "foundAt": "2026-11-16",
+   "bodyDeadline": "2026-11-25",
+   "bodyDeadlineText": "[교내-11/25] 2026학년도 2학기 미래로장학금 재심 신청 안내"
+  },
+  {
    "title": "2027년도 제10기 유하푸른재단 장학생 선발 안내",
    "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=423",
    "attachments": [
@@ -71,7 +91,9 @@
    "deadlineHint": null,
    "school": "가천대학교",
    "campus": "",
-   "foundAt": "2026-11-16"
+   "foundAt": "2026-11-16",
+   "bodyDeadline": "2026-11-18",
+   "bodyDeadlineText": "2026년 가천대학교 재학생 심층면접토론(FGD) 참여학생 모집 ○ 신청기간: 2026.11.05.(목) ~ 11.18.(수)"
   },
   {
    "title": "2026-2학기 장학사정관(릴레이쉽) 장학금 신청 안내",
@@ -8810,17 +8832,6 @@
    "bodyDeadlineText": "2026.10.12"
   },
   {
-   "title": "[교외-마감]2026학년도 2학기 송화재단 장학생 선발 안내(학교지원)",
-   "url": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NjMlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
-   "attachments": [],
-   "deadlineHint": "접수기간: 2026.10.2(금) 9시 ~ 2026.10.12(월) 17시 5. 제출 서류: 각 1부씩 제출, 2026.10월 이후 발급분만 인",
-   "school": "고려대학교",
-   "campus": "",
-   "foundAt": "2026-10-12",
-   "bodyDeadline": "2026-10-12",
-   "bodyDeadlineText": "2026-10-12"
-  },
-  {
    "title": "[등록/장학] 2026년 하반기 은평구민 장학생 선발 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53463&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "attachments": [
@@ -8955,17 +8966,6 @@
    "school": "경기대학교",
    "campus": "",
    "foundAt": "2026-10-12"
-  },
-  {
-   "title": "[교외-10/28]2026년도 하반기 은평구민장학재단 은평구민 장학생 선발 안내(재단지원)",
-   "url": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4NzIlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
-   "attachments": [],
-   "deadlineHint": null,
-   "school": "고려대학교",
-   "campus": "",
-   "foundAt": "2026-10-08",
-   "bodyDeadline": "2026-10-28",
-   "bodyDeadlineText": "[교외-10/28]2026년도 하반기 은평구민장학재단 은평구민 장학생 선발 안내(재단지원)"
   },
   {
    "title": "[한미교육위원단] 풀브라이트 미국 유학·연구 장학금 설명회",
