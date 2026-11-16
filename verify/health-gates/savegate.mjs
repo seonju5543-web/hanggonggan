@@ -9,6 +9,7 @@
        (저장 단계의 if 가 관문 단계 결과를 보거나 · 관문 단계가 continue-on-error 없이 넘어지고 저장 단계가 always() 로 덮지 않거나 · 같은 단계 안에서 관문이 먼저).
      · 🔴 (2026-11-16 리뷰) 되돌리기 짝은 **저장하는 경로를 전부** 덮어야 센다(gate-guard --stage · git checkout -- · 'auto' 는 정식 등록만) — 아니면
        저장 if 가 gate-guard 의 '다시 재어 초록'(reverted-*·flaky)만 받아야 한다(kept-preexisting 는 빨간 판을 받아들인 것) ·
+       🔴 (리뷰 2차) gate-guard 의 stage 는 저장 if 가 그 결과(outputs.gate)를 요구할 때만 덮는다 — 넘어지면 `||` 예비 줄만 돈다(revertCover 는 둘의 교집합) ·
        관문 줄을 삼키는 꼴(`| tee` 무 pipefail · if/!/until 조건 · `|| 무엇이든` · `&& …`)과 관문 **뒤** 쓰기(> · mv · cp · tee · sed -i · node -e)는 관문이 아니다.
    🔴 톱니(ratchet): 지금 관문이 없는 저장 job 은 아래 SAVE_GATE_EXCEPTIONS 에 이유 한 줄과 함께 있다 —
       새 저장 job 이 관문 없이 생기면 빨간불 · 목록에 있는 job 이 관문을 갖추면(또는 저장을 그만두면) 그것도 빨간불(목록에서 지우라고) → 목록은 줄기만 한다.
@@ -155,22 +156,44 @@ function producing(s) {
   return writeLineSet(s.run).size > 0;
 }
 
-/** 되돌리기 단계가 덮는 경로 — gate-guard `--stage a,b`(auto 는 정식 등록 파일의 자동 등록분만 뺀다 → data/registered.json) ·
-    `git checkout [HEAD] -- a b` · `git restore a b` · `git clean … -- a b`. `.` 는 '*'(전부) */
-export function revertCover(run) {
+const normPath = (p) => { const q = p.replace(/^["']|["']$/g, '').replace(/^\.\//, '').replace(/\/+$/, ''); return q === '.' ? '*' : q; };
+const coveredBy = (set, p) => set.has('*') || set.has(p) || [...set].some((c) => p.startsWith(`${c}/`));
+/** gate-guard 가 **끝까지 돌았을 때** 되돌릴 수 있는 경로 — `--stage a,b`(auto 는 정식 등록 파일의 자동 등록분만 뺀다 → data/registered.json).
+    gate-guard 를 부르지 않는 단계면 빈 집합 */
+export function guardStageCover(run) {
   const text = shLines(run).join('\n');
   const out = new Set();
-  const add = (p) => { const q = p.replace(/^["']|["']$/g, '').replace(/^\.\//, '').replace(/\/+$/, ''); if (q) out.add(q === '.' || q === '' ? '*' : q); };
-  if (/\bcollector\/gate-guard\.mjs\b/.test(text)) {
-    for (const m of text.matchAll(/--stage\s+(\S+)/g)) for (const p of m[1].split(',')) add(p === 'auto' ? 'data/registered.json' : p);
-  }
+  if (!/\bcollector\/gate-guard\.mjs\b/.test(text)) return out;
+  /* `if ! … --stage a,b; then` — 꼬리 ; 는 경로가 아니다(리뷰 2차 — 꼬리째 읽어 link-check 의 셋째 파일을 못 덮는다고 봤다) */
+  for (const m of text.matchAll(/--stage\s+([^\s;&|)]+)/g)) for (const p of m[1].split(',')) { const q = normPath(p === 'auto' ? 'data/registered.json' : p); if (q) out.add(q); }
+  return out;
+}
+/** 셸 git 되돌리기(`git checkout [HEAD] -- a b` · `git restore a b` · `git clean … -- a b`)가 덮는 경로. `.` 는 '*'(전부) */
+function gitRevertCover(text) {
+  const out = new Set();
   for (const m of text.matchAll(/\bgit\s+(checkout|restore|clean)\b([^\n;&|]*)/g)) {
     const args = m[2].replace(/\s\d?>\S*/g, ' ').trim().split(/\s+/).filter(Boolean);
     const dd = args.indexOf('--');
     if (m[1] === 'checkout' && dd < 0) continue;            // `git checkout -B x` 는 되돌리기가 아니다
     const paths = (dd >= 0 ? args.slice(dd + 1) : args).filter((a) => !a.startsWith('-') && !(m[1] === 'restore' && /^(HEAD|@)$/.test(a)));
-    paths.forEach(add);
+    for (const p of paths) { const q = normPath(p); if (q) out.add(q); }
   }
+  return out;
+}
+/** 되돌리기 단계가 **어느 경우에도** 덮는 경로 — 관문이 빨갈 때 저장 앞에서 반드시 직전 판으로 돌아가는 것.
+    🔴 (2026-11-16 리뷰 2차) gate-guard 의 `--stage` 와 `|| git checkout -- …` 예비 줄을 **합치지 않는다** — 예비 줄은 gate-guard 가 **넘어졌을 때**
+       (= 아무것도 안 되돌렸을 때)만 돈다. 그래서 gate-guard 를 부르는 단계는 두 쪽에 **다** 든 경로(교집합)만 덮는다:
+       도구가 끝까지 돌면 stage 를, 넘어지면 예비 줄을 되돌리기 때문이다(예비 줄이 없으면 넘어진 경우 덮는 것이 없다).
+       stage 만 덮는 경로는 저장 if 가 gate-guard 의 결과(outputs.gate)를 요구할 때만 센다(saveGateReport — 넘어지면 결과가 비어 저장하지 않는다).
+    gate-guard 가 없는 단계는 git 되돌리기 경로 그대로 */
+export function revertCover(run) {
+  const text = shLines(run).join('\n');
+  const git = gitRevertCover(text);
+  const stages = guardStageCover(run);
+  if (!/\bcollector\/gate-guard\.mjs\b/.test(text)) return git;
+  const out = new Set();
+  for (const s of stages) if (coveredBy(git, s)) out.add(s);
+  for (const g of git) if (coveredBy(stages, g)) out.add(g);
   return out;
 }
 /** 저장 경로가 되돌리기에 덮이는가 — 관문이 재는 경로만 따진다. '*'·'?'(전부·변수) 저장은 '*' 되돌리기만 덮는다 */
@@ -216,10 +239,17 @@ export function saveGateReport(yml) {
         const greenGuards = g.id ? steps.slice(k + 1, i).filter((r) => r.id && /\bcollector\/gate-guard\.mjs\b/.test(codeLines(r.run).join('\n'))
           && new RegExp(`steps\\.${g.id}\\.(outcome|conclusion)\\s*==\\s*'failure'`).test(String(r.if || ''))).map((r) => r.id) : [];
         const greenRe = (id) => new RegExp(`steps\\.${id}\\.outputs\\.gate\\s*==\\s*'(reverted-auto|reverted-files|flaky)'`);
-        /* 저장 if 가 관문 결과를 본다 — `||` 로 갈린 갈래마다 관문 성공 · gate-guard 의 초록 결과 · **덮는** 되돌리기 단계의 결과 중 하나를 봐야 한다
+        /* gate-guard 의 stage 가 저장 경로를 전부 덮는 되돌리기 단계 — 저장 if 가 그 결과(outputs.gate 가 무엇이라고 **적혔음**)를 요구할 때만 센다.
+           결과는 도구가 끝까지 돌아야 적힌다(main 의 마지막 줄) — 넘어지면 비어 저장이 안 돈다. `!= '어떤 값'` 은 빈 결과도 통과하므로 세지 않는다 */
+        const stageGuards = g.id ? steps.slice(k + 1, i).filter((r) => r.id && /\bcollector\/gate-guard\.mjs\b/.test(codeLines(r.run).join('\n'))
+          && new RegExp(`steps\\.${g.id}\\.(outcome|conclusion)\\s*==\\s*'failure'`).test(String(r.if || ''))
+          && covers(guardStageCover(r.run), paths)).map((r) => r.id) : [];
+        const resultRe = (id) => new RegExp(`steps\\.${id}\\.outputs\\.gate\\s*(?:==\\s*'[a-z-]+'|!=\\s*'')`);
+        /* 저장 if 가 관문 결과를 본다 — `||` 로 갈린 갈래마다 관문 성공 · gate-guard 의 초록 결과 · stage 가 덮는 gate-guard 의 결과 · **덮는** 되돌리기 단계의 결과 중 하나를 봐야 한다
            (`steps.audit.outcome == 'success' || steps.guard.outputs.gate == 'kept-preexisting'` 에서 guard 가 덮지 않으면 빨간 판이 저장된다) */
         const looksAt = !!g.id && ok(g.id).test(cond)
           && cond.split('||').every((p) => ok(g.id).test(p) || greenGuards.some((id) => greenRe(id).test(p))
+            || stageGuards.some((id) => resultRe(id).test(p))
             || covering.some((r) => r.id && p.includes(`steps.${r.id}.`)));
         /* 관문 실패를 보고 **작업을 빨간불로 멈추는** 단계(continue-on-error 없이 마지막 명령이 exit 1~9) — 저장 if 가 always()·failure() 로 덮지 않으면 저장은 돌지 않는다 */
         const stops = !!g.id && !hasAlways(cond) && steps.slice(k + 1, i).some((r) => !truthyCoe(r)
@@ -313,6 +343,20 @@ export const SAMPLES = {
   writeNodeEAfter: wfOf(ROBOT + GATE([TC, AU]) + `      - name: 손질\n        run: |\n          node -e "const fs=require('fs');\n            fs.writeFileSync('data/a.json','{}')"\n` + SAVE(['data/a.json'])),
   readNodeEAfter: wfOf(ROBOT + GATE([TC, AU]) + `      - name: 읽기만\n        run: node -e "JSON.parse(require('fs').readFileSync('data/a.json','utf8'))"\n` + SAVE(['data/a.json'])),
   sameStepWriteAfter: wfOf(ROBOT + SAME([TC, AU, 'cp /tmp/new.json data/a.json'])),
+  /* ── 2026-11-16 리뷰 2차 — gate-guard 가 넘어지면(예외 · exit 1) `||` 예비 줄만 돈다. stage 와 예비 줄을 합쳐 세면 예비 줄이 덮지 않는 경로가
+        관문 없이 저장된다(수집 두 로봇: 정식 등록 파일이 깨진 JSON 이면 auto 단계가 넘어지고 예비 줄은 정식 등록·양식·대기열만 되돌려, 장부·공고 피드가 빨간 채 저장) ── */
+  guardCrashPartial: wfOf(ROBOT + GATE([TC, AU], { coe: true }) + REVERT('node collector/gate-guard.mjs --keep-preexisting --stage data/a.json --stage data/b.json || git checkout -- data/a.json', 'guard')
+    + SAVE(['data/a.json', 'data/b.json'])),
+  guardCrashFull: wfOf(ROBOT + GATE([TC, AU], { coe: true }) + REVERT('node collector/gate-guard.mjs --keep-preexisting --stage data/a.json --stage data/b.json || git checkout -- data/a.json data/b.json', 'guard')
+    + SAVE(['data/a.json', 'data/b.json'])),
+  guardNoFallbackAlways: wfOf(ROBOT + GATE([TC, AU], { coe: true }) + REVERT('node collector/gate-guard.mjs --stage data/a.json,data/b.json\nexit 1', 'guard')
+    + SAVE(['data/a.json', 'data/b.json'], 'always()')),
+  guardResultRequired: wfOf(ROBOT + GATE([TC, AU], { coe: true }) + REVERT('node collector/gate-guard.mjs --keep-preexisting --stage data/a.json --stage data/b.json || { echo 넘어짐; exit 1; }', 'guard')
+    + SAVE(['data/a.json', 'data/b.json'], "steps.audit.outcome == 'success' || steps.guard.outputs.gate != ''")),
+  guardResultAlwaysRequired: wfOf(ROBOT + GATE([TC, AU], { coe: true }) + REVERT('node collector/gate-guard.mjs --keep-preexisting --stage data/a.json --stage data/b.json || git checkout -- data/a.json\nexit 1', 'guard')
+    + SAVE(['data/a.json', 'data/b.json'], "always() && (steps.audit.outcome == 'success' || steps.guard.outputs.gate != '')")),
+  guardResultNeqValue: wfOf(ROBOT + GATE([TC, AU], { coe: true }) + REVERT('node collector/gate-guard.mjs --keep-preexisting --stage data/a.json --stage data/b.json || git checkout -- data/a.json', 'guard')
+    + SAVE(['data/a.json', 'data/b.json'], "steps.audit.outcome == 'success' || steps.guard.outputs.gate != 'still-failing'")),
 };
 
 export default async function gate(eq, ctx) {
@@ -363,9 +407,24 @@ export default async function gate(eq, ctx) {
     [okv('writeRedirectAfter'), okv('writeMvAfter'), okv('writeNodeEAfter'), okv('readNodeEAfter')], [[false], [false], [false], [true]]);
   eq('  같은 단계에서 관문 뒤 git add 앞에 cp 로 data/ 에 쓴다 → 빠짐', okv('sameStepWriteAfter'), [false]);
   eq('  되돌리기가 덮는 경로 읽기 — gate-guard --stage(auto → 정식 등록) · git checkout [HEAD] -- · git restore · git clean · `.` 는 전부',
-    [[...revertCover('node collector/gate-guard.mjs --stage auto --stage data/x.json,collector/y.json || git checkout -- data/z.json')],
+    [[...guardStageCover('node collector/gate-guard.mjs --stage auto --stage data/x.json,collector/y.json || git checkout -- data/z.json')],
       [...revertCover('git checkout HEAD -- data/news\ngit clean -fdq -- data/news\ngit restore collector/a.json')], [...revertCover('git checkout -- .')], [...revertCover('git checkout -B deploy origin/main')]],
-    [['data/registered.json', 'data/x.json', 'collector/y.json', 'data/z.json'], ['data/news', 'collector/a.json'], ['*'], []]);
+    [['data/registered.json', 'data/x.json', 'collector/y.json'], ['data/news', 'collector/a.json'], ['*'], []]);
+
+  /* ①-3 (2026-11-16 리뷰 2차) gate-guard 가 넘어지면 `||` 예비 줄만 돈다 — 어느 경우에도 덮는 것은 stage 와 예비 줄의 **교집합**.
+     각 '빠짐' 표본과 교집합 값은 고치기 전 판(stage ∪ 예비 줄)에서 '통과'·합집합이었다(red-green) */
+  eq('①-3 gate-guard stage a·b + 예비 줄 a → 어느 경우에도 덮는 것은 a 뿐 · 폴더는 그 안의 파일까지 · 예비 줄 없으면 없음',
+    [[...revertCover('node collector/gate-guard.mjs --stage data/a.json,data/b.json || git checkout -- data/a.json')],
+      [...revertCover('node collector/gate-guard.mjs --stage data/news,collector/s.json || { git checkout -- data/news/x.json; git clean -fdq -- data/news; }')],
+      [...revertCover('node collector/gate-guard.mjs --stage data/a.json')],
+      [...guardStageCover('if ! node collector/gate-guard.mjs --stage data/a.json,collector/b.json; then exit 1; fi')]],
+    [['data/a.json'], ['data/news', 'data/news/x.json'], [], ['data/a.json', 'collector/b.json']]);
+  eq('  예비 줄이 a 만 되돌리는데 a·b 를 조건 없이 저장(수집 두 로봇의 꼴) → 빠짐 · 예비 줄이 a·b 를 되돌리면 → 통과',
+    [okv('guardCrashPartial'), okv('guardCrashFull')], [[false], [true]]);
+  eq('  예비 줄 없이 always() 로 저장 → 넘어지면 아무것도 안 되돌린 채 저장 → 빠짐',
+    okv('guardNoFallbackAlways'), [false]);
+  eq("  저장 if 가 gate-guard 결과를 요구(`!= ''` · always() 안에서도) → stage 가 덮으면 통과 · `!= '어떤 값'` 은 빈 결과도 통과시켜 → 빠짐",
+    [okv('guardResultRequired'), okv('guardResultAlwaysRequired'), okv('guardResultNeqValue')], [[true], [true], [false]]);
 
   /* ② 톱니 — 새 저장 로봇은 빨간불 · 목록에 있는데 관문이 생기면 그것도 빨간불(목록은 줄기만 한다) */
   eq('② 톱니 — 목록에 없는 관문 없는 저장 job 은 fresh · 관문이 생긴 목록 항목은 stale',
