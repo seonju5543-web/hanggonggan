@@ -211,22 +211,88 @@
    "detail": "auto-notice7doarticleno894170 — noApply"
   },
   {
-   "at": "2026-11-16 12:29 KST",
+   "at": "2026-11-15 16:40 KST",
+   "by": "조세현",
+   "action": "activitySource",
+   "detail": "출처 추가 · 서울과학기술대학교 → https://www.seoultech.ac.kr/service/board/rec"
+  },
+  {
+   "at": "2026-11-15 16:40 KST",
+   "by": "조세현",
+   "action": "activitySource",
+   "detail": "출처 추가 · 성균관대학교 → https://www.skku.edu/skku/campus/skk_comm/notice05.do"
+  },
+  {
+   "at": "2026-11-15 16:40 KST",
+   "by": "조세현",
+   "action": "activitySource",
+   "detail": "출처 추가 · 국민대학교 → https://www.kookmin.ac.kr/user/kmuNews/notice/9/index.do"
+  },
+  {
+   "at": "2026-11-15 16:40 KST",
+   "by": "조세현",
+   "action": "activitySource",
+   "detail": "출처 추가 · 한국항공대학교 → https://kau.ac.kr/kaulife/event.php"
+  },
+  {
+   "at": "2026-11-15 16:40 KST",
+   "by": "조세현",
+   "action": "activitySource",
+   "detail": "출처 추가 · 가톨릭대학교 → https://www.catholic.ac.kr/ko/campuslife/notice_outside.do"
+  },
+  {
+   "at": "2026-11-15 16:40 KST",
+   "by": "조세현",
+   "action": "activitySource",
+   "detail": "출처 추가 · 강원대학교 → https://kangwon.ac.kr/ko/bbs/719/list.do"
+  },
+  {
+   "at": "2026-11-15 16:40 KST",
+   "by": "조세현",
+   "action": "activitySource",
+   "detail": "출처 추가 · 홍익대학교 → https://www.hongik.ac.kr/kr/newscenter/event-contest.do?mode=list&srCategoryId=85&srSearchKey=&srSearchVal="
+  },
+  {
+   "at": "2026-11-15 16:40 KST",
+   "by": "조세현",
+   "action": "activitySource",
+   "detail": "출처 추가 · 충북대학교 → https://www.cbnu.ac.kr/www/selectBbsNttList.do?bbsNo=8&key=819&searchCtgry=%EB%AA%A8%EC%A7%91/%EA%B3%B5%EB%AA%A8"
+  },
+  {
+   "at": "2026-11-15 16:40 KST",
+   "by": "조세현",
+   "action": "activitySource",
+   "detail": "출처 추가 · 가천대학교 → https://www.gachon.ac.kr/kor/1147/subview.do"
+  },
+  {
+   "at": "2026-11-15 16:40 KST",
+   "by": "조세현",
+   "action": "activitySource",
+   "detail": "출처 추가 · 숙명여자대학교 → https://www.sookmyung.ac.kr/kr/news/event.do"
+  },
+  {
+   "at": "2026-11-15 16:40 KST",
+   "by": "조세현",
+   "action": "activitySource",
+   "detail": "출처 추가 · 충남청년포털 → https://youth.chungnam.go.kr/web/main/bbs/cnyouth_notice/list"
+  },
+  {
+   "at": "2026-11-15 16:40 KST",
+   "by": "조세현",
+   "action": "activitySource",
+   "detail": "출처 추가 · 한국대학사회봉사협의회 → https://kucss.or.kr/dp_notice"
+  },
+  {
+   "at": "2026-11-16 12:44 KST",
    "by": "claude-session",
    "action": "revert",
-   "detail": "9건 제거(355 → 346건) · 재등록 차단 id 9·주소 9"
+   "detail": "9건 제거(356 → 347건) · 재등록 차단 id 9·주소 0"
   },
   {
-   "at": "2026-11-16 12:38 KST",
+   "at": "2026-11-16 12:45 KST",
    "by": "claude-session",
    "action": "edit",
-   "detail": "8건 — auto-698detailviewdocategory6 — deadline, period / auto-0713no2516266sitedvscdkr — deadline, period, amount, amountValue / auto-kuk2351212035artclviewdo — amount, amountValue / auto-ervicenoticedetail521183 — amount, amountValue / auto-lviewdocategory6menu2377 — deadline, period / auto-oarticleno159660nocat501 — deadline, period / auto-srchenable1srchvotetype1-0rtcwpw — deadline, period / auto-oardid323515menuno200318 — deadline, period"
-  },
-  {
-   "at": "2026-11-16 12:39 KST",
-   "by": "claude-session",
-   "action": "edit",
-   "detail": "auto-0713no2516266sitedvscdkr — eligibilityLines"
+   "detail": "7건 — auto-698detailviewdocategory6 — deadline, period / auto-0713no2516266sitedvscdkr — deadline, period, amount, amountValue, eligibilityLines / auto-ervicenoticedetail521183 — amount, amountValue / auto-lviewdocategory6menu2377 — deadline, period / auto-oarticleno159660nocat501 — deadline, period / auto-srchenable1srchvotetype1-0rtcwpw — deadline, period / auto-oardid323515menuno200318 — deadline, period"
   }
  ]
 }

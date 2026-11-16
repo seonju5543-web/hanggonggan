@@ -149,13 +149,19 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
     /* 2026-11-02 개발자 결정 — 학교 게시판에서 주운 글은 「○○대학교 게시판」을 학생 화면에 적지 않는다(주최가 아니다) · 칩만 */
     eq('④ 윗줄은 갈래 칩만 (칩은 분야로 「봉사」 · 학교 게시판 글은 주최 글자 없음)', [seen[0].chip, seen[0].org], ['봉사', '']);
     eq('④ 마감을 읽은 글은 아랫줄 오른쪽 D-5 (장학 카드와 같은 자리·같은 글자)', await page.$eval('#activities-list [data-activity] .sch-foot .sch-due', (e) => e.textContent.trim()), 'D-5');
-    eq('④ 아랫줄 왼쪽(장학 카드의 금액 자리)은 「대상 · …」 — 발췌 대상이 없으면 첫 자격 줄', await page.$eval('#activities-list [data-activity] .sch-foot .sch-amount', (e) => e.textContent.trim()), '대상 · 만 19~34세 대한민국 국민');
+    /* 2026-11-15 개발자 결정("밑에 대상은 아예 빼버리고 시안 1로") — 카드 아랫줄에 「대상 · …」 줄이 없다 · 칩에 갈래 색 · 원문 아이콘은 마감 옆(오른쪽 끝) */
+    eq('④ 아랫줄 왼쪽은 빈칸 — 「대상 · …」 줄이 없다 (대상은 시트가 말한다)', await page.$$eval('#activities-list [data-activity] .sch-foot .sch-amount', (e) => e.map((x) => x.textContent.trim())), ['', '', '']);
+    eq('④ 칩에 갈래 색 — 봉사 · 공모전 · 대외활동이 제 색 클래스를 단다', await page.$$eval('#activities-list .sch-top .badge-kind', (e) => e.map((x) => x.className.replace('badge badge-kind ', ''))), ['badge-vol', 'badge-contest', 'badge-act']);
+    eq('④ 원문 아이콘은 마감 옆 — 카드 오른쪽 끝 · 마감 글자와 같은 줄', await page.evaluate(() => {
+      const w = document.querySelector('#activities-list .sch-card-wrap.has-link');
+      const l = w.querySelector('.card-src-link').getBoundingClientRect(), d = w.querySelector('.sch-due').getBoundingClientRect(), c = w.getBoundingClientRect();
+      return [l.left > d.right, c.right - l.right <= 24, Math.abs((l.top + l.bottom) / 2 - (d.top + d.bottom) / 2) <= 6];
+    }), [true, true, true]);
     /* 판정 하나 — 장학 카드와 같은 cardBadgeHtml (2026-10-01) */
     /* 자격 줄 없음 → 배지 없음 (2026-10-03 개발자 결정 — 활동 카드에 '자격 미확인' 을 안 단다 · 장학 카드는 그대로) */
     eq('④ 카드 맨 윗줄 판정 — 나이 맞음 → 적합도 % · 나이 넘음 → 미달 · 자격 줄 없음 → 배지 없음',
       await page.$$eval('#activities-list .sch-card .sch-top', (e) => e.map((x) => (x.querySelector('.sch-fit, .badge:not(.badge-kind)') || {}).textContent || '').map((t) => t.trim().replace(/\d+%/, 'N%'))),   // 갈래 칩(.badge-kind)은 판정이 아니다(시안 B 2026-11-02)
       ['적합도 N%', '지원 자격 미달', '']);
-    eq('④ 대상을 못 읽은 글은 아랫줄 왼쪽이 빈칸 (혜택·분야로 채우지 않는다 · 시안 B)', await page.$$eval('#activities-list [data-activity] .sch-amount', (e) => e.map((x) => x.textContent.trim().startsWith('대상 · ') || x.textContent.trim() === '')), [true, true, true]);
     eq('④ 카드에 발췌 줄을 쌓지 않는다 (장학 카드처럼 석 줄)', await page.$$eval('#activities-list .sch-provider', (e) => e.length), 0);
     eq('④ 장학 카드와 같은 그릇 (.sch-card-wrap > button.sch-card)', await page.$$eval('#activities-list .sch-card-wrap > button.sch-card[data-activity]', (e) => e.length), 3);
     /* 누르면 앱을 떠나지 않고 장학과 같은 상세 시트(#detail-sheet)가 열린다 */
@@ -361,6 +367,18 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
       const row = box.querySelector(`.cal-row[data-detail="act:${u}"]`); return row ? [row.querySelector('.cal-row-name').textContent.trim(), row.querySelector('.cal-row-sub').textContent.trim(), /내 공고/.test(box.textContent)] : null; }, ACT1),
       ['2026 대학생 해외봉사단 모집', '대외활동', true]);
     eq('⑥ 피드가 새로 오면 담아 둔 사본도 새 글로(옛 마감을 말하지 않게)', await page.evaluate((u) => { const s = state.saved.find((x) => x.id === `act:${u}`); s.snap = { ...s.snap, deadline: '2000-01-01' }; refreshActivitySnaps(); return s.snap.deadline !== '2000-01-01'; }, ACT1), true);
+    /* ── ⑥-2 보관함 장학금·대외활동 칩 (2026-11-16 은서 「공고보관함에서 대외활동과 장학금이 구분되게」) ── */
+    eq('⑥-2 한쪽만 담겼으면 칩이 없다', await page.evaluate(() => { showScreen('mysaved'); return document.querySelectorAll('#my-saved [data-saved-kind]').length; }), 0);
+    const SCH1 = await page.evaluate(() => { const s = allScholarships().find((x) => !isActivityId(x.id)); toggleSave(s.id); return s.id; });
+    const kindView = () => page.evaluate(() => [[...document.querySelectorAll('#my-saved [data-saved-kind]')].map((c) => (c.classList.contains('active') ? '*' : '') + c.textContent.trim()),
+      [...document.querySelectorAll('#my-saved .cal-row')].map((r) => (isActivityId(r.dataset.detail) ? 'act' : 'sch')).sort()]);
+    eq('⑥-2 둘 다 담기면 칩 셋 · 처음엔 전체', await page.evaluate(() => { showScreen('mysaved'); return 0; }).then(kindView), [['*전체 2', '장학금 1', '대외활동 1'], ['act', 'sch']]);
+    await page.click('#my-saved [data-saved-kind="act"]'); await page.waitForTimeout(150);
+    eq('⑥-2 「대외활동」을 누르면 활동만', await kindView(), [['전체 2', '장학금 1', '*대외활동 1'], ['act']]);
+    await page.click('#my-saved [data-saved-kind="sch"]'); await page.waitForTimeout(150);
+    eq('⑥-2 「장학금」을 누르면 장학만', await kindView(), [['전체 2', '*장학금 1', '대외활동 1'], ['sch']]);
+    eq('⑥-2 MY 메뉴 숫자는 늘 전체', await page.$eval('#my-sub-saved', (e) => e.textContent.trim().startsWith('2개')), true);
+    eq('⑥-2 한쪽을 다 빼면 칩이 사라지고 전체로 돌아간다', await page.evaluate((id) => { toggleSave(id); renderSaved(); return [document.querySelectorAll('#my-saved [data-saved-kind]').length, document.querySelectorAll('#my-saved .cal-row').length]; }, SCH1), [0, 1]);
     eq('페이지 오류 없음', errors, []);
     await page.context().close();
   }
@@ -432,6 +450,38 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
     eq('⑦ 바꾸기는 관문을 다시 열되 취소가 있다(고른 것은 켜진 채)', await page.evaluate(() => [
       !document.querySelector('#activities-gate').hidden, !document.querySelector('#act-gate-cancel').hidden,
       document.querySelector('#in-act-kinds input[value="대외활동"]').checked]), [true, true, true]);
+    /* 「내 정보」 (2026-11-15 개발자 지시 — 장학금 학적정보와 연동 · 입력 다각화): 활동 글의 자격 줄이 실제로 쓰는 칸만 묻고(픽스처 두 글이 나이를 묻는다 →
+       태어난 해 · 한 글만 묻는 국적은 안 묻는다), 값은 장학금과 같은 프로필 칸에서 오고 같은 칸에 저장된다 */
+    eq('⑦ 내 정보 — 학적정보에서 온 한 줄(학교 · 학년 · 학적)', await page.$eval('#act-gate-me', (e) => e.textContent.trim()), '한국외국어대학교 · 3학년 · 재학');
+    eq('⑦ 내 정보 — 활동 글 두 곳 이상이 묻는 칸만 · 프로필 값으로 채워져 있다', await page.$$eval('#act-gate-ask [data-elig-field]', (els) => els.map((e) => [e.dataset.eligField, e.value])), [['birthYear', String(new Date().getFullYear() - 23)]]);
+    eq('⑦ 내 정보 — 버튼 줄: 취소는 좁고 저장이 넓다(한 줄 · 같은 높이)', await page.evaluate(() => {
+      const c = document.querySelector('#act-gate-cancel').getBoundingClientRect(), v = document.querySelector('#act-gate-save').getBoundingClientRect();
+      return [c.width < v.width, Math.round(c.height) === Math.round(v.height), v.height < 70];
+    }), [true, true, true]);
+    /* 🔴 **안 건드린 칸은 저장이 건드리지 않는다** (2026-11-15 리뷰) — 관문은 이미 답한 칸도 채워 보이므로, 보인 값을 되적으면 그 사이 다른 화면에서 고친 값을 덮는다.
+       관문을 그려 둔 채 프로필의 태어난 해를 바꾸고(학적정보에서 고친 셈) 아무것도 안 건드리고 저장 → 바꾼 값이 남아야 한다 */
+    await page.evaluate(() => { state.profile.birthYear = 1999; state.profile.gpa = 3.5; });
+    await page.click('#act-gate-save');
+    await page.waitForTimeout(300);
+    eq('⑦ 내 정보 — 안 건드린 칸은 그대로 (그려 둔 옛 값으로 덮지 않는다)', await page.evaluate(() => JSON.parse(localStorage.getItem('handaejang.v1')).profile.birthYear), 1999);
+    await page.evaluate(() => { state.profile.birthYear = new Date().getFullYear() - 23; });
+    await page.click('#act-gate-edit');
+    await page.waitForTimeout(200);
+    await page.fill('#act-gate-ask [data-elig-field="birthYear"]', String(new Date().getFullYear() - 17));   // 17살 — 「만 19~34세」 글에 미달
+    await page.click('#act-gate-save');
+    await page.waitForTimeout(400);
+    eq('⑦ 내 정보 — 관문에서 고친 값이 장학금과 같은 프로필 칸에 저장된다', await page.evaluate(() => JSON.parse(localStorage.getItem('handaejang.v1')).profile.birthYear), new Date().getFullYear() - 17);
+    eq('⑦ 내 정보 — 그 값으로 활동 카드 판정이 바뀐다(해외봉사단 미달)', await page.evaluate(() => {
+      const c = [...document.querySelectorAll('#activities-list .sch-card')].find((x) => x.textContent.includes('해외봉사단'));
+      return !!c && /미달/.test(c.querySelector('.sch-top').textContent);
+    }), true);
+    await page.click('#act-gate-edit');
+    await page.waitForTimeout(200);
+    await page.fill('#act-gate-ask [data-elig-field="birthYear"]', String(new Date().getFullYear() - 23));
+    await page.click('#act-gate-save');
+    await page.waitForTimeout(300);
+    await page.click('#act-gate-edit');
+    await page.waitForTimeout(200);
     await page.click('#act-gate-cancel');
     await page.waitForTimeout(200);
     eq('⑦ 취소하면 목록으로 돌아온다', await page.evaluate(() => document.querySelector('#activities-gate').hidden && !document.querySelector('#activities-list').hidden), true);

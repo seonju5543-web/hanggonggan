@@ -833,6 +833,18 @@ function midYearBranch(text, yb, p, isExclude, ctx) {
       `4.5 만점에 4.0 이상인 자 우선 선발`·`학업성적: 4.5 만점 기준 3.5 이상 – 20점` 이 만점 가지를 좁힌 뒤 성적 요건 HIGH 로 살아나 평점 3.6 학생 ✕ 였다(틀린 미달) */
 const OLD_MANJEOM_NOISE = /만점(?!\s*(?:이상|이하|미만|초과|충족))/;
 const MANJEOM_RANK_TAIL = /우대|우선|가산|가점|순위|등급|그\s?외|유지\s?조건|[:：\-–→]\s*\d{1,3}\s*점|[(（]\s*\d{1,3}\s*점|만\s?원/;
+/* ⚠️ 넷 다 **줄 전체가 그 꼴일 때만** (리뷰 반례 — 진짜 요건과 한 줄에 있으면 요건이 이긴다):
+   · 가산점은 괄호 밖 줄 끝에서만 — `평점 3.0 이상인 재학생 (다자녀 가정 가산점 부여)` 는 평점 요건이 산다
+   · 이름 나열은 짧은 낱말들뿐이고 기준·빼는 말이 없을 때만 — `평점 3.0 이상, … 학생에게 지급하는 장학금` 은 요건이다
+   · 예외 무리는 모두를 가리키는 말(신청자·지원자·대상자·본교 재학생)이 아닐 때만 — `단, 본교 재학생은 3학년 이상` 은 모두의 요건이다 */
+const BONUS_LINE = /^\s*[-·•○*]?\s*우대\s?(?:사항|조건|대상)\s*[:：]|(?:가산점|가점)\s*(?:부여|적용|항목)?\s*[.]?\s*$/;
+const NAME_LIST_LINE = /^(?:[^·ㆍ,]{1,14}[·ㆍ,]\s*){2,}[^·ㆍ,]{1,20}장학금\s*$/;
+const NAME_LIST_NOT = /이상|이하|이내|미만|초과|없는|불가|제외|\d\s*(?:학점|구간|분위|학년)/;
+const EXCEPT_GROUP_LINE = /^\s*[(（]?\s*(?:단|다만)\s*[,，]?\s*([^,，.]{2,30}?(?:생|자|학생))\s?(?:은|는|의\s?경우|에\s?한해)[\s,]/;
+const EXCEPT_EVERYONE = /^(?:본교|우리\s?대학|본\s?대학)?\s*(?:신청자|지원자|대상자|수혜자|재학생|학부생|학생|장학생)$/;
+/* 제외 칸에 앉은 **인원 규칙** — `동일 세대 2명 선발 시 1명 지원(3자녀 이상 가정은 2명 선발)` : 몇 명 뽑는지지 누가 못 받는지가 아니다(다자녀 학생이 ✕ 였다 · 2026-11-15) */
+const LONG_PROGRAM_SCOPE = /학제\s?가?\s?[56]\s?(?:[~∼～,·]\s?|년?\s?(?:혹은|또는|이나)\s?)[56]\s?년\s?인?\s?전공에\s?한하여/;
+const HEADCOUNT_RULE = /^[^,(（]{0,12}\d\s*명\s*(?:을\s*)?(?:선발|지원)/;   // 줄머리가 인원 규칙일 때만 — `휴학생 (결원 발생 시 1명 선발)` 은 휴학생 제외 줄이다(리뷰 반례)
 function failInDoubt(text, c, p, ctx) {
   const branchLine = !!(ctx && (ctx.inYearBranch || ctx.wholeYearBranch));   // 학년 갈래 자신의 판정(그 갈래의 조건)은 그대로 둔다
   if (!branchLine && ctx && (c.kind === 'credits' || c.kind === 'grade')
@@ -855,6 +867,23 @@ function lineVerdict(text, p, isExclude, ctx, detail) {
      처럼 대상을 말하는 문장이 화면에서 아무 표시 없이 사라졌다. 지금은 학위 축(parseDegree)이
      판정하고, 학부/대학원 기준을 나란히 적은 표(`일반대학원생 : 평점 4.0`)만 무관하다. */
   if (PR.gradTarget(text) === 'label') return null;
+  /* 🔴 **요건이 아닌 줄 셋은 ✓·✕ 를 내지 않는다** (2026-11-15 · 전수표에서 틀린 ✕ 로 나온 꼴):
+     · 우대·가산점 줄 — `우대사항: 관련학과, … 2학년 이하`·`소득 5분위 이하 가산점` : 더 주는 점수지 자격이 아니다(3학년·6구간 학생에게 ✕ 였다)
+     · 장학금 이름을 늘어놓은 줄 — `성적우수·특기·다자녀·… 외국인 유학생,k-콘텐츠순천 장학금` : 이름 속 낱말(외국인 유학생)이 요건이 되어 모든 학생 ✕
+     · 「단, ○○ 학생은 …」 — 한 무리만의 예외 기준이다. `(단, 정규 마지막학기 등록생은 12학점 이상, 평점평균 3.0 이상)`·`단, 조기취업형 계약학과 학생은 1학년에 한해 …`
+       가 그 무리가 아닌 학생에게 ✕ 였다. 그 무리에 드는 학생의 ✓ 는 그대로 두고 ✕ 만 모름으로 낮춘다 — 빼는 말(제외·불가)이 든 줄은 손대지 않는다(`단, 휴학생은 제외`) */
+  if (!isExclude) {
+    const t0 = PR.untag(text);
+    if (BONUS_LINE.test(t0) || (NAME_LIST_LINE.test(t0) && !NAME_LIST_NOT.test(t0))) return null;
+    /* `학제가 5년 혹은 6년인 전공에 한하여, 각각 2~4학년과 2~5학년에 재학중인 자` — 5·6년제 학과만의 갈래다. 학과를 보고 그 학제가 아니면 이 줄은 내 이야기가 아니다(모름) —
+       4년제 학과 휴학생이 「재학중」 으로 ✕ 였다(같은 공고가 휴학생을 다른 줄에서 받는다) */
+    if (LONG_PROGRAM_SCOPE.test(t0) && !programLength(p).longProgram) return null;
+    const eg = !(ctx && ctx.exceptGroup) && t0.match(EXCEPT_GROUP_LINE);
+    if (eg && !EXCEPT_EVERYONE.test(eg[1].trim()) && !/제외|불가|않|없/.test(t0)) {
+      const v = lineVerdict(text, p, isExclude, { ...ctx, exceptGroup: true }, detail);
+      return v === 'no' ? null : v;
+    }
+  }
   if (isNoteLine(PR.untag(text))) return null;   // 참고 줄(`1학년 재학생은 성적 기준을 적용하지 않음`)은 요건이 아니다 — 학년을 읽어 ✕ 를 내면 안 된다(2026-10-15)
   /* 🔴 경우별 분기(`신입생:` `재학생:` `복학생 및 편입생:`)는 **내 경우만** 판정한다
      (2026-08-24 개발자 지적). 안 그러면 재학생인데 `신입생:` 줄에도 ✓가 붙는다.
@@ -1130,6 +1159,8 @@ function fitDetail(sch, p) {
      95·50·33 몇 가지로만 떨어졌다(외대 표본 31건 실측). 조건을 못 읽은 줄은 1 로 센다 · 표의 구간(bracketTable)은 판정과 같이 뺀다 */
   const weightOf = (text) => Math.max(1, parseLine(PR.untag(text), false).conds.filter((c) => !(ctx.bracketTable && c.kind === 'bracket')).length);
   for (const it of items) {
+    /* 5·6년제 학과만의 갈래 줄은 그 학제가 아닌 학생의 분모에 넣지 않는다(lineVerdict 가 '모름'으로 두는 줄 — 넣으면 본 갈래로 되는 학생의 적합도가 깎인다 · 리뷰: 인재림 64% → 40%) */
+    if (p && LONG_PROGRAM_SCOPE.test(PR.untag(it.text)) && !programLength(p).longProgram) continue;
     const d = {};
     const lv = lineVerdict(it.text, p, false, ctx, d);
     const verdict = lv === 'no' ? 'fail' : lv === 'ok' ? 'pass' : 'unknown';
@@ -1153,6 +1184,7 @@ function fitDetail(sch, p) {
   /* 제외 조항에 걸리면 미달과 같다 · 🔴 걸리지 않음을 **확인한** 제외 조항은 충족한 요건 하나로 센다 (2026-10-29 같은 지시 — 학생이 통과한 조건을
      점수에 넣지 않던 자리) · 판정 못 한 제외 조항은 세지 않는다(모르는 것을 분모에 넣어 깎지 않는다 — '틀린 안심'도 '틀린 미달'도 아니다) */
   for (const line of exLines) {
+    if (HEADCOUNT_RULE.test(line) && !/제외|불가/.test(line)) continue;
     const { conds } = parseLine(line, true);
     let passed = 0, failed = false;
     for (const c of conds) {

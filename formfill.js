@@ -81,6 +81,7 @@ function openFormFill(sch, file) {
   if (!e) return;
   const { rel, F } = e;
   ffCur = { sch, file, rel, F, from: (typeof currentScreen !== 'undefined' && currentScreen) || 'applications' };
+  if (typeof trackUse === 'function') trackUse('form_open', sch.id);   // 이용 횟수(usage-report.js)
   const saved = ffSaved(sch, rel);
   const pagesHtml = F.pages.map((pg) => {
     const fields = F.fields.filter((f) => f.page === pg.n);
@@ -132,6 +133,7 @@ function ffSet(fid, value, fromEl) {
   const k = ffKey(ffCur.sch, ffCur.rel);
   state.formFills[k] = state.formFills[k] || {};
   state.formFills[k][fid] = value;
+  if (typeof trackUse === 'function') trackUse('form_edit', ffCur.sch.id);   // 한 페이지에 한 번만 센다
   for (const el of $$(`[data-fid="${fid}"]`)) if (el !== fromEl && 'value' in el && el.tagName === 'INPUT') el.value = value;
   clearTimeout(ffSet.t);
   ffSet.t = setTimeout(() => saveState(), 250);

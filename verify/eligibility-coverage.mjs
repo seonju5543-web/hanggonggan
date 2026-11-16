@@ -91,6 +91,42 @@ export function traitTotals(cov) {
   return [...sum.entries()].sort((a, b) => b[1] - a[1]);
 }
 
+/* 가상 학생 셋의 카드·줄 판정 분포 (2026-11-15 · 1단계 '측정') — 파서를 고칠 때마다 '모름 n → m' 으로 비교하는 자. 앱 함수(fitDetail·requirementLines)를 그대로 부른다.
+   학생 셋은 10-24~11-11 분석에 쓴 것과 같다(완전한 학생 · 약한 학생 · 이과) — 바꾸면 추이가 끊긴다. ※ 참고 줄(aside)은 분모가 아니라 세지 않는다. 숫자는 경고로만 쓴다(실데이터 고정 검사 금지) */
+const BASE_STUDENT = { school: '한국외국어대학교', campus: '', track: 'humanities', major: '영어학과', year: 3, status: '재학', gpa: 3.8, bracket: 5, credits: 15, region: '서울', parentRegion: '서울', nationality: 'korean', birthYear: 2004, flags: [], common: {}, scholarships: [] };
+export const STUDENTS = {
+  '완전(외대3)': BASE_STUDENT,
+  '약한(경희1)': { ...BASE_STUDENT, school: '경희대학교', major: '경영학과', track: 'social', year: 1, gpa: 2.0, bracket: 10, credits: 10, region: '제주', parentRegion: '제주' },
+  '이과(연세2)': { ...BASE_STUDENT, school: '연세대학교', major: '기계공학과', track: 'engineering', year: 2, gpa: 3.2, bracket: 3, region: '부산', parentRegion: '부산' },
+};
+export function verdictDist(items, students = STUDENTS) {
+  const live = (items || []).filter((s) => !s.program && open(s.deadline));
+  const out = {};
+  for (const [name, p] of Object.entries(students)) {
+    const r = { cards: live.length, unread: 0, fail: 0, full: 0, partial: 0, lines: 0, ok: 0, no: 0, unknown: 0, noCond: 0 };
+    for (const s of live) {
+      const fd = ME.fitDetail(s, p);
+      if (fd.unread) r.unread += 1; else if (fd.fails.length) r.fail += 1; else if (fd.unknown === 0) r.full += 1; else r.partial += 1;
+      for (const it of ME.requirementLines(s, s.eligibilityLines || [], { withMeta: true, all: true })) {
+        if (it.aside) continue;
+        r.lines += 1;
+        const one = ME.fitDetail({ eligibilityLines: [it.text], eligibility: {} }, p);   // 줄 하나의 판정 — 앱이 쓰는 그 함수로(규칙을 베끼지 않는다)
+        const v = one.unread ? 'unknown' : one.fails.length ? 'no' : (one.met === one.total && one.total > 0) ? 'ok' : 'unknown';
+        r[v] += 1;
+        if (v === 'unknown') { let conds = []; try { conds = PR.parseLine(PR.untag(it.text), false).conds || []; } catch { /* 못 읽는 줄 */ } if (!conds.length) r.noCond += 1; }
+      }
+    }
+    out[name] = r;
+  }
+  return out;
+}
+export const verdictBrief = (dist) => {
+  const names = Object.keys(dist); if (!names.length) return '';
+  const col = (k) => names.map((n) => dist[n][k]).join('/');
+  const a = dist[names[0]];
+  return `- 가상 학생 판정(마감 전 등록 ${a.cards}건 · ${names.join('/')}): 자격미확인 ${col('unread')} · 미달 ${col('fail')} · 전부충족 ${col('full')} · 일부/모름 ${col('partial')} · 자격 줄 ${a.lines}개 중 모름 ${col('unknown')} (${names.map((n) => (dist[n].lines ? Math.round(dist[n].unknown * 100 / dist[n].lines) : 0) + '%').join('/')}) · 조건 못 집음 ${col('noCond')}`;
+};
+
 const top = (m, n = 99) => [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, n).map(([k, v]) => `${k} ${v}`).join(' · ');
 
 if (process.argv[1] && new URL(`file://${process.argv[1]}`).href === import.meta.url) {
@@ -104,6 +140,7 @@ if (process.argv[1] && new URL(`file://${process.argv[1]}`).href === import.meta
     const over = totals.filter(([k, n]) => !asked.has(k) && n >= 4).map(([k, n]) => `${k} ${n}`);
     const flag = (under.length || over.length) ? ` · ⚠️ 온보딩 질문 목록 손볼 때 — 4곳 미만인데 묻는 것: ${under.join(', ') || '없음'} · 4곳 이상인데 안 묻는 것: ${over.join(', ') || '없음'}` : '';
     console.log(`- 자격 줄 전수: 공고 ${Object.values(cov).map((s) => s.notices).join('/')} · 조건을 하나도 못 읽는 줄 ${Object.values(cov).map((s) => s.noCond.size).join('/')} (등록/재단/활동 · 합 ${noCondTotal}) · 처지 상위 ${totals.slice(0, 5).map(([k, n]) => `${k} ${n}`).join(', ')}${flag}`);
+    console.log(verdictBrief(verdictDist(reg)));   // 둘째 줄 — 가상 학생 셋의 카드·줄 판정 분포(1단계 측정)
     process.exit(0);
   }
   for (const [name, s] of Object.entries(cov)) {

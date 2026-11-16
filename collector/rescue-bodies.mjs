@@ -29,7 +29,7 @@ import { htmlToLines } from './html-text.mjs';
 import { htmlBodyImages, detailAttachments, BUTTON_WORD } from './attachment-link.mjs';
 import { chromium } from 'playwright';
 import { createRequire } from 'node:module';
-import { indexTexts, hasText, canonUrl, MIN_BODY, sourceFor } from './notice-source.mjs';
+import { indexTexts, hasText, canonUrl, MIN_BODY, sourceFor, fallbackIsThisNotice } from './notice-source.mjs';
 import { makeStripper } from './page-boilerplate.mjs';
 import { withDeadline, TIMED_OUT, makeBudget } from './harvest-budget.mjs';
 import { readLinkFixes, humanFixUrlBy } from './link-fixes-read.mjs';
@@ -316,8 +316,10 @@ for (const t of targets) {
        그래서 대안은 '브라우저를 더 잘 위장한다'가 아니라 '막히면 다른 길로 간다'이다 —
        브라우저가 필요했던 이유(본문을 JS로 그린다)와 봇 차단은 서로 다른 문제이고,
        봇 차단이 걸린 게시판은 대개 서버가 완성된 HTML을 준다. */
+    let fellBack = false;
     if (BOT_WALL.test(text) || BOT_WALL.test(String(finalUrl))) {
       report.push(`- 🤖 ${t.it.name.slice(0, 36)} — 브라우저가 봇 차단에 걸려 일반 내려받기로 물러섬`);
+      fellBack = true;
       try {
         const res = await fetch(openUrl, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(20000) });
         if (res.ok) {
@@ -342,7 +344,8 @@ for (const t of targets) {
        여기에 규칙을 한 벌 더 두면 "재수집기는 됐다는데 발췌기는 못 읽는" 어긋남이 생긴다. */
     /* 게시판에서 내려간 공고는 '못 받은 것'이 아니라 '없어진 것'이다 — 섞으면
        영영 다시 받으려 애쓴다. 건국대 총동문회 장학생이 실제로 이 상태였다. */
-    if (/게시물이?\s*\(?가?\)?\s*존재\s*하지\s*않|삭제된?\s*게시물|없는 게시물/.test(text)) {
+    /* `삭제된글 · 삭제자 · 삭제사유` 꼴(게시판이 글 자리에 남기는 안내)도 내려간 글이다(2026-11-15 · 1단계 B5 — 100자를 넘어 '본문 확보'로 적혔다) */
+    if (/게시물이?\s*\(?가?\)?\s*존재\s*하지\s*않|삭제된?\s*게시물|없는 게시물|삭제된\s?글|삭제\s?사유|관리자\s?삭제/.test(text)) {
       gone += 1;
       ledger[key] = ledgerEntry(ledger[key], 'gone', { today, minBody: MIN_BODY, name, restAfter: REST_AFTER });   // 칸 = { tries: REST_AFTER, gone: true, … } · 지난 확보 날짜는 이어 둔다(리뷰 R5)
       report.push(`- 🗑 **${t.it.name.slice(0, 40)}** — 게시판에서 내려갔습니다(삭제된 공고). 등록 목록에서 뺄지 검토가 필요합니다.`);
@@ -361,7 +364,11 @@ for (const t of targets) {
        한 쪽뿐이라 아무것도 못 배워 **여기서는 '본문 확보', 발췌기에서는 '껍데기'** 로 갈린다
        (의암 손병희: 163자 vs 85자 실측). 같은 말뭉치여야 같은 판정이다. */
     const probe = indexTexts(texts, { ...bodies, [t.url]: entry });
-    const ok = text && hasText(probe.byUrl.get(key) || entry);
+    /* 🔴 봇 차단 뒤 물러서서 받은 화면은 **그 글인지** 한 번 더 본다(notice-source fallbackIsThisNotice 한 곳 · 2026-11-15 · 1단계 B5) — 메뉴·목록 화면을
+       '본문 확보'로 적으면 발췌기는 영영 빈 자격을 읽고 로봇은 이레를 쉰다. 다른 등록 공고 제목이 셋 이상 보이면 목록이다 */
+    const same = fellBack ? fallbackIsThisNotice(text, t.it.name, reg.items.filter((x) => x !== t.it).map((x) => x.name)) : { ok: true };
+    if (fellBack && !same.ok) report.push(`- 🚧 ${t.it.name.slice(0, 36)} — 물러서서 받은 화면이 이 글이 아니다(${same.why}) · 본문으로 적지 않음`);
+    const ok = text && same.ok && hasText(probe.byUrl.get(key) || entry);
 
     if (ok) {
       bodies[t.url] = entry;

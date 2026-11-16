@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>한대장 아침 지표</title>
+  <!-- 아침 지표 (2026-11-15 · 은서) — 매일 아침 이 한 장을 보고 업무를 시작한다: 이용 횟수(누가는 없음 · 5건 미만 가림) · 앱 오류 · 로봇 경보.
+       관리자 사이트와 같이 Cloudflare Access 뒤에 있다(팀만 연다). 이용 횟수는 Supabase 보고서 열쇠가 있어야 나온다(이 기기에만 저장).
+       🔴 script-src 는 self 뿐 — 인라인 스크립트·onclick 금지. Supabase 주소는 아래 connect-src 와 vendor/supabase-config.js 가 같아야 한다(관문 대조). -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://ffnzmiorcojbhpqwqgcy.supabase.co; object-src 'none'; base-uri 'self'; form-action 'none'" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+  <link rel="stylesheet" href="admin.css" />
+  <style>
+    /* 아침 지표 — 관리자 화면과 같은 토큰(admin.css :root) · 색은 조금만: 타일 왼쪽 띠 · 오류 빨강/초록 · 경보 점 (2026-11-15 은서) */
+    body { background: var(--bg); }
+    .mo { max-width: 1040px; margin: 0 auto; padding: var(--space-32) var(--space-16) 64px; color: var(--text); }
+    .mo-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-12); flex-wrap: wrap; margin-bottom: var(--space-20); }
+    .mo-head h1 { font-size: 24px; font-weight: 700; margin: 0; }
+    .mo-when { font-size: 13px; color: var(--accent); background: var(--accent-soft); border-radius: var(--radius-pill); padding: var(--space-4) var(--space-12); }
+    .mo-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: var(--space-20); margin-bottom: var(--space-16); }
+    .mo-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-12); margin: 0 0 var(--space-16); }
+    .mo-row h2 { font-size: 16px; font-weight: 700; margin: 0; }
+    .mo h3 { font-size: 12px; font-weight: 600; color: var(--text-sub); margin: 0 0 var(--space-8); }
+    .mo select { font: inherit; font-size: 13px; padding: var(--space-6) var(--space-8); border: 1px solid var(--line); border-radius: var(--radius-xs); background: var(--surface); color: var(--text); }
+    .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-12); }
+    .tile { border: 1px solid var(--line); border-left: 3px solid var(--primary); border-radius: var(--radius-xs); padding: var(--space-12) var(--space-16); display: grid; gap: var(--space-4); }
+    .tile.t-reach { border-left-color: var(--accent); }
+    .tile.t-apply { border-left-color: var(--green); }
+    .tile.t-err { border-left-color: var(--red); }
+    .tile.t-ok { border-left-color: var(--green); }
+    .tile span { font-size: 12px; color: var(--text-sub); }
+    .tile b { font-size: 26px; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; }
+    .tile em { font-style: normal; font-size: 12px; color: var(--text-weak); font-variant-numeric: tabular-nums; }
+    .tile.t-err b { color: var(--red); }
+    .tile.t-ok b { color: var(--green); }
+    .note { font-size: 12px; color: var(--text-weak); margin: var(--space-12) 0 0; }
+    .mo table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+    .mo th { font-size: 12px; font-weight: 600; color: var(--text-sub); background: var(--surface-2); text-align: left; padding: var(--space-8) var(--space-12); }
+    .mo td { padding: var(--space-8) var(--space-12); border-bottom: 1px solid var(--line); vertical-align: top; }
+    .mo tr:last-child td { border-bottom: 0; }
+    .mo th.n, .mo td.n { text-align: right; width: 76px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .mo td.name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .mo td.dim { color: var(--text-weak); }
+    .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-20); }
+    .err-grid { display: grid; grid-template-columns: 200px 1fr; gap: var(--space-16); align-items: start; }
+    @media (max-width: 640px) { .err-grid { grid-template-columns: 1fr; } }
+    .alerts { list-style: none; margin: 0; padding: 0; }
+    .alerts li { display: flex; align-items: baseline; gap: var(--space-8); padding: var(--space-8) 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+    .alerts li:last-child { border-bottom: 0; }
+    .alerts li::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--red); transform: translateY(-1px); }
+    .alerts li.ok::before { background: var(--green); }
+    .alerts li.muted::before { background: var(--text-weak); }
+    .alerts li.ok { color: var(--green); font-weight: 600; }
+    .muted { color: var(--text-weak); font-size: 12px; }
+    .links { display: flex; flex-wrap: wrap; gap: var(--space-8); margin-top: var(--space-16); }
+    .links a { font-size: 13px; color: var(--accent); background: var(--accent-soft); border-radius: var(--radius-pill); padding: var(--space-6) var(--space-12); text-decoration: none; }
+    .keybox { display: flex; gap: var(--space-8); margin: var(--space-12) 0 0; }
+    .keybox input { flex: 1; font: inherit; padding: var(--space-8) var(--space-12); border: 1px solid var(--line); border-radius: var(--radius-xs); }
+    .keybox button { font: inherit; padding: var(--space-8) var(--space-16); border: 0; border-radius: var(--radius-xs); background: var(--primary); color: #fff; cursor: pointer; }
+    /* 폰 — 맨 끝에 둔다(앞 규칙을 덮어야 한다) */
+    @media (max-width: 640px) {
+      .mo-card { padding: var(--space-16) var(--space-12); }
+      .tiles { gap: var(--space-8); }
+      .tile { padding: var(--space-8) var(--space-8) var(--space-8) var(--space-12); }
+      .tile b { font-size: 20px; }
+      .tile span, .tile em { font-size: 11px; }
+      .mo table { font-size: 12px; }
+      .mo th, .mo td { padding: var(--space-6) var(--space-6); }
+      .mo th.n, .mo td.n { width: 40px; }
+      #mo-items th.n { font-size: 11px; white-space: normal; word-break: break-all; line-height: 1.2; }
+      .cols td.n { width: 64px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="mo">
+    <header class="mo-head"><h1>아침 지표</h1><span class="mo-when" id="mo-when">불러오는 중…</span></header>
+
+    <section class="mo-card" id="mo-key" hidden>
+      <div class="mo-row"><h2>보고서 열쇠</h2></div>
+      <p class="muted">Supabase SQL Editor 에서 <code>0007_usage_counts.sql</code> 을 실행하면 마지막에 열쇠가 나옵니다. 여기에만 붙여넣으세요(이 기기에만 저장 · 채팅·저장소에 붙여넣지 마세요).</p>
+      <div class="keybox"><input id="mo-key-in" type="password" autocomplete="off" placeholder="아침 지표 열쇠" /><button id="mo-key-save" type="button">저장</button></div>
+    </section>
+
+    <section class="mo-card">
+      <div class="mo-row"><h2>어제 숫자</h2><select id="mo-days" aria-label="기간"><option value="7">최근 7일</option><option value="30">최근 30일</option></select></div>
+      <div class="tiles" id="mo-tiles"></div>
+      <p class="note">누가 했는지는 모으지 않습니다 · 하루 단위 합계 · 카테고리별 5건 미만은 가립니다.</p>
+    </section>
+
+    <section class="mo-card">
+      <div class="mo-row"><h2>많이 본 공고</h2><span class="muted">기간 합계</span></div>
+      <table><thead><tr><th>공고</th><th class="n">상세</th><th class="n">저장</th><th class="n">원문</th><th class="n">준비</th><th class="n">제출</th></tr></thead><tbody id="mo-items"></tbody></table>
+    </section>
+
+    <section class="mo-card">
+      <div class="mo-row"><h2>카테고리별</h2><select id="mo-ev" aria-label="행동"></select></div>
+      <div class="cols">
+        <div><h3>학년 × 계열</h3><table><tbody id="mo-g-gt"></tbody></table></div>
+        <div><h3>지역</h3><table><tbody id="mo-g-rg"></tbody></table></div>
+        <div><h3>학교</h3><table><tbody id="mo-g-sc"></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="mo-card">
+      <div class="mo-row"><h2>앱 오류</h2><span class="muted">학생 폰에서 난 오류</span></div>
+      <div class="err-grid">
+        <div id="mo-err-tiles"></div>
+        <div><h3>최근 24시간 많이 난 오류</h3><table><thead><tr><th>오류</th><th style="width:110px">파일</th><th class="n">횟수</th></tr></thead><tbody id="mo-err-top"></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="mo-card">
+      <div class="mo-row"><h2>로봇 경보</h2><span class="muted">지금 열려 있는 것</span></div>
+      <ul class="alerts" id="mo-alerts"></ul>
+      <div class="links">
+        <a href="https://github.com/seonju5543-web/hanggonggan/actions/workflows/rollback.yml" target="_blank" rel="noopener">직전 판으로 되돌리기</a>
+        <a href="https://github.com/seonju5543-web/hanggonggan/blob/claude/nice-heisenberg-WESq5/docs/backend/%EC%82%AC%EA%B3%A0-%EB%8C%80%EC%9D%91.md" target="_blank" rel="noopener">사고 대응 한 장</a>
+        <a href="./">관리자 화면</a>
+      </div>
+    </section>
+  </main>
+  <script src="morning-off.js"></script>
+  <script src="vendor/supabase-config.js"></script>
+  <script src="vendor/usage-report.js"></script>
+  <script src="morning.js"></script>
+</body>
+</html>

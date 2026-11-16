@@ -1,7 +1,31 @@
 {
  "school": "서울시립대학교",
- "updatedAt": "2026-11-15",
+ "updatedAt": "2026-11-16",
  "items": [
+  {
+   "title": "\"자연재난과 공공재 선택에 관한 실험\"에 대한 서울시립대학교 연구참여자 추가 모집공고",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31847&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-16",
+   "postId": "31847",
+   "kind": "생활",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-16",
+   "desc": "경제학부 본 연구에 참여하실 연구참여자를 모집합니다. (IRB 승인번호: KHGIRB-26-221(NA) ) 연구 과제: 자연재난과 공공재 선택에 관한 실험 연구 목적: 본 연구는 자연재해 발생 가능성에 대비해…"
+  },
+  {
+   "title": "[공고] 2027학년도 수시모집 면접평가 시행에 따른 캠퍼스 및 건물 출입 통제",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31798&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-16",
+   "postId": "31798",
+   "kind": "생활",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-16",
+   "desc": "입학관리과 서울시립대학교 공고 제 2026 – 522 호 「 2027 학년도 수시모집 학생부종합전형 면접평가 」 시행과 관련하여 원활한 입학 전형 진행을 위해 출입이 허가된 사람 ( 수험생 및 면접 평가 관계자 등…"
+  },
   {
    "title": "제18회 공과대학 창의적 공학수학 경시대회 수상자 안내",
    "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31844&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
@@ -440,28 +464,6 @@
    "foundAt": "2026-10-30",
    "thumb": "data/news/img/3ffa37e5e81c5638.webp",
    "desc": "안녕하세요, 서울시립대학교 나비스트 프로젝트 UOS-Upcycling Lab 팀 입니다! 사용하지 않지만 버리기 아까웠던 물건, 하나쯤 있으신가요?"
-  },
-  {
-   "title": "웹메일 계정 보안강화를 위한 일회용인증(OTP) 설정 안내드립니다.",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31767&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-30",
-   "postId": "31767",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-10-30"
-  },
-  {
-   "title": "모바일 학생증 접속 불가 안내(10/30, 금, 18:00~22:00)",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31765&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-29",
-   "postId": "31765",
-   "kind": "학사",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-10-29",
-   "desc": "※ 진행상황에 따라 작업시간 변동가능 이용에 양해 부탁드립니다. 감사합니다. # 모바일 학생증 # 모바일 ID 앱"
   }
  ]
 }

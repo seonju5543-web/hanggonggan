@@ -253,6 +253,7 @@ function toggleSave(id) {
     const act = isActivityId(id) ? findActivity(id.slice(4)) : null;
     state.saved.push(act ? { id, savedAt: nowStamp(), snap: JSON.parse(JSON.stringify(act)) } : { id, savedAt: nowStamp() });
     saveState();
+    if (typeof trackUse === 'function') trackUse('save', isActivityId(id) ? id.slice(4) : id);
     toast('보관함에 저장했어요', { label: '보관함', run: () => showScreen('my') });
   }
   refreshSaveViews(id);
@@ -443,11 +444,12 @@ function cardOrgLine(sch) {
    윗줄 = 갈래 칩 + 주최(알 때만) + 적합도 알약 · 제목은 지우고 나누기만 · 핵심 한 줄은 장학 「금액 · …」 / 활동 「대상 · …」 · 마감은 아랫줄 그대로(옛 결정).
    🔴 글자를 더하지 않는다 — 칩 이름 여섯과 이름표 셋(금액·대상·접수)만 앱의 말이고 나머지는 원문이다. */
 const KIND_CHIP_CLS = { '교내': 'badge-in', '교외': 'badge-out' };
+const ACT_CHIP_CLS = { '공모전': 'badge-kind badge-contest', '봉사': 'badge-kind badge-vol', '청년정책': 'badge-kind', '대외활동': 'badge-kind badge-act' };   // 청년정책은 회색 그대로(시안에 없던 갈래)
 /* 갈래 칩 — 장학은 교내/교외, 활동은 공모전·봉사·청년정책·대외활동(출처·분야로 · 판정은 activity-kind 그대로) */
 function kindChip(x) {
   if (isActivityItem(x)) {
     const label = x.kind === '공모전' ? '공모전' : x.api === 'youthPolicy' ? '청년정책' : (x.field === '봉사' || x.api === 'vol1365') ? '봉사' : '대외활동';
-    return { label, cls: 'badge-kind' };
+    return { label, cls: ACT_CHIP_CLS[label] };   // 갈래 색(2026-11-15 승인 시안 1)
   }
   const type = String(x.type || '').trim();
   return { label: type ? `장학 · ${type}` : '장학', cls: `badge-kind${KIND_CHIP_CLS[type] ? ' ' + KIND_CHIP_CLS[type] : ''}` };
@@ -483,15 +485,6 @@ function cardTitleParts(sch) {
   const raw = String(sch.name || '').trim().replace(/^\s*(\S{2,8})\s+(?=[[【]\s*\1\s*[\]】])/, '').replace(/^공통\s+(?=\d)/, '');   // 「공통 2026-2학기 …」 — 게시판 분류(공통/학부/대학원) 머리말 · 해 앞에 선 것만(실측 경희대)
   /* 🔴 장학 제목의 괄호는 떼지 않는다 — 장학 카드엔 「대상 · …」 줄이 없어 뗀 글자가 갈 자리가 없다(지우기가 된다 · 리뷰 2026-11-02). 끝 마침표만 */
   return { title: cleanCardTitle(raw).replace(/\.\s*$/, '').trim(), who: [] };
-}
-/* 활동 글 — 제목에서 뗀 대상 + 발췌 「대상」(없으면 첫 자격 줄) 을 「대상 · …」 한 줄로(겹치면 한 번) */
-function activityWhoLine(n, parts) {
-  const first = (n.eligibilityLines || []).find((l) => !/제외|불가|아닌|없는/.test(String(l))) || '';   // 제외·불가 문장은 대상이 아니다(리뷰 2026-11-02)
-  const ex = ((n.excerpts || []).find((x) => x.label === '대상') || {}).text || first;
-  const bits = [...parts.who, unent(String(ex || '')).replace(/\s+/g, ' ').trim()].filter(Boolean);
-  const out = [];
-  for (const b of bits) if (!out.some((o) => o.replace(/\s/g, '').includes(b.replace(/\s/g, '')))) out.push(b);
-  return out.join(' · ');
 }
 /* 핵심 한 줄(장학) — 금액을 읽었으면 「금액 · 200만원」, 층2 재단이 적어 둔 긴 금액은 옅게, 못 읽었으면 줄 없음(「금액 원문 확인」 글자를 카드에 남기지 않는다) */
 function amountLine(sch) {
@@ -600,6 +593,7 @@ function recordSubmitted(sch) {
   if (!confirm(`${officialChannel(sch).label}에서 공식 제출을 마치셨나요?\n\n제출 완료로 기록하면 진행 단계가 '공식 제출'로 넘어가요.`)) return;
   app.submittedAt = nowStamp();
   saveState();
+  if (typeof trackUse === 'function') trackUse('submitted', sch.id);
   /* 손끝에도 한 번 (2026-09-09). 여기까지만 울린다 — 진동은 **되돌리기 어려운 일이 방금
      일어났다**는 신호로만 쓴다(저장·새로고침·이 기록 셋). 화면이 바뀔 때마다 울리면
      알림처럼 느껴져서 학생이 폰 설정에서 앱 진동을 통째로 꺼 버린다. */
@@ -2692,6 +2686,7 @@ function renderFormFill(restore) {
       const existing = state.applications.find((a) => a.id === sch.id);
       if (existing) { existing.pending = false; existing.formAns = formFill.ans; existing.appliedAt = nowStamp(); }
       else state.applications.push({ id: sch.id, name: sch.name, appliedAt: nowStamp(), step: 0, formAns: formFill.ans, pending: false, prep: {} });
+    if (typeof trackUse === 'function') trackUse('prep', sch.id);
       saveState();
       const ch = officialChannel(sch);
       /* 문서의 성격대로 말한다 (리뷰 2026-10-13) — 모르는 공고에 '양식·입력 칸이 있다'고 단정하지 않는다 */
@@ -3577,6 +3572,53 @@ function renderActivityGate() {
   $$('#in-act-kinds input').forEach((cb) => (cb.checked = (p.interestKinds || []).includes(cb.value)));
   fillInterestFields(p.interestFields || []);
   $('#act-gate-cancel').hidden = !actGateEditing;
+  /* 「내 정보」 — 장학금 학적정보에서 온 한 줄(학교·학년·학적) + 활동 글이 묻는 칸들 */
+  $('#act-gate-me').textContent = [[p.school, p.campus].filter(Boolean).join(' '), p.year ? p.year + '학년' : '', p.status].filter(Boolean).join(' · ');
+  drawActivityAsk(true);
+}
+
+/* ── 대외활동 관문 「내 정보」 (2026-11-15 개발자 지시 — "장학금 학적정보 입력이 대외활동 적합도·자격요건 매칭에 연동되게 ·
+   정보 입력 다각화 … 장학금과 연동") ──
+   활동 카드의 적합도는 처음부터 장학금과 **같은 프로필·같은 엔진**(activityFit → evaluateFor)으로 잰다. 다만 관문이 종류·분야 둘만 물어
+   그 사실이 안 보였고, 활동 글이 자주 묻는 칸(태어난 해·거주지·봉사 실적…)이 비어 있으면 그 줄은 판정되지 않았다.
+   그래서 관문이 **지금 보이는 활동 글의 자격 줄이 실제로 쓰는 학적정보 칸**을 같이 보이고 받는다 — 저장하는 곳은 장학금과 같은 프로필 칸이다
+   (birthYear·region·traits… · 새 칸을 만들지 않는다 → 여기서 적으면 장학금 적합도에도, 학적정보에서 적으면 여기에도 쓰인다).
+   🔴 칸 목록을 손으로 적지 않는다 — 공고 안 「미확인 자격」과 같은 탐침(elig-ask askableForSch)을 **묻는 칸을 비운 프로필**로 돌려 센다.
+      글이 바뀌면 묻는 칸도 저절로 바뀐다. 한 곳만 쓰는 칸(혜택 줄에 걸린 낱말 같은 잡음)은 안 묻는다(ACT_ASK_MIN).
+   🔴 처지(예/아니요)는 여기서 안 묻는다 (2026-11-15 리뷰) — 활동 글은 혜택·태그 줄(「1365 자원봉사시간 부여」·「#공모전」)이 처지 요건으로 읽히는 잡음이 있어
+      「아니요」가 틀린 미달을 만든다. 처지는 공고 안 「미확인 자격」과 온보딩이 묻는다.
+   🔴 줄마다 조건 종류가 읽는 칸만 찔러 본다(elig-ask probeKeysFor) — 전부 찔러 보면 화면이 몇 초 멈춘다(리뷰 실측).
+   ponytail(옛 메모): 관문을 그릴 때 한 번 (보이는 글 × 자격 줄 × 칸) 탐침 — 글 100건에 1만 번 안팎. 글이 천 건대로 늘면 수집 로봇이 세어 싣는 쪽으로 옮긴다. */
+const ACT_ASK_MIN = 2;
+let actAskMemo = null;   // { src, who, keys } — 같은 글 목록·같은 학적(묻는 칸을 비운 프로필)이면 다시 세지 않는다
+function activityAskKeys() {
+  const p = state.profile;
+  if (!p || !liveActivities || typeof askableFields !== 'function') return [];
+  const blank = Object.assign({}, p, { traits: {} });
+  Object.keys(FIELD_PROBE).forEach((k) => { blank[k] = null; });
+  const who = JSON.stringify(blank);
+  if (actAskMemo && actAskMemo.src === liveActivities && actAskMemo.who === who) return actAskMemo.keys;
+  const n = new Map();
+  for (const it of activitiesForMe()) {
+    const sch = activityAsSch(it);
+    const hit = new Set();
+    for (const line of sch.eligibilityLines) {
+      const only = probeKeysFor(line);
+      askableFields(line, blank, sch, only ? only.filter((k) => k.indexOf('trait:') !== 0) : Object.keys(FIELD_PROBE)).forEach((k) => hit.add(k));
+    }
+    hit.forEach((k) => n.set(k, (n.get(k) || 0) + 1));
+  }
+  const keys = [...n.entries()].filter(([k, c]) => c >= ACT_ASK_MIN && k.indexOf('trait:') !== 0).sort((a, b) => b[1] - a[1]).map(([k]) => k);
+  actAskMemo = { src: liveActivities, who, keys };
+  return keys;
+}
+/* force 없이 부르면 **빈 칸일 때만** 그린다 — 글 목록이 뒤늦게 와도 학생이 적던 값을 지우지 않는다(fillInterestFields 와 같은 규칙) */
+function drawActivityAsk(force) {
+  const box = $('#act-gate-ask');
+  if (!box || (!force && box.children.length)) return;
+  box.innerHTML = eligAskRowsHtml(activityAskKeys());
+  box.hidden = !box.children.length;
+  eligAskWireTraits(box);
 }
 /* 관문이 열리면 목록·칩·검색·정렬을 감춘다 — 관문을 지나기 전에는 쓸 수 없다(지시 4) */
 function activityGateShow(on) {
@@ -3596,6 +3638,7 @@ function saveActivityGate() {
   const fields = $$('#in-act-fields input:checked').map((c) => c.value);
   state.profile.interestKinds = kinds;
   state.profile.interestFields = fields.length ? fields : null;
+  eligAskCollect($('#act-gate-ask'));   // 「내 정보」 — 장학금과 같은 프로필 칸에 적는다(2026-11-15)
   saveState();
   actGateEditing = false;
   renderActivities();
@@ -3611,7 +3654,7 @@ function renderActivities() {
   activityGateShow(gateOn);
   if (gateOn) {
     if (!actGateDrawn) { renderActivityGate(); actGateDrawn = true; }
-    else fillInterestFields();   // 분야 목록이 뒤늦게 와도 고른 것은 지킨다(인자 없이 = 체크 유지)
+    else { fillInterestFields(); drawActivityAsk(); }   // 분야 목록·묻는 칸이 뒤늦게 와도 고른 것은 지킨다(인자 없이 = 체크 유지)
     return;
   }
   actGateDrawn = false;
@@ -3721,9 +3764,9 @@ function activityFit(n) {
 function activityCardHtml(n) {
   const m = activityFit(n);
   const d = n.deadline ? dday(n.deadline) : null;
-  /* 시안 B (2026-11-02) — 윗줄은 칩(봉사·대외활동·공모전·청년정책) + 주최 · 핵심 한 줄은 「대상 · …」(제목에서 뗀 괄호 + 발췌 대상) · 혜택·분야 줄은 시트로 */
+  /* 2026-11-15 개발자 결정("밑에 대상은 아예 빼버리고 시안 1로 · 간결하고 모던하게") — 윗줄 색 칩 + 주최 · 제목 · 아랫줄은 마감과 원문 아이콘뿐.
+     대상·혜택·분야는 시트가 말한다(제목에서 뗀 괄호 대상도 시트 「공고 안내」로 간다 — openActivityDetail) · 시안 docs/designs/mockups/activity-card-options.html */
   const parts = splitTitleWho(activityTitle(n));
-  const who = activityWhoLine(n, parts);
   return cardShellHtml({
     save: saveBtnHtml(`act:${n.url}`),   // 장학 카드와 같은 북마크(카드 바깥 · 2026-10-02)
     attrs: `data-activity="${esc(n.url)}"`,
@@ -3734,7 +3777,7 @@ function activityCardHtml(n) {
        아무 말도 안 하는 배지가 됐다. 장학 카드의 '자격 미확인'은 그대로다. ⚠️ 2026-11-07 부터 시트도 자격 0줄이면 「지원 자격」 칸을 안 그리므로(sheetSectionsHtml) 활동 글은 모른다는 사실을 어디서도 말하지 않는다 — 개발자 지시. */
     badge: fitVerdict(m.fit, m.fd) === 'unread' ? '' : cardBadgeHtml(m.fit, m.fd, null),
     name: parts.title,
-    foot: who ? `대상 · ${who}` : '',
+    foot: '',
     footKnown: false,
     due: d ? ddayWords(d) : '',
     urgent: !!d && d.days >= 0 && d.days <= 7,
@@ -3774,6 +3817,8 @@ function activityLinkHtml(n) {
 }
 
 function openActivityDetail(url) {
+  if (typeof trackUse === 'function') trackUse('detail', url);   // 이용 횟수 — 주소는 보내지 않고 지문으로(usage-report.js)
+  { const dsh = document.getElementById('detail-sheet'); if (dsh) dsh.dataset.useItem = url; }
   const n = activityItem(url);   // 피드에서 빠졌어도 저장해 둔 글이면 사본으로 연다
   if (!n) return;
   const { sch, result, fit, fd } = activityFit(n);
@@ -3782,7 +3827,8 @@ function openActivityDetail(url) {
   /* 「대상」 발췌는 자격 줄이 있으면 위 「지원 자격」이 이미 보여 준다 — 같은 A·B·C 조건이 「모집 안내」에 한 번 더 떴다(쇼미더임팩트 · 2026-10-16 개발자 지적) */
   const rows = (n.excerpts || []).filter((x) => x.label !== '혜택' && x.label !== '모집기간' && !(x.label === '대상' && (n.eligibilityLines || []).length));   // 모집기간은 「접수 · 기간」 줄이 말한다(승인 시안 2026-11-02)
   const parts = splitTitleWho(activityTitle(n));
-  const who = activityWhoLine(n, parts);
+  /* 제목에서 뗀 괄호 대상 — 카드에 대상 줄이 없어(2026-11-15) 여기가 그 글자가 남는 유일한 자리다. 자격 줄이 이미 같은 말을 하면 한 번만 */
+  const titleWho = parts.who.filter((w) => !(n.eligibilityLines || []).some((l) => String(l).replace(/\s/g, '').includes(w.replace(/\s/g, ''))));
   /* 「접수 · 기간」 — 발췌 모집기간(없으면 기간 토막 deadlineHint)을 그대로 넘긴다 · 날짜만 있는 글은 applySectionHtml 이 마감으로 말한다(리뷰 2026-11-02 · 9건이 「원문 확인」으로 떴다) */
   const recruit = ((n.excerpts || []).find((x) => x.label === '모집기간') || {}).text || (n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? hintText(n.deadlineHint) : '');
   if (recruit) sch.period = unent(recruit);
@@ -3792,7 +3838,8 @@ function openActivityDetail(url) {
   sheetBack = null;   // 이 시트에는 돌아갈 곳이 없다 — 내리면 닫힌다
   $('#detail-sheet').innerHTML = `
     <div class="sheet-handle"></div>
-    <div class="sheet-body">
+    <div class="sheet-body act-sheet">
+      ${/* act-sheet — 활동 시트만의 표식(2026-11-15 은서: 활동 시트는 목록 앞 점 없이 · 장학 시트는 그대로 — style.css) */ ''}
       ${/* 승인 시안(2026-11-02) — 장학 시트와 같은 머리줄·절 다섯(sheetSectionsHtml). 짧은 혜택은 금액 자리, 긴 혜택·활동기간·지역·원문 줄은 「공고 안내」, 모집기간은 「접수 · 기간」.
            단추는 검정 하나 — 이름은 source-link.js 의 activityButton 자리(글 하나로 가는 주소만 신청하기 · 목록·홈페이지는 그 이름 그대로 · 2026-10-03 원문 링크 정직성). */ ''}
       ${sheetHeadHtml({ x: n, d, save: saveBtnHtml(`act:${n.url}`) })}
@@ -3800,7 +3847,7 @@ function openActivityDetail(url) {
       ${benefit && benefit.length <= 40 ? `<p class="sheet-amount">${esc(benefit)}</p>` : ''}
       ${sheetSectionsHtml({ sch, result, fit, fd, activity: n, noticeLines: [
         ...(benefit && benefit.length > 40 ? [`혜택: ${benefit}`] : []),
-        ...(!(n.eligibilityLines || []).length && parts.who.length ? [`대상: ${parts.who.join(' · ')}`] : []),   // 제목에서 뗀 조각만 — 발췌 「대상」은 아래 rows 가 적는다(리뷰 2026-11-02)
+        ...(titleWho.length ? [`대상: ${titleWho.join(' · ')}`] : []),   // 제목에서 뗀 조각만 — 발췌 「대상」은 아래 rows 가 적는다(리뷰 2026-11-02)
         ...rows.map((x) => `${x.label}: ${unent(x.text)}`),
         ...notice,
       ] })}
@@ -4072,6 +4119,7 @@ function finalizeApply(sch, docs) {
     existing.appliedAt = nowStamp();
   } else {
     state.applications.push({ id: sch.id, name: sch.name, appliedAt: nowStamp(), step: 0, docs, pending: false, prep: {} });
+    if (typeof trackUse === 'function') trackUse('prep', sch.id);
   }
   saveState();
   const ch = officialChannel(sch);
@@ -4510,6 +4558,7 @@ function bulkStart() {
     id: sch.id, name: sch.name, appliedAt: nowStamp(), step: 0, docs: null, pending: bulkNeedsWork(sch), prep: {},
   }));
   saveState();
+  if (typeof trackUse === 'function') go.forEach((sch) => trackUse('prep', sch.id));   // 일괄 신청 준비도 공고마다 한 번
   closeSheet();
   const goneMsg = gone.length ? ` · ${gone.length}건은 그 사이 마감돼 제외` : '';
   toast(need.length
@@ -4961,6 +5010,8 @@ function openDetail(id) {
   /* 대외활동 줄(달력·보관함)은 활동 시트로 — 같은 [data-detail] 길로 들어온다(2026-10-02) */
   if (isActivityId(id)) { openActivityDetail(id.slice(4)); return; }
   const sch = appSch(id);   // 데이터에서 내려갔어도 결과를 적기 전이면 떠 둔 사본으로 연다(2026-10-02)
+  if (typeof trackUse === 'function') trackUse('detail', id);   // 이용 횟수 — 누가는 안 담는다(usage-report.js)
+  { const dsh = document.getElementById('detail-sheet'); if (dsh) dsh.dataset.useItem = id; }
   if (!sch) return;
   const result = evaluateFor(sch, state.profile);   // 카드와 같은 판정을 쓴다(위 주석)
   const fit = fitScore(sch, result, state.profile);
@@ -5441,6 +5492,10 @@ function eligAskHtml(sch) {
   const keys = askableForSch(sch, state.profile);
   const mine = eligAsk && eligAsk.id === sch.id ? eligAsk : null;
   if (!keys.length && !mine) return '';        /* 물을 것이 없으면 자리도 안 만든다 */
+  /* 🔴 화면에 보일 자격 줄이 없으면 묻지도 않는다 (2026-11-15 개발자 재제보 — 실측 4건: 「지원 자격 — 미확인 자격 0」 만 남은 빈 칸).
+     질문 거리(askableForSch)는 **저장된 줄 전부**에서 잡고 화면 줄(requirementLines)은 서류 안내·※ 조각을 걸러서, 줄은 0개인데 질문만 남았다 —
+     답해도 바뀔 줄이 없다(답하면 칸이 통째로 사라졌다). 제외 줄(✗)만 있는 시트도 같다(리뷰). 관문 `verify-elig-ask.js` ⑩ */
+  if (!requirementLines(sch, null, { all: true }).length) return '';
   const open = !!(mine && mine.open);
   const shown = (mine && mine.shown) || requirementLines(sch, null, { all: true })
     .filter((l) => !requirementMatch(l, state.profile, sch));
@@ -5451,38 +5506,7 @@ function eligAskHtml(sch) {
       + ` data-elig-open="${esc(sch.id)}" aria-expanded="false">`
       + `맞춰 볼 자격 <b>${left}</b>${ELIG_CHEV}</button></div>`;   // 이름 「미확인 자격」 → 「맞춰 볼 자격」(2026-11-15 · 개발자 결정 11-02)
   }
-  const rows = keys.map((k) => {
-    const pv = state.profile || {};
-    /* 🔴 처지(trait) — 프로필에 칸이 없던 개인 사정은 **예/아니요**로 묻는다
-       (2026-09-18 개발자 지시: "평점 말고 개인적인 부분들"). 종류는 parse-requirements
-       의 TRAIT_PAT 이 정하고 칸 이름은 elig-ask 의 TRAIT_LABEL 이 갖는다 — 여기서 짓지 않는다. */
-    if (k.indexOf('trait:') === 0) {
-      const tk = k.slice(6);
-      const now = ((pv.traits || {})[tk]);
-      const yn = (v, lbl) => `<button type="button" class="elig-yn${now === v ? ' on' : ''}"`
-        + ` data-elig-trait="${esc(tk)}" data-elig-val="${v ? '1' : '0'}">${lbl}</button>`;
-      return `<div class="elig-ask-row elig-ask-yn"><span>${esc(TRAIT_LABEL[tk] || tk)}</span>`
-        + `<span class="elig-yn-pair">${yn(true, '예')}${yn(false, '아니요')}</span></div>`;
-    }
-    const f = FIELD_META[k];
-    const val = pv[k] != null ? String(pv[k]) : '';
-    const input = f.kind === 'select'
-      ? `<select class="elig-ask-in" data-elig-field="${k}"><option value=""></option>`
-        /* 선택지는 글자(`대한민국`) 또는 {value, label}(거주 기간 — 값은 개월 · elig-ask FIELD_META) */
-        + f.options.map((o) => {
-          const v = o && o.value != null ? String(o.value) : String(o);
-          const l = o && o.label != null ? o.label : o;
-          return `<option value="${esc(v)}"${v === val ? ' selected' : ''}>${esc(l)}</option>`;
-        }).join('')
-        + `</select>`
-      : `<input class="elig-ask-in" data-elig-field="${k}" value="${esc(val)}" placeholder="—"`
-        + (f.kind === 'number'
-          ? ` type="number" inputmode="decimal" step="${f.step}" min="${f.min}" max="${f.max}"`
-          : ' type="text"') + `>`;
-    return `<label class="elig-ask-row"><span>${esc(f.label)}</span>`
-      + `<span class="elig-ask-wrap">${input}`
-      + (f.suffix ? `<em>${esc(f.suffix)}</em>` : '') + `</span></label>`;
-  }).join('');
+  const rows = eligAskRowsHtml(keys);
   /* 🔴 **미확인 줄을 여기 다시 나열하지 않는다** (2026-09-18 실측으로 드러났다).
      위 자격 블록이 이미 그 줄들을 보여 주고 있어서, 펼치면 똑같은 줄이 회색으로
      한 번 더 나왔다 — 화면이 두 배로 길어지고 표처럼 어수선했다.
@@ -5504,6 +5528,77 @@ function eligAskHtml(sch) {
     + `</div>`;
 }
 
+/* 묻는 칸의 줄들 — **공고 안 「미확인 자격」 상자와 대외활동 관문 「내 정보」가 같은 그림**을 쓴다(2026-11-15 · 베끼면 두 벌).
+   값은 지금 프로필에서 읽어 채워 둔다 · 모으기는 eligAskCollect 한 곳 */
+function eligAskRowsHtml(keys) {
+  return keys.map((k) => {
+    const pv = state.profile || {};
+    /* 🔴 처지(trait) — 프로필에 칸이 없던 개인 사정은 **예/아니요**로 묻는다
+       (2026-09-18 개발자 지시: "평점 말고 개인적인 부분들"). 종류는 parse-requirements
+       의 TRAIT_PAT 이 정하고 칸 이름은 elig-ask 의 TRAIT_LABEL 이 갖는다 — 여기서 짓지 않는다. */
+    if (k.indexOf('trait:') === 0) {
+      const tk = k.slice(6);
+      const now = ((pv.traits || {})[tk]);
+      const yn = (v, lbl) => `<button type="button" class="elig-yn${now === v ? ' on' : ''}"`
+        + ` data-elig-trait="${esc(tk)}" data-elig-val="${v ? '1' : '0'}">${lbl}</button>`;
+      return `<div class="elig-ask-row elig-ask-yn"><span>${esc(TRAIT_LABEL[tk] || tk)}</span>`
+        + `<span class="elig-yn-pair">${yn(true, '예')}${yn(false, '아니요')}</span></div>`;
+    }
+    const f = FIELD_META[k];
+    const val = pv[k] != null ? String(pv[k]) : '';
+    /* data-elig-was — 이 칸이 **처음에 보인 값**. 저장 때 그대로면 프로필을 건드리지 않는다(eligAskCollect). 선택 칸은 선택지에 없는 옛 값이면 빈 칸으로 보이므로 빈 글자 */
+    const optVals = f.kind === 'select' ? f.options.map((o) => (o && o.value != null ? String(o.value) : String(o))) : null;
+    const was = optVals ? (optVals.includes(val) ? val : '') : val;
+    const input = f.kind === 'select'
+      ? `<select class="elig-ask-in" data-elig-field="${k}" data-elig-was="${esc(was)}"><option value=""></option>`
+        /* 선택지는 글자(`대한민국`) 또는 {value, label}(거주 기간 — 값은 개월 · elig-ask FIELD_META) */
+        + f.options.map((o) => {
+          const v = o && o.value != null ? String(o.value) : String(o);
+          const l = o && o.label != null ? o.label : o;
+          return `<option value="${esc(v)}"${v === val ? ' selected' : ''}>${esc(l)}</option>`;
+        }).join('')
+        + `</select>`
+      : `<input class="elig-ask-in" data-elig-field="${k}" data-elig-was="${esc(was)}" value="${esc(val)}" placeholder="—"`
+        + (f.kind === 'number'
+          ? ` type="number" inputmode="decimal" step="${f.step}" min="${f.min}" max="${f.max}"`
+          : ' type="text"') + `>`;
+    return `<label class="elig-ask-row"><span>${esc(f.label)}</span>`
+      + `<span class="elig-ask-wrap">${input}`
+      + (f.suffix ? `<em>${esc(f.suffix)}</em>` : '') + `</span></label>`;
+  }).join('');
+}
+/* 예/아니요 알약은 누르는 즉시 그 칸만 켠다 — 저장은 부르는 쪽 단추가 한 번에 한다 */
+function eligAskWireTraits(root) {
+  $$('[data-elig-trait]', root).forEach((b) => b.addEventListener('click', () => {
+    $$(`[data-elig-trait="${b.dataset.eligTrait}"]`, root).forEach((o) => { o.classList.remove('on'); delete o.dataset.eligPicked; });
+    b.classList.add('on');
+    b.dataset.eligPicked = '1';   // 학생이 **이번에 누른** 알약 — 처음부터 켜져 있던 것과 가른다(eligAskCollect)
+  }));
+}
+/* 그 줄들에 적힌 답을 프로필에 옮긴다(저장은 부르는 쪽이) — 처지는 **고른 것만**(안 고른 칸을 false 로 적으면 '아니요'라고 답한 것이 된다).
+   🔴 **학생이 건드린 칸만 적는다** (2026-11-15 리뷰). 대외활동 관문은 이미 답한 칸도 채워서 보이므로, 보인 값을 그대로 되적으면
+      ① 선택지에 없는 값(옛 글자)이 빈 칸으로 보였다가 null 로 지워지고 ② 관문을 그려 둔 사이 학적정보에서 고친 값을 옛 값으로 덮으며
+      ③ 온보딩이 받아 준 값(1945년생·19.5학점)이 이 칸의 범위로 깎인다. 처음 보인 값(data-elig-was)과 같으면 건너뛴다.
+   시·도를 바꾸면 짝 시·군·구를 비운다(다른 시·도의 구가 남지 않게 · elig-ask FIELD_META 의 city) · 본인 거주지면 「지금 주소 거주 기간」도(온보딩과 같은 규칙) */
+function eligAskCollect(root) {
+  const wrote = new Set();
+  $$('[data-elig-field]', root).forEach((el) => {
+    if (el.value === (el.dataset.eligWas || '')) return;
+    state.profile[el.dataset.eligField] = coerceField(el.dataset.eligField, el.value);
+    wrote.add(el.dataset.eligField);
+  });
+  wrote.forEach((k) => {
+    const city = (FIELD_META[k] || {}).city;
+    if (city && !wrote.has(city)) state.profile[city] = null;
+    if (k === 'region' && !wrote.has('residenceMonths')) state.profile.residenceMonths = null;
+  });
+  const picked = $$('[data-elig-trait].on[data-elig-picked]', root);
+  if (picked.length) {
+    state.profile.traits = Object.assign({}, state.profile.traits || {});
+    picked.forEach((b) => { state.profile.traits[b.dataset.eligTrait] = b.dataset.eligVal === '1'; });
+  }
+}
+
 /* innerHTML 을 채운 **뒤에** 배선한다 — openDetail 이 쓰는 방식 그대로.
    🔴 인라인 `onclick` 은 CSP(`script-src 'self'`)가 조용히 막는다(2026-09-09 boot.js). */
 /* reopen — 다시 그리는 길. 장학은 openDetail, 대외활동은 openActivityDetail(2026-10-01) — 묻기 상자는 한 벌이다 */
@@ -5522,24 +5617,12 @@ function eligAskWire(sch, reopen = () => openDetail(sch.id)) {
   /* 닫는 자리는 둘이다 — 머리줄(화살표)과 「나중에 하기」 */
   $$('[data-elig-close]', sheet).forEach((c) => c.addEventListener('click', () => redraw(false)));
   const s = $('[data-elig-save]', sheet); if (s) s.addEventListener('click', () => eligAskSave(sch, reopen));
-  /* 예/아니요는 누르는 즉시 그 칸만 켠다 — 저장은 아래 단추가 한 번에 한다 */
-  $$('[data-elig-trait]', sheet).forEach((b) => b.addEventListener('click', () => {
-    $$(`[data-elig-trait="${b.dataset.eligTrait}"]`, sheet).forEach((o) => o.classList.remove('on'));
-    b.classList.add('on');
-  }));
+  eligAskWireTraits(sheet);
 }
 
 function eligAskSave(sch, reopen = () => openDetail(sch.id)) {
   const sheet = $('#detail-sheet');
-  $$('[data-elig-field]', sheet).forEach((el) => {
-    state.profile[el.dataset.eligField] = coerceField(el.dataset.eligField, el.value);
-  });
-  /* 처지는 **고른 것만** 적는다 — 안 고른 칸을 false 로 적으면 '아니요'라고 답한 것이 된다 */
-  const picked = $$('[data-elig-trait].on', sheet);
-  if (picked.length) {
-    state.profile.traits = Object.assign({}, state.profile.traits || {});
-    picked.forEach((b) => { state.profile.traits[b.dataset.eligTrait] = b.dataset.eligVal === '1'; });
-  }
+  eligAskCollect(sheet);
   saveState();
   /* 적은 것이 **다른 공고에도 쓰이므로** 목록·홈도 다시 그린다 */
   renderHome();
@@ -6062,11 +6145,22 @@ function calDayHtml(iso) {
    저장한 공고를 모아 보는 자리. 🔴 **금액 합계를 내지 않는다** — 합산은 더하기가 아니라
    고르기라(같은 장학금 한 번만 + 배타 그룹에서 최대 하나) 여기서 따로 더하면
    홈과 다른 숫자를 말하게 된다. 건수만 센다. */
+/* 장학금 · 대외활동 나눠 보기 (2026-11-16 은서 「공고보관함에서 대외활동과 장학금이 구분되게」) — 칩 셋(전체·장학금·대외활동) ·
+   한쪽만 담겼으면 칩을 안 그린다 · 고른 칩은 이 화면을 떠 있는 동안만(기기에 저장하지 않는다) · 위 숫자(sub)는 늘 전체 */
+let savedKind = 'all';
+const SAVED_KINDS = [['all', '전체'], ['sch', '장학금'], ['act', '대외활동']];
 function renderSaved() {
   const el = $('#my-saved');
   if (!el) return;
-  const list = savedScholarships();
-  { const sub = $('#my-sub-saved'); if (sub) { const n = list.filter((s) => s.deadline && dday(s.deadline).days >= 0 && dday(s.deadline).days <= CAL_SOON_DAYS).length; sub.textContent = list.length ? `${list.length}개${n ? ` · 이번 주 마감 ${n}개` : ''}` : '비어 있음'; } }
+  const all = savedScholarships();
+  const nAct = all.filter((s) => isActivityId(s.id)).length;
+  const counts = { all: all.length, act: nAct, sch: all.length - nAct };
+  const both = counts.act > 0 && counts.sch > 0;
+  if (!both) savedKind = 'all';
+  const list = savedKind === 'all' ? all : all.filter((s) => (savedKind === 'act') === isActivityId(s.id));
+  const kindRow = both ? `<div class="filter-row saved-kinds" role="group" aria-label="공고 종류">${SAVED_KINDS.map(([k, label]) =>
+    `<button type="button" class="filter-chip${k === savedKind ? ' active' : ''}" data-saved-kind="${k}" aria-pressed="${k === savedKind}">${label} ${counts[k]}</button>`).join('')}</div>` : '';
+  { const sub = $('#my-sub-saved'); if (sub) { const n = all.filter((s) => s.deadline && dday(s.deadline).days >= 0 && dday(s.deadline).days <= CAL_SOON_DAYS).length; sub.textContent = all.length ? `${all.length}개${n ? ` · 이번 주 마감 ${n}개` : ''}` : '비어 있음'; } }
   if (!list.length) {
     el.innerHTML = (`
       <p class="empty">저장한 공고가 없어요<br /><span class="empty-sub">공고에서 북마크를 누르면 여기 모여요</span></p><button class="btn btn-ghost btn-empty" data-go="explore">장학금 둘러보기</button>`);
@@ -6079,7 +6173,7 @@ function renderSaved() {
     .sort((a, b) => deadlineTs(b) - deadlineTs(a));
   const soon = open.filter((s) => dday(s.deadline).days <= CAL_SOON_DAYS).length;
 
-  el.innerHTML = (`
+  el.innerHTML = (`${kindRow}
     ${open.length ? `<h5 class="cal-sec">마감 순</h5>${open.map((s) => calRowHtml(s, { save: true })).join('')}` : ''}
     ${/* 🔴 날짜를 못 읽은 공고를 **숨기지 않는다** — 달력에는 찍을 수 없어 사라지는데,
          사라지면 학생은 그 공고가 없는 줄 안다. 여기가 그 자리다. */ ''}
@@ -7347,6 +7441,7 @@ function bindEvents() {
     // 프로필을 처음 만든 직후에 알림 동의를 딱 한 번 묻는다 (이후에는 MY 화면에서만)
     // 저장 완료 토스트가 사라진 뒤에 물어본다 (문구가 겹치지 않게)
     if (isFirstTime && typeof notifyMaybeAskConsent === 'function') notifyMaybeAskConsent(2900);
+    if (isFirstTime) if (typeof trackUse === 'function') trackUse('onboard', '');
   });
 
   $('#in-flags').addEventListener('change', syncConsentRow);
@@ -7777,6 +7872,7 @@ function bindEvents() {
      배선은 남겨 두되 **있을 때만** 건다(없는 요소에 걸면 그 자리에서 죽는다). */
   { const e = $('#btn-edit-profile'); if (e) e.addEventListener('click', editProfile); }
   { const e = $('#btn-my-edit'); if (e) e.addEventListener('click', editProfile); }
+  { const e = $('#act-gate-profile'); if (e) e.addEventListener('click', () => { actGateDrawn = false; editProfile(); }); }   // 대외활동 관문 「내 정보」의 「학적정보 수정」 — 같은 입구(2026-11-15)
 
   /* 눌러서 넘어가는 영역 — 마우스·손가락뿐 아니라 키보드로도 되어야 한다
      (div라 버튼과 달리 Enter·스페이스가 저절로 먹지 않는다) */
@@ -7814,6 +7910,12 @@ function bindEvents() {
   /* MY 메뉴 줄 → 안쪽 화면 (2026-10-10 C안 구조). 되돌아오기는 왼쪽 위 화살표와 오른쪽으로 쓸기(SWIPE_BACK_TO) */
   $$('[data-my-go]').forEach((b) => b.addEventListener('click', () => showScreen(b.dataset.myGo)));
   for (const n of ['myinfo', 'mydocs', 'mysaved']) $(`#btn-${n}-back`).addEventListener('click', () => showScreen('my', { back: true }));
+  $('#my-saved').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-saved-kind]');
+    if (!b || b.dataset.savedKind === savedKind) return;
+    savedKind = b.dataset.savedKind;
+    renderSaved();
+  });
   $('#btn-trash-back').addEventListener('click', () => showScreen('settings', { back: true }));
   $('#btn-terms-back').addEventListener('click', () => showScreen('settings', { back: true }));
   for (const id of ['#btn-logins-back', '#btn-faq-back', '#btn-support-back', '#btn-perms-back']) {

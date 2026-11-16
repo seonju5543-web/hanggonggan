@@ -28,7 +28,7 @@ import { makeStripper } from './page-boilerplate.mjs';
 /* 절 머리글 판정은 section-head.js 한 곳 — 화면(match-engine)·감사와 같은 파일을 쓴다.
    베끼면 '발췌기는 제외 절로 보는데 화면은 자격으로 보는' 어긋남이 생긴다. */
 import { createRequire as _cr } from 'node:module';
-const { isExcludeHead: shExclude, headText: shHead, isAmountHead: shAmount, isSectionBreak: shBreak } = _cr(import.meta.url)('../section-head.js');
+const { isExcludeHead: shExclude, headText: shHead, isAmountHead: shAmount, isSectionBreak: shBreak, headRest: shRest, sectionOf: shSection } = _cr(import.meta.url)('../section-head.js');
 /* 갈래 이름 줄 규칙은 화면(match-engine requirementLines)의 것을 불러 쓴다 — 베끼면 발췌기와 화면이 다른 줄을 갈래로 본다 */
 const ME_BRANCH_LABEL = _cr(import.meta.url)('../match-engine.js').BRANCH_LABEL;
 /* 공고문 첨부에서 글자 뽑기 — 본문이 "붙임 참조"뿐인 공고가 있다.
@@ -751,12 +751,22 @@ const EXCLUDE_HEAD = /(제외\s?대상|장학\s?제외|지원\s?제외|신청\s?
 function extractExcludeLines(text) {
   if (!text) return [];
   const lines = text.split(/\n+/).map((l) => unent(l).replace(/[ \t　]+/g, ' ').trim()).filter(Boolean);
-  const start = lines.findIndex((l) => EXCLUDE_HEAD.test(l) && l.length <= 30);
+  /* `참가제한`·`신청 제한 대상` 도 제외 절이다(2026-11-15 · 규칙은 section-head.js EXCLUDE_WORD 한 곳) — 이 꼴은 **머리글일 때만**(shExclude 가 이름표만 남는지 본다):
+     `→ 확정일로부터 1년 근로 참여 제한` 같은 내용 줄을 머리글로 읽으면 그 아래 줄이 통째로 제외가 된다 */
+  /* 길이는 **이름표 쪽**(콜론 앞)으로 잰다 — `4) 지원제한: 타 재단 장학금 등 중복수혜 제한은 … 따름` 은 줄은 길어도 머리글이다 */
+  const start = lines.findIndex((l) => (l.length <= 30 && EXCLUDE_HEAD.test(l)) || (/제한/.test(l) && shExclude(l) && l.split(/[:：]/)[0].length <= 30));
   if (start < 0) return [];
   const out = [];
+  /* `지원제한: 타 재단 장학금 등 중복수혜 제한은 … 규정에 따름` — 제한 머리글은 내용이 같은 줄에 붙어 오기도 한다(유하푸른재단). 머리글로 읽으면서 그 내용을 버리면
+     중복수혜 조항이 화면에서 사라진다(지원을 막는 조항은 빠뜨리지 않는다) — 같은 줄의 내용을 첫 제외 줄로 담는다 */
+  const inline = /제한/.test(lines[start]) ? String(shRest(lines[start]) || '').trim() : '';
+  if (inline.length >= 4 && inline.length <= 120) out.push(inline);
   for (let i = start + 1; i < lines.length && out.length < 6; i += 1) {
     const l = lines[i];
     if (NEXT_SECTION.test(l)) break;
+    /* 다른 절 머리글에서 끝낸다 (2026-11-15 · 「주제 ·자유주제」·통영시 `선발기준: 평균 C학점 이상` 줄이 제외 칸에 딸려 왔다).
+       자격·선발 절은 늘 끊고, 그 밖의 절 낱말(`안내`·`기타`·`일정`)은 **글머리 없는 줄**일 때만 — `·휴학 예정자 안내`·`·기타 사항` 같은 항목을 머리글로 읽어 끊으면 뒤의 진짜 항목을 잃는다(코드 리뷰) */
+    if (shBreak(l) && !shExclude(l) && (['qualify', 'select'].includes(shSection(l)) || !/^\s*[·•\-–*ㅇ○◦]/.test(l))) break;
     if (SECTION_HEAD.test(l)) {
       const body = l.replace(/^\s*(?:[가-힣]\s*[.)]|\d+\s*\.)\s*/, '');
       if (body.length <= 20) break;

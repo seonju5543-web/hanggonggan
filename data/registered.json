@@ -13421,72 +13421,6 @@
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
   },
   {
-   "id": "auto-0713no2515412sitedvscdkr",
-   "name": "2026년도 대전광역시 서구인재육성장학재단 장학생 선발 안내",
-   "boardTitle": "2026년도 대전광역시 서구인재육성장학재단 장학생 선발 안내",
-   "type": "교외",
-   "kindEvidence": [
-    "제목의 바깥 기관 낱말 「서구인재」"
-   ],
-   "kindConfidence": "high",
-   "kindFrom": "로봇(원문) 2026-10-12",
-   "provider": "주관 기관 원문 확인",
-   "amount": "150만원",
-   "amountValue": 1500000,
-   "deadline": "2026-10-08",
-   "listedAt": "2026-10-12",
-   "period": "접수 기간 ~2026-10-08",
-   "summary": "충남대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
-   "eligibility": {
-    "selective": true,
-    "schoolOnly": "충남대학교"
-   },
-   "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
-   ],
-   "duplicable": true,
-   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-10-12 — 양식 스키마화는 검수 후 진행",
-   "auto": true,
-   "attachments": [
-    {
-     "name": "붙임1. 2026년 장학생 선발 공고문(신청서 포함).hwpx",
-     "url": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2515412&atch_no=1"
-    },
-    {
-     "name": "붙임2. 2026년 장학생 선발 공고문(신청서 포함).pdf",
-     "url": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2515412&atch_no=2"
-    }
-   ],
-   "sourceUrl": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515412&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
-   "sourceKind": "auto",
-   "eligibilityLines": [
-    "3. 공통 자격 요건",
-    "1) 선발 공고일 기준 6개월 전(’26. 3. 14.이전)부터 대전 서구에 거주하고, 대전시에 소재한 대학교 재학생 중 총장의 추천을 받은 학생",
-    "※ 방위사업청 관내 이주 직원 자녀의 경우, 주소지 및 학교 소재지 제한 없음",
-    "2) 2026년도 타 기관 전액장학금(국가장학금 포함) 수혜자 제외",
-    "3) 1세대 1명만 신청 가능하며, 개별 신청 불가(총장 추천 필요)",
-    "4) 장학분야별 선발기준이 상이하므로 재단 공고문 참고"
-   ],
-   "excerpts": [
-    "2. 장학금액: 1인당 1,500,000원 이내(등록금성)",
-    "6. 선발절차: (학생) 구비 서류 학과 제출 → (학과) 단과대학 행정실로 학생 추천 → (단과대학) 분야별 장학생 추천 → (대학본부) 분야별 3명 선발 및 추천 → (재단) 장학생 심사 및 선발"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
-   "amountSpec": {
-    "kind": "fixed",
-    "value": 1500000,
-    "ratio": 0,
-    "min": 1500000,
-    "max": 1500000,
-    "raw": "2. 장학금액: 1인당 1,500,000원 이내(등록금성)"
-   },
-   "amountFrom": "공고 원문",
-   "deadlineFrom": "공고문 첨부",
-   "openDate": "2026-09-16",
-   "announceDate": "2026-11-20"
-  },
-  {
    "id": "auto-794detailviewdocategory6",
    "name": "2026학년도 양평․천대자장학기금[남원양씨(楊氏)] 장학생 선발 안내",
    "boardTitle": "2026학년도 양평․천대자장학기금[남원양씨(楊氏)] 장학생 선발 안내",
@@ -24073,8 +24007,7 @@
    "period": "접수 ~2026-11-18",
    "summary": "서강대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
-    "selective": true,
-    "schoolOnly": "서강대학교"
+    "selective": true
    },
    "documents": [
     "협회 서식 |@ 자기소개서 공백 포함 1.500자 이내",
@@ -24123,6 +24056,14 @@
    "eligibilityFrom": "공고문 첨부(OCR)",
    "openDate": "2026-11-05",
    "documentsFrom": "공고문 첨부(OCR)",
+   "alsoPostedAt": [
+    {
+     "school": "성균관대학교",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=142000&article.offset=0&articleLimit=10",
+     "id": "notice:https://www.skku.edu/skku/campus/skk_comm/notice06.do?articleno=142000"
+    }
+   ],
+   "scopeFrom": "같은 사업이 성균관대학교 게시판에도 올라옴(자동) — 성균관대학교 게시판 https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=142000&article.offset=0&articleLimit=10",
    "excerpts": [
     "○ 신청기간 : 2026. 11. 5(목) ~ 11. 18(수) 24:00(자정)",
     "○ 신청방법 : 이메일(<0080008.07.14) 및 우편(등기)"
@@ -24267,7 +24208,15 @@
     "○ 신청방법 : 이메일(<0080008.07.14) 및 우편(등기)"
    ],
    "excerptNote": "공고문 첨부에서 그대로 발췌 (자동)",
-   "amountFrom": "관리자 2026-11-16"
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 1000000,
+    "ratio": 0,
+    "min": 1000000,
+    "max": 1000000,
+    "raw": "1인당 100만원"
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-ervicenoticedetail521183",
@@ -24474,8 +24423,6 @@
    ],
    "sourceUrl": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2516266&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
    "sourceKind": "auto",
-   "deadlineFrom": "관리자 2026-11-16",
-   "amountFrom": "관리자 2026-11-16",
    "eligibilityLines": [
     "1) 충남대학교 학부 재학생(2026학년도 2학기 등록자 / 휴학·수료자 등 제외)",
     "2) 직전 학기 12학점 이상 이수자",
@@ -24484,7 +24431,9 @@
     "2) 국민기초생활수급자(신청자 본인이 수급자로 등록된 자 중 생계급여 또는 의료급여 수급자에 한함)",
     "3) 「아동복지법」상 가정위탁·아동복지시설 보호조치 연장자"
    ],
-   "eligibilityFrom": "관리자 2026-11-16"
+   "eligibilityFrom": "관리자 2026-11-16",
+   "deadlineFrom": "관리자 2026-11-16",
+   "amountFrom": "관리자 2026-11-16"
   },
   {
    "id": "auto-krbbskr846131artclviewdo",
@@ -24642,6 +24591,123 @@
     "min": 0,
     "max": 0,
     "raw": "다. 장학금액 : 2026-2학기 등록금 전액 지원(*기초생활수급자 생활비 추가 지원 없음) ※ 타 등록금성 장학금 수혜 시 해당 장학금을 국가우수장학금(이공계)으로 대체하며, 기수혜 장학금을 차감한 등록금 잔여 금액만 지급함"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-skor478127125artclviewdo",
+   "name": "2026-2학기 장학사정관(릴레이쉽) 장학금 신청 안내",
+   "boardTitle": "2026-2학기 장학사정관(릴레이쉽) 장학금 신청 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "접수처 「학과 사무실 제출」"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-11-16",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2027-01-15",
+   "deadlineFrom": "공고 원문 · 3. 신청기한 : 2027.1.15(금) 16시 까지",
+   "period": "접수 ~2027-01-15",
+   "summary": "가천대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "가천대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-16 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026-2학기 장학사정관(릴레이쉽) 시행(안).hwp",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/158824/download.do"
+    },
+    {
+     "name": "장학금 신청서(장사관_릴레이쉽).hwp",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/158825/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.gachon.ac.kr/bbs/kor/478/127125/artclView.do",
+   "sourceKind": "auto",
+   "openDate": "2026-11-05",
+   "excerpts": [
+    "3. 신청기한 : 2027.1.15(금) 16시 까지"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+  },
+  {
+   "id": "auto-qlmjzmaw5kv29yzcuzrcuyng-0d8bhds",
+   "name": "[교내-11/25] 2026학년도 2학기 미래로장학금 재심 신청 안내",
+   "boardTitle": "[교내-11/25] 2026학년도 2학기 미래로장학금 재심 신청 안내",
+   "type": "교내",
+   "kindEvidence": [
+    "제목 표식 「교내」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-16",
+   "provider": "주관 기관 원문 확인",
+   "amount": "등록금 50% 이내",
+   "amountValue": 0,
+   "deadline": "2026-11-25",
+   "deadlineFrom": "공고 원문 · [교내-11/25] 2026학년도 2학기 미래로장학금 재심 신청 안내",
+   "period": "접수 ~2026-11-25",
+   "summary": "고려대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "고려대학교"
+   },
+   "documents": [
+    "신청서(붙임 파일)",
+    "지도교수 추천서 혹은 학과장 추천서 중 택 1(붙임 파일)",
+    "가족관계 확인서",
+    "긴급가계곤란 증빙 서류 - ①~④ 중 해당 되는 내용 택 1",
+    "폐업: 폐업사실증명서 및 사실증명(사업자등록 사실 여부) - 폐업일 이후",
+    "퇴직: 고용보험 수급자격 인정 명세서",
+    "가정폭력으로 인한 가족관계 단절: 가정폭력 증빙서류(신고접수증, 가정폭력 사건처분결과증명서, 가정폭력소장 사본 등)",
+    "대상: 형제·자매·남매가 대학에 재학 중 인 경우(단, 정규학기 재학 에 한하여 인정)",
+    "신청서(붙임파일)",
+    "지도교수 혹은 학과장 추천서(붙임파일)",
+    "형제·자매·남매 재학증명서(정규학기 재학 확인용)",
+    "형제·자매·남매 등록금 납입 증명서(정규학기 재학 확인용)",
+    "비고: 고대가족장학금 수혜자 지원 제외"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-16 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4OTklMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
+   "sourceKind": "auto",
+   "applyPortal": "KUPID",
+   "applyPortalSource": "3. 신청방법: KUPID - 등록 / 장학 - 장학금 신청에서 미래로장학금 재심(1차) 신청",
+   "applyPortalFrom": "공고 원문",
+   "documentsFrom": "공고 원문",
+   "eligibilityLines": [
+    "1. 선발 기준",
+    "※ 공통 자격: 2026학년도 2학기 국가장학금을 신청하여 학자금 지원구간이 산정된 내국인 재학생",
+    "(단, 국가장학금 미신청자 또는 학자금 지원구간 미산정자의 경우 긴급가계곤란 유형 예외 인정, 학비부담 유형 불가)",
+    "정규학기 재학생 또는 복수전공 진입 이후 2개학기 이내인 자 (초과학기생 불가)",
+    "계약학과 재학생 지원 불가",
+    "가. 긴급가계곤란 유형",
+    "1) 대상: 당해년도 부모님이 폐업, 파산, 퇴직한 경우 (단, 최소 1년 이상 근로기간이 있는 자) 또는 가정폭력으로 가족관계가 단절된 자"
+   ],
+   "excerpts": [
+    "2. 신청기간: 2026학년도 11월 16일(월) 10시 ~ 11월 25일(수) 16시"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "ratio",
+    "value": 0,
+    "ratio": 0.5,
+    "min": 0,
+    "max": 0,
+    "upTo": true,
+    "raw": "2) 금액: 수업료의 50% 이내"
    },
    "amountFrom": "공고 원문"
   }

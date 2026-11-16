@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-15",
+ "updatedAt": "2026-11-16",
  "items": {
   "auto-oardid323011menuno200318": [
    {
@@ -800,14 +800,6 @@
     "at": "2026-11-14"
    }
   ],
-  "kosaf-2700058001": [
-   {
-    "src": "1-1.-제-44기-송원김영환장학재단-장학생-선발-안내.docx",
-    "srcBytes": 13123,
-    "none": true,
-    "at": "2026-11-14"
-   }
-  ],
   "kosaf-2000480007": [
    {
     "src": "[붙임]1. 2026년 대학생 봉사자 연계 지역돌봄 지원사업(KRA지역돌봄-겨울방학).hwpx",
@@ -958,6 +950,19 @@
     "srcBytes": 9216,
     "none": true,
     "at": "2026-11-14"
+   }
+  ],
+  "auto-skor478126763artclviewdo": [
+   {
+    "file": "auto-skor478126763artclviewdo/1-elig-lth9sj-1_p6-9.pdf",
+    "name": "공고문 안 신청서 서식 (6, 8~9쪽)",
+    "pages": 3,
+    "bytes": 403005,
+    "src": "elig-lth9sj-1.hwp",
+    "srcBytes": 79872,
+    "srcPages": "6, 8~9",
+    "from": "공고문 서식 쪽 떼기",
+    "at": "2026-11-16"
    }
   ]
  }
