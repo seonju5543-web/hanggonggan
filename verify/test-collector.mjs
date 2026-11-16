@@ -7387,6 +7387,21 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   /* 분교 7곳은 전부 매핑돼 있어야 한다 — 빠지면 그 학교 학과가 본교로 합쳐진다 */
   eq('data.js 분교 7곳이 전부 BRANCH_MAP 에 있다',
     [...unis].filter((u) => /캠퍼스$/.test(u) && !targets.includes(u)), []);
+  /* 🔴 분교인데 커리어넷이 본교 이름으로 주는 학교(BRANCH_BY_AREA · 2026-11-16) — 상명대 제2캠퍼스(충남)가 `상명대학교` 로 와서
+     `상명대학교 천안캠퍼스` 학생은 학과 파일이 없어 전국 공통 목록으로 물러났다. 표를 떼어 실제로 돌려 본다(로봇은 불러오는 순간 API 를 두드린다). */
+  {
+    const PRs = createRequire(import.meta.url)('../parse-requirements.js');
+    let byArea = {}; let branchByArea = (s) => s;   // 표·함수가 없으면 아래 eq 가 빨개진다(넘어지지 않게)
+    try {
+      if (majorsSrc.includes('const BRANCH_BY_AREA = {')) byArea = Function(`return ${sec(majorsSrc, 'const BRANCH_BY_AREA = {').replace(/^const BRANCH_BY_AREA = /, '')}}`)();
+      const fnSrc = (/function branchByArea\(school, area\) \{[\s\S]*?\n\}/.exec(majorsSrc) || [''])[0];
+      if (fnSrc) branchByArea = Function('BRANCH_BY_AREA', 'shortRegion', `${fnSrc}; return branchByArea;`)(byArea, PRs.shortRegion);
+    } catch { /* 읽지 못하면 아래가 빨개진다 */ }
+    eq('  BRANCH_BY_AREA 값이 전부 data.js UNIVERSITIES 의 분교 이름이다 · 상명대 충남 → 천안캠퍼스 · 서울은 본교 · 표에 없는 학교는 그대로',
+      [Object.values(byArea).flatMap((t) => Object.values(t)).filter((v) => !unis.has(v)), branchByArea('상명대학교', '충청남도'), branchByArea('상명대학교', '서울특별시'), branchByArea('한국외국어대학교', '충청남도')],
+      [[], '상명대학교 천안캠퍼스', '상명대학교', '한국외국어대학교']);
+    eq('  로봇이 줄마다 분교를 지역으로 단다(normalizeSchool 뒤 branchByArea)', /const school = school0 \? branchByArea\(school0, squash\(areaRaw/.test(majorsSrc), true);
+  }
 
   const ME = createRequire(import.meta.url)('../match-engine.js');
 
