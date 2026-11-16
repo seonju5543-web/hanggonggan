@@ -216,7 +216,7 @@ const SCHOOL = process.env.LINKCHECK_SCHOOL || '경희';
   if (!rounds.length) bad(`장부 시험에 쓸 보통 주소 ${SCHOOL} 카드가 없습니다 — ②에서 연 카드 ${checked.length}건`);
   const WANT = {
     list: { label: '게시판 목록 ↗', check: (c) => /목록에서 .+을\(를\) 찾아 눌러 주세요/.test(c.legend), say: '「목록에서 … 찾아 눌러 주세요」 안내', josa: '가' },
-    gone: { label: '원문 공고(확인 필요) ↗', check: (c) => c.legend.includes('이 주소가 열리지 않았어요 (2026-10-04 확인)'), say: '「이 주소가 열리지 않았어요 (2026-10-04 확인)」 한 줄', josa: '이' },
+    gone: { label: '원문 공고(열리지 않음) ↗', check: (c) => c.legend.includes('이 주소가 열리지 않았어요 (2026-10-04 확인)'), say: '「이 주소가 열리지 않았어요 (2026-10-04 확인)」 한 줄', josa: '이' },
   };
   for (const marks of rounds) {
     ledgerOverride = { ...realLedger, updatedAt: '2026-10-04T00:00:00.000Z', bad: { ...(realLedger.bad || {}), ...Object.fromEntries(marks.map(([id, v]) => [keyOf(id), { v, at: '2026-10-04' }])) } };

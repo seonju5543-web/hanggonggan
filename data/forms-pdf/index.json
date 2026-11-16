@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-15",
+ "updatedAt": "2026-11-16",
  "items": {
   "auto-ticedoarticleno231977952": [
    {
@@ -30,28 +30,6 @@
     "pages": 5,
     "bytes": 287340,
     "srcBytes": 287340,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-17"
-   }
-  ],
-  "auto-0713no2515412sitedvscdkr": [
-   {
-    "file": "auto-0713no2515412sitedvscdkr/1-붙임1._2026년_장학생_선발_공고문_신청서_포함_.pdf",
-    "name": "붙임1. 2026년 장학생 선발 공고문(신청서 포함).hwpx",
-    "pages": 25,
-    "bytes": 808471,
-    "srcBytes": 140875,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-28"
-   },
-   {
-    "file": "auto-0713no2515412sitedvscdkr/2-붙임2._2026년_장학생_선발_공고문_신청서_포함_.pdf",
-    "name": "붙임2. 2026년 장학생 선발 공고문(신청서 포함).pdf",
-    "pages": 17,
-    "bytes": 783432,
-    "srcBytes": 783432,
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-10-17"
@@ -315,40 +293,6 @@
     "at": "2026-11-13"
    }
   ],
-  "act-0m0311p": [
-   {
-    "file": "act-0m0311p/1-프리_텍스코어_사업계획서_양식_.pdf",
-    "name": "프리 텍스코어 사업계획서(양식).docx",
-    "pages": 2,
-    "bytes": 81713,
-    "srcBytes": 15977,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-13"
-   },
-   {
-    "file": "act-0m0311p/2-프리_텍스코어_사업계획서_양식_.pdf",
-    "name": "프리 텍스코어 사업계획서(양식).hwp",
-    "pages": 2,
-    "bytes": 69121,
-    "srcBytes": 76288,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-13"
-   }
-  ],
-  "act-0mnrtv1": [
-   {
-    "file": "act-0mnrtv1/1-_참가신청서_2026년_전남광주통합특별시_중국언어문화경진대회.pdf",
-    "name": "(참가신청서) 2026년 전남광주통합특별시 중국언어문화경진대회.hwp",
-    "pages": 4,
-    "bytes": 216725,
-    "srcBytes": 60928,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-13"
-   }
-  ],
   "auto-oardid323054menuno200318": [
    {
     "file": "auto-oardid323054menuno200318/1-2026-2학기_반영장학_선발_공지문_및_학업계획서_양식.pdf",
@@ -421,26 +365,86 @@
     "at": "2026-11-14"
    }
   ],
-  "act-1rw4nj4": [
+  "act-119z6si": [
    {
-    "file": "act-1rw4nj4/1-_양식_2026_INHA_AX-EDU_해커톤_신청서-예비교사_유형.pdf",
-    "name": "(양식) 2026 INHA AX-EDU 해커톤 신청서-예비교사 유형.hwp",
-    "pages": 2,
-    "bytes": 130949,
-    "srcBytes": 77824,
+    "file": "act-119z6si/1-붙임2._2026_한난_온랩_On-Lab_참가_신청서.pdf",
+    "name": "붙임2. 2026 한난 온랩(On-Lab) 참가 신청서.hwp",
+    "pages": 7,
+    "bytes": 386919,
+    "srcBytes": 81920,
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
-    "at": "2026-11-14"
+    "at": "2026-11-16"
+   }
+  ],
+  "act-0yjsva4": [
+   {
+    "file": "act-0yjsva4/1-3._2026년_국립농업박물관_문화상품_굿즈_공모전_신청서_양식.pdf",
+    "name": "3. 2026년 국립농업박물관 문화상품(굿즈) 공모전 신청서 양식.hwp",
+    "pages": 5,
+    "bytes": 234168,
+    "srcBytes": 51712,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-16"
+   }
+  ],
+  "act-0t2rijv": [
+   {
+    "file": "act-0t2rijv/1-붙임1._공고_및_참가신청서_2026년_국립조선왕조실록박물관_청년_국제_교류프로그램.pdf",
+    "name": "붙임1. [공고 및 참가신청서] 2026년 국립조선왕조실록박물관 청년 국제 교류프로그램.hwpx",
+    "pages": 4,
+    "bytes": 357352,
+    "srcBytes": 173100,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-16"
    },
    {
-    "file": "act-1rw4nj4/2-_양식_2026_INHA_AX-EDU_해커톤_신청서-예비개발자_유형.pdf",
-    "name": "(양식) 2026 INHA AX-EDU 해커톤 신청서-예비개발자 유형.hwp",
-    "pages": 2,
-    "bytes": 131945,
-    "srcBytes": 78336,
+    "file": "act-0t2rijv/2-붙임2._공고_및_참가신청서_2026년_국립조선왕조실록박물관_청년_국제_교류프로그램.pdf",
+    "name": "붙임2. [공고 및 참가신청서] 2026년 국립조선왕조실록박물관 청년 국제 교류프로그램.docx",
+    "pages": 6,
+    "bytes": 425203,
+    "srcBytes": 123610,
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
-    "at": "2026-11-14"
+    "at": "2026-11-16"
+   }
+  ],
+  "act-00t4wxq": [
+   {
+    "file": "act-00t4wxq/1-2026동계_인턴십_참가_신청서_성명.pdf",
+    "name": "2026동계 인턴십 참가 신청서_성명.hwp",
+    "pages": 6,
+    "bytes": 189090,
+    "srcBytes": 112640,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-16"
+   }
+  ],
+  "act-03k6crx": [
+   {
+    "file": "act-03k6crx/1-2026_SKKU_Intercultural_Learning_Program_참가_지원서.pdf",
+    "name": "2026 SKKU Intercultural Learning Program 참가 지원서.docx",
+    "pages": 5,
+    "bytes": 189391,
+    "srcBytes": 20242,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-16"
+   }
+  ],
+  "act-0eamu3i": [
+   {
+    "file": "act-0eamu3i/1-_크브페_지원신청서_작품명_지원자_팀_명.pdf",
+    "name": "[크브페]지원신청서_작품명_지원자(팀)명.hwp",
+    "pages": 5,
+    "bytes": 346876,
+    "srcBytes": 362496,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-16"
    }
   ]
  }

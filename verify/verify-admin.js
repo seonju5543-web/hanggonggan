@@ -2269,7 +2269,10 @@ function serve() {
     ok(reg && reg.group === 'marker' && /게시판 목록 ↗/.test(reg.label), '  정식 등록 목록 표식 — ① 묶음 · 학생이 지금 보는 이름(「게시판 목록 ↗」)', JSON.stringify(reg));
     ok(kos && kos.group === 'kosaf' && /재단 홈페이지 ↗/.test(kos.label), '  층2 재단 — ④ 묶음 · 「재단 홈페이지 ↗」', JSON.stringify(kos));
     ok(nws && nws.group === 'marker', '  교내 소식 목록 표식 — 학교별 소식 파일까지 읽어 ① 묶음에 든다', JSON.stringify(nws));
-    ok(bad && bad.group === 'bad' && /확인 필요/.test(bad.label), '  로봇이 확정한 문제 — ⑤ 묶음 · 「(확인 필요)」', JSON.stringify(bad));
+    /* 문제 링크 이름은 로봇이 본 것(TROUBLE_TAG — 로그인 필요·열리지 않음·다른 화면)을 말한다(2026-11-16 · 예전 「(확인 필요)」) — 표는 화면과 같은 source-link.js 에서 */
+    const troubleTags = Object.values(require(path.join(__dirname, '..', 'source-link.js')).TROUBLE_TAG);
+    ok(bad && bad.group === 'bad' && troubleTags.some((t) => bad.label.includes(`(${t})`)) && !/확인 필요/.test(bad.label),
+      '  로봇이 확정한 문제 — ⑤ 묶음 · 로봇이 본 것을 이름에 말한다(「(다른 화면)」 등 · 「확인 필요」 아님)', JSON.stringify(bad));
     ok(reg && /noreferrer/.test(reg.now || ''), '  「지금 링크 열기」는 학생처럼 리퍼러 없이 연다');
     const regSel = '#link-fix-slot [data-lf-row="id:verify-linkfix-reg"]';
     await page.fill(`${regSel} [data-lf-url]`, 'https://example.ac.kr/bbs/list.do#n-%EB%8B%A4%EB%A5%B8');

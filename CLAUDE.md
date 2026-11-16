@@ -208,7 +208,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 | `DESIGN.md` | 디자인 값의 사람용 사본 — 원본은 `style.css`, 관문 `verify/ui-tone.mjs` |
 | `docs/designs/data-model.md` `docs/designs/data-flow.md` `docs/designs/security-rules.md` | **설계 문서 셋** (고문 보고서 Q12) — 저장소 다섯이 각각 무엇을 담는가 · 공고가 폰까지 가는 길과 어디서 끊기는가 · 권한·보안 약속과 그 관문. 사본이라 관문 「CLAUDE.md 가 가리키는 것이 실제로 있다」가 같이 잰다 |
 
-## 중요한 기술 사실 (재발견에 시간 쓰지 말 것)
+## 중요한 기술 사실 (다시 캐지 말 것)
 
 각 줄의 경위는 `SESSIONS.md`(특히 「2026-09-23 이관분」)에서 제목으로 찾는다.
 "관문 「X」" 는 `verify/test-collector.mjs` 의 절이다 — `grep -n "■.*X" verify/test-collector.mjs` 로 찾는다.
@@ -247,8 +247,8 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   못 읽은 금액은 **홈 합계에서만** 중앙값으로 어림(`amountValue` 엔 안 적는다 — 감사가 막는다). 관문 금액 절.
 - **🔴 마감일은 이름표(`신청기간 :` 등) 뒤 날짜만** — 게시일·조회수·다른 공고 날짜가 섞여 있다. 못 믿으면 비운다. 관문 「마감일」.
 - **달력·저장은 '내 것'만 찍는다**(마감 파랑·발표 빨강 둘뿐) · `state.saved` 를 `applications` 와 합치지 말 것. `docs/designs/calendar-and-save.md`.
-- **2026-09-17 결정 셋**: 홈 순서 = 적합도 − 남은 날(`byHomeOrder` · 마감 모르는 공고에 가짜 14 금지) · 앱 내부 사정은 학생 화면에 안 적는다
-  ('자격 미확인' 배지는 남긴다) · 못 읽은 금액 어림은 `renderHome` 한 곳.
+- **2026-09-17 결정 셋**: 홈 순서 = 적합도 − 남은 날(`byHomeOrder` · 마감 모르면 가짜 14 금지) · 앱 내부 사정은 학생 화면에 안 적는다
+  (11-02: '모름'류 글자 없음 · 관문 「학생 화면에 '모름'류 글자가 없다」) · 못 읽은 금액 어림은 `renderHome` 한 곳.
 
 ### 층2(KOSAF) · 접수 채널 · 인스타
 
@@ -293,7 +293,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - **드라이버에 온보딩 단계 번호·공고 id·브라우저 경로·포트를 박지 말 것** — `verify/onboard-helper.js`(`nextUntil`·`dismissNotify`) · `pickTarget`.
   알림 동의 시트는 2.9초 뒤 떠서 클릭을 막는다 → `dismissNotify(page)`. 관문 test-collector 정적 검사.
 - **그려 놓고 센다** — 카드는 함수가 여럿이다(`schCard`·`liveNoticesHtml`). 값이 같아도 모양이 다를 수 있다(관리자 화면 · `verify-admin-shape.js`).
-- **서체 Pretendard 한 벌 · 작은 척도**. 다시 바꾸자는 제안은 화면을 보여 주고 정한다. 파일 끝 카드 블록이 앞 규칙을 덮는다.
+- **서체 Pretendard 한 벌 · 작은 척도**. 바꾸려면 화면을 보여 주고 정한다. 파일 끝 카드 블록이 앞 규칙을 덮는다.
 - **디자인 토큰**: 원본 `style.css`, 관문 `ui-tone.mjs`(토큰 이탈 톱니 · 괄호 짝 · 병합 충돌 표식). 🔴 CSS 에 남은 충돌 표식·짝 없는 `}` 는 조용히 규칙을 삼킨다.
 - 🔴 **문서는 굴러가지 않는다 — `#app` 안쪽만 굴러간다**(iOS 26 이 하단 탭을 화면 중간에 그린다). 스크롤은 `appScroller`·`appScrollTo` 로(`window.scrollY` 는 늘 0) · 드라이버도 같다. 관문 `verify-interactions.js` UI-7 절.
 - **시트는 전부 아래로 쓸어 닫는다** — `enableSheetSwipe` 한 곳 · 판정은 `scrollableAtTop` · 회귀는 TouchEvent 로.
@@ -305,7 +305,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   글자색이 바뀐다(탈퇴 제외 · `:active` 는 마우스가 아니라 CDP 로 잰다) · 패럴랙스 없음 · MY 프로필 카드는 통째 버튼이 아니다(`.my-edit-hint` 만) ·
   여백은 상자 사이가 아니라 **글자와 글자 사이**로 잰다 · 화면 제목 밑줄 없음(10-06 'AI 티' 개선안 A) · 구분선은 목록에만. 관문 `verify-settings.js`.
 - **카드·시트 한 벌(2026-11-02 승인 시안 · `docs/designs/mockups/card-consistency.html`)**: 윗줄 칩(`kindChip`)·주최·알약 · 제목은 지우고 나누기만(`cardTitleParts`) · 시트는 절 다섯(`sheetSectionsHtml`) · 마감은 아랫줄 그대로. 관문 「승인받은 화면 그대로인가 — 카드 시안 B」.
-- 일괄 신청 준비는 `confirm()` 이 아니라 앱 목록(`renderBulkPrep`) · 시트 그릇은 `#detail-sheet` · 체크해도 다시 그리지 않는다.
+- 일괄 신청 준비는 `confirm()` 아닌 앱 목록(`renderBulkPrep`) · 시트 그릇 `#detail-sheet` · 체크해도 다시 안 그린다.
 - 기다림이 보이는 곳은 실시간 공고 구역 하나(`allScholarships` 가 상시 제도를 먼저 준다). 못 받아 왔을 때 `null` 로 두지 말 것(뼈대가 굳는다).
 
 ### 로봇 · 워크플로

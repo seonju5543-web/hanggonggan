@@ -101,6 +101,9 @@ const PROFILE = (over) => ({
   eq('적합도 배지가 붙은 카드가 있다 (0이면 선택자가 어긋난 것)', okBadges.length > 0, true);
   eq('카드 배지는 퍼센트뿐이다', okBadges.every((b) => /^적합도 \d+%$/.test(b.text)), true);
   eq('카드에 요건 개수를 쓰지 않는다', okBadges.some((b) => /요건/.test(b.text)), false);
+  /* 2026-11-15 개발자 결정 11-02 — 자격을 못 읽은 공고는 알약이 없다(예전 「자격 미확인」) · 어긋난 요건이 없으면 빨강·주황을 안 쓴다 */
+  eq('「자격 미확인」 알약이 없다 (못 읽은 공고는 알약 없음)', bs.filter((b) => /badge-fit-unknown/.test(b.cls) || /미확인/.test(b.text)).length, 0);
+  eq('  미달이 아닌 알약에 빨강·주황이 없다 (판정 못 한 요건 때문에 낮은 퍼센트를 경고색으로 그리지 않는다)', okBadges.filter((b) => /fit-(red|orange)/.test(b.cls)).length, 0);
 
   /* 🔴 상세 시트는 자격 줄을 **하나도 빠뜨리지 않고** 보여야 한다 — 화면 5줄 상한이
      점수 분모까지 자르던 사고(2026-08-24)의 회귀다.
@@ -131,16 +134,21 @@ const PROFILE = (over) => ({
        '카드는 퍼센트뿐'만 검사되고 근거가 화면 어디에도 없는 상태가 통과한다. */
     const detailTxt = await page.$eval('#detail-sheet .badge-fit', (e) => e.innerText.replace(/\s+/g, ' '))
       .catch(() => '');
-    eq('상세 시트에는 퍼센트와 근거가 남아 있다', /적합도 \d+% .*요건 \d+개 중 \d+개 충족/.test(detailTxt), true);
-    /* 요건 수는 이제 **상세 배지에서만** 읽을 수 있다 — 카드에는 없다.
-       2026-10-29 부터 요건은 줄이 아니라 **조건**을 센다(개발자 "세세한 기준") — 줄 수 이상이고, 줄마다 읽은 조건 수의 합을 넘지 않는다(묶음은 1개) */
-    const total = Number((detailTxt.match(/요건 (\d+)개 중/) || [])[1]);
+    /* 2026-11-15 개발자 결정 11-02 — 상세 배지는 「적합도 n% · 맞는 요건 M개」(예전 「요건 n개 중 m개 충족 · 확인 필요 k」) — 모르는 요건 수는 말하지 않는다.
+       🔴 「어긋난 요건 없음」은 요건을 **전부 판정했을 때만**(fd.unknown === 0 · 2026-11-16) — 모르는 줄이 있는데 이 말이 붙으면 틀린 안심이다 */
+    const fdNow = await page.evaluate((sid) => { const f = fitDetailFor(allScholarships().find((x) => x.id === sid), state.profile); return { met: f.met, unknown: f.unknown }; }, id);
+    const wantTxt = fdNow.unknown > 0 ? (fdNow.met > 0 ? `맞는 요건 ${fdNow.met}개` : '') : `${fdNow.met > 0 ? `맞는 요건 ${fdNow.met}개 · ` : ''}어긋난 요건 없음`;
+    eq(`상세 시트에는 퍼센트와 근거가 남아 있다 (모르는 요건 ${fdNow.unknown > 0 ? '있음 → 맞는 요건만' : '없음 → 어긋난 요건 없음'} · 「확인 필요」 없음)`,
+      [new RegExp(`^적합도 \\d+%${wantTxt ? ` ${wantTxt}` : ''}$`).test(detailTxt.trim()), /확인 필요|미확인/.test(detailTxt), fdNow.unknown > 0 && /어긋난 요건 없음/.test(detailTxt)], [true, false, false]);
+    /* 맞은 요건 수는 이제 **상세 배지에서만** 읽을 수 있다 — 카드에는 없다.
+       2026-10-29 부터 요건은 줄이 아니라 **조건**을 센다(개발자 "세세한 기준") — 줄마다 읽은 조건 수의 합을 넘지 않는다(묶음은 1개) */
+    const total = Number((detailTxt.match(/맞는 요건 (\d+)개/) || [])[1] || 0);
     const condCap = await page.evaluate((id) => {
       const sch = allScholarships().find((s) => s.id === id);
       const items = requirementLines(sch, null, { all: true, withMeta: true });
       return items.reduce((n, it) => n + (it.group > 0 ? 0 : Math.max(1, PR.parseLine(PR.untag(it.text), false).conds.length)), 0) + new Set(items.filter((it) => it.group > 0).map((it) => it.group)).size + 8;   // +8: 통과를 확인한 제외 조항 몫(상한)
     }, id);
-    eq('배지의 요건 수가 줄 수 이상이고 조건 수 합을 넘지 않는다 (조건 단위 · 묶음은 1개)', total >= Math.min(expected, total) && total <= condCap, true);
+    eq('배지의 맞는 요건 수가 조건 수 합을 넘지 않는다 (조건 단위 · 묶음은 1개)', total >= 0 && total <= condCap, true);
   } else console.log('  🚨 요건 개수를 띄운 카드가 하나도 없다 — 배지 형식이 바뀌었는지 확인할 것');
 
   console.log('\nERRORS:', errors.length ? errors : 'none');

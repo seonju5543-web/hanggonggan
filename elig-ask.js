@@ -111,7 +111,10 @@ const TRAIT_LABEL = {
    **4곳 이상**이 묻는 처지. 걸린 공고 수 — award 17 · kosafApplied 11 · discipline 10 · job 10 · volunteer 6 · dorm 4 · military 4.
    ⚠️ 3곳 이하(birthOrder·farm·loan 각 3 · 나머지 1~2)는 공고 안에서만 묻는다 — 온보딩을 길게 만들 만큼 자주 나오지 않는다.
    ⚠️ 여기 적는 종류는 TRAIT_LABEL·TRAIT_PAT 에 있어야 한다(관문이 대조한다). 순서가 화면 순서다. */
-const ONBOARD_TRAITS = ['award', 'kosafApplied', 'discipline', 'job', 'volunteer', 'dorm', 'military', 'loan', 'careLeaver', 'fullTuition'];
+const ONBOARD_TRAITS = ['award', 'kosafApplied', 'discipline', 'job', 'dorm', 'military', 'loan', 'careLeaver', 'fullTuition'];
+/* 2026-11-15 개발자 결정("빼 주세요") — 봉사활동 실적(volunteer)을 뺐다. 같은 날 봉사 규칙을 '해 둔 실적을 말할 때만' 으로 좁히자(parse-requirements TRAIT_PAT)
+   걸리는 공고가 9곳 → 2곳이 됐다(나머지 7곳은 `봉사활동 가능자`·`…에 관심 있는 대학생` 처럼 요구가 아닌 줄이었다) — 잣대 「4곳 이상」 아래다.
+   그 두 공고에서는 공고 안 「미확인 자격」이 그대로 묻는다 · 이미 답해 둔 학생의 답(traits.volunteer)은 지우지 않는다(collectProfile 이 물려받는다). */
 /* 2026-11-13 fullTuition(이번 학기 등록금 전액 장학·면제 · 선조치 후 보고) — 열린 공고 4곳(층2 거창군·안산 반값·등록금 지원사업·다자녀가정 — 모두 제외 칸)이라 위 잣대 「4곳 이상」에 들어 더했다.
    ⚠️ 넷 다 **제외 칸**이라 공고 안 「미확인 자격」(자격 줄만 탐침)에서는 안 물린다 — 온보딩이 이 처지를 묻는 유일한 자리다. 3곳 이하로 줄면 집계가 「4곳 미만인데 묻는 것」으로 알린다 */
 /* 2026-11-09 개발자 결정("질문에 넣어") — 전수 집계가 「4곳 이상인데 안 묻는 것: loan 5 · careLeaver 4」 를 알린 뒤 둘을 더했다(loan 은 대출 이자 지원 장학 · careLeaver 는 자립준비청년 전용).

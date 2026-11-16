@@ -84,7 +84,7 @@ async function seed(page) {
   }));
   ok('입구는 자격 블록 아래 한 줄이다', entry.one === 1, `${entry.one}개`);
   ok('  줄마다 단추를 달지 않는다 (중복)', entry.perLine === 0, `${entry.perLine}개`);
-  ok('  미확인 자격 수를 말한다', /미확인 자격/.test(entry.label), entry.label.trim());
+  ok('  맞춰 볼 자격 수를 말한다 (2026-11-15 · 예전 「미확인 자격」 — 개발자 결정 11-02)', /맞춰 볼 자격/.test(entry.label) && !/미확인/.test(entry.label), entry.label.trim());
 
   /* ② 누르면 공고 팝업 **안에서** 펼쳐진다 (팝업을 갈아치우지 않는다) */
   const titleBefore = await page.evaluate(() =>
@@ -101,7 +101,7 @@ async function seed(page) {
     inputs: document.querySelectorAll('[data-elig-field]').length,
     save: !!document.querySelector('[data-elig-save]'),
   }));
-  ok('  펼친 머리줄도 같은 것을 말한다', /미확인 자격/.test(opened.head), opened.head.trim());
+  ok('  펼친 머리줄도 같은 것을 말한다', /맞춰 볼 자격/.test(opened.head), opened.head.trim());
   ok('  미확인 줄을 여기 다시 나열하지 않는다 (위 자격 블록이 이미 보여 준다)',
     opened.lines === 0, `${opened.lines}줄`);
   ok('  물을 칸이 그려져 있다', opened.inputs > 0, `${opened.inputs}칸`);

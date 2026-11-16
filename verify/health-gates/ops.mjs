@@ -672,4 +672,12 @@ export default async function gate(eq, ctx) {
         /esc\(x\.message\)/.test(mj), /cp _admin\/morning\.html _admin\/morning\.js _admin\/morning-off\.js/.test(bs) && /cp usage-report\.js "\$OUT\/vendor\/usage-report\.js"/.test(bs)],
       [true, true, true, true, true]);
   }
+
+  /* ── ⑭ 상세 시트 점 — 장학·활동 시트 모두 점 없이 · 줄 간격 좁게 (2026-11-15 은서 — 활동 시트 먼저, 같은 날 장학 시트도) ── */
+  {
+    const css = read(root, 'style.css');
+    eq('⑭ 상세 시트(#detail-sheet) 목록은 점 없이 · 줄 위아래 여백 var(--space-2)',
+      [/#detail-sheet \.doc-list li::before, #detail-sheet \.reason-list li::before \{ display: none; \}/.test(css), /#detail-sheet \.doc-list li, #detail-sheet \.reason-list li \{ padding: var\(--space-2\) 0; line-height: 1\.5; \}/.test(css)],
+      [true, true]);
+  }
 }

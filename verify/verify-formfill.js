@@ -51,7 +51,8 @@ const PROFILE = {
     let noField = null;
     for (const id of Object.keys(idx.items || {})) {
       const s = allScholarships().find((x) => x.id === id);
-      if (!s) continue;
+      /* 「신청 준비 시작」 단추는 마감 전·신청 절차가 있는 공고에만 열린다 — 끝난 공고를 고르면 ① 이 헛돈다(2026-11-16 · 선원가족 요강이 10-30 마감으로 읽혀 닫혔다) */
+      if (!s || dday(s.deadline).days < 0 || s.noApply) continue;
       const r = await fetch(`data/forms-pdf/${id}/fields.json`, { cache: 'no-store' });
       if (!r.ok) { noField = noField || { id }; continue; }
       const fj = await r.json();
@@ -111,6 +112,10 @@ const PROFILE = {
   eq('  학적정보에 없는 칸은 비워 둔다 — 지어내지 않는다', scr.byLabel.filter(([l]) => l === '주소').every(([, v]) => v === ''), true);
 
   console.log('\n■ ③ 목록에서 고치면 그림 위도 바뀐다 · 되돌리기 · 기기 장부');
+  /* 폰 폭에서 목록은 접힌 서랍 안이다 — 학생처럼 손잡이를 눌러 펼친 뒤 고친다(2026-11-16 · 칸이 적은 양식은 서랍이 안 굴러
+     접힌 채로는 「되돌리기」를 누를 수 없다 · 예전 대상은 목록이 길어 접힌 서랍 안을 굴려 우연히 눌렸다) · ④ 는 접힌 서랍에서 시작하므로 끝에 다시 접는다 */
+  await page.click('#fill-handle');
+  await page.waitForTimeout(400);
   const fid = await page.$eval('#fill-list .fill-pin', (e) => e.dataset.fid);
   const before = await page.$eval(`#fill-pages .fillp-field[data-fid="${fid}"]`, (e) => e.value);
   await page.fill('#fill-list .fill-pin', '홍길동');
@@ -131,6 +136,8 @@ const PROFILE = {
   await page.fill(`#fill-pages .fillp-field[data-fid="${fid}"]`, '이한장');
   await page.waitForTimeout(300);
   eq('그림 위 칸을 고치면 목록 칸이 같은 값이 된다', await page.$eval(`#fill-list .fill-pin[data-fid="${fid}"]`, (e) => e.value), '이한장');
+  await page.click('#fill-handle');
+  await page.waitForTimeout(400);
 
   console.log('\n■ ④ 폰은 서랍 · 넓은 폭은 사이드바 · 인쇄는 쪽 그림만');
   const drawer = await page.evaluate(() => { const p = document.querySelector('#fill-panel'); const r = p.getBoundingClientRect(); return { pos: getComputedStyle(p).position, open: p.classList.contains('open'), top: Math.round(r.top), vh: window.innerHeight, handle: getComputedStyle(document.querySelector('#fill-handle')).display }; });

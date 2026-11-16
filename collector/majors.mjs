@@ -105,6 +105,19 @@ function campusOf(school, area, campusNm) {
 }
 const splitsCampus = (school) => !!(CAMPUS_BY_AREA[school] || CAMPUS_BY_NUMBER[school]);
 
+/* ── 분교인데 커리어넷이 본교 이름으로 주는 학교 — 개설 지역(area · 시·도)으로 분교 이름을 단다 (2026-11-16 · 노션 C-6 학적정보 점검) ──
+   근거: 2026-11-12 리포트 — `상명대학교` 가 제1캠퍼스(서울특별시 60)·제2캠퍼스(충청남도 64)를 한 이름으로 받아,
+   앱의 별개 학교 `상명대학교 천안캠퍼스`(data.js · 분교 ≠ 이원화) 학생은 학과 파일이 없어 **전국 공통 목록**으로 물러났고
+   서울 학생의 목록에는 천안 학과 64개가 섞였다. 상명 서울캠퍼스는 서울(종로) · 천안캠퍼스는 충남이라 지역이 겹치지 않는다.
+   ⚠️ 지역이 겹치는 분교(같은 시·도에 본교·분교)는 여기 적지 않는다 — 짐작으로 가르지 않는다. 이름은 앱 UNIVERSITIES 와 글자가 같아야 한다(관문). */
+const BRANCH_BY_AREA = {
+  '상명대학교': { '충남': '상명대학교 천안캠퍼스' },
+};
+function branchByArea(school, area) {
+  const t = BRANCH_BY_AREA[school];
+  return (t && t[shortRegion(area)]) || school;
+}
+
 function normalizeSchool(raw) {
   const name = raw.replace(/\s+/g, ' ').trim();
   if (/사이버대|디지털대|원격대|방송통신대.*원|대학원대학/.test(name)) {
@@ -160,7 +173,8 @@ for (const seq of uniq) {
       last = m.index + m[0].length;
     }
     for (const [, campusRaw, majorRaw, schoolRaw, areaRaw] of blocks) {
-      const school = normalizeSchool(schoolRaw);
+      const school0 = normalizeSchool(schoolRaw);
+      const school = school0 ? branchByArea(school0, squash(areaRaw || '')) : school0;   // 분교를 지역으로(BRANCH_BY_AREA)
       /* 이름 정리는 발행기와 같은 함수 — `&amp;` 를 되돌린다(22개 파일에 그대로 실려 있었다) */
       const major = cleanMajorName(majorRaw);
       if (major) {

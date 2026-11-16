@@ -1244,6 +1244,34 @@ function fitScore(sch, result, p) {
   return fitDetail(sch, p).pct;
 }
 
+/* ── 기한도 자격도 모르는 정식 공고는 카드가 아니라 게시판 글로 (2026-11-15 · 개발자 결정 1 — 11-02 「학생 화면에 '모름'류 글자 없음」 계획) ──
+   마감을 못 읽었고(deadline 없음) 자격도 못 읽은(fitDetail unread · 확정 미달 아님) 정식 등록 공고는 카드로 그릴 것이 제목뿐이다 —
+   그래서 카드(홈·탐색·일괄 준비·도우미)에서 빼고 게시판 새 공고(제목+링크)로만 보인다(app.js registeredUrlMatcher 가 그 주소를 피드에서 안 뺀다).
+   🔴 판정을 새로 만들지 않는다 — 미달은 evaluate, 못 읽음은 fitDetail 그대로(카드의 fitVerdict 'unread' 와 같은 갈래).
+   🔴 화면(getMatches)·알림(notify-rules 「새 장학 공고」)이 **이 한 함수**를 쓴다 — 갈라지면 카드에 없는 공고를 알림이 운다.
+   상시 제도(program)·층2(kosaf — 마감 빈 재단을 버리지 말 것)는 대상이 아니다. 찾기(findSch)·저장·신청 내역은 그대로 연다.
+   known 은 이미 잰 { status, fd } — 같은 계산을 두 번 하지 않게(없으면 여기서 잰다) */
+function feedOnlyFormal(sch, p, known) {
+  if (!sch || !p || sch.program || sch.sourceKind === 'kosaf' || sch.deadline) return false;
+  const status = (known && known.status) || evaluate(sch, p).status;
+  if (status === 'ineligible') return false;
+  const fd = (known && known.fd) || fitDetail(sch, p);
+  return !!(fd && fd.unread);
+}
+
+/* 카드로 안 그리는 정식 공고(feedOnlyFormal)를 **게시판 새 공고 한 줄**로 바꾼다 (2026-11-16 리뷰 — 화면·알림이 갈라졌다).
+   그 학교 게시판 글(feed — 이미 내 학교 것만 거른 목록)에 같은 주소가 없을 때만 싣는다(다른 게시판·재단 게시판에서 온 공고) · 있으면 그 글이 그 자리다.
+   🔴 지어내지 않는다 — 제목·주소·날짜는 그 공고의 것 그대로(name·sourceUrl·listedAt).
+   🔴 화면(app.js boardNoticesForMe)과 알림(notify-rules 「4. 실시간 공고」 — notify.js·sw.js 가 부른다)이 **이 한 함수**를 쓴다 —
+      예전엔 app.js 에만 있어 화면엔 뜨는 줄을 알림이 영영 몰랐다(1번 규칙은 feedOnly 를 '4번이 맡는다'며 건너뛴다) */
+function feedOnlyBoardRows(list, feed, p, now) {
+  if (!p || !p.school) return [];
+  const sameUrl = (a, b) => !!a && !!b && (a.startsWith(b) || b.startsWith(a));
+  const urls = (feed || []).map((n) => String((n && n.url) || '')).filter(Boolean);
+  return (list || []).filter((s) => s && s.sourceUrl && notStale(s, now) && feedOnlyFormal(s, p) && !urls.some((u) => sameUrl(u, String(s.sourceUrl))))
+    .map((s) => ({ title: s.name, url: s.sourceUrl, school: (s.eligibility && s.eligibility.schoolOnly) || p.school, foundAt: s.listedAt || '' }));
+}
+
 /* 마감일을 확정하지 못한 공고(원문에 마감이 없거나 못 읽은 경우)는 dday가 '기한 원문 확인'이라
    목록에서 영영 사라지지 않는다 — 지난 학기 공고가 계속 떠 있는 문제가 있었다(2026-07-30 발견).
    그래서 등록일(listedAt)로부터 60일이 지나면 숨긴다. 실시간 공고의 60일 규칙과 같은 기준이다.
@@ -1838,6 +1866,24 @@ function anyOfCount(line) {
   const dig = t.match(/(\d)\s*가지/);
   return dig ? parseInt(dig[1], 10) : 0;
 }
+/* 🔴 **개요 번호 아래 「n개 이상 충족」 머리 줄** (2026-11-16 · 리뷰 — 충남대 사회 재환원 장학금).
+   원문은 `가. 필수조건(모두 충족)` ↵ 1) 2) ↵ `나. 차등조건(1개 이상 충족 시 신청 가능, 해당하는 모든 조건의 증빙서류 제출 필수)` ↵ 1) 2) 3) 이다.
+   POINTER_LINE 은 `아래·다음·위` 로 시작해야 하고 ANY_OF_LINE 은 `중 하나·가지 중` 을 찾아, 이 머리 줄이 그냥 버려졌다 —
+   보호조치 종료자·수급자·보호조치 연장자 셋(**동시에 될 수 없는** 둘이 섞였다)이 모두 갖춰야 하는 요건으로 읽혔다.
+   ① 짧은 이름표(차등조건·선택조건 …) 뒤 `(1개 이상 충족 …` · `: 다음 중 1개 이상 해당` 꼴 — **1개(하나·한 가지) 이상일 때만**이다.
+      `2개 이상 충족` 은 '하나만 되면 된다'가 아니다 — 택1 묶음으로 보면 틀린 안심이 된다(건드리지 않는다).
+   ② 몇 줄이 선택지인지는 `n가지` 가 없으면 **바로 아래 같은 꼴 번호 항목 수**로 센다(enumRun · 1) 2) 3) → 3).
+   ③ 머리 줄 자신은 POINTER_LINE 처럼 화면에 안 내보낸다 — 줄로 남기면 채점기(eligibility-report)가 '제목·이름표로 끝나는 줄'로 센다.
+      ⚠️ 그래서 화면은 아직 세 줄을 평평하게 늘어놓는다(택1 묶음이 화면에 표시되지 않는 것은 가리킴 줄 묶음 전부의 사정) — 적합도·판정만 묶음으로 센다. */
+const ANY_OF_HEAD = /^[가-힣A-Za-z ]{0,15}\s*[(（:：]\s*(?:(?:다음|아래)\s*)?(?:중\s*)?(?:1\s*개|1\s*가지|한\s*가지|하나)\s*(?:항목)?\s*이상\s*(?:을|를|에)?\s*(?:충족|해당|만족)/;
+const ENUM_FAMILIES = [/^\s*\(?\d+\s*\)/, /^\s*\d+\s*\./, /^\s*[①-⑳]/, /^\s*[가-하]\s*[.)]/, /^\s*[-·•▪]\s/];
+function enumRun(lines, start) {
+  const fam = ENUM_FAMILIES.find((re) => re.test(String(lines[start] || '')));
+  if (!fam) return 0;
+  let n = 0;
+  while (start + n < lines.length && fam.test(String(lines[start + n] || ''))) n += 1;
+  return n >= 2 ? n : 0;
+}
 /* `서울시민(성인)` 은 표 칸이 아니라 대상이다(2026-10-04 · 대외활동 표본) — 시민·도민·구민·군민·성인·청년·누구나 */
 const REAL_CATEGORY = /(자|생|중|상|하|명|원)$|북한이탈|새터민|다문화|기초생활|차상위|국적|유공|보훈|장애|한부모|다자녀|(?:시|도|구|군)민|성인|청년|누구나/;
 const isTableCell = (t) => BARE_CELL.test(t) && !REAL_CATEGORY.test(t);
@@ -2027,6 +2073,11 @@ function requirementLines(sch, lines, opts) {
        ⚠️ **대상을 말하는 문장은 지우지 않는다** — 그 줄이 사라지면 '내 것이 아니다'라는
           사실 자체가 화면에서 없어진다(2026-09-12 · 핵심-4). 학위 축이 ✓/✕ 를 붙인다. */
     if (!loose && PR2.gradTarget(t) === 'label') continue;
+    if (ANY_OF_HEAD.test(t) && !POINTER_LINE.test(t)) {
+      /* 개요 번호 아래 「1개 이상 충족」 머리 줄 — 아래 번호 항목들을 택1 묶음으로 연다. 줄 자신은 가리킴 줄(POINTER_LINE)과 같이 안 내보낸다(위 ANY_OF_HEAD 머리말) */
+      const n = anyOfCount(t) || enumRun(joined, li + 1);
+      if (n > 0) { anyLeft = n; anyGroup += 1; continue; }
+    }
     if (POINTER_LINE.test(t)) {
       /* 안내 줄 자신은 화면에 안 내보내되, '여기부터 n줄은 선택지'라는 사실은 남긴다 */
       const n = anyOfCount(t);
@@ -2318,7 +2369,7 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = { evaluate, fitScore, fitDetail, judgeCond, holdsExternalScholarship, FIT_UNREAD, FIT_FLOOR, FIT_MAX, FIT_MIN,
                      RESIDENCE_SPANS, residenceSpan,
                      joinSpacedSyllables, decodeEntities, looksFragment,
-                     scopedToProfile, inSchoolsAny, notStale, STALE_DAYS,
+                     scopedToProfile, inSchoolsAny, notStale, STALE_DAYS, feedOnlyFormal, feedOnlyBoardRows,
                      requirementLines, requirementStruct, requirementMatch, tidyRequirement,
                      REQ_SIGNAL, NOT_A_REQUIREMENT, EXCLUDE_LINE, HARD_THRESHOLD,
                      noticeForProfile, activityForProfile, taggedSchool, SHARED_BOARD_BRANCH, SERVED_SCHOOLS,

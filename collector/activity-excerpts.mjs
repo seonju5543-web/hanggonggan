@@ -177,6 +177,8 @@ export function eligLineOk(line) {
   if (age && age[1].split(/[,，]/).filter((x) => /세/.test(x)).length >= 2) return false;
   if (/개인정보/.test(l) && /유의|관리되|처리|수집|이용|동의/.test(l) && !/(?:대상|자격|요건)\s*[:：]/.test(l)) return false;
   const t = l.trim();
+  /* (o) 해시태그 줄·첨부 파일 이름 (2026-11-15 · 블로그 본문 「태그 #발달장애인 … #공모전」·「…공모전_안내 .pdf」·「포스터_….png」 — 실린 글에 다섯 줄) — 자격이 아니다 */
+  if (/^태그\s*#|(?:#[^\s#]+\s*){2,}/.test(t) || /\.(?:pdf|hwpx?|docx?|xlsx?|pptx?|zip|jpe?g|png|gif)\s*$/i.test(t)) return false;
   if (POLITE_END.test(t) && !HAS_LABEL.test(t) && !(ELIG_SAY.test(t) && !NOT_SAY.test(t))) return false;
   if (LABEL_ONLY.test(t) || AWARD_ROW.test(t)) return false;
   /* (h) 게시판 단추·칸 이름(`답변등록`·`처리상태`·`SNS 업로드`) — 글 아래 민원 양식·공유 단추가 자격 절 뒤에 붙어 왔다(정책브리핑 보도자료 · 농식품부 경진대회 · 2026-10-19) */
@@ -353,7 +355,7 @@ export function sanitizeBenefit(it) {
 
 /* 글 하나에 위 결과를 붙인다 — 수집 로봇의 세 길(새 글 · 재단 글 · 소급)과 API 로봇이 **같은 함수**를 쓴다.
    빈 칸은 지운다(읽었는데 없으면 옛 값을 남기지 않는다 · 장학 로봇과 같은 규칙). */
-export const ACT_DETAILS_V = 6;   // 6 (2026-10-27): 대외활동 어휘(activity-vocab) — 전 글 다시 읽기 · 5 (10-19): 자격요건 머리글·게시판 잡티   // 이 판으로 읽은 글은 detailsV 가 같다 — 다르면 수집 로봇이 원문을 다시 읽는다(소급 · 원칙 7) · 3 = 2026-10-03 활동 자격 읽기(제목부터·괄호 이름표·누구나) · 4 = 2026-10-16 안내 문장·시상표 거름 + 자격 절이 참가방법·시상에서 끊김
+export const ACT_DETAILS_V = 7;   // 7 (2026-11-15): 절 가르기 — `참가제한`·`신청 제한` 은 제외 절 · `주제` 는 다음 절(중국언어문화 경진대회 — 제한 항목 다섯이 자격 줄이었다) — 전 글 다시 읽기 · 6 (2026-10-27): 대외활동 어휘(activity-vocab) — 전 글 다시 읽기 · 5 (10-19): 자격요건 머리글·게시판 잡티   // 이 판으로 읽은 글은 detailsV 가 같다 — 다르면 수집 로봇이 원문을 다시 읽는다(소급 · 원칙 7) · 3 = 2026-10-03 활동 자격 읽기(제목부터·괄호 이름표·누구나) · 4 = 2026-10-16 안내 문장·시상표 거름 + 자격 절이 참가방법·시상에서 끊김
 export function putActivityDetails(it, details) {
   /* 🔴 본문에 자격이 없는데 첨부·포스터에서 읽어 둔 자격(eligibilityFrom · collector/activity-docs.mjs)은 지우지 않는다 —
      본문을 다시 읽을 때마다 첨부에서 건진 자격이 빈 본문에 덮여 사라진다. 본문에서 자격이 나오면 본문이 이긴다(출처 표식도 뗀다). */

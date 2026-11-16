@@ -56,9 +56,9 @@ export default async function gate(eq, ctx) {
     L.sourceLink({ url: 'https://www.jeju.go.kr/index.htm' }, 'activity').label, '주최 측 홈페이지 ↗');
   L.setLinkChecks({ updatedAt: 't', bad: { 'https://s.kr/x?a=1&b=2': { v: 'list', at: '2026-10-04' }, 'https://s.kr/y?id=9': { v: 'gone', at: '2026-10-04' } } });
   eq('  로봇이 확정한 목록 — 이스케이프된 채 저장된 주소도 같은 열쇠로 찾는다', L.sourceLink({ url: 'https://s.kr/x?a=1&amp;b=2', title: 'T' }, 'card').label, '게시판 목록에서 보기 ↗');
-  eq('  로봇이 확정한 404 — 이름에 (확인 필요) + 본 것을 그대로 한 줄',
+  eq('  로봇이 확정한 404 — 이름에 로봇이 본 것(열리지 않음 — 「확인 필요」 아님 · 결정 11-02) + 본 것을 그대로 한 줄',
     [L.sourceLink({ url: 'https://s.kr/y?id=9' }, 'detail').label, L.sourceLink({ url: 'https://s.kr/y?id=9' }, 'detail').caution],
-    ['원문 공고(확인 필요) ↗', '이 주소가 열리지 않았어요 (2026-10-04 확인) — 게시판에서 제목으로 찾아 주세요.']);
+    ['원문 공고(열리지 않음) ↗', '이 주소가 열리지 않았어요 (2026-10-04 확인) — 게시판에서 제목으로 찾아 주세요.']);
   L.setLinkChecks(null);
   eq('  장부를 비우면 다시 보통 주소', L.sourceLink({ url: 'https://s.kr/y?id=9' }, 'detail').kind, 'page');
 

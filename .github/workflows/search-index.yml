@@ -32,7 +32,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 22   # 준비 ~2 + 요약 ~3 + 관문 5 + 되돌리기 7 + 저장·경보 ~3 (2026-11-15 저장 앞 관문)
     steps:
       - uses: actions/checkout@v7
         with:
@@ -46,7 +46,29 @@ jobs:
       - name: 검색용 요약 만들기
         run: node collector/build-search-index.mjs
 
+      # 🔴 저장 직전 관문 (2026-11-15 · 노션 G-16 — 관문 「로봇·도구 점검 관문」 savegate): data/ 를 쓰는 로봇은 규칙 관문(test-collector)과
+      #    데이터 감사(audit-data)를 저장 앞에 거친다. 관문 없이 저장한 파일이 규칙을 어기면 그날 돈 다른 로봇 전부가 제 결과를 되돌린다(10-13 사냥꾼).
+      - name: 데이터 관문
+        id: audit
+        continue-on-error: true
+        timeout-minutes: 5
+        run: |
+          node verify/test-collector.mjs
+          node verify/audit-data.js
+
+      # 되돌리고 **관문을 다시 잰다** (collector/gate-guard.mjs 한 곳 · 수집·사냥꾼 로봇과 같은 장치) — 되돌릴 것은 검색용 요약 하나.
+      # --keep-preexisting: 되돌려도 빨가고 새로 걸린 검사가 없으면(원래 있던 빨간불) 이번 요약은 저장한다(2026-11-10 수집 로봇과 같은 결정).
+      # 상한 7분 = 관문 최대 세 번 + 여유. 넘어지면(|| 뒤) 그 파일만 직전 판으로.
+      - name: 관문 실패 시 검색용 요약 되돌리기
+        id: guard
+        if: always() && steps.audit.outcome == 'failure'
+        timeout-minutes: 7
+        run: |
+          node collector/gate-guard.mjs --note /tmp/gate-note.md --keep-preexisting --stage data/search-index.json || git checkout -- data/search-index.json
+
+      # 저장은 관문이 초록일 때만 — 처음 통과 · 되돌려서 통과 · 다시 재니 통과(flaky) · 원래 있던 빨간불(kept-preexisting). 끝내 빨가면 저장하지 않는다.
       - name: 저장
+        if: always() && (steps.audit.outcome == 'success' || steps.guard.outputs.gate == 'reverted-files' || steps.guard.outputs.gate == 'flaky' || steps.guard.outputs.gate == 'kept-preexisting')
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -71,9 +93,64 @@ jobs:
       # 🔴 실행 알림 (2026-09-06 신설) — 결과 알림과 다른 것이다.
       #    결과 알림: "보러 갔더니 상태가 이상하더라"  · 실행 알림: "보러 가다가 내가 넘어졌다"
       #    이게 없으면 감시 로봇이 죽었을 때 그 로봇이 지키던 것까지 함께 무음이 된다.
+      # 🔴 관문 실패는 조용히 넘어가지 않는다 — 무엇을 되돌렸는지는 gate-guard 의 단락(/tmp/gate-note.md)을 그대로 싣는다(사냥꾼과 같은 꼴).
+      #    이슈 **하나**에 모은다(제목에 날짜·결과 없음 · prefix) · 관문이 다시 통과하면 아래 짝이 닫는다(tools/alert-issue.mjs).
+      - name: 🚨 데이터 관문 실패 알림
+        if: always() && steps.audit.outcome == 'failure'
+        timeout-minutes: 1
+        run: |
+          case "${{ steps.guard.outputs.gate }}" in
+            reverted-files)   result="검색용 요약을 되돌려서 통과 — 이번 요약은 저장하지 않음" ;;
+            kept-preexisting) result="원래 있던 빨간불 — 이번 요약은 저장" ;;
+            still-failing)    result="되돌려도 빨간불 — 이번 요약은 저장하지 않음" ;;
+            flaky)            result="다시 재니 통과(되돌린 것 없음)" ;;
+            *)                result="되돌리기 단계가 결과를 남기지 못함(넘어짐·건너뜀·시간 초과) — 이번 요약은 저장하지 않음" ;;
+          esac
+          {
+            echo "🔎 검색용 요약 만들기: 🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **데이터 관문(test-collector · audit-data) 실패** — $result"
+            echo
+            if [ -n "${{ steps.guard.outputs.gate }}" ] && [ -s /tmp/gate-note.md ]; then cat /tmp/gate-note.md
+            else echo "> 되돌리기 단계가 결과를 남기지 못했습니다(넘어짐·건너뜀·시간 초과) — 이번 요약은 저장하지 않았습니다."; fi
+            echo
+            echo "실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '검색용 요약 관문 실패 확인해줘'라고 지시하세요."
+          } > /tmp/gate-issue.md
+      - name: 🚨 데이터 관문 실패 — 경보 이슈
+        if: always() && steps.audit.outcome == 'failure'
+        timeout-minutes: 1
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          match: prefix
+          title: 🚨 검색용 요약 만들기 — 데이터 관문 실패
+          label: search-index-gate
+          label-description: 검색용 요약 만들기 — 데이터 관문 실패
+          body-file: /tmp/gate-issue.md
+      - name: ✅ 데이터 관문 회복 — 경보 닫기
+        if: always() && steps.audit.outcome == 'success'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          match: prefix
+          title: 🚨 검색용 요약 만들기 — 데이터 관문 실패
+          body: |
+            ✅ 데이터 관문이 다시 통과했습니다 — 이번 요약은 저장됩니다. 자동으로 닫습니다.
+            실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
       - name: 🚨 로봇이 넘어졌다
         if: failure() || cancelled()
         uses: ./.github/actions/robot-down
         with:
           robot: 검색용 요약 만들기
           token: ${{ github.token }}
+
+      # 🔴 관문이 끝내 빨가면 초록불로 끝내지 않는다 — 이슈는 위 단계가 이미 열었다.
+      #    failure()·cancelled() 알림 **뒤**에 둔다(앞에 두면 '로봇이 넘어졌다'는 틀린 말이 붙는다 · 사냥꾼·수집 로봇과 같은 순서).
+      - name: 🚨 관문이 끝내 빨간불 (되돌린 뒤에도 · 원래 있던 빨간불 · 되돌리기 도구가 넘어짐)
+        if: always() && steps.audit.outcome == 'failure' && steps.guard.outputs.gate != 'reverted-files' && steps.guard.outputs.gate != 'flaky'
+        run: |
+          echo "::error::데이터 관문이 빨갛습니다(결과: '${{ steps.guard.outputs.gate }}') — 이슈에 적었습니다."
+          exit 1

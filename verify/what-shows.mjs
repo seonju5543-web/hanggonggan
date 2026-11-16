@@ -111,7 +111,7 @@ function takeConst(name) {
 }
 /* 의존 순서대로 — dday 는 todayStart 를, fitBadgeHtml 은 fitTone·fitVerdict 를,
    cardOrgLine 은 cardTitle·bareOrg·orgBase·providerUnknown 을 쓴다 */
-const NEED = ['todayStart', 'dday', 'fitTone', 'fitVerdict', 'fitBadgeHtml', 'applyLock',
+const NEED = ['todayStart', 'dday', 'fitTone', 'fitToneNoFail', 'fitVerdict', 'fitBadgeHtml', 'applyLock',
   'cleanCardTitle', 'cardTitle', 'cardOrgLine', 'kindChip', 'cardProviderLine', 'splitTitleWho', 'cardTitleParts', 'amountLine'];   // 카드 시안 B(2026-11-02) — 칩·주최·제목 나누기·금액 줄
 const ctx = vm.createContext({ Date, Math, Number, String, JSON, console });
 vm.runInContext([...['bareOrg', 'orgBase', 'providerUnknown', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G', 'isActivityItem', 'KIND_CHIP_CLS', 'ACT_CHIP_CLS', 'WHO_PAREN', 'NOT_WHO_PAREN', 'KOSAF_AMOUNT_UNKNOWN'].map(takeConst), ...['isDateBit', 'splitTitleDates'].map(takeFn), ...NEED.map(takeFn)].join('\n\n'),   // 카드 제목 날짜 규칙(2026-10-05) · 기관명 모름 판정(providerUnknown)
@@ -139,7 +139,7 @@ vm.runInContext([
   ...['ENTITIES', 'ENTITY_RE', 'PARTIAL_ENTITY_END', 'hintText', 'NEWS_THUMB_RE', 'SCHOOL_PHOTO_RE', 'PHOTO_FOCUS_RE',
     'CLOSED_KEEP_DAYS', 'KOSAF_ELIG', 'KOSAF_CORE', 'kosafClean', 'KOSAF_NOISE', 'kosafSplit', 'KOSAF_AMOUNT_UNKNOWN', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G'].map(takeConst),
   ...['isDateBit', 'splitTitleDates', 'hintShort', 'shortDay'].map(takeFn),   // 카드 제목 날짜·회색 기간 줄(2026-10-04·05) · 카드 윗줄 날짜(10-10)
-  ...['esc', 'unent', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'attachPrepTemplate', 'kosafAsScholarships', 'sourceLinkHintHtml',   // attachPrepTemplate: 층2 항목마다 지원문서를 붙인다(2026-10-13 ① · FORM_TEMPLATES 가 없는 자리에선 그대로 돌려준다)
+  ...['esc', 'unent', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'kosafNoticeValue', 'attachPrepTemplate', 'kosafAsScholarships', 'sourceLinkHintHtml',   // attachPrepTemplate: 층2 항목마다 지원문서를 붙인다(2026-10-13 ① · FORM_TEMPLATES 가 없는 자리에선 그대로 돌려준다)
     'attachmentLinkHtml', 'sourceLinkHtml', 'sourceNoteHtml', 'amountSourceLinkHtml', 'appLogLinkHtml', 'noticeCardHtml', 'activityLinkWhy'].map(takeFn),
   /* 층2 바꾸기가 읽는 앱 상태 — 이 도구는 저장·신청 내역을 모른다(없음) */
   'var kosafList = []; var kosafUpdatedAt = ""; var state = { applications: [] }; function isSaved() { return false; }',
@@ -304,7 +304,7 @@ for (const sch of hits) {
      여기에 조건을 손으로 적어 두었더니, 자격 잠금을 푼 뒤에도 이 도구만 계속
      '잠김'이라고 보고했다 — 이 파일 머리말이 경고한 바로 그 갈라짐이다.
      `app` 은 '이미 신청한 기록'인데 이 도구는 저장소 데이터만 보므로 항상 없다(null). */
-  const { canApply, caution, noApply } = appFn('applyLock')(result, null, d, sch);
+  const { canApply, caution, noApply } = appFn('applyLock')(result, null, d, sch, fd);
 
   const listLines = ME.requirementLines(sch, null);                    // 목록 카드 — 5줄 상한
   const allLines = ME.requirementLines(sch, null, { all: true });      // 상세 시트 — 전부

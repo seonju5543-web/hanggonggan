@@ -101,7 +101,8 @@ async function seed(page) {
       checked++;
       if (got !== want) wrong.push(`${sch.id} 기대='${want}' 실제='${got}'`);
       const shouldUrgent = !sch.program && d.days >= 0 && d.days <= 7;
-      if (el && el.classList.contains('urgent') === shouldUrgent) urgentOk++; else urgentBad++;
+      /* 마감을 모르면 마감 글자 자체가 없다(2026-11-15 · 예전 「기한 확인 중」) — 그때는 빨강일 수도 없다 */
+      if (el ? el.classList.contains('urgent') === shouldUrgent : (!shouldUrgent && want === '')) urgentOk++; else urgentBad++;
       /* 맨 윗줄(적합도 자리)에 마감이 올라가면 안 된다 — 개발자 지시 */
       if (c.querySelector('.sch-top .sch-due')) wrong.push(`${sch.id} 마감이 맨 윗줄(적합도 자리)에 있다`);
       if (c.querySelector('.dl-meter')) wrong.push(`${sch.id} 막대가 되살아났다`);
@@ -200,6 +201,10 @@ async function seed(page) {
       reader: read().querySelector('.sr-only')?.textContent || '',
     };
 
+    /* 받았는데 빈손 — 2026-11-15 결정 1 부터 이 구역은 「카드로 안 그리는 정식 공고」(feedOnlyFormal — 기한·자격을 다 모름)도 싣는다.
+       빈손을 재려면 그 공고도 잠시 비운다(규칙은 앱의 feedOnlyFormal 그대로) */
+    const keepReg = registeredList;
+    registeredList = registeredList.filter((s) => !feedOnlyFormal(s, state.profile));
     liveNotices = { items: [], updatedAt: null }; renderHome();      // 받았는데 빈손
     const after = {
       skeleton: !!read().querySelector('.skel-list'),
@@ -209,6 +214,7 @@ async function seed(page) {
       empty: /없어요|없음/.test(read().textContent),
     };
 
+    registeredList = keepReg;
     liveNotices = keep; renderHome();
     return { during, after };
   });

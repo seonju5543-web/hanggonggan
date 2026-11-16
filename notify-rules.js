@@ -161,6 +161,14 @@ var NOTIFY_RULES = (function () {
         : function () { return true; };
     }
     list = list.filter(isFresh);
+    /* 카드로 안 그리는 정식 공고(기한·자격을 다 모름)는 「새 장학 공고」로 알리지 않는다 — 화면과 같은 match-engine feedOnlyFormal 한 곳 (2026-11-15 결정 1).
+       그 글은 게시판 새 공고로 보이고 알림도 그쪽(4. 실시간 공고)이 맡는다. 호출자가 안 넘기면 전역, 그마저 없으면(옛 캐시 엔진) 거르지 않는다 */
+    var feedOnly = ctx.feedOnly;
+    if (typeof feedOnly !== 'function') {
+      feedOnly = (typeof feedOnlyFormal === 'function')
+        ? function (s) { return feedOnlyFormal(s, profile); }
+        : function () { return false; };
+    }
 
     /* 실시간 공고가 내 학교 것인가 — 판정은 match-engine.js의 noticeForProfile 하나로 통일한다.
        분교(한양 ERICA 등)와 제목의 [서울]·[ERICA] 표시를 여기서 함께 처리하므로,
@@ -188,6 +196,7 @@ var NOTIFY_RULES = (function () {
     var fresh = [];
     list.forEach(function (s) {
       if (!s || !s.id) return;
+      if (feedOnly(s)) return;                        // 카드가 아니다 — '본 것'으로도 적지 않는다(나중에 기한을 읽으면 그때 새 공고)
       if (seenSch[s.id]) return;
       seenSch[s.id] = 1;
       if (s.program) return;                          // 상시 제도는 '새 공고'가 아니다
@@ -214,8 +223,9 @@ var NOTIFY_RULES = (function () {
             key: 'new:' + s.id,
             type: 'newMatch',
             title: '새 장학 공고 · ' + s.name,
-            body: (s.amount ? s.amount + ' · ' : '')
-              + (d != null ? (d === 0 ? '오늘 마감' : '마감 D-' + d) : '마감 원문 확인'),
+            /* 금액·마감은 **아는 것만** 적는다 (2026-11-15 · 개발자 결정 11-02 — 예전 '금액 원문 확인 · 마감 원문 확인'). 금액 '모름' 표시는 화면과 같은 규칙으로 뺀다 */
+            body: [(s.amount && !/원문 확인|미확인|확인\s?필요|에서 확인/.test(s.amount)) ? s.amount : '',
+              d != null ? (d === 0 ? '오늘 마감' : '마감 D-' + d) : ''].filter(Boolean).join(' · ') || '내 조건에 맞는 공고',
             schId: s.id,
           });
         });
@@ -283,11 +293,14 @@ var NOTIFY_RULES = (function () {
       return !!ledger.lastCheck && !isNaN(t) && t + 2 * 864e5 <= ledger.lastCheck;
     };
     var freshNotices = [];
-    notices.forEach(function (n) {
+    // 내 학교 공고인지는 match-engine이 정한다 — 화면(app.js)과 같은 판정이어야
+    // 화면에 없는 공고를 알림으로 알리는 일이 없다. 분교(한양 ERICA 등)도 여기서 처리된다.
+    var mineFeed = notices.filter(function (n) { return n && n.url && noticeMine(n, profile); });
+    /* 카드로 안 그리는 정식 공고(1번이 건너뛴 feedOnly)는 화면이 게시판 새 공고 한 줄로 싣는다 — 알림도 **같은 함수**(match-engine feedOnlyBoardRows)로 같은 줄을 센다
+       (2026-11-16 리뷰 — 예전엔 화면에만 있어 그 공고는 어디서도 안 울었다). 옛 캐시 엔진에 함수가 없으면 예전처럼 게시판 글만 */
+    var demoted = (typeof feedOnlyBoardRows === 'function') ? feedOnlyBoardRows(list, mineFeed, profile, now) : [];
+    mineFeed.concat(demoted).forEach(function (n) {
       if (!n || !n.url) return;
-      // 내 학교 공고인지는 match-engine이 정한다 — 화면(app.js)과 같은 판정이어야
-      // 화면에 없는 공고를 알림으로 알리는 일이 없다. 분교(한양 ERICA 등)도 여기서 처리된다.
-      if (!noticeMine(n, profile)) return;
       var tk = titleSeenKey(n);
       var seen = seenNotice[n.url] || seenNotice[tk] || foundBeforeLastCheck(n);
       seenNotice[n.url] = 1;

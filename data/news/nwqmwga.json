@@ -1,7 +1,27 @@
 {
  "school": "전남대학교",
- "updatedAt": "2026-11-15",
+ "updatedAt": "2026-11-16",
  "items": [
+  {
+   "title": "[취업정보] [해병대] 해병대 장교 모집 설명회/상담회",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70996",
+   "postedAt": "2026-11-16",
+   "kind": "행사",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-16"
+  },
+  {
+   "title": "[학사안내] 2027학년도 전기(2차) 일반대학원 입학전형 모집요강 공고",
+   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70994",
+   "postedAt": "2026-11-16",
+   "kind": "학사",
+   "school": "전남대학교",
+   "campus": "",
+   "src": "b7347301",
+   "foundAt": "2026-11-16"
+  },
   {
    "title": "[취업정보] [올포랜드]2027 신입사원(SW개발, 측량 및 공간정보부문)...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70993",
@@ -378,26 +398,6 @@
    "title": "[취업정보] [KIA]26년 엔지니어(생산직) 설비기술인력(~11.18.(...",
    "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70938",
    "postedAt": "2026-11-06",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-08"
-  },
-  {
-   "title": "[채용공고] 전남대학교 전남광주인문사회연구원 행정지원인력(연구원) 채용 공고",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70937",
-   "postedAt": "2026-11-06",
-   "kind": "채용",
-   "school": "전남대학교",
-   "campus": "",
-   "src": "b7347301",
-   "foundAt": "2026-11-08"
-  },
-  {
-   "title": "[채용공고] 제10회 앵커사업단 ‧ 제3회 서남권 공유대학사업단 직원 채...",
-   "url": "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70936",
-   "postedAt": "2026-11-06",
-   "kind": "채용",
    "school": "전남대학교",
    "campus": "",
    "src": "b7347301",

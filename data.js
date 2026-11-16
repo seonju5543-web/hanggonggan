@@ -445,7 +445,8 @@ function isFormAttachment(a) {
   /* 🔴 `사업계획서 및 업무처리기준.pdf`·`선발 공고문(신청서 포함)`·`요강` 은 학생이 채우는 서식이 아니라 **공고문**이다(2026-11-15 · 1단계 B3 — 푸른등대 PDF 가 '양식 있음'으로 불리고
      양식 로봇의 '못 받음' 목록에 매일 남았다). 공고문 뒷장의 서식은 서식 쪽 로봇(form-pages)이 뗀다. 규칙은 함수 안에 둔다 — form-pdf.mjs 가 함수만 떼어 간다 */
   if (/사업\s?계획서|업무\s?처리\s?기준|공고문|요강|선발\s?계획/.test(name)) return false;
-  return /신청서|지원서|원서|양식|서식|서류|계획서|동의서|서약서/.test(name) && /\.(hwp|hwpx|docx?|zip|pdf)/i.test(name);
+  /* `자기소개서` 는 2026-11-15 — `사회봉사활동 자기소개서-이오순장학재단.hwp` 처럼 학생이 채워 내는 서식인데 이름에 위 낱말이 없어 '양식 없음'이었다 */
+  return /신청서|지원서|원서|양식|서식|서류|계획서|동의서|서약서|자기소개서/.test(name) && /\.(hwp|hwpx|docx?|zip|pdf)/i.test(name);
 }
 function hasFormAttachment(sch) {
   return (sch.attachments || []).some(isFormAttachment);
@@ -455,7 +456,13 @@ function hasFormAttachment(sch) {
    되지만, '작성하라'고 말하기엔 넓다 — `결과보고서 양식.hwp` 도 거기 걸린다(점프장학 실측). */
 function isApplicationForm(a) {
   /* 계획서·동의서·서약서도 학생이 채워 내는 서식이다(2026-10-13) — 추천서는 남(교수)이 쓰므로 뺀다 · '결과보고서 양식'은 여전히 아니다 */
-  return isFormAttachment(a) && /신청서|지원서|원서|계획서|동의서|서약서/.test((a && a.name) || '') && !/추천서|보고서/.test((a && a.name) || '');
+  /* 2026-11-15 셋 — ① 자기소개서도 학생이 쓴다(이오순장학재단) ② 이름에 자기소개서가 같이 있으면 추천서가 끼어도 학생이 쓰는 서식이다
+     (`2027 자기소개서 및 추천서 양식(장학금 지원자).doc` · 한독제석재단) ③ 운영 규칙 문서(업무처리기준·운영계획서·선발/심사 기준·강의계획서)는
+     계획서·기준이라는 낱말이 있어도 학생이 내는 서식이 아니다(`푸른등대 기부장학금 사업계획서 및 업무처리기준.pdf` 가 양식 PDF 로 붙었다) */
+  const n = (a && a.name) || '';
+  return isFormAttachment(a) && /신청서|지원서|원서|자기소개서|계획서|동의서|서약서/.test(n)
+    && !(/추천서|보고서/.test(n) && !/자기소개서/.test(n))   // `장학생 추천서 신청서양식` 은 여전히 추천서(남이 쓴다) — 자기소개서가 같이 적힌 것만 학생 서식
+    && !/업무\s*처리\s*기준|운영\s*계획서|선발\s*기준|심사\s*기준|강의\s*계획서/.test(n);
 }
 
 /* 접수 채널 분류 — 실제 공고의 접수 방식 (정직 표기: 앱이 대신 못 누르는 채널은 명시).
@@ -565,11 +572,12 @@ function officialChannel(sch) {
     const name = (what) => (knownProvider ? `${sch.provider} (${what})` : what);
     /* 🔴 이름은 **명사**로 — 'OO에서 공식 제출을 마치셨나요?'·'최종 제출처: OO' 처럼 문장 안에 들어간다(리뷰 APP-3 ·
        '…찾기에서 공식 제출을' 이 됐다). 할 일(제목으로 찾기)은 링크 옆 안내 문장(sourceLink hint)이 말한다. */
+    /* 🔴 문제 주소(trouble)도 이름은 「원문 공고의 접수 방법」 — 제출처는 여전히 원문 공고가 정한다(2026-11-16 · 예전 「… · 주소 확인 필요」 · 결정 11-02 '모름'류 낱말 빼기).
+       주소가 그 공고를 안 보여 준다는 사실은 note(로봇이 본 한 줄 · sourceLink caution — 「이 주소가 열리지 않았어요 …」)로 함께 넘긴다 — 링크로 그리는 자리(신청 내역 「최종 제출처」)가 옆에 붙인다 */
     const label = cls === 'list' ? name('게시판 목록')
       : cls === 'home' ? name('홈페이지')
-      : cls === 'trouble' ? name('원문 공고의 접수 방법 · 주소 확인 필요')   // 괄호를 쓰지 않는다 — '최종 제출처(…)가 표시됩니다' 안에서 괄호가 겹친다(화면 실측)
       : name('원문 공고의 접수 방법');
-    return { label, url: linkUrl, guide };
+    return cls === 'trouble' && sl && sl.caution ? { label, url: linkUrl, guide, note: sl.caution } : { label, url: linkUrl, guide };
   }
   return { label: knownProvider ? `${sch.provider} 장학공지 (학교 포털)` : '원문 공고의 접수 방법',
     guide: SUBMIT_GUIDES.campus };

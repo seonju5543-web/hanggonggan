@@ -1,7 +1,16 @@
 {
  "school": "가톨릭대학교",
- "updatedAt": "2026-11-15",
+ "updatedAt": "2026-11-16",
  "items": [
+  {
+   "title": "[학사행정팀] 2027학년도 1학기 재입학 모집 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277795&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-16",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-16"
+  },
   {
    "title": "[학생지원팀] 단과대학 개편 관련 학생 설명회 개최 안내",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277777&article.offset=0&articleLimit=10",
@@ -423,17 +432,6 @@
    "campus": "",
    "src": "5d85d287",
    "foundAt": "2026-10-23"
-  },
-  {
-   "title": "2026-겨울학기 가톨릭계 대학 학점교류 안내(서강대, 가톨릭관동대, 대구가톨릭대, 부산가톨릭대)",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277031&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-23",
-   "kind": "학사",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-23",
-   "desc": "1. 학점교류 제도 안내 신청절차 1) [ 트리니티 ] – [ 학사정보 ] – [ 수업 / 성적 ] – [ 수업 ] – [ 국내학점교류신청 ( 가톨릭계대학 )] 에서 지원사항 작성"
   }
  ]
 }

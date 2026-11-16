@@ -190,7 +190,7 @@ export default async function gate(eq, ctx) {
   vm.runInContext([
     T.one('ENTITIES'), T.one('ENTITY_RE'), T.one('PARTIAL_ENTITY_END'), T.one('hintText'), T.one('NEWS_THUMB_RE'), T.one('SCHOOL_PHOTO_RE'), T.one('PHOTO_FOCUS_RE'), T.one('CLOSED_KEEP_DAYS'),
     T.one('KOSAF_ELIG'), T.one('KOSAF_CORE'), T.one('kosafClean'), T.one('KOSAF_NOISE'), T.one('kosafSplit'), T.one('KOSAF_AMOUNT_UNKNOWN'), T.one('TD_DAY'), T.one('TD_DAY_RE'), T.one('TD_DAY_G'), T.fn('isDateBit'), T.fn('splitTitleDates'),
-    ...['esc', 'unent', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'attachPrepTemplate', 'kosafAsScholarships',   // attachPrepTemplate: 층2 지원문서(2026-10-13 ①) — FORM_TEMPLATES 가 없는 자리에선 그대로 돌려준다
+    ...['esc', 'unent', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'kosafNoticeValue', 'attachPrepTemplate', 'kosafAsScholarships',   // attachPrepTemplate: 층2 지원문서(2026-10-13 ①) — FORM_TEMPLATES 가 없는 자리에선 그대로 돌려준다
       'sourceLinkHintHtml', 'attachmentLinkHtml', 'sourceLinkHtml', 'sourceNoteHtml', 'amountSourceLinkHtml',
       'appLogLinkHtml', 'hintShort', 'shortDay', 'noticeCardHtml', 'activityLinkHtml'].map(T.fn),   // shortDay — 카드 수집 날짜를 「10.08」로 (2026-10-10)   // hintShort — 카드 회색 기간 줄(2026-10-04)
     /* kosafAsScholarships 가 읽는 앱 상태 — 저장·신청 내역은 없다(마감 지난 것도 전부 그린다 · 아래 dday 덮어쓰기) */
@@ -320,7 +320,7 @@ export default async function gate(eq, ctx) {
   F('setLinkChecks')(null);
   eq('(c) 장부가 「목록」을 확정한 보통 주소(표본) — 이름·찾기 안내·제출처 이름이 함께 바뀐다(표식이 없어도)',
     listNow, ['게시판 목록 ↗', true, true]);
-  eq('  장부가 「열리지 않음」을 확정한 주소 — (확인 필요) + 로봇이 본 것 한 줄', goneNow, ['원문 공고(확인 필요) ↗', true, '공고 원문 보기(확인 필요) ↗']);
+  eq('  장부가 「열리지 않음」을 확정한 주소 — (열리지 않음) + 로봇이 본 것 한 줄', goneNow, ['원문 공고(열리지 않음) ↗', true, '공고 원문 보기(열리지 않음) ↗']);
   eq('  장부를 비우면 예전 글자 그대로 (승인된 화면 — 보통 주소는 「원문 공고 ↗」)', textOf(F('sourceLinkHtml')(pageReg)), '원문 공고 ↗');
 
   /* (d) 바로잡은 원문(⑥)이 있으면 **이름과 주소가 함께** 바뀐다 (리뷰 2026-10-04 — 카드·도우미가 이름은 link 에서, 주소는 n.url 에서 받아

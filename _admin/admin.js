@@ -183,6 +183,8 @@ const D = {
   newsSources: { sources: [], parked: [] }, newsCfg: { hideUrls: [] }, newsIndex: { files: {} },
   /* 원문 링크 (2026-10-04) — 로봇이 열어 보고 확정한 문제(bad)·로봇이 찾은 원문(fix) · 관리자가 넣은 원문(fix). 둘 다 작다 */
   linkCheck: { bad: {} }, linkFixes: { v: 1, fix: {} },
+  /* 신청서 원본 PDF·공고문 서식 쪽 (2026-11-15) — 양식이 '있다'는 것은 formId 만이 아니다(결정 6 · 원본 그대로 PDF). 카드 채움 현황(verify/card-coverage.mjs)과 같은 셈 */
+  formsPdf: {}, formPages: {},
   failed: [],   // 읽지 못한 파일 — 비어 있지 않으면 화면 숫자를 믿으면 안 된다
 };
 
@@ -235,7 +237,7 @@ async function readText(path) {
 async function loadAll() {
   D.failed = [];        // 매번 새로 센다 — 지난번 실패가 남아 있으면 안 된다
   reportCache = {};     // 로봇을 돌린 뒤 옛 리포트가 보이던 문제(A5)
-  const [reg, notices, forms, health, schools, targets, linkHunt, pending, autoCfg, log, acts, actSrc, actCfg, newsSrc, newsCfg, newsIdx, linkCheck, linkFixes] =
+  const [reg, notices, forms, health, schools, targets, linkHunt, pending, autoCfg, log, acts, actSrc, actCfg, newsSrc, newsCfg, newsIdx, linkCheck, linkFixes, formsPdf, formPages] =
     await Promise.all([
       readJson('data/registered.json', { items: [] }),
       readJson('data/notices.json', { items: [] }),
@@ -255,9 +257,13 @@ async function loadAll() {
       readJson('data/news/index.json', { files: {} }),
       readJson('data/link-check.json', { bad: {} }),
       readJson('data/link-fixes.json', { v: 1, fix: {} }),
+      readJson('data/forms-pdf/index.json', { items: {} }),
+      readJson('data/form-pages/index.json', { items: {} }),
     ]);
 
   D.reg = reg.items || [];
+  D.formsPdf = (formsPdf && formsPdf.items) || {};
+  D.formPages = (formPages && formPages.items) || {};
   D.updatedAt = reg.updatedAt || '';
   D.notices = notices.items || [];
   D.forms = forms.templates || {};
@@ -384,11 +390,21 @@ function amountUnknown(it) {
   return !(Number(it.amountValue) > 0) && !it.amountSpec;
 }
 
+/* 신청서 첨부는 있는데 학생이 받을 양식이 없는가 — 마감 전 · 앱 양식(formId)도 원본 PDF(data/forms-pdf)도 서식 쪽(data/form-pages)도 없음 ·
+   신청서 판정은 data.js isApplicationForm(양식 PDF 로봇과 한 벌) · 카드 채움 현황(verify/card-coverage.mjs gaps)과 같은 셈 (2026-11-15) */
+function formMissing(it) {
+  if (!it || it.formId) return false;
+  if (dday(it.deadline) != null && dday(it.deadline) < 0) return false;
+  if ((D.formsPdf[it.id] || []).length || (D.formPages[it.id] || []).some((f) => f && f.file)) return false;
+  const isApp = typeof isApplicationForm === 'function' ? isApplicationForm : (typeof isFormAttachment === 'function' ? isFormAttachment : null);
+  return !!isApp && (it.attachments || []).some(isApp);
+}
+
 function badgesOf(it, formIds) {
   const b = [];
   if (amountUnknown(it)) b.push('금액 미확인');
   if (!it.deadline) b.push('마감일 없음');
-  if (typeof hasFormAttachment === 'function' && hasFormAttachment(it) && !it.formId) b.push('양식 미등록');
+  if (formMissing(it)) b.push('양식 미등록');
   const u = it.sourceUrl || '';
   if ((RULES.DOWNLOAD_URL && RULES.DOWNLOAD_URL.test(u)) || u.includes('#n-')) b.push('원문 링크 이상');
   if (it.formId && !formIds.has(it.formId)) b.push('없는 양식 연결');
@@ -3856,8 +3872,7 @@ function renderQuality(target) {
   const dead = deadLinks();
   const noAmount = noAmountItems().length;   // 「할 일」 구획과 같은 셈 (마감 지난 공고는 학생 화면에 없다)
   const noDeadline = noDeadlineItems().length;   // 「할 일」 구획과 같은 셈 — 카드 숫자와 줄 수가 갈라지지 않게
-  const noForm = D.reg.filter((it) => typeof hasFormAttachment === 'function'
-    && hasFormAttachment(it) && !it.formId).length;
+  const noForm = D.reg.filter(formMissing).length;
   /* 지원 자격 미확보 — 학생 화면에 "지원 자격을 아직 읽지 못했어요"로 나가는 공고.
      판정 기준은 **학생 앱과 같은 칸**(eligibilityLines)이다. 고치는 자리는 상세 시트에
      있었는데 '몇 건인지'를 세는 자리가 어디에도 없어서, 76건이 밀려 있어도 화면이 조용했다. */
@@ -3893,7 +3908,7 @@ function renderQuality(target) {
     { n: warns.length, tone: 'is-warn', k: '규칙 경고', d: '손봐야 하지만 치명적이지는 않음' },
     { n: noAmount, tone: 'is-warn', k: '금액 미확인', d: '학생이 얼마인지 모르는 공고 — 「할 일」 위쪽 「금액을 로봇이 못 읽은 공고」에서 금액을 적을 수 있습니다' },
     { n: noDeadline, tone: 'is-warn', k: '마감일 없음', d: '언제까지인지 모르는 공고 — 「할 일」 위쪽 「마감을 로봇이 못 읽은 공고」에서 날짜를 적을 수 있습니다' },
-    { n: noForm, tone: 'is-warn', k: '신청서 첨부는 있는데 양식 미등록', d: '앱에서 작성하게 만들 수 있는 후보' },
+    { n: noForm, tone: 'is-warn', k: '신청서 첨부는 있는데 양식 미등록', d: '마감 전 · 원본 PDF 도 아직 없음(양식 로봇이 받을 몫)' },
     { n: noElig, tone: 'is-warn', k: '지원 자격 미확보',
       d: '앱1이 자격을 한 줄도 못 읽은 공고 — 상세에서 원문 문장을 골라 주면 사라집니다 (학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다)' },
     { n: aiReadCount, tone: 'is-warn', k: 'AI가 읽은 자격 · 사람 검수 전',

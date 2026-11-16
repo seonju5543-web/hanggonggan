@@ -78,13 +78,13 @@ const CR = { title: '2026년 2학기 장학생 선발 안내', host: '재단법�
 
   /* ② 같은 화면에서 결과 파일에 없는 공고 — 무료 길 그대로(비상망) */
   const b = await sheet(page, OTHER.id);
-  ok('결과 파일에 없는 공고는 무료 길 값 그대로다 (방법 「원문 확인」 · 옛 마감)', (b.method || '') === '원문 확인' && (b.period || '').includes(mmdd(OTHER.deadline)), { method: b.method, period: b.period });
+  ok('결과 파일에 없는 공고는 무료 길 값 그대로다 (방법 줄 없음 · 옛 마감 · 무료 길 서류)', b.method === null && (b.period || '').includes(mmdd(OTHER.deadline)) && (b.docs || '').includes('접수방법'), { method: b.method, period: b.period, docs: b.docs });
   await ctx.close();
 
   /* ③ 결과 파일을 못 받으면(404) 전부 무료 길 — 앱이 넘어지지 않는다 */
   ({ ctx, page } = await open(false));
   const c = await sheet(page, ITEM.id);
-  ok('결과 파일을 못 받아도 공고가 뜨고 무료 길 값으로 보인다', (c.method || '') === '원문 확인' && (c.period || '').includes(mmdd(ITEM.deadline)), { method: c.method, period: c.period });
+  ok('결과 파일을 못 받아도 공고가 뜨고 무료 길 값으로 보인다', c.method === null && (c.period || '').includes(mmdd(ITEM.deadline)) && c.elig.length > 0, { method: c.method, period: c.period, elig: c.elig });
   await ctx.close();
 
   ok('화면 오류 없음', errors.length === 0, errors.slice(0, 3));

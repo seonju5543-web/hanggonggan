@@ -1,7 +1,18 @@
 {
  "school": "경희대학교",
- "updatedAt": "2026-11-15",
+ "updatedAt": "2026-11-16",
  "items": [
+  {
+   "title": "국제 [(국제) 심리상담센터] 다문화가정 및 북한이탈주민 재학생을 위한 NEO 성격검사",
+   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323562",
+   "postedAt": "2026-11-16",
+   "postId": "323562",
+   "school": "경희대학교",
+   "campus": "",
+   "src": "a92b27ac",
+   "foundAt": "2026-11-16",
+   "desc": "(국제 ) 심리상담센터에서 다문화가정 및 북한이탈주민 재학생 의 자기이해와 마음건강 증진을 지원하기 위해 ‘NEO 성격검사 ’ 를 진행합니다 . NEO 성격검사는 나의 성격적 특성을 객관적으로 이해하고 , 나…"
+  },
   {
    "title": "국제 [(주)선일다이파스]2027년 정기 공채사원 추천채용",
    "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323570",
@@ -376,27 +387,6 @@
    "src": "a92b27ac",
    "foundAt": "2026-10-19",
    "thumb": "data/news/img/d707a0d4c9c07f61.webp"
-  },
-  {
-   "title": "공통 [국제교육원]2026년 2학기 추오대학 TANDEM(언어 교환) 도우미 모집",
-   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323343",
-   "postedAt": "2026-10-16",
-   "postId": "323343",
-   "school": "경희대학교",
-   "campus": "",
-   "src": "a92b27ac",
-   "foundAt": "2026-10-16"
-  },
-  {
-   "title": "서울 [추가모집] [(서울)장애학생지원센터] ★2026-2학기 장애학생 학습도우미 모집 ★",
-   "url": "https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=322903",
-   "postedAt": "2026-10-16",
-   "postId": "322903",
-   "school": "경희대학교",
-   "campus": "",
-   "src": "a92b27ac",
-   "foundAt": "2026-10-16",
-   "thumb": "data/news/img/e839a690eef22921.webp"
   }
  ]
 }
