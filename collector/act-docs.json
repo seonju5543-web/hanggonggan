@@ -23,14 +23,6 @@
   "at": "2026-11-13",
   "tries": 2
  },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53254&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-11-10",
-  "tries": 1
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53663&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-11-10",
-  "tries": 1
- },
  "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627143&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888": {
   "at": "2026-11-11",
   "tries": 1
@@ -272,6 +264,66 @@
   "tries": 1
  },
  "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=142007&article.offset=0&articleLimit=10": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kau.ac.kr/kaulife/event.php?code=s1401&page=3&mode=read&seq=9242": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://wise.dongguk.ac.kr/article/servicenotice/detail/521193": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=819&bbsNo=8&nttNo=171439&pageUnit=10&searchCtgry=%eb%aa%a8%ec%a7%91%2f%ea%b3%b5%eb%aa%a8&searchCnd=all&pageIndex=1": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.gachon.ac.kr/bbs/kor/479/119165/artclView.do": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=943&page=3": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=6302&bidx=897276&qidx=6302&cate=10&allboard=false&nowpage=1": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=6302&bidx=895824&qidx=6302&cate=10&allboard=false&nowpage=1": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=6302&bidx=894511&qidx=6302&cate=10&allboard=false&nowpage=1": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=6302&bidx=893582&qidx=6302&cate=10&allboard=false&nowpage=1": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=6302&bidx=893358&qidx=6302&cate=10&allboard=false&nowpage=1": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=6302&bidx=893357&qidx=6302&cate=10&allboard=false&nowpage=1": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=6302&bidx=893356&qidx=6302&cate=10&allboard=false&nowpage=1": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=6302&bidx=893354&qidx=6302&cate=10&allboard=false&nowpage=1": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=6302&bidx=892382&qidx=6302&cate=10&allboard=false&nowpage=1": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=6302&bidx=892360&qidx=6302&cate=10&allboard=false&nowpage=1": {
   "at": "2026-11-16",
   "tries": 1
  }
