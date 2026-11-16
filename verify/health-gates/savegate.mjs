@@ -7,6 +7,9 @@
      · `data/` 를 저장하면 → 데이터 감사(verify/audit-data.js)도 저장 앞에
      · '앞에'는 같은 job 안, 로봇이 파일을 쓴 단계 **뒤** · 저장 단계는 관문이 빨가면 돌지 않아야 한다
        (저장 단계의 if 가 관문 단계 결과를 보거나 · 관문 단계가 continue-on-error 없이 넘어지고 저장 단계가 always() 로 덮지 않거나 · 같은 단계 안에서 관문이 먼저).
+     · 🔴 (2026-11-16 리뷰) 되돌리기 짝은 **저장하는 경로를 전부** 덮어야 센다(gate-guard --stage · git checkout -- · 'auto' 는 정식 등록만) — 아니면
+       저장 if 가 gate-guard 의 '다시 재어 초록'(reverted-*·flaky)만 받아야 한다(kept-preexisting 는 빨간 판을 받아들인 것) ·
+       관문 줄을 삼키는 꼴(`| tee` 무 pipefail · if/!/until 조건 · `|| 무엇이든` · `&& …`)과 관문 **뒤** 쓰기(> · mv · cp · tee · sed -i · node -e)는 관문이 아니다.
    🔴 톱니(ratchet): 지금 관문이 없는 저장 job 은 아래 SAVE_GATE_EXCEPTIONS 에 이유 한 줄과 함께 있다 —
       새 저장 job 이 관문 없이 생기면 빨간불 · 목록에 있는 job 이 관문을 갖추면(또는 저장을 그만두면) 그것도 빨간불(목록에서 지우라고) → 목록은 줄기만 한다.
    🔴 저장 여부는 `git add <경로>` 로 본다(주석 줄은 걷어 낸다) — 커밋 옮기기 로봇(deploy-sync·main-guard·device-deploy·rollback)은 git add 가 없어 저장 로봇이 아니다.
@@ -57,29 +60,128 @@ export function needsOf(paths) {
 
 const hasAlways = (cond) => /\b(always|failure|cancelled)\s*\(\)/.test(String(cond || ''));
 const truthyCoe = (s) => /^(true|'true'|"true")$/.test(String(s['continue-on-error'] || '').trim());
-/** 관문 줄이 빨간불을 삼키는가 — `|| true` · `|| :` · `|| echo …`(뒤에 exit 없음) */
-const swallowed = (line) => /\|\|\s*(true|:)\b/.test(line) || (/\|\|\s*echo\b/.test(line) && !/exit\s+[1-9]/.test(line));
+/** 셸 글 → 줄(주석 줄 걷고 줄 이어 쓰기 잇기) — 줄 번호는 늘 이 꼴로 센다 */
+const shLines = (run) => codeLines(run).join('\n').replace(/\\\n/g, ' ').split('\n');
 
-/** 단계 하나가 거치는 관문 — 셸 글의 줄 중 관문을 부르고 삼키지 않는 줄. 반환 { rule, data } (그 단계 run 의 첫 git add 앞 줄만 셀 수 있게 upto 를 준다) */
-function gatesIn(run, upto = Infinity) {
-  const g = { rule: false, data: false };
-  const lines = codeLines(run).join('\n').replace(/\\\n/g, ' ').split('\n');
+/* 관문이 재는 경로(data/ · collector 바로 밑 json)에 **쓰는** 셸 꼴 (2026-11-16 리뷰 — 관문 뒤 `jq … > t && mv t data/a.json`·`node -e "fs.writeFileSync('data/a.json')"` 가
+   '파일을 쓰는 단계'로 안 잡혀, 관문이 잰 뒤 바뀐 파일이 저장됐다) */
+const GATED_TARGET = /^["']?(?:\.\/)?(?:data(?:\/|["']?$)|collector\/[^/\s"']+\.json["']?$)/;
+const WRITE_VERB = /\b(?:writeFileSync|writeFile|appendFileSync|renameSync|copyFileSync|cpSync|rmSync|unlinkSync|write_text|write_bytes|json\.dump|shutil\.(?:copy|move))\b|\bopen\([^)]*,\s*["'][wax]/;
+const READ_VERB = /\b(?:readFileSync|readFile|JSON\.parse|require\(|read_text|json\.load)\b/;
+function writesGatedPath(seg) {
+  const s = seg.replace(/["'][^"']*["']/g, (q) => (/^["'](?:\.\/)?(?:data\/|collector\/)/.test(q) ? q : '""'));
+  for (const m of s.matchAll(/(?:^|[^0-9&>|])\d?>>?\|?\s*(\S+)/g)) if (GATED_TARGET.test(m[1])) return true;   // > data/a.json · >> · 2>
+  const toks = s.trim().split(/\s+/);
+  const cmd = toks.findIndex((t) => !/^[A-Z_][A-Z0-9_]*=/.test(t) && t !== 'sudo');
+  const head = toks[cmd] || '';
+  const args = toks.slice(cmd + 1).filter((t) => !t.startsWith('-'));
+  if (/^(mv|cp|install|rsync|ln)$/.test(head) && args.length >= 2 && GATED_TARGET.test(args[args.length - 1])) return true;
+  if (head === 'tee' && args.some((a) => GATED_TARGET.test(a))) return true;
+  if (/^(sed|perl)$/.test(head) && toks.some((t) => /^-[a-zA-Z]*i/.test(t)) && args.some((a) => GATED_TARGET.test(a))) return true;   // sed -i data/a.json
+  return false;
+}
+/** 줄 번호(shLines 기준)마다 '관문이 재는 경로에 쓰는가' — 로봇·도구 부르기(node·python·bash 스크립트) · 셸 쓰기(> · mv · cp · tee · sed -i) · node -e/python -c 의 몸통 */
+function writeLineSet(run) {
+  const lines = shLines(run);
+  const out = new Set();
+  lines.forEach((l, i) => {
+    const calls = [...l.matchAll(/\b(?:node|python3?|bash)\s+([^\s;&|]+)/g)].map((m) => m[1]);
+    if (calls.some((c) => !/^(verify\/|collector\/gate-guard\.mjs|tools\/alert-issue\.mjs|tools\/setup-collab\.sh|-e$|-c$|--check$)/.test(c))) out.add(i);
+    if (l.split(/;|&&|\|\||\|(?!\|)/).some(writesGatedPath)) out.add(i);
+  });
+  /* node -e "…" / python -c "…" — 몸통은 여러 줄일 수 있다. 관문 경로를 말하고, 쓰는 동사가 있거나 읽는 동사조차 없으면 쓰기로 센다(모르면 쓰기) */
+  const text = lines.join('\n');
+  for (const m of text.matchAll(/\b(?:node|python3?)\s+(?:-e|-c|--eval)\s+(["'])([\s\S]*?)\1/g)) {
+    const body = m[2];
+    if (!/(?:^|[^\w/])(?:\.\/)?(?:data\/|collector\/[^/\s"'`]+\.json)/.test(body)) continue;
+    if (WRITE_VERB.test(body) || !READ_VERB.test(body)) out.add(text.slice(0, m.index).split('\n').length - 1);
+  }
+  return out;
+}
+
+/* 단계의 셸 — `shell: bash` 면 GitHub 이 `bash --noprofile --norc -eo pipefail` 로 돌린다. 적지 않으면(기본) `bash -e` 라 pipefail 이 없다 */
+const pipefailShell = (shell) => String(shell || '').trim() === 'bash';
+const setsPipefail = (l) => /\bset\s+(?:-[a-zA-Z]*o\s+pipefail|-o\s+pipefail)\b/.test(l);
+/** if/while/until 묶음·`|| {` 묶음의 몸 — 그 줄부터 짝(fi · done · })까지 */
+function blockFrom(lines, i, closeRe) {
+  const out = [lines[i]];
+  if (closeRe.test(lines[i])) return out.join('\n');
+  for (let j = i + 1; j < lines.length; j += 1) { out.push(lines[j]); if (closeRe.test(lines[j])) break; }
+  return out.join('\n');
+}
+const EXITS = /\bexit\s+[1-9]/;
+
+/** 관문 줄이 빨간불을 삼키는가 (2026-11-16 리뷰 — `|| true`·`|| :`·`|| echo` 만 보아 아래가 '관문'으로 통과했다):
+    · `관문 | tee …` — 기본 셸(bash -e)은 pipefail 이 없어 tee 의 0 이 이긴다(단계 `shell: bash` 나 앞줄 `set -o pipefail` 이면 산다)
+    · `if 관문` · `if ! 관문` · `! 관문` · `while/until 관문` — 조건으로 쓰면 bash -e 가 멈추지 않는다(if 묶음 안에 exit 1~9 가 있으면 산다)
+    · `관문 || 무엇이든` — 뒤(같은 줄 또는 `|| {` 묶음)에 exit 1~9 가 없으면 삼킨다
+    · `관문 && …` — && 목록의 앞 명령은 bash -e 가 멈추지 않는다(그 줄이 run 의 마지막 명령이면 단계 결과가 되어 산다) */
+function swallowed(lines, i, ctx = {}) {
+  const line = lines[i];
+  const m = /\bverify\/(?:test-collector\.mjs|audit-data\.js)\b/.exec(line);
+  if (!m) return false;
+  const before = line.slice(0, m.index);
+  const after = line.slice(m.index + m[0].length);
+  if (/^\s*(?:if|elif)\b/.test(before)) return !EXITS.test(blockFrom(lines, i, /(?:^|[;\s])fi\b/));
+  if (/^\s*(?:while|until)\b/.test(before) || /!\s*(?:\S+=\S*\s+)*(?:node\s+)?$/.test(before)) return true;
+  const or = /\|\|(.*)$/.exec(after);
+  if (or) return !EXITS.test(/^\s*\{\s*$/.test(or[1]) ? blockFrom(lines, i, /^\s*\}/) : or[1]);
+  if (/\|(?!\|)/.test(after) && !pipefailShell(ctx.shell) && !lines.slice(0, i).some(setsPipefail)) return true;
+  if (/&&/.test(after)) { const rest = lines.slice(i + 1).filter((l) => l.trim()); return rest.length > 0; }
+  return false;
+}
+
+/** 단계 하나가 거치는 관문 — 셸 글의 줄 중 관문을 부르고 삼키지 않는 줄. 반환 { rule, data }.
+    upto: 그 단계 run 의 첫 git add 앞 줄만 센다 · 관문 **뒤에** 같은 단계가 관문 경로에 쓰면 그 앞의 관문은 무효(다시 잰 것이 아니다) */
+function gatesIn(run, upto = Infinity, ctx = {}) {
+  let g = { rule: false, data: false };
+  const lines = shLines(run);
+  const writes = writeLineSet(run);
   for (let i = 0; i < lines.length && i < upto; i += 1) {
-    if (swallowed(lines[i])) continue;
+    if (writes.has(i)) { g = { rule: false, data: false }; continue; }
+    if (swallowed(lines, i, ctx)) continue;
     if (RULE_GATE_RE.test(lines[i])) g.rule = true;
     if (DATA_GATE_RE.test(lines[i])) g.data = true;
   }
   return g;
 }
-const firstAddLine = (run) => codeLines(run).join('\n').replace(/\\\n/g, ' ').split('\n').findIndex((l) => /\bgit\s+add\b/.test(l));
+const firstAddLine = (run) => shLines(run).findIndex((l) => /\bgit\s+add\b/.test(l));
 
-/** 파일을 쓰는 단계인가 — 로봇·도구를 부르는 run(node·python·bash 스크립트). 관문·되돌리기·알림 도구는 뺀다 */
+/** 파일을 쓰는 단계인가 — 로봇·도구를 부르는 run(node·python·bash 스크립트) · 관문 경로에 쓰는 셸(> · mv · cp · tee · sed -i · node -e). 관문·되돌리기·알림 도구는 뺀다 */
 function producing(s) {
   const run = codeLines(s.run).join('\n');
   if (!run.trim()) return false;
   if (/\bgit\s+add\b/.test(run)) return false;
-  const calls = [...run.matchAll(/\b(?:node|python3?|bash)\s+([^\s;&|]+)/g)].map((m) => m[1]);
-  return calls.some((c) => !/^(verify\/|collector\/gate-guard\.mjs|tools\/alert-issue\.mjs|tools\/setup-collab\.sh|-e$|-c$|--check$)/.test(c));
+  return writeLineSet(s.run).size > 0;
+}
+
+/** 되돌리기 단계가 덮는 경로 — gate-guard `--stage a,b`(auto 는 정식 등록 파일의 자동 등록분만 뺀다 → data/registered.json) ·
+    `git checkout [HEAD] -- a b` · `git restore a b` · `git clean … -- a b`. `.` 는 '*'(전부) */
+export function revertCover(run) {
+  const text = shLines(run).join('\n');
+  const out = new Set();
+  const add = (p) => { const q = p.replace(/^["']|["']$/g, '').replace(/^\.\//, '').replace(/\/+$/, ''); if (q) out.add(q === '.' || q === '' ? '*' : q); };
+  if (/\bcollector\/gate-guard\.mjs\b/.test(text)) {
+    for (const m of text.matchAll(/--stage\s+(\S+)/g)) for (const p of m[1].split(',')) add(p === 'auto' ? 'data/registered.json' : p);
+  }
+  for (const m of text.matchAll(/\bgit\s+(checkout|restore|clean)\b([^\n;&|]*)/g)) {
+    const args = m[2].replace(/\s\d?>\S*/g, ' ').trim().split(/\s+/).filter(Boolean);
+    const dd = args.indexOf('--');
+    if (m[1] === 'checkout' && dd < 0) continue;            // `git checkout -B x` 는 되돌리기가 아니다
+    const paths = (dd >= 0 ? args.slice(dd + 1) : args).filter((a) => !a.startsWith('-') && !(m[1] === 'restore' && /^(HEAD|@)$/.test(a)));
+    paths.forEach(add);
+  }
+  return out;
+}
+/** 저장 경로가 되돌리기에 덮이는가 — 관문이 재는 경로만 따진다. '*'·'?'(전부·변수) 저장은 '*' 되돌리기만 덮는다 */
+export function covers(cover, paths) {
+  const need = paths.filter((p) => { const n = needsOf([p]); return n.rule || n.data; });
+  return need.every((p) => {
+    if (cover.has('*')) return true;
+    if (p === '*' || p === '?' || p === '.') return false;
+    const q = p.replace(/^\.\//, '').replace(/\/+$/, '');
+    return [...cover].some((c) => q === c || q.startsWith(`${c}/`));
+  });
 }
 
 /** 워크플로 글 하나 → 저장 job 마다 { job, needs, has, ok, why } */
@@ -95,20 +197,35 @@ export function saveGateReport(yml) {
     /* 저장 단계마다 그 앞(같은 job · 마지막 '파일을 쓰는 단계' 뒤)의 관문 중 저장을 막을 수 있는 것 */
     const perSave = saves.map(({ s, i, paths }) => {
       const n = needsOf(paths);
-      const got = gatesIn(s.run, firstAddLine(s.run));            // 같은 단계 안에서 git add 앞
+      const got = gatesIn(s.run, firstAddLine(s.run), { shell: s.shell });            // 같은 단계 안에서 git add 앞
       let lastProd = -1;
       for (let k = 0; k < i; k += 1) if (producing(steps[k])) lastProd = k;
       for (let k = lastProd + 1; k < i; k += 1) {
         const g = steps[k];
-        const gg = gatesIn(g.run);
+        const gg = gatesIn(g.run, Infinity, { shell: g.shell });
         if (!gg.rule && !gg.data) continue;
         const cond = String(s.if || '');
-        const looksAt = g.id && new RegExp(`steps\\.${g.id}\\.(outcome|conclusion)\\s*==\\s*'success'`).test(cond);
-        /* 되돌리기 짝 — 관문이 빨가면 되돌린다(gate-guard 가 되돌리고 다시 재거나 · git checkout 으로 직전 판).
-           관문 단계와 저장 단계 사이에 있고, 그 관문의 실패를 보고 돈다 */
-        const guarded = g.id && steps.slice(k + 1, i).some((r) => REVERT_RE.test(codeLines(r.run).join('\n'))
-          && new RegExp(`steps\\.${g.id}\\.(outcome|conclusion)\\s*==\\s*'failure'`).test(String(r.if || '')));
-        const blocks = looksAt || guarded || (!truthyCoe(g) && !hasAlways(cond));
+        const ok = (id) => new RegExp(`steps\\.${id}\\.(outcome|conclusion)\\s*==\\s*'success'`);
+        /* 되돌리기 짝 — 관문 단계와 저장 단계 사이에서 그 관문의 실패를 보고 돌고, 🔴 **저장하는 경로를 전부 덮는** 것만 (2026-11-16 리뷰 —
+           `git checkout -- data/a.json` 만 하는 되돌리기 뒤에 data/a.json·data/b.json 을 저장해도 '관문 있음'으로 셌다) */
+        const covering = g.id ? steps.slice(k + 1, i).filter((r) => REVERT_RE.test(codeLines(r.run).join('\n'))
+          && new RegExp(`steps\\.${g.id}\\.(outcome|conclusion)\\s*==\\s*'failure'`).test(String(r.if || ''))
+          && covers(revertCover(r.run), paths)) : [];
+        /* gate-guard 가 **다시 재어 초록**이라 말한 결과(reverted-auto · reverted-files · flaky) — 그때는 저장하는 판 전체를 관문이 잰 것이다.
+           kept-preexisting 는 빨간 판을 받아들인 것이라 여기 없다(되돌린 판에도 같은 빨간불 → stage 밖 파일이 새로 깨뜨린 것도 '원래 있던 것'으로 보인다) */
+        const greenGuards = g.id ? steps.slice(k + 1, i).filter((r) => r.id && /\bcollector\/gate-guard\.mjs\b/.test(codeLines(r.run).join('\n'))
+          && new RegExp(`steps\\.${g.id}\\.(outcome|conclusion)\\s*==\\s*'failure'`).test(String(r.if || ''))).map((r) => r.id) : [];
+        const greenRe = (id) => new RegExp(`steps\\.${id}\\.outputs\\.gate\\s*==\\s*'(reverted-auto|reverted-files|flaky)'`);
+        /* 저장 if 가 관문 결과를 본다 — `||` 로 갈린 갈래마다 관문 성공 · gate-guard 의 초록 결과 · **덮는** 되돌리기 단계의 결과 중 하나를 봐야 한다
+           (`steps.audit.outcome == 'success' || steps.guard.outputs.gate == 'kept-preexisting'` 에서 guard 가 덮지 않으면 빨간 판이 저장된다) */
+        const looksAt = !!g.id && ok(g.id).test(cond)
+          && cond.split('||').every((p) => ok(g.id).test(p) || greenGuards.some((id) => greenRe(id).test(p))
+            || covering.some((r) => r.id && p.includes(`steps.${r.id}.`)));
+        /* 관문 실패를 보고 **작업을 빨간불로 멈추는** 단계(continue-on-error 없이 마지막 명령이 exit 1~9) — 저장 if 가 always()·failure() 로 덮지 않으면 저장은 돌지 않는다 */
+        const stops = !!g.id && !hasAlways(cond) && steps.slice(k + 1, i).some((r) => !truthyCoe(r)
+          && new RegExp(`steps\\.${g.id}\\.(outcome|conclusion)\\s*==\\s*'failure'`).test(String(r.if || ''))
+          && /^\s*exit\s+[1-9]\s*$/.test(shLines(r.run).filter((l) => l.trim()).pop() || ''));
+        const blocks = looksAt || covering.length > 0 || stops || (!truthyCoe(g) && !hasAlways(cond));
         if (!blocks) continue;
         got.rule ||= gg.rule; got.data ||= gg.data;
       }
@@ -141,9 +258,12 @@ export function ratchet(ungated, exceptions) {
 const wfOf = (steps) => `name: 표본\non:\n  workflow_dispatch:\njobs:\n  run:\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v7\n${steps}`;
 const ROBOT = '      - name: 로봇\n        run: node collector/robot.mjs\n';
 const SAVE = (paths, cond = '') => `      - name: 저장\n${cond ? `        if: ${cond}\n` : ''}        run: |\n          git config user.name bot\n${paths.map((p) => `          [ -f ${p} ] && git add ${p}\n`).join('')}          git commit -m x && git push\n`;
-const GATE = (cmds, { id = 'audit', coe = false, cond = '' } = {}) => `      - name: 데이터 관문\n        id: ${id}\n${cond ? `        if: ${cond}\n` : ''}${coe ? '        continue-on-error: true\n' : ''}        run: |\n${cmds.map((c) => `          ${c}\n`).join('')}`;
+const GATE = (cmds, { id = 'audit', coe = false, cond = '', shell = '' } = {}) => `      - name: 데이터 관문\n        id: ${id}\n${cond ? `        if: ${cond}\n` : ''}${coe ? '        continue-on-error: true\n' : ''}${shell ? `        shell: ${shell}\n` : ''}        run: |\n${cmds.map((c) => `          ${c}\n`).join('')}`;
 const TC = 'node verify/test-collector.mjs';
 const AU = 'node verify/audit-data.js';
+/* 되돌리기 단계(관문 실패 때만) · 관문과 저장을 한 단계에(git add 는 늘 data/a.json) */
+const REVERT = (run, id = '') => `      - name: 되돌리기\n${id ? `        id: ${id}\n` : ''}        if: steps.audit.outcome == 'failure'\n        run: |\n${run.split('\n').map((l) => `          ${l}\n`).join('')}`;
+const SAME = (cmds) => `      - name: 관문과 저장\n        run: |\n${cmds.map((c) => `          ${c}\n`).join('')}          git add data/a.json\n`;
 export const SAMPLES = {
   noGate: wfOf(ROBOT + SAVE(['data/x.json'])),
   gateHard: wfOf(ROBOT + GATE([TC, AU]) + SAVE(['data/x.json', 'collector/x-state.json'])),
@@ -163,6 +283,36 @@ export const SAMPLES = {
   gateAfterSave: wfOf(ROBOT + SAVE(['data/x.json']) + GATE([TC, AU])),
   twoJobs: `${wfOf(ROBOT + GATE([TC, AU]) + SAVE(['data/x.json']))}  other:\n    runs-on: ubuntu-latest\n    timeout-minutes: 5\n    steps:\n${ROBOT}${SAVE(['data/y.json'])}`,
   addAll: wfOf(ROBOT + '      - name: 저장\n        run: |\n          git add -A\n          git commit -m x\n'),
+  /* ── 2026-11-16 리뷰 — 관문이 저장을 못 막는데 '관문 있음'으로 세던 꼴(각각 고치기 전 판에서는 통과했다) ── */
+  revertPartial: wfOf(ROBOT + GATE([TC, AU], { coe: true }) + REVERT('git checkout -- data/a.json') + SAVE(['data/a.json', 'data/b.json'], 'always()')),
+  revertFull: wfOf(ROBOT + GATE([TC, AU], { coe: true }) + REVERT('git checkout -- data/a.json data/b.json') + SAVE(['data/a.json', 'data/b.json'], 'always()')),
+  guardKeptPartial: wfOf(ROBOT + GATE([TC, AU], { coe: true }) + REVERT('node collector/gate-guard.mjs --keep-preexisting --stage data/a.json || git checkout -- data/a.json', 'guard')
+    + SAVE(['data/a.json', 'data/b.json'], "steps.audit.outcome == 'success' || steps.guard.outputs.gate == 'kept-preexisting'")),
+  guardKeptFull: wfOf(ROBOT + GATE([TC, AU], { coe: true }) + REVERT('node collector/gate-guard.mjs --keep-preexisting --stage data/a.json --stage data/b.json || git checkout -- data/a.json', 'guard')
+    + SAVE(['data/a.json', 'data/b.json'], "steps.audit.outcome == 'success' || steps.guard.outputs.gate == 'kept-preexisting'")),
+  guardGreenOnly: wfOf(ROBOT + GATE([TC, AU], { coe: true }) + REVERT('node collector/gate-guard.mjs --stage data/a.json || git checkout -- data/a.json', 'guard')
+    + SAVE(['data/a.json', 'data/b.json'], "always() && (steps.audit.outcome == 'success' || steps.guard.outputs.gate == 'reverted-files' || steps.guard.outputs.gate == 'flaky')")),
+  guardAutoAddAll: wfOf(ROBOT + GATE([TC, AU], { coe: true }) + REVERT('node collector/gate-guard.mjs --stage auto', 'guard')
+    + '      - name: 저장\n        run: |\n          git add -A\n          git commit -m x\n'),
+  revertDotAddAll: wfOf(ROBOT + GATE([TC, AU], { coe: true }) + REVERT('git checkout -- .')
+    + '      - name: 저장\n        run: |\n          git add -A\n          git commit -m x\n'),
+  stopAfterRevert: wfOf(ROBOT + GATE([TC, AU], { coe: true }) + REVERT('git checkout -- data/a.json\necho "::error::되돌렸습니다"\nexit 1') + SAVE(['data/a.json', 'data/b.json'])),
+  stopButAlways: wfOf(ROBOT + GATE([TC, AU], { coe: true }) + REVERT('git checkout -- data/a.json\nexit 1') + SAVE(['data/a.json', 'data/b.json'], 'always()')),
+  pipeTee: wfOf(ROBOT + GATE([`${TC} | tee /tmp/tc.txt`, `${AU} | tee /tmp/au.txt`]) + SAVE(['data/a.json'])),
+  pipeTeeBash: wfOf(ROBOT + GATE([`${TC} | tee /tmp/tc.txt`, `${AU} | tee /tmp/au.txt`], { shell: 'bash' }) + SAVE(['data/a.json'])),
+  pipeTeeSet: wfOf(ROBOT + GATE(['set -o pipefail', `${TC} | tee /tmp/tc.txt`, `${AU} | tee /tmp/au.txt`]) + SAVE(['data/a.json'])),
+  ifNotWarn: wfOf(ROBOT + SAME([`if ! ${TC}; then echo 경고; fi`, `if ! ${AU}; then echo 경고; fi`])),
+  ifNotExit: wfOf(ROBOT + SAME([`if ! ${TC}; then`, '  echo 실패', '  exit 1', 'fi', `if ! ${AU}; then exit 1; fi`])),
+  bangGate: wfOf(ROBOT + SAME([`! ${TC}`, `! ${AU}`])),
+  untilGate: wfOf(ROBOT + SAME([`until ${TC}; do sleep 1; done`, `until ${AU}; do sleep 1; done`])),
+  orAnything: wfOf(ROBOT + SAME([`${TC} || touch /tmp/failed`, `${AU} || node tools/alert-issue.mjs --mode open`])),
+  orExitBlock: wfOf(ROBOT + SAME([`${TC} || {`, '  echo 실패', '  exit 1', '}', `${AU} || exit 2`])),
+  andChain: wfOf(ROBOT + SAME([`${TC} && echo 규칙 통과`, `${AU} && echo 감사 통과`])),
+  writeMvAfter: wfOf(ROBOT + GATE([TC, AU]) + '      - name: 손질\n        run: |\n          jq . data/a.json > /tmp/t && mv /tmp/t data/a.json\n' + SAVE(['data/a.json'])),
+  writeRedirectAfter: wfOf(ROBOT + GATE([TC, AU]) + '      - name: 손질\n        run: echo "{}" > data/a.json\n' + SAVE(['data/a.json'])),
+  writeNodeEAfter: wfOf(ROBOT + GATE([TC, AU]) + `      - name: 손질\n        run: |\n          node -e "const fs=require('fs');\n            fs.writeFileSync('data/a.json','{}')"\n` + SAVE(['data/a.json'])),
+  readNodeEAfter: wfOf(ROBOT + GATE([TC, AU]) + `      - name: 읽기만\n        run: node -e "JSON.parse(require('fs').readFileSync('data/a.json','utf8'))"\n` + SAVE(['data/a.json'])),
+  sameStepWriteAfter: wfOf(ROBOT + SAME([TC, AU, 'cp /tmp/new.json data/a.json'])),
 };
 
 export default async function gate(eq, ctx) {
@@ -189,6 +339,33 @@ export default async function gate(eq, ctx) {
   eq('  `git add -A`(경로 없음) → 전부로 센다', ok('addAll').map((r) => r[1]), [false]);
   eq('  경로 읽기 — 줄 이어 쓰기 · 꼬리 주석 · 2>/dev/null · 변수', addedPaths('git add data/a.json \\\n  collector/b.json # 설명\ngit add insta/c.json 2>/dev/null || true\ngit add "$f"'),
     ['data/a.json', 'collector/b.json', 'insta/c.json', '?']);
+
+  /* ①-2 (2026-11-16 리뷰) 되돌리기는 **저장하는 경로를 전부** 덮어야 저장을 막는다 · 관문 줄을 삼키는 꼴 · 관문 뒤에 쓰는 꼴.
+     각 '빠짐' 표본은 고치기 전 판에서 '통과'였다(red-green) — 늘 통과로 돌아가면 여기서 빨개진다 */
+  const okv = (k) => ok(k).map((r) => r[1]);
+  eq('①-2 되돌리기가 a 만 덮는데 always() 로 a·b 저장 → 빠짐 · 둘 다 덮으면 → 통과',
+    [okv('revertPartial'), okv('revertFull')], [[false], [true]]);
+  eq('  gate-guard stage 가 a 만인데 kept-preexisting(빨간 판 받아들임)에도 a·b 저장 → 빠짐 · stage 가 a·b 를 덮으면 → 통과',
+    [okv('guardKeptPartial'), okv('guardKeptFull')], [[false], [true]]);
+  eq('  gate-guard 가 다시 재어 초록일 때만(reverted-files·flaky) 저장 → stage 밖 경로도 잰 판이라 통과',
+    okv('guardGreenOnly'), [true]);
+  eq('  `git add -A` 는 auto 단계(자동 등록분만 뺀다)로 못 덮는다 · `git checkout -- .` 는 덮는다',
+    [okv('guardAutoAddAll'), okv('revertDotAddAll')], [[false], [true]]);
+  eq('  되돌리기가 exit 1 로 작업을 멈추면 저장은 안 돈다 → 통과 · 저장이 always() 면 → 빠짐',
+    [okv('stopAfterRevert'), okv('stopButAlways')], [[true], [false]]);
+  eq('  `관문 | tee` — 기본 셸(pipefail 없음) → 빠짐 · shell: bash 나 set -o pipefail → 통과',
+    [okv('pipeTee'), okv('pipeTeeBash'), okv('pipeTeeSet')], [[false], [true], [true]]);
+  eq('  관문을 조건으로(if ! … then echo · ! … · until …) → 빠짐 · if ! … then exit 1 → 통과',
+    [okv('ifNotWarn'), okv('bangGate'), okv('untilGate'), okv('ifNotExit')], [[false], [false], [false], [true]]);
+  eq('  `관문 || 무엇이든`(exit 없음) · `관문 && …`(끝 명령 아님) → 빠짐 · `|| { …; exit 1; }` · `|| exit 2` → 통과',
+    [okv('orAnything'), okv('andChain'), okv('orExitBlock')], [[false], [false], [true]]);
+  eq('  관문 뒤 다른 단계가 data/ 에 쓴다(> · jq … && mv · node -e writeFileSync) → 빠짐 · node -e 로 읽기만 → 통과',
+    [okv('writeRedirectAfter'), okv('writeMvAfter'), okv('writeNodeEAfter'), okv('readNodeEAfter')], [[false], [false], [false], [true]]);
+  eq('  같은 단계에서 관문 뒤 git add 앞에 cp 로 data/ 에 쓴다 → 빠짐', okv('sameStepWriteAfter'), [false]);
+  eq('  되돌리기가 덮는 경로 읽기 — gate-guard --stage(auto → 정식 등록) · git checkout [HEAD] -- · git restore · git clean · `.` 는 전부',
+    [[...revertCover('node collector/gate-guard.mjs --stage auto --stage data/x.json,collector/y.json || git checkout -- data/z.json')],
+      [...revertCover('git checkout HEAD -- data/news\ngit clean -fdq -- data/news\ngit restore collector/a.json')], [...revertCover('git checkout -- .')], [...revertCover('git checkout -B deploy origin/main')]],
+    [['data/registered.json', 'data/x.json', 'collector/y.json', 'data/z.json'], ['data/news', 'collector/a.json'], ['*'], []]);
 
   /* ② 톱니 — 새 저장 로봇은 빨간불 · 목록에 있는데 관문이 생기면 그것도 빨간불(목록은 줄기만 한다) */
   eq('② 톱니 — 목록에 없는 관문 없는 저장 job 은 fresh · 관문이 생긴 목록 항목은 stale',
