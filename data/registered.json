@@ -9825,7 +9825,7 @@
     "[> 선발 대상 : 대학교 재학 대학생 (사이버대학교 불가)",
     "[> 선발 인원 : 대학생 200명 내외",
     "[> 신청 자격 : 학자금 지원구간 5구간 이내 / 복지자격, 1~5구간",
-    "[> 접수처 : wwwybzor.kr/",
+    "▷ 접수처 : www.ybz.or.kr/",
     "[> 서류 접수 기간 : 2026년 9월 1일(화) 10:00 ~ 2026년 10월 8일(목) 17:00"
    ],
    "excerptNote": "공고문 첨부에서 그대로 발췌 (자동)"
@@ -10134,8 +10134,8 @@
    ],
    "sourceUrl": "https://mirae.yonsei.ac.kr/bbs/wj/104/944143/artclView.do",
    "sourceKind": "auto",
-   "applyEmail": "Gnjael.gwd@gmail.com",
-   "applyEmailSource": "○ (신청방법) 서류 구비 후 이메일 Gnjael.gwd@gmail.com) 접수",
+   "applyEmail": "injae1.gwd@gmail.com",
+   "applyEmailSource": "❍ (신청방법) 서류 구비 후 이메일(injae1.gwd@gmail.com) 접수",
    "applyEmailFrom": "공고문 첨부(OCR)",
    "announceDate": "2026-10-23",
    "eligibilityLines": [
@@ -10154,7 +10154,7 @@
    "amountFrom": "공고 원문",
    "documentsFrom": "공고문 첨부(OCR)",
    "excerpts": [
-    "○ (신청방법) 서류 구비 후 이메일 Gnjael.gwd@gmail.com) 접수"
+    "❍ (신청방법) 서류 구비 후 이메일(injae1.gwd@gmail.com) 접수"
    ],
    "excerptNote": "공고문 첨부에서 그대로 발췌 (자동)"
   },
@@ -21838,9 +21838,9 @@
    "provider": "주관 기관 원문 확인",
    "amount": "금액 원문 확인",
    "amountValue": 0,
-   "deadline": "2026-11-18",
-   "deadlineFrom": "공고 원문 · 2026년 가천대학교 재학생 심층면접토론(FGD) 참여학생 모집 ○ 신청기간: 2026.11.05.(목) ~ 11.18.(수)",
-   "period": "접수 ~2026-11-18",
+   "deadline": "2026-11-11",
+   "deadlineFrom": "공고 원문 · 3. 신청기간 : 2026. 11. 6.(금), 15:00 ~ 11. 11.(수), 12:00 (기한엄수)",
+   "period": "접수 ~2026-11-11",
    "summary": "가천대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
@@ -21877,7 +21877,8 @@
     "3. 신청기간 : 2026. 11. 6.(금), 15:00 ~ 11. 11.(수), 12:00 (기한엄수)",
     "10. 문의 : ☎031-750-8945~6 (근로지 업무 관련 사항은 해당 근로지로 문의)"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "announceDate": "2026-11-13"
   },
   {
    "id": "auto-qlmjzmaw5kv29yzcuzrcuyng-07fiyle",
@@ -22283,9 +22284,9 @@
    "provider": "주관 기관 원문 확인",
    "amount": "금액 원문 확인",
    "amountValue": 0,
-   "deadline": "2026-11-18",
-   "deadlineFrom": "공고 원문 · 2026년 가천대학교 재학생 심층면접토론(FGD) 참여학생 모집 ○ 신청기간: 2026.11.05.(목) ~ 11.18.(수)",
-   "period": "접수 ~2026-11-18",
+   "deadline": "2026-11-16",
+   "deadlineFrom": "공고 원문 · 1. 신청 기간 2026년 11월 5일(목) ~ 11월 16일(월)",
+   "period": "접수 ~2026-11-16",
    "summary": "가천대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
@@ -22319,11 +22320,7 @@
     "- 재학생: 직전학기 12학점 이상 이수",
     "- 최종학년: 직전학기 9학점 이상 이수",
     "※ 위 자격요건을 충족하지 않는 경우 추가 장학금이 지급되지 않습니다."
-   ],
-   "excerpts": [
-    "○ 신청기간: 2026.11.05.(목) ~ 11.18.(수)"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   ]
   },
   {
    "id": "auto-skor478126763artclviewdo",
@@ -22338,9 +22335,9 @@
    "provider": "주관 기관 원문 확인",
    "amount": "금액 원문 확인",
    "amountValue": 0,
-   "deadline": "2026-11-18",
-   "deadlineFrom": "공고 원문 · 2026년 가천대학교 재학생 심층면접토론(FGD) 참여학생 모집 ○ 신청기간: 2026.11.05.(목) ~ 11.18.(수)",
-   "period": "접수 ~2026-11-18",
+   "deadline": "2026-11-12",
+   "deadlineFrom": "공고 원문 · 5. 신청기간: ~ 2026.11.12.(목) 12:00 까지",
+   "period": "접수 ~2026-11-12",
    "summary": "가천대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
@@ -23803,8 +23800,8 @@
    "kindConfidence": "high",
    "kindFrom": "로봇(원문) 2026-11-11",
    "provider": "주관 기관 원문 확인",
-   "amount": "최대 500만원",
-   "amountValue": 5000000,
+   "amount": "1팀 당 최대 500만원",
+   "amountValue": 0,
    "deadline": "2026-11-27",
    "listedAt": "2026-11-11",
    "period": "접수기간 2026년 11월 11일(수) ~ 11월 27일(금)",
@@ -23856,16 +23853,7 @@
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
    "documentsFrom": "공고문 첨부(OCR)",
-   "amountSpec": {
-    "kind": "fixed",
-    "value": 5000000,
-    "ratio": 0,
-    "min": 5000000,
-    "max": 5000000,
-    "upTo": true,
-    "raw": "지원금액 : '2026년 문화예술 장학금_팀 이름_수행계획서'첨부 1팀 당 최대 500만원,총 1000만원 PDF 파일로 제출 학생이 직접 기획한 문화예술 프로젝트의 소요 예산 을 산출하여 맞춤형 편딩 방식으로 지원 예정 심사 절차 사후서류 장학생은 프로젝트 종료 후'결과 보고서'&"
-   },
-   "amountFrom": "공고 원문",
+   "amountFrom": "관리자 2026-11-16 · 비움",
    "excerpts": [
     "문의:전북대학교동창회장학재단 063-270-3641"
    ],
@@ -24066,7 +24054,7 @@
    "scopeFrom": "같은 사업이 성균관대학교 게시판에도 올라옴(자동) — 성균관대학교 게시판 https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=142000&article.offset=0&articleLimit=10",
    "excerpts": [
     "○ 신청기간 : 2026. 11. 5(목) ~ 11. 18(수) 24:00(자정)",
-    "○ 신청방법 : 이메일(<0080008.07.14) 및 우편(등기)"
+    "ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편(등기)"
    ],
    "excerptNote": "공고문 첨부에서 그대로 발췌 (자동)",
    "amountSpec": {
@@ -24077,7 +24065,10 @@
     "max": 1000000,
     "raw": "1인당 100 만원"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "applyEmail": "kcna@kcna.or.kr",
+   "applyEmailSource": "ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편(등기)",
+   "applyEmailFrom": "공고문 첨부(OCR)"
   },
   {
    "id": "auto-skor478127041artclviewdo",
@@ -24092,9 +24083,6 @@
    "provider": "주관 기관 원문 확인",
    "amount": "금액 원문 확인",
    "amountValue": 0,
-   "deadline": "2026-11-18",
-   "deadlineFrom": "공고 원문 · 2026년 가천대학교 재학생 심층면접토론(FGD) 참여학생 모집 ○ 신청기간: 2026.11.05.(목) ~ 11.18.(수)",
-   "period": "접수 ~2026-11-18",
    "summary": "가천대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
@@ -24129,7 +24117,10 @@
     "가. 신청기간: ~11.15.(일) 23:59 까지 [기한엄수]",
     "나. 신청방법: 네이버 폼 제출 [ https://naver.me/GrgraOja ]"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "deadline": "2026-11-15",
+   "deadlineFrom": "관리자 2026-11-16",
+   "period": "접수 ~2026-11-15"
   },
   {
    "id": "auto-kuk2351212035artclviewdo",
@@ -24205,7 +24196,7 @@
    "documentsFrom": "공고문 첨부(OCR)",
    "excerpts": [
     "○ 신청기간 : 2026. 11. 5(목) ~ 11. 18(수) 24:00(자정)",
-    "○ 신청방법 : 이메일(<0080008.07.14) 및 우편(등기)"
+    "ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편(등기)"
    ],
    "excerptNote": "공고문 첨부에서 그대로 발췌 (자동)",
    "amountSpec": {
@@ -24216,7 +24207,10 @@
     "max": 1000000,
     "raw": "1인당 100만원"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "applyEmail": "kcna@kcna.or.kr",
+   "applyEmailSource": "ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편(등기)",
+   "applyEmailFrom": "공고문 첨부(OCR)"
   },
   {
    "id": "auto-ervicenoticedetail521183",
@@ -24288,10 +24282,13 @@
    ],
    "excerpts": [
     "○ 신청기간 : 2026. 11. 5(목) ~ 11. 18(수) 24:00(자정)",
-    "○ 신청방법 : 이메일(<0080008.07.14) 및 우편(등기)"
+    "ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편(등기)"
    ],
    "excerptNote": "공고문 첨부에서 그대로 발췌 (자동)",
-   "amountFrom": "관리자 2026-11-16"
+   "amountFrom": "관리자 2026-11-16",
+   "applyEmail": "kcna@kcna.or.kr",
+   "applyEmailSource": "ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편(등기)",
+   "applyEmailFrom": "공고문 첨부(OCR)"
   },
   {
    "id": "auto-oarticleno160317nocat501",
