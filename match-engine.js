@@ -1255,6 +1255,19 @@ function feedOnlyFormal(sch, p, known) {
   return !!(fd && fd.unread);
 }
 
+/* 카드로 안 그리는 정식 공고(feedOnlyFormal)를 **게시판 새 공고 한 줄**로 바꾼다 (2026-11-16 리뷰 — 화면·알림이 갈라졌다).
+   그 학교 게시판 글(feed — 이미 내 학교 것만 거른 목록)에 같은 주소가 없을 때만 싣는다(다른 게시판·재단 게시판에서 온 공고) · 있으면 그 글이 그 자리다.
+   🔴 지어내지 않는다 — 제목·주소·날짜는 그 공고의 것 그대로(name·sourceUrl·listedAt).
+   🔴 화면(app.js boardNoticesForMe)과 알림(notify-rules 「4. 실시간 공고」 — notify.js·sw.js 가 부른다)이 **이 한 함수**를 쓴다 —
+      예전엔 app.js 에만 있어 화면엔 뜨는 줄을 알림이 영영 몰랐다(1번 규칙은 feedOnly 를 '4번이 맡는다'며 건너뛴다) */
+function feedOnlyBoardRows(list, feed, p, now) {
+  if (!p || !p.school) return [];
+  const sameUrl = (a, b) => !!a && !!b && (a.startsWith(b) || b.startsWith(a));
+  const urls = (feed || []).map((n) => String((n && n.url) || '')).filter(Boolean);
+  return (list || []).filter((s) => s && s.sourceUrl && notStale(s, now) && feedOnlyFormal(s, p) && !urls.some((u) => sameUrl(u, String(s.sourceUrl))))
+    .map((s) => ({ title: s.name, url: s.sourceUrl, school: (s.eligibility && s.eligibility.schoolOnly) || p.school, foundAt: s.listedAt || '' }));
+}
+
 /* 마감일을 확정하지 못한 공고(원문에 마감이 없거나 못 읽은 경우)는 dday가 '기한 원문 확인'이라
    목록에서 영영 사라지지 않는다 — 지난 학기 공고가 계속 떠 있는 문제가 있었다(2026-07-30 발견).
    그래서 등록일(listedAt)로부터 60일이 지나면 숨긴다. 실시간 공고의 60일 규칙과 같은 기준이다.
@@ -2271,7 +2284,7 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = { evaluate, fitScore, fitDetail, judgeCond, holdsExternalScholarship, FIT_UNREAD, FIT_FLOOR, FIT_MAX, FIT_MIN,
                      RESIDENCE_SPANS, residenceSpan,
                      joinSpacedSyllables, decodeEntities, looksFragment,
-                     scopedToProfile, inSchoolsAny, notStale, STALE_DAYS, feedOnlyFormal,
+                     scopedToProfile, inSchoolsAny, notStale, STALE_DAYS, feedOnlyFormal, feedOnlyBoardRows,
                      requirementLines, requirementStruct, requirementMatch, tidyRequirement,
                      REQ_SIGNAL, NOT_A_REQUIREMENT, EXCLUDE_LINE, HARD_THRESHOLD,
                      noticeForProfile, activityForProfile, taggedSchool, SHARED_BOARD_BRANCH, SERVED_SCHOOLS,

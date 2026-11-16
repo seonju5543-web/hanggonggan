@@ -62,25 +62,34 @@ function htmlTexts(src) {
   return s.split('\n').map((t, k) => ({ text: t, line: k + 1 }));
 }
 
-/* 파일 하나 훑기 → [{ file, line, word, text }] — allow 는 { 'app.js:낱말:글자 일부': '까닭' } 꼴이 아니라 [{ file, has, why }] */
+/* 학생 화면 글자를 만드는 파일 전부 (2026-11-16 리뷰 — 예전엔 app.js·index.html·match-engine.js 셋뿐이라 source-link.js 의 「(확인 필요)」 링크 이름·
+   data.js 제출처 이름이 훑개 밖에서 살아남았다). 화면이 싣는 공용 파일·서비스워커(알림 문구)·약관 화면(앱 안에서 읽는다)까지.
+   새로 화면 글자를 만드는 파일을 더하면 여기에도 — 관문이 index.html 의 <script src> 가 전부 여기 있는지 본다 */
+const SCREEN_FILES = ['app.js', 'index.html', 'match-engine.js', 'source-link.js', 'data.js', 'apply-channel.js', 'forms.js', 'form-plan.js',
+  'notify-rules.js', 'notify.js', 'parse-amount.js', 'parse-requirements.js', 'section-head.js', 'formfill.js', 'essay.js', 'essay-ask.js', 'essay-quality.js',
+  'essay-submit-check.js', 'chat.js', 'resume.js', 'boot.js', 'sw.js', 'interactions.js', 'elig-ask.js', 'major-track.js', 'about.js', 'supabase-client.js',
+  'error-report.js', 'usage-report.js', 'terms.html'];
+
+/* 파일 하나 훑기 → [{ file, line, word, text }] — allow 는 { 'app.js:낱말:글자 일부': '까닭' } 꼴이 아니라 [{ file, has, why, exact? }]
+   exact 는 문자열 **전체**가 has 와 같을 때만 넘긴다(짧은 낱말 하나를 has 로 두면 그 파일의 같은 낱말이 전부 풀리므로) */
 function scanFile(file, src, allow = []) {
   const parts = /\.html$/.test(file) ? htmlTexts(src) : jsStrings(src);
   const hits = [];
   for (const p of parts) for (const w of UNKNOWN_WORDS) {
     if (!p.text.includes(w)) continue;
-    if (allow.some((a) => a.file === file && p.text.includes(a.has))) continue;
+    if (allow.some((a) => a.file === file && (a.exact ? p.text.trim() === a.has : p.text.includes(a.has)))) continue;
     hits.push({ file, line: p.line, word: w, text: p.text.trim().slice(0, 120) });
   }
   return hits;
 }
 
-module.exports = { jsStrings, htmlTexts, scanFile };
+module.exports = { jsStrings, htmlTexts, scanFile, SCREEN_FILES };
 
 if (require.main === module) {
   const root = path.join(__dirname, '..');
   const { NO_UNKNOWN_ALLOW } = require('./no-unknown-allow.cjs');
   let all = [];
-  for (const f of ['app.js', 'index.html', 'match-engine.js']) all = all.concat(scanFile(f, fs.readFileSync(path.join(root, f), 'utf8'), NO_UNKNOWN_ALLOW));
+  for (const f of SCREEN_FILES) all = all.concat(scanFile(f, fs.readFileSync(path.join(root, f), 'utf8'), NO_UNKNOWN_ALLOW));
   for (const h of all) console.log(`${h.file}:${h.line}  [${h.word}]  ${h.text}`);
   console.log(`${all.length}건`);
   process.exit(all.length ? 1 : 0);

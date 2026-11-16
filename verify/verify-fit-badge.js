@@ -133,8 +133,12 @@ const PROFILE = (over) => ({
        '카드는 퍼센트뿐'만 검사되고 근거가 화면 어디에도 없는 상태가 통과한다. */
     const detailTxt = await page.$eval('#detail-sheet .badge-fit', (e) => e.innerText.replace(/\s+/g, ' '))
       .catch(() => '');
-    /* 2026-11-15 개발자 결정 11-02 — 상세 배지는 「적합도 n% · 맞는 요건 M개 · 어긋난 요건 없음」(예전 「요건 n개 중 m개 충족 · 확인 필요 k」) — 모르는 요건 수는 말하지 않는다 */
-    eq('상세 시트에는 퍼센트와 근거가 남아 있다 (맞는 요건 · 어긋난 요건 없음 · 「확인 필요」 없음)', [/적합도 \d+% (맞는 요건 \d+개 · )?어긋난 요건 없음/.test(detailTxt), /확인 필요|미확인/.test(detailTxt)], [true, false]);
+    /* 2026-11-15 개발자 결정 11-02 — 상세 배지는 「적합도 n% · 맞는 요건 M개」(예전 「요건 n개 중 m개 충족 · 확인 필요 k」) — 모르는 요건 수는 말하지 않는다.
+       🔴 「어긋난 요건 없음」은 요건을 **전부 판정했을 때만**(fd.unknown === 0 · 2026-11-16) — 모르는 줄이 있는데 이 말이 붙으면 틀린 안심이다 */
+    const fdNow = await page.evaluate((sid) => { const f = fitDetailFor(allScholarships().find((x) => x.id === sid), state.profile); return { met: f.met, unknown: f.unknown }; }, id);
+    const wantTxt = fdNow.unknown > 0 ? (fdNow.met > 0 ? `맞는 요건 ${fdNow.met}개` : '') : `${fdNow.met > 0 ? `맞는 요건 ${fdNow.met}개 · ` : ''}어긋난 요건 없음`;
+    eq(`상세 시트에는 퍼센트와 근거가 남아 있다 (모르는 요건 ${fdNow.unknown > 0 ? '있음 → 맞는 요건만' : '없음 → 어긋난 요건 없음'} · 「확인 필요」 없음)`,
+      [new RegExp(`^적합도 \\d+%${wantTxt ? ` ${wantTxt}` : ''}$`).test(detailTxt.trim()), /확인 필요|미확인/.test(detailTxt), fdNow.unknown > 0 && /어긋난 요건 없음/.test(detailTxt)], [true, false, false]);
     /* 맞은 요건 수는 이제 **상세 배지에서만** 읽을 수 있다 — 카드에는 없다.
        2026-10-29 부터 요건은 줄이 아니라 **조건**을 센다(개발자 "세세한 기준") — 줄마다 읽은 조건 수의 합을 넘지 않는다(묶음은 1개) */
     const total = Number((detailTxt.match(/맞는 요건 (\d+)개/) || [])[1] || 0);

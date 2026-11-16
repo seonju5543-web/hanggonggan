@@ -4,6 +4,8 @@
 
    무엇을 재나 — 열린 정식 등록 공고(층1) 전부 + 층2 재단 줄 전부를 **앱 함수 그대로** 그린다:
      ① 카드(schCard) ② 상세 시트(openDetail → #detail-sheet) ③ 신청 준비 문서 머리말(지원문서 lead·tag·제출 안내 — prepKindFor 가 고른다)
+     ④ 카드·시트 밖의 자리(2026-11-16 리뷰) — 달력·MY 저장 줄(calRowHtml) · 금액 상세 한 줄(amountDetailRow) · 신청 내역 「선정」 줄과 제출처 줄(선정으로 적어 둔 시트) ·
+        지원서 초안 학업 계획(generateEssay plan) · 그리고 링크 확인 장부(data/link-check.json)가 문제로 적은 주소의 이름(게시판·소식 카드 · 도우미 · 활동)
    그리고 그 글자에서 「모름 · 미확인 · 원문 확인 · 원문에서 확인 · 확인 필요 · 기한 확인 중 · 정보 입력 필요」 와
    맨 앞 「?」 판정 표시를 센다. 하나라도 있으면 빨간불(어느 공고의 어느 자리인지 찍는다).
    🔴 규칙을 베끼지 않는다 — 앱을 띄워 그 함수를 부른다(what-shows.mjs 와 같은 원칙). 학생은 그 공고 학교 학생으로 둔다(학교 한정 공고는 그 학교 학생에게만 보인다).
@@ -67,6 +69,21 @@ const BASE = {
         const tpl = id && FORM_TEMPLATES[id];
         parts.prep = tpl && tpl.unofficial ? [tpl.lead, tpl.tag, ...(tpl.sections || []).map((x) => x.note || '')].filter(Boolean).join('\n') : '';
       } catch (e) { parts.prep = ''; }
+      /* ④ 달력 하루 목록·MY 저장 줄은 같은 calRowHtml 이다(저장 단추까지) · 금액 상세 한 줄 · 초안 학업 계획 */
+      parts.cal = textOf(calRowHtml(s, { save: true }));
+      parts.amount = textOf(amountDetailRow({ ref: s, won: s.amountValue || 0, mergedFrom: [] }, {}));
+      try { parts.essay = generateEssay({ kind: 'plan' }, s, p, { goal: '전공 공부를 이어가겠습니다', career: '연구자' }, {}); } catch (e) { parts.essay = ''; }
+      /* 신청 내역 — 선정으로 적어 둔 시트(「선정 · 금액」 줄 · 「최종 제출처」 줄) */
+      const keepApps = state.applications;
+      state.applications = [{ id: s.id, appliedAt: '2026-11-01', submittedAt: '2026-11-02', result: 'won', resultAt: '2026-12-10' }];
+      try {
+        openDetail(s.id);
+        const w = document.querySelector('#detail-sheet');
+        parts.won = w ? [...w.querySelectorAll('.progress-note, .applied-at')].map((e) => e.innerText).join('\n') : '';
+        parts.wonSeen = /2026-12-10 선정/.test(parts.won);
+        try { closeSheet(); } catch (e) { /* 안 열렸으면 닫을 것도 없다 */ }
+      } catch (e) { parts.won = ''; }
+      state.applications = keepApps;
       rows.push({ id: s.id, name: s.name, where, listed, parts });
     };
     const reg = registeredList.filter((s) => open(s) && notStale(s));
@@ -81,12 +98,24 @@ const BASE = {
     /* data.js 의 상시 제도·국가 공고도 같은 카드·시트로 나온다 */
     const nat = NATIONAL_SCHOLARSHIPS.filter(open);
     for (const s of nat) one(s, base, 'national');
+    /* 링크 확인 장부가 문제로 적은 주소(trouble) — 이름이 보이는 자리(게시판·소식 카드 · 도우미 · 활동 시트 단추)를 그 주소로 그린다.
+       장부에 문제 주소가 하나도 없는 날도 갈래가 그려지게 표본 한 줄을 장부에 더했다가 되돌린다(헛돌지 않게) */
+    const SAMPLE = 'https://www.example.ac.kr/bbs/view.do?id=verify-no-unknown';
+    const realChecks = typeof LINK_CHECKS === 'object' ? { ...LINK_CHECKS } : {};
+    setLinkChecks({ updatedAt: 't', bad: { ...realChecks, [SAMPLE]: { v: 'gone', at: '2026-11-16' } } });
+    const troubleUrls = Object.keys(realChecks).filter((u) => ['login', 'gone', 'other'].includes(realChecks[u].v)).concat(SAMPLE);
+    for (const u of troubleUrls) {
+      const n = { title: '표본 글', url: u, school: base.school, foundAt: '2026-11-16' };
+      const parts = { card: textOf(noticeCardHtml(n, {})), chat: ['chat', 'activity', 'activityButton', 'detail', 'amount', 'applog'].map((w) => sourceLink(n, w).label).join('\n') };
+      rows.push({ id: u, name: '문제 주소', where: 'trouble', listed: false, parts });
+    }
+    setLinkChecks({ updatedAt: 't', bad: realChecks });
     state.profile = keep;
-    return { rows, reg: reg.length, kosaf: kos.length, nat: nat.length };
+    return { rows, reg: reg.length, kosaf: kos.length, nat: nat.length, trouble: troubleUrls.length, wonSeen: rows.filter((r) => r.parts.wonSeen).length };
   }, { base: BASE });
   for (const r of out.rows) {
     r.hit = {}; r.sample = {};
-    for (const k of ['card', 'sheet', 'prep']) {
+    for (const k of ['card', 'sheet', 'prep', 'cal', 'amount', 'essay', 'won', 'chat']) {
       const h = unknownHits(r.parts[k]);
       if (Object.keys(h).length) { r.hit[k] = h; r.sample[k] = String(r.parts[k]).split('\n').filter((l) => Object.keys(unknownHits('\n' + l)).length).slice(0, 4); }
     }
@@ -101,13 +130,16 @@ const BASE = {
   /* 결정 1 — 카드에서 뺀 공고가 게시판 새 공고에도 없으면 학생은 그 공고를 영영 못 본다 */
   const lost = out.rows.filter((r) => r.where === 'registered' && !r.listed && r.parts.inFeed === false);
   for (const r of lost) console.log(`   ✕ 카드에서 뺐는데 게시판 새 공고에도 없다 — ${r.id} ${String(r.name).slice(0, 40)}`);
-  console.log(`■ 학생 화면 '모름'류 글자 전수 — 열린 정식 등록 ${out.reg}건(카드로 뜨는 것 ${listed} · 게시판 글로 가는 것 ${out.reg - listed}) · 층2 ${out.kosaf}줄 · 상시 제도·국가 ${out.nat}건`);
+  console.log(`■ 학생 화면 '모름'류 글자 전수 — 열린 정식 등록 ${out.reg}건(카드로 뜨는 것 ${listed} · 게시판 글로 가는 것 ${out.reg - listed}) · 층2 ${out.kosaf}줄 · 상시 제도·국가 ${out.nat}건 · 문제 주소 ${out.trouble}곳`);
+  console.log(`   (카드·시트 밖) 달력·저장 줄 · 금액 상세 · 초안 학업 계획 · 신청 내역 선정 줄(그려진 것 ${out.wonSeen}건) · 문제 주소 이름(카드·도우미·활동)`);
   for (const [k, n] of Object.entries(tally).sort((a, b) => b[1] - a[1])) console.log(`   ${k}  ${n}`);
   const show = Number(arg('show') || 6);
   for (const r of bad.slice(0, show)) console.log(`   ✕ ${r.id} ${String(r.name).slice(0, 40)} — ${JSON.stringify(r.sample).slice(0, 300)}`);
   if (arg('json')) fs.writeFileSync(arg('json'), JSON.stringify(out, null, 1));
   if (errors.length) console.log(errors.slice(0, 5).join('\n'));
-  const ok = bad.length === 0 && !lost.length && !errors.length && out.reg > 0;
+  /* 헛돌지 않는다 — 선정 줄을 하나도 못 그렸으면(시트 모양이 바뀌었다) 이 자리는 재지 못한 것이다 */
+  if (!out.wonSeen) console.log('   ✕ 신청 내역 「선정」 줄을 한 건도 못 그렸다 — 시트 모양이 바뀌었는지 볼 것(무력해진 검사)');
+  const ok = bad.length === 0 && !lost.length && !errors.length && out.reg > 0 && out.wonSeen > 0;
   console.log(ok ? `  ✓ 공고 ${out.rows.length}건 화면 어디에도 '모름'류 글자가 없다` : `  ✕ '모름'류 글자가 남은 공고 ${bad.length}건${errors.length ? ` · 페이지 오류 ${errors.length}` : ''}${out.reg ? '' : ' · 정식 등록을 하나도 못 읽었다(무력해진 검사)'}`);
   await browser.close();
   process.exit(ok ? 0 : 1);

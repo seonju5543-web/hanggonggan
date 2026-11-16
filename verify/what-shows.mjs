@@ -299,7 +299,7 @@ for (const sch of hits) {
      여기에 조건을 손으로 적어 두었더니, 자격 잠금을 푼 뒤에도 이 도구만 계속
      '잠김'이라고 보고했다 — 이 파일 머리말이 경고한 바로 그 갈라짐이다.
      `app` 은 '이미 신청한 기록'인데 이 도구는 저장소 데이터만 보므로 항상 없다(null). */
-  const { canApply, caution, noApply } = appFn('applyLock')(result, null, d, sch);
+  const { canApply, caution, noApply } = appFn('applyLock')(result, null, d, sch, fd);
 
   const listLines = ME.requirementLines(sch, null);                    // 목록 카드 — 5줄 상한
   const allLines = ME.requirementLines(sch, null, { all: true });      // 상세 시트 — 전부
