@@ -113,7 +113,8 @@ jobs:
       #    예전엔 소식 파일만 되돌리고 끝나, 찾기 로봇이 고친 출처 목록(news-sources.json)이 원인이면 그대로 저장되고 초록불이었다.
       #    ① 소식 발행분·장부·썸네일 장부 → 다시 재기 → ② 출처 목록·회전 커서·게시판 상태 → 다시 재기. HEAD 에 없던 파일(첫 실행의 썸네일 장부)은 지운다.
       #    🔴 커서·상태(news-cursor·news-health)도 ②에 (2026-11-16 · 노션 G-16 리뷰 — 아래 저장 단계가 늘 올리는데 되돌리기가 덮지 않아, 끝내 빨간 실행에도 관문 없이 저장됐다 · 관문 savegate).
-      #    still-failing 이면 맨 끝 단계가 빨간불. 넘어지면 소식 파일만이라도 HEAD 판으로(|| 뒤 — 옛 되돌리기와 같다).
+      #    still-failing 이면 맨 끝 단계가 빨간불. 넘어지면 ①② 단계의 파일을 **전부** HEAD 판으로(|| 뒤 — 아래 저장 단계는 조건 없이 돈다)하고 맨 끝 단계가 빨간불로 끝낸다
+      #    (2026-11-16 · 노션 G-16 리뷰 2차 — 예비 줄이 출처 목록을 빠뜨려, 도구가 넘어진 실행에 그 목록이 관문 없이 저장될 수 있었다 · 관문 savegate ①-3: 예비 줄과 stage 의 교집합만 덮는다고 센다).
       #    상한 5분 = 관문 최대 두 번 + 여유 — 관문 한 번은 ~55초다(2026-10-11 4코어 실측 · 장학·브라우저 수집의 되돌리기 단계와 같은 값).
       #    3분이던 때는 두 번 재면 느린 러너에서 여유가 1분뿐이었고, 시간 초과면 || 뒤도 안 돌고 아래 저장 단계가 건너뛰어진다.
       #    🔴 --keep-preexisting (2026-11-10 · 은서 결정): 다 되돌려도 빨가면 이번 실행 판을 다시 얹어 재고, 새로 걸린 검사가 하나도 없으면 이번 실행분을 저장한다(kept-preexisting — 원래 있던 빨간불 하나 때문에 새 등록이 며칠씩 멈추던 것). 상한 7분 = 관문 최대 세 번 + 여유.
@@ -129,6 +130,7 @@ jobs:
             git checkout -- collector/news-desc.json 2>/dev/null || rm -f collector/news-desc.json
             git checkout -- collector/news-cursor.json 2>/dev/null || rm -f collector/news-cursor.json
             git checkout -- collector/news-health.json 2>/dev/null || rm -f collector/news-health.json
+            git checkout -- collector/news-sources.json 2>/dev/null || rm -f collector/news-sources.json   # ② 단계의 출처 목록도 — 빠지면 넘어진 실행에 관문 없이 저장됐다(2026-11-16 리뷰 2차)
             git clean -fdq data/news || true
           }
 
@@ -292,13 +294,13 @@ jobs:
             still-failing)                result="되돌려도 빨간불" ;;
             kept-preexisting)             result="원래 있던 빨간불 — 이번 발행분은 저장" ;;
             flaky)                        result="다시 재니 통과(되돌린 것 없음)" ;;
-            *)                            result="되돌리기 도구가 넘어져 소식 파일을 직전 판으로 돌림" ;;
+            *)                            result="되돌리기 도구가 넘어져 이번 실행 파일을 직전 판으로 돌림" ;;
           esac
           {
             echo "🗞 교내 소식 수집 로봇: 🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **데이터 관문(test-collector·audit-data) 실패** — $result"
             echo
             if [ -n "${{ steps.guard.outputs.gate }}" ] && [ -s /tmp/gate-note.md ]; then cat /tmp/gate-note.md
-            else echo "> 되돌리기 도구가 결과를 남기지 못해 소식 발행분(data/news)·소식 장부·소식 사진 장부를 직전 판으로 돌렸습니다 — 홈 「우리 학교 소식」은 이번 실행에 갱신되지 않습니다."; fi
+            else echo "> 되돌리기 도구가 결과를 남기지 못해 소식 발행분(data/news)·소식 장부·소식 사진·요약 장부·회전 커서·게시판 상태·소식 출처 목록을 직전 판으로 돌렸습니다 — 홈 「우리 학교 소식」은 이번 실행에 갱신되지 않습니다(실행을 빨간불로 끝냅니다)."; fi
             echo
             echo "실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '소식 감사 실패 확인해줘'라고 지시하세요."
           } > /tmp/news-gate-issue.md
@@ -333,8 +335,9 @@ jobs:
       # 🔴 되돌린 뒤에도 관문이 빨가면 초록불로 끝내지 않는다 (2026-10-04 · 로봇·도구 점검). 이슈는 위 '데이터 감사 실패 알림'이 이미 열었다(또는 코멘트).
       #    failure()·cancelled() 알림 **뒤**에 둔다 — 앞에 두면 그 알림이 '이번 수집분은 저장되지 않았습니다'라는 틀린 말을 붙인다.
       - name: 🚨 관문이 끝내 빨간불 (되돌린 뒤에도)
-        if: steps.guard.outputs.gate == 'still-failing' || steps.guard.outputs.gate == 'kept-preexisting'
+        # 도구가 넘어진 실행(감사 실패인데 결과가 빔)도 — 예비 줄이 파일을 직전 판으로 돌렸지만 관문은 빨간 채다(2026-11-16 리뷰 2차)
+        if: steps.guard.outputs.gate == 'still-failing' || steps.guard.outputs.gate == 'kept-preexisting' || (steps.audit.outcome == 'failure' && steps.guard.outputs.gate == '')
         timeout-minutes: 1
         run: |
-          echo "::error::교내 소식 — 되돌리기 단계를 거친 뒤에도 데이터 관문이 빨갛습니다(무엇을 되돌렸는지는 감사 실패 이슈의 단락). 실행을 빨간불로 끝냅니다."
+          echo "::error::교내 소식 — 되돌리기 단계를 거친 뒤에도 데이터 관문이 빨갛습니다(무엇을 되돌렸는지는 감사 실패 이슈의 단락 · 결과가 비었으면 되돌리기 도구가 넘어진 것). 실행을 빨간불로 끝냅니다."
           exit 1
