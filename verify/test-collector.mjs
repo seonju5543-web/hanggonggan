@@ -1480,6 +1480,11 @@ console.log('\n■ 제출 서류 목록 — 원문의 「제출서류」 절을 
   /* 관리자가 고친 목록·끈 스위치는 로봇이 되덮지 않는다 — admin-apply 가 주인 표식을 남긴다(리뷰) */
   const aa = readText(new URL('../tools/admin-apply.mjs', import.meta.url));
   eq('  관리자 화면이 documents → documentsFrom · prepDoc → prepDocFrom 에 관리자 표식을 남긴다', [/mark\('documents', 'documentsFrom'\)/.test(aa), /changed\.includes\('prepDoc'\)\) it\.prepDocFrom = OWNER/.test(aa)], [true, true]);
+  /* 메일 접수 주소도 같다 (2026-11-16 · 상명대 근로장학 — 관리자가 비운 주소를 로봇이 다음 실행에 되채울 뻔했다) */
+  eq('  관리자 화면이 applyEmail → applyEmailFrom 에 관리자 표식(비울 때 「· 비움」)을 남기고 근거 문장을 같이 뺀다 · 로봇은 그 표식이면 안 채운다',
+    [/changed\.includes\('applyEmail'\)\) \{\s*it\.applyEmailFrom = it\.applyEmail \? OWNER : `\$\{OWNER\} · 비움`;\s*if \(!it\.applyEmail\) delete it\.applyEmailSource;/.test(aa),
+     /if \(it\.applyEmail \|\| humanOwnedEmail\(it\.applyEmailFrom\)\) return;/.test(readText(new URL('../collector/extract-excerpts.mjs', import.meta.url))),
+     (await import('../collector/apply-email.mjs')).humanOwnedEmail('관리자 2026-11-16 · 비움')], [true, true, true]);
   eq('  로봇은 신청서 첨부가 나중에 붙어도 제 prepDoc 을 끈다', /\(!got\.basis \|\| hasFormAtt\)/.test(readText(new URL('../collector/extract-excerpts.mjs', import.meta.url))), true);
   /* 🔴 발췌 로봇 실행 호출은 파일 **맨 끝** (2026-10-23) — 10-14 에 fillDocuments 와 const FORM_ATT_NAME 이 `main()` 호출 **뒤**에 붙었고, const 는 끌어올려지지 않아
      서류 목록을 찾은 첫 공고에서 'Cannot access before initialization' 으로 넘어졌다. 10-17 저녁부터 23일까지 두 수집 로봇(하루 5회)이 모두 그 단계에서 죽어 새 공고가 한 건도 저장되지 않았다.

@@ -24857,12 +24857,13 @@
    "sourceUrl": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=770333&article.offset=0&articleLimit=10",
    "sourceKind": "auto",
    "deadlineFrom": "공고문 첨부(OCR)",
-   "applyEmail": "hajinpark@smu.ac.kr",
-   "applyEmailSource": "<이메일 제출처: hajinpark@smu.ac.kr >",
-   "applyEmailFrom": "공고문 첨부(OCR)",
-   "eligibilityFrom": "공고문 첨부(OCR)",
+   "applyEmailFrom": "관리자 2026-11-16 · 비움",
+   "eligibilityFrom": "관리자 2026-11-16",
    "eligibilityLines": [
-    "1. 선발대상: 교내 행정부서 등에서 성실히 근로할 수 있는 재학생"
+    "가. 1~8학기 재학중인 자 (초과 학기자 불가)",
+    "나. 직전학기(2026-1) 취득학점 12학점(4학년 9학점) 이상인 자",
+    "다. 직전학기(2026-1) 성적 평점평균 1.6 이상인 자",
+    "라. 부서추천 근로장학생 및 국가근로장학생 선발자는 교내근로 신청 불가(중복 불가)"
    ],
    "excerpts": [
     "2. 신청기간: 2026.11.25.(수) 14:00~15:00",
