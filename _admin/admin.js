@@ -1393,7 +1393,10 @@ function lfFixedRowHtml(r) {
         <div class="t" data-row-title>${esc(r.target ? r.target.title : (r.ent.title || r.key))}</div>
         <div class="m">${r.target ? `<span class="pill info">${esc(FIX_DATASET_LABEL[r.target.ds] || r.target.ds)}</span>` : ''}<span class="mono">${esc(r.key.length > 70 ? `${r.key.slice(0, 70)}…` : r.key)}</span><span>${esc(r.ent.by || '')} ${esc(r.ent.at || '')}</span>${r.ent.round ? `<span>회차 ${esc(r.ent.round)}</span>` : ''}</div>
         <div class="scope-count">넣은 주소: <a href="${esc(safeUrl(r.ent.url))}" target="_blank" rel="noreferrer noopener">${esc(r.ent.url || '')}</a>${r.ent.note ? ` · 메모: ${esc(r.ent.note)}` : ''}</div>
-        ${r.bad ? `<div class="scope-count">원문 링크 확인 로봇이 이 주소도 문제로 확정했습니다(${esc(r.bad.v)} · ${esc(r.bad.at || '')}) — 학생에게는 「${esc(LR.sourceLink(r.target ? r.target.item : { url: r.ent.url || '' }, 'detail').label)}」로 보입니다.</div>` : ''}
+        ${r.bad ? `<div class="scope-count" data-lf-fixed-bad>원문 링크 확인 로봇이 이 주소도 문제로 확정했습니다(${esc(r.bad.v)} · ${esc(r.bad.at || '')}) — ${r.target
+    ? `학생에게는 「${esc(LR.sourceLink(r.target.item, 'detail').label)}」로 보입니다.`
+    /* 대상 글이 없으면(내려갔거나 주소가 바뀜) 이 주소를 받는 학생도 없다 — 주소만으로 이름을 지어 '학생에게 이렇게 보인다'고 말하지 않는다(2026-11-16 3차 리뷰) */
+    : '이 주소를 쓰는 글이 없어 지금 이 링크를 보는 학생은 없습니다.'}</div>` : ''}
       </div>
       <div class="btn-row"><button class="btn btn-sm danger" data-lf-unfix="${esc(r.key)}">지우기</button></div>
       <div><span class="pill ${st[0]}">${esc(st[1])}</span></div>

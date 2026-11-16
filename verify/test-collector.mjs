@@ -1480,6 +1480,11 @@ console.log('\n■ 제출 서류 목록 — 원문의 「제출서류」 절을 
   /* 관리자가 고친 목록·끈 스위치는 로봇이 되덮지 않는다 — admin-apply 가 주인 표식을 남긴다(리뷰) */
   const aa = readText(new URL('../tools/admin-apply.mjs', import.meta.url));
   eq('  관리자 화면이 documents → documentsFrom · prepDoc → prepDocFrom 에 관리자 표식을 남긴다', [/mark\('documents', 'documentsFrom'\)/.test(aa), /changed\.includes\('prepDoc'\)\) it\.prepDocFrom = OWNER/.test(aa)], [true, true]);
+  /* 메일 접수 주소도 같다 (2026-11-16 · 상명대 근로장학 — 관리자가 비운 주소를 로봇이 다음 실행에 되채울 뻔했다) */
+  eq('  관리자 화면이 applyEmail → applyEmailFrom 에 관리자 표식(비울 때 「· 비움」)을 남기고 근거 문장을 같이 뺀다 · 로봇은 그 표식이면 안 채운다',
+    [/changed\.includes\('applyEmail'\)\) \{\s*it\.applyEmailFrom = it\.applyEmail \? OWNER : `\$\{OWNER\} · 비움`;\s*if \(!it\.applyEmail\) delete it\.applyEmailSource;/.test(aa),
+     /if \(it\.applyEmail \|\| humanOwnedEmail\(it\.applyEmailFrom\)\) return;/.test(readText(new URL('../collector/extract-excerpts.mjs', import.meta.url))),
+     (await import('../collector/apply-email.mjs')).humanOwnedEmail('관리자 2026-11-16 · 비움')], [true, true, true]);
   eq('  로봇은 신청서 첨부가 나중에 붙어도 제 prepDoc 을 끈다', /\(!got\.basis \|\| hasFormAtt\)/.test(readText(new URL('../collector/extract-excerpts.mjs', import.meta.url))), true);
   /* 🔴 발췌 로봇 실행 호출은 파일 **맨 끝** (2026-10-23) — 10-14 에 fillDocuments 와 const FORM_ATT_NAME 이 `main()` 호출 **뒤**에 붙었고, const 는 끌어올려지지 않아
      서류 목록을 찾은 첫 공고에서 'Cannot access before initialization' 으로 넘어졌다. 10-17 저녁부터 23일까지 두 수집 로봇(하루 5회)이 모두 그 단계에서 죽어 새 공고가 한 건도 저장되지 않았다.
@@ -4793,6 +4798,47 @@ console.log('\n■ 발췌기 글자 읽기 — 카드 빈칸 비평의 이름표
     String(fixed).split('\n'), ['신청 기간 : 10.26~11. 06 15:00까지[기한 엄수]', '신청기간 : 2026.10.15.(목)~10.22.(목)', '합계 ~]0.22. 처리']);
   eq('  고친 줄은 마감으로 읽힌다 (11-06 · 10-22)', [dl('2026학년도 공과대학 특성화 장학 프로그램 모집 공고', String(fixed).split('\n')[0]), dl(String(fixed).split('\n')[1])], ['2026-11-06', '2026-10-22']);
 
+  /* ⑤-1 OCR 금액 줄의 자릿수 관문 (2026-11-16 · 상명대 근로장학 auto-enoticedoarticleno770333) — 아래 줄은 collector/extracted 의 실제 두 판독
+     (elig-szl3lw-1.pdf.ocr.txt ↔ .pdf.txt · 세종이도 elig-cs08qg-1-2 · 포스터 elig-kkdaoq-1.png) 을 옮긴 것이다 */
+  {
+    const PA1 = createRequire(import.meta.url)('../parse-amount.js');
+    const smuOcr = ['5. 근로기간. 2026.12.21.(월)~2027.01.26.(금) / 주당 12시간', '6. 장학금액: 11500,000원/인당', '가. 1~8학기 재학중인 자 (조과 학기자 불가)'].join('\n');
+    const smuLay = ['5. 근로기간: 2026.12.21.(월)~2027.01.26.(금) / 주당 12시간', '', '6. 장학금액: 1,500,000원/인당', '7. 신청자격'].join('\n');
+    eq('⑤-1 🔴 쉼표 자릿수가 어긋난 OCR 금액(`11500,000` · `1,50,000` · `15000,00` · `1.000,000` · `5.845,264`)은 믿지 않는다 · 멀쩡한 꼴·쉼표 없는 꼴(`150만원` · `1.5억`)은 판정하지 않는다',
+      ['11500,000', '1,50,000', '15000,00', '1.000,000', '5.845,264', '1,500,000', '500,000', '150', '1.5'].map((n) => call(AT, 'malformedMoney', n)),
+      [true, true, true, true, true, false, false, false, false]);
+    eq('  상명대 OCR 줄 `6. 장학금액: 11500,000원/인당` 은 같은 PDF 글자층의 그 이름표 줄 하나(`1,500,000원`)로 · 다른 줄은 그대로',
+      call(AT, 'ocrMoneyCheck', smuOcr, smuLay), ['5. 근로기간. 2026.12.21.(월)~2027.01.26.(금) / 주당 12시간', '6. 장학금액: 1,500,000원/인당', '가. 1~8학기 재학중인 자 (조과 학기자 불가)'].join('\n'));
+    eq('  🔴 못 맞추면 그 줄을 뺀다 — 글자층 없음(포스터 `학기 당 2000,000원`) · 이름표가 다른 줄 · 이름표 줄이 둘 · 금액이 두 자 이상 다름 · 금액 밖 숫자가 다름 · 한글이 다름',
+      [call(AT, 'ocrMoneyCheck', '- 장학금액: 학기 당 2000,000원\n문의 : 장학팀', ''),
+        call(AT, 'ocrMoneyCheck', '6. 장학금액: 11500,000원/인당', '6. 지원금액: 1,500,000원/인당'),
+        call(AT, 'ocrMoneyCheck', '6. 장학금액: 11500,000원/인당', '6. 장학금액: 1,500,000원/인당\n※ 장학금액: 2,000,000원/인당'),
+        call(AT, 'ocrMoneyCheck', '6. 장학금액: 11500,000원/인당', '6. 장학금액: 150,000원/인당'),
+        call(AT, 'ocrMoneyCheck', '6. 장학금액: 11500,000원/인당', '7. 장학금액: 1,500,000원/인당'),
+        call(AT, 'ocrMoneyCheck', '6. 장학금액: 11500,000원/인당', '6. 장학금액: 1,500,000원/학기 등록금 감면')],
+      ['문의 : 장학팀', '', '', '', '', '']);
+    eq('  대조군 — 멀쩡한 OCR 금액(`1,500,000원` · `150만원`)과 금액 아닌 쉼표(`2,3학년` · `1,500,0002`)는 글자층과 달라도 손대지 않는다',
+      [call(AT, 'ocrMoneyCheck', '6. 장학금액: 1,500,000원/인당', '6. 장학금액: 2,000,000원/인당'), call(AT, 'ocrMoneyCheck', '장학금액 : 150만원', ''),
+        call(AT, 'ocrMoneyCheck', '4년제 대학교 학부 2,3학년 10명 내외\n(대학생) 1,500,0002', '')],
+      ['6. 장학금액: 1,500,000원/인당', '장학금액 : 150만원', '4년제 대학교 학부 2,3학년 10명 내외\n(대학생) 1,500,0002']);
+    eq('  세종이도 OCR `(대학생) 1.000,000원` 줄 — 같은 이름표 줄이 글자층에 하나면 그 줄로 · `(인당 지원액)` 처럼 둘이면 뺀다',
+      [call(AT, 'ocrMoneyCheck', '- (중학생) 600,000원 / (고등학생) 900,000원 / (대학생) 1.000,000원', '   - (중학생) 600,000원 / (고등학생) 900,000원 / (대학생) 1,000,000원'),
+        call(AT, 'ocrMoneyCheck', '○ (인당 지원액) 1.000,000원', '❍ (인당 지원액) 700,000원\n❍ (인당 지원액) 학교급별 상이')],
+      ['- (중학생) 600,000원 / (고등학생) 900,000원 / (대학생) 1,000,000원', '']);
+    /* 배선 — 첨부 글자를 읽는 한 곳(attachmentText)이 OCR PDF 에 글자층을 맞춘다: 금액 로봇·발췌기·카드 읽기가 같은 글자를 본다 */
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ocrmoney-'));
+    const put = (f, body) => fs.writeFileSync(path.join(tmp, f), body);
+    put('a.pdf', '%PDF'); put('a.pdf.ocr.txt', smuOcr); put('a.pdf.txt', smuLay);
+    put('b.png', 'png'); put('b.png.ocr.txt', '장학금 안내\n- 장학금액: 학기 당 2000,000원\n신청기간 : 11.1~11.20');
+    put('c.hwp', 'hwp'); put('c.hwp.body.txt', '6. 장학금액: 11500,000원/인당');
+    const txt = (f) => call(AT, 'attachmentText', path.join(tmp, f));
+    const amt = (t) => { const r = PA1.amountFrom(String(t).split('\n').map((s) => s.trim()).filter(Boolean)); return [r.kind, r.value]; };
+    eq('  배선 — attachmentText 가 OCR PDF 를 글자층과 맞춰 금액 로봇이 150만원을 읽는다 · 글자층 없는 그림은 금액 모름(그 줄이 발췌로도 안 나간다) · HWP 글자는 손대지 않는다',
+      [amt(txt('a.pdf')), amt(txt('b.png')), /2000,000/.test(txt('b.png')), txt('c.hwp')],
+      [['fixed', 1500000], ['unknown', 0], false, '6. 장학금액: 11500,000원/인당']);
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+
   /* ⑥ 공고문 첨부 고르기 한 곳 — noticeDocFiles */
   eq('⑥ 「…공고문(신청서 포함).hwpx」 는 공고문 · 「장학금 신청서(서약서 포함).hwp」·「…신청서.hwp」 는 아니다',
     ['붙임1. 2026년 장학생 선발 공고문(신청서 포함).hwpx', '장학금 신청서(서약서 포함).hwp', '2026년 2학기 선원가족장학사업 신청서.hwp'].map((n) => AT.isNoticeDoc(n)), [true, false, false]);
@@ -4885,6 +4931,27 @@ console.log('\n■ 발췌기 글자 읽기 — 카드 빈칸 비평의 이름표
       call(EX, 'docExcerptOk', qkLine), call(EX, 'docExcerptOk', '제출서류 _ 소정양식은 홈페이지 (wwwsamwonsfor.kr) 참조'),
       ['1-@) 한국장학재단', '서류 제출 ㆍ)7@)17', 'khwc5770@khu,ac.kr', 'wwwybzor.kr/', 'www2.khu.ac.kr'].map((l) => (EX.ADDR_BROKEN ? EX.ADDR_BROKEN.test(l) : '(없음)'))],
     [null, null, 'abc@gmail.com', false, false, [false, false, true, true, false]]);
+  /* 3차 리뷰 (2026-11-16) — OCR 이 **한글 자체를** 영문 찌꺼기로 읽은 줄. 아래는 collector/extracted 의 실제 두 판독 그대로
+     (한국지도자육성장학재단 elig-1ou26f-1 · 하이패스 장학 elig-176ryo-1 · 삼원 elig-lwbap6-1) */
+  const kosfflOcr = '다. 제출처 : StH A) EAS AAS A Ct (http://Awww.kosffl.or.kr, 02-595-6817)';
+  const kosfflLay = ' 다. 제출처 : 한국지도자육성장학재단(http://www.kosffl.or.kr, 02-595-6817)';
+  eq('  🔴 한글을 영문 찌꺼기로 읽은 OCR 줄은 글자층 줄로(이름표 하나뿐 · OCR 한글이 전부 글자층에 · 찌꺼기 자리 · 숫자 같음 · 주소 아주 닮음) — 하나라도 어긋나면 OCR 줄 그대로',
+    [call(EX, 'crossCheckOcr', ['가. 제출기한 : 2026. 10. 31.(금)', kosfflOcr].join('\n'), ['가. 제출기한 : 2026. 10. 31.(금)', kosfflLay].join('\n')),
+      call(EX, 'crossCheckOcr', kosfflOcr, kosfflLay.replace('6817', '6818')),                                   // 전화 번호가 다르다
+      call(EX, 'crossCheckOcr', kosfflOcr.replace('StH', '협회 StH'), kosfflLay),                               // OCR 이 글자층에 없는 한글(협회)을 가졌다
+      call(EX, 'crossCheckOcr', kosfflOcr.replace('Awww.kosffl', 'Awww.kosaf'), kosfflLay.replace('www.kosffl', 'www.kosaf.go.kr/other')),   // 주소가 덜 닮았다
+      call(EX, 'crossCheckOcr', kosfflOcr, kosfflLay.replace('재단(', '재단 KLF(')),                             // 글자층 줄에도 영문이 있다 — 찌꺼기 자리를 못 가린다
+      call(EX, 'crossCheckOcr', kosfflOcr, [kosfflLay, ' 다. 제출처 : 한국장학재단(http://www.kosaf.go.kr, 1599-2000)'].join('\n')),   // 이름표가 둘
+      call(EX, 'crossCheckOcr', '다. 제출처 : 한국 (http://Awww.kosffl.or.kr, 02-595-6817)', kosfflLay)],      // 찌꺼기가 없다(빠진 한글만) — 같은 줄이라 할 근거가 없다
+    [['가. 제출기한 : 2026. 10. 31.(금)', '다. 제출처 : 한국지도자육성장학재단(http://www.kosffl.or.kr, 02-595-6817)'].join('\n'),
+      kosfflOcr, kosfflOcr.replace('StH', '협회 StH'), kosfflOcr.replace('Awww.kosffl', 'Awww.kosaf'), kosfflOcr, kosfflOcr, '다. 제출처 : 한국 (http://Awww.kosffl.or.kr, 02-595-6817)']);
+  eq('    🔴 못 맞춘 찌꺼기 줄은 첨부 발췌로 보이지 않는다(찌꺼기가 붙은 `Awww.`·영문 찌꺼기 줄) · 약어 줄·기록 줄·영문이 낀 멀쩡한 줄은 그대로 · 이름표 없는 삼원 OCR 줄은 바꾸지 않는다',
+    [kosfflOcr, 'ㆍ발급처 : 한국장학재단 SH 0A] Wwww.kosaf.go.kr)', '다. 제출처 : 한국 StH A EAS Ct 재단',
+      '다. 제출처 : 한국지도자육성장학재단(http://www.kosffl.or.kr, 02-595-6817)', '-주요 방송사: EBS, KBS, MBC, SBS', '4×400mR 1위, 4×100mR 2위, 100m 1위',
+      '어학 : TOEIC 800점 이상 또는 TOEFL iBT 90점 이상', '(2) 담당자 : 김대호팀장(010-7182-3150) E-mail : dh_kim@samwonpaper.com', '(3) 홈페이지 : www.samwonsf.or.kr']
+      .map((l) => call(EX, 'docExcerptOk', l))
+      .concat([call(EX, 'crossCheckOcr', '6) 제출서류 _ 소정양식은 홈페이지 (wwwsamwonsfor.kr) 참조', '6) 제출서류 _ 소정양식은 홈페이지 (www.samwonsf.or.kr) 참조')]),
+    [false, false, false, true, true, true, true, true, true, '6) 제출서류 _ 소정양식은 홈페이지 (wwwsamwonsfor.kr) 참조']);
   eq('    배선 — 첨부 글자를 읽는 자리(docTexts)가 OCR 첨부에 글자층을 맞춘다 · OCR 첨부에서 읽은 접수 메일은 다시 읽는다',
     [/const t = isOcrSource\(p\) \? crossCheckOcr\(t0, pdfLayerText\(p\)\) : t0;/.test(eeSrc), /it\.applyEmail && \/\^공고문 첨부\\\(OCR\\\)\/\.test\(it\.applyEmailFrom/.test(eeSrc)], [true, true]);
   const bodyPart = eeSrc.slice(eeSrc.indexOf('const body = strip('));
@@ -8112,6 +8179,8 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
     { ...wsBase, id: 'sample-many-lines', name: '표본 장학금 (자격 줄 일곱)', deadline: '2099-12-31',
       eligibilityLines: ['대한민국 국적을 가진 자', '직전학기 평점 2.5 이상인 자', '직전학기 12학점 이상 이수한 자', '학부 재학생', '소득 8구간 이하인 자', '서울시에 거주하는 자', '2학년 이상 재학생'] },
     { ...wsBase, id: 'sample-closed', name: '표본 장학금 (마감 지남)', deadline: '2020-01-31', eligibilityLines: ['직전학기 평점 2.5 이상인 자'] },
+    /* 기한도 자격도 못 읽은 정식 공고(2026-11-16) — 앱은 카드로 안 그리고 게시판 새 공고 한 줄로 싣는다(match-engine feedOnlyFormal) */
+    { ...wsBase, id: 'sample-feed-only', name: '표본 장학금 (기한·자격 못 읽음)', listedAt: new Date().toISOString().slice(0, 10), sourceUrl: 'https://example.ac.kr/notice/feed-only-1', eligibilityLines: [] },
   ] }));
   const run = (args) => {
     try {
@@ -8176,6 +8245,21 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
     const out = run([closed.id]);
     eq('마감 지난 공고는 신청 버튼 잠김이라고 말한다', /신청 버튼 잠김/.test(out), true);
   }
+
+  /* 🔴 카드로 안 그리는 정식 공고 (2026-11-16 리뷰) — 앱(getMatches)은 기한도 자격도 못 읽은 정식 공고를 카드에서 빼고
+     게시판 새 공고 한 줄(제목 + 링크)로만 싣는데(feedOnlyFormal·feedOnlyBoardRows), 이 도구는 카드·「판정 selective」·
+     「신청 버튼 열림 (마감: ?)」을 말했다(상명대 auto-enoticedoarticleno770333 실측). 도구가 같은 함수를 불러 '카드 없음'이라 말하는지 실제로 돌려 본다 */
+  const fo = reg2.items.find((x) => x.id === 'sample-feed-only');
+  eq('  기한·자격을 못 읽은 표본은 앱 규칙으로 카드가 없다 (이 검사의 전제 · match-engine feedOnlyFormal)', !!fo && ME4.feedOnlyFormal(fo, WS_P), true);
+  if (fo) {
+    const out = run([fo.id]);
+    eq('기한·자격을 못 읽은 정식 공고는 「카드 없음」 · 게시판 새 공고 한 줄(제목 + 링크)이라고 말한다 — 카드·판정·신청 버튼을 말하지 않는다',
+      [/카드 없음/.test(out), /게시판 새 공고 한 줄\(제목 \+ 링크\)로 보인다 — 「표본 장학금 \(기한·자격 못 읽음\)」/.test(out),
+        /카드 윗줄|판정 selective|신청 버튼/.test(out), out.includes('누르면 → https://example.ac.kr/notice/feed-only-1')],
+      [true, true, false, true]);
+  }
+  eq('  모르는 마감을 「마감: ?」로 찍지 않는다', /마감: \?|\|\| '\?'\}\)/.test(readText(new URL('../verify/what-shows.mjs', import.meta.url))), false);
+  eq('  카드 판정은 match-engine feedOnlyFormal 을 부른다 (사본이 아니다)', /ME\.feedOnlyFormal\(/.test(readText(new URL('../verify/what-shows.mjs', import.meta.url))), true);
 
   /* 배지 문구를 손으로 옮겨 적으면 갈라진다 — 앱 함수를 가져다 쓰는지 소스로도 못 박는다 */
   const ws = readText(new URL('../verify/what-shows.mjs', import.meta.url));
@@ -15495,6 +15579,37 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
   eq('  🔴 `다음 중 1가지 이상 해당` 의 `1가지` 는 문턱이지 선택지 수가 아니다 — 아래 셋이 한 묶음(첫 항목만 묶고 둘을 필수로 세지 않는다) · 수급자 학생은 요건 1개 맞음',
     [MEx.requirementLines({}, head1g, { withMeta: true, all: true }).map((x) => x.group), headFit(head1g, cnuStu({ flags: ['basicLiving'] }))],
     [[1, 1, 1], [1, 1, []]]);
+  /* 2026-11-16 · 리뷰 3차 — 번호 꼴을 넓은 갈래로 묶어 `(1)`↔`3)` · `가)`↔`다.` · `2.1`↔`3.` 을 같은 꼴로 봤다 → 묶음이 다음 필수 형제 줄(평점 3.5)까지 삼켜 평점 2.0 수급자가 미달 없이 통과(틀린 안심).
+     또 가리킴 줄 길(`가. 지원자격: 다음 중 1가지 이상 해당하는 자` · `신청자격: 아래 항목 중 1가지 이상 …`)은 `1가지` 를 선택지 수로 읽어 첫 항목만 묶고 둘을 필수로 셌다(틀린 미달) */
+  const lowBasic = cnuStu({ gpa: 2.0, flags: ['basicLiving'] });
+  const outline = {
+    paren: ['2) 차등조건(1개 이상 충족 시 신청 가능)', '(1) 보호조치 종료자', '(2) 국민기초생활수급자', '3) 직전학기 평점 3.5 이상인 자'],
+    kor: ['나. 선택조건(1개 이상 충족 시 신청 가능)', '가) 보호조치 종료자', '나) 국민기초생활수급자', '다. 직전학기 평점 3.5 이상인 자'],
+    dotted: ['2. 차등조건(1개 이상 충족 시 신청 가능)', '2.1 보호조치 종료자', '2.2 국민기초생활수급자', '3. 직전학기 평점 3.5 이상인 자'],
+    bareNum: ['가. 차등조건(1개 이상 충족 시 신청 가능)', '1) 보호조치 종료자', '2) 국민기초생활수급자', '3.5 이상 평점 유지 학생'],
+  };
+  eq('🔴 택1 묶음은 **같은 모양** 번호까지만 — `(1)`≠`3)` · `가)`≠`다.` · `2.1`≠`3.` · `3.5 이상…` 은 번호가 아니다 · 평점 2.0 수급자는 평점 줄에서 미달(1/2)',
+    Object.values(outline).map((L) => [MEx.requirementLines({}, L, { withMeta: true, all: true }).map((x) => x.group), headFit(L, lowBasic).slice(0, 2)]),
+    [[[1, 1, 0], [1, 2]], [[1, 1, 0], [1, 2]], [[1, 1, 0], [1, 2]], [[1, 1, 0], [1, 2]]]);
+  eq('  머리 줄과 같은 모양의 다음 줄은 아래 항목이 아니라 **형제**다 — `2) 차등조건(1개 이상 …)` ↵ `3)` `4)` 는 묶지 않는다',
+    MEx.requirementLines({}, ['2) 차등조건(1개 이상 충족 시 신청 가능)', '3) 보호조치 종료자', '4) 국민기초생활수급자'], { withMeta: true, all: true }).map((x) => x.group), [0, 0]);
+  const opts3 = ['1) 국민기초생활수급자', '2) 직전학기 평점 4.0 이상인 자', '3) 다자녀 가정의 자녀'];
+  eq('  🔴 가리킴 줄 길도 `1가지 이상` 은 문턱 — `가. 지원자격: 다음 중 1가지 이상 해당하는 자`·`신청자격: 아래 항목 중 1가지 이상 충족하는 학생` 아래 셋이 한 묶음 · 수급자는 1/1 (이름표만 다른 `차등조건:` 과 같은 판정)',
+    ['가. 지원자격: 다음 중 1가지 이상 해당하는 자', '신청자격: 아래 항목 중 1가지 이상 충족하는 학생', '나. 차등조건: 다음 중 1가지 이상 해당하는 자'].map((h) => [MEx.requirementLines({}, [h, ...opts3], { withMeta: true, all: true }).map((x) => x.group), headFit([h, ...opts3], lowBasic)]),
+    [[[1, 1, 1], [1, 1, []]], [[1, 1, 1], [1, 1, []]], [[1, 1, 1], [1, 1, []]]]);
+  const fam = ['가 . 신청대상 : 가족장학금을 신청할 수 있는 학생은 다음 3 가지 중 1 가지에 해당되어야 함', '1) 형제자매가 본교에 재학할 경우 학부에 재학하는 1인', '2) 2026년 3월 1일 기준',
+    '3) 부모 중 1인과 자녀가 본교에 재학할 경우 학부에 재학하는 1인', '나 . 성적기준', '- 직전학기 평점평균이 3.0 이상인 자'];
+  eq('  🔴 가리킴 줄 묶음도 개요로 끝난다 — 선택지가 걸러져도 다음 절의 필수 줄(평점)을 삼키지 않는다 · 평점 2.0 학생은 그 줄에서 미달',
+    headFit(fam, lowBasic)[2], ['직전학기 평점평균이 3.0 이상인 자']);
+  eq('  선택지 수는 원문이 말할 때만 — `아래 ①·②·③ 중 하나` 는 셋(④ 는 필수) · `다음 세 가지 중 하나` + 번호 없는 줄은 그 수까지 · 수를 말하지 않는 번호 없는 줄은 묶지 않는다',
+    [MEx.requirementLines({}, ['아래 ①·②·③ 중 하나에 해당하는 자', '① 국민기초생활수급자', '② 다자녀 가정의 자녀', '③ 한부모 가정의 자녀', '④ 직전학기 평점 3.0 이상인 자'], { withMeta: true, all: true }).map((x) => x.group),
+      MEx.requirementLines({}, ['다음 세 가지 중 하나에 해당하는 자', '국민기초생활수급자', '다자녀 가정의 자녀', '1) 직전학기 평점 3.0 이상인 자'], { withMeta: true, all: true }).map((x) => x.group),
+      MEx.requirementLines({}, ['다음 중 하나에 해당하는 자', '국민기초생활수급자', '다자녀 가정의 자녀', '직전학기 평점 3.0 이상인 자'], { withMeta: true, all: true }).map((x) => x.group)],
+    [[1, 1, 1, 0], [1, 1, 0], [0, 0, 0]]);
+  eq('  (대조군) `다음 3가지 중 2가지 이상` 은 택1 이 아니다 · `아래 6 개 항목 중 1 개 이상의 항목에 해당하지 않는 경우 지급 불가` 는 제외 문장이라 택1 자격 묶음이 아니다',
+    [MEx.requirementLines({}, ['다음 3가지 중 2가지 이상 해당하는 자', ...opts3], { withMeta: true, all: true }).map((x) => x.group),
+      MEx.requirementLines({}, ['가 . 아래 6 개 항목 중 1 개 이상의 항목에 해당하지 않는 경우 지급 불가', '① 형제 · 자매가 본교 학부에 동시 재적 중인 학생', '② 부부가 본교 학부에 동시 재적 중인 학생'], { withMeta: true, all: true }).map((x) => x.group)],
+    [[0, 0, 0], [0, 0]]);
   const stu6 = (o) => ({ school: '한국외국어대학교', track: 'humanities', major: '영어학과', year: 3, status: '재학', gpa: 3.8, bracket: 5, credits: 15, region: '서울', parentRegion: '서울', nationality: 'korean', birthYear: 2004, flags: [], common: {}, scholarships: [], ...o });
   const judge6 = (l, p, ex) => conds(l, ex).map((c) => MEx.judgeCond(c, p, {}));
   const condsEx6 = (l) => PRx.parseLine(l, true).conds;

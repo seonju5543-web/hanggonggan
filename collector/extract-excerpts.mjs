@@ -108,6 +108,8 @@ export function docExcerptOk(line) {
   if (/^[^(（]{0,8}[)）]/.test(t)) return false;
   if (/@/.test(t) && !/[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+/.test(t)) return false;
   if (/\bwww(?![.\d])[A-Za-z]/.test(t)) return false;   // 점이 빠진 누리집 주소(`wwwsamwonsfor.kr`) — OCR 오독이다(crossCheckOcr 머리말)
+  if (/[A-Za-z0-9]www\./i.test(t)) return false;        // 찌꺼기가 들러붙은 누리집 주소(`http://Awww.kosffl.or.kr`) — OCR 오독이다(3차 리뷰)
+  if (ocrJunkLine(t)) return false;                     // 한글을 영문 찌꺼기로 읽은 줄(`제출처 : StH A) EAS AAS A Ct`) — 원문 문장이 아니다
   const at = t.search(/[:：|｜]/);
   if (at < 0) return true;
   const label = t.slice(0, at), value = t.slice(at + 1);
@@ -1318,6 +1320,17 @@ const addrLabel = (line) => {
   const lab = squashWs(t.slice(0, at));
   return /(?:https?|ftp)$/i.test(lab) || /[@/\\]/.test(lab) ? null : lab;   // `(https://…` 의 `(https` 는 이름표가 아니다
 };
+/* 한글을 영문 찌꺼기로 읽은 OCR 줄 (3차 리뷰 · 2026-11-16) — `다. 제출처 : StH A) EAS AAS A Ct (http://Awww.kosffl.or.kr, …)`(글자층은 `한국지도자육성장학재단`).
+   찌꺼기 낱자: 홀로 선 영문 토막(숫자·영문에 붙지 않은 것) 중 한 글자(`A`)·소문자 뒤 대문자(`StH`)·두 글자 첫 대문자(`Ct`).
+   한글이 있는 줄에서 찌꺼기 낱자가 셋 이상 · 영문 토막의 절반 이상 · 영문 글자가 한글보다 많을 때만 — 약어 줄(`EBS, KBS, MBC, SBS`)·
+   기록 줄(`4×400mR 1위`)·영문 문장은 걸리지 않는다. 주소는 빼고 센다 · 발췌 문지기(docExcerptOk)가 부른다 */
+const ocrJunkLine = (line) => {
+  const o = String(line || '').replace(ADDR_TOKEN, ' ');
+  const han = (o.match(/[가-힣]/g) || []).length;
+  const toks = o.match(/(?<![0-9A-Za-z])[A-Za-z]+(?![0-9A-Za-z])/g) || [];
+  const junk = toks.filter((w) => w.length === 1 || /[a-z][A-Z]/.test(w) || /^[A-Z][a-z]$/.test(w)).length;
+  return han > 0 && junk >= 3 && junk * 2 >= toks.length && toks.join('').length > han;
+};
 const addrsOf = (line) => (String(line || '').match(ADDR_TOKEN) || []).map((a) => a.replace(/[.,]+$/, '').toLowerCase());
 const lcsLen = (a, b) => {
   let prev = new Array(b.length + 1).fill(0);
@@ -1332,6 +1345,25 @@ const closeness = (a, b) => (a.length + b.length ? (2 * lcsLen(a, b)) / (a.lengt
 const hangulOf = (line) => String(line || '').replace(ADDR_TOKEN, ' ').replace(/[^가-힣]/g, '');
 const textAgree = (a, b) => { const x = hangulOf(a), y = hangulOf(b); return x.length >= 3 && y.length >= 3 && closeness(x, y) >= 0.85; };
 const addrClose = (a, b) => closeness(a, b) >= 0.6;
+/* OCR 이 **한글 자체를** 영문 찌꺼기로 읽은 줄 (3차 리뷰 · 2026-11-16) — 한국지도자육성장학재단 elig-1ou26f-1 OCR
+   `다. 제출처 : StH A) EAS AAS A Ct (http://Awww.kosffl.or.kr, 02-595-6817)` ↔ 글자층 `다. 제출처 : 한국지도자육성장학재단(http://www.kosffl.or.kr, 02-595-6817)`.
+   한글이 다르니 textAgree 가 '다른 줄'이라 보고 깨진 줄을 남겼다. 같은 줄이라고 확신할 때만 글자층으로 — 네 가지가 **모두** 맞아야 한다:
+   ① OCR 의 한글은 전부 글자층 줄 안에 차례대로 있다(OCR 이 남의 한글을 갖고 있지 않다 · 이름표 포함 2자 이상)
+   ② 글자층이 더 가진 한글(3자 이상)의 자리에 OCR 은 영문 찌꺼기(3자 이상 · 빠진 한글의 0.4배 이상)를 갖고 · 글자층 줄엔 그런 영문이 없다
+   ③ 주소 밖 숫자(전화 등)가 글자 하나 다르지 않다 ④ 주소가 양쪽 다 있고 서로 아주 닮았다(0.8 · 짝이 하나씩) */
+const outsideAddr = (line) => String(line || '').replace(ADDR_TOKEN, ' ');
+const latinCount = (line) => (outsideAddr(line).match(/[A-Za-z]/g) || []).length;
+const digitsOutside = (line) => outsideAddr(line).replace(/\D/g, '');
+const garbledHangul = (ocr, lay) => {
+  const x = hangulOf(ocr), y = hangulOf(lay);
+  if (x.length < 2 || lcsLen(x, y) !== x.length) return false;                               // ①
+  const missing = y.length - x.length, junk = latinCount(ocr) - latinCount(lay);
+  if (missing < 3 || junk < 3 || junk < missing * 0.4 || latinCount(lay) > 0) return false;  // ②
+  if (digitsOutside(ocr) !== digitsOutside(lay)) return false;                               // ③
+  const mine = addrsOf(ocr), theirs = addrsOf(lay);
+  return mine.length > 0 && mine.length === theirs.length
+    && mine.every((a) => theirs.some((b) => closeness(a, b) >= 0.8)) && theirs.every((b) => mine.some((a) => closeness(a, b) >= 0.8));   // ④
+};
 const labelIndex = (text, keep) => {
   const m = new Map();
   for (const raw of String(text || '').split('\n')) {
@@ -1355,7 +1387,7 @@ export function crossCheckOcr(ocr, layer) {
     const [lay] = lays;
     const mine = addrsOf(l), theirs = addrsOf(lay);
     if (theirs.every((a) => mine.includes(a))) return l;                    // 주소가 같으면 OCR 그대로
-    if (!textAgree(l, lay)) return l;                                         // 다른 줄이다
+    if (!textAgree(l, lay) && !garbledHangul(l, lay)) return l;               // 다른 줄이다(한글을 찌꺼기로 읽은 같은 줄은 빼고 — 위 머리말)
     if (!mine.every((a) => theirs.some((b) => addrClose(a, b)))) return l;    // OCR 의 멀쩡한 주소가 글자층과 딴판이면 다른 줄이다
     return lay;
   }).join('\n');
