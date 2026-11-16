@@ -5322,3 +5322,20 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
   .fillp-field { background: transparent; border-color: transparent; }
   .fillp-field::placeholder { color: transparent; }
 }
+
+/* ── 상세 시트 절 다섯 — 칸마다 묶음 + 절 이름 앞 점 (2026-11-16 개발자 지시) ──
+   *"지원자격, 접수, 첨부, 원문의 큰 틀 안내가 불렛포인트 강조가 되어야 하는데 회색 글자로 흐릿하게 나와 있어 … 각 칸을 시각적으로 구분"*
+   절 이름은 진한 글자(11-02 승인 시안 sheet-consistency.html 도 h4 = var(--text) 였다 — 앱만 --text-weak 로 흐렸다).
+   🔴 바깥 절 이름만(> h4) — 「지원 제외 대상」 같은 안쪽 머리(.r-head)·서류 이름 h4 는 그대로다. 묶음은 app.js sheetSectionsHtml 한 곳. */
+.sheet-sec { border-top: 1px solid var(--line); margin-top: var(--sp-3); padding-top: var(--sp-2); }
+.sheet-sec > h4:first-child,
+.sheet-sec > .sheet-verdict:first-child { margin-top: 0; }
+.sheet-sec > h4,
+.sheet-sec > .sheet-verdict > h4 {
+  display: flex; align-items: center; gap: var(--sp-1);
+  font-size: var(--t-md); font-weight: 800; color: var(--text);
+}
+.sheet-sec > h4::before,
+.sheet-sec > .sheet-verdict > h4::before {
+  content: ''; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+}

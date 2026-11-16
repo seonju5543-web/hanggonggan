@@ -10194,6 +10194,16 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
     eq('상세 시트: 원문 링크는 「원문」 절에 한 번만 그린다 (openDetail 본문엔 링크 그리기가 없다)', [(secSrc.match(/<h4>원문<\/h4>/g) || []).length, /sourceLinkHtml\(sch\)|srcLink/.test(body.replace(/\/\*[\s\S]*?\*\//g, ''))], [1, false]);
     eq('  「원문」 절 = 링크(.doc-legend.sheet-source 안) + 안내 한 줄 + 층2 문의 · 「중복 수혜 가능」·「마감 …」 점 줄은 없다',
       /<div class="sheet-facts"><p class="doc-legend sheet-source">\$\{a \|\| sourceNoteHtml\(sch\)\}\$\{hint \? `<br \/>\$\{hint\}` : ''\}<\/p>\$\{\(sch\.sourceKind === 'kosaf' && sch\.contact\) \? `<p class="doc-legend">문의 \$\{esc\(sch\.contact\)\}<\/p>` : ''\}<\/div>/.test(secSrc) && !/중복 수혜 가능|마감 \$\{/.test(secSrc), true);
+    /* 2026-11-16 개발자 지시 — 절마다 한 묶음(.sheet-sec · 사이 옅은 선) + 절 이름은 진한 글자 앞 점(불렛). 회색으로 흐리게 되돌리면 여기서 걸린다 */
+    {
+      const cssSec = readText(new URL('../style.css', import.meta.url)).replace(/\/\*[\s\S]*?\*\//g, '');
+      eq('  절 다섯은 저마다 <section class="sheet-sec"> 묶음이다(빈 절은 묶음도 없다)',
+        /\[elig, apply, notice, att, src\]\.filter\(Boolean\)\.map\(\(s\) => `<section class="sheet-sec">\$\{s\}<\/section>`\)/.test(secSrc), true);
+      eq('  묶음 사이 옅은 선 · 절 이름은 진한 글자(--text) · 이름 앞 점(::before · --accent)',
+        [/\.sheet-sec \{[^}]*border-top: 1px solid var\(--line\)/.test(cssSec),
+         /\.sheet-sec > \.sheet-verdict > h4 \{[^}]*color: var\(--text\);/.test(cssSec),
+         /\.sheet-sec > \.sheet-verdict > h4::before \{[^}]*border-radius: 50%; background: var\(--accent\)/.test(cssSec)], [true, true, true]);
+    }
   }
 
   /* 🔴 'AI 티' 정리 A·D·E·G·H (2026-10-06 사장님 지시 → 전후 사진 보고 → 은서님이 다섯 개 골랐다).
@@ -13303,7 +13313,7 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
   const sec = fnOf('sheetSectionsHtml'), od = fnOf('openDetail'), oa = fnOf('openActivityDetail');
   const order = ['<h4>지원 자격</h4>', '<h4>접수</h4>', '<h4>공고 안내</h4>', '<h4>첨부', '<h4>원문</h4>'].map((h) => (h === '<h4>공고 안내</h4>' ? fnOf('noticeSummaryHtml') : h === '<h4>접수</h4>' ? fnOf('applySectionHtml') : sec).indexOf(h) >= 0);   // 접수·공고 안내 절은 제 함수가 그린다
   eq('시트 절 다섯이 다 있다 — 지원 자격 · 접수 · 공고 안내 · 첨부 · 원문', order, [true, true, true, true, true]);
-  eq('  순서 — 자격 → 접수 → 공고 안내 → 첨부 → 원문 (return elig + apply + notice + att + src)', /return elig \+ apply \+ notice \+ att \+ src;/.test(sec), true);
+  eq('  순서 — 자격 → 접수 → 공고 안내 → 첨부 → 원문 ([elig, apply, notice, att, src] — 11-16 부터 절마다 .sheet-sec 묶음)', /return \[elig, apply, notice, att, src\]\.filter\(Boolean\)/.test(sec), true);
   eq('  장학·층2 시트와 활동 시트가 같은 머리줄·절(sheetHeadHtml · sheetSectionsHtml)을 쓴다', [/sheetHeadHtml\(\{ x: sch/.test(od), /sheetSectionsHtml\(\{ sch, result, fit, fd, noticeLines/.test(od), /sheetHeadHtml\(\{ x: n, d/.test(oa), /sheetSectionsHtml\(\{ sch, result, fit, fd, activity: n/.test(oa)], [true, true, true, true]);
   eq('  「지원 가능·선발 심사」 알약(status-pill)은 어느 시트에도 없다', [/status-pill/.test(sec), /status-pill/.test(od), /status-pill/.test(oa)], [false, false, false]);
   /* 2026-11-07 개발자 지시 "지원자격에 넣을 내용이 없는 경우에는 지원자격 칸 자체를 없애기" — 11-02 의 「원문에서 확인」 한 줄(칸은 늘 있음)을 뒤집었다. 되돌리면 빨갛다 */
