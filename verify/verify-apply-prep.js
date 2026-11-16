@@ -129,7 +129,9 @@ async function swipeDown(page, sel) {
     /* A — 서류 목록에 안내 줄이 있고(③을 잴 수 있고) 원문 주소가 있는 것을 먼저 */
     const score = (s) => (s.documents.some((d) => PH.test(d)) ? 4 : 0) + (s.sourceUrl ? 2 : 0) + (hasFormAtt(s) ? 0 : 1);
     const A = l1.slice().sort((a, b) => score(b) - score(a))[0] || null;
-    const B = l1.find((s) => s !== A && hasFormAtt(s)) || null;
+    /* B 는 머리말이 **'첨부 신청서'(attached)** 인 공고 — 같은 첨부가 있어도 원문이 메일·포털 접수를 말하면 머리말은 그 접수 방법이다(forms.js prepKindFor 순서).
+       데이터가 메일 접수 주소를 새로 읽자 영남대 다문화가정(신청서.hwp + 「이메일 접수」)이 B 로 골려 ② 의 둘째 줄 대조가 헛돌았다(2026-11-16) */
+    const B = l1.find((s) => s !== A && hasFormAtt(s) && prepKindFor(s) === 'attached') || null;
     /* 층2도 2026-10-13 부터 앱 지원문서가 붙는다(① · 머리말 'kosaf') — 대상은 그 문서가 붙은 것 */
     const l2 = live.filter((s) => s.sourceKind === 'kosaf' && s.prepFormId && formTplIdFor(s) === s.prepFormId);
     const C = l2.find((s) => (s.attachments || []).length) || l2[0] || null;

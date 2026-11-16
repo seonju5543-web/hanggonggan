@@ -51,7 +51,8 @@ const PROFILE = {
     let noField = null;
     for (const id of Object.keys(idx.items || {})) {
       const s = allScholarships().find((x) => x.id === id);
-      if (!s) continue;
+      /* 「신청 준비 시작」 단추는 마감 전·신청 절차가 있는 공고에만 열린다 — 끝난 공고를 고르면 ① 이 헛돈다(2026-11-16 · 선원가족 요강이 10-30 마감으로 읽혀 닫혔다) */
+      if (!s || dday(s.deadline).days < 0 || s.noApply) continue;
       const r = await fetch(`data/forms-pdf/${id}/fields.json`, { cache: 'no-store' });
       if (!r.ok) { noField = noField || { id }; continue; }
       const fj = await r.json();
