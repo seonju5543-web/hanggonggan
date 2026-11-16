@@ -11,61 +11,9 @@
   "at": "2026-11-07",
   "tries": 2
  },
- "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11392": {
-  "at": "2026-10-30",
-  "tries": 1
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/270425/artclView.do": {
-  "at": "2026-11-06",
-  "tries": 2
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/270423/artclView.do": {
-  "at": "2026-10-30",
-  "tries": 1
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/270420/artclView.do": {
-  "at": "2026-10-30",
-  "tries": 1
- },
  "https://www.youthcenter.go.kr/bbs03View/48/10858": {
   "at": "2026-11-06",
   "tries": 2
- },
- "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156787394&pWise=sub&pWiseSub=C3": {
-  "at": "2026-11-07",
-  "tries": 2
- },
- "https://kau.ac.kr/kaulife/main/global.html": {
-  "at": "2026-11-09",
-  "tries": 2
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/270531/artclView.do": {
-  "at": "2026-11-02",
-  "tries": 1
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/270524/artclView.do": {
-  "at": "2026-11-02",
-  "tries": 1
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/270521/artclView.do": {
-  "at": "2026-11-02",
-  "tries": 1
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53593&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-11-02",
-  "tries": 1
- },
- "https://www.jbnu.ac.kr/web/Board/219309/detailView.do?category=6": {
-  "at": "2026-11-09",
-  "tries": 2
- },
- "https://wise.dongguk.ac.kr/article/servicenotice/detail/521064": {
-  "at": "2026-11-10",
-  "tries": 2
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/270682/artclView.do": {
-  "at": "2026-11-03",
-  "tries": 1
  },
  "https://www.youthcenter.go.kr/bbs03View/48/10865": {
   "at": "2026-11-04",
@@ -78,14 +26,6 @@
  "https://blog.naver.com/mohw2016/224463267916": {
   "at": "2026-11-05",
   "tries": 1
- },
- "https://blog.naver.com/kfdazzang/224463652864": {
-  "at": "2026-11-05",
-  "tries": 1
- },
- "https://www.mpb.go.kr/web/main/bbs/b_0001/3125?cp=1&sortOrder=BA_REGDATE&sortDirection=DESC&bcId=b_0001&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true": {
-  "at": "2026-11-12",
-  "tries": 2
  },
  "https://www.saha.go.kr/startup/program/list.do?mId=0302000000": {
   "at": "2026-11-13",
@@ -269,6 +209,66 @@
  },
  "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=944&page=3": {
   "at": "2026-11-15",
+  "tries": 1
+ },
+ "https://kau.ac.kr/kaulife/event.php?code=s1401&page=&mode=read&seq=11441": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kau.ac.kr/kaulife/event.php?code=s1401&page=&mode=read&seq=11397": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kau.ac.kr/kaulife/event.php?code=s1401&page=&mode=read&seq=11216": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kau.ac.kr/kaulife/event.php?code=s1401&page=&mode=read&seq=10638": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kau.ac.kr/kaulife/event.php?code=s1401&page=2&mode=read&seq=10416": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kau.ac.kr/kaulife/event.php?code=s1401&page=2&mode=read&seq=10392": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kau.ac.kr/kaulife/event.php?code=s1401&page=2&mode=read&seq=10311": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kau.ac.kr/kaulife/event.php?code=s1401&page=2&mode=read&seq=9987": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kau.ac.kr/kaulife/event.php?code=s1401&page=2&mode=read&seq=9959": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kau.ac.kr/kaulife/event.php?code=s1401&page=3&mode=read&seq=9729": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kau.ac.kr/kaulife/event.php?code=s1401&page=3&mode=read&seq=9718": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.hongik.ac.kr/kr/newscenter/event-contest.do?mode=view&articleNo=159226&article.offset=0&articleLimit=10&srCategoryId=85": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.hongik.ac.kr/kr/newscenter/event-contest.do?mode=view&articleNo=154825&article.offset=0&articleLimit=10&srCategoryId=85": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.hongik.ac.kr/kr/newscenter/event-contest.do?mode=view&articleNo=150177&article.offset=0&articleLimit=10&srCategoryId=85": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=819&bbsNo=8&nttNo=171537&pageUnit=10&searchCtgry=%eb%aa%a8%ec%a7%91%2f%ea%b3%b5%eb%aa%a8&searchCnd=all&pageIndex=1": {
+  "at": "2026-11-16",
   "tries": 1
  }
 }
