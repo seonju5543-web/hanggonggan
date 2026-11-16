@@ -15419,6 +15419,27 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
       [rmF('3학년(편입생 포함)은 평점 3.0 이상', { year: 1, gpa: 3.2 }), rmF('3학년(휴학생 제외)은 평점 3.0 이상', { year: 1, gpa: 3.2 }), rmF('3학년은 평점 3.0 이상', { year: 3, gpa: 2.6 })], [null, null, 'no']);
   }
 
+  /* ── 단체 회원은 그 단체 이름으로 묻고 따로 저장한다 (2026-11-16 개발자 결정 1번) ──
+     예전엔 처지 `member` 하나라, 한국건설교통신기술협회 공고에서 「예」라고 답하면 전기공사공제조합 공고에도 ✓ 였다(틀린 안심). */
+  {
+    const EAm = createRequire(import.meta.url)('../elig-ask.js');
+    const KCT = '1) (협회 회원사 자녀) 부 또는 모가 한국건설교통신기술협회 회원사 임·직원인 자';
+    const ELEC = '조합원전형: 신청일 현재 전기공사공제조합에 가입되어 있는 조합원 대표와 임직원 및 그 자녀';
+    const tr = (l) => (PRx.parseLine(l, false).conds.find((c) => c.kind === 'trait') || {}).anyOf;
+    eq('🔴 단체 회원 줄은 처지 열쇠를 `member:<단체>` 로 — 건설교통신기술협회 · 전기공사공제조합(가장 긴 고유 이름 · 맨 `협회` 아님) · 단체 이름이 없으면 예전처럼 `member`',
+      [tr(KCT), (tr(ELEC) || []).filter((k) => /^member/.test(k)), tr('향우회 회원 자녀')], [['member:한국건설교통신기술협회'], ['member:전기공사공제조합'], ['member']]);
+    const kk = 'member:한국건설교통신기술협회';
+    const p0 = { status: '재학', year: 3 };
+    eq('🔴 한 단체에 「예」 는 다른 단체 공고에 ✓ 를 주지 않는다 · 옛 처지 `member` 답은 단체 공고에 아무 말 없음 · 그 단체 「예」 ✓ · 「아니요」 ✕',
+      [MEx.requirementMatch(ELEC, { ...p0, traits: { [kk]: true } }, null), MEx.requirementMatch(KCT, { ...p0, traits: { member: true } }, null),
+        MEx.requirementMatch(KCT, { ...p0, traits: { [kk]: true } }, null), MEx.requirementMatch(KCT, { ...p0, traits: { [kk]: false } }, null)],
+      [null, null, 'ok', 'no']);
+    eq('  공고 안 「미확인 자격」 이 그 단체 이름으로 묻는다(askableFields · traitLabel) · 앱이 traitLabel 로 그린다',
+      [EAm.askableFields(KCT, { ...p0, traits: {} }, null), typeof EAm.traitLabel === 'function' ? EAm.traitLabel(kk) : null, typeof EAm.traitLabel === 'function' && EAm.traitLabel('award') === EAm.TRAIT_LABEL.award,
+        /traitLabel\(tk\)/.test(readText(new URL('../app.js', import.meta.url)))],
+      [['trait:member:한국건설교통신기술협회'], '한국건설교통신기술협회 회원·소속 (본인·부모)', true, true]);
+  }
+
   /* ── 편입·재입학 첫 학기 (2026-11-02 개발자 "편입이랑 재입학은 학적정보만으로 구분 가능하잖아") ── */
   const html = readText(new URL('../index.html', import.meta.url));
   eq('온보딩 학적 칩에 「편입 첫 학기」·「재입학 첫 학기」가 있다 (값 편입학·재입학)', [/data-value="편입학"/.test(html), /data-value="재입학"/.test(html)], [true, true]);

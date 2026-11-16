@@ -5564,7 +5564,7 @@ function eligAskRowsHtml(keys) {
       const now = ((pv.traits || {})[tk]);
       const yn = (v, lbl) => `<button type="button" class="elig-yn${now === v ? ' on' : ''}"`
         + ` data-elig-trait="${esc(tk)}" data-elig-val="${v ? '1' : '0'}">${lbl}</button>`;
-      return `<div class="elig-ask-row elig-ask-yn"><span>${esc(TRAIT_LABEL[tk] || tk)}</span>`
+      return `<div class="elig-ask-row elig-ask-yn"><span>${esc(typeof traitLabel === 'function' ? traitLabel(tk) : (TRAIT_LABEL[tk] || tk))}</span>`
         + `<span class="elig-yn-pair">${yn(true, '예')}${yn(false, '아니요')}</span></div>`;
     }
     const f = FIELD_META[k];
