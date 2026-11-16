@@ -107,6 +107,7 @@ export function docExcerptOk(line) {
   /* 옆 칸 글의 꼬리로 시작하는 조각(`금액) 지급하며 …`) · OCR 이 깨뜨린 메일 주소(`이메일 접수(/4111</0/(@히04.80.1[)`)는 원문 문장이 아니다 */
   if (/^[^(（]{0,8}[)）]/.test(t)) return false;
   if (/@/.test(t) && !/[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+/.test(t)) return false;
+  if (/\bwww(?![.\d])[A-Za-z]/.test(t)) return false;   // 점이 빠진 누리집 주소(`wwwsamwonsfor.kr`) — OCR 오독이다(crossCheckOcr 머리말)
   const at = t.search(/[:：|｜]/);
   if (at < 0) return true;
   const label = t.slice(0, at), value = t.slice(at + 1);
@@ -1286,39 +1287,77 @@ export function annexCut(text) {
 
 /** 공고문 첨부의 글자들 — 못 읽는 것(스캔·그림)은 조용히 뺀다. */
 /* formPath — 신청서 쪽에 섞여 온 공고문도 읽는가(마감·접수 시작·발표·접수처 · 기본 켬). 제출 서류 목록은 끈다(noticeDocFiles 머리말) */
-/* ── OCR 줄의 메일·누리집 주소는 PDF 글자층과 맞춰 본다 (2026-11-16 · 리뷰) ─────────────────────────────
+/* ── OCR 줄의 메일·누리집 주소는 PDF 글자층과 맞춰 본다 (2026-11-16 · 리뷰 · 같은 날 2차 리뷰로 좁힘) ─────────────────────────────
    한국건설교통신기술협회 요강 OCR 은 `○ 신청방법 : 이메일(<0080008.07.14) 및 우편(등기)` 인데 같은 PDF 의 글자층(.pdf.txt)은
    `ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편(등기)` 다 — 깨진 줄이 '그대로 발췌'로 학생에게 나갔다(마감 이틀 전 메일 접수 공고 셋).
    같은 꼴: `이메일 Gnjael.gwd@gmail.com)`(글자층 `injae1.gwd@gmail.com` — 접수 메일 칸에까지 들어갔다) · `접수처 : wwwybzor.kr/`(글자층 `www.ybz.or.kr/`).
-   🔴 주소 단서(메일·www·@·누리집·접수처)가 있는 OCR 줄만 본다 — 글자층은 숫자가 빠지는 일이 있어(attachmentText 머리말 2026-08-20) 다른 줄은 OCR 그대로다.
-   ① 글자층에 **같은 이름표**(`신청방법 :`·`(신청방법)`)의 줄이 있고 그 줄의 주소가 OCR 줄에 없으면 글자층 줄을 쓴다(원문 글자다 — 고쳐 쓰는 것이 아니다).
-   ② 맞출 글자층 줄이 없으면 주소 꼴이 깨진 줄(`www` 뒤 점 없음 · `@` 뒤 도메인 없음)은 버린다 — 깨진 주소를 원문이라고 보이지 않는다.
+   🔴 글자층 줄로 바꾸는 것은 **같은 줄이라고 확신할 때만**(2차 리뷰 — 짐작한 이름표로 바꿨더니 남의 줄이 들어왔다:
+      `(https://www.gov.kr)` 열 줄이 전부 `(https://efamily.scourt.go.kr) (주민등록등본상 …)` 로 · `E-Mail: info@daad-korea.org` 가 `E-Mail: na@daad.de` 로
+      · `(https://www.kosaf.go.kr) 2026년1학기 기준` 이 `… 세종시 1년 이상 계속 거주 상태를 확` 으로) —
+      ① 이름표(`신청방법 :`·`(신청방법)`)가 있다 · 주소의 `https:` 는 이름표가 아니다
+      ② 그 이름표의 주소 줄이 글자층에도 OCR 에도 **하나뿐**이다(`E-Mail:` 처럼 되풀이되는 이름표는 못 맞춘다)
+      ③ 주소를 뺀 한글이 거의 같다(textAgree · 3자 이상 · 0.85) — 남의 줄의 글자를 들여오지 않는다
+      ④ OCR 에 멀쩡한 꼴의 주소가 있으면 글자층 주소와 닮아야 한다(addrClose — 오독이지 다른 주소가 아니다).
+      못 맞추면 OCR 줄 **그대로**다(글자층은 숫자가 빠지는 일이 있어 — attachmentText 머리말 2026-08-20).
+   🔴 줄을 지우지 않는다(2차 리뷰 — 깨진 꼴 `7@)` 하나에 마감 줄 `서류접수 기간 ㆍ 2026년 10월 1일(목)ㅡ10월 30일(금) …` 이 통째로 사라졌다).
+      깨진 주소가 남은 줄은 접수 메일·포털의 근거로 쓰지 않고(withoutBrokenAddr) 발췌로 보이지 않는다(docExcerptOk) — 자르지도 고치지도 않는다.
    첨부 글자를 읽는 자리(docTexts) 한 곳에서 한다 — 발췌·접수 메일·마감이 같은 글자를 본다. */
 const ADDR_TOKEN = /[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+|(?:https?:\/\/|www\.)[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+[^\s)）]*/g;
-/* `@` 는 앞에 영문·숫자가 붙을 때만 주소다 — OCR 은 동그라미 숫자(①)를 `@` 로 읽는다(`@)-1 주민등록초본` · `|@ 자기소개서` — 서류 줄이다) */
-const ADDR_CUE = /[A-Za-z0-9._%+-]@|www|https?:|이\s?메일|e-?mail|메일|홈페이지|누리집|접수\s?처/i;
-const ADDR_BROKEN = /\bwww(?!\.)[A-Za-z0-9]|[A-Za-z0-9._%+-]@(?![A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+)/;
+/* `@` 는 바로 앞에 영문·숫자가 붙을 때만 주소다 — OCR 은 동그라미 숫자(①)를 `@` 로 읽는다(`@)-1 주민등록초본` · `|@ 자기소개서` · `1-@)` · `2-@ 연락처는` — 서류 줄이다) */
+const ADDR_CUE = /[A-Za-z0-9_]@|www|https?:|이\s?메일|e-?mail|메일|홈페이지|누리집|접수\s?처/i;
+/* 깨진 주소 — `www` 뒤에 점이 없다(`wwwybzor.kr` · `www2.` 는 멀쩡하다) · 영문·숫자 사이의 `@` 뒤에 도메인이 없다(`khwc5770@khu,ac.kr`)
+   · 도메인 끝이 쉼표로 갈렸다(`@gmail.co,kr` — 앞쪽만 주소로 읽으면 다른 주소가 된다). `7@)` 처럼 `@` 뒤가 글자가 아니면 동그라미 숫자다 */
+export const ADDR_BROKEN = /\bwww(?![.\d])[A-Za-z]|[A-Za-z0-9_]@(?=[A-Za-z0-9])(?![A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+)|[A-Za-z0-9_]@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*,[A-Za-z]{2}/;
+export const withoutBrokenAddr = (text) => String(text || '').split('\n').filter((l) => !ADDR_BROKEN.test(l)).join('\n');
 const addrLabel = (line) => {
   const t = String(line || '').replace(/^[^0-9A-Za-z가-힣(（]+/, '').trim();
   const par = t.match(/^[(（]\s*([가-힣 ]{2,12})\s*[)）]/);
   if (par) return squashWs(par[1]);
   const at = t.search(/[:：]/);
-  return at > 0 && at <= 15 ? squashWs(t.slice(0, at)) : null;
+  if (!(at > 0 && at <= 15)) return null;
+  const lab = squashWs(t.slice(0, at));
+  return /(?:https?|ftp)$/i.test(lab) || /[@/\\]/.test(lab) ? null : lab;   // `(https://…` 의 `(https` 는 이름표가 아니다
 };
 const addrsOf = (line) => (String(line || '').match(ADDR_TOKEN) || []).map((a) => a.replace(/[.,]+$/, '').toLowerCase());
-export function crossCheckOcr(ocr, layer) {
-  const byLabel = new Map();
-  for (const raw of String(layer || '').split('\n')) {
-    const l = raw.replace(/\s+/g, ' ').trim();
-    const k = addrLabel(l);
-    if (k && addrsOf(l).length && !byLabel.has(k)) byLabel.set(k, l);
+const lcsLen = (a, b) => {
+  let prev = new Array(b.length + 1).fill(0);
+  for (let i = 1; i <= a.length; i += 1) {
+    const cur = [0];
+    for (let j = 1; j <= b.length; j += 1) cur[j] = a[i - 1] === b[j - 1] ? prev[j - 1] + 1 : Math.max(prev[j], cur[j - 1]);
+    prev = cur;
   }
-  return String(ocr || '').split('\n').flatMap((l) => {
-    if (!ADDR_CUE.test(l)) return [l];
+  return prev[b.length];
+};
+const closeness = (a, b) => (a.length + b.length ? (2 * lcsLen(a, b)) / (a.length + b.length) : 0);
+const hangulOf = (line) => String(line || '').replace(ADDR_TOKEN, ' ').replace(/[^가-힣]/g, '');
+const textAgree = (a, b) => { const x = hangulOf(a), y = hangulOf(b); return x.length >= 3 && y.length >= 3 && closeness(x, y) >= 0.85; };
+const addrClose = (a, b) => closeness(a, b) >= 0.6;
+const labelIndex = (text, keep) => {
+  const m = new Map();
+  for (const raw of String(text || '').split('\n')) {
+    const l = raw.replace(/\s+/g, ' ').trim();
+    if (!keep(l)) continue;
     const k = addrLabel(l);
-    const lay = k ? byLabel.get(k) : null;
-    if (lay) { const mine = addrsOf(l); return addrsOf(lay).some((a) => !mine.includes(a)) ? [lay] : [l]; }
-    return ADDR_BROKEN.test(l) ? [] : [l];
+    if (!k) continue;
+    if (!m.has(k)) m.set(k, new Set());
+    m.get(k).add(l);
+  }
+  return m;
+};
+export function crossCheckOcr(ocr, layer) {
+  const byLabel = labelIndex(layer, (l) => addrsOf(l).length > 0);
+  const ocrLabels = labelIndex(ocr, (l) => ADDR_CUE.test(l));
+  return String(ocr || '').split('\n').map((l) => {
+    if (!ADDR_CUE.test(l)) return l;
+    const k = addrLabel(l);
+    const lays = k ? byLabel.get(k) : null;
+    if (!lays || lays.size !== 1 || (ocrLabels.get(k) || new Set()).size !== 1) return l;
+    const [lay] = lays;
+    const mine = addrsOf(l), theirs = addrsOf(lay);
+    if (theirs.every((a) => mine.includes(a))) return l;                    // 주소가 같으면 OCR 그대로
+    if (!textAgree(l, lay)) return l;                                         // 다른 줄이다
+    if (!mine.every((a) => theirs.some((b) => addrClose(a, b)))) return l;    // OCR 의 멀쩡한 주소가 글자층과 딴판이면 다른 줄이다
+    return lay;
   }).join('\n');
 }
 function docTexts(it, formPath = true) {
@@ -1381,8 +1420,9 @@ export function openDateFromDocs(it, texts) { return fromDocs(it, extractOpenDat
 export function announceFromDocs(it, texts) { return fromDocs(it, extractAnnounce, texts); }
 /* 접수 메일 주소도 같은 골격을 탄다 — 경희대는 본문이 '첨부파일 확인'으로 끝나
    첨부를 안 보면 접수처를 영영 못 읽는다(실측: 접수 주소 4건 중 2건이 첨부 안에 있었다). */
-export function applyEmailFromDocs(it, texts) { return fromDocs(it, findApplyEmail, texts); }
-export function applyPortalFromDocs(it, texts) { return fromDocs(it, findApplyPortal, texts); }
+/* 깨진 주소가 남은 줄(글자층과 못 맞춘 OCR 줄)은 접수처의 근거로 쓰지 않는다(crossCheckOcr 머리말) */
+export function applyEmailFromDocs(it, texts) { return fromDocs(it, (t) => findApplyEmail(withoutBrokenAddr(t)), texts); }
+export function applyPortalFromDocs(it, texts) { return fromDocs(it, (t) => findApplyPortal(withoutBrokenAddr(t)), texts); }
 
 /* 🔴 **사람이 정한 마감은 로봇이 건드리지 않는다** (2026-09-16 · G-3 ②).
    자격은 `eligibilityFrom` 의 `AI`·`관리자` 표식을 존중하는데 마감은 그 짝이 없었다 —
