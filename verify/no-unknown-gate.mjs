@@ -7,6 +7,7 @@
    ④ 학생 화면 글자를 만드는 파일 전부(SCREEN_FILES — app.js·index.html·match-engine.js·source-link.js·data.js·sw.js·약관…)의 **문자열**을 훑는다(주석·정규식 제외 · 예외는 verify/no-unknown-allow.cjs 에 까닭과 함께)
    ⑤ 카드·시트 밖의 자리(2026-11-16 리뷰) — 달력·MY 저장 줄 · 금액 상세 합친 목록 · 신청 내역 「선정」 줄 · 지원서 초안(학업 계획) · 문제 주소 링크 이름·제출처 이름 ·
       자격을 못 읽은 공고의 신청 안내 한 문장 · 「어긋난 요건 없음」은 다 판정했을 때만 · 게시판 글로 간 공고의 알림(feedOnlyBoardRows)
+   ⑥ 인용은 통째로 싣거나 통째로 뺀다(2026-11-16 2차 리뷰 · 원칙 8-1) — 낱말이 있는 원문·재단 글은 잘린 조각도 없이 빠진다(knownValue·kosafNoticeValue · SAYS_UNKNOWN 한 곳)
    낱말 목록은 verify/no-unknown-words.cjs 한 곳 · 실데이터 전수는 verify/verify-no-unknown.js(브라우저 · verify-ui.yml) */
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
@@ -114,6 +115,35 @@ export function runNoUnknownGate(eq, readText) {
     [/<p class="dp-note dp-caution">신청 전에 공고 원문에서 지원 자격을 확인하세요\.<\/p>/.test(unreadSheet), /id="btn-apply-one" >/.test(unreadSheet),
       /dp-caution/.test(A.sheetHtml('g-full')), Object.keys(unknownHits('신청 전에 공고 원문에서 지원 자격을 확인하세요.')).length],
     [true, true, false, 0]);
+
+  /* ⑥ 인용은 통째로 싣거나 통째로 뺀다 (2026-11-16 2차 리뷰 · 원칙 8-1) — 예전 knownValue → kosafNoticeValue 가 「확인 필요」 와 앞 세 낱말을 문장 가운데서 떼어
+     「등록금 전액 지원 단, 소득분위 확인 필요」 → 「등록금 전액」(조건이 사라진 글)을 따옴표 안 원문으로 보였다. 리뷰가 낸 입력 그대로 — 조각도 낱말도 없어야 한다 */
+  const Q = { ...reg1, id: 'g-quote', name: '표본 인용 장학', amountValue: 0 };
+  const quoteRow = (raw, exRaw) => run('amountDetailRow')({ ref: { ...Q, amountSpec: raw ? { kind: 'unknown', raw } : null, exclusivity: exRaw ? { raw: exRaw } : null }, won: 0, mergedFrom: [] }, { srcLink: true });
+  const cut = {
+    '금액 인용 — 조건이 붙은 문장': [quoteRow('등록금 전액 지원 단, 소득분위 확인 필요'), '등록금 전액'],
+    '금액 인용 — 괄호 속 조건': [quoteRow('1인당 300만원 지원 (소득구간별 차등, 학교 확인 필요)'), '300만원'],
+    '이중수혜 인용 — 꼬리 조건': [quoteRow('', '최대 500만원, 성적에 따라 차등 지급 확인 필요'), '500만원'],
+    '달력 줄 선발인원(실데이터 2700058001)': [run('calRowHtml')({ ...Q, headcount: '학교마다 선발인원 상이하므로 각 대학 홈페이지 확인 필요' }), '학교마다'],
+    '지원서 초안 학업 계획 — 기간 끝날짜가 잘리던 칸(2000342003)': [run('generateEssay')({ kind: 'plan' }, { ...Q, period: '2026-03-18 ~ 2026-11-30 기관 확인 필요요' }, P, { goal: '전공 공부를 이어가겠습니다', career: '연구자' }, {}), '2026-03-18'],
+  };
+  const setKosaf = run('(k) => { kosafList = k; }');
+  setKosaf([{ code: 'g2', org: '표본장학회', name: '표본 인용 재단 장학', due: '', home: 'https://pyobon.or.kr',
+    fields: { 지원금액: '1인당 300만원 지원 ※ 소득구간별 차등, 학교 확인 필요', 선발인원: '※ 학교마다 선발인원 상이하므로 각 대학 홈페이지 확인 필요', 선발방법: '○ 서류 심사 후 면접', 신청기간: '' } }]);
+  const kq = run('kosafAsScholarships')()[0] || {};
+  setKosaf(kosaf);
+  cut['층2 공고 안내 줄(선발인원)'] = [(kq.noticeLines || []).join('\n'), '학교마다'];
+  cut['층2 금액 상세(재단이 적어 둔 글)'] = [run('amountDetailRow')({ ref: kq, won: 0, mergedFrom: [] }, { srcLink: true }), '300만원'];
+  const cutDirty = Object.entries(cut).filter(([, [h, frag]]) => Object.keys(hits(h)).length || screenText(h).includes(frag)).map(([k]) => k);
+  eq(`⑥ 인용·재단 칸에 '모름'류 낱말이 있으면 그 글은 통째로 없다 — 잘린 조각(「등록금 전액」·「300만원 지원 )」·「성적에」·「학교마다 선발인원 상이하므로」·「2026-03-18 동안」)도 없다 (${Object.keys(cut).length}곳)`, cutDirty, []);
+  eq('  인용이 빠지면 따옴표 칸이 아니라 원문으로 가는 링크만 남는다 · 낱말 없는 인용·칸은 한 글자도 안 바꾸고 그대로(대조군)',
+    [/class="ad-src"/.test(cut['금액 인용 — 조건이 붙은 문장'][0]), /class="ad-link"/.test(cut['금액 인용 — 조건이 붙은 문장'][0]),
+      /<p class="ad-src">"1인당 300만원 지원 \(소득구간별 차등\)"/.test(quoteRow('1인당 300만원 지원 (소득구간별 차등)')),
+      screenText(run('calRowHtml')({ ...Q, headcount: '10명 내외' })).includes('10명 내외'),
+      /\[학업 계획\]\n2026학년도 2학기 동안 전공/.test(run('generateEssay')({ kind: 'plan' }, { ...Q, period: '2026학년도 2학기' }, P, { goal: '전공 공부를 이어가겠습니다', career: '연구자' }, {})),
+      kq.noticeLines], [false, true, true, true, true, ['선발방법: 서류 심사 후 면접']]);
+  eq('  낱말 판정은 앱의 SAYS_UNKNOWN 한 곳 — 낱말 목록(no-unknown-words.cjs)의 낱말마다 잡는다(브라우저가 그 파일을 못 읽어 앱에 한 번 더 둔 것이 갈라지지 않게)',
+    run('typeof SAYS_UNKNOWN') !== 'object' ? ['SAYS_UNKNOWN 없음'] : UNKNOWN_WORDS.filter((w) => !run('SAYS_UNKNOWN').test(`앞 ${w} 뒤`)), []);
 
   /* ④ 코드의 학생 화면 글자 훑기 */
   const scan = SCREEN_FILES.flatMap((f) => scanFile(f, read(f), NO_UNKNOWN_ALLOW));
