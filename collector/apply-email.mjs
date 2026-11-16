@@ -32,6 +32,10 @@ export const MAIL_RE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
 /* 내는 행위를 말하는 줄만 본다. `- 이메일 : scholarship@hufs.ac.kr` 처럼 동사가 없는 줄은
    문의 안내 블록 안에 있는 경우가 많아(실측) 받지 않는다. */
 const SUBMIT_VERB = /(제출|접수|송부|발송|보내)/;
+/* 🔴 이름표가 **신청 방법**이고 그 값이 메일이면 내는 행위를 말한 줄이다 (2026-11-16 · 한국건설교통신기술협회 요강
+   「ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편(등기)」 — 동사가 없어 마감 이틀 전 메일 접수 공고 셋의 '접수 메일 열기'가 안 떴다).
+   값이 **메일로 시작할 때만**(`신청방법 : 이메일(…)`) — 이름표 없는 `- 이메일 : …` 줄(문의 블록에 많다)은 여전히 받지 않는다 */
+const METHOD_IS_MAIL = /(?:신청|접수|제출|지원|응모)\s?방법\s*[:：]\s*(?:이\s?메일|e-?mail|메일|전자\s?우편)/i;
 
 /* 문의·담당자 줄 — 같은 주소가 접수처이기도 하면 아래 '제출' 줄에서 따로 잡힌다.
    ⚠️ 넓히지 말 것: `안내`·`신청` 을 넣으면 `신청서를 … 제출` 이 통째로 걸린다. */
@@ -74,7 +78,7 @@ export function judgeLine(line, before = '') {
   if ((ELSEWHERE_DONE.test(text) || ELSEWHERE_DONE.test(String(before || ''))) && DOCS_BY_MAIL.test(text)) {
     return { ok: false, why: '신청은 다른 경로 — 메일은 서류만', addr: m[0], line: text };
   }
-  if (!SUBMIT_VERB.test(text)) return { ok: false, why: '내는 행위가 없음', addr: m[0], line: text };
+  if (!SUBMIT_VERB.test(text) && !METHOD_IS_MAIL.test(text)) return { ok: false, why: '내는 행위가 없음', addr: m[0], line: text };
   return { ok: true, explicit: EXPLICIT.test(text), addr: m[0], line: text };
 }
 

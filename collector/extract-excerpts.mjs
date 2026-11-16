@@ -24,7 +24,7 @@ import { fileURLToPath } from 'node:url';
 import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
 /* 게시판 메뉴·푸터를 걷어내는 규칙 (2026-08-20 신설 — page-boilerplate.mjs 첫머리 참조).
    자격을 못 뽑은 61건 중 40건이 '본문이 메뉴에 파묻힌' 상태였다. */
-import { makeStripper } from './page-boilerplate.mjs';
+import { makeStripper, buildBoilerplate, boilerFor } from './page-boilerplate.mjs';
 /* 절 머리글 판정은 section-head.js 한 곳 — 화면(match-engine)·감사와 같은 파일을 쓴다.
    베끼면 '발췌기는 제외 절로 보는데 화면은 자격으로 보는' 어긋남이 생긴다. */
 import { createRequire as _cr } from 'node:module';
@@ -129,15 +129,45 @@ const EXCERPT_NOTE = '공고 원문에서 그대로 발췌 (자동)';
 const EXCERPT_NOTE_DOC = '공고문 첨부에서 그대로 발췌 (자동)';
 /* 본문에 다른 글의 띠(배너·팝업 — 항공대 「정규직 신규직원 채용 · 지원기간 : …」)가 제목보다 **앞에** 붙어 오는 게시판이 있다.
    공고 제목 줄이 본문에 있으면 그 줄부터 발췌한다(제목 앞은 그 글이 아니다) · 못 찾거나 그 뒤에서 한 줄도 못 뽑으면 본문 전체(예전 그대로) */
-function excerptsFromBody(body, it) {
-  const all = () => extractFrom(body);
-  const core = String(it.name || '').replace(/^(?:\[[^\]]*\]\s*|공통\s+)+/, '').replace(/\s+/g, '');
-  if (core.length < 10) return all();
+/* 공고 제목 줄의 자리 — 본문 줄 중 제목 몸통(말머리 뗀 앞 20자)을 담은 첫 줄. 못 찾으면 -1 (제목이 짧으면 찾지 않는다) */
+export function titleLineAt(lines, it) {
+  const core = String((it && it.name) || '').replace(/^(?:\[[^\]]*\]\s*|공통\s+)+/, '').replace(/\s+/g, '');
+  if (core.length < 10) return -1;
+  return (lines || []).findIndex((l) => String(l).replace(/\s+/g, '').includes(core.slice(0, 20)));
+}
+/* `own` — siteChrome 이 사이트 띠 줄을 걷어 낸 본문(ownBody). 제목 뒤에서 한 줄도 못 뽑아 본문 전체로 물러날 때 **띠를 걷은 쪽**을 읽는다
+   (가천 외국인 장학금 추가 신청: 제목 뒤 「1. 신청 기간」 ↵ 날짜 꼴이라 발췌가 비자, 물러난 본문 전체에서 FGD 띠 줄 하나가 발췌로 남았다 · 2026-11-16) */
+function excerptsFromBody(body, it, own = body) {
+  const all = () => extractFrom(own);
   const lines = String(body || '').split('\n');
-  const at = lines.findIndex((l) => l.replace(/\s+/g, '').includes(core.slice(0, 20)));
+  const at = titleLineAt(lines, it);
   if (at <= 0) return all();
   const got = extractFrom(lines.slice(at).join('\n'));
   return got.length ? got : all();
+}
+
+/* ── 사이트 띠(배너) 줄 — 마감 근거에서 뺀다 (2026-11-16 · 가천 FGD 띠 · 리뷰) ─────────────────────────────
+   가천 장학공지는 매 쪽 머리에 **다른 글의 띠**(「2026년 가천대학교 재학생 심층면접토론(FGD) 참여학생 모집」 ↵ 「○ 신청기간: 2026.11.05.(목) ~ 11.18.(수)」)를
+   싣는다. 그 줄이 글 본문보다 먼저 나와 첫 이름표로 잡혀, 11-11·11-12·11-15·11-16 에 끝나는 네 공고가 모두 11-18 마감이 됐다(닫힌 공고가 열림으로 보였다).
+   메뉴 걷기(page-boilerplate · 그 학교 쪽의 40%)는 띠가 26쪽 중 10쪽에만 있어 못 걷었다 — 띠는 몇 주마다 바뀐다.
+   🔴 띠 줄 = **같은 호스트의 서로 다른 글 셋 이상**에 글자 그대로 나오는 줄(buildBoilerplate keyOf · 같은 글의 주소 여벌은 한 번)이면서
+      **이 글의 제목 줄보다 앞에** 있는 줄. 둘 다여야 한다 — 영남대 다문화·3대 동문·천마가족 세 공고는 진짜로 같은 신청기간 줄을 **제목 뒤에** 싣는다
+      (deadline-hint.mjs 의 '같은 힌트 빈도 규칙을 쓰지 말 것' 과 같은 사정). 제목 줄을 못 찾으면 아무것도 걷지 않는다(예전 그대로). */
+const SITE_CHROME_MIN = 3;
+const squashWs = (s) => String(s || '').replace(/\s+/g, '');
+export function siteChromeFrom(pages) {
+  return buildBoilerplate(pages, { minPages: SITE_CHROME_MIN, ratio: 0, keyOf: (v) => squashWs(v.title) || String(v.url || '') });
+}
+/** 본문에서 제목 앞의 띠 줄을 걷은 글 — `{ text, chrome: [걷은 줄] }`. 띠를 모르거나 제목을 못 찾으면 본문 그대로 */
+export function ownBody(body, it, chromeSet) {
+  const text = String(body || '');
+  if (!chromeSet || !chromeSet.size) return { text, chrome: [] };
+  const lines = text.split('\n');
+  const at = titleLineAt(lines, it);
+  if (at <= 0) return { text, chrome: [] };
+  const chrome = [];
+  const kept = lines.filter((l, i) => !(i < at && chromeSet.has(l.trim()) && chrome.push(l.trim())));
+  return { text: kept.join('\n'), chrome };
 }
 
 function extractFrom(text) {
@@ -1185,6 +1215,9 @@ const idx = indexTexts(texts, browserBodies);
    같은 학교 여러 공고에 똑같이 나오는 줄만 지우므로 학교 구조를 알 필요가 없다.
    걷어낸 결과가 앙상하면 stripBoilerplate가 원문을 그대로 돌려준다(안전판). */
 const strip = makeStripper(texts);
+/* 사이트 띠 줄(위 siteChromeFrom 머리말) — 저장된 원문과 브라우저 원문을 한데 두고 '서로 다른 글' 수로 센다(비율 문턱이 없어 섞어도 된다) */
+const siteChrome = siteChromeFrom([...(Array.isArray(texts) ? texts : Object.values(texts || {})),
+  ...Object.entries(browserBodies || {}).map(([url, v]) => (v && v.text ? { url, ...v } : null)).filter(Boolean)]);
 
 /* 공고문 첨부 — 고르는 규칙은 attachment-text.mjs noticeDocFiles 한 곳(자격 색인 + 신청서 쪽에 섞여 온 공고문 · 2026-11-15).
    🔴 여기서 색인 파일을 직접 열지 말 것 — 길이 둘이 되면 마감은 읽는데 자격은 못 읽는 어긋남이 생긴다(관문 「발췌기 글자 읽기」). */
@@ -1253,12 +1286,48 @@ export function annexCut(text) {
 
 /** 공고문 첨부의 글자들 — 못 읽는 것(스캔·그림)은 조용히 뺀다. */
 /* formPath — 신청서 쪽에 섞여 온 공고문도 읽는가(마감·접수 시작·발표·접수처 · 기본 켬). 제출 서류 목록은 끈다(noticeDocFiles 머리말) */
+/* ── OCR 줄의 메일·누리집 주소는 PDF 글자층과 맞춰 본다 (2026-11-16 · 리뷰) ─────────────────────────────
+   한국건설교통신기술협회 요강 OCR 은 `○ 신청방법 : 이메일(<0080008.07.14) 및 우편(등기)` 인데 같은 PDF 의 글자층(.pdf.txt)은
+   `ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편(등기)` 다 — 깨진 줄이 '그대로 발췌'로 학생에게 나갔다(마감 이틀 전 메일 접수 공고 셋).
+   같은 꼴: `이메일 Gnjael.gwd@gmail.com)`(글자층 `injae1.gwd@gmail.com` — 접수 메일 칸에까지 들어갔다) · `접수처 : wwwybzor.kr/`(글자층 `www.ybz.or.kr/`).
+   🔴 주소 단서(메일·www·@·누리집·접수처)가 있는 OCR 줄만 본다 — 글자층은 숫자가 빠지는 일이 있어(attachmentText 머리말 2026-08-20) 다른 줄은 OCR 그대로다.
+   ① 글자층에 **같은 이름표**(`신청방법 :`·`(신청방법)`)의 줄이 있고 그 줄의 주소가 OCR 줄에 없으면 글자층 줄을 쓴다(원문 글자다 — 고쳐 쓰는 것이 아니다).
+   ② 맞출 글자층 줄이 없으면 주소 꼴이 깨진 줄(`www` 뒤 점 없음 · `@` 뒤 도메인 없음)은 버린다 — 깨진 주소를 원문이라고 보이지 않는다.
+   첨부 글자를 읽는 자리(docTexts) 한 곳에서 한다 — 발췌·접수 메일·마감이 같은 글자를 본다. */
+const ADDR_TOKEN = /[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+|(?:https?:\/\/|www\.)[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+[^\s)）]*/g;
+/* `@` 는 앞에 영문·숫자가 붙을 때만 주소다 — OCR 은 동그라미 숫자(①)를 `@` 로 읽는다(`@)-1 주민등록초본` · `|@ 자기소개서` — 서류 줄이다) */
+const ADDR_CUE = /[A-Za-z0-9._%+-]@|www|https?:|이\s?메일|e-?mail|메일|홈페이지|누리집|접수\s?처/i;
+const ADDR_BROKEN = /\bwww(?!\.)[A-Za-z0-9]|[A-Za-z0-9._%+-]@(?![A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+)/;
+const addrLabel = (line) => {
+  const t = String(line || '').replace(/^[^0-9A-Za-z가-힣(（]+/, '').trim();
+  const par = t.match(/^[(（]\s*([가-힣 ]{2,12})\s*[)）]/);
+  if (par) return squashWs(par[1]);
+  const at = t.search(/[:：]/);
+  return at > 0 && at <= 15 ? squashWs(t.slice(0, at)) : null;
+};
+const addrsOf = (line) => (String(line || '').match(ADDR_TOKEN) || []).map((a) => a.replace(/[.,]+$/, '').toLowerCase());
+export function crossCheckOcr(ocr, layer) {
+  const byLabel = new Map();
+  for (const raw of String(layer || '').split('\n')) {
+    const l = raw.replace(/\s+/g, ' ').trim();
+    const k = addrLabel(l);
+    if (k && addrsOf(l).length && !byLabel.has(k)) byLabel.set(k, l);
+  }
+  return String(ocr || '').split('\n').flatMap((l) => {
+    if (!ADDR_CUE.test(l)) return [l];
+    const k = addrLabel(l);
+    const lay = k ? byLabel.get(k) : null;
+    if (lay) { const mine = addrsOf(l); return addrsOf(lay).some((a) => !mine.includes(a)) ? [lay] : [l]; }
+    return ADDR_BROKEN.test(l) ? [] : [l];
+  }).join('\n');
+}
 function docTexts(it, formPath = true) {
   const out = [];
   out.files = [];                       // 글자와 같은 차례의 파일 이름 — 어느 첨부에서 읽었는지 표식에 쓴다
   for (const f of noticeDocFiles(it, { formPath })) {   // 원문 글자(HWP)가 OCR 보다 먼저(docOrder)
     const p = fileURLToPath(new URL(`extracted/${f}`, HERE));
-    const t = attachmentText(p);
+    const t0 = attachmentText(p);
+    const t = isOcrSource(p) ? crossCheckOcr(t0, pdfLayerText(p)) : t0;   // OCR 줄의 주소는 글자층과 맞춰 본다(위 머리말)
     if (readableDoc(p, t)) { out.push(t); out.files.push(f); }   // OCR 포스터는 문턱이 낮다(attachment-text readableDoc 한 곳)
   }
   return out;
@@ -1395,20 +1464,48 @@ function recheckDocDeadline(it, heading = '') {
    **그 문장 하나만** 다시 읽고(다른 줄을 새로 줍지 않는다) · 날짜가 나왔고 다를 때만 바꾼다 — 못 읽으면 그대로 둔다(모른다 ≠ 틀렸다 · 근거 문장은 잘려 있는 일이 많다).
    사람이 정한 마감(관리자·AI)·첨부·제목 표식은 건드리지 않는다. 관문 「발췌기 글자 읽기」 의 「부터」 줄이 잰다. */
 const QUOTED_DEADLINE_FROM = /^(공고 원문|게시판 요약) · /;
-export function recheckQuotedDeadline(it) {
+/* 🔴 근거 문장이 **사이트 띠 줄**(ownBody 가 걷은 줄 · 위 siteChrome 머리말)이면 그 문장은 이 글의 것이 아니다 —
+   그 문장만 다시 읽으면 같은 띠 날짜가 또 나온다(가천 네 공고가 그래서 11-18 에 머물렀다). 그때는 **띠를 걷은 이 글의 본문**에서 다시 읽는다. */
+export function quotesChrome(it, own) {
+  if (!it || !own || !(own.chrome || []).length || !QUOTED_DEADLINE_FROM.test(it.deadlineFrom || '')) return false;
+  const q = squashWs(String(it.deadlineFrom).replace(QUOTED_DEADLINE_FROM, ''));
+  return own.chrome.some((l) => extractDeadline(l) && q.includes(squashWs(l)));
+}
+export function recheckQuotedDeadline(it, own = null) {
   if (!it || !it.deadline || !QUOTED_DEADLINE_FROM.test(it.deadlineFrom || '')) return null;
-  const again = extractDeadline(String(it.deadlineFrom).replace(QUOTED_DEADLINE_FROM, ''));
+  const again = quotesChrome(it, own) ? extractDeadline(own.text)
+    : extractDeadline(String(it.deadlineFrom).replace(QUOTED_DEADLINE_FROM, ''));
   return again && again !== it.deadline ? again : null;
 }
-function recheckBodyDeadline(it) {
-  const again = recheckQuotedDeadline(it);
-  if (!again) return;
-  dlRechecked += 1;
-  console.log(`   [마감 다시 읽음] ${it.id} — ${it.deadline} → ${again} (근거 문장)`);
-  if (!WRITE) return;
+/* 띠를 걷은 본문에서 그 날을 내는 줄 — 새 근거 문장(감사 deadline-audit 이 근거로 센다). 한 줄로 안 읽히면 이름표 줄 + 다음 줄 */
+function ownEvidence(text, date) {
+  const lines = String(text || '').split(/\n+/).map((l) => l.trim()).filter(Boolean);
+  for (const l of lines) if (l.length <= 200 && extractDeadline(l) === date) return l;   // 한 줄로 읽히는 줄이 먼저(앞 항목 줄을 붙이지 않게)
+  for (let i = 0; i < lines.length; i += 1) {
+    const two = `${lines[i]} ${lines[i + 1] || ''}`.trim();
+    if (lines[i + 1] && two.length <= 200 && extractDeadline(`${lines[i]}\n${lines[i + 1]}`) === date) return two;
+  }
+  return null;
+}
+function recheckBodyDeadline(it, own = null) {
+  const chrome = quotesChrome(it, own);
+  const again = recheckQuotedDeadline(it, own);
+  if (!again && !chrome) return;
   const old = it.deadline;
-  it.deadline = again;
-  if (it.period && it.period.includes(`~${old}`)) it.period = it.period.replace(`~${old}`, `~${again}`);
+  /* 띠 문장이 근거였으면 같은 날이 나와도 근거는 바꾼다 · 이 글 본문에서 못 읽으면 **비운다**(띠 날짜는 이 글의 마감이 아니다 — 아래 채우기 길이 첨부·제목에서 다시 찾는다) */
+  const next = again || (chrome && extractDeadline(own.text) === old ? old : null);
+  dlRechecked += 1;
+  console.log(`   [마감 다시 읽음] ${it.id} — ${old} → ${next || '(비움)'} (${chrome ? '근거가 사이트 띠 줄' : '근거 문장'})`);
+  if (!WRITE) return;
+  if (!next) {
+    delete it.deadline; delete it.deadlineFrom;
+    if (it.period === `접수 ~${old}`) delete it.period;
+    else if (it.period) it.period = it.period.replace(`~${old}`, '').trim();
+    return;
+  }
+  it.deadline = next;
+  if (chrome) { const ev = ownEvidence(own.text, next); it.deadlineFrom = ev ? `공고 원문 · ${ev}` : '공고 원문'; }
+  if (it.period && it.period.includes(`~${old}`)) it.period = it.period.replace(`~${old}`, `~${next}`);
 }
 
 function putDeadline(it, dl, from) {
@@ -1425,6 +1522,16 @@ function putDeadline(it, dl, from) {
       (실측: 그래서 울산연구원 1건을 놓쳤다. 바로 그 갈림길의 마감일 주석이 같은 경고를 한다).
    🔴 주소만 넣지 않는다 — 근거 문장을 함께 남겨야 감사가 '원문에 실제로 있었는가'를 본다. */
 function fillApplyEmail(it, body) {
+  /* OCR 첨부에서 읽어 둔 접수 메일은 글자층과 맞춰 본 첨부(crossCheckOcr)로 다시 읽는다 — 다른 주소가 나오면 그것이 원문이다(연세 미래 브랜드장학금 `Gnjael.gwd` → `injae1.gwd`) */
+  if (it.applyEmail && /^공고문 첨부\(OCR\)/.test(it.applyEmailFrom || '')) {
+    const again = applyEmailFromDocs(it);
+    if (again && again.email !== it.applyEmail) {
+      gotApplyEmail += 1;
+      console.log(`   [접수메일 다시 읽음] ${it.id} — ${it.applyEmail} → ${again.email} (${docLabel(fromDocs.lastFile)})`);
+      if (WRITE) { it.applyEmail = again.email; it.applyEmailSource = decodeEntities(again.source); it.applyEmailFrom = docLabel(fromDocs.lastFile); }
+    }
+    return;
+  }
   if (it.applyEmail || humanOwnedEmail(it.applyEmailFrom)) return;
   let mail = body ? findApplyEmail(body) : null;
   let from = '공고 원문';
@@ -1659,6 +1766,7 @@ for (const it of reg.items) {
   }
 
   const body = strip(src.url, src.text);
+  const own = ownBody(body, it, boilerFor(siteChrome, src.url));   // 제목 앞 사이트 띠 줄을 걷은 본문 — 마감·발췌 물러남이 읽는다(siteChrome 머리말)
   /* 잘린 제목은 걷어내기 전 원문에서 보완한다(제목 줄이 다른 글에도 보여 공통 문구로 걷히는 게시판이 있다 — 경기대 통합 공지) */
   const fullName = completeTitle(it, src.text);
   if (fullName) {
@@ -1668,7 +1776,7 @@ for (const it of reg.items) {
   }
   if (body !== src.text) cleaned += 1;
 
-  let ex = excerptsFromBody(body, it);
+  let ex = excerptsFromBody(body, it, own.text);
   let exNote = EXCERPT_NOTE;
   // 자격 절을 못 찾았을 때만 2차 경로로 물러난다 (절이 있으면 그쪽이 언제나 정확하다)
   let qual = extractQualifyLines(body).length
@@ -1689,10 +1797,10 @@ for (const it of reg.items) {
   /* 마감일 — **비어 있을 때만** 채운다. 사람이 넣은 값도, auto-register 가 제목에서
      읽은 값도 덮지 않는다(더 많이 본 쪽이 이기는 게 아니라 먼저 정해진 쪽이 이긴다). */
   recheckDocDeadline(it);   // 로봇이 첨부에서 읽어 둔 마감은 지금 규칙으로 다시(위 함수 머리말)
-  recheckBodyDeadline(it);  // 본문 근거 문장도 지금 규칙으로 다시(위 함수 머리말)
+  recheckBodyDeadline(it, own);  // 본문 근거 문장도 지금 규칙으로 다시 · 근거가 사이트 띠 줄이면 띠를 걷은 본문에서(위 함수 머리말)
   if (!it.deadline && !humanOwned(it.deadlineFrom)) {
-    /* 본문이 먼저 · 못 읽으면 공고문 첨부 (2026-09-15 · G-3) */
-    let dl = extractDeadline(body);
+    /* 본문이 먼저 · 못 읽으면 공고문 첨부 (2026-09-15 · G-3) — 제목 앞 사이트 띠 줄은 걷고 읽는다(siteChrome) */
+    let dl = extractDeadline(own.text);
     let from = '공고 원문';
     if (!dl) { dl = deadlineFromDocs(it); if (dl) { from = docLabel(fromDocs.lastFile, fromDocs.lastVia); dlFromDoc += 1; } }
     /* 본문·첨부에 없으면 **제목 꼬리의 괄호 이름표**(「… 신청 안내[신청기간 2026.11.01(일)~08(일)]」) — 경기대 통합 공지는 제목 줄이 다른 글에도

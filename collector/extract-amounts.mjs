@@ -239,7 +239,12 @@ for (const it of items) {
     /* 로봇이 지난번에 적은 카드 문구 — 이것과 같으면 이번에 읽은 값으로 고쳐 쓴다(사람이 다듬은 문구는 이것과 다르다) */
     const prevSpec = it.amountFrom === OWN_AMOUNT ? it.amountSpec : null;
     const robotText = prevSpec ? amountText(prevSpec) : '';
+    /* 🔴 사람이 **문구만** 고친 금액 (2026-11-16 · 리뷰) — 관리자 화면은 금액 숫자(amountValue)를 바꿀 때만 표식을 '관리자'로 바꾸므로,
+       문구만 다듬으면(`300만원 (학기당)`) 표식은 로봇 것(`공고 원문`) 그대로다. 그 뒤 원문을 못 읽게 되면 아래 '못 읽음' 갈래가
+       사람 문구는 남기고 **숫자만 0 으로** 걷어, 카드는 300만원인데 홈 합계는 어림값이 됐다. 문구가 로봇이 적은 문구와 다르고 숫자가 있으면 숫자·구조를 걷지 않는다 */
+    const humanText = !!(prevSpec && robotText && it.amount !== robotText && /\d/.test(String(it.amount || '')));
     if (humanAmount) keptHuman += 1;
+    else if (a.kind === 'unknown' && humanText) keptHuman += 1;
     else if (a.kind === 'unknown') {
       /* 로봇이 적은 문구는 근거와 함께 걷는다 — 남기면 '갈리는 비율'로 비운 공고가 카드엔 '등록금 전액'이다.
          🔴 절대액도 같다 (2026-11-15) — 예전엔 비율·시급만 걷어 amountValue·`250만원` 문구가 남았다:
