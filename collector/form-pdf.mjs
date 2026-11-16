@@ -23,11 +23,11 @@
    ============================================================ */
 import fs from 'node:fs';
 import path from 'node:path';
-import vm from 'node:vm';
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { sameTitle } from './detail-url.mjs';
+import { loadFormRules, cleanAttachName, sameAttach, attachExt } from './form-rules.mjs';
 
 const HERE = fileURLToPath(new URL('.', import.meta.url));
 export const MAX_PDF_BYTES = 5 * 1024 * 1024;
@@ -42,18 +42,8 @@ export const SOFFICE_TIMEOUT_MS = 60000;
    '이미 있음'으로 건너뛰지 않고 다시 바꾼다(2026-10-12 첫 사본 14개 전부가 중국어 글꼴(WenQuanYi)로 그려져 표 칸이 넘쳤다 — 춘곡장학회 실측). */
 export const FONT_STAMP = 'ko-nanum-1';
 
-/* data.js 의 신청서 판정을 **불러 쓴다**(베끼면 앱과 로봇이 다른 첨부를 신청서라 부른다). data.js 는 브라우저 파일이라 함수를 이름으로 떼어 온다. */
-export function loadFormRules(root) {
-  const src = fs.readFileSync(path.join(root, 'data.js'), 'utf8');
-  const take = (name) => {
-    const m = src.match(new RegExp(`^function ${name}\\([\\s\\S]*?^\\}`, 'm'));
-    if (!m) throw new Error(`data.js 에서 ${name} 을 못 찾았습니다 — 가져올 수 없으면 멈춥니다`);
-    return m[0];
-  };
-  const ctx = vm.createContext({});
-  vm.runInContext(`${take('isFormAttachment')}\n${take('isApplicationForm')}`, ctx, { filename: 'data.js(발췌)' });
-  return { isApplicationForm: vm.runInContext('isApplicationForm', ctx) };
-}
+/* data.js 의 신청서 판정을 **불러 쓴다**(베끼면 앱과 로봇이 다른 첨부를 신청서라 부른다) — 떼어 오는 규칙은 form-rules.mjs 한 곳(card-coverage 도 같이 쓴다 · 2026-11-15) */
+export { loadFormRules };
 
 /* 활동 피드(data/activities.json)의 글 — id 있는 것만(수집 로봇이 idFromUrl('act-') 로 준다 · API 글은 제 id) · 없으면 빈 배열 */
 export function loadActivities(root) {
@@ -79,14 +69,22 @@ export function pickFormTargets(items, indexRows, { today, isApplicationForm }) 
   const out = []; const missing = [];
   for (const it of items || []) {
     if (!it || !it.id || it.program || it.hidden || !isOpen(it, today)) continue;
-    const forms = (it.attachments || []).filter((a) => (isApplicationForm(a) || PDF_FORM(a)) && CONVERTIBLE.test(a.name || ''));
+    /* 🔴 아이콘 꼬리(`… .hwp chevron_forward`)를 뗀 이름으로 본다 · 같은 첨부가 꼬리 있는 것·없는 것 두 줄로 실린 공고는 하나로 (2026-11-15 · 강원대 도전장학금) */
+    const seenNames = new Set();
+    const forms = (it.attachments || []).filter((a) => {
+      const nm = cleanAttachName(a && a.name);
+      if (!nm || seenNames.has(nm)) return false;
+      const ok = (isApplicationForm(a) || PDF_FORM(a)) && CONVERTIBLE.test(nm);
+      if (ok) seenNames.add(nm);
+      return ok;
+    });
     if (!forms.length) continue;
     const titles = [it.boardTitle, it.name, it.title].filter(Boolean);   // 활동 글(data/activities.json)은 title 하나 — 같은 줄 꼴로 색인에 적혀 있다(2026-10-30)
     const files = [];
     for (const a of forms) {
       /* id 가 적힌 줄은 **그 공고 것만** 쓴다(제목이 같은 다른 학교 글에 넘기지 않는다) · id 없는 옛 줄(사람 표적)은 제목으로 */
-      const row = indexRows.find((r) => r.attach === a.name && r.id && r.id === it.id)
-        || indexRows.find((r) => r.attach === a.name && !r.id && titles.some((t) => sameTitle(t, r.title)));
+      const row = indexRows.find((r) => sameAttach(r.attach, a.name) && r.id && r.id === it.id)
+        || indexRows.find((r) => sameAttach(r.attach, a.name) && !r.id && titles.some((t) => sameTitle(t, r.title)));
       if (row) files.push({ src: row.file, name: a.name, srcBytes: row.bytes || 0 });
       else missing.push({ id: it.id, name: a.name });
     }
@@ -155,9 +153,20 @@ export function loProfileArg() {
   return `-env:UserInstallation=${pathToFileURL(LO_PROFILE).href}`;
 }
 /** 한 파일을 PDF 로 — pdf 는 복사 · 나머지는 soffice. { ok, out, pages, bytes, why } */
-export function convertOne(src, outPath, { soffice = 'soffice', tmpDir } = {}) {
+export function convertOne(src, outPath, { soffice = 'soffice', tmpDir, name = '' } = {}) {
   if (!fs.existsSync(src)) return { ok: false, why: '원본 파일 없음' };
-  const ext = (src.match(/\.(\w+)$/) || [, ''])[1].toLowerCase();
+  let ext = (src.match(/\.(\w+)$/) || [, ''])[1].toLowerCase();
+  /* `.bin` 으로 저장된 옛 원본(이름 꼬리 때문 · form-rules attachExt 주석)은 첨부 이름 → 파일 머리로 진짜 꼴을 찾아, 그 확장자의 임시 사본으로 바꾼다 */
+  if (ext === 'bin') {
+    const real = attachExt(name, fs.readFileSync(src));
+    if (real === 'bin' || !/^(hwp|hwpx|doc|docx|pdf)$/.test(real)) return { ok: false, why: '파일 꼴을 모름(.bin)' };
+    const work = tmpDir || fs.mkdtempSync(path.join(os.tmpdir(), 'form-bin-'));
+    const copy = path.join(work, `${path.basename(src, '.bin')}.${real}`);
+    fs.copyFileSync(src, copy);
+    const r = convertOne(copy, outPath, { soffice, tmpDir: work, name });
+    if (!tmpDir) { try { fs.rmSync(work, { recursive: true, force: true }); } catch { /* 무시 */ } }
+    return r;
+  }
   let pdfBuf = null;
   if (ext === 'pdf') pdfBuf = fs.readFileSync(src);
   else {
@@ -267,7 +276,7 @@ export function runFormPdf({ root, today, dry = false, soffice = process.env.FOR
       const stale = have.find((h) => h.name === f.name && h.file === file && (h.srcBytes || 0) === (f.srcBytes || 0) && fs.existsSync(path.join(outDir, h.file)));
       if (dry) { log(`[dry] ${t.id} · ${f.name} ← ${f.src}`); return; }
       if (overBudget()) { left.push({ id: t.id, name: f.name }); if (stale) next.push(stale); return; }
-      const r = convertOne(path.join(root, 'collector', 'extracted', f.src), path.join(outDir, file), { soffice });
+      const r = convertOne(path.join(root, 'collector', 'extracted', f.src), path.join(outDir, file), { soffice, name: f.name });
       if (r.ok) { next.push({ file, name: f.name, pages: r.pages, bytes: r.bytes, srcBytes: f.srcBytes || 0, from: '원본 그대로 변환', fonts: FONT_STAMP, at: today }); done.push({ id: t.id, name: f.name, pages: r.pages }); flush(); }
       else { failed.push({ id: t.id, name: f.name, why: r.why }); if (stale) next.push(stale); }
     });

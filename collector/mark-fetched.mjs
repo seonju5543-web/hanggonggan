@@ -4,6 +4,7 @@
    확보 완료로 기록됐다 — 그 항목은 다시 시도되지 않고 영원히 스키마화 대기에 남았다
    (2026-07-30 발견: 큐 4건 중 3건이 이 상태였음). */
 import fs from 'node:fs';
+import { markFetchedQueue } from './form-rules.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const queuePath = new URL('pending-forms.json', HERE);
@@ -24,27 +25,11 @@ try { index = fs.readFileSync(new URL('extracted/forms-index.txt', HERE), 'utf8'
    못 받는 항목이 쌓일수록 매일 그만큼의 시간을 버린다. 리포트에는 계속 올라오므로
    (schematize-forms.mjs의 '🚨 양식 원본을 못 받고 있는 공고') 조용히 사라지지 않는다.
    다시 시도하려면 해당 항목의 retired만 지우면 된다. */
-const RETIRE_AT = 6;
-
-let marked = 0;
-let missed = 0;
-let retired = 0;
-for (const item of queue.items || []) {
-  if (item.fetched || item.retired || !item.target) continue;
-  if (index.includes(item.target.trim())) {
-    item.fetched = true;
-    delete item.tries;
-    marked++;
-  } else {
-    item.tries = (item.tries || 0) + 1;
-    item.lastTryAt = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
-    missed++;
-    if (item.tries >= RETIRE_AT) {
-      item.retired = true;
-      item.retiredReason = `${RETIRE_AT}회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요.`;
-      retired++;
-    }
-  }
-}
+/* 규칙은 form-rules.mjs `markFetchedQueue` 한 곳 — 시도는 하루 한 번만 센다 · 내린 항목도 매번 색인을 다시 본다 (2026-11-15 · 그 함수 주석) */
+const kst = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+/* 다시 살리는 것은 마감 전 등록 공고만 — 지난 공고를 표적으로 되돌리면 받을 것도 없이 엿새를 두드린다 */
+let live = new Set();
+try { live = new Set((JSON.parse(fs.readFileSync(new URL('../data/registered.json', HERE), 'utf8')).items || []).filter((it) => it && (!it.deadline || String(it.deadline) >= kst)).map((it) => it.id)); } catch { /* 없으면 아무것도 안 살린다 */ }
+const { marked, missed, retired, revived } = markFetchedQueue(queue, index, kst, { isLive: (id) => live.has(id) });
 fs.writeFileSync(queuePath, JSON.stringify(queue, null, 1) + '\n');
-console.log(`[mark-fetched] 원본 확보 ${marked}건${missed ? ` · 이번에 못 받음 ${missed}건` : ''}${retired ? ` · 표적에서 내림 ${retired}건` : ''}`);
+console.log(`[mark-fetched] 원본 확보 ${marked}건${missed ? ` · 이번에 못 받음 ${missed}건` : ''}${retired ? ` · 표적에서 내림 ${retired}건` : ''}${revived ? ` · 다시 살림 ${revived}건` : ''}`);

@@ -65,8 +65,8 @@ jobs:
     # 🔴 학교가 중간 인증서를 빠뜨려 Node 만 막히는 곳이 있다(collector/certs/README.md) — 검증을 끄는 것이 아니다
     env:
       NODE_EXTRA_CA_CERTS: collector/certs/bundle.pem
-    # 로봇 예산 20분 + 매달렸을 때의 워치독 1분 반 + 브라우저 설치·감사·저장
-    timeout-minutes: 35
+    # 로봇 예산 20분 + 매달렸을 때의 워치독 1분 반 + 브라우저 설치·저장 + 저장 앞 관문 5 · 되돌리기 7 (2026-11-15 G-16)
+    timeout-minutes: 47
     steps:
       - uses: actions/checkout@v7
         with:
@@ -93,22 +93,35 @@ jobs:
 
       # 데이터 관문 — 저장 직전. always() 인 이유: 로봇이 도중에 넘어져도 그때까지 본 것은 저장한다
       # (link-hunter 2026-08-01 — 찾아 놓은 것을 저장 단계 건너뜀으로 통째로 버린 사고). 실행은 빨간불로 남는다.
-      - name: 데이터 감사
+      # 🔴 규칙 관문(test-collector)도 저장 앞에 (2026-11-15 · 노션 G-16 · 관문 「로봇·도구 점검 관문」 savegate) — 이 로봇은 data/ 와
+      #    collector/*.json 장부를 쓴다. 감사만 거치면 test-collector 만 아는 규칙을 어긴 저장이 통과해 다른 로봇의 관문이 빨개진다(10-13 사냥꾼).
+      - name: 데이터 관문 (규칙 관문 + 데이터 감사)
         id: audit
         if: always() && !inputs.dry
         continue-on-error: true
-        run: node verify/audit-data.js
-
-      - name: 감사 실패 시 되돌리기
-        if: always() && steps.audit.outcome == 'failure'
+        timeout-minutes: 5
         run: |
-          git checkout -- data/link-check.json collector/link-check-state.json 2>/dev/null || true
-          git checkout -- collector/link-candidates-state.json 2>/dev/null || rm -f collector/link-candidates-state.json
-          # 되돌렸으면 반드시 말한다 — continue-on-error 라 초록불로 묻힌다(link-hunter 2026-09-05)
-          echo "::error::데이터 감사에 걸려 이번 원문 링크 확인 결과를 저장하지 않았습니다."
+          node verify/test-collector.mjs
+          node verify/audit-data.js
 
+      # 되돌리고 **관문을 다시 잰다** (collector/gate-guard.mjs 한 곳 · 수집·사냥꾼 로봇과 같은 장치) — 되돌릴 것은 로봇이 쓰는 세 파일.
+      # --keep-preexisting: 되돌려도 빨가고 새로 걸린 검사가 없으면(원래 있던 빨간불) 이번 결과는 저장한다(2026-11-10 수집 로봇과 같은 결정).
+      # 도구가 넘어지면 예전처럼 세 파일을 직전 판으로. 상한 7분 = 관문 최대 세 번 + 여유.
+      - name: 감사 실패 시 되돌리기
+        id: guard
+        if: always() && steps.audit.outcome == 'failure'
+        timeout-minutes: 7
+        run: |
+          if ! node collector/gate-guard.mjs --report collector/link-check-report.md --note /tmp/gate-note.md --keep-preexisting --stage data/link-check.json,collector/link-check-state.json,collector/link-candidates-state.json; then
+            git checkout -- data/link-check.json collector/link-check-state.json 2>/dev/null || true
+            git checkout -- collector/link-candidates-state.json 2>/dev/null || rm -f collector/link-candidates-state.json
+          fi
+          # 되돌렸으면 반드시 말한다 — continue-on-error 라 초록불로 묻힌다(link-hunter 2026-09-05) · 끝의 빨간불 단계가 실행도 빨갛게 끝낸다
+          echo "::error::데이터 관문에 걸렸습니다 — 되돌리기 결과는 이슈 「🚨 원문 링크 확인 로봇 — 데이터 관문 실패」에 적습니다."
+
+      # 저장은 관문이 초록일 때만 — 처음 통과 · 되돌려서 통과 · 다시 재니 통과(flaky) · 원래 있던 빨간불(kept-preexisting). 끝내 빨가면 저장하지 않는다.
       - name: 결과 저장 (기본 브랜치 → deploy-sync 가 main 으로)
-        if: always() && steps.audit.outcome == 'success'
+        if: always() && (steps.audit.outcome == 'success' || steps.guard.outputs.gate == 'reverted-files' || steps.guard.outputs.gate == 'flaky' || steps.guard.outputs.gate == 'kept-preexisting')
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -138,7 +151,7 @@ jobs:
       # 새로 확정된 문제 링크를 사람에게 알린다 — 라벨로 이슈 하나에 모은다(제목 검색은 이모지·한글에서 놓친다)
       # 원문 후보 판정(원문으로 올림 · 사람 확인)도 같은 이슈에 — 관리자가 사람 확인 후보를 여기서 본다
       - name: 🔗 새로 확정된 문제 링크 · 원문 후보 알림
-        if: always() && steps.audit.outcome == 'success' && ((steps.check.outputs.new_bad != '' && steps.check.outputs.new_bad != '0') || (steps.check.outputs.cand_verified != '' && steps.check.outputs.cand_verified != '0') || (steps.check.outputs.cand_suggest != '' && steps.check.outputs.cand_suggest != '0'))
+        if: always() && (steps.audit.outcome == 'success' || steps.guard.outputs.gate == 'flaky' || steps.guard.outputs.gate == 'kept-preexisting') && ((steps.check.outputs.new_bad != '' && steps.check.outputs.new_bad != '0') || (steps.check.outputs.cand_verified != '' && steps.check.outputs.cand_verified != '0') || (steps.check.outputs.cand_suggest != '' && steps.check.outputs.cand_suggest != '0'))
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
@@ -178,9 +191,64 @@ jobs:
 
       # 실행 알림 — 결과 알림("가 봤더니 이상하더라")과 다른 것("가다가 내가 넘어졌다").
       # cancelled() 도 본다 — 시간 초과는 '실패'가 아니라 '취소'다(2026-08-04 수집 로봇 사고).
+      # 🔴 관문 실패는 조용히 넘어가지 않는다 — 무엇을 되돌렸는지는 gate-guard 의 단락(/tmp/gate-note.md)을 그대로 싣는다(사냥꾼과 같은 꼴).
+      #    이슈 **하나**에 모은다(제목에 날짜·결과 없음 · prefix) · 관문이 다시 통과하면 아래 짝이 닫는다(tools/alert-issue.mjs).
+      - name: 🚨 데이터 관문 실패 알림
+        if: always() && !inputs.dry && steps.audit.outcome == 'failure'
+        timeout-minutes: 1
+        run: |
+          case "${{ steps.guard.outputs.gate }}" in
+            reverted-files)   result="이번 결과를 되돌려서 통과 — 확인 결과·장부는 저장하지 않음(리포트만)" ;;
+            kept-preexisting) result="원래 있던 빨간불 — 이번 결과는 저장" ;;
+            still-failing)    result="되돌려도 빨간불 — 이번 결과는 저장하지 않음" ;;
+            flaky)            result="다시 재니 통과(되돌린 것 없음)" ;;
+            *)                result="되돌리기 단계가 결과를 남기지 못함(넘어짐·건너뜀·시간 초과) — 이번 결과는 저장하지 않음" ;;
+          esac
+          {
+            echo "🔗 원문 링크 확인 로봇: 🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **데이터 관문(test-collector · audit-data) 실패** — $result"
+            echo
+            if [ -n "${{ steps.guard.outputs.gate }}" ] && [ -s /tmp/gate-note.md ]; then cat /tmp/gate-note.md
+            else echo "> 되돌리기 단계가 결과를 남기지 못했습니다(넘어짐·건너뜀·시간 초과) — 이번 결과는 저장하지 않았습니다."; fi
+            echo
+            echo "실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '원문 링크 확인 관문 실패 확인해줘'라고 지시하세요."
+          } > /tmp/gate-issue.md
+      - name: 🚨 데이터 관문 실패 — 경보 이슈
+        if: always() && !inputs.dry && steps.audit.outcome == 'failure'
+        timeout-minutes: 1
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          match: prefix
+          title: 🚨 원문 링크 확인 로봇 — 데이터 관문 실패
+          label: link-check-gate
+          label-description: 원문 링크 확인 로봇 — 데이터 관문 실패
+          body-file: /tmp/gate-issue.md
+      - name: ✅ 데이터 관문 회복 — 경보 닫기
+        if: always() && !inputs.dry && steps.audit.outcome == 'success'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          match: prefix
+          title: 🚨 원문 링크 확인 로봇 — 데이터 관문 실패
+          body: |
+            ✅ 데이터 관문이 다시 통과했습니다 — 이번 결과는 저장됩니다. 자동으로 닫습니다.
+            실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
       - name: 🚨 로봇이 넘어졌다
         if: failure() || cancelled()
         uses: ./.github/actions/robot-down
         with:
           robot: 원문 링크 확인 로봇
           token: ${{ github.token }}
+
+      # 🔴 관문이 끝내 빨가면 초록불로 끝내지 않는다 — 이슈는 위 단계가 이미 열었다.
+      #    failure()·cancelled() 알림 **뒤**에 둔다(앞에 두면 '로봇이 넘어졌다'는 틀린 말이 붙는다 · 사냥꾼·수집 로봇과 같은 순서).
+      - name: 🚨 관문이 끝내 빨간불 (되돌린 뒤에도 · 원래 있던 빨간불 · 되돌리기 도구가 넘어짐)
+        if: always() && !inputs.dry && steps.audit.outcome == 'failure' && steps.guard.outputs.gate != 'reverted-files' && steps.guard.outputs.gate != 'flaky'
+        run: |
+          echo "::error::데이터 관문이 빨갛습니다(결과: '${{ steps.guard.outputs.gate }}') — 이슈에 적었습니다."
+          exit 1
