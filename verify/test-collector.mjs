@@ -4841,9 +4841,25 @@ console.log('\n■ 발췌기 글자 읽기 — 카드 빈칸 비평의 이름표
   eq('  첨부 발췌는 이름표와 값의 짝이 맞을 때만 — 선원가족 OCR 「신청기간 : ※재혼선원배우자의 자녀일 경우 …」 · 깨진 메일 · 옆 칸 꼬리 「금액) 지급하며」 는 버린다',
     ['신청기간 : ※재혼선원배우자의 자녀일 경우 주민등록등본 추가1부', '- 신청방법: 이메일 접수(/4111</0/(@히04.80.1[)', '금액) 지급하며 실 납부금액이 100만원 미만일 시 지원 대상 제외',
       '신청기간 : 2026.10.15.(목)~10.22.(목)', '문의 : 이메일 forest.talent@kfas.or.kr'].map((l) => call(EX, 'docExcerptOk', l)), [false, false, false, true, true]);
+  /* OCR 줄의 주소는 PDF 글자층과 맞춰 본다 (2026-11-16 · 리뷰) — 아래 줄은 collector/extracted 의 실제 두 판독(.ocr.txt ↔ .pdf.txt)을 옮긴 것
+     (한국건설교통신기술협회 요강 elig-mijtko-1 · 강원 브랜드장학금 elig-aycfh2-1 · 열린장학재단 elig-1jkpzc-1) */
+  const kcnaOcr = ['○ 신청기간 : 2026. 11. 5(목) ~ 11. 18(수) 24:00(자정)', '○ 신청방법 : 이메일(<0080008.07.14) 및 우편(등기)', '※ 우편접수는 마감일 소인분까지 유효', '협회 서식 |@ 자기소개서 공백 포함 1.500자 이내'].join('\n');
+  const kcnaLayer = ['ㅇ 신청기간 : 2026. 11. 5(목) ~ 11. 18(수) 24:00(자정)', 'ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편(등기)'].join('\n');
+  eq('  🔴 OCR 줄의 메일·누리집 주소는 같은 PDF 글자층의 같은 이름표 줄로 — 깨진 줄(`이메일(<0080008.07.14)`·`Gnjael.gwd@`·`wwwybzor.kr/`)을 원문이라 보이지 않는다',
+    [call(EX, 'crossCheckOcr', kcnaOcr, kcnaLayer),
+      call(EX, 'crossCheckOcr', '○ (신청방법) 서류 구비 후 이메일 Gnjael.gwd@gmail.com) 접수', '❍ (신청방법) 서류 구비 후 이메일(injae1.gwd@gmail.com) 접수'),
+      call(EX, 'crossCheckOcr', '[> 접수처 : wwwybzor.kr/', '▷ 접수처 : www.ybz.or.kr/')],
+    [['○ 신청기간 : 2026. 11. 5(목) ~ 11. 18(수) 24:00(자정)', 'ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편(등기)', '※ 우편접수는 마감일 소인분까지 유효', '협회 서식 |@ 자기소개서 공백 포함 1.500자 이내'].join('\n'),
+      '❍ (신청방법) 서류 구비 후 이메일(injae1.gwd@gmail.com) 접수', '▷ 접수처 : www.ybz.or.kr/']);
+  eq('    맞출 글자층 줄이 없으면 주소 꼴이 깨진 줄만 버린다 · 동그라미 숫자를 읽은 `@)-1`·`|@` 서류 줄과 멀쩡한 주소 줄은 그대로 · 주소가 같으면 OCR 그대로',
+    [call(EX, 'crossCheckOcr', ['[> 접수처 : wwwybzor.kr/', '@)-1 주민등록초본(전체 주소이력) 대학생', '문의 : forest.talent@kfas.or.kr'].join('\n'), ''),
+      call(EX, 'crossCheckOcr', '○ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편', kcnaLayer)],
+    [['@)-1 주민등록초본(전체 주소이력) 대학생', '문의 : forest.talent@kfas.or.kr'].join('\n'), '○ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편']);
+  eq('    배선 — 첨부 글자를 읽는 자리(docTexts)가 OCR 첨부에 글자층을 맞춘다 · OCR 첨부에서 읽은 접수 메일은 다시 읽는다',
+    [/const t = isOcrSource\(p\) \? crossCheckOcr\(t0, pdfLayerText\(p\)\) : t0;/.test(eeSrc), /it\.applyEmail && \/\^공고문 첨부\\\(OCR\\\)\/\.test\(it\.applyEmailFrom/.test(eeSrc)], [true, true]);
   const bodyPart = eeSrc.slice(eeSrc.indexOf('const body = strip('));
   eq('  첨부 발췌는 두 갈래(본문에서 0줄 · 껍데기) 모두 · 본문은 제목 줄부터(제목 앞 다른 글 띠 — 가천 「FGD 참여학생 모집 ○ 신청기간」)',
-    [/excerptsFromDocs\(docs\(\)\)/.test(noBody), /if \(!ex\.length\) \{ const dx = excerptsFromDocs\(docs\(\)\)/.test(bodyPart), /let ex = excerptsFromBody\(body, it\)/.test(bodyPart)], [true, true, true]);
+    [/excerptsFromDocs\(docs\(\)\)/.test(noBody), /if \(!ex\.length\) \{ const dx = excerptsFromDocs\(docs\(\)\)/.test(bodyPart), /let ex = excerptsFromBody\(body, it(?:, own\.text)?\)/.test(bodyPart)], [true, true, true]);
 
   /* ⑧ 자격 절 */
   const kmu = ['◤ 1. 지원자격', '2026 학년도 현재 국민대학교에 재학 중인 여성 외국인 학생 ( 학부생 / 대학원생 ) 중 평점 평균이 4.0 이상으로 지도자로서의 품성을 갖추고 가정형편이 어려운 학생',
@@ -4874,6 +4890,42 @@ console.log('\n■ 발췌기 글자 읽기 — 카드 빈칸 비평의 이름표
       call(EX, 'recheckQuotedDeadline', { deadline: '2026-11-18', deadlineFrom: '공고 원문 · 2026. 11. 18（수）오전 10시부터' }),
       call(EX, 'recheckQuotedDeadline', { deadline: '2026-11-26', deadlineFrom: `공고 원문 · ${insuk}` })],
     ['2026-11-26', null, null, null]);
+
+  /* ⑩ 사이트 띠 줄 (2026-11-16 · 리뷰 — 가천 장학공지 매 쪽 머리의 「…FGD 참여학생 모집 ○ 신청기간: 2026.11.05.(목) ~ 11.18.(수)」 띠가
+     네 공고의 마감 11-18 이 됐다 · 진짜 마감 11-11·11-12·11-15·11-16). 아래 줄은 저장 원문(notices-text.json 가천 126826·영남 231554919)을 옮긴 것 */
+  const fgd = ['2026년 가천대학교 재학생 심층면접토론(FGD) 참여학생 모집', '○ 신청기간: 2026.11.05.(목) ~ 11.18.(수)'];
+  const gPage = (no, title, rest) => ({ url: `https://www.gachon.ac.kr/bbs/kor/478/${no}/artclView.do`, title, text: ['상단배너( 3 개)', ...fgd, String(no), title, ...rest].join('\n') });
+  const gaPages = [
+    gPage(126826, '[글로벌] 2026-2학기 일반 교내 및 교외 국가근로장학생 추가 모집(2차) 안내', ['2026.11.06', '3. 신청기간 : 2026. 11. 6.(금), 15:00 ~ 11. 11.(수), 12:00 (기한엄수)']),
+    gPage(126768, '[공통] 2026-2학기 외국인 장학금 추가 신청(최종)', ['2026.11.05', '1. 신청 기간', '2026년 11월 5일(목) ~ 11월 16일(월)']),
+    gPage(126763, '[메디컬] 인천광역시체육회 제45회 체육장학생 신청 안내', ['5. 신청기간: ~ 2026.11.12.(목) 12:00 까지'])];
+  /* 영남대 세 공고는 진짜로 같은 신청기간 줄을 **제목 뒤에** 싣는다 · 부산 원스톱 한 글은 주소 꼴만 달리해 세 벌 저장된다(서로 다른 글 셋이 아니다) */
+  const yuLine = '가. 신청기간: 2026. 9. 7.(월) 10:00 ~ 11. 20.(금) 17:00까지';
+  const yPage = (no, title) => ({ url: `https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=${no}`, title, text: ['장학공지', title, '3. 신청안내', yuLine].join('\n') });
+  const yuPages = [yPage(231554919, '2026-2학기 다문화가정 장학금 신청 안내'), yPage(231554921, '2026-2학기 3대 동문가족 특별장학금 신청 안내'), yPage(231554923, '2026-2학기 천마가족장학금 신청 안내')];
+  const puLine = '2. 신청 기간 : 2026. 10. 30.(금) 9시 ~ 11. 12.(목) 18시까지';
+  const puTitle = '2026년도 2학기 국가근로장학금 동계방학 집중근로(교외) 신청 안내';
+  const puPages = ['&seq=705', '#n-1', '&pageNo=2#n-1'].map((q) => ({ url: `https://onestop.pusan.ac.kr/page?menuCD=000000000000062${q}`, title: puTitle, text: [puLine, puTitle].join('\n') }));
+  const chromeMap = call(EX, 'siteChromeFrom', [...gaPages, ...yuPages, ...puPages]);
+  const setOf = (h) => (chromeMap instanceof Map && chromeMap.get(h)) || new Set();
+  const ownOf = (p, host) => call(EX, 'ownBody', p.text, { name: p.title }, setOf(host));
+  const gaOwn = gaPages.map((p) => ownOf(p, 'www.gachon.ac.kr'));
+  const banner = `공고 원문 · ${fgd.join(' ')}`;
+  eq('⑩ 🔴 제목 앞 사이트 띠 줄(같은 호스트의 서로 다른 글 셋 이상)은 마감 근거가 아니다 — 가천 세 공고가 제 마감을 읽는다 · 띠 근거로 들어간 마감은 띠를 걷은 본문에서 다시 읽는다',
+    [gaOwn.map((o) => call(EX, 'extractDeadline', (o && o.text) || '')),
+      gaPages.map((p, i) => call(EX, 'recheckQuotedDeadline', { deadline: '2026-11-18', deadlineFrom: banner }, gaOwn[i]))],
+    [['2026-11-11', '2026-11-16', '2026-11-12'], ['2026-11-11', '2026-11-16', '2026-11-12']]);
+  eq('  띠를 모르면(빈 Set)·제목 줄을 못 찾으면 예전 그대로 · 띠가 아닌 근거 문장은 그 문장만 다시 읽는다',
+    [call(EX, 'extractDeadline', call(EX, 'ownBody', gaPages[0].text, { name: gaPages[0].title }, new Set()).text),
+      call(EX, 'ownBody', gaPages[0].text, { name: '전혀 다른 제목의 장학금 신청 안내문입니다' }, setOf('www.gachon.ac.kr')).chrome.length,
+      call(EX, 'recheckQuotedDeadline', { deadline: '2026-11-18', deadlineFrom: `공고 원문 · ${insuk}` }, gaOwn[0])],
+    ['2026-11-18', 0, '2026-11-26']);
+  eq('  🔴 같은 기간을 제목 **뒤에** 싣는 세 공고(영남)·주소 여벌뿐인 한 글(부산)은 띠가 아니다 — 마감을 그대로 읽는다',
+    [yuPages.map((p) => call(EX, 'extractDeadline', ownOf(p, 'www.yu.ac.kr').text)), setOf('onestop.pusan.ac.kr').has(puLine),
+      call(EX, 'recheckQuotedDeadline', { deadline: '2026-11-20', deadlineFrom: `공고 원문 · 3. 신청안내 ${yuLine}` }, ownOf(yuPages[0], 'www.yu.ac.kr'))],
+    [['2026-11-20', '2026-11-20', '2026-11-20'], false, null]);
+  eq('    발췌기 배선 — 본문 마감·근거 다시 읽기·발췌 물러남이 띠를 걷은 본문(own)을 읽는다',
+    [/let dl = extractDeadline\(own\.text\)/.test(bodyPart), /recheckBodyDeadline\(it, own\)/.test(bodyPart), /excerptsFromBody\(body, it, own\.text\)/.test(bodyPart)], [true, true, true]);
 }
 
 console.log('\n■ 자격 자리의 잡음을 유형별로 세는가 (2026-08-23)');
@@ -5012,6 +5064,9 @@ console.log('\n■ 금액·양식 카드 빈 칸 (2026-11-15)');
     [(exSrc.match(/!bodyRefused &&/g) || []).length, /PA\.pickDocAmount\(results\)/.test(exSrc)], [2, true]);
   eq('  금액 로봇: 제가 적었던 절대액을 비울 때 amountValue·문구도 걷는다 (전엔 「250만원」·합계가 남았다)',
     /prevSpec\.kind === 'fixed' \|\| prevSpec\.kind === 'range'\) && Number\(it\.amountValue\) === Number\(prevSpec\.value\)\) it\.amountValue = 0/.test(exSrc), true);
+  eq('  🔴 금액 로봇: 사람이 문구만 고친 금액(표식은 로봇 것 · 문구 ≠ 로봇 문구 · 숫자 있음)은 원문을 못 읽게 돼도 숫자·구조를 걷지 않는다 (카드 300만원 · 합계 어림 어긋남)',
+    [/const humanText = !!\(prevSpec && robotText && it\.amount !== robotText && \/\\d\/\.test\(String\(it\.amount \|\| ''\)\)\);/.test(exSrc),
+      /else if \(a\.kind === 'unknown' && humanText\) keptHuman \+= 1;\s*else if \(a\.kind === 'unknown'\) \{/.test(exSrc)], [true, true]);
   const { amountText } = await import('../tools/edit-diff.mjs');
   eq('카드 문구 — 시급 괄호 꼴 「시급(10,320원)」 · 「최대 350만원」 · 「등록금 60% 이내」 (조선대 국가근로 3차가 시급으로 읽고도 「금액 원문 확인」 이었다)',
     [amountText({ kind: 'hourly', raw: '다 . 장학금액 : 월 실제 근로시간 * 시급(10,320원)' }), amountText({ kind: 'fixed', value: 3500000, upTo: true }), amountText({ kind: 'ratio', ratio: 0.6, upTo: true })],
@@ -11328,7 +11383,7 @@ console.log('■ 첨부에서 마감일 — 본문이 껍데기인 게시판 (20
   }
   /* ⚠️ 변수 이름·중괄호 자리를 박지 않는다 — 뜻이 같은 리팩터에 빨간불이 되면 다음 사람이 관문을 끈다.
      재는 것은 '본문을 먼저 보고, 못 읽었을 때 첨부로 물러나는 순서' 하나다. */
-  const 본문먼저 = ee.indexOf('extractDeadline(body)');
+  const 본문먼저 = ee.search(/extractDeadline\((?:body|own\.text)\)/);   // own.text — 제목 앞 사이트 띠 줄만 걷은 같은 본문(발췌기 siteChrome)
   eq('  본문을 먼저 보고 못 읽었을 때만 첨부로 물러난다',
     본문먼저 > 0 && ee.indexOf('deadlineFromDocs(it)', 본문먼저) > 본문먼저, true);
   /* 본문이 아예 없는 길(= `if (!hasText(src))` 블록) 안에서도 불러야 한다 */
@@ -12660,6 +12715,9 @@ return { submitChannelKind, submitChannelLabel, hasPortalName };`)();
     take('⑥ 서류 준비 및 메일(injae@uri.re.kr)로 신청서(3종), 증빙서류 제출'), true);
   eq('제출 방법 : 이메일 — 받는다',
     take('다 . 멘토활동계획서 제출 방법 : 이메일 : scholarship@hufs.ac.kr 또는 장학팀 ( 학생회관 121 호 ) 직접 제출'), true);
+  eq('🔴 이름표가 신청 방법이고 값이 메일이면 받는다(한국건설교통신기술협회 요강 PDF 글자층 · 동사 없음) — 이름표 없는 메일 줄·문의 줄은 그대로 안 받는다',
+    [take('ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편(등기)'), take('신청방법 : 방문 접수 (문의 : scholarship@hufs.ac.kr)'), take('신청방법 : 이메일 문의 후 방문(kcna@kcna.or.kr)')],
+    [true, false, false]);
 
   /* 🔴 버려야 하는 줄 — 전부 실제로 나온 것이다 */
   eq('문의처 줄은 접수처가 아니다',
@@ -15342,6 +15400,19 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
   eq('  꼬리 쉼표가 붙은 제외 줄(`… 이중국적자 제외,`)은 제외 칸으로 간다 — 전엔 자격 칸에 모름으로 남았다', [RL('주민등록상 해외이주 신고자, 영주권자 및 이중국적자 제외,').length, MEx.requirementLines({}, ['주민등록상 해외이주 신고자, 영주권자 및 이중국적자 제외,'], { onlyExclude: true }).length], [0, 1]);
   eq('  `…학생은 다음 3 가지 중 1 가지에 해당되어야 함` — 주어가 앞에 붙은 가리킴 줄도 선택지 묶음을 연다(그 줄은 안 보이고 아래 줄이 한 묶음)',
     MEx.requirementLines({}, ['가족장학금을 신청할 수 있는 학생은 다음 3 가지 중 1 가지에 해당되어야 함', '부모 중 1인이 재직자인 학생', '형제가 재학 중인 학생', '조부모가 동문인 학생'], { withMeta: true, all: true }).map((x) => x.group), [1, 1, 1]);
+  /* 2026-11-16 · 리뷰 — 충남대 사회 재환원 장학금(원문 form-1n9svq-2 · 관리자가 옮긴 eligibilityLines 그대로). 「나. 차등조건(1개 이상 충족 시 …)」 머리 줄이 버려져
+     보호조치 종료·수급·보호조치 연장(앞뒤 둘은 동시에 될 수 없다) 셋이 모두 필요한 요건으로 세어졌다(수급자 학생 60% · 요건 5개) */
+  const cnu = ['1) 충남대학교 학부 재학생(2026학년도 2학기 등록자 / 휴학·수료자 등 제외)', '2) 직전 학기 12학점 이상 이수자', '나. 차등조건(1개 이상 충족 시 신청 가능, 해당하는 모든 조건의 증빙서류 제출 필수)',
+    '1) 「아동복지법」상 가정위탁·아동복지시설 보호조치 종료가 5년 이상 경과한 자', '2) 국민기초생활수급자(신청자 본인이 수급자로 등록된 자 중 생계급여 또는 의료급여 수급자에 한함)', '3) 「아동복지법」상 가정위탁·아동복지시설 보호조치 연장자'];
+  const cnuStu = (o) => ({ school: '충남대학교', status: '재학', year: 3, credits: 14, lastCredits: 14, gpa: 3.5, flags: [], ...o });
+  const cnuFit = (p) => (({ met, total, fails }) => [met, total, fails.length])(MEx.fitDetail({ id: 'cnu', name: '사회 재환원 장학금', eligibilityLines: cnu }, p));
+  eq('🔴 개요 번호 아래 「나. 차등조건(1개 이상 충족 시 …)」 은 아래 번호 항목(1) 2) 3))을 택1 묶음으로 연다 — 머리 줄은 안 보이고 셋이 한 묶음 · 수급자 학생은 요건 3개 다 맞음 · 처지 모르는 학생도 미달 0',
+    [MEx.requirementLines({}, cnu, { withMeta: true, all: true }).map((x) => x.group), cnuFit(cnuStu({ flags: ['basicLiving'] })), cnuFit(cnuStu({})), cnuFit(cnuStu({ traits: { careLeaver: false } }))],
+    [[0, 0, 1, 1, 1], [3, 3, 0], [2, 3, 0], [2, 3, 0]]);
+  eq('  🔴 「2개 이상 충족」 은 택1 이 아니다(묶으면 하나만 맞아도 맞음 — 틀린 안심) · 번호 항목이 이어지지 않으면 묶지 않는다',
+    [MEx.requirementLines({}, ['나. 가점조건(2개 이상 충족 시 신청 가능)', '1) 국민기초생활수급자', '2) 다자녀 가정의 자녀', '3) 한부모 가정의 자녀'], { withMeta: true, all: true }).map((x) => x.group),
+      MEx.requirementLines({}, ['나. 차등조건(1개 이상 충족 시 신청 가능)', '국민기초생활수급자인 학생'], { withMeta: true, all: true }).map((x) => x.group)],
+    [[0, 0, 0], [0]]);
   const stu6 = (o) => ({ school: '한국외국어대학교', track: 'humanities', major: '영어학과', year: 3, status: '재학', gpa: 3.8, bracket: 5, credits: 15, region: '서울', parentRegion: '서울', nationality: 'korean', birthYear: 2004, flags: [], common: {}, scholarships: [], ...o });
   const judge6 = (l, p, ex) => conds(l, ex).map((c) => MEx.judgeCond(c, p, {}));
   const condsEx6 = (l) => PRx.parseLine(l, true).conds;

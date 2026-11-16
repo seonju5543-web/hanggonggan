@@ -25,14 +25,21 @@ const linesOf = (t) => String(t || '').split(/\n+/).map((l) => l.trim()).filter(
 /* 저장된 원문 전체를 훑어 호스트별 '메뉴 줄' 목록을 만든다.
    minPages: 이만큼도 안 모인 학교는 판단하지 않는다(적은 표본으로 지우면 본문을 지운다).
    ratio: 그 학교 공고의 이 비율 이상에 나오면 메뉴로 본다. */
-export function buildBoilerplate(texts, { minPages = 3, ratio = 0.4 } = {}) {
+/* keyOf(쪽) — 주면 **같은 글은 한 번만** 센다(같은 공고가 주소 꼴만 달리해 여럿 저장된다 — 부산 원스톱 한 글이 4벌).
+   발췌기의 사이트 띠 판정(extract-excerpts.mjs siteChrome)이 '서로 다른 글 셋 이상'을 셀 때 쓴다 · 안 주면 예전 그대로 쪽마다 센다 */
+export function buildBoilerplate(texts, { minPages = 3, ratio = 0.4, keyOf = null } = {}) {
   const stat = new Map();
   for (const v of texts || []) {
     if (!v || !v.text || /^FETCH_/.test(v.text)) continue;
     const h = hostOf(v.url);
     if (!h) continue;
-    if (!stat.has(h)) stat.set(h, { pages: 0, freq: new Map() });
+    if (!stat.has(h)) stat.set(h, { pages: 0, freq: new Map(), seen: new Set() });
     const e = stat.get(h);
+    const key = keyOf ? keyOf(v) : null;
+    if (key != null) {
+      if (e.seen.has(key)) continue;
+      e.seen.add(key);
+    }
     e.pages += 1;
     // 한 공고 안에서 여러 번 나와도 1번으로 센다 — 반복되는 배너가 한 페이지를 지배하지 않게
     for (const l of new Set(linesOf(v.text))) e.freq.set(l, (e.freq.get(l) || 0) + 1);

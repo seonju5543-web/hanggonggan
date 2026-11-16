@@ -1862,6 +1862,24 @@ function anyOfCount(line) {
   const dig = t.match(/(\d)\s*가지/);
   return dig ? parseInt(dig[1], 10) : 0;
 }
+/* 🔴 **개요 번호 아래 「n개 이상 충족」 머리 줄** (2026-11-16 · 리뷰 — 충남대 사회 재환원 장학금).
+   원문은 `가. 필수조건(모두 충족)` ↵ 1) 2) ↵ `나. 차등조건(1개 이상 충족 시 신청 가능, 해당하는 모든 조건의 증빙서류 제출 필수)` ↵ 1) 2) 3) 이다.
+   POINTER_LINE 은 `아래·다음·위` 로 시작해야 하고 ANY_OF_LINE 은 `중 하나·가지 중` 을 찾아, 이 머리 줄이 그냥 버려졌다 —
+   보호조치 종료자·수급자·보호조치 연장자 셋(**동시에 될 수 없는** 둘이 섞였다)이 모두 갖춰야 하는 요건으로 읽혔다.
+   ① 짧은 이름표(차등조건·선택조건 …) 뒤 `(1개 이상 충족 …` · `: 다음 중 1개 이상 해당` 꼴 — **1개(하나·한 가지) 이상일 때만**이다.
+      `2개 이상 충족` 은 '하나만 되면 된다'가 아니다 — 택1 묶음으로 보면 틀린 안심이 된다(건드리지 않는다).
+   ② 몇 줄이 선택지인지는 `n가지` 가 없으면 **바로 아래 같은 꼴 번호 항목 수**로 센다(enumRun · 1) 2) 3) → 3).
+   ③ 머리 줄 자신은 POINTER_LINE 처럼 화면에 안 내보낸다 — 줄로 남기면 채점기(eligibility-report)가 '제목·이름표로 끝나는 줄'로 센다.
+      ⚠️ 그래서 화면은 아직 세 줄을 평평하게 늘어놓는다(택1 묶음이 화면에 표시되지 않는 것은 가리킴 줄 묶음 전부의 사정) — 적합도·판정만 묶음으로 센다. */
+const ANY_OF_HEAD = /^[가-힣A-Za-z ]{0,15}\s*[(（:：]\s*(?:(?:다음|아래)\s*)?(?:중\s*)?(?:1\s*개|1\s*가지|한\s*가지|하나)\s*(?:항목)?\s*이상\s*(?:을|를|에)?\s*(?:충족|해당|만족)/;
+const ENUM_FAMILIES = [/^\s*\(?\d+\s*\)/, /^\s*\d+\s*\./, /^\s*[①-⑳]/, /^\s*[가-하]\s*[.)]/, /^\s*[-·•▪]\s/];
+function enumRun(lines, start) {
+  const fam = ENUM_FAMILIES.find((re) => re.test(String(lines[start] || '')));
+  if (!fam) return 0;
+  let n = 0;
+  while (start + n < lines.length && fam.test(String(lines[start + n] || ''))) n += 1;
+  return n >= 2 ? n : 0;
+}
 /* `서울시민(성인)` 은 표 칸이 아니라 대상이다(2026-10-04 · 대외활동 표본) — 시민·도민·구민·군민·성인·청년·누구나 */
 const REAL_CATEGORY = /(자|생|중|상|하|명|원)$|북한이탈|새터민|다문화|기초생활|차상위|국적|유공|보훈|장애|한부모|다자녀|(?:시|도|구|군)민|성인|청년|누구나/;
 const isTableCell = (t) => BARE_CELL.test(t) && !REAL_CATEGORY.test(t);
@@ -2038,6 +2056,11 @@ function requirementLines(sch, lines, opts) {
        ⚠️ **대상을 말하는 문장은 지우지 않는다** — 그 줄이 사라지면 '내 것이 아니다'라는
           사실 자체가 화면에서 없어진다(2026-09-12 · 핵심-4). 학위 축이 ✓/✕ 를 붙인다. */
     if (!loose && PR2.gradTarget(t) === 'label') continue;
+    if (ANY_OF_HEAD.test(t) && !POINTER_LINE.test(t)) {
+      /* 개요 번호 아래 「1개 이상 충족」 머리 줄 — 아래 번호 항목들을 택1 묶음으로 연다. 줄 자신은 가리킴 줄(POINTER_LINE)과 같이 안 내보낸다(위 ANY_OF_HEAD 머리말) */
+      const n = anyOfCount(t) || enumRun(joined, li + 1);
+      if (n > 0) { anyLeft = n; anyGroup += 1; continue; }
+    }
     if (POINTER_LINE.test(t)) {
       /* 안내 줄 자신은 화면에 안 내보내되, '여기부터 n줄은 선택지'라는 사실은 남긴다 */
       const n = anyOfCount(t);
