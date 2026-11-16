@@ -83,7 +83,16 @@ function linkRules() {
     sourceLink: w.sourceLink, setLinkChecks: w.setLinkChecks, setLinkFixes: w.setLinkFixes, linkFixFor: w.linkFixFor,
     linkCheckFor: w.linkCheckFor, linkShape: w.linkShape, decodeUrlEntities: w.decodeUrlEntities, fixUrlUsable: w.fixUrlUsable,
     fixKeys: w.fixKeys, markerTitleOf: w.markerTitleOf,
+    /* 고전 스크립트의 const 는 window 속성이 아니라 전역 이름이다(모듈에서도 그 이름으로 보인다) — 학생이 보는 문제 링크 이름을 말할 때 쓴다(베껴 적지 않는다) */
+    troubleTag: typeof TROUBLE_TAG === 'object' ? TROUBLE_TAG : null, surfaceLabels: typeof SURFACE_LABELS === 'object' ? SURFACE_LABELS : null,
   };
+}
+/* 로봇이 확정한 문제 링크가 학생에게 어떤 이름으로 보이는가 — source-link.js 의 표 그대로(SURFACE_LABELS.detail · TROUBLE_TAG · 2026-11-16 2차 리뷰: 예전 「(확인 필요)」 를 그대로 말해 화면과 달랐다) */
+function troubleLabelsText(LR) {
+  const L = LR && LR.surfaceLabels && LR.surfaceLabels.detail;
+  const tags = LR && LR.troubleTag ? Object.values(LR.troubleTag) : [];
+  if (!L || !L.trouble || !tags.length) return '로봇이 본 것을 붙인 이름';
+  return `${tags.map((t) => `「${L.trouble.replace('{t}', t)}」`).join('·')}(목록·첫 화면이면 「${L.list}」·「${L.home}」)`;
 }
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const byId = (id) => document.getElementById(id);
@@ -1188,7 +1197,7 @@ const LF_GROUPS = [
   { key: 'listid', title: '② 목록 주소에 글 번호만 붙인 꼴 — 학생에게 목록이 열립니다', d: '서버가 번호를 무시하고 목록을 줍니다. 그 글을 열어 주소창의 주소를 넣어 주세요.' },
   { key: 'home', title: '③ 사이트 첫 화면(홈페이지) 꼴', d: '첫 화면(index·main) 주소입니다. 그 공고 글의 주소를 넣어 주세요.' },
   { key: 'kosaf', title: '④ 재단 홈페이지 — 층2(한국장학재단에 등록된 재단 장학금)', d: '한국장학재단 상세는 새 탭에서 열리지 않아 재단 홈페이지만 보입니다. 재단 게시판에서 이번 회차 공고를 찾아 넣으면 그 회차(마감일)에만 쓰입니다.' },
-  { key: 'bad', title: '⑤ 로봇이 열어 보고 문제를 확정한 링크', d: '원문 링크 확인 로봇이 다른 날 두 번 같은 문제를 봤습니다(목록·첫 화면·로그인·열리지 않음·다른 글). 학생에게는 「(확인 필요)」로 보입니다.' },
+  { key: 'bad', title: '⑤ 로봇이 열어 보고 문제를 확정한 링크', d: '원문 링크 확인 로봇이 다른 날 두 번 같은 문제를 봤습니다(목록·첫 화면·로그인·열리지 않음·다른 글). 학생에게는 로봇이 본 것을 붙인 이름으로 보입니다 — ', dLabels: true },
 ];
 
 function lfDeadline(e) { return e.ds === 'kosaf' ? (e.raw.due || '') : (e.raw.deadline || ''); }
@@ -1376,6 +1385,7 @@ function lfFixedRows(all, LR) {
   });
 }
 function lfFixedRowHtml(r) {
+  const LR = linkRules();   // 부르는 곳(linkFixSlotHtml)이 이미 LR 이 있음을 확인했다
   const st = { applied: ['good', '쓰이는 중'], unused: ['warn', '안 쓰임 — 회차(마감)가 바뀌었거나 쓸 수 없는 주소'], none: ['warn', '대상 없음 — 글이 내려갔거나 주소가 바뀌었습니다'] }[r.status];
   return `
     <div class="row" data-row data-noclick data-lf-fixed="${esc(r.key)}" data-lf-status="${esc(r.status)}" style="cursor:default">
@@ -1383,7 +1393,7 @@ function lfFixedRowHtml(r) {
         <div class="t" data-row-title>${esc(r.target ? r.target.title : (r.ent.title || r.key))}</div>
         <div class="m">${r.target ? `<span class="pill info">${esc(FIX_DATASET_LABEL[r.target.ds] || r.target.ds)}</span>` : ''}<span class="mono">${esc(r.key.length > 70 ? `${r.key.slice(0, 70)}…` : r.key)}</span><span>${esc(r.ent.by || '')} ${esc(r.ent.at || '')}</span>${r.ent.round ? `<span>회차 ${esc(r.ent.round)}</span>` : ''}</div>
         <div class="scope-count">넣은 주소: <a href="${esc(safeUrl(r.ent.url))}" target="_blank" rel="noreferrer noopener">${esc(r.ent.url || '')}</a>${r.ent.note ? ` · 메모: ${esc(r.ent.note)}` : ''}</div>
-        ${r.bad ? `<div class="scope-count">원문 링크 확인 로봇이 이 주소도 문제로 확정했습니다(${esc(r.bad.v)} · ${esc(r.bad.at || '')}) — 학생에게는 「(확인 필요)」로 보입니다.</div>` : ''}
+        ${r.bad ? `<div class="scope-count">원문 링크 확인 로봇이 이 주소도 문제로 확정했습니다(${esc(r.bad.v)} · ${esc(r.bad.at || '')}) — 학생에게는 「${esc(LR.sourceLink(r.target ? r.target.item : { url: r.ent.url || '' }, 'detail').label)}」로 보입니다.</div>` : ''}
       </div>
       <div class="btn-row"><button class="btn btn-sm danger" data-lf-unfix="${esc(r.key)}">지우기</button></div>
       <div><span class="pill ${st[0]}">${esc(st[1])}</span></div>
@@ -1406,7 +1416,7 @@ function linkFixSlotHtml() {
   const fixedRows = lfFixedRows(all, LR);
   const grp = (g) => {
     const list = byGroup[g.key] || [];
-    const body = `<p class="muted">${esc(g.d)}</p>
+    const body = `<p class="muted">${esc(g.dLabels ? `${g.d}${troubleLabelsText(LR)}.` : g.d)}</p>
       <div class="rows" data-rows>${list.slice(0, shown(`lf-${g.key}`, 30)).map(lfRowHtml).join('')}</div>${moreBtn(`lf-${g.key}`, list.length, 30)}`;
     if (g.key === 'kosaf') {
       return `<details class="pgroup" data-lf-group="kosaf" data-lf-kosaf${LF.kosafOpen ? ' open' : ''}><summary><b>${esc(g.title)}</b> <span class="pill">${list.length}건</span> <span class="muted">마감 가까운 순 · 펼쳐서 보기</span></summary>${list.length ? body : '<p class="muted">없습니다.</p>'}</details>`;
@@ -1416,7 +1426,7 @@ function linkFixSlotHtml() {
   return `
     ${LF.failed.length ? `<p class="empty" data-lf-fail>읽지 못한 파일 ${LF.failed.length}개 — 아래 숫자는 그만큼 빠졌을 수 있습니다: ${LF.failed.map((p) => `<code class="mono">${esc(p)}</code>`).join(' ')}</p>` : ''}
     <p class="muted" data-lf-note><b>넣은 주소는 장부(data/link-fixes.json)에만 저장됩니다</b> — 로봇이 데이터를 다시 만들어도 사라지지 않고,
-      학생 앱은 다음 배포부터 그 주소를 「원문 공고」로 엽니다. 원문 링크 확인 로봇이 날마다 그 주소도 열어 보고, 문제면 「(확인 필요)」로 바꿔 말합니다.
+      학생 앱은 다음 배포부터 그 주소를 「원문 공고」로 엽니다. 원문 링크 확인 로봇이 날마다 그 주소도 열어 보고, 문제면 로봇이 본 것을 이름에 붙여 말합니다 — ${esc(troubleLabelsText(LR))}.
       ${robotFixed ? `로봇이 원문을 찾아 이미 고친 ${robotFixed}건은 뺐습니다.` : ''}</p>
     <div class="btn-row"><button class="btn btn-sm" data-lf-cand${LF.cand === 'loading' || Array.isArray(LF.cand) ? ' disabled' : ''}>${Array.isArray(LF.cand) ? '수집 기록 힌트 반영됨' : LF.cand === 'failed' ? '수집 기록을 못 읽었습니다 — 다시 시도' : '수집 기록에서도 같은 제목 찾기'}</button>
       <span class="muted">수집 기록(collector/candidates.json · 큰 파일)은 누를 때만 받습니다.</span></div>

@@ -424,12 +424,15 @@ const bareOrg = (t) => String(t || '').replace(/^(재단법인|사단법인|학�
 const orgBase = (t) => String(t || '').replace(/\s*\([^)]*\)\s*$/, '').trim();
 /* 주관 기관 칸이 비었거나 '모름' 표시(`주관 기관 원문 확인`·`미확인` — auto-register PROVIDER_UNKNOWN)인가 — 카드 윗줄·지원서 초안이 같이 쓴다 */
 const providerUnknown = (v) => !String(v || '').trim() || /원문 확인|미확인|확인\s?필요/.test(String(v));
-/* 칸 하나의 '아는 것만' (2026-11-16 리뷰 — 달력 줄·지원서 초안이 칸을 그대로 옮겨 「금액 원문 확인」·「기관확인필요」가 샜다) — 모름 판정은 위 providerUnknown,
-   재단이 적어 둔 긴 칸(「… 각 대학 홈페이지 확인 필요」)은 층2 공고 안내와 같은 kosafNoticeValue 로 그 마디만 뗀다. 로봇 표시(원문 확인·미확인)는 통째로 뺀다 · 글자를 더하지 않는다 */
+/* 학생 화면에 싣지 않는 '모름'류 글자 — verify/no-unknown-words.cjs UNKNOWN_WORDS 와 같은 낱말(브라우저가 그 파일을 못 읽어 한 번 더 · 관문 「학생 화면에 '모름'류 글자가 없다」 ⑥이 낱말마다 대조한다) */
+const SAYS_UNKNOWN = /모름|미확인|원문(?:에서)? 확인|확인\s?필요|기한 확인 중|정보 입력 필요/;
+/* 칸 하나의 '아는 것만' (2026-11-16 리뷰 — 달력 줄·지원서 초안이 칸을 그대로 옮겨 「금액 원문 확인」·「기관확인필요」가 샜다).
+   🔴 **통째로 싣거나 통째로 뺀다** (2026-11-16 2차 리뷰 · 원칙 8-1) — 원문·재단 칸은 인용이다. 예전엔 「확인 필요」 마디만 떼어
+      「등록금 전액 지원 단, 소득분위 확인 필요」 → 「등록금 전액」(조건이 사라져 무조건 전액으로 읽힌다)처럼 **문장 가운데를 자른 글**을 원문이라며 보였다.
+      '모름'류 낱말이 하나라도 있으면 그 값은 화면에 없다 · 없으면 한 글자도 안 바꾸고 그대로 · 글자를 더하지 않는다 */
 function knownValue(v) {
   const t = String(v || '').trim();
-  if (!providerUnknown(t)) return t;
-  return /원문 확인|미확인/.test(t) ? '' : kosafNoticeValue(t);
+  return t && !SAYS_UNKNOWN.test(t) ? t : '';
 }   // 「기관확인필요」 — 재단이 KOSAF 칸에 적어 둔 모름 표시(2026-11-02 실화면)
 function cardOrgLine(sch) {
   const prov = String(sch.provider || '').trim();
@@ -3173,13 +3176,12 @@ const KOSAF_NOISE = /제한없음|^(?:기관\s?확인\s?필요|해당\s?없음)[
 const kosafSplit = (t) => String(t || '').split(/\s*[○ㅇ※]\s*/).map((x) => kosafClean(x)).filter((x) => x.length >= 4 && !KOSAF_NOISE.test(x));
 
 /* 층2 「공고 안내」 칸 값 (2026-11-15 · 개발자 결정 11-02) — 재단이 적어 둔 '모름' 표시(`기관확인필요`·`대학 확인 필요`·`… 각 대학 홈페이지 확인 필요`)는 화면에 싣지 않는다.
-   🔴 지우기만 한다 — 「확인 필요」 로 끝나는 마디(앞 세 낱말까지)를 떼고, 남는 말이 없으면 줄째 뺀다. 글자를 더하거나 고치지 않는다(남의 오타도 그대로) */
+   🔴 **칸째 뺀다 — 자르지 않는다** (2026-11-16 2차 리뷰 · 원칙 8-1) — 예전엔 「확인 필요」 로 끝나는 마디(앞 세 낱말까지)를 떼어
+      「※ 학교마다 선발인원 상이하므로 각 대학 홈페이지 확인 필요」 → 「학교마다 선발인원 상이하므로」(실데이터 2700058001)처럼 끊긴 글을 「이름표: 값」 원문으로 보였다.
+      머리 기호(○·※)만 떼고(kosafClean · 서식) 나머지는 재단이 쓴 그대로 · 낱말 판정은 knownValue 와 같은 SAYS_UNKNOWN 한 곳 */
 function kosafNoticeValue(v) {
   const t = kosafClean(v);
-  if (!t || KOSAF_NOISE.test(t)) return '';
-  if (!/확인\s?필요/.test(t)) return t;
-  const rest = t.replace(/(?:\S+\s){0,3}\S*확인\s?필요[요음]*/g, ' ').replace(/\s+/g, ' ').replace(/^[\s·,\-–]+|[\s·,\-–]+$/g, '').trim();
-  return rest.replace(/\s/g, '').length >= 4 ? rest : '';
+  return !t || KOSAF_NOISE.test(t) ? '' : knownValue(t);
 }
 
 /* 카드·시트에 보이는 **혜택 한 줄**. 원문 문단을 통째로 띄우지 않는다 —
@@ -4409,7 +4411,8 @@ function amountDetailRow(m, opt) {
      ⚠️ 순서를 뒤집지 말 것 — `esc()` 뒤에 되돌리면 `&amp;middot;` 가 돼 영영 안 풀린다.
      (2026-09-11 에 `n.title`·`n.deadlineHint` 에서 같은 사고가 있었다. 그때 관문은
       **칸 이름 두 개만** 보는 손 목록이라 이 자리를 못 잡았다 — 관문도 함께 넓혔다.) */
-  /* 재단이 금액 칸에 '모름' 표시만 적어 둔 것(「지원금액: ※ 기관확인필요」)은 인용하지 않는다 — 층2 공고 안내와 같은 규칙(knownValue → kosafNoticeValue · 2026-11-16 리뷰) */
+  /* 인용은 통째로 싣거나 통째로 뺀다 — '모름'류 낱말이 있는 원문·재단 글(「지원금액: ※ 기관확인필요」 · 「… 단, 소득분위 확인 필요」)은 따옴표 안에 싣지 않는다(knownValue · 2026-11-16 2차 리뷰 · 원칙 8-1).
+     자른 글을 원문이라며 보이면 조건이 사라진 문장이 된다 — 그때는 아래 원문 링크만 남는다 */
   const raw = a && a.raw ? knownValue(unent(a.raw)) : '';
   const exRaw = sch.exclusivity && sch.exclusivity.raw ? knownValue(unent(sch.exclusivity.raw)) : '';
   return `<div class="${cls}" data-goto="${esc(sch.id)}" role="button" tabindex="0">

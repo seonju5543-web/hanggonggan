@@ -133,7 +133,14 @@ export default async function gate(eq, ctx) {
     "const u = 'https://a.kr/*x*/'; \nconst r = /\\/\\*/;   const t = `a${  ''}b`;");
   /* 금지 글자 = source-link.js 의 화면 이름 전부(목록을 베껴 적지 않는다 — 이름이 바뀌면 같이 따라온다) + 작업 지시서의 여섯 */
   const labels = new Set(['원문 공고 ↗', '공고 원문 보기 ↗', '원문 보기 ↗', '원문에서 신청하기 ↗', '게시판 목록 ↗', '재단 홈페이지 ↗']);
-  for (const s of Object.values(L.SURFACE_LABELS)) for (const v of Object.values(s)) if (v.length >= 5) labels.add(v);
+  /* 🔴 문제(trouble) 이름은 틀(`원문 공고({t}) ↗`)이다 — 틀 글자만 넣으면 학생이 보는 이름(로봇이 본 것을 채운 것)을 손으로 적어도 안 잡힌다(2026-11-16 2차 리뷰).
+     TROUBLE_TAG 값마다 채운 이름을 다 넣는다 */
+  const tags = Object.values(L.TROUBLE_TAG || {});
+  for (const s of Object.values(L.SURFACE_LABELS)) for (const v of Object.values(s)) {
+    for (const lb of v.includes('{t}') ? tags.map((t) => v.replace('{t}', t)) : [v]) if (lb.length >= 5) labels.add(lb);
+  }
+  eq('  (금지 글자 표가 살아 있다) 문제 이름은 로봇이 본 것마다 채운 꼴로 든다 — 틀 글자(`{t}`)는 없다 · 「원문 보기(열리지 않음) ↗」 같은 이름이 있다',
+    [tags.length >= 3, [...labels].some((x) => x.includes('{t}')), labels.has('원문 보기(열리지 않음) ↗'), labels.has('(원문 로그인 필요) ↗'), labels.has('원문 공고(다른 화면) ↗')], [true, false, true, true, true]);
   const found = [];
   for (const [f, c] of Object.entries(code)) for (const lb of labels) if (c.includes(lb)) found.push(`${f}: ${lb}`);
   eq('(a) app.js·chat.js·data.js 코드에 링크 이름 글자가 없다 — 이름은 source-link.js 한 곳에만 (자리마다 다시 정하면 그 자리만 거짓말한다)', found, []);
@@ -189,8 +196,8 @@ export default async function gate(eq, ctx) {
   /* app.js 발췌 — 링크를 그리는 자리 + 층2를 학생 화면 모양으로 바꾸는 함수(kosafAsScholarships) 그대로 */
   vm.runInContext([
     T.one('ENTITIES'), T.one('ENTITY_RE'), T.one('PARTIAL_ENTITY_END'), T.one('hintText'), T.one('NEWS_THUMB_RE'), T.one('SCHOOL_PHOTO_RE'), T.one('PHOTO_FOCUS_RE'), T.one('CLOSED_KEEP_DAYS'),
-    T.one('KOSAF_ELIG'), T.one('KOSAF_CORE'), T.one('kosafClean'), T.one('KOSAF_NOISE'), T.one('kosafSplit'), T.one('KOSAF_AMOUNT_UNKNOWN'), T.one('TD_DAY'), T.one('TD_DAY_RE'), T.one('TD_DAY_G'), T.fn('isDateBit'), T.fn('splitTitleDates'),
-    ...['esc', 'unent', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'kosafNoticeValue', 'attachPrepTemplate', 'kosafAsScholarships',   // attachPrepTemplate: 층2 지원문서(2026-10-13 ①) — FORM_TEMPLATES 가 없는 자리에선 그대로 돌려준다
+    T.one('KOSAF_ELIG'), T.one('KOSAF_CORE'), T.one('kosafClean'), T.one('KOSAF_NOISE'), T.one('SAYS_UNKNOWN'), T.one('kosafSplit'), T.one('KOSAF_AMOUNT_UNKNOWN'), T.one('TD_DAY'), T.one('TD_DAY_RE'), T.one('TD_DAY_G'), T.fn('isDateBit'), T.fn('splitTitleDates'),
+    ...['esc', 'unent', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'knownValue', 'kosafNoticeValue', 'attachPrepTemplate', 'kosafAsScholarships',   // knownValue: 층2 공고 안내 칸 값(kosafNoticeValue)이 부른다 · attachPrepTemplate: 층2 지원문서(2026-10-13 ①) — FORM_TEMPLATES 가 없는 자리에선 그대로 돌려준다
       'sourceLinkHintHtml', 'attachmentLinkHtml', 'sourceLinkHtml', 'sourceNoteHtml', 'amountSourceLinkHtml',
       'appLogLinkHtml', 'hintShort', 'shortDay', 'noticeCardHtml', 'activityLinkHtml'].map(T.fn),   // shortDay — 카드 수집 날짜를 「10.08」로 (2026-10-10)   // hintShort — 카드 회색 기간 줄(2026-10-04)
     /* kosafAsScholarships 가 읽는 앱 상태 — 저장·신청 내역은 없다(마감 지난 것도 전부 그린다 · 아래 dday 덮어쓰기) */

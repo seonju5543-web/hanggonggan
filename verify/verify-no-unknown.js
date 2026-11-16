@@ -6,6 +6,7 @@
      ① 카드(schCard) ② 상세 시트(openDetail → #detail-sheet) ③ 신청 준비 문서 머리말(지원문서 lead·tag·제출 안내 — prepKindFor 가 고른다)
      ④ 카드·시트 밖의 자리(2026-11-16 리뷰) — 달력·MY 저장 줄(calRowHtml) · 금액 상세 한 줄(amountDetailRow) · 신청 내역 「선정」 줄과 제출처 줄(선정으로 적어 둔 시트) ·
         지원서 초안 학업 계획(generateEssay plan) · 그리고 링크 확인 장부(data/link-check.json)가 문제로 적은 주소의 이름(게시판·소식 카드 · 도우미 · 활동)
+     ⑤ 인용을 자르지 않는다(2026-11-16 2차 리뷰) — 금액 상세 따옴표 안 글은 원문 그대로 · 달력 줄 선발인원·초안 기간은 칸 그대로이거나 없다
    그리고 그 글자에서 「모름 · 미확인 · 원문 확인 · 원문에서 확인 · 확인 필요 · 기한 확인 중 · 정보 입력 필요」 와
    맨 앞 「?」 판정 표시를 센다. 하나라도 있으면 빨간불(어느 공고의 어느 자리인지 찍는다).
    🔴 규칙을 베끼지 않는다 — 앱을 띄워 그 함수를 부른다(what-shows.mjs 와 같은 원칙). 학생은 그 공고 학교 학생으로 둔다(학교 한정 공고는 그 학교 학생에게만 보인다).
@@ -71,7 +72,16 @@ const BASE = {
       } catch (e) { parts.prep = ''; }
       /* ④ 달력 하루 목록·MY 저장 줄은 같은 calRowHtml 이다(저장 단추까지) · 금액 상세 한 줄 · 초안 학업 계획 */
       parts.cal = textOf(calRowHtml(s, { save: true }));
-      parts.amount = textOf(amountDetailRow({ ref: s, won: s.amountValue || 0, mergedFrom: [] }, {}));
+      const amtHtml = amountDetailRow({ ref: s, won: s.amountValue || 0, mergedFrom: [] }, {});
+      parts.amount = textOf(amtHtml);
+      /* 🔴 인용은 통째로 싣거나 통째로 뺀다(2026-11-16 2차 리뷰 · 원칙 8-1) — 따옴표 안 글은 원문(a.raw·exclusivity.raw) 그대로여야 한다 · 달력 줄 선발인원·초안 기간도 칸 그대로이거나 없다.
+         예전엔 「확인 필요」 마디만 떼어 「학교마다 선발인원 상이하므로」(층2 2700058001) 같은 끊긴 글이 나왔다 — 낱말은 없어서 위 낱말 세기로는 못 잡는다 */
+      const qd = document.createElement('div'); qd.innerHTML = amtHtml;
+      const q = qd.querySelector('.ad-src');
+      const quoted = q ? String(q.firstChild && q.firstChild.textContent || '').replace(/^"|"$/g, '') : null;
+      const asIs = [s.amountSpec && s.amountSpec.raw, s.exclusivity && s.exclusivity.raw].filter(Boolean).map((x) => unent(String(x)).trim());
+      parts.cut = [quoted !== null && !asIs.includes(quoted.trim()) ? `금액 인용 「${quoted.slice(0, 40)}」` : '',
+        ...['headcount', 'period'].map((k) => (s[k] && knownValue(s[k]) && knownValue(s[k]) !== String(s[k]).trim() ? `${k} 「${knownValue(s[k]).slice(0, 40)}」` : ''))].filter(Boolean);
       try { parts.essay = generateEssay({ kind: 'plan' }, s, p, { goal: '전공 공부를 이어가겠습니다', career: '연구자' }, {}); } catch (e) { parts.essay = ''; }
       /* 신청 내역 — 선정으로 적어 둔 시트(「선정 · 금액」 줄 · 「최종 제출처」 줄) */
       const keepApps = state.applications;
@@ -127,6 +137,8 @@ const BASE = {
     const key = `${r.where}·${k}·${w}`; tally[key] = (tally[key] || 0) + n;
   }
   const listed = out.rows.filter((r) => r.where === 'registered' && r.listed).length;
+  const cutRows = out.rows.filter((r) => (r.parts.cut || []).length);
+  for (const r of cutRows.slice(0, 6)) console.log(`   ✕ 원문을 잘라 보인다(인용은 통째로 싣거나 뺀다) — ${r.id} ${r.parts.cut.join(' · ')}`);
   /* 결정 1 — 카드에서 뺀 공고가 게시판 새 공고에도 없으면 학생은 그 공고를 영영 못 본다 */
   const lost = out.rows.filter((r) => r.where === 'registered' && !r.listed && r.parts.inFeed === false);
   for (const r of lost) console.log(`   ✕ 카드에서 뺐는데 게시판 새 공고에도 없다 — ${r.id} ${String(r.name).slice(0, 40)}`);
@@ -139,8 +151,8 @@ const BASE = {
   if (errors.length) console.log(errors.slice(0, 5).join('\n'));
   /* 헛돌지 않는다 — 선정 줄을 하나도 못 그렸으면(시트 모양이 바뀌었다) 이 자리는 재지 못한 것이다 */
   if (!out.wonSeen) console.log('   ✕ 신청 내역 「선정」 줄을 한 건도 못 그렸다 — 시트 모양이 바뀌었는지 볼 것(무력해진 검사)');
-  const ok = bad.length === 0 && !lost.length && !errors.length && out.reg > 0 && out.wonSeen > 0;
-  console.log(ok ? `  ✓ 공고 ${out.rows.length}건 화면 어디에도 '모름'류 글자가 없다` : `  ✕ '모름'류 글자가 남은 공고 ${bad.length}건${errors.length ? ` · 페이지 오류 ${errors.length}` : ''}${out.reg ? '' : ' · 정식 등록을 하나도 못 읽었다(무력해진 검사)'}`);
+  const ok = bad.length === 0 && !cutRows.length && !lost.length && !errors.length && out.reg > 0 && out.wonSeen > 0;
+  console.log(ok ? `  ✓ 공고 ${out.rows.length}건 화면 어디에도 '모름'류 글자가 없다` : `  ✕ '모름'류 글자가 남은 공고 ${bad.length}건${cutRows.length ? ` · 원문을 잘라 보인 공고 ${cutRows.length}건` : ''}${errors.length ? ` · 페이지 오류 ${errors.length}` : ''}${out.reg ? '' : ' · 정식 등록을 하나도 못 읽었다(무력해진 검사)'}`);
   await browser.close();
   process.exit(ok ? 0 : 1);
 })().catch((e) => { console.error(e); process.exit(1); });

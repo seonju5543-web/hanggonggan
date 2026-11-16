@@ -141,6 +141,8 @@ function serve() {
   const LFX = {
     regMark: 'https://example.ac.kr/bbs/list.do#n-%EA%B2%80%EC%82%AC%EC%9A%A9',
     badUrl: 'https://example.ac.kr/view.do?seq=990',
+    /* ⑥ 넣어 둔 주소인데 로봇이 그 주소도 문제로 확정한 것(열리지 않음) — 그 줄이 학생 이름을 화면과 같게 말하는지 본다(2026-11-16 2차 리뷰) */
+    fixBadUrl: 'https://example.ac.kr/view.do?seq=991',
     newsMark: 'https://news.example.ac.kr/bbs/list.do#n-%EC%86%8C%EC%8B%9D',
     newsFile: 'verify-linkfix-news.json',
     due: new Date(Date.now() + 9 * 3600e3 + 20 * 86400e3).toISOString().slice(0, 10),
@@ -247,7 +249,12 @@ function serve() {
     }
     if (rel === 'data/link-check.json') {
       const db = JSON.parse(body);
-      db.bad = { ...(db.bad || {}), [LFX.badUrl]: { v: 'other', at: '2026-10-03' } };
+      db.bad = { ...(db.bad || {}), [LFX.badUrl]: { v: 'other', at: '2026-10-03' }, [LFX.fixBadUrl]: { v: 'gone', at: '2026-10-03' } };
+      body = JSON.stringify(db);
+    }
+    if (rel === 'data/link-fixes.json') {
+      const db = JSON.parse(body);
+      db.fix = { ...(db.fix || {}), 'id:verify-linkfix-gone': { url: LFX.fixBadUrl, by: '검사', at: '2026-10-03', title: '검사용 넣어 둔 주소' } };
       body = JSON.stringify(db);
     }
     if (rel === 'data/news/index.json') {
@@ -2273,6 +2280,17 @@ function serve() {
     const troubleTags = Object.values(require(path.join(__dirname, '..', 'source-link.js')).TROUBLE_TAG);
     ok(bad && bad.group === 'bad' && troubleTags.some((t) => bad.label.includes(`(${t})`)) && !/확인 필요/.test(bad.label),
       '  로봇이 확정한 문제 — ⑤ 묶음 · 로봇이 본 것을 이름에 말한다(「(다른 화면)」 등 · 「확인 필요」 아님)', JSON.stringify(bad));
+    /* 🔴 관리자에게 학생 화면을 설명하는 글도 화면과 같은 이름을 말한다(2026-11-16 2차 리뷰 — ⑤ 설명·⑥ 줄·안내 문단이 예전 「(확인 필요)」 를 그대로 말했다).
+       기대 이름은 화면과 같은 source-link.js 표에서 만든다(베껴 적지 않는다) */
+    const SLX = require(path.join(__dirname, '..', 'source-link.js'));
+    const want = troubleTags.map((t) => SLX.SURFACE_LABELS.detail.trouble.replace('{t}', t));
+    const lfTexts = await page.evaluate(() => {
+      const t = (sel) => (document.querySelector(sel) || {}).textContent || '';
+      const fixed = [...document.querySelectorAll('#link-fix-slot [data-lf-fixed]')].find((x) => x.dataset.lfFixed === 'id:verify-linkfix-gone');
+      return { bad: t('#link-fix-slot [data-lf-group="bad"] p.muted'), note: t('#link-fix-slot [data-lf-note]'), fixed: fixed ? fixed.textContent : '', all: t('#link-fix-slot') };
+    });
+    ok(want.every((w) => lfTexts.bad.includes(w) && lfTexts.note.includes(w)) && /학생에게는 「원문 공고\(열리지 않음\) ↗」로 보입니다/.test(lfTexts.fixed) && !/확인 필요/.test(lfTexts.all),
+      `  관리자 설명도 학생 화면과 같은 이름 — ⑤ 설명·안내 문단에 ${want.join('·')} · 문제로 확정된 넣어 둔 주소(⑥)는 그 줄의 이름 그대로 · 「확인 필요」 없음`, JSON.stringify({ bad: lfTexts.bad.slice(-160), note: lfTexts.note.slice(0, 200), fixed: lfTexts.fixed.slice(0, 300) }));
     ok(reg && /noreferrer/.test(reg.now || ''), '  「지금 링크 열기」는 학생처럼 리퍼러 없이 연다');
     const regSel = '#link-fix-slot [data-lf-row="id:verify-linkfix-reg"]';
     await page.fill(`${regSel} [data-lf-url]`, 'https://example.ac.kr/bbs/list.do#n-%EB%8B%A4%EB%A5%B8');
