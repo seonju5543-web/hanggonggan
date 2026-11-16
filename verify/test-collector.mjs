@@ -15110,59 +15110,146 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
     [v({ title: '2026년도 통영시 저소득 대학생 장학금 지원 대상자 선발 안내' }).kept.title !== '', v({ title: '통영시 장학금 안내' }).kept.title, v({ host: '통영시' }).kept.host, v({ host: '통영시청 평생교육과' }).kept.host], [true, '', '통영시', '']);
   eq('  응답 꼴이 깨져도 넘어지지 않고 전부 버린다', [CR.verify(null, SRC, ITEM).kept.eligibility, CR.verify({ eligibility: 'x', deadline: 3 }, SRC, ITEM).kept.deadline], [[], null]);
 
-  /* ② 두 번 읽기 일치 */
+  /* ①-2 2026-11-15 독립 리뷰가 실제로 통과시킨 우회로들 — 서로 다른 문장의 숫자·부정이 섞인 줄은 기계 대조에서 떨어져야 한다 */
+  const glue = (src, line, field = 'eligibility') => CR.verify({ ...base, [field]: [line] }, src, ITEM).kept[field].length;
+  eq('🔴 떨어진 조각 잇기는 가까이·차례대로·틈에 숫자와 부정이 없을 때만 — 다른 문장의 숫자·부정이 섞인 줄은 버린다',
+    [glue('평점 2.5 이상인 자\n우대: 평점 3.0 미만은 감점', '평점 3.0 이상인 자'),
+      glue('학자금 지원구간 8구간 이하인 자\n다자녀 가구 3구간 이하인 자 우대', '학자금 지원구간 3구간 이하인 자'),
+      glue('타 장학금을 받지 않은 자\n국가장학금을 받은 자는 제외', '타 장학금을 받은 자'),
+      glue('생활비 학기당 100만원\n등록금은 연간 최대 500만원', '생활비 학기당 500만원', 'amount'),
+      glue('가. 2026학년도 2학기 현재 본교 학부에 재학 중인 자로서 직전학기 평점평균 2.0 이상인 자\n4. 우대사항 가. 직전학기 평점평균 3.5 이상인 자는 서류심사 가점', '2026학년도 2학기 현재 본교 학부에 재학 중인 자로서 직전학기 평점평균 3.5 이상인 자')],
+    [0, 0, 0, 0, 0]);
+  eq('  숫자 사이 쉼표는 쪼개지 않는다 — 원문 「1,000,000원」 으로 「2,000,000원」 이 통과하지 않는다 · 같은 금액은 통과',
+    [glue('장학금 1,000,000원 지급', '2,000,000원', 'amount'), glue('학기당 1,000,000원, 생활비 500,000원', '학기당 1,500,000원', 'amount'), glue('장학금 1,000,000원 지급', '장학금 1,000,000원', 'amount')], [0, 0, 1]);
+  eq('  🔴 끝말 고침의 부정 막이 — 원문에서 줄기 뒤가 잇는 말(「하고」)이어도 곧 부정이 오면 버린다 (「수혜하고 있지 않은 자」 → 「수혜한 자」)',
+    [glue('가. 타 장학금을 수혜하고 있지 않은 자', '타 장학금을 수혜한 자'), glue('가. 직전 학기 12학점 이상을 취득하고, 성실한 자', '직전 학기 12학점 이상을 취득한 자')], [0, 1]);
+  const dl = (src, date, quote, item = ITEM) => (CR.verify({ ...base, deadline: { date, quote } }, src, item).kept.deadline || {}).date || null;
+  eq('  마감 — 월·일이 문구에 **붙어** 있어야 하고 · 문구에 연도가 있으면 그 연도 · 진짜 날짜 · 게시일보다 이르지 않아야 한다',
+    [dl('11명 선발, 23일 발표', '2026-11-23', '11명 선발, 23일 발표'), dl('접수: 2025.11.2 ~ 2025.11.23', '2026-11-23', '접수: 2025.11.2 ~ 2025.11.23'), dl('접수 13.45까지', '2026-13-45', '접수 13.45까지'),
+      dl('접수기간: 12.20 ~ 1.10', '2026-01-10', '접수기간: 12.20 ~ 1.10', { ...ITEM, listedAt: '2026-11-10' }), dl('접수기간: 2026. 11. 18(수)부터 2026. 11. 26.(목)까지', '2026-11-26', '접수기간: 2026. 11. 18(수)부터 2026. 11. 26.(목)까지'),
+      dl('신청: 12월 04일 17시까지', '2026-12-04', '신청: 12월 04일 17시까지')], [null, null, null, null, '2026-11-26', '2026-12-04']);
+
+  /* ② 두 번 읽기 일치 — 줄 대 줄 · 긴 쪽으로 나눔 · 숫자와 부정·비교 낱말이 같아야 (리뷰 C1 — 한쪽의 실수가 혼자 실렸다) */
+  eq('② 숫자·부정·비교가 다르면 같은 줄이 아니다 · 한쪽이 잘린 줄도 아니다 · 끝말만 다른 줄은 같은 줄',
+    [CR.sameLine('직전학기 평점평균 3.5 이상인 자', '직전학기 평점평균 2.0 이상인 자'), CR.sameLine('직전학기 평점평균 3.0 이상인 자', '직전학기 평점평균 3.0 미만인 자'),
+      CR.sameLine('타 장학금을 받지 않는 자', '타 장학금을 받는 자'), CR.sameLine('서울시 거주자', '서울시 거주자가 아닌 자로서 본교 기숙사에 입사한 학생'), CR.sameLine('본교 재학생 중 3학년', '본교 재학생 중 3학년 제외'),
+      CR.sameLine('직전학기 12학점 이상 이수자', '직전학기 2학점 이상 이수자'), CR.sameLine('학업성적 평균 C학점 이상을 취득한 자', '학업성적 평균 C학점 이상을 취득한 학생')],
+    [false, false, false, false, false, false, true]);
+  const three = ['「국민기초생활 보장법」에 따른 기초생활수급자 및 차상위 계층 대학생', '학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 자', '관내 고등학교 졸업자로, 공고일 현재 주민등록상 6년 이상 통영시에 주소를 두고, 통영시 관내 학교를 6년 이상 다닌 자'];
+  eq('  줄을 다르게 나눴을 뿐이면(한쪽 세 줄 · 한쪽 한 줄) 칸 전체가 같은 말이라 싣는다 · 숫자 하나가 다르면 아니다',
+    [CR.fieldAgree(three, [three.join(' ')]), CR.fieldAgree(three, [three.join(' ').replace('6년 이상 통영시', '3년 이상 통영시')]), CR.fieldAgree(three, three.slice(0, 2))], [true, false, false]);
   const A1 = v({ eligibility: ['학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 자', '「국민기초생활 보장법」에 따른 기초생활수급자 및 차상위 계층 대학생'], excludes: ['대학원생, 휴학생'],
-    amount: ['1인당 상한액 100만 원'], deadline: { date: '2026-11-23', quote: '신청기간: 2026.11.2.(월)~2026.11.23.(월)' } });
+    amount: ['1인당 상한액 100만 원'], apply: ['방문 또는 우편 신청'], deadline: { date: '2026-11-23', quote: '신청기간: 2026.11.2.(월)~2026.11.23.(월)' } });
   const B1 = v({ eligibility: ['학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 학생'], notes: ['대학원생, 휴학생'],
-    amount: ['1인당 상한액 100만 원'], deadline: { date: '2026-11-02', quote: '신청기간: 2026.11.2.(월)~2026.11.23.(월)' } });
+    amount: ['1인당 상한액 100만 원'], apply: ['방문 또는 우편 신청', '신청기간: 2026.11.2.(월)~2026.11.23.(월)'], deadline: { date: '2026-11-02', quote: '신청기간: 2026.11.2.(월)~2026.11.23.(월)' } });
   const ag = CR.agree(A1, B1, ITEM);
-  eq('② 끝말만 다른 줄은 같은 줄로 싣고, 한쪽에만 있는 줄·칸이 갈린 줄(제외 ↔ 유의)·마감이 다른 것은 싣지 않고 넘긴다',
-    [ag.final.eligibility.length, ag.final.excludes, ag.final.notes, ag.final.amount.length, ag.final.deadline, ag.held.length >= 4], [1, [], [], 1, null, true]);
+  eq('  🔴 자격·제외·서류는 한 줄이라도 갈리면 **칸 전체를 싣지 않는다**(null = 무료 길 값) — 빠진 요건 한 줄이 틀린 안심이 된다 · 방법은 맞은 줄만 · 마감이 다르면 싣지 않는다',
+    [ag.final.eligibility, ag.final.excludes, ag.final.notes, ag.final.amount, ag.final.apply, ag.final.deadline, ag.held.length >= 4], [null, null, null, ['1인당 상한액 100만 원'], ['방문 또는 우편 신청'], null, true]);
   eq('  「연장」 공고는 두 읽기가 같아도 마감을 싣지 않는다 (받아 두지 못한 연장 공고문이 진짜 마감을 갖고 있을 수 있다)',
     [CR.agree(A1, A1, ITEM).final.deadline?.date || null, CR.agree(A1, A1, { ...ITEM, attachments: [{ name: '2026년 든든 학업지원금 연장 공고문.pdf' }] }).final.deadline], ['2026-11-23', null]);
   eq('    첨부 이름이 본문 글자에만 있어도 잡는다 · 사이트 메뉴의 「로그인 연장하기」 는 연장 공고가 아니다',
     [CR.agree(A1, A1, ITEM, '첨부파일\n2026년 든든 학업지원금 연장 공고문.pdf (72.7KB)').final.deadline, CR.agree(A1, A1, ITEM, '로그인 시간을 연장하시려면 로그인 연장하기 버튼을 클릭').final.deadline?.date || null], [null, '2026-11-23']);
   const wonIn = createRequire(import.meta.url)('../parse-amount.js').wonIn;
-  const be = CR.buildEntry(ITEM, SRC, { ...base, eligibility: A1.kept.eligibility, amount: ['1인당 상한액 100만 원'] }, { ...base, eligibility: A1.kept.eligibility, amount: ['1인당 상한액 100만 원'] }, wonIn);
-  eq('  한 건 만들기 — 맨 위 금액은 문구에서 숫자만 · 둘 다 「읽을 내용 없음」이거나 실을 줄이 없으면 싣지 않는다(무료 길 그대로)',
-    [be.entry.head, be.entry.eligibility.length, CR.buildEntry(ITEM, SRC, { ...base, unreadable: true }, { ...base, unreadable: true }, wonIn).entry, CR.buildEntry(ITEM, SRC, base, base, wonIn).entry], [1000000, 2, null, null]);
+  const full = { ...base, eligibility: A1.kept.eligibility, amount: ['1인당 상한액 100만 원'] };
+  const be = CR.buildEntry(ITEM, SRC, full, full, wonIn);
+  eq('  한 건 만들기 — 맨 위 금액은 문구에서 숫자만 · 총액·범위 줄에서는 안 집는다 · 둘 다 「읽을 내용 없음」이면 줄이 있어도 싣지 않는다 · 실을 줄이 없어도',
+    [be.entry.head, be.entry.eligibility.length, CR.headAmount({ amount: ['총 장학금 1억원 (1인당 200만원)'], multi: false }, ITEM, wonIn), CR.headAmount({ amount: ['1,200천원 ~ 1,800천원'], multi: false }, ITEM, wonIn),
+      CR.buildEntry(ITEM, SRC, { ...full, unreadable: true }, { ...full, unreadable: true }, wonIn).entry, CR.buildEntry(ITEM, SRC, base, base, wonIn).entry], [1000000, 2, 0, 0, null, null]);
   eq('  지시문이 바뀌면 원문이 같아도 해시가 달라진다(다시 읽는다) · 같은 원문은 같은 해시', [CR.sourceHash('가') === CR.sourceHash('가'), CR.sourceHash('가') === CR.sourceHash('나'), /update\(SYSTEM\)/.test(readText(new URL('../collector/card-read.mjs', import.meta.url)))], [true, false, true]);
+  eq('  🔴 내려갔는지는 유료가 읽은 마감으로 잰다 — 무료 길 마감(접수 시작일)이 지났어도 바로잡은 마감 전이면 결과를 지우지 않는다',
+    [CR.closedNow({ id: 'q', deadline: '2026-11-18', listedAt: '2026-11-10' }, { deadline: { date: '2026-11-26', quote: 'x' } }, '2026-11-19'), CR.closedNow({ id: 'q', deadline: '2026-11-18', listedAt: '2026-11-10' }, null, '2026-11-19')], [false, true]);
+  eq('  결과 파일 꼴 검사 — 줄 칸은 글자 배열 또는 null · 마감은 날짜 · 금액은 0 이상의 정수',
+    [CR.checkData({ items: { a: { ...be.entry, hash: 'x' } } }).length, CR.checkData({ items: { a: { ...be.entry, hash: 'x', eligibility: 'x' } } }).length > 0, CR.checkData({ items: { a: { ...be.entry, hash: 'x', head: '100' } } }).length > 0, CR.checkData({ items: [] }).length > 0], [0, true, true, true]);
 
-  /* ③ 진짜 로봇을 임시 폴더에서 — 스위치 · 가짜 응답 · 같은 원문 다시 안 읽기 · registered.json 안 건드림 */
-  const soon = new Date(Date.now() + 20 * 86400000).toISOString().slice(0, 10);
-  const body = `${SRC}\n${'장학금 지원 대상자 선발 안내 본문입니다 '.repeat(12)}`;
-  const regItem = { id: 'x-1', name: ITEM.name, type: '교외', sourceUrl: 'https://example.ac.kr/notice?no=1', deadline: soon, listedAt: new Date().toISOString().slice(0, 10), amountValue: 0, attachments: [], eligibility: {} };
-  const regText = `${JSON.stringify({ items: [regItem] }, null, 1)}\n`;
+  /* ③ 진짜 로봇을 임시 폴더에서 — 스위치 · 상한 · 가짜 응답 · 같은 원문 다시 안 읽기 · 응답 원본으로 다시 재기 · registered.json 안 건드림.
+     ⚠️ 날짜는 오늘에서 센다(마감 = 20일 뒤) — 박아 두면 그날이 지나면서 이 검사가 저절로 빨개진다 */
+  const plus = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+  const soon = plus(20), [sy, sm, sd] = soon.split('-').map(Number);
+  const QUOTE = `신청기간: ${sy}.${sm}.${sd}.까지`;
+  const body = `${SRC}\n${QUOTE}\n${'장학금 지원 대상자 선발 안내 본문입니다 '.repeat(12)}`;
+  const mk = (id, n) => ({ id, name: ITEM.name.replace('통영시', `통영${n}시`), type: '교외', sourceUrl: `https://example.ac.kr/notice?no=${n}`, deadline: plus(3), listedAt: plus(-1), amountValue: 0, attachments: [], eligibility: {} });
+  const regItems = [mk('x-1', 1), mk('x-2', 2)];
+  const regText = `${JSON.stringify({ items: regItems }, null, 1)}\n`;
   const sb = crSandbox(new URL('../', import.meta.url), 'hdj-card-read-');
+  const NOENV = { CARD_READ_ENABLE: '', CARD_READ_FAKE: '', ANTHROPIC_API_KEY: '' };   // 부르는 쪽 환경에 켜져 있어도 이 검사는 꺼진 채로 잰다
   try {
     sb.write('data/registered.json', regText);
-    sb.write('collector/extracted/notices-text.json', [{ title: ITEM.name, school: '시험대학교', url: regItem.sourceUrl, text: body }]);
-    const off = sb.run('collector/card-read.mjs', ['--write'], {}, 30000);
+    sb.write('collector/extracted/notices-text.json', regItems.map((it) => ({ title: it.name, school: '시험대학교', url: it.sourceUrl, text: body.replace('통영시 저소득', `${it.name.includes('통영1시') ? '통영1시' : '통영2시'} 저소득`) })));
+    const off = sb.run('collector/card-read.mjs', ['--write'], NOENV, 30000);
     eq('③ 스위치가 꺼져 있으면(설정 파일 없음 = 꺼짐 · CARD_READ_ENABLE 없음) --write 여도 부르지 않고 0 으로 끝난다 · 결과 파일을 만들지 않는다',
       [off.status, /부르지 않았습니다/.test(off.out), sb.exists('data/card-read.json')], [0, true, false]);
     sb.write('collector/card-read-config.json', { enabled: true });
-    const half = sb.run('collector/card-read.mjs', ['--write'], {}, 30000);
-    eq('  설정만 켜져 있고 환경 변수가 없으면 여전히 부르지 않는다 (스위치는 둘 다여야 한다)', [half.status, /부르지 않았습니다/.test(half.out), sb.exists('data/card-read.json')], [0, true, false]);
-    const good = { ...base, title: '2026년도 통영시 저소득 대학생 장학금 지원 대상자 선발 안내', host: '통영시',
-      eligibility: ['학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 자', '재산 3억 이하인 자'], excludes: ['대학원생, 휴학생'], amount: ['1인당 상한액 100만 원'],
-      deadline: { date: '2026-11-23', quote: '신청기간: 2026.11.2.(월)~2026.11.23.(월)' }, apply: ['방문 또는 우편 신청'] };
-    sb.write('fake.json', { 'x-1': { a: good, b: { ...good, eligibility: good.eligibility.slice(0, 1) } } });
-    const run1 = sb.run('collector/card-read.mjs', ['--write'], { CARD_READ_FAKE: sb.abs('fake.json') }, 30000);
-    const got = (sb.json('data/card-read.json') || {}).items || {}, led = sb.json('collector/card-read-ledger.json') || {};
-    eq('  가짜 응답으로 돌리면 결과 파일에 그 공고가 실린다 — 지어낸 줄(「재산 3억 이하」)은 빠지고 · 금액 숫자 · 마감 · 장부에 버린 줄이 남는다',
-      [run1.status, (got['x-1'] || {}).eligibility, (got['x-1'] || {}).head, ((got['x-1'] || {}).deadline || {}).date, (led['x-1'] || {}).done, ((led['x-1'] || {}).dropped || []).length],
-      [0, ['학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 자'], 1000000, '2026-11-23', true, 1]);
+    const half = sb.run('collector/card-read.mjs', ['--write'], NOENV, 30000);
+    sb.write('collector/card-read-config.json', { enabled: false });
+    const half2 = sb.run('collector/card-read.mjs', ['--write'], { ...NOENV, CARD_READ_ENABLE: '1' }, 30000);
+    eq('  스위치는 둘 다여야 한다 — 설정만 켜져도 · 환경 변수만 있어도 부르지 않는다',
+      [half.status, /부르지 않았습니다/.test(half.out), half2.status, /부르지 않았습니다/.test(half2.out), sb.exists('data/card-read.json')], [0, true, 0, true, false]);
+    const good = { ...base, title: '', host: '통영시',
+      eligibility: ['학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 자'], excludes: ['대학원생, 휴학생'], amount: ['1인당 상한액 100만 원'],
+      deadline: { date: soon, quote: QUOTE }, apply: ['방문 또는 우편 신청'], notes: ['재산 3억 이하인 자'] };
+    sb.write('fake.json', { 'x-1': { a: good, b: good }, 'x-2': { a: good, b: { ...good, eligibility: ['학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 자', '타 장학금을 수혜하지 않고, 학업에 성실한 자'] } } });
+    sb.write('collector/card-read-config.json', { enabled: false, maxPerRun: 1 });
+    const run1 = sb.run('collector/card-read.mjs', ['--write'], { ...NOENV, CARD_READ_FAKE: sb.abs('fake.json') }, 30000);
+    let got = (sb.json('data/card-read.json') || {}).items || {}, led = sb.json('collector/card-read-ledger.json') || {};
+    eq('  한 실행 상한(maxPerRun 1) — 두 건 중 한 건만 읽고 멈춘다', [run1.status, Object.keys(got).length, /상한 1건에 닿아 멈춥니다/.test(run1.out)], [0, 1, true]);
     if (run1.status !== 0) console.log(run1.out.slice(-800));
+    sb.write('collector/card-read-config.json', { enabled: false });
+    const run1b = sb.run('collector/card-read.mjs', ['--write'], { ...NOENV, CARD_READ_FAKE: sb.abs('fake.json') }, 30000);
+    got = (sb.json('data/card-read.json') || {}).items || {}; led = sb.json('collector/card-read-ledger.json') || {};
+    eq('  가짜 응답으로 돌리면 결과 파일에 실린다 — 지어낸 줄(「재산 3억 이하」)은 빠지고 · 마감 · 금액 숫자 · 장부에 버린 줄과 **응답 원본**이 남는다',
+      [run1b.status, (got['x-1'] || {}).eligibility, (got['x-1'] || {}).notes, ((got['x-1'] || {}).deadline || {}).date, (got['x-1'] || {}).head, (led['x-1'] || {}).done, ((led['x-1'] || {}).dropped || []).length, !!((led['x-1'] || {}).raw || {}).a],
+      [0, ['학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 자'], [], soon, 1000000, true, 2, true]);
+    eq('  두 읽기가 자격에서 갈린 공고는 자격 칸을 싣지 않는다(null) — 다른 칸은 싣는다', [(got['x-2'] || {}).eligibility, (got['x-2'] || {}).excludes, ((led['x-2'] || {}).held || []).length], [null, ['대학원생, 휴학생'], 1]);
     eq('  🔴 registered.json 은 한 글자도 안 바뀐다 (무료 길 값이 비상망으로 남는다)', sb.read('data/registered.json') === regText, true);
-    const run2 = sb.run('collector/card-read.mjs', ['--write'], { CARD_READ_FAKE: sb.abs('fake.json') }, 30000);
-    eq('  같은 원문은 다시 읽지 않는다 (대상 0건) · 실린 것은 그대로', [/대상 0건/.test(run2.out), Object.keys((sb.json('data/card-read.json') || {}).items || {})], [true, ['x-1']]);
-    sb.write('data/registered.json', { items: [{ ...regItem, deadline: '2020-01-01' }] });
-    sb.run('collector/card-read.mjs', ['--write'], { CARD_READ_FAKE: sb.abs('fake.json') }, 30000);
-    eq('  마감이 지나 학생 화면에서 내려간 공고는 결과 파일에서도 뺀다', Object.keys((sb.json('data/card-read.json') || {}).items || {}), []);
+    const run2 = sb.run('collector/card-read.mjs', ['--write'], { ...NOENV, CARD_READ_FAKE: sb.abs('fake.json') }, 30000);
+    eq('  같은 원문은 다시 읽지 않는다 (대상 0건) · 실린 것은 그대로', [/대상 0건/.test(run2.out), Object.keys((sb.json('data/card-read.json') || {}).items || {}).sort()], [true, ['x-1', 'x-2']]);
+    /* 응답 원본으로 다시 재기 — 결과 파일을 비운 뒤 --recheck 가 돈 없이 되살린다(규칙을 고친 뒤 이 길로 다시 잰다) */
+    sb.write('data/card-read.json', { items: {} });
+    const rc = sb.run('collector/card-read.mjs', ['--recheck', '--write'], NOENV, 30000);
+    eq('  --recheck 는 장부의 응답 원본으로 결과를 다시 만든다(스위치가 꺼져 있어도 · 돈 0)', [rc.status, Object.keys((sb.json('data/card-read.json') || {}).items || {}).sort(), /\$0/.test(rc.out)], [0, ['x-1', 'x-2'], true]);
+    const chk = sb.run('collector/card-read.mjs', ['--check'], NOENV, 30000);
+    sb.write('data/card-read.json', { items: { 'x-1': { eligibility: 'x' } } });
+    const chkBad = sb.run('collector/card-read.mjs', ['--check'], NOENV, 30000);
+    eq('  --check — 멀쩡한 결과 파일은 0 · 꼴이 깨진 파일은 1 로 끝난다', [chk.status, chkBad.status], [0, 1]);
+    sb.write('data/card-read.json', '{ "items": { ');
+    const broken = sb.run('collector/card-read.mjs', ['--write'], { ...NOENV, CARD_READ_FAKE: sb.abs('fake.json') }, 30000);
+    eq('  깨진 결과 파일을 빈 것으로 읽고 이어 가지 않는다 — 멈춘다(전부 다시 읽으면 돈이 다시 나간다)', [broken.status, /깨진 파일/.test(broken.out)], [1, true]);
+    sb.write('data/card-read.json', { items: { 'x-1': got['x-1'], 'x-2': got['x-2'] } });
+    sb.write('data/registered.json', { items: [regItems[0]] });
+    sb.run('collector/card-read.mjs', ['--write'], { ...NOENV, CARD_READ_FAKE: sb.abs('fake.json') }, 30000);
+    eq('  목록에서 빠진 공고는 결과 파일과 장부에서도 뺀다', [Object.keys((sb.json('data/card-read.json') || {}).items || {}), Object.keys(sb.json('collector/card-read-ledger.json') || {})], [['x-1'], ['x-1']]);
   } finally { sb.done(); }
   const robot = readText(new URL('../collector/card-read.mjs', import.meta.url));
-  eq('  로봇이 registered.json 에 쓰는 줄이 없다 · 유료 호출은 스위치 둘 뒤에만 · 넘어져도 저장(finally save)',
-    [/writeFileSync\([^)]*registered/.test(robot), /cfg\.enabled === true && process\.env\.CARD_READ_ENABLE === '1'/.test(robot), /finally \{\s*data\.updatedAt = TODAY;\s*save\(\);/.test(robot)], [false, true, true]);
+  eq('  로봇이 registered.json 에 쓰는 줄이 없다 · 유료 호출은 스위치 둘 뒤에만 · 건마다 저장 + 넘어져도 저장 · 한쪽이 실패해도 쓴 돈을 센다(allSettled) · 연달아 실패하면 멈춘다 · 실패가 있으면 빨갛게 끝낸다',
+    [/writeFileSync\([^)]*registered/.test(robot), /cfg\.enabled === true && process\.env\.CARD_READ_ENABLE === '1'/.test(robot), /save\(\);   \/\/ 건마다 저장/.test(robot) && /finally \{\s*save\(\);/.test(robot),
+      /Promise\.allSettled\(/.test(robot) && !/Promise\.all\(\[ask/.test(robot), /if \(streak >= 3\)/.test(robot), /if \(failed\) process\.exit\(1\);/.test(robot)], [false, true, true, true, true, true]);
+  const wf = readText(new URL('../.github/workflows/card-read.yml', import.meta.url));
+  eq('  워크플로 — 사전 관문 단계에 pipefail(관문이 빨가면 유료 단계가 안 돈다) · 저장 전 꼴 검사(--check) · 걸리면 되돌리고 빨갛게',
+    [/set -o pipefail\n\s+node verify\/test-collector\.mjs \| tail/.test(wf), /node collector\/card-read\.mjs --check/.test(wf), /git checkout -- data\/card-read\.json collector\/card-read-ledger\.json[\s\S]{0,200}exit 1/.test(wf)], [true, true, true]);
+
+  /* ④ 앱에 얹기(match-engine withCardRead) — 화면 드라이버(verify-card-read.js)가 못 재는 갈래를 여기서 잰다 */
+  const MEc = createRequire(import.meta.url)('../match-engine.js');
+  const free = { id: 'f-1', name: '표본 장학생 선발', provider: '주관 기관 원문 확인', amount: '금액 원문 확인', amountValue: 0, deadline: '2026-11-18', openDate: '2026-11-10', period: '접수 ~2026-11-18',
+    eligibility: {}, eligibilityLines: ['직전 학기 평점 3.5 이상인 자'], eligibilityExcludes: ['휴학생 제외'], documents: ['재학증명서'], excerpts: ['문의처: 장학팀 ☎650-2622', '3) 장학금 지급 금액 : 연간 300만원'] };
+  const paid = { host: '표본재단', eligibility: ['직전 학기 평점 3.0 이상인 자'], excludes: ['대학원생'], priority: [], amount: ['연간 300만원'], head: 3000000, deadline: { date: '2026-11-26', quote: 'x' }, apply: ['온라인 신청'], documents: ['성적증명서'], notes: ['중복수령 불가'], multi: false };
+  const o1 = MEc.withCardRead(free, paid);
+  eq('④ 유료가 읽은 칸은 유료 값으로 — 자격·제외·서류·마감·주최 · 금액은 무료 길이 못 읽었을 때만 · 문의처 발췌는 남는다 · 원본 객체는 안 바뀐다',
+    [o1.eligibilityLines, o1.eligibilityExcludes, o1.documents, o1.deadline, o1.provider, o1.amountValue, o1.excerpts.some((x) => /문의처/.test(x)), o1.excerpts.some((x) => /3\) 장학금/.test(x)), free.eligibilityLines[0]],
+    [['직전 학기 평점 3.0 이상인 자'], ['대학원생'], ['성적증명서'], '2026-11-26', '표본재단', 3000000, true, false, '직전 학기 평점 3.5 이상인 자']);
+  const o2 = MEc.withCardRead({ ...free, amountValue: 6000000, amount: '600만원' }, { ...paid, eligibility: null, excludes: null, documents: null });
+  eq('  🔴 갈려서 안 실은 칸(null)은 무료 길 값 그대로 — 자격·제외·서류가 비지 않는다 · 무료 길이 읽은 금액은 안 덮는다 · 거르기도 무료 길로',
+    [o2.eligibilityLines, o2.eligibilityExcludes, o2.documents, o2.amountValue, Array.isArray(o2.cardRead.eligibility)], [free.eligibilityLines, free.eligibilityExcludes, free.documents, 6000000, false]);
+  const o3 = MEc.withCardRead({ ...free, deadlineFrom: '관리자 2026-11-10', documentsFrom: '관리자 2026-11-10', eligibilityFrom: '관리자 2026-11-10' }, paid);
+  eq('  🔴 관리자가 고친 칸(마감·서류·자격)은 덮지 않는다', [o3.deadline, o3.documents, o3.eligibilityLines], ['2026-11-18', ['재학증명서'], free.eligibilityLines]);
+  eq('  꼴이 틀린 항목은 아무것도 안 바꾼다 — 빈 객체 · 숫자 주최 · 글자 금액', [MEc.withCardRead(free, {}).eligibilityLines, MEc.withCardRead(free, { host: 123, head: '3000000' }).provider, MEc.withCardRead(free, { host: 123, head: '3000000' }).amountValue], [free.eligibilityLines, free.provider, 0]);
+  const stu = { school: '한국외국어대학교', track: 'arts', major: '회화과', year: 3, status: '재학', gpa: 2.5, bracket: 5, credits: 15, region: '서울', parentRegion: '서울', nationality: 'foreign', birthYear: 2004, flags: [] };
+  const fd = (cr) => MEc.fitDetail(MEc.withCardRead({ ...free, eligibilityExcludes: [] }, { ...paid, excludes: [], ...cr }), stu);
+  eq('  묶인 공고(multi)는 한 종의 요건으로 미달을 내지 않는다 · 묶이지 않은 공고는 미달', [fd({ multi: true, eligibility: ['직전 학기 평점 3.5 이상인 자'] }).fails.length, fd({ eligibility: ['직전 학기 평점 3.5 이상인 자'] }).fails.length], [0, 1]);
+  eq('  제외 줄 — 「외국인 유학생」「예체능 계열 재학생」 은 무료 길과 똑같이 미달 · 장학금 수혜자 줄의 장학금 이름 속 낱말(지역대학생)은 판정 안 함',
+    [fd({ eligibility: ['대학교 재학생'], excludes: ['외국인 유학생'] }).fails.length, fd({ eligibility: ['대학교 재학생'], excludes: ['예체능 계열 재학생'] }).fails.length,
+      fd({ eligibility: ['대학교 재학생'], excludes: ['2026년도 통영시 성적우수 장학금, 지역대학생 장학금, 인재육성장학금 수혜자'] }).fails.length], [1, 1, 0]);
+  eq('  applyCardRead — 결과 파일에 없는 공고는 같은 객체 그대로 · 파일이 없거나 꼴이 틀리면 목록 그대로',
+    [MEc.applyCardRead([free], { items: {} })[0] === free, MEc.applyCardRead([free], null)[0] === free, MEc.applyCardRead([free], { items: [] })[0] === free, MEc.applyCardRead([free], { items: { 'f-1': paid } })[0].provider], [true, true, true, '표본재단']);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

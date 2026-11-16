@@ -36,7 +36,7 @@ jobs:
   read:
     runs-on: ubuntu-latest
     if: github.ref_name == 'claude/nice-heisenberg-WESq5'
-    timeout-minutes: 30
+    timeout-minutes: 45   # 단계 상한의 합(관문 12 + 읽기 12 + 꼴 검사 2 + 저장·알림)보다 길게
     steps:
       - uses: actions/checkout@v7
         with:
@@ -49,9 +49,12 @@ jobs:
       - run: npm i @anthropic-ai/sdk --no-audit --no-fund --silent
 
       # 부르기 전에 안전장치를 가짜 응답으로 시험한다(돈 0) — 기계 대조·일치 검사가 무력해졌으면 여기서 멈춘다
+      # 🔴 pipefail 을 건다 — 안 걸면 이 단계의 성패가 `tail` 의 것이라 관문이 빨개도 다음 유료 단계가 돈다(2026-11-15 리뷰 C3)
       - name: 관문 (가짜 응답 — 돈 0)
         timeout-minutes: 12
-        run: node verify/test-collector.mjs | tail -40
+        run: |
+          set -o pipefail
+          node verify/test-collector.mjs | tail -40
 
       - id: read
         name: 공고 읽기 (유료)
@@ -65,18 +68,21 @@ jobs:
           if [ -n "$ONLY_ID" ]; then node collector/card-read.mjs --only="$ONLY_ID" --write | tee /tmp/card-read.txt
           else node collector/card-read.mjs --write | tee /tmp/card-read.txt; fi
 
-      - name: 데이터 감사
+      # 결과 파일의 꼴을 스스로 잰다(앱이 받는 파일). 🔴 전체 데이터 감사(audit-data)는 여기 걸지 않는다 — 그 감사는 이 파일을 안 읽는데,
+      #    다른 이유로 빨갛다고 결과와 장부를 되돌리면 다음 실행이 같은 공고에 돈을 또 쓴다(리뷰 I9)
+      - name: 결과 파일 꼴 검사
         id: audit
         if: always()
         continue-on-error: true
-        timeout-minutes: 5
-        run: node verify/audit-data.js
+        timeout-minutes: 2
+        run: node collector/card-read.mjs --check
 
-      - name: 감사 실패 시 되돌리기
+      - name: 꼴 검사 실패 시 되돌리고 빨갛게 끝낸다
         if: always() && steps.audit.outcome == 'failure'
         run: |
           git checkout -- data/card-read.json collector/card-read-ledger.json 2>/dev/null || true
-          echo "::error::데이터 감사에 걸려 이번 유료 카드 읽기 결과를 저장하지 않았습니다."
+          echo "::error::결과 파일 꼴 검사에 걸려 이번 유료 카드 읽기 결과를 저장하지 않았습니다."
+          exit 1
 
       - name: 결과 저장 (기본 브랜치 → deploy-sync 가 main 으로)
         if: always() && steps.audit.outcome == 'success'

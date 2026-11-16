@@ -124,7 +124,8 @@ const PROFILE = (over) => ({
     }, id);
     await cards[idx].click();
     await page.waitForTimeout(700);
-    const lines = await page.$$eval('#detail-sheet li.r-elig', (e) => e.length);
+    /* 제외 줄(✗ · `r-elig r-x`)은 자격 줄이 아니다 — 같이 세면 「받을 수 없는 경우」 가 있는 공고에서 수가 안 맞는다(2026-11-15 · 유료 카드 읽기 결과가 실리자 드러났다) */
+    const lines = await page.$$eval('#detail-sheet li.r-elig:not(.r-x)', (e) => e.length);
     eq(`'${txt}' — 자격 줄 ${expected}개가 모두 보인다`, lines, expected);
     /* 🔴 카드에서 뺀 근거가 **상세에는 남아 있어야** 한다. 이 절이 없으면
        '카드는 퍼센트뿐'만 검사되고 근거가 화면 어디에도 없는 상태가 통과한다. */
