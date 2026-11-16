@@ -15428,6 +15428,19 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
     [MEx.requirementLines({}, ['나. 가점조건(2개 이상 충족 시 신청 가능)', '1) 국민기초생활수급자', '2) 다자녀 가정의 자녀', '3) 한부모 가정의 자녀'], { withMeta: true, all: true }).map((x) => x.group),
       MEx.requirementLines({}, ['나. 차등조건(1개 이상 충족 시 신청 가능)', '국민기초생활수급자인 학생'], { withMeta: true, all: true }).map((x) => x.group)],
     [[0, 0, 0], [0]]);
+  /* 2026-11-16 · 리뷰 2차 — 묶음은 **원문의 개요**를 따른다(match-engine ANY_OF_HEAD 머리말 ④). 처음엔 '몇 줄 남았나'를 내보낸 줄로 세어,
+     선택지 하나가 걸러지면(날짜 줄 · 중복) 묶음이 다음 필수 줄 `다. 직전학기 평점 3.5 이상인 자` 까지 삼켜 평점 2.0 학생이 95%(어긋난 요건 없음)가 됐다 */
+  const headDrop = ['가. 차등조건(1개 이상 충족 시 신청 가능)', '1) 보호조치 종료자', '2) 국민기초생활수급자', '3) 2026년 3월 1일 기준', '다. 직전학기 평점 3.5 이상인 자'];
+  const headDup = ['가. 차등조건(1개 이상 충족 시 신청 가능)', '1) 보호조치 종료자', '2) 국민기초생활수급자', '2) 국민기초생활수급자', '다. 직전학기 평점 3.5 이상인 자'];
+  const headFit = (lines, p) => (({ met, total, fails }) => [met, total, fails])(MEx.fitDetail({ id: 'head', name: '차등조건 표본', eligibilityLines: lines }, p));
+  eq('  🔴 선택지 하나가 걸러져도(날짜 줄·중복) 묶음은 번호 항목까지만 — 다음 `다.` 필수 줄(평점 3.5)은 묶음 밖 · 평점 2.0 수급자 학생은 그 줄에서 미달(95% 틀린 안심이 아니다)',
+    [MEx.requirementLines({}, headDrop, { withMeta: true, all: true }).map((x) => x.group), headFit(headDrop, cnuStu({ gpa: 2.0, flags: ['basicLiving'] })),
+      MEx.requirementLines({}, headDup, { withMeta: true, all: true }).map((x) => x.group), headFit(headDup, cnuStu({ gpa: 2.0, flags: ['basicLiving'] }))],
+    [[1, 1, 0], [1, 2, ['직전학기 평점 3.5 이상인 자']], [1, 1, 0], [1, 2, ['직전학기 평점 3.5 이상인 자']]]);
+  const head1g = ['나. 차등조건: 다음 중 1가지 이상 해당', '1) 국민기초생활수급자', '2) 다자녀 가정의 자녀', '3) 한부모 가정의 자녀'];
+  eq('  🔴 `다음 중 1가지 이상 해당` 의 `1가지` 는 문턱이지 선택지 수가 아니다 — 아래 셋이 한 묶음(첫 항목만 묶고 둘을 필수로 세지 않는다) · 수급자 학생은 요건 1개 맞음',
+    [MEx.requirementLines({}, head1g, { withMeta: true, all: true }).map((x) => x.group), headFit(head1g, cnuStu({ flags: ['basicLiving'] }))],
+    [[1, 1, 1], [1, 1, []]]);
   const stu6 = (o) => ({ school: '한국외국어대학교', track: 'humanities', major: '영어학과', year: 3, status: '재학', gpa: 3.8, bracket: 5, credits: 15, region: '서울', parentRegion: '서울', nationality: 'korean', birthYear: 2004, flags: [], common: {}, scholarships: [], ...o });
   const judge6 = (l, p, ex) => conds(l, ex).map((c) => MEx.judgeCond(c, p, {}));
   const condsEx6 = (l) => PRx.parseLine(l, true).conds;

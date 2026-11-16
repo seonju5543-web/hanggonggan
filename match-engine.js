@@ -1868,9 +1868,13 @@ function anyOfCount(line) {
    보호조치 종료자·수급자·보호조치 연장자 셋(**동시에 될 수 없는** 둘이 섞였다)이 모두 갖춰야 하는 요건으로 읽혔다.
    ① 짧은 이름표(차등조건·선택조건 …) 뒤 `(1개 이상 충족 …` · `: 다음 중 1개 이상 해당` 꼴 — **1개(하나·한 가지) 이상일 때만**이다.
       `2개 이상 충족` 은 '하나만 되면 된다'가 아니다 — 택1 묶음으로 보면 틀린 안심이 된다(건드리지 않는다).
-   ② 몇 줄이 선택지인지는 `n가지` 가 없으면 **바로 아래 같은 꼴 번호 항목 수**로 센다(enumRun · 1) 2) 3) → 3).
+   ② 어느 줄이 선택지인지는 **바로 아래 같은 꼴 번호 항목**으로 정한다(enumRun · 1) 2) 3) → 셋 · 아래 ④).
    ③ 머리 줄 자신은 POINTER_LINE 처럼 화면에 안 내보낸다 — 줄로 남기면 채점기(eligibility-report)가 '제목·이름표로 끝나는 줄'로 센다.
-      ⚠️ 그래서 화면은 아직 세 줄을 평평하게 늘어놓는다(택1 묶음이 화면에 표시되지 않는 것은 가리킴 줄 묶음 전부의 사정) — 적합도·판정만 묶음으로 센다. */
+      ⚠️ 그래서 화면은 아직 세 줄을 평평하게 늘어놓는다(택1 묶음이 화면에 표시되지 않는 것은 가리킴 줄 묶음 전부의 사정) — 적합도·판정만 묶음으로 센다.
+   ④ 🔴 묶음은 **원문의 개요**를 따른다(2026-11-16 리뷰 2차) — 머리 줄 바로 아래 같은 꼴 번호 항목들(joined 의 줄 자리)이고, 그 꼴이 아닌 첫 줄(`다.` 같은 형제·윗 번호 ·
+      다른 꼴 글머리)에서 끝난다. 처음엔 '몇 줄 남았나'를 **내보낸 줄**로 셌다 — 선택지 하나가 잡음·날짜·중복으로 걸러지면 묶음이 다음 필수 줄
+      (`다. 직전학기 평점 3.5 이상인 자`)까지 삼켜 평점 2.0 학생이 95% 가 됐다(틀린 안심). 걸러진 줄이 있어도 묶음의 끝은 그대로다.
+      `다음 중 1가지 이상 해당` 의 `1가지` 는 **문턱**이다 — 선택지 수로 읽었더니 첫 항목만 묶이고 나머지 둘이 필수 요건이 됐다(anyOfCount 는 가리킴 줄 몫). */
 const ANY_OF_HEAD = /^[가-힣A-Za-z ]{0,15}\s*[(（:：]\s*(?:(?:다음|아래)\s*)?(?:중\s*)?(?:1\s*개|1\s*가지|한\s*가지|하나)\s*(?:항목)?\s*이상\s*(?:을|를|에)?\s*(?:충족|해당|만족)/;
 const ENUM_FAMILIES = [/^\s*\(?\d+\s*\)/, /^\s*\d+\s*\./, /^\s*[①-⑳]/, /^\s*[가-하]\s*[.)]/, /^\s*[-·•▪]\s/];
 function enumRun(lines, start) {
@@ -1925,6 +1929,7 @@ function requirementLines(sch, lines, opts) {
   let asideSect = false;  // 지금 절이 ※ 곁말에서 온 것인가 (아래 주석)
   let asideBase = 'qualify';   // 곁말 전에 있던 절 — 번호 항목을 만나면 여기로 돌아온다
   let anyLeft = 0, anyGroup = 0;   // 선택지 묶음 — 몇 줄 남았나 / 몇 번째 묶음인가 (위 주석)
+  let headEnd = -1, headGroup = 0;   // 「n개 이상 충족」 머리 줄 묶음 — joined 의 몇 번째 줄 **앞까지**인가 / 묶음 번호 (ANY_OF_HEAD 머리말 ④)
   const meta = [];                 // out과 같은 순서로 각 줄의 묶음 번호
   const aside = [];                // out과 같은 순서 — 그 줄이 ※ 예외 참고인가 (2026-10-15)
   let caseRun = false, caseGroup = 0;   // 연달아 오는 '경우별 분기'를 한 묶음으로 (아래 주석)
@@ -2058,8 +2063,8 @@ function requirementLines(sch, lines, opts) {
     if (!loose && PR2.gradTarget(t) === 'label') continue;
     if (ANY_OF_HEAD.test(t) && !POINTER_LINE.test(t)) {
       /* 개요 번호 아래 「1개 이상 충족」 머리 줄 — 아래 번호 항목들을 택1 묶음으로 연다. 줄 자신은 가리킴 줄(POINTER_LINE)과 같이 안 내보낸다(위 ANY_OF_HEAD 머리말) */
-      const n = anyOfCount(t) || enumRun(joined, li + 1);
-      if (n > 0) { anyLeft = n; anyGroup += 1; continue; }
+      const n = enumRun(joined, li + 1);   // 🔴 `1가지 이상` 의 1 은 문턱이지 선택지 수가 아니다(anyOfCount 를 쓰지 않는다 · 머리말 ④)
+      if (n > 0) { headEnd = li + 1 + n; headGroup = (anyGroup += 1); anyLeft = 0; continue; }
     }
     if (POINTER_LINE.test(t)) {
       /* 안내 줄 자신은 화면에 안 내보내되, '여기부터 n줄은 선택지'라는 사실은 남긴다 */
@@ -2127,9 +2132,9 @@ function requirementLines(sch, lines, opts) {
         meta.push(caseGroup);
       } else {
         caseRun = false;
-        meta.push(anyLeft > 0 ? anyGroup : 0);   // 0 = 반드시 충족 / 1 이상 = 그 묶음 중 하나만
+        meta.push(li < headEnd ? headGroup : anyLeft > 0 ? anyGroup : 0);   // 0 = 반드시 충족 / 1 이상 = 그 묶음 중 하나만
       }
-      if (anyLeft > 0) anyLeft -= 1;
+      if (anyLeft > 0 && !(li < headEnd)) anyLeft -= 1;
     }
     /* 5줄이면 충분하다 — 더 늘어놓으면 학생이 안 읽는다. 사람이 정리한 것처럼 보여야 한다.
        못 담은 것은 바로 아래 '원문 보기'로 갈 수 있다. */
