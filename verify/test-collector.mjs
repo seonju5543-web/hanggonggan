@@ -4851,10 +4851,40 @@ console.log('\n■ 발췌기 글자 읽기 — 카드 빈칸 비평의 이름표
       call(EX, 'crossCheckOcr', '[> 접수처 : wwwybzor.kr/', '▷ 접수처 : www.ybz.or.kr/')],
     [['○ 신청기간 : 2026. 11. 5(목) ~ 11. 18(수) 24:00(자정)', 'ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편(등기)', '※ 우편접수는 마감일 소인분까지 유효', '협회 서식 |@ 자기소개서 공백 포함 1.500자 이내'].join('\n'),
       '❍ (신청방법) 서류 구비 후 이메일(injae1.gwd@gmail.com) 접수', '▷ 접수처 : www.ybz.or.kr/']);
-  eq('    맞출 글자층 줄이 없으면 주소 꼴이 깨진 줄만 버린다 · 동그라미 숫자를 읽은 `@)-1`·`|@` 서류 줄과 멀쩡한 주소 줄은 그대로 · 주소가 같으면 OCR 그대로',
+  eq('    맞출 글자층 줄이 없으면 OCR 줄 그대로(지우지 않는다) · 동그라미 숫자를 읽은 `@)-1`·`|@` 서류 줄과 멀쩡한 주소 줄은 그대로 · 주소가 같으면 OCR 그대로',
     [call(EX, 'crossCheckOcr', ['[> 접수처 : wwwybzor.kr/', '@)-1 주민등록초본(전체 주소이력) 대학생', '문의 : forest.talent@kfas.or.kr'].join('\n'), ''),
       call(EX, 'crossCheckOcr', '○ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편', kcnaLayer)],
-    [['@)-1 주민등록초본(전체 주소이력) 대학생', '문의 : forest.talent@kfas.or.kr'].join('\n'), '○ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편']);
+    [['[> 접수처 : wwwybzor.kr/', '@)-1 주민등록초본(전체 주소이력) 대학생', '문의 : forest.talent@kfas.or.kr'].join('\n'), '○ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편']);
+  /* 2차 리뷰 (2026-11-16) — 짐작한 이름표로 바꾸면 남의 줄이 들어온다. 아래는 collector/extracted 의 실제 두 판독(.ocr.txt ↔ .pdf.txt) 그대로
+     (세종이도인재 elig-cs08qg-1-1 · 디딤돌 elig-14do6t-1 · DAAD elig-1c8rvi-1) */
+  const cs08Ocr = ['(https://www.gov.kr)', '(https://www.nhis.or.kr)', '(https://www.kosaf.go.kr) 2026년1학기 기준', '(https://www.bokjiro.go.kr)'].join('\n');
+  const cs08Layer = ['류 ⑤ 주민등록등본            (https://www.gov.kr)', '                       (https://efamily.scourt.go.kr)   (주민등록등본상 가족관계가 확인이 안될 시 제출)',
+    '      확인서              (https://www.nhis.or.kr)         건강보험료 납부자', '      통지서              (https://www.kosaf.go.kr)', '                       (https://www.bokjiro.go.kr)'].join('\n');
+  const didimOcr = ['(https://www.kosaf.go.kr) 2026년1학기 기준', '(https://www.kosaf.go.kr) 학자금 원금상환 지원', '(https://hometax.go.kr)'].join('\n');
+  const didimLayer = ['                          (https://www.gov.kr)             - 세종시 1년 이상 계속 거주 상태를 확', '                          (https://www.kosaf.go.kr)',
+    '       증명서                (https://hometax.go.kr)            만 제출'].join('\n');
+  const daadOcr = ['E-Mail: na@daad.de', 'E-Mail: info@daad-korea.org'].join('\n');
+  const daadLayer = ['                                                                         E-Mail: na@daad.de', '                                                                         E-Mail: info@daad-korea.org'].join('\n');
+  eq('  🔴 주소의 `https:` 는 이름표가 아니다 · 되풀이되는 이름표(`E-Mail:`)는 못 맞춘다 · 주소 뺀 한글이 다르면 남의 줄이다 — OCR 줄 그대로 (efamily.scourt·거주 상태를 확·na@daad.de 가 들어왔다)',
+    [call(EX, 'crossCheckOcr', cs08Ocr, cs08Layer), call(EX, 'crossCheckOcr', didimOcr, didimLayer), call(EX, 'crossCheckOcr', daadOcr, daadLayer),
+      call(EX, 'crossCheckOcr', 'E-Mail: info@daad-korea.org', 'E-Mail: na@daad.de'),
+      call(EX, 'crossCheckOcr', '○ 신청방법 : 이메일(<0080008.07.14) 및 우편(등기)', 'ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 방문 접수 불가 · 신청서는 협회 누리집에서 내려받기'),
+      call(EX, 'crossCheckOcr', '○ 신청방법 : 이메일(<0080008.07.14) 및 우편(등기)', ['ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편(등기)', 'ㅇ 신청방법 : 이메일(other@kcna.or.kr) 및 우편(등기)'].join('\n'))],
+    [cs08Ocr, didimOcr, daadOcr, 'E-Mail: info@daad-korea.org', '○ 신청방법 : 이메일(<0080008.07.14) 및 우편(등기)', '○ 신청방법 : 이메일(<0080008.07.14) 및 우편(등기)']);
+  /* 실제 OCR 줄(맞출 글자층 없음) — 경희 생명 elig-sg3z3s-1.jpg · 공과대학 elig-qkhdcb-1.jpg · 선원가족 form-1oeo0o-3.pdf */
+  const sgLine = '서류접수 기간 ㆍ 2026년 10월 1일(목)ㅡ10월 30일(금) 서류 제출 ㆍ)7@)176310103「6.007 생물정보학, 면역학, 유전제학, 세포생물학,';
+  const qkLine = '신청방법 : 공과대학이메일(khwc5770@khu,ac.kr)제출';
+  const seaman = ['1-@) 한국장학재단에 회원가입 후 고객번호(10자리) 기재(문의처: 한국장학재단 1599-2071)', '2-@ 연락처는 반드시 연락가능한 번호 기재', '2-@ 입금계좌정보는 반드시 선원 또는 부모님', '3-@ “전화번호 및 팩스번호“는 학교 행정실(서무실)로 기재'].join('\n');
+  eq('  🔴 줄을 지우지 않는다 — 마감·신청 방법·서류 안내 줄이 깨진 꼴(`7@)`·`@khu,ac`·`1-@)`) 하나로 사라졌다 · 그 줄의 날짜는 그대로 읽힌다',
+    [call(EX, 'crossCheckOcr', sgLine, ''), call(EX, 'crossCheckOcr', qkLine, ''), call(EX, 'crossCheckOcr', seaman, ''),
+      EX.extractDeadline(call(EX, 'crossCheckOcr', '서류접수 기간 : 2026년 10월 1일(목)~10월 30일(금) 서류 제출 ㆍ)7@)176310103', ''))],
+    [sgLine, qkLine, seaman, '2026-10-30']);
+  eq('    깨진 주소가 남은 줄은 접수 메일 근거·첨부 발췌로 쓰지 않는다(자르지도 고치지도 않는다) · `1-@)`·`7@)` 는 동그라미 숫자 · `www2.` 는 멀쩡하다',
+    [call(EX, 'applyEmailFromDocs', {}, [qkLine]), call(EX, 'applyEmailFromDocs', {}, ['신청방법 : 이메일(abc@gmail.co,kr) 접수']),
+      call(EX, 'applyEmailFromDocs', {}, ['신청방법 : 이메일(abc@gmail.com) 접수']).email,
+      call(EX, 'docExcerptOk', qkLine), call(EX, 'docExcerptOk', '제출서류 _ 소정양식은 홈페이지 (wwwsamwonsfor.kr) 참조'),
+      ['1-@) 한국장학재단', '서류 제출 ㆍ)7@)17', 'khwc5770@khu,ac.kr', 'wwwybzor.kr/', 'www2.khu.ac.kr'].map((l) => (EX.ADDR_BROKEN ? EX.ADDR_BROKEN.test(l) : '(없음)'))],
+    [null, null, 'abc@gmail.com', false, false, [false, false, true, true, false]]);
   eq('    배선 — 첨부 글자를 읽는 자리(docTexts)가 OCR 첨부에 글자층을 맞춘다 · OCR 첨부에서 읽은 접수 메일은 다시 읽는다',
     [/const t = isOcrSource\(p\) \? crossCheckOcr\(t0, pdfLayerText\(p\)\) : t0;/.test(eeSrc), /it\.applyEmail && \/\^공고문 첨부\\\(OCR\\\)\/\.test\(it\.applyEmailFrom/.test(eeSrc)], [true, true]);
   const bodyPart = eeSrc.slice(eeSrc.indexOf('const body = strip('));
