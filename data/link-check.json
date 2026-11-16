@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-16T18:51:10.355Z",
+ "updatedAt": "2026-11-16T20:12:28.277Z",
  "v": 1,
  "bad": {
   "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11401": {
@@ -16,7 +16,7 @@
   },
   "https://www.dongguk.edu/article/JANGHAKNOTICE/list?pageNo=2#none": {
    "v": "list",
-   "at": "2026-11-16"
+   "at": "2026-11-17"
   },
   "https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26766512": {
    "v": "gone",
@@ -24,11 +24,15 @@
   },
   "https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26766513": {
    "v": "gone",
-   "at": "2026-11-16"
+   "at": "2026-11-17"
   },
   "https://www.dongguk.edu/article/JANGHAKNOTICE/view?pageNo=2&nttId=26766521": {
    "v": "gone",
-   "at": "2026-11-16"
+   "at": "2026-11-17"
+  },
+  "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159777&noCat=32": {
+   "v": "gone",
+   "at": "2026-11-17"
   },
   "https://www.inha.ac.kr/bbs/kr/8/46024/artclView.do": {
    "v": "other",
@@ -62,6 +66,10 @@
    "v": "other",
    "at": "2026-11-16"
   },
+  "https://www.korea.ac.kr/ko/568/subview.do?article.offset=10&nttId=000100000000003861": {
+   "v": "list",
+   "at": "2026-11-17"
+  },
   "https://www.kosaf.go.kr/ko/main.do": {
    "v": "home",
    "at": "2026-11-16"
@@ -88,7 +96,7 @@
   },
   "https://www.sogang.ac.kr/ko/detail/551490?bbsConfigFk=141&namepage=ScholarshipNotice": {
    "v": "other",
-   "at": "2026-11-16"
+   "at": "2026-11-17"
   },
   "https://www.usspc.or.kr/": {
    "v": "home",
@@ -97,6 +105,10 @@
   "https://www.yonsei.ac.kr/bbs/sc/58/944452/artclView.do": {
    "v": "other",
    "at": "2026-11-16"
+  },
+  "https://www.yonsei.ac.kr/bbs/sc/58/944486/artclView.do": {
+   "v": "other",
+   "at": "2026-11-17"
   },
   "https://www.yonsei.ac.kr/bbs/sc/58/944542/artclView.do": {
    "v": "other",
