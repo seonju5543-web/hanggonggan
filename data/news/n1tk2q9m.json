@@ -3,8 +3,18 @@
  "updatedAt": "2026-11-16",
  "items": [
   {
+   "title": "2027학년도 수시모집 논술고사 시행에 따른 교내 차량 전면 통제 안내 (11.28.(토)~29.(일))",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367962&article.offset=0&articleLimit=10&no=339",
+   "postedAt": "2026-11-16",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-16",
+   "desc": "2027학년도 수시모집 논술고사 시행에 따라 수험생 및 학부모 등 대규모 인원의 교내 방문이 예정되어 있습니다."
+  },
+  {
    "title": "[글로벌소통교육실] 2026 겨울 고급영어글쓰기, 스피킹 마스터 프로그램 신청 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367779&article.offset=0&articleLimit=10&no=329",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367779&article.offset=0&articleLimit=10&no=339",
    "postedAt": "2026-11-04",
    "school": "이화여자대학교",
    "campus": "",
@@ -14,7 +24,7 @@
   },
   {
    "title": "｢기술사업화센터｣ 2026년 지식재산 맞춤형 교육 실시 안내(11/27(금))",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367760&article.offset=0&articleLimit=10&no=329",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367760&article.offset=0&articleLimit=10&no=339",
    "postedAt": "2026-11-03",
    "school": "이화여자대학교",
    "campus": "",
@@ -23,7 +33,7 @@
   },
   {
    "title": "[학생지원팀] 2026학년도 재학생 교육 만족도 조사 참여하고 커피 기프티콘 받아가자!☕",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367745&article.offset=0&articleLimit=10&no=329",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367745&article.offset=0&articleLimit=10&no=339",
    "postedAt": "2026-11-02",
    "school": "이화여자대학교",
    "campus": "",
@@ -32,7 +42,7 @@
   },
   {
    "title": "[교목실] 2026 이화가족 성탄예배 안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367744&article.offset=0&articleLimit=10&no=329",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367744&article.offset=0&articleLimit=10&no=339",
    "postedAt": "2026-11-02",
    "school": "이화여자대학교",
    "campus": "",
@@ -41,13 +51,76 @@
   },
   {
    "title": "[학부] 2026학년도 겨울 계절학기 수강안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367643&article.offset=0&articleLimit=10&no=329",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367643&article.offset=0&articleLimit=10&no=339",
    "postedAt": "2026-10-27",
    "kind": "학사",
    "school": "이화여자대학교",
    "campus": "",
    "src": "ec6597da",
    "foundAt": "2026-11-16"
+  },
+  {
+   "title": "[안전팀] 약학관 주변 인도 및 차도 통제 안내",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367970&article.offset=0&articleLimit=10&no=336",
+   "postedAt": "2026-11-16",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-16",
+   "thumb": "data/news/img/5c62f3dbd86860b6.webp",
+   "desc": "약학관에 전력을 공급하고 있는 수변전설비 교체 공사를 위한 약학관 주변 인도 및 차도 통제를 아래와 같이 안내드리오니 양해 바랍니다."
+  },
+  {
+   "title": "[인재개발원][진로디자인]나의 진로 DNA 파악(12.23.(수))",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367969&article.offset=0&articleLimit=10&no=335",
+   "postedAt": "2026-11-16",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-16",
+   "thumb": "data/news/img/deea674821a580e2.webp",
+   "desc": "📌 교육일정 📌 교육안내 · 진로를 개발을 위한 기초과정으로 이해하면 좋습니다. · 진로를 개발하기 위한 첫걸음으로 무엇부터 필요한지 알아봅니다."
+  },
+  {
+   "title": "[인재개발원][진로디자인] 버크만 진단 기반, 어울리는 직무 탐색(12.22.(화))",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367968&article.offset=0&articleLimit=10&no=334",
+   "postedAt": "2026-11-16",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-16",
+   "desc": "📌 교육일정 📌 교육안내 · 버크만 진단 결과에 기반해서, 나의 흥미영역, 강점행동, 문제해결방식 등을 이해합니다. · 교육 신청자에게는 12월 14일(월) 버크만 진단 실시 안내 알림톡을 발송합니다."
+  },
+  {
+   "title": "[이화인문과학원] 2026 추계학술대회 'AI대전환시대 포스트휴먼 조건: 로봇·공생·통치'",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367967&article.offset=0&articleLimit=10&no=333",
+   "postedAt": "2026-11-16",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-16",
+   "thumb": "data/news/img/697340a92b8de49e.webp",
+   "desc": "2026년 11월 28일 토요일 *본 강연은 별도의 사전 신청 없이 참여 가능합니다. 페이스북"
+  },
+  {
+   "title": "[이대학보] 117기 신입기자(취재/영상) 모집",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367966&article.offset=0&articleLimit=10&no=332",
+   "postedAt": "2026-11-16",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-16",
+   "desc": "이화의 대표 언론기관 이대학보가 117기 신입기자(취재/영상)를 모집합니다. 1954년 창간한 이대학보는 종이신문을 넘어, 이화 구성원의 신뢰와 사랑을 받는 미디어 플랫폼으로 끊임없이 변화하고 있습니다."
+  },
+  {
+   "title": "[산학][집기/일반경쟁]김우재교수/산학협력관 멀티스케일 물질 및 시스템 연구소 사무공간 구축을 위한 가구 구입",
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367963&article.offset=0&articleLimit=10&no=330",
+   "postedAt": "2026-11-16",
+   "school": "이화여자대학교",
+   "campus": "",
+   "src": "ec6597da",
+   "foundAt": "2026-11-16",
+   "desc": "사. 납품기간: 계약 후 30일 이내(공휴일 제외) 납품 및 검수 완료 ※ 구매품목 관련 상세내용은 남윤선(02-3277-3982 / namy@ewha.ac.kr)에 문의"
   },
   {
    "title": "[용역/일반평가]학생지원팀/2027학년도 입학식 기획 및 진행 용역",
@@ -340,81 +413,6 @@
    "src": "ec6597da",
    "foundAt": "2026-11-10",
    "desc": "■ 일시 2026년 11월 28일 토요일 오후 2:00-6:00 ■ 장소 ECC B159호 ■ 문의 이메일: eih@ewha.ac.kr 연락처: 02)3277-6597 *본 강연은 별도의 사전 신청 없이 참여…"
-  },
-  {
-   "title": "[채용] 이화여자대학교 멀티스케일 물질 및 시스템 연구소(IMMS) 학부생 동계 인턴 모집",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367859&article.offset=0&articleLimit=10&no=323",
-   "postedAt": "2026-11-09",
-   "kind": "채용",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-11-10",
-   "desc": "\"물질의 한계를 넘어 시스템 혁신으로! 글로벌 융합 연구의 K-허브를 이끌어갈 미래 인재를 모십니다.\" 이화여자대학교 산학협력관에 구축된 국가연구소(NRL 2.0)로, 원자·분자 단위의 미세 세계부터 거대 산업…"
-  },
-  {
-   "title": "[인사팀] 이화여자대학교 직원 채용 공고(2027.1.1.자)",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367684&article.offset=0&articleLimit=10&no=334",
-   "postedAt": "2026-10-29",
-   "kind": "채용",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-11-09",
-   "desc": "※ 지원기간 중 ‘ 이화여자대학교 직원 채용 홈페이지 ’ 를 통한 인터넷 지원만 가능함 [ 문의처 ] 이화여자대학교 총무처 인사팀 페이스북"
-  },
-  {
-   "title": "[채용] 이화여자대학교 사회과학대학 행정실 계약직원(육아휴직대체) 모집: ~ 11. 17.(화) 마감",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367858&article.offset=0&articleLimit=10&no=332",
-   "postedAt": "2026-11-09",
-   "kind": "채용",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-11-09",
-   "desc": "이화여자대학교 사회과학대학 행정실에서 근무할 계약직원(육아휴직대체)을 다음과 같이 모집하오니 관심 있는 분들의 많은 지원 바랍니다."
-  },
-  {
-   "title": "[공사용역/일반경쟁]건축물 외부 마감재 안전점검 용역(2차)",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367857&article.offset=0&articleLimit=10&no=331",
-   "postedAt": "2026-11-09",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-11-09",
-   "desc": "나 . 현장설명을 입찰공고의 첨부자료로 대체합니다 . 현장설명자료를 숙지하시어 입찰에 참가하여 주시기 바랍니다 . 현장설명자료 미숙지로 인한 책임은 업체에 있음을 알려드립니다 ."
-  },
-  {
-   "title": "[공사/일반경쟁][대혁]조형예술관 C동 흡수식 냉온수기 및 온수보일러 교체 공사",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367856&article.offset=0&articleLimit=10&no=330",
-   "postedAt": "2026-11-09",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-11-09",
-   "desc": "나 . 현장설명 1) 일시 : 2026 년 11 월 17 일 ( 화 ) 14:00, 나라장터 (https://www.g2b.go.kr/) 현장설명신청 필수"
-  },
-  {
-   "title": "[총무팀] 명예박사 학위수여식 개최에 따른 차량 통제 안내 (11. 11.(수) ~ 11. 12.(목))",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367853&article.offset=0&articleLimit=10&no=327",
-   "postedAt": "2026-11-09",
-   "kind": "학사",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-11-09",
-   "thumb": "data/news/img/0e464e24c59b60b8.webp",
-   "desc": "11월 12일(목) 명예박사 학위수여식이 개최됨에 따라 원활한 행사 진행을 위해 행사장 주변의 차량 진입 및 주차가 아래와 같이 전면 통제될 예정입니다. 교내 구성원 여러분의 넓은 양해와 협조를 부탁드립니다."
-  },
-  {
-   "title": "ECC 네트워크 서비스 간헐적 중지(11월 29일(일) 9시 ~ 12시)안내",
-   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367849&article.offset=0&articleLimit=10&no=325",
-   "postedAt": "2026-11-09",
-   "school": "이화여자대학교",
-   "campus": "",
-   "src": "ec6597da",
-   "foundAt": "2026-11-09",
-   "desc": "ECC 네트워크 장비 점검으로 인하여 유선 네트워크 서비스가 다음과 같이 간헐적으로 중지될 예정이오니 이용에 참고하시기 바랍니다."
   }
  ]
 }
