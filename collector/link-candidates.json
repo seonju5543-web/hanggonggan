@@ -85,6 +85,399 @@
    "by": "Claude 세션 (2026-10-04 원문 바로잡기)",
    "addedAt": "2026-10-04",
    "note": "확신 낮음 — 글 번호 125694(수집 기록 subview.do?nttId=125694)와 ArTechne 게시판 743(웹 검색의 옛 마일리지 글)을 합친 주소. 로봇이 제목을 확인해야만 쓴다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2700016004"
+   },
+   "url": "https://www.stxfoundation.or.kr/index/s2/s2_1.php?wr_id=35",
+   "title": "2026년 장학생 선발 안내",
+   "note": "재단 공지 글(검색 결과 2위 · 재단 사이트)",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000480007"
+   },
+   "url": "https://www.rhof.or.kr/sub/sub0401_view.jsp?headerId=B00001100",
+   "title": "2026년 KRA아동돌봄 지원사업(겨울방학) 참여 대학생 모집",
+   "note": "재단 공지 글",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2703692001"
+   },
+   "also": [
+    "2703692003",
+    "2703692004"
+   ],
+   "url": "https://koreashe.org/notice/?uid=95478&mod=document&pageid=1",
+   "title": "[모집] 2027 인재양성 프로그램 <학업 장학생> 모집",
+   "note": "재단 공지 글 — 2027 모집(10/30~11/16) · 글에 \"2027년 신규 학업 장학생은 선발하지 않음\"이 적혀 있어 확인 로봇 판정에 맡김",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2700727005"
+   },
+   "url": "https://www.ansanfys.or.kr/sub03/sub03.php",
+   "title": "안산시 대학생 본인부담 등록금 반값지원 — 지원신청",
+   "note": "재단 사이트 사업 안내 쪽(지원마감일 2026.11.20 적힘)",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2704375001"
+   },
+   "url": "https://www.kref.or.jp/news/2026scholarshipkorea/",
+   "title": "2026년도 한국교육재단 한국사무소 장학생 모집 안내",
+   "note": "재단 공지 글",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2701277003"
+   },
+   "also": [
+    "2701277006",
+    "2701277007"
+   ],
+   "url": "https://www.pcu.ac.kr/kor/article/scholarship/1926154031",
+   "title": "배재장학재단 2026학년도 하반기 장학생 선발 요강",
+   "note": "층2 홈 주소(pcu.ac.kr)와 같은 사이트의 장학공지 글",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2704372001"
+   },
+   "url": "http://www.ilshinfoundation.com/bbs/board.php?bo_table=notice&wr_id=14",
+   "title": "일신문화재단 2026 형남장학금 공고",
+   "note": "재단 공지 글(첨부 공고문·지원신청서 · 접수 10.27~11.27)",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000423012"
+   },
+   "url": "https://www.jincheon.go.kr/jcjh/sub.do?menukey=3464&mode=view&no=974401097",
+   "title": "2026년 워킹홀리데이 지원사업 신청자 모집 공고",
+   "note": "진천군장학회(군 사이트 안) 공지 글",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000204008"
+   },
+   "url": "https://www.wonju.go.kr/www/selectBbsNttView.do?key=211&bbsNo=1&nttNo=478878",
+   "title": "2026년 다자녀가정 특별지원（대학등록금） 신청 안내",
+   "note": "원주시청 공지 글",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2701295001"
+   },
+   "url": "https://cbck.or.kr/cafl/Resources?no=20261403",
+   "title": "2027년도 명도회 장학금 지원 대상자 공모",
+   "note": "주교회의 평신도인재양성·기금위원회 글(신청 2026.9.14~)",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000202004"
+   },
+   "url": "https://www.samcheok.go.kr/media/00083/00089.web?gcode=1002&idx=142862&amode=view&",
+   "title": "2026년 다자녀가정 특별지원(대학등록금 지원) 사업안내",
+   "note": "삼척시청 글",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000319002"
+   },
+   "url": "https://www.yeongju.go.kr/atec/page.do?step=258&parm_bod_uid=1167553&mnu_uid=10795&",
+   "title": "2026년도 귀농인 대학생 자녀 학자금 지원사업 신청안내",
+   "note": "영주시청 글(검색 결과 주소에서 검색 조건 인자는 뺌)",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2704364001"
+   },
+   "url": "https://www.gangbuk.go.kr:18000/portal/bbs/B0000145/view.do?menuNo=200081&nttId=186080",
+   "title": "꿈나무장학재단 제15기 재능장학생 선발 모집 안내",
+   "note": "강북구청 새소식 글(2026-10-26 · 접수 10.28~11.27)",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "0571003"
+   },
+   "also": [
+    "0571004"
+   ],
+   "url": "https://inje.gangwon.kr/portal/adm/bulletin?articleSeq=254972",
+   "title": "2026년 하반기 저소득주민자녀장학금 장학생 모집 고시공고",
+   "note": "인제군 고시공고(층2 홈 inje.go.kr 와 같은 군의 새 주소)",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "0596010"
+   },
+   "url": "https://www.hssf.or.kr/user_sub.php?gid=www&bcd=notice&bk=NLGNF1792645704&pg=1&mu_idx=50&bt=rd",
+   "title": "(공고 2026-14호) 2026년 횡성군 대학생 등록금 지원사업(2학기) 신청 안내",
+   "note": "재단 공지 목록의 맨 위 글 — 제목은 목록 검색 결과로 봄 · 확인 로봇이 글 제목을 본다",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "0596010"
+   },
+   "board": "https://www.hssf.or.kr/user_sub.php?gid=www&mu_idx=50",
+   "note": "재단 공지 게시판",
+   "source": "board",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000347003"
+   },
+   "url": "https://gcdream.kr/bbs/board.php?bo_table=notice&wr_id=87",
+   "title": "거창군장학회 공지(최근 글)",
+   "note": "재단 공지 게시판의 최근 글 — 2026 2학기 등록금 지원(접수 10.15~11.16) 글로 보이나 제목은 확인 로봇이 본다",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000347003"
+   },
+   "board": "https://gcdream.kr/bbs/board.php?bo_table=notice",
+   "note": "재단 공지 게시판",
+   "source": "board",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2704219001"
+   },
+   "url": "https://www.ygef.or.kr/board/?board=recruitment&site=ygmirae&mn=213&type=view&post_idx=2394",
+   "title": "영광군미래교육재단 모집 공고(최근 글)",
+   "note": "재단 모집공고 게시판의 최근 글 — 2026년 2학기 대학생등록금 지원사업(11월 접수)로 보이나 제목은 확인 로봇이 본다",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2704219001"
+   },
+   "board": "https://www.ygef.or.kr/board/?board=recruitment&site=ygmirae&mn=213",
+   "note": "재단 모집공고 게시판",
+   "source": "board",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2701180001"
+   },
+   "board": "https://kwangnam.imweb.me/8dcb4ksz",
+   "note": "광남새마을금고장학회 공지 게시판(2025-10-21 선발공고가 실린 곳 · 2026 공고도 여기)",
+   "source": "board",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2700004002"
+   },
+   "also": [
+    "2700004003"
+   ],
+   "board": "https://www.ikef.or.kr/page.php?id=/kj/scholar_schedule",
+   "note": "관정재단 장학생 선발 공고 게시판",
+   "source": "board",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000483023"
+   },
+   "board": "https://www.seoulfuture.or.kr/home/kor/M025378985/board.do",
+   "note": "서울미래인재재단 장학사업 공지(홈에 서울선순환인재 장학금 2026.11.16~11.23 접수가 보임)",
+   "source": "board",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "0731002"
+   },
+   "board": "https://www.koreanursing.or.kr/kna_ko/126/subview.do",
+   "note": "대한간호협회 공지사항(1927번 「통일간호리더장학금 신청안내」 2026.11.02)",
+   "source": "board",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2700003009"
+   },
+   "board": "https://apply.kfas.or.kr/",
+   "note": "한국고등교육재단 지원 사이트 공지(문우림 제6기 선발 내용 2026-11-02)",
+   "source": "board",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "0723001"
+   },
+   "also": [
+    "0723002"
+   ],
+   "url": "https://med.hallym.ac.kr/bbs/med/1274/392278/artclView.do",
+   "title": "2027 한독제석재단 장학금 대상자 선발 공고",
+   "note": "재단 사이트에 글이 없어 학교 글(한림대 의대 · 접수마감 2026.12.14)",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2700724005"
+   },
+   "url": "https://www.gnu.ac.kr/international/na/ntt/selectNttInfo.do?nttSn=8232642&mi=8212",
+   "title": "2026년 도내 대학 해외교환 장학생 모집·선발 공고",
+   "note": "재단 사이트에 글이 없어 학교 글(경상국립대 국제처 · 공고 hwp 첨부)",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000307005"
+   },
+   "url": "https://sw.ac.kr/sw/promotion/scholarship.do?mode=view&articleNo=5326",
+   "title": "2026년 경상북도 영·호남 상생 장학생 선발 안내",
+   "note": "도청 사이트에 글이 없어 학교 글",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2704374001"
+   },
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46131/artclView.do",
+   "title": "2026학년도 한국건설교통신기술협회 미래 건설교통신기술인 장학사업 장학생 모집 안내",
+   "note": "협회 사이트에 글이 없어 학교 글(인하대 · 접수 11.5~11.18 · 안내 PDF 첨부)",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2703603001"
+   },
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=145209",
+   "title": "[유하푸른재단] 2026년도 제 9기 유하푸른재단 장학생 선발",
+   "note": "재단 사이트에 공고 글이 없어 학교 글(홍익대)",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2703679001"
+   },
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46061/artclView.do",
+   "title": "2026학년도 창암장학생 지원 공고 안내",
+   "note": "재단 사이트 공지 주소를 못 찾아 학교 글(인하대 · 원서접수 10.23~11.20)",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "0774003"
+   },
+   "url": "https://kua.or.kr/community/notices/2117",
+   "title": "2026년도 체육장학금 후보자 추천 안내",
+   "note": "국민체육진흥공단 사이트에 글이 없어 대한체육회 글",
+   "source": "search",
+   "by": "Claude 세션 (2026-11-16 웹 검색 · 네이버 열쇠 없음 대신)",
+   "addedAt": "2026-11-16"
   }
  ]
 }
