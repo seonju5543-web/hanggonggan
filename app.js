@@ -6098,11 +6098,22 @@ function calDayHtml(iso) {
    저장한 공고를 모아 보는 자리. 🔴 **금액 합계를 내지 않는다** — 합산은 더하기가 아니라
    고르기라(같은 장학금 한 번만 + 배타 그룹에서 최대 하나) 여기서 따로 더하면
    홈과 다른 숫자를 말하게 된다. 건수만 센다. */
+/* 장학금 · 대외활동 나눠 보기 (2026-11-16 은서 「공고보관함에서 대외활동과 장학금이 구분되게」) — 칩 셋(전체·장학금·대외활동) ·
+   한쪽만 담겼으면 칩을 안 그린다 · 고른 칩은 이 화면을 떠 있는 동안만(기기에 저장하지 않는다) · 위 숫자(sub)는 늘 전체 */
+let savedKind = 'all';
+const SAVED_KINDS = [['all', '전체'], ['sch', '장학금'], ['act', '대외활동']];
 function renderSaved() {
   const el = $('#my-saved');
   if (!el) return;
-  const list = savedScholarships();
-  { const sub = $('#my-sub-saved'); if (sub) { const n = list.filter((s) => s.deadline && dday(s.deadline).days >= 0 && dday(s.deadline).days <= CAL_SOON_DAYS).length; sub.textContent = list.length ? `${list.length}개${n ? ` · 이번 주 마감 ${n}개` : ''}` : '비어 있음'; } }
+  const all = savedScholarships();
+  const nAct = all.filter((s) => isActivityId(s.id)).length;
+  const counts = { all: all.length, act: nAct, sch: all.length - nAct };
+  const both = counts.act > 0 && counts.sch > 0;
+  if (!both) savedKind = 'all';
+  const list = savedKind === 'all' ? all : all.filter((s) => (savedKind === 'act') === isActivityId(s.id));
+  const kindRow = both ? `<div class="filter-row saved-kinds" role="group" aria-label="공고 종류">${SAVED_KINDS.map(([k, label]) =>
+    `<button type="button" class="filter-chip${k === savedKind ? ' active' : ''}" data-saved-kind="${k}" aria-pressed="${k === savedKind}">${label} ${counts[k]}</button>`).join('')}</div>` : '';
+  { const sub = $('#my-sub-saved'); if (sub) { const n = all.filter((s) => s.deadline && dday(s.deadline).days >= 0 && dday(s.deadline).days <= CAL_SOON_DAYS).length; sub.textContent = all.length ? `${all.length}개${n ? ` · 이번 주 마감 ${n}개` : ''}` : '비어 있음'; } }
   if (!list.length) {
     el.innerHTML = (`
       <p class="empty">저장한 공고가 없어요<br /><span class="empty-sub">공고에서 북마크를 누르면 여기 모여요</span></p><button class="btn btn-ghost btn-empty" data-go="explore">장학금 둘러보기</button>`);
@@ -6115,7 +6126,7 @@ function renderSaved() {
     .sort((a, b) => deadlineTs(b) - deadlineTs(a));
   const soon = open.filter((s) => dday(s.deadline).days <= CAL_SOON_DAYS).length;
 
-  el.innerHTML = (`
+  el.innerHTML = (`${kindRow}
     ${open.length ? `<h5 class="cal-sec">마감 순</h5>${open.map((s) => calRowHtml(s, { save: true })).join('')}` : ''}
     ${/* 🔴 날짜를 못 읽은 공고를 **숨기지 않는다** — 달력에는 찍을 수 없어 사라지는데,
          사라지면 학생은 그 공고가 없는 줄 안다. 여기가 그 자리다. */ ''}
@@ -7850,6 +7861,12 @@ function bindEvents() {
   /* MY 메뉴 줄 → 안쪽 화면 (2026-10-10 C안 구조). 되돌아오기는 왼쪽 위 화살표와 오른쪽으로 쓸기(SWIPE_BACK_TO) */
   $$('[data-my-go]').forEach((b) => b.addEventListener('click', () => showScreen(b.dataset.myGo)));
   for (const n of ['myinfo', 'mydocs', 'mysaved']) $(`#btn-${n}-back`).addEventListener('click', () => showScreen('my', { back: true }));
+  $('#my-saved').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-saved-kind]');
+    if (!b || b.dataset.savedKind === savedKind) return;
+    savedKind = b.dataset.savedKind;
+    renderSaved();
+  });
   $('#btn-trash-back').addEventListener('click', () => showScreen('settings', { back: true }));
   $('#btn-terms-back').addEventListener('click', () => showScreen('settings', { back: true }));
   for (const id of ['#btn-logins-back', '#btn-faq-back', '#btn-support-back', '#btn-perms-back']) {

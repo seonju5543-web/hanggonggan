@@ -366,6 +366,18 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
       const row = box.querySelector(`.cal-row[data-detail="act:${u}"]`); return row ? [row.querySelector('.cal-row-name').textContent.trim(), row.querySelector('.cal-row-sub').textContent.trim(), /내 공고/.test(box.textContent)] : null; }, ACT1),
       ['2026 대학생 해외봉사단 모집', '대외활동', true]);
     eq('⑥ 피드가 새로 오면 담아 둔 사본도 새 글로(옛 마감을 말하지 않게)', await page.evaluate((u) => { const s = state.saved.find((x) => x.id === `act:${u}`); s.snap = { ...s.snap, deadline: '2000-01-01' }; refreshActivitySnaps(); return s.snap.deadline !== '2000-01-01'; }, ACT1), true);
+    /* ── ⑥-2 보관함 장학금·대외활동 칩 (2026-11-16 은서 「공고보관함에서 대외활동과 장학금이 구분되게」) ── */
+    eq('⑥-2 한쪽만 담겼으면 칩이 없다', await page.evaluate(() => { showScreen('mysaved'); return document.querySelectorAll('#my-saved [data-saved-kind]').length; }), 0);
+    const SCH1 = await page.evaluate(() => { const s = allScholarships().find((x) => !isActivityId(x.id)); toggleSave(s.id); return s.id; });
+    const kindView = () => page.evaluate(() => [[...document.querySelectorAll('#my-saved [data-saved-kind]')].map((c) => (c.classList.contains('active') ? '*' : '') + c.textContent.trim()),
+      [...document.querySelectorAll('#my-saved .cal-row')].map((r) => (isActivityId(r.dataset.detail) ? 'act' : 'sch')).sort()]);
+    eq('⑥-2 둘 다 담기면 칩 셋 · 처음엔 전체', await page.evaluate(() => { showScreen('mysaved'); return 0; }).then(kindView), [['*전체 2', '장학금 1', '대외활동 1'], ['act', 'sch']]);
+    await page.click('#my-saved [data-saved-kind="act"]'); await page.waitForTimeout(150);
+    eq('⑥-2 「대외활동」을 누르면 활동만', await kindView(), [['전체 2', '장학금 1', '*대외활동 1'], ['act']]);
+    await page.click('#my-saved [data-saved-kind="sch"]'); await page.waitForTimeout(150);
+    eq('⑥-2 「장학금」을 누르면 장학만', await kindView(), [['전체 2', '*장학금 1', '대외활동 1'], ['sch']]);
+    eq('⑥-2 MY 메뉴 숫자는 늘 전체', await page.$eval('#my-sub-saved', (e) => e.textContent.trim().startsWith('2개')), true);
+    eq('⑥-2 한쪽을 다 빼면 칩이 사라지고 전체로 돌아간다', await page.evaluate((id) => { toggleSave(id); renderSaved(); return [document.querySelectorAll('#my-saved [data-saved-kind]').length, document.querySelectorAll('#my-saved .cal-row').length]; }, SCH1), [0, 1]);
     eq('페이지 오류 없음', errors, []);
     await page.context().close();
   }
