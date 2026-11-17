@@ -8190,7 +8190,24 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "성과형 장학금(자격증) 신청서 및 개인정보활용서.hwp",
+     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=31571&fSeq=1"
+    },
+    {
+     "name": "빅데이터 마이크로디그리 및 2026학년도 2학기 개설교과목 안내(최종).pdf",
+     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=31571&fSeq=2"
+    },
+    {
+     "name": "26-2 성과형장학금_자격증 목록.pdf",
+     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=31571&fSeq=3"
+    },
+    {
+     "name": "성과형 장학금 안내_카드뉴스.pdf",
+     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=31571&fSeq=4"
+    }
+   ],
    "sourceUrl": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31571&sort=7&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
    "sourceKind": "auto",
    "eligibilityLines": [
@@ -13089,6 +13106,18 @@
     {
      "name": "★붙임2_공적활동확인서(활동사진 포함)_신규서식_2026-2학기.hwp",
      "url": "https://www.knou.ac.kr/bbs/knou/51/277973/download.do"
+    },
+    {
+     "name": "★붙임1_(공지사항) 2026. 2학기 교외장학생(발전기금재단, 출판문화원, 아시아발전재단) 선발 안내.hwp",
+     "url": "https://www.knou.ac.kr/bbs/knou/51/277972/download.do"
+    },
+    {
+     "name": "★붙임3-1_교외장학(발전기금,출판문화원,아시아발전재단) 신청 매뉴얼_PC.pdf",
+     "url": "https://www.knou.ac.kr/bbs/knou/51/277974/download.do"
+    },
+    {
+     "name": "★붙임3-2_교외장학(발전기금,출판문화원,아시아발전재단) 신청 매뉴얼_모바일.pdf",
+     "url": "https://www.knou.ac.kr/bbs/knou/51/277975/download.do"
     }
    ],
    "sourceUrl": "https://www.knou.ac.kr/bbs/knou/51/815772/artclView.do",
@@ -13653,7 +13682,12 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-12 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "2026-2학기 천마가족장학금 신청 Q&A.hwpx",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=231554923&attachNo=376799"
+    }
+   ],
    "sourceUrl": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=231554923&article.offset=0&articleLimit=10",
    "sourceKind": "auto",
    "openDate": "2026-09-07",
@@ -15787,7 +15821,7 @@
    "attachments": [
     {
      "name": "복지장학생(부모장애유형) 신청서(양식).hwp",
-     "url": "javascript:downGO('복지장학생(부모장애유형) 신청서(양식).hwp','/files/article/servicenotice/520872/','1722741C5C19464AB216CC7AC1190A47.hwp');"
+     "url": "https://wise.dongguk.ac.kr/cmmn/fileDown.do?filename=%EB%B3%B5%EC%A7%80%EC%9E%A5%ED%95%99%EC%83%9D(%EB%B6%80%EB%AA%A8%EC%9E%A5%EC%95%A0%EC%9C%A0%ED%98%95)%20%EC%8B%A0%EC%B2%AD%EC%84%9C(%EC%96%91%EC%8B%9D).hwp&filepath=/files/article/servicenotice/520872/&filerealname=1722741C5C19464AB216CC7AC1190A47.hwp"
     }
    ],
    "sourceUrl": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520872",
@@ -16181,7 +16215,12 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-23 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "3007.png",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015253/download.do"
+    }
+   ],
    "sourceUrl": "https://www.yonsei.ac.kr/bbs/sc/58/944456/artclView.do",
    "sourceKind": "auto",
    "eligibilityLines": [
@@ -21124,7 +21163,20 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "2027-1 교내장학금 신청안내(SAINT)_내국인.pdf",
+     "url": "https://www.sogang.ac.kr/file-fe-prd/board/141/551715_1.pdf?sg=2027-1%20%EA%B5%90%EB%82%B4%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%EC%95%88%EB%82%B4(SAINT)_%EB%82%B4%EA%B5%AD%EC%9D%B8.pdf"
+    },
+    {
+     "name": "2027-1 장학금 신청안내 리플렛.pdf",
+     "url": "https://www.sogang.ac.kr/file-fe-prd/board/141/551715_2.pdf?sg=2027-1%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%EC%95%88%EB%82%B4%20%EB%A6%AC%ED%94%8C%EB%A0%9B.pdf"
+    },
+    {
+     "name": "개인정보 수집 및 활용 동의서.hwp",
+     "url": "https://www.sogang.ac.kr/file-fe-prd/board/141/551715_3.hwp?sg=%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4%20%EC%88%98%EC%A7%91%20%EB%B0%8F%20%ED%99%9C%EC%9A%A9%20%EB%8F%99%EC%9D%98%EC%84%9C.hwp"
+    }
+   ],
    "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551715?bbsConfigFk=141&namepage=ScholarshipNotice",
    "sourceKind": "auto",
    "openDate": "2026-11-01",
@@ -21176,7 +21228,12 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "[서식]글로벌여성리더장학금.hwp",
+     "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/fileDefaultDownload.do?fileNo=e9eb1bf7a4ad454288b829c1d30fe0c6&seq=1"
+    }
+   ],
    "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12570/view.do?currentPageNo=1",
    "sourceKind": "auto",
    "openDate": "2026-11-03",
@@ -21772,7 +21829,16 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-11-03 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "[서식]차세대여성리더장학금.hwp",
+     "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/fileDefaultDownload.do?fileNo=ab5475d6e8e64b0a91be1f01596a13a3&seq=1"
+    },
+    {
+     "name": "2026 차세대여성리더장학생_선발모집공고문 (21회)_최종.hwp",
+     "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/fileDefaultDownload.do?fileNo=ab5475d6e8e64b0a91be1f01596a13a3&seq=2"
+    }
+   ],
    "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12582/view.do?currentPageNo=1",
    "sourceKind": "auto",
    "openDate": "2026-11-03",
@@ -21892,7 +21958,24 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-11-08 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "붙임_1._제_44기_송원김영환장학재단_장학생_선발_안내.docx",
+     "url": "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=fsUY6mc0%2FPSv%2FXm4w8Uu425ipNa6s86pfhwWEYAEDiw%3D&fs=3"
+    },
+    {
+     "name": "붙임_2._장학생_지원서_및_자기소개서.hwp",
+     "url": "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=fsUY6mc0%2FPSv%2FXm4w8Uu425ipNa6s86pfhwWEYAEDiw%3D&fs=4"
+    },
+    {
+     "name": "붙임_3._개인정보_수집_이용_및_제3자_제공_동의서.docx",
+     "url": "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=fsUY6mc0%2FPSv%2FXm4w8Uu425ipNa6s86pfhwWEYAEDiw%3D&fs=5"
+    },
+    {
+     "name": "붙임_4._게시용_안내문.docx",
+     "url": "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=fsUY6mc0%2FPSv%2FXm4w8Uu425ipNa6s86pfhwWEYAEDiw%3D&fs=6"
+    }
+   ],
    "sourceUrl": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4OTUlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
    "sourceKind": "auto",
    "openDate": "2026-11-06",
@@ -22098,7 +22181,16 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-11-08 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "자기소개서_기본형 (1).hwp",
+     "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261105&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&#"
+    },
+    {
+     "name": "발전기금 장학생 신청서(2026년2학기) (1).hwp",
+     "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261105&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&#"
+    }
+   ],
    "sourceUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261105&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
    "sourceKind": "auto",
    "applyEmail": "chil8811@naver.com",
@@ -22222,7 +22314,12 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-11-08 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "2027년도 1학기 제7회 보림선원 서울선원 장학생 선발 공고.hwp",
+     "url": "https://www.sogang.ac.kr/file-fe-prd/board/141/551760_1.hwp?sg=2027%EB%85%84%EB%8F%84%201%ED%95%99%EA%B8%B0%20%EC%A0%9C7%ED%9A%8C%20%EB%B3%B4%EB%A6%BC%EC%84%A0%EC%9B%90%20%EC%84%9C%EC%9A%B8%EC%84%A0%EC%9B%90%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B3%B5%EA%B3%A0.hwp"
+    }
+   ],
    "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551760?bbsConfigFk=141&namepage=ScholarshipNotice",
    "sourceKind": "auto",
    "applyEmail": "borimseon@gmail.com",
