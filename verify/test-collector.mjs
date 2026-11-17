@@ -1389,27 +1389,33 @@ console.log('\n■ 공고별 지원문서 — 앱 양식이 없는 등록 공고
   const heads = (t) => t.sections.map((s) => s.heading);
   const t0 = eng.buildPrepTemplate(base);
   /* 2026-11-15 개발자 결정 11-02 — 머리말은 참인 말만(「양식을 찾지 못했다 · 제출 전 원문에서 확인」 → 「정리한 문서이고 이 문서 자체를 내는 것은 아니다」) */
-  eq('🔴 서류를 모르는 공고 — 머리말은 "정리한 문서 · 이 문서 자체를 내는 것은 아니다" (그대로 제출 가능이라 말하지 않는다 · \'모름\'류 글자 없음)',
-    [t0.prepKind, /이 문서 자체를 내는 것은 아닙니다/.test(t0.tag), /그대로 제출/.test(t0.tag), /찾지 못했|원문에서 확인|원문 확인|확인 필요/.test(t0.tag + t0.lead), t0.unofficial], ['unknown', true, false, false, true]);
+  /* 2026-11-17 개발자 지시 — 머리말은 「※ 앱 자체 제작 문서입니다」 한 줄뿐(갈래별 제출 안내는 둘째 줄 lead 와 제출 안내 절이 맡는다) */
+  const ONLY_TAG = '※ 앱 자체 제작 문서입니다';
+  eq('🔴 서류를 모르는 공고 — 머리말은 「※ 앱 자체 제작 문서입니다」 한 줄뿐 · 둘째 줄도 그대로 제출 가능이라 말하지 않고 \'모름\'류 글자 없음',
+    [t0.prepKind, t0.tag, /그대로 제출/.test(t0.lead), /찾지 못했|원문에서 확인|원문 확인|확인 필요/.test(t0.tag + t0.lead), t0.unofficial], ['unknown', ONLY_TAG, false, false, true]);
+  eq('🔴 여섯 갈래 모두 머리말이 정확히 「※ 앱 자체 제작 문서입니다」 (2026-11-17 — 뒤 문장 전부 삭제)',
+    [eng.buildPrepTemplate({ ...base, prepDoc: true }), eng.buildPrepTemplate({ ...base, applyEmail: 'a@b.kr' }), eng.buildPrepTemplate({ ...base, applyPortal: 'x' }),
+      eng.buildPrepTemplate({ ...base, attachments: [{ name: '붙임1 장학생 신청서.hwp', url: 'https://e.ac.kr/f.hwp' }] }), eng.buildPrepTemplate({ ...base, sourceKind: 'kosaf' }), t0].map((t) => t.tag),
+    [ONLY_TAG, ONLY_TAG, ONLY_TAG, ONLY_TAG, ONLY_TAG, ONLY_TAG]);
   eq('  자리표시 안내 줄은 제출 서류 절에 서류로 올라가지 않는다 — 서류를 못 읽었으면 절 자체가 없다(「원문 공고에서 확인하세요」 줄 없음)', t0.sections.some((s) => s.heading === '제출 서류 확인'), false);
   eq('  작성형 서류 이름이 없으면 기본 세 절(지원 동기·학업/활동·계획) — 자격 줄이 없으면 자격 절도 없다',
     heads(t0), ['신청 개요', '지원 동기 및 신청 사유', '학업 및 활동 요약', '향후 계획', '제출 안내']);
-  eq('  원문이 자유 양식이라 확인한 공고(prepDoc)만 "그대로 제출할 수 있다"',
-    (() => { const t = eng.buildPrepTemplate({ ...base, prepDoc: true }); return [t.prepKind, /그대로 제출할 수 있습니다/.test(t.tag)]; })(), ['free', true]);
+  eq('  원문이 자유 양식이라 확인한 공고(prepDoc)만 둘째 줄이 "그대로 제출할 수 있다"',
+    (() => { const t = eng.buildPrepTemplate({ ...base, prepDoc: true }); return [t.prepKind, /그대로 제출할 수 있습니다/.test(t.lead)]; })(), ['free', true]);
   const withAtt = { ...base, attachments: [{ name: '붙임1 장학생 신청서.hwp', url: 'https://e.ac.kr/f.hwp' }] };
-  eq('  첨부 신청서가 있으면 "원본 양식에 옮겨 적는다 · 제출은 원본 양식으로"',
-    (() => { const t = eng.buildPrepTemplate(withAtt); return [t.prepKind, /원본 양식/.test(t.tag), /그대로 제출/.test(t.tag)]; })(), ['attached', true, false]);
+  eq('  첨부 신청서가 있으면 둘째 줄이 "옮겨 적을 내용 · 제출은 원본 양식으로"',
+    (() => { const t = eng.buildPrepTemplate(withAtt); return [t.prepKind, /원본 양식/.test(t.lead), /그대로 제출/.test(t.lead)]; })(), ['attached', true, false]);
   eq('  순서 — 원문 확인(prepDoc) > 원문이 말한 접수 방법(메일 > 포털) > 첨부 신청서 > 모름 (submitChannelKind 와 같은 결정 · 리뷰)',
     [eng.buildPrepTemplate({ ...withAtt, prepDoc: true }).prepKind, eng.buildPrepTemplate({ ...base, applyPortal: 'x', applyEmail: 'a@b.kr' }).prepKind,
       eng.buildPrepTemplate({ ...base, applyPortal: 'x' }).prepKind, eng.buildPrepTemplate({ ...withAtt, applyPortal: 'x' }).prepKind, eng.buildPrepTemplate({ ...withAtt, applyEmail: 'a@b.kr' }).prepKind],
     ['free', 'email', 'portal', 'portal', 'email']);
-  eq('  메일·포털 머리말도 "이 문서 자체를 내는 것이 아니다"를 말한다 (그대로 제출은 free 만)',
-    ['email', 'portal'].map((k) => eng.buildPrepTemplate({ ...base, [k === 'email' ? 'applyEmail' : 'applyPortal']: 'x' }).tag).map((t) => /그대로 제출/.test(t) || !/아닙니다/.test(t)), [false, false]);
+  eq('  메일·포털 둘째 줄은 "옮겨 적을·붙여 넣을 내용"이라 말하고 그대로 제출이라 하지 않는다 (그대로 제출은 free 만)',
+    ['email', 'portal'].map((k) => eng.buildPrepTemplate({ ...base, [k === 'email' ? 'applyEmail' : 'applyPortal']: 'x' }).lead).map((t) => /그대로 제출/.test(t) || !/옮겨 적|붙여 넣/.test(t)), [false, false]);
   /* 다리가 data.js 를 싣는가 — 안 실으면 첨부 판정이 forms.js 의 물러나는 규칙으로만 재어져 isApplicationForm 을 바꿔도 여기가 안 빨개진다(리뷰) */
   eq('  Node 다리(form-engine-node)가 data.js 의 isApplicationForm 을 실어 브라우저와 같은 갈래를 잰다',
     /data\.js/.test(readText(new URL('./form-engine-node.mjs', import.meta.url))) && eng.buildPrepTemplate({ ...base, attachments: [{ name: '[서식 2] 장학생 추천서 신청서양식.hwp', url: 'u' }] }).prepKind, 'unknown');
-  eq('  층2(재단 공고문)는 \'kosaf\' — 첨부 이름에 신청서가 있어도 attached 가 아니고, 머리말은 "재단 선발 공고문이 정한다 · 이 문서 자체를 내는 것은 아니다" (2026-10-13 ①)',
-    (() => { const t = eng.buildPrepTemplate({ ...withAtt, sourceKind: 'kosaf' }); return [t.prepKind, /선발 공고문/.test(t.tag), /이 문서 자체를 내는 것은 아닙니다/.test(t.tag), /그대로 제출/.test(t.tag)]; })(), ['kosaf', true, true, false]);
+  eq('  층2(재단 공고문)는 \'kosaf\' — 첨부 이름에 신청서가 있어도 attached 가 아니고, 둘째 줄이 "재단 선발 공고문이 정한다" (2026-10-13 ①)',
+    (() => { const t = eng.buildPrepTemplate({ ...withAtt, sourceKind: 'kosaf' }); return [t.prepKind, /선발 공고문/.test(t.lead), /그대로 제출/.test(t.lead)]; })(), ['kosaf', true, false]);
   eq('  prepDoc(원문 확인)은 층2보다도 앞이다', eng.buildPrepTemplate({ ...base, sourceKind: 'kosaf', prepDoc: true }).prepKind, 'free');
   eq('  앱은 층2 항목에도 붙인다(kosafAsScholarships → attachPrepTemplate) · 다시 받으면 지운다',
     (() => { const aj = readText(new URL('../app.js', import.meta.url)); return [/\.map\(attachPrepTemplate\);/.test(aj.slice(aj.indexOf('function kosafAsScholarships('))), /startsWith\('prep:kosaf-'\)\) delete FORM_TEMPLATES\[k\]/.test(aj)]; })(), [true, true]);
@@ -1431,7 +1437,7 @@ console.log('\n■ 공고별 지원문서 — 앱 양식이 없는 등록 공고
   t4.sections.forEach((s) => (s.fields || []).forEach((f) => { ans[f.id] = f.type === 'checks' ? { checks: [f.options[0]], text: '' } : '«답»'; }));
   const html = eng.renderFormDoc(t4, FORM_SAMPLE_PROFILE, ans);
   eq('  문서에 공고 이름 · 머리말 · 자격 체크(☑) · 서약이 들어간다',
-    [/테스트장학 2026-2 — 지원문서/.test(html), /이 문서 자체를 내는 것은 아닙니다/.test(html), /☑ 재학생 중 직전 학기 12학점 이상 이수/.test(html), /사실과 다름이 없습니다/.test(html)],
+    [/테스트장학 2026-2 — 지원문서/.test(html), /※ 앱 자체 제작 문서입니다/.test(html), /☑ 재학생 중 직전 학기 12학점 이상 이수/.test(html), /사실과 다름이 없습니다/.test(html)],
     [true, true, true, true]);
   /* 앱 연결 — 글자가 아니라 실제 모양을 본다 */
   const appSrc = readText(new URL('../app.js', import.meta.url));
