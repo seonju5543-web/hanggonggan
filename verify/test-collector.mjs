@@ -3937,6 +3937,12 @@ console.log('\n■ 학교 이름이 걸린 요건 (2026-08-30)');
 console.log('\n■ 학과·전공·계열 요건 (2026-08-30)');
 {
   const MEq = createRequire(import.meta.url)('../match-engine.js');
+  /* 2026-11-18 — 「간호대학(원)에 재학 중인 자」 : 괄호 (원) 때문에 단과대 조건을 못 보고 '재학 중'만 읽어 외대 경영 학생에게 ✓(통일간호리더장학금 적합도 95% · 틀린 안심) */
+  {
+    const st = (t) => { const r = MEq.requirementMatch(t, { school: '한국외국어대학교', major: '경영학부', year: 3, status: '재학', gpa: 3.5 }); return r ? r.status : null; };
+    eq('  단과대 이름 뒤 「(원)」·「원」이 붙어도 단과대 조건이라 모름 — ✓ 를 주지 않는다',
+      [st('북한에서 이주하여 현재 간호대학(원)에 재학 중인 자'), st('간호대학원에 재학 중인 자'), st('의과대학에 재학 중인 자')], [null, null, null]);
+  }
   const PRq = createRequire(import.meta.url)('../parse-requirements.js');
   const of = (t) => PRq.parseLine(t, false).conds.find((c) => c.kind === 'major') || null;
   const names = (t) => (of(t) || {}).names || null;
