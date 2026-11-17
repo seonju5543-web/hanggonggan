@@ -3,6 +3,24 @@
  "updatedAt": "2026-11-17",
  "items": [
   {
+   "title": "[공통] 2027-1학기 국가장학금 1차 신청 안내",
+   "url": "https://www.gachon.ac.kr/bbs/kor/478/127234/artclView.do",
+   "attachments": [
+    {
+     "name": "1. (포스터) 27년 1학기 1차 국가장학금 신청.jpg",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/159054/download.do"
+    },
+    {
+     "name": "2. (현수막) 27년 1학기 1차 국가장학금 신청.jpg",
+     "url": "https://www.gachon.ac.kr/bbs/kor/478/159055/download.do"
+    }
+   ],
+   "deadlineHint": "신청기간: '26.11.24.(화) 9시~ '27.01.07.(목) 18시 ○ 서류제출 및 가구원동의: '26.11.24.(화) 9시~ '27.",
+   "school": "가천대학교",
+   "campus": "",
+   "foundAt": "2026-11-17"
+  },
+  {
    "title": "[메디컬] 2026-2학기 일반(교내, 교외) 국가근로장학생 2차 추가모집 선발명단 및 유의사항 안내",
    "url": "https://www.gachon.ac.kr/bbs/kor/478/127127/artclView.do",
    "attachments": [
@@ -973,24 +991,6 @@
     }
    ],
    "deadlineHint": "신청기간 : 2026. 9. 8.(화), 09:30 ~ 9. 9.(수), 15:00 (기한엄수) 4. 신청방법: 구글폼 작성 및 제출 ☞ [클릭",
-   "school": "가천대학교",
-   "campus": "",
-   "foundAt": "2026-09-30"
-  },
-  {
-   "title": "[공통] (생활비)2026년 하반기 대전청년내일재단 인재육성 성취 장학생 선발 안내",
-   "url": "https://www.gachon.ac.kr/bbs/kor/478/124978/artclView.do",
-   "attachments": [
-    {
-     "name": "대전청년내일재단-선발계획공고.hwpx",
-     "url": "https://www.gachon.ac.kr/bbs/kor/478/154691/download.do"
-    },
-    {
-     "name": "대전청년내일재단-포스터.jpg",
-     "url": "https://www.gachon.ac.kr/bbs/kor/478/154692/download.do"
-    }
-   ],
-   "deadlineHint": "신청기간 : 26. 9. 1.(화) ~ 9. 23.(수) 17:00) 2. 선발인원 : 468명(대전 소재 대학생 374명, 타지역 소재 대학생",
    "school": "가천대학교",
    "campus": "",
    "foundAt": "2026-09-30"
