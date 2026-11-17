@@ -16,10 +16,6 @@
   "excludes": [],
   "from": "브라우저 본문"
  },
- "https://www.youthcenter.go.kr/bbs03View/48/10858": {
-  "at": "2026-11-06",
-  "tries": 2
- },
  "https://www.saha.go.kr/startup/program/list.do?mId=0302000000": {
   "at": "2026-11-14",
   "tries": 2
@@ -132,15 +128,6 @@
   "excludes": [],
   "from": "브라우저 본문"
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3541969": {
-  "at": "2026-11-15",
-  "tries": 1,
-  "lines": [
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
  "https://youth.chungnam.go.kr/web/main/bbs/cnyouth_notice/791?cp=1&sortOrder=BA_REGDATE&sortDirection=DESC&bcId=cnyouth_notice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true": {
   "at": "2026-11-15",
   "tries": 1
@@ -180,16 +167,6 @@
  "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=954&page=3": {
   "at": "2026-11-15",
   "tries": 1
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3542419": {
-  "at": "2026-11-16",
-  "tries": 1,
-  "lines": [
-   "봉사자유형 : 성인",
-   "성인 장애인 나들이 프로그램 지원"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
  },
  "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=6302&bidx=838568&qidx=6302&cate=10&allboard=false&nowpage=3": {
   "at": "2026-11-16",
@@ -262,5 +239,17 @@
  "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=943&page=3": {
   "at": "2026-11-16",
   "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3544547": {
+  "at": "2026-11-17",
+  "tries": 1,
+  "lines": [
+   "아동·청소년",
+   "봉사자유형 : 성인",
+   "신청대상 : 성인",
+   "신청대상 : 성인·청소년"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
  }
 }
