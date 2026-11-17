@@ -1227,8 +1227,13 @@ switch (action) {
     const fixPath = path.join(dirAbs, 'fields-fix.json');
     const fixDoc = readJson(fixPath, null) || { files: {} };
     const prev = fixDoc.files[rel] || { add: [], remove: [] };
-    const next = { add: [...(prev.add || []), ...add.map((a) => ({ page: Number(a.page), x: Number(a.x), y: Number(a.y), w: Number(a.w), h: Number(a.h), label: cleanText(a.label).slice(0, 20), key: a.key || null }))],
-      remove: [...new Set([...(prev.remove || []), ...remove])], by: actor, at: TODAY };
+    /* 뺄 칸은 지금 화면의 칸 번호로 받아 **자리(쪽+상자)** 로 바꿔 적는다 — 번호는 로봇이 다시 그리면 다른 칸을 가리킨다(리뷰 2026-11-18) */
+    const box = (f) => ({ page: Number(f.page), x: Number(f.x), y: Number(f.y), w: Number(f.w), h: Number(f.h) });
+    const removeBoxes = remove.map((rid) => { const f = (F.fields || []).find((x) => String(x.id) === rid); if (!f) fail(`그 칸이 없습니다: ${rid} (화면을 새로 고쳐 다시 골라 주세요)`); return box(f); });
+    let prevAdd = (prev.add || []).filter((a) => !removeBoxes.some((g) => FF.sameBox(g, a)));   // 사람이 더했던 칸을 빼면 더하기 목록에서도 지운다
+    const newAdd = add.map((a) => ({ ...box(a), label: cleanText(a.label).slice(0, 20), key: a.key || null })).filter((a) => !prevAdd.some((p) => FF.sameBox(p, a)));
+    const robotGone = removeBoxes.filter((g) => !(prev.add || []).some((a) => FF.sameBox(g, a)));
+    const next = { add: [...prevAdd, ...newAdd], remove: [...(prev.remove || []).filter((r) => r && typeof r === 'object' && !newAdd.some((a) => FF.sameBox(r, a))), ...robotGone], by: actor, at: TODAY };
     const robotFields = (F.fields || []).filter((f) => f.by !== 'admin');
     const applied = FF.applyFieldFix(robotFields, next, F.pages);
     const addedOk = applied.filter((f) => f.by === 'admin').length;

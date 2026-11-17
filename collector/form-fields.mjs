@@ -287,15 +287,21 @@ export function runFormFields({ root, today, dry = false, force = false, log = c
      { "files": { "<파일 이름>": { "add": [{ page, x, y, w, h, label, key }], "remove": ["p1-3"], "by", "at" } } }
    저장은 tools/admin-apply.mjs fieldFix(관리자 버튼과 같은 길) · 로봇은 칸을 새로 만들 때마다 이 장부를 다시 얹는다(지우지 않는다). 순수 함수 */
 export const FIX_KEYS = new Set([...LABELS.map((L) => L.key).filter(Boolean)]);
+/* 같은 칸인가 — 쪽이 같고 자리·크기가 몇 포인트 안(로봇이 다시 그리면 좌표가 조금 흔들린다) */
+export const sameBox = (a, b) => !!a && !!b && a.page === b.page && Math.abs(a.x - b.x) <= 3 && Math.abs(a.y - b.y) <= 3 && Math.abs(a.w - b.w) <= 4 && Math.abs(a.h - b.h) <= 4;
+/* 🔴 뺄 칸은 **자리(쪽+상자)** 로 적는다 — 로봇 칸 번호(p1-3)는 찾는 규칙이 바뀌면 다른 칸을 가리킨다(리뷰 2026-11-18) · 사람이 더한 칸도 같은 자리로 뺀다 · 같은 칸을 두 번 더해도 하나 */
 export function applyFieldFix(fields, fix, pages) {
   if (!fix) return fields;
-  const gone = new Set((fix.remove || []).map(String));
-  const out = (fields || []).filter((f) => !gone.has(String(f.id)) && f.by !== 'admin');
-  (fix.add || []).forEach((a, i) => {
+  const gone = (fix.remove || []).filter((r) => r && typeof r === 'object');
+  const out = (fields || []).filter((f) => f.by !== 'admin' && !gone.some((g) => sameBox(g, f)));
+  const kept = [];
+  for (const a of fix.add || []) {
     const pg = (pages || []).find((p) => p.n === a.page);
-    if (!pg || !(a.w > 0 && a.h > 0) || a.x < 0 || a.y < 0 || a.x + a.w > pg.w + 1 || a.y + a.h > pg.h + 1) return;   // 쪽 밖의 칸은 버린다
-    out.push({ id: `a${i + 1}`, page: a.page, x: r1(a.x), y: r1(a.y), w: r1(a.w), h: r1(a.h), label: String(a.label || '').slice(0, 20) || '빈칸', key: FIX_KEYS.has(a.key) ? a.key : null, by: 'admin' });
-  });
+    if (!pg || !(a.w > 0 && a.h > 0) || a.x < 0 || a.y < 0 || a.x + a.w > pg.w + 1 || a.y + a.h > pg.h + 1) continue;   // 쪽 밖의 칸은 버린다
+    if (gone.some((g) => sameBox(g, a)) || kept.some((k) => sameBox(k, a))) continue;
+    kept.push(a);
+    out.push({ id: `a${kept.length}`, page: a.page, x: r1(a.x), y: r1(a.y), w: r1(a.w), h: r1(a.h), label: String(a.label || '').slice(0, 20) || '빈칸', key: FIX_KEYS.has(a.key) ? a.key : null, by: 'admin' });
+  }
   return out;
 }
 

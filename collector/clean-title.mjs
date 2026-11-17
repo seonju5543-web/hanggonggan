@@ -25,7 +25,7 @@ export function decodeEntities(t) {
     .replace(/&nbsp;/g, ' ')
     .replace(/&rarr;/g, '→').replace(/&rArr;/g, '⇒').replace(/&ge;/g, '≥').replace(/&le;/g, '≤').replace(/&larr;/g, '←').replace(/&ldquo;/g, '“').replace(/&rdquo;/g, '”')
     .replace(/&ndash;/g, '–').replace(/&mdash;/g, '—')
-    .replace(/&middot;/g, '·').replace(/&hellip;/g, '…')
+    .replace(/&middot;/g, '·').replace(/&bull;/g, '•').replace(/&hellip;/g, '…')
     .replace(/&amp;/g, '&');   // 반드시 마지막 — 먼저 풀면 &amp;quot; 가 이중 해제된다
 }
 

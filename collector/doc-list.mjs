@@ -21,9 +21,9 @@ const BULLET = /^[\s\-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙�
 const DOC_WORD = /\d\s*(?:부|매|통)(?![가-힣])|서|증명|사본|원본|통장|신분증|사진|등본|확인|계획|추천|동의|지원|신청|소개|이력|포트폴리오|성적|재학|졸업|가족|소득|수급/;
 export const WRITE_DOC = /자기소개서|자소서|학업계획서|수학계획서|연구계획서|활동계획서|사유서|지원\s*동기|에세이|포부|소개서|계획서/;
 export const FREE_FORM = /자유\s*(양식|서식|형식)|별도\s*(의\s*)?(양식|서식)(은|이)?\s*(없|무)|(양식|서식)\s*(은|이)?\s*(없음|없습니다|무)|서식\s*자유|자유롭게\s*작성|양식\s*자유|형식\s*자유/;
-const MAX_DOCS = 14;
+const MAX_DOCS = 20;   // 14 → 20 (2026-11-18 · 표가 긴 공고의 끝 서류가 잘렸다 — 귀농·귀촌 주민등록초본 · 장해등급증명서류)
 /* 활동 글의 제출물 — 작품·영상·발표 자료·캡처도 서류다(공모전 · 리뷰 2026-11-15) */
-const MEDIA_DOC = /작품|출품|(?<!홍보)영상|PPT|ppt|발표\s*자료|에세이|원고|캡처|캡쳐|이미지\s*파일|사진\s*파일|파일\s*\(|포트폴리오|시안|기획안|제안서/;
+const MEDIA_DOC = /작품|출품|(?<!홍보)영상(?!정보\s*처리)|PPT|ppt|발표\s*자료|에세이|원고|캡처|캡쳐|이미지\s*파일|사진\s*파일|파일\s*\(|포트폴리오|시안|기획안|제안서/;
 /* 서류가 아닌 줄 — 전화·주소·날짜·지시문(…하세요·…제출·…금지) · 꼬리 괄호를 떼고 본다 */
 const NOT_DOC = /☎|https?:\/\/|www\.|\d{2,4}-\d{3,4}-\d{4}|(기일|기간|마감|선정|지급|발표|통보)\s*[:：]|^\d{1,2}\/\d{1,2}|^\d{4}\s*[.년]/;
 /* 서류가 아닌 줄 둘째 묶음 (2026-11-17 개발자 지시 "대외활동 카드 … 이상한 내용") — 실측: 서울과기대 게시판 글의 서류 칸에 사이트 맨 아래 줄
@@ -88,6 +88,9 @@ const HEAD_ONLY = /^(제\s*출\s*(할\s*)?|구\s*비|신\s*청|필\s*요|첨\s*�
 const FILE_NOTE = /파일\s*(제목|명)|파일명/;
 /* 한 줄에 여러 서류가 쉼표·가운뎃점으로 붙어 있으면 가른다 — 조각마다 서류 낱말이 있을 때만(문장을 토막 내지 않는다) */
 function splitInline(s) {
+  /* 서류 이름 뒤의 곁말(→ · ※ · - …)은 가르지 않는다 — 「통장사본 1부 → 장학금 수령 통장으로 입,출금이 가능한 …」의 쉼표는 설명 안이다(리뷰 2026-11-18) */
+  const noteAt = s.search(/\s*(?:→|※)|\s+[-–]\s+/);
+  if (noteAt > 0) { const head = s.slice(0, noteAt); const parts = splitInline(head); return parts.length > 1 ? [...parts.slice(0, -1), parts[parts.length - 1] + s.slice(noteAt)] : [s]; }
   if (!/[,，·]/.test(s) || s.length > 120) return [s];
   const SEP = /[,，]/.test(s) ? /[,，]/ : /[,，·]/;   // 쉼표가 있으면 쉼표로만 — 「개인정보 수집 · 이용 동의서」의 가운뎃점은 이름 안이다(2026-11-18)
   /* 괄호 안의 쉼표(「신청서 1부 (소정양식, 사진 부착)」)는 가르지 않는다 — 리뷰 */
@@ -136,7 +139,12 @@ export function isDocHeadLabel(l) {
   if (!m) return false;
   const pre = m[1].replace(/\s/g, ''); const post = m[3];
   if (pre && (!/^[가-힣·]{1,10}$/.test(pre) || /[은는이가을를에의도로와과]$/.test(pre))) return false;
-  if (/^\s*(에|은|는|이|가|을|를|의|도|로|와|과|명|만|이나)/.test(post) && !/^\s*(이하|이력)/.test(post)) return false;
+  if (/^\s*(에|은|는|이|가|을|를|의|도|로|와|과|명|만|이나|상\s)/.test(post) && !/^\s*(이하|이력)/.test(post)) return false;
+  /* 이름표 뒤가 가름표 없이 문장으로 이어지면 머리가 아니다 — 「□ 장학생 신청 당시 제출서류 내용이 사실과 다른 경우」「3. 제출서류 미비 시 … 제외될 수 있습니다.」
+     「※ 제출서류 등 자세한 사항은 … 참고하시기 바랍니다.」(리뷰 2026-11-18 — 진짜 10줄 표 앞의 이런 줄을 머리로 잡아 엉뚱한 두 줄을 냈다).
+     가름표(- : → _ |)로 시작하는 곁말은 둔다: 「7. 제출서류 ( … ) - 하나의 압축 파일로 제출」 */
+  const tail = post.trim();
+  if (tail && !/^[-–—:：→_|]/.test(tail) && (SENTENCE_END.test(tail) || INSTRUCTION_END.test(tail) || /^(미비|누락|허위|등\s)/.test(tail))) return false;
   return true;
 }
 /* 줄 앞머리의 단계 — 같은 단계를 다시 만나야 절이 바뀐다(숫자는 값까지: 6. 아래 1) 은 하위, 7. 이 다음 절) */
@@ -168,7 +176,7 @@ function listFrom(lines, start, inline, headMark) {
   const inlineHit = out.length > 0;   // ④ 한 줄 목록이 실제로 서류를 냈을 때만 '아래는 서류 이름만' — 「6. 신청서류 : 각 학과 사무실로 원본 제출」 아래 표는 그대로 읽는다
   let blanks = 0;
   for (let i = start + 1; i < lines.length && out.length < MAX_DOCS; i += 1) {
-    const l = lines[i];
+    const l = decodeEntities(lines[i]);   // 「&bull; 인정 불가: …」 — 기호를 풀고 본다(리뷰 2026-11-18)
     if (!l) { blanks += 1; if (blanks >= 2 && out.length) break; continue; }
     blanks = 0;
     const bare = stripLead(l);
@@ -178,11 +186,11 @@ function listFrom(lines, start, inline, headMark) {
     if (isDocHeadLabel(l)) continue;                                                         // 또 다른 서류 머리(우대 증빙 표 뒤의 본 목록 등) — 이어 읽는다
     if (sameStep(headMark, leadMark(l)) && !DOC_NOUN.test(bare)) { if (out.length) break; continue; }   // ② 같은 단계의 새 절(머리 바로 아래 같은 단계 안내·소제목이면 건너뛴다 · 리뷰)
     if (bare.replace(/\s/g, '').length <= 12 && NEXT_HEAD_BARE.test(bare.replace(/\s/g, ''))) break;   // 띄어 쓴 표 머리 「1. 신 청 자 격」
-    if (/^(이전\s*글|다음\s*글|윗\s*글|아랫\s*글|목록|최근\s*게시물|최신\s*글|관련\s*게시물)(\s|[:：]|$)/.test(bare)) break;
+    if (/^(이전\s*글|다음\s*글|윗\s*글|아랫\s*글|목록(\s*보기)?|최근\s*게시물|최신\s*글|관련\s*게시물|다음|이전|처음|맨\s*위로|TOP)(\s|[:：]|$)/i.test(bare)) break;   // 게시판 아래 탐색 줄(서울대 「목록보기 / 다음 / 이전」 · 리뷰 2026-11-18)
     if (/^(학교\s*소개|대학\s*소개|[가-힣]{1,4}\s*캠퍼스|홍보\s*영상|오시는\s*길|사이트\s*맵|찾아오시는\s*길|개인정보\s*처리\s*방침)$/.test(bare)) { if (out.length) break; continue; }   // 사이트 메뉴 줄 — 목록 뒤 메뉴가 서류로 붙었다(2026-11-18)
     if (/^(유의|주의|참고|안내)\s*사\s*항\s*[:：]/.test(bare)) { if (out.length) break; continue; }   // 「주의사항: …」 줄은 곁말 절이다   // 게시판 아래 탐색 줄 — 그 아래는 다른 글 제목이다
     if (out.length && /^\[[^\]]{2,14}\]\s*\S/.test(bare) && !DOC_NOUN.test(bare) && /모집|채용|안내|접수|선발|행사|공지|살롱|~\s*\d|\d{1,2}\.\s*\d{1,2}/.test(bare)) break;       // 이웃 글 제목 「[조교 채용] … 모집」「[도서관] …」(리뷰 · 홍익 신용카드수수료장학금)
-    if (l.length > 120) break;                                                                 // 문단 — 목록이 아니다
+    if (l.length > 120) { if (/^[•·ㆍ\-–※*]/.test(l)) continue; break; }   // 문단이면 끝 — 단 앞 서류에 붙은 긴 곁말 줄(• 인정 불가: …)은 건너뛴다
     if (/^(※|\*|☞|▶|⇒)/.test(l)) continue;                                                   // 주석·지시 줄은 서류가 아니다
     if (!DOC_WORD.test(l) && cleanDoc(l).length > 30) { if (/^[-–·ㆍ*]/.test(l)) continue; break; }   // 서류 낱말 없는 긴 줄 — 목록이 끝났다(앞 서류 아래 「- 선택 제출 … 가산점 부여」 같은 곁말 줄은 건너뛴다 · 2026-11-18)                                   // 서류 낱말이 없는 긴 줄 — 목록이 끝났다
     if (inlineHit && !(DOC_NOUN.test(bare) || WRITE_DOC.test(bare) || MEDIA_DOC.test(bare))) continue;   // ④ 한 줄 목록 아래는 서류·제출물 이름만(아닌 줄은 건너뛴다 — 끊으면 「작품(이미지 파일)」 뒤가 사라졌다 · 리뷰)

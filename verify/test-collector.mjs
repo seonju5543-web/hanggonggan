@@ -1589,6 +1589,20 @@ console.log('\n■ 제출 서류 목록 — 원문의 「제출서류」 절을 
   /* 🔴 절 경계 (2026-11-15 · 저장된 서류 줄 1,183개를 하나하나 분류 — 서류가 아닌 줄 364 · 그중 자리표시 143 · 학생 화면에 보이던 안내 문장·심사 단계·자격 줄 약 220).
      고정 예시는 실제 공고 원문을 줄인 것이다(실데이터에 기대지 않는다). 하나라도 되돌리면 그 예시가 빨개진다. */
   const X = (...l) => DL.extractDocumentList(l.join('\n'));
+  /* 리뷰 2026-11-18 — 진짜 목록 앞의 문장 머리 · 게시판 아래 탐색 줄 · 곁말 안의 쉼표 · 긴 곁말 줄(&bull;) */
+  eq('  이름표 뒤가 문장이면 머리가 아니다 — 「□ 장학생 신청 당시 제출서류 내용이 사실과 다른 경우」 아래가 아니라 진짜 「제출서류」 표를 읽는다',
+    X('□ 장학생 신청 당시 제출서류 내용이 사실과 다른 경우', '○ 성적 미달 시, 1차 경고', '제출서류', '- 신청서 1부', '- 성적증명서 1부', '5. 문의'), ['신청서 1부', '성적증명서 1부']);
+  eq('  「※ 제출서류 등 자세한 사항은 … 참고하시기 바랍니다.」 는 머리가 아니다 · 「목록보기 / 다음 / 이전」 · 「영상정보처리기기 …방침」 은 서류가 아니다',
+    [X('※ 제출서류 등 자세한 사항은 붙임의 공고문을 참고하시기 바랍니다.', '목록보기', '다음', '이전', '영상정보처리기기 운영·관리방침'), X('제출서류', '- 신청서 1부', '목록보기', '다음', '영상정보처리기기 운영·관리방침')],
+    [[], ['신청서 1부']]);
+  eq('  게시판 아래 맨 「다음」·「목록보기」 줄에서 멈춘다 — 그 아래 이웃 글 제목(서류 낱말이 든)이 서류로 붙지 않는다',
+    [X('제출서류', '- 신청서 1부', '다음', '2026 학자금 신청서 제출 안내'), X('제출서류', '- 신청서 1부', '목록보기', '[장학] 성적증명서 발급 안내')], [['신청서 1부'], ['신청서 1부']]);
+  eq('  서류 뒤 곁말(→ · ※)의 쉼표로 서류를 가르지 않는다 (통장사본 → 「입,출금이 가능한」)',
+    X('제출서류', '◽ 통장사본 1부 → 장학금 수령 통장으로 입,출금이 가능한 본인 명의의 통장', '◽ 재학증명서 1부'), ['◽ 통장사본 1부 → 장학금 수령 통장으로 입,출금이 가능한 본인 명의의 통장', '◽ 재학증명서 1부']);
+  eq('  앞 서류에 붙은 긴 곁말 줄(&bull; 인정 불가: … 120자 넘음)은 건너뛰고 다음 서류를 읽는다',
+    X('제출서류', '가) 신청서 1부', '&bull; 인정 불가: ' + '가'.repeat(130), '다) 한국장학재단 학자금 지원구간(소득분위) 통지서 1부', '5. 문의'), ['신청서 1부', '한국장학재단 학자금 지원구간(소득분위) 통지서 1부']);
+  eq('  가름표(-)로 시작하는 머리 곁말은 머리를 막지 않는다 (「7. 제출서류 ( … ) - 하나의 압축 파일로 제출」)',
+    X('7. 제출서류 ( 서울캠퍼스 신청 기준 ) - 하나의 압축 파일로 제출', '가 . ( 공통 ) 신청서 엑셀 양식 1 부'), ['(공통) 신청서 엑셀 양식 1부']);
   eq('  ② 같은 단계 기호(○)의 새 절에서 멈춘다 · 끝 마침표가 있는 안내 문장은 서류가 아니다 (K-Startup 창업경진대회)',
     X('○ 제출서류', ' - 사업계획서', ' - 개인정보수집 및 이용 동의서', ' - 대표자 사업자등록 사실증명원', ' - 제출하신 서류는 사업운영기관에서 관리되오니 서류 반환 등 문의는 해당 기관으로 하시기 바랍니다.', '○ 서류심사 진행 예정', ' - 서류 합격자에 한해 발표 평가'),
     ['사업계획서', '개인정보수집 및 이용 동의서', '대표자 사업자등록 사실증명원']);
@@ -1741,13 +1755,26 @@ console.log('\n■ 신청서 쪽 그림 · 빈칸 자리 — 이름표 옆·표 
     if (FF.applyFieldFix) {
       const pagesFx = [{ n: 1, w: 595, h: 842 }];
       const base = [{ id: 'p1-1', page: 1, x: 10, y: 10, w: 50, h: 12, label: '이름', key: 'name' }, { id: 'p1-2', page: 1, x: 10, y: 30, w: 50, h: 12, label: '학번', key: 'studentId' }];
-      const out = FF.applyFieldFix(base, { add: [{ page: 1, x: 100, y: 700, w: 120, h: 18, label: '작성일', key: 'today' }, { page: 1, x: 590, y: 700, w: 120, h: 18, label: '밖' }, { page: 1, x: 100, y: 100, w: 80, h: 18, label: '서명', key: 'password' }], remove: ['p1-2'] }, pagesFx);
-      eq('  사람이 지정한 칸 — 뺀 칸은 빠지고 · 더한 칸은 by admin · 쪽 밖 칸은 버리고 · 모르는 key 는 null · 같은 장부를 두 번 얹어도 겹치지 않는다',
+      const out = FF.applyFieldFix(base, { add: [{ page: 1, x: 100, y: 700, w: 120, h: 18, label: '작성일', key: 'today' }, { page: 1, x: 590, y: 700, w: 120, h: 18, label: '밖' }, { page: 1, x: 100, y: 100, w: 80, h: 18, label: '서명', key: 'password' }], remove: [{ page: 1, x: 10, y: 30, w: 50, h: 12 }] }, pagesFx);
+      eq('  사람이 지정한 칸 — 뺀 칸(자리로 적힘)은 빠지고 · 더한 칸은 by admin · 쪽 밖 칸은 버리고 · 모르는 key 는 null · 같은 장부를 두 번 얹어도 겹치지 않는다',
         [out.map((f) => f.id), out.filter((f) => f.by === 'admin').map((f) => [f.label, f.key]), FF.applyFieldFix(out, { add: [{ page: 1, x: 100, y: 700, w: 120, h: 18, label: '작성일', key: 'today' }] }, pagesFx).filter((f) => f.by === 'admin').length],
-        [['p1-1', 'a1', 'a3'], [['작성일', 'today'], ['서명', null]], 1]);
+        [['p1-1', 'a1', 'a2'], [['작성일', 'today'], ['서명', null]], 1]);
+      /* 리뷰 2026-11-18 — 뺄 칸은 번호가 아니라 자리(번호는 로봇이 다시 그리면 다른 칸을 가리킨다) · 로봇이 2px 옮겨 그려도 같은 칸 · 같은 칸 두 번 더하기는 한 칸 · 뺀 자리에 더한 칸은 안 생긴다 */
+      const shifted = [{ id: 'p1-1', page: 1, x: 12, y: 31, w: 51, h: 12, label: '학번', key: 'studentId' }, { id: 'p1-2', page: 1, x: 10, y: 10, w: 50, h: 12, label: '이름', key: 'name' }];
+      const dup = { add: [{ page: 1, x: 200, y: 200, w: 60, h: 14, label: '전화' }, { page: 1, x: 201, y: 201, w: 60, h: 14, label: '전화' }, { page: 1, x: 10, y: 30, w: 50, h: 12, label: '학번칸' }], remove: [{ page: 1, x: 10, y: 30, w: 50, h: 12 }] };
+      const outDup = FF.applyFieldFix(shifted, dup, pagesFx);
+      eq('  사람이 지정한 칸 — 번호 대신 자리로 빼고(로봇 재그림 2px 어긋남도 같은 칸) · 겹친 더하기는 한 칸 · 뺀 자리엔 안 더한다 · 번호(문자열) 뺌은 무시',
+        [outDup.map((f) => f.label), FF.applyFieldFix(base, { remove: ['p1-1'] }, pagesFx).length, FF.sameBox({ page: 1, x: 0, y: 0, w: 10, h: 10 }, { page: 2, x: 0, y: 0, w: 10, h: 10 })],
+        [['이름', '전화'], 2, false]);
       const aa2 = readText(new URL('../tools/admin-apply.mjs', import.meta.url)); const ffs = readText(new URL('../collector/form-fields.mjs', import.meta.url));
       eq('  관리자 길(admin-apply fieldFix) — 장부 fields-fix.json 과 지금 fields.json 둘 다 · 로봇은 칸을 새로 만들 때 장부를 다시 얹는다',
         [/case 'fieldFix':/.test(aa2), /writeJson\(fixPath, fixDoc\); writeJson\(fjPath, fj\);/.test(aa2), /applyFieldFix\(fields, fixDoc && fixDoc\.files && fixDoc\.files\[rel\]/.test(ffs)], [true, true, true]);
+      eq('  관리자 길 — 뺄 칸 번호는 지금 칸의 자리로 바꿔 적고(removeBoxes) · 사람이 더했던 칸을 빼면 더하기에서 지운다',
+        [/const removeBoxes = remove\.map\(/.test(aa2), /let prevAdd = \(prev\.add \|\| \[\]\)\.filter\(\(a\) => !removeBoxes\.some\(\(g\) => FF\.sameBox\(g, a\)\)\)/.test(aa2)], [true, true]);
+      /* 리뷰 2026-11-18 — 고아 청소가 사람 장부를 지우면 관리자 칸이 밤마다 사라진다(form-pages·form-pdf 둘 다) */
+      const fpg = readText(new URL('../collector/form-pages.mjs', import.meta.url)); const fpd = readText(new URL('../collector/form-pdf.mjs', import.meta.url));
+      eq('  고아 청소는 fields.json · fields-fix.json · 「<이름>-pages」 를 둔다(form-pages · form-pdf)',
+        [/concat\(\['fields\.json', 'fields-fix\.json'\]\)/.test(fpg), /-pages`\]/.test(fpg), /concat\(\['fields\.json', 'fields-fix\.json'\]\)/.test(fpd), /-pages`\]/.test(fpd)], [true, true, true, true]);
     } else eq('  사람이 지정한 칸 함수(applyFieldFix)가 있다', false, true);
     /* 2026-11-18 (인계 1 f) — 둘째·셋째 가족 줄 · 밑줄 빈칸 · 날짜 칸 */
     {
