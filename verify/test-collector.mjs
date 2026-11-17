@@ -5276,8 +5276,10 @@ else {
      코드의 **사본**이라 관문이 없으면 썩는다(DESIGN.md 가 만들어진 3분 뒤 낡았던 전례).
      새 관문을 만들지 않고 이 절이 같이 읽는다 — 규칙을 두 벌 두면 한쪽만 고쳐져 갈라진다.
      ⚠️ 문서를 더할 때는 여기 이름만 더한다. */
+  /* 2026-11-18 — CLAUDE.md 가 60KB 천장에 닿아 교내 소식·대외활동 세부를 아래 두 설계 문서로 옮겼다.
+     옮긴 이름이 검사에서 빠지지 않게 두 문서도 잰다(붙이자마자 낡은 관문 이름 「수집 범위 감사」 하나가 잡혔다). */
   const DOCS = ['CLAUDE.md', 'docs/designs/data-model.md', 'docs/designs/data-flow.md',
-                'docs/designs/security-rules.md'];
+                'docs/designs/security-rules.md', 'docs/designs/news-feed.md', 'docs/designs/activities-tab.md'];
   const md = DOCS.map((f) => readText(new URL('../' + f, import.meta.url))).join('\n');
   const R = new URL('../', import.meta.url);
   const ex = (p) => fs.existsSync(new URL(p, R));
@@ -5291,7 +5293,9 @@ else {
 
   /* ① 파일 경로 — 뿌리 또는 흔한 폴더에서 찾는다. 글로브(*)는 폴더만 본다. */
   /* "만들면 안 된다"·확장자 이야기·빌드 산출물(`_admin/build.sh` 가 만든다)·분수 표기 */
-  const NOT_FILES = new Set(['_config.yml', '.nojekyll', '.ocr.txt', '.pdf.txt', 'dist/vendor/', 'met/total']);
+  const NOT_FILES = new Set(['_config.yml', '.nojekyll', '.ocr.txt', '.pdf.txt', 'dist/vendor/', 'met/total',
+    '/file/', '/attach/',            // 학교 사이트 주소 조각(news-feed.md — 진짜 사진이 사는 경로)
+    'vendor/activity-kind.mjs']);    // 관리자 빌드 산출물(activities-tab.md)
   const paths = [...new Set(ticks.filter((t) => !/\s/.test(t) && (/\//.test(t) || /\.(js|mjs|cjs|json|md|py|sh|yml|html|txt)$/.test(t))))]
     .map((t) => t.replace(/:\d+$/, ''))
     .filter((t) => !NOT_FILES.has(t) && !/^https?:/.test(t) && !/[<>…()']/.test(t) && !/^claude\//.test(t));   // 브랜치 이름·코드 조각 제외
@@ -5318,8 +5322,12 @@ else {
   const self = readText(new URL(import.meta.url));
   /* 절 이름에 작은따옴표가 든 절(「학생 화면에 '모름'류 글자가 없다」 · 2026-11-15)은 큰따옴표로 적는다 — 둘 다 읽는다 */
   const sections = [...self.matchAll(/console\.log\('\\?n?■ ([^']+)'\)|console\.log\("\\?n?■ ([^"]+)"\)/g)].map((m) => strip(m[1] || m[2]));
+  /* activities-tab.md 의 '관문'은 대외활동 탭의 관심 고르기 화면 이름이기도 하다 — 그 화면 글자 셋과
+     verify-interactions.js 의 절(이 파일 밖) 하나는 이 파일의 절이 아니다 */
+  const NOT_GATES = new Set(['X',   // 찾는 법을 설명하는 줄의 자리표시
+    '내 정보', '1365 자원봉사시간 부여', '고르면 이 탭과 홈 추천이 열려요…', '시트가 뜨면 뒤 화면이 잠긴다']);
   const gates = [...md.matchAll(/관문[^「\n]{0,30}「((?:[^「」]|「[^」]*」)+)」/g)].map((m) => strip(m[1]))
-    .filter((g) => g !== 'X');   // 찾는 법을 설명하는 줄의 자리표시
+    .filter((g) => !NOT_GATES.has(g));
   eq('관문 이름이 가리키는 절이 전부 있다', gates.filter((g) => !sections.some((s) => s.includes(g))), []);
   /* 🔴 뽑은 게 0이면 위 셋은 빈 목록을 상대로 통과한다 — 개수가 있어야 대조가 진짜다 */
   eq('  (대조할 것을 실제로 뽑았다 — 파일·이름·관문)', [paths.length > 40, ids.length > 40, gates.length > 10], [true, true, true]);
