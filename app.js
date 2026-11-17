@@ -752,10 +752,10 @@ function unent(s) {
 const JUNK_CHARS = /[\uE000-\uF8FF\uFFFD\u200B\u200C\u2060\uFEFF\u00AD\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
 const OCR_URL_GARBLE = /\s*\(\s*\/[^()가-힣]*\\[^()]*\)/g;
 const TIDY_SKIP_KEY = /(?:urls?|href|link|file|path|thumb|img|image|hash|home|src|page|^id)$/i;   // home(층2 재단 홈페이지)·src·page(학교 사진)·avoidUrls 도 주소(리뷰 2026-11-17)
-/* OCR 이 동그라미 숫자(①②)를 @·©·® 로 읽은 글머리와 표의 세로줄(|·ㅣ) — 자격·서류·발췌·안내 칸에서만 걷는다(리뷰 2026-11-17 · 「@)-1 주민등록초본」·「|@ 자기소개서」·「© 학자금 지원구간 통지서」).
+/* OCR 이 동그라미 숫자(①②)를 @·저작권·등록상표 기호(U+00A9·U+00AE)로 읽은 글머리와 표의 세로줄(|·ㅣ) — 자격·서류·발췌·안내 칸에서만 걷는다(리뷰 2026-11-17 · 「@)-1 주민등록초본」·「|@ 자기소개서」·「(저작권 기호) 학자금 지원구간 통지서」).
    🔴 이메일(abc@x.kr)의 @ 는 앞뒤가 글자라 안 걸린다 · 다른 칸(제목·이름)은 건드리지 않는다 */
 const OCR_TEXT_KEY = /^(?:documents|eligibilityLines|eligibilityExcludes|eligibilityPriority|excerpts|noticeLines|text)$/;
-const OCR_MARK = /(^|[\s|(\[ㅣ])[@©®]\)?(?:-?\d)?(?=\s|$)/g;
+const OCR_MARK = /(^|[\s|(\[ㅣ])[@\u00A9\u00AE]\)?(?:-?\d)?(?=\s|$)/g;
 function tidyOcr(t) {
   return t.replace(OCR_MARK, '$1').replace(/^[\s|ㅣ_]+/, '').replace(/[\s|ㅣ_]+$/, '').replace(/\s*\|\s*\|\s*/g, ' | ').replace(/([^ \t]) {2,}(?=\S)/g, '$1 ');
 }
