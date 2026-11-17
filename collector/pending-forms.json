@@ -1160,6 +1160,22 @@
    "added": "2026-11-16",
    "fetched": true,
    "schematized": false
+  },
+  {
+   "id": "auto-ent2431271834artclviewdo",
+   "name": "(글로벌)(교외)2026-2학기 외대비전 HUFS Dorm 장학금 신청",
+   "target": "(글로벌)(교외)2026-2학기 외대비전 HUFS Do",
+   "added": "2026-11-17",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-ervicenoticedetail521215",
+   "name": "2026학년도 국가우수장학(이공계) 일시지원유형(한 학기) 장학생 선발 안내",
+   "target": "2026학년도 국가우수장학(이공계) 일시지원유형(한 학",
+   "added": "2026-11-17",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }

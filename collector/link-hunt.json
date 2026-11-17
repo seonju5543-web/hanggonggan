@@ -449,6 +449,22 @@
    "lastWhy": "목록에서 못 찾음",
    "nextTryAt": "2026-11-18",
    "status": ""
+  },
+  "n:https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%5B%EA%B5%AD%EA%B0%80%2F%EC%8B%A0%EC%B2%AD%5D%20%E2%98%852026%20%EA%B5%AD%EA%B0%80%EC%9A%B0%EC%88%98%EC%9E%A5%ED%95%99%EA%B8%88(%EC%9D%B4%EA%B3%B5%EA%B3%84)%20..": {
+   "attempts": 0,
+   "title": "[국가/신청] ★2026 국가우수장학금(이공계) ..",
+   "lastTried": "2026-11-17",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261117&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&"
+  },
+  "r:auto-b888ec9db4eab3b5eab38420": {
+   "attempts": 0,
+   "title": "[국가/신청] ★2026 국가우수장학금(이공계) ..",
+   "lastTried": "2026-11-17",
+   "lastWhy": "",
+   "status": "resolved",
+   "resolvedUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261117&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&"
   }
  }
 }
