@@ -418,15 +418,70 @@ eq('  감사가 저장된 제목을 다시 청소해 본다(규칙은 베끼지 
    '선발'이 NOTICE_SIGNAL에 있다고 먼저 통과시키면 아주대 옆 메뉴가 새어 나간다(순서 회귀) */
 eq("'장학생 선발'(옆 메뉴)은 '선발'이 있어도 메뉴", isMenuEntry('장학생 선발'), true);
 
+/* 🔴 JS 글자를 **앞에서부터 한 번에** 읽어 코드만 남긴다 (2026-11-17 · 리뷰 — 예전엔 정규식으로 주석 → 템플릿 → 문자열 → 정규식 순으로 따로 지웠다).
+   차례로 지우면 한 갈래 안의 기호가 다음 갈래를 연다: extract-excerpts.mjs 545행의 머리 따옴표를 떼는 정규식(문자 묶음 안에 ' " 와 백틱이 함께 있다) 속 백틱이
+   **가짜 템플릿**을 열어, 그 뒤 파일 절반(약 590~1,760행)의 이름을 이 검사가 하나도 못 봤다(문자열 속 '/*' 도 같은 꼴로 그 뒤를 주석으로 먹는다).
+   그래서 글자를 하나씩 읽으며 지금 어디에 있는지(코드 · 줄/블록 주석 · ' " 문자열 · 템플릿 · 정규식)를 들고 간다.
+   정규식인지 나눗셈인지는 앞 글자로 가른다(앞이 연산자·여는 괄호·`return` 류 낱말이면 정규식) · 템플릿의 ${…} 안은 코드다(중첩 템플릿 포함).
+   돌려준 `open` — 끝났는데 템플릿·중괄호가 열려 있으면 참(= 어딘가 잘못 읽어 뒤를 못 봤다 · 관문이 파일마다 거짓인지 본다). */
+const JS_REGEX_AFTER_WORD = /^(?:return|typeof|instanceof|in|of|new|delete|void|throw|case|do|else|yield|await)$/;
+function jsCodeOnly(src) {
+  const s = String(src || '');
+  let out = '';
+  let i = 0;
+  const stack = [];          // 템플릿 ${ 에 들어갈 때의 중괄호 깊이
+  let depth = 0;
+  let lastSig = '';          // 마지막 의미 있는 글자(빈칸·주석 빼고) — 정규식/나눗셈 가르기
+  let lastWord = '';
+  const blank = (t) => t.replace(/[^\n]/g, ' ');
+  const template = () => {   // s[i] = 템플릿 글자 첫 칸(여는 ` 다음 · ${…} 를 닫은 } 다음)
+    while (i < s.length) {
+      const c = s[i];
+      if (c === '\\') { out += blank(s.slice(i, i + 2)); i += 2; continue; }
+      if (c === '`') { out += ' '; i += 1; return; }
+      if (c === '$' && s[i + 1] === '{') { out += '${'; i += 2; stack.push(depth); depth = 0; return; }
+      out += c === '\n' ? '\n' : ' '; i += 1;
+    }
+  };
+  while (i < s.length) {
+    const c = s[i];
+    const d = s[i + 1];
+    if (c === '/' && d === '/') { const e = s.indexOf('\n', i); const end = e < 0 ? s.length : e; out += blank(s.slice(i, end)); i = end; continue; }
+    if (c === '/' && d === '*') { const e = s.indexOf('*/', i + 2); const end = e < 0 ? s.length : e + 2; out += blank(s.slice(i, end)); i = end; continue; }
+    if (c === "'" || c === '"') {
+      let j = i + 1;
+      while (j < s.length && s[j] !== c && s[j] !== '\n') j += s[j] === '\\' ? 2 : 1;
+      out += c + blank(s.slice(i + 1, j)) + (s[j] === c ? c : ''); i = s[j] === c ? j + 1 : j; lastSig = c; lastWord = ''; continue;
+    }
+    if (c === '`') { out += ' '; i += 1; template(); lastSig = '`'; lastWord = ''; continue; }
+    if (c === '/' && (lastSig === '' || /[(,=:[!&|?{};+\-*%<>~^}]/.test(lastSig) || JS_REGEX_AFTER_WORD.test(lastWord))) {
+      let j = i + 1; let cls = false; let ok = false;
+      while (j < s.length && s[j] !== '\n') {
+        if (s[j] === '\\') { j += 2; continue; }
+        if (cls) { if (s[j] === ']') cls = false; } else if (s[j] === '[') cls = true; else if (s[j] === '/') { ok = true; break; }
+        j += 1;
+      }
+      if (ok) {
+        j += 1; while (j < s.length && /[a-z]/i.test(s[j])) j += 1;
+        out += ' /re/ '; i = j; lastSig = '/'; lastWord = ''; continue;
+      }
+    }
+    if (c === '{') depth += 1;
+    if (c === '}') {
+      if (depth === 0 && stack.length) { out += '}'; i += 1; depth = stack.pop(); template(); lastSig = '`'; lastWord = ''; continue; }
+      depth -= 1;
+    }
+    if (/[A-Za-z_$]/.test(c)) {
+      let j = i; while (j < s.length && /[\w$]/.test(s[j])) j += 1;
+      const w = s.slice(i, j); out += w; i = j; lastSig = 'w'; lastWord = w; continue;
+    }
+    out += c; i += 1;
+    if (!/\s/.test(c)) { lastSig = c; lastWord = ''; }
+  }
+  return { code: out, open: stack.length > 0 || depth !== 0 };
+}
 function undeclaredNames(src) {
-  let code = src;
-  code = code.replace(/\/\*[\s\S]*?\*\//g, ' ');                       // 블록 주석
-  code = code.replace(/(^|[^:/])\/\/[^\n]*/g, '$1 ');                  // 줄 주석
-  // 템플릿 문자열: 글자는 지우되 ${…} 안의 코드는 남긴다 — 사고가 거기 숨어 있었다
-  code = code.replace(/`(?:\\[\s\S]|\$\{[^{}]*\}|[^`\\])*`/g,
-    (m) => m.replace(/\$\{[^{}]*\}|[\s\S]/g, (c) => (c.startsWith('${') ? c : ' ')));
-  code = code.replace(/'(?:\\.|[^'\\\n])*'/g, "''").replace(/"(?:\\.|[^"\\\n])*"/g, '""');
-  code = code.replace(/([(,=:[!&|?{};+\n]\s*)\/(?![/*])(?:\\.|\[(?:\\.|[^\]\\\n])*\]|[^/\\\n])+\/[gimsuy]*/g, '$1/re/');
+  let code = jsCodeOnly(src).code;                                      // 주석·문자열·템플릿 글자·정규식을 걷은 코드(${…} 안은 남는다 — 사고가 거기 숨어 있었다)
   code = code.replace(/\.\s*([A-Za-z_$][\w$]*)/g, '.p');               // 속성 접근(process.env.X 등)
   const declared = new Set(NAME_GLOBALS);
   for (const m of code.matchAll(/\b(?:const|let|var|function|class)\s+([A-Z][A-Z0-9_]{2,})\b/g)) declared.add(m[1]);
@@ -453,6 +508,23 @@ function undeclaredNames(src) {
     undeclaredNames("import ASK from './x.js';\nconsole.log(ASK.p);"), []);
   eq('  그래도 안 들여온 이름은 잡는다',
     undeclaredNames("import ASK from './x.js';\nconsole.log(NOPE);"), ['NOPE']);
+  /* 🔴 검사가 **파일 끝까지** 보는가 (2026-11-17 · 리뷰) — 정규식 속 백틱·문자열 속 '/*' 가 가짜 템플릿·주석을 열어 뒤쪽 절반을 못 보던 것 */
+  eq('  🔴 정규식 속 백틱은 템플릿이 아니다 — 그 뒤 이름도 본다 (extract-excerpts 545행 꼴)',
+    undeclaredNames("const A = (s) => s.replace(/^['\"‘’“”`]+\\s*/, '');\nconsole.log(NOPE);\nconst B = `${A}`;"), ['NOPE']);
+  eq('  문자열 속 「/*」·「//」 는 주석이 아니다 · 주석 속 백틱은 템플릿이 아니다',
+    [undeclaredNames("const S = '/*';\nconsole.log(NOPE);\nconst T = '*/';"), undeclaredNames("const U = 'http://x' + NOPE;"),
+      undeclaredNames("// it's `x\nconsole.log(NOPE);\n// `")],
+    [['NOPE'], ['NOPE'], ['NOPE']]);
+  eq('  나눗셈은 정규식이 아니다 · 템플릿 ${…} 안(중첩 템플릿·객체 중괄호)도 코드다',
+    [undeclaredNames('const A = 4 / 2;\nconst B = A / 2 / NOPE;'), undeclaredNames('const A = 1;\nconst B = `a ${ { b: A }.b } ${`in ${GIVE}`} c`;\nconsole.log(B, NOPE);')],
+    [['NOPE'], ['GIVE', 'NOPE']]);
+  const exSrc = readText(new URL('extract-excerpts.mjs', dir)).split('\n');
+  const mainAt = exSrc.findIndex((l) => /^function main\(\) \{/.test(l));
+  eq('  🔴 extract-excerpts.mjs 뒤쪽(function main 바로 앞 · 예전 검사가 못 보던 자리)에 넣은 선언 없는 이름을 잡는다',
+    [mainAt > exSrc.length / 2, undeclaredNames([...exSrc.slice(0, mainAt), 'console.log(UNDECLARED_PROBE);', ...exSrc.slice(mainAt)].join('\n'))],
+    [true, ['UNDECLARED_PROBE']]);
+  const openFiles = fs.readdirSync(dir).filter((n) => n.endsWith('.mjs')).sort().filter((f) => jsCodeOnly(readText(new URL(f, dir))).open);
+  eq('  수집기 파일 전부 — 다 읽고 나서 템플릿·중괄호가 열려 있지 않다(어딘가 잘못 읽어 뒤를 못 본 파일이 없다)', openFiles, []);
 }
 
 /* 🔴 PDF 글자 뽑기 (2026-09-05) — 이 단계는 **조용히 아무 일도 안 하기 쉬운** 꼴이다.
@@ -5034,6 +5106,38 @@ console.log('\n■ 발췌기 글자 읽기 — 카드 빈칸 비평의 이름표
     [['2026-11-20', '2026-11-20', '2026-11-20'], false, null]);
   eq('    발췌기 배선 — 본문 마감·근거 다시 읽기·발췌 물러남이 띠를 걷은 본문(own)을 읽는다',
     [/let dl = extractDeadline\(own\.text\)/.test(bodyPart), /recheckBodyDeadline\(it, own\)/.test(bodyPart), /excerptsFromBody\(body, it, own\.text\)/.test(bodyPart)], [true, true, true]);
+
+  /* ⑪ 🔴 자동 등록이 보는 **본문 마감**(notice-deadline.mjs bodyDeadlineFrom · makeBodyReader)도 같은 띠 줄을 걷는다 (2026-11-17 · 리뷰).
+     발췌기만 걷고 등록 앞 본문 마감은 40% 껍데기 걷기만 해서, 실린 가천 글 9건의 bodyDeadline 이 전부 FGD 띠의 11-18 이었다(첫 등록 마감이 남의 글 띠에서 온다).
+     표본: 위 가천 세 쪽 + 띠 없는 가천 다섯 쪽(띠가 8쪽 중 3쪽 — 40% 껍데기로는 안 걷힌다 · 실측 26쪽 중 10쪽과 같은 꼴) */
+  {
+    const ND = await import('../collector/notice-deadline.mjs');
+    const PB = await import('../collector/page-boilerplate.mjs');
+    const { lastDateIn } = createRequire(import.meta.url)('../verify/entry-rules.cjs');
+    const plainGa = [127001, 127002, 127003, 127004, 127005].map((no) => ({ url: `https://www.gachon.ac.kr/bbs/kor/478/${no}/artclView.do`,
+      title: `[공통] 2026-2학기 장학 안내 제${no}호 공지사항입니다`, text: ['상단배너( 3 개)', String(no), `[공통] 2026-2학기 장학 안내 제${no}호 공지사항입니다`, '장학팀 공지'].join('\n') }));
+    const reader = ND.makeBodyReader({ stored: [...gaPages, ...plainGa], extract: EX.extractDeadline, lastDateIn });
+    const fresh = gaPages.map((p) => ({ url: p.url, title: p.title }));
+    fresh.forEach((n) => reader.fill(n));
+    const fgdText = fgd.join(' ');
+    const stale = gaPages.map((p) => ({ url: p.url, title: p.title, bodyDeadline: '2026-11-18', bodyDeadlineText: fgdText }));
+    stale.forEach((n) => reader.fill(n));
+    const moved = { url: gaPages[0].url, title: gaPages[0].title, bodyDeadline: '2026-11-18', bodyDeadlineText: '등록 뒤 원문에서 읽은 마감 2026-11-18' };
+    reader.fill(moved);
+    eq('⑪ 🔴 본문 마감(자동 등록 앞)도 제목 앞 띠 줄을 걷는다 — 가천 세 글이 제 마감 · 띠 근거로 실려 있던 본문 마감도 다시 읽는다(원칙 7) · 등록에서 옮긴 마감은 그대로',
+      [fresh.map((n) => n.bodyDeadline), stale.map((n) => n.bodyDeadline), moved.bodyDeadline, reader.counts.bodyRechecked,
+        (PB.boilerFor(reader.chrome, gaPages[0].url) || new Set()).has(fgd[1])],
+      [['2026-11-11', '2026-11-16', '2026-11-12'], ['2026-11-11', '2026-11-16', '2026-11-12'], '2026-11-18', 3, false]);
+    eq('  띠를 안 넘기면 예전 그대로(띠 날짜) · 제목 **뒤** 같은 줄(영남)은 걷지 않는다',
+      [(ND.bodyDeadlineFrom(gaPages[0].text, new Set(['상단배너( 3 개)']), EX.extractDeadline, lastDateIn) || {}).date,
+        (ND.bodyDeadlineFrom(yuPages[0].text, new Set(['장학공지']), EX.extractDeadline, lastDateIn, { siteChrome: setOf('www.yu.ac.kr'), title: yuPages[0].title }) || {}).date],
+      ['2026-11-18', '2026-11-20']);
+    const coll = fs.readdirSync(new URL('../collector/', import.meta.url)).filter((f) => f.endsWith('.mjs'))
+      .filter((f) => /export function (siteChromeFrom|ownBody|titleLineAt)\b/.test(readText(new URL(`../collector/${f}`, import.meta.url))));
+    const ar = readText(new URL('../collector/auto-register.mjs', import.meta.url));
+    eq('  띠 규칙은 page-boilerplate.mjs 한 곳(발췌기·본문 마감이 불러 쓴다 · 베끼지 않는다) · 자동 등록이 다시 읽은 수도 장부 저장 조건에 넣는다',
+      [coll, /reader\.counts\.bodyRechecked\)/.test(ar)], [['page-boilerplate.mjs'], true]);
+  }
 }
 
 console.log('\n■ 자격 자리의 잡음을 유형별로 세는가 (2026-08-23)');
@@ -12884,6 +12988,41 @@ return { submitChannelKind, submitChannelLabel, hasPortalName };`)();
      주소는 **이화여대**다. 받으면 우리 학생의 신청서가 남의 학교 메일함으로 간다. */
   eq('🔴 제3자(교수)가 내는 줄은 받지 않는다',
     take('(또는 교수님이 장학복지팀으로 제출하는 것도 가능함/ scholarship@ewha.ac.kr [추천 학생의 이름/학 번/장학금명 기재])'), false);
+
+  /* ⑧ 🔴 **신청은 시스템, 메일은 뽑힌 뒤 서류** (2026-11-17 · 상명대 근로장학 auto-enoticedoarticleno770333 첨부 원문 줄 그대로).
+     메일 줄 하나만 보면 「제출처」 이름표 + 주소라 가장 믿을 만한 줄이다 — 글 전체(신청방법 줄 + 선발자 안내 줄)를 봐야 갈린다.
+     관리자가 11-16 에 손으로 비웠고, 규칙이 그대로면 다음 회차·다른 학교에서 또 들어온다. */
+  const SMU = [
+    '라. 부서추천 근로장학생 및 국가근로장학생 선발자는 교내근로 신청 불가(중복 불가)',
+    '8. 신청방법: 샘물통합정보시스템 신청 선착순 선발(단, 동시 신청자는 성적순 선발)',
+    '  ※ 샘물통합정보시스템 [학생기본] → [장학정보] → [근로장학신청]에서 신청',
+    '9. 선발자 안내: 2026.11.30.(월) 이후 홈페이지 장학공지(개별 확인)',
+    '10. 신청서 제출: 2026.12.04.(금) 15:00까지',
+    ' ※홈페이지에서 신청서 출력 후 근로부서 담당자 서명한 PDF파일 이메일 제출',
+    '   <이메일 제출처: hajinpark@smu.ac.kr >',
+  ];
+  eq('🔴 신청은 시스템 · 메일은 선발 뒤 서류 — 접수 메일로 잡지 않는다 (상명대 원문)', findApplyEmail(SMU.join('\n')), null);
+  eq('  (메일 줄 하나만 보면 받는 줄이다 — 글 전체를 보는 것이 하는 일)', take(SMU[6]), true);
+  eq('  선발자 안내 줄이 없으면(뽑힌 뒤 단계가 아니면) 그대로 받는다',
+    findApplyEmail(SMU.filter((_, i) => i !== 3).join('\n'))?.email, 'hajinpark@smu.ac.kr');
+  eq('  신청방법이 메일이면 뒤에 선발 후 단계가 있어도 그대로 받는다',
+    findApplyEmail('ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편(등기)\nㅇ 선발자 발표 : 12월 중 개별 통보\nㅇ 접수주소 : kcna@kcna.or.kr 로 제출')?.email, 'kcna@kcna.or.kr');
+  eq('  자격 줄의 「…선발자는 신청 불가」(신청방법 줄 앞)는 선발 뒤 단계로 세지 않는다',
+    findApplyEmail([SMU[0], SMU[1], '나. 서류는 scholarship@smu.ac.kr 로 제출'].join('\n'))?.email, 'scholarship@smu.ac.kr');
+  /* 이미 들어간 로봇 값도 원문 전체로 다시 묻는다(원칙 7) — 조선대 빛고을장학재단 첨부의 개인정보 철회 메일함(원문 줄 그대로) */
+  {
+    const { staleInTexts } = await import('../collector/apply-email.mjs');
+    const CHOSUN = ['7. 신청방법: 온라인 신청(본교 종합정보시스템 → 장학 → 장학 신청)', '  •보존 기간 : 수집일로부터 빛고을장학재단 장학생 선발 후 1년',
+      '  * 철회요청 접수 이메일 주소 : dooob1213@korea.kr'].join('\n');
+    const robot = { applyEmail: 'dooob1213@korea.kr', applyEmailSource: '* 철회요청 접수 이메일 주소 : dooob1213@korea.kr', applyEmailFrom: '공고문 첨부' };
+    eq('  🔴 로봇 값 + 원문 전체로 보면 접수처 아님 → 걷는다', staleInTexts(robot, [null, CHOSUN]), true);
+    eq('  근거 문장이 든 원문이 없으면 걷지 않는다(본문 없는 날 멀쩡한 주소를 잃지 않는다)', staleInTexts(robot, [null, '다른 첨부 글']), false);
+    eq('  사람(관리자) 값은 건드리지 않는다', staleInTexts({ ...robot, applyEmailFrom: '관리자 2026-11-17' }, [CHOSUN]), false);
+    eq('  지금 규칙도 고르는 주소면 그대로', staleInTexts({ applyEmail: 'nohsy12@518.org', applyEmailSource: '◯ 접수주소 : nohsy12@518.org (※우편접수 불가)', applyEmailFrom: '공고 원문' },
+      ['가. 안내\n◯ 접수주소 : nohsy12@518.org (※우편접수 불가)']), false);
+    eq('  발췌기가 값이 있는 항목에도 원문 전체로 다시 묻는다(fillApplyEmail → staleInTexts)',
+      /function fillApplyEmail\(it, body\) \{[\s\S]{0,600}staleInTexts\(it, \[body,/.test(exc), true);
+  }
 
   /* ⑦ 🔴 **합성 픽스처 — 위 줄들과 달리 실제 공고에서 뽑은 것이 아니다.**
      말뭉치를 뒤져 보니 '메일 + 내는 행위 + 문의'를 한 줄에 가진 공고가 지금은 0건이라,

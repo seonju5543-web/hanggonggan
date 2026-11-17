@@ -571,7 +571,7 @@ if (healCounts.restored || healCounts.kept) console.log(`피드 메우기: 학�
    (위 '껍데기를 걷은 본문' 단락 · 학교별 파일 발행 전에 — 피드 메우기로 되살린 글까지) */
 retitleItems(notices.items);
 for (const n of notices.items) { bodyReader.heal(n); bodyReader.fill(n); }
-console.log(`껍데기를 걷은 본문: 기간 힌트 ${bodyReader.counts.hints}건을 다시 읽음 · 본문 마감 ${bodyReader.counts.bodyDeadlines}건을 새로 읽음 (껍데기를 아는 호스트 ${bodyReader.chrome.size}곳)`);
+console.log(`껍데기를 걷은 본문: 기간 힌트 ${bodyReader.counts.hints}건을 다시 읽음 · 본문 마감 ${bodyReader.counts.bodyDeadlines}건을 새로 읽음 · 사이트 띠로 읽혔던 본문 마감 ${bodyReader.counts.bodyRechecked}건을 다시 읽음 (껍데기를 아는 호스트 ${bodyReader.chrome.size}곳)`);
 
 const beforeCap = notices.items;
 /* 학교별 파일도 함께 발행한다 (2026-08-17) — 앱은 이쪽을 읽는다.

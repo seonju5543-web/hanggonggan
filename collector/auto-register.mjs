@@ -333,9 +333,11 @@ if (!cfg.enabled) {
        걷지 않은 요약으로 왔다. 항공대 머리 배너(`접수기간 : 2026.10.15.(목) 13:30까지`)가 마감으로 읽혀 10-15 전에는 가짜 마감으로 등록되고
        뒤에는 조용히 걸러졌다(2026-10-11 리뷰 · 원장 20줄). 규칙은 makeBodyReader 한 곳 — 수집기와 같은 순서(heal 다음 fill). */
     for (const n of notices.items || []) { reader.heal(n); reader.fill(n); }
-    if (reader.counts.bodyDeadlines || reader.counts.hints) {
+    /* 🔴 본문 마감은 제목 앞 **사이트 띠 줄**도 걷고 읽는다(2026-11-17 · 가천 FGD 띠 — 발췌기와 같은 page-boilerplate.mjs ownBody · makeBodyReader 한 곳) ·
+       띠 줄로 읽혀 실려 있던 본문 마감은 다시 읽는다(bodyRechecked · 원칙 7) — 첫 등록 마감이 남의 글 띠에서 오지 않게 */
+    if (reader.counts.bodyDeadlines || reader.counts.hints || reader.counts.bodyRechecked) {
       noticesTouched = true;
-      console.log(`저장된 원문(껍데기 걷고)에서 — 기간 힌트 다시 읽음 ${reader.counts.hints}건 · 본문 마감 새로 읽음 ${reader.counts.bodyDeadlines}건`);
+      console.log(`저장된 원문(껍데기 걷고)에서 — 기간 힌트 다시 읽음 ${reader.counts.hints}건 · 본문 마감 새로 읽음 ${reader.counts.bodyDeadlines}건 · 사이트 띠로 읽혔던 본문 마감 다시 읽음 ${reader.counts.bodyRechecked}건`);
     }
   } catch (e) { console.log(`본문 마감 채우기를 건너뜀 — ${String((e && e.message) || e).slice(0, 160)}`); }
 

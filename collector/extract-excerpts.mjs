@@ -24,7 +24,7 @@ import { fileURLToPath } from 'node:url';
 import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
 /* 게시판 메뉴·푸터를 걷어내는 규칙 (2026-08-20 신설 — page-boilerplate.mjs 첫머리 참조).
    자격을 못 뽑은 61건 중 40건이 '본문이 메뉴에 파묻힌' 상태였다. */
-import { makeStripper, buildBoilerplate, boilerFor } from './page-boilerplate.mjs';
+import { makeStripper, boilerFor, titleLineAt, siteChromeFrom, ownBody, squashWs } from './page-boilerplate.mjs';
 /* 절 머리글 판정은 section-head.js 한 곳 — 화면(match-engine)·감사와 같은 파일을 쓴다.
    베끼면 '발췌기는 제외 절로 보는데 화면은 자격으로 보는' 어긋남이 생긴다. */
 import { createRequire as _cr } from 'node:module';
@@ -38,7 +38,7 @@ import { attachmentText, readableDoc, isOcrSource, noticeDocFiles as noticeDocFi
 /* id 칸 없는 옛 신청서 색인 줄의 '같은 제목' 판정 — 규칙은 detail-url.mjs sameTitle 한 곳(베끼지 않는다) */
 import { sameTitle } from './detail-url.mjs';
 const noticeDocFiles = (it, opts = {}) => noticeDocFiles0(it, { sameTitle, ...opts });
-import { findApplyEmail, humanOwnedEmail, staleApplyEmail } from './apply-email.mjs';
+import { findApplyEmail, humanOwnedEmail, staleApplyEmail, staleInTexts } from './apply-email.mjs';
 import { decodeEntities } from './clean-title.mjs';
 import { readDocuments, placeholderOnly as docsPlaceholderOnly } from './doc-list.mjs';
 /* 포털 판정은 `apply-channel.js` 한 곳 — 앱·관리자 화면도 같은 파일을 쓴다(베끼지 말 것).
@@ -132,12 +132,7 @@ const EXCERPT_NOTE = '공고 원문에서 그대로 발췌 (자동)';
 const EXCERPT_NOTE_DOC = '공고문 첨부에서 그대로 발췌 (자동)';
 /* 본문에 다른 글의 띠(배너·팝업 — 항공대 「정규직 신규직원 채용 · 지원기간 : …」)가 제목보다 **앞에** 붙어 오는 게시판이 있다.
    공고 제목 줄이 본문에 있으면 그 줄부터 발췌한다(제목 앞은 그 글이 아니다) · 못 찾거나 그 뒤에서 한 줄도 못 뽑으면 본문 전체(예전 그대로) */
-/* 공고 제목 줄의 자리 — 본문 줄 중 제목 몸통(말머리 뗀 앞 20자)을 담은 첫 줄. 못 찾으면 -1 (제목이 짧으면 찾지 않는다) */
-export function titleLineAt(lines, it) {
-  const core = String((it && it.name) || '').replace(/^(?:\[[^\]]*\]\s*|공통\s+)+/, '').replace(/\s+/g, '');
-  if (core.length < 10) return -1;
-  return (lines || []).findIndex((l) => String(l).replace(/\s+/g, '').includes(core.slice(0, 20)));
-}
+/* 공고 제목 줄의 자리(titleLineAt)는 page-boilerplate.mjs 한 곳 — 띠 줄 걷기(ownBody)와 함께 옮겼다(2026-11-17 · 자동 등록의 본문 마감도 같은 규칙을 불러 쓴다) */
 /* `own` — siteChrome 이 사이트 띠 줄을 걷어 낸 본문(ownBody). 제목 뒤에서 한 줄도 못 뽑아 본문 전체로 물러날 때 **띠를 걷은 쪽**을 읽는다
    (가천 외국인 장학금 추가 신청: 제목 뒤 「1. 신청 기간」 ↵ 날짜 꼴이라 발췌가 비자, 물러난 본문 전체에서 FGD 띠 줄 하나가 발췌로 남았다 · 2026-11-16) */
 function excerptsFromBody(body, it, own = body) {
@@ -149,29 +144,10 @@ function excerptsFromBody(body, it, own = body) {
   return got.length ? got : all();
 }
 
-/* ── 사이트 띠(배너) 줄 — 마감 근거에서 뺀다 (2026-11-16 · 가천 FGD 띠 · 리뷰) ─────────────────────────────
-   가천 장학공지는 매 쪽 머리에 **다른 글의 띠**(「2026년 가천대학교 재학생 심층면접토론(FGD) 참여학생 모집」 ↵ 「○ 신청기간: 2026.11.05.(목) ~ 11.18.(수)」)를
-   싣는다. 그 줄이 글 본문보다 먼저 나와 첫 이름표로 잡혀, 11-11·11-12·11-15·11-16 에 끝나는 네 공고가 모두 11-18 마감이 됐다(닫힌 공고가 열림으로 보였다).
-   메뉴 걷기(page-boilerplate · 그 학교 쪽의 40%)는 띠가 26쪽 중 10쪽에만 있어 못 걷었다 — 띠는 몇 주마다 바뀐다.
-   🔴 띠 줄 = **같은 호스트의 서로 다른 글 셋 이상**에 글자 그대로 나오는 줄(buildBoilerplate keyOf · 같은 글의 주소 여벌은 한 번)이면서
-      **이 글의 제목 줄보다 앞에** 있는 줄. 둘 다여야 한다 — 영남대 다문화·3대 동문·천마가족 세 공고는 진짜로 같은 신청기간 줄을 **제목 뒤에** 싣는다
-      (deadline-hint.mjs 의 '같은 힌트 빈도 규칙을 쓰지 말 것' 과 같은 사정). 제목 줄을 못 찾으면 아무것도 걷지 않는다(예전 그대로). */
-const SITE_CHROME_MIN = 3;
-const squashWs = (s) => String(s || '').replace(/\s+/g, '');
-export function siteChromeFrom(pages) {
-  return buildBoilerplate(pages, { minPages: SITE_CHROME_MIN, ratio: 0, keyOf: (v) => squashWs(v.title) || String(v.url || '') });
-}
-/** 본문에서 제목 앞의 띠 줄을 걷은 글 — `{ text, chrome: [걷은 줄] }`. 띠를 모르거나 제목을 못 찾으면 본문 그대로 */
-export function ownBody(body, it, chromeSet) {
-  const text = String(body || '');
-  if (!chromeSet || !chromeSet.size) return { text, chrome: [] };
-  const lines = text.split('\n');
-  const at = titleLineAt(lines, it);
-  if (at <= 0) return { text, chrome: [] };
-  const chrome = [];
-  const kept = lines.filter((l, i) => !(i < at && chromeSet.has(l.trim()) && chrome.push(l.trim())));
-  return { text: kept.join('\n'), chrome };
-}
+/* ── 사이트 띠(배너) 줄 — 규칙은 page-boilerplate.mjs siteChromeFrom · ownBody 한 곳 (2026-11-16 가천 FGD 띠 · 2026-11-17 옮김) ──
+   발췌기(여기)와 자동 등록 앞의 본문 마감(notice-deadline.mjs bodyDeadlineFrom)이 **같은 함수**를 부른다 — 이 파일은 불러오는 순간 원문 파일을 읽어
+   notice-deadline 이 가져다 쓸 수 없어서, 읽고 쓰는 것이 없는 page-boilerplate 로 옮겼다. 베끼지 말 것(관문 「발췌기 글자 읽기」 ⑩·⑪). */
+export { titleLineAt, siteChromeFrom, ownBody };
 
 function extractFrom(text) {
   if (!text) return [];
@@ -1594,6 +1570,15 @@ function putDeadline(it, dl, from) {
       (실측: 그래서 울산연구원 1건을 놓쳤다. 바로 그 갈림길의 마감일 주석이 같은 경고를 한다).
    🔴 주소만 넣지 않는다 — 근거 문장을 함께 남겨야 감사가 '원문에 실제로 있었는가'를 본다. */
 function fillApplyEmail(it, body) {
+  /* 🔴 글 전체로 가르는 규칙(신청은 시스템 · 메일은 선발 뒤 단계 — apply-email.mjs staleInTexts)도 이미 들어간 로봇 값에 소급한다(원칙 7).
+     근거 문장이 든 원문이 손에 있을 때만 판정하고, 읽는 글은 아래 찾기와 같다(본문 그대로 · 첨부는 annexCut + withoutBrokenAddr) */
+  if (it.applyEmail && !humanOwnedEmail(it.applyEmailFrom)
+      && staleInTexts(it, [body, ...docTexts(it).map((t) => withoutBrokenAddr(annexCut(t)))])) {
+    droppedApplyEmail += 1;
+    console.log(`   [접수메일 걷음] ${it.id} — ${it.applyEmail} · 원문 전체로 보면 접수처가 아닌 줄(${it.applyEmailSource})`);
+    if (!WRITE) return;
+    delete it.applyEmail; delete it.applyEmailSource; delete it.applyEmailFrom;
+  }
   /* OCR 첨부에서 읽어 둔 접수 메일은 글자층과 맞춰 본 첨부(crossCheckOcr)로 다시 읽는다 — 다른 주소가 나오면 그것이 원문이다(연세 미래 브랜드장학금 `Gnjael.gwd` → `injae1.gwd`) */
   if (it.applyEmail && /^공고문 첨부\(OCR\)/.test(it.applyEmailFrom || '')) {
     const again = applyEmailFromDocs(it);
