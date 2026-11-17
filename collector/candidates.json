@@ -1,8 +1,118 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-11-17",
- "count": 1793,
+ "count": 1798,
  "items": [
+  {
+   "title": "(글로벌)(교외)2026-2학기 외대비전 HUFS Dorm 장학금 신청",
+   "url": "https://dep.hufs.ac.kr/bbs/student/2431/271834/artclView.do",
+   "attachments": [
+    {
+     "name": "2026-2학기 외대비전HUFSDorm 장학금 신청서 및 추천서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/153384/download.do"
+    },
+    {
+     "name": "개인정보수집이용동의서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/153385/download.do"
+    }
+   ],
+   "deadlineHint": "제출기한 : 2026. 11. 18( 수 ) ~ 2026. 11. 26( 목 ) 15:00 까지 8. 신청방법 : 온라인 신청 (HUFS Abi",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "foundAt": "2026-11-17",
+   "bodyDeadline": "2026-11-26",
+   "bodyDeadlineText": "( 파일명 : 2026-2 외대비전 HUFS Dorm 장학금 지원서 ( 학번 , 이름 ).pdf 7. 제출기한 : 2026. 11. 18( 수 ) ~ 2026. 11. 26( 목 ) 15:00 까지"
+  },
+  {
+   "title": "2026년도 경북대학교장학회장학기금「KNU 우수연구 장학금」장학..",
+   "url": "https://home.knu.ac.kr/HOME/knussw/sub.htm?nav_code=knu1619416593&mode=view&mv_data=aWR4PTIxNzUmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=",
+   "attachments": [
+    {
+     "name": "[붙임1] (필수서류)경북대학교장학회장학기금 장학생 추천서.hwpx",
+     "url": "https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxNzUmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=0"
+    },
+    {
+     "name": "[붙임2] (추가서류)KNU 우수연구장학금 신청서.hwpx",
+     "url": "https://home.knu.ac.kr/HOME/bbs/bbs_download.php?mv_data=aWR4PTIxNzUmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZuYXZfY29kZT1rbnUxNjE5NDE2NTkzJnNpdGVfY29kZT1rbnVzc3cmY29kZT1NdTZTeG42UDFJUWMmc2VhcmNoX2l0ZW09JnNlYXJjaF9vcmRlcj0mb3JkZXJfbGlzdD0mbGlzdF9zY2FsZT0=&download=h&seq=1"
+    }
+   ],
+   "deadlineHint": "신청 기한: ~2026. 11. 23.(월) ※ 예산 소진 시 조기 마감 가능 6. 문의처: 학생과 053-950-2105 [붙임1] (필수서류",
+   "school": "경북대학교",
+   "campus": "",
+   "foundAt": "2026-11-17",
+   "bodyDeadline": "2026-11-23",
+   "bodyDeadlineText": "4. 신청 방법: 제출 서류(붙임 1~2)를 소속 학과(부) 사무실로 제출 5. 신청 기한: ~2026. 11. 23.(월) ※ 예산 소진 시 조기 마감 가능"
+  },
+  {
+   "title": "주거안정장학금 월별 지급 변경에 따른 10월분 지급 일정 안내 (미제출시 지급 불가)",
+   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/274537/artclView.do",
+   "attachments": [
+    {
+     "name": "(학생)장학생 지급요청서 작성 매뉴얼.pdf",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/184361/download.do"
+    }
+   ],
+   "deadlineHint": "제출 기한 : 11 월 22 일 ( 일 ) 까지 3. 제출 사항 : 주거안정장학금 지급요청서 작성 및 제출 4. 문의 : 학생생활지원팀 044-",
+   "school": "고려대학교 세종캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-17",
+   "bodyDeadline": "2026-11-22",
+   "bodyDeadlineText": "2. 제출 기한 : 11 월 22 일 ( 일 ) 까지"
+  },
+  {
+   "title": "2026학년도 국가우수장학(이공계) 일시지원유형(한 학기) 장학생 선발 안내",
+   "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/521215",
+   "attachments": [
+    {
+     "name": "신청서류(양식).hwp",
+     "url": "https://wise.dongguk.ac.kr/cmmn/fileDown.do?filename=%EC%8B%A0%EC%B2%AD%EC%84%9C%EB%A5%98(%EC%96%91%EC%8B%9D).hwp&filepath=/files/article/servicenotice/521215/&filerealname=D1387D4E08ED4F75BB12B48A3706813D.hwp"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-17"
+  },
+  {
+   "title": "(사)한국건설교통신기술협회 미래 건설교통신기술인 장학생 모집 안내",
+   "url": "https://www.jbnu.ac.kr/web/Board/219952/detailView.do?category=6",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "전북대학교",
+   "campus": "",
+   "foundAt": "2026-11-17"
+  },
+  {
+   "title": "2026학년도 2학기 국가근로장학금 희망근로기관 3차신청 및 선발안내",
+   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12630/view.do?currentPageNo=1",
+   "attachments": [],
+   "deadlineHint": "신청기간 : 11.18.(수) ~ 11.20.(금 ) ( 기한 엄수 ) ※ 24 시간 신청 가능함 . 나 . 희망근로지 신청시 첨부된 엑셀자료의",
+   "school": "국민대학교",
+   "campus": "",
+   "foundAt": "2026-11-17",
+   "bodyDeadline": "2026-11-20",
+   "bodyDeadlineText": "가 . 희망근로지 3차신청기간 : 11.18.(수) ~ 11.20.(금 ) ( 기한 엄수 )"
+  },
+  {
+   "title": "[재공지] [발전협력팀]2026학년도 수원지역동문회 장학생 선발 안내(~11/25)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=142059&article.offset=0&articleLimit=10",
+   "attachments": [
+    {
+     "name": "부속기관",
+     "url": "https://www.skku.edu/skku/about/organ/attachment_01.do"
+    },
+    {
+     "name": "성균관대학교_수원장학회_장학금_신청서(2026).hwp",
+     "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=download&articleNo=142059&attachNo=119231"
+    }
+   ],
+   "deadlineHint": "접수기간: ~ 2026.11.25.(수), 18:00 2. 신청방법(아래의 자료를 yjhm89@skku.edu로 메일제출) 가. 첨부파일의 장학",
+   "school": "성균관대학교",
+   "campus": "",
+   "foundAt": "2026-11-17",
+   "bodyDeadline": "2026-11-25",
+   "bodyDeadlineText": "[재공지] [발전협력팀]2026학년도 수원지역동문회 장학생 선발 안내(~11/25)"
+  },
   {
    "title": "2027년도 제10기 유하푸른재단 장학생 선발 안내",
    "url": "https://home.knu.ac.kr/HOME/knussw/sub.htm?nav_code=knu1619416593&mode=view&mv_data=aWR4PTIxNzMmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=",
@@ -30068,33 +30178,6 @@
    "school": "경희대학교",
    "campus": "",
    "foundAt": "2026-09-18"
-  },
-  {
-   "title": "[공통][교외]2026-2학기 정영오(Luke) 장학금 장학생 모집안내",
-   "url": "https://dep.hufs.ac.kr/bbs/student/2431/267001/artclView.do",
-   "attachments": [
-    {
-     "name": "2026-2학기 정영오 장학금+신청서(양식).hwp",
-     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150782/download.do"
-    },
-    {
-     "name": "개인정보수집이용동의서.hwp",
-     "url": "https://dep.hufs.ac.kr/bbs/student/2431/150783/download.do"
-    }
-   ],
-   "deadlineHint": "지원기간 : 2026. 9. 21( 월 ) ~ 9. 30( 수 ) 15:00 까지 나 . 선발 : 10월말 ( 예정 ) 다 . 선발확인 : HU",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "foundAt": "2026-09-17"
-  },
-  {
-   "title": "공통 2026년 하반기 문주장학재단 AI·ICT 분야 인재 장학생 선발 안내",
-   "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/list.do?menuNo=200318#n-%EA%B3%B5%ED%86%B5%202026%EB%85%84%20%ED%95%98%EB%B0%98%EA%B8%B0%20%EB%AC%B8%EC%A3%BC%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20AI%C2%B7ICT%20%EB%B6%84%EC%95%BC%20%EC%9D%B8%EC%9E%AC%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20",
-   "attachments": [],
-   "deadlineHint": null,
-   "school": "경희대학교",
-   "campus": "",
-   "foundAt": "2026-09-17"
   }
  ]
 }

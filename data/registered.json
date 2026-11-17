@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-16",
+ "updatedAt": "2026-11-17",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -3521,7 +3521,13 @@
    ],
    "kindConfidence": "low",
    "kindFrom": "로봇(원문) 2026-10-01",
-   "openDate": "2026-09-11"
+   "openDate": "2026-09-11",
+   "excerpts": [
+    "신청기간 : 2026.9.11.(금) 09시~9.28.(월)18시",
+    "선발결과발표 2026. 10월말",
+    "신청문의 : a1599-2290"
+   ],
+   "excerptNote": "공고문 첨부에서 그대로 발췌 (자동)"
   },
   {
    "id": "auto-ent2431266612artclviewdo",
@@ -3698,8 +3704,8 @@
    "boardTitle": "서울 [서울C] 2026학년도 2학기 하나금융나눔재단 하나장학생 선발 안내",
    "type": "교외",
    "provider": "주관 기관 원문 확인",
-   "amount": "80만원",
-   "amountValue": 800000,
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
    "deadline": "2026-09-23",
    "listedAt": "2026-09-16",
    "period": "접수 기간 ~2026-09-23",
@@ -3742,15 +3748,6 @@
     "※ 복학생은 휴학 직전학기 성적 기준",
     "※ 본인이 장애인인 경우 성적 요건 미적용"
    ],
-   "amountSpec": {
-    "kind": "fixed",
-    "value": 800000,
-    "ratio": 0,
-    "min": 800000,
-    "max": 800000,
-    "raw": "1. 장학금액 1인 80만원 (생활비성 장학금)"
-   },
-   "amountFrom": "공고 원문",
    "eligibilityPrev": {
     "lines": [
      "2. 지원자격",
@@ -10254,11 +10251,6 @@
      "name": "본문이미지-1588x2245.jpg",
      "url": "https://wise.dongguk.ac.kr/cmmn/fileView?path=/ckeditor//servicenotice&physical=1789696402518.jpg",
      "bodyImage": true
-    },
-    {
-     "name": "본문이미지-982x734.png",
-     "url": "https://mindlogic-chatapi-public.s3.ap-northeast-2.amazonaws.com/university/dongguk_icon_image.png",
-     "bodyImage": true
     }
    ],
    "sourceUrl": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520607",
@@ -15650,11 +15642,6 @@
     {
      "name": "본문이미지-4961x7016.jpg",
      "url": "https://wise.dongguk.ac.kr/cmmn/fileView?path=/ckeditor//servicenotice&physical=1792135340162.jpg",
-     "bodyImage": true
-    },
-    {
-     "name": "본문이미지-982x734.png",
-     "url": "https://mindlogic-chatapi-public.s3.ap-northeast-2.amazonaws.com/university/dongguk_icon_image.png",
      "bodyImage": true
     }
    ],
@@ -24044,6 +24031,11 @@
      "school": "성균관대학교",
      "url": "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=142000&article.offset=0&articleLimit=10",
      "id": "notice:https://www.skku.edu/skku/campus/skk_comm/notice06.do?articleno=142000"
+    },
+    {
+     "school": "전북대학교",
+     "url": "https://www.jbnu.ac.kr/web/Board/219952/detailView.do?category=6",
+     "id": "notice:https://www.jbnu.ac.kr/web/Board/219952/detailView.do?category=6"
     }
    ],
    "scopeFrom": "같은 사업이 성균관대학교 게시판에도 올라옴(자동) — 성균관대학교 게시판 https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=142000&article.offset=0&articleLimit=10",
@@ -24754,11 +24746,6 @@
      "name": "본문이미지-1892x742.png",
      "url": "https://wise.dongguk.ac.kr/cmmn/fileView?path=/ckeditor//servicenotice&physical=1794815386440.png",
      "bodyImage": true
-    },
-    {
-     "name": "본문이미지-982x734.png",
-     "url": "https://mindlogic-chatapi-public.s3.ap-northeast-2.amazonaws.com/university/dongguk_icon_image.png",
-     "bodyImage": true
     }
    ],
    "sourceUrl": "https://wise.dongguk.ac.kr/article/servicenotice/detail/521206",
@@ -24958,6 +24945,151 @@
     "raw": "라 . 지원내용 : 선발 해당학기 (‘26 학년도 2 학기 ) 등록금 전액 지원 ※ 기초생활수급자 생활비 추가 지원 없음"
    },
    "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-ent2431271834artclviewdo",
+   "name": "(글로벌)(교외)2026-2학기 외대비전 HUFS Dorm 장학금 신청",
+   "boardTitle": "(글로벌)(교외)2026-2학기 외대비전 HUFS Dorm 장학금 신청",
+   "type": "교외",
+   "kindEvidence": [
+    "접수처 「포털 HUFS Ability」"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-11-17",
+   "provider": "주관 기관 원문 확인",
+   "amount": "50만원",
+   "amountValue": 500000,
+   "deadline": "2026-11-26",
+   "deadlineFrom": "공고 원문 · ( 파일명 : 2026-2 외대비전 HUFS Dorm 장학금 지원서 ( 학번 , 이름 ).pdf 7. 제출기한 : 2026. 11. 18( 수 ) ~ 2026. 11. 26( 목 ) 15:00 까지",
+   "period": "접수 ~2026-11-26",
+   "summary": "한국외국어대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "한국외국어대학교"
+   },
+   "documents": [
+    "장학금 신청서",
+    "자기소개서 ( 첨부 양식 )",
+    "장학금 추천서 ( 첨부 양식 )",
+    "2026-2 학기 국가장학금 소득구간 확인서 1 부",
+    "개인정보 이용 . 수집동의서 ( 첨부 양식 )"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-17 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026-2학기 외대비전HUFSDorm 장학금 신청서 및 추천서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/153384/download.do"
+    },
+    {
+     "name": "개인정보수집이용동의서.hwp",
+     "url": "https://dep.hufs.ac.kr/bbs/student/2431/153385/download.do"
+    }
+   ],
+   "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/271834/artclView.do",
+   "sourceKind": "auto",
+   "applyPortal": "HUFS Ability",
+   "applyPortalSource": "8. 신청방법 : 온라인 신청 (HUFS Ability- 학생핵심역량통합시스템 ) → 로그인 ( 학번 / 비번 ) → 교과 / 비교과 → 장학신청 목록 → 해당 장학금",
+   "applyPortalFrom": "공고 원문",
+   "openDate": "2026-11-18",
+   "documentsFrom": "공고 원문",
+   "eligibilityLines": [
+    "2. 지원대상 : 2026 년 글로벌캠퍼스 기숙사에 거주하는 / 했던 학생"
+   ],
+   "excerpts": [
+    "4. 장학금액 : 50 만원 ( 생활비성 장학금 )",
+    "7. 제출기한 : 2026. 11. 18( 수 ) ~ 2026. 11. 26( 목 ) 15:00 까지"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 500000,
+    "ratio": 0,
+    "min": 500000,
+    "max": 500000,
+    "raw": "4. 장학금액 : 50 만원 ( 생활비성 장학금 )"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-ervicenoticedetail521215",
+   "name": "2026학년도 국가우수장학(이공계) 일시지원유형(한 학기) 장학생 선발 안내",
+   "boardTitle": "2026학년도 국가우수장학(이공계) 일시지원유형(한 학기) 장학생 선발 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "본문 「교내장학」"
+   ],
+   "kindConfidence": "low",
+   "kindFrom": "로봇(원문) 2026-11-17",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": null,
+   "listedAt": "2026-11-17",
+   "period": "접수 기간 원문 확인",
+   "summary": "동국대학교 WISE캠퍼스 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "동국대학교 WISE캠퍼스"
+   },
+   "documents": [
+    "우수 인재를 이공계로 적극 유도하여 국가 핵심 인재군으로 육성하고 과학기술분야 국가 경쟁력 우위를 확보하기 위하여 지원하는 장학금",
+    "선발유형 및 지원금액"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-17 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "신청서류(양식).hwp",
+     "url": "https://wise.dongguk.ac.kr/cmmn/fileDown.do?filename=%EC%8B%A0%EC%B2%AD%EC%84%9C%EB%A5%98(%EC%96%91%EC%8B%9D).hwp&filepath=/files/article/servicenotice/521215/&filerealname=D1387D4E08ED4F75BB12B48A3706813D.hwp"
+    }
+   ],
+   "sourceUrl": "https://wise.dongguk.ac.kr/article/servicenotice/detail/521215",
+   "sourceKind": "auto",
+   "documentsFrom": "공고 원문",
+   "eligibilityLines": [
+    "대상 : 1 차 합격자",
+    "( 한국장학재단에 장학금 미신청자는 탈락되므로 기한엄수 )",
+    "~ 2026.11.27.( 금 ) 까지",
+    "최종 장학생 추천",
+    "1 차 합격자 에 한하여 학생서비스팀 신청 확인 및 최종 추천"
+   ]
+  },
+  {
+   "id": "auto-2630viewdocurrentpageno1",
+   "name": "2026학년도 2학기 국가근로장학금 희망근로기관 3차신청 및 선발안내",
+   "boardTitle": "2026학년도 2학기 국가근로장학금 희망근로기관 3차신청 및 선발안내",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「국가근로」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-17",
+   "provider": "주관 기관 원문 확인",
+   "amount": "금액 원문 확인",
+   "amountValue": 0,
+   "deadline": "2026-11-20",
+   "deadlineFrom": "공고 원문 · 가 . 희망근로지 3차신청기간 : 11.18.(수) ~ 11.20.(금 ) ( 기한 엄수 )",
+   "period": "접수 ~2026-11-20",
+   "summary": "국민대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "국민대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-17 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12630/view.do?currentPageNo=1",
+   "sourceKind": "auto"
   }
  ]
 }
