@@ -1,7 +1,28 @@
 {
  "school": "서울과학기술대학교",
- "updatedAt": "2026-11-16",
+ "updatedAt": "2026-11-17",
  "items": [
+  {
+   "title": "서울과학기술대학교 제43대 총학생회 본선거 투표 안내",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897851&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-17",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-17",
+   "thumb": "data/news/img/14e9c99cac3d6dd1.webp"
+  },
+  {
+   "title": "IXLab 학부 연구인턴 모집",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897840&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-17",
+   "kind": "채용",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-17",
+   "desc": "서울과학기술대학교 IXLab (Interaction Lab)에서 HCI(Human–Computer Interaction, 인간–컴퓨터 상호작용) 분야 연구에 참여할 학부 연구인턴을 모집합니다."
+  },
   {
    "title": "2026학년도 확장형 캡스톤디자인(MINI, PRE, JOINT) 지원사업 추가모집 결과발표",
    "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897831&qidx=4691&cate=10&allboard=false&nowpage=1",

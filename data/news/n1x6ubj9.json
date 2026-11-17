@@ -1,7 +1,28 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-11-16",
+ "updatedAt": "2026-11-17",
  "items": [
+  {
+   "title": "[채용/모집] 시스템 신경과학 연구실 대학원 진학 예정 학부 연구 인턴 모집 (성균관대 뇌과학뇌공학과 김재현)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142062&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-17",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-17",
+   "desc": "안녕하세요. 성균관대학교 뇌과학뇌공학과 시스템 신경과학 연구실(PI: 김재현 교수)에서 대학원 진학(2027년 후기 혹은 2028년 전기)을 희망하는 학부 학생을 대상으로 연구 인턴을 모집합니다."
+  },
+  {
+   "title": "[인사캠] 2026년 12월 체력증진센터(경영관, 600주년기념관) 회원모집 안내",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142011&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-17",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-17",
+   "desc": "성균관대학교 인문사회과학캠퍼스 체력증진센터 2026년 12월 회원을 아래와 같이 모집하오니 교내 구성원 여러분들의 많은 이용 바랍니다. Ⅰ. 등록 기준일 - 2026년 12월 1일(화)"
+  },
   {
    "title": "성균관대학교 교무처 교무팀(서울) 자체계약직원 채용",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142019&article.offset=0&articleLimit=10",
@@ -423,28 +444,6 @@
    "src": "45ec8fd1",
    "foundAt": "2026-11-09",
    "desc": "1. 모집인원: 0명 2. 지원 자격: 본교 재학생 또는 휴학생 - 한국인일 경우, 러시아어 능통자(해외 유학 경력자 우대)"
-  },
-  {
-   "title": "★ 2026 제2회 성균관대학교 삼성융합의과학원 국제심포지엄 안내 ★(11월 30일(월)까지 홈페이지 사전 등록 )",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141690&article.offset=0&articleLimit=10",
-   "postedAt": "2026-11-09",
-   "kind": "행사",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-11-09",
-   "thumb": "data/news/img/ed8d71efa3299be0.webp",
-   "desc": "삼성융합의과학원 성균관대학교 삼성융합의과학원(SAIHST)에서는 오는 12월 3일(목), ‘Physical AI in Medicine: From Recognition and Reasoning to Embodied…"
-  },
-  {
-   "title": "[운용재] 2026년 변리사반 신입실원 모집안내",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141576&article.offset=0&articleLimit=10",
-   "postedAt": "2026-11-09",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-11-09",
-   "desc": "성균관대 운용재 2026년도 운용재 변리사반 신입실원을 아래와 같이 모집하오니, 많은 지원 바랍니다."
   }
  ]
 }

@@ -1,7 +1,28 @@
 {
  "school": "부산대학교",
- "updatedAt": "2026-11-16",
+ "updatedAt": "2026-11-17",
  "items": [
+  {
+   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(고려대학교 HUSS)",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512239",
+   "postedAt": "2026-11-17",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-17",
+   "desc": "2026학년도 겨울계절수업 고려대학교(HUSS) 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
+  },
+  {
+   "title": "도약수업 (법학전문대학원 교수 및 AI튜터와 함께하는 맞춤형 민법) 신청안내",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512235",
+   "postedAt": "2026-11-17",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-17",
+   "desc": "1. 내용: 도약수업 현직 법학전문대학원 민법교수(주지홍 교수, 입학처장, 강의 경력 30년, 국가시험 출제위원)가 민법(민총, 물권, 채권)을 직접 1시간 강의하고, 그 후 2교시때 해당 부분에 대해 공무원…"
+  },
   {
    "title": "연구행정통합시스템(rERP) 침해사고 발생 및 개인정보 유출 관련 안내",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512220",
@@ -402,28 +423,6 @@
    "src": "2d0d4013",
    "foundAt": "2026-11-02",
    "thumb": "data/news/img/c21166f7d9761cd7.webp"
-  },
-  {
-   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(서강대학교 수정)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511918",
-   "postedAt": "2026-11-02",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-02",
-   "desc": "2026학년도 겨울계절수업 서강대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
-  },
-  {
-   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(중앙대학교)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511917",
-   "postedAt": "2026-11-02",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-02",
-   "desc": "2026학년도 겨울계절수업 중앙대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
   }
  ]
 }
