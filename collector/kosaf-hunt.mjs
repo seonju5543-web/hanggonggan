@@ -152,6 +152,20 @@ export function searchRows(json, allowed) {
   }
   return out;
 }
+/** 검색할 공고 — 오늘 홈페이지 길로 못 고른 것(leftover) + **오늘 안 본 재단** 가운데 글 후보(url 줄)가 아직 없는 것.
+    🔴 2026-11-18: 검색이 '오늘 홈페이지를 다시 본 재단'(3일에 한 번)에만 붙어 있어, 열쇠가 들어온 뒤에도 하루 몇 곳만 물었다 —
+       재단 홈페이지 꼴(여는 날)과 검색(묻는 날)은 따로다. 이미 글 후보가 있는 공고는 다시 묻지 않는다(그 재단을 다시 보는 날 새로 묻는다). */
+export function searchQueue(groups, due, leftover, prevItems) {
+  const dueHosts = new Set((due || []).map((g) => g.host));
+  const hasUrl = new Set();
+  for (const l of prevItems || []) if (l && l.url) for (const k of [l.target && l.target.key, ...(l.also || [])]) hasUrl.add(String(k || '').replace(/^kosaf-/, ''));
+  const out = [...(leftover || [])]; const seen = new Set(out.map((t) => t.key));
+  for (const g of groups || []) {
+    if (dueHosts.has(g.host)) continue;
+    for (const t of g.targets) if (!seen.has(t.key) && !hasUrl.has(String(t.key))) { seen.add(t.key); out.push(t); }
+  }
+  return out;
+}
 /** 공고 하나의 검색 결과 → 후보 줄 하나(못 고르면 null) */
 export function searchLine(t, rows, query, { today = '' } = {}) {
   const got = pickKosafPost(t, rows);
@@ -326,7 +340,7 @@ export async function runHunt({ root, today, dry = false, all = false, only = ''
   if (!keys) sstat.why = '꺼짐(열쇠 없음 — GitHub Secrets NAVER_CLIENT_ID · NAVER_CLIENT_SECRET)';
   else {
     const searched = [];
-    for (const t of leftover) {
+    for (const t of searchQueue(groups, due, leftover, prevFile.items)) {
       if (sstat.asked >= SEARCH_MAX) { sstat.why = `상한 ${SEARCH_MAX}번 — 나머지는 다음 실행`; break; }
       if (!budget.hasRoom(PAGE_MS)) { sstat.why = '예산이 다 됨 — 나머지는 다음 실행'; break; }
       if (sstat.failed >= 3) { sstat.why = '검색 실패가 3번 — 이번 실행은 멈춤(열쇠·한도를 확인)'; break; }

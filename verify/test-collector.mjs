@@ -14240,6 +14240,12 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
   eq('  같은 점수 규칙으로 그 사업 글을 고른다 · 후보 줄 source search · query 를 남긴다 · 확인 로봇이 읽는 꼴이다',
     sl ? [sl.target.key, sl.url, sl.source, sl.query, LCm.loadCandidates({ v: 1, items: [sl] }, { today: '2026-10-13' }).ok.length] : [], ['9001', 'https://gana.or.kr/bbs/view.php?id=101', 'search', '재단법인 가나장학재단 성적우수장학생 공고', 1]);
   eq('  그 사업 글이 없으면 고르지 않는다(남의 사업 글을 붙이지 않는다)', KH.searchLine ? KH.searchLine(t1, srows.filter((r) => /id=102/.test(r.url)), 'q', { today: '2026-10-13' }) : 'x', null);
+  /* 2026-11-18 — 검색은 '오늘 홈페이지를 다시 본 재단'에만 붙어 있으면 안 된다(열쇠가 들어온 뒤에도 사흘에 걸쳐 몇 곳만 물었다) */
+  const qa = { key: 'A1' }, qb = { key: 'B1' }, qc = { key: 'C1' }, qd = { key: 'C2' };
+  const qGroups = [{ host: 'a.kr', targets: [qa] }, { host: 'b.kr', targets: [qb] }, { host: 'c.kr', targets: [qc, qd] }];
+  eq('  ⑧-1 검색 대상 — 오늘 본 재단의 못 고른 공고 + 안 본 재단 중 글 후보(url 줄)가 없는 공고 · 게시판 줄만 있으면 묻는다 · also 로 묶인 공고도 후보 있음으로 친다',
+    KH.searchQueue ? KH.searchQueue(qGroups, [qGroups[0]], [qa], [{ target: { key: 'B1' }, board: 'https://b.kr/list' }, { target: { key: 'kosaf-C1' }, url: 'https://c.kr/v?id=1', also: ['C2'] }]).map((t) => t.key) : [],
+    ['A1', 'B1']);
   const khSrc = readText(new URL('../collector/kosaf-hunt.mjs', import.meta.url));
   eq('  열쇠는 환경 변수로만 받는다(코드에 값 없음) · 주소는 NAVER API HUB(옛 개발자센터는 신규 신청이 닫혔다) · 워크플로가 Secrets 를 넘긴다 · 상한이 있다',
     [/X-NCP-APIGW-API-KEY-ID': keys\.id/.test(khSrc) && /naverapihub\.apigw\.ntruss\.com\/search\/v1\/webkr/.test(khSrc), /NAVER_CLIENT_ID: \$\{\{ secrets\.NAVER_CLIENT_ID \}\}/.test(wf), /NAVER_CLIENT_SECRET: \$\{\{ secrets\.NAVER_CLIENT_SECRET \}\}/.test(wf), /sstat\.asked >= SEARCH_MAX/.test(khSrc)], [true, true, true, true]);
