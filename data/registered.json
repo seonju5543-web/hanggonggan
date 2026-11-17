@@ -17287,6 +17287,14 @@
      "name": "본문이미지-402x414.png",
      "url": "https://www.kw.ac.kr/ko/img/kw_chatbot_icon2.png?v=20251021",
      "bodyImage": true
+    },
+    {
+     "name": "20261021 인석장학금 유형Ⅰ 온라인접수 체크리스트1.hwp",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35466&ano=53536"
+    },
+    {
+     "name": "20261021 인석장학금 유형Ⅱ 온라인접수 체크리스트1.hwp",
+     "url": "https://www.kw.ac.kr/include/Download.jsp?fuid=35467&ano=53536"
     }
    ],
    "sourceUrl": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53536&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -23297,6 +23305,18 @@
     {
      "name": "(첨부3) 삼성꿈장학재단 글로벌 희망장학 홍보 포스터(게재용).pdf",
      "url": "https://www.inha.ac.kr/bbs/kr/8/41792/download.do"
+    },
+    {
+     "name": "첨부1. DAC List of Aid Recipients - 2025 flows.pdf",
+     "url": "https://www.sogang.ac.kr/file-fe-prd/board/141/551811_1.pdf?sg=%EC%B2%A8%EB%B6%801.%20DAC%20List%20of%20Aid%20Recipients%20-%202025%20flows.pdf"
+    },
+    {
+     "name": "첨부2-1.[양식]삼성꿈장학재단 글로벌 희망장학 신청서(학부).hwp",
+     "url": "https://www.sogang.ac.kr/file-fe-prd/board/141/551811_2.hwp?sg=%EC%B2%A8%EB%B6%802-1.[%EC%96%91%EC%8B%9D]%EC%82%BC%EC%84%B1%EA%BF%88%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8%20%EA%B8%80%EB%A1%9C%EB%B2%8C%20%ED%9D%AC%EB%A7%9D%EC%9E%A5%ED%95%99%20%EC%8B%A0%EC%B2%AD%EC%84%9C(%ED%95%99%EB%B6%80).hwp"
+    },
+    {
+     "name": "첨부2-2.[Form]Global Hope Scholarship Program Application(Undergraduate).doc",
+     "url": "https://www.sogang.ac.kr/file-fe-prd/board/141/551811_3.doc?sg=%EC%B2%A8%EB%B6%802-2.[Form]Global%20Hope%20Scholarship%20Program%20Application(Undergraduate).doc"
     }
    ],
    "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551811?bbsConfigFk=141&namepage=ScholarshipNotice",
@@ -23649,6 +23669,10 @@
     {
      "name": "문우림 제6기 장학생 선발 모집요강.pdf",
      "url": "https://www.kyonggi.ac.kr/www/downloadBbsFile.do?atchmnflNo=990304"
+    },
+    {
+     "name": "문우림 제6기 장학생 선발 포스터.jpg",
+     "url": "https://www.kyonggi.ac.kr/www/downloadBbsFile.do?atchmnflNo=990302"
     }
    ],
    "sourceUrl": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627142&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888",
@@ -23784,7 +23808,16 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-11-12 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "[유하푸른재단] 2027년도 제10기 장학생 선발 안내문.pdf",
+     "url": "https://www.sogang.ac.kr/file-fe-prd/board/141/551816_1.pdf?sg=1.%20[%EC%9C%A0%ED%95%98%ED%91%B8%EB%A5%B8%EC%9E%AC%EB%8B%A8]%202027%EB%85%84%EB%8F%84%20%EC%A0%9C10%EA%B8%B0%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EC%95%88%EB%82%B4%EB%AC%B8.pdf"
+    },
+    {
+     "name": "유하푸른재단 제 10기 장학생 지원서 (학교명, 지원자명).docx",
+     "url": "https://www.sogang.ac.kr/file-fe-prd/board/141/551816_2.docx?sg=2.%20%EC%9C%A0%ED%95%98%ED%91%B8%EB%A5%B8%EC%9E%AC%EB%8B%A8%20%EC%A0%9C%2010%EA%B8%B0%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%A7%80%EC%9B%90%EC%84%9C%20(%ED%95%99%EA%B5%90%EB%AA%85,%20%EC%A7%80%EC%9B%90%EC%9E%90%EB%AA%85).docx"
+    }
+   ],
    "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551816?bbsConfigFk=141&namepage=ScholarshipNotice",
    "sourceKind": "auto",
    "applyEmail": "rhdrudfla2@oneduksan.com",
@@ -24589,7 +24622,16 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-11-16 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "미래로장학금(재심)_신청서_양식(2026_2R).hwp",
+     "url": "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=9vJUvfNwRXSuK6yJ2uUCNW5ipNa6s86pfhwWEYAEDiw%3D&fs=1"
+    },
+    {
+     "name": "추천서_(학과장_또는_지도교수)_(미래로재심_2026)_2R.hwp",
+     "url": "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=9vJUvfNwRXSuK6yJ2uUCNW5ipNa6s86pfhwWEYAEDiw%3D&fs=2"
+    }
+   ],
    "sourceUrl": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4OTklMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
    "sourceKind": "auto",
    "applyPortal": "KUPID",
@@ -24657,6 +24699,10 @@
      "name": "본문이미지-1892x742.png",
      "url": "https://wise.dongguk.ac.kr/cmmn/fileView?path=/ckeditor//servicenotice&physical=1794815386440.png",
      "bodyImage": true
+    },
+    {
+     "name": "개인정보 수집 및 이용 동의서(2026장학).hwp",
+     "url": "https://wise.dongguk.ac.kr/cmmn/fileDown.do?filename=%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4%20%EC%88%98%EC%A7%91%20%EB%B0%8F%20%EC%9D%B4%EC%9A%A9%20%EB%8F%99%EC%9D%98%EC%84%9C(2026%EC%9E%A5%ED%95%99).hwp&filepath=/files/article/servicenotice/521206/&filerealname=A82E7B33FC7847439E4B9F0B41981740.hwp"
     }
    ],
    "sourceUrl": "https://wise.dongguk.ac.kr/article/servicenotice/detail/521206",
@@ -24728,6 +24774,10 @@
     {
      "name": "붙임.샘물근로배정부서 확인.pdf",
      "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770333&attachNo=564003"
+    },
+    {
+     "name": "웹 브라우저에서 바로보기",
+     "url": "https://www.smu.ac.kr/flexer/index.jsp?ftype=pdf&attachNo=564000"
     }
    ],
    "sourceUrl": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=770333&article.offset=0&articleLimit=10",
@@ -24790,6 +24840,10 @@
     {
      "name": "02-02.국가우수(이공계)장학금 대학 자체 선발 기준.pdf",
      "url": "https://www.smu.ac.kr/kor/life/notice.do?mode=download&articleNo=770332&attachNo=563999"
+    },
+    {
+     "name": "웹 브라우저에서 바로보기",
+     "url": "https://www.smu.ac.kr/flexer/index.jsp?ftype=pdf&attachNo=563999"
     }
    ],
    "sourceUrl": "https://www.smu.ac.kr/kor/life/notice.do?mode=view&articleNo=770332&article.offset=0&articleLimit=10",
@@ -24970,7 +25024,20 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-11-17 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "붙임3. 2026년도 2학기 희망근로지 신청 매뉴얼_모바일앱(3차 신청).pdf",
+     "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/fileDefaultDownload.do?fileNo=2c999c4186294b21ac9922f3298a70ee&seq=1"
+    },
+    {
+     "name": "붙임2. 2026년도 2학기 희망근로지 신청 매뉴얼_홈페이지(3차 신청).pdf",
+     "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/fileDefaultDownload.do?fileNo=2c999c4186294b21ac9922f3298a70ee&seq=2"
+    },
+    {
+     "name": "붙임1. 2026-2학기 지원가능학과 및 선발우대사항_교내근로(3차).xlsx",
+     "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/fileDefaultDownload.do?fileNo=2c999c4186294b21ac9922f3298a70ee&seq=3"
+    }
+   ],
    "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12630/view.do?currentPageNo=1",
    "sourceKind": "auto",
    "eligibilityLines": [

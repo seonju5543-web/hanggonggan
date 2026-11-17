@@ -13688,7 +13688,34 @@ return { submitChannelKind, submitChannelLabel, hasPortalName };`)();
    🔴 **주소를 여기 베껴 적지 않는다** — 베끼면 이 관문이 세 번째 사본이 된다.
       support-config.js 에서 읽어 terms.html 안에 그 주소가 있는지만 본다. */
 {
-  console.log('\n■ 문의처 — 앱과 약관이 갈라지지 않는다 (2026-09-23)');
+  console.log('\n■ 약관 수집 항목 — 서버로 가는 프로필 칸이 전부 약관에 적혀 있다 (2026-11-17)');
+{
+  /* 로그인하면 프로필 사본이 서버로 간다(supabase-client syncSafeProfile · 떼는 것은 rrn·account 와 동의 없는 flags·traits 뿐).
+     11-17 전엔 이름·연락처·부모 거주지·보유 장학금·신청서에서 배운 값이 약관 표에 없었다 — 칸을 늘리면 여기서 빨개진다. */
+  const appSrc = readText(new URL('../app.js', import.meta.url));
+  const terms = readText(new URL('../terms.html', import.meta.url));
+  const body = (/function collectProfile\(\)[\s\S]*?\n\}/.exec(appSrc) || [''])[0];
+  const keys = [...new Set([...body.matchAll(/^\s{4,6}([a-zA-Z]+):/gm)].map((m) => m[1]))];
+  const learned = [...((/const LEARNED_COMMON = \[([\s\S]*?)\];/.exec(appSrc) || [])[1] || '').matchAll(/\['([a-zA-Z]+)'/g)].map((m) => m[1]);
+  const OMIT = ['rrn', 'account', 'common'];            // 서버로 안 가는 것 · common 은 묶음 이름(안의 칸을 따로 본다)
+  const WORD = {
+    name: '이름', studentId: '학번', birth: '생년월일', phone: '휴대전화', email: '이메일', bank: '은행명',
+    school: '학교와 캠퍼스', campus: '학교와 캠퍼스', year: '학년', status: '학적상태', major: '전공과 계열', track: '전공과 계열',
+    gpa: '직전학기 성적', credits: '이수학점', bracket: '학자금 지원구간', nationality: '국적', birthYear: '출생연도',
+    region: '사는 곳', regionCity: '사는 곳', residenceMonths: '그 주소에 산 기간', parentRegion: '부모님이 사는 곳', parentRegionCity: '부모님이 사는 곳',
+    originRegion: '출신 고등학교 소재지', originCity: '출신 고등학교 소재지', schoolRegion: '학교와 캠퍼스',
+    scholarships: '지금 받고 있는 장학금', cert: '어학 성적 보유', exchange: '교환학생', interestKinds: '대외활동의 종류', interestFields: '대외활동의 종류와 분야',
+    flags: '특별자격', traits: '자격 확인 질문',
+    gender: '성별', addr: '주소', emergency: '긴급 연락처', guardianName: '보호자의 이름', guardianRel: '보호자의 이름과 관계', guardianPhone: '보호자 연락처',
+  };
+  const sent = keys.concat(learned).filter((k) => !OMIT.includes(k));
+  eq('collectProfile·LEARNED_COMMON 을 실제로 읽었다', [keys.length >= 20, learned.length >= 5], [true, true]);
+  eq('🔴 서버로 가는 칸마다 약관 문구가 정해져 있다 — 새 칸이면 약관 표에 적고 이 표(WORD)에 더한다', sent.filter((k) => !WORD[k]), []);
+  eq('🔴 그 문구가 약관(terms.html)에 실제로 있다', [...new Set(sent.map((k) => WORD[k]).filter(Boolean))].filter((w) => !terms.includes(w)), []);
+  eq('  서버로 안 가는 주민등록번호·계좌번호는 「③ 서버로 보내지 않는 정보」 에 있다', [/③ 서버로 보내지 않는 정보[\s\S]*주민등록번호[\s\S]*계좌번호/.test(terms)], [true]);
+}
+
+console.log('\n■ 문의처 — 앱과 약관이 갈라지지 않는다 (2026-09-23)');
   const supportSrc = readText(new URL('../support-config.js', import.meta.url));
   const terms = readText(new URL('../terms.html', import.meta.url));
   const m = supportSrc.match(/\bemail:\s*'([^']*)'/);
