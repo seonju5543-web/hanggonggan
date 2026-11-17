@@ -279,6 +279,33 @@
   "round": "2026-11-20",
   "nextAt": "2026-11-25"
  },
+ "kosaf|2000193001|https://www.hongcheon.go.kr/www/selectEminwonNewsView.do?key=283&news_epct_no=12167&ofr_pageSize=10": {
+  "ds": "kosaf",
+  "key": "2000193001",
+  "url": "https://www.hongcheon.go.kr/www/selectEminwonNewsView.do?key=283&news_epct_no=12167&ofr_pageSize=10",
+  "source": "search",
+  "by": "로봇(층2 글 사냥꾼)",
+  "title": "홍천군, 저소득 주민자녀 장학생 선발",
+  "firstAt": "2026-11-18",
+  "lastAt": "2026-11-18",
+  "tries": 1,
+  "status": "suggest",
+  "why": "회차를 가릴 날짜가 안 보임",
+  "checks": {
+   "C": "ok",
+   "L": "ok",
+   "H": "ok",
+   "T": "ok",
+   "R": "weak",
+   "X": "ok",
+   "P": "ok"
+  },
+  "round": "2026-11-20",
+  "decidedAt": "2026-11-18",
+  "also": [
+   "2000193002"
+  ]
+ },
  "kosaf|2000202004|https://www.samcheok.go.kr/media/00083/00089.web?gcode=1002&idx=142862&amode=view&": {
   "ds": "kosaf",
   "key": "2000202004",
@@ -313,6 +340,22 @@
   "checks": {},
   "round": "2026-12-11",
   "nextAt": "2026-11-20"
+ },
+ "kosaf|2000204008|board:https://www.wonju.go.kr/www/index.do": {
+  "ds": "kosaf",
+  "key": "2000204008",
+  "url": "",
+  "board": "https://www.wonju.go.kr/www/index.do",
+  "source": "board",
+  "by": "로봇(층2 글 사냥꾼)",
+  "firstAt": "2026-11-18",
+  "lastAt": "2026-11-18",
+  "tries": 1,
+  "status": "pending",
+  "why": "게시판 목록(12줄)에서 그 글을 하나로 못 고름",
+  "checks": {},
+  "round": "2026-12-11",
+  "nextAt": "2026-11-19"
  },
  "kosaf|2000204008|board:https://www.wonju.go.kr/www/selectBbsNttList.do?bbsNo=1119&key=5251&": {
   "ds": "kosaf",
@@ -542,6 +585,36 @@
   "round": "2026-11-20",
   "nextAt": "2026-11-24"
  },
+ "kosaf|2000395001|https://www.ongjin.go.kr/open_content/main/bbs/bbsMsgDetail.do?msg_seq=26744&bcd=notice": {
+  "ds": "kosaf",
+  "key": "2000395001",
+  "url": "https://www.ongjin.go.kr/open_content/main/bbs/bbsMsgDetail.do?msg_seq=26744&bcd=notice",
+  "source": "search",
+  "by": "로봇(층2 글 사냥꾼)",
+  "title": "(재)옹진군인재육성재단 2026년 2학기 장학생 선발 계획 공고",
+  "firstAt": "2026-11-18",
+  "lastAt": "2026-11-18",
+  "tries": 1,
+  "status": "verified",
+  "why": "그 재단·그 사업·이번 회차 공고로 확인",
+  "checks": {
+   "C": "ok",
+   "L": "ok",
+   "H": "ok",
+   "T": "ok",
+   "R": "ok",
+   "X": "ok",
+   "P": "ok"
+  },
+  "round": "2026-11-20",
+  "decidedAt": "2026-11-18",
+  "verifiedAt": "2026-11-18",
+  "also": [
+   "2000395002",
+   "2000395003",
+   "2000395006"
+  ]
+ },
  "kosaf|2000398001|board:https://www.gwangju.go.kr/welfare/boardList.do?boardId=BD_0000000594&pageId=welfare86": {
   "ds": "kosaf",
   "key": "2000398001",
@@ -573,6 +646,25 @@
   "checks": {},
   "round": "2026-11-18",
   "nextAt": "2026-11-25"
+ },
+ "kosaf|2000421001|https://www.inje.go.kr/egf/bp/board/article/download?fileSeq=120999": {
+  "ds": "kosaf",
+  "key": "2000421001",
+  "url": "https://www.inje.go.kr/egf/bp/board/article/download?fileSeq=120999",
+  "source": "search",
+  "by": "로봇(층2 글 사냥꾼)",
+  "title": "2026년 (재)인제군장학회 장학생 선발 공고(안)",
+  "firstAt": "2026-11-18",
+  "lastAt": "2026-11-18",
+  "tries": 1,
+  "status": "pending",
+  "why": "못 엶(열기 실패: page.goto: Download is starting) — 다시 봅니다",
+  "checks": {
+   "C": "ok",
+   "L": "unread"
+  },
+  "round": "2026-12-04",
+  "nextAt": "2026-11-19"
  },
  "kosaf|2000423012|https://www.jincheon.go.kr/jcjh/sub.do?menukey=3464&mode=view&no=1076147380": {
   "ds": "kosaf",
@@ -726,6 +818,32 @@
   "checks": {},
   "round": "2026-11-23",
   "nextAt": "2026-11-20"
+ },
+ "kosaf|2000483023|https://www.seoulfuture.or.kr/home/kor/M025378985/board.do?idx=cb00d1a0008a85e71a41b8741facbffe9c92b5676b1d6934d9efe41731e60154&act=detail&board_code=XL50YTz5": {
+  "ds": "kosaf",
+  "key": "2000483023",
+  "url": "https://www.seoulfuture.or.kr/home/kor/M025378985/board.do?idx=cb00d1a0008a85e71a41b8741facbffe9c92b5676b1d6934d9efe41731e60154&act=detail&board_code=XL50YTz5",
+  "source": "search",
+  "by": "로봇(층2 글 사냥꾼)",
+  "title": "[서울선순환인재 장학금] 2026년 서울선순환인재 장학금 선발공고 | 장학사업 공....",
+  "firstAt": "2026-11-18",
+  "lastAt": "2026-11-18",
+  "tries": 1,
+  "status": "verified",
+  "why": "그 재단·그 사업·이번 회차 공고로 확인",
+  "checks": {
+   "C": "ok",
+   "L": "ok",
+   "H": "ok",
+   "T": "ok",
+   "R": "ok",
+   "X": "ok",
+   "P": "ok"
+  },
+  "round": "2026-11-23",
+  "decidedAt": "2026-11-18",
+  "verifiedAt": "2026-11-18",
+  "also": []
  },
  "kosaf|2500058003|board:https://www.jiles.or.kr/community/notice/othernews.htm": {
   "ds": "kosaf",
@@ -910,6 +1028,25 @@
   "round": "2026-11-20",
   "nextAt": "2026-11-20"
  },
+ "kosaf|2700004002|https://www.ikef.or.kr/page.php?id=/kj/scholar_schedule_detail&wr_id=102&page=1": {
+  "ds": "kosaf",
+  "key": "2700004002",
+  "url": "https://www.ikef.or.kr/page.php?id=/kj/scholar_schedule_detail&wr_id=102&page=1",
+  "source": "search",
+  "by": "로봇(층2 글 사냥꾼)",
+  "title": "2026년도 21기 국내장학생 선발(학부)",
+  "firstAt": "2026-11-18",
+  "lastAt": "2026-11-18",
+  "tries": 1,
+  "status": "rejected",
+  "why": "다른 화면이 열림(다른 글이 열림(제목 불일치))",
+  "checks": {
+   "C": "ok",
+   "L": "fail"
+  },
+  "round": "2026-11-20",
+  "decidedAt": "2026-11-18"
+ },
  "kosaf|2700016004|https://www.stxfoundation.or.kr/index/s2/s2_1.php?wr_id=35": {
   "ds": "kosaf",
   "key": "2700016004",
@@ -983,6 +1120,25 @@
   "round": "2026-12-31",
   "decidedAt": "2026-11-01"
  },
+ "kosaf|2700071007|https://www.ycsf.or.kr/open/notice/dn.php?idx=342&step=A&num=1": {
+  "ds": "kosaf",
+  "key": "2700071007",
+  "url": "https://www.ycsf.or.kr/open/notice/dn.php?idx=342&step=A&num=1",
+  "source": "search",
+  "by": "로봇(층2 글 사냥꾼)",
+  "title": "2026년도 재단법인 영천시장학회 장학생 선발계획 공고",
+  "firstAt": "2026-11-18",
+  "lastAt": "2026-11-18",
+  "tries": 1,
+  "status": "pending",
+  "why": "못 엶(열기 실패: page.goto: Download is starting) — 다시 봅니다",
+  "checks": {
+   "C": "ok",
+   "L": "unread"
+  },
+  "round": "2026-12-31",
+  "nextAt": "2026-11-19"
+ },
  "kosaf|2700724005|https://www.gnu.ac.kr/international/na/ntt/selectNttInfo.do?nttSn=8232642&mi=8212": {
   "ds": "kosaf",
   "key": "2700724005",
@@ -1006,6 +1162,32 @@
   },
   "round": "2026-12-18",
   "decidedAt": "2026-11-16",
+  "also": []
+ },
+ "kosaf|2700727005|https://www.ansanfys.or.kr/sub02/sub01.php?type=view&uid=1071": {
+  "ds": "kosaf",
+  "key": "2700727005",
+  "url": "https://www.ansanfys.or.kr/sub02/sub01.php?type=view&uid=1071",
+  "source": "search",
+  "by": "로봇(층2 글 사냥꾼)",
+  "title": "2026년 2학기 안산시 대학생 본인부담 등록금 반값지원 신청 공고 2026-09-28",
+  "firstAt": "2026-11-18",
+  "lastAt": "2026-11-18",
+  "tries": 1,
+  "status": "suggest",
+  "why": "제목이 제목 자리가 아니라 본문에만 보임",
+  "checks": {
+   "C": "ok",
+   "L": "weak",
+   "H": "ok",
+   "T": "ok",
+   "R": "weak",
+   "X": "ok",
+   "P": "ok"
+  },
+  "final": "https://ansanfys.or.kr/sub02/sub01.php?type=view&uid=1071",
+  "round": "2026-11-20",
+  "decidedAt": "2026-11-18",
   "also": []
  },
  "kosaf|2700727005|https://www.ansanfys.or.kr/sub03/sub03.php": {
@@ -1042,22 +1224,16 @@
   "by": "로봇(층2 글 사냥꾼)",
   "title": "석성장학회, 2026년도 석성선행장학금 585명에 2억7천만원 전달",
   "firstAt": "2026-10-13",
-  "lastAt": "2026-10-14",
-  "tries": 2,
-  "status": "suggest",
-  "why": "회차를 가릴 날짜가 안 보임",
+  "lastAt": "2026-11-18",
+  "tries": 1,
+  "status": "pending",
+  "why": "못 엶(HTTP 403) — 다시 봅니다",
   "checks": {
    "C": "ok",
-   "L": "ok",
-   "H": "ok",
-   "T": "ok",
-   "R": "weak",
-   "X": "ok",
-   "P": "ok"
+   "L": "unread"
   },
   "round": "2026-11-30",
-  "decidedAt": "2026-10-14",
-  "also": []
+  "nextAt": "2026-11-19"
  },
  "kosaf|2701042002|board:http://www.seoksung.co.kr/cms/bbs/board.php?bo_table=nanum": {
   "ds": "kosaf",
@@ -1067,13 +1243,13 @@
   "source": "board",
   "by": "로봇(층2 글 사냥꾼)",
   "firstAt": "2026-10-13",
-  "lastAt": "2026-10-14",
-  "tries": 2,
-  "status": "rejected",
-  "why": "그 사이트 robots.txt 가 게시판 훑기를 막음 — 글 주소로 다시 적어 주세요",
+  "lastAt": "2026-11-18",
+  "tries": 1,
+  "status": "pending",
+  "why": "게시판을 못 엶(응답 403)",
   "checks": {},
   "round": "2026-11-30",
-  "decidedAt": "2026-10-14"
+  "nextAt": "2026-11-19"
  },
  "kosaf|2701048001|board:https://sanhak.duksung.ac.kr/support/board/inside": {
   "ds": "kosaf",
@@ -1090,6 +1266,32 @@
   "checks": {},
   "round": "2026-11-01",
   "nextAt": "2026-11-03"
+ },
+ "kosaf|2701096002|https://www.jincheon.go.kr/home/sub.do?menukey=406&mode=view&no=1090368397": {
+  "ds": "kosaf",
+  "key": "2701096002",
+  "url": "https://www.jincheon.go.kr/home/sub.do?menukey=406&mode=view&no=1090368397",
+  "source": "search",
+  "by": "로봇(층2 글 사냥꾼)",
+  "title": "2026년 (재)이월면장학회 장학생 선발 공고",
+  "firstAt": "2026-11-18",
+  "lastAt": "2026-11-18",
+  "tries": 1,
+  "status": "verified",
+  "why": "그 재단·그 사업·이번 회차 공고로 확인",
+  "checks": {
+   "C": "ok",
+   "L": "ok",
+   "H": "ok",
+   "T": "ok",
+   "R": "ok",
+   "X": "ok",
+   "P": "ok"
+  },
+  "round": "2026-11-18",
+  "decidedAt": "2026-11-18",
+  "verifiedAt": "2026-11-18",
+  "also": []
  },
  "kosaf|2701180001|board:https://kwangnam.imweb.me/8dcb4ksz": {
   "ds": "kosaf",

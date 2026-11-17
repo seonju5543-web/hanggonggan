@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-17T19:05:43.232Z",
+ "updatedAt": "2026-11-17T19:49:30.943Z",
  "v": 1,
  "bad": {
   "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11401": {
@@ -119,12 +119,54 @@
    "title": "2026년 2학기 구민한마음 계속장학금 지급 신청 안내",
    "round": "2026-11-20"
   },
+  "id:kosaf-2000395001": {
+   "url": "https://www.ongjin.go.kr/open_content/main/bbs/bbsMsgDetail.do?msg_seq=26744&bcd=notice",
+   "at": "2026-11-18",
+   "src": "robot",
+   "title": "2026년 2학기 장학생 선발계획",
+   "round": "2026-11-20"
+  },
+  "id:kosaf-2000395002": {
+   "url": "https://www.ongjin.go.kr/open_content/main/bbs/bbsMsgDetail.do?msg_seq=26744&bcd=notice",
+   "at": "2026-11-18",
+   "src": "robot",
+   "title": "2026년 2학기 장학생 선발계획",
+   "round": "2026-11-20"
+  },
+  "id:kosaf-2000395003": {
+   "url": "https://www.ongjin.go.kr/open_content/main/bbs/bbsMsgDetail.do?msg_seq=26744&bcd=notice",
+   "at": "2026-11-18",
+   "src": "robot",
+   "title": "2026년 2학기 장학생 선발계획",
+   "round": "2026-11-20"
+  },
+  "id:kosaf-2000395006": {
+   "url": "https://www.ongjin.go.kr/open_content/main/bbs/bbsMsgDetail.do?msg_seq=26744&bcd=notice",
+   "at": "2026-11-18",
+   "src": "robot",
+   "title": "2026년 2학기 장학생 선발계획",
+   "round": "2026-11-20"
+  },
   "id:kosaf-2000429013": {
    "url": "https://scholarship.eumseong.go.kr/www/selectBbsNttView.do?key=33&bbsNo=3&nttNo=792",
    "at": "2026-10-06",
    "src": "robot",
    "title": "2026년 전입장학금 지원 공고",
    "round": "2026-11-30"
+  },
+  "id:kosaf-2000483023": {
+   "url": "https://www.seoulfuture.or.kr/home/kor/M025378985/board.do?idx=cb00d1a0008a85e71a41b8741facbffe9c92b5676b1d6934d9efe41731e60154&act=detail&board_code=XL50YTz5",
+   "at": "2026-11-18",
+   "src": "robot",
+   "title": "2026년 서울선순환인재 장학금 선발 공고문",
+   "round": "2026-11-23"
+  },
+  "id:kosaf-2701096002": {
+   "url": "https://www.jincheon.go.kr/home/sub.do?menukey=406&mode=view&no=1090368397",
+   "at": "2026-11-18",
+   "src": "robot",
+   "title": "2026년 (재)이월면장학회 장학생 선발 공고",
+   "round": "2026-11-18"
   },
   "id:kosaf-2704378001": {
    "url": "https://www.cheongro.org/bbs/board.php?tbl=bbs41&mode=VIEW&num=30&",
