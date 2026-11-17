@@ -317,6 +317,18 @@
    "by": "claude-session",
    "action": "edit",
    "detail": "auto-oardid323054menuno200318 — amount, amountValue"
+  },
+  {
+   "at": "2026-11-17 19:37 KST",
+   "by": "claude-session",
+   "action": "revert",
+   "detail": "3건 제거(353 → 350건) · 재등록 차단 id 3·주소 3"
+  },
+  {
+   "at": "2026-11-17 19:37 KST",
+   "by": "claude-session",
+   "action": "edit",
+   "detail": "10건 — auto-bbssc58944388artclviewdo — eligibilityLines, eligibilityExcludes / auto-ent2431269444artclviewdo — eligibilityLines, eligibilityExcludes / auto-dmodeviewduid53536tpage1 — eligibilityLines, eligibilityExcludes / auto-ervicenoticedetail521215 — deadline, eligibilityLines, amount, period / auto-b888ec9db4eab3b5eab38420 — name, deadline, eligibilityLines, amount, period / auto-2630viewdocurrentpageno1 — eligibilityLines, eligibilityExcludes, amount / auto-4bnum57138cate0qidx57138-1duciyc — amount / auto-ent2431269433artclviewdo — eligibilityLines / auto-kuk2351210342artclviewdo — eligibilityLines / auto-skor478127125artclviewdo — type"
   }
  ]
 }
