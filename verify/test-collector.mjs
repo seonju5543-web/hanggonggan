@@ -5193,6 +5193,8 @@ console.log('\n■ 금액·양식 카드 빈 칸 (2026-11-15)');
       [nm('공문_붙임1_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf'), nm('(붙임2) 2026-2학기 국가근로장학금 운영계획서 및 자체선발기준.hwp'), nm('Attachment 강의계획서.pdf')], [false, false, false]);
     eq('  자기소개서는 학생 서식 · 자기소개서가 같이 적힌 추천서 양식도 · 추천서 신청서양식은 여전히 아니다',
       [nm('사회봉사활동 자기소개서-이오순장학재단(2027-1).hwp'), nm('2027 자기소개서 및 추천서 양식(장학금 지원자).doc'), nm('[서식 2] 장학생 추천서 신청서양식.hwp'), nm('붙임1.멘토 활동계획서 양식.hwp')], [true, true, false, true]);
+    eq('  `신청서 및 추천서` 한 파일은 학생 신청서다 — 신청서가 앞에 오고 및·쉼표로 이어질 때만 (외대 HUFS Dorm 11-17 · 양식 PDF 로봇이 동의서만 바꾸고 신청서를 빠뜨렸다) · 추천서만·추천서가 앞이면 아니다',
+      [nm('2026-2학기 외대비전HUFSDorm 장학금 신청서 및 추천서.hwp'), nm('장학금 지원서, 추천서.hwp'), nm('[서식 2] 장학생 추천서.hwp'), nm('추천서 및 신청서.hwp')], [true, true, false, false]);
     eq('첨부 확장자: 아이콘 꼬리를 떼고 · 이름에 없으면 바이트 머리(PDF·PNG) · OLE 는 이름 없이 가르지 않는다 (강원대 원본이 .bin)',
       [FR.attachExt('신청서 및 개인정보제공동의서(2026.2학기 도전장학금).hwp chevron_forward'), FR.attachExt('download.do', Buffer.from('%PDF-1.4 xx')),
         FR.attachExt('x', Buffer.from([0x89, 0x50, 0x4e, 0x47, 0, 0, 0, 0])), FR.attachExt('x', Buffer.from([0xd0, 0xcf, 0x11, 0xe0, 0, 0, 0, 0]))], ['hwp', 'pdf', 'png', 'bin']);
