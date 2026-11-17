@@ -1657,6 +1657,13 @@ console.log('\n■ 제출 서류 목록 — 원문의 「제출서류」 절을 
     [/got\.basis && !hasFormAtt && !it\.formId && !it\.program && !\/\^관리자\/\.test\(it\.prepDocFrom/.test(fd), /prepDocBasis = got\.basis\.slice\(0, 300\)/.test(fd), /prepDocFrom = `로봇/.test(fd)], [true, true, true]);
 }
 
+console.log('\n■ 원문 후보 리포트 — 🟡 사람 확인 목록에 닫힌·이미 고친 공고를 띄우지 않는다 (2026-11-18 · 인계)');
+{
+  const lc = readText(new URL('../collector/link-check.mjs', import.meta.url));
+  eq('  🟡 목록은 마감 전이고 사람 바로잡기(data/link-fixes.json)가 없는 후보만',
+    /\.filter\(\(\{ t \}\) => !\(t\.deadline && String\(t\.deadline\)\.slice\(0, 10\) < TODAY\) && !\(t\.fixKey && humanFix\[t\.fixKey\]\)\)/.test(lc), true);
+}
+
 console.log('\n■ 첨부 받기 실패 이유 장부 (2026-11-18 · 인계 F1)');
 {
   /* 실패가 로그 한 줄로만 사라져 「503·봇 차단」이 몇 건인지 아무도 못 셌다 — 받기 두 갈래(신청서 원본 · 자격 공고문)의 실패 자리 넷(상태 · 오류 · 스크립트 주소 · 웹페이지)이
