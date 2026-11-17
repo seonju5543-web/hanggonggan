@@ -23191,6 +23191,11 @@
      "school": "경북대학교",
      "url": "https://home.knu.ac.kr/HOME/knussw/sub.htm?nav_code=knu1619416593&mode=view&mv_data=aWR4PTIxNzQmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=",
      "id": "notice:https://home.knu.ac.kr/HOME/knussw/sub.htm?mv_data=aWR4PTIxNzQmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=&nav_code=knu1619416593"
+    },
+    {
+     "school": "고려대학교 세종캠퍼스",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/274547/artclView.do",
+     "id": "notice:https://sejong.korea.ac.kr/bbs/koreaSejong/659/274547/artclView.do"
     }
    ],
    "scopeFrom": "같은 사업이 서강대학교 게시판에도 올라옴(자동) — 서강대학교 게시판 https://www.sogang.ac.kr/ko/detail/551805?bbsConfigFk=141&namepage=ScholarshipNotice",
@@ -25070,7 +25075,7 @@
    "kindConfidence": "high",
    "kindFrom": "로봇(원문) 2026-11-17",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
+   "amount": "시급 10,320원",
    "amountValue": 0,
    "deadline": "2026-11-20",
    "deadlineFrom": "공고 원문 · 가 . 희망근로지 3차신청기간 : 11.18.(수) ~ 11.20.(금 ) ( 기한 엄수 )",
@@ -25089,11 +25094,36 @@
    "auto": true,
    "attachments": [],
    "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12630/view.do?currentPageNo=1",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "eligibilityLines": [
+    "2. 선발기준",
+    "가 . 선발 상세 기준 : 다음 순위조건을 만족하는 재학생으로 상위 순위자 순으로 선발",
+    "1) 1 순위 : 희망근로지 내에서 근로지 자체 우대사항 우선적용 ( 근로지별 지원가능학과 및 우대사항 엑셀자료 참조 )",
+    "★ 저소득학생이라고 무조건 선발되는 것은 아니며, 근로지별 지원가능학과, 우대사항 기타 등등 상황을 고려하여 근로지 최종 선발",
+    "2) 2 순위 : 소득구간 저소득순",
+    "3) 3 순위 : 소득구간이 동일할 경우 직전학기 백분위 성적이 높은 자",
+    "나 . 국 가근로장학금 업무처리기준 ( 계속참여제한 ) 에 따라 직전학기 국가근로장학생으로 선발되지 않은 학생을 근로지별로",
+    "분리하여 선발이 진행됨.",
+    "다 . 선발 시 부서의 특수성 등이 반영될 수 있으며 , 별도의 면접 및 자격요건 등에 대한 심사가 진행될 수 있음.",
+    "라. 기존 선발자 지원 불가"
+   ],
+   "excerpts": [
+    "희망근로지 3차신청기간 : 11.18.(수) ~ 11.20.(금 ) ( 기한 엄수 )"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "hourly",
+    "value": 0,
+    "ratio": 0,
+    "min": 0,
+    "max": 0,
+    "raw": "4. 지원금액 가 . 교내 - 시급 : 10,320 원 ( 국고 : 8,256 원 / 교비 : 2,064 원 ) ​"
+   },
+   "amountFrom": "공고 원문"
   },
   {
    "id": "auto-b888ec9db4eab3b5eab38420",
-   "name": "[국가/신청] ★2026 국가우수장학금(이공계) ..",
+   "name": "[국가/신청] ★2026 국가우수장학금(이공계) 일시지원 장학생 신청 안내★",
    "boardTitle": "[국가/신청] ★2026 국가우수장학금(이공계) ..",
    "type": "교외",
    "kindEvidence": [
@@ -25102,18 +25132,22 @@
    "kindConfidence": "low",
    "kindFrom": "로봇(원문) 2026-11-17",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
+   "amount": "등록금 전액",
    "amountValue": 0,
-   "deadline": null,
+   "deadline": "2026-11-22",
    "listedAt": "2026-11-17",
-   "period": "접수 기간 원문 확인",
+   "period": "접수 기간 ~2026-11-22",
    "summary": "서울시립대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
     "schoolOnly": "서울시립대학교"
    },
    "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
+    "[필 수] 성적증명서",
+    "[해당자] 한국장학재단 학자금 지원구간 통지서(2026학년도 2학기 기준)",
+    "[해당자] 장학금 수혜증명서(전체)",
+    "[해당자] 국가공인 봉사실적 인증시스템 발급서류(1365, VMS)",
+    "[해당자] 비교과 통합 인증서"
    ],
    "duplicable": true,
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
@@ -25121,7 +25155,40 @@
    "auto": true,
    "attachments": [],
    "sourceUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261117&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
-   "sourceKind": "auto"
+   "sourceKind": "auto",
+   "nameFrom": "공고 원문(잘린 제목 보완)",
+   "deadlineFrom": "공고 원문",
+   "applyEmail": "scholarship@uos.ac.kr",
+   "applyEmailSource": "사. 제출방법: 장학팀 대표메일(scholarship@uos.ac.kr)로 제출",
+   "applyEmailFrom": "공고 원문",
+   "openDate": "2026-11-17",
+   "documentsFrom": "공고 원문",
+   "eligibilityLines": [
+    "라. 심사기준: 지원자격 + 대학 자체 선발 기준(붙임자료 참조)",
+    "다. 지원대상 및 자격 ※아래의 자격요건을 모두 충족해야 함",
+    "1. (기본) 자연과학 또는 공학 계열 학부(과)에 재학중인 3학년 학생",
+    "2. (성적) 직전학기 백분위 87점 이상 또는 3.5이상 / 4.5만점",
+    "3. (학점) 직전학기 최소이수학점 9학점 이상",
+    "※ 심사학기가 졸업학기일 경우(조기졸업자 포함) 직전학기 최소 3학점 이상 적용"
+   ],
+   "eligibilityExcludes": [
+    "1. 국가우수장학금(이공계) 장학생 자격 유지자 또는 영구탈락자",
+    "※ 국가우수장학금(이공계) 일시지원 장학생 선발 이력은 무관"
+   ],
+   "excerpts": [
+    "사. 제출방법: 장학팀 대표메일(scholarship@uos.ac.kr)로 제출",
+    "- (대학) 추천 대상자 심사 및 선발: 2026. 11. 23.(월) ~ 11. 24.(화)"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "ratio",
+    "value": 0,
+    "ratio": 1,
+    "min": 0,
+    "max": 0,
+    "raw": "나. 장학금액: 2026학년도 2학기(1개 학기) 등록금 전액 ※생활비 미지원 다. 지원대상 및 자격 ※아래의 자격요건을 모두 충족해야 함 1. (기본) 자연과학 또는 공학 계열 학부(과)에 재학중인 3학년 학생 2. (성적) 직전학기 백분위 87점 이상 또는 3.5이상 / 4.5만점 3. (학점) 직전학기 최소이수학점 9학점 이상 ※ 심사학기가 졸업학기일"
+   },
+   "amountFrom": "공고 원문"
   }
  ]
 }
