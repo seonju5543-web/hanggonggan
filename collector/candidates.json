@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-11-17",
- "count": 1798,
+ "count": 1799,
  "items": [
   {
    "title": "(글로벌)(교외)2026-2학기 외대비전 HUFS Dorm 장학금 신청",
@@ -42,6 +42,15 @@
    "foundAt": "2026-11-17",
    "bodyDeadline": "2026-11-23",
    "bodyDeadlineText": "4. 신청 방법: 제출 서류(붙임 1~2)를 소속 학과(부) 사무실로 제출 5. 신청 기한: ~2026. 11. 23.(월) ※ 예산 소진 시 조기 마감 가능"
+  },
+  {
+   "title": "[국가/신청] ★2026 국가우수장학금(이공계) ..",
+   "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/list.do?brdBbsseq=1#n-%5B%EA%B5%AD%EA%B0%80%2F%EC%8B%A0%EC%B2%AD%5D%20%E2%98%852026%20%EA%B5%AD%EA%B0%80%EC%9A%B0%EC%88%98%EC%9E%A5%ED%95%99%EA%B8%88(%EC%9D%B4%EA%B3%B5%EA%B3%84)%20..",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "서울시립대학교",
+   "campus": "",
+   "foundAt": "2026-11-17"
   },
   {
    "title": "주거안정장학금 월별 지급 변경에 따른 10월분 지급 일정 안내 (미제출시 지급 불가)",
