@@ -73,17 +73,23 @@ const DOCS_BY_MAIL = /서류[^@\n]{0,20}[A-Za-z0-9._%+-]+@/;
      ① 신청방법 이름표의 값이 메일이 아닌 길(시스템·포털·홈페이지·방문·우편…)이고 그 값에 메일 낱말이 없다
      ② 그 줄 **뒤** · 메일 줄**까지** 사이에 선발 뒤 단계를 여는 줄(선발자 안내·선정 결과 발표·선발 후·합격자 …)이 있다
    ⚠️ 신청방법 값에 메일이 있으면(「신청방법 : 이메일(kcna@…) 및 우편」) 그대로 받는다 ·
-      자격 줄의 「국가근로장학생 선발자는 … 신청 불가」는 신청방법 줄보다 **앞**이라 세지 않는다(그래서 ②는 '뒤'만 본다). */
-const METHOD_LABEL = /(?:신청|접수|지원|응모)\s?방법\s*[:：]\s*(.+)$/;
+      자격 줄의 「국가근로장학생 선발자는 … 신청 불가」는 신청방법 줄보다 **앞**이라 세지 않는다(그래서 ②는 '뒤'만 본다).
+   🔴 신청방법 줄은 메일 줄에서 **가장 가까운 앞 줄**(그 줄 자신 포함)을 본다 — 장학금 여럿을 한 글에 적은 공고는 절마다 신청방법이 다르다
+      (「1. 성적우수 · 신청방법: 학생포털 · 선발결과 발표」 → 「2. 지역인재 · 신청방법: 이메일 접수 · 제출처: …@」 — 리뷰 3차 2026-11-17).
+      글의 첫 신청방법 줄만 보면 뒤 절의 진짜 접수 메일을 버리고, 발췌기 소급(staleInTexts)이 이미 들어간 주소까지 지운다.
+      가장 가까운 신청방법 줄이 메일을 말하거나 메일 아닌 길을 말하지 않으면 그대로 받는다(헷갈리면 거르지 않는다). */
+const METHOD_LABEL = /(?:신청|접수|지원|응모|제출)\s?방법\s*[:：]\s*(.+)$/;
 const OTHER_CHANNEL = /(시스템|포털|포탈|홈페이지|사이트|방문|우편|등기|온라인)/;
 const MAIL_WORD = /(이\s?메일|e-?mail|메일|전자\s?우편|@)/i;
 const AFTER_SELECTION = /((선발|선정|합격)\s?(자|결과)\s?(안내|발표|통보|공지|확인)|(선발|선정|합격)\s?(완료\s?)?(후|이후)(?![가-힣])|(선발|선정|합격)(된|되신)\s?(학생|자|분|경우))/;
-/** 글에서 '신청은 메일이 아닌 길'이라고 말하는 신청방법 줄의 자리(없으면 -1) */
-function otherChannelMethodAt(lines) {
-  return lines.findIndex((l) => {
-    const m = String(l || '').replace(/\s+/g, ' ').trim().match(METHOD_LABEL);
-    return !!(m && OTHER_CHANNEL.test(m[1]) && !MAIL_WORD.test(m[1]));
-  });
+/** i 번째 줄(자신 포함)에서 가장 가까운 앞 신청방법 줄 — { at, other } (없으면 null).
+ *  other = 그 값이 메일이 아닌 길(시스템·포털·방문·우편…)이고 메일 낱말이 없다 */
+function nearestMethodAt(lines, i) {
+  for (let j = i; j >= 0; j -= 1) {
+    const m = String(lines[j] || '').replace(/\s+/g, ' ').trim().match(METHOD_LABEL);
+    if (m) return { at: j, other: OTHER_CHANNEL.test(m[1]) && !MAIL_WORD.test(m[1]) };
+  }
+  return null;
 }
 
 /** 한 줄이 '학생이 여기로 낸다'고 말하는가 — 판정 근거를 통째로 돌려준다.
@@ -110,13 +116,13 @@ export function judgeLine(line, before = '') {
  */
 export function findApplyEmail(text) {
   const lines = String(text || '').split('\n');
-  const methodAt = otherChannelMethodAt(lines);
   let best = null;
   for (let i = 0; i < lines.length; i += 1) {
     const v = judgeLine(lines[i], lines.slice(Math.max(0, i - 2), i).join(' '));
     if (!v || !v.ok) continue;
-    /* 신청은 다른 길 + 이 메일 줄은 선발 뒤 단계(위 METHOD_LABEL 머리말) — 접수처가 아니다 */
-    if (methodAt >= 0 && i > methodAt && lines.slice(methodAt + 1, i + 1).some((l) => AFTER_SELECTION.test(l))) continue;
+    /* 이 메일 줄의 절에서 신청은 다른 길 + 메일 줄은 선발 뒤 단계(위 METHOD_LABEL 머리말) — 접수처가 아니다 */
+    const method = nearestMethodAt(lines, i);
+    if (method && method.other && lines.slice(method.at + 1, i + 1).some((l) => AFTER_SELECTION.test(l))) continue;
     /* 이름표가 있는 줄이 이긴다. 같은 급이면 **먼저 나온 줄**을 쓴다 —
        공고는 접수 방법을 앞에 적고 뒤에 부연을 단다. */
     if (!best || (v.explicit && !best.explicit)) best = v;

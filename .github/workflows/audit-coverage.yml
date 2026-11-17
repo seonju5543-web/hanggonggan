@@ -140,8 +140,10 @@ jobs:
       # 🔴 이슈 **하나**에 모은다 (2026-10-04 로봇·도구 점검). 옛 판은 라벨 coverage-audit 이 저장소에 없어 gh 가 실패 →
       #    예비 명령이 라벨 없는 이슈를 매주 새로 만들었다(열린 🔍 10건). 제목은 고정(같은 제목이어야 댓글로 모인다),
       #    날짜·건수는 본문 첫 줄에. 옛 날짜 붙은 🔍 는 리포트 정리(tools/report-retention.mjs · 최신 1건)가 닫는다.
+      # 🔴 관문이 리포트를 직전 판으로 되돌렸으면(reverted-files·still-failing·되돌리기 넘어짐) 올리지 않는다 — 디스크의 리포트는 지난 감사인데
+      #    이번 날짜·건수를 얹어 '이번 주 결과'로 올라간다(리뷰 3차 2026-11-17). 이번 판이 남는 것은 관문 통과·kept-preexisting·flaky 셋뿐(collector/gate-guard.mjs).
       - name: 결과 이슈 내용 만들기 (원인 미상이 있을 때만)
-        if: steps.run.outcome == 'success' && steps.run.outputs.unknown != '' && steps.run.outputs.unknown != '0'
+        if: steps.run.outcome == 'success' && steps.run.outputs.unknown != '' && steps.run.outputs.unknown != '0' && (steps.audit.outcome == 'success' || steps.guard.outputs.gate == 'kept-preexisting' || steps.guard.outputs.gate == 'flaky')
         timeout-minutes: 1
         env:
           UNKNOWN: ${{ steps.run.outputs.unknown }}
@@ -157,7 +159,7 @@ jobs:
             mv /tmp/cut.md /tmp/cov.md
           fi
       - name: 결과 이슈 (원인 미상이 있을 때만)
-        if: steps.run.outcome == 'success' && steps.run.outputs.unknown != '' && steps.run.outputs.unknown != '0'
+        if: steps.run.outcome == 'success' && steps.run.outputs.unknown != '' && steps.run.outputs.unknown != '0' && (steps.audit.outcome == 'success' || steps.guard.outputs.gate == 'kept-preexisting' || steps.guard.outputs.gate == 'flaky')
         timeout-minutes: 2
         uses: ./.github/actions/alert-issue
         with:
