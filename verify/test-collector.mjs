@@ -9090,7 +9090,14 @@ console.log('\n■ 환영 화면 문구 (2026-09-12 · UI-22)');
   /* 여러 줄로 쓴 검증은 위 그물을 빠져나간다 — 완료 버튼만은 '도중에 안 막는다'로 따로 못 박는다 */
   const fin = (app.match(/\$\('#btn-finish-onboard'\)\.addEventListener\('click', \(\) => \{([\s\S]*?)\n  \}\);/) || [])[1] || '';
   eq('완료 버튼 처리기를 실제로 찾았다 (빈 값을 통과시키지 않는다)', fin.length > 200, true);
-  eq('완료 버튼은 도중에 막지 않는다 (막으면 문구가 거짓이 된다)', /\breturn;/.test(fin), false);
+  /* 2026-11-17 입력 안전장치(9351b8a6)가 완료 버튼에 '있을 수 없는 값'(평점 999) 되돌림을 넣었는데 이 검사를 같이 옮기지 않아
+     기본 브랜치의 규칙 관문이 빨개졌다(수집 로봇들이 저장 전 관문에서 멈췄다 · 11-18 수리). 그 블록은 빈 칸을 통과시키므로(아래 줄) 문구는 여전히 참이다 —
+     그 한 블록만 떼고 본다 · 다른 return 이 생기면 그대로 걸린다 */
+  const finRest = fin.replace(/const bad = guardFirstBad\(\$\('#screen-onboarding'\)\);\n\s*if \(bad\) \{[\s\S]*?\n    \}\n/, '');
+  eq('완료 버튼은 도중에 막지 않는다 (막으면 문구가 거짓이 된다) — 있을 수 없는 값 되돌림(guardFirstBad) 한 블록만 예외', /\breturn;/.test(finRest), false);
+  const IG0 = createRequire(import.meta.url)('../input-guard.js');
+  eq('  그 되돌림은 빈 칸을 막지 않는다 (막으면 「학교·학년만」 문구가 거짓이 된다) · 다른 return 을 넣으면 걸린다',
+    [IG0.checkNumber('', IG0.PROFILE_LIMITS.gpa || { min: 0, max: 4.5, label: '평점' }).ok, IG0.checkBirthDate('').ok, /\breturn;/.test(`${finRest}\n    if (!x) return;`)], [true, true, true]);
 }
 
 console.log('\n■ 이어보기 판정 (2026-09-09)');
@@ -15814,6 +15821,12 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
   eq('  한 건 만들기 — 맨 위 금액은 문구에서 숫자만 · 총액·범위 줄에서는 안 집는다 · 둘 다 「읽을 내용 없음」이면 줄이 있어도 싣지 않는다 · 실을 줄이 없어도',
     [be.entry.head, be.entry.eligibility.length, CR.headAmount({ amount: ['총 장학금 1억원 (1인당 200만원)'], multi: false }, ITEM, wonIn), CR.headAmount({ amount: ['1,200천원 ~ 1,800천원'], multi: false }, ITEM, wonIn),
       CR.buildEntry(ITEM, SRC, { ...full, unreadable: true }, { ...full, unreadable: true }, wonIn).entry, CR.buildEntry(ITEM, SRC, base, base, wonIn).entry], [1000000, 2, 0, 0, null, null]);
+  /* 2026-11-18 첫 실제 읽기(연세 미래 어학우수장학금): 한 칸씩 흩어진 표를 한쪽이 짜 맞춘 줄(「TOEIC 950/990」)이 대조에서 떨어지자, 핵심 요건(어학 점수)이 빠진 자격 두 줄만 실렸다 */
+  const beDrop = CR.buildEntry(ITEM, SRC, { ...full, eligibility: [...full.eligibility, 'TOEIC 950/990 이상인 자'] }, full, wonIn);
+  const beDropBoth = CR.buildEntry(ITEM, SRC, { ...full, eligibility: ['TOEIC 950/990 이상인 자'] }, { ...full, eligibility: [] }, wonIn);
+  const beDropNote = CR.buildEntry(ITEM, SRC, { ...full, notes: ['TOEIC 950/990 이상인 자'] }, full, wonIn);
+  eq('  🔴 자격·제외·서류에서 한쪽이 낸 줄이 기계 대조에서 떨어지면 그 칸은 싣지 않는다(null) — 남은 줄만 실으면 핵심 요건이 빠진 목록이 된다 · 빈 배열로도 안 싣는다 · 다른 칸(유의)의 떨어진 줄은 자격을 안 건드린다',
+    [beDrop.entry.eligibility, beDrop.held.some((h) => h.field === 'eligibility' && /TOEIC/.test(h.line)), beDropBoth.entry.eligibility, (beDropNote.entry.eligibility || []).length], [null, true, null, 2]);
   eq('  지시문이 바뀌면 원문이 같아도 해시가 달라진다(다시 읽는다) · 같은 원문은 같은 해시', [CR.sourceHash('가') === CR.sourceHash('가'), CR.sourceHash('가') === CR.sourceHash('나'), /update\(SYSTEM\)/.test(readText(new URL('../collector/card-read.mjs', import.meta.url)))], [true, false, true]);
   eq('  🔴 내려갔는지는 유료가 읽은 마감으로 잰다 — 무료 길 마감(접수 시작일)이 지났어도 바로잡은 마감 전이면 결과를 지우지 않는다',
     [CR.closedNow({ id: 'q', deadline: '2026-11-18', listedAt: '2026-11-10' }, { deadline: { date: '2026-11-26', quote: 'x' } }, '2026-11-19'), CR.closedNow({ id: 'q', deadline: '2026-11-18', listedAt: '2026-11-10' }, null, '2026-11-19')], [false, true]);
