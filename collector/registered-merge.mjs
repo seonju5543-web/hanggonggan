@@ -66,7 +66,11 @@ export function mergeInto(keep, drop, { reason = '' } = {}) {
   if (!(keep.attachments || []).length && (drop.attachments || []).length) keep.attachments = drop.attachments;
   /* 발췌는 **주인 표식과 한 세트로** 옮긴다(2026-11-17) — 사람이 쓴 발췌를 표식 없이 옮기면 남는 쪽에서 '로봇이 원문에서 뽑은 줄'로
      둔갑해 근거로 쓰인다. 남는 쪽을 사람이 일부러 비웠으면(`관리자 … · 비움`) 되살리지 않는다(마감과 같다) */
-  if (!(keep.excerpts || []).length && (drop.excerpts || []).length && !excerptsHumanOwned(keep)) {
+  /* 🔴 버리는 쪽 발췌가 **사람 것**이고 남는 쪽이 로봇 것이면 사람 것이 이긴다(2026-11-17 리뷰 4차) — 범위 승격 로봇이 지켜보는 사람 없이
+     합치므로, 남는 쪽에 로봇 발췌가 있다는 이유로 관리자가 바로잡은 줄과 그 표식이 소리 없이 사라졌다 */
+  const dropHuman = (drop.excerpts || []).length && excerptsHumanOwned(drop);
+  if ((dropHuman && !excerptsHumanOwned(keep))
+      || (!(keep.excerpts || []).length && (drop.excerpts || []).length && !excerptsHumanOwned(keep))) {
     keep.excerpts = drop.excerpts;
     if (drop.excerptNote) keep.excerptNote = drop.excerptNote; else delete keep.excerptNote;
     if (drop.excerptsFrom) keep.excerptsFrom = drop.excerptsFrom; else delete keep.excerptsFrom;

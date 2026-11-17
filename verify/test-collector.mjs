@@ -11501,6 +11501,13 @@ console.log('\n■ 발췌 주인 표식 · 바닥글 — 사람이 쓴 발췌는
     const cleared = { id: 'k', eligibility: {}, excerptsFrom: '관리자 2026-11-17 · 비움' };
     RM.mergeInto(cleared, { id: 'd', eligibility: {}, excerpts: ['로봇 줄'], excerptNote: '공고 원문에서 그대로 발췌 (자동)' });
     eq('  사람이 비운 발췌는 합칠 때 되살리지 않는다', cleared.excerpts, undefined);
+    /* 리뷰 4차 — 범위 승격 로봇이 합칠 때 남는 쪽에 로봇 발췌가 있으면 버리는 쪽의 사람 발췌가 소리 없이 사라졌다 */
+    const robotKeep = { id: 'k', eligibility: {}, excerpts: ['로봇 줄'], excerptNote: '공고 원문에서 그대로 발췌 (자동)' };
+    RM.mergeInto(robotKeep, { id: 'd', eligibility: {}, excerpts: ['사람 줄'], excerptsFrom: '관리자 2026-11-17' });
+    eq('  남는 쪽이 로봇 발췌여도 버리는 쪽의 사람 발췌가 표식과 함께 이긴다', [robotKeep.excerpts, robotKeep.excerptsFrom, robotKeep.excerptNote], [['사람 줄'], '관리자 2026-11-17', undefined]);
+    const humanKeep = { id: 'k', eligibility: {}, excerpts: ['남는 쪽 사람 줄'], excerptsFrom: '관리자 2026-11-16' };
+    RM.mergeInto(humanKeep, { id: 'd', eligibility: {}, excerpts: ['버리는 쪽 사람 줄'], excerptsFrom: '관리자 2026-11-17' });
+    eq('  둘 다 사람 발췌면 남는 쪽을 그대로 둔다', [humanKeep.excerpts, humanKeep.excerptsFrom], [['남는 쪽 사람 줄'], '관리자 2026-11-16']);
   }
 
   /* ① 저장소를 진짜로 — 사본 저장소 한 건 */
