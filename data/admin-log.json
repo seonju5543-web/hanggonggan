@@ -305,6 +305,18 @@
    "by": "claude-session",
    "action": "edit",
    "detail": "auto-enoticedoarticleno770333 — eligibilityLines, applyEmail"
+  },
+  {
+   "at": "2026-11-17 17:43 KST",
+   "by": "claude-session",
+   "action": "revert",
+   "detail": "2건 제거(355 → 353건) · 재등록 차단 id 2·주소 2"
+  },
+  {
+   "at": "2026-11-17 17:43 KST",
+   "by": "claude-session",
+   "action": "edit",
+   "detail": "auto-oardid323054menuno200318 — amount, amountValue"
   }
  ]
 }

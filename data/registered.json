@@ -4303,8 +4303,8 @@
    "boardTitle": "공통 [공통] 2026학년도 2학기 반영장학 신청 안내",
    "type": "교내",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "학기 당 2,000,000원",
+   "amountValue": 2000000,
    "deadline": "2026-09-22",
    "listedAt": "2026-09-20",
    "period": "접수 기간 ~2026-09-22",
@@ -4363,7 +4363,8 @@
    "excerpts": [
     "' 신청기간 | 2026.9.11.(금)-9.22.(화) '"
    ],
-   "excerptNote": "공고문 첨부에서 그대로 발췌 (자동)"
+   "excerptNote": "공고문 첨부에서 그대로 발췌 (자동)",
+   "amountFrom": "관리자 2026-11-17"
   },
   {
    "id": "auto-oardid323019menuno200318",
@@ -10460,45 +10461,6 @@
    "nameFrom": "공고 원문(잘린 제목 보완)"
   },
   {
-   "id": "auto-q1brddate20260427brdseq1",
-   "name": "[교내/선발] 2026학년도 시대인재장학 선발 안..",
-   "boardTitle": "[교내/선발] 2026학년도 시대인재장학 선발 안..",
-   "type": "교내",
-   "kindEvidence": [
-    "제목 표식 「교내」"
-   ],
-   "kindConfidence": "high",
-   "kindFrom": "로봇(원문) 2026-10-05",
-   "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
-   "deadline": null,
-   "listedAt": "2026-10-05",
-   "period": "접수 기간 원문 확인",
-   "summary": "서울시립대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
-   "eligibility": {
-    "selective": true,
-    "schoolOnly": "서울시립대학교"
-   },
-   "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
-   ],
-   "duplicable": true,
-   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-10-05 — 양식 스키마화는 검수 후 진행",
-   "auto": true,
-   "attachments": [],
-   "sourceUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260427&brdSeq=1&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
-   "sourceKind": "auto",
-   "eligibilityLines": [
-    "2. 선발대상",
-    "가. 2025학년도 별별포인트 적립자",
-    "나. 직전학기 평균평점 3.5이상인 재학생",
-    "다. 정규학기 등록자(수업연한 초과자 제외)",
-    "라. 직전학기 유기정학 이상 중징계를 받지 않은 자"
-   ]
-  },
-  {
    "id": "auto-bswj104944019artclviewdo",
    "name": "[교외] 2026년 2학기 선원가족 장학생 모집 안내(~10/23)",
    "boardTitle": "[교외] 2026년 2학기 선원가족 장학생 모집 안내(~10/23)",
@@ -10608,80 +10570,6 @@
     "8. 문의 : 학생지원팀 02-910-4053"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
-  },
-  {
-   "id": "auto-0713no2515592sitedvscdkr",
-   "name": "2026년도 2학기 중소기업 취업연계 장학사업(희망사다리 1유형) 신규장학생 추천자 선발 공고",
-   "boardTitle": "2026년도 2학기 중소기업 취업연계 장학사업(희망사다리 1유형) 신규장학생 추천자 선발 공고",
-   "type": "교외",
-   "kindEvidence": [
-    "제목의 바깥 기관 낱말 「기업」"
-   ],
-   "kindConfidence": "high",
-   "kindFrom": "로봇(원문) 2026-10-06",
-   "provider": "주관 기관 원문 확인",
-   "amount": "200만원",
-   "amountValue": 2000000,
-   "deadline": null,
-   "listedAt": "2026-10-06",
-   "period": "접수 기간 원문 확인",
-   "summary": "충남대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
-   "eligibility": {
-    "selective": true,
-    "schoolOnly": "충남대학교"
-   },
-   "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
-   ],
-   "duplicable": true,
-   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-10-06 — 양식 스키마화는 검수 후 진행",
-   "auto": true,
-   "attachments": [
-    {
-     "name": "(붙임1) 26-2학기 희망사다리(1유형) 신규장학생 추천자 선발계획(안).hwp",
-     "url": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2515592&atch_no=1"
-    }
-   ],
-   "sourceUrl": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515592&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
-   "sourceKind": "auto",
-   "eligibilityLines": [
-    "- 대한민국 국적자로 학부 3학년 이상 재학생",
-    "- 희망사다리 장학금 신청 완료, 의무교육(온라인사전교육) 이수 및 진단평가 완료",
-    "- 직전학기 12학점 이상 이수, 백분위 점수 70점 이상"
-   ],
-   "amountSpec": {
-    "kind": "fixed",
-    "value": 2000000,
-    "ratio": 0,
-    "min": 2000000,
-    "max": 2000000,
-    "raw": "4. 지원금액: 학기당 등록금 전액 및 취·창업지원금 200만원 목록 페이지 관리자 | 관리자메일 주요사이트 대학원 대학·학부 학생시설"
-   },
-   "amountFrom": "공고 원문",
-   "eligibilityPrev": {
-    "lines": [
-     "3. 선발기준: 학업성적, 취업·창업준비계획, 유관사업 참여, 현장실습 교과목 이수 여부 및 저소득층 우대 가산점을 포함한 총점 고득점자 순으로 선발"
-    ],
-    "excludes": null,
-    "priority": null,
-    "from": null
-   },
-   "eligibilityStruct": {
-    "common": [
-     "- 대한민국 국적자로 학부 3학년 이상 재학생",
-     "- 희망사다리 장학금 신청 완료, 의무교육(온라인사전교육) 이수 및 진단평가 완료"
-    ],
-    "either": [],
-    "grade": [
-     "- 직전학기 12학점 이상 이수, 백분위 점수 70점 이상"
-    ]
-   },
-   "eligibilityPriority": [
-    "3. 선발기준: 학업성적, 취업·창업준비계획, 유관사업 참여, 현장실습 교과목 이수 여부 및 저소득층 우대 가산점을 포함한 총점 고득점자 순으로 선발"
-   ],
-   "eligibilityFrom": "AI(원문 줄 그대로)",
-   "eligibilityReviewed": false
   },
   {
    "id": "auto-ent2431268564artclviewdo",
