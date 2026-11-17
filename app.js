@@ -4386,7 +4386,8 @@ function bulkTags(sch) {
 function bulkRowHtml(sch) {
   const on = bulkPrep.ids.has(sch.id);
   const d = dday(sch.deadline);
-  const reqs = (typeof requirementLines === 'function' ? requirementLines(sch) : []).slice(0, 6);
+  /* 줄마다 택1 묶음의 머리 줄(`head` · 상세 시트와 같은 이름표)을 그 묶음 첫 줄 위에 — 요건 줄로 세지 않는다(2026-11-17) */
+  const reqs = (typeof requirementLines === 'function' ? requirementLines(sch, null, { withMeta: true }) : []).slice(0, 6);
   return `
     <div class="bulk-row${on ? '' : ' off'}" data-row="${esc(sch.id)}">
       <input type="checkbox" class="bulk-check" data-bulk="${esc(sch.id)}" ${on ? 'checked' : ''}
@@ -4408,7 +4409,7 @@ function bulkRowHtml(sch) {
           ${sch.deadline ? `<p class="bulk-meta">마감 ${esc(sch.deadline.replace(/-/g, '.'))}</p>` : ''}${/* 마감을 모르면 줄 없음(2026-11-15) */ ''}
           <p class="bulk-meta">${esc(submitChannelLabel(sch))}</p>
           ${reqs.length
-            ? `<p class="bulk-meta-head">지원자격 (공고 원문)</p><ul class="bulk-reqs">${reqs.map((r) => `<li>${esc(r)}</li>`).join('')}</ul>`
+            ? `<p class="bulk-meta-head">지원자격 (공고 원문)</p><ul class="bulk-reqs">${reqs.map((r) => `${r.head ? `<li class="r-pick">${esc(r.head)}</li>` : ''}<li>${esc(r.text)}</li>`).join('')}</ul>`
             : ''}
         </details>
       </div>
@@ -4765,13 +4766,15 @@ function noticeSummaryRows(lines) {
   /* 한 줄에 글머리 기호로 여러 항목이 붙어 온 것(`○ (신청방법) 네이버 폼 … ○ (모집대상) 만 19세~39세`)은 항목마다 한 줄로 가른다 — 글자는 그대로 */
   const segs = joinNoticeLines((lines || []).flatMap((raw) => String(raw || '').split(/\s+[○●■□\u25B6▷◆◇]\s*(?=\S)/)));
   for (const raw of segs) {
-    let t = tidyChars(unent(String(raw || '')))
+    const t0 = tidyChars(unent(String(raw || '')))
       .replace(/[\u2605☆\u261E]+/g, ' ').replace(/!{2,}/g, '!')   // 꾸밈 기호·느낌표 줄 — 뜻이 없다
-      .replace(/^[\s\-–—•\u25AA\u25AB\u25FD\u25FE\u25B6▷◆◇○●■□▣\u2605\u2666⇒‡◦∙❍◎￭·ㆍ*◌◍※]+/, '')   // \u25FD·\u25FE(작은 네모)도 글머리(성암육영회 서류 줄 · 2026-11-02 실화면 · 글자는 ui-tone 이 이모지로 세므로 코드에 안 적는다)   // 그림 기호는 \u 로 적는다(화면 말투 관문 ui-tone 이 이모지로 센다)
-      /* 번호를 뗀다 — ⚠️ `10.22.(목)` 의 `10.` 은 번호가 아니라 날짜다(뒤에 날짜가 이어지면 안 뗀다 · 대외활동 실측) */
-      .replace(/^\(?\s*\d{1,2}\s*\)\s*|^\d{1,2}\.(?!\s?\d{1,2}\s?[.(월])\s*|^[①-⑳]\s*|^[가-힣]\s*[.)]\s+/, '')
-      .replace(/^[(（][월화수목금토일][)）]\s*[-–]?\s*/, '')
-      .replace(/^[Oo0](?=\s?[가-힣]{2,8}\s?[:：])\s?/, '')   // 「0모집기간:」·「O접수기간:」 — 글머리 ○ 가 영문 O·숫자 0 으로 읽혀 왔다(2026-11-17 실측 · 이름표 앞에서만)   // `12.(월) - 접수방법 :` — 앞 줄에서 떨어져 나온 날짜 꼬리(번호는 위에서 이미 뗐다)
+      .replace(/^[\s\-–—•\u25AA\u25AB\u25FD\u25FE\u25B6▷◆◇○●■□▣\u2605\u2666⇒‡◦∙❍◎￭·ㆍ*◌◍※]+/, '');   // \u25FD·\u25FE(작은 네모)도 글머리(성암육영회 서류 줄 · 2026-11-02 실화면 · 글자는 ui-tone 이 이모지로 세므로 코드에 안 적는다)   // 그림 기호는 \u 로 적는다(화면 말투 관문 ui-tone 이 이모지로 센다)
+    /* 번호를 뗀다 — 숫자 표식은 match-engine stripListNumber 한 곳(자격 줄과 같은 규칙 · 2026-11-17 리뷰 `3.5 이상`→`5 이상`·`2.1 보호조치`→`1 보호조치`).
+       ⚠️ `10.22.(목)` 의 `10.` 은 번호가 아니라 날짜다(뒤에 날짜가 이어지면 안 뗀다 · 대외활동 실측 — 그 함수가 지킨다) */
+    const t1 = stripListNumber(t0);
+    let t = (t1 !== t0 ? t1 : t0.replace(/^[①-⑳]\s*|^[가-힣]\s*[.)]\s+/, ''))
+      .replace(/^[(（][월화수목금토일][)）]\s*[-–]?\s*/, '')   // `12.(월) - 접수방법 :` — 앞 줄에서 떨어져 나온 날짜 꼬리(번호는 위에서 이미 뗐다)
+      .replace(/^[Oo0](?=\s?[가-힣]{2,8}\s?[:：])\s?/, '')   // 「0모집기간:」·「O접수기간:」 — 글머리 ○ 가 영문 O·숫자 0 으로 읽혀 왔다(2026-11-17 실측 · 이름표 앞에서만)
       .replace(/\s+/g, ' ').trim();
     if (t.length < 4) continue;
     /* 이름표 — `신청기간 : …` · `(신청방법) …` · 앞 괄호가 잘린 `모집기간) …` 꼴. ⚠️ 시각(`09:00`)·주소(`https://`)의 콜론은 이름표가 아니다(리뷰 2026-10-15) */
@@ -5020,7 +5023,16 @@ function eligibilityRowsHtml(sch, result) {
     // 소제목을 달지 않는다 — 바깥 <h4>가 이미 '지원 자격'이라 두 번 나온다
     /* 번호(1) 2) 3))는 붙이지 않는다 — 요건은 순서가 아니라 목록이고,
        판정 못 한 줄에 번호만 달면 체크된 줄과 뒤섞여 어수선하다(2026-08-02 개발자 지시). */
-    reasonRows += reqShown.map((it) => reqRow(it)).join('');
+    /* 🔴 택1 묶음은 머리 줄을 이름표로 (2026-11-17 · 충남대 사회 재환원 장학금) — 엔진은 「차등조건(1개 이상 충족 시 …)」 아래 셋을 한 요건으로 세는데
+       화면이 셋을 평평하게 늘어놓아 '셋 다 갖춰야 한다'로 읽혔다. 원문 머리 줄(match-engine pickHeadCaption · 앞 번호만 뗌)을 그 묶음 첫 줄 위에 작게 —
+       요건 줄이 아니라 r-elig 를 달지 않는다(드라이버·적합도가 세지 않는다). 내 경우 거르기로 첫 줄이 빠져도 남은 첫 줄 위에 */
+    const pickHead = {};
+    reqItems.forEach((it) => { if (it.group && it.head && !pickHead[it.group]) pickHead[it.group] = it.head; });
+    const headDone = new Set();
+    reasonRows += reqShown.map((it) => {
+      const cap = it.group && pickHead[it.group] && !headDone.has(it.group) ? (headDone.add(it.group), `<li class="r-pick">${esc(pickHead[it.group])}</li>`) : '';
+      return cap + reqRow(it);
+    }).join('');
   } else if (requirementLines(sch, qLines).length) {
     // 자격 줄이 없으면 발췌 문장으로 물러나되, **같은 정리를 거쳐** 보여 준다
     reasonRows += requirementLines(sch, qLines)

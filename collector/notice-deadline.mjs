@@ -12,7 +12,7 @@
    🔴 껍데기를 걷지 않은 본문으로 읽지 말 것 — 항공대 머리 배너(교수 채용 `접수기간 : 2026.10.15.(목) 13:30까지`)가 모든 글의 마감이 된다.
       그 호스트의 껍데기를 모르면(저장된 쪽이 3쪽 미만) 읽지 않는다(bodyDeadlineFrom 이 null). */
 import { hintWithoutChrome, isChromeHint, HINT_HEAD } from './deadline-hint.mjs';
-import { boilerMulti, boilerFor } from './page-boilerplate.mjs';
+import { boilerMulti, boilerFor, siteChromeFrom, ownBody, titleLineAt } from './page-boilerplate.mjs';
 import { canonUrl } from './canon-url.mjs';
 import { decodeEntities } from './clean-title.mjs';
 
@@ -135,11 +135,16 @@ export function parseDeadline(n, today, opts = {}) {
  *   boiler  : 그 호스트의 껍데기 줄 Set(page-boilerplate.mjs boilerMulti) — **없거나 비면 읽지 않는다**
  *   extract : 날짜 판독기(장학과 같은 extractDeadline — 부르는 쪽이 넘긴다 · 새 판독기를 만들지 말 것)
  *   lastDateIn : 한 줄의 마지막 날짜(verify/entry-rules.cjs 한 곳) — 근거 줄 고르기에 쓴다
+ *   opts.siteChrome · opts.title : 그 호스트의 **사이트 띠 줄** Set(page-boilerplate.mjs siteChromeFrom)과 글 제목 — 주면 제목 줄보다 **앞의** 띠 줄을 먼저 걷는다
+ *     (2026-11-17 · 가천 장학공지 매 쪽 머리의 다른 글 띠 「○ 신청기간: 2026.11.05.(목) ~ 11.18.(수)」 — 40% 껍데기 걷기로는 못 걷어 실린 가천 글 9건의
+ *     본문 마감이 전부 11-18 이었다 · 발췌기와 **같은 함수**(ownBody) · 베끼지 말 것). 안 주면 예전 그대로.
  * 근거 줄(그 날짜를 내는 원문 한 줄)을 못 고르면 null — 감사가 근거를 못 찾는 마감은 담지 않는다(2026-10-01 데이터 관문 사고).
  */
-export function bodyDeadlineFrom(lines, boiler, extract, lastDateIn) {
+export function bodyDeadlineFrom(lines, boiler, extract, lastDateIn, opts = {}) {
   if (!boiler || !boiler.size || typeof extract !== 'function') return null;
-  const kept = (Array.isArray(lines) ? lines : String(lines || '').split(/\n+/)).map((l) => String(l).trim()).filter((l) => l && !boiler.has(l));
+  const raw = Array.isArray(lines) ? lines.join('\n') : String(lines || '');
+  const body = opts.siteChrome && opts.title ? ownBody(raw, { name: opts.title }, opts.siteChrome).text : raw;
+  const kept = body.split(/\n+/).map((l) => String(l).trim()).filter((l) => l && !boiler.has(l));
   if (!kept.length) return null;
   const date = extract(kept.join('\n'));
   if (!date || !ISO.test(date)) return null;
@@ -154,12 +159,32 @@ export function bodyDeadlineFrom(lines, boiler, extract, lastDateIn) {
   return null;
 }
 
+/* 실린 본문 마감의 근거 줄이 **남의 글 띠**인가 — 근거 줄(한 줄 또는 이어 붙인 두 줄)이 그 글 본문에서 **제목 줄보다 앞**에 있고
+   이루는 줄이 전부 껍데기·사이트 띠 줄이면 참. 띠는 몇 주마다 바뀌고 껍데기 표본도 자라서, 그때 읽은 근거 줄이 지금 규칙으로 다시 나오지 않을 수 있다 —
+   그래서 '옛 규칙이 지금도 같은 값을 읽는가'가 아니라 **근거 줄이 어디에 있는가**로 가른다(2026-11-17 실측: 가천 9건 · 지금 말뭉치로는 옛 규칙도 제 마감을 읽는다).
+   제목 줄을 못 찾거나 본문에 그 근거 줄이 없으면 거짓(모르면 손대지 않는다). */
+function quotesChrome(text, title, quote, sets) {
+  const q = String(quote || '').replace(/\s+/g, ' ').trim();
+  if (!q) return false;
+  const lines = String(text || '').split('\n').map((l) => l.trim());
+  const at = titleLineAt(lines, { name: title });
+  if (at <= 0) return false;
+  const isChrome = (l) => sets.some((set) => set && set.has(l));
+  for (let i = 0; i < at; i += 1) {
+    if (!lines[i]) continue;
+    const parts = lines[i].replace(/\s+/g, ' ') === q ? [lines[i]]
+      : (i + 1 < at && `${lines[i]} ${lines[i + 1]}`.replace(/\s+/g, ' ').trim() === q ? [lines[i], lines[i + 1]] : null);
+    if (parts && parts.every(isChrome)) return true;
+  }
+  return false;
+}
+
 /** 저장된 두 원문 파일(notices-text.json · browser-bodies.json 의 내용) → makeBodyReader 의 stored·browser.
  *  수집기와 자동 등록이 같은 모양으로 넘기게 한 곳에 둔다(파일은 부르는 쪽이 읽는다 — 이 파일은 읽고 쓰지 않는다). */
 export function corporaFrom(noticesText, browserBodies) {
   return {
     stored: Object.values(noticesText || {}),
-    browser: Object.entries(browserBodies || {}).map(([url, v]) => (v && v.text ? { url, text: v.text } : null)).filter(Boolean),
+    browser: Object.entries(browserBodies || {}).map(([url, v]) => (v && v.text ? { url, text: v.text, title: v.title } : null)).filter(Boolean),
   };
 }
 
@@ -169,8 +194,10 @@ export function corporaFrom(noticesText, browserBodies) {
  * 이번 실행 글은 저장된 같은 주소를 갈음한다(한 쪽을 두 번 세면 그 쪽 본문이 껍데기로 잡힐 수 있다).
  *   heal(n, fresh) — 기간 힌트(deadlineHint): 이번 실행 글은 껍데기를 걷고 다시 읽는다 · 실린 글은 힌트가 껍데기에서 시작했을 때만
  *                    저장된 원문으로 다시 읽고, 원문이 없으면 비운다(지어내지 않는다). 그 호스트의 껍데기를 모르면 손대지 않는다.
- *   fill(n)        — 본문 마감(bodyDeadline · bodyDeadlineText) — 이미 있으면 그대로.
- * 돌려준 값: 고친 수 { hints, bodyDeadlines }.
+ *   fill(n)        — 본문 마감(bodyDeadline · bodyDeadlineText) — 제목 앞 사이트 띠 줄을 걷고 읽는다(siteChrome · bodyDeadlineFrom opts) ·
+ *                    이미 있으면 그대로 — 단 근거 줄이 **제목 앞의 껍데기·띠 줄**(quotesChrome)이면 띠를 걷고 다시 읽는다(원칙 7 소급 · 못 읽으면 비운다 ·
+ *                    사람·등록에서 옮겨 온 마감은 근거 줄이 본문 띠가 아니라 건드리지 않는다).
+ * 돌려준 값: 고친 수 { hints, bodyDeadlines, bodyRechecked }.
  */
 export function makeBodyReader({ stored = [], browser = [], run = new Map(), extract, lastDateIn } = {}) {
   const byKey = new Map();
@@ -179,10 +206,15 @@ export function makeBodyReader({ stored = [], browser = [], run = new Map(), ext
   const browserByKey = new Map();
   for (const v of browser) if (v && v.url && v.text) browserByKey.set(canonUrl(v.url), v);
   const chrome = boilerMulti([[...byKey.values()], [...browserByKey.values()]]);
+  /* 사이트 띠 줄 — 발췌기(extract-excerpts siteChrome)와 같은 함수 · 같은 말뭉치(저장 원문 + 브라우저 원문 · '서로 다른 글' 수로 세니 섞어도 된다).
+     이번 실행 글은 제목을 달아 넣는다(글 열쇠가 제목이다 — 주소 여벌을 두 번 세지 않게) */
+  const runTitled = new Map([...run].filter(([n]) => n && n.url).map(([n]) => [canonUrl(n.url), n.title]));
+  const siteChrome = siteChromeFrom([...[...byKey.entries()].map(([k, v]) => (runTitled.has(k) ? { ...v, title: runTitled.get(k) } : v)), ...browserByKey.values()]);
   const bodyOf = (n) => run.get(n) || (byKey.get(canonUrl(n.url || '')) || {}).text || (browserByKey.get(canonUrl(n.url || '')) || {}).text || null;
-  const counts = { hints: 0, bodyDeadlines: 0 };
+  const counts = { hints: 0, bodyDeadlines: 0, bodyRechecked: 0 };
   return {
     chrome,
+    siteChrome,
     counts,
     heal(n, fresh = false) {
       const set = boilerFor(chrome, n.url);
@@ -195,11 +227,18 @@ export function makeBodyReader({ stored = [], browser = [], run = new Map(), ext
       counts.hints += 1;
     },
     fill(n) {
-      if (n.bodyDeadline) return;
       const set = boilerFor(chrome, n.url);
       const t = set && bodyOf(n);
       if (!t) return;
-      const got = bodyDeadlineFrom(t, set, extract, lastDateIn);
+      const opts = { siteChrome: boilerFor(siteChrome, n.url), title: n.title };
+      if (n.bodyDeadline) {
+        if (!quotesChrome(t, n.title, n.bodyDeadlineText, [opts.siteChrome, set])) return;   // 근거 줄이 이 글의 것이면 그대로(사람·등록에서 옮긴 마감도)
+        const now = bodyDeadlineFrom(t, set, extract, lastDateIn, opts);
+        if (now) { n.bodyDeadline = now.date; n.bodyDeadlineText = now.text; } else { delete n.bodyDeadline; delete n.bodyDeadlineText; }
+        counts.bodyRechecked += 1;
+        return;
+      }
+      const got = bodyDeadlineFrom(t, set, extract, lastDateIn, opts);
       if (got) { n.bodyDeadline = got.date; n.bodyDeadlineText = got.text; counts.bodyDeadlines += 1; }
     },
   };

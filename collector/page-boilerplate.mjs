@@ -100,3 +100,36 @@ export function makeStripperMulti(corpora, opts) {
 }
 /* 주소 → 그 호스트의 껍데기 줄 Set (모르면 undefined) — 줄 목록을 직접 쓰는 곳(수집기의 기간 힌트 · deadline-hint.mjs hintWithoutChrome)이 쓴다 */
 export const boilerFor = (boiler, url) => (boiler && boiler.get(hostOf(url))) || undefined;
+
+/* ── 공고 제목 줄 · 사이트 띠 줄 (2026-11-16 extract-excerpts.mjs 에서 신설 · 2026-11-17 이리 옮김) ──
+   발췌기(extract-excerpts)와 자동 등록 앞의 본문 마감(notice-deadline.mjs bodyDeadlineFrom)이 같이 쓴다 — 발췌기는 불러오는 순간 원문 파일을 읽어
+   notice-deadline 이 가져다 쓸 수 없었다 — 그래서 자동 등록이 보는 본문 마감은 띠를 걷지 않았다(11-17 실측: 실린 가천 글 9건의 bodyDeadline 이 전부 FGD 띠 줄의 11-18). 이 파일은 읽고 쓰는 것이 없다. */
+/* 공고 제목 줄의 자리 — 본문 줄 중 제목 몸통(말머리 뗀 앞 20자)을 담은 첫 줄. 못 찾으면 -1 (제목이 짧으면 찾지 않는다) */
+export function titleLineAt(lines, it) {
+  const core = String((it && it.name) || '').replace(/^(?:\[[^\]]*\]\s*|공통\s+)+/, '').replace(/\s+/g, '');
+  if (core.length < 10) return -1;
+  return (lines || []).findIndex((l) => String(l).replace(/\s+/g, '').includes(core.slice(0, 20)));
+}
+/* ── 사이트 띠(배너) 줄 — 마감 근거에서 뺀다 (2026-11-16 · 가천 FGD 띠 · 리뷰) ─────────────────────────────
+   가천 장학공지는 매 쪽 머리에 **다른 글의 띠**(「2026년 가천대학교 재학생 심층면접토론(FGD) 참여학생 모집」 ↵ 「○ 신청기간: 2026.11.05.(목) ~ 11.18.(수)」)를
+   싣는다. 그 줄이 글 본문보다 먼저 나와 첫 이름표로 잡혀, 11-11·11-12·11-15·11-16 에 끝나는 네 공고가 모두 11-18 마감이 됐다(닫힌 공고가 열림으로 보였다).
+   메뉴 걷기(page-boilerplate · 그 학교 쪽의 40%)는 띠가 26쪽 중 10쪽에만 있어 못 걷었다 — 띠는 몇 주마다 바뀐다.
+   🔴 띠 줄 = **같은 호스트의 서로 다른 글 셋 이상**에 글자 그대로 나오는 줄(buildBoilerplate keyOf · 같은 글의 주소 여벌은 한 번)이면서
+      **이 글의 제목 줄보다 앞에** 있는 줄. 둘 다여야 한다 — 영남대 다문화·3대 동문·천마가족 세 공고는 진짜로 같은 신청기간 줄을 **제목 뒤에** 싣는다
+      (deadline-hint.mjs 의 '같은 힌트 빈도 규칙을 쓰지 말 것' 과 같은 사정). 제목 줄을 못 찾으면 아무것도 걷지 않는다(예전 그대로). */
+const SITE_CHROME_MIN = 3;
+export const squashWs = (s) => String(s || '').replace(/\s+/g, '');
+export function siteChromeFrom(pages) {
+  return buildBoilerplate(pages, { minPages: SITE_CHROME_MIN, ratio: 0, keyOf: (v) => squashWs(v.title) || String(v.url || '') });
+}
+/** 본문에서 제목 앞의 띠 줄을 걷은 글 — `{ text, chrome: [걷은 줄] }`. 띠를 모르거나 제목을 못 찾으면 본문 그대로 */
+export function ownBody(body, it, chromeSet) {
+  const text = String(body || '');
+  if (!chromeSet || !chromeSet.size) return { text, chrome: [] };
+  const lines = text.split('\n');
+  const at = titleLineAt(lines, it);
+  if (at <= 0) return { text, chrome: [] };
+  const chrome = [];
+  const kept = lines.filter((l, i) => !(i < at && chromeSet.has(l.trim()) && chrome.push(l.trim())));
+  return { text: kept.join('\n'), chrome };
+}

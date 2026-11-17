@@ -40,6 +40,7 @@ export const EDIT_LABEL = {
   eligibilityLines: '학생에게 보여 줄 자격 문장',
   eligibilityVerified: '자격 제한 없음 확인',
   documents: '요구 서류',
+  excerpts: '신청 방법 원문 발췌',
   announceDate: '결과 발표일',
   eligibilityExcludes: '이런 학생은 못 받아요',
   eligibilityPriority: '먼저 뽑는 기준',
@@ -109,6 +110,17 @@ export function cleanLines(v) {
     .map((x) => x.slice(0, 300));
 }
 
+/** 신청 방법 원문 발췌 (2026-11-17) — 원문 문장 그대로를 줄마다. 글자가 아닌 줄(숫자·객체)이 섞이면 던진다(화면은 막힌 줄로 보여 준다).
+ *  🔴 사람이 적은 발췌는 원문 근거가 아니다 — 저장소가 `excerptsFrom = '관리자 …'` 를 붙이고, 근거로 읽는 곳은 전부
+ *     `collector/notice-source.mjs` evidenceExcerpts 로 그 줄을 뺀다(자격 줄의 eligibilityFrom 규칙과 같다). */
+export function cleanExcerpts(v) {
+  if (v === null || v === undefined || v === '') return null;
+  const arr = Array.isArray(v) ? v : (typeof v === 'string' ? v.split('\n') : null);
+  if (!arr || arr.some((x) => typeof x !== 'string')) throw new Error('원문 발췌는 문장(글자) 목록이어야 합니다');
+  const out = cleanLines(arr);
+  return out.length ? out : null;
+}
+
 /* 달력에 **실제로 있는 날**인가 — 모양만 보면 `2026-13-01`·`2026-02-30` 이 통과한다 */
 export const isDay = (v) => {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(v || ''))) return false;
@@ -135,6 +147,7 @@ export function normalizeValue(k, v) {
     return a.length ? a : null;
   }
   if (k === 'eligibilityVerified') return (out === true || out === 'true') ? true : null;
+  if (k === 'excerpts') return cleanExcerpts(out);
   if (k === 'exclusivity') return cleanExclusivity(out);
   if (k === 'amountValue') return Number(out) || 0;
   if (k === 'prepDoc') return (out === true || out === 'true');

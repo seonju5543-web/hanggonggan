@@ -4301,8 +4301,8 @@
    "boardTitle": "공통 [공통] 2026학년도 2학기 반영장학 신청 안내",
    "type": "교내",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
+   "amount": "학기 당 2,000,000원",
+   "amountValue": 2000000,
    "deadline": "2026-09-22",
    "listedAt": "2026-09-20",
    "period": "접수 기간 ~2026-09-22",
@@ -4361,7 +4361,8 @@
    "excerpts": [
     "' 신청기간 | 2026.9.11.(금)-9.22.(화) '"
    ],
-   "excerptNote": "공고문 첨부에서 그대로 발췌 (자동)"
+   "excerptNote": "공고문 첨부에서 그대로 발췌 (자동)",
+   "amountFrom": "관리자 2026-11-18"
   },
   {
    "id": "auto-oardid323019menuno200318",
@@ -7549,7 +7550,12 @@
     "max": 150000,
     "raw": "장학금액 지원액: 1인당 지원 상한액 15만원"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "excerpts": [
+    "◦ 학생신청: 학과에 서류 제출",
+    "- 2차 신청일자: 2027. 1. 6.(화) ~ 2027. 1. 8.(금) 15시"
+   ],
+   "excerptsFrom": "관리자 2026-11-18"
   },
   {
    "id": "auto-pnoticedoarticleno367130",
@@ -8212,9 +8218,12 @@
     "- 신청 시점에 자격증 취득이 '최종합격' 완료되어야 인정"
    ],
    "excerpts": [
-    "전화 : 02-6490-6114 / 서울시통합문의 : 02-120"
+    "1. 신청기간",
+    "2026. 11. 02.(월) ~ 2026. 12. 07.(월) 17시까지",
+    "2. 신청 절차",
+    "빅데이터혁신융합대학사업단 행정실(인문학관 201-2호)로 서면 제출",
+    "*온라인 신청 불가"
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "kindEvidence": [
     "교내 증거 없음 — 기본값"
    ],
@@ -8222,7 +8231,8 @@
    "kindFrom": "로봇(원문) 2026-10-01",
    "deadlineFrom": "공고 원문",
    "openDate": "2026-11-02",
-   "documentsFrom": "로봇 2026-10-17 · 원문 「제출서류」 절"
+   "documentsFrom": "로봇 2026-10-17 · 원문 「제출서류」 절",
+   "excerptsFrom": "관리자 2026-11-18"
   },
   {
    "id": "auto-leno275978srcategoryid22",
@@ -9265,59 +9275,6 @@
    "sameAs": "우양재단",
    "sameAsFrom": "자동",
    "documentsFrom": "로봇 2026-10-17 · 원문 「제출서류」 절"
-  },
-  {
-   "id": "auto-0005009002000000seq31569",
-   "name": "경영경제전문도서관 국가근로장학생 추가 모집",
-   "boardTitle": "경영경제전문도서관 국가근로장학생 추가 모집",
-   "type": "교외",
-   "kindEvidence": [
-    "제목의 바깥 기관 낱말 「국가근로」"
-   ],
-   "kindConfidence": "high",
-   "kindFrom": "로봇(원문) 2026-10-01",
-   "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
-   "deadline": null,
-   "listedAt": "2026-10-01",
-   "period": "접수 기간 원문 확인",
-   "summary": "서울시립대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
-   "eligibility": {
-    "selective": true,
-    "schoolOnly": "서울시립대학교"
-   },
-   "documents": [
-    "붙임의 지원동기서"
-   ],
-   "duplicable": true,
-   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-10-01 — 양식 스키마화는 검수 후 진행",
-   "auto": true,
-   "attachments": [
-    {
-     "name": "지원동기서.hwp",
-     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=31569&fSeq=1"
-    },
-    {
-     "name": "본문이미지-511x348.png",
-     "url": "https://www.uos.ac.kr/images/kor2021/main/ft_mk2_260126.png",
-     "bodyImage": true
-    }
-   ],
-   "sourceUrl": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31569&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "sourceKind": "auto",
-   "excerpts": [
-    "전화 : 02-6490-6114 / 서울시통합문의 : 02-120"
-   ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
-   "documentsFrom": "로봇 2026-10-17 · 원문 「제출서류」 절",
-   "aiTries": 2,
-   "eligibilityLines": [
-    "2. 자격사항",
-    "- 현재 학생과의 2026.2 학기 국가근로장학생 대상자 명단 에 있어야 함 ( 필수사항 )",
-    "-현재 국가근로장학, 직장체험인턴 , 교수지원장학 등 중복근로 불가"
-   ]
   },
   {
    "id": "auto-pnoticedoarticleno367194",
@@ -10424,85 +10381,6 @@
    "nameFrom": "공고 원문(잘린 제목 보완)"
   },
   {
-   "id": "auto-q1brddate20260526brdseq1",
-   "name": "[근로/신청] 2026년 2학기 국가근로장학금 신청 안내",
-   "boardTitle": "[근로/신청] 2026년 2학기 국가근로장학금 신..",
-   "type": "교외",
-   "kindEvidence": [
-    "제목의 바깥 기관 낱말 「국가근로」"
-   ],
-   "kindConfidence": "high",
-   "kindFrom": "로봇(원문) 2026-10-05",
-   "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
-   "deadline": null,
-   "listedAt": "2026-10-05",
-   "period": "접수 기간 원문 확인",
-   "summary": "서울시립대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
-   "eligibility": {
-    "selective": true,
-    "schoolOnly": "서울시립대학교"
-   },
-   "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
-   ],
-   "duplicable": true,
-   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-10-05 — 양식 스키마화는 검수 후 진행",
-   "auto": true,
-   "attachments": [],
-   "sourceUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260526&brdSeq=1&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
-   "sourceKind": "auto",
-   "eligibilityLines": [
-    "2. 장학생 필수 자격 요건: \"재학생\" 신분 유지",
-    "한국장학재단 규정에 따라, 국가근로장학생은 근로 기간 내내 '재학생' 신분을 유지해야 합니다.",
-    "다음의 경우 근로가 불가능합니다.",
-    "- 학기 중 휴학 또는 졸업 시, 해당 시점부터 근로 불가",
-    "- 신청 당시 재학생이었더라도, 근로 시작 전 또는 학기 중 휴학 시 자격 상실"
-   ],
-   "nameFrom": "공고 원문(잘린 제목 보완)"
-  },
-  {
-   "id": "auto-q1brddate20260427brdseq1",
-   "name": "[교내/선발] 2026학년도 시대인재장학 선발 안..",
-   "boardTitle": "[교내/선발] 2026학년도 시대인재장학 선발 안..",
-   "type": "교내",
-   "kindEvidence": [
-    "제목 표식 「교내」"
-   ],
-   "kindConfidence": "high",
-   "kindFrom": "로봇(원문) 2026-10-05",
-   "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
-   "deadline": null,
-   "listedAt": "2026-10-05",
-   "period": "접수 기간 원문 확인",
-   "summary": "서울시립대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
-   "eligibility": {
-    "selective": true,
-    "schoolOnly": "서울시립대학교"
-   },
-   "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
-   ],
-   "duplicable": true,
-   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-10-05 — 양식 스키마화는 검수 후 진행",
-   "auto": true,
-   "attachments": [],
-   "sourceUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260427&brdSeq=1&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
-   "sourceKind": "auto",
-   "eligibilityLines": [
-    "2. 선발대상",
-    "가. 2025학년도 별별포인트 적립자",
-    "나. 직전학기 평균평점 3.5이상인 재학생",
-    "다. 정규학기 등록자(수업연한 초과자 제외)",
-    "라. 직전학기 유기정학 이상 중징계를 받지 않은 자"
-   ]
-  },
-  {
    "id": "auto-bswj104944019artclviewdo",
    "name": "[교외] 2026년 2학기 선원가족 장학생 모집 안내(~10/23)",
    "boardTitle": "[교외] 2026년 2학기 선원가족 장학생 모집 안내(~10/23)",
@@ -10612,80 +10490,6 @@
     "8. 문의 : 학생지원팀 02-910-4053"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)"
-  },
-  {
-   "id": "auto-0713no2515592sitedvscdkr",
-   "name": "2026년도 2학기 중소기업 취업연계 장학사업(희망사다리 1유형) 신규장학생 추천자 선발 공고",
-   "boardTitle": "2026년도 2학기 중소기업 취업연계 장학사업(희망사다리 1유형) 신규장학생 추천자 선발 공고",
-   "type": "교외",
-   "kindEvidence": [
-    "제목의 바깥 기관 낱말 「기업」"
-   ],
-   "kindConfidence": "high",
-   "kindFrom": "로봇(원문) 2026-10-06",
-   "provider": "주관 기관 원문 확인",
-   "amount": "200만원",
-   "amountValue": 2000000,
-   "deadline": null,
-   "listedAt": "2026-10-06",
-   "period": "접수 기간 원문 확인",
-   "summary": "충남대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
-   "eligibility": {
-    "selective": true,
-    "schoolOnly": "충남대학교"
-   },
-   "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
-   ],
-   "duplicable": true,
-   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-10-06 — 양식 스키마화는 검수 후 진행",
-   "auto": true,
-   "attachments": [
-    {
-     "name": "(붙임1) 26-2학기 희망사다리(1유형) 신규장학생 추천자 선발계획(안).hwp",
-     "url": "https://plus.cnu.ac.kr/_prog/_board/common/download.php?code=sub07_0713&ntt_no=2515592&atch_no=1"
-    }
-   ],
-   "sourceUrl": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515592&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
-   "sourceKind": "auto",
-   "eligibilityLines": [
-    "- 대한민국 국적자로 학부 3학년 이상 재학생",
-    "- 희망사다리 장학금 신청 완료, 의무교육(온라인사전교육) 이수 및 진단평가 완료",
-    "- 직전학기 12학점 이상 이수, 백분위 점수 70점 이상"
-   ],
-   "amountSpec": {
-    "kind": "fixed",
-    "value": 2000000,
-    "ratio": 0,
-    "min": 2000000,
-    "max": 2000000,
-    "raw": "4. 지원금액: 학기당 등록금 전액 및 취·창업지원금 200만원 목록 페이지 관리자 | 관리자메일 주요사이트 대학원 대학·학부 학생시설"
-   },
-   "amountFrom": "공고 원문",
-   "eligibilityPrev": {
-    "lines": [
-     "3. 선발기준: 학업성적, 취업·창업준비계획, 유관사업 참여, 현장실습 교과목 이수 여부 및 저소득층 우대 가산점을 포함한 총점 고득점자 순으로 선발"
-    ],
-    "excludes": null,
-    "priority": null,
-    "from": null
-   },
-   "eligibilityStruct": {
-    "common": [
-     "- 대한민국 국적자로 학부 3학년 이상 재학생",
-     "- 희망사다리 장학금 신청 완료, 의무교육(온라인사전교육) 이수 및 진단평가 완료"
-    ],
-    "either": [],
-    "grade": [
-     "- 직전학기 12학점 이상 이수, 백분위 점수 70점 이상"
-    ]
-   },
-   "eligibilityPriority": [
-    "3. 선발기준: 학업성적, 취업·창업준비계획, 유관사업 참여, 현장실습 교과목 이수 여부 및 저소득층 우대 가산점을 포함한 총점 고득점자 순으로 선발"
-   ],
-   "eligibilityFrom": "AI(원문 줄 그대로)",
-   "eligibilityReviewed": false
   },
   {
    "id": "auto-ent2431268564artclviewdo",
@@ -15353,7 +15157,15 @@
    ],
    "scopeFrom": "같은 사업이 성균관대학교 게시판에도 올라옴(자동) — 성균관대학교 게시판 https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=140652&article.offset=0&articleLimit=10",
    "aiTries": 1,
-   "openDate": "2026-11-18"
+   "openDate": "2026-11-18",
+   "eligibilityLines": [
+    "- 신입생을 제외한 학생의 경우 : 총 평균평점 4.5만점에 3.0이상"
+   ],
+   "eligibilityFrom": "관리자 2026-11-18",
+   "eligibilityExcludes": [
+    "3. 9학기 진학 및 부분 등록자는 선발에서 배제됩니다."
+   ],
+   "eligibilityExcludesFrom": "관리자 2026-11-18"
   },
   {
    "id": "auto-bbssc58944387artclviewdo",
@@ -16010,7 +15822,15 @@
     "raw": "다. 장학금 지급 금액: 연간 400만원(학기별 200만원 분할지급 예정) *2026년도 2학기 및 2027년 1학기를 지급기한으로 함"
    },
    "amountFrom": "공고 원문",
-   "aiTries": 1
+   "aiTries": 1,
+   "eligibilityLines": [
+    "- 신입생을 제외한 학생의 경우 : 총 평균평점 4.5만점에 3.0이상"
+   ],
+   "eligibilityFrom": "관리자 2026-11-18",
+   "eligibilityExcludes": [
+    "다. 9학기 진학 및 부분 등록자는 선발에서 배제됨."
+   ],
+   "eligibilityExcludesFrom": "관리자 2026-11-18"
   },
   {
    "id": "auto-ent2431269433artclviewdo",
@@ -16050,16 +15870,12 @@
    "sourceUrl": "https://dep.hufs.ac.kr/bbs/student/2431/269433/artclView.do",
    "sourceKind": "auto",
    "eligibilityLines": [
-    "국민기초생활수급자 학생",
-    "장애인복지법에 따른 장애인 학생",
-    "한부모가족지원법에 따른 법정 한부모가족 학생",
-    "3자녀 이상 가정의 모든 학생, 차상위계층 학생",
-    "한국장학재단 통지 기준 소득분위 1~6구간 가정 학생",
+    "국민기초생활수급자 학생 장애인복지법에 따른 장애인 학생 한부모가족지원법에 따른 법정 한부모가족 학생 3자녀 이상 가정의 모든 학생, 차상위계층 학생 한국장학재단 통지 기준 소득분위 1~6구간 가정 학생",
     "국내 대학 재학생(한국호텔관광실용전문학교 포함)",
     "29세 이하 대학생(1997년 1월 1일 이후 출생자)",
     "공고일 기준 학생과 가족 1인 이상이 안산시에 계속 3년 이상 또는 합산 10년 이상 주민등록을 두고 거주"
    ],
-   "eligibilityFrom": "AI(공고 포스터 그림)",
+   "eligibilityFrom": "관리자 2026-11-18",
    "eligibilityPrev": {
     "lines": [
      "지원대상 : 지원금액 : 국민기초생활수급자 학생",
@@ -17293,16 +17109,12 @@
    "sourceUrl": "https://www.konkuk.ac.kr/bbs/konkuk/235/1210342/artclView.do",
    "sourceKind": "auto",
    "eligibilityLines": [
-    "국민기초생활수급자 학생",
-    "장애인복지법에 따른 장애인 학생",
-    "한부모가족지원법에 따른 법정 한부모가족 학생",
-    "3자녀 이상 가정의 모든 학생, 차상위계층 학생",
-    "한국장학재단 통지 기준 소득분위 1~6구간 가정 학생",
+    "국민기초생활수급자 학생 장애인복지법에 따른 장애인 학생 한부모가족지원법에 따른 법정 한부모가족 학생 3자녀 이상 가정의 모든 학생, 차상위계층 학생 한국장학재단 통지 기준 소득분위 1~6구간 가정 학생",
     "국내 대학 재학생(한국호텔관광실용전문학교 포함)",
     "29세 이하 대학생(1997년 1월 1일 이후 출생자)",
     "공고일 기준 학생과 가족 1인 이상이 안산시에 계속 3년 이상 또는 합산 10년 이상 주민등록을 두고 거주"
    ],
-   "eligibilityFrom": "AI(공고 포스터 그림)",
+   "eligibilityFrom": "관리자 2026-11-18",
    "eligibilityPrev": {
     "lines": [
      "지원대상 : 지원금액 : 본인부담 등록금 X 50%(학기당 100만원 한도)",
@@ -17497,7 +17309,15 @@
    },
    "amountFrom": "공고 원문",
    "aiTries": 2,
-   "openDate": "2026-11-18"
+   "openDate": "2026-11-18",
+   "eligibilityLines": [
+    "- 신입생을 제외한 학생의 경우 : 총 평균평점 4.5만점에 3.0이상"
+   ],
+   "eligibilityFrom": "관리자 2026-11-18",
+   "eligibilityExcludes": [
+    "3. 9학기 진학 및 부분 등록자는 선발에서 배제합니다."
+   ],
+   "eligibilityExcludesFrom": "관리자 2026-11-18"
   },
   {
    "id": "auto-skor478126350artclviewdo",
@@ -21234,7 +21054,14 @@
     "max": 3000000,
     "raw": "2. 장학금액 및 선발인원 300 만원 지급 , 1 명"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "excerpts": [
+    "◤ 6. 제출기간",
+    "2026 년 11 월 03 일 ( 화 ) ~ 12 월 04 일 ( 금 ) 17 시까지",
+    "◤ 7. 제 출 처",
+    "외국인유학생지원센터 ( 글로벌센터 1 층 5 호실 )"
+   ],
+   "excerptsFrom": "관리자 2026-11-18"
   },
   {
    "id": "auto-ent2431270591artclviewdo",
@@ -22181,9 +22008,6 @@
    "applyEmailFrom": "공고 원문",
    "openDate": "2026-11-06",
    "documentsFrom": "공고 원문",
-   "prepDoc": true,
-   "prepDocBasis": "① 자기소개서는 자유양식으로 작성하되 *‘ 언론계 진출 준비과정 , 장래계획 등 ’* 을 확인할 수 있는 내용을 반드시 포함할 것 (A4 2 장 내외 자유서술 )",
-   "prepDocFrom": "로봇 공고 원문",
    "eligibilityLines": [
     "라 . 대상자 : 졸업 후 언론계 진출 희망자",
     "마 . 신청자격 : 우리대학 3·4 학년 학부 재학생 ( 졸업예정자 가능 , 휴학생 · 졸업생 제외 ), 1, 2 학년학부 재학생도 지원은 가능하지만 , 선발 가능성은 낮음"
@@ -23375,7 +23199,7 @@
    "kindConfidence": "high",
    "kindFrom": "로봇(원문) 2026-11-10",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
+   "amount": "시급 12,430원",
    "amountValue": 0,
    "deadline": null,
    "listedAt": "2026-11-10",
@@ -23413,7 +23237,13 @@
     "- 희망사항: 학교인근 거주자 우대 , 컴퓨터활용능력자격증 소지자 우대 (필수사항은 아님)",
     "- 근무위치 : 서울과학기술대학교 서울테크노파크 423호",
     "- 근무시간 : 시간표 검토 후, 주 20시간 근무자만 지원바람"
-   ]
+   ],
+   "excerpts": [
+    "※ 지원하고자 하는 학생은 \" 국가근로장학생 지원서 \" 와 근로가능 시간표 를 작성하여 담당자 이메일로 제출 하시기 바랍니다.",
+    "- 지원방법 : 담당자 roirroir2@naver.com 으로 학업시간표 및 국가근로지원서(소득분위 필수 기재)",
+    "메일접수해주시면 해당자에 한해 개별연락드립니다~"
+   ],
+   "excerptsFrom": "관리자 2026-11-18"
   },
   {
    "id": "auto-amepagescholarshipnotice-0d1tyil",
@@ -24502,7 +24332,12 @@
    ],
    "eligibilityFrom": "관리자 2026-11-16",
    "deadlineFrom": "관리자 2026-11-16",
-   "amountFrom": "관리자 2026-11-16"
+   "amountFrom": "관리자 2026-11-16",
+   "excerpts": [
+    "가. 접수 기간: 2026년 11월 16일(월) ~ 11월 30일(월) [기한 엄수]",
+    "가. 접수방법: 소속 학과에서 직접 공문 회신(접수기간 내 도착분에 한함)"
+   ],
+   "excerptsFrom": "관리자 2026-11-18"
   },
   {
    "id": "auto-krbbskr846131artclviewdo",
@@ -24674,12 +24509,11 @@
    "id": "auto-skor478127125artclviewdo",
    "name": "2026-2학기 장학사정관(릴레이쉽) 장학금 신청 안내",
    "boardTitle": "2026-2학기 장학사정관(릴레이쉽) 장학금 신청 안내",
-   "type": "교외",
+   "type": "교내",
    "kindEvidence": [
-    "접수처 「학과 사무실 제출」"
+    "관리자(claude-session)가 교외 → 교내 로 정함"
    ],
-   "kindConfidence": "low",
-   "kindFrom": "로봇(원문) 2026-11-16",
+   "kindFrom": "관리자 2026-11-18",
    "provider": "주관 기관 원문 확인",
    "amount": "금액 원문 확인",
    "amountValue": 0,
@@ -24849,38 +24683,6 @@
     "raw": "2. 지급금액 : 1 인당 100 만원"
    },
    "amountFrom": "공고 원문"
-  },
-  {
-   "id": "auto-obrdbbsseq1nttid20260807",
-   "name": "[교내/선발] 2026학년도 2학기 학부 교내장학..",
-   "boardTitle": "[교내/선발] 2026학년도 2학기 학부 교내장학..",
-   "type": "교내",
-   "kindEvidence": [
-    "제목 표식 「교내」"
-   ],
-   "kindConfidence": "high",
-   "kindFrom": "로봇(원문) 2026-11-16",
-   "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
-   "amountValue": 0,
-   "deadline": null,
-   "listedAt": "2026-11-16",
-   "period": "접수 기간 원문 확인",
-   "summary": "서울시립대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
-   "eligibility": {
-    "selective": true,
-    "schoolOnly": "서울시립대학교"
-   },
-   "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
-   ],
-   "duplicable": true,
-   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
-   "noForm": "자동 등록(검수 전) 2026-11-16 — 양식 스키마화는 검수 후 진행",
-   "auto": true,
-   "attachments": [],
-   "sourceUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdBbsseq=1&pageNo=2&nttId=20260807",
-   "sourceKind": "auto"
   },
   {
    "id": "auto-enoticedoarticleno770333",
@@ -25101,11 +24903,11 @@
    "kindConfidence": "low",
    "kindFrom": "로봇(원문) 2026-11-17",
    "provider": "주관 기관 원문 확인",
-   "amount": "금액 원문 확인",
+   "amount": "등록금 전액",
    "amountValue": 0,
-   "deadline": null,
+   "deadline": "2026-11-24",
    "listedAt": "2026-11-17",
-   "period": "접수 기간 원문 확인",
+   "period": "접수 기간 ~2026-11-24",
    "summary": "동국대학교 WISE캠퍼스 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
    "eligibility": {
     "selective": true,
@@ -25129,12 +24931,16 @@
    "sourceKind": "auto",
    "documentsFrom": "공고 원문",
    "eligibilityLines": [
-    "대상 : 1 차 합격자",
-    "( 한국장학재단에 장학금 미신청자는 탈락되므로 기한엄수 )",
-    "~ 2026.11.27.( 금 ) 까지",
-    "최종 장학생 추천",
-    "1 차 합격자 에 한하여 학생서비스팀 신청 확인 및 최종 추천"
-   ]
+    "3. 선발자격:'26년도 자연과학·공학계열 학과(부) 3학년 재학 중인 자로서, 국가우수장학금(이공계) 선발 이력이 없는 자",
+    "선발 당시 재학생(휴학생 제외)으로 성적 및 이수학점 기준 충족자",
+    "성적기준: 총 평균 백분위 87점이상 또는 3.5/4.5만점 이상"
+   ],
+   "eligibilityFrom": "관리자 2026-11-18",
+   "deadlineFrom": "관리자 2026-11-18",
+   "excerpts": [
+    "나. 제출방법: 학생회관 1층 학생서비스팀으로 방문 제출"
+   ],
+   "excerptsFrom": "관리자 2026-11-18"
   },
   {
    "id": "auto-2630viewdocurrentpageno1",
@@ -25168,21 +24974,17 @@
    "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12630/view.do?currentPageNo=1",
    "sourceKind": "auto",
    "eligibilityLines": [
-    "2. 선발기준",
-    "가 . 선발 상세 기준 : 다음 순위조건을 만족하는 재학생으로 상위 순위자 순으로 선발",
-    "1) 1 순위 : 희망근로지 내에서 근로지 자체 우대사항 우선적용 ( 근로지별 지원가능학과 및 우대사항 엑셀자료 참조 )",
-    "★ 저소득학생이라고 무조건 선발되는 것은 아니며, 근로지별 지원가능학과, 우대사항 기타 등등 상황을 고려하여 근로지 최종 선발",
-    "2) 2 순위 : 소득구간 저소득순",
-    "3) 3 순위 : 소득구간이 동일할 경우 직전학기 백분위 성적이 높은 자",
-    "나 . 국 가근로장학금 업무처리기준 ( 계속참여제한 ) 에 따라 직전학기 국가근로장학생으로 선발되지 않은 학생을 근로지별로",
-    "분리하여 선발이 진행됨.",
-    "다 . 선발 시 부서의 특수성 등이 반영될 수 있으며 , 별도의 면접 및 자격요건 등에 대한 심사가 진행될 수 있음.",
-    "라. 기존 선발자 지원 불가"
+    "가. 2026학년도 2학기 국가근로장학금 1차, 2차, 3차 신청자",
+    "나. 2026학년도 2기에 재학인 학생",
+    "다. 대한민국 국적자로 직전학기 성적이 C⁰(70점/100점) 이상인 학생",
+    "(주민등록상 해외이주 신고자,영주권자 제외)",
+    "라. 소득 9구간 이하의 경제적으로 곤란한 학생",
+    "마. 4대보험 적용받는 취업중 학생인경우 근로 불가.(건강보험 자격득실 확인서 상 직장가입자로 본인이 가입이 되어 있을 경우 불가능)"
    ],
    "excerpts": [
-    "희망근로지 3차신청기간 : 11.18.(수) ~ 11.20.(금 ) ( 기한 엄수 )"
+    "가. 희망근로지 3차신청기간 : 11.18.(수) ~ 11.20.(금) (기한 엄수)",
+    "나. 희망근로지 신청시 첨부된 엑셀자료의 지원가능학과 및 유의사항을 반드시 확인하여 신청바람."
    ],
-   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "amountSpec": {
     "kind": "hourly",
     "value": 0,
@@ -25191,7 +24993,13 @@
     "max": 0,
     "raw": "4. 지원금액 가 . 교내 - 시급 : 10,320 원 ( 국고 : 8,256 원 / 교비 : 2,064 원 ) ​"
    },
-   "amountFrom": "공고 원문"
+   "amountFrom": "공고 원문",
+   "eligibilityFrom": "관리자 2026-11-18",
+   "eligibilityExcludes": [
+    "라. 기존 선발자 지원 불가"
+   ],
+   "eligibilityExcludesFrom": "관리자 2026-11-18",
+   "excerptsFrom": "관리자 2026-11-18"
   },
   {
    "id": "auto-b888ec9db4eab3b5eab38420",
@@ -25236,20 +25044,90 @@
    "openDate": "2026-11-17",
    "documentsFrom": "공고 원문",
    "eligibilityLines": [
-    "라. 심사기준: 지원자격 + 대학 자체 선발 기준(붙임자료 참조)",
-    "다. 지원대상 및 자격 ※아래의 자격요건을 모두 충족해야 함",
     "1. (기본) 자연과학 또는 공학 계열 학부(과)에 재학중인 3학년 학생",
     "2. (성적) 직전학기 백분위 87점 이상 또는 3.5이상 / 4.5만점",
     "3. (학점) 직전학기 최소이수학점 9학점 이상",
-    "※ 심사학기가 졸업학기일 경우(조기졸업자 포함) 직전학기 최소 3학점 이상 적용"
+    "※ 심사학기가 졸업학기일 경우(조기졸업자 포함) 직전학기 최소 3학점 이상 적용",
+    "[참고] 선발 제외 대상",
+    "1. 국가우수장학금(이공계) 장학생 자격 유지자 또는 영구탈락자",
+    "※ 국가우수장학금(이공계) 일시지원 장학생 선발 이력은 무관",
+    "2. 2026학년도 2학기 현재 휴학생",
+    "3. 동일학기에 한국장학재단에서 운영 중인 타 장학금 수혜자 또는 장학생 자격 유지자",
+    "4. 수업연한초과자"
    ],
    "eligibilityExcludes": [
     "1. 국가우수장학금(이공계) 장학생 자격 유지자 또는 영구탈락자",
     "※ 국가우수장학금(이공계) 일시지원 장학생 선발 이력은 무관"
    ],
    "excerpts": [
-    "사. 제출방법: 장학팀 대표메일(scholarship@uos.ac.kr)로 제출",
-    "- (대학) 추천 대상자 심사 및 선발: 2026. 11. 23.(월) ~ 11. 24.(화)"
+    "바. 제출기간: 2026.11.17.(화)~ 11.22.(일)까지",
+    "사. 제출방법: 장학팀 대표메일(scholarship@uos.ac.kr)로 제출"
+   ],
+   "amountSpec": {
+    "kind": "ratio",
+    "value": 0,
+    "ratio": 1,
+    "min": 0,
+    "max": 0,
+    "raw": "나. 장학금액: 2026학년도 2학기(1개 학기) 등록금 전액 ※생활비 미지원 다. 지원대상 및 자격 ※아래의 자격요건을 모두 충족해야 함 1. (기본) 자연과학 또는 공학 계열 학부(과)에 재학중인 3학년 학생 2. (성적) 직전학기 백분위 87점 이상 또는 3.5이상 / 4.5만점 3. (학점) 직전학기 최소이수학점 9학점 이상 ※ 심사학기가 졸업학기일"
+   },
+   "amountFrom": "공고 원문",
+   "eligibilityFrom": "관리자 2026-11-18",
+   "excerptsFrom": "관리자 2026-11-18"
+  },
+  {
+   "id": "auto-scho332282856artclviewdo",
+   "name": "2026학년도 국가우수장학금(이공계) 일시지원 선발 공고",
+   "boardTitle": "2026학년도 국가우수장학금(이공계) 일시지원 선발 공고",
+   "type": "교외",
+   "kindEvidence": [
+    "본문 「재단 시스템 신청」"
+   ],
+   "kindConfidence": "mid",
+   "kindFrom": "로봇(원문) 2026-11-18",
+   "provider": "주관 기관 원문 확인",
+   "amount": "등록금 전액",
+   "amountValue": 0,
+   "deadline": "2026-11-19",
+   "deadlineFrom": "공고 원문 · 2026.11.17 접수마감일 | 2026.11.19",
+   "period": "접수 ~2026-11-19",
+   "summary": "조선대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "조선대학교"
+   },
+   "documents": [
+    "지원 자격·제출 서류는 원문 공고에서 확인"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-18 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "1. 선발계획(안) (수정).hwp",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/380277/download.do"
+    },
+    {
+     "name": "2. 전인적인재성장계획서.hwp",
+     "url": "https://www3.chosun.ac.kr/bbs/scho/332/380278/download.do"
+    }
+   ],
+   "sourceUrl": "https://www3.chosun.ac.kr/bbs/scho/332/282856/artclView.do",
+   "sourceKind": "auto",
+   "applyPortal": "종합정보시스템",
+   "applyPortalSource": "- 온라인 신청 ( 본교 종합정보시스템 → 장학 → 장학 신청 )",
+   "applyPortalFrom": "공고 원문",
+   "openDate": "2026-11-18",
+   "eligibilityLines": [
+    "3. 선발 대상 : 아래 조건을 모두 충족하는 자연과학 및 공학계열 학과 ( 부 ) 3 학년 재학생",
+    "- 성적기준 : 직전학기 백분위 87 점 이상 또는 평점평균 3.5 이상",
+    "- 이수학점 : 직전학기 12 학점 이상",
+    "5. 선발기준 : 직전학기 백분위점수 (60) + 전인적인재성장계획서 (20) + 경제적수준 (20)"
+   ],
+   "excerpts": [
+    "접수마감일 | 2026.11.19",
+    "1. 신청기한 : ~ 2 026. 11. 19.( 목 ) 20:00"
    ],
    "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
    "amountSpec": {
@@ -25258,7 +25136,7 @@
     "ratio": 1,
     "min": 0,
     "max": 0,
-    "raw": "나. 장학금액: 2026학년도 2학기(1개 학기) 등록금 전액 ※생활비 미지원 다. 지원대상 및 자격 ※아래의 자격요건을 모두 충족해야 함 1. (기본) 자연과학 또는 공학 계열 학부(과)에 재학중인 3학년 학생 2. (성적) 직전학기 백분위 87점 이상 또는 3.5이상 / 4.5만점 3. (학점) 직전학기 최소이수학점 9학점 이상 ※ 심사학기가 졸업학기일"
+    "raw": "4. 장학금액 : 2026 학년도 2 학기 등록금 전액 (1 회 지원 ) ※ 기초생활수급자 생활비 추가 지원 없음"
    },
    "amountFrom": "공고 원문"
   }
