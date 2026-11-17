@@ -6543,6 +6543,37 @@ console.log('\n■ 절 경계 — 제외 대상·선발기준이 자격으로 �
     ['4년제 대학교 이공계 전공 새터민으로 재학 예정인 대학생']);
 }
 
+/* ── 「배제」로 말하는 제외 줄 (2026-11-17) ───────────────────────────────
+   `3. 9학기 진학 및 부분 등록자는 선발에서 배제됩니다.`(원문 셋 · collector/extracted 에 실제로 있는 꼴) 가 줄 단위 제외 규칙(match-engine EXCLUDE_LINE)에
+   안 걸려 **제외 칸에서 버려졌다**(저장된 eligibilityExcludes 줄이 화면에 안 보였다) · 자격 줄에 섞이면 `휴학생은 선발에서 배제됩니다` 가 **지원 자격 칸에** 떴다.
+   말끝이 배제일 때만 제외다 — `배제하지 않음`·`배제될 수 있음` 은 아니다. 판정은 다른 제외 줄과 같다(프로필이 모르는 축 — 9학기·부분 등록 — 은 '모름'). */
+console.log('\n■ 「배제」로 말하는 제외 줄 (2026-11-17)');
+{
+  const ME = createRequire(import.meta.url)('../match-engine.js');
+  const RAW = ['3. 9학기 진학 및 부분 등록자는 선발에서 배제됩니다.', '다. 9학기 진학 및 부분 등록자는 선발에서 배제됨.', '3. 9학기 진학 및 부분 등록자는 선발에서 배제합니다.​ ​'];
+  const base = ['1. 2026학년도 2학기 재학생', '2. 직전학기 평점 3.0 이상인 자'];
+  for (const l of RAW) {
+    const stored = { id: 'b1', name: 'b', eligibility: {}, eligibilityLines: base, eligibilityExcludes: [l] };
+    const mixed = { id: 'b2', name: 'b', eligibility: {}, eligibilityLines: [...base, l] };
+    /* 앱 상세 시트(app.js 「이런 경우는 제외돼요」)와 같은 두 출처 */
+    eq(`저장된 제외 줄이 제외 칸에 보인다: ${l.slice(0, 30)}`, ME.requirementLines(stored, stored.eligibilityExcludes, { onlyExclude: true }).length, 1);
+    eq(`  자격 줄에 섞이면 제외 칸으로 옮긴다(자격 칸엔 없다)`,
+      [ME.requirementLines(mixed, mixed.eligibilityLines, { onlyExclude: true }).length, ME.requirementLines(mixed, null, { all: true }).some((x) => /배제/.test(x))], [1, false]);
+  }
+  /* 말끝이 배제가 아닌 문장은 제외가 아니다 — 학생에게 오히려 유리한 말(중복 수혜 허용)이 '제외돼요'에 뜨면 안 된다 */
+  for (const l of ['중복 수혜를 배제하지 않음', '타 장학금과 중복 수혜를 배제하지 않습니다.', '서류 미비 시 선발에서 배제될 수 있음']) {
+    eq(`  대조군: 「${l}」 는 제외 줄이 아니다`, ME.requirementLines({}, [l], { onlyExclude: true }), []);
+  }
+  /* 판정 — 프로필이 아는 축(학적)은 「…제외됩니다」 와 똑같이 · 모르는 축(9학기·부분 등록)은 세지 않는다(틀린 미달 없음) */
+  const P = { school: '한국외국어대학교', campus: '서울', gpa: 3.5, bracket: 5, year: 4, track: 'humanities', major: '영어학과', flags: [], status: '재학', credits: 15, nationality: 'korean', region: '서울', birthYear: 2003 };
+  const fd = (lines, ex, p) => { const d = ME.fitDetail({ id: 'f', name: 'f', eligibility: {}, eligibilityLines: lines, eligibilityExcludes: ex }, p); return [d.pct, d.met, d.total, d.fails.length]; };
+  for (const p of [P, { ...P, year: 3 }, { ...P, status: '휴학' }]) {
+    eq(`  9학기 배제 줄은 판정하지 않는다(${p.year}학년 ${p.status})`, [fd([...base, RAW[0]], [], p), fd(base, [RAW[0]], p)], [fd(base, [], p), fd(base, [], p)]);
+    eq(`  휴학생 배제 = 휴학생 제외(${p.year}학년 ${p.status})`, [fd([...base, '휴학생은 선발에서 배제됩니다.'], [], p), fd(base, ['휴학생은 선발에서 배제됩니다.'], p)],
+      [fd([...base, '휴학생은 선발에서 제외됩니다.'], [], p), fd(base, ['휴학생은 선발에서 제외됩니다.'], p)]);
+  }
+}
+
 
 /* ── 🔴 적합도 — 0%를 내는 여덟 조건 (2026-08-24 · docs/designs/fit-score.md) ──
    0%는 학생에게서 장학금을 뺏는 판정이라 틀리면 가장 비싸다. 개발자 지시:
