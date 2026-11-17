@@ -1598,7 +1598,7 @@ console.log('\n■ 제출 서류 목록 — 원문의 「제출서류」 절을 
     X('□ 제출서류', '- 장학금 신청서 1부', '- 재학증명서 1부', '| 지원자 유의사항', '- 서류 미비자는 심사 대상에서 제외됩니다.'), ['장학금 신청서 1부', '재학증명서 1부']);
   eq('  ③ 「비 고」 칸 아래 안내(반환하지 않음 · 미제출 시 제외)는 서류가 아니다 · 한 줄 머리 값이 서류가 아니면 아래 표를 읽는다 (인하대)',
     X('6. 신청서류 : 각 학과 사무실로 원본 제출', '선발유형1 [가계곤란]', '장학사정관제 장학금 신청서 [ 인하포털시스템에서 작성 및 출력 ]', '참고용성적표(성적증명서 X)', '선발유형2', '장학사정관제 장학금 추천서 [별첨1 ]', '비 고', '관련 서류는 반환하지 않음', '기한 내 미제출 시 제외', '7. 제출처'),
-    ['장학사정관제 장학금 신청서 [ 인하포털시스템에서 작성 및 출력 ]', '참고용성적표(성적증명서 X)', '장학사정관제 장학금 추천서 [별첨1 ]']);
+    ['장학사정관제 장학금 신청서 [인하포털시스템에서 작성 및 출력]', '참고용성적표(성적증명서 X)', '장학사정관제 장학금 추천서 [별첨1]']);
   eq('  서류 이름 뒤에 가름표로 붙은 조건은 서류다 — 「확인서 - 해당자에 한함」「추천서 : 첨부 양식 (… 일괄 날인 예정)」「추천서(양식 2) ※ … 작성」',
     X('□ 제출서류', '- 봉사활동 확인서 - 해당자에 한함', '- 총장 추천서 : 첨부 양식 (총장 날인은 장학팀에서 일괄 날인 예정)', '- 장학생 추천서(양식 2) ※ 양식 내 추천기관 직인란은 제외 후 작성', '□ 신청방법'),
     ['봉사활동 확인서 - 해당자에 한함', '총장 추천서 : 첨부 양식 (총장 날인은 장학팀에서 일괄 날인 예정)', '장학생 추천서(양식 2) ※ 양식 내 추천기관 직인란은 제외 후 작성']);
@@ -1613,13 +1613,37 @@ console.log('\n■ 제출 서류 목록 — 원문의 「제출서류」 절을 
     [X('제출서류', '가. 한부모가족 증명서', '바. 지원서 및 자기소개서를 충실히 작성한 학생', '제출서류', '가. 장학금 지원서 1부'),
      X('■ 제출서류', '① 성적향상장학금 신청서 1 부 ( 첨부양식 사용 )', '② 본인 명의 통장 사본 1 부', '■ 신청서 작성법 및 유의사항', '- 최근 2 개학기 성적이 없는 자는 신청 불가함 .', '직전학기 성적'),
      X('제출서류', '- 재학증명서 1부', '- 모든 서류는 공고일 이후 발급받은 서류만 인정함.(학자금 지원구간 통지서는', '- 선정되지 않은 서류는 장학생 선발 확정 30일')],
-    [['한부모가족 증명서', '장학금 지원서 1부'], ['성적향상장학금 신청서 1 부 ( 첨부양식 사용 )', '본인 명의 통장 사본 1 부'], ['재학증명서 1부']]);
+    [['한부모가족 증명서', '장학금 지원서 1부'], ['성적향상장학금 신청서 1부 (첨부양식 사용)', '본인 명의 통장 사본 1부'], ['재학증명서 1부']]);
+  /* 2026-11-18 — docs-fill 을 이 규칙으로 합치며 실데이터(로봇 목록 191건) 옛/새 비교에서 잃던 진짜 서류를 되살린 꼴들. 하나라도 되돌리면 빨갛다 */
+  eq('  띄어쓰기 다듬기(「1 부」→「1부」·「( 첨부서류 )」→「(첨부서류)」) · 연도로 시작하는 서류 이름 · 괄호로 시작해도 뒤가 서류 이름이면 서류 · 「1부」만 있는 이름(신상카드)',
+    X('4. 제출서류', '가. 장학금 지급원서 ( 첨부서류 ) 1 부', '나. 2026 년 2 학기 학자금 지원구간 확인서 1부', '다. (해당자만) 수능성적표 사본', '라. 장학생 신상카드 (첨부양식) 1부', '5. 제출기한'),
+    ['장학금 지급원서 (첨부서류) 1부', '2026 년 2 학기 학자금 지원구간 확인서 1부', '(해당자만) 수능성적표 사본', '장학생 신상카드 (첨부양식) 1부']);
+  eq('  「제출서류 : …」 한 줄 목록은 80자를 넘어도 읽는다 · 쉼표가 있으면 가운뎃점(「수집 · 이용 동의서」)으로는 안 가른다 · 서류 아래 「- 선택 제출 … 가산점 부여」 곁말 줄은 건너뛴다',
+    [X('- 제출서류 : 제자사랑장학금 신청서 , 자기소개서 , 성적증명서 , 해당 학과 ( 부 ) 소속 교수 추천서 1 통 , 기타 생활 환경을 증명할 수 있는 서류 ( 필요 시 )'),
+     X('제출서류 : 장학금 신청서 , 가족관계증명서 (상세)*, 개인정보 수집 · 이용 동의서 , 서약서'),
+     X('6. 제출서류', '가 . 장학금 신청서 ( 첨부 양식 )', '- 선택 제출 (Optional) 이며 , 제출 시 가산점 부여', '라 . 개인정보 수집 · 이용 동의서 ( 첨부 양식 )', '7. 제출기한 : 11. 3')],
+    [['제자사랑장학금 신청서', '자기소개서', '성적증명서', '해당 학과 (부) 소속 교수 추천서 1통', '기타 생활 환경을 증명할 수 있는 서류 (필요 시)'],
+     ['장학금 신청서', '가족관계증명서 (상세)*', '개인정보 수집 · 이용 동의서', '서약서'],
+     ['장학금 신청서 (첨부 양식)', '개인정보 수집 · 이용 동의서 (첨부 양식)']]);
+  eq('  서류 이름 뒤 ※·-·→ 곁말은 판정에서 뗀다 · 「[해당자] …」는 이웃 글 제목이 아니다 · 목록 뒤 사이트 메뉴(학교소개·○○캠퍼스·홍보영상)·「주의사항: …」에서 멈춘다',
+    X('제출서류', '1) 국가근로장학생지원서 1부 ※지도교수 추천서는 공란으로 제출', '2) 학자금 지원구간 통지서 1부(직인 필수) - 발급 방법은 12p 참고', '- [해당자] 비교과 통합 인증서', '주의사항: 장학사정관 면담 및 추천서 서명은 필수이며', '학교소개', '서울캠퍼스', '홍보영상'),
+    ['국가근로장학생지원서 1부 ※지도교수 추천서는 공란으로 제출', '학자금 지원구간 통지서 1부(직인 필수) - 발급 방법은 12p 참고', '[해당자] 비교과 통합 인증서']);
+  eq('  되돌려도 되는가(hasDocSection) — 서류 절 머리가 있는 글자만 · 사이트 메뉴 껍데기(하나장학생 경희대 메뉴)는 못 읽은 것이라 옛 목록을 둔다',
+    [DL.hasDocSection('제출서류\n- 신청서'), DL.hasDocSection('대학\n경희정신\n설립자\n창학정신')], [true, false]);
+  {
+    process.env.DOCS_FILL_AS_LIB = '1'; process.env.EXCERPTS_AS_LIB = '1';
+    const DF = await import('../collector/docs-fill.mjs');
+    const items = [{ id: 'd', documents: ['관리자가 고친 서류'], documentsFrom: '관리자 선주 2026-11-01' }];
+    const r = DF.refreshOwnDocuments(items, null, '2026-11-18');   // 관리자 목록은 출처를 보기도 전에 건너뛴다
+    eq('  docs-fill 이 제 목록을 같은 규칙으로 다시 읽는다(refreshOwnDocuments) — 함수가 있고 본편에서 부른다 · 관리자 목록은 안 건드린다',
+      [typeof DF.refreshOwnDocuments, /const own = refreshOwnDocuments\(reg\.items, idx\)/.test(readText(new URL('../collector/docs-fill.mjs', import.meta.url))), items[0].documents, r.changed + r.reset], ['function', true, ['관리자가 고친 서류'], 0]);
+  }
   /* 🔴 고친 규칙으로 다시 읽어 목록이 없어진 **로봇 목록**은 자리표시로 되돌린다 — 안 그러면 옛 잡음(안내 문장·홍길동 예시)이 그대로 남는다. 원문을 못 읽은 날은 안 건드린다 */
   {
     const ee2 = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));
     const fd2 = ee2.slice(ee2.indexOf('function fillDocuments('), ee2.indexOf('function main()'));
     eq('  로봇 목록 되돌리기 — 로봇 출처(robotOwned)이고 원문 글자를 실제로 읽었을 때만 · 자리표시 글자는 doc-list 한 곳(DOC_PLACEHOLDER_LINE) · 로봇이 켠 prepDoc 도 끈다',
-      [/if \(robotOwned && readSomething\)/.test(fd2), /it\.documents = \[DOC_PLACEHOLDER_LINE\];/.test(fd2), /delete it\.documentsFrom;/.test(fd2), DL.DOC_PLACEHOLDER_LINE === '지원 자격·제출 서류는 원문 공고에서 확인', DL.placeholderOnly([DL.DOC_PLACEHOLDER_LINE])],
+      [/if \(robotOwned && readSomething && sectionSeen && !\/\^로봇 \/\.test\(it\.documentsFrom \|\| ''\)\)/.test(fd2), /it\.documents = \[DOC_PLACEHOLDER_LINE\];/.test(fd2), /delete it\.documentsFrom;/.test(fd2), DL.DOC_PLACEHOLDER_LINE === '지원 자격·제출 서류는 원문 공고에서 확인', DL.placeholderOnly([DL.DOC_PLACEHOLDER_LINE])],
       [true, true, true, true, true]);
   }
   /* 발췌기가 이 규칙으로 documents 를 채우고 prepDoc 을 켠다 — 사람 것은 덮지 않고, 신청서 첨부가 있으면 prepDoc 을 켜지 않는다 */
@@ -6817,7 +6841,7 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
   eq('  절이 없으면 빈 배열(지어내지 않는다) · 빈 글자도', AX.activityDocuments ? [AX.activityDocuments('○ 응모 자격 : 대학생\n○ 접수 : 이메일'), AX.activityDocuments('')] : null, [[], []]);
   const cm = readText(new URL('../collector/collect.mjs', import.meta.url));
   eq('② 수집 로봇 — 본문을 읽는 세 자리(새 글 · 소급 보강 · 서류 칸만 소급) 모두 서류 목록을 같은 함수로 적는다(activity-excerpts putActivityDocuments 한 곳 · 수집 로봇에 사본 없음) · 활동 글 id 는 canon-url activityId 한 곳(발행 전 전부에 소급 · 겹치면 뒤 글은 비운다)',
-    [(cm.match(/putActivityDocuments\(it, activityDocuments\(detail\.text\)\)/g) || []).length, /function putActivityDocuments/.test(cm), /import \{[^}]*\bputActivityDocuments\b[^}]*\} from '\.\/activity-excerpts\.mjs'/.test(cm),
+    [(cm.match(/putActivityDocuments\(it, activityDocuments\(detail\.text\)/g) || []).length, /function putActivityDocuments/.test(cm), /import \{[^}]*\bputActivityDocuments\b[^}]*\} from '\.\/activity-excerpts\.mjs'/.test(cm),
       /if \(!n\.id && n\.url\) n\.id = activityId\(n\.url\);/.test(cm), /import \{ canonUrl, activityId \} from '\.\/canon-url\.mjs'/.test(cm), /if \(other && other !== n\.url\)[^\n]*delete n\.id/.test(cm)], [3, false, true, true, true, true]);
   /* 🔴 판(documentsV · 첨부 로봇의 docsV 와 다른 칸) — 10-30 에 서류 칸을 더하고 판을 안 올려 이미 읽은 199건 중 1건만 서류가 생겼다(11-15 실측). 서류 판만 다르면 **서류 칸만** 다시 읽는다(자격 칸은 그대로) */
   {
@@ -6832,8 +6856,24 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
     eq('  서류 칸 쓰기 — 첨부·브라우저에서 읽어 둔 목록(documentsFrom)은 빈 본문이 지우지 않는다 · 본문 목록은 비면 지운다 · 본문이 목록을 주면 본문이 이긴다(출처 표식도 뗀다) · 늘 판을 적는다',
       [kept.documents, kept.documentsV === D, wiped.documents, wiped.documentsV === D, kept.docsV === undefined, put.documents, put.documentsFrom], [['참가신청서'], true, undefined, true, true, ['작품 설명서'], undefined]);
     eq('  서류 칸만 다시 읽는 갈래는 자격·발췌를 건드리지 않고 넘어간다(같은 판으로 이미 읽었다) · 못 받으면 이레 뒤에 다시 · 리포트의 「남은」 수도 같은 판단',
-      [/if \(need === 'docs'\) \{\s*\/\*[^*]*\*\/\s*if \(detail\.text\) \{ putActivityDocuments\(it, activityDocuments\(detail\.text\)\); delete it\.detailsTriedAt; \} else it\.detailsTriedAt = todayIso;\s*actBackfilled \+= 1; actDocsBackfilled \+= 1;\s*continue;/.test(cm),
+      [/if \(need === 'docs'\) \{\s*\/\*[^*]*\*\/\s*if \(detail\.text\) \{ putActivityDocuments\(it, activityDocuments\(detail\.text\), null, \{ thin: thinText\(detail\.text\) \}\); delete it\.detailsTriedAt; \} else it\.detailsTriedAt = todayIso;\s*actBackfilled \+= 1; actDocsBackfilled \+= 1;\s*continue;/.test(cm),
         /남은 \$\{acts\.items\.filter\(\(n\) => actRereadNeed\(n\)\)\.length\}건/.test(cm)], [true, true]);
+  }
+  /* 리뷰 확정 셋(2026-11-15 #7·#8·#9) — 첨부·브라우저 자격 글은 본문 재읽기를 안 한다 · 껍데기 본문이 읽어 둔 서류를 안 지운다 · API 재구성이 서류를 이어받는다 */
+  {
+    const V = AX.ACT_DETAILS_V, D = AX.ACT_DOCS_V;
+    const shell = '메뉴 홈 로그인'.repeat(3);
+    const kept = AX.putActivityDocuments({ documents: ['참가신청서 1부'] }, [], null, { thin: AX.thinText(shell) });
+    eq('  #7 자격을 첨부·요강·브라우저에서 읽은 글은 본문 서류 재읽기 대상이 아니다(첨부 로봇이 그 글자에서 읽는다) · #9 껍데기 본문은 읽어 둔 서류를 안 지운다(판만 적는다)',
+      [AX.actRereadNeed({ excerptsAt: 'x', detailsV: V, eligibilityFrom: '공고문 첨부(OCR)' }), AX.actRereadNeed({ excerptsAt: 'x', detailsV: V }), kept.documents, kept.documentsV === D, AX.thinText(shell), AX.thinText('가'.repeat(400))],
+      [null, 'docs', ['참가신청서 1부'], true, true, false]);
+    const adocs = readText(new URL('../collector/activity-docs.mjs', import.meta.url));
+    eq('  #7 첨부 로봇 staleDocs 가 서류 판(documentsV)이 옛것인 첨부 자격 글도 한 번 다시 열고 · 읽은 뒤 판을 적는다',
+      [/staleDocs = \(n\) => [^\n]*n\.documentsV !== ACT_DOCS_V/.test(adocs), /n\.documentsV = ACT_DOCS_V;/.test(adocs)], [true, true]);
+    const OM = await import('../collector/open-api-map.mjs');
+    const om = readText(new URL('../collector/open-api-map.mjs', import.meta.url));
+    eq('  #8 API 로봇이 글을 다시 만들 때 오늘 서류가 없으면 어제 서류(출처·판 포함)를 이어받는다',
+      /if \(old && !\(n\.documents \|\| \[\]\)\.length && \(old\.documents \|\| \[\]\)\.length\) n = \{ \.\.\.n, documents: old\.documents/.test(om), true);
   }
   /* 브라우저·첨부로만 읽히는 글 · API 글도 같은 규칙으로 서류를 받는다(전엔 일반 수집 본문만 서류를 읽었다 — 브라우저 본문 12건 · API 47건 모두 0) */
   {
@@ -16609,7 +16649,7 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
   /* 첨부에서 읽어 둔 줄의 소급 — 본문 다시 읽기(판)는 첨부 줄을 그대로 두므로 무료 모드가 한 번 더 읽는다 */
   eq('첨부에서 읽어 둔 자격이 옛 판이면 다시 읽을 글이다 · 이 판으로 읽었거나 · 본문에서 온 줄 · 관리자 줄 · 숨긴 글은 아니다',
     [AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '공고문 첨부' }), AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '공고문 첨부(OCR)', docsV: AX.ACT_DETAILS_V - 1 }),
-      AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '공고문 첨부', docsV: AX.ACT_DETAILS_V }), AD.staleDocs({ eligibilityLines: ['x'] }), AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '브라우저 본문' }),
+      AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '공고문 첨부', docsV: AX.ACT_DETAILS_V, documentsV: AX.ACT_DOCS_V }),   /* 이 판으로 읽음 = 자격 판(docsV)과 서류 판(documentsV) 둘 다(2026-11-18) */ AD.staleDocs({ eligibilityLines: ['x'] }), AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '브라우저 본문' }),
       AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '관리자 2026-11-15' }), AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '공고문 첨부', hidden: true })],
     [true, true, false, false, false, false, false]);
   const docsSrc = readText(new URL('../collector/activity-docs.mjs', import.meta.url));

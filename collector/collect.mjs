@@ -19,7 +19,7 @@ import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry, retitleItems } from './clean-title.mjs';
 import { isAttachmentEntry, detailAttachments, stripSiteChrome } from './attachment-link.mjs';
 import { activityKind, activityField, notActivity, unreadableSource, ACTIVITY_FIELDS } from './activity-kind.mjs';
-import { activityExcerpts, activityDetails, putActivityDetails, activityDocuments, putActivityDocuments, actRereadNeed, ACT_DETAILS_V, sanitizeBenefit, sanitizeElig, sanitizeSteps, sanitizeDocs, deadlineFromNotice, sanitizeForeign } from './activity-excerpts.mjs';
+import { activityExcerpts, activityDetails, putActivityDetails, activityDocuments, putActivityDocuments, actRereadNeed, thinText, ACT_DETAILS_V, sanitizeBenefit, sanitizeElig, sanitizeSteps, sanitizeDocs, deadlineFromNotice, sanitizeForeign } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { detailByRule } from './activity-detail-rules.mjs';   // 본문이 스크립트로 그려지는 게시판(온통청년)의 숨은 글 주소 — 첨부 로봇과 같은 함수(2026-10-28)
 import { robotsAllows } from './robots.mjs';
@@ -654,7 +654,7 @@ for (const it of acts.items) {
   const detail = await fetchDetail(it);
   if (need === 'docs') {
     /* 서류 칸만 — 자격·발췌·마감은 그대로 둔다(같은 판으로 이미 읽었다). 못 받으면 이레 뒤에 다시 */
-    if (detail.text) { putActivityDocuments(it, activityDocuments(detail.text)); delete it.detailsTriedAt; } else it.detailsTriedAt = todayIso;
+    if (detail.text) { putActivityDocuments(it, activityDocuments(detail.text), null, { thin: thinText(detail.text) }); delete it.detailsTriedAt; } else it.detailsTriedAt = todayIso;
     actBackfilled += 1; actDocsBackfilled += 1;
     continue;
   }
@@ -663,7 +663,7 @@ for (const it of acts.items) {
   if (ex.excerpts.length) it.excerpts = ex.excerpts;
   if (!it.field) { const f = activityField(it.title, it.kind); if (f) it.field = f; }
   if (detail.text) putActivityDetails(it, activityDetails(detail.text, it.title));
-  if (detail.text) putActivityDocuments(it, activityDocuments(detail.text));
+  if (detail.text) putActivityDocuments(it, activityDocuments(detail.text), null, { thin: thinText(detail.text) });
   if (detail.text) it.excerptsAt = new Date().toISOString().slice(0, 10);   // 못 받아 온 날은 적지 않는다 — 잠깐 끊긴 것을 영영 '읽었다'로 굳히지 않게
   if (detail.text) delete it.detailsTriedAt; else it.detailsTriedAt = todayIso;   // 못 받았으면 이레 뒤에 다시
   actBackfilled += 1;

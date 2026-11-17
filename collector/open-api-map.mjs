@@ -469,6 +469,8 @@ export function mergeApi(prevItems, results, { today, hideUrls = new Set() }) {
     const byId = n.id ? prevById.get(n.id) : null;
     const old = prevByUrl.get(k) || byId;
     if (old && !DETAIL_KEYS.some((f) => (n[f] || []).length)) for (const f of DETAIL_KEYS) if ((old[f] || []).length) n = { ...n, [f]: old[f] };
+    /* 제출 서류 — 오늘 API 가 서류를 안 줬으면 어제 것(첨부·브라우저 로봇이 채운 것 포함)을 이어받는다. 안 그러면 하루 두 번 지워졌다 다시 붙는다(리뷰 2026-11-15 #8) */
+    if (old && !(n.documents || []).length && (old.documents || []).length) n = { ...n, documents: old.documents, ...(old.documentsFrom ? { documentsFrom: old.documentsFrom } : {}), ...(old.documentsV ? { documentsV: old.documentsV } : {}) };
     const first = [firstSeen.get(k), firstSeen.get(titleKey(n)), byId && byId.foundAt].filter(Boolean).sort()[0];
     /* excerptsAt: 수집 로봇의 '원문 다시 읽기'가 건너뛰게 · seenAt: 오늘도 API 가 줬다 —
        수집 로봇의 60일 삭제는 API 글엔 처음 본 날이 아니라 이 날로 잰다(오래 열린 정책이 61일째 '새 글'로 돌아오지 않게 · 리뷰 I3) */

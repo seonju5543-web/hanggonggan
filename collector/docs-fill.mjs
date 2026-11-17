@@ -14,7 +14,7 @@
    ============================================================ */
 import fs from 'node:fs';
 import { isDocPlaceholder } from './extract-excerpts.mjs';
-import { readDocuments } from './doc-list.mjs';   // 🔴 서류 목록 규칙은 doc-list 한 곳(2026-11-15 리뷰 — 이 로봇만 옛 규칙 사본 extractDocuments 를 써서 고친 규칙이 74건에 안 닿았다)
+import { readDocuments, DOC_PLACEHOLDER_LINE, hasDocSection } from './doc-list.mjs';   // 🔴 서류 목록 규칙은 doc-list 한 곳(2026-11-15 리뷰 — 이 로봇만 옛 규칙 사본 extractDocuments 를 써서 고친 규칙이 74건에 안 닿았다)
 import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
 import { DOC_JUNK } from './doc-list.mjs';
 
@@ -49,7 +49,7 @@ export function fillDocuments(items, idx, today = TODAY) {
 /** 이미 실린 서류 칸에서 서류가 아닌 줄(사이트 맨 아래 줄·안내문·유의사항 — doc-list.mjs DOC_JUNK 한 곳)을 걷는다 (2026-11-17 · 원칙 7 소급).
     로봇이 적은 칸(ROBOT_OWNED)만 — 관리자·AI·출처 표식 없는 사람의 칸은 건드리지 않는다. 다 걸러져 비면 자동 등록의 자리표시로 되돌린다 — 위 fillDocuments 가 같은 실행에서 새 규칙으로 다시 읽는다.
     순수 함수 — 바뀐 항목 수와 리포트 줄을 돌려준다 */
-export const DOC_PLACEHOLDER_LINE = '지원 자격·제출 서류는 원문 공고에서 확인';
+export { DOC_PLACEHOLDER_LINE };   // 글자는 doc-list.mjs 한 곳
 export const ROBOT_OWNED = /^(공고 원문|공고문 첨부|로봇 )/;   // extract-excerpts.mjs(공고 원문·공고문 첨부…) · 이 파일 fillDocuments(로봇 날짜 · …)
 export function scrubDocuments(items) {
   let scrubbed = 0; const lines = [];
@@ -67,21 +67,50 @@ export function scrubDocuments(items) {
   return { scrubbed, lines };
 }
 
+/** 이 로봇이 적은 목록(「로봇 날짜 · 원문 「제출서류」 절」)을 **제 출처로** 다시 읽는다 (2026-11-18 · 원칙 7 소급).
+    서류 목록 규칙이 doc-list.mjs 한 곳으로 합쳐지며 바뀌었으니 옛 규칙(extractDocuments 사본)이 적은 74건을 같은 규칙으로 맞춘다.
+    ① 원문에서 목록이 나오고 지금 것과 다르면 바꾼다(날짜 표식만 새로 · 같으면 안 건드린다 — 매일 바뀌지 않게)
+    ② 원문을 실제로 읽었는데 목록이 없으면 자리표시로 되돌린다(옛 목록은 잡음이었다) · 원문이 없으면 그대로 둔다(못 읽은 날 지우지 않는다).
+    extract-excerpts 는 이 목록을 지우지 않는다 — 그 로봇의 본문은 이 로봇의 출처(브라우저 본문 등)와 다를 수 있다. 순수 함수. */
+export function refreshOwnDocuments(items, idx, today = TODAY) {
+  let changed = 0, reset = 0; const lines = [];
+  const norm = (a) => (a || []).map((d) => String(d).replace(/\s+/g, '')).join('|');
+  for (const it of items) {
+    if (!/^로봇 /.test(it.documentsFrom || '') || /^관리자/.test(it.documentsFrom || '')) continue;
+    const src = sourceFor(it, idx);
+    if (!hasText(src)) continue;
+    const docs = readDocuments(src.text).docs;
+    if (docs.length) {
+      if (norm(docs) === norm(it.documents)) {
+        if (JSON.stringify(docs) !== JSON.stringify(it.documents)) it.documents = docs;   // 빈칸만 다르면(띄어쓰기 다듬기) 글자만 맞춘다
+        continue;
+      }
+      it.documents = docs; it.documentsFrom = `로봇 ${today} · 원문 「제출서류」 절`; changed += 1;
+      lines.push(`- 🔁 \`${it.id}\` ${(it.name || '').slice(0, 40)} — 같은 규칙으로 다시 읽음: ${docs.slice(0, 3).join(' · ')}${docs.length > 3 ? ' …' : ''}`);
+    } else if (hasDocSection(src.text)) {
+      it.documents = [DOC_PLACEHOLDER_LINE]; delete it.documentsFrom; reset += 1;
+      lines.push(`- ↩️ \`${it.id}\` ${(it.name || '').slice(0, 40)} — 원문에 서류 목록이 없어 자리표시로 되돌림`);
+    }
+  }
+  return { changed, reset, lines };
+}
+
 /* ── 본편 — DOCS_FILL_AS_LIB 가 있으면 함수만(관문이 불러 쓴다 · activity-docs 와 같은 관례) ── */
 if (!process.env.DOCS_FILL_AS_LIB) {
   const reg = readJson(REG, null);
   if (!reg || !Array.isArray(reg.items)) { console.log('docs-fill: data/registered.json 없음 — 건너뜀'); process.exit(0); }
   const idx = indexTexts(readJson(new URL('extracted/notices-text.json', HERE), []), readJson(new URL('extracted/browser-bodies.json', HERE), {}));
   const scrub = scrubDocuments(reg.items);   // 먼저 걷고(비면 자리표시로) → 같은 실행에서 새 규칙으로 다시 채운다
+  const own = refreshOwnDocuments(reg.items, idx);   // 이 로봇이 적은 목록을 같은 규칙으로 다시(2026-11-18)
   const { filled, lines } = fillDocuments(reg.items, idx);
-  lines.unshift(...scrub.lines);
-  if ((filled || scrub.scrubbed) && WRITE) {
+  lines.unshift(...scrub.lines, ...own.lines);
+  if ((filled || scrub.scrubbed || own.changed || own.reset) && WRITE) {
     reg.updatedAt = TODAY;
     fs.writeFileSync(REG, JSON.stringify(reg, null, 1) + '\n');
   }
   const left = reg.items.filter(needsDocs).length;
-  const head = `\n### 📄 제출 서류 채우기 (원문 「제출서류」 절) — ${filled}건 · 서류 아닌 줄 걷음 ${scrub.scrubbed}건 · 아직 자리표시뿐 ${left}건`;
+  const head = `\n### 📄 제출 서류 채우기 (원문 「제출서류」 절) — ${filled}건 · 서류 아닌 줄 걷음 ${scrub.scrubbed}건 · 같은 규칙으로 다시 ${own.changed}건 · 되돌림 ${own.reset}건 · 아직 자리표시뿐 ${left}건`;
   const body = lines.length ? lines : ['- 이번 실행에서 원문에서 읽은 서류가 없었어요.'];
   if (WRITE && fs.existsSync(REPORT)) fs.appendFileSync(REPORT, ['', head, '원문 본문의 `제출서류·구비서류` 절 아래 서류 이름 줄만 담았어요(설명 문장·곁말·제출 방법은 뺌). 원문이 없거나 절이 없는 글은 그대로 둡니다.', ...body].join('\n') + '\n');
-  console.log(`docs-fill: ${filled} filled · ${scrub.scrubbed} scrubbed · ${left} left` + (WRITE ? "" : " (dry)"));
+  console.log(`docs-fill: ${filled} filled · ${scrub.scrubbed} scrubbed · ${own.changed} refreshed · ${own.reset} reset · ${left} left` + (WRITE ? "" : " (dry)"));
 }

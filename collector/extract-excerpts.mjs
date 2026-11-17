@@ -40,7 +40,7 @@ import { sameTitle } from './detail-url.mjs';
 const noticeDocFiles = (it, opts = {}) => noticeDocFiles0(it, { sameTitle, ...opts });
 import { findApplyEmail, humanOwnedEmail, staleApplyEmail, staleInTexts } from './apply-email.mjs';
 import { decodeEntities } from './clean-title.mjs';
-import { readDocuments, placeholderOnly as docsPlaceholderOnly, DOC_PLACEHOLDER_LINE } from './doc-list.mjs';
+import { readDocuments, placeholderOnly as docsPlaceholderOnly, DOC_PLACEHOLDER_LINE, hasDocSection } from './doc-list.mjs';
 /* 포털 판정은 `apply-channel.js` 한 곳 — 앱·관리자 화면도 같은 파일을 쓴다(베끼지 말 것).
    ⚠️ `_cr` 는 위에서 이미 들여왔다 — 다시 import 하면 그 자리에서 죽는다(실제로 그랬다). */
 const { findApplyPortal } = _cr(import.meta.url)('../apply-channel.js');
@@ -1733,7 +1733,8 @@ function fillDocuments(it, body, docsFn) {
     const readBody = !!(body && body.trim());
     const readAttach = (docsFn ? docsFn() : []).some((t) => String(t || '').trim());
     const readSomething = /^공고문 첨부/.test(it.documentsFrom || '') ? readAttach : readBody;
-    if (robotOwned && readSomething) {
+    const sectionSeen = hasDocSection(body) || (docsFn ? docsFn() : []).some((t) => hasDocSection(t));   // 서류 절 머리가 원문에 있을 때만(껍데기 글자로 지우지 않는다)
+    if (robotOwned && readSomething && sectionSeen && !/^로봇 /.test(it.documentsFrom || '')) {   // docs-fill(「로봇 …」) 목록은 그 로봇이 제 출처로 다시 본다 — 여기 본문(껍데기일 수 있다)으로 지우지 않는다(2026-11-18 · 하나장학생·천사장학금)
       resetDocs += 1;
       if (!WRITE) { console.log(`   [서류 되돌림] ${it.id} — 로봇 목록 ${(it.documents || []).length}줄 → 자리표시`); return; }
       it.documents = [DOC_PLACEHOLDER_LINE];

@@ -506,7 +506,10 @@ export function activityDocuments(text) {
 export const ACT_DOCS_V = 1;
 /* 글 하나에 서류 목록을 붙인다 — 수집 로봇(새 글 · 소급) · 첨부 로봇(activity-docs) · API 로봇이 **같은 함수**.
    목록이 없으면 칸을 지우되, 첨부·브라우저에서 읽어 둔 목록(documentsFrom)은 본문 재읽기가 비었다고 지우지 않는다(껍데기 본문이 덮지 않게). */
-export function putActivityDocuments(it, docs, from) {
+/* 껍데기 본문(한글 300자 미만 — 스크립트 껍데기·목록 화면)이 낸 '서류 없음'은 읽어 둔 목록을 지우지 않는다(putActivityDetails 의 thin 과 같은 잣대 · 리뷰 2026-11-15 #9) */
+export const thinText = (t) => String(t || '').replace(/[^가-힣]/g, '').length < 300;
+export function putActivityDocuments(it, docs, from, { thin = false } = {}) {
+  if (!(docs && docs.length) && thin && (it.documents || []).length) { it.documentsV = ACT_DOCS_V; return it; }
   if (docs && docs.length) {
     it.documents = docs;
     if (from) it.documentsFrom = from; else delete it.documentsFrom;
@@ -519,7 +522,8 @@ export function putActivityDocuments(it, docs, from) {
 export function actRereadNeed(it) {
   if (it.api && (it.eligibilityLines || []).length) return null;
   if (!(it.excerptsAt && it.detailsV === ACT_DETAILS_V)) return 'details';
-  if (!it.api && it.documentsV !== ACT_DOCS_V) return 'docs';
+  /* 자격을 첨부·요강·브라우저에서 읽은 글은 본문이 껍데기다 — 서류도 그 로봇(activity-docs staleDocs)이 같은 글자에서 읽는다(리뷰 2026-11-15 #7) */
+  if (!it.api && !it.eligibilityFrom && it.documentsV !== ACT_DOCS_V) return 'docs';
   return null;
 }
 
