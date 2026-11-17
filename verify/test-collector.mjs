@@ -10313,10 +10313,12 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
         [...got.eligibilityLines, ...got.documents],
         ['중소 · 중견기업', '장학생 신청접수 완료 후', '○ 신청대상', '모집 대상', '센터 × Google', '장학생신청서 - 금신장학재단 홈페이지에서 작성', '홈페이지(www.kumsin.or.kr)에서 작성']);
       eq('  주소·id 칸은 건드리지 않는다(주소의 & 는 decodeUrlEntities 몫)', [got.id, got.sourceUrl], ['a&amp;b', 'https://x.kr/v?a=1&amp;b=2']);
+      const got2 = tidy({ title: 'A\u200D B', name: '유형 Ⅱ \u200B 장학금', home: 'https://x.or.kr/?a=1&amp;b=2' });
+      eq('  이모지 잇개(U+200D)는 두고 · 폭 0 공백 자리의 겹친 빈칸은 하나로 · 재단 홈페이지(home) 같은 주소 칸도 그대로(리뷰 11-17)', [got2.title, got2.name, got2.home], ['A\u200D B', '유형 Ⅱ 장학금', 'https://x.or.kr/?a=1&amp;b=2']);
       const loaders = ['loadRegistered', 'loadKosaf', 'loadActivities', 'loadExternal', 'loadNotices', 'loadNews'].map((n) => [n, /tidyData\(/.test(takeFnSrc(n))]);
       eq('  받는 곳 여섯(정식 등록·카드 읽기·층2·대외활동·재단 게시판·학교 공고·소식)이 모두 씻는다', loaders.filter(([, ok]) => !ok).map(([n]) => n), []);
       const ws = readText(new URL('./what-shows.mjs', import.meta.url));
-      eq('  what-shows 도 앱처럼 씻은 글자로 말한다', /linkFn\('tidyData'\)\(reg\)/.test(ws) && /'tidyText', 'tidyData'/.test(ws), true);
+      eq('  what-shows 도 앱처럼 씻은 글자로 말한다 — 읽자마자(카드 읽기를 얹고 찾기 전에) · 카드 읽기 파일도', /const reg = tidyData\(JSON\.parse/.test(ws) && /applyCardRead\(reg\.items, tidyData\(/.test(ws) && /'tidyText', 'tidyData'/.test(ws), true);
     }
   }
 
@@ -13702,17 +13704,25 @@ console.log('\n■ 대외활동 — 남은 글 표본에서 찾은 것 (2026-10-
       ['2026-09-16', '2026-09-04', false, '2026-12-01', false, undefined]);
     const junk = ['01811 서울시 노원구 공릉로 232 서울과학기술대학교 | TEL. (02) 970.6114', '제출하신 서류는 사업운영기관에서 관리되오니 서류 반환 등 문의는 해당 기관으로 하시기 바랍니다.', '주요 심사기준에 따른 서류심사',
       '「 내 안전 지키는 안심헬프미」신청 안내', '장학금 2개 종 이상 동시 지원 불가', '전년도 장학생은 선발 대상에서 제외함', '증명서발급안내 : 대표홈페이지 | 학사안내 | 증명서발급 | 학부생'];
-    const real = ['지원서 1 부', '재학증명서 (공고일 9/1 이후 발급분)', '주민등록등본(주민번호 뒷자리 미포함, 3개월 이내 발급분)', '3 주민등록초본 | - 주소 변동 전체이력 포함', '=e" | @ 통장사본 (학생 본인 명의) | 알 수 있는 추가서류 필요)', '학업계획서(자유양식)'];
+    const real = ['지원서 1 부', '재학증명서 (공고일 9/1 이후 발급분)', '주민등록등본(주민번호 뒷자리 미포함, 3개월 이내 발급분)', '3 주민등록초본 | - 주소 변동 전체이력 포함', '=e" | @ 통장사본 (학생 본인 명의) | 알 수 있는 추가서류 필요)', '학업계획서(자유양식)',
+      /* 리뷰(11-17)가 찾은 오탐 — 서류 이름이 든 줄은 끝말(제외·불가)·세로줄·「서류심사」로 버리지 않는다 */
+      '1 | 재학증명서 | 1부', '성적증명서 | 1부 | 필수', '개인정보 수집·이용 동의서 | 서명 | 날인', '주민등록등본 1부 - 외국인 제외', '재학증명서(휴학생 제외', '기초생활수급자 증명서(해당자만, 차상위 제외', '서류심사용 자기소개서'];
     eq('  서류 칸 — 사이트 맨 아래 줄·안내문·다른 글 제목·유의사항·메뉴 경로는 서류가 아니다 · 진짜 서류(OCR 표의 세로줄 하나·서류 이름이 든 줄 포함)는 둔다',
       [junk.filter((d) => !DLq.DOC_JUNK.test(d)), real.filter((d) => DLq.DOC_JUNK.test(d))], [[], []]);
     const it5 = { documents: [...real.slice(0, 2), junk[0]] };
     eq('  활동 글 소급(sanitizeDocs) — 걸러낸 줄만 빠진다', [AXq.sanitizeDocs(it5), it5.documents], [true, real.slice(0, 2)]);
     process.env.DOCS_FILL_AS_LIB = '1';
     const DFq = await import('../collector/docs-fill.mjs');
-    const regs = [{ id: 'a', documents: [real[0], junk[4]] }, { id: 'b', documents: [junk[5]], documentsFrom: '공고문 첨부' }, { id: 'c', documents: [junk[4]], documentsFrom: '관리자 2026-11-01' }];
+    const regs = [{ id: 'a', documents: [real[0], junk[4]], documentsFrom: '공고 원문' }, { id: 'b', documents: [junk[5]], documentsFrom: '공고문 첨부' }, { id: 'c', documents: [junk[4]], documentsFrom: '관리자 2026-11-01' }];
     const sc = DFq.scrubDocuments(regs);
     eq('  정식 등록 소급(docs-fill scrubDocuments) — 걸러낸 줄만 빠지고 · 다 빠지면 자리표시로(같은 실행에서 다시 읽는다) · 관리자 칸은 안 건드린다',
       [sc.scrubbed, regs[0].documents, regs[1].documents, regs[1].documentsFrom, regs[2].documents], [2, [real[0]], [DFq.DOC_PLACEHOLDER_LINE], undefined, [junk[4]]]);
+    const it7 = { title: '전국 대학생 및 대학원생 대상 AI 공모전', eligibilityLines: ['전국 대학생 및 대학원생'], eligibilityFrom: '본문' };
+    eq('  제목이 대상으로 시작하는 글의 진짜 자격 줄(「전국 대학생 및 대학원생」)은 제목 조각으로 보지 않는다 — 끊긴 꼴(꾸밈말·조사 끝)만 뺀다(리뷰 11-17)', [AXq.sanitizeElig(it7), it7.eligibilityLines], [false, ['전국 대학생 및 대학원생']]);
+    eq('  모집 글은 상·합격·선정 낱말이 있어도 그대로 둔다(리뷰 11-17)',
+      ['2026 ○○ 공모전 참가자 모집 – 입상자 해외연수 특전', '○○ 서포터즈 모집 (최종 합격 시 활동비 지급)', '○○ 아이디어 공모전 – 30개 팀 선정', '2026 성과공유회 참가자 모집'].map((t) => AK.notActivity(t, new Date('2026-11-17'))), [false, false, false, false]);
+    const regs2 = [{ id: 'h', documents: ['장학금 2개 종 이상 동시 지원 불가'] }, { id: 'ai', documents: ['장학금 2개 종 이상 동시 지원 불가'], documentsFrom: 'AI 2026-10-01' }, { id: 'r', documents: ['지원서', '장학금 2개 종 이상 동시 지원 불가'], documentsFrom: '로봇 2026-10-17 · 원문 「제출서류」 절' }];
+    eq('  정식 등록 소급은 로봇이 적은 칸만 — 출처 표식 없는 사람의 칸·AI 칸은 그대로(extract-excerpts 와 같은 소유 규칙 · 리뷰 11-17)', [DFq.scrubDocuments(regs2).scrubbed, regs2[0].documents.length, regs2[1].documents.length, regs2[2].documents], [1, 1, 1, ['지원서']]);
     const it6 = { title: '청년들이 만드는 첨단 공공서비스 AI 영상 공모전', eligibilityLines: ['공모자격 : 공모자격 : 대학생으로 구성된 팀(5인 이내)', '청년들이 만드는', '대한민국 청년(1992.1.1~2007.12.31 출생자)'], eligibilityFrom: '본문' };
     eq('  자격 줄 — 이름표가 두 번 붙은 줄은 한 번으로 · 제목 앞머리 조각은 뺀다(sanitizeElig)',
       [AXq.sanitizeElig(it6), it6.eligibilityLines], [true, ['공모자격 : 대학생으로 구성된 팀(5인 이내)', '대한민국 청년(1992.1.1~2007.12.31 출생자)']]);
@@ -14547,8 +14557,8 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
         '활동일시 · 2026년 10월 17일(토) 15:00~21:00', '강북청년창업마루 - 강북창업지원센터에서 10월 창업 교육 및 그룹상담 프로그램을 진행합니다.', '온라인 접수 · <a href="https://forms.gle/x" target="_blank" rel="noopener">forms.gle ↗</a>']);   // 11-17 — 글 속 주소는 사이트 이름 링크(nsBodyHtml)
     /* 2026-11-17 개발자 지시(가독성) — 글 속 긴 주소는 누를 수 있는 사이트 이름으로 · 주소는 원문 그대로 링크에 · 꼬리 마침표는 주소가 아니다 · 주소 아닌 글자는 그대로 escape */
     eq('  공고 안내 — 글 속 주소는 「사이트 ↗」 링크(주소는 원문 그대로 · 꼬리 마침표 제외) · 나머지 글자는 escape',
-      rows2(['신청 방법 : 구글폼 https://forms.gle/AbC?x=1&y=<2> 로 접수.', '문의 <b>센터</b> 사이트 http://www.k-startup.go.kr/web/a.do.']),
-      ['신청 방법 · 구글폼 <a href="https://forms.gle/AbC?x=1&amp;y=" target="_blank" rel="noopener">forms.gle ↗</a> &lt;2&gt; 로 접수.', '문의 &lt;b&gt;센터&lt;/b&gt; 사이트 <a href="http://www.k-startup.go.kr/web/a.do" target="_blank" rel="noopener">k-startup.go.kr ↗</a> .']);
+      rows2(['신청 방법 : 구글폼 https://forms.gle/AbC?x=1&y=<2> 로 접수.', '문의 <b>센터</b> 사이트 http://www.k-startup.go.kr/web/a.do.', '온라인 접수 : https://forms.gle/abc에서 신청']),
+      ['신청 방법 · 구글폼 <a href="https://forms.gle/AbC?x=1&amp;y=" target="_blank" rel="noopener">forms.gle ↗</a> &lt;2&gt; 로 접수.', '문의 &lt;b&gt;센터&lt;/b&gt; 사이트 <a href="http://www.k-startup.go.kr/web/a.do" target="_blank" rel="noopener">k-startup.go.kr ↗</a> .', '온라인 접수 · <a href="https://forms.gle/abc" target="_blank" rel="noopener">forms.gle ↗</a> 에서 신청']);   // 주소에 붙은 한글은 주소가 아니다(리뷰 11-17)
     eq('  이름표가 있는 줄 뒤의 줄은 그 줄에 붙이지 않는다 · 항목 머리(`A.`·`○`·`1)`)도 새 줄',
       rows2(['지원자격 : 2026-1 학기 학부 재학생', '매일 09:00~18:00 접수', '안내 글자가 길어서 이어지는', 'A. 첫째 항목입니다.']), ['매일 09:00~18:00 접수', 'A. 첫째 항목입니다.']);
     eq('  공고 안내 — 자격 줄이 있으면 「대상」 발췌를 다시 적지 않는다 · 모집기간은 「접수」 절이(코드 자리)', /x\.label !== '혜택' && x\.label !== '모집기간' && !\(x\.label === '대상' && \(n\.eligibilityLines \|\| \[\]\)\.length\)/.test(appSrc), true);

@@ -227,7 +227,8 @@ export const dedupeLabel = (l) => String(l).replace(/^(\s*([^:：\d]{1,12})\s*[:
 /* 제목의 앞머리 조각(「청년들이 만드는」 ← 「청년들이 만드는 첨단 공공서비스 AI 영상 공모전」)은 자격 줄이 아니다 — 글 머리의 제목이 둘로 끊겨 들어왔다(2026-11-17 실측) */
 export function titleFragment(line, title) {
   const l = String(line || '').replace(/\s/g, ''), t = String(title || '').replace(/\[[^\]]*\]\s*/g, '').replace(/\s/g, '');
-  return l.length >= 4 && l.length <= 20 && t.length > l.length && t.startsWith(l);
+  /* 끊긴 꼴(꾸밈말·조사로 끝남 — 「청년들이 만드는」)일 때만 — 「전국 대학생 및 대학원생」처럼 제목이 대상으로 시작하는 글의 진짜 자격 줄은 둔다(리뷰 2026-11-17) */
+  return l.length >= 4 && l.length <= 20 && t.length > l.length && t.startsWith(l) && /(?:는|은|을|를|의|과|와|및|에서|으로|로|위한|하는|한)$/.test(l);
 }
 /** 서류 칸에 실린 사이트 맨 아래 줄·안내문·유의사항을 걷는다(doc-list.mjs DOC_JUNK 한 곳) — 바뀌면 true (수집 로봇 발행 때 모든 글에 · 원칙 7 소급) */
 export function sanitizeDocs(it) {

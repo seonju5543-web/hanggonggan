@@ -26,11 +26,20 @@ const require = createRequire(import.meta.url);
 const ME = require('../match-engine.js');
 /* WHAT_SHOWS_REGISTERED — 관문 표본용(2026-10-04): 실데이터 대신 표본 정식 등록 파일로 돈다(test-collector 가 이 도구를 실제로 돌려 잴 때).
    평소에는 쓰지 않는다 — 화면 이야기는 진짜 데이터로 한다. */
-const reg = JSON.parse(fs.readFileSync(process.env.WHAT_SHOWS_REGISTERED || new URL('../data/registered.json', import.meta.url), 'utf8'));
+/* 앱처럼 받은 데이터를 **받는 순간** 씻는다(깨진 글자 · app.js tidyData — 2026-11-17). 카드 읽기를 얹고 찾기 전에 — 앱도 두 파일을 씻은 뒤 applyCardRead 한다(리뷰).
+   앱 소스의 그 줄들을 떼어 쓴다(베끼지 않는다 · 관문 「깨진 글자 씻기」와 같은 자르기) */
+const tidyData = (() => {
+  const src = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+  const line = (re) => (src.match(re) || [''])[0];
+  const fn = (n) => { const a = src.indexOf(`function ${n}(`); return a < 0 ? '' : src.slice(a, src.indexOf('\n}\n', a) + 2); };
+  return new Function([line(/const ENTITIES = \{[^\n]+\};/), line(/const ENTITY_RE = [^\n]+;/), fn('unent'), line(/const JUNK_CHARS = [^\n]+;/), line(/const OCR_URL_GARBLE = [^\n]+;/),
+    line(/const TIDY_SKIP_KEY = [^\n]+;/), fn('tidyText'), fn('tidyData'), 'return tidyData;'].join('\n'))();
+})();
+const reg = tidyData(JSON.parse(fs.readFileSync(process.env.WHAT_SHOWS_REGISTERED || new URL('../data/registered.json', import.meta.url), 'utf8')));
 /* 유료 카드 읽기 결과를 앱과 같은 함수로 얹는다(2026-11-15 · match-engine applyCardRead) — 안 얹으면 이 도구가 학생 화면과 다른 줄을 말한다.
    표본 파일로 돌 때(WHAT_SHOWS_REGISTERED)는 얹지 않는다 · 파일이 없으면 그대로(무료 길) */
 if (!process.env.WHAT_SHOWS_REGISTERED) {
-  try { reg.items = ME.applyCardRead(reg.items, JSON.parse(fs.readFileSync(new URL('../data/card-read.json', import.meta.url), 'utf8'))); } catch { /* 아직 없음 */ }
+  try { reg.items = ME.applyCardRead(reg.items, tidyData(JSON.parse(fs.readFileSync(new URL('../data/card-read.json', import.meta.url), 'utf8')))); } catch { /* 아직 없음 */ }
 }
 
 const arg = (k, d) => {
@@ -149,7 +158,6 @@ vm.runInContext([
 ].join('\n\n'), linkCtx, { filename: 'app.js(링크 자리)' });
 linkCtx.joinSpacedSyllables = ME.joinSpacedSyllables;   // noticeSummaryHtml 의 tidyChars 가 쓴다(match-engine)
 const linkFn = (n) => vm.runInContext(n, linkCtx);
-linkFn('tidyData')(reg);   // 앱처럼 받은 데이터를 한 번 씻는다(깨진 글자 · 2026-11-17 tidyData) — 화면과 같은 글자로 말한다
 const LEDGER = new URL('../data/link-check.json', import.meta.url);
 const ledger = fs.existsSync(LEDGER) ? JSON.parse(fs.readFileSync(LEDGER, 'utf8')) : null;
 linkFn('setLinkChecks')(ledger);

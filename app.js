@@ -745,12 +745,13 @@ function unent(s) {
    · OCR 이 주소를 깨뜨린 괄호 `(//“\6401510.0ㅁ.<0)` — 역슬래시가 든 「/로 시작하는 괄호」만 걷는다(진짜 주소는 모르니 지어내지 않는다 · 원칙 8-1).
    🔴 주소 칸(url·href·link·file·path·thumb·img·id)은 건드리지 않는다 — 주소의 & 기호는 decodeUrlEntities 한 곳의 몫이다.
    🔴 지우기·기호 되돌리기만 한다(글자를 더하지 않는다). 관문 「깨진 글자 씻기」. */
-const JUNK_CHARS = /[\uE000-\uF8FF\uFFFD\u200B-\u200D\u2060\uFEFF\u00AD\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
+const JUNK_CHARS = /[\uE000-\uF8FF\uFFFD\u200B\u200C\u2060\uFEFF\u00AD\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
 const OCR_URL_GARBLE = /\s*\(\s*\/[^()가-힣]*\\[^()]*\)/g;
-const TIDY_SKIP_KEY = /(?:url|href|link|file|path|thumb|img|image|hash|^id)$/i;
+const TIDY_SKIP_KEY = /(?:urls?|href|link|file|path|thumb|img|image|hash|home|src|page|^id)$/i;   // home(층2 재단 홈페이지)·src·page(학교 사진)·avoidUrls 도 주소(리뷰 2026-11-17)
 function tidyText(s) {
   return unent(s).replace(JUNK_CHARS, '').replace(OCR_URL_GARBLE, '').replace(/^[ \t]+/, '')
-    .replace(/[(（]\s*([월화수목금토일])\s*[)）]/g, '($1)');   // 「11. 17.(화 )」·「( 월 )」 — 요일 괄호 안 빈칸(가독성 · 2026-11-17)
+    .replace(/[(（]\s*([월화수목금토일])\s*[)）]/g, '($1)')
+    .replace(/([^ \t]) {2,}(?=\S)/g, "$1 ");   // 요일 괄호 안 빈칸(「11. 17.(화 )」) · 폭 0 공백을 지운 자리의 겹친 빈칸(「유형 Ⅱ  장학금」) — 2026-11-17 · 이모지 잇개(U+200D)는 지우지 않는다(사람+학사모 같은 합친 이모지가 쪼개진다)
 }
 function tidyData(v, key = '') {
   if (typeof v === 'string') return TIDY_SKIP_KEY.test(key) ? v : tidyText(v);
@@ -4785,7 +4786,7 @@ function noticeSummaryRows(lines) {
 /* 글 속 주소 → 누를 수 있는 짧은 링크 (2026-11-17 개발자 지시 "가독성이 떨어지는 등 … 모두 수리") — 「온라인 접수https://www.k-startup.go.kr/web/contents/webPMSBizUnvs.do?returnUrl=…」
    처럼 긴 주소가 글자째 떠서 줄이 읽히지 않았다. 주소는 원문 그대로 링크에 담고, 보이는 글자만 사이트 이름(「forms.gle ↗」)으로 줄인다(글자를 지어내지 않는다).
    🔴 이 구간(NS_LABELS … sourceNoteHtml)은 관문·what-shows 가 떼어 돌린다 — 바깥 함수(safeUrl 등)에 기대지 말 것. http(s) 주소만 잡으므로 javascript: 는 들어오지 않는다 */
-const NS_URL = /https?:\/\/[^\s<>"'()\[\]{}]+/g;
+const NS_URL = /https?:\/\/[^\s<>"'()\[\]{}\u3131-\uD7A3]+/g;   // 주소에 붙은 한글(「…/abc에서 신청」)은 주소가 아니다 — 글자를 잃지 않는다(리뷰 2026-11-17)
 function nsBodyHtml(body) {
   const s = String(body || ''); let out = '', last = 0;
   for (const m of s.matchAll(NS_URL)) {
