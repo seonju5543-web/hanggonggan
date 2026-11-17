@@ -25,7 +25,10 @@ import { fileURLToPath } from 'node:url';
 import { cleanEnv, stripComments, stripYamlComments } from './gate.mjs';
 import { browserBodyEntry, clickBodyEntry } from '../../collector/html-text.mjs';
 import { canonUrl } from '../../collector/canon-url.mjs';
-import { restingAfterOk, closedForStudents, orderTargets, ledgerEntry, newAttachments, pruneLedger, wantsBody } from '../../collector/rescue-plan.mjs';
+import { restingAfterOk, closedForStudents, orderTargets, ledgerEntry, newAttachments, pruneLedger, wantsBody,
+  wantsAttachments, withAttCheck, withAttMiss, preferUsable, upgradeAttachmentUrls, attGapOf, replayOk, wrongKind, fileNameIn, usableUrl, attachmentAlarms, feedAttachmentGaps,
+  trustedAttachment, censusInPage, FILE_NAME_SRC } from '../../collector/rescue-plan.mjs';
+import { detailAttachments } from '../../collector/attachment-link.mjs';
 import { pickEligTargets } from '../../collector/elig-targets.mjs';
 import { fillRetired, nextShells, fillCounts } from '../../collector/notice-source.mjs';
 
@@ -66,6 +69,8 @@ export function sandbox(root, prefix = 'hdj-bodies-') {
 }
 
 /* 가짜 브라우저 — 주소에 든 낱말로 행동이 갈린다.
+     att-err : 열리지 않는다(연결 거부)
+     att-click-ok / att-click-login / att-href : 화면에 파일 이름이 보인다(첨부 살피기 · 2026-11-17) — 누르면 내려받기가 시작되거나(앞 둘) 진짜 링크가 그려져 있다(셋째)
      hang-forever : 본문 읽기가 영영 안 끝난다(닫기도 안 끝난다)
      hang-late    : 본문 읽기가 FAKE_LATE_MS 뒤에야 끝나고, 공고문 첨부 하나를 내놓는다(시한 뒤 늦게 끝나는 읽기)
      kill         : 여는 순간 프로세스를 강제로 죽인다(단계 시한의 강제 종료 흉내 — 신호 처리기가 못 돈다)
@@ -83,13 +88,24 @@ const BODY = ['2026학년도 2학기 표본재단 장학생 선발 안내',
 function makePage() {
   let url = 'about:blank';
   const kind = () => (/hang-forever/.test(url) ? 'forever' : /hang-late/.test(url) ? 'late' : /kill/.test(url) ? 'kill' : 'ok');
+  const att = () => (/att-href/.test(url) ? [{ i: 0, name: '2026 표본 장학금 공고문.pdf', href: 'https://fake.example/files/notice.pdf' }]
+    : /att-click-login/.test(url) ? [{ i: 0, name: '2026 표본 장학금 지원서.hwp', href: '' }]
+    : /att-click-ok/.test(url) ? [{ i: 0, name: '2026 표본 장학금 신청서.hwp', href: '' }] : []);
   const frame = {
-    locator: () => ({ innerText: () => (kind() === 'forever' ? never() : kind() === 'late' ? later(Number(process.env.FAKE_LATE_MS || 450), BODY) : Promise.resolve(BODY)) }),
-    $$eval: (sel) => Promise.resolve(sel === 'a[href]' && kind() === 'late' ? [{ name: '2026 표본 장학생 선발 공고문.hwp', url: 'https://fake.example/f.hwp' }] : []),
+    evaluate: async () => att(),
+    locator: (sel) => ({ innerText: () => (kind() === 'forever' ? never() : kind() === 'late' ? later(Number(process.env.FAKE_LATE_MS || 450), BODY) : Promise.resolve(BODY)),
+      first: () => ({ evaluate: async () => { note('click ' + sel); } }) }),
+    $$eval: (sel) => Promise.resolve(sel === 'a[href]' && kind() === 'late' ? [{ name: '2026 표본 장학생 선발 공고문.hwp', url: 'https://fake.example/f.hwp' }]
+      : /att-junk/.test(url) && sel === 'a[href]' ? [{ name: '대학정보공시', url: 'http://info.example/pubinfo/list.do?schlId=1&filePath=01' }, { name: '부설연구기관', url: 'https://fake.example/department/research_attach.jsp' },
+        { name: '첨부파일 다운로드', url: 'https://fake.example/notice.do?mode=fileDownload&attachNo=9' }, { name: '첨부파일 보기', url: 'https://fake.example/_attach/view.jsp?attach_no=9' },
+        { name: '2026 표본 장학금 신청 안내문', url: 'https://fake.example/notice.do?mode=download&attachNo=7' }]
+      : /att-junk/.test(url) && sel === 'img' ? [{ url: 'https://fake.example/img/logo.webp', w: 509, h: 348 }] : []),
   };
   return {
-    goto: async (u) => { url = u; note('goto ' + u); if (kind() === 'kill') process.kill(process.pid, 'SIGKILL'); },
+    goto: async (u) => { url = u; note('goto ' + u); if (kind() === 'kill') process.kill(process.pid, 'SIGKILL'); if (/att-err/.test(u)) throw new Error('net::ERR_CONNECTION_REFUSED'); },
     waitForTimeout: () => Promise.resolve(),
+    waitForEvent: () => (/att-click/.test(url) ? Promise.resolve({ url: () => 'https://fake.example/dl/' + (/login/.test(url) ? 'login' : 'file') + '.hwp', cancel: async () => {} })
+      : new Promise((_, rej) => setTimeout(() => rej(new Error('no download')), 30))),
     url: () => url,
     locator: () => ({ first: () => ({ count: async () => 0, evaluate: async () => {} }) }),
     frames: () => [frame],
@@ -234,6 +250,215 @@ export default async function bodies(eq, ctx) {
       Object.keys(wdLed).includes(canonUrl('https://fake.example/left-registered?id=1')), false);
   } finally {
     sb.done();
+  }
+
+  /* ── ① ⓔ 첨부 살피기 (2026-11-17 개발자 지시 — 원문에 있는 파일이 앱에도 보이게) ──
+     실측: 정식 등록 355건 중 90건이 첨부 0개 · 서울시립대·전북대·국민대는 16건 중 16건 0개(원문엔 파일이 있었다 — 주소가 아니라 누르면 도는 동작·화면이 뜬 뒤 그려지는 목록).
+     순수 규칙(rescue-plan) + 진짜 로봇을 가짜 브라우저·가짜 fetch 로 돌린다 */
+  {
+    const today = kstToday();
+    eq('① ⓔ 화면 글자에서 파일 이름 — 확장자로 끝나는 덩어리만 · 단추 글자·그림 이름은 아니다',
+      [fileNameIn('  붙임1. 2026-2학기 지원가능학과_교내근로(3차).xlsx [13KB] '), fileNameIn('미래 건설교통신기술인 장학사업 안내.pdf'), fileNameIn('다운로드'), fileNameIn('학교 로고.png'), fileNameIn('첨부파일 보기')],
+      ['붙임1. 2026-2학기 지원가능학과_교내근로(3차).xlsx', '미래 건설교통신기술인 장학사업 안내.pdf', '', '', '']);
+    eq('  🔴 확장자 바로 뒤에 글자가 이어지면 파일 이름이 아니다(본문 문장 「…신청서.hwp를 작성하여」 · 리뷰 1) · 꼬리표(`(다운로드 : 12회)`)가 붙은 것은 이름만',
+      [fileNameIn('제출서류는 붙임의 장학금 신청서.hwp를 작성하여 제출'), fileNameIn('장학금 신청서.hwp (다운로드 : 12회)'), fileNameIn('장학금 신청서.hwp')],
+      ['', '장학금 신청서.hwp', '장학금 신청서.hwp']);
+    eq('  🔴 같은 파일은 한 번만 쌓는다 — 화면 글자 `X.hwp` 와 링크 글자 `X.hwp (다운로드 : 12회)`·`1. X.hwp 미리보기` 는 같은 첨부(리뷰 5 · 서울교대 한 공고에 36개)',
+      newAttachments([{ name: '장학금 신청서.hwp (다운로드 : 12회)' }], [{ name: '장학금 신청서.hwp' }, { name: '1. 장학금 신청서.hwp 미리보기' }, { name: '선발 공고문.pdf [1.2MB]' }, { name: '선발 공고문.pdf' }]).map((a) => a.name),
+      ['선발 공고문.pdf [1.2MB]']);
+    eq('  받을 수 있는 주소는 http(s) 뿐 — `javascript:`·빈 주소·`#` 는 앱이 이름만 보인다',
+      [usableUrl('https://a.example/f.hwp'), usableUrl("javascript:filedown('1')"), usableUrl(''), usableUrl('#'), usableUrl(undefined)], [true, false, false, false, false]);
+    eq('  살필 때 — 한 번도 안 살폈으면 · 다 구했으면 다시 안 연다 · 못 구한 것이 남았어도 이레 안이면 쉰다 · 여드레면 다시',
+      [wantsAttachments(undefined, today), wantsAttachments({ tries: 1 }, today), wantsAttachments({ att: shift(today, -30), attGap: 0 }, today),
+        wantsAttachments({ att: shift(today, -3), attGap: 1 }, today), wantsAttachments({ att: shift(today, -8), attGap: 1 }, today)],
+      [true, true, false, false, true]);
+    eq('  🔴 못 여는 공고를 매 실행 두드리지 않는다(리뷰 2) — 내려간 글 · 본문 쪽에서 세 번 실패해 쉬는 글 · 첨부 살피기로 세 번 못 연 글은 이레 쉰다 · 두 번까지는·여드레 뒤에는 다시',
+      [wantsAttachments({ gone: true, tries: 3, at: shift(today, -30) }, today), wantsAttachments({ tries: 3, at: shift(today, -2) }, today), wantsAttachments({ tries: 3, at: shift(today, -8) }, today),
+        wantsAttachments({ attTries: 3, attAt: shift(today, -2) }, today), wantsAttachments({ attTries: 2, attAt: shift(today, -2) }, today), wantsAttachments({ attTries: 3, attAt: shift(today, -8) }, today)],
+      [false, false, true, false, true, true]);
+    eq('  못 연 횟수는 첨부 쪽에만 센다(본문 칸은 그대로) · 화면을 보면 지운다',
+      [withAttMiss({ ok: '2026-11-01', tries: 0 }, today), withAttMiss(withAttMiss(undefined, today), today).attTries, Object.keys(withAttCheck({ attTries: 2, attAt: today }, { today, seen: 0, gap: 0 })).sort()],
+      [{ ok: '2026-11-01', tries: 0, attTries: 1, attAt: today }, 2, ['att', 'attGap', 'attSeen']]);
+    eq('  🔴 장부 칸을 새로 적어도(본문 확보·실패·멈춤·삭제) 첨부 살핀 기록은 이어진다 — 안 이으면 매 실행 다시 연다 · 기록이 없던 칸에는 아무것도 안 생긴다',
+      [['ok', 'miss', 'hung', 'gone'].map((o) => { const e = ledgerEntry({ tries: 1, att: '2026-11-10', attSeen: 2, attGap: 1, attTries: 2, attAt: '2026-11-09' }, o, { today, minBody: 100, name: 'n' }); return [e.att, e.attSeen, e.attGap, e.attTries, e.attAt]; }),
+        Object.keys(ledgerEntry({ tries: 1 }, 'ok', { today, minBody: 100, name: 'n' })).filter((k) => k.startsWith('att'))],
+      [Array.from({ length: 4 }, () => ['2026-11-10', 2, 1, 2, '2026-11-09']), []]);
+    eq('  살핀 결과 얹기 — 본문 칸은 그대로',
+      withAttCheck({ ok: '2026-11-01', tries: 0 }, { today, seen: 3, gap: 1 }), { ok: '2026-11-01', tries: 0, att: today, attSeen: 3, attGap: 1 });
+    eq('  같은 이름을 주소 읽기(`javascript:`)와 누르기(진짜 주소)가 둘 다 냈으면 진짜 주소 쪽을 남긴다 · 앞 번호·미리보기 꼬리는 같은 이름 · 본문 그림은 주소로 구분',
+      preferUsable([{ name: '1. 신청서.hwp', url: "javascript:dl('1')" }, { name: '신청서.hwp 미리보기', url: 'https://a.example/1.hwp' }, { name: '공고문.pdf', url: '' },
+        { name: '본문이미지-800x1200.jpg', url: 'https://a.example/p1.jpg', bodyImage: true }, { name: '본문이미지-800x1200.jpg', url: 'https://a.example/p2.jpg', bodyImage: true }]).map((a) => a.url),
+      ['https://a.example/1.hwp', '', 'https://a.example/p1.jpg', 'https://a.example/p2.jpg']);
+    eq('  이름만 적혀 있던 첨부에 주소를 채운다 — 이름·차례는 그대로 · 이미 진짜 주소가 있으면 안 건드린다 · 주소 없는 것으로는 안 채운다',
+      (() => { const r = upgradeAttachmentUrls([{ name: '1. 신청서.hwp', url: "javascript:dl('1')" }, { name: '공고문.pdf', url: 'https://old.example/n.pdf' }, { name: '서약서.hwp', url: '' }],
+        [{ name: '신청서.hwp', url: 'https://a.example/1.hwp' }, { name: '공고문.pdf', url: 'https://new.example/n.pdf' }, { name: '서약서.hwp', url: '' }]);
+      return [r.list.map((a) => [a.name, a.url]), r.upgraded]; })(),
+      [[['1. 신청서.hwp', 'https://a.example/1.hwp'], ['공고문.pdf', 'https://old.example/n.pdf'], ['서약서.hwp', '']], ['1. 신청서.hwp']]);
+    eq('  못 구한 수 — 화면에서 본 이름 가운데 기록에 받을 주소가 없는 것(같은 이름은 한 번)',
+      [attGapOf(['신청서.hwp', '1. 신청서.hwp', '공고문.pdf'], [{ name: '신청서.hwp', url: 'https://a.example/1.hwp' }, { name: '공고문.pdf', url: '' }]), attGapOf([], []), attGapOf(['공고문.pdf'], [])],
+      [1, 0, 1]);
+    eq('  🔴 눌러서 잡은 주소는 세션 없는 새 요청이 **파일**을 줄 때만 믿는다 — 로그인·오류 화면도 200 으로 온다 · 빈 응답·4xx 는 아니다',
+      [replayOk(200, Buffer.from('%PDF-1.7 ...')), replayOk(200, Buffer.from([0xd0, 0xcf, 0x11, 0xe0])), replayOk(200, Buffer.from('<!DOCTYPE html><html><head><title>로그인</title>')),
+        replayOk(200, Buffer.from('\n  <html lang="ko">')), replayOk(200, Buffer.alloc(0)), replayOk(200, null), replayOk(403, Buffer.from('%PDF')), replayOk(302, Buffer.from('%PDF'))],
+      [true, true, false, false, false, false, false, false]);
+    eq('  🔴 파일 서명일 때만 믿는다(리뷰 4) — 안내창 스크립트·JSON 오류·보통 글자는 웹페이지 표지가 없어도 파일이 아니다 · 압축 꼴(hwpx·docx·xlsx)·한글 3 은 파일',
+      [replayOk(200, Buffer.from('<script>alert("로그인 후 이용");history.back()</script>')), replayOk(200, Buffer.from('{"error":"not found"}')), replayOk(200, Buffer.from('잘못된 접근입니다.')),
+        replayOk(200, Buffer.from([0x50, 0x4b, 0x03, 0x04, 0x14])), replayOk(200, Buffer.from('HWP Document File V3.00'))],
+      [false, false, false, true, true]);
+    eq('  눌러서 내려온 파일의 종류가 화면의 이름과 다르면 남의 내려받기다(앞 단추의 늦은 내려받기 · 리뷰 6) · 서버가 바꿔 준 이름·확장자 없는 이름은 그대로 믿는다',
+      [wrongKind('장학금 신청서.hwp', '선발 공고문.pdf'), wrongKind('장학금 신청서.hwp', '20261117_a1b2.hwp'), wrongKind('장학금 신청서.hwp', 'download'), wrongKind('장학금 신청서.hwp (12KB)', 'x.HWP')],
+      [true, false, false, false]);
+    eq('  첨부만 살피러 간 공고에서 믿는 첨부 — 파일 이름이거나 분명한 내려받기 주소 · 단추 글자·뷰어 안내·메뉴 링크·본문 그림은 아니다',
+      [{ name: '선발 공고문.pdf', url: '' }, { name: '2027-1 교내장학금 신청안내', url: 'https://a.example/n.do?mode=download&attachNo=7' }, { name: '첨부파일 다운로드', url: 'https://a.example/n.do?mode=fileDownload&attachNo=7' },
+        { name: '파일 다운로드', url: 'https://a.example/f.do?fileNo=3' }, { name: '한글뷰어 다운로드', url: 'https://a.example/csDownload.do' }, { name: '대학정보공시', url: 'http://i.example/list.do?filePath=01' },
+        { name: '부설연구기관', url: 'https://a.example/research_attach.jsp' }, { name: '본문이미지-800x600.jpg', url: 'https://a.example/p.jpg', bodyImage: true }].map(trustedAttachment),
+      [true, true, false, false, false, false, false, false]);
+    /* 화면에서 파일 이름 세기(censusInPage) — 브라우저 안에서 도는 함수를 **가짜 화면**으로 부른다(리뷰: 로봇 표본은 세기 결과를 통째로 가짜로 줘 이 함수가 한 번도 안 돌았다) */
+    {
+      const el = (tag, o = {}) => ({ tagName: tag, parentElement: o.parent || null, _a: { ...(o.attrs || {}) }, _hidden: !!o.hidden, _in: o.inside || '',
+        hasAttribute(k) { return k in this._a; }, getAttribute(k) { return this._a[k] ?? null; }, setAttribute(k, v) { this._a[k] = v; },
+        get href() { return `https://fake.example${this._a.href || ''}`; },
+        closest(sel) { return this._in && sel.split(',').includes(this._in) ? this : (this.parentElement ? this.parentElement.closest(sel) : null); },
+        getBoundingClientRect() { return this._hidden ? { width: 0, height: 0 } : { width: 100, height: 20 }; } });
+      const body = el('BODY');
+      const btn = el('BUTTON', { parent: body, attrs: { onclick: "cf_download('k1')" } });
+      const link = el('A', { parent: body, attrs: { href: '/files/notice.pdf' } });
+      const hash = el('A', { parent: body, attrs: { href: '#', onclick: "filedown('1')" } });
+      const para = el('P', { parent: el('DIV', { parent: body }) });
+      const two = el('A', { parent: body, attrs: { href: 'javascript:void(0)' } });
+      const nodes = [
+        { nodeValue: ' 미래 건설교통신기술인 장학사업 안내.pdf ', parentElement: el('SPAN', { parent: btn }) },           // 누르면 도는 동작(전북대)
+        { nodeValue: '2026 장학생 선발 공고문.pdf [1.2MB]', parentElement: link },                                         // 화면이 그린 진짜 링크(국민대)
+        { nodeValue: '추천 기준.hwp', parentElement: hash },                                                              // `#` 뒤의 동작(서울시립대)
+        { nodeValue: '제출서류는 붙임의 장학금 신청서.hwp 를 내려받아 작성한 뒤 학과 사무실로 기한 안에 제출하시기 바랍니다', parentElement: para },   // 본문 문장 — 누를 수 없다
+        { nodeValue: '안내 사항은 첨부한 유의사항 안내문.pdf (필독) 을 꼭 확인한 뒤 신청해 주시기 바랍니다 문의는 장학팀', parentElement: el('SPAN', { parent: hash }) },   // 누를 수 있어도 문장
+        { nodeValue: '숨은 양식.hwp', parentElement: el('A', { parent: body, attrs: { href: '/h.hwp' }, hidden: true }) },   // 안 보인다
+        { nodeValue: 'var f = "틀 속 이름.hwp"', parentElement: el('SCRIPT', { parent: body, inside: 'script' }) },           // 스크립트 속 글자
+        { nodeValue: '붙임1 신청서.hwp', parentElement: two }, { nodeValue: '붙임2 서약서.hwp', parentElement: two },       // 한 단추에 둘
+        { nodeValue: '추천 기준.hwp', parentElement: el('A', { parent: body, attrs: { href: '/dup.hwp' } }) },               // 같은 이름 또
+      ];
+      const saved = [globalThis.document, globalThis.NodeFilter];
+      let got;
+      try {
+        let k = 0;
+        globalThis.document = { body, createTreeWalker: () => ({ nextNode: () => nodes[k++] || null }) };
+        globalThis.NodeFilter = { SHOW_TEXT: 4 };
+        got = censusInPage(FILE_NAME_SRC);
+      } finally { [globalThis.document, globalThis.NodeFilter] = saved; }
+      eq('  🔴 화면에서 세는 것 — 누를 수 있는 것 안의 파일 이름만 · 본문 문장(누를 수 없음·글자가 길게 붙음)·안 보이는 것·스크립트 속 글자는 세지 않는다 · 같은 이름은 한 번 (리뷰 1)',
+        got.map((x) => x.name), ['미래 건설교통신기술인 장학사업 안내.pdf', '2026 장학생 선발 공고문.pdf', '추천 기준.hwp', '붙임1 신청서.hwp', '붙임2 서약서.hwp']);
+      eq('  진짜 링크는 주소를 주고 `#`·`javascript:`·단추는 빈 값(눌러서 잡는다) · 🔴 한 단추에 이름이 둘이면 둘째는 누르지 않는다(-1 — 표식을 덮어쓰지 않는다 · 리뷰 3)',
+        [got.map((x) => x.href), got.map((x) => x.i), two.getAttribute('data-hdj-att')],
+        [['', 'https://fake.example/files/notice.pdf', '', '', ''], [0, 1, 2, 3, -1], '3']);
+    }
+    {
+      const u2 = (k) => `https://fake.example/${k}`;
+      const led = { [canonUrl(u2('gap'))]: { att: today, attSeen: 2, attGap: 1 }, [canonUrl(u2('fine'))]: { att: today, attSeen: 1, attGap: 0 },
+        [canonUrl(u2('blocked'))]: { attTries: 3, attAt: today }, [canonUrl(u2('once'))]: { attTries: 1, attAt: today }, [canonUrl(u2('closed'))]: { att: today, attSeen: 2, attGap: 2 } };
+      const al = attachmentAlarms([{ id: 'gap', name: 'g', sourceUrl: u2('gap'), attachments: [{ name: 'a.hwp', url: '' }], listedAt: today }, { id: 'fine', name: 'f', sourceUrl: u2('fine'), attachments: [], listedAt: today },
+        { id: 'blocked', name: 'b', sourceUrl: u2('blocked'), attachments: [], listedAt: today }, { id: 'closed', name: 'c', sourceUrl: u2('closed'), deadline: shift(today, -1) },
+        { id: 'new', name: 'n', sourceUrl: u2('new'), listedAt: today }, { id: 'once', name: 'o', sourceUrl: u2('once'), listedAt: today }, { id: 'prog', name: 'p', sourceUrl: u2('prog'), program: true }], led, today);
+      eq('  경보 — 이름만 보이는 첨부가 남은 공고 · 원문을 세 번 열지 못한 공고만(한 번 못 연 것은 아직) · 마감 지난 공고·상시 제도는 빼고 · 안 살핀 공고는 수로',
+        [al.rows.map((r) => r.id), al.notYet, al.checked], [['gap', 'blocked'], 3, 2]);
+      eq('  피드 진단 — 글이 8건 이상인데 첨부 있는 글이 다섯에 하나도 안 되는 학교만 · 적은 순',
+        feedAttachmentGaps([...Array.from({ length: 16 }, () => ({ school: '가대', attachments: [] })), ...Array.from({ length: 16 }, (_, i) => ({ school: '나대', attachments: i < 3 ? [{ name: 'a' }] : [] })),
+          ...Array.from({ length: 16 }, (_, i) => ({ school: '다대', attachments: i < 4 ? [{ name: 'a' }] : [] })), ...Array.from({ length: 5 }, () => ({ school: '라대', attachments: [] }))]).map((g) => [g.school, g.total, g.withAtt]),
+        [['가대', 16, 0], ['나대', 16, 3]]);
+    }
+    /* 주소 읽기 길(일반 수집기 · 물러선 HTML) — `href="#" onclick="filedown(…)"` (서울시립대) */
+    eq('  `href="#"` 뒤에 숨은 내려받기 동작도 첨부로 본다(이름이 파일 이름일 때만) — 펼치기 단추·맨 위로·「첨부파일 보기」는 첨부가 아니다',
+      detailAttachments(`<span>첨부파일 :</span><a href="#" onclick="filedown('20261117', '1','1');return false;" class="filedown"> 2026 국가우수장학금(이공계) 추천 기준.pdf</a>
+        <a href="#" onclick="toggleMenu();return false;">전체 메뉴 열기</a><a href="#top">맨 위로 가기</a><a href="#" onclick="openAttachLayer()">첨부파일 보기</a>`, 'https://scholarship.example.ac.kr/notice/view.do').map((a) => a.name),
+      ['2026 국가우수장학금(이공계) 추천 기준.pdf']);
+
+    /* 진짜 로봇 — 가짜 브라우저(위 att-…) + 가짜 fetch(로그인 화면을 주는 주소 하나) */
+    const sb = sandbox(root, 'hdj-att-');
+    try {
+      sb.module('playwright', { 'package.json': JSON.stringify({ name: 'playwright', type: 'module', main: 'index.mjs', exports: './index.mjs' }), 'index.mjs': FAKE_PLAYWRIGHT });
+      sb.write('fake-fetch.mjs', ["import fs from 'node:fs';",
+        'globalThis.fetch = async (url) => {',
+        "  if (process.env.FAKE_FETCH_LOG) fs.appendFileSync(process.env.FAKE_FETCH_LOG, String(url) + '\\n');",
+        "  const bytes = new TextEncoder().encode(/login/.test(String(url)) ? '<!DOCTYPE html><html><head><title>로그인</title></head></html>' : 'HWP Document File');",
+        '  return { status: 200, ok: true, body: { getReader: () => ({ read: async () => ({ value: bytes, done: false }), cancel: async () => {} }) } };',
+        '};', ''].join('\n'));
+      const u = (k) => `https://fake.example/${k}?id=${k.length}`;
+      const read = { eligibilityLines: ['직전학기 평점평균 3.0 이상인 재학생'], amount: '등록금 전액', deadline: shift(today, 10) };   // 자격·금액·마감을 이미 읽은 공고 — 본문 대상이 아니다
+      const item = (id, k, extra = {}) => ({ id, name: `표본 ${id} 장학생 선발 안내 공고`, sourceUrl: u(k), attachments: [], listedAt: today, ...extra });
+      sb.write('data/registered.json', { items: [
+        item('click', 'att-click-ok-a'),                                   // 본문 대상 + 눌러서 받는 첨부
+        item('login', 'att-click-login-b'),                                // 눌러서 잡은 주소가 로그인 화면을 준다
+        item('href', 'att-href-c'),                                        // 화면이 그린 진짜 링크
+        item('only', 'att-click-ok-d', read),                              // 본문은 이미 읽음 — 첨부만 살핀다
+        item('up', 'att-click-ok-e', { ...read, attachments: [{ name: '1. 2026 표본 장학금 신청서.hwp', url: "javascript:dl('7')" }] }),   // 이름만 있던 기록
+        item('shut', 'att-click-ok-f', { ...read, deadline: shift(today, -1) }),   // 마감 지남 — 안 연다
+        item('junk', 'att-junk-g', read),                                  // 첨부만 살피는 공고의 화면에 메뉴 링크·단추·로고가 있다
+        item('err', 'att-err-h', read),                                    // 첨부만 살피러 갔는데 열리지 않는다
+      ] });
+      sb.write('collector/rescue-ledger.json', { [canonUrl(u('att-click-ok-d'))]: { ok: shift(today, -3), at: shift(today, -3), tries: 0, name: 'x' } });
+      sb.write('data/notices.json', { items: Array.from({ length: 9 }, (_, i) => ({ title: `글 ${i}`, url: `https://fake.example/n${i}`, school: '표본대학교', attachments: [] })) });
+      const pre = sb.run('collector/rescue-bodies.mjs', [], {});
+      eq('  로봇 미리보기 — 본문 차례 줄은 그대로(본문 대상만) · 첨부만 살필 공고는 따로 한 줄(본문 대상 뒤 · 마감 지난 공고는 없다)',
+        [pre.status, (pre.out.match(/차례: ([^\n]*)/) || [])[1], (pre.out.match(/첨부 살피기 \d+건 \(본문 대상 뒤에\): ([^\n]*)/) || [])[1]],
+        [0, 'click · login · href', 'up · junk · err · only']);   // 확보 기록이 없는 공고(up) 먼저 — orderTargets
+      const env = { FAKE_PW_LOG: sb.abs('pw.log'), FAKE_FETCH_LOG: sb.abs('fetch.log'), RESCUE_GAP_MS: '0', RESCUE_BUDGET_MS: '120000', RESCUE_CAP: '10' };
+      const w = sb.run('collector/rescue-bodies.mjs', ['--write'], env, 25000, ['--import', sb.abs('fake-fetch.mjs')]);
+      const regNow = (sb.json('data/registered.json') || { items: [] }).items;
+      const A = (id) => ((regNow.find((x) => x.id === id) || {}).attachments || []).map((a) => [a.name, a.url]);
+      const led = sb.json('collector/rescue-ledger.json') || {};
+      const L = (k) => led[canonUrl(u(k))] || {};
+      const rep = sb.read('collector/rescue-report.md') || '';
+      const pw = (sb.read('pw.log') || '').split('\n');
+      eq('  🔴 눌러서 내려받기가 시작되면 그 주소를 적는다(새 요청으로 파일이 오는 것을 본 뒤) — 링크가 아니라 동작으로 내려 주는 게시판(전북대 꼴)',
+        [w.status, A('click')], [0, [['2026 표본 장학금 신청서.hwp', 'https://fake.example/dl/file.hwp']]]);
+      eq('  🔴 잡은 주소가 새 요청에 로그인 화면을 주면 주소를 적지 않는다 — 이름만 적고(앱은 「원문 게시판에서 내려받기」) 장부에 못 구한 수를 남긴다',
+        [A('login'), L('att-click-login-b').attSeen, L('att-click-login-b').attGap], [[['2026 표본 장학금 지원서.hwp', '']], 1, 1]);
+      eq('  화면이 그린 진짜 링크는 누르지 않고 그대로 적는다(국민대 꼴 — 목록이 뜬 뒤에 그려진다) · 누른 것은 주소 없는 넷뿐',
+        [A('href'), pw.filter((l) => /^click /.test(l)).length], [[['2026 표본 장학금 공고문.pdf', 'https://fake.example/files/notice.pdf']], 4]);
+      eq('  첨부만 살피러 간 공고 — 첨부는 적고 · 본문 칸(확보 날짜·실패 횟수)은 그대로 · 본문 파일에 안 들어간다',
+        [A('only'), L('att-click-ok-d').ok, L('att-click-ok-d').tries, L('att-click-ok-d').att, L('att-click-ok-d').attGap, !!(sb.json('collector/extracted/browser-bodies.json') || {})[u('att-click-ok-d')]],
+        [[['2026 표본 장학금 신청서.hwp', 'https://fake.example/dl/file.hwp']], shift(today, -3), 0, today, 0, false]);
+      eq('  이름만 있던 기록(`javascript:`)에는 주소만 채운다 — 이름·개수는 그대로(같은 파일을 한 번 더 쌓지 않는다)',
+        A('up'), [['1. 2026 표본 장학금 신청서.hwp', 'https://fake.example/dl/file.hwp']]);
+      eq('  🔴 첨부만 살피러 간 공고에는 메뉴 링크(주소에 file·attach)·단추 글자(「첨부파일 다운로드」「보기」)·로고 그림을 적지 않는다 — 분명한 내려받기 주소만',
+        A('junk'), [['2026 표본 장학금 신청 안내문', 'https://fake.example/notice.do?mode=download&attachNo=7']]);
+      eq('  🔴 첨부만 살피러 갔는데 열리지 않으면 — 살폈다고 적지 않고 첨부 쪽 실패만 한 번 센다 · 본문 칸(실패 횟수)은 생기지 않는다(리뷰 2)',
+        [L('att-err-h').att, L('att-err-h').attTries, L('att-err-h').attAt, L('att-err-h').tries], [undefined, 1, today, undefined]);
+      eq('  마감 지난 공고는 열지 않는다 · 본문 대상은 본문도 확보하고 살핀 기록도 남는다',
+        [pw.some((l) => l.includes('att-click-ok-f')), L('att-click-ok-a').ok, L('att-click-ok-a').att], [false, today, today]);
+      eq('  리포트 맨 위(실행 날짜 바로 아래)에 첨부 경보 — 못 구한 공고가 🚨 로 · 피드에서 첨부가 안 잡히는 학교 표',
+        [/^실행: \d{4}-\d{2}-\d{2}\n\n## 📎 첨부/m.test(rep), (rep.match(/^- 🚨 .*\(login\)/gm) || []).length, /경보 \*\*1건\*\*/.test(rep), /- 표본대학교 — 글 9건 중 첨부 있는 글 0건/.test(rep)],
+        [true, 1, true, true]);
+      const alarm = sb.run('collector/attach-alarm.mjs', [], {});
+      eq('  경보 세기 도구(attach-alarm.mjs)가 같은 셈을 한 줄씩 찍는다 — 못 구한 공고 1건 · 이름과 id',
+        [alarm.status, /^count=1$/m.test(alarm.out), /^list=표본 login 장학생 선발 안내 공고\(login\)$/m.test(alarm.out)], [0, true, true]);
+      const again = sb.run('collector/rescue-bodies.mjs', [], {});
+      eq('  다시 돌리면 살핀 공고는 다시 안 연다 — 못 구한 공고도 이레 안에는 쉰다 · 한 번 못 연 공고만 다시 간다(세 번까지)',
+        [again.status, (again.out.match(/첨부 살피기 \d+건 \(본문 대상 뒤에\): ([^\n]*)/) || [])[1]], [0, 'err']);
+      const led2 = { ...led, [canonUrl(u('att-click-login-b'))]: { ...L('att-click-login-b'), att: shift(today, -8), ok: shift(today, -1) } };
+      sb.write('collector/rescue-ledger.json', led2);
+      const later2 = sb.run('collector/rescue-bodies.mjs', [], {});
+      eq('  여드레가 지나면 못 구한 공고도 다시 살핀다', (later2.out.match(/첨부 살피기 \d+건 \(본문 대상 뒤에\): ([^\n]*)/) || [])[1], 'login · err');
+    } finally {
+      sb.done();
+    }
+    {
+      const wf = stripYamlComments(readText('.github/workflows/rescue-bodies.yml'));
+      const iSave = wf.indexOf('- name: 저장'), iCount = wf.indexOf('node collector/attach-alarm.mjs >> "$GITHUB_OUTPUT"');
+      const TITLE = 'title: 🚨 원문에 있는 첨부가 앱에 다 안 보여요';
+      eq('  워크플로 — 저장 뒤에 세고 · 0 이 아니면 이슈를 열고 0 이면 닫는다(같은 제목 한 짝) · 세지 못했으면(빈 값) 열지도 닫지도 않는다',
+        [iSave > 0 && iCount > iSave, (wf.match(new RegExp(TITLE, 'g')) || []).length,
+          /if: always\(\) && steps\.att\.outputs\.count != '' && steps\.att\.outputs\.count != '0'[\s\S]{0,200}?mode: open/.test(wf.replace(/\n\s+(?:timeout-minutes|continue-on-error|uses|with|token)[^\n]*/g, '')),
+          /if: always\(\) && steps\.att\.outputs\.count == '0'[\s\S]{0,200}?mode: resolve/.test(wf.replace(/\n\s+(?:timeout-minutes|continue-on-error|uses|with|token)[^\n]*/g, ''))],
+        [true, 2, true, true]);
+    }
+    const rb = stripComments(readText('collector/rescue-bodies.mjs'));
+    eq('  첨부 살피기는 제 몫의 시한 안에서만 돌고(한 공고 시한을 넘기면 본문까지 시한 초과가 된다) · 누르는 수에 상한 · 화면이 넘어갔으면 그만 · 따로 try 로 감싼다',
+      [/const until = Date\.now\(\) \+ ATT_BUDGET_MS/.test(rb), /clicks < ATT_MAX_CLICKS && Date\.now\(\) < until && page\.url\(\) === at/.test(rb), /seenNames = \[\];\s*try \{/.test(rb)],
+      [true, true, true]);
+    eq('  누르기·세기·취소에 시한을 준다(표식이 사라지면 기본 30초를 기다린다 · 리뷰 3) · 안 내려오면 더 누르지 않는다(리뷰 6) · 제 창의 탭만 닫는다(리뷰 7)',
+      [/\.evaluate\(\(e\) => e\.click\(\), undefined, \{ timeout: left\(\) \}\)/.test(rb), /settle\(f\.evaluate\(censusInPage, FILE_NAME_SRC\), \d+\)/.test(rb), /settle\(dl\.cancel\(\), \d+\)/.test(rb),
+        /if \(!url\) clicks = ATT_MAX_CLICKS/.test(rb), /const pageCtx = ctx;/.test(rb) && /for \(const p of pageCtx\.pages\(\)\)/.test(rb) && !/for \(const p of ctx\.pages\(\)\)/.test(rb)],
+      [true, true, true, true, true]);
   }
 
   /* ── ① 글자 검사 — 루프 구조 ── */
