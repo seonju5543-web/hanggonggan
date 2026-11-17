@@ -365,6 +365,36 @@
    "by": "claude-session",
    "action": "edit",
    "detail": "8건 — auto-4bnum57138cate0qidx57138-1duciyc — excerpts / auto-o2432actionviewno9994682 — excerpts / auto-2570viewdocurrentpageno1 — excerpts / auto-0713no2516266sitedvscdkr — excerpts / auto-b888ec9db4eab3b5eab38420 — excerpts / auto-ervicenoticedetail521215 — excerpts / auto-2630viewdocurrentpageno1 — excerpts / auto-0005009002000000seq31571 — excerpts"
+  },
+  {
+   "at": "2026-11-18 02:04 KST",
+   "by": "claude-session",
+   "action": "revert",
+   "detail": "2건 제거(356 → 354건) · 재등록 차단 id 2·주소 0"
+  },
+  {
+   "at": "2026-11-18 02:04 KST",
+   "by": "claude-session",
+   "action": "edit",
+   "detail": "auto-oardid323054menuno200318 — amount, amountValue"
+  },
+  {
+   "at": "2026-11-18 02:04 KST",
+   "by": "claude-session",
+   "action": "revert",
+   "detail": "3건 제거(354 → 351건) · 재등록 차단 id 3·주소 0"
+  },
+  {
+   "at": "2026-11-18 02:04 KST",
+   "by": "claude-session",
+   "action": "edit",
+   "detail": "10건 — auto-bbssc58944388artclviewdo — eligibilityLines, eligibilityExcludes / auto-ent2431269444artclviewdo — eligibilityLines, eligibilityExcludes / auto-dmodeviewduid53536tpage1 — eligibilityLines, eligibilityExcludes / auto-ervicenoticedetail521215 — deadline, eligibilityLines, amount, period / auto-b888ec9db4eab3b5eab38420 — eligibilityLines / auto-2630viewdocurrentpageno1 — eligibilityLines, eligibilityExcludes / auto-4bnum57138cate0qidx57138-1duciyc — amount / auto-ent2431269433artclviewdo — eligibilityLines / auto-kuk2351210342artclviewdo — eligibilityLines / auto-skor478127125artclviewdo — type"
+  },
+  {
+   "at": "2026-11-18 02:04 KST",
+   "by": "claude-session",
+   "action": "edit",
+   "detail": "8건 — auto-4bnum57138cate0qidx57138-1duciyc — excerpts / auto-o2432actionviewno9994682 — excerpts / auto-2570viewdocurrentpageno1 — excerpts / auto-0713no2516266sitedvscdkr — excerpts / auto-b888ec9db4eab3b5eab38420 — excerpts / auto-ervicenoticedetail521215 — excerpts / auto-2630viewdocurrentpageno1 — excerpts / auto-0005009002000000seq31571 — excerpts"
   }
  ]
 }
