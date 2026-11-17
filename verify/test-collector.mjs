@@ -15595,6 +15595,43 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
     [MEx.requirementLines({}, ['나. 가점조건(2개 이상 충족 시 신청 가능)', '1) 국민기초생활수급자', '2) 다자녀 가정의 자녀', '3) 한부모 가정의 자녀'], { withMeta: true, all: true }).map((x) => x.group),
       MEx.requirementLines({}, ['나. 차등조건(1개 이상 충족 시 신청 가능)', '국민기초생활수급자인 학생'], { withMeta: true, all: true }).map((x) => x.group)],
     [[0, 0, 0], [0]]);
+  /* 2026-11-17 — 엔진은 위 셋을 한 요건(택1)으로 세는데 **화면은 머리 줄을 숨긴 채 셋을 평평하게** 늘어놓아 학생이 셋 다 필요한 요건으로 읽었다.
+     머리 줄을 원문 그대로(앞 번호만 떼고) withMeta 항목의 `head` 로 주고(match-engine pickHeadCaption), 앱이 그 묶음 첫 줄 위에 작은 이름표(r-pick)로 그린다.
+     🔴 이름표는 요건 줄이 아니다 — 줄 목록·5줄 상한·적합도·✓✕ 어디에도 안 든다(r-elig 를 달지 않는다) */
+  {
+    const cnuItems = MEx.requirementLines({}, cnu, { withMeta: true, all: true });
+    const capTxt = '차등조건(1개 이상 충족 시 신청 가능, 해당하는 모든 조건의 증빙서류 제출 필수)';
+    eq('🔴 택1 머리 줄은 그 묶음 **첫 줄에만** `head` 로 — 원문 그대로(앞 번호 「나.」 만 뗌) · 다른 줄엔 없다 · 줄 수는 그대로 5(머리 줄은 요건 줄이 아니다)',
+      [cnuItems.map((x) => x.head || null), cnuItems.length, MEx.requirementLines({}, cnu, { all: true }).includes(capTxt), MEx.requirementLines({}, cnu).length],
+      [[null, null, capTxt, null, null], 5, false, 5]);
+    const opt3h = ['1) 국민기초생활수급자', '2) 직전학기 평점 4.0 이상인 자', '3) 다자녀 가정의 자녀'];
+    eq('  가리킴 줄 길도 같은 이름표 — `2.`·`가 .`·글머리 번호만 떼고 나머지 글자는 그대로 · 택1 아닌 머리(`2개 이상`)·번호 없이 수도 안 말한 가리킴 줄은 이름표 없음',
+      [MEx.requirementLines({}, ['2. 차등조건(1개 이상 충족 시 신청 가능)', '2.1 보호조치 종료자', '2.2 국민기초생활수급자'], { withMeta: true, all: true })[0].head,
+        MEx.requirementLines({}, ['가 . 지원자격: 다음 중 1가지 이상 해당하는 자', ...opt3h], { withMeta: true, all: true })[0].head,
+        MEx.requirementLines({}, ['아래 ①·②·③ 중 하나에 해당하는 자', '① 국민기초생활수급자', '② 다자녀 가정의 자녀', '③ 한부모 가정의 자녀', '④ 직전학기 평점 3.0 이상인 자'], { withMeta: true, all: true }).map((x) => x.head || null),
+        MEx.requirementLines({}, ['나. 가점조건(2개 이상 충족 시 신청 가능)', '1) 국민기초생활수급자', '2) 다자녀 가정의 자녀'], { withMeta: true, all: true }).some((x) => x.head),
+        MEx.requirementLines({}, ['다음 중 하나에 해당하는 자', '국민기초생활수급자', '다자녀 가정의 자녀'], { withMeta: true, all: true }).some((x) => x.head)],
+      ['차등조건(1개 이상 충족 시 신청 가능)', '지원자격: 다음 중 1가지 이상 해당하는 자', ['아래 ①·②·③ 중 하나에 해당하는 자', null, null, null], false, false]);
+    /* 앱의 진짜 함수를 떼어 돌린다 — 사본을 재면 원본이 바뀌어도 초록이다 */
+    const appP = readText(new URL('../app.js', import.meta.url));
+    const fnP = (name) => { const a = appP.indexOf(`\nfunction ${name}(`) + 1; if (a < 1) return ''; let i = appP.indexOf(') {', a) + 2, d = 0; for (let j = i; j < appP.length; j++) { if (appP[j] === '{') d++; else if (appP[j] === '}' && --d === 0) return appP.slice(a, j + 1); } return ''; };
+    const PRp = createRequire(import.meta.url)('../parse-requirements.js');
+    const sheetP = new Function('requirementLines', 'requirementMatch', 'requirementStruct', 'PR', 'state', `${fnP('esc')}\n${fnP('unent')}\n${fnP('missingReqText')}\n${fnP('eligibilityRowsHtml')}\nreturn eligibilityRowsHtml;`)(
+      MEx.requirementLines, MEx.requirementMatch, MEx.requirementStruct, PRp, { profile: cnuStu({ flags: ['basicLiving'] }) });
+    const sheetH = String(sheetP({ id: 'cnu', name: '사회 재환원 장학금', eligibilityLines: cnu }, { reasons: [], missing: [] }));
+    const lis = [...sheetH.matchAll(/<li class="([^"]*)">([^<]*)<\/li>/g)].map((m) => [m[1], m[2].trim()]);
+    const capAt = lis.findIndex(([c]) => c === 'r-pick');
+    eq('🔴 상세 시트 — 이름표 하나(r-pick · r-elig 아님)가 택1 묶음 첫 줄(보호조치 종료) 바로 위 · 원문 글자 그대로 · 요건 줄(r-elig)은 그대로 5줄',
+      [lis.filter(([c]) => c === 'r-pick').length, capAt >= 0 ? lis[capAt][1] : null, capAt >= 0 && lis[capAt + 1] ? /보호조치 종료가 5년/.test(lis[capAt + 1][1]) : false, lis.filter(([c]) => /\br-elig\b/.test(c)).length],
+      [1, capTxt, true, 5]);
+    const bulkP = new Function('requirementLines', 'bulkPrep', 'dday', 'bulkNeedsWork', 'bulkTags', 'amountLine', 'ddayWords', 'submitChannelLabel',
+      `${fnP('esc')}\n${fnP('bulkRowHtml')}\nreturn bulkRowHtml;`)(MEx.requirementLines, { ids: new Set() }, () => ({}), () => false, () => [], () => ({ text: '' }), () => '', () => '');
+    const bulkH = String(bulkP({ id: 'cnu', name: '사회 재환원 장학금', type: '교외', eligibilityLines: cnu }));
+    const bl = [...(bulkH.match(/<ul class="bulk-reqs">([\s\S]*?)<\/ul>/) || ['', ''])[1].matchAll(/<li( class="[^"]*")?>([^<]*)<\/li>/g)].map((m) => [m[1] || '', m[2]]);
+    eq('  일괄 준비 목록 「지원자격 (공고 원문)」 도 같은 이름표를 묶음 첫 줄 위에(r-pick) · 요건 줄은 5줄 그대로',
+      [bl.findIndex(([c]) => /r-pick/.test(c)), (bl.find(([c]) => /r-pick/.test(c)) || [])[1], bl.filter(([c]) => !c).length], [2, capTxt, 5]);
+    eq('  이름표 모양은 토큰만(t-xs · text-sub · 점 없음) — style.css', /\.reason-list \.r-pick, \.bulk-reqs \.r-pick \{ font-size: var\(--t-xs\); color: var\(--text-sub\);/.test(readText(new URL('../style.css', import.meta.url))), true);
+  }
   /* 2026-11-16 · 리뷰 2차 — 묶음은 **원문의 개요**를 따른다(match-engine ANY_OF_HEAD 머리말 ④). 처음엔 '몇 줄 남았나'를 내보낸 줄로 세어,
      선택지 하나가 걸러지면(날짜 줄 · 중복) 묶음이 다음 필수 줄 `다. 직전학기 평점 3.5 이상인 자` 까지 삼켜 평점 2.0 학생이 95%(어긋난 요건 없음)가 됐다 */
   const headDrop = ['가. 차등조건(1개 이상 충족 시 신청 가능)', '1) 보호조치 종료자', '2) 국민기초생활수급자', '3) 2026년 3월 1일 기준', '다. 직전학기 평점 3.5 이상인 자'];

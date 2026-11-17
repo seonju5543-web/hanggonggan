@@ -4346,7 +4346,8 @@ function bulkTags(sch) {
 function bulkRowHtml(sch) {
   const on = bulkPrep.ids.has(sch.id);
   const d = dday(sch.deadline);
-  const reqs = (typeof requirementLines === 'function' ? requirementLines(sch) : []).slice(0, 6);
+  /* 줄마다 택1 묶음의 머리 줄(`head` · 상세 시트와 같은 이름표)을 그 묶음 첫 줄 위에 — 요건 줄로 세지 않는다(2026-11-17) */
+  const reqs = (typeof requirementLines === 'function' ? requirementLines(sch, null, { withMeta: true }) : []).slice(0, 6);
   return `
     <div class="bulk-row${on ? '' : ' off'}" data-row="${esc(sch.id)}">
       <input type="checkbox" class="bulk-check" data-bulk="${esc(sch.id)}" ${on ? 'checked' : ''}
@@ -4368,7 +4369,7 @@ function bulkRowHtml(sch) {
           ${sch.deadline ? `<p class="bulk-meta">마감 ${esc(sch.deadline.replace(/-/g, '.'))}</p>` : ''}${/* 마감을 모르면 줄 없음(2026-11-15) */ ''}
           <p class="bulk-meta">${esc(submitChannelLabel(sch))}</p>
           ${reqs.length
-            ? `<p class="bulk-meta-head">지원자격 (공고 원문)</p><ul class="bulk-reqs">${reqs.map((r) => `<li>${esc(r)}</li>`).join('')}</ul>`
+            ? `<p class="bulk-meta-head">지원자격 (공고 원문)</p><ul class="bulk-reqs">${reqs.map((r) => `${r.head ? `<li class="r-pick">${esc(r.head)}</li>` : ''}<li>${esc(r.text)}</li>`).join('')}</ul>`
             : ''}
         </details>
       </div>
@@ -4962,7 +4963,16 @@ function eligibilityRowsHtml(sch, result) {
     // 소제목을 달지 않는다 — 바깥 <h4>가 이미 '지원 자격'이라 두 번 나온다
     /* 번호(1) 2) 3))는 붙이지 않는다 — 요건은 순서가 아니라 목록이고,
        판정 못 한 줄에 번호만 달면 체크된 줄과 뒤섞여 어수선하다(2026-08-02 개발자 지시). */
-    reasonRows += reqShown.map((it) => reqRow(it)).join('');
+    /* 🔴 택1 묶음은 머리 줄을 이름표로 (2026-11-17 · 충남대 사회 재환원 장학금) — 엔진은 「차등조건(1개 이상 충족 시 …)」 아래 셋을 한 요건으로 세는데
+       화면이 셋을 평평하게 늘어놓아 '셋 다 갖춰야 한다'로 읽혔다. 원문 머리 줄(match-engine pickHeadCaption · 앞 번호만 뗌)을 그 묶음 첫 줄 위에 작게 —
+       요건 줄이 아니라 r-elig 를 달지 않는다(드라이버·적합도가 세지 않는다). 내 경우 거르기로 첫 줄이 빠져도 남은 첫 줄 위에 */
+    const pickHead = {};
+    reqItems.forEach((it) => { if (it.group && it.head && !pickHead[it.group]) pickHead[it.group] = it.head; });
+    const headDone = new Set();
+    reasonRows += reqShown.map((it) => {
+      const cap = it.group && pickHead[it.group] && !headDone.has(it.group) ? (headDone.add(it.group), `<li class="r-pick">${esc(pickHead[it.group])}</li>`) : '';
+      return cap + reqRow(it);
+    }).join('');
   } else if (requirementLines(sch, qLines).length) {
     // 자격 줄이 없으면 발췌 문장으로 물러나되, **같은 정리를 거쳐** 보여 준다
     reasonRows += requirementLines(sch, qLines)

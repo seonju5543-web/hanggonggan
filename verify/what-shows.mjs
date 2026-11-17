@@ -214,7 +214,8 @@ function kosafFitLines(sch) {
   const out = [`   학생: ${p.school} ${p.year}학년 ${p.status} · 평점 ${p.gpa} · ${p.credits}학점 · ${p.bracket}구간 · ${p.birthYear}년생 · 거주 ${p.region}${p.regionCity ? ' ' + p.regionCity : ''} · 부모 ${p.parentRegion || '-'}${p.parentRegionCity ? ' ' + p.parentRegionCity : ''}`,
     `   판정 ${result.status}  ·  배지 「${badge}」  ·  요건 ${fd.met}/${fd.total} 충족${fd.unknown ? ` · 모름 ${fd.unknown}` : ''}${fd.unread ? ' · 자격 미확인' : ''}`,
     '   ─ 상세 시트 자격 줄'];
-  for (const { text, group } of ME.requirementLines(sch, null, { all: true, withMeta: true })) {
+  for (const { text, group, head } of ME.requirementLines(sch, null, { all: true, withMeta: true })) {
+    if (head) out.push(`       ┄ 「${String(head).slice(0, 80)}」 (택1 묶음 이름표 · 요건 줄 아님)`);
     const v = ME.requirementMatch(text, p, sch);
     out.push(`       ${v === 'ok' ? '✓' : v === 'no' ? '✕' : '?'} ${group ? `[택1 ${group}] ` : ''}${String(text).slice(0, 84)}`);
   }
@@ -341,6 +342,12 @@ for (const sch of hits) {
 
   const listLines = ME.requirementLines(sch, null);                    // 목록 카드 — 5줄 상한
   const allLines = ME.requirementLines(sch, null, { all: true });      // 상세 시트 — 전부
+  /* 택1 묶음 머리 줄(이름표 · 2026-11-17) — 앱(eligibilityRowsHtml · bulkRowHtml)이 그 묶음 첫 줄 위에 작게 그리는 원문 글자. 요건 줄이 아니라 줄 수에 안 든다.
+     표 공고(requirementStruct)는 시트가 「공통 요건 / 다음 중 하나」 로 따로 그려 이 이름표를 안 쓴다 */
+  const headsOf = (items) => new Map(items.filter((x) => x.head).map((x) => [x.text, x.head]));
+  const listHeads = headsOf(ME.requirementLines(sch, null, { withMeta: true }));
+  const allHeads = ME.requirementStruct(sch) ? new Map() : headsOf(ME.requirementLines(sch, null, { all: true, withMeta: true }));
+  const capLine = (heads, l) => (heads.has(l) ? `       ┄ 「${String(heads.get(l)).slice(0, 80)}」 (택1 묶음 이름표 · 요건 줄 아님)\n` : '');
   /* 앱(eligibilityRowsHtml · 2026-10-15)과 같이 **두 목록을 따로** 거르고 자격 블록에 이미 보인 줄은 뺀다 — 이어 붙이면 제외 목록의 머리말
      (`지원 불가 대상:`)이 뒤따르는 자격 줄을 제외 절로 끌어들여 이 도구만 자격 1줄을 '제외'로 보고했다(2026-10-17 미래에셋 해외교환 실측) */
   const shownReq = new Set(allLines);
@@ -372,11 +379,11 @@ for (const sch of hits) {
   }
   if (canApply) console.log(`   누르면 → ${pressRoute(sch)}`);
   console.log(`   ─ 목록 카드에 보이는 자격 줄 (${listLines.length}줄 · 5줄 상한)`);
-  for (const l of listLines) console.log(`       · ${String(l).slice(0, 84)}`);
+  for (const l of listLines) console.log(`${capLine(listHeads, l)}       · ${String(l).slice(0, 84)}`);
   /* 자격 0줄이면 시트의 「지원 자격」 칸이 아예 없을 수 있다(2026-11-07 개발자 지시 · app.js sheetSectionsHtml). 칸이 남는 경우(우선 선발 기준·발췌 대체 줄·
      「별도 자격 제한 없음」·판정 근거·빠진 정보·물을 것)는 app.js 의 eligibilityRowsHtml 이 정하고 프로필에 달려 여기서 되풀이하지 않는다 — 유무는 브라우저로 본다(리뷰) */
   console.log(`   ─ 상세 시트에 보이는 자격 줄 (${allLines.length}줄 · 전부${allLines.length ? '' : ' · 0줄이면 「지원 자격」 칸이 아예 없을 수 있음 — 유무는 app.js eligibilityRowsHtml·브라우저로'})`);
-  for (const l of allLines) console.log(`       · ${String(l).slice(0, 84)}`);
+  for (const l of allLines) console.log(`${capLine(allHeads, l)}       · ${String(l).slice(0, 84)}`);
   if (allLines.length > listLines.length) console.log(`     ⚠️ 목록에는 ${allLines.length - listLines.length}줄이 안 보인다 — 그건 '숨겨진 것'이 아니라 미리보기 상한이다`);
   console.log(`   ─ 제외 줄 ✗ — 「지원 자격」 칸 안 (${exLines.length}줄)`);
   for (const l of exLines) console.log(`       ✗ ${String(l).slice(0, 84)}`);
