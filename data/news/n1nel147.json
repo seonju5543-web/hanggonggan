@@ -1,7 +1,36 @@
 {
  "school": "계명대학교",
- "updatedAt": "2026-11-16",
+ "updatedAt": "2026-11-17",
  "items": [
+  {
+   "title": "제124회 대학원생 콜로키움 안내",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271983&pageOrder=0&cmd=2&parm_bod_uid=271983&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-11-17",
+   "school": "계명대학교",
+   "campus": "",
+   "src": "9a241a98",
+   "foundAt": "2026-11-17"
+  },
+  {
+   "title": "주한폴란드대사관 주관 영화 'People' 상영회(11/25) 개최 안내",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271983&pageOrder=0&cmd=2&parm_bod_uid=271981&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-11-17",
+   "kind": "행사",
+   "school": "계명대학교",
+   "campus": "",
+   "src": "9a241a98",
+   "foundAt": "2026-11-17"
+  },
+  {
+   "title": "주한폴란드대사 초청 특별강연(11/25) 개최 안내",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271983&pageOrder=0&cmd=2&parm_bod_uid=271978&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-11-17",
+   "kind": "행사",
+   "school": "계명대학교",
+   "campus": "",
+   "src": "9a241a98",
+   "foundAt": "2026-11-17"
+  },
   {
    "title": "2026학년도 2학기 한국학연구원-국제학연구소 공동학술대회 개최 안내",
    "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271968&pageOrder=0&cmd=2&parm_bod_uid=271963&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
@@ -342,34 +371,6 @@
    "campus": "",
    "src": "9a241a98",
    "foundAt": "2026-10-20"
-  },
-  {
-   "title": "[K-Cloud] 2026학년도 2학기 K-Cloud 융합 성장 인증제 홍보 행사 안내",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271444&pageOrder=0&cmd=2&parm_bod_uid=271444&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
-   "postedAt": "2026-10-19",
-   "kind": "행사",
-   "school": "계명대학교",
-   "campus": "",
-   "src": "9a241a98",
-   "foundAt": "2026-10-19"
-  },
-  {
-   "title": "[생명윤리위원회] 연구자 교육",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271444&pageOrder=0&cmd=2&parm_bod_uid=271443&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
-   "postedAt": "2026-10-19",
-   "school": "계명대학교",
-   "campus": "",
-   "src": "9a241a98",
-   "foundAt": "2026-10-19"
-  },
-  {
-   "title": "[대학혁신지원사업] 학생 만족도 조사 참여 안내",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271444&pageOrder=0&cmd=2&parm_bod_uid=271440&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
-   "postedAt": "2026-10-19",
-   "school": "계명대학교",
-   "campus": "",
-   "src": "9a241a98",
-   "foundAt": "2026-10-19"
   }
  ]
 }

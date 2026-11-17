@@ -1,7 +1,17 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-11-16",
+ "updatedAt": "2026-11-17",
  "items": [
+  {
+   "title": "[시설] 2026년 11월 교내 승강기 정기 점검 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53696&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-17",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-17",
+   "desc": "교내 승강기 정기점검을 아래와 같이 실시하오니 참고하여 주시기 바랍니다."
+  },
   {
    "title": "[국제학생] 2026-2학기 졸업예정자 한국어능력평가 시험(2차) 신청 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53695&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -420,17 +430,6 @@
    "src": "b09cb042",
    "foundAt": "2026-10-30",
    "desc": "광운대학교 RISE사업단(서울캠퍼스타운)에서는, 양자와 AI를 결합한 Advanced AI Course 교육에 대해 사전신청을 받고 있습니다."
-  },
-  {
-   "title": "[일반] 기간제 계약직원 채용 공고(경영대학원 교학팀)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53585&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-30",
-   "kind": "채용",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-30",
-   "desc": "채용 부서 경영대학원 교학팀 모집인원 1. 지원 자격 및 우대사항 담당업무 경영대학원 교학팀 행정업무 등 지원 자격"
   }
  ]
 }

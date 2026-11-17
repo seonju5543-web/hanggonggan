@@ -1,7 +1,17 @@
 {
  "school": "경기대학교",
- "updatedAt": "2026-11-16",
+ "updatedAt": "2026-11-17",
  "items": [
+  {
+   "title": "[입학에서 취업까지] 2026학년도 2학기「인권과 성평등교육」 이수 안내 (졸업예정자 추가공지)",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627241&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-17",
+   "kind": "학사",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-17"
+  },
   {
    "title": "[입학에서 취업까지] 2027학년도 1학기 국회도서관 실습생 모집",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627233&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
@@ -404,16 +414,6 @@
    "src": "bf927d3e",
    "foundAt": "2026-11-03",
    "thumb": "data/news/img/451ba719862d5639.webp"
-  },
-  {
-   "title": "[일반] 2026학년도 2학기 본심사 신청서 제출기간 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626987&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-11-03",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-11-03",
-   "desc": "※유의사항 1. 본심사 일정은 전공별로 상이하니 각 전공 사무실을 통해 확인하여 주시기 바랍니다. *연락처는 하단에 있습니다."
   }
  ]
 }
