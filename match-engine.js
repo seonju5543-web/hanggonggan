@@ -1910,7 +1910,7 @@ function pickOneHead(t) {
       `2개 이상 충족` 은 '하나만 되면 된다'가 아니다 — 택1 묶음으로 보면 틀린 안심이 된다(건드리지 않는다).
    ② 어느 줄이 선택지인지는 **바로 아래 같은 꼴 번호 항목**으로 정한다(enumRun · 1) 2) 3) → 셋 · 아래 ④).
    ③ 머리 줄 자신은 POINTER_LINE 처럼 화면에 안 내보낸다 — 줄로 남기면 채점기(eligibility-report)가 '제목·이름표로 끝나는 줄'로 센다.
-      ⚠️ 그래서 화면은 아직 세 줄을 평평하게 늘어놓는다(택1 묶음이 화면에 표시되지 않는 것은 가리킴 줄 묶음 전부의 사정) — 적합도·판정만 묶음으로 센다.
+      대신 머리 줄 글자는 withMeta 항목의 `head` 로 따로 준다(pickHeadCaption · 2026-11-17) — 화면이 그 묶음 첫 줄 위에 이름표로 그린다(요건 줄로는 안 센다).
    ④ 🔴 묶음은 **원문의 개요**를 따른다(2026-11-16 리뷰 2차) — 머리 줄 바로 아래 같은 꼴 번호 항목들(joined 의 줄 자리)이고, 그 꼴이 아닌 첫 줄(`다.` 같은 형제·윗 번호 ·
       다른 꼴 글머리)에서 끝난다. 처음엔 '몇 줄 남았나'를 **내보낸 줄**로 셌다 — 선택지 하나가 잡음·날짜·중복으로 걸러지면 묶음이 다음 필수 줄
       (`다. 직전학기 평점 3.5 이상인 자`)까지 삼켜 평점 2.0 학생이 95% 가 됐다(틀린 안심). 걸러진 줄이 있어도 묶음의 끝은 그대로다.
@@ -1957,6 +1957,17 @@ function optionRun(lines, start, headLine, count) {
   let n = 0;
   while (start + n < lines.length && n < count && !enumShape(lines[start + n]) && !SH.sectionOf(String(lines[start + n] || ''))) n += 1;
   return n;
+}
+/* 🔴 **택1 묶음의 머리 줄을 화면 이름표로** (2026-11-17 · 충남대 사회 재환원 장학금 auto-0713no2516266sitedvscdkr).
+   엔진은 「나. 차등조건(1개 이상 충족 시 신청 가능, …)」 아래 셋을 한 요건(택1)으로 세는데, 화면은 머리 줄을 숨긴 채 셋을 평평하게 늘어놓아
+   학생이 셋 다 갖춰야 하는 요건으로 읽었다(보호조치 종료자·연장자는 동시에 될 수 없다). 머리 줄을 **원문 그대로**(앞머리 번호·글머리만 떼고) 돌려준다.
+   ⚠️ 이건 요건 줄이 아니다 — out(요건 줄)에 넣지 않고 withMeta 항목의 `head` 칸으로만 준다. 그래서 적합도(fitDetail)·✓✕·채점기(eligibility-report)·5줄 상한이 세지 않는다.
+   그리는 곳은 app.js eligibilityRowsHtml(상세 시트)·bulkRowHtml(일괄 준비 목록) · what-shows 도 같은 칸을 찍는다 */
+function pickHeadCaption(line) {
+  return decodeEntities(String(line || ''))
+    .replace(/^\s*(?:(?:[\uE000-\uF8FF]|[\uDB80-\uDBFF][\uDC00-\uDFFF])+|[(（]\s*(?:\d{1,2}|[가-하])\s*[)）]|[①-⑳]|\d{1,2}(?:\.\d{1,2})+\.?(?=\s)|\d{1,2}\s*[.)）]|[가-하]\s*[.)）]|[oOㅇ](?=\s)|[\-–—•▪▶▷◆◇○●■□▣★♦⇒◦∙❍◎￭·ㆍ*◌◍]+)\s*/, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 /* `서울시민(성인)` 은 표 칸이 아니라 대상이다(2026-10-04 · 대외활동 표본) — 시민·도민·구민·군민·성인·청년·누구나 */
 const REAL_CATEGORY = /(자|생|중|상|하|명|원)$|북한이탈|새터민|다문화|기초생활|차상위|국적|유공|보훈|장애|한부모|다자녀|(?:시|도|구|군)민|성인|청년|누구나/;
@@ -2017,6 +2028,7 @@ function requirementLines(sch, lines, opts) {
   let asideBase = 'qualify';   // 곁말 전에 있던 절 — 번호 항목을 만나면 여기로 돌아온다
   let anyGroup = 0;   // 몇 번째 묶음인가 (위 주석)
   let headEnd = -1, headGroup = 0;   // 택1 묶음(가리킴 줄 · 「n개 이상 충족」 머리 줄) — joined 의 몇 번째 줄 **앞까지**인가 / 묶음 번호 (ANY_OF_HEAD 머리말 ④ · optionRun)
+  const groupHead = {};            // 묶음 번호 → 그 묶음을 연 머리 줄(원문 그대로 · pickHeadCaption) — 화면 이름표 전용, 요건 줄 아님
   const meta = [];                 // out과 같은 순서로 각 줄의 묶음 번호
   const aside = [];                // out과 같은 순서 — 그 줄이 ※ 예외 참고인가 (2026-10-15)
   let caseRun = false, caseGroup = 0;   // 연달아 오는 '경우별 분기'를 한 묶음으로 (아래 주석)
@@ -2152,14 +2164,14 @@ function requirementLines(sch, lines, opts) {
       /* 개요 번호 아래 「1개 이상 충족」 머리 줄 — 아래 번호 항목들을 택1 묶음으로 연다. 줄 자신은 가리킴 줄(POINTER_LINE)과 같이 안 내보낸다(위 ANY_OF_HEAD 머리말) */
       const ph = pickOneHead(t);   // 🔴 `1가지 이상` 의 1 은 문턱이지 선택지 수가 아니다(anyOfCount 는 원문이 선택지 수를 말할 때만 · 머리말 ④)
       const n = ph ? optionRun(joined, li + 1, l, ph.count) : 0;
-      if (n > 0) { headEnd = li + 1 + n; headGroup = (anyGroup += 1); continue; }
+      if (n > 0) { headEnd = li + 1 + n; headGroup = (anyGroup += 1); groupHead[headGroup] = pickHeadCaption(l); continue; }
     }
     if (POINTER_LINE.test(t)) {
       /* 안내 줄 자신은 화면에 안 내보내되, '여기부터 선택지'라는 사실은 남긴다 — 끝은 위 「n개 이상」 머리 줄과 **같은 개요 규칙**(optionRun · headEnd)으로 정한다.
          🔴 예전엔 '몇 줄 남았나'를 내보낸 줄로 셌다 — 선택지 하나가 걸러지면 묶음이 다음 필수 줄을 삼켰다(리뷰 3차) */
       const ph = pickOneHead(t);
       const n = ph ? optionRun(joined, li + 1, l, ph.count) : 0;
-      if (n > 0) { headEnd = li + 1 + n; headGroup = (anyGroup += 1); }
+      if (n > 0) { headEnd = li + 1 + n; headGroup = (anyGroup += 1); groupHead[headGroup] = pickHeadCaption(l); }
       continue;
     }
     /* 제목 판정은 **공백을 없애고** 본다 — 한글 문서가 `제 출 서 류`처럼 자간을 벌려 쓴다 */
@@ -2257,7 +2269,16 @@ function requirementLines(sch, lines, opts) {
     i = Math.max(j, i + 1);
   }
   /* `withMeta`를 달라고 한 쪽(적합도 계산)에만 묶음 정보를 준다 — 화면은 예전 그대로 문자열이다 */
-  if (opts && opts.withMeta) return out.map((text, i) => ({ text, group: meta[i] || 0, aside: !!aside[i] }));
+  /* 머리 줄이 있는 묶음은 **그 묶음의 첫 줄**에 `head`(이름표 글자)를 단다 — 줄 수·판정은 그대로(pickHeadCaption 머리말) */
+  if (opts && opts.withMeta) {
+    const headed = new Set();
+    return out.map((text, i) => {
+      const g = meta[i] || 0;
+      const it = { text, group: g, aside: !!aside[i] };
+      if (g && groupHead[g] && !headed.has(g)) { headed.add(g); it.head = groupHead[g]; }
+      return it;
+    });
+  }
   return out;
 }
 
