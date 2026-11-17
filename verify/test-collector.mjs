@@ -1657,6 +1657,19 @@ console.log('\n■ 제출 서류 목록 — 원문의 「제출서류」 절을 
     [/got\.basis && !hasFormAtt && !it\.formId && !it\.program && !\/\^관리자\/\.test\(it\.prepDocFrom/.test(fd), /prepDocBasis = got\.basis\.slice\(0, 300\)/.test(fd), /prepDocFrom = `로봇/.test(fd)], [true, true, true]);
 }
 
+console.log('\n■ 첨부 받기 실패 이유 장부 (2026-11-18 · 인계 F1)');
+{
+  /* 실패가 로그 한 줄로만 사라져 「503·봇 차단」이 몇 건인지 아무도 못 셌다 — 받기 두 갈래(신청서 원본 · 자격 공고문)의 실패 자리 넷(상태 · 오류 · 스크립트 주소 · 웹페이지)이
+     전부 장부(collector/extracted/fetch-fail.json · 워크플로가 collector/extracted 를 통째로 저장)에 적고, 받으면 지운다 */
+  const df = readText(new URL('../collector/deepfetch.mjs', import.meta.url));
+  eq('  신청서 원본 받기 — 상태·오류·스크립트 주소·웹페이지 실패를 적고 받으면 지운다',
+    [(df.match(/noteFetchFail\(n\.regId \|\| n\.title,/g) || []).length, /clearFetchFail\(n\.regId \|\| n\.title, a\.name\)/.test(df)], [4, true]);
+  eq('  자격 공고문 받기 — 같은 넷을 적고 받으면 지운다',
+    [(df.match(/noteFetchFail\(it\.id,/g) || []).length, /clearFetchFail\(it\.id, a\.name\)/.test(df)], [4, true]);
+  eq('  장부는 30일 지난 줄을 걷고 · 저장 실패가 받기를 멈추지 않는다 · 장부는 function 이라 위쪽 경로가 먼저 불러도 된다(TDZ)',
+    [/30 \* 86400000/.test(df), /catch \{ \/\* 저장 실패는 받기를 멈추지 않는다/.test(df), /^function noteFetchFail\(/m.test(df), /git add collector\/extracted/.test(readText(new URL('../.github/workflows/deep-fetch.yml', import.meta.url)))], [true, true, true, true]);
+}
+
 /* 2026-10-13 ② — 공고문 뒷장 서식 쪽. 신청서가 따로 첨부되지 않은 공고라도 공고문 PDF 뒷장에 「별지」 서식이 붙는다(층2 재단 37곳) — 아무도 꺼내지 않았다. */
 console.log('\n■ 신청서 쪽 그림 · 빈칸 자리 — 이름표 옆·표 칸으로 빈칸을 찾고 지어내지 않는다 (2026-10-31 · 양식 5단계)');
 /* 로봇 collector/form-fields.mjs 는 원본 PDF 사본의 쪽 그림(WebP)과 이름표 옆 빈칸 자리(fields.json)를 만든다 — 앱 formfill.js 가 그 위에 답을 얹는다.
