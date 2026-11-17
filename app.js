@@ -4829,7 +4829,9 @@ function sheetSectionsHtml({ sch, result, fit, fd, activity = null, noticeLines 
   const a = activity ? (() => { const href = safeUrl(link.href); return href ? `<a href="${esc(href)}" target="_blank" rel="noopener">${esc(link.label)}</a>` : ''; })() : sourceLinkHtml(sch);   // 장학·층2는 sourceLinkHtml 한 곳(detail 자리)
   const hint = activity ? activityLinkWhy(activity, link) : sourceLinkHintHtml(link);
   const src = `<h4>원문</h4><div class="sheet-facts"><p class="doc-legend sheet-source">${a || sourceNoteHtml(sch)}${hint ? `<br />${hint}` : ''}</p>${(sch.sourceKind === 'kosaf' && sch.contact) ? `<p class="doc-legend">문의 ${esc(sch.contact)}</p>` : ''}</div>`;
-  return elig + apply + notice + att + src;
+  /* 절마다 한 묶음(.sheet-sec) — 묶음 사이 옅은 선 + 절 이름 앞 점(2026-11-16 개발자 지시 "각 칸을 시각적으로 구분하고 큰 틀 안내가 불렛포인트로").
+     빈 절은 묶음도 없다(11-07 「칸 자체를 없애기」 그대로) · h4 글자는 그대로라 드라이버가 읽는 이름은 안 바뀐다 */
+  return [elig, apply, notice, att, src].filter(Boolean).map((s) => `<section class="sheet-sec">${s}</section>`).join('');
 }
 
 function sourceNoteHtml(sch) {
