@@ -1,6 +1,6 @@
 {
  "v": 1,
- "updatedAt": "2026-11-17",
+ "updatedAt": "2026-11-18",
  "hosts": {
   "jntle.kr": {
    "checkedAt": "2026-10-23",
@@ -969,6 +969,46 @@
    "lines": 1,
    "targets": 1,
    "why": "글은 못 고르고 게시판만"
+  },
+  "bwdi.or.kr": {
+   "checkedAt": "2026-11-18",
+   "pages": 2,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "cheongro.org": {
+   "checkedAt": "2026-11-18",
+   "pages": 3,
+   "found": 1,
+   "lines": 1,
+   "targets": 1,
+   "why": ""
+  },
+  "gimje.go.kr": {
+   "checkedAt": "2026-11-18",
+   "pages": 8,
+   "found": 0,
+   "lines": 1,
+   "targets": 1,
+   "why": "글은 못 고르고 게시판만"
+  },
+  "jangseong.go.kr": {
+   "checkedAt": "2026-11-18",
+   "pages": 1,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
+  },
+  "mjsf.co.kr": {
+   "checkedAt": "2026-11-18",
+   "pages": 4,
+   "found": 0,
+   "lines": 0,
+   "targets": 1,
+   "why": "게시판도 글도 못 찾음"
   }
  }
 }

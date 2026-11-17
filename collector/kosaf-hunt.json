@@ -1,7 +1,7 @@
 {
  "v": 1,
  "note": "층2 재단 장학금의 개별 공고 후보 — 로봇(collector/kosaf-hunt.mjs)이 재단 홈페이지를 뒤져 적는다. 사람 후보 파일(link-candidates.json)과 같은 줄 꼴. 원문 링크 확인 로봇이 학생처럼 열어 확인한 것만 앱(data/link-check.json fix)에 실린다. 손으로 고치지 말 것 — 다음 실행이 다시 쓴다.",
- "updatedAt": "2026-11-17",
+ "updatedAt": "2026-11-18",
  "items": [
   {
    "target": {
@@ -161,6 +161,29 @@
    "by": "로봇(층2 글 사냥꾼)",
    "addedAt": "2026-11-14",
    "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 7) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2704378001"
+   },
+   "url": "https://www.cheongro.org/bbs/board.php?tbl=bbs41&mode=VIEW&num=30&",
+   "title": "2026년 (재)청로장학재단 제7기 장학생 선발 안내문",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-18",
+   "note": "https://www.cheongro.org/ 목록에서 고름 — 공고문 파일 제목 +2 · 재단 이름 +1 · 마감 해 +1 · 장학 낱말 +1 · 게시일 +1"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2513450002"
+   },
+   "board": "https://www.gimje.go.kr/board/list.gimje?boardId=BBS_0000045&menuCd=DOM_000000104004000000&contentsSid=197&cpath=",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-18",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다"
   }
  ]
 }
