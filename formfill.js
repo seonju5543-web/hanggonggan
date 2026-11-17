@@ -33,6 +33,8 @@ function ffAutoValue(key) {
     case 'email': return c.email || '';
     case 'bank': return c.bank || '';
     case 'account': return c.account || '';
+    /* 작성일·신청일 칸(2026-11-18 · form-fields LABELS 'today') — 오늘 날짜. 학생이 지우거나 고칠 수 있다(다른 칸과 같다) */
+    case 'today': { const d = new Date(); return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`; }
     default: return '';
   }
 }

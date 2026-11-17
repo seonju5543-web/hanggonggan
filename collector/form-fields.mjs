@@ -44,7 +44,11 @@ export const LABELS = [
   { re: /^(주소|현주소|자택주소|거주지|주민등록주소)$/, key: null, label: '주소' },
   { re: /^(학자금지원구간|소득분위|소득구간|지원구간)$/, key: 'bracket', label: '소득구간' },
   { re: /^(평점|평균평점|직전학기성적|성적|학점|직전학기평점)$/, key: 'gpa', label: '성적' },
+  /* 날짜 칸(2026-11-18 · 인계 1 f) — 「작성일 : ____」「신청일」 · 앱이 오늘 날짜를 먼저 채운다(formfill.js ffAutoValue 'today') */
+  { re: /^(작성일|작성일자|신청일|신청일자|제출일|제출일자|작성날짜|신청날짜)$/, key: 'today', label: '작성일' },
 ];
+/* 가족·명단 표의 같은 칸 아래로 이어지는 빈 줄을 몇 줄까지 잡나 — 「성명」 머리글 아래 둘째·셋째 가족 줄 */
+export const MAX_TABLE_ROWS = 6;
 
 export const norm = (s) => String(s || '').replace(/[\s:：·ㆍ()（）\[\]【】,./]/g, '').replace(/[*＊※]/g, '');
 
@@ -99,8 +103,20 @@ export function detectFields(page, pageNo, rules) {
   const spansX = (h, x0, x1) => h[1] <= x0 + 2 && h[2] >= x1 - 2;
   const textIn = (x0, y0, x1, y1) => page.lines.some((o) => o.x0 < x1 - 1 && o.x1 > x0 + 1 && o.y0 < y1 - 1 && o.y1 > y0 + 1);
   const push = (L, box, key, pageNo) => out.push({ id: `p${pageNo}-${out.length + 1}`, page: pageNo, x: r1(box.x0), y: r1(box.y0), w: r1(box.x1 - box.x0), h: r1(box.y1 - box.y0), label: L.label, key });
+  /* 밑줄 빈칸(2026-11-18) — 표 밖의 「성명 : ________」「신청인 ________ (인)」: 밑줄 낱말 앞의 글자가 사전 이름표면 밑줄 자리가 빈칸 */
+  const underlined = new Set();
+  for (const ln of page.lines) {
+    const k = ln.words.findIndex((w) => /_{3,}/.test(w.t));
+    if (k <= 0) continue;
+    const Lu = labelOf(ln.words.slice(0, k).map((w) => w.t).join(' '));
+    if (!Lu) continue;
+    const w = ln.words[k]; const lh2 = ln.y1 - ln.y0;
+    if (w.x1 - w.x0 < MIN_BOX_W) continue;
+    push(Lu, { x0: w.x0, y0: ln.y0 - lh2 * 0.15, x1: w.x1, y1: ln.y1 + lh2 * 0.15 }, Lu.key, pageNo);
+    underlined.add(ln);
+  }
   for (const { ln, L } of labeled) {
-    if (!L) continue;
+    if (!L || underlined.has(ln)) continue;
     const lh = ln.y1 - ln.y0;
     if (hasRules) {
       const vs = V.filter((v) => spansY(v, ln.y0, ln.y1)).map((v) => v[0]).sort((a, b) => a - b);
@@ -120,7 +136,22 @@ export function detectFields(page, pageNo, rules) {
           const vsBelow = V.filter((v) => hB2 != null && spansY(v, hB, hB2)).map((v) => v[0]);
           const belowCell = hB2 != null && vsBelow.some((x) => Math.abs(x - vL) < 3) && vsBelow.some((x) => Math.abs(x - vR) < 3)
             ? { x0: vL + 3, y0: hB + 2, x1: vR - 3, y1: hB2 - 2 } : null;
-          if (belowCell && belowCell.x1 - belowCell.x0 >= MIN_BOX_W && belowCell.y1 - belowCell.y0 >= lh * 0.8 && !textIn(belowCell.x0, belowCell.y0, belowCell.x1, belowCell.y1)) { push(L, belowCell, null, pageNo); below++; continue; }
+          if (belowCell && belowCell.x1 - belowCell.x0 >= MIN_BOX_W && belowCell.y1 - belowCell.y0 >= lh * 0.8 && !textIn(belowCell.x0, belowCell.y0, belowCell.x1, belowCell.y1)) {
+            push(L, belowCell, null, pageNo); below++;
+            /* 둘째·셋째 줄 — 같은 세로선 사이에 비어 있는 칸이 아래로 이어지면 그 칸들도 빈칸(가족 표의 둘째 가족 · 2026-11-18). 글자가 있거나 선이 끊기면 멈춘다 */
+            let top = hB2;
+            for (let r = 1; r < MAX_TABLE_ROWS; r++) {
+              const next = hsCol.find((y) => y > top + 4);
+              if (next == null) break;
+              const vsRow = V.filter((v) => spansY(v, top, next)).map((v) => v[0]);
+              if (!(vsRow.some((x) => Math.abs(x - vL) < 3) && vsRow.some((x) => Math.abs(x - vR) < 3))) break;
+              const cell = { x0: vL + 3, y0: top + 2, x1: vR - 3, y1: next - 2 };
+              if (cell.y1 - cell.y0 < lh * 0.8 || textIn(cell.x0, cell.y0, cell.x1, cell.y1)) break;
+              push(L, cell, null, pageNo); below++;
+              top = next;
+            }
+            continue;
+          }
           continue;   // 칸 안에 있는데 오른쪽도 아래도 빈 칸이 아니다 — 이미 값이 적힌 꼴
         }
       }

@@ -1728,6 +1728,25 @@ console.log('\n■ 신청서 쪽 그림 · 빈칸 자리 — 이름표 옆·표 
     const famName = ruled.fields.find((f) => f.label === '이름' && f.key === null); const famBirth = ruled.fields.find((f) => f.label === '생년월일');
     eq('🔴 오른쪽 칸에 글자가 있고 아래 칸이 비면 표 머리글 — 아래 칸이 빈칸이되 key 는 null (가족 표의 성명에 학생 이름을 넣으면 틀린 값)',
       [!!famName, famName && famName.y > 277, famBirth && famBirth.key, ruled.below], [true, true, null, 2]);
+    /* 2026-11-18 (인계 1 f) — 둘째·셋째 가족 줄 · 밑줄 빈칸 · 날짜 칸 */
+    {
+      const fam = FF.parseBbox(`<page width="595.2" height="841.8">
+        <line xMin="80" yMin="102" xMax="104" yMax="113"><word xMin="80" yMin="102" xMax="104" yMax="113">성명</word></line>
+        <line xMin="200" yMin="102" xMax="240" yMax="113"><word xMin="200" yMin="102" xMax="240" yMax="113">관계</word></line>
+        <line xMin="80" yMin="402" xMax="104" yMax="413"><word xMin="80" yMin="402" xMax="104" yMax="413">성명</word><word xMin="110" yMin="402" xMax="114" yMax="413">:</word><word xMin="120" yMin="402" xMax="260" yMax="413">____________</word></line>
+        <line xMin="80" yMin="452" xMax="118" yMax="463"><word xMin="80" yMin="452" xMax="118" yMax="463">작성일</word></line>
+      </page>`)[0];
+      const famRules = { h: [[98, 60, 400], [118, 60, 400], [140, 60, 400], [162, 60, 400], [184, 60, 400]], v: [[60, 98, 184], [180, 98, 184], [400, 98, 184]] };
+      const r = FF.detectFields(fam, 1, famRules);
+      const famNames = r.fields.filter((f) => f.label === '이름' && f.key === null);
+      eq('  머리글 아래 같은 세로선 사이의 빈 칸이 아래로 이어지면 둘째·셋째 줄도 빈칸(key null) — 글자가 있거나 선이 끊기면 멈춘다',
+        [famNames.length, famNames.map((f) => Math.round(f.y)), r.below], [3, [120, 142, 164], 3]);
+      const und = r.fields.find((f) => f.key === 'name' && f.y > 390);
+      eq('  밑줄 빈칸 — 「성명 : ________」 의 밑줄 자리가 빈칸(프로필 이름)', [!!und, und && Math.round(und.x), und && Math.round(und.x + und.w)], [true, 120, 260]);
+      const today = r.fields.find((f) => f.label === '작성일');
+      eq('  날짜 칸 — 「작성일」 이름표 → key today (앱이 오늘 날짜를 먼저 채운다 · formfill.js ffAutoValue)',
+        [today && today.key, /case 'today':/.test(readText(new URL('../formfill.js', import.meta.url)))], ['today', true]);
+    }
     /* red-green: 머리글 아래 칸에 key 를 붙이면 ↑ 가 빨간불 · 오른쪽 칸 규칙을 지우면 ④ 가 빨간불 (2026-10-31 확인) */
   }
   const app = readText(new URL('../app.js', import.meta.url));
