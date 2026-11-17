@@ -21,7 +21,7 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 /* 원문 찾기 규칙은 notice-source.mjs 한 곳에 있다 — 수집기·재채점 도구와 같은 방법을
    써야 "발췌기는 찾았는데 수집기는 못 찾는" 어긋남이 안 생긴다 (2026-08-03 분리). */
-import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
+import { indexTexts, sourceFor, hasText, excerptsHumanOwned } from './notice-source.mjs';
 /* 게시판 메뉴·푸터를 걷어내는 규칙 (2026-08-20 신설 — page-boilerplate.mjs 첫머리 참조).
    자격을 못 뽑은 61건 중 40건이 '본문이 메뉴에 파묻힌' 상태였다. */
 import { makeStripper, buildBoilerplate, boilerFor } from './page-boilerplate.mjs';
@@ -95,8 +95,11 @@ export function splitSentences(text) {
   }
   return out;
 }
-/* 발췌로 안 담는 줄 — 바닥글 연락처 띠(`(우)02841 … 대표전화 02-…`·`Copyright`)와 첨부 파일 이름 줄(`… 선발 공고문.hwp (52KB)`) */
-const EXCERPT_FOOTER = /대표\s?전화|copyright|all\s?rights|[(（]\s?우\s?[)）]?\s?\d{5}|우편\s?번호|사업자\s?등록/i;
+/* 발췌로 안 담는 줄 — 바닥글 연락처 띠(`(우)02841 … 대표전화 02-…`·`Copyright`)와 첨부 파일 이름 줄(`… 선발 공고문.hwp (52KB)`)
+   🔴 서울시 산하 누리집 바닥글 `전화 : 02-6490-6114 / 서울시통합문의 : 02-120`(서울시립대 · 2026-11-17)도 바닥글이다 — MARK 의 `문의\s?:` 가
+      `통합문의 :` 에 걸려 장학 두 건의 신청 안내 칸에 학교 대표 전화·120 다산콜이 앉았다. 낱말은 `서울(시)통합문의` 하나뿐이라
+      본문의 진짜 `문의 : 학생지원팀 02-…` 줄은 걸리지 않는다 · 맨 `통합문의`·`다산콜센터(120)` 는 서울시 장학의 진짜 문의처일 수 있어 넣지 않았다(관문 「발췌 주인 표식 · 바닥글」) */
+const EXCERPT_FOOTER = /대표\s?전화|copyright|all\s?rights|[(（]\s?우\s?[)）]?\s?\d{5}|우편\s?번호|사업자\s?등록|서울시?\s?통합\s?문의/i;
 const EXCERPT_FILE = /\.(?:hwpx?|pdf|docx?|xlsx?|zip|jpe?g|png)\s*(?:[(（\[][^)）\]]*[)）\]])?\s*$/i;
 
 /* 🔴 첨부에서 뽑은 발췌는 **이름표와 값이 짝이 맞을 때만** 담는다 (2026-11-15). OCR·납작해진 표는 이름표 칸과 옆 칸 글자를 한 줄로 붙인다 —
@@ -1225,7 +1228,7 @@ const siteChrome = siteChromeFrom([...(Array.isArray(texts) ? texts : Object.val
 /* 공고문 첨부 — 고르는 규칙은 attachment-text.mjs noticeDocFiles 한 곳(자격 색인 + 신청서 쪽에 섞여 온 공고문 · 2026-11-15).
    🔴 여기서 색인 파일을 직접 열지 말 것 — 길이 둘이 되면 마감은 읽는데 자격은 못 읽는 어긋남이 생긴다(관문 「발췌기 글자 읽기」). */
 
-let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, fromTitle = 0, gotDeadline = 0, dlFromDoc = 0, gotOpen = 0, gotAnnounce = 0, gotApplyEmail = 0, droppedApplyEmail = 0, gotApplyPortal = 0, gotDocs = 0, gotFree = 0;
+let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, fromTitle = 0, gotDeadline = 0, dlFromDoc = 0, gotOpen = 0, gotAnnounce = 0, gotApplyEmail = 0, droppedApplyEmail = 0, gotApplyPortal = 0, gotDocs = 0, gotFree = 0, humanEx = 0;
 let titleFixed = 0;   // 잘린 제목을 본문에서 보완한 공고(completeTitle)
 /* 공고문 첨부에서 자격 줄을 읽는다. 본문 경로와 원문 없는 경로가 **같은 함수**를 써야
    "본문 있을 땐 읽고 없을 땐 안 읽는" 어긋남이 안 생긴다. 스캔 PDF 등 글자가 안 나오는
@@ -1829,8 +1832,10 @@ for (const it of reg.items) {
     fillApplyEmail(it, null);          // 본문이 없으니 첨부에서만 — 본문 경로와 같은 함수
     fillApplyPortal(it, null);
     fillDocuments(it, null, docsOnce(it, false));     // 제출 서류 목록도 첨부에서 (2026-10-13 ④) — 신청서 쪽 공고문은 안 본다(noticeDocFiles formPath:false)
-    /* 발췌도 첨부에서 — 껍데기 공고는 안내 블록이 통째로 비었다. 예전 본문에서 뽑아 둔 발췌(원문 표식)는 덮지 않는다(원문이 없다 ≠ 발췌가 틀렸다) */
-    if (!(it.excerpts || []).length || it.excerptNote === EXCERPT_NOTE_DOC) {
+    /* 발췌도 첨부에서 — 껍데기 공고는 안내 블록이 통째로 비었다. 예전 본문에서 뽑아 둔 발췌(원문 표식)는 덮지 않는다(원문이 없다 ≠ 발췌가 틀렸다)
+       🔴 사람(관리자·AI)이 정한 발췌는 덮지 않는다 — 비운 것(`… · 비움`)도 되채우지 않는다(excerptsFrom · 아래 본문 갈래와 같은 판정 한 곳) */
+    if (excerptsHumanOwned(it)) humanEx += 1;
+    else if (!(it.excerpts || []).length || it.excerptNote === EXCERPT_NOTE_DOC) {
       const dx = excerptsFromDocs(docs());
       if (dx) { hit += 1; if (WRITE) { it.excerpts = dx.lines; it.excerptNote = EXCERPT_NOTE_DOC; } else console.log(`   [발췌 첨부] ${it.id} → ${dx.lines.join(' / ').slice(0, 120)}`); }
     }
@@ -1942,7 +1947,12 @@ for (const it of reg.items) {
       else delete it.eligibilityPriority;
     }
   }
-  if (ex.length) {
+  /* 🔴 사람(관리자·AI)이 정한 발췌는 덮지도 지우지도 않는다 (2026-11-17 · 관리자 수정 'excerpts' 를 연 날 같이) — 판정은 notice-source.mjs
+     excerptsHumanOwned 한 곳(`excerptsFrom` 이 '관리자'·'AI' 로 시작). 비운 것(`관리자 … · 비움`)도 되채우지 않는다(마감일과 같다) */
+  if (excerptsHumanOwned(it)) {
+    humanEx += 1;
+    if (!WRITE && ex.length) console.log(`   [발췌 사람 값 — 그대로] ${it.id} (${it.excerptsFrom})`);
+  } else if (ex.length) {
     hit++;
     if (WRITE) { it.excerpts = ex; it.excerptNote = exNote; }
     if (!WRITE) {
@@ -1956,7 +1966,7 @@ for (const it of reg.items) {
   }
 }
 console.log(`\n게시판 메뉴를 걷어낸 공고 ${cleaned}건`);
-console.log(`발췌 성공 ${hit}건 · 원문은 읽었으나 발췌 불가 ${none}건 · 원문 미확보라 손대지 않음 ${kept}건`);
+console.log(`발췌 성공 ${hit}건 · 원문은 읽었으나 발췌 불가 ${none}건 · 원문 미확보라 손대지 않음 ${kept}건 · 사람이 정한 발췌라 그대로 ${humanEx}건`);
 console.log(`자격을 공고문 첨부에서 읽은 공고 ${fromDoc}건 · 제목 속 「(대상: …)」에서 읽은 공고 ${fromTitle}건`);
 console.log(`마감일을 새로 읽은 공고 ${gotDeadline}건 (그중 공고문 첨부에서 ${dlFromDoc}건) · 첨부 마감을 지금 규칙으로 다시 읽어 고친 공고 ${dlRechecked}건`);
 console.log(`잘린 제목을 본문에서 보완한 공고 ${titleFixed}건`);

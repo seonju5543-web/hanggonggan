@@ -10878,6 +10878,7 @@ console.log('\n■ 관리자 수정 규칙이 한 벌인가 (화면 미리보기
     ['같은 값이면 아무것도 안 바뀐다', { name: '테스트 장학금' }],
     ['마감일', { deadline: '2026-11-30' }],
     ['자격 문장', { eligibilityLines: '재학생\n성적 3.0 이상' }],
+    ['원문 발췌 (2026-11-17)', { excerpts: ['신청기간 : 2026. 11. 1. ~ 11. 30.', '  '] }],
   ];
   const script = fileURLToPath(new URL('../tools/admin-apply.mjs', import.meta.url));
   for (const [label, patch] of CASES) {
@@ -11291,6 +11292,154 @@ console.log('\n■ 관리자 쓰기 — 되돌릴 수 없는 일 앞의 안전�
   eq('공고 목록을 안 고치는 동작 목록이 그대로다',
     cases.filter((c) => !writes.includes(c)).sort(),
     ['activityHide', 'activityKind', 'activitySource', 'activityUnhide', 'addBoard', 'autoRegister', 'formQueue', 'linkFix', 'linkUnfix', 'newsHide', 'newsKind', 'newsSource', 'newsThumbOff', 'newsThumbOn', 'newsUnhide', 'unblock']);
+}
+
+console.log('\n■ 발췌 주인 표식 · 바닥글 — 사람이 쓴 발췌는 로봇이 안 덮고 · 원문 근거로 안 쓴다 (2026-11-17)');
+/* 신청 방법 원문 발췌(`excerpts`)를 관리자가 `tools/admin-apply.mjs` edit 로 고칠 수 있게 연 날 같이 잠근 넷.
+   ① 저장소: 고치면 `excerptsFrom = '관리자 <날짜>'`(비우면 '· 비움' + excerpts·excerptNote 삭제) · 글자 아닌 줄은 멈춘다 · 화면 미리보기(edit-diff)와 같은 값
+   ② 발췌 로봇(extract-excerpts): excerptsFrom 이 '관리자'·'AI' 면 본문 갈래·첨부 갈래 모두 덮지도 지우지도 되채우지도 않는다
+   ③ 🔴 자기 근거 금지: 사람이 쓴 발췌는 자유 형식 제출·이중수혜 근거 대조(admin-apply corpus) · 범위 승격(scope-promote) · 교내 판정(kind-classify) ·
+      합칠 때 마감 근거(registered-merge deadlineQuote)에서 빠진다 — 판정은 collector/notice-source.mjs evidenceExcerpts 한 곳
+      (같은 patch 안의 자격 줄도 — 칸을 다 돈 뒤 붙던 표식 때문에 `{eligibilityLines:[문장], exclusivity:{raw:문장}}` 한 건이 통과했다)
+   ④ 바닥글: 서울시립대 `전화 : 02-6490-6114 / 서울시통합문의 : 02-120` 이 MARK `문의\s?:` 로 발췌에 앉던 것(EXCERPT_FOOTER)
+   표본은 전부 여기 적은 글자다(실데이터에 안 기댄다) — 저장소·로봇은 자식 프로세스로 진짜 돌린다. */
+{
+  const NS = await import(new URL('../collector/notice-source.mjs', import.meta.url));
+  const RM = await import(new URL('../collector/registered-merge.mjs', import.meta.url));
+  const { sandbox: exSandbox } = await import(new URL('./health-gates/bodies.mjs', import.meta.url));
+  const ROOT_URL = new URL('../', import.meta.url);
+
+  /* ④ 바닥글 — 진짜 문의 줄은 남는다 */
+  const FOOT = '전화 : 02-6490-6114 / 서울시통합문의 : 02-120';
+  eq('④ 서울시립대 바닥글(서울시통합문의)은 발췌가 아니다', AWAIT_EE.extractFrom(`가. 신청기간 : 2026. 11. 1.(월) ~ 11. 30.(월)\n${FOOT}`), ['가. 신청기간 : 2026. 11. 1.(월) ~ 11. 30.(월)']);
+  eq('  띄어 쓴 꼴(서울시 통합 문의)도', AWAIT_EE.extractFrom('대표 번호 02-6490-6114 · 서울시 통합 문의 : 120'), []);
+  eq('  진짜 문의 줄은 그대로 담는다 (문의 : / 문의처 : · 전화·메일)',
+    AWAIT_EE.extractFrom('7. 문의 : 학생지원팀 장학담당 02-6490-6200\n※ 문의처 : 장학팀 (scholar@uos.ac.kr)'),
+    ['7. 문의 : 학생지원팀 장학담당 02-6490-6200', '※ 문의처 : 장학팀 (scholar@uos.ac.kr)']);
+
+  /* 판정 한 곳 */
+  eq('주인 판정 — 관리자·AI 는 사람 값 · 로봇·표식 없음은 아니다',
+    [{ excerptsFrom: '관리자 2026-11-17' }, { excerptsFrom: '관리자 2026-11-17 · 비움' }, { excerptsFrom: 'AI(공고 포스터)' }, { excerptsFrom: '로봇' }, {}].map(NS.excerptsHumanOwned),
+    [true, true, true, false, false]);
+  eq('근거로 쓰는 발췌 — 관리자 줄만 빠진다 (AI 가 원문에서 읽은 줄은 자격 줄 규칙처럼 근거)',
+    [NS.evidenceExcerpts({ excerpts: ['가'], excerptsFrom: '관리자 2026-11-17' }), NS.evidenceExcerpts({ excerpts: ['나'] }), NS.evidenceExcerpts({ excerpts: ['다'], excerptsFrom: 'AI(첨부)' }), NS.evidenceExcerpts({})],
+    [[], ['나'], ['다'], []]);
+
+  /* ③ 합칠 때 — 마감 근거·발췌 옮기기 */
+  const drop0 = { id: 'd', deadline: '2026-11-30', period: '접수 기간 원문 확인', excerpts: ['신청기간 : 2026. 11. 1. ~ 11. 30.'] };
+  eq('③ 합칠 때 마감 근거 — 로봇 발췌는 근거가 된다 (대조군)', RM.deadlineQuote(drop0), '신청기간 : 2026. 11. 1. ~ 11. 30.');
+  eq('  사람이 쓴 발췌는 마감 근거가 아니다', RM.deadlineQuote({ ...drop0, excerptsFrom: '관리자 2026-11-17' }), null);
+  {
+    const keep = { id: 'k', eligibility: {} };
+    RM.mergeInto(keep, { id: 'd', eligibility: {}, excerpts: ['사람 줄'], excerptsFrom: '관리자 2026-11-17' });
+    eq('  발췌는 주인 표식과 한 세트로 옮긴다 (표식 없이 옮기면 로봇 줄로 둔갑해 근거가 된다)', [keep.excerpts, keep.excerptsFrom, NS.evidenceExcerpts(keep)], [['사람 줄'], '관리자 2026-11-17', []]);
+    const cleared = { id: 'k', eligibility: {}, excerptsFrom: '관리자 2026-11-17 · 비움' };
+    RM.mergeInto(cleared, { id: 'd', eligibility: {}, excerpts: ['로봇 줄'], excerptNote: '공고 원문에서 그대로 발췌 (자동)' });
+    eq('  사람이 비운 발췌는 합칠 때 되살리지 않는다', cleared.excerpts, undefined);
+  }
+
+  /* ① 저장소를 진짜로 — 사본 저장소 한 건 */
+  const script = fileURLToPath(new URL('../tools/admin-apply.mjs', import.meta.url));
+  const Q = '본 장학금은 타 장학금과 중복하여 받을 수 없습니다';
+  const EXC = { kind: 'forbidden', scope: 'external', raw: Q };
+  const runEdit = (edits, tweak = {}) => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'admexc-'));
+    fs.mkdirSync(path.join(dir, 'data'), { recursive: true });
+    fs.mkdirSync(path.join(dir, 'collector'), { recursive: true });
+    /* 원문 말뭉치(저장소 기준으로 읽는다)에 없을 주소 — 그래서 근거는 발췌·자격 줄 말고는 없다 */
+    const it = { id: 'reg-exc0', name: '발췌 주인 검사용 장학금', type: '교외', provider: '검사재단', amount: '금액 원문 확인', amountValue: 0, summary: '요약',
+      sourceUrl: 'https://excerpt-owner.invalid/view.do?seq=1', eligibility: { selective: true }, documents: ['재학증명서'],
+      deadline: '2026-12-01', noForm: '양식 없음', auto: true, listedAt: '2026-09-01', ...tweak };
+    fs.writeFileSync(path.join(dir, 'data/registered.json'), `${JSON.stringify({ items: [it] }, null, 1)}\n`);
+    fs.writeFileSync(path.join(dir, 'data/forms.json'), JSON.stringify({ forms: {}, templates: {} }));
+    fs.writeFileSync(path.join(dir, 'collector/auto-register-config.json'), `${JSON.stringify({ enabled: true, blockIds: [], blockUrls: [] }, null, 1)}\n`);
+    const r = spawnSync(process.execPath, [script], { cwd: dir, encoding: 'utf8',
+      env: { ...process.env, ACTION: 'edit', ACTOR: 'gate', PAYLOAD: JSON.stringify({ edits: edits.map((patch) => ({ id: 'reg-exc0', patch })) }) } });
+    const after = JSON.parse(readText(path.join(dir, 'data/registered.json'))).items[0];
+    fs.rmSync(dir, { recursive: true, force: true });
+    return { status: r.status, out: `${r.stdout || ''}${r.stderr || ''}`, after };
+  };
+  const ROBOT = { excerpts: ['옛 로봇 줄 신청기간 : 2026. 9. 1. ~ 9. 30.'], excerptNote: '공고 원문에서 그대로 발췌 (자동)' };
+  const set = runEdit([{ excerpts: ['  신청기간 : 2026. 11. 1.(월) ~ 11. 30.(월)  ', '   ', '접수처 : 학생지원팀 (02-123-4567)'] }], ROBOT);
+  eq('① 저장소가 발췌를 받는다 — 줄 다듬기 · 빈 줄 버림 · 관리자 표식 · 로봇 출처 문구(excerptNote) 뺌',
+    [set.status, set.after.excerpts, /^관리자 \d{4}-\d{2}-\d{2}$/.test(set.after.excerptsFrom || ''), set.after.excerptNote],
+    [0, ['신청기간 : 2026. 11. 1.(월) ~ 11. 30.(월)', '접수처 : 학생지원팀 (02-123-4567)'], true, undefined]);
+  const clr = runEdit([{ excerpts: [] }], ROBOT);
+  eq('  비우면 발췌·출처 문구를 지우고 · 비움 표식을 남긴다 (로봇이 되채우지 않게)',
+    [clr.status, clr.after.excerpts, clr.after.excerptNote, /^관리자 .* · 비움$/.test(clr.after.excerptsFrom || '')], [0, undefined, undefined, true]);
+  const bad = runEdit([{ excerpts: [1, { a: 2 }] }], ROBOT);
+  eq('  글자가 아닌 줄이 섞이면 멈추고 파일은 그대로', [bad.status !== 0, /문장\(글자\) 목록/.test(bad.out), bad.after.excerpts], [true, true, ROBOT.excerpts]);
+  /* 화면 미리보기가 같은 값을 예고한다 */
+  const rows = diffPatch(ROBOT, { excerpts: ['신청기간 : 2026. 11. 1. ~ 11. 30.', ' '] });
+  eq('  화면 미리보기(diffPatch)가 같은 칸·값을 예고한다 (이름표 · 전후)',
+    rows.map((d) => [d.key, d.label, d.before, d.after, d.block]), [['excerpts', '신청 방법 원문 발췌', ROBOT.excerpts, ['신청기간 : 2026. 11. 1. ~ 11. 30.'], null]]);
+  eq('  미리보기도 글자 아닌 줄은 막힌 줄로 보여 준다 (죽지 않는다)', !!(diffPatch(ROBOT, { excerpts: [3] })[0] || {}).block, true);
+
+  /* ③ 자기 근거 금지 — 대조군(로봇 발췌는 근거가 된다)이 먼저 통과해야 아래 거절이 '근거 대조가 돈다'는 뜻이다 */
+  const ctl = runEdit([{ exclusivity: EXC }], { excerpts: [Q] });
+  eq('③ 대조군 — 로봇이 뽑은 발췌는 이중수혜 근거가 된다', [ctl.status, (ctl.after.exclusivity || {}).raw], [0, Q]);
+  const stored = runEdit([{ exclusivity: EXC }], { excerpts: [Q], excerptsFrom: '관리자 2026-11-01' });
+  eq('  🔴 관리자가 쓴 발췌는 이중수혜 근거가 아니다', [stored.status !== 0, /이중수혜 근거를 확인하지 못했습니다/.test(stored.out), stored.after.exclusivity], [true, true, undefined]);
+  const samePatch = runEdit([{ excerpts: [Q], exclusivity: EXC }]);
+  eq('  한 patch 안에서 발췌를 쓰고 그 문장으로 이중수혜를 켜도 막힌다', [samePatch.status !== 0, samePatch.after.excerpts], [true, undefined]);
+  const twoEdits = runEdit([{ excerpts: [`${Q} 자유 양식`] }, { prepDoc: true, prepDocBasis: `${Q} 자유 양식` }]);
+  eq('  한 묶음 두 건(발췌 → 자유 형식 제출 근거)도 막힌다', [twoEdits.status !== 0, /자유 형식 제출 근거를 확인하지 못했습니다/.test(twoEdits.out), twoEdits.after.prepDoc], [true, true, undefined]);
+  const eligSame = runEdit([{ eligibilityLines: [Q], exclusivity: EXC }]);
+  eq('  🔴 자격 줄도 한 patch 안에서 근거가 못 된다 (2026-09-14 수리는 두 건으로 나눈 묶음만 막았다)',
+    [eligSame.status !== 0, eligSame.after.exclusivity, eligSame.after.eligibilityFrom], [true, undefined, undefined]);
+
+  /* ② 발췌 로봇을 진짜로 — 임시 폴더 사본 */
+  const sb = exSandbox(ROOT_URL, 'hdj-excerpt-owner-');
+  try {
+    const BODY = '지원 대상은 국내 대학에 재학 중인 학부생으로서 직전 학기 성적이 평균 이상인 학생입니다.\n'
+      + '선발된 학생에게는 한 학기 등록금 전액과 생활비를 함께 지원하며 학업 계획서를 심사합니다.\n'
+      + '장학생으로 선발된 학생은 학기 중 봉사 활동에 참여하고 결과 보고서를 제출하여야 합니다.\n'   // 본문 분량(MIN_BODY)을 넘겨 '원문 있음' 길로 — 모자라면 본문 갈래를 안 지나 헛돈다(만들며 겪었다)
+      + '가. 신청기간 : 2026. 11. 2.(월) ~ 11. 27.(금) 18:00까지\n나. 접수처 : 학생지원팀 장학담당 (02-555-0100)\n';
+    const DOC = `${'공고문 첨부 본문입니다. 선발 인원과 지원 금액, 심사 절차를 안내합니다. '.repeat(12)}\n가. 신청기간 : 2026. 12. 1.(화) ~ 12. 15.(화)\n`;
+    const U = (n) => `https://e${n}.example.ac.kr/view.do?seq=${n}`;
+    sb.write('collector/extracted/notices-text.json', [1, 2, 3, 4].map((n) => ({ title: `2026 발췌 주인 검사 장학생 선발 ${n}`, url: U(n), text: `2026 발췌 주인 검사 장학생 선발 ${n}\n${BODY}` })));
+    sb.write('collector/extracted/elig-docs.json', { d1: { files: ['own-d1.hwp'] }, d2: { files: ['own-d2.hwp'] } });
+    for (const f of ['own-d1.hwp', 'own-d2.hwp']) { sb.write(`collector/extracted/${f}`, 'HWP'); sb.write(`collector/extracted/${f}.body.txt`, DOC); }
+    const base = (id, n) => ({ id, name: `2026 발췌 주인 검사 장학생 선발 ${n}`, sourceUrl: U(n), auto: true });
+    const MAN = ['관리자가 원문에서 옮긴 줄 신청기간 : 2026. 11. 2. ~ 11. 27.'];
+    sb.write('data/registered.json', { items: [
+      { ...base('e1', 1), excerpts: ['옛 로봇 줄 신청기간 : 2026. 9. 1. ~ 9. 30.'], excerptNote: '공고 원문에서 그대로 발췌 (자동)' },
+      { ...base('e2', 2), excerpts: MAN, excerptsFrom: '관리자 2026-11-17' },
+      { ...base('e3', 3), excerptsFrom: '관리자 2026-11-17 · 비움' },
+      { ...base('e4', 4), excerpts: MAN, excerptsFrom: 'AI(공고 포스터 그림)' },
+      { id: 'd1', name: '2026 첨부만 있는 검사 장학생 선발 하나', sourceUrl: 'https://d1.example.ac.kr/view.do?seq=1', auto: true, excerpts: ['옛 첨부 줄 신청기간 : 2026. 9. 1. ~ 9. 3.'], excerptNote: '공고문 첨부에서 그대로 발췌 (자동)' },
+      { id: 'd2', name: '2026 첨부만 있는 검사 장학생 선발 둘', sourceUrl: 'https://d2.example.ac.kr/view.do?seq=2', auto: true, excerptsFrom: '관리자 2026-11-17 · 비움' },
+    ] });
+    const r = sb.run('collector/extract-excerpts.mjs', ['--write'], { EXCERPTS_AS_LIB: '' });
+    const by = Object.fromEntries((sb.json('data/registered.json')?.items || []).map((x) => [x.id, x]));
+    eq('② [발췌기 실행] 끝까지 돈다', r.status, 0);
+    eq('  대조군 — 로봇 발췌는 본문에서 새로 뽑아 바꾼다 · 첨부 발췌는 첨부에서 다시', [(by.e1?.excerpts || [])[0], (by.d1?.excerpts || [])[0]],
+      ['가. 신청기간 : 2026. 11. 2.(월) ~ 11. 27.(금) 18:00까지', '가. 신청기간 : 2026. 12. 1.(화) ~ 12. 15.(화)']);
+    eq('  🔴 관리자·AI 가 정한 발췌는 본문 갈래에서 덮지 않는다', [by.e2?.excerpts, by.e2?.excerptsFrom, by.e4?.excerpts], [MAN, '관리자 2026-11-17', MAN]);
+    eq('  🔴 사람이 비운 발췌는 본문·첨부 갈래 모두 되채우지 않는다', [by.e3?.excerpts, by.d2?.excerpts, by.d2?.excerptsFrom], [undefined, undefined, '관리자 2026-11-17 · 비움']);
+  } finally { sb.done?.(); }
+
+  /* ③ 범위 승격 로봇을 진짜로 — 사람이 쓴 발췌의 '재단 홈페이지에서 신청' 은 전국 승격 근거가 아니다 */
+  const sp = exSandbox(ROOT_URL, 'hdj-excerpt-scope-');
+  try {
+    sp.write('verify/entry-rules.cjs', readText(new URL('./entry-rules.cjs', import.meta.url)));
+    sp.write('collector/schools.json', { schools: [] });
+    sp.write('collector/extracted/notices-text.json', []);
+    const far = new Date(Date.now() + 40 * 86400000).toISOString().slice(0, 10);
+    const one = (id, extra) => ({ id, name: `2026 검사재단 장학생 선발 ${id}`, type: '교외', auto: true, deadline: far, eligibility: { schoolOnly: '검사대학교' },
+      sourceUrl: `https://${id}.example.ac.kr/view.do?seq=1`, ...extra });
+    const LINE = ['신청방법 : 검사재단 홈페이지에서 신청 (2026. 11. 30.까지)'];
+    sp.write('data/registered.json', { items: [one('s1', { excerpts: LINE }), one('s2', { excerpts: LINE, excerptsFrom: '관리자 2026-11-17' })] });
+    const r = sp.run('collector/scope-promote.mjs', ['report.md']);
+    const by = Object.fromEntries((sp.json('data/registered.json')?.items || []).map((x) => [x.id, x]));
+    eq('③ [범위 승격 실행] 대조군 — 로봇 발췌의 재단 신청 문장은 전국 근거 · 🔴 같은 문장이라도 관리자가 쓴 발췌면 학교 한정 그대로',
+      [r.status, (by.s1?.eligibility || {}).schoolOnly, (by.s2?.eligibility || {}).schoolOnly], [0, undefined, '검사대학교']);
+  } finally { sp.done?.(); }
+
+  /* 교내 판정 로봇(kind-classify)은 불러오는 순간 실행되고 학교 표가 커서 표본으로 못 돌린다 — 넘기는 발췌가 같은 한 곳을 지나는지 본다 */
+  const kc = readText(new URL('../collector/kind-classify.mjs', import.meta.url)).replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');   // 주석 속 글자로 통과하지 않게
+  eq('  교내 판정 로봇도 사람이 쓴 발췌를 빼고 넘긴다 (evidenceExcerpts · it.excerpts 를 그대로 넘기지 않는다)',
+    [/excerpts:\s*evidenceExcerpts\(it\)/.test(kc), /excerpts:\s*it\.excerpts/.test(kc), /!evidenceExcerpts\(it\)\.length/.test(kc)], [true, false, true]);
 }
 
 console.log('\n■ 못 읽은 파일의 숫자를 화면이 단정하지 않는다');

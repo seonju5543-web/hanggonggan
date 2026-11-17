@@ -2,6 +2,7 @@
    **같은 함수**를 쓴다(2026-09-30 · 베끼면 갈라진다). 서로 다른 학교에 같은 공고가 올라온 것은 사실 여러 학교가 받는
    장학금이라 한쪽만 남기면 다른 학교 학생이 못 보게 되므로 **전국으로 승격**한다(호반 선례). 남기는 쪽에 없는 정보는
    지우는 쪽에서 살려 온다. 사람이 일부러 비운 마감(`관리자 … · 비움`)은 되살리지 않는다. */
+import { evidenceExcerpts, excerptsHumanOwned } from './notice-source.mjs';
 /* 지우는 쪽에서 그 마감 날짜를 **글자로 내는** 문구 하나 — 화면 문구(period) · 출처 표식의 인용 · 발췌 줄 순. 없으면 null. */
 export function deadlineQuote(drop) {
   const iso = String(drop.deadline || '');
@@ -10,7 +11,8 @@ export function deadlineQuote(drop) {
   const mo = String(Number(m[2])), da = String(Number(m[3]));
   const hit = new RegExp(`${iso}|(^|\\D)0?${mo}\\s*[./월\\-]\\s*0?${da}(?![\\d])`);
   const fromQuote = /·/.test(drop.deadlineFrom || '') ? drop.deadlineFrom.slice(drop.deadlineFrom.indexOf('·') + 1).trim() : '';
-  const cands = [drop.period, fromQuote, ...(Array.isArray(drop.excerpts) ? drop.excerpts : [])].filter(Boolean).map(String);
+  /* 🔴 사람이 쓴 발췌(excerptsFrom '관리자 …')는 날짜의 원문 근거가 아니다 — 근거로 읽는 곳은 전부 evidenceExcerpts 를 지난다(2026-11-17) */
+  const cands = [drop.period, fromQuote, ...evidenceExcerpts(drop)].filter(Boolean).map(String);
   return cands.find((t) => !/원문\s*확인/.test(t) && hit.test(t)) || null;
 }
 
@@ -62,9 +64,12 @@ export function mergeInto(keep, drop, { reason = '' } = {}) {
     }
   }
   if (!(keep.attachments || []).length && (drop.attachments || []).length) keep.attachments = drop.attachments;
-  if (!(keep.excerpts || []).length && (drop.excerpts || []).length) {
+  /* 발췌는 **주인 표식과 한 세트로** 옮긴다(2026-11-17) — 사람이 쓴 발췌를 표식 없이 옮기면 남는 쪽에서 '로봇이 원문에서 뽑은 줄'로
+     둔갑해 근거로 쓰인다. 남는 쪽을 사람이 일부러 비웠으면(`관리자 … · 비움`) 되살리지 않는다(마감과 같다) */
+  if (!(keep.excerpts || []).length && (drop.excerpts || []).length && !excerptsHumanOwned(keep)) {
     keep.excerpts = drop.excerpts;
-    if (drop.excerptNote) keep.excerptNote = drop.excerptNote;
+    if (drop.excerptNote) keep.excerptNote = drop.excerptNote; else delete keep.excerptNote;
+    if (drop.excerptsFrom) keep.excerptsFrom = drop.excerptsFrom; else delete keep.excerptsFrom;
   }
   if (!keep.formId && drop.formId) keep.formId = drop.formId;
   /* 어느 학교 게시판에도 올라왔는지 — 전국으로 승격한 근거를 남긴다(원문 링크와 함께) */
