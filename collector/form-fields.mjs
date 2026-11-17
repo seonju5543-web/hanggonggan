@@ -243,6 +243,10 @@ export function runFormFields({ root, today, dry = false, force = false, log = c
       const fields = []; let headerRows = 0;
       pages.slice(0, MAX_PAGES).forEach((pg, i) => { const rp1 = rp.pages.find((p) => p.n === i + 1); const d = detectFields(pg, i + 1, rp1 && rp1.rules); fields.push(...d.fields); headerRows += d.headerRows; stats.below += d.below; });
       for (const x of fields) byLabel.set(x.label, (byLabel.get(x.label) || 0) + 1);
+      let fixDoc = null;
+      try { fixDoc = JSON.parse(fs.readFileSync(path.join(dir, 'fields-fix.json'), 'utf8')); } catch { /* 사람이 지정한 칸 없음 */ }
+      const fixed = applyFieldFix(fields, fixDoc && fixDoc.files && fixDoc.files[rel], pages.slice(0, MAX_PAGES).map((pg, i) => ({ n: i + 1, w: pg.w, h: pg.h })));
+      fields.length = 0; fields.push(...fixed);
       fj.files[rel] = {
         sha: h, dir: pagesDir, at: today,
         pages: rp.pages.map((p) => ({ n: p.n, w: r1((pages[p.n - 1] || {}).w || 0), h: r1((pages[p.n - 1] || {}).h || 0), img: p.img, iw: p.iw, ih: p.ih, rules: p.rules ? { h: p.rules.h.length, v: p.rules.v.length } : undefined })),
@@ -276,6 +280,23 @@ export function runFormFields({ root, today, dry = false, force = false, log = c
   if (!dry) fs.writeFileSync(reportPath, L.join('\n') + '\n');
   log(L.join('\n'));
   return stats;
+}
+
+/* ── 사람이 지정한 칸 (2026-11-18 · 인계 1 f 「관리자 칸 지정」) ─────────────────────────────────────
+   로봇이 못 찾았거나 잘못 찾은 칸을 사람이 고친다 — 장부 data/<forms-pdf|form-pages>/<id>/fields-fix.json:
+     { "files": { "<파일 이름>": { "add": [{ page, x, y, w, h, label, key }], "remove": ["p1-3"], "by", "at" } } }
+   저장은 tools/admin-apply.mjs fieldFix(관리자 버튼과 같은 길) · 로봇은 칸을 새로 만들 때마다 이 장부를 다시 얹는다(지우지 않는다). 순수 함수 */
+export const FIX_KEYS = new Set([...LABELS.map((L) => L.key).filter(Boolean)]);
+export function applyFieldFix(fields, fix, pages) {
+  if (!fix) return fields;
+  const gone = new Set((fix.remove || []).map(String));
+  const out = (fields || []).filter((f) => !gone.has(String(f.id)) && f.by !== 'admin');
+  (fix.add || []).forEach((a, i) => {
+    const pg = (pages || []).find((p) => p.n === a.page);
+    if (!pg || !(a.w > 0 && a.h > 0) || a.x < 0 || a.y < 0 || a.x + a.w > pg.w + 1 || a.y + a.h > pg.h + 1) return;   // 쪽 밖의 칸은 버린다
+    out.push({ id: `a${i + 1}`, page: a.page, x: r1(a.x), y: r1(a.y), w: r1(a.w), h: r1(a.h), label: String(a.label || '').slice(0, 20) || '빈칸', key: FIX_KEYS.has(a.key) ? a.key : null, by: 'admin' });
+  });
+  return out;
 }
 
 /* ── 빈칸 정확도를 재는 자 (2026-11-18 · 인계 F3) ──────────────────────────────────────────────

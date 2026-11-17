@@ -1737,6 +1737,18 @@ console.log('\n■ 신청서 쪽 그림 · 빈칸 자리 — 이름표 옆·표 
           /function formPageRowsHtml[\s\S]{0,900}?<li class="fill-slot" data-file="\$\{esc\(f\.file\)\}" hidden><\/li>/.test(appSrc2)],
         [true, true, true, true]);
     }
+    /* 2026-11-18 (인계 1 f) — 사람이 지정한 칸(fieldFix · fields-fix.json) — 로봇이 칸을 다시 만들어도 얹는다 · 쪽 밖은 버린다 · 모르는 key 는 null */
+    if (FF.applyFieldFix) {
+      const pagesFx = [{ n: 1, w: 595, h: 842 }];
+      const base = [{ id: 'p1-1', page: 1, x: 10, y: 10, w: 50, h: 12, label: '이름', key: 'name' }, { id: 'p1-2', page: 1, x: 10, y: 30, w: 50, h: 12, label: '학번', key: 'studentId' }];
+      const out = FF.applyFieldFix(base, { add: [{ page: 1, x: 100, y: 700, w: 120, h: 18, label: '작성일', key: 'today' }, { page: 1, x: 590, y: 700, w: 120, h: 18, label: '밖' }, { page: 1, x: 100, y: 100, w: 80, h: 18, label: '서명', key: 'password' }], remove: ['p1-2'] }, pagesFx);
+      eq('  사람이 지정한 칸 — 뺀 칸은 빠지고 · 더한 칸은 by admin · 쪽 밖 칸은 버리고 · 모르는 key 는 null · 같은 장부를 두 번 얹어도 겹치지 않는다',
+        [out.map((f) => f.id), out.filter((f) => f.by === 'admin').map((f) => [f.label, f.key]), FF.applyFieldFix(out, { add: [{ page: 1, x: 100, y: 700, w: 120, h: 18, label: '작성일', key: 'today' }] }, pagesFx).filter((f) => f.by === 'admin').length],
+        [['p1-1', 'a1', 'a3'], [['작성일', 'today'], ['서명', null]], 1]);
+      const aa2 = readText(new URL('../tools/admin-apply.mjs', import.meta.url)); const ffs = readText(new URL('../collector/form-fields.mjs', import.meta.url));
+      eq('  관리자 길(admin-apply fieldFix) — 장부 fields-fix.json 과 지금 fields.json 둘 다 · 로봇은 칸을 새로 만들 때 장부를 다시 얹는다',
+        [/case 'fieldFix':/.test(aa2), /writeJson\(fixPath, fixDoc\); writeJson\(fjPath, fj\);/.test(aa2), /applyFieldFix\(fields, fixDoc && fixDoc\.files && fixDoc\.files\[rel\]/.test(ffs)], [true, true, true]);
+    } else eq('  사람이 지정한 칸 함수(applyFieldFix)가 있다', false, true);
     /* 2026-11-18 (인계 1 f) — 둘째·셋째 가족 줄 · 밑줄 빈칸 · 날짜 칸 */
     {
       const fam = FF.parseBbox(`<page width="595.2" height="841.8">
@@ -11668,7 +11680,7 @@ console.log('\n■ 관리자 쓰기 — 되돌릴 수 없는 일 앞의 안전�
      목록이 바뀌면 사람이 '이 동작도 공고 목록을 고치는가'를 한 번 본다. */
   eq('공고 목록을 안 고치는 동작 목록이 그대로다',
     cases.filter((c) => !writes.includes(c)).sort(),
-    ['activityHide', 'activityKind', 'activitySource', 'activityUnhide', 'addBoard', 'autoRegister', 'formQueue', 'linkFix', 'linkUnfix', 'newsHide', 'newsKind', 'newsSource', 'newsThumbOff', 'newsThumbOn', 'newsUnhide', 'unblock']);
+    ['activityHide', 'activityKind', 'activitySource', 'activityUnhide', 'addBoard', 'autoRegister', 'fieldFix', 'formQueue', 'linkFix', 'linkUnfix', 'newsHide', 'newsKind', 'newsSource', 'newsThumbOff', 'newsThumbOn', 'newsUnhide', 'unblock']);
 }
 
 console.log('\n■ 발췌 주인 표식 · 바닥글 — 사람이 쓴 발췌는 로봇이 안 덮고 · 원문 근거로 안 쓴다 (2026-11-17)');

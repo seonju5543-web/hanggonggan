@@ -1206,6 +1206,41 @@ switch (action) {
     break;
   }
 
+  /* ── 양식 빈칸 지정 (2026-11-18 · 인계 1 f) — 로봇이 못 찾은·잘못 찾은 칸을 사람이 더하고 뺀다.
+     장부 data/<forms-pdf|form-pages>/<id>/fields-fix.json(로봇이 칸을 다시 만들 때마다 얹는다) + 지금 fields.json 에도 바로 얹는다(다음 로봇 실행을 기다리지 않게).
+     payload { id, file, base?: 'forms-pdf'|'form-pages', add?: [{ page, x, y, w, h, label, key? }], remove?: ['p1-3'] } — 좌표는 PDF 포인트(fields.json 과 같다) ── */
+  case 'fieldFix': {
+    const base = payload.base === 'form-pages' ? 'form-pages' : 'forms-pdf';
+    const id = String(payload.id || '');
+    const rel = String(payload.file || '').split('/').pop();
+    if (!/^[\w.-]+$/.test(id) || !rel) fail('공고 id 와 파일 이름이 필요합니다');
+    const dirAbs = path.join(ROOT, 'data', base, id);
+    const fjPath = path.join(dirAbs, 'fields.json');
+    const fj = readJson(fjPath, null);
+    if (!fj || !fj.files || !fj.files[rel]) fail(`그 양식의 빈칸 장부가 없습니다: data/${base}/${id}/fields.json · ${rel} (로봇이 쪽 그림을 먼저 만들어야 합니다)`);
+    const add = Array.isArray(payload.add) ? payload.add : []; const remove = Array.isArray(payload.remove) ? payload.remove.map(String) : [];
+    if (!add.length && !remove.length) fail('더하거나 뺄 칸이 없습니다');
+    if (add.length > 60) fail('한 번에 60칸까지만 받습니다');
+    process.env.FORM_FIELDS_AS_LIB = '1';
+    const FF = await import('../collector/form-fields.mjs');
+    const F = fj.files[rel];
+    const fixPath = path.join(dirAbs, 'fields-fix.json');
+    const fixDoc = readJson(fixPath, null) || { files: {} };
+    const prev = fixDoc.files[rel] || { add: [], remove: [] };
+    const next = { add: [...(prev.add || []), ...add.map((a) => ({ page: Number(a.page), x: Number(a.x), y: Number(a.y), w: Number(a.w), h: Number(a.h), label: cleanText(a.label).slice(0, 20), key: a.key || null }))],
+      remove: [...new Set([...(prev.remove || []), ...remove])], by: actor, at: TODAY };
+    const robotFields = (F.fields || []).filter((f) => f.by !== 'admin');
+    const applied = FF.applyFieldFix(robotFields, next, F.pages);
+    const addedOk = applied.filter((f) => f.by === 'admin').length;
+    if (add.length && addedOk < next.add.length) fail(`쪽 밖이거나 크기가 없는 칸이 있습니다(받은 ${next.add.length}칸 중 ${addedOk}칸만 쪽 안) — 좌표를 확인해 주세요`);
+    fixDoc.files[rel] = next;
+    F.fields = applied;
+    writeJson(fixPath, fixDoc); writeJson(fjPath, fj);
+    detail = `양식 빈칸 ${id} · ${rel} — 더함 ${add.length} · 뺌 ${remove.length} (지금 ${applied.length}칸)`;
+    touched = true;
+    break;
+  }
+
   /* ── 원문 바로잡기 지우기 — 장부에서 열쇠를 뺀다(학생 링크는 데이터 주소로 돌아간다) ── */
   case 'linkUnfix': {
     const keys = (Array.isArray(payload.keys) ? payload.keys : []).map((k) => String(k || '')).filter((k) => /^(id|u):\S/.test(k));
