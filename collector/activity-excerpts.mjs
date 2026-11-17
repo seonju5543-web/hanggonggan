@@ -66,7 +66,7 @@ const noContact = (lines) => lines.filter((l) => !CONTACT.test(l));
    그래도 이름표가 없으면 `대한민국 국민 누구나`·`AI에 관심 있는 누구나` 처럼 **누가 낼 수 있나만 말하는 줄**을 원문 그대로 쓴다(OPEN_LINE). */
 /* 활동 어휘는 collector/activity-vocab.mjs 한 곳(2026-10-27) — 머리글·요건 신호·'누가' 낱말·제목 속 대상 */
 import { ACT_HEAD, ACT_SIGNAL, ACT_WHO, ACT_TAIL, targetFromTitle } from './activity-vocab.mjs';
-import { readDocuments } from './doc-list.mjs';   // 제출 서류 목록 — 장학 발췌기와 같은 규칙 한 곳(2026-10-30 · 공모전 참가신청서가 화면에 없던 것)
+import { readDocuments, DOC_JUNK } from './doc-list.mjs';   // 제출 서류 목록 — 장학 발췌기와 같은 규칙 한 곳(2026-10-30 · 공모전 참가신청서가 화면에 없던 것)
 import { createRequire } from 'node:module';
 /* 지역 이름은 parse-requirements.js 의 REGION_CITIES 한 벌(화면·판정·알림) — 끝글자 `시|군|구|도` 로 짐작하면 `별도`·`표시`·`제도` 가 지역이 된다(2026-10-28 리뷰) */
 const PR = createRequire(import.meta.url)('../parse-requirements.js');
@@ -212,13 +212,45 @@ export function sanitizeElig(it) {
   let changed = false;
   for (const k of ['eligibilityLines', 'eligibilityExcludes']) {
     if (!Array.isArray(it[k])) continue;
-    const kept = (k === 'eligibilityLines' ? cutAtTableLabel(it[k]) : it[k]).filter(eligLineOk);   // 표 머리에서 자르기도 소급(2026-10-16)
-    if (kept.length === it[k].length) continue;
+    const kept = (k === 'eligibilityLines' ? cutAtTableLabel(it[k]) : it[k]).filter(eligLineOk)   // 표 머리에서 자르기도 소급(2026-10-16)
+      .map(dedupeLabel).filter((l) => !titleFragment(l, it.title));   // 「공모자격 : 공모자격 : …」 이름표 두 번 · 제목 앞머리 조각(「청년들이 만드는」) — 2026-11-17
+    if (kept.length === it[k].length && kept.every((l, i) => l === it[k][i])) continue;
     changed = true;
     if (kept.length) it[k] = kept; else delete it[k];
   }
   if (changed && !(it.eligibilityLines && it.eligibilityLines.length)) { delete it.eligibilityFrom; delete it.eligibilityReviewed; }
   return changed;
+}
+
+/* 「공모자격 : 공모자격 : 대학생으로 …」 — 표 머리와 칸 이름이 겹쳐 같은 이름표가 두 번 붙었다(금융감독원 금융공모전 · 2026-11-17 실측). 한 번만 남긴다 */
+export const dedupeLabel = (l) => String(l).replace(/^(\s*([^:：\d]{1,12})\s*[:：]\s*)\2\s*[:：]\s*/, '$1');
+/* 제목의 앞머리 조각(「청년들이 만드는」 ← 「청년들이 만드는 첨단 공공서비스 AI 영상 공모전」)은 자격 줄이 아니다 — 글 머리의 제목이 둘로 끊겨 들어왔다(2026-11-17 실측) */
+export function titleFragment(line, title) {
+  const l = String(line || '').replace(/\s/g, ''), t = String(title || '').replace(/\[[^\]]*\]\s*/g, '').replace(/\s/g, '');
+  return l.length >= 4 && l.length <= 20 && t.length > l.length && t.startsWith(l);
+}
+/** 서류 칸에 실린 사이트 맨 아래 줄·안내문·유의사항을 걷는다(doc-list.mjs DOC_JUNK 한 곳) — 바뀌면 true (수집 로봇 발행 때 모든 글에 · 원칙 7 소급) */
+export function sanitizeDocs(it) {
+  if (!it || !Array.isArray(it.documents)) return false;
+  const kept = it.documents.filter((d) => !DOC_JUNK.test(String(d)));
+  if (kept.length === it.documents.length) return false;
+  if (kept.length) it.documents = kept; else delete it.documents;
+  return true;
+}
+/** 마감이 빈 글은 「공고 안내」 줄의 기간(신청 기간·접수기간·제출기한·모집기간)에서 마감을 읽는다 — 판독기는 장학과 같은 extractDeadline(이름표 뒤 날짜만 · 해 없으면 null).
+    줄이 여럿이면(1차·2차 접수) **가장 늦은 끝**으로 — 1차 끝으로 2차가 열린 글을 지우지 않는다(external-clean lastRoundEnd 와 같은 이유).
+    왜 — 첨부·포스터에서 읽은 기간 줄(activity-docs noticeLines)엔 이 판독기를 한 번도 안 돌려, 3월·8월에 끝난 모집이 11월 화면에 '진행 중'으로 떴다(2026-11-17 실측 165건 중 수십 건). */
+export function deadlineFromNotice(it) {
+  if (!it || it.deadline || !Array.isArray(it.noticeLines)) return false;
+  let best = null, from = '';
+  for (const line of it.noticeLines) {
+    const d = extractDeadline(String(line || ''));
+    if (d && /^\d{4}-\d{2}-\d{2}$/.test(d) && (!best || d > best)) { best = d; from = String(line).trim(); }
+  }
+  if (!best) return false;
+  it.deadline = best;
+  it.deadlineFrom = `공고 안내 · ${from.slice(0, 80)}`;
+  return true;
 }
 
 /* 납작한 정의 표(`참가 대상` ↵ `대한민국 국민 누구나` ↵ `참가 형태` ↵ `개인 또는 3인 이하 팀` ↵ `출품 수` ↵ …)는 자격 짝 **다음 이름표**에서 끝이다 —

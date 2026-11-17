@@ -10299,6 +10299,25 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
          /\.sheet-sec > \.sheet-verdict > h4 \{[^}]*color: var\(--text\);/.test(cssSec),
          /\.sheet-sec > \.sheet-verdict > h4::before \{[^}]*border-radius: 50%; background: var\(--accent\)/.test(cssSec)], [true, true, true]);
     }
+    /* ■ 깨진 글자 씻기 (2026-11-17 개발자 지시 "깨진 글자 모두 찾아서 수리 · 장학금, 대외활동/공모전 모두") —
+       받은 데이터를 받는 순간 tidyData 한 번. 표본으로 앱 소스의 그 줄들을 떼어 돌린다(베끼지 않는다) · 실데이터는 재지 않는다 */
+    {
+      const takeLine = (re) => (appSrc2.match(re) || [''])[0];
+      const takeFnSrc = (n) => { const a = appSrc2.indexOf(`function ${n}(`); return a < 0 ? '' : appSrc2.slice(a, appSrc2.indexOf('\n}\n', a) + 2); };
+      const tidy = new Function([takeLine(/const ENTITIES = \{[^\n]+\};/), takeLine(/const ENTITY_RE = [^\n]+;/), takeFnSrc('unent'), takeLine(/const JUNK_CHARS = [^\n]+;/),
+        takeLine(/const OCR_URL_GARBLE = [^\n]+;/), takeLine(/const TIDY_SKIP_KEY = [^\n]+;/), takeFnSrc('tidyText'), takeFnSrc('tidyData'), 'return tidyData;'].join('\n'))();
+      const got = tidy({ items: [{ id: 'a&amp;b', sourceUrl: 'https://x.kr/v?a=1&amp;b=2',
+        eligibilityLines: ['중소 &middot; 중견기업', '\uF0A7 장학생 신청접수 완료 후', '\u200B \u200B○ 신청대상', '\uFFFD 모집 대상', '센터 &times; Google'],
+        documents: ['장학생신청서 - 금신장학재단 홈페이지(//“\\6401510.0ㅁ.<0)에서 작성', '홈페이지(www.kumsin.or.kr)에서 작성'] }] }).items[0];
+      eq('깨진 글자 씻기 — HTML 기호를 풀고 · HWP 기호·폭 0 공백·대체 문자를 지우고 · OCR 이 깨뜨린 주소 괄호만 걷는다(멀쩡한 괄호는 그대로)',
+        [...got.eligibilityLines, ...got.documents],
+        ['중소 · 중견기업', '장학생 신청접수 완료 후', '○ 신청대상', '모집 대상', '센터 × Google', '장학생신청서 - 금신장학재단 홈페이지에서 작성', '홈페이지(www.kumsin.or.kr)에서 작성']);
+      eq('  주소·id 칸은 건드리지 않는다(주소의 & 는 decodeUrlEntities 몫)', [got.id, got.sourceUrl], ['a&amp;b', 'https://x.kr/v?a=1&amp;b=2']);
+      const loaders = ['loadRegistered', 'loadKosaf', 'loadActivities', 'loadExternal', 'loadNotices', 'loadNews'].map((n) => [n, /tidyData\(/.test(takeFnSrc(n))]);
+      eq('  받는 곳 여섯(정식 등록·카드 읽기·층2·대외활동·재단 게시판·학교 공고·소식)이 모두 씻는다', loaders.filter(([, ok]) => !ok).map(([n]) => n), []);
+      const ws = readText(new URL('./what-shows.mjs', import.meta.url));
+      eq('  what-shows 도 앱처럼 씻은 글자로 말한다', /linkFn\('tidyData'\)\(reg\)/.test(ws) && /'tidyText', 'tidyData'/.test(ws), true);
+    }
   }
 
   /* 🔴 'AI 티' 정리 A·D·E·G·H (2026-10-06 사장님 지시 → 전후 사진 보고 → 은서님이 다섯 개 골랐다).
@@ -13662,8 +13681,45 @@ console.log('\n■ 대외활동 — 남은 글 표본에서 찾은 것 (2026-10-
   eq('  자격 문장이 화면에서 걸러지지 않는다 — `서울시민(성인)` · `18세 이상 성인`',
     ['참가자격: 서울시민(성인)', '18세 이상 성인'].map((l) => MEX.requirementLines({ eligibilityLines: [l] }, null, { all: true }).length), [1, 1]);
   eq('④ 모집 글이 아닌 것 — 결과·보도·지난 해 글은 대외활동이 아니다 · 모집 글은 그대로',
-    [AK.notActivity('2026년 제3회 장학수기 공모전 심사 결과...'), AK.notActivity('가명정보 활용 경진대회 대상·최우수상 동시 석권'), AK.notActivity('2018년 사회복지 협력기관 워크숍', new Date('2026-10-04')), AK.notActivity('2026년 경기 스타트업 아카데미 참여자 모집', new Date('2026-10-04')), AK.notActivity('2025학년도 겨울 해외탐방 모집', new Date('2026-10-04'))],
+    [AK.notActivity('2026년 제3회 장학수기 공모전 심사 결과...'), AK.notActivity('가명정보 활용 경진대회 대상·최우수상 동시 석권'), AK.notActivity('2018년 사회복지 협력기관 워크숍', new Date('2026-10-04')), AK.notActivity('2026년 경기 스타트업 아카데미 참여자 모집', new Date('2026-10-04')), AK.notActivity('2025학년도 겨울 해외탐방 모집', new Date('2025-12-01'))],
     [true, true, true, false, false]);
+  /* 2026-11-17 — 끝난 학기·계절의 글과 결과 글(입상자·최종합격·성과공유회·「n개교 선정」)도 모집 글이 아니다. 위 「2025학년도 겨울」 표본은 그 겨울이 오기 전(2025-12)엔 모집 글 그대로다 */
+  eq('  끝난 학기(2025-2학기·2025년 동계학기·2025학년도 — 이듬해 2월 끝 · 1학기·하계 — 8월 끝)와 결과 글은 뺀다 · 앞날의 해가 섞인 글(2025-2027)·올해 동계는 둔다',
+    [['2025학년도 겨울 해외탐방 모집', '2026-10-04'], ['2025-2학기 모의주식투자대회 특강 진행 안내', '2026-11-17'], ['[항공드론] 2025년 동계학기 항공·드론 무료 특강', '2026-11-17'], ['2026-1학기 서포터즈 모집', '2026-11-17'],
+      ['2025 KAU 리빙랩 아이디어 공모전 입상자 발표', '2026-11-17'], ['2차 파견단원 최종합격 및 국내교육 대상자 안내', '2026-11-17'], ['농심천심 대학생 봉사단 사업 12개교 선정', '2026-11-17'], ['해외봉사 프로그램 성과공유회 개최', '2026-11-17'],
+      ['(본공고) 2025-2027 KOICA-청년중기봉사단 2차 파견 단원 모집 안내', '2026-11-17'], ['[해외봉사] 2026학년도 동계 해외봉사단 추가 모집 안내', '2026-11-17'], ['2026-1학기 서포터즈 모집', '2026-03-02']].map(([t, d]) => AK.notActivity(t, new Date(d))),
+    [true, true, true, true, true, true, true, true, false, false, false]);
+  /* ■ 대외활동 카드 품질 (2026-11-17 개발자 지시 "공모전/대외활동 카드 … 내용이 없거나, 이상한 내용 … 가독성 … 모두 수리") — 표본만 잰다(실데이터 단정 금지) */
+  {
+    const AXq = await import('../collector/activity-excerpts.mjs');
+    const DLq = await import('../collector/doc-list.mjs');
+    const it1 = { title: 'x', noticeLines: ['-접수기간: 2026.8.5.(수)09:30~9.16.(수)18:00까지', '-결과 발표: 2026년10월 중 예정'] };
+    const it2 = { title: 'y', noticeLines: ['O접수기간: 2026.7.27.(월) 09:00 ~ 7.31.(금)18:00', 'O 접수기간: 2026.8.25.(화) 10:00 ~ 9.4.(금) 17:00'] };
+    const it3 = { title: 'z', deadline: '2026-12-01', noticeLines: ['신청기간:2026.03.16.(월)~03.27.(금)'] };
+    const it4 = { title: 'w', noticeLines: ['지원 기간: 8/11(화)~8/31(월) 까지'] };
+    eq('대외활동 — 마감이 빈 글은 「공고 안내」 기간 줄에서 마감을 읽는다(장학과 같은 extractDeadline · 여러 회차면 가장 늦은 끝 · 이미 있으면 안 바꾼다 · 해 없는 줄은 비운다)',
+      [AXq.deadlineFromNotice(it1) && it1.deadline, AXq.deadlineFromNotice(it2) && it2.deadline, AXq.deadlineFromNotice(it3), it3.deadline, AXq.deadlineFromNotice(it4), it4.deadline],
+      ['2026-09-16', '2026-09-04', false, '2026-12-01', false, undefined]);
+    const junk = ['01811 서울시 노원구 공릉로 232 서울과학기술대학교 | TEL. (02) 970.6114', '제출하신 서류는 사업운영기관에서 관리되오니 서류 반환 등 문의는 해당 기관으로 하시기 바랍니다.', '주요 심사기준에 따른 서류심사',
+      '「 내 안전 지키는 안심헬프미」신청 안내', '장학금 2개 종 이상 동시 지원 불가', '전년도 장학생은 선발 대상에서 제외함', '증명서발급안내 : 대표홈페이지 | 학사안내 | 증명서발급 | 학부생'];
+    const real = ['지원서 1 부', '재학증명서 (공고일 9/1 이후 발급분)', '주민등록등본(주민번호 뒷자리 미포함, 3개월 이내 발급분)', '3 주민등록초본 | - 주소 변동 전체이력 포함', '=e" | @ 통장사본 (학생 본인 명의) | 알 수 있는 추가서류 필요)', '학업계획서(자유양식)'];
+    eq('  서류 칸 — 사이트 맨 아래 줄·안내문·다른 글 제목·유의사항·메뉴 경로는 서류가 아니다 · 진짜 서류(OCR 표의 세로줄 하나·서류 이름이 든 줄 포함)는 둔다',
+      [junk.filter((d) => !DLq.DOC_JUNK.test(d)), real.filter((d) => DLq.DOC_JUNK.test(d))], [[], []]);
+    const it5 = { documents: [...real.slice(0, 2), junk[0]] };
+    eq('  활동 글 소급(sanitizeDocs) — 걸러낸 줄만 빠진다', [AXq.sanitizeDocs(it5), it5.documents], [true, real.slice(0, 2)]);
+    process.env.DOCS_FILL_AS_LIB = '1';
+    const DFq = await import('../collector/docs-fill.mjs');
+    const regs = [{ id: 'a', documents: [real[0], junk[4]] }, { id: 'b', documents: [junk[5]], documentsFrom: '공고문 첨부' }, { id: 'c', documents: [junk[4]], documentsFrom: '관리자 2026-11-01' }];
+    const sc = DFq.scrubDocuments(regs);
+    eq('  정식 등록 소급(docs-fill scrubDocuments) — 걸러낸 줄만 빠지고 · 다 빠지면 자리표시로(같은 실행에서 다시 읽는다) · 관리자 칸은 안 건드린다',
+      [sc.scrubbed, regs[0].documents, regs[1].documents, regs[1].documentsFrom, regs[2].documents], [2, [real[0]], [DFq.DOC_PLACEHOLDER_LINE], undefined, [junk[4]]]);
+    const it6 = { title: '청년들이 만드는 첨단 공공서비스 AI 영상 공모전', eligibilityLines: ['공모자격 : 공모자격 : 대학생으로 구성된 팀(5인 이내)', '청년들이 만드는', '대한민국 청년(1992.1.1~2007.12.31 출생자)'], eligibilityFrom: '본문' };
+    eq('  자격 줄 — 이름표가 두 번 붙은 줄은 한 번으로 · 제목 앞머리 조각은 뺀다(sanitizeElig)',
+      [AXq.sanitizeElig(it6), it6.eligibilityLines], [true, ['공모자격 : 대학생으로 구성된 팀(5인 이내)', '대한민국 청년(1992.1.1~2007.12.31 출생자)']]);
+    const collectSrc = readText(new URL('../collector/collect.mjs', import.meta.url));
+    eq('  수집 로봇이 발행 때마다 모든 활동 글에 건다(서류 칸 거름·마감 읽기) · 서류 채우기 로봇이 정식 등록에 건다',
+      [/^acts\.items\.forEach\(sanitizeDocs\);/m.test(collectSrc), /^acts\.items\.forEach\(deadlineFromNotice\);/m.test(collectSrc), /^  const scrub = scrubDocuments\(reg\.items\);/m.test(readText(new URL('../collector/docs-fill.mjs', import.meta.url)))], [true, true, true]);
+  }
   eq('  수집 로봇이 이미 실린 글에도 소급한다 · 인스타그램 게시물도 같은 자리에서 뺀다 · 들일 때도', [/acts\.items = acts\.items\.filter\(\(n\) => !notActivity\(n\.title\) && !unreadableSource\(n\.url\)\)/.test(readText(new URL('../collector/collect.mjs', import.meta.url))), /\.filter\(\(i\) => !unreadableSource\(i\.url\)\)/.test(readText(new URL('../collector/collect.mjs', import.meta.url)))], [true, true]);
   eq('  `(설명) 연합뉴스 … 기사 관련`·`보도 설명` 은 모집 글이 아니다 · `[보도자료] 2026 청년정책 공모전 개최` 는 모집 글 (2026-10-16)',
     [AK.notActivity('(설명) 연합뉴스, "정부 해외취업연수 매년 10% 안팎 폐강" 기사 관련'), AK.notActivity('보도 설명 자료'), AK.notActivity('[보도자료] 2026 청년정책 공모전 개최')], [true, true, false]);
@@ -14303,7 +14359,7 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
   eq('  ✕ 로 이미 보인 줄은 「내 정보로 확인한 항목」에 또 적지 않는다 (shownBad)', /shownBad\.has\(r\.slice\(FAIL_PREFIX\.length\)\)/.test(appSrc), true);
   eq('  주관·금액의 「원문 확인」 자리 표시는 큰 글씨·주관 줄에 안 나간다 · 본문 사진은 첨부 목록에 안 나간다',
     /* 2026-11-02 승인 시안 — 금액은 amountLine(모르면 줄 없음 · 재단 긴 금액은 옅게) · 주최는 cardProviderLine(모르면 빈 글자) · 본문 사진 거르기는 sheetSectionsHtml 의 첨부 절 */
-    [/const amt = amountLine\(sch\); const t = amt\.text\.replace/.test(appSrc), /function cardProviderLine[\s\S]*?if \(providerUnknown\(prov\)\) return '';/.test(appSrc), /filter\(\(a\) => a && !a\.bodyImage\);\n  const att = atts\.length \?/.test(appSrc)], [true, true, true]);
+    [/const amt = amountLine\(sch\); const t = amt\.text\.replace/.test(appSrc), /function cardProviderLine[\s\S]*?if \(providerUnknown\(prov\)\) return '';/.test(appSrc), /filter\(\(a\) => a && !a\.bodyImage\)[^\n]*;\n  const att = atts\.length \?/.test(appSrc)], [true, true, true]);   // 11-17 — 같은 줄 뒤에 같은 파일 한 번만(attSeen) 거르기가 붙었다
   eq('  단추 밑에는 아무 줄도 없다 — 「최종 제출 · 제출처」도 뺐다(2026-10-29 개발자 지시) · 「준비를 마치면 … 표시됩니다」 없음', [/준비를 마치면 최종 제출처/.test(appSrc), /최종 제출 · \$\{esc\(ch\.label\)\}/.test(appSrc)], [false, false]);
   /* ⑨ 리뷰(2026-10-15)가 실데이터 전수 비교(등록 226 + 활동 200 × 7 프로필)로 잡은 틀린 미달·틀린 안심·글자 회귀 — 되돌리면 그대로 재현된다 */
   eq('⑨ 「… 3.0/4.5점 또는」 — 이상이 분수 뒤에 없으면 성적 조건이 아니다 (춘곡장학회 · 평점 2.8 에게 ✕ 였다)', kinds('직전 정규학기에 12학점 이상 이수하였으며, 대학 전체학기 성적 평균 3.0/4.5점 또는').includes('grade'), false);
@@ -14488,7 +14544,11 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
       rows2(['충남 사회연대경제기업들의 임팩트 투자 기반을 조성하고 투자 유치를 희망하는', '기업들의 IR(Investor Relation) 역량 강화를 지원하기 위해 한국서부발전(주)과 함께', '하는 2026 프로젝트상생 『쇼미더임팩트 시즌6』 참가자를 모집하고자 합니다.',
         '활동일시', 'ㅇ 2026년 10월 17일(토) 15:00~21:00', '강북청년창업마루 - 강북창업지원센터에서', '10월 창업 교육 및 그룹상담 프로그램을 진행합니다.', '온라인 접수 : https://forms.gle/x', '물품 제공 및 주의사항 안내']),
       ['충남 사회연대경제기업들의 임팩트 투자 기반을 조성하고 투자 유치를 희망하는 기업들의 IR(Investor Relation) 역량 강화를 지원하기 위해 한국서부발전(주)과 함께 하는 2026 프로젝트상생 『쇼미더임팩트 시즌6』 참가자를 모집하고자 합니다.',
-        '활동일시 · 2026년 10월 17일(토) 15:00~21:00', '강북청년창업마루 - 강북창업지원센터에서 10월 창업 교육 및 그룹상담 프로그램을 진행합니다.', '온라인 접수 · https://forms.gle/x']);
+        '활동일시 · 2026년 10월 17일(토) 15:00~21:00', '강북청년창업마루 - 강북창업지원센터에서 10월 창업 교육 및 그룹상담 프로그램을 진행합니다.', '온라인 접수 · <a href="https://forms.gle/x" target="_blank" rel="noopener">forms.gle ↗</a>']);   // 11-17 — 글 속 주소는 사이트 이름 링크(nsBodyHtml)
+    /* 2026-11-17 개발자 지시(가독성) — 글 속 긴 주소는 누를 수 있는 사이트 이름으로 · 주소는 원문 그대로 링크에 · 꼬리 마침표는 주소가 아니다 · 주소 아닌 글자는 그대로 escape */
+    eq('  공고 안내 — 글 속 주소는 「사이트 ↗」 링크(주소는 원문 그대로 · 꼬리 마침표 제외) · 나머지 글자는 escape',
+      rows2(['신청 방법 : 구글폼 https://forms.gle/AbC?x=1&y=<2> 로 접수.', '문의 <b>센터</b> 사이트 http://www.k-startup.go.kr/web/a.do.']),
+      ['신청 방법 · 구글폼 <a href="https://forms.gle/AbC?x=1&amp;y=" target="_blank" rel="noopener">forms.gle ↗</a> &lt;2&gt; 로 접수.', '문의 &lt;b&gt;센터&lt;/b&gt; 사이트 <a href="http://www.k-startup.go.kr/web/a.do" target="_blank" rel="noopener">k-startup.go.kr ↗</a> .']);
     eq('  이름표가 있는 줄 뒤의 줄은 그 줄에 붙이지 않는다 · 항목 머리(`A.`·`○`·`1)`)도 새 줄',
       rows2(['지원자격 : 2026-1 학기 학부 재학생', '매일 09:00~18:00 접수', '안내 글자가 길어서 이어지는', 'A. 첫째 항목입니다.']), ['매일 09:00~18:00 접수', 'A. 첫째 항목입니다.']);
     eq('  공고 안내 — 자격 줄이 있으면 「대상」 발췌를 다시 적지 않는다 · 모집기간은 「접수」 절이(코드 자리)', /x\.label !== '혜택' && x\.label !== '모집기간' && !\(x\.label === '대상' && \(n\.eligibilityLines \|\| \[\]\)\.length\)/.test(appSrc), true);

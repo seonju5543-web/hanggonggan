@@ -138,9 +138,9 @@ vm.runInContext([
   /* 카드가 쓰는 한 줄 const 는 **전부** 여기에 — 하나라도 빠지면 그 꼴의 카드(기간 한 줄·학교 사진)에서만 이 도구가 넘어진다
      (리뷰 G3 · 기간 한 줄 달린 게시판 글에서 `hintText is not defined`). 관문 「원문 링크 정직성」 app 갈래가 실제 글 꼴로 돌려 본다. */
   ...['ENTITIES', 'ENTITY_RE', 'PARTIAL_ENTITY_END', 'hintText', 'NEWS_THUMB_RE', 'SCHOOL_PHOTO_RE', 'PHOTO_FOCUS_RE',
-    'CLOSED_KEEP_DAYS', 'KOSAF_ELIG', 'KOSAF_CORE', 'kosafClean', 'KOSAF_NOISE', 'SAYS_UNKNOWN', 'kosafSplit', 'KOSAF_AMOUNT_UNKNOWN', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G'].map(takeConst),
+    'CLOSED_KEEP_DAYS', 'KOSAF_ELIG', 'KOSAF_CORE', 'kosafClean', 'KOSAF_NOISE', 'SAYS_UNKNOWN', 'kosafSplit', 'KOSAF_AMOUNT_UNKNOWN', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G', 'JUNK_CHARS', 'OCR_URL_GARBLE', 'TIDY_SKIP_KEY'].map(takeConst),
   ...['isDateBit', 'splitTitleDates', 'hintShort', 'shortDay'].map(takeFn),   // 카드 제목 날짜·회색 기간 줄(2026-10-04·05) · 카드 윗줄 날짜(10-10)
-  ...['esc', 'unent', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'knownValue', 'kosafNoticeValue', 'attachPrepTemplate', 'kosafAsScholarships', 'sourceLinkHintHtml',   // knownValue: 층2 공고 안내 칸 값이 부른다 · attachPrepTemplate: 층2 항목마다 지원문서를 붙인다(2026-10-13 ① · FORM_TEMPLATES 가 없는 자리에선 그대로 돌려준다)
+  ...['esc', 'unent', 'tidyText', 'tidyData', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'knownValue', 'kosafNoticeValue', 'attachPrepTemplate', 'kosafAsScholarships', 'sourceLinkHintHtml',   // knownValue: 층2 공고 안내 칸 값이 부른다 · attachPrepTemplate: 층2 항목마다 지원문서를 붙인다(2026-10-13 ① · FORM_TEMPLATES 가 없는 자리에선 그대로 돌려준다)
     'attachmentLinkHtml', 'sourceLinkHtml', 'sourceNoteHtml', 'amountSourceLinkHtml', 'appLogLinkHtml', 'noticeCardHtml', 'activityLinkWhy'].map(takeFn),
   /* 층2 바꾸기가 읽는 앱 상태 — 이 도구는 저장·신청 내역을 모른다(없음) */
   'var kosafList = []; var kosafUpdatedAt = ""; var state = { applications: [] }; function isSaved() { return false; }',
@@ -149,6 +149,7 @@ vm.runInContext([
 ].join('\n\n'), linkCtx, { filename: 'app.js(링크 자리)' });
 linkCtx.joinSpacedSyllables = ME.joinSpacedSyllables;   // noticeSummaryHtml 의 tidyChars 가 쓴다(match-engine)
 const linkFn = (n) => vm.runInContext(n, linkCtx);
+linkFn('tidyData')(reg);   // 앱처럼 받은 데이터를 한 번 씻는다(깨진 글자 · 2026-11-17 tidyData) — 화면과 같은 글자로 말한다
 const LEDGER = new URL('../data/link-check.json', import.meta.url);
 const ledger = fs.existsSync(LEDGER) ? JSON.parse(fs.readFileSync(LEDGER, 'utf8')) : null;
 linkFn('setLinkChecks')(ledger);
@@ -223,7 +224,7 @@ function kosafFitLines(sch) {
 
 /* 정식 등록에 없는 이름 — 앱이 실제로 받는 파일에서 찾는다(공고·소식은 학교별 파일 · 층2는 앱 함수로 바꾼 모양) */
 function showFeedLinks(query) {
-  const read = (p) => { try { return JSON.parse(fs.readFileSync(new URL(p, import.meta.url), 'utf8')).items || []; } catch (e) { return []; } };
+  const read = (p) => { try { return linkFn('tidyData')(JSON.parse(fs.readFileSync(new URL(p, import.meta.url), 'utf8'))).items || []; } catch (e) { return []; } };   // 앱처럼 씻는다(2026-11-17)
   const dir = (p) => fs.readdirSync(new URL(p, import.meta.url)).filter((f) => /\.json$/.test(f) && f !== 'index.json').flatMap((f) => read(`${p}${f}`));
   linkCtx.kosafList = read('../data/kosaf-open.json');
   const sets = [

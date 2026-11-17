@@ -731,13 +731,32 @@ function esc(s) {
    **데이터에 나오는 기호를 전부 아는지** 세므로, 새 기호가 들어오면 그때 빨간불이 된다.
    2026-09-30 에 여덟 개를 더했다 — 44개교 복원으로 들어온 게시판들이 `&lsquo;`·`&#40;` 등을
    담아 왔다(관문이 잡았다). 숫자 기호도 **보이는 글자인 것만** 이름을 대고 넣는다(위 🔴 그대로). */
-const ENTITIES = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", '#39': "'", '#160': ' ', middot: '·', '#038': '&', '#039': "'", '#40': '(', '#41': ')', lsquo: '‘', rsquo: '’', bull: '•', sim: '∼', rarr: '→', rArr: '⇒', ge: '≥', le: '≤', ldquo: '“', rdquo: '”' };   // rArr·ge — 수집 글에 나온 겹화살표·부등호(2026-10-12 ui-tone) · ldquo·rdquo — 큰따옴표(2026-10-24 ui-tone)
+const ENTITIES = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", '#39': "'", '#160': ' ', middot: '·', '#038': '&', '#039': "'", '#40': '(', '#41': ')', lsquo: '‘', rsquo: '’', bull: '•', sim: '∼', rarr: '→', rArr: '⇒', ge: '≥', le: '≤', ldquo: '“', rdquo: '”', times: '×', egrave: 'è' };   // rArr·ge — 수집 글에 나온 겹화살표·부등호(2026-10-12 ui-tone) · ldquo·rdquo — 큰따옴표(2026-10-24 ui-tone) · times·egrave — 소식 글(「센터 &times; Google」·「Herm&egrave;s」 2026-11-17)
 /* 🔴 **목록을 두 벌 두지 않는다** (2026-09-13). 예전에는 정규식에 이름이 한 벌 더 박혀 있어서,
    ENTITIES 에 `middot` 를 더해도 정규식이 그걸 몰라 **아무 일도 안 일어났다**(실측).
    이 저장소가 여러 번 데인 자리다 — 목록에서 정규식을 만든다. */
 const ENTITY_RE = new RegExp('&(' + Object.keys(ENTITIES).join('|') + ');', 'g');
 function unent(s) {
   return String(s == null ? '' : s).replace(ENTITY_RE, (m, k) => ENTITIES[k]);
+}
+/* 깨진 글자 씻기 — 받은 데이터 **전부**를 받는 순간 한 번 (2026-11-17 개발자 지시 "깨진 글자 모두 찾아서 수리 · 장학금, 대외활동/공모전 모두").
+   unent 를 23곳에서만 불러 자격 줄·서류 칸에 `중소 &middot; 중견기업` 이 그대로 떴고, 이 앱이 거르지 않던 넷이 더 있었다(실측 11-17):
+   · HWP 전용 기호 글자(사용자 정의 영역 U+E000–F8FF — 폰에서 네모) · 대체 문자(U+FFFD — 이모지가 깨진 것) · 폭 0 공백·소프트 하이픈 · 제어 문자
+   · OCR 이 주소를 깨뜨린 괄호 `(//“\6401510.0ㅁ.<0)` — 역슬래시가 든 「/로 시작하는 괄호」만 걷는다(진짜 주소는 모르니 지어내지 않는다 · 원칙 8-1).
+   🔴 주소 칸(url·href·link·file·path·thumb·img·id)은 건드리지 않는다 — 주소의 & 기호는 decodeUrlEntities 한 곳의 몫이다.
+   🔴 지우기·기호 되돌리기만 한다(글자를 더하지 않는다). 관문 「깨진 글자 씻기」. */
+const JUNK_CHARS = /[\uE000-\uF8FF\uFFFD\u200B-\u200D\u2060\uFEFF\u00AD\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
+const OCR_URL_GARBLE = /\s*\(\s*\/[^()가-힣]*\\[^()]*\)/g;
+const TIDY_SKIP_KEY = /(?:url|href|link|file|path|thumb|img|image|hash|^id)$/i;
+function tidyText(s) {
+  return unent(s).replace(JUNK_CHARS, '').replace(OCR_URL_GARBLE, '').replace(/^[ \t]+/, '')
+    .replace(/[(（]\s*([월화수목금토일])\s*[)）]/g, '($1)');   // 「11. 17.(화 )」·「( 월 )」 — 요일 괄호 안 빈칸(가독성 · 2026-11-17)
+}
+function tidyData(v, key = '') {
+  if (typeof v === 'string') return TIDY_SKIP_KEY.test(key) ? v : tidyText(v);
+  if (Array.isArray(v)) { for (let i = 0; i < v.length; i += 1) v[i] = tidyData(v[i], key); return v; }
+  if (v && typeof v === 'object') { for (const k of Object.keys(v)) v[k] = tidyData(v[k], k); return v; }
+  return v;
 }
 /* 이미 저장된 기간 한 줄의 끝에 반쯤 잘린 기호(`16:00 &n`)가 남은 것 — 로봇은 이제 기호를 풀고 자르지만(collector/deadline-hint.mjs) 실린 글에 남아 있다(소급 · 관문이 같은 꼴을 대조) */
 const PARTIAL_ENTITY_END = /&(?:[a-z]{1,7}|#\d{0,6}|#x[0-9a-f]{0,5})?$/;
@@ -2793,7 +2812,7 @@ function loadNotices() {
   const files = (typeof noticeFilesForProfile === 'function' && p) ? noticeFilesForProfile(p) : [];
   const wanted = files.join(',');
   noticeFilesWanted = wanted;
-  const get = (u) => fetch(u, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  const get = (u) => fetch(u, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((d) => tidyData(d)).catch(() => null);   // 깨진 글자 씻기(2026-11-17)
   /* ⚠️ 색인은 학교별 파일과 **나란히** 부른다 — 먼저 받고 나서 부르면 공고가 있는 학생에게
      왕복이 한 번 더 늘어(모바일에서 눈에 보인다) 아낀 것보다 손해다. */
   const job = files.length
@@ -3100,6 +3119,7 @@ function loadRegistered() {
     fetch('data/card-read.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
   ])
     .then(([d, , cardRead]) => {
+      tidyData(d); tidyData(cardRead);   // 깨진 글자 씻기(2026-11-17) — 받는 순간 한 번
       if (!d) { if (appsData.registered !== 'ok') appsData.registered = 'fail'; return; }   // 한 번 받았으면 다시 받기 실패에도 'ok'(목록은 메모리에 그대로)
       appsData.registered = 'ok';
       registeredList = typeof applyCardRead === 'function' ? applyCardRead(d.items || [], cardRead) : (d.items || []);   // match-engine.js — 알림도 같은 함수로 얹는다
@@ -3117,6 +3137,7 @@ function loadKosaf() {
   return fetch('data/kosaf-open.json', { cache: 'no-store' })
     .then((r) => (r.ok ? r.json() : null))
     .then((d) => {
+      tidyData(d);   // 깨진 글자 씻기(2026-11-17)
       if (!d) { if (appsData.kosaf !== 'ok') appsData.kosaf = 'fail'; rerenderVisible(); return; }   // 다시 받기 실패에 받아 둔 목록을 비우지 않는다
       appsData.kosaf = 'ok';
       kosafList = d.items || [];
@@ -3523,6 +3544,7 @@ function loadActivities() {
     .then((r) => (r.ok ? r.json() : null))
     .catch(() => null)
     .then((d) => {
+      tidyData(d);   // 깨진 글자 씻기(2026-11-17)
       liveActivities = d || liveActivities || { items: [], updatedAt: null };
       refreshActivitySnaps();
       fillInterestFields();   // 온보딩 관심 분야 칸 — 목록이 이제 왔다(고른 것은 지킨다)
@@ -3885,6 +3907,7 @@ function loadExternal() {
     .then((r) => (r.ok ? r.json() : null))
     .catch(() => null)
     .then((d) => {
+      tidyData(d);   // 깨진 글자 씻기(2026-11-17)
       liveExternal = d || liveExternal || { items: [], updatedAt: null };
       rerenderVisible();
     });
@@ -3963,7 +3986,7 @@ function loadNews() {
   const files = (typeof newsFilesForProfile === 'function' && p) ? newsFilesForProfile(p) : [];
   const wanted = files.join(',');
   newsFilesWanted = wanted;
-  const get = (u) => fetch(u, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  const get = (u) => fetch(u, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((d) => tidyData(d)).catch(() => null);   // 깨진 글자 씻기(2026-11-17)
   /* 학교 대표 사진 목록 — 소식을 받을 때 한 번(작은 파일 · 실패하면 다음 받기 때 다시). 소식보다 늦게 와도 다시 그린다 */
   if (files.length && !schoolPhotos) get('assets/schools/photos.json').then((d) => { if (d && d.schools && !schoolPhotos) { schoolPhotos = d; if (liveNews) rerenderVisible(); } });
   const job = files.length
@@ -4730,7 +4753,8 @@ function noticeSummaryRows(lines) {
       .replace(/^[\s\-–—•\u25AA\u25AB\u25FD\u25FE\u25B6▷◆◇○●■□▣\u2605\u2666⇒‡◦∙❍◎￭·ㆍ*◌◍※]+/, '')   // \u25FD·\u25FE(작은 네모)도 글머리(성암육영회 서류 줄 · 2026-11-02 실화면 · 글자는 ui-tone 이 이모지로 세므로 코드에 안 적는다)   // 그림 기호는 \u 로 적는다(화면 말투 관문 ui-tone 이 이모지로 센다)
       /* 번호를 뗀다 — ⚠️ `10.22.(목)` 의 `10.` 은 번호가 아니라 날짜다(뒤에 날짜가 이어지면 안 뗀다 · 대외활동 실측) */
       .replace(/^\(?\s*\d{1,2}\s*\)\s*|^\d{1,2}\.(?!\s?\d{1,2}\s?[.(월])\s*|^[①-⑳]\s*|^[가-힣]\s*[.)]\s+/, '')
-      .replace(/^[(（][월화수목금토일][)）]\s*[-–]?\s*/, '')   // `12.(월) - 접수방법 :` — 앞 줄에서 떨어져 나온 날짜 꼬리(번호는 위에서 이미 뗐다)
+      .replace(/^[(（][월화수목금토일][)）]\s*[-–]?\s*/, '')
+      .replace(/^[Oo0](?=\s?[가-힣]{2,8}\s?[:：])\s?/, '')   // 「0모집기간:」·「O접수기간:」 — 글머리 ○ 가 영문 O·숫자 0 으로 읽혀 왔다(2026-11-17 실측 · 이름표 앞에서만)   // `12.(월) - 접수방법 :` — 앞 줄에서 떨어져 나온 날짜 꼬리(번호는 위에서 이미 뗐다)
       .replace(/\s+/g, ' ').trim();
     if (t.length < 4) continue;
     /* 이름표 — `신청기간 : …` · `(신청방법) …` · 앞 괄호가 잘린 `모집기간) …` 꼴. ⚠️ 시각(`09:00`)·주소(`https://`)의 콜론은 이름표가 아니다(리뷰 2026-10-15) */
@@ -4758,12 +4782,26 @@ function noticeSummaryRows(lines) {
   }
   return rows;
 }
+/* 글 속 주소 → 누를 수 있는 짧은 링크 (2026-11-17 개발자 지시 "가독성이 떨어지는 등 … 모두 수리") — 「온라인 접수https://www.k-startup.go.kr/web/contents/webPMSBizUnvs.do?returnUrl=…」
+   처럼 긴 주소가 글자째 떠서 줄이 읽히지 않았다. 주소는 원문 그대로 링크에 담고, 보이는 글자만 사이트 이름(「forms.gle ↗」)으로 줄인다(글자를 지어내지 않는다).
+   🔴 이 구간(NS_LABELS … sourceNoteHtml)은 관문·what-shows 가 떼어 돌린다 — 바깥 함수(safeUrl 등)에 기대지 말 것. http(s) 주소만 잡으므로 javascript: 는 들어오지 않는다 */
+const NS_URL = /https?:\/\/[^\s<>"'()\[\]{}]+/g;
+function nsBodyHtml(body) {
+  const s = String(body || ''); let out = '', last = 0;
+  for (const m of s.matchAll(NS_URL)) {
+    const u = m[0].replace(/[.,;:!?。]+$/, '');
+    let host = ''; try { host = new URL(u).hostname.replace(/^www\./, ''); } catch (e) { host = ''; }
+    out += esc(s.slice(last, m.index)) + (host ? ` <a href="${esc(u)}" target="_blank" rel="noopener">${esc(host)} ↗</a> ` : esc(u));
+    last = m.index + u.length;
+  }
+  return (out + esc(s.slice(last))).replace(/\s{2,}/g, ' ').trim();
+}
 /* 「공고 안내」 절 — 다섯 줄까지 펼치고 나머지는 「더 보기」 안에(승인 시안 2026-11-02 · 줄 규칙은 위 noticeSummaryRows 그대로) */
 const NS_SHOWN = 5;
 function noticeSummaryHtml(lines) {
   const rows = noticeSummaryRows(lines);
   if (!rows.length) return '';
-  const li = (r) => `<li>${r.label ? `<b class="ns-k">${esc(r.label)}</b>` : ''}${esc(r.body)}</li>`;
+  const li = (r) => `<li>${r.label ? `<b class="ns-k">${esc(r.label)}</b>` : ''}${nsBodyHtml(r.body)}</li>`;
   const head = rows.slice(0, NS_SHOWN), rest = rows.slice(NS_SHOWN);
   return `<h4>공고 안내</h4><ul class="doc-list notice-summary">${head.map(li).join('')}</ul>`
     + (rest.length ? `<details class="ns-more"><summary>더 보기</summary><ul class="doc-list notice-summary">${rest.map(li).join('')}</ul></details>` : '');
@@ -4786,7 +4824,7 @@ function sheetHeadHtml({ x, d, save }) {
 function applySectionHtml(sch, opts) {
   const act = (opts && opts.activity) || null;   // 활동 글의 서류는 그 글이 원문 「제출서류」 절에서 읽은 것(collector activityDocuments · 2026-10-30) — 없으면 서류 줄이 없다
   const from = fmtDay(sch.openDate), to = fmtDay(sch.deadline);
-  const rawPeriod = String(sch.period || '').replace(/^접수\s*/, '').replace(/\d{4}-(\d{2})-(\d{2})/g, '$1.$2').trim();   // ISO 날짜는 MM.DD 로(글자를 더하지 않고 줄인다) · 층2 「접수 ~…」 머리는 이름표와 겹친다
+  const rawPeriod = String(sch.period || '').replace(/^접수\s*(?:기간\s*[:：]?\s*)?/, '').replace(/\d{4}-(\d{2})-(\d{2})/g, '$1.$2').trim();   // ISO 날짜는 MM.DD 로(글자를 더하지 않고 줄인다) · 층2 「접수 ~…」·자동 등록 「접수 기간 ~…」 머리는 이름표와 겹친다(「기간 기간 ~09.21」 · 2026-11-17)
   const period = (from && to) ? `${from} ~ ${to}`
     : (/\d/.test(rawPeriod) && !providerUnknown(rawPeriod)) ? rawPeriod
     : to ? `~ ${to}`
@@ -4800,7 +4838,7 @@ function applySectionHtml(sch, opts) {
     : sch.sourceKind === 'kosaf' ? '재단 선발 공고문·홈페이지가 정한 접수 방법'
     : '';
   const docs = (act ? act.documents || [] : sch.documents || []).filter((doc) => !DOC_PLACEHOLDER.test(doc));
-  const row = (k, v) => `<li><b class="ns-k">${k}</b>${esc(v)}</li>`;
+  const row = (k, v) => `<li><b class="ns-k">${k}</b>${nsBodyHtml(v)}</li>`;
   const docText = docs.map((d) => String(d).replace(/^[\s\-–—•\u25AA\u25AB\u25FD\u25FE■□▣○●◆◇·ㆍ*]+/, '').trim()).filter(Boolean).join(' · ');   // 원문 글머리 기호(■·○)는 뗀다 — 점으로 잇는 한 줄이라 기호가 두 겹(실화면 2026-11-02)
   const methodRow = paidApply.length ? `<li><b class="ns-k">방법</b>${paidApply.map(esc).join('<br>')}</li>` : (method ? row('방법', method) : '');
   const rows = `${period ? row('기간', period) : ''}${methodRow}${docText ? row('서류', docText) : ''}`;
@@ -4822,7 +4860,8 @@ function sheetSectionsHtml({ sch, result, fit, fd, activity = null, noticeLines 
   /* ④ 첨부 — 본문 사진(bodyImage)은 첨부가 아니다 · 층2 첨부는 재단이 올린 선발 공고문이라 꼬리표로 말한다(신청서 양식이라 부르지 않는다) */
   /* 활동 글은 신청 준비 화면이 없어(접수는 주최 사이트) 로봇이 바꿔 둔 신청서 원본 PDF 줄(+ 「양식 채우기」 자리)을 첨부 맨 위에 둔다 — 장학과 같은 줄 꼴 formPdfRowsHtml · 열쇠는 글 id(2026-10-30 공동개발자 "공모전 신청 양식이 매우 미흡") */
   const pdfRows = activity && activity.id ? formPdfRowsHtml(activity) : '';
-  const atts = ((activity ? activity.attachments : sch.attachments) || []).filter((a) => a && !a.bodyImage);
+  const attSeen = new Set();   // 같은 파일이 두 번 실린 글(「1. 2026 절주서포터즈 모집 안내.pdf」 두 줄 · 2026-11-17 실측) — 이름+주소가 같으면 한 번만
+  const atts = ((activity ? activity.attachments : sch.attachments) || []).filter((a) => a && !a.bodyImage).filter((a) => { const k = `${String(a.name || '').trim()}|${a.url || ''}`; if (attSeen.has(k)) return false; attSeen.add(k); return true; });
   const att = atts.length ? `<h4>첨부${sch.sourceKind === 'kosaf' ? ' <span class="channel-tag">재단 선발 공고문</span>' : ''}</h4><ul class="doc-list">${pdfRows}${atts.map((a) => `<li class="att">${attachmentLinkHtml(a, 'color:var(--primary)')}${a.bytes ? ` <span class="doc-legend">${Math.max(1, Math.round(a.bytes / 1024))}KB</span>` : ''}</li>`).join('')}</ul>`  : (pdfRows ? `<h4>첨부</h4><ul class="doc-list">${pdfRows}</ul>` : '');
   /* ⑤ 원문 — 이름·안내는 source-link.js 한 곳(sourceLinkHtml · sourceLinkHintHtml) · 층2 문의 */
   const link = activity ? sourceLink(activity, 'activity') : sourceLink(sch, 'detail');

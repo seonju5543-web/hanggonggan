@@ -15,6 +15,7 @@
 import fs from 'node:fs';
 import { extractDocuments, isDocPlaceholder } from './extract-excerpts.mjs';
 import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
+import { DOC_JUNK } from './doc-list.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const REG = new URL('../data/registered.json', HERE);
@@ -44,19 +45,40 @@ export function fillDocuments(items, idx, today = TODAY) {
   return { filled, lines };
 }
 
+/** 이미 실린 서류 칸에서 서류가 아닌 줄(사이트 맨 아래 줄·안내문·유의사항 — doc-list.mjs DOC_JUNK 한 곳)을 걷는다 (2026-11-17 · 원칙 7 소급).
+    관리자가 손댄 칸(documentsFrom '관리자')은 건드리지 않는다. 다 걸러져 비면 자동 등록의 자리표시로 되돌린다 — 위 fillDocuments 가 같은 실행에서 새 규칙으로 다시 읽는다.
+    순수 함수 — 바뀐 항목 수와 리포트 줄을 돌려준다 */
+export const DOC_PLACEHOLDER_LINE = '지원 자격·제출 서류는 원문 공고에서 확인';
+export function scrubDocuments(items) {
+  let scrubbed = 0; const lines = [];
+  for (const it of items) {
+    if (/^관리자/.test(it.documentsFrom || '') || !Array.isArray(it.documents)) continue;
+    const kept = it.documents.filter((d) => !DOC_JUNK.test(String(d)));
+    if (kept.length === it.documents.length) continue;
+    const dropped = it.documents.filter((d) => DOC_JUNK.test(String(d)));
+    it.documents = kept.length ? kept : [DOC_PLACEHOLDER_LINE];
+    if (!kept.length) delete it.documentsFrom;
+    scrubbed += 1;
+    lines.push(`- 🧹 \`${it.id}\` ${(it.name || '').slice(0, 40)} — 서류가 아닌 줄 ${dropped.length}개 걷음: ${dropped.slice(0, 2).map((d) => String(d).trim().slice(0, 30)).join(' · ')}`);
+  }
+  return { scrubbed, lines };
+}
+
 /* ── 본편 — DOCS_FILL_AS_LIB 가 있으면 함수만(관문이 불러 쓴다 · activity-docs 와 같은 관례) ── */
 if (!process.env.DOCS_FILL_AS_LIB) {
   const reg = readJson(REG, null);
   if (!reg || !Array.isArray(reg.items)) { console.log('docs-fill: data/registered.json 없음 — 건너뜀'); process.exit(0); }
   const idx = indexTexts(readJson(new URL('extracted/notices-text.json', HERE), []), readJson(new URL('extracted/browser-bodies.json', HERE), {}));
+  const scrub = scrubDocuments(reg.items);   // 먼저 걷고(비면 자리표시로) → 같은 실행에서 새 규칙으로 다시 채운다
   const { filled, lines } = fillDocuments(reg.items, idx);
-  if (filled && WRITE) {
+  lines.unshift(...scrub.lines);
+  if ((filled || scrub.scrubbed) && WRITE) {
     reg.updatedAt = TODAY;
     fs.writeFileSync(REG, JSON.stringify(reg, null, 1) + '\n');
   }
   const left = reg.items.filter(needsDocs).length;
-  const head = `\n### 📄 제출 서류 채우기 (원문 「제출서류」 절) — ${filled}건 · 아직 자리표시뿐 ${left}건`;
-  const body = filled ? lines : ['- 이번 실행에서 원문에서 읽은 서류가 없었어요.'];
+  const head = `\n### 📄 제출 서류 채우기 (원문 「제출서류」 절) — ${filled}건 · 서류 아닌 줄 걷음 ${scrub.scrubbed}건 · 아직 자리표시뿐 ${left}건`;
+  const body = lines.length ? lines : ['- 이번 실행에서 원문에서 읽은 서류가 없었어요.'];
   if (WRITE && fs.existsSync(REPORT)) fs.appendFileSync(REPORT, ['', head, '원문 본문의 `제출서류·구비서류` 절 아래 서류 이름 줄만 담았어요(설명 문장·곁말·제출 방법은 뺌). 원문이 없거나 절이 없는 글은 그대로 둡니다.', ...body].join('\n') + '\n');
-  console.log(`docs-fill: ${filled} filled · ${left} left` + (WRITE ? '' : ' (dry)'));
+  console.log(`docs-fill: ${filled} filled · ${scrub.scrubbed} scrubbed · ${left} left` + (WRITE ? "" : " (dry)"));
 }

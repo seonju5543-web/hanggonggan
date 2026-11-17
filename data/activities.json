@@ -511,10 +511,6 @@
     "신청대상 : ㅇ 창업, 투자, 스타트업에 관심 있으신 분"
    ],
    "detailsV": 7,
-   "documents": [
-    "제출하신 서류는 사업운영기관에서 관리되오니 서류 반환 등 문의는 해당 기관으로 하시기 바랍니다.",
-    "별도 심사 없이 구글폼 통한 사전 신청 수"
-   ],
    "excerptsAt": "2026-11-16",
    "school": "",
    "campus": "",
@@ -563,9 +559,7 @@
     "최근 3개년 표준 재무제표 (2023~2025년, 표준 재무제표증명 포함)",
     "부가세 과세표준 확인원 (2026년 매출액 확인용) (예비창업자 제외)",
     "서울대학교 대학(원) 재학 및 졸업",
-    "수료 증명서",
-    "제출하신 서류는 사업운영기관에서 관리되오니 서류 반환 등 문의는 해당 기관으로 하시기 바랍니다.",
-    "주요 심사기준에 따른 서류심사"
+    "수료 증명서"
    ],
    "field": "교육·캠프",
    "excerptsAt": "2026-11-16",
@@ -597,9 +591,6 @@
     "- 시제품 제작 및 제조 기술 역량 강화를 희망하는 (예비)창업자 및 대학(원)생, 일반인 등"
    ],
    "detailsV": 7,
-   "documents": [
-    "제출하신 서류는 사업운영기관에서 관리되오니 서류 반환 등 문의는 해당 기관으로 하시기 바랍니다."
-   ],
    "excerptsAt": "2026-11-16",
    "school": "",
    "campus": "",
@@ -670,7 +661,9 @@
     "세대교류(어르신-청년)"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7
+   "docsV": 7,
+   "deadline": "2026-03-27",
+   "deadlineFrom": "공고 안내 · 신청기간:2026.03.16.(월)~03.27.(금)"
   },
   {
    "title": "2026 신촌글로벌대학문화축제 대학생 중앙기획단 모집",
@@ -704,7 +697,9 @@
     "본 축제에 관심 있는 대학생"
    ],
    "eligibilityFrom": "공고문 첨부",
-   "docsV": 7
+   "docsV": 7,
+   "deadline": "2026-04-10",
+   "deadlineFrom": "공고 안내 · ■ 접수기간 : 2026. 3. 16(월) ~ 2026. 4. 10(금)"
   },
   {
    "title": "2026년 제주-유네스코 청년 연수 프로그램",
@@ -762,9 +757,6 @@
    ],
    "deadlineHint": null,
    "detailsV": 7,
-   "documents": [
-    "01811 서울시 노원구 공릉로 232 서울과학기술대학교 | TEL. (02) 970.6114"
-   ],
    "field": "서포터즈·기자단",
    "excerptsAt": "2026-11-16",
    "school": "서울과학기술대학교",
@@ -780,7 +772,9 @@
     "모집 대상 : 전국 소재 대학생 대상 총 30팀(팀당 5명 이상,10명 이하로 구성)"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7
+   "docsV": 7,
+   "deadline": "2026-03-31",
+   "deadlineFrom": "공고 안내 · O(모집기간) 2026년 3월 9일(월)~3월 31일(화) 24:00까지(자정마감)"
   },
   {
    "title": "[아동권리보장원] 제5기 서포터즈 모집",
@@ -804,8 +798,7 @@
    "detailsV": 7,
    "documents": [
     "[제출서류2] 아동권리보장원 제5기 서포터스 개인정보 수집",
-    "이용 동의서.hwp",
-    "01811 서울시 노원구 공릉로 232 서울과학기술대학교 | TEL. (02) 970.6114"
+    "이용 동의서.hwp"
    ],
    "field": "서포터즈·기자단",
    "excerptsAt": "2026-11-16",
@@ -825,7 +818,9 @@
     "-개인(1인) 지원자는 선발 후 3인 이내 팀으로 구성하여 활동 예정"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7
+   "docsV": 7,
+   "deadline": "2026-03-25",
+   "deadlineFrom": "공고 안내 · 모집 기간: 2026.3.9.(월) ~3.25.(수)"
   },
   {
    "title": "[강릉시] 2026년 제18회 강릉관광기념품 공모전 안내",
@@ -1079,7 +1074,9 @@
     "❍ 접수자격: 전 국민 누구나(개인 및 팀별)"
    ],
    "eligibilityFrom": "공고문 첨부",
-   "docsV": 7
+   "docsV": 7,
+   "deadline": "2026-11-16",
+   "deadlineFrom": "공고 안내 · ❍ 접수기간: 2026. 10. 1.(목) ~ 11. 16.(월) 18:00"
   },
   {
    "title": "[국립중앙과학관] 2026년 전국과학경진대회 설명회 개최 안내",
@@ -1495,59 +1492,6 @@
    "id": "act-01i9iib"
   },
   {
-   "title": "2025학년도 글로벌리더십 프로그램 운영 및 참가학생 모집",
-   "url": "https://kau.ac.kr/kaulife/event.php?code=s1401&page=3&mode=read&seq=9287",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": "제출기한/방법 : 2025. 9. 12(금) 까지/메일제출(basec@kau.ac.kr) ※ 결과보고서 서식 : 지정 서식 라. 모든 일정에 참",
-   "deadline": "2025-06-22",
-   "excerpts": [
-    {
-     "label": "대상",
-     "text": "본교 학부 재학생 전체(전공 및 학년 무관)"
-    },
-    {
-     "label": "모집인원",
-     "text": "12명 내외"
-    }
-   ],
-   "eligibilityLines": [
-    "참가대상 및 모집 인원",
-    "가. 참가대상 : 본교 학부 재학생 전체(전공 및 학년 무관)",
-    "※ 단, 2025-2학기 기준 휴학 및 초과학기생은 지원 불가"
-   ],
-   "noticeLines": [
-    "수강신청 기간: 11. 10.(화) 10:00 ~ 11. 11.(수) 17:00"
-   ],
-   "detailsV": 7,
-   "documents": [
-    "지원서(지정서식)"
-   ],
-   "field": "해외·교류",
-   "excerptsAt": "2026-11-16",
-   "school": "한국항공대학교",
-   "campus": "",
-   "foundAt": "2026-11-16",
-   "id": "act-1bekwsr"
-  },
-  {
-   "title": "2025학년도 1학기 KAU 해외봉사 선발자 공고",
-   "url": "https://kau.ac.kr/kaulife/event.php?code=s1401&page=3&mode=read&seq=9242",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": null,
-   "noticeLines": [
-    "수강신청 기간: 11. 10.(화) 10:00 ~ 11. 11.(수) 17:00"
-   ],
-   "detailsV": 7,
-   "field": "봉사",
-   "excerptsAt": "2026-11-16",
-   "school": "한국항공대학교",
-   "campus": "",
-   "foundAt": "2026-11-16",
-   "id": "act-061vig0"
-  },
-  {
    "title": "[충북대창업보육센터(BI)]_「CBCN 2026 모두의 IR 경진대회」 참가기업 모집",
    "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=819&bbsNo=8&nttNo=171652&pageUnit=10&searchCtgry=%eb%aa%a8%ec%a7%91%2f%ea%b3%b5%eb%aa%a8&searchCnd=all&pageIndex=1",
    "kind": "공모전",
@@ -1820,20 +1764,6 @@
    "docsV": 7
   },
   {
-   "title": "2026-1학기 항공·경영대학장배 모의주식투자대회 특강 안내",
-   "url": "https://kau.ac.kr/kaulife/event.php?code=s1401&page=2&mode=read&seq=10416",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": null,
-   "detailsV": 7,
-   "field": "교육·캠프",
-   "excerptsAt": "2026-11-16",
-   "school": "한국항공대학교",
-   "campus": "",
-   "foundAt": "2026-11-16",
-   "id": "act-1inyt8f"
-  },
-  {
    "title": "[필독] 2026년 Airbus 101 공모전 참가팀 모집 연장 안내",
    "url": "https://kau.ac.kr/kaulife/event.php?code=s1401&page=2&mode=read&seq=10392",
    "kind": "공모전",
@@ -1994,70 +1924,6 @@
    "id": "act-0ssdyai"
   },
   {
-   "title": "[항공드론] 2025년 동계학기 항공·드론 무료 특강(Altium Designer, BARAM)",
-   "url": "https://kau.ac.kr/kaulife/event.php?code=s1401&page=2&mode=read&seq=9987",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "1차 특강 강의계획서.pdf",
-     "url": "https://kau.ac.kr/upfile/2025/12/12/20251212132629-5930.pdf"
-    },
-    {
-     "name": "2차 특강 강의계획서.pdf",
-     "url": "https://kau.ac.kr/upfile/2025/12/15/20251215150710-2573.pdf"
-    }
-   ],
-   "deadlineHint": null,
-   "detailsV": 7,
-   "field": "교육·캠프",
-   "excerptsAt": "2026-11-16",
-   "school": "한국항공대학교",
-   "campus": "",
-   "foundAt": "2026-11-16",
-   "id": "act-0ab5m66"
-  },
-  {
-   "title": "2025 KAU 리빙랩 아이디어 공모전 입상자 발표",
-   "url": "https://kau.ac.kr/kaulife/event.php?code=s1401&page=2&mode=read&seq=9959",
-   "kind": "공모전",
-   "attachments": [],
-   "deadlineHint": null,
-   "detailsV": 7,
-   "field": "기획·아이디어",
-   "excerptsAt": "2026-11-16",
-   "school": "한국항공대학교",
-   "campus": "",
-   "foundAt": "2026-11-16",
-   "id": "act-198i4vh"
-  },
-  {
-   "title": "2025학년도 포트폴리오 경진대회 개최 안내",
-   "url": "https://kau.ac.kr/kaulife/event.php?code=s1401&page=2&mode=read&seq=9877",
-   "kind": "공모전",
-   "attachments": [
-    {
-     "name": "포트폴리오 경진대회 참가 신청서.xlsx",
-     "url": "https://kau.ac.kr/upfile/2025/11/14/20251114160611-1452.xlsx"
-    }
-   ],
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "대상",
-     "text": "항공 ‧ 경영대학 3 학년 이상 재학생"
-    }
-   ],
-   "eligibilityLines": [
-    "참가 대상 : 항공 ‧ 경영대학 3 학년 이상 재학생"
-   ],
-   "detailsV": 7,
-   "excerptsAt": "2026-11-16",
-   "school": "한국항공대학교",
-   "campus": "",
-   "foundAt": "2026-11-16",
-   "id": "act-1f6qfdm"
-  },
-  {
    "title": "[기간연장 및 개인별 신청 가능]미래 항공·물류 산업 트렌드 탐방(전공 산업 박람회 체험) 참가팀 모집 공고",
    "url": "https://kau.ac.kr/kaulife/event.php?code=s1401&page=2&mode=read&seq=9770",
    "kind": "대외활동",
@@ -2111,20 +1977,6 @@
    "campus": "",
    "foundAt": "2026-11-16",
    "id": "act-1negq8o"
-  },
-  {
-   "title": "2025-2학기 항공·경영대학장배 모의주식투자대회 특강 진행 안내",
-   "url": "https://kau.ac.kr/kaulife/event.php?code=s1401&page=3&mode=read&seq=9718",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": null,
-   "detailsV": 7,
-   "field": "교육·캠프",
-   "excerptsAt": "2026-11-16",
-   "school": "한국항공대학교",
-   "campus": "",
-   "foundAt": "2026-11-16",
-   "id": "act-0nlmj9c"
   },
   {
    "title": "[구로노인종합복지관] 노인일자리 어르신 성과보고회 자원봉사자 모집",
@@ -2337,7 +2189,9 @@
     "나들이,플로깅,체육활동을 하며"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7
+   "docsV": 7,
+   "deadline": "2026-04-06",
+   "deadlineFrom": "공고 안내 · 신청기간 : 2026년 4월 6일(월)까지"
   },
   {
    "title": "[2026 모두의 창업] 리부트(Reboot) 캠프 참여자 모집 안내",
@@ -2749,7 +2603,9 @@
     "신청서제출기한"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7
+   "docsV": 7,
+   "deadline": "2026-09-15",
+   "deadlineFrom": "공고 안내 · 제출기한:2026.09.15.(화)18시까지"
   },
   {
    "title": "[대외협력사업팀] 농협중앙회 × 한국대학사회봉사협의회 대학생 농촌 봉사활동 '농심천심'",
@@ -2858,26 +2714,6 @@
    "docsV": 7
   },
   {
-   "title": "[해외1팀] 2025-2027 KOICA-청년중기봉사단(아프리카,중남미) 2차 파견단원 최종합격 및 국내교육…",
-   "url": "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=969&page=2",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "KOICA-청년중기봉사단아프리카, 중남미 2차 파견 단원선발 최종합격 및 국내교육 대상자 안내문.pdf",
-     "url": "javascript:file_down_each('https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_gKedWOt0_6db06d31ec5e62ff333c38d2c435a60aac60a586.pdf', 'KOICA-청년중기봉사단아프리카, 중남미 2차 파견 단원선발 최종합격 및 국내교육 대상자 안내문.pdf')"
-    }
-   ],
-   "deadlineHint": null,
-   "detailsV": 7,
-   "field": "봉사",
-   "excerptsAt": "2026-11-15",
-   "school": "",
-   "campus": "",
-   "host": "한국대학사회봉사협의회",
-   "foundAt": "2026-11-15",
-   "id": "act-1q41lc7"
-  },
-  {
    "title": "[코이카]WFK 해외봉사단 영상/사진 공모전 : 내 인생의 한 페이지",
    "url": "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=960&page=3",
    "kind": "공모전",
@@ -2946,21 +2782,6 @@
    "host": "한국대학사회봉사협의회",
    "foundAt": "2026-11-15",
    "id": "act-1rs8nzy"
-  },
-  {
-   "title": "농심천심 대학생 봉사단 사업 12개교 선정",
-   "url": "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=956&page=3",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": null,
-   "detailsV": 7,
-   "field": "봉사",
-   "excerptsAt": "2026-11-15",
-   "school": "",
-   "campus": "",
-   "host": "한국대학사회봉사협의회",
-   "foundAt": "2026-11-15",
-   "id": "act-1s289ox"
   },
   {
    "title": "[해외2팀] 2026년 WFK 청년봉사단 귀국단원 온기나눔 네트워킹 활동 모집 공고(~4.24(금) 17:0…",
@@ -3078,43 +2899,6 @@
    "id": "act-1sm7h2v"
   },
   {
-   "title": "[해외2팀] 2026년 하계 대학 자체개발 해외봉사 프로그램 공모",
-   "url": "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=945&page=3",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "1. 2026년 하계 대학자체개발 해외봉사 프로그램 공모 안내문.pdf",
-     "url": "javascript:file_down_each('https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_VpytuXaA_b005b5ee6a43d0cd2ef81ee0933b537de3fdd9ec.pdf', '1. 2026년 하계 대학자체개발 해외봉사 프로그램 공모 안내문.pdf')"
-    },
-    {
-     "name": "2. 2026년 하계 대학자체개발 해외봉사 프로그램 제안서 양식.hwp",
-     "url": "javascript:file_down_each('https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_LlQMjGr0_6924973d7c763b7ca6bce133219ef8b23511ef0d.hwp', '2. 2026년 하계 대학자체개발 해외봉사 프로그램 제안서 양식.hwp')"
-    },
-    {
-     "name": "3. 프로그램 전담인력 이력서 양식.hwp",
-     "url": "javascript:file_down_each('https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_5LeuBz74_bba2f92b87c52d6bde06ab815f2821177b2d31af.hwp', '3. 프로그램 전담인력 이력서 양식.hwp')"
-    },
-    {
-     "name": "4. 전담인력 개인정보이용동의서.hwp",
-     "url": "javascript:file_down_each('https://kr.object.ncloudstorage.com/dpunch/punch20_kucss/bbs/notice/3666883827_2ldFtewu_f45270cd2a4ed90e095b0a760b208153de4574d2.hwp', '4. 전담인력 개인정보이용동의서.hwp')"
-    }
-   ],
-   "deadlineHint": null,
-   "detailsV": 7,
-   "field": "봉사",
-   "excerptsAt": "2026-11-15",
-   "school": "",
-   "campus": "",
-   "host": "한국대학사회봉사협의회",
-   "foundAt": "2026-11-15",
-   "id": "act-1sc4pvx",
-   "eligibilityLines": [
-    "모집대상 : 모집기간 : 모집유형"
-   ],
-   "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7
-  },
-  {
    "title": "[해외2팀]2026년 WFK 청년봉사단 전문기관 프로그램 공모(정정_국가 변경)",
    "url": "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=944&page=3",
    "kind": "대외활동",
@@ -3142,21 +2926,6 @@
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
    "docsV": 7
-  },
-  {
-   "title": "[해외2팀] 2025년 대학 자체개발 해외봉사 프로그램 성과공유회 개최",
-   "url": "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=943&page=3",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": null,
-   "detailsV": 7,
-   "field": "봉사",
-   "excerptsAt": "2026-11-15",
-   "school": "",
-   "campus": "",
-   "host": "한국대학사회봉사협의회",
-   "foundAt": "2026-11-15",
-   "id": "act-1qo73q3"
   },
   {
    "title": "「숙명사랑 김장나눔봉사」 참여자 모집",
@@ -3465,7 +3234,9 @@
     "※팀 구성하여 참여 가능하나 팀대표 포함 4명 이내,1팀당 1건 접수 가능"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7
+   "docsV": 7,
+   "deadline": "2026-10-30",
+   "deadlineFrom": "공고 안내 · 0모집기간:2026.9.21.(월)09:00~ 10.30.(금) 18:00"
   },
   {
    "title": "[노원구청] 노원맑음돌봄단 참여자 모집 안내",
@@ -3521,7 +3292,9 @@
     "공모대상 : AI 영상/ AI 이미지"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7
+   "docsV": 7,
+   "deadline": "2026-09-16",
+   "deadlineFrom": "공고 안내 · -접수기간: 2026.8.5.(수)09:30~9.16.(수)18:00까지"
   },
   {
    "title": "[재단법인 한국청년기업가정신재단] 2026 한난 온랩(On-Lab) 참가팀 모집 안내",
@@ -3560,7 +3333,9 @@
     "참가대상 : 미래기술(AX, GX 등), 친환경, 에너지 등 분야 사업화에"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7
+   "docsV": 7,
+   "deadline": "2026-08-03",
+   "deadlineFrom": "공고 안내 · 모집기간:2026년 7월 1일(수) 10시~8월 3일(월) 17시까지"
   },
   {
    "title": "[시립인터넷중독예방상담센터] 청소년 디지털 윤리의식 On&On 인스타툰/숏폼 공모전 신청 안내",
@@ -3602,8 +3377,7 @@
    "eligibilityLines": [
     "참가 자격 : ·대한민국 청년(1992.1.1~2007.12.31 출생자)",
     "·개인 또는 팀으로 참가(팀당 최대 인원수 3명)",
-    "·①~⑤ 주제 중 선택하여 참여 가능",
-    "청년들이 만드는"
+    "·①~⑤ 주제 중 선택하여 참여 가능"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
    "docsV": 7
@@ -3630,12 +3404,14 @@
    ],
    "noticeFrom": "공고문 첨부(OCR)",
    "eligibilityLines": [
-    "공모자격 : 공모자격 : 대학생으로 구성된 팀(5인 이내)",
+    "공모자격 : 대학생으로 구성된 팀(5인 이내)",
     "공모자격 : 초·중고재학생또는동일연령청소년",
     "공모자격 : ·청소년금융창작물"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7
+   "docsV": 7,
+   "deadline": "2026-09-02",
+   "deadlineFrom": "공고 안내 · 접수 기간: 2026.6.17.(수)~9.2.(수)17시까지"
   },
   {
    "title": "[사단법인 한일문화산업교류협회] 한일축제한마당 2026 숏폼 영상 공모전 개최 안내",
@@ -3724,7 +3500,9 @@
     "참가자격 : 대한민국 국민 누구나"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7
+   "docsV": 7,
+   "deadline": "2026-08-31",
+   "deadlineFrom": "공고 안내 · 신청방법 : 기간 2026.7.6 (월)~8.31 (월)"
   },
   {
    "title": "[국립조선왕조실록박물관] 2026 국립조선왕조실록박물관 청년 국제 교류프로그램 참가자 모집",
@@ -3762,7 +3540,9 @@
     "대학 부설 어학당 재학생"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7
+   "docsV": 7,
+   "deadline": "2026-07-26",
+   "deadlineFrom": "공고 안내 · •접수기간:2026년 7월 6일(월)~7월 26일(일)"
   },
   {
    "title": "[외교부] 국립외교원 국민외교아카데미 제9기 대학생 외교 연수 과정 참가자 모집",
@@ -3839,7 +3619,9 @@
     "* 교육 효과, 교외 캠프 활동 등을고려하여 고학년 우선선발 권장"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7
+   "docsV": 7,
+   "deadline": "2026-05-15",
+   "deadlineFrom": "공고 안내 · 모집 기간:'26. 5. 1.(금)~15.(금)까지"
   },
   {
    "title": "2026년 서울 동아리ON(대학생 동아리 지원) 참여 동아리 모집",
@@ -3867,9 +3649,7 @@
    "detailsV": 7,
    "documents": [
     "동아리 모집 홍보 포스터(2026 서울 동아리ON).png",
-    "동아리 모집 홍보 카드뉴스(2026 서울 동아리ON).zip",
-    "「 내 안전 지키는 안심헬프미」신청 안내",
-    "01811 서울시 노원구 공릉로 232 서울과학기술대학교 | TEL. (02) 970.6114"
+    "동아리 모집 홍보 카드뉴스(2026 서울 동아리ON).zip"
    ],
    "excerptsAt": "2026-11-15",
    "school": "서울과학기술대학교",
@@ -3897,7 +3677,9 @@
     "O활동장소:서울시 내"
    ],
    "eligibilityFrom": "공고문 첨부(OCR)",
-   "docsV": 7
+   "docsV": 7,
+   "deadline": "2026-04-28",
+   "deadlineFrom": "공고 안내 · o신청기간: 2026.4.8.(수)~4.28.(화)18:00[21일 간]"
   },
   {
    "title": "[인공지능혁신융합대학사업단] 2026 AICOSS 11월 전문가 특강 안내 사전신청안내",

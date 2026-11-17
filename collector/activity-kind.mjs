@@ -44,9 +44,23 @@ export const UNREADABLE_SOURCE = /^https?:\/\/(?:[^/]+\.)?(?:instagram\.com|face
 /* 정책브리핑의 **정책 뉴스** 글(news/policyNewsView — 「단풍철 국립공원 안전산행 비법」)은 이벤트·공모 목록에 섞여 오지만 모집 글이 아니다(2026-10-19) */
 export const NEWS_URL = /^https?:\/\/(?:www\.)?korea\.kr\/news\/policyNewsView\.do/i;
 export const unreadableSource = (url) => UNREADABLE_SOURCE.test(String(url || '')) || NEWS_URL.test(String(url || ''));
+/* 지난 일을 알리는 글 둘째 묶음 (2026-11-17 개발자 지시 "대외활동 … 이상한 내용") — 실측: 「2025 KAU 리빙랩 아이디어 공모전 입상자 발표」·
+   「… 2차 파견단원 최종합격 및 국내교육…」·「농심천심 대학생 봉사단 사업 12개교 선정」·「… 해외봉사 프로그램 성과공유회 개최」 */
+const NOT_MORE = /입상\s*(?:작|자)|최종\s*합격|성과\s*공유회|\d+\s*개\s*(?:교|팀|기관|대학)\s*선정\s*$/;
+/* 학기·계절이 붙은 해 — 끝난 학기의 글(「2025-2학기 … 특강」·「2025년 동계학기 … 특강」·「2025학년도 포트폴리오 경진대회」)은 그 학기가 끝난 날로 잰다.
+   2학기·동계·학년도는 이듬해 2월 말, 1학기·하계는 그해 8월 말. 제목의 **모든** 해가 끝났을 때만 지난 글이다(「2025-2027 KOICA」처럼 앞날이 섞이면 아니다) */
+function termEnded(t, now) {
+  const terms = [...t.matchAll(/(20\d{2})\s*(?:-\s*([12])\s*학기|년?\s*(동계|하계|겨울|여름)|학년도)/g)];
+  if (!terms.length) return false;
+  const years = [...t.matchAll(/20\d{2}/g)].map((m) => Number(m[0]));
+  const ends = terms.map((m) => { const y = Number(m[1]); const first = m[2] === '1' || /하계|여름/.test(m[3] || ''); return first ? new Date(y, 8, 1) : new Date(y + 1, 2, 1); });
+  const latestTermEnd = Math.max(...ends.map((d) => d.getTime()));
+  return latestTermEnd < now.getTime() && Math.max(...years) <= Math.max(...terms.map((m) => Number(m[1])));
+}
 export function notActivity(title, now = new Date()) {
   const t = String(title || '');
-  if (NOT.test(t)) return true;
+  if (NOT.test(t) || NOT_MORE.test(t)) return true;
+  if (termEnded(t, now)) return true;
   const ys = [...t.matchAll(/(20\d{2})\s*(?:년|학년도)/g)].map((m) => Number(m[1]));
   return ys.length > 0 && Math.max(...ys) < now.getFullYear() - 1;   // 제목의 해가 모두 재작년 이전 — 지난 행사 글
 }
