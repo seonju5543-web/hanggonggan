@@ -23,7 +23,7 @@
 import fs from 'node:fs';
 import { chromium } from 'playwright';
 import { createRequire } from 'node:module';
-import { looseCandidate, findMissing, classifyMiss, coverageOf, fingerprint, dedupeNear, coverageSets } from './coverage-rules.mjs';
+import { looseCandidate, findMissing, classifyMiss, coverageOf, fingerprint, dedupeNear, coverageSets, rollingCoverage } from './coverage-rules.mjs';
 import { readSchoolFiles } from './publish-notices.mjs';
 import { makeBudget, withDeadline, TIMED_OUT, rotateOrder, nextCursor } from './harvest-budget.mjs';
 import { pageCandidates, samePage } from './paginate.mjs';
@@ -206,7 +206,14 @@ L.push(`- 감사한 학교: **${ok.length}곳** · 게시판을 못 읽은 곳 $
 const totalBoard = ok.reduce((a, r) => a + r.boardCount, 0);
 const totalMiss = ok.reduce((a, r) => a + r.missing, 0);
 L.push(`- 게시판에서 본 장학 후보 **${totalBoard}건** · 우리 데이터에 없는 것 **${totalMiss}건**`);
-if (totalBoard) L.push(`- 전체 인식 비율 **${Math.round(((totalBoard - totalMiss) / totalBoard) * 100)}%**`);
+if (totalBoard) L.push(`- 전체 인식 비율 **${Math.round(((totalBoard - totalMiss) / totalBoard) * 100)}%** (이번에 본 학교만)`);
+/* 최근 감사를 합친 비율 — 이번 결과를 이력에 얹어 계산(이력 저장은 아래 · 같은 날 다시 돌면 오늘 칸을 덮는다) */
+const histPath = new URL('coverage-history.json', HERE);
+let hist = {};
+try { hist = JSON.parse(fs.readFileSync(histPath, 'utf8')); } catch { /* 첫 실행 */ }
+const bySchoolCounts = Object.fromEntries(ok.map((r) => [r.school, [r.boardCount, r.missing]]));
+const roll = rollingCoverage({ ...hist, [today.slice(0, 10)]: { bySchoolCounts } });
+if (roll && roll.schools > ok.length) L.push(`- 최근 ${roll.runs}번 감사를 합친 비율(${roll.from}~ · 학교 ${roll.schools}곳의 가장 최근 결과): **${roll.coverage}%** · 후보 ${roll.board} · 누락 ${roll.missing}`);
 L.push('');
 L.push('### 누락 원인별 (많은 순)');
 Object.entries(causeTotal).sort((a, b) => b[1] - a[1]).forEach(([c, n]) => {
@@ -250,13 +257,11 @@ L.push('이 로봇은 **아무 데이터도 고치지 않습니다** — 자기 
 fs.writeFileSync(new URL('coverage-report.md', HERE), L.join('\n'));
 
 /* 비율 이력 — 오늘 숫자만으로는 '나아지고 있나'를 알 수 없다 */
-const histPath = new URL('coverage-history.json', HERE);
-let hist = {};
-try { hist = JSON.parse(fs.readFileSync(histPath, 'utf8')); } catch { /* 첫 실행 */ }
 hist[today.slice(0, 10)] = {
   schools: ok.length, boardCount: totalBoard, missing: totalMiss, unknown,
   coverage: totalBoard ? Math.round(((totalBoard - totalMiss) / totalBoard) * 100) : null,
   bySchool: Object.fromEntries(ok.map((r) => [r.school, r.coverage])),
+  bySchoolCounts,   // 합친 비율(rollingCoverage)의 재료 — 비율만으로는 학교를 합칠 수 없다
 };
 fs.writeFileSync(histPath, JSON.stringify(hist, null, 1));
 

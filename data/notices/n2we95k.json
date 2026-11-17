@@ -1,7 +1,21 @@
 {
  "school": "동국대학교 WISE캠퍼스",
- "updatedAt": "2026-11-16",
+ "updatedAt": "2026-11-17",
  "items": [
+  {
+   "title": "2026학년도 국가우수장학(이공계) 일시지원유형(한 학기) 장학생 선발 안내",
+   "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/521215",
+   "attachments": [
+    {
+     "name": "신청서류(양식).hwp",
+     "url": "https://wise.dongguk.ac.kr/cmmn/fileDown.do?filename=%EC%8B%A0%EC%B2%AD%EC%84%9C%EB%A5%98(%EC%96%91%EC%8B%9D).hwp&filepath=/files/article/servicenotice/521215/&filerealname=D1387D4E08ED4F75BB12B48A3706813D.hwp"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "동국대학교 WISE캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-17"
+  },
   {
    "title": "2026학년도 교촌장학생 선발 안내(장학금액: 100만원/생활비지원)",
    "url": "https://wise.dongguk.ac.kr/article/servicenotice/detail/521206",

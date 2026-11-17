@@ -54,8 +54,9 @@ const num = (k, d) => {
    숫자 칸과 같은 규칙으로 **틀린 입력이면 멈춘다** — 모르는 종류나 0·1 이 아닌 값을 조용히 '아니요'로 읽으면 그럴듯한 틀린 답이 된다. */
 const TRAIT_KEYS = Object.keys(require('../elig-ask.js').TRAIT_LABEL);
 const traits = Object.fromEntries(arg('traits', '').split(',').filter(Boolean).map((kv) => {
-  const [k, val] = kv.split(':');
-  if (!TRAIT_KEYS.includes(k) || !['0', '1'].includes(val)) { console.error(`--traits=${kv} 는 읽을 수 없습니다 — <종류>:1 또는 <종류>:0 (종류: ${TRAIT_KEYS.join(' ')})`); process.exit(1); }
+  const cut = kv.lastIndexOf(':');   // 단체 회원 열쇠(`member:<단체>:1`)는 가운데에도 쌍점이 있다
+  const k = kv.slice(0, cut), val = kv.slice(cut + 1);
+  if (!(TRAIT_KEYS.includes(k) || /^member:./.test(k)) || !['0', '1'].includes(val)) { console.error(`--traits=${kv} 는 읽을 수 없습니다 — <종류>:1 또는 <종류>:0 (종류: ${TRAIT_KEYS.join(' ')})`); process.exit(1); }
   return [k, val === '1'];
 }));
 const p = {
@@ -293,10 +294,42 @@ function pressRoute(sch) {
   return `(알 수 없음: ${got.join(',') || '아무것도 안 부름'})`;
 }
 
+/* ── 카드로 안 그리는 정식 공고 (2026-11-16 · 리뷰 — 이 도구만 카드·판정·신청 버튼을 말했다) ─────────────
+   앱의 getMatches 는 match-engine feedOnlyFormal(기한도 자격도 못 읽은 정식 공고)을 카드에서 빼고,
+   boardNoticesForMe 가 그 공고를 「우리 학교 게시판 공고」의 게시판 새 공고 한 줄(제목 + 링크)로 싣는다(feedOnlyBoardRows).
+   🔴 여기서도 베끼지 않는다 — 같은 두 함수를 부르고, 이 학생의 학교 게시판 글은 앱이 받는 학교별 파일(noticeFilesForProfile)을
+      앱과 같은 잣대(noticeForProfile)로 거른다. 그 글에 같은 주소가 있으면 그 글이 그 자리다(feedOnlyBoardRows 가 줄을 안 만든다). */
+function myBoardFeed() {
+  return ME.noticeFilesForProfile(p).flatMap((f) => {
+    try { return JSON.parse(fs.readFileSync(new URL(`../${f}`, import.meta.url), 'utf8')).items || []; } catch { return []; }
+  }).filter((n) => ME.noticeForProfile(n, p));
+}
+function feedOnlyLines(sch) {
+  const feed = myBoardFeed();
+  const own = ME.feedOnlyBoardRows([sch], feed, p)[0];
+  const inFeed = own ? null : feed.find((n) => !ME.feedOnlyBoardRows([sch], [n], p).length);
+  const out = ['   🔴 카드 없음 — 홈·탐색에 이 공고의 카드를 그리지 않는다 (기한도 자격도 못 읽은 정식 공고 · match-engine feedOnlyFormal)'];
+  const row = own || inFeed;
+  if (row) {
+    out.push(`   대신 「우리 학교 게시판 공고」에 게시판 새 공고 한 줄(제목 + 링크)로 보인다 — 「${row.title}」${own ? '' : ' (학교 게시판 글 그대로)'}`);
+    out.push(...linkLines(row, 'card').map((l) => l.replace('─ 원문 링크', '─ 게시판 새 공고 줄 링크')));
+  } else {
+    out.push('   게시판 새 공고 줄도 없다 (등록이 오래됐다 — notStale · 또는 이 학생 학교가 아니다)');
+  }
+  return out;
+}
+
 for (const sch of hits) {
   const result = ME.evaluate(sch, p);
   const fit = ME.fitScore(sch, result, p);
   const fd = ME.fitDetail(sch, p);
+  if (ME.feedOnlyFormal(sch, p, { status: result.status, fd })) {
+    console.log(`\n■ ${sch.name || sch.id}`);
+    console.log(`   학생: ${p.school} ${p.track} ${p.year}학년 · 평점 ${p.gpa} · ${p.credits}학점 · ${p.bracket}구간`);
+    for (const l of feedOnlyLines(sch)) console.log(l);
+    for (const l of linkLines(sch, 'sch')) console.log(l);
+    continue;
+  }
   /* 배지는 앱의 fitBadgeHtml 이 낸 그대로 (문구·'확인 필요 N' 까지 같다) */
   const badge = stripTags(appFn('fitBadgeHtml')(fit, fd)) || '(배지 없음)';
   const d = appFn('dday')(sch.deadline);
@@ -327,7 +360,7 @@ for (const sch of hits) {
   console.log(`   카드 아랫줄 왼쪽 (비어 있음 — 2026-11-15 개발자 지시 · 금액은 시트 머리 「${amt.text.replace(/^금액 · /, '') || '줄 없음'}」${amt.text && !amt.known ? ' (옅게)' : ''})`);
   console.log(`   학생: ${p.school} ${p.track} ${p.year}학년 · 평점 ${p.gpa} · ${p.credits}학점 · ${p.bracket}구간`);
   console.log(`   판정 ${result.status}  ·  배지 「${badge}」`);
-  console.log(`   신청 버튼 ${canApply ? '열림' : '잠김'}  (마감: ${d.label || '?'})`);
+  console.log(`   신청 버튼 ${canApply ? '열림' : '잠김'}  (마감: ${d.label || '없음'})`);
   if (noApply) console.log(`   신청 절차 없음 — 원문 「${sch.noApply}」 (버튼 잠김 · 홈 바로 신청·일괄 준비·지원문서에서 뺌)`);
   /* 막지 않는 대신 무엇을 알리는가 — 이것까지 보여야 '화면에 무엇이 보이는가'가 완성된다 */
   if (caution) {

@@ -150,13 +150,15 @@ export function gatherTargets(root, opts = {}) {
     if (!titles.length) { bump(skipped.noTitle, ds); return; }
     const url = decodeUrlEntities(raw);
     const r = { ds, id: ref.id || '', title: titles[0], where: ref.where || '' };
+    const due = item && /^\d{4}-\d{2}-\d{2}$/.test(String(item.deadline || '')) ? String(item.deadline) : '';   // 마감 — 다시 열 순서(planQueue 마감 임박 먼저)
     /* (리뷰 F2) 기대 제목이 정식 등록의 앱 이름(name)뿐인가 — 게시판 원제목(boardTitle)도 피드 제목도 없으면 판정기가 '다른 글'을 보류한다 */
     const nameOnly = item && item.fixTitle ? false : (ds === 'kosaf' ? !!(item && item.nameOnly) : ds === 'registered' && !(item && item.boardTitle));
     const had = byUrl.get(url);
     if (!had) {
-      byUrl.set(url, { url, raw: String(raw), ds: [ds], id: r.id, title: titles[0], titles: [...titles], nameOnly, host: hostOf(url), origin: originOf(url), refs: [r] });
+      byUrl.set(url, { url, raw: String(raw), ds: [ds], id: r.id, title: titles[0], titles: [...titles], nameOnly, host: hostOf(url), origin: originOf(url), refs: [r], ...(due ? { due } : {}) });
       return;
     }
+    if (due && (!had.due || due < had.due)) had.due = due;   // 같은 주소에 실린 글 중 가장 이른 마감
     if (!nameOnly) had.nameOnly = false;                 // 같은 주소의 피드 글·게시판 원제목이 있으면 근거가 생긴다
     if (!had.ds.includes(ds)) had.ds.push(ds);
     if (!had.id && r.id) had.id = r.id;
@@ -167,7 +169,7 @@ export function gatherTargets(root, opts = {}) {
   /* ① 정식 등록 — 화면이 sourceUrl 을 연다. 층2(sourceKind 'kosaf')가 섞여 들면 재단 홈페이지라 건너뛴다 */
   for (const it of (readJson(D('data/registered.json'), {}).items || [])) {
     if (it.sourceKind === 'kosaf') { skipped.kosaf.registered += 1; continue; }
-    takeApp('registered', it, { boardTitle: it.boardTitle, name: it.name, hidden: it.hidden }, { id: it.id, where: (it.eligibility || {}).schoolOnly || it.provider || '' });
+    takeApp('registered', it, { boardTitle: it.boardTitle, name: it.name, hidden: it.hidden, deadline: it.deadline }, { id: it.id, where: (it.eligibility || {}).schoolOnly || it.provider || '' });
   }
   /* ② 실시간 공고 — 🔴 폰은 data/notices.json 이 아니라 **학교별 파일**만 받는다(CLAUDE.md 「학교별 공고 파일」) */
   for (const f of perSchoolFiles(D('data/notices'))) {
@@ -180,7 +182,7 @@ export function gatherTargets(root, opts = {}) {
   const shown = shownActivities(acts, today);
   for (const it of acts) {
     if (it && it.url && !it.hidden && !shown.has(it)) { bump(skipped.closed, 'activities'); continue; }
-    takeApp('activities', it || {}, { title: it && it.title, hidden: it && it.hidden }, { id: (it && it.id) || '', where: (it && (it.host || it.school)) || '' });
+    takeApp('activities', it || {}, { title: it && it.title, hidden: it && it.hidden, deadline: it && it.deadline }, { id: (it && it.id) || '', where: (it && (it.host || it.school)) || '' });
   }
   /* ⑤ 교내 소식 — 학교별 파일뿐(옛 통짜 파일 없음) · 사진 폴더(img)는 건너뛴다 */
   for (const f of perSchoolFiles(D('data/news'))) {
@@ -237,7 +239,13 @@ export function otherTitlesFor(target, targets, siteTitles = [], cap = 80) {
    tier 0 — 처음 보는 정식 등록(학생이 신청하러 누르는 곳)  1 — 처음 보는 나머지
         2 — 한 번 본 문제(앞선 날 · 오늘 다시 보면 '다른 날 두 번'이 되어 확정)
         3 — 확정된 문제(풀렸는지 — 오래 안 본 것부터)  4 — 나머지(오래 안 본 것부터)
-   🔴 여는 순서는 **2 → 0 → 1 → 3 → 4** (2026-10-03 리뷰 LC-4) — 한 번 본 문제를 다시 여는 것이 앱 글자를 바꾸는 일이다.
+   (2026-11-16 · 로드맵 C3) **마감이 SOON_DAYS(14일) 안에 닥친 글**은 1·3·4 에 있어도 0 바로 뒤로 올린다(이른 마감부터) —
+      20분 예산에 한 바퀴가 사나흘이라 오래 안 본 순서만 따르면 이번 주 마감 공고의 링크가 사흘 묵은 판정으로 남고,
+      처음 보는 소식·공고 링크가 하루 예산 앞자리를 다 차지했다(실측 마감 임박 102건 중 58건이 예산 밖).
+      단 **어제 본 것은 올리지 않는다**(이틀에 한 번) — 매일 열면 임박 링크 100건 가까이가 하루 예산(약 160건)의 절반을 같은 링크에 쓴다.
+      2(확정 직전)와 0(처음 보는 정식 등록)은 그대로 앞이다. 마감은 정식 등록·대외활동의 deadline 칸만 쓴다
+      (실시간 공고·재단 게시판의 deadlineHint 는 게시판 요약이라 못 믿는다). 지난 마감·마감 없음은 예전 자리.
+   🔴 여는 순서는 **2 → 0 → (마감 임박) → 1 → 3 → 4** (2026-10-03 리뷰 LC-4 · 11-16 C3) — 한 번 본 문제를 다시 여는 것이 앱 글자를 바꾸는 일이다.
       처음 보는 링크 뒤에 두면 사이트 상한(8)에 밀려 링크가 많은 학교(광운 63건)는 확정까지 여드레가 걸렸다.
    오늘 이미 본 것은 다시 열지 않는다(같은 날 두 번은 한 번으로 센다 — nextState).
    opts: { perHost(기본 8), max(기본 400), used(사이트별로 이미 연 수), skip(오늘 이미 연 주소) } — 한 사이트를 몰아치지 않게 사이트마다 상한. */
@@ -248,6 +256,8 @@ export function tierOf(t, state, today) {
   if (BAD.includes(s.v) && s.confirmed) return 3;
   return 4;
 }
+export const SOON_DAYS = 14;
+const plusDays = (ymd, n) => new Date(Date.parse(`${ymd}T00:00:00Z`) + n * 86400000).toISOString().slice(0, 10);
 export function planQueue(targets, state, today, opts = {}) {
   const perHost = Number(opts.perHost) > 0 ? Number(opts.perHost) : 8;
   const max = Number(opts.max) > 0 ? Number(opts.max) : 400;
@@ -255,12 +265,17 @@ export function planQueue(targets, state, today, opts = {}) {
   const rows = targets
     .map((t, i) => ({ t, i, tier: tierOf(t, st, today), s: st[t.url] || {} }))
     .filter((r) => r.s.lastAt !== today);
+  const soonEnd = /^\d{4}-\d{2}-\d{2}$/.test(String(today)) ? plusDays(today, SOON_DAYS) : '';
+  const yesterday = soonEnd ? plusDays(today, -1) : '';
+  const soon = (r) => !!(soonEnd && r.t.due && r.t.due >= today && r.t.due <= soonEnd && !(r.s.lastAt && r.s.lastAt >= yesterday));
   const key = (r) => {
     if (r.tier === 2) return r.s.at || '';
+    if (r.tier === 'soon') return r.t.due;                                // 마감 임박 — 이른 마감부터
     if (r.tier >= 3) return `${r.s.lastAt || ''}${r.s.v ? 1 : 0}`;   // 오래 안 본 것 · 판정이 아직 없는 것(모름) 먼저
     return '';
   };
-  const ORDER = { 2: 0, 0: 1, 1: 2, 3: 3, 4: 4 };
+  for (const r of rows) if ([1, 3, 4].includes(r.tier) && soon(r)) r.tier = 'soon';
+  const ORDER = { 2: 0, 0: 1, soon: 1.5, 1: 2, 3: 3, 4: 4 };
   rows.sort((a, b) => (ORDER[a.tier] - ORDER[b.tier]) || (key(a) < key(b) ? -1 : key(a) > key(b) ? 1 : 0) || (a.i - b.i));
   /* opts.used — 같은 실행의 원문 후보 확인(0번 차례)이 이미 연 사이트별 수 · 사이트 상한에 함께 센다
      opts.skip — 오늘 이미 연 주소(후보 확인이 연 것) — 같은 날 같은 주소를 두 번 두드리지 않는다 */

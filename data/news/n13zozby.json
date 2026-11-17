@@ -1,7 +1,83 @@
 {
  "school": "부산대학교",
- "updatedAt": "2026-11-16",
+ "updatedAt": "2026-11-17",
  "items": [
+  {
+   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(고려대학교 HUSS)",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512239",
+   "postedAt": "2026-11-17",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-17",
+   "desc": "2026학년도 겨울계절수업 고려대학교(HUSS) 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
+  },
+  {
+   "title": "도약수업 (법학전문대학원 교수 및 AI튜터와 함께하는 맞춤형 민법) 신청안내",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512235",
+   "postedAt": "2026-11-17",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-17",
+   "desc": "1. 내용: 도약수업 현직 법학전문대학원 민법교수(주지홍 교수, 입학처장, 강의 경력 30년, 국가시험 출제위원)가 민법(민총, 물권, 채권)을 직접 1시간 강의하고, 그 후 2교시때 해당 부분에 대해 공무원…"
+  },
+  {
+   "title": "연구행정통합시스템(rERP) 침해사고 발생 및 개인정보 유출 관련 안내",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512220",
+   "postedAt": "2026-11-16",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-16",
+   "desc": "개인정보 유출 사실을 통지해 드리며 , 깊이 사과드립니다 . 귀하의 개인정보보호를 위해 최선을 다하고 있었음에도 불구하고 , 예기치 못한 사고로 인해 귀하의 소중한 개인정보가 유출되는 일이 발생하였습니다 . 이에…"
+  },
+  {
+   "title": "[AI융합교육원] 26-겨울계절수업 ‘SW융합 교과목' 수강정원 증원 안...",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512219",
+   "postedAt": "2026-11-16",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-16",
+   "desc": "AI융합교육원에서는 ‘SW융합트랙'을 이수하는 학생들을 위해 이번 겨울계절학기에 개설·운영하는 아래 교과목의 수강정원을 증원 합니다."
+  },
+  {
+   "title": "[교육부] 2026년도 국비유학사업 설명회 개최 안내",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512217",
+   "postedAt": "2026-11-16",
+   "kind": "행사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-16",
+   "thumb": "data/news/img/4279ae2f1a9c199f.webp"
+  },
+  {
+   "title": "[언어교육원] 2026학년도 겨울학기 정규과정 한국어도우미 모집 안내",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512216",
+   "postedAt": "2026-11-16",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-16",
+   "thumb": "data/news/img/c2d2a742995fb0e8.webp",
+   "desc": "※ 신청 전 아래 유의사항 을 확인해주시기 바랍니다. 최대한 희망 언어, 성별 등을 고려하여 매칭하기 위해 최선을 다하고 있습니다."
+  },
+  {
+   "title": "[SK AX] SK AX 현직자 AI 기술특강 및 SK 채용·SKALA 설명회 ...",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512198",
+   "postedAt": "2026-11-16",
+   "kind": "행사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-16",
+   "thumb": "data/news/img/2646831fe8e8f6bb.webp",
+   "desc": "- 장소: IT관 306호 - 내용: SK AX 현직자가 전하는 AI 기술 활용 사례와 최신 기술 동향, 산업 현장의 실무 경험 및 문제 해결 과정 소개"
+  },
   {
    "title": "찬바람 같은 스트레스로부터 나를 보호해줄 심리기술훈련 7차(신청기한 11월 19...",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512197",
@@ -347,82 +423,6 @@
    "src": "2d0d4013",
    "foundAt": "2026-11-02",
    "thumb": "data/news/img/c21166f7d9761cd7.webp"
-  },
-  {
-   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(서강대학교 수정)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511918",
-   "postedAt": "2026-11-02",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-02",
-   "desc": "2026학년도 겨울계절수업 서강대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
-  },
-  {
-   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(중앙대학교)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511917",
-   "postedAt": "2026-11-02",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-02",
-   "desc": "2026학년도 겨울계절수업 중앙대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
-  },
-  {
-   "title": "[부산광역시] 「국제게임전시회 지스타 2026」 참관 안내",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511876",
-   "postedAt": "2026-11-02",
-   "kind": "행사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-02",
-   "thumb": "data/news/img/59242950a3efa533.webp",
-   "desc": "부산시는 (사)한국게임산업협회와 함께 국내 게임산업의 성장 및 세계 게임기업과의 교류 협력을 위해 「국제게임전시회 지스타 2026」을 다음과 같이 개최하니, 학생 분들의 많은 관심과 참여 바랍니다."
-  },
-  {
-   "title": "[동래구] 동래구 청년정책위원회 위원 모집 안내",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511875",
-   "postedAt": "2026-11-02",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-02",
-   "thumb": "data/news/img/2d685ddafdc2b908.webp"
-  },
-  {
-   "title": "[금정구] 2026년 금정구 청소년어울림마당 [금샘런웨이페스타] 개최 및 참가팀...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511874",
-   "postedAt": "2026-11-02",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-02",
-   "thumb": "data/news/img/fc1ff66b233357b6.webp",
-   "desc": "금정구 청소년 문화·예술 축제인 금정구 청소년 어울림마당 [금샘런웨이페스타]가 개최되오니 학생 분들의 많은 관심과 참여 바랍니다. 자세한 내용은 포스터와 첨부 파일을 참고하시기 바랍니다."
-  },
-  {
-   "title": "[AI융합교육원] 2026학년도 'SW융합트랙' 이수자를 위한 겨...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511855",
-   "postedAt": "2026-10-30",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-30",
-   "desc": "AI융합교육원에서는 ‘SW 융합트랙 ’ 을 이수하는 학생 들을 위해 이번 겨울계절학기에 아래의 교과목을 개설 · 운영합니다 . 학생들은 본인이 이수하고 있는 융합트랙 교육과정에 따라 아래 교과목 정보를 확인하고…"
-  },
-  {
-   "title": "「Oracle AI Startup Bootcamp 부산 1기」 한국오라클 교육 ...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511854",
-   "postedAt": "2026-10-30",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-10-30",
-   "thumb": "data/news/img/2b3387d38dd9440c.webp",
-   "desc": "고용노동부가 주관하는 K- 뉴딜 아카데미 사업인 한국오라클 「 Orcle AI Startup Bootcamp 」 부산 교육을 아래와 같이 진행합니다 . 관심 있는 학생들의 많은 참여를 바랍니다 ."
   }
  ]
 }

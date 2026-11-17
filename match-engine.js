@@ -1856,15 +1856,32 @@ const POINTER_LINE = /^(?:[^.:：]{2,30}?(?:은|는)\s+)?(아래|다음|위|상�
    안내 줄을 그냥 지우면 선택지가 필수처럼 남아, 하나만 만족하는 학생이 0%가 된다
    (한국고등교육재단 동아시아연구장학생으로 실증 — 석사 재학생은 1번만 만족한다).
    `세 가지`처럼 **개수가 적혀 있으면 그 개수만큼**을 한 묶음으로 본다 — 짐작보다 정확하다. */
-const ANY_OF_LINE = /(중\s*(하나|1\s*개|1\s*가지|어느\s*하나)|둘\s*중|가지\s*중)[^.]{0,12}(만족|해당|충족)/;
-const KOR_NUM = { 한: 1, 두: 2, 세: 3, 네: 4, 다섯: 5, 여섯: 6 };
+const ANY_OF_LINE = /(중\s*(하나|1\s*개|1\s*가지|한\s*가지|어느\s*하나)|둘\s*중|가지\s*중)[^.]{0,12}(만족|해당|충족)/;
+const KOR_NUM = { 한: 1, 두: 2, 세: 3, 네: 4, 다섯: 5, 여섯: 6, 일곱: 7, 여덟: 8, 아홉: 9, 열: 10 };
+/* 🔴 **선택지 수는 원문이 선택지 수를 말할 때만** 읽는다 (2026-11-16 · 리뷰 3차).
+   `세 가지 중 하나` · `다음 3 가지 중 1 가지` · `둘 중` · `①·②·③ 중 하나` 처럼 **「N 가지(개) … 중」** 또는 나열이 있을 때만이다.
+   `다음 중 1가지 이상 해당` 의 `1가지` 는 문턱이다 — 예전엔 그 1 을 선택지 수로 읽어 첫 항목만 묶고 나머지를 필수로 셌다
+   (`가. 지원자격: 다음 중 1가지 이상 해당하는 자` 아래 1) 2) 3) — 수급자 학생이 평점 줄에서 틀린 미달). 말하지 않으면 0 — 선택지는 개요(optionRun)가 정한다. */
 function anyOfCount(line) {
   const t = String(line || '');
-  if (!ANY_OF_LINE.test(t)) return 0;
-  const kor = t.match(/(한|두|세|네|다섯|여섯)\s*가지/);
-  if (kor) return KOR_NUM[kor[1]] || 0;
-  const dig = t.match(/(\d)\s*가지/);
-  return dig ? parseInt(dig[1], 10) : 0;
+  const m = t.match(/(\d{1,2}|한|두|세|네|다섯|여섯|일곱|여덟|아홉|열)\s*(?:개|가지)\s*(?:의\s*)?(?:[가-힣]{1,4}\s*)?중/);
+  if (m) return /^\d/.test(m[1]) ? parseInt(m[1], 10) : (KOR_NUM[m[1]] || 0);
+  if (/둘\s*중/.test(t)) return 2;
+  const list = t.match(/((?:[^\s·,ㆍ]{1,8}\s*[·,ㆍ]\s*)+[^\s·,ㆍ]{1,8})\s*(?:항목\s*)?중/);
+  return list ? list[1].split(/\s*[·,ㆍ]\s*/).filter(Boolean).length : 0;
+}
+/* 이 머리 줄이 **택1**(하나만 맞으면 된다)인가 — 가리킴 줄·「n개 이상」 머리 줄 두 길이 같이 쓴다(한 곳).
+   · `1개(1가지·한 가지·하나) 이상` = 문턱 1 → 택1 · `중 하나`·`둘 중`·`가지 중 … 해당` → 택1
+   · `2개 이상`·`모두` → 택1 아님(묶으면 하나만 맞아도 맞음 — 틀린 안심)
+   · `… 해당하지 않는 경우 지급 불가` 처럼 **부정·제외**로 끝나는 줄은 택1 자격 묶음이 아니다(그 줄은 제외 규칙의 몫) */
+const ANY_THRESHOLD_ONE = /(?:1\s*(?:개|가지)|한\s*가지|하나)\s*(?:의\s*)?(?:항목|조건)?\s*(?:을|를|에)?\s*이상/;
+const ANY_THRESHOLD_MANY = /(?:[2-9]|1\d|두|세|네|다섯|여섯)\s*(?:개|가지)\s*(?:의\s*)?(?:항목|조건)?\s*(?:을|를|에)?\s*이상|모두\s*(?:를|에)?\s*(?:충족|해당|만족)/;
+function pickOneHead(t) {
+  const s = String(t || '');
+  if (/(?:해당|충족|만족)\s*(?:하|되)?\s*지\s*(?:않|못)|미\s*충족|미\s*해당|(?:지급|신청|지원|수혜)\s*불가/.test(s)) return null;   // 괄호 부연(`휴학생 제외`)은 막지 않는다
+  if (ANY_THRESHOLD_MANY.test(s.replace(/(\d{1,2}|한|두|세|네|다섯|여섯)\s*(?:개|가지)\s*(?:의\s*)?(?:[가-힣]{1,4}\s*)?중/, ''))) return null;
+  if (!(ANY_OF_LINE.test(s) || ANY_THRESHOLD_ONE.test(s))) return null;
+  return { count: anyOfCount(s) };
 }
 /* 🔴 **개요 번호 아래 「n개 이상 충족」 머리 줄** (2026-11-16 · 리뷰 — 충남대 사회 재환원 장학금).
    원문은 `가. 필수조건(모두 충족)` ↵ 1) 2) ↵ `나. 차등조건(1개 이상 충족 시 신청 가능, 해당하는 모든 조건의 증빙서류 제출 필수)` ↵ 1) 2) 3) 이다.
@@ -1880,13 +1897,47 @@ function anyOfCount(line) {
       (`다. 직전학기 평점 3.5 이상인 자`)까지 삼켜 평점 2.0 학생이 95% 가 됐다(틀린 안심). 걸러진 줄이 있어도 묶음의 끝은 그대로다.
       `다음 중 1가지 이상 해당` 의 `1가지` 는 **문턱**이다 — 선택지 수로 읽었더니 첫 항목만 묶이고 나머지 둘이 필수 요건이 됐다(anyOfCount 는 가리킴 줄 몫). */
 const ANY_OF_HEAD = /^[가-힣A-Za-z ]{0,15}\s*[(（:：]\s*(?:(?:다음|아래)\s*)?(?:중\s*)?(?:1\s*개|1\s*가지|한\s*가지|하나)\s*(?:항목)?\s*이상\s*(?:을|를|에)?\s*(?:충족|해당|만족)/;
-const ENUM_FAMILIES = [/^\s*\(?\d+\s*\)/, /^\s*\d+\s*\./, /^\s*[①-⑳]/, /^\s*[가-하]\s*[.)]/, /^\s*[-·•▪]\s/];
-function enumRun(lines, start) {
-  const fam = ENUM_FAMILIES.find((re) => re.test(String(lines[start] || '')));
-  if (!fam) return 0;
+/* 🔴 번호 꼴은 **정확한 모양**으로 가른다 (2026-11-16 · 리뷰 3차). 예전엔 꼴을 넓은 갈래로 묶어
+   `(1)` 과 `3)` · `가)` 와 `다.` · `2.1` 과 `3.`(그리고 번호가 아닌 `3.5 이상…`)을 같은 꼴로 봤다 — 그래서 `2) 차등조건(1개 이상 …)` ↵ `(1)` `(2)` ↵ `3) 직전학기 평점 3.5 이상인 자`
+   에서 묶음이 다음 필수 형제 줄(평점)까지 삼켜 평점 2.0 학생이 미달 없이 통과했다(틀린 안심). 한국 공고의 개요는 `1.` > `가.` > `1)` > `가)` > `(1)` > `(가)` > `①` 이고 `2.1` 은 `2.` 아래다.
+   `2.1`·`2.2` 는 윗 번호(2)까지 같아야 같은 꼴이다 · `3.5 이상`·`2026. 2학기` 같은 숫자 줄은 번호가 아니다. */
+function enumShape(line) {
+  const s = String(line || '');
+  if (/^\s*[(（]\s*\d+\s*[)）]/.test(s)) return '(d)';
+  if (/^\s*[(（]\s*[가-하]\s*[)）]/.test(s)) return '(k)';
+  const dd = s.match(/^\s*(\d{1,2})\.\d{1,2}(?:\.\d{1,2})*\.?\s+(?!이상|이하|미만|초과|만점|점|%|학점|배)/);
+  if (dd) return `d.d:${dd[1]}`;
+  if (/^\s*\d+\s*[)）]/.test(s)) return 'd)';
+  if (/^\s*\d+\s*\.(?!\s*\d)/.test(s)) return 'd.';
+  if (/^\s*[①-⑳]/.test(s)) return '①';
+  if (/^\s*[가-하]\s*[)）]/.test(s)) return 'k)';
+  if (/^\s*[가-하]\s*\.(?!\s*\d)/.test(s)) return 'k.';
+  const b = s.match(/^\s*([-·•▪])\s/);
+  return b ? `b${b[1]}` : '';
+}
+/* 머리 줄 바로 아래 **같은 모양** 번호 항목이 몇 줄 이어지나 — 모양이 다른 첫 줄에서 끝난다.
+   머리 줄 자신과 같은 모양이면 그 줄들은 아래 항목이 아니라 **형제**다(`2) 차등조건(…)` ↵ `3) …`) — 묶지 않는다 */
+function enumRun(lines, start, headLine) {
+  const shape = enumShape(lines[start]);
+  if (!shape) return 0;
+  if (headLine != null && enumShape(headLine) === shape) return 0;
   let n = 0;
-  while (start + n < lines.length && fam.test(String(lines[start + n] || ''))) n += 1;
+  while (start + n < lines.length && enumShape(lines[start + n]) === shape) n += 1;
   return n >= 2 ? n : 0;
+}
+/* 택1 머리 줄 아래 선택지가 joined 의 몇 줄인가 — **원문 개요로** 끝을 정한다(걸러진 줄이 있어도 끝은 그대로 · ANY_OF_HEAD 머리말 ④).
+   · 번호 항목이면 같은 모양이 이어지는 데까지(원문이 선택지 수를 말하면 그 수를 넘지 않는다)
+   · 번호가 없으면 원문이 선택지 수를 말할 때만(`다음 3 가지 중 1 가지`) — 번호 없는 줄이 이어지는 데까지, 그 수를 넘지 않는다.
+     수를 말하지 않으면 묶지 않는다 — 어디서 끝나는지 모르는데 묶으면 다음 필수 줄을 삼킨다(틀린 안심) */
+function optionRun(lines, start, headLine, count) {
+  if (enumShape(lines[start])) {
+    const run = enumRun(lines, start, headLine);
+    return count > 0 ? Math.min(count, run) : run;
+  }
+  if (!(count > 0)) return 0;
+  let n = 0;
+  while (start + n < lines.length && n < count && !enumShape(lines[start + n]) && !SH.sectionOf(String(lines[start + n] || ''))) n += 1;
+  return n;
 }
 /* `서울시민(성인)` 은 표 칸이 아니라 대상이다(2026-10-04 · 대외활동 표본) — 시민·도민·구민·군민·성인·청년·누구나 */
 const REAL_CATEGORY = /(자|생|중|상|하|명|원)$|북한이탈|새터민|다문화|기초생활|차상위|국적|유공|보훈|장애|한부모|다자녀|(?:시|도|구|군)민|성인|청년|누구나/;
@@ -1945,8 +1996,8 @@ function requirementLines(sch, lines, opts) {
   let branch = '';        // 지금 읽는 줄이 어느 갈래(`대전 소재 대학`) 아래인가 — 비면 갈래 없음 (조각 2)
   let asideSect = false;  // 지금 절이 ※ 곁말에서 온 것인가 (아래 주석)
   let asideBase = 'qualify';   // 곁말 전에 있던 절 — 번호 항목을 만나면 여기로 돌아온다
-  let anyLeft = 0, anyGroup = 0;   // 선택지 묶음 — 몇 줄 남았나 / 몇 번째 묶음인가 (위 주석)
-  let headEnd = -1, headGroup = 0;   // 「n개 이상 충족」 머리 줄 묶음 — joined 의 몇 번째 줄 **앞까지**인가 / 묶음 번호 (ANY_OF_HEAD 머리말 ④)
+  let anyGroup = 0;   // 몇 번째 묶음인가 (위 주석)
+  let headEnd = -1, headGroup = 0;   // 택1 묶음(가리킴 줄 · 「n개 이상 충족」 머리 줄) — joined 의 몇 번째 줄 **앞까지**인가 / 묶음 번호 (ANY_OF_HEAD 머리말 ④ · optionRun)
   const meta = [];                 // out과 같은 순서로 각 줄의 묶음 번호
   const aside = [];                // out과 같은 순서 — 그 줄이 ※ 예외 참고인가 (2026-10-15)
   let caseRun = false, caseGroup = 0;   // 연달아 오는 '경우별 분기'를 한 묶음으로 (아래 주석)
@@ -2080,13 +2131,16 @@ function requirementLines(sch, lines, opts) {
     if (!loose && PR2.gradTarget(t) === 'label') continue;
     if (ANY_OF_HEAD.test(t) && !POINTER_LINE.test(t)) {
       /* 개요 번호 아래 「1개 이상 충족」 머리 줄 — 아래 번호 항목들을 택1 묶음으로 연다. 줄 자신은 가리킴 줄(POINTER_LINE)과 같이 안 내보낸다(위 ANY_OF_HEAD 머리말) */
-      const n = enumRun(joined, li + 1);   // 🔴 `1가지 이상` 의 1 은 문턱이지 선택지 수가 아니다(anyOfCount 를 쓰지 않는다 · 머리말 ④)
-      if (n > 0) { headEnd = li + 1 + n; headGroup = (anyGroup += 1); anyLeft = 0; continue; }
+      const ph = pickOneHead(t);   // 🔴 `1가지 이상` 의 1 은 문턱이지 선택지 수가 아니다(anyOfCount 는 원문이 선택지 수를 말할 때만 · 머리말 ④)
+      const n = ph ? optionRun(joined, li + 1, l, ph.count) : 0;
+      if (n > 0) { headEnd = li + 1 + n; headGroup = (anyGroup += 1); continue; }
     }
     if (POINTER_LINE.test(t)) {
-      /* 안내 줄 자신은 화면에 안 내보내되, '여기부터 n줄은 선택지'라는 사실은 남긴다 */
-      const n = anyOfCount(t);
-      if (n > 0) { anyLeft = n; anyGroup += 1; }
+      /* 안내 줄 자신은 화면에 안 내보내되, '여기부터 선택지'라는 사실은 남긴다 — 끝은 위 「n개 이상」 머리 줄과 **같은 개요 규칙**(optionRun · headEnd)으로 정한다.
+         🔴 예전엔 '몇 줄 남았나'를 내보낸 줄로 셌다 — 선택지 하나가 걸러지면 묶음이 다음 필수 줄을 삼켰다(리뷰 3차) */
+      const ph = pickOneHead(t);
+      const n = ph ? optionRun(joined, li + 1, l, ph.count) : 0;
+      if (n > 0) { headEnd = li + 1 + n; headGroup = (anyGroup += 1); }
       continue;
     }
     /* 제목 판정은 **공백을 없애고** 본다 — 한글 문서가 `제 출 서 류`처럼 자간을 벌려 쓴다 */
@@ -2149,9 +2203,8 @@ function requirementLines(sch, lines, opts) {
         meta.push(caseGroup);
       } else {
         caseRun = false;
-        meta.push(li < headEnd ? headGroup : anyLeft > 0 ? anyGroup : 0);   // 0 = 반드시 충족 / 1 이상 = 그 묶음 중 하나만
+        meta.push(li < headEnd ? headGroup : 0);   // 0 = 반드시 충족 / 1 이상 = 그 묶음 중 하나만
       }
-      if (anyLeft > 0 && !(li < headEnd)) anyLeft -= 1;
     }
     /* 5줄이면 충분하다 — 더 늘어놓으면 학생이 안 읽는다. 사람이 정리한 것처럼 보여야 한다.
        못 담은 것은 바로 아래 '원문 보기'로 갈 수 있다. */

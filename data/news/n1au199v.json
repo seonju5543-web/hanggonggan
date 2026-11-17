@@ -1,7 +1,65 @@
 {
  "school": "서울시립대학교",
- "updatedAt": "2026-11-16",
+ "updatedAt": "2026-11-17",
  "items": [
+  {
+   "title": "[안내] 2027년도 학교 외 단체의 다중이용시설 예약 안내",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31861&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-17",
+   "postId": "31861",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-17",
+   "thumb": "data/news/img/99a23b8044b9f131.webp",
+   "desc": "학교 소속이 아닌 외부단체 대관 가능한 시설과 신청 절차에 대한 안내 입니다. 아래 내용 확인하시고, 기간 내 신청하여 주시기 바랍니다."
+  },
+  {
+   "title": "[웹메일] 개인·부서 대표메일 계정 정보보안 강화를 위한 2차인증(OTP) 설정안내(강조)",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31860&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-17",
+   "postId": "31860",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-17",
+   "desc": "전산정보과 안녕하십니까. 서울시립대학교 전산정보원 전산정보과입니다. 1. 관련법령 · 규정"
+  },
+  {
+   "title": "[생활관] 2026학년도 기숙사 동계특별개관 사용승인 공고 (기존 기숙사 거주자)",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31858&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-16",
+   "postId": "31858",
+   "kind": "생활",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-16",
+   "desc": "( 조건부승인등 ) < 기존 기숙사 거주자 > 2026 학년도 동계특별개관 기숙사 이용 승인여부와 특약사항 등을 확인하시고 동의하시는 경우에 한하여 기숙사비를 납부하여 기간 내 등록하여 주시기 바랍니다 . <…"
+  },
+  {
+   "title": "📢[청년취업사관학교] 'AI 융합 전문가' 양성 과정 👉추가 모집",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31854&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-16",
+   "postId": "31854",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-16",
+   "thumb": "data/news/img/ae4d69d569bf49ea.webp"
+  },
+  {
+   "title": "[인공지능혁신융합대학사업단] AICOSS「2026 동계 비교과 자격증 취득 프로그램」수요조사 안내",
+   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31853&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+   "postedAt": "2026-11-16",
+   "postId": "31853",
+   "school": "서울시립대학교",
+   "campus": "",
+   "src": "80d7d3bc",
+   "foundAt": "2026-11-16",
+   "thumb": "data/news/img/b845c4033212d5df.webp",
+   "desc": "인공지능혁신융합대학사업단 안녕하세요. 인공지능혁신융합대학사업단 입니다. 전남대학교 인공지능혁신융합대학사업단에서 「2026 동계 비교과 자격증 취득 프로그램」 을 운영할 예정입니다."
+  },
   {
    "title": "\"자연재난과 공공재 선택에 관한 실험\"에 대한 서울시립대학교 연구참여자 추가 모집공고",
    "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31847&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
@@ -406,64 +464,6 @@
    "src": "80d7d3bc",
    "foundAt": "2026-10-30",
    "desc": "공학교육혁신센터 전국 공과대학생이 참여하는 공학인의 축제, 2026 공학페스티벌이 개최됩니다."
-  },
-  {
-   "title": "[중앙도서관] 자유 열람실 (열람석) 자율배석 운영 안내(10. 30. 18시~22시)",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31768&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-30",
-   "postId": "31768",
-   "kind": "생활",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-10-30"
-  },
-  {
-   "title": "[생활관] 2026년 2학기 RC프로그램 [K-POP댄스(2기)] 수강생 모집 공고",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31737&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-30",
-   "postId": "31737",
-   "kind": "생활",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-10-30",
-   "desc": "수강생 모집 공고 서울시립대학교 생활관에서는 기숙사생 및 재학생을 비롯하여 , 대학 공동체와 지역사회를 아우르는 2026 학년 2 학기 RC(Residential College) 프로그램 [K-POP 댄스 (2 기…"
-  },
-  {
-   "title": "[생활관] 2026년 2학기 RC프로그램 [버스킹·보컬트레이닝(3기)] 수강생 모집 공고",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31735&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-30",
-   "postId": "31735",
-   "kind": "생활",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-10-30",
-   "desc": "수강생 모집 공고 서울시립대학교 생활관에서는 기숙사생 및 재학생을 비롯하여 , 대학 공동체와 지역사회를 아우르는 2026 학년 2 학기 RC(Residential College) 프로그램 [ 보컬트레이닝 · 버스킹…"
-  },
-  {
-   "title": "[청년취업사관학교] 'AI 융합 전문가' 양성 과정 모집 안내",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31736&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-30",
-   "postId": "31736",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-10-30",
-   "desc": "■ 교육 안내 서울시 공공데이터 활용 디지털 마케팅 인재 양성 과정 ■ 신청 대상 ① 만 15세 이상 서울 시민·서울 거소자 ② 서울 외 거주자"
-  },
-  {
-   "title": "[학생과 나비스트 프로젝트] [마감 D-4🎁] UOS-Upcycling Lab 팀 -「CAMPUS RE」폐자원 수거 안내 (배달의민족 상품권 증정)",
-   "url": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31660&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
-   "postedAt": "2026-10-30",
-   "postId": "31660",
-   "school": "서울시립대학교",
-   "campus": "",
-   "src": "80d7d3bc",
-   "foundAt": "2026-10-30",
-   "thumb": "data/news/img/3ffa37e5e81c5638.webp",
-   "desc": "안녕하세요, 서울시립대학교 나비스트 프로젝트 UOS-Upcycling Lab 팀 입니다! 사용하지 않지만 버리기 아까웠던 물건, 하나쯤 있으신가요?"
   }
  ]
 }

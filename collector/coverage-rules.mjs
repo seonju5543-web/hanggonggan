@@ -190,3 +190,19 @@ export function coverageOf(boardCount, missingCount) {
   if (!boardCount) return null;                      // 게시판을 못 읽었으면 비율을 말할 수 없다
   return Math.round(((boardCount - missingCount) / boardCount) * 100);
 }
+
+/* 최근 몇 번의 감사를 합친 전체 인식 비율 (2026-11-16 · 로드맵 C1) — 감사는 예산 안에서 학교를 회전시켜 한 번에 30여 곳만 본다.
+   그날 숫자(그날 본 학교만)는 학교 구성이 바뀔 때마다 출렁여 '나아지고 있나'를 못 말한다 → 학교마다 **가장 최근 결과**를 모아 합친다.
+   재료는 이력의 bySchoolCounts({ 학교: [게시판 후보, 누락] } · 11-16 부터 적는다). 옛 이력(비율뿐)은 세지 않는다 — 비율만으로는 합칠 수 없다.
+   runs: 최근 몇 번의 감사까지 보나(기본 4 — 매주 한 번이라 한 달). 재료가 없으면 null. */
+export function rollingCoverage(hist, { runs = 4 } = {}) {
+  const days = Object.keys(hist || {}).filter((d) => hist[d] && hist[d].bySchoolCounts).sort().slice(-Math.max(1, runs));
+  if (!days.length) return null;
+  const latest = new Map();
+  for (const d of days) for (const [school, c] of Object.entries(hist[d].bySchoolCounts)) {
+    if (Array.isArray(c) && Number(c[0]) > 0) latest.set(school, [Number(c[0]), Number(c[1]) || 0]);   // 못 읽은 날(0)은 앞선 결과를 덮지 않는다
+  }
+  let board = 0; let missing = 0;
+  for (const [b, m] of latest.values()) { board += b; missing += m; }
+  return { runs: days.length, from: days[0], schools: latest.size, board, missing, coverage: coverageOf(board, missing) };
+}

@@ -347,18 +347,6 @@
   "minBody": 100,
   "name": "[학생지원팀] (한국장학재단) 2026-2학기 국가근로장학금 추가신청기간 안내(10/21~10/29)"
  },
- "https://www.seoultech.ac.kr/service/info/janghak/?bidx=896418&bnum=5233&cate=0&qidx=5233": {
-  "ok": "2026-11-08",
-  "at": "2026-11-08",
-  "tries": 0,
-  "name": "서울과학기술대학교 중소기업 취업연계 장학사업 (희망사다리Ⅰ유형) 신규장학생 자체선발 기준 안내"
- },
- "https://sejong.korea.ac.kr/bbs/koreaSejong/659/273624/artclView.do": {
-  "ok": "2026-11-15",
-  "at": "2026-11-15",
-  "tries": 0,
-  "name": "[국가]2026학년도 2학기 한국장학재단 중소기업 취업연계 장학생(희망사다리Ⅰ유형) 추천"
- },
  "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12488/view.do?currentpageno=1": {
   "ok": "2026-10-28",
   "at": "2026-10-28",
@@ -412,12 +400,6 @@
   "at": "2026-10-29",
   "minBody": 100,
   "name": "[공통][교외]2026년 2학기 안산시 대학생 본인부담 등록금 반값지원 장학생 선발(~11"
- },
- "https://www.yonsei.ac.kr/bbs/sc/58/944448/artclView.do": {
-  "ok": "2026-11-12",
-  "at": "2026-11-12",
-  "tries": 0,
-  "name": "희망사다리1유형(중소기업 취업연계 장학금) 선발 기준 안내"
  },
  "https://www.cbnu.ac.kr/www/selectBbsNttView.do?bbsno=8&key=815&nttno=170869&searchctgry=학사/장학": {
   "ok": "2026-11-08",
@@ -491,12 +473,6 @@
   "tries": 0,
   "name": "2026학년도 2학기(3차) 국가근로장학금 학생 신청기간 안내"
  },
- "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323355&menuno=200318": {
-  "tries": 5,
-  "at": "2026-11-15",
-  "minBody": 100,
-  "name": "공통 2026-2학기 중소기업취업연계장학사업(희망사다리Ⅰ유형) 신규장학생 대학선발 기준 안내"
- },
  "https://www3.chosun.ac.kr/bbs/scho/332/282329/artclView.do": {
   "ok": "2026-10-27",
   "at": "2026-10-27",
@@ -545,12 +521,6 @@
   "tries": 0,
   "name": "2026년 김천시-한국전력기술 지역상생지원 장학금 및 취업준비금 신청 안내"
  },
- "https://www3.chosun.ac.kr/bbs/scho/332/282304/artclView.do": {
-  "tries": 5,
-  "at": "2026-11-15",
-  "minBody": 100,
-  "name": "[장학금 접수] 삼성 청년 SW·AI 아카데미(SSAFY) 모집 안내"
- },
  "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?articleno=367645": {
   "tries": 4,
   "at": "2026-11-08",
@@ -574,12 +544,6 @@
   "at": "2026-10-31",
   "tries": 0,
   "name": "2026년도 2학기 국가근로장학금 동계방학 집중근로(교외) 신청 안내"
- },
- "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323404&menuno=200318": {
-  "tries": 5,
-  "at": "2026-11-16",
-  "minBody": 100,
-  "name": "공통 세아해암학술장학재단 제1회 차세대 공학연구자 Alumni 심포지엄 2026 신청 안내"
  },
  "https://www.seoultech.ac.kr/service/info/janghak/?bidx=897345&bnum=5233&cate=0&qidx=5233": {
   "tries": 3,
@@ -623,18 +587,6 @@
   "minBody": 100,
   "name": "2026년 전북대동창회장학재단 문화예술장학생 선발 안내"
  },
- "https://www.skku.edu/skku/campus/skk_comm/notice06.do?articleno=140261": {
-  "ok": "2026-11-12",
-  "at": "2026-11-12",
-  "tries": 0,
-  "name": "[한국장학재단] 2026학년도 2학기 중소기업 취업연계(희망사다리1유형) 신규장학생 선발기준 안내"
- },
- "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdbbsseq=1&brddate=20260807&brdseq=2": {
-  "ok": "2026-11-12",
-  "at": "2026-11-12",
-  "tries": 0,
-  "name": "[교내/선발] 2026학년도 2학기 학부 교내장학 선발완료 안내"
- },
  "https://www.gachon.ac.kr/bbs/kor/478/126763/artclView.do": {
   "ok": "2026-11-12",
   "at": "2026-11-12",
@@ -658,5 +610,23 @@
   "at": "2026-11-15",
   "minBody": 100,
   "name": "2026학년도 충남대학교 백마봉사단「사회 재환원 장학금」대상자 추천 안내"
+ },
+ "https://www.gachon.ac.kr/bbs/kor/478/127125/artclView.do": {
+  "ok": "2026-11-17",
+  "at": "2026-11-17",
+  "tries": 0,
+  "name": "2026-2학기 장학사정관(릴레이쉽) 장학금 신청 안내"
+ },
+ "https://wise.dongguk.ac.kr/article/servicenotice/detail/521206": {
+  "ok": "2026-11-17",
+  "at": "2026-11-17",
+  "tries": 0,
+  "name": "2026학년도 교촌장학생 선발 안내(장학금액: 100만원/생활비지원)"
+ },
+ "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdbbsseq=1&nttid=20260807": {
+  "tries": 2,
+  "at": "2026-11-17",
+  "minBody": 100,
+  "name": "[교내/선발] 2026학년도 2학기 학부 교내장학.."
  }
 }

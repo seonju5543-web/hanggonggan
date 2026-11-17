@@ -1,159 +1,18 @@
-## 🗞 교내 소식 수집 리포트 (2026-11-16)
+## 🗞 교내 소식 수집 리포트 (2026-11-17)
 
-새 글 **38건** → 앱 홈 「우리 학교 소식」 (학교별 파일 data/news/ · 44개교 · 게시판 아는 학교 44/44 · 둘째 게시판 3곳)
+새 글 **37건** → 앱 홈 「우리 학교 소식」 (학교별 파일 data/news/ · 44개교 · 게시판 아는 학교 44/44 · 둘째 게시판 3곳)
 
-⏰ **시간 예산(4분)에 걸려 게시판 3곳을 이번 실행에서 못 봤습니다** — 성균관대학교 · 한양대학교 · 중앙대학교
-  → 이번에 본 게시판 44/47곳 · 다음 실행은 **성균관대학교**부터 시작합니다.
+⏰ **시간 예산(4분)에 걸려 게시판 8곳을 이번 실행에서 못 봤습니다** — 충남대학교 · 전남대학교 · 조선대학교 · 충북대학교 · 부경대학교 · 강원대학교 · 경희대학교 · 한국외국어대학교
+  → 이번에 본 게시판 39/47곳 · 다음 실행은 **충남대학교**부터 시작합니다.
 
 ### 🚨 연속 실패 — 게시판 주소 확인 필요
-- 아주대학교 (51회 연속) — 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
-- 강원대학교 (26회 연속) — 오류 (TypeError: UND_ERR_SOCKET) — 주소 확인 필요
-
-### 서울시립대학교
-상태: ✅ 정상 (공지 글 5건 감지 · 새 글 2)
-- [생활] ["자연재난과 공공재 선택에 관한 실험"에 대한 서울시립대학교 연구참여자 추가 모집공고](https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31847&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&) — 2026-11-16
-- [생활] [[공고] 2027학년도 수시모집 면접평가 시행에 따른 캠퍼스 및 건물 출입 통제](https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31798&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&) — 2026-11-16
-
-### 건국대학교
-상태: ✅ 정상 (공지 글 17건 감지 · 새 글 0)
-
-### 동국대학교
-상태: ✅ 정상 (공지 글 5건 감지 · 새 글 1)
-- [11월 17일(화) 헌혈버스 시행 안내](https://www.dongguk.edu/article/GENERALNOTICES/detail/26767000) — 2026-11-16
-
-### 동국대학교 WISE캠퍼스
-상태: ✅ 정상 (공지 글 7건 감지 · 새 글 0)
-
-### 홍익대학교
-상태: ✅ 정상 (공지 글 5건 감지 · 새 글 0)
-
-### 숙명여자대학교
-상태: ✅ 정상 (공지 글 9건 감지 · 새 글 0)
-
-### 광운대학교
-상태: ✅ 정상 (공지 글 29건 감지 · 새 글 3)
-- [채용] [[국제학생] [한국무역협회] 외국인유학생 채용지원 교육과정 KITA K-커리어마스터 안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53685&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-11-16
-- [[일반] 내PC지키미를 이용한 PC보안 및 알약 점검 협조 요청](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53688&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-11-16
-- [[일반] 불법 소프트웨어, 이미지, 폰트 사용 및 배포 방지를 위한 협조 안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53686&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-11-16
-
-### 명지대학교
-상태: ✅ 정상 (공지 글 13건 감지 · 새 글 1)
-- [[융합교육지원센터] 2026학년도 학생설계전공 교육과정 개발 학생공모전 최종 수상자 발표 안내](https://www.mju.ac.kr/bbs/mjukr/141/237207/artclView.do) — 2026-11-16
-
-### 상명대학교
-상태: ✅ 정상 (공지 글 9건 감지 · 새 글 0)
-
-### 가천대학교
-상태: ✅ 정상 (공지 글 10건 감지 · 새 글 0)
-
-### 아주대학교
-상태: ⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
-
-### 국민대학교
-상태: ✅ 정상 (공지 글 3건 감지 · 새 글 0)
-
-### 숭실대학교
-상태: ✅ 정상 (공지 글 10건 감지 · 새 글 0)
-
-### 세종대학교
-상태: ✅ 정상 (공지 글 8건 감지 · 새 글 1)
-- [웹툰으로 알아보는 상담소 이용 가이드 ④탄 - 학업](https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=896267&article.offset=0&articleLimit=10) — 2026-11-16
-
-### 이화여자대학교
-상태: ✅ 정상 (공지 글 12건 감지 · 새 글 12)
-- [[글로벌소통교육실] 2026 겨울 고급영어글쓰기, 스피킹 마스터 프로그램 신청 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367779&article.offset=0&articleLimit=10&no=329) — 2026-11-04
-- [｢기술사업화센터｣ 2026년 지식재산 맞춤형 교육 실시 안내(11/27(금))](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367760&article.offset=0&articleLimit=10&no=329) — 2026-11-03
-- [[학생지원팀] 2026학년도 재학생 교육 만족도 조사 참여하고 커피 기프티콘 받아가자!☕](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367745&article.offset=0&articleLimit=10&no=329) — 2026-11-02
-- [[교목실] 2026 이화가족 성탄예배 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367744&article.offset=0&articleLimit=10&no=329) — 2026-11-02
-- [학사] [[학부] 2026학년도 겨울 계절학기 수강안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367643&article.offset=0&articleLimit=10&no=329) — 2026-10-27
-- [학사] [[용역/일반평가]학생지원팀/2027학년도 입학식 기획 및 진행 용역](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367954&article.offset=0&articleLimit=10&no=328) — 2026-11-16
-- [행사] [[기술지주] 제21회 이화 스타트업 살롱 (11/24, 화) 개최 안내 (연사 : 노타AI 채명수 대표)](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367948&article.offset=0&articleLimit=10&no=327) — 2026-11-16
-- [행사] [[인재개발원] Hermes Korea (에르메스 코리아) 채용행사 안내 (11/24, 화)](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367937&article.offset=0&articleLimit=10&no=325) — 2026-11-16
-- [채용] [[채용] 조형예술대학 도자예술전공 사무실 계약직원 모집](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367934&article.offset=0&articleLimit=10&no=323) — 2026-11-13
-- [[언어교육원] 2026학년도 겨울 12월 NTU 위탁 과정 한국어 도우미 모집](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367933&article.offset=0&articleLimit=10&no=322) — 2026-11-13
-- [[언어교육원] 2026학년도 겨울 집중과정 한국어 도우미 모집](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367932&article.offset=0&articleLimit=10&no=321) — 2026-11-13
-- [[출판문화원] 2027 이화달력 · 이화플래너 퀴즈 이벤트!](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367930&article.offset=0&articleLimit=10&no=320) — 2026-11-13
-
-### 인하대학교
-상태: ✅ 정상 (공지 글 16건 감지 · 새 글 2)
-- [학사] [[로봇특성화대학사업단] AI로봇 융합전공 설명회 안내 (11/26 목 17:00~ )](https://www.inha.ac.kr/bbs/kr/8/46136/artclView.do) — 2026-11-16
-- [실감 3면 콘텐츠 및 MR/VR 체험Day 안내 [11.19(목) 오전 10시 30분~11시 30분 / 오후 3시~4시]](https://www.inha.ac.kr/bbs/kr/8/46134/artclView.do) — 2026-11-16
-
-### 부산대학교
-상태: ✅ 정상 (공지 글 11건 감지 · 새 글 1)
-- [찬바람 같은 스트레스로부터 나를 보호해줄 심리기술훈련 7차(신청기한 11월 19...](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512197) — 2026-11-16
-
-### 가톨릭대학교
-상태: ✅ 정상 (공지 글 5건 감지 · 새 글 1)
-- [[학사행정팀] 2027학년도 1학기 재입학 모집 안내](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277795&article.offset=0&articleLimit=10) — 2026-11-16
-
-### 한국항공대학교
-상태: ✅ 정상 (공지 글 9건 감지 · 새 글 0)
-
-### 경기대학교
-상태: ✅ 정상 (공지 글 8건 감지 · 새 글 1)
-- [[일반] [사학] 2026학년도 2학기 추계학술답사 객실 배정 관련 사실관계 조사 안내](https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627216&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888) — 2026-11-16
-
-### 서울과학기술대학교
-상태: ✅ 정상 (공지 글 14건 감지 · 새 글 1)
-- [[학생상담센터] 2026학년도 맞춤형 온라인 심리검사 11월 오프라인 행사 '이달의 검사' 안내(국립대학육성사업)](https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897799&qidx=4691&cate=10&allboard=false&nowpage=1) — 2026-11-16
-
-### 계명대학교
-상태: ✅ 정상 (공지 글 17건 감지 · 새 글 0)
-
-### 서울교육대학교
-상태: ✅ 정상 (공지 글 11건 감지 · 새 글 0)
-
-### 한국방송통신대학교
-상태: ✅ 정상 (공지 글 8건 감지 · 새 글 2)
-- [[일반] [방송대 학보] KNOU위클리 308호 (2026년 11월 16일 발행) 지면안내](https://www.knou.ac.kr/bbs/knou/51/822423/artclView.do) — 2026-11-16
-- [[일반] 2026년 맞춤배움길 서비스 만족도 설문조사 참여 안내](https://www.knou.ac.kr/bbs/knou/51/822434/artclView.do) — 2026-11-16
-
-### 경북대학교
-상태: ⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
-
-### 영남대학교
-상태: ✅ 정상 (공지 글 10건 감지 · 새 글 0)
-
-### 전북대학교
-상태: ✅ 정상 (공지 글 2건 감지 · 새 글 0)
-
-### 충남대학교
-상태: ✅ 정상 (공지 글 7건 감지 · 새 글 0)
-
-### 전남대학교
-상태: ✅ 정상 (공지 글 11건 감지 · 새 글 2)
-- [행사] [[취업정보] [해병대] 해병대 장교 모집 설명회/상담회](https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70996) — 2026-11-16
-- [학사] [[학사안내] 2027학년도 전기(2차) 일반대학원 입학전형 모집요강 공고](https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardID=5&bbsMode=view&page=1&key=70994) — 2026-11-16
-
-### 조선대학교
-상태: ✅ 정상 (공지 글 8건 감지 · 새 글 1)
-- [[앵커사업단] AI·로봇 인증체계 개발 및 AI 기반 데이터사이언스 전문가 양성 교육 (M4 과정) 교육생 모집](https://www3.chosun.ac.kr/bbs/chosun/117/282817/artclView.do) — 2026-11-16
-
-### 충북대학교
-상태: ✅ 정상 (공지 글 6건 감지 · 새 글 3)
-- [「교양영어 선택이수제」 11월 신청 안내](https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171627&pageUnit=10&searchCnd=all&pageIndex=1) — 2026-11-13
-- [학사] [2026학년도 동기 계절수업 2차 폐강 과목 및 2차(최종) 수강신청 안내](https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171624&pageUnit=10&searchCnd=all&pageIndex=1) — 2026-11-13
-- [학사] [2026학년도 동기 계절수업 다른 대학교 수학 안내(서원대)](https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171623&pageUnit=10&searchCnd=all&pageIndex=1) — 2026-11-13
-
-### 부경대학교
-상태: ✅ 정상 (공지 글 14건 감지 · 새 글 1)
-- [채용] [[채용공고] 국립부경대학교 체육진흥원 조교(조정부 감독) 채용 공고](https://www.pknu.ac.kr/main/163?action=view&no=727020) — 2026-11-16
-
-### 강원대학교
-상태: ⚠️ 오류 (TypeError: UND_ERR_SOCKET) — 주소 확인 필요
-
-### 경희대학교
-상태: ✅ 정상 (공지 글 5건 감지 · 새 글 1)
-- [국제 [(국제) 심리상담센터] 다문화가정 및 북한이탈주민 재학생을 위한 NEO 성격검사](https://www.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200316&boardId=323562) — 2026-11-16
-
-### 한국외국어대학교
-상태: ✅ 정상 (공지 글 10건 감지 · 새 글 2)
-- [2026학년도 동계방학 HUFS Dorm 사생 모집](https://www.hufs.ac.kr/bbs/hufs/2180/271685/artclView.do) — 2026-11-12
-- [생활] [[HUFStory]2026년 도서관 북토크 '이야기는 세상을 구할 수 있을까? ' 안내](https://www.hufs.ac.kr/bbs/hufs/2180/271680/artclView.do) — 2026-11-16
+- 한양대학교 (40회 연속) — 접속 실패 (HTTP 403) — 주소 수정 필요
+- 아주대학교 (53회 연속) — 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
+- 경북대학교 (3회 연속) — 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
 
 ### 서울대학교
-상태: ✅ 정상 (공지 글 2건 감지 · 새 글 0)
+상태: ✅ 정상 (공지 글 3건 감지 · 새 글 1)
+- [생활] [2027학년도 관악학생생활관 학부재학생 신청 및 선발 안내](https://www.snu.ac.kr/snunow/notice/genernal?md=v&bbsidx=179510) — 2026-11-16
 
 ### 서울대학교 · 학부대학 공지
 상태: ✅ 정상 (공지 글 12건 감지 · 새 글 0)
@@ -162,10 +21,16 @@
 상태: ✅ 정상 (공지 글 8건 감지 · 새 글 0)
 
 ### 연세대학교 미래캠퍼스
-상태: ✅ 정상 (공지 글 10건 감지 · 새 글 0)
+상태: ✅ 정상 (공지 글 9건 감지 · 새 글 2)
+- [행사] [2026년 권역별 「연구실 안전주간 행사」 개최 안내](https://www.yonsei.ac.kr/bbs/wj/104/944656/artclView.do) — 2026-11-16
+- [[무료교육] ICT융합 스마트 굿즈 및 메이커 장비 마스터 교육생 모집 모집](https://www.yonsei.ac.kr/bbs/wj/104/944650/artclView.do) — 2026-11-16
 
 ### 고려대학교
-상태: ✅ 정상 (공지 글 5건 감지 · 새 글 0)
+상태: ✅ 정상 (공지 글 7건 감지 · 새 글 4)
+- [[세종에코업혁신융합대학사업단] 11월 18일(수) ~ 11.21(토) 부재안내](https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE3MTIlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D) — 2026-11-17
+- [생활] [정전 비상대응 매뉴얼 배포 및 숙지 안내](https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE3MDclMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D) — 2026-11-17
+- [채용] [고려대학교 학부대학 교수학습지원센터 연구인력 채용공고](https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE2ODUlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D) — 2026-11-16
+- [인문계 차량진입 통제 안내(11/21~22)](https://www.korea.ac.kr/ko/566/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjElMkYwMDAwNjAwMDAwMDAwNjE3MDElMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D) — 2026-11-16
 
 ### 고려대학교 세종캠퍼스
 상태: ✅ 정상 (공지 글 2건 감지 · 새 글 0)
@@ -180,12 +45,147 @@
 상태: ✅ 정상 (공지 글 10건 감지 · 새 글 0)
 
 ### 성균관대학교
-상태: ⏰ 시간 예산(4분) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다
+상태: ✅ 정상 (공지 글 16건 감지 · 새 글 2)
+- [채용] [[채용/모집] 시스템 신경과학 연구실 대학원 진학 예정 학부 연구 인턴 모집 (성균관대 뇌과학뇌공학과 김재현)](https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142062&article.offset=0&articleLimit=10) — 2026-11-17
+- [[인사캠] 2026년 12월 체력증진센터(경영관, 600주년기념관) 회원모집 안내](https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142011&article.offset=0&articleLimit=10) — 2026-11-17
 
 ### 한양대학교
-상태: ⏰ 시간 예산(4분) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다
+상태: ⚠️ 접속 실패 (HTTP 403) — 주소 수정 필요
 
 ### 중앙대학교
+상태: ✅ 정상 (공지 글 7건 감지 · 새 글 1)
+- [학사] [2026학년도 동계 계절학기 블루메이트(국가근로_장애학생도우미) 모집(서울캠퍼스)](https://www.cau.ac.kr/cms/FR_CON/BoardView.do?MENU_ID=100&CONTENTS_NO=1&SITE_NO=2&P_TAB_NO=&TAB_NO=&BOARD_SEQ=4&BOARD_CATEGORY_NO=&BBS_SEQ=30342&pageNo=1) — 2026-11-17
+
+### 서울시립대학교
+상태: ✅ 정상 (공지 글 7건 감지 · 새 글 2)
+- [[안내] 2027년도 학교 외 단체의 다중이용시설 예약 안내](https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31861&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&) — 2026-11-17
+- [[웹메일] 개인·부서 대표메일 계정 정보보안 강화를 위한 2차인증(OTP) 설정안내(강조)](https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31860&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&) — 2026-11-17
+
+### 건국대학교
+상태: ✅ 정상 (공지 글 17건 감지 · 새 글 0)
+
+### 동국대학교
+상태: ✅ 정상 (공지 글 7건 감지 · 새 글 1)
+- [채용] [[교수학습혁신센터] 2026 XR활용 학습역량 강화 체험 프로그램 신청자 모집!](https://www.dongguk.edu/article/GENERALNOTICES/detail/26767012) — 2026-11-17
+
+### 동국대학교 WISE캠퍼스
+상태: ✅ 정상 (공지 글 6건 감지 · 새 글 0)
+
+### 홍익대학교
+상태: ✅ 정상 (공지 글 5건 감지 · 새 글 1)
+- [채용] [[서울] 온라인커뮤니케이션실 - 사진기자 근로 학생 모집 공고](https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=160421&noCat=501) — 2026-11-17
+
+### 숙명여자대학교
+상태: ✅ 정상 (공지 글 9건 감지 · 새 글 0)
+
+### 광운대학교
+상태: ✅ 정상 (공지 글 32건 감지 · 새 글 1)
+- [[시설] 2026년 11월 교내 승강기 정기 점검 안내](https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53696&tpage=1&searchKey=1&searchVal=&srCategoryId=) — 2026-11-17
+
+### 명지대학교
+상태: ✅ 정상 (공지 글 14건 감지 · 새 글 1)
+- [교섭 요구 사실 공고문(전국공공운수사회서비스노동조합)](https://www.mju.ac.kr/bbs/mjukr/141/237234/artclView.do) — 2026-11-17
+
+### 상명대학교
+상태: ✅ 정상 (공지 글 9건 감지 · 새 글 0)
+
+### 가천대학교
+상태: ✅ 정상 (공지 글 10건 감지 · 새 글 1)
+- [학사] [2027-1학기 휴학 및 휴학연장 안내](https://www.gachon.ac.kr/bbs/kor/475/127173/artclView.do) — 2026-11-17
+
+### 아주대학교
+상태: ⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
+
+### 국민대학교
+상태: ✅ 정상 (공지 글 6건 감지 · 새 글 1)
+- [학사] [[미래자동차사업단] 2026학년도 동계 계절학기 [한국항공대학교-항공드론] 학점교류 신청 안내](https://www.kookmin.ac.kr/user/kmuNews/notice/4/12573/view.do?currentPageNo=1) — 2026-10-30
+
+### 숭실대학교
+상태: ✅ 정상 (공지 글 10건 감지 · 새 글 0)
+
+### 세종대학교
+상태: ✅ 정상 (공지 글 7건 감지 · 새 글 0)
+
+### 이화여자대학교
+상태: ✅ 정상 (공지 글 9건 감지 · 새 글 7)
+- [2027학년도 수시모집 논술고사 시행에 따른 교내 차량 전면 통제 안내 (11.28.(토)~29.(일))](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367962&article.offset=0&articleLimit=10&no=335) — 2026-11-16
+- [학사] [[학부] 2026학년도 겨울 계절학기 수강안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367643&article.offset=0&articleLimit=10&no=335) — 2026-10-27
+- [[이화인문과학원] 종말, 우리가 아는 세상의 끝 | 한국포스트휴먼연구회 × 과학기술과 사회 네트워크 공동학술대회](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367982&article.offset=0&articleLimit=10&no=333) — 2026-11-17
+- [채용] [[채용] 이화여자대학교 대학원혁신연구실 직원 모집 공고](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367977&article.offset=0&articleLimit=10&no=330) — 2026-11-17
+- [[안전팀] 약학관 주변 인도 및 차도 통제 안내](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367970&article.offset=0&articleLimit=10&no=327) — 2026-11-16
+- [[인재개발원][진로디자인]나의 진로 DNA 파악(12.23.(수))](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367969&article.offset=0&articleLimit=10&no=326) — 2026-11-16
+- [[인재개발원][진로디자인] 버크만 진단 기반, 어울리는 직무 탐색(12.22.(화))](https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367968&article.offset=0&articleLimit=10&no=325) — 2026-11-16
+
+### 인하대학교
+상태: ✅ 정상 (공지 글 15건 감지 · 새 글 0)
+
+### 부산대학교
+상태: ✅ 정상 (공지 글 12건 감지 · 새 글 2)
+- [학사] [[학사과] 2026학년도 겨울계절수업 교류 수학 안내(고려대학교 HUSS)](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512239) — 2026-11-17
+- [도약수업 (법학전문대학원 교수 및 AI튜터와 함께하는 맞춤형 민법) 신청안내](https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512235) — 2026-11-17
+
+### 가톨릭대학교
+상태: ✅ 정상 (공지 글 6건 감지 · 새 글 1)
+- [[입학처] 신입생(26학번) 대상 설문 진행(5천원 상당 음료 기프티콘 제공 *선착순 400명)](https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277855&article.offset=0&articleLimit=10) — 2026-11-17
+
+### 한국항공대학교
+상태: ✅ 정상 (공지 글 8건 감지 · 새 글 0)
+
+### 경기대학교
+상태: ✅ 정상 (공지 글 7건 감지 · 새 글 1)
+- [학사] [[입학에서 취업까지] 2026학년도 2학기「인권과 성평등교육」 이수 안내 (졸업예정자 추가공지)](https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627241&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888) — 2026-11-17
+
+### 서울과학기술대학교
+상태: ✅ 정상 (공지 글 16건 감지 · 새 글 2)
+- [서울과학기술대학교 제43대 총학생회 본선거 투표 안내](https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897851&qidx=4691&cate=10&allboard=false&nowpage=1) — 2026-11-17
+- [채용] [IXLab 학부 연구인턴 모집](https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897840&qidx=4691&cate=10&allboard=false&nowpage=1) — 2026-11-17
+
+### 계명대학교
+상태: ✅ 정상 (공지 글 18건 감지 · 새 글 3)
+- [제124회 대학원생 콜로키움 안내](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271983&pageOrder=0&cmd=2&parm_bod_uid=271983&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&) — 2026-11-17
+- [행사] [주한폴란드대사관 주관 영화 'People' 상영회(11/25) 개최 안내](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271983&pageOrder=0&cmd=2&parm_bod_uid=271981&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&) — 2026-11-17
+- [행사] [주한폴란드대사 초청 특별강연(11/25) 개최 안내](https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271983&pageOrder=0&cmd=2&parm_bod_uid=271978&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&) — 2026-11-17
+
+### 서울교육대학교
+상태: ✅ 정상 (공지 글 11건 감지 · 새 글 0)
+
+### 한국방송통신대학교
+상태: ✅ 정상 (공지 글 10건 감지 · 새 글 2)
+- [[일반] [일반] [2026학년도 재학생 실태조사] 참여를 부탁드립니다 (추첨하여 모바일 상품권 증](https://www.knou.ac.kr/bbs/knou/51/822628/artclView.do) — 2026-11-17
+- [학사] [[학적] 2027학년도 1학기 복수전공 이수 신청자 승인 안내](https://www.knou.ac.kr/bbs/knou/51/822627/artclView.do) — 2026-11-17
+
+### 경북대학교
+상태: ⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
+
+### 영남대학교
+상태: ✅ 정상 (공지 글 10건 감지 · 새 글 1)
+- [2027학년도 1학기 학생설계전공 신청 안내](https://www.yu.ac.kr/main/bachelor/bachelor-guide.do?mode=view&articleNo=232557600&article.offset=0&articleLimit=10&srYearMonth=2026-11&ref=calendar) — 2026-11-17
+
+### 전북대학교
+상태: ⚠️ 오류 (TypeError: UND_ERR_CONNECT_TIMEOUT) — 주소 확인 필요
+
+### 충남대학교
+상태: ⏰ 시간 예산(4분) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다
+
+### 전남대학교
+상태: ⏰ 시간 예산(4분) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다
+
+### 조선대학교
+상태: ⏰ 시간 예산(4분) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다
+
+### 충북대학교
+상태: ⏰ 시간 예산(4분) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다
+
+### 부경대학교
+상태: ⏰ 시간 예산(4분) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다
+
+### 강원대학교
+상태: ⏰ 시간 예산(4분) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다
+
+### 경희대학교
+상태: ⏰ 시간 예산(4분) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다
+
+### 한국외국어대학교
 상태: ⏰ 시간 예산(4분) 소진 — 이번 실행은 건너뜀, 다음 실행이 여기부터 이어서 봅니다
 
 ---

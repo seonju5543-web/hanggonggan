@@ -196,7 +196,78 @@ export function attachmentText(filePath) {
    알아보도록 **줄 머리 이름표 뒤에만** 콜론을 둔다(2026-10-17 · 강원대 청년창업어업인 포스터: 자격 줄이 있는데 못 읽었다). */
 const OCR_LABEL = /^((?:신청|지원|선발|모집|참가|참여)\s?(?:대상|자격|인원|금액|기간|방법|문의)|접수\s?(?:기간|방법)|문의처?)\s+(?=\S)/gm;
 function ocrText(filePath) {
-  try { return ocrPeriodFix(fs.readFileSync(filePath + '.ocr.txt', 'utf8').replace(OCR_LABEL, '$1 : ')); } catch { return ''; }
+  let t;
+  try { t = fs.readFileSync(filePath + '.ocr.txt', 'utf8'); } catch { return ''; }
+  return ocrMoneyCheck(ocrPeriodFix(t.replace(OCR_LABEL, '$1 : ')), pdfLayerText(filePath));
+}
+
+/* ── OCR 금액 줄의 자릿수 관문 (2026-11-16 · 상명대 근로장학 auto-enoticedoarticleno770333) ─────────────────────────────
+   OCR 이 천 단위 쉼표를 `1` 로 읽었다: `6. 장학금액: 11500,000원/인당` ↔ 같은 PDF 글자층 `6. 장학금액: 1,500,000원/인당`.
+   금액 로봇은 그것을 1,150만원으로 읽어 카드 금액이 약 7.7배가 될 뻔했다(발췌에도 그 줄이 '그대로' 나갈 뻔했다).
+   🔴 **쉼표의 자릿수가 어긋난 금액**(`11500,000` · `1,50,000` · `15000,00` · `1.000,000` · `5.845,264` — 첫 쉼표 앞이 네 자리 이상이거나
+      쉼표 뒤 묶음이 세 자리가 아니거나 점과 쉼표가 섞였다)은 OCR 에서 믿지 않는다. 사람이 쓴 원문은 그렇게 적지 않는다 — 오독이다.
+   그 줄은 같은 파일의 글자층에서 **같은 줄이라고 확신할 때만** 글자층 줄로 바꾼다(sameMoneyLine — 모두 맞아야 한다):
+      ① 이름표(`6. 장학금액 :` · `(인당 지원액)`)가 있고 그 이름표의 줄이 글자층에도 OCR 에도 **하나뿐**이다
+      ② 글자층 줄의 금액은 전부 자릿수가 바르다 · 금액 개수와 단위가 같다
+      ③ 금액 숫자는 한 글자 차이까지(짧은 쪽이 긴 쪽 안에 차례대로 있다 — 쉼표를 숫자로 읽거나 숫자 하나를 놓친 오독) · OCR 의 멀쩡한 금액은 글자층과 같다
+      ④ 금액 밖의 숫자는 하나도 다르지 않고 한글은 거의 같다(0.85)
+   못 맞추면 **그 줄을 뺀다** — 금액은 모름(amountValue 0)이고 발췌로도 안 나간다. OCR 품질 관문(ocr-text.py)이 못 믿는 줄을 빼는 것과 같은 길이다.
+   🔴 글자층을 통째로 믿는 것은 아니다(2026-08-20 결정 그대로 — 글자층은 숫자가 빠진다) · 이 줄 하나만 두 판독이 맞을 때 바꾼다.
+   🔴 OCR 글자에만 건다 — HWP·DOCX·본문은 사람이 친 글자라 이 오독이 없다(저장분에서 본 적 없음).
+   여기 한 곳에서 하므로 첨부 글자를 읽는 로봇(발췌기·금액 로봇·카드 읽기·대외활동)이 모두 같은 글자를 본다. */
+const MONEY_UNIT = '(천\\s*만\\s*원|백\\s*만\\s*원|만\\s*원|천\\s*원|억|원)';
+const MONEY_TOKEN = new RegExp(`(?<![\\d.,])\\d(?:[\\d.,]*\\d)?(?=\\s*${MONEY_UNIT})`, 'g');
+export const moneyTokens = (line) => [...String(line || '').matchAll(MONEY_TOKEN)]
+  .map((m) => ({ num: m[0], unit: m[1].replace(/\s+/g, ''), digits: m[0].replace(/\D/g, '') }));
+/** 쉼표 자릿수가 어긋난 금액 숫자인가 — 쉼표가 없으면(`150만원` · `1.5억`) 판정하지 않는다 */
+export const malformedMoney = (num) => String(num).includes(',') && !/^\d{1,3}(?:,\d{3})+$/.test(String(num));
+const hasBadMoney = (line) => moneyTokens(line).some((t) => malformedMoney(t.num));
+/* 이름표 — 줄 머리의 번호·기호(`6.` `가.` `①` `○` `❍` `-`)를 걷고 `(이름표)` 또는 콜론 앞(15자 안). 띄어쓰기는 OCR 이 흔들어 빼고 비교한다 */
+const LEAD_MARK = /^(?:\s*(?:\d{1,2}\s*[.)]|[가-하]\s*[.)]|\(\s*\d{1,2}\s*\)|[①-⑳]|[○●◦▪■□◎❍ㅇ※•·\-–]))+\s*/;
+export function moneyLabel(line) {
+  const t = String(line || '').replace(LEAD_MARK, '').trim();
+  const par = t.match(/^[(（]\s*([가-힣 ]{2,12})\s*[)）]/);
+  const lab = par ? par[1] : (() => { const at = t.search(/[:：]/); return at > 0 && at <= 15 ? t.slice(0, at) : ''; })();
+  const k = lab.replace(/\s+/g, '');
+  return (k.match(/[가-힣]/g) || []).length >= 2 && !/\d/.test(k) ? k : null;
+}
+const lcs = (a, b) => {
+  let prev = new Array(b.length + 1).fill(0);
+  for (let i = 1; i <= a.length; i += 1) {
+    const cur = [0];
+    for (let j = 1; j <= b.length; j += 1) cur[j] = a[i - 1] === b[j - 1] ? prev[j - 1] + 1 : Math.max(prev[j], cur[j - 1]);
+    prev = cur;
+  }
+  return prev[b.length];
+};
+const outsideMoney = (line) => String(line || '').replace(MONEY_TOKEN, ' ');
+const oneSlip = (a, b) => { const [s, l] = a.length <= b.length ? [a, b] : [b, a]; return l.length - s.length <= 1 && lcs(s, l) === s.length; };
+/** OCR 금액 줄과 글자층 줄이 같은 줄인가 (위 머리말 ②③④ · ①은 ocrMoneyCheck 가 본다) */
+export function sameMoneyLine(ocrLine, layLine) {
+  const mine = moneyTokens(ocrLine), theirs = moneyTokens(layLine);
+  if (!theirs.length || mine.length !== theirs.length || theirs.some((t) => malformedMoney(t.num))) return false;   // ②
+  for (let i = 0; i < mine.length; i += 1) {
+    if (mine[i].unit !== theirs[i].unit) return false;
+    if (malformedMoney(mine[i].num) ? !oneSlip(mine[i].digits, theirs[i].digits) : mine[i].digits !== theirs[i].digits) return false;   // ③
+  }
+  if (outsideMoney(ocrLine).replace(/\D/g, '') !== outsideMoney(layLine).replace(/\D/g, '')) return false;   // ④ 숫자
+  const x = outsideMoney(ocrLine).replace(/[^가-힣]/g, ''), y = outsideMoney(layLine).replace(/[^가-힣]/g, '');
+  return x.length >= 2 && y.length >= 2 && (2 * lcs(x, y)) / (x.length + y.length) >= 0.85;   // ④ 한글
+}
+/** OCR 글자에서 자릿수가 어긋난 금액 줄을 글자층 줄로 바꾸거나 뺀다 (layer 가 없으면 빼기만) */
+export function ocrMoneyCheck(ocr, layer = '') {
+  const lines = String(ocr || '').split('\n');
+  if (!lines.some(hasBadMoney)) return String(ocr || '');
+  const count = (arr) => { const m = new Map(); for (const l of arr) { const k = moneyLabel(l); if (k) m.set(k, [...(m.get(k) || []), l]); } return m; };
+  const lays = count(String(layer || '').replace(OCR_LABEL, '$1 : ').split('\n').map((l) => l.trim()).filter(Boolean));
+  const ocrs = count(lines);
+  return lines.map((l) => {
+    if (!hasBadMoney(l)) return l;
+    const k = moneyLabel(l);
+    const cand = k ? lays.get(k) || [] : [];
+    if (cand.length !== 1 || (ocrs.get(k) || []).length !== 1) return null;   // ①
+    return sameMoneyLine(l, cand[0]) ? cand[0] : null;
+  }).filter((l) => l !== null).join('\n');
 }
 
 /* OCR 이 **기간 줄**에서 흔히 내는 두 오독을 되돌린다 (2026-11-15 · 카드 빈칸 비평).

@@ -1,7 +1,38 @@
 {
  "school": "한국방송통신대학교",
- "updatedAt": "2026-11-16",
+ "updatedAt": "2026-11-17",
  "items": [
+  {
+   "title": "[일반] [일반] [2026학년도 재학생 실태조사] 참여를 부탁드립니다 (추첨하여 모바일 상품권 증",
+   "url": "https://www.knou.ac.kr/bbs/knou/51/822628/artclView.do",
+   "postedAt": "2026-11-17",
+   "school": "한국방송통신대학교",
+   "campus": "",
+   "src": "6cb89020",
+   "foundAt": "2026-11-17"
+  },
+  {
+   "title": "[학적] 2027학년도 1학기 복수전공 이수 신청자 승인 안내",
+   "url": "https://www.knou.ac.kr/bbs/knou/51/822627/artclView.do",
+   "postedAt": "2026-11-17",
+   "kind": "학사",
+   "school": "한국방송통신대학교",
+   "campus": "",
+   "src": "6cb89020",
+   "foundAt": "2026-11-17",
+   "desc": "2027 학년도 1 학기 복수전공 이수자 선발 결과를 다음과 같이 안내하오니 확인하시기 바랍니다 . ▣ 승인 일시 : 2026. 11. 17.(화) ▣ 승인 조회 :"
+  },
+  {
+   "title": "[시험성적] 2026학년도 2학기 기말결시 추가과제물 시행안내",
+   "url": "https://www.knou.ac.kr/bbs/knou/51/822465/artclView.do",
+   "postedAt": "2026-11-16",
+   "kind": "학사",
+   "school": "한국방송통신대학교",
+   "campus": "",
+   "src": "6cb89020",
+   "foundAt": "2026-11-16",
+   "desc": "2026 학년도 2 학기 기말결시 추가과제물 시행에 따른 제출기간 , 제출방법 등을 다음과 같이 안내합니다 ."
+  },
   {
    "title": "[일반] [방송대 학보] KNOU위클리 308호 (2026년 11월 16일 발행) 지면안내",
    "url": "https://www.knou.ac.kr/bbs/knou/51/822423/artclView.do",
@@ -384,27 +415,6 @@
    "src": "6cb89020",
    "foundAt": "2026-10-19",
    "desc": "복수전공이란 ? 제 1 전공 이외의 전공 교과목을 체계적으로 이수하여 학위를 취득하는 것을 말하며 , 졸업증서에 복수전공 해당학과 및 복수전공명이 함께 표기됩니다 ."
-  },
-  {
-   "title": "[일반] [방송대 학보] KNOU위클리 305호(2026년 10월 19일 발행) 지면안내",
-   "url": "https://www.knou.ac.kr/bbs/knou/51/818772/artclView.do",
-   "postedAt": "2026-10-19",
-   "school": "한국방송통신대학교",
-   "campus": "",
-   "src": "6cb89020",
-   "foundAt": "2026-10-19",
-   "thumb": "data/news/img/79deb7d2faaad995.webp",
-   "desc": "◎ 커버스토리 : 서정원 교수(사회복지학과) 신간 『 AI 나라의 홍콩할머니 』"
-  },
-  {
-   "title": "[시험성적] 2026학년도 2학기 기말과제물 시행공고",
-   "url": "https://www.knou.ac.kr/bbs/knou/51/818151/artclView.do",
-   "postedAt": "2026-10-14",
-   "kind": "학사",
-   "school": "한국방송통신대학교",
-   "campus": "",
-   "src": "6cb89020",
-   "foundAt": "2026-10-19"
   }
  ]
 }

@@ -415,9 +415,30 @@ function nfPressed() { return ++nfPressSeq; }
 function nfRegisterFailed(res) {
   return pushConfigured() && !(res && res.ok) && !(res && res.reason === 'off');
 }
+/* 🔴 **잠깐의 실패로 바로 끄지 않는다** (2026-11-17 은서 — 다른 세션 진단 "일시적인 실패가 한 번만 나도 스위치가 바로 꺼지고,
+   꺼진 뒤엔 앱이 다시 시도하지 않아 학생은 켰다고 믿는데 알림이 영영 안 온다").
+   · 다시 하면 될 실패(인터넷 끊김 network · 서버 오류 server · 구글·애플 푸시 서비스의 일시 거절 subscribe-failed · 시간 초과 timeout)는
+     NF_RETRY_DELAYS_MS 만큼 쉬고 다시 등록한다. 그래도 안 되면 그때 꺼짐(11-09 지시 그대로 — 따로 알리지 않는다).
+   · 다시 해도 소용없는 것(푸시 미지원 unsupported · 권한 차단 permission · 발송 서버 설정 없음 unconfigured)은 지금처럼 바로 꺼짐.
+   · 다시 하기는 누른 뒤 NF_RETRY_WINDOW_MS 안에서만 시작한다 — 이미 12초(NF_PUSH_STEP_MS)를 기다린 시간 초과를 또 기다리게 하면
+     학생은 켜짐을 30초 넘게 보다가 꺼지는 것을 보게 된다.
+   · 그새 다시 눌렀거나 껐으면 멈춘다(마지막 누름이 정한다). */
+const NF_RETRY_REASONS = ['network', 'server', 'subscribe-failed', 'timeout'];
+const NF_RETRY_DELAYS_MS = [2000, 5000];
+const NF_RETRY_WINDOW_MS = 10000;
+function nfRetryable(res) { return !!(res && NF_RETRY_REASONS.includes(res.reason)); }
 async function nfRegisterAfterPress(seq) {
-  const res = await nfPushQueue(() => pushEnsure());
-  if (seq !== nfPressSeq || !notifyLedger || !notifyLedger.enabled) return res;
+  const startedAt = Date.now();
+  const stale = () => seq !== nfPressSeq || !notifyLedger || !notifyLedger.enabled;
+  let res = await nfPushQueue(() => pushEnsure());
+  for (const wait of NF_RETRY_DELAYS_MS) {
+    if (stale() || !nfRegisterFailed(res) || !nfRetryable(res)) break;
+    if (Date.now() - startedAt + wait > NF_RETRY_WINDOW_MS) break;
+    await new Promise((r) => setTimeout(r, wait));
+    if (stale()) break;
+    res = await nfPushQueue(() => pushEnsure());
+  }
+  if (stale()) return res;
   if (!nfRegisterFailed(res)) return res;
   notifyLedger.enabled = false;
   await notifySaveLedger();

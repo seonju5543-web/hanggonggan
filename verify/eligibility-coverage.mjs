@@ -137,7 +137,8 @@ if (process.argv[1] && new URL(`file://${process.argv[1]}`).href === import.meta
   if (process.argv.includes('--brief')) {
     /* 수집 리포트용 한 줄 — 온보딩에서 묻는 처지가 4곳 미만이 되거나, 안 묻는 처지가 4곳 이상이면 「손볼 때」 */
     const under = totals.filter(([k, n]) => asked.has(k) && n < 4).map(([k, n]) => `${k} ${n}`);
-    const over = totals.filter(([k, n]) => !asked.has(k) && n >= 4).map(([k, n]) => `${k} ${n}`);
+    /* 단체 회원(`member:<단체>`)은 공고 안에서 그 단체 이름으로만 묻는다 — 온보딩 후보가 아니다(2026-11-16 개발자 결정 1번) */
+    const over = totals.filter(([k, n]) => !asked.has(k) && n >= 4 && !/^member:/.test(k)).map(([k, n]) => `${k} ${n}`);
     const flag = (under.length || over.length) ? ` · ⚠️ 온보딩 질문 목록 손볼 때 — 4곳 미만인데 묻는 것: ${under.join(', ') || '없음'} · 4곳 이상인데 안 묻는 것: ${over.join(', ') || '없음'}` : '';
     console.log(`- 자격 줄 전수: 공고 ${Object.values(cov).map((s) => s.notices).join('/')} · 조건을 하나도 못 읽는 줄 ${Object.values(cov).map((s) => s.noCond.size).join('/')} (등록/재단/활동 · 합 ${noCondTotal}) · 처지 상위 ${totals.slice(0, 5).map(([k, n]) => `${k} ${n}`).join(', ')}${flag}`);
     console.log(verdictBrief(verdictDist(reg)));   // 둘째 줄 — 가상 학생 셋의 카드·줄 판정 분포(1단계 측정)

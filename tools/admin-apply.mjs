@@ -723,6 +723,14 @@ switch (action) {
          (끈 것: prepDoc 이 사라져도 prepDocFrom 은 '관리자'로 남겨 로봇이 다시 켜지 않게 — 리뷰) */
       mark('documents', 'documentsFrom');
       if (changed.includes('prepDoc')) it.prepDocFrom = OWNER;
+      /* 메일 접수 주소도 같은 규칙 (2026-11-16 · 상명대 근로장학 — 로봇이 '선발 뒤 신청서 제출' 메일을 접수처로 읽었다).
+         로봇(extract-excerpts fillApplyEmail · apply-email humanOwnedEmail)은 applyEmailFrom 이 '관리자'면 안 채운다.
+         🔴 비울 때도 표식을 남긴다 — 없으면 다음 실행이 같은 줄을 다시 읽어 같은 주소를 되채운다(마감일과 같다).
+         근거 문장(applyEmailSource)은 주소와 한 세트라 주소를 비우면 같이 뺀다 */
+      if (changed.includes('applyEmail')) {
+        it.applyEmailFrom = it.applyEmail ? OWNER : `${OWNER} · 비움`;
+        if (!it.applyEmail) delete it.applyEmailSource;
+      }
       /* 원문 주소를 고쳤는데 같은 공고에 예전 「원문 바로잡기」(data/link-fixes.json)가 있으면 그것이 늘 이겨 고친 주소가 앱에 안 나간다
          (리뷰 2026-10-04) — 같은 커밋에서 그 바로잡기를 지우고 기록에 남긴다. 사람이 방금 넣은 주소가 새 원문이다 */
       if (changed.includes('sourceUrl')) {

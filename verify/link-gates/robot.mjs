@@ -225,6 +225,34 @@ export default async function gate(eq, ctx) {
   const q = P.planQueue(tg, st, today, {}).map((t) => t.url.split('=')[1]);
   eq('ⓑ 한 번 본 문제(앞선 날 — 다시 보면 확정) → 처음 보는 정식 등록 → 처음 보는 나머지 → 확정 문제 → 나머지 · 오늘 이미 본 것은 다시 안 연다(리뷰 LC-4)', q, ['3', '5', '1', '4', '2']);
   eq('  한 번 본 문제를 다른 날 다시 열어야 확정된다 — 같은 날 본 것(id=6)은 오늘 순서에 없다', [q.includes('3'), q.includes('6')], [true, false]);
+  /* (2026-11-16 · 로드맵 C3) 마감이 14일 안에 닥친 글은 처음 보는 나머지(1)·확정 문제(3)·나머지(4)보다 앞(이른 마감 먼저) — 지난 마감·마감 없음·먼 마감은 예전 자리 */
+  const D = (id, due, lastAt) => ({ ...T(`https://d${id}.kr/v?id=${id}`, 'registered', `마감 순서 글 ${id}번 장학생 선발`), ...(due ? { due } : {}) });
+  const dueT = [D(1, '', '2026-10-01'), D(2, '2026-10-30', '2026-10-02'), D(3, '2026-10-12', '2026-10-04'), D(4, '2026-10-01', '2026-10-01'), D(5, '2026-10-08', '2026-10-04'), D(6, '2026-10-19', '2026-10-03')];
+  const seenAt = ['2026-10-01', '2026-10-02', '2026-10-02', '2026-10-01', '2026-10-03', '2026-10-03'];
+  const dueSt = Object.fromEntries(dueT.map((t, i) => [t.url, { v: 'post', at: seenAt[i], lastAt: seenAt[i], lastV: 'post' }]));
+  eq('  ⓑ-2 다시 여는 차례: 마감 14일 안(이른 마감부터: 10-08 → 10-12 → 10-19) → 나머지는 오래 안 본 순서(지난 마감 10-01 · 마감 없음 · 먼 마감 10-30)',
+    P.planQueue(dueT, dueSt, today, {}).map((t) => t.url.split('=')[1]), ['5', '3', '6', '1', '4', '2']);
+  eq('  ⓑ-2 어제 본 임박 링크는 올리지 않는다(이틀에 한 번 · 하루 예산을 같은 링크에 쓰지 않게) — 10-08 마감(id=5)을 어제 봤으면 제자리',
+    P.planQueue(dueT, { ...dueSt, [dueT[4].url]: { ...dueSt[dueT[4].url], at: '2026-10-04', lastAt: '2026-10-04' } }, today, {}).map((t) => t.url.split('=')[1]), ['3', '6', '1', '4', '2', '5']);
+  const newNews = T('https://n9.kr/v?id=9', 'news', '처음 보는 소식 글 학사 일정 안내');
+  const newReg = T('https://n8.kr/v?id=8', 'registered', '처음 보는 정식 등록 장학생 선발');
+  const hit = { ...T('https://n7.kr/v?id=7', 'notices', '확정 직전 문제 글 장학 안내'), due: '2026-10-06' };
+  const mix = P.planQueue([newNews, dueT[4], newReg, dueT[1], hit], { ...dueSt, [hit.url]: { v: 'list', at: '2026-10-04', n: 1, confirmed: false, lastAt: '2026-10-04', lastV: 'list' } }, today, {}).map((t) => t.url.split('=')[1]);
+  eq('  ⓑ-2 마감 임박은 처음 보는 소식(1)보다 앞 · 확정 직전 문제(2)·처음 보는 정식 등록(0) 뒤 · 먼 마감은 제자리', mix, ['7', '8', '5', '9', '2']);
+  {
+    const tmpD = fs.mkdtempSync(path.join(os.tmpdir(), 'link-check-due-'));
+    try {
+      fs.mkdirSync(path.join(tmpD, 'data'), { recursive: true });
+      fs.writeFileSync(path.join(tmpD, 'data/registered.json'), JSON.stringify({ items: [
+        { id: 'r1', name: '마감 칸 장학생 선발 공고', boardTitle: '마감 칸 장학생 선발 공고', sourceUrl: 'https://due.kr/v?id=1', deadline: '2026-10-09' },
+        { id: 'r2', name: '같은 주소 다른 장학생 선발', boardTitle: '같은 주소 다른 장학생 선발', sourceUrl: 'https://due.kr/v?id=1', deadline: '2026-10-07' },
+        { id: 'r3', name: '마감 모르는 장학생 선발 공고', boardTitle: '마감 모르는 장학생 선발 공고', sourceUrl: 'https://due.kr/v?id=3', deadline: '상시' },
+      ] }));
+      const gDue = P.gatherTargets(tmpD, { today });
+      const dueOf = (u) => (gDue.targets.find((t) => t.url === u) || {}).due;
+      eq('  ⓑ-3 마감은 정식 등록의 deadline 칸(날짜 꼴만)에서 · 같은 주소에 둘이면 이른 마감', [dueOf('https://due.kr/v?id=1'), dueOf('https://due.kr/v?id=3')], ['2026-10-07', undefined]);
+    } finally { fs.rmSync(tmpD, { recursive: true, force: true }); }
+  }
   const many = Array.from({ length: 12 }, (_, i) => T(`https://same.kr/v?id=${i}`, 'news', `같은 사이트 글 ${i}번 안내 공고`));
   eq('  사이트마다 상한(기본 8 · 학교 서버를 몰아치지 않는다) · 전체 상한', [P.planQueue(many, {}, today, {}).length, P.planQueue(many, {}, today, { perHost: 3 }).length, P.planQueue(tg, {}, today, { max: 2 }).length], [8, 3, 2]);
   const lastHit = new Map([['h1.kr', 1000], ['h2.kr', 1000]]);

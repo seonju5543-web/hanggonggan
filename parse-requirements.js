@@ -869,11 +869,24 @@ const TRAIT_DISQUALIFY = new Set(['discipline', 'fullTuition']);   // fullTuitio
 const TRAIT_OPEN_LIST = /등\s*[)）]?\s*[.。]?\s*$|(?:및|또는|와|과|,)\s*그?\s*자녀|(?:임직원|재직자|근로자|직원)의?\s?자녀|우대|가산점?|필수[^.]{0,6}아님/;
 /* 같은 계열(코드 리뷰 실측): `봉사실적이 40 시간 이상인 자 우대`·`자격증 소지자 우대 (필수사항은 아님)` 는 **우대**지 요건이 아니고,
    `회사 임직원의 자녀` 는 본인이 재직자가 아니어도 된다 — 모두 「아니요」에 미달이 났다. 확신을 낮춘다(모름) */
+/* ── 단체 회원은 **그 단체 이름으로** 묻고 저장한다 (2026-11-16 개발자 결정 1번) ──
+   예전엔 처지 `member` 하나라, 한국건설교통신기술협회 공고에서 「예」라고 답하면 전기공사공제조합 공고에도 ✓ 가 떴다(틀린 안심).
+   줄에서 단체 이름을 읽으면 처지 열쇠를 `member:<단체>` 로 쓴다 — 답도 단체마다 따로다. 못 읽으면 예전처럼 `member`.
+   ⚠️ 이름은 '협회·조합·향우회…' 로 끝나는 네 글자 이상 고유 이름만(맨 `협회`·`조합` 은 단체 이름이 아니다) · 둘 이상이면 가장 긴 것 */
+const MEMBER_ORG = /([가-힣A-Za-z0-9]{2,30}(?:공제조합|조합|협회|향우회|동문회|총연합회|연합회|중앙회))(?=\s*(?:의\s*)?(?:회원|조합원|에\s*가입|소속))/g;
+const MEMBER_ORG_GENERIC = /^(?:협회|조합|공제조합|향우회|동문회|연합회|총연합회|중앙회|회원사협회)$/;
+function memberOrgOf(t) {
+  const names = [...String(t || '').matchAll(MEMBER_ORG)].map((m) => m[1]).filter((n) => n.length >= 4 && !MEMBER_ORG_GENERIC.test(n));
+  return names.length ? names.sort((a, b) => b.length - a.length)[0] : null;
+}
+const memberKeyOf = (t) => { const o = memberOrgOf(t); return o ? `member:${o}` : 'member'; };
+
 function parseTrait(t, isExclude) {
   const hit = TRAIT_PAT.filter(([, re]) => re.test(t)).map(([k]) => k)
     /* 전액 장학·면제는 **빼는 말일 때만** — 제외 칸이거나 줄에 `제외`·`불가` 가 있어야 한다(`타 장학금 수혜자(전액 장학금 포함) 신청 가능` 은 받는다는 말이다) */
     .filter((k) => k !== 'fullTuition' || (!FULL_TUITION_NOT.test(t) && (isExclude || /제외|불가|제한|할\s?수\s?없/.test(t))));
   if (!hit.length) return [];
+  for (let i = 0; i < hit.length; i += 1) if (hit[i] === 'member') hit[i] = memberKeyOf(t);   // 단체 이름으로(위 memberOrgOf)
   const conf = HAS_EXCEPTION.test(t) ? LOW : HIGH;
   const out = [];
   const bad = hit.filter((k) => TRAIT_DISQUALIFY.has(k));
@@ -1316,8 +1329,14 @@ function parseResidence(t) {
      거주 요건의 예외는 위 RES_EXCEPT 로만 판단한다. */
   /* about:'home' — 갈래를 **모든 갈래에 적는다**. ②③ 에만 적으면 '없음'이 두 가지 뜻
      (거주지다 / 아직 안 가른 옛 값)을 갖게 되고, 그걸 읽는 쪽이 갈라진다. */
+  /* 🔴 보호자 줄의 `(학생 주소 무관)`·`※ 학생의 주소 무관` 은 예외가 아니다 (2026-11-17 · 장성장학회 층2) — 「학생 주소는 안 보고 **보호자 주소만** 본다」는
+     뜻이라 요건을 좁히는 말인데, RES_EXCEPT 의 `무관` 이 이걸 예외로 읽어 확신을 낮췄고(LOW) 부모가 서울인 학생에게 ✕ 대신 모름 · 「적합」 쪽이 됐다(틀린 안심).
+     보호자·부모를 말하는 줄에서 학생·본인 주소가 무관하다는 말만 지우고 잰다 — `부모 주소 무관`(본인만 보면 된다)·`관외 거주 인정` 같은 진짜 예외는 그대로 LOW */
+  const tEx = /보호자|부모/.test(t)
+    ? t.replace(/(?:[(（]\s*|※\s*)(?:학생|본인|학생\s?본인)\s?의?\s*(?:주소|주민등록|거주지?)\s*(?:와|은|는)?\s*무관\s*[)）]?/g, '')
+    : t;
   const out = { kind: 'residence', about: 'home', anyOf: prov, cities, inArea,
-    conf: (RES_EXCEPT.test(t) || orOtherTie) ? LOW : HIGH };
+    conf: (RES_EXCEPT.test(tEx) || orOtherTie) ? LOW : HIGH };
   /* 🔴 거주 **기간**·**누가**·**어디 안쪽**을 담는다 (2026-11-02 · 3차 · 틀린 ✓ 31곳). 프로필에 거주 기간·읍면동 칸이 없어서
      시·군만 맞으면 ✓ 를 냈다 — `공고일 기준 1년 이상 계속 기장군에 주소를 둔` 을 이사 온 지 석 달 된 학생도 ✓ 로 봤다(틀린 안심).
      질문은 더하지 않는다(개발자 결정 대기) — judgeCond 가 이 표식이 있으면 맞아도 ✓ 대신 '모름'을 낸다. 다르면 지금처럼 판정한다 */
@@ -2005,7 +2024,7 @@ function shortRegion(x) {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { schoolKindAlt, parseLine, shortRegion, REGION_CITIES, provincesOfCity, parseDegree, TRAIT_PAT, TRAIT_DISQUALIFY, gradOnly, gradTarget, mentionsUndergrad, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, REGIONS, untag, BRANCH_TAG, yearBranchLabels, yearBranchDoubt};
+  module.exports = { schoolKindAlt, parseLine, shortRegion, REGION_CITIES, provincesOfCity, parseDegree, TRAIT_PAT, TRAIT_DISQUALIFY, gradOnly, gradTarget, mentionsUndergrad, GRADE_SCALE, STATUSES, HIGH, LOW, MULTI_PROGRAM, HAS_EXCEPTION, caseBranch, unaskedAttr, hasTopLevelOr, orBranches, REGIONS, untag, BRANCH_TAG, yearBranchLabels, yearBranchDoubt, memberOrgOf};
 }
 
 /* ── 경우별 분기 (2026-08-24 개발자 지적) ─────────────────────────────────
