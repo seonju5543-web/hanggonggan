@@ -1665,6 +1665,16 @@ console.log('\n■ 신청서 쪽 그림 · 빈칸 자리 — 이름표 옆·표 
   process.env.FORM_FIELDS_AS_LIB = '1';
   const FF = await import('../collector/form-fields.mjs').catch(() => ({}));
   eq('로봇을 불러왔다 (parseBbox · labelOf · detectFields)', ['parseBbox', 'labelOf', 'detectFields'].every((k) => typeof FF[k] === 'function'), true);
+  /* 2026-11-18 인계 F3 — 빈칸 정확도를 재는 자 · 리포트가 그대로 둔 파일의 0칸도 센다(전엔 3개로 적었고 실제 7개였다) */
+  if (FF.gradeReport) {
+    const pf = [{ id: 'a', rel: 'x.pdf', sha: 's1', n: 0 }, { id: 'b', rel: 'y.pdf', sha: 's2', n: 12 }];
+    const none = FF.gradeReport({}, pf), some = FF.gradeReport({ s2: { foundAtGrading: 10, right: 9, missed: 2, wrong: 1 } }, pf);
+    eq('  채점 장부 — 없으면 표본 후보(0칸 파일 먼저) · 있으면 맞게 찾은 비율과 「채점 때 n칸 → 지금 m칸」 경고 · 실데이터 정답은 관문에 안 박는다(장부는 추적만)',
+      [/아직 채점한 파일이 없습니다/.test(none.join('\n')), none.findIndex((l) => /^- a ·/.test(l)) < none.findIndex((l) => /^- b ·/.test(l)), /맞게 찾음 9\(82%\)/.test(some.join('\n')), /채점 때 10칸 → 지금 12칸/.test(some.join('\n'))],
+      [true, true, true, true]);
+  } else eq('  채점 장부 함수(gradeReport)가 있다', false, true);
+  eq('  그대로 둔 파일(sha 같음)도 0칸이면 리포트의 「빈칸을 하나도 못 찾은 파일」에 센다',
+    /stats\.same\+\+;[^\n]*if \(!prev\.fields\.length\) stats\.noField\.push/.test(readText(new URL('../collector/form-fields.mjs', import.meta.url))), true);
   if (FF.parseBbox) {
     const xml = `<page width="595.2" height="841.8">
       <line xMin="87.2" yMin="172.5" xMax="110.7" yMax="184.0"><word xMin="87.2" yMin="172.5" xMax="96.6" yMax="184.0">대</word><word xMin="101.3" yMin="172.5" xMax="110.7" yMax="184.0">학</word></line>

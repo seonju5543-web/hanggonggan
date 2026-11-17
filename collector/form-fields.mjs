@@ -176,7 +176,7 @@ export function runFormFields({ root, today, dry = false, force = false, log = c
   let index = { items: {} };
   try { index = JSON.parse(fs.readFileSync(indexPath, 'utf8')); } catch { /* 사본이 아직 없다 */ }
   const items = (index && index.items) || {};
-  const stats = { files: 0, done: 0, same: 0, failed: [], fields: 0, keyed: 0, noField: [], headerRows: 0, below: 0, png: 0, capped: [] };
+  const stats = { files: 0, done: 0, same: 0, failed: [], fields: 0, keyed: 0, noField: [], headerRows: 0, below: 0, png: 0, capped: [], perFile: [] };
   const byLabel = new Map();
   for (const [id, files] of Object.entries(items)) {
     const dir = path.join(outDir, id);
@@ -192,7 +192,7 @@ export function runFormFields({ root, today, dry = false, force = false, log = c
       keep.add(rel);
       const h = sha(pdfPath);
       const prev = fj.files[rel];
-      if (!force && prev && prev.sha === h && prev.pages && prev.pages.every((p) => fs.existsSync(path.join(dir, prev.dir || '', p.img)))) { stats.same++; stats.fields += prev.fields.length; stats.keyed += prev.fields.filter((x) => x.key).length; continue; }
+      if (!force && prev && prev.sha === h && prev.pages && prev.pages.every((p) => fs.existsSync(path.join(dir, prev.dir || '', p.img)))) { stats.same++; stats.fields += prev.fields.length; stats.keyed += prev.fields.filter((x) => x.key).length; stats.perFile.push({ id, rel, sha: h, n: prev.fields.length }); if (!prev.fields.length) stats.noField.push(`${id} · ${rel}`); continue; }   // 그대로 둔 파일도 센다(2026-11-18 · 리포트가 0칸 파일을 3개로 적었는데 실제 7개)
       if (dry) { log(`· ${id} · ${rel} — 만들 것`); continue; }
       const xml = sh('pdftotext', ['-bbox-layout', pdfPath, '-']);
       if (xml.status !== 0) { stats.failed.push({ id, name: rel, why: `pdftotext 실패: ${String(xml.stderr || '').slice(0, 100)}` }); continue; }
@@ -212,6 +212,7 @@ export function runFormFields({ root, today, dry = false, force = false, log = c
       };
       stats.done++; stats.fields += fields.length; stats.keyed += fields.filter((x) => x.key).length; stats.headerRows += headerRows;
       if (!fields.length) stats.noField.push(`${id} · ${rel}`);
+      stats.perFile.push({ id, rel, sha: h, n: fields.length });
       log(`✓ ${id} · ${rel} — ${rp.pages.length}쪽 · 빈칸 ${fields.length}(프로필로 채울 수 있는 것 ${fields.filter((x) => x.key).length})`);
     }
     if (dry) continue;
@@ -231,9 +232,38 @@ export function runFormFields({ root, today, dry = false, force = false, log = c
   if (stats.failed.length) { L.push(''); L.push('### 실패'); stats.failed.forEach((f) => L.push(`- ${f.id} · ${f.name} — ${f.why}`)); }
   if (stats.noField.length) { L.push(''); L.push('### 빈칸을 하나도 못 찾은 파일 (학생은 원본을 받아 손으로 쓴다 · 관리자가 칸을 지정하는 길은 다음 조각)'); stats.noField.forEach((s) => L.push(`- ${s}`)); }
   if (stats.capped.length) { L.push(''); L.push('### 쪽 상한으로 자른 파일'); stats.capped.forEach((s) => L.push(`- ${s}`)); }
+  let grades = {};
+  try { grades = JSON.parse(fs.readFileSync(path.join(root, 'collector', 'form-fields-grades.json'), 'utf8')) || {}; } catch { /* 없음 */ }
+  L.push(''); L.push(...gradeReport(grades, stats.perFile));
   if (!dry) fs.writeFileSync(reportPath, L.join('\n') + '\n');
   log(L.join('\n'));
   return stats;
+}
+
+/* ── 빈칸 정확도를 재는 자 (2026-11-18 · 인계 F3) ──────────────────────────────────────────────
+   사람이 표본 PDF 를 **한 번** 채점한다(칸마다 맞음·놓침·틀림) → collector/form-fields-grades.json 에 파일 sha 를 열쇠로 적는다:
+     { "<sha>": { "name": "…", "foundAtGrading": 6, "right": 5, "missed": 2, "wrong": 1, "at": "2026-11-20", "by": "선주" } }
+   로봇은 매 실행 그 sha 의 지금 찾은 칸 수를 채점 때와 견주어 리포트에 한 줄만 적는다(실데이터 정답을 관문에 박지 않는다 — 경고·추적만).
+   채점된 것이 없으면 표본 후보 10개를 고른다: 칸 0개 파일 → 칸이 가장 많은 파일 → 나머지(앞에서부터). 순수 함수. */
+export function gradeReport(grades, perFile) {
+  const out = ['### 🎯 빈칸 정확도 (사람 채점 표본 · collector/form-fields-grades.json)'];
+  const graded = (perFile || []).filter((f) => grades && grades[f.sha]);
+  if (!graded.length) {
+    const zero = perFile.filter((f) => !f.n), rest = perFile.filter((f) => f.n).sort((a, b) => b.n - a.n);
+    const pick = [...zero.slice(0, 4), ...rest.slice(0, 3), ...rest.slice(-3)].filter((f, i, a) => a.findIndex((x) => x.sha === f.sha) === i).slice(0, 10);
+    out.push('아직 채점한 파일이 없습니다 — 아래 표본을 한 번 채점해 주세요(칸마다 맞음·놓침·틀림 · 파일 sha 를 열쇠로):');
+    pick.forEach((f) => out.push(`- ${f.id} · ${f.rel} — 지금 찾은 칸 ${f.n} · sha ${String(f.sha).slice(0, 12)}`));
+    return out;
+  }
+  let right = 0, missed = 0, wrong = 0;
+  for (const f of graded) {
+    const g = grades[f.sha]; right += g.right || 0; missed += g.missed || 0; wrong += g.wrong || 0;
+    const drift = (g.foundAtGrading ?? f.n) !== f.n ? ` · ⚠️ 채점 때 ${g.foundAtGrading}칸 → 지금 ${f.n}칸(규칙이 바뀌었다 — 다시 채점)` : '';
+    out.push(`- ${f.id} · ${f.rel} — 맞음 ${g.right || 0} · 놓침 ${g.missed || 0} · 틀림 ${g.wrong || 0}${drift}`);
+  }
+  const all = right + missed;
+  out.splice(1, 0, `채점 ${graded.length}개 파일 · 찾아야 할 칸 ${all}개 중 맞게 찾음 ${right}(${all ? Math.round((right / all) * 100) : 0}%) · 놓침 ${missed} · 잘못 찾음 ${wrong}`);
+  return out;
 }
 
 if (!process.env.FORM_FIELDS_AS_LIB) {
