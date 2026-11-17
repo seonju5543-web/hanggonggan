@@ -21,7 +21,7 @@ import { createRequire } from 'node:module';
 import * as canon from '../collector/canon-url.mjs';
 import { indexTexts, sourceFor, hasText, evidenceExcerpts } from '../collector/notice-source.mjs';
 import { attachmentText, readable } from '../collector/attachment-text.mjs';
-import { periodAfterDeadline, amountAfterValue, needsBulkExpect, cleanExcerpts } from './edit-diff.mjs';
+import { periodAfterDeadline, amountAfterValue, needsBulkExpect, cleanExcerpts, ELIG_KEYS } from './edit-diff.mjs';   // 자격 칸 목록은 edit-diff 한 곳(화면 미리보기와 저장이 갈라지지 않게 · 2026-11-18)
 import { newsPostKey } from '../collector/news-board-rules.mjs';   // 소식 숨김 열쇠 한 곳 (수집 로봇의 newsHidden 과 같다)
 import { thumbKey, isThumbPath } from '../collector/news-thumb.mjs';   // 소식 썸네일 열쇠·꼴 한 곳 (썸네일 로봇과 같다)
 import { urlKey } from '../collector/url-key.mjs';
@@ -136,17 +136,6 @@ const NEVER_EMPTY = new Set(['name', 'type', 'provider', 'amount', 'summary', 's
 /* 🔴 `eligibility`(기계 판정용)와 `eligibilityLines`(사람이 읽는 문장)를 **섞지 말 것.**
    매칭·알림·홈 합계는 전부 `eligibility`를 보고 판정한다. 여기에 자유 문장이 들어가면
    판정이 조용히 망가진다. 그래서 중첩 키도 화이트리스트로 못 박고, 값의 형태까지 검사한다. */
-const ELIG_KEYS = {
-  selective: 'bool',
-  schoolOnly: 'str',
-  campusOnly: 'str',
-  schoolsAny: 'strArr', // "학교" 또는 "학교|캠퍼스" — match-engine.js inSchoolsAny
-  years: 'numArr',      // [1,2,3,4]
-  minGpa: 'num',
-  maxBracket: 'num',
-  tracks: 'strArr',
-};
-
 function cleanEligibility(v) {
   if (!v || typeof v !== 'object' || Array.isArray(v)) fail('자격(기계 판정용) 형식이 올바르지 않습니다');
   const out = {};

@@ -67,12 +67,19 @@ export const ELIG_KEYS = {
   minGpa: 'num',
   maxBracket: 'num',
   tracks: 'strArr',
+  /* 엔진(match-engine.js judgeCond)이 읽는 구조화 칸 다섯 — 목록에 없으면 관리자가 그 공고를 고칠 때 **조용히 지워진다**(2026-11-18 인계 M6 · 지금 쓰는 공고 0건 · 예방) */
+  flagsAny: 'strArr',   // 특별자격 하나 이상(match-engine.js:81)
+  freshmanOnly: 'bool', // 신입생만(:71)
+  seoulOnly: 'bool',    // 서울 거주(:93)
+  needCert: 'bool',     // 어학 성적 보유(:98)
+  exchange: 'bool',     // 교환학생(:103)
 };
 
 /* 자격 칸을 사람 말로 — 화면이 `{"schoolOnly":"경희대학교"}` 를 그대로 뱉으면 못 읽는다 */
 export const ELIG_LABEL = {
   selective: '선발제', schoolOnly: '학교 한정', campusOnly: '캠퍼스 한정', schoolsAny: '지원 대상 대학',
   years: '학년', minGpa: '최소 학점', maxBracket: '소득구간 상한', tracks: '계열',
+  flagsAny: '특별자격(하나 이상)', freshmanOnly: '신입생만', seoulOnly: '서울 거주', needCert: '어학 성적 보유', exchange: '교환학생',
 };
 
 /** 기계 판정용 자격을 정리한다. 모르는 키는 조용히 버린다.

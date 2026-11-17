@@ -11174,7 +11174,10 @@ console.log('\n■ 관리자 수정 규칙이 한 벌인가 (화면 미리보기
     const end = src.indexOf('};', at);
     return [...src.slice(at, end).matchAll(/^\s{2}([a-zA-Z]+):/gm)].map((m) => m[1]).sort();
   };
-  eq('기계 판정용 자격 칸 목록도 같다', eligKeysOf(applyJs), eligKeysOf(diffJs));
+  /* 2026-11-18 M6 — 자격 칸 목록은 edit-diff 한 곳(저장은 가져다 쓴다 · 사본이 있으면 화면과 저장이 갈라진다) · 엔진이 읽는 구조화 칸은 전부 목록에 있다(없으면 관리자가 고칠 때 조용히 지워진다) */
+  eq('기계 판정용 자격 칸 목록은 edit-diff 한 곳 — 저장 경로는 가져다 쓰고 사본이 없다 · 엔진이 읽는 다섯 칸(flagsAny·freshmanOnly·seoulOnly·needCert·exchange)이 들어 있다',
+    [/import \{[^}]*\bELIG_KEYS\b[^}]*\} from '\.\/edit-diff\.mjs'/.test(applyJs), applyJs.includes('ELIG_KEYS = {'), ['flagsAny', 'freshmanOnly', 'seoulOnly', 'needCert', 'exchange'].every((k) => eligKeysOf(diffJs).includes(k))],
+    [true, false, true]);
 
   /* ③ 🔴 **진짜 대조** — 같은 patch 를 넣어 저장소를 실제로 돌리고, 화면이 예고한
      '바뀌는 칸'과 '바뀐 뒤 값'이 그대로인지 본다. 칸 이름만 대면 안 된다:
@@ -13641,7 +13644,8 @@ console.log('\n■ 여러 대학만 받는 공고 · 분야 이름 학과 판정
 
   /* 관리자 저장 경로가 이 칸을 조용히 버리면 다음 수정 때 전국 공고로 되돌아간다 */
   const apply = readText(new URL('../tools/admin-apply.mjs', import.meta.url));
-  eq('  관리자 저장 경로가 schoolsAny 칸을 받는다', /schoolsAny:\s*'strArr'/.test(apply), true);
+  const diffSrc = readText(new URL('../tools/edit-diff.mjs', import.meta.url));   // 자격 칸 목록은 edit-diff 한 곳 — 저장 경로는 가져다 쓴다(2026-11-18)
+  eq('  관리자 저장 경로가 schoolsAny 칸을 받는다', /schoolsAny:\s*'strArr'/.test(diffSrc) && /import \{[^}]*\bELIG_KEYS\b[^}]*\} from '\.\/edit-diff\.mjs'/.test(apply), true);
 
   /* 분야 이름: 학과명에 그 분야가 들어 있으면 ✓, 아니면 '모름'(연계 전공일 수 있어 미달 아님) */
   const base = { school: '서울대학교', year: 3, status: '재학', nationality: 'korean', flags: [], track: 'engineering' };
