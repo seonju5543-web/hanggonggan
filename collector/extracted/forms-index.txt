@@ -502,7 +502,6 @@ form-nika1h-1.hwp	[SW중심대학사업단] 2026 INHA AX-EDU HACKATHON 참가자
 form-nika1h-2.hwp	[SW중심대학사업단] 2026 INHA AX-EDU HACKATHON 참가자 모집(11.6.(금)까지)	(양식) 2026 INHA AX-EDU 해커톤 신청서-예비개발자 유형.hwp	78336	act-1rw4nj4
 form-kkdaoq-1.hwpx	공통 [공통] 2026학년도 2학기 반영장학 신청 안내	2026-2학기 반영장학 선발 공지문 및 학업계획서 양식.hwpx	42588	auto-oardid323054menuno200318
 form-qkhdcb-1.hwp	공통 공과대학 특성화 장학 프로그램 참여학생 모집 안내	공과대학 특성화 장학 프로그램 신청서fv.hwp	370688	auto-oardid323410menuno200318
-form-8mc4mw-5.pdf	2026-2학기 한국장학재단 푸른등대 기부장학금 신규장학생 선발 안내(2차)	붙임1_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf	742637
 form-1phh0r-1.docx	[대학혁신과공유센터] 2026학년도 해외융합프로젝트 참가자 모집(스위스 제네바 국제기구 탐방)	2026 SKKU Intercultural Learning Program 참가 지원서.docx	20242	act-03k6crx
 form-1qq3k4-1.hwp	제7회 크리에이티브 브릿지 페스티벌 작품 공모	[크브페]지원신청서_작품명_지원자(팀)명.hwp	362496	act-0eamu3i
 form-1rdv2f-1.hwp	2026학년도 동계 의료인공지능 체험형 인턴십 프로그램 참가자 모집(~11/27)	2026동계 인턴십 참가 신청서_성명.hwp	112640	act-00t4wxq
@@ -517,3 +516,16 @@ form-szl3lw-1.pdf	[학생복지팀] (2026-동계) 근로장학생(방학중) 신
 form-szl3lw-2.hwp	[학생복지팀] (2026-동계) 근로장학생(방학중) 신청 안내	붙임.근로장학생 신청서.hwp	62976
 form-szl3lw-3.hwp	[학생복지팀] (2026-동계) 근로장학생(방학중) 신청 안내	붙임.근로장학생 포기신청서.hwp	49664
 form-szl3lw-4.pdf	[학생복지팀] (2026-동계) 근로장학생(방학중) 신청 안내	붙임.샘물근로배정부서 확인.pdf	66822
+form-8mc4mw-6.pdf	2026-2학기 한국장학재단 푸른등대 기부장학금 신규장학생 선발 안내(2차)	붙임1_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf	742637
+form-ucu7o0-1.hwp	[필독]대학생 집단연수(MT 등) 신고서 및 기획(안) 양식	붙임3. 대학생 집단연수(MT 등) 안전 확보를 위한 준수사항 및 서약서.hwp	62976	act-05s40mf
+form-hovtep-1.hwp	[충북대창업보육센터(BI)]_「CBCN 2026 모두의 IR 경진대회」 참가기업 모집	[붙임1] 2026 CBCN 모두의 IR 경진대회 참가신청서(R).hwp	60928	act-1rabwcn
+form-rm8ras-3.hwp	[교외] 관정이종환교육재단 장학생 선발 안내(11/23 마감, 등록금 전액 or 학업장려금 400만원)	관정국내장학생자기소개서양식.hwp	33280	auto-amepagescholarshipnotice-09j8czz
+form-wa2414-1.hwp	[HUSS] BRIDGE Agent 글로벌 프로젝트 참여학생 모집(중국 선전 4박 5일)	[HUSS GLOBAL] 동계 선전 기관탐방 참가신청서.hwp	63488	act-1nx44jd
+form-wa2414-2.hwp	[HUSS] BRIDGE Agent 글로벌 프로젝트 참여학생 모집(중국 선전 4박 5일)	[HUSS GLOBAL] 동계 선전 기관탐방 활동계획서.hwp	63488	act-1nx44jd
+form-15gt3j-1.docx	[KT그룹 희망나눔재단] 2026 KT랜선야학 대학생 멘토 선발	2026 KT랜선야학_대학생 멘토 지원서(학교명, 이름).docx	46532	act-0gx79pb
+form-1xpkrv-1.hwp	[필독] 2026년 Airbus 101 공모전 참가팀 모집 연장 안내	2026학년도 Airbus 101 참가 지원서.hwp	107008	act-0i53ule
+form-1lcb5s-1.hwpx	2026 신촌글로벌대학문화축제 대학생 중앙기획단 모집	신청서식.hwpx	125384	act-0l7vy7t
+form-1ou2x9-1.hwp	2026년 제주-유네스코 청년 연수 프로그램	2. 2026년 제주-유네스코 청년 연수 프로그램 신청서식.hwp	59392	act-0r96zru
+form-1ou2x9-2.hwp	2026년 제주-유네스코 청년 연수 프로그램	2. 2026년 제주-유네스코 청년 연수 프로그램 신청서식.hwp	812306	act-0r96zru
+form-1ysei1-1.hwp	[아동권리보장원] 제5기 서포터즈 모집	[제출서류1] 아동권리보장원 제5기 서포터스 신청서 및 사전미션.hwp	115200	act-1mx45lv
+form-1ysei1-2.hwp	[아동권리보장원] 제5기 서포터즈 모집	[제출서류2] 아동권리보장원 제5기 서포터스 개인정보 수집·이용 동의서.hwp	189440	act-1mx45lv
