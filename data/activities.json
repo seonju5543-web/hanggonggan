@@ -1,6 +1,45 @@
 {
- "updatedAt": "2026-11-17",
+ "updatedAt": "2026-11-18",
  "items": [
+  {
+   "title": "2026 서구토탈창업아카데미 참가자 모집",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179638",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": "접수기간 2026-10-27 ~ 2026-11-18 16:00 주관기관명 온랩 대상 전체 창업업력 예비창업자, 3년미만 연락처 070890889",
+   "deadline": "2026-11-18",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-10-27 ~ 2026-11-18 16:00"
+    },
+    {
+     "label": "일시",
+     "text": "2026. 11. 24.(화) ~ 11. 25.(수) / 1박 2일"
+    },
+    {
+     "label": "대상",
+     "text": "예비창업자 및 업력 3년 이내 초기창업기업 관계자 등"
+    }
+   ],
+   "eligibilityLines": [
+    "신청대상 : 예비창업자 및 업력 3년 이내 초기창업기업 관계자 등"
+   ],
+   "noticeLines": [
+    "• 신청 마감: 2026. 11. 18.(금)"
+   ],
+   "detailsV": 7,
+   "documents": [
+    "온라인 신청폼 작성"
+   ],
+   "field": "교육·캠프",
+   "excerptsAt": "2026-11-17",
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원 K-Startup",
+   "foundAt": "2026-11-17",
+   "id": "act-0ats8x8"
+  },
   {
    "title": "2026 논산시 사회적경제 창업 아카데미 참여자 모집",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179591",
@@ -6049,46 +6088,6 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-11-05",
-   "seenAt": "2026-11-17",
-   "excerptsAt": "2026-11-17"
-  },
-  {
-   "title": "2026 서구토탈창업아카데미 참가자 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179638",
-   "kind": "대외활동",
-   "field": "교육·캠프",
-   "deadline": "2026-11-18",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-27 ~ 2026-11-18"
-    },
-    {
-     "label": "대상",
-     "text": "예비창업자 및 업력 3년 이내 초기창업기업 관계자 등"
-    },
-    {
-     "label": "활동지역",
-     "text": "전국"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "온랩",
-   "api": "kstartup",
-   "apiId": "179638",
-   "id": "api-kstartup-179638",
-   "eligibilityLines": [
-    "예비창업자 및 업력 3년 이내 초기창업기업 관계자 등"
-   ],
-   "noticeLines": [
-    "예비·초기창업자의 사업모델 고도화와 실전 창업역량 강화를 지원하고, 분야별 전문가 멘토링 및 창업경진대회를 통해 창업아이템의 사업화 가능성을 높이기 위한 「2026 서구토탈창업아카데미」 참가자를 다음과 같이 모집하오니 많은 관심과 참여 바랍니다.",
-    "온라인 접수 : https://docs.google.com/forms/d/e/1FAIpQLSfSf8JshcFHUXPzlBSCaz1n2jxvFAO_nsNxGdgqZohX00L6NA/viewform"
-   ],
-   "detailsV": 7,
-   "foundAt": "2026-11-04",
    "seenAt": "2026-11-17",
    "excerptsAt": "2026-11-17"
   },
