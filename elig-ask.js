@@ -130,7 +130,7 @@ const FIELD_META = {
   gpa:         { label: '평점', kind: 'number', suffix: '/ 4.5', min: 0, max: 4.5, step: 0.01 },
   credits:     { label: '직전 학기 이수학점', kind: 'number', min: 0, max: 30, step: 1 },
   bracket:     { label: '학자금 지원구간', kind: 'number', min: 0, max: 10, step: 1 },
-  birthYear:   { label: '태어난 해', kind: 'number', min: 1950, max: 2015, step: 1 },
+  birthYear:   { label: '태어난 해', kind: 'number', min: 1940, max: 2020, step: 1 },   // 온보딩·DB(0004)·input-guard 와 같은 범위 (2026-11-17 · 1950~2015 였다)
   /* 값은 온보딩 선택 칸(index.html #in-nationality)과 같은 코드 · 이름표도 그 글자 그대로 */
   nationality: { label: '국적', kind: 'select', options: [{ value: 'korean', label: '대한민국' }, { value: 'foreign', label: '외국인 유학생' }, { value: 'dual', label: '복수국적 · 영주권' }] },
   major:       { label: '학과', kind: 'text' },
@@ -262,8 +262,12 @@ function coerceField(key, raw) {
     if (Number.isNaN(n)) return null;
     const lo = meta.min == null ? -Infinity : meta.min;
     const hi = meta.max == null ? Infinity : meta.max;
-    const clamped = Math.min(hi, Math.max(lo, n));
-    return meta.step === 1 ? Math.round(clamped) : clamped;
+    /* 🔴 범위 밖은 **깎지 않고 null(모름)** (2026-11-17). 예전엔 5.0 → 4.5 로 깎아 학생이 적지 않은
+       값을 지어냈다(원칙 8-1). 화면은 칠 때부터 막으므로(input-guard.js) 여기는 마지막 방어다.
+       정수 칸에 소수가 오면 반올림하지 않고 역시 null — 19.5학점을 20학점으로 바꾸지 않는다. */
+    if (n < lo || n > hi) return null;
+    if (meta.step === 1 && !Number.isInteger(n)) return null;
+    return n;
   }
   return s;
 }

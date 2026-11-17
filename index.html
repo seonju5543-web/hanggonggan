@@ -177,11 +177,11 @@
           <p class="onboard-sub">장학금 자격 판단의 핵심 기준</p>
           <label class="field">
             <span class="field-label">직전학기 평점 (4.5 만점 · 신입학은 공란 가능)</span>
-            <input type="number" id="in-gpa" placeholder="예: 3.85" min="0" max="4.5" step="0.01" inputmode="decimal" />
+            <input type="text" id="in-gpa" placeholder="예: 3.85" min="0" max="4.5" step="0.01" inputmode="decimal" data-guard="gpa" autocomplete="off" />
           </label>
           <label class="field">
             <span class="field-label">직전학기 이수학점</span>
-            <input type="number" id="in-credits" placeholder="예: 15" min="0" max="30" step="1" inputmode="numeric" />
+            <input type="text" id="in-credits" placeholder="예: 15" min="0" max="30" step="1" inputmode="numeric" data-guard="credits" autocomplete="off" />
           </label>
           <label class="field">
             <span class="field-label">학자금 지원구간 (모르면 비워 두기)</span>
@@ -247,7 +247,7 @@
           </label>
           <label class="field">
             <span class="field-label">태어난 해 (선택)</span>
-            <input type="number" id="in-birth-year" placeholder="예: 2004" min="1940" max="2020" step="1" inputmode="numeric" />
+            <input type="text" id="in-birth-year" placeholder="예: 2004" min="1940" max="2020" step="1" inputmode="numeric" data-guard="birthYear" autocomplete="off" />
           </label>
         </div>
         <div class="onboard-actions">
@@ -355,15 +355,15 @@
           <p class="onboard-sub">대부분의 장학금 신청서가 공통으로 요구하는 정보입니다.<br />모두 선택 사항이며 이 기기에만 저장됩니다.</p>
           <label class="field">
             <span class="field-label">학번 (선택)</span>
-            <input type="text" id="in-sid" placeholder="예: 202512345" maxlength="12" inputmode="numeric" autocomplete="off" />
+            <input type="text" id="in-sid" placeholder="예: 202512345" maxlength="12" inputmode="numeric" autocomplete="off" data-guard-kind="studentId" />
           </label>
           <label class="field">
             <span class="field-label">생년월일 (선택)</span>
-            <input type="text" id="in-birth" placeholder="예: 2005.03.14" maxlength="10" autocomplete="off" />
+            <input type="text" id="in-birth" placeholder="예: 2005.03.14" maxlength="10" inputmode="decimal" autocomplete="off" data-guard-kind="date" />
           </label>
           <label class="field">
             <span class="field-label">휴대폰 번호 (선택)</span>
-            <input type="tel" id="in-phone" placeholder="예: 010-1234-5678" maxlength="13" autocomplete="off" />
+            <input type="tel" id="in-phone" placeholder="예: 010-1234-5678" maxlength="13" autocomplete="off" data-guard-kind="phone" />
           </label>
           <label class="field">
             <span class="field-label">이메일 (선택)</span>
@@ -377,7 +377,7 @@
           <label class="field" id="in-account-field" hidden>
             <span class="field-label">장학금 수령 계좌 (선택)</span>
             <input type="text" id="in-bank" placeholder="은행명 (예: 국민은행)" maxlength="12" autocomplete="off" style="margin-bottom:8px" />
-            <input type="text" id="in-account" placeholder="계좌번호" maxlength="20" inputmode="numeric" autocomplete="off" />
+            <input type="text" id="in-account" placeholder="계좌번호" maxlength="20" inputmode="numeric" autocomplete="off" data-guard-kind="account" />
           </label>
         </div>
         <div class="onboard-actions">
@@ -934,6 +934,7 @@
   <script src="parse-amount.js"></script>
   <script src="match-engine.js"></script>
   <!-- 🔴 match-engine 보다 뒤여야 한다 — requirementMatch 전역이 먼저 있어야 한다 -->
+  <script src="input-guard.js"></script>   <!-- 입력 안전장치 — 있을 수 없는 값(평점 999)을 칠 때부터 막는다 · app.js 보다 먼저 -->
   <script src="elig-ask.js"></script>
   <script src="notify-rules.js"></script>
   <script src="push-config.js"></script>

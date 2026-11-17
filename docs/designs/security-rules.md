@@ -99,6 +99,11 @@ connect-src 'self' https://*.workers.dev https://*.supabase.co
    고문 Q6 의 '컬럼으로 쪼개라'가 필요해지는 것은 **서버가 프로필로 질의할 때**(예: "이 공고에 맞는 학생 찾기")이고,
    우리는 그런 질의를 하지 않는다. 쪼개는 값은 아직 없고 값은 있다(앱 구조가 바뀔 때마다 DB 도 고쳐야 한다 —
    `supabase/migrations/0001_profiles.sql` 주석).
+🔴 **있을 수 없는 값은 세 겹으로 막는다** — 앱 `input-guard.js` · DB `supabase/migrations/0004_profile_columns.sql` 의 CHECK · 서버 `profileOutOfRange`
+   (규칙 전문은 CLAUDE.md 운영 원칙 10 · 2026-11-18 에 아래 ⚠️ 둘을 거기서 옮겼다).
+   ⚠️ CHECK 는 **'있을 수 없는 값'만** 잡고 **거짓말은 못 잡는다** — 없는 방어를 있다고 적지 말 것.
+   ⚠️ 거절은 화면이 **한 번** 알린다(`syncTellIfRejected`) — 안 알리면 프로필이 조용히 영영 안 올라간다.
+   관문 `verify/verify-apply-guard.mjs` · `verify-supabase.js` [13] · 관문 「프로필 개별 칸 · DB 검증」.
 
 ⚠️ 남은 천장 둘
 - **서버 사본은 일부러 덜 담긴다** — 특별자격·처지는 동의했을 때만 있다. 그래서 동의를 안 켠 학생의

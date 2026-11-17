@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-17",
+ "updatedAt": "2026-11-18",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -4364,7 +4364,7 @@
     "' 신청기간 | 2026.9.11.(금)-9.22.(화) '"
    ],
    "excerptNote": "공고문 첨부에서 그대로 발췌 (자동)",
-   "amountFrom": "관리자 2026-11-17"
+   "amountFrom": "관리자 2026-11-18"
   },
   {
    "id": "auto-oardid323019menuno200318",
@@ -7567,7 +7567,7 @@
     "◦ 학생신청: 학과에 서류 제출",
     "- 2차 신청일자: 2027. 1. 6.(화) ~ 2027. 1. 8.(금) 15시"
    ],
-   "excerptsFrom": "관리자 2026-11-17"
+   "excerptsFrom": "관리자 2026-11-18"
   },
   {
    "id": "auto-pnoticedoarticleno367130",
@@ -8196,7 +8196,24 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-09-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "성과형 장학금(자격증) 신청서 및 개인정보활용서.hwp",
+     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=31571&fSeq=1"
+    },
+    {
+     "name": "빅데이터 마이크로디그리 및 2026학년도 2학기 개설교과목 안내(최종).pdf",
+     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=31571&fSeq=2"
+    },
+    {
+     "name": "26-2 성과형장학금_자격증 목록.pdf",
+     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=31571&fSeq=3"
+    },
+    {
+     "name": "성과형 장학금 안내_카드뉴스.pdf",
+     "url": "https://www.uos.ac.kr/common/board-download.do?listId=FA1&seq=31571&fSeq=4"
+    }
+   ],
    "sourceUrl": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31571&sort=7&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
    "sourceKind": "auto",
    "eligibilityLines": [
@@ -8227,7 +8244,7 @@
    "deadlineFrom": "공고 원문",
    "openDate": "2026-11-02",
    "documentsFrom": "로봇 2026-10-17 · 원문 「제출서류」 절",
-   "excerptsFrom": "관리자 2026-11-17"
+   "excerptsFrom": "관리자 2026-11-18"
   },
   {
    "id": "auto-leno275978srcategoryid22",
@@ -12893,6 +12910,18 @@
     {
      "name": "★붙임2_공적활동확인서(활동사진 포함)_신규서식_2026-2학기.hwp",
      "url": "https://www.knou.ac.kr/bbs/knou/51/277973/download.do"
+    },
+    {
+     "name": "★붙임1_(공지사항) 2026. 2학기 교외장학생(발전기금재단, 출판문화원, 아시아발전재단) 선발 안내.hwp",
+     "url": "https://www.knou.ac.kr/bbs/knou/51/277972/download.do"
+    },
+    {
+     "name": "★붙임3-1_교외장학(발전기금,출판문화원,아시아발전재단) 신청 매뉴얼_PC.pdf",
+     "url": "https://www.knou.ac.kr/bbs/knou/51/277974/download.do"
+    },
+    {
+     "name": "★붙임3-2_교외장학(발전기금,출판문화원,아시아발전재단) 신청 매뉴얼_모바일.pdf",
+     "url": "https://www.knou.ac.kr/bbs/knou/51/277975/download.do"
     }
    ],
    "sourceUrl": "https://www.knou.ac.kr/bbs/knou/51/815772/artclView.do",
@@ -13457,7 +13486,12 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-12 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "2026-2학기 천마가족장학금 신청 Q&A.hwpx",
+     "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=fileDownload&articleNo=231554923&attachNo=376799"
+    }
+   ],
    "sourceUrl": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=231554923&article.offset=0&articleLimit=10",
    "sourceKind": "auto",
    "openDate": "2026-09-07",
@@ -15140,11 +15174,11 @@
    "eligibilityLines": [
     "- 신입생을 제외한 학생의 경우 : 총 평균평점 4.5만점에 3.0이상"
    ],
+   "eligibilityFrom": "관리자 2026-11-18",
    "eligibilityExcludes": [
     "3. 9학기 진학 및 부분 등록자는 선발에서 배제됩니다."
    ],
-   "eligibilityExcludesFrom": "관리자 2026-11-17",
-   "eligibilityFrom": "관리자 2026-11-17"
+   "eligibilityExcludesFrom": "관리자 2026-11-18"
   },
   {
    "id": "auto-bbssc58944387artclviewdo",
@@ -15599,7 +15633,7 @@
    "attachments": [
     {
      "name": "복지장학생(부모장애유형) 신청서(양식).hwp",
-     "url": "javascript:downGO('복지장학생(부모장애유형) 신청서(양식).hwp','/files/article/servicenotice/520872/','1722741C5C19464AB216CC7AC1190A47.hwp');"
+     "url": "https://wise.dongguk.ac.kr/cmmn/fileDown.do?filename=%EB%B3%B5%EC%A7%80%EC%9E%A5%ED%95%99%EC%83%9D(%EB%B6%80%EB%AA%A8%EC%9E%A5%EC%95%A0%EC%9C%A0%ED%98%95)%20%EC%8B%A0%EC%B2%AD%EC%84%9C(%EC%96%91%EC%8B%9D).hwp&filepath=/files/article/servicenotice/520872/&filerealname=1722741C5C19464AB216CC7AC1190A47.hwp"
     }
    ],
    "sourceUrl": "https://wise.dongguk.ac.kr/article/servicenotice/detail/520872",
@@ -15805,11 +15839,11 @@
    "eligibilityLines": [
     "- 신입생을 제외한 학생의 경우 : 총 평균평점 4.5만점에 3.0이상"
    ],
+   "eligibilityFrom": "관리자 2026-11-18",
    "eligibilityExcludes": [
     "다. 9학기 진학 및 부분 등록자는 선발에서 배제됨."
    ],
-   "eligibilityExcludesFrom": "관리자 2026-11-17",
-   "eligibilityFrom": "관리자 2026-11-17"
+   "eligibilityExcludesFrom": "관리자 2026-11-18"
   },
   {
    "id": "auto-ent2431269433artclviewdo",
@@ -15854,7 +15888,7 @@
     "29세 이하 대학생(1997년 1월 1일 이후 출생자)",
     "공고일 기준 학생과 가족 1인 이상이 안산시에 계속 3년 이상 또는 합산 10년 이상 주민등록을 두고 거주"
    ],
-   "eligibilityFrom": "관리자 2026-11-17",
+   "eligibilityFrom": "관리자 2026-11-18",
    "eligibilityPrev": {
     "lines": [
      "지원대상 : 지원금액 : 국민기초생활수급자 학생",
@@ -15997,7 +16031,12 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-23 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "3007.png",
+     "url": "https://www.yonsei.ac.kr/bbs/sc/58/1015253/download.do"
+    }
+   ],
    "sourceUrl": "https://www.yonsei.ac.kr/bbs/sc/58/944456/artclView.do",
    "sourceKind": "auto",
    "eligibilityLines": [
@@ -17088,7 +17127,7 @@
     "29세 이하 대학생(1997년 1월 1일 이후 출생자)",
     "공고일 기준 학생과 가족 1인 이상이 안산시에 계속 3년 이상 또는 합산 10년 이상 주민등록을 두고 거주"
    ],
-   "eligibilityFrom": "관리자 2026-11-17",
+   "eligibilityFrom": "관리자 2026-11-18",
    "eligibilityPrev": {
     "lines": [
      "지원대상 : 지원금액 : 본인부담 등록금 X 50%(학기당 100만원 한도)",
@@ -17287,11 +17326,11 @@
    "eligibilityLines": [
     "- 신입생을 제외한 학생의 경우 : 총 평균평점 4.5만점에 3.0이상"
    ],
+   "eligibilityFrom": "관리자 2026-11-18",
    "eligibilityExcludes": [
     "3. 9학기 진학 및 부분 등록자는 선발에서 배제합니다."
    ],
-   "eligibilityExcludesFrom": "관리자 2026-11-17",
-   "eligibilityFrom": "관리자 2026-11-17"
+   "eligibilityExcludesFrom": "관리자 2026-11-18"
   },
   {
    "id": "auto-skor478126350artclviewdo",
@@ -20944,7 +20983,20 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "2027-1 교내장학금 신청안내(SAINT)_내국인.pdf",
+     "url": "https://www.sogang.ac.kr/file-fe-prd/board/141/551715_1.pdf?sg=2027-1%20%EA%B5%90%EB%82%B4%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%EC%95%88%EB%82%B4(SAINT)_%EB%82%B4%EA%B5%AD%EC%9D%B8.pdf"
+    },
+    {
+     "name": "2027-1 장학금 신청안내 리플렛.pdf",
+     "url": "https://www.sogang.ac.kr/file-fe-prd/board/141/551715_2.pdf?sg=2027-1%20%EC%9E%A5%ED%95%99%EA%B8%88%20%EC%8B%A0%EC%B2%AD%EC%95%88%EB%82%B4%20%EB%A6%AC%ED%94%8C%EB%A0%9B.pdf"
+    },
+    {
+     "name": "개인정보 수집 및 활용 동의서.hwp",
+     "url": "https://www.sogang.ac.kr/file-fe-prd/board/141/551715_3.hwp?sg=%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4%20%EC%88%98%EC%A7%91%20%EB%B0%8F%20%ED%99%9C%EC%9A%A9%20%EB%8F%99%EC%9D%98%EC%84%9C.hwp"
+    }
+   ],
    "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551715?bbsConfigFk=141&namepage=ScholarshipNotice",
    "sourceKind": "auto",
    "openDate": "2026-11-01",
@@ -20996,7 +21048,12 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-10-30 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "[서식]글로벌여성리더장학금.hwp",
+     "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/fileDefaultDownload.do?fileNo=e9eb1bf7a4ad454288b829c1d30fe0c6&seq=1"
+    }
+   ],
    "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12570/view.do?currentPageNo=1",
    "sourceKind": "auto",
    "openDate": "2026-11-03",
@@ -21020,7 +21077,7 @@
     "◤ 7. 제 출 처",
     "외국인유학생지원센터 ( 글로벌센터 1 층 5 호실 )"
    ],
-   "excerptsFrom": "관리자 2026-11-17"
+   "excerptsFrom": "관리자 2026-11-18"
   },
   {
    "id": "auto-ent2431270591artclviewdo",
@@ -21599,7 +21656,16 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-11-03 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "[서식]차세대여성리더장학금.hwp",
+     "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/fileDefaultDownload.do?fileNo=ab5475d6e8e64b0a91be1f01596a13a3&seq=1"
+    },
+    {
+     "name": "2026 차세대여성리더장학생_선발모집공고문 (21회)_최종.hwp",
+     "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/fileDefaultDownload.do?fileNo=ab5475d6e8e64b0a91be1f01596a13a3&seq=2"
+    }
+   ],
    "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12582/view.do?currentPageNo=1",
    "sourceKind": "auto",
    "openDate": "2026-11-03",
@@ -21719,7 +21785,24 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-11-08 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "붙임_1._제_44기_송원김영환장학재단_장학생_선발_안내.docx",
+     "url": "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=fsUY6mc0%2FPSv%2FXm4w8Uu425ipNa6s86pfhwWEYAEDiw%3D&fs=3"
+    },
+    {
+     "name": "붙임_2._장학생_지원서_및_자기소개서.hwp",
+     "url": "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=fsUY6mc0%2FPSv%2FXm4w8Uu425ipNa6s86pfhwWEYAEDiw%3D&fs=4"
+    },
+    {
+     "name": "붙임_3._개인정보_수집_이용_및_제3자_제공_동의서.docx",
+     "url": "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=fsUY6mc0%2FPSv%2FXm4w8Uu425ipNa6s86pfhwWEYAEDiw%3D&fs=5"
+    },
+    {
+     "name": "붙임_4._게시용_안내문.docx",
+     "url": "https://portal.korea.ac.kr/ctt/bb/bulletin?encQS=fsUY6mc0%2FPSv%2FXm4w8Uu425ipNa6s86pfhwWEYAEDiw%3D&fs=6"
+    }
+   ],
    "sourceUrl": "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4OTUlMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg%3D%3D",
    "sourceKind": "auto",
    "openDate": "2026-11-06",
@@ -21925,7 +22008,16 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-11-08 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "자기소개서_기본형 (1).hwp",
+     "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261105&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&#"
+    },
+    {
+     "name": "발전기금 장학생 신청서(2026년2학기) (1).hwp",
+     "url": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261105&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&#"
+    }
+   ],
    "sourceUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261105&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
    "sourceKind": "auto",
    "applyEmail": "chil8811@naver.com",
@@ -22049,7 +22141,12 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-11-08 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "2027년도 1학기 제7회 보림선원 서울선원 장학생 선발 공고.hwp",
+     "url": "https://www.sogang.ac.kr/file-fe-prd/board/141/551760_1.hwp?sg=2027%EB%85%84%EB%8F%84%201%ED%95%99%EA%B8%B0%20%EC%A0%9C7%ED%9A%8C%20%EB%B3%B4%EB%A6%BC%EC%84%A0%EC%9B%90%20%EC%84%9C%EC%9A%B8%EC%84%A0%EC%9B%90%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EC%84%A0%EB%B0%9C%20%EA%B3%B5%EA%B3%A0.hwp"
+    }
+   ],
    "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551760?bbsConfigFk=141&namepage=ScholarshipNotice",
    "sourceKind": "auto",
    "applyEmail": "borimseon@gmail.com",
@@ -23018,6 +23115,11 @@
      "school": "경북대학교",
      "url": "https://home.knu.ac.kr/HOME/knussw/sub.htm?nav_code=knu1619416593&mode=view&mv_data=aWR4PTIxNzQmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=",
      "id": "notice:https://home.knu.ac.kr/HOME/knussw/sub.htm?mv_data=aWR4PTIxNzQmc3RhcnRQYWdlPSZsaXN0Tm89JnRhYmxlPWV4X2Jic19kYXRhX2tudXNzdyZjb2RlPU11NlN4bjZQMUlRYyZzZWFyY2hfaXRlbT0mc2VhcmNoX29yZGVyPSZvcmRlcl9saXN0PSZsaXN0X3NjYWxlPSZ2aWV3X2xldmVsPSZ2aWV3X2NhdGU9JnZpZXdfY2F0ZTI9JnNpdGVfY29kZT1rbnVzc3c=&nav_code=knu1619416593"
+    },
+    {
+     "school": "고려대학교 세종캠퍼스",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/274547/artclView.do",
+     "id": "notice:https://sejong.korea.ac.kr/bbs/koreaSejong/659/274547/artclView.do"
     }
    ],
    "scopeFrom": "같은 사업이 서강대학교 게시판에도 올라옴(자동) — 서강대학교 게시판 https://www.sogang.ac.kr/ko/detail/551805?bbsConfigFk=141&namepage=ScholarshipNotice",
@@ -23162,7 +23264,7 @@
     "- 지원방법 : 담당자 roirroir2@naver.com 으로 학업시간표 및 국가근로지원서(소득분위 필수 기재)",
     "메일접수해주시면 해당자에 한해 개별연락드립니다~"
    ],
-   "excerptsFrom": "관리자 2026-11-17"
+   "excerptsFrom": "관리자 2026-11-18"
   },
   {
    "id": "auto-amepagescholarshipnotice-0d1tyil",
@@ -24262,7 +24364,7 @@
     "가. 접수 기간: 2026년 11월 16일(월) ~ 11월 30일(월) [기한 엄수]",
     "가. 접수방법: 소속 학과에서 직접 공문 회신(접수기간 내 도착분에 한함)"
    ],
-   "excerptsFrom": "관리자 2026-11-17"
+   "excerptsFrom": "관리자 2026-11-18"
   },
   {
    "id": "auto-krbbskr846131artclviewdo",
@@ -24438,7 +24540,7 @@
    "kindEvidence": [
     "관리자(claude-session)가 교외 → 교내 로 정함"
    ],
-   "kindFrom": "관리자 2026-11-17",
+   "kindFrom": "관리자 2026-11-18",
    "provider": "주관 기관 원문 확인",
    "amount": "금액 원문 확인",
    "amountValue": 0,
@@ -24861,12 +24963,12 @@
     "선발 당시 재학생(휴학생 제외)으로 성적 및 이수학점 기준 충족자",
     "성적기준: 총 평균 백분위 87점이상 또는 3.5/4.5만점 이상"
    ],
-   "eligibilityFrom": "관리자 2026-11-17",
-   "deadlineFrom": "관리자 2026-11-17",
+   "eligibilityFrom": "관리자 2026-11-18",
+   "deadlineFrom": "관리자 2026-11-18",
    "excerpts": [
     "나. 제출방법: 학생회관 1층 학생서비스팀으로 방문 제출"
    ],
-   "excerptsFrom": "관리자 2026-11-17"
+   "excerptsFrom": "관리자 2026-11-18"
   },
   {
    "id": "auto-2630viewdocurrentpageno1",
@@ -24907,16 +25009,25 @@
     "라. 소득 9구간 이하의 경제적으로 곤란한 학생",
     "마. 4대보험 적용받는 취업중 학생인경우 근로 불가.(건강보험 자격득실 확인서 상 직장가입자로 본인이 가입이 되어 있을 경우 불가능)"
    ],
-   "eligibilityExcludes": [
-    "라. 기존 선발자 지원 불가"
-   ],
-   "eligibilityExcludesFrom": "관리자 2026-11-17",
-   "eligibilityFrom": "관리자 2026-11-17",
    "excerpts": [
     "가. 희망근로지 3차신청기간 : 11.18.(수) ~ 11.20.(금) (기한 엄수)",
     "나. 희망근로지 신청시 첨부된 엑셀자료의 지원가능학과 및 유의사항을 반드시 확인하여 신청바람."
    ],
-   "excerptsFrom": "관리자 2026-11-17"
+   "amountSpec": {
+    "kind": "hourly",
+    "value": 0,
+    "ratio": 0,
+    "min": 0,
+    "max": 0,
+    "raw": "4. 지원금액 가 . 교내 - 시급 : 10,320 원 ( 국고 : 8,256 원 / 교비 : 2,064 원 ) ​"
+   },
+   "amountFrom": "공고 원문",
+   "eligibilityFrom": "관리자 2026-11-18",
+   "eligibilityExcludes": [
+    "라. 기존 선발자 지원 불가"
+   ],
+   "eligibilityExcludesFrom": "관리자 2026-11-18",
+   "excerptsFrom": "관리자 2026-11-18"
   },
   {
    "id": "auto-b888ec9db4eab3b5eab38420",
@@ -24940,7 +25051,11 @@
     "schoolOnly": "서울시립대학교"
    },
    "documents": [
-    "지원 자격·제출 서류는 원문 공고에서 확인"
+    "[필 수] 성적증명서",
+    "[해당자] 한국장학재단 학자금 지원구간 통지서(2026학년도 2학기 기준)",
+    "[해당자] 장학금 수혜증명서(전체)",
+    "[해당자] 국가공인 봉사실적 인증시스템 발급서류(1365, VMS)",
+    "[해당자] 비교과 통합 인증서"
    ],
    "duplicable": true,
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
@@ -24949,6 +25064,13 @@
    "attachments": [],
    "sourceUrl": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20261117&brdSeq=1&filSeq=&pageIndex=1&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
    "sourceKind": "auto",
+   "nameFrom": "공고 원문(잘린 제목 보완)",
+   "deadlineFrom": "공고 원문",
+   "applyEmail": "scholarship@uos.ac.kr",
+   "applyEmailSource": "사. 제출방법: 장학팀 대표메일(scholarship@uos.ac.kr)로 제출",
+   "applyEmailFrom": "공고 원문",
+   "openDate": "2026-11-17",
+   "documentsFrom": "공고 원문",
    "eligibilityLines": [
     "1. (기본) 자연과학 또는 공학 계열 학부(과)에 재학중인 3학년 학생",
     "2. (성적) 직전학기 백분위 87점 이상 또는 3.5이상 / 4.5만점",
@@ -24961,13 +25083,25 @@
     "3. 동일학기에 한국장학재단에서 운영 중인 타 장학금 수혜자 또는 장학생 자격 유지자",
     "4. 수업연한초과자"
    ],
-   "eligibilityFrom": "관리자 2026-11-17",
-   "deadlineFrom": "관리자 2026-11-17",
+   "eligibilityExcludes": [
+    "1. 국가우수장학금(이공계) 장학생 자격 유지자 또는 영구탈락자",
+    "※ 국가우수장학금(이공계) 일시지원 장학생 선발 이력은 무관"
+   ],
    "excerpts": [
     "바. 제출기간: 2026.11.17.(화)~ 11.22.(일)까지",
     "사. 제출방법: 장학팀 대표메일(scholarship@uos.ac.kr)로 제출"
    ],
-   "excerptsFrom": "관리자 2026-11-17"
+   "amountSpec": {
+    "kind": "ratio",
+    "value": 0,
+    "ratio": 1,
+    "min": 0,
+    "max": 0,
+    "raw": "나. 장학금액: 2026학년도 2학기(1개 학기) 등록금 전액 ※생활비 미지원 다. 지원대상 및 자격 ※아래의 자격요건을 모두 충족해야 함 1. (기본) 자연과학 또는 공학 계열 학부(과)에 재학중인 3학년 학생 2. (성적) 직전학기 백분위 87점 이상 또는 3.5이상 / 4.5만점 3. (학점) 직전학기 최소이수학점 9학점 이상 ※ 심사학기가 졸업학기일"
+   },
+   "amountFrom": "공고 원문",
+   "eligibilityFrom": "관리자 2026-11-18",
+   "excerptsFrom": "관리자 2026-11-18"
   }
  ]
 }

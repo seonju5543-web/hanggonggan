@@ -3,6 +3,28 @@
  "updatedAt": "2026-11-17",
  "items": [
   {
+   "title": "「오늘, 마음의 날씨를 체크해 보세요!」 마음체크 참여 안내",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512241",
+   "postedAt": "2026-11-17",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-17",
+   "thumb": "data/news/img/24d1ad1ad3d24937.webp",
+   "desc": "안녕하세요. 효원상담원입니다. 마음체크는 현재 자신의 마음건강 상태를 살펴보고, 필요한 심리지원 정보를 확인할 수 있는 간단한 검사입니다. ✔ 약 3분 이면 현재 나의 마음건강 상태를 확인할 수 있습니다."
+  },
+  {
+   "title": "[사학과] Pre-BK 해외학자 초청강연 개최",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512240",
+   "postedAt": "2026-11-17",
+   "kind": "행사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-17",
+   "desc": "사학과에서 <해외학자 초청강연>을 개최합니다. *주제: 식민지 공창제도는 어떻게 설계되었는가: 대만의 경험으로 본 일본 제국의 성(性) 관리 *일시: 다음 주 월요일(11/23) 오후 3시 *장소: 부산대학교…"
+  },
+  {
    "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(고려대학교 HUSS)",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512239",
    "postedAt": "2026-11-17",
@@ -401,28 +423,6 @@
    "src": "2d0d4013",
    "foundAt": "2026-11-02",
    "thumb": "data/news/img/7e68db4de2306e84.webp"
-  },
-  {
-   "title": "[부산대소식 11월호] 부산대 수시 지원자 내신 성적 상승폭 '거점국립대...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511926",
-   "postedAt": "2026-11-02",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-02",
-   "thumb": "data/news/img/19bb302687b514b1.webp",
-   "desc": "안녕하세요. 홍보실입니다. 매월 부산대학교 소식을 전하는 웹진 『부산대소식』 11월호가 나왔습니다! 2027학년도 부산대 수시 지원자 내신 성적 상승폭이 '거점국립대 1위'를 차지했습니다."
-  },
-  {
-   "title": "[언어교육원행정실] '26학년도 4차 BK21 영어역량강화 지원 프로그램...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511920",
-   "postedAt": "2026-11-02",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-02",
-   "thumb": "data/news/img/c21166f7d9761cd7.webp"
   }
  ]
 }

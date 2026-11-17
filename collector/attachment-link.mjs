@@ -121,10 +121,14 @@ export function detailAttachments(html, pageUrl, { decode = (s) => s, max = 8 } 
     /* ④ `href="javascript:void(0)" onclick="fn_download('54098','1','hwpx')"` — 호출이 onclick 에 있는 게시판(과기정통부 · 2026-10-16).
        빈 href 일 때만 onclick 을 호출로 본다 · 모르는 함수면 아래 resolveJsDownload 가 null 이라 첨부가 되지 않는다 */
     const oc = (m[1] + m[4]).match(/\bonclick\s*=\s*(?:"([^"]*)"|'([^']*)')/i);
-    if ((!raw || JS_NOT_DOWNLOAD.test(raw)) && oc) raw = `javascript:${decode(oc[1] ?? oc[2] ?? '').trim()}`;
+    /* ⑤ `href="#" onclick="filedown('20261117','1','1');return false;"` — 빈 자리표 `#` 도 빈 href 와 같다(서울시립대 장학 게시판 · 2026-11-17 실측: 16건 중 16건이 첨부 0개).
+       `#` 로 시작하면 무조건 건너뛰던 탓에 onclick 을 보기도 전에 버렸다. 🔴 `#`+onclick 은 탭·펼치기 단추에도 흔하다 — 아래에서 **이름이 파일 이름일 때만** 첨부로 본다 */
+    const hashOnly = /^#/.test(raw);
+    if ((!raw || hashOnly || JS_NOT_DOWNLOAD.test(raw)) && oc) raw = `javascript:${decode(oc[1] ?? oc[2] ?? '').trim()}`;
     if (!raw || raw.startsWith('#') || JS_NOT_DOWNLOAD.test(raw)) continue;
     let name = cleanAttachName(m[5].replace(/<[^>]+>/g, ' '));
     let url = /^javascript:/i.test(raw) ? resolveJsDownload(raw, pageUrl) || raw : null;
+    if (hashOnly && url === raw && !ATTACH_EXT.test(name)) continue;   // 모르는 동작 + 파일 이름 아님 = 화면 단추
     if (!url) { try { url = new URL(raw, pageUrl).href; } catch { continue; } }
     /* 단추 글자(`다운로드`)뿐이면 파일 이름은 바로 앞 요소에 있다 — 태그를 줄로 바꿔 마지막 파일 이름 줄을 쓴다(지어내지 않는다 · 없으면 그대로).
        스크립트 호출(과기정통부)뿐 아니라 보통 내려받기 주소의 단추(경기대·충북대 · 2026-11-02)도 같다 */
