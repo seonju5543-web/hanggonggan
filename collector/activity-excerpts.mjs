@@ -183,6 +183,8 @@ export function eligLineOk(line) {
   if (LABEL_ONLY.test(t) || AWARD_ROW.test(t)) return false;
   /* (h) 게시판 단추·칸 이름(`답변등록`·`처리상태`·`SNS 업로드`) — 글 아래 민원 양식·공유 단추가 자격 절 뒤에 붙어 왔다(정책브리핑 보도자료 · 농식품부 경진대회 · 2026-10-19) */
   if (BOARD_CHROME.test(t)) return false;
+  /* (p) 프로그램·혜택 줄(2026-11-17 리뷰 실측): 「MS · LG전자 출신 강사」·「Take-off Stage 청년특강」·「동계 계절학기 1학점 인정」·「등록금 : 학생 개별 납부(…)」·「신청가능 국가: …」 */
+  if (/(?:출신\s*)?강사\s*$|특강\s*$|학점\s*인정\s*$|^등록금\s*[:：]|신청\s*가능\s*국가/.test(t)) return false;
   /* (i) 자격이 아닌 이름표 줄(`ㅇ 기간 : …`·`접수 : …`·`문의 : …`) — 자격 절 바로 뒤 줄이 같은 글머리로 이어져 블록에 딸려 왔다 */
   if (NOT_ELIG_LABEL.test(t)) return false;
   /* (j)~(m) 스크립트 페이지·API 표가 납작해져 들어온 조각 (2026-10-28 · 국방부 화이트햇 「참가 자격 : 안내」·「참가 대상 : AI·풀이 환경」 · K-Startup 「창업업력」·「2026년 10월 23일」·「조슈아파트너스(주)」·「대상연령 : 전체」):
@@ -213,7 +215,9 @@ export function sanitizeElig(it) {
   for (const k of ['eligibilityLines', 'eligibilityExcludes']) {
     if (!Array.isArray(it[k])) continue;
     const kept = (k === 'eligibilityLines' ? cutAtTableLabel(it[k]) : it[k]).filter(eligLineOk)   // 표 머리에서 자르기도 소급(2026-10-16)
-      .map(dedupeLabel).filter((l) => !titleFragment(l, it.title));   // 「공모자격 : 공모자격 : …」 이름표 두 번 · 제목 앞머리 조각(「청년들이 만드는」) — 2026-11-17
+      .map(dedupeLabel).filter((l) => !titleFragment(l, it.title))
+      /* 같은 줄이 제외 칸에도 있으면 자격 칸에서 뺀다 — 화면이 자격으로 먼저 그려 ✗ 없이 「색맹 또는 색약이 있으신 분」이 요건처럼 떴다(fMRI 실험 · 리뷰 11-17) */
+      .filter((l) => k !== 'eligibilityLines' || !(it.eligibilityExcludes || []).some((x) => normT(x) === normT(l)));   // 「공모자격 : 공모자격 : …」 이름표 두 번 · 제목 앞머리 조각(「청년들이 만드는」) — 2026-11-17
     if (kept.length === it[k].length && kept.every((l, i) => l === it[k][i])) continue;
     changed = true;
     if (kept.length) it[k] = kept; else delete it[k];
@@ -230,28 +234,107 @@ export function titleFragment(line, title) {
   /* 끊긴 꼴(꾸밈말·조사로 끝남 — 「청년들이 만드는」)일 때만 — 「전국 대학생 및 대학원생」처럼 제목이 대상으로 시작하는 글의 진짜 자격 줄은 둔다(리뷰 2026-11-17) */
   return l.length >= 4 && l.length <= 20 && t.length > l.length && t.startsWith(l) && /(?:는|은|을|를|의|과|와|및|에서|으로|로|위한|하는|한)$/.test(l);
 }
+/* 다른 글의 제목 — 게시판 목록·사이드바의 글 제목이 본문 줄로 딸려 왔다(2026-11-17 리뷰 실측: 봉사 글 「공고 안내」의 「2026학년도 교촌장학생 선발 안내(장학금액: …)」 ·
+   창업 경진대회 자격 칸의 「[안전관리팀] 계약직원 모집 (보훈 제한경쟁 채용)」 · 김장봉사 자격 칸의 「[경기북부하나센터] … '사랑의 김장나눔' 봉사활동 (사전)」).
+   꼴: 「[부서]」 머리 또는 「2026년도·2026학년도」 머리 + 글 제목 끝말(모집·안내·공고·선발·채용·봉사활동, 꼬리 괄호 허용) · 괄호 밖에 콜론이 없다(이름표 줄이 아니다) · 제 글 제목과 같은 말이면 둔다 */
+const POST_END = /(?:모집|안내|공고|선발|채용|봉사\s*활동)\s*(?:[(（][^)）]{0,40}[)）])?\s*$/;
+const normT = (x) => String(x || '').replace(/\[[^\]]*\]|[(（][^)）]*[)）]/g, '').replace(/[^\p{L}\p{N}]/gu, '');
+export function otherPostTitle(line, title) {
+  const l = String(line || '').trim();
+  if (l.length < 10 || l.length > 80 || /[:：]/.test(l.replace(/[(（][^)）]*[)）]/g, ''))) return false;
+  if (!(/^\[[^\]]{2,15}\]\s*\S/.test(l) || /^20\d{2}\s*(?:년도?|학년도)\s/.test(l)) || !POST_END.test(l)) return false;
+  const a = normT(l), b = normT(title);
+  return !(a && b && (b.includes(a) || a.includes(b)));
+}
+/** 칸 다섯(안내·자격·제외·우선·서류)에서 다른 글 제목을 걷는다 — 바뀌면 true (수집 로봇 발행 때 모든 글에 · 원칙 7 소급) */
+export function sanitizeForeign(it) {
+  if (!it) return false;
+  let changed = false;
+  for (const k of ['noticeLines', 'eligibilityLines', 'eligibilityExcludes', 'eligibilityPriority', 'documents']) {
+    if (!Array.isArray(it[k]) || (k !== 'noticeLines' && k !== 'documents' && /^관리자/.test(it.eligibilityFrom || ''))) continue;
+    const kept = it[k].filter((l) => !otherPostTitle(l, it.title));
+    if (kept.length === it[k].length) continue;
+    changed = true;
+    if (kept.length) it[k] = kept; else delete it[k];
+  }
+  return changed;
+}
 /** 서류 칸에 실린 사이트 맨 아래 줄·안내문·유의사항을 걷는다(doc-list.mjs DOC_JUNK 한 곳) — 바뀌면 true (수집 로봇 발행 때 모든 글에 · 원칙 7 소급) */
 export function sanitizeDocs(it) {
   if (!it || !Array.isArray(it.documents)) return false;
-  const kept = it.documents.filter((d) => !DOC_JUNK.test(String(d)));
-  if (kept.length === it.documents.length) return false;
+  const kept = it.documents.filter((d) => !DOC_JUNK.test(String(d)))
+    .map((d) => String(d).replace(/^[\s•·\-*]*(?:제출|구비|필요)\s*서류\s*[:：]\s*/, ''))   // 「• 제출 서류: 작품 본문…」 — 서류 줄에 절 이름표가 남았다(리뷰 11-17)
+    .filter(Boolean);
+  if (kept.length === it.documents.length && kept.every((d, i) => d === it.documents[i])) return false;
   if (kept.length) it.documents = kept; else delete it.documents;
   return true;
 }
-/** 마감이 빈 글은 「공고 안내」 줄의 기간(신청 기간·접수기간·제출기한·모집기간)에서 마감을 읽는다 — 판독기는 장학과 같은 extractDeadline(이름표 뒤 날짜만 · 해 없으면 null).
-    줄이 여럿이면(1차·2차 접수) **가장 늦은 끝**으로 — 1차 끝으로 2차가 열린 글을 지우지 않는다(external-clean lastRoundEnd 와 같은 이유).
-    왜 — 첨부·포스터에서 읽은 기간 줄(activity-docs noticeLines)엔 이 판독기를 한 번도 안 돌려, 3월·8월에 끝난 모집이 11월 화면에 '진행 중'으로 떴다(2026-11-17 실측 165건 중 수십 건). */
-export function deadlineFromNotice(it) {
-  if (!it || it.deadline || !Array.isArray(it.noticeLines)) return false;
+/** 마감이 빈 글의 마감을 원문 글자에서 읽는다 (2026-11-17 개발자 지시 "대외활동 … 이상한 내용" · 리뷰 두 차례).
+    왜 — 첨부·포스터에서 읽은 기간 줄(activity-docs noticeLines)·자격 칸에 딸려 온 「지원방법: ~3월 14일까지」·기간 토막·제목 「(~11/23)」엔
+    마감 판독기를 한 번도 안 돌려, 3월·8월에 끝난 모집이 11월 화면에 '진행 중'으로 떴고 열린 글엔 D-day 가 없었다(2026-11-17 실측 수십 건).
+    차례 — ① 「공고 안내」 줄에 장학과 같은 extractDeadline(이름표 뒤 날짜만) ② 그래도 없으면 신청·접수·지원·모집·제출 이름표 **뒤**의 끝 날짜
+    (「~ 12월 6일」·「5.13.(수)까지」·「2026-11-09 ~ 2026-12-06」 — 활동·교육·발표 날짜는 안 본다) ③ 제목의 「(~11/23)」.
+    해가 없으면 같은 글자 앞쪽의 해 → 처음 본 날(foundAt)의 해(그보다 300일 넘게 앞서면 이듬해 — 12월 글의 1월 마감) · 여러 회차면 가장 늦은 끝.
+    ④ 마감 글자가 하나도 없고 「결과 발표」 날짜(해 있음)가 이미 지났으면 그날을 마감으로 — 결과가 나온 공모전은 닫힌 글이다. */
+const PERIOD_LABEL_RE = /(?:신청|접수|지원|모집|제출|응모|참가\s*신청)\s*(?:기간|기한|마감|방법|일정)?/;
+const END_AFTER_TILDE = /~\s*(?:(20\d{2})\s*[.\-/년]\s*)?(\d{1,2})\s*[.\-/월]\s*(\d{1,2})(?!\d)/g;
+const END_UNTIL = /(?:(20\d{2})\s*[.\-/년]\s*)?(\d{1,2})\s*[.\-/월]\s*(\d{1,2})\s*일?\.?\s*(?:[(（][월화수목금토일][)）])?\s*(?:\d{1,2}\s*[:시]\s*\d{0,2}\s*분?\s*)?까지/g;
+const pad2 = (n) => String(n).padStart(2, '0');
+function ymd(y, m, d) { const mm = Number(m), dd = Number(d); if (!(mm >= 1 && mm <= 12 && dd >= 1 && dd <= 31)) return null; return `${y}-${pad2(mm)}-${pad2(dd)}`; }
+function inferYear(text, idx, foundAt) {
+  const before = String(text).slice(0, idx); const ys = [...before.matchAll(/20\d{2}/g)];
+  if (ys.length) return Number(ys[ys.length - 1][0]);
+  return null;
+}
+function withFoundYear(m, d, foundAt) {
+  const f = /^\d{4}-\d{2}-\d{2}$/.test(String(foundAt || '')) ? String(foundAt) : null;
+  if (!f) return null;
+  let y = Number(f.slice(0, 4)); let v = ymd(y, m, d);
+  if (v && (Date.parse(f) - Date.parse(v)) > 300 * 86400000) v = ymd(y + 1, m, d);
+  return v;
+}
+/** 글자 하나에서 신청·접수 이름표 뒤의 끝 날짜들(YYYY-MM-DD) — 순수 함수(관문이 표본으로 돈다) */
+export function periodEnds(text, foundAt) {
+  const t = String(text || ''); const lab = t.search(PERIOD_LABEL_RE); if (lab < 0) return [];
+  const out = [];
+  const iso = [...t.slice(lab).matchAll(/~\s*(20\d{2})-(\d{2})-(\d{2})/g)];
+  for (const m of iso) { const v = ymd(m[1], m[2], m[3]); if (v) out.push(v); }
+  for (const re of [END_AFTER_TILDE, END_UNTIL]) {
+    re.lastIndex = 0;
+    for (const m of t.slice(lab).matchAll(re)) {
+      if (/^~\s*20\d{2}-/.test(m[0])) continue;   // ISO 는 위에서
+      const y = m[1] ? Number(m[1]) : inferYear(t, lab + m.index, foundAt);
+      const v = y ? ymd(y, m[2], m[3]) : withFoundYear(m[2], m[3], foundAt);
+      if (v) out.push(v);
+    }
+  }
+  return out;
+}
+export function deadlineFromNotice(it, today = new Date().toISOString().slice(0, 10)) {
+  if (!it || it.deadline) return false;
+  const set = (d, from) => { it.deadline = d; it.deadlineFrom = from.slice(0, 90); return true; };
+  /* ① 「공고 안내」 줄 — 장학과 같은 판독기 */
   let best = null, from = '';
-  for (const line of it.noticeLines) {
+  for (const line of it.noticeLines || []) {
     const d = extractDeadline(String(line || ''));
     if (d && /^\d{4}-\d{2}-\d{2}$/.test(d) && (!best || d > best)) { best = d; from = String(line).trim(); }
   }
-  if (!best) return false;
-  it.deadline = best;
-  it.deadlineFrom = `공고 안내 · ${from.slice(0, 80)}`;
-  return true;
+  if (best) return set(best, `공고 안내 · ${from}`);
+  /* ② 이름표 뒤 끝 날짜 — 안내·자격 칸·기간 토막·모집기간 발췌 */
+  const texts = [...(it.noticeLines || []), ...(it.eligibilityLines || []), it.deadlineHint || '',
+    ...(it.excerpts || []).filter((x) => x && /기간|마감|기한/.test(x.label || '')).map((x) => `${x.label}: ${x.text}`)];
+  for (const t of texts) for (const d of periodEnds(t, it.foundAt)) if (!best || d > best) { best = d; from = String(t).trim(); }
+  if (best) return set(best, `원문 기간 · ${from}`);
+  /* ③ 제목 「(~11/23)」·「(~4.24(금)」 */
+  const tm = String(it.title || '').match(/[(（]\s*~\s*(\d{1,2})\s*[./]\s*(\d{1,2})/);
+  if (tm) { const d = withFoundYear(tm[1], tm[2], it.foundAt); if (d) return set(d, `제목 · ${String(it.title).trim()}`); }
+  /* ④ 결과 발표가 이미 지났으면 닫힌 글 */
+  for (const line of [...(it.noticeLines || []), ...(it.excerpts || []).map((x) => `${x.label}: ${x.text}`)]) {
+    const m = String(line).match(/결과\s*(?:발표|공지|안내)\s*[:：]?\s*(20\d{2})\s*[.\-년]\s*(\d{1,2})\s*[.\-월]\s*(\d{1,2})/);
+    const d = m && ymd(m[1], m[2], m[3]);
+    if (d && d < today) return set(d, `결과 발표 · ${String(line).trim()}`);
+  }
+  return false;
 }
 
 /* 납작한 정의 표(`참가 대상` ↵ `대한민국 국민 누구나` ↵ `참가 형태` ↵ `개인 또는 3인 이하 팀` ↵ `출품 수` ↵ …)는 자격 짝 **다음 이름표**에서 끝이다 —

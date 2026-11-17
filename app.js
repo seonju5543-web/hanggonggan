@@ -748,13 +748,22 @@ function unent(s) {
 const JUNK_CHARS = /[\uE000-\uF8FF\uFFFD\u200B\u200C\u2060\uFEFF\u00AD\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
 const OCR_URL_GARBLE = /\s*\(\s*\/[^()가-힣]*\\[^()]*\)/g;
 const TIDY_SKIP_KEY = /(?:urls?|href|link|file|path|thumb|img|image|hash|home|src|page|^id)$/i;   // home(층2 재단 홈페이지)·src·page(학교 사진)·avoidUrls 도 주소(리뷰 2026-11-17)
-function tidyText(s) {
-  return unent(s).replace(JUNK_CHARS, '').replace(OCR_URL_GARBLE, '').replace(/^[ \t]+/, '')
+/* OCR 이 동그라미 숫자(①②)를 @·©·® 로 읽은 글머리와 표의 세로줄(|·ㅣ) — 자격·서류·발췌·안내 칸에서만 걷는다(리뷰 2026-11-17 · 「@)-1 주민등록초본」·「|@ 자기소개서」·「© 학자금 지원구간 통지서」).
+   🔴 이메일(abc@x.kr)의 @ 는 앞뒤가 글자라 안 걸린다 · 다른 칸(제목·이름)은 건드리지 않는다 */
+const OCR_TEXT_KEY = /^(?:documents|eligibilityLines|eligibilityExcludes|eligibilityPriority|excerpts|noticeLines|text)$/;
+const OCR_MARK = /(^|[\s|(\[ㅣ])[@©®]\)?(?:-?\d)?(?=\s|$)/g;
+function tidyOcr(t) {
+  return t.replace(OCR_MARK, '$1').replace(/^[\s|ㅣ_]+/, '').replace(/[\s|ㅣ_]+$/, '').replace(/\s*\|\s*\|\s*/g, ' | ').replace(/([^ \t]) {2,}(?=\S)/g, '$1 ');
+}
+function tidyText(s, key = '') {
+  const t = unent(s).replace(/(\S)[\uE000-\uF8FF]+(?=\S)/g, '$1 ')   // 단어 사이에 끼인 HWP 기호(「이미지·상징성」의 가운뎃점 자리)는 빈칸으로 — 지우면 두 낱말이 붙는다(리뷰 2026-11-17)
+    .replace(JUNK_CHARS, '').replace(OCR_URL_GARBLE, '').replace(/^[ \t]+/, '')
     .replace(/[(（]\s*([월화수목금토일])\s*[)）]/g, '($1)')
-    .replace(/([^ \t]) {2,}(?=\S)/g, "$1 ");   // 요일 괄호 안 빈칸(「11. 17.(화 )」) · 폭 0 공백을 지운 자리의 겹친 빈칸(「유형 Ⅱ  장학금」) — 2026-11-17 · 이모지 잇개(U+200D)는 지우지 않는다(사람+학사모 같은 합친 이모지가 쪼개진다)
+    .replace(/([^ \t]) {2,}(?=\S)/g, "$1 ");
+  return OCR_TEXT_KEY.test(key) ? tidyOcr(t) : t;   // 요일 괄호 안 빈칸(「11. 17.(화 )」) · 폭 0 공백을 지운 자리의 겹친 빈칸(「유형 Ⅱ  장학금」) — 2026-11-17 · 이모지 잇개(U+200D)는 지우지 않는다(사람+학사모 같은 합친 이모지가 쪼개진다)
 }
 function tidyData(v, key = '') {
-  if (typeof v === 'string') return TIDY_SKIP_KEY.test(key) ? v : tidyText(v);
+  if (typeof v === 'string') return TIDY_SKIP_KEY.test(key) ? v : tidyText(v, key);
   if (Array.isArray(v)) { for (let i = 0; i < v.length; i += 1) v[i] = tidyData(v[i], key); return v; }
   if (v && typeof v === 'object') { for (const k of Object.keys(v)) v[k] = tidyData(v[k], k); return v; }
   return v;
@@ -4792,7 +4801,9 @@ function nsBodyHtml(body) {
   for (const m of s.matchAll(NS_URL)) {
     const u = m[0].replace(/[.,;:!?。]+$/, '');
     let host = ''; try { host = new URL(u).hostname.replace(/^www\./, ''); } catch (e) { host = ''; }
-    out += esc(s.slice(last, m.index)) + (host ? ` <a href="${esc(u)}" target="_blank" rel="noopener">${esc(host)} ↗</a> ` : esc(u));
+    const before = s.slice(last, m.index);
+    const gap = /[^\s(（\[「『'"]$/.test(before) ? ' ' : '';   // 「접수https://…」 처럼 글자에 붙은 주소 앞에만 빈칸 하나 — 괄호 안·뒤 글자에는 더하지 않는다(리뷰 2026-11-17)
+    out += esc(before) + (host ? `${gap}<a href="${esc(u)}" target="_blank" rel="noopener">${esc(host)} ↗</a>` : esc(u));
     last = m.index + u.length;
   }
   return (out + esc(s.slice(last))).replace(/\s{2,}/g, ' ').trim();
@@ -4825,7 +4836,7 @@ function sheetHeadHtml({ x, d, save }) {
 function applySectionHtml(sch, opts) {
   const act = (opts && opts.activity) || null;   // 활동 글의 서류는 그 글이 원문 「제출서류」 절에서 읽은 것(collector activityDocuments · 2026-10-30) — 없으면 서류 줄이 없다
   const from = fmtDay(sch.openDate), to = fmtDay(sch.deadline);
-  const rawPeriod = String(sch.period || '').replace(/^접수\s*(?:기간\s*[:：]?\s*)?/, '').replace(/\d{4}-(\d{2})-(\d{2})/g, '$1.$2').trim();   // ISO 날짜는 MM.DD 로(글자를 더하지 않고 줄인다) · 층2 「접수 ~…」·자동 등록 「접수 기간 ~…」 머리는 이름표와 겹친다(「기간 기간 ~09.21」 · 2026-11-17)
+  const rawPeriod = String(sch.period || '').replace(/^(?:(?:접수|모집|신청|지원)\s*(?:기간\s*)?|기간\s*)[:：·]?\s*/, '').replace(/\s*https?:\/\/\S*$/, '').replace(/\d{4}-(\d{2})-(\d{2})/g, '$1.$2').trim();   // ISO 날짜는 MM.DD 로(글자를 더하지 않고 줄인다) · 층2 「접수 ~…」·자동 등록 「접수 기간 ~…」 머리는 이름표와 겹친다(「기간 기간 ~09.21」 · 2026-11-17) · 모집·신청·지원 기간 머리도(활동 기간 토막 · 리뷰) · 끝에 붙은 주소는 기간이 아니다(80자에서 잘린 주소 — 리뷰)
   const period = (from && to) ? `${from} ~ ${to}`
     : (/\d/.test(rawPeriod) && !providerUnknown(rawPeriod)) ? rawPeriod
     : to ? `~ ${to}`
@@ -4839,10 +4850,10 @@ function applySectionHtml(sch, opts) {
     : sch.sourceKind === 'kosaf' ? '재단 선발 공고문·홈페이지가 정한 접수 방법'
     : '';
   const docs = (act ? act.documents || [] : sch.documents || []).filter((doc) => !DOC_PLACEHOLDER.test(doc));
-  const row = (k, v) => `<li><b class="ns-k">${k}</b>${nsBodyHtml(v)}</li>`;
+  const row = (k, v, plain) => `<li><b class="ns-k">${k}</b>${plain ? esc(v) : nsBodyHtml(v)}</li>`;   // 기간 줄은 plain — 80자에서 잘린 기간 토막의 주소를 진짜 같은 링크로 만들지 않는다(리뷰 2026-11-17)
   const docText = docs.map((d) => String(d).replace(/^[\s\-–—•\u25AA\u25AB\u25FD\u25FE■□▣○●◆◇·ㆍ*]+/, '').trim()).filter(Boolean).join(' · ');   // 원문 글머리 기호(■·○)는 뗀다 — 점으로 잇는 한 줄이라 기호가 두 겹(실화면 2026-11-02)
   const methodRow = paidApply.length ? `<li><b class="ns-k">방법</b>${paidApply.map(esc).join('<br>')}</li>` : (method ? row('방법', method) : '');
-  const rows = `${period ? row('기간', period) : ''}${methodRow}${docText ? row('서류', docText) : ''}`;
+  const rows = `${period ? row('기간', period, true) : ''}${methodRow}${docText ? row('서류', docText) : ''}`;
   return rows ? `<h4>접수</h4><ul class="doc-list notice-summary apply-rows">${rows}</ul>` : '';
 }
 function sheetSectionsHtml({ sch, result, fit, fd, activity = null, noticeLines = [] }) {
