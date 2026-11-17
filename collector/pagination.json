@@ -89,7 +89,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-11-16"
+  "checkedAt": "2026-11-17"
  },
  "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=list&srCategoryId=22": {
   "ok": false,
@@ -157,7 +157,7 @@
  },
  "https://kangwon.ac.kr/ko/bbs/750/list.do": {
   "ok": false,
-  "checkedAt": "2026-10-28"
+  "checkedAt": "2026-11-17"
  },
  "https://www.yonsei.ac.kr/sc/254/subview.do?enc=Zm5jdDF8QEB8JTJGYmJzJTJGc2MlMkY1OCUyRmFydGNsTGlzdC5kbyUzRmZpbmRDbFNlcSUzRDI1NyUyNg%3D%3D": {
   "ok": true,
@@ -523,5 +523,9 @@
  "https://www.gachon.ac.kr/kor/1147/subview.do": {
   "ok": false,
   "checkedAt": "2026-11-16"
+ },
+ "https://kangwon.ac.kr/ko/bbs/719/list.do": {
+  "ok": false,
+  "checkedAt": "2026-11-17"
  }
 }

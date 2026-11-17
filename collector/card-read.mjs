@@ -252,6 +252,14 @@ export function buildEntry(item, source, outA, outB, wonIn) {
   const va = verify(outA, source, item), vb = verify(outB, source, item);
   const { final, held, unreadable } = agree(va, vb, item, source);
   const dropped = [...va.dropped.map((x) => ({ ...x, by: 'a' })), ...vb.dropped.map((x) => ({ ...x, by: 'b' }))];
+  /* 🔴 엄격 칸(자격·제외·서류)에서 한쪽이 낸 줄이 기계 대조에서 떨어졌으면 그 칸은 싣지 않는다 — 남은 줄만 실으면 요건이 빠진 목록이 된다(틀린 안심).
+     2026-11-18 첫 실제 읽기: 한 칸씩 흩어진 표를 첫째 읽기가 짜 맞춘 「TOEIC 950/990」 열 줄이 떨어지자 어학 점수 없는 자격 두 줄만 실렸다. 빈 배열로도 안 싣는다(무료 길 값을 지운다) */
+  for (const k of STRICT_FIELDS) {
+    const lost = dropped.filter((x) => x.field === k);
+    if (!lost.length || final[k] === null) continue;
+    held.push(...lost.map((x) => ({ field: k, line: x.line, why: `대조에서 떨어진 줄이 있어 칸을 싣지 않음 — ${x.why}` })));
+    final[k] = null;
+  }
   const filled = LIST_FIELDS.some((k) => final[k] && final[k].length) || !!final.deadline;
   if (unreadable || !filled) return { entry: null, held, dropped, unreadable: true };
   const entry = { title: final.title, host: final.host };

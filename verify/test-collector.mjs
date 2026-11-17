@@ -1389,27 +1389,33 @@ console.log('\n■ 공고별 지원문서 — 앱 양식이 없는 등록 공고
   const heads = (t) => t.sections.map((s) => s.heading);
   const t0 = eng.buildPrepTemplate(base);
   /* 2026-11-15 개발자 결정 11-02 — 머리말은 참인 말만(「양식을 찾지 못했다 · 제출 전 원문에서 확인」 → 「정리한 문서이고 이 문서 자체를 내는 것은 아니다」) */
-  eq('🔴 서류를 모르는 공고 — 머리말은 "정리한 문서 · 이 문서 자체를 내는 것은 아니다" (그대로 제출 가능이라 말하지 않는다 · \'모름\'류 글자 없음)',
-    [t0.prepKind, /이 문서 자체를 내는 것은 아닙니다/.test(t0.tag), /그대로 제출/.test(t0.tag), /찾지 못했|원문에서 확인|원문 확인|확인 필요/.test(t0.tag + t0.lead), t0.unofficial], ['unknown', true, false, false, true]);
+  /* 2026-11-17 개발자 지시 — 머리말은 「※ 앱 자체 제작 문서입니다」 한 줄뿐(갈래별 제출 안내는 둘째 줄 lead 와 제출 안내 절이 맡는다) */
+  const ONLY_TAG = '※ 앱 자체 제작 문서입니다';
+  eq('🔴 서류를 모르는 공고 — 머리말은 「※ 앱 자체 제작 문서입니다」 한 줄뿐 · 둘째 줄도 그대로 제출 가능이라 말하지 않고 \'모름\'류 글자 없음',
+    [t0.prepKind, t0.tag, /그대로 제출/.test(t0.lead), /찾지 못했|원문에서 확인|원문 확인|확인 필요/.test(t0.tag + t0.lead), t0.unofficial], ['unknown', ONLY_TAG, false, false, true]);
+  eq('🔴 여섯 갈래 모두 머리말이 정확히 「※ 앱 자체 제작 문서입니다」 (2026-11-17 — 뒤 문장 전부 삭제)',
+    [eng.buildPrepTemplate({ ...base, prepDoc: true }), eng.buildPrepTemplate({ ...base, applyEmail: 'a@b.kr' }), eng.buildPrepTemplate({ ...base, applyPortal: 'x' }),
+      eng.buildPrepTemplate({ ...base, attachments: [{ name: '붙임1 장학생 신청서.hwp', url: 'https://e.ac.kr/f.hwp' }] }), eng.buildPrepTemplate({ ...base, sourceKind: 'kosaf' }), t0].map((t) => t.tag),
+    [ONLY_TAG, ONLY_TAG, ONLY_TAG, ONLY_TAG, ONLY_TAG, ONLY_TAG]);
   eq('  자리표시 안내 줄은 제출 서류 절에 서류로 올라가지 않는다 — 서류를 못 읽었으면 절 자체가 없다(「원문 공고에서 확인하세요」 줄 없음)', t0.sections.some((s) => s.heading === '제출 서류 확인'), false);
   eq('  작성형 서류 이름이 없으면 기본 세 절(지원 동기·학업/활동·계획) — 자격 줄이 없으면 자격 절도 없다',
     heads(t0), ['신청 개요', '지원 동기 및 신청 사유', '학업 및 활동 요약', '향후 계획', '제출 안내']);
-  eq('  원문이 자유 양식이라 확인한 공고(prepDoc)만 "그대로 제출할 수 있다"',
-    (() => { const t = eng.buildPrepTemplate({ ...base, prepDoc: true }); return [t.prepKind, /그대로 제출할 수 있습니다/.test(t.tag)]; })(), ['free', true]);
+  eq('  원문이 자유 양식이라 확인한 공고(prepDoc)만 둘째 줄이 "그대로 제출할 수 있다"',
+    (() => { const t = eng.buildPrepTemplate({ ...base, prepDoc: true }); return [t.prepKind, /그대로 제출할 수 있습니다/.test(t.lead)]; })(), ['free', true]);
   const withAtt = { ...base, attachments: [{ name: '붙임1 장학생 신청서.hwp', url: 'https://e.ac.kr/f.hwp' }] };
-  eq('  첨부 신청서가 있으면 "원본 양식에 옮겨 적는다 · 제출은 원본 양식으로"',
-    (() => { const t = eng.buildPrepTemplate(withAtt); return [t.prepKind, /원본 양식/.test(t.tag), /그대로 제출/.test(t.tag)]; })(), ['attached', true, false]);
+  eq('  첨부 신청서가 있으면 둘째 줄이 "옮겨 적을 내용 · 제출은 원본 양식으로"',
+    (() => { const t = eng.buildPrepTemplate(withAtt); return [t.prepKind, /원본 양식/.test(t.lead), /그대로 제출/.test(t.lead)]; })(), ['attached', true, false]);
   eq('  순서 — 원문 확인(prepDoc) > 원문이 말한 접수 방법(메일 > 포털) > 첨부 신청서 > 모름 (submitChannelKind 와 같은 결정 · 리뷰)',
     [eng.buildPrepTemplate({ ...withAtt, prepDoc: true }).prepKind, eng.buildPrepTemplate({ ...base, applyPortal: 'x', applyEmail: 'a@b.kr' }).prepKind,
       eng.buildPrepTemplate({ ...base, applyPortal: 'x' }).prepKind, eng.buildPrepTemplate({ ...withAtt, applyPortal: 'x' }).prepKind, eng.buildPrepTemplate({ ...withAtt, applyEmail: 'a@b.kr' }).prepKind],
     ['free', 'email', 'portal', 'portal', 'email']);
-  eq('  메일·포털 머리말도 "이 문서 자체를 내는 것이 아니다"를 말한다 (그대로 제출은 free 만)',
-    ['email', 'portal'].map((k) => eng.buildPrepTemplate({ ...base, [k === 'email' ? 'applyEmail' : 'applyPortal']: 'x' }).tag).map((t) => /그대로 제출/.test(t) || !/아닙니다/.test(t)), [false, false]);
+  eq('  메일·포털 둘째 줄은 "옮겨 적을·붙여 넣을 내용"이라 말하고 그대로 제출이라 하지 않는다 (그대로 제출은 free 만)',
+    ['email', 'portal'].map((k) => eng.buildPrepTemplate({ ...base, [k === 'email' ? 'applyEmail' : 'applyPortal']: 'x' }).lead).map((t) => /그대로 제출/.test(t) || !/옮겨 적|붙여 넣/.test(t)), [false, false]);
   /* 다리가 data.js 를 싣는가 — 안 실으면 첨부 판정이 forms.js 의 물러나는 규칙으로만 재어져 isApplicationForm 을 바꿔도 여기가 안 빨개진다(리뷰) */
   eq('  Node 다리(form-engine-node)가 data.js 의 isApplicationForm 을 실어 브라우저와 같은 갈래를 잰다',
     /data\.js/.test(readText(new URL('./form-engine-node.mjs', import.meta.url))) && eng.buildPrepTemplate({ ...base, attachments: [{ name: '[서식 2] 장학생 추천서 신청서양식.hwp', url: 'u' }] }).prepKind, 'unknown');
-  eq('  층2(재단 공고문)는 \'kosaf\' — 첨부 이름에 신청서가 있어도 attached 가 아니고, 머리말은 "재단 선발 공고문이 정한다 · 이 문서 자체를 내는 것은 아니다" (2026-10-13 ①)',
-    (() => { const t = eng.buildPrepTemplate({ ...withAtt, sourceKind: 'kosaf' }); return [t.prepKind, /선발 공고문/.test(t.tag), /이 문서 자체를 내는 것은 아닙니다/.test(t.tag), /그대로 제출/.test(t.tag)]; })(), ['kosaf', true, true, false]);
+  eq('  층2(재단 공고문)는 \'kosaf\' — 첨부 이름에 신청서가 있어도 attached 가 아니고, 둘째 줄이 "재단 선발 공고문이 정한다" (2026-10-13 ①)',
+    (() => { const t = eng.buildPrepTemplate({ ...withAtt, sourceKind: 'kosaf' }); return [t.prepKind, /선발 공고문/.test(t.lead), /그대로 제출/.test(t.lead)]; })(), ['kosaf', true, false]);
   eq('  prepDoc(원문 확인)은 층2보다도 앞이다', eng.buildPrepTemplate({ ...base, sourceKind: 'kosaf', prepDoc: true }).prepKind, 'free');
   eq('  앱은 층2 항목에도 붙인다(kosafAsScholarships → attachPrepTemplate) · 다시 받으면 지운다',
     (() => { const aj = readText(new URL('../app.js', import.meta.url)); return [/\.map\(attachPrepTemplate\);/.test(aj.slice(aj.indexOf('function kosafAsScholarships('))), /startsWith\('prep:kosaf-'\)\) delete FORM_TEMPLATES\[k\]/.test(aj)]; })(), [true, true]);
@@ -1431,7 +1437,7 @@ console.log('\n■ 공고별 지원문서 — 앱 양식이 없는 등록 공고
   t4.sections.forEach((s) => (s.fields || []).forEach((f) => { ans[f.id] = f.type === 'checks' ? { checks: [f.options[0]], text: '' } : '«답»'; }));
   const html = eng.renderFormDoc(t4, FORM_SAMPLE_PROFILE, ans);
   eq('  문서에 공고 이름 · 머리말 · 자격 체크(☑) · 서약이 들어간다',
-    [/테스트장학 2026-2 — 지원문서/.test(html), /이 문서 자체를 내는 것은 아닙니다/.test(html), /☑ 재학생 중 직전 학기 12학점 이상 이수/.test(html), /사실과 다름이 없습니다/.test(html)],
+    [/테스트장학 2026-2 — 지원문서/.test(html), /※ 앱 자체 제작 문서입니다/.test(html), /☑ 재학생 중 직전 학기 12학점 이상 이수/.test(html), /사실과 다름이 없습니다/.test(html)],
     [true, true, true, true]);
   /* 앱 연결 — 글자가 아니라 실제 모양을 본다 */
   const appSrc = readText(new URL('../app.js', import.meta.url));
@@ -5270,8 +5276,10 @@ else {
      코드의 **사본**이라 관문이 없으면 썩는다(DESIGN.md 가 만들어진 3분 뒤 낡았던 전례).
      새 관문을 만들지 않고 이 절이 같이 읽는다 — 규칙을 두 벌 두면 한쪽만 고쳐져 갈라진다.
      ⚠️ 문서를 더할 때는 여기 이름만 더한다. */
+  /* 2026-11-18 — CLAUDE.md 가 60KB 천장에 닿아 교내 소식·대외활동 세부를 아래 두 설계 문서로 옮겼다.
+     옮긴 이름이 검사에서 빠지지 않게 두 문서도 잰다(붙이자마자 낡은 관문 이름 「수집 범위 감사」 하나가 잡혔다). */
   const DOCS = ['CLAUDE.md', 'docs/designs/data-model.md', 'docs/designs/data-flow.md',
-                'docs/designs/security-rules.md'];
+                'docs/designs/security-rules.md', 'docs/designs/news-feed.md', 'docs/designs/activities-tab.md'];
   const md = DOCS.map((f) => readText(new URL('../' + f, import.meta.url))).join('\n');
   const R = new URL('../', import.meta.url);
   const ex = (p) => fs.existsSync(new URL(p, R));
@@ -5285,7 +5293,9 @@ else {
 
   /* ① 파일 경로 — 뿌리 또는 흔한 폴더에서 찾는다. 글로브(*)는 폴더만 본다. */
   /* "만들면 안 된다"·확장자 이야기·빌드 산출물(`_admin/build.sh` 가 만든다)·분수 표기 */
-  const NOT_FILES = new Set(['_config.yml', '.nojekyll', '.ocr.txt', '.pdf.txt', 'dist/vendor/', 'met/total']);
+  const NOT_FILES = new Set(['_config.yml', '.nojekyll', '.ocr.txt', '.pdf.txt', 'dist/vendor/', 'met/total',
+    '/file/', '/attach/',            // 학교 사이트 주소 조각(news-feed.md — 진짜 사진이 사는 경로)
+    'vendor/activity-kind.mjs']);    // 관리자 빌드 산출물(activities-tab.md)
   const paths = [...new Set(ticks.filter((t) => !/\s/.test(t) && (/\//.test(t) || /\.(js|mjs|cjs|json|md|py|sh|yml|html|txt)$/.test(t))))]
     .map((t) => t.replace(/:\d+$/, ''))
     .filter((t) => !NOT_FILES.has(t) && !/^https?:/.test(t) && !/[<>…()']/.test(t) && !/^claude\//.test(t));   // 브랜치 이름·코드 조각 제외
@@ -5312,8 +5322,12 @@ else {
   const self = readText(new URL(import.meta.url));
   /* 절 이름에 작은따옴표가 든 절(「학생 화면에 '모름'류 글자가 없다」 · 2026-11-15)은 큰따옴표로 적는다 — 둘 다 읽는다 */
   const sections = [...self.matchAll(/console\.log\('\\?n?■ ([^']+)'\)|console\.log\("\\?n?■ ([^"]+)"\)/g)].map((m) => strip(m[1] || m[2]));
+  /* activities-tab.md 의 '관문'은 대외활동 탭의 관심 고르기 화면 이름이기도 하다 — 그 화면 글자 셋과
+     verify-interactions.js 의 절(이 파일 밖) 하나는 이 파일의 절이 아니다 */
+  const NOT_GATES = new Set(['X',   // 찾는 법을 설명하는 줄의 자리표시
+    '내 정보', '1365 자원봉사시간 부여', '고르면 이 탭과 홈 추천이 열려요…', '시트가 뜨면 뒤 화면이 잠긴다']);
   const gates = [...md.matchAll(/관문[^「\n]{0,30}「((?:[^「」]|「[^」]*」)+)」/g)].map((m) => strip(m[1]))
-    .filter((g) => g !== 'X');   // 찾는 법을 설명하는 줄의 자리표시
+    .filter((g) => !NOT_GATES.has(g));
   eq('관문 이름이 가리키는 절이 전부 있다', gates.filter((g) => !sections.some((s) => s.includes(g))), []);
   /* 🔴 뽑은 게 0이면 위 셋은 빈 목록을 상대로 통과한다 — 개수가 있어야 대조가 진짜다 */
   eq('  (대조할 것을 실제로 뽑았다 — 파일·이름·관문)', [paths.length > 40, ids.length > 40, gates.length > 10], [true, true, true]);
@@ -9084,7 +9098,14 @@ console.log('\n■ 환영 화면 문구 (2026-09-12 · UI-22)');
   /* 여러 줄로 쓴 검증은 위 그물을 빠져나간다 — 완료 버튼만은 '도중에 안 막는다'로 따로 못 박는다 */
   const fin = (app.match(/\$\('#btn-finish-onboard'\)\.addEventListener\('click', \(\) => \{([\s\S]*?)\n  \}\);/) || [])[1] || '';
   eq('완료 버튼 처리기를 실제로 찾았다 (빈 값을 통과시키지 않는다)', fin.length > 200, true);
-  eq('완료 버튼은 도중에 막지 않는다 (막으면 문구가 거짓이 된다)', /\breturn;/.test(fin), false);
+  /* 2026-11-17 입력 안전장치(9351b8a6)가 완료 버튼에 '있을 수 없는 값'(평점 999) 되돌림을 넣었는데 이 검사를 같이 옮기지 않아
+     기본 브랜치의 규칙 관문이 빨개졌다(수집 로봇들이 저장 전 관문에서 멈췄다 · 11-18 수리). 그 블록은 빈 칸을 통과시키므로(아래 줄) 문구는 여전히 참이다 —
+     그 한 블록만 떼고 본다 · 다른 return 이 생기면 그대로 걸린다 */
+  const finRest = fin.replace(/const bad = guardFirstBad\(\$\('#screen-onboarding'\)\);\n\s*if \(bad\) \{[\s\S]*?\n    \}\n/, '');
+  eq('완료 버튼은 도중에 막지 않는다 (막으면 문구가 거짓이 된다) — 있을 수 없는 값 되돌림(guardFirstBad) 한 블록만 예외', /\breturn;/.test(finRest), false);
+  const IG0 = createRequire(import.meta.url)('../input-guard.js');
+  eq('  그 되돌림은 빈 칸을 막지 않는다 (막으면 「학교·학년만」 문구가 거짓이 된다) · 다른 return 을 넣으면 걸린다',
+    [IG0.checkNumber('', IG0.PROFILE_LIMITS.gpa || { min: 0, max: 4.5, label: '평점' }).ok, IG0.checkBirthDate('').ok, /\breturn;/.test(`${finRest}\n    if (!x) return;`)], [true, true, true]);
 }
 
 console.log('\n■ 이어보기 판정 (2026-09-09)');
@@ -12264,8 +12285,11 @@ console.log('\n■ 자격 묻기 — 무엇을 물을 수 있나');
   eq('평점은 숫자로 바뀐다', EA.coerceField('gpa', '3.42'), 3.42);
   eq('  빈 칸은 null', EA.coerceField('gpa', '  '), null);
   eq('  글자는 null (0 이 아니다)', EA.coerceField('gpa', '몰라요'), null);
-  eq('  4.5 를 넘으면 4.5 로 깎는다 (온보딩과 같은 규칙)', EA.coerceField('gpa', '5.0'), 4.5);
-  eq('  음수는 0 으로', EA.coerceField('gpa', '-1'), 0);
+  /* 🔴 2026-11-17 뒤집었다 — 예전엔 5.0 → 4.5 · -1 → 0 으로 **깎았다**. 깎으면 학생이 적지 않은 값을
+     지어낸다(평점 999 가 만점이 됐다 · HDJ-요청-2026-001 후속). 지금은 범위 밖이면 null(모름). */
+  eq('  🔴 4.5 를 넘으면 깎지 않고 null', EA.coerceField('gpa', '5.0'), null);
+  eq('  🔴 음수도 깎지 않고 null', EA.coerceField('gpa', '-1'), null);
+  eq('  🔴 정수 칸의 소수는 반올림하지 않고 null (19.5학점 → 20 금지)', EA.coerceField('credits', '19.5'), null);
   eq('소득구간은 정수', EA.coerceField('bracket', '8'), 8);
   eq('  0 은 null 이 아니다 (0 구간·0 학점은 유효한 값이다)', EA.coerceField('credits', '0'), 0);
 
@@ -15901,6 +15925,12 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
   eq('  한 건 만들기 — 맨 위 금액은 문구에서 숫자만 · 총액·범위 줄에서는 안 집는다 · 둘 다 「읽을 내용 없음」이면 줄이 있어도 싣지 않는다 · 실을 줄이 없어도',
     [be.entry.head, be.entry.eligibility.length, CR.headAmount({ amount: ['총 장학금 1억원 (1인당 200만원)'], multi: false }, ITEM, wonIn), CR.headAmount({ amount: ['1,200천원 ~ 1,800천원'], multi: false }, ITEM, wonIn),
       CR.buildEntry(ITEM, SRC, { ...full, unreadable: true }, { ...full, unreadable: true }, wonIn).entry, CR.buildEntry(ITEM, SRC, base, base, wonIn).entry], [1000000, 2, 0, 0, null, null]);
+  /* 2026-11-18 첫 실제 읽기(연세 미래 어학우수장학금): 한 칸씩 흩어진 표를 한쪽이 짜 맞춘 줄(「TOEIC 950/990」)이 대조에서 떨어지자, 핵심 요건(어학 점수)이 빠진 자격 두 줄만 실렸다 */
+  const beDrop = CR.buildEntry(ITEM, SRC, { ...full, eligibility: [...full.eligibility, 'TOEIC 950/990 이상인 자'] }, full, wonIn);
+  const beDropBoth = CR.buildEntry(ITEM, SRC, { ...full, eligibility: ['TOEIC 950/990 이상인 자'] }, { ...full, eligibility: [] }, wonIn);
+  const beDropNote = CR.buildEntry(ITEM, SRC, { ...full, notes: ['TOEIC 950/990 이상인 자'] }, full, wonIn);
+  eq('  🔴 자격·제외·서류에서 한쪽이 낸 줄이 기계 대조에서 떨어지면 그 칸은 싣지 않는다(null) — 남은 줄만 실으면 핵심 요건이 빠진 목록이 된다 · 빈 배열로도 안 싣는다 · 다른 칸(유의)의 떨어진 줄은 자격을 안 건드린다',
+    [beDrop.entry.eligibility, beDrop.held.some((h) => h.field === 'eligibility' && /TOEIC/.test(h.line)), beDropBoth.entry.eligibility, (beDropNote.entry.eligibility || []).length], [null, true, null, 2]);
   eq('  지시문이 바뀌면 원문이 같아도 해시가 달라진다(다시 읽는다) · 같은 원문은 같은 해시', [CR.sourceHash('가') === CR.sourceHash('가'), CR.sourceHash('가') === CR.sourceHash('나'), /update\(SYSTEM\)/.test(readText(new URL('../collector/card-read.mjs', import.meta.url)))], [true, false, true]);
   eq('  🔴 내려갔는지는 유료가 읽은 마감으로 잰다 — 무료 길 마감(접수 시작일)이 지났어도 바로잡은 마감 전이면 결과를 지우지 않는다',
     [CR.closedNow({ id: 'q', deadline: '2026-11-18', listedAt: '2026-11-10' }, { deadline: { date: '2026-11-26', quote: 'x' } }, '2026-11-19'), CR.closedNow({ id: 'q', deadline: '2026-11-18', listedAt: '2026-11-10' }, null, '2026-11-19')], [false, true]);
@@ -16078,6 +16108,76 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
   const docsSrc = readText(new URL('../collector/activity-docs.mjs', import.meta.url));
   eq('  무료 모드만 다시 읽는다(브라우저 모드는 자격 0줄인 글만) · 읽은 판을 docsV 에 적는다 · 다시 읽은 글은 옛 제외 줄을 남기지 않는다',
     [/needsElig\(n\) \|\| \(!BROWSER && staleDocs\(n\)\)\) \|\| !dueFree/.test(docsSrc), /n\.docsV = ACT_DETAILS_V;/.test(docsSrc), /else delete n\.eligibilityExcludes;/.test(docsSrc)], [true, true, true]);
+}
+
+console.log('■ 입력 안전장치 (2026-11-17 · HDJ-요청-2026-001 후속) — 있을 수 없는 값은 칠 때부터 막는다');
+{
+  const IG = createRequire(import.meta.url)('../input-guard.js');
+  const L = IG.PROFILE_LIMITS;
+  /* ① 칠 때 — 한 글자씩 친다고 보고 받아 주는지 본다 */
+  const typed = (key, s) => { let v = ''; for (const ch of s) { if (IG.guardText(v + ch, L[key])) v += ch; } return v; };
+  eq('평점 999 는 첫 9 부터 안 들어간다', typed('gpa', '999'), '');
+  eq('  4.6 은 4. 까지만 들어간다', typed('gpa', '4.6'), '4.');
+  eq('  소수 셋째 자리는 안 들어간다 (3.855 → 3.85)', typed('gpa', '3.855'), '3.85');
+  eq('  정상 평점은 그대로 (3.85 · 4.5 · 0 · 0.5)', ['3.85', '4.5', '0', '0.5'].map((s) => typed('gpa', s)), ['3.85', '4.5', '0', '0.5']);
+  eq('  e·- 같은 글자는 안 들어간다', [typed('gpa', '3e1'), typed('gpa', '-1')], ['3', '1']);
+  eq('학점 999 는 99 도 안 된다 (30 상한) · 31 → 3', [typed('credits', '999'), typed('credits', '31'), typed('credits', '15')], ['9', '3', '15']);
+  eq('  학점 앞자리 0 은 안 받는다 (05)', typed('credits', '05'), '0');
+  /* typed 는 막힌 글자만 건너뛰고 뒤에 친 글자는 계속 받아 본다(학생이 계속 치는 것과 같다) */
+  eq('출생연도 3000 · 0 으로 시작하면 한 글자도 안 들어간다', [typed('birthYear', '3000'), typed('birthYear', '0000')], ['', '']);
+  eq('  18 의 8 은 막힌다 (1800년대는 1940 에 못 닿는다) · 2021 은 202 까지', [typed('birthYear', '18'), typed('birthYear', '2021')], ['1', '202']);
+  eq('  정상 출생연도는 그대로 (2004 · 1940 · 2020)', ['2004', '1940', '2020'].map((s) => typed('birthYear', s)), ['2004', '1940', '2020']);
+  /* 붙여넣기 — 통째로 들어오는 글자도 같은 함수가 본다 */
+  eq('붙여넣은 999 · 3.855 · 2005년 은 통째로 거절', [IG.guardText('999', L.gpa), IG.guardText('3.855', L.gpa), IG.guardText('2005년', L.birthYear)], [false, false, false]);
+  /* ② 넘길 때 — 다 못 친 값 */
+  eq('다 못 친 출생연도 19 · 점으로 끝난 3. 은 넘어가지 못한다', [IG.checkNumber('19', L.birthYear).ok, IG.checkNumber('3.', L.gpa).ok], [false, false]);
+  eq('  빈 칸은 모름이라 통과(값 null)', IG.checkNumber('', L.gpa), { ok: true, value: null });
+  eq('  정상 값은 숫자로', [IG.checkNumber('3.85', L.gpa).value, IG.checkNumber('15', L.credits).value], [3.85, 15]);
+  /* ③ 예전에 저장된 값 — 그 칸만 비운다 · 🔴 고쳐 넣지 않는다 */
+  {
+    const p = { gpa: 999, credits: 15, birthYear: 3000, school: '한국외국어대학교' };
+    const cleared = IG.scrubProfileNumbers(p);
+    eq('예전 저장값 999·3000 은 그 칸만 null · 정상 칸은 그대로', [p.gpa, p.credits, p.birthYear, p.school, cleared], [null, 15, null, '한국외국어대학교', ['평점', '태어난 해']]);
+    eq('  🔴 정상 프로필은 하나도 안 건드린다', IG.scrubProfileNumbers({ gpa: 4.5, credits: 0, birthYear: 1940 }), []);
+  }
+  /* 서류 정보 칸 — 글자 종류 · 있을 수 없는 날짜 */
+  eq('전화·계좌에 글자는 안 들어간다 · 학번은 영문까지', [IG.guardKind('010-1234', 'phone'), IG.guardKind('010ㄱ', 'phone'), IG.guardKind('12-34', 'account'), IG.guardKind('A2025', 'studentId'), IG.guardKind('학번', 'studentId')], [true, false, true, true, false]);
+  eq('생년월일 13월·2월 30일·3000년은 거절 · 윤년 2월 29일은 통과', [IG.checkBirthDate('2005.13.01').ok, IG.checkBirthDate('2005.02.30').ok, IG.checkBirthDate('3000.01.01').ok, IG.checkBirthDate('2004.02.29').ok, IG.checkBirthDate('20050314').ok, IG.checkBirthDate('').ok], [false, false, false, true, true, true]);
+  eq('  월·일 한 자리(2005.3.14 · 2005-3-4)는 정상 · 두 자리 연도(05.03.14)는 짚는다',
+    [IG.checkBirthDate('2005.3.14').ok, IG.checkBirthDate('2005-3-4').ok, IG.checkBirthDate('05.03.14').ok], [true, true, false]);
+
+  /* 🔴 범위 숫자 다섯 곳 대조 — input-guard · index.html 입력칸 · elig-ask FIELD_META · DB(0004) · 대신 접수 서버.
+     한 곳만 넓히면 칠 때는 받아 주고 저장에서 거절되거나(학생은 이유를 모른다), 반대로 정상 값을 칠 때 막는다. */
+  const html = readText(new URL('../index.html', import.meta.url));
+  const sql = readText(new URL('../supabase/migrations/0004_profile_columns.sql', import.meta.url));
+  const EA2 = createRequire(import.meta.url)('../elig-ask.js');
+  const attr = (id, a) => { const tag = new RegExp('<input[^>]*id="' + id + '"[^>]*>').exec(html); const m = tag && new RegExp(' ' + a + '="([-0-9.]+)"').exec(tag[0]); return m ? Number(m[1]) : null; };
+  for (const [key, id, col] of [['gpa', 'in-gpa', 'gpa'], ['credits', 'in-credits', 'credits'], ['birthYear', 'in-birth-year', 'birth_year']]) {
+    const want = [L[key].min, L[key].max];
+    const sqlR = col === 'gpa'
+      ? (/gpa\s*>=\s*([0-9.]+)\s+and\s+gpa\s*<=\s*([0-9.]+)/.exec(sql) || []).slice(1).map(Number)
+      : (new RegExp(col + '\\s+between\\s+([0-9.]+)\\s+and\\s+([0-9.]+)').exec(sql) || []).slice(1).map(Number);
+    eq('  ' + key + ' 범위가 다섯 곳에서 같다 (guard · 입력칸 · FIELD_META · DB · 서버)',
+      [[attr(id, 'min'), attr(id, 'max')], [EA2.FIELD_META[key].min, EA2.FIELD_META[key].max], sqlR, GUARD_BOUNDS[key]],
+      [want, want, want, want]);
+    const tag = (new RegExp('<input[^>]*id="' + id + '"[^>]*>').exec(html) || [''])[0];
+    eq('  ' + id + ' 은 type="text" + data-guard="' + key + '" 다 (type="number" 는 999·e 를 칠 때 못 막는다)',
+      [/type="text"/.test(tag), tag.includes('data-guard="' + key + '"')], [true, true]);
+  }
+  eq('  서류 정보 칸 넷에 글자 종류 안전장치가 걸려 있다',
+    ['in-sid', 'in-birth', 'in-phone', 'in-account'].map((id) => /data-guard-kind="\w+"/.test((new RegExp('<input[^>]*id="' + id + '"[^>]*>').exec(html) || [''])[0])), [true, true, true, true]);
+  /* 배선 — 파일을 싣고, 칸에 걸고, 넘길 때·저장할 때 보고, 깎기는 없다 */
+  const app = readText(new URL('../app.js', import.meta.url));
+  const sw = readText(new URL('../sw.js', import.meta.url));
+  eq('  index.html 이 input-guard.js 를 app.js·elig-ask.js 보다 먼저 싣는다 · 서비스워커도 담는다',
+    [html.indexOf('src="input-guard.js"') > 0 && html.indexOf('src="input-guard.js"') < html.indexOf('src="elig-ask.js"'), sw.includes("'input-guard.js'")], [true, true]);
+  eq('  시작할 때 배선한다 · 다음/완료/미확인 자격/대외활동 관문이 다 못 친 값을 짚는다',
+    [/bindInputGuards\(\);/.test(app), /guardStepOk\(btn\.closest\('\.onboard-step'\)\)/.test(app), /guardFirstBad\(\$\('#screen-onboarding'\)\)/.test(app), /guardStepOk\(sheet\.querySelector\('\.elig-ask'\)/.test(app), /guardStepOk\(\$\('#act-gate-ask'\)\)/.test(app)],
+    [true, true, true, true, true]);
+  const cp = app.slice(app.indexOf('function collectProfile()'), app.indexOf('function collectProfile()') + 1500);
+  eq('  🔴 collectProfile 이 평점을 4.5 로 깎지 않는다 (Math.min(4.5 가 되살아나면 실패)', /Math\.min\(\s*4\.5/.test(cp), false);
+  eq('  예전 저장값을 시작할 때 정리한다', /scrubbedOnLoad = scrubProfileNumbers\(state\.profile\)/.test(app), true);
+  eq('  공고 「미확인 자격」 숫자 칸도 type="number" 가 아니다', /f\.kind === 'number'\s*\n?\s*\? ` type="number"/.test(app), false);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

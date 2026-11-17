@@ -3,6 +3,27 @@
  "updatedAt": "2026-11-17",
  "items": [
   {
+   "title": "[일반] [채용공고]광운대학교 산학협력단 「로봇특성화대학사업단」 직원 채용 공고",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53700&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-17",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-17",
+   "desc": "광운대학교 「로봇특성화대학사업단」에서 유능하고 역량 있는 인재를 다음과 같이 공개 채용합니다. 광운대학교 산학협력단장"
+  },
+  {
+   "title": "[일반] 외부 미승인 AI 서비스(GPAI)의 학교 계정 연동 금지 및 보안 유의 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53699&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-17",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-17",
+   "desc": "최근 외부 AI 서비스인 GPAI(gpai.app) 에서 우리 대학 KLAS 와의 연동 기능을 홍보하는 사례가 확인되었습니다 ."
+  },
+  {
    "title": "[시설] 2026년 11월 교내 승강기 정기 점검 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53696&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "postedAt": "2026-11-17",
@@ -409,27 +430,6 @@
    "src": "b09cb042",
    "foundAt": "2026-11-03",
    "thumb": "data/news/img/85077a9c8b559d86.webp"
-  },
-  {
-   "title": "[시설] 한울관 및 아이스링크 주차장 입구 차량 출입 통제 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53599&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-03",
-   "kind": "생활",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-03",
-   "thumb": "data/news/img/1a5262a81a92f0eb.webp"
-  },
-  {
-   "title": "[일반] [광운대학교x노르마] Advanced AI Course 양자컴퓨팅(사전안내)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53588&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-30",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-30",
-   "desc": "광운대학교 RISE사업단(서울캠퍼스타운)에서는, 양자와 AI를 결합한 Advanced AI Course 교육에 대해 사전신청을 받고 있습니다."
   }
  ]
 }
