@@ -12240,8 +12240,11 @@ console.log('\n■ 자격 묻기 — 무엇을 물을 수 있나');
   eq('평점은 숫자로 바뀐다', EA.coerceField('gpa', '3.42'), 3.42);
   eq('  빈 칸은 null', EA.coerceField('gpa', '  '), null);
   eq('  글자는 null (0 이 아니다)', EA.coerceField('gpa', '몰라요'), null);
-  eq('  4.5 를 넘으면 4.5 로 깎는다 (온보딩과 같은 규칙)', EA.coerceField('gpa', '5.0'), 4.5);
-  eq('  음수는 0 으로', EA.coerceField('gpa', '-1'), 0);
+  /* 🔴 2026-11-17 뒤집었다 — 예전엔 5.0 → 4.5 · -1 → 0 으로 **깎았다**. 깎으면 학생이 적지 않은 값을
+     지어낸다(평점 999 가 만점이 됐다 · HDJ-요청-2026-001 후속). 지금은 범위 밖이면 null(모름). */
+  eq('  🔴 4.5 를 넘으면 깎지 않고 null', EA.coerceField('gpa', '5.0'), null);
+  eq('  🔴 음수도 깎지 않고 null', EA.coerceField('gpa', '-1'), null);
+  eq('  🔴 정수 칸의 소수는 반올림하지 않고 null (19.5학점 → 20 금지)', EA.coerceField('credits', '19.5'), null);
   eq('소득구간은 정수', EA.coerceField('bracket', '8'), 8);
   eq('  0 은 null 이 아니다 (0 구간·0 학점은 유효한 값이다)', EA.coerceField('credits', '0'), 0);
 
@@ -15982,6 +15985,74 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
   const docsSrc = readText(new URL('../collector/activity-docs.mjs', import.meta.url));
   eq('  무료 모드만 다시 읽는다(브라우저 모드는 자격 0줄인 글만) · 읽은 판을 docsV 에 적는다 · 다시 읽은 글은 옛 제외 줄을 남기지 않는다',
     [/needsElig\(n\) \|\| \(!BROWSER && staleDocs\(n\)\)\) \|\| !dueFree/.test(docsSrc), /n\.docsV = ACT_DETAILS_V;/.test(docsSrc), /else delete n\.eligibilityExcludes;/.test(docsSrc)], [true, true, true]);
+}
+
+console.log('■ 입력 안전장치 (2026-11-17 · HDJ-요청-2026-001 후속) — 있을 수 없는 값은 칠 때부터 막는다');
+{
+  const IG = createRequire(import.meta.url)('../input-guard.js');
+  const L = IG.PROFILE_LIMITS;
+  /* ① 칠 때 — 한 글자씩 친다고 보고 받아 주는지 본다 */
+  const typed = (key, s) => { let v = ''; for (const ch of s) { if (IG.guardText(v + ch, L[key])) v += ch; } return v; };
+  eq('평점 999 는 첫 9 부터 안 들어간다', typed('gpa', '999'), '');
+  eq('  4.6 은 4. 까지만 들어간다', typed('gpa', '4.6'), '4.');
+  eq('  소수 셋째 자리는 안 들어간다 (3.855 → 3.85)', typed('gpa', '3.855'), '3.85');
+  eq('  정상 평점은 그대로 (3.85 · 4.5 · 0 · 0.5)', ['3.85', '4.5', '0', '0.5'].map((s) => typed('gpa', s)), ['3.85', '4.5', '0', '0.5']);
+  eq('  e·- 같은 글자는 안 들어간다', [typed('gpa', '3e1'), typed('gpa', '-1')], ['3', '1']);
+  eq('학점 999 는 99 도 안 된다 (30 상한) · 31 → 3', [typed('credits', '999'), typed('credits', '31'), typed('credits', '15')], ['9', '3', '15']);
+  eq('  학점 앞자리 0 은 안 받는다 (05)', typed('credits', '05'), '0');
+  /* typed 는 막힌 글자만 건너뛰고 뒤에 친 글자는 계속 받아 본다(학생이 계속 치는 것과 같다) */
+  eq('출생연도 3000 · 0 으로 시작하면 한 글자도 안 들어간다', [typed('birthYear', '3000'), typed('birthYear', '0000')], ['', '']);
+  eq('  18 의 8 은 막힌다 (1800년대는 1940 에 못 닿는다) · 2021 은 202 까지', [typed('birthYear', '18'), typed('birthYear', '2021')], ['1', '202']);
+  eq('  정상 출생연도는 그대로 (2004 · 1940 · 2020)', ['2004', '1940', '2020'].map((s) => typed('birthYear', s)), ['2004', '1940', '2020']);
+  /* 붙여넣기 — 통째로 들어오는 글자도 같은 함수가 본다 */
+  eq('붙여넣은 999 · 3.855 · 2005년 은 통째로 거절', [IG.guardText('999', L.gpa), IG.guardText('3.855', L.gpa), IG.guardText('2005년', L.birthYear)], [false, false, false]);
+  /* ② 넘길 때 — 다 못 친 값 */
+  eq('다 못 친 출생연도 19 · 점으로 끝난 3. 은 넘어가지 못한다', [IG.checkNumber('19', L.birthYear).ok, IG.checkNumber('3.', L.gpa).ok], [false, false]);
+  eq('  빈 칸은 모름이라 통과(값 null)', IG.checkNumber('', L.gpa), { ok: true, value: null });
+  eq('  정상 값은 숫자로', [IG.checkNumber('3.85', L.gpa).value, IG.checkNumber('15', L.credits).value], [3.85, 15]);
+  /* ③ 예전에 저장된 값 — 그 칸만 비운다 · 🔴 고쳐 넣지 않는다 */
+  {
+    const p = { gpa: 999, credits: 15, birthYear: 3000, school: '한국외국어대학교' };
+    const cleared = IG.scrubProfileNumbers(p);
+    eq('예전 저장값 999·3000 은 그 칸만 null · 정상 칸은 그대로', [p.gpa, p.credits, p.birthYear, p.school, cleared], [null, 15, null, '한국외국어대학교', ['평점', '태어난 해']]);
+    eq('  🔴 정상 프로필은 하나도 안 건드린다', IG.scrubProfileNumbers({ gpa: 4.5, credits: 0, birthYear: 1940 }), []);
+  }
+  /* 서류 정보 칸 — 글자 종류 · 있을 수 없는 날짜 */
+  eq('전화·계좌에 글자는 안 들어간다 · 학번은 영문까지', [IG.guardKind('010-1234', 'phone'), IG.guardKind('010ㄱ', 'phone'), IG.guardKind('12-34', 'account'), IG.guardKind('A2025', 'studentId'), IG.guardKind('학번', 'studentId')], [true, false, true, true, false]);
+  eq('생년월일 13월·2월 30일·3000년은 거절 · 윤년 2월 29일은 통과', [IG.checkBirthDate('2005.13.01').ok, IG.checkBirthDate('2005.02.30').ok, IG.checkBirthDate('3000.01.01').ok, IG.checkBirthDate('2004.02.29').ok, IG.checkBirthDate('20050314').ok, IG.checkBirthDate('').ok], [false, false, false, true, true, true]);
+
+  /* 🔴 범위 숫자 다섯 곳 대조 — input-guard · index.html 입력칸 · elig-ask FIELD_META · DB(0004) · 대신 접수 서버.
+     한 곳만 넓히면 칠 때는 받아 주고 저장에서 거절되거나(학생은 이유를 모른다), 반대로 정상 값을 칠 때 막는다. */
+  const html = readText(new URL('../index.html', import.meta.url));
+  const sql = readText(new URL('../supabase/migrations/0004_profile_columns.sql', import.meta.url));
+  const EA2 = createRequire(import.meta.url)('../elig-ask.js');
+  const attr = (id, a) => { const tag = new RegExp('<input[^>]*id="' + id + '"[^>]*>').exec(html); const m = tag && new RegExp(' ' + a + '="([-0-9.]+)"').exec(tag[0]); return m ? Number(m[1]) : null; };
+  for (const [key, id, col] of [['gpa', 'in-gpa', 'gpa'], ['credits', 'in-credits', 'credits'], ['birthYear', 'in-birth-year', 'birth_year']]) {
+    const want = [L[key].min, L[key].max];
+    const sqlR = col === 'gpa'
+      ? (/gpa\s*>=\s*([0-9.]+)\s+and\s+gpa\s*<=\s*([0-9.]+)/.exec(sql) || []).slice(1).map(Number)
+      : (new RegExp(col + '\\s+between\\s+([0-9.]+)\\s+and\\s+([0-9.]+)').exec(sql) || []).slice(1).map(Number);
+    eq('  ' + key + ' 범위가 다섯 곳에서 같다 (guard · 입력칸 · FIELD_META · DB · 서버)',
+      [[attr(id, 'min'), attr(id, 'max')], [EA2.FIELD_META[key].min, EA2.FIELD_META[key].max], sqlR, GUARD_BOUNDS[key]],
+      [want, want, want, want]);
+    const tag = (new RegExp('<input[^>]*id="' + id + '"[^>]*>').exec(html) || [''])[0];
+    eq('  ' + id + ' 은 type="text" + data-guard="' + key + '" 다 (type="number" 는 999·e 를 칠 때 못 막는다)',
+      [/type="text"/.test(tag), tag.includes('data-guard="' + key + '"')], [true, true]);
+  }
+  eq('  서류 정보 칸 넷에 글자 종류 안전장치가 걸려 있다',
+    ['in-sid', 'in-birth', 'in-phone', 'in-account'].map((id) => /data-guard-kind="\w+"/.test((new RegExp('<input[^>]*id="' + id + '"[^>]*>').exec(html) || [''])[0])), [true, true, true, true]);
+  /* 배선 — 파일을 싣고, 칸에 걸고, 넘길 때·저장할 때 보고, 깎기는 없다 */
+  const app = readText(new URL('../app.js', import.meta.url));
+  const sw = readText(new URL('../sw.js', import.meta.url));
+  eq('  index.html 이 input-guard.js 를 app.js·elig-ask.js 보다 먼저 싣는다 · 서비스워커도 담는다',
+    [html.indexOf('src="input-guard.js"') > 0 && html.indexOf('src="input-guard.js"') < html.indexOf('src="elig-ask.js"'), sw.includes("'input-guard.js'")], [true, true]);
+  eq('  시작할 때 배선한다 · 다음/완료/미확인 자격/대외활동 관문이 다 못 친 값을 짚는다',
+    [/bindInputGuards\(\);/.test(app), /guardStepOk\(btn\.closest\('\.onboard-step'\)\)/.test(app), /guardFirstBad\(\$\('#screen-onboarding'\)\)/.test(app), /guardStepOk\(sheet\.querySelector\('\.elig-ask'\)/.test(app), /guardStepOk\(\$\('#act-gate-ask'\)\)/.test(app)],
+    [true, true, true, true, true]);
+  const cp = app.slice(app.indexOf('function collectProfile()'), app.indexOf('function collectProfile()') + 1500);
+  eq('  🔴 collectProfile 이 평점을 4.5 로 깎지 않는다 (Math.min(4.5 가 되살아나면 실패)', /Math\.min\(\s*4\.5/.test(cp), false);
+  eq('  예전 저장값을 시작할 때 정리한다', /scrubbedOnLoad = scrubProfileNumbers\(state\.profile\)/.test(app), true);
+  eq('  공고 「미확인 자격」 숫자 칸도 type="number" 가 아니다', /f\.kind === 'number'\s*\n?\s*\? ` type="number"/.test(app), false);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

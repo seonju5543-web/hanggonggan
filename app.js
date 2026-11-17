@@ -130,8 +130,12 @@ function loadState() {
     if (!Array.isArray(state.saved)) state.saved = [];          // 저장 기능 이전에 저장된 판
     if (!Array.isArray(state.trash)) state.trash = [];          // 휴지통 이전에 저장된 판
     if (state.profile) { migrateBranchCampus(state.profile); migrateFitFields(state.profile); }
+    /* 예전에 저장된 있을 수 없는 값(평점 999·출생연도 3000)은 **그 칸만** 비운다(운영 원칙 7 · 소급).
+       고쳐 넣지 않는다 — 비우면 '모름'이라 판정하지 않는다. 학생에게는 시작 뒤 한 번 알린다. */
+    if (state.profile) scrubbedOnLoad = scrubProfileNumbers(state.profile);
   } catch (e) { /* 손상된 데이터는 무시 */ }
 }
+let scrubbedOnLoad = [];
 /* opts.fromServer = 서버에서 받아 온 것을 그대로 적는 중이라는 뜻.
    그때는 시각을 새로 찍지 않고(서버 시각을 그대로 쓴다) 되돌려 올리지도 않는다 —
    안 그러면 받은 것을 곧바로 다시 올리는 헛돌기가 생긴다. */
@@ -1640,8 +1644,10 @@ function fillInterestFields(selected) {
 }
 
 function collectProfile() {
-  const gpaRaw = $('#in-gpa').value.trim();
-  const gpa = gpaRaw === '' ? null : Math.min(4.5, Math.max(0, parseFloat(gpaRaw)));
+  /* 🔴 범위 밖 값을 **깎지 않는다** (2026-11-17 · HDJ-요청-2026-001 후속). 예전엔 평점 999 를
+     말없이 4.5 로 바꿔 저장해 학생 모르게 만점 학생이 됐다(지어낸 값). 지금은 칠 때부터 막고
+     (input-guard.js), 혹시 새어 들어와도 여기서는 null(모름)로 둔다 — 고쳐 넣지 않는다. */
+  const guardedNum = (sel, key) => { const r = checkNumber($(sel).value, PROFILE_LIMITS[key]); return r.ok ? r.value : null; };
   const bracketRaw = $('#in-bracket').value;
   return {
     name: $('#in-name').value.trim(),
@@ -1650,7 +1656,7 @@ function collectProfile() {
     major: $('#in-major').value.trim(),
     year: Number(getChip('#in-year')),
     status: getChip('#in-status'),
-    gpa: Number.isNaN(gpa) ? null : gpa,
+    gpa: guardedNum('#in-gpa', 'gpa'),
     bracket: bracketRaw === '' ? null : Number(bracketRaw),
     campus: $('#campus-field').hidden ? '' : (getChip('#in-campus') || ''),
     /* 적합도 판정에 쓰는 값들 — 자격 요건의 37%(학적상태)·9%(학점)·7%(거주지)를 연다.
@@ -1663,8 +1669,8 @@ function collectProfile() {
     parentRegion: $('#in-parent-region').value || null,
     parentRegionCity: $('#in-parent-region-city').value || null,
     nationality: $('#in-nationality').value || null,
-    credits: $('#in-credits').value.trim() === '' ? null : Number($('#in-credits').value),
-    birthYear: $('#in-birth-year').value.trim() === '' ? null : Number($('#in-birth-year').value),
+    credits: guardedNum('#in-credits', 'credits'),
+    birthYear: guardedNum('#in-birth-year', 'birthYear'),
     flags: $$('#in-flags input:checked').map((c) => c.value),
     /* 🔴 **처지(traits) 는 이 화면에 칸이 없다 — 그래서 그대로 물려받는다** (2026-09-18 코드
        리뷰). 학적정보 수정은 이 객체를 **통째로 새로 만들어** 프로필에 넣으므로, 여기 안
@@ -3650,6 +3656,7 @@ function saveActivityGate() {
   const kinds = $$('#in-act-kinds input:checked').map((c) => c.value);
   if (!kinds.length) { toast('종류를 하나 이상 골라 주세요'); return; }
   const fields = $$('#in-act-fields input:checked').map((c) => c.value);
+  if ($('#act-gate-ask') && !guardStepOk($('#act-gate-ask'))) return;   // 「내 정보」 칸에 다 못 친 값
   state.profile.interestKinds = kinds;
   state.profile.interestFields = fields.length ? fields : null;
   eligAskCollect($('#act-gate-ask'));   // 「내 정보」 — 장학금과 같은 프로필 칸에 적는다(2026-11-15)
@@ -5584,8 +5591,11 @@ function eligAskRowsHtml(keys) {
         }).join('')
         + `</select>`
       : `<input class="elig-ask-in" data-elig-field="${k}" data-elig-was="${esc(was)}" value="${esc(val)}" placeholder="—"`
+        /* 숫자 칸도 type="text" 다 — type="number" 는 '999'·'e' 를 그대로 받고, 칠 때 막을 수 없다(input-guard.js).
+           범위는 PROFILE_LIMITS 에 있는 칸이면 그것을 쓴다(data-guard) · 없으면 FIELD_META 의 min/max */
         + (f.kind === 'number'
-          ? ` type="number" inputmode="decimal" step="${f.step}" min="${f.min}" max="${f.max}"`
+          ? ` type="text" inputmode="${f.step === 1 ? 'numeric' : 'decimal'}" autocomplete="off" step="${f.step}" min="${f.min}" max="${f.max}"`
+            + (typeof PROFILE_LIMITS !== 'undefined' && PROFILE_LIMITS[k] ? ` data-guard="${k}"` : ` data-guard-min="${f.min}" data-guard-max="${f.max}" data-guard-dec="${f.step === 1 ? 0 : 2}"`)
           : ' type="text"') + `>`;
     return `<label class="elig-ask-row"><span>${esc(f.label)}</span>`
       + `<span class="elig-ask-wrap">${input}`
@@ -5647,6 +5657,7 @@ function eligAskWire(sch, reopen = () => openDetail(sch.id)) {
 
 function eligAskSave(sch, reopen = () => openDetail(sch.id)) {
   const sheet = $('#detail-sheet');
+  if (!guardStepOk(sheet.querySelector('.elig-ask') || sheet)) return;   // 다 못 친 값은 저장하지 않고 짚는다
   eligAskCollect(sheet);
   saveState();
   /* 적은 것이 **다른 공고에도 쓰이므로** 목록·홈도 다시 그린다 */
@@ -7380,6 +7391,94 @@ function renderWallet() {
   );
 }
 
+/* ---------------- 입력 안전장치 (2026-11-17 · HDJ-요청-2026-001 후속) ----------------
+   규칙(범위·글자 종류)은 input-guard.js 한 곳이다. 여기는 그 규칙을 **칸에 거는 배선**만 한다.
+   · data-guard="gpa|credits|birthYear"   — PROFILE_LIMITS 의 범위
+   · data-guard-min/max/dec               — PROFILE_LIMITS 에 없는 숫자 칸
+   · data-guard-kind="studentId|phone|date|account" — 글자 종류만
+   🔴 위임 하나로 건다 — 공고 시트·대외활동 관문 칸은 나중에 그려지므로 칸마다 걸면 새 칸이 빠진다. */
+function guardLimitOf(el) {
+  const key = el.dataset.guard;
+  if (key && typeof PROFILE_LIMITS !== 'undefined' && PROFILE_LIMITS[key]) return PROFILE_LIMITS[key];
+  if (el.dataset.guardMin != null) {
+    const lab = el.closest('label') && el.closest('label').querySelector('span');
+    return { min: Number(el.dataset.guardMin), max: Number(el.dataset.guardMax), decimals: Number(el.dataset.guardDec || 0),
+      label: lab ? lab.textContent.trim() : '이 칸', unit: '' };
+  }
+  return null;
+}
+const guardLast = new WeakMap();   // 칸마다 마지막으로 받아 준 글자 — 막을 때 이 글자로 되돌린다
+let guardHintAt = 0;
+function guardTextOk(el, text) {
+  const lim = guardLimitOf(el);
+  if (lim) return guardText(text, lim);
+  if (el.dataset.guardKind) return guardKind(text, el.dataset.guardKind);
+  return true;
+}
+const GUARD_KIND_MSG = {
+  studentId: '학번은 숫자·영문만 적을 수 있어요',
+  phone: '휴대폰 번호는 숫자와 - 만 적을 수 있어요',
+  date: '생년월일은 숫자로 적어 주세요 (예: 2005.03.14)',
+  account: '계좌번호는 숫자와 - 만 적을 수 있어요',
+};
+function guardHint(el) {
+  el.classList.add('guard-bad');
+  clearTimeout(el._guardT);
+  el._guardT = setTimeout(() => el.classList.remove('guard-bad'), 900);
+  const now = Date.now();
+  if (now - guardHintAt < 1500) return;   // 연달아 친 글자마다 알림을 띄우지 않는다
+  guardHintAt = now;
+  const lim = guardLimitOf(el);
+  toast(lim ? `${lim.label}은(는) ${lim.min}~${lim.max}${lim.unit || ''} 사이만 적을 수 있어요`
+    : (GUARD_KIND_MSG[el.dataset.guardKind] || '적을 수 없는 글자예요'));
+}
+function bindInputGuards() {
+  const isGuarded = (el) => !!(el && el.matches && el.matches('input[data-guard], input[data-guard-min], input[data-guard-kind]'));
+  /* 칸에 들어갈 때 지금 글자를 '받아 준 글자'로 적는다 — 코드가 채운 값(저장된 프로필)도 여기서 잡힌다 */
+  document.addEventListener('focusin', (e) => { if (isGuarded(e.target)) guardLast.set(e.target, e.target.value); }, true);
+  /* 친 뒤 — 받을 수 없는 글자면 직전 글자로 되돌린다. 붙여넣기·자동완성도 전부 여기를 지난다 */
+  document.addEventListener('input', (e) => {
+    const el = e.target;
+    if (!isGuarded(el) || e.isComposing) return;
+    if (guardTextOk(el, el.value)) { guardLast.set(el, el.value); return; }
+    const prev = guardLast.has(el) ? guardLast.get(el) : '';
+    const pos = Math.max(0, (el.selectionStart || 0) - (el.value.length - prev.length));
+    el.value = guardTextOk(el, prev) ? prev : '';
+    try { el.setSelectionRange(pos, pos); } catch (err) { /* 선택 범위를 못 쓰는 칸 */ }
+    guardHint(el);
+  }, true);
+  /* 한글 입력이 끝나는 순간 한 번 더 — 조합 중에는 위에서 건너뛰었다 */
+  document.addEventListener('compositionend', (e) => {
+    const el = e.target;
+    if (!isGuarded(el) || guardTextOk(el, el.value)) return;
+    el.value = guardLast.has(el) ? guardLast.get(el) : '';
+    guardHint(el);
+  }, true);
+}
+/* 넘길 때 — 이 범위 안 칸 중 **다 쳤는데 범위 밖**이거나 있을 수 없는 날짜인 첫 칸 */
+function guardFirstBad(root) {
+  if (!root) return null;
+  /* 🔴 `$$` 는 범위(root)를 안 받는다 — 화면 전체를 뒤지면 다른 단계의 칸에 걸린다 */
+  for (const el of Array.from(root.querySelectorAll('input[data-guard], input[data-guard-min], input[data-guard-kind="date"]'))) {
+    const lim = guardLimitOf(el);
+    const r = lim ? checkNumber(el.value, lim) : checkBirthDate(el.value);
+    if (!r.ok) return { el, msg: r.msg };
+  }
+  return null;
+}
+function guardShowBad(bad) {
+  bad.el.classList.add('guard-bad');
+  clearTimeout(bad.el._guardT);
+  bad.el._guardT = setTimeout(() => bad.el.classList.remove('guard-bad'), 1800);
+  try { bad.el.focus(); } catch (e) { /* 숨은 칸 */ }
+  toast(bad.msg);
+}
+function guardStepOk(root) {
+  const bad = guardFirstBad(root);
+  if (bad) { guardShowBad(bad); return false; }
+  return true;
+}
+
 /* ---------------- 이벤트 바인딩 ---------------- */
 function bindEvents() {
   /* 소식 썸네일을 못 받으면(아직 배포 전·오프라인·지워짐) 그림만 빼고 글자 카드로 (2026-10-03).
@@ -7435,6 +7534,8 @@ function bindEvents() {
         if (!$('#in-school').value.trim()) { toast('학교명 입력 필요'); return; }
         if (!getChip('#in-year')) { toast('학년 선택 필요'); return; }
       }
+      /* 다 못 친 값(출생연도 '19')·있을 수 없는 날짜는 칠 때 못 막으니 넘어갈 때 짚는다 (input-guard ②) */
+      if (!guardStepOk(btn.closest('.onboard-step'))) return;
       onboardStep += 1;
       renderOnboardStep();
       onboardProgressSave();   /* 어느 단계까지 왔는지도 진행분이다 */
@@ -7447,6 +7548,19 @@ function bindEvents() {
   });
 
   $('#btn-finish-onboard').addEventListener('click', () => {
+    /* 저장 전에 **온보딩 전체**를 한 번 더 본다 — 이어보기로 옛 진행분이 칸에 채워진 경우 등.
+       걸린 칸이 있으면 그 칸의 단계로 데려가 짚는다(저장하지 않는다) */
+    const bad = guardFirstBad($('#screen-onboarding'));
+    if (bad) {
+      const st = bad.el.closest('.onboard-step');
+      if (st && st.dataset.step != null && Number(st.dataset.step) !== onboardStep) {
+        onboardStep = Number(st.dataset.step);
+        renderOnboardStep();
+        onboardProgressSave();
+      }
+      guardShowBad(bad);
+      return;
+    }
     onboardEditing = false;
     const isFirstTime = !state.profile;
     state.profile = collectProfile();
@@ -8475,7 +8589,9 @@ async function authSubmit() {
 /* ---------------- 시작 ---------------- */
 loadState();
 bindEvents();
+bindInputGuards();
 initOnboarding();
+if (scrubbedOnLoad.length) setTimeout(() => toast(`저장돼 있던 ${scrubbedOnLoad.join('·')} 값이 범위를 벗어나 비웠어요 — 내 정보에서 다시 적어 주세요`), 1500);
 loadLinkChecks();   // 원문 링크 확인 장부 — 링크를 그리는 목록들보다 먼저 띄운다(작다 · 없어도 조용하다)
 /* 처음 받는 데이터 — 다 도착하면(`bootJobs`) 홈을 한 번 그리고 인트로를 돌린다(위 `bootHold` 머리말) */
 const bootJobs = [loadNotices(), loadNews(), loadActivities(), loadExternal(), loadRegistered(), loadKosaf()];

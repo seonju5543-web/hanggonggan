@@ -233,6 +233,10 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   자동 등록은 늘 게시한 학교로 `schoolOnly` 를 단다 — **재단·구청·KOSAF에 직접 내는 것은 전국**, 학교 창구(장학팀·포털·추천 배정)로 받는 것만 그 학교.
   새로 묶인 것은 관리자 「할 일」의 '교외인데 한 학교에만' 묶음에 뜬다. 칸을 새로 만들면 `admin-apply.mjs`·`edit-diff.mjs` 의 `ELIG_KEYS` 에도(안 하면 저장 때 조용히 버려진다).
 - **분교 ≠ 이원화** — 분교는 `UNIVERSITIES` 에 별개 학교, 이원화는 `CAMPUSES_BY_SCHOOL`. 게시판 공유 분교 판정은 `noticeForProfile` 한 곳(data.js 금지 — sw 가 안 읽는다).
+- **🔴 있을 수 없는 값은 칠 때부터 막는다 — `input-guard.js` (11-17 · 업무 요청서 HDJ-요청-2026-001 후속)**. 입력칸 `min/max` 는 타이핑을 안 막는다 — 전엔 평점 999 를 **말없이 4.5 로 깎았고**(지어낸 값) 학점 999·출생연도 3000 은 폰 안 판정을 뒤집었다.
+  세 겹: 칠 때(`guardText` · 붙여넣기 포함) → 넘길 때(`checkNumber`·`checkBirthDate` — 다 못 친 '19'·13월은 다음·저장·「미확인 자격」·대외활동 관문에서 짚음) → 예전 값(`scrubProfileNumbers` — 그 칸만 비우고 한 번 알림). 서류 칸 넷(학번·생년월일·전화·계좌)은 글자 종류만.
+  **범위를 넘으면 깎지 말 것**(`collectProfile`·`coerceField` 모두 null) · 숫자 칸은 `type="text"`+`data-guard`(`type="number"` 는 e·999 를 받는다) · 나중에 그려지는 칸도 위임으로 걸린다(`bindInputGuards`).
+  범위 숫자 **다섯 곳**(`PROFILE_LIMITS`·index.html min/max·`FIELD_META`·DB 0004·apply-guard)이 같아야 한다 — 관문 「입력 안전장치」 · 브라우저 `verify-input-guard.js`. 거짓말(정상 범위 안)·4.3 만점 구분은 못 막는다.
 - **'오늘'을 상수로 굳히지 말 것** — `todayStart()` 가 부를 때마다 읽는다(PWA 는 며칠씩 떠 있다) · 자동 등록의 연도도 오늘 기준(`yearHold`). 관문 「마감 판정이 앱을 켠 시각에 굳지 않는다」.
 - **공고 카드 품질(10-15)**: 「○○의 경우」 줄은 범위 밖이면 '모름'(`lineVerdict`) · 열거 학년·이수 학기(`parseSemester`)·따옴표 구간·「3.0/4.5」 판정 · 자격 줄이 없으면 구조화 조건이 요건(`fitDetail`) · 조각·글 제목·※ 예외는 자격 줄 아님(`looksFragment`) · 중위소득 %는 구간 표(`parseIncomeBand`) · 단과대론 ✓ 안 줌 · ✕ 는 한 번만 · 「공고 안내」 `noticeSummaryHtml` · 활동 안내·시상표 거름 `eligLineOk` · 모르는 칸은 접는다. 관문 「공고 카드 품질」.
 

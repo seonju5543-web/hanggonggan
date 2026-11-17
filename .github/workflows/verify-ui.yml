@@ -205,7 +205,7 @@ jobs:
                    verify-elig-ask.js \
                    verify-card-read.js \
                    verify-apply-prep.js verify-formfill.js verify-activities.js verify-news.js \
-                   verify-region-city.js verify-academic-info.js; do
+                   verify-region-city.js verify-academic-info.js verify-input-guard.js; do
             left=$((end - SECONDS))
             if [ "$left" -le 0 ]; then unrun="$unrun $f"; continue; fi
             if [ "$left" -gt 300 ]; then left=300; fi

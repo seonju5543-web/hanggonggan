@@ -5339,3 +5339,7 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 .sheet-sec > .sheet-verdict > h4::before {
   content: ''; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
 }
+
+/* 입력 안전장치 (2026-11-17 · input-guard.js) — 받을 수 없는 값을 친 칸을 잠깐 빨갛게.
+   🔴 전역 appearance:none·칸별 테두리 규칙보다 이겨야 해서 !important — 잠깐 뜨고 사라지는 표시라 다른 규칙과 다툴 일이 없다 */
+input.guard-bad { border-color: var(--red) !important; background: var(--red-weak) !important; }
