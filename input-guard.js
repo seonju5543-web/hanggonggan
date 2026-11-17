@@ -108,9 +108,16 @@ function guardKind(text, kind) {
 function checkBirthDate(text) {
   const t = String(text == null ? '' : text).trim();
   if (t === '') return { ok: true };
-  const d = t.replace(/[^0-9]/g, '');
-  if (d.length !== 8) return { ok: false, msg: '생년월일은 2005.03.14 처럼 여덟 자리로 적어 주세요' };
-  const y = +d.slice(0, 4), m = +d.slice(4, 6), day = +d.slice(6, 8);
+  /* 구분자가 있으면 월·일은 한 자리도 받는다(2005.3.14) · 없으면 여덟 자리(20050314) */
+  const parts = t.split(/[.\-/ ]+/).filter(Boolean);
+  let y, m, day;
+  if (parts.length === 3 && /^\d{4}$/.test(parts[0]) && /^\d{1,2}$/.test(parts[1]) && /^\d{1,2}$/.test(parts[2])) {
+    [y, m, day] = parts.map(Number);
+  } else if (/^\d{8}$/.test(t)) {
+    y = +t.slice(0, 4); m = +t.slice(4, 6); day = +t.slice(6, 8);
+  } else {
+    return { ok: false, msg: '생년월일은 2005.03.14 처럼 적어 주세요' };
+  }
   const lim = PROFILE_LIMITS.birthYear;
   const last = new Date(Date.UTC(y, m, 0)).getUTCDate();   // 그 달의 마지막 날(윤년 포함)
   if (y < lim.min || y > lim.max || m < 1 || m > 12 || day < 1 || day > last) {

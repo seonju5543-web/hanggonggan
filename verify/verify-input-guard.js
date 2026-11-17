@@ -74,6 +74,14 @@ const eq = (label, got, want) => {
   await page.$eval('#in-account-field', (el) => { el.hidden = false; });
   eq('계좌 칸에 한글·기호는 안 들어간다', await typeInto('#in-account', '123-45@가6'), '123-456');
   eq('학번 칸에 한글은 안 들어간다', await typeInto('#in-sid', '2025학번12'), '202512');
+  /* 안전장치 전에 저장된 형식 밖 값('2005년 3월') — 덧붙이기는 막고 지우기는 받는다(한 글자에 칸이 통째로 비면 안 된다) */
+  await page.$eval('#in-birth', (el) => { el.value = '2005년 3월'; });
+  await page.focus('#in-birth');
+  await page.keyboard.press('End');
+  await page.keyboard.type('1');
+  eq('형식 밖 옛 값에 덧붙이기는 막는다 (칸을 비우지 않는다)', await page.inputValue('#in-birth'), '2005년 3월');
+  await page.keyboard.press('Backspace');
+  eq('  지우기는 받는다', await page.inputValue('#in-birth'), '2005년 3');
   await typeInto('#in-birth', '2005.13.01');
   await page.click('#btn-finish-onboard');
   await page.waitForTimeout(200);

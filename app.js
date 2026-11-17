@@ -7442,8 +7442,11 @@ function bindInputGuards() {
     if (!isGuarded(el) || e.isComposing) return;
     if (guardTextOk(el, el.value)) { guardLast.set(el, el.value); return; }
     const prev = guardLast.has(el) ? guardLast.get(el) : '';
+    /* 🔴 직전 글자부터 이미 규칙 밖이면(안전장치 전에 저장된 '2005년 3월 14일' 같은 값) **지우는 쪽은 받아 준다** —
+       안 받으면 한 글자 치는 순간 칸이 통째로 비거나, 고칠 길 없이 갇힌다. 덧붙이는 것만 막는다. */
+    if (!guardTextOk(el, prev) && el.value.length < prev.length) { guardLast.set(el, el.value); return; }
     const pos = Math.max(0, (el.selectionStart || 0) - (el.value.length - prev.length));
-    el.value = guardTextOk(el, prev) ? prev : '';
+    el.value = prev;
     try { el.setSelectionRange(pos, pos); } catch (err) { /* 선택 범위를 못 쓰는 칸 */ }
     guardHint(el);
   }, true);
@@ -7451,7 +7454,9 @@ function bindInputGuards() {
   document.addEventListener('compositionend', (e) => {
     const el = e.target;
     if (!isGuarded(el) || guardTextOk(el, el.value)) return;
-    el.value = guardLast.has(el) ? guardLast.get(el) : '';
+    const prev = guardLast.has(el) ? guardLast.get(el) : '';
+    if (!guardTextOk(el, prev) && el.value.length < prev.length) { guardLast.set(el, el.value); return; }   // 위와 같은 규칙
+    el.value = prev;
     guardHint(el);
   }, true);
 }

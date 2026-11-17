@@ -16026,6 +16026,8 @@ console.log('■ 입력 안전장치 (2026-11-17 · HDJ-요청-2026-001 후속) 
   /* 서류 정보 칸 — 글자 종류 · 있을 수 없는 날짜 */
   eq('전화·계좌에 글자는 안 들어간다 · 학번은 영문까지', [IG.guardKind('010-1234', 'phone'), IG.guardKind('010ㄱ', 'phone'), IG.guardKind('12-34', 'account'), IG.guardKind('A2025', 'studentId'), IG.guardKind('학번', 'studentId')], [true, false, true, true, false]);
   eq('생년월일 13월·2월 30일·3000년은 거절 · 윤년 2월 29일은 통과', [IG.checkBirthDate('2005.13.01').ok, IG.checkBirthDate('2005.02.30').ok, IG.checkBirthDate('3000.01.01').ok, IG.checkBirthDate('2004.02.29').ok, IG.checkBirthDate('20050314').ok, IG.checkBirthDate('').ok], [false, false, false, true, true, true]);
+  eq('  월·일 한 자리(2005.3.14 · 2005-3-4)는 정상 · 두 자리 연도(05.03.14)는 짚는다',
+    [IG.checkBirthDate('2005.3.14').ok, IG.checkBirthDate('2005-3-4').ok, IG.checkBirthDate('05.03.14').ok], [true, true, false]);
 
   /* 🔴 범위 숫자 다섯 곳 대조 — input-guard · index.html 입력칸 · elig-ask FIELD_META · DB(0004) · 대신 접수 서버.
      한 곳만 넓히면 칠 때는 받아 주고 저장에서 거절되거나(학생은 이유를 모른다), 반대로 정상 값을 칠 때 막는다. */
