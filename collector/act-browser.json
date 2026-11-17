@@ -124,10 +124,6 @@
   "at": "2026-11-15",
   "tries": 1
  },
- "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=982": {
-  "at": "2026-11-15",
-  "tries": 1
- },
  "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=978": {
   "at": "2026-11-15",
   "tries": 1
@@ -136,15 +132,7 @@
   "at": "2026-11-15",
   "tries": 1
  },
- "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=969&page=2": {
-  "at": "2026-11-15",
-  "tries": 1
- },
  "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=957&page=3": {
-  "at": "2026-11-15",
-  "tries": 1
- },
- "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=956&page=3": {
   "at": "2026-11-15",
   "tries": 1
  },
@@ -156,27 +144,11 @@
   "at": "2026-11-16",
   "tries": 1
  },
- "https://kau.ac.kr/kaulife/event.php?code=s1401&page=3&mode=read&seq=9242": {
-  "at": "2026-11-16",
-  "tries": 1
- },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/521193": {
   "at": "2026-11-16",
   "tries": 1
  },
  "https://kau.ac.kr/kaulife/event.php?code=s1401&page=&mode=read&seq=11441": {
-  "at": "2026-11-16",
-  "tries": 1
- },
- "https://kau.ac.kr/kaulife/event.php?code=s1401&page=&mode=read&seq=11397": {
-  "at": "2026-11-16",
-  "tries": 1
- },
- "https://kau.ac.kr/kaulife/event.php?code=s1401&page=&mode=read&seq=11216": {
-  "at": "2026-11-16",
-  "tries": 1
- },
- "https://kau.ac.kr/kaulife/event.php?code=s1401&page=2&mode=read&seq=10416": {
   "at": "2026-11-16",
   "tries": 1
  },
@@ -188,19 +160,7 @@
   "at": "2026-11-16",
   "tries": 1
  },
- "https://kau.ac.kr/kaulife/event.php?code=s1401&page=2&mode=read&seq=9987": {
-  "at": "2026-11-16",
-  "tries": 1
- },
- "https://kau.ac.kr/kaulife/event.php?code=s1401&page=2&mode=read&seq=9959": {
-  "at": "2026-11-16",
-  "tries": 1
- },
  "https://kau.ac.kr/kaulife/event.php?code=s1401&page=3&mode=read&seq=9729": {
-  "at": "2026-11-16",
-  "tries": 1
- },
- "https://kau.ac.kr/kaulife/event.php?code=s1401&page=3&mode=read&seq=9718": {
   "at": "2026-11-16",
   "tries": 1
  },
@@ -208,19 +168,7 @@
   "at": "2026-11-16",
   "tries": 1
  },
- "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=819&bbsNo=8&nttNo=171537&pageUnit=10&searchCtgry=%eb%aa%a8%ec%a7%91%2f%ea%b3%b5%eb%aa%a8&searchCnd=all&pageIndex=1": {
-  "at": "2026-11-16",
-  "tries": 1
- },
  "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=819&bbsNo=8&nttNo=171439&pageUnit=10&searchCtgry=%eb%aa%a8%ec%a7%91%2f%ea%b3%b5%eb%aa%a8&searchCnd=all&pageIndex=1": {
-  "at": "2026-11-16",
-  "tries": 1
- },
- "https://www.gachon.ac.kr/bbs/kor/479/119165/artclView.do": {
-  "at": "2026-11-16",
-  "tries": 1
- },
- "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=943&page=3": {
   "at": "2026-11-16",
   "tries": 1
  },
@@ -277,6 +225,10 @@
   "tries": 1
  },
  "https://www.kookmin.ac.kr/user/kmuNews/notice/9/12569/view.do?currentPageNo=1": {
+  "at": "2026-11-17",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3551501": {
   "at": "2026-11-17",
   "tries": 1
  }
