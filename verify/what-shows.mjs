@@ -148,6 +148,7 @@ vm.runInContext([
   appSrc.slice(appSrc.indexOf('const NS_LABELS = ['), appSrc.indexOf('\nfunction sourceNoteHtml(')),
 ].join('\n\n'), linkCtx, { filename: 'app.js(링크 자리)' });
 linkCtx.joinSpacedSyllables = ME.joinSpacedSyllables;   // noticeSummaryHtml 의 tidyChars 가 쓴다(match-engine)
+linkCtx.stripListNumber = ME.stripListNumber;   // noticeSummaryRows 의 번호 떼기도 match-engine 한 곳(2026-11-17)
 const linkFn = (n) => vm.runInContext(n, linkCtx);
 const LEDGER = new URL('../data/link-check.json', import.meta.url);
 const ledger = fs.existsSync(LEDGER) ? JSON.parse(fs.readFileSync(LEDGER, 'utf8')) : null;

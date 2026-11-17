@@ -14324,13 +14324,21 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
   {
     const a = appSrc.indexOf('const NS_LABELS = ['), b = appSrc.indexOf('\nfunction sourceNoteHtml(');
     const escS = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    const nsh = (a > 0 && b > a) ? new Function('esc', 'unent', 'joinSpacedSyllables', `${appSrc.slice(a, b)}\nreturn noticeSummaryHtml;`)(escS, ME3.decodeEntities, ME3.joinSpacedSyllables) : () => '';
+    const nsh = (a > 0 && b > a) ? new Function('esc', 'unent', 'joinSpacedSyllables', 'stripListNumber', `${appSrc.slice(a, b)}\nreturn noticeSummaryHtml;`)(escS, ME3.decodeEntities, ME3.joinSpacedSyllables, ME3.stripListNumber) : () => '';
     const html = nsh(['12.(월) - 접수방법 : 이메일(x@y.kr) 또는 등기우편', '<b>굵게</b> 문의 : 02-123 <script>x</script>', '장학금액 : 1 인 당 1,000,000 원', '지원자격 : 2026-1 학기 학부 재학생',
       '매일 09:00~18:00 접수', '신청방법 : 포털 로그인 후 신청하고', '10.22.(목) 7:00~15:00', '모집기간) 2026.8.13.(목) ~ 2026.8.23(일) ○ (신청방법) 네이버 폼을 통한 온라인 신청']);
     const items = [...html.matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => m[1].replace(/<b class="ns-k">([^<]*)<\/b>/g, '$1 · '));
     eq('⑩ 공고 안내 — 번호·요일 꼬리 뗌 · 이름표 묶음(접수방법→신청 방법 · 장학금액→지원 금액) · 자격 줄 뺌 · 시각 콜론은 이름표 아님 · 잘린 꼬리는 … · 날짜는 번호가 아니다 · ○ 항목 가르기 · 글자는 esc',
       items, ['신청 방법 · 이메일(x@y.kr) 또는 등기우편', '&lt;b&gt;굵게&lt;/b&gt; 문의 : 02-123 &lt;script&gt;x&lt;/script&gt;', '지원 금액 · 1인 당 1,000,000원', '매일 09:00~18:00 접수', '신청 방법 · 포털 로그인 후 신청…', '10.22.(목) 7:00~15:00', '신청 기간 · 2026.8.13.(목) ~ 2026.8.23(일)', '신청 방법 · 네이버 폼을 통한 온라인 신청']);
     eq('  줄이 없으면 빈 글자 · 같은 줄은 한 번', [nsh([]), (nsh(['문의 : 02-1', '문의 : 02-1']).match(/<li>/g) || []).length], ['', 1]);
+    /* 2026-11-17 리뷰 — 옛 규칙 `^\d+[.]` 이 소수·절 번호·해의 앞 토막만 뗐다(`2.1 보호조치 종료자`→`1 보호조치 종료자` · `3.5 이상인 자 우대`→`5 이상인 자 우대` ·
+       실데이터 `2025. 12. 31.부터 …`→`12. 31.부터 …` · `26.1학기 성적 보유자`→`1학기 …`). 번호 떼기는 stripListNumber 한 곳 — 자격 줄과 공고 안내가 같이 부른다 */
+    eq('  번호 떼기는 목록 표식만 — 소수(`3.5 이상`)·해(`2025. 12. 31.`·`26.1학기`)는 값이라 남고 점 찍힌 절 번호(`2.1 `)는 통째로 뗀다 (stripListNumber)',
+      ['2.1 보호조치 종료자', '2.1. 보호조치 종료자', '3.5 이상인 자 우대', '*3.3이상(4.3 만점 기준)', '2025. 12. 31.부터 공고일 현재까지 주민등록', '26.1학기 성적 보유자', '1. 재학생', '1) 재학생', '(1) 재학생', '1.2026-2학기 재학생', '4.5 만점 3.0 이상'].map((x) => ME3.tidyRequirement(x)),
+      ['보호조치 종료자', '보호조치 종료자', '3.5 이상인 자 우대', '3.3이상(4.3 만점 기준)', '2025. 12. 31.부터 공고일 현재까지 주민등록', '26.1학기 성적 보유자', '재학생', '재학생', '재학생', '2026-2학기 재학생', '4.5 만점 3.0 이상']);
+    eq('  공고 안내도 같은 규칙 — 「3.5 이상인 학생은 …」은 숫자가 남고 「2.1 서류는 …」은 절 번호만 뗀다',
+      [...nsh(['3.5 이상인 학생은 가산점을 받습니다.', '2.1 서류는 우편으로 제출합니다.']).matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => m[1]),
+      ['3.5 이상인 학생은 가산점을 받습니다.', '서류는 우편으로 제출합니다.']);
   }
   /* ⑪ 숫자가 있는데 '모름'이던 자격 줄 123개 진단(2026-10-15 · 개발자 "여기서 진행") — 위험 없는 갈래만 판정한다. 되돌리면 그대로 '모름'이 된다 */
   const mm = (t, o) => ME3.requirementMatch(t, { ...st, ...(o || {}) }, null);
@@ -14482,7 +14490,7 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
     /* 화면 — 「공고 안내」는 줄바꿈으로 끊긴 문장을 잇고 납작한 표를 `이름표 : 값` 으로 · 이름표 없는 조각은 안 보인다 · 「모집 안내」는 자격 줄이 있으면 「대상」 발췌를 다시 적지 않는다 */
     const a2 = appSrc.indexOf('const NS_LABELS = ['), b2 = appSrc.indexOf('\nfunction sourceNoteHtml(');
     const escS2 = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    const nsh2 = (a2 > 0 && b2 > a2) ? new Function('esc', 'unent', 'joinSpacedSyllables', `${appSrc.slice(a2, b2)}\nreturn noticeSummaryHtml;`)(escS2, ME3.decodeEntities, ME3.joinSpacedSyllables) : () => '';
+    const nsh2 = (a2 > 0 && b2 > a2) ? new Function('esc', 'unent', 'joinSpacedSyllables', 'stripListNumber', `${appSrc.slice(a2, b2)}\nreturn noticeSummaryHtml;`)(escS2, ME3.decodeEntities, ME3.joinSpacedSyllables, ME3.stripListNumber) : () => '';
     const rows2 = (ls) => [...nsh2(ls).matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => m[1].replace(/<b class="ns-k">([^<]*)<\/b>/g, '$1 · '));
     eq('  공고 안내 — 세 줄로 끊긴 한 문장은 한 줄로(쇼미더임팩트) · `활동일시` ↵ `ㅇ 2026…` 는 `활동일시 · …` · `…센터에서` ↵ `10월 … 진행합니다.` 도 한 문장(강북 실데이터) · 홀로 남은 조각은 안 보인다',
       rows2(['충남 사회연대경제기업들의 임팩트 투자 기반을 조성하고 투자 유치를 희망하는', '기업들의 IR(Investor Relation) 역량 강화를 지원하기 위해 한국서부발전(주)과 함께', '하는 2026 프로젝트상생 『쇼미더임팩트 시즌6』 참가자를 모집하고자 합니다.',
@@ -14493,7 +14501,7 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
       rows2(['지원자격 : 2026-1 학기 학부 재학생', '매일 09:00~18:00 접수', '안내 글자가 길어서 이어지는', 'A. 첫째 항목입니다.']), ['매일 09:00~18:00 접수', 'A. 첫째 항목입니다.']);
     eq('  공고 안내 — 자격 줄이 있으면 「대상」 발췌를 다시 적지 않는다 · 모집기간은 「접수」 절이(코드 자리)', /x\.label !== '혜택' && x\.label !== '모집기간' && !\(x\.label === '대상' && \(n\.eligibilityLines \|\| \[\]\)\.length\)/.test(appSrc), true);
     /* 「공고 안내」가 자격에 이미 나온 줄을 빼는 비교 열쇠(noticeFlat) — 글머리 기호 차이(`■ 주 1회 …` vs `주 1회 …`)로 같은 문장이 두 칸에 떴다(관악서울대 치과병원 · 2026-10-28) */
-    const nflat = new Function('esc', 'unent', 'joinSpacedSyllables', `${appSrc.slice(a2, b2)}\nreturn noticeFlat;`)(escS2, ME3.decodeEntities, ME3.joinSpacedSyllables);
+    const nflat = new Function('esc', 'unent', 'joinSpacedSyllables', 'stripListNumber', `${appSrc.slice(a2, b2)}\nreturn noticeFlat;`)(escS2, ME3.decodeEntities, ME3.joinSpacedSyllables, ME3.stripListNumber);
     eq('  공고 안내의 비교 열쇠는 글머리 기호를 뗀다 — `■ 주 1회 이상, 총 5회 이상 꾸준히 봉사가 가능한 분` 과 기호 없는 같은 줄이 같다 · 시트가 그 열쇠(noticeFlat)를 쓴다',
       [nflat('■ 주 1회 이상, 총 5회 이상 꾸준히 봉사가 가능한 분') === nflat('주 1회 이상, 총 5회 이상 꾸준히 봉사가 가능한 분'), nflat('ㅇ 20세 이상') === nflat('20세 이상'), /\(n\.noticeLines \|\| \[\]\)\.filter\(\(l\) => !seenText\.some\(\(e\) => noticeFlat\(l\)\.includes\(e\)\)\)/.test(appSrc)], [true, true, true]);
   }

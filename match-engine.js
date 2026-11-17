@@ -1706,8 +1706,25 @@ function joinSpacedSyllables(s) {
     return parts.join('') + (tail ? (parts.length >= 3 ? tail.trim() : tail) : '');
   });
 }
+/* 앞머리 **번호 표식**만 뗀다 — 값인 숫자는 남긴다 (2026-11-17 리뷰: `2.1 보호조치 종료자` 가 `1 보호조치 종료자`,
+   `3.5 이상인 자 우대` 가 `5 이상인 자 우대` 로 떴다 — 옛 규칙 `^\d+[.]` 이 소수·절 번호의 앞 토막만 뗐다).
+   🔴 자격 줄(tidyRequirement)과 「공고 안내」(app.js noticeSummaryRows)가 **이 함수 하나**를 부른다 — 따로 적으면 한쪽만 고쳐진다.
+     · `1.` `1)` `(1)` `12.` 는 표식 — 점 뒤에 숫자가 붙으면(`3.5`·`2026.3.1`·`1.5배`) 표식이 아니라 값이다
+       (단 `1.2026년 …` 처럼 해가 붙어 오면 `1.` 은 표식이다)
+     · 점 찍힌 절 번호(`2.1 보호조치`·`2.1. 보호조치`)는 **통째로** 뗀다 — 뒤 낱말이 비교·단위 말(`이상`·`만점`·`학점`·`점`…)이면 값이라 둔다
+     · `10. 22.(목)` 처럼 날짜가 이어지면 번호가 아니다 */
+const LEAD_NUM_VALUE_NEXT = /^(?:이상|이하|미만|초과|만점|이내|기준|부터|까지|이고|이며|이거나|또는|및|퍼센트|학점|평점|(?:점|배|시간|년|개월|명|회|원|만원|일|주|학기|학년|세|등|위|%)(?![가-힣]))/;
+function stripListNumber(s) {
+  const t = String(s || '');
+  let m = t.match(/^\(\s*\d{1,2}\s*\)\s*|^\d{1,2}\s*\)\s*/);
+  if (m) return t.slice(m[0].length);
+  m = t.match(/^\d{1,2}(?:\.\d{1,2})+(?:\.\s*|\s+)(?=[가-힣])/);
+  if (m) return LEAD_NUM_VALUE_NEXT.test(t.slice(m[0].length)) ? t : t.slice(m[0].length);
+  m = t.match(/^\d{1,2}\s*\.(?!\d)(?!\s?\d{1,2}\s?[.(월])\s*|^\d{1,2}\.(?=(?:19|20)\d\d(?!\d))/);
+  return m ? t.slice(m[0].length) : t;
+}
 function tidyRequirement(line) {
-  return joinSpacedSyllables(decodeEntities(String(line || '')))
+  const head = joinSpacedSyllables(decodeEntities(String(line || '')))
     /* `① 또는 ② 해당자 ① A ② B` — 표의 머리와 칸이 한 줄로 붙은 꼴. 원문 낱말 그대로 `A 또는 B` 로 편다(세종 디딤돌 · 2026-10-15) */
     .replace(/^\s*①\s*또는\s*②\s*해당자\s*①\s*(.+?)\s*②\s*(.+)$/, '$1 또는 $2')
     // 글 가운데 글머리 기호(`다문화 ⦁ 탈북학생`)는 가운뎃점으로 — 지우면 낱말이 붙는다 (2026-10-15)
@@ -1719,9 +1736,11 @@ function tidyRequirement(line) {
     .replace(/^[\s\-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙❍◎￭·ㆍ*◌◍!|ㅣ:：©®]+/, '')   // © 는 OCR 이 글머리 기호를 잘못 읽은 것(`© 아래 기준 충족자` · 2026-11-11)
     .replace(/^[oOㅇ]\s+(?=\S)/, '')   // 글자 `o`·`ㅇ` 를 글머리로 쓴 줄(`o 대학생 : …`)
     .replace(/[\s!|ㅣ,、]+$/, '')   // 꼬리 쉼표(`… 이중국적자 제외,`)를 안 떼면 제외 줄 판정(`제외$`)이 비켜 가 자격 칸에 남는다(2026-11-11 · 1단계)
-    .replace(/\s*[|ㅣ]\s*/g, ' · ')   // 표 칸 사이의 세로줄(`대학생 |직전학기 성적 …`)은 가운뎃점으로
-    // 앞머리 번호 — "3 )" "1." "가." "①" 모두. ⚠️ `① 또는 ② 해당자` 의 ① 은 번호가 아니라 글이다(떼면 `또는 ②` 로 시작한다 · 2026-10-15)
-    .replace(/^\(?\s*\d+\s*[).]|^[①-⑳](?!\s*(?:또는|및|,|·))|^[가-힣]\s*[.)]\s/, '')
+    .replace(/\s*[|ㅣ]\s*/g, ' · ');   // 표 칸 사이의 세로줄(`대학생 |직전학기 성적 …`)은 가운뎃점으로
+  // 앞머리 번호 — "3 )" "1." "2.1" "가." "①" 모두. 숫자 표식은 stripListNumber 한 곳(소수 `3.5 이상`은 값이다 · 2026-11-17)
+  // ⚠️ `① 또는 ② 해당자` 의 ① 은 번호가 아니라 글이다(떼면 `또는 ②` 로 시작한다 · 2026-10-15)
+  const unnumbered = stripListNumber(head);
+  return (unnumbered !== head ? unnumbered : head.replace(/^[①-⑳](?!\s*(?:또는|및|,|·))|^[가-힣]\s*[.)]\s/, ''))
     // "지원자격 : 내용" 처럼 이름표가 앞에 붙은 경우 이름표만 뗀다 (내용은 살린다)
     /* "지원자격 : 내용" 처럼 이름표가 앞에 붙은 경우 이름표만 뗀다 (내용은 살린다).
        바깥 제목이 이미 '지원 자격'이라 **줄마다 또 말하면 같은 말이 두 번** 나온다
@@ -2428,7 +2447,7 @@ if (typeof module !== 'undefined' && module.exports) {
                      RESIDENCE_SPANS, residenceSpan,
                      joinSpacedSyllables, decodeEntities, looksFragment,
                      scopedToProfile, inSchoolsAny, notStale, STALE_DAYS, feedOnlyFormal, feedOnlyBoardRows,
-                     requirementLines, requirementStruct, requirementMatch, tidyRequirement,
+                     requirementLines, requirementStruct, requirementMatch, tidyRequirement, stripListNumber,
                      REQ_SIGNAL, NOT_A_REQUIREMENT, EXCLUDE_LINE, HARD_THRESHOLD,
                      noticeForProfile, activityForProfile, taggedSchool, SHARED_BOARD_BRANCH, SERVED_SCHOOLS,
                      noticeKind, NOTICE_CAMPUS_MARK, OWN_PROGRAMS,
