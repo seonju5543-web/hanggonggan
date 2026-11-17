@@ -1728,6 +1728,15 @@ console.log('\n■ 신청서 쪽 그림 · 빈칸 자리 — 이름표 옆·표 
     const famName = ruled.fields.find((f) => f.label === '이름' && f.key === null); const famBirth = ruled.fields.find((f) => f.label === '생년월일');
     eq('🔴 오른쪽 칸에 글자가 있고 아래 칸이 비면 표 머리글 — 아래 칸이 빈칸이되 key 는 null (가족 표의 성명에 학생 이름을 넣으면 틀린 값)',
       [!!famName, famName && famName.y > 277, famBirth && famBirth.key, ruled.below], [true, true, null, 2]);
+    /* 2026-11-18 — 공고문에서 뗀 서식 쪽(data/form-pages)도 같은 로봇·같은 화면 — 서식 쪽만 있는 공고에 「양식 채우기」가 안 열렸다 */
+    {
+      const ffSrc = readText(new URL('../collector/form-fields.mjs', import.meta.url)); const fillSrc = readText(new URL('../formfill.js', import.meta.url)); const appSrc2 = readText(new URL('../app.js', import.meta.url));
+      eq('  서식 쪽 — 로봇이 data/form-pages 색인(파일 있는 줄만)도 돈다 · 앱이 두 fields.json 을 합쳐 읽고 쪽 그림 주소를 폴더(base)로 고른다 · 서식 쪽 줄 밑에도 「양식 채우기」 자리',
+        [/const sets = \[\[outDir, items\], \[pagesDir,/.test(ffSrc) && /filter\(\(f\) => f && f\.file\)/.test(ffSrc),
+          /Promise\.all\(\[pdfs \? one\('forms-pdf'\) : \{\}, pages \? one\('form-pages'\) : \{\}\]\)/.test(fillSrc), /data\/\$\{esc\(F\.base \|\| 'forms-pdf'\)\}/.test(fillSrc),
+          /function formPageRowsHtml[\s\S]{0,900}?<li class="fill-slot" data-file="\$\{esc\(f\.file\)\}" hidden><\/li>/.test(appSrc2)],
+        [true, true, true, true]);
+    }
     /* 2026-11-18 (인계 1 f) — 둘째·셋째 가족 줄 · 밑줄 빈칸 · 날짜 칸 */
     {
       const fam = FF.parseBbox(`<page width="595.2" height="841.8">

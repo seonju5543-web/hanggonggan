@@ -41,12 +41,17 @@ function ffAutoValue(key) {
 
 /* 그 공고의 fields.json — 한 번만 받는다(없으면 null · 마감 뒤 로봇이 지운 공고도 null) */
 function loadFormFields(sch) {
-  if (!sch || typeof formPdfsFor !== 'function' || !formPdfsFor(sch).length) return Promise.resolve(null);
+  /* 원본 PDF 사본(data/forms-pdf)과 공고문에서 뗀 서식 쪽(data/form-pages · 2026-11-18) — 둘의 fields.json 을 합친다. 파일마다 어느 폴더인지(base)를 적어 쪽 그림 주소를 고른다 */
+  const pdfs = typeof formPdfsFor === 'function' ? formPdfsFor(sch).length : 0;
+  const pages = typeof formPagesFor === 'function' ? formPagesFor(sch).length : 0;
+  if (!sch || (!pdfs && !pages)) return Promise.resolve(null);
   if (sch.id in ffCache) return Promise.resolve(ffCache[sch.id]);
   if (ffPending[sch.id]) return ffPending[sch.id];
-  ffPending[sch.id] = fetch(`data/forms-pdf/${encodeURIComponent(sch.id)}/fields.json`, { cache: 'no-store' })
+  const one = (base) => fetch(`data/${base}/${encodeURIComponent(sch.id)}/fields.json`, { cache: 'no-store' })
     .then((r) => (r.ok ? r.json() : null)).catch(() => null)
-    .then((j) => { ffCache[sch.id] = j && j.files && typeof j.files === 'object' ? j : null; delete ffPending[sch.id]; return ffCache[sch.id]; });
+    .then((j) => (j && j.files && typeof j.files === 'object' ? Object.fromEntries(Object.entries(j.files).map(([k, F]) => [k, { ...F, base }])) : {}));
+  ffPending[sch.id] = Promise.all([pdfs ? one('forms-pdf') : {}, pages ? one('form-pages') : {}])
+    .then(([a, b]) => { const files = { ...b, ...a }; ffCache[sch.id] = Object.keys(files).length ? { files } : null; delete ffPending[sch.id]; return ffCache[sch.id]; });
   return ffPending[sch.id];
 }
 /* index.json 의 file("<id>/<n>-<이름>.pdf") → fields.json 의 항목(빈칸이 하나라도 있을 때만) */
@@ -88,7 +93,7 @@ function openFormFill(sch, file) {
   const pagesHtml = F.pages.map((pg) => {
     const fields = F.fields.filter((f) => f.page === pg.n);
     return `<div class="fillp-page" data-page="${pg.n}" style="aspect-ratio:${pg.w}/${pg.h}" data-w="${pg.w}">
-      <img src="data/forms-pdf/${esc(sch.id)}/${esc(F.dir)}/${esc(pg.img)}" alt="${pg.n}쪽" loading="lazy">
+      <img src="data/${esc(F.base || 'forms-pdf')}/${esc(sch.id)}/${esc(F.dir)}/${esc(pg.img)}" alt="${pg.n}쪽" loading="lazy">
       ${fields.map((f) => `<input class="fillp-field${ffValueOf(f, saved) ? '' : ' fillp-empty'}" data-fid="${esc(f.id)}" aria-label="${esc(f.label)}" value="${esc(ffValueOf(f, saved))}" placeholder="${esc(f.label)}"
         style="left:${ffPct(f.x, pg.w)};top:${ffPct(f.y, pg.h)};width:${ffPct(f.w, pg.w)};height:${ffPct(f.h, pg.h)}">`).join('')}
     </div>`;

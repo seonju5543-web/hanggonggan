@@ -2908,7 +2908,7 @@ function formPagesFor(sch) { return ((sch && formPagesIndex[sch.id]) || []).filt
 function formPageRowsHtml(sch) {
   return formPagesFor(sch).map((f) => {
     const meta = `${f.pages ? `${f.pages}쪽 · ` : ''}${Math.max(1, Math.round((f.bytes || 0) / 1024))}KB · 공고문에서 뗀 서식 쪽${f.srcPages ? ` (원문 ${f.srcPages}쪽)` : ''}`;
-    return `<li class="att att-row att-row-new"><span class="att-ic att-ic-pdf">PDF</span><span class="att-t"><a href="${esc(`data/form-pages/${f.file}`)}" target="_blank" rel="noopener">${esc(f.name || '공고문 안 신청서 서식')}</a><span class="att-m">${esc(meta)}</span></span><span class="att-go">열기 ›</span></li>`;
+    return `<li class="att att-row att-row-new"><span class="att-ic att-ic-pdf">PDF</span><span class="att-t"><a href="${esc(`data/form-pages/${f.file}`)}" target="_blank" rel="noopener">${esc(f.name || '공고문 안 신청서 서식')}</a><span class="att-m">${esc(meta)}</span></span><span class="att-go">열기 ›</span></li><li class="fill-slot" data-file="${esc(f.file)}" hidden></li>`;   /* 서식 쪽도 빈칸을 찾았으면 「양식 채우기」(formfill.js · 2026-11-18) */
   }).join('');
 }
 /* 원본 신청서 — 공고 첨부 중 신청서(isApplicationForm · data.js 한 곳) + 로봇이 PDF 로 바꿔 둔 사본(data/forms-pdf/index.json · formPdfsFor) + 공고문에서 뗀 서식 쪽(formPagesFor).

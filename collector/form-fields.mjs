@@ -207,9 +207,16 @@ export function runFormFields({ root, today, dry = false, force = false, log = c
   let index = { items: {} };
   try { index = JSON.parse(fs.readFileSync(indexPath, 'utf8')); } catch { /* 사본이 아직 없다 */ }
   const items = (index && index.items) || {};
+  /* 공고문 뒷장에서 뗀 서식 쪽(data/form-pages · form-pages.mjs)도 같은 규칙으로 쪽 그림·빈칸을 만든다(2026-11-18 · 서식 쪽만 있는 공고도 「양식 채우기」가 열리게).
+     🔴 그 색인의 'none' 줄(서식 쪽 없음 기록)은 파일이 없어 건너뛴다 · 결과는 data/form-pages/<id>/fields.json(앱 formfill.js 가 둘을 합쳐 읽는다) */
+  const pagesDir = path.join(root, 'data', 'form-pages');
+  let pagesIndex = { items: {} };
+  try { pagesIndex = JSON.parse(fs.readFileSync(path.join(pagesDir, 'index.json'), 'utf8')); } catch { /* 아직 없다 */ }
+  const sets = [[outDir, items], [pagesDir, Object.fromEntries(Object.entries((pagesIndex && pagesIndex.items) || {}).map(([id, arr]) => [id, (arr || []).filter((f) => f && f.file)]).filter(([, arr]) => arr.length))]];
   const stats = { files: 0, done: 0, same: 0, failed: [], fields: 0, keyed: 0, noField: [], headerRows: 0, below: 0, png: 0, capped: [], perFile: [] };
   const byLabel = new Map();
-  for (const [id, files] of Object.entries(items)) {
+  for (const [baseDir, setItems] of sets) for (const [id, files] of Object.entries(setItems)) {
+    const outDir = baseDir;   // 아래 본문이 쓰는 이름 그대로(한 벌의 규칙)
     const dir = path.join(outDir, id);
     const fjPath = path.join(dir, 'fields.json');
     let fj = { updatedAt: today, files: {} };
