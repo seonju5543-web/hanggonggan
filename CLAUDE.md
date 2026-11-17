@@ -17,9 +17,9 @@
 6. **개발 업무 질문에는 답 끝에 `node tools/link-wanted.mjs` 결과를 붙여 링크를 요청한다**
    (학습 로봇은 검색을 못 해 사람이 새 링크를 줘야 넓어진다. 주소는 추천하지 않는다).
 7. **로봇 운영 수리(저장 전 관문·되돌리기·경보 짝 빠짐)는 묻지 않고 즉시 한다**. 규칙 파일(`collector/*.json`)을 쓰는 로봇은 저장 앞에 `test-collector` 를 거친다 — 없는 로봇이 보이면 그 자리에서 붙인다(관문 「층2 재단 글 사냥꾼」 ⑦-1).
-8. 🔴 **돈이 나가는 호출은 개발자가 채팅에서 그 실행을 지시했을 때만.** 유료 워크플로(`eligibility-fill.yml`·`essay-smoke.yml`)를 세션이 돌리거나 `apiEnabled`·`ELIG_AI_ENABLE` 을 켜지 않는다. 비용 질문은 `gh run list` 기록으로 답한다.
+8. 🔴 **돈이 나가는 호출은 개발자가 채팅에서 그 실행을 지시했을 때만.** 유료 워크플로(`eligibility-fill.yml`·`essay-smoke.yml`)를 세션이 돌리거나 `apiEnabled`·`ELIG_AI_ENABLE` 을 켜지 않는다(`card-read.yml` 은 11-15 지시로 만들었지만 스위치 `card-read-config.json` 은 리뷰 뒤 꺼 둠 — 켜는 것도 지시 때만). 비용 질문은 `gh run list` 기록으로 답한다.
 
-## 🔴 수집망 44개교 복원 (2026-09-29 지시 *"죽은 학교들을 모두 다시 살려"*)
+## 🔴 수집망 44개교 복원 (2026-09-29 지시)
 
 - **수집·실시간 피드·대외활동은 44개교**. 고치는 자리는 셋이 한 세트 — `schools.json`·`browser-targets.json`(`parked` 는 안 쓰는 게시판 보관 자리 · 지우지 말 것) + `match-engine.js` `SERVED_SCHOOLS`(앱·알림·발행 공용 — 브라우저가 schools.json 을 못 읽어 한 번 더 · 갈라지면 로봇은 모으는데 앱은 숨긴다). 관문 「수집망 복원」·「화면이 보여 주는 학교 = 로봇이 수집하는 학교」.
 - **정식 등록(자격 진단·양식)도 44개교** — `auto-register-config.json` `schools` 는 빈 배열(= 수집 학교 전부). 🔴 부작용: 자동 등록은 게시 학교로 `schoolOnly` 를 달아 전국 사업이 한 학교에 묶인다(노션 F-5) → 관리자 「할 일」 '교외인데 한 학교에만' 에서 merge 로 승격 · 타교 같은 사업은 컨펌 대기. 좁히는 것은 개발자 지시 때만(관문 「수집망 복원」).
@@ -32,7 +32,7 @@
 - **판정기 `collector/kind-evidence.mjs`**(`classifyKind` · 순수 함수): 제목 표식 → 학교 제도 표(`OWN_PROGRAMS` + 학습 `own-programs.json`) → 제목의 바깥 기관 낱말(`ORG_RE`) → 학교 이름표(`schoolTokens`) + 본문 증거(교비·장학팀 접수·학교 도메인 이메일) 순. 이름표 없이 본문 낱말만으로는 교내로 보지 않는다 (껍데기를 걷어낸 본문만 읽는다 `makeStripperMulti`). 증거 없음 = 교외.
 - **소급 로봇 `collector/kind-classify.mjs`**(원문 도착 뒤 · 두 수집 워크플로의 데이터 관문 앞): 확신 high 면 구분을 고치고 `kindEvidence` 를 남기며 제도 이름을 학습 표에 적는다(다음 등록부터 `noticeKind(title, school, learned)` 셋째 인자로 잡힌다 · 앱 화면은 안 넘긴다). mid 는 `kind-candidates.json` 후보로만. 관리자가 교내→교외로 되돌린 이름은 `blocked` 로(다시 배우지 않는다).
 - **범위 승격 `collector/scope-promote.mjs`**(F-5): 학교 한정·교외·로봇 등록분 중 ① 접수 이메일이 학교 밖 ② 본문 "재단에 직접 제출/재단 홈페이지 신청/우편 접수" ③ 타교 같은 사업(`programKey` · `entry-rules.cjs`)이면 전국으로(`scopeFrom` 에 근거) · 학교 창구(장학팀·포털) 문장이 있으면 안 푼다. 자동 등록도 타교 같은 사업이 오면 기존 것을 승격(`verdict: 'promote'`) · 합치기는 `collector/registered-merge.mjs` 한 곳.
-- **리뷰 3차에서 막은 구멍 넷**(경위 SESSIONS.md): ① 학교 이름표에 지역 밑동·두 글자 별칭 금지(`schoolTokens` · 지역은 `REGION_CITIES`) · 교내 high 는 '학교가 준다'는 본문 또는 약한 신호 둘 ② 전국 등록분은 세 번째 학교 글을 흡수(`absorbed` · `isNationalAbsorber` · 여러 학교 공고는 `schoolsAny` 일 때만) · 승격은 로봇 등록·교외·사람 미지정·마감 전만 ③ 관리자가 고친 구분·범위는 `kindFrom`·`scopeFrom` 에 '관리자' 표식 ④ 판정 로봇 셋은 리포트 파일을 인자로(`browser-report.md`).
+- **리뷰 3차에서 막은 구멍 넷**(세부 SESSIONS.md 「2026-09-30 — 판정 자동화 리뷰 3차 반영」): ① 학교 이름표에 지역 밑동·두 글자 별칭 금지(`schoolTokens`) ② 전국 등록분은 세 번째 학교 글을 흡수(`isNationalAbsorber`) · 승격은 로봇 등록·교외·사람 미지정·마감 전만 ③ 관리자가 고친 구분·범위는 `kindFrom`·`scopeFrom` 에 '관리자' 표식 ④ 판정 로봇은 리포트 파일을 인자로.
 - 🔴 **합칠 때 마감은 날짜를 내는 문구와 함께만 옮긴다**(`deadlineQuote` · 10-01 자동 등록 8건 되돌림). **실데이터에 기댄 고정 검사를 관문에 두지 말 것**(「정식 등록도 나눌 때」의 '지금은 선 아래' 줄이 같은 사고).
 - 그 밖(같은 지시): 브라우저 담당 게시판은 `schools.json` `collector:"browser"` 로 일반 로봇이 건너뛴다 · 못 읽는 학교는 `run-probe.txt` 정찰 · 분교 씨앗 `school-board-seeds.json` 은 `find-boards.mjs` 가 후보만 리포트 · 포털 표 후보 `collector/portal-candidates.mjs` · 정문 사진 44개교(`fetch-gate-photos.mjs`). 관문 「장학금 판정 자동화 · 범위 승격」.
 
@@ -42,6 +42,11 @@
 - **원문 링크 확인 로봇** `collector/link-check.mjs`(매일 · 판정은 `collector/link-landing.mjs` 한 곳 · 학생처럼 새 탭) — 🔴 **주소를 고치지 않는다.** 다른 날 두 번 같은 문제여야 `data/link-check.json` 에 싣는다(앱이 받는다). 제목 먼저·로그인 벽은 나중 · 다른 글 제목을 반드시 넘긴다.
 - 🔴 **고치는 로봇은 멀쩡한 주소를 표식으로 덮어쓰지 않는다**. 병합 순위 `preferNotice`: 진짜 주소 > 목록 표식 > 목록+번호.
 - **원문 바로잡기**(`source-link.js` ⑥ · 로봇 데이터에 고쳐 쓰면 사라진다): 사람 `data/link-fixes.json`(관리자 「원문 링크 손볼 것」 → `tools/admin-apply.mjs` `linkFix` · 늘 이긴다) · 로봇 `data/link-check.json` `fix`(후보 `collector/link-candidates.json` 을 학생처럼 열어 `acceptCandidate` 통과분만). 열쇠 `id:`·`u:` · 회차(`round`)는 층2만. 관문 같은 절 fixes·candidates·admin.
+
+## 🔴 유료 카드 읽기 (2026-11-15 지시 · 설계 `docs/designs/paid-card-reading.md`)
+
+- 로봇 `collector/card-read.mjs` 가 본문+첨부를 모델 둘에게 따로 읽혀, 글자가 원문에 있고(`verify`) 둘이 같은 말을 한 줄(`agree`)만 `data/card-read.json` 에 싣는다. 🔴 `registered.json` 은 안 고친다(무료 길 = 비상망) · 지어냄을 막는 것은 지시문이 아니라 `verify` 다.
+- 앱·알림·`what-shows` 는 `applyCardRead`(match-engine) 한 곳으로 얹는다 — 얹힌 공고(`cardRead`)는 `requirementLines` 의 거르기를 건너뛴다. 스위치 `enabled`+`CARD_READ_ENABLE`. 관문 「유료 카드 읽기」 · `verify-card-read.js`.
 
 ## 🔴 학적정보 테일러링 (2026-10-24 개발자 지시 넷 — 원문은 설계 문서 0절)
 
@@ -57,9 +62,9 @@
   노션이 안 붙은 세션이면 **먼저 그렇게 말하고** 저장소로만 답한다.
 - **백로그의 일을 했으면 끝내기 전에 노션을 고친다** — 상태 + 상태 메모(날짜·근거·커밋). 없는 일이면 행을 더한다.
   Stop 훅이 '고쳤는데 노션에 안 썼으면' 알린다. 읽기·실패한 쓰기는 반영이 아니다.
-- 「작업 현황」은 로봇(`tools/notion-status.mjs`)이 채운다 — 아래 기술 사실 참조. 🔴 **공유문서 만들기 중단(10-30 지시)** — 보고서 PDF(`work-report`)·노션 새 페이지·아티팩트를 만들지 않는다(다시 지시할 때까지).
-- **노션에 없고 여기서만 사는 것**: ① 인스타 토큰 60일 — **2026-11-12 쯤 재발급**(`node insta/token-days.mjs` 의 `살아 있음 · n일` 문장을 본다)
-  ② GitHub 관리자 열쇠 만료 2026-11-07(노션 F-4) ③ 재조사 금지: KOSAF 는 재단은 100% 알지만 **이번 회차는 19%만** 알고 신청서 양식 첨부가 없다(`collector/kosaf-fetch.mjs` 머리말).
+- 「작업 현황」은 로봇(`tools/notion-status.mjs`)이 채운다 — 아래 기술 사실 참조. 🔴 **공유문서 만들기 중단(10-30 지시)** — 작업이 끝날 때마다 만들던 보고서 PDF(`work-report` 스킬은 멈춤)·노션 새 페이지·아티팩트를 만들지 않는다(다시 지시할 때까지). 개발자가 그 자리에서 보고서를 청할 때만 `internal-report`(11-17).
+- **노션에 없고 여기서만 사는 것**: ① 열쇠 만료일은 `docs/backend/keys.json` 한 곳(매일 `key-expiry.yml` 이 14일 전 경보 · 관리자 화면 열쇠는 11-11 재발급).
+  🔴 인스타 토큰은 11-18 현재 **재발급 안 됨**(시크릿 `IG_ACCESS_TOKEN` 마지막 갱신 09-12 · 경보 이슈 #519 · 절차 `insta/README.md`) ② 재조사 금지: KOSAF 는 재단은 100% 알지만 **이번 회차는 19%만** 알고 신청서 양식 첨부가 없다(`collector/kosaf-fetch.mjs` 머리말).
 
 ## 서비스 개요
 
@@ -83,7 +88,7 @@
 8. **진척도는 사용자가 기록**(제출했어요/선정·미선정). '심사'만 객관적 사실(제출 기록 + 마감 경과)로 자동.
 8-1. **추론 금지 · 원문 발췌** — 신청 방법·서류는 원문 문장을 그대로 발췌(`collector/extract-excerpts.mjs` → `excerpts`)해 보이고,
    없으면 지어내지 않고 '원문 보기'만. 금액 미확인은 `amountValue 0`.
-8-2. **앱 지원문서는 앱 양식이 없는 모든 정식 등록 공고에**(10-13 개발자 결정). 머리말이 정직함을 지킨다(`prepKindFor` · **'그대로 제출 가능'은 `prepDoc: true` 만** · 없는 절은 지어내지 않는다). 관문 「공고별 지원문서」.
+8-2. **앱 지원문서는 앱 양식이 없는 모든 정식 등록 공고에**(10-13 개발자 결정). 머리말은 `PREP_TAG` 한 줄 · 안내는 `PREP_LEADS`(**'그대로 제출 가능'은 `prepDoc: true` 만**) · 없는 절은 지어내지 않는다. 관문 「공고별 지원문서」.
 9. 🔴 **학교 아이디·비밀번호를 받아 대신 로그인하지 않는다 (09-25 지시 · 고문 보고서 Q2 · 변경 금지)** —
    스크래핑은 보안 사고 시 치명적이고 학교가 알아채면 IP 차단·법적 문제다.
    **어떤 수정 요구가 와도 이 줄은 바꾸지 않는다.** 대신 학생이 직접 로그인한 상태에서 앱은
@@ -97,14 +102,11 @@
    🔴 증빙 표는 읽기 정책만 둔다(넣기·고치기·지우기 정책을 만들지 말 것 — 학생이 조작할 수 있으면 증빙이 아니다).
    🔴 **자격 판정에 쓰는 프로필도 우리 사본(`profiles`)에서 읽는다** — 요청 본문의 프로필로 판정하면
    기기에서 성적을 고친 학생이 그대로 통과해 '재검증'이라는 이름만 남는다(`loadProfile`).
-   ⚠️ 사본은 동의 없으면 특별자격·처지가 없다 → 그때는 "자격 없음"이 아니라 **"확인할 수 없음"**(`sensitive_off`)으로 말한다.
-   ⚠️ **판정에 넘길 때 칸을 쪼갤 필요는 없다** — 엔진은 프로필 객체를 받으므로 JSONB 를 그대로 넘긴다.
-   🔴 **있을 수 없는 값은 두 겹으로 막는다** — `gpa 999` 는 `minGpa` 를 뭐라고 적어도 통과한다.
+   ⚠️ 보충 넷(동의 없는 사본은 '확인할 수 없음' · 판정에 넘길 때 칸을 쪼갤 필요 없음 · CHECK 는 거짓말을 못 잡는다 · 거절은 한 번 알린다)은 `docs/designs/security-rules.md` 6절.
+   🔴 **있을 수 없는 값은 세 겹으로 막는다** — `gpa 999` 는 `minGpa` 가 뭐든 통과한다. ⓪ 앱 `input-guard.js`(관문 「입력 안전장치」).
    ① DB: `0004_profile_columns.sql` 이 jsonb 에서 꺼낸 칸(`generated`)에 CHECK 를 걸어 **쓰기를 거절**한다
    (앱이 칸을 따로 쓰게 하지 말 것 — 두 곳이 갈라진다 · 닫힌 목록 금지 — 성별은 자유 입력으로도 배워진다).
    ② 서버: `profileOutOfRange` 가 같은 범위를 한 번 더 본다(숫자는 `PROFILE_BOUNDS` 한 곳 · 관문이 SQL 과 대조).
-   ⚠️ CHECK 는 **'있을 수 없는 값'만** 잡고 **거짓말은 못 잡는다** — 없는 방어를 있다고 적지 말 것.
-   ⚠️ 거절은 화면이 **한 번** 알린다(`syncTellIfRejected`) — 안 알리면 프로필이 영영 안 올라가고 조용하다.
    🔴 서버가 준 `details` 에는 실패한 행이 통째로(주민등록번호까지) 들어 있어 **화면에 옮기지 않는다.**
    관문 `verify/verify-apply-guard.mjs` · `verify-supabase.js` [13] · 관문 「프로필 개별 칸 · DB 검증」.
 
@@ -126,7 +128,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - push-to-run(GitHub 연결 없는 세션): `collector/run-*.txt`·`tools/run-gate-photos.txt`·`insta/run-notify.txt`·`deploy/run-deploy.txt` 를 고쳐 기본 브랜치에 push.
   🔴 저장하는 push-to-run 로봇은 push 트리거에 `branches:` 를 건다 — 없으면 그 파일을 고친 커밋이 main·작업 브랜치에 올라갈 때 **그 브랜치에서** 돌아 저장한다(관문 「원문 링크 정직성」 robot ⓩ).
 - 라이브 앱 확인은 샌드박스에서 github.io 가 막혀 `.github/workflows/check-live.yml` 로그로만 한다.
-  🔴 그 점검은 **앱이 실제로 받는 파일**을 봐야 한다 — 옛 통짜 파일만 보고 학교별 공고·학과 파일은 **아무도 안 보고 있었다**(404 여도 조용히 물러난다).
+  🔴 그 점검은 **앱이 실제로 받는 파일**을 봐야 한다(404 여도 앱은 조용히 물러난다).
   파일 이름은 `match-engine.js` 규칙으로 뽑는다(박아 두지 말 것). 새 데이터 파일을 앱이 받게 하면 이 점검에도 넣는다.
 
 ## 브랜치 · 배포
@@ -203,7 +205,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 | `DESIGN.md` | 디자인 값의 사람용 사본 — 원본은 `style.css`, 관문 `verify/ui-tone.mjs` |
 | `docs/designs/data-model.md` `docs/designs/data-flow.md` `docs/designs/security-rules.md` | **설계 문서 셋** (고문 보고서 Q12) — 저장소 다섯이 각각 무엇을 담는가 · 공고가 폰까지 가는 길과 어디서 끊기는가 · 권한·보안 약속과 그 관문. 사본이라 관문 「CLAUDE.md 가 가리키는 것이 실제로 있다」가 같이 잰다 |
 
-## 중요한 기술 사실 (재발견에 시간 쓰지 말 것)
+## 중요한 기술 사실 (다시 캐지 말 것)
 
 각 줄의 경위는 `SESSIONS.md`(특히 「2026-09-23 이관분」)에서 제목으로 찾는다.
 "관문 「X」" 는 `verify/test-collector.mjs` 의 절이다 — `grep -n "■.*X" verify/test-collector.mjs` 로 찾는다.
@@ -242,8 +244,8 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   못 읽은 금액은 **홈 합계에서만** 중앙값으로 어림(`amountValue` 엔 안 적는다 — 감사가 막는다). 관문 금액 절.
 - **🔴 마감일은 이름표(`신청기간 :` 등) 뒤 날짜만** — 게시일·조회수·다른 공고 날짜가 섞여 있다. 못 믿으면 비운다. 관문 「마감일」.
 - **달력·저장은 '내 것'만 찍는다**(마감 파랑·발표 빨강 둘뿐) · `state.saved` 를 `applications` 와 합치지 말 것. `docs/designs/calendar-and-save.md`.
-- **2026-09-17 결정 셋**: 홈 순서 = 적합도 − 남은 날(`byHomeOrder` · 마감 모르는 공고에 가짜 14 금지) · 앱 내부 사정은 학생 화면에 안 적는다
-  ('자격 미확인' 배지는 남긴다) · 못 읽은 금액 어림은 `renderHome` 한 곳.
+- **2026-09-17 결정 셋**: 홈 순서 = 적합도 − 남은 날(`byHomeOrder` · 마감 모르면 가짜 14 금지) · 앱 내부 사정은 학생 화면에 안 적는다
+  (11-02: '모름'류 글자 없음 · 관문 「학생 화면에 '모름'류 글자가 없다」) · 못 읽은 금액 어림은 `renderHome` 한 곳.
 
 ### 층2(KOSAF) · 접수 채널 · 인스타
 
@@ -254,30 +256,19 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   버튼은 `mailto:` 라 서버가 필요 없다. 관문 「메일 접수 주소」.
 - **포털 신청**(`findApplyPortal`): 한 학교가 시스템을 둘 쓴다 · 양식 받는 곳·결과 보는 곳·계좌 등록은 접수처가 아니다 · 길은 원문 그대로 인용 ·
   주소를 짐작해 채우지 말 것 · 열쇠 글자는 `PORTAL_SYSTEMS`↔`PORTAL_SYSTEM_INFO` 같게. 관문 「포털 신청 시스템」.
-- **대외활동·공모전 탭** (2026-09-25 · 노션 UI-34): 판정은 `collector/activity-kind.mjs` `activityKind` 한 곳(장학 제도는 장학 쪽 · 공모전은 장학 낱말이 있어도 공모전) ·
-  파일·장부는 장학 피드와 **따로**(`data/activities.json` · 섞으면 알림이 활동 글로 운다) · 학교 범위는 `activityForProfile` · 카드는 `noticeCardHtml` 한 벌 ·
-  출처 `activity-sources.json` 은 주소마다 `evidence` · 집계 사이트는 출처가 아니다. 관문 「대외활동·공모전」 · `verify-activities.js`.
-  관리자 「활동」 탭(`#activities`): 종류 바꾸기·숨기기(`hidden` + `activity-config.json`)·출처 추가/보관 — `activityKind`·`activityHide`·`activitySource`. 관문 같은 절 ⑤ · `verify-admin.js`.
-  활동 글의 마감·발췌는 `collector/activity-excerpts.mjs` 한 곳(마감 규칙은 장학과 같은 `extractDeadline` · 분야는 `activityField` · 제출 서류는 `activityDocuments` — 장학과 같은 규칙) · 신청서 원본 PDF·「양식 채우기」는 장학과 같은 로봇·화면(열쇠는 글 id `activityId` · `fillTargetFor`) · 관문 「대외활동·공모전 — 제출 서류 · 신청서 원본 PDF」 · 공공·재단 게시판은 `collector/robots.mjs` 로 robots.txt 를 묻고 읽는다 · 카드 D-day 는 `dday()` 한 곳. 관문 같은 절 ⑥.
-  **공공 API 로봇**(`collector/open-api.mjs` · 규칙 `collector/open-api-map.mjs`): K-Startup·1365(`DATA_GO_KR_KEY`)·온통청년(`YOUTHCENTER_KEY`·`YOUTHCENTER_CONTENT_KEY` — 🔴 포털 열쇠로 안 열린다) → 같은 `data/activities.json`(`api` 칸) · 못 받은 출처의 지난 글은 안 지운다 · 60일 삭제는 `seenAt` · 실패는 리포트 ❌ → 이슈. 관문 「공공 API 로봇」.
-  🔴 발췌기에 넘기는 상세 글자는 **줄을 살린 것**(`htmlToLines`) — 뭉개면 **전부 0건**. 발췌 없는 글은 다음 실행이 다시 읽는다(`ACT_BACKFILL`).
+- **대외활동·공모전 탭** (2026-09-25 · 노션 UI-34 · 세부는 `docs/designs/activities-tab.md` 「CLAUDE.md 에서 옮긴 규칙」): 판정은 `collector/activity-kind.mjs` `activityKind` 한 곳 ·
+  파일·장부는 장학 피드와 **따로**(`data/activities.json` · 섞으면 알림이 활동 글로 운다) · 학교 범위 `activityForProfile` · 카드는 `noticeCardHtml` 한 벌 · 마감·발췌는 `collector/activity-excerpts.mjs` 한 곳(장학과 같은 규칙) ·
+  출처는 주소마다 `evidence`(집계 사이트는 출처가 아니다) · 공공·재단 게시판은 `collector/robots.mjs` 로 robots.txt 를 묻는다 · 공공 API 로봇 `collector/open-api.mjs`(🔴 온통청년 열쇠는 포털 열쇠로 안 열린다). 관문 「대외활동·공모전」 · 「공공 API 로봇」 · `verify-activities.js`.
+  🔴 발췌기에 넘기는 상세 글자는 **줄을 살린 것**(`htmlToLines`) — 뭉개면 **전부 0건**.
 - **재단·지자체 게시판(교외 확대)** (2026-09-26 · 노션 F-13): 링커리어류는 크롤링이 아니라 **주최사 직접 등록**이라 긁지 않는다 — 우리는 주최의 제 게시판을 읽는다.
   출처 `collector/external-sources.json` 은 `kosaf-open.json` 의 재단 홈페이지에서 왔고, `collector/find-boards.mjs` 가 게시판을 찾아 `autoFound` 로 적는다(잘못 찾으면 `parked`).
   글은 `data/external.json`(학교 피드와 따로) → 홈 「재단·지자체 새 공고」(`externalNoticesHtml` · 등록된 주소는 `registeredUrlMatcher` 로 뺀다). 링크 읽는 눈은 `collector/board-links.mjs` 한 곳. 관문 「재단·지자체 게시판」.
-- **교내 소식** (2026-09-30 개발자 지시): 학교 **공지** 게시판에서 제목+링크+수집일(발췌·마감 없음) →
-  `data/news/<학교키>.json`(`newsFileFor` · 공고와 같은 열쇠 · 옛 통짜 파일 없음) → 홈 첫 화면 아이콘 네 칸 밑 사진 카드 띠(`homeNewsHtml` · 네 장 `NEWS_STRIP_N`) + 「전체 보기」 시트(`schoolNewsHtml`).
-  로봇은 **따로**(`collect-news.mjs`) · 판정은 `news-kind.mjs` 한 곳(장학·활동 글은 그쪽 피드 몫) · 학교 범위는 `noticeForProfile` ·
-  출처는 웹 검색 후보를 찾기 로봇이 열어 확인해 `boardUrl` 로 올린다(못 찾으면 리포트 「개발자에게 요청」) · 알림 없음. 관문 「교내 소식」 · `verify-news.js`.
-  🔴 글 줄은 **날짜가 붙은 줄만**(`extractDatedRows` · 게시일 `postedAt`) — 페이지 링크 전부를 쓰면 사이트 메뉴가 글이 된다(10-01 906건 사고). 학교 게시판은 robots.txt 를 묻지 않는다(장학 수집기와 같은 정책).
-  🔴 **목록이 보통 링크가 아닌 게시판은 `news-board-rules.mjs` 한 곳**(클릭형 onclick·data-id · 글 주소 없는 목록 표식 listOnly · API json/post) — 두 로봇이 `rowsForBoard` 하나를 부른다.
-  상세 주소는 유추하지 않고, 상세가 있는 규칙은 **매번 첫 글의 상세를 열어** 그 글의 화면인지 본다(`verifyRuleDetail` · 목록 표식은 상세가 없어 건너뜀) · API 규칙은 정찰이 본 화면(`page`)만 게시판으로 올린다.
-  같은 글은 **게시판의 글 번호**(`postId`)로 알아본다 — 목록 표식 주소(#n-제목)는 제목 다듬기가 바뀌면 달라져 두 번 실렸다(`collapseSamePost` · 발행 때 소급 · 숨김·git 병합도 글 번호 `newsHidden`·`newsDistinct`). 분류·캠퍼스 꼬리표는 떼지 않는다.
-  못 읽는 학교는 정찰(`run-probe.txt` `checkUrl:` · 인증서는 `certHost:`) 결과만으로 규칙을 적는다.
-  **사진 썸네일**(2026-10-03 개발자 지시): 수집 다음 단계(`collect-news-thumbs.mjs` · 보강)가 새 글부터 상세(또는 규칙의 본문 API `postContentRequest`)를 열어 본문 사진 → 첨부 그림 순으로 고르고(`news-thumb.mjs` 한 곳 · og:image 는 안 쓴다 — 전부 학교 로고였다)
-  글 화면에 제목이 있는지(`pageHasTitle`)·받아서 진짜 사진인지(크기·가로세로·QR·글자뿐인 문서 그림 `looksLikeTextPage`) 본 뒤 240px WebP 로 `data/news/img/<바이트 해시>.webp` 에 둔다(서비스워커가 캐시 우선이라 이름을 다시 쓰지 않는다). 🔴 **두 글 이상에 같은 그림 = 학교 공통 그림**(로고·기본 공유 그림)이라 막는다 —
-  이름 낱말은 거들 뿐. 장부 `news-thumbs.json` 을 매 실행 실린 글 전부에 다시 입히고(`applyThumbs`) 안 쓰는 그림은 지운다 · 관리자 「사진 빼기」는 `noThumb` · 전체 스위치 `news-config.json` 의 `thumbs`(on · dry=받아만 두고 카드엔 안 붙임 · off=모두 뗌). 카드는 `opts.thumb` 를 받은 소식 카드만 그린다(꼴 사본은 관문이 대조).
-  **학교 대표 사진**(10-03 지시): 글의 사진이 없는 카드만 학교 사진(「학교 사진」 표시는 뺐다 — 다시 붙이지 말 것) · 출처(BY·BY-SA)는 라이선스 화면 「사진 출처」(`photoCreditsHtml`) · 위키미디어 열린 라이선스만 · 기록 `docs/designs/assets/gates/school-photo-picks.json` → `tools/build-school-photos.mjs` → `assets/schools/photos.json`. 관문 「학교 대표 사진」 · `verify-news.js` ⑥⑦.
-  🔴 **소식 0건 학교는 없다**(10-03 지시): 학교마다 최근 4건은 기한이 지나도 남기고(`newsFloor`) · 글이 드문 학교는 둘째 게시판(`extraBoards` · 규칙 열쇠 `newsRuleKey`) · 0건이면 리포트 🙋 + 이슈.
+- **교내 소식** (2026-09-30 개발자 지시 · 세부는 `docs/designs/news-feed.md` 「CLAUDE.md 에서 옮긴 규칙」): 학교 **공지** 게시판의 제목+링크+수집일 → `data/news/<학교키>.json`(`newsFileFor`) →
+  홈 사진 카드 띠(`homeNewsHtml`) + 「전체 보기」(`schoolNewsHtml`). 로봇은 **따로**(`collect-news.mjs`) · 판정은 `news-kind.mjs` 한 곳 · 학교 범위 `noticeForProfile` · 알림 없음 · 학교 게시판은 robots.txt 를 묻지 않는다. 관문 「교내 소식」 · `verify-news.js`.
+  🔴 글 줄은 **날짜가 붙은 줄만**(`extractDatedRows`) — 링크 전부를 쓰면 사이트 메뉴가 글이 된다(10-01 906건 사고).
+  🔴 **목록이 보통 링크가 아닌 게시판은 `news-board-rules.mjs` 한 곳**(두 로봇이 `rowsForBoard` 하나를 부른다) · 상세 주소는 유추하지 않는다 · 같은 글은 **글 번호**(`postId` · `collapseSamePost`)로 알아본다.
+  사진 썸네일은 `news-thumb.mjs` 한 곳 — 🔴 **두 글 이상에 같은 그림 = 학교 공통 그림**이라 막는다 · og:image 안 씀 · 그림 이름을 다시 쓰지 않는다(서비스워커 캐시 우선). 학교 대표 사진은 글 사진이 없을 때만(「학교 사진」 표시는 다시 붙이지 말 것 · 관문 「학교 대표 사진」).
+  🔴 **소식 0건 학교는 없다**(`newsFloor` · 둘째 게시판 `extraBoards`) · 0건이면 리포트 🙋 + 이슈.
 - **학자금대출**은 정식 등록 제외(이자 지원 장학금은 제외 아님 — `LOAN_EXCEPT`) · 피드에선 장학 공고 뒤로(`boardNoticesForMe`).
 - **인스타**: 🔴 게시는 사람만 누른다 · 토큰은 워크플로에만 · 한 실행 최대 6건 · 수정은 다시 그려 **보여 주고 물은 뒤** push-to-run(스킬 `insta-revise`).
   관문 `verify-insta.js` · `docs/designs/instagram-pipeline.md`.
@@ -288,7 +279,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - **드라이버에 온보딩 단계 번호·공고 id·브라우저 경로·포트를 박지 말 것** — `verify/onboard-helper.js`(`nextUntil`·`dismissNotify`) · `pickTarget`.
   알림 동의 시트는 2.9초 뒤 떠서 클릭을 막는다 → `dismissNotify(page)`. 관문 test-collector 정적 검사.
 - **그려 놓고 센다** — 카드는 함수가 여럿이다(`schCard`·`liveNoticesHtml`). 값이 같아도 모양이 다를 수 있다(관리자 화면 · `verify-admin-shape.js`).
-- **서체 Pretendard 한 벌 · 작은 척도**. 다시 바꾸자는 제안은 화면을 보여 주고 정한다. 파일 끝 카드 블록이 앞 규칙을 덮는다.
+- **서체 Pretendard 한 벌 · 작은 척도**. 바꾸려면 화면을 보여 주고 정한다. 파일 끝 카드 블록이 앞 규칙을 덮는다.
 - **디자인 토큰**: 원본 `style.css`, 관문 `ui-tone.mjs`(토큰 이탈 톱니 · 괄호 짝 · 병합 충돌 표식). 🔴 CSS 에 남은 충돌 표식·짝 없는 `}` 는 조용히 규칙을 삼킨다.
 - 🔴 **문서는 굴러가지 않는다 — `#app` 안쪽만 굴러간다**(iOS 26 이 하단 탭을 화면 중간에 그린다). 스크롤은 `appScroller`·`appScrollTo` 로(`window.scrollY` 는 늘 0) · 드라이버도 같다. 관문 `verify-interactions.js` UI-7 절.
 - **시트는 전부 아래로 쓸어 닫는다** — `enableSheetSwipe` 한 곳 · 판정은 `scrollableAtTop` · 회귀는 TouchEvent 로.
@@ -300,14 +291,14 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   글자색이 바뀐다(탈퇴 제외 · `:active` 는 마우스가 아니라 CDP 로 잰다) · 패럴랙스 없음 · MY 프로필 카드는 통째 버튼이 아니다(`.my-edit-hint` 만) ·
   여백은 상자 사이가 아니라 **글자와 글자 사이**로 잰다 · 화면 제목 밑줄 없음(10-06 'AI 티' 개선안 A) · 구분선은 목록에만. 관문 `verify-settings.js`.
 - **카드·시트 한 벌(2026-11-02 승인 시안 · `docs/designs/mockups/card-consistency.html`)**: 윗줄 칩(`kindChip`)·주최·알약 · 제목은 지우고 나누기만(`cardTitleParts`) · 시트는 절 다섯(`sheetSectionsHtml`) · 마감은 아랫줄 그대로. 관문 「승인받은 화면 그대로인가 — 카드 시안 B」.
-- 일괄 신청 준비는 `confirm()` 이 아니라 앱 목록(`renderBulkPrep`) · 시트 그릇은 `#detail-sheet` · 체크해도 다시 그리지 않는다.
+- 일괄 신청 준비는 `confirm()` 아닌 앱 목록(`renderBulkPrep`) · 시트 그릇 `#detail-sheet` · 체크해도 다시 안 그린다.
 - 기다림이 보이는 곳은 실시간 공고 구역 하나(`allScholarships` 가 상시 제도를 먼저 준다). 못 받아 왔을 때 `null` 로 두지 말 것(뼈대가 굳는다).
 
 ### 로봇 · 워크플로
 
 - **🔴 로봇이 고친 파일은 전부 `git add` 에** · 없을 수 있는 파일은 `[ -f … ] && git add` · 데이터 관문(감사)은 저장 직전 · 빨가면 `collector/gate-guard.mjs` 가 단계별로 되돌리며 다시 잰다(끝내 빨가면 이슈 + 빨간불 · 두 번 걸린 자동 등록은 3일 쉼).
 - **🔴 모든 워크플로에 `timeout-minutes`** · 보강 단계는 `timeout-minutes` + `continue-on-error: true` · 실패 알림은 `if: failure() || cancelled()` ·
-  학교마다 `withDeadline()` 절대 시한 · 전역 예산(`harvest-budget.mjs`) 안에 스스로 끝낸다(상한을 올리는 건 해법 아님) · 넘어져도 `saveAll()`.
+  학교마다 `withDeadline()` 절대 시한 · 전역 예산(`harvest-budget.mjs`) 안에 스스로 끝낸다(상한 올리기는 해법 아님) · 넘어져도 `saveAll()`.
 - 대기줄(concurrency)을 하나로 합치지 말 것(대기 실행이 취소된다) · 예약은 정각·UTC 자정을 피한다(관례는 홀수 분) · 새 공고 0건이면 이슈 대신 코멘트.
 - 문법 검사는 `node --check` — `import('./x.mjs')` 는 **실행된다**. 불러오는 순간 실행되는 파일(auto-register·schematize)은 가져다 쓰지 말 것.
 - **원문 링크는 그 공고 하나로** — 주소를 유추하지 말고 게시판 폼을 그대로 · 세션 없는 새 탭에서 열어 확인 · '못 읽음'과 '다른 글'을 구분 ·
@@ -318,16 +309,16 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   그 길도 색인(`data/notices/index.json`)으로 **알 때는 안 받는다**(`noticeFallbackNeeded` 한 곳 — 화면·알림 공용).
   프로필이 없으면 아무것도 안 받고, 학교가 정해지거나 바뀌면 다시 받는다(`loadNoticesIfSchoolChanged`). 관문 「학교별 공고 파일」.
 - **학과 목록도 학교별 파일뿐이다**(2026-09-26 · `majorsFileFor` — 공고와 **같은 이름 규칙을 불러 쓴다**).
-  `data/majors.json`(209개교 407KB)은 사람·도구용이고 앱은 안 받는다 · 발행 `collector/publish-majors.mjs`
+  `data/majors.json` 은 사람·도구용이고 앱은 안 받는다 · 발행 `collector/publish-majors.mjs`
   (majors.mjs 는 **불러오는 순간 API 를 두드려서** 발행만 떼어 놨다) · 앱은 첫 화면에서 안 받고 학교가 정해질 때 받는다.
-  🔴 끊기면 **조용하다** — 전국 공통 목록으로 물러나 "경희대에 '일'→일어일문학과" 사고로 돌아간다.
-  🔴 발행 열쇠는 **`UNIVERSITIES` 의 이름**이어야 한다 — 커리어넷 이름은 다르다(`한국과학기술원`↔`KAIST` 등 7곳).
+  🔴 끊기면 **조용하다**(전국 공통 목록으로 물러난다).
+  🔴 발행 열쇠는 **`UNIVERSITIES` 의 이름**이어야 한다 — 커리어넷 이름은 다르다(`한국과학기술원`↔`KAIST`).
   이어 주는 표를 새로 만들지 말고 `UNIV_ALIASES` 를 통과시킨다 · `'학교 캠퍼스'` 꼴은 로봇이 발행하지 않는다(부르면 404).
   관문 「분교 이름이 로봇과 앱에서 같은가」 · `verify-onboard-gaps.js`(경희대로 내용을 잰다 — 외대는 손검수 목록이 있어 헛돈다).
-- `kosaf-open.json`·`registered.json` 은 못 줄였다(층2 `fields` 는 카드 값 · 정식 등록 전국분은 모두가 받는다) — 학교별로 나누면 **자라는 것만** 막힌다.
-- 🔴 **학교가 늘면 정식 등록도 나누라고 데이터가 스스로 말한다**(09-26 지시 — *"그때 다시 얘기해줘"*).
+- `kosaf-open.json`·`registered.json` 은 못 줄였다 — 학교별로 나누면 **자라는 것만** 막힌다.
+- 🔴 **학교가 늘면 정식 등록도 나누라고 데이터가 스스로 말한다**(09-26 지시).
   재는 곳은 `verify/data-weight.cjs` 의 `registeredSplitAdvice` **한 곳**(감사와 수집 리포트가 같이 쓴다 · 선을 베껴 적지 말 것) ·
-  뜨는 곳은 수집 리포트 → GitHub 이슈(감사 출력은 CI 로그에만 남아 아무도 안 본다) · 경고다(오류로 두면 자동 등록이 멈춘다).
+  뜨는 곳은 수집 리포트 → GitHub 이슈· 경고다(오류로 두면 자동 등록이 멈춘다).
   관문 「학교가 늘면 「정식 등록도 나눌 때」라고 말하는가」.
 - 브라우저 수집 게시판 연결이 안 되면 리포트의 진단(프레임·클릭·본 글자)부터 본다. 짐작 말고 스킬 `probe-run`.
 
@@ -342,9 +333,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   🔴 **잠금 획득에 시한이 있어야 한다**(`authLockWaitMs` · 넘으면 `{steal:true}` 로 빼앗는다) — 잠금을 쥔 탭이 죽으면 `locks.request` 가
   **영영 돌아오지 않아** 그 기기가 다시는 갱신하지 못한다(`.catch` 는 '거절'만 받는다). 관문 `verify-supabase.js` [14].
   🔴 시한을 **SDK 기본값 5초로 베끼지 말 것** — 우리 요청 시한이 8초라 정상 갱신 중인 탭의 잠금을 빼앗는다. `timeoutMs` 에서 유도한다.
-- 🔴 **Supabase SDK 를 들여오지 않기로 했다 (2026-09-28 · 고문 보고서)** — 다중 탭 로그아웃은 이미 고쳐져 있고(관문 [10]),
-  SDK 의 Mutex Lock 은 **우리와 같은 `navigator.locks`** 이며, UMD 54KB(gzip)는 첫 화면 예산 75KB 의 3분의 2다.
-  SDK 가 나은 점 하나(고아 잠금 회수)만 가져왔다. 들여오게 되면 번들러 없이 npm 의 UMD 한 장을 저장소에(`script-src 'self'` 유지 · `SESSIONS.md` 「SDK 를 번들로…」).
+- 🔴 **Supabase SDK 를 들여오지 않기로 했다 (2026-09-28 · 고문 보고서 · 경위 `SESSIONS.md` 「SDK 를 번들로…」)** — 들여오게 되면 번들러 없이 npm 의 UMD 한 장을 저장소에(`script-src 'self'` 유지).
 - 🔴 **기기 사이 덮어쓰기**: push 는 **내가 본 판이 아직 서버에 있을 때만** 고친다(조건부 PATCH · 0행이면 `conflict`). 🔴 고문 보고서 Q6 의 '칸을 쪼개라'로는 안 고쳐진다. 합치는 규칙은 `syncApplyRemote` 한 곳 · 충돌 때는 `{quiet:true}`(프로필은 이 기기 것 · 신청내역은 합침). ⚠️ 진짜 Postgres 의 시각 비교는 아직 안 눌러 봤다. `docs/designs/sync-overwrite.md` · 관문 `verify-supabase.js` [9].
 
 ### 관리자 화면 · 외부 서비스
@@ -361,8 +350,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 
 ### 훅 · 검사 운영
 
-- 🔴 **배포 감시는 `git add data/…` 하는 워크플로 전부를 본다**(`check-deploy-sync.js`) — 파일 이름을 하나씩 적었더니
-  2026-09-26까지 워크플로 넷을 **초록불인 채로** 놓쳤다.
+- 🔴 **배포 감시는 `git add data/…` 하는 워크플로 전부를 본다**(`check-deploy-sync.js`).
   새 로봇이 앱 데이터를 쓰면 `deploy-sync.yml` 의 `workflows:` 목록에도 이름을 넣는다(안 넣으면 최대 12시간 안 나간다).
 - 검사는 '돌리라고 적어 두면' 안 돈다 — 워크플로·훅에 걸어야 돈다. 새 사고는 **먼저 관문을 만들고** 여기엔 그 위치만 적는다.
 - **로봇·도구 점검**(2026-10-04~11 · 규칙 전체 `docs/designs/robot-health.md`): 고친 것마다 `verify/health-gates/` 묶음 — 관문 「로봇·도구 점검 관문」. 🔴 표본만 잰다(실데이터 단정은 `REAL_READ_ALLOW` 톱니로 잠김) · 워크플로·문서 글자는 `softEq`(로봇에선 경고) · 셸은 가짜 node·gh 로 실제로 돌린다.

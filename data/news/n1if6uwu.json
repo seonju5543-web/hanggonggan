@@ -1,7 +1,29 @@
 {
  "school": "연세대학교 미래캠퍼스",
- "updatedAt": "2026-11-15",
+ "updatedAt": "2026-11-17",
  "items": [
+  {
+   "title": "2026년 권역별 「연구실 안전주간 행사」 개최 안내",
+   "url": "https://www.yonsei.ac.kr/bbs/wj/104/944656/artclView.do",
+   "postedAt": "2026-11-16",
+   "kind": "행사",
+   "school": "연세대학교 미래캠퍼스",
+   "campus": "",
+   "src": "83c7ba87",
+   "foundAt": "2026-11-17",
+   "thumb": "data/news/img/2946c895f612c23a.webp"
+  },
+  {
+   "title": "[무료교육] ICT융합 스마트 굿즈 및 메이커 장비 마스터 교육생 모집 모집",
+   "url": "https://www.yonsei.ac.kr/bbs/wj/104/944650/artclView.do",
+   "postedAt": "2026-11-16",
+   "school": "연세대학교 미래캠퍼스",
+   "campus": "",
+   "src": "83c7ba87",
+   "foundAt": "2026-11-17",
+   "thumb": "data/news/img/a8fb5bbb6bba5afb.webp",
+   "desc": "안녕하세요 , 연세대학교 미래캠퍼스 메이커스페이스(DH미래공작소)입니다 1.ICT융합 스마트 굿즈 제작 교육 -ICT스마트 굿즈 제작교육 -스마트 자율주행 교육 -드론 프로그래밍 교육 신청 링크:…"
+  },
   {
    "title": "[미래평생교육원]2026학년도 겨울학기 연세회원권 신청 안내(11/23~12/4)",
    "url": "https://www.yonsei.ac.kr/bbs/wj/104/944629/artclView.do",

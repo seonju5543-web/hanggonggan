@@ -1,7 +1,57 @@
 {
  "school": "고려대학교 세종캠퍼스",
- "updatedAt": "2026-11-15",
+ "updatedAt": "2026-11-18",
  "items": [
+  {
+   "title": "한국고등교육재단 문우림 제6기 장학생 선발 안내",
+   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/274547/artclView.do",
+   "attachments": [
+    {
+     "name": "문우림 제6기 장학생 선발 공고문.hwp",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/184372/download.do"
+    },
+    {
+     "name": "문우림 제6기 장학생 선발 모집요강.pdf",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/184373/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "고려대학교 세종캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-17"
+  },
+  {
+   "title": "주거안정장학금 월별 지급 변경에 따른 10월분 지급 일정 안내 (미제출시 지급 불가)",
+   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/274537/artclView.do",
+   "attachments": [
+    {
+     "name": "(학생)장학생 지급요청서 작성 매뉴얼.pdf",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/184361/download.do"
+    }
+   ],
+   "deadlineHint": "제출 기한 : 11 월 22 일 ( 일 ) 까지 3. 제출 사항 : 주거안정장학금 지급요청서 작성 및 제출 4. 문의 : 학생생활지원팀 044-",
+   "school": "고려대학교 세종캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-17"
+  },
+  {
+   "title": "2026년 국가우수장학금(이공계) 일시지원(한 학기 지원) 유형 선발 안내",
+   "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/274491/artclView.do",
+   "attachments": [
+    {
+     "name": "2026년 국가우수장학금(이공계) 일시지원(한 학기 지원)유형.hwp",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/184303/download.do"
+    },
+    {
+     "name": "2026년 국가우수장학금(이공계) 일시지원(한 학기 지원)유형 학생신청 매뉴얼.pdf",
+     "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/184304/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "고려대학교 세종캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-16"
+  },
   {
    "title": "[집중근로] 2026년 국가근로장학금 동계방학 집중근로 프로그램 희망근로지 학생 신청 안내",
    "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/274426/artclView.do",

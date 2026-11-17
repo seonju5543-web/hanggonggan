@@ -615,21 +615,18 @@ function prepKindFor(sch) {
   if (prepHasFormAttachment(sch)) return 'attached';
   return 'unknown';
 }
-const PREP_TAGS = {
-  free: '※ 이 공고는 별도 신청서 양식 없이 자유 형식 제출을 받는다고 원문에서 확인했습니다 — 아래 문서를 그대로 제출할 수 있습니다.',
-  attached: '※ 이 공고에는 첨부된 신청서 양식이 있습니다 — 아래는 그 원본 양식에 옮겨 적을 내용을 정리한 문서이고, 제출은 공고의 원본 양식으로 합니다.',
-  portal: '※ 이 공고는 포털·온라인 입력으로 접수합니다 — 아래는 입력 칸에 붙여 넣을 답을 정리한 문서이고, 이 문서 자체를 내는 것은 아닙니다.',
-  email: '※ 이 공고는 메일로 접수합니다 — 아래는 보낼 내용을 정리한 문서이고, 공고가 정한 서식·서류에 옮겨 적어 보내세요(이 문서 자체를 보내는 것은 아닙니다).',
-  unknown: '※ 이 공고에서 첨부된 신청서 양식을 찾지 못했습니다 — 아래 문서로 내용을 준비하고, 제출 전 원문에서 양식·접수 방법을 확인하세요.',
-  kosaf: '※ 한국장학재단이 아는 재단 장학금입니다 — 접수 방법과 서식은 재단의 선발 공고문(또는 재단 홈페이지)이 정합니다. 아래는 그때 옮겨 적을 내용을 정리한 문서이고, 이 문서 자체를 내는 것은 아닙니다.',
-};
+/* 🔴 머리말은 「※ 앱 자체 제작 문서입니다」 **한 줄뿐**이다(2026-11-17 개발자 지시 — *"앱 자체 제작 문서입니다 만 띄우고 나머지는 모두 삭제"* ·
+   11-16 에는 이 말로 시작하고 뒤에 갈래별 제출 안내를 붙였었다). 갈래별로 다른 말(접수 방법·그대로 제출 가능 여부)은 둘째 줄(PREP_LEADS)과
+   제출 안내 절(prepSubmitNote)이 맡는다 — '그대로 제출 가능'은 여전히 free 만 말한다(원칙 8-2). 갈래 열쇠는 그대로 둔다(PREP_TAGS[kind] 로 찾는다). */
+const PREP_TAG = '※ 앱 자체 제작 문서입니다';
+const PREP_TAGS = { free: PREP_TAG, attached: PREP_TAG, portal: PREP_TAG, email: PREP_TAG, unknown: PREP_TAG, kosaf: PREP_TAG };
 /* 화면 머리줄용 짧은 말 — 긴 tag 는 문서 위에, 이것은 작성 화면 둘째 줄에 */
 const PREP_LEADS = {
   free: '자유 형식 제출 공고 — 이 문서를 그대로 제출할 수 있습니다',
   attached: '첨부 신청서 양식에 옮겨 적을 내용을 정리합니다 — 제출은 원본 양식으로',
   portal: '포털 입력 칸에 붙여 넣을 답을 정리합니다',
   email: '메일 접수 공고 — 공고가 정한 서식에 옮겨 적을 내용을 정리합니다',
-  unknown: '내용을 먼저 준비합니다 — 양식·접수 방법은 제출 전 원문에서 확인',
+  unknown: '공고에 낼 내용을 정리합니다 — 제출은 공고가 정한 방법으로',
   kosaf: '재단 접수 공고 — 선발 공고문의 서식·방법에 맞춰 옮겨 적을 내용을 정리합니다',
 };
 /* 지원 자격 줄 → 학생이 스스로 확인하는 체크 항목(판정이 아니다 · 너무 긴 줄·조각 줄은 뺀다 · 여섯 줄까지) */
@@ -645,9 +642,9 @@ function prepEligOptions(sch) {
 }
 function prepSubmitNote(sch) {
   const kind = prepKindFor(sch);
-  const where = { free: '공고의 접수처', attached: '원본 양식을 채워 공고의 접수처', portal: '공고가 안내한 포털·온라인 입력', email: `메일 ${sch.applyEmail || ''}`.trim(), unknown: '원문 공고의 접수 방법', kosaf: '재단 선발 공고문·홈페이지가 정한 접수 방법' }[kind];
-  const due = sch.deadline ? `마감 ${sch.deadline}` : '마감은 원문 확인';
-  return `${where} · ${due} · 학교·재단에 실제로 접수되는 것은 아니며 제출은 학생이 직접 합니다.`;
+  const where = { free: '공고의 접수처', attached: '원본 양식을 채워 공고의 접수처', portal: '공고가 안내한 포털·온라인 입력', email: `메일 ${sch.applyEmail || ''}`.trim(), unknown: '공고가 정한 접수 방법', kosaf: '재단 선발 공고문·홈페이지가 정한 접수 방법' }[kind];
+  const due = sch.deadline ? `마감 ${sch.deadline}` : '';   // 마감을 모르면 말하지 않는다(2026-11-15 · 예전 '마감은 원문 확인')
+  return `${[where, due].filter(Boolean).join(' · ')} · 학교·재단에 실제로 접수되는 것은 아니며 제출은 학생이 직접 합니다.`;
 }
 
 function buildPrepTemplate(sch) {
@@ -713,11 +710,8 @@ function buildPrepTemplate(sch) {
     });
   }
   const docs = prepRealDocs(sch);
-  sections.push({
-    heading: '제출 서류 확인',
-    note: docs.length ? docs.join(' · ') : '제출 서류는 원문 공고에서 확인하세요.',
-    fields: []
-  });
+  /* 서류를 못 읽었으면 절을 안 만든다 (2026-11-15 · 예전 「제출 서류는 원문 공고에서 확인하세요.」 — 개발자 결정 11-02) */
+  if (docs.length) sections.push({ heading: '제출 서류 확인', note: docs.join(' · '), fields: [] });
   sections.push({ heading: '제출 안내', note: prepSubmitNote(sch), fields: [] });
   return {
     title: `${sch.name} — 지원문서`,

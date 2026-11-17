@@ -19,7 +19,7 @@ import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry, retitleItems } from './clean-title.mjs';
 import { isAttachmentEntry, detailAttachments, stripSiteChrome } from './attachment-link.mjs';
 import { activityKind, activityField, notActivity, unreadableSource, ACTIVITY_FIELDS } from './activity-kind.mjs';
-import { activityExcerpts, activityDetails, putActivityDetails, activityDocuments, putActivityDocuments, actRereadNeed, sanitizeBenefit, sanitizeElig, sanitizeSteps } from './activity-excerpts.mjs';
+import { activityExcerpts, activityDetails, putActivityDetails, activityDocuments, putActivityDocuments, actRereadNeed, ACT_DETAILS_V, sanitizeBenefit, sanitizeElig, sanitizeSteps, sanitizeDocs, deadlineFromNotice, sanitizeForeign } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { detailByRule } from './activity-detail-rules.mjs';   // 본문이 스크립트로 그려지는 게시판(온통청년)의 숨은 글 주소 — 첨부 로봇과 같은 함수(2026-10-28)
 import { robotsAllows } from './robots.mjs';
@@ -569,7 +569,7 @@ if (healCounts.restored || healCounts.kept) console.log(`피드 메우기: 학�
    (위 '껍데기를 걷은 본문' 단락 · 학교별 파일 발행 전에 — 피드 메우기로 되살린 글까지) */
 retitleItems(notices.items);
 for (const n of notices.items) { bodyReader.heal(n); bodyReader.fill(n); }
-console.log(`껍데기를 걷은 본문: 기간 힌트 ${bodyReader.counts.hints}건을 다시 읽음 · 본문 마감 ${bodyReader.counts.bodyDeadlines}건을 새로 읽음 (껍데기를 아는 호스트 ${bodyReader.chrome.size}곳)`);
+console.log(`껍데기를 걷은 본문: 기간 힌트 ${bodyReader.counts.hints}건을 다시 읽음 · 본문 마감 ${bodyReader.counts.bodyDeadlines}건을 새로 읽음 · 사이트 띠로 읽혔던 본문 마감 ${bodyReader.counts.bodyRechecked}건을 다시 읽음 (껍데기를 아는 호스트 ${bodyReader.chrome.size}곳)`);
 
 const beforeCap = notices.items;
 /* 학교별 파일도 함께 발행한다 (2026-08-17) — 앱은 이쪽을 읽는다.
@@ -621,9 +621,13 @@ acts.items = acts.items.filter((n) => !notActivity(n.title) && !unreadableSource
     usedIds.set(n.id, n.url);
   }
 }
+const todayIsoAct = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);   // 한국 날짜 — 결과 발표가 지났는지 잰다(deadlineFromNotice ④)
 acts.items.forEach(sanitizeBenefit);   // 「혜택」에 섞인 조건은 자격 줄로 — 출처(본문·API)와 상관없이 매번 모든 글에(2026-10-04 · activity-excerpts.mjs splitBenefit)
 acts.items.forEach(sanitizeSteps);   // 「1. 2. 3.」 단계 번호 떼기 — 연락처 단계가 빠지면 「3.」부터 남던 1365 글(2026-11-02 · activity-excerpts.mjs stripStepNumber) · 소급
 acts.items.forEach(sanitizeElig);   // 자격 줄 거름(여러 갈래 나이·개인정보 안내문)을 실린 글 전부에 매번 — 소급(2026-10-05 점검 api-06 · activity-excerpts.mjs eligLineOk)
+acts.items.forEach(sanitizeDocs);   // 서류 칸의 사이트 맨 아래 줄·안내문·유의사항 걷기(doc-list.mjs DOC_JUNK · 2026-11-17) · 소급
+acts.items.forEach(sanitizeForeign);   // 칸 안에 딸려 온 다른 글 제목 걷기(activity-excerpts.mjs otherPostTitle · 2026-11-17) · 소급
+acts.items.forEach((n) => deadlineFromNotice(n, todayIsoAct));   // 마감이 빈 글은 원문 기간 줄·제목 「(~11/23)」에서 마감을 읽는다 · 결과 발표가 지난 글은 닫힌다 — 끝난 모집이 '진행 중'으로 뜨지 않게(2026-11-17) · 소급
 acts.items.forEach((n) => bodyReader.heal(n));   // 껍데기에서 시작한 기간 힌트 소급(위 '껍데기를 걷은 본문' 단락)
 acts.items = dedupeNotices(acts.items);
 acts.items = acts.items.filter((n) => !n.school).concat(dropUnserved(acts.items.filter((n) => n.school)));

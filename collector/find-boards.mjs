@@ -18,6 +18,7 @@
    실행: node collector/find-boards.mjs   (FIND_BOARDS_MAX=8 FIND_BOARDS_MS=150000)
    ============================================================ */
 import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { FETCH_HEADERS } from './http-headers.mjs';
 import { extractLinks } from './board-links.mjs';
 import { isMenuEntry } from './clean-title.mjs';
@@ -160,6 +161,9 @@ async function main() {
 }
 
 /* 관문이 순수 함수만 가져다 쓸 수 있게 — 직접 실행할 때만 돈다 */
-if (process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href) {
+/* 🔴 실행 경로는 **진짜 경로**로 견준다 (2026-11-15) — 맥의 임시 폴더(`/var/folders/…`)는 `/private/var/…` 의 바로가기라, 글자로만 견주면
+   import.meta.url(진짜 경로)과 달라 로봇이 아무것도 안 하고 0 으로 끝났다(관문 「찾기 로봇 실행」이 이 맥에서만 늘 빨갰던 이유 — 연결 거절 코드와는 무관했다) */
+const ranDirectly = () => { try { return fs.realpathSync(process.argv[1]) === fs.realpathSync(fileURLToPath(import.meta.url)); } catch { return false; } };
+if (process.argv[1] && ranDirectly()) {
   main().catch((e) => { console.error(e); process.exit(1); });
 }

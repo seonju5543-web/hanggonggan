@@ -8,12 +8,12 @@
   { "name": "DATA_GO_KR_KEY", "where": "GitHub Secrets", "for": "공공 API 로봇(K-Startup·1365)", "owner": "이선주", "expires": "확인 필요", "renew": "공공데이터포털 마이페이지 → 활용 신청 현황에서 활용기간을 보고 여기 적는다" },
   { "name": "YOUTHCENTER_KEY", "where": "GitHub Secrets", "for": "공공 API 로봇(온통청년 정책)", "owner": "이선주", "expires": "확인 필요", "renew": "온통청년 오픈API 마이페이지에서 유효기간 확인" },
   { "name": "YOUTHCENTER_CONTENT_KEY", "where": "GitHub Secrets", "for": "공공 API 로봇(온통청년 콘텐츠)", "owner": "이선주", "expires": "확인 필요", "renew": "온통청년 오픈API 마이페이지에서 유효기간 확인" },
-  { "name": "NAVER_CLIENT_ID", "where": "GitHub Secrets", "for": "층2 재단 글 사냥꾼의 검색 길(NAVER API HUB)", "owner": "유은서", "expires": "확인 필요", "renew": "네이버클라우드 콘솔 → NAVER API HUB → 인증 정보" },
-  { "name": "NAVER_CLIENT_SECRET", "where": "GitHub Secrets", "for": "층2 재단 글 사냥꾼의 검색 길(NAVER API HUB)", "owner": "유은서", "expires": "확인 필요", "renew": "네이버클라우드 콘솔 → NAVER API HUB → 인증 정보" },
+  { "name": "NAVER_CLIENT_ID", "where": "GitHub Secrets(2026-11-17 넣음 · 검색 56번 실패 0 확인)", "for": "층2 재단 글 사냥꾼의 검색 길(NAVER API HUB)", "owner": "유은서", "expires": "없음", "renew": "네이버클라우드 콘솔 → NAVER API HUB → 인증 정보" },
+  { "name": "NAVER_CLIENT_SECRET", "where": "GitHub Secrets(2026-11-17 넣음 · 검색 56번 실패 0 확인)", "for": "층2 재단 글 사냥꾼의 검색 길(NAVER API HUB)", "owner": "유은서", "expires": "없음", "renew": "네이버클라우드 콘솔 → NAVER API HUB → 인증 정보" },
   { "name": "ANTHROPIC_API_KEY", "where": "GitHub Secrets · Cloudflare(essay·chat 서버)", "for": "자격 AI 읽기·양식 스키마화·AI 초안·도우미", "owner": "이선주", "expires": "없음", "renew": "Anthropic 콘솔 → API Keys (월 사용 한도는 따로 건다)" },
   { "name": "NOTION_TOKEN", "where": "GitHub Secrets", "for": "노션 「작업 현황」 로봇", "owner": "이선주", "expires": "없음", "renew": "노션 통합(integration) 화면에서 재발급" },
-  { "name": "CLOUDFLARE_API_TOKEN", "where": "GitHub Secrets", "for": "푸시 서버 운영 배포(push-deploy.yml)", "owner": "이선주", "expires": "확인 필요", "renew": "Cloudflare → My Profile → API Tokens(「Edit Cloudflare Workers」 틀) — 만들 때 만료(TTL)를 정했으면 여기 적는다 · 아직 안 넣었으면 푸시 배포가 멈춰 있다" },
-  { "name": "CLOUDFLARE_ACCOUNT_ID", "where": "GitHub Secrets", "for": "푸시 서버 운영 배포(계정 번호 — 열쇠 아님)", "owner": "이선주", "expires": "없음", "renew": "바뀌지 않는다" },
+  { "name": "CLOUDFLARE_API_TOKEN", "where": "GitHub Secrets(2026-11-17 넣음 · 은서 프로필의 사용자 토큰 · 대상 계정 Seonju5543 · 첫 배포 도장 일치 확인)", "for": "푸시 서버 운영 배포(push-deploy.yml)", "owner": "유은서", "expires": "없음", "renew": "Cloudflare → My Profile → API Tokens(「Edit Cloudflare Workers」 틀) — 만들 때 만료(TTL)를 정했으면 여기 적는다" },
+  { "name": "CLOUDFLARE_ACCOUNT_ID", "where": "GitHub Secrets", "for": "푸시 서버 운영 배포(계정 번호 — 열쇠 아님 · Seonju5543 계정)", "owner": "유은서", "expires": "없음", "renew": "바뀌지 않는다" },
   { "name": "PUSH_ADMIN_KEY", "where": "GitHub Secrets", "for": "푸시 서버 검사 버튼(push-check.yml)", "owner": "이선주", "expires": "없음", "renew": "우리가 만든 값 — Cloudflare 푸시 서버의 ADMIN_KEY 와 같은 값이어야 한다" },
   { "name": "MAIL_USER", "where": "GitHub Secrets", "for": "인스타 카드 알림 메일(보내는 계정)", "owner": "이선주", "expires": "없음", "renew": "보내는 계정을 바꿀 때만" },
   { "name": "MAIL_PASS", "where": "GitHub Secrets", "for": "인스타 카드 알림 메일(앱 비밀번호)", "owner": "이선주", "expires": "없음", "renew": "구글 계정 비밀번호를 바꾸면 무효가 된다 — 그때 앱 비밀번호를 다시 만든다" },
@@ -28,6 +28,7 @@
   { "name": "APPLY_FROM", "where": "Cloudflare(apply 서버 · 아직 안 켬)", "for": "발신 주소(열쇠 아님)", "owner": "미정", "expires": "없음", "renew": "도메인을 산 뒤" },
   { "name": "SUPABASE_URL", "where": "Cloudflare(apply 서버 · 아직 안 켬)", "for": "회원 장부 주소(공개값)", "owner": "이선주", "expires": "없음", "renew": "바뀌지 않는다" },
   { "name": "SUPABASE_ANON_KEY", "where": "Cloudflare(apply 서버) · supabase-config.js(공개값)", "for": "회원 장부 공개 열쇠", "owner": "이선주", "expires": "없음", "renew": "Supabase → Settings → API Keys" },
+  { "name": "아침 지표 열쇠", "where": "Supabase report_keys 표 · 각자 관리자 사이트 브라우저", "for": "관리자 사이트 「아침 지표」가 이용 횟수·오류 보고서를 읽는다(usage_report)", "owner": "은서", "expires": "없음", "renew": "새어 나갔으면 SQL Editor 에서 delete from report_keys; 뒤 0007 을 다시 실행해 새 열쇠를 만든다" },
   { "name": "SUPABASE_SERVICE_KEY", "where": "Cloudflare(apply 서버 · 아직 안 켬)", "for": "회원 장부 만능 열쇠 — 🔴 저장소·채팅에 절대 넣지 않는다", "owner": "이선주", "expires": "없음", "renew": "Supabase → Settings → API Keys(새어 나갔으면 즉시 교체)" }
  ]
 }

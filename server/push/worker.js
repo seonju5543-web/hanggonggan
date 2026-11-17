@@ -159,7 +159,15 @@ function ymd(ts) {
    - reg.schools : 여러 학교만 받는 공고(eligibility.schoolsAny — '학교' 또는 '학교|캠퍼스')의 학교 이름들.
                    없으면 null. 학교 한정(schoolOnly)도 여러 학교(schools)도 없을 때만 전국 공고다.
    - notices     : noticeMini 꼴 — 제목 다듬기·날짜 읽기·분교 판정 같은 **글자 일은 여기서 끝낸다**(아래 noticeMini). */
-function summarize(reg, notices) {
+/* 🔴 마감은 **유료 카드 읽기가 바로잡은 날짜가 있으면 그것**으로 본다 (2026-11-15 리뷰 I4 · data/card-read.json — 화면·폰은 match-engine applyCardRead 로 같은 값을 쓴다).
+   안 그러면 접수 시작일이 마감으로 읽혀 있던 공고(인석장학회 11.18 → 11.26)에서 서버는 옛 마감 전날 폰을 깨우고(폰은 할 말이 없다) 진짜 마감 전날에는 안 깨운다.
+   ⚠️ 관리자가 고친 마감(deadlineFrom 「관리자…」)은 덮지 않는다 — 화면과 같은 규칙. 파일을 못 받으면(null) 예전 그대로다 */
+function effectiveDeadline(s, cardRead) {
+  const cr = cardRead && cardRead.items && cardRead.items[s.id];
+  const d = cr && cr.deadline && typeof cr.deadline === 'object' ? String(cr.deadline.date || '') : '';
+  return /^\d{4}-\d{2}-\d{2}$/.test(d) && !/^관리자/.test(String(s.deadlineFrom || '')) ? d : (s.deadline || null);
+}
+function summarize(reg, notices, cardRead) {
   return {
     reg: ((reg && reg.items) || [])
       .filter((s) => s && s.id)
@@ -168,7 +176,7 @@ function summarize(reg, notices) {
         const any = Array.isArray(e.schoolsAny) && e.schoolsAny.length
           ? Array.from(new Set(e.schoolsAny.map((x) => String(x).split('|')[0]).filter(Boolean)))
           : null;
-        return { id: s.id, school: e.schoolOnly || null, schools: any, deadline: s.deadline || null };
+        return { id: s.id, school: e.schoolOnly || null, schools: any, deadline: effectiveDeadline(s, cardRead) };
       }),
     notices: ((notices && notices.items) || [])
       .filter((n) => n && n.url && n.school)
@@ -289,11 +297,12 @@ function fetchData(env, path) {
    주지 않으면 직접 받아온다(시험·수동 실행 경로). */
 async function schoolsToWake(env, mini) {
   if (!mini) {
-    const [reg, notices] = await Promise.all([
+    const [reg, notices, cardRead] = await Promise.all([
       fetchData(env, 'data/registered.json'),
       fetchData(env, 'data/notices.json'),
+      fetchData(env, 'data/card-read.json').catch(() => null),
     ]);
-    mini = summarize(reg, notices);
+    mini = summarize(reg, notices, cardRead);
   }
 
   const today = ymd(Date.now());
@@ -484,7 +493,8 @@ async function tick(env, opts = {}) {
   if (run.step === 'reg') {
     const reg = await fetchData(env, 'data/registered.json');
     if (!reg) return { step: 'reg', note: '데이터를 받지 못함 — 다음 걸음에서 다시 시도' };
-    await env.SUBS.put('state:mini', JSON.stringify(summarize(reg, null)));
+    const cardRead = await fetchData(env, 'data/card-read.json').catch(() => null);
+    await env.SUBS.put('state:mini', JSON.stringify(summarize(reg, null, cardRead)));
     await nextStep('notices');
     return { step: 'reg', done: true };
   }

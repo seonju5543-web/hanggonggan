@@ -71,13 +71,15 @@ function makeEnv(overrides = {}) {
 
 /* 데이터 파일 요청만 가짜로 받아준다. 밖으로 나간 요청 수도 센다(무료 등급 50건/실행 검사용). */
 let outboundCount = 0;
-function stubFetch(regItems, noticeItems, onPush) {
+/* cardRead — 유료 카드 읽기 결과 파일(data/card-read.json · 2026-11-15). 안 주면 404(파일 없음)다 — 푸시 발송으로 세지 않는다 */
+function stubFetch(regItems, noticeItems, onPush, cardRead) {
   outboundCount = 0;
   globalThis.fetch = async (url, init) => {
     outboundCount++;
     const u = String(url && url.url ? url.url : url);
     if (u.endsWith('registered.json')) return new Response(JSON.stringify({ items: regItems }), { status: 200 });
     if (u.endsWith('notices.json')) return new Response(JSON.stringify({ items: noticeItems }), { status: 200 });
+    if (u.endsWith('card-read.json')) return cardRead ? new Response(JSON.stringify(cardRead), { status: 200 }) : new Response('', { status: 404 });
     if (onPush) return onPush(u, init);
     return new Response('', { status: 404 });
   };
@@ -184,6 +186,27 @@ const later = worker.ymd(Date.now() + 20 * 86400000);
   stubFetch(items.concat([{ id: 'd', eligibility: { schoolOnly: '중앙대학교' }, deadline: tomorrow }]), []);
   r = await worker.schoolsToWake(env);
   ok(r.schools.has('중앙대학교'), '마감 임박 공고가 있는 학교를 깨움', Array.from(r.schools));
+
+  /* 유료 카드 읽기가 바로잡은 마감 (2026-11-15 리뷰 I4) — 무료 길은 접수 시작일(내일)을 마감으로 읽었고 유료 길이 20일 뒤로 바로잡은 공고는 내일 깨우지 않는다.
+     거꾸로 무료 길 마감은 멀고 바로잡은 마감이 내일이면 깨운다. 관리자가 고친 마감은 덮지 않는다. 결과 파일이 없으면(404) 예전 그대로 */
+  {
+    const env2 = makeEnv();
+    const fixed = [{ id: 'p1', eligibility: { schoolOnly: '인하대학교' }, deadline: tomorrow }, { id: 'p2', eligibility: { schoolOnly: '아주대학교' }, deadline: later },
+      { id: 'p3', eligibility: { schoolOnly: '국민대학교' }, deadline: later, deadlineFrom: '관리자 2026-11-10' }];
+    const cr = { items: { p1: { deadline: { date: later, quote: 'x' } }, p2: { deadline: { date: tomorrow, quote: 'x' } }, p3: { deadline: { date: tomorrow, quote: 'x' } } } };
+    const calm = fixed.map((x) => ({ ...x, deadline: later }));     // 장부 채우기 — 셋 다 마감이 먼 상태(이때는 깨울 사유가 없다)
+    stubFetch(calm, []);
+    await worker.schoolsToWake(env2);
+    stubFetch(fixed, [], null, cr);
+    const r2 = await worker.schoolsToWake(env2);
+    ok(!r2.schools.has('인하대학교') && r2.schools.has('아주대학교') && !r2.schools.has('국민대학교'), '마감은 유료 카드 읽기가 바로잡은 날짜로 본다 (관리자가 고친 마감은 그대로)', Array.from(r2.schools));
+    const env3 = makeEnv();
+    stubFetch(calm, []);
+    await worker.schoolsToWake(env3);
+    stubFetch(fixed, []);
+    const r3 = await worker.schoolsToWake(env3);
+    ok(r3.schools.has('인하대학교') && !r3.schools.has('아주대학교'), '  결과 파일이 없으면 예전 그대로(무료 길 마감)', Array.from(r3.schools));
+  }
 
   // 전국 공고 → 전원
   stubFetch(items.concat([{ id: 'e', eligibility: {}, deadline: tomorrow }]), []);

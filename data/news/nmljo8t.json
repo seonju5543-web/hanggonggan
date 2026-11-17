@@ -1,7 +1,18 @@
 {
  "school": "숭실대학교",
- "updatedAt": "2026-11-15",
+ "updatedAt": "2026-11-17",
  "items": [
+  {
+   "title": "학사 2026-2학기(겨울계절제수업 포함) 성적처리 관련 안내",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026-2%ED%95%99%EA%B8%B0%EA%B2%A8%EC%9A%B8%EA%B3%84%EC%A0%88%EC%A0%9C%EC%88%98%EC%97%85-%ED%8F%AC%ED%95%A8-%EC%84%B1%EC%A0%81%EC%B2%98%EB%A6%AC-%EA%B4%80%EB%A0%A8-%EC%95%88%EB%82%B4&keyword",
+   "postedAt": "2026-11-17",
+   "kind": "학사",
+   "school": "숭실대학교",
+   "campus": "",
+   "src": "3b348584",
+   "foundAt": "2026-11-17",
+   "thumb": "data/news/img/30a8e1ba500679c9.webp"
+  },
   {
    "title": "채용 2026년 숭실대학교 입학처 입학팀 단시간 근로자 채용공고(보훈 및 취업보호대상자)",
    "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026%EB%85%84-%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EC%9E%85%ED%95%99%EC%B2%98-%EC%9E%85%ED%95%99%ED%8C%80-%EB%8B%A8%EC%8B%9C%EA%B0%84-%EA%B7%BC%EB%A1%9C%EC%9E%90-%EC%B1%84%EC%9A%A9%EA%B3%B5&keyword",
@@ -412,16 +423,6 @@
    "src": "3b348584",
    "foundAt": "2026-10-26",
    "desc": "해당 교육은 법정의무교육으로 미이수 시 성적조회가 제한되오니 기한 내 이수를 부탁드립니다."
-  },
-  {
-   "title": "학사 ■ 2026-2학기 비전채플 설문조사 참여 안내",
-   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%E2%96%A0-2026-2%ED%95%99%EA%B8%B0-%EB%B9%84%EC%A0%84%EC%B1%84%ED%94%8C-%EC%84%A4%EB%AC%B8%EC%A1%B0%EC%82%AC-%EC%B0%B8%EC%97%AC-%EC%95%88%EB%82%B4&keyword",
-   "postedAt": "2026-10-26",
-   "school": "숭실대학교",
-   "campus": "",
-   "src": "3b348584",
-   "foundAt": "2026-10-26",
-   "desc": "본교 채플 운영의 지속적인 개선을 목적으로 이번 학기 비전채플을 이수한 재학생 여러분의 소중한 의견을 구합니다 . 설문에 진지하게 참여 및 응답해주시기 바랍니다 ."
   }
  ]
 }

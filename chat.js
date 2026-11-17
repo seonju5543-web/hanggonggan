@@ -374,14 +374,8 @@ function chatAnswerDocuments(q) {
      "그거 서류 뭐야?"처럼 앞에서 말한 공고를 가리키는 경우도 chatPickTarget이 받는다. */
   const hit = chatPickTarget(q);
   /* 자리표시 줄(「지원 자격·제출 서류는 원문 공고에서 확인」)은 서류가 아니다 — 앱 화면과 같은 꼴(app.js DOC_PLACEHOLDER · 2026-11-15 리뷰) */
+  /* 자리표시뿐인 공고는 서류가 없는 공고와 같이 아래 일반 답으로 간다(학생 화면에 '원문에서 확인'류 말은 쓰지 않는다 · 11-15 결정) */
   const realDocs = (sch) => (sch.documents || []).filter((doc) => !DOC_PLACEHOLDER.test(String(doc || '')));
-  if (hit && !realDocs(hit.sch).length && (hit.sch.documents || []).length) {
-    return {
-      text: `'${hit.sch.name}'의 제출 서류는 앱이 원문에서 아직 읽지 못했어요. 공고 원문에서 확인해 주세요.`,
-      cards: [hit],
-      actions: [{ act: 'detail:' + hit.sch.id, label: '공고 자세히 보기' }],
-    };
-  }
   if (hit && realDocs(hit.sch).length) {
     const rows = realDocs(hit.sch).map((doc) => {
       const st = chatSafe(() => docWalletStatus(doc), null);

@@ -84,7 +84,7 @@ async function seed(page) {
   }));
   ok('입구는 자격 블록 아래 한 줄이다', entry.one === 1, `${entry.one}개`);
   ok('  줄마다 단추를 달지 않는다 (중복)', entry.perLine === 0, `${entry.perLine}개`);
-  ok('  미확인 자격 수를 말한다', /미확인 자격/.test(entry.label), entry.label.trim());
+  ok('  맞춰 볼 자격 수를 말한다 (2026-11-15 · 예전 「미확인 자격」 — 개발자 결정 11-02)', /맞춰 볼 자격/.test(entry.label) && !/미확인/.test(entry.label), entry.label.trim());
 
   /* ② 누르면 공고 팝업 **안에서** 펼쳐진다 (팝업을 갈아치우지 않는다) */
   const titleBefore = await page.evaluate(() =>
@@ -101,7 +101,7 @@ async function seed(page) {
     inputs: document.querySelectorAll('[data-elig-field]').length,
     save: !!document.querySelector('[data-elig-save]'),
   }));
-  ok('  펼친 머리줄도 같은 것을 말한다', /미확인 자격/.test(opened.head), opened.head.trim());
+  ok('  펼친 머리줄도 같은 것을 말한다', /맞춰 볼 자격/.test(opened.head), opened.head.trim());
   ok('  미확인 줄을 여기 다시 나열하지 않는다 (위 자격 블록이 이미 보여 준다)',
     opened.lines === 0, `${opened.lines}줄`);
   ok('  물을 칸이 그려져 있다', opened.inputs > 0, `${opened.inputs}칸`);
@@ -144,7 +144,7 @@ async function seed(page) {
   /* ④ 적고 저장하면 그 줄이 **자리를 지키며 색만** 바뀐다 */
   const filled = await page.evaluate(() => {
     const VAL = { gpa: '4.0', credits: '18', bracket: '3', birthYear: '2003',
-      nationality: '대한민국', major: '경영학과', regionCity: '동대문구' };
+      nationality: 'korean', major: '경영학과', regionCity: '동대문구', region: '서울', parentRegion: '서울', originRegion: '서울' };
     const els = [...document.querySelectorAll('[data-elig-field]')];
     els.forEach((el) => { el.value = VAL[el.dataset.eligField] || '1'; });
     /* 🔴 처지 칸도 **같이** 답해야 「물을 것이 없다」가 된다 — 여기를 빠뜨리면
@@ -292,6 +292,35 @@ async function seed(page) {
   const r0 = await residAnswer('0');
   /* 🔴 모자라도 ✕ 는 아니다 (2026-11-13 리뷰) — 질문은 「지금 주소」, 요건은 「옹진군에 산 지」라 같은 군 안에서 이사한 학생은 더 오래 살았을 수 있다 */
   ok('  「1년 미만」 으로 저장해도 ✕ 가 아니라 모름(표시 없음)이고 0 으로 남는다 (0 은 답이다 — 비운 것과 다르다)', r0.after.length > 0 && r0.after.every((c) => !/r-bad|r-ok/.test(c)) && r0.saved === 0, `${r0.after.join(' / ')} · ${JSON.stringify(r0.saved)}`);
+
+  /* ⑩ 보여 줄 자격 줄이 0개면 질문도 칸도 없다 (2026-11-15 개발자 제보 "지원자격을 못읽은경우에도 내용 없는 지원자격 칸이 있음").
+     저장된 줄이 전부 화면에서 걸러지는 공고(서류 안내·※ 예외 조각)에서도 그 줄의 낱말(선원)로 질문 거리가 잡혀
+     「지원 자격 — 미확인 자격 0」 만 남은 빈 칸이 그려졌다(실측 4건). 표본은 화면 안에서만 붙인다(실데이터에 안 기댄다) */
+  const emptyBox = await page.evaluate(() => {
+    NATIONAL_SCHOLARSHIPS.push(Object.assign({}, NATIONAL_SCHOLARSHIPS[0], { id: 'zz-empty-elig', name: '빈 자격 칸 표본', program: false, eligibility: {},
+      eligibilityLines: ['※순직·장해선원 및 해양수산청의 승·하선 공인을 받은 경우 생략가능'] }));
+    const sch = findSch('zz-empty-elig');
+    openDetail('zz-empty-elig');
+    const sheet = document.querySelector('#detail-sheet');
+    return { askable: askableForSch(sch, state.profile).length, shown: requirementLines(sch, null, { all: true }).length,
+      box: !!sheet.querySelector('.sheet-verdict'), ask: !!sheet.querySelector('.elig-ask'), title: /빈 자격 칸 표본/.test(sheet.textContent) };
+  });
+  ok('빈 자격 칸 — 표본이 그 처지다(질문 거리는 잡히는데 화면에 보일 자격 줄은 0개)', emptyBox.askable > 0 && emptyBox.shown === 0 && emptyBox.title, JSON.stringify(emptyBox));
+  ok('  그러면 「지원 자격」 칸도 「미확인 자격 0」 버튼도 그리지 않는다', !emptyBox.box && !emptyBox.ask, JSON.stringify(emptyBox));
+
+  /* ⑪ 시트가 옆으로 끌리지 않는다 (2026-11-15 개발자 제보 "글이 오른쪽 화면을 넘어가는 경우 … 화면 전체가 함께 움직임").
+     끊을 데 없는 긴 낱말(주소 · 띄어쓰기 없는 한글 파일 이름)이 목록 칸을 밀어 시트 폭이 793/390 까지 늘었다 — 줄이 접혀야 한다 */
+  const wide = await page.evaluate(() => {
+    openDetail('zz-resid-probe');
+    const sheet = document.querySelector('#detail-sheet');
+    const ul = sheet.querySelector('.reason-list');
+    if (!ul) return null;
+    for (const t of ['https://example.com/' + 'a'.repeat(300), '2026학년도2학기복지장학금개인정보이용및제공동의서'.repeat(4) + '.hwp']) {
+      const li = document.createElement('li'); li.textContent = t; ul.appendChild(li);
+    }
+    return { sw: sheet.scrollWidth, cw: sheet.clientWidth };
+  });
+  ok('가로 넘침 — 긴 주소·띄어쓰기 없는 파일 이름이 든 줄이 있어도 시트 폭이 화면 폭을 넘지 않는다', !!wide && wide.sw <= wide.cw, JSON.stringify(wide));
 
   console.log(`\n${fails.length ? `✕ 실패 ${fails.length}건` : `✓ 전부 통과 (${pass}항목)`}`);
   fails.forEach((f) => console.log(`   - ${f}`));

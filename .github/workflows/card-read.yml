@@ -1,0 +1,144 @@
+# 유료 카드 읽기 — 공고 한 건을 통째로 모델 둘에게 읽혀 카드의 모든 칸을 채운다 (2026-11-15 개발자 지시)
+#
+# 🔴 돈이 나가는 워크플로다. 켜고 끄는 곳은 collector/card-read-config.json 의 enabled 하나
+#    (꺼져 있으면 이 워크플로가 돌아도 부르지 않는다). 한 실행의 상한은 같은 파일의 maxPerRun · maxUsdPerRun.
+#    원문이 같은 공고는 다시 읽지 않으므로(해시) 평소에는 새로 올라온 공고만 읽는다.
+#
+# 하는 일 · 안전장치: collector/card-read.mjs 첫머리 · docs/designs/paid-card-reading.md
+#   ① 글자가 원문에 있는가(기계 대조) ② 두 모델이 같은 말을 했는가 — 둘 다 통과한 줄만 data/card-read.json 에 싣는다.
+#   registered.json 은 안 건드린다 — 결과 파일이 없거나 비면 앱은 무료 길 값 그대로다(비상망).
+#
+# 되돌리는 법: data/card-read.json 을 `{"items":{}}` 로 비우거나 이 워크플로의 커밋을 revert 한다. 앱은 곧바로 무료 길로 돌아간다.
+
+name: 유료 카드 읽기
+
+on:
+  workflow_dispatch:
+    inputs:
+      only:
+        description: '공고 하나만 다시 읽기 (공고 id — 비우면 아직 안 읽은 것 전부, 상한까지)'
+        type: string
+        default: ''
+  schedule:
+    - cron: '17 4 * * *'    # 13:17 KST — 낮 수집(11:41·12:07)과 원문 받기 뒤
+    - cron: '17 12 * * *'   # 21:17 KST — 저녁 수집 뒤
+
+permissions:
+  contents: write
+  issues: write
+
+# 수집 로봇(group: collector)과 다른 대기줄 — 같은 줄이면 대기 중인 예약 수집이 취소된다(eligibility-fill.yml 과 같은 이유)
+concurrency:
+  group: card-read
+  cancel-in-progress: false
+
+jobs:
+  read:
+    runs-on: ubuntu-latest
+    if: github.ref_name == 'claude/nice-heisenberg-WESq5'
+    timeout-minutes: 55   # 단계 상한의 합(사전 관문 12 + 읽기 12 + 꼴 검사 2 + 규칙 관문 12 + 감사 5 + 저장·알림)보다 길게
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref_name }}
+      - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
+        run: bash tools/setup-collab.sh
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - run: npm i @anthropic-ai/sdk --no-audit --no-fund --silent
+
+      # 부르기 전에 안전장치를 가짜 응답으로 시험한다(돈 0) — 기계 대조·일치 검사가 무력해졌으면 여기서 멈춘다.
+      # 🔴 pipefail 을 건다 — 안 걸면 이 단계의 성패가 `tail` 의 것이라 관문이 빨개도 다음 유료 단계가 돈다(2026-11-15 리뷰 C3)
+      - name: 사전 관문 (가짜 응답 — 돈 0)
+        timeout-minutes: 12
+        run: |
+          set -o pipefail
+          node verify/test-collector.mjs | tail -40
+
+      # 일부 공고가 실패해도(로봇은 실패가 있으면 1 로 끝난다) 읽은 것은 저장한다 — 그래서 continue-on-error. 실패는 아래 알림 단계가 알린다
+      - id: read
+        name: 공고 읽기 (유료)
+        timeout-minutes: 12
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CARD_READ_ENABLE: '1'
+          ONLY_ID: ${{ inputs.only }}
+        run: |
+          set -o pipefail
+          if [ -n "$ONLY_ID" ]; then node collector/card-read.mjs --only="$ONLY_ID" --write | tee /tmp/card-read.txt
+          else node collector/card-read.mjs --write | tee /tmp/card-read.txt; fi
+
+      # 저장 앞 관문 — 결과 파일의 꼴(앱이 받는 파일) · 규칙 관문 · 데이터 감사. 하나라도 빨가면 저장하지 않고 멈춘다.
+      # 그때 돈을 쓴 결과를 잃지 않게 장부(응답 원본이 들어 있다)를 아티팩트로 남긴다 — 되살린 뒤 `--recheck --write` 로 돈 없이 다시 만든다
+      - name: 결과 파일 꼴 검사
+        timeout-minutes: 2
+        run: node collector/card-read.mjs --check
+
+      - name: 규칙 관문
+        timeout-minutes: 12
+        run: node verify/test-collector.mjs > /tmp/gate.txt 2>&1 || { tail -40 /tmp/gate.txt; exit 1; }
+
+      - name: 데이터 감사
+        timeout-minutes: 5
+        run: node verify/audit-data.js
+
+      - name: 결과 저장 (기본 브랜치 → deploy-sync 가 main 으로)
+        run: |
+          git config user.name "handaejang-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          [ -f data/card-read.json ] && git add data/card-read.json
+          [ -f collector/card-read-ledger.json ] && git add collector/card-read-ledger.json
+          if ! git diff --cached --quiet; then
+            git commit -m "유료 카드 읽기: $(grep -o '읽음 [0-9]*건(실음 [0-9]*)' /tmp/card-read.txt | tail -1 || echo '결과 갱신')"
+            pushed=0
+            for i in 1 2 3; do
+              if git push origin HEAD:${{ github.ref_name }}; then pushed=1; break; fi
+              git pull --rebase --autostash origin "${{ github.ref_name }}"
+            done
+            if [ "$pushed" != "1" ]; then
+              echo "::error::유료 카드 읽기 결과 push 실패 — 3회 재시도 모두 실패."
+              exit 1
+            fi
+          fi
+
+      - name: 저장하지 못했으면 장부를 남긴다 (돈을 쓴 응답 원본)
+        if: failure() || cancelled()
+        continue-on-error: true
+        uses: actions/upload-artifact@v7
+        with:
+          name: card-read-ledger
+          path: |
+            collector/card-read-ledger.json
+            data/card-read.json
+          retention-days: 14
+
+      - name: 🚨 실패 알림
+        if: failure() || cancelled() || steps.read.outcome == 'failure'
+        timeout-minutes: 1
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          body="🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **유료 카드 읽기** 가 끝까지 돌지 못했습니다.
+          $(tail -5 /tmp/card-read.txt 2>/dev/null || true)
+
+          실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          앱은 이미 실린 결과와 무료 길 값으로 그대로 보입니다. 잔액 부족이면 콘솔 Billing 을 확인하세요.
+          다음 실행이 성공하면 이 이슈는 저절로 닫힙니다."
+          node tools/alert-issue.mjs --mode open --match exact --title '🧾 유료 카드 읽기 알림' \
+            --label card-read --label-color 5319E7 --label-description '유료 카드 읽기 로봇 실패' --body "$body"
+
+      - name: 다시 성공하면 알림을 닫는다
+        if: success() && steps.read.outcome == 'success'
+        timeout-minutes: 1
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          body="✅ $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST 유료 카드 읽기 — 다시 끝까지 돌았습니다. 자동으로 닫습니다.
+          $(tail -1 /tmp/card-read.txt 2>/dev/null || true)"
+          node tools/alert-issue.mjs --mode resolve --match exact --title '🧾 유료 카드 읽기 알림' --body "$body"

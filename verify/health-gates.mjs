@@ -9,7 +9,7 @@
    혼자 돌리기: node verify/health-gates.mjs [묶음 …] */
 import fs from 'node:fs';
 
-export const PARTS = ['gate', 'feed', 'bodies', 'browser', 'qnotice', 'qfeeds', 'links', 'ci', 'alerts', 'servers', 'insta', 'admin', 'refresh', 'ops'];
+export const PARTS = ['gate', 'feed', 'bodies', 'browser', 'qnotice', 'qfeeds', 'links', 'ci', 'alerts', 'servers', 'insta', 'admin', 'refresh', 'ops', 'savegate'];
 
 /** 목록(parts)과 폴더(dirUrl 안의 .mjs)를 대조한다 — 목록에서 빠진 묶음은 통째로 돌지 않는데도 초록불이었다. verify/link-gates.mjs 도 이것을 부른다 */
 export function checkPartsMatchDir(eq, parts, dirUrl, label) {

@@ -1,88 +1,11 @@
 {
- "updatedAt": "2026-11-15",
+ "updatedAt": "2026-11-17",
  "items": {
-  "auto-oardid323011menuno200318": [
-   {
-    "src": "elig-11wbg7-1.pdf",
-    "srcBytes": 113295,
-    "none": true,
-    "at": "2026-10-23"
-   }
-  ],
   "auto-o2432actionviewno9994682": [
    {
     "src": "elig-10ypl0-1.pdf",
     "srcBytes": 185670,
     "none": true,
-    "at": "2026-10-23"
-   }
-  ],
-  "auto-ticedoarticleno231977952": [
-   {
-    "file": "auto-ticedoarticleno231977952/1-elig-q43v3p-1_p17-21.pdf",
-    "name": "공고문 안 신청서 서식 (17~21쪽)",
-    "pages": 5,
-    "bytes": 1109095,
-    "src": "elig-q43v3p-1.pdf",
-    "srcBytes": 890787,
-    "srcPages": "17~21",
-    "from": "공고문 서식 쪽 떼기",
-    "at": "2026-10-23"
-   }
-  ],
-  "auto-leno276603srcategoryid22": [
-   {
-    "src": "elig-1oeo0o-1.pdf",
-    "srcBytes": 151368,
-    "none": true,
-    "at": "2026-10-23"
-   },
-   {
-    "src": "elig-1oeo0o-2.hwp",
-    "srcBytes": 48640,
-    "none": true,
-    "at": "2026-11-02"
-   }
-  ],
-  "auto-srchenable1srchvotetype1-0rtcwpw": [
-   {
-    "src": "elig-11bok5-1.pdf",
-    "srcBytes": 576796,
-    "none": true,
-    "at": "2026-10-23"
-   }
-  ],
-  "auto-oarticleno159308nocat501": [
-   {
-    "src": "elig-q641o0-1.docx",
-    "srcBytes": 21581,
-    "none": true,
-    "at": "2026-10-23"
-   }
-  ],
-  "kosaf-0596010": [
-   {
-    "file": "kosaf-0596010/1-_공고_제2026-14호_2026년_횡성군_대학생_등록금_지원사업_2학기_공고문_p7-8.pdf",
-    "name": "공고문 안 신청서 서식 (7~8쪽)",
-    "pages": 2,
-    "bytes": 387216,
-    "src": "(공고 제2026-14호) 2026년 횡성군 대학생 등록금 지원사업(2학기) 공고문.pdf",
-    "srcBytes": 395434,
-    "srcPages": "7~8",
-    "from": "공고문 서식 쪽 떼기",
-    "at": "2026-10-23"
-   }
-  ],
-  "kosaf-2000347003": [
-   {
-    "file": "kosaf-2000347003/1-공고문_2026년_2학기_거창군_지역출신_대학생_등록금_지원사업_p6-8.pdf",
-    "name": "공고문 안 신청서 서식 (6~8쪽)",
-    "pages": 3,
-    "bytes": 297366,
-    "src": "공고문_2026년 2학기 거창군 지역출신 대학생 등록금 지원사업.pdf",
-    "srcBytes": 327526,
-    "srcPages": "6~8",
-    "from": "공고문 서식 쪽 떼기",
     "at": "2026-10-23"
    }
   ],
@@ -147,62 +70,6 @@
     "at": "2026-10-23"
    }
   ],
-  "auto-oardid321881menuno200318": [
-   {
-    "src": "elig-cs08qg-1-1.pdf",
-    "srcBytes": 346474,
-    "none": true,
-    "at": "2026-10-24"
-   },
-   {
-    "src": "elig-cs08qg-1-2.pdf",
-    "srcBytes": 1033156,
-    "none": true,
-    "at": "2026-10-24"
-   }
-  ],
-  "auto-otice06doarticleno140646": [
-   {
-    "file": "auto-otice06doarticleno140646/1-elig-sejrs6-1_p6-8.pdf",
-    "name": "공고문 안 신청서 서식 (6~8쪽)",
-    "pages": 3,
-    "bytes": 297366,
-    "src": "elig-sejrs6-1.pdf",
-    "srcBytes": 327526,
-    "srcPages": "6~8",
-    "from": "공고문 서식 쪽 떼기",
-    "at": "2026-10-24"
-   }
-  ],
-  "auto-4srsearchkeyarticletitle": [
-   {
-    "src": "elig-18fhtq-1.pdf",
-    "srcBytes": 2535243,
-    "none": true,
-    "at": "2026-10-25"
-   }
-  ],
-  "auto-pnoticedoarticleno367476": [
-   {
-    "file": "auto-pnoticedoarticleno367476/1-elig-176ryo-1_p6-8.pdf",
-    "name": "공고문 안 신청서 서식 (6~8쪽)",
-    "pages": 3,
-    "bytes": 297366,
-    "src": "elig-176ryo-1.pdf",
-    "srcBytes": 327526,
-    "srcPages": "6~8",
-    "from": "공고문 서식 쪽 떼기",
-    "at": "2026-10-25"
-   }
-  ],
-  "auto-oardid323398menuno200318": [
-   {
-    "src": "elig-1r3nwp-1.pdf",
-    "srcBytes": 143423,
-    "none": true,
-    "at": "2026-10-26"
-   }
-  ],
   "auto-scho332282326artclviewdo": [
    {
     "src": "elig-1guecu-1.pdf",
@@ -219,14 +86,6 @@
     "at": "2026-10-27"
    }
   ],
-  "auto-scho332282304artclviewdo": [
-   {
-    "src": "elig-z4ki38-1.pdf",
-    "srcBytes": 4059486,
-    "none": true,
-    "at": "2026-10-27"
-   }
-  ],
   "auto-ent2431269128artclviewdo": [
    {
     "file": "auto-ent2431269128artclviewdo/1-elig-1qi88m-1_p5-8.pdf",
@@ -238,28 +97,6 @@
     "srcPages": "5, 8",
     "from": "공고문 서식 쪽 떼기",
     "at": "2026-10-28"
-   }
-  ],
-  "auto-srchenable1srchvotetype1-0hhsw1d": [
-   {
-    "src": "elig-g6ze20-1.docx",
-    "srcBytes": 21581,
-    "none": true,
-    "at": "2026-10-28"
-   }
-  ],
-  "auto-rykeywordpaged1slug20262-0mvhb0o": [
-   {
-    "src": "elig-n5gut5-1.pdf",
-    "srcBytes": 96203,
-    "none": true,
-    "at": "2026-11-11"
-   },
-   {
-    "src": "elig-n5gut5-2.pdf",
-    "srcBytes": 96539,
-    "none": true,
-    "at": "2026-11-11"
    }
   ],
   "kosaf-2000204008": [
@@ -419,38 +256,6 @@
     "at": "2026-11-04"
    }
   ],
-  "kosaf-2703692001": [
-   {
-    "src": "[공모안] 2027 숲과나눔 학업장학생 모집.pdf",
-    "srcBytes": 224133,
-    "none": true,
-    "at": "2026-11-04"
-   }
-  ],
-  "kosaf-2703692003": [
-   {
-    "src": "[공모안] 2027 숲과나눔 학업장학생 모집.pdf",
-    "srcBytes": 224133,
-    "none": true,
-    "at": "2026-11-04"
-   }
-  ],
-  "kosaf-2703692004": [
-   {
-    "src": "[공모안] 2027 숲과나눔 학업장학생 모집.pdf",
-    "srcBytes": 224133,
-    "none": true,
-    "at": "2026-11-04"
-   }
-  ],
-  "kosaf-2704228001": [
-   {
-    "src": "공고문 없음.hwp",
-    "srcBytes": 13312,
-    "none": true,
-    "at": "2026-11-04"
-   }
-  ],
   "kosaf-2000395001": [
    {
     "src": "[공고문]2026년_2학기_장학생_선발계획.hwpx",
@@ -538,14 +343,6 @@
     "at": "2026-11-04"
    }
   ],
-  "auto-ervicenoticedetail520867": [
-   {
-    "src": "elig-1furvb-1.pdf",
-    "srcBytes": 80418,
-    "none": true,
-    "at": "2026-11-05"
-   }
-  ],
   "auto-345bnum5233cate0qidx5233": [
    {
     "file": "auto-345bnum5233cate0qidx5233/1-elig-1s2isd-1_p3-5.pdf",
@@ -557,32 +354,6 @@
     "srcPages": "3, 5",
     "from": "공고문 서식 쪽 떼기",
     "at": "2026-11-06"
-   }
-  ],
-  "kosaf-0571003": [
-   {
-    "file": "kosaf-0571003/1-2026년_하반기_저소득주민자녀_장학생_선발_공고_안__p3-7.pdf",
-    "name": "공고문 안 신청서 서식 (3~7쪽)",
-    "pages": 5,
-    "bytes": 313890,
-    "src": "2026년 하반기 저소득주민자녀 장학생 선발 공고(안).pdf",
-    "srcBytes": 172277,
-    "srcPages": "3~7",
-    "from": "공고문 서식 쪽 떼기",
-    "at": "2026-11-07"
-   }
-  ],
-  "kosaf-0571004": [
-   {
-    "file": "kosaf-0571004/1-2026년_하반기_저소득주민자녀_장학생_선발_공고_안__p3-7.pdf",
-    "name": "공고문 안 신청서 서식 (3~7쪽)",
-    "pages": 5,
-    "bytes": 313888,
-    "src": "2026년 하반기 저소득주민자녀 장학생 선발 공고(안).pdf",
-    "srcBytes": 172277,
-    "srcPages": "3~7",
-    "from": "공고문 서식 쪽 떼기",
-    "at": "2026-11-07"
    }
   ],
   "kosaf-2701096002": [
@@ -630,50 +401,12 @@
     "at": "2026-11-07"
    }
   ],
-  "auto-418bnum5233cate0qidx5233": [
-   {
-    "src": "elig-2iqubi-1.pdf",
-    "srcBytes": 221598,
-    "none": true,
-    "at": "2026-11-08"
-   }
-  ],
-  "auto-amepagescholarshipnotice-02ghu3o": [
-   {
-    "src": "elig-1yvytc-1.pdf",
-    "srcBytes": 90280,
-    "none": true,
-    "at": "2026-11-09"
-   },
-   {
-    "src": "elig-1yvytc-2.hwp",
-    "srcBytes": 60416,
-    "none": true,
-    "at": "2026-11-09"
-   }
-  ],
   "auto-amepagescholarshipnotice-09j8czz": [
    {
     "src": "elig-rm8ras-1.pdf",
     "srcBytes": 458360,
     "none": true,
     "at": "2026-11-09"
-   }
-  ],
-  "auto-skor478126826artclviewdo": [
-   {
-    "src": "elig-hkpf03-1.pdf",
-    "srcBytes": 111930,
-    "none": true,
-    "at": "2026-11-09"
-   }
-  ],
-  "auto-oardid323515menuno200318": [
-   {
-    "src": "elig-cav05w-1.pdf",
-    "srcBytes": 101319,
-    "none": true,
-    "at": "2026-11-11"
    }
   ],
   "auto-bbssc58944606artclviewdo": [
@@ -747,14 +480,6 @@
     "at": "2026-11-13"
    }
   ],
-  "auto-skor478127041artclviewdo": [
-   {
-    "src": "elig-1rbz5n-1.pdf",
-    "srcBytes": 60053,
-    "none": true,
-    "at": "2026-11-13"
-   }
-  ],
   "auto-amepagescholarshipnotice-1naazn9": [
    {
     "src": "elig-1qarmj-1.pdf",
@@ -797,14 +522,6 @@
     "srcBytes": 229376,
     "srcPages": "21~30",
     "from": "공고문 서식 쪽 떼기",
-    "at": "2026-11-14"
-   }
-  ],
-  "kosaf-2700058001": [
-   {
-    "src": "1-1.-제-44기-송원김영환장학재단-장학생-선발-안내.docx",
-    "srcBytes": 13123,
-    "none": true,
     "at": "2026-11-14"
    }
   ],
@@ -958,6 +675,14 @@
     "srcBytes": 9216,
     "none": true,
     "at": "2026-11-14"
+   }
+  ],
+  "auto-enoticedoarticleno770333": [
+   {
+    "src": "elig-szl3lw-1.pdf",
+    "srcBytes": 63744,
+    "none": true,
+    "at": "2026-11-17"
    }
   ]
  }

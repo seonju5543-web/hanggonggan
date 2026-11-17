@@ -33,8 +33,8 @@
    🔴 **화면이 쓰는 그 함수 하나만** 쓴다. judgeCond 로 내려가면 경우별 분기·표 라벨·
       선택지 묶음 관문을 건너뛰어, 재학생에게 `신입생:` 줄의 평점을 묻게 된다. */
 const EA_ME = (typeof module !== 'undefined' && module.exports)
-  ? require('./match-engine.js')
-  : { requirementMatch, RESIDENCE_SPANS };
+  ? Object.assign({}, require('./match-engine.js'), { parseLine: require('./parse-requirements.js').parseLine, REGION_CITIES: require('./parse-requirements.js').REGION_CITIES })
+  : { requirementMatch, RESIDENCE_SPANS, parseLine, REGION_CITIES };
 
 /* 물어볼 수 있는 칸과 그 **탐침 값**.
    🔴 칸 이름은 app.js `collectProfile()` 이 만드는 이름과 반드시 같아야 한다 —
@@ -49,7 +49,7 @@ const FIELD_PROBE = {
   credits: [0, 24],
   bracket: [1, 10],
   birthYear: [1980, 2010],
-  nationality: ['대한민국', '기타'],
+  nationality: ['korean', 'foreign'],   // 🔴 프로필·엔진이 쓰는 값 그대로(index.html #in-nationality · match-engine `p.nationality === c.eq`) — 2026-11-15 까지 '대한민국'·'기타' 라 고르면 한국 학생이 ✕ 가 됐다(리뷰)
   major: ['국어국문학과', '기계공학과'],
   region: ['서울', '전남'],
   regionCity: ['종로구', '무안군'],
@@ -111,7 +111,10 @@ const TRAIT_LABEL = {
    **4곳 이상**이 묻는 처지. 걸린 공고 수 — award 17 · kosafApplied 11 · discipline 10 · job 10 · volunteer 6 · dorm 4 · military 4.
    ⚠️ 3곳 이하(birthOrder·farm·loan 각 3 · 나머지 1~2)는 공고 안에서만 묻는다 — 온보딩을 길게 만들 만큼 자주 나오지 않는다.
    ⚠️ 여기 적는 종류는 TRAIT_LABEL·TRAIT_PAT 에 있어야 한다(관문이 대조한다). 순서가 화면 순서다. */
-const ONBOARD_TRAITS = ['award', 'kosafApplied', 'discipline', 'job', 'volunteer', 'dorm', 'military', 'loan', 'careLeaver', 'fullTuition'];
+const ONBOARD_TRAITS = ['award', 'kosafApplied', 'discipline', 'job', 'dorm', 'military', 'loan', 'careLeaver', 'fullTuition'];
+/* 2026-11-15 개발자 결정("빼 주세요") — 봉사활동 실적(volunteer)을 뺐다. 같은 날 봉사 규칙을 '해 둔 실적을 말할 때만' 으로 좁히자(parse-requirements TRAIT_PAT)
+   걸리는 공고가 9곳 → 2곳이 됐다(나머지 7곳은 `봉사활동 가능자`·`…에 관심 있는 대학생` 처럼 요구가 아닌 줄이었다) — 잣대 「4곳 이상」 아래다.
+   그 두 공고에서는 공고 안 「미확인 자격」이 그대로 묻는다 · 이미 답해 둔 학생의 답(traits.volunteer)은 지우지 않는다(collectProfile 이 물려받는다). */
 /* 2026-11-13 fullTuition(이번 학기 등록금 전액 장학·면제 · 선조치 후 보고) — 열린 공고 4곳(층2 거창군·안산 반값·등록금 지원사업·다자녀가정 — 모두 제외 칸)이라 위 잣대 「4곳 이상」에 들어 더했다.
    ⚠️ 넷 다 **제외 칸**이라 공고 안 「미확인 자격」(자격 줄만 탐침)에서는 안 물린다 — 온보딩이 이 처지를 묻는 유일한 자리다. 3곳 이하로 줄면 집계가 「4곳 미만인데 묻는 것」으로 알린다 */
 /* 2026-11-09 개발자 결정("질문에 넣어") — 전수 집계가 「4곳 이상인데 안 묻는 것: loan 5 · careLeaver 4」 를 알린 뒤 둘을 더했다(loan 은 대출 이자 지원 장학 · careLeaver 는 자립준비청년 전용).
@@ -127,14 +130,17 @@ const FIELD_META = {
   gpa:         { label: '평점', kind: 'number', suffix: '/ 4.5', min: 0, max: 4.5, step: 0.01 },
   credits:     { label: '직전 학기 이수학점', kind: 'number', min: 0, max: 30, step: 1 },
   bracket:     { label: '학자금 지원구간', kind: 'number', min: 0, max: 10, step: 1 },
-  birthYear:   { label: '태어난 해', kind: 'number', min: 1950, max: 2015, step: 1 },
-  nationality: { label: '국적', kind: 'select', options: ['대한민국', '기타'] },
+  birthYear:   { label: '태어난 해', kind: 'number', min: 1940, max: 2020, step: 1 },   // 온보딩·DB(0004)·input-guard 와 같은 범위 (2026-11-17 · 1950~2015 였다)
+  /* 값은 온보딩 선택 칸(index.html #in-nationality)과 같은 코드 · 이름표도 그 글자 그대로 */
+  nationality: { label: '국적', kind: 'select', options: [{ value: 'korean', label: '대한민국' }, { value: 'foreign', label: '외국인 유학생' }, { value: 'dual', label: '복수국적 · 영주권' }] },
   major:       { label: '학과', kind: 'text' },
-  region:      { label: '거주 시·도', kind: 'text' },
+  /* 🔴 시·도는 **고르는 칸** (2026-11-15 리뷰) — 글자로 받으면 「서울특별시」·「경기도」 가 온보딩 값(서울·경기)과 달라 틀린 ✕ 가 나고 학적정보 수정 화면의 선택 칸이 비어 저장 때 지워진다.
+     선택지는 판정이 쓰는 표(parse-requirements REGION_CITIES 의 시·도) 그대로 · `city` 는 시·도가 바뀌면 함께 비울 짝 칸(다른 시·도의 구가 남지 않게 — app.js eligAskCollect) */
+  region:      { label: '거주 시·도', kind: 'select', options: Object.keys(EA_ME.REGION_CITIES || {}), city: 'regionCity' },
   regionCity:  { label: '거주 시·군·구', kind: 'text' },
-  parentRegion:     { label: '부모 거주 시·도', kind: 'text' },
+  parentRegion:     { label: '부모 거주 시·도', kind: 'select', options: Object.keys(EA_ME.REGION_CITIES || {}), city: 'parentRegionCity' },
   parentRegionCity: { label: '부모 거주 시·군·구', kind: 'text' },
-  originRegion:     { label: '출신 고교 시·도', kind: 'text' },
+  originRegion:     { label: '출신 고교 시·도', kind: 'select', options: Object.keys(EA_ME.REGION_CITIES || {}), city: 'originCity' },
   originCity:       { label: '출신 고교 시·군·구', kind: 'text' },
   /* 🔴 값이 **숫자**인 선택 칸 — 선택지는 match-engine RESIDENCE_SPANS 한 곳(온보딩 칩과 같은 칸 · 베끼면 칸이 갈라진다). 저장값은 칸의 하한 개월 */
   residenceMonths:  { label: '지금 주소 거주 기간', kind: 'select', numeric: true,
@@ -160,11 +166,40 @@ function answered(p, key) {
    ⚠️ 알려진 천장: 어떤 칸은 **탐침 값으로는 풀리는데 학생의 실제 값으로는 안 풀릴** 수
       있다. 그때는 적어도 그 줄이 흐린 채 남는다(틀린 말을 하지는 않는다). 실측 8줄에서는
       그런 경우가 없었고, 막으려면 칸마다 판정 가능 구간을 적어야 해서 하지 않는다. */
-function askableFields(line, profile, sch) {
+/* 이 줄이 말하는 조건 종류로 **탐침할 칸을 좁힌다** (2026-11-15 · 대외활동 관문 「내 정보」).
+   줄 하나를 칸 13개 × 2 + 처지 23개 × 2 로 다 찔러 보면 100ms 안팎이라, 보이는 글 전부(400줄)를 세는 관문이 3초쯤 멈췄다(리뷰 실측).
+   조건 종류(parse-requirements parseLine)가 읽는 칸만 남긴다 — **좁히기만 한다**: 판정은 여전히 탐침이 하고, 모르는 종류가 섞이면 null(= 전부 탐침).
+   실측(활동 + 정식 등록 2,598줄): 전부 탐침과 다른 줄 3 — 모두 조건이 없는 줄에 탐침이 헛걸린 것(학년 줄의 `학과` 등)이라 안 묻는 쪽이 맞다.
+   ⚠️ 공고 안 「미확인 자격」(askableForSch 기본)은 예전대로 전부 탐침한다 — 넘겨받을 때만 좁힌다. */
+const KIND_FIELDS = { age: ['birthYear'], grade: ['gpa'], credits: ['credits'], bracket: ['bracket'], nationality: ['nationality'], major: ['major'],
+  residence: ['region', 'regionCity', 'parentRegion', 'parentRegionCity', 'originRegion', 'originCity', 'residenceMonths'] };
+const KIND_NO_FIELD = ['open', 'degree', 'scholarship', 'year', 'semester', 'cert', 'status', 'flags', 'school'];   // 묻는 칸이 없는 종류(온보딩 필수 칸·여러 개 고르는 칸)
+function probeKeysFor(line) {
+  let conds;
+  try { conds = EA_ME.parseLine(line).conds || []; } catch (e) { return null; }
+  const out = [];
+  for (const c of conds) {
+    if (c.kind === 'trait') { if (!(c.anyOf || []).length) return null; c.anyOf.forEach((t) => out.push('trait:' + t)); }
+    else if (KIND_FIELDS[c.kind]) out.push(...KIND_FIELDS[c.kind]);
+    else if (KIND_NO_FIELD.indexOf(c.kind) === -1) return null;
+  }
+  return out;
+}
+
+/* 처지 칸 이름 — 단체 회원은 그 단체 이름으로(parse-requirements memberOrgOf · `member:<단체>` 열쇠) */
+function traitLabel(key) {
+  if (TRAIT_LABEL[key]) return TRAIT_LABEL[key];
+  const m = /^member:(.+)$/.exec(String(key || ''));
+  return m ? `${m[1]} 회원·소속 (본인·부모)` : String(key || '');
+}
+
+function askableFields(line, profile, sch, only) {
   const p = profile || {};
+  if (only && !only.length) return [];                    // 좁혔더니 물을 칸이 없는 줄 — 판정기를 부르지 않는다
   if (EA_ME.requirementMatch(line, p, sch)) return [];   // 지금도 판정된다
   const out = [];
   for (const key of Object.keys(FIELD_PROBE)) {
+    if (only && only.indexOf(key) === -1) continue;        // 이 줄이 읽지 않는 칸
     if (answered(p, key)) continue;                        // 이미 답했다
     for (const v of FIELD_PROBE[key]) {
       const trial = Object.assign({}, p);
@@ -181,7 +216,10 @@ function askableFields(line, profile, sch) {
         「예」는 여전히 '모름'이고 「아니요」만 미달이 된다. 실측으로 수상 15줄 중 12줄이
         그 꼴이었다. 학생에게 자기를 떨어뜨리는 것밖에 못 하는 단추를 주지 않는다. */
   const tr = (p.traits && typeof p.traits === 'object') ? p.traits : {};
-  for (const key of Object.keys(TRAIT_LABEL)) {
+  /* 단체 회원 열쇠(`member:<단체>`)는 줄마다 다르다 — 이 줄이 읽는 열쇠를 더한다 */
+  const lineKeys = (probeKeysFor(line) || []).filter((k) => k.indexOf('trait:member:') === 0).map((k) => k.slice(6));
+  for (const key of Object.keys(TRAIT_LABEL).concat(lineKeys)) {
+    if (only && only.indexOf('trait:' + key) === -1) continue;
     if (typeof tr[key] === 'boolean') continue;            // 이미 답했다
     const verdicts = [true, false].map((v) => EA_ME.requirementMatch(
       line, Object.assign({}, p, { traits: Object.assign({}, tr, { [key]: v }) }), sch));
@@ -192,11 +230,11 @@ function askableFields(line, profile, sch) {
 
 /* 이 공고에서 물을 수 있는 칸 전부 (자격 줄을 다 훑어 중복 제거).
    ⚠️ 자격 줄이 없는 공고(층2 KOSAF·상시 제도)에서도 죽지 않아야 한다 — 빈 배열을 낸다. */
-function askableForSch(sch, profile) {
+function askableForSch(sch, profile, narrow) {
   const lines = (sch && sch.eligibilityLines) || [];
   const out = [];
   for (const line of lines) {
-    for (const k of askableFields(line, profile, sch)) {
+    for (const k of askableFields(line, profile, sch, narrow ? probeKeysFor(line) : null)) {
       if (out.indexOf(k) === -1) out.push(k);
     }
   }
@@ -224,12 +262,16 @@ function coerceField(key, raw) {
     if (Number.isNaN(n)) return null;
     const lo = meta.min == null ? -Infinity : meta.min;
     const hi = meta.max == null ? Infinity : meta.max;
-    const clamped = Math.min(hi, Math.max(lo, n));
-    return meta.step === 1 ? Math.round(clamped) : clamped;
+    /* 🔴 범위 밖은 **깎지 않고 null(모름)** (2026-11-17). 예전엔 5.0 → 4.5 로 깎아 학생이 적지 않은
+       값을 지어냈다(원칙 8-1). 화면은 칠 때부터 막으므로(input-guard.js) 여기는 마지막 방어다.
+       정수 칸에 소수가 오면 반올림하지 않고 역시 null — 19.5학점을 20학점으로 바꾸지 않는다. */
+    if (n < lo || n > hi) return null;
+    if (meta.step === 1 && !Number.isInteger(n)) return null;
+    return n;
   }
   return s;
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { askableFields, askableForSch, coerceField, answered, FIELD_META, FIELD_PROBE, TRAIT_LABEL, ONBOARD_TRAITS };
+  module.exports = { askableFields, askableForSch, probeKeysFor, coerceField, answered, FIELD_META, FIELD_PROBE, TRAIT_LABEL, ONBOARD_TRAITS, traitLabel };
 }

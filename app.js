@@ -130,8 +130,12 @@ function loadState() {
     if (!Array.isArray(state.saved)) state.saved = [];          // 저장 기능 이전에 저장된 판
     if (!Array.isArray(state.trash)) state.trash = [];          // 휴지통 이전에 저장된 판
     if (state.profile) { migrateBranchCampus(state.profile); migrateFitFields(state.profile); }
+    /* 예전에 저장된 있을 수 없는 값(평점 999·출생연도 3000)은 **그 칸만** 비운다(운영 원칙 7 · 소급).
+       고쳐 넣지 않는다 — 비우면 '모름'이라 판정하지 않는다. 학생에게는 시작 뒤 한 번 알린다. */
+    if (state.profile) scrubbedOnLoad = scrubProfileNumbers(state.profile);
   } catch (e) { /* 손상된 데이터는 무시 */ }
 }
+let scrubbedOnLoad = [];
 /* opts.fromServer = 서버에서 받아 온 것을 그대로 적는 중이라는 뜻.
    그때는 시각을 새로 찍지 않고(서버 시각을 그대로 쓴다) 되돌려 올리지도 않는다 —
    안 그러면 받은 것을 곧바로 다시 올리는 헛돌기가 생긴다. */
@@ -207,6 +211,7 @@ function fitDetailFor(s, p) {
 
 function getMatches() {
   const p = state.profile;
+  /* 기한도 자격도 모르는 정식 공고는 카드가 아니라 게시판 글로 간다 — 판정은 match-engine feedOnlyFormal 한 곳(알림과 같다 · 2026-11-15 결정 1) */
   return allScholarships().map((s) => {
     const result = evaluateFor(s, p);
     /* 🔴 한국장학재단 등록분은 **적합도를 단정하지 않는다** (2026-08-30).
@@ -217,7 +222,7 @@ function getMatches() {
        그래서 배지·정렬이 보는 fd 를 '아직 못 읽음'으로 준다(자격 줄은 그대로 보여 준다).
        판정 규칙은 fitVerdict 한 곳 그대로다 — 여기서는 근거만 정직하게 넘긴다. */
     return { sch: s, result, fit: fitScore(s, result, p), fd: fitDetailFor(s, p) };
-  });
+  }).filter((m) => !feedOnlyFormal(m.sch, p, { status: m.result.status, fd: m.fd }));
 }
 
 /* ---------------- 공고 저장(북마크) ----------------
@@ -252,6 +257,7 @@ function toggleSave(id) {
     const act = isActivityId(id) ? findActivity(id.slice(4)) : null;
     state.saved.push(act ? { id, savedAt: nowStamp(), snap: JSON.parse(JSON.stringify(act)) } : { id, savedAt: nowStamp() });
     saveState();
+    if (typeof trackUse === 'function') trackUse('save', isActivityId(id) ? id.slice(4) : id);
     toast('보관함에 저장했어요', { label: '보관함', run: () => showScreen('my') });
   }
   refreshSaveViews(id);
@@ -350,7 +356,10 @@ function deadlineTs(sch) {
 const CLOSED_KEEP_DAYS = 1;
 
 function dday(dateStr) {
-  if (!dateStr) return { label: '기한 원문 확인', cls: '', days: 14 }; // 마감을 확정 못 한 공고 — 목록에 유지
+  /* 마감을 확정 못 한 공고 — 목록에 유지(days 14 는 목록에서 안 사라지게 하는 값일 뿐 · 순서에 쓰지 말 것 — homeScore).
+     🔴 글자는 비운다 (2026-11-15 · 개발자 결정 11-02 "'모름' 같은 말이 보이면 신뢰가 떨어진다") — 예전 '기한 원문 확인'·'기한 확인 중'.
+        모르는 마감은 **아무것도 그리지 않는다**(지어내지 않는다). 모른다는 표시는 unknown 하나 — 글자로 판정하지 말 것 */
+  if (!dateStr) return { label: '', cls: '', days: 14, unknown: true };
   // 날짜끼리 비교해야 마감 다음 날 새벽에 D-DAY로 잘못 뜨지 않는다 (마감 당일=D-DAY, 지난 날=마감)
   const startOfToday = todayStart();
   const d = Math.round((new Date(dateStr + 'T00:00:00') - startOfToday) / 86400000);
@@ -372,8 +381,7 @@ function dday(dateStr) {
       맞췄다 — 목록과 상세가 마감을 다른 글자로 말하지 않는다.
    ⚠️ 달력은 날짜 자체가 내용이라 이 말을 쓰지 않는다(isoOf 그대로). */
 function ddayWords(d) {
-  if (!d) return '';
-  if (d.label === '기한 원문 확인') return '기한 확인 중';
+  if (!d || d.unknown) return '';   // 마감을 모르면 말하지 않는다(2026-11-15 · 예전 '기한 확인 중')
   return d.label;   // '마감' · 'D-DAY' · 'D-n' — dday() 가 낸 글자 그대로
 }
 
@@ -419,7 +427,17 @@ const bareOrg = (t) => String(t || '').replace(/^(재단법인|사단법인|학�
    안 떼면 제목이 `(재)가송재단 장학생 (한국외대 접수, 2026-2학기)` 인데도 겹침을 못 알아본다(실측 3건). */
 const orgBase = (t) => String(t || '').replace(/\s*\([^)]*\)\s*$/, '').trim();
 /* 주관 기관 칸이 비었거나 '모름' 표시(`주관 기관 원문 확인`·`미확인` — auto-register PROVIDER_UNKNOWN)인가 — 카드 윗줄·지원서 초안이 같이 쓴다 */
-const providerUnknown = (v) => !String(v || '').trim() || /원문 확인|미확인|확인\s?필요/.test(String(v));   // 「기관확인필요」 — 재단이 KOSAF 칸에 적어 둔 모름 표시(2026-11-02 실화면)
+const providerUnknown = (v) => !String(v || '').trim() || /원문 확인|미확인|확인\s?필요/.test(String(v));
+/* 학생 화면에 싣지 않는 '모름'류 글자 — verify/no-unknown-words.cjs UNKNOWN_WORDS 와 같은 낱말(브라우저가 그 파일을 못 읽어 한 번 더 · 관문 「학생 화면에 '모름'류 글자가 없다」 ⑥이 낱말마다 대조한다) */
+const SAYS_UNKNOWN = /모름|미확인|원문(?:에서)? 확인|확인\s?필요|기한 확인 중|정보 입력 필요/;
+/* 칸 하나의 '아는 것만' (2026-11-16 리뷰 — 달력 줄·지원서 초안이 칸을 그대로 옮겨 「금액 원문 확인」·「기관확인필요」가 샜다).
+   🔴 **통째로 싣거나 통째로 뺀다** (2026-11-16 2차 리뷰 · 원칙 8-1) — 원문·재단 칸은 인용이다. 예전엔 「확인 필요」 마디만 떼어
+      「등록금 전액 지원 단, 소득분위 확인 필요」 → 「등록금 전액」(조건이 사라져 무조건 전액으로 읽힌다)처럼 **문장 가운데를 자른 글**을 원문이라며 보였다.
+      '모름'류 낱말이 하나라도 있으면 그 값은 화면에 없다 · 없으면 한 글자도 안 바꾸고 그대로 · 글자를 더하지 않는다 */
+function knownValue(v) {
+  const t = String(v || '').trim();
+  return t && !SAYS_UNKNOWN.test(t) ? t : '';
+}   // 「기관확인필요」 — 재단이 KOSAF 칸에 적어 둔 모름 표시(2026-11-02 실화면)
 function cardOrgLine(sch) {
   const prov = String(sch.provider || '').trim();
   /* 🔴 **'모른다'는 표시는 카드 윗줄에 싣지 않는다** (2026-10-06 사장님 지시 'AI 티' · 개선안 D).
@@ -440,11 +458,12 @@ function cardOrgLine(sch) {
    윗줄 = 갈래 칩 + 주최(알 때만) + 적합도 알약 · 제목은 지우고 나누기만 · 핵심 한 줄은 장학 「금액 · …」 / 활동 「대상 · …」 · 마감은 아랫줄 그대로(옛 결정).
    🔴 글자를 더하지 않는다 — 칩 이름 여섯과 이름표 셋(금액·대상·접수)만 앱의 말이고 나머지는 원문이다. */
 const KIND_CHIP_CLS = { '교내': 'badge-in', '교외': 'badge-out' };
+const ACT_CHIP_CLS = { '공모전': 'badge-kind badge-contest', '봉사': 'badge-kind badge-vol', '청년정책': 'badge-kind', '대외활동': 'badge-kind badge-act' };   // 청년정책은 회색 그대로(시안에 없던 갈래)
 /* 갈래 칩 — 장학은 교내/교외, 활동은 공모전·봉사·청년정책·대외활동(출처·분야로 · 판정은 activity-kind 그대로) */
 function kindChip(x) {
   if (isActivityItem(x)) {
     const label = x.kind === '공모전' ? '공모전' : x.api === 'youthPolicy' ? '청년정책' : (x.field === '봉사' || x.api === 'vol1365') ? '봉사' : '대외활동';
-    return { label, cls: 'badge-kind' };
+    return { label, cls: ACT_CHIP_CLS[label] };   // 갈래 색(2026-11-15 승인 시안 1)
   }
   const type = String(x.type || '').trim();
   return { label: type ? `장학 · ${type}` : '장학', cls: `badge-kind${KIND_CHIP_CLS[type] ? ' ' + KIND_CHIP_CLS[type] : ''}` };
@@ -480,15 +499,6 @@ function cardTitleParts(sch) {
   const raw = String(sch.name || '').trim().replace(/^\s*(\S{2,8})\s+(?=[[【]\s*\1\s*[\]】])/, '').replace(/^공통\s+(?=\d)/, '');   // 「공통 2026-2학기 …」 — 게시판 분류(공통/학부/대학원) 머리말 · 해 앞에 선 것만(실측 경희대)
   /* 🔴 장학 제목의 괄호는 떼지 않는다 — 장학 카드엔 「대상 · …」 줄이 없어 뗀 글자가 갈 자리가 없다(지우기가 된다 · 리뷰 2026-11-02). 끝 마침표만 */
   return { title: cleanCardTitle(raw).replace(/\.\s*$/, '').trim(), who: [] };
-}
-/* 활동 글 — 제목에서 뗀 대상 + 발췌 「대상」(없으면 첫 자격 줄) 을 「대상 · …」 한 줄로(겹치면 한 번) */
-function activityWhoLine(n, parts) {
-  const first = (n.eligibilityLines || []).find((l) => !/제외|불가|아닌|없는/.test(String(l))) || '';   // 제외·불가 문장은 대상이 아니다(리뷰 2026-11-02)
-  const ex = ((n.excerpts || []).find((x) => x.label === '대상') || {}).text || first;
-  const bits = [...parts.who, unent(String(ex || '')).replace(/\s+/g, ' ').trim()].filter(Boolean);
-  const out = [];
-  for (const b of bits) if (!out.some((o) => o.replace(/\s/g, '').includes(b.replace(/\s/g, '')))) out.push(b);
-  return out.join(' · ');
 }
 /* 핵심 한 줄(장학) — 금액을 읽었으면 「금액 · 200만원」, 층2 재단이 적어 둔 긴 금액은 옅게, 못 읽었으면 줄 없음(「금액 원문 확인」 글자를 카드에 남기지 않는다) */
 function amountLine(sch) {
@@ -567,12 +577,9 @@ function splitTitleDates(title) {
 /* notStale(오래된 공고 숨김)은 match-engine.js에 있다 — 화면에서 숨긴 공고를
    알림으로는 알리는 모순이 생기지 않도록 알림 규칙도 같은 함수를 쓴다. */
 
-const STATUS_META = {
-  eligible:   { label: '신청 가능',        cls: 'ok' },
-  selective:  { label: '지원 가능 · 선발 심사', cls: 'sel' },
-  unknown:    { label: '정보 입력 필요',     cls: 'unk' },
-  ineligible: { label: '요건 미충족',       cls: 'no' },
-};
+/* 판정 알약 이름표(STATUS_META · '신청 가능'·'지원 가능 · 선발 심사'·'정보 입력 필요'·'요건 미충족')는 **지웠다** (2026-11-15) —
+   2026-11-02 시안 B 부터 어느 화면도 그리지 않는 죽은 표였고, '정보 입력 필요'는 개발자 결정 11-02(학생 화면에 '모름'류 글자 없음)에 걸린다.
+   되살리지 말 것 — 판정은 fitVerdict·cardBadgeHtml 이 말한다. */
 
 const APP_STEPS = ['신청 준비 완료', '공식 제출', '심사', '선정 발표'];
 
@@ -600,6 +607,7 @@ function recordSubmitted(sch) {
   if (!confirm(`${officialChannel(sch).label}에서 공식 제출을 마치셨나요?\n\n제출 완료로 기록하면 진행 단계가 '공식 제출'로 넘어가요.`)) return;
   app.submittedAt = nowStamp();
   saveState();
+  if (typeof trackUse === 'function') trackUse('submitted', sch.id);
   /* 손끝에도 한 번 (2026-09-09). 여기까지만 울린다 — 진동은 **되돌리기 어려운 일이 방금
      일어났다**는 신호로만 쓴다(저장·새로고침·이 기록 셋). 화면이 바뀔 때마다 울리면
      알림처럼 느껴져서 학생이 폰 설정에서 앱 진동을 통째로 꺼 버린다. */
@@ -727,13 +735,42 @@ function esc(s) {
    **데이터에 나오는 기호를 전부 아는지** 세므로, 새 기호가 들어오면 그때 빨간불이 된다.
    2026-09-30 에 여덟 개를 더했다 — 44개교 복원으로 들어온 게시판들이 `&lsquo;`·`&#40;` 등을
    담아 왔다(관문이 잡았다). 숫자 기호도 **보이는 글자인 것만** 이름을 대고 넣는다(위 🔴 그대로). */
-const ENTITIES = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", '#39': "'", '#160': ' ', middot: '·', '#038': '&', '#039': "'", '#40': '(', '#41': ')', lsquo: '‘', rsquo: '’', bull: '•', sim: '∼', rarr: '→', rArr: '⇒', ge: '≥', le: '≤', ldquo: '“', rdquo: '”' };   // rArr·ge — 수집 글에 나온 겹화살표·부등호(2026-10-12 ui-tone) · ldquo·rdquo — 큰따옴표(2026-10-24 ui-tone)
+const ENTITIES = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", '#39': "'", '#160': ' ', middot: '·', '#038': '&', '#039': "'", '#40': '(', '#41': ')', lsquo: '‘', rsquo: '’', bull: '•', sim: '∼', rarr: '→', rArr: '⇒', ge: '≥', le: '≤', ldquo: '“', rdquo: '”', times: '×', egrave: 'è' };   // rArr·ge — 수집 글에 나온 겹화살표·부등호(2026-10-12 ui-tone) · ldquo·rdquo — 큰따옴표(2026-10-24 ui-tone) · times·egrave — 소식 글(「센터 &times; Google」·「Herm&egrave;s」 2026-11-17)
 /* 🔴 **목록을 두 벌 두지 않는다** (2026-09-13). 예전에는 정규식에 이름이 한 벌 더 박혀 있어서,
    ENTITIES 에 `middot` 를 더해도 정규식이 그걸 몰라 **아무 일도 안 일어났다**(실측).
    이 저장소가 여러 번 데인 자리다 — 목록에서 정규식을 만든다. */
 const ENTITY_RE = new RegExp('&(' + Object.keys(ENTITIES).join('|') + ');', 'g');
 function unent(s) {
   return String(s == null ? '' : s).replace(ENTITY_RE, (m, k) => ENTITIES[k]);
+}
+/* 깨진 글자 씻기 — 받은 데이터 **전부**를 받는 순간 한 번 (2026-11-17 개발자 지시 "깨진 글자 모두 찾아서 수리 · 장학금, 대외활동/공모전 모두").
+   unent 를 23곳에서만 불러 자격 줄·서류 칸에 `중소 &middot; 중견기업` 이 그대로 떴고, 이 앱이 거르지 않던 넷이 더 있었다(실측 11-17):
+   · HWP 전용 기호 글자(사용자 정의 영역 U+E000–F8FF — 폰에서 네모) · 대체 문자(U+FFFD — 이모지가 깨진 것) · 폭 0 공백·소프트 하이픈 · 제어 문자
+   · OCR 이 주소를 깨뜨린 괄호 `(//“\6401510.0ㅁ.<0)` — 역슬래시가 든 「/로 시작하는 괄호」만 걷는다(진짜 주소는 모르니 지어내지 않는다 · 원칙 8-1).
+   🔴 주소 칸(url·href·link·file·path·thumb·img·id)은 건드리지 않는다 — 주소의 & 기호는 decodeUrlEntities 한 곳의 몫이다.
+   🔴 지우기·기호 되돌리기만 한다(글자를 더하지 않는다). 관문 「깨진 글자 씻기」. */
+const JUNK_CHARS = /[\uE000-\uF8FF\uFFFD\u200B\u200C\u2060\uFEFF\u00AD\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
+const OCR_URL_GARBLE = /\s*\(\s*\/[^()가-힣]*\\[^()]*\)/g;
+const TIDY_SKIP_KEY = /(?:urls?|href|link|file|path|thumb|img|image|hash|home|src|page|^id)$/i;   // home(층2 재단 홈페이지)·src·page(학교 사진)·avoidUrls 도 주소(리뷰 2026-11-17)
+/* OCR 이 동그라미 숫자(①②)를 @·저작권·등록상표 기호(U+00A9·U+00AE)로 읽은 글머리와 표의 세로줄(|·ㅣ) — 자격·서류·발췌·안내 칸에서만 걷는다(리뷰 2026-11-17 · 「@)-1 주민등록초본」·「|@ 자기소개서」·「(저작권 기호) 학자금 지원구간 통지서」).
+   🔴 이메일(abc@x.kr)의 @ 는 앞뒤가 글자라 안 걸린다 · 다른 칸(제목·이름)은 건드리지 않는다 */
+const OCR_TEXT_KEY = /^(?:documents|eligibilityLines|eligibilityExcludes|eligibilityPriority|excerpts|noticeLines|text)$/;
+const OCR_MARK = /(^|[\s|(\[ㅣ])[@\u00A9\u00AE]\)?(?:-?\d)?(?=\s|$)/g;
+function tidyOcr(t) {
+  return t.replace(OCR_MARK, '$1').replace(/^[\s|ㅣ_]+/, '').replace(/[\s|ㅣ_]+$/, '').replace(/\s*\|\s*\|\s*/g, ' | ').replace(/([^ \t]) {2,}(?=\S)/g, '$1 ');
+}
+function tidyText(s, key = '') {
+  const t = unent(s).replace(/(\S)[\uE000-\uF8FF]+(?=\S)/g, '$1 ')   // 단어 사이에 끼인 HWP 기호(「이미지·상징성」의 가운뎃점 자리)는 빈칸으로 — 지우면 두 낱말이 붙는다(리뷰 2026-11-17)
+    .replace(JUNK_CHARS, '').replace(OCR_URL_GARBLE, '').replace(/^[ \t]+/, '')
+    .replace(/[(（]\s*([월화수목금토일])\s*[)）]/g, '($1)')
+    .replace(/([^ \t]) {2,}(?=\S)/g, "$1 ");
+  return OCR_TEXT_KEY.test(key) ? tidyOcr(t) : t;   // 요일 괄호 안 빈칸(「11. 17.(화 )」) · 폭 0 공백을 지운 자리의 겹친 빈칸(「유형 Ⅱ  장학금」) — 2026-11-17 · 이모지 잇개(U+200D)는 지우지 않는다(사람+학사모 같은 합친 이모지가 쪼개진다)
+}
+function tidyData(v, key = '') {
+  if (typeof v === 'string') return TIDY_SKIP_KEY.test(key) ? v : tidyText(v, key);
+  if (Array.isArray(v)) { for (let i = 0; i < v.length; i += 1) v[i] = tidyData(v[i], key); return v; }
+  if (v && typeof v === 'object') { for (const k of Object.keys(v)) v[k] = tidyData(v[k], k); return v; }
+  return v;
 }
 /* 이미 저장된 기간 한 줄의 끝에 반쯤 잘린 기호(`16:00 &n`)가 남은 것 — 로봇은 이제 기호를 풀고 자르지만(collector/deadline-hint.mjs) 실린 글에 남아 있다(소급 · 관문이 같은 꼴을 대조) */
 const PARTIAL_ENTITY_END = /&(?:[a-z]{1,7}|#\d{0,6}|#x[0-9a-f]{0,5})?$/;
@@ -1636,8 +1673,10 @@ function fillInterestFields(selected) {
 }
 
 function collectProfile() {
-  const gpaRaw = $('#in-gpa').value.trim();
-  const gpa = gpaRaw === '' ? null : Math.min(4.5, Math.max(0, parseFloat(gpaRaw)));
+  /* 🔴 범위 밖 값을 **깎지 않는다** (2026-11-17 · HDJ-요청-2026-001 후속). 예전엔 평점 999 를
+     말없이 4.5 로 바꿔 저장해 학생 모르게 만점 학생이 됐다(지어낸 값). 지금은 칠 때부터 막고
+     (input-guard.js), 혹시 새어 들어와도 여기서는 null(모름)로 둔다 — 고쳐 넣지 않는다. */
+  const guardedNum = (sel, key) => { const r = checkNumber($(sel).value, PROFILE_LIMITS[key]); return r.ok ? r.value : null; };
   const bracketRaw = $('#in-bracket').value;
   return {
     name: $('#in-name').value.trim(),
@@ -1646,7 +1685,7 @@ function collectProfile() {
     major: $('#in-major').value.trim(),
     year: Number(getChip('#in-year')),
     status: getChip('#in-status'),
-    gpa: Number.isNaN(gpa) ? null : gpa,
+    gpa: guardedNum('#in-gpa', 'gpa'),
     bracket: bracketRaw === '' ? null : Number(bracketRaw),
     campus: $('#campus-field').hidden ? '' : (getChip('#in-campus') || ''),
     /* 적합도 판정에 쓰는 값들 — 자격 요건의 37%(학적상태)·9%(학점)·7%(거주지)를 연다.
@@ -1659,8 +1698,8 @@ function collectProfile() {
     parentRegion: $('#in-parent-region').value || null,
     parentRegionCity: $('#in-parent-region-city').value || null,
     nationality: $('#in-nationality').value || null,
-    credits: $('#in-credits').value.trim() === '' ? null : Number($('#in-credits').value),
-    birthYear: $('#in-birth-year').value.trim() === '' ? null : Number($('#in-birth-year').value),
+    credits: guardedNum('#in-credits', 'credits'),
+    birthYear: guardedNum('#in-birth-year', 'birthYear'),
     flags: $$('#in-flags input:checked').map((c) => c.value),
     /* 🔴 **처지(traits) 는 이 화면에 칸이 없다 — 그래서 그대로 물려받는다** (2026-09-18 코드
        리뷰). 학적정보 수정은 이 객체를 **통째로 새로 만들어** 프로필에 넣으므로, 여기 안
@@ -1724,6 +1763,11 @@ function fitTone(pct) {
   if (pct >= 20) return 'orange';
   return 'red';
 }
+/* 어긋난 요건이 없는 공고의 색 — 빨강·주황(경고색)은 미달에만 쓴다 (2026-11-15). 낮은 퍼센트는 노랑까지만 */
+function fitToneNoFail(pct) {
+  const t = fitTone(pct);
+  return t === 'red' || t === 'orange' ? 'yellow' : t;
+}
 
 /* 🔴 '미달인가'를 정하는 **단 한 곳** (2026-08-29 신설).
    배지는 여기를 보고, 목록 정렬도 여기를 본다. 예전에는 배지가 `fd.fails` 로,
@@ -1751,7 +1795,9 @@ function fitBadgeHtml(fit, fd, { full = false } = {}) {
      `eligibilityLines`만 읽어 구조화된 자격(flagsAny·tracks)을 못 봐서 '자격 미확인'이 떴다
      (2026-08-26 정렬 검증에서 발견). 미달을 모른다고 말하면 학생이 헛걸음한다. */
   const verdict = fitVerdict(fit, fd);
-  if (verdict === 'unread') return '<span class="badge badge-fit-unknown">자격 미확인</span>';
+  /* 🔴 자격을 못 읽었으면 **배지를 안 그린다** (2026-11-15 · 개발자 결정 11-02 — 예전 「자격 미확인」).
+     빈 글자를 돌려준다 — 이 갈래의 퍼센트(FIT_UNREAD 35%)는 정렬용이라 화면에 새면 지어낸 숫자가 된다. 순서(fitRank)는 그대로 아래다 */
+  if (verdict === 'unread') return '';
   if (verdict === 'no') return '<span class="badge badge-fit-no">지원 자격 미달</span>';
   /* 🔴 미달은 **숫자가 아니라 fails로** 판정한다 (2026-08-24). 0%를 안 쓰기로 하면서
      `pct === 0`이 영영 참이 되지 않아 '지원 자격 미달' 배지가 통째로 사라졌었다.
@@ -1771,9 +1817,17 @@ function fitBadgeHtml(fit, fd, { full = false } = {}) {
         `요건 6개 중 3개 충족 · 확인 필요 3`을 그대로 낸다.
      ⚠️ 색(fit-*)만으로 뜻을 전하지 않는다 — 퍼센트 숫자가 늘 함께 간다
         (색각 이상이 있는 학생에게 색은 아무 말도 하지 않는다). */
-  if (!full) return `<span class="badge badge-fit fit-${fitTone(fd.pct)}">적합도 ${fd.pct}%</span>`;
-  const note = fd.unknown > 0 ? ` · 확인 필요 ${fd.unknown}` : '';
-  return `<span class="badge badge-fit fit-${fitTone(fd.pct)}">적합도 ${fd.pct}% <em>요건 ${fd.total}개 중 ${fd.met}개 충족${note}</em></span>`;
+  /* 🔴 어긋난 요건이 없으면(여기 오는 것은 늘 그렇다 — 미달은 위에서 빠졌다) 빨강·주황을 쓰지 않는다 (2026-11-15) —
+     판정 못 한 요건이 분모에 있어 퍼센트가 낮을 뿐인데 경고색이면 '안 맞는다'로 읽힌다(틀린 미달처럼 보인다) */
+  const tone = fitToneNoFail(fd.pct);
+  if (!full) return `<span class="badge badge-fit fit-${tone}">적합도 ${fd.pct}%</span>`;
+  /* 상세 — 「적합도 n% · 맞는 요건 M개」 (2026-11-15 · 예전 「요건 n개 중 m개 충족 · 확인 필요 k」).
+     판정 못 한 요건 수는 말하지 않는다(개발자 결정 11-02) — 그 줄들은 표시 없이 목록에 그대로 있다(eligibilityRowsHtml).
+     🔴 「어긋난 요건 없음」은 **요건을 전부 판정했을 때만**(fd.unknown === 0 · 2026-11-16 리뷰) — 판정 못 한 줄이 있는데 이 말을 하면
+        모르는 줄까지 '괜찮다'고 단정하는 틀린 안심이 된다. 모르는 줄이 있으면 **확인한 것만** 말한다(맞는 요건 M개 · 0개면 퍼센트만) */
+  const judgedAll = !(fd.unknown > 0);
+  const why = judgedAll ? `${fd.met > 0 ? `맞는 요건 ${fd.met}개 · ` : ''}어긋난 요건 없음` : (fd.met > 0 ? `맞는 요건 ${fd.met}개` : '');
+  return `<span class="badge badge-fit fit-${tone}">적합도 ${fd.pct}%${why ? ` <em>${why}</em>` : ''}</span>`;
 }
 
 /* 카드에 붙는 판정은 **하나뿐**이다 (2026-09-10 페이스리프트).
@@ -1794,17 +1848,16 @@ function cardBadgeHtml(fit, fd, myApp, sch) {
       : '<span class="badge badge-applied">신청 완료</span>');
   const v = fitVerdict(fit, fd);
   if (v === 'no') return '<span class="badge badge-fit-no">지원 자격 미달</span>';
-  if (v === 'unread') return '<span class="badge badge-fit-unknown">자격 미확인</span>';
+  if (v === 'unread') return '';   // 자격을 못 읽었으면 카드 알약도 없다(2026-11-15 · fitBadgeHtml 과 같은 규칙)
   /* 퍼센트 — 2026-08-31 개발자 지시('요건 없애고 퍼센테이지로')대로 숫자만.
      2026-09-10 페이스리프트가 이것을 알약이 아닌 **글자**로 낮췄는데(다섯 장 연속 같은 알약이
      제목보다 먼저 읽혔다), **2026-09-11 개발자 지시로 다시 알약**이 됐다 — "옅은 회색으로 잘
      보이지 않음". 모양은 style.css 파일 끝 '적합도 알약' 절이 정한다(여기 클래스 이름은 그대로). */
-  return fd ? '<span class="sch-fit fit-' + fitTone(fd.pct) + '">적합도 ' + fd.pct + '%</span>' : '';
+  return fd ? '<span class="sch-fit fit-' + fitToneNoFail(fd.pct) + '">적합도 ' + fd.pct + '%</span>' : '';
 }
 
 /* ---------------- 카드 렌더링 ---------------- */
 function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
-  const meta = STATUS_META[result.status];
   const d = dday(sch.deadline);
   /* 🔴 **'담았다'와 '다 했다'를 가른다** (2026-09-10 코드 리뷰에서 잡았다).
      예전에는 신청내역에 있기만 하면 '신청 완료' 배지를 달았다. 그런데 '한 번에 신청 준비'로
@@ -1824,8 +1877,9 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
      '등록금 실납부액에 따라 차등지급 자세한 사항은 첨부파일 또는 홈페이지 참…'(잘린 본문).
      이런 줄을 굵게 쓰면 카드가 확정되지 않은 금액을 확정된 것처럼 말한다.
      그래서 **짧고 숫자가 있는 것만** 굵게 쓴다. 나머지는 지우지 않고 옅게 남긴다(원칙 8-1). */
-  /* 시안 B (2026-11-02) — 윗줄은 칩(장학 · 교내/교외) + 주최(알 때만) + 알약 · 핵심 한 줄은 「금액 · …」(amountLine 한 곳 · 모르면 줄 없음) */
-  const amt = amountLine(sch);
+  /* 시안 B (2026-11-02) — 윗줄은 칩(장학 · 교내/교외) + 주최(알 때만) + 알약.
+     🔴 아랫줄 왼쪽의 회색 「금액 · …」 줄은 뺐다 (2026-11-15 개발자 지시 "회색으로 금액 뜨는거 빼라 … 장학금이랑 대외활동 다 같이 말하는거야" —
+     같은 날 활동 카드의 「대상 · …」 줄을 뺀 것과 한 짝이다). 금액은 시트 머리(amountLine)가 그대로 말한다 */
   return cardShellHtml({
     save: saveBtnHtml(sch.id),
     attrs: `data-detail="${sch.id}"`,
@@ -1833,8 +1887,8 @@ function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
     org: cardProviderLine(sch),
     badge,
     name: cardTitleParts(sch).title,
-    foot: amt.text,
-    footKnown: amt.known,
+    foot: '',
+    footKnown: false,
     due,
     urgent: !sch.program && d.days >= 0 && d.days <= 7,
     link: cardSrcLinkHtml(sch, 'detail'),   // 원문 아이콘 — 활동 카드와 같은 자리·같은 모양(2026-10-28)
@@ -2450,7 +2504,7 @@ function generateEssay(def, sch, p, ans, extra) {
     );
   } else if (def.kind === 'plan') {
     paras.push(
-      `[학업 계획]\n${sch.period} 동안 ${ans.goal}. ${gpaTxt ? '현재 ' + gpaTxt + '을 바탕으로 학점 관리도 병행하겠습니다.' : ''}`,
+      `[학업 계획]\n${knownValue(sch.period) ? knownValue(sch.period) + ' 동안 ' : ''}${ans.goal}. ${gpaTxt ? '현재 ' + gpaTxt + '을 바탕으로 학점 관리도 병행하겠습니다.' : ''}`,
       `[진로 계획]\n중장기적으로는 ${ans.career}을(를) 목표로 하고 있습니다. 이번 학기의 계획은 그 목표로 가는 구체적인 발판입니다.`,
       `[장학금 활용]\n지원받는 장학금은 학업 관련 비용에 우선 사용하여 계획 실행에 온전히 집중하겠습니다.`
     );
@@ -2682,13 +2736,14 @@ function renderFormFill(restore) {
       const existing = state.applications.find((a) => a.id === sch.id);
       if (existing) { existing.pending = false; existing.formAns = formFill.ans; existing.appliedAt = nowStamp(); }
       else state.applications.push({ id: sch.id, name: sch.name, appliedAt: nowStamp(), step: 0, formAns: formFill.ans, pending: false, prep: {} });
+    if (typeof trackUse === 'function') trackUse('prep', sch.id);
       saveState();
       const ch = officialChannel(sch);
       /* 문서의 성격대로 말한다 (리뷰 2026-10-13) — 모르는 공고에 '양식·입력 칸이 있다'고 단정하지 않는다 */
       toast(!tpl.unofficial || tpl.prepKind === 'free'
         ? `양식 작성 완료 · 문서를 저장해 ${ch.label}에 제출하세요`
         : tpl.prepKind === 'unknown'
-          ? '지원문서 작성 완료 · 제출 양식·방법은 원문에서 확인한 뒤 내용을 옮기세요'
+          ? `지원문서 작성 완료 · 내용을 ${ch.label}의 접수 방법에 맞춰 옮겨 제출하세요`
           : `지원문서 작성 완료 · 내용을 ${ch.label}의 양식·입력 칸에 옮겨 제출하세요`);
       formFill = null;
       formProgressClear();   /* 신청내역에 정식으로 들어갔으니 '쓰던 것' 표시를 지운다 */
@@ -2773,7 +2828,7 @@ function loadNotices() {
   const files = (typeof noticeFilesForProfile === 'function' && p) ? noticeFilesForProfile(p) : [];
   const wanted = files.join(',');
   noticeFilesWanted = wanted;
-  const get = (u) => fetch(u, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  const get = (u) => fetch(u, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((d) => tidyData(d)).catch(() => null);   // 깨진 글자 씻기(2026-11-17)
   /* ⚠️ 색인은 학교별 파일과 **나란히** 부른다 — 먼저 받고 나서 부르면 공고가 있는 학생에게
      왕복이 한 번 더 늘어(모바일에서 눈에 보인다) 아낀 것보다 손해다. */
   const job = files.length
@@ -3076,11 +3131,14 @@ function loadRegistered() {
   return Promise.all([
     fetch('data/registered.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)),
     linkChecksWait(),
+    /* 유료 카드 읽기 결과(2026-11-15) — 못 받으면 null 이고 그때는 무료 길 값 그대로다(비상망). 받기 실패가 공고 목록을 막지 않는다 */
+    fetch('data/card-read.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
   ])
-    .then(([d]) => {
+    .then(([d, , cardRead]) => {
+      tidyData(d); tidyData(cardRead);   // 깨진 글자 씻기(2026-11-17) — 받는 순간 한 번
       if (!d) { if (appsData.registered !== 'ok') appsData.registered = 'fail'; return; }   // 한 번 받았으면 다시 받기 실패에도 'ok'(목록은 메모리에 그대로)
       appsData.registered = 'ok';
-      registeredList = d.items || [];
+      registeredList = typeof applyCardRead === 'function' ? applyCardRead(d.items || [], cardRead) : (d.items || []);   // match-engine.js — 알림도 같은 함수로 얹는다
       regUpdatedAt = d.updatedAt || '';
       dataFetchedAt = new Date();
       attachPrepTemplates(registeredList);
@@ -3095,6 +3153,7 @@ function loadKosaf() {
   return fetch('data/kosaf-open.json', { cache: 'no-store' })
     .then((r) => (r.ok ? r.json() : null))
     .then((d) => {
+      tidyData(d);   // 깨진 글자 씻기(2026-11-17)
       if (!d) { if (appsData.kosaf !== 'ok') appsData.kosaf = 'fail'; rerenderVisible(); return; }   // 다시 받기 실패에 받아 둔 목록을 비우지 않는다
       appsData.kosaf = 'ok';
       kosafList = d.items || [];
@@ -3155,6 +3214,15 @@ const KOSAF_NOISE = /제한없음|^(?:기관\s?확인\s?필요|해당\s?없음)[
    🔴 이 한 줄을 kosafAsScholarships·verify/eligibility-coverage.mjs·what-shows 가 같이 쓴다 (2026-11-11 · 6차) — 집계 도구가 따로 쪼갰더니(`○` 와 줄바꿈만)
    `※` 꼬리가 앞 줄에 붙어 **앱에 없는 줄**을 '못 읽는 줄'로 세고 있었다(`외국대학/사이버대학/대학원 학생 자세한 사항은 …`). 한 줄로 둘 것 · 도구가 글자로 읽는다 */
 const kosafSplit = (t) => String(t || '').split(/\s*[○ㅇ※]\s*/).map((x) => kosafClean(x)).filter((x) => x.length >= 4 && !KOSAF_NOISE.test(x));
+
+/* 층2 「공고 안내」 칸 값 (2026-11-15 · 개발자 결정 11-02) — 재단이 적어 둔 '모름' 표시(`기관확인필요`·`대학 확인 필요`·`… 각 대학 홈페이지 확인 필요`)는 화면에 싣지 않는다.
+   🔴 **칸째 뺀다 — 자르지 않는다** (2026-11-16 2차 리뷰 · 원칙 8-1) — 예전엔 「확인 필요」 로 끝나는 마디(앞 세 낱말까지)를 떼어
+      「※ 학교마다 선발인원 상이하므로 각 대학 홈페이지 확인 필요」 → 「학교마다 선발인원 상이하므로」(실데이터 2700058001)처럼 끊긴 글을 「이름표: 값」 원문으로 보였다.
+      머리 기호(○·※)만 떼고(kosafClean · 서식) 나머지는 재단이 쓴 그대로 · 낱말 판정은 knownValue 와 같은 SAYS_UNKNOWN 한 곳 */
+function kosafNoticeValue(v) {
+  const t = kosafClean(v);
+  return !t || KOSAF_NOISE.test(t) ? '' : knownValue(t);
+}
 
 /* 카드·시트에 보이는 **혜택 한 줄**. 원문 문단을 통째로 띄우지 않는다 —
    금액은 이미 parse-amount 가 읽어 뒀으니 그 숫자로 짧게 말하고, 조건은 상세 칸에서 본다.
@@ -3231,7 +3299,7 @@ function kosafAsScholarships() {
         ...(aExcl && aExcl.kind ? { exclusivity: aExcl } : {}),
         deadline: i.due || null,
         listedAt: (kosafUpdatedAt || '').slice(0, 10) || null,   // 마감 미상일 때 60일 규칙이 걸리게
-        period: i.due ? `접수 ~${i.due}` : (kosafClean(f['신청기간']) || '접수 기간 원문 확인'),
+        period: i.due ? `접수 ~${i.due}` : (kosafClean(f['신청기간']) || ''),   // 모르면 비운다(2026-11-15 · 예전 '접수 기간 원문 확인' — 「접수」 절이 기간 줄을 안 그린다)
         summary: `${i.org} — 한국장학재단 등록 장학금.`,
         eligibility: { selective: true },     // 구조화된 조건이 없으니 판정하지 않는다(=unknown)
         ...(lines.length ? { eligibilityLines: lines } : {}),
@@ -3260,7 +3328,7 @@ function kosafAsScholarships() {
            자격 판정을 못 붙이는 대신 재단이 쓴 것을 그대로 옮긴다 — 해석하지 않는다. */
         ...(kosafClean(f['선발인원']) ? { headcount: kosafClean(f['선발인원']) } : {}),
         /* 재단 칸 중 자격·서류·금액·문의 밖의 것(선발방법·선발인원·추천필요여부)은 「공고 안내」 줄로 — 「이름표: 값」 원문 그대로(승인 시안 2026-11-02) · 「해당없음」은 말이 없다 */
-        noticeLines: ['선발방법', '선발인원', '추천필요여부'].map((k) => [k, kosafClean(f[k])]).filter(([, v]) => v && !/해당\s*없음/.test(v)).map(([k, v]) => `${k}: ${v}`),
+        noticeLines: ['선발방법', '선발인원', '추천필요여부'].map((k) => [k, kosafNoticeValue(f[k])]).filter(([, v]) => v && !/해당\s*없음/.test(v)).map(([k, v]) => `${k}: ${v}`),
       };
     })
     /* 층2에도 앱 지원문서 (2026-10-13 ① · 개발자 "남은 것 모두 진행") — 머리말은 forms.js prepKindFor 의 'kosaf'(재단 접수 방법은 공고문 확인) */
@@ -3291,7 +3359,9 @@ function liveNoticesHead(updatedAt) {
 /* '이 주소는 이미 정식 등록됐나' — 학교 게시판 구역과 재단·지자체 구역이 **같은 잣대**를 쓴다 (2026-09-26 분리).
    URL 뒤에 목록 파라미터가 붙는 경우가 있어 전방일치로 비교한다. */
 function registeredUrlMatcher() {
-  const regUrls = registeredList.map((s) => s.sourceUrl)
+  /* 카드로 안 그리는 정식 공고(feedOnlyFormal — 기한·자격을 다 모름)의 주소는 빼지 않는다 — 그 글은 게시판 새 공고로 보여야 한다(2026-11-15 결정 1) */
+  const p = state.profile;
+  const regUrls = registeredList.filter((s) => !feedOnlyFormal(s, p)).map((s) => s.sourceUrl)
     .concat(NATIONAL_SCHOLARSHIPS.filter((s) => s.sourceKind === 'official' && s.sourceUrl).map((s) => s.sourceUrl))
     .filter(Boolean);
   return (url) => regUrls.some((u) => url.startsWith(u) || u.startsWith(url));
@@ -3304,7 +3374,11 @@ function boardNoticesForMe() {
   // URL 뒤에 목록 파라미터가 붙는 경우가 있어 전방일치로 비교한다
   const isRegistered = registeredUrlMatcher();
   /* 내 학교 공고인지는 match-engine이 정한다 — 알림(notify-rules)도 같은 함수를 쓴다 */
-  const forMe = (liveNotices.items || []).filter((n) => noticeForProfile(n, p) && !isRegistered(n.url));
+  const fromFeed = (liveNotices.items || []).filter((n) => noticeForProfile(n, p) && !isRegistered(n.url));
+  /* 카드로 안 그리는 정식 공고(feedOnlyFormal — 기한·자격을 다 모름 · 2026-11-15 결정 1)가 이 학교 게시판 글에 없으면(다른 게시판에서 온 공고) 여기 한 줄로 싣는다.
+     🔴 판정은 match-engine feedOnlyBoardRows 한 곳 — 알림(notify-rules 「4. 실시간 공고」)도 같은 함수에 같은 목록(allScholarships — notify.js 가 넘기는 것)을 넘긴다 */
+  const demoted = feedOnlyBoardRows(allScholarships(), fromFeed, p);
+  const forMe = fromFeed.concat(demoted);
   /* 학자금 대출·융자는 장학금이 아니라서 매칭 카드로는 만들지 않는다(정직 원칙).
      그렇다고 피드에서까지 밀려 잘리면 학생이 대출 정보를 아예 볼 곳이 없어지므로,
      장학 공고를 앞에 두되 대출 공고는 뒤에 둔다 (2026-07-30 조정). */
@@ -3486,6 +3560,7 @@ function loadActivities() {
     .then((r) => (r.ok ? r.json() : null))
     .catch(() => null)
     .then((d) => {
+      tidyData(d);   // 깨진 글자 씻기(2026-11-17)
       liveActivities = d || liveActivities || { items: [], updatedAt: null };
       refreshActivitySnaps();
       fillInterestFields();   // 온보딩 관심 분야 칸 — 목록이 이제 왔다(고른 것은 지킨다)
@@ -3549,6 +3624,53 @@ function renderActivityGate() {
   $$('#in-act-kinds input').forEach((cb) => (cb.checked = (p.interestKinds || []).includes(cb.value)));
   fillInterestFields(p.interestFields || []);
   $('#act-gate-cancel').hidden = !actGateEditing;
+  /* 「내 정보」 — 장학금 학적정보에서 온 한 줄(학교·학년·학적) + 활동 글이 묻는 칸들 */
+  $('#act-gate-me').textContent = [[p.school, p.campus].filter(Boolean).join(' '), p.year ? p.year + '학년' : '', p.status].filter(Boolean).join(' · ');
+  drawActivityAsk(true);
+}
+
+/* ── 대외활동 관문 「내 정보」 (2026-11-15 개발자 지시 — "장학금 학적정보 입력이 대외활동 적합도·자격요건 매칭에 연동되게 ·
+   정보 입력 다각화 … 장학금과 연동") ──
+   활동 카드의 적합도는 처음부터 장학금과 **같은 프로필·같은 엔진**(activityFit → evaluateFor)으로 잰다. 다만 관문이 종류·분야 둘만 물어
+   그 사실이 안 보였고, 활동 글이 자주 묻는 칸(태어난 해·거주지·봉사 실적…)이 비어 있으면 그 줄은 판정되지 않았다.
+   그래서 관문이 **지금 보이는 활동 글의 자격 줄이 실제로 쓰는 학적정보 칸**을 같이 보이고 받는다 — 저장하는 곳은 장학금과 같은 프로필 칸이다
+   (birthYear·region·traits… · 새 칸을 만들지 않는다 → 여기서 적으면 장학금 적합도에도, 학적정보에서 적으면 여기에도 쓰인다).
+   🔴 칸 목록을 손으로 적지 않는다 — 공고 안 「미확인 자격」과 같은 탐침(elig-ask askableForSch)을 **묻는 칸을 비운 프로필**로 돌려 센다.
+      글이 바뀌면 묻는 칸도 저절로 바뀐다. 한 곳만 쓰는 칸(혜택 줄에 걸린 낱말 같은 잡음)은 안 묻는다(ACT_ASK_MIN).
+   🔴 처지(예/아니요)는 여기서 안 묻는다 (2026-11-15 리뷰) — 활동 글은 혜택·태그 줄(「1365 자원봉사시간 부여」·「#공모전」)이 처지 요건으로 읽히는 잡음이 있어
+      「아니요」가 틀린 미달을 만든다. 처지는 공고 안 「미확인 자격」과 온보딩이 묻는다.
+   🔴 줄마다 조건 종류가 읽는 칸만 찔러 본다(elig-ask probeKeysFor) — 전부 찔러 보면 화면이 몇 초 멈춘다(리뷰 실측).
+   ponytail(옛 메모): 관문을 그릴 때 한 번 (보이는 글 × 자격 줄 × 칸) 탐침 — 글 100건에 1만 번 안팎. 글이 천 건대로 늘면 수집 로봇이 세어 싣는 쪽으로 옮긴다. */
+const ACT_ASK_MIN = 2;
+let actAskMemo = null;   // { src, who, keys } — 같은 글 목록·같은 학적(묻는 칸을 비운 프로필)이면 다시 세지 않는다
+function activityAskKeys() {
+  const p = state.profile;
+  if (!p || !liveActivities || typeof askableFields !== 'function') return [];
+  const blank = Object.assign({}, p, { traits: {} });
+  Object.keys(FIELD_PROBE).forEach((k) => { blank[k] = null; });
+  const who = JSON.stringify(blank);
+  if (actAskMemo && actAskMemo.src === liveActivities && actAskMemo.who === who) return actAskMemo.keys;
+  const n = new Map();
+  for (const it of activitiesForMe()) {
+    const sch = activityAsSch(it);
+    const hit = new Set();
+    for (const line of sch.eligibilityLines) {
+      const only = probeKeysFor(line);
+      askableFields(line, blank, sch, only ? only.filter((k) => k.indexOf('trait:') !== 0) : Object.keys(FIELD_PROBE)).forEach((k) => hit.add(k));
+    }
+    hit.forEach((k) => n.set(k, (n.get(k) || 0) + 1));
+  }
+  const keys = [...n.entries()].filter(([k, c]) => c >= ACT_ASK_MIN && k.indexOf('trait:') !== 0).sort((a, b) => b[1] - a[1]).map(([k]) => k);
+  actAskMemo = { src: liveActivities, who, keys };
+  return keys;
+}
+/* force 없이 부르면 **빈 칸일 때만** 그린다 — 글 목록이 뒤늦게 와도 학생이 적던 값을 지우지 않는다(fillInterestFields 와 같은 규칙) */
+function drawActivityAsk(force) {
+  const box = $('#act-gate-ask');
+  if (!box || (!force && box.children.length)) return;
+  box.innerHTML = eligAskRowsHtml(activityAskKeys());
+  box.hidden = !box.children.length;
+  eligAskWireTraits(box);
 }
 /* 관문이 열리면 목록·칩·검색·정렬을 감춘다 — 관문을 지나기 전에는 쓸 수 없다(지시 4) */
 function activityGateShow(on) {
@@ -3566,8 +3688,10 @@ function saveActivityGate() {
   const kinds = $$('#in-act-kinds input:checked').map((c) => c.value);
   if (!kinds.length) { toast('종류를 하나 이상 골라 주세요'); return; }
   const fields = $$('#in-act-fields input:checked').map((c) => c.value);
+  if ($('#act-gate-ask') && !guardStepOk($('#act-gate-ask'))) return;   // 「내 정보」 칸에 다 못 친 값
   state.profile.interestKinds = kinds;
   state.profile.interestFields = fields.length ? fields : null;
+  eligAskCollect($('#act-gate-ask'));   // 「내 정보」 — 장학금과 같은 프로필 칸에 적는다(2026-11-15)
   saveState();
   actGateEditing = false;
   renderActivities();
@@ -3583,7 +3707,7 @@ function renderActivities() {
   activityGateShow(gateOn);
   if (gateOn) {
     if (!actGateDrawn) { renderActivityGate(); actGateDrawn = true; }
-    else fillInterestFields();   // 분야 목록이 뒤늦게 와도 고른 것은 지킨다(인자 없이 = 체크 유지)
+    else { fillInterestFields(); drawActivityAsk(); }   // 분야 목록·묻는 칸이 뒤늦게 와도 고른 것은 지킨다(인자 없이 = 체크 유지)
     return;
   }
   actGateDrawn = false;
@@ -3693,9 +3817,9 @@ function activityFit(n) {
 function activityCardHtml(n) {
   const m = activityFit(n);
   const d = n.deadline ? dday(n.deadline) : null;
-  /* 시안 B (2026-11-02) — 윗줄은 칩(봉사·대외활동·공모전·청년정책) + 주최 · 핵심 한 줄은 「대상 · …」(제목에서 뗀 괄호 + 발췌 대상) · 혜택·분야 줄은 시트로 */
+  /* 2026-11-15 개발자 결정("밑에 대상은 아예 빼버리고 시안 1로 · 간결하고 모던하게") — 윗줄 색 칩 + 주최 · 제목 · 아랫줄은 마감과 원문 아이콘뿐.
+     대상·혜택·분야는 시트가 말한다(제목에서 뗀 괄호 대상도 시트 「공고 안내」로 간다 — openActivityDetail) · 시안 docs/designs/mockups/activity-card-options.html */
   const parts = splitTitleWho(activityTitle(n));
-  const who = activityWhoLine(n, parts);
   return cardShellHtml({
     save: saveBtnHtml(`act:${n.url}`),   // 장학 카드와 같은 북마크(카드 바깥 · 2026-10-02)
     attrs: `data-activity="${esc(n.url)}"`,
@@ -3706,7 +3830,7 @@ function activityCardHtml(n) {
        아무 말도 안 하는 배지가 됐다. 장학 카드의 '자격 미확인'은 그대로다. ⚠️ 2026-11-07 부터 시트도 자격 0줄이면 「지원 자격」 칸을 안 그리므로(sheetSectionsHtml) 활동 글은 모른다는 사실을 어디서도 말하지 않는다 — 개발자 지시. */
     badge: fitVerdict(m.fit, m.fd) === 'unread' ? '' : cardBadgeHtml(m.fit, m.fd, null),
     name: parts.title,
-    foot: who ? `대상 · ${who}` : '',
+    foot: '',
     footKnown: false,
     due: d ? ddayWords(d) : '',
     urgent: !!d && d.days >= 0 && d.days <= 7,
@@ -3746,6 +3870,8 @@ function activityLinkHtml(n) {
 }
 
 function openActivityDetail(url) {
+  if (typeof trackUse === 'function') trackUse('detail', url);   // 이용 횟수 — 주소는 보내지 않고 지문으로(usage-report.js)
+  { const dsh = document.getElementById('detail-sheet'); if (dsh) dsh.dataset.useItem = url; }
   const n = activityItem(url);   // 피드에서 빠졌어도 저장해 둔 글이면 사본으로 연다
   if (!n) return;
   const { sch, result, fit, fd } = activityFit(n);
@@ -3754,7 +3880,8 @@ function openActivityDetail(url) {
   /* 「대상」 발췌는 자격 줄이 있으면 위 「지원 자격」이 이미 보여 준다 — 같은 A·B·C 조건이 「모집 안내」에 한 번 더 떴다(쇼미더임팩트 · 2026-10-16 개발자 지적) */
   const rows = (n.excerpts || []).filter((x) => x.label !== '혜택' && x.label !== '모집기간' && !(x.label === '대상' && (n.eligibilityLines || []).length));   // 모집기간은 「접수 · 기간」 줄이 말한다(승인 시안 2026-11-02)
   const parts = splitTitleWho(activityTitle(n));
-  const who = activityWhoLine(n, parts);
+  /* 제목에서 뗀 괄호 대상 — 카드에 대상 줄이 없어(2026-11-15) 여기가 그 글자가 남는 유일한 자리다. 자격 줄이 이미 같은 말을 하면 한 번만 */
+  const titleWho = parts.who.filter((w) => !(n.eligibilityLines || []).some((l) => String(l).replace(/\s/g, '').includes(w.replace(/\s/g, ''))));
   /* 「접수 · 기간」 — 발췌 모집기간(없으면 기간 토막 deadlineHint)을 그대로 넘긴다 · 날짜만 있는 글은 applySectionHtml 이 마감으로 말한다(리뷰 2026-11-02 · 9건이 「원문 확인」으로 떴다) */
   const recruit = ((n.excerpts || []).find((x) => x.label === '모집기간') || {}).text || (n.deadlineHint && !/window\.|dataLayer|function|\)\s*\)/.test(n.deadlineHint) ? hintText(n.deadlineHint) : '');
   if (recruit) sch.period = unent(recruit);
@@ -3764,7 +3891,8 @@ function openActivityDetail(url) {
   sheetBack = null;   // 이 시트에는 돌아갈 곳이 없다 — 내리면 닫힌다
   $('#detail-sheet').innerHTML = `
     <div class="sheet-handle"></div>
-    <div class="sheet-body">
+    <div class="sheet-body act-sheet">
+      ${/* act-sheet — 활동 시트만의 표식(2026-11-15 은서: 활동 시트는 목록 앞 점 없이 · 장학 시트는 그대로 — style.css) */ ''}
       ${/* 승인 시안(2026-11-02) — 장학 시트와 같은 머리줄·절 다섯(sheetSectionsHtml). 짧은 혜택은 금액 자리, 긴 혜택·활동기간·지역·원문 줄은 「공고 안내」, 모집기간은 「접수 · 기간」.
            단추는 검정 하나 — 이름은 source-link.js 의 activityButton 자리(글 하나로 가는 주소만 신청하기 · 목록·홈페이지는 그 이름 그대로 · 2026-10-03 원문 링크 정직성). */ ''}
       ${sheetHeadHtml({ x: n, d, save: saveBtnHtml(`act:${n.url}`) })}
@@ -3772,7 +3900,7 @@ function openActivityDetail(url) {
       ${benefit && benefit.length <= 40 ? `<p class="sheet-amount">${esc(benefit)}</p>` : ''}
       ${sheetSectionsHtml({ sch, result, fit, fd, activity: n, noticeLines: [
         ...(benefit && benefit.length > 40 ? [`혜택: ${benefit}`] : []),
-        ...(!(n.eligibilityLines || []).length && parts.who.length ? [`대상: ${parts.who.join(' · ')}`] : []),   // 제목에서 뗀 조각만 — 발췌 「대상」은 아래 rows 가 적는다(리뷰 2026-11-02)
+        ...(titleWho.length ? [`대상: ${titleWho.join(' · ')}`] : []),   // 제목에서 뗀 조각만 — 발췌 「대상」은 아래 rows 가 적는다(리뷰 2026-11-02)
         ...rows.map((x) => `${x.label}: ${unent(x.text)}`),
         ...notice,
       ] })}
@@ -3796,6 +3924,7 @@ function loadExternal() {
     .then((r) => (r.ok ? r.json() : null))
     .catch(() => null)
     .then((d) => {
+      tidyData(d);   // 깨진 글자 씻기(2026-11-17)
       liveExternal = d || liveExternal || { items: [], updatedAt: null };
       rerenderVisible();
     });
@@ -3874,7 +4003,7 @@ function loadNews() {
   const files = (typeof newsFilesForProfile === 'function' && p) ? newsFilesForProfile(p) : [];
   const wanted = files.join(',');
   newsFilesWanted = wanted;
-  const get = (u) => fetch(u, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  const get = (u) => fetch(u, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((d) => tidyData(d)).catch(() => null);   // 깨진 글자 씻기(2026-11-17)
   /* 학교 대표 사진 목록 — 소식을 받을 때 한 번(작은 파일 · 실패하면 다음 받기 때 다시). 소식보다 늦게 와도 다시 그린다 */
   if (files.length && !schoolPhotos) get('assets/schools/photos.json').then((d) => { if (d && d.schools && !schoolPhotos) { schoolPhotos = d; if (liveNews) rerenderVisible(); } });
   const job = files.length
@@ -4044,6 +4173,7 @@ function finalizeApply(sch, docs) {
     existing.appliedAt = nowStamp();
   } else {
     state.applications.push({ id: sch.id, name: sch.name, appliedAt: nowStamp(), step: 0, docs, pending: false, prep: {} });
+    if (typeof trackUse === 'function') trackUse('prep', sch.id);
   }
   saveState();
   const ch = officialChannel(sch);
@@ -4248,7 +4378,7 @@ function bulkTags(sch) {
       for (const c of (parseLine(line).conds || [])) bulkCondWords(c, L).forEach(add);
     }
   }
-  return out.length ? out.slice(0, BULK_TAG_MAX) : ['자격 원문 확인'];
+  return out.slice(0, BULK_TAG_MAX);   // 못 읽었으면 칩 없음(2026-11-15 · 예전 '자격 원문 확인')
 }
 
 /* 목록 한 줄. 겉은 넷(체크·제목·자격 단어·금액)이고 나머지는 <details> 안이다.
@@ -4256,7 +4386,8 @@ function bulkTags(sch) {
 function bulkRowHtml(sch) {
   const on = bulkPrep.ids.has(sch.id);
   const d = dday(sch.deadline);
-  const reqs = (typeof requirementLines === 'function' ? requirementLines(sch) : []).slice(0, 6);
+  /* 줄마다 택1 묶음의 머리 줄(`head` · 상세 시트와 같은 이름표)을 그 묶음 첫 줄 위에 — 요건 줄로 세지 않는다(2026-11-17) */
+  const reqs = (typeof requirementLines === 'function' ? requirementLines(sch, null, { withMeta: true }) : []).slice(0, 6);
   return `
     <div class="bulk-row${on ? '' : ' off'}" data-row="${esc(sch.id)}">
       <input type="checkbox" class="bulk-check" data-bulk="${esc(sch.id)}" ${on ? 'checked' : ''}
@@ -4264,24 +4395,22 @@ function bulkRowHtml(sch) {
       <div class="bulk-main">
         <p class="bulk-name">${esc(sch.name)}${bulkNeedsWork(sch) ? '<span class="badge badge-pending">서류 작성 필요</span>' : ''}</p>
         <p class="bulk-tags">${bulkTags(sch).map((x) => `<span class="chip-sm">${esc(x)}</span>`).join('')}</p>
-        <p class="bulk-amount">${esc(sch.amount || '금액 원문 확인')}</p>
+        ${amountLine(sch).text ? `<p class="bulk-amount">${esc(amountLine(sch).text.replace(/^금액 · /, ''))}</p>` : ''}${/* 모르는 금액은 줄 없음(2026-11-15 · amountLine 한 곳 · 예전 '금액 원문 확인') */ ''}
         <details class="bulk-more">
           <summary>더보기</summary>
           <div class="bulk-badges">
             <span class="badge badge-${sch.type === '교내' ? 'in' : 'out'}">${esc(sch.type)}</span>
-            ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : `<span class="badge badge-dday ${d.cls}">${d.label}</span>`}
+            ${sch.program ? '<span class="badge badge-program">상시 제도</span>' : (ddayWords(d) ? `<span class="badge badge-dday ${d.cls}">${esc(ddayWords(d))}</span>` : '')}
             ${/* 🔴 '자동 등록 · 검수 전' 배지를 뺐다 (2026-09-17 개발자 지시 — 내부 공정은
                  관리자에게만). 운영 원칙 2 의 '정직한 표시'는 **학생이 판단에 쓸 수 있는 것**을
                  감추지 말라는 뜻이고, 우리 검수 공정의 단계는 거기 해당하지 않는다.
                  세는 곳은 관리자 '오늘 할 일'의 검수 전 카드 둘이다(_admin/admin.js). */ ''}
           </div>
-          <p class="bulk-meta">${sch.deadline
-            ? `마감 ${esc(sch.deadline.replace(/-/g, '.'))}`
-            : '마감 기한 미확인 — 공고 원문에서 꼭 확인하세요'}</p>
+          ${sch.deadline ? `<p class="bulk-meta">마감 ${esc(sch.deadline.replace(/-/g, '.'))}</p>` : ''}${/* 마감을 모르면 줄 없음(2026-11-15) */ ''}
           <p class="bulk-meta">${esc(submitChannelLabel(sch))}</p>
           ${reqs.length
-            ? `<p class="bulk-meta-head">지원자격 (공고 원문)</p><ul class="bulk-reqs">${reqs.map((r) => `<li>${esc(r)}</li>`).join('')}</ul>`
-            : '<p class="bulk-meta">지원 자격은 공고 원문에서 확인하세요</p>'}
+            ? `<p class="bulk-meta-head">지원자격 (공고 원문)</p><ul class="bulk-reqs">${reqs.map((r) => `${r.head ? `<li class="r-pick">${esc(r.head)}</li>` : ''}<li>${esc(r.text)}</li>`).join('')}</ul>`
+            : ''}
         </details>
       </div>
     </div>`;
@@ -4311,7 +4440,7 @@ function estOpt(m, opt) {
 function amountDetailRow(m, opt) {
   const o = opt || {};
   const sch = m.ref, a = sch.amountSpec || null;
-  const val = o.text || (m.won ? won(m.won) : '금액 원문 확인');
+  const val = o.text || (m.won ? won(m.won) : '');   // 모르는 금액은 비운다(2026-11-15 · 예전 '금액 원문 확인' — 갈래 이름이 이미 그 사실을 말한다)
   /* 줄을 누르면 **그 공고의 상세 시트**가 뜬다 (2026-08-27 개발자 지시로 변경).
      처음엔 장학금 탭으로 옮겨 그 카드를 찾아 스크롤했는데, 카드를 못 찾으면(필터·정렬·
      마감 숨김) 아무 일도 안 일어난 것처럼 보였다. 지금은 찾아가지 않고 **바로 연다** —
@@ -4326,15 +4455,17 @@ function amountDetailRow(m, opt) {
      ⚠️ 순서를 뒤집지 말 것 — `esc()` 뒤에 되돌리면 `&amp;middot;` 가 돼 영영 안 풀린다.
      (2026-09-11 에 `n.title`·`n.deadlineHint` 에서 같은 사고가 있었다. 그때 관문은
       **칸 이름 두 개만** 보는 손 목록이라 이 자리를 못 잡았다 — 관문도 함께 넓혔다.) */
-  const raw = a && a.raw ? unent(a.raw) : '';
-  const exRaw = sch.exclusivity && sch.exclusivity.raw ? unent(sch.exclusivity.raw) : '';
+  /* 인용은 통째로 싣거나 통째로 뺀다 — '모름'류 낱말이 있는 원문·재단 글(「지원금액: ※ 기관확인필요」 · 「… 단, 소득분위 확인 필요」)은 따옴표 안에 싣지 않는다(knownValue · 2026-11-16 2차 리뷰 · 원칙 8-1).
+     자른 글을 원문이라며 보이면 조건이 사라진 문장이 된다 — 그때는 아래 원문 링크만 남는다 */
+  const raw = a && a.raw ? knownValue(unent(a.raw)) : '';
+  const exRaw = sch.exclusivity && sch.exclusivity.raw ? knownValue(unent(sch.exclusivity.raw)) : '';
   return `<div class="${cls}" data-goto="${esc(sch.id)}" role="button" tabindex="0">
     <div class="ad-top"><p class="ad-name">${esc(sch.name || '')}</p>
-      <p class="ad-val ${o.tone || ''}">${o.check ? '<span class="ad-chk">✓</span>' : ''}${esc(val)}</p></div>
+      ${val || o.check ? `<p class="ad-val ${o.tone || ''}">${o.check ? '<span class="ad-chk">✓</span>' : ''}${esc(val)}</p>` : ''}</div>
     ${o.note ? `<p class="ad-note">${esc(o.note)}</p>` : ''}
     ${merged ? `<details><summary>${esc(schoolOfNotice(m.mergedFrom[0]) || '다른 학교')} 외 ${merged}건</summary>
       <div class="ad-list"><span>같은 재단이 여러 학교에서 접수하는 공고. 1건으로 합산.</span>
-      ${[sch, ...m.mergedFrom].map((x) => `<span>${esc(x.provider || x.name || '')}</span>`).join('')}</div></details>` : ''}
+      ${[sch, ...m.mergedFrom].map((x) => `<span>${esc(providerUnknown(x.provider) ? (x.name || '') : x.provider)}</span>`).join('')}</div></details>` : ''}
     ${/* 층2는 우리가 읽은 공고 원문이 아니라 재단이 한국장학재단에 적어 둔 칸이다 — '원문'이라 부르지 않는다 (2026-10-03) */ ''}
     ${raw || exRaw ? `<details><summary>${sch.sourceKind === 'kosaf' ? '재단이 적어 둔 글' : '원문 보기'}</summary>
       <p class="ad-src">"${esc(raw || exRaw)}"<em>${esc(noticeSourceLabel(sch))}</em></p></details>`
@@ -4342,7 +4473,7 @@ function amountDetailRow(m, opt) {
        금액이 첨부파일이나 제목에만 있어 사람이 손으로 넣은 공고가 있다 — 화면에 금액이
        뜨는데 근거를 하나도 못 보여 주는 상태로 두면 안 된다(개발자 지적 2026-08-27).
        게시판 목록 주소인 공고는 '원문 공고'라고 쓰면 거짓말이라 라벨을 바꾼다. */
-    : (o.text || m.won ? amountSourceLinkHtml(sch) : '')}
+    : (o.text || m.won || o.srcLink ? amountSourceLinkHtml(sch) : '')}
   </div>`;
 }
 
@@ -4392,7 +4523,7 @@ function renderAmountDetail(keepScroll) {
         <p class="ad-total-amt">${bill.assumedWon > 0 ? '약' : '최대'} ${won(bill.total)}</p>
         <p class="ad-total-sub">${bill.assumedWon > 0
           ? `금액을 못 읽은 ${bill.assumed.length}건은 어림잡아 더함`
-          : `확인된 금액만 합산${bill.unknown.length ? ` · 미확인 ${bill.unknown.length}건 제외` : ''}`}</p>
+          : `금액을 읽은 공고만 합산${bill.unknown.length ? ` · 못 읽은 ${bill.unknown.length}건 제외` : ''}`}</p>
       </div>
       ${grp('합산', `${bill.added.length}건 · ${won(sum(bill.added))}`, '',
         bill.added.map((m) => amountDetailRow(m, estOpt(m, { tone: 'on' }))).join(''),
@@ -4409,16 +4540,17 @@ function renderAmountDetail(keepScroll) {
         '등록금 비율로 적힌 공고는 없어요')}
       ${/* 🔴 홈 히어로가 이 몫을 어림잡아 더하므로(2026-09-17 개발자 지시) 이 칸도 그렇게
            적어야 한다 — 합계에 넣어 놓고 '0원'이라고 적으면 두 숫자가 서로 다른 말을 한다.
-           🔴 줄마다의 금액은 여전히 '금액 원문 확인'이다: 어림잡은 것은 **합계 한 곳**이지
+           🔴 줄마다의 금액은 여전히 비어 있다(2026-11-15 · 예전 '금액 원문 확인'): 어림잡은 것은 **합계 한 곳**이지
               그 공고의 금액이 아니다(원칙 8-1 · parse-amount.js sumAmounts ④). */ ''}
-      ${grp('금액 미확인', bill.assumedWon > 0
+      ${/* 갈래 이름 '금액 미확인' → '금액을 못 읽은 공고' (2026-11-15 · 개발자 결정 11-02 '미확인'류 글자 없음 · 히어로 아랫줄 「금액을 못 읽은 n건」과 같은 말) */ ''}
+      ${grp('금액을 못 읽은 공고', bill.assumedWon > 0
           ? `${bill.unknown.length}건 · 어림 ${won(bill.assumedWon)}`
           : `${bill.unknown.length}건 · 0원`,
         bill.assumedWon > 0
           ? `원문에 금액이 없거나 첨부파일에만 있는 공고입니다. 이 중 ${bill.assumed.length}건은 위 합계에 한 건당 ${won(bill.assumedEach)}(확인된 공고들의 중앙값)으로 어림잡아 더했습니다 — 실제 금액과 다를 수 있습니다.`
           : '원문에 금액이 없거나 첨부파일에만 있는 공고입니다.',
         bill.unknown.length ? `<details><summary>공고 ${bill.unknown.length}건 보기</summary>
-          ${bill.unknown.map((m) => amountDetailRow(m, { dim: true, tone: 'off', text: '금액 원문 확인' })).join('')}</details>` : '',
+          ${bill.unknown.map((m) => amountDetailRow(m, { dim: true, tone: 'off', srcLink: true })).join('')}</details>` : '',
         '모든 공고의 금액을 확인했습니다.')}
       <p class="ad-foot">모든 금액은 공고 원문 기준입니다.<br>선발 결과에 따라 실제 수혜액은 달라질 수 있습니다.</p>
     </div>`;
@@ -4454,7 +4586,7 @@ function bulkRefresh() {
   /* 금액을 확인 못 한 공고는 합계에 넣지 않는다 — 지어낸 숫자를 섞지 않는다(원칙 8-1).
      홈 히어로의 '금액 미확인 n건 제외'와 같은 규칙이다. */
   const unknown = picked.filter((sch) => !sch.amountValue).length;
-  $('#bulk-sum').textContent = `선택 ${picked.length}건 · 최대 ${won(total)}${unknown ? ` · 금액 미확인 ${unknown}건 제외` : ''}`;
+  $('#bulk-sum').textContent = `선택 ${picked.length}건 · 최대 ${won(total)}${unknown ? ` · 금액을 못 읽은 ${unknown}건 제외` : ''}`;
   const all = $('#bulk-all');
   if (all) all.checked = picked.length === bulkPrep.list.length;
   $$('#detail-sheet [data-bulk]').forEach((box) => {
@@ -4483,6 +4615,7 @@ function bulkStart() {
     id: sch.id, name: sch.name, appliedAt: nowStamp(), step: 0, docs: null, pending: bulkNeedsWork(sch), prep: {},
   }));
   saveState();
+  if (typeof trackUse === 'function') go.forEach((sch) => trackUse('prep', sch.id));   // 일괄 신청 준비도 공고마다 한 번
   closeSheet();
   const goneMsg = gone.length ? ` · ${gone.length}건은 그 사이 마감돼 제외` : '';
   toast(need.length
@@ -4522,13 +4655,17 @@ function applyAll() {
       (이공계 새터민)에서 실제로 그랬다: 새터민이고 이공계이고 성적도 넘는 학생인데 자격 줄
       셋 중 둘을 못 읽어 unknown 이 됐고, 화면은 그 학생에게 '요건 미충족'이라 단정했다.
       그때는 **버튼 문구만** 갈랐고 잠금은 안 갈라서, 그 학생은 여전히 못 눌렀다. */
-function applyLock(result, app, d, sch) {
+/* 🔴 fd(fitDetailFor) — 자격 줄을 한 줄도 못 읽은 공고(fd.unread)도 「원문에서 자격을 보라」 한 문장을 단다 (2026-11-16 리뷰). 정식 등록 공고는 거의 다
+   status 'selective' 라 status 갈래로는 안내가 영영 안 붙고, 「자격 미확인」 배지도 뺐으니(11-02 결정) 앱이 자격을 확인해 준 공고와 똑같아 보인다.
+   문장은 'unknown' 갈래와 같은 것(모르는 것을 말하는 낱말이 없는 할 일 안내) · 판정은 바꾸지 않는다(버튼은 그대로 열린다) */
+function applyLock(result, app, d, sch, fd) {
   /* 🔴 원문이 「별도 신청 없이 학교가 선발」이라 적은 공고(noApply = 그 원문 문장 · 관리자가 적는다 · 2026-11-02 세종대 학업수석총장장학금) —
      자격이 맞아도 버튼을 열지 않는다. 열면 학생이 없는 절차를 준비한다. 홈 「바로 신청」·앱 지원문서도 같은 칸을 본다. */
   if (sch && sch.noApply) return { canApply: false, caution: '', noApply: true };
   const canApply = (!app || app.pending) && d.days >= 0;
   const unsure = !['eligible', 'selective'].includes((result && result.status) || '');
-  return { canApply, caution: canApply && unsure ? result.status : '' };
+  const caution = !canApply ? '' : unsure ? result.status : (fd && fd.unread ? 'unknown' : '');
+  return { canApply, caution };
 }
 
 /* ---------------- 상세 바텀시트 ---------------- */
@@ -4629,12 +4766,15 @@ function noticeSummaryRows(lines) {
   /* 한 줄에 글머리 기호로 여러 항목이 붙어 온 것(`○ (신청방법) 네이버 폼 … ○ (모집대상) 만 19세~39세`)은 항목마다 한 줄로 가른다 — 글자는 그대로 */
   const segs = joinNoticeLines((lines || []).flatMap((raw) => String(raw || '').split(/\s+[○●■□\u25B6▷◆◇]\s*(?=\S)/)));
   for (const raw of segs) {
-    let t = tidyChars(unent(String(raw || '')))
+    const t0 = tidyChars(unent(String(raw || '')))
       .replace(/[\u2605☆\u261E]+/g, ' ').replace(/!{2,}/g, '!')   // 꾸밈 기호·느낌표 줄 — 뜻이 없다
-      .replace(/^[\s\-–—•\u25AA\u25AB\u25FD\u25FE\u25B6▷◆◇○●■□▣\u2605\u2666⇒‡◦∙❍◎￭·ㆍ*◌◍※]+/, '')   // \u25FD·\u25FE(작은 네모)도 글머리(성암육영회 서류 줄 · 2026-11-02 실화면 · 글자는 ui-tone 이 이모지로 세므로 코드에 안 적는다)   // 그림 기호는 \u 로 적는다(화면 말투 관문 ui-tone 이 이모지로 센다)
-      /* 번호를 뗀다 — ⚠️ `10.22.(목)` 의 `10.` 은 번호가 아니라 날짜다(뒤에 날짜가 이어지면 안 뗀다 · 대외활동 실측) */
-      .replace(/^\(?\s*\d{1,2}\s*\)\s*|^\d{1,2}\.(?!\s?\d{1,2}\s?[.(월])\s*|^[①-⑳]\s*|^[가-힣]\s*[.)]\s+/, '')
+      .replace(/^[\s\-–—•\u25AA\u25AB\u25FD\u25FE\u25B6▷◆◇○●■□▣\u2605\u2666⇒‡◦∙❍◎￭·ㆍ*◌◍※]+/, '');   // \u25FD·\u25FE(작은 네모)도 글머리(성암육영회 서류 줄 · 2026-11-02 실화면 · 글자는 ui-tone 이 이모지로 세므로 코드에 안 적는다)   // 그림 기호는 \u 로 적는다(화면 말투 관문 ui-tone 이 이모지로 센다)
+    /* 번호를 뗀다 — 숫자 표식은 match-engine stripListNumber 한 곳(자격 줄과 같은 규칙 · 2026-11-17 리뷰 `3.5 이상`→`5 이상`·`2.1 보호조치`→`1 보호조치`).
+       ⚠️ `10.22.(목)` 의 `10.` 은 번호가 아니라 날짜다(뒤에 날짜가 이어지면 안 뗀다 · 대외활동 실측 — 그 함수가 지킨다) */
+    const t1 = stripListNumber(t0);
+    let t = (t1 !== t0 ? t1 : t0.replace(/^[①-⑳]\s*|^[가-힣]\s*[.)]\s+/, ''))
       .replace(/^[(（][월화수목금토일][)）]\s*[-–]?\s*/, '')   // `12.(월) - 접수방법 :` — 앞 줄에서 떨어져 나온 날짜 꼬리(번호는 위에서 이미 뗐다)
+      .replace(/^[Oo0](?=\s?[가-힣]{2,8}\s?[:：])\s?/, '')   // 「0모집기간:」·「O접수기간:」 — 글머리 ○ 가 영문 O·숫자 0 으로 읽혀 왔다(2026-11-17 실측 · 이름표 앞에서만)
       .replace(/\s+/g, ' ').trim();
     if (t.length < 4) continue;
     /* 이름표 — `신청기간 : …` · `(신청방법) …` · 앞 괄호가 잘린 `모집기간) …` 꼴. ⚠️ 시각(`09:00`)·주소(`https://`)의 콜론은 이름표가 아니다(리뷰 2026-10-15) */
@@ -4662,12 +4802,28 @@ function noticeSummaryRows(lines) {
   }
   return rows;
 }
+/* 글 속 주소 → 누를 수 있는 짧은 링크 (2026-11-17 개발자 지시 "가독성이 떨어지는 등 … 모두 수리") — 「온라인 접수https://www.k-startup.go.kr/web/contents/webPMSBizUnvs.do?returnUrl=…」
+   처럼 긴 주소가 글자째 떠서 줄이 읽히지 않았다. 주소는 원문 그대로 링크에 담고, 보이는 글자만 사이트 이름(「forms.gle ↗」)으로 줄인다(글자를 지어내지 않는다).
+   🔴 이 구간(NS_LABELS … sourceNoteHtml)은 관문·what-shows 가 떼어 돌린다 — 바깥 함수(safeUrl 등)에 기대지 말 것. http(s) 주소만 잡으므로 javascript: 는 들어오지 않는다 */
+const NS_URL = /https?:\/\/[^\s<>"'()\[\]{}\u3131-\uD7A3]+/g;   // 주소에 붙은 한글(「…/abc에서 신청」)은 주소가 아니다 — 글자를 잃지 않는다(리뷰 2026-11-17)
+function nsBodyHtml(body) {
+  const s = String(body || ''); let out = '', last = 0;
+  for (const m of s.matchAll(NS_URL)) {
+    const u = m[0].replace(/[.,;:!?。]+$/, '');
+    let host = ''; try { host = new URL(u).hostname.replace(/^www\./, ''); } catch (e) { host = ''; }
+    const before = s.slice(last, m.index);
+    const gap = /[^\s(（\[「『'"]$/.test(before) ? ' ' : '';   // 「접수https://…」 처럼 글자에 붙은 주소 앞에만 빈칸 하나 — 괄호 안·뒤 글자에는 더하지 않는다(리뷰 2026-11-17)
+    out += esc(before) + (host ? `${gap}<a href="${esc(u)}" target="_blank" rel="noopener">${esc(host)} ↗</a>` : esc(u));
+    last = m.index + u.length;
+  }
+  return (out + esc(s.slice(last))).replace(/\s{2,}/g, ' ').trim();
+}
 /* 「공고 안내」 절 — 다섯 줄까지 펼치고 나머지는 「더 보기」 안에(승인 시안 2026-11-02 · 줄 규칙은 위 noticeSummaryRows 그대로) */
 const NS_SHOWN = 5;
 function noticeSummaryHtml(lines) {
   const rows = noticeSummaryRows(lines);
   if (!rows.length) return '';
-  const li = (r) => `<li>${r.label ? `<b class="ns-k">${esc(r.label)}</b>` : ''}${esc(r.body)}</li>`;
+  const li = (r) => `<li>${r.label ? `<b class="ns-k">${esc(r.label)}</b>` : ''}${nsBodyHtml(r.body)}</li>`;
   const head = rows.slice(0, NS_SHOWN), rest = rows.slice(NS_SHOWN);
   return `<h4>공고 안내</h4><ul class="doc-list notice-summary">${head.map(li).join('')}</ul>`
     + (rest.length ? `<details class="ns-more"><summary>더 보기</summary><ul class="doc-list notice-summary">${rest.map(li).join('')}</ul></details>` : '');
@@ -4681,35 +4837,41 @@ const fmtDay = (iso) => { const s = String(iso || ''); if (!/^\d{4}-\d{2}-\d{2}$
 const isActivityItem = (x) => !!(x.activity || x.api || (x.kind && !x.type));   // 활동 글(피드 항목·activityAsSch 사본)인가 — 장학 공고는 type 이 있다
 function sheetHeadHtml({ x, d, save }) {
   const org = isActivityItem(x) ? activityHostLine(x) : cardProviderLine(x);
-  const dd = x.program ? '<span class="badge badge-dday badge-program">상시 제도</span>' : (d ? `<span class="badge badge-dday ${d.cls}">${esc(ddayWords(d))}</span>` : '');   // 상시 제도는 마감 자리에(카드 아랫줄과 같은 글자)
+  const dw = d ? ddayWords(d) : '';   // 마감을 모르면 빈 글자 — 배지를 안 그린다(2026-11-15 · 예전 「기한 확인 중」)
+  const dd = x.program ? '<span class="badge badge-dday badge-program">상시 제도</span>' : (dw ? `<span class="badge badge-dday ${d.cls}">${esc(dw)}</span>` : '');   // 상시 제도는 마감 자리에(카드 아랫줄과 같은 글자)
   return `<div class="sch-top sheet-top">${kindChipHtml(x)}${org ? `<span class="sch-org">${esc(org)}</span>` : ''}${dd}${save}</div>`;
 }
-/* 「접수」 절의 세 줄 — 기간은 접수 시작~마감(둘 다 날짜일 때만 · 아니면 원문 기간 문구 · 없으면 원문 확인) · 방법은 원문 문장(noApply·메일·포털·재단) · 서류는 읽은 것만 */
+/* 「접수」 절의 세 줄 — 기간은 접수 시작~마감(둘 다 날짜일 때만 · 아니면 원문 기간 문구) · 방법은 원문 문장(noApply·메일·포털·재단) · 서류는 읽은 것만.
+   🔴 모르는 줄은 **안 그린다** (2026-11-15 · 개발자 결정 11-02 — 예전 「기간 원문 확인」·「방법 원문 확인」). 세 줄 다 없으면 「접수」 절이 통째로 없다(「지원 자격」 칸과 같은 규칙 · 2026-11-07) */
 function applySectionHtml(sch, opts) {
   const act = (opts && opts.activity) || null;   // 활동 글의 서류는 그 글이 원문 「제출서류」 절에서 읽은 것(collector activityDocuments · 2026-10-30) — 없으면 서류 줄이 없다
   const from = fmtDay(sch.openDate), to = fmtDay(sch.deadline);
-  const rawPeriod = String(sch.period || '').replace(/^접수\s*/, '').replace(/\d{4}-(\d{2})-(\d{2})/g, '$1.$2').trim();   // ISO 날짜는 MM.DD 로(글자를 더하지 않고 줄인다) · 층2 「접수 ~…」 머리는 이름표와 겹친다
+  const rawPeriod = String(sch.period || '').replace(/^(?:(?:접수|모집|신청|지원)\s*(?:기간\s*)?|기간\s*)[:：·]?\s*/, '').replace(/\s*https?:\/\/\S*$/, '').replace(/\d{4}-(\d{2})-(\d{2})/g, '$1.$2').trim();   // ISO 날짜는 MM.DD 로(글자를 더하지 않고 줄인다) · 층2 「접수 ~…」·자동 등록 「접수 기간 ~…」 머리는 이름표와 겹친다(「기간 기간 ~09.21」 · 2026-11-17) · 모집·신청·지원 기간 머리도(활동 기간 토막 · 리뷰) · 끝에 붙은 주소는 기간이 아니다(80자에서 잘린 주소 — 리뷰)
   const period = (from && to) ? `${from} ~ ${to}`
     : (/\d/.test(rawPeriod) && !providerUnknown(rawPeriod)) ? rawPeriod
     : to ? `~ ${to}`
     : /상시/.test(rawPeriod) ? '상시'
-    : '원문 확인';
+    : '';
+  /* 유료 카드 읽기가 읽은 신청 방법(원문 문장 · 줄머리 이름표를 뗀 것)이 있으면 그것을 줄마다 보인다(2026-11-15) */
+  const paidApply = (!act && sch.cardRead && Array.isArray(sch.cardRead.apply)) ? sch.cardRead.apply.filter((l) => typeof l === 'string' && l.trim()) : [];
   const method = sch.noApply ? sch.noApply
     : sch.applyEmail ? (sch.applyEmailSource || `메일 ${sch.applyEmail}`)
     : sch.applyPortalSource ? sch.applyPortalSource
     : sch.sourceKind === 'kosaf' ? '재단 선발 공고문·홈페이지가 정한 접수 방법'
-    : '원문 확인';
+    : '';
   const docs = (act ? act.documents || [] : sch.documents || []).filter((doc) => !DOC_PLACEHOLDER.test(doc));
-  const row = (k, v) => `<li><b class="ns-k">${k}</b>${esc(v)}</li>`;
+  const row = (k, v, plain) => `<li><b class="ns-k">${k}</b>${plain ? esc(v) : nsBodyHtml(v)}</li>`;   // 기간 줄은 plain — 80자에서 잘린 기간 토막의 주소를 진짜 같은 링크로 만들지 않는다(리뷰 2026-11-17)
   const docText = docs.map((d) => String(d).replace(/^[\s\-–—•\u25AA\u25AB\u25FD\u25FE■□▣○●◆◇·ㆍ*]+/, '').trim()).filter(Boolean).join(' · ');   // 원문 글머리 기호(■·○)는 뗀다 — 점으로 잇는 한 줄이라 기호가 두 겹(실화면 2026-11-02)
-  return `<h4>접수</h4><ul class="doc-list notice-summary apply-rows">${row('기간', period)}${row('방법', method)}${docText ? row('서류', docText) : ''}</ul>`;
+  const methodRow = paidApply.length ? `<li><b class="ns-k">방법</b>${paidApply.map(esc).join('<br>')}</li>` : (method ? row('방법', method) : '');
+  const rows = `${period ? row('기간', period, true) : ''}${methodRow}${docText ? row('서류', docText) : ''}`;
+  return rows ? `<h4>접수</h4><ul class="doc-list notice-summary apply-rows">${rows}</ul>` : '';
 }
 function sheetSectionsHtml({ sch, result, fit, fd, activity = null, noticeLines = [] }) {
   /* ① 지원 자격 — 판정은 eligibilityRowsHtml·fitBadgeHtml 그대로(알약 status-pill 은 없다 · 두 축의 말이라).
      🔴 넣을 줄이 없고 물을 것도 없으면 **칸 자체를 안 그린다** (2026-11-07 개발자 지시 "지원자격을 못읽은경우에도 내용 없는 지원자격 칸이 있음 … 칸 자체를 없애기" —
      11-02 시안의 「원문에서 확인」 한 줄(칸은 늘 있음)을 뒤집었다). 장학 카드는 「자격 미확인」 배지가 그 사실을 말하고, 활동 카드엔 그 배지가 없어(아래 noticeCardHtml 10-03 결정)
      활동 시트는 이제 아무 데서도 말하지 않는다 — 개발자 지시대로다(리뷰 2026-11-07). */
-  const rows = eligibilityRowsHtml(sch, result).replace(/<li class="r-unk">\? 지원 자격은 [^<]*<\/li>/g, '');
+  const rows = eligibilityRowsHtml(sch, result);   // 못 읽은 공고는 빈 글자(2026-11-15 · 예전엔 「? 지원 자격은 …」 줄을 여기서 걷어냈다)
   const ask = eligAskHtml(sch);
   const elig = (rows || ask) ? `<div class="sheet-verdict"><h4>지원 자격</h4><span class="verdict-marks">${fitBadgeHtml(fit, fd, { full: true })}</span></div>
       <ul class="reason-list">${rows}</ul>
@@ -4720,14 +4882,17 @@ function sheetSectionsHtml({ sch, result, fit, fd, activity = null, noticeLines 
   /* ④ 첨부 — 본문 사진(bodyImage)은 첨부가 아니다 · 층2 첨부는 재단이 올린 선발 공고문이라 꼬리표로 말한다(신청서 양식이라 부르지 않는다) */
   /* 활동 글은 신청 준비 화면이 없어(접수는 주최 사이트) 로봇이 바꿔 둔 신청서 원본 PDF 줄(+ 「양식 채우기」 자리)을 첨부 맨 위에 둔다 — 장학과 같은 줄 꼴 formPdfRowsHtml · 열쇠는 글 id(2026-10-30 공동개발자 "공모전 신청 양식이 매우 미흡") */
   const pdfRows = activity && activity.id ? formPdfRowsHtml(activity) : '';
-  const atts = ((activity ? activity.attachments : sch.attachments) || []).filter((a) => a && !a.bodyImage);
+  const attSeen = new Set();   // 같은 파일이 두 번 실린 글(「1. 2026 절주서포터즈 모집 안내.pdf」 두 줄 · 2026-11-17 실측) — 이름+주소가 같으면 한 번만
+  const atts = ((activity ? activity.attachments : sch.attachments) || []).filter((a) => a && !a.bodyImage).filter((a) => { const k = `${String(a.name || '').trim()}|${a.url || ''}`; if (attSeen.has(k)) return false; attSeen.add(k); return true; });
   const att = atts.length ? `<h4>첨부${sch.sourceKind === 'kosaf' ? ' <span class="channel-tag">재단 선발 공고문</span>' : ''}</h4><ul class="doc-list">${pdfRows}${atts.map((a) => `<li class="att">${attachmentLinkHtml(a, 'color:var(--primary)')}${a.bytes ? ` <span class="doc-legend">${Math.max(1, Math.round(a.bytes / 1024))}KB</span>` : ''}</li>`).join('')}</ul>`  : (pdfRows ? `<h4>첨부</h4><ul class="doc-list">${pdfRows}</ul>` : '');
   /* ⑤ 원문 — 이름·안내는 source-link.js 한 곳(sourceLinkHtml · sourceLinkHintHtml) · 층2 문의 */
   const link = activity ? sourceLink(activity, 'activity') : sourceLink(sch, 'detail');
   const a = activity ? (() => { const href = safeUrl(link.href); return href ? `<a href="${esc(href)}" target="_blank" rel="noopener">${esc(link.label)}</a>` : ''; })() : sourceLinkHtml(sch);   // 장학·층2는 sourceLinkHtml 한 곳(detail 자리)
   const hint = activity ? activityLinkWhy(activity, link) : sourceLinkHintHtml(link);
   const src = `<h4>원문</h4><div class="sheet-facts"><p class="doc-legend sheet-source">${a || sourceNoteHtml(sch)}${hint ? `<br />${hint}` : ''}</p>${(sch.sourceKind === 'kosaf' && sch.contact) ? `<p class="doc-legend">문의 ${esc(sch.contact)}</p>` : ''}</div>`;
-  return elig + apply + notice + att + src;
+  /* 절마다 한 묶음(.sheet-sec) — 묶음 사이 옅은 선 + 절 이름 앞 점(2026-11-16 개발자 지시 "각 칸을 시각적으로 구분하고 큰 틀 안내가 불렛포인트로").
+     빈 절은 묶음도 없다(11-07 「칸 자체를 없애기」 그대로) · h4 글자는 그대로라 드라이버가 읽는 이름은 안 바뀐다 */
+  return [elig, apply, notice, att, src].filter(Boolean).map((s) => `<section class="sheet-sec">${s}</section>`).join('');
 }
 
 function sourceNoteHtml(sch) {
@@ -4750,6 +4915,20 @@ function sourceLinkHtml(sch) {
   const href = safeUrl(link.href);
   if (href) return `<a href="${esc(href)}" target="_blank" rel="noopener">${esc(link.label)}</a>`;
   return sch.sourceKind === 'kosaf' ? '' : '원문 공고 확인';
+}
+
+/* 판정에 쓸 학생 정보가 없어 못 맞춰 본 요건 → 그 요건 한 줄 (2026-11-15). 이름은 match-engine evaluate 의 missing 그대로 받는다.
+   🔴 지어내지 않는다 — 숫자는 공고의 조건 값, 중복 수혜는 원문 문장(exclusivity.raw)이다. 모르는 이름이면 줄을 만들지 않는다 */
+function missingReqText(m, sch) {
+  const e = (sch && sch.eligibility) || {};
+  if (m === '직전학기 평점' && e.minGpa != null) return `직전학기 평점 ${e.minGpa} 이상`;
+  if (m === '학자금 지원구간' && e.maxBracket != null) return `학자금 지원구간 ${e.maxBracket}구간 이내`;
+  /* 중복 수혜 — 원문 칸에서 **그 조항 한 마디만**(○·※ 로 나뉜 항목 중 중복·타 장학금을 말하는 것) · 재단 칸 전체를 쏟지 않는다(2026-08-30 개발자 지적과 같은 이유) */
+  if (m === '지금 받고 있는 장학금') {
+    const raw = sch.exclusivity && sch.exclusivity.raw ? unent(String(sch.exclusivity.raw)) : '';
+    return raw.split(/\s*[○ㅇ●◦※]\s*/).map((x) => x.replace(/\s+/g, ' ').trim()).find((x) => x.length >= 4 && /중복|타\s?(?:장학|재단|기관)|외부\s?장학/.test(x)) || '';
+  }
+  return '';
 }
 
 /* 상세 시트의 '지원 자격' 줄들 — 장학(openDetail)과 대외활동·공모전(openActivityDetail)이 **한 함수**를 쓴다 (2026-10-01 개발자 지시:
@@ -4793,8 +4972,10 @@ function eligibilityRowsHtml(sch, result) {
           '확인 필요'(모름)를 ✓ 로 두지 않으려던 장치라, 미달을 먼저 본다. */
     const bad = /미달/.test(r) || (/필요|아니에요|가능$/.test(r) && !/충족|확인/.test(r));
     return `<li class="${bad ? 'r-bad' : 'r-ok'}">${bad ? '✕' : '✓'} ${esc(r)}</li>`;
-  }).join('')
-    + result.missing.map((m) => `<li class="r-unk">? ${esc(m)} 정보를 입력하면 정확히 판단할 수 있습니다</li>`).join('');
+  }).join('');
+  /* 🔴 판정 못 한 요건은 **표시 없이 요건 그대로** (2026-11-15 · 개발자 결정 11-02 — 예전 「? ○○ 정보를 입력하면 정확히 판단할 수 있습니다」).
+     줄은 버리지 않는다(요건이 사라지면 학생이 모른 채 지원한다) — 글자는 그 공고의 조건 값·원문 문장이다(missingReqText) · 그리는 자리는 아래 「내 정보로 확인한 항목」 */
+  const missTexts = result.missing.map((m) => missingReqText(m, sch)).filter(Boolean);
 
   /* 지원 자격 한 덩어리 — 원문 요건을 먼저 보여 주고, 그 아래에 '내 정보로 확인한 것'을 붙인다.
      앱이 판정할 수 있는 건 성적·소득구간·학년 같은 숫자 조건뿐이고, 원문의 '유자녀' 같은 항목은
@@ -4842,7 +5023,16 @@ function eligibilityRowsHtml(sch, result) {
     // 소제목을 달지 않는다 — 바깥 <h4>가 이미 '지원 자격'이라 두 번 나온다
     /* 번호(1) 2) 3))는 붙이지 않는다 — 요건은 순서가 아니라 목록이고,
        판정 못 한 줄에 번호만 달면 체크된 줄과 뒤섞여 어수선하다(2026-08-02 개발자 지시). */
-    reasonRows += reqShown.map((it) => reqRow(it)).join('');
+    /* 🔴 택1 묶음은 머리 줄을 이름표로 (2026-11-17 · 충남대 사회 재환원 장학금) — 엔진은 「차등조건(1개 이상 충족 시 …)」 아래 셋을 한 요건으로 세는데
+       화면이 셋을 평평하게 늘어놓아 '셋 다 갖춰야 한다'로 읽혔다. 원문 머리 줄(match-engine pickHeadCaption · 앞 번호만 뗌)을 그 묶음 첫 줄 위에 작게 —
+       요건 줄이 아니라 r-elig 를 달지 않는다(드라이버·적합도가 세지 않는다). 내 경우 거르기로 첫 줄이 빠져도 남은 첫 줄 위에 */
+    const pickHead = {};
+    reqItems.forEach((it) => { if (it.group && it.head && !pickHead[it.group]) pickHead[it.group] = it.head; });
+    const headDone = new Set();
+    reasonRows += reqShown.map((it) => {
+      const cap = it.group && pickHead[it.group] && !headDone.has(it.group) ? (headDone.add(it.group), `<li class="r-pick">${esc(pickHead[it.group])}</li>`) : '';
+      return cap + reqRow(it);
+    }).join('');
   } else if (requirementLines(sch, qLines).length) {
     // 자격 줄이 없으면 발췌 문장으로 물러나되, **같은 정리를 거쳐** 보여 준다
     reasonRows += requirementLines(sch, qLines)
@@ -4891,19 +5081,22 @@ function eligibilityRowsHtml(sch, result) {
      ⚠️ 그 줄을 만들던 `aiRead` 상수도 함께 지웠다 — 여기서 쓰는 곳이 더는 없다.
         판정식(`/^AI/.test(eligibilityFrom) && eligibilityReviewed !== true`)의 원본은
         이제 관리자 쪽 한 곳이다. 되살린다면 베끼지 말고 그 함수를 부를 것. */
-  if (checkRows) {
-    reasonRows += `<li class="r-head">내 정보로 확인한 항목</li>` + checkRows;
+  /* 못 맞춘 요건 한 줄(missingReqText) — 위 자격·제외 줄에 이미 보인 문장이면 또 적지 않는다(같은 줄 두 번 · 2026-10-15 카드 전수와 같은 규칙) */
+  const flatT = (t) => String(t || '').replace(/[\s.·,]/g, '');
+  const shownFlat = [...reqLines, ...exLines].map(flatT);
+  const missRows = missTexts.filter((t) => !shownFlat.some((x) => x.includes(flatT(t)) || flatT(t).includes(x)))
+    .map((t) => `<li class="r-req">${esc(t)}</li>`).join('');
+  if (checkRows || missRows) {
+    reasonRows += `<li class="r-head">내 정보로 확인한 항목</li>` + checkRows + missRows;
   }
   if (!reasonRows) {
     /* 원문 요건도 못 읽었고 판정할 조건도 없는 경우 — '제한이 없다'가 아니라 **모른다**는 뜻이다.
-       원문에서 '제한 없음'을 확인한 공고만 eligibilityVerified로 확신 문구를 낸다. */
-    /* '아래 공고 원문'은 아래 링크가 **그 공고로 갈 때만** (2026-10-03 · 원문 링크 정직성) — 재단 홈페이지(층2)·게시판 목록·
-       기관 첫 화면이면 '아래 링크'라고만 한다. 종류는 sourceLink 한 곳(활동 시트는 id 의 'act:' 뒤가 그 글 주소다 · activityAsSch). */
-    const actUrl = String(sch.id || '').replace(/^act:/, '');
-    const below = sourceLink(sch.activity ? (activityItem(actUrl) || { url: actUrl }) : sch, 'detail').cls === 'post' ? '아래 공고 원문' : '아래 링크';   // 글 원본(id 포함)으로 — id 열쇠 바로잡기도 같이 본다
+       원문에서 '제한 없음'을 확인한 공고만 eligibilityVerified로 확신 문구를 낸다.
+       🔴 못 읽었으면 **아무 줄도 없다** (2026-11-15 · 개발자 결정 11-02 — 예전 「? 지원 자격은 아래 링크에서 확인해 주세요 (지원자 중 선발 심사로 결정됩니다)」).
+       줄이 없으면 「지원 자격」 칸 자체가 안 그려진다(sheetSectionsHtml · 2026-11-07 지시) */
     reasonRows = sch.eligibilityVerified
       ? `<li class="r-ok">✓ 별도 자격 제한이 없는 공고입니다${result.status === 'selective' ? ' — 지원자 중 선발 심사로 결정됩니다' : ''}</li>`
-      : `<li class="r-unk">? 지원 자격은 ${below}에서 확인해 주세요${result.status === 'selective' ? ' (지원자 중 선발 심사로 결정됩니다)' : ''}</li>`;
+      : '';
   }
   return reasonRows;
 }
@@ -4912,13 +5105,15 @@ function openDetail(id) {
   /* 대외활동 줄(달력·보관함)은 활동 시트로 — 같은 [data-detail] 길로 들어온다(2026-10-02) */
   if (isActivityId(id)) { openActivityDetail(id.slice(4)); return; }
   const sch = appSch(id);   // 데이터에서 내려갔어도 결과를 적기 전이면 떠 둔 사본으로 연다(2026-10-02)
+  if (typeof trackUse === 'function') trackUse('detail', id);   // 이용 횟수 — 누가는 안 담는다(usage-report.js)
+  { const dsh = document.getElementById('detail-sheet'); if (dsh) dsh.dataset.useItem = id; }
   if (!sch) return;
   const result = evaluateFor(sch, state.profile);   // 카드와 같은 판정을 쓴다(위 주석)
   const fit = fitScore(sch, result, state.profile);
   const fd = fitDetailFor(sch, state.profile);   // 카드와 같은 근거를 쓴다(위 주석)
   const d = dday(sch.deadline);
   const app = state.applications.find((a) => a.id === id);
-  const lock = applyLock(result, app, d, sch);
+  const lock = applyLock(result, app, d, sch, fd);
   /* 데이터에서 내려간 공고(사본으로 연 시트)에서는 신청을 시작·이어가지 않는다 — 양식 흐름이 findSch 로 공고를 다시 찾다 넘어진다(2026-10-02 리뷰).
      기록(제출·결과)은 신청 내역 패널에서 그대로 적을 수 있다 */
   const gone = !findSch(id);
@@ -4979,7 +5174,7 @@ function openDetail(id) {
               it.key === 'write' && !it.done ? ' <span class="doc-legend">「서류 작성 이어서 하기」로</span>' : ''}</li>`).join('')}
           </ul>`;
         })()}
-        <p class="applied-at">${app.appliedAt} ${prepChecklist(app, sch).complete || step > 0 ? '준비 완료' : '신청내역에 담김 · 준비 중'} · 최종 제출처: ${ch.url ? `<a href="${esc(safeUrl(ch.url))}" target="_blank" rel="noopener">${esc(ch.label)}</a>` : esc(ch.label)}</p>
+        <p class="applied-at">${app.appliedAt} ${prepChecklist(app, sch).complete || step > 0 ? '준비 완료' : '신청내역에 담김 · 준비 중'} · 최종 제출처: ${ch.url ? `<a href="${esc(safeUrl(ch.url))}" target="_blank" rel="noopener">${esc(ch.label)}</a>` : esc(ch.label)}${ch.note ? ` <span class="doc-legend">${esc(ch.note)}</span>` : ''}</p>
         ${step === 0 ? `
           <button class="btn btn-outline" id="btn-mark-submitted" style="width:100%;margin-bottom:6px">공식 제출 완료로 기록</button>
           <p class="dp-note">최종 제출은 ${esc(ch.label)}에서 이루어집니다. 제출을 마친 뒤 누르면 다음 단계로 넘어갑니다.</p>` : ''}
@@ -4994,7 +5189,7 @@ function openDetail(id) {
           </div>` : ''}
         ${step === 3 ? `
           <p class="progress-note ${app.result === 'won' ? 'progress-won' : ''}">${app.result === 'won'
-            ? `${esc(app.resultAt)} 선정 · ${esc(sch.amount)}`
+            ? `${esc(app.resultAt)} 선정${(() => { const t = amountLine(sch).text.replace(/^금액 · /, ''); return t ? ` · ${esc(t)}` : ''; })()}`   /* 금액은 카드와 같은 amountLine — 모르면 「선정」까지만(예전 「선정 · 금액 원문 확인」 · 2026-11-16) */
             : `${esc(app.resultAt)} 미선정으로 기록됨`}</p>
           <button class="link-btn" id="btn-undo-progress" style="margin-bottom:10px">결과 기록 취소</button>` : ''}
         ${app.docs && app.docs.length ? `
@@ -5365,7 +5560,7 @@ function rememberAmountBack() {
 }
 
 /* ── 자격 확인 도우미 — 못 읽은 자격을 그 자리에서 묻는다 (2026-09-17 · 노션 AI-1) ──
-   🔴 앱이 하는 말은 「미확인 자격 n」 하나다. 설명·약속 문장을 넣지 말 것 —
+   🔴 앱이 하는 말은 「맞춰 볼 자격 n」 하나다(2026-11-15 이름 바꿈 · 예전 「미확인 자격 n」 — 개발자 결정 11-02). 설명·약속 문장을 넣지 말 것 —
       앱이 아는 것은 공고에 적힌 요건 중 **자기가 읽어낸 것**뿐이고, 적는다고
       좋은 소식이 는 것도 아니다(적은 결과가 ✕ 일 수 있다). 설계 3-2.
    🔴 재사용을 화면이 말하지 않는다 (2026-09-17 개발자 결정) — 그렇게 동작하되
@@ -5392,6 +5587,10 @@ function eligAskHtml(sch) {
   const keys = askableForSch(sch, state.profile);
   const mine = eligAsk && eligAsk.id === sch.id ? eligAsk : null;
   if (!keys.length && !mine) return '';        /* 물을 것이 없으면 자리도 안 만든다 */
+  /* 🔴 화면에 보일 자격 줄이 없으면 묻지도 않는다 (2026-11-15 개발자 재제보 — 실측 4건: 「지원 자격 — 미확인 자격 0」 만 남은 빈 칸).
+     질문 거리(askableForSch)는 **저장된 줄 전부**에서 잡고 화면 줄(requirementLines)은 서류 안내·※ 조각을 걸러서, 줄은 0개인데 질문만 남았다 —
+     답해도 바뀔 줄이 없다(답하면 칸이 통째로 사라졌다). 제외 줄(✗)만 있는 시트도 같다(리뷰). 관문 `verify-elig-ask.js` ⑩ */
+  if (!requirementLines(sch, null, { all: true }).length) return '';
   const open = !!(mine && mine.open);
   const shown = (mine && mine.shown) || requirementLines(sch, null, { all: true })
     .filter((l) => !requirementMatch(l, state.profile, sch));
@@ -5400,40 +5599,9 @@ function eligAskHtml(sch) {
   if (!open) {
     return `<div class="elig-ask"><button type="button" class="elig-ask-open"`
       + ` data-elig-open="${esc(sch.id)}" aria-expanded="false">`
-      + `미확인 자격 <b>${left}</b>${ELIG_CHEV}</button></div>`;
+      + `맞춰 볼 자격 <b>${left}</b>${ELIG_CHEV}</button></div>`;   // 이름 「미확인 자격」 → 「맞춰 볼 자격」(2026-11-15 · 개발자 결정 11-02)
   }
-  const rows = keys.map((k) => {
-    const pv = state.profile || {};
-    /* 🔴 처지(trait) — 프로필에 칸이 없던 개인 사정은 **예/아니요**로 묻는다
-       (2026-09-18 개발자 지시: "평점 말고 개인적인 부분들"). 종류는 parse-requirements
-       의 TRAIT_PAT 이 정하고 칸 이름은 elig-ask 의 TRAIT_LABEL 이 갖는다 — 여기서 짓지 않는다. */
-    if (k.indexOf('trait:') === 0) {
-      const tk = k.slice(6);
-      const now = ((pv.traits || {})[tk]);
-      const yn = (v, lbl) => `<button type="button" class="elig-yn${now === v ? ' on' : ''}"`
-        + ` data-elig-trait="${esc(tk)}" data-elig-val="${v ? '1' : '0'}">${lbl}</button>`;
-      return `<div class="elig-ask-row elig-ask-yn"><span>${esc(TRAIT_LABEL[tk] || tk)}</span>`
-        + `<span class="elig-yn-pair">${yn(true, '예')}${yn(false, '아니요')}</span></div>`;
-    }
-    const f = FIELD_META[k];
-    const val = pv[k] != null ? String(pv[k]) : '';
-    const input = f.kind === 'select'
-      ? `<select class="elig-ask-in" data-elig-field="${k}"><option value=""></option>`
-        /* 선택지는 글자(`대한민국`) 또는 {value, label}(거주 기간 — 값은 개월 · elig-ask FIELD_META) */
-        + f.options.map((o) => {
-          const v = o && o.value != null ? String(o.value) : String(o);
-          const l = o && o.label != null ? o.label : o;
-          return `<option value="${esc(v)}"${v === val ? ' selected' : ''}>${esc(l)}</option>`;
-        }).join('')
-        + `</select>`
-      : `<input class="elig-ask-in" data-elig-field="${k}" value="${esc(val)}" placeholder="—"`
-        + (f.kind === 'number'
-          ? ` type="number" inputmode="decimal" step="${f.step}" min="${f.min}" max="${f.max}"`
-          : ' type="text"') + `>`;
-    return `<label class="elig-ask-row"><span>${esc(f.label)}</span>`
-      + `<span class="elig-ask-wrap">${input}`
-      + (f.suffix ? `<em>${esc(f.suffix)}</em>` : '') + `</span></label>`;
-  }).join('');
+  const rows = eligAskRowsHtml(keys);
   /* 🔴 **미확인 줄을 여기 다시 나열하지 않는다** (2026-09-18 실측으로 드러났다).
      위 자격 블록이 이미 그 줄들을 보여 주고 있어서, 펼치면 똑같은 줄이 회색으로
      한 번 더 나왔다 — 화면이 두 배로 길어지고 표처럼 어수선했다.
@@ -5450,9 +5618,83 @@ function eligAskHtml(sch) {
     : '';
   return `<div class="elig-ask elig-ask-on">`
     + `<button type="button" class="elig-ask-head" data-elig-close="${esc(sch.id)}"`
-    + ` aria-expanded="true">미확인 자격 <b>${left}</b>${ELIG_CHEV}</button>`
+    + ` aria-expanded="true">맞춰 볼 자격 <b>${left}</b>${ELIG_CHEV}</button>`
     + `<div class="elig-ask-fields">${rows}</div>` + foot
     + `</div>`;
+}
+
+/* 묻는 칸의 줄들 — **공고 안 「미확인 자격」 상자와 대외활동 관문 「내 정보」가 같은 그림**을 쓴다(2026-11-15 · 베끼면 두 벌).
+   값은 지금 프로필에서 읽어 채워 둔다 · 모으기는 eligAskCollect 한 곳 */
+function eligAskRowsHtml(keys) {
+  return keys.map((k) => {
+    const pv = state.profile || {};
+    /* 🔴 처지(trait) — 프로필에 칸이 없던 개인 사정은 **예/아니요**로 묻는다
+       (2026-09-18 개발자 지시: "평점 말고 개인적인 부분들"). 종류는 parse-requirements
+       의 TRAIT_PAT 이 정하고 칸 이름은 elig-ask 의 TRAIT_LABEL 이 갖는다 — 여기서 짓지 않는다. */
+    if (k.indexOf('trait:') === 0) {
+      const tk = k.slice(6);
+      const now = ((pv.traits || {})[tk]);
+      const yn = (v, lbl) => `<button type="button" class="elig-yn${now === v ? ' on' : ''}"`
+        + ` data-elig-trait="${esc(tk)}" data-elig-val="${v ? '1' : '0'}">${lbl}</button>`;
+      return `<div class="elig-ask-row elig-ask-yn"><span>${esc(typeof traitLabel === 'function' ? traitLabel(tk) : (TRAIT_LABEL[tk] || tk))}</span>`
+        + `<span class="elig-yn-pair">${yn(true, '예')}${yn(false, '아니요')}</span></div>`;
+    }
+    const f = FIELD_META[k];
+    const val = pv[k] != null ? String(pv[k]) : '';
+    /* data-elig-was — 이 칸이 **처음에 보인 값**. 저장 때 그대로면 프로필을 건드리지 않는다(eligAskCollect). 선택 칸은 선택지에 없는 옛 값이면 빈 칸으로 보이므로 빈 글자 */
+    const optVals = f.kind === 'select' ? f.options.map((o) => (o && o.value != null ? String(o.value) : String(o))) : null;
+    const was = optVals ? (optVals.includes(val) ? val : '') : val;
+    const input = f.kind === 'select'
+      ? `<select class="elig-ask-in" data-elig-field="${k}" data-elig-was="${esc(was)}"><option value=""></option>`
+        /* 선택지는 글자(`대한민국`) 또는 {value, label}(거주 기간 — 값은 개월 · elig-ask FIELD_META) */
+        + f.options.map((o) => {
+          const v = o && o.value != null ? String(o.value) : String(o);
+          const l = o && o.label != null ? o.label : o;
+          return `<option value="${esc(v)}"${v === val ? ' selected' : ''}>${esc(l)}</option>`;
+        }).join('')
+        + `</select>`
+      : `<input class="elig-ask-in" data-elig-field="${k}" data-elig-was="${esc(was)}" value="${esc(val)}" placeholder="—"`
+        /* 숫자 칸도 type="text" 다 — type="number" 는 '999'·'e' 를 그대로 받고, 칠 때 막을 수 없다(input-guard.js).
+           범위는 PROFILE_LIMITS 에 있는 칸이면 그것을 쓴다(data-guard) · 없으면 FIELD_META 의 min/max */
+        + (f.kind === 'number'
+          ? ` type="text" inputmode="${f.step === 1 ? 'numeric' : 'decimal'}" autocomplete="off" step="${f.step}" min="${f.min}" max="${f.max}"`
+            + (typeof PROFILE_LIMITS !== 'undefined' && PROFILE_LIMITS[k] ? ` data-guard="${k}"` : ` data-guard-min="${f.min}" data-guard-max="${f.max}" data-guard-dec="${f.step === 1 ? 0 : 2}"`)
+          : ' type="text"') + `>`;
+    return `<label class="elig-ask-row"><span>${esc(f.label)}</span>`
+      + `<span class="elig-ask-wrap">${input}`
+      + (f.suffix ? `<em>${esc(f.suffix)}</em>` : '') + `</span></label>`;
+  }).join('');
+}
+/* 예/아니요 알약은 누르는 즉시 그 칸만 켠다 — 저장은 부르는 쪽 단추가 한 번에 한다 */
+function eligAskWireTraits(root) {
+  $$('[data-elig-trait]', root).forEach((b) => b.addEventListener('click', () => {
+    $$(`[data-elig-trait="${b.dataset.eligTrait}"]`, root).forEach((o) => { o.classList.remove('on'); delete o.dataset.eligPicked; });
+    b.classList.add('on');
+    b.dataset.eligPicked = '1';   // 학생이 **이번에 누른** 알약 — 처음부터 켜져 있던 것과 가른다(eligAskCollect)
+  }));
+}
+/* 그 줄들에 적힌 답을 프로필에 옮긴다(저장은 부르는 쪽이) — 처지는 **고른 것만**(안 고른 칸을 false 로 적으면 '아니요'라고 답한 것이 된다).
+   🔴 **학생이 건드린 칸만 적는다** (2026-11-15 리뷰). 대외활동 관문은 이미 답한 칸도 채워서 보이므로, 보인 값을 그대로 되적으면
+      ① 선택지에 없는 값(옛 글자)이 빈 칸으로 보였다가 null 로 지워지고 ② 관문을 그려 둔 사이 학적정보에서 고친 값을 옛 값으로 덮으며
+      ③ 온보딩이 받아 준 값(1945년생·19.5학점)이 이 칸의 범위로 깎인다. 처음 보인 값(data-elig-was)과 같으면 건너뛴다.
+   시·도를 바꾸면 짝 시·군·구를 비운다(다른 시·도의 구가 남지 않게 · elig-ask FIELD_META 의 city) · 본인 거주지면 「지금 주소 거주 기간」도(온보딩과 같은 규칙) */
+function eligAskCollect(root) {
+  const wrote = new Set();
+  $$('[data-elig-field]', root).forEach((el) => {
+    if (el.value === (el.dataset.eligWas || '')) return;
+    state.profile[el.dataset.eligField] = coerceField(el.dataset.eligField, el.value);
+    wrote.add(el.dataset.eligField);
+  });
+  wrote.forEach((k) => {
+    const city = (FIELD_META[k] || {}).city;
+    if (city && !wrote.has(city)) state.profile[city] = null;
+    if (k === 'region' && !wrote.has('residenceMonths')) state.profile.residenceMonths = null;
+  });
+  const picked = $$('[data-elig-trait].on[data-elig-picked]', root);
+  if (picked.length) {
+    state.profile.traits = Object.assign({}, state.profile.traits || {});
+    picked.forEach((b) => { state.profile.traits[b.dataset.eligTrait] = b.dataset.eligVal === '1'; });
+  }
 }
 
 /* innerHTML 을 채운 **뒤에** 배선한다 — openDetail 이 쓰는 방식 그대로.
@@ -5473,24 +5715,13 @@ function eligAskWire(sch, reopen = () => openDetail(sch.id)) {
   /* 닫는 자리는 둘이다 — 머리줄(화살표)과 「나중에 하기」 */
   $$('[data-elig-close]', sheet).forEach((c) => c.addEventListener('click', () => redraw(false)));
   const s = $('[data-elig-save]', sheet); if (s) s.addEventListener('click', () => eligAskSave(sch, reopen));
-  /* 예/아니요는 누르는 즉시 그 칸만 켠다 — 저장은 아래 단추가 한 번에 한다 */
-  $$('[data-elig-trait]', sheet).forEach((b) => b.addEventListener('click', () => {
-    $$(`[data-elig-trait="${b.dataset.eligTrait}"]`, sheet).forEach((o) => o.classList.remove('on'));
-    b.classList.add('on');
-  }));
+  eligAskWireTraits(sheet);
 }
 
 function eligAskSave(sch, reopen = () => openDetail(sch.id)) {
   const sheet = $('#detail-sheet');
-  $$('[data-elig-field]', sheet).forEach((el) => {
-    state.profile[el.dataset.eligField] = coerceField(el.dataset.eligField, el.value);
-  });
-  /* 처지는 **고른 것만** 적는다 — 안 고른 칸을 false 로 적으면 '아니요'라고 답한 것이 된다 */
-  const picked = $$('[data-elig-trait].on', sheet);
-  if (picked.length) {
-    state.profile.traits = Object.assign({}, state.profile.traits || {});
-    picked.forEach((b) => { state.profile.traits[b.dataset.eligTrait] = b.dataset.eligVal === '1'; });
-  }
+  if (!guardStepOk(sheet.querySelector('.elig-ask') || sheet)) return;   // 다 못 친 값은 저장하지 않고 짚는다
+  eligAskCollect(sheet);
   saveState();
   /* 적은 것이 **다른 공고에도 쓰이므로** 목록·홈도 다시 그린다 */
   renderHome();
@@ -5615,7 +5846,7 @@ function nextAction(app, sch, step, d, closed) {
     return closed
       ? { text: '접수가 마감됐어요. 제출하셨나요?',
           btn: `<button class="app-next-btn" data-mark-submit="${esc(app.id)}">제출했다고 기록</button>` }
-      : { text: `아직 제출 기록이 없어요 · ${sch.deadline ? '마감 ' + esc(d.label) : '마감 기한 미확인'}`,
+      : { text: `아직 제출 기록이 없어요${sch.deadline ? ' · 마감 ' + esc(d.label) : ''}`,   // 마감을 모르면 말하지 않는다(2026-11-15)
           btn: go('제출하러 가기') };
   }
   if (step === 1) return { text: '제출 기록됨 · 접수가 마감되면 심사로 넘어가요', btn: '' };
@@ -5648,12 +5879,10 @@ function docChecklistHtml(sch) {
      그래서 갈라서, 이런 항목은 세지 않고 '원문 확인' 한 줄로만 내놓는다. */
   const known = all.filter((doc) => !isUnknownDoc(doc));
   const unknown = all.length - known.length;
-  const note = unknown
-    ? '<p class="dc-unknown">이 밖의 제출 서류는 공고 원문에서 확인</p>'
-    : '';
-  if (!known.length) {
-    return '<p class="dc-unknown dc-only">제출 서류는 공고 원문에서 확인</p>';
-  }
+  /* 🔴 못 읽은 서류는 **아무 줄도 없다** (2026-11-15 · 개발자 결정 11-02 — 예전 「(이 밖의) 제출 서류는 공고 원문에서 확인」) — 세지도 않는다(위 주석 그대로) */
+  void unknown;
+  const note = '';
+  if (!known.length) return '';
   const certDocs = known;
   const marks = certDocs.map((doc) => ({ doc, st: docWalletStatus(doc) }));
   const tracked = marks.filter((m) => m.st);
@@ -5706,7 +5935,7 @@ function appLogHtml(app, sch, step) {
       </div>
       ${docChecklistHtml(sch)}
       <ul class="app-log-list">
-        ${row(!!closed, '접수 마감', sch.deadline ? esc(sch.deadline) + (closed ? ' 지남' : ' · ' + esc(d.label)) : '기한 미확인')}
+        ${sch.deadline ? row(!!closed, '접수 마감', esc(sch.deadline) + (closed ? ' 지남' : ' · ' + esc(d.label))) : ''}
         ${row(step >= 2, '심사', app.submittedAt && closed ? '진행 중' : '제출 기록과 마감 경과 후 표시')}
         ${row(!!app.result, '선정 발표',
           app.result ? (app.result === 'won' ? '선정 · ' : '미선정 · ') + esc(app.resultAt || '')
@@ -5958,7 +6187,7 @@ function calRowHtml(sch, { badge = true, save = false } = {}) {
   const row = `<button class="cal-row" data-detail="${esc(sch.id)}">
       <span class="cal-row-top">${mark}${d ? `<span class="badge badge-dday ${d.cls}">${d.label}</span>` : ''}${sch.formId ? '<span class="badge badge-form">앱에서 작성</span>' : ''}</span>
       <span class="cal-row-name">${esc(sch.name)}</span>
-      <span class="cal-row-sub">${esc(sch.amount)}${sch.headcount ? ` · ${esc(sch.headcount)}` : ''}</span>
+      ${(() => { const sub = [amountLine(sch).text.replace(/^금액 · /, ''), knownValue(sch.headcount)].filter(Boolean).join(' · '); return sub ? `<span class="cal-row-sub">${esc(sub)}</span>` : ''; })()}
     </button>`;
   /* 보관함에서는 **여기서 바로 해제**할 수 있어야 한다 — 담는 곳과 빼는 곳이 다르면
      학생이 뺄 방법을 못 찾는다. 카드와 같은 이유로 단추는 줄 **바깥**에 둔다. */
@@ -5982,7 +6211,7 @@ function calDayHtml(iso) {
        날짜를 열었을 때는 그 공고가 지금 어떤 상태인지 한 줄로 밝힌다. */
     const why = k.kind === 'wait' ? '발표 예정'
       : (calAwaiting(sch.id) && sch.deadline && dday(sch.deadline).days < 0)
-        ? (sch.announceDate ? '접수 마감 · 결과 대기' : '접수 마감 · 결과 대기 (발표일은 원문 확인)')
+        ? '접수 마감 · 결과 대기'   // 발표일을 모르면 말하지 않는다(2026-11-15 · 예전 「(발표일은 원문 확인)」)
         : '접수 마감';
     return `<p class="cal-why">${why}</p>` + calRowHtml(sch, { badge: false });
   }).join('');
@@ -6015,11 +6244,22 @@ function calDayHtml(iso) {
    저장한 공고를 모아 보는 자리. 🔴 **금액 합계를 내지 않는다** — 합산은 더하기가 아니라
    고르기라(같은 장학금 한 번만 + 배타 그룹에서 최대 하나) 여기서 따로 더하면
    홈과 다른 숫자를 말하게 된다. 건수만 센다. */
+/* 장학금 · 대외활동 나눠 보기 (2026-11-16 은서 「공고보관함에서 대외활동과 장학금이 구분되게」) — 칩 셋(전체·장학금·대외활동) ·
+   한쪽만 담겼으면 칩을 안 그린다 · 고른 칩은 이 화면을 떠 있는 동안만(기기에 저장하지 않는다) · 위 숫자(sub)는 늘 전체 */
+let savedKind = 'all';
+const SAVED_KINDS = [['all', '전체'], ['sch', '장학금'], ['act', '대외활동']];
 function renderSaved() {
   const el = $('#my-saved');
   if (!el) return;
-  const list = savedScholarships();
-  { const sub = $('#my-sub-saved'); if (sub) { const n = list.filter((s) => s.deadline && dday(s.deadline).days >= 0 && dday(s.deadline).days <= CAL_SOON_DAYS).length; sub.textContent = list.length ? `${list.length}개${n ? ` · 이번 주 마감 ${n}개` : ''}` : '비어 있음'; } }
+  const all = savedScholarships();
+  const nAct = all.filter((s) => isActivityId(s.id)).length;
+  const counts = { all: all.length, act: nAct, sch: all.length - nAct };
+  const both = counts.act > 0 && counts.sch > 0;
+  if (!both) savedKind = 'all';
+  const list = savedKind === 'all' ? all : all.filter((s) => (savedKind === 'act') === isActivityId(s.id));
+  const kindRow = both ? `<div class="filter-row saved-kinds" role="group" aria-label="공고 종류">${SAVED_KINDS.map(([k, label]) =>
+    `<button type="button" class="filter-chip${k === savedKind ? ' active' : ''}" data-saved-kind="${k}" aria-pressed="${k === savedKind}">${label} ${counts[k]}</button>`).join('')}</div>` : '';
+  { const sub = $('#my-sub-saved'); if (sub) { const n = all.filter((s) => s.deadline && dday(s.deadline).days >= 0 && dday(s.deadline).days <= CAL_SOON_DAYS).length; sub.textContent = all.length ? `${all.length}개${n ? ` · 이번 주 마감 ${n}개` : ''}` : '비어 있음'; } }
   if (!list.length) {
     el.innerHTML = (`
       <p class="empty">저장한 공고가 없어요<br /><span class="empty-sub">공고에서 북마크를 누르면 여기 모여요</span></p><button class="btn btn-ghost btn-empty" data-go="explore">장학금 둘러보기</button>`);
@@ -6032,13 +6272,14 @@ function renderSaved() {
     .sort((a, b) => deadlineTs(b) - deadlineTs(a));
   const soon = open.filter((s) => dday(s.deadline).days <= CAL_SOON_DAYS).length;
 
-  el.innerHTML = (`
+  el.innerHTML = (`${kindRow}
     ${open.length ? `<h5 class="cal-sec">마감 순</h5>${open.map((s) => calRowHtml(s, { save: true })).join('')}` : ''}
     ${/* 🔴 날짜를 못 읽은 공고를 **숨기지 않는다** — 달력에는 찍을 수 없어 사라지는데,
          사라지면 학생은 그 공고가 없는 줄 안다. 여기가 그 자리다. */ ''}
     ${/* 🔴 '날짜를 아직 읽지 못한' → '기한은 원문에서 확인' (2026-09-17 개발자 지시).
          앞은 우리가 못 한 일이고 뒤는 학생이 할 일이다. 건수는 관리자 '마감일 없음'이 센다. */ ''}
-    ${undated.length ? `<h5 class="cal-sec">마감일 확인 필요 ${undated.length}개</h5>
+    ${/* 이름 '마감일 확인 필요' → '날짜 없는 저장 공고' (2026-11-15 · 개발자 결정 11-02) — 달력에 못 찍는 저장 공고라는 사실만 말한다 */ ''}
+    ${undated.length ? `<h5 class="cal-sec">날짜 없는 저장 공고 ${undated.length}개</h5>
       ${undated.map((s) => calRowHtml(s, { save: true })).join('')}` : ''}
     ${closed.length ? `<details class="cal-kosaf">
         <summary>이미 마감된 저장 공고 ${closed.length}건</summary>
@@ -6212,10 +6453,11 @@ function renderApplications() {
               예전엔 `… · 서류 작성 필요 1건 · 선정된 장학금` 처럼 한 줄에 가운뎃점으로
               붙어 있어, 아래 금액의 이름표가 **네 번째 건수처럼** 읽혔다. */ ''}
          <p>준비 완료 ${prepared.length}건${inPrep.length ? ` · 준비 중 ${inPrep.length}건` : ''}${submitted.length ? ` · 제출·심사 중 ${submitted.length}건` : ''}${wonApps.length ? ` · 선정 ${wonApps.length}건` : ''}${pending.length ? ` · 서류 작성 필요 ${pending.length}건` : ''}</p>
-         <p class="summary-label">${wonApps.length ? '선정된 장학금' : '예상 최대 수혜액'}</p>
-         <p class="summary-amount">${shownAmount ? won(shownAmount) : '금액 미확인'}</p>
+         ${/* 합이 0 이면 금액 두 줄을 안 그린다(2026-11-15 · 예전 「금액 미확인」 — '0원'도 쓰지 않는다: 한 푼도 못 받는다로 읽힌다) */ ''}
+         ${shownAmount ? `<p class="summary-label">${wonApps.length ? '선정된 장학금' : '예상 최대 수혜액'}</p>
+         <p class="summary-amount">${won(shownAmount)}</p>` : ''}
          <p class="summary-note">제출·발표는 각 공식 채널에서 · 결과는 여기에 기록${
-           shownAmount && unknownAmount ? ` · 금액 미확인 ${unknownAmount}건 제외` : ''}</p>
+           shownAmount && unknownAmount ? ` · 금액을 못 읽은 ${unknownAmount}건 제외` : ''}</p>
        </div>`
     : '';
 
@@ -6385,7 +6627,7 @@ function renderMy() {
     <div class="my-grid">
       <div><span>학년</span><strong>${p.year}학년 (${esc(p.status || '미설정')})</strong></div>
       <div><span>직전학기 평점</span><strong>${p.gpa != null ? p.gpa.toFixed(2) : '미입력'}</strong></div>
-      <div><span>지원구간</span><strong>${p.bracket != null ? p.bracket + '구간' : '모름'}</strong></div>
+      <div><span>지원구간</span><strong>${p.bracket != null ? p.bracket + '구간' : '미입력'}</strong></div>
       <div><span>공통 서류정보</span><strong>${commonFilled}/5 입력됨</strong></div>
     </div>
     ${/* 🔴 줄 셋을 뺐다 (2026-09-12 개발자 지시) — '특별자격: 해당 없음' · 공통 서류정보
@@ -6413,7 +6655,7 @@ function renderMyMenu(p, trackLabel) {
   }
   const info = $('#my-sub-info');
   /* 🔴 작은 글씨는 **상태·숫자만** (2026-10-10 은서 「멘트들이 너무 AI 같애」) — 설명을 덧붙이지 않는다 */
-  if (info) info.textContent = [p.gpa != null ? p.gpa.toFixed(2) : '평점 없음', p.bracket != null ? `${p.bracket}구간` : '구간 모름', p.status || ''].filter(Boolean).join(' · ');
+  if (info) info.textContent = [p.gpa != null ? p.gpa.toFixed(2) : '평점 없음', p.bracket != null ? `${p.bracket}구간` : '', p.status || ''].filter(Boolean).join(' · ');
   const set = $('#my-sub-settings');
   if (set) {
     const on = typeof notifyLedger !== 'undefined' && notifyLedger && notifyLedger.enabled && typeof Notification !== 'undefined' && Notification.permission === 'granted';
@@ -6514,8 +6756,8 @@ const FAQ_ITEMS = [
     '지금 공고 원문을 모으고 있는 학교가 정해져 있어요. 그 밖의 학교라도 <strong>전국 대상 공고</strong>와 <strong>한국장학재단이 아는 재단 장학금</strong>은 그대로 보입니다.'],
   ['공고·매칭', '자격 요건이 안 적힌 공고가 있어요.',
     '그 공고에서는 자격 요건을 <strong>공고 원문에서 직접 확인</strong>해 주세요. 앱이 짐작해서 채우지 않습니다 — 틀린 자격 판정은 모른다고 말하는 것보다 나쁘기 때문이에요.'],
-  ['공고·매칭', '금액이 "원문 확인"인 공고가 있어요.',
-    '공고 원문에 금액이 적혀 있지 않거나 첨부파일에만 있는 경우입니다. 그 공고의 카드에는 지어낸 숫자를 적지 않고 <strong>"금액 원문 확인"</strong> 그대로 둡니다. 다만 홈의 합계는 이런 공고를 빼 버리면 실제보다 작아지므로, <strong>금액을 확인한 공고들의 중앙값</strong>으로 어림잡아 더하고 숫자 앞에 "약"을 붙입니다. 자세한 내역은 홈의 금액을 눌러 <strong>금액 상세</strong>에서 볼 수 있어요.'],
+  ['공고·매칭', '금액이 안 보이는 공고가 있어요.',
+    '공고 원문에 금액이 적혀 있지 않거나 첨부파일에만 있는 경우입니다. 그 공고의 카드에는 지어낸 숫자를 적지 않고 <strong>금액 줄을 비워</strong> 둡니다. 다만 홈의 합계는 이런 공고를 빼 버리면 실제보다 작아지므로, <strong>금액을 확인한 공고들의 중앙값</strong>으로 어림잡아 더하고 숫자 앞에 "약"을 붙입니다. 자세한 내역은 홈의 금액을 눌러 <strong>금액 상세</strong>에서 볼 수 있어요.'],
   ['공고·매칭', '저장(북마크)한 공고는 어디에 남나요?',
     '<strong>이 기기에만</strong> 남습니다. 로그인해도 저장 목록은 서버로 올라가지 않아서, 기기를 바꾸면 다시 저장하셔야 해요.'],
   ['공고·매칭', '달력에 왜 몇 개만 표시되나요?',
@@ -7212,6 +7454,99 @@ function renderWallet() {
   );
 }
 
+/* ---------------- 입력 안전장치 (2026-11-17 · HDJ-요청-2026-001 후속) ----------------
+   규칙(범위·글자 종류)은 input-guard.js 한 곳이다. 여기는 그 규칙을 **칸에 거는 배선**만 한다.
+   · data-guard="gpa|credits|birthYear"   — PROFILE_LIMITS 의 범위
+   · data-guard-min/max/dec               — PROFILE_LIMITS 에 없는 숫자 칸
+   · data-guard-kind="studentId|phone|date|account" — 글자 종류만
+   🔴 위임 하나로 건다 — 공고 시트·대외활동 관문 칸은 나중에 그려지므로 칸마다 걸면 새 칸이 빠진다. */
+function guardLimitOf(el) {
+  const key = el.dataset.guard;
+  if (key && typeof PROFILE_LIMITS !== 'undefined' && PROFILE_LIMITS[key]) return PROFILE_LIMITS[key];
+  if (el.dataset.guardMin != null) {
+    const lab = el.closest('label') && el.closest('label').querySelector('span');
+    return { min: Number(el.dataset.guardMin), max: Number(el.dataset.guardMax), decimals: Number(el.dataset.guardDec || 0),
+      label: lab ? lab.textContent.trim() : '이 칸', unit: '' };
+  }
+  return null;
+}
+const guardLast = new WeakMap();   // 칸마다 마지막으로 받아 준 글자 — 막을 때 이 글자로 되돌린다
+let guardHintAt = 0;
+function guardTextOk(el, text) {
+  const lim = guardLimitOf(el);
+  if (lim) return guardText(text, lim);
+  if (el.dataset.guardKind) return guardKind(text, el.dataset.guardKind);
+  return true;
+}
+const GUARD_KIND_MSG = {
+  studentId: '학번은 숫자·영문만 적을 수 있어요',
+  phone: '휴대폰 번호는 숫자와 - 만 적을 수 있어요',
+  date: '생년월일은 숫자로 적어 주세요 (예: 2005.03.14)',
+  account: '계좌번호는 숫자와 - 만 적을 수 있어요',
+};
+function guardHint(el) {
+  el.classList.add('guard-bad');
+  clearTimeout(el._guardT);
+  el._guardT = setTimeout(() => el.classList.remove('guard-bad'), 900);
+  const now = Date.now();
+  if (now - guardHintAt < 1500) return;   // 연달아 친 글자마다 알림을 띄우지 않는다
+  guardHintAt = now;
+  const lim = guardLimitOf(el);
+  toast(lim ? `${lim.label}은(는) ${lim.min}~${lim.max}${lim.unit || ''} 사이만 적을 수 있어요`
+    : (GUARD_KIND_MSG[el.dataset.guardKind] || '적을 수 없는 글자예요'));
+}
+function bindInputGuards() {
+  const isGuarded = (el) => !!(el && el.matches && el.matches('input[data-guard], input[data-guard-min], input[data-guard-kind]'));
+  /* 칸에 들어갈 때 지금 글자를 '받아 준 글자'로 적는다 — 코드가 채운 값(저장된 프로필)도 여기서 잡힌다 */
+  document.addEventListener('focusin', (e) => { if (isGuarded(e.target)) guardLast.set(e.target, e.target.value); }, true);
+  /* 친 뒤 — 받을 수 없는 글자면 직전 글자로 되돌린다. 붙여넣기·자동완성도 전부 여기를 지난다 */
+  document.addEventListener('input', (e) => {
+    const el = e.target;
+    if (!isGuarded(el) || e.isComposing) return;
+    if (guardTextOk(el, el.value)) { guardLast.set(el, el.value); return; }
+    const prev = guardLast.has(el) ? guardLast.get(el) : '';
+    /* 🔴 직전 글자부터 이미 규칙 밖이면(안전장치 전에 저장된 '2005년 3월 14일' 같은 값) **지우는 쪽은 받아 준다** —
+       안 받으면 한 글자 치는 순간 칸이 통째로 비거나, 고칠 길 없이 갇힌다. 덧붙이는 것만 막는다. */
+    if (!guardTextOk(el, prev) && el.value.length < prev.length) { guardLast.set(el, el.value); return; }
+    const pos = Math.max(0, (el.selectionStart || 0) - (el.value.length - prev.length));
+    el.value = prev;
+    try { el.setSelectionRange(pos, pos); } catch (err) { /* 선택 범위를 못 쓰는 칸 */ }
+    guardHint(el);
+  }, true);
+  /* 한글 입력이 끝나는 순간 한 번 더 — 조합 중에는 위에서 건너뛰었다 */
+  document.addEventListener('compositionend', (e) => {
+    const el = e.target;
+    if (!isGuarded(el) || guardTextOk(el, el.value)) return;
+    const prev = guardLast.has(el) ? guardLast.get(el) : '';
+    if (!guardTextOk(el, prev) && el.value.length < prev.length) { guardLast.set(el, el.value); return; }   // 위와 같은 규칙
+    el.value = prev;
+    guardHint(el);
+  }, true);
+}
+/* 넘길 때 — 이 범위 안 칸 중 **다 쳤는데 범위 밖**이거나 있을 수 없는 날짜인 첫 칸 */
+function guardFirstBad(root) {
+  if (!root) return null;
+  /* 🔴 `$$` 는 범위(root)를 안 받는다 — 화면 전체를 뒤지면 다른 단계의 칸에 걸린다 */
+  for (const el of Array.from(root.querySelectorAll('input[data-guard], input[data-guard-min], input[data-guard-kind="date"]'))) {
+    const lim = guardLimitOf(el);
+    const r = lim ? checkNumber(el.value, lim) : checkBirthDate(el.value);
+    if (!r.ok) return { el, msg: r.msg };
+  }
+  return null;
+}
+function guardShowBad(bad) {
+  bad.el.classList.add('guard-bad');
+  clearTimeout(bad.el._guardT);
+  bad.el._guardT = setTimeout(() => bad.el.classList.remove('guard-bad'), 1800);
+  try { bad.el.focus(); } catch (e) { /* 숨은 칸 */ }
+  toast(bad.msg);
+}
+function guardStepOk(root) {
+  const bad = guardFirstBad(root);
+  if (bad) { guardShowBad(bad); return false; }
+  return true;
+}
+
 /* ---------------- 이벤트 바인딩 ---------------- */
 function bindEvents() {
   /* 소식 썸네일을 못 받으면(아직 배포 전·오프라인·지워짐) 그림만 빼고 글자 카드로 (2026-10-03).
@@ -7267,6 +7602,8 @@ function bindEvents() {
         if (!$('#in-school').value.trim()) { toast('학교명 입력 필요'); return; }
         if (!getChip('#in-year')) { toast('학년 선택 필요'); return; }
       }
+      /* 다 못 친 값(출생연도 '19')·있을 수 없는 날짜는 칠 때 못 막으니 넘어갈 때 짚는다 (input-guard ②) */
+      if (!guardStepOk(btn.closest('.onboard-step'))) return;
       onboardStep += 1;
       renderOnboardStep();
       onboardProgressSave();   /* 어느 단계까지 왔는지도 진행분이다 */
@@ -7279,6 +7616,19 @@ function bindEvents() {
   });
 
   $('#btn-finish-onboard').addEventListener('click', () => {
+    /* 저장 전에 **온보딩 전체**를 한 번 더 본다 — 이어보기로 옛 진행분이 칸에 채워진 경우 등.
+       걸린 칸이 있으면 그 칸의 단계로 데려가 짚는다(저장하지 않는다) */
+    const bad = guardFirstBad($('#screen-onboarding'));
+    if (bad) {
+      const st = bad.el.closest('.onboard-step');
+      if (st && st.dataset.step != null && Number(st.dataset.step) !== onboardStep) {
+        onboardStep = Number(st.dataset.step);
+        renderOnboardStep();
+        onboardProgressSave();
+      }
+      guardShowBad(bad);
+      return;
+    }
     onboardEditing = false;
     const isFirstTime = !state.profile;
     state.profile = collectProfile();
@@ -7298,6 +7648,7 @@ function bindEvents() {
     // 프로필을 처음 만든 직후에 알림 동의를 딱 한 번 묻는다 (이후에는 MY 화면에서만)
     // 저장 완료 토스트가 사라진 뒤에 물어본다 (문구가 겹치지 않게)
     if (isFirstTime && typeof notifyMaybeAskConsent === 'function') notifyMaybeAskConsent(2900);
+    if (isFirstTime) if (typeof trackUse === 'function') trackUse('onboard', '');
   });
 
   $('#in-flags').addEventListener('change', syncConsentRow);
@@ -7728,6 +8079,7 @@ function bindEvents() {
      배선은 남겨 두되 **있을 때만** 건다(없는 요소에 걸면 그 자리에서 죽는다). */
   { const e = $('#btn-edit-profile'); if (e) e.addEventListener('click', editProfile); }
   { const e = $('#btn-my-edit'); if (e) e.addEventListener('click', editProfile); }
+  { const e = $('#act-gate-profile'); if (e) e.addEventListener('click', () => { actGateDrawn = false; editProfile(); }); }   // 대외활동 관문 「내 정보」의 「학적정보 수정」 — 같은 입구(2026-11-15)
 
   /* 눌러서 넘어가는 영역 — 마우스·손가락뿐 아니라 키보드로도 되어야 한다
      (div라 버튼과 달리 Enter·스페이스가 저절로 먹지 않는다) */
@@ -7765,6 +8117,12 @@ function bindEvents() {
   /* MY 메뉴 줄 → 안쪽 화면 (2026-10-10 C안 구조). 되돌아오기는 왼쪽 위 화살표와 오른쪽으로 쓸기(SWIPE_BACK_TO) */
   $$('[data-my-go]').forEach((b) => b.addEventListener('click', () => showScreen(b.dataset.myGo)));
   for (const n of ['myinfo', 'mydocs', 'mysaved']) $(`#btn-${n}-back`).addEventListener('click', () => showScreen('my', { back: true }));
+  $('#my-saved').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-saved-kind]');
+    if (!b || b.dataset.savedKind === savedKind) return;
+    savedKind = b.dataset.savedKind;
+    renderSaved();
+  });
   $('#btn-trash-back').addEventListener('click', () => showScreen('settings', { back: true }));
   $('#btn-terms-back').addEventListener('click', () => showScreen('settings', { back: true }));
   for (const id of ['#btn-logins-back', '#btn-faq-back', '#btn-support-back', '#btn-perms-back']) {
@@ -8299,7 +8657,9 @@ async function authSubmit() {
 /* ---------------- 시작 ---------------- */
 loadState();
 bindEvents();
+bindInputGuards();
 initOnboarding();
+if (scrubbedOnLoad.length) setTimeout(() => toast(`저장돼 있던 ${scrubbedOnLoad.join('·')} 값이 범위를 벗어나 비웠어요 — 내 정보에서 다시 적어 주세요`), 1500);
 loadLinkChecks();   // 원문 링크 확인 장부 — 링크를 그리는 목록들보다 먼저 띄운다(작다 · 없어도 조용하다)
 /* 처음 받는 데이터 — 다 도착하면(`bootJobs`) 홈을 한 번 그리고 인트로를 돌린다(위 `bootHold` 머리말) */
 const bootJobs = [loadNotices(), loadNews(), loadActivities(), loadExternal(), loadRegistered(), loadKosaf()];

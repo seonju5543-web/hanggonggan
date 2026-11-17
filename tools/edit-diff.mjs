@@ -40,6 +40,7 @@ export const EDIT_LABEL = {
   eligibilityLines: '학생에게 보여 줄 자격 문장',
   eligibilityVerified: '자격 제한 없음 확인',
   documents: '요구 서류',
+  excerpts: '신청 방법 원문 발췌',
   announceDate: '결과 발표일',
   eligibilityExcludes: '이런 학생은 못 받아요',
   eligibilityPriority: '먼저 뽑는 기준',
@@ -109,6 +110,17 @@ export function cleanLines(v) {
     .map((x) => x.slice(0, 300));
 }
 
+/** 신청 방법 원문 발췌 (2026-11-17) — 원문 문장 그대로를 줄마다. 글자가 아닌 줄(숫자·객체)이 섞이면 던진다(화면은 막힌 줄로 보여 준다).
+ *  🔴 사람이 적은 발췌는 원문 근거가 아니다 — 저장소가 `excerptsFrom = '관리자 …'` 를 붙이고, 근거로 읽는 곳은 전부
+ *     `collector/notice-source.mjs` evidenceExcerpts 로 그 줄을 뺀다(자격 줄의 eligibilityFrom 규칙과 같다). */
+export function cleanExcerpts(v) {
+  if (v === null || v === undefined || v === '') return null;
+  const arr = Array.isArray(v) ? v : (typeof v === 'string' ? v.split('\n') : null);
+  if (!arr || arr.some((x) => typeof x !== 'string')) throw new Error('원문 발췌는 문장(글자) 목록이어야 합니다');
+  const out = cleanLines(arr);
+  return out.length ? out : null;
+}
+
 /* 달력에 **실제로 있는 날**인가 — 모양만 보면 `2026-13-01`·`2026-02-30` 이 통과한다 */
 export const isDay = (v) => {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(v || ''))) return false;
@@ -135,6 +147,7 @@ export function normalizeValue(k, v) {
     return a.length ? a : null;
   }
   if (k === 'eligibilityVerified') return (out === true || out === 'true') ? true : null;
+  if (k === 'excerpts') return cleanExcerpts(out);
   if (k === 'exclusivity') return cleanExclusivity(out);
   if (k === 'amountValue') return Number(out) || 0;
   if (k === 'prepDoc') return (out === true || out === 'true');
@@ -262,11 +275,14 @@ export function wonText(n) {
 /* 등록금 비율·시급도 원문 그대로 짧게 (2026-10-05 · UI-12) — 읽어 두고 카드에 '금액 원문 확인' 이라 적던 10건.
    시급은 원문 근거 줄(raw)의 숫자만 쓴다 — 못 찾으면 '' (부르는 쪽이 문구를 그대로 둔다). */
 export function amountText(a) {
-  if (a && a.kind === 'ratio') return a.ratio === 1 ? '등록금 전액' : `등록금 ${Math.round(a.ratio * 100)}%`;
+  /* 상한으로 적힌 비율(`수업료 60% 이내 차등지급`)은 상한 그대로 — 「등록금 60%」 라 적으면 다 받는 것처럼 읽힌다 (2026-11-15) */
+  if (a && a.kind === 'ratio') return a.ratio === 1 ? (a.upTo ? '등록금 전액 이내' : '등록금 전액') : `등록금 ${Math.round(a.ratio * 100)}%${a.upTo ? ' 이내' : ''}`;
   if (a && a.kind === 'hourly') {
-    const m = String(a.raw || '').match(/(?:시급|시간당)\s*[:：]?\s*([\d,]+)\s*원|([\d,]+)\s*원\s*\/\s*(?:시간|시|h)/i);
+    /* `시급(10,320원)` 괄호 꼴도 (조선대 국가근로 3차 · 2026-11-15 — 시급형으로 읽고도 문구가 비어 '금액 원문 확인'이었다) */
+    const m = String(a.raw || '').match(/(?:시급|시간당)\s*[:：(（]?\s*([\d,]+)\s*원|([\d,]+)\s*원\s*\/\s*(?:시간|시|h)/i);
     return m ? `시급 ${m[1] || m[2]}원` : '';
   }
+  if (a && a.kind === 'fixed' && a.upTo && a.value) return `최대 ${wonText(a.value)}`;   // 원문이 상한으로 적은 금액(`최대 350만원`)
   return a && a.kind === 'range' ? `${wonText(a.min)} ~ ${wonText(a.max)}` : wonText(a && a.value);
 }
 

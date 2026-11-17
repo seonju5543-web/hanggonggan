@@ -1,7 +1,40 @@
 {
  "school": "조선대학교",
- "updatedAt": "2026-11-15",
+ "updatedAt": "2026-11-17",
  "items": [
+  {
+   "title": "목소리로 세상을 그리는 남자 강수진인데요? 조선대학교 특별가 안내",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282864/artclView.do",
+   "postedAt": "2026-11-17",
+   "school": "조선대학교",
+   "campus": "",
+   "src": "c6a7801d",
+   "foundAt": "2026-11-17",
+   "thumb": "data/news/img/54306087d198e205.webp",
+   "desc": "공연 일시 : 2026 년 12 월 12 일 ( 토 ) 오후 2 시 / 오후 6 시 ( 총 2 회 ) 공연 장소 : 조선대학교 해오름관 티켓 가격 : 정가 66,000 원 특별 할인 : 조선대학교 임직원 및 재학생…"
+  },
+  {
+   "title": "2026학년도 동계 단기토익사관학교 사전 안내(교육비 무료)",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282854/artclView.do",
+   "postedAt": "2026-11-17",
+   "school": "조선대학교",
+   "campus": "",
+   "src": "c6a7801d",
+   "foundAt": "2026-11-17",
+   "thumb": "data/news/img/5139dfcd1259142c.webp",
+   "desc": "글로벌언어교육지원팀 ⇨ 동계방학에는 단기 토익스피킹사관학교가 열리지 않습니다. ⇦ 410 점에서 750 점으로 ! 665 점에서 940 점으로 ! 단기간에 수강생 전체 평균 점수 140 점 이상 향상 여러분의 선배…"
+  },
+  {
+   "title": "[앵커사업단] AI·로봇 인증체계 개발 및 AI 기반 데이터사이언스 전문가 양성 교육 (M4 과정) 교육생 모집",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282817/artclView.do",
+   "postedAt": "2026-11-16",
+   "school": "조선대학교",
+   "campus": "",
+   "src": "c6a7801d",
+   "foundAt": "2026-11-16",
+   "thumb": "data/news/img/fd4259df2be58078.webp",
+   "desc": "- 과정명: DSAC M4. Deep Learning (딥러닝) - 주관: 조선대학교 앵커사업단"
+  },
   {
    "title": "[일자리지원팀] 상담 받고 치킨 받는 법. (선착순+추첨)",
    "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282800/artclView.do",
@@ -388,28 +421,6 @@
    "src": "c6a7801d",
    "foundAt": "2026-10-20",
    "desc": "본교에서는 글로벌 인재양성 및 취업률 제고를 위하여 재학생 여러분들의 외국어 실력을 향상 시키고자 YBM 한국토익위원회 주관 본교 TOEIC 특별 시험 (= 모의토익 ) 을 시행 중에 있습니다."
-  },
-  {
-   "title": "[취업전략팀] NEZOT주식회사 온라인 채용설명회",
-   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282075/artclView.do",
-   "postedAt": "2026-10-16",
-   "kind": "행사",
-   "school": "조선대학교",
-   "campus": "",
-   "src": "c6a7801d",
-   "foundAt": "2026-10-16",
-   "thumb": "data/news/img/0f9610f3444def4d.webp",
-   "desc": "네조트주식회사의 기업 소개부터 웹개발자 채용정보, 전형 절차까지 온라인으로 확인하세요!"
-  },
-  {
-   "title": "[대학일자리플러스센터] 2026 대학일자리플러스센터 비교과프로그램 참여 수기 공모전 수상자 공고",
-   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282070/artclView.do",
-   "postedAt": "2026-10-16",
-   "school": "조선대학교",
-   "campus": "",
-   "src": "c6a7801d",
-   "foundAt": "2026-10-16",
-   "desc": "일자리지원팀 2026 대학일자리플러스센터 에세이 공모전 심사 결과 안내 프로그램에 참여해주신 재학생, 졸업생 여러분 감사합니다. 수상을 진심으로 축하드립니다. 공모전 심사 결과를 아래와 같이 안내합니다."
   }
  ]
 }

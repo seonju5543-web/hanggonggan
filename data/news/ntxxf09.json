@@ -1,7 +1,79 @@
 {
  "school": "경기대학교",
- "updatedAt": "2026-11-15",
+ "updatedAt": "2026-11-17",
  "items": [
+  {
+   "title": "[입학에서 취업까지] 2027학년도 전공선택유연화 시행 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627253&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-17",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-17"
+  },
+  {
+   "title": "[입학에서 취업까지] 2026학년도 2학기「인권과 성평등교육」 이수 안내 (졸업예정자 추가공지)",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627241&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-17",
+   "kind": "학사",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-17"
+  },
+  {
+   "title": "[입학에서 취업까지] 2027학년도 1학기 국회도서관 실습생 모집",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627233&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-16",
+   "kind": "생활",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-16",
+   "desc": "공지 내 일정 및 안내사항 필수로 확인 후 신청 바랍니다. 2027-1 도서관 실습 강의 수강 예정인 4학년 학생 (도서관 실습 강의 수강하지 않을 시 신청불가) 모집인원: 2명 (선착순 모집) 실습장소: 국회도서관"
+  },
+  {
+   "title": "[대학생활/업무안내] [수학과] 2027학년도 전공선택유연화 신청안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627231&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-16",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-16",
+   "desc": "대학소개 대학·조직 대학생활 맞춤정보 어떤 정보 를 찾고계시나요? 맞춤설정 저장하기 (언제든 변경 가능합니다) 맞춤설정 이란? 소속, 내용, 기간별로 나만의 맞춤 콘텐츠를 찾아보세요."
+  },
+  {
+   "title": "[입학에서 취업까지] 2026-동계 미시간 주립대학교 프로그램(2주) 온라인 설명회",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627230&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-16",
+   "kind": "행사",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-16",
+   "desc": "-날짜및 시간:2026.11.16, 저녁 5시 예정 -참여방법: https://msu.zoom.us/j/91405650058로 들어가시면 됩니다."
+  },
+  {
+   "title": "[대학생활/업무안내] 2025학년도 인권성평등 온라인 영화제 수상자 발표",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627229&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-16",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-16",
+   "thumb": "data/news/img/da8b4d1b720aec47.webp",
+   "desc": "이미지 확대보기 인권성평등센터입니다. 인권성평등센터에서 진행한 2026학년도 온라인 인권 영화상영회에 참여한 모든 분들 감사합니다. 심사가 마무리 되어 수상 작품을 알립니다."
+  },
+  {
+   "title": "[일반] [사학] 2026학년도 2학기 추계학술답사 객실 배정 관련 사실관계 조사 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627216&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-16",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-16",
+   "desc": "이번 추계학술답사에서 객실 배정과 관련하여 규정 위반이 의심되는 정황이 확인되었습니다. 이에 부득이하게 사실관계 조사를 실시하고자 합니다."
+  },
   {
    "title": "[입학에서 취업까지] <2026-2 무역학과 1차 졸업시험 결과 관련 공지 +2차 시험 관련 공지>",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627207&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
@@ -340,80 +412,6 @@
    "src": "bf927d3e",
    "foundAt": "2026-11-03",
    "desc": "서비스명 : KGU AI ONE(케이지유 에이아이 원) 이용대상 : 학부 재학생 월별 크레딧 이용 한도 : 1인당 월 3,000 크레딧 이용 기간: 2026.11.01. ~ 2027.02.28. 제공 모델:…"
-  },
-  {
-   "title": "[수강에서 성적까지] 2026학년도 재학생 BARUN 핵심역량진단 시행 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626994&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-11-03",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-11-03",
-   "thumb": "data/news/img/451ba719862d5639.webp"
-  },
-  {
-   "title": "[일반] 2026학년도 2학기 본심사 신청서 제출기간 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626987&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-11-03",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-11-03",
-   "desc": "※유의사항 1. 본심사 일정은 전공별로 상이하니 각 전공 사무실을 통해 확인하여 주시기 바랍니다. *연락처는 하단에 있습니다."
-  },
-  {
-   "title": "[일반] 2026-2학기 학위논문 공개발표 및 본심사 신청 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626986&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-11-03",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-11-03",
-   "thumb": "data/news/img/b8b59e3fd96c2281.webp",
-   "desc": "대학소개 대학·조직 대학생활 맞춤정보 어떤 정보 를 찾고계시나요? 맞춤설정 저장하기 (언제든 변경 가능합니다) 맞춤설정 이란? 소속, 내용, 기간별로 나만의 맞춤 콘텐츠를 찾아보세요."
-  },
-  {
-   "title": "[일반] [러시아어문전공] 경기대학교 러시아어문전공 실습조교 모집 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626985&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-11-03",
-   "kind": "채용",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-11-03"
-  },
-  {
-   "title": "[일반] 2026학년도 전기(2027년 2월 졸업) 학위논문 온라인(dColleciton) 제출 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626979&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-11-03",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-11-03"
-  },
-  {
-   "title": "[일반] [독어독문전공] 2027학년도 전공선택유연화 시행 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626978&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-11-03",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-11-03"
-  },
-  {
-   "title": "[일반] [동덕여자대학교 글로벌MICE융합전공] 제7회 동덕MICE포럼 「2026 MI-CULTURE」",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=626977&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-11-03",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-11-03",
-   "thumb": "data/news/img/614d7dd15b30d5fc.webp",
-   "desc": "안녕하세요! 동덕여자대학교 글로벌MICE융합전공 학회 [동덕MICE앰버서더]입니다. 현직자 멘토링부터 업계 전문가 강연, 네트워킹까지 한자리에서 만날 수 있는 제7회 동덕MICE포럼 「2026 MI-CULTURE」…"
   }
  ]
 }

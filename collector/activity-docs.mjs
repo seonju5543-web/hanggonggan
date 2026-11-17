@@ -35,7 +35,7 @@ import { FETCH_HEADERS } from './http-headers.mjs';
 import { htmlToLines } from './html-text.mjs';
 import { decodeEntities } from './clean-title.mjs';
 import { attachmentText, isOcrSource, isNoticeDoc } from './attachment-text.mjs';
-import { activityDetails, eligLineOk, activityDocuments, putActivityDocuments } from './activity-excerpts.mjs';
+import { activityDetails, eligLineOk, ACT_DETAILS_V, activityDocuments, putActivityDocuments } from './activity-excerpts.mjs';
 import { ACT_SIGNAL } from './activity-vocab.mjs';
 import { detailByRule } from './activity-detail-rules.mjs';   // 온통청년처럼 글·포스터가 JSON 에 있는 게시판 — 수집 로봇과 같은 함수(2026-10-28)
 const { cutAtNextSection } = await import('./extract-excerpts.mjs');   // activity-excerpts 와 같은 이유로 동적으로(환경변수보다 뒤에)
@@ -73,6 +73,12 @@ const flatK = (x) => String(x || '').replace(/\[[^\]]*\]|\([^)]*\)/g, '').replac
 /** 이 줄이 글 제목(또는 제목을 품은 머리줄)인가 */
 export const isTitleLine = (line, title) => { const k = flatK(title).slice(0, 12); return k.length >= 6 && flatK(line).includes(k); };
 export const needsElig = (n) => !n.hidden && !(n.eligibilityLines && n.eligibilityLines.length);
+/* 첨부·포스터에서 읽어 둔 자격이 **옛 규칙으로 뽑힌 것**이면 무료 모드가 한 번 더 읽는다 (2026-11-15 · 소급 — 원칙 7).
+   수집 로봇의 다시 읽기(판 ACT_DETAILS_V)는 **본문**만 다시 읽고 첨부에서 온 줄은 그대로 둔다(putActivityDetails keepDocs) — 그래서 절 가르기 규칙이 바뀌어도
+   첨부에서 뽑은 줄은 영영 옛 규칙이었다(중국언어문화 경진대회 안내문 — 「참가제한」 항목 다섯이 자격 줄로 남았다).
+   · 다시 못 읽으면(파일이 내려갔다 · 기회 두 번을 다 썼다 — dueFree) **읽어 둔 줄은 그대로 둔다** — 지우지 않는다
+   · 브라우저 모드는 하지 않는다(자격 0줄인 글만 연다 — 같은 글을 두 로봇이 다시 두드리지 않게) · 읽은 판은 docsV 에 적는다 */
+export const staleDocs = (n) => !n.hidden && /^(?:공고문 첨부|요강 페이지)/.test(n.eligibilityFrom || '') && (n.docsV || 0) < ACT_DETAILS_V;
 
 /** 받을 후보 — 첨부(공고문·포스터) 먼저, 그다음 본문 그림. 서식·꾸밈 그림은 뺀다. */
 /** 글 제목이 HTML 에 마지막으로 나온 자리부터 (없으면 전체) — activity-excerpts.mjs atTitle 과 같은 생각 */
@@ -354,7 +360,7 @@ async function fetchPhase(acts) {
   let posts = 0, files = 0;
   for (const n of acts.items) {
     if (posts >= POSTS_PER_RUN || Date.now() > until) break;
-    if (!needsElig(n) || !dueFree(ledger[n.url], today)) continue;
+    if (!(needsElig(n) || (!BROWSER && staleDocs(n))) || !dueFree(ledger[n.url], today)) continue;
     if (BROWSER && !plainTried[n.url]) continue;           // 무료 모드가 먼저 — 그래도 못 읽은 글만 브라우저로
     if (BROWSER && ledger[n.url] && ledger[n.url].lines) continue;   // 이미 찾아 장부에 적었다 — 수집 로봇이 합치기 전까지 다시 열지 않는다
     posts += 1;
@@ -419,7 +425,7 @@ function applyPhase(acts) {
   for (const n of acts.items) {
     const files = manifest[n.url];
     /* 본문이 스크립트로 그려져 빈 글(정책브리핑 보도자료 · 2026-10-27)은 첨부(보도자료 hwpx)의 글이 「공고 안내」가 된다 — 자격은 이미 있어도 */
-    const wantElig = needsElig(n), wantNotice = !(n.noticeLines || []).length;
+    const wantElig = needsElig(n) || (!BROWSER && staleDocs(n)), wantNotice = !(n.noticeLines || []).length;
     if (!files || !files.length || !(wantElig || wantNotice)) continue;
     const d = eligFromFiles(n, files);
     if (!d) continue;
@@ -429,8 +435,9 @@ function applyPhase(acts) {
     if (BROWSER) { bled[n.url] = { ...(bled[n.url] || {}), lines: d.eligibilityLines, excludes: d.eligibilityExcludes, from: d.from, ...((d.documents || []).length ? { documents: d.documents } : {}) }; got += 1; continue; }
     if ((d.documents || []).length && !(n.documents || []).length) putActivityDocuments(n, d.documents, d.from);   // 본문이 준 목록이 있으면 본문이 이긴다
     n.eligibilityLines = d.eligibilityLines;
-    if (d.eligibilityExcludes.length) n.eligibilityExcludes = d.eligibilityExcludes;
+    if (d.eligibilityExcludes.length) n.eligibilityExcludes = d.eligibilityExcludes; else delete n.eligibilityExcludes;   // 다시 읽은 글 — 옛 제외 줄이 남지 않게
     n.eligibilityFrom = d.from;
+    n.docsV = ACT_DETAILS_V;   // 이 판의 규칙으로 읽었다(staleDocs)
     got += 1;
   }
   /* OCR 이 실패한 파일 때문에 못 읽은 글은 그 시도를 세지 않는다(위 rollbackOcrTries) — 같은 결과로 두 번 되돌리지 않게 표시해 둔다 */

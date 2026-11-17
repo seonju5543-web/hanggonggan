@@ -16,240 +16,9 @@
   "excludes": [],
   "from": "브라우저 본문"
  },
- "https://dep.hufs.ac.kr/bbs/student/2436/269599/artclView.do": {
-  "at": "2026-11-07",
-  "tries": 2
- },
- "https://wise.dongguk.ac.kr/article/servicenotice/detail/520976": {
-  "at": "2026-10-27",
-  "tries": 1,
-  "lines": [
-   "장애학생지원",
-   "장애인 복지시설"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53567&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-11-03",
-  "tries": 2
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53566&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-11-03",
-  "tries": 2
- },
- "https://wise.dongguk.ac.kr/article/servicenotice/detail/520964": {
-  "at": "2026-10-27",
-  "tries": 1,
-  "lines": [
-   "장애학생지원",
-   "장애인 복지시설"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/269933/artclView.do": {
-  "at": "2026-10-27",
-  "tries": 1,
-  "lines": [
-   "모집 대상 : 중학교 1학년(2013년생)~ 대학생 4학년(2002년생)20명"
-  ],
-  "excludes": [],
-  "from": "공고문 첨부(OCR)"
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/269932/artclView.do": {
-  "at": "2026-10-27",
-  "tries": 1,
-  "lines": [
-   "교육대상 : 데이터 분석 및 저널리즘 분야로 취업을 희망하는자",
-   "QR 코드로 신청하기",
-   "신청자격 : 국민내일배움카드 발급자 또는 발급 가능한자",
-   "* 교육과정 최종 합격자 발표 전 내일배움카드 수령 가능한자"
-  ],
-  "excludes": [],
-  "from": "공고문 첨부(OCR)"
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/269931/artclView.do": {
-  "at": "2026-10-27",
-  "tries": 1,
-  "lines": [
-   "참가대상 : 전 국민 (개인·팀 가능)",
-   "대상 : 1팀"
-  ],
-  "excludes": [],
-  "from": "공고문 첨부(OCR)"
- },
- "https://dep.hufs.ac.kr/bbs/student/2431/270217/artclView.do": {
-  "at": "2026-11-04",
-  "tries": 2
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53578&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-11-04",
-  "tries": 2
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/270140/artclView.do": {
-  "at": "2026-11-04",
-  "tries": 2
- },
- "https://blog.naver.com/moeblog/224450331936": {
-  "at": "2026-10-29",
-  "tries": 1,
-  "lines": [
-   "※ 시상규모는 접수 현황과 심사 결과에 따라 조정될 수 있으며, 상금은 표기된 금엑에 제세공과금 공제 후 지급 예정",
-   "저작자 명시 필수",
-   "영리적 사용 불가",
-   "내용 변경 불가",
-   "태그 #교육부 #2026년 #한국형사회정서교육 #우수사례 #공모전",
-   "이 글에 공감한 블로거 열고 닫기",
-   "이 글에 댓글 단 블로거 열고 닫기",
-   "블로그 보내기 카페 보내기 Keep 보내기 메모 보내기 기타 보내기 펼치기"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://www.bizinfo.go.kr/sii/siia/selectSIIA200Detail.do?pblancId=PBLN_000000000127281": {
-  "at": "2026-11-05",
-  "tries": 2
- },
- "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156787017&pWise=sub&pWiseSub=C5": {
-  "at": "2026-11-05",
-  "tries": 2
- },
- "https://www.youthcenter.go.kr/bbs03View/48/10858": {
-  "at": "2026-11-06",
-  "tries": 2
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/270425/artclView.do": {
-  "at": "2026-11-06",
-  "tries": 2
- },
- "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156787394&pWise=sub&pWiseSub=C3": {
-  "at": "2026-11-07",
-  "tries": 2
- },
- "https://www.jbnu.ac.kr/web/Board/219309/detailView.do?category=6": {
-  "at": "2026-11-09",
-  "tries": 2
- },
- "https://kau.ac.kr/kaulife/main/global.html": {
-  "at": "2026-11-09",
-  "tries": 2
- },
- "https://wise.dongguk.ac.kr/article/servicenotice/detail/521064": {
-  "at": "2026-11-10",
-  "tries": 2
- },
- "https://www.k-startup.go.kr/web/contents/webNOTICE_MATR.do?page=1&viewCount=18&id=176472&schBdcode=&schGroupCode=&schM=view": {
-  "at": "2026-11-12",
-  "tries": 2
- },
- "https://blog.naver.com/mohw2016/224463267916": {
-  "at": "2026-11-05",
-  "tries": 1,
-  "lines": [
-   "2026년 발달장애인 인식개선 수기 공모전_안내 .pdf",
-   "발달장애인 지원 제도로 되찾은 일상의 여유, 함께하며 발견한 작은 행복,",
-   "앞으로도 보건복지부는 발달장애인과 가족의 삶에 귀 기울이며,",
-   "태그 #발달장애인 #발달장애인인식개선 #수기공모전 #2026공모전 #장애인복지 #공모전이벤트 #국민참여 #함께하는일상 #공모전소식 #보건복지부"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://blog.naver.com/kfdazzang/224463652864": {
-  "at": "2026-11-05",
-  "tries": 1,
-  "lines": [
-   "ㅇ 대한민국 국민으로 국내에 거주 중인 만 18세 이상 누구나",
-   "- 식·의약 정책에 관심이 많고 적극적인 취재 활동이 가능한 분",
-   "- 콘텐츠 제작 시 트렌드 (‘밈’), 생성형 AI 프로그램을 등을 적절히 활용할 수 있는 분",
-   "ㅇ 총 10명 내외",
-   "※ 모집 인원은 상황에 따라 변경될 수 있음"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://www.mpb.go.kr/web/main/bbs/b_0001/3125?cp=1&sortOrder=BA_REGDATE&sortDirection=DESC&bcId=b_0001&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true": {
-  "at": "2026-11-12",
-  "tries": 2
- },
  "https://www.saha.go.kr/startup/program/list.do?mId=0302000000": {
   "at": "2026-11-14",
   "tries": 2
- },
- "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000242/articleView.do?searchSeq=17550&commonMenuNo=506_533": {
-  "at": "2026-11-14",
-  "tries": 2
- },
- "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000242/articleView.do?searchSeq=17523&commonMenuNo=506_533": {
-  "at": "2026-11-14",
-  "tries": 2
- },
- "https://www.daejeonyouthportal.kr/board/BBSMSTR_000000000242/articleView.do?searchSeq=17549&commonMenuNo=506_533": {
-  "at": "2026-11-14",
-  "tries": 2
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53623&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-11-14",
-  "tries": 2
- },
- "https://www.korea.kr/briefing/pressReleaseView.do?newsId=156788329&pWise=sub&pWiseSub=C4": {
-  "at": "2026-11-08",
-  "tries": 1,
-  "lines": [
-   "ㅇ ‘ 2030청년자문단 ’은 국토교통부 정책에 관심 있는 만 19~39세 청년 이라면 누구나 ‘ 청년인재 DB ’ (www.2030db.go.kr) 를 통해 신청할 수 있다 . 서류심사 와 면접 을 거쳐 25명 내외를 선발 한다. 활동 기간은 2027년 1월부터 12월 까지다.",
-   "ㅇ ‘ 청년온라인패널 ’ 역시 만 19~39 세 청년 을 대상으로 하며 , 국토교통부 온통광장 (www.molit.go.kr/ontong_plaza)을 통해 신청할 수 있다. 최대 1천 명 을 모집 하며, 선발된 청년들은 월 1 회 이상 주요 정책에 대한 온라인 설문조사 에 참여한다 . 3 회 이상 참여하면 활동 증명서 를 받을 수 있다 ."
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53636&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-11-09",
-  "tries": 1
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/271109/artclView.do": {
-  "at": "2026-11-09",
-  "tries": 1,
-  "lines": [
-   "모집대상 : -해외봉사에 관심있고 준비하는 누구나",
-   "- 2026.12.08~ 2026.12.22",
-   "-NGO및 국제개발협력에 관심있는 누구나",
-   "(온라인 비대면 활동)"
-  ],
-  "excludes": [],
-  "from": "공고문 첨부(OCR)"
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/271103/artclView.do": {
-  "at": "2026-11-09",
-  "tries": 1
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53663&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-11-10",
-  "tries": 1
- },
- "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=897685&qidx=5233&cate=0&allboard=true&nowpage=1": {
-  "at": "2026-11-10",
-  "tries": 1
- },
- "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=141798&article.offset=0&articleLimit=10": {
-  "at": "2026-11-11",
-  "tries": 1
- },
- "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627143&pageUnit=10&searchCnd=WRTER&searchKrwd=%ec%9e%a5%ed%95%99&sf.pnos=1073&sf.pnos=888": {
-  "at": "2026-11-11",
-  "tries": 1
- },
- "https://dep.hufs.ac.kr/bbs/student/2436/271342/artclView.do": {
-  "at": "2026-11-11",
-  "tries": 1
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3544547": {
-  "at": "2026-11-12",
-  "tries": 1,
-  "lines": [
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
  },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3544550": {
   "at": "2026-11-12",
@@ -267,10 +36,6 @@
   ],
   "excludes": [],
   "from": "브라우저 본문"
- },
- "https://www.skku.edu/skku/campus/skk_comm/notice06.do?mode=view&articleNo=141810&article.offset=0&articleLimit=10": {
-  "at": "2026-11-12",
-  "tries": 1
  },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3549461": {
   "at": "2026-11-13",
@@ -294,10 +59,6 @@
   ],
   "excludes": [],
   "from": "브라우저 본문"
- },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53683&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-11-13",
-  "tries": 1
  },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3545702": {
   "at": "2026-11-14",
@@ -341,5 +102,182 @@
   ],
   "excludes": [],
   "from": "브라우저 본문"
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3541967": {
+  "at": "2026-11-15",
+  "tries": 1,
+  "lines": [
+   "봉사자유형 : 성인"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://youth.chungnam.go.kr/web/main/bbs/cnyouth_notice/791?cp=1&sortOrder=BA_REGDATE&sortDirection=DESC&bcId=cnyouth_notice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true": {
+  "at": "2026-11-15",
+  "tries": 1
+ },
+ "https://youth.chungnam.go.kr/web/main/bbs/cnyouth_notice/790?cp=1&sortOrder=BA_REGDATE&sortDirection=DESC&bcId=cnyouth_notice&baNotice=false&baCommSelec=false&baOpenDay=false&baUse=true": {
+  "at": "2026-11-15",
+  "tries": 1
+ },
+ "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=991": {
+  "at": "2026-11-15",
+  "tries": 1
+ },
+ "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=982": {
+  "at": "2026-11-15",
+  "tries": 1
+ },
+ "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=978": {
+  "at": "2026-11-15",
+  "tries": 1
+ },
+ "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=971&page=2": {
+  "at": "2026-11-15",
+  "tries": 1
+ },
+ "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=969&page=2": {
+  "at": "2026-11-15",
+  "tries": 1
+ },
+ "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=957&page=3": {
+  "at": "2026-11-15",
+  "tries": 1
+ },
+ "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=956&page=3": {
+  "at": "2026-11-15",
+  "tries": 1
+ },
+ "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=954&page=3": {
+  "at": "2026-11-15",
+  "tries": 1
+ },
+ "https://www.seoultech.ac.kr/service/board/rec?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=6302&bidx=838568&qidx=6302&cate=10&allboard=false&nowpage=3": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kau.ac.kr/kaulife/event.php?code=s1401&page=3&mode=read&seq=9242": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://wise.dongguk.ac.kr/article/servicenotice/detail/521193": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kau.ac.kr/kaulife/event.php?code=s1401&page=&mode=read&seq=11441": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kau.ac.kr/kaulife/event.php?code=s1401&page=&mode=read&seq=11397": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kau.ac.kr/kaulife/event.php?code=s1401&page=&mode=read&seq=11216": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kau.ac.kr/kaulife/event.php?code=s1401&page=2&mode=read&seq=10416": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kau.ac.kr/kaulife/event.php?code=s1401&page=2&mode=read&seq=10392": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kau.ac.kr/kaulife/event.php?code=s1401&page=2&mode=read&seq=10311": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kau.ac.kr/kaulife/event.php?code=s1401&page=2&mode=read&seq=9987": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kau.ac.kr/kaulife/event.php?code=s1401&page=2&mode=read&seq=9959": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kau.ac.kr/kaulife/event.php?code=s1401&page=3&mode=read&seq=9729": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kau.ac.kr/kaulife/event.php?code=s1401&page=3&mode=read&seq=9718": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.hongik.ac.kr/kr/newscenter/event-contest.do?mode=view&articleNo=159226&article.offset=0&articleLimit=10&srCategoryId=85": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=819&bbsNo=8&nttNo=171537&pageUnit=10&searchCtgry=%eb%aa%a8%ec%a7%91%2f%ea%b3%b5%eb%aa%a8&searchCnd=all&pageIndex=1": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=819&bbsNo=8&nttNo=171439&pageUnit=10&searchCtgry=%eb%aa%a8%ec%a7%91%2f%ea%b3%b5%eb%aa%a8&searchCnd=all&pageIndex=1": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://www.gachon.ac.kr/bbs/kor/479/119165/artclView.do": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://kucss.or.kr/dpbbs/board.php?bo_table=dp_notice&wr_id=943&page=3": {
+  "at": "2026-11-16",
+  "tries": 1
+ },
+ "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3544547": {
+  "at": "2026-11-17",
+  "tries": 1,
+  "lines": [
+   "아동·청소년",
+   "봉사자유형 : 성인",
+   "신청대상 : 성인",
+   "신청대상 : 성인·청소년"
+  ],
+  "excludes": [],
+  "from": "브라우저 본문"
+ },
+ "https://www.youthcenter.go.kr/bbs03View/48/10889": {
+  "at": "2026-11-17",
+  "tries": 1
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/271857/artclView.do": {
+  "at": "2026-11-17",
+  "tries": 1
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2436/271852/artclView.do": {
+  "at": "2026-11-17",
+  "tries": 1
+ },
+ "https://wise.dongguk.ac.kr/article/servicenotice/detail/521208": {
+  "at": "2026-11-17",
+  "tries": 1
+ },
+ "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=141810&article.offset=0&articleLimit=10": {
+  "at": "2026-11-17",
+  "tries": 1
+ },
+ "https://www.kookmin.ac.kr/user/kmuNews/notice/9/12607/view.do?currentPageNo=1": {
+  "at": "2026-11-17",
+  "tries": 1
+ },
+ "https://www.kookmin.ac.kr/user/kmuNews/notice/9/12589/view.do?currentPageNo=1": {
+  "at": "2026-11-17",
+  "tries": 1
+ },
+ "https://www.kookmin.ac.kr/user/kmuNews/notice/9/12531/view.do?currentPageNo=1": {
+  "at": "2026-11-17",
+  "tries": 1
+ },
+ "https://www.kookmin.ac.kr/user/kmuNews/notice/9/12584/view.do?currentPageNo=1": {
+  "at": "2026-11-17",
+  "tries": 1
+ },
+ "https://www.kookmin.ac.kr/user/kmuNews/notice/9/12575/view.do?currentPageNo=1": {
+  "at": "2026-11-17",
+  "tries": 1
+ },
+ "https://www.kookmin.ac.kr/user/kmuNews/notice/9/12569/view.do?currentPageNo=1": {
+  "at": "2026-11-17",
+  "tries": 1
  }
 }

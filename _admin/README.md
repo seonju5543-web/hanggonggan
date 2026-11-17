@@ -45,6 +45,8 @@
 ```
 _admin/*
 data.js
+supabase-config.js
+usage-report.js
 apply-channel.js
 forms.js
 form-plan.js

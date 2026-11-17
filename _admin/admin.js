@@ -83,7 +83,16 @@ function linkRules() {
     sourceLink: w.sourceLink, setLinkChecks: w.setLinkChecks, setLinkFixes: w.setLinkFixes, linkFixFor: w.linkFixFor,
     linkCheckFor: w.linkCheckFor, linkShape: w.linkShape, decodeUrlEntities: w.decodeUrlEntities, fixUrlUsable: w.fixUrlUsable,
     fixKeys: w.fixKeys, markerTitleOf: w.markerTitleOf,
+    /* 고전 스크립트의 const 는 window 속성이 아니라 전역 이름이다(모듈에서도 그 이름으로 보인다) — 학생이 보는 문제 링크 이름을 말할 때 쓴다(베껴 적지 않는다) */
+    troubleTag: typeof TROUBLE_TAG === 'object' ? TROUBLE_TAG : null, surfaceLabels: typeof SURFACE_LABELS === 'object' ? SURFACE_LABELS : null,
   };
+}
+/* 로봇이 확정한 문제 링크가 학생에게 어떤 이름으로 보이는가 — source-link.js 의 표 그대로(SURFACE_LABELS.detail · TROUBLE_TAG · 2026-11-16 2차 리뷰: 예전 「(확인 필요)」 를 그대로 말해 화면과 달랐다) */
+function troubleLabelsText(LR) {
+  const L = LR && LR.surfaceLabels && LR.surfaceLabels.detail;
+  const tags = LR && LR.troubleTag ? Object.values(LR.troubleTag) : [];
+  if (!L || !L.trouble || !tags.length) return '로봇이 본 것을 붙인 이름';
+  return `${tags.map((t) => `「${L.trouble.replace('{t}', t)}」`).join('·')}(목록·첫 화면이면 「${L.list}」·「${L.home}」)`;
 }
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const byId = (id) => document.getElementById(id);
@@ -183,6 +192,8 @@ const D = {
   newsSources: { sources: [], parked: [] }, newsCfg: { hideUrls: [] }, newsIndex: { files: {} },
   /* 원문 링크 (2026-10-04) — 로봇이 열어 보고 확정한 문제(bad)·로봇이 찾은 원문(fix) · 관리자가 넣은 원문(fix). 둘 다 작다 */
   linkCheck: { bad: {} }, linkFixes: { v: 1, fix: {} },
+  /* 신청서 원본 PDF·공고문 서식 쪽 (2026-11-15) — 양식이 '있다'는 것은 formId 만이 아니다(결정 6 · 원본 그대로 PDF). 카드 채움 현황(verify/card-coverage.mjs)과 같은 셈 */
+  formsPdf: {}, formPages: {},
   failed: [],   // 읽지 못한 파일 — 비어 있지 않으면 화면 숫자를 믿으면 안 된다
 };
 
@@ -235,7 +246,7 @@ async function readText(path) {
 async function loadAll() {
   D.failed = [];        // 매번 새로 센다 — 지난번 실패가 남아 있으면 안 된다
   reportCache = {};     // 로봇을 돌린 뒤 옛 리포트가 보이던 문제(A5)
-  const [reg, notices, forms, health, schools, targets, linkHunt, pending, autoCfg, log, acts, actSrc, actCfg, newsSrc, newsCfg, newsIdx, linkCheck, linkFixes] =
+  const [reg, notices, forms, health, schools, targets, linkHunt, pending, autoCfg, log, acts, actSrc, actCfg, newsSrc, newsCfg, newsIdx, linkCheck, linkFixes, formsPdf, formPages] =
     await Promise.all([
       readJson('data/registered.json', { items: [] }),
       readJson('data/notices.json', { items: [] }),
@@ -255,9 +266,13 @@ async function loadAll() {
       readJson('data/news/index.json', { files: {} }),
       readJson('data/link-check.json', { bad: {} }),
       readJson('data/link-fixes.json', { v: 1, fix: {} }),
+      readJson('data/forms-pdf/index.json', { items: {} }),
+      readJson('data/form-pages/index.json', { items: {} }),
     ]);
 
   D.reg = reg.items || [];
+  D.formsPdf = (formsPdf && formsPdf.items) || {};
+  D.formPages = (formPages && formPages.items) || {};
   D.updatedAt = reg.updatedAt || '';
   D.notices = notices.items || [];
   D.forms = forms.templates || {};
@@ -384,11 +399,21 @@ function amountUnknown(it) {
   return !(Number(it.amountValue) > 0) && !it.amountSpec;
 }
 
+/* 신청서 첨부는 있는데 학생이 받을 양식이 없는가 — 마감 전 · 앱 양식(formId)도 원본 PDF(data/forms-pdf)도 서식 쪽(data/form-pages)도 없음 ·
+   신청서 판정은 data.js isApplicationForm(양식 PDF 로봇과 한 벌) · 카드 채움 현황(verify/card-coverage.mjs gaps)과 같은 셈 (2026-11-15) */
+function formMissing(it) {
+  if (!it || it.formId) return false;
+  if (dday(it.deadline) != null && dday(it.deadline) < 0) return false;
+  if ((D.formsPdf[it.id] || []).length || (D.formPages[it.id] || []).some((f) => f && f.file)) return false;
+  const isApp = typeof isApplicationForm === 'function' ? isApplicationForm : (typeof isFormAttachment === 'function' ? isFormAttachment : null);
+  return !!isApp && (it.attachments || []).some(isApp);
+}
+
 function badgesOf(it, formIds) {
   const b = [];
   if (amountUnknown(it)) b.push('금액 미확인');
   if (!it.deadline) b.push('마감일 없음');
-  if (typeof hasFormAttachment === 'function' && hasFormAttachment(it) && !it.formId) b.push('양식 미등록');
+  if (formMissing(it)) b.push('양식 미등록');
   const u = it.sourceUrl || '';
   if ((RULES.DOWNLOAD_URL && RULES.DOWNLOAD_URL.test(u)) || u.includes('#n-')) b.push('원문 링크 이상');
   if (it.formId && !formIds.has(it.formId)) b.push('없는 양식 연결');
@@ -1172,7 +1197,7 @@ const LF_GROUPS = [
   { key: 'listid', title: '② 목록 주소에 글 번호만 붙인 꼴 — 학생에게 목록이 열립니다', d: '서버가 번호를 무시하고 목록을 줍니다. 그 글을 열어 주소창의 주소를 넣어 주세요.' },
   { key: 'home', title: '③ 사이트 첫 화면(홈페이지) 꼴', d: '첫 화면(index·main) 주소입니다. 그 공고 글의 주소를 넣어 주세요.' },
   { key: 'kosaf', title: '④ 재단 홈페이지 — 층2(한국장학재단에 등록된 재단 장학금)', d: '한국장학재단 상세는 새 탭에서 열리지 않아 재단 홈페이지만 보입니다. 재단 게시판에서 이번 회차 공고를 찾아 넣으면 그 회차(마감일)에만 쓰입니다.' },
-  { key: 'bad', title: '⑤ 로봇이 열어 보고 문제를 확정한 링크', d: '원문 링크 확인 로봇이 다른 날 두 번 같은 문제를 봤습니다(목록·첫 화면·로그인·열리지 않음·다른 글). 학생에게는 「(확인 필요)」로 보입니다.' },
+  { key: 'bad', title: '⑤ 로봇이 열어 보고 문제를 확정한 링크', d: '원문 링크 확인 로봇이 다른 날 두 번 같은 문제를 봤습니다(목록·첫 화면·로그인·열리지 않음·다른 글). 학생에게는 로봇이 본 것을 붙인 이름으로 보입니다 — ', dLabels: true },
 ];
 
 function lfDeadline(e) { return e.ds === 'kosaf' ? (e.raw.due || '') : (e.raw.deadline || ''); }
@@ -1360,6 +1385,7 @@ function lfFixedRows(all, LR) {
   });
 }
 function lfFixedRowHtml(r) {
+  const LR = linkRules();   // 부르는 곳(linkFixSlotHtml)이 이미 LR 이 있음을 확인했다
   const st = { applied: ['good', '쓰이는 중'], unused: ['warn', '안 쓰임 — 회차(마감)가 바뀌었거나 쓸 수 없는 주소'], none: ['warn', '대상 없음 — 글이 내려갔거나 주소가 바뀌었습니다'] }[r.status];
   return `
     <div class="row" data-row data-noclick data-lf-fixed="${esc(r.key)}" data-lf-status="${esc(r.status)}" style="cursor:default">
@@ -1367,7 +1393,10 @@ function lfFixedRowHtml(r) {
         <div class="t" data-row-title>${esc(r.target ? r.target.title : (r.ent.title || r.key))}</div>
         <div class="m">${r.target ? `<span class="pill info">${esc(FIX_DATASET_LABEL[r.target.ds] || r.target.ds)}</span>` : ''}<span class="mono">${esc(r.key.length > 70 ? `${r.key.slice(0, 70)}…` : r.key)}</span><span>${esc(r.ent.by || '')} ${esc(r.ent.at || '')}</span>${r.ent.round ? `<span>회차 ${esc(r.ent.round)}</span>` : ''}</div>
         <div class="scope-count">넣은 주소: <a href="${esc(safeUrl(r.ent.url))}" target="_blank" rel="noreferrer noopener">${esc(r.ent.url || '')}</a>${r.ent.note ? ` · 메모: ${esc(r.ent.note)}` : ''}</div>
-        ${r.bad ? `<div class="scope-count">원문 링크 확인 로봇이 이 주소도 문제로 확정했습니다(${esc(r.bad.v)} · ${esc(r.bad.at || '')}) — 학생에게는 「(확인 필요)」로 보입니다.</div>` : ''}
+        ${r.bad ? `<div class="scope-count" data-lf-fixed-bad>원문 링크 확인 로봇이 이 주소도 문제로 확정했습니다(${esc(r.bad.v)} · ${esc(r.bad.at || '')}) — ${r.target
+    ? `학생에게는 「${esc(LR.sourceLink(r.target.item, 'detail').label)}」로 보입니다.`
+    /* 대상 글이 없으면(내려갔거나 주소가 바뀜) 이 주소를 받는 학생도 없다 — 주소만으로 이름을 지어 '학생에게 이렇게 보인다'고 말하지 않는다(2026-11-16 3차 리뷰) */
+    : '이 주소를 쓰는 글이 없어 지금 이 링크를 보는 학생은 없습니다.'}</div>` : ''}
       </div>
       <div class="btn-row"><button class="btn btn-sm danger" data-lf-unfix="${esc(r.key)}">지우기</button></div>
       <div><span class="pill ${st[0]}">${esc(st[1])}</span></div>
@@ -1390,7 +1419,7 @@ function linkFixSlotHtml() {
   const fixedRows = lfFixedRows(all, LR);
   const grp = (g) => {
     const list = byGroup[g.key] || [];
-    const body = `<p class="muted">${esc(g.d)}</p>
+    const body = `<p class="muted">${esc(g.dLabels ? `${g.d}${troubleLabelsText(LR)}.` : g.d)}</p>
       <div class="rows" data-rows>${list.slice(0, shown(`lf-${g.key}`, 30)).map(lfRowHtml).join('')}</div>${moreBtn(`lf-${g.key}`, list.length, 30)}`;
     if (g.key === 'kosaf') {
       return `<details class="pgroup" data-lf-group="kosaf" data-lf-kosaf${LF.kosafOpen ? ' open' : ''}><summary><b>${esc(g.title)}</b> <span class="pill">${list.length}건</span> <span class="muted">마감 가까운 순 · 펼쳐서 보기</span></summary>${list.length ? body : '<p class="muted">없습니다.</p>'}</details>`;
@@ -1400,7 +1429,7 @@ function linkFixSlotHtml() {
   return `
     ${LF.failed.length ? `<p class="empty" data-lf-fail>읽지 못한 파일 ${LF.failed.length}개 — 아래 숫자는 그만큼 빠졌을 수 있습니다: ${LF.failed.map((p) => `<code class="mono">${esc(p)}</code>`).join(' ')}</p>` : ''}
     <p class="muted" data-lf-note><b>넣은 주소는 장부(data/link-fixes.json)에만 저장됩니다</b> — 로봇이 데이터를 다시 만들어도 사라지지 않고,
-      학생 앱은 다음 배포부터 그 주소를 「원문 공고」로 엽니다. 원문 링크 확인 로봇이 날마다 그 주소도 열어 보고, 문제면 「(확인 필요)」로 바꿔 말합니다.
+      학생 앱은 다음 배포부터 그 주소를 「원문 공고」로 엽니다. 원문 링크 확인 로봇이 날마다 그 주소도 열어 보고, 문제면 로봇이 본 것을 이름에 붙여 말합니다 — ${esc(troubleLabelsText(LR))}.
       ${robotFixed ? `로봇이 원문을 찾아 이미 고친 ${robotFixed}건은 뺐습니다.` : ''}</p>
     <div class="btn-row"><button class="btn btn-sm" data-lf-cand${LF.cand === 'loading' || Array.isArray(LF.cand) ? ' disabled' : ''}>${Array.isArray(LF.cand) ? '수집 기록 힌트 반영됨' : LF.cand === 'failed' ? '수집 기록을 못 읽었습니다 — 다시 시도' : '수집 기록에서도 같은 제목 찾기'}</button>
       <span class="muted">수집 기록(collector/candidates.json · 큰 파일)은 누를 때만 받습니다.</span></div>
@@ -2754,7 +2783,7 @@ const ROBOTS = [
      안 일어나는' 버튼이 된다.
    · `two-school-scan.yml` — 일회용이고 push 트리거가 남의 브랜치를 본다.
    관문(test-collector)이 이 둘이 목록에 **없는지** 확인한다. */
-const ROBOT_NOT_LISTED = ['device-deploy.yml', 'two-school-scan.yml', 'push-limit-check.yml', 'push-deploy.yml', 'rollback.yml', 'key-expiry.yml', 'codeql.yml', 'codeql-triage.yml', 'error-watch.yml'];   // error-watch: 앱 오류 급증 감시(11-13 · 2시간마다 · 경보 이슈로만) · codeql-triage: 보안 경고 정리(11-11 · Claude 세션용 버튼) · codeql: 보안 코드 점검(11-11 · 매주 예약 + 코드 push · 경보 이슈로만) · key-expiry: 열쇠 만료 확인(11-11 · 매일 예약 · 경보 이슈로만 알린다) · rollback: 직전 판으로 되돌리기(11-11 · 미리보기 → 번호 넣고 되돌리기 · Actions 탭에서만 — 관리자 화면 버튼은 나중에) · push-limit-check: 푸시 서버 운영 판이 저장소 판인지 도장으로 대조하는 진단(10-12) · push-deploy: 푸시 서버를 Cloudflare 운영에 올리는 배포(10-12 · 열쇠는 Actions 시크릿) — 둘 다 Actions 탭에서만
+const ROBOT_NOT_LISTED = ['device-deploy.yml', 'two-school-scan.yml', 'push-limit-check.yml', 'push-deploy.yml', 'rollback.yml', 'key-expiry.yml', 'codeql.yml', 'codeql-triage.yml', 'error-watch.yml', 'card-read.yml'];   /* card-read: 유료 카드 읽기(11-15 · 하루 두 번 예약 · 스위치는 card-read-config.json) */   // error-watch: 앱 오류 급증 감시(11-13 · 2시간마다 · 경보 이슈로만) · codeql-triage: 보안 경고 정리(11-11 · Claude 세션용 버튼) · codeql: 보안 코드 점검(11-11 · 매주 예약 + 코드 push · 경보 이슈로만) · key-expiry: 열쇠 만료 확인(11-11 · 매일 예약 · 경보 이슈로만 알린다) · rollback: 직전 판으로 되돌리기(11-11 · 미리보기 → 번호 넣고 되돌리기 · Actions 탭에서만 — 관리자 화면 버튼은 나중에) · push-limit-check: 푸시 서버 운영 판이 저장소 판인지 도장으로 대조하는 진단(10-12) · push-deploy: 푸시 서버를 Cloudflare 운영에 올리는 배포(10-12 · 열쇠는 Actions 시크릿) — 둘 다 Actions 탭에서만
 
 /** 설명은 함수일 수 있다 — 건수를 사본으로 두지 않고 셀 때 센다 */
 const robotDesc = (r) => (typeof r.d === 'function' ? r.d() : r.d);
@@ -3856,8 +3885,7 @@ function renderQuality(target) {
   const dead = deadLinks();
   const noAmount = noAmountItems().length;   // 「할 일」 구획과 같은 셈 (마감 지난 공고는 학생 화면에 없다)
   const noDeadline = noDeadlineItems().length;   // 「할 일」 구획과 같은 셈 — 카드 숫자와 줄 수가 갈라지지 않게
-  const noForm = D.reg.filter((it) => typeof hasFormAttachment === 'function'
-    && hasFormAttachment(it) && !it.formId).length;
+  const noForm = D.reg.filter(formMissing).length;
   /* 지원 자격 미확보 — 학생 화면에 "지원 자격을 아직 읽지 못했어요"로 나가는 공고.
      판정 기준은 **학생 앱과 같은 칸**(eligibilityLines)이다. 고치는 자리는 상세 시트에
      있었는데 '몇 건인지'를 세는 자리가 어디에도 없어서, 76건이 밀려 있어도 화면이 조용했다. */
@@ -3893,7 +3921,7 @@ function renderQuality(target) {
     { n: warns.length, tone: 'is-warn', k: '규칙 경고', d: '손봐야 하지만 치명적이지는 않음' },
     { n: noAmount, tone: 'is-warn', k: '금액 미확인', d: '학생이 얼마인지 모르는 공고 — 「할 일」 위쪽 「금액을 로봇이 못 읽은 공고」에서 금액을 적을 수 있습니다' },
     { n: noDeadline, tone: 'is-warn', k: '마감일 없음', d: '언제까지인지 모르는 공고 — 「할 일」 위쪽 「마감을 로봇이 못 읽은 공고」에서 날짜를 적을 수 있습니다' },
-    { n: noForm, tone: 'is-warn', k: '신청서 첨부는 있는데 양식 미등록', d: '앱에서 작성하게 만들 수 있는 후보' },
+    { n: noForm, tone: 'is-warn', k: '신청서 첨부는 있는데 양식 미등록', d: '마감 전 · 원본 PDF 도 아직 없음(양식 로봇이 받을 몫)' },
     { n: noElig, tone: 'is-warn', k: '지원 자격 미확보',
       d: '앱1이 자격을 한 줄도 못 읽은 공고 — 상세에서 원문 문장을 골라 주면 사라집니다 (학생 화면에는 "공고 원문에서 지원 자격을 확인하세요"로만 나갑니다)' },
     { n: aiReadCount, tone: 'is-warn', k: 'AI가 읽은 자격 · 사람 검수 전',

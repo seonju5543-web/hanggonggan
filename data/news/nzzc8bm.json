@@ -1,7 +1,18 @@
 {
  "school": "가천대학교",
- "updatedAt": "2026-11-15",
+ "updatedAt": "2026-11-17",
  "items": [
+  {
+   "title": "2027-1학기 휴학 및 휴학연장 안내",
+   "url": "https://www.gachon.ac.kr/bbs/kor/475/127173/artclView.do",
+   "postedAt": "2026-11-17",
+   "kind": "학사",
+   "school": "가천대학교",
+   "campus": "",
+   "src": "02ae4269",
+   "foundAt": "2026-11-17",
+   "desc": "1. 신청기간 신청기간 미등록 휴학 - 등록금(수업료) 납부 없이 휴학신청 하는 경우"
+  },
   {
    "title": "2026학년도 2학기 성적공시 및 정정 기간 안내(12주 수업)",
    "url": "https://www.gachon.ac.kr/bbs/kor/475/127069/artclView.do",

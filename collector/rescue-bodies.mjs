@@ -29,12 +29,14 @@ import { htmlToLines } from './html-text.mjs';
 import { htmlBodyImages, detailAttachments, BUTTON_WORD } from './attachment-link.mjs';
 import { chromium } from 'playwright';
 import { createRequire } from 'node:module';
-import { indexTexts, hasText, canonUrl, MIN_BODY, sourceFor } from './notice-source.mjs';
+import { indexTexts, hasText, canonUrl, MIN_BODY, sourceFor, fallbackIsThisNotice } from './notice-source.mjs';
 import { makeStripper } from './page-boilerplate.mjs';
 import { withDeadline, TIMED_OUT, makeBudget } from './harvest-budget.mjs';
 import { readLinkFixes, humanFixUrlBy } from './link-fixes-read.mjs';
 /* 대상 거르기·차례·장부 한 칸·첨부 합치기는 순수 함수 파일 하나에 — 이 파일은 불러오는 순간 돌아 관문이 못 부른다 */
-import { restingAfterOk, closedForStudents, orderTargets, ledgerEntry, newAttachments, pruneLedger, wantsBody } from './rescue-plan.mjs';
+import { restingAfterOk, closedForStudents, orderTargets, ledgerEntry, newAttachments, pruneLedger, wantsBody,
+  wantsAttachments, withAttCheck, withAttMiss, preferUsable, upgradeAttachmentUrls, attGapOf, replayOk, wrongKind, fileNameIn, usableUrl,
+  attachmentAlarms, feedAttachmentGaps, trustedAttachment, censusInPage, FILE_NAME_SRC, ATT_MAX_CLICKS, ATT_BUDGET_MS } from './rescue-plan.mjs';
 import { writeFileAtomic } from './write-atomic.mjs';
 
 const { requirementLines } = createRequire(import.meta.url)('../match-engine.js');
@@ -50,6 +52,8 @@ const GAP_MS = Number(process.env.RESCUE_GAP_MS || 2500);        // 공고 사�
 const CAP = Number(process.env.RESCUE_CAP || 25);
 /* 감시 타이머 — 아래 '감시 타이머' 머리말 · 워크플로: 9분 + 60초 + 30초 = 10분 30초 < 단계 시한 11분 */
 const WATCHDOG_MS = Number(process.env.RESCUE_WATCHDOG_MS || (BUDGET_MS + PAGE_MS + 30000));
+/* 맥에서 손으로 돌릴 때는 CHROME_PATH 로 깔려 있는 크롬을 가리킨다(verify 드라이버와 같은 관례 · 워크플로는 안 준다 — 방금 깐 크롬을 쓴다) */
+const LAUNCH = { args: ['--no-sandbox'], ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}) };
 const CTX_OPTS = {
   userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36',
   locale: 'ko-KR',
@@ -115,7 +119,20 @@ export function pickTargets(items, idx = indexTexts(texts, bodies)) {
   }
   /* 안 해 본 것부터 — 안 그러면 한도(25건)가 매번 앞쪽 같은 것만 다시 붙든다
      (eligibility-ai에서 실제로 겪은 함정) · 같으면 한 번도 본문을 못 받은 것 먼저 */
-  return orderTargets(out);
+  /* 🔴 **첨부만 살피러 가는 공고** (2026-11-17 · rescue-plan 「첨부 살피기」 머리말) — 위에서 안 뽑힌 공고(자격·본문을 이미 읽었거나 쉬는 중)라도
+     첨부를 한 번도 안 살폈으면 연다. 본문 대상 **뒤에** 서고, 본문 칸·실패 횟수는 건드리지 않는다(attOnly — 아래 목록 돌기에서 본문 판정을 건너뛴다).
+     학생 화면에서 내려간 공고는 안 연다. 위 본문 대상 고르기는 한 글자도 안 바꿨다 */
+  const picked = new Set(out.map((t) => t.it));
+  const later = [];
+  for (const it of items) {
+    if (it.program || picked.has(it)) continue;
+    const url = it.sourceUrl || '';
+    if (!/^https?:\/\//.test(url) || url.includes('#n-')) continue;
+    const led = ledger[canonUrl(url)];
+    if (closedForStudents(it, today) || !wantsAttachments(led, today, { restAfter: REST_AFTER, restDays: REST_DAYS })) continue;
+    later.push({ it, url, tries: (led && led.attTries) || 0, everOk: !!(led && led.ok), attOnly: true });
+  }
+  return [...orderTargets(out), ...orderTargets(later)];
 }
 
 /* ── 저장은 한 곳에서 ──
@@ -137,7 +154,55 @@ function saveAll(crashNote, progress = '', stopNote = '') {
   if (regDirty) writeFileAtomic(regPath, JSON.stringify(reg, null, 1) + '\n');
   if (crashNote) report.push('', `🚨 도중에 넘어졌습니다: ${crashNote}`);
   if (stopNote) report.push('', stopNote);
-  writeFileAtomic(reportPath, [...report, ...(progress && !crashNote ? ['', progress] : [])].join('\n') + '\n');
+  writeFileAtomic(reportPath, [...report.slice(0, 4), ...attachmentSection(), ...report.slice(4), ...(progress && !crashNote ? ['', progress] : [])].join('\n') + '\n');
+}
+/* 리포트 머리 바로 아래 — 첨부 경보(rescue-plan attachmentAlarms) · 피드의 학교별 진단 표(feedAttachmentGaps). 저장할 때마다 지금 장부로 다시 센다 */
+function attachmentSection() {
+  const out = [];
+  try {
+    const al = attachmentAlarms(reg.items, ledger, today);
+    out.push('## 📎 첨부 — 원문에 있는 파일이 앱에도 보이는가', '',
+      `학생 화면에 떠 있는 정식 등록 공고 가운데 첨부를 살핀 것 **${al.checked}건** · 아직 안 살핀 것 ${al.notYet}건 · 경보 **${al.rows.length}건**`, '');
+    for (const r of al.rows.slice(0, 40)) out.push(`- 🚨 **${String(r.name).slice(0, 44)}** (${r.id}) — ${r.why}`);
+    if (al.rows.length > 40) out.push(`- … 그 밖에 ${al.rows.length - 40}건`);
+    let notices = [];
+    try { const j = JSON.parse(fs.readFileSync(new URL('../data/notices.json', HERE), 'utf8')); notices = Array.isArray(j) ? j : (j.items || []); } catch { /* 없으면 표를 안 그린다 */ }
+    const gaps = feedAttachmentGaps(notices);
+    if (gaps.length) {
+      out.push('', '실시간 피드에서 첨부가 거의 안 잡히는 학교(수집 단계가 그 게시판의 첨부를 못 보는 표시 — 정식 등록되면 위 살피기가 채운다):', '');
+      for (const g of gaps) out.push(`- ${g.school} — 글 ${g.total}건 중 첨부 있는 글 ${g.withAtt}건`);
+    }
+    out.push('');
+  } catch (e) { out.push(`(첨부 경보를 세지 못했습니다: ${String((e && e.message) || e).slice(0, 80)})`, ''); }
+  return out;
+}
+
+/* ── 눌러서 내려받기 주소를 잡는다 (2026-11-17) ──
+   표식 단 것을 누르고, 브라우저가 **내려받기**를 시작하면 그 주소를 읽는다(파일은 받지 않고 바로 취소한다). 그 주소가 쿠키 없는 새 요청으로도
+   파일을 주는지 첫 조각만 받아 본다(rescue-plan replayOk — 로그인 화면·오류 화면도 200 으로 온다). 통과한 주소만 돌려준다 · 아니면 ''.
+   🔴 학생은 앱에서 로그인 없이 그 주소를 누른다 — 로봇의 세션에서만 열리는 주소를 적으면 '눌러도 안 열리는 첨부'가 된다 */
+async function captureDownloadUrl(page, frame, i, name, until) {
+  const left = () => Math.max(500, Math.min(6000, until - Date.now()));
+  let url = '';
+  try {
+    const wait = page.waitForEvent('download', { timeout: left() });
+    wait.catch(() => {});   // 안 내려오면 그만 — 잡지 않은 거절로 로봇이 넘어지지 않게
+    /* 누르기에도 시한을 준다(리뷰 3) — 표식이 사라졌으면(화면이 넘어감) 기본 30초를 기다려 한 공고 시한을 넘긴다 */
+    await frame.locator(`[data-hdj-att="${i}"]`).first().evaluate((e) => e.click(), undefined, { timeout: left() });
+    const dl = await wait;
+    url = dl.url();
+    const other = wrongKind(name, typeof dl.suggestedFilename === 'function' ? dl.suggestedFilename() : '');
+    await settle(dl.cancel(), 2000);
+    if (other) return '';   // 내려온 파일의 종류가 화면의 이름과 다르다 — 남의 내려받기(리뷰 6)
+  } catch { return ''; }
+  if (!usableUrl(url)) return '';
+  try {
+    const res = await fetch(url, { headers: UA, redirect: 'follow', signal: AbortSignal.timeout(left()) });
+    const reader = res.body && res.body.getReader();
+    const first = reader ? await reader.read() : { value: null };
+    if (reader) reader.cancel().catch(() => {});
+    return replayOk(res.status, first.value ? Buffer.from(first.value) : null) ? url : '';
+  } catch { return ''; }
 }
 const onCrash = (e) => { try { saveAll(String((e && e.message) || e).slice(0, 200)); } catch { /* 저장도 실패하면 어쩔 수 없다 */ } process.exit(1); };
 process.on('uncaughtException', onCrash);
@@ -145,9 +210,12 @@ process.on('unhandledRejection', onCrash);
 
 /* ── 본편 ── */
 const targets = pickTargets(reg.items);
-log(`대상 ${targets.length}건 (아직 자격을 못 읽은 공고 — 읽을 재료를 찾으러 간다)`);
-if (targets.length) log(`차례: ${targets.slice(0, 10).map((t) => t.it.id).join(' · ')}${targets.length > 10 ? ' …' : ''}`);
-report.push(`대상 **${targets.length}건** · 이번 실행 한도 ${CAP}건`, '');
+const bodyTargets = targets.filter((t) => !t.attOnly);
+const attTargets = targets.filter((t) => t.attOnly);
+log(`대상 ${bodyTargets.length}건 (아직 자격을 못 읽은 공고 — 읽을 재료를 찾으러 간다)`);
+if (bodyTargets.length) log(`차례: ${bodyTargets.slice(0, 10).map((t) => t.it.id).join(' · ')}${bodyTargets.length > 10 ? ' …' : ''}`);
+if (attTargets.length) log(`첨부 살피기 ${attTargets.length}건 (본문 대상 뒤에): ${attTargets.slice(0, 10).map((t) => t.it.id).join(' · ')}${attTargets.length > 10 ? ' …' : ''}`);
+report.push(`대상 **${bodyTargets.length}건** · 첨부만 살필 공고 ${attTargets.length}건 · 이번 실행 한도 ${CAP}건`, '');
 if (!WRITE) { log('미리보기 — --write 를 붙여야 실제로 받는다'); process.exit(0); }
 /* 등록 목록에서 빠진 공고의 장부 칸은 지운다 (리뷰 R5) — 확보도 날짜로 남기게 된 뒤(rescue-plan ledgerEntry 'ok')로는
    지우는 곳이 없으면 장부가 확보한 공고 수만큼 끝없이 자란다. 열쇠는 이 로봇이 쓰는 것과 같은 canonUrl(sourceUrl). */
@@ -158,7 +226,7 @@ if (!WRITE) { log('미리보기 — --write 를 붙여야 실제로 받는다');
 if (!targets.length) { saveAll(); process.exit(0); }
 
 const total = Math.min(CAP, targets.length);
-let got = 0, miss = 0, done = 0, gone = 0, hung = 0;
+let got = 0, miss = 0, done = 0, gone = 0, hung = 0, attChecked = 0, attGaps = 0;
 const progress = () => `(진행 중 ${done}/${total} — 확보 ${got} · 본문 없음 ${miss} · 시한 초과 ${hung} · 삭제 ${gone})`;
 /* 🔴 **감시 타이머** (2026-10-04 리뷰 R2) — 예산·한 공고 시한이 있어도, 시한 없는 호출 하나(브라우저 띄우기 등)가 서면 단계 시한(11분)이
    node 를 강제로 끊는다. 그날(run #53) node 는 시한 뒤에도 고아로 살아 있었다 — 공고마다 저장하는 지금은 그런 고아가 관문·저장 단계와
@@ -173,7 +241,7 @@ setTimeout(() => {
   process.exit(1);
 }, WATCHDOG_MS).unref();
 
-let browser = await chromium.launch({ args: ['--no-sandbox'] });
+let browser = await chromium.launch(LAUNCH);
 let ctx = await browser.newContext(CTX_OPTS);
 const settle = (p, ms) => withDeadline(Promise.resolve(p).catch(() => TIMED_OUT), ms);
 
@@ -185,7 +253,7 @@ async function freshContext() {
   for (let attempt = 0; attempt < 2; attempt += 1) {
     if (attempt || !browser.isConnected()) {
       await settle(browser.close(), 5000);
-      const b = await settle(chromium.launch({ args: ['--no-sandbox'] }), 30000);
+      const b = await settle(chromium.launch(LAUNCH), 30000);
       if (b === TIMED_OUT) return false;
       browser = b;
     }
@@ -222,6 +290,7 @@ for (const t of targets) {
        (harvest-budget withDeadline — 수집기와 같은 규칙).
        🔴 아래 읽기는 **등록 항목(t.it)·리포트를 직접 고치지 않는다** — 결과를 돌려주기만 한다. 시한 뒤 늦게 끝난 읽기가
           다음 공고를 도는 사이 첨부를 몰래 덧붙이면 그 공고는 '시한 초과'인데 registered.json 이 바뀐다(점검 bodies-1). */
+    const pageCtx = ctx;   // 이 공고를 연 창 — 시한 뒤 새 창으로 바뀌어도(freshContext) 늦게 끝난 읽기가 **다음 공고의 탭**을 닫지 않게(리뷰 7)
     const read = (async () => { try {
       await page.goto(openUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
       await page.waitForTimeout(6000);           // 자바스크립트가 본문을 그릴 시간 (4초로는 모자란 학교가 있었다)
@@ -291,16 +360,47 @@ for (const t of targets) {
           }
         }
       } catch { /* 첨부를 못 걷어도 본문 저장은 계속한다 */ }
-      return { text, finalUrl, found };
+      /* 🔴 **화면에 보이는 파일 이름을 세고, 주소가 없으면 눌러서 잡는다** (2026-11-17 · rescue-plan 「첨부 살피기」).
+         위 주소 읽기는 `<a href>` 만 본다 — 누르면 도는 동작(전북대 `<button onclick="cf_download(…)">`)은 링크가 아니라 아예 안 보였다.
+         제 몫의 시한(ATT_BUDGET_MS) 안에서만 돈다 — 한 공고 시한(PAGE_MS)을 넘기면 본문까지 '시한 초과'가 된다. 따로 try 로 감싼다(여기서 넘어져도 위에서 모은 것은 남는다) */
+      const seenNames = [];
+      try {
+        const until = Date.now() + ATT_BUDGET_MS;
+        const at = page.url();
+        let clicks = 0;
+        for (const f of page.frames()) {
+          const seen = await settle(f.evaluate(censusInPage, FILE_NAME_SRC), 5000);   // 세기에도 시한 — 멈춘 프레임 하나가 한 공고 시한을 다 쓰지 않게(리뷰 3)
+          if (seen === TIMED_OUT || !Array.isArray(seen)) continue;
+          for (const s of seen) {
+            seenNames.push(s.name);
+            if (found.some((x) => x.name === s.name && usableUrl(x.url))) continue;        // 주소 읽기가 이미 진짜 주소를 구했다
+            if (usableUrl(s.href)) { found.push({ name: s.name, url: s.href }); continue; }   // 화면이 그린 진짜 링크(국민대 — 목록이 뜬 뒤에 그려진다)
+            let url = '';
+            /* 누르는 것은 ① 표식이 달린 것(i >= 0) ② 상한·시한 안 ③ 화면이 그대로일 때만 — 앞 누르기가 화면을 넘겼으면(로그인 화면 등) 표식이 사라져 다음 누르기가 헛돈다 */
+            if (s.i >= 0 && clicks < ATT_MAX_CLICKS && Date.now() < until && page.url() === at) {
+              clicks += 1;
+              url = await captureDownloadUrl(page, f, s.i, s.name, until);
+              /* 🔴 안 내려왔으면 이 공고에서는 더 누르지 않는다(리뷰 6) — 늦게 시작된 내려받기를 **다음 단추**가 제 것으로 받아 이름과 주소가 엇갈린다 */
+              if (!url) clicks = ATT_MAX_CLICKS;
+            }
+            found.push({ name: s.name, url });   // 못 구하면 이름만 — 앱은 「원문 게시판에서 내려받기」로 보인다(지어내지 않는다)
+          }
+        }
+      } catch { /* 첨부 살피기가 넘어져도 본문 저장은 계속한다 */ }
+      /* 누른 것이 새 탭을 열었으면 닫는다(미리보기 창) — 창(context)은 다음 공고도 쓴다 */
+      try { for (const p of pageCtx.pages()) if (p !== page) p.close().catch(() => {}); } catch { /* 없으면 그만 */ }
+      return { text, finalUrl, found, seenNames };
     } catch (e) {
-      return { text: '', finalUrl: '', found: [], error: String(e.message) };
+      return { text: '', finalUrl: '', found: [], seenNames: [], error: String(e.message) };
     } })();
     const timedOut = await withDeadline(read, PAGE_MS) === TIMED_OUT;
   page.close().catch(() => {});   // 기다리지 않는다 — 멈춘 페이지는 닫기도 멈출 수 있다 (들여쓰기 두 칸은 test-collector 「자격요건 로봇」 글자 검사가 찾는 꼴)
     if (timedOut) {
       hung += 1;
-      ledger[key] = ledgerEntry(ledger[key], 'hung', { today, minBody: MIN_BODY, name });
-      report.push(`- ⏱ ${t.it.name.slice(0, 40)} — ${PAGE_MS / 1000}초 안에 끝나지 않아 건너뜀 (${ledger[key].tries}회째)`);
+      /* 첨부만 살피러 간 공고는 본문 칸(실패 횟수·쉼 시계)을 건드리지 않고 첨부 쪽 횟수만 센다(리뷰 2 — 본문 칸을 세면 본문의 쉼이 영영 안 끝난다) */
+      if (t.attOnly) ledger[key] = withAttMiss(ledger[key], today);
+      else ledger[key] = ledgerEntry(ledger[key], 'hung', { today, minBody: MIN_BODY, name });
+      report.push(`- ⏱ ${t.it.name.slice(0, 40)} — ${PAGE_MS / 1000}초 안에 끝나지 않아 건너뜀 (${t.attOnly ? ledger[key].attTries : ledger[key].tries}회째)`);
       log(`⏱ ${t.it.name.slice(0, 30)} — 시한 초과`);
       if (!(await freshContext())) { log('브라우저를 다시 띄우지 못함 — 여기까지 저장하고 멈춘다'); break; }
       continue;
@@ -316,8 +416,10 @@ for (const t of targets) {
        그래서 대안은 '브라우저를 더 잘 위장한다'가 아니라 '막히면 다른 길로 간다'이다 —
        브라우저가 필요했던 이유(본문을 JS로 그린다)와 봇 차단은 서로 다른 문제이고,
        봇 차단이 걸린 게시판은 대개 서버가 완성된 HTML을 준다. */
+    let fellBack = false;
     if (BOT_WALL.test(text) || BOT_WALL.test(String(finalUrl))) {
       report.push(`- 🤖 ${t.it.name.slice(0, 36)} — 브라우저가 봇 차단에 걸려 일반 내려받기로 물러섬`);
+      fellBack = true;
       try {
         const res = await fetch(openUrl, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(20000) });
         if (res.ok) {
@@ -330,6 +432,8 @@ for (const t of targets) {
       } catch { /* 이쪽도 안 되면 그냥 실패로 둔다 */ }
     }
     /* 첨부 적기는 물러서기 **뒤**에 — 물러선 HTML 의 본문 그림도 같이 적는다 */
+    if (t.attOnly) r.found = r.found.filter(trustedAttachment);   // 첨부만 살피러 온 공고 — 메뉴 링크·단추 글자·본문 그림은 적지 않는다(rescue-plan trustedAttachment 머리말)
+    r.found = preferUsable(r.found);   // 같은 파일을 주소 읽기(`javascript:`)와 누르기(진짜 주소)가 둘 다 냈으면 진짜 주소 쪽을 남긴다
     const add = newAttachments(t.it.attachments, r.found);
     if (add.length) {
       t.it.attachments = [...(t.it.attachments || []), ...add];
@@ -337,16 +441,43 @@ for (const t of targets) {
       const pic = add.filter((a) => a.bodyImage).length;
       report.push(`- 📎 ${t.it.name.slice(0, 36)} — 첨부 ${add.length}개를 새로 받아 적음${pic ? ` (그중 **본문 그림 ${pic}장**)` : ''}: ${add.map((a) => a.name).join(' , ').slice(0, 90)}`);
     }
+    /* 이름은 적혀 있는데 받을 주소가 없던 첨부(`javascript:`·빈 주소)에 이번에 구한 주소를 채운다 — 이름·차례는 그대로 (2026-11-17) */
+    const up = upgradeAttachmentUrls(t.it.attachments, r.found);
+    if (up.upgraded.length) {
+      t.it.attachments = up.list;
+      regDirty = true;
+      report.push(`- 🔗 ${t.it.name.slice(0, 36)} — 이름만 보이던 첨부 ${up.upgraded.length}개에 받을 주소를 채움: ${up.upgraded.join(' , ').slice(0, 90)}`);
+    }
+    /* 살핀 기록을 장부에 — 화면에서 본 파일 이름(누르기·주소 읽기·물러선 HTML 모두) 가운데 받을 주소가 없는 수(attGap)가 남으면 리포트 맨 위 경보로 나간다.
+       열지 못했거나(오류) 화면을 못 본 채 아무것도 못 찾았으면 '살폈다'고 적지 않는다 — 다음 실행이 다시 본다. 봇 차단으로 물러서 HTML 을 읽은 것은 살핀 것이다 */
+    {
+      const names = [...new Set([...(r.seenNames || []), ...r.found.filter((a) => !a.bodyImage).map((a) => fileNameIn(a.name)).filter(Boolean)])];
+      const looked = !r.error && (text || names.length);
+      if (looked) {
+        ledger[key] = withAttCheck(ledger[key], { today, seen: names.length, gap: attGapOf(names, t.it.attachments) });
+        attChecked += 1;
+        if (ledger[key].attGap) attGaps += 1;
+      } else if (t.attOnly) {
+        /* 화면을 못 봤다(열지 못함 · 빈 화면) — 살폈다고 적지 않고 못 연 횟수만 센다. 세 번이면 이레 쉬고 경보에 나간다(rescue-plan wantsAttachments · 리뷰 2) */
+        ledger[key] = withAttMiss(ledger[key], today);
+      }
+    }
 
     /* 받아 온 글자가 **본문인지**는 notice-source의 규칙 하나로만 판단한다.
        여기에 규칙을 한 벌 더 두면 "재수집기는 됐다는데 발췌기는 못 읽는" 어긋남이 생긴다. */
     /* 게시판에서 내려간 공고는 '못 받은 것'이 아니라 '없어진 것'이다 — 섞으면
        영영 다시 받으려 애쓴다. 건국대 총동문회 장학생이 실제로 이 상태였다. */
-    if (/게시물이?\s*\(?가?\)?\s*존재\s*하지\s*않|삭제된?\s*게시물|없는 게시물/.test(text)) {
+    /* `삭제된글 · 삭제자 · 삭제사유` 꼴(게시판이 글 자리에 남기는 안내)도 내려간 글이다(2026-11-15 · 1단계 B5 — 100자를 넘어 '본문 확보'로 적혔다) */
+    if (/게시물이?\s*\(?가?\)?\s*존재\s*하지\s*않|삭제된?\s*게시물|없는 게시물|삭제된\s?글|삭제\s?사유|관리자\s?삭제/.test(text)) {
       gone += 1;
       ledger[key] = ledgerEntry(ledger[key], 'gone', { today, minBody: MIN_BODY, name, restAfter: REST_AFTER });   // 칸 = { tries: REST_AFTER, gone: true, … } · 지난 확보 날짜는 이어 둔다(리뷰 R5)
       report.push(`- 🗑 **${t.it.name.slice(0, 40)}** — 게시판에서 내려갔습니다(삭제된 공고). 등록 목록에서 뺄지 검토가 필요합니다.`);
       log(`🗑 ${t.it.name.slice(0, 30)} — 삭제된 공고`);
+      continue;
+    }
+    if (t.attOnly) {   // 첨부만 살피러 온 공고 — 본문·자격은 이미 읽었다. 본문 칸·실패 횟수를 건드리지 않는다
+      log(`📎 ${t.it.name.slice(0, 30)} — 첨부 살핌`);
+      await new Promise((r2) => setTimeout(r2, GAP_MS));
       continue;
     }
     const entry = { title: t.it.name, text: text.slice(0, 15000), at: today, via: 'rescue' };
@@ -361,7 +492,11 @@ for (const t of targets) {
        한 쪽뿐이라 아무것도 못 배워 **여기서는 '본문 확보', 발췌기에서는 '껍데기'** 로 갈린다
        (의암 손병희: 163자 vs 85자 실측). 같은 말뭉치여야 같은 판정이다. */
     const probe = indexTexts(texts, { ...bodies, [t.url]: entry });
-    const ok = text && hasText(probe.byUrl.get(key) || entry);
+    /* 🔴 봇 차단 뒤 물러서서 받은 화면은 **그 글인지** 한 번 더 본다(notice-source fallbackIsThisNotice 한 곳 · 2026-11-15 · 1단계 B5) — 메뉴·목록 화면을
+       '본문 확보'로 적으면 발췌기는 영영 빈 자격을 읽고 로봇은 이레를 쉰다. 다른 등록 공고 제목이 셋 이상 보이면 목록이다 */
+    const same = fellBack ? fallbackIsThisNotice(text, t.it.name, reg.items.filter((x) => x !== t.it).map((x) => x.name)) : { ok: true };
+    if (fellBack && !same.ok) report.push(`- 🚧 ${t.it.name.slice(0, 36)} — 물러서서 받은 화면이 이 글이 아니다(${same.why}) · 본문으로 적지 않음`);
+    const ok = text && same.ok && hasText(probe.byUrl.get(key) || entry);
 
     if (ok) {
       bodies[t.url] = entry;
@@ -398,6 +533,7 @@ for (const t of targets) {
 
 await settle(browser.close(), 10000);   // 닫기도 시한 안에서 — 멈춘 브라우저의 닫기는 돌아오지 않을 수 있다
 report.push('', `---`, `확보 **${got}건** · 본문 없음 ${miss}건 · 시한 초과 ${hung}건 · 삭제된 공고 ${gone}건 · 처리 ${done}/${targets.length}건`,
+  `첨부 살핌 ${attChecked}건 · 그중 받을 주소를 못 구한 첨부가 남은 공고 ${attGaps}건`,
   `본문 판정 기준: 메뉴를 걷어낸 뒤 한글 ${MIN_BODY}자 이상 (notice-source.mjs) · 한 공고 시한 ${PAGE_MS / 1000}초`);
 saveAll();
 log(`끝 — 확보 ${got}건 · 본문 없음 ${miss}건 · 시한 초과 ${hung}건 · 삭제된 공고 ${gone}건`);

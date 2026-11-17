@@ -63,7 +63,7 @@ export default async function gate(eq, ctx) {
   reset();
   SL.setLinkFixes({ fix: { 'id:reg-m': { url: 'https://a.kr/bbs/view.do?id=8' } } });
   SL.setLinkChecks({ bad: { 'https://a.kr/bbs/view.do?id=8': { v: 'gone', at: '2026-10-05' } }, fix: {} });
-  eq('⑤ 바로잡은 원문이 확정된 문제면 그대로 말한다(확인 필요)', [label(marker), href(marker)], ['원문 공고(확인 필요) ↗', 'https://a.kr/bbs/view.do?id=8']);
+  eq('⑤ 바로잡은 원문이 확정된 문제면 그대로 말한다(열리지 않음)', [label(marker), href(marker)], ['원문 공고(열리지 않음) ↗', 'https://a.kr/bbs/view.do?id=8']);
 
   /* ⑥ 학생이 여는 주소 한 곳(effectiveLinkUrl) — 도우미·제출처가 같은 주소를 쓴다 */
   reset();

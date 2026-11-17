@@ -833,6 +833,18 @@ function midYearBranch(text, yb, p, isExclude, ctx) {
       `4.5 만점에 4.0 이상인 자 우선 선발`·`학업성적: 4.5 만점 기준 3.5 이상 – 20점` 이 만점 가지를 좁힌 뒤 성적 요건 HIGH 로 살아나 평점 3.6 학생 ✕ 였다(틀린 미달) */
 const OLD_MANJEOM_NOISE = /만점(?!\s*(?:이상|이하|미만|초과|충족))/;
 const MANJEOM_RANK_TAIL = /우대|우선|가산|가점|순위|등급|그\s?외|유지\s?조건|[:：\-–→]\s*\d{1,3}\s*점|[(（]\s*\d{1,3}\s*점|만\s?원/;
+/* ⚠️ 넷 다 **줄 전체가 그 꼴일 때만** (리뷰 반례 — 진짜 요건과 한 줄에 있으면 요건이 이긴다):
+   · 가산점은 괄호 밖 줄 끝에서만 — `평점 3.0 이상인 재학생 (다자녀 가정 가산점 부여)` 는 평점 요건이 산다
+   · 이름 나열은 짧은 낱말들뿐이고 기준·빼는 말이 없을 때만 — `평점 3.0 이상, … 학생에게 지급하는 장학금` 은 요건이다
+   · 예외 무리는 모두를 가리키는 말(신청자·지원자·대상자·본교 재학생)이 아닐 때만 — `단, 본교 재학생은 3학년 이상` 은 모두의 요건이다 */
+const BONUS_LINE = /^\s*[-·•○*]?\s*우대\s?(?:사항|조건|대상)\s*[:：]|(?:가산점|가점)\s*(?:부여|적용|항목)?\s*[.]?\s*$/;
+const NAME_LIST_LINE = /^(?:[^·ㆍ,]{1,14}[·ㆍ,]\s*){2,}[^·ㆍ,]{1,20}장학금\s*$/;
+const NAME_LIST_NOT = /이상|이하|이내|미만|초과|없는|불가|제외|\d\s*(?:학점|구간|분위|학년)/;
+const EXCEPT_GROUP_LINE = /^\s*[(（]?\s*(?:단|다만)\s*[,，]?\s*([^,，.]{2,30}?(?:생|자|학생))\s?(?:은|는|의\s?경우|에\s?한해)[\s,]/;
+const EXCEPT_EVERYONE = /^(?:본교|우리\s?대학|본\s?대학)?\s*(?:신청자|지원자|대상자|수혜자|재학생|학부생|학생|장학생)$/;
+/* 제외 칸에 앉은 **인원 규칙** — `동일 세대 2명 선발 시 1명 지원(3자녀 이상 가정은 2명 선발)` : 몇 명 뽑는지지 누가 못 받는지가 아니다(다자녀 학생이 ✕ 였다 · 2026-11-15) */
+const LONG_PROGRAM_SCOPE = /학제\s?가?\s?[56]\s?(?:[~∼～,·]\s?|년?\s?(?:혹은|또는|이나)\s?)[56]\s?년\s?인?\s?전공에\s?한하여/;
+const HEADCOUNT_RULE = /^[^,(（]{0,12}\d\s*명\s*(?:을\s*)?(?:선발|지원)/;   // 줄머리가 인원 규칙일 때만 — `휴학생 (결원 발생 시 1명 선발)` 은 휴학생 제외 줄이다(리뷰 반례)
 function failInDoubt(text, c, p, ctx) {
   const branchLine = !!(ctx && (ctx.inYearBranch || ctx.wholeYearBranch));   // 학년 갈래 자신의 판정(그 갈래의 조건)은 그대로 둔다
   if (!branchLine && ctx && (c.kind === 'credits' || c.kind === 'grade')
@@ -855,6 +867,23 @@ function lineVerdict(text, p, isExclude, ctx, detail) {
      처럼 대상을 말하는 문장이 화면에서 아무 표시 없이 사라졌다. 지금은 학위 축(parseDegree)이
      판정하고, 학부/대학원 기준을 나란히 적은 표(`일반대학원생 : 평점 4.0`)만 무관하다. */
   if (PR.gradTarget(text) === 'label') return null;
+  /* 🔴 **요건이 아닌 줄 셋은 ✓·✕ 를 내지 않는다** (2026-11-15 · 전수표에서 틀린 ✕ 로 나온 꼴):
+     · 우대·가산점 줄 — `우대사항: 관련학과, … 2학년 이하`·`소득 5분위 이하 가산점` : 더 주는 점수지 자격이 아니다(3학년·6구간 학생에게 ✕ 였다)
+     · 장학금 이름을 늘어놓은 줄 — `성적우수·특기·다자녀·… 외국인 유학생,k-콘텐츠순천 장학금` : 이름 속 낱말(외국인 유학생)이 요건이 되어 모든 학생 ✕
+     · 「단, ○○ 학생은 …」 — 한 무리만의 예외 기준이다. `(단, 정규 마지막학기 등록생은 12학점 이상, 평점평균 3.0 이상)`·`단, 조기취업형 계약학과 학생은 1학년에 한해 …`
+       가 그 무리가 아닌 학생에게 ✕ 였다. 그 무리에 드는 학생의 ✓ 는 그대로 두고 ✕ 만 모름으로 낮춘다 — 빼는 말(제외·불가)이 든 줄은 손대지 않는다(`단, 휴학생은 제외`) */
+  if (!isExclude) {
+    const t0 = PR.untag(text);
+    if (BONUS_LINE.test(t0) || (NAME_LIST_LINE.test(t0) && !NAME_LIST_NOT.test(t0))) return null;
+    /* `학제가 5년 혹은 6년인 전공에 한하여, 각각 2~4학년과 2~5학년에 재학중인 자` — 5·6년제 학과만의 갈래다. 학과를 보고 그 학제가 아니면 이 줄은 내 이야기가 아니다(모름) —
+       4년제 학과 휴학생이 「재학중」 으로 ✕ 였다(같은 공고가 휴학생을 다른 줄에서 받는다) */
+    if (LONG_PROGRAM_SCOPE.test(t0) && !programLength(p).longProgram) return null;
+    const eg = !(ctx && ctx.exceptGroup) && t0.match(EXCEPT_GROUP_LINE);
+    if (eg && !EXCEPT_EVERYONE.test(eg[1].trim()) && !/제외|불가|않|없/.test(t0)) {
+      const v = lineVerdict(text, p, isExclude, { ...ctx, exceptGroup: true }, detail);
+      return v === 'no' ? null : v;
+    }
+  }
   if (isNoteLine(PR.untag(text))) return null;   // 참고 줄(`1학년 재학생은 성적 기준을 적용하지 않음`)은 요건이 아니다 — 학년을 읽어 ✕ 를 내면 안 된다(2026-10-15)
   /* 🔴 경우별 분기(`신입생:` `재학생:` `복학생 및 편입생:`)는 **내 경우만** 판정한다
      (2026-08-24 개발자 지적). 안 그러면 재학생인데 `신입생:` 줄에도 ✓가 붙는다.
@@ -1024,7 +1053,7 @@ function noticeCtx(sch) {
     for (const c of PR.parseLine(it.text, false).conds) if (c.kind === 'bracket') brackets.add(c.max);
   }
   /* 여러 장학금이 묶인 공고 — 하나에 미달해도 다른 것에 지원한다(설계 조건 ⑧) */
-  const multi = items.some((it) => PR.MULTI_PROGRAM.test(PR.untag(it.text)));
+  const multi = !!(sch && sch.cardRead && sch.cardRead.multi) || items.some((it) => PR.MULTI_PROGRAM.test(PR.untag(it.text)));   // 유료 읽기는 묶음 이름표 줄을 떼므로 그 판정(multi)을 그대로 받는다(리뷰 I1 — 안 받으면 한 종의 요건으로 미달)
   /* 🔴 **공고 어딘가에 학부가 대상이라고 적혀 있으면** 다른 줄의 대학원 표현으로 미달을 내지
      않는다 (2026-09-12 · 핵심-4). 대상을 여러 줄에 나눠 적는 공고가 있다:
        `4년제 대학 재학생` / `대학원 석·박사 과정 재학생`  ← 둘 중 하나면 된다는 뜻이다.
@@ -1117,7 +1146,7 @@ function fitDetail(sch, p) {
     ...requirementLines(sch, lines, { onlyExclude: true }),
   ])];
   /* 여러 장학금이 묶인 공고는 0%를 내지 않는다(설계 조건 ⑧) — 하나에 미달해도 다른 것에 지원한다 */
-  const multi = items.some((it) => PR.MULTI_PROGRAM.test(PR.untag(it.text)));
+  const multi = !!(sch && sch.cardRead && sch.cardRead.multi) || items.some((it) => PR.MULTI_PROGRAM.test(PR.untag(it.text)));   // 유료 읽기는 묶음 이름표 줄을 떼므로 그 판정(multi)을 그대로 받는다(리뷰 I1 — 안 받으면 한 종의 요건으로 미달)
 
   const ctx = noticeCtx(sch);
 
@@ -1130,6 +1159,8 @@ function fitDetail(sch, p) {
      95·50·33 몇 가지로만 떨어졌다(외대 표본 31건 실측). 조건을 못 읽은 줄은 1 로 센다 · 표의 구간(bracketTable)은 판정과 같이 뺀다 */
   const weightOf = (text) => Math.max(1, parseLine(PR.untag(text), false).conds.filter((c) => !(ctx.bracketTable && c.kind === 'bracket')).length);
   for (const it of items) {
+    /* 5·6년제 학과만의 갈래 줄은 그 학제가 아닌 학생의 분모에 넣지 않는다(lineVerdict 가 '모름'으로 두는 줄 — 넣으면 본 갈래로 되는 학생의 적합도가 깎인다 · 리뷰: 인재림 64% → 40%) */
+    if (p && LONG_PROGRAM_SCOPE.test(PR.untag(it.text)) && !programLength(p).longProgram) continue;
     const d = {};
     const lv = lineVerdict(it.text, p, false, ctx, d);
     const verdict = lv === 'no' ? 'fail' : lv === 'ok' ? 'pass' : 'unknown';
@@ -1153,11 +1184,16 @@ function fitDetail(sch, p) {
   /* 제외 조항에 걸리면 미달과 같다 · 🔴 걸리지 않음을 **확인한** 제외 조항은 충족한 요건 하나로 센다 (2026-10-29 같은 지시 — 학생이 통과한 조건을
      점수에 넣지 않던 자리) · 판정 못 한 제외 조항은 세지 않는다(모르는 것을 분모에 넣어 깎지 않는다 — '틀린 안심'도 '틀린 미달'도 아니다) */
   for (const line of exLines) {
+    if (HEADCOUNT_RULE.test(line) && !/제외|불가/.test(line)) continue;
     const { conds } = parseLine(line, true);
     let passed = 0, failed = false;
     for (const c of conds) {
       if (c.conf !== PR.HIGH) continue;
       if (ctx.bracketTable && c.kind === 'bracket') continue;
+      /* 유료 읽기의 제외 줄 가운데 **장학금 수혜자 줄**(「통영시 … 장학금 4회 이상 수혜자」「지역대학생 장학금 수혜자」)은 장학금 이름 속 낱말이 엉뚱한 축으로 읽힌다
+         (「지역대학생」→ 학교 '지역대') — 그 줄은 학적·학위·학교 종류·학년·결격 처지·타 장학금 축만 센다. 그 밖의 제외 줄(「외국인 유학생」「예체능 계열」)은 무료 길과 똑같이 판정한다
+         (리뷰 I2 — 전부 좁혔더니 진짜 제외 대상이 「적합도 95%」였다) */
+      if (sch && sch.cardRead && CARD_BENEFICIARY_LINE.test(line) && !CARD_EXCLUDE_KINDS.has(c.kind)) continue;
       const v = judgeCond(c, p, ctx);
       if (v === 'fail' && !multi) { fails.push(line); failed = true; }
       else if (v === 'pass') passed += 1;
@@ -1206,6 +1242,34 @@ function fitScore(sch, result, p) {
   /* 구조화된 자격(eligibility)으로 이미 미달이 확정된 공고는 그대로 0 */
   if (result.status === 'ineligible') return 0;
   return fitDetail(sch, p).pct;
+}
+
+/* ── 기한도 자격도 모르는 정식 공고는 카드가 아니라 게시판 글로 (2026-11-15 · 개발자 결정 1 — 11-02 「학생 화면에 '모름'류 글자 없음」 계획) ──
+   마감을 못 읽었고(deadline 없음) 자격도 못 읽은(fitDetail unread · 확정 미달 아님) 정식 등록 공고는 카드로 그릴 것이 제목뿐이다 —
+   그래서 카드(홈·탐색·일괄 준비·도우미)에서 빼고 게시판 새 공고(제목+링크)로만 보인다(app.js registeredUrlMatcher 가 그 주소를 피드에서 안 뺀다).
+   🔴 판정을 새로 만들지 않는다 — 미달은 evaluate, 못 읽음은 fitDetail 그대로(카드의 fitVerdict 'unread' 와 같은 갈래).
+   🔴 화면(getMatches)·알림(notify-rules 「새 장학 공고」)이 **이 한 함수**를 쓴다 — 갈라지면 카드에 없는 공고를 알림이 운다.
+   상시 제도(program)·층2(kosaf — 마감 빈 재단을 버리지 말 것)는 대상이 아니다. 찾기(findSch)·저장·신청 내역은 그대로 연다.
+   known 은 이미 잰 { status, fd } — 같은 계산을 두 번 하지 않게(없으면 여기서 잰다) */
+function feedOnlyFormal(sch, p, known) {
+  if (!sch || !p || sch.program || sch.sourceKind === 'kosaf' || sch.deadline) return false;
+  const status = (known && known.status) || evaluate(sch, p).status;
+  if (status === 'ineligible') return false;
+  const fd = (known && known.fd) || fitDetail(sch, p);
+  return !!(fd && fd.unread);
+}
+
+/* 카드로 안 그리는 정식 공고(feedOnlyFormal)를 **게시판 새 공고 한 줄**로 바꾼다 (2026-11-16 리뷰 — 화면·알림이 갈라졌다).
+   그 학교 게시판 글(feed — 이미 내 학교 것만 거른 목록)에 같은 주소가 없을 때만 싣는다(다른 게시판·재단 게시판에서 온 공고) · 있으면 그 글이 그 자리다.
+   🔴 지어내지 않는다 — 제목·주소·날짜는 그 공고의 것 그대로(name·sourceUrl·listedAt).
+   🔴 화면(app.js boardNoticesForMe)과 알림(notify-rules 「4. 실시간 공고」 — notify.js·sw.js 가 부른다)이 **이 한 함수**를 쓴다 —
+      예전엔 app.js 에만 있어 화면엔 뜨는 줄을 알림이 영영 몰랐다(1번 규칙은 feedOnly 를 '4번이 맡는다'며 건너뛴다) */
+function feedOnlyBoardRows(list, feed, p, now) {
+  if (!p || !p.school) return [];
+  const sameUrl = (a, b) => !!a && !!b && (a.startsWith(b) || b.startsWith(a));
+  const urls = (feed || []).map((n) => String((n && n.url) || '')).filter(Boolean);
+  return (list || []).filter((s) => s && s.sourceUrl && notStale(s, now) && feedOnlyFormal(s, p) && !urls.some((u) => sameUrl(u, String(s.sourceUrl))))
+    .map((s) => ({ title: s.name, url: s.sourceUrl, school: (s.eligibility && s.eligibility.schoolOnly) || p.school, foundAt: s.listedAt || '' }));
 }
 
 /* 마감일을 확정하지 못한 공고(원문에 마감이 없거나 못 읽은 경우)는 dday가 '기한 원문 확인'이라
@@ -1445,7 +1509,10 @@ const REQ_SIGNAL = new RegExp([
         낱말이 안 걸리는 진짜 요건이 잘려 나갔다(회귀가 잡았다).
         이 꼴은 거의 언제나 '자격이 있는 사람'을 가리킨다. */
   '(자|학생|사람|대상자|(?<!\\d\\s?)분)\\s*[)）]?\\s*$',          // …인 자 / …한 학생 / …가능한 분 (으로 끝난다) — 봉사·활동 글은 존댓말 「분」으로 사람을 가리킨다(관악서울대 치과병원 · 2026-10-28) · `30분`(시간)은 아니다
-  '수\\s?있는\\s?(자|학생|사람|분)',                    // …할 수 있는 학생 / …할 수 있는 분
+  '수\\s?있는\\s?(자|학생|사람|분)',
+  /* 대외활동·공모전이 사람을 가리키는 끝말 (2026-11-17 리뷰 실측 — 화면에서 숨겨진 진짜 자격 줄): `… 전·현직 전문가` · `창업 인큐베이팅 경험자(3년), … 기술·경영 전문가` ·
+     `사업자등록을 완료한 개인 또는 단체` · `(예비)창업자`. 🔴 줄 **끝**에서만 — 줄 가운데의 `전문가 멘토링` 같은 혜택 말은 아니다 */
+  '(?:전문가|경험자|(?:예비\\s?)?창업자|개인\\s?(?:및|또는|·)\\s?(?:단체|기업|팀))\\s*[)）]?\\s*$',                    // …할 수 있는 학생 / …할 수 있는 분
   '(마친|가진|이수한|합격한|해당하는|갖춘)\\s?자',
   '이상인?\\s?자|이하의?\\s?(해당\\s?)?학생',
   '결격\\s?사유|결격사유|합격자|재직|파견|추천\\s?(가능|대상)자?|이수(한|자)',
@@ -1503,7 +1570,13 @@ const NOT_A_REQUIREMENT = new RegExp([
    (2026-08-21 목포향우회 우선선발과 같은 계열). 앱에 '이런 경우는 제외돼요' 블록이 이미 있다. */
 /* 🔴 `참여 불가`·`참가 불가`가 빠져 있어서 `휴학생 참여 불가`가 지원 자격 자리에 앉아 있었다
    (2026-08-24 개발자 지적 — 대청교 멘토). 제외를 말하는 낱말은 여기 한 곳에 모은다. */
-const EXCLUDE_LINE = /(제외(한다|합니다|됨|대상)?\s*$|받은\s*(학생|자)는?\s*제외|불가\s*$|불가능\s*$|불가자|(지원|신청|참여|참가|수혜|선발|근로)\s*불가|신청할\s*수\s*없|선발에서\s*제외|대상에서\s*제외)/;
+/* 🔴 `배제` 도 제외다 (2026-11-17) — `3. 9학기 진학 및 부분 등록자는 선발에서 배제됩니다.`·`…배제됨.`·`…배제합니다.` 가 이 규칙에 안 걸려
+   제외 칸(onlyExclude)에서 버려지고(저장된 eligibilityExcludes 줄이 화면에 안 보였다) 자격 칸에서는 **자격 줄로** 떴다(`휴학생은 선발에서 배제됩니다` 가 지원 자격 자리에 —
+   뜻이 뒤집혀 보이는 실패). 「(선발|지원|…)에서 배제(됨|됩니다|합니다|한다)」·「선발 배제」로 **줄이 끝날 때만** 제외로 본다 —
+   `중복 수혜를 배제하지 않음`·`배제하지 않습니다`·`배제될 수 있음` 은 말끝이 배제가 아니라 제외가 아니다. 머리글(`참여배제자`)은 section-head.js EXCLUDE_WORD 몫
+   🔴 띄어 쓴 말끝·처리 말끝(`배제 됩니다`·`배제 됨`·`배제 처리됩니다`)도 같은 제외다(리뷰 4차 2026-11-17 — `제외 됩니다` 는 이미 걸리는데 배제만 빠져
+   휴학생에게 '맞아요'가 떴다) · 면제·산정 규칙의 배제(`성적 산정 대상에서 배제`·`적용 배제`·`학점 배제`)는 아래 NOT_AN_EXCLUSION 이 제외와 똑같이 푼다. */
+const EXCLUDE_LINE = /(제외(한다|합니다|됨|대상)?\s*$|받은\s*(학생|자)는?\s*제외|불가\s*$|불가능\s*$|불가자|(지원|신청|참여|참가|수혜|선발|근로)\s*불가|신청할\s*수\s*없|선발에서\s*제외|대상에서\s*제외|(?:선발|지원|신청|참여|참가|수혜|대상)\s*(?:에서\s*)?배제\s*(?:처리\s*)?(?:됨|됩니다|합니다|한다|된다|함)?[\s.。​]*$)/;
 /* 🔴 '제외'가 붙었다고 다 제외가 아니다 — **면제·산정 규칙**은 오히려 학생에게 유리하다
    (2026-08-24 전수 조사). `신/편입생은 입학 학기에만 학점 및 성적 기준 적용 제외`가
    '이런 경우는 제외돼요'에 떠서, 혜택을 불이익으로 보여 주고 있었다.
@@ -1513,7 +1586,7 @@ const EXCLUDE_LINE = /(제외(한다|합니다|됨|대상)?\s*$|받은\s*(학생
    말하는 것은 **선발 가능**이다. 앞의 '없는'은 대상을 꾸미는 말일 뿐이다.
    제외 칸에 넣으면 외국 국적 학생이 자기가 안 된다고 읽는다 — 자격이 뒤집혀 보인다. */
 const ENDS_AFFIRM = /(가능|있음|인\s?자|한다)\s*[.]?\s*$/;
-const NOT_AN_EXCLUSION = /(기준\s*)?적용\s*제외|미적용|산정.{0,6}제외|학점\s*제외|계절.{0,10}제외|제외한\s|제외하고|을\s*제외한|를\s*제외한/;
+const NOT_AN_EXCLUSION = /(기준\s*)?적용\s*(?:제외|배제)|미적용|산정.{0,6}(?:제외|배제)|학점\s*(?:제외|배제)|계절.{0,10}(?:제외|배제)|(?:제외|배제)한\s|(?:제외|배제)하고|을\s*(?:제외|배제)한|를\s*(?:제외|배제)한/;
 /* 제외 절에 있어도 **긍정으로 적힌 줄은 자격**이다 (2026-08-24 개발자 지적).
    `결격사유에 해당하지 않는 자`는 지원 자격이고, `결격사유에 해당하면` 제외다. */
 /* 🔴 맨 `…아닌 자`·`…없는 자` 는 긍정이 아니다 (2026-10-27 · 인천 국제기구 직업체험 「참여배제자 ① 인천시민이 아닌 자」 가 자격 칸에 떴다).
@@ -1642,8 +1715,31 @@ function joinSpacedSyllables(s) {
     return parts.join('') + (tail ? (parts.length >= 3 ? tail.trim() : tail) : '');
   });
 }
+/* 앞머리 **번호 표식**만 뗀다 — 값인 숫자는 남긴다 (2026-11-17 리뷰: `2.1 보호조치 종료자` 가 `1 보호조치 종료자`,
+   `3.5 이상인 자 우대` 가 `5 이상인 자 우대` 로 떴다 — 옛 규칙 `^\d+[.]` 이 소수·절 번호의 앞 토막만 뗐다).
+   🔴 자격 줄(tidyRequirement)과 「공고 안내」(app.js noticeSummaryRows)가 **이 함수 하나**를 부른다 — 따로 적으면 한쪽만 고쳐진다.
+     · `1.` `1)` `(1)` `12.` 는 표식 — 점 뒤에 숫자가 붙으면(`3.5`·`2026.3.1`·`1.5배`) 표식이 아니라 값이다
+       (단 `1.2026년 …` 처럼 해가 붙어 오면 `1.` 은 표식이다)
+     · 점 찍힌 숫자(`2.1 보호조치`·`2.1. 보호조치`)는 **떼지 않는다** — 절 번호와 날짜(`11.30. 마감`·`2.28. 현재 재학 중인 자`)·
+       값(`2.0 미달 시 환수`·`1.5 배수`·`3.5 내외`)이 글자로는 같은 꼴이다. 🔴 헷갈리면 남긴다: `2.1` 이 보이는 건 해가 없지만
+       날짜·기준값이 사라지면 학생이 마감·기준을 못 본다(2026-11-17 리뷰 3차 — 뒤 낱말 허용 목록으로 가렸더니 `미달`·`마감`·`현재` 에서 샜다)
+     · `10. 22.(목)` 처럼 날짜가 이어지면 번호가 아니다
+     · 🔴 예외 하나 — 점 찍힌 절 번호 **바로 뒤가 짧은 이름표 + 콜론**이면(`2.1 신청기간 : …`·`3.2 지원자격 : 재학생`·`2.1. 대상 : …`) 절 번호다
+       (리뷰 4차 2026-11-17 — 안 떼니 「공고 안내」가 이름표를 못 읽어 `2.1 신청기간 : …` 이 이름표 없는 줄로 뜨고 `3.2 지원자격 :` 줄이 NS_SKIP 을 비켜 다시 보였다).
+       이름표는 **이름표 낱말로 끝날 때만**(STRIP_SECTION_LABEL — 기간·방법·자격·대상·문의·서류…) — 값·날짜 뒤에 콜론이 오는 꼴(`3.5 이상 : 20점`·`11.30. 마감 : …`)은 그대로 남는다.
+       첫 숫자는 한 자리(`1.`~`9.`)만 — `11.30.`·`12.5.` 같은 날짜가 이름표처럼 보이는 줄을 떼지 않는다 */
+const STRIP_SECTION_LABEL = /^[1-9](?:\.\d{1,2}){1,2}\.?\s*(?=(?:[가-힣A-Za-z][가-힣A-Za-z0-9\s·]{0,14}?)?(?:기간|일시|일정|기한|방법|자격|대상|요건|조건|문의|연락처|장소|서류|금액|인원|내용|혜택|절차|접수처|제출처|문의처|사항|주소|분야|개요|목적)\s*[:：](?!\/\/))/;
+function stripListNumber(s) {
+  const t = String(s || '');
+  let m = t.match(/^\(\s*\d{1,2}\s*\)\s*|^\d{1,2}\s*\)\s*/);
+  if (m) return t.slice(m[0].length);
+  m = t.match(STRIP_SECTION_LABEL);
+  if (m) return t.slice(m[0].length);
+  m = t.match(/^\d{1,2}\s*\.(?!\d)(?!\s?\d{1,2}\s?[.(월])\s*|^\d{1,2}\.(?=(?:19|20)\d\d(?!\d))/);
+  return m ? t.slice(m[0].length) : t;
+}
 function tidyRequirement(line) {
-  return joinSpacedSyllables(decodeEntities(String(line || '')))
+  const head = joinSpacedSyllables(decodeEntities(String(line || '')))
     /* `① 또는 ② 해당자 ① A ② B` — 표의 머리와 칸이 한 줄로 붙은 꼴. 원문 낱말 그대로 `A 또는 B` 로 편다(세종 디딤돌 · 2026-10-15) */
     .replace(/^\s*①\s*또는\s*②\s*해당자\s*①\s*(.+?)\s*②\s*(.+)$/, '$1 또는 $2')
     // 글 가운데 글머리 기호(`다문화 ⦁ 탈북학생`)는 가운뎃점으로 — 지우면 낱말이 붙는다 (2026-10-15)
@@ -1655,9 +1751,11 @@ function tidyRequirement(line) {
     .replace(/^[\s\-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙❍◎￭·ㆍ*◌◍!|ㅣ:：©®]+/, '')   // © 는 OCR 이 글머리 기호를 잘못 읽은 것(`© 아래 기준 충족자` · 2026-11-11)
     .replace(/^[oOㅇ]\s+(?=\S)/, '')   // 글자 `o`·`ㅇ` 를 글머리로 쓴 줄(`o 대학생 : …`)
     .replace(/[\s!|ㅣ,、]+$/, '')   // 꼬리 쉼표(`… 이중국적자 제외,`)를 안 떼면 제외 줄 판정(`제외$`)이 비켜 가 자격 칸에 남는다(2026-11-11 · 1단계)
-    .replace(/\s*[|ㅣ]\s*/g, ' · ')   // 표 칸 사이의 세로줄(`대학생 |직전학기 성적 …`)은 가운뎃점으로
-    // 앞머리 번호 — "3 )" "1." "가." "①" 모두. ⚠️ `① 또는 ② 해당자` 의 ① 은 번호가 아니라 글이다(떼면 `또는 ②` 로 시작한다 · 2026-10-15)
-    .replace(/^\(?\s*\d+\s*[).]|^[①-⑳](?!\s*(?:또는|및|,|·))|^[가-힣]\s*[.)]\s/, '')
+    .replace(/\s*[|ㅣ]\s*/g, ' · ');   // 표 칸 사이의 세로줄(`대학생 |직전학기 성적 …`)은 가운뎃점으로
+  // 앞머리 번호 — "3 )" "1." "2.1" "가." "①" 모두. 숫자 표식은 stripListNumber 한 곳(소수 `3.5 이상`은 값이다 · 2026-11-17)
+  // ⚠️ `① 또는 ② 해당자` 의 ① 은 번호가 아니라 글이다(떼면 `또는 ②` 로 시작한다 · 2026-10-15)
+  const unnumbered = stripListNumber(head);
+  return (unnumbered !== head ? unnumbered : head.replace(/^[①-⑳](?!\s*(?:또는|및|,|·))|^[가-힣]\s*[.)]\s/, ''))
     // "지원자격 : 내용" 처럼 이름표가 앞에 붙은 경우 이름표만 뗀다 (내용은 살린다)
     /* "지원자격 : 내용" 처럼 이름표가 앞에 붙은 경우 이름표만 뗀다 (내용은 살린다).
        바깥 제목이 이미 '지원 자격'이라 **줄마다 또 말하면 같은 말이 두 번** 나온다
@@ -1693,9 +1791,10 @@ function tidyRequirement(line) {
    🔴 버리면 안 된다 — 그 줄에 진짜 요건이 들어 있다. **다음 줄과 이어 붙인다.** */
 const CONTINUES = /(또는|및|이고|이며|하여|중)\s*$|\s인\s*$|[,·+]\s*$/;
 /* 참고 줄 — `1학년 재학생은 성적 기준을 적용하지 않음` 처럼 요건을 **푸는** 말(2026-10-15 · 123줄 진단 ⑧). 요건이 아니라 옅게 보이고 분모에서 뺀다(aside) */
-const NOTE_LINE = /(?:기준|요건|조건)(?:을|은|는|이)?\s*(?:적용하지\s*않|적용\s*안\s*함|적용\s*제외|미적용|면제|없음)|(?:학점|성적)\s*(?:기준\s*)?제한\s*없|성적\s?(?:기준\s?)?무관|성적이?\s*반영됨|아니라도\s?(?:지원|신청)\s?(?:이|가)?\s?가능|^(?:선정|선발)\s?(?:시|되면|후|이후)[,\s][^.]*(?:가입|기부|참가|참여|참석|서약|납부|활동)/;   // `…아니라도 지원 가능`(요건을 푸는 말) · `선정시, … 기부에 참가할 자`(선정 뒤 의무)도 참고다(2026-11-11 · 1단계)   // `마지막 학기 등록자는 이수학점 제한 없음` 도 참고다(2026-10-15 · 3학년에게 ✕ 가 떴다) · `성적기준 없음`·`성적무관`·`유급 전 성적이 반영됨` 도(2026-11-02)
+const NOTE_LINE = /(?:기준|요건|조건)(?:을|은|는|이)?\s*(?:적용하지\s*않|적용\s*안\s*함|적용\s*(?:제외|배제)|미적용|면제|없음)|(?:학점|성적)\s*(?:기준\s*)?제한\s*없|성적\s?(?:기준\s?)?무관|성적이?\s*반영됨|아니라도\s?(?:지원|신청)\s?(?:이|가)?\s?가능|^(?:선정|선발)\s?(?:시|되면|후|이후)[,\s][^.]*(?:가입|기부|참가|참여|참석|서약|납부|활동)/;   // `…아니라도 지원 가능`(요건을 푸는 말) · `선정시, … 기부에 참가할 자`(선정 뒤 의무)도 참고다(2026-11-11 · 1단계)   // `마지막 학기 등록자는 이수학점 제한 없음` 도 참고다(2026-10-15 · 3학년에게 ✕ 가 떴다) · `성적기준 없음`·`성적무관`·`유급 전 성적이 반영됨` 도(2026-11-02)
 /* 🔴 `성적기준 적용 제외 가능` 도 면제 안내다 (2026-11-02 · 3차) — 층2 국가근로 「학생이 장애인·자립준비청년((구)보호종료아동)인 경우 성적기준 적용 제외 가능」이
-   자립준비청년 처지 조건이 되어 「아니요」 답한 학생에게 ✕ 였다(틀린 미달). ⚠️ 앞에 기준·요건·조건이 붙을 때만 — `적용 제외 대상 : …` 은 진짜 제외 줄이다 */
+   자립준비청년 처지 조건이 되어 「아니요」 답한 학생에게 ✕ 였다(틀린 미달). ⚠️ 앞에 기준·요건·조건이 붙을 때만 — `적용 제외 대상 : …` 은 진짜 제외 줄이다
+   `적용 배제` 도 같은 면제 안내다(리뷰 4차 2026-11-17 — 배제를 제외로 읽기 시작해 면제 쪽도 짝을 맞춘다 · EXCLUDE_LINE 머리말) */
 /* 참고인가는 **괄호 밖**으로 본다 — `평점평균 2.0 이상인 자 (단, 신입생·편입생 성적제한 없음)` 은 요건이고 괄호는 면제 부연이다 */
 /* 척도 줄(`4.5만점 기준`·`4.5만점 기준으로 환산 적용`)도 참고다 — 단 문턱(이상·이하…)이 같은 줄에 있으면 요건이다(`4.5만점 기준 3.0 이상` · 2026-11-02) */
 /* ※ 꼬리도 괄호처럼 곁말이다 — `… 9구간 이하를 모두 충족하는 자 ※ 신·편입생은 성적무관` 은 요건이고 ※ 뒤는 면제 부연이다(요건을 통째로 참고로 만들면 그 공고가 '자격 미확인'이 된다 · 2026-11-02 실측).
@@ -1792,15 +1891,99 @@ const POINTER_LINE = /^(?:[^.:：]{2,30}?(?:은|는)\s+)?(아래|다음|위|상�
    안내 줄을 그냥 지우면 선택지가 필수처럼 남아, 하나만 만족하는 학생이 0%가 된다
    (한국고등교육재단 동아시아연구장학생으로 실증 — 석사 재학생은 1번만 만족한다).
    `세 가지`처럼 **개수가 적혀 있으면 그 개수만큼**을 한 묶음으로 본다 — 짐작보다 정확하다. */
-const ANY_OF_LINE = /(중\s*(하나|1\s*개|1\s*가지|어느\s*하나)|둘\s*중|가지\s*중)[^.]{0,12}(만족|해당|충족)/;
-const KOR_NUM = { 한: 1, 두: 2, 세: 3, 네: 4, 다섯: 5, 여섯: 6 };
+const ANY_OF_LINE = /(중\s*(하나|1\s*개|1\s*가지|한\s*가지|어느\s*하나)|둘\s*중|가지\s*중)[^.]{0,12}(만족|해당|충족)/;
+const KOR_NUM = { 한: 1, 두: 2, 세: 3, 네: 4, 다섯: 5, 여섯: 6, 일곱: 7, 여덟: 8, 아홉: 9, 열: 10 };
+/* 🔴 **선택지 수는 원문이 선택지 수를 말할 때만** 읽는다 (2026-11-16 · 리뷰 3차).
+   `세 가지 중 하나` · `다음 3 가지 중 1 가지` · `둘 중` · `①·②·③ 중 하나` 처럼 **「N 가지(개) … 중」** 또는 나열이 있을 때만이다.
+   `다음 중 1가지 이상 해당` 의 `1가지` 는 문턱이다 — 예전엔 그 1 을 선택지 수로 읽어 첫 항목만 묶고 나머지를 필수로 셌다
+   (`가. 지원자격: 다음 중 1가지 이상 해당하는 자` 아래 1) 2) 3) — 수급자 학생이 평점 줄에서 틀린 미달). 말하지 않으면 0 — 선택지는 개요(optionRun)가 정한다. */
 function anyOfCount(line) {
   const t = String(line || '');
-  if (!ANY_OF_LINE.test(t)) return 0;
-  const kor = t.match(/(한|두|세|네|다섯|여섯)\s*가지/);
-  if (kor) return KOR_NUM[kor[1]] || 0;
-  const dig = t.match(/(\d)\s*가지/);
-  return dig ? parseInt(dig[1], 10) : 0;
+  const m = t.match(/(\d{1,2}|한|두|세|네|다섯|여섯|일곱|여덟|아홉|열)\s*(?:개|가지)\s*(?:의\s*)?(?:[가-힣]{1,4}\s*)?중/);
+  if (m) return /^\d/.test(m[1]) ? parseInt(m[1], 10) : (KOR_NUM[m[1]] || 0);
+  if (/둘\s*중/.test(t)) return 2;
+  const list = t.match(/((?:[^\s·,ㆍ]{1,8}\s*[·,ㆍ]\s*)+[^\s·,ㆍ]{1,8})\s*(?:항목\s*)?중/);
+  return list ? list[1].split(/\s*[·,ㆍ]\s*/).filter(Boolean).length : 0;
+}
+/* 이 머리 줄이 **택1**(하나만 맞으면 된다)인가 — 가리킴 줄·「n개 이상」 머리 줄 두 길이 같이 쓴다(한 곳).
+   · `1개(1가지·한 가지·하나) 이상` = 문턱 1 → 택1 · `중 하나`·`둘 중`·`가지 중 … 해당` → 택1
+   · `2개 이상`·`모두` → 택1 아님(묶으면 하나만 맞아도 맞음 — 틀린 안심)
+   · `… 해당하지 않는 경우 지급 불가` 처럼 **부정·제외**로 끝나는 줄은 택1 자격 묶음이 아니다(그 줄은 제외 규칙의 몫) */
+const ANY_THRESHOLD_ONE = /(?:1\s*(?:개|가지)|한\s*가지|하나)\s*(?:의\s*)?(?:항목|조건)?\s*(?:을|를|에)?\s*이상/;
+const ANY_THRESHOLD_MANY = /(?:[2-9]|1\d|두|세|네|다섯|여섯)\s*(?:개|가지)\s*(?:의\s*)?(?:항목|조건)?\s*(?:을|를|에)?\s*이상|모두\s*(?:를|에)?\s*(?:충족|해당|만족)/;
+function pickOneHead(t) {
+  const s = String(t || '');
+  if (/(?:해당|충족|만족)\s*(?:하|되)?\s*지\s*(?:않|못)|미\s*충족|미\s*해당|(?:지급|신청|지원|수혜)\s*불가/.test(s)) return null;   // 괄호 부연(`휴학생 제외`)은 막지 않는다
+  if (ANY_THRESHOLD_MANY.test(s.replace(/(\d{1,2}|한|두|세|네|다섯|여섯)\s*(?:개|가지)\s*(?:의\s*)?(?:[가-힣]{1,4}\s*)?중/, ''))) return null;
+  if (!(ANY_OF_LINE.test(s) || ANY_THRESHOLD_ONE.test(s))) return null;
+  return { count: anyOfCount(s) };
+}
+/* 🔴 **개요 번호 아래 「n개 이상 충족」 머리 줄** (2026-11-16 · 리뷰 — 충남대 사회 재환원 장학금).
+   원문은 `가. 필수조건(모두 충족)` ↵ 1) 2) ↵ `나. 차등조건(1개 이상 충족 시 신청 가능, 해당하는 모든 조건의 증빙서류 제출 필수)` ↵ 1) 2) 3) 이다.
+   POINTER_LINE 은 `아래·다음·위` 로 시작해야 하고 ANY_OF_LINE 은 `중 하나·가지 중` 을 찾아, 이 머리 줄이 그냥 버려졌다 —
+   보호조치 종료자·수급자·보호조치 연장자 셋(**동시에 될 수 없는** 둘이 섞였다)이 모두 갖춰야 하는 요건으로 읽혔다.
+   ① 짧은 이름표(차등조건·선택조건 …) 뒤 `(1개 이상 충족 …` · `: 다음 중 1개 이상 해당` 꼴 — **1개(하나·한 가지) 이상일 때만**이다.
+      `2개 이상 충족` 은 '하나만 되면 된다'가 아니다 — 택1 묶음으로 보면 틀린 안심이 된다(건드리지 않는다).
+   ② 어느 줄이 선택지인지는 **바로 아래 같은 꼴 번호 항목**으로 정한다(enumRun · 1) 2) 3) → 셋 · 아래 ④).
+   ③ 머리 줄 자신은 POINTER_LINE 처럼 화면에 안 내보낸다 — 줄로 남기면 채점기(eligibility-report)가 '제목·이름표로 끝나는 줄'로 센다.
+      대신 머리 줄 글자는 withMeta 항목의 `head` 로 따로 준다(pickHeadCaption · 2026-11-17) — 화면이 그 묶음 첫 줄 위에 이름표로 그린다(요건 줄로는 안 센다).
+   ④ 🔴 묶음은 **원문의 개요**를 따른다(2026-11-16 리뷰 2차) — 머리 줄 바로 아래 같은 꼴 번호 항목들(joined 의 줄 자리)이고, 그 꼴이 아닌 첫 줄(`다.` 같은 형제·윗 번호 ·
+      다른 꼴 글머리)에서 끝난다. 처음엔 '몇 줄 남았나'를 **내보낸 줄**로 셌다 — 선택지 하나가 잡음·날짜·중복으로 걸러지면 묶음이 다음 필수 줄
+      (`다. 직전학기 평점 3.5 이상인 자`)까지 삼켜 평점 2.0 학생이 95% 가 됐다(틀린 안심). 걸러진 줄이 있어도 묶음의 끝은 그대로다.
+      `다음 중 1가지 이상 해당` 의 `1가지` 는 **문턱**이다 — 선택지 수로 읽었더니 첫 항목만 묶이고 나머지 둘이 필수 요건이 됐다(anyOfCount 는 가리킴 줄 몫). */
+const ANY_OF_HEAD = /^[가-힣A-Za-z ]{0,15}\s*[(（:：]\s*(?:(?:다음|아래)\s*)?(?:중\s*)?(?:1\s*개|1\s*가지|한\s*가지|하나)\s*(?:항목)?\s*이상\s*(?:을|를|에)?\s*(?:충족|해당|만족)/;
+/* 🔴 번호 꼴은 **정확한 모양**으로 가른다 (2026-11-16 · 리뷰 3차). 예전엔 꼴을 넓은 갈래로 묶어
+   `(1)` 과 `3)` · `가)` 와 `다.` · `2.1` 과 `3.`(그리고 번호가 아닌 `3.5 이상…`)을 같은 꼴로 봤다 — 그래서 `2) 차등조건(1개 이상 …)` ↵ `(1)` `(2)` ↵ `3) 직전학기 평점 3.5 이상인 자`
+   에서 묶음이 다음 필수 형제 줄(평점)까지 삼켜 평점 2.0 학생이 미달 없이 통과했다(틀린 안심). 한국 공고의 개요는 `1.` > `가.` > `1)` > `가)` > `(1)` > `(가)` > `①` 이고 `2.1` 은 `2.` 아래다.
+   `2.1`·`2.2` 는 윗 번호(2)까지 같아야 같은 꼴이다 · `3.5 이상`·`2026. 2학기` 같은 숫자 줄은 번호가 아니다. */
+function enumShape(line) {
+  const s = String(line || '');
+  if (/^\s*[(（]\s*\d+\s*[)）]/.test(s)) return '(d)';
+  if (/^\s*[(（]\s*[가-하]\s*[)）]/.test(s)) return '(k)';
+  const dd = s.match(/^\s*(\d{1,2})\.\d{1,2}(?:\.\d{1,2})*\.?\s+(?!이상|이하|미만|초과|만점|점|%|학점|배)/);
+  if (dd) return `d.d:${dd[1]}`;
+  if (/^\s*\d+\s*[)）]/.test(s)) return 'd)';
+  if (/^\s*\d+\s*\.(?!\s*\d)/.test(s)) return 'd.';
+  if (/^\s*[①-⑳]/.test(s)) return '①';
+  if (/^\s*[가-하]\s*[)）]/.test(s)) return 'k)';
+  if (/^\s*[가-하]\s*\.(?!\s*\d)/.test(s)) return 'k.';
+  const b = s.match(/^\s*([-·•▪])\s/);
+  return b ? `b${b[1]}` : '';
+}
+/* 머리 줄 바로 아래 **같은 모양** 번호 항목이 몇 줄 이어지나 — 모양이 다른 첫 줄에서 끝난다.
+   머리 줄 자신과 같은 모양이면 그 줄들은 아래 항목이 아니라 **형제**다(`2) 차등조건(…)` ↵ `3) …`) — 묶지 않는다 */
+function enumRun(lines, start, headLine) {
+  const shape = enumShape(lines[start]);
+  if (!shape) return 0;
+  if (headLine != null && enumShape(headLine) === shape) return 0;
+  let n = 0;
+  while (start + n < lines.length && enumShape(lines[start + n]) === shape) n += 1;
+  return n >= 2 ? n : 0;
+}
+/* 택1 머리 줄 아래 선택지가 joined 의 몇 줄인가 — **원문 개요로** 끝을 정한다(걸러진 줄이 있어도 끝은 그대로 · ANY_OF_HEAD 머리말 ④).
+   · 번호 항목이면 같은 모양이 이어지는 데까지(원문이 선택지 수를 말하면 그 수를 넘지 않는다)
+   · 번호가 없으면 원문이 선택지 수를 말할 때만(`다음 3 가지 중 1 가지`) — 번호 없는 줄이 이어지는 데까지, 그 수를 넘지 않는다.
+     수를 말하지 않으면 묶지 않는다 — 어디서 끝나는지 모르는데 묶으면 다음 필수 줄을 삼킨다(틀린 안심) */
+function optionRun(lines, start, headLine, count) {
+  if (enumShape(lines[start])) {
+    const run = enumRun(lines, start, headLine);
+    return count > 0 ? Math.min(count, run) : run;
+  }
+  if (!(count > 0)) return 0;
+  let n = 0;
+  while (start + n < lines.length && n < count && !enumShape(lines[start + n]) && !SH.sectionOf(String(lines[start + n] || ''))) n += 1;
+  return n;
+}
+/* 🔴 **택1 묶음의 머리 줄을 화면 이름표로** (2026-11-17 · 충남대 사회 재환원 장학금 auto-0713no2516266sitedvscdkr).
+   엔진은 「나. 차등조건(1개 이상 충족 시 신청 가능, …)」 아래 셋을 한 요건(택1)으로 세는데, 화면은 머리 줄을 숨긴 채 셋을 평평하게 늘어놓아
+   학생이 셋 다 갖춰야 하는 요건으로 읽었다(보호조치 종료자·연장자는 동시에 될 수 없다). 머리 줄을 **원문 그대로**(앞머리 번호·글머리만 떼고) 돌려준다.
+   ⚠️ 이건 요건 줄이 아니다 — out(요건 줄)에 넣지 않고 withMeta 항목의 `head` 칸으로만 준다. 그래서 적합도(fitDetail)·✓✕·채점기(eligibility-report)·5줄 상한이 세지 않는다.
+   그리는 곳은 app.js eligibilityRowsHtml(상세 시트)·bulkRowHtml(일괄 준비 목록) · what-shows 도 같은 칸을 찍는다 */
+function pickHeadCaption(line) {
+  return decodeEntities(String(line || ''))
+    .replace(/^\s*(?:(?:[\uE000-\uF8FF]|[\uDB80-\uDBFF][\uDC00-\uDFFF])+|[(（]\s*(?:\d{1,2}|[가-하])\s*[)）]|[①-⑳]|\d{1,2}(?:\.\d{1,2})+\.?(?=\s)|\d{1,2}\s*[.)）]|[가-하]\s*[.)）]|[oOㅇ](?=\s)|[\-–—•▪▶▷◆◇○●■□▣★♦⇒◦∙❍◎￭·ㆍ*◌◍]+)\s*/, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 /* `서울시민(성인)` 은 표 칸이 아니라 대상이다(2026-10-04 · 대외활동 표본) — 시민·도민·구민·군민·성인·청년·누구나 */
 const REAL_CATEGORY = /(자|생|중|상|하|명|원)$|북한이탈|새터민|다문화|기초생활|차상위|국적|유공|보훈|장애|한부모|다자녀|(?:시|도|구|군)민|성인|청년|누구나/;
@@ -1816,6 +1999,19 @@ const isTableCell = (t) => BARE_CELL.test(t) && !REAL_CATEGORY.test(t);
 const BRANCH_LABEL = /^[(（]?\s*[가-힣·]{2,8}\s?소재\s?대학교?\s*[)）]?\s*[:：]?$/;
 const ENUM_START = /^\s*(?:[①-⑳]|[가-하]\s*[.)]|\d+\s*[.)]|[-·•]\s)/;
 function requirementLines(sch, lines, opts) {
+  /* 🔴 유료 카드 읽기가 읽은 공고(`sch.cardRead` · applyCardRead)는 **거르지 않고 그대로** 낸다 (2026-11-15 · 설계 paid-card-reading.md 4절).
+     그 줄들은 모델 둘이 칸을 나눠 읽고 기계 대조·일치 검사를 통과한 것이다 — 아래 무료 길의 잡음 규칙을 다시 걸면 「받을 수 없는 경우」 4줄이
+     통째로 숨는다(시안에서 실제로 그랬다). 자격·제외·우선 줄은 이미 칸이 갈려 있어서, 자격 줄에서 제외·우선을 다시 골라내지 않는다.
+     ⚠️ 그 공고의 제 줄 배열을 넘겼을 때만이다 — 다른 줄 묶음(층2 칸 등)을 넘기면 아래 무료 길로 간다 */
+  if (sch && sch.cardRead && Array.isArray(sch.cardRead.eligibility)) {
+    const own = !lines || lines === sch.eligibilityLines;
+    const asIs = (arr) => (arr || []).map((x) => String(x || '').trim()).filter(Boolean);
+    if (opts && opts.onlyPriority && own) return [];
+    if (opts && opts.onlyExclude && own) return [];
+    if (lines && lines === sch.eligibilityExcludes && Array.isArray(sch.cardRead.excludes)) return asIs(lines);
+    if (lines && lines === sch.eligibilityPriority && Array.isArray(sch.cardRead.priority)) return asIs(lines);
+    if (own) { const out = asIs(sch.eligibilityLines); return opts && opts.withMeta ? out.map((text) => ({ text, group: 0, aside: false })) : out; }
+  }
   const keepPriority = !!(opts && opts.keepPriority);   // '먼저 뽑는 기준' 블록을 그릴 때만 참
   /* `loose` — '제외 대상'·'먼저 뽑는 기준' 블록을 그릴 때만 참.
      그 블록들은 애초에 자격이 아니므로 '요건임을 증명하라'를 적용하면 통째로 사라진다. */
@@ -1846,7 +2042,9 @@ function requirementLines(sch, lines, opts) {
   let branch = '';        // 지금 읽는 줄이 어느 갈래(`대전 소재 대학`) 아래인가 — 비면 갈래 없음 (조각 2)
   let asideSect = false;  // 지금 절이 ※ 곁말에서 온 것인가 (아래 주석)
   let asideBase = 'qualify';   // 곁말 전에 있던 절 — 번호 항목을 만나면 여기로 돌아온다
-  let anyLeft = 0, anyGroup = 0;   // 선택지 묶음 — 몇 줄 남았나 / 몇 번째 묶음인가 (위 주석)
+  let anyGroup = 0;   // 몇 번째 묶음인가 (위 주석)
+  let headEnd = -1, headGroup = 0;   // 택1 묶음(가리킴 줄 · 「n개 이상 충족」 머리 줄) — joined 의 몇 번째 줄 **앞까지**인가 / 묶음 번호 (ANY_OF_HEAD 머리말 ④ · optionRun)
+  const groupHead = {};            // 묶음 번호 → 그 묶음을 연 머리 줄(원문 그대로 · pickHeadCaption) — 화면 이름표 전용, 요건 줄 아님
   const meta = [];                 // out과 같은 순서로 각 줄의 묶음 번호
   const aside = [];                // out과 같은 순서 — 그 줄이 ※ 예외 참고인가 (2026-10-15)
   let caseRun = false, caseGroup = 0;   // 연달아 오는 '경우별 분기'를 한 묶음으로 (아래 주석)
@@ -1978,10 +2176,18 @@ function requirementLines(sch, lines, opts) {
        ⚠️ **대상을 말하는 문장은 지우지 않는다** — 그 줄이 사라지면 '내 것이 아니다'라는
           사실 자체가 화면에서 없어진다(2026-09-12 · 핵심-4). 학위 축이 ✓/✕ 를 붙인다. */
     if (!loose && PR2.gradTarget(t) === 'label') continue;
+    if (ANY_OF_HEAD.test(t) && !POINTER_LINE.test(t)) {
+      /* 개요 번호 아래 「1개 이상 충족」 머리 줄 — 아래 번호 항목들을 택1 묶음으로 연다. 줄 자신은 가리킴 줄(POINTER_LINE)과 같이 안 내보낸다(위 ANY_OF_HEAD 머리말) */
+      const ph = pickOneHead(t);   // 🔴 `1가지 이상` 의 1 은 문턱이지 선택지 수가 아니다(anyOfCount 는 원문이 선택지 수를 말할 때만 · 머리말 ④)
+      const n = ph ? optionRun(joined, li + 1, l, ph.count) : 0;
+      if (n > 0) { headEnd = li + 1 + n; headGroup = (anyGroup += 1); groupHead[headGroup] = pickHeadCaption(l); continue; }
+    }
     if (POINTER_LINE.test(t)) {
-      /* 안내 줄 자신은 화면에 안 내보내되, '여기부터 n줄은 선택지'라는 사실은 남긴다 */
-      const n = anyOfCount(t);
-      if (n > 0) { anyLeft = n; anyGroup += 1; }
+      /* 안내 줄 자신은 화면에 안 내보내되, '여기부터 선택지'라는 사실은 남긴다 — 끝은 위 「n개 이상」 머리 줄과 **같은 개요 규칙**(optionRun · headEnd)으로 정한다.
+         🔴 예전엔 '몇 줄 남았나'를 내보낸 줄로 셌다 — 선택지 하나가 걸러지면 묶음이 다음 필수 줄을 삼켰다(리뷰 3차) */
+      const ph = pickOneHead(t);
+      const n = ph ? optionRun(joined, li + 1, l, ph.count) : 0;
+      if (n > 0) { headEnd = li + 1 + n; headGroup = (anyGroup += 1); groupHead[headGroup] = pickHeadCaption(l); }
       continue;
     }
     /* 제목 판정은 **공백을 없애고** 본다 — 한글 문서가 `제 출 서 류`처럼 자간을 벌려 쓴다 */
@@ -2044,9 +2250,8 @@ function requirementLines(sch, lines, opts) {
         meta.push(caseGroup);
       } else {
         caseRun = false;
-        meta.push(anyLeft > 0 ? anyGroup : 0);   // 0 = 반드시 충족 / 1 이상 = 그 묶음 중 하나만
+        meta.push(li < headEnd ? headGroup : 0);   // 0 = 반드시 충족 / 1 이상 = 그 묶음 중 하나만
       }
-      if (anyLeft > 0) anyLeft -= 1;
     }
     /* 5줄이면 충분하다 — 더 늘어놓으면 학생이 안 읽는다. 사람이 정리한 것처럼 보여야 한다.
        못 담은 것은 바로 아래 '원문 보기'로 갈 수 있다. */
@@ -2080,7 +2285,16 @@ function requirementLines(sch, lines, opts) {
     i = Math.max(j, i + 1);
   }
   /* `withMeta`를 달라고 한 쪽(적합도 계산)에만 묶음 정보를 준다 — 화면은 예전 그대로 문자열이다 */
-  if (opts && opts.withMeta) return out.map((text, i) => ({ text, group: meta[i] || 0, aside: !!aside[i] }));
+  /* 머리 줄이 있는 묶음은 **그 묶음의 첫 줄**에 `head`(이름표 글자)를 단다 — 줄 수·판정은 그대로(pickHeadCaption 머리말) */
+  if (opts && opts.withMeta) {
+    const headed = new Set();
+    return out.map((text, i) => {
+      const g = meta[i] || 0;
+      const it = { text, group: g, aside: !!aside[i] };
+      if (g && groupHead[g] && !headed.has(g)) { headed.add(g); it.head = groupHead[g]; }
+      return it;
+    });
+  }
   return out;
 }
 
@@ -2219,16 +2433,62 @@ function requirementStruct(sch) {
   return { common: clean(st.common).slice(0, 4), either, grade: clean(st.grade).slice(0, 2) };
 }
 
+/* ---------------- 유료 카드 읽기 결과를 공고에 얹는다 (2026-11-15 · 설계 docs/designs/paid-card-reading.md) ----------------
+   `data/card-read.json` 은 로봇(collector/card-read.mjs)이 공고 한 건을 통째로 모델 둘에게 읽혀, 글자가 원문에 있고 둘이 같은 말을 한 줄만 실은 파일이다.
+   그 공고는 유료 결과만 싣는다(무료 값은 남기지 않는다 — 남기면 무료 길의 틀린 값이 그대로 보인다). 파일에 없는 공고는 손대지 않는다 = 무료 길이 비상망.
+   🔴 화면(app.js)·알림(sw.js)·도구(what-shows)가 **이 함수 하나**를 부른다 — 따로 얹으면 화면의 마감과 알림의 마감이 갈린다.
+   ⚠️ 원본 공고 객체를 고치지 않는다(새 객체) · 이름(name)은 안 바꾼다(다른 장부가 이름으로 잇는다 — 카드 제목은 cardTitle 이 다듬는다).
+   ⚠️ 금액·마감은 유료 결과가 **있을 때만** 덮는다 — 둘 다 숫자·날짜 규칙(parse-amount · extractDeadline)이 따로 지키는 칸이라, 유료 길이 못 읽었다고 비우지 않는다. */
+const CARD_EXCLUDE_KINDS = new Set(['status', 'degree', 'schoolType', 'year', 'trait', 'scholarship']);
+const CARD_BENEFICIARY_LINE = /장학(?:금|생)[^,，]{0,15}(?:수혜|선정|수급|받)/;
+function cardWon(v) { return v % 10000 === 0 ? `${(v / 10000).toLocaleString('ko-KR')}만원` : `${v.toLocaleString('ko-KR')}원`; }
+const cardByAdmin = (v) => /^관리자/.test(String(v || ''));   // 관리자가 고친 칸의 표식(tools/admin-apply.mjs — deadlineFrom·documentsFrom·amountFrom·eligibilityFrom)
+function withCardRead(sch, cr) {
+  /* 칸마다 **글자 배열일 때만** 덮는다 — null 은 「두 읽기가 갈려 싣지 않은 칸」이라 무료 길 값을 그대로 둔다(로봇 agree · STRICT_FIELDS). 꼴이 틀린 값도 건드리지 않는다 */
+  const arr = (x) => (Array.isArray(x) ? x.filter((l) => typeof l === 'string' && l.trim()) : null);
+  const out = Object.assign({}, sch, { cardRead: cr });
+  const E = arr(cr.eligibility), X = arr(cr.excludes), Pr = arr(cr.priority), D = arr(cr.documents), Am = arr(cr.amount), N = arr(cr.notes);
+  /* 🔴 관리자가 고친 칸은 덮지 않는다(리뷰 I3) — 사람의 수정이 로봇 읽기보다 먼저다 */
+  if (E && !cardByAdmin(sch.eligibilityFrom)) {
+    out.eligibilityLines = E;
+    if (X) out.eligibilityExcludes = X;       // 제외·우선은 유료가 읽었을 때만 바꾼다 — 갈려서 안 실은 칸(null)을 비우면 「휴학생 제외」 같은 줄이 사라져 틀린 안심이 된다
+    if (Pr) out.eligibilityPriority = Pr;
+    delete out.eligibilityStruct; delete out.eligibilityFrom;
+  } else out.cardRead = Object.assign({}, cr, { eligibility: null });   // 자격을 안 덮었으면 requirementLines 도 무료 길로 간다(아래 own 판정)
+  if (D && !cardByAdmin(sch.documentsFrom)) out.documents = D;
+  if (typeof cr.host === 'string' && cr.host.trim()) out.provider = cr.host.trim();
+  const dl = cr.deadline && typeof cr.deadline === 'object' ? String(cr.deadline.date || '') : '';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dl) && !cardByAdmin(sch.deadlineFrom)) {
+    if (out.openDate && String(out.openDate) > dl) delete out.openDate;   // 접수 시작이 새 마감보다 늦을 수는 없다(그 밖에는 둔다 — 「접수 전」 표시가 산다)
+    out.deadline = dl;
+    out.period = `접수 ~${dl}`;
+    out.deadlineFrom = `유료 읽기 · ${cr.deadline.quote || ''}`;
+  }
+  /* 맨 위 금액은 무료 길이 못 읽었을 때만 채운다(리뷰 I5) — 금액은 무료 길의 규칙(parse-amount · amountSpec)이 더 꼼꼼하다: 월 50만 × 12 · 총액 줄 거르기 */
+  if (Number.isInteger(cr.head) && cr.head > 0 && !(Number(sch.amountValue) > 0) && !cardByAdmin(sch.amountFrom)) { out.amountValue = cr.head; out.amount = cardWon(cr.head); }
+  if (Am || N) {
+    const keep = (sch.excerpts || []).filter((x) => /^\s*(?:문의처?|담당)\s*[:：]/.test(String(x)));   // 문의처는 유료 길이 안 읽는 칸이라 남긴다
+    out.excerpts = [...(Am || []).map((x) => `장학금액: ${x}`), ...(N || []).map((x) => `유의사항: ${x}`), ...keep];
+  }
+  return out;
+}
+function applyCardRead(list, doc) {
+  const items = doc && doc.items;
+  if (!items || typeof items !== 'object') return list || [];
+  return (list || []).map((sch) => { const cr = sch && items[sch.id]; return cr && typeof cr === 'object' ? withCardRead(sch, cr) : sch; });
+}
+
 /* Node(검증 스크립트)에서도 같은 엔진을 불러 쓸 수 있게 — 브라우저·서비스워커에는 영향 없음 */
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { evaluate, fitScore, fitDetail, judgeCond, holdsExternalScholarship, FIT_UNREAD, FIT_FLOOR, FIT_MAX, FIT_MIN,
                      RESIDENCE_SPANS, residenceSpan,
                      joinSpacedSyllables, decodeEntities, looksFragment,
-                     scopedToProfile, inSchoolsAny, notStale, STALE_DAYS,
-                     requirementLines, requirementStruct, requirementMatch, tidyRequirement,
+                     scopedToProfile, inSchoolsAny, notStale, STALE_DAYS, feedOnlyFormal, feedOnlyBoardRows,
+                     requirementLines, requirementStruct, requirementMatch, tidyRequirement, stripListNumber,
                      REQ_SIGNAL, NOT_A_REQUIREMENT, EXCLUDE_LINE, HARD_THRESHOLD,
                      noticeForProfile, activityForProfile, taggedSchool, SHARED_BOARD_BRANCH, SERVED_SCHOOLS,
                      noticeKind, NOTICE_CAMPUS_MARK, OWN_PROGRAMS,
                      noticeFileKey, noticeFileFor, noticeFilesForProfile,
-                     noticeFallbackNeeded, majorsFileFor, newsFileFor, newsFilesForProfile, BRANCH_LABEL };
+                     noticeFallbackNeeded, majorsFileFor, newsFileFor, newsFilesForProfile, BRANCH_LABEL,
+                     applyCardRead, withCardRead };
 }

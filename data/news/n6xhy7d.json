@@ -1,7 +1,113 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-11-15",
+ "updatedAt": "2026-11-17",
  "items": [
+  {
+   "title": "[일반] [채용공고]광운대학교 산학협력단 「로봇특성화대학사업단」 직원 채용 공고",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53700&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-17",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-17",
+   "desc": "광운대학교 「로봇특성화대학사업단」에서 유능하고 역량 있는 인재를 다음과 같이 공개 채용합니다. 광운대학교 산학협력단장"
+  },
+  {
+   "title": "[일반] 외부 미승인 AI 서비스(GPAI)의 학교 계정 연동 금지 및 보안 유의 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53699&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-17",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-17",
+   "desc": "최근 외부 AI 서비스인 GPAI(gpai.app) 에서 우리 대학 KLAS 와의 연동 기능을 홍보하는 사례가 확인되었습니다 ."
+  },
+  {
+   "title": "[시설] 2026년 11월 교내 승강기 정기 점검 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53696&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-17",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-17",
+   "desc": "교내 승강기 정기점검을 아래와 같이 실시하오니 참고하여 주시기 바랍니다."
+  },
+  {
+   "title": "[국제학생] 2026-2학기 졸업예정자 한국어능력평가 시험(2차) 신청 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53695&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-16",
+   "kind": "학사",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-16",
+   "desc": "2026 학년도 2 학기 졸업 예정인 외국인 유학생을 대상으로 아래와 같이 한국어능력평가시험을 시행하오니 , 해당 학생들은 기간 내 반드시 신청해 주시기 바랍니다 ."
+  },
+  {
+   "title": "[일반] [광운대학교 로봇특성화대학사업단] 2026학년도 동계 계절수업 (KW-IC) AI로봇회로설계 수강신청 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53694&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-16",
+   "kind": "학사",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-16",
+   "desc": "광운대학교 로봇특성화대학사업단에서는 2026학년도 동계 계절수업 기간 중 「(KW-IC) AI로봇회로설계」 교과목을 개설하오니, 수강을 희망하는 학생들은 아래 내용을 확인하여 기간 내 신청하시기 바랍니다."
+  },
+  {
+   "title": "[일반] KIAT 공학 페스티벌 청년 뉴턴(NEW:TURN) 개최 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53693&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-16",
+   "kind": "행사",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-16",
+   "desc": "일시 : 2026년 11월 19일(목) 10:00 ~ 16:00 행사장소 : 서울 SETEC 제3전시관 프로그램 구성"
+  },
+  {
+   "title": "[일반] [KIAT공학페스티벌]청년뉴턴(NEW:TURN) 2026 포스터 인증 이벤트",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53692&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-16",
+   "kind": "행사",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-16",
+   "thumb": "data/news/img/bc7c5d1363ffdc35.webp"
+  },
+  {
+   "title": "[국제학생] [한국무역협회] 외국인유학생 채용지원 교육과정 KITA K-커리어마스터 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53685&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-16",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-16",
+   "thumb": "data/news/img/112a0d4a9493c469.webp"
+  },
+  {
+   "title": "[일반] 내PC지키미를 이용한 PC보안 및 알약 점검 협조 요청",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53688&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-16",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-16",
+   "desc": "사이버 보안 침해 사고의 교내 발생을 예방하기 위하여 PC보안 점검사항을 안내하오니 적극 동참하여 주시기 바랍니다. 요청사항 업무용 PC에는 반드시 ‘내PC 지키미’ 를 설치하여 주시기 바랍니다."
+  },
+  {
+   "title": "[일반] 불법 소프트웨어, 이미지, 폰트 사용 및 배포 방지를 위한 협조 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53686&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-16",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-16",
+   "desc": "최근 S/W업체들이 경영여건 변화와 실적개선 필요성 등으로 인해 라이선스 준수 여부 점검을 강화하고 있으며, 관련 법무법인을 통한 저작권 침해 경고 및 내용증명 발송 사례도 발생하고 있사오니 각 부서 및 학과에서는…"
+  },
   {
    "title": "[일반] [학생상담실] 내 멘탈 점검, 지금은 몇%? -우울 불안 온라인검사 / 뇌파맥파 스트레스 오프라인검사",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53681&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -324,113 +430,6 @@
    "src": "b09cb042",
    "foundAt": "2026-11-03",
    "thumb": "data/news/img/85077a9c8b559d86.webp"
-  },
-  {
-   "title": "[시설] 한울관 및 아이스링크 주차장 입구 차량 출입 통제 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53599&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-03",
-   "kind": "생활",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-03",
-   "thumb": "data/news/img/1a5262a81a92f0eb.webp"
-  },
-  {
-   "title": "[일반] [광운대학교x노르마] Advanced AI Course 양자컴퓨팅(사전안내)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53588&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-30",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-30",
-   "desc": "광운대학교 RISE사업단(서울캠퍼스타운)에서는, 양자와 AI를 결합한 Advanced AI Course 교육에 대해 사전신청을 받고 있습니다."
-  },
-  {
-   "title": "[일반] 기간제 계약직원 채용 공고(경영대학원 교학팀)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53585&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-30",
-   "kind": "채용",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-30",
-   "desc": "채용 부서 경영대학원 교학팀 모집인원 1. 지원 자격 및 우대사항 담당업무 경영대학원 교학팀 행정업무 등 지원 자격"
-  },
-  {
-   "title": "[일반] [강북청년창업마루] 2026 강북창업포럼(NCI 민/관/학 창업포럼) 참관객 모집 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53582&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-29",
-   "kind": "행사",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-29",
-   "thumb": "data/news/img/35ea4c92fd38650a.webp",
-   "desc": "2026 강북창업포럼(NCI 민/관/학 창업포럼) 이 \"AI가 바꾸는 창업의 미래\"를주제로 개최됩니다."
-  },
-  {
-   "title": "[일반] [채용공고] 광운대학교 산학협력단 직원 채용 공고",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53579&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-28",
-   "kind": "채용",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-28",
-   "desc": "1. 채용분야 및 지원자격 2. 응시자격 및 우대조건 가. 일반사항 1) 학사학위 이상 보유자"
-  },
-  {
-   "title": "[일반] 80주년기념관 승강기(3호기) 부분 운행 제한 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53575&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-28",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-28"
-  },
-  {
-   "title": "[일반] [교육혁신원] 2026학년도 2학기 다전공 수요조사 참여 안내 (~11/29(일))",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53574&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-28",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-28",
-   "desc": "2026학년도 2학기 다전공 수요조사 참여 안내 우리 대학에서는 학생들의 다전공에 대한 인식과 수요를 파악하고, 향후 다전공 제도 및 학생 지원 방안 개선을 위한 기초자료를 수집하고자 ‘다전공 수요조사’ 를…"
-  },
-  {
-   "title": "[국제학생] 2026 서울마이소울 웰컴데이 행사 참여 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53568&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-28",
-   "kind": "행사",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-28",
-   "thumb": "data/news/img/5cdde3c713a4568f.webp"
-  },
-  {
-   "title": "[외부] [한국스카우트연맹] 제20회 Youth Hero Prize 후보자 추천 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53577&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-28",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-28",
-   "thumb": "data/news/img/d5b67df4edf0d666.webp",
-   "desc": "2) 추천부문 : 5 개부문 가 ) 학술 ( 인문 · 과학 ), 체육 , 사회봉사 · 진로개척 , 문화 · 예술 , 스카우트"
-  },
-  {
-   "title": "[외부] [세종학당재단] 2027 세종학당 문화인턴 파견 사업 설명회 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53576&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-10-28",
-   "kind": "행사",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-10-28",
-   "thumb": "data/news/img/6b68b3fb2fc2b981.webp"
   }
  ]
 }

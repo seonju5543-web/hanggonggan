@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { htmlToLines } from './html-text.mjs';
 import { isHtmlPayload, resolveJsDownload } from './attachment-link.mjs';
+import { attachExt } from './form-rules.mjs';
 /* 요청 머리말은 http-headers.mjs 한 곳에 있다 — 베껴 두면 한쪽만 고쳐져
    "수집기는 받는데 심층 수집은 못 받는" 어긋남이 생긴다 (2026-08-20 신설, 첫머리 주석 참조) */
 import { FETCH_HEADERS } from './http-headers.mjs';
@@ -383,7 +384,8 @@ async function downloadForms() {
         // 착각해 받아 두면 스키마화가 매번 그걸 붙들고 실패한다(연구지원팀·연구진흥팀 사례).
         if (isHtmlPayload(buf)) { console.log('attach skip (웹페이지였음):', a.name); continue; }
         fi += 1; ai += 1;
-        const ext = (a.name.match(/\.(hwp|hwpx|doc|docx|pdf|xls|xlsx|zip)$/i) || [, 'bin'])[1];
+        /* 확장자는 form-rules attachExt 한 곳 — 아이콘 꼬리(`… .hwp chevron_forward`)를 떼고, 이름에 없으면 받은 바이트의 머리로 (2026-11-15 · 강원대 원본이 .bin 이었다) */
+        const ext = attachExt(a.name, buf);
         const fname = `form-${slug}-${ai}.${ext}`;
         fs.writeFileSync(new URL(fname, OUT), buf);
         written.add(fname);
@@ -525,7 +527,7 @@ async function downloadEligDocs() {
            pdf를 넣고 여기를 안 고쳐서, 받아 온 PDF 5개가 전부 `.bin`으로 저장됐다 —
            `attachmentText()`는 확장자로 해석기를 고르므로 손도 못 댔다.
            파일은 멀쩡히 내려받아져 있는데(320KB·1.1MB…) 아무도 못 읽는 상태였다. */
-        const ext = (a.name.match(/\.(hwp|hwpx|docx?|pdf|zip|png|jpe?g|gif|webp)$/i) || [, 'bin'])[1].toLowerCase();
+        const ext = attachExt(a.name, buf);   // 이름(아이콘 꼬리를 뗀 것) → 바이트 머리 (form-rules 한 곳 · 2026-11-15)
         /* zip 묶음은 안의 공고문류만 꺼내 저장한다(attachment-text zipNoticeDocs 한 곳) — zip 자체는 아무도 못 읽는다
            (2026-10-17 · 홍익대 제주 미래이음: 공고문이 zip 안에만 있어 자격을 영영 못 읽었다) */
         const inner = ext === 'zip' ? zipNoticeDocs(buf) : null;

@@ -53,7 +53,7 @@ jobs:
     env:
       NODE_EXTRA_CA_CERTS: collector/certs/bundle.pem
     # 재수집 예산 12분 + 브라우저 설치·검증·저장. 상한은 예산의 그릇이지 '넉넉히'가 아니다.
-    timeout-minutes: 54   # 크롬 설치 5 + 장학 11 + 활동 받기 8 + 글자 읽기 8 + 고르기 2 + PaddleOCR 경보 짝 1+1(2026-10-28) + 관문 5 + 저장 3 = 46 · 수정 전 42 · 체크아웃·알림 여유 8 (2026-10-04)
+    timeout-minutes: 62   # (2026-11-17 첨부 경보 짝 1+1+1 → 59→62) # 크롬 설치 5 + 장학 11 + 활동 받기 8 + 글자 읽기 8 + 고르기 2 + PaddleOCR 경보 짝 1+1(2026-10-28) + 관문 5 + 되돌리기 7(2026-11-16 gate-guard · --keep-preexisting) + 저장 3 = 53 · 수정 전 42 · 체크아웃·알림 여유 8 (2026-10-04)
     steps:
       - uses: actions/checkout@v7
         with:
@@ -142,15 +142,28 @@ jobs:
           node verify/audit-data.js
       # 🔴 장부(rescue-ledger.json)도 함께 되돌린다 (2026-10-04 점검 bodies-12) — 본문 확보는 장부에 '확보한 날'로 남는데(이레 쉼),
       #    본문만 되돌리고 장부를 남기면 그 공고를 이레 동안 아무도 안 연다. 대외활동 장부·리포트는 남긴다('해 봤다'와 진단 기록).
+      # 🔴 되돌리고 **관문을 다시 잰다** (2026-11-16 · 노션 G-16 리뷰 — collector/gate-guard.mjs 한 곳 · 관문 「로봇·도구 점검 관문」 savegate).
+      #    예전엔 ① 장학 본문·정식 등록·장부만 되돌리고 대외활동 장부(act-browser.json)는 늘 저장했다 — 관문이 빨간 원인이 그 장부여도
+      #    아래 저장(always)이 관문 없이 올려, 다음 수집 로봇이 합치다 관문에 걸린다. 이제 ①을 되돌려 통과하면 대외활동 장부는 그대로 남기고(예전과 같다),
+      #    그래도 빨가면 ② 대외활동 장부도 직전 판으로. 결과와 상관없이 빨간불로 끝낸다(exit 1 — 예전과 같다).
+      #    🔴 --keep-preexisting (2026-11-16 리뷰 2차 · 다른 gate-guard 로봇과 같은 11-10 결정) — 다른 로봇이 남긴 빨간불이면 매 실행 ②까지 가서
+      #       대외활동 장부를 버렸다(같은 글을 매번 다시 받고 수집 로봇은 결과를 영영 못 받는다). 다 되돌려도 빨갛고 이번 실행이 새로 깨뜨린 것이 없으면 이번 실행분을 지킨다.
+      #    🔴 도구가 넘어지면(결과 outputs.gate 가 빔) 아래 저장 단계가 돌지 않는다 — || 뒤는 ①만 되돌려, 넘어진 실행에 대외활동 장부가 관문 없이 저장될 수 있었다(리뷰 2차 · 관문 savegate ①-3).
+      #    상한 7분 = 관문 최대 세 번 + 여유(관문 한 번 ~55초).
       - name: 관문에 걸리면 되돌린다
+        id: guard
         if: steps.audit.outcome == 'failure'
+        timeout-minutes: 7
         run: |
-          git checkout -- collector/extracted/browser-bodies.json data/registered.json collector/rescue-ledger.json || true
-          echo "::error::재수집 결과가 감사를 통과하지 못했습니다. 되돌렸습니다."
+          node collector/gate-guard.mjs --keep-preexisting --stage collector/extracted/browser-bodies.json,data/registered.json,collector/rescue-ledger.json --stage collector/act-browser.json \
+            || git checkout -- collector/extracted/browser-bodies.json data/registered.json collector/rescue-ledger.json collector/act-browser.json || true
+          echo "::error::재수집 결과가 감사를 통과하지 못했습니다 — 되돌렸는지(또는 원래 있던 빨간불이라 이번 실행분을 지켰는지)는 위 「데이터 관문 되돌리기 결과」 줄에 있습니다."
           exit 1
 
+      # 🔴 관문이 통과했거나 되돌리기 도구가 끝까지 돌아 결과를 적었을 때만 (2026-11-16 리뷰 2차) — always() 는 위 단계의 exit 1 을 넘으려는 것이다.
+      #    결과가 비었으면(도구가 넘어짐 · 시간 초과) 무엇이 되돌려졌는지 모르니 저장하지 않는다.
       - name: 저장
-        if: always()
+        if: always() && (steps.audit.outcome == 'success' || steps.guard.outputs.gate != '')
         timeout-minutes: 3
         run: |
           git config user.name "handaejang-bot"
@@ -178,6 +191,42 @@ jobs:
           else
             echo "::notice::새로 확보한 본문이 없습니다."
           fi
+
+      # 🔴 첨부 경보 짝 (2026-11-17 개발자 지시 — 원문에 있는 파일이 앱에도 보이게 · rescue-plan.mjs 「첨부 살피기」).
+      #    학생 화면에 떠 있는 정식 등록 공고 가운데 원문 화면엔 파일 이름이 보이는데 받을 주소를 못 구했거나, 브라우저가 막혀 화면을 못 본 공고가 있으면 이슈 하나에 모은다.
+      #    그날 바로 알리려는 것이다 — 예전엔 학교 아홉 곳의 첨부가 통째로 0개인 것을 사람이 세어 보고서야 알았다. 없어지면 닫는다. 저장 **뒤**에 센다(저장된 판 기준).
+      - name: 첨부 경보 세기
+        id: att
+        if: always()
+        timeout-minutes: 1
+        continue-on-error: true
+        run: node collector/attach-alarm.mjs >> "$GITHUB_OUTPUT"
+      - name: 🚨 원문 첨부가 앱에 다 안 보여요
+        if: always() && steps.att.outputs.count != '' && steps.att.outputs.count != '0'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          title: 🚨 원문에 있는 첨부가 앱에 다 안 보여요
+          label: attachments
+          body: |
+            학생 화면에 떠 있는 정식 등록 공고 ${{ steps.att.outputs.count }}건에서 원문의 첨부를 앱에 온전히 싣지 못했습니다(살핀 공고 ${{ steps.att.outputs.checked }}건 · 아직 안 살핀 공고 ${{ steps.att.outputs.notyet }}건).
+            파일 이름은 앱에 보이지만 눌러 받을 주소가 없어 「원문 게시판에서 내려받기」로 뜨거나, 브라우저가 막혀 원문 화면을 못 본 공고입니다.
+            공고: ${{ steps.att.outputs.list }}
+            공고별 사유는 저장소의 collector/rescue-report.md 맨 위 「📎 첨부」 절에 있습니다. 실행: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      - name: ✅ 첨부 경보 회복 — 닫기
+        if: always() && steps.att.outputs.count == '0'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          title: 🚨 원문에 있는 첨부가 앱에 다 안 보여요
+          label: attachments
+          body: 이번 실행에서 살핀 정식 등록 공고의 첨부가 모두 받을 주소까지 실렸습니다.
 
       # 🔴 재수집 단계가 끝까지 못 갔으면 작업을 실패로 남긴다 (2026-10-04 점검 bodies-2).
       #    그 단계는 continue-on-error 라(아래 대외활동·관문·저장이 돌아야 한다) 단계 시한(11분)에 잘려도 작업은 '성공'이었다 —

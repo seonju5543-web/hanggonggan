@@ -101,6 +101,9 @@ const PROFILE = (over) => ({
   eq('적합도 배지가 붙은 카드가 있다 (0이면 선택자가 어긋난 것)', okBadges.length > 0, true);
   eq('카드 배지는 퍼센트뿐이다', okBadges.every((b) => /^적합도 \d+%$/.test(b.text)), true);
   eq('카드에 요건 개수를 쓰지 않는다', okBadges.some((b) => /요건/.test(b.text)), false);
+  /* 2026-11-15 개발자 결정 11-02 — 자격을 못 읽은 공고는 알약이 없다(예전 「자격 미확인」) · 어긋난 요건이 없으면 빨강·주황을 안 쓴다 */
+  eq('「자격 미확인」 알약이 없다 (못 읽은 공고는 알약 없음)', bs.filter((b) => /badge-fit-unknown/.test(b.cls) || /미확인/.test(b.text)).length, 0);
+  eq('  미달이 아닌 알약에 빨강·주황이 없다 (판정 못 한 요건 때문에 낮은 퍼센트를 경고색으로 그리지 않는다)', okBadges.filter((b) => /fit-(red|orange)/.test(b.cls)).length, 0);
 
   /* 🔴 상세 시트는 자격 줄을 **하나도 빠뜨리지 않고** 보여야 한다 — 화면 5줄 상한이
      점수 분모까지 자르던 사고(2026-08-24)의 회귀다.
@@ -124,23 +127,64 @@ const PROFILE = (over) => ({
     }, id);
     await cards[idx].click();
     await page.waitForTimeout(700);
-    const lines = await page.$$eval('#detail-sheet li.r-elig', (e) => e.length);
+    /* 제외 줄(✗ · `r-elig r-x`)은 자격 줄이 아니다 — 같이 세면 「받을 수 없는 경우」 가 있는 공고에서 수가 안 맞는다(2026-11-15 · 유료 카드 읽기 결과가 실리자 드러났다) */
+    const lines = await page.$$eval('#detail-sheet li.r-elig:not(.r-x)', (e) => e.length);
     eq(`'${txt}' — 자격 줄 ${expected}개가 모두 보인다`, lines, expected);
     /* 🔴 카드에서 뺀 근거가 **상세에는 남아 있어야** 한다. 이 절이 없으면
        '카드는 퍼센트뿐'만 검사되고 근거가 화면 어디에도 없는 상태가 통과한다. */
     const detailTxt = await page.$eval('#detail-sheet .badge-fit', (e) => e.innerText.replace(/\s+/g, ' '))
       .catch(() => '');
-    eq('상세 시트에는 퍼센트와 근거가 남아 있다', /적합도 \d+% .*요건 \d+개 중 \d+개 충족/.test(detailTxt), true);
-    /* 요건 수는 이제 **상세 배지에서만** 읽을 수 있다 — 카드에는 없다.
-       2026-10-29 부터 요건은 줄이 아니라 **조건**을 센다(개발자 "세세한 기준") — 줄 수 이상이고, 줄마다 읽은 조건 수의 합을 넘지 않는다(묶음은 1개) */
-    const total = Number((detailTxt.match(/요건 (\d+)개 중/) || [])[1]);
+    /* 2026-11-15 개발자 결정 11-02 — 상세 배지는 「적합도 n% · 맞는 요건 M개」(예전 「요건 n개 중 m개 충족 · 확인 필요 k」) — 모르는 요건 수는 말하지 않는다.
+       🔴 「어긋난 요건 없음」은 요건을 **전부 판정했을 때만**(fd.unknown === 0 · 2026-11-16) — 모르는 줄이 있는데 이 말이 붙으면 틀린 안심이다 */
+    const fdNow = await page.evaluate((sid) => { const f = fitDetailFor(allScholarships().find((x) => x.id === sid), state.profile); return { met: f.met, unknown: f.unknown }; }, id);
+    const wantTxt = fdNow.unknown > 0 ? (fdNow.met > 0 ? `맞는 요건 ${fdNow.met}개` : '') : `${fdNow.met > 0 ? `맞는 요건 ${fdNow.met}개 · ` : ''}어긋난 요건 없음`;
+    eq(`상세 시트에는 퍼센트와 근거가 남아 있다 (모르는 요건 ${fdNow.unknown > 0 ? '있음 → 맞는 요건만' : '없음 → 어긋난 요건 없음'} · 「확인 필요」 없음)`,
+      [new RegExp(`^적합도 \\d+%${wantTxt ? ` ${wantTxt}` : ''}$`).test(detailTxt.trim()), /확인 필요|미확인/.test(detailTxt), fdNow.unknown > 0 && /어긋난 요건 없음/.test(detailTxt)], [true, false, false]);
+    /* 맞은 요건 수는 이제 **상세 배지에서만** 읽을 수 있다 — 카드에는 없다.
+       2026-10-29 부터 요건은 줄이 아니라 **조건**을 센다(개발자 "세세한 기준") — 줄마다 읽은 조건 수의 합을 넘지 않는다(묶음은 1개) */
+    const total = Number((detailTxt.match(/맞는 요건 (\d+)개/) || [])[1] || 0);
     const condCap = await page.evaluate((id) => {
       const sch = allScholarships().find((s) => s.id === id);
       const items = requirementLines(sch, null, { all: true, withMeta: true });
       return items.reduce((n, it) => n + (it.group > 0 ? 0 : Math.max(1, PR.parseLine(PR.untag(it.text), false).conds.length)), 0) + new Set(items.filter((it) => it.group > 0).map((it) => it.group)).size + 8;   // +8: 통과를 확인한 제외 조항 몫(상한)
     }, id);
-    eq('배지의 요건 수가 줄 수 이상이고 조건 수 합을 넘지 않는다 (조건 단위 · 묶음은 1개)', total >= Math.min(expected, total) && total <= condCap, true);
+    eq('배지의 맞는 요건 수가 조건 수 합을 넘지 않는다 (조건 단위 · 묶음은 1개)', total >= 0 && total <= condCap, true);
   } else console.log('  🚨 요건 개수를 띄운 카드가 하나도 없다 — 배지 형식이 바뀌었는지 확인할 것');
+
+  /* 🔴 택1 묶음의 머리 줄은 **이름표**로 보이고 요건 줄로 세지 않는다 (2026-11-17 · 충남대 사회 재환원 장학금 auto-0713no2516266sitedvscdkr).
+     엔진은 「나. 차등조건(1개 이상 충족 시 …)」 아래 셋을 한 요건으로 세는데, 시트가 머리 줄을 숨긴 채 셋을 평평하게 늘어놓아 '셋 다 필요'로 읽혔다.
+     표본은 화면 안에서만 붙인다(실데이터에 안 기댄다) — 줄은 그 공고 원문 그대로 */
+  console.log('\n■ 택1 묶음 머리 줄 — 이름표(r-pick)는 보이고 요건 줄로 세지 않는다');
+  const pick = await page.evaluate(() => {
+    NATIONAL_SCHOLARSHIPS.push(Object.assign({}, NATIONAL_SCHOLARSHIPS[0], { id: 'zz-pick-head', name: '택1 머리 줄 표본', program: false, eligibility: {},
+      eligibilityLines: ['1) 충남대학교 학부 재학생(2026학년도 2학기 등록자 / 휴학·수료자 등 제외)', '2) 직전 학기 12학점 이상 이수자',
+        '나. 차등조건(1개 이상 충족 시 신청 가능, 해당하는 모든 조건의 증빙서류 제출 필수)',
+        '1) 「아동복지법」상 가정위탁·아동복지시설 보호조치 종료가 5년 이상 경과한 자',
+        '2) 국민기초생활수급자(신청자 본인이 수급자로 등록된 자 중 생계급여 또는 의료급여 수급자에 한함)',
+        '3) 「아동복지법」상 가정위탁·아동복지시설 보호조치 연장자'] }));
+    openDetail('zz-pick-head');
+    const lis = [...document.querySelectorAll('#detail-sheet .reason-list li')];
+    const caps = lis.filter((li) => li.classList.contains('r-pick'));
+    const at = lis.indexOf(caps[0]);
+    const cs = caps[0] ? getComputedStyle(caps[0]) : null;
+    const probe = document.createElement('span');
+    document.querySelector('#detail-sheet').appendChild(probe);
+    probe.style.fontSize = 'var(--t-xs)'; probe.style.color = 'var(--text-sub)';
+    const want = getComputedStyle(probe); const wantFs = want.fontSize, wantCol = want.color; probe.remove();
+    return {
+      caps: caps.length, text: caps[0] ? caps[0].textContent.trim() : null,
+      next: lis[at + 1] ? /보호조치 종료가 5년/.test(lis[at + 1].textContent) : false,
+      capIsElig: caps.some((li) => li.classList.contains('r-elig')),
+      elig: document.querySelectorAll('#detail-sheet li.r-elig:not(.r-x)').length,
+      lines: requirementLines(findSch('zz-pick-head'), null, { all: true }).length,
+      tokens: !!cs && cs.fontSize === wantFs && cs.color === wantCol,
+      dot: cs ? getComputedStyle(caps[0], '::before').display : null,
+    };
+  });
+  eq('머리 줄 이름표 하나가 택1 묶음 첫 줄(보호조치 종료) 바로 위 · 원문 글자 그대로(앞 「나.」 만 뗌)', [pick.caps, pick.text, pick.next],
+    [1, '차등조건(1개 이상 충족 시 신청 가능, 해당하는 모든 조건의 증빙서류 제출 필수)', true]);
+  eq('  이름표는 자격 줄(r-elig)이 아니다 — 자격 줄 수는 엔진 줄 수(5) 그대로', [pick.capIsElig, pick.elig, pick.lines], [false, 5, 5]);
+  eq('  모양은 토큰 그대로(t-xs · text-sub) · 목록 점 없음', [pick.tokens, pick.dot], [true, 'none']);
 
   console.log('\nERRORS:', errors.length ? errors : 'none');
   if (errors.length) fail++;

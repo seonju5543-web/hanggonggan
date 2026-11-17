@@ -1,6 +1,6 @@
 {
  "school": "아주대학교",
- "updatedAt": "2026-11-15",
+ "updatedAt": "2026-11-17",
  "items": [
   {
    "title": "[일자리+센터] 26하반기 모의면접 실전반-인성/역량 면접",
@@ -140,39 +140,6 @@
    "src": "e5299528",
    "foundAt": "2026-10-19",
    "thumb": "data/news/img/d4126b02c54da51a.webp"
-  },
-  {
-   "title": "[교육대학원] 2027학년도 전기(정시) 신입생 모집 안내(10.30.(금) 9:00 ~ 11.9.(월) 18:00)",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377588&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-16",
-   "school": "아주대학교",
-   "campus": "",
-   "src": "e5299528",
-   "foundAt": "2026-10-16",
-   "thumb": "data/news/img/6b96d2015eca2c12.webp",
-   "desc": "▪︎ 접수처: 유웨이 홈페이지( uwayapply.com ) (온라인 접수만 진행) 📍 모집요강: 첨부파일 또는 아주대학교 교육대학원 홈페이지( edu.ajou.ac.kr ) 내 입학공지사항 확인"
-  },
-  {
-   "title": "[앵커] 2026 랜선으로 만나는 릴레이 글로벌 취·창업 톡톡톡(talk) 신청 안내!",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377587&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-16",
-   "school": "아주대학교",
-   "campus": "",
-   "src": "e5299528",
-   "foundAt": "2026-10-16",
-   "desc": "글로벌 취업·창업·인턴십을 꿈꾸는 재학생을 위한 「2026 랜선으로 만나는 릴레이 글로벌 취·창업 톡톡톡(talk)」을 진행합니다."
-  },
-  {
-   "title": "[사회과학대학]2026학년도 공직진출설명회 개최 안내(10/29(목))",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377553&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-16",
-   "kind": "행사",
-   "school": "아주대학교",
-   "campus": "",
-   "src": "e5299528",
-   "foundAt": "2026-10-16",
-   "thumb": "data/news/img/f93b37c17c5dfa51.webp",
-   "desc": "사회과학대학 교학팀 사회과학대학에서 공직진출설명회를 개최하오니 참여를 희망하시는 경우, 아래 링크를 통해 신청하여 주시기 바랍니다."
   }
  ]
 }

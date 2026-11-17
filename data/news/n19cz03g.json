@@ -1,7 +1,49 @@
 {
  "school": "한국외국어대학교",
- "updatedAt": "2026-11-15",
+ "updatedAt": "2026-11-17",
  "items": [
+  {
+   "title": "2026학년도 동계방학기간 한국외국어대학교 글로벌홀 기숙사생 모집 공고",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/271704/artclView.do",
+   "postedAt": "2026-11-16",
+   "kind": "생활",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-11-16"
+  },
+  {
+   "title": "[서울] 한국외대 국제학생회 ISO 48기 신입스태프 모집",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/271695/artclView.do",
+   "postedAt": "2026-11-16",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-11-16",
+   "thumb": "data/news/img/61493d69d9ff1b65.webp",
+   "desc": "안녕하세요, 한국외국어대학교 서울캠퍼스 국제학생회 ISO입니다. ISO(International Student Organization)는 한국외대 국제교류처 소속 자치기구 로서, 2003년 설립 이후 꾸준히…"
+  },
+  {
+   "title": "2026학년도 동계방학 HUFS Dorm 사생 모집",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/271685/artclView.do",
+   "postedAt": "2026-11-12",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-11-16",
+   "desc": "1. 신청대상 : 2026 학년도 동계방학 중 기숙사에 거주하고자 하는 한국외대 재학생"
+  },
+  {
+   "title": "[HUFStory]2026년 도서관 북토크 '이야기는 세상을 구할 수 있을까? ' 안내",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/271680/artclView.do",
+   "postedAt": "2026-11-16",
+   "kind": "생활",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-11-16",
+   "thumb": "data/news/img/11a8f16e92457e7a.webp"
+  },
   {
    "title": "홈페이지 가짜 ‘로봇 인증’ 공격 주의사항 안내",
    "url": "https://www.hufs.ac.kr/bbs/hufs/2180/271590/artclView.do",
@@ -284,26 +326,6 @@
    "campus": "",
    "src": "54a450a4",
    "foundAt": "2026-10-21"
-  },
-  {
-   "title": "2026년 제59차(2026-4회) IRB 정기심의(정규심의) 일정 및 접수 안내",
-   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/269298/artclView.do",
-   "postedAt": "2026-10-16",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "src": "54a450a4",
-   "foundAt": "2026-10-16",
-   "desc": "한국외국어대학교 기관생명윤리위원회에서는 다음과 같이 2026 년 제 59 차 (2026-4 회 ) IRB 정기심의 ( 정규심의 ) 일정 및 접수 안내 를 공지드립니다."
-  },
-  {
-   "title": "📢 Special Guest Talk: Witnessing Conflict Behind the Photography of L",
-   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/269264/artclView.do",
-   "postedAt": "2026-09-28",
-   "school": "한국외국어대학교",
-   "campus": "",
-   "src": "54a450a4",
-   "foundAt": "2026-10-16",
-   "thumb": "data/news/img/0789a0f0292fd3fb.webp"
   }
  ]
 }

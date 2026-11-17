@@ -1,7 +1,27 @@
 {
  "school": "국민대학교",
- "updatedAt": "2026-11-15",
+ "updatedAt": "2026-11-17",
  "items": [
+  {
+   "title": "[미래자동차사업단] 2026학년도 동계 계절학기 [한국항공대학교-항공드론] 학점교류 신청 안내",
+   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12573/view.do?currentPageNo=1",
+   "postedAt": "2026-10-30",
+   "kind": "학사",
+   "school": "국민대학교",
+   "campus": "",
+   "src": "78d70305",
+   "foundAt": "2026-11-17"
+  },
+  {
+   "title": "[미래자동차사업단] 2026학년도 동계 계절학기 “사물인터넷 컨소시엄\" 학점교류 신청 안내 (세종대 신청기간 연장!!)",
+   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12624/view.do?currentPageNo=1",
+   "postedAt": "2026-11-04",
+   "kind": "학사",
+   "school": "국민대학교",
+   "campus": "",
+   "src": "78d70305",
+   "foundAt": "2026-11-16"
+  },
   {
    "title": "2026학년도 동계 계절학기 온라인 수요조사 안내 (학부)",
    "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12594/view.do?currentPageNo=1",
@@ -21,8 +41,7 @@
    "school": "국민대학교",
    "campus": "",
    "src": "78d70305",
-   "foundAt": "2026-11-09",
-   "thumb": "data/news/img/f9358f8e08d31bd5.webp"
+   "foundAt": "2026-11-09"
   },
   {
    "title": "2026년도 동계 SGE Global Challenge 프로그램 2차 설명회 신청 (~11/4 오전 9시)",
@@ -35,7 +54,7 @@
    "foundAt": "2026-11-08"
   },
   {
-   "title": "[차세대통신사업단] 2026학년도 2학기 마이크로디그리 사전 이수 신청 (10.27~11.3) 2026.10.26 차세대통신사업단 최윤정",
+   "title": "[차세대통신사업단] 2026학년도 2학기 마이크로디그리 사전 이수 신청 (10.27~11.3)",
    "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12550/view.do?currentPageNo=1",
    "postedAt": "2026-10-26",
    "school": "국민대학교",
@@ -76,7 +95,7 @@
    "foundAt": "2026-10-28"
   },
   {
-   "title": "[기후변화대응사업단] 2026학년도 동계계절학기 환경컨소시엄 타대학(덕성여대) 학점교류 수강신청 안내 2026.10.27 기후변화대응사업단 김준희",
+   "title": "[기후변화대응사업단] 2026학년도 동계계절학기 환경컨소시엄 타대학(덕성여대) 학점교류 수강신청 안내",
    "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/4/12553/view.do?currentPageNo=1",
    "postedAt": "2026-10-27",
    "kind": "학사",

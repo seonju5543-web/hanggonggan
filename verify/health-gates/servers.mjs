@@ -196,6 +196,7 @@ export default async function gate(eq, ctx) {
         u = String(u);
         if (u.endsWith('data/registered.json')) return regDown ? new Response('', { status: 503 }) : new Response(JSON.stringify({ items: [] }));
         if (u.endsWith('data/notices.json')) return new Response(JSON.stringify({ items: feed }));
+        if (u.endsWith('data/card-read.json')) return new Response('', { status: 404 });   // 유료 카드 읽기 결과 파일(2026-11-15) — 데이터 주소다(없으면 예전 마감 그대로)
         pushes.push(u);                                                          // 데이터 주소가 아니면 푸시 서비스
         return new Response('', { status: pushStatus });
       };

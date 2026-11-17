@@ -32,6 +32,10 @@ export const MAIL_RE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
 /* 내는 행위를 말하는 줄만 본다. `- 이메일 : scholarship@hufs.ac.kr` 처럼 동사가 없는 줄은
    문의 안내 블록 안에 있는 경우가 많아(실측) 받지 않는다. */
 const SUBMIT_VERB = /(제출|접수|송부|발송|보내)/;
+/* 🔴 이름표가 **신청 방법**이고 그 값이 메일이면 내는 행위를 말한 줄이다 (2026-11-16 · 한국건설교통신기술협회 요강
+   「ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편(등기)」 — 동사가 없어 마감 이틀 전 메일 접수 공고 셋의 '접수 메일 열기'가 안 떴다).
+   값이 **메일로 시작할 때만**(`신청방법 : 이메일(…)`) — 이름표 없는 `- 이메일 : …` 줄(문의 블록에 많다)은 여전히 받지 않는다 */
+const METHOD_IS_MAIL = /(?:신청|접수|제출|지원|응모)\s?방법\s*[:：]\s*(?:이\s?메일|e-?mail|메일|전자\s?우편)/i;
 
 /* 문의·담당자 줄 — 같은 주소가 접수처이기도 하면 아래 '제출' 줄에서 따로 잡힌다.
    ⚠️ 넓히지 말 것: `안내`·`신청` 을 넣으면 `신청서를 … 제출` 이 통째로 걸린다. */
@@ -61,6 +65,42 @@ const FALLBACK_ONLY = /(오류|장애|불가피|부득이|문제|접속\s*불가
 const ELSEWHERE_DONE = /(저장해야|작성\s*후\s*저장|새\s*글|(홈페이지|포털|포탈|시스템|사이트)\s*(에서|을\s*통해|를\s*통해)\s*(온라인\s*)?(신청|작성)(?!서|양식))/;
 const DOCS_BY_MAIL = /서류[^@\n]{0,20}[A-Za-z0-9._%+-]+@/;
 
+/* 🔴 **신청은 시스템·포털로 끝나고, 메일은 뽑힌 뒤 단계의 서류만 받는 공고** (2026-11-17 · 상명대 근로장학 실례 auto-enoticedoarticleno770333).
+   「8. 신청방법: 샘물통합정보시스템 신청 선착순 선발」 → 「9. 선발자 안내: …」 → 「10. 신청서 제출: …」 「<이메일 제출처: hajinpark@smu.ac.kr >」 —
+   메일은 **선발된 뒤** 근로부서 서명 신청서를 내는 곳이다. 그 주소로 '접수 메일 열기'를 띄우면 학생은 선착순 시스템 신청을 건너뛰고
+   메일만 보낸다(관리자가 11-16 에 손으로 비웠다 — 규칙이 그대로면 다른 학교·다른 회차에서 또 들어온다).
+   한 줄만 봐서는 못 가른다(「제출처」 이름표 + 주소라 가장 믿을 만한 줄로 보인다) — 글 전체를 보는 findApplyEmail 에서 **두 조건이 함께일 때만** 거른다:
+     ① 신청방법 이름표의 값이 메일이 아닌 길(시스템·포털·홈페이지·방문·우편…)이고 그 값에 메일 낱말이 없다
+     ② 그 줄 **뒤** · 메일 줄**까지** 사이에 선발 뒤 단계를 여는 줄(선발자 안내·선정 결과 발표·선발 후·합격자 …)이 있다
+   ⚠️ 신청방법 값에 메일이 있으면(「신청방법 : 이메일(kcna@…) 및 우편」) 그대로 받는다 ·
+      자격 줄의 「국가근로장학생 선발자는 … 신청 불가」는 신청방법 줄보다 **앞**이라 세지 않는다(그래서 ②는 '뒤'만 본다).
+   🔴 신청방법 줄은 메일 줄에서 **가장 가까운 앞 줄**을 본다 — 장학금 여럿을 한 글에 적은 공고는 절마다 신청방법이 다르다
+      (「1. 성적우수 · 신청방법: 학생포털 · 선발결과 발표」 → 「2. 지역인재 · 신청방법: 이메일 접수 · 제출처: …@」 — 리뷰 3차 2026-11-17).
+      글의 첫 신청방법 줄만 보면 뒤 절의 진짜 접수 메일을 버리고, 발췌기 소급(staleInTexts)이 이미 들어간 주소까지 지운다.
+      가장 가까운 신청방법 줄이 메일을 말하거나 메일 아닌 길을 말하지 않으면 그대로 받는다(헷갈리면 거르지 않는다).
+   🔴 **학생이 신청하는 방법만 센다 — 신청·접수·지원·응모 방법** (리뷰 4차 2026-11-17). `제출방법`·`서류 제출방법`은 신청 길이 아니라 서류를 내는 길이다:
+      ① 선발 뒤 단계 안의 「- 제출방법: … 이메일 제출」을 신청방법으로 치면 그 줄이 '메일'이라 앞의 「신청방법: 시스템」이 가려져 상명대 구멍이 다시 열리고
+      ② 「※ 서류 제출방법: 원본은 등기우편 제출」을 신청방법으로 치면 앞의 「신청방법: 이메일 접수」가 가려져 진짜 접수 메일을 버린다.
+   🔴 **메일 줄 자신은 제 신청방법 줄이 되지 못한다** — 그 줄에 든 주소(@)가 '메일 낱말'로 세어져 언제나 '메일 신청'이 되기 때문이다.
+      예외 하나: 메일 줄 자신이 신청방법 줄이고 **주소를 뺀 값**이 메일을 말하면(「신청방법: 이메일(x@…) 접수」) 그 줄이 그 절의 신청방법이다. */
+const METHOD_LABEL = /(?:신청|접수|지원|응모)\s?방법\s*[:：]\s*(.+)$/;
+const OTHER_CHANNEL = /(시스템|포털|포탈|홈페이지|사이트|방문|우편|등기|온라인)/;
+const MAIL_WORD = /(이\s?메일|e-?mail|메일|전자\s?우편|@)/i;
+const AFTER_SELECTION = /((선발|선정|합격)\s?(자|결과)\s?(안내|발표|통보|공지|확인)|(선발|선정|합격)\s?(완료\s?)?(후|이후)(?![가-힣])|(선발|선정|합격)(된|되신)\s?(학생|자|분|경우))/;
+const methodValue = (line) => (String(line || '').replace(/\s+/g, ' ').trim().match(METHOD_LABEL) || [])[1];
+/** i 번째 메일 줄에서 가장 가까운 **앞** 신청방법 줄 — { at, other } (없으면 null).
+ *  other = 그 값이 메일이 아닌 길(시스템·포털·방문·우편…)이고 메일 낱말이 없다.
+ *  메일 줄 자신은 주소를 뺀 값이 메일을 말할 때만 제 신청방법 줄이다(위 머리말). */
+function nearestMethodAt(lines, i) {
+  const own = methodValue(lines[i]);
+  if (own != null && MAIL_WORD.test(own.replace(new RegExp(MAIL_RE.source, 'g'), ' '))) return { at: i, other: false };
+  for (let j = i - 1; j >= 0; j -= 1) {
+    const v = methodValue(lines[j]);
+    if (v != null) return { at: j, other: OTHER_CHANNEL.test(v) && !MAIL_WORD.test(v) };
+  }
+  return null;
+}
+
 /** 한 줄이 '학생이 여기로 낸다'고 말하는가 — 판정 근거를 통째로 돌려준다.
  *  @param {string} line    판정할 줄
  *  @param {string} [before] 바로 앞 줄들(있으면) — '신청은 다른 곳에서 끝난다'가 앞 줄에 있는 꼴만 본다 */
@@ -74,7 +114,7 @@ export function judgeLine(line, before = '') {
   if ((ELSEWHERE_DONE.test(text) || ELSEWHERE_DONE.test(String(before || ''))) && DOCS_BY_MAIL.test(text)) {
     return { ok: false, why: '신청은 다른 경로 — 메일은 서류만', addr: m[0], line: text };
   }
-  if (!SUBMIT_VERB.test(text)) return { ok: false, why: '내는 행위가 없음', addr: m[0], line: text };
+  if (!SUBMIT_VERB.test(text) && !METHOD_IS_MAIL.test(text)) return { ok: false, why: '내는 행위가 없음', addr: m[0], line: text };
   return { ok: true, explicit: EXPLICIT.test(text), addr: m[0], line: text };
 }
 
@@ -89,6 +129,9 @@ export function findApplyEmail(text) {
   for (let i = 0; i < lines.length; i += 1) {
     const v = judgeLine(lines[i], lines.slice(Math.max(0, i - 2), i).join(' '));
     if (!v || !v.ok) continue;
+    /* 이 메일 줄의 절에서 신청은 다른 길 + 메일 줄은 선발 뒤 단계(위 METHOD_LABEL 머리말) — 접수처가 아니다 */
+    const method = nearestMethodAt(lines, i);
+    if (method && method.other && lines.slice(method.at + 1, i + 1).some((l) => AFTER_SELECTION.test(l))) continue;
     /* 이름표가 있는 줄이 이긴다. 같은 급이면 **먼저 나온 줄**을 쓴다 —
        공고는 접수 방법을 앞에 적고 뒤에 부연을 단다. */
     if (!best || (v.explicit && !best.explicit)) best = v;
@@ -122,4 +165,24 @@ export function staleApplyEmail(it) {
   if (v && v.ok) return false;
   if (v && v.why === '내는 행위가 없음' && /^…|…$/.test(src.trim())) return false;
   return true;
+}
+
+/**
+ * 🔴 **글 전체를 봐야 갈리는 규칙의 소급** (2026-11-17 · 원칙 7 · 위 METHOD_LABEL 머리말).
+ * staleApplyEmail 은 근거 한 줄만 보므로 '신청은 시스템 · 메일은 선발 뒤 단계'처럼 글 전체로 가르는 규칙을 못 본다
+ * (조선대 빛고을장학재단 첨부의 「* 철회요청 접수 이메일 주소 : …@korea.kr」 — 개인정보 동의 철회 메일함이 '접수 메일'로 들어가 있었다).
+ * 그래서 **근거 문장이 든 원문(본문·첨부)이 손에 있을 때만**, 지금 규칙이 그 글에서 이 주소를 더는 고르지 않으면 참.
+ * 원문이 없거나 근거 문장이 든 글이 하나도 없으면 거짓 — 본문 없는 날 멀쩡한 주소를 잃지 않는다(staleApplyEmail 의 ⚠️ 와 같은 까닭).
+ * 🔴 사람(관리자·AI)이 넣은 값은 건드리지 않는다.
+ * @param {object} it
+ * @param {string[]} texts  발췌기가 접수 메일을 찾을 때 읽는 글 그대로(본문 · 자른 첨부 글)
+ */
+export function staleInTexts(it, texts) {
+  if (!it || !it.applyEmail || humanOwnedEmail(it.applyEmailFrom)) return false;
+  const norm = (s) => String(s || '').replace(/\s+/g, ' ').trim();
+  const src = norm(it.applyEmailSource).replace(/^…\s*/, '').replace(/\s*…$/, '');
+  if (!src) return false;
+  const holding = (texts || []).filter((t) => t && norm(t).includes(src));
+  if (!holding.length) return false;
+  return !holding.some((t) => (findApplyEmail(t) || {}).email === it.applyEmail);
 }

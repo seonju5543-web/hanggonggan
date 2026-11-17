@@ -40,7 +40,7 @@ import { publishBySchool, splitBySchool } from '../collector/publish-notices.mjs
 /* ⚠️ 발행만 든 모듈이다 — `collector/majors.mjs` 는 **불러오는 순간 커리어넷을 두드린다.** */
 import { publishMajorsBySchool } from '../collector/publish-majors.mjs';
 import { pageCandidates, pageUrl, existingPageParam, samePage, shouldRetry } from '../collector/paginate.mjs';
-import { looseCandidate, sameNotice, findMissing, classifyMiss, coverageOf, looksLikeBoardChrome, looksLikeAttachmentName, dedupeNear } from '../collector/coverage-rules.mjs';
+import { looseCandidate, sameNotice, findMissing, classifyMiss, coverageOf, rollingCoverage, looksLikeBoardChrome, looksLikeAttachmentName, dedupeNear } from '../collector/coverage-rules.mjs';
 import { createRequire } from 'node:module';
 import { isAttachmentEntry, isHtmlPayload } from '../collector/attachment-link.mjs';
 import { isDetailUrl, isMarkerUrl, markerTitle, sameTitle, titleCore, rowByCore, detailCandidates, looksLikeLoginWall, rowDetailCandidates } from '../collector/detail-url.mjs';
@@ -418,15 +418,70 @@ eq('  감사가 저장된 제목을 다시 청소해 본다(규칙은 베끼지 
    '선발'이 NOTICE_SIGNAL에 있다고 먼저 통과시키면 아주대 옆 메뉴가 새어 나간다(순서 회귀) */
 eq("'장학생 선발'(옆 메뉴)은 '선발'이 있어도 메뉴", isMenuEntry('장학생 선발'), true);
 
+/* 🔴 JS 글자를 **앞에서부터 한 번에** 읽어 코드만 남긴다 (2026-11-17 · 리뷰 — 예전엔 정규식으로 주석 → 템플릿 → 문자열 → 정규식 순으로 따로 지웠다).
+   차례로 지우면 한 갈래 안의 기호가 다음 갈래를 연다: extract-excerpts.mjs 545행의 머리 따옴표를 떼는 정규식(문자 묶음 안에 ' " 와 백틱이 함께 있다) 속 백틱이
+   **가짜 템플릿**을 열어, 그 뒤 파일 절반(약 590~1,760행)의 이름을 이 검사가 하나도 못 봤다(문자열 속 '/*' 도 같은 꼴로 그 뒤를 주석으로 먹는다).
+   그래서 글자를 하나씩 읽으며 지금 어디에 있는지(코드 · 줄/블록 주석 · ' " 문자열 · 템플릿 · 정규식)를 들고 간다.
+   정규식인지 나눗셈인지는 앞 글자로 가른다(앞이 연산자·여는 괄호·`return` 류 낱말이면 정규식) · 템플릿의 ${…} 안은 코드다(중첩 템플릿 포함).
+   돌려준 `open` — 끝났는데 템플릿·중괄호가 열려 있으면 참(= 어딘가 잘못 읽어 뒤를 못 봤다 · 관문이 파일마다 거짓인지 본다). */
+const JS_REGEX_AFTER_WORD = /^(?:return|typeof|instanceof|in|of|new|delete|void|throw|case|do|else|yield|await)$/;
+function jsCodeOnly(src) {
+  const s = String(src || '');
+  let out = '';
+  let i = 0;
+  const stack = [];          // 템플릿 ${ 에 들어갈 때의 중괄호 깊이
+  let depth = 0;
+  let lastSig = '';          // 마지막 의미 있는 글자(빈칸·주석 빼고) — 정규식/나눗셈 가르기
+  let lastWord = '';
+  const blank = (t) => t.replace(/[^\n]/g, ' ');
+  const template = () => {   // s[i] = 템플릿 글자 첫 칸(여는 ` 다음 · ${…} 를 닫은 } 다음)
+    while (i < s.length) {
+      const c = s[i];
+      if (c === '\\') { out += blank(s.slice(i, i + 2)); i += 2; continue; }
+      if (c === '`') { out += ' '; i += 1; return; }
+      if (c === '$' && s[i + 1] === '{') { out += '${'; i += 2; stack.push(depth); depth = 0; return; }
+      out += c === '\n' ? '\n' : ' '; i += 1;
+    }
+  };
+  while (i < s.length) {
+    const c = s[i];
+    const d = s[i + 1];
+    if (c === '/' && d === '/') { const e = s.indexOf('\n', i); const end = e < 0 ? s.length : e; out += blank(s.slice(i, end)); i = end; continue; }
+    if (c === '/' && d === '*') { const e = s.indexOf('*/', i + 2); const end = e < 0 ? s.length : e + 2; out += blank(s.slice(i, end)); i = end; continue; }
+    if (c === "'" || c === '"') {
+      let j = i + 1;
+      while (j < s.length && s[j] !== c && s[j] !== '\n') j += s[j] === '\\' ? 2 : 1;
+      out += c + blank(s.slice(i + 1, j)) + (s[j] === c ? c : ''); i = s[j] === c ? j + 1 : j; lastSig = c; lastWord = ''; continue;
+    }
+    if (c === '`') { out += ' '; i += 1; template(); lastSig = '`'; lastWord = ''; continue; }
+    if (c === '/' && (lastSig === '' || /[(,=:[!&|?{};+\-*%<>~^}]/.test(lastSig) || JS_REGEX_AFTER_WORD.test(lastWord))) {
+      let j = i + 1; let cls = false; let ok = false;
+      while (j < s.length && s[j] !== '\n') {
+        if (s[j] === '\\') { j += 2; continue; }
+        if (cls) { if (s[j] === ']') cls = false; } else if (s[j] === '[') cls = true; else if (s[j] === '/') { ok = true; break; }
+        j += 1;
+      }
+      if (ok) {
+        j += 1; while (j < s.length && /[a-z]/i.test(s[j])) j += 1;
+        out += ' /re/ '; i = j; lastSig = '/'; lastWord = ''; continue;
+      }
+    }
+    if (c === '{') depth += 1;
+    if (c === '}') {
+      if (depth === 0 && stack.length) { out += '}'; i += 1; depth = stack.pop(); template(); lastSig = '`'; lastWord = ''; continue; }
+      depth -= 1;
+    }
+    if (/[A-Za-z_$]/.test(c)) {
+      let j = i; while (j < s.length && /[\w$]/.test(s[j])) j += 1;
+      const w = s.slice(i, j); out += w; i = j; lastSig = 'w'; lastWord = w; continue;
+    }
+    out += c; i += 1;
+    if (!/\s/.test(c)) { lastSig = c; lastWord = ''; }
+  }
+  return { code: out, open: stack.length > 0 || depth !== 0 };
+}
 function undeclaredNames(src) {
-  let code = src;
-  code = code.replace(/\/\*[\s\S]*?\*\//g, ' ');                       // 블록 주석
-  code = code.replace(/(^|[^:/])\/\/[^\n]*/g, '$1 ');                  // 줄 주석
-  // 템플릿 문자열: 글자는 지우되 ${…} 안의 코드는 남긴다 — 사고가 거기 숨어 있었다
-  code = code.replace(/`(?:\\[\s\S]|\$\{[^{}]*\}|[^`\\])*`/g,
-    (m) => m.replace(/\$\{[^{}]*\}|[\s\S]/g, (c) => (c.startsWith('${') ? c : ' ')));
-  code = code.replace(/'(?:\\.|[^'\\\n])*'/g, "''").replace(/"(?:\\.|[^"\\\n])*"/g, '""');
-  code = code.replace(/([(,=:[!&|?{};+\n]\s*)\/(?![/*])(?:\\.|\[(?:\\.|[^\]\\\n])*\]|[^/\\\n])+\/[gimsuy]*/g, '$1/re/');
+  let code = jsCodeOnly(src).code;                                      // 주석·문자열·템플릿 글자·정규식을 걷은 코드(${…} 안은 남는다 — 사고가 거기 숨어 있었다)
   code = code.replace(/\.\s*([A-Za-z_$][\w$]*)/g, '.p');               // 속성 접근(process.env.X 등)
   const declared = new Set(NAME_GLOBALS);
   for (const m of code.matchAll(/\b(?:const|let|var|function|class)\s+([A-Z][A-Z0-9_]{2,})\b/g)) declared.add(m[1]);
@@ -453,6 +508,23 @@ function undeclaredNames(src) {
     undeclaredNames("import ASK from './x.js';\nconsole.log(ASK.p);"), []);
   eq('  그래도 안 들여온 이름은 잡는다',
     undeclaredNames("import ASK from './x.js';\nconsole.log(NOPE);"), ['NOPE']);
+  /* 🔴 검사가 **파일 끝까지** 보는가 (2026-11-17 · 리뷰) — 정규식 속 백틱·문자열 속 '/*' 가 가짜 템플릿·주석을 열어 뒤쪽 절반을 못 보던 것 */
+  eq('  🔴 정규식 속 백틱은 템플릿이 아니다 — 그 뒤 이름도 본다 (extract-excerpts 545행 꼴)',
+    undeclaredNames("const A = (s) => s.replace(/^['\"‘’“”`]+\\s*/, '');\nconsole.log(NOPE);\nconst B = `${A}`;"), ['NOPE']);
+  eq('  문자열 속 「/*」·「//」 는 주석이 아니다 · 주석 속 백틱은 템플릿이 아니다',
+    [undeclaredNames("const S = '/*';\nconsole.log(NOPE);\nconst T = '*/';"), undeclaredNames("const U = 'http://x' + NOPE;"),
+      undeclaredNames("// it's `x\nconsole.log(NOPE);\n// `")],
+    [['NOPE'], ['NOPE'], ['NOPE']]);
+  eq('  나눗셈은 정규식이 아니다 · 템플릿 ${…} 안(중첩 템플릿·객체 중괄호)도 코드다',
+    [undeclaredNames('const A = 4 / 2;\nconst B = A / 2 / NOPE;'), undeclaredNames('const A = 1;\nconst B = `a ${ { b: A }.b } ${`in ${GIVE}`} c`;\nconsole.log(B, NOPE);')],
+    [['NOPE'], ['GIVE', 'NOPE']]);
+  const exSrc = readText(new URL('extract-excerpts.mjs', dir)).split('\n');
+  const mainAt = exSrc.findIndex((l) => /^function main\(\) \{/.test(l));
+  eq('  🔴 extract-excerpts.mjs 뒤쪽(function main 바로 앞 · 예전 검사가 못 보던 자리)에 넣은 선언 없는 이름을 잡는다',
+    [mainAt > exSrc.length / 2, undeclaredNames([...exSrc.slice(0, mainAt), 'console.log(UNDECLARED_PROBE);', ...exSrc.slice(mainAt)].join('\n'))],
+    [true, ['UNDECLARED_PROBE']]);
+  const openFiles = fs.readdirSync(dir).filter((n) => n.endsWith('.mjs')).sort().filter((f) => jsCodeOnly(readText(new URL(f, dir))).open);
+  eq('  수집기 파일 전부 — 다 읽고 나서 템플릿·중괄호가 열려 있지 않다(어딘가 잘못 읽어 뒤를 못 본 파일이 없다)', openFiles, []);
 }
 
 /* 🔴 PDF 글자 뽑기 (2026-09-05) — 이 단계는 **조용히 아무 일도 안 하기 쉬운** 꼴이다.
@@ -691,6 +763,17 @@ console.log('\n■ 누락 감사 (감사가 수집기의 맹점을 물려받지 
     classifyMiss('2026학년도 2학기 성적우수장학금 선발 공고', { ...deps, page: 1 }), '원인 미상');
   eq('게시판을 못 읽었으면 비율을 말하지 않는다', coverageOf(0, 0), null);
   eq('비율 계산', coverageOf(10, 2), 80);
+  {
+    /* (2026-11-16 · 로드맵 C1) 회전 감사의 합친 비율 — 학교마다 가장 최근 결과 · 못 읽은 날(0)은 앞선 결과를 덮지 않음 · 옛 이력(비율뿐)은 안 셈 · 최근 n번만 */
+    const H = {
+      '2026-10-20': { coverage: 50, bySchool: { 가: 50 } },
+      '2026-10-27': { bySchoolCounts: { 가: [10, 5], 나: [20, 2] } },
+      '2026-11-03': { bySchoolCounts: { 가: [10, 1], 다: [0, 0] } },
+      '2026-11-10': { bySchoolCounts: { 다: [10, 4] } },
+    };
+    eq('합친 인식 비율: 가는 최근(10·1) · 나(20·2) · 다(10·4) → 40중 7 누락', rollingCoverage(H), { runs: 3, from: '2026-10-27', schools: 3, board: 40, missing: 7, coverage: 83 });
+    eq('  최근 n번만 · 재료(bySchoolCounts) 없으면 null', [rollingCoverage(H, { runs: 1 }).schools, rollingCoverage({ '2026-10-20': { coverage: 50 } })], [1, null]);
+  }
 
   /* 🔴 첫 실행(2026-08-17)의 실제 잡음을 고정 자료로 박아 둔다.
      그때 '원인 미상 60건' 중 **37건이 게시판 옆 메뉴 덩어리, 9건이 첨부 파일 이름**이었다.
@@ -1348,6 +1431,8 @@ console.log('\n■ 신청 준비 시작 버튼 — 양식이 없어도 곧장 \'
     ['붙임2 장학_신청서.pdf', '[서식1] 활동계획서.hwp', '개인정보 수집·이용 동의서.docx'].map((n) => D.isApplicationForm({ name: n })), [true, true, true]);
   eq('  추천서·결과보고서·포스터 그림은 신청서가 아니다',
     ['[서식 2] 장학생 추천서.hwp', '활동 결과보고서.pdf', '포스터.png'].map((n) => D.isApplicationForm({ name: n })), [false, false, false]);
+  eq('  B3 공고문은 신청서가 아니다 — `사업계획서 및 업무처리기준.pdf`·`선발 공고문(신청서 포함).hwpx`·`모집요강.pdf` (2026-11-15 · 양식 로봇의 못 받음 목록에서 빠진다)',
+    ['붙임2_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf', '붙임1. 2026년 장학생 선발 공고문(신청서 포함).hwpx', '2027 모집요강.pdf'].map((n) => D.isApplicationForm({ name: n })), [false, false, false]);
   eq('🔴 층2 첨부는 이름에 신청서가 있어도 \'양식 다운로드형\'이라 부르지 않는다 (화면이 \'선발 공고문\'이라 부른다)',
     D.submitChannelKind({ sourceKind: 'kosaf', provider: '원주시청', attachments: [{ name: '지원신청서.hwp' }] }) === 'download', false);
   eq('  층1 은 그대로 다운로드형이다', D.submitChannelKind({ attachments: [{ name: '장학금 신청서.hwp' }] }), 'download');
@@ -1375,27 +1460,34 @@ console.log('\n■ 공고별 지원문서 — 앱 양식이 없는 등록 공고
     documents: ['지원 자격·제출 서류는 원문 공고에서 확인'], attachments: [], eligibilityLines: [] };
   const heads = (t) => t.sections.map((s) => s.heading);
   const t0 = eng.buildPrepTemplate(base);
-  eq('🔴 서류를 모르는 공고 — 머리말은 "양식을 찾지 못했다 · 제출 전 원문 확인" (그대로 제출 가능이라 말하지 않는다)',
-    [t0.prepKind, /찾지 못했습니다/.test(t0.tag), /그대로 제출/.test(t0.tag), t0.unofficial], ['unknown', true, false, true]);
-  eq('  자리표시 안내 줄은 제출 서류 절에 서류로 올라가지 않는다', t0.sections.find((s) => s.heading === '제출 서류 확인').note, '제출 서류는 원문 공고에서 확인하세요.');
+  /* 2026-11-15 개발자 결정 11-02 — 머리말은 참인 말만(「양식을 찾지 못했다 · 제출 전 원문에서 확인」 → 「정리한 문서이고 이 문서 자체를 내는 것은 아니다」) */
+  /* 2026-11-17 개발자 지시 — 머리말은 「※ 앱 자체 제작 문서입니다」 한 줄뿐(갈래별 제출 안내는 둘째 줄 lead 와 제출 안내 절이 맡는다) */
+  const ONLY_TAG = '※ 앱 자체 제작 문서입니다';
+  eq('🔴 서류를 모르는 공고 — 머리말은 「※ 앱 자체 제작 문서입니다」 한 줄뿐 · 둘째 줄도 그대로 제출 가능이라 말하지 않고 \'모름\'류 글자 없음',
+    [t0.prepKind, t0.tag, /그대로 제출/.test(t0.lead), /찾지 못했|원문에서 확인|원문 확인|확인 필요/.test(t0.tag + t0.lead), t0.unofficial], ['unknown', ONLY_TAG, false, false, true]);
+  eq('🔴 여섯 갈래 모두 머리말이 정확히 「※ 앱 자체 제작 문서입니다」 (2026-11-17 — 뒤 문장 전부 삭제)',
+    [eng.buildPrepTemplate({ ...base, prepDoc: true }), eng.buildPrepTemplate({ ...base, applyEmail: 'a@b.kr' }), eng.buildPrepTemplate({ ...base, applyPortal: 'x' }),
+      eng.buildPrepTemplate({ ...base, attachments: [{ name: '붙임1 장학생 신청서.hwp', url: 'https://e.ac.kr/f.hwp' }] }), eng.buildPrepTemplate({ ...base, sourceKind: 'kosaf' }), t0].map((t) => t.tag),
+    [ONLY_TAG, ONLY_TAG, ONLY_TAG, ONLY_TAG, ONLY_TAG, ONLY_TAG]);
+  eq('  자리표시 안내 줄은 제출 서류 절에 서류로 올라가지 않는다 — 서류를 못 읽었으면 절 자체가 없다(「원문 공고에서 확인하세요」 줄 없음)', t0.sections.some((s) => s.heading === '제출 서류 확인'), false);
   eq('  작성형 서류 이름이 없으면 기본 세 절(지원 동기·학업/활동·계획) — 자격 줄이 없으면 자격 절도 없다',
-    heads(t0), ['신청 개요', '지원 동기 및 신청 사유', '학업 및 활동 요약', '향후 계획', '제출 서류 확인', '제출 안내']);
-  eq('  원문이 자유 양식이라 확인한 공고(prepDoc)만 "그대로 제출할 수 있다"',
-    (() => { const t = eng.buildPrepTemplate({ ...base, prepDoc: true }); return [t.prepKind, /그대로 제출할 수 있습니다/.test(t.tag)]; })(), ['free', true]);
+    heads(t0), ['신청 개요', '지원 동기 및 신청 사유', '학업 및 활동 요약', '향후 계획', '제출 안내']);
+  eq('  원문이 자유 양식이라 확인한 공고(prepDoc)만 둘째 줄이 "그대로 제출할 수 있다"',
+    (() => { const t = eng.buildPrepTemplate({ ...base, prepDoc: true }); return [t.prepKind, /그대로 제출할 수 있습니다/.test(t.lead)]; })(), ['free', true]);
   const withAtt = { ...base, attachments: [{ name: '붙임1 장학생 신청서.hwp', url: 'https://e.ac.kr/f.hwp' }] };
-  eq('  첨부 신청서가 있으면 "원본 양식에 옮겨 적는다 · 제출은 원본 양식으로"',
-    (() => { const t = eng.buildPrepTemplate(withAtt); return [t.prepKind, /원본 양식/.test(t.tag), /그대로 제출/.test(t.tag)]; })(), ['attached', true, false]);
+  eq('  첨부 신청서가 있으면 둘째 줄이 "옮겨 적을 내용 · 제출은 원본 양식으로"',
+    (() => { const t = eng.buildPrepTemplate(withAtt); return [t.prepKind, /원본 양식/.test(t.lead), /그대로 제출/.test(t.lead)]; })(), ['attached', true, false]);
   eq('  순서 — 원문 확인(prepDoc) > 원문이 말한 접수 방법(메일 > 포털) > 첨부 신청서 > 모름 (submitChannelKind 와 같은 결정 · 리뷰)',
     [eng.buildPrepTemplate({ ...withAtt, prepDoc: true }).prepKind, eng.buildPrepTemplate({ ...base, applyPortal: 'x', applyEmail: 'a@b.kr' }).prepKind,
       eng.buildPrepTemplate({ ...base, applyPortal: 'x' }).prepKind, eng.buildPrepTemplate({ ...withAtt, applyPortal: 'x' }).prepKind, eng.buildPrepTemplate({ ...withAtt, applyEmail: 'a@b.kr' }).prepKind],
     ['free', 'email', 'portal', 'portal', 'email']);
-  eq('  메일·포털 머리말도 "이 문서 자체를 내는 것이 아니다"를 말한다 (그대로 제출은 free 만)',
-    ['email', 'portal'].map((k) => eng.buildPrepTemplate({ ...base, [k === 'email' ? 'applyEmail' : 'applyPortal']: 'x' }).tag).map((t) => /그대로 제출/.test(t) || !/아닙니다/.test(t)), [false, false]);
+  eq('  메일·포털 둘째 줄은 "옮겨 적을·붙여 넣을 내용"이라 말하고 그대로 제출이라 하지 않는다 (그대로 제출은 free 만)',
+    ['email', 'portal'].map((k) => eng.buildPrepTemplate({ ...base, [k === 'email' ? 'applyEmail' : 'applyPortal']: 'x' }).lead).map((t) => /그대로 제출/.test(t) || !/옮겨 적|붙여 넣/.test(t)), [false, false]);
   /* 다리가 data.js 를 싣는가 — 안 실으면 첨부 판정이 forms.js 의 물러나는 규칙으로만 재어져 isApplicationForm 을 바꿔도 여기가 안 빨개진다(리뷰) */
   eq('  Node 다리(form-engine-node)가 data.js 의 isApplicationForm 을 실어 브라우저와 같은 갈래를 잰다',
     /data\.js/.test(readText(new URL('./form-engine-node.mjs', import.meta.url))) && eng.buildPrepTemplate({ ...base, attachments: [{ name: '[서식 2] 장학생 추천서 신청서양식.hwp', url: 'u' }] }).prepKind, 'unknown');
-  eq('  층2(재단 공고문)는 \'kosaf\' — 첨부 이름에 신청서가 있어도 attached 가 아니고, 머리말은 "재단 선발 공고문이 정한다 · 이 문서 자체를 내는 것은 아니다" (2026-10-13 ①)',
-    (() => { const t = eng.buildPrepTemplate({ ...withAtt, sourceKind: 'kosaf' }); return [t.prepKind, /선발 공고문/.test(t.tag), /이 문서 자체를 내는 것은 아닙니다/.test(t.tag), /그대로 제출/.test(t.tag)]; })(), ['kosaf', true, true, false]);
+  eq('  층2(재단 공고문)는 \'kosaf\' — 첨부 이름에 신청서가 있어도 attached 가 아니고, 둘째 줄이 "재단 선발 공고문이 정한다" (2026-10-13 ①)',
+    (() => { const t = eng.buildPrepTemplate({ ...withAtt, sourceKind: 'kosaf' }); return [t.prepKind, /선발 공고문/.test(t.lead), /그대로 제출/.test(t.lead)]; })(), ['kosaf', true, false]);
   eq('  prepDoc(원문 확인)은 층2보다도 앞이다', eng.buildPrepTemplate({ ...base, sourceKind: 'kosaf', prepDoc: true }).prepKind, 'free');
   eq('  앱은 층2 항목에도 붙인다(kosafAsScholarships → attachPrepTemplate) · 다시 받으면 지운다',
     (() => { const aj = readText(new URL('../app.js', import.meta.url)); return [/\.map\(attachPrepTemplate\);/.test(aj.slice(aj.indexOf('function kosafAsScholarships('))), /startsWith\('prep:kosaf-'\)\) delete FORM_TEMPLATES\[k\]/.test(aj)]; })(), [true, true]);
@@ -1411,13 +1503,13 @@ console.log('\n■ 공고별 지원문서 — 앱 양식이 없는 등록 공고
     ec && ec.fields[0].type === 'checks' && ec.fields[0].options, ['재학생 중 직전 학기 12학점 이상 이수', '평점 3.0 이상']);
   eq('  제출 안내 절은 마감과 "실제 접수 아님"을 말한다',
     /2099-01-01/.test(t4.sections.at(-1).note) && /실제로 접수되는 것은 아니/.test(t4.sections.at(-1).note), true);
-  eq('  마감을 모르면 지어내지 않는다 ("마감은 원문 확인")', /마감은 원문 확인/.test(eng.buildPrepTemplate({ ...base, deadline: '' }).sections.at(-1).note), true);
+  eq('  마감을 모르면 지어내지 않고 말하지도 않는다 (예전 "마감은 원문 확인" · 2026-11-15)', (() => { const n = eng.buildPrepTemplate({ ...base, deadline: '' }).sections.at(-1).note; return [/마감/.test(n), /원문 확인/.test(n), /실제로 접수되는 것은 아니/.test(n)]; })(), [false, false, true]);
   /* 문서가 실제로 그려진다 — 모르는 타입 없이 · 공고 이름·머리말·절·서약 */
   const ans = {};
   t4.sections.forEach((s) => (s.fields || []).forEach((f) => { ans[f.id] = f.type === 'checks' ? { checks: [f.options[0]], text: '' } : '«답»'; }));
   const html = eng.renderFormDoc(t4, FORM_SAMPLE_PROFILE, ans);
   eq('  문서에 공고 이름 · 머리말 · 자격 체크(☑) · 서약이 들어간다',
-    [/테스트장학 2026-2 — 지원문서/.test(html), /첨부된 신청서 양식을 찾지 못했습니다/.test(html), /☑ 재학생 중 직전 학기 12학점 이상 이수/.test(html), /사실과 다름이 없습니다/.test(html)],
+    [/테스트장학 2026-2 — 지원문서/.test(html), /※ 앱 자체 제작 문서입니다/.test(html), /☑ 재학생 중 직전 학기 12학점 이상 이수/.test(html), /사실과 다름이 없습니다/.test(html)],
     [true, true, true, true]);
   /* 앱 연결 — 글자가 아니라 실제 모양을 본다 */
   const appSrc = readText(new URL('../app.js', import.meta.url));
@@ -1477,6 +1569,11 @@ console.log('\n■ 제출 서류 목록 — 원문의 「제출서류」 절을 
   /* 관리자가 고친 목록·끈 스위치는 로봇이 되덮지 않는다 — admin-apply 가 주인 표식을 남긴다(리뷰) */
   const aa = readText(new URL('../tools/admin-apply.mjs', import.meta.url));
   eq('  관리자 화면이 documents → documentsFrom · prepDoc → prepDocFrom 에 관리자 표식을 남긴다', [/mark\('documents', 'documentsFrom'\)/.test(aa), /changed\.includes\('prepDoc'\)\) it\.prepDocFrom = OWNER/.test(aa)], [true, true]);
+  /* 메일 접수 주소도 같다 (2026-11-16 · 상명대 근로장학 — 관리자가 비운 주소를 로봇이 다음 실행에 되채울 뻔했다) */
+  eq('  관리자 화면이 applyEmail → applyEmailFrom 에 관리자 표식(비울 때 「· 비움」)을 남기고 근거 문장을 같이 뺀다 · 로봇은 그 표식이면 안 채운다',
+    [/changed\.includes\('applyEmail'\)\) \{\s*it\.applyEmailFrom = it\.applyEmail \? OWNER : `\$\{OWNER\} · 비움`;\s*if \(!it\.applyEmail\) delete it\.applyEmailSource;/.test(aa),
+     /if \(it\.applyEmail \|\| humanOwnedEmail\(it\.applyEmailFrom\)\) return;/.test(readText(new URL('../collector/extract-excerpts.mjs', import.meta.url))),
+     (await import('../collector/apply-email.mjs')).humanOwnedEmail('관리자 2026-11-16 · 비움')], [true, true, true]);
   eq('  로봇은 신청서 첨부가 나중에 붙어도 제 prepDoc 을 끈다', /\(!got\.basis \|\| hasFormAtt\)/.test(readText(new URL('../collector/extract-excerpts.mjs', import.meta.url))), true);
   /* 🔴 발췌 로봇 실행 호출은 파일 **맨 끝** (2026-10-23) — 10-14 에 fillDocuments 와 const FORM_ATT_NAME 이 `main()` 호출 **뒤**에 붙었고, const 는 끌어올려지지 않아
      서류 목록을 찾은 첫 공고에서 'Cannot access before initialization' 으로 넘어졌다. 10-17 저녁부터 23일까지 두 수집 로봇(하루 5회)이 모두 그 단계에서 죽어 새 공고가 한 건도 저장되지 않았다.
@@ -1528,7 +1625,8 @@ console.log('\n■ 제출 서류 목록 — 원문의 「제출서류」 절을 
   /* 발췌기가 이 규칙으로 documents 를 채우고 prepDoc 을 켠다 — 사람 것은 덮지 않고, 신청서 첨부가 있으면 prepDoc 을 켜지 않는다 */
   const ee = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));
   const fd = ee.slice(ee.indexOf('function fillDocuments('), ee.indexOf('function main()'));
-  eq('  발췌기가 두 갈래(본문 · 첨부만)에서 모두 부른다', (ee.match(/fillDocuments\(it, (body|null), docs\);/g) || []).length, 2);
+  /* 2026-11-15: 서류 목록은 신청서 쪽 공고문을 안 본다 — 두 갈래 모두 docsOnce(it, false)(noticeDocFiles formPath:false) */
+  eq('  발췌기가 두 갈래(본문 · 첨부만)에서 모두 부른다', (ee.match(/fillDocuments\(it, (body|null), docsOnce\(it, false\)\);/g) || []).length, 2);
   eq('  사람(관리자·AI)이 적은 목록과 자리표시가 아닌 옛 목록은 덮지 않는다',
     [/\/\^\(관리자\|AI\)\/\.test\(it\.documentsFrom/.test(fd), /docsPlaceholderOnly\(it\.documents\) && !robotOwned\) return/.test(fd)], [true, true]);
   eq('  prepDoc 은 근거 있음 · 신청서 첨부 없음 · 양식·상시 제도 아님 · 관리자가 끄지 않음 일 때만 · 근거는 300자 상한 · 출처 표식(prepDocFrom 로봇)',
@@ -4370,6 +4468,17 @@ console.log('\n■ 껍데기 페이지와 브라우저 본문 (2026-08-20)');
      37건을 그렇게 저장했다가 전부 다시 받았다. */
   const rb = readText(new URL('collector/rescue-bodies.mjs', root));
   eq('재수집은 화면에 그려진 줄바꿈을 그대로 받는다', /innerText\(/.test(rb), true);
+  /* 1단계 B5 (2026-11-15) — 봇 차단 뒤 물러서서 받은 화면이 그 글인지 묻는다 · 삭제 안내 꼴도 내려간 글 */
+  {
+    const NS = await import(new URL('collector/notice-source.mjs', root));
+    const others = ['2026학년도 2학기 성취장학생 선발 안내', '2026-2학기 국가근로장학금 신청 안내', '2026학년도 교내 봉사장학금 모집 공고', '2026년 하반기 글로벌 장학생 선발'];
+    eq('  물러선 화면 — 제목이 있고 다른 글 제목이 셋 미만이면 그 글 · 제목이 없으면 아니다 · 다른 등록 공고 제목이 셋 이상 보이면 목록 화면이다',
+      [NS.fallbackIsThisNotice('공지사항\n2026학년도 2학기 성취장학생 선발 안내\n1. 지원자격 …', '2026학년도 2학기 성취장학생 선발 안내', others).ok,
+        NS.fallbackIsThisNotice('공지사항 목록\n2026-2학기 국가근로장학금 신청 안내\n…', '2026학년도 2학기 성취장학생 선발 안내', others).ok,
+        NS.fallbackIsThisNotice(`공지사항\n${others.join('\n')}\n이전글 다음글`, '2026학년도 2학기 성취장학생 선발 안내', others).why], [true, false, '다른 글 제목 3개']);
+    eq('  재수집 로봇은 물러섰을 때만 그 판정을 거치고(fellBack) · `삭제된글·삭제사유·관리자 삭제` 는 내려간 글로 적는다',
+      [/fellBack \? fallbackIsThisNotice\(text, t\.it\.name/.test(rb), /same\.ok && hasText/.test(rb), /삭제된\\s\?글\|삭제\\s\?사유\|관리자\\s\?삭제/.test(rb)], [true, true, true]);
+  }
   /* 본문을 다듬을 때 **가로 공백만** 누른다 — `\s+`로 누르면 줄바꿈까지 사라진다.
      ⚠️ '파일 어디에도 \s+ 가 없다'로 검사하면 안 된다. 첨부 **이름**을 다듬는
      `textContent.replace(/\s+/g,' ')`는 정상이고 본문과 무관한데 거기 걸린다
@@ -4463,6 +4572,37 @@ console.log('\n■ 학교 서버에 붙는 워크플로의 인증서 설정 (202
    개발자가 앱을 눈으로 볼 때까지 아무도 몰랐다. 이번엔 **세는 자리**를 만들었다.
    ⚠️ 채점기가 필터와 같은 낱말을 쓰면 필터의 눈으로 필터를 채점하는 꼴이라
    필터가 놓친 것은 영영 0으로 나온다 — 다른 축(문장이 무엇을 말하는가)으로 재야 한다. */
+console.log('\n■ 신청 공고가 아닌 안내문은 정식 등록하지 않는다 (2026-11-15 확장)');
+{
+  /* 11-15 열린 정식 등록 100건의 제목·본문(collector/extracted/)을 다 읽고 신청 공고가 아닌 꼴을 더했다(verify/entry-rules.cjs NOT_APPLICATION·_WEAK).
+     아래 제목은 전부 실제 게시판 제목이다 — 등록분 8건 + 실시간 피드 1,486개 제목 중 같은 꼴. 🔴 되돌리면 이 글들이 다시 '신청하세요' 카드로 뜬다.
+     거꾸로 진짜 신청 공고(결과·기준·지급·선발 낱말이 섞인 것)는 걸리면 안 된다 — 틀리게 지우면 진짜 장학금이 사라진다. */
+  const { checkEntry } = createRequire(import.meta.url)('./entry-rules.cjs');
+  const base = { id: 'x', name: '', type: '교외', provider: '재단', amount: '100만원', amountValue: 1000000, summary: 's', eligibility: {}, documents: [], sourceUrl: 'https://a.ac.kr/bbs/view.do?no=1', deadline: '2099-01-01', eligibilityLines: ['재학생'], noForm: '사유' };
+  const caught = (name) => checkEntry({ ...base, name }).some((p) => p.level === 'error' && /안내문/.test(p.msg));
+  /* ① 희망사다리Ⅰ 학교 선발 기준 글 — 학생은 한국장학재단에 신청하고, 글은 학교 기준표뿐(성균관대 「선발을 위한 자체기준을 다음과 같이 안내합니다」) */
+  eq('선발·추천·심사 기준 안내는 신청 공고가 아니다 (희망사다리Ⅰ · 주거안정 기준표)', ['[한국장학재단] 2026학년도 2학기 중소기업 취업연계(희망사다리1유형) 신규장학생 선발기준 안내',
+    '서울과학기술대학교 중소기업 취업연계 장학사업 (희망사다리Ⅰ유형) 신규장학생 자체선발 기준 안내', '[공통] 2026-2학기 중소기업취업연계(희망사다리1유향) 장학금 신규 장학생 선발 기준',
+    '희망사다리1유형(중소기업 취업연계 장학금) 선발 기준 안내', '공통 2026-2학기 중소기업취업연계장학사업(희망사다리Ⅰ유형) 신규장학생 대학선발 기준 안내',
+    '[교외] 2026년 2학기 중소기업 취업연계 장학사업(희망사다리Ⅰ유형) 신규장학생 심사기준', '2026-2학기 주거안정장학금 우선지원 및 지원제외 기준 안내'].map(caught), [true, true, true, true, true, true, true]);
+  /* ② 선발 결과 · ③ 지급 · ④ 설명회·보증보험 동의 */
+  eq('  선발완료·선발 결과·최종선발자 공지도', ['[교내/선발] 2026학년도 2학기 학부 교내장학 선발완료 안내', '[교내장학] 2026학년도 2학기 사회봉사장학 최종 선발 결과 안내',
+    '[국가근로] 2026학년도 2학기 국가(교내)근로장학생 최종선발자 공지', '[장학공지] RE:2026학년도 2학기 하나금융나눔재단 하나장학생 선발결과 안내'].map(caught), [true, true, true, true]);
+  eq('  지급 일정·지급 안내 · 설명회 · 보증보험 동의도', ['2026-2학기 주거안정장학금 9월분 지급 일정 안내', '[한국장학재단] 2026학년도 2학기 국가장학금(1유형/다자녀) 지급 안내',
+    '[교외] 풀브라이트 미국 유학·연구 장학금 설명회 안내(11/6, 오후 12시)', '2026-2학기 중소기업 취업연계 장학금 서류제출 및 보증보험 동의 안내'].map(caught), [true, true, true, true]);
+  /* 강한 낱말 — 제목에 「[장학금 접수]」·「신청」 이 있어도 안내문이다 */
+  eq('  SSAFY 교육생 모집 · 「심포지엄 2026 신청 안내」 는 「접수·신청」 이 붙어도 안내문', ['[장학금 접수] 삼성 청년 SW·AI 아카데미(SSAFY) 모집 안내',
+    '공통 세아해암학술장학재단 제1회 차세대 공학연구자 Alumni 심포지엄 2026 신청 안내'].map(caught), [true, true]);
+  /* 진짜 신청 공고 — 결과·기준·지급·선발·설명회 낱말이 들어 있다 */
+  eq('  진짜 신청 공고는 걸리지 않는다 (결과·지급 낱말 · 「추가 선발」 · 「선발 안내」 · 설명회 및 접수)', ['[기금-10/8] 2026학년도 2학기 푸른솔 사회정의 장학금 신청 안내 (심사중) (선발결과는 11월 초중순 별도 메일로 안내 예정)',
+    '2026학년도 2학기 국가근로장학생 선발 결과 및 2차 추가 선발 안내', '[일반] [앵커사업] 2026년도 동계 계절수업 Python 교과목 신청 안내 (장학금 지급/전공학점 인정)',
+    '[학부-교내장학] 2026학년도 외국어성적우수장학생 선발 안내', '[학부-교내장학] 2026학년도 2학기 장학사정관제 장학금 선발 안내', '2026-2학기 장학금 신청 설명회 및 접수 안내',
+    '[교외] STX장학재단 장학생 선발 안내(11/16 마감, 등록금 300만원+학업보조금 월 50만원)', '2026학년도 2학기 의료인공지능특화융합인재양성사업 연구우수 장학생 선발 안내'].map(caught),
+  [false, false, false, false, false, false, false, false]);
+  /* 「추천」 만 있는 제목은 제목으로 거르지 않는다 — 「외수한일교류장학회 장학생 추천 안내」 처럼 학교에 내는 진짜 신청이 많다(본문이 기준표뿐인 글은 관리자 되돌리기로) */
+  eq('  「장학생 추천」 제목은 제목만으로 거르지 않는다', ['2026학년도 2학기 외수한일교류장학회 장학생 추천 안내', '[국가]2026학년도 2학기 한국장학재단 중소기업 취업연계 장학생(희망사다리Ⅰ유형) 추천'].map(caught), [false, false]);
+}
+
 console.log('\n■ 신청 공고가 아닌 안내문은 정식 등록하지 않는다 (2026-10-30)');
 {
   const { checkEntry } = createRequire(import.meta.url)('./entry-rules.cjs');
@@ -4475,8 +4615,9 @@ console.log('\n■ 신청 공고가 아닌 안내문은 정식 등록하지 않�
     '(홍보) 한국장학재단 희망사다리 장학금 신청 안내(마감)'].map((n) => errs(n).some((m) => /안내문/.test(m))), [true, true, true, true, true]);
   eq('  「국가근로장학금 신청 및 사전교육 안내」·「신청 안내(서약서 포함)」 은 신청 공고다 — 약한 낱말은 신청·접수·모집이 없을 때만',
     ['2026-2학기 국가근로장학금 신청 및 사전교육 안내', '2026-2학기 가족장학금 신청 안내(서약서 포함)'].map((n) => errs(n).some((m) => /안내문/.test(m))), [false, false]);
-  eq('  진짜 신청 공고는 걸리지 않는다 (설명회·교육 낱말 · 추천 · 자체선발 기준 · 마감일이 제목 속에)', ['2026-2학기 장학금 신청 설명회 및 접수 안내', '[국가]2026학년도 2학기 한국장학재단 중소기업 취업연계 장학생(희망사다리Ⅰ유형) 추천',
-    '서울과학기술대학교 중소기업 취업연계 장학사업 (희망사다리Ⅰ유형) 신규장학생 자체선발 기준 안내', '2026년 성암육영회 장학생 모집 안내(10/27 마감)'].map((n) => errs(n).some((m) => /안내문/.test(m))), [false, false, false, false]);
+  /* 11-15: 「서울과기대 … 자체선발 기준 안내」 는 본문·첨부를 열어 보니 기준표뿐(신청은 한국장학재단) — 위 「(2026-11-15 확장)」 절의 안내문 쪽으로 옮겼다 */
+  eq('  진짜 신청 공고는 걸리지 않는다 (설명회·교육 낱말 · 추천 · 마감일이 제목 속에)', ['2026-2학기 장학금 신청 설명회 및 접수 안내', '[국가]2026학년도 2학기 한국장학재단 중소기업 취업연계 장학생(희망사다리Ⅰ유형) 추천',
+    '2026학년도 2학기 외수한일교류장학회 장학생 추천 안내', '2026년 성암육영회 장학생 모집 안내(10/27 마감)'].map((n) => errs(n).some((m) => /안내문/.test(m))), [false, false, false, false]);
   eq('  자동 등록 로봇은 오류 수준에서 막는다(checkEntry error → 컨펌 대기)', /level === 'error'/.test(readText(new URL('../collector/auto-register.mjs', import.meta.url))), true);
 }
 
@@ -4686,6 +4827,361 @@ console.log('\n■ 자격 절 고르기 — 이름표 줄 · 짧은 블록 덧�
     [majorOf('기본 선발 요건을 충족한 학생 (AI, SW 컴퓨터 관련 전공 아니어도 활동 가능)'), majorOf('원자력 관련 학과 재학생')], [0, 1]);
 }
 
+console.log('\n■ 발췌기 글자 읽기 — 카드 빈칸 비평의 이름표 꼴·해·첨부 한 곳·발췌·자격 절 (2026-11-15)');
+{
+  /* 카드 빈칸 비평(2026-11-11 승인 계획 — 원문에 있는 값은 채우고, 없으면 그리지 않는다)에서 원문을 열어 보고 고친 발췌기 규칙 묶음.
+     🔴 아래 글자는 전부 **실제 원문 줄**을 옮긴 것이다(collector/extracted/ 의 OCR·HWP·PDF 글자층 · 어느 공고인지 줄 옆에 적었다).
+        저장된 첨부는 60일마다 갈리므로 파일을 읽지 않고 줄을 여기 박아 둔다(실데이터에 기댄 관문 금지 — CLAUDE.md).
+     🔴 함수가 없으면(옛 코드) 값이 '(없음)' 이 되어 빨간불이다 — 넘어지지 않고 센다. */
+  process.env.EXCERPTS_AS_LIB = '1';
+  const EX = await import(new URL('../collector/extract-excerpts.mjs', import.meta.url));
+  const AT = await import(new URL('../collector/attachment-text.mjs', import.meta.url));
+  const SH = createRequire(import.meta.url)('../section-head.js');
+  const DU = await import(new URL('../collector/detail-url.mjs', import.meta.url));
+  const call = (o, k, ...a) => { try { return typeof o[k] === 'function' ? o[k](...a) : '(없음)'; } catch (e) { return `(오류 ${e.message})`; } };
+  const dl = (...lines) => call(EX, 'extractDeadline', lines.join('\n'));
+  const od = (...lines) => call(EX, 'extractOpenDate', lines.join('\n'));
+
+  /* ① 이름표 꼴 */
+  eq('① `|` 칸 가름 — 경희 반영장학 포스터 OCR 「\' 신청기간 | 2026.9.11.(금)-9.22.(화) \'」 → 마감 09-22 · 접수 시작 09-11',
+    [dl("' 신청기간 | 2026.9.11.(금)-9.22.(화) '"), od("' 신청기간 | 2026.9.11.(금)-9.22.(화) '")], ['2026-09-22', '2026-09-11']);
+  eq('  `모집기간| 2026.10.19.(월)~11.13.(금)`(엔지니어링인재육성재단 홍보물) → 11-13 · 표 머리 줄 「구분 | 신청기간 | 비고」 는 날짜가 아니다',
+    [dl('모집기간| 2026.10.19.(월)~11.13.(금)'), dl('구분 | 신청기간 | 비고')], ['2026-11-13', null]);
+  eq('  줄 머리 괄호 이름표 「❍ (접수기간) 2026. 9. 16.(수) 09:00 ~ 2026. 10. 8.(목) 18:00 / 23일간」(대전 서구인재육성 공고문) → 10-08 · 「(공고기간)」 은 아니다',
+    [dl('❍ (접수기간) 2026. 9. 16.(수) 09:00 ~ 2026. 10. 8.(목) 18:00 / 23일간'), dl('❍ (공고기간) 2026. 9. 15.(화) ~ 2026. 9. 30.(수) / 16일간')], ['2026-10-08', null]);
+  /* 인재림 제7기 요강 docx — 진짜 접수 줄을 못 읽고 일정표 칸 「온라인 서류 접수 기간」 ↵ (다음 칸) 「26. 12. 21.(월)」(= 면접 대상자 발표)을 마감으로 읽었다 */
+  eq('  「[지원 기간] 2026. 10. 8.(목) ~ 10. 29.(목) 15:00까지」 가 일정표의 엉뚱한 칸(12-21)보다 먼저 읽힌다 (인재림 요강)',
+    dl('[지원 기간] 2026. 10. 8.(목) ~ 10. 29.(목) 15:00까지', '[지원 방법] 한국고등교육재단 지원 홈페이지(클릭) 회원가입 후 인재림 모집공고 확인',
+      '선발 절차 및 프로그램 주요 일정', '2026년', '26. 10. 8.(목)~29.(목) 15:00', '온라인 서류 접수 기간', '26. 12. 21.(월)', '면접 대상자 발표'), '2026-10-29');
+  eq('  제목 꼬리 괄호 이름표(예전 규칙)는 그대로 — 「… 선발(접수기간: 2026.10.14(화) ~ 10.27(화))」',
+    dl('2026학년도 장학생 선발(접수기간: 2026.10.14(화) ~ 10.27(화))'), '2026-10-27');
+  /* 금신사랑 공고 PDF OCR — 「6. 신청기간 및 방법」 ↵ 「기간 : 2026. ?. 15. (화) ~ 2026. 9. 21. (월)」(시작 달을 OCR 이 못 읽었다) */
+  eq('  기간 절 제목 아래 맨 「기간 :」 의 범위 → 끝 09-21 · 시작은 못 읽었으니 접수 시작일은 없다 (금신사랑)',
+    [dl('6. 신청기간 및 방법', '기간 : 2026. ?. 15. (화) ~ 2026. 9. 21. (월)'), od('6. 신청기간 및 방법', '기간 : 2026. ?. 15. (화) ~ 2026. 9. 21. (월)')], ['2026-09-21', null]);
+  eq('  🔴 `근로기간` 은 제목 아래여도 아니다 · 제목 없는 맨 `기간` 범위도 여전히 아니다(근로장학생의 일하는 기간)',
+    [dl('6. 신청기간 및 방법', '근로기간 : 2026. 9. 1. ~ 2027. 2. 12.'), dl('3. 근로 안내', '가. 기간: 2026. 9. 1. ~ 2027. 2. 12.')], [null, null]);
+  eq('  「○ 선발기간: 2026. 10. 6.(화) ~ 10. 30.(금) 18:00까지…」(김천시-한국전력기술) → 10-30 · `까지` 없는 「선발기간 : 2026년 10월 19일(월)~2026년 11월 13일(금)」 은 뽑는 기간이라 아니다',
+    [dl('○ 선발기간: 2026. 10. 6.(화) ~ 10. 30.(금) 18:00까지토일공휴일 제외)'), dl('선발기간 : 2026년 10월 19일(월)~2026년 11월 13일(금)')], ['2026-10-30', null]);
+  /* 숭실 특별장학금 — 표 칸이 「2026.10.28(수) 9:00」 ↵ 「~ 11.10(화) 17:30」 두 줄. 안 이으면 시작일을 마감으로 읽는다(열린 공고가 닫힌다) */
+  eq('  다음 줄의 「~ 날짜」 를 잇는다 — 이름표 줄·이름표만 있는 줄 둘 다 11-10 (숭실 · 시작일 10-28 을 마감으로 읽지 않는다)',
+    [dl('신청기간 : 2026.10.28(수) 9:00', '~ 11.10(화) 17:30'), dl('신청 기간', '2026.10.28(수) 9:00', '~ 11.10(화) 17:30')], ['2026-11-10', '2026-11-10']);
+  /* 세종이도인재장학금 포스터 OCR — 이름표 줄은 「분야별상이」, 갈래마다 기간이 따로 */
+  const sejong = ['·신청기간· 분야별상이', '디딤돌(학자금대출 외),무지개:2026.5.6.(수)~2026.7.10.(금),18:00까지', '※디담돌-학자금 대출관련 분야는 7월 중 별도 공고 예정',
+    '핵심인재육성(우수인재, 특기적성):2026.8.10.(월) ~9.30.(수), 18:00까지', '선발분야·'];
+  eq('  한 이름표 아래 갈래 여럿(분야별 상이) → **가장 늦은 끝** 09-30 · 갈래별 시작이 달라 접수 시작일은 비운다 (세종이도인재)',
+    [dl(...sejong), od(...sejong)], ['2026-09-30', null]);
+  eq('    갈래가 하나만 읽히면 쓰지 않는다(다른 갈래의 끝이 더 늦을 수 있다)', dl(sejong[0], sejong[1], sejong[2], '선발분야·'), null);
+
+  /* ② 해 — 참고 연도 · 해 둘 */
+  eq('② 참고 연도(연간 소득·임금·원천징수·출생)는 해로 세지 않는다 — 「2025년도 선원월평균임금」 + 「2026년 2학기」 → 2026 하나',
+    ((r) => (r instanceof Set ? [...r] : r))(call(EX, 'yearsOf', '2026년 2학기 선원가족 장학생 선발 요강(변경)\n소득기준 2025년도 선원월평균임금 이하\n2025년도 근로소득원천징수영수증 1부')), ['2026']);
+  eq('  🔴 참고 연도 하나뿐인 글은 해 없는 `까지` 날짜에 그 해를 찍지 않는다(지난해 마감이 된다)',
+    dl('소득 기준 : 2025년도 연간 소득 기준 중위소득 100% 이하', '신청기간 : 10. 23.(금)까지'), null);
+  eq('  해가 둘이면 같은 글이 그 달·날을 해와 함께 적은 곳의 해를 쓴다 — 「4. 제출방법: 10/23(금)까지」 + 「2026.10.13 ~ 2026.10.23」 (연세 외수한일)',
+    dl('2026학년도 2학기 외수한일교류장학회 장학생 추천 안내', '2025년 선발 결과 안내', '2026.10.13 ~ 2026.10.23', '4. 제출방법: 10/23(금)까지 scholar2@yonsei.ac.kr로 제출'), '2026-10-23');
+  eq('  🔴 그런 해가 둘이면 고르지 않는다 — `2025. 10. 23.` 과 `05.10.23` 이 함께면 2025 도 2005 도 아니다(첫 승자로 고르던 잠복 버그)',
+    [call(EX, 'yearByMonthDay', '2025. 10. 23. 결과 발표 · 05.10.23 기준', 10, 23), call(EX, 'yearByMonthDay', '2026.10.13 ~ 2026.10.23', 10, 23)], [null, 2026]);
+
+  /* ③ PDF 글자층 칸 읽기 — 마감만 */
+  const seawon = ['2026년 2학기 선원가족 장학생 선발 요강(변경)', '소득기준                      2025년도 선원월평균임금 이하 (「한국선원통계연보」기준)',
+    '신청기간                                                                              ※ 재혼선원 배우자의 자녀일 경우 주민등록등본 추가',
+    '           기    간       9월 1일 ∼ 10월 30일     11월 中    당해 연도 학생당 2회 가능'].join('\n');
+  const ssu = ['2026학년도 2학기 특별장학금 신청 안내', '        장학금      신청 기간                            장학금액 및', '              2026.10.28(수) 9:00                  600,000원/인     청, 소득',
+    '                                     (SSUport)', '              ~ 11.10(화) 17:30                                   된 자'].join('\n');
+  eq('③ 글자층 칸 읽기 — 같은 줄 옆 칸(선원가족 「기    간 │ 9월 1일 ∼ 10월 30일」 · 2025년도 임금은 참고 연도) 10-30 · 아래 같은 열(숭실 「신청 기간」 열) 11-10',
+    [call(EX, 'columnDeadline', seawon), call(EX, 'columnDeadline', ssu)], ['2026-10-30', '2026-11-10']);
+  eq('  자간 벌린 낱글자는 한 칸 — 「기    간」 → 「기간」(자리는 그대로)', ((r) => (Array.isArray(r) ? r.map((c) => c.text) : r))(call(EX, 'layoutCells', '           기    간       9월 1일 ∼ 10월 30일')), ['기간', '9월 1일 ∼ 10월 30일']);
+  eq('  🔴 칸 읽기도 `근로기간` 칸은 아니다 · OCR 과 맞춰 보는 눈(달·날이 OCR 에도 있나)',
+    [call(EX, 'columnDeadline', seawon.replace('기    간', '근로기간')), call(EX, 'mentionsMonthDay', '9월 1일 ~ 10월 30일', '2026-10-30'), call(EX, 'mentionsMonthDay', '9월 1일 ~ 10월 23일', '2026-10-30')],
+    [null, true, false]);
+  const eeSrc = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));
+  eq('  칸 읽기는 첨부 마감에만 · 같은 파일 OCR 이 있으면 그 날이 OCR 에도 있어야 · 표식 「공고문 첨부(PDF 글자층)」',
+    /function columnDeadlineFromDocs[\s\S]*?mentionsMonthDay\(ocr, d\)/.test(eeSrc) && /'공고문 첨부\(PDF 글자층\)'/.test(eeSrc)
+      && !/columnDeadline/.test(eeSrc.slice(eeSrc.indexOf('function extractOpenDate'), eeSrc.indexOf('function extractOpenDate') + 200)), true);
+
+  /* ④ 껍데기 원문의 제목 줄 꼬리 — 가톨릭 선원가족 「…선발 안내(~10.30 접수기간 연장)」 */
+  const cuk = { name: '[학생지원팀] 2026년 2학기 한국선원복지고용센터 선원가족장학생 선발 안내' };
+  const cukRaw = ['[장학][학생지원팀] 2026년 2학기 한국선원복지고용센터 선원가족장학생 선발 안내(~10.30 접수기간 연장) | 가톨릭대학교',
+    '[학생지원팀] 2026년 2학기 한국선원복지고용센터 선원가족장학생 선발 안내(~10.30 접수기간 연장)', '조회수 120'].join('\n');
+  const head = call(EX, 'pageHeading', cuk, cukRaw);
+  eq('④ 껍데기 원문의 제목 줄(등록 제목 + 꼬리)을 찾고 꼬리 마감 10-30 을 읽는다 · 꼬리 없는 같은 제목 줄은 고친 제목이 아니다',
+    [head, call(EX, 'titleTailDeadline', head, '2026'), call(EX, 'pageHeading', cuk, `${cuk.name}\n조회수 3`)],
+    ['[학생지원팀] 2026년 2학기 한국선원복지고용센터 선원가족장학생 선발 안내(~10.30 접수기간 연장)', '2026-10-30', null]);
+  const noBody = eeSrc.slice(eeSrc.indexOf('if (!hasText(src)) {'), eeSrc.indexOf('const body = strip('));
+  eq('  첨부보다 **먼저** 읽고 출처는 「공고 원문 제목」 · 제목이 연장을 말하면 첨부 판정에 넘긴다',
+    noBody.indexOf('pageHeading(it') > 0 && noBody.indexOf('pageHeading(it') < noBody.indexOf('deadlineFromDocs(it') && /deadlineFromDocs\(it, undefined, heading/.test(noBody)
+      && EX.HEADING_LABEL === '공고 원문 제목', true);
+  const oldReq = '2026년 2학기 선원가족장학사업 선발 요강\n신청기간 : 2026. 9. 1.(월) ~ 10. 23.(목)';
+  eq('  🔴 연장 제목인데 연장·변경을 모르는 첨부(연장 전 요강)의 이른 마감은 안 읽는다 · `[변경]` 판 요강은 읽는다',
+    [call(EX, 'deadlineFromDocs', { id: 'x', name: '선원가족 장학생 모집 안내' }, [oldReq], '… 선발 안내(~10.30 접수기간 연장)'),
+      call(EX, 'deadlineFromDocs', { id: 'x', name: '선원가족 장학생 모집 안내(연장)' }, [oldReq.replace('요강', '요강[변경]').replace('10. 23.(목)', '10. 30.(목)')])],
+    [null, '2026-10-30']);
+
+  /* ⑤ OCR 기간 줄 오독 — 기간 줄에서만 */
+  const fixed = call(AT, 'ocrPeriodFix', '신청 기간 : 10.26~11. 0615:00까지[기한 엄수]\n신청기간 : 2026.10.15.(목)~]0.22.(목)\n합계 ~]0.22. 처리');
+  eq('⑤ OCR 기간 줄 — 「11. 0615:00」 → 「11. 06 15:00」(경희 공과대학 포스터) · 「~]0.22.」 → 「~10.22.」(강원 도전장학금) · 기간 줄이 아니면 그대로',
+    String(fixed).split('\n'), ['신청 기간 : 10.26~11. 06 15:00까지[기한 엄수]', '신청기간 : 2026.10.15.(목)~10.22.(목)', '합계 ~]0.22. 처리']);
+  eq('  고친 줄은 마감으로 읽힌다 (11-06 · 10-22)', [dl('2026학년도 공과대학 특성화 장학 프로그램 모집 공고', String(fixed).split('\n')[0]), dl(String(fixed).split('\n')[1])], ['2026-11-06', '2026-10-22']);
+
+  /* ⑤-1 OCR 금액 줄의 자릿수 관문 (2026-11-16 · 상명대 근로장학 auto-enoticedoarticleno770333) — 아래 줄은 collector/extracted 의 실제 두 판독
+     (elig-szl3lw-1.pdf.ocr.txt ↔ .pdf.txt · 세종이도 elig-cs08qg-1-2 · 포스터 elig-kkdaoq-1.png) 을 옮긴 것이다 */
+  {
+    const PA1 = createRequire(import.meta.url)('../parse-amount.js');
+    const smuOcr = ['5. 근로기간. 2026.12.21.(월)~2027.01.26.(금) / 주당 12시간', '6. 장학금액: 11500,000원/인당', '가. 1~8학기 재학중인 자 (조과 학기자 불가)'].join('\n');
+    const smuLay = ['5. 근로기간: 2026.12.21.(월)~2027.01.26.(금) / 주당 12시간', '', '6. 장학금액: 1,500,000원/인당', '7. 신청자격'].join('\n');
+    eq('⑤-1 🔴 쉼표 자릿수가 어긋난 OCR 금액(`11500,000` · `1,50,000` · `15000,00` · `1.000,000` · `5.845,264`)은 믿지 않는다 · 멀쩡한 꼴·쉼표 없는 꼴(`150만원` · `1.5억`)은 판정하지 않는다',
+      ['11500,000', '1,50,000', '15000,00', '1.000,000', '5.845,264', '1,500,000', '500,000', '150', '1.5'].map((n) => call(AT, 'malformedMoney', n)),
+      [true, true, true, true, true, false, false, false, false]);
+    eq('  상명대 OCR 줄 `6. 장학금액: 11500,000원/인당` 은 같은 PDF 글자층의 그 이름표 줄 하나(`1,500,000원`)로 · 다른 줄은 그대로',
+      call(AT, 'ocrMoneyCheck', smuOcr, smuLay), ['5. 근로기간. 2026.12.21.(월)~2027.01.26.(금) / 주당 12시간', '6. 장학금액: 1,500,000원/인당', '가. 1~8학기 재학중인 자 (조과 학기자 불가)'].join('\n'));
+    eq('  🔴 못 맞추면 그 줄을 뺀다 — 글자층 없음(포스터 `학기 당 2000,000원`) · 이름표가 다른 줄 · 이름표 줄이 둘 · 금액이 두 자 이상 다름 · 금액 밖 숫자가 다름 · 한글이 다름',
+      [call(AT, 'ocrMoneyCheck', '- 장학금액: 학기 당 2000,000원\n문의 : 장학팀', ''),
+        call(AT, 'ocrMoneyCheck', '6. 장학금액: 11500,000원/인당', '6. 지원금액: 1,500,000원/인당'),
+        call(AT, 'ocrMoneyCheck', '6. 장학금액: 11500,000원/인당', '6. 장학금액: 1,500,000원/인당\n※ 장학금액: 2,000,000원/인당'),
+        call(AT, 'ocrMoneyCheck', '6. 장학금액: 11500,000원/인당', '6. 장학금액: 150,000원/인당'),
+        call(AT, 'ocrMoneyCheck', '6. 장학금액: 11500,000원/인당', '7. 장학금액: 1,500,000원/인당'),
+        call(AT, 'ocrMoneyCheck', '6. 장학금액: 11500,000원/인당', '6. 장학금액: 1,500,000원/학기 등록금 감면')],
+      ['문의 : 장학팀', '', '', '', '', '']);
+    eq('  대조군 — 멀쩡한 OCR 금액(`1,500,000원` · `150만원`)과 금액 아닌 쉼표(`2,3학년` · `1,500,0002`)는 글자층과 달라도 손대지 않는다',
+      [call(AT, 'ocrMoneyCheck', '6. 장학금액: 1,500,000원/인당', '6. 장학금액: 2,000,000원/인당'), call(AT, 'ocrMoneyCheck', '장학금액 : 150만원', ''),
+        call(AT, 'ocrMoneyCheck', '4년제 대학교 학부 2,3학년 10명 내외\n(대학생) 1,500,0002', '')],
+      ['6. 장학금액: 1,500,000원/인당', '장학금액 : 150만원', '4년제 대학교 학부 2,3학년 10명 내외\n(대학생) 1,500,0002']);
+    eq('  세종이도 OCR `(대학생) 1.000,000원` 줄 — 같은 이름표 줄이 글자층에 하나면 그 줄로 · `(인당 지원액)` 처럼 둘이면 뺀다',
+      [call(AT, 'ocrMoneyCheck', '- (중학생) 600,000원 / (고등학생) 900,000원 / (대학생) 1.000,000원', '   - (중학생) 600,000원 / (고등학생) 900,000원 / (대학생) 1,000,000원'),
+        call(AT, 'ocrMoneyCheck', '○ (인당 지원액) 1.000,000원', '❍ (인당 지원액) 700,000원\n❍ (인당 지원액) 학교급별 상이')],
+      ['- (중학생) 600,000원 / (고등학생) 900,000원 / (대학생) 1,000,000원', '']);
+    /* 배선 — 첨부 글자를 읽는 한 곳(attachmentText)이 OCR PDF 에 글자층을 맞춘다: 금액 로봇·발췌기·카드 읽기가 같은 글자를 본다 */
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ocrmoney-'));
+    const put = (f, body) => fs.writeFileSync(path.join(tmp, f), body);
+    put('a.pdf', '%PDF'); put('a.pdf.ocr.txt', smuOcr); put('a.pdf.txt', smuLay);
+    put('b.png', 'png'); put('b.png.ocr.txt', '장학금 안내\n- 장학금액: 학기 당 2000,000원\n신청기간 : 11.1~11.20');
+    put('c.hwp', 'hwp'); put('c.hwp.body.txt', '6. 장학금액: 11500,000원/인당');
+    const txt = (f) => call(AT, 'attachmentText', path.join(tmp, f));
+    const amt = (t) => { const r = PA1.amountFrom(String(t).split('\n').map((s) => s.trim()).filter(Boolean)); return [r.kind, r.value]; };
+    eq('  배선 — attachmentText 가 OCR PDF 를 글자층과 맞춰 금액 로봇이 150만원을 읽는다 · 글자층 없는 그림은 금액 모름(그 줄이 발췌로도 안 나간다) · HWP 글자는 손대지 않는다',
+      [amt(txt('a.pdf')), amt(txt('b.png')), /2000,000/.test(txt('b.png')), txt('c.hwp')],
+      [['fixed', 1500000], ['unknown', 0], false, '6. 장학금액: 11500,000원/인당']);
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+
+  /* ⑥ 공고문 첨부 고르기 한 곳 — noticeDocFiles */
+  eq('⑥ 「…공고문(신청서 포함).hwpx」 는 공고문 · 「장학금 신청서(서약서 포함).hwp」·「…신청서.hwp」 는 아니다',
+    ['붙임1. 2026년 장학생 선발 공고문(신청서 포함).hwpx', '장학금 신청서(서약서 포함).hwp', '2026년 2학기 선원가족장학사업 신청서.hwp'].map((n) => AT.isNoticeDoc(n)), [true, false, false]);
+  {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ndoc-'));
+    const put = (f, body) => fs.writeFileSync(path.join(tmp, f), body);
+    put('elig-a-1.png', 'poster'); put('form-a-1.hwpx', 'NOTICE-WITH-FORM'); put('form-a-2.hwp', 'FORM'); put('form-a-3.hwp', 'poster');
+    put('form-b-1.hwp', 'OTHER-NOTICE'); put('form-c-1.hwp', 'TITLE-MATCH');
+    fs.writeFileSync(path.join(tmp, 'elig-docs.json'), JSON.stringify({ A: { files: ['elig-a-1.png'] } }));
+    fs.writeFileSync(path.join(tmp, 'forms-index.txt'), [
+      'form-a-1.hwpx\t선발 안내\t붙임1. 2026년 장학생 선발 공고문(신청서 포함).hwpx\t10\tA',
+      'form-a-2.hwp\t선발 안내\t2026 장학금 신청서.hwp\t10\tA',
+      'form-a-3.hwp\t선발 안내\t2026 장학생 선발 공고(사본).hwp\t10\tA',
+      'form-b-1.hwp\t선발 안내\t2026 장학생 선발 공고.hwp\t10\tB',
+      'form-c-1.hwp\t2026년도 국가유산진흥원 우수 장학생 선발 안내\t1.2026년 국가유산진흥원 우수 장학생 선발 공고.hwp\t10'].join('\n'));
+    const idx = call(AT, 'loadNoticeDocIndex', tmp);
+    const C = { id: 'C', name: '2026년도 국가유산진흥원 우수 장학생 선발 안내', attachments: [{ name: '1.2026년 국가유산진흥원 우수 장학생 선발 공고.hwp' }] };
+    eq('  신청서 쪽 공고문을 더한다 · 신청서만인 파일·다른 공고(id 가 다른 줄)·같은 바이트 사본은 뺀다 · 공고문이 먼저(docOrder)',
+      call(AT, 'noticeDocFiles', { id: 'A' }, { index: idx }), ['form-a-1.hwpx', 'elig-a-1.png']);
+    eq('  id 칸 없는 옛 줄은 같은 제목 + 그 공고의 첨부 이름일 때만 · formPath:false 면 자격 색인만',
+      [call(AT, 'noticeDocFiles', C, { index: idx, sameTitle: DU.sameTitle }), call(AT, 'noticeDocFiles', { ...C, attachments: [] }, { index: idx, sameTitle: DU.sameTitle }),
+        call(AT, 'noticeDocFiles', C, { index: idx }), call(AT, 'noticeDocFiles', { id: 'A' }, { index: idx, formPath: false })],
+      [['form-c-1.hwp'], [], [], ['elig-a-1.png']]);
+    /* 이 파일은 양식 로봇 사본 관문(「양식 변환 로봇의 두 스위치」)이 몇 파일만 복사해 돌린다 — 무거운 import 를 들이면 그 관문이 넘어진다 */
+    eq('    attachment-text.mjs 는 이웃 모듈을 pdf-text.mjs 하나만 불러온다(같은 제목 판정은 부르는 쪽이 넘긴다)',
+      [...readText(new URL('../collector/attachment-text.mjs', import.meta.url)).matchAll(/^import .* from '\.\/([^']+)'/gm)].map((m) => m[1]), ['pdf-text.mjs']);
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+  const amSrc = readText(new URL('../collector/extract-amounts.mjs', import.meta.url));
+  eq('  🔴 발췌기·금액 로봇은 색인 파일을 직접 열지 않는다(noticeDocFiles 한 곳) · 서류 목록·금액·자격은 formPath:false(넓혔을 때 달서 80만원 · 자격 줄이 서류에 섞였다)',
+    [/elig-docs\.json/.test(eeSrc), /elig-docs\.json/.test(amSrc), /noticeDocFiles\(it, \{ formPath: false \}\)/.test(amSrc),
+      (eeSrc.match(/fillDocuments\(it, (?:body|null), docsOnce\(it, false\)\)/g) || []).length, /function qualFromDocs[\s\S]*?noticeDocFiles\(it, \{ formPath: false \}\)/.test(eeSrc)],
+    [false, false, true, 2, true]);
+
+  /* ⑦ 발췌 — 문장 가르기 · 이름표 · 첨부 발췌 */
+  eq('⑦ 날짜의 점에서 자르지 않는다 · 항목 번호 앞에서 자르고 번호는 남긴다 (서울과기대 「4. 신청기간 : 2026.10.1.(목) ~ 10. 14.(수) 18:00까지」 가 「~ 10.」 에서 잘렸다)',
+    call(EX, 'splitSentences', '4. 신청기간 : 2026.10.1.(목) ~ 10. 14.(수) 18:00까지 5. 장학금액 : 1인당 100만원(최대1학기만 지원)'),
+    ['4. 신청기간 : 2026.10.1.(목) ~ 10. 14.(수) 18:00까지', '5. 장학금액 : 1인당 100만원(최대1학기만 지원)']);
+  eq('  🔴 한글 항목 기호는 가 나 다 … 하 열넷뿐 — 「300만 원)」 의 `원)` 은 항목이 아니다 · 칸 벌린 날짜 「09:00 – 11 . 18.」 는 한 덩어리',
+    [call(EX, 'splitSentences', '장학금액 : 300만 원) 다. 신청기간: 9. 1. ~ 9. 30.'), call(EX, 'splitSentences', '신청기간 : 2026 년 11 월 4 일 09:00 – 11 . 18.(수) 17:00')],
+    [['장학금액 : 300만 원)', '다. 신청기간: 9. 1. ~ 9. 30.'], ['신청기간 : 2026 년 11 월 4 일 09:00 – 11 . 18.(수) 17:00']]);
+  eq('  새 이름표(모집기간·접수처) · 같은 줄은 한 번 · 바닥글 연락처 띠·첨부 파일 이름 줄은 안 담는다',
+    EX.extractFrom(['모집기간: 10.26(월) ~11.9(월)', '- 각 분야별 신청마감일 18:00 까지 도착한 서류만 인정', '- 각 분야별 신청마감일 18:00 까지 도착한 서류만 인정',
+      '(우)02841 서울특별시 성북구 안암로 145 대표전화 02-3290-1114 문의처 장학팀', '붙임1. 2026년 신청기간 안내.hwp', '▷ 접수처 : www.ybz.or.kr/'].join('\n')),
+    ['모집기간: 10.26(월) ~11.9(월)', '- 각 분야별 신청마감일 18:00 까지 도착한 서류만 인정', '▷ 접수처 : www.ybz.or.kr/']);
+  eq('  첨부 발췌는 이름표와 값의 짝이 맞을 때만 — 선원가족 OCR 「신청기간 : ※재혼선원배우자의 자녀일 경우 …」 · 깨진 메일 · 옆 칸 꼬리 「금액) 지급하며」 는 버린다',
+    ['신청기간 : ※재혼선원배우자의 자녀일 경우 주민등록등본 추가1부', '- 신청방법: 이메일 접수(/4111</0/(@히04.80.1[)', '금액) 지급하며 실 납부금액이 100만원 미만일 시 지원 대상 제외',
+      '신청기간 : 2026.10.15.(목)~10.22.(목)', '문의 : 이메일 forest.talent@kfas.or.kr'].map((l) => call(EX, 'docExcerptOk', l)), [false, false, false, true, true]);
+  /* OCR 줄의 주소는 PDF 글자층과 맞춰 본다 (2026-11-16 · 리뷰) — 아래 줄은 collector/extracted 의 실제 두 판독(.ocr.txt ↔ .pdf.txt)을 옮긴 것
+     (한국건설교통신기술협회 요강 elig-mijtko-1 · 강원 브랜드장학금 elig-aycfh2-1 · 열린장학재단 elig-1jkpzc-1) */
+  const kcnaOcr = ['○ 신청기간 : 2026. 11. 5(목) ~ 11. 18(수) 24:00(자정)', '○ 신청방법 : 이메일(<0080008.07.14) 및 우편(등기)', '※ 우편접수는 마감일 소인분까지 유효', '협회 서식 |@ 자기소개서 공백 포함 1.500자 이내'].join('\n');
+  const kcnaLayer = ['ㅇ 신청기간 : 2026. 11. 5(목) ~ 11. 18(수) 24:00(자정)', 'ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편(등기)'].join('\n');
+  eq('  🔴 OCR 줄의 메일·누리집 주소는 같은 PDF 글자층의 같은 이름표 줄로 — 깨진 줄(`이메일(<0080008.07.14)`·`Gnjael.gwd@`·`wwwybzor.kr/`)을 원문이라 보이지 않는다',
+    [call(EX, 'crossCheckOcr', kcnaOcr, kcnaLayer),
+      call(EX, 'crossCheckOcr', '○ (신청방법) 서류 구비 후 이메일 Gnjael.gwd@gmail.com) 접수', '❍ (신청방법) 서류 구비 후 이메일(injae1.gwd@gmail.com) 접수'),
+      call(EX, 'crossCheckOcr', '[> 접수처 : wwwybzor.kr/', '▷ 접수처 : www.ybz.or.kr/')],
+    [['○ 신청기간 : 2026. 11. 5(목) ~ 11. 18(수) 24:00(자정)', 'ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편(등기)', '※ 우편접수는 마감일 소인분까지 유효', '협회 서식 |@ 자기소개서 공백 포함 1.500자 이내'].join('\n'),
+      '❍ (신청방법) 서류 구비 후 이메일(injae1.gwd@gmail.com) 접수', '▷ 접수처 : www.ybz.or.kr/']);
+  eq('    맞출 글자층 줄이 없으면 OCR 줄 그대로(지우지 않는다) · 동그라미 숫자를 읽은 `@)-1`·`|@` 서류 줄과 멀쩡한 주소 줄은 그대로 · 주소가 같으면 OCR 그대로',
+    [call(EX, 'crossCheckOcr', ['[> 접수처 : wwwybzor.kr/', '@)-1 주민등록초본(전체 주소이력) 대학생', '문의 : forest.talent@kfas.or.kr'].join('\n'), ''),
+      call(EX, 'crossCheckOcr', '○ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편', kcnaLayer)],
+    [['[> 접수처 : wwwybzor.kr/', '@)-1 주민등록초본(전체 주소이력) 대학생', '문의 : forest.talent@kfas.or.kr'].join('\n'), '○ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편']);
+  /* 2차 리뷰 (2026-11-16) — 짐작한 이름표로 바꾸면 남의 줄이 들어온다. 아래는 collector/extracted 의 실제 두 판독(.ocr.txt ↔ .pdf.txt) 그대로
+     (세종이도인재 elig-cs08qg-1-1 · 디딤돌 elig-14do6t-1 · DAAD elig-1c8rvi-1) */
+  const cs08Ocr = ['(https://www.gov.kr)', '(https://www.nhis.or.kr)', '(https://www.kosaf.go.kr) 2026년1학기 기준', '(https://www.bokjiro.go.kr)'].join('\n');
+  const cs08Layer = ['류 ⑤ 주민등록등본            (https://www.gov.kr)', '                       (https://efamily.scourt.go.kr)   (주민등록등본상 가족관계가 확인이 안될 시 제출)',
+    '      확인서              (https://www.nhis.or.kr)         건강보험료 납부자', '      통지서              (https://www.kosaf.go.kr)', '                       (https://www.bokjiro.go.kr)'].join('\n');
+  const didimOcr = ['(https://www.kosaf.go.kr) 2026년1학기 기준', '(https://www.kosaf.go.kr) 학자금 원금상환 지원', '(https://hometax.go.kr)'].join('\n');
+  const didimLayer = ['                          (https://www.gov.kr)             - 세종시 1년 이상 계속 거주 상태를 확', '                          (https://www.kosaf.go.kr)',
+    '       증명서                (https://hometax.go.kr)            만 제출'].join('\n');
+  const daadOcr = ['E-Mail: na@daad.de', 'E-Mail: info@daad-korea.org'].join('\n');
+  const daadLayer = ['                                                                         E-Mail: na@daad.de', '                                                                         E-Mail: info@daad-korea.org'].join('\n');
+  eq('  🔴 주소의 `https:` 는 이름표가 아니다 · 되풀이되는 이름표(`E-Mail:`)는 못 맞춘다 · 주소 뺀 한글이 다르면 남의 줄이다 — OCR 줄 그대로 (efamily.scourt·거주 상태를 확·na@daad.de 가 들어왔다)',
+    [call(EX, 'crossCheckOcr', cs08Ocr, cs08Layer), call(EX, 'crossCheckOcr', didimOcr, didimLayer), call(EX, 'crossCheckOcr', daadOcr, daadLayer),
+      call(EX, 'crossCheckOcr', 'E-Mail: info@daad-korea.org', 'E-Mail: na@daad.de'),
+      call(EX, 'crossCheckOcr', '○ 신청방법 : 이메일(<0080008.07.14) 및 우편(등기)', 'ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 방문 접수 불가 · 신청서는 협회 누리집에서 내려받기'),
+      call(EX, 'crossCheckOcr', '○ 신청방법 : 이메일(<0080008.07.14) 및 우편(등기)', ['ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편(등기)', 'ㅇ 신청방법 : 이메일(other@kcna.or.kr) 및 우편(등기)'].join('\n'))],
+    [cs08Ocr, didimOcr, daadOcr, 'E-Mail: info@daad-korea.org', '○ 신청방법 : 이메일(<0080008.07.14) 및 우편(등기)', '○ 신청방법 : 이메일(<0080008.07.14) 및 우편(등기)']);
+  /* 실제 OCR 줄(맞출 글자층 없음) — 경희 생명 elig-sg3z3s-1.jpg · 공과대학 elig-qkhdcb-1.jpg · 선원가족 form-1oeo0o-3.pdf */
+  const sgLine = '서류접수 기간 ㆍ 2026년 10월 1일(목)ㅡ10월 30일(금) 서류 제출 ㆍ)7@)176310103「6.007 생물정보학, 면역학, 유전제학, 세포생물학,';
+  const qkLine = '신청방법 : 공과대학이메일(khwc5770@khu,ac.kr)제출';
+  const seaman = ['1-@) 한국장학재단에 회원가입 후 고객번호(10자리) 기재(문의처: 한국장학재단 1599-2071)', '2-@ 연락처는 반드시 연락가능한 번호 기재', '2-@ 입금계좌정보는 반드시 선원 또는 부모님', '3-@ “전화번호 및 팩스번호“는 학교 행정실(서무실)로 기재'].join('\n');
+  eq('  🔴 줄을 지우지 않는다 — 마감·신청 방법·서류 안내 줄이 깨진 꼴(`7@)`·`@khu,ac`·`1-@)`) 하나로 사라졌다 · 그 줄의 날짜는 그대로 읽힌다',
+    [call(EX, 'crossCheckOcr', sgLine, ''), call(EX, 'crossCheckOcr', qkLine, ''), call(EX, 'crossCheckOcr', seaman, ''),
+      EX.extractDeadline(call(EX, 'crossCheckOcr', '서류접수 기간 : 2026년 10월 1일(목)~10월 30일(금) 서류 제출 ㆍ)7@)176310103', ''))],
+    [sgLine, qkLine, seaman, '2026-10-30']);
+  eq('    깨진 주소가 남은 줄은 접수 메일 근거·첨부 발췌로 쓰지 않는다(자르지도 고치지도 않는다) · `1-@)`·`7@)` 는 동그라미 숫자 · `www2.` 는 멀쩡하다',
+    [call(EX, 'applyEmailFromDocs', {}, [qkLine]), call(EX, 'applyEmailFromDocs', {}, ['신청방법 : 이메일(abc@gmail.co,kr) 접수']),
+      call(EX, 'applyEmailFromDocs', {}, ['신청방법 : 이메일(abc@gmail.com) 접수']).email,
+      call(EX, 'docExcerptOk', qkLine), call(EX, 'docExcerptOk', '제출서류 _ 소정양식은 홈페이지 (wwwsamwonsfor.kr) 참조'),
+      ['1-@) 한국장학재단', '서류 제출 ㆍ)7@)17', 'khwc5770@khu,ac.kr', 'wwwybzor.kr/', 'www2.khu.ac.kr'].map((l) => (EX.ADDR_BROKEN ? EX.ADDR_BROKEN.test(l) : '(없음)'))],
+    [null, null, 'abc@gmail.com', false, false, [false, false, true, true, false]]);
+  /* 3차 리뷰 (2026-11-16) — OCR 이 **한글 자체를** 영문 찌꺼기로 읽은 줄. 아래는 collector/extracted 의 실제 두 판독 그대로
+     (한국지도자육성장학재단 elig-1ou26f-1 · 하이패스 장학 elig-176ryo-1 · 삼원 elig-lwbap6-1) */
+  const kosfflOcr = '다. 제출처 : StH A) EAS AAS A Ct (http://Awww.kosffl.or.kr, 02-595-6817)';
+  const kosfflLay = ' 다. 제출처 : 한국지도자육성장학재단(http://www.kosffl.or.kr, 02-595-6817)';
+  eq('  🔴 한글을 영문 찌꺼기로 읽은 OCR 줄은 글자층 줄로(이름표 하나뿐 · OCR 한글이 전부 글자층에 · 찌꺼기 자리 · 숫자 같음 · 주소 아주 닮음) — 하나라도 어긋나면 OCR 줄 그대로',
+    [call(EX, 'crossCheckOcr', ['가. 제출기한 : 2026. 10. 31.(금)', kosfflOcr].join('\n'), ['가. 제출기한 : 2026. 10. 31.(금)', kosfflLay].join('\n')),
+      call(EX, 'crossCheckOcr', kosfflOcr, kosfflLay.replace('6817', '6818')),                                   // 전화 번호가 다르다
+      call(EX, 'crossCheckOcr', kosfflOcr.replace('StH', '협회 StH'), kosfflLay),                               // OCR 이 글자층에 없는 한글(협회)을 가졌다
+      call(EX, 'crossCheckOcr', kosfflOcr.replace('Awww.kosffl', 'Awww.kosaf'), kosfflLay.replace('www.kosffl', 'www.kosaf.go.kr/other')),   // 주소가 덜 닮았다
+      call(EX, 'crossCheckOcr', kosfflOcr, kosfflLay.replace('재단(', '재단 KLF(')),                             // 글자층 줄에도 영문이 있다 — 찌꺼기 자리를 못 가린다
+      call(EX, 'crossCheckOcr', kosfflOcr, [kosfflLay, ' 다. 제출처 : 한국장학재단(http://www.kosaf.go.kr, 1599-2000)'].join('\n')),   // 이름표가 둘
+      call(EX, 'crossCheckOcr', '다. 제출처 : 한국 (http://Awww.kosffl.or.kr, 02-595-6817)', kosfflLay)],      // 찌꺼기가 없다(빠진 한글만) — 같은 줄이라 할 근거가 없다
+    [['가. 제출기한 : 2026. 10. 31.(금)', '다. 제출처 : 한국지도자육성장학재단(http://www.kosffl.or.kr, 02-595-6817)'].join('\n'),
+      kosfflOcr, kosfflOcr.replace('StH', '협회 StH'), kosfflOcr.replace('Awww.kosffl', 'Awww.kosaf'), kosfflOcr, kosfflOcr, '다. 제출처 : 한국 (http://Awww.kosffl.or.kr, 02-595-6817)']);
+  eq('    🔴 못 맞춘 찌꺼기 줄은 첨부 발췌로 보이지 않는다(찌꺼기가 붙은 `Awww.`·영문 찌꺼기 줄) · 약어 줄·기록 줄·영문이 낀 멀쩡한 줄은 그대로 · 이름표 없는 삼원 OCR 줄은 바꾸지 않는다',
+    [kosfflOcr, 'ㆍ발급처 : 한국장학재단 SH 0A] Wwww.kosaf.go.kr)', '다. 제출처 : 한국 StH A EAS Ct 재단',
+      '다. 제출처 : 한국지도자육성장학재단(http://www.kosffl.or.kr, 02-595-6817)', '-주요 방송사: EBS, KBS, MBC, SBS', '4×400mR 1위, 4×100mR 2위, 100m 1위',
+      '어학 : TOEIC 800점 이상 또는 TOEFL iBT 90점 이상', '(2) 담당자 : 김대호팀장(010-7182-3150) E-mail : dh_kim@samwonpaper.com', '(3) 홈페이지 : www.samwonsf.or.kr']
+      .map((l) => call(EX, 'docExcerptOk', l))
+      .concat([call(EX, 'crossCheckOcr', '6) 제출서류 _ 소정양식은 홈페이지 (wwwsamwonsfor.kr) 참조', '6) 제출서류 _ 소정양식은 홈페이지 (www.samwonsf.or.kr) 참조')]),
+    [false, false, false, true, true, true, true, true, true, '6) 제출서류 _ 소정양식은 홈페이지 (wwwsamwonsfor.kr) 참조']);
+  eq('    배선 — 첨부 글자를 읽는 자리(docTexts)가 OCR 첨부에 글자층을 맞춘다 · OCR 첨부에서 읽은 접수 메일은 다시 읽는다',
+    [/const t = isOcrSource\(p\) \? crossCheckOcr\(t0, pdfLayerText\(p\)\) : t0;/.test(eeSrc), /it\.applyEmail && \/\^공고문 첨부\\\(OCR\\\)\/\.test\(it\.applyEmailFrom/.test(eeSrc)], [true, true]);
+  const bodyPart = eeSrc.slice(eeSrc.indexOf('const body = strip('));
+  eq('  첨부 발췌는 두 갈래(본문에서 0줄 · 껍데기) 모두 · 본문은 제목 줄부터(제목 앞 다른 글 띠 — 가천 「FGD 참여학생 모집 ○ 신청기간」)',
+    [/excerptsFromDocs\(docs\(\)\)/.test(noBody), /if \(!ex\.length\) \{ const dx = excerptsFromDocs\(docs\(\)\)/.test(bodyPart), /let ex = excerptsFromBody\(body, it(?:, own\.text)?\)/.test(bodyPart)], [true, true, true]);
+
+  /* ⑧ 자격 절 */
+  const kmu = ['◤ 1. 지원자격', '2026 학년도 현재 국민대학교에 재학 중인 여성 외국인 학생 ( 학부생 / 대학원생 ) 중 평점 평균이 4.0 이상으로 지도자로서의 품성을 갖추고 가정형편이 어려운 학생',
+    '◤ 2. 장학금액 및 선발인원', '300 만원 지급 , 1 명', '◤ 3. 장학생 선발방법', '가 . 1 차 : 서류 및 에세이 (Essay) 심사'];
+  eq('⑧ 「◤ 2. 장학금액 및 선발인원」 에서 자격 절이 끝난다 (국민대 글로벌 여성리더 — 금액·선발방법 줄이 자격에 딸려 왔다)',
+    EX.extractQualifyLines(kmu.join('\n')), kmu.slice(0, 2));
+  eq('  section-head 가 `◤` 를 떼고 본다 — 금액 머리 · 다른 절(선발방법) · 자격 머리',
+    [SH.isAmountHead('◤ 2. 장학금액 및 선발인원'), SH.isSectionBreak('◤ 3. 장학생 선발방법'), SH.isQualifyHead('◤ 1. 지원자격')], [true, true, true]);
+  eq('  `지원내역 :` 도 금액 머리다', SH.isAmountHead('3. 지원내역 : 1인 300만원'), true);
+  eq('  🔴 `응시대상자 :` 는 자격 절 제목이 아니다(시험 안내) · 줄 머리 「■ 대 상 자 :」 는 그대로',
+    [EX.extractQualifyLines(['- 응시대상자 : 2026학년도 재학생 중 1단계 합격자', '- 시험일 : 2026. 10. 3.(토)'].join('\n')).length,
+      EX.extractQualifyLines(['■ 대 상 자 : 2026학년도 2학기 재학생 중 직전학기 평점 3.0 이상인 자', '■ 신청기간 : 2026. 10. 1. ~ 10. 8.'].join('\n')).length], [0, 1]);
+  eq('  줄 머리 「2.대상자및 장학금액」(장학사정관 포스터 OCR)은 자격 절 제목 · 문장 가운데 「…차상위계층대상자 및 …」 는 아니다',
+    [EX.extractQualifyLines(['2.대상자및 장학금액', ':국가장학금 미수혜자 중 직전학기 12학점 이상 이수한 재학생', '3.신청기간 : 11.1~11.8'].join('\n')),
+      EX.extractQualifyLines(['1. 지급목적', ':기초생활수급자, 차상위계층대상자 및 한부모 재학생을 지원', '2. 신청방법 : 포털'].join('\n')).length],
+    [[':국가장학금 미수혜자 중 직전학기 12학점 이상 이수한 재학생'], 0]);   // 제목 줄 자체는 금액 낱말(장학금액) 때문에 담지 않는다 — 그 아래 요건이 담긴다
+
+  /* ⑨ 「부터」 범위 (2026-11-16 · 인석장학회 — 시작일 11-18 을 마감으로 읽어 11-26 까지 받는 공고가 일찍 닫힐 뻔했다) */
+  const insuk = '1）지원서 제출 기한 : 2026. 11. 18（수）오전 10시부터 2026. 11. 26.（목） 오후 4시까지 인석장학회 홈페이지 온라인 접수';
+  eq('⑨ 「…11. 18（수）오전 10시부터 2026. 11. 26.（목） 오후 4시까지」 → 마감 11-26 · 접수 시작 11-18 (인석장학회 · 한양 공고 꼴도)',
+    [dl(insuk), od(insuk), dl('1. 지원서 제출기한 : 2026년 11월 18일 오전 10시부터 2026년 11월 26일 오후 4시까지 홈페이지 온라인 접수')],
+    ['2026-11-26', '2026-11-18', '2026-11-26']);
+  eq('  🔴 「부터」 뒤에 날짜가 없으면 예전 그대로 — 「신청기간 : 2026. 8. 10.부터 접수」 는 그날 · 접수 시작일은 없다',
+    [dl('신청기간 : 2026. 8. 10.부터 접수'), od('신청기간 : 2026. 8. 10.부터 접수')], ['2026-08-10', null]);
+  eq('  로봇이 본문에서 읽어 둔 마감은 그 근거 문장을 지금 규칙으로 다시 읽는다 — 사람·첨부 표식과 못 읽는 문장은 그대로',
+    [call(EX, 'recheckQuotedDeadline', { deadline: '2026-11-18', deadlineFrom: `공고 원문 · ${insuk}` }),
+      call(EX, 'recheckQuotedDeadline', { deadline: '2026-11-18', deadlineFrom: `관리자 2026-11-16 · ${insuk}` }),
+      call(EX, 'recheckQuotedDeadline', { deadline: '2026-11-18', deadlineFrom: '공고 원문 · 2026. 11. 18（수）오전 10시부터' }),
+      call(EX, 'recheckQuotedDeadline', { deadline: '2026-11-26', deadlineFrom: `공고 원문 · ${insuk}` })],
+    ['2026-11-26', null, null, null]);
+
+  /* ⑩ 사이트 띠 줄 (2026-11-16 · 리뷰 — 가천 장학공지 매 쪽 머리의 「…FGD 참여학생 모집 ○ 신청기간: 2026.11.05.(목) ~ 11.18.(수)」 띠가
+     네 공고의 마감 11-18 이 됐다 · 진짜 마감 11-11·11-12·11-15·11-16). 아래 줄은 저장 원문(notices-text.json 가천 126826·영남 231554919)을 옮긴 것 */
+  const fgd = ['2026년 가천대학교 재학생 심층면접토론(FGD) 참여학생 모집', '○ 신청기간: 2026.11.05.(목) ~ 11.18.(수)'];
+  const gPage = (no, title, rest) => ({ url: `https://www.gachon.ac.kr/bbs/kor/478/${no}/artclView.do`, title, text: ['상단배너( 3 개)', ...fgd, String(no), title, ...rest].join('\n') });
+  const gaPages = [
+    gPage(126826, '[글로벌] 2026-2학기 일반 교내 및 교외 국가근로장학생 추가 모집(2차) 안내', ['2026.11.06', '3. 신청기간 : 2026. 11. 6.(금), 15:00 ~ 11. 11.(수), 12:00 (기한엄수)']),
+    gPage(126768, '[공통] 2026-2학기 외국인 장학금 추가 신청(최종)', ['2026.11.05', '1. 신청 기간', '2026년 11월 5일(목) ~ 11월 16일(월)']),
+    gPage(126763, '[메디컬] 인천광역시체육회 제45회 체육장학생 신청 안내', ['5. 신청기간: ~ 2026.11.12.(목) 12:00 까지'])];
+  /* 영남대 세 공고는 진짜로 같은 신청기간 줄을 **제목 뒤에** 싣는다 · 부산 원스톱 한 글은 주소 꼴만 달리해 세 벌 저장된다(서로 다른 글 셋이 아니다) */
+  const yuLine = '가. 신청기간: 2026. 9. 7.(월) 10:00 ~ 11. 20.(금) 17:00까지';
+  const yPage = (no, title) => ({ url: `https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=${no}`, title, text: ['장학공지', title, '3. 신청안내', yuLine].join('\n') });
+  const yuPages = [yPage(231554919, '2026-2학기 다문화가정 장학금 신청 안내'), yPage(231554921, '2026-2학기 3대 동문가족 특별장학금 신청 안내'), yPage(231554923, '2026-2학기 천마가족장학금 신청 안내')];
+  const puLine = '2. 신청 기간 : 2026. 10. 30.(금) 9시 ~ 11. 12.(목) 18시까지';
+  const puTitle = '2026년도 2학기 국가근로장학금 동계방학 집중근로(교외) 신청 안내';
+  const puPages = ['&seq=705', '#n-1', '&pageNo=2#n-1'].map((q) => ({ url: `https://onestop.pusan.ac.kr/page?menuCD=000000000000062${q}`, title: puTitle, text: [puLine, puTitle].join('\n') }));
+  const chromeMap = call(EX, 'siteChromeFrom', [...gaPages, ...yuPages, ...puPages]);
+  const setOf = (h) => (chromeMap instanceof Map && chromeMap.get(h)) || new Set();
+  const ownOf = (p, host) => call(EX, 'ownBody', p.text, { name: p.title }, setOf(host));
+  const gaOwn = gaPages.map((p) => ownOf(p, 'www.gachon.ac.kr'));
+  const banner = `공고 원문 · ${fgd.join(' ')}`;
+  eq('⑩ 🔴 제목 앞 사이트 띠 줄(같은 호스트의 서로 다른 글 셋 이상)은 마감 근거가 아니다 — 가천 세 공고가 제 마감을 읽는다 · 띠 근거로 들어간 마감은 띠를 걷은 본문에서 다시 읽는다',
+    [gaOwn.map((o) => call(EX, 'extractDeadline', (o && o.text) || '')),
+      gaPages.map((p, i) => call(EX, 'recheckQuotedDeadline', { deadline: '2026-11-18', deadlineFrom: banner }, gaOwn[i]))],
+    [['2026-11-11', '2026-11-16', '2026-11-12'], ['2026-11-11', '2026-11-16', '2026-11-12']]);
+  eq('  띠를 모르면(빈 Set)·제목 줄을 못 찾으면 예전 그대로 · 띠가 아닌 근거 문장은 그 문장만 다시 읽는다',
+    [call(EX, 'extractDeadline', call(EX, 'ownBody', gaPages[0].text, { name: gaPages[0].title }, new Set()).text),
+      call(EX, 'ownBody', gaPages[0].text, { name: '전혀 다른 제목의 장학금 신청 안내문입니다' }, setOf('www.gachon.ac.kr')).chrome.length,
+      call(EX, 'recheckQuotedDeadline', { deadline: '2026-11-18', deadlineFrom: `공고 원문 · ${insuk}` }, gaOwn[0])],
+    ['2026-11-18', 0, '2026-11-26']);
+  eq('  🔴 같은 기간을 제목 **뒤에** 싣는 세 공고(영남)·주소 여벌뿐인 한 글(부산)은 띠가 아니다 — 마감을 그대로 읽는다',
+    [yuPages.map((p) => call(EX, 'extractDeadline', ownOf(p, 'www.yu.ac.kr').text)), setOf('onestop.pusan.ac.kr').has(puLine),
+      call(EX, 'recheckQuotedDeadline', { deadline: '2026-11-20', deadlineFrom: `공고 원문 · 3. 신청안내 ${yuLine}` }, ownOf(yuPages[0], 'www.yu.ac.kr'))],
+    [['2026-11-20', '2026-11-20', '2026-11-20'], false, null]);
+  eq('    발췌기 배선 — 본문 마감·근거 다시 읽기·발췌 물러남이 띠를 걷은 본문(own)을 읽는다',
+    [/let dl = extractDeadline\(own\.text\)/.test(bodyPart), /recheckBodyDeadline\(it, own\)/.test(bodyPart), /excerptsFromBody\(body, it, own\.text\)/.test(bodyPart)], [true, true, true]);
+
+  /* ⑪ 🔴 자동 등록이 보는 **본문 마감**(notice-deadline.mjs bodyDeadlineFrom · makeBodyReader)도 같은 띠 줄을 걷는다 (2026-11-17 · 리뷰).
+     발췌기만 걷고 등록 앞 본문 마감은 40% 껍데기 걷기만 해서, 실린 가천 글 9건의 bodyDeadline 이 전부 FGD 띠의 11-18 이었다(첫 등록 마감이 남의 글 띠에서 온다).
+     표본: 위 가천 세 쪽 + 띠 없는 가천 다섯 쪽(띠가 8쪽 중 3쪽 — 40% 껍데기로는 안 걷힌다 · 실측 26쪽 중 10쪽과 같은 꼴) */
+  {
+    const ND = await import('../collector/notice-deadline.mjs');
+    const PB = await import('../collector/page-boilerplate.mjs');
+    const { lastDateIn } = createRequire(import.meta.url)('../verify/entry-rules.cjs');
+    const plainGa = [127001, 127002, 127003, 127004, 127005].map((no) => ({ url: `https://www.gachon.ac.kr/bbs/kor/478/${no}/artclView.do`,
+      title: `[공통] 2026-2학기 장학 안내 제${no}호 공지사항입니다`, text: ['상단배너( 3 개)', String(no), `[공통] 2026-2학기 장학 안내 제${no}호 공지사항입니다`, '장학팀 공지'].join('\n') }));
+    const reader = ND.makeBodyReader({ stored: [...gaPages, ...plainGa], extract: EX.extractDeadline, lastDateIn });
+    const fresh = gaPages.map((p) => ({ url: p.url, title: p.title }));
+    fresh.forEach((n) => reader.fill(n));
+    const fgdText = fgd.join(' ');
+    const stale = gaPages.map((p) => ({ url: p.url, title: p.title, bodyDeadline: '2026-11-18', bodyDeadlineText: fgdText }));
+    stale.forEach((n) => reader.fill(n));
+    const moved = { url: gaPages[0].url, title: gaPages[0].title, bodyDeadline: '2026-11-18', bodyDeadlineText: '등록 뒤 원문에서 읽은 마감 2026-11-18' };
+    reader.fill(moved);
+    eq('⑪ 🔴 본문 마감(자동 등록 앞)도 제목 앞 띠 줄을 걷는다 — 가천 세 글이 제 마감 · 띠 근거로 실려 있던 본문 마감도 다시 읽는다(원칙 7) · 등록에서 옮긴 마감은 그대로',
+      [fresh.map((n) => n.bodyDeadline), stale.map((n) => n.bodyDeadline), moved.bodyDeadline, reader.counts.bodyRechecked,
+        (PB.boilerFor(reader.chrome, gaPages[0].url) || new Set()).has(fgd[1])],
+      [['2026-11-11', '2026-11-16', '2026-11-12'], ['2026-11-11', '2026-11-16', '2026-11-12'], '2026-11-18', 3, false]);
+    eq('  띠를 안 넘기면 예전 그대로(띠 날짜) · 제목 **뒤** 같은 줄(영남)은 걷지 않는다',
+      [(ND.bodyDeadlineFrom(gaPages[0].text, new Set(['상단배너( 3 개)']), EX.extractDeadline, lastDateIn) || {}).date,
+        (ND.bodyDeadlineFrom(yuPages[0].text, new Set(['장학공지']), EX.extractDeadline, lastDateIn, { siteChrome: setOf('www.yu.ac.kr'), title: yuPages[0].title }) || {}).date],
+      ['2026-11-18', '2026-11-20']);
+    const coll = fs.readdirSync(new URL('../collector/', import.meta.url)).filter((f) => f.endsWith('.mjs'))
+      .filter((f) => /export function (siteChromeFrom|ownBody|titleLineAt)\b/.test(readText(new URL(`../collector/${f}`, import.meta.url))));
+    const ar = readText(new URL('../collector/auto-register.mjs', import.meta.url));
+    eq('  띠 규칙은 page-boilerplate.mjs 한 곳(발췌기·본문 마감이 불러 쓴다 · 베끼지 않는다) · 자동 등록이 다시 읽은 수도 장부 저장 조건에 넣는다',
+      [coll, /reader\.counts\.bodyRechecked\)/.test(ar)], [['page-boilerplate.mjs'], true]);
+  }
+}
+
 console.log('\n■ 자격 자리의 잡음을 유형별로 세는가 (2026-08-23)');
 {
   const rep = readText(new URL('../verify/eligibility-report.mjs', import.meta.url));
@@ -4762,6 +5258,122 @@ console.log('\n■ 자격 자리의 잡음을 유형별로 세는가 (2026-08-23
    🟢 `forms.json` 도 2026-08-29 개발자 승인으로 1칸으로 되돌렸다(내용 변경 0).
    2026-08-15 에 한 세션이 2칸으로 저장해 놓은 것이었고, 그 파일을 쓰는 로봇
    (`schematize-forms.mjs`)은 줄곧 1칸이었다 — 다음 실행에 6천 줄이 뒤집힐 상태였다. */
+/* ── 금액·양식 카드 빈 칸 (2026-11-15 · 승인 계획 11-02·11-11: 마감 전 정식 등록 카드의 금액·양식을 원문 값으로 · 없으면 그리지 않는다 · 지어내지 않는다) ──
+   실데이터를 읽지 않는다 — 원문에서 옮긴 줄을 표본으로 잰다(실데이터에 기댄 고정 검사 금지 · CLAUDE.md).
+   🔴 과장 다섯 갈래(한 갈래 고르기·상한 문구를 비율로·'못 받는 경우' 줄·첨부 한 장·문턱 금액)와 못 읽던 꼴(풀이 괄호·도형 글머리·1인당 줄),
+      양식 넷(운영 규칙 문서·자기소개서·아이콘 꼬리·.bin)과 대기줄을 하루 여섯 번 세던 것. */
+console.log('\n■ 금액·양식 카드 빈 칸 (2026-11-15)');
+{
+  const PA = createRequire(import.meta.url)('../parse-amount.js');
+  const af = (lines) => { const a = PA.amountFrom(lines); return [a.kind, a.value, a.ratio]; };
+  /* ① 못 읽던 꼴 — 원문 줄 그대로 */
+  eq('상한 문구는 비율이 아니다 — 「수업료의 30% (수업료 전액 범위 내 지급)」 은 30% (영남대 3건)',
+    af(['나. 지급금액: 수업료의 30% (수업료 전액 범위 내 지급)']), ['ratio', 0, 0.3]);
+  eq('  풀이 괄호 — 「등록금 ( 수업료 ) 반액」 50% · 「등록금(수업료) 전액」 전액 (연세 어학우수 · 경희 국가우수)',
+    [af(['2. 장학금액: 한 학기 등록금 ( 수업료 ) 반액'])[2], af(['1) 지원 금액 : 등록금(수업료) 전액'])[2]], [0.5, 1]);
+  eq('  「등록금 범위 내 장학금 전액 지급」 은 등록금 전액 (한독제석재단)',
+    af(['나. 장학금액: 3년 또는 1년간 등록금 범위 내 장학금 전액 지급(재단 최종 선발 결과에 따름)']), ['ratio', 0, 1]);
+  eq('  표 칸의 상한 풀이 줄 「(등록금 범위 내 지급)」 에서 금액 절이 끝나지 않는다 (국민대 가온누리)',
+    af(['2. 장학금액', '소득분위', '장학금', '(등록금 범위 내 지급)', '생활비', '(등록금 범위 외 지급)', '0 분위 ( 기초생활수급자 )', '수업료의 100%']), ['ratio', 0, 1]);
+  eq('  도형 글머리 「◤ 2. 장학금액 및 선발인원」 도 금액 머리글 (국민대 여성리더)',
+    af(['◤ 2. 장학금액 및 선발인원', '300 만원 지급 , 1 명']), ['fixed', 3000000, 0]);
+  eq('  머리글 없는 1인당 줄 — 줄 전체 「1인당 100 만원」 · 이름표 값 「A] 급 액: 1인 100만원(…)」 (건설교통신기술협회 포스터 · 김천 공고문 OCR)',
+    [af(['총장학금', '20 명선발', '1인당 100 만원', '2,000만원']), af(['○ A] 급 액: 1인 100만원(학생 본인 계좌 입금)'])],
+    [['fixed', 1000000, 0], ['fixed', 1000000, 0]]);
+  eq('  앞 숫자에 단위 없는 범위 「100~150만원」 은 범위다',
+    (() => { const a = PA.amountFrom(['지급금액 : 1인 100~150만원']); return [a.kind, a.min, a.max]; })(), ['range', 1000000, 1500000]);
+  /* ② 과장 — 한 갈래를 고르지 않는다 */
+  eq('갈린다는 말 + 범위 없음 → 비운다 · 「분야별 상이」 (전남인재육성 — 첨부 표의 「최대 250만원」 이 카드에 떴다)',
+    (() => { const a = PA.amountFrom(['- 지급금액: 장학금 분야별 상이']); return [a.kind, a.refused]; })(), ['unknown', 'tiered']);
+  eq('  「못 받는 경우」 줄의 전액은 이 장학금의 금액이 아니다 · 「차등 금액 지급」 은 비운다 (부산대 장학사정관 — 「등록금 전액」 이었다)',
+    (() => { const a = PA.amountFrom(['2. 지원금액 : 가계곤란 정도에 따라 차등 금액 지급 ( 등록금에 한함 )', '※ 2026 학년도 2 학기 등록금을 전액 감면 ( 등록금 전액 장학생 ) 받은 경우 지원 불가']); return [a.kind, a.ratio, a.refused]; })(),
+    ['unknown', 0, 'tiered']);
+  eq('  값 없는 표 머리글 「지급금액」 의 다른 행이 다른 비율이면 비운다 — 화도 50% / 동해 25% (광운대)',
+    PA.amountFrom(['지급금액', '소득기준', '비고', '화도', '등록금의 50%', '소득 0~6 구간', '* 0~6 구간은 화도장학 선발 확정이며 , 7~9 구간은 추후 결정됨 .',
+      '【 장학생 선발절차 】', '1. 1 차 신청 재학생 및 1,2 차 신청 복학생을 대상으로', '동해', '등록금의 25%', '소득 7 구간부터 최대 9 구간까지', '5. 장학금 지급 방식']).kind, 'unknown');
+  eq('  금액만 있는 칸이 둘 이상 다른 값이면 비운다 — 최대1,000,000원 / 500,000원 (계명 3종 장학)',
+    PA.amountFrom(['장학금액', '최대1,000,000원', '최대1,000,000원', '500,000원']).kind, 'unknown');
+  eq('  「최대 N원」 이 여럿이고 1인당 조각이 첫 금액이 아니면 비운다 — 부양자녀 1인당 100만원을 고르지 않는다 (국세청 근로·자녀 장려)',
+    PA.amountFrom(['3. 장학금액', '-근로장려금 : 연간 최대 300만원', '단독가구: 최대 165만원', '-자녀장려금 : 연간 최대 100만원 (부양자녀 1인당)']).kind, 'unknown');
+  eq('  대조군: 첫 금액이 1인당이면 그대로 (세종이도 · 1인당 최대 1,000,000원) · 대학생 몫(봄내장학생 100만원)도 그대로',
+    [PA.amountFrom(['장학금액', '1인당 최대 1,000,000원', '(인당 지원액) 개인별 상이(최대 500천원) ※대출이자 금액에 따라 상이']).value,
+      PA.amountFrom(['❍ 장 학 금: 고등학생 50만 원, 대학생 최대 100만 원 * 원격대학장학생: 최대 50만원']).value], [1000000, 1000000]);
+  eq('  문턱 금액 「지원액이 20만원 미만일 경우 미지원」 은 금액이 아니다 (순천시인재육성장학회)',
+    PA.amountFrom(['지급 액:등록금에서 당해 학기(2학기) 수령액을 제외한 금액', '중복수혜 제외 후 지원액이 20만원 미만일 경우 미지원']).value, 0);
+  eq('  학교급이 줄로 나뉜 표는 대학생 줄 — 고등학생 120만원이 아니다 (선원가족 장학)',
+    (() => { const a = PA.amountFrom(['선발인원 : 지급금액', '비고', '선발인원 : 및금액 고등학생', '120만원', '00명', '선발인원은예산범위 내에', '대학생 본인 부담액기준최대350만원']); return [a.value, !!a.upTo]; })(),
+    [3500000, true]);
+  eq('  「지원내역:」 이름표도 금액 절 · 한 줄에 100%·50%면 비운다 (서울과기대 어의장학금)',
+    (() => { const a = PA.amountFrom(['라. 지원내역: 수업료 100% 면제 (단, 학자금 지원구간 차상위~5구간 학생 중 국가장학 Ⅰ유형 미수혜 학생은 50%만 면제)']); return [a.kind, a.refused]; })(),
+    ['unknown', 'mixed']);
+  eq('  상한 비율 「수업료 60% 이내 차등지급」 → 비율 0.6 · 상한 표시 · 합계에는 안 넣는다 (신용카드수수료장학금)',
+    (() => { const a = PA.amountFrom(['3. 장학금액 : 수업료 60% 이내 차등지급 (단, 수업료 범위 내에서 교내장학금 간 이중수혜 허용)']); return [a.kind, a.ratio, !!a.upTo, PA.amountWon({ amountSpec: a }, 4000000)]; })(),
+    ['ratio', 0.6, true, 0]);
+  eq('첨부끼리 금액이 다르면 비운다 · 사본(같은 값)은 그대로 · 한 장이라도 일부러 비웠으면 비운다 (pickDocAmount)',
+    [PA.pickDocAmount([{ kind: 'ratio', value: 0, ratio: 1, min: 0, max: 0 }, { kind: 'ratio', value: 0, ratio: 0.5, min: 0, max: 0 }]),
+      PA.pickDocAmount([{ kind: 'fixed', value: 1e6, ratio: 0, min: 1e6, max: 1e6 }, { kind: 'fixed', value: 1e6, ratio: 0, min: 1e6, max: 1e6 }]).value,
+      PA.pickDocAmount([{ kind: 'fixed', value: 1e6, ratio: 0, min: 1e6, max: 1e6 }, { kind: 'unknown', refused: 'tiered' }])], [null, 1000000, null]);
+  const exSrc = readText(new URL('../collector/extract-amounts.mjs', import.meta.url));
+  eq('  금액 로봇: 본문이 일부러 비운 공고는 AI 줄·첨부로 되채우지 않는다 · 첨부는 pickDocAmount 로 고른다',
+    [(exSrc.match(/!bodyRefused &&/g) || []).length, /PA\.pickDocAmount\(results\)/.test(exSrc)], [2, true]);
+  eq('  금액 로봇: 제가 적었던 절대액을 비울 때 amountValue·문구도 걷는다 (전엔 「250만원」·합계가 남았다)',
+    /prevSpec\.kind === 'fixed' \|\| prevSpec\.kind === 'range'\) && Number\(it\.amountValue\) === Number\(prevSpec\.value\)\) it\.amountValue = 0/.test(exSrc), true);
+  eq('  🔴 금액 로봇: 사람이 문구만 고친 금액(표식은 로봇 것 · 문구 ≠ 로봇 문구 · 숫자 있음)은 원문을 못 읽게 돼도 숫자·구조를 걷지 않는다 (카드 300만원 · 합계 어림 어긋남)',
+    [/const humanText = !!\(prevSpec && robotText && it\.amount !== robotText && \/\\d\/\.test\(String\(it\.amount \|\| ''\)\)\);/.test(exSrc),
+      /else if \(a\.kind === 'unknown' && humanText\) keptHuman \+= 1;\s*else if \(a\.kind === 'unknown'\) \{/.test(exSrc)], [true, true]);
+  const { amountText } = await import('../tools/edit-diff.mjs');
+  eq('카드 문구 — 시급 괄호 꼴 「시급(10,320원)」 · 「최대 350만원」 · 「등록금 60% 이내」 (조선대 국가근로 3차가 시급으로 읽고도 「금액 원문 확인」 이었다)',
+    [amountText({ kind: 'hourly', raw: '다 . 장학금액 : 월 실제 근로시간 * 시급(10,320원)' }), amountText({ kind: 'fixed', value: 3500000, upTo: true }), amountText({ kind: 'ratio', ratio: 0.6, upTo: true })],
+    ['시급 10,320원', '최대 350만원', '등록금 60% 이내']);
+  /* ③ 카드 채움 현황이 카드가 그리는 것으로 센다 */
+  const CC = await import('./card-coverage.mjs');
+  eq('카드 채움 현황: 금액은 카드 문구로 센다 — 「등록금 30%」(amountValue 0)는 찬 칸 · 「금액 원문 확인」 은 빈 칸',
+    [CC.amountShown({ amount: '등록금 30%', amountValue: 0 }), CC.amountShown({ amount: '금액 원문 확인', amountValue: 0 }), CC.amountShown({ amount: '', amountNote: '기관확인필요' })], [true, false, false]);
+  /* ④ 양식 — 신청서 판정(data.js) · 이름 꼬리 · .bin · 대기줄 */
+  let FR = null;
+  try { FR = await import('../collector/form-rules.mjs'); } catch (e) { eq('양식 규칙 한 곳(collector/form-rules.mjs)을 불러온다', e.message, '(있음)'); }
+  if (FR) {
+    const { isApplicationForm } = FR.loadFormRules(fileURLToPath(new URL('..', import.meta.url)));
+    const nm = (n) => isApplicationForm({ name: n });
+    eq('신청서 판정: 운영 규칙 문서는 양식이 아니다 — 업무처리기준·운영계획서 및 자체선발기준·강의계획서 (푸른등대 사업계획서 PDF 가 양식으로 붙었다)',
+      [nm('공문_붙임1_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf'), nm('(붙임2) 2026-2학기 국가근로장학금 운영계획서 및 자체선발기준.hwp'), nm('Attachment 강의계획서.pdf')], [false, false, false]);
+    eq('  자기소개서는 학생 서식 · 자기소개서가 같이 적힌 추천서 양식도 · 추천서 신청서양식은 여전히 아니다',
+      [nm('사회봉사활동 자기소개서-이오순장학재단(2027-1).hwp'), nm('2027 자기소개서 및 추천서 양식(장학금 지원자).doc'), nm('[서식 2] 장학생 추천서 신청서양식.hwp'), nm('붙임1.멘토 활동계획서 양식.hwp')], [true, true, false, true]);
+    eq('  `신청서 및 추천서` 한 파일은 학생 신청서다 — 신청서가 앞에 오고 및·쉼표로 이어질 때만 (외대 HUFS Dorm 11-17 · 양식 PDF 로봇이 동의서만 바꾸고 신청서를 빠뜨렸다) · 추천서만·추천서가 앞이면 아니다',
+      [nm('2026-2학기 외대비전HUFSDorm 장학금 신청서 및 추천서.hwp'), nm('장학금 지원서, 추천서.hwp'), nm('[서식 2] 장학생 추천서.hwp'), nm('추천서 및 신청서.hwp')], [true, true, false, false]);
+    eq('첨부 확장자: 아이콘 꼬리를 떼고 · 이름에 없으면 바이트 머리(PDF·PNG) · OLE 는 이름 없이 가르지 않는다 (강원대 원본이 .bin)',
+      [FR.attachExt('신청서 및 개인정보제공동의서(2026.2학기 도전장학금).hwp chevron_forward'), FR.attachExt('download.do', Buffer.from('%PDF-1.4 xx')),
+        FR.attachExt('x', Buffer.from([0x89, 0x50, 0x4e, 0x47, 0, 0, 0, 0])), FR.attachExt('x', Buffer.from([0xd0, 0xcf, 0x11, 0xe0, 0, 0, 0, 0]))], ['hwp', 'pdf', 'png', 'bin']);
+    const dfSrc = readText(new URL('../collector/deepfetch.mjs', import.meta.url));
+    eq('  deepfetch 두 자리(신청서·자격 첨부)가 attachExt 한 곳을 쓴다', (dfSrc.match(/const ext = attachExt\(a\.name, buf\)/g) || []).length, 2);
+    process.env.FORM_PDF_AS_LIB = '1';
+    const FP = await import('../collector/form-pdf.mjs');
+    const items = [{ id: 'a1', name: 'T', attachments: [{ name: '신청서.hwp', url: 'u' }, { name: '신청서.hwp chevron_forward', url: 'u' }] }];
+    const rows = [{ file: 'form-x-1.bin', title: 'T', attach: '신청서.hwp chevron_forward', bytes: 9, id: 'a1' }];
+    const picked = FP.pickFormTargets(items, rows, { today: '2026-11-15', isApplicationForm });
+    eq('양식 PDF 로봇: 꼬리 붙은 색인 줄과 꼬리 없는 첨부를 같은 것으로 · 두 줄로 실린 같은 첨부는 하나로',
+      [picked.targets.length, (picked.targets[0] || { files: [] }).files.length, picked.missing.length], [1, 1, 0]);
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'form-bin-gate-'));
+    fs.writeFileSync(path.join(tmp, 'form-x-1.bin'), Buffer.concat([Buffer.from('%PDF-1.4\n'), Buffer.alloc(200, 32), Buffer.from('/Type /Page\n%%EOF')]));
+    const conv = FP.convertOne(path.join(tmp, 'form-x-1.bin'), path.join(tmp, 'out.pdf'), { soffice: '/nonexistent-soffice', name: '신청서.pdf chevron_forward' });
+    eq('  .bin 원본은 첨부 이름·바이트 머리로 꼴을 찾아 바꾼다 (PDF 는 변환기 없이 복사)', [conv.ok, fs.existsSync(path.join(tmp, 'out.pdf'))], [true, true]);
+    fs.rmSync(tmp, { recursive: true, force: true });
+    const q = { items: [
+      { id: 'got', target: '반영장학 신청 안내', added: '2026-09-25', tries: 6, lastTryAt: '2026-09-26', retired: true, retiredReason: 'x' },
+      { id: 'quick', target: '없는 제목', added: '2026-10-27', tries: 6, lastTryAt: '2026-10-28', retired: true, retiredReason: 'x' },
+      { id: 'closed', target: '없는 제목2', added: '2026-10-16', tries: 6, lastTryAt: '2026-10-17', retired: true, retiredReason: 'x' },
+      { id: 'new', target: '새 표적', added: '2026-11-15' },
+    ] };
+    const idxText = 'form-k-1.hwpx\t공통 [공통] 다른 글자 제목\t반영장학 양식.hwpx\t42588\tgot\n';
+    const live = (id) => id !== 'closed';
+    FR.markFetchedQueue(q, idxText, '2026-11-15', { isLive: live });
+    FR.markFetchedQueue(q, idxText, '2026-11-15', { isLive: live });   // 같은 날 두 번째 실행
+    const by = Object.fromEntries(q.items.map((x) => [x.id, x]));
+    eq('양식 대기줄: 색인 id 칸으로 받은 것은 내렸어도 fetched 로 · 하루 한 번만 센다 · 이틀 만에 내린 옛 기록은 마감 전이면 되살린다 (경희 323054·323410 · 동국 WISE)',
+      [by.got.fetched === true && !by.got.retired, !!by.quick.retired, by.quick.tries, !!by.closed.retired, by.new.tries], [true, false, 3, true, 1]);
+  }
+}
+
 /* ── 🔴 CLAUDE.md 가 다시 불어나지 못하게 (2026-08-29 개발자 지시) ──
    이 문서는 **매 세션 통째로 실린다.** 1,560줄까지 불어나자 개발자가 지적했다 —
    *"써 있는데도 못 읽는 경우가 많고 줄이 엄청 늘어났다."* 그날 641줄로 줄였다
@@ -4806,8 +5418,10 @@ else {
      코드의 **사본**이라 관문이 없으면 썩는다(DESIGN.md 가 만들어진 3분 뒤 낡았던 전례).
      새 관문을 만들지 않고 이 절이 같이 읽는다 — 규칙을 두 벌 두면 한쪽만 고쳐져 갈라진다.
      ⚠️ 문서를 더할 때는 여기 이름만 더한다. */
+  /* 2026-11-18 — CLAUDE.md 가 60KB 천장에 닿아 교내 소식·대외활동 세부를 아래 두 설계 문서로 옮겼다.
+     옮긴 이름이 검사에서 빠지지 않게 두 문서도 잰다(붙이자마자 낡은 관문 이름 「수집 범위 감사」 하나가 잡혔다). */
   const DOCS = ['CLAUDE.md', 'docs/designs/data-model.md', 'docs/designs/data-flow.md',
-                'docs/designs/security-rules.md'];
+                'docs/designs/security-rules.md', 'docs/designs/news-feed.md', 'docs/designs/activities-tab.md'];
   const md = DOCS.map((f) => readText(new URL('../' + f, import.meta.url))).join('\n');
   const R = new URL('../', import.meta.url);
   const ex = (p) => fs.existsSync(new URL(p, R));
@@ -4821,7 +5435,9 @@ else {
 
   /* ① 파일 경로 — 뿌리 또는 흔한 폴더에서 찾는다. 글로브(*)는 폴더만 본다. */
   /* "만들면 안 된다"·확장자 이야기·빌드 산출물(`_admin/build.sh` 가 만든다)·분수 표기 */
-  const NOT_FILES = new Set(['_config.yml', '.nojekyll', '.ocr.txt', '.pdf.txt', 'dist/vendor/', 'met/total']);
+  const NOT_FILES = new Set(['_config.yml', '.nojekyll', '.ocr.txt', '.pdf.txt', 'dist/vendor/', 'met/total',
+    '/file/', '/attach/',            // 학교 사이트 주소 조각(news-feed.md — 진짜 사진이 사는 경로)
+    'vendor/activity-kind.mjs']);    // 관리자 빌드 산출물(activities-tab.md)
   const paths = [...new Set(ticks.filter((t) => !/\s/.test(t) && (/\//.test(t) || /\.(js|mjs|cjs|json|md|py|sh|yml|html|txt)$/.test(t))))]
     .map((t) => t.replace(/:\d+$/, ''))
     .filter((t) => !NOT_FILES.has(t) && !/^https?:/.test(t) && !/[<>…()']/.test(t) && !/^claude\//.test(t));   // 브랜치 이름·코드 조각 제외
@@ -4846,9 +5462,14 @@ else {
   /* ③ "관문 「X」" — 이 파일의 절 이름이어야 한다(「」 는 떼고 대조) */
   const strip = (s) => s.replace(/[「」]/g, '').trim();
   const self = readText(new URL(import.meta.url));
-  const sections = [...self.matchAll(/console\.log\('\\?n?■ ([^']+)'\)/g)].map((m) => strip(m[1]));
+  /* 절 이름에 작은따옴표가 든 절(「학생 화면에 '모름'류 글자가 없다」 · 2026-11-15)은 큰따옴표로 적는다 — 둘 다 읽는다 */
+  const sections = [...self.matchAll(/console\.log\('\\?n?■ ([^']+)'\)|console\.log\("\\?n?■ ([^"]+)"\)/g)].map((m) => strip(m[1] || m[2]));
+  /* activities-tab.md 의 '관문'은 대외활동 탭의 관심 고르기 화면 이름이기도 하다 — 그 화면 글자 셋과
+     verify-interactions.js 의 절(이 파일 밖) 하나는 이 파일의 절이 아니다 */
+  const NOT_GATES = new Set(['X',   // 찾는 법을 설명하는 줄의 자리표시
+    '내 정보', '1365 자원봉사시간 부여', '고르면 이 탭과 홈 추천이 열려요…', '시트가 뜨면 뒤 화면이 잠긴다']);
   const gates = [...md.matchAll(/관문[^「\n]{0,30}「((?:[^「」]|「[^」]*」)+)」/g)].map((m) => strip(m[1]))
-    .filter((g) => g !== 'X');   // 찾는 법을 설명하는 줄의 자리표시
+    .filter((g) => !NOT_GATES.has(g));
   eq('관문 이름이 가리키는 절이 전부 있다', gates.filter((g) => !sections.some((s) => s.includes(g))), []);
   /* 🔴 뽑은 게 0이면 위 셋은 빈 목록을 상대로 통과한다 — 개수가 있어야 대조가 진짜다 */
   eq('  (대조할 것을 실제로 뽑았다 — 파일·이름·관문)', [paths.length > 40, ids.length > 40, gates.length > 10], [true, true, true]);
@@ -5295,7 +5916,9 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
     ...extsOf(etSrc, /DOC_EXT = \/\\\.\(([^)]+)\)\$\/i/),
     ...extsOf(etSrc, /IMG_EXT = \/\\\.\(([^)]+)\)\$\/i/),
   ])];
-  const mapping = extsOf(eligFn, /const ext = \(a\.name\.match\(\/\\\.\(([^)]+)\)\$\/i\)/);
+  /* 확장자를 정하는 규칙은 2026-11-15 부터 form-rules.mjs attachExt 한 곳(아이콘 꼬리 떼기 · 바이트 머리) — 자격 함수가 그것을 부르는지와 그 목록을 잰다 */
+  const frSrc = readText(new URL('../collector/form-rules.mjs', import.meta.url));
+  const mapping = /const ext = attachExt\(a\.name, buf\)/.test(eligFn) ? extsOf(frSrc, /const EXT_RE = \/\\\.\(([^)]+)\)\$\/i/) : [];
   const gap = wanted.filter((e) => !mapping.includes(e));
   eq(`받는 확장자 ${wanted.length}종이 모두 파일 이름 규칙에 있다`, gap.join(',') || '(없음)', '(없음)');
   eq('  deepfetch 의 두 자리(자격용·밀린 첨부)가 pickDocAttachments 를 쓴다 · 직접 거르는 OK_EXT 는 없다',
@@ -5574,6 +6197,9 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
   eq('  신청서는 읽지 않는다', AT.isNoticeDoc('장학금 신청서.hwp'), false);
   eq('  개인정보 동의서도 읽지 않는다', AT.isNoticeDoc('개인정보 수집·이용 동의서.hwp'), false);
   eq('  선발원서도 서식이다', AT.isNoticeDoc('F_장학생 선발원서(제24기).docx'), false);
+  /* 1단계 B3 (2026-11-15) — 서식 낱말이 섞여도 공고문인 것이 분명한 꼴은 읽는다 */
+  eq('  B3 `사업계획서 및 업무처리기준.pdf`·`선발 공고문(신청서 포함).hwpx`·`선발계획` 은 공고문이다(계획서·신청서 낱말보다 공고문 낱말이 이긴다) · 맨 `활동계획서`·`신청서식` 은 여전히 서식',
+    ['붙임2_2026년 2학기 푸른등대 기부장학금(2차) 사업계획서 및 업무처리기준.pdf', '붙임1. 2026년 장학생 선발 공고문(신청서 포함).hwpx', '2026년 하반기 장학생 선발계획.hwp', '붙임1.멘토 활동계획서 양식.hwp', '신청서식.hwpx'].map((n) => AT.isNoticeDoc(n)), [true, true, true, false, false]);
   /* ② PDF는 자격 경로에서 쓰지 않는다 — 글자가 정확히 안 나온다.
         실측: 원문 `3년 이상`이 `년이상`으로 뽑혔다. 숫자 하나가 결론을 바꾸는 글이다. */
   eq('  PDF는 자격 경로에서 쓰지 않는다', AT.attachmentText('없는파일.pdf'), '');
@@ -5961,6 +6587,59 @@ console.log('\n■ 절 경계 — 제외 대상·선발기준이 자격으로 �
     ['4년제 대학교 이공계 전공 새터민으로 재학 예정인 대학생']);
 }
 
+/* ── 「배제」로 말하는 제외 줄 (2026-11-17) ───────────────────────────────
+   `3. 9학기 진학 및 부분 등록자는 선발에서 배제됩니다.`(원문 셋 · collector/extracted 에 실제로 있는 꼴) 가 줄 단위 제외 규칙(match-engine EXCLUDE_LINE)에
+   안 걸려 **제외 칸에서 버려졌다**(저장된 eligibilityExcludes 줄이 화면에 안 보였다) · 자격 줄에 섞이면 `휴학생은 선발에서 배제됩니다` 가 **지원 자격 칸에** 떴다.
+   말끝이 배제일 때만 제외다 — `배제하지 않음`·`배제될 수 있음` 은 아니다. 판정은 다른 제외 줄과 같다(프로필이 모르는 축 — 9학기·부분 등록 — 은 '모름'). */
+console.log('\n■ 「배제」로 말하는 제외 줄 (2026-11-17)');
+{
+  const ME = createRequire(import.meta.url)('../match-engine.js');
+  const RAW = ['3. 9학기 진학 및 부분 등록자는 선발에서 배제됩니다.', '다. 9학기 진학 및 부분 등록자는 선발에서 배제됨.', '3. 9학기 진학 및 부분 등록자는 선발에서 배제합니다.​ ​'];
+  const base = ['1. 2026학년도 2학기 재학생', '2. 직전학기 평점 3.0 이상인 자'];
+  for (const l of RAW) {
+    const stored = { id: 'b1', name: 'b', eligibility: {}, eligibilityLines: base, eligibilityExcludes: [l] };
+    const mixed = { id: 'b2', name: 'b', eligibility: {}, eligibilityLines: [...base, l] };
+    /* 앱 상세 시트(app.js 「이런 경우는 제외돼요」)와 같은 두 출처 */
+    eq(`저장된 제외 줄이 제외 칸에 보인다: ${l.slice(0, 30)}`, ME.requirementLines(stored, stored.eligibilityExcludes, { onlyExclude: true }).length, 1);
+    eq(`  자격 줄에 섞이면 제외 칸으로 옮긴다(자격 칸엔 없다)`,
+      [ME.requirementLines(mixed, mixed.eligibilityLines, { onlyExclude: true }).length, ME.requirementLines(mixed, null, { all: true }).some((x) => /배제/.test(x))], [1, false]);
+  }
+  /* 말끝이 배제가 아닌 문장은 제외가 아니다 — 학생에게 오히려 유리한 말(중복 수혜 허용)이 '제외돼요'에 뜨면 안 된다 */
+  for (const l of ['중복 수혜를 배제하지 않음', '타 장학금과 중복 수혜를 배제하지 않습니다.', '서류 미비 시 선발에서 배제될 수 있음']) {
+    eq(`  대조군: 「${l}」 는 제외 줄이 아니다`, ME.requirementLines({}, [l], { onlyExclude: true }), []);
+  }
+  /* 판정 — 프로필이 아는 축(학적)은 「…제외됩니다」 와 똑같이 · 모르는 축(9학기·부분 등록)은 세지 않는다(틀린 미달 없음) */
+  const P = { school: '한국외국어대학교', campus: '서울', gpa: 3.5, bracket: 5, year: 4, track: 'humanities', major: '영어학과', flags: [], status: '재학', credits: 15, nationality: 'korean', region: '서울', birthYear: 2003 };
+  const fd = (lines, ex, p) => { const d = ME.fitDetail({ id: 'f', name: 'f', eligibility: {}, eligibilityLines: lines, eligibilityExcludes: ex }, p); return [d.pct, d.met, d.total, d.fails.length]; };
+  for (const p of [P, { ...P, year: 3 }, { ...P, status: '휴학' }]) {
+    eq(`  9학기 배제 줄은 판정하지 않는다(${p.year}학년 ${p.status})`, [fd([...base, RAW[0]], [], p), fd(base, [RAW[0]], p)], [fd(base, [], p), fd(base, [], p)]);
+    eq(`  휴학생 배제 = 휴학생 제외(${p.year}학년 ${p.status})`, [fd([...base, '휴학생은 선발에서 배제됩니다.'], [], p), fd(base, ['휴학생은 선발에서 배제됩니다.'], p)],
+      [fd([...base, '휴학생은 선발에서 제외됩니다.'], [], p), fd(base, ['휴학생은 선발에서 제외됩니다.'], p)]);
+  }
+  /* 🔴 리뷰 4차(2026-11-17) — 배제 갈래에 **제외의 면제·산정 예외**가 없어서 `장애학생은 성적 산정 대상에서 배제`(학생에게 유리한 산정 규칙)가
+     제외 칸에 떠 장애학생에게 틀린 미달(5%)이 났다 · 띄어 쓴 말끝(`배제 됩니다`·`배제 됨`·`배제 처리됩니다`)은 안 걸려 휴학생에게 '맞아요'(틀린 안심).
+     배제 줄은 같은 뜻의 제외 줄과 **똑같이** 판정한다 — 제외 칸 · 적합도 둘 다 */
+  const same = (bj, jw, p) => [ME.requirementLines({}, [bj], { onlyExclude: true }).length, fd([...base, bj], [], p), fd(base, [bj], p)];
+  const PAIRS = [
+    ['장애학생은 성적 산정 대상에서 배제', '장애학생은 성적 산정 대상에서 제외', { ...P, flags: ['disabled'] }],
+    ['기초생활수급자는 소득 산정 대상에서 배제', '기초생활수급자는 소득 산정 대상에서 제외', { ...P, flags: ['basic'] }],
+    ['신/편입생은 입학 학기에만 학점 및 성적 기준 적용 배제', '신/편입생은 입학 학기에만 학점 및 성적 기준 적용 제외', P],
+    ['계절, 교류, 인정학점 배제', '계절, 교류, 인정학점 제외', P],
+    ['휴학생은 선발에서 배제 됩니다.', '휴학생은 선발에서 제외 됩니다.', { ...P, status: '휴학' }],
+    ['휴학생은 선발에서 배제 됩니다.', '휴학생은 선발에서 제외 됩니다.', P],
+    ['휴학생은 선발에서 배제 처리됩니다', '휴학생은 선발에서 제외 처리됩니다', { ...P, status: '휴학' }],
+    ['대학원생은 지원 대상에서 배제 됨', '대학원생은 지원 대상에서 제외 됨', P],
+  ];
+  for (const [bj, jw, p] of PAIRS) eq(`  배제 = 제외 (${bj} · ${p.status}${p.flags.length ? ' ' + p.flags.join(',') : ''})`, same(bj, jw, p), same(jw, jw, p));
+  eq('  🔴 산정·적용 배제는 제외 칸에 안 뜨고 장애학생에게 미달이 아니다', [ME.requirementLines({}, [PAIRS[0][0]], { onlyExclude: true }), fd([...base, PAIRS[0][0]], [], PAIRS[0][2])[3]], [[], 0]);
+  eq('  🔴 띄어 쓴·처리 말끝도 제외 칸으로 간다 (휴학생은 미달)',
+    [...['휴학생은 선발에서 배제 됩니다.', '휴학생은 선발에서 배제 처리됩니다', '대학원생은 지원 대상에서 배제 됨', '휴학생은 선발 배제 처리함'].map((l) => ME.requirementLines({}, [l], { onlyExclude: true }).length), fd([...base, '휴학생은 선발에서 배제 됩니다.'], [], { ...P, status: '휴학' })[3] > 0],
+    [1, 1, 1, 1, true]);
+  for (const l of ['중복 수혜를 배제 하지 않음', '서류 미비 시 선발에서 배제 될 수 있음', '타 장학금 수혜자도 선발에서 배제되지 않습니다.', '선발에서 배제 처리될 수 있음']) {
+    eq(`  대조군: 「${l}」 는 제외 줄이 아니다`, ME.requirementLines({}, [l], { onlyExclude: true }), []);
+  }
+}
+
 
 /* ── 🔴 적합도 — 0%를 내는 여덟 조건 (2026-08-24 · docs/designs/fit-score.md) ──
    0%는 학생에게서 장학금을 뺏는 판정이라 틀리면 가장 비싸다. 개발자 지시:
@@ -6140,18 +6819,18 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
   eq('② 수집 로봇 — 본문을 읽는 세 자리(새 글 · 소급 보강 · 서류 칸만 소급) 모두 서류 목록을 같은 함수로 적는다(activity-excerpts putActivityDocuments 한 곳 · 수집 로봇에 사본 없음) · 활동 글 id 는 canon-url activityId 한 곳(발행 전 전부에 소급 · 겹치면 뒤 글은 비운다)',
     [(cm.match(/putActivityDocuments\(it, activityDocuments\(detail\.text\)\)/g) || []).length, /function putActivityDocuments/.test(cm), /import \{[^}]*\bputActivityDocuments\b[^}]*\} from '\.\/activity-excerpts\.mjs'/.test(cm),
       /if \(!n\.id && n\.url\) n\.id = activityId\(n\.url\);/.test(cm), /import \{ canonUrl, activityId \} from '\.\/canon-url\.mjs'/.test(cm), /if \(other && other !== n\.url\)[^\n]*delete n\.id/.test(cm)], [3, false, true, true, true, true]);
-  /* 🔴 판(docsV) — 10-30 에 서류 칸을 더하고 판을 안 올려 이미 읽은 199건 중 1건만 서류가 생겼다(11-15 실측). 서류 판만 다르면 **서류 칸만** 다시 읽는다(자격 칸은 그대로) */
+  /* 🔴 판(documentsV · 첨부 로봇의 docsV 와 다른 칸) — 10-30 에 서류 칸을 더하고 판을 안 올려 이미 읽은 199건 중 1건만 서류가 생겼다(11-15 실측). 서류 판만 다르면 **서류 칸만** 다시 읽는다(자격 칸은 그대로) */
   {
     const V = AX.ACT_DETAILS_V, D = AX.ACT_DOCS_V;
     eq('  다시 읽기 판단 한 곳(actRereadNeed) — 옛 자격 판 → details · 자격 판은 같고 서류 판만 옛것 → docs · 둘 다 최신 → 안 읽음 · API 글(자격 있음)은 안 읽고 서류 판으로는 안 읽는다',
-      [AX.actRereadNeed({ excerptsAt: 'x', detailsV: V - 1 }), AX.actRereadNeed({ excerptsAt: 'x', detailsV: V }), AX.actRereadNeed({ excerptsAt: 'x', detailsV: V, docsV: D }),
+      [AX.actRereadNeed({ excerptsAt: 'x', detailsV: V - 1 }), AX.actRereadNeed({ excerptsAt: 'x', detailsV: V }), AX.actRereadNeed({ excerptsAt: 'x', detailsV: V, documentsV: D }),
         AX.actRereadNeed({ api: 'k', eligibilityLines: ['a'], excerptsAt: 'x', detailsV: V }), AX.actRereadNeed({ api: 'k', excerptsAt: 'x', detailsV: V }), AX.actRereadNeed({})],
       ['details', 'docs', null, null, null, 'details']);
     const kept = AX.putActivityDocuments({ documents: ['참가신청서'], documentsFrom: '브라우저 본문' }, []);
     const wiped = AX.putActivityDocuments({ documents: ['옛 목록'] }, []);
     const put = AX.putActivityDocuments({ documents: ['옛'], documentsFrom: '공고문 첨부' }, ['작품 설명서'], null);
     eq('  서류 칸 쓰기 — 첨부·브라우저에서 읽어 둔 목록(documentsFrom)은 빈 본문이 지우지 않는다 · 본문 목록은 비면 지운다 · 본문이 목록을 주면 본문이 이긴다(출처 표식도 뗀다) · 늘 판을 적는다',
-      [kept.documents, kept.docsV === D, wiped.documents, wiped.docsV === D, put.documents, put.documentsFrom], [['참가신청서'], true, undefined, true, ['작품 설명서'], undefined]);
+      [kept.documents, kept.documentsV === D, wiped.documents, wiped.documentsV === D, kept.docsV === undefined, put.documents, put.documentsFrom], [['참가신청서'], true, undefined, true, true, ['작품 설명서'], undefined]);
     eq('  서류 칸만 다시 읽는 갈래는 자격·발췌를 건드리지 않고 넘어간다(같은 판으로 이미 읽었다) · 못 받으면 이레 뒤에 다시 · 리포트의 「남은」 수도 같은 판단',
       [/if \(need === 'docs'\) \{\s*\/\*[^*]*\*\/\s*if \(detail\.text\) \{ putActivityDocuments\(it, activityDocuments\(detail\.text\)\); delete it\.detailsTriedAt; \} else it\.detailsTriedAt = todayIso;\s*actBackfilled \+= 1; actDocsBackfilled \+= 1;\s*continue;/.test(cm),
         /남은 \$\{acts\.items\.filter\(\(n\) => actRereadNeed\(n\)\)\.length\}건/.test(cm)], [true, true]);
@@ -6345,7 +7024,8 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
   }
   eq('  사본으로 연 시트에서는 신청을 시작·이어가지 않는다(양식 흐름이 넘어진다)', /const gone = !findSch\(id\);\s*const canApply = lock\.canApply && !gone;/.test(allApp), true);
   eq('  사본은 공고 목록을 다 받았을 때만 뜨고, 바뀌었을 때만 적는다', /function snapApplications\(resolve\) \{\s*if \(appsDataState\(\) !== 'ok'\) return false;/.test(allApp) && /if \(a\.snap && JSON\.stringify\(a\.snap\) === json\) continue;/.test(allApp), true);
-  eq('  상세 시트·패널의 제출/결과 단추가 사본으로도 찾는다(appSch)', /function openDetail\(id\) \{[\s\S]{0,200}?const sch = appSch\(id\);/.test(allApp) && /const sch = appSch\(id\);   \/\/ 사본으로 보이는 줄의 단추도/.test(allApp), true);
+  /* 창 200 → 600자 (2026-11-15) — 이용 횟수 세기(b8c227c5 · trackUse 두 줄)가 함수 머리에 들어와 appSch 가 200자 밖으로 밀렸다. 하는 일은 그대로(머리에서 사본으로 찾는다)라 창만 넓힌다 */
+  eq('  상세 시트·패널의 제출/결과 단추가 사본으로도 찾는다(appSch)', /function openDetail\(id\) \{[\s\S]{0,600}?const sch = appSch\(id\);/.test(allApp) && /const sch = appSch\(id\);   \/\/ 사본으로 보이는 줄의 단추도/.test(allApp), true);
   eq('  내려간 공고에 결과를 적으면 줄이 사라지므로 실행 취소를 준다', /if \(!findSch\(sch\.id\)\) toast\([^\n]*\{ label: '실행 취소', run: \(\) => undoProgress\(sch\.id\) \}\)/.test(allApp), true);
   eq("  '목록에서 내려감' 카드는 없다", /appCardGone|badge-gone/.test(readText(new URL('../app.js', import.meta.url))), false);
   /* 되돌리기는 공고를 요구하면 안 된다 — 요구하면 사라진 공고의 기록이 영영 안 지워진다
@@ -6354,8 +7034,9 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
 
   /* 합이 0 일 때 '0원'이라고 말하지 않는다 — 금액 미확인 공고가 많아(실측 68건 중 41건)
      그중 하나를 선정으로 기록하면 '선정된 장학금 0원'이 떴다. */
-  eq("합이 0 이면 '금액 미확인'이라고 적는다",
-    appsSrc.includes("shownAmount ? won(shownAmount) : '금액 미확인'"), true);
+  /* 2026-11-15 개발자 결정 11-02 — '금액 미확인'도 쓰지 않는다: 합이 0 이면 금액 두 줄(이름표·금액)을 안 그린다 */
+  eq("합이 0 이면 '0원'도 '금액 미확인'도 아니라 금액 줄을 안 그린다",
+    [/\$\{shownAmount \? `<p class="summary-label">/.test(appsSrc), /'금액 미확인'|· 금액 미확인/.test(appsSrc)], [true, false]);
 
   /* ── 🔴 차례 — 할 일이 있는 것부터 (2026-09-20 개발자 지적) ──
      예전엔 담은 순서를 뒤집기만 해서, 실측으로 위 세 장이 전부 끝난 일이고 '서류 작성
@@ -6415,8 +7096,9 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
   eq('구조로 저장된 자격만 단어로 옮긴다',
     bulkTags({ eligibility: { minGpa: 3, maxBracket: 8, years: [2, 3], flagsAny: ['basicLiving'] } }),
     ['기초생활수급자', '평점 3 이상', '소득 8구간 이하', '2·3학년']);
-  eq('자격을 모르면 지어내지 않는다', bulkTags({ eligibility: {} }), ['자격 원문 확인']);
-  eq('자격 칸이 아예 없어도 지어내지 않는다', bulkTags({}), ['자격 원문 확인']);
+  /* 2026-11-15 개발자 결정 11-02 — 못 읽은 자격은 칩을 안 그린다(예전 '자격 원문 확인') */
+  eq('자격을 모르면 지어내지 않는다 — 칩 없음', bulkTags({ eligibility: {} }), []);
+  eq('자격 칸이 아예 없어도 지어내지 않는다 — 칩 없음', bulkTags({}), []);
 
   /* ── 🔴 홈 차례 — 적합도와 마감일을 한 점수로 (2026-09-17 개발자 지시) ──
      "홈화면 장학금 적합도순으로 된것같은데 제목은 마감임박이야. 마감임박이라는 수치를 지우고
@@ -7176,7 +7858,8 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
   eq('renderAmountDetail 이 있다', body.length > 200, true);
 
   // ① 갈래 넷 — 이름은 개발자가 '명사형으로 조이기'로 정한 것이다
-  for (const t of ['합산', '중복 수혜 불가', '등록금 비율 환산', '금액 미확인']) {
+  //    넷째 '금액 미확인' → '금액을 못 읽은 공고' (2026-11-15 · 개발자 결정 11-02 '미확인'류 글자 없음 — 히어로 아랫줄 「금액을 못 읽은 n건」과 같은 말 · 갈래 수는 그대로 넷)
+  for (const t of ['합산', '중복 수혜 불가', '등록금 비율 환산', '금액을 못 읽은 공고']) {
     eq(`갈래 '${t}' 가 있다`, body.includes(`grp('${t}'`), true);
   }
   eq('제목은 금액 상세다', body.includes('금액 상세'), true);
@@ -7436,6 +8119,21 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   /* 분교 7곳은 전부 매핑돼 있어야 한다 — 빠지면 그 학교 학과가 본교로 합쳐진다 */
   eq('data.js 분교 7곳이 전부 BRANCH_MAP 에 있다',
     [...unis].filter((u) => /캠퍼스$/.test(u) && !targets.includes(u)), []);
+  /* 🔴 분교인데 커리어넷이 본교 이름으로 주는 학교(BRANCH_BY_AREA · 2026-11-16) — 상명대 제2캠퍼스(충남)가 `상명대학교` 로 와서
+     `상명대학교 천안캠퍼스` 학생은 학과 파일이 없어 전국 공통 목록으로 물러났다. 표를 떼어 실제로 돌려 본다(로봇은 불러오는 순간 API 를 두드린다). */
+  {
+    const PRs = createRequire(import.meta.url)('../parse-requirements.js');
+    let byArea = {}; let branchByArea = (s) => s;   // 표·함수가 없으면 아래 eq 가 빨개진다(넘어지지 않게)
+    try {
+      if (majorsSrc.includes('const BRANCH_BY_AREA = {')) byArea = Function(`return ${sec(majorsSrc, 'const BRANCH_BY_AREA = {').replace(/^const BRANCH_BY_AREA = /, '')}}`)();
+      const fnSrc = (/function branchByArea\(school, area\) \{[\s\S]*?\n\}/.exec(majorsSrc) || [''])[0];
+      if (fnSrc) branchByArea = Function('BRANCH_BY_AREA', 'shortRegion', `${fnSrc}; return branchByArea;`)(byArea, PRs.shortRegion);
+    } catch { /* 읽지 못하면 아래가 빨개진다 */ }
+    eq('  BRANCH_BY_AREA 값이 전부 data.js UNIVERSITIES 의 분교 이름이다 · 상명대 충남 → 천안캠퍼스 · 서울은 본교 · 표에 없는 학교는 그대로',
+      [Object.values(byArea).flatMap((t) => Object.values(t)).filter((v) => !unis.has(v)), branchByArea('상명대학교', '충청남도'), branchByArea('상명대학교', '서울특별시'), branchByArea('한국외국어대학교', '충청남도')],
+      [[], '상명대학교 천안캠퍼스', '상명대학교', '한국외국어대학교']);
+    eq('  로봇이 줄마다 분교를 지역으로 단다(normalizeSchool 뒤 branchByArea)', /const school = school0 \? branchByArea\(school0, squash\(areaRaw/.test(majorsSrc), true);
+  }
 
   const ME = createRequire(import.meta.url)('../match-engine.js');
 
@@ -7545,9 +8243,10 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
      이 로봇은 2026-09-15 까지 첨부를 한 번도 안 열었다 — 게시판 본문이 '붙임 참조'뿐인 공고는
      영영 '금액 원문 확인'이었다. 자격 발췌기와 **같은 색인(elig-docs)·같은 함수(attachmentText)**
      를 써야 "발췌기는 읽는데 금액 로봇은 못 읽는" 어긋남이 안 생긴다. */
-  eq('금액 로봇이 공고문 첨부 색인을 연다', /elig-docs\.json/.test(ex), true);
-  eq('  첨부 글자는 발췌기와 같은 함수로 읽는다 (readableDoc — OCR 포스터 문턱도 같다)', /import \{ attachmentText, readableDoc, docOrder \} from '\.\/attachment-text\.mjs'/.test(ex), true);
-  eq('  본문·AI 줄로 못 읽었을 때만 첨부를 본다', /a\.kind === 'unknown' && hasDocs/.test(ex), true);
+  /* 2026-11-15: 색인은 attachment-text.mjs noticeDocFiles 한 곳이 연다 — 금액은 자격 색인만(formPath:false) */
+  eq('금액 로봇이 공고문 첨부 색인을 연다', /noticeDocFiles\(it, \{ formPath: false \}\)/.test(ex), true);
+  eq('  첨부 글자는 발췌기와 같은 함수로 읽는다 (readableDoc — OCR 포스터 문턱도 같다)', /import \{ attachmentText, readableDoc, noticeDocFiles \} from '\.\/attachment-text\.mjs'/.test(ex), true);
+  eq('  본문·AI 줄로 못 읽었을 때만 첨부를 본다', /a\.kind === 'unknown' && (?:!bodyRefused && )?hasDocs/.test(ex), true);
   eq('  첨부 금액도 parse-amount 가 정한다', /PA\.amountFrom\(t\.split/.test(ex), true);
 
   /* 검산기가 금액 줄을 실제로 돌려주는지 — 가짜 응답으로 돌려 본다(돈 0원) */
@@ -7730,6 +8429,8 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
     { ...wsBase, id: 'sample-many-lines', name: '표본 장학금 (자격 줄 일곱)', deadline: '2099-12-31',
       eligibilityLines: ['대한민국 국적을 가진 자', '직전학기 평점 2.5 이상인 자', '직전학기 12학점 이상 이수한 자', '학부 재학생', '소득 8구간 이하인 자', '서울시에 거주하는 자', '2학년 이상 재학생'] },
     { ...wsBase, id: 'sample-closed', name: '표본 장학금 (마감 지남)', deadline: '2020-01-31', eligibilityLines: ['직전학기 평점 2.5 이상인 자'] },
+    /* 기한도 자격도 못 읽은 정식 공고(2026-11-16) — 앱은 카드로 안 그리고 게시판 새 공고 한 줄로 싣는다(match-engine feedOnlyFormal) */
+    { ...wsBase, id: 'sample-feed-only', name: '표본 장학금 (기한·자격 못 읽음)', listedAt: new Date().toISOString().slice(0, 10), sourceUrl: 'https://example.ac.kr/notice/feed-only-1', eligibilityLines: [] },
   ] }));
   const run = (args) => {
     try {
@@ -7794,6 +8495,21 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
     const out = run([closed.id]);
     eq('마감 지난 공고는 신청 버튼 잠김이라고 말한다', /신청 버튼 잠김/.test(out), true);
   }
+
+  /* 🔴 카드로 안 그리는 정식 공고 (2026-11-16 리뷰) — 앱(getMatches)은 기한도 자격도 못 읽은 정식 공고를 카드에서 빼고
+     게시판 새 공고 한 줄(제목 + 링크)로만 싣는데(feedOnlyFormal·feedOnlyBoardRows), 이 도구는 카드·「판정 selective」·
+     「신청 버튼 열림 (마감: ?)」을 말했다(상명대 auto-enoticedoarticleno770333 실측). 도구가 같은 함수를 불러 '카드 없음'이라 말하는지 실제로 돌려 본다 */
+  const fo = reg2.items.find((x) => x.id === 'sample-feed-only');
+  eq('  기한·자격을 못 읽은 표본은 앱 규칙으로 카드가 없다 (이 검사의 전제 · match-engine feedOnlyFormal)', !!fo && ME4.feedOnlyFormal(fo, WS_P), true);
+  if (fo) {
+    const out = run([fo.id]);
+    eq('기한·자격을 못 읽은 정식 공고는 「카드 없음」 · 게시판 새 공고 한 줄(제목 + 링크)이라고 말한다 — 카드·판정·신청 버튼을 말하지 않는다',
+      [/카드 없음/.test(out), /게시판 새 공고 한 줄\(제목 \+ 링크\)로 보인다 — 「표본 장학금 \(기한·자격 못 읽음\)」/.test(out),
+        /카드 윗줄|판정 selective|신청 버튼/.test(out), out.includes('누르면 → https://example.ac.kr/notice/feed-only-1')],
+      [true, true, false, true]);
+  }
+  eq('  모르는 마감을 「마감: ?」로 찍지 않는다', /마감: \?|\|\| '\?'\}\)/.test(readText(new URL('../verify/what-shows.mjs', import.meta.url))), false);
+  eq('  카드 판정은 match-engine feedOnlyFormal 을 부른다 (사본이 아니다)', /ME\.feedOnlyFormal\(/.test(readText(new URL('../verify/what-shows.mjs', import.meta.url))), true);
 
   /* 배지 문구를 손으로 옮겨 적으면 갈라진다 — 앱 함수를 가져다 쓰는지 소스로도 못 박는다 */
   const ws = readText(new URL('../verify/what-shows.mjs', import.meta.url));
@@ -8102,6 +8818,13 @@ console.log('\n■ 신청 잠금 — 자격 판정으로는 막지 않는다 (20
      applyLock(R('ineligible'), null, open).caution !== applyLock(R('unknown'), null, open).caution, true);
   eq('자격 통과에는 안내를 붙이지 않는다 (없는 걱정을 만들지 않는다)',
      applyLock(R('eligible'), null, open).caution, '');
+  /* 🔴 정식 등록 공고는 거의 다 'selective' 다 — 자격 줄을 한 줄도 못 읽었으면(fd.unread) 그래도 「원문에서 자격을 보라」를 단다(2026-11-16 리뷰 ·
+     「자격 미확인」 배지를 뺀 뒤 이 한 문장이 없으면 앱이 자격을 확인해 준 공고처럼 보인다) · 읽은 공고엔 안 단다 · 버튼은 그대로 열린다 */
+  eq('  🔴 선발 심사 + 자격을 못 읽음 → 「원문에서 자격 확인」 안내(unknown 갈래) · 버튼은 열림 · 읽었으면 안내 없음 · 상세가 fd 를 넘긴다',
+     [applyLock(R('selective'), null, open, { id: 'x' }, { unread: true }).caution, applyLock(R('selective'), null, open, { id: 'x' }, { unread: true }).canApply,
+      applyLock(R('selective'), null, open, { id: 'x' }, { unread: false }).caution, applyLock(R('selective'), null, closed, { id: 'x' }, { unread: true }).caution,
+      /const lock = applyLock\(result, app, d, sch, fd\)/.test(src)],
+     ['unknown', true, '', '', true]);
   /* 🔴 원문이 「별도 신청 없이 학교가 선발」이라 적은 공고(noApply = 그 원문 문장 · 2026-11-02 세종대 학업수석총장장학금)는
      자격이 맞아도 신청 버튼을 열지 않는다 — 열면 학생이 없는 절차를 준비한다. 같은 값이 홈 '바로 신청'·일괄 준비·앱 지원문서에서도 뺀다 */
   const noApply = { noApply: '별도의 신청절차없이 매학기 성적 확정 후, 학생지원처에서 선발.' };
@@ -8112,7 +8835,7 @@ console.log('\n■ 신청 잠금 — 자격 판정으로는 막지 않는다 (20
   eq('🔴 일괄 신청 준비 목록(bulkTargets)도 noApply 를 뺀다 — 홈 버튼을 누르면 이 목록이 시트에 체크된 채 들어간다(리뷰가 잡은 구멍)',
      /function bulkTargets\(\)[\s\S]{0,400}?!m\.sch\.noApply/.test(src), true);
   eq('  앱 지원문서를 붙이지 않는다', /if \(s\.formId \|\| s\.program \|\| s\.noApply\) return s;/.test(src), true);
-  eq('  상세 시트가 applyLock 에 공고를 넘긴다', /applyLock\(result, app, d, sch\)/.test(src), true);
+  eq('  상세 시트가 applyLock 에 공고(와 자격 근거 fd)를 넘긴다', /applyLock\(result, app, d, sch, fd\)/.test(src), true);
 
   /* 🔴 **여기는 계속 막힌다** — 우리 판정이 아니라 사실이라서다 */
   eq('마감된 공고는 여전히 잠긴다', applyLock(R('eligible'), null, closed).canApply, false);
@@ -8600,7 +9323,14 @@ console.log('\n■ 환영 화면 문구 (2026-09-12 · UI-22)');
   /* 여러 줄로 쓴 검증은 위 그물을 빠져나간다 — 완료 버튼만은 '도중에 안 막는다'로 따로 못 박는다 */
   const fin = (app.match(/\$\('#btn-finish-onboard'\)\.addEventListener\('click', \(\) => \{([\s\S]*?)\n  \}\);/) || [])[1] || '';
   eq('완료 버튼 처리기를 실제로 찾았다 (빈 값을 통과시키지 않는다)', fin.length > 200, true);
-  eq('완료 버튼은 도중에 막지 않는다 (막으면 문구가 거짓이 된다)', /\breturn;/.test(fin), false);
+  /* 2026-11-17 입력 안전장치(9351b8a6)가 완료 버튼에 '있을 수 없는 값'(평점 999) 되돌림을 넣었는데 이 검사를 같이 옮기지 않아
+     기본 브랜치의 규칙 관문이 빨개졌다(수집 로봇들이 저장 전 관문에서 멈췄다 · 11-18 수리). 그 블록은 빈 칸을 통과시키므로(아래 줄) 문구는 여전히 참이다 —
+     그 한 블록만 떼고 본다 · 다른 return 이 생기면 그대로 걸린다 */
+  const finRest = fin.replace(/const bad = guardFirstBad\(\$\('#screen-onboarding'\)\);\n\s*if \(bad\) \{[\s\S]*?\n    \}\n/, '');
+  eq('완료 버튼은 도중에 막지 않는다 (막으면 문구가 거짓이 된다) — 있을 수 없는 값 되돌림(guardFirstBad) 한 블록만 예외', /\breturn;/.test(finRest), false);
+  const IG0 = createRequire(import.meta.url)('../input-guard.js');
+  eq('  그 되돌림은 빈 칸을 막지 않는다 (막으면 「학교·학년만」 문구가 거짓이 된다) · 다른 return 을 넣으면 걸린다',
+    [IG0.checkNumber('', IG0.PROFILE_LIMITS.gpa || { min: 0, max: 4.5, label: '평점' }).ok, IG0.checkBirthDate('').ok, /\breturn;/.test(`${finRest}\n    if (!x) return;`)], [true, true, true]);
 }
 
 console.log('\n■ 이어보기 판정 (2026-09-09)');
@@ -8943,7 +9673,7 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
     eq('D-DAY 는 D-DAY 그대로', ddayWords({ label: 'D-DAY', cls: 'urgent', days: 0 }), 'D-DAY');
     eq('D-3 은 D-3 그대로 (풀어 쓰지 않는다)', ddayWords({ label: 'D-3', cls: 'urgent', days: 3 }), 'D-3');
     eq('지난 것은 마감', ddayWords({ label: '마감', cls: 'closed', days: -2 }), '마감');
-    eq('못 읽은 것은 지어내지 않는다', ddayWords({ label: '기한 원문 확인', cls: '', days: 14 }), '기한 확인 중');
+    eq('못 읽은 것은 지어내지 않고 말하지도 않는다 (2026-11-15 · 예전 「기한 확인 중」)', ddayWords({ label: '', cls: '', days: 14, unknown: true }), '');
   }
   /* 마감 자리는 맨 아랫줄(.sch-foot) — 맨 윗줄(.sch-top)은 적합도 자리라 거기 두면 안 된다(개발자 지시) */
   {
@@ -9805,6 +10535,40 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
     eq('상세 시트: 원문 링크는 「원문」 절에 한 번만 그린다 (openDetail 본문엔 링크 그리기가 없다)', [(secSrc.match(/<h4>원문<\/h4>/g) || []).length, /sourceLinkHtml\(sch\)|srcLink/.test(body.replace(/\/\*[\s\S]*?\*\//g, ''))], [1, false]);
     eq('  「원문」 절 = 링크(.doc-legend.sheet-source 안) + 안내 한 줄 + 층2 문의 · 「중복 수혜 가능」·「마감 …」 점 줄은 없다',
       /<div class="sheet-facts"><p class="doc-legend sheet-source">\$\{a \|\| sourceNoteHtml\(sch\)\}\$\{hint \? `<br \/>\$\{hint\}` : ''\}<\/p>\$\{\(sch\.sourceKind === 'kosaf' && sch\.contact\) \? `<p class="doc-legend">문의 \$\{esc\(sch\.contact\)\}<\/p>` : ''\}<\/div>/.test(secSrc) && !/중복 수혜 가능|마감 \$\{/.test(secSrc), true);
+    /* 2026-11-16 개발자 지시 — 절마다 한 묶음(.sheet-sec · 사이 옅은 선) + 절 이름은 진한 글자 앞 점(불렛). 회색으로 흐리게 되돌리면 여기서 걸린다 */
+    {
+      const cssSec = readText(new URL('../style.css', import.meta.url)).replace(/\/\*[\s\S]*?\*\//g, '');
+      eq('  절 다섯은 저마다 <section class="sheet-sec"> 묶음이다(빈 절은 묶음도 없다)',
+        /\[elig, apply, notice, att, src\]\.filter\(Boolean\)\.map\(\(s\) => `<section class="sheet-sec">\$\{s\}<\/section>`\)/.test(secSrc), true);
+      eq('  묶음 사이 옅은 선 · 절 이름은 진한 글자(--text) · 이름 앞 점(::before · --accent)',
+        [/\.sheet-sec \{[^}]*border-top: 1px solid var\(--line\)/.test(cssSec),
+         /\.sheet-sec > \.sheet-verdict > h4 \{[^}]*color: var\(--text\);/.test(cssSec),
+         /\.sheet-sec > \.sheet-verdict > h4::before \{[^}]*border-radius: 50%; background: var\(--accent\)/.test(cssSec)], [true, true, true]);
+    }
+    /* ■ 깨진 글자 씻기 (2026-11-17 개발자 지시 "깨진 글자 모두 찾아서 수리 · 장학금, 대외활동/공모전 모두") —
+       받은 데이터를 받는 순간 tidyData 한 번. 표본으로 앱 소스의 그 줄들을 떼어 돌린다(베끼지 않는다) · 실데이터는 재지 않는다 */
+    {
+      const takeLine = (re) => (appSrc2.match(re) || [''])[0];
+      const takeFnSrc = (n) => { const a = appSrc2.indexOf(`function ${n}(`); return a < 0 ? '' : appSrc2.slice(a, appSrc2.indexOf('\n}\n', a) + 2); };
+      const tidy = new Function([takeLine(/const ENTITIES = \{[^\n]+\};/), takeLine(/const ENTITY_RE = [^\n]+;/), takeFnSrc('unent'), takeLine(/const JUNK_CHARS = [^\n]+;/),
+        takeLine(/const OCR_URL_GARBLE = [^\n]+;/), takeLine(/const TIDY_SKIP_KEY = [^\n]+;/), takeLine(/const OCR_TEXT_KEY = [^\n]+;/), takeLine(/const OCR_MARK = [^\n]+;/), takeFnSrc('tidyOcr'), takeFnSrc('tidyText'), takeFnSrc('tidyData'), 'return tidyData;'].join('\n'))();
+      const got = tidy({ items: [{ id: 'a&amp;b', sourceUrl: 'https://x.kr/v?a=1&amp;b=2',
+        eligibilityLines: ['중소 &middot; 중견기업', '\uF0A7 장학생 신청접수 완료 후', '\u200B \u200B○ 신청대상', '\uFFFD 모집 대상', '센터 &times; Google'],
+        documents: ['장학생신청서 - 금신장학재단 홈페이지(//“\\6401510.0ㅁ.<0)에서 작성', '홈페이지(www.kumsin.or.kr)에서 작성'] }] }).items[0];
+      eq('깨진 글자 씻기 — HTML 기호를 풀고 · HWP 기호·폭 0 공백·대체 문자를 지우고 · OCR 이 깨뜨린 주소 괄호만 걷는다(멀쩡한 괄호는 그대로)',
+        [...got.eligibilityLines, ...got.documents],
+        ['중소 · 중견기업', '장학생 신청접수 완료 후', '○ 신청대상', '모집 대상', '센터 × Google', '장학생신청서 - 금신장학재단 홈페이지에서 작성', '홈페이지(www.kumsin.or.kr)에서 작성']);
+      eq('  주소·id 칸은 건드리지 않는다(주소의 & 는 decodeUrlEntities 몫)', [got.id, got.sourceUrl], ['a&amp;b', 'https://x.kr/v?a=1&amp;b=2']);
+      const got2 = tidy({ title: 'A\u200D B', name: '유형 Ⅱ \u200B 장학금', home: 'https://x.or.kr/?a=1&amp;b=2' });
+      const got3 = tidy({ items: [{ title: '© 2026 제목', documents: ['@)-1 주민등록초본(전체 주소이력)', '협회 서식 |@ 자기소개서 1,500자 이내', '© 학자금 지원구간 통지서', '문의 abc@kosaf.go.kr'], eligibilityLines: ['강릉의 이미지\uF0A0상징성을 표현'] }] }).items[0];
+      eq('  OCR 이 동그라미 숫자를 읽은 @·©·® 글머리와 세로줄은 자격·서류 칸에서만 걷는다(이메일 @·제목은 그대로) · 단어 사이 HWP 기호는 빈칸으로(리뷰 11-17)',
+        [got3.title, got3.documents, got3.eligibilityLines], ['© 2026 제목', ['주민등록초본(전체 주소이력)', '협회 서식 | 자기소개서 1,500자 이내', '학자금 지원구간 통지서', '문의 abc@kosaf.go.kr'], ['강릉의 이미지 상징성을 표현']]);
+      eq('  이모지 잇개(U+200D)는 두고 · 폭 0 공백 자리의 겹친 빈칸은 하나로 · 재단 홈페이지(home) 같은 주소 칸도 그대로(리뷰 11-17)', [got2.title, got2.name, got2.home], ['A\u200D B', '유형 Ⅱ 장학금', 'https://x.or.kr/?a=1&amp;b=2']);
+      const loaders = ['loadRegistered', 'loadKosaf', 'loadActivities', 'loadExternal', 'loadNotices', 'loadNews'].map((n) => [n, /tidyData\(/.test(takeFnSrc(n))]);
+      eq('  받는 곳 여섯(정식 등록·카드 읽기·층2·대외활동·재단 게시판·학교 공고·소식)이 모두 씻는다', loaders.filter(([, ok]) => !ok).map(([n]) => n), []);
+      const ws = readText(new URL('./what-shows.mjs', import.meta.url));
+      eq('  what-shows 도 앱처럼 씻은 글자로 말한다 — 읽자마자(카드 읽기를 얹고 찾기 전에) · 카드 읽기 파일도', /const reg = tidyData\(JSON\.parse/.test(ws) && /applyCardRead\(reg\.items, tidyData\(/.test(ws) && /'tidyText', 'tidyData'/.test(ws), true);
+    }
   }
 
   /* 🔴 'AI 티' 정리 A·D·E·G·H (2026-10-06 사장님 지시 → 전후 사진 보고 → 은서님이 다섯 개 골랐다).
@@ -9879,8 +10643,10 @@ console.log('\n■ 앱 내부 사정은 학생 화면에 적지 않는다 (2026-
     /금액 미확인/.test(adm) && /마감일 없음/.test(adm) && /지원 자격 미확보/.test(adm), true);
 
   /* ③ 🔴 지워서는 안 되는 것 — 여기까지 지우면 앱이 '확인해 줬다'고 말하는 셈이 된다 */
-  eq('그래도 「자격 미확인」 배지는 남아 있다 (원칙 8-1)',
-    /badge-fit-unknown">자격 미확인</.test(appCode), true);
+  /* 2026-11-15 개발자 결정 11-02 — 「자격 미확인」 배지도 뺐다(학생 화면에 '모름'류 글자 없음). 못 읽은 공고는 알약이 없고 순서는 아래(fitRank) ·
+     신청 전 안내(아래)는 남는다 — 그것까지 지우면 앱이 '확인해 줬다'고 말하는 셈이다 */
+  eq('「자격 미확인」 배지는 없다 — 못 읽은 공고는 알약 없음 (2026-11-15)',
+    [/badge-fit-unknown">자격 미확인</.test(appCode), /if \(verdict === 'unread'\) return '';/.test(appCode)], [false, true]);
   eq('  자격을 못 읽은 공고는 신청 전에 원문을 보라고 말한다',
     /공고 원문에서 지원 자격을 확인하세요/.test(appCode), true);
 }
@@ -10382,6 +11148,7 @@ console.log('\n■ 관리자 수정 규칙이 한 벌인가 (화면 미리보기
     ['같은 값이면 아무것도 안 바뀐다', { name: '테스트 장학금' }],
     ['마감일', { deadline: '2026-11-30' }],
     ['자격 문장', { eligibilityLines: '재학생\n성적 3.0 이상' }],
+    ['원문 발췌 (2026-11-17)', { excerpts: ['신청기간 : 2026. 11. 1. ~ 11. 30.', '  '] }],
   ];
   const script = fileURLToPath(new URL('../tools/admin-apply.mjs', import.meta.url));
   for (const [label, patch] of CASES) {
@@ -10527,7 +11294,7 @@ console.log('\n■ 관리자 화면 로봇 목록 — 화면이 부를 수 있�
     .replace(/const ROBOT_NOT_LISTED = \[[^\]]*\]/, '');
   const unreachable = all.filter((f) => !calls.includes(f));
   eq(`화면이 못 부르는 워크플로 (지금 ${unreachable.length}개: ${unreachable.join(' · ')})`,
-    unreachable.sort(), ['codeql-triage.yml', 'codeql.yml', 'device-deploy.yml', 'error-watch.yml', 'key-expiry.yml', 'push-deploy.yml', 'push-limit-check.yml', 'rollback.yml', 'two-school-scan.yml']);   // rollback: 11-11 · Actions 탭에서만(관리자 화면 버튼은 나중에)
+    unreachable.sort(), ['card-read.yml', 'codeql-triage.yml', 'codeql.yml', 'device-deploy.yml', 'error-watch.yml', 'key-expiry.yml', 'push-deploy.yml', 'push-limit-check.yml', 'rollback.yml', 'two-school-scan.yml']);   // rollback: 11-11 · Actions 탭에서만(관리자 화면 버튼은 나중에)
 }
 
 console.log('\n■ 안내문이 사람을 화면으로 부른다 (채팅으로 되돌아가면 실패)');
@@ -10797,6 +11564,161 @@ console.log('\n■ 관리자 쓰기 — 되돌릴 수 없는 일 앞의 안전�
     ['activityHide', 'activityKind', 'activitySource', 'activityUnhide', 'addBoard', 'autoRegister', 'formQueue', 'linkFix', 'linkUnfix', 'newsHide', 'newsKind', 'newsSource', 'newsThumbOff', 'newsThumbOn', 'newsUnhide', 'unblock']);
 }
 
+console.log('\n■ 발췌 주인 표식 · 바닥글 — 사람이 쓴 발췌는 로봇이 안 덮고 · 원문 근거로 안 쓴다 (2026-11-17)');
+/* 신청 방법 원문 발췌(`excerpts`)를 관리자가 `tools/admin-apply.mjs` edit 로 고칠 수 있게 연 날 같이 잠근 넷.
+   ① 저장소: 고치면 `excerptsFrom = '관리자 <날짜>'`(비우면 '· 비움' + excerpts·excerptNote 삭제) · 글자 아닌 줄은 멈춘다 · 화면 미리보기(edit-diff)와 같은 값
+   ② 발췌 로봇(extract-excerpts): excerptsFrom 이 '관리자'·'AI' 면 본문 갈래·첨부 갈래 모두 덮지도 지우지도 되채우지도 않는다
+   ③ 🔴 자기 근거 금지: 사람이 쓴 발췌는 자유 형식 제출·이중수혜 근거 대조(admin-apply corpus) · 범위 승격(scope-promote) · 교내 판정(kind-classify) ·
+      합칠 때 마감 근거(registered-merge deadlineQuote)에서 빠진다 — 판정은 collector/notice-source.mjs evidenceExcerpts 한 곳
+      (같은 patch 안의 자격 줄도 — 칸을 다 돈 뒤 붙던 표식 때문에 `{eligibilityLines:[문장], exclusivity:{raw:문장}}` 한 건이 통과했다)
+   ④ 바닥글: 서울시립대 `전화 : 02-6490-6114 / 서울시통합문의 : 02-120` 이 MARK `문의\s?:` 로 발췌에 앉던 것(EXCERPT_FOOTER)
+   표본은 전부 여기 적은 글자다(실데이터에 안 기댄다) — 저장소·로봇은 자식 프로세스로 진짜 돌린다. */
+{
+  const NS = await import(new URL('../collector/notice-source.mjs', import.meta.url));
+  const RM = await import(new URL('../collector/registered-merge.mjs', import.meta.url));
+  const { sandbox: exSandbox } = await import(new URL('./health-gates/bodies.mjs', import.meta.url));
+  const ROOT_URL = new URL('../', import.meta.url);
+
+  /* ④ 바닥글 — 진짜 문의 줄은 남는다 */
+  const FOOT = '전화 : 02-6490-6114 / 서울시통합문의 : 02-120';
+  eq('④ 서울시립대 바닥글(서울시통합문의)은 발췌가 아니다', AWAIT_EE.extractFrom(`가. 신청기간 : 2026. 11. 1.(월) ~ 11. 30.(월)\n${FOOT}`), ['가. 신청기간 : 2026. 11. 1.(월) ~ 11. 30.(월)']);
+  eq('  띄어 쓴 꼴(서울시 통합 문의)도', AWAIT_EE.extractFrom('대표 번호 02-6490-6114 · 서울시 통합 문의 : 120'), []);
+  eq('  진짜 문의 줄은 그대로 담는다 (문의 : / 문의처 : · 전화·메일)',
+    AWAIT_EE.extractFrom('7. 문의 : 학생지원팀 장학담당 02-6490-6200\n※ 문의처 : 장학팀 (scholar@uos.ac.kr)'),
+    ['7. 문의 : 학생지원팀 장학담당 02-6490-6200', '※ 문의처 : 장학팀 (scholar@uos.ac.kr)']);
+
+  /* 판정 한 곳 */
+  eq('주인 판정 — 관리자·AI 는 사람 값 · 로봇·표식 없음은 아니다',
+    [{ excerptsFrom: '관리자 2026-11-17' }, { excerptsFrom: '관리자 2026-11-17 · 비움' }, { excerptsFrom: 'AI(공고 포스터)' }, { excerptsFrom: '로봇' }, {}].map(NS.excerptsHumanOwned),
+    [true, true, true, false, false]);
+  eq('근거로 쓰는 발췌 — 관리자 줄만 빠진다 (AI 가 원문에서 읽은 줄은 자격 줄 규칙처럼 근거)',
+    [NS.evidenceExcerpts({ excerpts: ['가'], excerptsFrom: '관리자 2026-11-17' }), NS.evidenceExcerpts({ excerpts: ['나'] }), NS.evidenceExcerpts({ excerpts: ['다'], excerptsFrom: 'AI(첨부)' }), NS.evidenceExcerpts({})],
+    [[], ['나'], ['다'], []]);
+
+  /* ③ 합칠 때 — 마감 근거·발췌 옮기기 */
+  const drop0 = { id: 'd', deadline: '2026-11-30', period: '접수 기간 원문 확인', excerpts: ['신청기간 : 2026. 11. 1. ~ 11. 30.'] };
+  eq('③ 합칠 때 마감 근거 — 로봇 발췌는 근거가 된다 (대조군)', RM.deadlineQuote(drop0), '신청기간 : 2026. 11. 1. ~ 11. 30.');
+  eq('  사람이 쓴 발췌는 마감 근거가 아니다', RM.deadlineQuote({ ...drop0, excerptsFrom: '관리자 2026-11-17' }), null);
+  {
+    const keep = { id: 'k', eligibility: {} };
+    RM.mergeInto(keep, { id: 'd', eligibility: {}, excerpts: ['사람 줄'], excerptsFrom: '관리자 2026-11-17' });
+    eq('  발췌는 주인 표식과 한 세트로 옮긴다 (표식 없이 옮기면 로봇 줄로 둔갑해 근거가 된다)', [keep.excerpts, keep.excerptsFrom, NS.evidenceExcerpts(keep)], [['사람 줄'], '관리자 2026-11-17', []]);
+    const cleared = { id: 'k', eligibility: {}, excerptsFrom: '관리자 2026-11-17 · 비움' };
+    RM.mergeInto(cleared, { id: 'd', eligibility: {}, excerpts: ['로봇 줄'], excerptNote: '공고 원문에서 그대로 발췌 (자동)' });
+    eq('  사람이 비운 발췌는 합칠 때 되살리지 않는다', cleared.excerpts, undefined);
+    /* 리뷰 4차 — 범위 승격 로봇이 합칠 때 남는 쪽에 로봇 발췌가 있으면 버리는 쪽의 사람 발췌가 소리 없이 사라졌다 */
+    const robotKeep = { id: 'k', eligibility: {}, excerpts: ['로봇 줄'], excerptNote: '공고 원문에서 그대로 발췌 (자동)' };
+    RM.mergeInto(robotKeep, { id: 'd', eligibility: {}, excerpts: ['사람 줄'], excerptsFrom: '관리자 2026-11-17' });
+    eq('  남는 쪽이 로봇 발췌여도 버리는 쪽의 사람 발췌가 표식과 함께 이긴다', [robotKeep.excerpts, robotKeep.excerptsFrom, robotKeep.excerptNote], [['사람 줄'], '관리자 2026-11-17', undefined]);
+    const humanKeep = { id: 'k', eligibility: {}, excerpts: ['남는 쪽 사람 줄'], excerptsFrom: '관리자 2026-11-16' };
+    RM.mergeInto(humanKeep, { id: 'd', eligibility: {}, excerpts: ['버리는 쪽 사람 줄'], excerptsFrom: '관리자 2026-11-17' });
+    eq('  둘 다 사람 발췌면 남는 쪽을 그대로 둔다', [humanKeep.excerpts, humanKeep.excerptsFrom], [['남는 쪽 사람 줄'], '관리자 2026-11-16']);
+  }
+
+  /* ① 저장소를 진짜로 — 사본 저장소 한 건 */
+  const script = fileURLToPath(new URL('../tools/admin-apply.mjs', import.meta.url));
+  const Q = '본 장학금은 타 장학금과 중복하여 받을 수 없습니다';
+  const EXC = { kind: 'forbidden', scope: 'external', raw: Q };
+  const runEdit = (edits, tweak = {}) => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'admexc-'));
+    fs.mkdirSync(path.join(dir, 'data'), { recursive: true });
+    fs.mkdirSync(path.join(dir, 'collector'), { recursive: true });
+    /* 원문 말뭉치(저장소 기준으로 읽는다)에 없을 주소 — 그래서 근거는 발췌·자격 줄 말고는 없다 */
+    const it = { id: 'reg-exc0', name: '발췌 주인 검사용 장학금', type: '교외', provider: '검사재단', amount: '금액 원문 확인', amountValue: 0, summary: '요약',
+      sourceUrl: 'https://excerpt-owner.invalid/view.do?seq=1', eligibility: { selective: true }, documents: ['재학증명서'],
+      deadline: '2026-12-01', noForm: '양식 없음', auto: true, listedAt: '2026-09-01', ...tweak };
+    fs.writeFileSync(path.join(dir, 'data/registered.json'), `${JSON.stringify({ items: [it] }, null, 1)}\n`);
+    fs.writeFileSync(path.join(dir, 'data/forms.json'), JSON.stringify({ forms: {}, templates: {} }));
+    fs.writeFileSync(path.join(dir, 'collector/auto-register-config.json'), `${JSON.stringify({ enabled: true, blockIds: [], blockUrls: [] }, null, 1)}\n`);
+    const r = spawnSync(process.execPath, [script], { cwd: dir, encoding: 'utf8',
+      env: { ...process.env, ACTION: 'edit', ACTOR: 'gate', PAYLOAD: JSON.stringify({ edits: edits.map((patch) => ({ id: 'reg-exc0', patch })) }) } });
+    const after = JSON.parse(readText(path.join(dir, 'data/registered.json'))).items[0];
+    fs.rmSync(dir, { recursive: true, force: true });
+    return { status: r.status, out: `${r.stdout || ''}${r.stderr || ''}`, after };
+  };
+  const ROBOT = { excerpts: ['옛 로봇 줄 신청기간 : 2026. 9. 1. ~ 9. 30.'], excerptNote: '공고 원문에서 그대로 발췌 (자동)' };
+  const set = runEdit([{ excerpts: ['  신청기간 : 2026. 11. 1.(월) ~ 11. 30.(월)  ', '   ', '접수처 : 학생지원팀 (02-123-4567)'] }], ROBOT);
+  eq('① 저장소가 발췌를 받는다 — 줄 다듬기 · 빈 줄 버림 · 관리자 표식 · 로봇 출처 문구(excerptNote) 뺌',
+    [set.status, set.after.excerpts, /^관리자 \d{4}-\d{2}-\d{2}$/.test(set.after.excerptsFrom || ''), set.after.excerptNote],
+    [0, ['신청기간 : 2026. 11. 1.(월) ~ 11. 30.(월)', '접수처 : 학생지원팀 (02-123-4567)'], true, undefined]);
+  const clr = runEdit([{ excerpts: [] }], ROBOT);
+  eq('  비우면 발췌·출처 문구를 지우고 · 비움 표식을 남긴다 (로봇이 되채우지 않게)',
+    [clr.status, clr.after.excerpts, clr.after.excerptNote, /^관리자 .* · 비움$/.test(clr.after.excerptsFrom || '')], [0, undefined, undefined, true]);
+  const bad = runEdit([{ excerpts: [1, { a: 2 }] }], ROBOT);
+  eq('  글자가 아닌 줄이 섞이면 멈추고 파일은 그대로', [bad.status !== 0, /문장\(글자\) 목록/.test(bad.out), bad.after.excerpts], [true, true, ROBOT.excerpts]);
+  /* 화면 미리보기가 같은 값을 예고한다 */
+  const rows = diffPatch(ROBOT, { excerpts: ['신청기간 : 2026. 11. 1. ~ 11. 30.', ' '] });
+  eq('  화면 미리보기(diffPatch)가 같은 칸·값을 예고한다 (이름표 · 전후)',
+    rows.map((d) => [d.key, d.label, d.before, d.after, d.block]), [['excerpts', '신청 방법 원문 발췌', ROBOT.excerpts, ['신청기간 : 2026. 11. 1. ~ 11. 30.'], null]]);
+  eq('  미리보기도 글자 아닌 줄은 막힌 줄로 보여 준다 (죽지 않는다)', !!(diffPatch(ROBOT, { excerpts: [3] })[0] || {}).block, true);
+
+  /* ③ 자기 근거 금지 — 대조군(로봇 발췌는 근거가 된다)이 먼저 통과해야 아래 거절이 '근거 대조가 돈다'는 뜻이다 */
+  const ctl = runEdit([{ exclusivity: EXC }], { excerpts: [Q] });
+  eq('③ 대조군 — 로봇이 뽑은 발췌는 이중수혜 근거가 된다', [ctl.status, (ctl.after.exclusivity || {}).raw], [0, Q]);
+  const stored = runEdit([{ exclusivity: EXC }], { excerpts: [Q], excerptsFrom: '관리자 2026-11-01' });
+  eq('  🔴 관리자가 쓴 발췌는 이중수혜 근거가 아니다', [stored.status !== 0, /이중수혜 근거를 확인하지 못했습니다/.test(stored.out), stored.after.exclusivity], [true, true, undefined]);
+  const samePatch = runEdit([{ excerpts: [Q], exclusivity: EXC }]);
+  eq('  한 patch 안에서 발췌를 쓰고 그 문장으로 이중수혜를 켜도 막힌다', [samePatch.status !== 0, samePatch.after.excerpts], [true, undefined]);
+  const twoEdits = runEdit([{ excerpts: [`${Q} 자유 양식`] }, { prepDoc: true, prepDocBasis: `${Q} 자유 양식` }]);
+  eq('  한 묶음 두 건(발췌 → 자유 형식 제출 근거)도 막힌다', [twoEdits.status !== 0, /자유 형식 제출 근거를 확인하지 못했습니다/.test(twoEdits.out), twoEdits.after.prepDoc], [true, true, undefined]);
+  const eligSame = runEdit([{ eligibilityLines: [Q], exclusivity: EXC }]);
+  eq('  🔴 자격 줄도 한 patch 안에서 근거가 못 된다 (2026-09-14 수리는 두 건으로 나눈 묶음만 막았다)',
+    [eligSame.status !== 0, eligSame.after.exclusivity, eligSame.after.eligibilityFrom], [true, undefined, undefined]);
+
+  /* ② 발췌 로봇을 진짜로 — 임시 폴더 사본 */
+  const sb = exSandbox(ROOT_URL, 'hdj-excerpt-owner-');
+  try {
+    const BODY = '지원 대상은 국내 대학에 재학 중인 학부생으로서 직전 학기 성적이 평균 이상인 학생입니다.\n'
+      + '선발된 학생에게는 한 학기 등록금 전액과 생활비를 함께 지원하며 학업 계획서를 심사합니다.\n'
+      + '장학생으로 선발된 학생은 학기 중 봉사 활동에 참여하고 결과 보고서를 제출하여야 합니다.\n'   // 본문 분량(MIN_BODY)을 넘겨 '원문 있음' 길로 — 모자라면 본문 갈래를 안 지나 헛돈다(만들며 겪었다)
+      + '가. 신청기간 : 2026. 11. 2.(월) ~ 11. 27.(금) 18:00까지\n나. 접수처 : 학생지원팀 장학담당 (02-555-0100)\n';
+    const DOC = `${'공고문 첨부 본문입니다. 선발 인원과 지원 금액, 심사 절차를 안내합니다. '.repeat(12)}\n가. 신청기간 : 2026. 12. 1.(화) ~ 12. 15.(화)\n`;
+    const U = (n) => `https://e${n}.example.ac.kr/view.do?seq=${n}`;
+    sb.write('collector/extracted/notices-text.json', [1, 2, 3, 4].map((n) => ({ title: `2026 발췌 주인 검사 장학생 선발 ${n}`, url: U(n), text: `2026 발췌 주인 검사 장학생 선발 ${n}\n${BODY}` })));
+    sb.write('collector/extracted/elig-docs.json', { d1: { files: ['own-d1.hwp'] }, d2: { files: ['own-d2.hwp'] } });
+    for (const f of ['own-d1.hwp', 'own-d2.hwp']) { sb.write(`collector/extracted/${f}`, 'HWP'); sb.write(`collector/extracted/${f}.body.txt`, DOC); }
+    const base = (id, n) => ({ id, name: `2026 발췌 주인 검사 장학생 선발 ${n}`, sourceUrl: U(n), auto: true });
+    const MAN = ['관리자가 원문에서 옮긴 줄 신청기간 : 2026. 11. 2. ~ 11. 27.'];
+    sb.write('data/registered.json', { items: [
+      { ...base('e1', 1), excerpts: ['옛 로봇 줄 신청기간 : 2026. 9. 1. ~ 9. 30.'], excerptNote: '공고 원문에서 그대로 발췌 (자동)' },
+      { ...base('e2', 2), excerpts: MAN, excerptsFrom: '관리자 2026-11-17' },
+      { ...base('e3', 3), excerptsFrom: '관리자 2026-11-17 · 비움' },
+      { ...base('e4', 4), excerpts: MAN, excerptsFrom: 'AI(공고 포스터 그림)' },
+      { id: 'd1', name: '2026 첨부만 있는 검사 장학생 선발 하나', sourceUrl: 'https://d1.example.ac.kr/view.do?seq=1', auto: true, excerpts: ['옛 첨부 줄 신청기간 : 2026. 9. 1. ~ 9. 3.'], excerptNote: '공고문 첨부에서 그대로 발췌 (자동)' },
+      { id: 'd2', name: '2026 첨부만 있는 검사 장학생 선발 둘', sourceUrl: 'https://d2.example.ac.kr/view.do?seq=2', auto: true, excerptsFrom: '관리자 2026-11-17 · 비움' },
+    ] });
+    const r = sb.run('collector/extract-excerpts.mjs', ['--write'], { EXCERPTS_AS_LIB: '' });
+    const by = Object.fromEntries((sb.json('data/registered.json')?.items || []).map((x) => [x.id, x]));
+    eq('② [발췌기 실행] 끝까지 돈다', r.status, 0);
+    eq('  대조군 — 로봇 발췌는 본문에서 새로 뽑아 바꾼다 · 첨부 발췌는 첨부에서 다시', [(by.e1?.excerpts || [])[0], (by.d1?.excerpts || [])[0]],
+      ['가. 신청기간 : 2026. 11. 2.(월) ~ 11. 27.(금) 18:00까지', '가. 신청기간 : 2026. 12. 1.(화) ~ 12. 15.(화)']);
+    eq('  🔴 관리자·AI 가 정한 발췌는 본문 갈래에서 덮지 않는다', [by.e2?.excerpts, by.e2?.excerptsFrom, by.e4?.excerpts], [MAN, '관리자 2026-11-17', MAN]);
+    eq('  🔴 사람이 비운 발췌는 본문·첨부 갈래 모두 되채우지 않는다', [by.e3?.excerpts, by.d2?.excerpts, by.d2?.excerptsFrom], [undefined, undefined, '관리자 2026-11-17 · 비움']);
+  } finally { sb.done?.(); }
+
+  /* ③ 범위 승격 로봇을 진짜로 — 사람이 쓴 발췌의 '재단 홈페이지에서 신청' 은 전국 승격 근거가 아니다 */
+  const sp = exSandbox(ROOT_URL, 'hdj-excerpt-scope-');
+  try {
+    sp.write('verify/entry-rules.cjs', readText(new URL('./entry-rules.cjs', import.meta.url)));
+    sp.write('collector/schools.json', { schools: [] });
+    sp.write('collector/extracted/notices-text.json', []);
+    const far = new Date(Date.now() + 40 * 86400000).toISOString().slice(0, 10);
+    const one = (id, extra) => ({ id, name: `2026 검사재단 장학생 선발 ${id}`, type: '교외', auto: true, deadline: far, eligibility: { schoolOnly: '검사대학교' },
+      sourceUrl: `https://${id}.example.ac.kr/view.do?seq=1`, ...extra });
+    const LINE = ['신청방법 : 검사재단 홈페이지에서 신청 (2026. 11. 30.까지)'];
+    sp.write('data/registered.json', { items: [one('s1', { excerpts: LINE }), one('s2', { excerpts: LINE, excerptsFrom: '관리자 2026-11-17' })] });
+    const r = sp.run('collector/scope-promote.mjs', ['report.md']);
+    const by = Object.fromEntries((sp.json('data/registered.json')?.items || []).map((x) => [x.id, x]));
+    eq('③ [범위 승격 실행] 대조군 — 로봇 발췌의 재단 신청 문장은 전국 근거 · 🔴 같은 문장이라도 관리자가 쓴 발췌면 학교 한정 그대로',
+      [r.status, (by.s1?.eligibility || {}).schoolOnly, (by.s2?.eligibility || {}).schoolOnly], [0, undefined, '검사대학교']);
+  } finally { sp.done?.(); }
+
+  /* 교내 판정 로봇(kind-classify)은 불러오는 순간 실행되고 학교 표가 커서 표본으로 못 돌린다 — 넘기는 발췌가 같은 한 곳을 지나는지 본다 */
+  const kc = readText(new URL('../collector/kind-classify.mjs', import.meta.url)).replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');   // 주석 속 글자로 통과하지 않게
+  eq('  교내 판정 로봇도 사람이 쓴 발췌를 빼고 넘긴다 (evidenceExcerpts · it.excerpts 를 그대로 넘기지 않는다)',
+    [/excerpts:\s*evidenceExcerpts\(it\)/.test(kc), /excerpts:\s*it\.excerpts/.test(kc), /!evidenceExcerpts\(it\)\.length/.test(kc)], [true, false, true]);
+}
+
 console.log('\n■ 못 읽은 파일의 숫자를 화면이 단정하지 않는다');
 /* 🔴 관리자 화면이 말하는 「게시판 2곳」·「재단 90곳」은 전부 **파일에서 센 것**이다.
    그 파일을 못 읽었을 때 조용히 빈 값으로 바꾸면 인터넷이 끊겨도 화면은 「0곳 · 모든
@@ -10966,7 +11888,8 @@ console.log('■ 첨부에서 마감일 — 본문이 껍데기인 게시판 (20
   const 첨부마감 = reg.filter((i) => i.deadlineFrom === '공고문 첨부' && i.deadline);
   if (첨부마감.length) {
     eq(`첨부에서 읽었다고 적힌 공고 ${첨부마감.length}건이 실제로 다시 읽힌다`,
-      첨부마감.filter((i) => AWAIT_EE.deadlineFromDocs({ id: i.id }) !== i.deadline).map((i) => i.id), []);
+      /* 2026-11-15: 공고 **전체**를 넘긴다 — 신청서 쪽에 섞여 온 공고문(noticeDocFiles)은 id 칸 없는 옛 색인 줄을 제목·첨부 이름으로 찾는다(발췌기가 부르는 그대로) */
+      첨부마감.filter((i) => AWAIT_EE.deadlineFromDocs(i) !== i.deadline).map((i) => i.id), []);
   } else {
     /* 표본이 없다 — 그래도 **함수가 살아 있는지**는 잰다(첨부가 60일마다 갈려 0건일 수 있다) */
     const 색인 = JSON.parse(readText(new URL('../collector/extracted/elig-docs.json', import.meta.url)));
@@ -11036,17 +11959,18 @@ console.log('■ 첨부에서 마감일 — 본문이 껍데기인 게시판 (20
   }
   /* ⚠️ 변수 이름·중괄호 자리를 박지 않는다 — 뜻이 같은 리팩터에 빨간불이 되면 다음 사람이 관문을 끈다.
      재는 것은 '본문을 먼저 보고, 못 읽었을 때 첨부로 물러나는 순서' 하나다. */
-  const 본문먼저 = ee.indexOf('extractDeadline(body)');
+  const 본문먼저 = ee.search(/extractDeadline\((?:body|own\.text)\)/);   // own.text — 제목 앞 사이트 띠 줄만 걷은 같은 본문(발췌기 siteChrome)
   eq('  본문을 먼저 보고 못 읽었을 때만 첨부로 물러난다',
     본문먼저 > 0 && ee.indexOf('deadlineFromDocs(it)', 본문먼저) > 본문먼저, true);
   /* 본문이 아예 없는 길(= `if (!hasText(src))` 블록) 안에서도 불러야 한다 */
   const noBody = ee.slice(ee.indexOf('if (!hasText(src)) {'), ee.indexOf('const body = strip('));
-  eq('  본문이 아예 없는 길에서도 첨부를 본다', /deadlineFromDocs\(it\)/.test(noBody), true);
+  eq('  본문이 아예 없는 길에서도 첨부를 본다', /deadlineFromDocs\(it[,)]/.test(noBody), true);
   eq('  채우는 자리는 한 곳이다 (period 처리가 갈라지지 않게)',
     (ee.match(/function putDeadline\(/g) || []).length, 1);
   /* 2026-09-17: 표식은 docLabel 이 정한다 — 원문 글자면 '공고문 첨부', OCR 이면 '공고문 첨부(OCR)' */
   /* 2026-10-30: 첨부 뒤에 제목 보조 길이 생겨 표식을 `from` 에 모아 넘긴다 — 첨부에서 읽은 날은 여전히 docLabel 이 표식이다 */
-  eq('  출처를 정직하게 적는다', /let from = dl \? docLabel\(fromDocs\.lastFile\) : null;/.test(noBody) && /putDeadline\(it, dl, from\)/.test(noBody) && /'공고문 첨부\(OCR\)' : '공고문 첨부'/.test(ee), true);
+  /* 2026-11-15: 원문 제목 꼬리가 첨부보다 먼저라 `from` 을 두 번 정한다 · 글자층 칸 읽기는 lastVia 가 표식을 바꾼다 */
+  eq('  출처를 정직하게 적는다', /from = dl \? docLabel\(fromDocs\.lastFile, fromDocs\.lastVia\) : null;/.test(noBody) && /putDeadline\(it, dl, from\)/.test(noBody) && /'공고문 첨부\(OCR\)' : '공고문 첨부'/.test(ee), true);
   eq('  첨부에도 없을 때만 제목(이름표 꼬리 → 물결 꼬리)을 본다 · 표식은 「공고 제목」', /if \(!dl\) \{ dl = extractDeadline\(it\.name \|\| ''\) \|\| titleTailDeadline\(it\.name,[^\n]*from = '공고 제목'/.test(noBody), true);
 
   /* ③ 🔴 **동사가 든 이름표는 날짜 '범위'도 근거로 받는다** (2026-09-15 · G-3 이어서).
@@ -11434,6 +12358,70 @@ console.log('\n■ 자격 판정 전수 대조 — 틀린 ✓·틀린 ✗ (2026-
     mark('장애학생 중 학업 성적 우수, 예술‧체육‧기능‧기타 분야에서 도단위 이상 대회 3위 이상 수상 실적이 있는 자', { flags: ['disabled'] }), null);
   eq('  다자녀 줄은 여전히 다자녀 학생에게 ✓ (되돌아가면 안 되는 것)', mark('다자녀 가구의 자녀', { flags: ['multiChild'] }), 'ok');
 
+  /* ⑦-2 2026-11-15 개발자 "지원자격 매칭에 자꾸 오류가 생김" — 정답표에 없는 판정 줄 518개를 전수로 읽어 찾은 틀린 ✕·✓ 꼴 (표본은 원문 줄 그대로 · 실데이터에 안 기댄다).
+     방향은 하나다 — 틀린 ✕ 는 맞는 판정 또는 모름으로, 틀린 ✓ 는 모름으로. 대조군(되돌아가면 안 되는 것)을 짝으로 둔다 */
+  eq('「2학년 재학생 이상」 은 범위다 — 3학년 ✓ · 1학년 ✕ (전엔 2학년만 ✓)', [mark('국민대학교 2학년 재학생 이상'), mark('국민대학교 2학년 재학생 이상', { year: 1 })], ['ok', 'no']);
+  eq('괄호 속 다른 무리의 기준은 학과 요건이 아니다 — 의약학계열 15학점 · 건축학과 10학기 · 대상학부 (과) 는 14학점',
+    [mark('직전학기 원성적 기준 12학점(의약학계열 15학점) 이상 취득 및 평균평점 2.0 이상인 자'),
+      mark('2026학년도 2학기 기준 8학기(건축학과 10학기, 약학부(제약학과, 약학과) 12학기) 이내 재학생'),
+      mark('직전학기 취득학점 (계절학기 제외) 이 15학점 (졸업이수학점이 120인 대상학부 (과) 는 14학점 / 최종직전학기는 9학점) 이상')].map((v) => v !== 'no'), [true, true, true]);
+  eq('  대조군: 괄호 밖 학과 이름은 여전히 요건이다 · 숫자가 이름에 안 붙은 괄호의 학과도 읽는다',
+    [mark('건축학과 재학생 (직전학기 12학점 이상)'), ((PRq.parseLine('건축학과 재학생 (건축공학과 포함, 12학점 이상)', false).conds.find((c) => c.kind === 'major') || {}).names || []).length], ['no', 2]);
+  eq('예시 괄호 `(ex. 건축학과 / 한의예과 등)` 은 학과 요건이 아니고, 「학제가 5·6년인 전공에 한하여」 줄은 그 학제가 아니면 모름(휴학생도)',
+    [mark('학제가 5년 혹은 6년인 전공에 한하여, 각각 2~4학년과 2~5학년에 재학중인 자 (ex. 건축학과 / 한의예과 등)'),
+      mark('학제 5~6년인 전공에 한하여, 각 2~4학년과 2~5학년에 재학 중인 학생 지원 가능', { status: '휴학' })], [null, null]);
+  eq('「이공·상경·인문사회 계열 전공자」 — 공학·자연계 ✓ · 예체능 ✕ (전엔 맨 앞 이공이 빠져 공학 ✕)',
+    ['engineering', 'science', 'arts'].map((track) => mark('대한민국 국적이며, 4년제 국내 정규대학에 재학 중인 학부생으로, 이공·상경·인문사회 계열 전공자', { track, major: '' })), ['ok', 'ok', 'no']);
+  eq('「단, ○○ 학생은 …」 예외 줄은 그 무리가 아닌 학생에게 ✕ 가 아니다 · 우대·가산점 줄 · 장학금 이름 나열 줄도',
+    [mark('(단, 정규 마지막학기 등록생은 직전학기 취득학점 12학점 이상, 평점평균 3.0 이상)'), mark('단, 조기취업형 계약학과 학생은 1학년에 한해 최대 2회까지 지원 가능'),
+      mark('우대사항: 관련학과, 직전학기 미선발자, 2학년 이하, 실험실활동 유경험자'), mark('소득 5분위 이하 가산점', { bracket: 8 }),
+      mark('성적우수·특기·다자녀·청향·희망드림·국제교류 외국인 유학생,k-콘텐츠순천 장학금')], [null, null, null, null, null]);
+  eq('  대조군: 빼는 말이 든 「단,」 줄 · 가산점이 아닌 구간 줄은 그대로 ✕',
+    [mark('(단, 휴학생은 제외)', { status: '휴학' }), mark('소득 5분위 이하인 자', { bracket: 8 })], ['no', 'no']);
+  eq('학과 사무실·법 이름은 학과·계열 요건이 아니다 — 「자유전공학부 홈페이지 … 공지함」 · 「이공계지원법」',
+    [mark('선발 기준은 신청자 누구나 확인할 수 있도록 자유전공학부 홈페이지 및 학부 공지 채널을 통해 사전 공지함.'),
+      PRq.parseLine("- 「이공계지원법」 개정 취지에 따라, '25년부터 선발되는 장학생에 이공계 산·학·연 종사 의무를 폐지", true).conds.length], [null, 0]);
+  eq('  대조군: 「자유전공학부 재학생」 은 여전히 학과 요건(영어학과 ✕) · 흐린 분야 이름은 아무 학과나 ✓ 가 아니다',
+    [mark('2026-2학기 자유전공학부 재학생'), mark('전통 기 · 예능 분야 및 매장유산 관련 분야 전공자로 2학년 이상 재학 중인 대학생')], ['no', null]);
+  eq('「관내 고등학교 졸업자로 … 대학생」 의 졸업은 대학 졸업이 아니다 (전엔 재학생 전원 ✕) · 대조군: 「대학교 졸업자」 는 졸업',
+    [PRq.parseLine('관내 고등학교 졸업자로, 공고일 현재 대학에 다니는 자', false).conds.some((c) => c.kind === 'status'),
+      ((PRq.parseLine('4년제 대학교 졸업자', false).conds.find((c) => c.kind === 'status') || {}).anyOf || []).includes('졸업')], [false, true]);
+  eq('쉬면 어떻게 되는지를 적은 줄은 휴학생에게 ✓ 가 아니다 — 자격 상실 · 반환 · 휴학 계획이 없는 학생만',
+    ['휴학시 장학 계속 지급 자격 상실(복학시 재신청 가능)', '2027-1학기 휴학, 자퇴시 수혜장학금을 반환하여야 함', '2027학년도 1학기 휴학 계획이 없는 학생만 지원 가능']
+      .map((l) => mark(l, { status: '휴학' })), [null, null, null]);
+  eq('  대조군: 휴학생을 받는 줄은 여전히 ✓', mark('현재 휴학생이거나 휴학 예정인 학생도 지원 가능', { status: '휴학' }), 'ok');
+  eq('학과마다 학년이 다른 줄 · 「전체 학년」 갈래가 있는 줄은 학년을 단정하지 않는다',
+    [mark('의학과 2학년, 약학과 4학년 진학 예정자 각 1명', { year: 2 }), mark('인공지능융합대학 1~2학년 학생, 인융대 제외 전체 학년')], [null, null]);
+  eq('「(학년 수료 기준은 재학 중인 학교 기준을 따름)」 의 재학은 학적 요건이 아니다 — 2학년 휴학생에게 ✕ 가 아니다',
+    mark('학부 2, 3학년이며 2개 학기 이상 이수자 (학년 수료 기준은 재학 중인 학교 기준을 따름)', { status: '휴학', year: 2 }) !== 'no', true);
+  eq('제외 칸의 인원 규칙(`3자녀 이상 가정은 2명 선발`)은 다자녀 학생의 미달 사유가 아니다 · 대조군: 「다자녀 가구 제외」 는 미달',
+    [MEq.fitDetail({ eligibilityLines: ['대학교 재학생'], eligibilityExcludes: ['동일 세대 2명 선발 시 1명 지원(3자녀 이상 가정은 2명 선발)'] }, { ...base, flags: ['multiChild'] }).fails.length,
+      MEq.fitDetail({ eligibilityLines: ['대학교 재학생'], eligibilityExcludes: ['다자녀 가구의 자녀'] }, { ...base, flags: ['multiChild'] }).fails.length], [0, 1]);
+
+  /* ⑦-3 같은 날 독립 리뷰가 실제로 돌려 본 반례 — ⑦-2 의 규칙이 **다른 문장에서 새로 틀리지 않는가** (넓힌 규칙마다 좁히는 짝) */
+  eq('이공 나열 뒤에 빼는 말이 오면 허용 계열이 아니다 — 공학생이 ✓ 가 아니다',
+    [mark('인문·사회계열 재학생 (이공·예체능계열 제외)', { track: 'engineering', major: '' }), mark('상경·인문 계열 재학생 (이공·자연 계열은 지원 불가)', { track: 'science', major: '' })].map((v) => v !== 'ok'), [true, true]);
+  eq('괄호 속 학과가 곧 요건인 줄은 걷지 않는다 — 그 학과가 아니면 ✕ (숫자 바로 뒤 괄호·`등` 으로 끝나는 예시만 걷는다)',
+    [mark('본교 재학생 (간호학과 4학기 이상 이수자)'), mark('신청자격: 재학생 (컴퓨터공학과 12학점 이상 취득자에 한함)'), mark('신청 대상 (ex. 컴퓨터공학과 3학년)')], ['no', 'no', 'no']);
+  eq('  5·6년제 학과 학생에게 예시 괄호의 학과 이름은 요건이 아니다 (한의예과 ✕ 아님)',
+    mark('학제가 5년 혹은 6년인 전공에 한하여, 각각 2~4학년과 2~5학년에 재학중인 자 (ex. 건축학과 / 한의예과 등)', { major: '한의예과', track: 'medical' }) !== 'no', true);
+  eq('휴학생을 받는 줄에 「휴학 시 …」 부연이 붙어도 휴학생은 ✕ 가 아니다 · 제외 칸의 「휴학 시 자격 박탈」 은 여전히 미달',
+    [mark('재학생 및 휴학생 지원 가능 (휴학 시 장학금은 복학 학기에 지급)', { status: '휴학' }), mark('재학생 및 휴학생 (휴학할 경우 복학 학기에 지급)', { status: '휴학' }),
+      MEq.fitDetail({ eligibilityLines: ['대학교 재학생 및 휴학생'], eligibilityExcludes: ['휴학 시 자격 박탈'] }, { ...base, status: '휴학' }).fails.length], ['ok', 'ok', 1]);
+  eq('  같은 뜻의 다른 꼴도 휴학생에게 ✓ 가 아니다 — 휴학하면 · 휴학 시에는 · 학적상태(휴학 등)',
+    ['휴학하면 장학금 지급을 중단함', '휴학 시에는 장학금 지급 중단', '선발 심사 당시의 학자금 지원구간, 학적상태(휴학 등) 반영 예정'].map((l) => mark(l, { status: '휴학' })), [null, null, null]);
+  eq('「관내 고등학교 졸업자」 를 못 읽은 줄은 신입생 하나로 ✓ 가 아니다', mark('(신입생) 관내 고등학교 졸업자', { year: 1, status: '신입학', gpa: null, credits: null }), null);
+  eq('진짜 요건과 한 줄에 있으면 요건이 이긴다 — 괄호 속 가산점 · 기준이 든 「…장학금」 줄 · 모두를 가리키는 「단,」 줄',
+    [mark('직전학기 평점 3.0 이상인 재학생 (다자녀 가정 가산점 부여)', { gpa: 2.5 }), mark('평점 3.0 이상, 12학점 이상 이수, 소득 8구간 이하 학생에게 지급하는 장학금', { gpa: 2.0 }),
+      mark('단, 본교 재학생은 3학년 이상', { year: 1 }), mark('단, 신청자는 2학년 이상 재학생', { year: 1 })], ['no', 'no', 'no', 'no']);
+  eq('제외 칸 — 줄머리가 인원 규칙일 때만 건너뛴다 (휴학생 제외가 섞인 줄은 여전히 미달)',
+    ['가구당 1명 지원 원칙이며 휴학생은 제외', '휴학생 (결원 발생 시 1명 선발)'].map((ex) => MEq.fitDetail({ eligibilityLines: ['대학교 재학생 및 휴학생'], eligibilityExcludes: [ex] }, { ...base, status: '휴학' }).fails.length), [1, 1]);
+  eq('5·6년제 갈래 줄은 그 학제가 아닌 학생의 분모에 들어가지 않는다 (본 갈래로 되는 학생의 적합도가 안 깎인다)',
+    MEq.fitDetail({ eligibilityLines: ['학부 2, 3학년 재학생', '학제가 5년 혹은 6년인 전공에 한하여, 각각 2~4학년과 2~5학년에 재학중인 자'] }, base).pct
+      === MEq.fitDetail({ eligibilityLines: ['학부 2, 3학년 재학생'] }, base).pct, true);
+  eq('학과 이름 자리의 `대상`·`학년`·`소속` 은 이름이 아니다',
+    ['졸업이수학점이 120인 대상학부 재학생', '1, 2학년학부 재학생도 지원 가능', '소속학과 재학생'].map((l) => ((PRq.parseLine(l, false).conds.find((c) => c.kind === 'major') || {}).names || []).length), [0, 0, 0]);
+
   /* ⑧ 🔴 정답표 — 사람이 읽은 판정과 엔진이 같은가 (예방 장치).
      규칙을 고쳐 판정이 바뀌면 여기서 빨간불이 난다. 의도한 변화면 표를 다시 읽고
      `node verify/verdict-table.mjs --write-gold` 로 굳힌다. 안 읽고 굳히지 말 것. */
@@ -11576,9 +12564,11 @@ console.log('\n■ OCR — 그림·스캔 첨부 글자 읽기 (2026-09-17)');
   }
   const exSrc2 = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));
   eq('발췌기가 그 차례로 읽고 OCR 출처를 「공고문 첨부(OCR)」로 적는다',
-    (exSrc2.match(/docOrder\(/g) || []).length >= 2 && (exSrc2.match(/docLabel\(/g) || []).length >= 4 && /'공고문 첨부\(OCR\)'/.test(exSrc2), true);
+    /* 2026-11-15: 차례(docOrder)는 첨부 고르기 한 곳(noticeDocFiles)이 정한다 — 발췌기는 그것만 부른다 */
+    (exSrc2.match(/noticeDocFiles\(/g) || []).length >= 2 && /return docOrder\(out\);/.test(readText(new URL('../collector/attachment-text.mjs', import.meta.url)))
+      && (exSrc2.match(/docLabel\(/g) || []).length >= 4 && /'공고문 첨부\(OCR\)'/.test(exSrc2), true);
   eq('  옛 표식을 지울 때 (OCR) 판도 같이 본다', /\/\^공고문 첨부\/\.test\(it\.eligibilityFrom/.test(exSrc2), true);
-  eq('  금액 로봇도 같은 차례', /docOrder\(/.test(readText(new URL('../collector/extract-amounts.mjs', import.meta.url))), true);
+  eq('  금액 로봇도 같은 차례', /noticeDocFiles\(/.test(readText(new URL('../collector/extract-amounts.mjs', import.meta.url))), true);
   /* KOSAF 쪽 — 사본 정리가 장부를 지우지 않고, 빈 껍데기 판정이 .ocr.txt 도 연다 */
   eq('KOSAF 사본 정리가 재단 폴더만 지운다 (장부는 남긴다)', /isDirectory\(\)\) continue;/.test(readText(new URL('../collector/kosaf-attach.mjs', import.meta.url))), true);
   eq('  KOSAF 빈 껍데기 판정이 .ocr.txt 도 연다', /'\.ocr\.txt'/.test(readText(new URL('../collector/kosaf-empty.mjs', import.meta.url))), true);
@@ -11626,6 +12616,21 @@ console.log('\n■ 자격 묻기 — 무엇을 물을 수 있나');
     EA.askableFields('한국장학재단 학자금 지원구간 8구간 이내인 자', bare, sch), ['bracket']);
   eq('국적을 묻는다',
     EA.askableFields('대한민국 국적을 가진 자에 한함', bare, sch), ['nationality']);
+  /* 🔴 묻는 칸의 값은 **프로필·엔진이 쓰는 값 그대로**여야 한다 (2026-11-15 리뷰 — 국적 선택지가 '대한민국'·'기타' 라 고르면 한국 학생이 ✕ 가 됐다:
+     온보딩·엔진은 korean·foreign·dual). 탐침은 아무 값이나 '판정이 났다'로 세어 이 어긋남을 못 본다 — 그래서 고른 값으로 **실제 판정**을 잰다 */
+  {
+    const idx = readText(new URL('../index.html', import.meta.url));
+    const optsOf = (id) => [...(idx.match(new RegExp(`<select id="${id}">([\\s\\S]*?)</select>`)) || ['', ''])[1].matchAll(/<option(?: value="([^"]*)")?>([^<]*)<\/option>/g)].map((m) => (m[1] != null ? m[1] : m[2])).filter(Boolean);
+    const val = (o) => (o && o.value != null ? String(o.value) : String(o));
+    eq('  국적 선택지 = 온보딩 선택 칸의 값(korean·foreign·dual) · 탐침 값도 그 안', [EA.FIELD_META.nationality.options.map(val), EA.FIELD_PROBE.nationality.every((v) => optsOf('in-nationality').includes(v))], [optsOf('in-nationality'), true]);
+    eq('  고른 값으로 판정이 맞다 — 「대한민국 국적」 줄에 대한민국을 고르면 ✓ · 외국인 유학생을 고르면 ✕',
+      EA.FIELD_META.nationality.options.slice(0, 2).map((o) => createRequire(import.meta.url)('../match-engine.js').requirementMatch('대한민국 국적을 가진 자에 한함', { ...bare, nationality: EA.coerceField('nationality', val(o)) }, sch)), ['ok', 'no']);
+    eq('  시·도 칸은 고르는 칸 — 선택지가 온보딩 「본인 거주 지역」과 같다 (글자로 받으면 「서울특별시」가 틀린 ✕ 를 낸다)', ['region', 'parentRegion', 'originRegion'].map((k) => [EA.FIELD_META[k].kind, JSON.stringify(EA.FIELD_META[k].options.map(val)) === JSON.stringify(optsOf('in-region'))]), [['select', true], ['select', true], ['select', true]]);
+    /* 좁혀서 탐침(probeKeysFor) — 줄이 읽는 칸만 남기고, 모르는 꼴은 null(전부 탐침)로 물러난다 · 좁혀도 답은 같다 */
+    eq('  탐침할 칸 좁히기 — 나이 줄은 태어난 해 · 조건 없는 줄은 빈 목록 · 좁혀도 묻는 칸이 같다',
+      [EA.probeKeysFor('만 19세 이상 34세 이하 청년'), EA.probeKeysFor('문의처 02-123-4567'), EA.askableFields('만 19세 이상 34세 이하 청년', bare, sch, EA.probeKeysFor('만 19세 이상 34세 이하 청년')), EA.askableFields('만 19세 이상 34세 이하 청년', bare, sch)],
+      [['birthYear'], [], ['birthYear'], ['birthYear']]);
+  }
 
   /* 🔴 이미 채운 칸은 다시 묻지 않는다 — 남은 칸만 묻는다 */
   eq('이미 적은 칸은 묻지 않는다 (남은 칸만)',
@@ -11661,8 +12666,11 @@ console.log('\n■ 자격 묻기 — 무엇을 물을 수 있나');
   eq('평점은 숫자로 바뀐다', EA.coerceField('gpa', '3.42'), 3.42);
   eq('  빈 칸은 null', EA.coerceField('gpa', '  '), null);
   eq('  글자는 null (0 이 아니다)', EA.coerceField('gpa', '몰라요'), null);
-  eq('  4.5 를 넘으면 4.5 로 깎는다 (온보딩과 같은 규칙)', EA.coerceField('gpa', '5.0'), 4.5);
-  eq('  음수는 0 으로', EA.coerceField('gpa', '-1'), 0);
+  /* 🔴 2026-11-17 뒤집었다 — 예전엔 5.0 → 4.5 · -1 → 0 으로 **깎았다**. 깎으면 학생이 적지 않은 값을
+     지어낸다(평점 999 가 만점이 됐다 · HDJ-요청-2026-001 후속). 지금은 범위 밖이면 null(모름). */
+  eq('  🔴 4.5 를 넘으면 깎지 않고 null', EA.coerceField('gpa', '5.0'), null);
+  eq('  🔴 음수도 깎지 않고 null', EA.coerceField('gpa', '-1'), null);
+  eq('  🔴 정수 칸의 소수는 반올림하지 않고 null (19.5학점 → 20 금지)', EA.coerceField('credits', '19.5'), null);
   eq('소득구간은 정수', EA.coerceField('bracket', '8'), 8);
   eq('  0 은 null 이 아니다 (0 구간·0 학점은 유효한 값이다)', EA.coerceField('credits', '0'), 0);
 
@@ -12286,6 +13294,9 @@ return { submitChannelKind, submitChannelLabel, hasPortalName };`)();
     take('⑥ 서류 준비 및 메일(injae@uri.re.kr)로 신청서(3종), 증빙서류 제출'), true);
   eq('제출 방법 : 이메일 — 받는다',
     take('다 . 멘토활동계획서 제출 방법 : 이메일 : scholarship@hufs.ac.kr 또는 장학팀 ( 학생회관 121 호 ) 직접 제출'), true);
+  eq('🔴 이름표가 신청 방법이고 값이 메일이면 받는다(한국건설교통신기술협회 요강 PDF 글자층 · 동사 없음) — 이름표 없는 메일 줄·문의 줄은 그대로 안 받는다',
+    [take('ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편(등기)'), take('신청방법 : 방문 접수 (문의 : scholarship@hufs.ac.kr)'), take('신청방법 : 이메일 문의 후 방문(kcna@kcna.or.kr)')],
+    [true, false, false]);
 
   /* 🔴 버려야 하는 줄 — 전부 실제로 나온 것이다 */
   eq('문의처 줄은 접수처가 아니다',
@@ -12302,6 +13313,61 @@ return { submitChannelKind, submitChannelLabel, hasPortalName };`)();
      주소는 **이화여대**다. 받으면 우리 학생의 신청서가 남의 학교 메일함으로 간다. */
   eq('🔴 제3자(교수)가 내는 줄은 받지 않는다',
     take('(또는 교수님이 장학복지팀으로 제출하는 것도 가능함/ scholarship@ewha.ac.kr [추천 학생의 이름/학 번/장학금명 기재])'), false);
+
+  /* ⑧ 🔴 **신청은 시스템, 메일은 뽑힌 뒤 서류** (2026-11-17 · 상명대 근로장학 auto-enoticedoarticleno770333 첨부 원문 줄 그대로).
+     메일 줄 하나만 보면 「제출처」 이름표 + 주소라 가장 믿을 만한 줄이다 — 글 전체(신청방법 줄 + 선발자 안내 줄)를 봐야 갈린다.
+     관리자가 11-16 에 손으로 비웠고, 규칙이 그대로면 다음 회차·다른 학교에서 또 들어온다. */
+  const SMU = [
+    '라. 부서추천 근로장학생 및 국가근로장학생 선발자는 교내근로 신청 불가(중복 불가)',
+    '8. 신청방법: 샘물통합정보시스템 신청 선착순 선발(단, 동시 신청자는 성적순 선발)',
+    '  ※ 샘물통합정보시스템 [학생기본] → [장학정보] → [근로장학신청]에서 신청',
+    '9. 선발자 안내: 2026.11.30.(월) 이후 홈페이지 장학공지(개별 확인)',
+    '10. 신청서 제출: 2026.12.04.(금) 15:00까지',
+    ' ※홈페이지에서 신청서 출력 후 근로부서 담당자 서명한 PDF파일 이메일 제출',
+    '   <이메일 제출처: hajinpark@smu.ac.kr >',
+  ];
+  eq('🔴 신청은 시스템 · 메일은 선발 뒤 서류 — 접수 메일로 잡지 않는다 (상명대 원문)', findApplyEmail(SMU.join('\n')), null);
+  eq('  (메일 줄 하나만 보면 받는 줄이다 — 글 전체를 보는 것이 하는 일)', take(SMU[6]), true);
+  eq('  선발자 안내 줄이 없으면(뽑힌 뒤 단계가 아니면) 그대로 받는다',
+    findApplyEmail(SMU.filter((_, i) => i !== 3).join('\n'))?.email, 'hajinpark@smu.ac.kr');
+  eq('  신청방법이 메일이면 뒤에 선발 후 단계가 있어도 그대로 받는다',
+    findApplyEmail('ㅇ 신청방법 : 이메일(kcna@kcna.or.kr) 및 우편(등기)\nㅇ 선발자 발표 : 12월 중 개별 통보\nㅇ 접수주소 : kcna@kcna.or.kr 로 제출')?.email, 'kcna@kcna.or.kr');
+  eq('  자격 줄의 「…선발자는 신청 불가」(신청방법 줄 앞)는 선발 뒤 단계로 세지 않는다',
+    findApplyEmail([SMU[0], SMU[1], '나. 서류는 scholarship@smu.ac.kr 로 제출'].join('\n'))?.email, 'scholarship@smu.ac.kr');
+  /* 🔴 장학금 여럿을 한 글에 적은 공고 — 절마다 신청방법이 다르다(리뷰 3차 2026-11-17). 글의 첫 신청방법 줄만 보면
+     뒷 절의 진짜 접수 메일을 버리고 발췌기 소급(staleInTexts)이 이미 들어간 주소까지 지웠다 — 메일 줄에서 가장 가까운 신청방법 줄을 본다 */
+  const MULTI = ['1. 성적우수 장학금', '가. 신청방법: 학생포털 온라인 신청', '나. 선발결과 발표: 2026. 11. 30.', '2. 지역인재 장학금', '가. 신청방법: 이메일 접수', '나. 이메일 제출처: scholar@univ.ac.kr'].join('\n');
+  eq('🔴 장학금이 여럿인 글 — 메일 줄에서 가장 가까운 신청방법이 메일이면 받는다 (앞 절의 포털·선발결과는 세지 않는다)', findApplyEmail(MULTI)?.email, 'scholar@univ.ac.kr');
+  eq('  같은 글에서 앞 절만 남기고 메일 신청방법을 포털로 바꾸면 거른다 (가장 가까운 신청방법이 포털 + 그 뒤 선발 뒤 단계)',
+    findApplyEmail(['가. 신청방법: 학생포털 온라인 신청', '나. 선발결과 발표: 2026. 11. 30.', '다. 서류 제출처: scholar@univ.ac.kr 로 제출'].join('\n')), null);
+  eq('  메일 줄 자신이 「신청방법: 이메일(…)」이면 그 줄이 그 절의 신청방법이다 (앞 절의 포털·선발결과는 세지 않는다)',
+    findApplyEmail(['가. 신청방법: 학생포털 온라인 신청', '나. 선발결과 발표: 2026. 11. 30.', '2. 지역인재 장학금', '가. 신청방법: 이메일(scholar@univ.ac.kr)로 접수'].join('\n'))?.email, 'scholar@univ.ac.kr');
+  /* 🔴 리뷰 4차(2026-11-17): 학생이 **신청하는** 방법만 센다 — `제출방법`·`서류 제출방법`은 서류를 내는 길이고,
+     메일 줄 자신은 제 신청방법 줄이 되지 못한다(그 줄의 @ 가 늘 '메일'로 세어진다). 둘 다 상명대 구멍을 다시 열거나 진짜 접수 메일을 버렸다 */
+  eq('  🔴 선발 뒤 단계 안의 「- 제출방법: … 이메일 제출」은 신청방법이 아니다 (상명대 + 하위 줄 하나 · 변형 A)',
+    findApplyEmail([SMU[1], SMU[3], SMU[4], ' - 제출방법: 근로부서 담당자 서명한 PDF파일 이메일 제출', SMU[6]].join('\n')), null);
+  eq('  🔴 「10. 신청서 제출방법: 이메일(…)로 제출」 한 줄도 제 신청방법이 되지 못한다 (변형 B)',
+    findApplyEmail([SMU[1], SMU[3], '10. 신청서 제출방법: 이메일(hajinpark@smu.ac.kr)로 제출'].join('\n')), null);
+  eq('  🔴 「※ 서류 제출방법: 원본은 등기우편 제출」은 앞의 「신청방법: 이메일 접수」를 가리지 않는다',
+    findApplyEmail(['3. 신청방법: 이메일 접수', '4. 제출서류: 신청서 1부, 성적증명서 1부', ' ※ 서류 제출방법: 원본은 등기우편 제출', '5. 선발 및 지급: 선발 후 개별 통보', '6. 접수처: scholar@found.or.kr 로 제출'].join('\n'))?.email, 'scholar@found.or.kr');
+  /* 이미 들어간 로봇 값도 원문 전체로 다시 묻는다(원칙 7) — 조선대 빛고을장학재단 첨부의 개인정보 철회 메일함(원문 줄 그대로) */
+  {
+    const { staleInTexts } = await import('../collector/apply-email.mjs');
+    const CHOSUN = ['7. 신청방법: 온라인 신청(본교 종합정보시스템 → 장학 → 장학 신청)', '  •보존 기간 : 수집일로부터 빛고을장학재단 장학생 선발 후 1년',
+      '  * 철회요청 접수 이메일 주소 : dooob1213@korea.kr'].join('\n');
+    const robot = { applyEmail: 'dooob1213@korea.kr', applyEmailSource: '* 철회요청 접수 이메일 주소 : dooob1213@korea.kr', applyEmailFrom: '공고문 첨부' };
+    eq('  🔴 로봇 값 + 원문 전체로 보면 접수처 아님 → 걷는다', staleInTexts(robot, [null, CHOSUN]), true);
+    eq('  근거 문장이 든 원문이 없으면 걷지 않는다(본문 없는 날 멀쩡한 주소를 잃지 않는다)', staleInTexts(robot, [null, '다른 첨부 글']), false);
+    eq('  사람(관리자) 값은 건드리지 않는다', staleInTexts({ ...robot, applyEmailFrom: '관리자 2026-11-17' }, [CHOSUN]), false);
+    eq('  🔴 장학금이 여럿인 글의 뒷 절 접수 메일은 소급으로도 지우지 않는다 (staleInTexts)',
+      staleInTexts({ applyEmail: 'scholar@univ.ac.kr', applyEmailSource: '나. 이메일 제출처: scholar@univ.ac.kr', applyEmailFrom: '공고 원문' }, [MULTI]), false);
+    eq('  상명대 원문의 로봇 값은 소급으로 걷는다 (같은 규칙)',
+      staleInTexts({ applyEmail: 'hajinpark@smu.ac.kr', applyEmailSource: '<이메일 제출처: hajinpark@smu.ac.kr >', applyEmailFrom: '공고문 첨부' }, [SMU.join('\n')]), true);
+    eq('  지금 규칙도 고르는 주소면 그대로', staleInTexts({ applyEmail: 'nohsy12@518.org', applyEmailSource: '◯ 접수주소 : nohsy12@518.org (※우편접수 불가)', applyEmailFrom: '공고 원문' },
+      ['가. 안내\n◯ 접수주소 : nohsy12@518.org (※우편접수 불가)']), false);
+    eq('  발췌기가 값이 있는 항목에도 원문 전체로 다시 묻는다(fillApplyEmail → staleInTexts)',
+      /function fillApplyEmail\(it, body\) \{[\s\S]{0,600}staleInTexts\(it, \[body,/.test(exc), true);
+  }
 
   /* ⑦ 🔴 **합성 픽스처 — 위 줄들과 달리 실제 공고에서 뽑은 것이 아니다.**
      말뭉치를 뒤져 보니 '메일 + 내는 행위 + 문의'를 한 줄에 가진 공고가 지금은 0건이라,
@@ -12738,8 +13804,8 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
     /if \(it\.detailsTriedAt && \(Date\.parse\(todayIso\) - Date\.parse\(it\.detailsTriedAt\)\) < 7 \* 86400000\) continue;/.test(cmY) && /if \(detail\.text\) delete it\.detailsTriedAt; else it\.detailsTriedAt = todayIso;/.test(cmY), true);
   eq('⑥ 활동 글을 엔진 모양으로 — 칸 이름이 장학과 같다', /function activityAsSch[\s\S]*?eligibilityLines: \[\.\.\.\(n\.eligibilityLines[\s\S]*?titleTargetLines\(n\.title\)[\s\S]*?eligibilityExcludes: n\.eligibilityExcludes/.test(appX), true);
   eq('  제목·혜택 정리(2026-10-04 개발자 지적) — 카드·시트·보관함이 같은 activityTitle · 긴 혜택은 카드엔 benefitShort, 시트엔 「혜택」 목록',
-    /* 2026-11-02 승인 시안 B — 카드 아랫줄 왼쪽은 「대상 · …」(activityWhoLine) · 긴 혜택은 시트 「공고 안내」 줄(`혜택: …`) · 짧은 혜택은 시트 금액 자리 그대로 */
-    [(appX.match(/activityTitle\(n\)/g) || []).length >= 3, /foot: who \? `대상 · \$\{who\}` : ''/.test(appX), /`혜택: \$\{benefit\}`/.test(appX), /benefit && benefit\.length <= 40 \? `<p class="sheet-amount">/.test(appX)], [true, true, true, true]);
+    /* 2026-11-15 개발자 결정("밑에 대상은 아예 빼버리고 시안 1로") — 카드 아랫줄 왼쪽은 빈칸(foot: '') · 긴 혜택은 시트 「공고 안내」 줄(`혜택: …`) · 짧은 혜택은 시트 금액 자리 그대로 */
+    [(appX.match(/activityTitle\(n\)/g) || []).length >= 3, /function activityCardHtml[\s\S]*?foot: '',/.test(appX) && !/activityWhoLine/.test(appX), /`혜택: \$\{benefit\}`/.test(appX), /benefit && benefit\.length <= 40 \? `<p class="sheet-amount">/.test(appX)], [true, true, true, true]);
   {
     const grab = (a, b) => appX.slice(appX.indexOf(a), appX.indexOf(b, appX.indexOf(a)));
     const fn = new Function('unent', `${grab('const TD_DAY =', '/* notStale(오래된 공고 숨김)')}; ${grab('const ACT_TAG', '/* 제목 괄호 속 대상')}; return { activityTitle, benefitShort, benefitItems };`)((x) => String(x));
@@ -12793,15 +13859,18 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
   const fnOf = (name) => { const a = appV.indexOf(`function ${name}(`); if (a < 0) return ''; let i = appV.indexOf(') {', a) + 2, d = 0; for (let j = i; j < appV.length; j++) { if (appV[j] === '{') d++; else if (appV[j] === '}' && --d === 0) return appV.slice(a, j + 1).replace(/\/\*[\s\S]*?\*\//g, ''); } return ''; };   // 머리의 기본값 객체(= {})는 건너뛴다 · 주석은 걷는다
   const constOf = (name) => (appV.match(new RegExp(`^const ${name} = .*$`, 'm')) || [''])[0];
   /* 앱의 진짜 함수를 떼어 돌린다 — 사본을 재면 원본이 바뀌어도 초록이다 */
-  const helpers = [constOf('isActivityItem'), constOf('KIND_CHIP_CLS'), constOf('WHO_PAREN'), constOf('NOT_WHO_PAREN'), constOf('KOSAF_AMOUNT_UNKNOWN'), constOf('bareOrg'), constOf('orgBase'), constOf('providerUnknown'),
+  const helpers = [constOf('isActivityItem'), constOf('KIND_CHIP_CLS'), constOf('ACT_CHIP_CLS'), constOf('WHO_PAREN'), constOf('NOT_WHO_PAREN'), constOf('KOSAF_AMOUNT_UNKNOWN'), constOf('bareOrg'), constOf('orgBase'), constOf('providerUnknown'),
     appV.slice(appV.indexOf('const TD_DAY ='), appV.indexOf('/* notStale(오래된 공고 숨김)')), fnOf('cleanCardTitle'), fnOf('cardTitle'),
-    fnOf('kindChip'), fnOf('cardProviderLine'), fnOf('splitTitleWho'), fnOf('cardTitleParts'), fnOf('activityWhoLine'), fnOf('amountLine')].join('\n');
-  const H = new Function('unent', `${helpers}; return { kindChip, cardProviderLine, splitTitleWho, cardTitleParts, activityWhoLine, amountLine };`)((x) => String(x));
+    fnOf('kindChip'), fnOf('cardProviderLine'), fnOf('splitTitleWho'), fnOf('cardTitleParts'), fnOf('amountLine')].join('\n');
+  const H = new Function('unent', `${helpers}; return { kindChip, cardProviderLine, splitTitleWho, cardTitleParts, amountLine };`)((x) => String(x));
   eq('칩 — 장학은 교내/교외 · 활동은 공모전·봉사·청년정책·대외활동 · 상시 제도도 장학 칩', [
     H.kindChip({ type: '교내', name: 'x' }).label, H.kindChip({ type: '교외' }).label, H.kindChip({ kind: '공모전' }).label, H.kindChip({ kind: '대외활동', field: '봉사' }).label,
     H.kindChip({ kind: '대외활동', api: 'vol1365' }).label, H.kindChip({ kind: '대외활동', api: 'youthPolicy' }).label, H.kindChip({ kind: '대외활동', api: 'kstartup' }).label, H.kindChip({ program: true, type: '교외' }).label],
     ['장학 · 교내', '장학 · 교외', '공모전', '봉사', '봉사', '청년정책', '대외활동', '장학 · 교외']);   // 상시 제도는 칩이 아니라 마감 자리(카드 아랫줄 · 시트 머리줄 배지)
-  eq('  교내는 초록(badge-in) · 교외는 보라(badge-out) · 활동은 회색', [H.kindChip({ type: '교내' }).cls, H.kindChip({ type: '교외' }).cls, H.kindChip({ kind: '공모전' }).cls], ['badge-kind badge-in', 'badge-kind badge-out', 'badge-kind']);
+  /* 2026-11-15 개발자 승인 시안 1(docs/designs/mockups/activity-card-options.html) — 활동 칩도 갈래 색 */
+  eq('  교내는 초록(badge-in) · 교외는 보라(badge-out) · 활동은 갈래 색(공모전·봉사·대외활동 · 청년정책은 회색)', [H.kindChip({ type: '교내' }).cls, H.kindChip({ type: '교외' }).cls, H.kindChip({ kind: '공모전' }).cls, H.kindChip({ kind: '대외활동', field: '봉사' }).cls, H.kindChip({ kind: '대외활동', api: 'youthPolicy' }).cls, H.kindChip({ kind: '대외활동' }).cls],
+    ['badge-kind badge-in', 'badge-kind badge-out', 'badge-kind badge-contest', 'badge-kind badge-vol', 'badge-kind', 'badge-kind badge-act']);
+  eq('  그 색 넷이 style.css 에 있다 · 원문 아이콘은 오른쪽 끝(마감 옆)', [...['badge-contest', 'badge-vol', 'badge-act', 'badge-act'].map((c) => new RegExp(`\\.badge-kind\\.${c} \\{`).test(readText(new URL('../style.css', import.meta.url)))), /right: var\(--space-20\); bottom: var\(--space-16\);/.test(readText(new URL('../style.css', import.meta.url)))], [true, true, true, true, true]);
   eq('주최 — 알 때만 · 제목이 기관명을 담으면 뺀다 · 모르면 빈 글자', [H.cardProviderLine({ name: '동산장학회 장학생', provider: '동산장학회' }), H.cardProviderLine({ name: '2026 장학생 선발', provider: '세종연구원' }), H.cardProviderLine({ name: 'x', provider: '주관 기관 원문 확인' })], ['', '세종연구원', '']);
   eq('제목 나누기 — 앞머리 대상 괄호와 「(※…)」 꼬리는 대상으로 · 끝 마침표 뗌', H.splitTitleWho('(대학생,대학원생만)11월 미래인재 주말과학교실 자원봉사자 모집(※토 4회 모두 가능자, 교육봉사 아님)'),
     { title: '11월 미래인재 주말과학교실 자원봉사자 모집', who: ['대학생,대학원생만', '토 4회 모두 가능자, 교육봉사 아님'] });
@@ -12809,28 +13878,27 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
     ['(재)가송재단 장학생 (한국외대 접수)', '(강릉.원주) 2026. 2학기 도전장학금 신청 안내', [], [], []]);
   eq('  「…봉사자를 모집합니다.」 는 마침표만 뗀다 — 문장은 고치지 않는다', H.splitTitleWho('인제대학교 캠퍼스 내 도박문제 예방캠페인 봉사자를 모집합니다.').title, '인제대학교 캠퍼스 내 도박문제 예방캠페인 봉사자를 모집합니다');
   eq('  정식 등록 — 게시판 분류 머리말 「공통」(대괄호 짝 · 해 앞)을 뗀다 · 「공통」이 든 이름은 그대로 · 괄호는 떼지 않는다(대상 줄이 없어 지우기가 된다 — 리뷰)', [H.cardTitleParts({ name: '공통 [공통] 2026학년도 2학기 반영장학 신청 안내' }).title, H.cardTitleParts({ name: '공통 2026-2학기 푸른등대 기부장학금(2차) 신규장학생 모집 안내' }).title, H.cardTitleParts({ name: '공통장학금 안내' }).title, H.cardTitleParts({ name: '(대학생) 2026 장학생 선발 (※ 중복 지원 불가).' })], ['2026학년도 2학기 반영장학 신청 안내', '2026-2학기 푸른등대 기부장학금(2차) 신규장학생 모집 안내', '공통장학금 안내', { title: '(대학생) 2026 장학생 선발 (※ 중복 지원 불가)', who: [] }]);
-  eq('활동 대상 줄 — 제목에서 뗀 조각 + 발췌 「대상」(겹치면 한 번) · 없으면 첫 자격 줄', [
-    H.activityWhoLine({ excerpts: [{ label: '대상', text: '여성 벤처·스타트업 대표' }] }, { who: [] }), H.activityWhoLine({ eligibilityLines: ['만 19~34세 대한민국 국민'] }, { who: ['대학생만'] }),
-    H.activityWhoLine({ excerpts: [{ label: '대상', text: '대학생,대학원생만' }] }, { who: ['대학생,대학원생만'] })], ['여성 벤처·스타트업 대표', '대학생만 · 만 19~34세 대한민국 국민', '대학생,대학원생만']);
   eq('금액 줄 — 읽은 금액은 「금액 · …」 굵게 · 재단이 적어 둔 긴 금액은 옅게 · 모르면 줄 없음(「금액 원문 확인」 글자를 카드에 남기지 않는다)', [
     H.amountLine({ amount: '200만원' }), H.amountLine({ amount: '금액은 재단 홈페이지에서 확인', amountNote: '학기별 등록금액의 1/2' }), H.amountLine({ amount: '금액 원문 확인' }), H.amountLine({ amount: '금액은 재단 홈페이지에서 확인', amountNote: '기관확인필요' })],
     [{ text: '금액 · 200만원', known: true }, { text: '금액 · 학기별 등록금액의 1/2', known: false }, { text: '', known: false }, { text: '', known: false }]);
   /* 카드 한 벌 — schCard·activityCardHtml 이 칩·주최·제목 나누기·핵심 한 줄을 쓴다 · 마감은 아랫줄 그대로(개발자 결정) */
   const sc = fnOf('schCard'), ac = fnOf('activityCardHtml'), shell = fnOf('cardShellHtml');
-  eq('장학 카드 — 칩 · 주최 · 알약 · 제목 나누기 · 금액 줄', [/chip: kindChipHtml\(sch\)/.test(sc), /org: cardProviderLine\(sch\)/.test(sc), /badge,/.test(sc), /name: cardTitleParts\(sch\)\.title/.test(sc), /const amt = amountLine\(sch\)/.test(sc)], [true, true, true, true, true]);
-  eq('활동 카드 — 칩 · 주최(호스트만 · 학교 게시판 글은 빈 글자 — 2026-11-02 개발자 결정) · 제목 나누기 · 대상 줄 · 혜택·분야 줄 없음', [/chip: kindChipHtml\(n\)/.test(ac), /org: activityHostLine\(n\)/.test(ac) && /const activityHostLine = \(n\) => \(n\.school \? '' : /.test(appV), /name: parts\.title/.test(ac), /foot: who \? `대상 · \$\{who\}` : ''/.test(ac), /benefitShort|n\.field/.test(ac)], [true, true, true, true, false]);
+  /* 2026-11-15 개발자 지시 — 아랫줄 왼쪽의 회색 「금액 · …」 줄을 뺐다(활동 카드의 「대상 · …」 줄과 한 짝 · 금액은 시트 머리가 말한다). 되돌리면 빨갛다 */
+  eq('장학 카드 — 칩 · 주최 · 알약 · 제목 나누기 · 아랫줄 왼쪽은 빈칸(금액 줄 없음 · 2026-11-15)', [/chip: kindChipHtml\(sch\)/.test(sc), /org: cardProviderLine\(sch\)/.test(sc), /badge,/.test(sc), /name: cardTitleParts\(sch\)\.title/.test(sc), /foot: '',/.test(sc), /amountLine\(sch\)/.test(sc), /const amt = amountLine\(sch\)/.test(fnOf('openDetail'))], [true, true, true, true, true, false, true]);
+  eq('활동 카드 — 칩 · 주최(호스트만 · 학교 게시판 글은 빈 글자 — 2026-11-02 개발자 결정) · 제목 나누기 · 대상 줄 없음(2026-11-15 개발자 결정) · 혜택·분야 줄 없음', [/chip: kindChipHtml\(n\)/.test(ac), /org: activityHostLine\(n\)/.test(ac) && /const activityHostLine = \(n\) => \(n\.school \? '' : /.test(appV), /name: parts\.title/.test(ac), /foot: '',/.test(ac), /benefitShort|n\.field|대상/.test(ac)], [true, true, true, true, false]);
+  eq('  제목에서 뗀 괄호 대상은 시트 「공고 안내」에 남는다 — 카드에 대상 줄이 없어 여기가 유일한 자리', /const titleWho = parts\.who\.filter/.test(fnOf('openActivityDetail')) && /titleWho\.length \? \[`대상: \$\{titleWho\.join\(' · '\)\}`\]/.test(fnOf('openActivityDetail')), true);
   eq('  그릇 윗줄 = 칩 + 주최(있을 때만) + 알약 · 마감은 아랫줄(.sch-foot)', [/<div class="sch-top">\s*\$\{chip\}\$\{org \? `<span class="sch-org">/.test(shell), /class="sch-foot">[\s\S]*?sch-due/.test(shell)], [true, true]);
   /* 시트 한 벌 — 절 다섯의 순서 · 알약 없음 · 머리줄 같음 · 단추 한 벌 */
   const sec = fnOf('sheetSectionsHtml'), od = fnOf('openDetail'), oa = fnOf('openActivityDetail');
   const order = ['<h4>지원 자격</h4>', '<h4>접수</h4>', '<h4>공고 안내</h4>', '<h4>첨부', '<h4>원문</h4>'].map((h) => (h === '<h4>공고 안내</h4>' ? fnOf('noticeSummaryHtml') : h === '<h4>접수</h4>' ? fnOf('applySectionHtml') : sec).indexOf(h) >= 0);   // 접수·공고 안내 절은 제 함수가 그린다
   eq('시트 절 다섯이 다 있다 — 지원 자격 · 접수 · 공고 안내 · 첨부 · 원문', order, [true, true, true, true, true]);
-  eq('  순서 — 자격 → 접수 → 공고 안내 → 첨부 → 원문 (return elig + apply + notice + att + src)', /return elig \+ apply \+ notice \+ att \+ src;/.test(sec), true);
+  eq('  순서 — 자격 → 접수 → 공고 안내 → 첨부 → 원문 ([elig, apply, notice, att, src] — 11-16 부터 절마다 .sheet-sec 묶음)', /return \[elig, apply, notice, att, src\]\.filter\(Boolean\)/.test(sec), true);
   eq('  장학·층2 시트와 활동 시트가 같은 머리줄·절(sheetHeadHtml · sheetSectionsHtml)을 쓴다', [/sheetHeadHtml\(\{ x: sch/.test(od), /sheetSectionsHtml\(\{ sch, result, fit, fd, noticeLines/.test(od), /sheetHeadHtml\(\{ x: n, d/.test(oa), /sheetSectionsHtml\(\{ sch, result, fit, fd, activity: n/.test(oa)], [true, true, true, true]);
   eq('  「지원 가능·선발 심사」 알약(status-pill)은 어느 시트에도 없다', [/status-pill/.test(sec), /status-pill/.test(od), /status-pill/.test(oa)], [false, false, false]);
   /* 2026-11-07 개발자 지시 "지원자격에 넣을 내용이 없는 경우에는 지원자격 칸 자체를 없애기" — 11-02 의 「원문에서 확인」 한 줄(칸은 늘 있음)을 뒤집었다. 되돌리면 빨갛다 */
   eq('  자격 0줄이고 물을 것도 없으면 「지원 자격」 칸 자체가 없다(「원문에서 확인」 자리표시 줄 없음 · 2026-11-07) · 제외 조건은 같은 목록 안 ✗(r-x)',
     [/const elig = \(rows \|\| ask\) \? `<div class="sheet-verdict">/.test(sec), /자격은 원문에서 확인해 주세요/.test(sec), /class="r-elig r-x">✗ /.test(fnOf('eligibilityRowsHtml')), /지원 제외 대상/.test(fnOf('eligibilityRowsHtml'))], [true, false, true, false]);
-  eq('  「접수」 = 기간 · 방법 · 서류(읽은 것만) — 방법은 원문 문장(noApply·메일·포털·재단)', [/row\('기간', period\)/, /row\('방법', method\)/, /docText \? row\('서류'/, /sch\.noApply \? sch\.noApply/, /재단 선발 공고문·홈페이지가 정한 접수 방법/].map((r) => r.test(fnOf('applySectionHtml'))), [true, true, true, true, true]);
+  eq('  「접수」 = 기간 · 방법 · 서류(읽은 것만) — 방법은 원문 문장(noApply·메일·포털·재단)', [/row\('기간', period, true\)/, /row\('방법', method\)/, /docText \? row\('서류'/, /sch\.noApply \? sch\.noApply/, /재단 선발 공고문·홈페이지가 정한 접수 방법/].map((r) => r.test(fnOf('applySectionHtml'))), [true, true, true, true, true]);
   /* 2026-11-15 은서 지시 — 「더 보기」 뒤 줄 수(「(2줄)」)는 뺀다 · 시트 목록 앞 점도 뺀다(style.css #detail-sheet 블록) */
   eq('  「공고 안내」 는 다섯 줄 뒤 「더 보기」(줄 수 없이) · 층2 재단 칸(선발방법·선발인원·추천필요여부)도 같은 줄로', [/NS_SHOWN/.test(fnOf('noticeSummaryHtml')), /<summary>더 보기<\/summary>/.test(fnOf('noticeSummaryHtml')) && !/더 보기 \(/.test(fnOf('noticeSummaryHtml')), /\['선발방법', '선발인원', '추천필요여부'\]/.test(fnOf('kosafAsScholarships'))], [true, true, true]);
   eq('  「첨부」 — 층2는 꼬리표 「재단 선발 공고문」 · 「공고 원본 첨부 양식」 이름은 없다', [/<h4>첨부\$\{sch\.sourceKind === 'kosaf' \? ' <span class="channel-tag">재단 선발 공고문<\/span>' : ''\}<\/h4>/.test(sec), /공고 원본 첨부 양식|공고 원본 첨부</.test(appV)], [true, false]);
@@ -13078,8 +14146,79 @@ console.log('\n■ 대외활동 — 남은 글 표본에서 찾은 것 (2026-10-
   eq('  자격 문장이 화면에서 걸러지지 않는다 — `서울시민(성인)` · `18세 이상 성인`',
     ['참가자격: 서울시민(성인)', '18세 이상 성인'].map((l) => MEX.requirementLines({ eligibilityLines: [l] }, null, { all: true }).length), [1, 1]);
   eq('④ 모집 글이 아닌 것 — 결과·보도·지난 해 글은 대외활동이 아니다 · 모집 글은 그대로',
-    [AK.notActivity('2026년 제3회 장학수기 공모전 심사 결과...'), AK.notActivity('가명정보 활용 경진대회 대상·최우수상 동시 석권'), AK.notActivity('2018년 사회복지 협력기관 워크숍', new Date('2026-10-04')), AK.notActivity('2026년 경기 스타트업 아카데미 참여자 모집', new Date('2026-10-04')), AK.notActivity('2025학년도 겨울 해외탐방 모집', new Date('2026-10-04'))],
+    [AK.notActivity('2026년 제3회 장학수기 공모전 심사 결과...'), AK.notActivity('가명정보 활용 경진대회 대상·최우수상 동시 석권'), AK.notActivity('2018년 사회복지 협력기관 워크숍', new Date('2026-10-04')), AK.notActivity('2026년 경기 스타트업 아카데미 참여자 모집', new Date('2026-10-04')), AK.notActivity('2025학년도 겨울 해외탐방 모집', new Date('2025-12-01'))],
     [true, true, true, false, false]);
+  /* 2026-11-17 — 끝난 학기·계절의 글과 결과 글(입상자·최종합격·성과공유회·「n개교 선정」)도 모집 글이 아니다. 위 「2025학년도 겨울」 표본은 그 겨울이 오기 전(2025-12)엔 모집 글 그대로다 */
+  eq('  끝난 학기(2025-2학기·2025년 동계학기·2025학년도 — 이듬해 2월 끝 · 1학기·하계 — 8월 끝)와 결과 글은 뺀다 · 앞날의 해가 섞인 글(2025-2027)·올해 동계는 둔다',
+    [['2025학년도 겨울 해외탐방 모집', '2026-10-04'], ['2025-2학기 모의주식투자대회 특강 진행 안내', '2026-11-17'], ['[항공드론] 2025년 동계학기 항공·드론 무료 특강', '2026-11-17'], ['2026-1학기 서포터즈 모집', '2026-11-17'],
+      ['2025 KAU 리빙랩 아이디어 공모전 입상자 발표', '2026-11-17'], ['2차 파견단원 최종합격 및 국내교육 대상자 안내', '2026-11-17'], ['농심천심 대학생 봉사단 사업 12개교 선정', '2026-11-17'], ['해외봉사 프로그램 성과공유회 개최', '2026-11-17'],
+      ['(본공고) 2025-2027 KOICA-청년중기봉사단 2차 파견 단원 모집 안내', '2026-11-17'], ['[해외봉사] 2026학년도 동계 해외봉사단 추가 모집 안내', '2026-11-17'], ['2026-1학기 서포터즈 모집', '2026-03-02']].map(([t, d]) => AK.notActivity(t, new Date(d))),
+    [true, true, true, true, true, true, true, true, false, false, false]);
+  /* ■ 대외활동 카드 품질 (2026-11-17 개발자 지시 "공모전/대외활동 카드 … 내용이 없거나, 이상한 내용 … 가독성 … 모두 수리") — 표본만 잰다(실데이터 단정 금지) */
+  {
+    const AXq = await import('../collector/activity-excerpts.mjs');
+    const DLq = await import('../collector/doc-list.mjs');
+    const it1 = { title: 'x', noticeLines: ['-접수기간: 2026.8.5.(수)09:30~9.16.(수)18:00까지', '-결과 발표: 2026년10월 중 예정'] };
+    const it2 = { title: 'y', noticeLines: ['O접수기간: 2026.7.27.(월) 09:00 ~ 7.31.(금)18:00', 'O 접수기간: 2026.8.25.(화) 10:00 ~ 9.4.(금) 17:00'] };
+    const it3 = { title: 'z', deadline: '2026-12-01', noticeLines: ['신청기간:2026.03.16.(월)~03.27.(금)'] };
+    const it4 = { title: 'w', noticeLines: ['지원 기간: 8/11(화)~8/31(월) 까지'] };
+    eq('대외활동 — 마감이 빈 글은 「공고 안내」 기간 줄에서 마감을 읽는다(장학과 같은 extractDeadline · 여러 회차면 가장 늦은 끝 · 이미 있으면 안 바꾼다 · 해 없는 줄은 비운다)',
+      [AXq.deadlineFromNotice(it1) && it1.deadline, AXq.deadlineFromNotice(it2) && it2.deadline, AXq.deadlineFromNotice(it3), it3.deadline, AXq.deadlineFromNotice(it4), it4.deadline],
+      ['2026-09-16', '2026-09-04', false, '2026-12-01', false, undefined]);
+    const junk = ['01811 서울시 노원구 공릉로 232 서울과학기술대학교 | TEL. (02) 970.6114', '제출하신 서류는 사업운영기관에서 관리되오니 서류 반환 등 문의는 해당 기관으로 하시기 바랍니다.', '주요 심사기준에 따른 서류심사',
+      '「 내 안전 지키는 안심헬프미」신청 안내', '장학금 2개 종 이상 동시 지원 불가', '전년도 장학생은 선발 대상에서 제외함', '증명서발급안내 : 대표홈페이지 | 학사안내 | 증명서발급 | 학부생'];
+    const real = ['지원서 1 부', '재학증명서 (공고일 9/1 이후 발급분)', '주민등록등본(주민번호 뒷자리 미포함, 3개월 이내 발급분)', '3 주민등록초본 | - 주소 변동 전체이력 포함', '=e" | @ 통장사본 (학생 본인 명의) | 알 수 있는 추가서류 필요)', '학업계획서(자유양식)',
+      /* 리뷰(11-17)가 찾은 오탐 — 서류 이름이 든 줄은 끝말(제외·불가)·세로줄·「서류심사」로 버리지 않는다 */
+      '1 | 재학증명서 | 1부', '성적증명서 | 1부 | 필수', '개인정보 수집·이용 동의서 | 서명 | 날인', '주민등록등본 1부 - 외국인 제외', '재학증명서(휴학생 제외', '기초생활수급자 증명서(해당자만, 차상위 제외', '서류심사용 자기소개서'];
+    eq('  서류 칸 — 사이트 맨 아래 줄·안내문·다른 글 제목·유의사항·메뉴 경로는 서류가 아니다 · 진짜 서류(OCR 표의 세로줄 하나·서류 이름이 든 줄 포함)는 둔다',
+      [junk.filter((d) => !DLq.DOC_JUNK.test(d)), real.filter((d) => DLq.DOC_JUNK.test(d))], [[], []]);
+    const it5 = { documents: [...real.slice(0, 2), junk[0]] };
+    eq('  활동 글 소급(sanitizeDocs) — 걸러낸 줄만 빠진다', [AXq.sanitizeDocs(it5), it5.documents], [true, real.slice(0, 2)]);
+    process.env.DOCS_FILL_AS_LIB = '1';
+    const DFq = await import('../collector/docs-fill.mjs');
+    const regs = [{ id: 'a', documents: [real[0], junk[4]], documentsFrom: '공고 원문' }, { id: 'b', documents: [junk[5]], documentsFrom: '공고문 첨부' }, { id: 'c', documents: [junk[4]], documentsFrom: '관리자 2026-11-01' }];
+    const sc = DFq.scrubDocuments(regs);
+    eq('  정식 등록 소급(docs-fill scrubDocuments) — 걸러낸 줄만 빠지고 · 다 빠지면 자리표시로(같은 실행에서 다시 읽는다) · 관리자 칸은 안 건드린다',
+      [sc.scrubbed, regs[0].documents, regs[1].documents, regs[1].documentsFrom, regs[2].documents], [2, [real[0]], [DFq.DOC_PLACEHOLDER_LINE], undefined, [junk[4]]]);
+    const it7 = { title: '전국 대학생 및 대학원생 대상 AI 공모전', eligibilityLines: ['전국 대학생 및 대학원생'], eligibilityFrom: '본문' };
+    eq('  제목이 대상으로 시작하는 글의 진짜 자격 줄(「전국 대학생 및 대학원생」)은 제목 조각으로 보지 않는다 — 끊긴 꼴(꾸밈말·조사 끝)만 뺀다(리뷰 11-17)', [AXq.sanitizeElig(it7), it7.eligibilityLines], [false, ['전국 대학생 및 대학원생']]);
+    eq('  모집 글은 상·합격·선정 낱말이 있어도 그대로 둔다(리뷰 11-17)',
+      ['2026 ○○ 공모전 참가자 모집 – 입상자 해외연수 특전', '○○ 서포터즈 모집 (최종 합격 시 활동비 지급)', '○○ 아이디어 공모전 – 30개 팀 선정', '2026 성과공유회 참가자 모집'].map((t) => AK.notActivity(t, new Date('2026-11-17'))), [false, false, false, false]);
+    const regs2 = [{ id: 'h', documents: ['장학금 2개 종 이상 동시 지원 불가'] }, { id: 'ai', documents: ['장학금 2개 종 이상 동시 지원 불가'], documentsFrom: 'AI 2026-10-01' }, { id: 'r', documents: ['지원서', '장학금 2개 종 이상 동시 지원 불가'], documentsFrom: '로봇 2026-10-17 · 원문 「제출서류」 절' }];
+    eq('  정식 등록 소급은 로봇이 적은 칸만 — 출처 표식 없는 사람의 칸·AI 칸은 그대로(extract-excerpts 와 같은 소유 규칙 · 리뷰 11-17)', [DFq.scrubDocuments(regs2).scrubbed, regs2[0].documents.length, regs2[1].documents.length, regs2[2].documents], [1, 1, 1, ['지원서']]);
+    /* 2026-11-17 최종 점검(리뷰 워크플로) — 마감을 원문 여러 칸·제목에서 · 결과 발표가 지난 글은 닫힘 · 다른 글 제목 · 비자격 줄 · 제외 중복 · 서류 머리 · 제목 잡음 */
+    const dl = (o) => { const x = { foundAt: '2026-11-15', ...o }; AXq.deadlineFromNotice(x, '2026-11-17'); return x.deadline || null; };
+    eq('  마감 — 해 없는 기간 줄은 처음 본 날의 해 · 자격 칸 「지원방법: ~3월 14일까지」 · 기간 토막의 여러 회차는 가장 늦은 끝 · 제목 「(~11/23)」 · ISO 발췌 · 결과 발표가 지났으면 그날 · 활동·OT 날짜는 안 본다',
+      [dl({ noticeLines: ['지원 기간: 8/11(화)~8/31(월) 까지'] }), dl({ eligibilityLines: ['√ 지원방법: ~3월 14일(토)까지 큐알을 통한 지원서 제출'] }),
+        dl({ deadlineHint: '모집기간 · 사전공고 2026.04.07.~04.19. · 신청접수 2026.04.20.~05.10. * 지원 방법' }), dl({ title: '[성북구] 2027년 상반기 청년 행정체험단 모집(~11/27)' }),
+        dl({ excerpts: [{ label: '모집기간', text: '2026-11-09 ~ 2026-12-06' }] }), dl({ noticeLines: ['결과 발표: 2026. 9. 22.(화) 개별 통보'] }), dl({ noticeLines: ['결과 발표: 2026. 12. 22.(화)'] }),
+        dl({ noticeLines: ['활동 기간: 12월 1일 ~ 12월 31일', '오프라인 OT : 12월 18일(금)'] }), dl({ foundAt: '2026-12-10', noticeLines: ['접수 기간: 12.1 ~ 1.15'] })],
+      ['2026-08-31', '2026-03-14', '2026-05-10', '2026-11-27', '2026-12-06', '2026-09-22', null, null, '2027-01-15']);
+    eq('  다른 글 제목(「[부서] … 모집」·「2026학년도 … 선발 안내(…)」)은 칸에서 걷는다 · 이름표 줄·제 글 제목·보통 자격 줄은 둔다',
+      [['2026학년도 교촌장학생 선발 안내(장학금액: 100만원/생활비지원)', '지역사랑 봉사활동 자원봉사자 모집'], ['[안전관리팀] 계약직원 모집 (보훈 제한경쟁 채용)', '창업 아이디어 경진대회'],
+        ['신청기한 : 2026.11.17.(화) ~ 선착순 마감', 'x'], ['[교내봉사] 동국인이 함께하는 봉사활동 자원봉사자 모집', '[교내봉사] 동국인이 함께하는 봉사활동 자원봉사자 모집 (김장)'], ['2026학년도 2학기 재학생', 'y']].map(([l, t]) => AXq.otherPostTitle(l, t)),
+      [true, true, false, false, false]);
+    const it8 = { title: 'fMRI 실험 참여자 모집', eligibilityLines: ['만 19세 이상 성인', '색맹 또는 색약이 있으신 분', 'Take-off Stage 청년특강', 'MS · LG전자 출신 강사'], eligibilityExcludes: ['색맹 또는 색약이 있으신 분'], eligibilityFrom: '본문' };
+    const it9 = { documents: ['• 제출 서류: 작품 본문(제목 포함)이 작성된 파일 1부', '제출 전에 꼭 한 번 더 확인해 주세요.'] };
+    eq('  자격 칸 — 제외 칸에도 있는 줄·강사·특강 줄은 뺀다 · 서류 칸 — 「제출 서류:」 머리를 떼고 안내 문장은 뺀다',
+      [AXq.sanitizeElig(it8), it8.eligibilityLines, AXq.sanitizeDocs(it9), it9.documents], [true, ['만 19세 이상 성인'], true, ['작품 본문(제목 포함)이 작성된 파일 1부']]);
+    eq('  모집 글이 아닌 안내·서식·교직원 글은 뺀다 · 「… 양식 안내 및 서포터즈 모집」은 둔다',
+      ['Boeing Day 본선진출팀 선발 안내', '[필독]대학생 집단연수(MT 등) 신고서 및 기획(안) 양식', '[사무국] 2026년 대학 사회봉사 업무 연수 안내', '자원봉사활동 현장의 사고 예방 및 대응 방법 안내', '신청 양식 안내 및 서포터즈 모집'].map((t) => AK.notActivity(t, new Date('2026-11-17'))),
+      [true, true, true, true, false]);
+    const CTq = await import('../collector/clean-title.mjs');
+    eq('  제목 — 목록 상태·분류 열(「접수중 」·「활동 [기관]」)과 게시일 뒤 기관·담당자 이름을 뗀다 · 「활동 사진 공모전」·「… 2026.09.10 대강당」(장소)은 둔다',
+      ['접수중 [고용노동부] 2026 미래내일 일경험', '활동 [기후변화대응사업단] 기후 캠프 모집 (~11/20(금) 14:00) 2026.11.13 기후변화대응사업단 김동윤', '[문화체육관광부] 대학생 기자단 울림 22기 모집(~11/9) 2026.10.30 문화체육관광부 김효선', '활동 사진 공모전', '교육부 장학생 모집 안내 2026.09.10 대강당'].map(CTq.cleanTitle),
+      ['[고용노동부] 2026 미래내일 일경험', '[기후변화대응사업단] 기후 캠프 모집 (~11/20(금) 14:00)', '[문화체육관광부] 대학생 기자단 울림 22기 모집(~11/9)', '활동 사진 공모전', '교육부 장학생 모집 안내 2026.09.10 대강당']);
+    const MEq = createRequire(import.meta.url)('../match-engine.js');
+    eq('  화면 자격 줄 — 끝이 사람을 가리키는 「… 전문가」·「… 경험자」·「… 개인 또는 단체」 는 보인다 · 줄 가운데의 「전문가 멘토링 제공」 은 아니다(리뷰 11-17 · 실측 3줄 · 장학 0줄 변화)',
+      ['최소 경력 2년 이상의 창업, 투자, 기술경영 분야 전·현직 전문가', '공고 마감일까지 관련 분야 사업자등록을 완료한 개인 또는 단체', '현직 전문가 멘토링 제공'].map((l) => MEq.requirementLines({ eligibilityLines: [l] }, null, { all: true }).length), [1, 1, 0]);
+    const it6 = { title: '청년들이 만드는 첨단 공공서비스 AI 영상 공모전', eligibilityLines: ['공모자격 : 공모자격 : 대학생으로 구성된 팀(5인 이내)', '청년들이 만드는', '대한민국 청년(1992.1.1~2007.12.31 출생자)'], eligibilityFrom: '본문' };
+    eq('  자격 줄 — 이름표가 두 번 붙은 줄은 한 번으로 · 제목 앞머리 조각은 뺀다(sanitizeElig)',
+      [AXq.sanitizeElig(it6), it6.eligibilityLines], [true, ['공모자격 : 대학생으로 구성된 팀(5인 이내)', '대한민국 청년(1992.1.1~2007.12.31 출생자)']]);
+    const collectSrc = readText(new URL('../collector/collect.mjs', import.meta.url));
+    eq('  수집 로봇이 발행 때마다 모든 활동 글에 건다(서류 칸 거름·마감 읽기) · 서류 채우기 로봇이 정식 등록에 건다',
+      [/^acts\.items\.forEach\(sanitizeDocs\);/m.test(collectSrc), /^acts\.items\.forEach\(\(n\) => deadlineFromNotice\(n, todayIsoAct\)\);/m.test(collectSrc) && /^acts\.items\.forEach\(sanitizeForeign\);/m.test(collectSrc), /^  const scrub = scrubDocuments\(reg\.items\);/m.test(readText(new URL('../collector/docs-fill.mjs', import.meta.url)))], [true, true, true]);
+  }
   eq('  수집 로봇이 이미 실린 글에도 소급한다 · 인스타그램 게시물도 같은 자리에서 뺀다 · 들일 때도', [/acts\.items = acts\.items\.filter\(\(n\) => !notActivity\(n\.title\) && !unreadableSource\(n\.url\)\)/.test(readText(new URL('../collector/collect.mjs', import.meta.url))), /\.filter\(\(i\) => !unreadableSource\(i\.url\)\)/.test(readText(new URL('../collector/collect.mjs', import.meta.url)))], [true, true]);
   eq('  `(설명) 연합뉴스 … 기사 관련`·`보도 설명` 은 모집 글이 아니다 · `[보도자료] 2026 청년정책 공모전 개최` 는 모집 글 (2026-10-16)',
     [AK.notActivity('(설명) 연합뉴스, "정부 해외취업연수 매년 10% 안팎 폐강" 기사 관련'), AK.notActivity('보도 설명 자료'), AK.notActivity('[보도자료] 2026 청년정책 공모전 개최')], [true, true, false]);
@@ -13655,6 +14794,15 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
 }
 
 
+console.log("\n■ 학생 화면에 '모름'류 글자가 없다 (2026-11-15)");
+/* 개발자 결정(2026-11-02) — '모름' 같은 말이 앱에 보이면 신뢰가 떨어진다 → 학생 화면에서 모르는 것을 말하는 글자를 전부 뺀다(모르면 아무것도 그리지 않는다 · 지어내지 않는다 · 판정 코드 무변경).
+   표본을 앱 함수 그대로 그려 세고(verify/app-vm.cjs) · 결정 1(기한·자격을 다 모르는 정식 공고는 게시판 글로 · feedOnlyFormal) · 학생 화면 글자를 만드는 파일 전부(no-unknown-scan.cjs SCREEN_FILES) 문자열 훑기 · 카드·시트 밖의 자리(달력·금액 상세·선정 줄·초안·문제 주소 이름 · 2026-11-16).
+   절 본문은 verify/no-unknown-gate.mjs · 낱말은 verify/no-unknown-words.cjs 한 곳 · 실데이터 전수는 verify/verify-no-unknown.js(브라우저) */
+{
+  const { runNoUnknownGate } = await import('./no-unknown-gate.mjs');
+  runNoUnknownGate(eq, readText);
+}
+
 /* ■ 공고 카드 품질 (2026-10-15 개발자 지시 — "공고 카드를 눌렀을 때 … 사용자 입장에서 다 완벽했으면")
    상세 200건을 브라우저로 전수 열어 본 결과를 한 절로 잠근다. 틀린 미달(8) · 학적정보로 판정할 수 있는데 모름(2) ·
    깨진 글자(3) · 엉뚱한 칸(4) · 자리 표시 글자(6) · 같은 줄 두 번(7). 되돌리면 그 자리에서 빨간불. */
@@ -13710,7 +14858,7 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
   eq('  ✕ 로 이미 보인 줄은 「내 정보로 확인한 항목」에 또 적지 않는다 (shownBad)', /shownBad\.has\(r\.slice\(FAIL_PREFIX\.length\)\)/.test(appSrc), true);
   eq('  주관·금액의 「원문 확인」 자리 표시는 큰 글씨·주관 줄에 안 나간다 · 본문 사진은 첨부 목록에 안 나간다',
     /* 2026-11-02 승인 시안 — 금액은 amountLine(모르면 줄 없음 · 재단 긴 금액은 옅게) · 주최는 cardProviderLine(모르면 빈 글자) · 본문 사진 거르기는 sheetSectionsHtml 의 첨부 절 */
-    [/const amt = amountLine\(sch\); const t = amt\.text\.replace/.test(appSrc), /function cardProviderLine[\s\S]*?if \(providerUnknown\(prov\)\) return '';/.test(appSrc), /filter\(\(a\) => a && !a\.bodyImage\);\n  const att = atts\.length \?/.test(appSrc)], [true, true, true]);
+    [/const amt = amountLine\(sch\); const t = amt\.text\.replace/.test(appSrc), /function cardProviderLine[\s\S]*?if \(providerUnknown\(prov\)\) return '';/.test(appSrc), /filter\(\(a\) => a && !a\.bodyImage\)[^\n]*;\n  const att = atts\.length \?/.test(appSrc)], [true, true, true]);   // 11-17 — 같은 줄 뒤에 같은 파일 한 번만(attSeen) 거르기가 붙었다
   eq('  단추 밑에는 아무 줄도 없다 — 「최종 제출 · 제출처」도 뺐다(2026-10-29 개발자 지시) · 「준비를 마치면 … 표시됩니다」 없음', [/준비를 마치면 최종 제출처/.test(appSrc), /최종 제출 · \$\{esc\(ch\.label\)\}/.test(appSrc)], [false, false]);
   /* ⑨ 리뷰(2026-10-15)가 실데이터 전수 비교(등록 226 + 활동 200 × 7 프로필)로 잡은 틀린 미달·틀린 안심·글자 회귀 — 되돌리면 그대로 재현된다 */
   eq('⑨ 「… 3.0/4.5점 또는」 — 이상이 분수 뒤에 없으면 성적 조건이 아니다 (춘곡장학회 · 평점 2.8 에게 ✕ 였다)', kinds('직전 정규학기에 12학점 이상 이수하였으며, 대학 전체학기 성적 평균 3.0/4.5점 또는').includes('grade'), false);
@@ -13731,13 +14879,44 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
   {
     const a = appSrc.indexOf('const NS_LABELS = ['), b = appSrc.indexOf('\nfunction sourceNoteHtml(');
     const escS = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    const nsh = (a > 0 && b > a) ? new Function('esc', 'unent', 'joinSpacedSyllables', `${appSrc.slice(a, b)}\nreturn noticeSummaryHtml;`)(escS, ME3.decodeEntities, ME3.joinSpacedSyllables) : () => '';
+    const nsh = (a > 0 && b > a) ? new Function('esc', 'unent', 'joinSpacedSyllables', 'stripListNumber', `${appSrc.slice(a, b)}\nreturn noticeSummaryHtml;`)(escS, ME3.decodeEntities, ME3.joinSpacedSyllables, ME3.stripListNumber) : () => '';
     const html = nsh(['12.(월) - 접수방법 : 이메일(x@y.kr) 또는 등기우편', '<b>굵게</b> 문의 : 02-123 <script>x</script>', '장학금액 : 1 인 당 1,000,000 원', '지원자격 : 2026-1 학기 학부 재학생',
       '매일 09:00~18:00 접수', '신청방법 : 포털 로그인 후 신청하고', '10.22.(목) 7:00~15:00', '모집기간) 2026.8.13.(목) ~ 2026.8.23(일) ○ (신청방법) 네이버 폼을 통한 온라인 신청']);
     const items = [...html.matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => m[1].replace(/<b class="ns-k">([^<]*)<\/b>/g, '$1 · '));
     eq('⑩ 공고 안내 — 번호·요일 꼬리 뗌 · 이름표 묶음(접수방법→신청 방법 · 장학금액→지원 금액) · 자격 줄 뺌 · 시각 콜론은 이름표 아님 · 잘린 꼬리는 … · 날짜는 번호가 아니다 · ○ 항목 가르기 · 글자는 esc',
       items, ['신청 방법 · 이메일(x@y.kr) 또는 등기우편', '&lt;b&gt;굵게&lt;/b&gt; 문의 : 02-123 &lt;script&gt;x&lt;/script&gt;', '지원 금액 · 1인 당 1,000,000원', '매일 09:00~18:00 접수', '신청 방법 · 포털 로그인 후 신청…', '10.22.(목) 7:00~15:00', '신청 기간 · 2026.8.13.(목) ~ 2026.8.23(일)', '신청 방법 · 네이버 폼을 통한 온라인 신청']);
     eq('  줄이 없으면 빈 글자 · 같은 줄은 한 번', [nsh([]), (nsh(['문의 : 02-1', '문의 : 02-1']).match(/<li>/g) || []).length], ['', 1]);
+    /* 2026-11-17 리뷰 — 옛 규칙 `^\d+[.]` 이 소수·절 번호·해의 앞 토막만 뗐다(`2.1 보호조치 종료자`→`1 보호조치 종료자` · `3.5 이상인 자 우대`→`5 이상인 자 우대` ·
+       실데이터 `2025. 12. 31.부터 …`→`12. 31.부터 …` · `26.1학기 성적 보유자`→`1학기 …`). 번호 떼기는 stripListNumber 한 곳 — 자격 줄과 공고 안내가 같이 부른다 */
+    /* 리뷰 3차(같은 날) — 점 찍힌 절 번호(`2.1 `)를 통째로 떼던 갈래가 날짜(`11.30. 마감`)·기준값(`2.0 미달 시`)까지 지웠다.
+       절 번호·날짜·값은 글자로 같은 꼴이라 🔴 헷갈리면 남긴다 — `2.1` 이 보이는 건 해가 없고, 날짜·기준이 사라지면 학생이 못 본다 */
+    eq('  번호 떼기는 목록 표식만 — 소수(`3.5 이상`)·해(`2025. 12. 31.`·`26.1학기`)·점 찍힌 숫자(`2.1 `·`11.30.`)는 남긴다 (stripListNumber)',
+      ['2.1 보호조치 종료자', '2.1. 보호조치 종료자', '3.5 이상인 자 우대', '*3.3이상(4.3 만점 기준)', '2025. 12. 31.부터 공고일 현재까지 주민등록', '26.1학기 성적 보유자', '1. 재학생', '1) 재학생', '(1) 재학생', '1.2026-2학기 재학생', '4.5 만점 3.0 이상'].map((x) => ME3.tidyRequirement(x)),
+      ['2.1 보호조치 종료자', '2.1. 보호조치 종료자', '3.5 이상인 자 우대', '3.3이상(4.3 만점 기준)', '2025. 12. 31.부터 공고일 현재까지 주민등록', '26.1학기 성적 보유자', '재학생', '재학생', '재학생', '2026-2학기 재학생', '4.5 만점 3.0 이상']);
+    {
+      const keep = ['11.30. 마감 예정입니다.', '10.15 접수 마감', '2.28. 현재 재학 중인 자', '26.11.30. 마감입니다.', '12.5. 오후 6시까지 이메일로 제출합니다.', '11.18. 접수 시작, 11.30. 마감', '3.1. 현재 재학생',
+        '2.0 미달 시 환수합니다.', '1.5 배수 선발 후 면접합니다.', '3.5 내외의 학생을 선발합니다.', '4.0 수준', '2.0 미달자 제외'];
+      eq('  앞머리 날짜(`11.30. 마감`·`2.28. 현재`·`10.15 접수`·`26.11.30.`)와 기준값(`2.0 미달`·`1.5 배수`·`3.5 내외`·`4.0 수준`)은 한 글자도 안 뗀다 — 자격 줄',
+        keep.map((x) => ME3.tidyRequirement(x)), keep);
+      eq('  같은 줄은 공고 안내에서도 그대로 남는다 (noticeSummaryRows)',
+        keep.map((x) => [...nsh([x]).matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => m[1]).join(' / ')), keep);
+    }
+    eq('  공고 안내도 같은 규칙 — 「3.5 이상인 학생은 …」·「2.1 서류는 …」 모두 숫자가 남는다',
+      [...nsh(['3.5 이상인 학생은 가산점을 받습니다.', '2.1 서류는 우편으로 제출합니다.']).matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => m[1]),
+      ['3.5 이상인 학생은 가산점을 받습니다.', '2.1 서류는 우편으로 제출합니다.']);
+    /* 🔴 리뷰 4차(2026-11-17) — 점 찍힌 숫자를 안 떼자 절 번호 뒤 이름표(`2.1 신청기간 :`)를 「공고 안내」가 못 읽어 이름표 없는 줄로 떴고
+       `3.2 지원자격 : 재학생` 이 NS_SKIP 을 비켜 다시 보였다 · 자격 줄은 `2.1 대상 :` 이름표가 남았다. 절 번호 + **이름표 낱말로 끝나는 짧은 이름표 + 콜론**일 때만 뗀다 */
+    eq('  절 번호 + 이름표 + 콜론은 번호를 뗀다 — 공고 안내 이름표가 산다 · 자격 이름표 줄은 빠진다 (noticeSummaryRows)',
+      [...nsh(['2.1 신청기간 : 2026. 11. 1.(월) ~ 11. 30.(금)', '2.2 신청방법 : 이메일 제출', '3.1 문의 : 장학팀 02-123-4567', '3.2 지원자격 : 재학생']).matchAll(/<li>([\s\S]*?)<\/li>/g)]
+        .map((m) => m[1].replace(/<b class="ns-k">([^<]*)<\/b>/g, '$1 · ')),
+      ['신청 기간 · 2026. 11. 1.(월) ~ 11. 30.(금)', '신청 방법 · 이메일 제출', '문의 · 장학팀 02-123-4567']);
+    eq('  자격 줄도 같은 함수 — `2.1 대상 : 휴학생 제외` · `2.1. 지원자격 : 재학생` 의 번호·이름표가 떨어진다 (tidyRequirement)',
+      ['2.1 대상 : 휴학생 제외', '2.1. 지원자격 : 2026학년도 재학생', '3.2.1 신청자격 : 평점 3.0 이상'].map((x) => ME3.tidyRequirement(x)), ['휴학생 제외', '2026학년도 재학생', '평점 3.0 이상']);
+    {
+      const keep2 = ['3.5 이상 : 20점', '4.0 이상 : 100만원 지급', '11.30. 마감 : 학과 사무실 제출', '12.5. 접수기간 : 12.10.까지', '2.0 미달 시 : 환수', '1.5 배수 : 면접 대상'];
+      eq('  값·날짜 뒤 콜론은 이름표가 아니다 — `3.5 이상 :`·`11.30. 마감 :`·`12.5. 접수기간 :`(두 자리 첫 숫자는 날짜)은 숫자를 남긴다',
+        keep2.map((x) => ME3.stripListNumber(x)), keep2);
+    }
   }
   /* ⑪ 숫자가 있는데 '모름'이던 자격 줄 123개 진단(2026-10-15 · 개발자 "여기서 진행") — 위험 없는 갈래만 판정한다. 되돌리면 그대로 '모름'이 된다 */
   const mm = (t, o) => ME3.requirementMatch(t, { ...st, ...(o || {}) }, null);
@@ -13863,12 +15042,14 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
       const cSrc = readText(new URL('../collector/collect.mjs', import.meta.url)), aSrc = readText(new URL('../collector/activity-docs.mjs', import.meta.url));
       eq('  수집 로봇(fetchDetail)과 첨부 로봇(fetchPost)이 같은 detailByRule 을 먼저 부른다', [/const ruled = await detailByRule\(item\.url\)/.test(cSrc), /const ruled = await detailByRule\(n\.url\)/.test(aSrc) && /-R\.txt/.test(aSrc)], [true, true]);
     }
-    /* 2026-10-28 개발자 최종 — 선 없이 카드 왼쪽 아래 **바깥링크 아이콘만**(글자는 읽는 기계용으로 font-size 0) · 카드 단추는 그만큼 아래 여백(승인 화면 — 드라이버처럼 모양을 잠근다) */
+    /* 2026-10-28 개발자 최종 — 선 없이 **바깥링크 아이콘만**(글자는 읽는 기계용으로 font-size 0) · 승인 화면이라 모양을 잠근다.
+       2026-11-15 개발자 승인 시안 1("시안 1로 해 · 간결하고 모던하게") — 자리가 왼쪽 아래(혼자 한 줄) → **마감 옆(아랫줄 오른쪽 끝)** 으로 · 카드 아래 여백 대신 아랫줄 오른쪽을 비운다 */
     const css = readText(new URL('../style.css', import.meta.url));
     const linkBlock = (css.match(/\.card-src-link \{([\s\S]*?)\}/) || [])[1] || '';
-    eq('  카드 링크 자리는 style.css 에 있다(.card-src-link 왼쪽 아래 · 선 없음 · 글자 숨김 · 아이콘 마스크 · has-link 아래 여백)',
-      [/left: var\(--space-20\); bottom: var\(--space-16\);/.test(linkBlock), !/border-top/.test(linkBlock), /font-size: 0;/.test(linkBlock), /\.card-src-link::before \{[\s\S]*?mask: url\("data:image\/svg\+xml/.test(css), /\.sch-card-wrap\.has-link > \.sch-card \{ padding-bottom:/.test(css)],
-      [true, true, true, true, true]);
+    eq('  카드 링크 자리는 style.css 에 있다(.card-src-link 오른쪽 아래 = 마감 옆 · 선 없음 · 글자 숨김 · 아이콘 마스크 · 아랫줄 오른쪽 비움 · 아이콘만의 아래 여백 없음)',
+      [/right: var\(--space-20\); bottom: var\(--space-16\);/.test(linkBlock) && !/left:/.test(linkBlock), !/border-top/.test(linkBlock), /font-size: 0;/.test(linkBlock), /\.card-src-link::before \{[\s\S]*?mask: url\("data:image\/svg\+xml/.test(css),
+        /\.sch-card-wrap\.has-link > \.sch-card \.sch-foot \{ padding-right: calc\(var\(--space-24\) \+ var\(--space-4\)\);/.test(css), /\.sch-card-wrap\.has-link > \.sch-card \{ padding-bottom:/.test(css)],
+      [true, true, true, true, true, false]);
     eq('⑭ 자격 줄 — 안내 문장(`…모집합니다`·`…제공하고 있습니다`·`…하시기 바랍니다`·`첨부파일이(가) 없습니다`·`가능합니다`)은 아니다',
       ['2026 평택시민나눔문화축제에서 합정장애인주간보호센터 홍보부스 운영을 보조해주실 자원봉사자를 모집합니다.', '합정장애인주간보호센터는 사회복지법인 연꽃마을에서 운영하고 있으며, 성인발달장애인을 위한 프로그램을 제공하고 있습니다.',
         '- 기타: 식권제공, 개인사정으로 참여가 어려울 시 사전에 반드시 반려신청하시기 바랍니다.', '첨부파일이(가) 없습니다.', '- 정해진 시간에만 봉사활동 가능합니다.', '장려상 2점 각 50만원을 시상합니다.', '- 꿈빛도서관은 기관장 직인을 찍어주지 않는 점 양해 부탁드립니다.(싸인으로 대체)'].map(ok),
@@ -13887,18 +15068,22 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
     /* 화면 — 「공고 안내」는 줄바꿈으로 끊긴 문장을 잇고 납작한 표를 `이름표 : 값` 으로 · 이름표 없는 조각은 안 보인다 · 「모집 안내」는 자격 줄이 있으면 「대상」 발췌를 다시 적지 않는다 */
     const a2 = appSrc.indexOf('const NS_LABELS = ['), b2 = appSrc.indexOf('\nfunction sourceNoteHtml(');
     const escS2 = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    const nsh2 = (a2 > 0 && b2 > a2) ? new Function('esc', 'unent', 'joinSpacedSyllables', `${appSrc.slice(a2, b2)}\nreturn noticeSummaryHtml;`)(escS2, ME3.decodeEntities, ME3.joinSpacedSyllables) : () => '';
+    const nsh2 = (a2 > 0 && b2 > a2) ? new Function('esc', 'unent', 'joinSpacedSyllables', 'stripListNumber', `${appSrc.slice(a2, b2)}\nreturn noticeSummaryHtml;`)(escS2, ME3.decodeEntities, ME3.joinSpacedSyllables, ME3.stripListNumber) : () => '';
     const rows2 = (ls) => [...nsh2(ls).matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => m[1].replace(/<b class="ns-k">([^<]*)<\/b>/g, '$1 · '));
     eq('  공고 안내 — 세 줄로 끊긴 한 문장은 한 줄로(쇼미더임팩트) · `활동일시` ↵ `ㅇ 2026…` 는 `활동일시 · …` · `…센터에서` ↵ `10월 … 진행합니다.` 도 한 문장(강북 실데이터) · 홀로 남은 조각은 안 보인다',
       rows2(['충남 사회연대경제기업들의 임팩트 투자 기반을 조성하고 투자 유치를 희망하는', '기업들의 IR(Investor Relation) 역량 강화를 지원하기 위해 한국서부발전(주)과 함께', '하는 2026 프로젝트상생 『쇼미더임팩트 시즌6』 참가자를 모집하고자 합니다.',
         '활동일시', 'ㅇ 2026년 10월 17일(토) 15:00~21:00', '강북청년창업마루 - 강북창업지원센터에서', '10월 창업 교육 및 그룹상담 프로그램을 진행합니다.', '온라인 접수 : https://forms.gle/x', '물품 제공 및 주의사항 안내']),
       ['충남 사회연대경제기업들의 임팩트 투자 기반을 조성하고 투자 유치를 희망하는 기업들의 IR(Investor Relation) 역량 강화를 지원하기 위해 한국서부발전(주)과 함께 하는 2026 프로젝트상생 『쇼미더임팩트 시즌6』 참가자를 모집하고자 합니다.',
-        '활동일시 · 2026년 10월 17일(토) 15:00~21:00', '강북청년창업마루 - 강북창업지원센터에서 10월 창업 교육 및 그룹상담 프로그램을 진행합니다.', '온라인 접수 · https://forms.gle/x']);
+        '활동일시 · 2026년 10월 17일(토) 15:00~21:00', '강북청년창업마루 - 강북창업지원센터에서 10월 창업 교육 및 그룹상담 프로그램을 진행합니다.', '온라인 접수 · <a href="https://forms.gle/x" target="_blank" rel="noopener">forms.gle ↗</a>']);   // 11-17 — 글 속 주소는 사이트 이름 링크(nsBodyHtml)
+    /* 2026-11-17 개발자 지시(가독성) — 글 속 긴 주소는 누를 수 있는 사이트 이름으로 · 주소는 원문 그대로 링크에 · 꼬리 마침표는 주소가 아니다 · 주소 아닌 글자는 그대로 escape */
+    eq('  공고 안내 — 글 속 주소는 「사이트 ↗」 링크(주소는 원문 그대로 · 꼬리 마침표 제외) · 나머지 글자는 escape',
+      rows2(['신청 방법 : 구글폼 https://forms.gle/AbC?x=1&y=<2> 로 접수.', '문의 <b>센터</b> 사이트 http://www.k-startup.go.kr/web/a.do.', '온라인 접수 : https://forms.gle/abc에서 신청']),
+      ['신청 방법 · 구글폼 <a href="https://forms.gle/AbC?x=1&amp;y=" target="_blank" rel="noopener">forms.gle ↗</a>&lt;2&gt; 로 접수.', '문의 &lt;b&gt;센터&lt;/b&gt; 사이트 <a href="http://www.k-startup.go.kr/web/a.do" target="_blank" rel="noopener">k-startup.go.kr ↗</a>.', '온라인 접수 · <a href="https://forms.gle/abc" target="_blank" rel="noopener">forms.gle ↗</a>에서 신청']);   // 링크 앞뒤에 빈칸을 더하지 않는다(리뷰 11-17 — 「( 사이트 ↗ )」)   // 주소에 붙은 한글은 주소가 아니다(리뷰 11-17)
     eq('  이름표가 있는 줄 뒤의 줄은 그 줄에 붙이지 않는다 · 항목 머리(`A.`·`○`·`1)`)도 새 줄',
       rows2(['지원자격 : 2026-1 학기 학부 재학생', '매일 09:00~18:00 접수', '안내 글자가 길어서 이어지는', 'A. 첫째 항목입니다.']), ['매일 09:00~18:00 접수', 'A. 첫째 항목입니다.']);
     eq('  공고 안내 — 자격 줄이 있으면 「대상」 발췌를 다시 적지 않는다 · 모집기간은 「접수」 절이(코드 자리)', /x\.label !== '혜택' && x\.label !== '모집기간' && !\(x\.label === '대상' && \(n\.eligibilityLines \|\| \[\]\)\.length\)/.test(appSrc), true);
     /* 「공고 안내」가 자격에 이미 나온 줄을 빼는 비교 열쇠(noticeFlat) — 글머리 기호 차이(`■ 주 1회 …` vs `주 1회 …`)로 같은 문장이 두 칸에 떴다(관악서울대 치과병원 · 2026-10-28) */
-    const nflat = new Function('esc', 'unent', 'joinSpacedSyllables', `${appSrc.slice(a2, b2)}\nreturn noticeFlat;`)(escS2, ME3.decodeEntities, ME3.joinSpacedSyllables);
+    const nflat = new Function('esc', 'unent', 'joinSpacedSyllables', 'stripListNumber', `${appSrc.slice(a2, b2)}\nreturn noticeFlat;`)(escS2, ME3.decodeEntities, ME3.joinSpacedSyllables, ME3.stripListNumber);
     eq('  공고 안내의 비교 열쇠는 글머리 기호를 뗀다 — `■ 주 1회 이상, 총 5회 이상 꾸준히 봉사가 가능한 분` 과 기호 없는 같은 줄이 같다 · 시트가 그 열쇠(noticeFlat)를 쓴다',
       [nflat('■ 주 1회 이상, 총 5회 이상 꾸준히 봉사가 가능한 분') === nflat('주 1회 이상, 총 5회 이상 꾸준히 봉사가 가능한 분'), nflat('ㅇ 20세 이상') === nflat('20세 이상'), /\(n\.noticeLines \|\| \[\]\)\.filter\(\(l\) => !seenText\.some\(\(e\) => noticeFlat\(l\)\.includes\(e\)\)\)/.test(appSrc)], [true, true, true]);
   }
@@ -13961,6 +15146,8 @@ console.log('\n■ 학적정보 테일러링 (2026-10-24 개발자 지시 1~4 ·
   eq('  `&amp;` 를 되돌린다 (두 번 인코딩도)', [cleanMajorName('Global Business &amp; Technology학부'), cleanMajorName('A &amp;amp; B')], ['Global Business & Technology학부', 'A & B']);
   eq('  모집단위([통합모집]·기타모집단위)는 학과가 아니다 · 같은 이름은 하나로 · 계열모집은 남긴다',
     cleanMajors(['경상대학[통합모집]', '기타모집단위(글로벌)', '공과계열', '수학과', '수학과 ', '']), ['공과계열', '수학과']);
+  eq('  이름 어디든 `모집단위` 면 학과가 아니다(2026-11-16 개발자 결정 · 동국·경운·대구한의) · 계열모집·보통 학과는 남는다',
+    cleanMajors(['바이오시스템대학(광역화 모집단위)', '사회안전대학 인문계열 통합 모집단위', '자연계열 성인통합모집단위', '인문계열', '모집디자인학과']), ['인문계열', '모집디자인학과']);
   {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'majors-camp-')) + path.sep;
     const dir = new URL('file://' + tmp);
@@ -14224,6 +15411,14 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
     [true, null, null, 'no', 'ok']);
   eq('  본인·학생 갈래가 있으면 보호자만이 아니다 (`학생 또는 학생의 보호자가`·`군민 또는 군민의 자녀`) · `학생의 주소 무관` 은 본인 갈래가 아니다',
     ['지급기준일 현재 학생 또는 학생의 보호자가 3년이상 계속해서 횡성군에 주소를 두고 실거주 하는 자', '공고일 기준 관내에 주소를 1년 이상 두고 계속 거주하고 있는 군민 또는 군민의 자녀', '보호자가 공고일 현재 3년 이상 계속하여 영광군에 주민등록을 두고 있어야 함 ※ 학생의 주소 무관'].map((l) => !!(one(l, 'residence') || {}).parentOnly), [false, false, true]);
+  const jangseong = '보호자가 공고일 현재 3년 이상 계속하여 장성군에 주민등록을 두고 있어야 함(학생 주소 무관)';
+  eq('🔴 보호자 줄의 `(학생 주소 무관)`·`※ 학생의 주소 무관` 은 예외가 아니다(확신 그대로) — 부모가 서울 강서구면 ✕ · 부모가 장성군이면 ✓ 가 아니라 모름(기간) · `(부모 주소 무관)`·`(단, 관외 거주 인정)` 은 그대로 예외 (2026-11-17 장성장학회 틀린 안심)',
+    [rmx(jangseong, { region: '서울', regionCity: '강서구', parentRegion: '서울', parentRegionCity: '강서구' }),
+      rmx('보호자가 공고일 현재 3년 이상 계속하여 영광군에 주민등록을 두고 있어야 함 ※ 학생의 주소 무관', { region: '서울', regionCity: '강서구', parentRegion: '서울', parentRegionCity: '강서구' }),
+      rmx(jangseong, { region: '서울', regionCity: '강서구', parentRegion: '전남', parentRegionCity: '장성군' }),
+      (one('본인이 장성군에 주민등록을 두고 있어야 함(부모 주소 무관)', 'residence') || {}).conf === PRx.LOW,
+      (one('보호자가 장성군에 주민등록을 두고 있어야 함(단, 관외 거주 인정)', 'residence') || {}).conf === PRx.LOW],
+    ['no', 'no', null, true, true]);
   const sancheong = '발전소주변지역 지원에 관한 법률 제2조에 정한 발전소주변지역에 공고일 포함 2년 이상 계속 거주하는 주민 또는 그 자녀 ※ 발전소 주변지역:산청군 시천면 ※ 자세한 사항은 첨부파일 또는 홈페이지 참고';
   const scC = one(sancheong, 'residence') || {};
   eq('🔴 G. 읍·면·동·특정지역 — `산청군 시천면`·`석탄산업전환지역` 은 시·군 안쪽(subArea) · 기간을 빼고 재도 산청군 학생은 모름 · 진주시 학생은 ✕ 그대로',
@@ -14927,6 +16122,27 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
       [rmF('3학년(편입생 포함)은 평점 3.0 이상', { year: 1, gpa: 3.2 }), rmF('3학년(휴학생 제외)은 평점 3.0 이상', { year: 1, gpa: 3.2 }), rmF('3학년은 평점 3.0 이상', { year: 3, gpa: 2.6 })], [null, null, 'no']);
   }
 
+  /* ── 단체 회원은 그 단체 이름으로 묻고 따로 저장한다 (2026-11-16 개발자 결정 1번) ──
+     예전엔 처지 `member` 하나라, 한국건설교통신기술협회 공고에서 「예」라고 답하면 전기공사공제조합 공고에도 ✓ 였다(틀린 안심). */
+  {
+    const EAm = createRequire(import.meta.url)('../elig-ask.js');
+    const KCT = '1) (협회 회원사 자녀) 부 또는 모가 한국건설교통신기술협회 회원사 임·직원인 자';
+    const ELEC = '조합원전형: 신청일 현재 전기공사공제조합에 가입되어 있는 조합원 대표와 임직원 및 그 자녀';
+    const tr = (l) => (PRx.parseLine(l, false).conds.find((c) => c.kind === 'trait') || {}).anyOf;
+    eq('🔴 단체 회원 줄은 처지 열쇠를 `member:<단체>` 로 — 건설교통신기술협회 · 전기공사공제조합(가장 긴 고유 이름 · 맨 `협회` 아님) · 단체 이름이 없으면 예전처럼 `member`',
+      [tr(KCT), (tr(ELEC) || []).filter((k) => /^member/.test(k)), tr('향우회 회원 자녀')], [['member:한국건설교통신기술협회'], ['member:전기공사공제조합'], ['member']]);
+    const kk = 'member:한국건설교통신기술협회';
+    const p0 = { status: '재학', year: 3 };
+    eq('🔴 한 단체에 「예」 는 다른 단체 공고에 ✓ 를 주지 않는다 · 옛 처지 `member` 답은 단체 공고에 아무 말 없음 · 그 단체 「예」 ✓ · 「아니요」 ✕',
+      [MEx.requirementMatch(ELEC, { ...p0, traits: { [kk]: true } }, null), MEx.requirementMatch(KCT, { ...p0, traits: { member: true } }, null),
+        MEx.requirementMatch(KCT, { ...p0, traits: { [kk]: true } }, null), MEx.requirementMatch(KCT, { ...p0, traits: { [kk]: false } }, null)],
+      [null, null, 'ok', 'no']);
+    eq('  공고 안 「미확인 자격」 이 그 단체 이름으로 묻는다(askableFields · traitLabel) · 앱이 traitLabel 로 그린다',
+      [EAm.askableFields(KCT, { ...p0, traits: {} }, null), typeof EAm.traitLabel === 'function' ? EAm.traitLabel(kk) : null, typeof EAm.traitLabel === 'function' && EAm.traitLabel('award') === EAm.TRAIT_LABEL.award,
+        /traitLabel\(tk\)/.test(readText(new URL('../app.js', import.meta.url)))],
+      [['trait:member:한국건설교통신기술협회'], '한국건설교통신기술협회 회원·소속 (본인·부모)', true, true]);
+  }
+
   /* ── 편입·재입학 첫 학기 (2026-11-02 개발자 "편입이랑 재입학은 학적정보만으로 구분 가능하잖아") ── */
   const html = readText(new URL('../index.html', import.meta.url));
   eq('온보딩 학적 칩에 「편입 첫 학기」·「재입학 첫 학기」가 있다 (값 편입학·재입학)', [/data-value="편입학"/.test(html), /data-value="재입학"/.test(html)], [true, true]);
@@ -14956,6 +16172,100 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
   eq('  꼬리 쉼표가 붙은 제외 줄(`… 이중국적자 제외,`)은 제외 칸으로 간다 — 전엔 자격 칸에 모름으로 남았다', [RL('주민등록상 해외이주 신고자, 영주권자 및 이중국적자 제외,').length, MEx.requirementLines({}, ['주민등록상 해외이주 신고자, 영주권자 및 이중국적자 제외,'], { onlyExclude: true }).length], [0, 1]);
   eq('  `…학생은 다음 3 가지 중 1 가지에 해당되어야 함` — 주어가 앞에 붙은 가리킴 줄도 선택지 묶음을 연다(그 줄은 안 보이고 아래 줄이 한 묶음)',
     MEx.requirementLines({}, ['가족장학금을 신청할 수 있는 학생은 다음 3 가지 중 1 가지에 해당되어야 함', '부모 중 1인이 재직자인 학생', '형제가 재학 중인 학생', '조부모가 동문인 학생'], { withMeta: true, all: true }).map((x) => x.group), [1, 1, 1]);
+  /* 2026-11-16 · 리뷰 — 충남대 사회 재환원 장학금(원문 form-1n9svq-2 · 관리자가 옮긴 eligibilityLines 그대로). 「나. 차등조건(1개 이상 충족 시 …)」 머리 줄이 버려져
+     보호조치 종료·수급·보호조치 연장(앞뒤 둘은 동시에 될 수 없다) 셋이 모두 필요한 요건으로 세어졌다(수급자 학생 60% · 요건 5개) */
+  const cnu = ['1) 충남대학교 학부 재학생(2026학년도 2학기 등록자 / 휴학·수료자 등 제외)', '2) 직전 학기 12학점 이상 이수자', '나. 차등조건(1개 이상 충족 시 신청 가능, 해당하는 모든 조건의 증빙서류 제출 필수)',
+    '1) 「아동복지법」상 가정위탁·아동복지시설 보호조치 종료가 5년 이상 경과한 자', '2) 국민기초생활수급자(신청자 본인이 수급자로 등록된 자 중 생계급여 또는 의료급여 수급자에 한함)', '3) 「아동복지법」상 가정위탁·아동복지시설 보호조치 연장자'];
+  const cnuStu = (o) => ({ school: '충남대학교', status: '재학', year: 3, credits: 14, lastCredits: 14, gpa: 3.5, flags: [], ...o });
+  const cnuFit = (p) => (({ met, total, fails }) => [met, total, fails.length])(MEx.fitDetail({ id: 'cnu', name: '사회 재환원 장학금', eligibilityLines: cnu }, p));
+  eq('🔴 개요 번호 아래 「나. 차등조건(1개 이상 충족 시 …)」 은 아래 번호 항목(1) 2) 3))을 택1 묶음으로 연다 — 머리 줄은 안 보이고 셋이 한 묶음 · 수급자 학생은 요건 3개 다 맞음 · 처지 모르는 학생도 미달 0',
+    [MEx.requirementLines({}, cnu, { withMeta: true, all: true }).map((x) => x.group), cnuFit(cnuStu({ flags: ['basicLiving'] })), cnuFit(cnuStu({})), cnuFit(cnuStu({ traits: { careLeaver: false } }))],
+    [[0, 0, 1, 1, 1], [3, 3, 0], [2, 3, 0], [2, 3, 0]]);
+  eq('  🔴 「2개 이상 충족」 은 택1 이 아니다(묶으면 하나만 맞아도 맞음 — 틀린 안심) · 번호 항목이 이어지지 않으면 묶지 않는다',
+    [MEx.requirementLines({}, ['나. 가점조건(2개 이상 충족 시 신청 가능)', '1) 국민기초생활수급자', '2) 다자녀 가정의 자녀', '3) 한부모 가정의 자녀'], { withMeta: true, all: true }).map((x) => x.group),
+      MEx.requirementLines({}, ['나. 차등조건(1개 이상 충족 시 신청 가능)', '국민기초생활수급자인 학생'], { withMeta: true, all: true }).map((x) => x.group)],
+    [[0, 0, 0], [0]]);
+  /* 2026-11-17 — 엔진은 위 셋을 한 요건(택1)으로 세는데 **화면은 머리 줄을 숨긴 채 셋을 평평하게** 늘어놓아 학생이 셋 다 필요한 요건으로 읽었다.
+     머리 줄을 원문 그대로(앞 번호만 떼고) withMeta 항목의 `head` 로 주고(match-engine pickHeadCaption), 앱이 그 묶음 첫 줄 위에 작은 이름표(r-pick)로 그린다.
+     🔴 이름표는 요건 줄이 아니다 — 줄 목록·5줄 상한·적합도·✓✕ 어디에도 안 든다(r-elig 를 달지 않는다) */
+  {
+    const cnuItems = MEx.requirementLines({}, cnu, { withMeta: true, all: true });
+    const capTxt = '차등조건(1개 이상 충족 시 신청 가능, 해당하는 모든 조건의 증빙서류 제출 필수)';
+    eq('🔴 택1 머리 줄은 그 묶음 **첫 줄에만** `head` 로 — 원문 그대로(앞 번호 「나.」 만 뗌) · 다른 줄엔 없다 · 줄 수는 그대로 5(머리 줄은 요건 줄이 아니다)',
+      [cnuItems.map((x) => x.head || null), cnuItems.length, MEx.requirementLines({}, cnu, { all: true }).includes(capTxt), MEx.requirementLines({}, cnu).length],
+      [[null, null, capTxt, null, null], 5, false, 5]);
+    const opt3h = ['1) 국민기초생활수급자', '2) 직전학기 평점 4.0 이상인 자', '3) 다자녀 가정의 자녀'];
+    eq('  가리킴 줄 길도 같은 이름표 — `2.`·`가 .`·글머리 번호만 떼고 나머지 글자는 그대로 · 택1 아닌 머리(`2개 이상`)·번호 없이 수도 안 말한 가리킴 줄은 이름표 없음',
+      [MEx.requirementLines({}, ['2. 차등조건(1개 이상 충족 시 신청 가능)', '2.1 보호조치 종료자', '2.2 국민기초생활수급자'], { withMeta: true, all: true })[0].head,
+        MEx.requirementLines({}, ['가 . 지원자격: 다음 중 1가지 이상 해당하는 자', ...opt3h], { withMeta: true, all: true })[0].head,
+        MEx.requirementLines({}, ['아래 ①·②·③ 중 하나에 해당하는 자', '① 국민기초생활수급자', '② 다자녀 가정의 자녀', '③ 한부모 가정의 자녀', '④ 직전학기 평점 3.0 이상인 자'], { withMeta: true, all: true }).map((x) => x.head || null),
+        MEx.requirementLines({}, ['나. 가점조건(2개 이상 충족 시 신청 가능)', '1) 국민기초생활수급자', '2) 다자녀 가정의 자녀'], { withMeta: true, all: true }).some((x) => x.head),
+        MEx.requirementLines({}, ['다음 중 하나에 해당하는 자', '국민기초생활수급자', '다자녀 가정의 자녀'], { withMeta: true, all: true }).some((x) => x.head)],
+      ['차등조건(1개 이상 충족 시 신청 가능)', '지원자격: 다음 중 1가지 이상 해당하는 자', ['아래 ①·②·③ 중 하나에 해당하는 자', null, null, null], false, false]);
+    /* 앱의 진짜 함수를 떼어 돌린다 — 사본을 재면 원본이 바뀌어도 초록이다 */
+    const appP = readText(new URL('../app.js', import.meta.url));
+    const fnP = (name) => { const a = appP.indexOf(`\nfunction ${name}(`) + 1; if (a < 1) return ''; let i = appP.indexOf(') {', a) + 2, d = 0; for (let j = i; j < appP.length; j++) { if (appP[j] === '{') d++; else if (appP[j] === '}' && --d === 0) return appP.slice(a, j + 1); } return ''; };
+    const PRp = createRequire(import.meta.url)('../parse-requirements.js');
+    const sheetP = new Function('requirementLines', 'requirementMatch', 'requirementStruct', 'PR', 'state', `${fnP('esc')}\n${fnP('unent')}\n${fnP('missingReqText')}\n${fnP('eligibilityRowsHtml')}\nreturn eligibilityRowsHtml;`)(
+      MEx.requirementLines, MEx.requirementMatch, MEx.requirementStruct, PRp, { profile: cnuStu({ flags: ['basicLiving'] }) });
+    const sheetH = String(sheetP({ id: 'cnu', name: '사회 재환원 장학금', eligibilityLines: cnu }, { reasons: [], missing: [] }));
+    const lis = [...sheetH.matchAll(/<li class="([^"]*)">([^<]*)<\/li>/g)].map((m) => [m[1], m[2].trim()]);
+    const capAt = lis.findIndex(([c]) => c === 'r-pick');
+    eq('🔴 상세 시트 — 이름표 하나(r-pick · r-elig 아님)가 택1 묶음 첫 줄(보호조치 종료) 바로 위 · 원문 글자 그대로 · 요건 줄(r-elig)은 그대로 5줄',
+      [lis.filter(([c]) => c === 'r-pick').length, capAt >= 0 ? lis[capAt][1] : null, capAt >= 0 && lis[capAt + 1] ? /보호조치 종료가 5년/.test(lis[capAt + 1][1]) : false, lis.filter(([c]) => /\br-elig\b/.test(c)).length],
+      [1, capTxt, true, 5]);
+    const bulkP = new Function('requirementLines', 'bulkPrep', 'dday', 'bulkNeedsWork', 'bulkTags', 'amountLine', 'ddayWords', 'submitChannelLabel',
+      `${fnP('esc')}\n${fnP('bulkRowHtml')}\nreturn bulkRowHtml;`)(MEx.requirementLines, { ids: new Set() }, () => ({}), () => false, () => [], () => ({ text: '' }), () => '', () => '');
+    const bulkH = String(bulkP({ id: 'cnu', name: '사회 재환원 장학금', type: '교외', eligibilityLines: cnu }));
+    const bl = [...(bulkH.match(/<ul class="bulk-reqs">([\s\S]*?)<\/ul>/) || ['', ''])[1].matchAll(/<li( class="[^"]*")?>([^<]*)<\/li>/g)].map((m) => [m[1] || '', m[2]]);
+    eq('  일괄 준비 목록 「지원자격 (공고 원문)」 도 같은 이름표를 묶음 첫 줄 위에(r-pick) · 요건 줄은 5줄 그대로',
+      [bl.findIndex(([c]) => /r-pick/.test(c)), (bl.find(([c]) => /r-pick/.test(c)) || [])[1], bl.filter(([c]) => !c).length], [2, capTxt, 5]);
+    eq('  이름표 모양은 토큰만(t-xs · text-sub · 점 없음) — style.css', /\.reason-list \.r-pick, \.bulk-reqs \.r-pick \{ font-size: var\(--t-xs\); color: var\(--text-sub\);/.test(readText(new URL('../style.css', import.meta.url))), true);
+  }
+  /* 2026-11-16 · 리뷰 2차 — 묶음은 **원문의 개요**를 따른다(match-engine ANY_OF_HEAD 머리말 ④). 처음엔 '몇 줄 남았나'를 내보낸 줄로 세어,
+     선택지 하나가 걸러지면(날짜 줄 · 중복) 묶음이 다음 필수 줄 `다. 직전학기 평점 3.5 이상인 자` 까지 삼켜 평점 2.0 학생이 95%(어긋난 요건 없음)가 됐다 */
+  const headDrop = ['가. 차등조건(1개 이상 충족 시 신청 가능)', '1) 보호조치 종료자', '2) 국민기초생활수급자', '3) 2026년 3월 1일 기준', '다. 직전학기 평점 3.5 이상인 자'];
+  const headDup = ['가. 차등조건(1개 이상 충족 시 신청 가능)', '1) 보호조치 종료자', '2) 국민기초생활수급자', '2) 국민기초생활수급자', '다. 직전학기 평점 3.5 이상인 자'];
+  const headFit = (lines, p) => (({ met, total, fails }) => [met, total, fails])(MEx.fitDetail({ id: 'head', name: '차등조건 표본', eligibilityLines: lines }, p));
+  eq('  🔴 선택지 하나가 걸러져도(날짜 줄·중복) 묶음은 번호 항목까지만 — 다음 `다.` 필수 줄(평점 3.5)은 묶음 밖 · 평점 2.0 수급자 학생은 그 줄에서 미달(95% 틀린 안심이 아니다)',
+    [MEx.requirementLines({}, headDrop, { withMeta: true, all: true }).map((x) => x.group), headFit(headDrop, cnuStu({ gpa: 2.0, flags: ['basicLiving'] })),
+      MEx.requirementLines({}, headDup, { withMeta: true, all: true }).map((x) => x.group), headFit(headDup, cnuStu({ gpa: 2.0, flags: ['basicLiving'] }))],
+    [[1, 1, 0], [1, 2, ['직전학기 평점 3.5 이상인 자']], [1, 1, 0], [1, 2, ['직전학기 평점 3.5 이상인 자']]]);
+  const head1g = ['나. 차등조건: 다음 중 1가지 이상 해당', '1) 국민기초생활수급자', '2) 다자녀 가정의 자녀', '3) 한부모 가정의 자녀'];
+  eq('  🔴 `다음 중 1가지 이상 해당` 의 `1가지` 는 문턱이지 선택지 수가 아니다 — 아래 셋이 한 묶음(첫 항목만 묶고 둘을 필수로 세지 않는다) · 수급자 학생은 요건 1개 맞음',
+    [MEx.requirementLines({}, head1g, { withMeta: true, all: true }).map((x) => x.group), headFit(head1g, cnuStu({ flags: ['basicLiving'] }))],
+    [[1, 1, 1], [1, 1, []]]);
+  /* 2026-11-16 · 리뷰 3차 — 번호 꼴을 넓은 갈래로 묶어 `(1)`↔`3)` · `가)`↔`다.` · `2.1`↔`3.` 을 같은 꼴로 봤다 → 묶음이 다음 필수 형제 줄(평점 3.5)까지 삼켜 평점 2.0 수급자가 미달 없이 통과(틀린 안심).
+     또 가리킴 줄 길(`가. 지원자격: 다음 중 1가지 이상 해당하는 자` · `신청자격: 아래 항목 중 1가지 이상 …`)은 `1가지` 를 선택지 수로 읽어 첫 항목만 묶고 둘을 필수로 셌다(틀린 미달) */
+  const lowBasic = cnuStu({ gpa: 2.0, flags: ['basicLiving'] });
+  const outline = {
+    paren: ['2) 차등조건(1개 이상 충족 시 신청 가능)', '(1) 보호조치 종료자', '(2) 국민기초생활수급자', '3) 직전학기 평점 3.5 이상인 자'],
+    kor: ['나. 선택조건(1개 이상 충족 시 신청 가능)', '가) 보호조치 종료자', '나) 국민기초생활수급자', '다. 직전학기 평점 3.5 이상인 자'],
+    dotted: ['2. 차등조건(1개 이상 충족 시 신청 가능)', '2.1 보호조치 종료자', '2.2 국민기초생활수급자', '3. 직전학기 평점 3.5 이상인 자'],
+    bareNum: ['가. 차등조건(1개 이상 충족 시 신청 가능)', '1) 보호조치 종료자', '2) 국민기초생활수급자', '3.5 이상 평점 유지 학생'],
+  };
+  eq('🔴 택1 묶음은 **같은 모양** 번호까지만 — `(1)`≠`3)` · `가)`≠`다.` · `2.1`≠`3.` · `3.5 이상…` 은 번호가 아니다 · 평점 2.0 수급자는 평점 줄에서 미달(1/2)',
+    Object.values(outline).map((L) => [MEx.requirementLines({}, L, { withMeta: true, all: true }).map((x) => x.group), headFit(L, lowBasic).slice(0, 2)]),
+    [[[1, 1, 0], [1, 2]], [[1, 1, 0], [1, 2]], [[1, 1, 0], [1, 2]], [[1, 1, 0], [1, 2]]]);
+  eq('  머리 줄과 같은 모양의 다음 줄은 아래 항목이 아니라 **형제**다 — `2) 차등조건(1개 이상 …)` ↵ `3)` `4)` 는 묶지 않는다',
+    MEx.requirementLines({}, ['2) 차등조건(1개 이상 충족 시 신청 가능)', '3) 보호조치 종료자', '4) 국민기초생활수급자'], { withMeta: true, all: true }).map((x) => x.group), [0, 0]);
+  const opts3 = ['1) 국민기초생활수급자', '2) 직전학기 평점 4.0 이상인 자', '3) 다자녀 가정의 자녀'];
+  eq('  🔴 가리킴 줄 길도 `1가지 이상` 은 문턱 — `가. 지원자격: 다음 중 1가지 이상 해당하는 자`·`신청자격: 아래 항목 중 1가지 이상 충족하는 학생` 아래 셋이 한 묶음 · 수급자는 1/1 (이름표만 다른 `차등조건:` 과 같은 판정)',
+    ['가. 지원자격: 다음 중 1가지 이상 해당하는 자', '신청자격: 아래 항목 중 1가지 이상 충족하는 학생', '나. 차등조건: 다음 중 1가지 이상 해당하는 자'].map((h) => [MEx.requirementLines({}, [h, ...opts3], { withMeta: true, all: true }).map((x) => x.group), headFit([h, ...opts3], lowBasic)]),
+    [[[1, 1, 1], [1, 1, []]], [[1, 1, 1], [1, 1, []]], [[1, 1, 1], [1, 1, []]]]);
+  const fam = ['가 . 신청대상 : 가족장학금을 신청할 수 있는 학생은 다음 3 가지 중 1 가지에 해당되어야 함', '1) 형제자매가 본교에 재학할 경우 학부에 재학하는 1인', '2) 2026년 3월 1일 기준',
+    '3) 부모 중 1인과 자녀가 본교에 재학할 경우 학부에 재학하는 1인', '나 . 성적기준', '- 직전학기 평점평균이 3.0 이상인 자'];
+  eq('  🔴 가리킴 줄 묶음도 개요로 끝난다 — 선택지가 걸러져도 다음 절의 필수 줄(평점)을 삼키지 않는다 · 평점 2.0 학생은 그 줄에서 미달',
+    headFit(fam, lowBasic)[2], ['직전학기 평점평균이 3.0 이상인 자']);
+  eq('  선택지 수는 원문이 말할 때만 — `아래 ①·②·③ 중 하나` 는 셋(④ 는 필수) · `다음 세 가지 중 하나` + 번호 없는 줄은 그 수까지 · 수를 말하지 않는 번호 없는 줄은 묶지 않는다',
+    [MEx.requirementLines({}, ['아래 ①·②·③ 중 하나에 해당하는 자', '① 국민기초생활수급자', '② 다자녀 가정의 자녀', '③ 한부모 가정의 자녀', '④ 직전학기 평점 3.0 이상인 자'], { withMeta: true, all: true }).map((x) => x.group),
+      MEx.requirementLines({}, ['다음 세 가지 중 하나에 해당하는 자', '국민기초생활수급자', '다자녀 가정의 자녀', '1) 직전학기 평점 3.0 이상인 자'], { withMeta: true, all: true }).map((x) => x.group),
+      MEx.requirementLines({}, ['다음 중 하나에 해당하는 자', '국민기초생활수급자', '다자녀 가정의 자녀', '직전학기 평점 3.0 이상인 자'], { withMeta: true, all: true }).map((x) => x.group)],
+    [[1, 1, 1, 0], [1, 1, 0], [0, 0, 0]]);
+  eq('  (대조군) `다음 3가지 중 2가지 이상` 은 택1 이 아니다 · `아래 6 개 항목 중 1 개 이상의 항목에 해당하지 않는 경우 지급 불가` 는 제외 문장이라 택1 자격 묶음이 아니다',
+    [MEx.requirementLines({}, ['다음 3가지 중 2가지 이상 해당하는 자', ...opts3], { withMeta: true, all: true }).map((x) => x.group),
+      MEx.requirementLines({}, ['가 . 아래 6 개 항목 중 1 개 이상의 항목에 해당하지 않는 경우 지급 불가', '① 형제 · 자매가 본교 학부에 동시 재적 중인 학생', '② 부부가 본교 학부에 동시 재적 중인 학생'], { withMeta: true, all: true }).map((x) => x.group)],
+    [[0, 0, 0], [0, 0]]);
   const stu6 = (o) => ({ school: '한국외국어대학교', track: 'humanities', major: '영어학과', year: 3, status: '재학', gpa: 3.8, bracket: 5, credits: 15, region: '서울', parentRegion: '서울', nationality: 'korean', birthYear: 2004, flags: [], common: {}, scholarships: [], ...o });
   const judge6 = (l, p, ex) => conds(l, ex).map((c) => MEx.judgeCond(c, p, {}));
   const condsEx6 = (l) => PRx.parseLine(l, true).conds;
@@ -14989,8 +16299,13 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
   fs.writeFileSync(tmp + 'kosaf.json', JSON.stringify({ items: [{ code: 'k1', name: '표본 재단', fields: { '특정자격': '○ 제한없음\n○ 기관확인필요\n○ 해당없음음\n○ 대회 입상자', '성적기준': '평점 3.5 이상', '자격제한': '○ 기관확인필요요' } }] }));   // 기관확인필요(요)·해당없음(음) 도 아무것도 말하지 않는 줄 — 앱 KOSAF_NOISE 와 같이 버린다(2026-11-02 · 자격제한 칸도 센다)
   const env = { ...process.env, COVERAGE_REGISTERED: tmp + 'reg.json', COVERAGE_KOSAF: tmp + 'kosaf.json', COVERAGE_ACTIVITIES: tmp + 'none.json' };
   const r = spawnSync(process.execPath, [fileURLToPath(new URL('../verify/eligibility-coverage.mjs', import.meta.url)), '--brief'], { encoding: 'utf8', timeout: 120000, env });
-  eq('  도구가 표본으로 돌고 한 줄을 낸다 (없는 파일은 빈 묶음 · 제한없음·기관확인필요·해당없음 줄은 세지 않는다)', [r.status, (r.stdout || '').trim().replace(/ · 처지 상위.*$/, '')],
+  eq('  도구가 표본으로 돌고 한 줄을 낸다 (없는 파일은 빈 묶음 · 제한없음·기관확인필요·해당없음 줄은 세지 않는다)', [r.status, ((r.stdout || '').trim().split('\n')[0] || '').replace(/ · 처지 상위.*$/, '')],
     [0, '- 자격 줄 전수: 공고 1/1/0 · 조건을 하나도 못 읽는 줄 1/0/0 (등록/재단/활동 · 합 1)']);
+  /* 1단계 측정(2026-11-15) — 둘째 줄: 가상 학생 셋의 카드·줄 판정 분포. 표본 공고 1건 · 완전한 학생(3학년·3.8)은 평점 줄 ✓ · 자립준비·교수 추천 줄은 모름 */
+  const line2 = ((r.stdout || '').trim().split('\n')[1] || '');
+  eq('  둘째 줄 — 가상 학생 셋(완전/약한/이과)의 자격미확인·미달·전부충족·모름 줄·조건 못 집음을 한 줄로', /^- 가상 학생 판정\(마감 전 등록 1건 · 완전\(외대3\)\/약한\(경희1\)\/이과\(연세2\)\): 자격미확인 \d+\/\d+\/\d+ · 미달 \d+\/\d+\/\d+ · 전부충족 \d+\/\d+\/\d+ · 일부\/모름 \d+\/\d+\/\d+ · 자격 줄 \d+개 중 모름 \d+\/\d+\/\d+ \(\d+%\/\d+%\/\d+%\) · 조건 못 집음 \d+\/\d+\/\d+$/.test(line2), true);
+  const COV = await import(new URL('../verify/eligibility-coverage.mjs', import.meta.url)).catch(() => ({}));
+  eq('  verdictDist 는 앱 함수로 센다 — 표본(평점 3.0 이상 ✓ · 1학년 2.0 은 ✕ · 참고 줄은 안 센다)', COV.verdictDist ? (({ a, b }) => [a.ok, a.no, b.no, a.lines])((() => { const d = COV.verdictDist([{ name: 's', deadline: '2099-01-01', eligibilityLines: ['직전학기 평점 3.0 이상인 재학생', '성적기준 없음'] }]); return { a: d['완전(외대3)'], b: d['약한(경희1)'] }; })()) : null, [1, 0, 1, 1]);
   eq('  처지 집계가 돈다 (자립준비청년 · 수상)', /careLeaver 1/.test(r.stdout || '') && /award 1/.test(r.stdout || ''), true);
   const EAy = createRequire(import.meta.url)('../elig-ask.js');
   const PRy = createRequire(import.meta.url)('../parse-requirements.js');
@@ -15031,6 +16346,345 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
     [/\berrorReport:\s*(true|false)/.test(cfg), html.indexOf('src="supabase-config.js"') < html.indexOf('src="supabase-client.js"') && html.indexOf('src="supabase-client.js"') < html.indexOf('src="error-report.js"'),
       /'error-report\.js'/.test(sw), /앱 오류가 났을 때/.test(terms) && /30일 뒤 자동 파기/.test(terms)],
     [true, true, true, true]);
+}
+
+/* ── 2026-11-15 · 유료 카드 읽기 (개발자 지시 — 설계 docs/designs/paid-card-reading.md) ──
+   공고 한 건을 통째로 모델 둘에게 읽혀 카드의 모든 칸을 채우는 로봇. 지어냄을 막는 것은 지시문이 아니라 **기계 대조(verify)** 와 **두 번 읽기 일치(agree)** 다 —
+   이 절은 가짜 응답으로(돈 0) 그 둘이 실제로 막는지 잰다. 표본은 전부 여기 적은 글자다(실데이터·네트워크에 안 기댄다). */
+{
+  console.log('\n■ 유료 카드 읽기 — 기계 대조 · 두 번 읽기 일치 · 스위치 (2026-11-15)');
+  const CR = await import(new URL('../collector/card-read.mjs', import.meta.url));
+  const { sandbox: crSandbox } = await import(new URL('./health-gates/bodies.mjs', import.meta.url));
+  const SRC = [
+    '===== 게시판 본문 =====', '통영시 저소득 대학생 장학금 지원 대상자 선발 안내', '3. 지원자격',
+    '가.「국민기초생활 보장법」에 따른 기초생활수급자 및 차상위 계층 대학생으로,',
+    '나. 학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득하고,',
+    '다. 관내 고등학교 졸업자로, 공고일 현재 주민등록상 6년 이상 통영시에 주소를 두고, 통영시 관내 학교를 6년 이상 다닌 자',
+    '라. 타 장학금을 수혜하지 않고, 학업에 성실한 자', '4. 지원제외: 대학원생, 휴학생',
+    '5. 신청기간: 2026.11.2.(월)~2026.11.23.(월)', '6. 지원금액: 1인당 상한액 100만 원', '7. 신청방법: 방문 또는 우편 신청',
+    '===== 첨부 1.jpg =====', '학자금 지원구간', '사이버대제외/기존학생제외', '5구간 이내',
+  ].join('\n');
+  const ITEM = { id: 'x-1', name: '[교외] 2026년도 통영시 저소득 대학생 장학금 지원 대상자 선발 안내(~11/23)', amountValue: 0, attachments: [] };
+  const base = { title: '', host: '', eligibility: [], excludes: [], priority: [], amount: [], deadline: { date: '', quote: '' }, apply: [], documents: [], notes: [], multi: false, unreadable: false };
+  const v = (over) => CR.verify({ ...base, ...over }, SRC, ITEM);
+
+  /* ① 기계 대조 */
+  const r1 = v({ eligibility: ['「국민기초생활 보장법」에 따른 기초생활수급자 및 차상위 계층 대학생', '학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 자',
+    '관내 고등학교 졸업자로, 공고일 현재 주민등록상 6년 이상 통영시에 주소를 두고, 통영시 관내 학교를 6년 이상 다닌 자', '직전 학기 평점 3.5 이상인 자'] });
+  eq('① 번호를 뗀 줄·끝말만 고친 줄(「…취득하고,」→「…취득한 자」)은 통과하고, 원문에 없는 요건(평점 3.5)은 버린다',
+    [r1.kept.eligibility.length, r1.dropped.map((d) => d.line)], [3, ['직전 학기 평점 3.5 이상인 자']]);
+  eq('  🔴 끝말 고침이 뜻을 뒤집으면 버린다 — 원문 「수혜하지 않고,」 를 「수혜한 자」 로', v({ eligibility: ['타 장학금을 수혜한 자'] }).kept.eligibility, []);
+  eq('  끝말 고침은 자격·제외 줄에만 — 신청 방법·유의 줄은 글자가 그대로 원문에 있어야 한다',
+    [v({ apply: ['방문 또는 우편 신청'] }).kept.apply.length, v({ notes: ['학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 자'] }).kept.notes.length], [1, 0]);
+  eq('  낱말을 바꾼 줄(「차상위 계층」→「저소득층」)·요약한 줄은 버린다', v({ eligibility: ['「국민기초생활 보장법」에 따른 기초생활수급자 및 저소득층 대학생', '기초수급·차상위 대학생'] }).kept.eligibility, []);
+  eq('  깨진 띄어쓰기를 고친 줄 · 포스터에서 두 줄로 갈라진 문장을 이은 줄은 통과한다',
+    v({ eligibility: ['「국민기초생활보장법」에 따른 기초생활 수급자 및 차상위 계층 대학생', '학자금 지원구간 5구간 이내'] }).kept.eligibility.length, 2);
+  eq('  마감 — 근거 문구가 원문에 있고 그 문구에 그 월·일이 있어야 한다 (접수 시작일 11.2 는 문구에 있으니 통과 — 그건 ② 가 잡는다 · 없는 날짜 11.30 · 원문에 없는 문구는 버린다)',
+    [v({ deadline: { date: '2026-11-23', quote: '신청기간: 2026.11.2.(월)~2026.11.23.(월)' } }).kept.deadline?.date || null,
+      v({ deadline: { date: '2026-11-30', quote: '신청기간: 2026.11.2.(월)~2026.11.23.(월)' } }).kept.deadline,
+      v({ deadline: { date: '2026-11-23', quote: '접수 마감 2026.11.23.' } }).kept.deadline], ['2026-11-23', null, null]);
+  eq('  제목은 공고 제목에서 온 글자만(말머리·꼬리 날짜를 뗀 것은 통과 · 지어낸 제목은 버림) · 주최는 원문·제목에 있는 이름만',
+    [v({ title: '2026년도 통영시 저소득 대학생 장학금 지원 대상자 선발 안내' }).kept.title !== '', v({ title: '통영시 장학금 안내' }).kept.title, v({ host: '통영시' }).kept.host, v({ host: '통영시청 평생교육과' }).kept.host], [true, '', '통영시', '']);
+  eq('  응답 꼴이 깨져도 넘어지지 않고 전부 버린다', [CR.verify(null, SRC, ITEM).kept.eligibility, CR.verify({ eligibility: 'x', deadline: 3 }, SRC, ITEM).kept.deadline], [[], null]);
+
+  /* ①-2 2026-11-15 독립 리뷰가 실제로 통과시킨 우회로들 — 서로 다른 문장의 숫자·부정이 섞인 줄은 기계 대조에서 떨어져야 한다 */
+  const glue = (src, line, field = 'eligibility') => CR.verify({ ...base, [field]: [line] }, src, ITEM).kept[field].length;
+  eq('🔴 떨어진 조각 잇기는 가까이·차례대로·틈에 숫자와 부정이 없을 때만 — 다른 문장의 숫자·부정이 섞인 줄은 버린다',
+    [glue('평점 2.5 이상인 자\n우대: 평점 3.0 미만은 감점', '평점 3.0 이상인 자'),
+      glue('학자금 지원구간 8구간 이하인 자\n다자녀 가구 3구간 이하인 자 우대', '학자금 지원구간 3구간 이하인 자'),
+      glue('타 장학금을 받지 않은 자\n국가장학금을 받은 자는 제외', '타 장학금을 받은 자'),
+      glue('생활비 학기당 100만원\n등록금은 연간 최대 500만원', '생활비 학기당 500만원', 'amount'),
+      glue('가. 2026학년도 2학기 현재 본교 학부에 재학 중인 자로서 직전학기 평점평균 2.0 이상인 자\n4. 우대사항 가. 직전학기 평점평균 3.5 이상인 자는 서류심사 가점', '2026학년도 2학기 현재 본교 학부에 재학 중인 자로서 직전학기 평점평균 3.5 이상인 자')],
+    [0, 0, 0, 0, 0]);
+  eq('  숫자 사이 쉼표는 쪼개지 않는다 — 원문 「1,000,000원」 으로 「2,000,000원」 이 통과하지 않는다 · 같은 금액은 통과',
+    [glue('장학금 1,000,000원 지급', '2,000,000원', 'amount'), glue('학기당 1,000,000원, 생활비 500,000원', '학기당 1,500,000원', 'amount'), glue('장학금 1,000,000원 지급', '장학금 1,000,000원', 'amount')], [0, 0, 1]);
+  eq('  🔴 끝말 고침의 부정 막이 — 원문에서 줄기 뒤가 잇는 말(「하고」)이어도 곧 부정이 오면 버린다 (「수혜하고 있지 않은 자」 → 「수혜한 자」)',
+    [glue('가. 타 장학금을 수혜하고 있지 않은 자', '타 장학금을 수혜한 자'), glue('가. 직전 학기 12학점 이상을 취득하고, 성실한 자', '직전 학기 12학점 이상을 취득한 자')], [0, 1]);
+  const dl = (src, date, quote, item = ITEM) => (CR.verify({ ...base, deadline: { date, quote } }, src, item).kept.deadline || {}).date || null;
+  eq('  마감 — 월·일이 문구에 **붙어** 있어야 하고 · 문구에 연도가 있으면 그 연도 · 진짜 날짜 · 게시일보다 이르지 않아야 한다',
+    [dl('11명 선발, 23일 발표', '2026-11-23', '11명 선발, 23일 발표'), dl('접수: 2025.11.2 ~ 2025.11.23', '2026-11-23', '접수: 2025.11.2 ~ 2025.11.23'), dl('접수 13.45까지', '2026-13-45', '접수 13.45까지'),
+      dl('접수기간: 12.20 ~ 1.10', '2026-01-10', '접수기간: 12.20 ~ 1.10', { ...ITEM, listedAt: '2026-11-10' }), dl('접수기간: 2026. 11. 18(수)부터 2026. 11. 26.(목)까지', '2026-11-26', '접수기간: 2026. 11. 18(수)부터 2026. 11. 26.(목)까지'),
+      dl('신청: 12월 04일 17시까지', '2026-12-04', '신청: 12월 04일 17시까지')], [null, null, null, null, '2026-11-26', '2026-12-04']);
+
+  /* ② 두 번 읽기 일치 — 줄 대 줄 · 긴 쪽으로 나눔 · 숫자와 부정·비교 낱말이 같아야 (리뷰 C1 — 한쪽의 실수가 혼자 실렸다) */
+  eq('② 숫자·부정·비교가 다르면 같은 줄이 아니다 · 한쪽이 잘린 줄도 아니다 · 끝말만 다른 줄은 같은 줄',
+    [CR.sameLine('직전학기 평점평균 3.5 이상인 자', '직전학기 평점평균 2.0 이상인 자'), CR.sameLine('직전학기 평점평균 3.0 이상인 자', '직전학기 평점평균 3.0 미만인 자'),
+      CR.sameLine('타 장학금을 받지 않는 자', '타 장학금을 받는 자'), CR.sameLine('서울시 거주자', '서울시 거주자가 아닌 자로서 본교 기숙사에 입사한 학생'), CR.sameLine('본교 재학생 중 3학년', '본교 재학생 중 3학년 제외'),
+      CR.sameLine('직전학기 12학점 이상 이수자', '직전학기 2학점 이상 이수자'), CR.sameLine('학업성적 평균 C학점 이상을 취득한 자', '학업성적 평균 C학점 이상을 취득한 학생')],
+    [false, false, false, false, false, false, true]);
+  const three = ['「국민기초생활 보장법」에 따른 기초생활수급자 및 차상위 계층 대학생', '학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 자', '관내 고등학교 졸업자로, 공고일 현재 주민등록상 6년 이상 통영시에 주소를 두고, 통영시 관내 학교를 6년 이상 다닌 자'];
+  eq('  줄을 다르게 나눴을 뿐이면(한쪽 세 줄 · 한쪽 한 줄) 칸 전체가 같은 말이라 싣는다 · 숫자 하나가 다르면 아니다',
+    [CR.fieldAgree(three, [three.join(' ')]), CR.fieldAgree(three, [three.join(' ').replace('6년 이상 통영시', '3년 이상 통영시')]), CR.fieldAgree(three, three.slice(0, 2))], [true, false, false]);
+  const A1 = v({ eligibility: ['학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 자', '「국민기초생활 보장법」에 따른 기초생활수급자 및 차상위 계층 대학생'], excludes: ['대학원생, 휴학생'],
+    amount: ['1인당 상한액 100만 원'], apply: ['방문 또는 우편 신청'], deadline: { date: '2026-11-23', quote: '신청기간: 2026.11.2.(월)~2026.11.23.(월)' } });
+  const B1 = v({ eligibility: ['학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 학생'], notes: ['대학원생, 휴학생'],
+    amount: ['1인당 상한액 100만 원'], apply: ['방문 또는 우편 신청', '신청기간: 2026.11.2.(월)~2026.11.23.(월)'], deadline: { date: '2026-11-02', quote: '신청기간: 2026.11.2.(월)~2026.11.23.(월)' } });
+  const ag = CR.agree(A1, B1, ITEM);
+  eq('  🔴 자격·제외·서류는 한 줄이라도 갈리면 **칸 전체를 싣지 않는다**(null = 무료 길 값) — 빠진 요건 한 줄이 틀린 안심이 된다 · 방법은 맞은 줄만 · 마감이 다르면 싣지 않는다',
+    [ag.final.eligibility, ag.final.excludes, ag.final.notes, ag.final.amount, ag.final.apply, ag.final.deadline, ag.held.length >= 4], [null, null, null, ['1인당 상한액 100만 원'], ['방문 또는 우편 신청'], null, true]);
+  eq('  「연장」 공고는 두 읽기가 같아도 마감을 싣지 않는다 (받아 두지 못한 연장 공고문이 진짜 마감을 갖고 있을 수 있다)',
+    [CR.agree(A1, A1, ITEM).final.deadline?.date || null, CR.agree(A1, A1, { ...ITEM, attachments: [{ name: '2026년 든든 학업지원금 연장 공고문.pdf' }] }).final.deadline], ['2026-11-23', null]);
+  eq('    첨부 이름이 본문 글자에만 있어도 잡는다 · 사이트 메뉴의 「로그인 연장하기」 는 연장 공고가 아니다',
+    [CR.agree(A1, A1, ITEM, '첨부파일\n2026년 든든 학업지원금 연장 공고문.pdf (72.7KB)').final.deadline, CR.agree(A1, A1, ITEM, '로그인 시간을 연장하시려면 로그인 연장하기 버튼을 클릭').final.deadline?.date || null], [null, '2026-11-23']);
+  const wonIn = createRequire(import.meta.url)('../parse-amount.js').wonIn;
+  const full = { ...base, eligibility: A1.kept.eligibility, amount: ['1인당 상한액 100만 원'] };
+  const be = CR.buildEntry(ITEM, SRC, full, full, wonIn);
+  eq('  한 건 만들기 — 맨 위 금액은 문구에서 숫자만 · 총액·범위 줄에서는 안 집는다 · 둘 다 「읽을 내용 없음」이면 줄이 있어도 싣지 않는다 · 실을 줄이 없어도',
+    [be.entry.head, be.entry.eligibility.length, CR.headAmount({ amount: ['총 장학금 1억원 (1인당 200만원)'], multi: false }, ITEM, wonIn), CR.headAmount({ amount: ['1,200천원 ~ 1,800천원'], multi: false }, ITEM, wonIn),
+      CR.buildEntry(ITEM, SRC, { ...full, unreadable: true }, { ...full, unreadable: true }, wonIn).entry, CR.buildEntry(ITEM, SRC, base, base, wonIn).entry], [1000000, 2, 0, 0, null, null]);
+  /* 2026-11-18 첫 실제 읽기(연세 미래 어학우수장학금): 한 칸씩 흩어진 표를 한쪽이 짜 맞춘 줄(「TOEIC 950/990」)이 대조에서 떨어지자, 핵심 요건(어학 점수)이 빠진 자격 두 줄만 실렸다 */
+  const beDrop = CR.buildEntry(ITEM, SRC, { ...full, eligibility: [...full.eligibility, 'TOEIC 950/990 이상인 자'] }, full, wonIn);
+  const beDropBoth = CR.buildEntry(ITEM, SRC, { ...full, eligibility: ['TOEIC 950/990 이상인 자'] }, { ...full, eligibility: [] }, wonIn);
+  const beDropNote = CR.buildEntry(ITEM, SRC, { ...full, notes: ['TOEIC 950/990 이상인 자'] }, full, wonIn);
+  eq('  🔴 자격·제외·서류에서 한쪽이 낸 줄이 기계 대조에서 떨어지면 그 칸은 싣지 않는다(null) — 남은 줄만 실으면 핵심 요건이 빠진 목록이 된다 · 빈 배열로도 안 싣는다 · 다른 칸(유의)의 떨어진 줄은 자격을 안 건드린다',
+    [beDrop.entry.eligibility, beDrop.held.some((h) => h.field === 'eligibility' && /TOEIC/.test(h.line)), beDropBoth.entry.eligibility, (beDropNote.entry.eligibility || []).length], [null, true, null, 2]);
+  eq('  지시문이 바뀌면 원문이 같아도 해시가 달라진다(다시 읽는다) · 같은 원문은 같은 해시', [CR.sourceHash('가') === CR.sourceHash('가'), CR.sourceHash('가') === CR.sourceHash('나'), /update\(SYSTEM\)/.test(readText(new URL('../collector/card-read.mjs', import.meta.url)))], [true, false, true]);
+  eq('  🔴 내려갔는지는 유료가 읽은 마감으로 잰다 — 무료 길 마감(접수 시작일)이 지났어도 바로잡은 마감 전이면 결과를 지우지 않는다',
+    [CR.closedNow({ id: 'q', deadline: '2026-11-18', listedAt: '2026-11-10' }, { deadline: { date: '2026-11-26', quote: 'x' } }, '2026-11-19'), CR.closedNow({ id: 'q', deadline: '2026-11-18', listedAt: '2026-11-10' }, null, '2026-11-19')], [false, true]);
+  eq('  결과 파일 꼴 검사 — 줄 칸은 글자 배열 또는 null · 마감은 날짜 · 금액은 0 이상의 정수',
+    [CR.checkData({ items: { a: { ...be.entry, hash: 'x' } } }).length, CR.checkData({ items: { a: { ...be.entry, hash: 'x', eligibility: 'x' } } }).length > 0, CR.checkData({ items: { a: { ...be.entry, hash: 'x', head: '100' } } }).length > 0, CR.checkData({ items: [] }).length > 0], [0, true, true, true]);
+
+  /* ③ 진짜 로봇을 임시 폴더에서 — 스위치 · 상한 · 가짜 응답 · 같은 원문 다시 안 읽기 · 응답 원본으로 다시 재기 · registered.json 안 건드림.
+     ⚠️ 날짜는 오늘에서 센다(마감 = 20일 뒤) — 박아 두면 그날이 지나면서 이 검사가 저절로 빨개진다 */
+  const plus = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+  const soon = plus(20), [sy, sm, sd] = soon.split('-').map(Number);
+  const QUOTE = `신청기간: ${sy}.${sm}.${sd}.까지`;
+  const body = `${SRC}\n${QUOTE}\n${'장학금 지원 대상자 선발 안내 본문입니다 '.repeat(12)}`;
+  const mk = (id, n) => ({ id, name: ITEM.name.replace('통영시', `통영${n}시`), type: '교외', sourceUrl: `https://example.ac.kr/notice?no=${n}`, deadline: plus(3), listedAt: plus(-1), amountValue: 0, attachments: [], eligibility: {} });
+  const regItems = [mk('x-1', 1), mk('x-2', 2)];
+  const regText = `${JSON.stringify({ items: regItems }, null, 1)}\n`;
+  const sb = crSandbox(new URL('../', import.meta.url), 'hdj-card-read-');
+  const NOENV = { CARD_READ_ENABLE: '', CARD_READ_FAKE: '', ANTHROPIC_API_KEY: '' };   // 부르는 쪽 환경에 켜져 있어도 이 검사는 꺼진 채로 잰다
+  try {
+    sb.write('data/registered.json', regText);
+    sb.write('collector/extracted/notices-text.json', regItems.map((it) => ({ title: it.name, school: '시험대학교', url: it.sourceUrl, text: body.replace('통영시 저소득', `${it.name.includes('통영1시') ? '통영1시' : '통영2시'} 저소득`) })));
+    const off = sb.run('collector/card-read.mjs', ['--write'], NOENV, 30000);
+    eq('③ 스위치가 꺼져 있으면(설정 파일 없음 = 꺼짐 · CARD_READ_ENABLE 없음) --write 여도 부르지 않고 0 으로 끝난다 · 결과 파일을 만들지 않는다',
+      [off.status, /부르지 않았습니다/.test(off.out), sb.exists('data/card-read.json')], [0, true, false]);
+    sb.write('collector/card-read-config.json', { enabled: true });
+    const half = sb.run('collector/card-read.mjs', ['--write'], NOENV, 30000);
+    sb.write('collector/card-read-config.json', { enabled: false });
+    const half2 = sb.run('collector/card-read.mjs', ['--write'], { ...NOENV, CARD_READ_ENABLE: '1' }, 30000);
+    eq('  스위치는 둘 다여야 한다 — 설정만 켜져도 · 환경 변수만 있어도 부르지 않는다',
+      [half.status, /부르지 않았습니다/.test(half.out), half2.status, /부르지 않았습니다/.test(half2.out), sb.exists('data/card-read.json')], [0, true, 0, true, false]);
+    const good = { ...base, title: '', host: '통영시',
+      eligibility: ['학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 자'], excludes: ['대학원생, 휴학생'], amount: ['1인당 상한액 100만 원'],
+      deadline: { date: soon, quote: QUOTE }, apply: ['방문 또는 우편 신청'], notes: ['재산 3억 이하인 자'] };
+    sb.write('fake.json', { 'x-1': { a: good, b: good }, 'x-2': { a: good, b: { ...good, eligibility: ['학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 자', '타 장학금을 수혜하지 않고, 학업에 성실한 자'] } } });
+    sb.write('collector/card-read-config.json', { enabled: false, maxPerRun: 1 });
+    const run1 = sb.run('collector/card-read.mjs', ['--write'], { ...NOENV, CARD_READ_FAKE: sb.abs('fake.json') }, 30000);
+    let got = (sb.json('data/card-read.json') || {}).items || {}, led = sb.json('collector/card-read-ledger.json') || {};
+    eq('  한 실행 상한(maxPerRun 1) — 두 건 중 한 건만 읽고 멈춘다', [run1.status, Object.keys(got).length, /상한 1건에 닿아 멈춥니다/.test(run1.out)], [0, 1, true]);
+    if (run1.status !== 0) console.log(run1.out.slice(-800));
+    sb.write('collector/card-read-config.json', { enabled: false });
+    const run1b = sb.run('collector/card-read.mjs', ['--write'], { ...NOENV, CARD_READ_FAKE: sb.abs('fake.json') }, 30000);
+    got = (sb.json('data/card-read.json') || {}).items || {}; led = sb.json('collector/card-read-ledger.json') || {};
+    eq('  가짜 응답으로 돌리면 결과 파일에 실린다 — 지어낸 줄(「재산 3억 이하」)은 빠지고 · 마감 · 금액 숫자 · 장부에 버린 줄과 **응답 원본**이 남는다',
+      [run1b.status, (got['x-1'] || {}).eligibility, (got['x-1'] || {}).notes, ((got['x-1'] || {}).deadline || {}).date, (got['x-1'] || {}).head, (led['x-1'] || {}).done, ((led['x-1'] || {}).dropped || []).length, !!((led['x-1'] || {}).raw || {}).a],
+      [0, ['학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 자'], [], soon, 1000000, true, 2, true]);
+    eq('  두 읽기가 자격에서 갈린 공고는 자격 칸을 싣지 않는다(null) — 다른 칸은 싣는다', [(got['x-2'] || {}).eligibility, (got['x-2'] || {}).excludes, ((led['x-2'] || {}).held || []).length], [null, ['대학원생, 휴학생'], 1]);
+    eq('  🔴 registered.json 은 한 글자도 안 바뀐다 (무료 길 값이 비상망으로 남는다)', sb.read('data/registered.json') === regText, true);
+    const run2 = sb.run('collector/card-read.mjs', ['--write'], { ...NOENV, CARD_READ_FAKE: sb.abs('fake.json') }, 30000);
+    eq('  같은 원문은 다시 읽지 않는다 (대상 0건) · 실린 것은 그대로', [/대상 0건/.test(run2.out), Object.keys((sb.json('data/card-read.json') || {}).items || {}).sort()], [true, ['x-1', 'x-2']]);
+    /* 응답 원본으로 다시 재기 — 결과 파일을 비운 뒤 --recheck 가 돈 없이 되살린다(규칙을 고친 뒤 이 길로 다시 잰다) */
+    sb.write('data/card-read.json', { items: {} });
+    const rc = sb.run('collector/card-read.mjs', ['--recheck', '--write'], NOENV, 30000);
+    eq('  --recheck 는 장부의 응답 원본으로 결과를 다시 만든다(스위치가 꺼져 있어도 · 돈 0)', [rc.status, Object.keys((sb.json('data/card-read.json') || {}).items || {}).sort(), /\$0/.test(rc.out)], [0, ['x-1', 'x-2'], true]);
+    const chk = sb.run('collector/card-read.mjs', ['--check'], NOENV, 30000);
+    sb.write('data/card-read.json', { items: { 'x-1': { eligibility: 'x' } } });
+    const chkBad = sb.run('collector/card-read.mjs', ['--check'], NOENV, 30000);
+    eq('  --check — 멀쩡한 결과 파일은 0 · 꼴이 깨진 파일은 1 로 끝난다', [chk.status, chkBad.status], [0, 1]);
+    sb.write('data/card-read.json', '{ "items": { ');
+    const broken = sb.run('collector/card-read.mjs', ['--write'], { ...NOENV, CARD_READ_FAKE: sb.abs('fake.json') }, 30000);
+    eq('  깨진 결과 파일을 빈 것으로 읽고 이어 가지 않는다 — 멈춘다(전부 다시 읽으면 돈이 다시 나간다)', [broken.status, /깨진 파일/.test(broken.out)], [1, true]);
+    sb.write('data/card-read.json', { items: { 'x-1': got['x-1'], 'x-2': got['x-2'] } });
+    sb.write('data/registered.json', { items: [regItems[0]] });
+    sb.run('collector/card-read.mjs', ['--write'], { ...NOENV, CARD_READ_FAKE: sb.abs('fake.json') }, 30000);
+    eq('  목록에서 빠진 공고는 결과 파일과 장부에서도 뺀다', [Object.keys((sb.json('data/card-read.json') || {}).items || {}), Object.keys(sb.json('collector/card-read-ledger.json') || {})], [['x-1'], ['x-1']]);
+  } finally { sb.done(); }
+  const robot = readText(new URL('../collector/card-read.mjs', import.meta.url));
+  eq('  로봇이 registered.json 에 쓰는 줄이 없다 · 유료 호출은 스위치 둘 뒤에만 · 건마다 저장 + 넘어져도 저장 · 한쪽이 실패해도 쓴 돈을 센다(allSettled) · 연달아 실패하면 멈춘다 · 실패가 있으면 빨갛게 끝낸다',
+    [/writeFileSync\([^)]*registered/.test(robot), /cfg\.enabled === true && process\.env\.CARD_READ_ENABLE === '1'/.test(robot), /save\(\);   \/\/ 건마다 저장/.test(robot) && /finally \{\s*save\(\);/.test(robot),
+      /Promise\.allSettled\(/.test(robot) && !/Promise\.all\(\[ask/.test(robot), /if \(streak >= 3\)/.test(robot), /if \(failed\) process\.exit\(1\);/.test(robot)], [false, true, true, true, true, true]);
+  const wf = readText(new URL('../.github/workflows/card-read.yml', import.meta.url));
+  /* 저장 앞 관문의 짜임(규칙 관문·데이터 감사·되돌리기)은 health-gates/savegate.mjs 가 모든 워크플로에 대해 잰다 — 여기는 이 워크플로만의 것 셋 */
+  eq('  워크플로 — 사전 관문 단계에 pipefail(관문이 빨가면 유료 단계가 안 돈다) · 저장 전 꼴 검사(--check) · 읽기 단계가 일부 실패해도 저장으로 가고(continue-on-error) 알림은 그 결과를 본다',
+    [/set -o pipefail\n\s+node verify\/test-collector\.mjs \| tail/.test(wf), /run: node collector\/card-read\.mjs --check/.test(wf),
+      /id: read[\s\S]{0,120}continue-on-error: true/.test(wf) && /if: failure\(\) \|\| cancelled\(\) \|\| steps\.read\.outcome == 'failure'/.test(wf)], [true, true, true]);
+
+  /* ④ 앱에 얹기(match-engine withCardRead) — 화면 드라이버(verify-card-read.js)가 못 재는 갈래를 여기서 잰다 */
+  const MEc = createRequire(import.meta.url)('../match-engine.js');
+  const free = { id: 'f-1', name: '표본 장학생 선발', provider: '주관 기관 원문 확인', amount: '금액 원문 확인', amountValue: 0, deadline: '2026-11-18', openDate: '2026-11-10', period: '접수 ~2026-11-18',
+    eligibility: {}, eligibilityLines: ['직전 학기 평점 3.5 이상인 자'], eligibilityExcludes: ['휴학생 제외'], documents: ['재학증명서'], excerpts: ['문의처: 장학팀 ☎650-2622', '3) 장학금 지급 금액 : 연간 300만원'] };
+  const paid = { host: '표본재단', eligibility: ['직전 학기 평점 3.0 이상인 자'], excludes: ['대학원생'], priority: [], amount: ['연간 300만원'], head: 3000000, deadline: { date: '2026-11-26', quote: 'x' }, apply: ['온라인 신청'], documents: ['성적증명서'], notes: ['중복수령 불가'], multi: false };
+  const o1 = MEc.withCardRead(free, paid);
+  eq('④ 유료가 읽은 칸은 유료 값으로 — 자격·제외·서류·마감·주최 · 금액은 무료 길이 못 읽었을 때만 · 문의처 발췌는 남는다 · 원본 객체는 안 바뀐다',
+    [o1.eligibilityLines, o1.eligibilityExcludes, o1.documents, o1.deadline, o1.provider, o1.amountValue, o1.excerpts.some((x) => /문의처/.test(x)), o1.excerpts.some((x) => /3\) 장학금/.test(x)), free.eligibilityLines[0]],
+    [['직전 학기 평점 3.0 이상인 자'], ['대학원생'], ['성적증명서'], '2026-11-26', '표본재단', 3000000, true, false, '직전 학기 평점 3.5 이상인 자']);
+  const o2 = MEc.withCardRead({ ...free, amountValue: 6000000, amount: '600만원' }, { ...paid, eligibility: null, excludes: null, documents: null });
+  eq('  🔴 갈려서 안 실은 칸(null)은 무료 길 값 그대로 — 자격·제외·서류가 비지 않는다 · 무료 길이 읽은 금액은 안 덮는다 · 거르기도 무료 길로',
+    [o2.eligibilityLines, o2.eligibilityExcludes, o2.documents, o2.amountValue, Array.isArray(o2.cardRead.eligibility)], [free.eligibilityLines, free.eligibilityExcludes, free.documents, 6000000, false]);
+  const o3 = MEc.withCardRead({ ...free, deadlineFrom: '관리자 2026-11-10', documentsFrom: '관리자 2026-11-10', eligibilityFrom: '관리자 2026-11-10' }, paid);
+  eq('  🔴 관리자가 고친 칸(마감·서류·자격)은 덮지 않는다', [o3.deadline, o3.documents, o3.eligibilityLines], ['2026-11-18', ['재학증명서'], free.eligibilityLines]);
+  eq('  꼴이 틀린 항목은 아무것도 안 바꾼다 — 빈 객체 · 숫자 주최 · 글자 금액', [MEc.withCardRead(free, {}).eligibilityLines, MEc.withCardRead(free, { host: 123, head: '3000000' }).provider, MEc.withCardRead(free, { host: 123, head: '3000000' }).amountValue], [free.eligibilityLines, free.provider, 0]);
+  const stu = { school: '한국외국어대학교', track: 'arts', major: '회화과', year: 3, status: '재학', gpa: 2.5, bracket: 5, credits: 15, region: '서울', parentRegion: '서울', nationality: 'foreign', birthYear: 2004, flags: [] };
+  const fd = (cr) => MEc.fitDetail(MEc.withCardRead({ ...free, eligibilityExcludes: [] }, { ...paid, excludes: [], ...cr }), stu);
+  eq('  묶인 공고(multi)는 한 종의 요건으로 미달을 내지 않는다 · 묶이지 않은 공고는 미달', [fd({ multi: true, eligibility: ['직전 학기 평점 3.5 이상인 자'] }).fails.length, fd({ eligibility: ['직전 학기 평점 3.5 이상인 자'] }).fails.length], [0, 1]);
+  eq('  제외 줄 — 「외국인 유학생」「예체능 계열 재학생」 은 무료 길과 똑같이 미달 · 장학금 수혜자 줄의 장학금 이름 속 낱말(지역대학생)은 판정 안 함',
+    [fd({ eligibility: ['대학교 재학생'], excludes: ['외국인 유학생'] }).fails.length, fd({ eligibility: ['대학교 재학생'], excludes: ['예체능 계열 재학생'] }).fails.length,
+      fd({ eligibility: ['대학교 재학생'], excludes: ['2026년도 통영시 성적우수 장학금, 지역대학생 장학금, 인재육성장학금 수혜자'] }).fails.length], [1, 1, 0]);
+  eq('  applyCardRead — 결과 파일에 없는 공고는 같은 객체 그대로 · 파일이 없거나 꼴이 틀리면 목록 그대로',
+    [MEc.applyCardRead([free], { items: {} })[0] === free, MEc.applyCardRead([free], null)[0] === free, MEc.applyCardRead([free], { items: [] })[0] === free, MEc.applyCardRead([free], { items: { 'f-1': paid } })[0].provider], [true, true, true, '표본재단']);
+}
+
+/* ══ 활동 글의 틀린 미달 — 처지 낱말 · 열거 속 처지 · 「참가제한」 절 (2026-11-15 개발자 "네, 고쳐 주세요") ══
+   전수(등록 · 층2 · 활동 화면 줄): 처지로 읽히는 줄 69 → 61 · 「아니요」에 ✕ 63 → 50. 사라진 13줄은 전부 실적 요구가 아닌 줄이었다
+   (앞으로 할 봉사 · 관심 · 활동 이름 · 태그 · 열거 속 한 갈래 · 평가 항목 예시). 원인 셋과 그 자리:
+     ① parse-requirements TRAIT_PAT — `봉사활동`·`공모전` 낱말만으로 '실적 요구'로 읽었다
+     ② parse-requirements parseTrait — `…등` 열린 목록·「및 그 자녀」의 처지를 높은 확신으로 냈다
+     ③ section-head EXCLUDE_WORD — `참가제한` 을 제외 절로도, 절 머리글로도 못 알아봤다(제한 항목이 자격 줄이 됐다)
+   🔴 표본만 잰다(실데이터에 기댄 고정 검사 금지). 판정은 화면이 쓰는 fitDetail 로 — 줄 하나 · 「예」/「아니요」. */
+{
+  console.log('\n■ 활동 글의 틀린 미달 — 처지 낱말 · 열거 속 처지 · 「참가제한」 절 (2026-11-15)');
+  const req = createRequire(import.meta.url);
+  const ME = req('../match-engine.js'), PR = req('../parse-requirements.js'), SH = req('../section-head.js');
+  const AX = await import('../collector/activity-excerpts.mjs');
+  const AD = await import('../collector/activity-docs.mjs');
+  const base = { school: '한국외국어대학교', track: 'humanities', major: '영어학과', year: 3, status: '재학', gpa: 3.8, bracket: 5, credits: 15, region: '서울', parentRegion: '서울', nationality: 'korean', birthYear: 2004, flags: [] };
+  const one = (line, traits) => { const fd = ME.fitDetail({ eligibilityLines: [line], eligibility: {} }, { ...base, traits }); return fd.unread ? '?' : fd.fails.length ? 'X' : (fd.met === fd.total && fd.total > 0) ? 'O' : '?'; };
+  const noYes = (line, k) => one(line, { [k]: false }) + one(line, { [k]: true });   // 「아니요」·「예」 순
+  const traitsOf = (line) => (PR.parseLine(line, false).conds || []).filter((c) => c.kind === 'trait').flatMap((c) => c.anyOf || []);
+  /* ① 봉사 — 해 둔 실적일 때만 */
+  eq('① 봉사 — 앞으로 할 일·관심·활동 이름·혜택은 처지가 아니다 (「아니요」 학생에게 봉사자 모집 글이 미달이었다)',
+    ['겨울방학 중 경기도 내 지역아동센터에서 봉사활동 가능자', '겨울방학 기간 중 경기도 내 지역아동센터에서 100시간 이상의 자원봉사 활동을 수행할 수 있는 자', '봉사활동 100시간 및 사전교육 5시간 이수가 가능한 학생',
+      '교육봉사활동에 관심 있는 대학생', "[경기북부하나센터] 북한이탈주민 취약계층 지원 '사랑의 김장나눔' 봉사활동 (사전)", '- 혜택 : 1365 자원봉사시간 부여(4시간)', '자원봉사자는 아동학대 관련 범죄경력조회 후 봉사활동 진행',
+      '사회봉사 경험 및 졸업후의 사회기여 의지', '봉사자 교육 4시간 이상 이수한 자', '봉사활동 100시간 이상 이수해야 함', '활동내용 : 경기도 지역아동센터 봉사활동 100시간 이상'].map((l) => traitsOf(l).includes('volunteer')),
+    [false, false, false, false, false, false, false, false, false, false, false]);
+  eq('  실적을 말하는 줄은 그대로 읽는다 — 「아니요」 ✕ · 「예」 ✓',
+    ['공고일 현재, 1365 또는 VMS 사회봉사실적 30 시간 이상 자', '1365포털에서 자원봉사 시간이 100시간 이상이며 2026년 자원봉사활동 실적이 3회 이상 있는 자', '자원봉사활동 우수자', '사회봉사활동에 적극적으로 참여한 학생',
+      '봉사활동 30시간 이상 이수자', '교내외 봉사활동 50시간 이상 수행자', '봉사활동 2회 이상 참여자', '봉사활동 시간이 30시간 이상인 자', '봉사활동 참여 실적이 우수한 학생'].map((l) => noYes(l, 'volunteer')), ['XO', 'XO', 'XO', 'XO', 'XO', 'XO', 'XO', 'XO', 'XO']);
+  eq('  수상 — `공모전` 낱말만 있는 줄(태그·접수 일정·파일 이름)은 처지가 아니다 · 입상·순위가 있으면 그대로',
+    [traitsOf('태그 #교육부 #2026년 #우수사례 #공모전'), traitsOf('숏폼공모전 접수 일정'), noYes('전국규모의 예체능계 경연대회에서 3위 이내 입상자', 'award'), noYes('각종 공모전 수상 실적이 있는 자', 'award'), noYes('전국 규모 공모전 당선자', 'award')], [[], [], 'XO', 'XO', 'XO']);
+  /* ② 열거·예시 속의 처지 — 「아니요」여도 ✕ 가 아니다(모름) · 단정한 줄은 그대로 ✕ · 결격 처지는 열린 목록이어도 그대로 */
+  eq('② `…등` 열린 목록·괄호 속 예시·「및 그 자녀」 의 처지는 「아니요」에 ✕ 가 아니다',
+    [noYes('예비창업자, 창업기업 대표 및 임직원, 대학(원)생, 유관기관 등', 'job')[0], noYes('실험실 혁신창업동아리, 혁신창업실험실 및 창업·기술사업화에 관심 있는 대학생·대학원생 등', 'club')[0],
+      noYes('학업(연구) 수행능력(성적, 수상경력, 연구계획 등)', 'award'), noYes('조합원 대표와 임직원 및 그 자녀', 'job')[0]], ['?', '?', '?O', '?']);
+  eq('  우대·가산·「필수는 아님」 줄과 `임직원의 자녀` 도 「아니요」에 ✕ 가 아니다 (우대는 요건이 아니다 · 자녀는 본인이 재직자가 아니다)',
+    [noYes('봉사실적이 40 시간 이상인 자 우대', 'volunteer')[0], noYes('컴퓨터활용능력자격증 소지자 우대 (필수사항은 아님)', 'cert')[0], noYes('회사 임직원의 자녀', 'job')[0]], ['?', '?', '?']);
+  eq('  단정한 줄은 그대로 — `임직원인 자`·`울산 소재 중소기업 재직자` 는 「아니요」 ✕',
+    [noYes('임직원인 자', 'job'), noYes('울산 소재 중소기업 재직자', 'job')[0]], ['XO', 'X']);
+  eq('  결격 처지(징계)는 열린 목록이어도 확신을 낮추지 않는다 — 「징계 예」 는 ✕',
+    (PR.parseLine('학칙에 의한 징계 처분을 받은 자 등', true).conds || []).filter((c) => c.kind === 'trait').map((c) => [c.anyOf.join(), c.conf, !!c.exclude]), [['discipline', 'high', true]]);
+  /* ③ 제한 절 */
+  eq('③ `참가제한`·`참여 제한 대상`·`응모 제한 사항` 은 제외 절 머리글 (이름표가 정확히 그 말일 때만 · 번호·글머리는 뗀다 · 같은 줄의 내용은 있어도 된다)',
+    ['참가제한', '참가 제한', '■ 참가제한', '2. 참가제한', '참여 제한 대상', '응모 제한 사항', '참가제한 :', '참가 제한: 과거 대상 수상자'].map((h) => SH.isExcludeHead(h)), [true, true, true, true, true, true, true, true]);
+  /* 🔴 코드 리뷰가 잡은 넓힘 — 머리글로 읽으면 그 **아래 자격 줄이 제외 칸으로** 넘어간다(평점 3.0 이상인 학생이 「평점 3.0 이상」 줄로 미달 · 반대로 요건이 잘려 틀린 충족) */
+  eq('  값이 없음·인원·횟수면 머리글이 아니다 · 앞뒤에 다른 말이 붙어도 아니다 · `신청 제한`·`지원 제한` 은 넣지 않았다(장학 공고에서 뜻이 갈린다 — 순천시 「한 분야만 신청 가능」)',
+    ['참가 제한 없음', '참가 제한: 제한 없음', '참가제한 대상 : 없음', '참가제한 : 해당 없음', '응모 제한 : 1인 1작품', '참가 제한 : 선착순 30명', '참가 제한 인원 : 20명', '참가 제한 연령 : 만 39세', '사업참여 제한', '→ 확정일로부터 1년 근로 참여 제한',
+      '신청제한', '신청 제한 : 없음', '지원 제한 사항 없음', '4) 지원제한: 타 재단 장학금 등 중복수혜 제한은 재단 장학금 지급 규정에 따름', '학자금 지원 제한 대학', '재정지원제한대학', '중복지원제한', '연령 제한'].map((h) => SH.isExcludeHead(h)).includes(true), false);
+  const voidHead = AX.activityDetails(['2026 청년 캠프 참가자 모집', '참가자격', '- 대학 재학생', '- 참가 제한 : 없음', '- 직전학기 평점 3.0 이상인 자', '- 만 19세 이상 34세 이하인 자', '신청방법', '- 누리집 접수'].join('\n'), '2026 청년 캠프 참가자 모집');
+  eq('  `참가 제한 : 없음` 뒤의 자격 줄은 자격 칸에 남는다 — 제외 칸으로 넘어가지 않는다',
+    [voidHead.eligibilityLines.some((l) => /평점 3\.0/.test(l)), voidHead.eligibilityLines.some((l) => /만 19세/.test(l)), voidHead.eligibilityExcludes], [true, true, []]);
+  eq('  `주제` 는 다음 절 머리글(자격 절이 끝난다) · `자유주제` 같은 내용은 아니다', ['주제', '발표주제', '공모 주제 : 탄소중립', '자유주제'].map((h) => SH.isSectionBreak(h)), [true, true, true, false]);
+  const guide = ['2026 중국언어문화 경진대회', '참가자격', '·대한민국 국민 누구나', '참가제한', '·중화권 국가에서 총 5년 이상 체류한 자', '·중화권 국가 국적자 및 중화권 국가 출신 귀화자', '·역대 중국언어문화경진대회‘대상’수상자',
+    '·타 대회 참가 원고로 신청한 자', '·기타 부정한 방법으로 대회에 참가한 자', '주제', '·중국과 관련된 자유주제(반드시 참가자가 직접 창작한 내용)', '□ 제출방법', '신청기간', '·2026. 10. 19.(월) ~ 11. 18.(수)'].join('\n');
+  const gd = AX.activityDetails(guide, '2026 중국언어문화 경진대회');
+  eq('  안내문 표본 — 자격 줄은 「누구나」 하나 · 제한 다섯은 제외 칸 · 주제 줄은 어디에도 없다',
+    [gd.eligibilityLines.length, /대한민국 국민 누구나/.test(gd.eligibilityLines[0] || ''), gd.eligibilityLines.some((l) => /체류|수상자|자유주제/.test(l)), gd.eligibilityExcludes.length, gd.eligibilityExcludes.some((l) => /자유주제/.test(l)), gd.eligibilityExcludes.some((l) => /대상’수상자/.test(l))], [1, true, false, 5, false, true]);
+  eq('  그 글은 「수상 아니요」·「수상 예」 어느 쪽에도 미달이 아니다 (제외 칸의 처지는 결격만 ✕)',
+    [false, true].map((v) => ME.fitDetail({ eligibilityLines: gd.eligibilityLines, eligibilityExcludes: gd.eligibilityExcludes, eligibility: {} }, { ...base, traits: { award: v } }).fails.length), [0, 0]);
+  /* 장학 원문 889건 전후 비교에서 달라진 두 꼴 — 제한 머리글에 붙은 내용은 제외 줄로 남고(중복수혜 조항을 잃지 않는다) · 제외 절은 다음 절 머리글에서 끝난다 */
+  eq('  `참가 제한: 역대 대상 수상자` — 머리글과 같은 줄에 붙은 내용이 제외 줄로 남는다 · 장학 공고의 `지원제한: … 중복수혜 …` 줄은 예전대로 자격 줄(머리글이 아니다)',
+    [AWAIT_EE.extractExcludeLines(['참가자격: 대학생 누구나', '참가 제한: 역대 대상 수상자', '시상내역'].join('\n')), AWAIT_EE.extractExcludeLines(['3) 지원자격: 이공계열 1학년 재학생', '4) 지원제한: 타 재단 장학금 등 중복수혜 제한은 재단 장학금 지급 규정에 따름', '2. 장학생 지원사항'].join('\n'))],
+    [['역대 대상 수상자'], []]);
+  eq('  제외 절은 다음 절 머리글(`선발기준:`·`주제`)에서 끝난다 — 그 아래 줄이 「이런 경우는 제외돼요」 에 딸려 오지 않는다',
+    AWAIT_EE.extractExcludeLines(['제외대상', '- 대학원생 및 휴학생', '선발기준: 학업성적이 평균 C학점 이상 (2026년 1학기 성적 기준)', '- 지원신청'].join('\n')), ['- 대학원생 및 휴학생']);
+  eq('  글머리 달린 항목은 절 낱말(`안내`·`기타`)이 있어도 항목이다 — 거기서 끊으면 뒤의 진짜 항목을 잃는다',
+    AWAIT_EE.extractExcludeLines(['참가제한', '·휴학 예정자 안내 대상', '·기타 부정한 방법으로 참가한 자', '·역대 대상 수상자', '유의사항', '·원고를 보지 않고 발표'].join('\n')).length, 3);
+  /* 태그·파일 이름 줄 — 수집 때도, 이미 실린 글에도(sanitizeElig) */
+  eq('해시태그 줄·첨부 파일 이름은 자격 줄이 아니다 (실린 글도 발행 때 걷는다) · 보통 자격 줄은 그대로',
+    [AX.eligLineOk('태그 #발달장애인 #수기공모전 #2026공모전 #국민참여'), AX.eligLineOk('2026년 발달장애인 인식개선 수기 공모전_안내 .pdf'), AX.eligLineOk('포스터_DESIGN MARKETING 기업 프로젝트 참여자 모집.png'), AX.eligLineOk('만 19세 이상 39세 이하 청년 누구나'),
+      (() => { const it = { eligibilityLines: ['대한민국 국민 누구나', '태그 #교육부 #2026년 #우수사례 #공모전'], eligibilityFrom: '브라우저 본문' }; AX.sanitizeElig(it); return it.eligibilityLines; })()],
+    [false, false, false, true, ['대한민국 국민 누구나']]);
+  /* 첨부에서 읽어 둔 줄의 소급 — 본문 다시 읽기(판)는 첨부 줄을 그대로 두므로 무료 모드가 한 번 더 읽는다 */
+  eq('첨부에서 읽어 둔 자격이 옛 판이면 다시 읽을 글이다 · 이 판으로 읽었거나 · 본문에서 온 줄 · 관리자 줄 · 숨긴 글은 아니다',
+    [AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '공고문 첨부' }), AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '공고문 첨부(OCR)', docsV: AX.ACT_DETAILS_V - 1 }),
+      AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '공고문 첨부', docsV: AX.ACT_DETAILS_V }), AD.staleDocs({ eligibilityLines: ['x'] }), AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '브라우저 본문' }),
+      AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '관리자 2026-11-15' }), AD.staleDocs({ eligibilityLines: ['x'], eligibilityFrom: '공고문 첨부', hidden: true })],
+    [true, true, false, false, false, false, false]);
+  const docsSrc = readText(new URL('../collector/activity-docs.mjs', import.meta.url));
+  eq('  무료 모드만 다시 읽는다(브라우저 모드는 자격 0줄인 글만) · 읽은 판을 docsV 에 적는다 · 다시 읽은 글은 옛 제외 줄을 남기지 않는다',
+    [/needsElig\(n\) \|\| \(!BROWSER && staleDocs\(n\)\)\) \|\| !dueFree/.test(docsSrc), /n\.docsV = ACT_DETAILS_V;/.test(docsSrc), /else delete n\.eligibilityExcludes;/.test(docsSrc)], [true, true, true]);
+}
+
+console.log('■ 입력 안전장치 (2026-11-17 · HDJ-요청-2026-001 후속) — 있을 수 없는 값은 칠 때부터 막는다');
+{
+  const IG = createRequire(import.meta.url)('../input-guard.js');
+  const L = IG.PROFILE_LIMITS;
+  /* ① 칠 때 — 한 글자씩 친다고 보고 받아 주는지 본다 */
+  const typed = (key, s) => { let v = ''; for (const ch of s) { if (IG.guardText(v + ch, L[key])) v += ch; } return v; };
+  eq('평점 999 는 첫 9 부터 안 들어간다', typed('gpa', '999'), '');
+  eq('  4.6 은 4. 까지만 들어간다', typed('gpa', '4.6'), '4.');
+  eq('  소수 셋째 자리는 안 들어간다 (3.855 → 3.85)', typed('gpa', '3.855'), '3.85');
+  eq('  정상 평점은 그대로 (3.85 · 4.5 · 0 · 0.5)', ['3.85', '4.5', '0', '0.5'].map((s) => typed('gpa', s)), ['3.85', '4.5', '0', '0.5']);
+  eq('  e·- 같은 글자는 안 들어간다', [typed('gpa', '3e1'), typed('gpa', '-1')], ['3', '1']);
+  eq('학점 999 는 99 도 안 된다 (30 상한) · 31 → 3', [typed('credits', '999'), typed('credits', '31'), typed('credits', '15')], ['9', '3', '15']);
+  eq('  학점 앞자리 0 은 안 받는다 (05)', typed('credits', '05'), '0');
+  /* typed 는 막힌 글자만 건너뛰고 뒤에 친 글자는 계속 받아 본다(학생이 계속 치는 것과 같다) */
+  eq('출생연도 3000 · 0 으로 시작하면 한 글자도 안 들어간다', [typed('birthYear', '3000'), typed('birthYear', '0000')], ['', '']);
+  eq('  18 의 8 은 막힌다 (1800년대는 1940 에 못 닿는다) · 2021 은 202 까지', [typed('birthYear', '18'), typed('birthYear', '2021')], ['1', '202']);
+  eq('  정상 출생연도는 그대로 (2004 · 1940 · 2020)', ['2004', '1940', '2020'].map((s) => typed('birthYear', s)), ['2004', '1940', '2020']);
+  /* 붙여넣기 — 통째로 들어오는 글자도 같은 함수가 본다 */
+  eq('붙여넣은 999 · 3.855 · 2005년 은 통째로 거절', [IG.guardText('999', L.gpa), IG.guardText('3.855', L.gpa), IG.guardText('2005년', L.birthYear)], [false, false, false]);
+  /* ② 넘길 때 — 다 못 친 값 */
+  eq('다 못 친 출생연도 19 · 점으로 끝난 3. 은 넘어가지 못한다', [IG.checkNumber('19', L.birthYear).ok, IG.checkNumber('3.', L.gpa).ok], [false, false]);
+  eq('  빈 칸은 모름이라 통과(값 null)', IG.checkNumber('', L.gpa), { ok: true, value: null });
+  eq('  정상 값은 숫자로', [IG.checkNumber('3.85', L.gpa).value, IG.checkNumber('15', L.credits).value], [3.85, 15]);
+  /* ③ 예전에 저장된 값 — 그 칸만 비운다 · 🔴 고쳐 넣지 않는다 */
+  {
+    const p = { gpa: 999, credits: 15, birthYear: 3000, school: '한국외국어대학교' };
+    const cleared = IG.scrubProfileNumbers(p);
+    eq('예전 저장값 999·3000 은 그 칸만 null · 정상 칸은 그대로', [p.gpa, p.credits, p.birthYear, p.school, cleared], [null, 15, null, '한국외국어대학교', ['평점', '태어난 해']]);
+    eq('  🔴 정상 프로필은 하나도 안 건드린다', IG.scrubProfileNumbers({ gpa: 4.5, credits: 0, birthYear: 1940 }), []);
+  }
+  /* 서류 정보 칸 — 글자 종류 · 있을 수 없는 날짜 */
+  eq('전화·계좌에 글자는 안 들어간다 · 학번은 영문까지', [IG.guardKind('010-1234', 'phone'), IG.guardKind('010ㄱ', 'phone'), IG.guardKind('12-34', 'account'), IG.guardKind('A2025', 'studentId'), IG.guardKind('학번', 'studentId')], [true, false, true, true, false]);
+  eq('생년월일 13월·2월 30일·3000년은 거절 · 윤년 2월 29일은 통과', [IG.checkBirthDate('2005.13.01').ok, IG.checkBirthDate('2005.02.30').ok, IG.checkBirthDate('3000.01.01').ok, IG.checkBirthDate('2004.02.29').ok, IG.checkBirthDate('20050314').ok, IG.checkBirthDate('').ok], [false, false, false, true, true, true]);
+  eq('  월·일 한 자리(2005.3.14 · 2005-3-4)는 정상 · 두 자리 연도(05.03.14)는 짚는다',
+    [IG.checkBirthDate('2005.3.14').ok, IG.checkBirthDate('2005-3-4').ok, IG.checkBirthDate('05.03.14').ok], [true, true, false]);
+
+  /* 🔴 범위 숫자 다섯 곳 대조 — input-guard · index.html 입력칸 · elig-ask FIELD_META · DB(0004) · 대신 접수 서버.
+     한 곳만 넓히면 칠 때는 받아 주고 저장에서 거절되거나(학생은 이유를 모른다), 반대로 정상 값을 칠 때 막는다. */
+  const html = readText(new URL('../index.html', import.meta.url));
+  const sql = readText(new URL('../supabase/migrations/0004_profile_columns.sql', import.meta.url));
+  const EA2 = createRequire(import.meta.url)('../elig-ask.js');
+  const attr = (id, a) => { const tag = new RegExp('<input[^>]*id="' + id + '"[^>]*>').exec(html); const m = tag && new RegExp(' ' + a + '="([-0-9.]+)"').exec(tag[0]); return m ? Number(m[1]) : null; };
+  for (const [key, id, col] of [['gpa', 'in-gpa', 'gpa'], ['credits', 'in-credits', 'credits'], ['birthYear', 'in-birth-year', 'birth_year']]) {
+    const want = [L[key].min, L[key].max];
+    const sqlR = col === 'gpa'
+      ? (/gpa\s*>=\s*([0-9.]+)\s+and\s+gpa\s*<=\s*([0-9.]+)/.exec(sql) || []).slice(1).map(Number)
+      : (new RegExp(col + '\\s+between\\s+([0-9.]+)\\s+and\\s+([0-9.]+)').exec(sql) || []).slice(1).map(Number);
+    eq('  ' + key + ' 범위가 다섯 곳에서 같다 (guard · 입력칸 · FIELD_META · DB · 서버)',
+      [[attr(id, 'min'), attr(id, 'max')], [EA2.FIELD_META[key].min, EA2.FIELD_META[key].max], sqlR, GUARD_BOUNDS[key]],
+      [want, want, want, want]);
+    const tag = (new RegExp('<input[^>]*id="' + id + '"[^>]*>').exec(html) || [''])[0];
+    eq('  ' + id + ' 은 type="text" + data-guard="' + key + '" 다 (type="number" 는 999·e 를 칠 때 못 막는다)',
+      [/type="text"/.test(tag), tag.includes('data-guard="' + key + '"')], [true, true]);
+  }
+  eq('  서류 정보 칸 넷에 글자 종류 안전장치가 걸려 있다',
+    ['in-sid', 'in-birth', 'in-phone', 'in-account'].map((id) => /data-guard-kind="\w+"/.test((new RegExp('<input[^>]*id="' + id + '"[^>]*>').exec(html) || [''])[0])), [true, true, true, true]);
+  /* 배선 — 파일을 싣고, 칸에 걸고, 넘길 때·저장할 때 보고, 깎기는 없다 */
+  const app = readText(new URL('../app.js', import.meta.url));
+  const sw = readText(new URL('../sw.js', import.meta.url));
+  eq('  index.html 이 input-guard.js 를 app.js·elig-ask.js 보다 먼저 싣는다 · 서비스워커도 담는다',
+    [html.indexOf('src="input-guard.js"') > 0 && html.indexOf('src="input-guard.js"') < html.indexOf('src="elig-ask.js"'), sw.includes("'input-guard.js'")], [true, true]);
+  eq('  시작할 때 배선한다 · 다음/완료/미확인 자격/대외활동 관문이 다 못 친 값을 짚는다',
+    [/bindInputGuards\(\);/.test(app), /guardStepOk\(btn\.closest\('\.onboard-step'\)\)/.test(app), /guardFirstBad\(\$\('#screen-onboarding'\)\)/.test(app), /guardStepOk\(sheet\.querySelector\('\.elig-ask'\)/.test(app), /guardStepOk\(\$\('#act-gate-ask'\)\)/.test(app)],
+    [true, true, true, true, true]);
+  const cp = app.slice(app.indexOf('function collectProfile()'), app.indexOf('function collectProfile()') + 1500);
+  eq('  🔴 collectProfile 이 평점을 4.5 로 깎지 않는다 (Math.min(4.5 가 되살아나면 실패)', /Math\.min\(\s*4\.5/.test(cp), false);
+  eq('  예전 저장값을 시작할 때 정리한다', /scrubbedOnLoad = scrubProfileNumbers\(state\.profile\)/.test(app), true);
+  eq('  공고 「미확인 자격」 숫자 칸도 type="number" 가 아니다', /f\.kind === 'number'\s*\n?\s*\? ` type="number"/.test(app), false);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

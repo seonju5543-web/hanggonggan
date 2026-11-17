@@ -1,7 +1,18 @@
 {
  "school": "상명대학교",
- "updatedAt": "2026-11-15",
+ "updatedAt": "2026-11-17",
  "items": [
+  {
+   "title": "경영대학원, ‘제4회 피트니스 MBA 컨퍼런스’ 성료... 2027 피트니스 산업 대전환 전망",
+   "url": "https://www.smu.ac.kr/webzine/today.do?mode=view&articleNo=770340&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-16",
+   "school": "상명대학교",
+   "campus": "",
+   "src": "f8a29ec6",
+   "foundAt": "2026-11-16",
+   "thumb": "data/news/img/c6e10f9d4c963429.webp",
+   "desc": "대외협력팀 우리 대학 경영대학원 피트니스 MBA는 지난 7일 미래백년관 밀레홀에서 ‘제4회 상명대학교 경영대학원 피트니스 MBA 컨퍼런스’를 성황리에 개최했다."
+  },
   {
    "title": "대한법무사협회와 교류협력협약 체결... 법무 분야 교류 확장",
    "url": "https://www.smu.ac.kr/webzine/today.do?mode=view&articleNo=770253&article.offset=0&articleLimit=10",
@@ -124,30 +135,6 @@
    "foundAt": "2026-10-22",
    "thumb": "data/news/img/a3a8db7f7b537f26.webp",
    "desc": "대외협력팀 우리 대학 생명공학전공 기장서 교수 연구팀은 환경DNA(eDNA) 분석 자료에서 기존 수질 지수에 부합하는 지표종을 자동 선별하는 ‘지식기반 후진 제거(Knowledge-Guided Backward…"
-  },
-  {
-   "title": "상명대, 우즈베키스탄 페르가나 한국국제대외 복수학위 협력 강화",
-   "url": "https://www.smu.ac.kr/webzine/today.do?mode=view&articleNo=769553&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-16",
-   "kind": "학사",
-   "school": "상명대학교",
-   "campus": "",
-   "src": "f8a29ec6",
-   "foundAt": "2026-10-16",
-   "thumb": "data/news/img/cf0809a64b2474e0.webp",
-   "desc": "대외협력팀 상명대학교(총장 김종희)는 10월 15일 우즈베키스탄 페르가나 한국국제대학교(KIUF)를 방문해 2+2 복수학위 프로그램을 현지 학생들에게 알리고 우호협력 관계를 기념하는 현판을 전달했다고 밝혔다."
-  },
-  {
-   "title": "양종훈 석좌교수, 서울 종암경찰서 초청 특강 성료... 제주 해녀·히말라야 셰르파와 경찰 사명감 강조",
-   "url": "https://www.smu.ac.kr/webzine/today.do?mode=view&articleNo=769527&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-16",
-   "kind": "행사",
-   "school": "상명대학교",
-   "campus": "",
-   "src": "f8a29ec6",
-   "foundAt": "2026-10-16",
-   "thumb": "data/news/img/7e894d6c195a89b1.webp",
-   "desc": "대외협력팀 우리 대학 양종훈 석좌교수가 지난 14일 서울 종암경찰서 대강당에서 경찰관들을 대상으로 특별 강연을 진행했다. 이날 특강에는 오훈 종암경찰서장을 비롯한 경찰관 100여 명이 참석했다."
   }
  ]
 }
