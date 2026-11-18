@@ -2,6 +2,7 @@
 
 > 새 세션은 이 문서를 먼저 읽는다. 개발자는 코드를 모른다 — **전문 용어 없이**, 인과를 분명히 설명한다.
 > 여기엔 **규칙과 그 규칙을 지키는 관문 위치**만 둔다. 경위·실측·사고 기록은 `SESSIONS.md`. 정리 직전 전문은 그 파일의 **「2026-09-23 이관분」** 절에 통째로 있다.
+> 아래에서 **'세부 문서'** = `docs/designs/claude-md-details.md` — 줄인 항목의 원문이 그대로 있다(관문이 같이 잰다).
 
 ## 🔴 매 세션 이것만은
 
@@ -29,12 +30,12 @@
 ## 🔴 장학금 판정 자동화 (2026-09-30 지시 — *"2번의 이유를 분석하고 장학금 판정을 자동화"*)
 
 - **왜 원문 증거인가**: 낱말 목록으로 교외를 찾는 옛길은 막혔다 — 남은 길은 **원문 증거**다(경위 SESSIONS.md).
-- **판정기 `collector/kind-evidence.mjs`**(`classifyKind` · 순수 함수): 제목 표식 → 학교 제도 표(`OWN_PROGRAMS` + 학습 `own-programs.json`) → 제목의 바깥 기관 낱말(`ORG_RE`) → 학교 이름표(`schoolTokens`) + 본문 증거(교비·장학팀 접수·학교 도메인 이메일) 순. 이름표 없이 본문 낱말만으로는 교내로 보지 않는다 (껍데기를 걷어낸 본문만 읽는다 `makeStripperMulti`). 증거 없음 = 교외.
-- **소급 로봇 `collector/kind-classify.mjs`**(원문 도착 뒤 · 두 수집 워크플로의 데이터 관문 앞): 확신 high 면 구분을 고치고 `kindEvidence` 를 남기며 제도 이름을 학습 표에 적는다(다음 등록부터 `noticeKind(title, school, learned)` 셋째 인자로 잡힌다 · 앱 화면은 안 넘긴다). mid 는 `kind-candidates.json` 후보로만. 관리자가 교내→교외로 되돌린 이름은 `blocked` 로(다시 배우지 않는다).
-- **범위 승격 `collector/scope-promote.mjs`**(F-5): 학교 한정·교외·로봇 등록분 중 ① 접수 이메일이 학교 밖 ② 본문 "재단에 직접 제출/재단 홈페이지 신청/우편 접수" ③ 타교 같은 사업(`programKey` · `entry-rules.cjs`)이면 전국으로(`scopeFrom` 에 근거) · 학교 창구(장학팀·포털) 문장이 있으면 안 푼다. 자동 등록도 타교 같은 사업이 오면 기존 것을 승격(`verdict: 'promote'`) · 합치기는 `collector/registered-merge.mjs` 한 곳.
+- **판정기 `collector/kind-evidence.mjs`**(`classifyKind` · 순수 함수): 제목 표식 → 학교 제도 표 → 바깥 기관 낱말 → 학교 이름표 + 본문 증거 순 · 이름표 없이 본문 낱말만으로는 교내로 보지 않는다(껍데기를 걷어낸 본문만 `makeStripperMulti`) · 증거 없음 = 교외.
+- **소급 로봇 `collector/kind-classify.mjs`**(원문 도착 뒤 · 두 수집 워크플로의 데이터 관문 앞): 확신 high 만 구분을 고치고 제도 이름을 학습 표에 적는다(등록 때만 쓴다 · 앱 화면은 안 넘긴다) · mid 는 후보로만 · 관리자가 교내→교외로 되돌린 이름은 `blocked`(다시 배우지 않는다).
+- **범위 승격 `collector/scope-promote.mjs`**(F-5): 학교 한정·교외·로봇 등록분 중 학교 밖 접수 이메일·재단 직접 제출(홈페이지·우편)·타교 같은 사업이면 전국으로(`scopeFrom` 에 근거) · 학교 창구 문장이 있으면 안 푼다 · 합치기는 `collector/registered-merge.mjs` 한 곳.
 - **리뷰 3차에서 막은 구멍 넷**(세부 SESSIONS.md 「2026-09-30 — 판정 자동화 리뷰 3차 반영」): ① 학교 이름표에 지역 밑동·두 글자 별칭 금지(`schoolTokens`) ② 전국 등록분은 세 번째 학교 글을 흡수(`isNationalAbsorber`) · 승격은 로봇 등록·교외·사람 미지정·마감 전만 ③ 관리자가 고친 구분·범위는 `kindFrom`·`scopeFrom` 에 '관리자' 표식 ④ 판정 로봇은 리포트 파일을 인자로.
 - 🔴 **합칠 때 마감은 날짜를 내는 문구와 함께만 옮긴다**(`deadlineQuote` · 10-01 자동 등록 8건 되돌림). **실데이터에 기댄 고정 검사를 관문에 두지 말 것**(「정식 등록도 나눌 때」의 '지금은 선 아래' 줄이 같은 사고).
-- 그 밖(같은 지시): 브라우저 담당 게시판은 `schools.json` `collector:"browser"` 로 일반 로봇이 건너뛴다 · 못 읽는 학교는 `run-probe.txt` 정찰 · 분교 씨앗 `school-board-seeds.json` 은 `find-boards.mjs` 가 후보만 리포트 · 포털 표 후보 `collector/portal-candidates.mjs` · 정문 사진 44개교(`fetch-gate-photos.mjs`). 관문 「장학금 판정 자동화 · 범위 승격」.
+- 그 밖: 브라우저 담당 게시판은 `schools.json` `collector:"browser"` 로 일반 로봇이 건너뛴다(빠지면 두 로봇이 같은 게시판을 수집) · 정찰·분교 씨앗(`find-boards.mjs` 는 후보만 리포트)·포털 표 후보·정문 사진은 세부 문서. 관문 「장학금 판정 자동화 · 범위 승격」.
 
 ## 🔴 원문 링크 정직성 (2026-10-03 P0 · 장학·활동·소식 전반)
 
@@ -52,7 +53,7 @@
 
 - 학과 이름 → 계열은 `major-track.js` `trackOfMajor`(확실한 것만 · 모르면 null — 틀리면 문↔이 틀린 미달) · 앱은 `majorPool`·`renderTrackChips`(그 학교 계열만 · 많은 순 · 나머지 「+n」)·`syncTrackFromMajor`(학과 → 계열). 🔴 `data.js` 에 손 학과 목록 금지(로봇 파일을 가린다).
 - 로봇 파일 정리는 `publish-majors.mjs` `cleanMajors`(`&amp;` 되돌림 · 모집단위 제거) · 이원화 캠퍼스는 `majors.mjs` `CAMPUS_BY_AREA` 가 지역으로 갈라 `campuses` 에(앱 칩 이름과 같을 때만) · 재발행 `node collector/publish-majors.mjs`.
-- 온보딩 5단계 「적합도 높이기」 = `elig-ask.js` `ONBOARD_TRAITS`(열린 공고 4곳 이상이 묻는 처지 · 저장은 `traits` · 안 누른 것은 저장 안 함) + 출신 고교 `originRegion`·`originCity`(엔진 `about:'origin'` 맞으면 ✓ · 아니면 모름). 관심 대외활동은 대외활동 탭 관문 `activityGateDone` 뒤에(`collectProfile` 은 관심을 물려받는다). 소재지는 학과 파일의 시·도를 `schoolRegion` 에 적어 `about:'school'` ✓/모름. 전수 집계 `verify/eligibility-coverage.mjs`. 관문 「학적정보 테일러링」·「못 읽던 자격 줄」 · `verify-academic-info.js` · 설계 `docs/designs/academic-info-tailoring.md`.
+- 온보딩 5단계 「적합도 높이기」 = `elig-ask.js` `ONBOARD_TRAITS`(열린 공고 4곳 이상이 묻는 처지 · 안 누른 것은 저장 안 함) + 출신 고교 `originRegion`(맞으면 ✓ · 아니면 모름). 관문 「학적정보 테일러링」·「못 읽던 자격 줄」 · `verify-academic-info.js` · 전수 집계 `verify/eligibility-coverage.mjs` · 설계 `docs/designs/academic-info-tailoring.md`.
 
 ## 관리자 업무 = 노션 백로그 (정본은 노션 하나)
 
@@ -187,13 +188,13 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 | `collector/collect.mjs` `browser-collect.mjs` | 게시판 수집(일반·진짜 Chromium) — 일반 수집기가 같은 행에서 대외활동·공모전도 갈라 담는다(`activity-kind.mjs` · 출처 `activity-sources.json`) |
 | `collector/auto-register.mjs` | 자동 정식 등록(원칙 2) — 다른 학교의 같은 사업은 새로 등록하지 않고 기존 등록을 전국으로 승격 |
 | `collector/kind-evidence.mjs` `kind-classify.mjs` `scope-promote.mjs` `registered-merge.mjs` `docs-fill.mjs` | 교내·교외 증거 판정 · 원문 도착 뒤 소급 판정(학습 표 `own-programs.json`) · 학교 한정 → 전국 승격 · 합치기 한 곳 · 서류 칸 채우기 |
-| `collector/collect-news.mjs` `find-news-boards.mjs` `news-kind.mjs` `collect-news-thumbs.mjs` `news-thumb.mjs` | 교내 소식 로봇(따로 돈다) · 공지 게시판 찾기(출처 `news-sources.json` · 후보는 웹 검색 + `evidence`) · 실을지·갈래 판정 한 곳 · 사진 썸네일 단계·고르기 한 곳 |
-| `collector/activity-docs.mjs` | 대외활동 자격 **출처만** 늘리는 곳 — 본문 → 요강 페이지 → HWP·DOCX → 그림·PDF(PaddleOCR `collector/paddle-ocr.py`) → 유료 AI(꺼짐). 🔴 자격 줄 고르기는 늘 `activityDetails` 하나 · 남의 글 막기는 `ownsImageText` · 받은 파일은 커밋 안 함 · 관문 「대외활동·공모전 — 첨부·포스터 읽기」 |
+| `collector/collect-news.mjs` `find-news-boards.mjs` `news-kind.mjs` `collect-news-thumbs.mjs` `news-thumb.mjs` | 교내 소식 로봇(따로 돈다) · 게시판 찾기 · 실을지 판정 한 곳 · 사진 썸네일 |
+| `collector/activity-docs.mjs` | 대외활동 자격 **출처만** 늘리는 곳(본문 → 요강 → HWP·DOCX → 그림·PDF OCR → 유료 AI(꺼짐)) · 🔴 자격 줄 고르기는 늘 `activityDetails` 하나 · 남의 글 막기는 `ownsImageText` · 받은 파일은 커밋 안 함 · 관문 「대외활동·공모전 — 첨부·포스터 읽기」 |
 | `collector/fetch-board.mjs` | 게시판 받기·실패 이유 펴기 — 일반 수집기와 소식 로봇이 같이 쓴다(베끼지 말 것) |
 | `collector/extract-excerpts.mjs` | 원문 발췌 · 마감일 · 메일 접수 주소(`apply-email.mjs`) |
-| `collector/deepfetch.mjs` `rescue-bodies.mjs` | 본문·첨부 원본 받기 · **자격요건 로봇**(`.github/workflows/rescue-bodies.yml` · 진짜 크롬 · 하루 두 번) — 장학 본문 재수집 + 대외활동 `activity-docs.mjs --browser`. 🔴 진짜 브라우저로 자격을 찾는 로봇은 이것 하나(하나 더 만들면 같은 공고를 두 번 두드린다) · `data/activities.json` 은 안 쓰고 장부 act-browser.json 에만(수집 로봇이 합친다) |
+| `collector/deepfetch.mjs` `rescue-bodies.mjs` | 본문·첨부 원본 받기 · **자격요건 로봇**(`.github/workflows/rescue-bodies.yml`) — 🔴 진짜 브라우저로 자격을 찾는 로봇은 이것 하나(하나 더 만들면 같은 공고를 두 번 두드린다) · `data/activities.json` 은 안 쓰고 장부 act-browser.json 에만(수집 로봇이 합친다) |
 | `collector/schematize-forms.mjs` `form-pdf.mjs` `form-fields.mjs` | 양식 스키마화(멈춤) · 신청서 **원본 그대로** → PDF(`data/forms-pdf/` · HWP 는 H2Orestart · 관문 「신청서 원본 → PDF」) · 쪽 그림·빈칸 자리(관문 「신청서 쪽 그림 · 빈칸 자리」) |
-| `collector/link-hunter.mjs` `probe-links.mjs` `resolve-detail-urls.mjs` `detail-url.mjs` `kosaf-hunt.mjs` | 원문 주소 찾기 · 정찰 · 주소 규칙 · 층2 → 재단 개별 공고 후보(재단 홈페이지를 뒤져 `kosaf-hunt.json` 에 · 확인은 link-check · 관문 「층2 재단 글 사냥꾼」) |
+| `collector/link-hunter.mjs` `probe-links.mjs` `resolve-detail-urls.mjs` `detail-url.mjs` `kosaf-hunt.mjs` | 원문 주소 찾기 · 정찰 · 주소 규칙 · 층2 재단 개별 공고 후보(확인은 link-check · 관문 「층2 재단 글 사냥꾼」) |
 | `collector/notice-source.mjs` `canon-url.mjs` `url-key.mjs` `clean-title.mjs` | '같은 공고인가'·'원문이 무엇인가' 규칙 한 곳 |
 | `collector/kosaf-*.mjs` | 층2 수확 · 첨부 사본 |
 | `collector/pdf-text.py` `ocr-text.py` `hwp-*.py` | 첨부 글자 뽑기(`.ocr.txt` 는 품질 관문 통과분만) |
@@ -213,8 +214,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 
 ### 판정 · 자격
 
-- **🔴 틀린 미달은 못 받는 것보다 나쁘다 · 판정 못 하는 축은 '틀린 안심'이다.** 확신 낮은 어긋남은 '모름'(`lineVerdict`). 배지·정렬은 `app.js fitVerdict` 한 곳. 범위(`3~4학년`·`0~8구간`)는 `이하`와 같은 확신 · 반대말(`1~3구간 불가`)·「또는」 줄은 '모름' · 출신 지역(`originPlaceIn`)은 맞으면 ✓ 아니면 '모름'(10-24) · 갈래 꼬리표 〔○○ 소재 대학〕 는 화면만의 것이라 판정은 `untag` 로 뗀다(관문 「자격을 찾는 곳 넓히기」).
-  10-15 결정: 학적정보에 있으면 판정 — 백분위는 두 환산표의 안전한 쪽(`pctToGpa`) · 학년 하나면 그 학년 · 남은 학기는 학년으로 한쪽만 · 어학은 보유 체크 없으면 ✕(`parseCert`) · 가계곤란은 둔다.
+- **🔴 틀린 미달은 못 받는 것보다 나쁘다 · 판정 못 하는 축은 '틀린 안심'이다.** 확신 낮은 어긋남은 '모름'(`lineVerdict`). 배지·정렬은 `app.js fitVerdict` 한 곳. 반대말(`1~3구간 불가`)·「또는」 줄은 '모름' · 어학은 보유 체크 없으면 ✕(`parseCert`) · 백분위는 두 환산표의 안전한 쪽(`pctToGpa`) · 갈래 꼬리표는 `untag` 로 떼고 판정 · 나머지(범위·출신 지역·학년·학기)는 세부 문서 · 관문 「자격을 찾는 곳 넓히기」.
 - **🔴 퍼센트를 숫자로 비교하지 말 것** — 판정 근거는 `met/total`·`fails`. 규칙은 `verify/fit-consistency.cjs` 한 곳, `=== 'no'` 로 본다. 관문 「적합도 상수」.
 - **🔴 자격/제외/선발은 낱말이 아니라 절 경계로** — `section-head.js`(베끼지 말 것 · `index.html`·`sw.js` 모두 match-engine 보다 먼저 싣는다).
   채점기(`eligibility-report.mjs`)는 **필터와 다른 축**으로 본다(같은 규칙이면 새 유형을 영영 못 본다).
@@ -224,14 +224,14 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - **「또는」 줄**: 처지(trait) 축에서만, 맞은 조건이 반대편 갈래에 있고 공통 꼬리가 없을 때만 푼다(`dropUnchosenOrTraits` 한 곳). 줄 전체를 OR 로 쪼개지 말 것. 관문 「또는 줄의 처지 판정」.
 - **처지(trait) 넓히기**: 걸리는 줄을 전부 찍어 보고 「전부 예」·「전부 아니요」 프로필로 잰다. 제외 칸에선 결격(징계)만 미달. 넓히지 말 것 넷 —
   성별 · `2자녀 이상`(3자녀부터 다자녀) · 기숙사의 재사생/학숙 · 맨 `유공자`. 관문 「처지 요건」 · `docs/designs/eligibility-ask.md`.
-- **'자격을 못 읽는다'의 원인은 대개 '본문을 못 받았다'** — 본문 판정은 실제 분량(한글 `MIN_BODY`)으로, 발췌기·AI와 같은 말뭉치로. 짐작 말고 `run-probe.txt` 에 `checkUrl:`. 본문이 두 줄뿐이면 첨부가 본문이다: 공고문류가 그림보다 먼저(`pickDocAttachments`) · zip 안 공고문류를 꺼낸다(`zipNoticeDocs`) · OCR 포스터는 80자면 읽는다(`readableDoc`) · 납작한 표·분야별 표 블록은 비운다 · 사이트 장식 그림(접근성 마크·SNS 로고·챗봇·띠)은 받기 전에 뺀다(`isDecorativeImage` 한 곳).
+- **'자격을 못 읽는다'의 원인은 대개 '본문을 못 받았다'** — 본문 판정은 실제 분량(한글 `MIN_BODY`)으로 · 짐작 말고 `run-probe.txt` 에 `checkUrl:`. 본문이 두 줄뿐이면 첨부가 본문이다 · 납작한 표·분야별 표 블록은 비운다 · 첨부 고르는 규칙은 세부 문서 · 장식 그림은 `isDecorativeImage` 한 곳.
 - **'지원 자격'에 잡음이 섞이면** 규칙을 덧붙이지 말고 채점기를 본다. 우선 선발 기준은 버리지 않고 자리를 옮긴다.
 - **학교 범위**: `eligibility.schoolOnly`(한 학교) · `campusOnly` · **`schoolsAny`**(여러 학교 — `"학교"` 또는 `"학교|캠퍼스"`, `inSchoolsAny`).
   자동 등록은 늘 게시한 학교로 `schoolOnly` 를 단다 — **재단·구청·KOSAF에 직접 내는 것은 전국**, 학교 창구(장학팀·포털·추천 배정)로 받는 것만 그 학교.
   새로 묶인 것은 관리자 「할 일」의 '교외인데 한 학교에만' 묶음에 뜬다. 칸을 새로 만들면 `admin-apply.mjs`·`edit-diff.mjs` 의 `ELIG_KEYS` 에도(안 하면 저장 때 조용히 버려진다).
 - **분교 ≠ 이원화** — 분교는 `UNIVERSITIES` 에 별개 학교, 이원화는 `CAMPUSES_BY_SCHOOL`. 게시판 공유 분교 판정은 `noticeForProfile` 한 곳(data.js 금지 — sw 가 안 읽는다).
 - **'오늘'을 상수로 굳히지 말 것** — `todayStart()` 가 부를 때마다 읽는다(PWA 는 며칠씩 떠 있다) · 자동 등록의 연도도 오늘 기준(`yearHold`). 관문 「마감 판정이 앱을 켠 시각에 굳지 않는다」.
-- **공고 카드 품질(10-15)**: 「○○의 경우」 줄은 범위 밖이면 '모름'(`lineVerdict`) · 열거 학년·이수 학기(`parseSemester`)·따옴표 구간·「3.0/4.5」 판정 · 자격 줄이 없으면 구조화 조건이 요건(`fitDetail`) · 조각·글 제목·※ 예외는 자격 줄 아님(`looksFragment`) · 중위소득 %는 구간 표(`parseIncomeBand`) · 단과대론 ✓ 안 줌 · ✕ 는 한 번만 · 「공고 안내」 `noticeSummaryHtml` · 활동 안내·시상표 거름 `eligLineOk` · 모르는 칸은 접는다. 관문 「공고 카드 품질」.
+- **공고 카드 품질(10-15)**: 조각·글 제목·※ 예외는 자격 줄 아님(`looksFragment`) · 단과대론 ✓ 안 줌 · ✕ 는 한 번만 · 나머지 규칙 묶음(「○○의 경우」·학기·중위소득 등)은 세부 문서. 관문 「공고 카드 품질」.
 
 ### 교내/교외 · 제목 · 금액 · 마감
 
@@ -249,9 +249,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 
 ### 층2(KOSAF) · 접수 채널 · 인스타
 
-- **층2는 층1과 섞지 않는다** — 자격 진단은 붙이지 않고 재단 칸을 그대로 보인다. `due` 가 빈 재단을 버리지 말 것(모집 중일 수 있다) ·
-  수확 때 지난 상세를 이어받는다 · `goods:'학자금'`(대출)은 뺀다 · 첨부 원주소는 담지 않고 사본을 준다 · 첨부 칸을 낱말로 찾지 말 것 ·
-  사본을 서비스워커가 가로채지 않게 · 앱 지원문서는 붙되(10-13) 머리말 `kosaf` — 접수는 선발 공고문이 정한다. 관문 「층2 첨부」·`verify-kosaf.js`.
+- **층2는 층1과 섞지 않는다** — 자격 진단은 붙이지 않고 재단 칸을 그대로 · `due` 가 빈 재단을 버리지 말 것(모집 중일 수 있다) · 수확 때 지난 상세를 이어받는다 · 대출은 뺀다 · 첨부는 원주소 대신 사본(서비스워커가 가로채지 않게) · 첨부 칸을 낱말로 찾지 말 것. 세부 문서 · 관문 「층2 첨부」·`verify-kosaf.js`.
 - **메일 접수**(`collector/apply-email.mjs`): 문의처는 접수처가 아니다 · 남(교수)이 내는 것은 학생이 내는 것이 아니다 · 근거 문장(`applyEmailSource`) 없이 주소만 넣지 말 것 ·
   버튼은 `mailto:` 라 서버가 필요 없다. 관문 「메일 접수 주소」.
 - **포털 신청**(`findApplyPortal`): 한 학교가 시스템을 둘 쓴다 · 양식 받는 곳·결과 보는 곳·계좌 등록은 접수처가 아니다 · 길은 원문 그대로 인용 ·
@@ -260,9 +258,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
   파일·장부는 장학 피드와 **따로**(`data/activities.json` · 섞으면 알림이 활동 글로 운다) · 학교 범위 `activityForProfile` · 카드는 `noticeCardHtml` 한 벌 · 마감·발췌는 `collector/activity-excerpts.mjs` 한 곳(장학과 같은 규칙) ·
   출처는 주소마다 `evidence`(집계 사이트는 출처가 아니다) · 공공·재단 게시판은 `collector/robots.mjs` 로 robots.txt 를 묻는다 · 공공 API 로봇 `collector/open-api.mjs`(🔴 온통청년 열쇠는 포털 열쇠로 안 열린다). 관문 「대외활동·공모전」 · 「공공 API 로봇」 · `verify-activities.js`.
   🔴 발췌기에 넘기는 상세 글자는 **줄을 살린 것**(`htmlToLines`) — 뭉개면 **전부 0건**.
-- **재단·지자체 게시판(교외 확대)** (2026-09-26 · 노션 F-13): 링커리어류는 크롤링이 아니라 **주최사 직접 등록**이라 긁지 않는다 — 우리는 주최의 제 게시판을 읽는다.
-  출처 `collector/external-sources.json` 은 `kosaf-open.json` 의 재단 홈페이지에서 왔고, `collector/find-boards.mjs` 가 게시판을 찾아 `autoFound` 로 적는다(잘못 찾으면 `parked`).
-  글은 `data/external.json`(학교 피드와 따로) → 홈 「재단·지자체 새 공고」(`externalNoticesHtml` · 등록된 주소는 `registeredUrlMatcher` 로 뺀다). 링크 읽는 눈은 `collector/board-links.mjs` 한 곳. 관문 「재단·지자체 게시판」.
+- **재단·지자체 게시판(교외 확대)** (노션 F-13): 링커리어류는 긁지 않는다 — 주최의 제 게시판을 읽는다 · 글은 `data/external.json`(학교 피드와 따로 · 등록된 주소는 `registeredUrlMatcher` 로 뺀다) · 링크 읽는 눈은 `collector/board-links.mjs` 한 곳. 세부 문서 · 관문 「재단·지자체 게시판」.
 - **교내 소식** (2026-09-30 개발자 지시 · 세부는 `docs/designs/news-feed.md` 「CLAUDE.md 에서 옮긴 규칙」): 학교 **공지** 게시판의 제목+링크+수집일 → `data/news/<학교키>.json`(`newsFileFor`) →
   홈 사진 카드 띠(`homeNewsHtml`) + 「전체 보기」(`schoolNewsHtml`). 로봇은 **따로**(`collect-news.mjs`) · 판정은 `news-kind.mjs` 한 곳 · 학교 범위 `noticeForProfile` · 알림 없음 · 학교 게시판은 robots.txt 를 묻지 않는다. 관문 「교내 소식」 · `verify-news.js`.
   🔴 글 줄은 **날짜가 붙은 줄만**(`extractDatedRows`) — 링크 전부를 쓰면 사이트 메뉴가 글이 된다(10-01 906건 사고).
@@ -304,22 +300,10 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - **원문 링크는 그 공고 하나로** — 주소를 유추하지 말고 게시판 폼을 그대로 · 세션 없는 새 탭에서 열어 확인 · '못 읽음'과 '다른 글'을 구분 ·
   같은 학교를 하루에 여러 번 두드리지 말 것 · 못 찾으면 `#n-` 표식(앱이 '게시판 목록 ↗'). 사냥꾼이 못 찾는 이유는 대개 `boardTitle` 이 없어서.
 - 주소 같음 판정 `urlKey()`/`canonUrl` 한 곳 · 공고 상한 `capNotices()` · 실시간 공고 60일 · 정식 등록은 마감+30일, 마감 없으면 `listedAt`+60일(`notStale`).
-- **폰은 `notices.json` 을 받지 않는다 — 학교별 파일뿐이다**(`noticeFilesForProfile`).
-  옛 파일은 로봇 장부 + 물러나는 길로만 남았고,
-  그 길도 색인(`data/notices/index.json`)으로 **알 때는 안 받는다**(`noticeFallbackNeeded` 한 곳 — 화면·알림 공용).
-  프로필이 없으면 아무것도 안 받고, 학교가 정해지거나 바뀌면 다시 받는다(`loadNoticesIfSchoolChanged`). 관문 「학교별 공고 파일」.
-- **학과 목록도 학교별 파일뿐이다**(2026-09-26 · `majorsFileFor` — 공고와 **같은 이름 규칙을 불러 쓴다**).
-  `data/majors.json` 은 사람·도구용이고 앱은 안 받는다 · 발행 `collector/publish-majors.mjs`
-  (majors.mjs 는 **불러오는 순간 API 를 두드려서** 발행만 떼어 놨다) · 앱은 첫 화면에서 안 받고 학교가 정해질 때 받는다.
-  🔴 끊기면 **조용하다**(전국 공통 목록으로 물러난다).
-  🔴 발행 열쇠는 **`UNIVERSITIES` 의 이름**이어야 한다 — 커리어넷 이름은 다르다(`한국과학기술원`↔`KAIST`).
-  이어 주는 표를 새로 만들지 말고 `UNIV_ALIASES` 를 통과시킨다 · `'학교 캠퍼스'` 꼴은 로봇이 발행하지 않는다(부르면 404).
-  관문 「분교 이름이 로봇과 앱에서 같은가」 · `verify-onboard-gaps.js`(경희대로 내용을 잰다 — 외대는 손검수 목록이 있어 헛돈다).
+- **폰은 `notices.json` 을 받지 않는다 — 학교별 파일뿐이다**(`noticeFilesForProfile` · 색인으로 알 때는 옛 파일도 안 받는다 — `noticeFallbackNeeded` 한 곳, 화면·알림 공용) · 프로필이 없으면 안 받고 학교가 바뀌면 다시 받는다(`loadNoticesIfSchoolChanged`). 관문 「학교별 공고 파일」.
+- **학과 목록도 학교별 파일뿐이다**(`majorsFileFor`) · 발행 `collector/publish-majors.mjs`(majors.mjs 는 **불러오는 순간 API 를 두드린다** — 가져다 쓰지 말 것) · 🔴 끊기면 **조용하다**(전국 공통 목록으로 물러난다) · 🔴 발행 열쇠는 **`UNIVERSITIES` 의 이름**(이어 주는 표를 새로 만들지 말고 `UNIV_ALIASES` 를 통과 · `'학교 캠퍼스'` 꼴은 발행 안 함). 관문 「분교 이름이 로봇과 앱에서 같은가」 · `verify-onboard-gaps.js`(경희대로 잰다 — 외대는 손검수 목록이 있어 헛돈다).
 - `kosaf-open.json`·`registered.json` 은 못 줄였다 — 학교별로 나누면 **자라는 것만** 막힌다.
-- 🔴 **학교가 늘면 정식 등록도 나누라고 데이터가 스스로 말한다**(09-26 지시).
-  재는 곳은 `verify/data-weight.cjs` 의 `registeredSplitAdvice` **한 곳**(감사와 수집 리포트가 같이 쓴다 · 선을 베껴 적지 말 것) ·
-  뜨는 곳은 수집 리포트 → GitHub 이슈· 경고다(오류로 두면 자동 등록이 멈춘다).
-  관문 「학교가 늘면 「정식 등록도 나눌 때」라고 말하는가」.
+- 🔴 **학교가 늘면 정식 등록도 나누라고 데이터가 스스로 말한다**(09-26) — 재는 곳은 `verify/data-weight.cjs` `registeredSplitAdvice` 한 곳(선을 베껴 적지 말 것) · 수집 리포트 → GitHub 이슈·경고로(오류면 자동 등록이 멈춘다). 관문 「학교가 늘면 「정식 등록도 나눌 때」라고 말하는가」.
 - 브라우저 수집 게시판 연결이 안 되면 리포트의 진단(프레임·클릭·본 글자)부터 본다. 짐작 말고 스킬 `probe-run`.
 
 ### 알림 · 업데이트 · 보안
