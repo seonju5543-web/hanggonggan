@@ -766,8 +766,8 @@
   "att": "2026-11-18",
   "attSeen": 2,
   "attGap": 0,
-  "attTries": 1,
-  "attAt": "2026-11-18"
+  "attTries": 2,
+  "attAt": "2026-11-19"
  },
  "https://www.sogang.ac.kr/ko/detail/551760?bbsconfigfk=141&namepage=ScholarshipNotice": {
   "att": "2026-11-18",
@@ -845,8 +845,8 @@
   "attGap": 0
  },
  "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardid=5&cate=8&key=70976": {
-  "attTries": 2,
-  "attAt": "2026-11-18"
+  "attTries": 3,
+  "attAt": "2026-11-19"
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/521183": {
   "att": "2026-11-18",
@@ -906,6 +906,16 @@
  "https://www3.chosun.ac.kr/bbs/scho/332/282856/artclView.do": {
   "att": "2026-11-18",
   "attSeen": 4,
+  "attGap": 0
+ },
+ "https://www.inha.ac.kr/bbs/kr/8/46174/artclView.do": {
+  "att": "2026-11-19",
+  "attSeen": 1,
+  "attGap": 0
+ },
+ "https://www.konkuk.ac.kr/bbs/konkuk/235/1212436/artclView.do": {
+  "att": "2026-11-19",
+  "attSeen": 0,
   "attGap": 0
  }
 }
