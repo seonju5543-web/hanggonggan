@@ -880,12 +880,9 @@
    "name": "(홍보) 2026년 2학기 푸른등대 기부장학금 신규장학생 신청 안내(~11/12(목)까지)",
    "target": "(홍보) 2026년 2학기 푸른등대 기부장학금 신규장학",
    "added": "2026-10-27",
-   "fetched": false,
+   "fetched": true,
    "schematized": false,
-   "tries": 6,
-   "lastTryAt": "2026-10-28",
-   "retired": true,
-   "retiredReason": "6회 시도해도 원본을 못 받음 (공고가 수집 목록에서 사라진 것으로 보임). 다시 받으려면 retired를 지우세요."
+   "lastTryAt": "2026-10-28"
   },
   {
    "id": "auto-ent2431270154artclviewdo",
@@ -1222,10 +1219,35 @@
    "name": "[교외-11/23]송원김영환장학재단 2027학년도 제44기 송원장학생 모집 안내(학교지원)",
    "target": "송원김영환장학재단 2027학년도 제44기 송원장학생 모",
    "added": "2026-11-18",
+   "fetched": true,
+   "schematized": false,
+   "lastTryAt": "2026-11-18"
+  },
+  {
+   "id": "auto-q1brddate20261105brdseq1",
+   "name": "[교외] 제9기 서울시립대 언론인회 장학생 선발",
+   "target": "제9기 서울시립대 언론인회 장학생 선발",
+   "added": "2026-11-18",
    "fetched": false,
    "schematized": false,
    "tries": 1,
    "lastTryAt": "2026-11-18"
+  },
+  {
+   "id": "auto-amepagescholarshipnotice-12u2guu",
+   "name": "[교외] 유하푸른재단 장학생 선발 안내(11/20 마감, 이공계열 1학년, 등록금 및 자기개발비, 교환학생 장학금)",
+   "target": "유하푸른재단 장학생 선발 안내(11/20 마감, 이공계",
+   "added": "2026-11-18",
+   "fetched": true,
+   "schematized": false
+  },
+  {
+   "id": "auto-qlmjzmaw5kv29yzcuzrcuyng-0d8bhds",
+   "name": "[교내-11/25] 2026학년도 2학기 미래로장학금 재심 신청 안내",
+   "target": "2026학년도 2학기 미래로장학금 재심 신청 안내",
+   "added": "2026-11-18",
+   "fetched": true,
+   "schematized": false
   }
  ]
 }

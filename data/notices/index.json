@@ -5,7 +5,39 @@
  "files": {
   "이화여자대학교": {
    "file": "n1tk2q9m.json",
-   "count": 46
+   "count": 47
+  },
+  "가톨릭대학교": {
+   "file": "n174lvh5.json",
+   "count": 34
+  },
+  "경기대학교": {
+   "file": "ntxxf09.json",
+   "count": 23
+  },
+  "전남대학교": {
+   "file": "nwqmwga.json",
+   "count": 45
+  },
+  "조선대학교": {
+   "file": "n1qr99q6.json",
+   "count": 26
+  },
+  "연세대학교": {
+   "file": "nz3ew5y.json",
+   "count": 57
+  },
+  "고려대학교 세종캠퍼스": {
+   "file": "n1ch7t87.json",
+   "count": 30
+  },
+  "동국대학교 WISE캠퍼스": {
+   "file": "n2we95k.json",
+   "count": 30
+  },
+  "홍익대학교": {
+   "file": "nv8pha4.json",
+   "count": 27
   },
   "인하대학교": {
    "file": "nkeh7pq.json",
@@ -15,29 +47,13 @@
    "file": "n14kv35j.json",
    "count": 60
   },
-  "조선대학교": {
-   "file": "n1qr99q6.json",
-   "count": 25
-  },
   "강원대학교": {
    "file": "nlzhvsh.json",
    "count": 40
   },
-  "연세대학교": {
-   "file": "nz3ew5y.json",
-   "count": 56
-  },
   "연세대학교 미래캠퍼스": {
    "file": "n1if6uwu.json",
    "count": 47
-  },
-  "고려대학교 세종캠퍼스": {
-   "file": "n1ch7t87.json",
-   "count": 29
-  },
-  "동국대학교 WISE캠퍼스": {
-   "file": "n2we95k.json",
-   "count": 29
   },
   "가천대학교": {
    "file": "nzzc8bm.json",
@@ -107,33 +123,17 @@
    "file": "n1or8oiw.json",
    "count": 52
   },
-  "가톨릭대학교": {
-   "file": "n174lvh5.json",
-   "count": 33
-  },
   "서울교육대학교": {
    "file": "n18ebv4b.json",
    "count": 17
-  },
-  "홍익대학교": {
-   "file": "nv8pha4.json",
-   "count": 26
   },
   "숭실대학교": {
    "file": "nmljo8t.json",
    "count": 38
   },
-  "전남대학교": {
-   "file": "nwqmwga.json",
-   "count": 44
-  },
   "서강대학교": {
    "file": "n14n199r.json",
    "count": 52
-  },
-  "경기대학교": {
-   "file": "ntxxf09.json",
-   "count": 22
   },
   "경희대학교": {
    "file": "n1w4hprp.json",
