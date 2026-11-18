@@ -6288,10 +6288,12 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
       (AL.htmlBodyImages || (() => undefined))('<img src="/_res/img-logo.svg"><p><img src="/cms/plugin/editorImage.do?$cms$AbC " data-width="1080" data-height="1920"></p><img src="/x.png" width="200" height="200"><img src="data:image/png;base64,AAAA" width="900" height="900">', hongik),
       [{ name: '본문이미지-1080x1920.jpg', url: 'https://www.hongik.ac.kr/cms/plugin/editorImage.do?$cms$AbC', bodyImage: true }]);
     const rb2 = readText(new URL('../collector/rescue-bodies.mjs', import.meta.url));
+    /* 브라우저 링크 읽기는 2026-11-18 부터 rescue-plan linksFromAnchors 한 곳(빈 href·`#…` 를 주소로 치지 않는 규칙과 함께 · 관문 bodies ⓔ-2 가 동작을 잰다) — 자리만 옮겼다 */
+    const rp2 = readText(new URL('../collector/rescue-plan.mjs', import.meta.url));
     eq('  재수집 로봇: 물러선 HTML 의 첨부 링크·그림을 적고(detailAttachments·htmlBodyImages) 첨부 적기(newAttachments)는 그 **뒤**에 · 브라우저 링크도 단추 글자(BUTTON_WORD)면 앞 요소 이름',
       [rb2.indexOf('r.found.push(...detailAttachments(html, openUrl), ...htmlBodyImages(html, openUrl))') > 0
         && rb2.indexOf('r.found.push(...detailAttachments(html, openUrl)') < rb2.indexOf('const add = newAttachments(t.it.attachments, r.found)'),
-        /previousElementSibling/.test(rb2) && /BUTTON_WORD\.source\)/.test(rb2)], [true, true]);
+        /\$\$eval\('a\[href\]', linksFromAnchors, BUTTON_WORD\.source\)/.test(rb2) && /export function linksFromAnchors[\s\S]{0,600}previousElementSibling/.test(rp2)], [true, true]);
     /* 🔴 등록 당시 `javascript:` 로 적힌 첨부는 받을 때 푼다 (2026-11-02 · 서울과기대 희망사다리Ⅰ 자체선발기준: 규칙(10-16)보다 먼저 등록(10-12)돼 11-01 자격용 받기가 TypeError → files: []) */
     const df2 = readText(new URL('../collector/deepfetch.mjs', import.meta.url));
     eq('  deepfetch 의 두 내려받기(양식·자격용)가 fetchUrlOf 로 스크립트 주소를 풀고 · 오류는 두 경로 모두 cause 까지 적는다(errWhy)',

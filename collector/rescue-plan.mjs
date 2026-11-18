@@ -131,12 +131,27 @@ export const usableUrl = (u) => /^https?:\/\//i.test(String(u || '').trim());
    브라우저는 `href="#"`·`href=""`·`href="#none"` 을 **화면 주소로 풀어** 준다(a.href) — http(s) 라 usableUrl 을 통과해,
    학생이 「신청서.hwp」를 누르면 파일이 아니라 공고 화면이 다시 열렸다(서울시립대 언론인회 신청서·자기소개서 · 11-17 첫 실행이 적음).
    게다가 장부가 '받을 주소 있음'으로 세어(attGap 0) 다시 살피지도, 경보를 내지도 않았다. 옛 로봇의 `화면#n-파일이름` 표식(서울과기대)도 같은 꼴이다.
-   비교는 조각(#…)을 떼고 한다 — 파일 주소에 조각이 붙어도 서버가 받는 주소는 같다. */
+   비교는 조각(#…)을 떼고 한다 — 파일 주소에 조각이 붙어도 서버가 받는 주소는 같다.
+   🔴 일부러 canonUrl(주소 같음 한 곳)을 쓰지 않는다 — canonUrl 은 `mode`·`do` 같은 칸을 떼어 `board.do?mode=view&articleNo=1` 과
+      `…mode=download&articleNo=1` 을 같은 주소로 본다(그러면 진짜 내려받기 줄이 지워진다 · 리뷰 11-18). 여기서는 조각만 뗀 **글자 그대로** 비교한다.
+   새로 적는 길은 linksFromAnchors 가 막는다(빈 href·`#…` 는 주소로 치지 않는다) — 이 함수는 이미 적힌 줄을 걷는 데 쓴다. */
 export function pageSelfUrl(u, pageUrls) {
   const strip = (x) => String(x || '').replace(/&amp;/g, '&').replace(/#.*$/, '').trim();
   const s = strip(u);
   if (!/^https?:\/\//i.test(s)) return false;
   return (pageUrls || []).some((p) => p && strip(p) === s);
+}
+/** 화면의 `<a href>` → { name, url } — rescue-bodies 주소 읽기가 **브라우저 안에서** 부른다(함수 글자째 넘어가므로 바깥 이름을 쓰지 않는다).
+    🔴 href 가 비었거나 `#…` 면 주소가 아니다 — a.href 는 그 **프레임**의 화면 주소(+#)로 풀린다(iframe 안이면 iframe 주소라 pageSelfUrl 로도 못 잡는다 ·
+       2026-11-18 리뷰 1 · censusInPage 와 같은 규칙). `javascript:` 는 a.href 도 그 글자 그대로라 그대로 둔다(받을 주소가 아니라 앱은 이름만 · 누르기가 진짜 주소를 잡는다).
+    단추 글자뿐이면(`다운로드`) 파일 이름은 바로 앞 요소에 있다(경기대·충북대 selectBbsNttView · HTML 길 detailAttachments 와 같은 낱말 BUTTON_WORD) */
+export function linksFromAnchors(as, button) {
+  return as.map((a) => {
+    let name = (a.textContent || '').replace(/\s+/g, ' ').trim();
+    if (new RegExp(button, 'i').test(name) && a.previousElementSibling) name = (a.previousElementSibling.textContent || '').replace(/\s+/g, ' ').trim();
+    const raw = (a.getAttribute('href') || '').trim();
+    return { name, url: !raw || raw.startsWith('#') ? '' : a.href };
+  });
 }
 /** 첨부 목록에서 화면 자신의 주소를 걷어 낸다 — 같은 이름에 진짜 주소 줄이 따로 있으면 그 줄을 지우고, 없으면 **이름만** 남긴다
     (앱은 「원문 게시판에서 내려받기」 · 다음 살피기의 누르기가 진짜 주소를 채운다 · upgradeAttachmentUrls). 본문 그림은 건드리지 않는다 */

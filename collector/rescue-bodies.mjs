@@ -36,7 +36,7 @@ import { readLinkFixes, humanFixUrlBy } from './link-fixes-read.mjs';
 /* 대상 거르기·차례·장부 한 칸·첨부 합치기는 순수 함수 파일 하나에 — 이 파일은 불러오는 순간 돌아 관문이 못 부른다 */
 import { restingAfterOk, closedForStudents, orderTargets, ledgerEntry, newAttachments, pruneLedger, wantsBody,
   wantsAttachments, withAttCheck, withAttMiss, preferUsable, upgradeAttachmentUrls, attGapOf, replayOk, wrongKind, fileNameIn, usableUrl,
-  attachmentAlarms, feedAttachmentGaps, trustedAttachment, censusInPage, FILE_NAME_SRC, ATT_MAX_CLICKS, ATT_BUDGET_MS, pageSelfUrl, dropSelfLinks } from './rescue-plan.mjs';
+  attachmentAlarms, feedAttachmentGaps, trustedAttachment, censusInPage, FILE_NAME_SRC, ATT_MAX_CLICKS, ATT_BUDGET_MS, pageSelfUrl, dropSelfLinks, linksFromAnchors } from './rescue-plan.mjs';
 import { writeFileAtomic } from './write-atomic.mjs';
 
 const { requirementLines } = createRequire(import.meta.url)('../match-engine.js');
@@ -336,12 +336,8 @@ for (const t of targets) {
       const found = [];
       try {
         for (const f of page.frames()) {
-          const links = await f.$$eval('a[href]', (as, button) => as.map((a) => {
-            let name = (a.textContent || '').replace(/\s+/g, ' ').trim();
-            /* 단추 글자뿐이면(`다운로드`) 파일 이름은 바로 앞 요소에 있다 — 경기대·충북대 selectBbsNttView 게시판(2026-11-02 · HTML 길 detailAttachments 와 같은 낱말 BUTTON_WORD) */
-            if (new RegExp(button, 'i').test(name) && a.previousElementSibling) name = (a.previousElementSibling.textContent || '').replace(/\s+/g, ' ').trim();
-            return { name, url: a.href };
-          }), BUTTON_WORD.source).catch(() => []);
+          /* 이름·주소 읽기는 rescue-plan linksFromAnchors 한 곳 — 빈 href·`#…` 는 주소로 치지 않는다(브라우저가 그 프레임 화면 주소로 풀어 준다 · 2026-11-18) */
+          const links = await f.$$eval('a[href]', linksFromAnchors, BUTTON_WORD.source).catch(() => []);
           for (const l of links) {
             if (!/\.(hwp|hwpx|pdf|docx?|xlsx?|zip)(\?|$)/i.test(l.name) && !/download|file|attach/i.test(l.url)) continue;
             const nm = l.name.replace(/\s*미리보기\s*$/, '').replace(/^\d+\.\s*/, '').trim();
@@ -442,7 +438,9 @@ for (const t of targets) {
        (같은 이름에 진짜 주소 줄이 있으면 그 줄을 지우고, 없으면 이름만 · 그러면 아래 attGap 이 바로 세어 경보·다시 살피기가 돈다) */
     const selfPages = [t.url, openUrl, finalUrl];
     r.found = dropSelfLinks(r.found, selfPages);
-    {
+    /* 🔴 이미 적힌 줄은 **화면을 실제로 본 날에만** 걷는다(리뷰 11-18 ②) — 못 연 날 걷으면 '다시 살필 표시'(화면 주소 줄)만 사라지고
+       장부는 옛 '다 구함(attGap 0)'이 남아 다시는 안 살피고 경보도 없다. 못 연 날은 그대로 두면 다음 실행이 다시 고른다(못 연 횟수의 쉼은 그대로) */
+    if (!r.error && text) {
       const before = t.it.attachments || [];
       const healed = dropSelfLinks(before, selfPages);
       if (healed.length !== before.length || healed.some((a, i) => a !== before[i])) {

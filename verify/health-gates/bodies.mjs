@@ -27,8 +27,8 @@ import { browserBodyEntry, clickBodyEntry } from '../../collector/html-text.mjs'
 import { canonUrl } from '../../collector/canon-url.mjs';
 import { restingAfterOk, closedForStudents, orderTargets, ledgerEntry, newAttachments, pruneLedger, wantsBody,
   wantsAttachments, withAttCheck, withAttMiss, preferUsable, upgradeAttachmentUrls, attGapOf, replayOk, wrongKind, fileNameIn, usableUrl, attachmentAlarms, feedAttachmentGaps,
-  trustedAttachment, censusInPage, FILE_NAME_SRC, pageSelfUrl, dropSelfLinks } from '../../collector/rescue-plan.mjs';
-import { detailAttachments } from '../../collector/attachment-link.mjs';
+  trustedAttachment, censusInPage, FILE_NAME_SRC, pageSelfUrl, dropSelfLinks, linksFromAnchors } from '../../collector/rescue-plan.mjs';
+import { detailAttachments, BUTTON_WORD } from '../../collector/attachment-link.mjs';
 import { pickEligTargets } from '../../collector/elig-targets.mjs';
 import { fillRetired, nextShells, fillCounts } from '../../collector/notice-source.mjs';
 
@@ -459,6 +459,16 @@ export default async function bodies(eq, ctx) {
         [['공고문.hwpx', 'https://board.example.ac.kr/dl.do?id=1'], ['신청서.hwp', ''], ['본문이미지-900x900.jpg', `${P}#`], ['규정.hwp', "javascript:dl('2')"]]);
       eq('  걷어 낸 뒤의 셈 — 화면 주소 줄은 받을 주소가 아니라 장부가 못 구한 것으로 센다(경보·다시 살피기가 돈다)',
         [attGapOf(['신청서.hwp'], [{ name: '신청서.hwp', url: `${P}#` }]), attGapOf(['신청서.hwp'], dropSelfLinks([{ name: '신청서.hwp', url: `${P}#` }], [P]))], [0, 1]);
+      /* 새로 적는 길 — 브라우저 안 주소 읽기(linksFromAnchors). a.href 는 그 프레임 화면 주소로 풀리므로(iframe 안이면 iframe 주소) 글자(getAttribute)로 가린다(리뷰 11-18 ①) */
+      const A = (text, raw, href, prev) => ({ textContent: text, getAttribute: () => raw, href, previousElementSibling: prev ? { textContent: prev } : null });
+      const IF = 'https://board.example.ac.kr/inner/view.jsp?x=1';
+      eq('  주소 읽기 — 빈 href·`#…` 는 주소가 아니다(작은 창 안이어도) · 진짜 링크·`javascript:` 는 그대로 · 단추 글자(`다운로드`)는 앞 요소 이름',
+        linksFromAnchors([A('2026 서식.hwp', '#', `${IF}#`), A('신청서.hwp', '#none', `${IF}#none`), A('빈.hwp', '', IF), A(' 공고문.pdf ', '/dl.do?id=2', 'https://board.example.ac.kr/dl.do?id=2'),
+          A('다운로드', '/f.hwp', 'https://board.example.ac.kr/f.hwp', '추천서 양식.hwp'), A('규정.hwp', "javascript:fileDown('3')", "javascript:fileDown('3')")], BUTTON_WORD.source).map((l) => [l.name, l.url]),
+        [['2026 서식.hwp', ''], ['신청서.hwp', ''], ['빈.hwp', ''], ['공고문.pdf', 'https://board.example.ac.kr/dl.do?id=2'], ['추천서 양식.hwp', 'https://board.example.ac.kr/f.hwp'], ['규정.hwp', "javascript:fileDown('3')"]]);
+      const rbSrc = stripComments(readText('collector/rescue-bodies.mjs'));
+      eq('  배선 — 로봇의 주소 읽기가 그 함수를 쓴다 · 이미 적힌 줄 걷기는 화면을 실제로 본 날에만(못 연 날 걸으면 다시 살필 표시만 사라진다 · 리뷰 11-18 ②)',
+        [/\$\$eval\('a\[href\]', linksFromAnchors, BUTTON_WORD\.source\)/.test(rbSrc), /if \(!r\.error && text\) \{\s*const before = t\.it\.attachments/.test(rbSrc)], [true, true]);
       /* 진짜 로봇 — 가짜 브라우저 att-click-self(위) · 장부가 잘못 '다 구함'으로 적은 공고 하나 */
       const sb2 = sandbox(root, 'hdj-att-self-');
       try {
@@ -475,12 +485,16 @@ export default async function bodies(eq, ctx) {
             attachments: [{ name: '2026 표본 장학금 공고문.pdf', url: 'https://fake.example/files/notice.pdf' }, { name: '2026 표본 장학금 공고문.pdf', url: `${u('att-href-j')}#n-x` }] },
           { id: 'done', name: '표본 done 장학생 선발 안내 공고', sourceUrl: u('att-href-k'), listedAt: today, ...read,
             attachments: [{ name: '2026 표본 장학금 공고문.pdf', url: 'https://fake.example/files/notice.pdf' }] },
+          { id: 'errheal', name: '표본 errheal 장학생 선발 안내 공고', sourceUrl: u('att-err-z'), listedAt: today, ...read,
+            attachments: [{ name: '2026 표본 장학금 서식.hwp', url: `${u('att-err-z')}#` }] },   // 화면 주소 줄이 있는데 오늘은 안 열린다
         ] });
-        /* heal·done 은 오늘 살펴 '다 구함(attGap 0)'으로 적혀 있다 — heal 은 화면 주소 줄이 남아 있어 다시 가야 하고, done 은 안 간다 */
-        sb2.write('collector/rescue-ledger.json', { [canonUrl(u('att-href-j'))]: { att: today, attSeen: 1, attGap: 0 }, [canonUrl(u('att-href-k'))]: { att: today, attSeen: 1, attGap: 0 } });
+        /* heal·done·errheal 은 어제 살펴 '다 구함(attGap 0)'으로 적혀 있다 — heal·errheal 은 화면 주소 줄이 남아 있어 다시 가야 하고, done 은 안 간다 */
+        const yday = shift(today, -1);
+        sb2.write('collector/rescue-ledger.json', { [canonUrl(u('att-href-j'))]: { att: yday, attSeen: 1, attGap: 0 }, [canonUrl(u('att-href-k'))]: { att: yday, attSeen: 1, attGap: 0 },
+          [canonUrl(u('att-err-z'))]: { att: yday, attSeen: 1, attGap: 0 } });
+        const pickAtt = (run) => ((run.out.match(/첨부 살피기 \d+건 \(본문 대상 뒤에\): ([^\n]*)/) || [])[1] || '').split(' · ').filter(Boolean).sort();
         const pre2 = sb2.run('collector/rescue-bodies.mjs', [], {});
-        const order = ((pre2.out.match(/첨부 살피기 \d+건 \(본문 대상 뒤에\): ([^\n]*)/) || [])[1] || '').split(' · ').sort();
-        eq('  🔴 장부보다 지금 데이터 — 화면 주소가 첨부로 적힌 공고는 장부가 \'다 구함\'이어도 다시 살핀다 · 진짜 주소뿐인 공고는 안 간다', [pre2.status, order], [0, ['heal', 'self']]);
+        eq('  🔴 장부보다 지금 데이터 — 화면 주소가 첨부로 적힌 공고는 장부가 \'다 구함\'이어도 다시 살핀다 · 진짜 주소뿐인 공고는 안 간다', [pre2.status, pickAtt(pre2)], [0, ['errheal', 'heal', 'self']]);
         const w2 = sb2.run('collector/rescue-bodies.mjs', ['--write'], { RESCUE_GAP_MS: '0', RESCUE_BUDGET_MS: '120000', RESCUE_CAP: '10' }, 25000, ['--import', sb2.abs('fake-fetch.mjs')]);
         const reg2 = (sb2.json('data/registered.json') || { items: [] }).items;
         const A2 = (id) => ((reg2.find((x) => x.id === id) || {}).attachments || []).map((a) => [a.name, a.url]);
@@ -489,6 +503,11 @@ export default async function bodies(eq, ctx) {
           [w2.status, A2('self'), (led2b[canonUrl(u('att-click-self-i'))] || {}).attGap], [0, [['2026 표본 장학금 서식.hwp', 'https://fake.example/dl/file.hwp']], 0]);
         eq('  이미 적힌 화면 주소 줄은 살필 때 걷는다 — 같은 이름의 진짜 주소 줄이 있으면 그 줄만 남는다(서울과기대 꼴) · 리포트에 🧹 한 줄',
           [A2('heal'), /🧹 표본 heal/.test(sb2.read('collector/rescue-report.md') || '')], [[['2026 표본 장학금 공고문.pdf', 'https://fake.example/files/notice.pdf']], true]);
+        const errLed = led2b[canonUrl(u('att-err-z'))] || {};
+        eq('  🔴 안 열린 날엔 걷지 않는다 — 화면 주소 줄이 그대로 남고(다시 살필 표시) · 장부엔 못 연 횟수만(옛 \'살핀 날\'은 그대로) (리뷰 11-18 ②)',
+          [A2('errheal'), errLed.attTries, errLed.att], [[['2026 표본 장학금 서식.hwp', `${u('att-err-z')}#`]], 1, yday]);
+        const again2 = sb2.run('collector/rescue-bodies.mjs', [], {});
+        eq('  …그래서 다음 실행이 그 공고를 다시 고른다(살핀 self·heal 은 이제 안 간다) — 못 연 횟수의 쉼은 그대로 지킨다', pickAtt(again2), ['errheal']);
       } finally {
         sb2.done();
       }
