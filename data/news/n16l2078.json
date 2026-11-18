@@ -3,6 +3,29 @@
  "updatedAt": "2026-11-18",
  "items": [
   {
+   "title": "충북대학교 학생설계전공 홍보 런치설명회 개최",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171710&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-11-18",
+   "kind": "행사",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-11-18",
+   "thumb": "data/news/img/611c7094a1099483.webp",
+   "desc": "이미지 확대보기 우리 대학의 학생설계전공 이수 제도를 안내하고 홍보하기 위해 다음과 같이 런치설명회를 개최합니다. 학생들의 많은 참여 바랍니다."
+  },
+  {
+   "title": "충북지역 바이오/헬스산업 ‘AX(지능화) 혁신을 위한 기초 소양 융합 교육’",
+   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171721&pageUnit=10&searchCnd=all&pageIndex=1",
+   "postedAt": "2026-11-18",
+   "school": "충북대학교",
+   "campus": "",
+   "src": "76d254e7",
+   "foundAt": "2026-11-18",
+   "thumb": "data/news/img/7a8f3452d35f9a1f.webp",
+   "desc": "AI 와 양자컴퓨팅이 만나는 충북 바이오헬스의 미래 권태호 박사 ( 한국생명공학연구원 ) 일반인 ( 학생 및 직장인 포함 ) 대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
+  },
+  {
    "title": "[오뚜기함태호재단 심포지엄]The 2nd Next-Gen FoodTech&Nutrition Symposium",
    "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171668&pageUnit=10&searchCnd=all&pageIndex=1",
    "postedAt": "2026-11-12",
@@ -409,27 +432,6 @@
    "src": "76d254e7",
    "foundAt": "2026-11-02",
    "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
-  },
-  {
-   "title": "충북대학교 대학회계 공무직(사무원) 공개경쟁채용시험 공고",
-   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171146&pageUnit=10&searchCnd=all&pageIndex=1",
-   "postedAt": "2026-11-02",
-   "kind": "채용",
-   "school": "충북대학교",
-   "campus": "",
-   "src": "76d254e7",
-   "foundAt": "2026-11-02",
-   "desc": "대학생활-공지사항 상세보기 - 제목, 부서, 카테고리, 내용, 파일 정보 제공"
-  },
-  {
-   "title": "2027년도 제16회 변호사시험 시험관리원 선발 안내",
-   "url": "https://www.cbnu.ac.kr/www/selectBbsNttView.do?key=813&bbsNo=8&nttNo=171106&pageUnit=10&searchCnd=all&pageIndex=1",
-   "postedAt": "2026-11-02",
-   "school": "충북대학교",
-   "campus": "",
-   "src": "76d254e7",
-   "foundAt": "2026-11-02",
-   "desc": "법무부에서 2027년도 제16회 변호사시험에서 시험관리원으로 근무할 우리 대학 학부생을 선발합니다."
   }
  ]
 }

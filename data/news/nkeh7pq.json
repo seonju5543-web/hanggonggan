@@ -3,6 +3,30 @@
  "updatedAt": "2026-11-18",
  "items": [
   {
+   "title": "[교수학습개발센터] 2026-2학기 ICC 프로젝트 운영TA 모집",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46175/artclView.do",
+   "postedAt": "2026-11-18",
+   "kind": "채용",
+   "school": "인하대학교",
+   "campus": "",
+   "src": "f4141706",
+   "foundAt": "2026-11-18",
+   "thumb": "data/news/img/d652367e2f437286.webp",
+   "desc": "교수학습개발센터에서는 2026학년도 2학기 ICC 프로젝트 운영을 보조 해 줄 대학원생 TA를 아래와 같이 모집합니다."
+  },
+  {
+   "title": "[SW중심대학사업단] 2027 AI-POT 자격증 취득 지원 프로그램(1차) 참여 신청 (12/3~12/9)",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46171/artclView.do",
+   "postedAt": "2026-11-18",
+   "kind": "행사",
+   "school": "인하대학교",
+   "campus": "",
+   "src": "f4141706",
+   "foundAt": "2026-11-18",
+   "thumb": "data/news/img/d64de0108038ecbd.webp",
+   "desc": "인하대학교 SW중심대학사업단에서는 본교 학생들의 AI 역량 향상 및 경쟁력 강화를 위해 한국생산성본부(KPC)에서 운영하는 ‘생성형 AI 프롬프트 활용 능력 자격증(AI-POT: Prompt Operator…"
+  },
+  {
    "title": "2026-2학기 성적공시 안내",
    "url": "https://www.inha.ac.kr/bbs/kr/8/46168/artclView.do",
    "postedAt": "2026-11-18",
@@ -409,28 +433,6 @@
    "campus": "",
    "src": "f4141706",
    "foundAt": "2026-10-30"
-  },
-  {
-   "title": "[인하공학교육혁신센터] 사무원 채용 공고",
-   "url": "https://www.inha.ac.kr/bbs/kr/8/45987/artclView.do",
-   "postedAt": "2026-10-29",
-   "kind": "채용",
-   "school": "인하대학교",
-   "campus": "",
-   "src": "f4141706",
-   "foundAt": "2026-10-29",
-   "desc": "인하대학교 공학교육혁신센터는 다음과 같이 사무원을 채용하고자 하오니 , 많은 지원 부탁드립니다 ."
-  },
-  {
-   "title": "[프런티어창의대학] 촉탁연구원 채용 공고",
-   "url": "https://www.inha.ac.kr/bbs/kr/8/45975/artclView.do",
-   "postedAt": "2026-10-29",
-   "kind": "채용",
-   "school": "인하대학교",
-   "campus": "",
-   "src": "f4141706",
-   "foundAt": "2026-10-29",
-   "desc": "1. 모집부문 및 지원자격 모집대상 분야 및 업무 지원자격 우대사항 촉탁 연구원 &bull; 대학혁신지원사업 관련 프로그램 운영 및 관리 학사학위 소지자 &bull; 교육(공)학 전공자 우대 &bull;…"
   }
  ]
 }

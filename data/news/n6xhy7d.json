@@ -3,6 +3,39 @@
  "updatedAt": "2026-11-18",
  "items": [
   {
+   "title": "[일반] [로봇특성화대학사업단] 청년 뉴턴(NEW:TURN) 2026' 행사 안내",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53710&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-18",
+   "kind": "행사",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-18",
+   "thumb": "data/news/img/73a785e4be00628b.webp",
+   "desc": "- 장소: 서울 SETEC 제3전시관 (온라인 생중계 병행) - 대상: 대학(원)생 및 청년 누구나"
+  },
+  {
+   "title": "[일반] [채용공고]광운대학교 산학협력단 [도봉구 청년창업센터] 직원 채용 공고",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53708&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-18",
+   "kind": "채용",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-18",
+   "desc": "1. 채용분야 및 지원자격 2. 응시자격 및 우대조건 가. 일반사항 1) 성별, 학력, 거주지 제한 없음"
+  },
+  {
+   "title": "[외부] [외교부] 정년 해외안전여행 안내 \" 영사안전 콜센터와 함께하는 안전한 해외여행\"",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53707&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-18",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-18",
+   "thumb": "data/news/img/0947eb701f285943.webp"
+  },
+  {
    "title": "[일반] [채용공고]광운대학교 산학협력단 「로봇특성화대학사업단」 직원 채용 공고",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53700&tpage=1&searchKey=1&searchVal=&srCategoryId=",
    "postedAt": "2026-11-17",
@@ -398,38 +431,6 @@
    "foundAt": "2026-11-08",
    "thumb": "data/news/img/0bac29e7175f58eb.webp",
    "desc": "○ 내용: 10년 차 진로·취업·커리어 전문 코치와 함께 강점·가치관 발견, 관심 직무 탐색, 실천 계획 수립까지 하루 동안 진행하는 커리어 디자인 캠프"
-  },
-  {
-   "title": "[일반] [원격교육지원센터] 광운대학교 2026년 매치업 X+AI (바이오헬스 분야) 요구도 조사",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53613&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-05",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-08",
-   "thumb": "data/news/img/aa11382cc676c056.webp",
-   "desc": "안녕하세요. 광운대학교 교육혁신원 원격교육지원센터 입니다. 본 설문은 광운대 X+AI 바이오헬스 강좌 교육과정 요구도 조사를 위한 것입니다."
-  },
-  {
-   "title": "[일반] [체육지원팀]광운대학교 축구부 2026 KUSF U-리그 왕중왕전 경기 일정 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53603&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-03",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-03",
-   "thumb": "data/news/img/86ed43a3a51ff134.webp",
-   "desc": "우리대학 축구부가 대한축구협회와 한국대학스포츠협의회가 주최하는 「 2026 대학축구 U-리그 왕중왕전 」대회 에 출전합니다."
-  },
-  {
-   "title": "[일반] 2026 국립국제교육원 인지도 조사 참여 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53601&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-03",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-03",
-   "thumb": "data/news/img/85077a9c8b559d86.webp"
   }
  ]
 }

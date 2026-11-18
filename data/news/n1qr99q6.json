@@ -3,6 +3,28 @@
  "updatedAt": "2026-11-18",
  "items": [
   {
+   "title": "[신문방송사] 2026학년도 제38회 조대문화상 공모",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282902/artclView.do",
+   "postedAt": "2026-11-18",
+   "school": "조선대학교",
+   "campus": "",
+   "src": "c6a7801d",
+   "foundAt": "2026-11-18",
+   "thumb": "data/news/img/76605b0a985c53cd.webp",
+   "desc": "대학의 올바른 이념 구현과 참다운 민족문화 창달을 위한 제38회 조대문화상 공모를 시작합니다."
+  },
+  {
+   "title": "[취업전략팀] AI 위협탐지·대응과정 취업연계 교육 모집 안내",
+   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282888/artclView.do",
+   "postedAt": "2026-11-18",
+   "school": "조선대학교",
+   "campus": "",
+   "src": "c6a7801d",
+   "foundAt": "2026-11-18",
+   "thumb": "data/news/img/165d1d6c018a1579.webp",
+   "desc": "취업전략팀 정보보호·AI 보안 분야 취업을 준비 중이신가요? 보안 인프라 구축부터 AI 위협탐지, 침해사고 대응 프로젝트까지 3주 만에 실무를 완성합니다."
+  },
+  {
    "title": "목소리로 세상을 그리는 남자 강수진인데요? 조선대학교 특별가 안내",
    "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282864/artclView.do",
    "postedAt": "2026-11-17",
@@ -411,16 +433,6 @@
    "foundAt": "2026-10-20",
    "thumb": "data/news/img/7cd31a02be3f357e.webp",
    "desc": "교육일시 2026년 11월 10일(화) 18:00~20:00 교육장소 CSU 창작마을센터 목공실 교육대상 (예비)창업자, 지역 내 메이커, 일반인 등 교육인원 접수방식 CSU 창작마을센터 홈페이지 프로그램 신청…"
-  },
-  {
-   "title": "[2026학년도 2학기 2차] YBM 한국토익위원회 주관 본교 특별 TOEIC 시험 실시 안내(11. 14.(토))",
-   "url": "https://www3.chosun.ac.kr/bbs/chosun/117/282162/artclView.do",
-   "postedAt": "2026-10-20",
-   "school": "조선대학교",
-   "campus": "",
-   "src": "c6a7801d",
-   "foundAt": "2026-10-20",
-   "desc": "본교에서는 글로벌 인재양성 및 취업률 제고를 위하여 재학생 여러분들의 외국어 실력을 향상 시키고자 YBM 한국토익위원회 주관 본교 TOEIC 특별 시험 (= 모의토익 ) 을 시행 중에 있습니다."
   }
  ]
 }

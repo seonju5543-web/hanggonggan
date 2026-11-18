@@ -3,6 +3,16 @@
  "updatedAt": "2026-11-18",
  "items": [
   {
+   "title": "교원채용 2027-1학기 숭실대학교 교수 초빙 공고(비정년직 전임교원)",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2027-1%ED%95%99%EA%B8%B0-%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EA%B5%90%EC%88%98-%EC%B4%88%EB%B9%99-%EA%B3%B5%EA%B3%A0%EB%B9%84%EC%A0%95%EB%85%84%EC%A7%81-%EC%A0%84%EC%9E%84%EA%B5%90&keyword",
+   "postedAt": "2026-11-18",
+   "kind": "채용",
+   "school": "숭실대학교",
+   "campus": "",
+   "src": "3b348584",
+   "foundAt": "2026-11-18"
+  },
+  {
    "title": "학사 2026-2학기(겨울계절제수업 포함) 성적처리 관련 안내",
    "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026-2%ED%95%99%EA%B8%B0%EA%B2%A8%EC%9A%B8%EA%B3%84%EC%A0%88%EC%A0%9C%EC%88%98%EC%97%85-%ED%8F%AC%ED%95%A8-%EC%84%B1%EC%A0%81%EC%B2%98%EB%A6%AC-%EA%B4%80%EB%A0%A8-%EC%95%88%EB%82%B4&keyword",
    "postedAt": "2026-11-17",
@@ -413,16 +423,6 @@
    "foundAt": "2026-10-28",
    "thumb": "data/news/img/218d8b71550ae390.webp",
    "desc": "교내외 구성원 여러분의 AI 활용 경험과 수요를 바탕으로 AX(AI Transformation) 추진 방향을 구체화하고자 다음과 같이 설문조사를 실시합니다."
-  },
-  {
-   "title": "학사 2026학년도 2학기 학부생 및 대학원생 대상 폭력예방교육 실시 안내",
-   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2026%ED%95%99%EB%85%84%EB%8F%84-2%ED%95%99%EA%B8%B0-%ED%95%99%EB%B6%80%EC%83%9D-%EB%B0%8F-%EB%8C%80%ED%95%99%EC%9B%90%EC%83%9D-%EB%8C%80%EC%83%81-%ED%8F%AD%EB%A0%A5%EC%98%88%EB%B0%A9%EA%B5%90%EC%9C%A1&keyword",
-   "postedAt": "2026-10-26",
-   "school": "숭실대학교",
-   "campus": "",
-   "src": "3b348584",
-   "foundAt": "2026-10-26",
-   "desc": "해당 교육은 법정의무교육으로 미이수 시 성적조회가 제한되오니 기한 내 이수를 부탁드립니다."
   }
  ]
 }

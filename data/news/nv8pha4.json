@@ -3,6 +3,27 @@
  "updatedAt": "2026-11-18",
  "items": [
   {
+   "title": "학생설계전공 시행 안내",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=160549&noCat=500",
+   "postedAt": "2026-11-18",
+   "school": "홍익대학교",
+   "campus": "",
+   "src": "9c41077f",
+   "foundAt": "2026-11-18",
+   "desc": "학사지원팀 1. 우리 대학은 학생 스스로 학문적 관심과 진로에 맞춰 두 개 이상의 학과(부)/전공의 교과목을 융합하여 교과과정을 설계하고 이수할 수 있는 학생설계전공(student-designed major)을…"
+  },
+  {
+   "title": "2026학년도 동계계절학기 학점교류 신청 안내 (강서대학교)",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=160547&noCat=500",
+   "postedAt": "2026-11-18",
+   "kind": "학사",
+   "school": "홍익대학교",
+   "campus": "",
+   "src": "9c41077f",
+   "foundAt": "2026-11-18",
+   "desc": "2026학년도 동계계절학기에 강서대학교에서 개설한 강좌를 수강하고자 하는 학생은 다음 사항을 참고하여 신청하기 바랍니다."
+  },
+  {
    "title": "[모집] 2027 AI 실무 트렌드 마스터 : 차세대 Web App 빌드업 챌린지 교육",
    "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=160519&noCat=514",
    "postedAt": "2026-11-18",
@@ -414,28 +435,6 @@
    "foundAt": "2026-10-27",
    "thumb": "data/news/img/8c85031f0caf9104.webp",
    "desc": "학생활동 영자신문 📝모집 인원 : 0명 📝모집 부문 : 취재기자 0명 📝주요 업무 &bull; 기자: 연 4회 간행물 발행에 따른 기사 작성 및 그에 필요한 활동 📝지원 자격 : 2026년 2학기 재학생 중…"
-  },
-  {
-   "title": "2026학년도 2학기 천원의 아침밥 운영 기한 안내 (서울캠퍼스)",
-   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159614&noCat=500",
-   "postedAt": "2026-10-27",
-   "school": "홍익대학교",
-   "campus": "",
-   "src": "9c41077f",
-   "foundAt": "2026-10-27",
-   "desc": "홍익대학교 서울캠퍼스 천원의 아침밥 운영 기한을 다음과 같이 안내하오니 재학생들의 많은 이용 바랍니다 ."
-  },
-  {
-   "title": "[행사 안내] 2026 Light on 세종 개최 및 학생 참여 안내",
-   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159596&noCat=32",
-   "postedAt": "2026-10-26",
-   "kind": "행사",
-   "school": "홍익대학교",
-   "campus": "",
-   "src": "9c41077f",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/2181ed980478f227.webp",
-   "desc": "세종캠퍼스 앵커사업단(세종) 1. 셔틀버스 운행 개요 - 운행일자: 2026. 10. 30.(금) (하루)"
   }
  ]
 }
