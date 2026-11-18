@@ -1,7 +1,18 @@
 {
  "school": "상명대학교",
- "updatedAt": "2026-11-17",
+ "updatedAt": "2026-11-18",
  "items": [
+  {
+   "title": "‘청년취업사관학교 대학플러스’ 사업 출범... AI 전문교육 프로그램 ‘AIMING’으로 첫 발",
+   "url": "https://www.smu.ac.kr/webzine/today.do?mode=view&articleNo=770393&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-18",
+   "school": "상명대학교",
+   "campus": "",
+   "src": "f8a29ec6",
+   "foundAt": "2026-11-18",
+   "thumb": "data/news/img/f3cd0321d7338bd0.webp",
+   "desc": "대외협력팀 우리 대학이 AI 시대를 선도하는 창의융합형 실무 인재를 양성하기 위해 ‘청년취업사관학교 대학+’ 사업을 출범한다."
+  },
   {
    "title": "경영대학원, ‘제4회 피트니스 MBA 컨퍼런스’ 성료... 2027 피트니스 산업 대전환 전망",
    "url": "https://www.smu.ac.kr/webzine/today.do?mode=view&articleNo=770340&article.offset=0&articleLimit=10",

@@ -1,7 +1,28 @@
 {
  "school": "서울과학기술대학교",
- "updatedAt": "2026-11-17",
+ "updatedAt": "2026-11-18",
  "items": [
+  {
+   "title": "학내 정보시스템 및 전체 인터넷 서비스 일시 중단 안내",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897889&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-18",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-18",
+   "desc": "리눅스 커널 보안취약점 패치 및 메트로스위치 OS 업그레이드로 인하여 다음과 같이 학내 정보시스템의 서비스 및 인터넷 서비스가 중지됨을 알려드립니다. * 상기 작업 시간은 변동될 수 있음"
+  },
+  {
+   "title": "[교육혁신원] 2026 대학 교양교육 수요와 만족도 조사(~11.30.)",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897908&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-18",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-18",
+   "thumb": "data/news/img/de799bbdaf44ae56.webp",
+   "desc": "교육혁신원에서는 재학생들의 교양교육 만족도 향상을 위해 우리 대 학 교양 교육에 대한 <2026 대학 교양교육 수요와 만족도 조사>를 실시하여 더 나은 교양 교육과정을 운영하고자 합니다."
+  },
   {
    "title": "[생활협동조합] 11/23(월) 수시논술고사 시행에 따른 고사장 건물내 카페 운영 시간 변경(13:00~17:40)",
    "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897881&qidx=4691&cate=10&allboard=false&nowpage=1",
@@ -405,18 +426,6 @@
    "foundAt": "2026-10-21",
    "thumb": "data/news/img/0138f5a5c26ed96d.webp",
    "desc": "2026 서울과기대 교양대학 연속강연, 전쟁의 시대, 다시 묻는 평화 3강 <스펙터클이 된 전쟁: 우리는 가자지구를 어떻게 보고 있는가> 일시: 2026년 11월 3일(목) 오후 4시-6시 장소: 서울과학기술대학교…"
-  },
-  {
-   "title": "[도서관] 교양한스푼(초청강연) I, II 안내(11/4(수), 김영민 교수/11/11(수), 최은영 작가)",
-   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896775&qidx=4691&cate=10&allboard=false&nowpage=1",
-   "postedAt": "2026-10-21",
-   "kind": "행사",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "src": "4da0b96f",
-   "foundAt": "2026-10-21",
-   "thumb": "data/news/img/7676a5c7ca65bb59.webp",
-   "desc": "★★2026 교양한스푼I, II 초청강연 알림★★ 1. 참여대상: 학생 및 교직원, 지역주민 등 80명"
   }
  ]
 }

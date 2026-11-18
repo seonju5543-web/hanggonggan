@@ -1,7 +1,16 @@
 {
  "school": "계명대학교",
- "updatedAt": "2026-11-17",
+ "updatedAt": "2026-11-18",
  "items": [
+  {
+   "title": "일반대학원 학·석사연계과정 제도",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=0&pageOrder=0&cmd=2&parm_bod_uid=271999&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
+   "postedAt": "2026-11-18",
+   "school": "계명대학교",
+   "campus": "",
+   "src": "9a241a98",
+   "foundAt": "2026-11-18"
+  },
   {
    "title": "[5차수]2026학년도 2학기 학과 맞춤형 전공설계 교육 – 심리학과",
    "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271988&pageOrder=0&cmd=2&parm_bod_uid=271988&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
@@ -362,15 +371,6 @@
    "campus": "",
    "src": "9a241a98",
    "foundAt": "2026-10-21"
-  },
-  {
-   "title": "[학생성공센터] 2026학년도 2학기 학생성공 전공설계 챌린지북 참여 이벤트 안내",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271466&pageOrder=0&cmd=2&parm_bod_uid=271462&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=143&",
-   "postedAt": "2026-10-20",
-   "school": "계명대학교",
-   "campus": "",
-   "src": "9a241a98",
-   "foundAt": "2026-10-20"
   }
  ]
 }

@@ -1,7 +1,29 @@
 {
  "school": "홍익대학교",
- "updatedAt": "2026-11-17",
+ "updatedAt": "2026-11-18",
  "items": [
+  {
+   "title": "[모집] 2027 AI 실무 트렌드 마스터 : 차세대 Web App 빌드업 챌린지 교육",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=160519&noCat=514",
+   "postedAt": "2026-11-18",
+   "school": "홍익대학교",
+   "campus": "",
+   "src": "9c41077f",
+   "foundAt": "2026-11-18",
+   "thumb": "data/news/img/25f814e2f5e0a3bc.webp",
+   "desc": "<모집안내> -신청기간 : 2026.11.23(월) 10시 ~ 12.14(월) 15시 (신청링크: https://forms.gle/eBd2tFJa6qNGzaD69 ) -모집인원 : 홍익대(서울) 공과대학 재학생…"
+  },
+  {
+   "title": "[모집] 2027 파이썬을 활용한 인공지능 자율주행 모빌리티 제작 실습 교육",
+   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=160517&noCat=514",
+   "postedAt": "2026-11-18",
+   "school": "홍익대학교",
+   "campus": "",
+   "src": "9c41077f",
+   "foundAt": "2026-11-18",
+   "thumb": "data/news/img/e5c08bd85cc5f043.webp",
+   "desc": "<모집안내> -신청기간 : 2026.11.23(월) 10시 ~ 12.14(월) 15시 (신청링크: https://forms.gle/7fTjJLNsApBeQGXn7 ) -모집인원 : 홍익대(서울) 공과대학 재학생…"
+  },
   {
    "title": "2026학년도 동계계절학기 학점교류 신청 안내 (계명대학교)",
    "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=160493&noCat=500",
@@ -414,27 +436,6 @@
    "foundAt": "2026-10-26",
    "thumb": "data/news/img/2181ed980478f227.webp",
    "desc": "세종캠퍼스 앵커사업단(세종) 1. 셔틀버스 운행 개요 - 운행일자: 2026. 10. 30.(금) (하루)"
-  },
-  {
-   "title": "[세종앵커사업단] 2026년 산업별 기업설명회 안내",
-   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159589&noCat=32",
-   "postedAt": "2026-10-26",
-   "kind": "행사",
-   "school": "홍익대학교",
-   "campus": "",
-   "src": "9c41077f",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/1772fc3e895f5ce9.webp",
-   "desc": "세종캠퍼스 앵커사업단(세종) 세종일자리경제진흥원과 고려대학교 세종캠퍼스와 공동 주최하는 2026년 산업별 기업설명회를 개최합니다. 학생 및 구직자 여러분들의 많은 참여 부탁드립니다."
-  },
-  {
-   "title": "2026학년도 졸업사진 추가촬영 안내(서울캠퍼스)",
-   "url": "https://www.hongik.ac.kr/kr/newscenter/notice.do?mode=view&articleNo=159585&noCat=500",
-   "postedAt": "2026-10-26",
-   "school": "홍익대학교",
-   "campus": "",
-   "src": "9c41077f",
-   "foundAt": "2026-10-26"
   }
  ]
 }

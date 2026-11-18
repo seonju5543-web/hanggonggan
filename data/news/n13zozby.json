@@ -1,7 +1,69 @@
 {
  "school": "부산대학교",
- "updatedAt": "2026-11-17",
+ "updatedAt": "2026-11-18",
  "items": [
+  {
+   "title": "[국제처] 2027학년도 전기 외국인특별전형 입학업무 관련 아르바이트생 모집 공고",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512311",
+   "postedAt": "2026-11-18",
+   "kind": "채용",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-18"
+  },
+  {
+   "title": "[외교부] 청년의 안전한 해외진출 ! 외교부 해외안전여행 앱, 영사안전콜센터와 ...",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512309",
+   "postedAt": "2026-11-18",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-18",
+   "desc": "출국 전 , 여권 , 비자 / 신분증 , 증빙자료 사본 / 여행자보험 / 해외안전여행 앱은 필수입니다 . 해외안전여행 앱 또는 홈페이지 (www.0404.go.kr) 를 통해 아래 사항을 확인해주세요 ."
+  },
+  {
+   "title": "찬바람 같은 스트레스로부터 나를 지켜줄 심리기술훈련 7차(11월 19일까지 신청)",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512298",
+   "postedAt": "2026-11-18",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-18",
+   "desc": "7 차 주제 신체감각 및 이완을 통한 심리안정화 기술 익히기 7 차 일정 : 2026.11.20. ( 금 ) 10:30 &sim; 11:30 7 차 신청기한 : 2026.10.19.~ 2026.11.19. 18시까지"
+  },
+  {
+   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(동신대학교)",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512297",
+   "postedAt": "2026-11-18",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-18",
+   "desc": "2026학년도 겨울계절수업 동신대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
+  },
+  {
+   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(계명대학교)",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512296",
+   "postedAt": "2026-11-18",
+   "kind": "학사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-18",
+   "desc": "2026학년도 겨울계절수업 계명대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
+  },
+  {
+   "title": "[에듀테크센터] 11/20(금) Google Korea가 부산대에 찾아옵니다! ...",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512294",
+   "postedAt": "2026-11-18",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-18",
+   "desc": "[부산대학교 교육혁신본부 에듀테크센터 &times; Google for Education Partnership] 11/20(금) Google Korea에서 부산대에 찾아옵니다! (Career Meetup 행사 안내)"
+  },
   {
    "title": "「오늘, 마음의 날씨를 체크해 보세요!」 마음체크 참여 안내",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512241",
@@ -191,7 +253,6 @@
    "campus": "",
    "src": "2d0d4013",
    "foundAt": "2026-11-11",
-   "thumb": "data/news/img/a98a2e9f7b20312d.webp",
    "desc": "[부산대학교 교육혁신본부 에듀테크센터 &times; Google for Education Partnership] 📢 Google Korea에서 Software Engineer와 Technical Account…"
   },
   {
@@ -361,68 +422,6 @@
    "campus": "",
    "src": "2d0d4013",
    "foundAt": "2026-11-08"
-  },
-  {
-   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(인하대학교 이차전지)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512024",
-   "postedAt": "2026-11-06",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-08",
-   "desc": "2026학년도 겨울계절수업 인하대학교 이차전지 혁신융합대학 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
-  },
-  {
-   "title": "2026학년도 다중전공 수기공모전 수상자 발표",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512022",
-   "postedAt": "2026-11-06",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-08",
-   "desc": "2026학년도 다중전공 수기공모전에 참여해 주신 모든 분께 감사드립니다. 다중전공 선택과 이수 과정에서의 경험, 배움과 성장을 나누어 주신 참가자 여러분께 감사드리며, 수상자를 다음과 같이 안내드립니다."
-  },
-  {
-   "title": "[학사과] 2026학년도 겨울계절수업 교류 수학 안내(신라대학교)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512000",
-   "postedAt": "2026-11-05",
-   "kind": "학사",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-08",
-   "desc": "2026학년도 겨울계절수업 신라대학교 교류 수학을 다음과 같이 안내드리니, 수학을 희망하는 학생은 소속 학과사무실로 신청하여 주시기 바랍니다."
-  },
-  {
-   "title": "[국제처] 2026 동계 KNU in the World Pro...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511959",
-   "postedAt": "2026-11-03",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-03",
-   "desc": "2026 학년도 동계 서울대와 함께 우리 학생들의 글로벌 경쟁력 강화를 위해 해외 주요 기관에서의 현장학습을 중심으로 하는 국제화 프로그램을 운영하고자 합니다."
-  },
-  {
-   "title": "[AI융합교육원][Microsoft] 청년 취·창업을 위한「AI 실전 프로젝트 ...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511937",
-   "postedAt": "2026-11-03",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-03",
-   "thumb": "data/news/img/ee03dd6a978adbd1.webp"
-  },
-  {
-   "title": "[언어교육원]2026학년도 부산대학교 재학생의 외국어 학습 수요에 대한 설문 조...",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511888",
-   "postedAt": "2026-11-02",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-02",
-   "thumb": "data/news/img/7e68db4de2306e84.webp"
   }
  ]
 }

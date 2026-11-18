@@ -1,7 +1,18 @@
 {
  "school": "전북대학교",
- "updatedAt": "2026-11-17",
+ "updatedAt": "2026-11-18",
  "items": [
+  {
+   "title": "[SW중심대학사업단] 2026 AI·SW 평생교육 참가자(일반인) 모집(신청기간: ~11.22(일)까지)",
+   "url": "https://www.jbnu.ac.kr/web/Board/219981/detailView.do",
+   "postedAt": "2026-11-18",
+   "postId": "219981",
+   "school": "전북대학교",
+   "campus": "",
+   "src": "e41d3fac",
+   "foundAt": "2026-11-18",
+   "thumb": "data/news/img/2bcb311e5325085b.webp"
+  },
   {
    "title": "2026 공학페스티벌 '청년뉴턴(NEW:TURN)' 개최 및 관련 행사 안내 (포스터 인증 이벤트 11월 18일(수)까지 연장)",
    "url": "https://www.jbnu.ac.kr/web/Board/219970/detailView.do",
@@ -68,7 +79,8 @@
    "school": "전북대학교",
    "campus": "",
    "src": "e41d3fac",
-   "foundAt": "2026-11-16"
+   "foundAt": "2026-11-16",
+   "thumb": "data/news/img/413592b923637ddf.webp"
   },
   {
    "title": "<유아숲지도사> 2027년도 유아숲지도사양성과정 11기 교육생 모집",
@@ -89,7 +101,8 @@
    "school": "전북대학교",
    "campus": "",
    "src": "e41d3fac",
-   "foundAt": "2026-11-16"
+   "foundAt": "2026-11-16",
+   "desc": "⊙ 역량인증제란? - 'SW역량인증제'는 SW중심대학사업단에서 전교생을 대상으로 프로그래밍 문제해결 능력을 평가하는 무료 코딩 인증 테스트 로, 브론즈/실버/골드 3단계 레벨 인증을 통해 코딩 역량을 강화할 수…"
   },
   {
    "title": "[법정의무교육] 2026년 LMS 폭력예방교육 이수 재안내",
@@ -445,19 +458,6 @@
    "src": "e41d3fac",
    "foundAt": "2026-11-03",
    "thumb": "data/news/img/f9d397f0d787ba62.webp"
-  },
-  {
-   "title": "[조선내화] 교내 채용설명회 개최 안내",
-   "url": "https://www.jbnu.ac.kr/web/Board/219392/detailView.do",
-   "postedAt": "2026-11-03",
-   "postId": "219392",
-   "kind": "행사",
-   "school": "전북대학교",
-   "campus": "",
-   "src": "e41d3fac",
-   "foundAt": "2026-11-03",
-   "thumb": "data/news/img/6bdad3146876f0b9.webp",
-   "desc": "로딩이 오래걸리면 미리보기를 다시 눌러주세요."
   }
  ]
 }

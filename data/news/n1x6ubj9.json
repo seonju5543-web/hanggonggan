@@ -1,7 +1,61 @@
 {
  "school": "성균관대학교",
- "updatedAt": "2026-11-17",
+ "updatedAt": "2026-11-18",
  "items": [
+  {
+   "title": "카운슬링센터 촉탁직원(연구원) 채용",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142083&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-18",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-18",
+   "desc": "총괄지원팀 우리 대학 카운슬링센터에 근무할 촉탁직원(연구원)을 아래와 같이 채용합니다."
+  },
+  {
+   "title": "[마감] IBS 뇌과학이미징연구단 행정직원 채용 공고",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141591&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-18",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-18",
+   "desc": "성균관대학교 뇌과학이미징연구단(IBS-CNIR)에서 연구단의 행정업무를 함께 수행할 성실하고 역량 있는 행정직원을 모집합니다. 관심 있는 분들의 많은 지원 바랍니다."
+  },
+  {
+   "title": "[대학원팀] 4단계 BK21 대학원혁신지원사업 사업추진관리 자체직원 채용 공고",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142085&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-18",
+   "kind": "채용",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-18",
+   "desc": "- 4단계 BK21 대학원혁신사업 사업성과관리 및 지출 관련 처리 - 기타 국고사업 추진 관련 행정 지원"
+  },
+  {
+   "title": "2027학년도 수강신청 일정 안내 *사전수강신청 첨부파일 필독*",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142080&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-18",
+   "kind": "학사",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-18",
+   "desc": "선착순 수강신청 1일 2개 학년 병행 시행(시작 시간10시, 14시 분리 운영)"
+  },
+  {
+   "title": "2026학년도 겨울 계절수업 안내 (학부생)",
+   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142079&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-18",
+   "kind": "학사",
+   "school": "성균관대학교",
+   "campus": "",
+   "src": "45ec8fd1",
+   "foundAt": "2026-11-18"
+  },
   {
    "title": "★대한민국 행정·정책 전문가★ 국정전문대학원 2차 입학설명회 및 2027학년도 전기 수시전형 안내",
    "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=142071&article.offset=0&articleLimit=10",
@@ -388,62 +442,6 @@
    "foundAt": "2026-11-10",
    "thumb": "data/news/img/fcab717b905564d5.webp",
    "desc": "인공지능혁신대학원 성균관대학교 일반대학원 “AI응용공학과”는 도메인 지식과 AI 기술을 융합하여 첨단 제조 AX (AI전환)를 선도할 2027학년도 전기 수시1차 석사, 박사, 석박사통합과정 학생을 모집합니다."
-  },
-  {
-   "title": "[HUSS] 사회문제 해결 창업 프로젝트: 2026-2027 EF 헐트프라이즈(EF Hult Prize) 성균관대학교 도전팀 1차 모집 안내",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141726&article.offset=0&articleLimit=10",
-   "postedAt": "2026-11-10",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-11-10",
-   "thumb": "data/news/img/1eed00774912d096.webp",
-   "desc": "2. 참가 자격: 만 18세 이상, 2~4인 팀 (성균관대학교 학생 1명 이상 포함, 타 대학 학생 팀원 가능)"
-  },
-  {
-   "title": "2026학년도 제16회 성균토론대회 개최 안내(접수마감: 11월 27일)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141717&article.offset=0&articleLimit=10",
-   "postedAt": "2026-11-10",
-   "kind": "행사",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-11-10",
-   "thumb": "data/news/img/801ae2589aec486b.webp",
-   "desc": "학부대학 성균관대학교 학부대학에서는 미래 사회를 이끌어갈 다음 세대에게 필요한 인문학적 성찰과 통찰을 모색하고, 비판적 사고력과 논리적 의사소통 능력, 타인의 의견을 존중하고 경청하는 태도를 함양하기 위해…"
-  },
-  {
-   "title": "법학전문대학원 글로벌 커머셜 공개과정 운영 조교 모집",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141722&article.offset=0&articleLimit=10",
-   "postedAt": "2026-11-10",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-11-10",
-   "desc": "성균관대학교 법학전문대학원에서 삼성 5개社(전자/전기/SDI/디스플레이/바이오로직스) 재직자 대상 글로벌 커머셜 과정 운영을 보조할 조교를 다음과 같이 모집합니다. 관심 있는 학생 여러분들의 많은 지원 바랍니다."
-  },
-  {
-   "title": "디지털교육혁신원 교육혁신팀 자체계약직원(PD 및 디자이너) 채용 공고 (2차)",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141706&article.offset=0&articleLimit=10",
-   "postedAt": "2026-11-09",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-11-09",
-   "desc": "디지털교육혁신원 우리대학 교육혁신팀에서 근무할 자체계약직원을 다음과 같이 채용합니다."
-  },
-  {
-   "title": "문과대학 사학과 행정조교 모집",
-   "url": "https://www.skku.edu/skku/campus/skk_comm/notice01.do?mode=view&articleNo=141701&article.offset=0&articleLimit=10",
-   "postedAt": "2026-11-09",
-   "kind": "채용",
-   "school": "성균관대학교",
-   "campus": "",
-   "src": "45ec8fd1",
-   "foundAt": "2026-11-09",
-   "desc": "※ 개인정보는 행정조교 채용 목적으로만 수집/이용되며, 수집한 정보는 모집 종료 후 일괄 폐기합니다"
   }
  ]
 }

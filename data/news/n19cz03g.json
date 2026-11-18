@@ -1,7 +1,30 @@
 {
  "school": "한국외국어대학교",
- "updatedAt": "2026-11-17",
+ "updatedAt": "2026-11-18",
  "items": [
+  {
+   "title": "[글로벌]보건실-사랑의 헌혈 운동 안내(2026. 11. 18.(수)- 학생회관앞 주차장)",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/271400/artclView.do",
+   "postedAt": "2026-11-02",
+   "kind": "생활",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-11-18",
+   "desc": "글로벌캠퍼스 보건실에서는 대한적십자사 주관으로 [사랑의 헌혈 운동]을 실시할 예정입니다. 학생 및 교직원분들의 많은 참여 바랍니다."
+  },
+  {
+   "title": "2026 반도체 소부장 기업 채용설명회",
+   "url": "https://www.hufs.ac.kr/bbs/hufs/2180/271932/artclView.do",
+   "postedAt": "2026-11-18",
+   "kind": "행사",
+   "school": "한국외국어대학교",
+   "campus": "",
+   "src": "54a450a4",
+   "foundAt": "2026-11-18",
+   "thumb": "data/news/img/ebdd9142be7fd6ae.webp",
+   "desc": "안녕하세요, 한국외국어대학교 G-앵커사업단입니다. 우리 사업단에서는 한국외대 학생 여러분의 진로 탐색 및 우수 반도체 기업 취업 지원을 위해 「2026 반도체 소부장 기업 채용설명회 및 부스 상담」을 개최합니다."
+  },
   {
    "title": "2026학년도 동계방학기간 한국외국어대학교 글로벌홀 기숙사생 모집 공고",
    "url": "https://www.hufs.ac.kr/bbs/hufs/2180/271704/artclView.do",

@@ -1,7 +1,18 @@
 {
  "school": "부경대학교",
- "updatedAt": "2026-11-17",
+ "updatedAt": "2026-11-18",
  "items": [
+  {
+   "title": "2027학년도 대학수학능력시험 시행일 관련 11.19.(목) 상상옷장 운영시간 조정 안내 알림",
+   "url": "https://www.pknu.ac.kr/main/163?action=view&no=727055",
+   "postedAt": "2026-11-18",
+   "kind": "생활",
+   "school": "부경대학교",
+   "campus": "",
+   "src": "53a197d6",
+   "foundAt": "2026-11-18",
+   "desc": "학생성공지원과 안녕하세요 국립부경대학교 상상옷장입니다 : ) 2027학년도 대학수학능력시험이 시행됨에 따라 2026. 11. 19.(목) 은 상상옷장을 10:00부터 운영 하오니 이용에 참고하시기 바랍니다."
+  },
   {
    "title": "[학생조교모집] 2026 부경글로벌메이트(PKNU GlobalMATE) 학생조교 선발(~11/22까지)",
    "url": "https://www.pknu.ac.kr/main/163?action=view&no=727040",
@@ -417,16 +428,6 @@
    "src": "53a197d6",
    "foundAt": "2026-11-02",
    "thumb": "data/news/img/c0509f4b670a9d98.webp"
-  },
-  {
-   "title": "★글로벌언어집중강좌(GLIP) 세션4 수강생 모집 안내",
-   "url": "https://www.pknu.ac.kr/main/163?action=view&no=726805",
-   "postedAt": "2026-10-30",
-   "school": "부경대학교",
-   "campus": "",
-   "src": "53a197d6",
-   "foundAt": "2026-10-31",
-   "desc": "글로벌어학교육센터에서 아래와 같이 글로벌언어 집중 강좌 수강생을 아래와 같이 모집 하오니 관심 있는 학생의 많은 지원 바랍니다."
   }
  ]
 }

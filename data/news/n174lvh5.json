@@ -1,7 +1,18 @@
 {
  "school": "가톨릭대학교",
- "updatedAt": "2026-11-17",
+ "updatedAt": "2026-11-18",
  "items": [
+  {
+   "title": "[학생생활상담소] 2026년 겨울방학 집단상담 1차 신청 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277937&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-18",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-18",
+   "thumb": "data/news/img/893bc7b31db27fa6.webp",
+   "desc": "[학생생활상담소] 2026학년도 겨울방학 집단상담 참가자 모집 안녕하세요, 학생생활상담소입니다. 학생생활상담소에서는 여러분의 건강한 대학생활을 돕기 위해 다양한 집단상담 프로그램을 운영합니다."
+  },
   {
    "title": "[입학처] 신입생(26학번) 대상 설문 진행(5천원 상당 음료 기프티콘 제공 *선착순 400명)",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277855&article.offset=0&articleLimit=10",
@@ -420,17 +431,6 @@
    "src": "5d85d287",
    "foundAt": "2026-10-26",
    "desc": "취업·진로 관련 정보와 서비스를 한곳에서 통합 제공하는 가톨릭대학교 대학일자리플러스센터 홈페이지 가 새롭게 문을 열었습니다."
-  },
-  {
-   "title": "[융합전공학부] 2026-2학기 학생설계전공 홍보 이벤트 '나만의 전공 커스텀' 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277049&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-26",
-   "kind": "학사",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/ab9577d99990f4ae.webp"
   }
  ]
 }
