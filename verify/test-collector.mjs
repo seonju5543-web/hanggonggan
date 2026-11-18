@@ -16906,8 +16906,10 @@ console.log('■ CodeQL 보안 경고 수리 (2026-11-18 · #55~#59) — 되돌�
   eq('#58 겹친 <script> 와 </script > 를 남김없이 지운다', screenText('x<scr<script>1</script>ipt>alert(1)</script >y'), 'xy');
   /* #56 HTML 훑기 — </script > 뒤 글자를 화면 글자로 읽지 않는다 */
   const { htmlTexts } = req('./no-unknown-scan.cjs');
-  eq('#56 htmlTexts 가 </script > 안쪽 글자를 화면 글자로 안 읽는다',
-    htmlTexts('<p>보임</p><script>var 숨김=1</script >').map((t) => t.text).join('').includes('숨김'), false);
+  eq('#56·#60 htmlTexts 가 </script > · </script\\t\\n bar> 안쪽 글자를 화면 글자로 안 읽는다',
+    [htmlTexts('<p>보임</p><script>var 숨김=1</script >'), htmlTexts('<p>보임</p><script>var 숨김=1</script\t\n bar>뒤')]
+      .map((ts) => ts.map((t) => t.text).join('').includes('숨김')), [false, false]);
+  eq('#60 screenText 도 </script\\t\\n bar> 를 닫는 태그로 본다', screenText('a<script>x</script\t\n bar>b'), 'ab');
   /* #55 느려지는 패턴 — 「!==\t」 반복 줄에서 순식간에 끝나야 한다(옛 패턴은 24번 반복에 7.7초 · 40번이면 끝나지 않는다 →
      22번으로 둔다: 옛 패턴이 되돌아오면 몇 초 걸려 '실패'로 끝나고, 검사가 멈춰 버리지는 않는다) */
   const { swallowed } = await import('./health-gates/savegate.mjs');

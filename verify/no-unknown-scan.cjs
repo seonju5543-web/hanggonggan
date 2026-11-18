@@ -58,8 +58,9 @@ function jsStrings(src) {
 /* HTML — 주석·<script>·<style> 을 뺀 글자와 속성값(줄 번호와 함께) */
 function htmlTexts(src) {
   const blank = (m) => m.replace(/[^\n]/g, ' ');
-  /* 닫는 태그는 `</script >`·`</style\n>` 처럼 빈칸이 끼어도 잡는다(2026-11-18 · CodeQL #56 — 안 잡으면 그 뒤 스크립트 글자까지 화면 글자로 훑는다) */
-  const s = src.replace(/<!--[\s\S]*?-->/g, blank).replace(/<script\b[\s\S]*?<\/script\s*>/gi, blank).replace(/<style\b[\s\S]*?<\/style\s*>/gi, blank);
+  /* 닫는 태그는 `</script >`·`</script\t\n bar>` 처럼 빈칸·군글자가 끼어도 잡는다 — 브라우저는 그것도 닫는 태그로 읽는다
+     (2026-11-18 · CodeQL #56·#60 — 안 잡으면 그 뒤 스크립트 글자까지 화면 글자로 훑는다) */
+  const s = src.replace(/<!--[\s\S]*?-->/g, blank).replace(/<script\b[\s\S]*?<\/script\b[^>]*>/gi, blank).replace(/<style\b[\s\S]*?<\/style\b[^>]*>/gi, blank);
   return s.split('\n').map((t, k) => ({ text: t, line: k + 1 }));
 }
 
