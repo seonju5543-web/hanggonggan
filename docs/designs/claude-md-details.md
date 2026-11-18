@@ -56,3 +56,18 @@ CLAUDE.md 가 60KB 천장 가까이 붙어 있어, 긴 항목은 거기에 🔴 
 | `collector/activity-docs.mjs` | 대외활동 자격 **출처만** 늘리는 곳 — 본문 → 요강 페이지 → HWP·DOCX → 그림·PDF(PaddleOCR `collector/paddle-ocr.py`) → 유료 AI(꺼짐). 🔴 자격 줄 고르기는 늘 `activityDetails` 하나 · 남의 글 막기는 `ownsImageText` · 받은 파일은 커밋 안 함 · 관문 「대외활동·공모전 — 첨부·포스터 읽기」 |
 | `collector/deepfetch.mjs` `rescue-bodies.mjs` | 본문·첨부 원본 받기 · **자격요건 로봇**(`.github/workflows/rescue-bodies.yml` · 진짜 크롬 · 하루 두 번) — 장학 본문 재수집 + 대외활동 `activity-docs.mjs --browser`. 🔴 진짜 브라우저로 자격을 찾는 로봇은 이것 하나(하나 더 만들면 같은 공고를 두 번 두드린다) · `data/activities.json` 은 안 쓰고 장부 act-browser.json 에만(수집 로봇이 합친다) |
 | `collector/link-hunter.mjs` `probe-links.mjs` `resolve-detail-urls.mjs` `detail-url.mjs` `kosaf-hunt.mjs` | 원문 주소 찾기 · 정찰 · 주소 규칙 · 층2 → 재단 개별 공고 후보(재단 홈페이지를 뒤져 `kosaf-hunt.json` 에 · 확인은 link-check · 관문 「층2 재단 글 사냥꾼」) |
+
+## 아키텍처 표 (원문 행 · 둘째 묶음)
+
+| 파일 | 역할 |
+|---|---|
+| `data/news/` | 교내 소식(학교 공지 게시판 · 제목+링크+수집일 + 그 글의 사진 썸네일 `data/news/img/<해시>.webp` · **학교별 파일뿐** · 옛 통짜 파일 없음) — `docs/designs/news-feed.md` |
+| `collector/collect.mjs` `browser-collect.mjs` | 게시판 수집(일반·진짜 Chromium) — 일반 수집기가 같은 행에서 대외활동·공모전도 갈라 담는다(`activity-kind.mjs` · 출처 `activity-sources.json`) |
+| `collector/kind-evidence.mjs` `kind-classify.mjs` `scope-promote.mjs` `registered-merge.mjs` `docs-fill.mjs` | 교내·교외 증거 판정 · 원문 도착 뒤 소급 판정(학습 표 `own-programs.json`) · 학교 한정 → 전국 승격 · 합치기 한 곳 · 서류 칸 채우기 |
+| `docs/designs/data-model.md` `docs/designs/data-flow.md` `docs/designs/security-rules.md` | **설계 문서 셋** (고문 보고서 Q12) — 저장소 다섯이 각각 무엇을 담는가 · 공고가 폰까지 가는 길과 어디서 끊기는가 · 권한·보안 약속과 그 관문. 사본이라 관문 「CLAUDE.md 가 가리키는 것이 실제로 있다」가 같이 잰다(11-18부터 `docs/designs/news-feed.md`·`docs/designs/activities-tab.md` 도) |
+
+## 날짜에 묶였던 상태 줄 (원문 · 11-18 기준)
+
+- 매 세션 8번의 괄호: (`card-read.yml` 은 11-15 지시로 만들었지만 스위치 `card-read-config.json` 은 리뷰 뒤 꺼 둠 — 켜는 것도 지시 때만)
+- **노션에 없고 여기서만 사는 것**: ① 열쇠 만료일은 `docs/backend/keys.json` 한 곳(매일 `key-expiry.yml` 이 14일 전 경보 · 관리자 화면 열쇠는 11-11 재발급).
+  🔴 인스타 토큰은 11-18 현재 **재발급 안 됨**(시크릿 `IG_ACCESS_TOKEN` 마지막 갱신 09-12 · 경보 이슈 #519 · 절차 `insta/README.md`) ② 재조사 금지: KOSAF 는 재단은 100% 알지만 **이번 회차는 19%만** 알고 신청서 양식 첨부가 없다(`collector/kosaf-fetch.mjs` 머리말).
