@@ -20,23 +20,6 @@
   "at": "2026-11-14",
   "tries": 2
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3544550": {
-  "at": "2026-11-12",
-  "tries": 1,
-  "lines": [
-   "아동·청소년",
-   "활동구분",
-   "오프라인",
-   "1. 활동 일시 : 2026.11.19.(목) 06:30~09:30 (※집결시간 :6시20분까지)",
-   "2. 활동 장소 : 대구상원고등학교, 영남고등학교 정문 일대 (※집결: 대구상원고등학교 정문 앞)",
-   "3. 활동 인원 : 20대 대학생 20명(남녀무관)",
-   "4. 활동 내용 : 수능 격려 물품 전달 등",
-   "[봉사장소 지도] 지도 건너뛰기",
-   "봉사자유형 : 성인"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
  "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3549461": {
   "at": "2026-11-13",
   "tries": 1,
@@ -172,18 +155,6 @@
   "at": "2026-11-16",
   "tries": 1
  },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3544547": {
-  "at": "2026-11-17",
-  "tries": 1,
-  "lines": [
-   "아동·청소년",
-   "봉사자유형 : 성인",
-   "신청대상 : 성인",
-   "신청대상 : 성인·청소년"
-  ],
-  "excludes": [],
-  "from": "브라우저 본문"
- },
  "https://www.youthcenter.go.kr/bbs03View/48/10889": {
   "at": "2026-11-17",
   "tries": 1
@@ -225,10 +196,6 @@
   "tries": 1
  },
  "https://www.kookmin.ac.kr/user/kmuNews/notice/9/12569/view.do?currentPageNo=1": {
-  "at": "2026-11-17",
-  "tries": 1
- },
- "https://1365.go.kr/vols/P9210/partcptn/timeCptn.do?type=show&progrmRegistNo=3551501": {
   "at": "2026-11-17",
   "tries": 1
  }
