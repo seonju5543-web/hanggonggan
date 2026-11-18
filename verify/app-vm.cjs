@@ -85,6 +85,9 @@ function loadApp({ profile = null, kosaf = [], registered = [], read = (f) => fs
 }
 
 /* HTML → 화면 글자(태그를 줄바꿈으로) */
-const screenText = (html) => String(html || '').replace(/<(script|style)[\s\S]*?<\/\1>/g, '').replace(/<[^>]+>/g, '\n').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/[ \t]+/g, ' ').replace(/\n\s*/g, '\n').trim();
+/* 🔴 (2026-11-18 · CodeQL #57·#58) ① <script>/<style> 덩어리는 더 지울 것이 없을 때까지 지운다(한 번만 지우면 「<scr<script></script>ipt>」 꼴이 남는다) ·
+   닫는 태그는 `</script >` 처럼 빈칸이 있어도 잡는다 ② `&amp;` 는 **맨 마지막에** 푼다 — 먼저 풀면 화면에 「&lt;」로 보이는 글자가 「<」로 두 번 풀린다(decodeEntities 와 같은 규칙) */
+const stripBlocks = (s) => { let prev; do { prev = s; s = s.replace(/<(script|style)\b[\s\S]*?<\/\1\s*>/gi, ''); } while (s !== prev); return s; };
+const screenText = (html) => stripBlocks(String(html || '')).replace(/<[^>]+>/g, '\n').replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/[ \t]+/g, ' ').replace(/\n\s*/g, '\n').trim();
 
 module.exports = { loadApp, topLevelDecls, screenText };

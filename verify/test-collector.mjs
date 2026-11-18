@@ -16896,5 +16896,33 @@ console.log('■ 입력 안전장치 (2026-11-17 · HDJ-요청-2026-001 후속) 
   eq('  공고 「미확인 자격」 숫자 칸도 type="number" 가 아니다', /f\.kind === 'number'\s*\n?\s*\? ` type="number"/.test(app), false);
 }
 
+console.log('■ CodeQL 보안 경고 수리 (2026-11-18 · #55~#59) — 되돌아오면 실패한다');
+{
+  const req = createRequire(import.meta.url);
+  /* #57 이중 해제 — 화면에 「&lt;」로 보이는 글자를 「<」로 두 번 풀면 안 된다(&amp; 는 맨 마지막) */
+  const { screenText } = req('./app-vm.cjs');
+  eq('#57 screenText 는 &amp;lt; 를 화면 그대로 &lt; 로 둔다', screenText('a &amp;lt;b&amp;gt; c'), 'a &lt;b&gt; c');
+  /* #58 스크립트 덩어리는 더 지울 것이 없을 때까지 · 닫는 태그 빈칸도 */
+  eq('#58 겹친 <script> 와 </script > 를 남김없이 지운다', screenText('x<scr<script>1</script>ipt>alert(1)</script >y'), 'xy');
+  /* #56 HTML 훑기 — </script > 뒤 글자를 화면 글자로 읽지 않는다 */
+  const { htmlTexts } = req('./no-unknown-scan.cjs');
+  eq('#56 htmlTexts 가 </script > 안쪽 글자를 화면 글자로 안 읽는다',
+    htmlTexts('<p>보임</p><script>var 숨김=1</script >').map((t) => t.text).join('').includes('숨김'), false);
+  /* #55 느려지는 패턴 — 「!==\t」 반복 줄에서 순식간에 끝나야 한다(옛 패턴은 24번 반복에 7.7초 · 40번이면 끝나지 않는다 →
+     22번으로 둔다: 옛 패턴이 되돌아오면 몇 초 걸려 '실패'로 끝나고, 검사가 멈춰 버리지는 않는다) */
+  const { swallowed } = await import('./health-gates/savegate.mjs');
+  const t0 = Date.now();
+  swallowed(['! ' + '!==\t'.repeat(22) + 'x verify/test-collector.mjs'], 0);
+  eq('#55 savegate swallowed 가 반복 줄에서 0.5초 안에 끝난다', Date.now() - t0 < 500, true);
+  eq('  뜻은 그대로 — `! FOO=1 node verify/test-collector.mjs` 는 삼킨다 · 그냥 부르는 줄은 아니다',
+    [swallowed(['! FOO=1 node verify/test-collector.mjs'], 0), swallowed(['node verify/test-collector.mjs'], 0)], [true, false]);
+  /* #59 괄호 조각 떼기 — 지운 자리에서 새 짝이 생겨도 남김없이 */
+  const { dropBracketed } = await import('../collector/doc-list.mjs');
+  /* 결과에 다시 돌려도 더 지울 것이 없어야 한다(한 번만 지우는 옛 방식이 CodeQL 경고였다) */
+  const tricky = '서류<<a>b> (첨부(양식)) 1부';
+  eq('#59 dropBracketed 결과는 다시 돌려도 그대로다(남김없이 뗐다)', dropBracketed(dropBracketed(tricky)), dropBracketed(tricky));
+  eq('  보통 줄은 한 번 지운 것과 같다', dropBracketed('성적증명서 (원본) 1부'), '성적증명서  1부');
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
