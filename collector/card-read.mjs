@@ -223,7 +223,10 @@ export function agree(va, vb, item, source = '') {
   for (const k of LIST_FIELDS) {
     const A = va.kept[k], B = vb.kept[k];
     if (!A.length && !B.length) { final[k] = []; continue; }
-    if (fieldAgree(A, B)) { final[k] = A.slice(); continue; }
+    /* 엄격 칸은 지름길에 조건을 하나 더 — 양쪽의 **모든 줄**이 상대 칸에 있어야 한다(같은 줄이거나 상대 칸 글자 안에 통째로).
+       2026-11-18 리뷰: 한쪽에만 있는 짧은 요건 한 줄(숫자·부정 없음 — 「다자녀 가정의 자녀」)은 겹침 0.9 를 넘겨 그 줄 없이 실렸다 */
+    const covered = (X, Y) => { const y = norm(Y.join('')); return X.every((l) => Y.some((o) => sameLine(l, o)) || y.includes(norm(l))); };
+    if (fieldAgree(A, B) && (!STRICT_FIELDS.has(k) || (covered(A, B) && covered(B, A)))) { final[k] = A.slice(); continue; }
     const ok = [], miss = [];
     for (const line of A) (B.some((o) => sameLine(line, o)) ? ok : miss).push({ field: k, line, why: '둘째 읽기에 없음' });
     for (const line of B) if (!A.some((o) => sameLine(o, line))) miss.push({ field: k, line, why: '첫째 읽기에 없음' });
@@ -255,10 +258,16 @@ export function buildEntry(item, source, outA, outB, wonIn) {
   /* 🔴 엄격 칸(자격·제외·서류)에서 한쪽이 낸 줄이 기계 대조에서 떨어졌으면 그 칸은 싣지 않는다 — 남은 줄만 실으면 요건이 빠진 목록이 된다(틀린 안심).
      2026-11-18 첫 실제 읽기: 한 칸씩 흩어진 표를 첫째 읽기가 짜 맞춘 「TOEIC 950/990」 열 줄이 떨어지자 어학 점수 없는 자격 두 줄만 실렸다. 빈 배열로도 안 싣는다(무료 길 값을 지운다) */
   for (const k of STRICT_FIELDS) {
-    const lost = dropped.filter((x) => x.field === k);
+    const lost = dropped.filter((x) => x.field === k && String(x.line || '').replace(/[\s\-–·.]/g, ''));   // 빈 줄·줄표뿐인 줄은 빠진 요건이 아니다(리뷰)
     if (!lost.length || final[k] === null) continue;
     held.push(...lost.map((x) => ({ field: k, line: x.line, why: `대조에서 떨어진 줄이 있어 칸을 싣지 않음 — ${x.why}` })));
     final[k] = null;
+  }
+  /* 🔴 제외 칸이 보류(null)면 자격 칸도 싣지 않는다 (2026-11-18 리뷰 · 실제 2건) — 앱은 유료 자격이 실리면 무료 길의 자격 줄을 통째로 갈아 끼우는데,
+     무료 길은 「받을 수 없는 경우」 줄을 그 자격 줄 사이에서 골라 보인다. 유료 자격만 실으면 그 줄(「신입생·편입생은 첫 학기 신청 불가」)이 화면 어디에도 없다 */
+  if (final.excludes === null && Array.isArray(final.eligibility)) {
+    held.push(...final.eligibility.map((line) => ({ field: 'eligibility', line, why: '제외 칸이 보류돼 자격 칸도 싣지 않음(무료 길 값 그대로)' })));
+    final.eligibility = null;
   }
   const filled = LIST_FIELDS.some((k) => final[k] && final[k].length) || !!final.deadline;
   if (unreadable || !filled) return { entry: null, held, dropped, unreadable: true };
@@ -274,7 +283,7 @@ export function buildEntry(item, source, outA, outB, wonIn) {
 export function sourceText(parts) { return parts.map((x) => `===== ${x.label} =====\n${x.text}`).join('\n\n'); }
 /* 🔴 조회수는 원문이 아니다 — 본문을 다시 받을 때마다 그 숫자만 바뀌어 같은 공고를 돈 내고 또 읽힌다(2026-11-18 실측: 나흘에 839건 중 27건 · 전부 조회수뿐).
    ponytail: 이름표(「조회수」) 붙은 숫자만 뗀다 — 이름표 없이 숫자만 한 줄인 조회수(dep.hufs 브라우저 본문)는 못 잡는다. 숫자뿐인 줄을 다 떼면 표 칸(「300」)이 바뀐 것을 놓친다. 새는 돈이 보이면 게시판별 머리 줄을 자르는 쪽으로 */
-const hashText = (text) => String(text).replace(/(조회\s?수)\s*:?\s*\d[\d,]*/g, '$1');
+const hashText = (text) => String(text).replace(/(조회\s?수)\s*:?\s*\d[\d,]*(?![\d,.\-/~%가-힣A-Za-z])/g, '$1');   // 뒤에 글자·기호가 붙은 숫자(「2027학년도」·「300만원」·「11.26까지」)는 조회수가 아니라 내용이다(리뷰)
 export const sourceHash = (text) => crypto.createHash('sha256').update(SYSTEM).update('\n').update(hashText(text)).digest('hex').slice(0, 16);   // 지시문이 바뀌어도 다시 읽는다
 export function makeSources({ texts, browserBodies, eligDocs, extractedDir }) {
   const idx = indexTexts(texts, browserBodies || {});

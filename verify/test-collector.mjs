@@ -9469,11 +9469,12 @@ console.log('\n■ 환영 화면 문구 (2026-09-12 · UI-22)');
   /* 2026-11-17 입력 안전장치(9351b8a6)가 완료 버튼에 '있을 수 없는 값'(평점 999) 되돌림을 넣었는데 이 검사를 같이 옮기지 않아
      기본 브랜치의 규칙 관문이 빨개졌다(수집 로봇들이 저장 전 관문에서 멈췄다 · 11-18 수리). 그 블록은 빈 칸을 통과시키므로(아래 줄) 문구는 여전히 참이다 —
      그 한 블록만 떼고 본다 · 다른 return 이 생기면 그대로 걸린다 */
-  const finRest = fin.replace(/const bad = guardFirstBad\(\$\('#screen-onboarding'\)\);\n\s*if \(bad\) \{[\s\S]*?\n    \}\n/, '');
+  const stripGuard = (f) => f.replace(/const bad = guardFirstBad\(\$\('#screen-onboarding'\)\);\n\s*if \(bad\) \{[\s\S]*?\n    \}\n/, '');
+  const finRest = stripGuard(fin);
   eq('완료 버튼은 도중에 막지 않는다 (막으면 문구가 거짓이 된다) — 있을 수 없는 값 되돌림(guardFirstBad) 한 블록만 예외', /\breturn;/.test(finRest), false);
   const IG0 = createRequire(import.meta.url)('../input-guard.js');
   eq('  그 되돌림은 빈 칸을 막지 않는다 (막으면 「학교·학년만」 문구가 거짓이 된다) · 다른 return 을 넣으면 걸린다',
-    [IG0.checkNumber('', IG0.PROFILE_LIMITS.gpa || { min: 0, max: 4.5, label: '평점' }).ok, IG0.checkBirthDate('').ok, /\breturn;/.test(`${finRest}\n    if (!x) return;`)], [true, true, true]);
+    [IG0.checkNumber('', IG0.PROFILE_LIMITS.gpa || { min: 0, max: 4.5, label: '평점' }).ok, IG0.checkBirthDate('').ok, fin.includes('onboardEditing = false;') && /\breturn;/.test(stripGuard(fin.replace('onboardEditing = false;', 'if (!x) return;\n    onboardEditing = false;')))], [true, true, true]);
 }
 
 console.log('\n■ 이어보기 판정 (2026-09-09)');
@@ -16630,6 +16631,16 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
   const beDropNote = CR.buildEntry(ITEM, SRC, { ...full, notes: ['TOEIC 950/990 이상인 자'] }, full, wonIn);
   eq('  🔴 자격·제외·서류에서 한쪽이 낸 줄이 기계 대조에서 떨어지면 그 칸은 싣지 않는다(null) — 남은 줄만 실으면 핵심 요건이 빠진 목록이 된다 · 빈 배열로도 안 싣는다 · 다른 칸(유의)의 떨어진 줄은 자격을 안 건드린다',
     [beDrop.entry.eligibility, beDrop.held.some((h) => h.field === 'eligibility' && /TOEIC/.test(h.line)), beDropBoth.entry.eligibility, (beDropNote.entry.eligibility || []).length], [null, true, null, 2]);
+  /* 2026-11-18 독립 리뷰가 낸 반례 셋 */
+  const vk = (elig) => ({ kept: { ...A1.kept, eligibility: elig }, dropped: [] });
+  const agX = CR.agree(vk(three), vk([...three, '다자녀 가정의 자녀']), ITEM), agSplit = CR.agree(vk(three), vk([three.join(' ')]), ITEM);
+  eq('  🔴 한쪽 읽기에만 있는 짧은 요건 한 줄(숫자·부정 없음)은 「칸 전체가 거의 같다」로 넘어가지 못한다 — 자격 칸을 싣지 않고 그 줄을 넘긴다 · 줄을 다르게 나눴을 뿐이면 그대로 싣는다',
+    [agX.final.eligibility, agX.held.some((h) => h.field === 'eligibility' && h.line === '다자녀 가정의 자녀'), agSplit.final.eligibility], [null, true, three]);
+  const beEx = CR.buildEntry(ITEM, SRC, { ...full, excludes: ['대학원생, 휴학생'] }, { ...full, excludes: [] }, wonIn);
+  eq('  🔴 제외 칸이 보류되면 자격 칸도 싣지 않는다 — 유료 자격만 실으면 무료 길이 자격 줄 사이에서 골라 주던 「받을 수 없는 경우」 줄이 화면에서 사라진다(실제 2건)',
+    [beEx.entry.excludes, beEx.entry.eligibility, (beEx.entry.amount || []).length], [null, null, 1]);
+  eq('  🔴 「조회수」 바로 뒤가 조회수가 아니라 내용의 숫자(연도·금액·날짜)면 떼지 않는다 — 떼면 바뀐 원문을 같은 원문으로 본다',
+    [CR.sourceHash('조회수\n2027학년도 1학기 교내장학') === CR.sourceHash('조회수\n2026학년도 1학기 교내장학'), CR.sourceHash('조회수\n300만원 지급') === CR.sourceHash('조회수\n500만원 지급'), CR.sourceHash('조회수\n11.26까지') === CR.sourceHash('조회수\n12.26까지')], [false, false, false]);
   eq('  🔴 조회수만 바뀐 원문은 같은 원문이다(다시 읽히지 않는다 — 본문을 다시 받을 때마다 숫자만 바뀐다 · 나흘에 839건 중 27건) · 내용의 숫자가 바뀌면 다른 원문',
     [CR.sourceHash('작성일\n2026.10.26\n조회수\n235\n평점 3.0 이상') === CR.sourceHash('작성일\n2026.10.26\n조회수\n236\n평점 3.0 이상'), CR.sourceHash('2026-09-07 조회수 307\n작성자') === CR.sourceHash('2026-09-07 조회수 1,312\n작성자'),
       CR.sourceHash('조회수\n235\n평점 3.0 이상') === CR.sourceHash('조회수\n235\n평점 3.5 이상'), CR.sourceHash('조회수\n235\n2026.11.23') === CR.sourceHash('조회수\n235\n2026.11.30')], [true, true, false, false]);

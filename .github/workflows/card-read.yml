@@ -55,6 +55,8 @@ jobs:
         run: |
           set -o pipefail
           node verify/test-collector.mjs | tail -40
+          # 데이터 감사도 **돈을 쓰기 전에** 한 번 — 다른 로봇 탓에 감사가 빨간 날은 읽고도 저장을 못 해, 같은 공고를 하루 두 번씩 다시 사게 된다(2026-11-18 리뷰)
+          node verify/audit-data.js | tail -15
 
       # 일부 공고가 실패해도(로봇은 실패가 있으면 1 로 끝난다) 읽은 것은 저장한다 — 그래서 continue-on-error. 실패는 아래 알림 단계가 알린다
       - id: read
