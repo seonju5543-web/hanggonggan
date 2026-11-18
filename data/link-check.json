@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-18T00:09:22.654Z",
+ "updatedAt": "2026-11-18T17:27:56.045Z",
  "v": 1,
  "bad": {
   "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11401": {
@@ -71,10 +71,6 @@
    "at": "2026-11-18"
   },
   "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53682&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-   "v": "other",
-   "at": "2026-11-18"
-  },
-  "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1511959": {
    "v": "other",
    "at": "2026-11-18"
   },
