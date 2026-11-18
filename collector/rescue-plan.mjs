@@ -127,6 +127,31 @@ export const ATT_BUDGET_MS = 20000;
 /** 받을 수 있는 주소인가 — http(s) 만. `javascript:`·빈 주소·`#` 는 앱이 이름만 보인다(app.js attachmentLinkHtml) */
 export const usableUrl = (u) => /^https?:\/\//i.test(String(u || '').trim());
 
+/* 🔴 **공고 화면 자신의 주소는 첨부 주소가 아니다** (2026-11-18 · 제보 "PDF 등 문서가 앱에 안 올라오거나 일부만").
+   브라우저는 `href="#"`·`href=""`·`href="#none"` 을 **화면 주소로 풀어** 준다(a.href) — http(s) 라 usableUrl 을 통과해,
+   학생이 「신청서.hwp」를 누르면 파일이 아니라 공고 화면이 다시 열렸다(서울시립대 언론인회 신청서·자기소개서 · 11-17 첫 실행이 적음).
+   게다가 장부가 '받을 주소 있음'으로 세어(attGap 0) 다시 살피지도, 경보를 내지도 않았다. 옛 로봇의 `화면#n-파일이름` 표식(서울과기대)도 같은 꼴이다.
+   비교는 조각(#…)을 떼고 한다 — 파일 주소에 조각이 붙어도 서버가 받는 주소는 같다. */
+export function pageSelfUrl(u, pageUrls) {
+  const strip = (x) => String(x || '').replace(/&amp;/g, '&').replace(/#.*$/, '').trim();
+  const s = strip(u);
+  if (!/^https?:\/\//i.test(s)) return false;
+  return (pageUrls || []).some((p) => p && strip(p) === s);
+}
+/** 첨부 목록에서 화면 자신의 주소를 걷어 낸다 — 같은 이름에 진짜 주소 줄이 따로 있으면 그 줄을 지우고, 없으면 **이름만** 남긴다
+    (앱은 「원문 게시판에서 내려받기」 · 다음 살피기의 누르기가 진짜 주소를 채운다 · upgradeAttachmentUrls). 본문 그림은 건드리지 않는다 */
+export function dropSelfLinks(list, pageUrls) {
+  const arr = list || [];
+  const real = new Set(arr.filter((a) => a && !a.bodyImage && usableUrl(a.url) && !pageSelfUrl(a.url, pageUrls)).map((a) => normName(a.name)));
+  const out = [];
+  for (const a of arr) {
+    if (!a || a.bodyImage || !pageSelfUrl(a.url, pageUrls)) { out.push(a); continue; }
+    if (real.has(normName(a.name))) continue;
+    out.push({ ...a, url: '' });
+  }
+  return out;
+}
+
 /* 화면 글자에서 파일 이름 — 확장자로 끝나는 덩어리. 브라우저 안(census)과 여기(관문)가 같은 식을 쓴다(FILE_NAME_SRC 를 문자열로 넘긴다).
    그림 확장자는 뺀다 — 본문 그림은 따로 적고(본문이미지-…), 사이트 로고·배너 파일 이름이 글자로 보이는 일은 드물지만 첨부로 세면 경보가 헛돈다 */
 export const FILE_NAME_SRC = String.raw`([^\\/:*?"<>|\n\t]{2,120}\.(?:hwp|hwpx|pdf|docx?|xlsx?|pptx?|zip))(?=$|[\s\[\(（【])`;

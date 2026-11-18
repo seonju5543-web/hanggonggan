@@ -36,7 +36,7 @@ import { readLinkFixes, humanFixUrlBy } from './link-fixes-read.mjs';
 /* 대상 거르기·차례·장부 한 칸·첨부 합치기는 순수 함수 파일 하나에 — 이 파일은 불러오는 순간 돌아 관문이 못 부른다 */
 import { restingAfterOk, closedForStudents, orderTargets, ledgerEntry, newAttachments, pruneLedger, wantsBody,
   wantsAttachments, withAttCheck, withAttMiss, preferUsable, upgradeAttachmentUrls, attGapOf, replayOk, wrongKind, fileNameIn, usableUrl,
-  attachmentAlarms, feedAttachmentGaps, trustedAttachment, censusInPage, FILE_NAME_SRC, ATT_MAX_CLICKS, ATT_BUDGET_MS } from './rescue-plan.mjs';
+  attachmentAlarms, feedAttachmentGaps, trustedAttachment, censusInPage, FILE_NAME_SRC, ATT_MAX_CLICKS, ATT_BUDGET_MS, pageSelfUrl, dropSelfLinks } from './rescue-plan.mjs';
 import { writeFileAtomic } from './write-atomic.mjs';
 
 const { requirementLines } = createRequire(import.meta.url)('../match-engine.js');
@@ -129,7 +129,11 @@ export function pickTargets(items, idx = indexTexts(texts, bodies)) {
     const url = it.sourceUrl || '';
     if (!/^https?:\/\//.test(url) || url.includes('#n-')) continue;
     const led = ledger[canonUrl(url)];
-    if (closedForStudents(it, today) || !wantsAttachments(led, today, { restAfter: REST_AFTER, restDays: REST_DAYS })) continue;
+    /* 🔴 장부보다 지금 데이터 — 공고 화면 주소가 첨부 주소로 적혀 있으면 장부는 '다 구함(attGap 0)'으로 잘못 셌다(2026-11-18 · rescue-plan pageSelfUrl).
+       한 번도 안 살핀 것처럼 다시 본다 — 못 여는 글의 쉼(gone·tries·attTries)은 그대로 지킨다. 살피면 걷어 내므로 되풀이되지 않는다 */
+    const selfNow = (it.attachments || []).some((a) => a && !a.bodyImage && pageSelfUrl(a.url, [url]));
+    const ledNow = selfNow && led ? { ...led, att: undefined } : led;
+    if (closedForStudents(it, today) || !wantsAttachments(ledNow, today, { restAfter: REST_AFTER, restDays: REST_DAYS })) continue;
     later.push({ it, url, tries: (led && led.attTries) || 0, everOk: !!(led && led.ok), attOnly: true });
   }
   return [...orderTargets(out), ...orderTargets(later)];
@@ -367,14 +371,16 @@ for (const t of targets) {
       try {
         const until = Date.now() + ATT_BUDGET_MS;
         const at = page.url();
+        /* 🔴 화면 자신의 주소(`href="#"`·빈 href 를 브라우저가 풀어 준 것)는 '진짜 주소'가 아니다 — 그렇게 세면 누르지 않고 넘어가 공고 화면 주소가 첨부로 적혔다(2026-11-18 · 서울시립대) */
+        const real = (u) => usableUrl(u) && !pageSelfUrl(u, [at, openUrl]);
         let clicks = 0;
         for (const f of page.frames()) {
           const seen = await settle(f.evaluate(censusInPage, FILE_NAME_SRC), 5000);   // 세기에도 시한 — 멈춘 프레임 하나가 한 공고 시한을 다 쓰지 않게(리뷰 3)
           if (seen === TIMED_OUT || !Array.isArray(seen)) continue;
           for (const s of seen) {
             seenNames.push(s.name);
-            if (found.some((x) => x.name === s.name && usableUrl(x.url))) continue;        // 주소 읽기가 이미 진짜 주소를 구했다
-            if (usableUrl(s.href)) { found.push({ name: s.name, url: s.href }); continue; }   // 화면이 그린 진짜 링크(국민대 — 목록이 뜬 뒤에 그려진다)
+            if (found.some((x) => x.name === s.name && real(x.url))) continue;        // 주소 읽기가 이미 진짜 주소를 구했다
+            if (real(s.href)) { found.push({ name: s.name, url: s.href }); continue; }   // 화면이 그린 진짜 링크(국민대 — 목록이 뜬 뒤에 그려진다)
             let url = '';
             /* 누르는 것은 ① 표식이 달린 것(i >= 0) ② 상한·시한 안 ③ 화면이 그대로일 때만 — 앞 누르기가 화면을 넘겼으면(로그인 화면 등) 표식이 사라져 다음 누르기가 헛돈다 */
             if (s.i >= 0 && clicks < ATT_MAX_CLICKS && Date.now() < until && page.url() === at) {
@@ -432,6 +438,19 @@ for (const t of targets) {
       } catch { /* 이쪽도 안 되면 그냥 실패로 둔다 */ }
     }
     /* 첨부 적기는 물러서기 **뒤**에 — 물러선 HTML 의 본문 그림도 같이 적는다 */
+    /* 🔴 공고 화면 자신의 주소는 첨부 주소가 아니다(2026-11-18 · rescue-plan pageSelfUrl 머리말) — 찾은 것에서 걷고, 이미 적힌 것도 이번에 고친다
+       (같은 이름에 진짜 주소 줄이 있으면 그 줄을 지우고, 없으면 이름만 · 그러면 아래 attGap 이 바로 세어 경보·다시 살피기가 돈다) */
+    const selfPages = [t.url, openUrl, finalUrl];
+    r.found = dropSelfLinks(r.found, selfPages);
+    {
+      const before = t.it.attachments || [];
+      const healed = dropSelfLinks(before, selfPages);
+      if (healed.length !== before.length || healed.some((a, i) => a !== before[i])) {
+        t.it.attachments = healed;
+        regDirty = true;
+        report.push(`- 🧹 ${t.it.name.slice(0, 36)} — 공고 화면 주소가 첨부 주소로 적혀 있던 것 ${before.filter((a) => a && !a.bodyImage && pageSelfUrl(a.url, selfPages)).length}개를 걷어 냄(진짜 주소 줄이 있으면 지우고 없으면 이름만)`);
+      }
+    }
     if (t.attOnly) r.found = r.found.filter(trustedAttachment);   // 첨부만 살피러 온 공고 — 메뉴 링크·단추 글자·본문 그림은 적지 않는다(rescue-plan trustedAttachment 머리말)
     r.found = preferUsable(r.found);   // 같은 파일을 주소 읽기(`javascript:`)와 누르기(진짜 주소)가 둘 다 냈으면 진짜 주소 쪽을 남긴다
     const add = newAttachments(t.it.attachments, r.found);
