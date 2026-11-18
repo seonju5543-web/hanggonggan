@@ -153,14 +153,15 @@ const EXITS = /\bexit\s+[1-9]/;
     · `if 관문` · `if ! 관문` · `! 관문` · `while/until 관문` — 조건으로 쓰면 bash -e 가 멈추지 않는다(if 묶음 안에 exit 1~9 가 있으면 산다)
     · `관문 || 무엇이든` — 뒤(같은 줄 또는 `|| {` 묶음)에 exit 1~9 가 없으면 삼킨다
     · `관문 && …` — && 목록의 앞 명령은 bash -e 가 멈추지 않는다(그 줄이 run 의 마지막 명령이면 단계 결과가 되어 산다) */
-function swallowed(lines, i, ctx = {}) {
+export function swallowed(lines, i, ctx = {}) {
   const line = lines[i];
   const m = /\bverify\/(?:test-collector\.mjs|audit-data\.js)\b/.exec(line);
   if (!m) return false;
   const before = line.slice(0, m.index);
   const after = line.slice(m.index + m[0].length);
   if (/^\s*(?:if|elif)\b/.test(before)) return !EXITS.test(blockFrom(lines, i, /(?:^|[;\s])fi\b/));
-  if (/^\s*(?:while|until)\b/.test(before) || /!\s*(?:\S+=\S*\s+)*(?:node\s+)?$/.test(before)) return true;
+  /* 앞의 `VAR=값 ` 묶음: 이름은 `=` 를 못 담게 한다(`[^\s=]+`) — `\S+=` 로 두면 「!==!==…」 같은 줄에서 나누는 길이 폭발한다(2026-11-18 · CodeQL #55) */
+  if (/^\s*(?:while|until)\b/.test(before) || /!\s*(?:[^\s=]+=\S*\s+)*(?:node\s+)?$/.test(before)) return true;
   const or = /\|\|(.*)$/.exec(after);
   if (or) return !EXITS.test(/^\s*\{\s*$/.test(or[1]) ? blockFrom(lines, i, /^\s*\}/) : or[1]);
   if (/\|(?!\|)/.test(after) && !pipefailShell(ctx.shell) && !lines.slice(0, i).some(setsPipefail)) return true;

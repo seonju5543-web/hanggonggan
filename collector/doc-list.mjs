@@ -12,6 +12,14 @@
 
 import { decodeEntities } from './clean-title.mjs';
 
+/* 괄호·꺾쇠로 싼 조각을 더 지울 것이 없을 때까지 뗀다 — 판정용 글자 다듬기(화면에 내보내는 값이 아니다).
+   한 번만 지우면 지운 자리에서 새 괄호 짝이 생길 수 있다(2026-11-18 · CodeQL #59 「여러 글자 걸러내기가 덜 됐다」) */
+export function dropBracketed(s) {
+  let prev;
+  do { prev = s; s = s.replace(/[\[(（【〔<〈「『][^\])）】〕>〉」』]*[\])）】〕>〉」』]/g, ''); } while (s !== prev);
+  return s;
+}
+
 export const DOC_HEAD = /(제출\s*(할\s*)?서류|구비\s*서류|신청\s*서류|접수\s*서류|필요\s*서류|첨부\s*서류|제출\s*서류\s*및\s*(방법|절차))/;
 /* 다음 절의 머리 — 여기서 서류 목록이 끝난다(서류 이름이 이런 낱말로 시작하는 일은 없다) */
 const NEXT_HEAD = /^\s*(?:[\[(【〔]?\s*)?(?:[\d①-⑳]+\s*[.)]?\s*|[가-힣]\s*[.)]\s*|[-–—•▪▶▷◆◇○●■□▣★♦⇒‡◦∙❍◎￭·ㆍ*ㅇ]\s*)?(신청\s*방법|신청\s*기간|접수\s*기간|접수\s*방법|제출\s*방법|제출\s*기한|제출\s*처|문의|유의\s*사항|기타|선발\s*(인원|방법|절차|일정)|지원\s*자격|신청\s*자격|지급|심사|발표|지원\s*내용|장학\s*금액|지원\s*금액|일정|향후|결과)/;
@@ -70,7 +78,7 @@ const isDocLike = (c) => {
   if (/서류(는|를|가|만|도|에)\s/.test(core) && !DOC_NOUN.test(core.split(/서류(는|를|가|만|도|에)\s/)[0])) return false;   // 「모든 서류는 …」「선정되지 않은 서류는 …」 — 서류를 두고 하는 말
   if (CATEGORY_END.test(core) && !DOC_NOUN.test(core)) return false;
   if (/[한인된는은던할]\s*(학생|자|사람|분)$/.test(core)) return false;   // 「…을 충실히 작성한 학생」「…에 재학 중인 자」 — 누가 받는가(자격)이지 서류가 아니다
-  if (PURE_HEAD.test(stripLead(c).replace(/[\[(（【〔<〈「『][^\])）】〕>〉」』]*[\])）】〕>〉」』]/g, '').replace(/[\s·]/g, ''))) return false;   // 서류 절 머리 자체
+  if (PURE_HEAD.test(dropBracketed(stripLead(c)).replace(/[\s·]/g, ''))) return false;   // 서류 절 머리 자체
   /* 꼬리 괄호 안이 안내 문장이고 앞에 서류 명사가 없다(「… 구비서류에 관련 필독(… 참고하시기 바랍니다.)」) */
   const tailIn = c.match(/[(（]([^()（）]*)[)）]\s*$/);
   if (tailIn && /(니다|바랍니다)\s*\.?\s*$/.test(tailIn[1]) && !DOC_NOUN.test(core)) return false;
