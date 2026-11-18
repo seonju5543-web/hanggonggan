@@ -14340,7 +14340,10 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
   {
     const a = appSrc.indexOf('const NS_LABELS = ['), b = appSrc.indexOf('\nfunction sourceNoteHtml(');
     const escS = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    const nsh = (a > 0 && b > a) ? new Function('esc', 'unent', 'joinSpacedSyllables', `${appSrc.slice(a, b)}\nreturn noticeSummaryHtml;`)(escS, ME3.decodeEntities, ME3.joinSpacedSyllables) : () => '';
+    const nsh = (a > 0 && b > a) ? new Function('esc', 'unent', 'joinSpacedSyllables', `${(appSrc.match(/^const SAYS_UNKNOWN = .*;$/m) || [''])[0]}\n${appSrc.slice(a, b)}\nreturn noticeSummaryHtml;`)(escS, ME3.decodeEntities, ME3.joinSpacedSyllables) : () => '';
+    /* 2026-11-18 — 「공고 안내」 줄 중 '모름'류 낱말(SAYS_UNKNOWN · 블록 밖 상수라 위에서 같이 떼어 넣는다)이 든 줄은 통째로 빠진다. 원문 문장이어도(유료 카드 읽기 첫 본 실행의 유의 두 줄) · 다른 줄은 그대로 */
+    eq('  「공고 안내」 — 「…확인 필요」·「미확인에 따른 불이익…」 줄은 통째로 빠지고 다른 줄은 남는다 (잘라서 싣지 않는다)',
+      (() => { const h = nsh(['신청 완료 후 신청서를 출력하여 본인이 작성한 내용이 맞는지 확인 필요', '신청일시가 조회되는지 반드시 확인할 것. 미확인에 따른 불이익은 책임지지 않음', '정규 8학기 중 1회만 수혜 가능']); return [/확인 필요|미확인|출력하여|조회되는지/.test(h), h.includes('정규 8학기 중 1회만 수혜 가능')]; })(), [false, true]);
     const html = nsh(['12.(월) - 접수방법 : 이메일(x@y.kr) 또는 등기우편', '<b>굵게</b> 문의 : 02-123 <script>x</script>', '장학금액 : 1 인 당 1,000,000 원', '지원자격 : 2026-1 학기 학부 재학생',
       '매일 09:00~18:00 접수', '신청방법 : 포털 로그인 후 신청하고', '10.22.(목) 7:00~15:00', '모집기간) 2026.8.13.(목) ~ 2026.8.23(일) ○ (신청방법) 네이버 폼을 통한 온라인 신청']);
     const items = [...html.matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => m[1].replace(/<b class="ns-k">([^<]*)<\/b>/g, '$1 · '));
@@ -14498,7 +14501,7 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
     /* 화면 — 「공고 안내」는 줄바꿈으로 끊긴 문장을 잇고 납작한 표를 `이름표 : 값` 으로 · 이름표 없는 조각은 안 보인다 · 「모집 안내」는 자격 줄이 있으면 「대상」 발췌를 다시 적지 않는다 */
     const a2 = appSrc.indexOf('const NS_LABELS = ['), b2 = appSrc.indexOf('\nfunction sourceNoteHtml(');
     const escS2 = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    const nsh2 = (a2 > 0 && b2 > a2) ? new Function('esc', 'unent', 'joinSpacedSyllables', `${appSrc.slice(a2, b2)}\nreturn noticeSummaryHtml;`)(escS2, ME3.decodeEntities, ME3.joinSpacedSyllables) : () => '';
+    const nsh2 = (a2 > 0 && b2 > a2) ? new Function('esc', 'unent', 'joinSpacedSyllables', `${(appSrc.match(/^const SAYS_UNKNOWN = .*;$/m) || [''])[0]}\n${appSrc.slice(a2, b2)}\nreturn noticeSummaryHtml;`)(escS2, ME3.decodeEntities, ME3.joinSpacedSyllables) : () => '';
     const rows2 = (ls) => [...nsh2(ls).matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => m[1].replace(/<b class="ns-k">([^<]*)<\/b>/g, '$1 · '));
     eq('  공고 안내 — 세 줄로 끊긴 한 문장은 한 줄로(쇼미더임팩트) · `활동일시` ↵ `ㅇ 2026…` 는 `활동일시 · …` · `…센터에서` ↵ `10월 … 진행합니다.` 도 한 문장(강북 실데이터) · 홀로 남은 조각은 안 보인다',
       rows2(['충남 사회연대경제기업들의 임팩트 투자 기반을 조성하고 투자 유치를 희망하는', '기업들의 IR(Investor Relation) 역량 강화를 지원하기 위해 한국서부발전(주)과 함께', '하는 2026 프로젝트상생 『쇼미더임팩트 시즌6』 참가자를 모집하고자 합니다.',
@@ -15827,6 +15830,9 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
   const beDropNote = CR.buildEntry(ITEM, SRC, { ...full, notes: ['TOEIC 950/990 이상인 자'] }, full, wonIn);
   eq('  🔴 자격·제외·서류에서 한쪽이 낸 줄이 기계 대조에서 떨어지면 그 칸은 싣지 않는다(null) — 남은 줄만 실으면 핵심 요건이 빠진 목록이 된다 · 빈 배열로도 안 싣는다 · 다른 칸(유의)의 떨어진 줄은 자격을 안 건드린다',
     [beDrop.entry.eligibility, beDrop.held.some((h) => h.field === 'eligibility' && /TOEIC/.test(h.line)), beDropBoth.entry.eligibility, (beDropNote.entry.eligibility || []).length], [null, true, null, 2]);
+  eq('  🔴 조회수만 바뀐 원문은 같은 원문이다(다시 읽히지 않는다 — 본문을 다시 받을 때마다 숫자만 바뀐다 · 나흘에 839건 중 27건) · 내용의 숫자가 바뀌면 다른 원문',
+    [CR.sourceHash('작성일\n2026.10.26\n조회수\n235\n평점 3.0 이상') === CR.sourceHash('작성일\n2026.10.26\n조회수\n236\n평점 3.0 이상'), CR.sourceHash('2026-09-07 조회수 307\n작성자') === CR.sourceHash('2026-09-07 조회수 1,312\n작성자'),
+      CR.sourceHash('조회수\n235\n평점 3.0 이상') === CR.sourceHash('조회수\n235\n평점 3.5 이상'), CR.sourceHash('조회수\n235\n2026.11.23') === CR.sourceHash('조회수\n235\n2026.11.30')], [true, true, false, false]);
   eq('  지시문이 바뀌면 원문이 같아도 해시가 달라진다(다시 읽는다) · 같은 원문은 같은 해시', [CR.sourceHash('가') === CR.sourceHash('가'), CR.sourceHash('가') === CR.sourceHash('나'), /update\(SYSTEM\)/.test(readText(new URL('../collector/card-read.mjs', import.meta.url)))], [true, false, true]);
   eq('  🔴 내려갔는지는 유료가 읽은 마감으로 잰다 — 무료 길 마감(접수 시작일)이 지났어도 바로잡은 마감 전이면 결과를 지우지 않는다',
     [CR.closedNow({ id: 'q', deadline: '2026-11-18', listedAt: '2026-11-10' }, { deadline: { date: '2026-11-26', quote: 'x' } }, '2026-11-19'), CR.closedNow({ id: 'q', deadline: '2026-11-18', listedAt: '2026-11-10' }, null, '2026-11-19')], [false, true]);

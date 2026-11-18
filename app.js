@@ -4740,6 +4740,9 @@ function noticeSummaryRows(lines) {
       .replace(/^[(（][월화수목금토일][)）]\s*[-–]?\s*/, '')   // `12.(월) - 접수방법 :` — 앞 줄에서 떨어져 나온 날짜 꼬리(번호는 위에서 이미 뗐다)
       .replace(/\s+/g, ' ').trim();
     if (t.length < 4) continue;
+    /* '모름'류 낱말이 든 줄은 통째로 뺀다 — 원문 문장(「…확인 필요」·「미확인에 따른 불이익…」)이어도 화면에선 앱이 모른다는 말로 읽힌다(개발자 결정 11-02 · knownValue 와 같은 규칙 — 잘라서 싣지 않는다).
+       2026-11-18 유료 카드 읽기 첫 본 실행에서 유의 두 줄이 실려 verify-no-unknown 이 빨개졌다 · 무료 길 발췌에도 같은 줄이 있다(마감 지난 2건) */
+    if (SAYS_UNKNOWN.test(t)) continue;
     /* 이름표 — `신청기간 : …` · `(신청방법) …` · 앞 괄호가 잘린 `모집기간) …` 꼴. ⚠️ 시각(`09:00`)·주소(`https://`)의 콜론은 이름표가 아니다(리뷰 2026-10-15) */
     const m = t.match(/^([가-힣A-Za-z0-9\s·]{1,16}?)\s*[:：](?!\d|\/\/)\s*(.+)$/) || t.match(/^[(（]([가-힣A-Za-z0-9\s·]{1,12})[)）]\s*(.+)$/) || t.match(/^([가-힣\s]{2,8})[)）]\s*(.+)$/);
     let label = '', body = t;
@@ -4800,7 +4803,7 @@ function applySectionHtml(sch, opts) {
     : /상시/.test(rawPeriod) ? '상시'
     : '';
   /* 유료 카드 읽기가 읽은 신청 방법(원문 문장 · 줄머리 이름표를 뗀 것)이 있으면 그것을 줄마다 보인다(2026-11-15) */
-  const paidApply = (!act && sch.cardRead && Array.isArray(sch.cardRead.apply)) ? sch.cardRead.apply.filter((l) => typeof l === 'string' && l.trim()) : [];
+  const paidApply = (!act && sch.cardRead && Array.isArray(sch.cardRead.apply)) ? sch.cardRead.apply.filter((l) => typeof l === 'string' && knownValue(l)) : [];   // '모름'류 낱말이 든 줄은 통째로 뺀다(「공고 안내」와 같은 규칙)
   const method = sch.noApply ? sch.noApply
     : sch.applyEmail ? (sch.applyEmailSource || `메일 ${sch.applyEmail}`)
     : sch.applyPortalSource ? sch.applyPortalSource

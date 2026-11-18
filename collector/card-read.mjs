@@ -272,7 +272,10 @@ export function buildEntry(item, source, outA, outB, wonIn) {
 
 /* ── 원문 = 게시판 본문 + 첨부 글자 (eligibility-ai·extract-excerpts 와 같은 길: notice-source · elig-docs · attachment-text) ── */
 export function sourceText(parts) { return parts.map((x) => `===== ${x.label} =====\n${x.text}`).join('\n\n'); }
-export const sourceHash = (text) => crypto.createHash('sha256').update(SYSTEM).update('\n').update(text).digest('hex').slice(0, 16);   // 지시문이 바뀌어도 다시 읽는다
+/* 🔴 조회수는 원문이 아니다 — 본문을 다시 받을 때마다 그 숫자만 바뀌어 같은 공고를 돈 내고 또 읽힌다(2026-11-18 실측: 나흘에 839건 중 27건 · 전부 조회수뿐).
+   ponytail: 이름표(「조회수」) 붙은 숫자만 뗀다 — 이름표 없이 숫자만 한 줄인 조회수(dep.hufs 브라우저 본문)는 못 잡는다. 숫자뿐인 줄을 다 떼면 표 칸(「300」)이 바뀐 것을 놓친다. 새는 돈이 보이면 게시판별 머리 줄을 자르는 쪽으로 */
+const hashText = (text) => String(text).replace(/(조회\s?수)\s*:?\s*\d[\d,]*/g, '$1');
+export const sourceHash = (text) => crypto.createHash('sha256').update(SYSTEM).update('\n').update(hashText(text)).digest('hex').slice(0, 16);   // 지시문이 바뀌어도 다시 읽는다
 export function makeSources({ texts, browserBodies, eligDocs, extractedDir }) {
   const idx = indexTexts(texts, browserBodies || {});
   return (it) => {
