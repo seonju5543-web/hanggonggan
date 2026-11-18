@@ -203,7 +203,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 | `insta/` | 인스타 카드뉴스(`insta/README.md` · 스킬 `insta-revise`·`insta-template`) |
 | `tools/notion-status.mjs` | 노션 「작업 현황」 로봇 |
 | `DESIGN.md` | 디자인 값의 사람용 사본 — 원본은 `style.css`, 관문 `verify/ui-tone.mjs` |
-| `docs/designs/data-model.md` `docs/designs/data-flow.md` `docs/designs/security-rules.md` | **설계 문서 셋** (고문 보고서 Q12) — 저장소 다섯이 각각 무엇을 담는가 · 공고가 폰까지 가는 길과 어디서 끊기는가 · 권한·보안 약속과 그 관문. 사본이라 관문 「CLAUDE.md 가 가리키는 것이 실제로 있다」가 같이 잰다 |
+| `docs/designs/data-model.md` `docs/designs/data-flow.md` `docs/designs/security-rules.md` | **설계 문서 셋** (고문 보고서 Q12) — 저장소 다섯이 각각 무엇을 담는가 · 공고가 폰까지 가는 길과 어디서 끊기는가 · 권한·보안 약속과 그 관문. 사본이라 관문 「CLAUDE.md 가 가리키는 것이 실제로 있다」가 같이 잰다(11-18부터 `docs/designs/news-feed.md`·`docs/designs/activities-tab.md` 도) |
 
 ## 중요한 기술 사실 (다시 캐지 말 것)
 
@@ -353,6 +353,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 - 🔴 **배포 감시는 `git add data/…` 하는 워크플로 전부를 본다**(`check-deploy-sync.js`).
   새 로봇이 앱 데이터를 쓰면 `deploy-sync.yml` 의 `workflows:` 목록에도 이름을 넣는다(안 넣으면 최대 12시간 안 나간다).
 - 검사는 '돌리라고 적어 두면' 안 돈다 — 워크플로·훅에 걸어야 돈다. 새 사고는 **먼저 관문을 만들고** 여기엔 그 위치만 적는다.
+- 기본 브랜치 빨간불을 고치기 전에 `git fetch` 로 다른 세션이 이미 고쳤는지 본다(11-18 완료 버튼 관문이 두 세션에서 따로 고쳐졌다).
 - **로봇·도구 점검**(2026-10-04~11 · 규칙 전체 `docs/designs/robot-health.md`): 고친 것마다 `verify/health-gates/` 묶음 — 관문 「로봇·도구 점검 관문」. 🔴 표본만 잰다(실데이터 단정은 `REAL_READ_ALLOW` 톱니로 잠김) · 워크플로·문서 글자는 `softEq`(로봇에선 경고) · 셸은 가짜 node·gh 로 실제로 돌린다.
 - 🔴 경보 이슈는 `tools/alert-issue.mjs` 한 곳(여는·닫는 단계의 제목이 같아야 닫힌다 · 제목에 날짜 금지 · 보강 단계도 경보 짝) · 푸시 서버는 공용 규칙의 사본을 둔다(원본을 바꾸면 `server/push/worker.js` 도) · 피드는 `healFromLedger` 로 스스로 메운다(피드에서 빼는 새 규칙은 메우기에도) · 열쇠 규칙을 바꾸면 실린 데이터도 새 열쇠로 다시 합친다.
 - 훅은 스킬 호출을 장부(`.claude/hooks/skill-ledger.sh`)에 적는다. Stop 훅이 **막는 것은 디버깅 빚뿐**(verify 빨간불 뒤 `systematic-debugging` 미호출), 리뷰는 알림. 빚 관문·노션 표식은 조기 종료보다 **위**에 둔다. 리뷰 스킬이 서브에이전트를 못 쓰면 diff 를 직접 보되 항목을 하나씩 짚는다.
@@ -365,6 +366,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 
 - **한 항목은 규칙 한두 줄 + 관문 위치.** 경위·실측·사고는 `SESSIONS.md` 로.
 - **현황 숫자를 적지 않는다**(사본은 반드시 낡는다) — 필요하면 그때 센다.
+- 세부를 덜어낼 땐 **관문이 재는 문서로** 옮긴다(아래 관문의 `DOCS` 목록 — 안 재는 문서로 옮기면 이름이 조용히 낡는다) · 옮기면서 🔴 표시를 붙이거나 떼지 않는다.
 - 🔴 관문: `test-collector.mjs` 「CLAUDE.md 부피」 — **60KB · 400줄 · 한 항목 20줄**을 넘으면 실패한다.
 - 🔴 관문: 같은 파일 「CLAUDE.md 가 가리키는 것이 실제로 있다」 — 백틱·명령 블록의 **파일 경로**, 백틱의 **함수·칸 이름**,
   「관문 「X」」의 **절 이름**이 코드에 없으면 실패한다. 이름을 바꾸면 이 문서도 같이 고친다. 코드에 없는 이름(MCP 도구 등)은 그 절의 예외 목록에.
