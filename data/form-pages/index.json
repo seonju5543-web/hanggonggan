@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-17",
+ "updatedAt": "2026-11-18",
  "items": {
   "auto-o2432actionviewno9994682": [
    {
@@ -177,19 +177,6 @@
     "src": "elig-183jo5-1.hwp",
     "srcBytes": 15360,
     "none": true,
-    "at": "2026-10-29"
-   }
-  ],
-  "auto-krbbskr845968artclviewdo": [
-   {
-    "file": "auto-krbbskr845968artclviewdo/1-elig-an5oq9-1_p3-3.pdf",
-    "name": "공고문 안 신청서 서식 (3쪽)",
-    "pages": 1,
-    "bytes": 101127,
-    "src": "elig-an5oq9-1.hwp",
-    "srcBytes": 101888,
-    "srcPages": "3",
-    "from": "공고문 서식 쪽 떼기",
     "at": "2026-10-29"
    }
   ],
@@ -683,6 +670,106 @@
     "srcBytes": 63744,
     "none": true,
     "at": "2026-11-17"
+   }
+  ],
+  "auto-0005009002000000seq31571": [
+   {
+    "src": "elig-gr6loy-1.pdf",
+    "srcBytes": 839486,
+    "none": true,
+    "at": "2026-11-18"
+   },
+   {
+    "src": "elig-gr6loy-2.pdf",
+    "srcBytes": 3506494,
+    "none": true,
+    "at": "2026-11-18"
+   }
+  ],
+  "auto-sknou51815772artclviewdo": [
+   {
+    "src": "elig-1vruxo-1.hwp",
+    "srcBytes": 172544,
+    "none": true,
+    "at": "2026-11-18"
+   }
+  ],
+  "auto-amepagescholarshipnotice-1p6dyle": [
+   {
+    "src": "elig-z60c3i-1.pdf",
+    "srcBytes": 677233,
+    "none": true,
+    "at": "2026-11-18"
+   },
+   {
+    "src": "elig-z60c3i-2.pdf",
+    "srcBytes": 252375,
+    "none": true,
+    "at": "2026-11-18"
+   }
+  ],
+  "auto-2582viewdocurrentpageno1": [
+   {
+    "src": "elig-2jx4th-1.hwp",
+    "srcBytes": 121344,
+    "none": true,
+    "at": "2026-11-18"
+   }
+  ],
+  "auto-qlmjzmaw5kv29yzcuzrcuyng-07fiyle": [
+   {
+    "src": "elig-1tq99x-1.docx",
+    "srcBytes": 13123,
+    "none": true,
+    "at": "2026-11-18"
+   },
+   {
+    "src": "elig-1tq99x-2.docx",
+    "srcBytes": 24620,
+    "none": true,
+    "at": "2026-11-18"
+   }
+  ],
+  "auto-amepagescholarshipnotice-1h5dt8m": [
+   {
+    "src": "elig-qvghpz-1.hwp",
+    "srcBytes": 52224,
+    "none": true,
+    "at": "2026-11-18"
+   }
+  ],
+  "auto-scho332282856artclviewdo": [
+   {
+    "file": "auto-scho332282856artclviewdo/1-elig-xt6vup-1_p4-4.pdf",
+    "name": "공고문 안 신청서 서식 (4쪽)",
+    "pages": 1,
+    "bytes": 104434,
+    "src": "elig-xt6vup-1.hwp",
+    "srcBytes": 68096,
+    "srcPages": "4",
+    "from": "공고문 서식 쪽 떼기",
+    "at": "2026-11-18"
+   }
+  ],
+  "kosaf-2000449006": [
+   {
+    "file": "kosaf-2000449006/1-2026년_2학기_장성군_대학생_등록금_지원사업_공고_p6-8.pdf",
+    "name": "공고문 안 신청서 서식 (6~8쪽)",
+    "pages": 3,
+    "bytes": 307892,
+    "src": "2026년_2학기_장성군_대학생_등록금_지원사업_공고.pdf",
+    "srcBytes": 271425,
+    "srcPages": "6~8",
+    "from": "공고문 서식 쪽 떼기",
+    "at": "2026-11-18"
+   }
+  ],
+  "kosaf-2700636002": [
+   {
+    "src": "2026년 동지장학생 선발공고.hwp",
+    "srcBytes": 66048,
+    "none": true,
+    "at": "2026-11-18"
    }
   ]
  }
