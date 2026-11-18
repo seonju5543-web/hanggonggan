@@ -14248,11 +14248,20 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
     sl ? [sl.target.key, sl.url, sl.source, sl.query, LCm.loadCandidates({ v: 1, items: [sl] }, { today: '2026-10-13' }).ok.length] : [], ['9001', 'https://gana.or.kr/bbs/view.php?id=101', 'search', '재단법인 가나장학재단 성적우수장학생 공고', 1]);
   eq('  그 사업 글이 없으면 고르지 않는다(남의 사업 글을 붙이지 않는다)', KH.searchLine ? KH.searchLine(t1, srows.filter((r) => /id=102/.test(r.url)), 'q', { today: '2026-10-13' }) : 'x', null);
   /* 2026-11-18 — 검색은 '오늘 홈페이지를 다시 본 재단'에만 붙어 있으면 안 된다(열쇠가 들어온 뒤에도 사흘에 걸쳐 몇 곳만 물었다) */
-  const qa = { key: 'A1' }, qb = { key: 'B1' }, qc = { key: 'C1' }, qd = { key: 'C2' };
-  const qGroups = [{ host: 'a.kr', targets: [qa] }, { host: 'b.kr', targets: [qb] }, { host: 'c.kr', targets: [qc, qd] }];
-  eq('  ⑧-1 검색 대상 — 오늘 본 재단의 못 고른 공고 + 안 본 재단 중 글 후보(url 줄)가 없는 공고 · 게시판 줄만 있으면 묻는다 · also 로 묶인 공고도 후보 있음으로 친다',
-    KH.searchQueue ? KH.searchQueue(qGroups, [qGroups[0]], [qa], [{ target: { key: 'B1' }, board: 'https://b.kr/list' }, { target: { key: 'kosaf-C1' }, url: 'https://c.kr/v?id=1', also: ['C2'] }]).map((t) => t.key) : [],
-    ['A1', 'B1']);
+  const qa = { key: 'A1' }, qb = { key: 'B1' }, qc = { key: 'C1' }, qd = { key: 'C2' }, qe = { key: 'E1', alsoCodes: ['E2'] }, qf = { key: 'E2', alsoCodes: ['E1'] }, qz = { key: 'Z1' };
+  const qGroups = [{ host: 'a.kr', targets: [qa] }, { host: 'b.kr', targets: [qb] }, { host: 'c.kr', targets: [qc, qd] }, { host: 'e.kr', targets: [qe, qf] }, { host: 'z.kr', targets: [qz] }];
+  const qKeys = (...a) => (KH.searchQueue ? KH.searchQueue(...a).map((t) => t.key) : []);
+  eq('  ⑧-1 검색 대상 — 오늘 연 공고의 못 고른 것 + 오늘 안 연 공고 중 글 후보(url 줄)가 없는 것 · 게시판 줄만 있으면 묻는다 · also 로 묶인 공고도 후보 있음으로 친다',
+    qKeys(qGroups, new Set(['A1']), [qa], [{ target: { key: 'B1' }, board: 'https://b.kr/list' }, { target: { key: 'kosaf-C1' }, url: 'https://c.kr/v?id=1', also: ['C2'] }]),
+    ['A1', 'B1', 'E1', 'Z1']);
+  eq('  ⑧-2 상한에 걸려도 늘 같은 꼬리가 밀리지 않게 — 안 물은 것 → 오래전에 물은 것 순(오늘 연 공고의 못 고른 것은 맨 앞 그대로)',
+    qKeys(qGroups, new Set(['A1']), [qa], [], { B1: '2026-11-17', C1: '2026-11-16', E1: '2026-11-15', E2: '2026-11-15' }),
+    ['A1', 'C2', 'Z1', 'E1', 'C1', 'B1']);
+  eq('  ⑧-3 같은 공고 묶음(alsoCodes)은 하나만 묻는다(한 주소 한 줄) · 오늘 열려다 예산에 잘린 재단의 공고는 검색이 받는다(연 공고만 뺀다)',
+    qKeys([{ host: 'e.kr', targets: [qe, qf] }], new Set(), [], []), ['E1']);
+  const khSrcQ = readText(new URL('../collector/kosaf-hunt.mjs', import.meta.url));
+  eq('  ⑧-4 로봇이 실제로 그 대상으로 묻는다 · 물은 날을 묶음째 장부(searched)에 적는다 — 줄을 옛 leftover 로 되돌리면 빨갛다(리뷰 11-18)',
+    [/for \(const t of searchQueue\(groups, huntedKeys, leftover, prevFile\.items, searchedAt\)\)/.test(khSrcQ), /for \(const k of \[t\.key, \.\.\.\(t\.alsoCodes \|\| \[\]\)\]\) searchedAt\[k\] = today/.test(khSrcQ), /searched: searchedLive/.test(khSrcQ)], [true, true, true]);
   const khSrc = readText(new URL('../collector/kosaf-hunt.mjs', import.meta.url));
   eq('  열쇠는 환경 변수로만 받는다(코드에 값 없음) · 주소는 NAVER API HUB(옛 개발자센터는 신규 신청이 닫혔다) · 워크플로가 Secrets 를 넘긴다 · 상한이 있다',
     [/X-NCP-APIGW-API-KEY-ID': keys\.id/.test(khSrc) && /naverapihub\.apigw\.ntruss\.com\/search\/v1\/webkr/.test(khSrc), /NAVER_CLIENT_ID: \$\{\{ secrets\.NAVER_CLIENT_ID \}\}/.test(wf), /NAVER_CLIENT_SECRET: \$\{\{ secrets\.NAVER_CLIENT_SECRET \}\}/.test(wf), /sstat\.asked >= SEARCH_MAX/.test(khSrc)], [true, true, true, true]);
