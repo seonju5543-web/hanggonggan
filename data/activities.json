@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-18",
+ "updatedAt": "2026-11-19",
  "items": [
   {
    "title": "2027년 상반기「IBK창공(創工) UNIST캠프」모집 공고",
@@ -1116,7 +1116,8 @@
    "school": "한국외국어대학교",
    "campus": "",
    "foundAt": "2026-11-17",
-   "id": "act-1hrudvx"
+   "id": "act-1hrudvx",
+   "documentsV": 1
   },
   {
    "title": "[HUSS] 미래융합 아카데미(겨울 계절수업) 참여학생 모집(11/26 마감)",
@@ -1163,7 +1164,8 @@
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-11-17",
-   "id": "act-0qcoq7g"
+   "id": "act-0qcoq7g",
+   "documentsV": 1
   },
   {
    "title": "[N센터, 3T fMRI] 뇌언어 영역 실험 참여자 모집",
@@ -1193,7 +1195,8 @@
    "school": "성균관대학교",
    "campus": "",
    "foundAt": "2026-11-17",
-   "id": "act-0rqjl6c"
+   "id": "act-0rqjl6c",
+   "documentsV": 1
   },
   {
    "title": "「2026년 지능정보사회 법제도 포럼 하반기 공개세미나」개최 안내",
@@ -1210,7 +1213,8 @@
    "school": "가톨릭대학교",
    "campus": "",
    "foundAt": "2026-11-17",
-   "id": "act-1pmlxjl"
+   "id": "act-1pmlxjl",
+   "documentsV": 1
   },
   {
    "title": "(재공고)2026학년도 지역문제 기반 프로젝트 공모전 안내",
@@ -1250,7 +1254,8 @@
    "school": "강원대학교",
    "campus": "",
    "foundAt": "2026-11-17",
-   "id": "act-037wp91"
+   "id": "act-037wp91",
+   "detailsTriedAt": "2026-11-18"
   },
   {
    "title": "2026 탄소중립 창작 그림책 공모전",
@@ -1353,7 +1358,8 @@
    "school": "강원대학교",
    "campus": "",
    "foundAt": "2026-11-17",
-   "id": "act-1fz2fcx"
+   "id": "act-1fz2fcx",
+   "detailsTriedAt": "2026-11-18"
   },
   {
    "title": "2026년도 공공데이터 활용 경진대회",
@@ -1466,7 +1472,8 @@
    "foundAt": "2026-11-17",
    "id": "act-02ihmx2",
    "deadline": "2026-11-24",
-   "deadlineFrom": "원문 기간 · 모집기간: 2026. 11. 17.(화) ~ 11. 24.(화) 17:00 마감"
+   "deadlineFrom": "원문 기간 · 모집기간: 2026. 11. 17.(화) ~ 11. 24.(화) 17:00 마감",
+   "documentsV": 1
   },
   {
    "title": "[충남] 2026 충남 앵커 산학프로젝트 멘토링 참여기업 모집(6개 대학 교수 1:1 기술 멘토링, 무료)",

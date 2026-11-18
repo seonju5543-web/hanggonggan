@@ -1,7 +1,25 @@
 {
  "school": "연세대학교 미래캠퍼스",
- "updatedAt": "2026-11-18",
+ "updatedAt": "2026-11-19",
  "items": [
+  {
+   "title": "(재)양천장학회 2026학년도 후기 「학업지원 특별장학금」 신청 안내(~11/23)",
+   "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/944671/artclView.do",
+   "attachments": [
+    {
+     "name": "(재)양천장학회 2026학년도 후기 학업지원 특별장학금 수급계획 안내.pdf",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015596/download.do"
+    },
+    {
+     "name": "(재)양천장학회 2026학년도 후기 학업지원 특별장학금 신청 서류양식.hwp",
+     "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/1015597/download.do"
+    }
+   ],
+   "deadlineHint": "제출 기간 및 방법 가. 기간 : 2026. 11. 23.(월) 12:00까지 (학교별 일괄접수, 개인별 접수 불가) 나. 접수처 : 연세대학교",
+   "school": "연세대학교 미래캠퍼스",
+   "campus": "",
+   "foundAt": "2026-11-18"
+  },
   {
    "title": "[한국장학재단] 2027년 1학기 국가장학금 1차 신청 안내(~1/7)",
    "url": "https://mirae.yonsei.ac.kr/bbs/wj/104/944665/artclView.do",
