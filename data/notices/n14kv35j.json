@@ -3,6 +3,32 @@
  "updatedAt": "2026-11-18",
  "items": [
   {
+   "title": "★필독★ 2027학년도 1학기 국가장학금 1차 신청 안내(11.24.~1.7. 18시)",
+   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=897923&qidx=5233&cate=0&allboard=true&nowpage=1",
+   "attachments": [
+    {
+     "name": "장학금 신청 주요 일정",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/35C76D28D5004E32A52A4B7CF3701664.pdf"
+    },
+    {
+     "name": "장학금 규정 전문(2021. 10. 1.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/38060CD67CC14E0BBAFF76DBED5063C4.pdf"
+    },
+    {
+     "name": "장학금 지침 전문(2026. 08. 03.)",
+     "url": "https://www.seoultech.ac.kr/storage/www/ckfinder/files/A84CAB85EB1B467C8E719DF534E772A9.pdf"
+    },
+    {
+     "name": "1. (포스터) 27년 1학기 1차 국가장학금 신청.jpg",
+     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F5233&fname=C66B9170F5F54938A0A787649688F1CE_.jpg&ogrfname=1.+%28%ED%8F%AC%EC%8A%A4%ED%84%B0%29+27%EB%85%84+1%ED%95%99%EA%B8%B0+1%EC%B0%A8+%EA%B5%AD%EA%B0%80%EC%9E%A5%ED%95%99%EA%B8%88+%EC%8B%A0%EC%B2%AD.jpg"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "foundAt": "2026-11-18"
+  },
+  {
    "title": "2027학년도 관정재단 장학생 선발 안내(~11/25(수)까지)",
    "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=5233&bidx=897875&qidx=5233&cate=0&allboard=true&nowpage=1",
    "attachments": [
@@ -971,24 +997,6 @@
    "school": "서울과학기술대학교",
    "campus": "",
    "foundAt": "2026-10-06"
-  },
-  {
-   "title": "[보건진료소] 2026학년도 2학기 국가근로장학생 모집 안내",
-   "url": "https://www.seoultech.ac.kr/service/info/janghak/?do=commonview&searchtext=&searchtype=-1&nowpage=3&bnum=57138&bidx=894195&qidx=57138&cate=0&allboard=true&nowpage=3",
-   "attachments": [
-    {
-     "name": "서식1. 국가근로장학생 지원서(학생).hwp",
-     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F57138&fname=BCFA7FB29FF941DFA31942256FFA3AFF_.hwp&ogrfname=%EC%84%9C%EC%8B%9D1.+%EA%B5%AD%EA%B0%80%EA%B7%BC%EB%A1%9C%EC%9E%A5%ED%95%99%EC%83%9D+%EC%A7%80%EC%9B%90%EC%84%9C%28%ED%95%99%EC%83%9D%29.hwp"
-    },
-    {
-     "name": "근로가능 시간표 서식_학번_이름.xlsx",
-     "url": "https://www.seoultech.ac.kr/hcm/bbs/bbs_download.jsp?fpath=%2Fstorage%2Fwww%2Fbbs%2F57138&fname=840D65E8B8874B4AB251CB178F5905E0_.xlsx&ogrfname=%EA%B7%BC%EB%A1%9C%EA%B0%80%EB%8A%A5+%EC%8B%9C%EA%B0%84%ED%91%9C+%EC%84%9C%EC%8B%9D_%ED%95%99%EB%B2%88_%EC%9D%B4%EB%A6%84.xlsx"
-    }
-   ],
-   "deadlineHint": "모집기간: &nbsp;~ 2026. 8. 25.(화) 15:00까지 &nbsp;&rarr; 기간 내 지원한 서류만 검토 * 지원자가 많을 시 조",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "foundAt": "2026-09-30"
   }
  ]
 }
