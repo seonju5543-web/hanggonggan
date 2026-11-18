@@ -284,6 +284,22 @@ function settleEligIndex(index, id, slug, files, oldNames, today) {
   for (const k of Object.keys(index)) if (k !== id && index[k].slug === slug) delete index[k];
   index[id] = { ...(index[id] || {}), slug, files, at: today };
 }
+/* 받기 실패 이유 장부 (2026-11-18 인계 F1) — 전엔 실패가 로그 한 줄로만 사라져 「503·봇 차단」이 몇 건인지 아무도 못 셌다.
+   열쇠 `<공고 id 또는 제목>|<첨부 이름>` · 이유(HTTP 상태 · 네트워크 오류 · 스크립트 주소) · 주소 · 횟수 · 날짜. 받으면 지운다 · 30일 지난 줄은 걷는다.
+   진짜 브라우저로 대신 받기(rescue-bodies)가 이 장부에서 '실패 + 마감 전'을 고른다(다음 조각). function — 위쪽 경로가 먼저 부른다(TDZ) */
+function fetchFailLedger(mutate) {
+  const p = new URL('fetch-fail.json', OUT);
+  let j = {};
+  try { j = JSON.parse(fs.readFileSync(p, 'utf8')) || {}; } catch { /* 처음 */ }
+  mutate(j);
+  const cutoff = Date.now() - 30 * 86400000;
+  for (const [k, v] of Object.entries(j)) if (!v || Date.parse(v.at) < cutoff) delete j[k];
+  try { fs.writeFileSync(p, JSON.stringify(j, null, 1) + '\n'); } catch { /* 저장 실패는 받기를 멈추지 않는다 */ }
+}
+function noteFetchFail(owner, name, url, why) {
+  fetchFailLedger((j) => { const k = `${owner}|${name}`; j[k] = { at: kstToday(), why: String(why || '').slice(0, 160), url: String(url || '').slice(0, 300), n: ((j[k] || {}).n || 0) + 1 }; });
+}
+function clearFetchFail(owner, name) { fetchFailLedger((j) => { delete j[`${owner}|${name}`]; }); }
 function kstToday() { return new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10); }   // 마감은 한국 날짜다 (점검 bodies-3) · 🔴 function — 위쪽 경로가 먼저 부른다(TDZ)
 
 async function downloadForms() {
@@ -375,14 +391,14 @@ async function downloadForms() {
       attempted = true;
       try {
         const url = fetchUrlOf(a, n.url);
-        if (!url) { console.log('attach skip (스크립트 주소를 못 풀었음):', a.name); continue; }
+        if (!url) { console.log('attach skip (스크립트 주소를 못 풀었음):', a.name); noteFetchFail(n.regId || n.title, a.name, a.url, '스크립트 주소를 못 풀었음'); continue; }
         const res = await fetch(url, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(30000) });
-        if (!res.ok) { console.log('attach fail', res.status, a.name); continue; }
+        if (!res.ok) { console.log('attach fail', res.status, a.name); noteFetchFail(n.regId || n.title, a.name, url, `HTTP ${res.status}`); continue; }
         const buf = Buffer.from(await res.arrayBuffer());
         if (buf.length < 1000 || buf.length > 15 * 1024 * 1024) continue;
         // 받아 보니 문서가 아니라 웹페이지면 버린다 — 게시판 하단 메뉴(부서 링크 등)를 첨부로
         // 착각해 받아 두면 스키마화가 매번 그걸 붙들고 실패한다(연구지원팀·연구진흥팀 사례).
-        if (isHtmlPayload(buf)) { console.log('attach skip (웹페이지였음):', a.name); continue; }
+        if (isHtmlPayload(buf)) { console.log('attach skip (웹페이지였음):', a.name); noteFetchFail(n.regId || n.title, a.name, url, '받은 것이 웹페이지(로그인·차단 화면일 수 있다)'); continue; }
         fi += 1; ai += 1;
         /* 확장자는 form-rules attachExt 한 곳 — 아이콘 꼬리(`… .hwp chevron_forward`)를 떼고, 이름에 없으면 받은 바이트의 머리로 (2026-11-15 · 강원대 원본이 .bin 이었다) */
         const ext = attachExt(a.name, buf);
@@ -391,6 +407,7 @@ async function downloadForms() {
         written.add(fname);
         indexLines.push(`${fname}\t${n.title}\t${a.name}\t${buf.length}${n.regId ? `\t${n.regId}` : ''}`);
         console.log('attach ok:', a.name, buf.length);
+        clearFetchFail(n.regId || n.title, a.name);
         /* 등록 공고의 공고문류 → 자격 색인 사본 (위 머리말) · zip 은 안의 공고문류만(zipNoticeDocs 한 곳 · 없으면 안 올린다) */
         if (it && /\.(hwp|hwpx|docx?|pdf|zip)$/i.test(a.name) && isNoticeDoc(a.name)) {
           const inner = /^zip$/i.test(ext) ? zipNoticeDocs(buf) : null;
@@ -401,7 +418,7 @@ async function downloadForms() {
             else put(`elig-${eslug}-${ei}.${ext.toLowerCase()}`, buf);
           }
         }
-      } catch (e) { console.log('attach err', a.name, errWhy(e)); }
+      } catch (e) { console.log('attach err', a.name, errWhy(e)); noteFetchFail(n.regId || n.title, a.name, a.url, errWhy(e)); }
     }
     /* 표적 공고의 갈아끼우기 — **이 일이 같은 첨부 이름으로 새로 받은 원본만** 옛 것을 대신한다(2026-11-12 리뷰 확정 둘):
        ① 지우는 줄은 제목이 이 공고와 **똑같고** id 칸이 없는 옛 줄 가운데, 첨부 이름이 이번에 새로 저장한 것과 같은 줄뿐이다 —
@@ -515,13 +532,13 @@ async function downloadEligDocs() {
       if (Date.now() - startedAt > BUDGET_MS) { cut = true; break; }
       try {
         const url = fetchUrlOf(a, it.sourceUrl || it.url);
-        if (!url) { console.log('elig doc skip (스크립트 주소를 못 풀었음):', a.name); continue; }
+        if (!url) { console.log('elig doc skip (스크립트 주소를 못 풀었음):', a.name); noteFetchFail(it.id, a.name, a.url, '스크립트 주소를 못 풀었음'); continue; }
         const res = await fetch(url, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(20000) });
-        if (!res.ok) { console.log('elig doc fail', res.status, a.name); continue; }
+        if (!res.ok) { console.log('elig doc fail', res.status, a.name); noteFetchFail(it.id, a.name, url, `HTTP ${res.status}`); continue; }
         const buf = Buffer.from(await res.arrayBuffer());
         if (buf.length < 1000 || buf.length > MAX_BYTES) continue;   // 5906×8268 포스터도 8MB 안에 든다(실측)
         // 받아 보니 문서가 아니라 로그인 페이지면 버린다 — 글자로 읽으면 엉뚱한 자격이 된다
-        if (isHtmlPayload(buf)) { console.log('elig doc skip (웹페이지였음):', a.name); continue; }
+        if (isHtmlPayload(buf)) { console.log('elig doc skip (웹페이지였음):', a.name); noteFetchFail(it.id, a.name, url, '받은 것이 웹페이지(로그인·차단 화면일 수 있다)'); continue; }
         /* 🔴 확장자는 **첨부 이름**에서 딴다 — 주소는 `download.do`처럼 확장자가 없는 경우가 많다.
            그리고 이 목록은 받는 목록(elig-targets DOC_EXT·IMG_EXT)과 **반드시 같아야 한다.** 2026-08-23에 받는 목록에만
            pdf를 넣고 여기를 안 고쳐서, 받아 온 PDF 5개가 전부 `.bin`으로 저장됐다 —
@@ -533,6 +550,7 @@ async function downloadEligDocs() {
         const inner = ext === 'zip' ? zipNoticeDocs(buf) : null;
         if (inner && !inner.length) { console.log('elig doc skip (zip 안에 공고문류 없음):', a.name); continue; }
         ai += 1; got += 1;
+        clearFetchFail(it.id, a.name);
         /* 저장 한 곳 — 🔴 받은 바이트가 지금 파일과 같으면 파생 글자(.txt·.body.txt·.ocr.txt)를 지우지 않는다(bodies-5) · 다르면 그 파일의 파생만 지운다 */
         const keep = (fname, data, label) => {
           const same = keepEligDoc(fname, data, oldNames);   // 저장 한 곳(표적 양식 받기와 공용)
@@ -545,7 +563,7 @@ async function downloadEligDocs() {
          Node fetch 의 연결 실패를 전부 `TypeError` 한 낱말로 줄여 버려, 조선대 공고문
          PDF가 왜 안 받아지는지 알 수 없었다. 진짜 원인은 `cause` 안에 들어 있다
          (여기서는 UNABLE_TO_VERIFY_LEAF_SIGNATURE — 학교가 중간 인증서를 안 보낸 것). */
-      } catch (e) { console.log('elig doc err', a.name, errWhy(e)); }
+      } catch (e) { console.log('elig doc err', a.name, errWhy(e)); noteFetchFail(it.id, a.name, a.url, errWhy(e)); }
     }
     if (files.length && !cut) {
       /* 이번에 안 받은 옛 파일(번호가 줄었거나 확장자가 바뀐 것)과 그 파생 글자는 지운다 · 같은 표식을 쓰던 다른 공고의 색인은 뺀다(파일이 갈렸다) */

@@ -1,93 +1,8 @@
 {
  "v": 1,
  "note": "층2 재단 장학금의 개별 공고 후보 — 로봇(collector/kosaf-hunt.mjs)이 재단 홈페이지를 뒤져 적는다. 사람 후보 파일(link-candidates.json)과 같은 줄 꼴. 원문 링크 확인 로봇이 학생처럼 열어 확인한 것만 앱(data/link-check.json fix)에 실린다. 손으로 고치지 말 것 — 다음 실행이 다시 쓴다.",
- "updatedAt": "2026-11-17",
+ "updatedAt": "2026-11-18",
  "items": [
-  {
-   "target": {
-    "ds": "kosaf",
-    "key": "2000395001"
-   },
-   "board": "https://www.ongjin.go.kr/open_content/main/administration/gov30/announce_board3.jsp",
-   "source": "board",
-   "by": "로봇(층2 글 사냥꾼)",
-   "addedAt": "2026-11-13",
-   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다",
-   "also": [
-    "2000395002",
-    "2000395003",
-    "2000395006"
-   ]
-  },
-  {
-   "target": {
-    "ds": "kosaf",
-    "key": "2000356002"
-   },
-   "board": "https://www.tongyeong.go.kr/00001/00286/00309.web",
-   "source": "board",
-   "by": "로봇(층2 글 사냥꾼)",
-   "addedAt": "2026-11-07",
-   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다",
-   "also": [
-    "2000356004"
-   ]
-  },
-  {
-   "target": {
-    "ds": "kosaf",
-    "key": "2701295001"
-   },
-   "board": "https://cbck.or.kr/Board/K7120",
-   "source": "board",
-   "by": "로봇(층2 글 사냥꾼)",
-   "addedAt": "2026-10-20",
-   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다"
-  },
-  {
-   "target": {
-    "ds": "kosaf",
-    "key": "0731002"
-   },
-   "board": "http://www.gbanurse.or.kr/index.php?g_page=notice&m_page=notice01&wd=1",
-   "source": "board",
-   "by": "로봇(층2 글 사냥꾼)",
-   "addedAt": "2026-10-31",
-   "note": "게시판처럼 보이는 쪽(공고 2건 · 글 줄 15) — 확인 로봇이 목록을 다시 읽어 고른다"
-  },
-  {
-   "target": {
-    "ds": "kosaf",
-    "key": "2000204008"
-   },
-   "board": "https://council.wonju.go.kr/content/news/photoGallery.html",
-   "source": "board",
-   "by": "로봇(층2 글 사냥꾼)",
-   "addedAt": "2026-11-13",
-   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 9) — 확인 로봇이 목록을 다시 읽어 고른다"
-  },
-  {
-   "target": {
-    "ds": "kosaf",
-    "key": "2700071007"
-   },
-   "board": "https://www.ycsf.or.kr/open/notice/list.html",
-   "source": "board",
-   "by": "로봇(층2 글 사냥꾼)",
-   "addedAt": "2026-10-14",
-   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 15) — 확인 로봇이 목록을 다시 읽어 고른다"
-  },
-  {
-   "target": {
-    "ds": "kosaf",
-    "key": "2000319002"
-   },
-   "board": "https://www.yeongju.go.kr/check/bbs/board.php?bo_table=yjra0101",
-   "source": "board",
-   "by": "로봇(층2 글 사냥꾼)",
-   "addedAt": "2026-10-13",
-   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 100) — 확인 로봇이 목록을 다시 읽어 고른다"
-  },
   {
    "target": {
     "ds": "kosaf",
@@ -120,6 +35,43 @@
   {
    "target": {
     "ds": "kosaf",
+    "key": "2701042001"
+   },
+   "url": "https://www.seoksung.co.kr/cms/bbs/board.php?bo_table=nanum&wr_id=522",
+   "title": "석성장학회, 2026년도 석성선행장학금 585명에 2억7천만원 전달",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-18",
+   "note": "http://www.seoksung.co.kr/cms/bbs/board.php?bo_table=nanum 목록에서 고름 — 사업 이름 +1 · 재단 이름 +1 · 마감 해 +1 · 장학 낱말 +1 · 게시일 +1"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2701042002"
+   },
+   "board": "http://www.seoksung.co.kr/cms/bbs/board.php?bo_table=nanum",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-18",
+   "note": "게시판처럼 보이는 쪽(공고 2건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000356002"
+   },
+   "board": "https://www.tongyeong.go.kr/00001/00286/00309.web",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-07",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다",
+   "also": [
+    "2000356004"
+   ]
+  },
+  {
+   "target": {
+    "ds": "kosaf",
     "key": "2700003009"
    },
    "url": "https://apply.kfas.or.kr/apply_board/view.php?seq=3363&types=103",
@@ -128,6 +80,39 @@
    "by": "로봇(층2 글 사냥꾼)",
    "addedAt": "2026-11-14",
    "note": "https://apply.kfas.or.kr/ 목록에서 고름 — 사업 이름 +1 · 마감 해 +1 · 게시일 +1"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2701295001"
+   },
+   "board": "https://cbck.or.kr/Board/K7120",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-20",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "0731002"
+   },
+   "board": "http://www.gbanurse.or.kr/index.php?g_page=notice&m_page=notice01&wd=1",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-31",
+   "note": "게시판처럼 보이는 쪽(공고 2건 · 글 줄 15) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2513450002"
+   },
+   "board": "https://www.gimje.go.kr/board/list.gimje?boardId=BBS_0000045&menuCd=DOM_000000104004000000&contentsSid=197&cpath=",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-18",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 10) — 확인 로봇이 목록을 다시 읽어 고른다"
   },
   {
    "target": {
@@ -154,6 +139,39 @@
   {
    "target": {
     "ds": "kosaf",
+    "key": "2000204008"
+   },
+   "board": "https://www.wonju.go.kr/www/index.do",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-18",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 12) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2700071007"
+   },
+   "board": "https://www.ycsf.or.kr/open/notice/list.html",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-14",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 15) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000319002"
+   },
+   "board": "https://www.yeongju.go.kr/check/bbs/board.php?bo_table=yjra0101",
+   "source": "board",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-10-13",
+   "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 100) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
     "key": "2703603001"
    },
    "board": "https://www.yuha.or.kr/News_Notice.aspx",
@@ -161,6 +179,173 @@
    "by": "로봇(층2 글 사냥꾼)",
    "addedAt": "2026-11-14",
    "note": "게시판처럼 보이는 쪽(공고 0건 · 글 줄 7) — 확인 로봇이 목록을 다시 읽어 고른다"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000395001"
+   },
+   "url": "https://www.ongjin.go.kr/open_content/main/bbs/bbsMsgDetail.do?msg_seq=26744&bcd=notice",
+   "title": "(재)옹진군인재육성재단 2026년 2학기 장학생 선발 계획 공고",
+   "source": "search",
+   "query": "(재)옹진군인재육성재단 인재장학금 공고",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-18",
+   "note": "네이버 검색에서 고름 — 공고문 파일 제목 +2 · 사업 이름 +1 · 재단 이름 +1 · 마감 해 +1 · 학기·반기 +1 · 장학 낱말 +1",
+   "also": [
+    "2000395002",
+    "2000395003",
+    "2000395006"
+   ]
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000395003"
+   },
+   "url": "https://www.ongjin.go.kr/open_content/main/bbs/bbsMsgDetail.do?msg_seq=26744&bcd=notice",
+   "title": "(재)옹진군인재육성재단 2026년 2학기 장학생 선발 계획 공고",
+   "source": "search",
+   "query": "(재)옹진군인재육성재단 복지장학금 공고",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-18",
+   "note": "네이버 검색에서 고름 — 공고문 파일 제목 +2 · 재단 이름 +1 · 마감 해 +1 · 학기·반기 +1 · 장학 낱말 +1",
+   "also": [
+    "2000395001",
+    "2000395002",
+    "2000395006"
+   ]
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000395006"
+   },
+   "url": "https://www.ongjin.go.kr/open_content/main/bbs/bbsMsgDetail.do?msg_seq=26744&bcd=notice",
+   "title": "(재)옹진군인재육성재단 2026년 2학기 장학생 선발 계획 공고",
+   "source": "search",
+   "query": "(재)옹진군인재육성재단 지역핵심인재장학금 공고",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-18",
+   "note": "네이버 검색에서 고름 — 공고문 파일 제목 +2 · 재단 이름 +1 · 마감 해 +1 · 학기·반기 +1 · 장학 낱말 +1",
+   "also": [
+    "2000395001",
+    "2000395002",
+    "2000395003"
+   ]
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000193001"
+   },
+   "url": "https://www.hongcheon.go.kr/www/selectEminwonNewsView.do?key=283&news_epct_no=12167&ofr_pageSize=10",
+   "title": "홍천군, 저소득 주민자녀 장학생 선발",
+   "source": "search",
+   "query": "강원도 홍천군청 저소득주민자녀장학금 (일반) 공고",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-18",
+   "note": "네이버 검색에서 고름 — 공고문 파일 제목 +2 · 사업 이름 +1 · 장학 낱말 +1",
+   "also": [
+    "2000193002"
+   ]
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000193002"
+   },
+   "url": "https://www.hongcheon.go.kr/www/selectEminwonNewsView.do?key=283&news_epct_no=12167&ofr_pageSize=10",
+   "title": "홍천군, 저소득 주민자녀 장학생 선발",
+   "source": "search",
+   "query": "강원도 홍천군청 저소득주민자녀장학금 (특별) 공고",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-18",
+   "note": "네이버 검색에서 고름 — 공고문 파일 제목 +2 · 사업 이름 +1 · 장학 낱말 +1",
+   "also": [
+    "2000193001"
+   ]
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2700004002"
+   },
+   "url": "https://www.ikef.or.kr/page.php?id=/kj/scholar_schedule_detail&wr_id=102&page=1",
+   "title": "2026년도 21기 국내장학생 선발(학부)",
+   "source": "search",
+   "query": "관정재단 학부장학생 공고",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-18",
+   "note": "네이버 검색에서 고름 — 사업 이름 +1 · 마감 해 +1 · 장학 낱말 +1"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000421001"
+   },
+   "url": "https://www.inje.go.kr/egf/bp/board/article/download?fileSeq=120999",
+   "title": "2026년 (재)인제군장학회 장학생 선발 공고(안)",
+   "source": "search",
+   "query": "(재)인제군장학회 대학생장학금 공고",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-18",
+   "note": "네이버 검색에서 고름 — 재단 이름 +1 · 마감 해 +1 · 장학 낱말 +1",
+   "also": [
+    "2000421002"
+   ]
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2701096002"
+   },
+   "url": "https://www.jincheon.go.kr/home/sub.do?menukey=406&mode=view&no=1090368397",
+   "title": "2026년 (재)이월면장학회 장학생 선발 공고",
+   "source": "search",
+   "query": "(재)이월면장학회 장학생 공고",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-18",
+   "note": "네이버 검색에서 고름 — 공고문 파일 제목 +2 · 재단 이름 +1 · 마감 해 +1 · 장학 낱말 +1"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2700727005"
+   },
+   "url": "https://www.ansanfys.or.kr/sub02/sub01.php?type=view&uid=1071",
+   "title": "2026년 2학기 안산시 대학생 본인부담 등록금 반값지원 신청 공고 2026-09-28",
+   "source": "search",
+   "query": "재단법인 안산인재육성재단 대학생 본인부담 등록금 반값 지원 공고",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-18",
+   "note": "네이버 검색에서 고름 — 공고문 파일 제목 +2 · 사업 이름 +1 · 마감 해 +1 · 학기·반기 +1"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2000483023"
+   },
+   "url": "https://www.seoulfuture.or.kr/home/kor/M025378985/board.do?idx=cb00d1a0008a85e71a41b8741facbffe9c92b5676b1d6934d9efe41731e60154&act=detail&board_code=XL50YTz5",
+   "title": "[서울선순환인재 장학금] 2026년 서울선순환인재 장학금 선발공고 | 장학사업 공....",
+   "source": "search",
+   "query": "서울미래인재재단 서울선순환인재 장학금 공고",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-18",
+   "note": "네이버 검색에서 고름 — 공고문 파일 제목 +2 · 사업 이름 +1 · 마감 해 +1 · 장학 낱말 +1"
+  },
+  {
+   "target": {
+    "ds": "kosaf",
+    "key": "2700071007"
+   },
+   "url": "https://www.ycsf.or.kr/open/notice/dn.php?idx=342&step=A&num=1",
+   "title": "2026년도 재단법인 영천시장학회 장학생 선발계획 공고",
+   "source": "search",
+   "query": "영천시장학회 SOS 장학금 공고",
+   "by": "로봇(층2 글 사냥꾼)",
+   "addedAt": "2026-11-18",
+   "note": "네이버 검색에서 고름 — 재단 이름 +1 · 마감 해 +1 · 장학 낱말 +1"
   }
  ]
 }

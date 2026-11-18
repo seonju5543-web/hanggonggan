@@ -11,6 +11,7 @@
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { canonUrl } from './canon-url.mjs';
+import { evidenceExcerpts } from './notice-source.mjs';   // 사람이 쓴 발췌는 원문 증거가 아니다(관리자 표식 줄을 뺀다 · 한 곳)
 import { makeStripperMulti } from './page-boilerplate.mjs';   // 메뉴·푸터 껍데기를 걷어낸 본문만 읽는다 — 메뉴의 '발전기금'·'포털'이 증거로 세어졌다(첫 시험)
 import { classifyKind, programNameForTable, domainForSchool } from './kind-evidence.mjs';
 import { loadSchoolNames, schoolTokens } from './school-names.mjs';
@@ -55,9 +56,9 @@ for (const it of reg.items) {
   if (!it.auto || /^관리자/.test(it.kindFrom || '')) continue;
   const school = schoolOf(it); if (!school) continue;
   const body = bodyByKey.get(canonUrl(it.sourceUrl || '')) || '';
-  if (!body && !(it.excerpts || []).length) continue;   // 읽을 원문이 없으면 제목 판정을 그대로 둔다
+  if (!body && !evidenceExcerpts(it).length) continue;   // 읽을 원문이 없으면 제목 판정을 그대로 둔다
   const ownNames = [...(OWN_PROGRAMS[school] || []), ...((own.programs[school] || []).map((p) => p.name))];
-  const k = classifyKind({ title: it.name, school, provider: it.provider, text: body, excerpts: it.excerpts, applyEmail: it.applyEmail, applyPortal: it.applyPortal,
+  const k = classifyKind({ title: it.name, school, provider: it.provider, text: body, excerpts: evidenceExcerpts(it), applyEmail: it.applyEmail, applyPortal: it.applyPortal,
     tokens: schoolTokens(school, names), domain: domainOf(school), campusMark: NOTICE_CAMPUS_MARK, own: ownNames });
   if (k.kind !== it.type) {
     if (k.confidence === 'high') {

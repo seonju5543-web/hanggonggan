@@ -231,8 +231,10 @@ export function runFormPages({ root, today, dry = false, budgetSec = BUDGET_SEC,
     if (!next.some((h) => h.file)) none.push({ id: t.id, name: t.name });
     if (next.length) index.items[t.id] = next; else if (!dry) delete index.items[t.id];
     if (!dry && fs.existsSync(path.join(outDir, t.id))) {
-      const keep = new Set(next.filter((h) => h.file).map((h) => path.basename(h.file)));
-      for (const fn of fs.readdirSync(path.join(outDir, t.id))) if (!keep.has(fn)) { try { fs.rmSync(path.join(outDir, t.id, fn), { force: true }); } catch { /* 무시 */ } }
+      /* 🔴 뒤 단계(form-fields.mjs)의 결과물·사람 장부는 고아가 아니다 — fields.json · fields-fix.json(관리자 칸 지정) · 살아 있는 PDF 의 「<이름>-pages」 쪽 그림 폴더는 둔다
+         (2026-11-18 리뷰 — 서식 쪽도 「양식 채우기」가 열리게 한 뒤 이 정리가 매일 그 파일을 지워 앱에 한 번도 안 닿을 뻔했다 · form-pdf.mjs 의 같은 정리와 같은 목록) */
+      const keep = new Set(next.filter((h) => h.file).flatMap((h) => [path.basename(h.file), `${path.basename(h.file).replace(/\.pdf$/i, '')}-pages`]).concat(['fields.json', 'fields-fix.json']));
+      for (const fn of fs.readdirSync(path.join(outDir, t.id))) if (!keep.has(fn)) { try { fs.rmSync(path.join(outDir, t.id, fn), { recursive: true, force: true }); } catch { /* 무시 */ } }
       if (!keep.size) { try { fs.rmSync(path.join(outDir, t.id), { recursive: true, force: true }); } catch { /* 무시 */ } }
     }
     void any;

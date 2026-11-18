@@ -24,9 +24,9 @@ concurrency:
 jobs:
   audit:
     runs-on: ubuntu-latest
-    # 상한 = 감사 예산 35분 + 준비·저장 여유. 예산을 스스로 지키므로 취소되지 않아야 한다.
-    # (첫 실행은 20분 예산으로 16/41곳만 봤다 — 학교당 약 75초.)
-    timeout-minutes: 45
+    # 상한 = 감사 단계 상한 40(예산 35분을 스스로 지킨다) + 준비 ~5 + 관문 5 + 되돌리기 7 + 저장·경보 ~3. 취소되지 않아야 한다.
+    # (첫 실행은 20분 예산으로 16/41곳만 봤다 — 학교당 약 75초.) 관문 둘은 2026-11-17 저장 앞 관문(노션 G-16)으로 더했다.
+    timeout-minutes: 62
     steps:
       - uses: actions/checkout@v7
       - name: 협업 병합기 등록 (충돌 자동 해소 — COLLAB.md)
@@ -43,11 +43,31 @@ jobs:
         continue-on-error: true
         run: node collector/audit-coverage.mjs
 
-      # 🔴 감사는 아무것도 고치지 않는다. 그래서 저장 목록에 **리포트 둘만** 넣는다.
+      # 🔴 저장 직전 관문 (2026-11-17 · 노션 G-16 — 관문 「로봇·도구 점검 관문」 savegate · CLAUDE.md 매 세션 7):
+      #    기록장 둘(coverage-history·coverage-cursor)은 규칙 파일 자리(collector 바로 밑 json)라 규칙 관문(test-collector)을 저장 앞에 거친다.
+      #    감사는 data/ 를 쓰지 않아 데이터 감사(audit-data)는 묶지 않는다 — 남의 데이터 빨간불에 감사 기록까지 멈추지 않게(층2 사냥꾼과 같은 꼴).
+      - name: 데이터 관문
+        id: audit
+        continue-on-error: true
+        timeout-minutes: 5
+        run: node verify/test-collector.mjs
+
+      # 되돌리고 **관문을 다시 잰다** (collector/gate-guard.mjs 한 곳 · 수집·사냥꾼·요약 로봇과 같은 장치) — 되돌릴 것은 이 로봇이 저장하는 셋 전부.
+      # --keep-preexisting: 되돌려도 빨갛고 새로 걸린 검사가 없으면(원래 있던 빨간불) 이번 감사 결과는 저장한다 — 남의 빨간불에 회전 커서가 멈추면
+      #   뒤쪽 학교가 영영 감사되지 않는다. 상한 7분 = 관문 최대 두 번 + 여유. 넘어지면(|| 뒤) 그 셋만 직전 판으로.
+      - name: 관문 실패 시 감사 기록 되돌리기
+        id: guard
+        if: always() && steps.audit.outcome == 'failure'
+        timeout-minutes: 7
+        run: |
+          GATE_CMD='node verify/test-collector.mjs' node collector/gate-guard.mjs --note /tmp/gate-note.md --keep-preexisting --stage collector/coverage-report.md,collector/coverage-history.json,collector/coverage-cursor.json || git checkout -- collector/coverage-report.md collector/coverage-history.json collector/coverage-cursor.json
+
+      # 🔴 감사는 아무것도 고치지 않는다. 그래서 저장 목록에 **리포트와 제 기록장만** 넣는다.
       # 여기에 seen.json이나 data/*.json을 추가하면 감사가 데이터를 만지게 되고,
       # 감사가 만든 변화를 감사가 다시 재는 순환이 생긴다. 절대 늘리지 말 것.
+      # 저장은 관문이 처음 통과했거나 되돌리기 도구가 결과를 남겼을 때만 — 결과가 still-failing 이면 셋은 이미 직전 판이라 올라갈 것이 없다.
       - name: 리포트 저장
-        if: always()
+        if: always() && (steps.audit.outcome == 'success' || steps.guard.outputs.gate != '')
         run: |
           git config user.name "handaejang-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -69,12 +89,61 @@ jobs:
             fi
           fi
 
+      # 🔴 관문 실패는 조용히 넘어가지 않는다 — 무엇을 되돌렸는지는 gate-guard 의 단락(/tmp/gate-note.md)을 그대로 싣는다(요약·사냥꾼과 같은 꼴).
+      #    이슈 **하나**에 모은다(제목에 날짜·결과 없음 · prefix) · 관문이 다시 통과하면 아래 짝이 닫는다(tools/alert-issue.mjs · 여는·닫는 제목이 같다).
+      - name: 🚨 데이터 관문 실패 알림
+        if: always() && steps.audit.outcome == 'failure'
+        timeout-minutes: 1
+        run: |
+          case "${{ steps.guard.outputs.gate }}" in
+            reverted-files)   result="감사 기록을 되돌려서 통과 — 이번 감사 결과는 저장하지 않음" ;;
+            kept-preexisting) result="원래 있던 빨간불 — 이번 감사 결과는 저장" ;;
+            still-failing)    result="되돌려도 빨간불 — 이번 감사 결과는 저장하지 않음" ;;
+            flaky)            result="다시 재니 통과(되돌린 것 없음)" ;;
+            *)                result="되돌리기 단계가 결과를 남기지 못함(넘어짐·건너뜀·시간 초과) — 이번 감사 결과는 저장하지 않음" ;;
+          esac
+          {
+            echo "🔍 공고 누락 감사: 🚨 $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST **데이터 관문(test-collector) 실패** — $result"
+            echo
+            if [ -n "${{ steps.guard.outputs.gate }}" ] && [ -s /tmp/gate-note.md ]; then cat /tmp/gate-note.md
+            else echo "> 되돌리기 단계가 결과를 남기지 못했습니다(넘어짐·건너뜀·시간 초과) — 이번 감사 결과는 저장하지 않았습니다."; fi
+            echo
+            echo "실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} · Claude 세션에 '누락 감사 관문 실패 확인해줘'라고 지시하세요."
+          } > /tmp/gate-issue.md
+      - name: 🚨 데이터 관문 실패 — 경보 이슈
+        if: always() && steps.audit.outcome == 'failure'
+        timeout-minutes: 1
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: open
+          match: prefix
+          title: 🚨 공고 누락 감사 — 데이터 관문 실패
+          label: coverage-audit-gate
+          label-description: 공고 누락 감사 — 데이터 관문 실패
+          body-file: /tmp/gate-issue.md
+      - name: ✅ 데이터 관문 회복 — 경보 닫기
+        if: always() && steps.audit.outcome == 'success'
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: ./.github/actions/alert-issue
+        with:
+          token: ${{ github.token }}
+          mode: resolve
+          match: prefix
+          title: 🚨 공고 누락 감사 — 데이터 관문 실패
+          body: |
+            ✅ 데이터 관문이 다시 통과했습니다 — 이번 감사 결과는 저장됩니다. 자동으로 닫습니다.
+            실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
       # 결과를 이슈로 — '원인 미상'이 있을 때만. 없으면 조용히 끝낸다(정상 세션에 소음 0).
       # 🔴 이슈 **하나**에 모은다 (2026-10-04 로봇·도구 점검). 옛 판은 라벨 coverage-audit 이 저장소에 없어 gh 가 실패 →
       #    예비 명령이 라벨 없는 이슈를 매주 새로 만들었다(열린 🔍 10건). 제목은 고정(같은 제목이어야 댓글로 모인다),
       #    날짜·건수는 본문 첫 줄에. 옛 날짜 붙은 🔍 는 리포트 정리(tools/report-retention.mjs · 최신 1건)가 닫는다.
+      # 🔴 관문이 리포트를 직전 판으로 되돌렸으면(reverted-files·still-failing·되돌리기 넘어짐) 올리지 않는다 — 디스크의 리포트는 지난 감사인데
+      #    이번 날짜·건수를 얹어 '이번 주 결과'로 올라간다(리뷰 3차 2026-11-17). 이번 판이 남는 것은 관문 통과·kept-preexisting·flaky 셋뿐(collector/gate-guard.mjs).
       - name: 결과 이슈 내용 만들기 (원인 미상이 있을 때만)
-        if: steps.run.outcome == 'success' && steps.run.outputs.unknown != '' && steps.run.outputs.unknown != '0'
+        if: steps.run.outcome == 'success' && steps.run.outputs.unknown != '' && steps.run.outputs.unknown != '0' && (steps.audit.outcome == 'success' || steps.guard.outputs.gate == 'kept-preexisting' || steps.guard.outputs.gate == 'flaky')
         timeout-minutes: 1
         env:
           UNKNOWN: ${{ steps.run.outputs.unknown }}
@@ -90,7 +159,7 @@ jobs:
             mv /tmp/cut.md /tmp/cov.md
           fi
       - name: 결과 이슈 (원인 미상이 있을 때만)
-        if: steps.run.outcome == 'success' && steps.run.outputs.unknown != '' && steps.run.outputs.unknown != '0'
+        if: steps.run.outcome == 'success' && steps.run.outputs.unknown != '' && steps.run.outputs.unknown != '0' && (steps.audit.outcome == 'success' || steps.guard.outputs.gate == 'kept-preexisting' || steps.guard.outputs.gate == 'flaky')
         timeout-minutes: 2
         uses: ./.github/actions/alert-issue
         with:
@@ -114,3 +183,11 @@ jobs:
         with:
           robot: 공고 누락 감사
           token: ${{ github.token }}
+
+      # 🔴 관문이 끝내 빨가면 초록불로 끝내지 않는다 — 이슈는 위 단계가 이미 열었다.
+      #    failure()·cancelled() 알림 **뒤**에 둔다(앞에 두면 '감사가 끝까지 못 갔다'는 틀린 말이 붙는다 · 요약·사냥꾼 로봇과 같은 순서).
+      - name: 🚨 관문이 끝내 빨간불 (되돌린 뒤에도 · 원래 있던 빨간불 · 되돌리기 도구가 넘어짐)
+        if: always() && steps.audit.outcome == 'failure' && steps.guard.outputs.gate != 'reverted-files' && steps.guard.outputs.gate != 'flaky'
+        run: |
+          echo "::error::데이터 관문이 빨갛습니다(결과: '${{ steps.guard.outputs.gate }}') — 이슈에 적었습니다."
+          exit 1

@@ -151,6 +151,41 @@ const PROFILE = (over) => ({
     eq('배지의 맞는 요건 수가 조건 수 합을 넘지 않는다 (조건 단위 · 묶음은 1개)', total >= 0 && total <= condCap, true);
   } else console.log('  🚨 요건 개수를 띄운 카드가 하나도 없다 — 배지 형식이 바뀌었는지 확인할 것');
 
+  /* 🔴 택1 묶음의 머리 줄은 **이름표**로 보이고 요건 줄로 세지 않는다 (2026-11-17 · 충남대 사회 재환원 장학금 auto-0713no2516266sitedvscdkr).
+     엔진은 「나. 차등조건(1개 이상 충족 시 …)」 아래 셋을 한 요건으로 세는데, 시트가 머리 줄을 숨긴 채 셋을 평평하게 늘어놓아 '셋 다 필요'로 읽혔다.
+     표본은 화면 안에서만 붙인다(실데이터에 안 기댄다) — 줄은 그 공고 원문 그대로 */
+  console.log('\n■ 택1 묶음 머리 줄 — 이름표(r-pick)는 보이고 요건 줄로 세지 않는다');
+  const pick = await page.evaluate(() => {
+    NATIONAL_SCHOLARSHIPS.push(Object.assign({}, NATIONAL_SCHOLARSHIPS[0], { id: 'zz-pick-head', name: '택1 머리 줄 표본', program: false, eligibility: {},
+      eligibilityLines: ['1) 충남대학교 학부 재학생(2026학년도 2학기 등록자 / 휴학·수료자 등 제외)', '2) 직전 학기 12학점 이상 이수자',
+        '나. 차등조건(1개 이상 충족 시 신청 가능, 해당하는 모든 조건의 증빙서류 제출 필수)',
+        '1) 「아동복지법」상 가정위탁·아동복지시설 보호조치 종료가 5년 이상 경과한 자',
+        '2) 국민기초생활수급자(신청자 본인이 수급자로 등록된 자 중 생계급여 또는 의료급여 수급자에 한함)',
+        '3) 「아동복지법」상 가정위탁·아동복지시설 보호조치 연장자'] }));
+    openDetail('zz-pick-head');
+    const lis = [...document.querySelectorAll('#detail-sheet .reason-list li')];
+    const caps = lis.filter((li) => li.classList.contains('r-pick'));
+    const at = lis.indexOf(caps[0]);
+    const cs = caps[0] ? getComputedStyle(caps[0]) : null;
+    const probe = document.createElement('span');
+    document.querySelector('#detail-sheet').appendChild(probe);
+    probe.style.fontSize = 'var(--t-xs)'; probe.style.color = 'var(--text-sub)';
+    const want = getComputedStyle(probe); const wantFs = want.fontSize, wantCol = want.color; probe.remove();
+    return {
+      caps: caps.length, text: caps[0] ? caps[0].textContent.trim() : null,
+      next: lis[at + 1] ? /보호조치 종료가 5년/.test(lis[at + 1].textContent) : false,
+      capIsElig: caps.some((li) => li.classList.contains('r-elig')),
+      elig: document.querySelectorAll('#detail-sheet li.r-elig:not(.r-x)').length,
+      lines: requirementLines(findSch('zz-pick-head'), null, { all: true }).length,
+      tokens: !!cs && cs.fontSize === wantFs && cs.color === wantCol,
+      dot: cs ? getComputedStyle(caps[0], '::before').display : null,
+    };
+  });
+  eq('머리 줄 이름표 하나가 택1 묶음 첫 줄(보호조치 종료) 바로 위 · 원문 글자 그대로(앞 「나.」 만 뗌)', [pick.caps, pick.text, pick.next],
+    [1, '차등조건(1개 이상 충족 시 신청 가능, 해당하는 모든 조건의 증빙서류 제출 필수)', true]);
+  eq('  이름표는 자격 줄(r-elig)이 아니다 — 자격 줄 수는 엔진 줄 수(5) 그대로', [pick.capIsElig, pick.elig, pick.lines], [false, 5, 5]);
+  eq('  모양은 토큰 그대로(t-xs · text-sub) · 목록 점 없음', [pick.tokens, pick.dot], [true, 'none']);
+
   console.log('\nERRORS:', errors.length ? errors : 'none');
   if (errors.length) fail++;
   await browser.close();

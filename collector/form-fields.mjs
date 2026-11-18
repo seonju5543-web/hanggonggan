@@ -44,7 +44,11 @@ export const LABELS = [
   { re: /^(주소|현주소|자택주소|거주지|주민등록주소)$/, key: null, label: '주소' },
   { re: /^(학자금지원구간|소득분위|소득구간|지원구간)$/, key: 'bracket', label: '소득구간' },
   { re: /^(평점|평균평점|직전학기성적|성적|학점|직전학기평점)$/, key: 'gpa', label: '성적' },
+  /* 날짜 칸(2026-11-18 · 인계 1 f) — 「작성일 : ____」「신청일」 · 앱이 오늘 날짜를 먼저 채운다(formfill.js ffAutoValue 'today') */
+  { re: /^(작성일|작성일자|신청일|신청일자|제출일|제출일자|작성날짜|신청날짜)$/, key: 'today', label: '작성일' },
 ];
+/* 가족·명단 표의 같은 칸 아래로 이어지는 빈 줄을 몇 줄까지 잡나 — 「성명」 머리글 아래 둘째·셋째 가족 줄 */
+export const MAX_TABLE_ROWS = 6;
 
 export const norm = (s) => String(s || '').replace(/[\s:：·ㆍ()（）\[\]【】,./]/g, '').replace(/[*＊※]/g, '');
 
@@ -99,8 +103,20 @@ export function detectFields(page, pageNo, rules) {
   const spansX = (h, x0, x1) => h[1] <= x0 + 2 && h[2] >= x1 - 2;
   const textIn = (x0, y0, x1, y1) => page.lines.some((o) => o.x0 < x1 - 1 && o.x1 > x0 + 1 && o.y0 < y1 - 1 && o.y1 > y0 + 1);
   const push = (L, box, key, pageNo) => out.push({ id: `p${pageNo}-${out.length + 1}`, page: pageNo, x: r1(box.x0), y: r1(box.y0), w: r1(box.x1 - box.x0), h: r1(box.y1 - box.y0), label: L.label, key });
+  /* 밑줄 빈칸(2026-11-18) — 표 밖의 「성명 : ________」「신청인 ________ (인)」: 밑줄 낱말 앞의 글자가 사전 이름표면 밑줄 자리가 빈칸 */
+  const underlined = new Set();
+  for (const ln of page.lines) {
+    const k = ln.words.findIndex((w) => /_{3,}/.test(w.t));
+    if (k <= 0) continue;
+    const Lu = labelOf(ln.words.slice(0, k).map((w) => w.t).join(' '));
+    if (!Lu) continue;
+    const w = ln.words[k]; const lh2 = ln.y1 - ln.y0;
+    if (w.x1 - w.x0 < MIN_BOX_W) continue;
+    push(Lu, { x0: w.x0, y0: ln.y0 - lh2 * 0.15, x1: w.x1, y1: ln.y1 + lh2 * 0.15 }, Lu.key, pageNo);
+    underlined.add(ln);
+  }
   for (const { ln, L } of labeled) {
-    if (!L) continue;
+    if (!L || underlined.has(ln)) continue;
     const lh = ln.y1 - ln.y0;
     if (hasRules) {
       const vs = V.filter((v) => spansY(v, ln.y0, ln.y1)).map((v) => v[0]).sort((a, b) => a - b);
@@ -120,7 +136,22 @@ export function detectFields(page, pageNo, rules) {
           const vsBelow = V.filter((v) => hB2 != null && spansY(v, hB, hB2)).map((v) => v[0]);
           const belowCell = hB2 != null && vsBelow.some((x) => Math.abs(x - vL) < 3) && vsBelow.some((x) => Math.abs(x - vR) < 3)
             ? { x0: vL + 3, y0: hB + 2, x1: vR - 3, y1: hB2 - 2 } : null;
-          if (belowCell && belowCell.x1 - belowCell.x0 >= MIN_BOX_W && belowCell.y1 - belowCell.y0 >= lh * 0.8 && !textIn(belowCell.x0, belowCell.y0, belowCell.x1, belowCell.y1)) { push(L, belowCell, null, pageNo); below++; continue; }
+          if (belowCell && belowCell.x1 - belowCell.x0 >= MIN_BOX_W && belowCell.y1 - belowCell.y0 >= lh * 0.8 && !textIn(belowCell.x0, belowCell.y0, belowCell.x1, belowCell.y1)) {
+            push(L, belowCell, null, pageNo); below++;
+            /* 둘째·셋째 줄 — 같은 세로선 사이에 비어 있는 칸이 아래로 이어지면 그 칸들도 빈칸(가족 표의 둘째 가족 · 2026-11-18). 글자가 있거나 선이 끊기면 멈춘다 */
+            let top = hB2;
+            for (let r = 1; r < MAX_TABLE_ROWS; r++) {
+              const next = hsCol.find((y) => y > top + 4);
+              if (next == null) break;
+              const vsRow = V.filter((v) => spansY(v, top, next)).map((v) => v[0]);
+              if (!(vsRow.some((x) => Math.abs(x - vL) < 3) && vsRow.some((x) => Math.abs(x - vR) < 3))) break;
+              const cell = { x0: vL + 3, y0: top + 2, x1: vR - 3, y1: next - 2 };
+              if (cell.y1 - cell.y0 < lh * 0.8 || textIn(cell.x0, cell.y0, cell.x1, cell.y1)) break;
+              push(L, cell, null, pageNo); below++;
+              top = next;
+            }
+            continue;
+          }
           continue;   // 칸 안에 있는데 오른쪽도 아래도 빈 칸이 아니다 — 이미 값이 적힌 꼴
         }
       }
@@ -176,9 +207,16 @@ export function runFormFields({ root, today, dry = false, force = false, log = c
   let index = { items: {} };
   try { index = JSON.parse(fs.readFileSync(indexPath, 'utf8')); } catch { /* 사본이 아직 없다 */ }
   const items = (index && index.items) || {};
-  const stats = { files: 0, done: 0, same: 0, failed: [], fields: 0, keyed: 0, noField: [], headerRows: 0, below: 0, png: 0, capped: [] };
+  /* 공고문 뒷장에서 뗀 서식 쪽(data/form-pages · form-pages.mjs)도 같은 규칙으로 쪽 그림·빈칸을 만든다(2026-11-18 · 서식 쪽만 있는 공고도 「양식 채우기」가 열리게).
+     🔴 그 색인의 'none' 줄(서식 쪽 없음 기록)은 파일이 없어 건너뛴다 · 결과는 data/form-pages/<id>/fields.json(앱 formfill.js 가 둘을 합쳐 읽는다) */
+  const pagesDir = path.join(root, 'data', 'form-pages');
+  let pagesIndex = { items: {} };
+  try { pagesIndex = JSON.parse(fs.readFileSync(path.join(pagesDir, 'index.json'), 'utf8')); } catch { /* 아직 없다 */ }
+  const sets = [[outDir, items], [pagesDir, Object.fromEntries(Object.entries((pagesIndex && pagesIndex.items) || {}).map(([id, arr]) => [id, (arr || []).filter((f) => f && f.file)]).filter(([, arr]) => arr.length))]];
+  const stats = { files: 0, done: 0, same: 0, failed: [], fields: 0, keyed: 0, noField: [], headerRows: 0, below: 0, png: 0, capped: [], perFile: [] };
   const byLabel = new Map();
-  for (const [id, files] of Object.entries(items)) {
+  for (const [baseDir, setItems] of sets) for (const [id, files] of Object.entries(setItems)) {
+    const outDir = baseDir;   // 아래 본문이 쓰는 이름 그대로(한 벌의 규칙)
     const dir = path.join(outDir, id);
     const fjPath = path.join(dir, 'fields.json');
     let fj = { updatedAt: today, files: {} };
@@ -192,7 +230,7 @@ export function runFormFields({ root, today, dry = false, force = false, log = c
       keep.add(rel);
       const h = sha(pdfPath);
       const prev = fj.files[rel];
-      if (!force && prev && prev.sha === h && prev.pages && prev.pages.every((p) => fs.existsSync(path.join(dir, prev.dir || '', p.img)))) { stats.same++; stats.fields += prev.fields.length; stats.keyed += prev.fields.filter((x) => x.key).length; continue; }
+      if (!force && prev && prev.sha === h && prev.pages && prev.pages.every((p) => fs.existsSync(path.join(dir, prev.dir || '', p.img)))) { stats.same++; stats.fields += prev.fields.length; stats.keyed += prev.fields.filter((x) => x.key).length; stats.perFile.push({ id, rel, sha: h, n: prev.fields.length }); if (!prev.fields.length) stats.noField.push(`${id} · ${rel}`); continue; }   // 그대로 둔 파일도 센다(2026-11-18 · 리포트가 0칸 파일을 3개로 적었는데 실제 7개)
       if (dry) { log(`· ${id} · ${rel} — 만들 것`); continue; }
       const xml = sh('pdftotext', ['-bbox-layout', pdfPath, '-']);
       if (xml.status !== 0) { stats.failed.push({ id, name: rel, why: `pdftotext 실패: ${String(xml.stderr || '').slice(0, 100)}` }); continue; }
@@ -205,6 +243,10 @@ export function runFormFields({ root, today, dry = false, force = false, log = c
       const fields = []; let headerRows = 0;
       pages.slice(0, MAX_PAGES).forEach((pg, i) => { const rp1 = rp.pages.find((p) => p.n === i + 1); const d = detectFields(pg, i + 1, rp1 && rp1.rules); fields.push(...d.fields); headerRows += d.headerRows; stats.below += d.below; });
       for (const x of fields) byLabel.set(x.label, (byLabel.get(x.label) || 0) + 1);
+      let fixDoc = null;
+      try { fixDoc = JSON.parse(fs.readFileSync(path.join(dir, 'fields-fix.json'), 'utf8')); } catch { /* 사람이 지정한 칸 없음 */ }
+      const fixed = applyFieldFix(fields, fixDoc && fixDoc.files && fixDoc.files[rel], pages.slice(0, MAX_PAGES).map((pg, i) => ({ n: i + 1, w: pg.w, h: pg.h })));
+      fields.length = 0; fields.push(...fixed);
       fj.files[rel] = {
         sha: h, dir: pagesDir, at: today,
         pages: rp.pages.map((p) => ({ n: p.n, w: r1((pages[p.n - 1] || {}).w || 0), h: r1((pages[p.n - 1] || {}).h || 0), img: p.img, iw: p.iw, ih: p.ih, rules: p.rules ? { h: p.rules.h.length, v: p.rules.v.length } : undefined })),
@@ -212,6 +254,7 @@ export function runFormFields({ root, today, dry = false, force = false, log = c
       };
       stats.done++; stats.fields += fields.length; stats.keyed += fields.filter((x) => x.key).length; stats.headerRows += headerRows;
       if (!fields.length) stats.noField.push(`${id} · ${rel}`);
+      stats.perFile.push({ id, rel, sha: h, n: fields.length });
       log(`✓ ${id} · ${rel} — ${rp.pages.length}쪽 · 빈칸 ${fields.length}(프로필로 채울 수 있는 것 ${fields.filter((x) => x.key).length})`);
     }
     if (dry) continue;
@@ -231,9 +274,61 @@ export function runFormFields({ root, today, dry = false, force = false, log = c
   if (stats.failed.length) { L.push(''); L.push('### 실패'); stats.failed.forEach((f) => L.push(`- ${f.id} · ${f.name} — ${f.why}`)); }
   if (stats.noField.length) { L.push(''); L.push('### 빈칸을 하나도 못 찾은 파일 (학생은 원본을 받아 손으로 쓴다 · 관리자가 칸을 지정하는 길은 다음 조각)'); stats.noField.forEach((s) => L.push(`- ${s}`)); }
   if (stats.capped.length) { L.push(''); L.push('### 쪽 상한으로 자른 파일'); stats.capped.forEach((s) => L.push(`- ${s}`)); }
+  let grades = {};
+  try { grades = JSON.parse(fs.readFileSync(path.join(root, 'collector', 'form-fields-grades.json'), 'utf8')) || {}; } catch { /* 없음 */ }
+  L.push(''); L.push(...gradeReport(grades, stats.perFile));
   if (!dry) fs.writeFileSync(reportPath, L.join('\n') + '\n');
   log(L.join('\n'));
   return stats;
+}
+
+/* ── 사람이 지정한 칸 (2026-11-18 · 인계 1 f 「관리자 칸 지정」) ─────────────────────────────────────
+   로봇이 못 찾았거나 잘못 찾은 칸을 사람이 고친다 — 장부 data/<forms-pdf|form-pages>/<id>/fields-fix.json:
+     { "files": { "<파일 이름>": { "add": [{ page, x, y, w, h, label, key }], "remove": ["p1-3"], "by", "at" } } }
+   저장은 tools/admin-apply.mjs fieldFix(관리자 버튼과 같은 길) · 로봇은 칸을 새로 만들 때마다 이 장부를 다시 얹는다(지우지 않는다). 순수 함수 */
+export const FIX_KEYS = new Set([...LABELS.map((L) => L.key).filter(Boolean)]);
+/* 같은 칸인가 — 쪽이 같고 자리·크기가 몇 포인트 안(로봇이 다시 그리면 좌표가 조금 흔들린다) */
+export const sameBox = (a, b) => !!a && !!b && a.page === b.page && Math.abs(a.x - b.x) <= 3 && Math.abs(a.y - b.y) <= 3 && Math.abs(a.w - b.w) <= 4 && Math.abs(a.h - b.h) <= 4;
+/* 🔴 뺄 칸은 **자리(쪽+상자)** 로 적는다 — 로봇 칸 번호(p1-3)는 찾는 규칙이 바뀌면 다른 칸을 가리킨다(리뷰 2026-11-18) · 사람이 더한 칸도 같은 자리로 뺀다 · 같은 칸을 두 번 더해도 하나 */
+export function applyFieldFix(fields, fix, pages) {
+  if (!fix) return fields;
+  const gone = (fix.remove || []).filter((r) => r && typeof r === 'object');
+  const out = (fields || []).filter((f) => f.by !== 'admin' && !gone.some((g) => sameBox(g, f)));
+  const kept = [];
+  for (const a of fix.add || []) {
+    const pg = (pages || []).find((p) => p.n === a.page);
+    if (!pg || !(a.w > 0 && a.h > 0) || a.x < 0 || a.y < 0 || a.x + a.w > pg.w + 1 || a.y + a.h > pg.h + 1) continue;   // 쪽 밖의 칸은 버린다
+    if (gone.some((g) => sameBox(g, a)) || kept.some((k) => sameBox(k, a))) continue;
+    kept.push(a);
+    out.push({ id: `a${kept.length}`, page: a.page, x: r1(a.x), y: r1(a.y), w: r1(a.w), h: r1(a.h), label: String(a.label || '').slice(0, 20) || '빈칸', key: FIX_KEYS.has(a.key) ? a.key : null, by: 'admin' });
+  }
+  return out;
+}
+
+/* ── 빈칸 정확도를 재는 자 (2026-11-18 · 인계 F3) ──────────────────────────────────────────────
+   사람이 표본 PDF 를 **한 번** 채점한다(칸마다 맞음·놓침·틀림) → collector/form-fields-grades.json 에 파일 sha 를 열쇠로 적는다:
+     { "<sha>": { "name": "…", "foundAtGrading": 6, "right": 5, "missed": 2, "wrong": 1, "at": "2026-11-20", "by": "선주" } }
+   로봇은 매 실행 그 sha 의 지금 찾은 칸 수를 채점 때와 견주어 리포트에 한 줄만 적는다(실데이터 정답을 관문에 박지 않는다 — 경고·추적만).
+   채점된 것이 없으면 표본 후보 10개를 고른다: 칸 0개 파일 → 칸이 가장 많은 파일 → 나머지(앞에서부터). 순수 함수. */
+export function gradeReport(grades, perFile) {
+  const out = ['### 🎯 빈칸 정확도 (사람 채점 표본 · collector/form-fields-grades.json)'];
+  const graded = (perFile || []).filter((f) => grades && grades[f.sha]);
+  if (!graded.length) {
+    const zero = perFile.filter((f) => !f.n), rest = perFile.filter((f) => f.n).sort((a, b) => b.n - a.n);
+    const pick = [...zero.slice(0, 4), ...rest.slice(0, 3), ...rest.slice(-3)].filter((f, i, a) => a.findIndex((x) => x.sha === f.sha) === i).slice(0, 10);
+    out.push('아직 채점한 파일이 없습니다 — 아래 표본을 한 번 채점해 주세요(칸마다 맞음·놓침·틀림 · 파일 sha 를 열쇠로):');
+    pick.forEach((f) => out.push(`- ${f.id} · ${f.rel} — 지금 찾은 칸 ${f.n} · sha ${String(f.sha).slice(0, 12)}`));
+    return out;
+  }
+  let right = 0, missed = 0, wrong = 0;
+  for (const f of graded) {
+    const g = grades[f.sha]; right += g.right || 0; missed += g.missed || 0; wrong += g.wrong || 0;
+    const drift = (g.foundAtGrading ?? f.n) !== f.n ? ` · ⚠️ 채점 때 ${g.foundAtGrading}칸 → 지금 ${f.n}칸(규칙이 바뀌었다 — 다시 채점)` : '';
+    out.push(`- ${f.id} · ${f.rel} — 맞음 ${g.right || 0} · 놓침 ${g.missed || 0} · 틀림 ${g.wrong || 0}${drift}`);
+  }
+  const all = right + missed;
+  out.splice(1, 0, `채점 ${graded.length}개 파일 · 찾아야 할 칸 ${all}개 중 맞게 찾음 ${right}(${all ? Math.round((right / all) * 100) : 0}%) · 놓침 ${missed} · 잘못 찾음 ${wrong}`);
+  return out;
 }
 
 if (!process.env.FORM_FIELDS_AS_LIB) {

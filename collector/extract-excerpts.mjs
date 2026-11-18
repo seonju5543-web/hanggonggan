@@ -21,10 +21,10 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 /* 원문 찾기 규칙은 notice-source.mjs 한 곳에 있다 — 수집기·재채점 도구와 같은 방법을
    써야 "발췌기는 찾았는데 수집기는 못 찾는" 어긋남이 안 생긴다 (2026-08-03 분리). */
-import { indexTexts, sourceFor, hasText } from './notice-source.mjs';
+import { indexTexts, sourceFor, hasText, excerptsHumanOwned } from './notice-source.mjs';
 /* 게시판 메뉴·푸터를 걷어내는 규칙 (2026-08-20 신설 — page-boilerplate.mjs 첫머리 참조).
    자격을 못 뽑은 61건 중 40건이 '본문이 메뉴에 파묻힌' 상태였다. */
-import { makeStripper, buildBoilerplate, boilerFor } from './page-boilerplate.mjs';
+import { makeStripper, boilerFor, titleLineAt, siteChromeFrom, ownBody, squashWs } from './page-boilerplate.mjs';
 /* 절 머리글 판정은 section-head.js 한 곳 — 화면(match-engine)·감사와 같은 파일을 쓴다.
    베끼면 '발췌기는 제외 절로 보는데 화면은 자격으로 보는' 어긋남이 생긴다. */
 import { createRequire as _cr } from 'node:module';
@@ -38,9 +38,9 @@ import { attachmentText, readableDoc, isOcrSource, noticeDocFiles as noticeDocFi
 /* id 칸 없는 옛 신청서 색인 줄의 '같은 제목' 판정 — 규칙은 detail-url.mjs sameTitle 한 곳(베끼지 않는다) */
 import { sameTitle } from './detail-url.mjs';
 const noticeDocFiles = (it, opts = {}) => noticeDocFiles0(it, { sameTitle, ...opts });
-import { findApplyEmail, humanOwnedEmail, staleApplyEmail } from './apply-email.mjs';
+import { findApplyEmail, humanOwnedEmail, staleApplyEmail, staleInTexts } from './apply-email.mjs';
 import { decodeEntities } from './clean-title.mjs';
-import { readDocuments, placeholderOnly as docsPlaceholderOnly } from './doc-list.mjs';
+import { readDocuments, placeholderOnly as docsPlaceholderOnly, DOC_PLACEHOLDER_LINE, hasDocSection } from './doc-list.mjs';
 /* 포털 판정은 `apply-channel.js` 한 곳 — 앱·관리자 화면도 같은 파일을 쓴다(베끼지 말 것).
    ⚠️ `_cr` 는 위에서 이미 들여왔다 — 다시 import 하면 그 자리에서 죽는다(실제로 그랬다). */
 const { findApplyPortal } = _cr(import.meta.url)('../apply-channel.js');
@@ -95,8 +95,11 @@ export function splitSentences(text) {
   }
   return out;
 }
-/* 발췌로 안 담는 줄 — 바닥글 연락처 띠(`(우)02841 … 대표전화 02-…`·`Copyright`)와 첨부 파일 이름 줄(`… 선발 공고문.hwp (52KB)`) */
-const EXCERPT_FOOTER = /대표\s?전화|copyright|all\s?rights|[(（]\s?우\s?[)）]?\s?\d{5}|우편\s?번호|사업자\s?등록/i;
+/* 발췌로 안 담는 줄 — 바닥글 연락처 띠(`(우)02841 … 대표전화 02-…`·`Copyright`)와 첨부 파일 이름 줄(`… 선발 공고문.hwp (52KB)`)
+   🔴 서울시 산하 누리집 바닥글 `전화 : 02-6490-6114 / 서울시통합문의 : 02-120`(서울시립대 · 2026-11-17)도 바닥글이다 — MARK 의 `문의\s?:` 가
+      `통합문의 :` 에 걸려 장학 두 건의 신청 안내 칸에 학교 대표 전화·120 다산콜이 앉았다. 낱말은 `서울(시)통합문의` 하나뿐이라
+      본문의 진짜 `문의 : 학생지원팀 02-…` 줄은 걸리지 않는다 · 맨 `통합문의`·`다산콜센터(120)` 는 서울시 장학의 진짜 문의처일 수 있어 넣지 않았다(관문 「발췌 주인 표식 · 바닥글」) */
+const EXCERPT_FOOTER = /대표\s?전화|copyright|all\s?rights|[(（]\s?우\s?[)）]?\s?\d{5}|우편\s?번호|사업자\s?등록|서울시?\s?통합\s?문의/i;
 const EXCERPT_FILE = /\.(?:hwpx?|pdf|docx?|xlsx?|zip|jpe?g|png)\s*(?:[(（\[][^)）\]]*[)）\]])?\s*$/i;
 
 /* 🔴 첨부에서 뽑은 발췌는 **이름표와 값이 짝이 맞을 때만** 담는다 (2026-11-15). OCR·납작해진 표는 이름표 칸과 옆 칸 글자를 한 줄로 붙인다 —
@@ -132,12 +135,7 @@ const EXCERPT_NOTE = '공고 원문에서 그대로 발췌 (자동)';
 const EXCERPT_NOTE_DOC = '공고문 첨부에서 그대로 발췌 (자동)';
 /* 본문에 다른 글의 띠(배너·팝업 — 항공대 「정규직 신규직원 채용 · 지원기간 : …」)가 제목보다 **앞에** 붙어 오는 게시판이 있다.
    공고 제목 줄이 본문에 있으면 그 줄부터 발췌한다(제목 앞은 그 글이 아니다) · 못 찾거나 그 뒤에서 한 줄도 못 뽑으면 본문 전체(예전 그대로) */
-/* 공고 제목 줄의 자리 — 본문 줄 중 제목 몸통(말머리 뗀 앞 20자)을 담은 첫 줄. 못 찾으면 -1 (제목이 짧으면 찾지 않는다) */
-export function titleLineAt(lines, it) {
-  const core = String((it && it.name) || '').replace(/^(?:\[[^\]]*\]\s*|공통\s+)+/, '').replace(/\s+/g, '');
-  if (core.length < 10) return -1;
-  return (lines || []).findIndex((l) => String(l).replace(/\s+/g, '').includes(core.slice(0, 20)));
-}
+/* 공고 제목 줄의 자리(titleLineAt)는 page-boilerplate.mjs 한 곳 — 띠 줄 걷기(ownBody)와 함께 옮겼다(2026-11-17 · 자동 등록의 본문 마감도 같은 규칙을 불러 쓴다) */
 /* `own` — siteChrome 이 사이트 띠 줄을 걷어 낸 본문(ownBody). 제목 뒤에서 한 줄도 못 뽑아 본문 전체로 물러날 때 **띠를 걷은 쪽**을 읽는다
    (가천 외국인 장학금 추가 신청: 제목 뒤 「1. 신청 기간」 ↵ 날짜 꼴이라 발췌가 비자, 물러난 본문 전체에서 FGD 띠 줄 하나가 발췌로 남았다 · 2026-11-16) */
 function excerptsFromBody(body, it, own = body) {
@@ -149,29 +147,10 @@ function excerptsFromBody(body, it, own = body) {
   return got.length ? got : all();
 }
 
-/* ── 사이트 띠(배너) 줄 — 마감 근거에서 뺀다 (2026-11-16 · 가천 FGD 띠 · 리뷰) ─────────────────────────────
-   가천 장학공지는 매 쪽 머리에 **다른 글의 띠**(「2026년 가천대학교 재학생 심층면접토론(FGD) 참여학생 모집」 ↵ 「○ 신청기간: 2026.11.05.(목) ~ 11.18.(수)」)를
-   싣는다. 그 줄이 글 본문보다 먼저 나와 첫 이름표로 잡혀, 11-11·11-12·11-15·11-16 에 끝나는 네 공고가 모두 11-18 마감이 됐다(닫힌 공고가 열림으로 보였다).
-   메뉴 걷기(page-boilerplate · 그 학교 쪽의 40%)는 띠가 26쪽 중 10쪽에만 있어 못 걷었다 — 띠는 몇 주마다 바뀐다.
-   🔴 띠 줄 = **같은 호스트의 서로 다른 글 셋 이상**에 글자 그대로 나오는 줄(buildBoilerplate keyOf · 같은 글의 주소 여벌은 한 번)이면서
-      **이 글의 제목 줄보다 앞에** 있는 줄. 둘 다여야 한다 — 영남대 다문화·3대 동문·천마가족 세 공고는 진짜로 같은 신청기간 줄을 **제목 뒤에** 싣는다
-      (deadline-hint.mjs 의 '같은 힌트 빈도 규칙을 쓰지 말 것' 과 같은 사정). 제목 줄을 못 찾으면 아무것도 걷지 않는다(예전 그대로). */
-const SITE_CHROME_MIN = 3;
-const squashWs = (s) => String(s || '').replace(/\s+/g, '');
-export function siteChromeFrom(pages) {
-  return buildBoilerplate(pages, { minPages: SITE_CHROME_MIN, ratio: 0, keyOf: (v) => squashWs(v.title) || String(v.url || '') });
-}
-/** 본문에서 제목 앞의 띠 줄을 걷은 글 — `{ text, chrome: [걷은 줄] }`. 띠를 모르거나 제목을 못 찾으면 본문 그대로 */
-export function ownBody(body, it, chromeSet) {
-  const text = String(body || '');
-  if (!chromeSet || !chromeSet.size) return { text, chrome: [] };
-  const lines = text.split('\n');
-  const at = titleLineAt(lines, it);
-  if (at <= 0) return { text, chrome: [] };
-  const chrome = [];
-  const kept = lines.filter((l, i) => !(i < at && chromeSet.has(l.trim()) && chrome.push(l.trim())));
-  return { text: kept.join('\n'), chrome };
-}
+/* ── 사이트 띠(배너) 줄 — 규칙은 page-boilerplate.mjs siteChromeFrom · ownBody 한 곳 (2026-11-16 가천 FGD 띠 · 2026-11-17 옮김) ──
+   발췌기(여기)와 자동 등록 앞의 본문 마감(notice-deadline.mjs bodyDeadlineFrom)이 **같은 함수**를 부른다 — 이 파일은 불러오는 순간 원문 파일을 읽어
+   notice-deadline 이 가져다 쓸 수 없어서, 읽고 쓰는 것이 없는 page-boilerplate 로 옮겼다. 베끼지 말 것(관문 「발췌기 글자 읽기」 ⑩·⑪). */
+export { titleLineAt, siteChromeFrom, ownBody };
 
 function extractFrom(text) {
   if (!text) return [];
@@ -1225,7 +1204,7 @@ const siteChrome = siteChromeFrom([...(Array.isArray(texts) ? texts : Object.val
 /* 공고문 첨부 — 고르는 규칙은 attachment-text.mjs noticeDocFiles 한 곳(자격 색인 + 신청서 쪽에 섞여 온 공고문 · 2026-11-15).
    🔴 여기서 색인 파일을 직접 열지 말 것 — 길이 둘이 되면 마감은 읽는데 자격은 못 읽는 어긋남이 생긴다(관문 「발췌기 글자 읽기」). */
 
-let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, fromTitle = 0, gotDeadline = 0, dlFromDoc = 0, gotOpen = 0, gotAnnounce = 0, gotApplyEmail = 0, droppedApplyEmail = 0, gotApplyPortal = 0, gotDocs = 0, gotFree = 0;
+let hit = 0, none = 0, kept = 0, cleaned = 0, fromDoc = 0, fromTitle = 0, gotDeadline = 0, dlFromDoc = 0, gotOpen = 0, gotAnnounce = 0, gotApplyEmail = 0, droppedApplyEmail = 0, gotApplyPortal = 0, gotDocs = 0, gotFree = 0, humanEx = 0, resetDocs = 0;
 let titleFixed = 0;   // 잘린 제목을 본문에서 보완한 공고(completeTitle)
 /* 공고문 첨부에서 자격 줄을 읽는다. 본문 경로와 원문 없는 경로가 **같은 함수**를 써야
    "본문 있을 땐 읽고 없을 땐 안 읽는" 어긋남이 안 생긴다. 스캔 PDF 등 글자가 안 나오는
@@ -1594,6 +1573,15 @@ function putDeadline(it, dl, from) {
       (실측: 그래서 울산연구원 1건을 놓쳤다. 바로 그 갈림길의 마감일 주석이 같은 경고를 한다).
    🔴 주소만 넣지 않는다 — 근거 문장을 함께 남겨야 감사가 '원문에 실제로 있었는가'를 본다. */
 function fillApplyEmail(it, body) {
+  /* 🔴 글 전체로 가르는 규칙(신청은 시스템 · 메일은 선발 뒤 단계 — apply-email.mjs staleInTexts)도 이미 들어간 로봇 값에 소급한다(원칙 7).
+     근거 문장이 든 원문이 손에 있을 때만 판정하고, 읽는 글은 아래 찾기와 같다(본문 그대로 · 첨부는 annexCut + withoutBrokenAddr) */
+  if (it.applyEmail && !humanOwnedEmail(it.applyEmailFrom)
+      && staleInTexts(it, [body, ...docTexts(it).map((t) => withoutBrokenAddr(annexCut(t)))])) {
+    droppedApplyEmail += 1;
+    console.log(`   [접수메일 걷음] ${it.id} — ${it.applyEmail} · 원문 전체로 보면 접수처가 아닌 줄(${it.applyEmailSource})`);
+    if (!WRITE) return;
+    delete it.applyEmail; delete it.applyEmailSource; delete it.applyEmailFrom;
+  }
   /* OCR 첨부에서 읽어 둔 접수 메일은 글자층과 맞춰 본 첨부(crossCheckOcr)로 다시 읽는다 — 다른 주소가 나오면 그것이 원문이다(연세 미래 브랜드장학금 `Gnjael.gwd` → `injae1.gwd`) */
   if (it.applyEmail && /^공고문 첨부\(OCR\)/.test(it.applyEmailFrom || '')) {
     const again = applyEmailFromDocs(it);
@@ -1727,7 +1715,7 @@ function fillCalendarDates(it, readOpen, readAnnounce) {
 const FORM_ATT_NAME = /신청서|지원서|원서|계획서|동의서|서약서/;
 function fillDocuments(it, body, docsFn) {
   if (/^(관리자|AI)/.test(it.documentsFrom || '')) return;
-  const robotOwned = /^(공고 원문|공고문 첨부)/.test(it.documentsFrom || '');
+  const robotOwned = /^(공고 원문|공고문 첨부|로봇 )/.test(it.documentsFrom || '');   // 「로봇 날짜 · 원문 「제출서류」 절」 = docs-fill — 같은 규칙으로 다시 읽는다(리뷰 2026-11-15)
   if (!docsPlaceholderOnly(it.documents) && !robotOwned) return;
   let got = body ? readDocuments(body) : { docs: [], basis: null };
   let from = '공고 원문';
@@ -1738,7 +1726,23 @@ function fillDocuments(it, body, docsFn) {
       if (r.docs.length) { got = r; from = docLabel((texts.files || [])[i]); break; }
     }
   }
-  if (!got.docs.length) return;
+  if (!got.docs.length) {
+    /* 🔴 로봇이 적은 옛 목록인데 지금 규칙으로 원문을 다시 읽으니 서류 목록이 없다 → 옛 목록은 안내 문장·심사 단계를 담은 잡음이었다(2026-11-15 doc-list 절 경계).
+       원문을 실제로 읽었을 때만(본문 또는 첨부 글자가 있을 때) 자리표시로 되돌린다 — 못 읽은 날 지우지 않는다. 사람이 적은 목록은 위에서 이미 걸렀다. */
+    /* 목록이 나온 **그 출처**를 실제로 읽었을 때만 — 첨부에서 읽은 목록을 첨부를 못 읽은 날 본문(껍데기일 수 있다)만 보고 지우지 않는다(리뷰 2026-11-15) */
+    const readBody = !!(body && body.trim());
+    const readAttach = (docsFn ? docsFn() : []).some((t) => String(t || '').trim());
+    const readSomething = /^공고문 첨부/.test(it.documentsFrom || '') ? readAttach : readBody;
+    const sectionSeen = hasDocSection(body) || (docsFn ? docsFn() : []).some((t) => hasDocSection(t));   // 서류 절 머리가 원문에 있을 때만(껍데기 글자로 지우지 않는다)
+    if (robotOwned && readSomething && sectionSeen && !/^로봇 /.test(it.documentsFrom || '')) {   // docs-fill(「로봇 …」) 목록은 그 로봇이 제 출처로 다시 본다 — 여기 본문(껍데기일 수 있다)으로 지우지 않는다(2026-11-18 · 하나장학생·천사장학금)
+      resetDocs += 1;
+      if (!WRITE) { console.log(`   [서류 되돌림] ${it.id} — 로봇 목록 ${(it.documents || []).length}줄 → 자리표시`); return; }
+      it.documents = [DOC_PLACEHOLDER_LINE];
+      delete it.documentsFrom;
+      if (it.prepDoc && /^로봇/.test(it.prepDocFrom || '')) { delete it.prepDoc; delete it.prepDocBasis; delete it.prepDocFrom; }
+    }
+    return;
+  }
   gotDocs += 1;
   if (!WRITE) { console.log(`   [서류 ${from}] ${it.id} → ${got.docs.join(' · ').slice(0, 120)}${got.basis ? `  ⟶ 자유 양식: ${got.basis.slice(0, 60)}` : ''}`); return; }
   it.documents = got.docs;
@@ -1829,8 +1833,10 @@ for (const it of reg.items) {
     fillApplyEmail(it, null);          // 본문이 없으니 첨부에서만 — 본문 경로와 같은 함수
     fillApplyPortal(it, null);
     fillDocuments(it, null, docsOnce(it, false));     // 제출 서류 목록도 첨부에서 (2026-10-13 ④) — 신청서 쪽 공고문은 안 본다(noticeDocFiles formPath:false)
-    /* 발췌도 첨부에서 — 껍데기 공고는 안내 블록이 통째로 비었다. 예전 본문에서 뽑아 둔 발췌(원문 표식)는 덮지 않는다(원문이 없다 ≠ 발췌가 틀렸다) */
-    if (!(it.excerpts || []).length || it.excerptNote === EXCERPT_NOTE_DOC) {
+    /* 발췌도 첨부에서 — 껍데기 공고는 안내 블록이 통째로 비었다. 예전 본문에서 뽑아 둔 발췌(원문 표식)는 덮지 않는다(원문이 없다 ≠ 발췌가 틀렸다)
+       🔴 사람(관리자·AI)이 정한 발췌는 덮지 않는다 — 비운 것(`… · 비움`)도 되채우지 않는다(excerptsFrom · 아래 본문 갈래와 같은 판정 한 곳) */
+    if (excerptsHumanOwned(it)) humanEx += 1;
+    else if (!(it.excerpts || []).length || it.excerptNote === EXCERPT_NOTE_DOC) {
       const dx = excerptsFromDocs(docs());
       if (dx) { hit += 1; if (WRITE) { it.excerpts = dx.lines; it.excerptNote = EXCERPT_NOTE_DOC; } else console.log(`   [발췌 첨부] ${it.id} → ${dx.lines.join(' / ').slice(0, 120)}`); }
     }
@@ -1942,7 +1948,12 @@ for (const it of reg.items) {
       else delete it.eligibilityPriority;
     }
   }
-  if (ex.length) {
+  /* 🔴 사람(관리자·AI)이 정한 발췌는 덮지도 지우지도 않는다 (2026-11-17 · 관리자 수정 'excerpts' 를 연 날 같이) — 판정은 notice-source.mjs
+     excerptsHumanOwned 한 곳(`excerptsFrom` 이 '관리자'·'AI' 로 시작). 비운 것(`관리자 … · 비움`)도 되채우지 않는다(마감일과 같다) */
+  if (excerptsHumanOwned(it)) {
+    humanEx += 1;
+    if (!WRITE && ex.length) console.log(`   [발췌 사람 값 — 그대로] ${it.id} (${it.excerptsFrom})`);
+  } else if (ex.length) {
     hit++;
     if (WRITE) { it.excerpts = ex; it.excerptNote = exNote; }
     if (!WRITE) {
@@ -1956,13 +1967,13 @@ for (const it of reg.items) {
   }
 }
 console.log(`\n게시판 메뉴를 걷어낸 공고 ${cleaned}건`);
-console.log(`발췌 성공 ${hit}건 · 원문은 읽었으나 발췌 불가 ${none}건 · 원문 미확보라 손대지 않음 ${kept}건`);
+console.log(`발췌 성공 ${hit}건 · 원문은 읽었으나 발췌 불가 ${none}건 · 원문 미확보라 손대지 않음 ${kept}건 · 사람이 정한 발췌라 그대로 ${humanEx}건`);
 console.log(`자격을 공고문 첨부에서 읽은 공고 ${fromDoc}건 · 제목 속 「(대상: …)」에서 읽은 공고 ${fromTitle}건`);
 console.log(`마감일을 새로 읽은 공고 ${gotDeadline}건 (그중 공고문 첨부에서 ${dlFromDoc}건) · 첨부 마감을 지금 규칙으로 다시 읽어 고친 공고 ${dlRechecked}건`);
 console.log(`잘린 제목을 본문에서 보완한 공고 ${titleFixed}건`);
 console.log(`접수 메일 주소를 새로 읽은 공고 ${gotApplyEmail}건 · 지금 규칙으로 접수처가 아니라 걷은 공고 ${droppedApplyEmail}건`);
 console.log(`포털 신청 시스템을 새로 읽은 공고 ${gotApplyPortal}건`);
-console.log(`제출 서류 목록을 읽은 공고 ${gotDocs}건 · 그중 자유 양식 근거로 앱 지원문서를 그대로 낼 수 있는 공고 ${gotFree}건`);
+console.log(`제출 서류 목록을 읽은 공고 ${gotDocs}건 · 그중 자유 양식 근거로 앱 지원문서를 그대로 낼 수 있는 공고 ${gotFree}건 · 지금 규칙으로 목록이 없어 자리표시로 되돌린 로봇 목록 ${resetDocs}건`);
 console.log(`접수 시작일 ${gotOpen}건 · 발표일 ${gotAnnounce}건 (캘린더용 — 원문에 있을 때만)`);
 if (WRITE) {
   fs.writeFileSync(regPath, JSON.stringify(reg, null, 1) + '\n');
