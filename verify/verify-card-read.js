@@ -25,8 +25,8 @@ const ITEM = { id: 'zz-card-read', name: '[교외] 2026년 2학기 장학생 선
 const OTHER = { ...ITEM, id: 'zz-free-only', name: '[교외] 무료길장학회 장학생 선발 안내', sourceUrl: 'https://example.org/notice/2' };
 const CR = { title: '2026년 2학기 장학생 선발 안내', host: '재단법인 표본장학회',
   eligibility: ['직전 학기 평점 3.0 이상을 취득한 자', '학자금 지원구간 3구간 이내인 자'], excludes: ['휴학생', '타 장학금 4회 이상 수혜자'], priority: [],
-  amount: ['연간 300만원'], head: 3000000, deadline: { date: day(11), quote: '접수 기간' }, apply: ['표본장학회 홈페이지 온라인신청', '방문 접수는 받지 않음'],
-  documents: ['장학금 지원서 1부', '성적증명서 1부'], notes: ['타 장학금과 중복수령 불가'], multi: false, hash: 'x', readAt: day(0) };
+  amount: ['연간 300만원'], head: 3000000, deadline: { date: day(11), quote: '접수 기간' }, apply: ['표본장학회 홈페이지 온라인신청', '방문 접수는 받지 않음', '접수 후 접수 여부 확인 필요'],
+  documents: ['장학금 지원서 1부', '성적증명서 1부'], notes: ['타 장학금과 중복수령 불가', '신청일시가 조회되는지 반드시 확인할 것. 미확인에 따른 불이익은 책임지지 않음'], multi: false, hash: 'x', readAt: day(0) };
 
 (async () => {
   await assertOwnServer(PORT);
@@ -72,6 +72,9 @@ const CR = { title: '2026년 2학기 장학생 선발 안내', host: '재단법�
   ok('서류가 유료 결과의 서류 이름이다', (a.docs || '').includes('장학금 지원서 1부') && (a.docs || '').includes('성적증명서 1부') && !(a.docs || '').includes('접수방법'), a.docs);
   ok('맨 위 금액이 숫자만이다 (300만원)', /300만원/.test(a.text) && !/금액 원문 확인/.test(a.text));
   ok('주최가 윗줄에 붙고 유의사항이 「공고 안내」 에 있다', a.text.includes('재단법인 표본장학회') && a.text.includes('타 장학금과 중복수령 불가'));
+  /* 2026-11-18 첫 본 실행 — 원문의 「…확인 필요」·「미확인에 따른 불이익…」 줄이 유의·방법에 실려 '모름'류 글자 검사(verify-no-unknown)가 빨개졌다.
+     그 낱말이 든 줄은 통째로 뺀다(앱의 기존 규칙 knownValue 와 같다 — 잘라서 싣지 않는다) · 같은 칸의 다른 줄은 그대로 */
+  ok("  '모름'류 낱말(확인 필요·미확인)이 든 원문 줄은 통째로 안 보인다 — 유의·방법 모두 · 다른 줄은 그대로", !/확인 필요|미확인/.test(a.text) && a.text.includes('타 장학금과 중복수령 불가') && (a.method || '').includes('방문 접수는 받지 않음'), a.text.split('\n').filter((l) => /확인 필요|미확인/.test(l)));
   ok('시트가 옆으로 넘치지 않는다', a.sw <= a.cw, { sw: a.sw, cw: a.cw });
   const card = await page.evaluate((id) => { const s = findSch(id); return { verdict: fitDetailFor(s, state.profile), paid: !!s.cardRead }; }, ITEM.id);
   ok('판정 근거가 유료 줄이다 — 미달 사유가 「3구간 이내」 줄', card.paid && (card.verdict.fails || []).some((f) => f.includes('3구간')), card.verdict);

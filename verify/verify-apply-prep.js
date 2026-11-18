@@ -180,11 +180,14 @@ async function swipeDown(page, sel) {
       { label: '신청 준비 시작', disabled: false });
     eq('  누르면 지원문서 작성 화면(#btn-ff-generate)이 뜬다 — 빈 준비 시트가 아니다', [r.form, !!(await page.$('#apply-prep'))], [true, false]);
     eq('  머리가 「지원문서 작성」 이고 둘째 줄이 그 문서의 성격(제출은 원본으로 · 포털에 붙여 넣기 · 원문 확인)을 말한다',
-      await page.evaluate(() => {
+      await page.evaluate((id) => {
         const t = document.querySelector('#detail-sheet .sheet-title');
         const p = document.querySelector('#detail-sheet .sheet-provider');
-        return [t && t.textContent.trim(), !!(p && /원본 양식|붙여 넣을|공고가 정한 방법|그대로 제출|보낼 내용/.test(p.textContent) && !/원문에서 확인|원문 확인|확인 필요/.test(p.textContent))];   // 2026-11-15 — 모르는 공고의 둘째 줄은 「공고에 낼 내용을 정리합니다 — 제출은 공고가 정한 방법으로」(예전 「… 원문에서 확인」)
-      }), ['지원문서 작성', true]);
+        /* 🔴 문구를 여기 베껴 적지 않는다 — 그 공고의 갈래(prepKindFor)가 말하는 둘째 줄(forms.js PREP_LEADS)이 그대로 떠 있는가.
+           2026-11-18: 손으로 적은 목록에 「메일 접수」 갈래 문구(「공고가 정한 서식에 옮겨 적을 내용」)가 없어, 대상이 메일 접수 공고로 바뀐 날 앱이 멀쩡한데 빨개졌다 */
+        const lead = PREP_LEADS[prepKindFor(findSch(id))] || '';
+        return [t && t.textContent.trim(), !!(p && lead && p.textContent.includes(lead) && !/원문에서 확인|원문 확인|확인 필요/.test(p.textContent))];   // 2026-11-15 — 모르는 공고의 둘째 줄은 「공고에 낼 내용을 정리합니다 — 제출은 공고가 정한 방법으로」(예전 「… 원문에서 확인」)
+      }, pick.A.id), ['지원문서 작성', true]);
     /* 🔴 이게 핵심이다 — 예전 버그는 바로 이 순간 '신청 준비 완료'를 찍었다 */
     eq('  🔴 그 순간 신청내역(state.applications)에 없다', await appsOf(pick.A.id), { mem: [], disk: [] });
     await page.waitForTimeout(500);

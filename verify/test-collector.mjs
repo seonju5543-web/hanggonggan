@@ -5548,7 +5548,8 @@ else {
   /* 2026-11-18 — CLAUDE.md 가 60KB 천장에 닿아 교내 소식·대외활동 세부를 아래 두 설계 문서로 옮겼다.
      옮긴 이름이 검사에서 빠지지 않게 두 문서도 잰다(붙이자마자 낡은 관문 이름 「수집 범위 감사」 하나가 잡혔다). */
   const DOCS = ['CLAUDE.md', 'docs/designs/data-model.md', 'docs/designs/data-flow.md',
-                'docs/designs/security-rules.md', 'docs/designs/news-feed.md', 'docs/designs/activities-tab.md'];
+                'docs/designs/security-rules.md', 'docs/designs/news-feed.md', 'docs/designs/activities-tab.md',
+                'docs/designs/claude-md-details.md'];   // CLAUDE.md 에서 줄인 항목의 원문(11-18)
   const md = DOCS.map((f) => readText(new URL('../' + f, import.meta.url))).join('\n');
   const R = new URL('../', import.meta.url);
   const ex = (p) => fs.existsSync(new URL(p, R));
@@ -6288,10 +6289,12 @@ console.log('\n■ 공고문 첨부에서 자격 읽기 (2026-08-20)');
       (AL.htmlBodyImages || (() => undefined))('<img src="/_res/img-logo.svg"><p><img src="/cms/plugin/editorImage.do?$cms$AbC " data-width="1080" data-height="1920"></p><img src="/x.png" width="200" height="200"><img src="data:image/png;base64,AAAA" width="900" height="900">', hongik),
       [{ name: '본문이미지-1080x1920.jpg', url: 'https://www.hongik.ac.kr/cms/plugin/editorImage.do?$cms$AbC', bodyImage: true }]);
     const rb2 = readText(new URL('../collector/rescue-bodies.mjs', import.meta.url));
+    /* 브라우저 링크 읽기는 2026-11-18 부터 rescue-plan linksFromAnchors 한 곳(빈 href·`#…` 를 주소로 치지 않는 규칙과 함께 · 관문 bodies ⓔ-2 가 동작을 잰다) — 자리만 옮겼다 */
+    const rp2 = readText(new URL('../collector/rescue-plan.mjs', import.meta.url));
     eq('  재수집 로봇: 물러선 HTML 의 첨부 링크·그림을 적고(detailAttachments·htmlBodyImages) 첨부 적기(newAttachments)는 그 **뒤**에 · 브라우저 링크도 단추 글자(BUTTON_WORD)면 앞 요소 이름',
       [rb2.indexOf('r.found.push(...detailAttachments(html, openUrl), ...htmlBodyImages(html, openUrl))') > 0
         && rb2.indexOf('r.found.push(...detailAttachments(html, openUrl)') < rb2.indexOf('const add = newAttachments(t.it.attachments, r.found)'),
-        /previousElementSibling/.test(rb2) && /BUTTON_WORD\.source\)/.test(rb2)], [true, true]);
+        /\$\$eval\('a\[href\]', linksFromAnchors, BUTTON_WORD\.source\)/.test(rb2) && /export function linksFromAnchors[\s\S]{0,600}previousElementSibling/.test(rp2)], [true, true]);
     /* 🔴 등록 당시 `javascript:` 로 적힌 첨부는 받을 때 푼다 (2026-11-02 · 서울과기대 희망사다리Ⅰ 자체선발기준: 규칙(10-16)보다 먼저 등록(10-12)돼 11-01 자격용 받기가 TypeError → files: []) */
     const df2 = readText(new URL('../collector/deepfetch.mjs', import.meta.url));
     eq('  deepfetch 의 두 내려받기(양식·자격용)가 fetchUrlOf 로 스크립트 주소를 풀고 · 오류는 두 경로 모두 cause 까지 적는다(errWhy)',
@@ -9469,11 +9472,12 @@ console.log('\n■ 환영 화면 문구 (2026-09-12 · UI-22)');
   /* 2026-11-17 입력 안전장치(9351b8a6)가 완료 버튼에 '있을 수 없는 값'(평점 999) 되돌림을 넣었는데 이 검사를 같이 옮기지 않아
      기본 브랜치의 규칙 관문이 빨개졌다(수집 로봇들이 저장 전 관문에서 멈췄다 · 11-18 수리). 그 블록은 빈 칸을 통과시키므로(아래 줄) 문구는 여전히 참이다 —
      그 한 블록만 떼고 본다 · 다른 return 이 생기면 그대로 걸린다 */
-  const finRest = fin.replace(/const bad = guardFirstBad\(\$\('#screen-onboarding'\)\);\n\s*if \(bad\) \{[\s\S]*?\n    \}\n/, '');
+  const stripGuard = (f) => f.replace(/const bad = guardFirstBad\(\$\('#screen-onboarding'\)\);\n\s*if \(bad\) \{[\s\S]*?\n    \}\n/, '');
+  const finRest = stripGuard(fin);
   eq('완료 버튼은 도중에 막지 않는다 (막으면 문구가 거짓이 된다) — 있을 수 없는 값 되돌림(guardFirstBad) 한 블록만 예외', /\breturn;/.test(finRest), false);
   const IG0 = createRequire(import.meta.url)('../input-guard.js');
   eq('  그 되돌림은 빈 칸을 막지 않는다 (막으면 「학교·학년만」 문구가 거짓이 된다) · 다른 return 을 넣으면 걸린다',
-    [IG0.checkNumber('', IG0.PROFILE_LIMITS.gpa || { min: 0, max: 4.5, label: '평점' }).ok, IG0.checkBirthDate('').ok, /\breturn;/.test(`${finRest}\n    if (!x) return;`)], [true, true, true]);
+    [IG0.checkNumber('', IG0.PROFILE_LIMITS.gpa || { min: 0, max: 4.5, label: '평점' }).ok, IG0.checkBirthDate('').ok, fin.includes('onboardEditing = false;') && /\breturn;/.test(stripGuard(fin.replace('onboardEditing = false;', 'if (!x) return;\n    onboardEditing = false;')))], [true, true, true]);
 }
 
 console.log('\n■ 이어보기 판정 (2026-09-09)');
@@ -15068,7 +15072,10 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
   {
     const a = appSrc.indexOf('const NS_LABELS = ['), b = appSrc.indexOf('\nfunction sourceNoteHtml(');
     const escS = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    const nsh = (a > 0 && b > a) ? new Function('esc', 'unent', 'joinSpacedSyllables', 'stripListNumber', `${appSrc.slice(a, b)}\nreturn noticeSummaryHtml;`)(escS, ME3.decodeEntities, ME3.joinSpacedSyllables, ME3.stripListNumber) : () => '';
+    const nsh = (a > 0 && b > a) ? new Function('esc', 'unent', 'joinSpacedSyllables', 'stripListNumber', `${(appSrc.match(/^const SAYS_UNKNOWN = .*;$/m) || [''])[0]}\n${appSrc.slice(a, b)}\nreturn noticeSummaryHtml;`)(escS, ME3.decodeEntities, ME3.joinSpacedSyllables, ME3.stripListNumber) : () => '';
+    /* 2026-11-18 — 「공고 안내」 줄 중 '모름'류 낱말(SAYS_UNKNOWN · 블록 밖 상수라 위에서 같이 떼어 넣는다)이 든 줄은 통째로 빠진다. 원문 문장이어도(유료 카드 읽기 첫 본 실행의 유의 두 줄) · 다른 줄은 그대로 */
+    eq('  「공고 안내」 — 「…확인 필요」·「미확인에 따른 불이익…」 줄은 통째로 빠지고 다른 줄은 남는다 (잘라서 싣지 않는다)',
+      (() => { const h = nsh(['신청 완료 후 신청서를 출력하여 본인이 작성한 내용이 맞는지 확인 필요', '신청일시가 조회되는지 반드시 확인할 것. 미확인에 따른 불이익은 책임지지 않음', '정규 8학기 중 1회만 수혜 가능']); return [/확인 필요|미확인|출력하여|조회되는지/.test(h), h.includes('정규 8학기 중 1회만 수혜 가능')]; })(), [false, true]);
     const html = nsh(['12.(월) - 접수방법 : 이메일(x@y.kr) 또는 등기우편', '<b>굵게</b> 문의 : 02-123 <script>x</script>', '장학금액 : 1 인 당 1,000,000 원', '지원자격 : 2026-1 학기 학부 재학생',
       '매일 09:00~18:00 접수', '신청방법 : 포털 로그인 후 신청하고', '10.22.(목) 7:00~15:00', '모집기간) 2026.8.13.(목) ~ 2026.8.23(일) ○ (신청방법) 네이버 폼을 통한 온라인 신청']);
     const items = [...html.matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => m[1].replace(/<b class="ns-k">([^<]*)<\/b>/g, '$1 · '));
@@ -15257,7 +15264,7 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
     /* 화면 — 「공고 안내」는 줄바꿈으로 끊긴 문장을 잇고 납작한 표를 `이름표 : 값` 으로 · 이름표 없는 조각은 안 보인다 · 「모집 안내」는 자격 줄이 있으면 「대상」 발췌를 다시 적지 않는다 */
     const a2 = appSrc.indexOf('const NS_LABELS = ['), b2 = appSrc.indexOf('\nfunction sourceNoteHtml(');
     const escS2 = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    const nsh2 = (a2 > 0 && b2 > a2) ? new Function('esc', 'unent', 'joinSpacedSyllables', 'stripListNumber', `${appSrc.slice(a2, b2)}\nreturn noticeSummaryHtml;`)(escS2, ME3.decodeEntities, ME3.joinSpacedSyllables, ME3.stripListNumber) : () => '';
+    const nsh2 = (a2 > 0 && b2 > a2) ? new Function('esc', 'unent', 'joinSpacedSyllables', 'stripListNumber', `${(appSrc.match(/^const SAYS_UNKNOWN = .*;$/m) || [''])[0]}\n${appSrc.slice(a2, b2)}\nreturn noticeSummaryHtml;`)(escS2, ME3.decodeEntities, ME3.joinSpacedSyllables, ME3.stripListNumber) : () => '';
     const rows2 = (ls) => [...nsh2(ls).matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => m[1].replace(/<b class="ns-k">([^<]*)<\/b>/g, '$1 · '));
     eq('  공고 안내 — 세 줄로 끊긴 한 문장은 한 줄로(쇼미더임팩트) · `활동일시` ↵ `ㅇ 2026…` 는 `활동일시 · …` · `…센터에서` ↵ `10월 … 진행합니다.` 도 한 문장(강북 실데이터) · 홀로 남은 조각은 안 보인다',
       rows2(['충남 사회연대경제기업들의 임팩트 투자 기반을 조성하고 투자 유치를 희망하는', '기업들의 IR(Investor Relation) 역량 강화를 지원하기 위해 한국서부발전(주)과 함께', '하는 2026 프로젝트상생 『쇼미더임팩트 시즌6』 참가자를 모집하고자 합니다.',
@@ -16627,6 +16634,19 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
   const beDropNote = CR.buildEntry(ITEM, SRC, { ...full, notes: ['TOEIC 950/990 이상인 자'] }, full, wonIn);
   eq('  🔴 자격·제외·서류에서 한쪽이 낸 줄이 기계 대조에서 떨어지면 그 칸은 싣지 않는다(null) — 남은 줄만 실으면 핵심 요건이 빠진 목록이 된다 · 빈 배열로도 안 싣는다 · 다른 칸(유의)의 떨어진 줄은 자격을 안 건드린다',
     [beDrop.entry.eligibility, beDrop.held.some((h) => h.field === 'eligibility' && /TOEIC/.test(h.line)), beDropBoth.entry.eligibility, (beDropNote.entry.eligibility || []).length], [null, true, null, 2]);
+  /* 2026-11-18 독립 리뷰가 낸 반례 셋 */
+  const vk = (elig) => ({ kept: { ...A1.kept, eligibility: elig }, dropped: [] });
+  const agX = CR.agree(vk(three), vk([...three, '다자녀 가정의 자녀']), ITEM), agSplit = CR.agree(vk(three), vk([three.join(' ')]), ITEM);
+  eq('  🔴 한쪽 읽기에만 있는 짧은 요건 한 줄(숫자·부정 없음)은 「칸 전체가 거의 같다」로 넘어가지 못한다 — 자격 칸을 싣지 않고 그 줄을 넘긴다 · 줄을 다르게 나눴을 뿐이면 그대로 싣는다',
+    [agX.final.eligibility, agX.held.some((h) => h.field === 'eligibility' && h.line === '다자녀 가정의 자녀'), agSplit.final.eligibility], [null, true, three]);
+  const beEx = CR.buildEntry(ITEM, SRC, { ...full, excludes: ['대학원생, 휴학생'] }, { ...full, excludes: [] }, wonIn);
+  eq('  🔴 제외 칸이 보류되면 자격 칸도 싣지 않는다 — 유료 자격만 실으면 무료 길이 자격 줄 사이에서 골라 주던 「받을 수 없는 경우」 줄이 화면에서 사라진다(실제 2건)',
+    [beEx.entry.excludes, beEx.entry.eligibility, (beEx.entry.amount || []).length], [null, null, 1]);
+  eq('  🔴 「조회수」 바로 뒤가 조회수가 아니라 내용의 숫자(연도·금액·날짜)면 떼지 않는다 — 떼면 바뀐 원문을 같은 원문으로 본다',
+    [CR.sourceHash('조회수\n2027학년도 1학기 교내장학') === CR.sourceHash('조회수\n2026학년도 1학기 교내장학'), CR.sourceHash('조회수\n300만원 지급') === CR.sourceHash('조회수\n500만원 지급'), CR.sourceHash('조회수\n11.26까지') === CR.sourceHash('조회수\n12.26까지')], [false, false, false]);
+  eq('  🔴 조회수만 바뀐 원문은 같은 원문이다(다시 읽히지 않는다 — 본문을 다시 받을 때마다 숫자만 바뀐다 · 나흘에 839건 중 27건) · 내용의 숫자가 바뀌면 다른 원문',
+    [CR.sourceHash('작성일\n2026.10.26\n조회수\n235\n평점 3.0 이상') === CR.sourceHash('작성일\n2026.10.26\n조회수\n236\n평점 3.0 이상'), CR.sourceHash('2026-09-07 조회수 307\n작성자') === CR.sourceHash('2026-09-07 조회수 1,312\n작성자'),
+      CR.sourceHash('조회수\n235\n평점 3.0 이상') === CR.sourceHash('조회수\n235\n평점 3.5 이상'), CR.sourceHash('조회수\n235\n2026.11.23') === CR.sourceHash('조회수\n235\n2026.11.30')], [true, true, false, false]);
   eq('  지시문이 바뀌면 원문이 같아도 해시가 달라진다(다시 읽는다) · 같은 원문은 같은 해시', [CR.sourceHash('가') === CR.sourceHash('가'), CR.sourceHash('가') === CR.sourceHash('나'), /update\(SYSTEM\)/.test(readText(new URL('../collector/card-read.mjs', import.meta.url)))], [true, false, true]);
   eq('  🔴 내려갔는지는 유료가 읽은 마감으로 잰다 — 무료 길 마감(접수 시작일)이 지났어도 바로잡은 마감 전이면 결과를 지우지 않는다',
     [CR.closedNow({ id: 'q', deadline: '2026-11-18', listedAt: '2026-11-10' }, { deadline: { date: '2026-11-26', quote: 'x' } }, '2026-11-19'), CR.closedNow({ id: 'q', deadline: '2026-11-18', listedAt: '2026-11-10' }, null, '2026-11-19')], [false, true]);
