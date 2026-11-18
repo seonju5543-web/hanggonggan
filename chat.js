@@ -373,8 +373,11 @@ function chatAnswerDocuments(q) {
   /* 특정 공고를 물었으면 그 공고의 서류를, 아니면 자주 필요한 서류를 모아서.
      "그거 서류 뭐야?"처럼 앞에서 말한 공고를 가리키는 경우도 chatPickTarget이 받는다. */
   const hit = chatPickTarget(q);
-  if (hit && (hit.sch.documents || []).length) {
-    const rows = hit.sch.documents.map((doc) => {
+  /* 자리표시 줄(「지원 자격·제출 서류는 원문 공고에서 확인」)은 서류가 아니다 — 앱 화면과 같은 꼴(app.js DOC_PLACEHOLDER · 2026-11-15 리뷰) */
+  /* 자리표시뿐인 공고는 서류가 없는 공고와 같이 아래 일반 답으로 간다(학생 화면에 '원문에서 확인'류 말은 쓰지 않는다 · 11-15 결정) */
+  const realDocs = (sch) => (sch.documents || []).filter((doc) => !DOC_PLACEHOLDER.test(String(doc || '')));
+  if (hit && realDocs(hit.sch).length) {
+    const rows = realDocs(hit.sch).map((doc) => {
       const st = chatSafe(() => docWalletStatus(doc), null);
       const name = String(doc).replace(/\s*\(.*\)$/, '');
       if (st && st.ok) return `✓ ${name} — 보관함에 있어요`;
@@ -390,7 +393,7 @@ function chatAnswerDocuments(q) {
   }
 
   const count = {};
-  chatApplyable().forEach((m) => (m.sch.documents || []).forEach((doc) => {
+  chatApplyable().forEach((m) => realDocs(m.sch).forEach((doc) => {
     const name = String(doc).replace(/\s*\(.*\)$/, '');
     count[name] = (count[name] || 0) + 1;
   }));

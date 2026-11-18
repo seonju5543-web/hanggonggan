@@ -40,6 +40,7 @@ export const EDIT_LABEL = {
   eligibilityLines: '학생에게 보여 줄 자격 문장',
   eligibilityVerified: '자격 제한 없음 확인',
   documents: '요구 서류',
+  excerpts: '신청 방법 원문 발췌',
   announceDate: '결과 발표일',
   eligibilityExcludes: '이런 학생은 못 받아요',
   eligibilityPriority: '먼저 뽑는 기준',
@@ -66,12 +67,19 @@ export const ELIG_KEYS = {
   minGpa: 'num',
   maxBracket: 'num',
   tracks: 'strArr',
+  /* 엔진(match-engine.js judgeCond)이 읽는 구조화 칸 다섯 — 목록에 없으면 관리자가 그 공고를 고칠 때 **조용히 지워진다**(2026-11-18 인계 M6 · 지금 쓰는 공고 0건 · 예방) */
+  flagsAny: 'strArr',   // 특별자격 하나 이상(match-engine.js:81)
+  freshmanOnly: 'bool', // 신입생만(:71)
+  seoulOnly: 'bool',    // 서울 거주(:93)
+  needCert: 'bool',     // 어학 성적 보유(:98)
+  exchange: 'bool',     // 교환학생(:103)
 };
 
 /* 자격 칸을 사람 말로 — 화면이 `{"schoolOnly":"경희대학교"}` 를 그대로 뱉으면 못 읽는다 */
 export const ELIG_LABEL = {
   selective: '선발제', schoolOnly: '학교 한정', campusOnly: '캠퍼스 한정', schoolsAny: '지원 대상 대학',
   years: '학년', minGpa: '최소 학점', maxBracket: '소득구간 상한', tracks: '계열',
+  flagsAny: '특별자격(하나 이상)', freshmanOnly: '신입생만', seoulOnly: '서울 거주', needCert: '어학 성적 보유', exchange: '교환학생',
 };
 
 /** 기계 판정용 자격을 정리한다. 모르는 키는 조용히 버린다.
@@ -109,6 +117,17 @@ export function cleanLines(v) {
     .map((x) => x.slice(0, 300));
 }
 
+/** 신청 방법 원문 발췌 (2026-11-17) — 원문 문장 그대로를 줄마다. 글자가 아닌 줄(숫자·객체)이 섞이면 던진다(화면은 막힌 줄로 보여 준다).
+ *  🔴 사람이 적은 발췌는 원문 근거가 아니다 — 저장소가 `excerptsFrom = '관리자 …'` 를 붙이고, 근거로 읽는 곳은 전부
+ *     `collector/notice-source.mjs` evidenceExcerpts 로 그 줄을 뺀다(자격 줄의 eligibilityFrom 규칙과 같다). */
+export function cleanExcerpts(v) {
+  if (v === null || v === undefined || v === '') return null;
+  const arr = Array.isArray(v) ? v : (typeof v === 'string' ? v.split('\n') : null);
+  if (!arr || arr.some((x) => typeof x !== 'string')) throw new Error('원문 발췌는 문장(글자) 목록이어야 합니다');
+  const out = cleanLines(arr);
+  return out.length ? out : null;
+}
+
 /* 달력에 **실제로 있는 날**인가 — 모양만 보면 `2026-13-01`·`2026-02-30` 이 통과한다 */
 export const isDay = (v) => {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(v || ''))) return false;
@@ -135,6 +154,7 @@ export function normalizeValue(k, v) {
     return a.length ? a : null;
   }
   if (k === 'eligibilityVerified') return (out === true || out === 'true') ? true : null;
+  if (k === 'excerpts') return cleanExcerpts(out);
   if (k === 'exclusivity') return cleanExclusivity(out);
   if (k === 'amountValue') return Number(out) || 0;
   if (k === 'prepDoc') return (out === true || out === 'true');

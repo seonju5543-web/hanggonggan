@@ -18,11 +18,14 @@
    앞으로 — 글을 찾은 쪽(또는 공고가 3건 이상인 쪽)은 재단 게시판으로 external-sources.json 에 적는다(autoFound · find-boards 와 같은 자리).
      그러면 재단·지자체 수집 로봇이 날마다 그 게시판을 읽고(data/external.json), 층2 짝짓기(kosafMatches)가 새 회차 글을 스스로 짝짓는다.
      층2 공고가 새로 들어오면(월·목 kosaf-fetch) 다음 날 이 로봇이 그 재단을 다시 본다.
-   ⑤ 검색 길 (2026-10-13 · 은서 — 사장님 "네이버 검색 API 발급받아서 넣어 줄 수 있음?") — 홈페이지 길로 글을 못 고른 공고(홈페이지를 못 연 재단 포함)만
+   ⑤ 검색 길 (2026-10-13 · 은서 — 사장님 "네이버 검색 API 발급받아서 넣어 줄 수 있음?") — 홈페이지 길로 글을 못 고른 공고(홈페이지를 못 연 재단 포함)
+     + 오늘 홈페이지를 안 연 공고 중 글 후보가 없는 것(2026-11-18 · searchQueue — 예전엔 '오늘 연 재단'만 물어 하루 몇 곳뿐이었다)을
      네이버 웹문서 검색(NAVER API HUB — 네이버클라우드 콘솔 → NAVER API HUB 에서 앱을 만들고 '검색 - 웹문서'를 고른다)에 「재단 이름 + 사업 이름 + 공고」를 묻는다. 결과 중 **그 재단 사이트의 글 주소**(hostAllowed · looksLikePost)만 남겨 같은 점수 규칙
      (pickKosafPost)으로 고르고, 후보 줄 source 'search'(검색 결과 제목은 증거로만 — 확인 로봇이 학생처럼 열어 본 뒤에야 앱에 실린다).
      🔴 열쇠(GitHub Secrets NAVER_CLIENT_ID · NAVER_CLIENT_SECRET)가 없으면 이 길은 조용히 꺼진다 — 리포트에 '꺼짐(열쇠 없음)'으로 적는다.
-     🔴 한 실행 검색 상한 SEARCH_MAX(기본 60 — 무료 한도 하루 25,000번에 한참 못 미친다) · 검색 사이 틈 · 실패가 연달아 3번이면 그 실행은 검색을 멈춘다.
+     🔴 한 실행 검색 상한 SEARCH_MAX(기본 60 · 하루 한 번 → 한 달 약 1,800번 — NCP 안내(2026-11-18 확인): 「한시적으로 무료 · 유료 전환 시 사전 공지」 ·
+        한도는 월 775,000건). 🔴 유료로 바뀐다는 공지가 오면 CLAUDE.md 8번(돈이 나가는 호출) 대상이다 — 개발자에게 묻기 전엔 상한을 올리지 말 것.
+        검색 사이 틈 · 실패가 연달아 3번이면 그 실행은 검색을 멈춘다.
    🔴 같은 재단은 3일에 한 번(KOSAF_HUNT_RETRY_DAYS) · 한 재단 요청 10번 상한 · 전체 예산(KOSAF_HUNT_MS · 9분) 안에 스스로 끝낸다.
    실행: node collector/kosaf-hunt.mjs [--dry] [--all] [--only=호스트조각] [--no-browser]
    관문: verify/test-collector.mjs 「층2 재단 글 사냥꾼」 (순수 함수 — KOSAF_HUNT_AS_LIB=1 이면 본편을 건너뛴다)
@@ -149,6 +152,28 @@ export function searchRows(json, allowed) {
     const k = urlKey(u);
     if (seen.has(k)) continue;
     seen.add(k); out.push({ url: u, title });
+  }
+  return out;
+}
+/** 검색할 공고 — 오늘 홈페이지 길로 못 고른 것(leftover) + **오늘 홈페이지를 안 연** 공고 가운데 글 후보(url 줄)가 아직 없는 것.
+    🔴 2026-11-18: 검색이 '오늘 홈페이지를 다시 본 재단'(3일에 한 번)에만 붙어 있어, 열쇠가 들어온 뒤에도 하루 몇 곳만 물었다 —
+       재단 홈페이지 꼴(여는 날)과 검색(묻는 날)은 따로다. 이미 글 후보가 있는 공고는 다시 묻지 않는다(그 재단을 다시 보는 날 새로 묻는다).
+    · 오늘 연 공고(crawledKeys)만 뺀다 — 예산에 잘려 못 연 재단의 공고는 검색이 받는다.
+    · 뒤쪽은 **오래 안 물은 것부터**(searchedAt · 장부 searched) — 대상이 상한(SEARCH_MAX)보다 많으면 늘 같은 꼬리가 밀린다(리뷰 11-18: 63건 vs 60).
+    · 같은 공고 묶음(alsoCodes)은 하나만 묻는다 — 둘 다 물으면 한 주소에 줄이 둘 생긴다(한 주소 한 줄 · huntLines 와 같은 규칙). */
+export function searchQueue(groups, crawledKeys, leftover, prevItems, searchedAt = {}) {
+  const crawled = crawledKeys instanceof Set ? crawledKeys : new Set(crawledKeys || []);
+  const hasUrl = new Set();
+  for (const l of prevItems || []) if (l && l.url) for (const k of [l.target && l.target.key, ...(l.also || [])]) hasUrl.add(String(k || '').replace(/^kosaf-/, ''));
+  const rest = [];
+  for (const g of groups || []) for (const t of g.targets) if (!crawled.has(t.key) && !hasUrl.has(String(t.key))) rest.push(t);
+  const when = (t) => String((searchedAt || {})[t.key] || '');
+  rest.sort((a, b) => when(a).localeCompare(when(b)));   // 안 물은 것('') → 오래전에 물은 것 · 같으면 원래 순서(안정 정렬)
+  const out = []; const covered = new Set();
+  for (const t of [...(leftover || []), ...rest]) {
+    if (covered.has(String(t.key))) continue;
+    for (const k of [t.key, ...(t.alsoCodes || [])]) covered.add(String(k));
+    out.push(t);
   }
   return out;
 }
@@ -289,6 +314,7 @@ export async function runHunt({ root, today, dry = false, all = false, only = ''
   const huntedKeys = new Set(); const newLines = []; const report = [];
   const stats = { groups: groups.length, due: due.length, hunted: 0, found: 0, boardLines: 0, boardsAdded: 0, boardsFilled: 0, noPage: 0, nothing: 0 };
   const keys = searchKeys(); const leftover = [];   // 홈페이지 길로 글을 못 고른 공고 — ⑤ 검색 길이 받는다
+  const searchedAt = { ...(state.searched || {}) };   // 공고마다 마지막으로 검색에 물은 날 — 상한에 걸리면 오래 안 물은 것부터(searchQueue)
   const sstat = { asked: 0, found: 0, failed: 0, why: '' };
   const R = (s) => report.push(s);
   let stopNote = '';
@@ -322,16 +348,17 @@ export async function runHunt({ root, today, dry = false, all = false, only = ''
     else if (lines.length) R(`- 🟡 **${g.org || g.host}** (${g.targets.length}건: ${names}) — 글은 못 고르고 게시판처럼 보이는 쪽만: ${lines[0].board}${boardNote}`);
     else { stats.nothing += 1; R(`- ⚪ ${g.org || g.host} (${g.targets.length}건: ${names}) — 쪽 ${pages.length}개를 봤지만 공고 글 줄이 없음(메뉴 두 단계 안에 게시판이 없거나 스크립트로만 그림)`); }
   }
-  /* ⑤ 검색 길 — 열쇠가 있을 때만 · 홈페이지 길로 못 고른 공고만 · 상한·예산 안에서 */
+  /* ⑤ 검색 길 — 열쇠가 있을 때만 · 홈페이지 길로 못 고른 공고 + 오늘 홈페이지를 안 연 공고 중 글 후보가 없는 것(searchQueue) · 상한·예산 안에서 */
   if (!keys) sstat.why = '꺼짐(열쇠 없음 — GitHub Secrets NAVER_CLIENT_ID · NAVER_CLIENT_SECRET)';
   else {
     const searched = [];
-    for (const t of leftover) {
-      if (sstat.asked >= SEARCH_MAX) { sstat.why = `상한 ${SEARCH_MAX}번 — 나머지는 다음 실행`; break; }
+    for (const t of searchQueue(groups, huntedKeys, leftover, prevFile.items, searchedAt)) {
+      if (sstat.asked >= SEARCH_MAX) { sstat.why = `상한 ${SEARCH_MAX}번 — 나머지는 다음 실행(오래 안 물은 것부터)`; break; }
       if (!budget.hasRoom(PAGE_MS)) { sstat.why = '예산이 다 됨 — 나머지는 다음 실행'; break; }
       if (sstat.failed >= 3) { sstat.why = '검색 실패가 3번 — 이번 실행은 멈춤(열쇠·한도를 확인)'; break; }
       const q = searchQuery(t);
       sstat.asked += 1;
+      for (const k of [t.key, ...(t.alsoCodes || [])]) searchedAt[k] = today;   // 묶음은 한 번 물으면 다 물은 것
       let json = null;
       try { json = await naverSearch(keys, q); } catch (e) { sstat.failed += 1; log(`  검색 실패: ${q} — ${String((e && e.message) || e).slice(0, 60)}`); continue; }
       const line = searchLine(t, searchRows(json, t.allowed), q, { today });
@@ -355,7 +382,8 @@ export async function runHunt({ root, today, dry = false, all = false, only = ''
   ].join('\n');
   if (!dry) {
     fs.writeFileSync(P('collector/kosaf-hunt.json'), JSON.stringify({ v: 1, note: NOTE, updatedAt: today, items }, null, 1) + '\n');
-    fs.writeFileSync(P('collector/kosaf-hunt-state.json'), JSON.stringify({ v: 1, updatedAt: today, hosts: state.hosts }, null, 1) + '\n');
+    const searchedLive = Object.fromEntries(Object.entries(searchedAt).filter(([k]) => liveKeys.has(k)));   // 마감 지난 공고의 날짜는 버린다(장부가 자라지 않게)
+    fs.writeFileSync(P('collector/kosaf-hunt-state.json'), JSON.stringify({ v: 1, updatedAt: today, hosts: state.hosts, searched: searchedLive }, null, 1) + '\n');
     fs.writeFileSync(P('collector/external-sources.json'), JSON.stringify(cfg, null, 1));
     fs.writeFileSync(P('collector/kosaf-hunt-report.md'), md);
   }

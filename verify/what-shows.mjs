@@ -26,11 +26,20 @@ const require = createRequire(import.meta.url);
 const ME = require('../match-engine.js');
 /* WHAT_SHOWS_REGISTERED — 관문 표본용(2026-10-04): 실데이터 대신 표본 정식 등록 파일로 돈다(test-collector 가 이 도구를 실제로 돌려 잴 때).
    평소에는 쓰지 않는다 — 화면 이야기는 진짜 데이터로 한다. */
-const reg = JSON.parse(fs.readFileSync(process.env.WHAT_SHOWS_REGISTERED || new URL('../data/registered.json', import.meta.url), 'utf8'));
+/* 앱처럼 받은 데이터를 **받는 순간** 씻는다(깨진 글자 · app.js tidyData — 2026-11-17). 카드 읽기를 얹고 찾기 전에 — 앱도 두 파일을 씻은 뒤 applyCardRead 한다(리뷰).
+   앱 소스의 그 줄들을 떼어 쓴다(베끼지 않는다 · 관문 「깨진 글자 씻기」와 같은 자르기) */
+const tidyData = (() => {
+  const src = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+  const line = (re) => (src.match(re) || [''])[0];
+  const fn = (n) => { const a = src.indexOf(`function ${n}(`); return a < 0 ? '' : src.slice(a, src.indexOf('\n}\n', a) + 2); };
+  return new Function([line(/const ENTITIES = \{[^\n]+\};/), line(/const ENTITY_RE = [^\n]+;/), fn('unent'), line(/const JUNK_CHARS = [^\n]+;/), line(/const OCR_URL_GARBLE = [^\n]+;/),
+    line(/const TIDY_SKIP_KEY = [^\n]+;/), line(/const OCR_TEXT_KEY = [^\n]+;/), line(/const OCR_MARK = [^\n]+;/), fn('tidyOcr'), fn('tidyText'), fn('tidyData'), 'return tidyData;'].join('\n'))();
+})();
+const reg = tidyData(JSON.parse(fs.readFileSync(process.env.WHAT_SHOWS_REGISTERED || new URL('../data/registered.json', import.meta.url), 'utf8')));
 /* 유료 카드 읽기 결과를 앱과 같은 함수로 얹는다(2026-11-15 · match-engine applyCardRead) — 안 얹으면 이 도구가 학생 화면과 다른 줄을 말한다.
    표본 파일로 돌 때(WHAT_SHOWS_REGISTERED)는 얹지 않는다 · 파일이 없으면 그대로(무료 길) */
 if (!process.env.WHAT_SHOWS_REGISTERED) {
-  try { reg.items = ME.applyCardRead(reg.items, JSON.parse(fs.readFileSync(new URL('../data/card-read.json', import.meta.url), 'utf8'))); } catch { /* 아직 없음 */ }
+  try { reg.items = ME.applyCardRead(reg.items, tidyData(JSON.parse(fs.readFileSync(new URL('../data/card-read.json', import.meta.url), 'utf8')))); } catch { /* 아직 없음 */ }
 }
 
 const arg = (k, d) => {
@@ -138,9 +147,9 @@ vm.runInContext([
   /* 카드가 쓰는 한 줄 const 는 **전부** 여기에 — 하나라도 빠지면 그 꼴의 카드(기간 한 줄·학교 사진)에서만 이 도구가 넘어진다
      (리뷰 G3 · 기간 한 줄 달린 게시판 글에서 `hintText is not defined`). 관문 「원문 링크 정직성」 app 갈래가 실제 글 꼴로 돌려 본다. */
   ...['ENTITIES', 'ENTITY_RE', 'PARTIAL_ENTITY_END', 'hintText', 'NEWS_THUMB_RE', 'SCHOOL_PHOTO_RE', 'PHOTO_FOCUS_RE',
-    'CLOSED_KEEP_DAYS', 'KOSAF_ELIG', 'KOSAF_CORE', 'kosafClean', 'KOSAF_NOISE', 'SAYS_UNKNOWN', 'kosafSplit', 'KOSAF_AMOUNT_UNKNOWN', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G'].map(takeConst),
+    'CLOSED_KEEP_DAYS', 'KOSAF_ELIG', 'KOSAF_CORE', 'kosafClean', 'KOSAF_NOISE', 'SAYS_UNKNOWN', 'kosafSplit', 'KOSAF_AMOUNT_UNKNOWN', 'TD_DAY', 'TD_DAY_RE', 'TD_DAY_G', 'JUNK_CHARS', 'OCR_URL_GARBLE', 'TIDY_SKIP_KEY', 'OCR_TEXT_KEY', 'OCR_MARK'].map(takeConst),
   ...['isDateBit', 'splitTitleDates', 'hintShort', 'shortDay'].map(takeFn),   // 카드 제목 날짜·회색 기간 줄(2026-10-04·05) · 카드 윗줄 날짜(10-10)
-  ...['esc', 'unent', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'knownValue', 'kosafNoticeValue', 'attachPrepTemplate', 'kosafAsScholarships', 'sourceLinkHintHtml',   // knownValue: 층2 공고 안내 칸 값이 부른다 · attachPrepTemplate: 층2 항목마다 지원문서를 붙인다(2026-10-13 ① · FORM_TEMPLATES 가 없는 자리에선 그대로 돌려준다)
+  ...['esc', 'unent', 'tidyOcr', 'tidyText', 'tidyData', 'safeUrl', 'won', 'todayStart', 'dday', 'kosafAmountLabel', 'knownValue', 'kosafNoticeValue', 'attachPrepTemplate', 'kosafAsScholarships', 'sourceLinkHintHtml',   // knownValue: 층2 공고 안내 칸 값이 부른다 · attachPrepTemplate: 층2 항목마다 지원문서를 붙인다(2026-10-13 ① · FORM_TEMPLATES 가 없는 자리에선 그대로 돌려준다)
     'attachmentLinkHtml', 'sourceLinkHtml', 'sourceNoteHtml', 'amountSourceLinkHtml', 'appLogLinkHtml', 'noticeCardHtml', 'activityLinkWhy'].map(takeFn),
   /* 층2 바꾸기가 읽는 앱 상태 — 이 도구는 저장·신청 내역을 모른다(없음) */
   'var kosafList = []; var kosafUpdatedAt = ""; var state = { applications: [] }; function isSaved() { return false; }',
@@ -148,6 +157,7 @@ vm.runInContext([
   appSrc.slice(appSrc.indexOf('const NS_LABELS = ['), appSrc.indexOf('\nfunction sourceNoteHtml(')),
 ].join('\n\n'), linkCtx, { filename: 'app.js(링크 자리)' });
 linkCtx.joinSpacedSyllables = ME.joinSpacedSyllables;   // noticeSummaryHtml 의 tidyChars 가 쓴다(match-engine)
+linkCtx.stripListNumber = ME.stripListNumber;   // noticeSummaryRows 의 번호 떼기도 match-engine 한 곳(2026-11-17)
 const linkFn = (n) => vm.runInContext(n, linkCtx);
 const LEDGER = new URL('../data/link-check.json', import.meta.url);
 const ledger = fs.existsSync(LEDGER) ? JSON.parse(fs.readFileSync(LEDGER, 'utf8')) : null;
@@ -214,7 +224,8 @@ function kosafFitLines(sch) {
   const out = [`   학생: ${p.school} ${p.year}학년 ${p.status} · 평점 ${p.gpa} · ${p.credits}학점 · ${p.bracket}구간 · ${p.birthYear}년생 · 거주 ${p.region}${p.regionCity ? ' ' + p.regionCity : ''} · 부모 ${p.parentRegion || '-'}${p.parentRegionCity ? ' ' + p.parentRegionCity : ''}`,
     `   판정 ${result.status}  ·  배지 「${badge}」  ·  요건 ${fd.met}/${fd.total} 충족${fd.unknown ? ` · 모름 ${fd.unknown}` : ''}${fd.unread ? ' · 자격 미확인' : ''}`,
     '   ─ 상세 시트 자격 줄'];
-  for (const { text, group } of ME.requirementLines(sch, null, { all: true, withMeta: true })) {
+  for (const { text, group, head } of ME.requirementLines(sch, null, { all: true, withMeta: true })) {
+    if (head) out.push(`       ┄ 「${String(head).slice(0, 80)}」 (택1 묶음 이름표 · 요건 줄 아님)`);
     const v = ME.requirementMatch(text, p, sch);
     out.push(`       ${v === 'ok' ? '✓' : v === 'no' ? '✕' : '?'} ${group ? `[택1 ${group}] ` : ''}${String(text).slice(0, 84)}`);
   }
@@ -223,7 +234,7 @@ function kosafFitLines(sch) {
 
 /* 정식 등록에 없는 이름 — 앱이 실제로 받는 파일에서 찾는다(공고·소식은 학교별 파일 · 층2는 앱 함수로 바꾼 모양) */
 function showFeedLinks(query) {
-  const read = (p) => { try { return JSON.parse(fs.readFileSync(new URL(p, import.meta.url), 'utf8')).items || []; } catch (e) { return []; } };
+  const read = (p) => { try { return linkFn('tidyData')(JSON.parse(fs.readFileSync(new URL(p, import.meta.url), 'utf8'))).items || []; } catch (e) { return []; } };   // 앱처럼 씻는다(2026-11-17)
   const dir = (p) => fs.readdirSync(new URL(p, import.meta.url)).filter((f) => /\.json$/.test(f) && f !== 'index.json').flatMap((f) => read(`${p}${f}`));
   linkCtx.kosafList = read('../data/kosaf-open.json');
   const sets = [
@@ -341,6 +352,12 @@ for (const sch of hits) {
 
   const listLines = ME.requirementLines(sch, null);                    // 목록 카드 — 5줄 상한
   const allLines = ME.requirementLines(sch, null, { all: true });      // 상세 시트 — 전부
+  /* 택1 묶음 머리 줄(이름표 · 2026-11-17) — 앱(eligibilityRowsHtml · bulkRowHtml)이 그 묶음 첫 줄 위에 작게 그리는 원문 글자. 요건 줄이 아니라 줄 수에 안 든다.
+     표 공고(requirementStruct)는 시트가 「공통 요건 / 다음 중 하나」 로 따로 그려 이 이름표를 안 쓴다 */
+  const headsOf = (items) => new Map(items.filter((x) => x.head).map((x) => [x.text, x.head]));
+  const listHeads = headsOf(ME.requirementLines(sch, null, { withMeta: true }));
+  const allHeads = ME.requirementStruct(sch) ? new Map() : headsOf(ME.requirementLines(sch, null, { all: true, withMeta: true }));
+  const capLine = (heads, l) => (heads.has(l) ? `       ┄ 「${String(heads.get(l)).slice(0, 80)}」 (택1 묶음 이름표 · 요건 줄 아님)\n` : '');
   /* 앱(eligibilityRowsHtml · 2026-10-15)과 같이 **두 목록을 따로** 거르고 자격 블록에 이미 보인 줄은 뺀다 — 이어 붙이면 제외 목록의 머리말
      (`지원 불가 대상:`)이 뒤따르는 자격 줄을 제외 절로 끌어들여 이 도구만 자격 1줄을 '제외'로 보고했다(2026-10-17 미래에셋 해외교환 실측) */
   const shownReq = new Set(allLines);
@@ -372,11 +389,11 @@ for (const sch of hits) {
   }
   if (canApply) console.log(`   누르면 → ${pressRoute(sch)}`);
   console.log(`   ─ 목록 카드에 보이는 자격 줄 (${listLines.length}줄 · 5줄 상한)`);
-  for (const l of listLines) console.log(`       · ${String(l).slice(0, 84)}`);
+  for (const l of listLines) console.log(`${capLine(listHeads, l)}       · ${String(l).slice(0, 84)}`);
   /* 자격 0줄이면 시트의 「지원 자격」 칸이 아예 없을 수 있다(2026-11-07 개발자 지시 · app.js sheetSectionsHtml). 칸이 남는 경우(우선 선발 기준·발췌 대체 줄·
      「별도 자격 제한 없음」·판정 근거·빠진 정보·물을 것)는 app.js 의 eligibilityRowsHtml 이 정하고 프로필에 달려 여기서 되풀이하지 않는다 — 유무는 브라우저로 본다(리뷰) */
   console.log(`   ─ 상세 시트에 보이는 자격 줄 (${allLines.length}줄 · 전부${allLines.length ? '' : ' · 0줄이면 「지원 자격」 칸이 아예 없을 수 있음 — 유무는 app.js eligibilityRowsHtml·브라우저로'})`);
-  for (const l of allLines) console.log(`       · ${String(l).slice(0, 84)}`);
+  for (const l of allLines) console.log(`${capLine(allHeads, l)}       · ${String(l).slice(0, 84)}`);
   if (allLines.length > listLines.length) console.log(`     ⚠️ 목록에는 ${allLines.length - listLines.length}줄이 안 보인다 — 그건 '숨겨진 것'이 아니라 미리보기 상한이다`);
   console.log(`   ─ 제외 줄 ✗ — 「지원 자격」 칸 안 (${exLines.length}줄)`);
   for (const l of exLines) console.log(`       ✗ ${String(l).slice(0, 84)}`);

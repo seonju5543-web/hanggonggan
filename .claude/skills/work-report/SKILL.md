@@ -1,9 +1,11 @@
 ---
 name: work-report
-description: Use when a task in this repo (hanggonggan/한대장) is finished, and again after the day's last task — the developer requires an internal work report PDF (사내 작업 보고서) each time, with every number shown as a chart. Also use when asked for "작업 보고서", "사내관리문서", "오늘 한 일 PDF", "일일 보고".
+description: PAUSED since 2026-10-30 (CLAUDE.md 「관리자 업무」 — do NOT run automatically at the end of tasks until the developer re-instructs). Only when the developer explicitly asks in chat for a daily work report PDF in this repo (hanggonggan/한대장) — "작업 보고서", "사내관리문서", "오늘 한 일 PDF", "일일 보고". For other reports they ask for, use internal-report.
 ---
 
 # 사내 작업 보고서 PDF
+
+> ⏸ **2026-10-30 지시로 자동 작성은 멈춤**(CLAUDE.md 「관리자 업무」 · 다시 지시할 때까지). 개발자가 채팅에서 이 보고서를 직접 청할 때만 아래 순서를 따른다.
 
 2026-10-12 개발자 지시(이선주): 개발자들과 하루 작업을 요약한 **사내관리문서 PDF** 를 만들어 제시한다.
 **작업이 끝날 때**(작업 보고)와 **하루의 마지막 작업이 끝난 뒤**(하루 마감 보고) 두 번. 전문적인 꼴을 갖추고 **수치는 모두 시각 자료로**.

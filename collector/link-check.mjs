@@ -300,8 +300,12 @@ function candReport({ fix, dropped }) {
   L.push('#### ✅ 원문으로 올린 것 (이번 실행)');
   list(by('verified').map((r) => line(r.target.ds, r.target.label, r.entry, r.res.why, r.cand.by)));
   L.push('');
+  /* 🟡 목록에서 뺄 것(2026-11-18 인계) — 이미 마감이 지난 공고 · 사람이 이미 「원문 링크」로 고친 공고(data/link-fixes.json).
+     전엔 닫힌 층2 4건·사람이 10-04 에 고친 연세 글까지 13건으로 띄워 개발자가 할 일을 실제보다 많이 봤다 */
+  const humanFix = (readJson(new URL('../data/link-fixes.json', import.meta.url), {}) || {}).fix || {};
   const waiting = Object.values(candState).filter((e) => e && e.status === 'suggest')
-    .map((e) => ({ e, t: index.find({ ds: e.ds, key: e.key }) })).filter((x) => x.t);
+    .map((e) => ({ e, t: index.find({ ds: e.ds, key: e.key }) })).filter((x) => x.t)
+    .filter(({ t }) => !(t.deadline && String(t.deadline).slice(0, 10) < TODAY) && !(t.fixKey && humanFix[t.fixKey]));
   L.push(`#### 🟡 사람 확인을 기다리는 후보 (전체 ${waiting.length}건) — 열어 보고 맞으면 관리자 화면 「원문 링크」에 넣어 주세요`);
   list(waiting.map(({ e, t }) => `${line(t.ds, t.label, e, e.why, e.by)}${Object.entries(e.checks || {}).length ? `\n  잣대: ${Object.entries(e.checks).map(([k, v]) => `${CHECK_WORD[k] || k} ${v === 'ok' ? '✓' : v === 'fail' ? '✕' : v === 'n/a' ? '-' : '?'}`).join(' · ')}` : ''}`));
   L.push('');

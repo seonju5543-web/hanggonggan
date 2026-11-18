@@ -245,14 +245,6 @@
   "minBody": 100,
   "name": "[국가근로] 2026학년도 2학기 국가근로장학생 추가 모집 안내(교수학습개발센터)"
  },
- "https://plus.cnu.ac.kr/_prog/_board/?code=sub07_0713&menu_dvs_cd=0713&no=2515592&site_dvs_cd=kr": {
-  "tries": 5,
-  "at": "2026-10-23",
-  "minBody": 100,
-  "name": "2026년도 2학기 중소기업 취업연계 장학사업(희망사다리 1유형) 신규장학생 추천자 선발 공고",
-  "attTries": 1,
-  "attAt": "2026-11-18"
- },
  "https://www.catholic.ac.kr/ko/campuslife/notice.do?articleno=276603&srcategoryid=22": {
   "tries": 5,
   "at": "2026-11-15",
@@ -271,17 +263,14 @@
   "tries": 0,
   "name": "[우양재단] 2026년 동행 장학생 모집 (가족 돌봄 청년 대상, ~10/18)"
  },
- "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&menuid=2000005009002000000&seq=31569": {
-  "ok": "2026-11-09",
-  "at": "2026-11-09",
-  "tries": 0,
-  "name": "경영경제전문도서관 국가근로장학생 추가 모집"
- },
  "https://www.sejong.ac.kr/kor/intro/notice7.do?articleno=894170": {
   "ok": "2026-10-26",
   "at": "2026-10-26",
   "tries": 0,
-  "name": "2026-2 학업수석총장장학금 선발 안내"
+  "name": "2026-2 학업수석총장장학금 선발 안내",
+  "att": "2026-11-18",
+  "attSeen": 0,
+  "attGap": 0
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/520607": {
   "ok": "2026-10-12",
@@ -383,7 +372,10 @@
   "ok": "2026-11-15",
   "at": "2026-11-15",
   "tries": 0,
-  "name": "2026학년도 하반기 재단법인 인석장학회 장학생 선발 안내"
+  "name": "2026학년도 하반기 재단법인 인석장학회 장학생 선발 안내",
+  "att": "2026-11-18",
+  "attSeen": 1,
+  "attGap": 0
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/520867": {
   "tries": 7,
@@ -395,7 +387,10 @@
   "ok": "2026-11-15",
   "at": "2026-11-15",
   "tries": 0,
-  "name": "[공통][교외]2026학년도 하반기 인석장학금 선발 공고(~11/26)"
+  "name": "[공통][교외]2026학년도 하반기 인석장학금 선발 공고(~11/26)",
+  "att": "2026-11-18",
+  "attSeen": 2,
+  "attGap": 0
  },
  "https://dep.hufs.ac.kr/bbs/student/2431/269433/artclView.do": {
   "tries": 3,
@@ -449,7 +444,10 @@
   "ok": "2026-11-15",
   "at": "2026-11-15",
   "tries": 0,
-  "name": "[일반] 2026학년도 하반기 인석장학금 지원신청 안내"
+  "name": "[일반] 2026학년도 하반기 인석장학금 지원신청 안내",
+  "att": "2026-11-18",
+  "attSeen": 4,
+  "attGap": 0
  },
  "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?category=장학&keyword=장학&paged=1&slug=2026학년도-2학기-한국장학재단-푸른등대-기부장학금2차": {
   "tries": 2,
@@ -572,7 +570,10 @@
   "ok": "2026-11-08",
   "at": "2026-11-08",
   "tries": 0,
-  "name": "[교외] 관정이종환교육재단 장학생 선발 안내(11/23 마감, 등록금 전액 or 학업장려금 400만원)"
+  "name": "[교외] 관정이종환교육재단 장학생 선발 안내(11/23 마감, 등록금 전액 or 학업장려금 400만원)",
+  "att": "2026-11-18",
+  "attSeen": 4,
+  "attGap": 0
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323515&menuno=200318": {
   "tries": 3,
@@ -584,13 +585,19 @@
   "tries": 2,
   "at": "2026-11-10",
   "minBody": 100,
-  "name": "장학 2026년 숭실대학교 직원 추천 장학생 선발 공고"
+  "name": "장학 2026년 숭실대학교 직원 추천 장학생 선발 공고",
+  "att": "2026-11-18",
+  "attSeen": 2,
+  "attGap": 0
  },
  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?boardid=323545&menuno=200318": {
   "tries": 2,
   "at": "2026-11-11",
   "minBody": 100,
-  "name": "공통 2026학년도 2학기 문우림 제6기 장학생 선발 안내"
+  "name": "공통 2026학년도 2학기 문우림 제6기 장학생 선발 안내",
+  "att": "2026-11-18",
+  "attSeen": 2,
+  "attGap": 0
  },
  "https://www.jbnu.ac.kr/web/Board/219698/detailView.do?category=6": {
   "tries": 3,
@@ -626,21 +633,18 @@
   "ok": "2026-11-17",
   "at": "2026-11-17",
   "tries": 0,
-  "name": "2026-2학기 장학사정관(릴레이쉽) 장학금 신청 안내"
+  "name": "2026-2학기 장학사정관(릴레이쉽) 장학금 신청 안내",
+  "att": "2026-11-18",
+  "attSeen": 2,
+  "attGap": 0
  },
  "https://wise.dongguk.ac.kr/article/servicenotice/detail/521206": {
   "ok": "2026-11-17",
   "at": "2026-11-17",
   "tries": 0,
-  "name": "2026학년도 교촌장학생 선발 안내(장학금액: 100만원/생활비지원)"
- },
- "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdbbsseq=1&nttid=20260807": {
-  "tries": 3,
-  "at": "2026-11-18",
-  "minBody": 100,
-  "name": "[교내/선발] 2026학년도 2학기 학부 교내장학..",
+  "name": "2026학년도 교촌장학생 선발 안내(장학금액: 100만원/생활비지원)",
   "att": "2026-11-18",
-  "attSeen": 0,
+  "attSeen": 2,
   "attGap": 0
  },
  "https://nano.pknu.ac.kr/nano/2432?action=view&no=9994682": {
@@ -651,15 +655,6 @@
  "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&menuid=2000005009002000000&seq=31571": {
   "att": "2026-11-18",
   "attSeen": 4,
-  "attGap": 0
- },
- "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdbbsseq=1&brddate=20260526&brdseq=1": {
-  "attTries": 1,
-  "attAt": "2026-11-18"
- },
- "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdbbsseq=1&brddate=20260427&brdseq=1": {
-  "att": "2026-11-18",
-  "attSeen": 0,
   "attGap": 0
  },
  "https://www.knou.ac.kr/bbs/knou/51/815772/artclView.do": {
@@ -805,6 +800,109 @@
  "https://www.skku.edu/skku/campus/skk_comm/notice06.do?articleno=141703": {
   "att": "2026-11-18",
   "attSeen": 0,
+  "attGap": 0
+ },
+ "https://www.yonsei.ac.kr/bbs/sc/58/944606/artclView.do": {
+  "att": "2026-11-18",
+  "attSeen": 2,
+  "attGap": 0
+ },
+ "https://www.seoultech.ac.kr/service/info/janghak/?bidx=897664&bnum=57138&cate=0&qidx=57138": {
+  "att": "2026-11-18",
+  "attSeen": 1,
+  "attGap": 0
+ },
+ "https://www.sogang.ac.kr/ko/detail/551811?bbsconfigfk=141&namepage=ScholarshipNotice": {
+  "att": "2026-11-18",
+  "attSeen": 3,
+  "attGap": 0
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2431/271374/artclView.do": {
+  "att": "2026-11-18",
+  "attSeen": 2,
+  "attGap": 0
+ },
+ "https://www.skku.edu/skku/campus/skk_comm/notice06.do?articleno=141760": {
+  "att": "2026-11-18",
+  "attSeen": 0,
+  "attGap": 0
+ },
+ "https://www.kw.ac.kr/ko/life/notice.jsp?boardmode=view&duid=53668&tpage=1": {
+  "att": "2026-11-18",
+  "attSeen": 0,
+  "attGap": 0
+ },
+ "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?bbsno=1073&key=7520&nttno=627142&searchkrwd=장학&sf.pnos=1073&sf.pnos=888": {
+  "att": "2026-11-18",
+  "attSeen": 2,
+  "attGap": 0
+ },
+ "https://www.sogang.ac.kr/ko/detail/551816?bbsconfigfk=141&namepage=ScholarshipNotice": {
+  "att": "2026-11-18",
+  "attSeen": 4,
+  "attGap": 0
+ },
+ "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardid=5&cate=8&key=70976": {
+  "attTries": 1,
+  "attAt": "2026-11-18"
+ },
+ "https://wise.dongguk.ac.kr/article/servicenotice/detail/521183": {
+  "att": "2026-11-18",
+  "attSeen": 2,
+  "attGap": 0
+ },
+ "https://www.hongik.ac.kr/kr/newscenter/notice.do?articleno=160317&nocat=501": {
+  "att": "2026-11-18",
+  "attSeen": 1,
+  "attGap": 0
+ },
+ "https://www.inha.ac.kr/bbs/kr/8/46131/artclView.do": {
+  "att": "2026-11-18",
+  "attSeen": 2,
+  "attGap": 0
+ },
+ "https://www.catholic.ac.kr/ko/campuslife/notice.do?articleno=277782&srcategoryid=22": {
+  "att": "2026-11-18",
+  "attSeen": 2,
+  "attGap": 0
+ },
+ "https://www.korea.ac.kr/ko/568/subview.do?enc=Zm5jdDF8QEB8JTJGcG9ydGFsQm9hcmQlMkZrbyUyRjMlMkYwMDAxMDAwMDAwMDAwMDM4OTklMkZwb3J0YWxCb2FyZFZpZXcuZG8lM0ZzaXRlSWQlM0RrbyUyNnR5cGUlM0QlMjZpZCUzRCUyNmFydGljbGVJZCUzRCUyNnBhZ2UlM0QlMjZzdGFydERhdGUlM0QlMjZlbmREYXRlJTNEJTI2ZmluZFR5cGUlM0QlMjZmaW5kV29yZCUzRCUyNg==": {
+  "att": "2026-11-18",
+  "attSeen": 2,
+  "attGap": 0
+ },
+ "https://www.smu.ac.kr/kor/life/notice.do?articleno=770333": {
+  "att": "2026-11-18",
+  "attSeen": 4,
+  "attGap": 0
+ },
+ "https://www.smu.ac.kr/kor/life/notice.do?articleno=770332": {
+  "att": "2026-11-18",
+  "attSeen": 1,
+  "attGap": 0
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2431/271834/artclView.do": {
+  "att": "2026-11-18",
+  "attSeen": 2,
+  "attGap": 0
+ },
+ "https://wise.dongguk.ac.kr/article/servicenotice/detail/521215": {
+  "att": "2026-11-18",
+  "attSeen": 1,
+  "attGap": 0
+ },
+ "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12630/view.do?currentpageno=1": {
+  "att": "2026-11-18",
+  "attSeen": 3,
+  "attGap": 0
+ },
+ "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdbbsseq=1&brddate=20261117&brdseq=1": {
+  "attTries": 1,
+  "attAt": "2026-11-18"
+ },
+ "https://www3.chosun.ac.kr/bbs/scho/332/282856/artclView.do": {
+  "att": "2026-11-18",
+  "attSeen": 4,
   "attGap": 0
  }
 }

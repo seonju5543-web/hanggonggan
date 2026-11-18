@@ -286,7 +286,7 @@ export function runFormPdf({ root, today, dry = false, soffice = process.env.FOR
        🔴 뒤 단계(form-fields.mjs)의 결과물은 고아가 아니다 — fields.json 과 살아 있는 PDF 의 「<이름>-pages」 폴더는 둔다.
           여기서 지우면 그 로봇이 **매일 26개 전부를 다시 그린다**(2026-11-09 실측 · 리포트 「그대로 0」) · 죽은 PDF 의 쪽 폴더는 그 로봇이 스스로 지운다. */
     if (!dry && fs.existsSync(path.join(outDir, t.id))) {
-      const keep = new Set(next.flatMap((h) => [path.basename(h.file), `${path.basename(h.file).replace(/\.pdf$/i, '')}-pages`]).concat(['fields.json']));
+      const keep = new Set(next.flatMap((h) => [path.basename(h.file), `${path.basename(h.file).replace(/\.pdf$/i, '')}-pages`]).concat(['fields.json', 'fields-fix.json']));   // fields-fix.json = 사람이 지정한 칸 장부(tools/admin-apply fieldFix · 2026-11-18) — 지우면 관리자 칸이 밤마다 사라진다
       for (const fn of fs.readdirSync(path.join(outDir, t.id))) if (!keep.has(fn)) { try { fs.rmSync(path.join(outDir, t.id, fn), { recursive: true, force: true }); } catch { /* 무시 */ } }
       if (!next.length) { try { fs.rmSync(path.join(outDir, t.id), { recursive: true, force: true }); } catch { /* 무시 */ } }
     }

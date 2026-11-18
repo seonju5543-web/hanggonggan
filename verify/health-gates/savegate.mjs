@@ -28,8 +28,44 @@ export const REVERT_RE = /\bcollector\/gate-guard\.mjs\b|\bgit\s+(checkout|resto
 /** 관문이 없는 저장 job — `파일#job` → 이유 한 줄. 🔴 줄기만 한다(관문을 붙였으면 여기서 지운다 · 새로 더하지 말 것) */
 export const SAVE_GATE_EXCEPTIONS = {
   'admin-apply.yml#apply': '관리자 버튼 — 감사만 돈다: test-collector 만 알던 규칙은 감사·저장소 거절로 옮겼다(관문 gate ② · 10-04) · 남의 빨간불에 관리자 수정이 막히지 않게',
-  'audit-coverage.yml#audit': '쓰는 json 은 제 기록장(coverage-history·coverage-cursor)뿐 — 관문·감사·다른 로봇이 읽지 않는다(11-15 grep) · 걸면 남의 빨간불에 감사만 멈춘다',
+  /* audit-coverage.yml#audit — 11-17 지웠다: collector/coverage-*.json 은 규칙 파일 자리(collector 바로 밑 json)라 CLAUDE.md 매 세션 7 대로 관문을 붙였다
+     (남의 빨간불에 감사가 멈추지 않게 gate-guard --keep-preexisting · 관문은 test-collector 만 — 사냥꾼과 같은 꼴) */
 };
+
+/** 관문이 재지 않는 자리(insta/ · docs/ · collector/extracted/ 아래)**만** 저장하는 job — `파일#job` → { why, readers } (2026-11-17 · 노션 G-16 나머지).
+    위 규칙(data/ · collector 바로 밑 json)에 안 걸려 관문 없이 저장해도 되는 까닭을 한 줄로 적어 둔다 — 「저장 로봇이 아니다」로 조용히 빠지던 것을 이름으로 붙잡는다.
+    · why: 그 파일을 누가 읽는가 · 관문(test-collector·audit-data)을 걸면 무엇이 깨지는가
+    · readers: 앱(뿌리 *.js·*.html)·수집 로봇(collector/*.mjs·*.cjs) 중 그 경로를 글자로 부르는 것은 이 파일들뿐이다(③-2 가 잰다 — 다른 데서 부르기 시작하면 이유가 낡은 것)
+    🔴 톱니 — 새 job 은 여기 이유를 적어 더하고 · 이제 data/·collector/*.json 을 저장하면(관문 대상) 여기서 지우고 관문을 붙인다 */
+export const OUTSIDE_GATE_SAVERS = {
+  'gate-photos.yml#fetch': { why: '정문 사진 후보·manifest(docs/designs/assets/gates) — 사람이 tools/build-school-photos.mjs·gate-reel/build-app-gates.mjs 로 골라 assets/ 로 옮길 때만 읽고, 앱이 받는 assets/ 쪽은 그 사람 커밋이 관문(「학교 대표 사진」·「시작 화면」)을 거친다', readers: [] },
+  'insta-comments.yml#run': { why: 'insta/comments.json — 관리자 화면 인스타 탭만 읽는다(앱·수집 로봇·관문 안 읽음) · 사실 관문은 verify-insta.js 가 따로 지킨다', readers: [] },
+  'insta-samples.yml#draw': { why: 'insta/samples(판형 견본 그림·index.json) — 관리자 화면 판형 탭만 읽는다 · 앱·수집 로봇·관문 안 읽음', readers: [] },
+  'insta-stats.yml#harvest': { why: 'insta/stats.json(팔로워·반응) — 관리자 화면만 읽는다 · 앱·수집 로봇·관문 안 읽음 · 걸면 남의 빨간불에 반응 수확이 끊긴다', readers: [] },
+  'insta-token-check.yml#check': { why: 'insta/token-seen.json(토큰 지문) — 이 감시 로봇과 관리자 화면만 읽는다 · 걸면 남의 빨간불에 토큰 만료 경보가 멈춘다', readers: [] },
+  'insta.yml#prepare': { why: 'insta/pub·seen.json — 인스타 로봇끼리·관리자 화면만 읽는다 · 카드의 사실은 그리기 전 사실 관문(verify-insta.js)이 잰다', readers: [] },
+  'insta.yml#publish': { why: 'insta/seen.json — 올린 뒤 반드시 적어야 같은 공고를 두 번 올리지 않는다(always) · 관문을 걸면 남의 빨간불에 올린 기록이 사라진다', readers: [] },
+  'insta.yml#skip': { why: 'insta/seen.json — 관리자 건너뛰기 기록 · 인스타 로봇끼리·관리자 화면만 읽는다 · 걸면 남의 빨간불에 건너뛰기가 안 먹는다', readers: [] },
+  'two-school-scan.yml#scan': { why: '일회용 조사(09-02) — 기본 브랜치가 아닌 제 브랜치에만 push · collector/extracted/two-school·ts-* 는 이 조사 짝 로봇만 읽는다(test-collector 의 판정 표본은 글자를 베껴 둔 것)', readers: ['collector/scan-two-schools.mjs', 'collector/classify-two-schools.mjs'] },
+};
+
+/** 관문이 재지 않는 자리만 저장하는 job 과 그 경로 — { '파일#job': [경로…] } */
+export function outsideGateSavers(files) {
+  const out = {};
+  for (const [f, yml] of Object.entries(files)) for (const job of jobsOf(yml)) {
+    const paths = stepsOf(job.text).flatMap((s) => addedPaths(s.run));
+    if (!paths.length) continue;
+    const n = needsOf(paths);
+    if (!n.rule && !n.data) out[`${f}#${job.name}`] = paths;
+  }
+  return out;
+}
+
+/** 그 경로를 글자로 부르는 파일 — texts = { 파일: 글 } · 경로의 `*` 앞까지만 본다(`collector/extracted/ts-*.*` → `collector/extracted/ts-`) */
+export function readersOf(paths, texts) {
+  const keys = paths.map((p) => p.replace(/\*.*$/, '').replace(/\/+$/, '')).filter((k) => k.length >= 6);
+  return Object.entries(texts).filter(([, t]) => keys.some((k) => t.includes(k))).map(([f]) => f).sort();
+}
 
 const codeLines = (t) => String(t || '').split('\n').filter((l) => !/^\s*#/.test(l));
 
@@ -445,4 +481,26 @@ export default async function gate(eq, ctx) {
   eqWf('  관문 없이 저장하는 **새** job 이 없다 — 저장 앞에 관문(test-collector · data/ 면 audit-data)을 붙인다(예외 목록에 더하지 말 것)', fresh.map(why), []);
   eqWf('  예외 목록의 job 이 이제 관문을 갖췄거나 저장하지 않는다 — SAVE_GATE_EXCEPTIONS 에서 지운다(목록은 줄기만 한다)', stale, []);
   eq('  예외마다 이유 한 줄(10자 이상 · 줄바꿈 없음)', Object.entries(SAVE_GATE_EXCEPTIONS).filter(([, w]) => !(typeof w === 'string' && w.trim().length >= 10 && !/\n/.test(w))).map(([k]) => k), []);
+
+  /* ③-2 (2026-11-17 · G-16 나머지) 관문이 재지 않는 자리만 저장하는 job — 이름과 이유로 붙잡는다(조용히 '저장 로봇 아님'으로 빠지지 않게) */
+  const outSample = outsideGateSavers({ 'a.yml': SAMPLES.notRuleFiles, 'b.yml': SAMPLES.noGate, 'c.yml': SAMPLES.ruleOnlyForRules });
+  eq('③-2 표본 — insta/·docs/·extracted·리포트만 저장하는 job 만 잡는다(data/·collector/*.json 저장 job 은 위 규칙 몫)',
+    outSample, { 'a.yml#run': ['collector/x-report.md', 'collector/extracted/x.json', 'insta/seen.json', 'docs/designs/assets/gates'] });
+  const readTexts = { 'app.js': "fetch('assets/gates/gates.json')", 'collector/x.mjs': "readFileSync('insta/seen.json')", 'collector/y.mjs': 'collector/extracted/ts-1.txt' };
+  eq('  읽는 쪽 대조 — 경로를 글자로 부르는 파일만(`*` 앞까지 · docs/ 사본은 assets/ 와 다르다)',
+    [readersOf(['insta/seen.json'], readTexts), readersOf(['collector/extracted/ts-*.*'], readTexts), readersOf(['docs/designs/assets/gates'], readTexts)],
+    [['collector/x.mjs'], ['collector/y.mjs'], []]);
+  const outside = outsideGateSavers(files);
+  const rOut = ratchet(Object.keys(outside), OUTSIDE_GATE_SAVERS);
+  eqWf('  관문이 재지 않는 자리만 저장하는 **새** job 이 없다 — OUTSIDE_GATE_SAVERS 에 이유를 적거나, 앱·로봇이 읽는 파일이면 관문을 붙인다', rOut.fresh.map((k) => `${k} — ${outside[k].join(' ')}`), []);
+  eqWf('  목록의 job 이 이제 관문 대상(data/·collector/*.json)을 저장하거나 저장을 그만뒀다 — OUTSIDE_GATE_SAVERS 에서 지운다', rOut.stale, []);
+  eq('  이유마다 한 줄(20자 이상 · 줄바꿈 없음) · readers 는 배열', Object.entries(OUTSIDE_GATE_SAVERS)
+    .filter(([, v]) => !(v && typeof v.why === 'string' && v.why.trim().length >= 20 && !/\n/.test(v.why) && Array.isArray(v.readers))).map(([k]) => k), []);
+  /* 앱(뿌리 *.js·*.html)과 수집 로봇(collector/*.mjs·*.cjs) 가운데 그 경로를 부르는 파일은 readers 뿐 — 다른 데서 읽기 시작하면 '아무도 안 읽는다'는 이유가 낡은 것 */
+  const listDir = (rel, re) => fs.readdirSync(new URL(rel, root)).filter((f) => re.test(f)).map((f) => rel + f);
+  const appAndRobots = Object.fromEntries([...listDir('', /\.(js|html)$/), ...listDir('collector/', /\.(mjs|cjs)$/)]
+    .map((f) => [f, fs.readFileSync(new URL(f, root), 'utf8')]));
+  eqWf('  앱·수집 로봇 중 그 경로를 부르는 것은 readers 뿐(읽기 시작하면 관문을 붙이고 목록에서 지운다)',
+    Object.entries(outside).filter(([k]) => OUTSIDE_GATE_SAVERS[k])
+      .flatMap(([k, paths]) => readersOf(paths, appAndRobots).filter((f) => !OUTSIDE_GATE_SAVERS[k].readers.includes(f)).map((f) => `${k} ← ${f}`)), []);
 }

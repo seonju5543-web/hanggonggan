@@ -19,9 +19,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import * as canon from '../collector/canon-url.mjs';
-import { indexTexts, sourceFor, hasText } from '../collector/notice-source.mjs';
+import { indexTexts, sourceFor, hasText, evidenceExcerpts } from '../collector/notice-source.mjs';
 import { attachmentText, readable } from '../collector/attachment-text.mjs';
-import { periodAfterDeadline, amountAfterValue, needsBulkExpect } from './edit-diff.mjs';
+import { periodAfterDeadline, amountAfterValue, needsBulkExpect, cleanExcerpts, ELIG_KEYS } from './edit-diff.mjs';   // 자격 칸 목록은 edit-diff 한 곳(화면 미리보기와 저장이 갈라지지 않게 · 2026-11-18)
 import { newsPostKey } from '../collector/news-board-rules.mjs';   // 소식 숨김 열쇠 한 곳 (수집 로봇의 newsHidden 과 같다)
 import { thumbKey, isThumbPath } from '../collector/news-thumb.mjs';   // 소식 썸네일 열쇠·꼴 한 곳 (썸네일 로봇과 같다)
 import { urlKey } from '../collector/url-key.mjs';
@@ -113,6 +113,9 @@ const ALLOWED = new Set([
   /* 자격 요건 (2026-08-09 추가) — 학생 앱이 이미 읽는 칸들이라 앱 코드 변경은 필요 없다
      (`app.js`의 qBlock·reasonRows, `match-engine.js`의 tidyRequirement). */
   'eligibilityLines', 'eligibilityVerified', 'eligibility', 'documents',
+  /* 신청 방법 원문 발췌 (2026-11-17) — 원문 문장 그대로를 줄마다. 고치면 `excerptsFrom = '관리자 <날짜>'` 가 붙어
+     발췌 로봇이 덮지·지우지 않고, 🔴 **원문 근거로는 쓰이지 않는다**(아래 corpus · notice-source evidenceExcerpts) */
+  'excerpts',
   /* 앱이 이미 읽는데 화면에만 칸이 없던 넷 (2026-09-13 · C4) — 달력 발표 점(app.js 의
      announceDate) · '이런 학생은 못 받아요'(eligibilityExcludes) · '먼저 뽑는 기준'
      (eligibilityPriority) · 이중수혜(exclusivity).
@@ -133,17 +136,6 @@ const NEVER_EMPTY = new Set(['name', 'type', 'provider', 'amount', 'summary', 's
 /* 🔴 `eligibility`(기계 판정용)와 `eligibilityLines`(사람이 읽는 문장)를 **섞지 말 것.**
    매칭·알림·홈 합계는 전부 `eligibility`를 보고 판정한다. 여기에 자유 문장이 들어가면
    판정이 조용히 망가진다. 그래서 중첩 키도 화이트리스트로 못 박고, 값의 형태까지 검사한다. */
-const ELIG_KEYS = {
-  selective: 'bool',
-  schoolOnly: 'str',
-  campusOnly: 'str',
-  schoolsAny: 'strArr', // "학교" 또는 "학교|캠퍼스" — match-engine.js inSchoolsAny
-  years: 'numArr',      // [1,2,3,4]
-  minGpa: 'num',
-  maxBracket: 'num',
-  tracks: 'strArr',
-};
-
 function cleanEligibility(v) {
   if (!v || typeof v !== 'object' || Array.isArray(v)) fail('자격(기계 판정용) 형식이 올바르지 않습니다');
   const out = {};
@@ -213,14 +205,16 @@ function corpus(it) {
     const t = attachmentText(path.join(ROOT, 'collector/extracted', f));
     if (readable(t)) { parts.push(t); hasSource = true; }
   }
-  /* 발췌는 로봇이 **원문에서 그대로 뽑아 둔 것**이라 근거로 쓸 수 있다(ALLOWED 밖이라 사람이 못 고친다).
+  /* 발췌는 로봇이 **원문에서 그대로 뽑아 둔 것**이라 근거로 쓸 수 있다.
+     🔴 2026-11-17 부터 발췌도 이 화면이 고칠 수 있다(ALLOWED 'excerpts') — 그래서 아래 자격 줄과 **같은 규칙**으로
+        사람이 쓴 발췌(`excerptsFrom` '관리자 …')는 뺀다(규칙은 notice-source.mjs evidenceExcerpts 한 곳 · 로봇들도 같은 함수).
      다만 이것만 있는 상태는 '원문을 갖고 있다'가 아니다 — 아래에서 사유를 가를 때 쓴다.
      🔴 **자격 줄은 사람이 방금 쓴 것일 수 있다** (2026-09-14 수리). `eligibilityLines` 는
         같은 관리자 화면이 고칠 수 있는 칸이라, 근거로 인정하면 **자기가 쓴 글을 근거로**
         prepDoc·exclusivity 를 켤 수 있었다 — 한 묶음 안에서 ①자격 줄에 문장을 적고
         ②그 문장을 근거로 스위치를 켜면 통과했다(실측). 원칙 8-2 를 정면으로 깬다.
         그래서 **로봇이 넣은 자격 줄만** 근거로 쓴다(관리자 표식이 붙은 것은 뺀다). */
-  parts.push(...(it.excerpts || []));
+  parts.push(...evidenceExcerpts(it));
   if (!/^관리자/.test(it.eligibilityFrom || '')) parts.push(...(it.eligibilityLines || []));
   return { text: parts.join('\n'), hasSource };
 }
@@ -641,6 +635,7 @@ switch (action) {
     /** 한 건에 patch 를 입힌다. 바뀐 칸 이름들을 돌려준다. */
     const applyPatch = (it, patch) => {
       const changed = [];
+      const OWNER = `관리자 ${TODAY}`;   // 주인 표식 — 아래 '주인 표식' 절 · 자격 줄·발췌는 칸을 돌 때 바로 붙인다
       const oldDeadline = it.deadline;   // 마감을 비울 때 period 에 남은 그 날짜를 같이 걷어내려고
       const oldType = it.type;
       const scopeOf = (e) => JSON.stringify([(e || {}).schoolOnly || '', (e || {}).campusOnly || '', (e || {}).schoolsAny || []]);
@@ -663,6 +658,9 @@ switch (action) {
         } else if (k === 'documents' || k === 'eligibilityExcludes' || k === 'eligibilityPriority') {
           v = cleanLines(v);
           if (!v.length) v = null;
+        } else if (k === 'excerpts') {
+          /* 규칙은 화면 미리보기와 같은 함수(edit-diff cleanExcerpts) — 글자 아닌 줄이 섞이면 그 자리에서 멈춘다 */
+          try { v = cleanExcerpts(v); } catch (e) { fail(`${it.id} — ${e.message}`); }
         } else if (k === 'exclusivity') {
           v = cleanExclusivity(it, v);
         } else if (k === 'announceDate' && v) {
@@ -701,6 +699,11 @@ switch (action) {
         } else if (!same(old, v)) {
           it[k] = v; changed.push(k);
         }
+        /* 🔴 **사람이 쓴 줄의 표식은 그 자리에서 붙인다** (2026-11-17) — 아래 주인 표식은 칸을 다 돈 **뒤에** 붙는데, 같은 patch 의
+           뒤 칸(이중수혜 근거 대조)은 그 사이에 corpus 를 읽는다. 그래서 `{ eligibilityLines:[문장], exclusivity:{raw:문장} }` 한 건이
+           방금 쓴 자격 줄을 원문 근거로 받아 통과했다(실측 — 2026-09-14 수리는 '두 건으로 나눈 묶음'만 막았다). 발췌도 같은 자리 */
+        if (changed.includes(k) && k === 'eligibilityLines' && it[k] !== undefined) it.eligibilityFrom = OWNER;
+        if (changed.includes(k) && k === 'excerpts') it.excerptsFrom = it.excerpts ? OWNER : `${OWNER} · 비움`;
       });
 
       /* ── 주인 표식 ────────────────────────────────────────────
@@ -710,7 +713,6 @@ switch (action) {
          🔴 비우면 표식도 함께 지워 **로봇에게 돌려준다**(다음 수집 때 원문에서 다시 읽는다).
          ⚠️ `exclusivityFrom` 은 뜻이 거꾸로였다(표식이 **없는** 값이 사람 값) — 로봇 쪽
             판정 한 줄(`extract-amounts.mjs`)이 같이 고쳐져야 이 표식이 일한다. */
-      const OWNER = `관리자 ${TODAY}`;
       const mark = (key, from) => {
         if (!changed.includes(key)) return;
         if (it[key] !== undefined) it[from] = OWNER; else delete it[from];
@@ -723,6 +725,11 @@ switch (action) {
          (끈 것: prepDoc 이 사라져도 prepDocFrom 은 '관리자'로 남겨 로봇이 다시 켜지 않게 — 리뷰) */
       mark('documents', 'documentsFrom');
       if (changed.includes('prepDoc')) it.prepDocFrom = OWNER;
+      /* 신청 방법 원문 발췌도 같은 규칙 (2026-11-17) — 발췌 로봇(extract-excerpts)은 excerptsFrom 이 '관리자'·'AI' 면 덮지도 지우지도 않는다.
+         표식은 위 칸 돌기에서 이미 붙였다(같은 patch 의 근거 대조가 방금 쓴 발췌를 원문으로 받지 않게).
+         🔴 로봇이 붙인 '(자동)' 출처 문구(excerptNote)는 사람 줄의 출처가 아니므로 뺀다 · 비울 때도 표식을 남긴다 — 없으면 다음 실행이
+            같은 원문에서 같은 줄을 되채운다(마감일과 같다). 로봇에게 다시 맡기려면 이 표식을 지운다 */
+      if (changed.includes('excerpts')) delete it.excerptNote;
       /* 메일 접수 주소도 같은 규칙 (2026-11-16 · 상명대 근로장학 — 로봇이 '선발 뒤 신청서 제출' 메일을 접수처로 읽었다).
          로봇(extract-excerpts fillApplyEmail · apply-email humanOwnedEmail)은 applyEmailFrom 이 '관리자'면 안 채운다.
          🔴 비울 때도 표식을 남긴다 — 없으면 다음 실행이 같은 줄을 다시 읽어 같은 주소를 되채운다(마감일과 같다).
@@ -1195,6 +1202,46 @@ switch (action) {
     doc.updatedAt = `${kstNow()} KST`;
     writeJson(LINK_FIXES, doc);
     detail = `원문 주소 ${done.length}건 — ${done.join(' · ')}`.slice(0, 600);
+    touched = true;
+    break;
+  }
+
+  /* ── 양식 빈칸 지정 (2026-11-18 · 인계 1 f) — 로봇이 못 찾은·잘못 찾은 칸을 사람이 더하고 뺀다.
+     장부 data/<forms-pdf|form-pages>/<id>/fields-fix.json(로봇이 칸을 다시 만들 때마다 얹는다) + 지금 fields.json 에도 바로 얹는다(다음 로봇 실행을 기다리지 않게).
+     payload { id, file, base?: 'forms-pdf'|'form-pages', add?: [{ page, x, y, w, h, label, key? }], remove?: ['p1-3'] } — 좌표는 PDF 포인트(fields.json 과 같다) ── */
+  case 'fieldFix': {
+    const base = payload.base === 'form-pages' ? 'form-pages' : 'forms-pdf';
+    const id = String(payload.id || '');
+    const rel = String(payload.file || '').split('/').pop();
+    if (!/^[\w.-]+$/.test(id) || !rel) fail('공고 id 와 파일 이름이 필요합니다');
+    const dirAbs = path.join(ROOT, 'data', base, id);
+    const fjPath = path.join(dirAbs, 'fields.json');
+    const fj = readJson(fjPath, null);
+    if (!fj || !fj.files || !fj.files[rel]) fail(`그 양식의 빈칸 장부가 없습니다: data/${base}/${id}/fields.json · ${rel} (로봇이 쪽 그림을 먼저 만들어야 합니다)`);
+    const add = Array.isArray(payload.add) ? payload.add : []; const remove = Array.isArray(payload.remove) ? payload.remove.map(String) : [];
+    if (!add.length && !remove.length) fail('더하거나 뺄 칸이 없습니다');
+    if (add.length > 60) fail('한 번에 60칸까지만 받습니다');
+    process.env.FORM_FIELDS_AS_LIB = '1';
+    const FF = await import('../collector/form-fields.mjs');
+    const F = fj.files[rel];
+    const fixPath = path.join(dirAbs, 'fields-fix.json');
+    const fixDoc = readJson(fixPath, null) || { files: {} };
+    const prev = fixDoc.files[rel] || { add: [], remove: [] };
+    /* 뺄 칸은 지금 화면의 칸 번호로 받아 **자리(쪽+상자)** 로 바꿔 적는다 — 번호는 로봇이 다시 그리면 다른 칸을 가리킨다(리뷰 2026-11-18) */
+    const box = (f) => ({ page: Number(f.page), x: Number(f.x), y: Number(f.y), w: Number(f.w), h: Number(f.h) });
+    const removeBoxes = remove.map((rid) => { const f = (F.fields || []).find((x) => String(x.id) === rid); if (!f) fail(`그 칸이 없습니다: ${rid} (화면을 새로 고쳐 다시 골라 주세요)`); return box(f); });
+    let prevAdd = (prev.add || []).filter((a) => !removeBoxes.some((g) => FF.sameBox(g, a)));   // 사람이 더했던 칸을 빼면 더하기 목록에서도 지운다
+    const newAdd = add.map((a) => ({ ...box(a), label: cleanText(a.label).slice(0, 20), key: a.key || null })).filter((a) => !prevAdd.some((p) => FF.sameBox(p, a)));
+    const robotGone = removeBoxes.filter((g) => !(prev.add || []).some((a) => FF.sameBox(g, a)));
+    const next = { add: [...prevAdd, ...newAdd], remove: [...(prev.remove || []).filter((r) => r && typeof r === 'object' && !newAdd.some((a) => FF.sameBox(r, a))), ...robotGone], by: actor, at: TODAY };
+    const robotFields = (F.fields || []).filter((f) => f.by !== 'admin');
+    const applied = FF.applyFieldFix(robotFields, next, F.pages);
+    const addedOk = applied.filter((f) => f.by === 'admin').length;
+    if (add.length && addedOk < next.add.length) fail(`쪽 밖이거나 크기가 없는 칸이 있습니다(받은 ${next.add.length}칸 중 ${addedOk}칸만 쪽 안) — 좌표를 확인해 주세요`);
+    fixDoc.files[rel] = next;
+    F.fields = applied;
+    writeJson(fixPath, fixDoc); writeJson(fjPath, fj);
+    detail = `양식 빈칸 ${id} · ${rel} — 더함 ${add.length} · 뺌 ${remove.length} (지금 ${applied.length}칸)`;
     touched = true;
     break;
   }

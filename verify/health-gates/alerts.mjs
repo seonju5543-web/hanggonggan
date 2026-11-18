@@ -560,4 +560,15 @@ export default async function gate(eq, ctx) {
   eqWf('  공고 누락 감사 — 결과는 경보 도구(라벨 coverage-audit) · 실패는 robot-down · 결과물 올리기 단계를 끼워도 같은 판정',
     [/alert-issue/.test(acRep.uses || ''), with_(acRep, 'label'), coversDown(ac), coversDown(stepsOf(withUploadStep(acY))), silentFailureSteps(withUploadStep(acY)), withUploadStep(acY) !== acY],
     [true, 'coverage-audit', true, true, [], true]);
+  /* 리뷰 3차 2026-11-17 — 관문이 리포트를 직전 판으로 되돌렸는데(reverted-files·still-failing·되돌리기 넘어짐) '원인 미상' 이슈가
+     이번 날짜·건수를 지난 리포트 위에 얹어 올렸다. 이번 판이 남는 결과(gate-guard 의 상태 이름에서 읽는다)일 때만 올린다 */
+  {
+    const gg = read(root, 'collector/gate-guard.mjs');
+    const kept = ['kept-preexisting', 'flaky'].filter((s) => new RegExp(`status = '${s}'`).test(gg));
+    const unk = ac.filter((s) => /원인 미상/.test(s.name || ''));
+    const okIf = (c) => /steps\.audit\.outcome == 'success'/.test(c) && kept.every((s) => c.includes(`steps.guard.outputs.gate == '${s}'`))
+      && !/reverted-files|still-failing|steps\.guard\.outputs\.gate != ''/.test(c);
+    eqWf('  공고 누락 감사 — 「원인 미상」 이슈 두 단계는 관문 통과·kept-preexisting·flaky 일 때만 (되돌린 지난 리포트를 이번 결과로 올리지 않는다)',
+      [kept, unk.length, unk.map((s) => okIf(String(s.if || '')))], [['kept-preexisting', 'flaky'], 2, [true, true]]);
+  }
 }

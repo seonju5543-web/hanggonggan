@@ -71,7 +71,12 @@
   "auto-bbssc58944448artclviewdo",
   "auto-oardid323355menuno200318",
   "auto-scho332282304artclviewdo",
-  "auto-oardid323404menuno200318"
+  "auto-oardid323404menuno200318",
+  "auto-q1brddate20260427brdseq1",
+  "auto-0713no2515592sitedvscdkr",
+  "auto-0005009002000000seq31569",
+  "auto-q1brddate20260526brdseq1",
+  "auto-obrdbbsseq1nttid20260807"
  ],
  "blockUrls": [
   "https://nano.pknu.ac.kr/nano/2432?action=view&no=9910966",
@@ -119,7 +124,12 @@
   "https://www.yonsei.ac.kr/bbs/sc/58/944448/artclView.do",
   "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323355",
   "https://www3.chosun.ac.kr/bbs/scho/332/282304/artclView.do",
-  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323404"
+  "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323404",
+  "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260427&brdSeq=1&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
+  "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515592&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
+  "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31569&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+  "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260526&brdSeq=1&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
+  "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdBbsseq=1&pageNo=2&nttId=20260807"
  ],
  "_왜 blockUrls도 있나": "id는 주소에서 파생되므로(auto- + canonUrl 뒷 24자) 주소 정규화 규칙을 고치면 blockIds가 통째로 무효가 된다. 2026-08-14에 실제로 그래서 부경대 2014~2024년 공고가 새 id를 달고 되살아났다. 주소로 막으면 규칙이 바뀌어도 살아남는다. 앞으로 뺄 때는 여기에 sourceUrl을 넣을 것.",
  "_reg-konkuk-alumni": "2026-08-23 — 건국대 총동문회 장학생. 재수집 로봇이 열어 보니 게시판이 '게시물이(가) 존재 하지 않습니다.'라고 답했다(삭제된 공고). 등록에서 뺐고, 같은 주소가 다시 걸려도 자동 등록되지 않게 막는다.",
@@ -141,6 +151,11 @@
   "auto-bbssc58944448artclviewdo": "https://www.yonsei.ac.kr/bbs/sc/58/944448/artclView.do",
   "auto-oardid323355menuno200318": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323355",
   "auto-scho332282304artclviewdo": "https://www3.chosun.ac.kr/bbs/scho/332/282304/artclView.do",
-  "auto-oardid323404menuno200318": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323404"
+  "auto-oardid323404menuno200318": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=323404",
+  "auto-q1brddate20260427brdseq1": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260427&brdSeq=1&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
+  "auto-0713no2515592sitedvscdkr": "https://plus.cnu.ac.kr/_prog/_board/?mode=V&no=2515592&code=sub07_0713&site_dvs_cd=kr&menu_dvs_cd=0713&skey=&sval=&site_dvs=&ntt_tag=&GotoPage=",
+  "auto-0005009002000000seq31569": "https://www.uos.ac.kr/korNotice/view.do?list_id=FA1&seq=31569&sort=1&pageIndex=1&searchCnd=&searchWrd=&cate_id=&viewAuth=Y&writeAuth=Y&board_list_num=10&lpageCount=12&menuid=2000005009002000000&identified=anonymous&",
+  "auto-q1brddate20260526brdseq1": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdDate=20260526&brdSeq=1&filSeq=&pageIndex=2&brdBbsseq=1&searchWrd=&searchCnd=1&identified=anonymous&",
+  "auto-obrdbbsseq1nttid20260807": "https://scholarship.uos.ac.kr/scholarship/notice/notice/view.do?brdBbsseq=1&pageNo=2&nttId=20260807"
  }
 }

@@ -19,10 +19,8 @@ import { pageCandidates, samePage, shouldRetry } from './paginate.mjs';
 import { cleanTitle, isMenuEntry, retitleItems } from './clean-title.mjs';
 import { isAttachmentEntry, detailAttachments, stripSiteChrome } from './attachment-link.mjs';
 import { activityKind, activityField, notActivity, unreadableSource, ACTIVITY_FIELDS } from './activity-kind.mjs';
-import { activityExcerpts, activityDetails, putActivityDetails, activityDocuments, ACT_DETAILS_V, sanitizeBenefit, sanitizeElig, sanitizeSteps } from './activity-excerpts.mjs';
+import { activityExcerpts, activityDetails, putActivityDetails, activityDocuments, putActivityDocuments, actRereadNeed, thinText, ACT_DETAILS_V, sanitizeBenefit, sanitizeElig, sanitizeSteps, sanitizeDocs, deadlineFromNotice, sanitizeForeign } from './activity-excerpts.mjs';
 import { htmlToLines } from './html-text.mjs';
-/* 활동 글의 제출 서류 — 본문이 준 목록이 있으면 그것, 없으면 칸을 지운다(원문에 없는 것을 남기지 않는다 · 사람이 적은 칸은 아직 없다) */
-function putActivityDocuments(it, docs) { if (docs && docs.length) it.documents = docs; else delete it.documents; }
 import { detailByRule } from './activity-detail-rules.mjs';   // 본문이 스크립트로 그려지는 게시판(온통청년)의 숨은 글 주소 — 첨부 로봇과 같은 함수(2026-10-28)
 import { robotsAllows } from './robots.mjs';
 import { extractLinks, stripSessionId, hrefText } from './board-links.mjs';
@@ -571,7 +569,7 @@ if (healCounts.restored || healCounts.kept) console.log(`피드 메우기: 학�
    (위 '껍데기를 걷은 본문' 단락 · 학교별 파일 발행 전에 — 피드 메우기로 되살린 글까지) */
 retitleItems(notices.items);
 for (const n of notices.items) { bodyReader.heal(n); bodyReader.fill(n); }
-console.log(`껍데기를 걷은 본문: 기간 힌트 ${bodyReader.counts.hints}건을 다시 읽음 · 본문 마감 ${bodyReader.counts.bodyDeadlines}건을 새로 읽음 (껍데기를 아는 호스트 ${bodyReader.chrome.size}곳)`);
+console.log(`껍데기를 걷은 본문: 기간 힌트 ${bodyReader.counts.hints}건을 다시 읽음 · 본문 마감 ${bodyReader.counts.bodyDeadlines}건을 새로 읽음 · 사이트 띠로 읽혔던 본문 마감 ${bodyReader.counts.bodyRechecked}건을 다시 읽음 (껍데기를 아는 호스트 ${bodyReader.chrome.size}곳)`);
 
 const beforeCap = notices.items;
 /* 학교별 파일도 함께 발행한다 (2026-08-17) — 앱은 이쪽을 읽는다.
@@ -623,9 +621,13 @@ acts.items = acts.items.filter((n) => !notActivity(n.title) && !unreadableSource
     usedIds.set(n.id, n.url);
   }
 }
+const todayIsoAct = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);   // 한국 날짜 — 결과 발표가 지났는지 잰다(deadlineFromNotice ④)
 acts.items.forEach(sanitizeBenefit);   // 「혜택」에 섞인 조건은 자격 줄로 — 출처(본문·API)와 상관없이 매번 모든 글에(2026-10-04 · activity-excerpts.mjs splitBenefit)
 acts.items.forEach(sanitizeSteps);   // 「1. 2. 3.」 단계 번호 떼기 — 연락처 단계가 빠지면 「3.」부터 남던 1365 글(2026-11-02 · activity-excerpts.mjs stripStepNumber) · 소급
 acts.items.forEach(sanitizeElig);   // 자격 줄 거름(여러 갈래 나이·개인정보 안내문)을 실린 글 전부에 매번 — 소급(2026-10-05 점검 api-06 · activity-excerpts.mjs eligLineOk)
+acts.items.forEach(sanitizeDocs);   // 서류 칸의 사이트 맨 아래 줄·안내문·유의사항 걷기(doc-list.mjs DOC_JUNK · 2026-11-17) · 소급
+acts.items.forEach(sanitizeForeign);   // 칸 안에 딸려 온 다른 글 제목 걷기(activity-excerpts.mjs otherPostTitle · 2026-11-17) · 소급
+acts.items.forEach((n) => deadlineFromNotice(n, todayIsoAct));   // 마감이 빈 글은 원문 기간 줄·제목 「(~11/23)」에서 마감을 읽는다 · 결과 발표가 지난 글은 닫힌다 — 끝난 모집이 '진행 중'으로 뜨지 않게(2026-11-17) · 소급
 acts.items.forEach((n) => bodyReader.heal(n));   // 껍데기에서 시작한 기간 힌트 소급(위 '껍데기를 걷은 본문' 단락)
 acts.items = dedupeNotices(acts.items);
 acts.items = acts.items.filter((n) => !n.school).concat(dropUnserved(acts.items.filter((n) => n.school)));
@@ -639,22 +641,29 @@ acts.items.forEach((n) => { if (actHide.has(canonUrl(n.url))) n.hidden = true; e
    (못 읽었어도 적는다 — 없는 이름표를 매일 다시 찾지 않는다). */
 const todayIso = new Date().toISOString().slice(0, 10);
 const ACT_BACKFILL = 40;   // 2026-10-01 20→40 — 자격 판(detailsV) 소급으로 다시 읽을 글이 130건이다. 예산(budget.hasRoom) 안에서만 돈다
-let actBackfilled = 0;
+let actBackfilled = 0, actDocsBackfilled = 0;
 for (const it of acts.items) {
   /* 🔴 자격 판(detailsV)이 옛것인 글도 다시 읽는다 (2026-10-01 · 소급 — 원칙 7). API 글은 API 로봇이 채우므로 건너뛴다 */
   /* API 글은 API 본문으로 읽었으니 건너뛴다 — 단 거기서 자격이 안 나온 글은 원문 페이지를 읽어 본다(제주 청년정책 「체인지메이커」: API 칸은 한 줄, 페이지엔 자격 표 · 2026-10-16) */
-  if (actBackfilled >= ACT_BACKFILL || (it.api && (it.eligibilityLines || []).length) || (it.excerptsAt && it.detailsV === ACT_DETAILS_V)) continue;
+  const need = actRereadNeed(it);   // 'details' 자격까지 · 'docs' 서류 칸만(2026-11-15 · activity-excerpts.mjs 한 곳) · null 안 읽음
+  if (actBackfilled >= ACT_BACKFILL || !need) continue;
   /* 못 받아 온 글은 **이레에 한 번만** 다시 두드린다 (2026-10-01 코드 리뷰) — 안 그러면 죽은 주소가 매 실행 40칸을 먹어
      앞쪽에 그런 글이 쌓이면 나머지가 영영 소급되지 않고, 같은 학교 게시판을 하루 세 번 두드린다 */
   if (it.detailsTriedAt && (Date.parse(todayIso) - Date.parse(it.detailsTriedAt)) < 7 * 86400000) continue;
   if (!budget.hasRoom(20000)) break;
   const detail = await fetchDetail(it);
+  if (need === 'docs') {
+    /* 서류 칸만 — 자격·발췌·마감은 그대로 둔다(같은 판으로 이미 읽었다). 못 받으면 이레 뒤에 다시 */
+    if (detail.text) { putActivityDocuments(it, activityDocuments(detail.text), null, { thin: thinText(detail.text) }); delete it.detailsTriedAt; } else it.detailsTriedAt = todayIso;
+    actBackfilled += 1; actDocsBackfilled += 1;
+    continue;
+  }
   const ex = activityExcerpts(detail.text);
   if (ex.deadline) it.deadline = ex.deadline;
   if (ex.excerpts.length) it.excerpts = ex.excerpts;
   if (!it.field) { const f = activityField(it.title, it.kind); if (f) it.field = f; }
   if (detail.text) putActivityDetails(it, activityDetails(detail.text, it.title));
-  if (detail.text) putActivityDocuments(it, activityDocuments(detail.text));
+  if (detail.text) putActivityDocuments(it, activityDocuments(detail.text), null, { thin: thinText(detail.text) });
   if (detail.text) it.excerptsAt = new Date().toISOString().slice(0, 10);   // 못 받아 온 날은 적지 않는다 — 잠깐 끊긴 것을 영영 '읽었다'로 굳히지 않게
   if (detail.text) delete it.detailsTriedAt; else it.detailsTriedAt = todayIso;   // 못 받았으면 이레 뒤에 다시
   actBackfilled += 1;
@@ -801,7 +810,7 @@ if (chronic.length) {
 
 /* 대외활동·공모전 — 컨펌 대상이 아니다(제목+링크만 앱 '대외활동' 탭에 실린다). 상태와 새 글만 적는다. */
 lines.push(`### 🎯 대외활동·공모전 새 글 ${freshActs.length}건 → 앱 '대외활동' 탭 (data/activities.json · ${acts.items.length}건 게재 중)`);
-if (actBackfilled) lines.push(`- 🔁 전에 실린 글 ${actBackfilled}건의 원문을 다시 읽어 마감·발췌를 채웠습니다 (남은 ${acts.items.filter((n) => !n.excerptsAt).length}건은 다음 실행에)`);
+if (actBackfilled) lines.push(`- 🔁 전에 실린 글 ${actBackfilled}건의 원문을 다시 읽어 마감·발췌를 채웠습니다 (그중 서류 칸만 ${actDocsBackfilled}건 · 남은 ${acts.items.filter((n) => actRereadNeed(n)).length}건은 다음 실행에)`);
 for (const r of actResults) {
   lines.push(`- **${r.name}** — ${r.status}`);
   for (const i of r.items) lines.push(`  - [${i.kind}] [${i.title}](${i.url})${i.deadlineHint ? ` — ⏰ ${i.deadlineHint}` : ''}`);

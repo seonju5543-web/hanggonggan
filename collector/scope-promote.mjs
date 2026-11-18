@@ -15,6 +15,7 @@
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { canonUrl } from './canon-url.mjs';
+import { evidenceExcerpts } from './notice-source.mjs';   // 사람이 쓴 발췌는 원문 증거가 아니다(관리자 표식 줄을 뺀다 · 한 곳)
 import { makeStripperMulti } from './page-boilerplate.mjs';   // 메뉴·푸터 껍데기를 걷어낸 본문만 읽는다 — 메뉴의 '발전기금'·'포털'이 증거로 세어졌다(첫 시험)
 import { classifyKind, SCHOOL_APPLY_RE, domainMatches, domainForSchool } from './kind-evidence.mjs';
 import { loadSchoolNames, schoolTokens } from './school-names.mjs';
@@ -56,7 +57,7 @@ export function isNationalAbsorber(it, school) {
 /* 원문 증거로 전국인가 — 순수 함수(관문이 픽스처로 돈다). 학교 창구 문장이 있으면 절대 아니다. */
 export function nationalEvidence(it, body) {
   const school = (it.eligibility || {}).schoolOnly;
-  const k = classifyKind({ title: it.name, school, text: body, excerpts: it.excerpts, applyEmail: it.applyEmail, applyPortal: it.applyPortal,
+  const k = classifyKind({ title: it.name, school, text: body, excerpts: evidenceExcerpts(it), applyEmail: it.applyEmail, applyPortal: it.applyPortal,
     tokens: schoolTokens(school, names), domain: domainOf(school), own: [] });
   const schoolWindow = SCHOOL_APPLY_RE.test(body || '') || !!it.applyPortal || domainMatches((it.applyEmail || '').split('@')[1], domainOf(school));
   if (!k.national || schoolWindow) return null;
@@ -84,7 +85,7 @@ for (let i = 0; i < items.length; i++) {
 for (const it of items) {
   if (!isCandidate(it)) continue;
   const body = bodyByKey.get(canonUrl(it.sourceUrl || '')) || '';
-  if (!body && !(it.excerpts || []).length && !it.applyEmail) continue;   // 읽을 원문이 없으면 판단하지 않는다
+  if (!body && !evidenceExcerpts(it).length && !it.applyEmail) continue;   // 읽을 원문이 없으면 판단하지 않는다
   const why = nationalEvidence(it, body);
   if (!why) continue;
   const e = it.eligibility;
