@@ -66,10 +66,18 @@ const PROFILE = {
        (이슈 #486). 층2인지는 앱이 매긴 sourceKind 로만 본다. */
     const byId = Object.fromEntries(allScholarships().map((s) => [s.id, s]));
     const shown = ids.filter((id) => byId[id] && byId[id].sourceKind === 'kosaf');
+    /* 🔴 **목록 맨 앞 공고를 그대로 쓰지 말 것** (2026-11-18 · 경보 #659) — 원문 링크 확인 로봇이 층2 공고의
+       **진짜 공고 주소**를 확정하면(data/link-check.json `fix`) 그 공고의 링크는 정직하게 「원문 공고 ↗」가 된다.
+       11-17 밤 로봇이 목록 맨 앞 공고(서울미래인재재단)를 확정하자 「재단 홈페이지 ↗」를 요구하던 이 검사가
+       5회 연속 빨간불이었다 — 앱은 맞고 검사가 실데이터에 기대고 있었다(CLAUDE.md 「실데이터에 기댄 고정 검사 금지」).
+       그래서 갈래를 앱의 판정 함수(`linkKind` · source-link.js)로 나눠 고른다 — 규칙을 베끼지 않는다. */
+    const homeOnly = shown.filter((id) => linkKind(byId[id]) === 'foundation-home');
+    const fixedPage = shown.filter((id) => linkFixFor(byId[id]) && linkKind(byId[id]) === 'page');
     return {
       made: all.length,
       shown: shown.length,
-      first: shown[0] || null,
+      first: homeOnly[0] || null,
+      fixed: fixedPage[0] || null,
       allExternal: all.every((s) => s.type === '교외'),
       hasSpec: all.filter((s) => s.amountSpec).length,
       /* 원문에 숫자가 없는데 값이 잡혔으면 지어낸 것이다 */
@@ -131,6 +139,9 @@ const PROFILE = {
   eq('  그래도 탐색 목록에는 그대로 남는다 (숨기는 게 아니다)', reach.stillListed > 0, true);
 
   console.log('\n■ 상세 시트');
+  /* 확정 주소가 없는 층2 공고가 하나도 없으면 아래 검사는 무엇도 재지 않는다 — 조용히 넘기지 않고 실패로 말한다 */
+  eq('확정 원문 주소가 없는 층2 공고가 목록에 있다 (재단 홈페이지 링크를 잴 대상)', !!info.first, true);
+  if (!info.first) { await browser.close(); console.log(`\n✕ 실패 ${fail}건`); process.exit(1); }
   await page.click(`#explore-list [data-detail="${info.first}"]`);
   await page.waitForSelector('#detail-sheet.show', { timeout: 4000 });
   await page.waitForTimeout(300);
@@ -155,6 +166,24 @@ const PROFILE = {
   /* 🔴 KOSAF 첨부는 Referer 검사가 있어 앱에서 누르면 "비정상적인 접근"이 뜬다 */
   eq('KOSAF 첨부 내려받기 주소가 화면에 없다',
     await page.$$eval('#detail-sheet a', (a) => a.filter((x) => /kosaf\.go\.kr.*(download|fileDown|atchFile)/i.test(x.href)).length), 0);
+
+  /* 반대쪽 — 로봇이 진짜 공고 주소를 확정한 층2 공고는 「원문 공고 ↗」로 부르고 그 주소를 연다.
+     확정된 것이 목록에 없는 날도 있으니(로봇 데이터는 날마다 바뀐다) 그때는 건너뛴다고 말만 한다. */
+  if (info.fixed) {
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(400);
+    await page.click(`#explore-list [data-detail="${info.fixed}"]`);
+    await page.waitForSelector('#detail-sheet.show', { timeout: 4000 });
+    await page.waitForTimeout(300);
+    const fx = await page.evaluate((id) => {
+      const s = allScholarships().find((x) => x.id === id);
+      const want = linkFixFor(s).url;
+      const links = [...document.querySelectorAll('#detail-sheet a')].map((a) => ({ t: a.textContent.trim(), h: a.getAttribute('href') || '' }));
+      return { named: links.some((l) => /원문 공고\s*↗/.test(l.t)), opensFix: links.some((l) => /원문 공고\s*↗/.test(l.t) && l.h === want), home: links.some((l) => /재단 홈페이지\s*↗/.test(l.t)) };
+    }, info.fixed);
+    eq('로봇이 공고 주소를 확정한 층2 공고는 「원문 공고 ↗」로 부르고 그 주소를 연다 · 「재단 홈페이지」라고 하지 않는다',
+      [fx.named, fx.opensFix, fx.home], [true, true, false]);
+  } else console.log('  · 확정 원문 주소가 있는 층2 공고가 지금 목록에 없어 「원문 공고」 쪽은 건너뜀');
 
   console.log('\n■ 🔴 원문을 그대로 쏟아 붓지 않는다 (2026-08-30 개발자 지적)');
   /* 지적 넷: `💡 undefined` · `○` 머리 기호 · `특정자격:` 칸 이름 접두어 ·
