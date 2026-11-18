@@ -4611,7 +4611,7 @@
    "expiredAt": "2026-11-17"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2701096002",
    "org": "(재)이월면장학회",
    "name": "장학생",
@@ -4621,7 +4621,9 @@
    "cards": 5,
    "dir": "insta/pub/2701096002",
    "at": "2026-11-09",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-19"
   },
   {
    "status": "prepared",
@@ -4747,7 +4749,7 @@
    "dates": "absolute"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000398006",
    "org": "빛고을장학재단",
    "name": "명예선양 장학생",
@@ -4757,7 +4759,9 @@
    "cards": 5,
    "dir": "insta/pub/2000398006",
    "at": "2026-11-10",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-19"
   },
   {
    "status": "prepared",
@@ -4870,7 +4874,7 @@
    "dates": "absolute"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2704374001",
    "org": "한국건설교통신기술협회",
    "name": "미래 건설교통신기술인 장학생",
@@ -4880,10 +4884,12 @@
    "cards": 5,
    "dir": "insta/pub/2704374001",
    "at": "2026-11-13",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-19"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2000480007",
    "org": "한국농어촌희망재단",
    "name": "KRA아동돌봄 지원사업",
@@ -4893,7 +4899,9 @@
    "cards": 4,
    "dir": "insta/pub/2000480007",
    "at": "2026-11-13",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-19"
   },
   {
    "status": "prepared",
@@ -5093,7 +5101,7 @@
    "dates": "absolute"
   },
   {
-   "status": "prepared",
+   "status": "expired",
    "code": "2704380001",
    "org": "불교여성개발원",
    "name": "장학생",
@@ -5103,7 +5111,9 @@
    "cards": 4,
    "dir": "insta/pub/2704380001",
    "at": "2026-11-17",
-   "dates": "absolute"
+   "dates": "absolute",
+   "expiredFrom": "prepared",
+   "expiredAt": "2026-11-19"
   },
   {
    "status": "prepared",
