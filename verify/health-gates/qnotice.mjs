@@ -180,7 +180,9 @@ export default async function qnotice(eq, ctx) {
         /acts\.items = retitleItems\(freshActs\.concat\(acts\.items \|\| \[\]\)\);/.test(col), /ext\.items = retitleItems\(freshExt\.concat\(ext\.items \|\| \[\]\)\);/.test(col)],
       [true, true, true]);
     eq('  수집기 배선 — 이번 실행 상세 글자를 모으고 · 읽개를 만들고 · 새 글(장학·활동·재단)과 실린 글 전부(장학·활동·재단)에 건다',
-      [(col.match(/runBodies\.set\(it, detail\.text\)/g) || []).length, /makeBodyReader\(\{[\s\S]*?run: runBodies/.test(col),
+      /* 새 글(장학·활동·재단) 세 자리가 모두 상세 글자를 모은다 — 2026-11-19 부터 그 4줄은 readDetailInto 한 곳이라
+         「그 함수가 runBodies 에 적는다」 + 「세 자리가 그 함수를 부른다」로 잰다(예전엔 runBodies.set 글자 3번을 셌다) */
+      [/async function readDetailInto\(it\) \{[^}]*runBodies\.set\(it, detail\.text\)/.test(col) ? (col.match(/await readDetailInto\(it\)/g) || []).length : 0, /makeBodyReader\(\{[\s\S]*?run: runBodies/.test(col),
         /for \(const it of freshAll\) \{ bodyReader\.heal\(it, true\); bodyReader\.fill\(it\); \}/.test(col), /freshActs\.concat\(freshExt\)\) bodyReader\.heal\(it, true\)/.test(col),
         /for \(const n of notices\.items\) \{ bodyReader\.heal\(n\); bodyReader\.fill\(n\); \}[\s\S]*publishBySchool\(beforeCap\)/.test(col),
         /acts\.items\.forEach\(\(n\) => bodyReader\.heal\(n\)\)/.test(col), /ext\.items\.forEach\(\(n\) => bodyReader\.heal\(n\)\)/.test(col)],

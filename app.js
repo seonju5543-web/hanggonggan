@@ -2191,7 +2191,6 @@ const EXPLORE_SORTS = {
   deadline: { label: '마감 임박순', cmp: byDeadline },
   listed: { label: '등록 최신순', cmp: byListed },
 };
-const SORT_KEYS = Object.keys(EXPLORE_SORTS);
 
 /* 정렬 — **누르면 다음 기준으로 넘어가고, 길게 누르면 아래에 목록이 뜬다**
    (2026-08-26 개발자 지시). 기준이 셋뿐이라 한 번 누르는 것이 가장 빠르고,
@@ -3747,7 +3746,6 @@ function renderActivities() {
    원문 사이트로 바로 나갔다. 이제 장학 카드와 **같은 그림**(cardShellHtml)으로 석 줄만 보이고, 누르면 장학과 **같은
    시트**(#detail-sheet)가 열려 발췌·첨부·원문 단추를 보여 준다. 신청은 원문에서 한다(우리가 접수하지 않는다 · 원칙 1).
    🔴 자격·적합도·양식은 붙이지 않는다 — 원문을 읽어 판정한 것이 아니다(원칙 8-1). 발췌는 원문 문장 그대로다. */
-const activityWhere = (n) => (n.school ? `${n.school}${n.campus ? ' ' + n.campus : ''} 게시판` : (n.host || '전국'));
 /* 카드·시트 윗줄의 주최 — 학교 게시판에서 주운 글은 주최를 모른다(「○○대학교 게시판」은 어디에 올라왔는지이지 누가 주는지가 아니다 · 2026-11-02 개발자 결정: 학생 화면에 적지 않는다 · school 칸은 범위 판정에만) · 호스트가 있는 전국 글만 */
 const activityHostLine = (n) => (n.school ? '' : String(n.host || '').trim());
 /* 혜택 줄이 짧으면 카드 아랫줄 왼쪽(장학 카드의 금액 자리)에 굵게 — 길거나 없으면 분야를 옅게 */
