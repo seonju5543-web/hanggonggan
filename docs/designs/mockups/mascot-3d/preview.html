@@ -1,0 +1,9 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>마스코트 미리보기</title>
+<style>body{margin:0;background:#fdfcfa;font-family:sans-serif;display:flex}.s{display:block;width:500px;height:560px;border:0;padding:0;background:none}canvas{width:100%;height:100%;display:block}</style></head>
+<body><button class="s"><canvas></canvas></button><button class="s"><canvas></canvas></button><button class="s"><canvas></canvas></button>
+<script>window.onerror=function(m){window.__err=String(m)}</script>
+<script src="three.min.js"></script><script src="kit.js"></script>
+<script src="mascots/part-0.js"></script><script src="mascots/part-1.js"></script><script src="mascots/part-2.js"></script><script src="mascots/part-3.js"></script><script src="mascots/part-4.js"></script><script src="mascots/part-5.js"></script>
+<script>/* 정면 · 비스듬히 · 뒤 */
+const k=new URLSearchParams(location.search).get('m')||'hufs';document.title=k;
+[0,0.95,Math.PI].forEach((yaw,i)=>{const st=K.Stage(document.querySelectorAll('.s')[i],{camY:1.6,lookY:1.4,dist:6.4,yaw});st.setChar(K.MASCOTS[k].build());});</script></body></html>
