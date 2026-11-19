@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-18",
+ "updatedAt": "2026-11-19",
  "items": {
   "auto-o2432actionviewno9994682": [
    {
@@ -172,14 +172,6 @@
     "at": "2026-10-29"
    }
   ],
-  "auto-bswj104944500artclviewdo": [
-   {
-    "src": "elig-183jo5-1.hwp",
-    "srcBytes": 15360,
-    "none": true,
-    "at": "2026-10-29"
-   }
-  ],
   "kosaf-2704219001": [
    {
     "file": "kosaf-2704219001/1-2026년_2학기_영광군_대학생등록금_지원사업_공고_안__p7-7.pdf",
@@ -343,19 +335,6 @@
     "at": "2026-11-06"
    }
   ],
-  "kosaf-2701096002": [
-   {
-    "file": "kosaf-2701096002/1-_공고_2026년_재_이월면장학회_장학생_선발_공고_p4-6.pdf",
-    "name": "공고문 안 신청서 서식 (4, 6쪽)",
-    "pages": 2,
-    "bytes": 370726,
-    "src": "★[공고]2026년 (재)이월면장학회 장학생 선발 공고.hwpx",
-    "srcBytes": 204712,
-    "srcPages": "4, 6",
-    "from": "공고문 서식 쪽 떼기",
-    "at": "2026-11-07"
-   }
-  ],
   "kosaf-2700004002": [
    {
     "src": "2027년 국내대학 장학생 선발계획.pdf",
@@ -410,19 +389,6 @@
     "at": "2026-11-11"
    }
   ],
-  "kosaf-2000398006": [
-   {
-    "file": "kosaf-2000398006/1-_제2026-4호_2026년_하반기_재_빛고을장학재단장학생_선발_공고_p6-8.pdf",
-    "name": "공고문 안 신청서 서식 (6, 8쪽)",
-    "pages": 2,
-    "bytes": 509325,
-    "src": "(제2026-4호) 2026년 하반기 (재)빛고을장학재단장학생 선발 공고.hwpx",
-    "srcBytes": 107521,
-    "srcPages": "6, 8",
-    "from": "공고문 서식 쪽 떼기",
-    "at": "2026-11-11"
-   }
-  ],
   "kosaf-2000053007": [
    {
     "src": "2026년 2학기 구민한마음 계속장학금 지급 신청 안내.pdf.pdf",
@@ -467,38 +433,6 @@
     "at": "2026-11-13"
    }
   ],
-  "auto-amepagescholarshipnotice-1naazn9": [
-   {
-    "src": "elig-1qarmj-1.pdf",
-    "srcBytes": 127019,
-    "none": true,
-    "at": "2026-11-14"
-   }
-  ],
-  "auto-kuk2351212035artclviewdo": [
-   {
-    "src": "elig-lju9ao-1.pdf",
-    "srcBytes": 127019,
-    "none": true,
-    "at": "2026-11-14"
-   }
-  ],
-  "auto-ervicenoticedetail521183": [
-   {
-    "src": "elig-mijtko-1.pdf",
-    "srcBytes": 127019,
-    "none": true,
-    "at": "2026-11-14"
-   }
-  ],
-  "auto-krbbskr846131artclviewdo": [
-   {
-    "src": "elig-cder0q-1.pdf",
-    "srcBytes": 127019,
-    "none": true,
-    "at": "2026-11-14"
-   }
-  ],
   "auto-leno277782srcategoryid22": [
    {
     "file": "auto-leno277782srcategoryid22/1-elig-151ftt-1_p21-30.pdf",
@@ -509,23 +443,6 @@
     "srcBytes": 229376,
     "srcPages": "21~30",
     "from": "공고문 서식 쪽 떼기",
-    "at": "2026-11-14"
-   }
-  ],
-  "kosaf-2000480007": [
-   {
-    "src": "[붙임]1. 2026년 대학생 봉사자 연계 지역돌봄 지원사업(KRA지역돌봄-겨울방학).hwpx",
-    "srcBytes": 1409920,
-    "none": true,
-    "at": "2026-11-14",
-    "why": "쪽 수 70"
-   }
-  ],
-  "kosaf-2704374001": [
-   {
-    "src": "20261109124527_b6321401.pdf",
-    "srcBytes": 387259,
-    "none": true,
     "at": "2026-11-14"
    }
   ],
@@ -770,6 +687,22 @@
     "srcBytes": 66048,
     "none": true,
     "at": "2026-11-18"
+   }
+  ],
+  "auto-amepagescholarshipnotice-12u2guu": [
+   {
+    "src": "elig-nqn0ff-1.pdf",
+    "srcBytes": 182417,
+    "none": true,
+    "at": "2026-11-19"
+   }
+  ],
+  "auto-b888ec9db4eab3b5eab38420": [
+   {
+    "src": "elig-tcc39o-1.pdf",
+    "srcBytes": 102069,
+    "none": true,
+    "at": "2026-11-19"
    }
   ]
  }
