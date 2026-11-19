@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-18T18:44:12.566Z",
+ "updatedAt": "2026-11-19T17:33:08.212Z",
  "v": 1,
  "bad": {
   "https://kau.ac.kr/kaulife/notice.php?code=s1101&page=&mode=read&seq=11401": {
@@ -81,10 +81,6 @@
   "https://www.sejong.ac.kr/kor/intro/notice1.do?mode=view&articleNo=894982&article.offset=0&articleLimit=10": {
    "v": "gone",
    "at": "2026-11-19"
-  },
-  "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896780&qidx=4691&cate=10&allboard=false&nowpage=1": {
-   "v": "other",
-   "at": "2026-11-15"
   },
   "https://www.sogang.ac.kr/ko/detail/551490?bbsConfigFk=141&namepage=ScholarshipNotice": {
    "v": "other",
