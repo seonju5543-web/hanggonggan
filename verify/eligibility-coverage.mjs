@@ -36,7 +36,7 @@ const open = (d) => !d || d >= today;
 /* 층2 는 자격 줄이 재단 칸에 들어 있다 — **앱의 상수를 글자로 읽어 쓴다**(app.js `KOSAF_ELIG`·`kosafClean` 한 줄짜리 const · 베끼면 칸 수가 갈라진다 — 리뷰가 잡았다).
    줄 쪼개기도 앱의 한 줄(`kosafSplit` · ○ㅇ※ 글머리 · 앱이 버리는 `제한없음` 줄도 버린다)을 그대로 쓴다 — 따로 쪼갰더니 `※ 자세한 사항은 …` 꼬리가
    앞 줄에 붙어 **앱에 없는 줄**을 못 읽는 줄로 세고 있었다(2026-11-11 · 6차) */
-const appSrc = fs.readFileSync(new URL('../app.js', HERE), 'utf8');
+const appSrc = createRequire(import.meta.url)('./app-source.cjs').appSource();
 const takeConst = (name) => { const m = appSrc.match(new RegExp(`^const ${name} = .*$`, 'm')); if (!m) throw new Error(`app.js 에서 ${name} 을 못 찾았습니다`); return m[0]; };
 const appCtx = vm.createContext({ String, RegExp, Array });
 vm.runInContext([takeConst('KOSAF_ELIG'), takeConst('kosafClean'), takeConst('KOSAF_NOISE'), takeConst('kosafSplit')].join('\n'), appCtx);

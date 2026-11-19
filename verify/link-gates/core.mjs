@@ -162,7 +162,7 @@ export default async function gate(eq, ctx) {
      기간 한 줄이 달린 게시판 글에서 `hintText is not defined` 로 넘어졌다 · 그 꼴의 글이 없는 날엔 조용하다).
      실데이터 없이 글자로만 잰다: 떼어 오는 함수 몸에 나오는 app.js 최상위 const 이름이 목록에 없으면 실패. */
   {
-    const appSrc = fs.readFileSync(new URL('app.js', ctx.root), 'utf8');
+    const appSrc = createRequire(import.meta.url)('../app-source.cjs').appSource(ctx.root);
     const ws = fs.readFileSync(new URL('verify/what-shows.mjs', ctx.root), 'utf8');
     const linkBlock = ws.slice(ws.indexOf('vm.runInContext([', ws.indexOf('const linkCtx')), ws.indexOf("'app.js(링크 자리)'"));
     const listOf = (re) => [...linkBlock.matchAll(re)].flatMap((m) => [...m[1].matchAll(/'([A-Za-z_$][\w$]*)'/g)].map((x) => x[1]));

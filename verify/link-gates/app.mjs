@@ -118,7 +118,7 @@ export default async function gate(eq, ctx) {
   const root = (ctx && ctx.root) || new URL('../../', import.meta.url);
   const read = (p) => fs.readFileSync(new URL(p, root), 'utf8');
   const L = require('../../source-link.js');
-  const appSrc = read('app.js');
+  const appSrc = createRequire(import.meta.url)('../app-source.cjs').appSource(root);
   const chatSrc = read('chat.js');
   const dataSrc = read('data.js');
 

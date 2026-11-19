@@ -173,7 +173,7 @@ export function runNoUnknownGate(eq, readText) {
      이 학교 게시판에 없는 공고(다른 게시판·재단에서 온 정식 공고)는 어디서도 안 울었다. 화면(boardNoticesForMe)과 알림이 같은 feedOnlyBoardRows 를 부른다 */
   const feedEv = fresh.events.filter((e) => e.type === 'feed');
   eq('  게시판 글로 간 공고(이 학교 게시판에 없는 것)는 「○○ 새 공고」 묶음 알림으로 운다 — 화면의 게시판 새 공고와 같은 줄 · 같은 함수(feedOnlyBoardRows)를 화면·알림이 부른다',
-    [feedEv.length === 1 && feedEv[0].body.includes(reg[0].name), /feedOnlyBoardRows\(allScholarships\(\), fromFeed, p\)/.test(read('app.js')), /feedOnlyBoardRows\(list, mineFeed, profile, now\)/.test(read('notify-rules.js')), run('typeof feedOnlyBoardRows')],
+    [feedEv.length === 1 && feedEv[0].body.includes(reg[0].name), /feedOnlyBoardRows\(allScholarships\(\), fromFeed, p\)/.test(createRequire(import.meta.url)('./app-source.cjs').appSource()), /feedOnlyBoardRows\(list, mineFeed, profile, now\)/.test(read('notify-rules.js')), run('typeof feedOnlyBoardRows')],
     [true, true, true, 'function']);
   const fresh2 = NR.evaluate({ now: Date.now(), profile: P, scholarships: [reg[0]], notices: [{ title: reg[0].name, url: reg[0].sourceUrl, school: '표본대학교', foundAt: iso(0) }], ledger: { ...NR.newLedger(), baseline: true, enabled: true }, matchStatus: () => 'selective', noticeForProfile: (n, p) => n.school === p.school });
   eq('  게시판에 같은 글이 이미 있으면 두 번 세지 않는다(새 공고 1건)', fresh2.events.filter((e) => e.type === 'feed').map((e) => e.title), ['표본대학교 새 공고 1건']);

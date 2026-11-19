@@ -16,6 +16,7 @@
  * 실행:  node verify/ui-tone.mjs          (실패하면 종료 코드 1)
  */
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -37,7 +38,7 @@ const stripComments = (t) => t
   .replace(/<!--[\s\S]*?-->/g, '');
 
 /* 화면 코드 — 🔴 chat.js 는 넣지 않는다 (위 지시) */
-const UI_FILES = ['index.html', 'app.js', 'essay.js', 'notify.js', 'notify-rules.js',
+const UI_FILES = ['index.html', 'app.js', 'app-onboarding.js', 'essay.js', 'notify.js', 'notify-rules.js',
   'forms.js', 'form-plan.js', 'essay-ask.js', 'essay-submit-check.js', 'essay-quality.js'];
 
 /* ── ① 이모지 ───────────────────────────────────────────────────────────────
@@ -313,7 +314,7 @@ console.log('\n■ 서체와 글자 척도 (2026-09-10)');
       (2026-09-10 서체 관문에서 실제로 그렇게 새는 것을 red-green 으로 잡았다). */
 console.log('\n■ 수집한 글의 HTML 기호를 글자로 띄우지 않는다 (2026-09-11)');
 {
-  const app = stripComments(R('app.js'));
+  const app = stripComments(createRequire(import.meta.url)('./app-source.cjs').appSource());
   eq('되돌리는 함수(unent)가 있다', /function unent\s*\(/.test(app), true);
   /* 수집 데이터에서 온 글(n.title · n.deadlineHint)을 unent 없이 esc 만 하는 곳 */
   const bare = [];

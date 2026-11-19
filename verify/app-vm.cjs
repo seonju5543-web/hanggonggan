@@ -73,7 +73,7 @@ function loadApp({ profile = null, kosaf = [], registered = [], read = (f) => fs
   });
   ctx.window = ctx; ctx.self = ctx; ctx.globalThis = ctx;
   for (const f of LIBS) vm.runInContext(read(f), ctx, { filename: f });
-  const { fns, vars } = topLevelDecls(read('app.js'));
+  const { fns, vars } = topLevelDecls(require('./app-source.cjs').appSource());
   vm.runInContext(fns.join('\n\n'), ctx, { filename: 'app.js(함수)' });
   const skipped = [];
   for (const v of vars) { try { vm.runInContext(v, ctx, { filename: 'app.js(선언)' }); } catch (e) { skipped.push(`${v.split('\n')[0].slice(0, 60)} — ${e.message}`); } }
