@@ -37,7 +37,6 @@
   .chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
 
   /* ① 홈 총액 */
-  .hero-label { font-size: 15px; font-weight: 600; color: var(--sub); margin: 0; }
   .hero { display: grid; grid-template-columns: 1fr; }
   .stage { position: relative; height: 256px; margin: 2px -20px 0; border: 0; padding: 0; background: none; display: block; width: calc(100% + 40px); cursor: grab; touch-action: pan-y; -webkit-tap-highlight-color: transparent; outline: none; }
   .stage:active { cursor: grabbing; }
@@ -47,19 +46,17 @@
   .bubble::after { content: ''; position: absolute; left: 50%; bottom: -6px; width: 11px; height: 11px; background: #fff; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); transform: translateX(-50%) rotate(45deg); }
   .bubble.pop { animation: pop .34s var(--spring); }
   @keyframes pop { from { transform: translateX(-50%) scale(.86); opacity: .2; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
-  .hero-amount { font-size: 40px; font-weight: 800; letter-spacing: -0.03em; margin: 2px 0 0; font-variant-numeric: tabular-nums; transform-origin: left center; }
-  .hero-amount.bump { animation: bump .32s var(--spring); }
   @keyframes bump { 40% { transform: scale(1.06); } }
   .hint { font-size: 12.5px; color: var(--weak); margin: 4px 0 0; }
-  .cta { width: 100%; margin-top: 16px; border: 0; border-radius: 22px; padding: 19px; background: var(--navy); color: #fff; font-size: 17px; font-weight: 700; box-shadow: 0 8px 22px rgba(34,43,69,.26); }
 
-  /* 배치 B — 금액 옆에 작게 */
-  .hero.compact { grid-template-columns: minmax(0, 1fr) 132px; align-items: center; column-gap: 4px; }
-  .hero.compact .stage { grid-column: 2; grid-row: 1 / span 3; height: 150px; width: 132px; margin: 0; }
-  .hero.compact .bubble { display: none; }
-  .hero.compact .hero-amount { font-size: 30px; white-space: nowrap; }
-  .hero .say-inline { display: none; }
-  .hero.compact .say-inline { display: block; font-size: 13.5px; font-weight: 600; color: var(--sub); margin: 6px 0 0; min-height: 38px; line-height: 1.4; }
+  /* 마스코트 중심 — 카드·버튼 없이, 금액은 마스코트의 말풍선 안에 */
+  .hero .stage { height: 372px; background: radial-gradient(60% 34% at 50% 84%, rgba(157,211,242,.30), transparent 70%); }
+  .hero .bubble { top: 4px; padding: 11px 20px 12px; border-radius: 22px; }
+  .hero .bubble .b-say { display: block; font-size: 13.5px; font-weight: 600; color: var(--sub); }
+  .hero .bubble .b-amt { display: block; font-size: 31px; font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; line-height: 1.2; white-space: nowrap; }
+  .hero .b-amt.bump { animation: bump .32s var(--spring); }
+  .hero-count { text-align: center; font-size: 15px; font-weight: 700; margin: 2px 0 0; }
+  .hero .hint { text-align: center; }
 
   /* ② 신청 내역 */
   .apps-head { display: flex; align-items: center; justify-content: space-between; margin: 0 0 16px; }
@@ -87,7 +84,7 @@
   .notes h3 { margin: 0 0 6px; font-size: 14px; color: var(--ink); }
   .notes ul { margin: 0; padding-left: 18px; }
   .nogl { display: none; font-size: 13px; color: var(--red, #8f3a2e); margin-top: 8px; }
-  @media (prefers-reduced-motion: reduce) { .bubble.pop, .hero-amount.bump, .sum-amount.bump { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .bubble.pop, .b-amt.bump, .sum-amount.bump { animation: none; } }
 </style>
 </head>
 <body>
@@ -108,23 +105,15 @@
         <button class="chip" data-school="booCute" aria-pressed="true">부 · 더 귀엽게</button>
         <button class="chip" data-school="booBaby" aria-pressed="false">부 · 아주 귀엽게</button>
       </div>
-      <div class="ctl" aria-label="배치 (앱에는 없음)">
-        <span>배치</span>
-        <button class="chip" data-layout="big" aria-pressed="true">A 크게</button>
-        <button class="chip" data-layout="compact" aria-pressed="false">B 금액 옆에 작게</button>
-      </div>
       <div class="phone">
-        <p class="hero-label">지금 신청할 수 있는 장학금</p>
         <div class="hero" id="hero">
           <button class="stage" id="stage-home" aria-label="마스코트 — 누르면 동전이 나와요">
             <canvas></canvas>
-            <span class="bubble" id="bubble-home" aria-live="polite"></span>
+            <span class="bubble" id="bubble-home" aria-live="polite"><span class="b-say" id="say-home"></span><strong class="b-amt" id="amount-home">최대 3,524만원</strong></span>
           </button>
-          <p class="hero-amount" id="amount-home">최대 3,524만원</p>
-          <p class="say-inline" id="say-home"></p>
+          <p class="hero-count">지금 신청할 수 있는 장학금 15건</p>
           <p class="hint">마스코트를 눌러 보세요</p>
         </div>
-        <button class="cta">15건 신청 준비</button>
       </div>
     </section>
 
@@ -156,7 +145,7 @@
   <div class="notes">
     <h3>이 시안에서 정한 것 · 아직 안 정한 것</h3>
     <ul>
-      <li>금액은 <strong>누르지 않아도 처음부터 보입니다</strong>. 누르는 것은 재미일 뿐, 정보를 숨기지 않아요.</li>
+      <li>금액은 <strong>누르지 않아도 처음부터 말풍선 안에 보입니다</strong>. 누르는 것은 재미일 뿐, 정보를 숨기지 않아요.</li>
       <li>홈은 한국외대 <strong>부</strong>예요 — 하늘색 달걀 몸 · 머리 위 깃 둘 · 주황 부리 · 남색 몸판/흰 소매 과잠(H). 얼굴은 원작 그대로와 더 귀여운 쪽을 바꿔 볼 수 있어요.</li>
       <li>학교 공식 캐릭터를 앱에 싣는 것은 학교 허락이 필요해요 — 이 시안은 내부 검토용입니다.</li>
       <li>대장님은 지금 앱의 '왕눈이' 얼굴(크림색 몸 · 큰 눈 · 금색 학사모)을 그대로 입체로 옮겼어요.</li>
@@ -516,7 +505,7 @@
       // 좁은 무대에서는 물러나 캐릭터가 잘리지 않게
       const dist = (opt.dist || 5.7) * Math.max(1, 0.95 / cam.aspect);
       cam.position.set(0, opt.camY || 1.45, dist); cam.lookAt(0, opt.lookY || 1.28, 0); cam.updateProjectionMatrix();
-      if (stack) stack.group.visible = cam.aspect > 1.05;
+      if (stack) stack.group.visible = cam.aspect > 0.85;
     }
     new ResizeObserver(size).observe(btn); size();
     if ('IntersectionObserver' in window) new IntersectionObserver((es) => { S.visible = es[0].isIntersecting; }).observe(btn);
@@ -620,28 +609,20 @@
   const TOTAL = 3524, COUNT = 15;
   const bubbleHome = document.getElementById('bubble-home'), sayHome = document.getElementById('say-home'), amountHome = document.getElementById('amount-home');
   let school = 'booCute', homeLine = 0;
-  const homeLines = () => [
-    `지금 신청할 수 있는 장학금이 ${COUNT}건 있어요`,
-    `모두 더하면 최대 ${won(TOTAL)}이에요`,
-    '마감이 가까운 것부터 준비해 볼까요?',
-  ];
-  function homeSay(t) { say(bubbleHome, t); sayHome.textContent = t; }
+  const homeLines = () => [`${COUNT}건을 모두 더하면`, '마감이 가까운 것부터 챙기면', '지금 받을 수 있는 장학금은'];
+  function homeSay(t) { sayHome.textContent = t; bubbleHome.classList.remove('pop'); void bubbleHome.offsetWidth; bubbleHome.classList.add('pop'); }
   const home = Stage(document.getElementById('stage-home'), {
-    stack: [1.4, 0.3], coins: 12, jump: 0.5,
-    onTap(full) { const L = homeLines(); homeSay(full ? '동전이 가득 찼어요! 이제 신청 준비하러 가요' : L[homeLine++ % L.length]); bump(amountHome); },
+    stack: [1.3, 0.3], coins: 12, jump: 0.45, camY: 1.75, lookY: 1.62, dist: 6.0,
+    onTap(full) { const L = homeLines(); homeSay(full ? '동전이 가득 찼어요! 모두 더하면' : L[homeLine++ % L.length]); bump(amountHome); },
   });
   function setSchool(k) {
     school = k; homeLine = 0; if (!home) return;
     home.setChar(SCHOOLS[k].build());
-    homeSay(`${SCHOOLS[k].hello} 최대 ${won(TOTAL)}까지 신청할 수 있어요`);
+    homeSay(`${SCHOOLS[k].hello} 지금 받을 수 있는 장학금은`);
     countUp(amountHome, TOTAL, (n) => '최대 ' + won(n));
   }
   document.querySelectorAll('[data-school]').forEach((b) => b.addEventListener('click', () => {
     document.querySelectorAll('[data-school]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); setSchool(b.dataset.school);
-  }));
-  document.querySelectorAll('[data-layout]').forEach((b) => b.addEventListener('click', () => {
-    document.querySelectorAll('[data-layout]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-    document.getElementById('hero').classList.toggle('compact', b.dataset.layout === 'compact');
   }));
   setSchool('booCute');
 
