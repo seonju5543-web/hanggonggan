@@ -6432,8 +6432,7 @@ function authProvidersHtml() {
       const m = AUTH_PROVIDERS[p];
       return `<button type="button" class="auth-social-btn auth-${esc(p)}" data-oauth="${esc(p)}"
         aria-label="${esc(m.label)}로 계속하기" title="${esc(m.label)}로 계속하기">${m.svg}</button>`;
-    }).join('')}</div>
-    <p class="auth-social-note">한 번 연결하면 다음부터 비밀번호 없이 로그인</p>`;
+    }).join('')}</div>`;
 }
 
 function renderAuthSheet(errText, okText) {
@@ -6477,14 +6476,14 @@ function renderAuthSheet(errText, okText) {
 
   const goLabel = { in: '로그인', up: '가입하기', reset: '재설정 메일 보내기', newpw: '비밀번호 바꾸기' }[mode];
   const swap = mode === 'in'
-    ? '<button class="btn btn-outline" id="btn-auth-swap" style="width:100%">계정 없음 — 회원가입</button>'
+    ? '<button class="btn btn-outline" id="btn-auth-swap" style="width:100%">회원가입</button>'
     : mode === 'up'
-      ? '<button class="btn btn-outline" id="btn-auth-swap" style="width:100%">계정 있음 — 로그인</button>'
+      ? '<button class="btn btn-outline" id="btn-auth-swap" style="width:100%">로그인</button>'
       : '<button class="btn btn-outline" id="btn-auth-swap" style="width:100%">← 로그인으로 돌아가기</button>';
 
   $('#detail-sheet').innerHTML = `
     <div class="sheet-handle"></div>
-    <div class="sheet-body">
+    <div class="sheet-body auth-sheet">
       <h3 class="sheet-title">${title}</h3>
       ${mid}
       <p class="auth-err" id="auth-err" ${errText ? '' : 'hidden'}>${esc(errText || '')}</p>
@@ -6492,7 +6491,6 @@ function renderAuthSheet(errText, okText) {
       <button class="btn btn-primary btn-lg" id="btn-auth-go">${goLabel}</button>
       ${swap}
       ${mode === 'in' || mode === 'up' ? authProvidersHtml() : ''}
-      <p class="dp-note">주민등록번호·계좌번호·증명서류는 이 기기에만 저장됩니다.</p>
     </div>`;
 
   $('#btn-auth-go').addEventListener('click', authSubmit);
