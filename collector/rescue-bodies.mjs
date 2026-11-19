@@ -419,13 +419,27 @@ for (const t of targets) {
        브라우저가 필요했던 이유(본문을 JS로 그린다)와 봇 차단은 서로 다른 문제이고,
        봇 차단이 걸린 게시판은 대개 서버가 완성된 HTML을 준다. */
     let fellBack = false;
-    if (BOT_WALL.test(text) || BOT_WALL.test(String(finalUrl))) {
-      report.push(`- 🤖 ${t.it.name.slice(0, 36)} — 브라우저가 봇 차단에 걸려 일반 내려받기로 물러섬`);
+    /* 🔴 **브라우저가 화면을 아예 못 연 것도 같은 길로 물러선다** (2026-11-19 · 경보 #667).
+       전남대 공지 한 글(key=70976)만 브라우저가 매일 `page.goto: Timeout` 으로 못 열었다 — 같은 게시판의 다른 글은 열리고,
+       수집 로봇의 일반 내려받기는 그 글의 본문·첨부를 받아 왔다. 물러설 길이 봇 차단 하나뿐이라 세 번 '열지 못함'이 쌓여 경보가 됐다.
+       못 연 날 물러서서 읽었으면 그날은 화면을 본 것이다(아래 looked) — 못 읽었으면 오류는 그대로 남아 못 연 횟수를 센다. */
+    const browserFailed = !!r.error && /page\.goto|net::|Timeout/i.test(r.error);
+    if (BOT_WALL.test(text) || BOT_WALL.test(String(finalUrl)) || browserFailed) {
+      report.push(browserFailed
+        ? `- 🌐 ${t.it.name.slice(0, 36)} — 브라우저가 화면을 열지 못해 일반 내려받기로 물러섬`
+        : `- 🤖 ${t.it.name.slice(0, 36)} — 브라우저가 봇 차단에 걸려 일반 내려받기로 물러섬`);
       fellBack = true;
       try {
         const res = await fetch(openUrl, { redirect: 'follow', headers: UA, signal: AbortSignal.timeout(20000) });
         if (res.ok) {
           const html = await res.text();
+          if (browserFailed) {
+            if (BOT_WALL.test(html) || !htmlToLines(html).trim()) throw new Error('물러선 길도 빈 화면');
+            /* 그 글이 맞을 때만 '봤다'로 친다 — 목록·오류 화면의 첨부를 이 글 첨부로 적지 않게(아래 본문 쪽과 같은 판정 한 곳) */
+            if (!fallbackIsThisNotice(htmlToLines(html), t.it.name, reg.items.filter((x) => x !== t.it).map((x) => x.name)).ok) throw new Error('물러선 화면이 이 글이 아니다');
+            delete r.error;   // 물러선 길로 화면을 읽었다 — 아래 '살폈다'·본문 판정이 이 글자로 간다
+            finalUrl = res.url || openUrl;
+          }
           text = htmlToLines(html);   // HTML → 줄 글자는 html-text.mjs 한 곳 (2026-09-30)
           /* 본문이 그림 한 장인 게시판(홍익대 editorImage.do · 2026-11-02)은 글자가 메뉴뿐이라 '확보'로 보이면서 자격이 영영 비었다 —
              브라우저가 못 본 첨부 링크·그림을 HTML 에서 적는다(attachment-link detailAttachments·htmlBodyImages 한 곳 · 아래 첨부 적기가 같이 받는다 · 리뷰: 그림만 적으면 hwp·pdf 는 여전히 빈다) */

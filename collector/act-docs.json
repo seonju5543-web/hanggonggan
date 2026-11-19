@@ -339,10 +339,6 @@
   "at": "2026-11-18",
   "tries": 1
  },
- "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53683&tpage=1&searchKey=1&searchVal=&srCategoryId=": {
-  "at": "2026-11-18",
-  "tries": 1
- },
  "https://youth.chungnam.go.kr/web/main/customSupp/M030-02/view?bizId=A20260309CT000000000003021": {
   "at": "2026-11-18",
   "tries": 1
@@ -360,6 +356,10 @@
   "tries": 1
  },
  "https://www.inha.ac.kr/bbs/kr/8/46177/artclView.do": {
+  "at": "2026-11-19",
+  "tries": 1
+ },
+ "https://apac.spectory.net/tcs15kr": {
   "at": "2026-11-19",
   "tries": 1
  }

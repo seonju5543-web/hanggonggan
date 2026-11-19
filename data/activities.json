@@ -2,6 +2,193 @@
  "updatedAt": "2026-11-19",
  "items": [
   {
+   "title": "2026년 12월 현장실습 지원금 지급 일정 안내",
+   "url": "https://www.kosaf.go.kr/ko/notice.do?mode=view&searchStr=&searchType=&page=1&ctgrId1=&ctgrId2=&seqNo=21505",
+   "kind": "대외활동",
+   "attachments": [],
+   "deadlineHint": "마감일: ~2026. 12. 9.(수)까지 * 최초신청과 최종신청을 혼동하지 않도록 유의 요망 □ 지급예정일 : 2026. 12. 17.(목)",
+   "deadline": "2026-12-09",
+   "eligibilityLines": [
+    "□ 지급대상자 : 2026. 12. 9.(수)까지 현장실습 지원금을 최종신청한 현장실습생 중 지원금 지원 적격에 대한 내부심사를 통과한 자"
+   ],
+   "noticeLines": [
+    "□ 최종신청 마감일: ~2026. 12. 9.(수)까지"
+   ],
+   "detailsV": 7,
+   "documents": [
+    "WEST 재정지원금 조회",
+    "분할상환 약정신청",
+    "손해금(지연배상금)감면 분할상환약정 신청",
+    "중소기업 근로자 분할상환약정 신청",
+    "분할상환약정 조건 변경 신청",
+    "사회적배려계층 분할상환 유예 신청",
+    "신용도판단정보 회복 신청",
+    "사망·심신장애인 학자금대출 채무면제 신청",
+    "외부연계 신용회복지원사업(지자체제외) 신청",
+    "외부연계 신용회복지원사업(지자체제외) 신청현황",
+    "증명서발급",
+    "증명서발급 이력"
+   ],
+   "documentsV": 1,
+   "field": "인턴·일경험",
+   "excerptsAt": "2026-11-19",
+   "school": "",
+   "campus": "",
+   "host": "한국장학재단 공지",
+   "foundAt": "2026-11-19",
+   "id": "act-0dtydwi"
+  },
+  {
+   "title": "[외교부] 2026 한·중·일 3국 초·중·고 포스터 공모전",
+   "url": "https://apac.spectory.net/tcs15kr",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": null,
+   "detailsV": 7,
+   "documentsV": 1,
+   "field": "디자인·미술",
+   "excerptsAt": "2026-11-19",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-11-19",
+   "id": "act-1v4wqmn",
+   "noticeLines": [
+    "○ 접수기간 : 2026. 10. 26.(월) ~ 11. 29.(일) 23:59",
+    "- 결과발표 : 2026. 12월 중 (*공모전 홈페이지 게시 및 수상자 개별 연락)",
+    "○ 결과발표 : 2026. 12월 중(예정)"
+   ],
+   "noticeFrom": "요강 페이지",
+   "eligibilityLines": [
+    "○ 공모자격 : 한·중·일 3국 초·중·고등학생 및 동일 연령 청소년",
+    "○ 공모분야 : 손그림 또는 디지털 일러스트로 제작한 포스터"
+   ],
+   "eligibilityFrom": "요강 페이지",
+   "docsV": 7
+  },
+  {
+   "title": "[문화체육관광부] 쉽고 바른 정보통신기술(ICT) 공공언어 웹툰 공모전",
+   "url": "https://korea.donga.ac.kr/korea/CMS/Board/Board.do?mCode=MN032&mode=view&mgr_seq=1002&board_seq=8520208",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": "접수 기간: 11월 9 일(월)~11월 29 일(일) 신청 대상: 쉽고 바른 공공언어를 사랑하는 시민 누구나 신청 방법: 동아대 국어문화원 누리",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "11월 9 일(월)~11월 29 일(일)"
+    },
+    {
+     "label": "대상",
+     "text": "쉽고 바른 공공언어를 사랑하는 시민 누구나"
+    }
+   ],
+   "eligibilityLines": [
+    "신청 대상: 쉽고 바른 공공언어를 사랑하는 시민 누구나"
+   ],
+   "noticeLines": [
+    "접수 기간: 11월 9 일(월)~11월 29 일(일)",
+    "결과 발표: 12월 4일(금)"
+   ],
+   "detailsV": 7,
+   "documentsV": 1,
+   "field": "디자인·미술",
+   "excerptsAt": "2026-11-19",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-11-19",
+   "id": "act-0mgjdhu",
+   "deadline": "2026-11-29",
+   "deadlineFrom": "원문 기간 · 접수 기간: 11월 9 일(월)~11월 29 일(일)"
+  },
+  {
+   "title": "[개인정보보호위원회] 2026년 개인정보 보호 숏폼 콘텐츠 공모전",
+   "url": "https://pipc.go.kr/np/cop/bbs/selectBoardArticle.do?bbsId=BS074&mCode=C020010000&nttId=12644",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "대상",
+     "text": "및 방법"
+    }
+   ],
+   "eligibilityLines": [
+    "- 60초 내외 짧은 영상으로 일반국민 누구나 참여 가능(11.11.~11.30.)"
+   ],
+   "detailsV": 7,
+   "documentsV": 1,
+   "field": "영상·사진",
+   "excerptsAt": "2026-11-19",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-11-19",
+   "id": "act-1ur9oxb"
+  },
+  {
+   "title": "[국토교통부] 2026 국가시범도시AI 아이디어·기술 공모전",
+   "url": "https://smartcity-ai.kr/",
+   "kind": "공모전",
+   "attachments": [],
+   "deadlineHint": "접수기간 2026.11.16. ~ 12.14. 18:00 국민의 창의적인 아이디어와 기업의 전문 기술로 시범도시에 적용할 새로운 AI 서비스를",
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026.11.16. ~ 12.14. 18:00"
+    }
+   ],
+   "eligibilityLines": [
+    "참가자격 : (아이디어) 국민 누구나",
+    "(기술) 기업·대학·연구기관·스타트업"
+   ],
+   "noticeLines": [
+    "접수기간 : 2026.11.16. ~ 12.14. 18:00"
+   ],
+   "detailsV": 7,
+   "documentsV": 1,
+   "field": "기획·아이디어",
+   "excerptsAt": "2026-11-19",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-11-19",
+   "id": "act-0rzc44x",
+   "deadline": "2026-12-14",
+   "deadlineFrom": "원문 기간 · 접수기간 : 2026.11.16. ~ 12.14. 18:00"
+  },
+  {
+   "title": "[농림축산식품부] 농어촌 기본소득 연계 사회연대경제 활성화 공모전 지방정부 우수모델을 찾습니다.",
+   "url": "https://www.mafra.go.kr/home/5109/subview.do?enc=Zm5jdDF8QEB8JTJGYmJzJTJGaG9tZSUyRjc5MiUyRjU3OTMwMCUyRmFydGNsVmlldy5kbyUzRg%3D%3D",
+   "kind": "공모전",
+   "attachments": [
+    {
+     "name": "(농촌정책국-농촌사회서비스과) 기본소득+사회연대경제 농촌형 순환경제의 답을 찾는다. (9. 30. 06시부터).hwp &nbsp;&nbsp;&nbsp;(파일 용량 : 1449 KB",
+     "url": "https://www.mafra.go.kr/bbs/home/792/600782/download.do"
+    },
+    {
+     "name": "(농촌정책국-농촌사회서비스과) 기본소득+사회연대경제 농촌형 순환경제의 답을 찾는다. (9. 30. 06시부터).hwpx &nbsp;&nbsp;&nbsp;(파일 용량 : 1432 K",
+     "url": "https://www.mafra.go.kr/bbs/home/792/600783/download.do"
+    },
+    {
+     "name": "(농촌정책국-농촌사회서비스과) 기본소득+사회연대경제 농촌형 순환경제의 답을 찾는다. (9. 30. 06시부터).pdf &nbsp;&nbsp;&nbsp;(파일 용량 : 631 KB)",
+     "url": "https://www.mafra.go.kr/bbs/home/792/600784/download.do"
+    }
+   ],
+   "deadlineHint": null,
+   "eligibilityLines": [
+    "아울러 , 농식품부는 주민 · 공동체 등을 대상으로 사회연대경제 관련 역량강화 교육을 실시하고 , 농촌 경제 · 사회서비스 지역지원기관 시범사업 공모 , 지역 맞춤형 서비스 협력모델 실증 지원사업 등 다양한 연계 정책을 펼쳐 농촌형 사회연대경제 활성화를 지속적으로 견인할 계획이다 ."
+   ],
+   "detailsV": 7,
+   "documentsV": 1,
+   "excerptsAt": "2026-11-19",
+   "school": "",
+   "campus": "",
+   "host": "대한민국 정책브리핑 이벤트·공모",
+   "foundAt": "2026-11-19",
+   "id": "act-1nf7uh4"
+  },
+  {
    "title": "[창업보육센터]K-Tech 창업성장아카데미 교육프로그램 수강생 모집(~11월)",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179208",
    "kind": "대외활동",
@@ -1735,7 +1922,8 @@
    "campus": "",
    "host": "창업진흥원 K-Startup",
    "foundAt": "2026-11-16",
-   "id": "act-0v4m05b"
+   "id": "act-0v4m05b",
+   "documentsV": 1
   },
   {
    "title": "2027년 상반기 「IBK창공(創工) 서울대캠프」 모집 공고",
@@ -1786,7 +1974,8 @@
    "campus": "",
    "host": "창업진흥원 K-Startup",
    "foundAt": "2026-11-16",
-   "id": "act-1l4hsfc"
+   "id": "act-1l4hsfc",
+   "documentsV": 1
   },
   {
    "title": "<2026년 제조공정 마스터 클래스> 프로그램 참여자 모집",
@@ -1815,7 +2004,8 @@
    "campus": "",
    "host": "창업진흥원 K-Startup",
    "foundAt": "2026-11-16",
-   "id": "act-0vcja47"
+   "id": "act-0vcja47",
+   "documentsV": 1
   },
   {
    "title": "[KT그룹 희망나눔재단] 2026 KT랜선야학 대학생 멘토 선발",
@@ -2184,7 +2374,8 @@
    "school": "서울과학기술대학교",
    "campus": "",
    "foundAt": "2026-11-16",
-   "id": "act-1mhsbxe"
+   "id": "act-1mhsbxe",
+   "documentsV": 1
   },
   {
    "title": "[용산청소년센터] 2026년 ESG 서포터즈 모집",
@@ -2228,7 +2419,8 @@
    "school": "서울과학기술대학교",
    "campus": "",
    "foundAt": "2026-11-16",
-   "id": "act-0wdqjmn"
+   "id": "act-0wdqjmn",
+   "documentsV": 1
   },
   {
    "title": "[시립노원청소년센터] 자원봉사사업 멘토링 프로그램 대학생 멘토 모집",
@@ -2267,7 +2459,8 @@
    "school": "서울과학기술대학교",
    "campus": "",
    "foundAt": "2026-11-16",
-   "id": "act-0dyt0rm"
+   "id": "act-0dyt0rm",
+   "documentsV": 1
   },
   {
    "title": "[정읍시] 2026년 정읍시 관광 유튜브 공모전",
@@ -5826,8 +6019,7 @@
    "excerptsAt": "2026-11-19",
    "eligibilityLines": [
     "봉사자유형 : 성인",
-    "아동·청소년",
-    "[경기북부하나센터] 북한이탈주민 취약계층 지원 '사랑의 김장나눔 ' 봉사활동 (사전)"
+    "아동·청소년"
    ],
    "eligibilityFrom": "브라우저 본문"
   },
@@ -5877,87 +6069,6 @@
    "eligibilityFrom": "브라우저 본문"
   },
   {
-   "title": "[성평등가족부] 제4차 「성평등 언박싱 토크」 청년 참여자 모집",
-   "url": "https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.ulsan?bbsId=BBS_0000000000000309&mId=008001002000000000&dataId=61205",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": "모집기간) 2026.11.9.(월) ~ 2026.11.20.(금) ○ (신청방법) 온라인 신청( https://naver.me/GM3hWy89)",
-   "deadline": "2026-11-20",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-09 ~ 2026-11-20"
-    },
-    {
-     "label": "일시",
-     "text": "2026.11.25.(수), 16:00~18:00"
-    },
-    {
-     "label": "대상",
-     "text": "20·30청년 누구나(50명 내외)"
-    }
-   ],
-   "eligibilityLines": [
-    "○ 모집대상 : 20·30청년 누구나(50명 내외)",
-    "* 선정자 개별 안내 예정"
-   ],
-   "noticeLines": [
-    "○ 신청방법 : 온라인 신청( https://naver.me/GM3hWy89)"
-   ],
-   "detailsV": 7,
-   "excerptsAt": "2026-11-16",
-   "school": "",
-   "campus": "",
-   "host": "울산청년정책플랫폼 U-PAGE",
-   "foundAt": "2026-11-13",
-   "id": "act-0bp0gxz"
-  },
-  {
-   "title": "[고용노동부] 2026 미래내일 일경험 지원사업 비수도권 로컬 AI 메이커스랩 참가자 모집",
-   "url": "https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.ulsan?bbsId=BBS_0000000000000309&mId=008001002000000000&dataId=61201",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": "모집 기간 : 11월 9일(월) ~ 12월 6일(일) - 오프라인 OT : 12월 18일(금) 오프라인 진행 - 사전교육 : 12월 28일(월)",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-09 ~ 2026-12-06"
-    }
-   ],
-   "eligibilityLines": [
-    "- 만 19세 이상 34세 이하 미취업 청년(군필자 만 39세 한정)",
-    "- 비수도권 거주 또는 비수도권 소재 대학생",
-    "* 비수도권 : 서울/경기/인천을 제외한 대한민국 소재지",
-    "* 등본/재학증명서로 증빙 가능해야 함",
-    "- 사전교육 및 오프라인 발표 일정에 참여 가능한 자",
-    "- 일경험 시작일로부터 최대 4주의 팀 프로젝트 활동이 가능한 자"
-   ],
-   "detailsV": 7,
-   "field": "인턴·일경험",
-   "excerptsAt": "2026-11-16",
-   "school": "",
-   "campus": "",
-   "host": "울산청년정책플랫폼 U-PAGE",
-   "foundAt": "2026-11-13",
-   "id": "act-1ogrivf",
-   "deadline": "2026-12-06",
-   "deadlineFrom": "원문 기간 · 모집 기간 : 11월 9일(월) ~ 12월 6일(일) - 오프라인 OT : 12월 18일(금) 오프라인 진행 - 사전교육 : 12월 28일(월)"
-  },
-  {
-   "title": "[국제학생] 서울시립미술관 2026 외국어 전시해설 12월 참여자 모집 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53683&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": null,
-   "detailsV": 7,
-   "field": "해외·교류",
-   "excerptsAt": "2026-11-16",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-11-13",
-   "id": "act-1wg5qjh"
-  },
-  {
    "title": "대학생 봉사활동 활성화",
    "url": "https://www.ulsan.go.kr/s/ulsanyouth/bbs/view.do?bbsId=BBS_0000000000000316&mId=008001001000000000&dataId=56236",
    "kind": "대외활동",
@@ -5992,96 +6103,6 @@
    "foundAt": "2026-11-12",
    "seenAt": "2026-11-19",
    "excerptsAt": "2026-11-19"
-  },
-  {
-   "title": "[숭실대학교 캠퍼스타운] 생성형 AI 활용 기초 및 업무 자동화 과정 참여자 모집",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179458",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": "접수기간 2026-10-08 ~ 2026-11-12 23:59 주관기관명 숭실대학교산학협력단 대상 대학생, 일반인, 대학, 연구기관, 일반기업,",
-   "deadline": "2026-11-12",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-08 ~ 2026-11-12 23:59"
-    },
-    {
-     "label": "대상",
-     "text": "지역주민, 대학생, 예비 창업자, 일반인 등 AI 활용에 관심 있는 누구나"
-    },
-    {
-     "label": "모집인원",
-     "text": "회차당 30명"
-    }
-   ],
-   "eligibilityLines": [
-    "- 대상 : 지역주민, 대학생, 예비 창업자, 일반인 등 AI 활용에 관심 있는 누구나",
-    "- 준비물 : *개인 노트북 지참"
-   ],
-   "detailsV": 7,
-   "excerptsAt": "2026-11-16",
-   "school": "",
-   "campus": "",
-   "host": "창업진흥원 K-Startup",
-   "foundAt": "2026-11-12",
-   "id": "act-15o3yvg"
-  },
-  {
-   "title": "[일반] [2026 실험실 특화형 창업선도대학] 「Lab-Startup 밋업(4차)」 참가자 모집 (11.18.(수) 10:30~13:00)",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53674&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": "신청기간 : ~ 2026. 11. 15.(일) 23:59까지 [참가 수요조사 및 신청하기] https://forms.gle/L4mEHRj2Ybg",
-   "deadline": "2026-11-15",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "~ 2026. 11. 15.(일) 23:59까지"
-    },
-    {
-     "label": "일시",
-     "text": "2026. 11. 18.(수) 10:30 ~ 13:00"
-    },
-    {
-     "label": "대상",
-     "text": "실험실 혁신창업동아리, 혁신창업실험실 및 창업·기술사업화에 관심 있는 대학생·대학원생 등"
-    },
-    {
-     "label": "모집인원",
-     "text": "약 50명 내외"
-    }
-   ],
-   "eligibilityLines": [
-    "실험실 혁신창업동아리, 혁신창업실험실 및 창업·기술사업화에 관심 있는 대학생·대학원생 등"
-   ],
-   "detailsV": 7,
-   "excerptsAt": "2026-11-16",
-   "school": "광운대학교",
-   "campus": "",
-   "foundAt": "2026-11-12",
-   "id": "act-06qiktb"
-  },
-  {
-   "title": "[학생지원팀][한국농어촌희망재단]2026년 대학생 봉사자 연계 아동돌봄 지원사업(겨울방학) 참여대학생 모집 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277713&article.offset=0&articleLimit=10&srCategoryId=22",
-   "kind": "대외활동",
-   "attachments": [
-    {
-     "name": "[붙임]1. 2026년 대학생 봉사자 연계 지역돌봄 지원사업(KRA지역돌봄-겨울방학).hwpx",
-     "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=download&articleNo=277713&attachNo=227480"
-    }
-   ],
-   "deadlineHint": null,
-   "eligibilityLines": [
-    "BK21 FOUR 스마트파마 미래인재 양성사업팀"
-   ],
-   "detailsV": 7,
-   "field": "봉사",
-   "excerptsAt": "2026-11-16",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "foundAt": "2026-11-12",
-   "id": "act-0qi7gcp"
   },
   {
    "title": "2026 전북콘텐츠코리아랩 AI 활용 콘텐츠(캐릭터) 아이디어 발굴 캠프",
