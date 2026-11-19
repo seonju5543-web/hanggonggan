@@ -11,6 +11,7 @@ const path = require('path');
 const { fileURLToPath } = require('url');
 
 const PARTS = [
+  { file: 'app-live.js', mark: '/* @@ 실시간 공고 구역(공고 파일 받기·학과·등록금·원문 링크·층2·학교 사진)은 app-live.js 로 옮겼다 — 검사는 verify/app-source.cjs 가 이 자리에 다시 끼워 읽는다 @@ */' },
   { file: 'app-sheet.js', mark: '/* @@ 상세 시트(공고 상세·자격 묻기·시트 되돌아가기)은 app-sheet.js 로 옮겼다 — 검사는 verify/app-source.cjs 가 이 자리에 다시 끼워 읽는다 @@ */' },
   { file: 'app-my.js', mark: '/* @@ MY 화면(보관함·설정·자주 묻는 질문·고객센터·약관·휴지통)은 app-my.js 로 옮겼다 — 검사는 verify/app-source.cjs 가 이 자리에 다시 끼워 읽는다 @@ */' },
   { file: 'app-applications.js', mark: '/* @@ 신청 내역 화면은 app-applications.js 로 옮겼다 — 검사는 verify/app-source.cjs 가 이 자리에 다시 끼워 읽는다 @@ */' },
