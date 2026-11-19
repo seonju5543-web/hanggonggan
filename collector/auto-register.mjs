@@ -30,7 +30,7 @@ import { stripSiteChrome } from './attachment-link.mjs';
 import { recordPastRounds, prunePastRounds, pastRoundOf } from './past-rounds.mjs';
 /* 차년도 계획 · 제목 연도 보류 · 오래된 글 보류 — 기준 연도를 오늘(TODAY)에서 읽는 규칙은 register-timing.mjs 한 곳(2026-10-11 점검 gap-07 · gap-bf-3 ·
    예전엔 `202[7-9]`·`y >= 2027` 이 박혀 있었다 · 이 파일은 불러오는 순간 실행되어 관문이 표본으로 못 잰다) */
-import { futurePlan, yearHold, staleHold, guessedPastHold, looksSameProgram } from './register-timing.mjs';
+import { futurePlan, yearHold, staleHold, guessedPastHold, looksSameProgram, pastYearTitle } from './register-timing.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const cfgPath = new URL('auto-register-config.json', HERE);
@@ -155,6 +155,8 @@ function classify(n, regUrlSet, regItems, batchSeen, pastRounds, feed = []) {
   if (NOT_UNDERGRAD.test(t)) return { verdict: 'skip', why: '학부생 대상 아님(대학원 등)' };
   if (ADMIN_NOTICE.test(t)) return { verdict: 'skip', why: '행정 안내(신청 공고 아님)' };
   if (futurePlan(t, TODAY)) return { verdict: 'skip', why: '차년도 계획·신입학(현 재학생 신청 대상 아님)' };
+  /* 지난 해 글 (2026-11-19 성신여대 — 게시판을 처음 읽은 날 2024·2025학년도 「장학생 모집 공고」가 정식 등록됐다) */
+  if (pastYearTitle(t, TODAY)) return { verdict: 'skip', why: '지난 해 글(제목의 해가 이미 끝남)' };
   if (/국가장학금/.test(t)) return { verdict: 'skip', why: '국가장학금 상시 제도 — 앱 내 카드로 이미 안내' };
   if (!POSITIVE.test(t)) return { verdict: 'skip', why: "'장학' 신호 없음" };
   /* 제목 연도 보류(내년도·그 뒤 사업)는 같은 사업 판정 **뒤**에서 본다(아래 yearHold) — 이미 등록된 같은 사업이면 흡수·승격이 먼저다(2026-10-11 점검 gap-07) */

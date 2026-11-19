@@ -17,6 +17,7 @@ import { judgeLanding, stripRowTail } from './link-landing.mjs';
 import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from './harvest-budget.mjs';
 /* 학교별 결과 → 건강 장부 규칙 한 곳 (2026-10-05 점검 B4 — 열렸지만 장학 0건·예산 건너뜀·일반 로봇과 같이 쓰는 장부) */
 import { targetOutcome, applyBrowserHealth, chronicList } from './browser-health.mjs';
+import { pastYearTitle } from './register-timing.mjs';   // 지난 해 글 (순수 모듈)
 
 const HERE = new URL('.', import.meta.url);
 const cfg = JSON.parse(fs.readFileSync(new URL('browser-targets.json', HERE), 'utf8'));
@@ -674,6 +675,8 @@ const cutoff = new Date(Date.now() - 60 * 86400000).toISOString().slice(0, 10);
 notices.items = notices.items.filter((n) => (n.foundAt || '9999') >= cutoff);
 /* 예전에 담긴 첨부파일 링크도 매 실행 걷어낸다 (소급 적용 — 운영 원칙 7) */
 notices.items = notices.items.filter((n) => !isAttachmentEntry(n));
+/* 지난 해 글은 피드에 두지 않는다 (2026-11-19 · register-timing.mjs pastYearTitle — 제목의 해가 이미 끝난 해 · 소급) */
+notices.items = notices.items.filter((n) => !pastYearTitle(n.title, todayStr));
 /* 같은 공고가 다른 주소(정렬 순번·클릭형 표식)로 여러 번 들어와 있으면 하나로 합친다 */
 notices.items = dedupeNotices(notices.items);
 /* 학교당 40건 · 전체는 학교 수에 비례 (학교 수 × 15건, 최소 200건).

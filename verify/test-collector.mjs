@@ -16996,5 +16996,28 @@ console.log('■ app.js 나누기 — 떼어 낸 화면이 제자리에 실린�
   eq('검사 파일이 app.js 를 원본 그대로 읽지 않는다(verify/app-source.cjs appSource 를 쓴다)', raw, []);
 }
 
+console.log('\n■ 지난 해 글 · 링크 안의 부서 줄 (2026-11-19 성신여대)');
+{
+  /* 게시판을 처음 읽으면 몇 해 전 글도 '오늘 발견'으로 실린다(성신여대 「장학생 모집공고」 2023~2025학년도) · 링크 안에 부서·조회수 목록이
+     같이 들어 있으면 제목 끝에 부서 이름이 붙는다(「… 학생지원팀」). 규칙은 register-timing.mjs pastYearTitle · board-links.mjs extractLinks 한 곳씩 */
+  const { pastYearTitle } = await import('../collector/register-timing.mjs');
+  const { extractLinks: XL } = await import('../collector/board-links.mjs');
+  eq('지난 해 제목 — 재작년 이전은 늘 · 작년은 3월부터 · 올해·내년·해 없는 제목은 아니다 · 큰 해를 본다',
+    [pastYearTitle('2024학년도 장학생 모집 공고', '2026-11-19'), pastYearTitle('2025학년도 장학생 모집 공고', '2026-11-19'), pastYearTitle('2026학년도 2학기 국가장학금 2차 신청', '2027-01-20'),
+      pastYearTitle('2026학년도 2학기 국가장학금 2차 신청', '2027-03-02'), pastYearTitle('2026학년도 장학생 모집 공고', '2026-11-19'), pastYearTitle('2027학년도 1학기 장학 신청', '2026-11-19'),
+      pastYearTitle('교외장학생 모집 안내', '2026-11-19'), pastYearTitle('2025학년도 수혜자 대상 2026-2학기 계속장학 신청', '2026-11-19'), pastYearTitle('2025학년도 장학생 모집', '')],
+    [true, true, false, true, false, false, false, false, false]);
+  const cm2 = readText(new URL('../collector/collect.mjs', import.meta.url)), bc2 = readText(new URL('../collector/browser-collect.mjs', import.meta.url));
+  eq('  두 수집기 모두 피드를 합칠 때 지난 해 글을 뺀다(소급) · 일반 수집기는 상세도 읽지 않는다',
+    [/notices\.items = notices\.items\.filter\(\(n\) => !pastYearTitle\(n\.title, todayStr\)\);/.test(cm2), /notices\.items = notices\.items\.filter\(\(n\) => !pastYearTitle\(n\.title, todayStr\)\);/.test(bc2),
+      /\.filter\(\(i\) => !pastYearTitle\(i\.title, todayStr\)\);/.test(cm2)], [true, true, true]);
+  eq('  자동 등록도 지난 해 글을 건너뛴다', /if \(pastYearTitle\(t, TODAY\)\) return \{ verdict: 'skip', why: '지난 해 글\(제목의 해가 이미 끝남\)' \};/.test(readText(new URL('../collector/auto-register.mjs', import.meta.url))), true);
+  const row = '<a href="/bbs/x/4719/152840/artclView.do"><strong>2026학년도 장학생 모집 공고</strong><div class="row-list"><ul><li>학생지원팀</li><li>조회수 6545</li></ul></div></a>';
+  eq('링크 안의 목록(부서·조회수)은 제목이 아니다', XL(row, 'https://a.ac.kr/').map((l) => l.title), ['2026학년도 장학생 모집 공고']);
+  eq('  제목이 목록 안에 있는 게시판은 예전처럼 전부 읽는다 · 목록 없는 보통 링크는 그대로',
+    [XL('<a href="/v/1"><ul><li>교외장학생 모집 안내</li></ul></a>', 'https://a.ac.kr/').map((l) => l.title), XL('<a href="/v/2">국가근로장학금 2차 신청 안내</a>', 'https://a.ac.kr/').map((l) => l.title)],
+    [['교외장학생 모집 안내'], ['국가근로장학금 2차 신청 안내']]);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
