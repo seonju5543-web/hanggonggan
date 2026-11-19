@@ -16945,6 +16945,52 @@ console.log('■ 신청서 원본 → PDF — 단계 시한 안에 끝난다 (20
     (yml.match(/apt-get install[^\n]*DPkg::Lock::Timeout/g) || []).length >= 2, true);
 }
 
+/* ■ 공고문 PDF 사본 (2026-11-20 개발자 결정 · docs/designs/all-docs-pdf.md) — 한글·워드 첨부(신청서 아닌 것 · 층2 는 전부)를 PDF 로.
+   🔴 collector/doc-pdf.mjs 는 DOC_PDF_AS_LIB=1 이 아니면 불러오는 순간 본편이 돈다(form-pdf 와 같은 규칙). */
+console.log('■ 공고문 PDF 사본 — 고르기 · 글자 대조 · 쉼 (2026-11-20 · docs/designs/all-docs-pdf.md)');
+{
+  process.env.FORM_PDF_AS_LIB = '1';
+  process.env.DOC_PDF_AS_LIB = '1';
+  const DP = await import('../collector/doc-pdf.mjs').catch((e) => ({ loadError: e.message }));
+  eq('  (로봇을 불러왔다 — 본편은 돌지 않는다)', [typeof DP.pickDocTargets, DP.loadError || ''], ['function', '']);
+  if (typeof DP.pickDocTargets === 'function') {
+    const { isApplicationForm } = (await import('../collector/form-rules.mjs')).loadFormRules(fileURLToPath(new URL('..', import.meta.url)));
+    const today = '2026-11-20';
+    const reg = [
+      { id: 'r1', name: '가 장학', deadline: '2026-12-01', sourceUrl: 'https://x.ac.kr/v?id=1', attachments: [
+        { name: '공고문.hwp chevron_forward', url: 'https://x.ac.kr/f/1' }, { name: '공고문.hwp', url: 'https://x.ac.kr/f/1' },
+        { name: '장학생 신청서.hwp', url: 'https://x.ac.kr/f/2' }, { name: '포스터.jpg', url: 'https://x.ac.kr/f/3' },
+        { name: '모집요강.pdf', url: 'https://x.ac.kr/f/4' }, { name: '안내.docx', url: 'https://x.ac.kr/f/5', bodyImage: true }] },
+      { id: 'r2', name: '지난 공고', deadline: '2026-11-01', attachments: [{ name: '공고문.hwp', url: 'u' }] },
+      { id: 'r3', name: '상시 제도', program: true, attachments: [{ name: '공고문.hwp', url: 'u' }] },
+      { id: 'r4', name: '숨김', hidden: true, deadline: '2026-12-01', attachments: [{ name: '공고문.hwp', url: 'u' }] },
+    ];
+    const act = [{ id: 'act-1', title: '봉사단', deadline: '2026-12-01', url: 'https://y.or.kr/1', attachments: [
+      { name: '모집 요강.hwpx', url: 'https://y.or.kr/a' }, { name: '참가신청서.hwp', url: 'https://y.or.kr/b' }] }];
+    const ko = [
+      { code: '123', due: '2026-12-01', files: [{ name: '선발 공고.hwpx', path: 'data/kosaf-files/123/선발 공고.hwpx' },
+        { name: '장학생 신청서.hwp', path: 'data/kosaf-files/123/장학생 신청서.hwp' }, { name: '안내.pdf', path: 'data/kosaf-files/123/안내.pdf' }] },
+      { code: '456', due: '2026-11-01', files: [{ name: '공고.hwp', path: 'data/kosaf-files/456/공고.hwp' }] },
+      { code: '789', due: '', files: [{ name: '공고.docx', path: 'data/kosaf-files/789/공고.docx' }] },
+    ];
+    const got = DP.pickDocTargets({ registered: reg, activities: act, kosaf: ko }, { today, isApplicationForm });
+    eq('① 대상 — 마감 전·상시 아님·숨김 아님 공고의 한글·워드 첨부 중 신청서가 아닌 것 · 같은 이름은 한 번 · 본문 사진 아님 · 층2 는 신청서 이름이어도 전부 · 마감 모르는 재단은 둔다',
+      got.map((t) => [t.id, t.files.map((f) => f.name)]),
+      [['r1', ['공고문.hwp chevron_forward']], ['act-1', ['모집 요강.hwpx']], ['kosaf-123', ['선발 공고.hwpx', '장학생 신청서.hwp']], ['kosaf-789', ['공고.docx']]]);
+    eq('  층1·활동은 첨부 주소(url)와 원문 주소(pageUrl)로 받고 · 층2 는 저장소 사본(src)에서 바꾼다',
+      [got[0].files[0].url, got[0].pageUrl, got[1].pageUrl, got[2].files[0].src], ['https://x.ac.kr/f/1', 'https://x.ac.kr/v?id=1', 'https://y.or.kr/1', 'data/kosaf-files/123/선발 공고.hwpx']);
+    const T = '가나다라마바사아자차카타파하'.repeat(5) + '2026';
+    eq('② 글자 대조 — 같으면 1 · PDF 에 머리말·쪽 번호가 더 있어도 1 · 차례는 안 본다(표 칸이 다른 차례로 나와도 통과)',
+      [DP.keptRatio(T, T), DP.keptRatio(T, `${T} 머리말 1`), DP.keptRatio(T, [...T].reverse().join(''))], [1, 1, 1]);
+    eq('  한글이 일부 빠지면 기준 아래 · 원본 글자가 50자 미만이면 잴 수 없다(null)',
+      [DP.keptRatio(T, T.slice(7)) < DP.KEEP_MIN, DP.keptRatio('가나다 123', '')], [true, null]);
+    eq('  기준 숫자(통과 비율 · 잴 수 있는 최소 글자 · 쉼 날수)', [DP.KEEP_MIN, DP.MIN_CHARS, DP.REST_DAYS], [0.98, 50, 3]);
+    eq('③ 실패한 첨부는 사흘 쉰다 — 이틀 전 실패는 쉬는 중 · 사흘 전은 다시 · 기록 없으면 다시',
+      [DP.resting({ 'a|b': { at: '2026-11-18' } }, 'a|b', today), DP.resting({ 'a|b': { at: '2026-11-17' } }, 'a|b', today), DP.resting({}, 'a|b', today)],
+      [true, false, false]);
+  }
+}
+
 console.log('■ app.js 나누기 — 떼어 낸 화면이 제자리에 실린다 (2026-11-19 · 첫 화면 app-onboarding.js)');
 {
   const AS = createRequire(import.meta.url)('./app-source.cjs');
