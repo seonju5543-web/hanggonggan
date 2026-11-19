@@ -382,6 +382,47 @@
    "excerptsAt": "2026-11-19"
   },
   {
+   "title": "대전 팁스타운 26년 제3차 팁스아카데미 : 스타트업의 새로운 기회, 오픈이노베이션",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179836",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-11-24",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-18 ~ 2026-11-24"
+    },
+    {
+     "label": "대상",
+     "text": "대전 팁스타운 입주기업 및 지역 내 창업기업 등"
+    },
+    {
+     "label": "활동지역",
+     "text": "전국"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "창업진흥원",
+   "api": "kstartup",
+   "apiId": "179836",
+   "id": "api-kstartup-179836",
+   "eligibilityLines": [
+    "대전 팁스타운 입주기업 및 지역 내 창업기업 등"
+   ],
+   "noticeLines": [
+    "대전 팁스타운에서 창업기업 대상 오픈이노베이션과 PoC 이해도 제고, 우수 협업사례 공유를 통한 교육을 진행합니다.",
+    "많은 참여 바랍니다.",
+    "온라인 접수 : https://moaform.com/q/Gl6Sfm"
+   ],
+   "detailsV": 7,
+   "foundAt": "2026-11-18",
+   "seenAt": "2026-11-19",
+   "excerptsAt": "2026-11-19"
+  },
+  {
    "title": "[경과원 X 나이스디앤비] 스타트업 공공시장 진출 실전 특강 - 공공입찰부터 기업·기술평가까지 한번에!",
    "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179793",
    "kind": "대외활동",
@@ -457,6 +498,46 @@
    ],
    "detailsV": 7,
    "foundAt": "2026-11-17",
+   "seenAt": "2026-11-19",
+   "excerptsAt": "2026-11-19"
+  },
+  {
+   "title": "예비, 초기 창업자가 반드시 알아야 할 스타트업 마케팅 방법론 - 제11차 DDM 벤처스타트업 아카데미",
+   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179835",
+   "kind": "대외활동",
+   "field": "교육·캠프",
+   "deadline": "2026-11-27",
+   "deadlineHint": null,
+   "excerpts": [
+    {
+     "label": "모집기간",
+     "text": "2026-11-18 ~ 2026-11-27"
+    },
+    {
+     "label": "대상",
+     "text": "스타트업 마케팅에 관심이 있는 누구나"
+    },
+    {
+     "label": "활동지역",
+     "text": "전국"
+    }
+   ],
+   "attachments": [],
+   "school": "",
+   "campus": "",
+   "host": "DDM 청년창업센터 유니콘",
+   "api": "kstartup",
+   "apiId": "179835",
+   "id": "api-kstartup-179835",
+   "eligibilityLines": [
+    "스타트업 마케팅에 관심이 있는 누구나"
+   ],
+   "noticeLines": [
+    "DDM 청년창업센터 유니콘에서 '예비, 초기 창업자가 반드시 알아야 할 스타트업 마케팅 방법론'을 주제로 제 10차 DDM 벤처스타트업 아카데미를 진행하오니 많은 참여 부탁드립니다.",
+    "온라인 접수 : 예비, 초기 창업자가 반드시 알아야 할 스타트업 마케팅 방법론"
+   ],
+   "detailsV": 7,
+   "foundAt": "2026-11-18",
    "seenAt": "2026-11-19",
    "excerptsAt": "2026-11-19"
   },
@@ -537,87 +618,6 @@
    "noticeLines": [
     "강남구여성능력개발센터에서는 정부지원사업(모두의 창업 등) 도전 및 성공적인 창업 준비를 지원하기 위해 분야별 전문 멘토와 함께하는 1:1 맞춤형 창업 멘토링을 운영합니다. 창업의 첫걸음부터 비즈니스 모델 구체화, 서비스 고도화까지 개별 맞춤 솔루션을 받아보실 기회이니 역량 있는 예비·초기 창업자분들의 많은 관심과 참여 바랍니다.",
     "온라인 접수 : buly.kr/5qARl5u"
-   ],
-   "detailsV": 7,
-   "foundAt": "2026-11-19",
-   "seenAt": "2026-11-19",
-   "excerptsAt": "2026-11-19"
-  },
-  {
-   "title": "취약분야 상시 컨설팅 11월 참가자 모집 공고",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179514",
-   "kind": "대외활동",
-   "deadline": "2026-11-29",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-10-14 ~ 2026-11-29"
-    },
-    {
-     "label": "대상",
-     "text": "예비창업자, 기창업자"
-    },
-    {
-     "label": "활동지역",
-     "text": "전국"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "강동구 청년해냄센터",
-   "api": "kstartup",
-   "apiId": "179514",
-   "id": "api-kstartup-179514",
-   "eligibilityLines": [
-    "예비창업자, 기창업자"
-   ],
-   "noticeLines": [
-    "강동구 청년해냄센터에서 10월 취약 분야 상시 컨설팅 계획을 다음과 같이 공고하니 참여 희망자는 안내에 따라 신청하시기 바랍니다.",
-    "온라인 접수 : http://www.gdhaenaem.com/?c=169"
-   ],
-   "detailsV": 7,
-   "foundAt": "2026-11-19",
-   "seenAt": "2026-11-19",
-   "excerptsAt": "2026-11-19"
-  },
-  {
-   "title": "[무료 세미나] 글로벌 진출 초기 챙겨야 할 GEO 전략",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179711",
-   "kind": "대외활동",
-   "field": "해외·교류",
-   "deadline": "2026-11-30",
-   "deadlineHint": null,
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-03 ~ 2026-11-30"
-    },
-    {
-     "label": "대상",
-     "text": "- 글로벌 진출을 준비하는 사업자 - 글로벌 마케팅을 실행하는 마케터 - GEO에 대한 기본 이해를 갖추고 있어 글로벌 시장에 맞는 GEO 전략까지 확장하고 싶은 사업자"
-    },
-    {
-     "label": "활동지역",
-     "text": "전국"
-    }
-   ],
-   "attachments": [],
-   "school": "",
-   "campus": "",
-   "host": "토스페이먼츠",
-   "api": "kstartup",
-   "apiId": "179711",
-   "id": "api-kstartup-179711",
-   "eligibilityLines": [
-    "글로벌 진출을 준비하는 사업자",
-    "글로벌 마케팅을 실행하는 마케터",
-    "GEO에 대한 기본 이해를 갖추고 있어 글로벌 시장에 맞는 GEO 전략까지 확장하고 싶은 사업자"
-   ],
-   "noticeLines": [
-    "해외 시장 진출을 준비하거나 글로벌 고객을 대상으로 사업을 운영하는 기업이라면, 현지 고객이 우리 브랜드와 상품을 어떤 경로로 발견하는지가 중요합니다. 최근에는 Google 등 기존 검색엔진뿐 아니라 ChatGPT, Gemini와 같은 생성형 AI를 통해 상품과 서비스를 탐색하는 이용자가 늘어나면서, 해외 고객의 AI 검색 결과에 브랜드가 어떻게 노출되고 추천되는지를 관리하는 GEO(Generative Engine Optim…",
-    "온라인 접수 : https://tosspayments.recatch.cc/workflows/ykowxqffrm?utm_source=toss&utm_medium=viral&utm_campaign=K-startup"
    ],
    "detailsV": 7,
    "foundAt": "2026-11-19",
@@ -1992,73 +1992,6 @@
    "host": "창업진흥원 K-Startup",
    "foundAt": "2026-11-18",
    "id": "act-0q1g0oy"
-  },
-  {
-   "title": "예비, 초기 창업자가 반드시 알아야 할 스타트업 마케팅 방법론 - 제11차 DDM 벤처스타트업 아카데미",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179835",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": null,
-   "deadline": "2026-11-27",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-18 ~ 2026-11-27 15:00"
-    },
-    {
-     "label": "일시",
-     "text": "2026. 11.27.(금) 15:00~16:30"
-    }
-   ],
-   "eligibilityLines": [
-    "신청대상 : 스타트업 마케팅에 관심이 있는 누구나"
-   ],
-   "detailsV": 7,
-   "documentsV": 1,
-   "field": "교육·캠프",
-   "excerptsAt": "2026-11-18",
-   "school": "",
-   "campus": "",
-   "host": "창업진흥원 K-Startup",
-   "foundAt": "2026-11-18",
-   "id": "act-199i4pp"
-  },
-  {
-   "title": "대전 팁스타운 26년 제3차 팁스아카데미 : 스타트업의 새로운 기회, 오픈이노베이션",
-   "url": "https://www.k-startup.go.kr/web/contents/bizpbanc-ongoing.do?schM=view&pbancSn=179836",
-   "kind": "대외활동",
-   "attachments": [],
-   "deadlineHint": null,
-   "deadline": "2026-11-24",
-   "excerpts": [
-    {
-     "label": "모집기간",
-     "text": "2026-11-19 ~ 2026-11-24 18:00"
-    },
-    {
-     "label": "일시",
-     "text": "2026.11.25.(수) 16시 ~ 18시"
-    }
-   ],
-   "eligibilityLines": [
-    "- 교육대상 : 대전 팁스타운 입주기업 및 지역 내 창업기업 등",
-    "- 교육일시 : 2026.11.25.(수) 16시 ~ 18시",
-    "(대전광역시 유성구 대학로 99)",
-    "(1부 / 16:00~17:00) \"함께 실험하고 함께 확장하다\" - 오픈이노베이션 사례",
-    "* 한국오라클 유한회사 김현웅 본부장",
-    "(2부 / 17:00~18:00) \"왜 지금 오픈이노베이션인가\" - 민관협력 오픈이노베이션 지원사업 소개",
-    "* 창업진흥원 민관협력실 최진영 과장",
-    "* 주차권 지원 불가"
-   ],
-   "detailsV": 7,
-   "documentsV": 1,
-   "field": "교육·캠프",
-   "excerptsAt": "2026-11-18",
-   "school": "",
-   "campus": "",
-   "host": "창업진흥원 K-Startup",
-   "foundAt": "2026-11-18",
-   "id": "act-1e71dkg"
   },
   {
    "title": "[봉사] [(사)코드클럽한국위원회] 현대오토에버 스마트 모빌리티 공학 체험캠프 대학생 교육기부자 모집",
