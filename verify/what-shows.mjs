@@ -299,7 +299,10 @@ function pressRoute(sch) {
   }
   if (got[0] === 'doc') return `서류 도우미 (${run('essayDefsFor')(s).map((d) => d.doc).join(' · ')})`;
   if (got[0] === 'prep') {
-    const n = (s.attachments || []).filter(run('isFormAttachment')).length;
+    /* 앱 신청서 칸과 같은 셈 — 로봇이 원본 내용을 읽고 이름과 다르게 가른 것(forms-pdf 색인 roles · app-live attIsForm)이 먼저 (2026-11-20) */
+    const roles = (() => { try { return (JSON.parse(fs.readFileSync(new URL('../data/forms-pdf/index.json', import.meta.url), 'utf8')).roles || {})[s.id] || {}; } catch { return {}; } })();
+    const isForm = run('isFormAttachment');
+    const n = (s.attachments || []).filter((a) => (roles[a.name] ? roles[a.name] === 'form' : isForm(a))).length;
     return `신청 준비 시트 — 확인을 눌러야 담긴다 (내려받을 신청서 양식 첨부 ${n}개)`;
   }
   return `(알 수 없음: ${got.join(',') || '아무것도 안 부름'})`;

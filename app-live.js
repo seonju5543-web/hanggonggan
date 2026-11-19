@@ -114,7 +114,7 @@ function formPageRowsHtml(sch) {
    층2(10-13 ①)는 첨부를 **선발 공고문**이라 부른다 — 신청서가 아니다(CLAUDE.md 「층2」). 10-13 개발자 결정으로 층1은 지원문서 질문 화면이 먼저 뜨므로 시안 A 의 줄은 여기(화면 머리)에 선다. */
 function prepOriginalsHtml(sch) {
   const kosaf = sch.sourceKind === 'kosaf';
-  const atts = (sch.attachments || []).filter((a) => a && !a.bodyImage && (kosaf || isApplicationForm(a)));
+  const atts = (sch.attachments || []).filter((a) => a && !a.bodyImage && (kosaf || attIsForm(sch, a)));
   const pdfRows = kosaf ? '' : formPdfRowsHtml(sch);
   const pageRows = formPageRowsHtml(sch);
   if (!atts.length && !pdfRows && !pageRows) return '';
@@ -311,6 +311,13 @@ function loadFormsPdfIndex() {
     .catch(() => {});
 }
 function formPdfsFor(sch) { return (sch && formsPdfIndex.items && formsPdfIndex.items[sch.id]) || []; }
+/* 첨부가 신청서 칸에 서는가 — 로봇이 **원본 내용**을 읽고 이름과 다르게 가른 것(색인 roles · collector/attachment-text attachDecision)이 먼저,
+   없으면 이름 규칙(data.js isApplicationForm). 2026-11-20 — 이름만 보면 속이 안내문인 「…신청서.hwp」가 양식 칸에 서고 「[서식] 1~3.hwp」는 안 섰다 */
+function attIsForm(sch, a) {
+  const r = sch && formsPdfIndex.roles && formsPdfIndex.roles[sch.id];
+  const v = r && a && r[a.name];
+  return v ? v === 'form' : isApplicationForm(a);
+}
 /* 첨부 한 줄(시안 A 꼴) — 아이콘(확장자) · 이름 · 작은 글씨 · 오른쪽 동작 */
 function attachKb(a) { return a && a.bytes ? ` · ${Math.max(1, Math.round(a.bytes / 1024))}KB` : ''; }
 function attachRowHtml(a, { meta = '', go = '↓' } = {}) {

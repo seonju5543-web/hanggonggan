@@ -1399,9 +1399,10 @@ console.log('\n■ 신청 준비 시작 버튼 — 양식이 없어도 곧장 \'
   eq('  준비 시트는 확인 버튼 배선을 가진다', /\$\('#btn-prep-confirm'\)\.addEventListener\('click'/.test(prep), true);
   eq('🔴 확인 버튼을 누르기 전에는 finalizeApply 를 부르지 않는다', /finalizeApply\(/.test(beforeClick), false);
   eq('  확인 버튼이 finalizeApply 를 부른다', /addEventListener\('click',[\s\S]*finalizeApply\(sch/.test(prep), true);
-  /* 제출처·채널 이름·양식 첨부 판정·원문 링크 이름은 **한 곳씩** — 시트가 제 사본을 들면 상세 시트와 다른 말을 한다 */
+  /* 제출처·채널 이름·양식 첨부 판정·원문 링크 이름은 **한 곳씩** — 시트가 제 사본을 들면 상세 시트와 다른 말을 한다
+     (양식 첨부 판정의 한 곳은 2026-11-20 부터 attIsForm — 로봇의 내용 판정(roles)이 먼저, 없으면 data.js isApplicationForm · 관문 「첨부를 내용으로 가르기」) */
   eq('  판정을 새로 만들지 않고 한 곳씩 가져다 쓴다',
-    ['officialChannel(sch)', 'submitChannelLabel(sch)', 'isApplicationForm', 'sourceNoteHtml(sch)'].filter((s) => !prep.includes(s)), []);
+    ['officialChannel(sch)', 'submitChannelLabel(sch)', 'attIsForm(sch, a)', 'sourceNoteHtml(sch)'].filter((s) => !prep.includes(s)), []);
   /* 확인하면 닫지 않고 그 공고의 '준비 완료' 화면을 연다 — 메일 접수 버튼·제출처가 거기 있다(리뷰 L1) */
   eq('  확인하면 그 공고의 준비 완료 화면을 다시 연다 (다음 할 일이 거기 있다)',
     /finalizeApply\(sch, null\);\s*openDetail\(sch\.id\)/.test(prep), true);
@@ -4959,6 +4960,103 @@ console.log('\n■ 자격 절 고르기 — 이름표 줄 · 짧은 블록 덧�
   const majorOf = (l) => (PRq.parseLine(l).conds || []).filter((c) => c.kind === 'major').length;
   eq('  `…컴퓨터 관련 전공 아니어도 활동 가능` 은 학과 요건이 아니다 · `원자력 관련 학과 재학생` 은 그대로 학과 요건',
     [majorOf('기본 선발 요건을 충족한 학생 (AI, SW 컴퓨터 관련 전공 아니어도 활동 가능)'), majorOf('원자력 관련 학과 재학생')], [0, 1]);
+}
+
+console.log('\n■ 첨부를 내용으로 가르기 — 신청서 칸인가 카드(자격·마감)인가 (2026-11-20)');
+{
+  /* 개발자 지시(2026-11-20): 원문의 문서·이미지·파일을 전부 읽고 「공고 카드에 들어갈 것」과 「신청 양식 칸에 들어갈 것」을 가른다.
+     이름만 보던 세 자리(양식 PDF 로봇 pickFormTargets · 공고문 고르기 noticeDocFiles · 앱 신청서 칸)가 attachDecision 한 곳을 따른다.
+     🔴 아래 글자는 **실제 원본에서 옮긴 줄**이다(파일을 읽지 않는다 — 실데이터에 기댄 관문 금지):
+        복지장학생 신청서(form-t8is3u-1 HWP 미리보기 칸 꼴) · 공적활동확인서(form-1vruxo-2) · 복지장학금 신청서 첫머리(form-2x9z1k-1 · 인적사항 칸 없는 익명 서식) ·
+        HUFS Dream 신청 안내(공고문 절 머리) */
+  const AT = await import(new URL('../collector/attachment-text.mjs', import.meta.url));
+  const call = (o, k, ...a) => { try { return typeof o[k] === 'function' ? o[k](...a) : '(없음)'; } catch (e) { return `(오류 ${e.message})`; } };
+  const FORM_HWP = '<복 지 장 학 생 신 청 서>\n<신 청 자><성  명><><학  번><><소  속><             대학                      학과/전공                   학년><연락처><><주  소><><계 좌>< 은행 :            계좌번호 :                    예금주 : 학생본인>\n<위와 같이 장학금을 지급받고자 신청합니다. 20  년      월       일                                            위 본인                   (인/서명)    학생처장  귀하>';
+  const FORM_ACT = '2026. 2학기 공적활동확인서(활동사진 포함)\n학  과\n국문<예시: 실제 작성 시 삭제>\n학  번\n202311-1234567\n성  명\n홍길동\n연락처\n010-123-4567\n활동분야 (3분야 중 선택)\n□ 기획\n■ 홍보\n□ 진행';
+  const FORM_ANON = '복지장학금 신청서\n\n장학금 구분\n\n등록금성 장학금\n\n• 복지장학금은 생활비성 장학이 아닌 등록금성 장학으로\n\n유의사항\n\n※ 주의사항: 이름 등 본인을 특정할 수 있는 인적 사항은 기재를 금함\n작성해야 하는 문항은 총 3개이며, 누락할 시에 심사에서 제외됨';
+  const NOTICE = '2026학년도 2학기 서울캠퍼스 HUFS Dream 장학금 신청 안내\n다음과 같이 선발하오니 많은 신청 바랍니다.\n3. 장학금액 : 최대 1,000,000 원 ( 등록금 범위 내 지급 , 타 장학금 전액 수혜자 제외 )\n4. 신청자격 ( 아래 가 · 나 항목을 모두 충족해야 함 )\n① 2026-2 학기 서울캠퍼스에 재학중인 자 ( 초과학기자 지원 가능 )\n6. 신청기간 : 2026. 11. 23.(월 ) 9:00 ~ 2026. 12. 4.(금 ) 16:00\n7. 제출서류 : 신청서 1부\n10. 관련 문의 : 서울캠퍼스 장학팀 02-2173-2138';
+  eq('내용 판정 — 빈칸·서명란 서식(HWP 칸 꼴 · 확인서) = form · 첫머리 「…신청서」 익명 서식은 form 쪽 표식 · 절 머리 안내문 = notice · 둘 다 = mixed · 글자 없음 = null(이름 규칙)',
+    [call(AT, 'docRole', FORM_HWP), call(AT, 'docRole', FORM_ACT), call(AT, 'docRoleSignals', FORM_ANON).form >= 2, call(AT, 'docRole', NOTICE),
+      call(AT, 'docRole', `${NOTICE}\n${FORM_HWP}`), call(AT, 'docRole', ''), call(AT, 'docRole', 'poster')],
+    ['form', 'form', true, 'notice', 'mixed', null, null]);
+  const dec = (name, text, nameForm) => { const d = call(AT, 'attachDecision', name, text, nameForm); return typeof d === 'object' ? [d.form, d.notice] : d; };
+  eq('  행선지 — 이름에 신청서가 없는 진짜 서식은 신청서 칸으로(`[서식] 1~3.hwp`) · 속이 안내문인 「…신청서.hwp」는 칸에서 빼고 카드로 · 추천서는 서식이어도 칸에 안 둔다',
+    [dec('[서식] 1~3.hwp', FORM_HWP, false), dec('★붙임2_공적활동확인서(활동사진 포함)_신규서식_2026-2학기.hwp', FORM_ACT, false),
+      dec('2026-2학기 특별장학금 신청서.hwp', NOTICE, true), dec('동산장학회) 학(과)장 장학생 추천서(양식).hwp', FORM_HWP, false)],
+    [[true, false], [true, false], [false, true], [false, false]]);
+  eq('  이름이 공고문인데 속에 서식이 있으면 둘 다 든 파일(카드로 읽고 칸엔 안 올림 · 서식 쪽은 form-pages) · 이름이 신청서인 둘 다 든 파일은 칸에도 · 글자 없으면 이름 규칙 그대로 · 익명 서식은 이름 규칙(신청서)이 지킨다',
+    [dec('2026년도 하반기 장학생 선발 공고문(발췌본).hwpx', FORM_HWP, false), dec('붙임. 충남대학교총동창회 장학생선발공고+신청서식.hwp', `${NOTICE}\n${FORM_HWP}`, true),
+      dec('2026 장학금 신청서.hwp', '', true), dec('2026 장학생 선발 공고.hwp', '', false), dec('2.2026학년도2학기복지장학금신청서류.hwp', FORM_ANON, true)],
+    [[false, true], [true, true], [true, false], [false, true], [true, false]]);
+
+  /* 배선 ① 양식 PDF 로봇 — 받은 원본의 내용으로 대상을 고르고(contentDecide) · 이름과 다르게 가른 것을 색인 roles 에 남기고 · 안 받은 문서 첨부는 unread 로 */
+  process.env.FORM_PDF_AS_LIB = '1';
+  const FP = await import(new URL('../collector/form-pdf.mjs', import.meta.url));
+  const FR = await import(new URL('../collector/form-rules.mjs', import.meta.url));
+  const { isApplicationForm } = FR.loadFormRules(fileURLToPath(new URL('..', import.meta.url)));
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'attach-role-'));
+  const put = (f, body) => fs.writeFileSync(path.join(tmp, f), body);
+  put('form-r-1.hwp', 'hwp'); put('form-r-1.hwp.body.txt', FORM_HWP);
+  put('form-r-2.hwp', 'hwp'); put('form-r-2.hwp.body.txt', NOTICE);
+  put('form-r-3.hwp', 'hwp'); put('form-r-3.hwp.body.txt', FORM_HWP);
+  const item = { id: 'R', name: 'T', deadline: '2099-12-31', attachments: [
+    { name: '[서식] 1~3.hwp', url: 'u1' }, { name: '2026 특별장학금 신청서.hwp', url: 'u2' }, { name: '붙임1.hwp', url: 'u3' },
+    { name: '2026 장학금 신청서.hwp', url: 'u4' }, { name: '붙임2.pdf', url: 'u5' }, { name: '선발 공고.pdf', url: 'u7' }, { name: '포스터.jpg', url: 'u6' }] };
+  const rows = [{ file: 'form-r-1.hwp', title: 'T', attach: '[서식] 1~3.hwp', id: 'R' }, { file: 'form-r-2.hwp', title: 'T', attach: '2026 특별장학금 신청서.hwp', id: 'R' },
+    { file: 'form-r-3.hwp', title: 'T', attach: '붙임1.hwp', id: 'R' }];
+  const got = call(FP, 'pickFormTargets', [item], rows, { today: '2026-11-20', isApplicationForm, decide: FP.contentDecide ? FP.contentDecide(tmp) : undefined });
+  eq('  양식 PDF 로봇: 내용이 서식인 것만 대상(이름이 애매해도) · 속이 안내문인 「신청서」는 뺀다 · 다르게 가른 것은 roles · 안 받은 신청서는 missing · 이름이 신청서도 공고문도 아닌 안 받은 문서만 unread(공고문은 자격 로봇 몫 · 그림은 아니다)',
+    typeof got === 'object' ? [got.targets.flatMap((t) => t.files.map((f) => f.name)), got.roles, got.missing.map((m) => m.name), (got.unread || []).map((m) => m.name)] : got,
+    [['[서식] 1~3.hwp', '붙임1.hwp'], { R: { '[서식] 1~3.hwp': 'form', '2026 특별장학금 신청서.hwp': 'notice', '붙임1.hwp': 'form' } }, ['2026 장학금 신청서.hwp'], ['붙임2.pdf']]);
+  const bl = call(FP, 'pickFormBacklog', [item, { id: 'S', name: 'S', deadline: '2099-12-31', attachments: [{ name: '붙임.hwp', url: 'v' }] }], rows, { today: '2026-11-20', isApplicationForm });
+  eq('  밀린 목록이 이름이 애매한 문서도 받는다(받아야 내용으로 가른다) · 확실한 신청서가 있는 공고가 먼저',
+    Array.isArray(bl) ? bl.map(({ it, atts }) => [it.id, atts.map((a) => a.name)]) : bl, [['R', ['2026 장학금 신청서.hwp', '붙임2.pdf']], ['S', ['붙임.hwp']]]);
+  const fpSrc = readText(new URL('../collector/form-pdf.mjs', import.meta.url));
+  eq('  본편이 내용 판정으로 고르고 색인에 roles 를 쓴다', [/pickFormTargets\(items, rows, \{[^}]*decide: contentDecide\(/.test(fpSrc), /index\.roles = roles/.test(fpSrc)], [true, true]);
+
+  /* 배선 ② 공고문 고르기 — 신청서 쪽으로 받은 원본도 속이 안내문이면 카드를 읽는 데 쓴다(이름이 애매한 「붙임1.hwp」) */
+  put('form-r-4.hwp', 'hwp4'); put('form-r-4.hwp.body.txt', NOTICE);
+  fs.writeFileSync(path.join(tmp, 'elig-docs.json'), '{}');
+  fs.writeFileSync(path.join(tmp, 'forms-index.txt'), ['form-r-4.hwp\tT\t붙임1.hwp\t10\tR', 'form-r-1.hwp\tT\t[서식] 1~3.hwp\t10\tR'].join('\n'));
+  eq('  공고문 고르기: 이름이 애매해도 속이 안내문이면 읽고 · 속이 서식이면 안 읽는다',
+    call(AT, 'noticeDocFiles', { id: 'R' }, { index: call(AT, 'loadNoticeDocIndex', tmp) }), ['form-r-4.hwp']);
+  /* 리뷰(2026-11-20) 셋 — ① 절 머리는 갈래 **전체**를 줄 머리에 묶는다(`^a|b` 는 서식 칸의 「기타사항」「장학금액」을 줄 어디서나 셌다)
+     ② 이름이 서식 꼴인 「공고 몇 줄 + 신청서」 파일은 카드로 안 읽는다(개인정보 동의 문구가 자격이 된 08-20 사고) ③ 속이 안내문이라 뺀 신청서의 옛 PDF 는 지운다 */
+  const CELLS = '장학생 지원서\n성  명\n학  번\n학  과\n연락처\n지원 장학금액 (만원)\n기타사항 및 특기사항\n담당부서 확인\n위와 같이 지원합니다.\n2026년   월   일\n지원자 (서명)';
+  eq('  ① 서식 칸의 「…장학금액」「기타사항」「담당부서」는 공고문 절 머리가 아니다', call(AT, 'docRoleSignals', CELLS).notice, 0);
+  put('form-r-5.hwp', 'hwp5'); put('form-r-5.hwp.body.txt', `${NOTICE}\n${FORM_HWP}`);
+  fs.writeFileSync(path.join(tmp, 'forms-index.txt'), 'form-r-5.hwp\tT\t(서식) 일반장학생 선발 지원서.hwp\t10\tR');
+  eq('  ② 이름이 서식 꼴이고 속에 서식이 든 파일(공고 몇 줄 + 신청서)은 카드 읽기에 안 넣는다',
+    call(AT, 'noticeDocFiles', { id: 'R' }, { index: call(AT, 'loadNoticeDocIndex', tmp) }), []);
+  {
+    const fake = fs.mkdtempSync(path.join(os.tmpdir(), 'attach-role-fake-'));
+    const mk = (rel, body) => { fs.mkdirSync(path.dirname(path.join(fake, rel)), { recursive: true }); fs.writeFileSync(path.join(fake, rel), body); };
+    fs.copyFileSync(fileURLToPath(new URL('../data.js', import.meta.url)), path.join(fake, 'data.js'));
+    mk('data/registered.json', JSON.stringify({ items: [{ id: 'D', name: 'T', deadline: '2099-12-31', attachments: [{ name: '2026 특별장학금 신청서.hwp', url: 'u' }] }] }));
+    mk('collector/extracted/forms-index.txt', 'form-d-1.hwp\tT\t2026 특별장학금 신청서.hwp\t10\tD');
+    mk('collector/extracted/form-d-1.hwp', 'hwp'); mk('collector/extracted/form-d-1.hwp.body.txt', NOTICE);
+    mk('data/forms-pdf/D/1-old.pdf', '%PDF');
+    mk('data/forms-pdf/index.json', JSON.stringify({ items: { D: [{ file: 'D/1-old.pdf', name: '2026 특별장학금 신청서.hwp' }] } }));
+    const r = call(FP, 'runFormPdf', { root: fake, today: '2026-11-20', soffice: '/nonexistent-soffice', log: () => {} });
+    const idx = JSON.parse(readText(path.join(fake, 'data/forms-pdf/index.json')));
+    eq('  ③ 속이 안내문이라 신청서 칸에서 뺀 첨부의 옛 PDF 는 색인·파일에서 지운다(그 공고의 신청서가 전부 빠져도) · roles 에 남긴다',
+      [typeof r === 'object', idx.items.D, fs.existsSync(path.join(fake, 'data/forms-pdf/D/1-old.pdf')), (idx.roles || {}).D], [true, undefined, false, { '2026 특별장학금 신청서.hwp': 'notice' }]);
+    fs.rmSync(fake, { recursive: true, force: true });
+  }
+  fs.rmSync(tmp, { recursive: true, force: true });
+  const fpgSrc = readText(new URL('../collector/form-pages.mjs', import.meta.url));
+  eq('  공고문 뒷장 서식 떼기도 같은 공고문 고르기를 쓴다(신청서 쪽으로 받은 「공고+서식」 파일)', /filesFor = \(it\) => noticeDocFiles\(it/.test(fpgSrc) && /pickPageTargets\(\{[^}]*filesFor \}\)/.test(fpgSrc), true);
+
+  /* 배선 ③ 앱 — 신청서 칸 두 자리(양식 화면 머리 · 신청 준비 시트)가 로봇의 roles 를 먼저 본다 */
+  const liveSrc = readText(new URL('../app-live.js', import.meta.url));
+  const prepSrc = readText(new URL('../app-prep.js', import.meta.url));
+  eq('  앱 신청서 칸이 내용 판정(attIsForm · 색인 roles)을 먼저 본다 — 양식 화면 머리와 신청 준비 시트 둘 다',
+    [/function attIsForm\(sch, a\)[\s\S]{0,200}formsPdfIndex\.roles/.test(liveSrc), /kosaf \|\| attIsForm\(sch, a\)/.test(liveSrc), /atts\.filter\(\(a\) => attIsForm\(sch, a\)\)/.test(prepSrc)],
+    [true, true, true]);
+  const attIsForm = new Function('formsPdfIndex', 'isApplicationForm', `${liveSrc.match(/function attIsForm\(sch, a\) \{[\s\S]*?\n\}/)[0]}\nreturn attIsForm;`)(
+    { roles: { X: { '붙임1.hwp': 'form', '특별장학금 신청서.hwp': 'notice' } } }, (a) => /신청서/.test(a.name));
+  eq('  attIsForm — roles 가 있으면 그것 · 없으면 이름 규칙',
+    [attIsForm({ id: 'X' }, { name: '붙임1.hwp' }), attIsForm({ id: 'X' }, { name: '특별장학금 신청서.hwp' }), attIsForm({ id: 'Y' }, { name: '장학금 신청서.hwp' })], [true, false, true]);
 }
 
 console.log('\n■ 발췌기 글자 읽기 — 카드 빈칸 비평의 이름표 꼴·해·첨부 한 곳·발췌·자격 절 (2026-11-15)');

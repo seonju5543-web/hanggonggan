@@ -56,7 +56,7 @@ function renderApplyPrep(sch) {
   const kosaf = sch.sourceKind === 'kosaf';
   /* 층2 첨부는 재단이 올린 **선발 공고문**이다 — 신청서라고 부르면 학생이 그 안에서 빈칸을 찾는다
      (상세 시트의 '선발 공고문' 머리말과 같은 규칙) */
-  const formAtts = kosaf ? [] : atts.filter(isApplicationForm);
+  const formAtts = kosaf ? [] : atts.filter((a) => attIsForm(sch, a));   // 내용 판정이 먼저(app-live attIsForm · 색인 roles)
   /* 본문 사진(bodyImage)은 공고 원문 그 자체다 — '첨부 파일'로 늘어놓지 않는다(원문 링크가 준다) */
   const pdfRows = kosaf ? '' : formPdfRowsHtml(sch);
   /* 로봇이 PDF 로 둔 그 파일(이름이 같은 첨부)은 「원본 양식 그대로 보기」 줄이 이미 보여 준다 — 밑에 또 늘어놓지 않는다(PDF 신청서는 isApplicationForm 밖이라 여기 걸렸다 · 10-14 실측 선원가족) */
