@@ -397,7 +397,7 @@
     try {
       if (!TR) { TR = { r: new T.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true }), s: new T.Scene(), c: new T.PerspectiveCamera(32, 1, 0.1, 50) };
         TR.s.add(new T.HemisphereLight(0xffffff, 0xe9dcc8, 2.1)); const k = new T.DirectionalLight(0xfff6e8, 2.3); k.position.set(2.5, 5, 4.5); TR.s.add(k);
-        TR.c.position.set(0, 1.5, 5.3); TR.c.lookAt(0, 1.22, 0); }
+        TR.c.position.set(0, 1.55, 5.9); TR.c.lookAt(0, 1.32, 0); }
       TR.r.setSize(size || 240, size || 240, false);
       const ch = build(); ch.root.scale.setScalar(ch.scale || 1); ch.root.rotation.y = -0.28; TR.s.add(ch.root); TR.r.render(TR.s, TR.c);
       const url = TR.r.domElement.toDataURL('image/png'); TR.s.remove(ch.root); return url;
