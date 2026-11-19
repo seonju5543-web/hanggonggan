@@ -574,7 +574,10 @@ let faqQuery = '';
 /* 검색은 **질문과 답 둘 다** 본다 — '주민번호'는 질문에 없고 답에만 있다.
    답에 섞인 <strong> 같은 표시는 빼고 글자만 견준다(안 빼면 'strong'이 검색된다). */
 function faqPlain(html) {
-  return String(html).replace(/<[^>]*>/g, '');
+  /* 더 지울 것이 없을 때까지 — 한 번만 지우면 `<<b>b>` 가 `<b>` 로 남는다(CodeQL 「불완전한 여러 글자 정리」 · 2026-11-19 app.js 에서 떼어 올 때 새 경보) */
+  let s = String(html), prev;
+  do { prev = s; s = s.replace(/<[^>]*>/g, ''); } while (s !== prev);
+  return s;
 }
 function faqHit(item, q) {
   if (!q) return true;

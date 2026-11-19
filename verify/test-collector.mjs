@@ -16933,6 +16933,14 @@ console.log('■ CodeQL 보안 경고 수리 (2026-11-18 · #55~#59) — 되돌�
   const tricky = '서류<<a>b> (첨부(양식)) 1부';
   eq('#59 dropBracketed 결과는 다시 돌려도 그대로다(남김없이 뗐다)', dropBracketed(dropBracketed(tricky)), dropBracketed(tricky));
   eq('  보통 줄은 한 번 지운 것과 같다', dropBracketed('성적증명서 (원본) 1부'), '성적증명서  1부');
+  /* FAQ 검색 표시 떼기(2026-11-19 · app.js → app-my.js 로 옮기며 새 경보) — 같은 꼴: 더 지울 것이 없을 때까지 */
+  const myJs = readText(new URL('../app-my.js', import.meta.url));
+  const faqSrc = (/function faqPlain\(html\) \{[\s\S]*?\n\}/.exec(myJs) || [''])[0];
+  const faqPlain = faqSrc ? new Function(`${faqSrc}; return faqPlain;`)() : () => null;
+  const faqTricky = 'a<s<b>trong>b</strong>c';
+  eq('faqPlain 결과는 다시 돌려도 그대로다(남김없이 뗐다) · 반복문 꼴이다',
+    [faqPlain(faqPlain(faqTricky)) === faqPlain(faqTricky), /<[^>]*>/.test(faqPlain(faqTricky)), /\bwhile \(s !== prev\)/.test(faqSrc)], [true, false, true]);
+  eq('  보통 답은 글자만 남는다', faqPlain('<strong>주민번호</strong> 안내'), '주민번호 안내');
 }
 
 console.log('■ 신청서 원본 → PDF — 단계 시한 안에 끝난다 (2026-11-19 · 경보 #668·#669)');
