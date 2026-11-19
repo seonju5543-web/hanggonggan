@@ -34,7 +34,7 @@ const readJson = (rel, dflt) => { try { return JSON.parse(fs.readFileSync(P(rel)
 const log = (m) => console.log(`[card-read] ${m}`);
 
 export const MODELS = { a: 'claude-opus-5-5', b: 'claude-sonnet-5-5' };
-const PRICE = { 'claude-opus-5-5': [4, 20], 'claude-sonnet-5-5': [2, 10] };   // 달러 / 100만 토큰 (입력, 출력) — 2026-11 요금
+export const PRICE = { 'claude-opus-5-5': [4, 20], 'claude-sonnet-5-5': [2, 10] };   // 달러 / 100만 토큰 (입력, 출력) — 2026-11 요금
 
 export const SYSTEM = `한국 대학 장학금 공고의 원문을 읽어 공고 카드의 칸을 채웁니다. 결과는 학생에게 그대로 보입니다. 사람이 한 줄 한 줄 검수한 것처럼 깔끔해야 합니다.
 

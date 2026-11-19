@@ -25,6 +25,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
+import crypto from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { sameTitle } from './detail-url.mjs';
 import { loadFormRules, cleanAttachName, sameAttach, attachExt } from './form-rules.mjs';
@@ -66,8 +67,21 @@ export function parseFormsIndex(text) {
 export const isOpen = (it, today) => !it.deadline || String(it.deadline) >= today;
 
 /* 받은 원본의 글자로 신청서인가를 가른다(2026-11-20 · attachment-text attachDecision 한 곳) — 글자를 못 읽으면 이름 규칙 그대로 */
-export const contentDecide = (extractedDir) => (a, row, nameForm) =>
-  attachDecision(a.name, roleText(path.join(extractedDir, row.file)), nameForm);
+/* paid — 유료 첨부 판정(collector/attach-role-read.mjs)의 결과 { items: { '<id>|<첨부 이름>': { file, role } } } · 글자가 없어 무료 판정이 '모름'인 파일에만 쓴다 */
+export const contentDecide = (extractedDir, paid = {}) => (a, row, nameForm, it) => {
+  const file = path.join(extractedDir, row.file);
+  const p = ((paid && paid.items) || {})[`${it && it.id}|${a.name}`];
+  /* 🔴 같은 이름에 다른 바이트가 덮였으면 옛 답을 안 쓴다(바이트 해시 · attach-role-read 와 같은 셈 · 리뷰) */
+  const same = p && p.role && p.file === row.file && p.hash === fileHash16(file);
+  return attachDecision(a.name, roleText(file), nameForm, same ? p.role : null);
+};
+const fileHash16 = (f) => { try { return crypto.createHash('sha1').update(fs.readFileSync(f)).digest('hex').slice(0, 16); } catch { return ''; } };
+/** 공고 첨부 하나의 원본 줄(forms-index) — 🔴 id 가 적힌 줄은 **그 공고 것만** 쓴다(제목이 같은 다른 학교 글에 넘기지 않는다) · id 없는 옛 줄(사람 표적)은 제목으로.
+ *  양식 PDF 로봇과 유료 첨부 판정이 같이 쓴다(베끼면 둘이 다른 원본을 본다) */
+export function findRow(it, a, indexRows, titles = [it.boardTitle, it.name, it.title].filter(Boolean)) {
+  return indexRows.find((r) => sameAttach(r.attach, a.name) && r.id && r.id === it.id)
+    || indexRows.find((r) => sameAttach(r.attach, a.name) && !r.id && titles.some((t) => sameTitle(t, r.title)));
+}
 const nameDecide = (a, row, nameForm) => ({ form: nameForm, notice: false, role: null, by: 'name' });
 
 /** 바꿀 대상 — 마감 전 공고의 신청서 첨부와 그 원본 파일.
@@ -93,15 +107,13 @@ export function pickFormTargets(items, indexRows, { today, isApplicationForm, de
     const files = [];
     for (const a of docs) {
       const nameForm = !!(isApplicationForm(a) || PDF_FORM(a));
-      /* id 가 적힌 줄은 **그 공고 것만** 쓴다(제목이 같은 다른 학교 글에 넘기지 않는다) · id 없는 옛 줄(사람 표적)은 제목으로 */
-      const row = indexRows.find((r) => sameAttach(r.attach, a.name) && r.id && r.id === it.id)
-        || indexRows.find((r) => sameAttach(r.attach, a.name) && !r.id && titles.some((t) => sameTitle(t, r.title)));
+      const row = findRow(it, a, indexRows, titles);
       /* 안 받은 것 — 이름이 신청서면 missing · 이름이 공고문이면 자격 로봇(--elig-attach)이 받는다 · **어느 쪽도 아닌 이름**(「붙임1.hwp」·「[Form]…」)은
          아무도 안 받았다 → unread(밀린 목록이 받아 내용으로 가른다) */
       /* .doc(옛 워드)는 글자를 못 뽑아(attachmentText) 받아도 내용으로 못 가른다 — unread 에 넣지 않는다(리뷰) */
       if (!row) { if (nameForm) missing.push({ id: it.id, name: a.name }); else if (!isNoticeDoc(a.name) && !/\.doc$/i.test(cleanAttachName(a.name))) unread.push({ id: it.id, name: a.name }); continue; }
-      const d = decide(a, row, nameForm);
-      if (d.form !== nameForm && d.by === 'content') (roles[it.id] ||= {})[a.name] = d.form ? 'form' : 'notice';
+      const d = decide(a, row, nameForm, it);
+      if (d.form !== nameForm && d.by !== 'name') (roles[it.id] ||= {})[a.name] = d.form ? 'form' : 'notice';
       if (d.form) files.push({ src: row.file, name: a.name, srcBytes: row.bytes || 0 });
     }
     if (files.length) out.push({ id: it.id, name: it.name || it.title || it.id, deadline: it.deadline || '', files });
@@ -280,7 +292,10 @@ export function runFormPdf({ root, today, dry = false, soffice = process.env.FOR
   const items = [...(reg.items || []), ...loadActivities(root)];
   const rows = fs.existsSync(idxPath) ? parseFormsIndex(fs.readFileSync(idxPath, 'utf8')) : [];
   const { isApplicationForm } = loadFormRules(root);
-  const { targets, missing, unread, roles } = pickFormTargets(items, rows, { today, isApplicationForm, decide: contentDecide(path.join(root, 'collector', 'extracted')) });
+  /* 유료 첨부 판정 결과(없으면 빈 것) — 글자 없는 PDF·그림의 신청서/공고문 답(모델 둘이 같은 답일 때만 실린다 · attach-role-read.mjs) */
+  let paid = {};
+  try { paid = JSON.parse(fs.readFileSync(path.join(root, 'collector', 'attach-role-paid.json'), 'utf8')); } catch { /* 아직 없음 */ }
+  const { targets, missing, unread, roles } = pickFormTargets(items, rows, { today, isApplicationForm, decide: contentDecide(path.join(root, 'collector', 'extracted'), paid) });
   let index = { updatedAt: today, items: {} };
   try { const j = JSON.parse(fs.readFileSync(indexPath, 'utf8')); if (j && j.items && typeof j.items === 'object') index = { ...j, items: j.items }; } catch { /* 첫 실행 */ }
   /* 내용 판정이 이름과 다른 첨부 — 앱 신청서 칸이 먼저 본다(app-live attIsForm) · 마감 전 공고만(pickFormTargets 가 거른다) · 매 실행 새로 쓴다 */

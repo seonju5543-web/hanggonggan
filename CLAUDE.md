@@ -50,6 +50,7 @@
 
 - 로봇 `collector/card-read.mjs` 가 본문+첨부를 모델 둘에게 따로 읽혀, 글자가 원문에 있고(`verify`) 둘이 같은 말을 한 줄(`agree`)만 `data/card-read.json` 에 싣는다. 🔴 `registered.json` 은 안 고친다(무료 길 = 비상망) · 지어냄을 막는 것은 지시문이 아니라 `verify` 다.
 - 앱·알림·`what-shows` 는 `applyCardRead`(match-engine) 한 곳으로 얹는다 — 얹힌 공고(`cardRead`)는 `requirementLines` 의 거르기를 건너뛴다. 스위치 `enabled`+`CARD_READ_ENABLE`. 관문 「유료 카드 읽기」 · `verify-card-read.js`.
+- **첨부가 신청서 칸인가 카드인가**(11-20)는 원본 **내용**으로 — `attachDecision`(attachment-text) 한 곳 · 모르면 이름 규칙 · 앱은 `attIsForm`(색인 `roles`). 글자 없는 스캔 PDF·그림만 `collector/attach-role-read.mjs` 가 파일째 모델 둘에게 묻고 같은 답만 `collector/attach-role-paid.json` 에(같은 스위치 · 상한 `roleMaxPerRun`·`roleMaxUsdPerRun`). 관문 「첨부를 내용으로 가르기」.
 
 ## 🔴 학적정보 테일러링 (2026-10-24 개발자 지시 넷 — 원문은 설계 문서 0절)
 

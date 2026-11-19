@@ -5057,6 +5057,80 @@ console.log('\n■ 첨부를 내용으로 가르기 — 신청서 칸인가 카�
     { roles: { X: { '붙임1.hwp': 'form', '특별장학금 신청서.hwp': 'notice' } } }, (a) => /신청서/.test(a.name));
   eq('  attIsForm — roles 가 있으면 그것 · 없으면 이름 규칙',
     [attIsForm({ id: 'X' }, { name: '붙임1.hwp' }), attIsForm({ id: 'X' }, { name: '특별장학금 신청서.hwp' }), attIsForm({ id: 'Y' }, { name: '장학금 신청서.hwp' })], [true, false, true]);
+
+  /* ── 유료 첨부 판정 (2026-11-20 개발자 지시 「유료로 해」) — 글자 없는 스캔 PDF·그림만 · 모델 둘이 같은 답일 때만 · 가짜 응답으로(돈 0) ── */
+  let AR = null;
+  try { AR = await import(new URL('../collector/attach-role-read.mjs', import.meta.url)); } catch (e) { eq('유료 첨부 판정 로봇(collector/attach-role-read.mjs)을 불러온다', e.message, '(있음)'); }
+  if (AR) {
+    eq('유료 첨부 판정: 두 답이 같고 unknown 이 아닐 때만 싣는다 · 정해진 넷 밖의 답은 버린다',
+      [AR.agreeRole({ role: 'form' }, { role: 'form' }), AR.agreeRole({ role: 'form' }, { role: 'notice' }), AR.agreeRole({ role: 'unknown' }, { role: 'unknown' }), AR.agreeRole({ role: 'poster' }, { role: 'poster' }), AR.agreeRole(null, { role: 'form' })],
+      ['form', null, null, null, null]);
+    eq('  유료 답은 글자로 못 가른 파일에만 — 글자가 정한 것은 무료 길이 이긴다 · 유료 답의 행선지도 같은 규칙(추천서는 칸에 안 둔다)',
+      [dec('붙임1.pdf', '', false), (() => { const d = AT.attachDecision('붙임1.pdf', '', false, 'form'); return [d.form, d.by]; })(),
+        AT.attachDecision('2026 특별장학금 신청서.pdf', NOTICE, true, 'form').form, AT.attachDecision('교수 추천서.pdf', '', false, 'form').form],
+      [[false, false], [true, 'paid'], false, false]);
+    /* 임시 저장소 — 스캔 PDF(글자 없음) 둘 · 글자로 가른 PDF 하나 · 20쪽 PDF 하나 */
+    const fake = fs.mkdtempSync(path.join(os.tmpdir(), 'attach-role-paid-'));
+    const mk = (rel, body) => { fs.mkdirSync(path.dirname(path.join(fake, rel)), { recursive: true }); fs.writeFileSync(path.join(fake, rel), body); };
+    const pdf = (n) => `%PDF-1.4\n${Array.from({ length: n }, (_, i) => `${i + 1} 0 obj << /Type /Page >> endobj`).join('\n')}\n<< /Type /Pages /Count ${n} >>\n%%EOF`;
+    fs.copyFileSync(fileURLToPath(new URL('../data.js', import.meta.url)), path.join(fake, 'data.js'));
+    mk('data/registered.json', JSON.stringify({ items: [{ id: 'P', name: 'T', deadline: '2099-12-31', attachments: [
+      { name: '붙임1.pdf', url: 'u1' }, { name: '2026 장학금 신청서.pdf', url: 'u2' }, { name: '안내.pdf', url: 'u3' }, { name: '요강.pdf', url: 'u4' }] },
+      { id: 'Q', name: 'old', deadline: '2020-01-01', attachments: [{ name: 'x.pdf', url: 'u' }] }] }));
+    mk('collector/extracted/forms-index.txt', ['form-p-1.pdf\tT\t붙임1.pdf\t9\tP', 'form-p-2.pdf\tT\t2026 장학금 신청서.pdf\t9\tP', 'form-p-3.pdf\tT\t안내.pdf\t9\tP', 'form-p-4.pdf\tT\t요강.pdf\t9\tP'].join('\n'));
+    mk('collector/extracted/form-p-1.pdf', pdf(2)); mk('collector/extracted/form-p-2.pdf', pdf(1));
+    mk('collector/extracted/form-p-3.pdf', pdf(1)); mk('collector/extracted/form-p-3.pdf.txt', NOTICE);
+    mk('collector/extracted/form-p-4.pdf', pdf(20));
+    mk('collector/card-read-config.json', JSON.stringify({ enabled: false }));
+    mk('collector/attach-role-paid.json', JSON.stringify({ items: { 'Q|x.pdf': { role: 'form' } } }));
+    const fakeAns = path.join(fake, 'fake.json');
+    fs.writeFileSync(fakeAns, JSON.stringify({ 'P|붙임1.pdf': { a: { role: 'form', evidence: '위와 같이 신청합니다' }, b: { role: 'form', evidence: '(서명)' } },
+      'P|2026 장학금 신청서.pdf': { a: { role: 'notice', evidence: '1. 지원자격' }, b: { role: 'form', evidence: '성명' } } }));
+    const quiet = () => {};
+    const off = await AR.runAttachRole({ root: fake, today: '2026-11-20', write: true, env: {}, log: quiet });
+    eq('  대상은 글자로 못 가른 스캔 PDF 만(글자로 가른 것·15쪽 넘는 것은 아니다) · 스위치가 꺼져 있으면 부르지 않는다 · 마감 지난 공고 줄은 뺀다',
+      [off.targets.map((t) => t.a.name), off.called, Object.keys(JSON.parse(readText(path.join(fake, 'collector/attach-role-paid.json'))).items)],
+      [['붙임1.pdf', '2026 장학금 신청서.pdf'], 0, []]);
+    const on = await AR.runAttachRole({ root: fake, today: '2026-11-20', write: true, env: { ATTACH_ROLE_FAKE: fakeAns }, log: quiet });
+    const saved = JSON.parse(readText(path.join(fake, 'collector/attach-role-paid.json'))).items;
+    eq('  가짜 응답으로 한 바퀴 — 같은 답(form)만 싣고 갈린 답은 안 싣는다 · 같은 바이트는 다시 묻지 않는다',
+      [on.called, saved['P|붙임1.pdf'].role, saved['P|2026 장학금 신청서.pdf'].role, saved['P|붙임1.pdf'].file,
+        (await AR.runAttachRole({ root: fake, today: '2026-11-20', write: false, env: {}, log: quiet })).targets.length],
+      [2, 'form', undefined, 'form-p-1.pdf', 0]);
+    /* 양식 PDF 로봇이 그 답을 쓴다 — 파일 이름이 같을 때만(다시 받은 다른 원본에 옛 답을 붙이지 않는다) */
+    const rowsP = FP.parseFormsIndex(readText(path.join(fake, 'collector/extracted/forms-index.txt')));
+    const itP = JSON.parse(readText(path.join(fake, 'data/registered.json'))).items[0];
+    const pk = (paid) => FP.pickFormTargets([itP], rowsP, { today: '2026-11-20', isApplicationForm, decide: FP.contentDecide(path.join(fake, 'collector/extracted'), paid) });
+    eq('  양식 PDF 로봇이 유료 답으로 「붙임1.pdf」(스캔 신청서)를 신청서 칸에 올린다 · 파일이 바뀐 옛 답은 안 쓴다',
+      [pk({ items: saved }).roles, pk({ items: { 'P|붙임1.pdf': { file: 'form-p-9.pdf', role: 'form' } } }).roles,
+        pk({ items: { 'P|붙임1.pdf': { ...saved['P|붙임1.pdf'], hash: 'deadbeefdeadbeef' } } }).roles], [{ P: { '붙임1.pdf': 'form' } }, {}, {}]);
+    /* 리뷰(2026-11-20 · 돈 새는 구멍) — 쪽 수는 쪽 나무 /Count 와 견줘 큰 쪽(객체 스트림 PDF 를 1쪽으로 세고 80쪽을 보낼 뻔) · 상한·시간 예산에서 멈춘다 */
+    eq('  쪽 수: 쪽 객체가 하나만 보여도 /Count 80 이면 80쪽(15쪽 넘어 안 보낸다)', AR.pdfPages(Buffer.from('<< /Type /Page >> << /Type /Pages /Kids [1 0 R] /Count 80 >>')), 80);
+    const capRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'attach-role-cap-'));
+    const mk2 = (rel, body) => { fs.mkdirSync(path.dirname(path.join(capRoot, rel)), { recursive: true }); fs.writeFileSync(path.join(capRoot, rel), body); };
+    fs.copyFileSync(fileURLToPath(new URL('../data.js', import.meta.url)), path.join(capRoot, 'data.js'));
+    const names = ['a1.pdf', 'a2.pdf', 'a3.pdf'];
+    mk2('data/registered.json', JSON.stringify({ items: [{ id: 'C', name: 'T', deadline: '2099-12-31', attachments: names.map((n) => ({ name: n, url: n })) }] }));
+    mk2('collector/extracted/forms-index.txt', names.map((n, i) => `form-c-${i + 1}.pdf\tT\t${n}\t9\tC`).join('\n'));
+    names.forEach((n, i) => mk2(`collector/extracted/form-c-${i + 1}.pdf`, `${pdf(1)}\n% ${i}`));
+    const ansC = path.join(capRoot, 'fake.json');
+    fs.writeFileSync(ansC, JSON.stringify(Object.fromEntries(names.map((n) => [`C|${n}`, { a: { role: 'form', evidence: 'x' }, b: { role: 'form', evidence: 'x' } }]))));
+    mk2('collector/card-read-config.json', JSON.stringify({ roleMaxPerRun: 2 }));
+    const capRun = await AR.runAttachRole({ root: capRoot, today: '2026-11-20', write: true, env: { ATTACH_ROLE_FAKE: ansC }, log: quiet });
+    fs.rmSync(path.join(capRoot, 'collector/attach-role-paid.json'));
+    mk2('collector/card-read-config.json', JSON.stringify({ roleMaxMs: 0 }));
+    const timeRun = await AR.runAttachRole({ root: capRoot, today: '2026-11-20', write: true, env: { ATTACH_ROLE_FAKE: ansC }, log: quiet });
+    eq('  한 실행 상한(roleMaxPerRun)과 시간 예산(roleMaxMs)에서 멈춘다', [capRun.called, timeRun.called], [2, 0]);
+    fs.rmSync(capRoot, { recursive: true, force: true });
+    fs.rmSync(fake, { recursive: true, force: true });
+    const crSrc = readText(new URL('../.github/workflows/card-read.yml', import.meta.url));
+    const fpSrc2 = readText(new URL('../collector/form-pdf.mjs', import.meta.url));
+    eq('  배선 — 유료 카드 읽기 워크플로가 같은 스위치로 돌리고(시한·실패해도 저장) 답 파일을 저장·보관하고 실패를 알린다 · 양식 PDF 로봇이 답 파일을 읽는다',
+      [/id: role[\s\S]{0,200}timeout-minutes: 6[\s\S]{0,60}continue-on-error: true[\s\S]{0,200}CARD_READ_ENABLE: '1'[\s\S]{0,120}attach-role-read\.mjs --write/.test(crSrc),
+        /git add collector\/attach-role-paid\.json/.test(crSrc), /steps\.role\.outcome == 'failure'/.test(crSrc),
+        /attach-role-paid\.json[\s\S]{0,300}contentDecide\(path\.join\(root, 'collector', 'extracted'\), paid\)/.test(fpSrc2)],
+      [true, true, true, true]);
+  }
 }
 
 console.log('\n■ 발췌기 글자 읽기 — 카드 빈칸 비평의 이름표 꼴·해·첨부 한 곳·발췌·자격 절 (2026-11-15)');

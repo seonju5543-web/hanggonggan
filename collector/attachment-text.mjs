@@ -109,20 +109,23 @@ const NOT_STUDENT_FORM = (n) => /추천서|보고서|영수증|점검표|수료\
 
 /** 첨부 하나의 행선지 — { form: 앱 신청서 칸에 둔다, notice: 카드(자격·마감·서류)를 읽는 데 쓴다, role, by: 'content'|'name' }
     name = 첨부 이름 · text = 그 파일 글자(roleText) · nameForm = 이름 규칙(data.js isApplicationForm · PDF 꼴) */
-export function attachDecision(name, text, nameForm) {
+export function attachDecision(name, text, nameForm, paidRole = null) {
   const n = String(name || '');
   const sig = docRoleSignals(text);
   let role = docRole(text, sig);
+  /* 글자로 못 가른 파일(스캔 PDF·그림)만 — 유료 첨부 판정(모델 둘이 같은 답 · collector/attach-role-read.mjs)의 답을 쓴다. 글자로 가른 것은 그대로(무료 길이 먼저) */
+  let by = 'content';
+  if (role === null && ['form', 'notice', 'mixed'].includes(paidRole)) { role = paidRole; by = 'paid'; }
   /* 이름이 공고문(공고문·요강·선발계획·업무처리기준)인데 속에 서식 표식이 있으면 **뒷장에 서식이 붙은 공고문**으로 본다 —
      통째로 신청서 칸에 올리면 공고문 전체가 '원본 양식'으로 보인다(운영지침·업무처리기준 실측). 서식 쪽은 form-pages 가 뗀다 */
   if (role === 'form' && !nameForm && (isNoticeDoc(n) || /지침|규정/.test(n))) role = 'mixed';
   /* 이름이 신청서인데 공고문 표식이 많아도 서식 표식이 하나라도 있으면 둘 다 든 한 파일이다(「선발 공지문 및 학업계획서 양식.hwpx」) */
   if (role === 'notice' && nameForm && sig.form >= 1) role = 'mixed';
-  if (role === 'form') return { form: !NOT_STUDENT_FORM(n), notice: false, role, by: 'content' };
-  if (role === 'notice') return { form: false, notice: true, role, by: 'content' };
+  if (role === 'form') return { form: !NOT_STUDENT_FORM(n), notice: false, role, by };
+  if (role === 'notice') return { form: false, notice: true, role, by };
   /* 공고문에 서식이 붙은 한 파일 — 카드는 늘 읽는다(뒷장 서식의 견본 날짜는 발췌기 annexCut 이 자른다) · 신청서 칸엔 이름이 신청서일 때만
      (아니면 서식 쪽만 form-pages 가 떼어 「공고문 안 신청서 서식」으로 보인다) */
-  if (role === 'mixed') return { form: !!nameForm && !NOT_STUDENT_FORM(n), notice: true, role, by: 'content' };
+  if (role === 'mixed') return { form: !!nameForm && !NOT_STUDENT_FORM(n), notice: true, role, by };
   return { form: !!nameForm, notice: !nameForm && isNoticeDoc(n), role: null, by: 'name' };
 }
 
