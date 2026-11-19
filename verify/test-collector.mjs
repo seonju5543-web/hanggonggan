@@ -16989,7 +16989,9 @@ console.log('■ app.js 나누기 — 떼어 낸 화면이 제자리에 실린�
   const vdir = fileURLToPath(new URL('./', import.meta.url));
   const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
   const raw = walk(vdir).filter((f) => /\.(m?js|cjs)$/.test(f) && !/app-source\.cjs$|zz-tc-tmp\.mjs$/.test(f))
-    .filter((f) => /readFileSync\([^)\n]*['"](\.\.\/)?app\.js['"]/.test(readText(f)))
+    /* readFileSync 뿐 아니라 파일마다 둔 읽기 도우미(read(root, 'app.js') · read('app.js'))도 — 2026-11-19 6단계에서
+       health-gates/ops.mjs 의 두 검사가 이 꼴로 원본만 읽어 빨개졌고, link-gates/app.mjs 의 「없어야 한다」 검사는 1단계부터 조용히 덜 보고 있었다 */
+    .filter((f) => /\b(?:readFileSync|read\w*)\(\s*(?:[\w.]+,\s*)?(?:new URL\(\s*)?['"](?:\.\.?\/)*app\.js['"]/.test(readText(f)))
     .map((f) => path.relative(vdir, f)).filter((f) => f !== 'test-collector.mjs');
   eq('검사 파일이 app.js 를 원본 그대로 읽지 않는다(verify/app-source.cjs appSource 를 쓴다)', raw, []);
 }

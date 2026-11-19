@@ -347,7 +347,7 @@ export default async function gate(eq, ctx) {
       [FIXED, true, 'https://act.or.kr/notice/view.do?id=9', FIXED, FIXED, FIXED, FIXED]);
   }
   /* 함수로 떼어 재기 어려운 자리(도우미 · 홈 사진 띠 · 제출처 열기 단추)는 글자로 — 링크 주소를 데이터 칸에서 바로 꺼내지 않는다 */
-  const appSrcD = read('app.js');
+  const appSrcD = appSrc;   // 떼어 낸 화면까지 끼운 글자(위 appSource) — 원본만 읽으면 「없어야 한다」가 덜 본다
   const chatSrcD = read('chat.js');
   eq('  링크 주소를 데이터 칸(n.url · sch.sourceUrl)에서 바로 꺼내 여는 자리가 없다 — 도우미·홈 사진 띠·제출처 열기 단추 포함',
     [(appSrcD.match(/safeUrl\((?:n|s|sch|it|item)\.(?:url|sourceUrl)\)/g) || []), /safeUrl\(ch\.url \|\| sch\.sourceUrl\)/.test(appSrcD), /safeUrl\(n\.url\)/.test(chatSrcD), /const url = chatSafe\(\(\) => safeUrl\(\(link && link\.href\) \|\| n\.url\), ''\);/.test(chatSrcD)],

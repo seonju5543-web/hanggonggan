@@ -28,6 +28,8 @@ import { stripComments } from './servers.mjs';
 
 const BASE = 'claude/nice-heisenberg-WESq5';
 const read = (root, rel) => fs.readFileSync(new URL(rel, root), 'utf8').replace(/\r/g, '');
+/* app.js 는 떼어 낸 화면(app-*.js)을 제자리에 끼운 글자로 읽는다 — 원본만 읽으면 옮겨 간 코드를 못 본다(관문 「app.js 나누기」) */
+const appText = (root) => createRequire(import.meta.url)('../app-source.cjs').appSource(root).replace(/\r/g, '');
 /** 함수 몸통 — `head` 부터 짝 맞는 `}` 까지 (못 찾으면 '') */
 function fnBody(src, head) {
   const at = src.indexOf(head);
@@ -632,7 +634,7 @@ export default async function gate(eq, ctx) {
       [!errOn || /앱 오류 기록/.test(sec), !errOn || /계정과 관계없이 전송/.test(sec)], [true, true]);
     eq('  국외 이전 — 보유·이용 기간과 받는 곳의 개인정보처리방침(연락처)을 적는다', [/보유·이용 기간/.test(sec), /supabase\.com\/privacy/.test(sec) && /cloudflare\.com\/privacypolicy/.test(sec)], [true, true]);
     eq('  기기에 남은 정보 지우는 법(공용 기기면 서류까지)을 약관이 알려 주고 · 그 선택칸이 앱에 실제로 있다',
-      [/데이터 초기화/.test(terms) && /서류 보관함 파일과 휴지통도 지우기/.test(terms), /id="wp-wipe-docs"/.test(read(root, 'app.js')) && /서류 보관함 파일과 휴지통도 지우기/.test(read(root, 'app.js'))], [true, true]);
+      [/데이터 초기화/.test(terms) && /서류 보관함 파일과 휴지통도 지우기/.test(terms), /id="wp-wipe-docs"/.test(appText(root)) && /서류 보관함 파일과 휴지통도 지우기/.test(appText(root))], [true, true]);
   }
 
   /* ── ⑬ 이용 횟수 세기 (2026-11-15 · 은서 · 사용자 트랙션 — usage-report.js · 0007_usage_counts.sql · _admin/morning.*) ──
@@ -656,7 +658,7 @@ export default async function gate(eq, ctx) {
     eq('  🔴 보고서는 열쇠가 맞을 때만 · 5건 미만은 가린다(having ≥ gate · case when ≥ gate) · 열쇠는 무작위 UUID 둘',
       [/if p_key is null or not exists \(select 1 from public\.report_keys where key = p_key\)/.test(sql), /gate integer := 5/.test(sql) && /having sum\(n\) >= gate/.test(sql) && /case when sum\(n\) >= gate/.test(sql), /gen_random_uuid\(\)::text \|\| gen_random_uuid\(\)/.test(sql)],
       [true, true, true]);
-    const app = read(root, 'app.js'); const ff = read(root, 'formfill.js'); const ur = read(root, 'usage-report.js');
+    const app = appText(root); const ff = read(root, 'formfill.js'); const ur = read(root, 'usage-report.js');
     const fired = ['detail', 'save', 'submitted', 'prep', 'onboard'].filter((e) => !new RegExp(`trackUse\\('${e}'`).test(app));
     eq('  배선 — 앱이 행동마다 센다(상세·저장·제출·신청 준비·온보딩 · 양식 열기·작성 · 원문 열기·하루 방문)',
       [fired, /trackUse\('form_open'/.test(ff) && /trackUse\('form_edit'/.test(ff), /trackUse\('source'/.test(ur) && /trackUse\('open'/.test(ur)], [[], true, true]);
