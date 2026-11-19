@@ -103,11 +103,9 @@
     <section>
       <p class="frame-title">① 홈 — 총 장학금</p>
       <div class="ctl" aria-label="시안 조절 (앱에는 없음)">
-        <span>학교</span>
-        <button class="chip" data-school="tiger" aria-pressed="true">호랑이</button>
-        <button class="chip" data-school="eagle" aria-pressed="false">독수리</button>
-        <button class="chip" data-school="lion" aria-pressed="false">사자</button>
-        <button class="chip" data-school="bull" aria-pressed="false">황소</button>
+        <span>한국외대</span>
+        <button class="chip" data-school="boo" aria-pressed="true">부 · 원작 얼굴</button>
+        <button class="chip" data-school="booCute" aria-pressed="false">부 · 더 귀엽게</button>
       </div>
       <div class="ctl" aria-label="배치 (앱에는 없음)">
         <span>배치</span>
@@ -158,7 +156,8 @@
     <h3>이 시안에서 정한 것 · 아직 안 정한 것</h3>
     <ul>
       <li>금액은 <strong>누르지 않아도 처음부터 보입니다</strong>. 누르는 것은 재미일 뿐, 정보를 숨기지 않아요.</li>
-      <li>동물은 학교 <strong>상징 동물을 새로 그린 예시</strong>예요(공식 마스코트 그림이 아님). 학교 색 목도리로 구분했어요.</li>
+      <li>홈은 한국외대 <strong>부</strong>예요 — 하늘색 달걀 몸 · 머리 위 깃 둘 · 주황 부리 · 남색 몸판/흰 소매 과잠(H). 얼굴은 원작 그대로와 더 귀여운 쪽을 바꿔 볼 수 있어요.</li>
+      <li>학교 공식 캐릭터를 앱에 싣는 것은 학교 허락이 필요해요 — 이 시안은 내부 검토용입니다.</li>
       <li>대장님은 지금 앱의 '왕눈이' 얼굴(크림색 몸 · 큰 눈 · 금색 학사모)을 그대로 입체로 옮겼어요.</li>
       <li>지금 모양은 코드로 빚은 임시 조형입니다. 최종 품질은 3D 모델 파일로 바꿔 끼우면 돼요.</li>
     </ul>
@@ -254,6 +253,8 @@
   }
 
   const SCHOOLS = {
+    boo: { name: '부', hello: '안녕, 나는 부야!', build: () => buildBoo(false) },
+    booCute: { name: '부', hello: '안녕, 나는 부야!', build: () => buildBoo(true) },
     tiger: {
       name: '호랑이', hello: '어흥!',
       build() {
@@ -324,6 +325,81 @@
       },
     },
   };
+
+  // 한국외대 '부' — 하늘색 달걀 몸 · 머리 위 깃 둘 · 주황 세모 부리 · 남색 몸판/흰 소매 과잠(H)
+  // cute=false: 원작의 무심한 흰 타원 눈 그대로 · cute=true: 눈동자를 키우고 반짝임·볼터치를 더함
+  function buildBoo(cute) {
+    const root = new T.Group(), squash = new T.Group(); root.add(squash);
+    const SKY = 0x9dd3f2, SKY_L = 0xc9e6f8, NAVY = 0x14305c, WHITE = 0xffffff, ORANGE = 0xf59a3c;
+    const H = cute ? 1.92 : 2.05, W = cute ? 0.98 : 0.92, Y0 = 0.28;
+    const rr = (t) => { t = clamp(t, 0, 1); return W * Math.pow(Math.max(0, 1 - Math.pow(Math.abs(2 * t - 1), 2.4)), 0.5) * (1 - 0.1 * t); };
+    const yy = (t) => Y0 + H * t;
+    const lathe = (t0, t1, off, m, ps, pl) => {
+      const pts = []; for (let i = 0; i <= 40; i++) { const t = lerp(t0, t1, i / 40); pts.push(new T.Vector2(Math.max(0.0001, rr(t) + off), yy(t))); }
+      return new T.Mesh(new T.LatheGeometry(pts, 56, ps || 0, pl || Math.PI * 2), m);
+    };
+    // 표면 위의 자리에 놓고 바깥을 보게
+    const place = (o, t, phi, off) => {
+      const r = rr(t) + off, e = 0.01, tilt = Math.atan2(-(rr(t + e) - rr(t - e)), H * 2 * e);
+      o.position.set(r * Math.sin(phi), yy(t), r * Math.cos(phi)); o.rotation.order = 'YXZ'; o.rotation.y = phi; o.rotation.x = -tilt; return o;
+    };
+    squash.add(lathe(0, 1, 0, mat(SKY, 0.75)));
+    squash.add(lathe(0.02, 0.6, 0.012, mat(SKY_L, 0.8), -0.55, 1.1));
+    // 과잠 — 앞이 열린 남색 몸판 · 줄무늬 시보리 · 똑딱단추 · 가슴의 H
+    const G = 0.3, navy = mat(NAVY, 0.85), white = mat(WHITE, 0.8); navy.side = T.DoubleSide;
+    squash.add(lathe(0.2, 0.64, 0.04, navy, G, Math.PI * 2 - G * 2));
+    const ring = (t, off, tube, m, dy) => {
+      const g = new T.Group(), o = new T.Mesh(new T.TorusGeometry(rr(t) + off, tube, 12, 64, Math.PI * 2 - G * 2), m);
+      o.rotation.x = Math.PI / 2; g.add(o); g.rotation.y = -(Math.PI / 2 + G); g.position.y = yy(t) + (dy || 0); squash.add(g);
+    };
+    [[0.2, 0.075], [0.64, 0.06]].forEach(([t, tube]) => { ring(t, 0.045, tube, navy); ring(t, 0.045 + tube * 0.62, 0.016, white, 0.028); ring(t, 0.045 + tube * 0.62, 0.016, white, -0.028); });
+    [0.27, 0.37, 0.47, 0.57].forEach((t) => squash.add(place(sph(0.042, white), t, G + 0.1, 0.05)));
+    const cv = document.createElement('canvas'); cv.width = cv.height = 128;
+    const cx = cv.getContext('2d'); cx.fillStyle = '#fff'; cx.font = '900 122px Rockwell, "Roboto Slab", Georgia, serif'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText('H', 64, 70);
+    const tex = new T.CanvasTexture(cv); tex.colorSpace = T.SRGBColorSpace;
+    squash.add(place(new T.Mesh(new T.PlaneGeometry(0.36, 0.36), new T.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false })), 0.5, 0.82, 0.06));
+    // 흰 소매 팔 — 어깨가 축
+    const arms = [-1, 1].map((s) => {
+      const g = new T.Group(); g.position.set(s * (rr(0.58) + 0.0), yy(0.58), 0.04);
+      g.add(sph(0.2, white, 0, -0.42, 0, 1, 2.3, 1));
+      const cuff = new T.Mesh(new T.TorusGeometry(0.14, 0.06, 10, 28), navy); cuff.rotation.x = Math.PI / 2; cuff.position.y = -0.84; g.add(cuff);
+      const st = new T.Mesh(new T.TorusGeometry(0.19, 0.014, 8, 28), white); st.rotation.x = Math.PI / 2; st.position.y = -0.84; g.add(st);
+      g.add(sph(0.16, mat(SKY, 0.75), 0, -1.0, 0, 1, 1, 0.75));
+      [-1, 0, 1].forEach((k) => g.add(sph(0.065, mat(SKY, 0.75), k * 0.09, -1.13, 0)));
+      g.userData.side = s; squash.add(g); return g;
+    });
+    [-1, 1].forEach((s) => {
+      const leg = new T.Mesh(new T.CylinderGeometry(0.06, 0.06, 0.34, 12), mat(SKY, 0.75)); leg.position.set(s * 0.22, 0.2, 0); squash.add(leg);
+      squash.add(sph(0.2, mat(ORANGE, 0.6), s * 0.22, 0.09, 0.1, 1, 0.5, 1.35));
+    });
+    // 얼굴 — 몸과 한 덩어리라 조금만 따라 본다
+    const head = new T.Group(), PY = 1.2; head.position.y = PY; squash.add(head);
+    const onFace = (o, t, phi, off) => { place(o, t, phi, off); o.position.y -= PY; head.add(o); return o; };
+    const eyes = [-1, 1].map((s) => {
+      const g = new T.Group();
+      if (cute) {
+        g.add(sph(0.17, white, 0, 0, 0, 1.15, 1, 0.3));
+        g.add(sph(0.105, mat(INK, 0.35), 0, 0, 0.035, 1, 1, 0.45));
+        const w = new T.MeshBasicMaterial({ color: 0xffffff });
+        g.add(sph(0.038, w, 0.04, 0.045, 0.085)); g.add(sph(0.018, w, -0.04, -0.04, 0.085));
+      } else {
+        g.add(sph(0.15, white, 0, 0, 0, 1.32, 0.82, 0.3));
+        g.add(sph(0.07, mat(0x4a4f58, 0.4), 0, 0, 0.03, 1.15, 0.85, 0.45));
+      }
+      return onFace(g, cute ? 0.77 : 0.79, s * (cute ? 0.36 : 0.33), -0.02);
+    });
+    const beak = new T.Mesh(new T.ConeGeometry(cute ? 0.1 : 0.085, cute ? 0.17 : 0.15, 18), mat(ORANGE, 0.5));
+    onFace(beak, cute ? 0.7 : 0.725, 0, 0.03); beak.rotateX(Math.PI / 2);
+    if (cute) [-1, 1].forEach((s) => onFace(sph(0.1, mat(0xffb3a0, 0.8), 0, 0, 0, 1.25, 0.75, 0.25), 0.7, s * 0.6, -0.01));
+    // 머리 위 깃 둘
+    const ears = [-1, 1].map((s) => {
+      const g = new T.Group(); g.position.set(s * 0.2, yy(0.975) - PY - 0.04, 0);
+      const curve = new T.QuadraticBezierCurve3(new T.Vector3(0, 0, 0), new T.Vector3(s * 0.06, 0.24, 0), new T.Vector3(s * 0.26, 0.32, 0));
+      g.add(new T.Mesh(new T.TubeGeometry(curve, 16, 0.06, 10), mat(SKY, 0.75))); g.add(sph(0.06, mat(SKY, 0.75), s * 0.26, 0.32, 0));
+      head.add(g); return g;
+    });
+    return { root, squash, head, arms, eyes, ears, look: 0.4, scale: 0.9 };
+  }
 
   // 대장님 — index.html 의 <symbol id="mascot"> ('왕눈이')를 입체로
   function buildCaptain() {
@@ -488,13 +564,14 @@
       const pop = 1 + 0.25 * Math.sin(appear * Math.PI) * (1 - appear) - Math.pow(1 - appear, 3);
       const sxz = 1 / Math.sqrt(sy);
       ch.root.position.y = y; ch.root.rotation.y = S.yaw + Math.sin(S.time * 0.8) * 0.04;
-      ch.root.scale.setScalar(Math.max(0.001, pop) * (opt.scale || 1));
+      ch.root.scale.setScalar(Math.max(0.001, pop) * (opt.scale || 1) * (ch.scale || 1));
       ch.squash.scale.set(sxz, sy, sxz);
-      shadow.scale.setScalar((1 - y * 0.45) * (opt.scale || 1));
+      shadow.scale.setScalar((1 - y * 0.45) * (opt.scale || 1) * (ch.scale || 1));
       // 시선
       S.lx = lerp(S.lx, S.lookX, 1 - Math.pow(0.002, dt)); S.ly = lerp(S.ly, S.lookY, 1 - Math.pow(0.002, dt));
-      ch.head.rotation.y = S.lx * 0.34 - S.yaw * 0.25; ch.head.rotation.x = S.ly * 0.2 + (S.tJump >= 0 && S.tJump < 0.56 ? -0.18 : 0);
-      ch.head.rotation.z = Math.sin(S.time * 1.1) * 0.03;
+      const lk = ch.look || 1;
+      ch.head.rotation.y = (S.lx * 0.34 - S.yaw * 0.25) * lk; ch.head.rotation.x = (S.ly * 0.2 + (S.tJump >= 0 && S.tJump < 0.56 ? -0.18 : 0)) * lk;
+      ch.head.rotation.z = Math.sin(S.time * 1.1) * 0.03 * lk;
       // 깜빡임
       S.blink -= dt; if (S.blink < 0) { S.blinkT = 0.14; S.blink = rand(2.2, 4.8); }
       if (S.blinkT > 0) S.blinkT -= dt;
@@ -533,7 +610,7 @@
   // ① 홈
   const TOTAL = 3524, COUNT = 15;
   const bubbleHome = document.getElementById('bubble-home'), sayHome = document.getElementById('say-home'), amountHome = document.getElementById('amount-home');
-  let school = 'tiger', homeLine = 0;
+  let school = 'boo', homeLine = 0;
   const homeLines = () => [
     `지금 신청할 수 있는 장학금이 ${COUNT}건 있어요`,
     `모두 더하면 최대 ${won(TOTAL)}이에요`,
@@ -557,7 +634,7 @@
     document.querySelectorAll('[data-layout]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
     document.getElementById('hero').classList.toggle('compact', b.dataset.layout === 'compact');
   }));
-  setSchool('tiger');
+  setSchool('boo');
 
   // ② 신청 내역
   const bubbleApps = document.getElementById('bubble-apps'), amountApps = document.getElementById('amount-apps');
