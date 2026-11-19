@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>3D 마스코트 시안 — 총 장학금 · 신청 내역 · 학교별</title>
+<!--
+  레퍼런스 시안 (2026-11-19 · 승인 전) — 앱 코드는 아직 한 줄도 바뀌지 않았다.
+  ① 홈 총 장학금: 학교 마스코트가 가운데 서고 금액은 말풍선 안에(카드·「n건 신청 준비」 버튼 없음)
+  ② 신청 내역: 대장님이 같은 방식으로 알려 준다(남색 카드 없음)
+  ③ 학교별 마스코트: kit.js(공용 부품) + mascots/*.js(학교별) · 과잠 색은 docs/designs/mascot-survey.md 「과잠 색 정하기」
+  학교 공식 캐릭터를 앱에 싣는 것은 학교 허락이 필요하다 — 내부 검토용.
+-->
+<style>
+  :root {
+    --bg: #fdfcfa; --ink: #191713; --sub: #57524a; --weak: #8b857b;
+    --line: rgba(25, 23, 19, 0.10); --navy: #222b45; --navy-2: #1b2238;
+    --gold: #d9b56a; --page: #ece8e1;
+    --font: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
+    --spring: cubic-bezier(0.34, 1.4, 0.44, 1);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--page); color: var(--ink); font-family: var(--font); letter-spacing: -0.01em; -webkit-font-smoothing: antialiased; }
+  button { font: inherit; color: inherit; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 22px 16px 60px; }
+  .intro h1 { font-size: 21px; margin: 0 0 6px; letter-spacing: -0.03em; }
+  .intro p { margin: 0; color: var(--sub); font-size: 14px; line-height: 1.55; }
+  .frames { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; margin-top: 20px; align-items: start; }
+  .frame-title { font-size: 13px; font-weight: 700; color: var(--sub); margin: 0 0 8px; }
+  .phone { background: var(--bg); border-radius: 30px; padding: 26px 20px 24px; box-shadow: 0 1px 2px rgba(58,48,28,.05), 0 14px 36px rgba(58,48,28,.12); overflow: hidden; }
+
+  /* 시안 조절 줄 — 앱에는 없는 것 */
+  .ctl { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 0 0 10px; }
+  .ctl span { font-size: 12px; color: var(--weak); margin-right: 2px; }
+  .chip { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 600; color: var(--sub); cursor: pointer; }
+  .chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+  /* ① 홈 총액 */
+  .hero { display: grid; grid-template-columns: 1fr; }
+  .stage { position: relative; height: 256px; margin: 2px -20px 0; border: 0; padding: 0; background: none; display: block; width: calc(100% + 40px); cursor: grab; touch-action: pan-y; -webkit-tap-highlight-color: transparent; outline: none; }
+  .stage:active { cursor: grabbing; }
+  .stage:focus-visible { box-shadow: inset 0 0 0 3px rgba(138,106,31,.3); border-radius: 20px; }
+  .stage canvas { width: 100%; height: 100%; display: block; }
+  .bubble { position: absolute; left: 50%; top: 6px; transform: translateX(-50%); max-width: 86%; width: max-content; background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 9px 14px; font-size: 14px; font-weight: 600; line-height: 1.4; box-shadow: 0 6px 18px rgba(58,48,28,.10); text-align: center; pointer-events: none; }
+  .bubble::after { content: ''; position: absolute; left: 50%; bottom: -6px; width: 11px; height: 11px; background: #fff; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); transform: translateX(-50%) rotate(45deg); }
+  .bubble.pop { animation: pop .34s var(--spring); }
+  @keyframes pop { from { transform: translateX(-50%) scale(.86); opacity: .2; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
+  @keyframes bump { 40% { transform: scale(1.06); } }
+  .hint { font-size: 12.5px; color: var(--weak); margin: 4px 0 0; }
+
+  /* 마스코트 중심 — 카드·버튼 없이, 금액은 마스코트의 말풍선 안에 */
+  .hero .stage { height: 372px; background: radial-gradient(60% 34% at 50% 84%, rgba(157,211,242,.30), transparent 70%); }
+  .hero .bubble { top: 4px; padding: 11px 20px 12px; border-radius: 22px; }
+  .hero .bubble .b-say { display: block; font-size: 13.5px; font-weight: 600; color: var(--sub); }
+  .hero .bubble .b-amt { display: block; font-size: 31px; font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; line-height: 1.2; white-space: nowrap; }
+  .hero .b-amt.bump { animation: bump .32s var(--spring); }
+  .hero-count { text-align: center; font-size: 15px; font-weight: 700; margin: 2px 0 0; }
+  .hero .hint { text-align: center; }
+
+  /* ② 신청 내역 */
+  .apps-head { display: flex; align-items: center; justify-content: space-between; margin: 0 0 16px; }
+  .apps-head h2 { font-size: 23px; margin: 0; letter-spacing: -0.03em; }
+  .apps-head div { display: flex; gap: 8px; }
+  .ghost { border: 1px solid var(--line); background: #fff; border-radius: 14px; padding: 9px 14px; font-size: 14px; color: var(--sub); }
+  /* 신청 내역도 마스코트 중심 — 남색 카드 없이 대장님이 말풍선으로 알려 준다 */
+  .apps .stage { height: 330px; background: radial-gradient(60% 34% at 50% 86%, rgba(217,181,106,.26), transparent 70%); }
+  .apps .bubble { top: 4px; padding: 11px 20px 12px; border-radius: 22px; }
+  .apps .bubble .b-say { display: block; font-size: 13.5px; font-weight: 600; color: var(--sub); }
+  .apps .bubble .b-amt { display: block; font-size: 31px; font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; line-height: 1.2; white-space: nowrap; }
+  .apps .b-amt.bump { animation: bump .32s var(--spring); }
+  .apps-foot { text-align: center; font-size: 12.5px; color: var(--weak); margin: 4px 0 0; line-height: 1.5; }
+  .who { text-align: center; font-size: 12.5px; color: var(--weak); margin: 0 0 2px; }
+  .pick { font: inherit; font-size: 14px; font-weight: 600; padding: 8px 10px; border-radius: 12px; border: 1px solid var(--line); background: #fff; color: var(--ink); max-width: 100%; }
+  .all h2 { font-size: 17px; margin: 30px 0 4px; letter-spacing: -0.02em; } .all p { margin: 0 0 12px; font-size: 13.5px; color: var(--sub); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 10px; }
+  .m { border: 1px solid var(--line); background: #fff; border-radius: 16px; padding: 6px 6px 9px; text-align: center; cursor: pointer; }
+  .m[aria-pressed="true"] { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+  .m img { width: 100%; aspect-ratio: 1; display: block; } .m b { display: block; font-size: 12.5px; } .m span { display: block; font-size: 11px; color: var(--weak); }
+  .row-chips { display: flex; justify-content: space-between; margin-top: 18px; }
+  .tag { border: 1px solid var(--line); border-radius: 10px; padding: 4px 9px; font-size: 12.5px; font-weight: 700; color: var(--weak); background: #fff; }
+  .tag.off { background: #efeeec; border-color: transparent; color: #b5b1aa; }
+
+  .notes { margin-top: 26px; background: #fff; border-radius: 18px; padding: 16px 18px; font-size: 13.5px; line-height: 1.6; color: var(--sub); }
+  .notes h3 { margin: 0 0 6px; font-size: 14px; color: var(--ink); }
+  .notes ul { margin: 0; padding-left: 18px; }
+  .nogl { display: none; font-size: 13px; color: var(--red, #8f3a2e); margin-top: 8px; }
+  @media (prefers-reduced-motion: reduce) { .bubble.pop, .b-amt.bump, .sum-amount.bump { animation: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="intro">
+    <h1>3D 마스코트 시안</h1>
+    <p>캐릭터를 <strong>누르면</strong> 뛰어오르며 동전이 튀고, <strong>옆으로 끌면</strong> 돌아가요. 금액과 건수는 올려 주신 화면의 숫자를 그대로 썼어요.</p>
+    <p class="nogl" id="nogl">이 화면에서는 3D(WebGL)가 켜지지 않았어요. 다른 브라우저에서 열어 주세요.</p>
+  </header>
+
+  <div class="frames">
+    <section>
+      <p class="frame-title">① 홈 — 총 장학금</p>
+      <div class="ctl" aria-label="시안 조절 (앱에는 없음)"><span>학교</span><select class="pick" id="pick" aria-label="학교 고르기"></select></div>
+      <div class="phone">
+        <div class="hero" id="hero">
+          <button class="stage" id="stage-home" aria-label="마스코트 — 누르면 동전이 나와요">
+            <canvas></canvas>
+            <span class="bubble" id="bubble-home" aria-live="polite"><span class="b-say" id="say-home"></span><strong class="b-amt" id="amount-home">최대 3,524만원</strong></span>
+          </button>
+          <p class="who" id="who"></p>
+          <p class="hero-count">지금 신청할 수 있는 장학금 15건</p>
+          <p class="hint">마스코트를 눌러 보세요</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <p class="frame-title">② 신청 내역 — 대장님</p>
+      <div class="ctl" style="visibility:hidden"><span>.</span><select class="pick"><option>.</option></select></div>
+      <div class="phone apps">
+        <div class="apps-head">
+          <h2>신청 내역</h2>
+          <div><button class="ghost">달력 보기</button><button class="ghost">선택</button></div>
+        </div>
+        <button class="stage" id="stage-apps" aria-label="대장님 — 누르면 신청 현황을 알려 줘요">
+          <canvas></canvas>
+          <span class="bubble" id="bubble-apps" aria-live="polite"><span class="b-say" id="say-apps"></span><strong class="b-amt" id="amount-apps">200만원</strong></span>
+        </button>
+        <p class="hero-count">준비 완료 1건</p>
+        <p class="apps-foot">제출·발표는 각 공식 채널에서 · 결과는 여기에 기록</p>
+        <div class="row-chips"><span class="tag">교외</span><span class="tag off">마감</span></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="all">
+    <h2>③ 학교별 마스코트 시안</h2>
+    <p>누르면 위 ① 화면의 마스코트가 바뀝니다. 과잠 몸판은 공식 그림의 색, 없으면 학교 상징색이에요.</p>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <div class="notes">
+    <h3>이 시안에서 정한 것 · 아직 안 정한 것</h3>
+    <ul>
+      <li>금액은 <strong>누르지 않아도 처음부터 말풍선 안에 보입니다</strong>. 누르는 것은 재미일 뿐, 정보를 숨기지 않아요.</li>
+      <li>카드와 「n건 신청 준비」 버튼을 없앴어요(11-19 결정). 신청 내역도 남색 카드 대신 대장님이 알려 줍니다.</li>
+      <li>모든 마스코트가 과잠을 입습니다. 원래 다른 옷이 정체성인 캐릭터(유생 옷·비행복 등)는 원작 변형이에요.</li>
+      <li>학교 공식 캐릭터를 앱에 싣는 것은 학교 허락이 필요해요 — 이 시안은 내부 검토용입니다.</li>
+      <li>지금 모양은 코드로 빚은 조형입니다. 최종 품질은 3D 모델 파일로 바꿔 끼우면 돼요.</li>
+    </ul>
+  </div>
+</div>
+
+<script src="three.min.js"></script>
+<script src="kit.js"></script>
+<script src="mascots/part-0.js"></script><script src="mascots/part-1.js"></script>
+<script src="mascots/part-2.js"></script>
+<script src="mascots/part-3.js"></script>
+<script src="mascots/part-4.js"></script>
+<script src="mascots/part-5.js"></script><script src="mascots/part-6.js"></script>
+<script>
+(function () {
+  'use strict';
+  if (!window.K) { document.getElementById('nogl').style.display = 'block'; return; }
+  const { Stage, MASCOTS, ORDER, buildCaptain, REDUCED, clamp, thumb } = K;
+  const $ = (id) => document.getElementById(id);
+  function bump(el) { el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
+  function sayIn(bubble, line, text) { line.textContent = text; bubble.classList.remove('pop'); void bubble.offsetWidth; bubble.classList.add('pop'); }
+  function countUp(el, to, fmt) {
+    if (REDUCED) { el.textContent = fmt(to); return; }
+    const t0 = performance.now(), dur = 900;
+    (function step(now) { const u = clamp((now - t0) / dur, 0, 1), e = 1 - Math.pow(1 - u, 3); el.textContent = fmt(Math.round(to * e)); if (u < 1) requestAnimationFrame(step); })(t0);
+  }
+  const won = (n) => n.toLocaleString('ko-KR') + '만원';
+
+  // ① 홈
+  const TOTAL = 3524, COUNT = 15;
+  let homeLine = 0;
+  const homeLines = [`${COUNT}건을 모두 더하면`, '마감이 가까운 것부터 챙기면', '지금 받을 수 있는 장학금은'];
+  const home = Stage($('stage-home'), {
+    stack: [1.3, 0.3], coins: 12, jump: 0.45, camY: 1.75, lookY: 1.62, dist: 6.0,
+    onTap(full) { sayIn($('bubble-home'), $('say-home'), full ? '동전이 가득 찼어요! 모두 더하면' : homeLines[homeLine++ % homeLines.length]); bump($('amount-home')); },
+  });
+  function setSchool(k) {
+    const d = MASCOTS[k]; if (!d || !home) return;
+    homeLine = 0; home.setChar(d.build());
+    $('who').textContent = `${d.school} · ${d.name}`;
+    sayIn($('bubble-home'), $('say-home'), '지금 받을 수 있는 장학금은');
+    countUp($('amount-home'), TOTAL, (n) => '최대 ' + won(n));
+    $('pick').value = k;
+    document.querySelectorAll('.m').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.k === k)));
+  }
+  ORDER.forEach((k) => { const o = document.createElement('option'); o.value = k; o.textContent = `${MASCOTS[k].school} — ${MASCOTS[k].name}`; $('pick').appendChild(o); });
+  $('pick').addEventListener('change', (e) => setSchool(e.target.value));
+  const first = new URLSearchParams(location.search).get('m');
+  setSchool(MASCOTS[first] ? first : 'hufs');
+
+  // ② 신청 내역
+  let appLine = 0;
+  const appLines = ['준비를 마친 1건이 선정되면 최대', '제출은 공식 채널에서 직접 · 예상 최대 수혜액', '결과가 나오면 여기에 적어 주세요 · 예상 최대'];
+  const apps = Stage($('stage-apps'), {
+    coins: 5, spread: 1.2, jump: 0.4, camY: 1.55, lookY: 1.42, dist: 6.8, coinY: 1.3,
+    onTap() { sayIn($('bubble-apps'), $('say-apps'), appLines[appLine++ % appLines.length]); bump($('amount-apps')); },
+  });
+  if (apps) { apps.setChar(buildCaptain()); sayIn($('bubble-apps'), $('say-apps'), '안녕하세요, 저는 대장님이에요! 예상 최대 수혜액'); countUp($('amount-apps'), 200, won); }
+
+  // ③ 학교별 — 정지 그림을 차례로 찍는다
+  const grid = $('grid'); let i = 0;
+  (function next() {
+    if (i >= ORDER.length) return;
+    const k = ORDER[i++], d = MASCOTS[k], b = document.createElement('button');
+    b.className = 'm'; b.dataset.k = k; b.setAttribute('aria-pressed', String($('pick').value === k));
+    const src = thumb(d.build, 240);
+    const im = document.createElement('img'), nm = document.createElement('b'), sc = document.createElement('span');
+    im.alt = ''; if (src) im.src = src; nm.textContent = d.name; sc.textContent = d.school; b.append(im, nm, sc);
+    b.addEventListener('click', () => { setSchool(k); $('hero').scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+    grid.appendChild(b); setTimeout(next, 0);
+  })();
+  window.__mock = { home, apps };
+})();
+</script>
+</body>
+</html>
