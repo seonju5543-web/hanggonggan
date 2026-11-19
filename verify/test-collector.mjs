@@ -5055,6 +5055,9 @@ console.log('\n■ 첨부를 내용으로 가르기 — 신청서 칸인가 카�
     [true, true, true]);
   const attIsForm = new Function('formsPdfIndex', 'isApplicationForm', `${liveSrc.match(/function attIsForm\(sch, a\) \{[\s\S]*?\n\}/)[0]}\nreturn attIsForm;`)(
     { roles: { X: { '붙임1.hwp': 'form', '특별장학금 신청서.hwp': 'notice' } } }, (a) => /신청서/.test(a.name));
+  const wsSrc = readText(new URL('what-shows.mjs', import.meta.url));
+  eq('  what-shows 가 장학 공고의 신청서 양식 칸을 말한다 — 앱 attIsForm 을 가져다 쓴다(베끼지 않는다) · 원본 PDF·서식 쪽·첨부 셋',
+    [/takeFn\('attIsForm'\)/.test(wsSrc), /function formSlotLines\(sch\)[\s\S]{0,600}appIsForm\(sch, a\)/.test(wsSrc), /for \(const l of formSlotLines\(sch\)\) console\.log\(l\)/.test(wsSrc)], [true, true, true]);
   eq('  attIsForm — roles 가 있으면 그것 · 없으면 이름 규칙',
     [attIsForm({ id: 'X' }, { name: '붙임1.hwp' }), attIsForm({ id: 'X' }, { name: '특별장학금 신청서.hwp' }), attIsForm({ id: 'Y' }, { name: '장학금 신청서.hwp' })], [true, false, true]);
 
