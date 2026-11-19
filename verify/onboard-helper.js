@@ -132,4 +132,44 @@ async function bootGone(page, timeout = 10000) {
   await page.waitForSelector('#boot', { state: 'hidden', timeout }).catch(() => {});
 }
 
-module.exports = { nextUntil, assertOwnServer, dismissNotify, webfontBanner, bootGone };
+
+/* ── ④ 시트를 아래로 쓸어 닫는 손가락 (TouchEvent) — verify-apply-prep·verify-sheet-back 이 같은 사본을 두던 것(2026-11-19) ── */
+async function swipeDown(page, sel) {
+  const at = await page.$eval(sel, (e) => { const r = e.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + 20 }; });
+  await page.evaluate(({ x, y }) => {
+    const el = document.elementFromPoint(x, y);
+    const mk = (t, cy) => new TouchEvent(t, { bubbles: true, cancelable: true,
+      touches: t === 'touchend' ? [] : [new Touch({ identifier: 1, target: el, clientX: x, clientY: cy })],
+      changedTouches: [new Touch({ identifier: 1, target: el, clientX: x, clientY: cy })] });
+    el.dispatchEvent(mk('touchstart', y));
+    el.dispatchEvent(mk('touchmove', y + 140));
+    el.dispatchEvent(mk('touchend', y + 140));
+  }, at);
+}
+
+
+/* ── ⑤ 기본 온보딩(외대 · 인문 · 3학년 · 평점 3.8) — verify-chat·verify-notify 가 같은 사본을 두던 것(2026-11-19) ── */
+async function onboardBasic(page) {
+  await page.click('.onboard-step[data-step="0"] [data-next]');
+  await page.fill('#in-school', '외대');
+  await page.waitForSelector('.ac-list:not([hidden]) .ac-item');
+  await page.click('.ac-list:not([hidden]) .ac-item');
+  await page.waitForSelector('#campus-field:not([hidden])');
+  await page.click('#in-campus .chip:nth-child(1)');
+  await page.click('#in-track .chip[data-value="humanities"]');
+  await page.fill('#in-name', '이선주');
+  await page.click('#in-year .chip[data-value="3"]');
+  await page.click('#in-status .chip[data-value="재학"]');
+  await page.click('.onboard-step[data-step="1"] [data-next]');
+  await page.fill('#in-gpa', '3.8');
+  await page.selectOption('#in-bracket', '4');
+  await page.selectOption('#in-region', '서울');
+  await page.click('.onboard-step[data-step="2"] [data-next]');
+  /* 단계 번호를 박지 말 것 — 온보딩이 4단계에서 6단계가 되며 이 검사가 죽어 있었다 */
+  await nextUntil(page, '#btn-finish-onboard');
+  await page.click('#btn-finish-onboard');
+  await page.waitForSelector('#screen-home:not([hidden])');
+}
+
+
+module.exports = { nextUntil, assertOwnServer, dismissNotify, webfontBanner, bootGone, swipeDown, onboardBasic };

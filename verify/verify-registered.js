@@ -1,5 +1,5 @@
 const { chromium } = require('playwright-core');
-const { assertOwnServer } = require('./onboard-helper.js');
+const { assertOwnServer, dismissNotify } = require('./onboard-helper.js');
 /* 표본을 언제·무엇으로 심는가는 open-form-sample.cjs 한 곳 — 관문(verify/health-gates/ci.mjs)이 같은 함수를 브라우저 없이 잰다 */
 const { shouldPlantSample, openFormSample } = require('./open-form-sample.cjs');
 const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
@@ -12,14 +12,6 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
    검사 도중에 뒤늦게 떠서 화면을 덮고, 그때부터 모든 클릭이 막힌다 —
    이 드라이버가 오래 빨간불이던 진짜 원인이다(CLAUDE.md 14차 세션 기록).
    그래서 **뜰 때까지 기다렸다가** 치운다. verify-chat.js와 같은 방식. */
-async function dismissNotify(page) {
-  await page.waitForSelector('#notify-sheet:not([hidden])', { timeout: 6000 }).catch(() => {});
-  const later = await page.$('#btn-nf-later');
-  if (later) await later.click().catch(() => {});
-  else await page.keyboard.press('Escape');
-  await page.waitForSelector('#notify-sheet[hidden]', { timeout: 4000 }).catch(() => {});
-  await page.waitForTimeout(300);
-}
 
 async function driveAnyLiveForm(page) {
   await page.click('.nav-item[data-nav="explore"]');

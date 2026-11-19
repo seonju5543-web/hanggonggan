@@ -68,7 +68,7 @@
 import fs from 'node:fs';
 import { chromium } from 'playwright';
 import { cleanTitle } from './clean-title.mjs';
-import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, rowMatchesTitle, rowByCore, rowDetailCandidates, observeLanding, otherTitlesOnSite, cleanStoredUrl } from './detail-url.mjs';
+import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, rowMatchesTitle, rowByCore, rowDetailCandidates, observeLanding, otherTitlesOnSite, cleanStoredUrl, scrapeForms } from './detail-url.mjs';
 /* 🔴 '이 주소를 열면 그 공고가 뜨는가'는 **공용 판정 한 곳**(link-landing.mjs judgeLanding)으로 본다 (2026-10-03).
    예전 verify() 는 제 규칙을 따로 들고 있다가 ① 로그인 벽을 제목보다 먼저 봐서 머리의 회원 로그인 상자 때문에
    멀쩡한 전북·부경 공고를 떨어뜨렸고 ② 목록 판정에 빈 목록을 받아 진짜 목록을 통과시켰다.
@@ -446,12 +446,7 @@ async function scrapeRows(page) {
     src: [e.getAttribute('onclick') || '', e.getAttribute('href') || '', e.getAttribute('data-id') || ''].join('|'),
   })).filter((x) => x.t.length >= 6 && x.t.length <= 160)).catch(() => []);
 }
-async function scrapeForms(page) {
-  return page.evaluate(() => [...document.querySelectorAll('form')].slice(0, 4).map((f) => ({
-    action: f.getAttribute('action') || '',
-    fields: [...f.querySelectorAll('input,select')].map((i) => `${i.name}=${i.value}`).filter((x) => !x.startsWith('=')).slice(0, 16).join('&'),
-  }))).catch(() => []);
-}
+
 /* 다음 묶음 단추('다음'·'›'·'»'·'next')가 화면에 있나 — 쪽 번호가 10개씩 묶인 게시판은 11쪽 번호가 안 보여도 목록의 끝이 아니다 */
 async function hasNextControl(page) {
   /* 마지막 쪽에서도 꺼진 '다음' 단추를 그대로 두는 게시판이 있다 — 그때도 '더 있을 수 있음'으로 본다(내려갔다고 잘못 말하지 않는 쪽) */

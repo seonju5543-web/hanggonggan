@@ -10,7 +10,7 @@
    실행: python3 -m http.server 8123 & 후 node verify/verify-notify.js */
 const { chromium } = require('playwright-core');
 const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
-const { nextUntil, assertOwnServer } = require('./onboard-helper.js');
+const { nextUntil, assertOwnServer, onboardBasic: onboard } = require('./onboard-helper.js');
 const EXE = process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 /* 우리 코드의 잘못이 아닌 콘솔 메시지는 빼고 센다.
    · Failed to load resource — 드라이버가 일부러 없는 파일을 부르는 경우
@@ -82,27 +82,6 @@ const SPY = () => {
   }
 };
 
-async function onboard(page) {
-  await page.click('.onboard-step[data-step="0"] [data-next]');
-  await page.fill('#in-school', '외대');
-  await page.waitForSelector('.ac-list:not([hidden]) .ac-item');
-  await page.click('.ac-list:not([hidden]) .ac-item');
-  await page.waitForSelector('#campus-field:not([hidden])');
-  await page.click('#in-campus .chip:nth-child(1)');
-  await page.click('#in-track .chip[data-value="humanities"]');
-  await page.fill('#in-name', '이선주');
-  await page.click('#in-year .chip[data-value="3"]');
-  await page.click('#in-status .chip[data-value="재학"]');
-  await page.click('.onboard-step[data-step="1"] [data-next]');
-  await page.fill('#in-gpa', '3.8');
-  await page.selectOption('#in-bracket', '4');
-  await page.selectOption('#in-region', '서울');
-  await page.click('.onboard-step[data-step="2"] [data-next]');
-  /* 단계 번호를 박지 말 것 — 온보딩이 4단계에서 6단계가 되며 이 검사들이 죽어 있었다 */
-  await nextUntil(page, '#btn-finish-onboard');
-  await page.click('#btn-finish-onboard');
-  await page.waitForSelector('#screen-home:not([hidden])');
-}
 
 (async () => {
   /* 🔴 재기 전에 **이 서버가 내 앱인지** 확인한다 — 아니면 여기서 멈춘다.

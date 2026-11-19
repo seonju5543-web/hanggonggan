@@ -33,7 +33,7 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { decodeUrlEntities, linkShape, expectTitles, BAD } from './link-landing.mjs';
 import { sameTitle, titleFingerprint } from './detail-url.mjs';
-import { kosafAppItem, kosafTitles, kosafAttachTitles } from './link-candidates.mjs';
+import { kosafAppItem, kosafTitles, kosafAttachTitles, rootDir } from './link-candidates.mjs';
 
 /* 앱과 같은 파일 — 바로잡은 원문(⑥)을 고르는 규칙을 베끼지 않는다 */
 const SL = createRequire(import.meta.url)('../source-link.js');
@@ -78,11 +78,7 @@ export function kstToday(now = Date.now()) {
   return new Date(now + 9 * 3600000).toISOString().slice(0, 10);
 }
 
-function rootDir(root) {
-  if (root instanceof URL) return fileURLToPath(root);
-  const s = String(root || '.');
-  return s.startsWith('file:') ? fileURLToPath(s) : path.resolve(s);
-}
+
 function readJson(file, fallback) {
   try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return fallback; }
 }

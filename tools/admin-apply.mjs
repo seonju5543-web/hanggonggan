@@ -21,7 +21,7 @@ import { createRequire } from 'node:module';
 import * as canon from '../collector/canon-url.mjs';
 import { indexTexts, sourceFor, hasText, evidenceExcerpts } from '../collector/notice-source.mjs';
 import { attachmentText, readable } from '../collector/attachment-text.mjs';
-import { periodAfterDeadline, amountAfterValue, needsBulkExpect, cleanExcerpts, ELIG_KEYS } from './edit-diff.mjs';   // 자격 칸 목록은 edit-diff 한 곳(화면 미리보기와 저장이 갈라지지 않게 · 2026-11-18)
+import { periodAfterDeadline, amountAfterValue, needsBulkExpect, cleanExcerpts, ELIG_KEYS, cleanLines } from './edit-diff.mjs';   // 자격 칸 목록은 edit-diff 한 곳(화면 미리보기와 저장이 갈라지지 않게 · 2026-11-18)
 import { newsPostKey } from '../collector/news-board-rules.mjs';   // 소식 숨김 열쇠 한 곳 (수집 로봇의 newsHidden 과 같다)
 import { thumbKey, isThumbPath } from '../collector/news-thumb.mjs';   // 소식 썸네일 열쇠·꼴 한 곳 (썸네일 로봇과 같다)
 import { urlKey } from '../collector/url-key.mjs';
@@ -171,11 +171,6 @@ const isDay = (v) => {
 };
 
 /* 사람이 읽는 자격 문장 — 줄 수·길이에 상한을 둔다(브라우저에서 오는 값을 믿지 않는다) */
-function cleanLines(v) {
-  const arr = Array.isArray(v) ? v : String(v || '').split('\n');
-  return arr.map((x) => String(x).replace(/\s+/g, ' ').trim()).filter(Boolean).slice(0, 20)
-    .map((x) => x.slice(0, 300));
-}
 
 /* ── 저장된 공고 원문 — '이 문장이 정말 원문에 있나'를 확인할 때만 읽는다 ───────────
    🔴 근거를 안 보고 켜는 칸을 만들면 운영 원칙 8-1(추론 금지)이 그 자리에서 깨진다.
