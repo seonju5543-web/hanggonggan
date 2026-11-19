@@ -19,17 +19,29 @@
    🔴 DOC_PDF_AS_LIB=1 이면 본편을 건너뛴다(관문이 함수만 부른다). DOC_PDF_ROOT 로 저장소를 바꿔 끼운다(관문 임시 폴더).
    실행: node collector/doc-pdf.mjs [--dry] [--today=YYYY-MM-DD]
    ============================================================ */
-import { cleanAttachName } from './form-rules.mjs';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { cleanAttachName, attachExt, loadFormRules } from './form-rules.mjs';
+import { resolveJsDownload, isHtmlPayload } from './attachment-link.mjs';
+import { FETCH_HEADERS } from './http-headers.mjs';
+import { attachmentText } from './attachment-text.mjs';
 
 /* form-pdf.mjs 는 불러오는 순간 본편이 돈다 — 순수 함수만 쓰도록 표시를 먼저 세우고 동적으로 부른다(deepfetch 와 같은 길) */
 process.env.FORM_PDF_AS_LIB = '1';
 const FP = await import('./form-pdf.mjs');
 
+const HERE = fileURLToPath(new URL('.', import.meta.url));
 export const OFFICE_DOC = /\.(hwp|hwpx|doc|docx)$/i;
 export const KEEP_MIN = 0.98;        // 원본 글자 중 PDF 에 남아야 하는 몫(개수 기준) — 신청서 사본 51개 실측은 전부 1(11-20)
 export const MIN_CHARS = 50;         // 이보다 원본 글자가 적으면 잴 수 없다(그림 문서) — 사본은 두고 리포트에 센다
 export const REST_DAYS = 3;          // 받기·변환에 실패한 첨부는 사흘 쉰다
 export const FETCH_TIMEOUT_MS = 30000;
+/* 변환 시간 예산(초) — deep-fetch 단계 시한 안에 스스로 끝낸다 · 넘으면 남은 것은 다음 실행이 잇는다(form-pdf 와 같은 셈) */
+export const BUDGET_SEC = Number(process.env.DOC_PDF_BUDGET_SEC || 240);
+const MAX_FETCH_BYTES = 15 * 1024 * 1024;
 
 /* 한 공고의 첨부 가운데 한글·워드인 것 — 본문 사진은 첨부가 아니다 · 아이콘 꼬리를 뗀 이름으로 한 번만 */
 function officeAtts(atts, { skipForm = false, isApplicationForm = () => false } = {}) {
@@ -69,8 +81,9 @@ function tally(text) {
   for (const ch of String(text || '').normalize('NFC')) if (/[가-힣0-9]/.test(ch)) m.set(ch, (m.get(ch) || 0) + 1);
   return m;
 }
-/** 원본 글자 중 PDF 에 남은 몫(0~1) — 원본 글자가 MIN_CHARS 보다 적으면 null(잴 수 없다) */
+/** 원본 글자 중 PDF 에 남은 몫(0~1) — 원본 글자가 MIN_CHARS 보다 적거나 PDF 글자를 못 뽑았으면(null) null(잴 수 없다) */
 export function keptRatio(origText, pdfText) {
+  if (pdfText == null) return null;   // 🔴 '못 뽑음'은 '글자 0'이 아니다 — pdftotext 가 없는 날 사본이 전부 버려지지 않게(관문이 잰다)
   const o = tally(origText);
   let n = 0;
   for (const c of o.values()) n += c;
@@ -88,4 +101,170 @@ export function resting(tried, key, today, restDays = REST_DAYS) {
   if (!at) return false;
   const d = dayDiff(at, today);
   return Number.isFinite(d) && d < restDays;
+}
+
+/* ── 글자 뽑기 (글자 대조의 두 쪽) ───────────────────────────────────────────── */
+/** 원본 글자 — HWP 는 hwp-bodytext.py 가 본문을 <파일>.body.txt 로 남기게 한 뒤 attachmentText 로 읽는다(그 함수가 .body.txt 를 먼저 본다).
+ *  HWPX·DOCX 는 attachmentText 가 바로 읽는다 · 그 밖(.doc)은 '' — 잴 수 없다. 🔴 늘 임시 폴더의 사본에 부른다(저장소에 .body.txt 를 흘리지 않게) */
+export function defaultOrigText(src) {
+  const ext = (String(src).match(/\.(\w+)$/) || [, ''])[1].toLowerCase();
+  if (ext === 'hwp') {
+    spawnSync('python3', [path.join(HERE, 'hwp-bodytext.py'), path.dirname(src)], { encoding: 'utf8', timeout: 60000 });
+    return attachmentText(src);
+  }
+  return ext === 'hwpx' || ext === 'docx' ? attachmentText(src) : '';
+}
+/** PDF 글자 — poppler 의 pdftotext · 도구가 없거나 못 읽으면 null(잴 수 없다 · 사본은 둔다) */
+export function defaultPdfText(pdfPath) {
+  const r = spawnSync('pdftotext', ['-enc', 'UTF-8', pdfPath, '-'], { encoding: 'utf8', timeout: 60000, maxBuffer: 64 * 1024 * 1024 });
+  return r.error || r.status !== 0 ? null : (r.stdout || '');
+}
+
+/* ── 한 첨부 → PDF 한 장 ─────────────────────────────────────────────────────── */
+async function makeOne({ t, f, file, root, outDir, today, fetchImpl, convert, origText, pdfText }) {
+  const work = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-pdf-'));   // 받은 원본은 여기에만 — 커밋하지 않는다
+  try {
+    let src;
+    if (f.src) {
+      const from = path.join(root, f.src);
+      if (!fs.existsSync(from)) return { ok: false, why: '원본 사본 없음' };
+      src = path.join(work, `src.${(f.src.match(/\.(\w+)$/) || [, 'bin'])[1].toLowerCase()}`);
+      fs.copyFileSync(from, src);
+    } else {
+      /* 게시판 내려받기 스크립트(javascript:…)는 확인한 사이트만 진짜 주소로 푼다(attachment-link.mjs) — 못 풀면 짐작하지 않는다 */
+      const url = /^javascript:/i.test(f.url || '') ? resolveJsDownload(f.url, t.pageUrl) : f.url;
+      if (!url) return { ok: false, why: '주소 없음' };
+      let res;
+      try { res = await fetchImpl(url, { redirect: 'follow', headers: FETCH_HEADERS, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) }); }
+      catch (e) { return { ok: false, why: `받기 실패(${[e && e.name, e && e.cause && (e.cause.code || e.cause.message)].filter(Boolean).join(' · ').slice(0, 80) || '오류'})` }; }
+      if (!res.ok) return { ok: false, why: `HTTP ${res.status}` };
+      const buf = Buffer.from(await res.arrayBuffer());
+      if (buf.length < 1000 || buf.length > MAX_FETCH_BYTES) return { ok: false, why: `크기 밖(${Math.round(buf.length / 1024)}KB)` };
+      if (isHtmlPayload(buf)) return { ok: false, why: '받은 것이 웹페이지(로그인·차단 화면일 수 있다)' };
+      const ext = attachExt(f.name, buf);
+      if (!/^(hwp|hwpx|doc|docx)$/.test(ext)) return { ok: false, why: `한글·워드가 아님(${ext})` };
+      src = path.join(work, `src.${ext}`);
+      fs.writeFileSync(src, buf);
+    }
+    const out = path.join(outDir, file);
+    const r = convert(src, out, { soffice: process.env.DOC_PDF_SOFFICE || process.env.FORM_PDF_SOFFICE || 'soffice', name: f.name });
+    if (!r || !r.ok) return { ok: false, why: (r && r.why) || '변환 실패' };
+    const ratio = keptRatio(origText(src), pdfText(out));
+    if (ratio != null && ratio < KEEP_MIN) {
+      try { fs.rmSync(out, { force: true }); } catch { /* 무시 */ }
+      return { ok: false, why: `글자 빠짐(${Math.floor(ratio * 100)}%)` };
+    }
+    return { ok: true, entry: { file, name: f.name, pages: r.pages, bytes: r.bytes, fonts: FP.FONT_STAMP, kept: ratio == null ? null : Math.round(ratio * 1000) / 1000, at: today } };
+  } finally {
+    try { fs.rmSync(work, { recursive: true, force: true }); } catch { /* 무시 */ }
+  }
+}
+
+export function buildDocReport({ today, targets, done, failed, skipped, rested, unchecked, dropped, left, budgetSec }) {
+  const L = [];
+  const files = targets.reduce((n, t) => n + t.files.length, 0);
+  L.push(`## 📄 공고문 → PDF 리포트 (${today})`, '');
+  L.push('마감 전 공고의 한글·워드 첨부(신청서 제외 · 층2 재단 공고문은 전부)를 글자 하나 안 바꾸고 PDF 로 바꿔 `data/docs-pdf/` 에 둡니다(마감 뒤 지움).');
+  L.push(`🔴 원본 한글·숫자의 ${Math.round(KEEP_MIN * 100)}% 이상이 PDF 에 남은 것만 둡니다(글자 대조) — 못 바꾸거나 빠진 것은 앱에 원본만 보입니다.`, '');
+  L.push(`대상 공고 ${targets.length}건 · 파일 ${files}개 — 이번에 바꿈 ${done.length} · 이미 있어 건너뜀 ${skipped} · 못 바꿈 ${failed.length} · 쉬는 중 ${rested} · 대조 안 함 ${unchecked.length} · 마감 지나 지움 ${dropped.length}건${left.length ? ` · ⏰ 예산(${budgetSec}초)이 다 돼 남김 ${left.length}개(다음 실행이 잇는다)` : ''}`, '');
+  if (failed.length) {
+    const by = new Map();
+    for (const f of failed) { const k = f.why.replace(/\(\d+%\)$/, '(…%)').replace(/\(\d+KB\)$/, '(…KB)'); by.set(k, (by.get(k) || 0) + 1); }
+    L.push('### 못 바꾼 것 (이유별 · 사흘 쉬고 다시)');
+    [...by].sort((a, b) => b[1] - a[1]).forEach(([w, n]) => L.push(`- ${w}: ${n}개`));
+    failed.slice(0, 30).forEach((f) => L.push(`  - ${f.id} · ${f.name} — ${f.why}`));
+    L.push('');
+  }
+  if (unchecked.length) { L.push(`### 글자 대조를 못 한 사본 — ${unchecked.length}개 (그림 문서·.doc·PDF 글자 도구 없음 · 사본은 둠)`); unchecked.slice(0, 30).forEach((u) => L.push(`- ${u.id} · ${u.name}`)); L.push(''); }
+  if (dropped.length) { L.push(`### 마감이 지나 지운 공고 — ${dropped.length}건`); dropped.slice(0, 30).forEach((d) => L.push(`- ${d}`)); L.push(''); }
+  return L.join('\n');
+}
+
+/* ── 본편 ─────────────────────────────────────────────────────────────────── */
+export async function runDocPdf({ root, today, dry = false, budgetSec = BUDGET_SEC, fetchImpl = fetch, convert = FP.convertOne,
+  origText = defaultOrigText, pdfText = defaultPdfText, isApplicationForm = null, log = console.log } = {}) {
+  const readJson = (rel, fallback) => { try { return JSON.parse(fs.readFileSync(path.join(root, rel), 'utf8')); } catch { return fallback; } };
+  const isApp = isApplicationForm || loadFormRules(root).isApplicationForm;
+  const targets = pickDocTargets({
+    registered: (readJson('data/registered.json', {}) || {}).items || [],
+    activities: FP.loadActivities(root),
+    kosaf: (readJson('data/kosaf-open.json', {}) || {}).items || [],
+  }, { today, isApplicationForm: isApp });
+  const outDir = path.join(root, 'data', 'docs-pdf');
+  const indexPath = path.join(outDir, 'index.json');
+  const prev = readJson('data/docs-pdf/index.json', null);
+  const index = { updatedAt: today, items: {}, tried: {} };
+  if (prev && prev.items && typeof prev.items === 'object') index.items = prev.items;
+  if (prev && prev.tried && typeof prev.tried === 'object') index.tried = prev.tried;
+  const live = new Set(targets.map((t) => t.id));
+  const dropped = dry ? Object.keys(index.items).filter((id) => !live.has(id)) : FP.prune(index, live, outDir);
+  if (!dry) for (const k of Object.keys(index.tried)) if (!live.has(k.slice(0, k.indexOf('|')))) delete index.tried[k];   // 대상에서 빠진 공고의 실패 장부도 지운다
+  const done = []; const failed = []; const left = []; const unchecked = [];
+  let skipped = 0; let rested = 0;
+  const t0 = Date.now();
+  /* 🔴 남은 예산이 파일 하나의 최대 시간(받기 + 변환)보다 적으면 시작하지 않는다 — 단계 시한에 끊기지 않게(form-pdf 11-19 사고와 같은 셈) */
+  const overBudget = () => (Date.now() - t0) / 1000 + (FETCH_TIMEOUT_MS + FP.SOFFICE_TIMEOUT_MS) / 1000 > budgetSec;
+  /* 🔴 넘어져도 지금까지 바꾼 것은 남는다 — 색인은 파일 하나 끝날 때마다 쓴다 */
+  const flush = () => { if (dry) return; fs.mkdirSync(outDir, { recursive: true }); index.updatedAt = today; fs.writeFileSync(indexPath, JSON.stringify(index, null, 1) + '\n'); };
+  for (const t of targets) {
+    const have = index.items[t.id] || [];
+    const next = [];
+    for (let i = 0; i < t.files.length; i += 1) {
+      const f = t.files[i];
+      const file = `${t.id}/${i + 1}-${FP.safeName(f.name)}.pdf`;
+      const key = `${t.id}|${f.name}`;
+      const exists = (h) => h.name === f.name && h.file === file && fs.existsSync(path.join(outDir, h.file));
+      const same = have.find((h) => exists(h) && h.fonts === FP.FONT_STAMP);
+      if (same) { next.push(same); skipped += 1; continue; }
+      const stale = have.find(exists);   // 글꼴 도장만 다른 옛 사본 — 새로 못 만들면 그대로 둔다(줄이 사라지지 않게)
+      if (resting(index.tried, key, today)) { rested += 1; if (stale) next.push(stale); continue; }
+      if (dry) { log(`[dry] ${t.id} · ${f.name}`); continue; }
+      if (overBudget()) { left.push({ id: t.id, name: f.name }); if (stale) next.push(stale); continue; }
+      const r = await makeOne({ t, f, file, root, outDir, today, fetchImpl, convert, origText, pdfText });
+      if (r.ok) {
+        next.push(r.entry);
+        delete index.tried[key];
+        done.push({ id: t.id, name: f.name });
+        if (r.entry.kept == null) unchecked.push({ id: t.id, name: f.name });
+      } else {
+        index.tried[key] = { at: today, why: r.why };
+        failed.push({ id: t.id, name: f.name, why: r.why });
+        if (stale) next.push(stale);
+      }
+      index.items[t.id] = next.slice();
+      flush();
+    }
+    if (dry) continue;
+    if (next.length) index.items[t.id] = next; else delete index.items[t.id];
+    /* 그 공고 폴더에서 색인에 없는 파일(첨부가 빠지거나 차례가 바뀐 옛 결과)은 지운다 — 폴더째 지우는 prune 이 못 보는 고아 */
+    const dir = path.join(outDir, t.id);
+    if (fs.existsSync(dir)) {
+      const keep = new Set(next.map((h) => path.basename(h.file)));
+      for (const fn of fs.readdirSync(dir)) if (!keep.has(fn)) { try { fs.rmSync(path.join(dir, fn), { recursive: true, force: true }); } catch { /* 무시 */ } }
+      if (!next.length) { try { fs.rmSync(dir, { recursive: true, force: true }); } catch { /* 무시 */ } }
+    }
+    flush();
+  }
+  const report = buildDocReport({ today, targets, done, failed, skipped, rested, unchecked, dropped, left, budgetSec });
+  if (!dry) {
+    flush();
+    fs.mkdirSync(path.join(root, 'collector'), { recursive: true });
+    fs.writeFileSync(path.join(root, 'collector', 'doc-pdf-report.md'), report + '\n');
+  }
+  log(report);
+  return { targets, done, failed, skipped, rested, unchecked, dropped, left, index };
+}
+
+if (!process.env.DOC_PDF_AS_LIB) {
+  const argv = process.argv.slice(2);
+  const flag = (k) => { const a = argv.find((x) => x === `--${k}` || x.startsWith(`--${k}=`)); return a ? (a.includes('=') ? a.slice(a.indexOf('=') + 1) : true) : null; };
+  const root = process.env.DOC_PDF_ROOT ? path.resolve(process.env.DOC_PDF_ROOT) : path.resolve(HERE, '..');
+  const kst = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
+  const r = await runDocPdf({ root, today: String(flag('today') || kst), dry: flag('dry') === true });
+  /* 🔴 한글·워드를 하나도 못 바꿨는데 변환기가 못 읽은 것이 있으면 빨간불로 끝낸다(form-pdf 와 같은 규칙) — 보강 단계라 경보 짝이 이슈를 연다 */
+  const officeFails = r.failed.filter((f) => /변환기가 못 읽음/.test(f.why || '')).length;
+  if (flag('dry') !== true && officeFails > 0 && !r.done.length) {
+    console.error(`::error::공고문 → PDF — 변환기(LibreOffice+H2Orestart)가 ${officeFails}개를 못 읽고 한 개도 못 바꿨습니다. 리포트의 '변환기가 못 읽음' 줄을 보세요.`);
+    process.exit(3);
+  }
 }

@@ -16984,10 +16984,81 @@ console.log('■ 공고문 PDF 사본 — 고르기 · 글자 대조 · 쉼 (202
       [DP.keptRatio(T, T), DP.keptRatio(T, `${T} 머리말 1`), DP.keptRatio(T, [...T].reverse().join(''))], [1, 1, 1]);
     eq('  한글이 일부 빠지면 기준 아래 · 원본 글자가 50자 미만이면 잴 수 없다(null)',
       [DP.keptRatio(T, T.slice(7)) < DP.KEEP_MIN, DP.keptRatio('가나다 123', '')], [true, null]);
+    /* 🔴 PDF 글자를 못 뽑은 것(null · pdftotext 없음)은 '잴 수 없음'이지 '글자 0%'가 아니다 — 섞으면 도구 하나 빠진 날 사본이 전부 버려진다 */
+    eq('  PDF 글자를 못 뽑았으면(null) 잴 수 없다 · 뽑았는데 비었으면("") 0', [DP.keptRatio(T, null), DP.keptRatio(T, '')], [null, 0]);
     eq('  기준 숫자(통과 비율 · 잴 수 있는 최소 글자 · 쉼 날수)', [DP.KEEP_MIN, DP.MIN_CHARS, DP.REST_DAYS], [0.98, 50, 3]);
     eq('③ 실패한 첨부는 사흘 쉰다 — 이틀 전 실패는 쉬는 중 · 사흘 전은 다시 · 기록 없으면 다시',
       [DP.resting({ 'a|b': { at: '2026-11-18' } }, 'a|b', today), DP.resting({ 'a|b': { at: '2026-11-17' } }, 'a|b', today), DP.resting({}, 'a|b', today)],
       [true, false, false]);
+
+    /* ④ 본편 — 임시 저장소 · 가짜 받기·변환기·글자 뽑기(인터넷·LibreOffice 없이) */
+    eq('④ 본편 함수가 있다', typeof DP.runDocPdf, 'function');
+    if (typeof DP.runDocPdf === 'function') {
+      const FPm = await import('../collector/form-pdf.mjs');
+      const root = fs.mkdtempSync(path.join(os.tmpdir(), 'docpdf-'));
+      const put = (rel, body) => { fs.mkdirSync(path.dirname(path.join(root, rel)), { recursive: true }); fs.writeFileSync(path.join(root, rel), body); };
+      const L2NAME = '※ 2026 (재)빛고을 공고.hwpx';
+      put('data/registered.json', JSON.stringify({ items: [
+        { id: 'r1', name: '가 장학', deadline: '2026-12-01', sourceUrl: 'https://x.ac.kr/v?id=1', attachments: [{ name: '공고문.hwp', url: 'https://x.ac.kr/f/1' }, { name: '안내.docx', url: 'https://x.ac.kr/f/2' }] },
+        { id: 'r9', name: '스크립트 주소', deadline: '2026-12-01', sourceUrl: 'https://z.ac.kr/v', attachments: [{ name: '요강.hwp', url: "javascript:fnDown('1')" }] },
+      ] }));
+      put('data/activities.json', JSON.stringify({ items: [] }));
+      put('data/kosaf-open.json', JSON.stringify({ items: [{ code: '123', due: '2026-12-01', files: [{ name: L2NAME, path: 'data/kosaf-files/123/a.hwpx' }] }] }));
+      put('data/kosaf-files/123/a.hwpx', 'PK fake hwpx');
+      put('data/docs-pdf/old/1-x.pdf', '%PDF old');                               // 마감 지나 목록에서 빠진 공고의 옛 사본
+      put('data/docs-pdf/index.json', JSON.stringify({ items: { old: [{ file: 'old/1-x.pdf', name: 'x.hwp', fonts: FPm.FONT_STAMP }] }, tried: {} }));
+      put('data/forms-pdf/keep/1-form.pdf', '%PDF form');                         // 남의 폴더 — 손대면 안 된다
+      const T = '가나다라마바사아자차카타파하'.repeat(5) + '2026';
+      const calls = [];
+      let respond = () => ({ ok: true, status: 200, body: Buffer.alloc(2000, 0x41) });
+      const fetchImpl = async (url) => { calls.push(url); const r = respond(url); return { ok: r.ok, status: r.status, arrayBuffer: async () => r.body }; };
+      const convert = (src, out) => { fs.mkdirSync(path.dirname(out), { recursive: true }); fs.writeFileSync(out, '%PDF-1.4 fake'); return { ok: true, out, pages: 1, bytes: 13 }; };
+      let pdfText = () => T;
+      const base = { root, isApplicationForm, fetchImpl, convert, origText: () => T, pdfText: (p) => pdfText(p), log: () => {} };
+      respond = (url) => (url.endsWith('/f/2') ? { ok: true, status: 200, body: Buffer.from(`<!doctype html><html>${'x'.repeat(2000)}</html>`) } : { ok: true, status: 200, body: Buffer.alloc(2000, 0x41) });
+      const r1 = await DP.runDocPdf({ ...base, today: '2026-11-20' });
+      const idx1 = JSON.parse(fs.readFileSync(path.join(root, 'data/docs-pdf/index.json'), 'utf8'));
+      eq('⑤ 첫 실행 — 층1 첨부는 받아서 · 층2 는 사본에서 바꿔 색인에 싣는다(대조 1) · 받기는 층1 두 번뿐(스크립트 주소는 못 풀어 안 받는다)',
+        [Object.keys(idx1.items).sort(), (idx1.items.r1 || []).map((e) => [e.name, e.file, e.kept, e.fonts === FPm.FONT_STAMP]), calls.length],
+        [['kosaf-123', 'r1'], [['공고문.hwp', 'r1/1-공고문.pdf', 1, true]], 2]);
+      eq('  층2 이름의 ※·괄호·띄어쓰기는 파일 이름에서 안전한 글자로(safeName) · 앱에는 첨부 이름 그대로',
+        (idx1.items['kosaf-123'] || []).map((e) => [e.file, e.name]), [[`kosaf-123/1-${FPm.safeName(L2NAME)}.pdf`, L2NAME]]);
+      eq('  받은 것이 웹페이지면 버리고 · 주소를 못 풀면 「주소 없음」 — 둘 다 실패 장부에 오늘 날짜',
+        [/웹페이지/.test(((idx1.tried || {})['r1|안내.docx'] || {}).why || ''), ((idx1.tried || {})['r9|요강.hwp'] || {}).why || '', ((idx1.tried || {})['r1|안내.docx'] || {}).at || ''],
+        [true, '주소 없음', '2026-11-20']);
+      eq('  마감 지나 빠진 공고의 사본·색인은 지우고 · 남의 폴더(data/forms-pdf)는 그대로 · 리포트를 남긴다',
+        [fs.existsSync(path.join(root, 'data/docs-pdf/old')), 'old' in idx1.items, fs.existsSync(path.join(root, 'data/forms-pdf/keep/1-form.pdf')), fs.existsSync(path.join(root, 'collector/doc-pdf-report.md'))],
+        [false, false, true, true]);
+      eq('  돌려준 숫자 — 바꿈 2 · 실패 2', [r1.done.length, r1.failed.length], [2, 2]);
+      calls.length = 0;
+      const r2 = await DP.runDocPdf({ ...base, today: '2026-11-21' });
+      eq('⑥ 이튿날 — 이미 바꾼 둘은 받지도 않고 건너뛰고 · 실패한 둘은 쉬는 중이라 안 두드린다(받기 0번)', [calls.length, r2.skipped, r2.rested], [0, 2, 2]);
+      /* 글자 대조 — 80% 만 남은 PDF 는 버린다 · 잴 수 없으면(null) 사본은 두고 센다 */
+      fs.writeFileSync(path.join(root, 'data/docs-pdf/index.json'), JSON.stringify({ items: {}, tried: {} }));
+      pdfText = () => T.slice(0, Math.floor(T.length * 0.8));
+      const r3 = await DP.runDocPdf({ ...base, today: '2026-11-25' });
+      const idx3 = JSON.parse(fs.readFileSync(path.join(root, 'data/docs-pdf/index.json'), 'utf8'));
+      eq('⑦ 글자가 빠진 PDF 는 버린다 — 색인에 없고 · 파일도 지우고 · 이유에 「글자 빠짐(nn%)」',
+        [Object.keys(idx3.items).length, fs.existsSync(path.join(root, 'data/docs-pdf/r1/1-공고문.pdf')), r3.failed.filter((f) => /^글자 빠짐\(\d+%\)$/.test(f.why)).length],
+        [0, false, 2]);
+      fs.writeFileSync(path.join(root, 'data/docs-pdf/index.json'), JSON.stringify({ items: {}, tried: {} }));
+      pdfText = () => null;
+      const r4 = await DP.runDocPdf({ ...base, today: '2026-11-25' });
+      eq('  PDF 글자를 못 뽑으면(pdftotext 없음) 잴 수 없음 — 사본은 두고 「대조 안 함」으로 센다',
+        [r4.done.length, r4.unchecked.length, (JSON.parse(fs.readFileSync(path.join(root, 'data/docs-pdf/index.json'), 'utf8')).items.r1 || [])[0]?.kept], [2, 2, null]);
+      fs.writeFileSync(path.join(root, 'data/docs-pdf/index.json'), JSON.stringify({ items: {}, tried: {} }));
+      pdfText = () => T;
+      respond = () => ({ ok: false, status: 404, body: Buffer.alloc(0) });
+      calls.length = 0;
+      await DP.runDocPdf({ ...base, today: '2026-11-25' });
+      const idx5 = JSON.parse(fs.readFileSync(path.join(root, 'data/docs-pdf/index.json'), 'utf8'));
+      eq('⑧ 404 는 「HTTP 404」 로 적고 사흘 쉰다', [((idx5.tried || {})['r1|공고문.hwp'] || {}).why], ['HTTP 404']);
+      const beforeDry = fs.readFileSync(path.join(root, 'data/docs-pdf/index.json'), 'utf8');
+      calls.length = 0;
+      await DP.runDocPdf({ ...base, today: '2026-11-30', dry: true });
+      eq('⑨ --dry 는 받지도 쓰지도 않는다', [calls.length, fs.readFileSync(path.join(root, 'data/docs-pdf/index.json'), 'utf8') === beforeDry], [0, true]);
+      fs.rmSync(root, { recursive: true, force: true });
+    }
   }
 }
 
