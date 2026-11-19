@@ -29,7 +29,7 @@ const ME = require('../match-engine.js');
 /* 앱처럼 받은 데이터를 **받는 순간** 씻는다(깨진 글자 · app.js tidyData — 2026-11-17). 카드 읽기를 얹고 찾기 전에 — 앱도 두 파일을 씻은 뒤 applyCardRead 한다(리뷰).
    앱 소스의 그 줄들을 떼어 쓴다(베끼지 않는다 · 관문 「깨진 글자 씻기」와 같은 자르기) */
 const tidyData = (() => {
-  const src = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+  const src = require('./app-source.cjs').appSource();
   const line = (re) => (src.match(re) || [''])[0];
   const fn = (n) => { const a = src.indexOf(`function ${n}(`); return a < 0 ? '' : src.slice(a, src.indexOf('\n}\n', a) + 2); };
   return new Function([line(/const ENTITIES = \{[^\n]+\};/), line(/const ENTITY_RE = [^\n]+;/), fn('unent'), line(/const JUNK_CHARS = [^\n]+;/), line(/const OCR_URL_GARBLE = [^\n]+;/),
@@ -105,7 +105,7 @@ if (hits.length > CAP) {
    ⚠️ 두 함수 사이를 잘라 오지 않는다 — 순서가 바뀌거나 사이에 주석 한 줄만 들어가도
       엉뚱한 곳을 자른다(리뷰가 재현했다: 10만 자를 자르거나 0자를 자른다).
       이 파일의 최상위 함수는 열 0의 `function 이름(` 으로 시작해 열 0의 `}` 로 끝난다. */
-const appSrc = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+const appSrc = require('./app-source.cjs').appSource();
 function takeFn(name) {
   const re = new RegExp(`^function ${name}\\([\\s\\S]*?^\\}`, 'm');
   const m = appSrc.match(re);
@@ -413,7 +413,7 @@ if (feedMode && !showFeedLinks(q)) {
    🔴 못 찾으면 **지어내지 않고 그렇게 말한다** — 이 도구의 존재 이유가 '화면에 실제로
       무엇이 보이는가'를 틀리지 않게 답하는 것이라, 모르면서 아는 척하면 도구가 해롭다. */
 function cautionText(kind) {
-  const src = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+  const src = require('./app-source.cjs').appSource();
   const from = src.indexOf('dp-note dp-caution');
   const to = from < 0 ? -1 : src.indexOf('id="btn-apply-one"', from);
   const seg = from >= 0 && to > from ? src.slice(from, to) : '';

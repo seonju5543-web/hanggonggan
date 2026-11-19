@@ -115,7 +115,6 @@ const EXT_FRESH_MAX = 20;
 const EXT_CAP = 200;
 /* 메뉴/공고 판정은 clean-title.mjs의 isMenuEntry 한 곳에만 둔다 — 브라우저 수집기와 갈라지면
    같은 게시판을 두 로봇이 다르게 읽는다(2026-08-02 '…안내' 공고 대량 유실 사고) */
-const ATTACH_RE = /\.(hwp|hwpx|doc|docx|pdf|xls|xlsx)(\?|$)/i;
 /* 접수 기간 한 줄을 뽑는 규칙은 collector/deadline-hint.mjs 한 곳 — 브라우저 수집기와 공용이다.
    여기 정규식을 되살리지 말 것(두 벌이 갈라져 학생 화면에 게시판 껍데기가 떴다 · 2026-09-12). */
 
@@ -295,6 +294,14 @@ const results = [];
 const freshAll = [];
 /* 이번 실행에 받은 상세 화면 줄 글자 — 글 객체 → 글자 (저장하지 않는다 · 아래 '껍데기를 걷은 본문' 단락이 쓴다 · 2026-10-05 점검 collect-04·07) */
 const runBodies = new Map();
+/* 공고 하나의 상세를 읽어 본문(이번 실행 장부)·첨부·기간 힌트를 붙인다 — 장학·대외활동·재단 공고가 같은 4줄을 세 번 두던 것(2026-11-19) */
+async function readDetailInto(it) {
+  const detail = await fetchDetail(it);
+  if (detail.text) runBodies.set(it, detail.text);   // 껍데기를 걷은 기간 힌트·본문 마감은 발행 단계에서(이번 실행의 같은 호스트 글까지 배운 뒤)
+  it.attachments = detail.attachments;
+  it.deadlineHint = detail.deadlineHint;
+  return detail;
+}
 /* 대외활동·공모전 — 전용 게시판의 상태와 이번에 새로 주운 글. 장학 results 와 분리해 두는 이유:
    health.json(연속 실패 장부)은 prune-health.mjs 가 schools.json 이름으로 고아를 지우므로
    전용 게시판을 거기 섞으면 매 실행 지워진다. 전용 게시판 상태는 리포트에만 적는다. */
@@ -370,10 +377,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
       const freshA = actItems.filter((i) => !seenAct[urlKey(i.url)]).slice(0, ACT_FRESH_MAX);
       for (const it of freshA) {
         if (ctx.dead) return;
-        const detail = await fetchDetail(it);
-        if (detail.text) runBodies.set(it, detail.text);
-        it.attachments = detail.attachments;
-        it.deadlineHint = detail.deadlineHint;
+        const detail = await readDetailInto(it);
         /* 원문 발췌 (2026-09-29) — 모집기간→마감일(장학과 같은 규칙) · 활동기간·대상·혜택·주최·인원은 원문 문장 그대로. 없으면 비운다 */
         const ex = activityExcerpts(detail.text);
         if (ex.deadline) it.deadline = ex.deadline;
@@ -412,10 +416,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
       const freshE = extItems.filter((i) => !seenExt[urlKey(i.url)]).slice(0, EXT_FRESH_MAX);
       for (const it of freshE) {
         if (ctx.dead) return;
-        const detail = await fetchDetail(it);
-        if (detail.text) runBodies.set(it, detail.text);
-        it.attachments = detail.attachments;
-        it.deadlineHint = detail.deadlineHint;
+        const detail = await readDetailInto(it);
         const exd = activityExcerpts(detail.text);   // 재단 공고도 마감일은 같은 규칙으로 읽는다 (발췌 줄은 장학 카드가 아니라 안 싣는다)
         if (exd.deadline) it.deadline = exd.deadline;
         it.school = '';
@@ -448,10 +449,7 @@ async function harvestBoard(s, ctx = { dead: false }) {
     // 상세 페이지 방문: 첨부양식·마감 단서 수집
     for (const it of fresh) {
       if (ctx.dead) return;
-      const detail = await fetchDetail(it);
-      if (detail.text) runBodies.set(it, detail.text);   // 껍데기를 걷은 기간 힌트·본문 마감은 아래 발행 단계에서(이번 실행의 같은 호스트 글까지 배운 뒤)
-      it.attachments = detail.attachments;
-      it.deadlineHint = detail.deadlineHint;
+      const detail = await readDetailInto(it);
       it.school = s.school;
       it.campus = s.campus === '공통' ? '' : s.campus;
       it.foundAt = new Date().toISOString().slice(0, 10);

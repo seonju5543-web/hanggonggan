@@ -12,7 +12,7 @@
    실행: python3 -m http.server 8123 & 후 node verify/verify-chat.js */
 const { chromium } = require('playwright-core');
 const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
-const { nextUntil, assertOwnServer } = require('./onboard-helper.js');
+const { nextUntil, assertOwnServer, onboardBasic: onboard, dismissNotify } = require('./onboard-helper.js');
 const EXE = (process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome');
 const IGNORE_CONSOLE = /Failed to load resource|does not support the Push API in incognito/;
 const BASE = `http://localhost:${PORT}`;
@@ -23,39 +23,11 @@ const ok = (cond, label, extra) => {
   if (!cond) fail++;
 };
 
-async function onboard(page) {
-  await page.click('.onboard-step[data-step="0"] [data-next]');
-  await page.fill('#in-school', '외대');
-  await page.waitForSelector('.ac-list:not([hidden]) .ac-item');
-  await page.click('.ac-list:not([hidden]) .ac-item');
-  await page.waitForSelector('#campus-field:not([hidden])');
-  await page.click('#in-campus .chip:nth-child(1)');
-  await page.click('#in-track .chip[data-value="humanities"]');
-  await page.fill('#in-name', '이선주');
-  await page.click('#in-year .chip[data-value="3"]');
-  await page.click('#in-status .chip[data-value="재학"]');
-  await page.click('.onboard-step[data-step="1"] [data-next]');
-  await page.fill('#in-gpa', '3.8');
-  await page.selectOption('#in-bracket', '4');
-  await page.selectOption('#in-region', '서울');
-  await page.click('.onboard-step[data-step="2"] [data-next]');
-  /* 단계 번호를 박지 말 것 — 온보딩이 4단계에서 6단계가 되며 이 검사가 죽어 있었다 */
-  await nextUntil(page, '#btn-finish-onboard');
-  await page.click('#btn-finish-onboard');
-  await page.waitForSelector('#screen-home:not([hidden])');
-}
 
 /* 알림 동의 시트는 온보딩이 끝나고 **2.9초 뒤에** 뜬다(app.js). 그래서 온보딩 직후에 한 번
    보고 없으면 넘어가면, 검사 도중에 시트가 뒤늦게 떠서 화면을 덮고 그때부터 클릭이 전부 막힌다
    (verify-registered.js가 이 문제로 오래 빨간불이었다 — CLAUDE.md 14차 세션 기록).
    그래서 **뜰 때까지 기다렸다가** 치운다. */
-async function dismissNotify(page) {
-  await page.waitForSelector('#notify-sheet:not([hidden])', { timeout: 6000 }).catch(() => {});
-  const later = await page.$('#btn-nf-later');
-  if (later) await later.click().catch(() => {});
-  else await page.keyboard.press('Escape');
-  await page.waitForSelector('#notify-sheet[hidden]', { timeout: 4000 }).catch(() => {});
-}
 
 async function ask(page, q) {
   await page.fill('#chat-input', q);

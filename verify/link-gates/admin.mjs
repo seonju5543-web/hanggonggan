@@ -62,7 +62,7 @@ export default async function gate(eq, ctx) {
   }
   eq('  층2 모양은 앱(kosafAsScholarships)과 같은 칸 — id · sourceKind · 재단 홈 · 마감 = due',
     (({ id, sourceKind, sourceUrl, deadline }) => [id, sourceKind, sourceUrl, deadline])(LF.linkItemOf('kosaf', kraw)), ['kosaf-0001', 'kosaf', 'https://found.or.kr', '2026-11-30']);
-  const appJs = fs.readFileSync(new URL('app.js', ctx.root), 'utf8');
+  const appJs = createRequire(import.meta.url)('../app-source.cjs').appSource(ctx.root);
   eq('  (앱이 정말 그 칸으로 만든다 — 모양이 갈라지면 바로잡기가 조용히 안 걸린다)',
     [/id: `kosaf-\$\{i\.code\}`/.test(appJs) || /`kosaf-\$\{i\.code\}`/.test(appJs), /deadline: i\.due \|\| null/.test(appJs), /sourceUrl: i\.home \|\| ''/.test(appJs), /sourceKind: 'kosaf'/.test(appJs)], [true, true, true, true]);
 

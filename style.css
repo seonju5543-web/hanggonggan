@@ -5348,3 +5348,13 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
 /* 입력 안전장치 (2026-11-17 · input-guard.js) — 받을 수 없는 값을 친 칸을 잠깐 빨갛게.
    🔴 전역 appearance:none·칸별 테두리 규칙보다 이겨야 해서 !important — 잠깐 뜨고 사라지는 표시라 다른 규칙과 다툴 일이 없다 */
 input.guard-bad { border-color: var(--red) !important; background: var(--red-weak) !important; }
+
+/* 로그인·가입·비밀번호 재설정 시트 간격 (2026-11-19 개발자 지시)
+   제목 아래를 띄운다 · 칸 이름(이메일·비밀번호)은 입력 상자에 붙이고 칸끼리는 띄운다 ·
+   큰 버튼 둘(로그인/회원가입 · 재설정 메일 보내기/로그인으로 돌아가기) 사이에도 간격. 아래 회색 부연 문구는 없앴다. */
+.auth-sheet .sheet-title { margin-bottom: var(--space-32); }
+.auth-sheet .auth-lead { margin-top: calc(-1 * var(--space-20)); margin-bottom: var(--space-24); }
+.auth-sheet .field { margin-bottom: var(--space-20); }
+.auth-sheet .field-label { margin-bottom: var(--space-6); }
+.auth-sheet .auth-row { margin-bottom: var(--space-24); }
+.auth-sheet #btn-auth-go { margin-bottom: var(--space-12); }

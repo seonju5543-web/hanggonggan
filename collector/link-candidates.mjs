@@ -312,7 +312,7 @@ export function hostsInText(text) {
 }
 
 /* ── 색인: 앱이 받는 파일 → 바로잡을 공고 ───────────────────────────── */
-function rootDir(root) {
+export function rootDir(root) {
   if (root instanceof URL) return fileURLToPath(root);
   const s = String(root || '.');
   return s.startsWith('file:') ? fileURLToPath(s) : path.resolve(s);

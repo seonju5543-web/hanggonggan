@@ -211,21 +211,22 @@ var NOTIFY_RULES = (function () {
         push({
           key: 'new:batch:' + ymd(now) + ':' + fresh.length,
           type: 'newMatch',
-          title: '새 장학 공고 ' + fresh.length + '건',
+          title: '새 장학금 ' + fresh.length + '건 확인하기',
           body: fresh.slice(0, 2).map(function (s) { return s.name; }).join(', ')
-            + ' 외 ' + (fresh.length - 2) + '건 · 내 조건에 맞는 공고',
+            + ' 외 ' + (fresh.length - 2) + '건',
           url: './?screen=explore',
         });
       } else {
         fresh.forEach(function (s) {
           var d = daysUntil(s.deadline, now);
+          /* 문구는 2026-11-19 개발자 선택 C안(할 일이 맨 앞 · 짧게) — 제목 '공고 이름 · D-n', 본문 '내 조건에 맞아요 · 금액'.
+             금액·마감은 **아는 것만** 적는다 (2026-11-15 · 개발자 결정 11-02 — 예전 '금액 원문 확인 · 마감 원문 확인'). 금액 '모름' 표시는 화면과 같은 규칙으로 뺀다 */
+          var amt = (s.amount && !/원문 확인|미확인|확인\s?필요|에서 확인/.test(s.amount)) ? s.amount : '';
           push({
             key: 'new:' + s.id,
             type: 'newMatch',
-            title: '새 장학 공고 · ' + s.name,
-            /* 금액·마감은 **아는 것만** 적는다 (2026-11-15 · 개발자 결정 11-02 — 예전 '금액 원문 확인 · 마감 원문 확인'). 금액 '모름' 표시는 화면과 같은 규칙으로 뺀다 */
-            body: [(s.amount && !/원문 확인|미확인|확인\s?필요|에서 확인/.test(s.amount)) ? s.amount : '',
-              d != null ? (d === 0 ? '오늘 마감' : '마감 D-' + d) : ''].filter(Boolean).join(' · ') || '내 조건에 맞는 공고',
+            title: s.name + (d != null ? ' · ' + (d === 0 ? '오늘 마감' : 'D-' + d) : ''),
+            body: ['내 조건에 맞아요', amt].filter(Boolean).join(' · '),
             schId: s.id,
           });
         });
@@ -251,11 +252,10 @@ var NOTIFY_RULES = (function () {
         push({
           key: 'dl:' + s.id + ':' + d,
           type: 'deadline',
-          title: (d === 1 ? '내일 마감 · ' : '오늘 마감 · ') + s.name,
-          body: app
-            ? '준비해 둔 서류로 ' + (d === 1 ? '내일' : '오늘') + ' 안에 제출하세요.'
-            : (d === 1 ? '아직 신청 준비 전 · 지금 준비하면 내일 제출 가능.'
-                       : '오늘이 마지막 날 · 지금 바로 준비.'),
+          /* 잠금화면에서 첫 몇 글자로 알아보게 '내일/오늘 마감 —' 을 맨 앞에(C안) · 공고 이름은 본문 */
+          title: (d === 1 ? '내일 마감 — ' : '오늘 마감 — ')
+            + (app ? '제출만 남았어요' : (d === 1 ? '지금 준비하기' : '지금 확인하기')),
+          body: s.name,
           schId: s.id,
         });
       });
@@ -272,8 +272,8 @@ var NOTIFY_RULES = (function () {
         push({
           key: d === 0 ? 'sub:' + s.id + ':last' : 'sub:' + s.id,
           type: 'submit',
-          title: '제출 기록 없음 · ' + s.name,
-          body: '마감 ' + (d === 0 ? '당일' : 'D-' + d) + ' · 제출을 마쳤다면 앱에 기록.',
+          title: s.name + ' 제출 완료 표시하기',
+          body: '마감 ' + (d === 0 ? '당일' : 'D-' + d) + ' · 이미 냈다면 한 번만 눌러 주세요.',
           schId: s.id,
         });
       });
@@ -313,7 +313,7 @@ var NOTIFY_RULES = (function () {
       push({
         key: 'feed:' + ymd(now) + ':' + freshNotices.length,
         type: 'feed',
-        title: profile.school + ' 새 공고 ' + freshNotices.length + '건',
+        title: profile.school + ' 새 장학 공고 ' + freshNotices.length + '건 보기',
         body: freshNotices[0].title
           + (freshNotices.length > 1 ? ' 외 ' + (freshNotices.length - 1) + '건' : ''),
         url: './?screen=explore',
@@ -331,8 +331,8 @@ var NOTIFY_RULES = (function () {
         push({
           key: 'res:' + s.id,
           type: 'result',
-          title: '결과 기록하기 · ' + s.name,
-          body: '접수 마감 후 2주 경과. 선정 결과를 앱에 기록하면 신청 내역이 정확해져요.',
+          title: s.name + ' 결과 기록하기',
+          body: '마감 후 2주가 지났어요.',
           schId: s.id,
         });
       });

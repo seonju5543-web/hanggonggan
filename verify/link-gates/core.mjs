@@ -162,7 +162,7 @@ export default async function gate(eq, ctx) {
      기간 한 줄이 달린 게시판 글에서 `hintText is not defined` 로 넘어졌다 · 그 꼴의 글이 없는 날엔 조용하다).
      실데이터 없이 글자로만 잰다: 떼어 오는 함수 몸에 나오는 app.js 최상위 const 이름이 목록에 없으면 실패. */
   {
-    const appSrc = fs.readFileSync(new URL('app.js', ctx.root), 'utf8');
+    const appSrc = createRequire(import.meta.url)('../app-source.cjs').appSource(ctx.root);
     const ws = fs.readFileSync(new URL('verify/what-shows.mjs', ctx.root), 'utf8');
     const linkBlock = ws.slice(ws.indexOf('vm.runInContext([', ws.indexOf('const linkCtx')), ws.indexOf("'app.js(링크 자리)'"));
     const listOf = (re) => [...linkBlock.matchAll(re)].flatMap((m) => [...m[1].matchAll(/'([A-Za-z_$][\w$]*)'/g)].map((x) => x[1]));
@@ -207,7 +207,7 @@ export default async function gate(eq, ctx) {
     const feedN = (r) => r.events.filter((e) => e.type === 'feed').map((e) => e.title);
     eq('⑨ 같은 공고의 주소가 고쳐져도 새 공고로 다시 울리지 않는다(제목 열쇠) · 열쇠 없던 옛 장부도(수집일이 지난 확인보다 이틀 앞) · 진짜 새 공고는 운다',
       [feedN(r1).length, feedN(r2), feedN(legacy), feedN(r3)],
-      [1, [], [], ['가천대학교 새 공고 1건']]);
+      [1, [], [], ['가천대학교 새 장학 공고 1건 보기']]);
   }
   /* ⑩ 확인 로봇 첫 실행(2026-10-04 02:55)의 오판 둘 — 정찰(run-probe 2026-10-03 · run 37142940191)이 연 진짜 화면 글자로 잰다.
      ⓐ 서울과기대 상세(do=commonview): 제목이 머리글이 아니라 표의 「제목」 칸에 있고 화면에 다른 글 제목이 여럿 → 'list' 로 오판했다.

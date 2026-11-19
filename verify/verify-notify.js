@@ -10,7 +10,7 @@
    실행: python3 -m http.server 8123 & 후 node verify/verify-notify.js */
 const { chromium } = require('playwright-core');
 const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
-const { nextUntil, assertOwnServer } = require('./onboard-helper.js');
+const { nextUntil, assertOwnServer, onboardBasic: onboard } = require('./onboard-helper.js');
 const EXE = process.env.CHROME_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 /* 우리 코드의 잘못이 아닌 콘솔 메시지는 빼고 센다.
    · Failed to load resource — 드라이버가 일부러 없는 파일을 부르는 경우
@@ -82,27 +82,6 @@ const SPY = () => {
   }
 };
 
-async function onboard(page) {
-  await page.click('.onboard-step[data-step="0"] [data-next]');
-  await page.fill('#in-school', '외대');
-  await page.waitForSelector('.ac-list:not([hidden]) .ac-item');
-  await page.click('.ac-list:not([hidden]) .ac-item');
-  await page.waitForSelector('#campus-field:not([hidden])');
-  await page.click('#in-campus .chip:nth-child(1)');
-  await page.click('#in-track .chip[data-value="humanities"]');
-  await page.fill('#in-name', '이선주');
-  await page.click('#in-year .chip[data-value="3"]');
-  await page.click('#in-status .chip[data-value="재학"]');
-  await page.click('.onboard-step[data-step="1"] [data-next]');
-  await page.fill('#in-gpa', '3.8');
-  await page.selectOption('#in-bracket', '4');
-  await page.selectOption('#in-region', '서울');
-  await page.click('.onboard-step[data-step="2"] [data-next]');
-  /* 단계 번호를 박지 말 것 — 온보딩이 4단계에서 6단계가 되며 이 검사들이 죽어 있었다 */
-  await nextUntil(page, '#btn-finish-onboard');
-  await page.click('#btn-finish-onboard');
-  await page.waitForSelector('#screen-home:not([hidden])');
-}
 
 (async () => {
   /* 🔴 재기 전에 **이 서버가 내 앱인지** 확인한다 — 아니면 여기서 멈춘다.
@@ -181,8 +160,8 @@ async function onboard(page) {
        버튼이 아니라 **전달 정책**이다: 권한이 없으면 휴대폰 알림은 안 나가고 알림함에는 쌓인다.
        그래서 버튼이 부르던 것과 **같은 함수**를 직접 부른다. 버튼이 다시 생겨도 안 깨진다. */
     await page.evaluate(async () => {
-      const ev = { key: 'test:' + Date.now(), type: 'newMatch', title: '한대장 테스트 알림',
-        body: '알림 도착 예시', url: './?screen=notifications' };
+      const ev = { key: 'test:' + Date.now(), type: 'newMatch', title: '테스트 알림 — 잘 도착했어요',
+        body: '실제 알림에는 공고 이름과 마감일이 들어가요.', url: './?screen=notifications' };
       NOTIFY_RULES.pushToInbox(notifyLedger, [ev], Date.now());
       await notifyDeliver([ev]);
       await notifySaveLedger();
@@ -284,19 +263,19 @@ async function onboard(page) {
       eligibility: { schoolOnly: '한국외국어대학교', minGpa: 4.45 },
     });
     const n = await notifyCheck({ quiet: true });
-    return { delivered: n, os: window.__notifs, inbox: notifyLedger.inbox.map((i) => ({ type: i.type, title: i.title })) };
+    return { delivered: n, os: window.__notifs, inbox: notifyLedger.inbox.map((i) => ({ type: i.type, title: i.title, text: i.title + ' ' + (i.body || '') })) };
   });
 
   const types = injected.inbox.map((i) => i.type);
   ok(types.includes('newMatch'), '조건 1 — 새 공고 알림 발생', injected.inbox.map((i) => i.title));
   ok(types.includes('deadline'), '조건 2 — 마감 하루 전 알림 발생', injected.inbox.map((i) => i.title));
-  ok(injected.inbox.some((i) => /내일 마감/.test(i.title) && /내일마감/.test(i.title)), '마감 알림 제목에 공고 이름과 "내일 마감" 표기');
-  ok(!injected.inbox.some((i) => /요건미달/.test(i.title)), '자격 미달 공고는 알리지 않음', injected.inbox.map((i) => i.title));
+  ok(injected.inbox.some((i) => /^내일 마감/.test(i.title) && /내일마감/.test(i.text)), '마감 알림 제목 맨 앞에 "내일 마감" · 본문에 공고 이름 (2026-11-19 C안)');
+  ok(!injected.inbox.some((i) => /요건미달/.test(i.text)), '자격 미달 공고는 알리지 않음', injected.inbox.map((i) => i.title));
   ok(injected.os.length > 0, `휴대폰 알림이 실제로 호출됨 (${injected.os.length}건)`, injected.os.map((o) => o.title));
   ok(injected.os.every((o) => o.data && o.data.url), '알림에 열 화면 주소가 담김', injected.os[0]);
-  ok(injected.inbox.filter((i) => /내일마감 장학금/.test(i.title)).length === 1,
+  ok(injected.inbox.filter((i) => /내일마감 장학금/.test(i.text)).length === 1,
     '같은 공고로 알림이 두 번 가지 않음 (새 공고 알림에 마감일이 이미 담겨 있으면 마감 알림 생략)',
-    injected.inbox.filter((i) => /내일마감 장학금/.test(i.title)).map((i) => i.title));
+    injected.inbox.filter((i) => /내일마감 장학금/.test(i.text)).map((i) => i.text));
 
   // ⑤ 배지 · 알림함
   await page.click('.nav-item[data-nav="home"]');

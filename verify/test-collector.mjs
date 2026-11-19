@@ -19,7 +19,15 @@ import { diffPatch } from '../tools/edit-diff.mjs';
    같은 계열의 수리: 2026-09-05 `검사 5건이 개발자 컴퓨터에서만 실패하고 있었다`(URL.pathname).
    🔴 파일이나 core.autocrlf 를 건드리지 말 것 — 저장소 전 파일이 '바뀐 것'으로 보여 통째로 충돌한다.
       고칠 곳은 **읽는 쪽**이고, 그 자리는 여기 하나다. */
-const readText = (u) => fs.readFileSync(u, 'utf8').replace(/\r\n/g, '\n');
+/* app.js 를 읽으면 떼어 낸 화면 파일을 제자리에 끼운 글자를 준다(표시 줄이 있을 때만 · 2026-11-19 app.js 나누기) —
+   파일 목록을 돌며 `readText(new URL(f, root))` 로 읽는 검사까지 놓치지 않게 여기 한 곳에서. 표시가 없는 app.js(검사가 만든 가짜 저장소)는 그대로 */
+const readText = (u) => {
+  const raw = fs.readFileSync(u, 'utf8');
+  const p = u instanceof URL ? fileURLToPath(u) : String(u);
+  const whole = /(^|[\\/])app\.js$/.test(p) && raw.includes('검사는 verify/app-source.cjs 가 이 자리에 다시 끼워 읽는다 @@')
+    ? createRequire(import.meta.url)('./app-source.cjs').appSource(path.dirname(p)) : raw;
+  return whole.replace(/\r\n/g, '\n');
+};
 // 하트비트 순수 함수 — 예약 간격 계산은 한 곳에만 둔다 (2026-09-06)
 import { hoursFor, cronsOf, isStale, countField, runsPerWeek, everyWords, latestSuccessIso, newerIso } from '../collector/robot-heartbeat.mjs';
 /* 🔴 URL 을 파일 경로로 쓸 때는 .pathname 이 아니라 fileURLToPath 다.
@@ -42,6 +50,7 @@ import { publishMajorsBySchool } from '../collector/publish-majors.mjs';
 import { pageCandidates, pageUrl, existingPageParam, samePage, shouldRetry } from '../collector/paginate.mjs';
 import { looseCandidate, sameNotice, findMissing, classifyMiss, coverageOf, rollingCoverage, looksLikeBoardChrome, looksLikeAttachmentName, dedupeNear } from '../collector/coverage-rules.mjs';
 import { createRequire } from 'node:module';
+const { appSource } = createRequire(import.meta.url)('./app-source.cjs');   // app.js 를 글자로 읽는 검사는 이것으로(나눈 화면을 제자리에 끼운 글자 · 2026-11-19)
 import { isAttachmentEntry, isHtmlPayload } from '../collector/attachment-link.mjs';
 import { isDetailUrl, isMarkerUrl, markerTitle, sameTitle, titleCore, rowByCore, detailCandidates, looksLikeLoginWall, rowDetailCandidates } from '../collector/detail-url.mjs';
 import { cleanTitle, isMenuEntry } from '../collector/clean-title.mjs';
@@ -1360,7 +1369,7 @@ console.log('\n■ 나중에 신청서가 붙은 공고도 양식 대기줄에 �
 console.log('\n■ 신청 준비 시작 버튼 — 양식이 없어도 곧장 \'준비 완료\'로 새지 않는다 (2026-09-23)');
 {
   /* app.js 의 **진짜 함수**를 이름으로 떼어 가짜 이웃과 함께 돌린다(사본을 재면 원본이 바뀌어도 초록이다). */
-  const appSrc = readText(new URL('../app.js', import.meta.url));
+  const appSrc = appSource();
   const take = (name) => {
     const s = appSrc.indexOf(`function ${name}(`);
     if (s < 0) throw new Error(`app.js 에서 ${name} 을 못 찾음`);
@@ -1490,7 +1499,7 @@ console.log('\n■ 공고별 지원문서 — 앱 양식이 없는 등록 공고
     (() => { const t = eng.buildPrepTemplate({ ...withAtt, sourceKind: 'kosaf' }); return [t.prepKind, /선발 공고문/.test(t.lead), /그대로 제출/.test(t.lead)]; })(), ['kosaf', true, false]);
   eq('  prepDoc(원문 확인)은 층2보다도 앞이다', eng.buildPrepTemplate({ ...base, sourceKind: 'kosaf', prepDoc: true }).prepKind, 'free');
   eq('  앱은 층2 항목에도 붙인다(kosafAsScholarships → attachPrepTemplate) · 다시 받으면 지운다',
-    (() => { const aj = readText(new URL('../app.js', import.meta.url)); return [/\.map\(attachPrepTemplate\);/.test(aj.slice(aj.indexOf('function kosafAsScholarships('))), /startsWith\('prep:kosaf-'\)\) delete FORM_TEMPLATES\[k\]/.test(aj)]; })(), [true, true]);
+    (() => { const aj = appSource(); return [/\.map\(attachPrepTemplate\);/.test(aj.slice(aj.indexOf('function kosafAsScholarships('))), /startsWith\('prep:kosaf-'\)\) delete FORM_TEMPLATES\[k\]/.test(aj)]; })(), [true, true]);
   const t3 = eng.buildPrepTemplate({ ...base, documents: ['자기소개서 (자유 양식, A4 1장)', '학업계획서', '성적증명서 1부', '재학증명서 (자동 제출)'] });
   eq('  공고가 이름 붙인 작성형 서류마다 절 하나 — 절 이름은 원문 서류 이름 · 서술 칸은 kind:story(서류 도우미가 붙을 자리)',
     t3.sections.filter((s) => (s.fields || []).some((f) => f.kind === 'story')).map((s) => s.heading), ['자기소개서', '학업계획서']);
@@ -1512,7 +1521,7 @@ console.log('\n■ 공고별 지원문서 — 앱 양식이 없는 등록 공고
     [/테스트장학 2026-2 — 지원문서/.test(html), /※ 앱 자체 제작 문서입니다/.test(html), /☑ 재학생 중 직전 학기 12학점 이상 이수/.test(html), /사실과 다름이 없습니다/.test(html)],
     [true, true, true, true]);
   /* 앱 연결 — 글자가 아니라 실제 모양을 본다 */
-  const appSrc = readText(new URL('../app.js', import.meta.url));
+  const appSrc = appSource();
   const attach = appSrc.slice(appSrc.indexOf('function attachPrepTemplate('), appSrc.indexOf('/* 원본 신청서 —'));
   eq('🔴 앱은 양식(formId)·상시 제도·신청 절차 없는 공고(noApply)만 빼고 **모든 등록 공고**에 붙인다 (prepDoc 한정으로 되돌리면 빈 준비 시트가 돌아온다)',
     [/if \(s\.formId \|\| s\.program \|\| s\.noApply\) return s;/.test(attach), /!s\.prepDoc/.test(attach), /for \(const s of list\) attachPrepTemplate\(s\);/.test(attach)], [true, false, true]);
@@ -1744,7 +1753,7 @@ console.log('\n■ 신청서 쪽 그림 · 빈칸 자리 — 이름표 옆·표 
       [!!famName, famName && famName.y > 277, famBirth && famBirth.key, ruled.below], [true, true, null, 2]);
     /* 2026-11-18 — 공고문에서 뗀 서식 쪽(data/form-pages)도 같은 로봇·같은 화면 — 서식 쪽만 있는 공고에 「양식 채우기」가 안 열렸다 */
     {
-      const ffSrc = readText(new URL('../collector/form-fields.mjs', import.meta.url)); const fillSrc = readText(new URL('../formfill.js', import.meta.url)); const appSrc2 = readText(new URL('../app.js', import.meta.url));
+      const ffSrc = readText(new URL('../collector/form-fields.mjs', import.meta.url)); const fillSrc = readText(new URL('../formfill.js', import.meta.url)); const appSrc2 = appSource();
       eq('  서식 쪽 — 로봇이 data/form-pages 색인(파일 있는 줄만)도 돈다 · 앱이 두 fields.json 을 합쳐 읽고 쪽 그림 주소를 폴더(base)로 고른다 · 서식 쪽 줄 밑에도 「양식 채우기」 자리',
         [/const sets = \[\[outDir, items\], \[pagesDir,/.test(ffSrc) && /filter\(\(f\) => f && f\.file\)/.test(ffSrc),
           /Promise\.all\(\[pdfs \? one\('forms-pdf'\) : \{\}, pages \? one\('form-pages'\) : \{\}\]\)/.test(fillSrc), /data\/\$\{esc\(F\.base \|\| 'forms-pdf'\)\}/.test(fillSrc),
@@ -1797,7 +1806,7 @@ console.log('\n■ 신청서 쪽 그림 · 빈칸 자리 — 이름표 옆·표 
     }
     /* red-green: 머리글 아래 칸에 key 를 붙이면 ↑ 가 빨간불 · 오른쪽 칸 규칙을 지우면 ④ 가 빨간불 (2026-10-31 확인) */
   }
-  const app = readText(new URL('../app.js', import.meta.url));
+  const app = appSource();
   const ff = readText(new URL('../formfill.js', import.meta.url));
   const html = readText(new URL('../index.html', import.meta.url));
   const css = readText(new URL('../style.css', import.meta.url));
@@ -1856,7 +1865,7 @@ console.log('\n■ 공고문 뒷장 서식 쪽 떼기 — 쪽 글자의 표식�
   const ga = readText(new URL('../.gitattributes', import.meta.url));
   eq('  병합 규칙 — 사본은 이진 · 색인·리포트는 내 것', /data\/form-pages\/\*\*\s+-diff/.test(ga) && /data\/form-pages\/index\.json\s+merge=ours/.test(ga) && /collector\/form-pages-report\.md merge=ours/.test(ga), true);
   eq('  서비스워커가 뗀 쪽 PDF 를 가로채지 않는다', /\\\/data\\\/form-pages\\\//.test(readText(new URL('../sw.js', import.meta.url))), true);
-  const app = readText(new URL('../app.js', import.meta.url));
+  const app = appSource();
   eq('  앱이 색인을 받아 질문 화면 머리에 「공고문 안 신청서 서식」으로 보인다 (층1·층2 같은 함수)',
     [/fetch\('data\/form-pages\/index\.json'/.test(app), /formPageRowsHtml\(sch\)/.test(app.slice(app.indexOf('function prepOriginalsHtml('))), /bootJobs\.push\(loadFormPagesIndex\(\)\)/.test(app) && /jobs\.push\(loadFormPagesIndex\(\)\)/.test(app)], [true, true, true]);
 }
@@ -1864,7 +1873,7 @@ console.log('\n■ 공고문 뒷장 서식 쪽 떼기 — 쪽 글자의 표식�
 /* 2026-10-13 ③ — 신청 준비 체크리스트. '준비 완료'는 버튼이 아니라 네 항목(서류 확인·작성·증명서·제출 방법)의 결과다. */
 console.log('\n■ 신청 준비 체크리스트 — 준비 완료는 네 항목의 결과 · pending(작성 남음)의 뜻은 그대로 (2026-10-13)');
 {
-  const app = readText(new URL('../app.js', import.meta.url));
+  const app = appSource();
   const take = (name) => { const s0 = app.indexOf(`function ${name}(`); let d = 0, seen = false; for (let i = app.indexOf('{', s0); i < app.length; i += 1) { if (app[i] === '{') { d += 1; seen = true; } else if (app[i] === '}') { d -= 1; if (seen && !d) return app.slice(s0, i + 1); } } throw new Error(name); };
   const items = app.match(/const PREP_ITEMS = \[[\s\S]*?\n\];/)[0];
   const ESSAY_DEFS = [{ match: /자기소개서/ }];
@@ -2258,7 +2267,7 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
   eq('  실린 글의 kind 는 둘 중 하나', acts.items.every((n) => ACTIVITY_KINDS.includes(n.kind) && n.url && n.title), true);
   /* ④ 화면 */
   const html = readText(new URL('../index.html', import.meta.url));
-  const app = readText(new URL('../app.js', import.meta.url));
+  const app = appSource();
   eq('아래 탭에 대외활동이 있다', /data-nav="activities"/.test(html), true);
   const at = (id) => html.indexOf(`id="${id}"`);
   eq('화면은 탐색 **뒤**·신청내역 **앞** (관문 「교내·교외 분류와 주관 기관」이 홈~탐색 사이를 재므로)',
@@ -2404,7 +2413,7 @@ console.log('\n■ 대외활동·공모전 (2026-09-25 · 노션 UI-34)');
     eq('  끝에 달이 없는 범위 `2026년 10월 7일(수) ~ 30일(금)` 은 같은 달 30일 · `공모 기간 :` 도 마감 이름표 · 맨 `( 기간 )` 은 발췌만(까지·마감 없이는 마감으로 안 읽는다 — 근로 기간 함정)',
       [exOf('접수 기간 2026년 10월 7일(수) ~ 30일(금)')[0], exOf('- 공모 기간 : 2026. 10. 6.( 화 ) ~ 11. 17.( 화 ) 18:00 까지')[0], exOf('ㅇ ( 기간 ) 2026.10.7.( 수 ) ~ 10.30.( 금 )')], ['2026-10-30', '2026-11-17', [null, ['모집기간=2026.10.7.( 수 ) ~ 10.30.( 금 )']]]);
     {
-      const appT = readText(new URL('../app.js', import.meta.url));
+      const appT = appSource();
       /* 2026-11-02 승인 시안(sheet-consistency.html)으로 바뀐 자리 — 「모집 안내」·「마감일 …」 줄은 없다(접수·공고 안내·머리줄 D-day 로 옮김).
          「지원 자격」 칸의 「원문에서 확인」 한 줄은 2026-11-07 개발자 지시로 없앴다(0줄이면 칸 자체가 없다 — 관문 「승인받은 화면 그대로인가」) */
       eq('  활동 시트 — 「모집 안내」·「마감일」 줄이 없다 · 장학 시트와 같은 절 다섯(sheetSectionsHtml)을 쓴다',
@@ -2556,7 +2565,7 @@ console.log('\n■ 재단·지자체 게시판 (2026-09-26 · 노션 F-13 · 교
   eq('병합 규칙 — 발행·장부는 합집합, 리포트는 내 것', /data\/external\.json\s+merge=jsonunion/.test(ga) && /collector\/seen-external\.json\s+merge=jsonunion/.test(ga) && /collector\/find-boards-report\.md\s+merge=ours/.test(ga), true);
   /* 화면 */
   const html = readText(new URL('../index.html', import.meta.url));
-  const app = readText(new URL('../app.js', import.meta.url));
+  const app = appSource();
   const homeSlice = html.slice(html.indexOf('id="screen-home"'), html.indexOf('id="screen-explore"'));
   eq('홈에 구역이 있다 — 학교 게시판 구역 바로 아래', homeSlice.indexOf('id="live-notices"') > 0 && homeSlice.indexOf('id="live-notices"') < homeSlice.indexOf('id="external-notices"'), true);
   eq('renderHome 이 그린다', /\$\('#external-notices'\)\.innerHTML = externalNoticesHtml\(\);/.test(app), true);
@@ -2723,7 +2732,7 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
     const extras = src.sources.flatMap((x) => (x.extraBoards || []).map((e) => ({ ...e, school: x.school, main: x.boardUrl })));
     eq('  둘째 게시판은 첫 게시판이 있는 학교에만 · 주소와 근거(웹 검색 결과 + 정찰)가 있다 · 이름이 학교 안에서 하나', extras.length >= 3 && extras.every((e) => e.main && /^https:\/\//.test(e.boardUrl) && typeof e.label === 'string' && e.label && /웹 검색/.test(e.evidence || '') && /정찰/.test(e.evidence || '')) && new Set(extras.map((e) => `${e.school}#${e.label}`)).size === extras.length, true);
     eq('    로봇은 게시판 줄을 첫 게시판 + 둘째 게시판으로 펴고(board 이름) 규칙 열쇠는 newsRuleKey 하나 · 그 글에 board 를 단다', /\.map\(\(e\) => \(\{ school: s\.school, campus: s\.campus, boardUrl: e\.boardUrl, label: e\.label \|\| '둘째 게시판', board: e\.label \|\| '둘째 게시판', extra: true \}\)\)\]\);/.test(rn) && /if \(s\.board\) it\.board = s\.board;/.test(rn) && !/NEWS_BOARD_RULES\[s\.school\]/.test(rn), true);
-    eq('  분교 학생에게 본교 글의 학교 사진을 쓰지 않는다 (다른 캠퍼스 사진 · 출처도 안 맞음 · 리뷰 10-04) · 띠 차례는 모든 카드가 센다 · 갈아 끼운 사진도 초점 · 목록 표식 링크는 이름을 붙인다', [/const me = state\.profile && state\.profile\.school;\s*if \(me && n && n\.school !== me\) return null;/.test(readText(new URL('app.js', root))), /const sp = schoolPhotoFor\(n, turn\[n\.school\] = \(turn\[n\.school\] \?\? -1\) \+ 1\);\s*const spFocus/.test(readText(new URL('app.js', root))), /if \(ff && PHOTO_FOCUS_RE\.test\(ff\)\) img\.style\.objectPosition = ff;/.test(readText(new URL('app.js', root))), /link\.cls !== 'post' && link\.label \? link\.label : ''/.test(readText(new URL('app.js', root)))], [true, true, true, true]);
+    eq('  분교 학생에게 본교 글의 학교 사진을 쓰지 않는다 (다른 캠퍼스 사진 · 출처도 안 맞음 · 리뷰 10-04) · 띠 차례는 모든 카드가 센다 · 갈아 끼운 사진도 초점 · 목록 표식 링크는 이름을 붙인다', [/const me = state\.profile && state\.profile\.school;\s*if \(me && n && n\.school !== me\) return null;/.test(appSource()), /const sp = schoolPhotoFor\(n, turn\[n\.school\] = \(turn\[n\.school\] \?\? -1\) \+ 1\);\s*const spFocus/.test(appSource()), /if \(ff && PHOTO_FOCUS_RE\.test\(ff\)\) img\.style\.objectPosition = ff;/.test(appSource()), /link\.cls !== 'post' && link\.label \? link\.label : ''/.test(appSource())], [true, true, true, true]);
     eq('    썸네일 로봇도 글의 규칙을 같은 열쇠로 찾는다', /postContentRequest\(NEWS_BOARD_RULES\[newsRuleKey\(n\)\], n\)/.test(readText(new URL('collector/collect-news-thumbs.mjs', root))), true);
     eq('    열쇠 — 첫 게시판은 학교, 둘째는 학교#이름', [RB.newsRuleKey({ school: '서강대학교' }), RB.newsRuleKey({ school: '서강대학교', board: '행사특강' })], ['서강대학교', '서강대학교#행사특강']);
     eq('    「학교#이름」 규칙은 글 번호가 첫 게시판과 같은 번호 공간이라고 밝힌다(sharedIds) — 열쇠가 「학교 + 글 번호」라 번호가 따로면 다른 글이 합쳐진다', Object.entries(RB.NEWS_BOARD_RULES).filter(([k, r]) => k.includes('#') && r.sharedIds !== true).map(([k]) => k), []);
@@ -2933,7 +2942,7 @@ console.log('\n■ 교내 소식 (2026-09-30 · 개발자 지시 "사용자들 �
   fs.rmSync(tmp, { recursive: true, force: true });
   /* ⑦ 화면 */
   const html = readText(new URL('index.html', root));
-  const app = readText(new URL('app.js', root));
+  const app = appSource();
   const homeSlice = html.slice(html.indexOf('id="screen-home"'), html.indexOf('id="screen-explore"'));
   eq('홈 첫 화면 띠 — 히어로(아이콘 네 칸) 다음 · 「나에게 맞는 장학금」 앞 · 옛 아래 구역(#school-news)은 없다 (2026-10-04 승인 시안 1안)', homeSlice.indexOf('class="hero-card"') > 0 && homeSlice.indexOf('class="hero-card"') < homeSlice.indexOf('id="home-news"') && homeSlice.indexOf('id="home-news"') < homeSlice.indexOf('id="home-deadline-list"') && !/id="school-news"/.test(html), true);
   eq('renderHome 이 그린다 · 소식이 없으면 구역째 숨긴다', /const newsHtml = homeNewsHtml\(\);\s*\$\('#home-news'\)\.innerHTML = newsHtml;\s*\$\('#home-news'\)\.hidden = !newsHtml;/.test(app), true);
@@ -3134,7 +3143,7 @@ console.log('\n■ 교내 소식 썸네일 (2026-10-03 개발자 지시 "실제 
   eq('  장부 열쇠 = 새 글 판정 열쇠 (글 번호가 있으면 글 번호 · 같은 제목의 다른 글이 사진을 나눠 갖지 않는다)', [TH.thumbKey({ school: '경희대학교', postId: '41', url: 'https://k/list#n-x' }), TH.thumbKey({ school: '경희대학교', postId: '42', url: 'https://k/list#n-x' })], ['post:경희대학교:41', 'post:경희대학교:42']);
   eq('  본문 요청 — 목록 표식은 글 화면이 없어 없음(주소를 짓지 않는다) · 본문 API 규칙은 그 API · 나머지는 글 주소', [RB.postContentRequest(undefined, { url: 'https://k/list#n-x' }), RB.postContentRequest(RB.NEWS_BOARD_RULES['서강대학교'], { url: 'https://www.sogang.ac.kr/ko/detail/550598?bbsConfigFk=3' }).url, RB.postContentRequest(undefined, { url: base }).url], [null, 'https://www.sogang.ac.kr/api/api/v1/mainKo/BbsData?pkId=550598', base]);
   /* ⑦ 썸네일 경로 꼴은 한 곳 — 앱·감사·관리자 사본이 로봇의 꼴과 같다 (다르면 로봇이 만든 그림을 앱이 안 그리거나, 감사가 막는다) */
-  const app = readText(new URL('app.js', root));
+  const app = appSource();
   const appRe = (app.match(/const NEWS_THUMB_RE = \/(.+)\/;/) || [])[1];
   const auditRe = (readText(new URL('verify/audit-data.js', root)).match(/const THUMB_RE = \/(.+)\/;/) || [])[1];
   const adm = readText(new URL('_admin/admin.js', root));
@@ -3231,7 +3240,7 @@ console.log('\n■ 교내 소식 썸네일 (2026-10-03 개발자 지시 "실제 
 console.log('\n■ 학교 대표 사진 (2026-10-03 개발자 지시 "썸네일이 없는 공고들은 각 학교의 가장 예쁜 사진으로 대체")');
 {
   const root = new URL('../', import.meta.url);
-  const app = readText(new URL('app.js', root));
+  const app = appSource();
   const css = readText(new URL('style.css', root));
   const ME = createRequire(import.meta.url)('../match-engine.js');
   const SP = await import('../tools/build-school-photos.mjs');
@@ -3395,7 +3404,7 @@ console.log('\n■ 학적정보 수정이 다른 칸을 지우지 않는다 (202
      `Object.assign` 으로 물려받고 있었는데, 2026-09-18 에 들어온 `traits`(처지)가 빠져
      **MY → 학적정보 수정 저장 한 번에 학생이 답해 둔 처지가 전부 날아가고** 있었다.
      ⚠️ 프로필에 화면 밖 칸을 새로 만들면 여기 한 줄을 더하는 것까지가 한 세트다. */
-  const app = readText(new URL('../app.js', import.meta.url));
+  const app = appSource();
   const at = app.indexOf('function collectProfile');
   let fn = '';
   if (at >= 0) {
@@ -3515,7 +3524,7 @@ console.log('\n■ 교내·교외 분류와 주관 기관 (2026-09-18 개발자 
   /* 🔴 **"모른다"고 적은 값이 학생 화면·학생 글로 새지 않는다** (2026-09-18 코드 리뷰가 셋을 더 잡았다).
      `주관 기관 원문 확인` 은 앱 내부 사정이다 — 학생에게 그대로 보이면 2026-09-17 지시
      (앱 내부 사정은 학생 화면에 안 적는다)를 정면으로 어긴다. 새던 자리 셋을 각각 못 박는다. */
-  const app = readText(new URL('../app.js', import.meta.url));
+  const app = appSource();
   eq('초안이 "모름" 주관 기관을 문장에 넣지 않는다', /provLead\(sch\)/.test(app), true);
   eq('  그 함수가 "원문 확인" 을 걸러 낸다', /원문 확인\|미확인/.test(app), true);
   const dataJs = readText(new URL('../data.js', import.meta.url));
@@ -3712,7 +3721,7 @@ console.log('\n■ 접수 기간 한 줄 (2026-09-12)');
     [H('신청기간:&nbsp;2026. 10. 1.(목) 10:00 ~ 2026. 10. 30.(금) 16:00&nbsp; &nbsp; &nbsp; &nbsp; 다음 문장이 길게 이어지고 있습니다 계속 계속 계속 계속'), H('접수기간: 2026. 9. 1. ~ 9. 30. R&D 연구실 &amp;nbsp; 제출')],
     ['신청기간: 2026. 10. 1.(목) 10:00 ~ 2026. 10. 30.(금) 16:00 다음 문장이 길게 이어지고 있습니다 계속 계속 계', '접수기간: 2026. 9. 1. ~ 9. 30. R&D 연구실 제출']);
   {
-    const appSrc = readText(new URL('../app.js', import.meta.url));
+    const appSrc = appSource();
     const dh = readText(new URL('../collector/deadline-hint.mjs', import.meta.url));
     const reOf = (src) => (src.match(/const PARTIAL_ENTITY_END = (\/.+\/);/) || [])[1];
     eq('  앱이 이미 실린 힌트 끝의 반쪽 기호를 떼고 보인다(같은 꼴 · 카드 한 자리 — 활동 시트의 기간 토막 줄은 2026-11-02 승인 시안으로 없어졌다)', [reOf(appSrc) === reOf(dh) && !!reOf(dh), (appSrc.match(/(?:esc|tidyChars)\(hint(?:Text|Short)\(n\.deadlineHint\)\)/g) || []).length, /esc\(unent\(n\.deadlineHint\)\)/.test(appSrc), /function hintShort\(s\) \{\n  let t = hintText\(s\)/.test(appSrc)], [true, 1, false, true]);   // 카드는 hintShort(2026-10-04 · 첫 항목만) — 그것도 hintText 로 시작한다 · 활동 시트는 hintText 위에 tidyChars(2026-10-15)
@@ -7017,7 +7026,7 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
   const fpSrc = readText(new URL('../collector/form-pdf.mjs', import.meta.url)); const dfSrc = readText(new URL('../collector/deepfetch.mjs', import.meta.url));
   eq('  본편이 활동 피드를 등록분과 한 줄에 세우고(loadActivities) 살아 있는 id 에 활동 글도 넣는다 · 받는 로봇의 밀린 목록도 같다',
     [/const items = \[\.\.\.\(reg\.items \|\| \[\]\), \.\.\.loadActivities\(root\)\];/.test(fpSrc), /const live = new Set\(items\.filter/.test(fpSrc), /FP\.pickFormBacklog\(\[\.\.\.\(reg\.items \|\| \[\]\), \.\.\.FP\.loadActivities\(root\)\]/.test(dfSrc)], [true, true, true]);
-  const appA = readText(new URL('../app.js', import.meta.url));
+  const appA = appSource();
   const sheet = appA.slice(appA.indexOf('function openActivityDetail('), appA.indexOf('/* ---------------- 재단·지자체 새 공고'));
   const sections = appA.slice(appA.indexOf('function applySectionHtml('), appA.indexOf('function sourceNoteHtml('));
   eq('④ 활동 시트(승인 시안 11-02 · sheetSectionsHtml) — 서류는 「접수 · 서류」 줄(act.documents · 같은 자리표시 거름 · esc) · 신청서 원본 PDF 는 「첨부」 맨 위(장학과 같은 formPdfRowsHtml · 글 id) · 둘 다 없으면 줄·칸이 없다',
@@ -7037,7 +7046,7 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
    사흘 전인 채로 남아 **이미 마감된 공고가 D-2로 보이고 일괄 신청 준비 대상에도 들어갔다.**
    되돌아가면 여기서 잡는다. 브라우저 없이 app.js 의 진짜 함수를 떼어 내 돌려 본다. */
 {
-  const appSrc = readText(new URL('../app.js', import.meta.url));
+  const appSrc = appSource();
   /* 이름으로 함수 한 덩어리를 떼어 낸다 — 베낀 사본이 아니라 **진짜 코드**를 검사해야
      의미가 있다(사본을 검사하면 원본이 바뀌어도 계속 통과한다). */
   const grab = (name) => {
@@ -7132,11 +7141,11 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
   eq('  결과를 적기 전엔 사본으로 남는다 · 사본이 없거나 결과를 적었으면 빠진다', snapRows.map((r) => [r.app.id, r.sch.name]), [['w', '사본']]);
   eq('  기록 자체는 지우지 않는다(공고가 다시 올라오면 선정 기록과 함께 돌아온다)', [kept.length, shownAppRows(kept, (id) => ({ id })).length], [3, 3]);
   eq('  목록·홈 신청내역 칸·전체 선택이 같은 함수를 쓴다(숫자가 서로 다른 말을 하지 않게)',
-    (() => { const all = readText(new URL('../app.js', import.meta.url)); return [appsSrc.includes('appOrder(shownAppRows(state.applications, resolve))'),
+    (() => { const all = appSource(); return [appsSrc.includes('appOrder(shownAppRows(state.applications, resolve))'),
       /applications: shownAppCount\(\),/.test(all) && /function shownAppCount\(\) \{[\s\S]*?return shownAppRows\(state\.applications, r\)\.length;/.test(all), /const ids = shownAppRows\(state\.applications, schResolver\(\)\)\.map\(\(r\) => r\.app\.id\)/.test(all)]; })(), [true, true, true]);
   eq('  화면에서 빼려고 기기 기록을 지우지 않는다(state.applications 를 거르지 않는다)', /state\.applications\s*=\s*state\.applications\.filter\(/.test(codeOnly(appsSrc)), false);
   /* 코드 리뷰(2026-10-02)가 잡은 세 구멍 — '내려갔다'를 잘못 판정하면 진짜 기록이 말없이 사라진다 */
-  const allApp = readText(new URL('../app.js', import.meta.url));
+  const allApp = appSource();
   eq('  공고 목록을 받기 전·못 받았을 때는 내려갔다고 가르지 않는다(모두 사라져 「아직 없어요」가 뜨던 것)',
     /const dataState = appsDataState\(\);\s*if \(dataState !== 'ok' && state\.applications\.length\)/.test(allApp) && /function shownAppCount\(\) \{\s*if \(appsDataState\(\) !== 'ok'\) return state\.applications\.length;/.test(allApp), true);
   eq('  한 번 받은 뒤 다시 받기 실패는 \'못 받음\'이 아니다', (allApp.match(/if \(appsData\.(registered|kosaf) !== 'ok'\) appsData\.\1 = 'fail'/g) || []).length >= 4, true);
@@ -7173,7 +7182,7 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
   /* 창 200 → 600자 (2026-11-15) — 이용 횟수 세기(b8c227c5 · trackUse 두 줄)가 함수 머리에 들어와 appSch 가 200자 밖으로 밀렸다. 하는 일은 그대로(머리에서 사본으로 찾는다)라 창만 넓힌다 */
   eq('  상세 시트·패널의 제출/결과 단추가 사본으로도 찾는다(appSch)', /function openDetail\(id\) \{[\s\S]{0,600}?const sch = appSch\(id\);/.test(allApp) && /const sch = appSch\(id\);   \/\/ 사본으로 보이는 줄의 단추도/.test(allApp), true);
   eq('  내려간 공고에 결과를 적으면 줄이 사라지므로 실행 취소를 준다', /if \(!findSch\(sch\.id\)\) toast\([^\n]*\{ label: '실행 취소', run: \(\) => undoProgress\(sch\.id\) \}\)/.test(allApp), true);
-  eq("  '목록에서 내려감' 카드는 없다", /appCardGone|badge-gone/.test(readText(new URL('../app.js', import.meta.url))), false);
+  eq("  '목록에서 내려감' 카드는 없다", /appCardGone|badge-gone/.test(appSource()), false);
   /* 되돌리기는 공고를 요구하면 안 된다 — 요구하면 사라진 공고의 기록이 영영 안 지워진다
      (저장 해제 `toggleSave` 가 2026-09-07 코드 리뷰에서 같은 이유로 고쳐졌다) */
   eq('되돌리기가 공고를 요구하지 않는다', grab('undoProgress').includes('typeof schOrId'), true);
@@ -7502,7 +7511,7 @@ console.log('■ 프로필 개별 칸 · DB 검증 (0004 · 2026-09-26 · 고문
 
   /* 🔴 ⑦ 거절이 학생에게 보이는가 — 조용히 실패하면 프로필이 영영 안 올라간다 */
   const cli = readText(new URL('../supabase-client.js', import.meta.url));
-  const app = readText(new URL('../app.js', import.meta.url));
+  const app = appSource();
   eq('  앱이 check_violation(23514) 을 알아본다', /'23514'/.test(cli), true);
   eq('  화면이 그것을 한 번 알린다', /syncTellIfRejected/.test(app), true);
   /* 🔴 서버가 준 details 에는 실패한 행이 통째로(주민등록번호까지) 들어 있다 */
@@ -7997,7 +8006,7 @@ console.log('\n■ 등록금 비율 환산 — 한 학기 기준인가 (2026-08-
 
 console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-08-27)');
 {
-  const app = readText(new URL('../app.js', import.meta.url));
+  const app = appSource();
   /* 줄 하나를 그리는 amountDetailRow 도 같은 화면이라 함께 본다 */
   /* estOpt(추정 표시)·amountDetailRow(줄 하나)도 같은 화면이라 함께 본다 */
   const body = app.slice(app.indexOf('function estOpt'), app.indexOf('function renderBulkPrep'));
@@ -8289,7 +8298,7 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
      자기 학교 목록(gzip 1.5KB)뿐이다. 이제 학교별 파일 하나만 받는다.
      🔴 이 배선이 끊기면 **조용하다** — 파일이 없으면 전국 공통 목록으로 물러나므로
         화면상 아무 일도 안 일어난 것처럼 보이고, 2026-08-02의 그 사고로 되돌아간다. */
-  const appSrc = readText(new URL('../app.js', import.meta.url));
+  const appSrc = appSource();
   eq('  앱이 첫 화면에서 407KB 파일을 받지 않는다',
     /fetch\(\s*'data\/majors\.json'/.test(appSrc), false);
   eq('  앱이 학교별 파일 이름 규칙을 쓴다 (match-engine 한 곳)',
@@ -8512,7 +8521,7 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
     /registeredList\.find\(\(s\) => s\.formId === 'test-dummy'\)/.test(fd), false);
 
   /* ④ 배지와 정렬이 같은 근거를 쓴다 — 갈라지면 '적합도 33%' 카드가 미달 카드 사이에 앉는다 */
-  const app2 = readText(new URL('../app.js', import.meta.url));
+  const app2 = appSource();
   eq('미달 판정이 한 곳(fitVerdict)에 있다', /function fitVerdict\(/.test(app2), true);
   eq('배지가 그 한 곳을 쓴다', /const verdict = fitVerdict\(fit, fd\)/.test(app2), true);
   eq('정렬도 그 한 곳을 쓴다', /fitRank\(a\) - fitRank\(b\)/.test(app2), true);
@@ -8606,7 +8615,7 @@ console.log('\n■ 분교 이름이 로봇과 앱에서 같은가 (갈라지면 
   /* app.js 에서 함수 한 덩어리를 **이름으로** 떼어 온다 — 베낀 사본이 아니라 진짜 코드다.
    (같은 방식이 위 '마감 판정' 절에도 있다. 규칙을 두 벌 두지 않으려고 여기서도 이걸 쓴다) */
   const grabApp = (name) => {
-    const src = readText(new URL('../app.js', import.meta.url));
+    const src = appSource();
     const start = src.indexOf(`function ${name}(`);
     if (start < 0) throw new Error(`app.js 에서 ${name} 을 못 찾음`);
     let depth = 0, seen = false;
@@ -8938,7 +8947,7 @@ console.log('\n■ 신청 잠금 — 자격 판정으로는 막지 않는다 (20
 
      🔴 규칙을 베끼지 않는다 — app.js 의 `applyLock` 을 이름으로 떼어 내 그대로 돌린다.
         (손으로 옮겨 적으면 app.js 가 바뀌어도 이 검사는 계속 통과한다.) */
-  const src = readText(new URL('../app.js', import.meta.url));
+  const src = appSource();
   const grab = (name) => {
     const m = src.match(new RegExp(`^function ${name}\\([\\s\\S]*?^\\}`, 'm'));
     if (!m) throw new Error(`app.js 에서 ${name}() 을 못 찾았습니다 — 최상위 함수가 아니거나 이름이 바뀌었습니다.`);
@@ -9269,7 +9278,7 @@ console.log('\n■ 첫 실행 화면 (2026-09-09)');
   eq('boot.js 에 시한이 있다 (갇히지 않는다)', /BOOT_TIMEOUT_MS/.test(bootJs), true);
   eq('boot.js 가 걷는 손잡이를 연다', /window\.bootDone/.test(bootJs), true);
   eq('app.js 가 화면을 정한 뒤 부팅 화면을 걷는다',
-    /window\.bootDone\(bootSettled\)/.test(readText(new URL('app.js', root))), true);
+    /window\.bootDone\(bootSettled\)/.test(appSource()), true);
 
   /* ③ 🔴 boot.js 는 **다른 스크립트보다 먼저** 실려야 한다. 뒤에 두면 그 사이가
      그대로 비고, 그게 이 파일이 없애려던 바로 그 틈이다. */
@@ -9343,7 +9352,7 @@ console.log('\n■ 화면이 「전국 모든 대학」을 약속하지 않는�
 {
   const root = new URL('../', import.meta.url);
   const html = readText(new URL('index.html', root));
-  const app = readText(new URL('app.js', root));
+  const app = appSource();
   const strip = (t) => t.replace(/<!--[\s\S]*?-->/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
   eq('화면 문구에 「전국 모든 대학」이 없다', /전국\s*모든\s*대학/.test(strip(html) + strip(app)), false);
   eq('  MY 아래줄이 「전국 대학 지원」이라고 하지 않는다', /전국 대학 지원/.test(strip(app)), false);
@@ -9363,7 +9372,7 @@ console.log('\n■ 시작 화면 — 승인받은 컷 A 그대로인가 (2026-09
   const root = new URL('../', import.meta.url);
   const html = readText(new URL('index.html', root));
   const css = readText(new URL('style.css', root));
-  const app = readText(new URL('app.js', root));
+  const app = appSource();
   const reel = readText(new URL('tools/gate-reel/reel.html', root));
   const step0 = (html.match(/<div class="onboard-step" data-step="0">([\s\S]*?)\n      <\/div>/) || [])[1] || '';
   const s0 = step0.replace(/<!--[\s\S]*?-->/g, '');
@@ -9448,7 +9457,7 @@ console.log('\n■ 환영 화면 문구 (2026-09-12 · UI-22)');
      그래서 파일 전체에서 '알리고 막는 줄'을 찾는다: 한 줄 안에서 toast 로 알리고 return 으로
      돌아서며 온보딩 칸(in-…)을 보는 줄. `#` 을 붙여 세지 않는다 — getElementById('in-major')
      처럼 쓰면 `#` 이 없어 그냥 빠져나갔다(실측). */
-  const app = readText(new URL('app.js', root));
+  const app = appSource();
   const blockers = [...new Set(app.split('\n')
     .filter((l) => /toast\(/.test(l) && /return;/.test(l) && /\bin-[a-z-]+/.test(l))
     .flatMap((l) => [...l.matchAll(/\bin-([a-z-]+)/g)].map((m) => m[1])))].sort();
@@ -9530,7 +9539,7 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
 
   /* 🔴 진행분은 **기기 밖으로 안 나간다** — 프로필 장부와 다른 열쇠여야 한다.
      여기엔 학생이 신청서에 쓴 글이 들어가고, 저쪽은 로그인하면 서버로 올라간다. */
-  const appJs = readText(new URL('../app.js', import.meta.url));
+  const appJs = appSource();
   eq('이어보기 열쇠가 프로필 열쇠와 다르다', R.RESUME_KEY === 'handaejang.v1', false);
   eq('이어보기 값을 state 에 넣지 않는다', /state\.resume\b/.test(appJs), false);
 
@@ -9626,7 +9635,7 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   /* ⑨-2 🔴 **덮개 밑에서 홈을 일곱 번 다시 그리지 않는다** (2026-10-04 실측 — 인트로가 끊긴 진짜 원인).
      데이터 파일이 하나 올 때마다 홈을 통째로 그려 0.4~1.8초씩 멈췄고, 파일이 오는 틈을 프레임 감지가
      '한가하다'로 읽어 인트로를 그 한가운데에 시작했다. 고친 뒤(4배 느린 CPU): 인트로 1.7초에 프레임 100장 · 최악 간격 0.05초. */
-  const bootApp = readText(new URL('../app.js', import.meta.url));
+  const bootApp = appSource();
   const bootNotify = readText(new URL('../notify.js', import.meta.url));
   eq('덮개가 떠 있는 동안 다시 그리기는 모아 둔다 (rerenderVisible 이 bootHold 를 본다)',
     /function rerenderVisible\(\) \{\s*if \(!state\.profile\) return;\s*if \(bootHold\) \{ bootHeld = true; return; \}/.test(bootApp), true);
@@ -9776,7 +9785,7 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
    못 보거나 늦게야 보이는 함정 넷**을 실행 전에 잡는다. */
 {
   console.log('\n■ 손짓과 움직임');
-  const appJs = readText(new URL('../app.js', import.meta.url));
+  const appJs = appSource();
   const inter = readText(new URL('../interactions.js', import.meta.url));
   const css = readText(new URL('../style.css', import.meta.url));
   const html = readText(new URL('../index.html', import.meta.url));
@@ -9850,7 +9859,7 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
    🔴 앱의 진짜 함수를 떼어 내 돌린다 — 사본을 검사하면 원본이 바뀌어도 통과한다. */
 {
   console.log('\n■ 카드 제목 — 기관명을 담고, 윗줄에서는 뺀다 (2026-09-21)');
-  const appJs = readText(new URL('../app.js', import.meta.url));
+  const appJs = appSource();
   const parts = [
     appJs.match(/const bareOrg = .*\n/),
     appJs.match(/const orgBase = .*\n/),
@@ -9920,7 +9929,7 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
    브라우저 없이 잡을 수 있는 함정 셋 — 서버로 새는 길 · 사진란 없는 양식에 붙는 것 · 카드 클릭으로 번지는 것. */
 {
   console.log('\n■ 프로필 사진 (2026-09-11)');
-  const appJs = readText(new URL('../app.js', import.meta.url));
+  const appJs = appSource();
   const formsJs = readText(new URL('../forms.js', import.meta.url));
   const sbJs = readText(new URL('../supabase-client.js', import.meta.url));
   const html = readText(new URL('../index.html', import.meta.url));
@@ -10004,7 +10013,7 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
      ⚠️ **MY 화면은 2026-09-12 개발자 지시로 특별자격 줄을 뺐다**("이거 삭제해"). 그래서
         이 규칙이 사는 자리는 이제 일괄 신청 준비 목록(`bulkTags`) 하나다 — 거기서도
         `L[f] || f` 로 열쇠를 내놓는다. MY 에 줄을 되살린다면 같은 꼴로 쓸 것. */
-  const appJs = readText(new URL('../app.js', import.meta.url));
+  const appJs = appSource();
   eq('이름표 없는 자격을 빈칸으로 내놓지 않는다 (일괄 준비 목록)',
     /L\[f\]\s*\|\|\s*f/.test(appJs), true);
   eq('MY 화면에 특별자격 줄이 되살아나지 않았다 (개발자가 뺀 줄)',
@@ -10146,7 +10155,7 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   /* ⚠️ **주석을 먼저 걷어낸다.** 이 저장소의 주석은 사고 경위에 옛 코드를 그대로 인용하므로
      (`예전에는 showScreen() 으로 …`), 안 걷어내면 고쳐 놓은 것을 안 고쳤다고 잡는다. */
   const strip = (t) => t.replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '));
-  const appJs = strip(readText(new URL('../app.js', import.meta.url)));
+  const appJs = strip(appSource());
 
   /* ① 목록 카드가 '담았다'와 '다 했다'를 가른다.
      '한 번에 신청 준비'로 담은 건은 `pending: bulkNeedsWork(sch)` 로 **서류가 남은 채** 들어간다.
@@ -10231,7 +10240,7 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
       이 저장소가 이미 아는 '상수의 뜻이 바뀌면 그 값을 읽는 곳이 조용히 죽는다' 유형이다. */
 {
   console.log('\n■ 옛 프로필 값');
-  const appJs = readText(new URL('../app.js', import.meta.url));
+  const appJs = appSource();
   const html = readText(new URL('../index.html', import.meta.url));
 
   /* 이전표에 적힌 **옛 값**이 곧 '코드에 있으면 안 되는 값'이다 — 목록을 따로 베끼지 않는다 */
@@ -10343,7 +10352,7 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
       (reasons 도 비어 있어 이유조차 없었다). 확인 안 한 것을 확인했다고 말하는 것이다. */
 {
   console.log('\n■ 판정 문구의 정직함');
-  const appJs = readText(new URL('../app.js', import.meta.url));
+  const appJs = appSource();
   /* ⚠️ 끝을 찾을 때 **시작 뒤부터** 찾는다 — `$('#detail-sheet')` 는 파일 앞쪽에도 나와서
      그냥 indexOf 하면 시작보다 앞을 가리키고 잘라 낸 조각이 빈다(그렇게 짰다가 잡았다). */
   /* 🔴 **뜻은 그대로, 자리만 옮겼다** (2026-09-13). 2026-09-09 에 이 검사는 버튼 문구
@@ -10432,7 +10441,7 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
   /* ── 🔴 짐작이 데이터로 새지 않는가 ── */
   /* ⚠️ 주석은 코드가 아니다 — 안 걸러내면 이 변경을 설명하는 주석이 '켜는 곳'으로 세어진다
      (실제로 그렇게 짰다가 2건으로 나왔다). '적합도 상수' 절이 쓰는 방식 그대로다. */
-  const appSrc2 = readText(new URL('../app.js', import.meta.url))
+  const appSrc2 = appSource()
     .replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/[^\n]*/g, '$1');
   eq('켜는 곳은 홈 히어로 한 곳뿐이다 (금액 상세·감사는 확인된 금액만 본다)',
     (appSrc2.match(/estimate:\s*true/g) || []).length, 1);
@@ -10616,7 +10625,7 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
     const { softEq } = await import('./health-gates/alerts.mjs');
     const eqWf = softEq(eq, DOC_GATES);
     const wf = readText(new URL('../.github/workflows/collect-news.yml', import.meta.url));
-    const appN = readText(new URL('../app.js', import.meta.url));
+    const appN = appSource();
     const robotN = readText(new URL('../collector/collect-news-desc.mjs', import.meta.url));
     eq('  앱 — 요약이 있는 글만 요약 줄을 그린다 (홈 띠 · 전체 보기 카드)', [/\$\{n\.desc \? `<span class="news-tile-desc">/.test(appN), /\$\{o\.desc \? `<p class="sch-desc">/.test(appN), /desc: n\.desc \}\)/.test(appN)], [true, true, true]);
     eq('  앱 — 「오늘 n」 은 부를 때마다 오늘을 읽는다 (todayStart · 날짜를 굳히지 않는다)', /function newsIsToday[\s\S]{0,300}todayStart\(\)/.test(appN), true);
@@ -10751,7 +10760,7 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
       신청 버튼만 내밀어, 앱이 확인해 준 것처럼 읽힌다(원칙 8-1). */
 console.log('\n■ 앱 내부 사정은 학생 화면에 적지 않는다 (2026-09-17 개발자 지시)');
 {
-  const app = readText(new URL('../app.js', import.meta.url));
+  const app = appSource();
   const adm = readText(new URL('../_admin/admin.js', import.meta.url));
   /* 주석은 화면이 아니다 — 이 변경을 설명하는 주석마다 걸리면 관문이 못 쓰게 된다.
      (바로 위 '적합도 상수' 절이 같은 이유로 쓰는 방식 그대로다.) */
@@ -10978,7 +10987,7 @@ console.log('\n■ 층2 첨부 — 학생이 실제로 받을 수 있는 주소�
 
 console.log('\n■ 층2 첨부 — 앱이 그 파일을 실제로 열 수 있게 배선돼 있다');
 {
-  const appjs = readText(new URL('../app.js', import.meta.url));
+  const appjs = appSource();
   const swjs = readText(new URL('../sw.js', import.meta.url));
   /* 🔴 `location.origin` 을 기준으로 풀면 `data/…` 가 **사이트 뿌리**로 풀려 404 다
      (앱은 …github.io/hanggonggan/ 에 있다). 되돌리면 공고문 링크가 전부 죽는다. */
@@ -11923,7 +11932,7 @@ console.log('\n■ 못 읽은 파일의 숫자를 화면이 단정하지 않는�
 console.log('■ 학교 장학 신청 포털 — 「학교 포털」이 어디인지 (2026-09-14 · 백로그 UI-20)');
 {
   const dataSrc = readText(new URL('../data.js', import.meta.url));
-  const appSrc2 = readText(new URL('../app.js', import.meta.url));
+  const appSrc2 = appSource();
   const lit = (name) => {
     const at = dataSrc.indexOf(`const ${name} = {`);
     if (at < 0) throw new Error(`data.js 에서 ${name} 을 못 찾음`);
@@ -12288,7 +12297,7 @@ console.log('■ 첨부에서 마감일 — 본문이 껍데기인 게시판 (20
    뒤에 오고(그대로 물은 것만 앞), 낱말 하나로는 답하지 않는다 — '지원금 있어?' 사고의 FAQ 판. */
 console.log('\n■ 도우미가 자주 묻는 질문을 답한다 (2026-09-15 · 노션 UI-11)');
 {
-  const appSrc = readText(new URL('../app.js', import.meta.url));
+  const appSrc = appSource();
   const a = appSrc.indexOf('const FAQ_ITEMS = [');
   const b = appSrc.indexOf('\n];', a);
   eq('FAQ 원본은 app.js 하나다', a > 0 && b > a, true);
@@ -12804,7 +12813,7 @@ console.log('\n■ 자격 묻기 — 무엇을 물을 수 있나');
     Object.keys(EA.FIELD_META).filter((f) => !EA.FIELD_PROBE[f]), []);
 
   {
-    const appJs = readText(new URL('../app.js', import.meta.url));
+    const appJs = appSource();
     const at = appJs.indexOf('function collectProfile()');
     const body = appJs.slice(at, at + 2600);
     const made = new Set([...body.matchAll(/^\s{4}([A-Za-z_$][\w$]*):/gm)].map((m) => m[1]));
@@ -13187,7 +13196,7 @@ console.log('\n■ 학교가 스스로 운영하는 장학 제도 (2026-09-20)')
      가 '교내' 칸에 떴다 — **국가장학금 공지를 교내라고 부르는** 09-18 사고 그대로다.
      등록 로봇은 그 제목을 `국가장학금` 규칙으로 이미 거르므로, 표는 **등록 단계에서만** 쓴다. */
   const arSrc = readText(new URL('../collector/auto-register.mjs', import.meta.url));
-  const appSrc = readText(new URL('../app.js', import.meta.url));
+  const appSrc = appSource();
   eq('로봇이 학교를 같이 넘긴다', /type: noticeKind\(title, n\.school(, learnedPrograms)?\)/.test(arSrc), true);   // 셋째 인자 = 학습 표 (2026-09-30)
   eq('  앱의 게시판 글 판정은 표식만 본다 (표를 쓰지 않는다)',
     /noticeKind\(n\.title\) === '교내'/.test(appSrc), true);
@@ -13566,7 +13575,7 @@ return { submitChannelKind, submitChannelLabel, hasPortalName };`)();
   const { judgePortalLine, findApplyPortal, PORTAL_SYSTEMS } = req('../apply-channel.js');
   const exc = readText(new URL('../collector/extract-excerpts.mjs', import.meta.url));
   const dataJs = readText(new URL('../data.js', import.meta.url));
-  const appJs = readText(new URL('../app.js', import.meta.url));
+  const appJs = appSource();
   const take = (l) => { const v = judgePortalLine(l); return !!(v && v.ok); };
   const sysOf = (l) => { const v = judgePortalLine(l); return v && v.ok ? v.system : null; };
 
@@ -13696,7 +13705,7 @@ return { submitChannelKind, submitChannelLabel, hasPortalName };`)();
 {
   /* 로그인하면 프로필 사본이 서버로 간다(supabase-client syncSafeProfile · 떼는 것은 rrn·account 와 동의 없는 flags·traits 뿐).
      11-17 전엔 이름·연락처·부모 거주지·보유 장학금·신청서에서 배운 값이 약관 표에 없었다 — 칸을 늘리면 여기서 빨개진다. */
-  const appSrc = readText(new URL('../app.js', import.meta.url));
+  const appSrc = appSource();
   const terms = readText(new URL('../terms.html', import.meta.url));
   const body = (/function collectProfile\(\)[\s\S]*?\n\}/.exec(appSrc) || [''])[0];
   const keys = [...new Set([...body.matchAll(/^\s{4,6}([a-zA-Z]+):/gm)].map((m) => m[1]))];
@@ -13976,7 +13985,7 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
   const yp = M2.mapYouthPolicy({ plcyNm: '청년 정책 서포터즈 모집', aplyUrlAddr: 'https://example.go.kr/apply', aplyYmd: '20260901 ~ 20261130', sprtTrgtMinAge: '19', sprtTrgtMaxAge: '34', sprtTrgtAgeLmtYn: 'Y', ptcpPrpTrgtCn: '공무원' }, { scholarship: /장학/ }).item;
   eq('  청년정책 — 나이 줄은 엔진이 읽는 꼴(만 19세 ~ 만 34세) · 참여 제한은 제외 칸', [yp.eligibilityLines[0], MEX.requirementMatch(yp.eligibilityLines[0], P(23), {}), yp.eligibilityExcludes], ['만 19세 ~ 만 34세', 'ok', ['공무원']]);
   /* ⑥ 앱 — 장학과 같은 함수로 판정하고 그린다(베낀 두 번째 판정 없음) */
-  const appX = readText(new URL('../app.js', import.meta.url));
+  const appX = appSource();
   const cmY = readText(new URL('../collector/collect.mjs', import.meta.url));
   eq('  소급 — 못 받아 온 글은 이레에 한 번만 다시 두드린다(죽은 주소가 매 실행 칸을 먹지 않게)',
     /if \(it\.detailsTriedAt && \(Date\.parse\(todayIso\) - Date\.parse\(it\.detailsTriedAt\)\) < 7 \* 86400000\) continue;/.test(cmY) && /if \(detail\.text\) delete it\.detailsTriedAt; else it\.detailsTriedAt = todayIso;/.test(cmY), true);
@@ -14033,7 +14042,7 @@ console.log('\n■ 대외활동·공모전 — 원문·자격·적합도를 장�
    🔴 검사만 고쳐 통과시키지 말 것 — 화면을 바꾸려면 개발자에게 다시 보여 주고 승인받은 뒤 여기도 같이 고친다(스킬 approved-design). */
 {
   console.log('\n■ 승인받은 화면 그대로인가 — 카드 시안 B · 상세 시트 한 벌 (2026-11-02)');
-  const appV = readText(new URL('../app.js', import.meta.url));
+  const appV = appSource();
   const fnOf = (name) => { const a = appV.indexOf(`function ${name}(`); if (a < 0) return ''; let i = appV.indexOf(') {', a) + 2, d = 0; for (let j = i; j < appV.length; j++) { if (appV[j] === '{') d++; else if (appV[j] === '}' && --d === 0) return appV.slice(a, j + 1).replace(/\/\*[\s\S]*?\*\//g, ''); } return ''; };   // 머리의 기본값 객체(= {})는 건너뛴다 · 주석은 걷는다
   const constOf = (name) => (appV.match(new RegExp(`^const ${name} = .*$`, 'm')) || [''])[0];
   /* 앱의 진짜 함수를 떼어 돌린다 — 사본을 재면 원본이 바뀌어도 초록이다 */
@@ -14453,7 +14462,7 @@ console.log('\n■ 대외활동 — 「혜택」에 섞인 조건은 자격으�
   eq('  이름표가 없는 혜택은 손대지 않는다(○ 항목 구분을 살린다)', [AX.sanitizeBenefit(keep), keep.excerpts[0].text], [false, '○ 항공료 지원 ○ 숙박 지원']);
   eq('  API 의 `해당없음` 은 자격·제외 줄이 아니다', [MAPX.splitLines('해당없음'), MAPX.splitLines('해당 사항 없음'), MAPX.splitLines('만 19세 이상')], [[], [], ['만 19세 이상']]);
   {
-    const appB = readText(new URL('../app.js', import.meta.url));
+    const appB = appSource();
     const s0 = appB.indexOf('function benefitItems'), s1 = appB.indexOf('/* 제목 괄호 속 대상');
     const bf = new Function('unent', `${appB.slice(s0, s1)}; return benefitShort;`)((x) => String(x));
     eq('  카드 아랫줄 — `1:1 매칭` 의 콜론에서 자르지 않는다 · `이름 : 값` 은 이름', [bf('창업어가와 후견인을 1:1 매칭하여, 후견인의 교육 및 지도에 필요한 비용 지원 ㅇ 기술 지도'), bf('○ 맞춤형 정책상담 : 1시간 ○ 기념품 : 선착순')], ['', '맞춤형 정책상담 외 1']);
@@ -15044,7 +15053,7 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
   const myeon = { eligibilityLines: ['가. 2026-2학기 등록자, 2026-2학기를 포함하여 8학기 이하인 자', '※ 10학기 이하 후기 이중전공자는 등록금 전액 납부 시 신청 가능', '나. 직전 정규학기 12학점 이상, 평점평균 2.0 이상인 자'] };
   eq('⑦ 예외 곁말은 aside 로 표시되고 요건 수에 안 들어간다 (조건 단위 분모 3 · 2026-10-29)', [ME3.requirementLines(myeon, null, { all: true, withMeta: true }).map((it) => !!it.aside), ME3.fitDetail(myeon, st).total], [[false, true, false], 3]);
   /* ⑧ 화면(app.js) — 글자로 잠근다(브라우저 드라이버는 verify-ui.yml 몫). 되돌리면 「원문 그대로」 머리·같은 줄 두 번·자리 표시 글자가 돌아온다 */
-  const appSrc = readText(new URL('../app.js', import.meta.url));
+  const appSrc = appSource();
   eq('⑧ 「공고 원문 안내 · 원문 그대로」 머리가 없다 — 세 시트(상세·신청 준비·활동)가 noticeSummaryHtml 한 곳을 부른다',
     /* 2026-11-02 승인 시안 — 상세·활동 두 시트는 sheetSectionsHtml 한 곳(noticeSummaryHtml(noticeLines))을 거치고, 신청 준비 시트가 따로 부른다 → 부르는 자리 둘 */
     [/원문 안내 <span class="channel-tag">원문 그대로<\/span>/.test(appSrc), (appSrc.match(/noticeSummaryHtml\((?:excerpts|noticeLines)\)/g) || []).length], [false, 2]);
@@ -15161,7 +15170,7 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
     const r5 = DF.fillDocuments(items, idx5, '2026-10-17');
     eq('  채우기 로봇 — 자리표시뿐인 글만(사람이 적은 서류·관리자 표식·원문 없음은 그대로) · 근거 표식을 남긴다',
       [r5.filled, items[0].documents, items[0].documentsFrom, items[1].documents, items[2].documents, items[3].documents], [1, ['재학증명서 1부', '성적증명서 1부'], '로봇 2026-10-17 · 원문 「제출서류」 절', ['재학증명서'], ['구비서류는 재공고 원문 확인'], ['신청 방법·서류는 원문 공고 확인']]);
-    const appD = readText(new URL('../app.js', import.meta.url));
+    const appD = appSource();
     eq('  자리표시 판정은 앱(DOC_PLACEHOLDER)과 로봇(isDocPlaceholder)이 같은 글자 · 앱은 서류가 없으면 칸을 접는다(문구 없음) · 관리자가 서류를 고치면 documentsFrom 표식',
       [(appD.match(/const DOC_PLACEHOLDER = (\/.*?\/);/) || [])[1], (readText(new URL('../collector/extract-excerpts.mjs', import.meta.url)).match(/const DOC_PLACEHOLDER = (\/.*?\/);/) || [])[1], /제출 서류는 공고 원문에서 확인해 주세요\.<\/p>/.test(appD.slice(appD.indexOf('<h4>지원 자격</h4>'))), /docText \? row\('서류', docText\) : ''/.test(appD) && /const docs = \(act \? act\.documents \|\| \[\] : sch\.documents \|\| \[\]\)\.filter\(\(doc\) => !DOC_PLACEHOLDER\.test\(doc\)\);/.test(appD), /if \(changed\.includes\('documents'\)\) it\.documentsFrom = OWNER;/.test(readText(new URL('../tools/admin-apply.mjs', import.meta.url)))],
       ['/(원문\\s*공고|공고문|재?공고\\s*원문)(에서)?\\s*확인/', '/(원문\\s*공고|공고문|재?공고\\s*원문)(에서)?\\s*확인/', false, true, true]);
@@ -15183,7 +15192,7 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
     eq('  「1. 자격요건」 아래 세 줄이 자격으로 읽힌다 (전엔 0줄 · 공고 안내에만 있었다)', dental.eligibilityLines.filter((l) => /가능한 분|건강한 분|이행할 수 있는 분/.test(l)).length, 3);
     eq('  활동 내용 절은 자격에 안 딸려 온다', dental.eligibilityLines.some((l) => /치과 진료 보조/.test(l)), false);
     /* 원문 링크 — 시트 단추·카드 링크 이름은 sourceLink(n,'activity') 한 곳 「원문 공고 ↗」 · 카드는 단추 바깥 링크(2026-10-19 개발자 "카드에도 원문공고 하이퍼링크") */
-    const appSrc14 = readText(new URL('../app.js', import.meta.url));
+    const appSrc14 = appSource();
     const slSrc = readText(new URL('../source-link.js', import.meta.url));
     /* 2026-11-02 승인 시안 — 단추 하나 「원문에서 신청하기 ↗」(source-link activityButton · 글 하나로 가는 주소만) · 단추 밑 안내 줄은 없다(안내는 「원문」 절) */
     eq('  활동 시트 단추 이름은 「원문에서 신청하기 ↗」(activityButton) · 카드 링크는 「원문 공고 ↗」(activity) · 단추 밑 안내 줄 없음', /activityButton:\s*\{ page: '원문에서 신청하기 ↗'/.test(slSrc) && /activity:\s*\{ page: '원문 공고 ↗'/.test(slSrc) && !/자세한 내용과 신청은 원문 공고에서 확인하세요/.test(appSrc14), true);
@@ -15383,7 +15392,7 @@ console.log('\n■ 학적정보 테일러링 (2026-10-24 개발자 지시 1~4 ·
   /* ⚠️ 발행된 외대 파일에 GBT학부가 실제로 있는가는 **실데이터**라 여기(수집 로봇이 같이 쓰는 관문)에 두지 않는다 — verify-academic-info.js ② 가 브라우저로 잰다 */
 
   /* 앱 배선 — 글자로 */
-  const app = readText(new URL('../app.js', import.meta.url)).replace(/\/\*[\s\S]*?\*\//g, '');
+  const app = appSource().replace(/\/\*[\s\S]*?\*\//g, '');
   const html = readText(new URL('../index.html', import.meta.url));
   const sw = readText(new URL('../sw.js', import.meta.url));
   eq('  index.html 이 major-track.js 를 app.js 보다 먼저 싣는다', html.indexOf('src="major-track.js"') > 0 && html.indexOf('src="major-track.js"') < html.indexOf('src="app.js"'), true);
@@ -15702,7 +15711,7 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
     [meta6([yg6[0], '30세 이하 대학생']), !!(PRx.schoolKindAlt && PRx.schoolKindAlt('고등교육법 제2조에 해당하는 학교 재학생')), !!(PRx.schoolKindAlt && PRx.schoolKindAlt('「고등교육법」제2조에 해당하는 학교 재학생 중 평점 3.0 이상인 자'))],
     [[false, false], false, false]);
   {
-    const appSrc6 = readText(new URL('../app.js', import.meta.url));
+    const appSrc6 = appSource();
     const covSrc6 = readText(new URL('../verify/eligibility-coverage.mjs', import.meta.url));
     const wsSrc6 = readText(new URL('../verify/what-shows.mjs', import.meta.url));
     const take6 = (n) => (appSrc6.match(new RegExp(`^const ${n} = .*$`, 'm')) || [''])[0];
@@ -15773,7 +15782,7 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
     eq('Q① 온보딩 칩(값·이름표)·공고 안 묻기 선택지가 RESIDENCE_SPANS 한 곳과 같다 (0·12·36·60·120 · 다시 누르면 푸는 묶음)',
       [chips, ((EAx.FIELD_META.residenceMonths || {}).options || []).map((o) => [o.value, o.label]), !!chipBox && /data-toggle/.test(chipBox[0])], [spans, spans, true]);
     eq('  값은 0·12·36·60·120 개월이다', spans.map((s) => Number(s[0])), [0, 12, 36, 60, 120]);
-    const app = readText(new URL('../app.js', import.meta.url));
+    const app = appSource();
     eq('  collectProfile 이 칩을 residenceMonths 로 적고(안 골랐으면 null) · 고치러 온 화면이 되살린다 · data-toggle 묶음만 다시 누르면 푼다',
       [/residenceMonths:\s*\(\(\)\s*=>\s*\{\s*const v = getChip\('#in-residence-months'\);\s*return v == null \? null : Number\(v\);/.test(app),
         /setChip\('#in-residence-months', p\.residenceMonths != null \? String\(p\.residenceMonths\) : null\)/.test(app),
@@ -15893,7 +15902,7 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
       [fB(kJin, pJin), fB({ ...kJin, sourceKind: undefined }, pJin), fB(kGs, pB({ gpa: 3.4, residenceMonths: 12 })), fB(kGs, pB({ gpa: 3.6, residenceMonths: 12 })), fB({ ...kGs, eligibilityLines: [whoB, resB], kosafCoreLines: [whoB] }, pB({ gpa: 3.6, residenceMonths: 12 }))],
       [[true, 0], [false, 0], [false, 1], [false, 0], [true, 0]]);
     eq('  B① 앱이 층2 「누가·성적」 칸 줄을 kosafCoreLines 로 넘긴다(app.js kosafAsScholarships · KOSAF_CORE 가 특정자격·성적기준)',
-      (() => { const aj = readText(new URL('../app.js', import.meta.url)); const body = aj.slice(aj.indexOf('function kosafAsScholarships(')); return [/^const KOSAF_CORE = \['특정자격', '성적기준'\];/m.test(aj), /kosafCoreLines: KOSAF_CORE\.flatMap\(\(k\) => split\(f\[k\]\)\)/.test(body.slice(0, body.indexOf('\n}\n')))]; })(), [true, true]);
+      (() => { const aj = appSource(); const body = aj.slice(aj.indexOf('function kosafAsScholarships(')); return [/^const KOSAF_CORE = \['특정자격', '성적기준'\];/m.test(aj), /kosafCoreLines: KOSAF_CORE\.flatMap\(\(k\) => split\(f\[k\]\)\)/.test(body.slice(0, body.indexOf('\n}\n')))]; })(), [true, true]);
     const dongB = '인천 검단동·불로대곡동·원당동·당하동·오류왕길동·마전동·아라동 거주 5년 이상인 자';
     eq('🔴 B② 시·도 뒤 동 목록(`인천 검단동·불로대곡동…`)은 시·군 안쪽이다 — 인천 남동구·서구 학생 5년 이상이어도 모름(전엔 남동구 ✓ · 틀린 안심) · 서울 학생 ✕ 는 그대로 · `서울 화곡동·등촌동·가양동` 양천구 1년 모름',
       [rmx(dongB, pB({ region: '인천', regionCity: '남동구', parentRegion: '인천', parentRegionCity: '남동구', residenceMonths: 60 })), rmx(dongB, pB({ region: '인천', regionCity: '서구', residenceMonths: 60 })),
@@ -15953,7 +15962,7 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
       [fR(kR(whoR), pR({ gpa: 3.8, residenceMonths: 12 })), fR(kR(whoR), pR({ gpa: 3.4, residenceMonths: 12 })), fR(kR('대한민국 국적의 대학 재학생'), pR({ gpa: 3.8, residenceMonths: 12 }))],
       [[true, 0], [false, 1], [false, 0]]);
     eq('  1회차① 앱이 특정자격 칸 줄을 kosafWhoLines 로 따로 넘긴다(app.js kosafAsScholarships)',
-      (() => { const aj = readText(new URL('../app.js', import.meta.url)); const body = aj.slice(aj.indexOf('function kosafAsScholarships(')); return /kosafWhoLines: split\(f\['특정자격'\]\)/.test(body.slice(0, body.indexOf('\n}\n'))); })(), true);
+      (() => { const aj = appSource(); const body = aj.slice(aj.indexOf('function kosafAsScholarships(')); return /kosafWhoLines: split\(f\['특정자격'\]\)/.test(body.slice(0, body.indexOf('\n}\n'))); })(), true);
     /* ② 소수 학점 수(`12.5학점`)의 뒤 숫자는 평점이 아니다 */
     eq('🔴 1회차② `12.0학점`·`12.5학점`·`13.5학점` 의 뒤 수를 평점으로 읽지 않는다 — 평점 2.9 ✕ · 3.2 ✕ 아님 · 2.8 ✕(전엔 ✓ · ✕ · ✓) · 반대 사례: 같은 줄의 평점 3.0 넘으면 ✓ · `4.5만점 기준 3.5학점` 은 그대로 평점',
       [rmx('이수학점 12.0학점 이상 및 평점 3.0 이상', pR({ gpa: 2.9 })), rmx('직전학기 13.5학점 이상 이수한 자', pR({ gpa: 3.2 })) === 'no', rmx('직전학기 12.5학점 이상 이수 및 평점 3.0 이상인 재학생', pR({ gpa: 2.8 })),
@@ -16335,7 +16344,7 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
       [null, null, 'ok', 'no']);
     eq('  공고 안 「미확인 자격」 이 그 단체 이름으로 묻는다(askableFields · traitLabel) · 앱이 traitLabel 로 그린다',
       [EAm.askableFields(KCT, { ...p0, traits: {} }, null), typeof EAm.traitLabel === 'function' ? EAm.traitLabel(kk) : null, typeof EAm.traitLabel === 'function' && EAm.traitLabel('award') === EAm.TRAIT_LABEL.award,
-        /traitLabel\(tk\)/.test(readText(new URL('../app.js', import.meta.url)))],
+        /traitLabel\(tk\)/.test(appSource())],
       [['trait:member:한국건설교통신기술협회'], '한국건설교통신기술협회 회원·소속 (본인·부모)', true, true]);
   }
 
@@ -16399,7 +16408,7 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
         MEx.requirementLines({}, ['다음 중 하나에 해당하는 자', '국민기초생활수급자', '다자녀 가정의 자녀'], { withMeta: true, all: true }).some((x) => x.head)],
       ['차등조건(1개 이상 충족 시 신청 가능)', '지원자격: 다음 중 1가지 이상 해당하는 자', ['아래 ①·②·③ 중 하나에 해당하는 자', null, null, null], false, false]);
     /* 앱의 진짜 함수를 떼어 돌린다 — 사본을 재면 원본이 바뀌어도 초록이다 */
-    const appP = readText(new URL('../app.js', import.meta.url));
+    const appP = appSource();
     const fnP = (name) => { const a = appP.indexOf(`\nfunction ${name}(`) + 1; if (a < 1) return ''; let i = appP.indexOf(') {', a) + 2, d = 0; for (let j = i; j < appP.length; j++) { if (appP[j] === '{') d++; else if (appP[j] === '}' && --d === 0) return appP.slice(a, j + 1); } return ''; };
     const PRp = createRequire(import.meta.url)('../parse-requirements.js');
     const sheetP = new Function('requirementLines', 'requirementMatch', 'requirementStruct', 'PR', 'state', `${fnP('esc')}\n${fnP('unent')}\n${fnP('missingReqText')}\n${fnP('eligibilityRowsHtml')}\nreturn eligibilityRowsHtml;`)(
@@ -16883,7 +16892,7 @@ console.log('■ 입력 안전장치 (2026-11-17 · HDJ-요청-2026-001 후속) 
   eq('  서류 정보 칸 넷에 글자 종류 안전장치가 걸려 있다',
     ['in-sid', 'in-birth', 'in-phone', 'in-account'].map((id) => /data-guard-kind="\w+"/.test((new RegExp('<input[^>]*id="' + id + '"[^>]*>').exec(html) || [''])[0])), [true, true, true, true]);
   /* 배선 — 파일을 싣고, 칸에 걸고, 넘길 때·저장할 때 보고, 깎기는 없다 */
-  const app = readText(new URL('../app.js', import.meta.url));
+  const app = appSource();
   const sw = readText(new URL('../sw.js', import.meta.url));
   eq('  index.html 이 input-guard.js 를 app.js·elig-ask.js 보다 먼저 싣는다 · 서비스워커도 담는다',
     [html.indexOf('src="input-guard.js"') > 0 && html.indexOf('src="input-guard.js"') < html.indexOf('src="elig-ask.js"'), sw.includes("'input-guard.js'")], [true, true]);
@@ -16946,6 +16955,35 @@ console.log('■ 신청서 원본 → PDF — 단계 시한 안에 끝난다 (20
     limitMin * 60 >= budget + FP.SOFFICE_TIMEOUT_MS / 1000 + 180, true);
   eq('③ 그 단계와 다음 단계의 설치는 잠금을 기다린다(끊긴 앞 단계 잠금에 0초 실패하지 않게)',
     (yml.match(/apt-get install[^\n]*DPkg::Lock::Timeout/g) || []).length >= 2, true);
+}
+
+console.log('■ app.js 나누기 — 떼어 낸 화면이 제자리에 실린다 (2026-11-19 · 첫 화면 app-onboarding.js)');
+{
+  const AS = createRequire(import.meta.url)('./app-source.cjs');
+  const html = readText(new URL('../index.html', import.meta.url));
+  const sw = readText(new URL('../sw.js', import.meta.url));
+  const rawApp = AS.rawApp();
+  for (const p of AS.PARTS) {
+    const at = (s) => html.indexOf(`src="${s}"`);
+    eq(`${p.file} — 앱 화면이 싣고 app.js 보다 먼저다(app.js 맨 아래 시작 코드가 이 파일 함수를 부른다)`, at(p.file) > 0 && at(p.file) < at('app.js'), true);
+    eq(`  서비스워커가 담는다 · 화면 글자 훑개(no-unknown)·말투 관문(ui-tone)이 훑는다`,
+      [sw.includes(`'${p.file}'`), readText(new URL('./no-unknown-scan.cjs', import.meta.url)).includes(`'${p.file}'`), readText(new URL('./ui-tone.mjs', import.meta.url)).includes(`'${p.file}'`)], [true, true, true]);
+    eq('  app.js 에 끼울 자리 표시가 정확히 하나', rawApp.split(p.mark).length - 1, 1);
+    /* 이 파일 맨 윗단은 선언과 리터럴뿐이어야 한다 — app.js 보다 먼저 실리므로 그 자리에서 app.js 의 것을 쓰면 넘어진다 */
+    let threw = '';
+    try { createRequire(import.meta.url)('node:vm').runInNewContext(readText(new URL('../' + p.file, import.meta.url)), {}, { filename: p.file }); } catch (e) { threw = e.message; }
+    eq('  빈 환경에 실어도 넘어지지 않는다(불러오는 순간 app.js 의 상수·함수를 쓰지 않는다)', threw, '');
+  }
+  const whole = AS.appSource();
+  eq('검사가 읽는 app.js 에 표시가 남지 않는다(전부 끼워졌다) · 떼어 낸 함수가 그 안에 있다',
+    [AS.PARTS.every((p) => !whole.includes(p.mark)), /^function collectProfile\(\) \{/m.test(whole), /^function initOnboarding\(\) \{/m.test(whole)], [true, true, true]);
+  /* app.js 를 원본 그대로 읽는 검사가 새로 생기면 떼어 낸 화면을 못 본다 — 「없어야 한다」 검사가 조용히 통과한다 */
+  const vdir = fileURLToPath(new URL('./', import.meta.url));
+  const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
+  const raw = walk(vdir).filter((f) => /\.(m?js|cjs)$/.test(f) && !/app-source\.cjs$|zz-tc-tmp\.mjs$/.test(f))
+    .filter((f) => /readFileSync\([^)\n]*['"](\.\.\/)?app\.js['"]/.test(readText(f)))
+    .map((f) => path.relative(vdir, f)).filter((f) => f !== 'test-collector.mjs');
+  eq('검사 파일이 app.js 를 원본 그대로 읽지 않는다(verify/app-source.cjs appSource 를 쓴다)', raw, []);
 }
 
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');

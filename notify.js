@@ -147,8 +147,8 @@ async function notifyDeliver(events) {
     toShow = [{
       key: 'sum:' + Date.now(),
       type: 'newMatch',
-      title: `한대장 · 새 알림 ${events.length}건`,
-      body: events.slice(0, 2).map((e) => e.title.replace(/^[^ ]+ /, '')).join(' / ') + ' 외',
+      title: `새 알림 ${events.length}건 확인하기`,
+      body: events[0].title + ` 외 ${events.length - 1}건`,
       url: './?screen=notifications',
     }];
   }
@@ -533,8 +533,8 @@ function bindNotifySettings() {
     const ev = {
       key: 'test:' + Date.now(),
       type: 'newMatch',
-      title: '한대장 테스트 알림',
-      body: '알림 도착 예시 · 실제 알림에는 공고 이름과 마감일 포함.',
+      title: '테스트 알림 — 잘 도착했어요',
+      body: '실제 알림에는 공고 이름과 마감일이 들어가요.',
       url: './?screen=notifications',
     };
     NOTIFY_RULES.pushToInbox(notifyLedger, [ev], Date.now());

@@ -613,3 +613,11 @@ export async function observeLanding(page, res, { maxText = 20000, maxFrames = 6
   got.text = got.text.slice(0, maxText);
   return { status, finalUrl, docTitle, ...got };
 }
+
+/* 화면의 폼(최대 4개) — 주소를 유추하지 않고 게시판이 쓰는 폼 그대로를 읽는다. 사냥꾼(link-hunter)·복구 로봇(resolve-detail-urls)이 같이 쓴다(2026-11-19 · 두 벌이던 것) */
+export async function scrapeForms(page) {
+  return page.evaluate(() => [...document.querySelectorAll('form')].slice(0, 4).map((f) => ({
+    action: f.getAttribute('action') || '',
+    fields: [...f.querySelectorAll('input,select')].map((i) => `${i.name}=${i.value}`).filter((x) => !x.startsWith('=')).slice(0, 16).join('&'),
+  }))).catch(() => []);
+}

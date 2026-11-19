@@ -196,7 +196,7 @@ function summarize(reg, notices, cardRead) {
 
 /* 공고 하나를 '본 것'으로 알아보는 두 번째 열쇠 — notify-rules.js 의 titleSeenKey 사본.
    링크 사냥꾼·복구 로봇이 목록 표식(#n-)을 진짜 글 주소로 고치면 **같은 공고의 주소가 바뀐다**.
-   폰은 학교+제목 열쇠로 '본 공고'라 알리지 않는데 서버가 주소만 보면 그 학교를 깨워 빈 알림('새 장학 소식')이 뜬다
+   폰은 학교+제목 열쇠로 '본 공고'라 알리지 않는데 서버가 주소만 보면 그 학교를 깨워 빈 알림('장학 공고 둘러보기')이 뜬다
    (2026-10-04 08:10 회차 실측: 깨운 9개교 전부가 주소만 바뀐 글 46건). */
 const titleSeenKey = (n) => 't:' + (n.school || '') + '|' + String(n.title || '').replace(/\s+/g, '');
 /* titleSeenKey 와 **같은 답**을 싸게 — 공고 400여 건마다 도는 자리다(noticeMini). 위 정규식은 새로 뜬 실행 환경에서
@@ -331,7 +331,7 @@ async function schoolsToWake(env, mini) {
     const dl = s.deadline;
     const dueSoon = dl === today || dl === tomorrow;
     /* 마감 사유는 **공고마다 하루 한 번만** 깨운다(열쇠 'due:공고:오늘'). 폰은 같은 마감 알림을 하루 한 번만
-       보내므로(notify-rules 'dl:' 열쇠) 같은 날 두 번째 회차의 깨우기는 빈 알림('새 장학 소식')이 됐다 —
+       보내므로(notify-rules 'dl:' 열쇠) 같은 날 두 번째 회차의 깨우기는 빈 알림('장학 공고 둘러보기')이 됐다 —
        전국 마감 공고가 있는 날마다 20:10 에 모든 구독자에게. 첫 실행(장부가 빔)에도 마감은 깨운다. */
     const dueKey = 'due:' + s.id + ':' + today;
     const dueFresh = dueSoon && !seen.has(dueKey);

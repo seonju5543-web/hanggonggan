@@ -22,7 +22,7 @@
    실행: node collector/resolve-detail-urls.mjs [--dry]  (워크플로 resolve-detail-urls.yml) */
 import fs from 'node:fs';
 import { chromium } from 'playwright';
-import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, rowMatchesTitle, detailCandidates, idsFromSource, rowDetailCandidates, observeLanding, otherTitlesOnSite, cleanStoredUrl } from './detail-url.mjs';
+import { isMarkerUrl, markerTitle, listUrlOf, isDetailUrl, sameTitle, rowMatchesTitle, detailCandidates, idsFromSource, rowDetailCandidates, observeLanding, otherTitlesOnSite, cleanStoredUrl, scrapeForms } from './detail-url.mjs';
 /* '이 주소를 열면 그 공고가 뜨는가'는 공용 판정 한 곳(link-landing.mjs) — 링크 사냥꾼·브라우저 수집과 같은 것 (2026-10-03).
    예전 verifyCandidate 는 로그인 벽을 제목보다 먼저 봐서 머리의 회원 로그인 상자 하나로 멀쩡한 공고를 떨어뜨렸다. */
 import { judgeLanding, expectTitles, stripRowTail } from './link-landing.mjs';
@@ -252,12 +252,6 @@ async function scrapeRows(page) {
 
 /* 게시판을 여러 페이지 훑는다 — 앱에 담긴 공고 중에는 이미 1페이지에서 밀려난 것이 많다
    (1차 실행에서 '목록에서 못 찾음'이 68건 중 다수였던 이유). */
-async function scrapeForms(page) {
-  return page.evaluate(() => [...document.querySelectorAll('form')].slice(0, 4).map((f) => ({
-    action: f.getAttribute('action') || '',
-    fields: [...f.querySelectorAll('input,select')].map((i) => `${i.name}=${i.value}`).filter((x) => !x.startsWith('=')).slice(0, 16).join('&'),
-  }))).catch(() => []);
-}
 
 async function scanBoard(page, listUrl, maxPages) {
   const seenTitles = new Set();

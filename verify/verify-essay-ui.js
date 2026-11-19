@@ -17,7 +17,7 @@
      ⑤ 서버가 실패하면 학생이 쓴 글이 그대로 남는다
    ============================================================ */
 const { chromium } = require('playwright-core');
-const { assertOwnServer } = require('./onboard-helper.js');
+const { assertOwnServer, dismissNotify } = require('./onboard-helper.js');
 const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 const SHOT = (n) => `${__dirname}/shot-essay-${n}.png`;
 
@@ -27,14 +27,6 @@ const ok = (cond, name, extra) => {
   else { fail++; console.log(`  ✗ ${name}${extra ? '\n      ' + extra : ''}`); }
 };
 
-async function dismissNotify(page) {
-  await page.waitForSelector('#notify-sheet:not([hidden])', { timeout: 6000 }).catch(() => {});
-  const later = await page.$('#btn-nf-later');
-  if (later) await later.click().catch(() => {});
-  else await page.keyboard.press('Escape');
-  await page.waitForSelector('#notify-sheet[hidden]', { timeout: 4000 }).catch(() => {});
-  await page.waitForTimeout(300);
-}
 
 (async () => {
   /* 🔴 재기 전에 **이 서버가 내 앱인지** 확인한다 — 아니면 여기서 멈춘다.

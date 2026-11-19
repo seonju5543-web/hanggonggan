@@ -56,7 +56,7 @@ async function seed(page) {
      개발자 지시: "빨간색 마감 인터렉션 바를 지우고 마감 D-DAY 카운트만 남겨놓기".
      red-green: interactions.js 에 deadlineMeter 를 다시 만들거나 app.js 가 그것을 부르면 여기서 빨간불. */
   console.log('\n■ 마감 막대가 없다 (브라우저 없이)');
-  const appSrc = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  const appSrc = require('./app-source.cjs').appSource();
   const cssSrc = fs.readFileSync(path.join(__dirname, '..', 'style.css'), 'utf8');
   ok('interactions.js 가 막대 함수를 내보내지 않는다', !('deadlineMeter' in inter) && !('deadlineMeterHtml' in inter));
   ok('app.js 가 막대를 부르지 않는다', !/deadlineMeterHtml|dl-meter/.test(appSrc));

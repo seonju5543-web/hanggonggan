@@ -22,7 +22,7 @@
    실행: 이 워크트리에서 `python3 -m http.server <포트>` 를 띄운 뒤
          CHROME_PATH=... PORT=<포트> node verify/verify-apply-prep.js */
 const { chromium } = require('playwright-core');
-const { assertOwnServer, dismissNotify } = require('./onboard-helper.js');
+const { assertOwnServer, dismissNotify, swipeDown } = require('./onboard-helper.js');
 const PORT = process.env.PORT || 8123;   // 워크트리마다 서버 포트가 다르다 — 박아 두면 남의 코드를 잰다
 
 let fail = 0;
@@ -45,18 +45,6 @@ const PROFILE = {
 const PLACEHOLDER_RE = /(원문\s*공고에서\s*확인|공고문에서\s*확인)/;
 
 /* 손가락으로 시트를 아래로 끄는 동작 (verify-sheet-back 과 같은 방식) */
-async function swipeDown(page, sel) {
-  const at = await page.$eval(sel, (e) => { const r = e.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + 20 }; });
-  await page.evaluate(({ x, y }) => {
-    const el = document.elementFromPoint(x, y);
-    const mk = (t, cy) => new TouchEvent(t, { bubbles: true, cancelable: true,
-      touches: t === 'touchend' ? [] : [new Touch({ identifier: 1, target: el, clientX: x, clientY: cy })],
-      changedTouches: [new Touch({ identifier: 1, target: el, clientX: x, clientY: cy })] });
-    el.dispatchEvent(mk('touchstart', y));
-    el.dispatchEvent(mk('touchmove', y + 140));
-    el.dispatchEvent(mk('touchend', y + 140));
-  }, at);
-}
 
 (async () => {
   await assertOwnServer(PORT);   // 남의 워크트리를 재면 판정이 거짓이 된다
