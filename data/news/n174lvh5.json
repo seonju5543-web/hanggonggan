@@ -3,6 +3,16 @@
  "updatedAt": "2026-11-19",
  "items": [
   {
+   "title": "보안 업데이트에 따른 대표 홈페이지 접속 일시 중단 안내",
+   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=278015&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-19",
+   "school": "가톨릭대학교",
+   "campus": "",
+   "src": "5d85d287",
+   "foundAt": "2026-11-19",
+   "desc": "최신 보안 업데이트 적용을 위해 서버를 재기동할 예정입니다. 작업 중 가톨릭대학교 대표 홈페이지 접속이 일시적으로 중단될 수 있으니 이용에 참고해 주시기 바랍니다."
+  },
+  {
    "title": "[공간디자인·소비자학과] 2026년 제 5회 부천건축문화제 공간디자인·소비자학과 작품 전시",
    "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277959&article.offset=0&articleLimit=10",
    "postedAt": "2026-11-18",
@@ -421,17 +431,6 @@
    "src": "5d85d287",
    "foundAt": "2026-10-26",
    "thumb": "data/news/img/5c4e5cf09878a0f1.webp"
-  },
-  {
-   "title": "[중앙도서관] 모바일 APP 서비스 중지 안내",
-   "url": "https://www.catholic.ac.kr/ko/campuslife/notice.do?mode=view&articleNo=277106&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-26",
-   "kind": "생활",
-   "school": "가톨릭대학교",
-   "campus": "",
-   "src": "5d85d287",
-   "foundAt": "2026-10-26",
-   "thumb": "data/news/img/01b9eb2d303f14e2.webp"
   }
  ]
 }

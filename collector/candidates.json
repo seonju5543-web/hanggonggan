@@ -1,7 +1,7 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-11-19",
- "count": 1892,
+ "count": 1896,
  "items": [
   {
    "title": "[서울][교내] 2026학년도 2학기 서울캠퍼스 HUFS Dream 장학금 신청 안내 (1",
@@ -512,6 +512,42 @@
    "foundAt": "2026-11-19",
    "bodyDeadline": "2026-12-23",
    "bodyDeadlineText": "[교외] KC미래장학재단 장학생 선발 안내(12/23 마감, 이공계열, 생활비 400만원)"
+  },
+  {
+   "title": "2023학년도 장학생 모집 공고 학생지원팀",
+   "url": "https://www.sungshin.ac.kr/bbs/main_kor/4719/118511/artclView.do",
+   "attachments": [],
+   "deadlineHint": "신청기간 장학성격 서울장학재단 2024년 서울희망 공익인 재 장학금 장학생 선발 ~3월 22일 16시 학업장려금성 서울장학재단 2024년 청춘S",
+   "school": "성신여자대학교",
+   "campus": "",
+   "foundAt": "2026-11-19"
+  },
+  {
+   "title": "2024학년도 장학생 모집 공고 학생지원팀",
+   "url": "https://www.sungshin.ac.kr/bbs/main_kor/4719/128518/artclView.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "성신여자대학교",
+   "campus": "",
+   "foundAt": "2026-11-19"
+  },
+  {
+   "title": "2025학년도 장학생 모집 공고 학생지원팀",
+   "url": "https://www.sungshin.ac.kr/bbs/main_kor/4719/140196/artclView.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "성신여자대학교",
+   "campus": "",
+   "foundAt": "2026-11-19"
+  },
+  {
+   "title": "2026학년도 장학생 모집 공고 학생지원팀",
+   "url": "https://www.sungshin.ac.kr/bbs/main_kor/4719/152840/artclView.do",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "성신여자대학교",
+   "campus": "",
+   "foundAt": "2026-11-19"
   },
   {
    "title": "★2027-1학기 국가장학금 1차 신청 안내(재학생은 반드시 1차 신청)",

@@ -474,7 +474,7 @@
    "kind": "page",
    "param": "page"
   },
-  "checkedAt": "2026-11-18"
+  "checkedAt": "2026-11-19"
  },
  "https://www.sookmyung.ac.kr/kr/news/event.do": {
   "ok": false,
@@ -535,5 +535,13 @@
  "https://kangwon.ac.kr/ko/bbs/719/list.do": {
   "ok": false,
   "checkedAt": "2026-11-17"
+ },
+ "https://www.sungshin.ac.kr/main_kor/11107/subview.do": {
+  "ok": false,
+  "checkedAt": "2026-11-19"
+ },
+ "https://www.sungshin.ac.kr/main_kor/18962/subview.do": {
+  "ok": false,
+  "checkedAt": "2026-11-19"
  }
 }

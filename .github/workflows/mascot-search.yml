@@ -1,0 +1,37 @@
+name: 마스코트 그림 후보 찾기
+
+# 3D 마스코트 시안(docs/designs/mascot-survey.md)의 빈 칸을 네이버 검색으로 메운다.
+# 저장하지 않는다(contents: read) — 결과는 로그와 아티팩트로만. 실행: tools/run-mascot-search.txt 를 고쳐 push.
+
+# 손으로 돌리는 길(workflow_dispatch)은 두지 않는다 — 한 번 쓰는 조사 도구라 관리자 화면에 버튼이 없다(관문 「화면이 못 부르는 워크플로」)
+on:
+  push:
+    # 시안 작업 브랜치에서만 — 거르지 않으면 같은 커밋이 다른 브랜치에 올라갈 때마다 다시 돈다
+    branches: ['david/elegant-cannon-2vtxj3']
+    paths:
+      - 'tools/run-mascot-search.txt'
+
+permissions:
+  contents: read
+
+jobs:
+  search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: 네이버 검색에 묻기
+        timeout-minutes: 5
+        env:
+          NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+        run: node tools/mascot-search.mjs mascot-search.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: mascot-search
+          path: mascot-search.json
+          retention-days: 7
