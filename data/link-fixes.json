@@ -1,7 +1,7 @@
 {
  "v": 1,
  "note": "관리자가 넣은 원문 공고 주소 — 관리자 화면 「원문 링크」가 적는다(tools/admin-apply.mjs linkFix). 앱은 source-link.js 가 읽는다. 열쇠: id:<공고 id> · u:<지금 주소>",
- "updatedAt": "2026-10-04 22:43 KST",
+ "updatedAt": "2026-11-20 02:04 KST",
  "fix": {
   "id:reg-khu-uiam": {
    "url": "https://news.khu.ac.kr/kor/user/bbs/BMSR00040/view.do?menuNo=200318&boardId=322415",
@@ -104,6 +104,318 @@
    "by": "Claude 세션",
    "at": "2026-10-04",
    "note": "중앙대 view.do?…nttId= 주소가 「점검 중」 화면 — 같은 번호의 BoardView(BBS_SEQ)(2026-10-04 확인)"
+  },
+  "id:kosaf-2704219001": {
+   "url": "https://www.ygef.or.kr/board/?board=notice&site=ygmirae&mn=211&type=view&post_idx=2356",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-27",
+   "title": "2026년 2학기 대학생등록금 지원사업 공고",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2000423012": {
+   "url": "https://www.jincheon.go.kr/jcjh/sub.do?menukey=3464&mode=view&no=974401097",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-30",
+   "title": "(재)진천군장학회 2026년 워킹홀리데이 지원사업 신청자 모집 공고(항공료 지원)",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2700003009": {
+   "url": "https://www.mju.ac.kr/bbs/mjukr/145/237091/artclView.do",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-12-11",
+   "title": "한국고등교육재단 문우림 제6기 장학생 선발 안내",
+   "note": "주는 곳 사이트에 글이 없거나 못 열어 이 공고를 옮겨 실은 학교 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2704364001": {
+   "url": "https://www.gangbuk.go.kr/portal/bbs/B0000145/view.do?menuNo=200081&nttId=186080",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-27",
+   "title": "꿈나무장학재단 제15기 재능장학생 선발 모집 안내",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2000204008": {
+   "url": "https://www.wonju.go.kr/www/selectBbsNttView.do?key=211&bbsNo=1&nttNo=478878",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-12-11",
+   "title": "2026년 다자녀가정 특별지원（대학등록금） 신청 안내",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2000193001": {
+   "url": "https://eminwon.hongcheon.go.kr/emwp/gov/mogaha/ntis/web/ofr/action/OfrAction.do?method=selectOfrNotAncmt&methodnm=selectOfrNotAncmtRegst&jndinm=OfrNotAncmtEJB&context=NTIS&not_ancmt_mgt_no=56076&homepage_pbs_yn=Y&subCheck=Y",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-20",
+   "title": "2026년도 홍천군 저소득주민자녀장학생 선발 공고",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2000193002": {
+   "url": "https://eminwon.hongcheon.go.kr/emwp/gov/mogaha/ntis/web/ofr/action/OfrAction.do?method=selectOfrNotAncmt&methodnm=selectOfrNotAncmtRegst&jndinm=OfrNotAncmtEJB&context=NTIS&not_ancmt_mgt_no=56076&homepage_pbs_yn=Y&subCheck=Y",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-20",
+   "title": "2026년도 홍천군 저소득주민자녀장학생 선발 공고",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2701104001": {
+   "url": "https://geomdansf.clickn.co.kr/boards/33/view",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-20",
+   "title": "2026년 장학생 선발 공고",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2000356002": {
+   "url": "https://www.tongyeong.go.kr/00852/00853/00858.web?amode=view&not_ancmt_mgt_no=51792",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-23",
+   "title": "2026년도 통영시 저소득 대학생 장학금 지원대상자 선발 재공고",
+   "note": "통영시 고시/공고 재공고(공고 제2026-2063호 · 게재 2026-11-03) — 2026-11-19 열어 확인"
+  },
+  "id:kosaf-2000356004": {
+   "url": "https://www.tongyeong.go.kr/00852/00853/00858.web?amode=view&not_ancmt_mgt_no=51736",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-23",
+   "title": "2026년도 통영시 지역대학생 장학금 지원대상자 선발 공고",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2700724005": {
+   "url": "https://baro.gyeongnam.go.kr/baro/serviceView.es?service_no=475&mid=a10202000000",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-12-18",
+   "title": "도내 대학 해외교환학생 장학금",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2000319002": {
+   "url": "https://www.yeongju.go.kr/atec/page.do?step=258&parm_bod_uid=1167553&mnu_uid=10795&",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-12-31",
+   "title": "2026년도 귀농인 대학생 자녀 학자금 지원사업 신청안내",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2700004002": {
+   "url": "https://www.knu.ac.kr/wbbs/wbbs/bbs/btin/viewBtin.action?bbs_cde=1&btin.bbs_cde=1&btin.doc_no=1338708&btin.appl_no=000000&menu_idx=67",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-20",
+   "title": "2027학년도 관정재단 장학생(학부생) 선발 안내_26.11.20.(금) 18:00",
+   "note": "주는 곳 사이트에 글이 없거나 못 열어 이 공고를 옮겨 실은 학교 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2513450002": {
+   "url": "https://www.gimje.go.kr/board/view.gimje?boardId=BBS_0000027&menuCd=DOM_000000104001000000&dataSid=375816",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-27",
+   "title": "2026년 하반기 김제시 대학생 생활안정비 지원사업 대상자 모집",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2700636002": {
+   "url": "https://mjsf.co.kr/default/board/01.php?com_board_basic=read_form&com_board_idx=18&com_board_id=1",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-12-11",
+   "title": "2026년 동지장학생 선발공고",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-0731002": {
+   "url": "https://www.koreanursing.or.kr/bbs/kna_ko/9/10937/artclView.do",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-12-04",
+   "title": "[일반] 통일간호리더장학금 신청안내",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-0758001": {
+   "url": "https://blog.naver.com/pscholarship/224455531565",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-12-31",
+   "title": "2027 박신양 FUN 장학회 제19기 장학생 모집",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2701277003": {
+   "url": "https://www.pcu.ac.kr/kor/article/scholarship/1926154031",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-27",
+   "title": "배재장학재단 2026학년도 하반기 장학생 선발 요강",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2701277006": {
+   "url": "https://www.pcu.ac.kr/kor/article/scholarship/1926154031",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-27",
+   "title": "배재장학재단 2026학년도 하반기 장학생 선발 요강",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2701277007": {
+   "url": "https://www.pcu.ac.kr/kor/article/scholarship/1926154031",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-27",
+   "title": "배재장학재단 2026학년도 하반기 장학생 선발 요강",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2700157001": {
+   "url": "http://www.baeksan.or.kr/SBoard/sboard.asp?boardid=notice&mode=view&seq=46",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-21",
+   "title": "2026년도 백산장학재단 장학금 선발 공고",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2704373001": {
+   "url": "https://cafe.naver.com/borimseoul/607",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2027-01-05",
+   "title": "2027년도 1학기 제7회 보림선원 서울선원 장학생 선발 공고",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2704380001": {
+   "url": "http://www.bwdi.or.kr/bbs/board.php?bo_table=06_1&wr_id=801",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-18",
+   "title": "불교여성개발원 제11회 장학생 선발 공고",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2700071007": {
+   "url": "https://www.ycsf.or.kr/open/notice/read.html?idx=342&step=A",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-12-31",
+   "title": "(재)영천시장학회 2026년도 장학생 선발계획 공고",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2704372001": {
+   "url": "http://www.ilshinfoundation.com/bbs/board.php?bo_table=notice&wr_id=14",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-27",
+   "title": "[공고] 일신문화재단 2026 형남장학금",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2703652001": {
+   "url": "https://www.cheongju.go.kr/munui/selectBbsNttView.do?key=2426&bbsNo=511&nttNo=273950&searchCtgry=&searchCnd=all&searchKrwd=&pageIndex=1&integrDeptCode=000100200",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-20",
+   "title": "2026년 하반기 재단법인 문의육영장학재단 장학생 선발계획 공고",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2701042001": {
+   "url": "https://www.seoksung.co.kr/cms/bbs/board.php?bo_table=notice&wr_id=55",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-30",
+   "title": "2026년도 석성선행장학생 선발 안내",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2701042002": {
+   "url": "https://www.seoksung.co.kr/cms/bbs/board.php?bo_table=notice&wr_id=55",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-30",
+   "title": "2026년도 석성선행장학생 선발 안내",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2700727005": {
+   "url": "https://ansanfys.or.kr/sub02/sub01.php?type=view&uid=1071",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-20",
+   "title": "2026년 2학기 안산시 대학생 본인부담 등록금 반값지원 신청 공고",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2703603001": {
+   "url": "https://www.ewha.ac.kr/ewha/news/notice.do?mode=view&articleNo=367925",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-20",
+   "title": "[학부] [유하푸른재단] 2027년도 제10기 장학생 선발 안내",
+   "note": "주는 곳 사이트에 글이 없거나 못 열어 이 공고를 옮겨 실은 학교 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2703679001": {
+   "url": "http://www.changam.or.kr/?act=board&bbs_code=notice&bbs_mode=view&bbs_seq=21",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-20",
+   "title": "2026년도 창암장학생 모집 재공고(선발일정 변경)",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-0723001": {
+   "url": "https://www.handokmuseum.com/company/notice.php?ptype=view&idx=42577&code=notice_c",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-12-14",
+   "title": "2027 장학금 및 연구지원금 지원 대상자 선발 공고",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-0723002": {
+   "url": "https://www.handokmuseum.com/company/notice.php?ptype=view&idx=42577&code=notice_c",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-12-14",
+   "title": "2027 장학금 및 연구지원금 지원 대상자 선발 공고",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2000449006": {
+   "url": "https://www.jangseong.go.kr/home/www/news/jangseong/notice/show/6675",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-12-11",
+   "title": "2026년 2학기 장성군 대학생 등록금 지원사업 공고",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-3098537003": {
+   "url": "https://www.jecheon.go.kr/www/selectBbsNttView.do?key=5233&bbsNo=18&nttNo=405538",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-30",
+   "title": "2026년 2학기 제천시 다자녀가구 등록금 지원 사업 신청 공고",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2704374001": {
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46131/artclView.do",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-18",
+   "title": "[학부-교외장학] 2026학년도 한국건설교통신기술협회 미래 건설교통신기술인 장학사업 장학생 모집 안내",
+   "note": "주는 곳 사이트에 글이 없거나 못 열어 이 공고를 옮겨 실은 학교 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2704375001": {
+   "url": "https://www.kref.or.jp/news/2026scholarshipkorea/",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-20",
+   "title": "2026년도 한국교육재단 한국사무소 장학생 모집 안내",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2000480007": {
+   "url": "https://www.rhof.or.kr/sub/sub0401_view.jsp?headerId=B00001100",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-11-18",
+   "title": "2026년 KRA아동돌봄 지원사업(겨울방학) 참여 대학생 모집 안내",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
+  },
+  "id:kosaf-2701295001": {
+   "url": "https://cbck.or.kr/cafl/Resources?no=20261403",
+   "by": "Claude 세션(개발자 지시 2026-11-19)",
+   "at": "2026-11-20",
+   "round": "2026-12-11",
+   "title": "[공모] 2027년도 명도회 장학금 지원 대상자 공모",
+   "note": "주는 곳의 공고 글 — 2026-11-19 새 탭으로 열어 제목 확인"
   }
  }
 }
