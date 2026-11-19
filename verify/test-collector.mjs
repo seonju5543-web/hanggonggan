@@ -16638,7 +16638,8 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
   const soon = plus(20), [sy, sm, sd] = soon.split('-').map(Number);
   const QUOTE = `신청기간: ${sy}.${sm}.${sd}.까지`;
   const body = `${SRC}\n${QUOTE}\n${'장학금 지원 대상자 선발 안내 본문입니다 '.repeat(12)}`;
-  const mk = (id, n) => ({ id, name: ITEM.name.replace('통영시', `통영${n}시`), type: '교외', sourceUrl: `https://example.ac.kr/notice?no=${n}`, deadline: plus(3), listedAt: plus(-1), amountValue: 0, attachments: [], eligibility: {} });
+  /* 2026-11-20 — 유료로 읽는 것은 숨김 등록분(paidGate)만이라 표본에 달아 둔다(달지 않은 공고는 아래 ⑤ 가 '안 읽힌다'를 잰다) */
+  const mk = (id, n) => ({ id, name: ITEM.name.replace('통영시', `통영${n}시`), type: '교외', sourceUrl: `https://example.ac.kr/notice?no=${n}`, deadline: plus(3), listedAt: plus(-1), paidGate: plus(-1), amountValue: 0, attachments: [], eligibility: {} });
   const regItems = [mk('x-1', 1), mk('x-2', 2)];
   const regText = `${JSON.stringify({ items: regItems }, null, 1)}\n`;
   const sb = crSandbox(new URL('../', import.meta.url), 'hdj-card-read-');
@@ -16669,8 +16670,9 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
     got = (sb.json('data/card-read.json') || {}).items || {}; led = sb.json('collector/card-read-ledger.json') || {};
     eq('  가짜 응답으로 돌리면 결과 파일에 실린다 — 지어낸 줄(「재산 3억 이하」)은 빠지고 · 마감 · 금액 숫자 · 장부에 버린 줄과 **응답 원본**이 남는다',
       [run1b.status, (got['x-1'] || {}).eligibility, (got['x-1'] || {}).notes, ((got['x-1'] || {}).deadline || {}).date, (got['x-1'] || {}).head, (led['x-1'] || {}).done, ((led['x-1'] || {}).dropped || []).length, !!((led['x-1'] || {}).raw || {}).a],
-      [0, ['학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 자'], [], soon, 1000000, true, 2, true]);
-    eq('  두 읽기가 자격에서 갈린 공고는 자격 칸을 싣지 않는다(null) — 다른 칸은 싣는다', [(got['x-2'] || {}).eligibility, (got['x-2'] || {}).excludes, ((led['x-2'] || {}).held || []).length], [null, ['대학원생, 휴학생'], 1]);
+      [0, ['학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 자'], [], soon, 1000000, true, 1, true]);
+    eq('  읽기→고치기(2026-11-20) — 둘째(고치기)가 낸 결과가 실린다: 첫째가 빠뜨린 원문 요건을 더한 자격 칸 · 장부에 mode fix · 두 읽기를 견주지 않으니 넘긴 줄 0',
+      [((got['x-2'] || {}).eligibility || []).length, (got['x-2'] || {}).excludes, ((led['x-2'] || {}).held || []).length, (led['x-2'] || {}).mode], [2, ['대학원생, 휴학생'], 0, 'fix']);
     eq('  🔴 registered.json 은 한 글자도 안 바뀐다 (무료 길 값이 비상망으로 남는다)', sb.read('data/registered.json') === regText, true);
     const run2 = sb.run('collector/card-read.mjs', ['--write'], { ...NOENV, CARD_READ_FAKE: sb.abs('fake.json') }, 30000);
     eq('  같은 원문은 다시 읽지 않는다 (대상 0건) · 실린 것은 그대로', [/대상 0건/.test(run2.out), Object.keys((sb.json('data/card-read.json') || {}).items || {}).sort()], [true, ['x-1', 'x-2']]);
@@ -16691,9 +16693,9 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
     eq('  목록에서 빠진 공고는 결과 파일과 장부에서도 뺀다', [Object.keys((sb.json('data/card-read.json') || {}).items || {}), Object.keys(sb.json('collector/card-read-ledger.json') || {})], [['x-1'], ['x-1']]);
   } finally { sb.done(); }
   const robot = readText(new URL('../collector/card-read.mjs', import.meta.url));
-  eq('  로봇이 registered.json 에 쓰는 줄이 없다 · 유료 호출은 스위치 둘 뒤에만 · 건마다 저장 + 넘어져도 저장 · 한쪽이 실패해도 쓴 돈을 센다(allSettled) · 연달아 실패하면 멈춘다 · 실패가 있으면 빨갛게 끝낸다',
+  eq('  로봇이 registered.json 에 쓰는 줄이 없다 · 유료 호출은 스위치 둘 뒤에만 · 건마다 저장 + 넘어져도 저장 · 고치기가 실패해도 읽기에 쓴 돈을 센다 · 연달아 실패하면 멈춘다 · 실패가 있으면 빨갛게 끝낸다',
     [/writeFileSync\([^)]*registered/.test(robot), /cfg\.enabled === true && process\.env\.CARD_READ_ENABLE === '1'/.test(robot), /save\(\);   \/\/ 건마다 저장/.test(robot) && /finally \{\s*save\(\);/.test(robot),
-      /Promise\.allSettled\(/.test(robot) && !/Promise\.all\(\[ask/.test(robot), /if \(streak >= 3\)/.test(robot), /if \(failed\) process\.exit\(1\);/.test(robot)], [false, true, true, true, true, true]);
+      /spent \+= ra\.usd; outA = ra\.out;[\s\S]{0,240}spent \+= rb\.usd/.test(robot) && /usd \+= spent;/.test(robot) && !/Promise\.all\(\[ask/.test(robot), /if \(streak >= 3\)/.test(robot), /if \(failed\) process\.exit\(1\);/.test(robot)], [false, true, true, true, true, true]);
   const wf = readText(new URL('../.github/workflows/card-read.yml', import.meta.url));
   /* 저장 앞 관문의 짜임(규칙 관문·데이터 감사·되돌리기)은 health-gates/savegate.mjs 가 모든 워크플로에 대해 잰다 — 여기는 이 워크플로만의 것 셋 */
   eq('  워크플로 — 사전 관문 단계에 pipefail(관문이 빨가면 유료 단계가 안 돈다) · 저장 전 꼴 검사(--check) · 읽기 단계가 일부 실패해도 저장으로 가고(continue-on-error) 알림은 그 결과를 본다',
@@ -16723,6 +16725,75 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
       fd({ eligibility: ['대학교 재학생'], excludes: ['2026년도 통영시 성적우수 장학금, 지역대학생 장학금, 인재육성장학금 수혜자'] }).fails.length], [1, 1, 0]);
   eq('  applyCardRead — 결과 파일에 없는 공고는 같은 객체 그대로 · 파일이 없거나 꼴이 틀리면 목록 그대로',
     [MEc.applyCardRead([free], { items: {} })[0] === free, MEc.applyCardRead([free], null)[0] === free, MEc.applyCardRead([free], { items: [] })[0] === free, MEc.applyCardRead([free], { items: { 'f-1': paid } })[0].provider], [true, true, true, '표본재단']);
+}
+
+/* ══ 유료 관문 — 읽기→고치기→사실 검사 · 숨김 등록 (2026-11-20 개발자 지시 · 설계 docs/designs/paid-gate-pipeline.md) ══
+   다듬은 문장(text)은 자유롭지만 사실(숫자·부정·비교 말·기관 이름)은 원문 근거(quote)와 같아야 실린다. 🔴 표본만 잰다 · 돈 0(가짜 응답) */
+{
+  console.log('\n■ 유료 관문 — 읽기→고치기→사실 검사 · 숨김 등록 (2026-11-20)');
+  const CR = await import(new URL('../collector/card-read.mjs', import.meta.url));
+  const { sandbox: gSandbox } = await import(new URL('./health-gates/bodies.mjs', import.meta.url));
+  const wonIn = createRequire(import.meta.url)('../parse-amount.js').wonIn;
+  const SRC = ['===== 게시판 본문 =====', '삼성꿈장학재단 장학생 선발 안내', '가. 직전학기 평점평균 3.0 이상인 자로,', '나. 휴학생 제외',
+    '다. 타 장학금을 수혜하지 않고, 학업에 성실한 자', '접수기간: 2026.11.18.(수)~2026.11.26.(목)', '지원금액: 학기당 200만원', '제출서류: 재학증명서 1부, 성적증명서 1부'].join('\n');
+  const ITEM = { id: 'g-1', name: '[교외] 삼성꿈장학재단 장학생 선발 안내', amountValue: 0, attachments: [], listedAt: '2026-11-17' };
+  const fm = (t, q) => CR.factsMatch(t, q).ok;
+  eq('① 사실 대조 — 다듬은 말은 통과 · 숫자를 바꾸면 · 「제외」를 빼면 · 근거에 없는 기관 이름을 넣으면 · 전혀 다른 말이면 떨어진다',
+    [fm('직전 학기 평점평균 3.0 이상인 학생', '직전학기 평점평균 3.0 이상인 자로,'), fm('직전 학기 평점평균 3.5 이상인 학생', '직전학기 평점평균 3.0 이상인 자로,'),
+      fm('휴학생', '휴학생 제외'), fm('휴학생 제외', '나. 휴학생 제외'), fm('삼성꿈장학재단 추천을 받은 학생', '본교 총장 추천자'), fm('서울 거주 대학생', '직전학기 평점평균 3.0 이상인 자로,'),
+      fm('타 장학금을 받고 있지 않은 학생', '타 장학금을 수혜하지 않고,'), fm('평점 3.0 이상인 학생', '3.0 미만인 자')],
+    [true, false, false, true, false, false, true, false]);
+  const base = { title: '', host: '', eligibility: [], excludes: [], priority: [], amount: [], deadline: { date: '', quote: '' }, apply: [], documents: [], notes: [], multi: false, unreadable: false };
+  const L = (text, quote) => ({ text, quote });
+  const v = CR.verify({ ...base, eligibility: [L('직전 학기 평점평균 3.0 이상인 학생', '직전학기 평점평균 3.0 이상인 자로,'), L('직전 학기 평점평균 3.0 이상인 학생', '평점 3.0 이상')] }, SRC, ITEM);
+  eq('  근거가 원문 그대로가 아니면 떨어진다 · 통과한 줄은 다듬은 문장(text)이 실린다 · 버린 줄은 근거와 함께 장부로',
+    [v.kept.eligibility, v.dropped.length, v.dropped[0] && v.dropped[0].quote], [['직전 학기 평점평균 3.0 이상인 학생'], 1, '평점 3.0 이상']);
+  const fixed = { ...base, host: '삼성꿈장학재단', eligibility: [L('직전 학기 평점평균 3.0 이상인 학생', '직전학기 평점평균 3.0 이상인 자로,'), L('다른 장학금을 받지 않고 학업에 성실한 학생', '타 장학금을 수혜하지 않고, 학업에 성실한 자')],
+    excludes: [L('휴학생', '휴학생')], amount: [L('학기당 200만원', '지원금액: 학기당 200만원')], documents: [L('재학증명서 1부', '재학증명서 1부'), L('성적증명서 1부', '성적증명서 1부')],
+    deadline: { date: '2026-11-26', quote: '접수기간: 2026.11.18.(수)~2026.11.26.(목)' } };
+  const be = CR.buildEntryFixed(ITEM, SRC, fixed, wonIn);
+  eq('② 고친 결과 하나로 카드를 만든다 — 자격·제외·서류·금액(맨 위 200만원)·마감·주최',
+    [be.entry && be.entry.eligibility.length, be.entry && be.entry.excludes, be.entry && be.entry.documents.length, be.entry && be.entry.head, be.entry && be.entry.deadline.date, be.entry && be.entry.host],
+    [2, ['휴학생'], 2, 2000000, '2026-11-26', '삼성꿈장학재단']);
+  const beBad = CR.buildEntryFixed(ITEM, SRC, { ...fixed, eligibility: [...fixed.eligibility, L('직전 학기 평점평균 3.5 이상인 학생', '직전학기 평점평균 3.0 이상인 자로,')] }, wonIn);
+  const beEx = CR.buildEntryFixed(ITEM, SRC, { ...fixed, excludes: [L('휴학생', '휴학생 제외')] }, wonIn);
+  eq('  🔴 엄격 칸(자격·제외·서류)에서 한 줄이라도 떨어지면 그 칸은 싣지 않는다(null) · 제외 칸이 보류면 자격 칸도 · 다른 칸은 실린다',
+    [beBad.entry.eligibility, beEx.entry.excludes, beEx.entry.eligibility, (beEx.entry.amount || []).length], [null, null, null, 1]);
+  eq('  「연장」 공고는 마감을 싣지 않는다 · 「읽을 내용 없음」이면 싣지 않는다',
+    [CR.buildEntryFixed({ ...ITEM, name: '장학생 선발 연장 공고' }, SRC, fixed, wonIn).entry.deadline, CR.buildEntryFixed(ITEM, SRC, { ...base, unreadable: true }, wonIn).entry], [null, null]);
+  eq('  🔴 옛 장부(두 읽기 · 글자 줄)는 옛 길 그대로 — 같은 응답이면 옛 결과와 같다',
+    CR.buildEntry(ITEM, SRC, { ...base, excludes: ['휴학생 제외'] }, { ...base, excludes: ['휴학생 제외'] }, wonIn).entry.excludes, ['휴학생 제외']);
+  eq('  지시문 — 읽기와 고치기 둘 다 줄마다 text·quote 를 요구하고 · 고치기는 완성본 전체를 낸다 · 해시는 두 지시문을 다 넣는다 · 줄의 꼴은 {text, quote}',
+    [/quote/.test(CR.SYSTEM) && /quote/.test(CR.FIX_SYSTEM), /완성본 전체/.test(CR.FIX_SYSTEM), /update\(SYSTEM\)\.update\(FIX_SYSTEM\)/.test(readText(new URL('../collector/card-read.mjs', import.meta.url))),
+      JSON.stringify(CR.SCHEMA.properties.eligibility.items.required)], [true, true, true, '["text","quote"]']);
+
+  /* ③ 진짜 로봇을 임시 폴더에서 — 숨김분만 읽는다 · 한 번 올린 것은 다시 숨기지 않는다 · 사람에게 넘길 숨김분(gateHeld) */
+  const plus = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+  const soon = plus(20), [sy, sm, sd] = soon.split('-').map(Number);
+  const QUOTE = `접수기간: ${sy}.${sm}.${sd}.까지`;
+  const body = (n) => `${SRC.replace('삼성꿈', `삼성꿈${n}`)}\n${QUOTE}\n${'장학생 선발 안내 본문입니다 '.repeat(12)}`;
+  const mk = (id, n, over = {}) => ({ id, name: `[교외] 삼성꿈${n}장학재단 장학생 선발 안내`, type: '교외', sourceUrl: `https://example.ac.kr/g?no=${n}`, deadline: plus(10), listedAt: plus(-1), amountValue: 0, attachments: [], eligibility: {}, ...over });
+  const items = [mk('g-new', 1, { paidGate: plus(-1) }), mk('g-old', 2), mk('g-nosrc', 3, { paidGate: plus(-5), sourceUrl: 'https://example.ac.kr/g?no=99' })];
+  const sb = gSandbox(new URL('../', import.meta.url), 'hdj-paid-gate-');
+  const NOENV = { CARD_READ_ENABLE: '', CARD_READ_FAKE: '', ANTHROPIC_API_KEY: '' };
+  try {
+    sb.write('data/registered.json', `${JSON.stringify({ items }, null, 1)}\n`);
+    sb.write('collector/extracted/notices-text.json', [1, 2].map((n) => ({ title: items[n - 1].name, school: '시험대학교', url: items[n - 1].sourceUrl, text: body(n) })));
+    const good = { ...fixed, host: '', deadline: { date: soon, quote: QUOTE } };
+    sb.write('fake.json', { 'g-new': { a: base, b: good }, 'g-old': { a: base, b: good } });
+    const r1 = sb.run('collector/card-read.mjs', ['--write'], { ...NOENV, CARD_READ_FAKE: sb.abs('fake.json') }, 30000);
+    const doc = sb.json('data/card-read.json') || {};
+    eq('③ 숨김 등록분만 읽는다 — 그 전 등록분(paidGate 없음)은 원문이 있어도 안 읽는다 · 원문이 사흘 넘게 없는 숨김분은 사람에게(no-source)',
+      [r1.status, Object.keys(doc.items || {}), doc.gateHeld], [0, ['g-new'], { 'g-nosrc': 'no-source' }]);
+    if (r1.status !== 0) console.log(r1.out.slice(-600));
+    const led = sb.json('collector/card-read-ledger.json'); led['g-new'].hash = 'old';
+    sb.write('collector/card-read-ledger.json', led);
+    sb.write('fake.json', { 'g-new': { a: base, b: { ...base, unreadable: true } } });
+    sb.run('collector/card-read.mjs', ['--write'], { ...NOENV, CARD_READ_FAKE: sb.abs('fake.json') }, 30000);
+    const doc2 = sb.json('data/card-read.json') || {};
+    eq('  🔴 한 번 학생 화면에 올린 숨김분은 다시 읽기가 빈 결과를 내도 결과를 지우지 않는다(다시 숨지 않는다) · 사람에게 넘기지도 않는다',
+      [!!(doc2.items || {})['g-new'], (doc2.gateHeld || {})['g-new'] || null], [true, null]);
+  } finally { sb.done(); }
 }
 
 /* ══ 활동 글의 틀린 미달 — 처지 낱말 · 열거 속 처지 · 「참가제한」 절 (2026-11-15 개발자 "네, 고쳐 주세요") ══
