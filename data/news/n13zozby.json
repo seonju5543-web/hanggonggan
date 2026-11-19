@@ -1,7 +1,18 @@
 {
  "school": "부산대학교",
- "updatedAt": "2026-11-18",
+ "updatedAt": "2026-11-19",
  "items": [
+  {
+   "title": "[한국민족문화연구소][학술행사 안내] 학술심포지엄 「크리틱/ 방법으로서 부산」",
+   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512334",
+   "postedAt": "2026-11-19",
+   "kind": "행사",
+   "school": "부산대학교",
+   "campus": "",
+   "src": "2d0d4013",
+   "foundAt": "2026-11-19",
+   "thumb": "data/news/img/3395831fee72700d.webp"
+  },
   {
    "title": "[학생과] 2026학년도 동계 너의 재능이 보여 추가 모집 공고",
    "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512318",
@@ -411,17 +422,6 @@
    "src": "2d0d4013",
    "foundAt": "2026-11-09",
    "desc": "AI로 문제를 발견하고, 해결안을 만들고, 결과물까지 검증해보세요! 부산대학교 종합교원양성센터, 부산교육대학교 미래교육원에서는 학생들의 실질적인 AI·디지털 활용 역량 강화를 위해 2026학년도 2학기…"
-  },
-  {
-   "title": "📣 2026 부산대 교육수요자 만족도 조사 참여 안내(PCSI)",
-   "url": "https://www.pusan.ac.kr/kor/CMS/Board/Board.do?mCode=MN095&mode=view&mgr_seq=3&board_seq=1512056",
-   "postedAt": "2026-11-09",
-   "school": "부산대학교",
-   "campus": "",
-   "src": "2d0d4013",
-   "foundAt": "2026-11-09",
-   "thumb": "data/news/img/3beebd5bffa3b29b.webp",
-   "desc": "이미지를 클릭하면 <부산대학교 교육수요자 만족도 조사 페이지>로 바로 이동합니다!"
   }
  ]
 }

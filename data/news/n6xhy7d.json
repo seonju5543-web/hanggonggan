@@ -1,7 +1,29 @@
 {
  "school": "광운대학교",
- "updatedAt": "2026-11-18",
+ "updatedAt": "2026-11-19",
  "items": [
+  {
+   "title": "[일반] [광운대학교 창업보육센터] 광운창업지원센터 신규 입주기업 모집(~12.07(월))",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53715&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-19",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-19",
+   "thumb": "data/news/img/6db465b5162afb1a.webp",
+   "desc": "광운창업지원센터에서는 신규 입주기업을 모집하고 있으니 , 기술기반의 경쟁력 있는 사업아이템을 가진 예비창업자 및 창업 5 년 이내의 우수 기업의 많은 관심과 지원 바랍니다 ."
+  },
+  {
+   "title": "[국제학생] 2026 제15회 유러피언 크리스마스 마켓 축제",
+   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53711&tpage=1&searchKey=1&searchVal=&srCategoryId=",
+   "postedAt": "2026-11-19",
+   "kind": "행사",
+   "school": "광운대학교",
+   "campus": "",
+   "src": "b09cb042",
+   "foundAt": "2026-11-19",
+   "thumb": "data/news/img/eec6760fa4424c2d.webp"
+  },
   {
    "title": "[일반] [로봇특성화대학사업단] 청년 뉴턴(NEW:TURN) 2026' 행사 안내",
    "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53710&tpage=1&searchKey=1&searchVal=&srCategoryId=",
@@ -408,29 +430,6 @@
    "src": "b09cb042",
    "foundAt": "2026-11-08",
    "desc": "1. 초빙 분야 및 인원 가 . 일반전임 ( 정년트랙 ) 전자정보공과대학 전자공학과 학과 ( 부 ) 별 인원 전자통신공학과 전자융합공학과 전기공학과 전자재료공학과 반도체시스템공학부 인공지능융합대학 컴퓨터정보공학부…"
-  },
-  {
-   "title": "[일반] [대학혁신지원사업] 2026 광운대학교 취업박람회 개최 안내",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53605&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-04",
-   "kind": "행사",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-08",
-   "desc": "경력개발팀에서는 우리 학생들의 진로탐색과 취업역량 강화를 위해 취업박람회를 개최합니다.",
-   "thumb": "data/news/img/5038307901bcc72f.webp"
-  },
-  {
-   "title": "[일반] 2026 서울영커리언스",
-   "url": "https://www.kw.ac.kr/ko/life/notice.jsp?BoardMode=view&DUID=53627&tpage=1&searchKey=1&searchVal=&srCategoryId=",
-   "postedAt": "2026-11-07",
-   "school": "광운대학교",
-   "campus": "",
-   "src": "b09cb042",
-   "foundAt": "2026-11-08",
-   "thumb": "data/news/img/0bac29e7175f58eb.webp",
-   "desc": "○ 내용: 10년 차 진로·취업·커리어 전문 코치와 함께 강점·가치관 발견, 관심 직무 탐색, 실천 계획 수립까지 하루 동안 진행하는 커리어 디자인 캠프"
   }
  ]
 }

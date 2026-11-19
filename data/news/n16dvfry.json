@@ -1,6 +1,6 @@
 {
  "school": "아주대학교",
- "updatedAt": "2026-11-18",
+ "updatedAt": "2026-11-19",
  "items": [
   {
    "title": "[일자리+센터] 26하반기 모의면접 실전반-인성/역량 면접",
@@ -64,82 +64,6 @@
    "campus": "",
    "src": "e5299528",
    "foundAt": "2026-10-20"
-  },
-  {
-   "title": "[일자리+센터] 📢2026년 10월 채용공고분석 특강 참여자 모집 (재공지)",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377663&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-19",
-   "kind": "행사",
-   "school": "아주대학교",
-   "campus": "",
-   "src": "e5299528",
-   "foundAt": "2026-10-19",
-   "desc": "단순 공고 소개를 넘어 산업 동향, 경쟁사 분석, 자소서 작성 TIP까지 다각도로 공고를 '읽는 법'을 안내해 드립니다."
-  },
-  {
-   "title": "🏛️ [법학도서관] 2026년 법률DB 이용 교육(온라인) 안내 (10/27 - 10/30)",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377658&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-19",
-   "kind": "생활",
-   "school": "아주대학교",
-   "campus": "",
-   "src": "e5299528",
-   "foundAt": "2026-10-19"
-  },
-  {
-   "title": "[총무팀] 캠퍼스내 지정 흡연구역 내 흡연 준수 안내",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377655&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-19",
-   "kind": "생활",
-   "school": "아주대학교",
-   "campus": "",
-   "src": "e5299528",
-   "foundAt": "2026-10-19",
-   "thumb": "data/news/img/bee2c11145ac6b9a.webp",
-   "desc": "현재(2026. 4. 기준) 지정된 흡연구역을 안내드립니다. 캠퍼스 전 구역은 관계법령(국민건강증진법)에 따라 일체 금연구역이며 구성원 중 흡연자를 위해 흡연구역을 지정하여 운영중에 있습니다."
-  },
-  {
-   "title": "[데이터보안] 2026-동계 강원대학교 데이터보안ㆍ활용융합 학점교류 신청 안내(~10/23까지)",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377654&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-19",
-   "kind": "학사",
-   "school": "아주대학교",
-   "campus": "",
-   "src": "e5299528",
-   "foundAt": "2026-10-19",
-   "desc": "데이터보안ㆍ활용혁신융합대학사업단 첨단분야혁신융합대학사업 데이터보안ㆍ활용융합분야 강원대학교 학점교류 안내입니다.",
-   "thumb": "data/news/img/bc46fcc92b059dc4.webp"
-  },
-  {
-   "title": "👀 이거 아직 안 한 사람? U-Chance 퀴즈대회 마감 임박!",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377640&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-19",
-   "school": "아주대학교",
-   "campus": "",
-   "src": "e5299528",
-   "foundAt": "2026-10-19",
-   "desc": "교육혁신팀 U-Chance를 얼마나 알고 있나요? 🤔 매월 새롭게 찾아오는 U-Chance 퀴즈대회! U-Chance 학생이력통합시스템과 관련된 퀴즈를 풀고, 정답을 맞힌 학생 중 추첨을 통해 기프티콘 을…"
-  },
-  {
-   "title": "[대학혁신지원사업] 대학혁신지원사업 참여학생 만족도 설문조사",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377635&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-19",
-   "school": "아주대학교",
-   "campus": "",
-   "src": "e5299528",
-   "foundAt": "2026-10-19",
-   "thumb": "data/news/img/abc191d685c55acd.webp",
-   "desc": "(포스터를 클릭해도 설문조사 페이지로 넘어갑니다.)"
-  },
-  {
-   "title": "[글로벌제약임상대학원]2027학년도 전기 정시 신입생 모집 안내",
-   "url": "https://www.ajou.ac.kr/kr/ajou/notice.do?mode=view&articleNo=377600&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-19",
-   "school": "아주대학교",
-   "campus": "",
-   "src": "e5299528",
-   "foundAt": "2026-10-19",
-   "thumb": "data/news/img/d4126b02c54da51a.webp"
   }
  ]
 }

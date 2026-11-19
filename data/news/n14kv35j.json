@@ -1,7 +1,18 @@
 {
  "school": "서울과학기술대학교",
- "updatedAt": "2026-11-18",
+ "updatedAt": "2026-11-19",
  "items": [
+  {
+   "title": "또래상담사와 함께하는 2026년 마음건증진콘텐츠 '미리 메리 크리스마스' 안내",
+   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897950&qidx=4691&cate=10&allboard=false&nowpage=1",
+   "postedAt": "2026-11-19",
+   "school": "서울과학기술대학교",
+   "campus": "",
+   "src": "4da0b96f",
+   "foundAt": "2026-11-19",
+   "thumb": "data/news/img/4f97ac2e22ba3c6a.webp",
+   "desc": "크리스마스를 한 달 앞둔 지금, 학생상담센터와 또래상담사 3기가 함께 준비한 2026년 마음건강 증진 콘텐츠 「미리 메리 크리스마스」를 소개합니다! � 어느덧 한 해의 끝자락에 다다랐습니다."
+  },
   {
    "title": "학내 정보시스템 및 전체 인터넷 서비스 일시 중단 안내",
    "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=897889&qidx=4691&cate=10&allboard=false&nowpage=1",
@@ -415,17 +426,6 @@
    "campus": "",
    "src": "4da0b96f",
    "foundAt": "2026-10-21"
-  },
-  {
-   "title": "2026 교양대학 연속강좌 3강 (11/3 화)",
-   "url": "https://www.seoultech.ac.kr/service/info/notice/?do=commonview&searchtext=&searchtype=-1&nowpage=1&bnum=4691&bidx=896780&qidx=4691&cate=10&allboard=false&nowpage=1",
-   "postedAt": "2026-10-21",
-   "school": "서울과학기술대학교",
-   "campus": "",
-   "src": "4da0b96f",
-   "foundAt": "2026-10-21",
-   "thumb": "data/news/img/0138f5a5c26ed96d.webp",
-   "desc": "2026 서울과기대 교양대학 연속강연, 전쟁의 시대, 다시 묻는 평화 3강 <스펙터클이 된 전쟁: 우리는 가자지구를 어떻게 보고 있는가> 일시: 2026년 11월 3일(목) 오후 4시-6시 장소: 서울과학기술대학교…"
   }
  ]
 }

@@ -1,7 +1,18 @@
 {
  "school": "서울대학교",
- "updatedAt": "2026-11-18",
+ "updatedAt": "2026-11-19",
  "items": [
+  {
+   "title": "2027학년도 관악학생생활관 대학원생 및 연구생 신청 선발 안내",
+   "url": "https://www.snu.ac.kr/snunow/notice/genernal?md=v&bbsidx=179675",
+   "postedAt": "2026-11-18",
+   "kind": "생활",
+   "school": "서울대학교",
+   "campus": "",
+   "src": "72747282",
+   "foundAt": "2026-11-19",
+   "desc": "페이지 안내 서울대 소식 공지사항 일반공지 공지사항 일반공지 카카오톡으로 공유하기 페이스북으로 공유하기 URL복사하기"
+  },
   {
    "title": "2027. 3. 1.자 학부대학 비전임(강의)교원 채용 공고(~11/30)",
    "url": "https://snuc.snu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/?mod=document&uid=958",
@@ -197,38 +208,6 @@
    "foundAt": "2026-10-21",
    "thumb": "data/news/img/12c20eb39b6cf914.webp",
    "desc": "학부대학이 구독 중인 Nature Masterclasses On-demand(NMO)의 기관 혜택으로, Springer Nature가 주최하는 AI 학술 글쓰기 웨비나에 서울대학교 구성원 여러분을 초대합니다."
-  },
-  {
-   "title": "2027년도 2월 말 퇴직교원 정부포상 추천 후보자 공개검증",
-   "url": "https://www.snu.ac.kr/snunow/notice/genernal?md=v&bbsidx=177443",
-   "postedAt": "2026-10-19",
-   "school": "서울대학교",
-   "campus": "",
-   "src": "72747282",
-   "foundAt": "2026-10-19"
-  },
-  {
-   "title": "☆ 2026학년도 동계 계절수업 수강신청 안내",
-   "url": "https://snuc.snu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/?mod=document&uid=914",
-   "postedAt": "2026-10-19",
-   "kind": "학사",
-   "school": "서울대학교",
-   "campus": "",
-   "board": "학부대학 공지",
-   "src": "efac1856",
-   "foundAt": "2026-10-19",
-   "desc": "붙임 1-2. 서울대학교 수강신청 매뉴얼 붙임 1-3. 강의매매방지 수강신청제도 안내 붙임 2. 수강신청 부정행위 관련 안내 붙임 3. 중복수강신청 매뉴얼"
-  },
-  {
-   "title": "[대학혁신지원사업] 2026년 자체평가를 위한 만족도 조사 참여 안내",
-   "url": "https://snuc.snu.ac.kr/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/?mod=document&uid=915",
-   "postedAt": "2026-10-19",
-   "school": "서울대학교",
-   "campus": "",
-   "board": "학부대학 공지",
-   "src": "efac1856",
-   "foundAt": "2026-10-19",
-   "desc": "한국연구재단에서는 대학혁신지원사업의 성과 측정 및 개선 방안 마련을 위한 기초자료로 활용하고자 만족도 조사를 실시하오니, 학생 여러분의 많은 참여 바랍니다."
   }
  ]
 }

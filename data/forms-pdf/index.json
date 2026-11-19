@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-18",
+ "updatedAt": "2026-11-19",
  "items": {
   "auto-ticedoarticleno231554919": [
    {
@@ -35,30 +35,6 @@
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-10-28"
-   }
-  ],
-  "auto-bswj104944472artclviewdo": [
-   {
-    "file": "auto-bswj104944472artclviewdo/1-2027-1_어학우수장학금_신청서_양식_.pdf",
-    "name": "2027-1_어학우수장학금_신청서(양식).hwp",
-    "pages": 2,
-    "bytes": 93972,
-    "srcBytes": 122368,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-28"
-   }
-  ],
-  "auto-bswj104944500artclviewdo": [
-   {
-    "file": "auto-bswj104944500artclviewdo/1-외국인재학생_장학금_신청서.pdf",
-    "name": "외국인재학생_장학금_신청서.hwp",
-    "pages": 2,
-    "bytes": 85032,
-    "srcBytes": 15360,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-10-29"
    }
   ],
   "auto-ent2431270591artclviewdo": [
@@ -197,18 +173,6 @@
     "at": "2026-11-17"
    }
   ],
-  "act-1onjwjn": [
-   {
-    "file": "act-1onjwjn/1-붙임_3._신청서_등_지원_서류.pdf",
-    "name": "붙임 3. 신청서 등 지원 서류.hwp",
-    "pages": 13,
-    "bytes": 485494,
-    "srcBytes": 140800,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-13"
-   }
-  ],
   "auto-amepagescholarshipnotice-0d1tyil": [
    {
     "file": "auto-amepagescholarshipnotice-0d1tyil/1-_양식_삼성꿈장학재단_글로벌_희망장학_신청서_학부_.pdf",
@@ -219,6 +183,16 @@
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-11-14"
+   },
+   {
+    "file": "auto-amepagescholarshipnotice-0d1tyil/2-첨부2-1._양식_삼성꿈장학재단_글로벌_희망장학_신청서_학부_.pdf",
+    "name": "첨부2-1.[양식]삼성꿈장학재단 글로벌 희망장학 신청서(학부).hwp",
+    "pages": 9,
+    "bytes": 411574,
+    "srcBytes": 84480,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-19"
    }
   ],
   "auto-oarticleno160317nocat501": [
@@ -252,18 +226,6 @@
     "pages": 6,
     "bytes": 189090,
     "srcBytes": 112640,
-    "from": "원본 그대로 변환",
-    "fonts": "ko-nanum-1",
-    "at": "2026-11-16"
-   }
-  ],
-  "act-03k6crx": [
-   {
-    "file": "act-03k6crx/1-2026_SKKU_Intercultural_Learning_Program_참가_지원서.pdf",
-    "name": "2026 SKKU Intercultural Learning Program 참가 지원서.docx",
-    "pages": 5,
-    "bytes": 189391,
-    "srcBytes": 20242,
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-11-16"
@@ -599,6 +561,90 @@
     "from": "원본 그대로 변환",
     "fonts": "ko-nanum-1",
     "at": "2026-11-18"
+   }
+  ],
+  "auto-0005009002000000seq31571": [
+   {
+    "file": "auto-0005009002000000seq31571/1-성과형_장학금_자격증_신청서_및_개인정보활용서.pdf",
+    "name": "성과형 장학금(자격증) 신청서 및 개인정보활용서.hwp",
+    "pages": 1,
+    "bytes": 104441,
+    "srcBytes": 81920,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-19"
+   }
+  ],
+  "auto-amepagescholarshipnotice-1p6dyle": [
+   {
+    "file": "auto-amepagescholarshipnotice-1p6dyle/1-개인정보_수집_및_활용_동의서.pdf",
+    "name": "개인정보 수집 및 활용 동의서.hwp",
+    "pages": 2,
+    "bytes": 100386,
+    "srcBytes": 79872,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-19"
+   }
+  ],
+  "auto-krbbskr846174artclviewdo": [
+   {
+    "file": "auto-krbbskr846174artclviewdo/1-CHUBB_Innovation_Fund_7기_신청서_학생용_.pdf",
+    "name": "CHUBB Innovation Fund 7기_신청서 (학생용).docx",
+    "pages": 3,
+    "bytes": 146664,
+    "srcBytes": 48596,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-19"
+   }
+  ],
+  "act-1pk75lo": [
+   {
+    "file": "act-1pk75lo/1-26회_융합기초프로젝트_팀_신청서.pdf",
+    "name": "26회_융합기초프로젝트_팀_신청서.hwp",
+    "pages": 2,
+    "bytes": 107679,
+    "srcBytes": 73216,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-19"
+   }
+  ],
+  "act-1354f33": [
+   {
+    "file": "act-1354f33/1-_붙임1_신청서_및_개인정보_수집활용_동의서_주제1_.pdf",
+    "name": "[붙임1] 신청서 및 개인정보 수집활용 동의서(주제1).hwp",
+    "pages": 2,
+    "bytes": 128982,
+    "srcBytes": 51712,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-19"
+   }
+  ],
+  "act-0slj2js": [
+   {
+    "file": "act-0slj2js/1-3._양식_예비언론인캠프_참가신청서_제29기_최종_.pdf",
+    "name": "3. (양식) 예비언론인캠프 참가신청서 제29기(최종).hwp",
+    "pages": 2,
+    "bytes": 140353,
+    "srcBytes": 55296,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-19"
+   }
+  ],
+  "act-1t6tf7v": [
+   {
+    "file": "act-1t6tf7v/1-_AIxSeoul_지원신청서_작품명_지원자_팀_명.pdf",
+    "name": "[AIxSeoul]지원신청서_작품명_지원자(팀)명.hwp",
+    "pages": 3,
+    "bytes": 205807,
+    "srcBytes": 243712,
+    "from": "원본 그대로 변환",
+    "fonts": "ko-nanum-1",
+    "at": "2026-11-19"
    }
   ]
  }

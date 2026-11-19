@@ -1,0 +1,25 @@
+{
+ "updatedAt": "2026-11-19",
+ "files": {
+  "1-elig-xt6vup-1_p4-4.pdf": {
+   "sha": "8aa034dbbb419d89",
+   "dir": "1-elig-xt6vup-1_p4-4-pages",
+   "at": "2026-11-19",
+   "pages": [
+    {
+     "n": 1,
+     "w": 595.2,
+     "h": 841.9,
+     "img": "1.webp",
+     "iw": 794,
+     "ih": 1123,
+     "rules": {
+      "h": 16,
+      "v": 13
+     }
+    }
+   ],
+   "fields": []
+  }
+ }
+}
