@@ -267,22 +267,6 @@
   "at": "2026-11-17",
   "tries": 1
  },
- "https://www.kookmin.ac.kr/user/kmuNews/notice/9/12589/view.do?currentPageNo=1": {
-  "at": "2026-11-17",
-  "tries": 1
- },
- "https://www.kookmin.ac.kr/user/kmuNews/notice/9/12531/view.do?currentPageNo=1": {
-  "at": "2026-11-17",
-  "tries": 1
- },
- "https://www.kookmin.ac.kr/user/kmuNews/notice/9/12584/view.do?currentPageNo=1": {
-  "at": "2026-11-17",
-  "tries": 1
- },
- "https://www.kookmin.ac.kr/user/kmuNews/notice/9/12575/view.do?currentPageNo=1": {
-  "at": "2026-11-17",
-  "tries": 1
- },
  "https://kangwon.ac.kr/ko/bbs/750/detail.do?pstSn=2546&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0": {
   "at": "2026-11-17",
   "tries": 1
@@ -316,10 +300,6 @@
   "tries": 1
  },
  "https://kangwon.ac.kr/ko/bbs/719/detail.do?pstSn=4273&pageIndex=1&pageItm=10&searchOrderSort=0&searchGbn=0": {
-  "at": "2026-11-17",
-  "tries": 1
- },
- "https://www.kookmin.ac.kr/user/kmuNews/notice/9/12569/view.do?currentPageNo=1": {
   "at": "2026-11-17",
   "tries": 1
  },
@@ -360,6 +340,26 @@
   "tries": 1
  },
  "https://apac.spectory.net/tcs15kr": {
+  "at": "2026-11-19",
+  "tries": 1
+ },
+ "https://www.skku.edu/skku/campus/skk_comm/notice05.do?mode=view&articleNo=141708&article.offset=0&articleLimit=10": {
+  "at": "2026-11-19",
+  "tries": 1
+ },
+ "https://www.sungshin.ac.kr/bbs/main_kor/3181/161847/artclView.do": {
+  "at": "2026-11-19",
+  "tries": 1
+ },
+ "https://www.sungshin.ac.kr/bbs/main_kor/3181/161583/artclView.do": {
+  "at": "2026-11-19",
+  "tries": 1
+ },
+ "https://www.sungshin.ac.kr/bbs/main_kor/3181/161878/artclView.do": {
+  "at": "2026-11-19",
+  "tries": 1
+ },
+ "https://www.sungshin.ac.kr/bbs/main_kor/3181/161676/artclView.do": {
   "at": "2026-11-19",
   "tries": 1
  }
