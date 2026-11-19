@@ -1,7 +1,18 @@
 {
  "school": "숭실대학교",
- "updatedAt": "2026-11-18",
+ "updatedAt": "2026-11-19",
  "items": [
+  {
+   "title": "채용 숭실대학교 자연과학대학 학사조교 모집 공고",
+   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EC%9E%90%EC%97%B0%EA%B3%BC%ED%95%99%EB%8C%80%ED%95%99-%ED%95%99%EC%82%AC%EC%A1%B0%EA%B5%90-%EB%AA%A8%EC%A7%91-%EA%B3%B5%EA%B3%A0-3&keyword",
+   "postedAt": "2026-11-19",
+   "kind": "채용",
+   "school": "숭실대학교",
+   "campus": "",
+   "src": "3b348584",
+   "foundAt": "2026-11-19",
+   "desc": "모집 요건 가. 지원자격 : 학사 학위 이상 소지자 나. 지원조건 : 조교 임용규정에 결격 사유가 없는 자"
+  },
   {
    "title": "교원채용 2027-1학기 숭실대학교 교수 초빙 공고(비정년직 전임교원)",
    "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=2027-1%ED%95%99%EA%B8%B0-%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-%EA%B5%90%EC%88%98-%EC%B4%88%EB%B9%99-%EA%B3%B5%EA%B3%A0%EB%B9%84%EC%A0%95%EB%85%84%EC%A7%81-%EC%A0%84%EC%9E%84%EA%B5%90&keyword",
@@ -412,17 +423,6 @@
    "foundAt": "2026-10-28",
    "thumb": "data/news/img/058ebe05cc84fe77.webp",
    "desc": "한패스에서 한국에서 취업을 희망하는 외국인을 대상으로 제2회 글로벌 외국인 잡페어를 진행합니다. 현장에서 채용 담당자를 만나 면접과 컨설팅 등을 경험할 수 있으니, 유학생 여러분의 많은 관심과 참여 바랍니다."
-  },
-  {
-   "title": "기타 숭실대학교 AX 추진을 위한 AI 활용 실태 및 수요 조사 참여 안내",
-   "url": "https://scatch.ssu.ac.kr/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?f&category&paged=1&slug=%EC%88%AD%EC%8B%A4%EB%8C%80%ED%95%99%EA%B5%90-ax-%EC%B6%94%EC%A7%84%EC%9D%84-%EC%9C%84%ED%95%9C-ai-%ED%99%9C%EC%9A%A9-%EC%8B%A4%ED%83%9C-%EB%B0%8F-%EC%88%98%EC%9A%94-%EC%A1%B0%EC%82%AC-%EC%B0%B8&keyword",
-   "postedAt": "2026-10-28",
-   "school": "숭실대학교",
-   "campus": "",
-   "src": "3b348584",
-   "foundAt": "2026-10-28",
-   "thumb": "data/news/img/218d8b71550ae390.webp",
-   "desc": "교내외 구성원 여러분의 AI 활용 경험과 수요를 바탕으로 AX(AI Transformation) 추진 방향을 구체화하고자 다음과 같이 설문조사를 실시합니다."
   }
  ]
 }

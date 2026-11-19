@@ -1,7 +1,40 @@
 {
  "school": "경기대학교",
- "updatedAt": "2026-11-18",
+ "updatedAt": "2026-11-19",
  "items": [
+  {
+   "title": "[일반] [독어독문전공] 2026학년도 전기(2027년 2월) 졸업사정 관련 일정 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627288&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-19",
+   "kind": "학사",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-19",
+   "desc": "2026학년도 전기 졸업사정관련 일정을 다음과 같이 안내하오니 졸업 해당 학생들은 참고해주시길 바랍니다."
+  },
+  {
+   "title": "[일반] [이즈피엠피] 2027년 상반기 채용공고",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627286&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-19",
+   "kind": "채용",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-19",
+   "desc": "대학소개 대학·조직 대학생활 맞춤정보 어떤 정보 를 찾고계시나요? 맞춤설정 저장하기 (언제든 변경 가능합니다) 맞춤설정 이란? 소속, 내용, 기간별로 나만의 맞춤 콘텐츠를 찾아보세요."
+  },
+  {
+   "title": "[일반] 2026학년도 전기(2027년 2월) 졸업사정 관련 일정 안내",
+   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627285&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
+   "postedAt": "2026-11-19",
+   "kind": "학사",
+   "school": "경기대학교",
+   "campus": "",
+   "src": "bf927d3e",
+   "foundAt": "2026-11-19",
+   "desc": "1. 단과대학 및 학과(전공) 졸업사정 기간 : 2027. 1. 20(수) ~ 7. 26(화)"
+  },
   {
    "title": "[일반] 생명과학전공 2026학년도 2학기 1차 졸업시험 결과 및 2차 졸업시험 일정 안내",
    "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627270&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
@@ -381,38 +414,6 @@
    "src": "bf927d3e",
    "foundAt": "2026-11-03",
    "desc": "학위논문 샘플 안내드립니다. 관광전문대학원의 논문규격은 일반대학원의 논문규격과 거의 일치합니다. 다만, 인쇄소에 의뢰할 때는 아래의 두 가지 정보를 수정하여 요청하셔야 합니다."
-  },
-  {
-   "title": "[대학생활/업무안내] 26학년도 2학기 행사, 성황리 마무리!",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627005&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-11-03",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-11-03",
-   "thumb": "data/news/img/29e79adc575e23d8.webp",
-   "desc": "대학소개 대학·조직 대학생활 맞춤정보 어떤 정보 를 찾고계시나요? 맞춤설정 저장하기 (언제든 변경 가능합니다) 맞춤설정 이란? 소속, 내용, 기간별로 나만의 맞춤 콘텐츠를 찾아보세요."
-  },
-  {
-   "title": "[일반] 관광전문대학원 2026-2 논문 표절검색시스템(카피킬러캠퍼스) 사용 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627004&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-11-03",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-11-03",
-   "desc": "- 경기대학교 관광전문대학원 홈페이지 메인화면에서 논문 → ·Copy Killer· 배너 클릭 - 자세한 사용법 첨부파일 확인"
-  },
-  {
-   "title": "[일반] 2026학년도 2학기 dCollection 서류/표절검사결과보고서/학위논문 인쇄본 제출 안내",
-   "url": "https://www.kyonggi.ac.kr/www/selectBbsNttView.do?key=7520&bbsNo=1073&nttNo=627000&pageUnit=10&searchCnd=all&sf.pnos=1073&sf.pnos=888",
-   "postedAt": "2026-11-03",
-   "kind": "학사",
-   "school": "경기대학교",
-   "campus": "",
-   "src": "bf927d3e",
-   "foundAt": "2026-11-03",
-   "desc": "※유의사항 1. dCollection 업로드 기간은 11/23(월) ~ 12/18(금)까지이므로 기간 내에 업로드하셔야 합니다."
   }
  ]
 }

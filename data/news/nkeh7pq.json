@@ -1,7 +1,18 @@
 {
  "school": "인하대학교",
- "updatedAt": "2026-11-18",
+ "updatedAt": "2026-11-19",
  "items": [
+  {
+   "title": "청년의 안전한 해외진출 ! 외교부 해외안전여행 앱, 영사안전콜센터와 함께하세요 ~",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46183/artclView.do",
+   "postedAt": "2026-11-19",
+   "school": "인하대학교",
+   "campus": "",
+   "src": "f4141706",
+   "foundAt": "2026-11-19",
+   "thumb": "data/news/img/1f3ccb533a6f8cc4.webp",
+   "desc": "출국 전 , 여권 , 비자 / 신분증 , 증빙자료 사본 / 여행자보험 / 해외안전여행 앱은 필수입니다 . 해외안전여행 앱 또는 홈페이지 (www.0404.go.kr) 를 통해 아래 사항을 확인해주세요 ."
+  },
   {
    "title": "[교수학습개발센터] 2026-2학기 ICC 프로젝트 운영TA 모집",
    "url": "https://www.inha.ac.kr/bbs/kr/8/46175/artclView.do",
@@ -424,15 +435,6 @@
    "src": "f4141706",
    "foundAt": "2026-10-30",
    "desc": "인하대학교 공학교육혁신센터는 다음과 같이 사무원을 채용하고자 하오니 , 많은 지원 부탁드립니다 ."
-  },
-  {
-   "title": "2026년 대학생의용소방대원 상시모집 공고",
-   "url": "https://www.inha.ac.kr/bbs/kr/8/45992/artclView.do",
-   "postedAt": "2026-10-30",
-   "school": "인하대학교",
-   "campus": "",
-   "src": "f4141706",
-   "foundAt": "2026-10-30"
   }
  ]
 }

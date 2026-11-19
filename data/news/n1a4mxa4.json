@@ -1,7 +1,17 @@
 {
  "school": "숙명여자대학교",
- "updatedAt": "2026-11-18",
+ "updatedAt": "2026-11-19",
  "items": [
+  {
+   "title": "[학사] 2027-1 학생자율설계전공 신청 안내",
+   "url": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=96072&article.offset=0&articleLimit=10",
+   "postedAt": "2026-11-19",
+   "school": "숙명여자대학교",
+   "campus": "",
+   "src": "72128af9",
+   "foundAt": "2026-11-19",
+   "desc": "우리대학에서는 유연한 융복합 복수전공제도 중 하나로 '학생자율설계전공' 제도를 운영하고 있습니다. 재학생 중 학생자율설계전공 이수를 원하는 학생은 아래 내용을 참고하여 기한 내 전공을 신청하시기 바랍니다."
+  },
   {
    "title": "[학부] 2027학년도 1학기 전공선택 (2026.12.02 ~ 2026.12.18)",
    "url": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=95960&article.offset=0&articleLimit=10",
@@ -32,17 +42,6 @@
    "campus": "",
    "src": "72128af9",
    "foundAt": "2026-10-20"
-  },
-  {
-   "title": "[본교생_학부] 2026-겨울학기 국내 대학 학점교류 시행 안내",
-   "url": "https://www.sookmyung.ac.kr/kr/news/important-notice.do?mode=view&articleNo=95490&article.offset=0&articleLimit=10",
-   "postedAt": "2026-10-12",
-   "kind": "학사",
-   "school": "숙명여자대학교",
-   "campus": "",
-   "src": "72128af9",
-   "foundAt": "2026-10-12",
-   "desc": "※본 공지는 학부생 학점교류 에 대한 안내 공지입니다. 대학원생 학점교류는 대학원 교학팀으로 문의하시기 바랍니다."
   }
  ]
 }
