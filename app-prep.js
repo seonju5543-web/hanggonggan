@@ -56,9 +56,9 @@ function renderApplyPrep(sch) {
   const kosaf = sch.sourceKind === 'kosaf';
   /* 층2 첨부는 재단이 올린 **선발 공고문**이다 — 신청서라고 부르면 학생이 그 안에서 빈칸을 찾는다
      (상세 시트의 '선발 공고문' 머리말과 같은 규칙) */
-  /* 신청서 묶음 — 신청서 첨부 + PDF 로 올라온 신청서(사본과 이름이 같은 첨부 · 개발자 11-20 「원래 PDF 는 두 곳 다」 — 위 PDF 줄과 맨 밑 원본 둘 다) */
+  /* 신청서 묶음 — 신청서인가는 attIsForm 한 곳(로봇이 원본 내용으로 가른 roles 가 먼저 · app-live) + PDF 로 올라온 신청서(사본과 이름이 같은 첨부 · 개발자 11-20 「원래 PDF 는 두 곳 다」 — 위 PDF 줄과 맨 밑 원본 둘 다) */
   const formNames = new Set(formPdfsFor(sch).map((f) => f.name));
-  const formAtts = kosaf ? [] : atts.filter((a) => a && !a.bodyImage && (isApplicationForm(a) || formNames.has(a.name)));
+  const formAtts = kosaf ? [] : atts.filter((a) => a && !a.bodyImage && (attIsForm(sch, a) || formNames.has(a.name)));
   /* 본문 사진(bodyImage)은 공고 원문 그 자체다 — '첨부 파일'로 늘어놓지 않는다(원문 링크가 준다) */
   const otherAtts = atts.filter((a) => a && !a.bodyImage && !formAtts.includes(a));
   /* 2026-11-20 승인 시안(docs/designs/all-docs-pdf.md) — 묶음마다 위는 PDF 줄(attachPdfRowsHtml 한 곳 · 첨부 차례), 맨 밑은 올린 원본(아이콘 · 이름 · ↓ · 작은 글씨 없음) */

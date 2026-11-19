@@ -113,7 +113,8 @@ function formPageRowsHtml(sch) {
 function prepOriginalsHtml(sch) {
   const kosaf = sch.sourceKind === 'kosaf';
   const formNames = new Set(formPdfsFor(sch).map((f) => f.name));
-  const atts = (sch.attachments || []).filter((a) => a && !a.bodyImage && (kosaf || isApplicationForm(a) || formNames.has(a.name)));
+  /* 신청서인가는 attIsForm 한 곳(로봇이 원본 내용으로 가른 roles 가 먼저 · 2026-11-20) + PDF 로 올라온 신청서(사본과 이름이 같은 첨부 — 「원래 PDF 는 두 곳 다」) */
+  const atts = (sch.attachments || []).filter((a) => a && !a.bodyImage && (kosaf || attIsForm(sch, a) || formNames.has(a.name)));
   const pdfRows = attachPdfRowsHtml(sch, atts);
   const pageRows = formPageRowsHtml(sch);
   if (!atts.length && !pdfRows && !pageRows) return '';
@@ -318,6 +319,13 @@ function loadDocsPdfIndex() {
 }
 function docPdfsFor(sch) {
   return (sch && docsPdfIndex.items && docsPdfIndex.items[sch.id]) || [];
+}
+/* 첨부가 신청서 칸에 서는가 — 로봇이 **원본 내용**을 읽고 이름과 다르게 가른 것(색인 roles · collector/attachment-text attachDecision)이 먼저,
+   없으면 이름 규칙(data.js isApplicationForm). 2026-11-20 — 이름만 보면 속이 안내문인 「…신청서.hwp」가 양식 칸에 서고 「[서식] 1~3.hwp」는 안 섰다 */
+function attIsForm(sch, a) {
+  const r = sch && formsPdfIndex.roles && formsPdfIndex.roles[sch.id];
+  const v = r && a && r[a.name];
+  return v ? v === 'form' : isApplicationForm(a);
 }
 /* 첨부 한 줄 — 아이콘(확장자) · 이름 · 오른쪽 동작. 이름 밑 작은 글씨(출처·크기)는 2026-11-20 승인 시안에서 뺐다(meta 를 주는 곳이 없다) */
 function attachRowHtml(a, { meta = '', go = '↓' } = {}) {

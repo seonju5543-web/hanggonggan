@@ -23828,6 +23828,10 @@
      "name": "본문이미지-1241x1755.jpg",
      "url": "https://www.jbnu.ac.kr/common/file.do?file=4Gi651BuWks9/9M2ei5v+TEBKn6PPKy9OHY4EfVRcXcRCXH7uboDTXcEiUpw8de8cCa9v8l1OJdYcG4tnpFO5w==",
      "bodyImage": true
+    },
+    {
+     "name": "2026년 문화예술 장학금 선발 요강_261109.hwp",
+     "url": "https://www.jbnu.ac.kr/async/MultiFile/download.do?file=SAHNRKRuede/miagSfyk5g=="
     }
    ],
    "sourceUrl": "https://www.jbnu.ac.kr/web/Board/219698/detailView.do?category=6",
@@ -25446,7 +25450,12 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-11-19 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "인산장학회(학번, 이름).hwp",
+     "url": "https://kep.kookmin.ac.kr/com/cmsv/FileCtr/fileDefaultDownload.do?fileNo=245742a0608b419eb1066d4fa152f25d&seq=1"
+    }
+   ],
    "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12638/view.do?currentPageNo=1",
    "sourceKind": "auto",
    "openDate": "2026-11-19",
@@ -25665,7 +25674,20 @@
    "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
    "noForm": "자동 등록(검수 전) 2026-11-19 — 양식 스키마화는 검수 후 진행",
    "auto": true,
-   "attachments": [],
+   "attachments": [
+    {
+     "name": "[붙임1] 「KC 미래장학금」 제10기 장학생 모집안내 상세안내.pdf",
+     "url": "https://www.sogang.ac.kr/file-fe-prd/board/141/551877_1.pdf?sg=[%EB%B6%99%EC%9E%841]%20%E3%80%8CKC%20%EB%AF%B8%EB%9E%98%EC%9E%A5%ED%95%99%EA%B8%88%E3%80%8D%20%EC%A0%9C10%EA%B8%B0%20%EC%9E%A5%ED%95%99%EC%83%9D%20%EB%AA%A8%EC%A7%91%EC%95%88%EB%82%B4%20%EC%83%81%EC%84%B8%EC%95%88%EB%82%B4.pdf"
+    },
+    {
+     "name": "[붙임2] 27년도_제출서류양식.hwp",
+     "url": "https://www.sogang.ac.kr/file-fe-prd/board/141/551877_2.hwp?sg=[%EB%B6%99%EC%9E%842]%2027%EB%85%84%EB%8F%84_%EC%A0%9C%EC%B6%9C%EC%84%9C%EB%A5%98%EC%96%91%EC%8B%9D.hwp"
+    },
+    {
+     "name": "[붙임3] 27년도_제10기_케이씨미래장학재단_장학생_선발_포스터.pdf",
+     "url": "https://www.sogang.ac.kr/file-fe-prd/board/141/551877_3.pdf?sg=[%EB%B6%99%EC%9E%843]%2027%EB%85%84%EB%8F%84_%EC%A0%9C10%EA%B8%B0_%EC%BC%80%EC%9D%B4%EC%94%A8%EB%AF%B8%EB%9E%98%EC%9E%A5%ED%95%99%EC%9E%AC%EB%8B%A8_%EC%9E%A5%ED%95%99%EC%83%9D_%EC%84%A0%EB%B0%9C_%ED%8F%AC%EC%8A%A4%ED%84%B0.pdf"
+    }
+   ],
    "sourceUrl": "https://www.sogang.ac.kr/ko/detail/551877?bbsConfigFk=141&namepage=ScholarshipNotice",
    "sourceKind": "auto",
    "documentsFrom": "공고 원문",
