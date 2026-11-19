@@ -10699,7 +10699,7 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
       const loaders = ['loadRegistered', 'loadKosaf', 'loadActivities', 'loadExternal', 'loadNotices', 'loadNews'].map((n) => [n, /tidyData\(/.test(takeFnSrc(n))]);
       eq('  받는 곳 여섯(정식 등록·카드 읽기·층2·대외활동·재단 게시판·학교 공고·소식)이 모두 씻는다', loaders.filter(([, ok]) => !ok).map(([n]) => n), []);
       const ws = readText(new URL('./what-shows.mjs', import.meta.url));
-      eq('  what-shows 도 앱처럼 씻은 글자로 말한다 — 읽자마자(카드 읽기를 얹고 찾기 전에) · 카드 읽기 파일도', /const reg = tidyData\(JSON\.parse/.test(ws) && /applyCardRead\(reg\.items, tidyData\(/.test(ws) && /'tidyText', 'tidyData'/.test(ws), true);
+      eq('  what-shows 도 앱처럼 씻은 글자로 말한다 — 읽자마자(카드 읽기를 얹고 찾기 전에) · 카드 읽기 파일도(숨김 거르기와 함께 publishedList 로 · 2026-11-20)', /const reg = tidyData\(JSON\.parse/.test(ws) && /cr = tidyData\(JSON\.parse/.test(ws) && /ME\.publishedList\(reg\.items, cr\)/.test(ws) && /'tidyText', 'tidyData'/.test(ws), true);
     }
   }
 
@@ -16595,8 +16595,10 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
   const B1 = v({ eligibility: ['학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 학생'], notes: ['대학원생, 휴학생'],
     amount: ['1인당 상한액 100만 원'], apply: ['방문 또는 우편 신청', '신청기간: 2026.11.2.(월)~2026.11.23.(월)'], deadline: { date: '2026-11-02', quote: '신청기간: 2026.11.2.(월)~2026.11.23.(월)' } });
   const ag = CR.agree(A1, B1, ITEM);
-  eq('  🔴 자격·제외·서류는 한 줄이라도 갈리면 **칸 전체를 싣지 않는다**(null = 무료 길 값) — 빠진 요건 한 줄이 틀린 안심이 된다 · 방법은 맞은 줄만 · 마감이 다르면 싣지 않는다',
-    [ag.final.eligibility, ag.final.excludes, ag.final.notes, ag.final.amount, ag.final.apply, ag.final.deadline, ag.held.length >= 4], [null, null, null, ['1인당 상한액 100만 원'], ['방문 또는 우편 신청'], null, true]);
+  /* 🔴 2026-11-20 개발자 결정(「빼고 올려」) — 갈린 줄은 빼서 관리자에게, 두 읽기가 같이 낸 유료 줄은 엄격 칸도 싣는다. 같이 낸 줄이 없을 때만 무료 길 값(null) */
+  eq('  갈린 줄은 빼고(관리자에게) 같이 낸 줄은 싣는다 — 자격은 같이 낸 한 줄 · 한쪽에만 있는 제외·유의는 무료 길 값(null) · 방법은 맞은 줄만 · 마감이 다르면 싣지 않는다',
+    [ag.final.eligibility, ag.final.excludes, ag.final.notes, ag.final.amount, ag.final.apply, ag.final.deadline, ag.held.length >= 4],
+    [['학업성적 평균 C학점 이상(2026년 1학기 성적 기준)을 취득한 자'], null, null, ['1인당 상한액 100만 원'], ['방문 또는 우편 신청'], null, true]);
   eq('  「연장」 공고는 두 읽기가 같아도 마감을 싣지 않는다 (받아 두지 못한 연장 공고문이 진짜 마감을 갖고 있을 수 있다)',
     [CR.agree(A1, A1, ITEM).final.deadline?.date || null, CR.agree(A1, A1, { ...ITEM, attachments: [{ name: '2026년 든든 학업지원금 연장 공고문.pdf' }] }).final.deadline], ['2026-11-23', null]);
   eq('    첨부 이름이 본문 글자에만 있어도 잡는다 · 사이트 메뉴의 「로그인 연장하기」 는 연장 공고가 아니다',
@@ -16611,13 +16613,13 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
   const beDrop = CR.buildEntry(ITEM, SRC, { ...full, eligibility: [...full.eligibility, 'TOEIC 950/990 이상인 자'] }, full, wonIn);
   const beDropBoth = CR.buildEntry(ITEM, SRC, { ...full, eligibility: ['TOEIC 950/990 이상인 자'] }, { ...full, eligibility: [] }, wonIn);
   const beDropNote = CR.buildEntry(ITEM, SRC, { ...full, notes: ['TOEIC 950/990 이상인 자'] }, full, wonIn);
-  eq('  🔴 자격·제외·서류에서 한쪽이 낸 줄이 기계 대조에서 떨어지면 그 칸은 싣지 않는다(null) — 남은 줄만 실으면 핵심 요건이 빠진 목록이 된다 · 빈 배열로도 안 싣는다 · 다른 칸(유의)의 떨어진 줄은 자격을 안 건드린다',
-    [beDrop.entry.eligibility, beDrop.held.some((h) => h.field === 'eligibility' && /TOEIC/.test(h.line)), beDropBoth.entry.eligibility, (beDropNote.entry.eligibility || []).length], [null, true, null, 2]);
+  eq('  🔴 기계 대조에서 떨어진 줄은 빼고 남은 유료 줄은 싣는다(2026-11-20 개발자 결정) — 떨어진 줄은 관리자 몫으로 남는다 · 칸의 줄이 **전부** 떨어지면 무료 길 값(null) · 다른 칸(유의)의 떨어진 줄은 자격을 안 건드린다',
+    [(beDrop.entry.eligibility || []).length, beDrop.dropped.some((h) => h.field === 'eligibility' && /TOEIC/.test(h.line)), beDropBoth.entry.eligibility, (beDropNote.entry.eligibility || []).length], [2, true, null, 2]);
   /* 2026-11-18 독립 리뷰가 낸 반례 셋 */
   const vk = (elig) => ({ kept: { ...A1.kept, eligibility: elig }, dropped: [] });
   const agX = CR.agree(vk(three), vk([...three, '다자녀 가정의 자녀']), ITEM), agSplit = CR.agree(vk(three), vk([three.join(' ')]), ITEM);
-  eq('  🔴 한쪽 읽기에만 있는 짧은 요건 한 줄(숫자·부정 없음)은 「칸 전체가 거의 같다」로 넘어가지 못한다 — 자격 칸을 싣지 않고 그 줄을 넘긴다 · 줄을 다르게 나눴을 뿐이면 그대로 싣는다',
-    [agX.final.eligibility, agX.held.some((h) => h.field === 'eligibility' && h.line === '다자녀 가정의 자녀'), agSplit.final.eligibility], [null, true, three]);
+  eq('  🔴 한쪽 읽기에만 있는 짧은 요건 한 줄(숫자·부정 없음)은 「칸 전체가 거의 같다」로 넘어가지 못한다 — 그 줄은 관리자에게 넘기고 같이 낸 줄은 싣는다 · 줄을 다르게 나눴을 뿐이면 그대로 싣는다',
+    [agX.final.eligibility, agX.held.some((h) => h.field === 'eligibility' && h.line === '다자녀 가정의 자녀'), agSplit.final.eligibility], [three, true, three]);
   const beEx = CR.buildEntry(ITEM, SRC, { ...full, excludes: ['대학원생, 휴학생'] }, { ...full, excludes: [] }, wonIn);
   eq('  🔴 제외 칸이 보류되면 자격 칸도 싣지 않는다 — 유료 자격만 실으면 무료 길이 자격 줄 사이에서 골라 주던 「받을 수 없는 경우」 줄이 화면에서 사라진다(실제 2건)',
     [beEx.entry.excludes, beEx.entry.eligibility, (beEx.entry.amount || []).length], [null, null, 1]);
@@ -16757,12 +16759,19 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
     [2, ['휴학생'], 2, 2000000, '2026-11-26', '삼성꿈장학재단']);
   const beBad = CR.buildEntryFixed(ITEM, SRC, { ...fixed, eligibility: [...fixed.eligibility, L('직전 학기 평점평균 3.5 이상인 학생', '직전학기 평점평균 3.0 이상인 자로,')] }, wonIn);
   const beEx = CR.buildEntryFixed(ITEM, SRC, { ...fixed, excludes: [L('휴학생', '휴학생 제외')] }, wonIn);
-  eq('  🔴 엄격 칸(자격·제외·서류)에서 한 줄이라도 떨어지면 그 칸은 싣지 않는다(null) · 제외 칸이 보류면 자격 칸도 · 다른 칸은 실린다',
-    [beBad.entry.eligibility, beEx.entry.excludes, beEx.entry.eligibility, (beEx.entry.amount || []).length], [null, null, null, 1]);
+  eq('  🔴 떨어진 줄은 빼고 통과한 유료 줄로 싣는다(2026-11-20 「빼고 올려」) · 칸의 줄이 전부 떨어지면 무료 길 값(null) · 제외 칸이 그렇게 비면 자격 칸도 무료 길 값 · 다른 칸은 실린다',
+    [(beBad.entry.eligibility || []).length, beBad.dropped.length, beEx.entry.excludes, beEx.entry.eligibility, (beEx.entry.amount || []).length], [2, 1, null, null, 1]);
   eq('  「연장」 공고는 마감을 싣지 않는다 · 「읽을 내용 없음」이면 싣지 않는다',
     [CR.buildEntryFixed({ ...ITEM, name: '장학생 선발 연장 공고' }, SRC, fixed, wonIn).entry.deadline, CR.buildEntryFixed(ITEM, SRC, { ...base, unreadable: true }, wonIn).entry], [null, null]);
   eq('  🔴 옛 장부(두 읽기 · 글자 줄)는 옛 길 그대로 — 같은 응답이면 옛 결과와 같다',
     CR.buildEntry(ITEM, SRC, { ...base, excludes: ['휴학생 제외'] }, { ...base, excludes: ['휴학생 제외'] }, wonIn).entry.excludes, ['휴학생 제외']);
+  const ex = CR.explainLine(beBad.dropped[0]), exq = CR.explainLine({ field: 'documents', line: '가족관계증명서', quote: '가족관계증명서 1부', kind: 'quote' }), exk = CR.explainLine(beEx.dropped[0]);
+  eq('  관리자 말 — 칸은 화면 말로 · 문장과 근거를 나란히 · 까닭과 확인할 것을 사람 말로(로봇 말 「원문에 없는 글자」·held·대조 없음)',
+    [ex.label, ex.text, ex.quote, /3\.5/.test(ex.reason) && /3\.0/.test(ex.reason), /확인해 주세요/.test(ex.check), exq.label, /찾지 못했습니다/.test(exq.reason), exk.label, /제외/.test(exk.reason),
+      [ex, exq, exk].every((x) => !/held|verify|대조|원문에 없는 글자/.test(x.reason + x.check))],
+    ['지원 자격', '직전 학기 평점평균 3.5 이상인 학생', '직전학기 평점평균 3.0 이상인 자로,', true, true, '제출 서류', true, '받을 수 없는 경우', true, true]);
+  const rv = CR.reviewOf({ 'g-1': { name: '표본', at: '2026-11-20', held: [{ field: 'eligibility', line: 'x줄', why: '둘째 읽기에 없음', kind: 'agree' }], dropped: [{ field: 'eligibility', line: 'x줄', kind: 'agree' }, { field: 'notes', line: '-', kind: 'quote' }] }, 'g-2': { name: '깨끗', held: [], dropped: [] } }, { 'g-3': 'no-source' });
+  eq('  관리자용 파일 — 잡힌 줄이 있는 공고만 · 같은 줄은 한 번 · 빈 줄·줄표는 뺀다 · 사람에게 넘긴 숨김분도 함께', [Object.keys(rv.items), rv.items['g-1'].lines.length, rv.gateHeld], [['g-1'], 1, { 'g-3': 'no-source' }]);
   eq('  지시문 — 읽기와 고치기 둘 다 줄마다 text·quote 를 요구하고 · 고치기는 완성본 전체를 낸다 · 해시는 두 지시문을 다 넣는다 · 줄의 꼴은 {text, quote}',
     [/quote/.test(CR.SYSTEM) && /quote/.test(CR.FIX_SYSTEM), /완성본 전체/.test(CR.FIX_SYSTEM), /update\(SYSTEM\)\.update\(FIX_SYSTEM\)/.test(readText(new URL('../collector/card-read.mjs', import.meta.url))),
       JSON.stringify(CR.SCHEMA.properties.eligibility.items.required)], [true, true, true, '["text","quote"]']);
@@ -16793,7 +16802,42 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
     const doc2 = sb.json('data/card-read.json') || {};
     eq('  🔴 한 번 학생 화면에 올린 숨김분은 다시 읽기가 빈 결과를 내도 결과를 지우지 않는다(다시 숨지 않는다) · 사람에게 넘기지도 않는다',
       [!!(doc2.items || {})['g-new'], (doc2.gateHeld || {})['g-new'] || null], [true, null]);
+    /* 옛 장부(두 읽기 · mode 없음 · 글자 줄) 다시 재기 — 2026-11-20 실제로 났던 실수: put 의 mode 기본값이 'fix' 라 옛 장부 57건이 새 길(둘째 결과만)로 다시 재졌다 */
+    const led3 = sb.json('collector/card-read-ledger.json');
+    const legacyA = { ...base, excludes: ['휴학생 제외'], eligibility: ['직전학기 평점평균 3.0 이상인 자'] }, legacyB = { ...base, excludes: ['휴학생 제외'], eligibility: [] };
+    led3['g-old'] = { name: 'old', hash: 'whatever', done: true, raw: { a: legacyA, b: legacyB } };
+    sb.write('collector/card-read-ledger.json', led3);
+    const rc = sb.run('collector/card-read.mjs', ['--recheck', '--write'], NOENV, 30000);
+    const doc3 = sb.json('data/card-read.json') || {}, led4 = sb.json('collector/card-read-ledger.json') || {}, rv = sb.json('collector/card-read-review.json') || {};
+    eq('  🔴 옛 장부는 옛 길(두 읽기 일치)로 다시 잰다 — 해시가 지시문 때문에 달라도 지금 원문에 대고 · mode 표시가 안 붙는다 · 한쪽에만 있는 자격 줄은 빼고 관리자 파일로',
+      [rc.status, ((doc3.items || {})['g-old'] || {}).excludes, ((doc3.items || {})['g-old'] || {}).eligibility, (led4['g-old'] || {}).mode || null, ((rv.items || {})['g-old'] || { lines: [] }).lines.map((x) => x.label)],
+      [0, ['휴학생 제외'], null, null, ['지원 자격']]);
   } finally { sb.done(); }
+
+  /* ④ 숨김 거르기 — 보이는가는 match-engine paidGateOpen 한 곳 · 그 공고 목록을 보는 곳은 전부 그 함수로 */
+  const ME = createRequire(import.meta.url)('../match-engine.js');
+  const gdoc = { items: { b: { eligibility: ['직전 학기 평점 3.0 이상인 학생'], excludes: [], documents: [] } }, gateHeld: { c: 'no-source' } };
+  const GL = [{ id: 'a' }, { id: 'b', paidGate: '2026-11-19' }, { id: 'c', paidGate: '2026-11-10' }, { id: 'd', paidGate: '2026-11-19' }, { id: 'e', paidGate: '2026-11-15' }, { id: 'f', paidGate: '언제' }];
+  eq('④ 보이는가 — 표식 없음 ✓ · 통과 ✓ · 사람에게 넘김 ✕(열흘이 지나도) · 하루 기다림 ✕ · 닷새 기다림 ✓(유료가 멈춘 날의 비상망) · 날짜가 깨진 표식 ✕',
+    GL.map((x) => ME.paidGateOpen(x, gdoc, '2026-11-20')), [true, true, false, false, true, false]);
+  eq('  🔴 결과 파일을 못 받으면(null) 숨김분은 하나도 안 보인다 — 통과했는지 모른다 · 표식 없는 옛 공고는 그대로',
+    GL.map((x) => ME.paidGateOpen(x, null, '2026-11-20')), [true, false, false, false, false, false]);
+  const pub = ME.publishedList(GL.map((x) => ({ ...x, eligibilityLines: ['무료 길 줄'] })), gdoc, '2026-11-20');
+  eq('  publishedList — 거르고 유료 결과를 얹는다(통과한 b 의 자격 줄은 유료 값)', [pub.map((x) => x.id), pub.find((x) => x.id === 'b').eligibilityLines], [['a', 'b', 'e'], ['직전 학기 평점 3.0 이상인 학생']]);
+  const fnText = (src, name) => { const at = src.indexOf(`function ${name}(`); return at < 0 ? '' : src.slice(at, src.indexOf('\n}\n', at) + 2); };
+  const meSrc = readText(new URL('../match-engine.js', import.meta.url)), pushSrc = readText(new URL('../server/push/worker.js', import.meta.url));
+  eq('  🔴 푸시 서버의 사본이 원본과 글자까지 같다(paidGateOpen · 기다리는 날 수 · 오늘 날짜) — 다르면 숨김분으로 폰을 깨운다',
+    [fnText(meSrc, 'paidGateOpen').length > 100 && fnText(meSrc, 'paidGateOpen') === fnText(pushSrc, 'paidGateOpen'), /const PAID_GATE_WAIT_DAYS = 3;/.test(pushSrc), /const kstToday = \(\) => new Date\(Date\.now\(\) \+ 9 \* 3600000\)\.toISOString\(\)\.slice\(0, 10\);/.test(pushSrc),
+      /\.filter\(\(s\) => s && s\.id && paidGateOpen\(s, cardRead, today\)\)/.test(pushSrc)], [true, true, true, true]);
+  const src = (rel) => readText(new URL(`../${rel}`, import.meta.url));
+  eq('  그 공고 목록을 보는 곳이 전부 거른다 — 앱 · 서비스워커 · what-shows · 인스타 · 검색 요약 · 접수 서버 (applyCardRead 를 혼자 부르지 않는다)',
+    [/registeredList = typeof publishedList === 'function' \? publishedList\(/.test(src('app-live.js')) && !/applyCardRead\(/.test(src('app-live.js')),
+      /reg\.items = publishedList\(reg\.items/.test(src('sw.js')) && !/applyCardRead\(/.test(src('sw.js')),
+      /ME\.publishedList\(reg\.items, cr\)/.test(src('verify/what-shows.mjs')) && !/ME\.applyCardRead\(/.test(src('verify/what-shows.mjs')),
+      /paidGateOpen\(x, cr\)/.test(src('insta/school.mjs')), /filter\(\(s\) => paidGateOpen\(s, cardRead\)\)/.test(src('collector/build-search-index.mjs')),
+      /publishedRegistered\(await r\.json\(\), cardRead\)/.test(src('server/apply/worker.js'))], [true, true, true, true, true, true]);
+  eq('  자동 등록이 새 공고에 등록일로 표식을 단다 · 관리자는 표식을 지우기만 한다(빈 값 = 무료 값으로 올리기 · 다른 값은 멈춤)',
+    [/paidGate: TODAY,/.test(src('collector/auto-register.mjs')), /'paidGate',/.test(src('tools/admin-apply.mjs')) && /k === 'paidGate' && v\) \{\s*fail\(/.test(src('tools/admin-apply.mjs')), /paidGate: '/.test(src('tools/edit-diff.mjs'))], [true, true, true]);
 }
 
 /* ══ 활동 글의 틀린 미달 — 처지 낱말 · 열거 속 처지 · 「참가제한」 절 (2026-11-15 개발자 "네, 고쳐 주세요") ══

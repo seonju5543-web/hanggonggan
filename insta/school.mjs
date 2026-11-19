@@ -14,7 +14,7 @@ import { createRequire } from 'node:module';
 
 const require_ = createRequire(import.meta.url);
 const { sectionOf, headText } = require_('../section-head.js');
-const { EXCLUDE_LINE } = require_('../match-engine.js');
+const { EXCLUDE_LINE, paidGateOpen } = require_('../match-engine.js');
 
 const ROOT = new URL('../', import.meta.url);
 
@@ -109,7 +109,8 @@ export function toNotice(x) {
 /** 경희대·한국외대 교내 공고 전부. */
 export function schoolNotices() {
   const r = JSON.parse(readFileSync(new URL('data/registered.json', ROOT), 'utf8'));
-  return (r.items || r).filter((x) => x.type === '교내').map(toNotice).filter(Boolean);
+  let cr = null; try { cr = JSON.parse(readFileSync(new URL('data/card-read.json', ROOT), 'utf8')); } catch { /* 아직 없음 */ }
+  return (r.items || r).filter((x) => x.type === '교내' && paidGateOpen(x, cr)).map(toNotice).filter(Boolean);   // 유료 확인 전 숨김분은 게시하지 않는다(2026-11-20)
 }
 
 // ── 실행 ────────────────────────────────────────────────────

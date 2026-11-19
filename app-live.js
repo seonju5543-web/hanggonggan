@@ -336,7 +336,9 @@ function loadRegistered() {
       tidyData(d); tidyData(cardRead);   // 깨진 글자 씻기(2026-11-17) — 받는 순간 한 번
       if (!d) { if (appsData.registered !== 'ok') appsData.registered = 'fail'; return; }   // 한 번 받았으면 다시 받기 실패에도 'ok'(목록은 메모리에 그대로)
       appsData.registered = 'ok';
-      registeredList = typeof applyCardRead === 'function' ? applyCardRead(d.items || [], cardRead) : (d.items || []);   // match-engine.js — 알림도 같은 함수로 얹는다
+      /* match-engine publishedList — 유료 확인 전 숨김분을 거르고 유료 결과를 얹는다(알림·서비스워커도 같은 함수 · 2026-11-20).
+         옛 엔진이 캐시에서 오면 숨김분은 통째로 안 보인다(안전한 쪽) */
+      registeredList = typeof publishedList === 'function' ? publishedList(d.items || [], cardRead) : (d.items || []).filter((s) => !s.paidGate);
       regUpdatedAt = d.updatedAt || '';
       dataFetchedAt = new Date();
       attachPrepTemplates(registeredList);

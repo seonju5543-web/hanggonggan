@@ -92,6 +92,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           [ -f data/card-read.json ] && git add data/card-read.json
           [ -f collector/card-read-ledger.json ] && git add collector/card-read-ledger.json
+          [ -f collector/card-read-review.json ] && git add collector/card-read-review.json
           if ! git diff --cached --quiet; then
             git commit -m "유료 카드 읽기: $(grep -o '읽음 [0-9]*건(실음 [0-9]*)' /tmp/card-read.txt | tail -1 || echo '결과 갱신')"
             pushed=0

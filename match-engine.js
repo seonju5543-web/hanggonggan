@@ -2478,6 +2478,26 @@ function applyCardRead(list, doc) {
   return (list || []).map((sch) => { const cr = sch && items[sch.id]; return cr && typeof cr === 'object' ? withCardRead(sch, cr) : sch; });
 }
 
+/* 유료 관문 (2026-11-20 개발자 지시 · 설계 docs/designs/paid-gate-pipeline.md) — 자동 등록이 `paidGate: <등록일>` 을 단 공고는
+   유료 확인(collector/card-read.mjs)을 통과해 card-read.json 에 실려야 보인다. 사람에게 넘긴 것(gateHeld)은 관리자가 정할 때까지 안 보인다.
+   그 밖에 사흘이 지나도 통과 못 한 것은 무료 길 값으로 보인다(유료가 멈춘 날의 비상망 — 경보는 card-read.yml).
+   🔴 card-read.json 을 못 받으면(null) 숨김분은 하나도 안 보인다(사흘 규칙은 파일을 받았는데 통과가 없을 때 — 유료가 멈춘 날) — 그 공고 목록을 보는 곳은 전부 이 함수로(앱·서비스워커·what-shows·인스타·검색 요약·접수 서버 · 푸시 서버는 사본) */
+const PAID_GATE_WAIT_DAYS = 3;
+const kstToday = () => new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
+function paidGateOpen(sch, doc, today) {
+  if (!sch || !sch.paidGate) return true;
+  if (!doc || typeof doc !== 'object') return false;   // 결과 파일을 못 받은 날은 숨김분을 다 숨긴다(통과했는지 모른다 · 잠깐 안 보이는 쪽이 안전하다)
+  const items = doc.items, held = doc.gateHeld;
+  if (items && typeof items === 'object' && items[sch.id]) return true;
+  if (held && typeof held === 'object' && held[sch.id]) return false;
+  const waited = (Date.parse(`${today || kstToday()}T00:00:00Z`) - Date.parse(`${String(sch.paidGate).slice(0, 10)}T00:00:00Z`)) / 86400000;
+  return Number.isFinite(waited) && waited > PAID_GATE_WAIT_DAYS;
+}
+function publishedList(list, doc, today) {
+  const t = today || kstToday();
+  return applyCardRead((list || []).filter((s) => paidGateOpen(s, doc, t)), doc);
+}
+
 /* Node(검증 스크립트)에서도 같은 엔진을 불러 쓸 수 있게 — 브라우저·서비스워커에는 영향 없음 */
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { evaluate, fitScore, fitDetail, judgeCond, holdsExternalScholarship, FIT_UNREAD, FIT_FLOOR, FIT_MAX, FIT_MIN,
@@ -2490,5 +2510,5 @@ if (typeof module !== 'undefined' && module.exports) {
                      noticeKind, NOTICE_CAMPUS_MARK, OWN_PROGRAMS,
                      noticeFileKey, noticeFileFor, noticeFilesForProfile,
                      noticeFallbackNeeded, majorsFileFor, newsFileFor, newsFilesForProfile, BRANCH_LABEL,
-                     applyCardRead, withCardRead };
+                     applyCardRead, withCardRead, PAID_GATE_WAIT_DAYS, paidGateOpen, publishedList };
 }

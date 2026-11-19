@@ -122,6 +122,8 @@ const ALLOWED = new Set([
      🔴 `amountSpec`(금액 구조)은 **일부러 안 넣는다** — 손으로 적으면 홈 합계가 틀어지고,
         그건 학생에게 받을 수 없는 숫자를 보여 주는 일이다(기망). */
   'announceDate', 'eligibilityExcludes', 'eligibilityPriority', 'exclusivity',
+  /* 유료 확인 대기 표식(2026-11-20 · auto-register 가 단다) — **지우기만**: 지우면 유료 확인 없이 무료 길 값으로 학생 화면에 나온다(관리자 「할 일」 「올리기」) */
+  'paidGate',
   /* 자유 형식 제출 스위치 — 아래에서 **근거 문장과 짝으로만** 다룬다 */
   'prepDoc', 'prepDocBasis',
 ]);
@@ -670,6 +672,8 @@ switch (action) {
           if (v < 0) fail(`${it.id} — 금액은 0 이상이어야 합니다 (받은 값: ${v})`);
         } else if (k === 'deadline' && v) {
           if (!isDay(v)) fail(`마감일 형식이 올바르지 않습니다: ${v} (YYYY-MM-DD · 달력에 있는 날)`);
+        } else if (k === 'paidGate' && v) {
+          fail(`${it.id} — 유료 확인 대기 표식은 지우기만 할 수 있습니다 (빈 값으로 보내세요)`);
         } else if (k === 'type' && v && !['교내', '교외'].includes(v)) {
           fail(`구분은 '교내' 또는 '교외'만 가능합니다: ${v}`);
         } else if ((k === 'sourceUrl' || k === 'applyEmail') && v) {

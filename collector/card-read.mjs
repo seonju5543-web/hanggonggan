@@ -174,15 +174,17 @@ const ORG = /[가-힣A-Za-z]{2,}(?:장학재단|재단|장학회|대학교|대�
 const uniq = (a) => [...new Set(a)].sort().join(',');
 export function factsMatch(text, quote, extra = '') {
   const t = norm(text), q = norm(quote).replace(LEAD_ENUM, '');
-  if (t.length < 2) return { ok: false, why: '빈 줄' };
-  if (digitsOf(t).sort().join(',') !== digitsOf(q).sort().join(',')) return { ok: false, why: `숫자가 근거와 다름: 「${digitsOf(t).join(' ')}」 ↔ 「${digitsOf(q).join(' ')}」` };
-  if (uniq(t.match(TOK) || []) !== uniq(q.match(TOK) || [])) return { ok: false, why: `부정·비교 말이 근거와 다름: 「${uniq(t.match(TOK) || [])}」 ↔ 「${uniq(q.match(TOK) || [])}」` };
+  if (t.length < 2) return { ok: false, kind: 'empty', why: '빈 줄' };
+  const dt = digitsOf(t), dq = digitsOf(q);
+  if (dt.slice().sort().join(',') !== dq.slice().sort().join(',')) return { ok: false, kind: 'digits', t: dt, q: dq, why: `숫자가 근거와 다름: 「${dt.join(' ')}」 ↔ 「${dq.join(' ')}」` };
+  const kt = [...new Set(t.match(TOK) || [])], kq = [...new Set(q.match(TOK) || [])];
+  if (uniq(kt) !== uniq(kq)) return { ok: false, kind: 'tok', t: kt, q: kq, why: `부정·비교 말이 근거와 다름: 「${uniq(kt)}」 ↔ 「${uniq(kq)}」` };
   const qx = q + norm(extra);
   const org = (t.match(ORG) || []).find((o) => !qx.includes(o));
-  if (org) return { ok: false, why: `근거에 없는 기관 이름: 「${org}」` };
+  if (org) return { ok: false, kind: 'org', t: [org], q: [], why: `근거에 없는 기관 이름: 「${org}」` };
   const T = bigrams(t), Q = bigrams(q); let hit = 0, all = 0;
   for (const [g, c] of T) { all += c; if (Q.has(g)) hit += c; }
-  if (all && hit / all < 0.3) return { ok: false, why: '근거와 다른 말' };
+  if (all && hit / all < 0.3) return { ok: false, kind: 'words', why: '근거와 다른 말' };
   return { ok: true };
 }
 /* 모델 한 번의 응답 → 원문에 있는 것만(kept) · 버린 것(dropped). 응답 꼴이 틀리면 전부 버린다(던지지 않는다).
@@ -199,18 +201,20 @@ export function verify(out, source, item) {
       if (typeof line !== 'string' && !pair) continue;
       const quote = pair ? line.quote : line, text = pair ? line.text : line;
       let r = (k === 'eligibility' || k === 'excludes') ? inSourceEnding(quote, srcN) : inSource(quote, srcN);
-      if (r.ok && pair) r = factsMatch(text, quote, titleN);
-      if (r.ok) kept[k].push(text.trim()); else dropped.push({ field: k, line: text, ...(pair ? { quote } : {}), why: r.why });
+      if (!r.ok) r = { ...r, kind: 'quote' };
+      else if (pair) r = factsMatch(text, quote, titleN);
+      if (r.ok) kept[k].push(text.trim());
+      else dropped.push({ field: k, line: text, ...(pair ? { quote } : {}), why: r.why, kind: r.kind, ...(r.t ? { t: r.t, q: r.q } : {}) });
     }
   }
   const t = typeof o.title === 'string' && o.title ? inSource(o.title, titleN) : { ok: false };
-  kept.title = t.ok ? o.title.trim() : ''; if (o.title && !t.ok) dropped.push({ field: 'title', line: String(o.title), why: t.why || '꼴 아님' });
+  kept.title = t.ok ? o.title.trim() : ''; if (o.title && !t.ok) dropped.push({ field: 'title', line: String(o.title), why: t.why || '꼴 아님', kind: 'title' });
   const h = typeof o.host === 'string' && o.host ? inSource(o.host, srcN + titleN) : { ok: false };
-  kept.host = h.ok ? o.host.trim() : ''; if (o.host && !h.ok) dropped.push({ field: 'host', line: String(o.host), why: h.why || '꼴 아님' });
+  kept.host = h.ok ? o.host.trim() : ''; if (o.host && !h.ok) dropped.push({ field: 'host', line: String(o.host), why: h.why || '꼴 아님', kind: 'host' });
   const dl = (o.deadline && typeof o.deadline === 'object') ? o.deadline : null;
   const d = checkDeadline(dl, srcN, item);
   kept.deadline = d.ok ? { date: dl.date, quote: String(dl.quote).trim() } : null;
-  if (dl && dl.date && !d.ok) dropped.push({ field: 'deadline', line: `${dl.date} ← ${dl.quote}`, why: d.why });
+  if (dl && dl.date && !d.ok) dropped.push({ field: 'deadline', line: dl.date, quote: String(dl.quote || ''), why: d.why, kind: 'deadline' });
   kept.multi = o.multi === true; kept.unreadable = o.unreadable === true;
   return { kept, dropped };
 }
@@ -264,18 +268,19 @@ export function agree(va, vb, item, source = '') {
     const covered = (X, Y) => { const y = norm(Y.join('')); return X.every((l) => Y.some((o) => sameLine(l, o)) || y.includes(norm(l))); };
     if (fieldAgree(A, B) && (!STRICT_FIELDS.has(k) || (covered(A, B) && covered(B, A)))) { final[k] = A.slice(); continue; }
     const ok = [], miss = [];
-    for (const line of A) (B.some((o) => sameLine(line, o)) ? ok : miss).push({ field: k, line, why: '둘째 읽기에 없음' });
-    for (const line of B) if (!A.some((o) => sameLine(o, line))) miss.push({ field: k, line, why: '첫째 읽기에 없음' });
+    for (const line of A) (B.some((o) => sameLine(line, o)) ? ok : miss).push({ field: k, line, why: '둘째 읽기에 없음', kind: 'agree' });
+    for (const line of B) if (!A.some((o) => sameLine(o, line))) miss.push({ field: k, line, why: '첫째 읽기에 없음', kind: 'agree' });
     held.push(...miss);
-    final[k] = miss.length && (STRICT_FIELDS.has(k) || !ok.length) ? null : ok.map((x) => x.line);
+    /* 🔴 2026-11-20 개발자 결정 — 갈린 줄은 빼고(관리자 「할 일」로) 두 읽기가 같이 낸 유료 줄은 싣는다(엄격 칸도). 같이 낸 줄이 하나도 없을 때만 무료 길 값 */
+    final[k] = miss.length && !ok.length ? null : ok.map((x) => x.line);
   }
   const da = va.kept.deadline, db = vb.kept.deadline;
   final.deadline = da && db && da.date === db.date ? da : null;
-  if ((da || db) && !final.deadline) held.push({ field: 'deadline', line: `${da ? da.date : '없음'} / ${db ? db.date : '없음'}`, why: '두 읽기의 마감이 다름' });
-  if (final.deadline && isExtension(item, source)) { held.push({ field: 'deadline', line: `${final.deadline.date} ← ${final.deadline.quote}`, why: '「연장」 공고 — 연장된 마감을 사람이 확인' }); final.deadline = null; }
+  if ((da || db) && !final.deadline) held.push({ field: 'deadline', line: `${da ? da.date : '없음'} / ${db ? db.date : '없음'}`, why: '두 읽기의 마감이 다름', kind: 'agree' });
+  if (final.deadline && isExtension(item, source)) { held.push({ field: 'deadline', line: final.deadline.date, quote: final.deadline.quote, why: '「연장」 공고 — 연장된 마감을 사람이 확인', kind: 'extension' }); final.deadline = null; }
   final.title = va.kept.title && norm(va.kept.title) === norm(vb.kept.title) ? va.kept.title : '';
   final.host = va.kept.host && norm(va.kept.host) === norm(vb.kept.host) ? va.kept.host : '';
-  if ((va.kept.host || vb.kept.host) && !final.host) held.push({ field: 'host', line: `${va.kept.host || '없음'} / ${vb.kept.host || '없음'}`, why: '두 읽기의 주최가 다름' });
+  if ((va.kept.host || vb.kept.host) && !final.host) held.push({ field: 'host', line: `${va.kept.host || '없음'} / ${vb.kept.host || '없음'}`, why: '두 읽기의 주최가 다름', kind: 'agree' });
   final.multi = va.kept.multi || vb.kept.multi;
   return { final, held, unreadable: va.kept.unreadable && vb.kept.unreadable };
 }
@@ -300,18 +305,19 @@ export function buildEntryFixed(item, source, outFixed, wonIn) {
   const final = {};
   for (const k of LIST_FIELDS) final[k] = v.kept[k];
   final.deadline = v.kept.deadline;
-  if (final.deadline && isExtension(item, source)) { held.push({ field: 'deadline', line: `${final.deadline.date} ← ${final.deadline.quote}`, why: '「연장」 공고 — 연장된 마감을 사람이 확인' }); final.deadline = null; }
+  if (final.deadline && isExtension(item, source)) { held.push({ field: 'deadline', line: final.deadline.date, quote: final.deadline.quote, why: '「연장」 공고 — 연장된 마감을 사람이 확인', kind: 'extension' }); final.deadline = null; }
   final.title = v.kept.title; final.host = v.kept.host; final.multi = v.kept.multi;
   return finishEntry(final, held, v.dropped.map((x) => ({ ...x, by: 'b' })), v.kept.unreadable, item, wonIn);
 }
 function finishEntry(final, held, dropped, unreadable, item, wonIn) {
   /* 🔴 엄격 칸(자격·제외·서류)에서 한쪽이 낸 줄이 기계 대조에서 떨어졌으면 그 칸은 싣지 않는다 — 남은 줄만 실으면 요건이 빠진 목록이 된다(틀린 안심).
      2026-11-18 첫 실제 읽기: 한 칸씩 흩어진 표를 첫째 읽기가 짜 맞춘 「TOEIC 950/990」 열 줄이 떨어지자 어학 점수 없는 자격 두 줄만 실렸다. 빈 배열로도 안 싣는다(무료 길 값을 지운다) */
+  /* 🔴 2026-11-20 개발자 결정(「빼고 올려」 · *"유료가 틀린걸 무료가 잡는다는게 말이돼"*) — 기계 검사에 떨어진 줄은 **빼고** 통과한 유료 줄로 싣는다(엄격 칸도).
+     떨어진 줄은 관리자 「할 일」로(card-read-review.json · 까닭과 확인할 것을 사람 말로). 한 칸의 줄이 **전부** 떨어져 실을 유료 줄이 없을 때만 그 칸은 무료 길 값(null).
+     (11-18 까지는 한 줄만 떨어져도 칸 전체를 무료 길 값으로 돌렸다 — 「TOEIC 950/990」 한 줄이 떨어지자 어학 점수 없는 자격 두 줄만 실린 일이 있었고, 이제 그 줄은 관리자가 본다) */
   for (const k of STRICT_FIELDS) {
     const lost = dropped.filter((x) => x.field === k && String(x.line || '').replace(/[\s\-–·.]/g, ''));   // 빈 줄·줄표뿐인 줄은 빠진 요건이 아니다(리뷰)
-    if (!lost.length || final[k] === null) continue;
-    held.push(...lost.map((x) => ({ field: k, line: x.line, why: `대조에서 떨어진 줄이 있어 칸을 싣지 않음 — ${x.why}` })));
-    final[k] = null;
+    if (lost.length && Array.isArray(final[k]) && !final[k].length) final[k] = null;
   }
   /* 🔴 제외 칸이 보류(null)면 자격 칸도 싣지 않는다 (2026-11-18 리뷰 · 실제 2건) — 앱은 유료 자격이 실리면 무료 길의 자격 줄을 통째로 갈아 끼우는데,
      무료 길은 「받을 수 없는 경우」 줄을 그 자격 줄 사이에서 골라 보인다. 유료 자격만 실으면 그 줄(「신입생·편입생은 첫 학기 신청 불가」)이 화면 어디에도 없다 */
@@ -386,6 +392,44 @@ export function gateHeldOf(items, partsOf, ledger, paid, today, waitDays = 3) {
   }
   return out;
 }
+/* 관리자 「할 일」에 보일 말 (2026-11-20 개발자 지시 — *"이러이러한 부분이 기계검사에서 잡혔으니 뭐랑 뭐를 확인바란다는게 명확하게"*).
+   🔴 로봇 말(held·verify·대조·「원문에 없는 글자」)을 쓰지 않는다 — 어느 칸 · 왜 잡혔는지 · 무엇을 확인하면 되는지를 한 문장씩 */
+export const FIELD_LABEL = { eligibility: '지원 자격', excludes: '받을 수 없는 경우', priority: '먼저 뽑는 기준', amount: '금액', apply: '접수 방법',
+  documents: '제출 서류', notes: '유의사항', deadline: '마감', title: '제목', host: '주는 곳' };
+const shown = (a) => (a && a.length ? a.join(', ') : '없음');
+export function explainLine(d) {
+  const label = FIELD_LABEL[d.field] || d.field;
+  const pick = {
+    digits: () => [`문장의 숫자(${shown(d.t)})가 근거로 든 원문 문구의 숫자(${shown(d.q)})와 다릅니다.`, `원문에서 이 ${label}의 숫자가 ${shown(d.q)}${d.t && d.t.length ? `인지 ${shown(d.t)}인지` : '가 맞는지'} 확인해 주세요.`],
+    tok: () => [`문장의 조건 말(${shown(d.t)})이 원문 문구의 조건 말(${shown(d.q)})과 다릅니다 — '이상·이하·미만·제외·않' 같은 말이 빠지거나 더해지면 뜻이 뒤집힙니다.`,
+      `원문에서 이 조건이 「${d.quote || ''}」 그대로인지(${shown(d.q)}) 확인해 주세요.`],
+    org: () => [`문장에 있는 기관 이름 「${shown(d.t)}」가 근거로 든 원문 문구에 없습니다.`, '원문에 이 기관 이름이 실제로 적혀 있는지 확인해 주세요.'],
+    words: () => ['문장이 근거로 든 원문 문구와 다른 내용을 말합니다.', '문장이 원문 문구와 같은 뜻인지 확인해 주세요.'],
+    quote: () => ['근거로 든 원문 문구를 공고 원문(본문·첨부)에서 찾지 못했습니다.', `원문에 이 ${label} 내용이 실제로 적혀 있는지 확인해 주세요.`],
+    empty: () => ['빈 줄이 들어왔습니다.', '확인할 것 없음 — 버리면 됩니다.'],
+    deadline: () => [`마감 ${d.line}을 근거 문구에서 확인하지 못했습니다(${String(d.why || '').replace(/^근거 문구/, '근거 문구가')}).`, '원문에서 신청 마감일을 확인해 주세요(접수 시작일·발표일과 헷갈리지 않았는지).'],
+    extension: () => [`「연장」 공고라 마감(${d.line})을 싣지 않았습니다 — 받아 두지 못한 연장 공고문에 진짜 마감이 있을 수 있습니다.`, '연장된 마감일을 원문에서 확인해 주세요.'],
+    agree: () => ['두 번 읽은 결과가 이 줄에서 달랐습니다.', `원문에서 이 ${label} 줄이 맞는지 확인해 주세요.`],
+    title: () => ['제목이 공고 제목에서 온 글자가 아닙니다.', '공고 제목을 확인해 주세요.'],
+    host: () => ['주는 곳 이름을 원문에서 확인하지 못했습니다.', '원문에서 장학금을 주는 기관 이름을 확인해 주세요.'],
+  }[d.kind] || (() => ['기계 검사에서 잡혔습니다.', '원문에서 이 줄이 맞는지 확인해 주세요.']);
+  const [reason, check] = pick();
+  return { field: d.field, label, text: d.line, ...(d.quote ? { quote: d.quote } : {}), reason, check };
+}
+/* 관리자용 파일 — 공고마다 잡힌 줄(사람 말) · 사람에게 넘긴 숨김분. 앱은 받지 않는다(collector/ 아래) */
+export function reviewOf(ledger, gateHeld) {
+  const items = {};
+  for (const [id, led] of Object.entries(ledger || {})) {
+    const seen = new Set(), lines = [];
+    for (const d of [...(led.held || []), ...(led.dropped || [])]) {
+      const key = `${d.field}|${d.line}`;
+      if (seen.has(key) || !String(d.line || '').replace(/[\s\-–·.]/g, '')) continue;
+      seen.add(key); lines.push(explainLine(d));
+    }
+    if (lines.length) items[id] = { name: led.name, at: led.at, lines };
+  }
+  return { items, gateHeld: gateHeld || {} };
+}
 /* 결과 파일의 꼴 — 앱이 받는 파일이라 저장 전에 스스로 잰다(워크플로 `--check`). 문제 줄 목록을 낸다(비면 통과) */
 export function checkData(data) {
   const bad = [];
@@ -444,7 +488,7 @@ if (process.argv[1] && ranDirectly()) {
   const { wonIn } = require('../parse-amount.js');
   /* 임시 파일에 쓰고 이름을 바꾼다(쓰다 죽어도 반쪽 파일이 안 남는다) · 결과 파일을 장부보다 먼저(장부만 '읽음'이고 결과가 없는 상태가 안 생긴다) */
   const writeAtomic = (rel, obj) => { const p = P(rel), tmp = `${p}.tmp`; fs.writeFileSync(tmp, `${JSON.stringify(obj, null, 1)}\n`); fs.renameSync(tmp, p); };
-  const save = () => { data.updatedAt = TODAY; data.gateHeld = gateHeldOf(reg.items, partsOf, ledger, data.items, TODAY); writeAtomic('../data/card-read.json', data); writeAtomic('card-read-ledger.json', ledger); };
+  const save = () => { data.updatedAt = TODAY; data.gateHeld = gateHeldOf(reg.items, partsOf, ledger, data.items, TODAY); writeAtomic('../data/card-read.json', data); writeAtomic('card-read-ledger.json', ledger); writeAtomic('card-read-review.json', { updatedAt: TODAY, ...reviewOf(ledger, data.gateHeld) }); };
 
   /* 학생 화면에서 내려간 공고·목록에서 빠진 공고는 결과 파일과 장부에서 뺀다(자라기만 하지 않게) — 내려갔는지는 유료 마감으로 잰다(closedNow) */
   const live = new Map(reg.items.map((it) => [it.id, it]));
@@ -454,7 +498,7 @@ if (process.argv[1] && ranDirectly()) {
 
   /* 한 건의 두 응답을 결과·장부에 적는다 — 읽기와 다시 재기(--recheck)가 같은 길 */
   /* mode 'fix' = 읽기 → 고치기(2026-11-20 · b 가 고친 결과) · 없으면 옛 길(두 읽기 일치 · 장부 다시 재기용) */
-  const put = (it, text, hash, outA, outB, mode = 'fix') => {
+  const put = (it, text, hash, outA, outB, mode) => {   // 🔴 mode 에 기본값을 두지 말 것 — 옛 장부(mode 없음)가 새 길로 다시 재진다
     const led = ledger[it.id] = { ...(ledger[it.id] || {}), name: String(it.name).slice(0, 60), hash };
     const r = mode === 'fix' ? buildEntryFixed(it, text, outB, wonIn) : buildEntry(it, text, outA, outB, wonIn);
     led.done = true; led.at = TODAY; led.held = r.held; led.dropped = r.dropped; led.raw = { a: outA, b: outB };
@@ -472,7 +516,9 @@ if (process.argv[1] && ranDirectly()) {
       const led = ledger[it.id];
       if (!led || !led.raw || closedNow(it, data.items[it.id], TODAY)) continue;
       const text = sourceText(partsOf(it));
-      if (sourceHash(text) !== led.hash) continue;   // 원문이 바뀌었다 — 다음 유료 실행이 다시 읽는다
+      /* 원문이 바뀌었으면 다음 유료 실행이 다시 읽는다. 단 옛 장부(두 읽기 · mode 없음)는 지시문이 바뀌어(2026-11-20) 해시가 늘 다르다 — 그 공고는 다시 유료로 읽지 않으니(숨김분만 읽는다)
+         지금 원문에 대고 다시 잰다(기계 대조가 지금 원문으로 보므로 바뀐 원문에 없는 줄은 떨어진다) */
+      if (led.mode === 'fix' && sourceHash(text) !== led.hash) continue;
       const r = put(it, text, led.hash, led.raw.a, led.raw.b, led.mode); n += 1; if (r.entry) filled += 1;
     }
     if (WRITE) save();
@@ -512,7 +558,7 @@ if (process.argv[1] && ranDirectly()) {
       } catch (e) { err = e; }
       usd += spent; led.usd = Math.round(((led.usd || 0) + spent) * 10000) / 10000;
       if (!err) {
-        const r = put(t.it, t.text, t.hash, outA, outB);
+        const r = put(t.it, t.text, t.hash, outA, outB, 'fix');
         heldN += r.held.length; done += 1; streak = 0; if (r.entry) filled += 1;
         log(`  ✓ ${t.it.id} · ${String(t.it.name).slice(0, 30)} · ${r.entry ? ['eligibility', 'excludes', 'documents'].map((k) => `${{ eligibility: '자격', excludes: '제외', documents: '서류' }[k]} ${r.entry[k] ? r.entry[k].length : '보류'}`).join(' · ') + ` · 마감 ${r.entry.deadline ? r.entry.deadline.date : '—'}` : '실을 것 없음(무료 길 그대로)'} · 넘긴 줄 ${r.held.length} · 버린 줄 ${r.dropped.length}`);
       } else {

@@ -492,6 +492,9 @@ if (!cfg.enabled) {
       note: '수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.',
       noForm: `자동 등록(검수 전) ${TODAY} — 양식 스키마화는 검수 후 진행`,
       auto: true,
+      /* 🔴 유료 관문 (2026-11-20 개발자 지시) — 유료 확인(collector/card-read.mjs)을 통과해야 학생 화면에 나온다(match-engine paidGateOpen).
+         값은 등록일 — 사흘이 지나도 통과 못 하면 무료 길 값으로 보인다(비상망) · 관리자가 지우면 바로 보인다 */
+      paidGate: TODAY,
       attachments: atts,
       sourceUrl: nUrl,
       sourceKind: 'auto'
