@@ -15,7 +15,9 @@ function bindEvents() {
       const ff = img.getAttribute('data-fallback-focus');
       img.removeAttribute('data-fallback');
       img.removeAttribute('data-fallback-focus');
-      if (fb) { if (ff && PHOTO_FOCUS_RE.test(ff)) img.style.objectPosition = ff; img.src = fb; } else img.remove();
+      /* 🔴 화면에 적힌 주소를 그대로 그림 주소로 넣지 않는다 — 적는 쪽(homeNewsHtml)과 같은 규칙 SCHOOL_PHOTO_RE(우리 학교 사진 파일 꼴)만 통과
+         (CodeQL 「DOM text reinterpreted as HTML」 high #63 · 2026-11-19 app.js 에서 떼어 올 때 새 경보) */
+      if (fb && SCHOOL_PHOTO_RE.test(fb)) { if (ff && PHOTO_FOCUS_RE.test(ff)) img.style.objectPosition = ff; img.src = fb; } else img.remove();
       return;
     }
     /* 글의 사진·학교 사진 모두 img.notice-thumb 한 장이 썸네일 자리다 */

@@ -93,7 +93,7 @@
   } });
 
   // 광운대 비마(현행판) — 흰 아기 천마 · 자주색 갈기(이마 곱슬)·꼬리·발굽 · 작은 흰 날개 · 분홍 볼 / 과잠: 자주 갈색(#702732) · 흰 K
-  register('kw', { school: '광운대학교', name: '비마', build() {
+  register('kw', { school: '광운대학교', name: '우니', build() {
     const W = 0xffffff, M = 0x8c1c2e, mm = mat(M, 0.6);
     const ch = chibi({ body: W, feet: M, jacket: { color: 0x702732, letter: 'K' } });
     pointEar(ch, 0.45, 0.48, W, M);
