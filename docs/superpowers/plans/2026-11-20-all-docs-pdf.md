@@ -112,7 +112,7 @@
   - `let docsPdfIndex = { items: {} }` · `function loadDocsPdfIndex()` — `fetch('data/docs-pdf/index.json', { cache: 'no-store' })` · 실패는 조용히
   - `function docPdfsFor(sch)` → 색인 항목 배열
   - `function pdfRowHtml({ href, name, slot = '' })` → Global Constraints 의 줄 꼴 + `slot` 이 있으면 `<li class="fill-slot" data-file="…" hidden></li>`
-  - `function attachPdfRowsHtml(sch, atts)` → 첨부 차례대로: 신청서 사본(같은 이름 · `slot` = 그 file) → `data/forms-pdf/<file>` · 공고문 사본 → `data/docs-pdf/<file>` · 이름이 `.pdf` 이고 `safeUrl` 이 되는 원래 PDF → 원래 주소. 끝에 첨부와 이름이 안 맞는 신청서 사본을 덧붙인다(지금 활동 줄을 잃지 않게).
+  - `function attachPdfRowsHtml(sch, atts)` → 첨부 차례대로: 신청서 사본(같은 이름 · `slot` = 그 file) → `data/forms-pdf/<file>` · 공고문 사본 → `data/docs-pdf/<file>` · 이름이 `.pdf` 이고 `safeUrl` 이 되는 원래 PDF → 원래 주소. ~~끝에 첨부와 이름이 안 맞는 신청서 사본을 덧붙인다~~ — 일부러 뺐다(리뷰 11-20 #3 · 오늘 0건 · 첨부 이름이 바뀐 날 하루만 빠지고 다음 실행이 새 이름으로 다시 만든다).
   - `attachRowHtml(a, { meta = '' })` 은 그대로 · 호출하는 곳은 `meta` 를 안 준다.
 
 - [ ] **Step 1: 실패하는 드라이버**

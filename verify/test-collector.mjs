@@ -17153,6 +17153,9 @@ console.log('■ 공고문 PDF 사본 — 고르기 · 글자 대조 · 쉼 (202
     eq('① 대상 — 마감 전·상시 아님·숨김 아님 공고의 한글·워드 첨부 중 신청서가 아닌 것 · 같은 이름은 한 번 · 본문 사진 아님 · 층2 는 신청서 이름이어도 전부 · 마감 모르는 재단은 둔다',
       got.map((t) => [t.id, t.files.map((f) => f.name)]),
       [['r1', ['공고문.hwp chevron_forward']], ['act-1', ['모집 요강.hwpx']], ['kosaf-123', ['선발 공고.hwpx', '장학생 신청서.hwp']], ['kosaf-789', ['공고.docx']]]);
+    const withRoles = DP.pickDocTargets({ registered: reg }, { today, isApplicationForm, roles: { r1: { '장학생 신청서.hwp': 'notice', '공고문.hwp chevron_forward': 'form' } } });
+    eq('  신청서 판정은 form-pdf·앱(attIsForm)과 같은 기준 — 로봇이 원본 내용으로 가른 roles 가 먼저(속이 안내문인 「…신청서」는 여기서 바꾸고 · 진짜 서식은 건너뛴다)',
+      withRoles.map((t) => [t.id, t.files.map((f) => f.name)]), [['r1', ['장학생 신청서.hwp']]]);
     eq('  층1·활동은 첨부 주소(url)와 원문 주소(pageUrl)로 받고 · 층2 는 저장소 사본(src)에서 바꾼다',
       [got[0].files[0].url, got[0].pageUrl, got[1].pageUrl, got[2].files[0].src], ['https://x.ac.kr/f/1', 'https://x.ac.kr/v?id=1', 'https://y.or.kr/1', 'data/kosaf-files/123/선발 공고.hwpx']);
     const T = '가나다라마바사아자차카타파하'.repeat(5) + '2026';
@@ -17163,6 +17166,10 @@ console.log('■ 공고문 PDF 사본 — 고르기 · 글자 대조 · 쉼 (202
     /* 🔴 PDF 글자를 못 뽑은 것(null · pdftotext 없음)은 '잴 수 없음'이지 '글자 0%'가 아니다 — 섞으면 도구 하나 빠진 날 사본이 전부 버려진다 */
     eq('  PDF 글자를 못 뽑았으면(null) 잴 수 없다 · 뽑았는데 비었으면("") 0', [DP.keptRatio(T, null), DP.keptRatio(T, '')], [null, 0]);
     eq('  기준 숫자(통과 비율 · 잴 수 있는 최소 글자 · 쉼 날수)', [DP.KEEP_MIN, DP.MIN_CHARS, DP.REST_DAYS], [0.98, 50, 3]);
+    const office = (n, ext = '') => Array.from({ length: n }, (_, i) => ({ id: `x${i}`, name: 'a.hwp', why: `변환기가 못 읽음(hwp)${ext} · 종료 1` }));
+    eq('  실행 빨간불은 변환기 자체가 깨진 날만 — 확장 없음 표식 · 못 읽음 둘 이상인데 0개 바꿈 · 파일 하나 못 읽음이나 하나라도 바꾼 날은 아니다(경보가 사흘마다 흔들리지 않게)',
+      [DP.systemicFailure({ failed: office(1, ' — 가져오기 확장(H2Orestart) 필요'), done: [] }), DP.systemicFailure({ failed: office(2), done: [] }),
+        DP.systemicFailure({ failed: office(1), done: [] }), DP.systemicFailure({ failed: office(3), done: [{}] })], [true, true, false, false]);
     eq('③ 실패한 첨부는 사흘 쉰다 — 이틀 전 실패는 쉬는 중 · 사흘 전은 다시 · 기록 없으면 다시',
       [DP.resting({ 'a|b': { at: '2026-11-18' } }, 'a|b', today), DP.resting({ 'a|b': { at: '2026-11-17' } }, 'a|b', today), DP.resting({}, 'a|b', today)],
       [true, false, false]);
@@ -17189,7 +17196,7 @@ console.log('■ 공고문 PDF 사본 — 고르기 · 글자 대조 · 쉼 (202
       const T = '가나다라마바사아자차카타파하'.repeat(5) + '2026';
       const calls = [];
       let respond = () => ({ ok: true, status: 200, body: Buffer.alloc(2000, 0x41) });
-      const fetchImpl = async (url) => { calls.push(url); const r = respond(url); return { ok: r.ok, status: r.status, arrayBuffer: async () => r.body }; };
+      const fetchImpl = async (url) => { calls.push(url); const r = respond(url); return { ok: r.ok, status: r.status, arrayBuffer: async () => { if (r.bodyError) throw Object.assign(new Error('The operation was aborted due to timeout'), { name: 'TimeoutError' }); return r.body; } }; };
       const convert = (src, out) => { fs.mkdirSync(path.dirname(out), { recursive: true }); fs.writeFileSync(out, '%PDF-1.4 fake'); return { ok: true, out, pages: 1, bytes: 13 }; };
       let pdfText = () => T;
       const base = { root: tmpRepo, isApplicationForm, fetchImpl, convert, origText: () => T, pdfText: (p) => pdfText(p), log: () => {} };
@@ -17235,6 +17242,23 @@ console.log('■ 공고문 PDF 사본 — 고르기 · 글자 대조 · 쉼 (202
       calls.length = 0;
       await DP.runDocPdf({ ...base, today: '2026-11-30', dry: true });
       eq('⑨ --dry 는 받지도 쓰지도 않는다', [calls.length, idxText() === beforeDry], [0, true]);
+      /* ⑩ 한 파일이 넘어져도 로봇은 멈추지 않는다(리뷰 2026-11-20 #1) — 본문을 받다 끊김 · 깨진 문서를 읽다 RangeError → 그 첨부만 실패 장부 · 다음 공고는 그대로 · 대조 전 사본은 결과 폴더에 안 남는다 */
+      put('data/docs-pdf/index.json', JSON.stringify({ items: {}, tried: {} }));
+      respond = (url) => (url.endsWith('/f/1') ? { ok: true, status: 200, bodyError: true } : { ok: true, status: 200, body: Buffer.alloc(2000, 0x41) });
+      let threw = '';
+      const r10 = await DP.runDocPdf({ ...base, today: '2026-12-01' }).catch((e) => { threw = String(e); return null; });
+      const idx10 = readIdx();
+      eq('⑩ 본문 받다 끊겨도 던지지 않는다 — 그 첨부는 「오류(TimeoutError…)」로 쉬고 · 같은 실행의 재단 공고는 그대로 바뀐다',
+        [threw, /^오류\(TimeoutError/.test(((idx10.tried || {})['r1|공고문.hwp'] || {}).why || ''), Object.keys(idx10.items).includes('kosaf-123'), r10 ? r10.done.map((d) => `${d.id}|${d.name}`).sort() : null],
+        ['', true, true, ['kosaf-123|※ 2026 (재)빛고을 공고.hwpx', 'r1|안내.docx']]);
+      put('data/docs-pdf/index.json', JSON.stringify({ items: {}, tried: {} }));
+      respond = () => ({ ok: true, status: 200, body: Buffer.alloc(2000, 0x41) });
+      threw = '';
+      const r11 = await DP.runDocPdf({ ...base, today: '2026-12-01', origText: () => { throw new RangeError('Offset is outside the bounds of the DataView'); } }).catch((e) => { threw = String(e); return null; });
+      const idx11 = readIdx();
+      eq('  깨진 문서를 읽다 RangeError — 던지지 않고 「오류(RangeError…)」 · 대조 전 사본이 결과 폴더에 남지 않는다(변환은 임시 폴더에서)',
+        [threw, /^오류\(RangeError/.test(((idx11.tried || {})['r1|공고문.hwp'] || {}).why || ''), Object.keys(idx11.items).length, fs.existsSync(path.join(tmpRepo, 'data', 'docs-pdf', 'r1')), !!r11],
+        ['', true, 0, false, true]);
       fs.rmSync(tmpRepo, { recursive: true, force: true });
     }
   }
@@ -17273,8 +17297,13 @@ console.log('■ 공고문 PDF 사본 — 배선(deep-fetch 보강 단계 · 경
   const jobCap = Number((/^ {4}timeout-minutes:\s*(\d+)/m.exec(yml) || [])[1] || 0);
   const docMin = Number((/timeout-minutes:\s*(\d+)/.exec(doc) || [])[1] || 0);
   const budget = Number((/DOC_PDF_BUDGET_SEC:\s*'?(\d+)/.exec(doc) || [])[1] || 0);
-  eq(`④ 시한 셈 — 단계 ${docMin}분 ≥ 예산 ${budget}초 + 받기 30초 + 변환 60초 + 설치 여유 180초 · 작업 상한 ${jobCap}분 ≥ 54 + 새 단계 시한`,
-    [docMin * 60 >= budget + 30 + 60 + 180, jobCap >= 54 + docMin], [true, true]);
+  process.env.DOC_PDF_AS_LIB = '1';
+  const fileMax = Number((await import('../collector/doc-pdf.mjs')).FILE_MAX_SEC) || 999;
+  eq(`④ 시한 셈 — 단계 ${docMin}분 ≥ 예산 ${budget}초 + 파일 하나 최대 ${fileMax}초(받기·변환·글자 뽑기 둘) + 설치 여유 180초 · 작업 상한 ${jobCap}분 ≥ 54 + 새 단계 시한`,
+    [docMin * 60 >= budget + fileMax + 180, jobCap >= 54 + docMin], [true, true]);
+  const ga = readText(new URL('../.gitattributes', import.meta.url));
+  eq('  병합 규칙 — 사본은 이진 · 색인·리포트는 로봇 것(merge=ours) — 없으면 배포 동기화가 충돌로 멈춘다(2026-08-01 #85·#86 · .gitattributes 머리말)',
+    [/^data\/docs-pdf\/\*\*\s+-diff$/m.test(ga), /^data\/docs-pdf\/index\.json\s+merge=ours$/m.test(ga), /^collector\/doc-pdf-report\.md\s+merge=ours$/m.test(ga)], [true, true, true]);
   const swjs = readText(new URL('../sw.js', import.meta.url));
   const guardLine = 'if (/\\/data\\/docs-pdf\\//.test(url.pathname)) return;';
   eq('⑤ 서비스워커는 공고문 PDF 사본을 가로채지 않는다 — 그 줄이 navigate 분기보다 위(아래면 새 탭에 앱이 뜬다)',

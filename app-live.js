@@ -301,7 +301,7 @@ let formsPdfIndex = { items: {} };
 function loadFormsPdfIndex() {
   return fetch('data/forms-pdf/index.json', { cache: 'no-store' })
     .then((r) => (r.ok ? r.json() : null))
-    .then((j) => { if (j && j.items && typeof j.items === 'object') formsPdfIndex = j; })
+    .then((j) => { tidyData(j); if (j && j.items && typeof j.items === 'object') formsPdfIndex = j; })   // 이름을 공고 첨부와 같은 다듬기로(엔터티·겹친 띄어쓰기 · file 은 안 건드린다) — 줄 짝짓기가 이름으로 한다
     .catch(() => {});
 }
 /* 여러 줄로 둔다 — verify/what-shows.mjs 의 takeFn 은 줄 머리의 `}` 까지 가져가서, 한 줄 함수면 뒤의 선언까지 끌고 간다 */
@@ -314,7 +314,7 @@ let docsPdfIndex = { items: {} };
 function loadDocsPdfIndex() {
   return fetch('data/docs-pdf/index.json', { cache: 'no-store' })
     .then((r) => (r.ok ? r.json() : null))
-    .then((j) => { if (j && j.items && typeof j.items === 'object') docsPdfIndex = j; })
+    .then((j) => { tidyData(j); if (j && j.items && typeof j.items === 'object') docsPdfIndex = j; })   // 신청서 색인과 같은 다듬기
     .catch(() => {});
 }
 function docPdfsFor(sch) {

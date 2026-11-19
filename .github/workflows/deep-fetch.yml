@@ -11,7 +11,7 @@ on:
     branches: ['claude/nice-heisenberg-WESq5']
     paths:
       - 'collector/run-deepfetch.txt'   # 이 파일을 수정해 push하면 자동 실행
-  # 매일 03:33 KST (2026-10-23) — 「원본 양식 그대로 보기」(forms-pdf)·「공고문 안 신청서 서식」(form-pages)은 이 워크플로만 만드는데
+  # 매일 03:33 KST (2026-10-23) — 신청서 PDF 줄(forms-pdf)·「공고문 안 신청서 서식」(form-pages)은 이 워크플로만 만드는데
   # 수동·push-to-run 뿐이라 10-16 뒤로 멈춰 새 공고에 양식이 한 건도 붙지 않았다(앱이 받는 data/form-pages/index.json 은 만들어진 적도 없어 「앱 반영 점검」이 매일 빨간불).
   # 홀수 분 · 다른 로봇과 다른 분(관문 「예약 겹침」) · 새벽이라 학교 서버·수집 로봇과 겹치지 않는다.
   schedule:
@@ -102,7 +102,7 @@ jobs:
           title: 🚨 신청서 원본 → PDF 단계가 넘어졌어요
           label: form-pdf-step
           body: |
-            신청서 원본을 PDF 로 바꾸는 단계가 끝까지 가지 못했습니다(글꼴·HWP 확장 설치 또는 변환). 그동안 앱의 「원본 양식 그대로 보기」 줄은 옛 사본으로 남습니다. 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            신청서 원본을 PDF 로 바꾸는 단계가 끝까지 가지 못했습니다(글꼴·HWP 확장 설치 또는 변환). 그동안 앱의 신청서 PDF 줄은 옛 사본으로 남습니다. 실행 로그: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
       - name: ✅ 신청서 원본 → PDF 단계 회복 — 경보 닫기
         if: always() && steps.formpdf.outcome == 'success'
         timeout-minutes: 1
@@ -120,9 +120,9 @@ jobs:
         id: docpdf
         timeout-minutes: 10
         continue-on-error: true
-        # 예산 330초 + 받기 30초 + 변환 60초 + 설치 여유 3분 = 10분(관문 「공고문 PDF 사본 — 배선」 ④가 잰다) · 처음 밀린 74개(11-20)는 며칠에 나눠 잇는다
+        # 예산 270초 + 파일 하나 최대 130초(받기 30 · 변환 60 · 글자 뽑기 20×2 — doc-pdf FILE_MAX_SEC) + 설치 여유 3분 ≤ 10분(관문 「공고문 PDF 사본 — 배선」 ④) · 처음 밀린 74개(11-20)는 며칠에 나눠 잇는다
         env:
-          DOC_PDF_BUDGET_SEC: '330'
+          DOC_PDF_BUDGET_SEC: '270'
         run: |
           sudo apt-get install -y -qq -o DPkg::Lock::Timeout=120 libreoffice-writer libreoffice-core libreoffice-java-common fonts-nanum fonts-noto-cjk poppler-utils
           pip install olefile --quiet

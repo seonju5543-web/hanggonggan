@@ -133,7 +133,7 @@ const PLACEHOLDER_RE = /(원문\s*공고에서\s*확인|공고문에서\s*확인
       formAtts: (s.attachments || []).filter(isApplicationForm).map((a) => ({ name: a.name, href: safeUrl(a.url) })),
       pdfs: formPdfsFor(s).map((f) => ({ href: new URL(`data/forms-pdf/${f.file}`, document.baseURI).href, pages: f.pages, bytes: f.bytes, name: unent(String(f.name || '')).replace(/\s+/g, ' ').trim() })),
       /* 맨 밑 원본 신청서 — 신청서 첨부 + PDF 로 올라온 신청서(사본과 이름이 같은 첨부 · 11-20 「원래 PDF 는 두 곳 다」) */
-      origForms: (s.attachments || []).filter((a) => a && !a.bodyImage && (isApplicationForm(a) || formPdfsFor(s).some((f) => f.name === a.name))).map((a) => unent(String(a.name || '')).replace(/\s+/g, ' ').trim()),
+      origForms: (s.attachments || []).filter((a) => a && !a.bodyImage && (attIsForm(s, a) || formPdfsFor(s).some((f) => f.name === a.name))).map((a) => unent(String(a.name || '')).replace(/\s+/g, ' ').trim()),
       ph: s.documents.some((d) => PH.test(d)) });
     return { A: brief(A), B: brief(B), C: brief(C), F: brief(F), P: brief(P),
       counts: { l1: l1.length, l2: l2.length, pdf: Object.keys((formsPdfIndex && formsPdfIndex.items) || {}).length } };

@@ -163,7 +163,7 @@ linkCtx.stripListNumber = ME.stripListNumber;   // noticeSummaryRows 의 번호 
 const linkFn = (n) => vm.runInContext(n, linkCtx);
 /* 「첨부」 칸 (2026-11-20 승인 시안 · docs/designs/all-docs-pdf.md) — 앱이 받는 두 사본 색인을 넣고 앱 함수(attachPdfRowsHtml · sheetAttachments)로 그대로 센다 */
 for (const [k, rel] of [['formsPdfIndex', '../data/forms-pdf/index.json'], ['docsPdfIndex', '../data/docs-pdf/index.json']]) {
-  try { linkCtx[k] = JSON.parse(fs.readFileSync(new URL(rel, import.meta.url), 'utf8')); } catch { /* 없으면 빈 색인 — 앱도 그때 PDF 줄이 없다 */ }
+  try { linkCtx[k] = linkFn('tidyData')(JSON.parse(fs.readFileSync(new URL(rel, import.meta.url), 'utf8'))); } catch { /* 없으면 빈 색인 — 앱도 그때 PDF 줄이 없다 */ }   // 앱처럼 다듬는다
 }
 function attachLines(it) {
   const atts = linkFn('sheetAttachments')(it.attachments);
