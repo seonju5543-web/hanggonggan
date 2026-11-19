@@ -125,7 +125,7 @@
     eyes(ch, { x: 0.2, y: 0.12, r: 0.06, style: 'dot' });
     [-1, 1].forEach((s) => ch.on(sph(0.13, mat(PINK, 0.8), 0, 0, 0, 1.2, 0.85, 0.35), s * 0.5, -0.1, 0.03));
     const sm = torus(0.1, 0.022, mat(INK, 0.4), Math.PI); sm.rotation.z = Math.PI; ch.on(sm, 0, -0.1, 0.035);
-    const tooth = cone(0.035, 0.08, mat(WHITE, 0.5), 10); ch.on(tooth, 0.085, -0.215, 0.035); tooth.rotation.z = Math.PI;
+    const tooth = cone(0.045, 0.1, mat(WHITE, 0.5), 10); ch.on(tooth, 0.09, -0.235, 0.05); tooth.rotation.z = Math.PI;
     const tail = new T.Group(); tail.position.set(0, 0.4, -0.5);
     tail.add(tube([[0, 0, 0], [0.1, 0.2, -0.28], [0.22, 0.42, -0.3]], 0.035, mat(O, 0.75))); tail.add(sph(0.1, mat(0xa9551c, 0.75), 0.24, 0.48, -0.3, 1, 1.25, 1));
     ch.squash.add(tail); ch.tail = tail;
@@ -147,7 +147,7 @@
     const top = box(0.56, 0.035, 0.56, nv); top.position.y = 0.16; top.rotation.y = Math.PI / 4; cap.add(top);
     cap.add(sph(0.035, yl, 0, 0.19, 0)); cap.add(tube([[0, 0.19, 0], [0.26, 0.17, 0.1], [0.36, 0.02, 0.14]], 0.012, nv)); cap.add(sph(0.06, yl, 0.36, -0.03, 0.14, 1, 1.1, 0.7));
     cap.position.set(0.34, e.yy(0.965) - ch.PY, 0.1); cap.rotation.z = -0.38; ch.head.add(cap);
-    const tail = new T.Group(); tail.position.set(0, 0.62, -e.rr(0.17) + 0.08); tail.rotation.x = 0.7;
+    const tail = new T.Group(); tail.position.set(0, 0.44, -e.rr(0.08) + 0.06); tail.rotation.x = 0.45;
     tail.add(sph(0.2, sky, 0, 0, -0.14, 0.9, 0.7, 1.5)); [-1, 1].forEach((s) => { const f = sph(0.17, sky, s * 0.16, 0.06, -0.42, 1.2, 0.45, 0.9); f.rotation.y = -s * 0.5; tail.add(f); });
     ch.squash.add(tail); ch.tail = tail;
     return ch;
@@ -164,7 +164,7 @@
     [-1, 1].forEach((s) => { const q = torus(0.05, 0.018, mat(D, 0.4), Math.PI); q.rotation.z = Math.PI; q.position.set(s * 0.05, -0.2, 0.725); ch.head.add(q); });   // ω 입
     const hp = new T.Group(), w = mat(WHITE, 0.6);   // 하트 펜던트
     [-1, 1].forEach((s) => hp.add(sph(0.062, w, s * 0.045, 0.03, 0, 1, 1, 0.6)));
-    const pt = cone(0.085, 0.12, w, 4); pt.rotation.z = Math.PI; pt.position.y = -0.045; pt.scale.z = 0.5; pt.rotation.y = Math.PI / 4; hp.add(pt);
+    const pt = cone(0.105, 0.13, w, 4); pt.rotation.z = Math.PI; pt.position.y = -0.05; pt.scale.z = 0.5; pt.rotation.y = Math.PI / 4; hp.add(pt);
     hp.scale.setScalar(1.5); ch.e.place(hp, 0.66, 0, 0.07); ch.squash.add(hp);
     const cord = torus(ch.e.rr(0.84) + 0.07, 0.014, w); cord.rotation.x = Math.PI / 2; cord.position.y = ch.e.yy(0.84); ch.squash.add(cord);
     const tail = sph(0.14, mat(S, 0.75), 0, 0.42, -0.62); ch.squash.add(tail); ch.tail = tail;

@@ -150,8 +150,8 @@
     });
     ch.head.add(sph(0.3, mat(D, 0.7), 0, 0.4, 0.4, 1.1, 0.7, 0.7));
     [0.3, 0.08, -0.14, -0.36].forEach((y) => {   // 머리를 두르는 가로 줄무늬(얼굴 쪽은 비운다)
-      const g = new T.Group(), q = torus(0.72 * 0.98 * Math.sqrt(1 - Math.pow(y / (0.72 * 0.88), 2)) - 0.005, 0.035, mat(D, 0.7), PI * 1.24);
-      q.rotation.x = -PI / 2; g.add(q); g.rotation.y = -0.12 * PI; g.scale.set(1.2 / 0.98, 0.7, 1); g.position.y = y; ch.head.add(g);
+      const g = new T.Group(), q = torus(0.72 * 0.98 * Math.sqrt(1 - Math.pow(y / (0.72 * 0.88), 2)) - 0.005, 0.035, mat(D, 0.7), PI * 1.4), in_ = new T.Group();
+      q.rotation.x = -PI / 2; in_.add(q); in_.rotation.y = -0.2 * PI; g.add(in_); g.scale.set(1.2 / 0.98, 0.7, 1); g.position.y = y; ch.head.add(g);
     });
     ch.on(grin(0.07), 0, -0.32, 0.07);
     const tail = new T.Group(); tail.position.set(0, 0.42, -0.5); ch.squash.add(tail); ch.tail = tail;
@@ -174,7 +174,7 @@
     });
     [0.05, 0.6, 1.15, 1.7, 2.2].forEach((a) => { const c = cone(0.22, 0.42, mat(BL, 0.65)); c.position.set(0, 0.8 * Math.cos(a) * 0.94, -0.82 * Math.sin(a)); c.rotation.x = -a; c.scale.x = 0.5; ch.head.add(c); });
     const tail = new T.Group(); tail.position.set(0, 0.5, -0.5); ch.squash.add(tail); ch.tail = tail;
-    [0.7, 1.25, 1.8].forEach((a, i) => { const l = 0.34 - i * 0.05, f = sph(0.2, mat(BL, 0.65), 0, l * Math.cos(a), -l * Math.sin(a), 0.4, 1.6 - i * 0.25, 0.75); f.rotation.x = -a; tail.add(f); });
+    [0.7, 1.25, 1.8].forEach((a, i) => { const l = 0.34 - i * 0.05, f = sph(0.2, mat(BL, 0.65), 0, l * Math.cos(a), -l * Math.sin(a), 0.75, 1.6 - i * 0.25, 0.5); f.rotation.x = -a; tail.add(f); });
     return ch;
   } });
 })();
