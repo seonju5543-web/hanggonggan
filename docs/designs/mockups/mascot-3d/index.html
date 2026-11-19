@@ -105,8 +105,8 @@
       <div class="ctl" aria-label="시안 조절 (앱에는 없음)">
         <span>한국외대</span>
         <button class="chip" data-school="boo" aria-pressed="false">부 · 원작 얼굴</button>
-        <button class="chip" data-school="booCute" aria-pressed="false">부 · 더 귀엽게</button>
-        <button class="chip" data-school="booBaby" aria-pressed="true">부 · 아주 귀엽게</button>
+        <button class="chip" data-school="booCute" aria-pressed="true">부 · 더 귀엽게</button>
+        <button class="chip" data-school="booBaby" aria-pressed="false">부 · 아주 귀엽게</button>
       </div>
       <div class="ctl" aria-label="배치 (앱에는 없음)">
         <span>배치</span>
@@ -619,7 +619,7 @@
   // ① 홈
   const TOTAL = 3524, COUNT = 15;
   const bubbleHome = document.getElementById('bubble-home'), sayHome = document.getElementById('say-home'), amountHome = document.getElementById('amount-home');
-  let school = 'booBaby', homeLine = 0;
+  let school = 'booCute', homeLine = 0;
   const homeLines = () => [
     `지금 신청할 수 있는 장학금이 ${COUNT}건 있어요`,
     `모두 더하면 최대 ${won(TOTAL)}이에요`,
@@ -643,7 +643,7 @@
     document.querySelectorAll('[data-layout]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
     document.getElementById('hero').classList.toggle('compact', b.dataset.layout === 'compact');
   }));
-  setSchool('booBaby');
+  setSchool('booCute');
 
   // ② 신청 내역
   const bubbleApps = document.getElementById('bubble-apps'), amountApps = document.getElementById('amount-apps');
