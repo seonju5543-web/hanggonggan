@@ -1859,7 +1859,7 @@ console.log('\n■ 공고문 뒷장 서식 쪽 떼기 — 쪽 글자의 표식�
   /* 배선 — 워크플로 보강 단계 · 저장 목록 · 병합 규칙 · 서비스워커 · 앱 */
   const wf = readText(new URL('../.github/workflows/deep-fetch.yml', import.meta.url)).split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
   eq('  deep-fetch 보강 단계(시한 + continue-on-error)로 돌고 data/form-pages 를 저장한다',
-    [/timeout-minutes: 6\s*\n\s*continue-on-error: true\s*\n\s*run: \|\s*\n\s*sudo apt-get install -y -qq poppler-utils\s*\n\s*node collector\/form-pages\.mjs/.test(wf), /git add -A data\/form-pages/.test(wf), /git add collector\/form-pages-report\.md/.test(wf)], [true, true, true]);
+    [/timeout-minutes: 6\s*\n\s*continue-on-error: true\s*\n\s*run: \|\s*\n\s*sudo apt-get install -y -qq(?: -o DPkg::Lock::Timeout=\d+)? poppler-utils\s*\n\s*node collector\/form-pages\.mjs/.test(wf), /git add -A data\/form-pages/.test(wf), /git add collector\/form-pages-report\.md/.test(wf)], [true, true, true]);
   const ga = readText(new URL('../.gitattributes', import.meta.url));
   eq('  병합 규칙 — 사본은 이진 · 색인·리포트는 내 것', /data\/form-pages\/\*\*\s+-diff/.test(ga) && /data\/form-pages\/index\.json\s+merge=ours/.test(ga) && /collector\/form-pages-report\.md merge=ours/.test(ga), true);
   eq('  서비스워커가 뗀 쪽 PDF 를 가로채지 않는다', /\\\/data\\\/form-pages\\\//.test(readText(new URL('../sw.js', import.meta.url))), true);
@@ -16995,8 +16995,10 @@ console.log('■ 공고문 PDF 사본 — 고르기 · 글자 대조 · 쉼 (202
     eq('④ 본편 함수가 있다', typeof DP.runDocPdf, 'function');
     if (typeof DP.runDocPdf === 'function') {
       const FPm = await import('../collector/form-pdf.mjs');
-      const root = fs.mkdtempSync(path.join(os.tmpdir(), 'docpdf-'));
-      const put = (rel, body) => { fs.mkdirSync(path.dirname(path.join(root, rel)), { recursive: true }); fs.writeFileSync(path.join(root, rel), body); };
+      const tmpRepo = fs.mkdtempSync(path.join(os.tmpdir(), 'docpdf-'));   // 임시 저장소 — 실데이터가 아니다(뿌리 이름이면 실데이터 톱니가 센다)
+      const put = (rel, body) => { fs.mkdirSync(path.dirname(path.join(tmpRepo, rel)), { recursive: true }); fs.writeFileSync(path.join(tmpRepo, rel), body); };
+      const idxText = () => readText(path.join(tmpRepo, 'data', 'docs-pdf', 'index.json'));
+      const readIdx = () => JSON.parse(idxText());
       const L2NAME = '※ 2026 (재)빛고을 공고.hwpx';
       put('data/registered.json', JSON.stringify({ items: [
         { id: 'r1', name: '가 장학', deadline: '2026-12-01', sourceUrl: 'https://x.ac.kr/v?id=1', attachments: [{ name: '공고문.hwp', url: 'https://x.ac.kr/f/1' }, { name: '안내.docx', url: 'https://x.ac.kr/f/2' }] },
@@ -17014,10 +17016,10 @@ console.log('■ 공고문 PDF 사본 — 고르기 · 글자 대조 · 쉼 (202
       const fetchImpl = async (url) => { calls.push(url); const r = respond(url); return { ok: r.ok, status: r.status, arrayBuffer: async () => r.body }; };
       const convert = (src, out) => { fs.mkdirSync(path.dirname(out), { recursive: true }); fs.writeFileSync(out, '%PDF-1.4 fake'); return { ok: true, out, pages: 1, bytes: 13 }; };
       let pdfText = () => T;
-      const base = { root, isApplicationForm, fetchImpl, convert, origText: () => T, pdfText: (p) => pdfText(p), log: () => {} };
+      const base = { root: tmpRepo, isApplicationForm, fetchImpl, convert, origText: () => T, pdfText: (p) => pdfText(p), log: () => {} };
       respond = (url) => (url.endsWith('/f/2') ? { ok: true, status: 200, body: Buffer.from(`<!doctype html><html>${'x'.repeat(2000)}</html>`) } : { ok: true, status: 200, body: Buffer.alloc(2000, 0x41) });
       const r1 = await DP.runDocPdf({ ...base, today: '2026-11-20' });
-      const idx1 = JSON.parse(fs.readFileSync(path.join(root, 'data/docs-pdf/index.json'), 'utf8'));
+      const idx1 = readIdx();
       eq('⑤ 첫 실행 — 층1 첨부는 받아서 · 층2 는 사본에서 바꿔 색인에 싣는다(대조 1) · 받기는 층1 두 번뿐(스크립트 주소는 못 풀어 안 받는다)',
         [Object.keys(idx1.items).sort(), (idx1.items.r1 || []).map((e) => [e.name, e.file, e.kept, e.fonts === FPm.FONT_STAMP]), calls.length],
         [['kosaf-123', 'r1'], [['공고문.hwp', 'r1/1-공고문.pdf', 1, true]], 2]);
@@ -17027,37 +17029,37 @@ console.log('■ 공고문 PDF 사본 — 고르기 · 글자 대조 · 쉼 (202
         [/웹페이지/.test(((idx1.tried || {})['r1|안내.docx'] || {}).why || ''), ((idx1.tried || {})['r9|요강.hwp'] || {}).why || '', ((idx1.tried || {})['r1|안내.docx'] || {}).at || ''],
         [true, '주소 없음', '2026-11-20']);
       eq('  마감 지나 빠진 공고의 사본·색인은 지우고 · 남의 폴더(data/forms-pdf)는 그대로 · 리포트를 남긴다',
-        [fs.existsSync(path.join(root, 'data/docs-pdf/old')), 'old' in idx1.items, fs.existsSync(path.join(root, 'data/forms-pdf/keep/1-form.pdf')), fs.existsSync(path.join(root, 'collector/doc-pdf-report.md'))],
+        [fs.existsSync(path.join(tmpRepo, 'data/docs-pdf/old')), 'old' in idx1.items, fs.existsSync(path.join(tmpRepo, 'data/forms-pdf/keep/1-form.pdf')), fs.existsSync(path.join(tmpRepo, 'collector/doc-pdf-report.md'))],
         [false, false, true, true]);
       eq('  돌려준 숫자 — 바꿈 2 · 실패 2', [r1.done.length, r1.failed.length], [2, 2]);
       calls.length = 0;
       const r2 = await DP.runDocPdf({ ...base, today: '2026-11-21' });
       eq('⑥ 이튿날 — 이미 바꾼 둘은 받지도 않고 건너뛰고 · 실패한 둘은 쉬는 중이라 안 두드린다(받기 0번)', [calls.length, r2.skipped, r2.rested], [0, 2, 2]);
       /* 글자 대조 — 80% 만 남은 PDF 는 버린다 · 잴 수 없으면(null) 사본은 두고 센다 */
-      fs.writeFileSync(path.join(root, 'data/docs-pdf/index.json'), JSON.stringify({ items: {}, tried: {} }));
+      put('data/docs-pdf/index.json', JSON.stringify({ items: {}, tried: {} }));
       pdfText = () => T.slice(0, Math.floor(T.length * 0.8));
       const r3 = await DP.runDocPdf({ ...base, today: '2026-11-25' });
-      const idx3 = JSON.parse(fs.readFileSync(path.join(root, 'data/docs-pdf/index.json'), 'utf8'));
+      const idx3 = readIdx();
       eq('⑦ 글자가 빠진 PDF 는 버린다 — 색인에 없고 · 파일도 지우고 · 이유에 「글자 빠짐(nn%)」',
-        [Object.keys(idx3.items).length, fs.existsSync(path.join(root, 'data/docs-pdf/r1/1-공고문.pdf')), r3.failed.filter((f) => /^글자 빠짐\(\d+%\)$/.test(f.why)).length],
+        [Object.keys(idx3.items).length, fs.existsSync(path.join(tmpRepo, 'data/docs-pdf/r1/1-공고문.pdf')), r3.failed.filter((f) => /^글자 빠짐\(\d+%\)$/.test(f.why)).length],
         [0, false, 2]);
-      fs.writeFileSync(path.join(root, 'data/docs-pdf/index.json'), JSON.stringify({ items: {}, tried: {} }));
+      put('data/docs-pdf/index.json', JSON.stringify({ items: {}, tried: {} }));
       pdfText = () => null;
       const r4 = await DP.runDocPdf({ ...base, today: '2026-11-25' });
       eq('  PDF 글자를 못 뽑으면(pdftotext 없음) 잴 수 없음 — 사본은 두고 「대조 안 함」으로 센다',
-        [r4.done.length, r4.unchecked.length, (JSON.parse(fs.readFileSync(path.join(root, 'data/docs-pdf/index.json'), 'utf8')).items.r1 || [])[0]?.kept], [2, 2, null]);
-      fs.writeFileSync(path.join(root, 'data/docs-pdf/index.json'), JSON.stringify({ items: {}, tried: {} }));
+        [r4.done.length, r4.unchecked.length, (readIdx().items.r1 || [])[0]?.kept], [2, 2, null]);
+      put('data/docs-pdf/index.json', JSON.stringify({ items: {}, tried: {} }));
       pdfText = () => T;
       respond = () => ({ ok: false, status: 404, body: Buffer.alloc(0) });
       calls.length = 0;
       await DP.runDocPdf({ ...base, today: '2026-11-25' });
-      const idx5 = JSON.parse(fs.readFileSync(path.join(root, 'data/docs-pdf/index.json'), 'utf8'));
+      const idx5 = readIdx();
       eq('⑧ 404 는 「HTTP 404」 로 적고 사흘 쉰다', [((idx5.tried || {})['r1|공고문.hwp'] || {}).why], ['HTTP 404']);
-      const beforeDry = fs.readFileSync(path.join(root, 'data/docs-pdf/index.json'), 'utf8');
+      const beforeDry = idxText();
       calls.length = 0;
       await DP.runDocPdf({ ...base, today: '2026-11-30', dry: true });
-      eq('⑨ --dry 는 받지도 쓰지도 않는다', [calls.length, fs.readFileSync(path.join(root, 'data/docs-pdf/index.json'), 'utf8') === beforeDry], [0, true]);
-      fs.rmSync(root, { recursive: true, force: true });
+      eq('⑨ --dry 는 받지도 쓰지도 않는다', [calls.length, idxText() === beforeDry], [0, true]);
+      fs.rmSync(tmpRepo, { recursive: true, force: true });
     }
   }
 }
