@@ -1309,6 +1309,21 @@
     ],
     "evidence": "웹 검색 2026-09-30 '강원대학교 공지사항 kangwon.ac.kr bbs list.do' → 결과 URL https://www.kangwon.ac.kr/ko/bbs/504/list.do (제목: 강원대학교); 요약에 '공지사항 = /bbs/504/list.do, 총 10,224건'"
    }
+  },
+  {
+   "school": "성신여자대학교",
+   "campus": "",
+   "home": "https://www.sungshin.ac.kr/sites/main_kor/main.jsp",
+   "boardUrl": "https://www.sungshin.ac.kr/main_kor/11107/subview.do",
+   "candidates": [
+    {
+     "url": "https://www.sungshin.ac.kr/main_kor/11107/subview.do",
+     "label": "학사공지",
+     "evidence": "직접 확인 2026-11-19 (저장소 fetchBoard+rowsForBoard): 학교 첫 화면 메뉴 「공지사항 › 학사공지」 /main_kor/11107/subview.do 200 · 날짜 줄 20개(2026-11-17 …) · 「★ 2027학년도 1학기 부·복수전공 및 교직 복수전공 선발(신청) 안내 ★」「[학생지원팀] 성신체인지 사회봉사단 'Bright 성북순찰대' 모집」 · 상세 /bbs/main_kor/3181/<번호>/artclView.do"
+    }
+   ],
+   "note": "개발자 지시(2026-11-19 · 45번째 학교). 「학사공지」 한 곳 — 「일반공지」(/main_kor/11108/subview.do · 날짜 줄 10개 · 건강검진·사칭 주의 등)는 둘째 게시판 후보지만 정찰 근거를 갖춘 뒤에 붙인다.",
+   "evidence": "직접 확인 2026-11-19 (세션에서 저장소 fetchBoard+rowsForBoard 로 열어 봄): 로그인 요구 없음 · 200 · 날짜 줄 20개(2026-11-17 …) · 줄은 보통 링크 /bbs/main_kor/3181/<번호>/artclView.do · 장학 글도 이 게시판에 올라온다(제목 검색 '장학' 약 10건/년)"
   }
  ],
  "_parked": "쓰지 않게 된 게시판을 보관하는 자리. 되돌리려면 sources 로 옮긴다(관리자 화면 「소식」 탭의 되살리기).",

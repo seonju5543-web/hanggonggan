@@ -156,7 +156,7 @@
 <script src="mascots/part-2.js"></script>
 <script src="mascots/part-3.js"></script>
 <script src="mascots/part-4.js"></script>
-<script src="mascots/part-5.js"></script>
+<script src="mascots/part-5.js"></script><script src="mascots/part-6.js"></script>
 <script>
 (function () {
   'use strict';
@@ -210,8 +210,8 @@
     const k = ORDER[i++], d = MASCOTS[k], b = document.createElement('button');
     b.className = 'm'; b.dataset.k = k; b.setAttribute('aria-pressed', String($('pick').value === k));
     const src = thumb(d.build, 240);
-    b.innerHTML = `<img alt="" ${src ? `src="${src}"` : ''}><b></b><span></span>`;
-    b.querySelector('b').textContent = d.name; b.querySelector('span').textContent = d.school;
+    const im = document.createElement('img'), nm = document.createElement('b'), sc = document.createElement('span');
+    im.alt = ''; if (src) im.src = src; nm.textContent = d.name; sc.textContent = d.school; b.append(im, nm, sc);
     b.addEventListener('click', () => { setSchool(k); $('hero').scrollIntoView({ behavior: 'smooth', block: 'center' }); });
     grid.appendChild(b); setTimeout(next, 0);
   })();
