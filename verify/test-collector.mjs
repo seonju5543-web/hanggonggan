@@ -24,7 +24,7 @@ import { diffPatch } from '../tools/edit-diff.mjs';
 const readText = (u) => {
   const raw = fs.readFileSync(u, 'utf8');
   const p = u instanceof URL ? fileURLToPath(u) : String(u);
-  const whole = /(^|[\\/])app\.js$/.test(p) && raw.includes('@@ 온보딩(첫 화면)은 app-onboarding.js 로 옮겼다')
+  const whole = /(^|[\\/])app\.js$/.test(p) && raw.includes('검사는 verify/app-source.cjs 가 이 자리에 다시 끼워 읽는다 @@')
     ? createRequire(import.meta.url)('./app-source.cjs').appSource(path.dirname(p)) : raw;
   return whole.replace(/\r\n/g, '\n');
 };

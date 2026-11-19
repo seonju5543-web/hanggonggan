@@ -11,6 +11,7 @@ const path = require('path');
 const { fileURLToPath } = require('url');
 
 const PARTS = [
+  { file: 'app-applications.js', mark: '/* @@ 신청 내역 화면은 app-applications.js 로 옮겼다 — 검사는 verify/app-source.cjs 가 이 자리에 다시 끼워 읽는다 @@ */' },
   { file: 'app-onboarding.js', mark: '/* @@ 온보딩(첫 화면)은 app-onboarding.js 로 옮겼다 — 검사는 verify/app-source.cjs 가 이 자리에 다시 끼워 읽는다 @@ */' },
 ];
 
