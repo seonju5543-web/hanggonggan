@@ -18,7 +18,12 @@ const Q = [
 const id = (process.env.NAVER_CLIENT_ID || '').trim(), secret = (process.env.NAVER_CLIENT_SECRET || '').trim();
 if (!id || !secret) { console.error('열쇠 없음 — NAVER_CLIENT_ID · NAVER_CLIENT_SECRET'); process.exit(1); }
 const headers = { 'X-NCP-APIGW-API-KEY-ID': id, 'X-NCP-APIGW-API-KEY': secret };
-const clean = (x) => String(x || '').replace(/<[^>]*>/g, '').replace(/&(quot|#39|amp|lt|gt);/g, ' ').replace(/[\s|]+/g, ' ').trim();
+/* 검색 결과 제목의 <b> 표시 떼기 — 더 지울 것이 없을 때까지, 남은 꺾쇠도 지운다(한 번만 떼면 CodeQL 「불완전한 여러 글자 정리」 high · 2026-11-19 #679) */
+const clean = (x) => {
+  let s = String(x || ''), prev;
+  do { prev = s; s = s.replace(/<[^>]*>/g, ''); } while (s !== prev);
+  return s.replace(/[<>]/g, '').replace(/&(quot|#39|amp|lt|gt);/g, ' ').replace(/[\s|]+/g, ' ').trim();
+};
 async function ask(kind, query, display) {
   try {
     const r = await fetch(`${BASE}${kind}?query=${encodeURIComponent(query)}&display=${display}`, { headers, signal: AbortSignal.timeout(10000) });

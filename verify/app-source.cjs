@@ -11,6 +11,7 @@ const path = require('path');
 const { fileURLToPath } = require('url');
 
 const PARTS = [
+  { file: 'app-prep.js', mark: '/* @@ 신청 준비(일괄 준비·신청 준비 시트·제출처 안내)은 app-prep.js 로 옮겼다 — 검사는 verify/app-source.cjs 가 이 자리에 다시 끼워 읽는다 @@ */' },
   { file: 'app-events.js', mark: '/* @@ 이벤트 연결(버튼·화면 전환·입력 묶기)은 app-events.js 로 옮겼다 — 검사는 verify/app-source.cjs 가 이 자리에 다시 끼워 읽는다 @@ */' },
   { file: 'app-live.js', mark: '/* @@ 실시간 공고 구역(공고 파일 받기·학과·등록금·원문 링크·층2·학교 사진)은 app-live.js 로 옮겼다 — 검사는 verify/app-source.cjs 가 이 자리에 다시 끼워 읽는다 @@ */' },
   { file: 'app-sheet.js', mark: '/* @@ 상세 시트(공고 상세·자격 묻기·시트 되돌아가기)은 app-sheet.js 로 옮겼다 — 검사는 verify/app-source.cjs 가 이 자리에 다시 끼워 읽는다 @@ */' },

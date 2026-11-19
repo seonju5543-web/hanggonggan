@@ -16941,6 +16941,12 @@ console.log('■ CodeQL 보안 경고 수리 (2026-11-18 · #55~#59) — 되돌�
   eq('faqPlain 결과는 다시 돌려도 그대로다(남김없이 뗐다) · 반복문 꼴이다',
     [faqPlain(faqPlain(faqTricky)) === faqPlain(faqTricky), /<[^>]*>/.test(faqPlain(faqTricky)), /\bwhile \(s !== prev\)/.test(faqSrc)], [true, false, true]);
   eq('  보통 답은 글자만 남는다', faqPlain('<strong>주민번호</strong> 안내'), '주민번호 안내');
+  /* 마스코트 검색 도구의 제목 정리(2026-11-19 · #679) — 같은 꼴. 도구는 불러오는 순간 네이버를 부르므로 글자로 읽는다 */
+  const mascotSrc = readText(new URL('../tools/mascot-search.mjs', import.meta.url));
+  const cleanSrc = (/const clean = \(x\) => \{[\s\S]*?\n\};/.exec(mascotSrc) || [''])[0];
+  const mascotClean = cleanSrc ? new Function(`${cleanSrc}; return clean;`)() : () => null;
+  eq('mascot-search clean 은 겹친 꺾쇠를 남김없이 뗀다 · 반복문 꼴이다',
+    [/[<>]/.test(mascotClean('a<s<b>cript>x</b>')), mascotClean('<b>경희대</b> 쿠옹'), /\bwhile \(s !== prev\)/.test(cleanSrc)], [false, '경희대 쿠옹', true]);
 }
 
 console.log('■ 신청서 원본 → PDF — 단계 시한 안에 끝난다 (2026-11-19 · 경보 #668·#669)');
