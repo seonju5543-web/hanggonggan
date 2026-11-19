@@ -284,7 +284,7 @@ async function backgroundCheck() {
   if (out.events.length) {
     NOTIFY_RULES.pushToInbox(out.ledger, out.events, Date.now());
     const show = out.events.length > 3
-      ? [{ key: 'sum:' + Date.now(), title: `🔔 한대장 새 알림 ${out.events.length}건`, body: out.events[0].title, url: './?screen=notifications' }]
+      ? [{ key: 'sum:' + Date.now(), title: `새 알림 ${out.events.length}건 확인하기`, body: out.events[0].title, url: './?screen=notifications' }]
       : out.events;
     for (const ev of show) {
       await self.registration.showNotification(ev.title, {
@@ -358,8 +358,8 @@ self.addEventListener('push', (e) => {
     try { shown = await backgroundCheck(); } catch (err) { shown = 0; }
     if (shown > 0) return;
 
-    await self.registration.showNotification('한대장 · 새 장학 소식', {
-      body: '우리 학교와 내 조건에 맞는 공고를 확인해 보세요.',
+    await self.registration.showNotification('장학 공고 둘러보기', {
+      body: '우리 학교 · 내 조건 맞춤',
       tag: 'handaejang-wake',
       icon: 'icons/icon-192.png',
       badge: 'icons/icon-192.png',

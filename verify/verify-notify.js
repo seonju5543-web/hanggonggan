@@ -263,19 +263,19 @@ const SPY = () => {
       eligibility: { schoolOnly: '한국외국어대학교', minGpa: 4.45 },
     });
     const n = await notifyCheck({ quiet: true });
-    return { delivered: n, os: window.__notifs, inbox: notifyLedger.inbox.map((i) => ({ type: i.type, title: i.title })) };
+    return { delivered: n, os: window.__notifs, inbox: notifyLedger.inbox.map((i) => ({ type: i.type, title: i.title, text: i.title + ' ' + (i.body || '') })) };
   });
 
   const types = injected.inbox.map((i) => i.type);
   ok(types.includes('newMatch'), '조건 1 — 새 공고 알림 발생', injected.inbox.map((i) => i.title));
   ok(types.includes('deadline'), '조건 2 — 마감 하루 전 알림 발생', injected.inbox.map((i) => i.title));
-  ok(injected.inbox.some((i) => /내일 마감/.test(i.title) && /내일마감/.test(i.title)), '마감 알림 제목에 공고 이름과 "내일 마감" 표기');
-  ok(!injected.inbox.some((i) => /요건미달/.test(i.title)), '자격 미달 공고는 알리지 않음', injected.inbox.map((i) => i.title));
+  ok(injected.inbox.some((i) => /^내일 마감/.test(i.title) && /내일마감/.test(i.text)), '마감 알림 제목 맨 앞에 "내일 마감" · 본문에 공고 이름 (2026-11-19 C안)');
+  ok(!injected.inbox.some((i) => /요건미달/.test(i.text)), '자격 미달 공고는 알리지 않음', injected.inbox.map((i) => i.title));
   ok(injected.os.length > 0, `휴대폰 알림이 실제로 호출됨 (${injected.os.length}건)`, injected.os.map((o) => o.title));
   ok(injected.os.every((o) => o.data && o.data.url), '알림에 열 화면 주소가 담김', injected.os[0]);
-  ok(injected.inbox.filter((i) => /내일마감 장학금/.test(i.title)).length === 1,
+  ok(injected.inbox.filter((i) => /내일마감 장학금/.test(i.text)).length === 1,
     '같은 공고로 알림이 두 번 가지 않음 (새 공고 알림에 마감일이 이미 담겨 있으면 마감 알림 생략)',
-    injected.inbox.filter((i) => /내일마감 장학금/.test(i.title)).map((i) => i.title));
+    injected.inbox.filter((i) => /내일마감 장학금/.test(i.text)).map((i) => i.text));
 
   // ⑤ 배지 · 알림함
   await page.click('.nav-item[data-nav="home"]');

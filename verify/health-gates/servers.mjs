@@ -684,7 +684,7 @@ export default async function gate(eq, ctx) {
       return { res, shown, box };
     };
     const sw1 = await runSw(false);
-    eq('⑩ (a) importScripts 가 실패한 서비스워커가 빈 푸시를 받으면 — 거절 없이 알림 1건(기본 문구)', [sw1.res, sw1.shown], ['resolved', ['한대장 · 새 장학 소식']]);
+    eq('⑩ (a) importScripts 가 실패한 서비스워커가 빈 푸시를 받으면 — 거절 없이 알림 1건(기본 문구)', [sw1.res, sw1.shown], ['resolved', ['장학 공고 둘러보기']]);
     const list = ((/importScripts\(([^)]*)\)/.exec(stripComments(swSrc)) || [])[1] || '').match(/'[^']+'/g) || [];
     const sw2 = await runSw(true);
     eq('  (b) sw.js 의 importScripts 목록(순서 그대로)을 실제 파일로 실으면 알림 규칙·엔진이 선다(목록에서 하나 빠지면 빨간불)',

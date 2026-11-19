@@ -147,8 +147,8 @@ async function notifyDeliver(events) {
     toShow = [{
       key: 'sum:' + Date.now(),
       type: 'newMatch',
-      title: `한대장 · 새 알림 ${events.length}건`,
-      body: events.slice(0, 2).map((e) => e.title.replace(/^[^ ]+ /, '')).join(' / ') + ' 외',
+      title: `새 알림 ${events.length}건 확인하기`,
+      body: events[0].title + ` 외 ${events.length - 1}건`,
       url: './?screen=notifications',
     }];
   }
