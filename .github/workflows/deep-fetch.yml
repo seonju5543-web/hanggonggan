@@ -82,8 +82,12 @@ jobs:
         id: formpdf
         timeout-minutes: 8
         continue-on-error: true
+        # 🔴 변환 예산 4분 + 설치(apt·확장·글꼴) — 단계 시한 8분 안에 스스로 끝나게(2026-11-19 · 예산 5분 + 설치로 8분을 넘겨 끊겼다 · 경보 #668).
+        #    관문 「신청서 원본 → PDF — 단계 시한 안에 끝난다」 가 이 셈을 잰다
+        env:
+          FORM_PDF_BUDGET_SEC: '240'
         run: |
-          sudo apt-get install -y -qq libreoffice-writer libreoffice-core libreoffice-java-common fonts-nanum fonts-noto-cjk   # java-common: HWP 확장이 자바라 없으면 조용히 '못 읽음'
+          sudo apt-get install -y -qq -o DPkg::Lock::Timeout=120 libreoffice-writer libreoffice-core libreoffice-java-common fonts-nanum fonts-noto-cjk   # java-common: HWP 확장이 자바라 없으면 조용히 '못 읽음'
           bash collector/install-h2orestart.sh
           bash collector/install-form-fonts.sh   # 한글 문서 글꼴 → 나눔·Noto 못 박기 — 없으면 중국어 글꼴로 표가 깨진다(2026-10-12 실측 14/14 · 춘곡)
           node collector/form-pdf.mjs
@@ -118,7 +122,7 @@ jobs:
         timeout-minutes: 6
         continue-on-error: true
         run: |
-          sudo apt-get install -y -qq poppler-utils python3-pil
+          sudo apt-get install -y -qq -o DPkg::Lock::Timeout=120 poppler-utils python3-pil   # 잠금 대기 — 앞 단계가 끊기며 남긴 설치 잠금에 0초 만에 죽었다(2026-11-19 · 경보 #669)
           node collector/form-fields.mjs
       - name: 🚨 신청서 쪽 그림 단계 실패 알림
         if: always() && steps.formfields.outcome == 'failure'

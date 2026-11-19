@@ -261,7 +261,10 @@ export function runFormPdf({ root, today, dry = false, soffice = process.env.FOR
   const dropped = dry ? Object.keys(index.items).filter((id) => !live.has(id)) : prune(index, live, outDir);
   const done = []; const failed = []; const left = []; let skippedSame = 0;
   const t0 = Date.now();
-  const overBudget = () => (Date.now() - t0) / 1000 >= budgetSec;
+  /* 🔴 파일 하나는 최대 SOFFICE_TIMEOUT_MS 까지 돈다 — 「예산을 넘었나」만 보면 4분 59초에 시작한 파일이 1분 더 돌아
+     단계 시한(워크플로 timeout-minutes)에 강제로 끊긴다(2026-11-19 · 8분 13초에 끊겨 경보 #668 · 끊긴 설치의 잠금으로 다음 단계도 0초 실패 #669).
+     그래서 **남은 예산이 파일 하나의 최대 시간보다 적으면 시작하지 않는다** — 남은 것은 다음 실행이 잇는다. */
+  const overBudget = () => (Date.now() - t0) / 1000 + SOFFICE_TIMEOUT_MS / 1000 > budgetSec;
   /* 🔴 넘어져도 지금까지 바꾼 것은 남는다 — 색인은 파일 하나 끝날 때마다 쓴다(단계 시한에 죽으면 끝에 한 번 쓰는 색인은 통째로 사라진다 · 리뷰 2026-10-12) */
   const flush = () => { if (dry) return; fs.mkdirSync(outDir, { recursive: true }); index.updatedAt = today; fs.writeFileSync(indexPath, JSON.stringify(index, null, 1) + '\n'); };
   for (const t of targets) {

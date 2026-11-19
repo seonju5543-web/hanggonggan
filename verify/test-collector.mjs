@@ -16926,5 +16926,27 @@ console.log('■ CodeQL 보안 경고 수리 (2026-11-18 · #55~#59) — 되돌�
   eq('  보통 줄은 한 번 지운 것과 같다', dropBracketed('성적증명서 (원본) 1부'), '성적증명서  1부');
 }
 
+console.log('■ 신청서 원본 → PDF — 단계 시한 안에 끝난다 (2026-11-19 · 경보 #668·#669)');
+{
+  /* 예산 5분 + 파일 하나 최대 60초 + 설치가 단계 시한 8분을 넘겨 강제로 끊겼고, 끊긴 설치의 잠금에 다음 단계까지 0초 만에 죽었다.
+     ① 로봇은 남은 예산이 파일 하나의 최대 시간보다 적으면 시작하지 않는다 ② 워크플로의 셈: 시한 ≥ 예산 + 파일 하나 + 설치 여유 3분 */
+  /* 🔴 form-pdf.mjs 를 import 하지 말 것 — **불러오는 순간 로봇이 돌아** 데이터 폴더를 고친다(2026-11-19 이 관문을 만들며 실제로 30여 파일을 고쳤다).
+     숫자는 글자로 읽는다 */
+  const src = readText(new URL('../collector/form-pdf.mjs', import.meta.url));
+  const num = (name) => Number(eval((new RegExp('export const ' + name + '\\s*=\\s*([^;]+);').exec(src) || [, 'NaN'])[1].replace(/Number\(process\.env\.\w+\s*\|\|\s*(\d+)\)/, '$1')));
+  const FP = { BUDGET_SEC: num('BUDGET_SEC'), SOFFICE_TIMEOUT_MS: num('SOFFICE_TIMEOUT_MS') };
+  eq('  (숫자를 글자로 읽었다 — 예산·파일 하나 시간)', [FP.BUDGET_SEC > 0, FP.SOFFICE_TIMEOUT_MS > 0], [true, true]);
+  eq('① 예산 검사가 파일 하나의 최대 변환 시간(SOFFICE_TIMEOUT_MS)을 셈에 넣는다',
+    /const overBudget = \(\) => [^\n]*SOFFICE_TIMEOUT_MS/.test(src), true);
+  const yml = readText(new URL('../.github/workflows/deep-fetch.yml', import.meta.url));
+  const step = (/- name: 신청서 원본 → PDF[^\n]*\n([\s\S]*?)\n      - name:/.exec(yml) || [])[1] || '';
+  const limitMin = Number((/timeout-minutes:\s*(\d+)/.exec(step) || [])[1] || 0);
+  const budget = Number((/FORM_PDF_BUDGET_SEC:\s*'?(\d+)/.exec(step) || [])[1] || FP.BUDGET_SEC);
+  eq(`② 단계 시한(${limitMin}분) ≥ 변환 예산(${budget}초) + 파일 하나(${FP.SOFFICE_TIMEOUT_MS / 1000}초) + 설치 여유 180초`,
+    limitMin * 60 >= budget + FP.SOFFICE_TIMEOUT_MS / 1000 + 180, true);
+  eq('③ 그 단계와 다음 단계의 설치는 잠금을 기다린다(끊긴 앞 단계 잠금에 0초 실패하지 않게)',
+    (yml.match(/apt-get install[^\n]*DPkg::Lock::Timeout/g) || []).length >= 2, true);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);
