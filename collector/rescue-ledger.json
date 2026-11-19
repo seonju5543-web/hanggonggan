@@ -600,10 +600,13 @@
   "attGap": 0
  },
  "https://www.jbnu.ac.kr/web/Board/219698/detailView.do?category=6": {
-  "tries": 3,
-  "at": "2026-11-13",
+  "tries": 4,
+  "at": "2026-11-20",
   "minBody": 100,
-  "name": "2026년 전북대동창회장학재단 문화예술장학생 선발 안내"
+  "name": "2026년 전북대동창회장학재단 문화예술장학생 선발 안내",
+  "att": "2026-11-20",
+  "attSeen": 1,
+  "attGap": 0
  },
  "https://www.gachon.ac.kr/bbs/kor/478/126763/artclView.do": {
   "ok": "2026-11-12",
@@ -911,6 +914,41 @@
  },
  "https://www.konkuk.ac.kr/bbs/konkuk/235/1212436/artclView.do": {
   "att": "2026-11-19",
+  "attSeen": 0,
+  "attGap": 0
+ },
+ "https://www.jnu.ac.kr/WebApp/web/HOM/COM/Board/board.aspx?boardid=5&cate=8&key=70976": {
+  "att": "2026-11-20",
+  "attSeen": 1,
+  "attGap": 0
+ },
+ "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12638/view.do?currentpageno=1": {
+  "att": "2026-11-20",
+  "attSeen": 1,
+  "attGap": 0
+ },
+ "https://www.inha.ac.kr/bbs/kr/8/46184/artclView.do": {
+  "att": "2026-11-20",
+  "attSeen": 1,
+  "attGap": 0
+ },
+ "https://dep.hufs.ac.kr/bbs/student/2431/272166/artclView.do": {
+  "att": "2026-11-20",
+  "attSeen": 1,
+  "attGap": 0
+ },
+ "https://www.sogang.ac.kr/ko/detail/551877?bbsconfigfk=141&namepage=ScholarshipNotice": {
+  "att": "2026-11-20",
+  "attSeen": 3,
+  "attGap": 0
+ },
+ "https://www.ewha.ac.kr/ewha/bachelor/scholarship-notice.do?articleno=368050": {
+  "att": "2026-11-20",
+  "attSeen": 1,
+  "attGap": 0
+ },
+ "https://www.inha.ac.kr/bbs/kr/8/46193/artclView.do": {
+  "att": "2026-11-20",
   "attSeen": 0,
   "attGap": 0
  }
