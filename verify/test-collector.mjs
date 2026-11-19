@@ -17062,6 +17062,47 @@ console.log('■ 공고문 PDF 사본 — 고르기 · 글자 대조 · 쉼 (202
   }
 }
 
+console.log('■ 공고문 PDF 사본 — 배선(deep-fetch 보강 단계 · 경보 짝 · 되돌리기·저장 목록 · 서비스워커)');
+{
+  const yml = readText(new URL('../.github/workflows/deep-fetch.yml', import.meta.url));
+  const steps = yml.split('\n      - name: ').slice(1).map((c) => ({ name: c.split('\n')[0].trim(), body: c }));
+  const step = (re) => (steps.find((s) => re.test(s.name)) || { body: '' }).body;
+  const title = (b) => ((/title:\s*(.+)/.exec(b || '') || [])[1] || '').trim();
+  /* 경보 짝 — 넘어지면 이슈를 열고(mode open · 그 라벨) 회복하면 같은 제목으로 닫는다(mode resolve · continue-on-error) */
+  const pair = (id, label) => {
+    const open = steps.find((s) => s.body.includes(`steps.${id}.outcome == 'failure'`));
+    const res = steps.find((s) => s.body.includes(`steps.${id}.outcome == 'success'`));
+    return [!!open && /mode: open/.test(open.body) && open.body.includes(`label: ${label}\n`),
+      !!res && /mode: resolve/.test(res.body) && /continue-on-error: true/.test(res.body),
+      !!open && !!res && !!title(open.body) && title(open.body) === title(res.body)];
+  };
+  const doc = step(/^공고문 → PDF/);
+  eq('① 단계 「공고문 → PDF」 — id docpdf · 시한 · continue-on-error · 예산 · 잠금 대기 설치(poppler) · olefile · 확장·글꼴 · 로봇 실행',
+    [/\n\s+id: docpdf\n/.test(doc), /timeout-minutes:\s*\d+/.test(doc), /continue-on-error:\s*true/.test(doc), /DOC_PDF_BUDGET_SEC:\s*'?\d+/.test(doc),
+      /apt-get install[^\n]*DPkg::Lock::Timeout[^\n]*poppler-utils/.test(doc), /pip install olefile/.test(doc), /install-h2orestart\.sh/.test(doc),
+      /install-form-fonts\.sh/.test(doc), /node collector\/doc-pdf\.mjs/.test(doc)],
+    [true, true, true, true, true, true, true, true, true]);
+  eq('  경보 짝(doc-pdf-step) — 열고 · 닫고 · 제목이 같다', pair('docpdf', 'doc-pdf-step'), [true, true, true]);
+  const pages = step(/^공고문 뒷장 서식 쪽 떼기/);
+  eq('② 빠져 있던 것 — 「공고문 뒷장 서식 쪽 떼기」 단계도 id · 잠금 대기 · 경보 짝(form-pages-step · CLAUDE.md 매 세션 7)',
+    [/\n\s+id: formpages\n/.test(pages), /apt-get install[^\n]*DPkg::Lock::Timeout/.test(pages), ...pair('formpages', 'form-pages-step')], [true, true, true, true, true]);
+  const guard = step(/^관문 실패 시 되돌리기/);
+  const save = step(/^저장$/);
+  eq('③ 관문 되돌리기(--stage · checkout · clean)와 저장(git add)에 data/docs-pdf · 리포트',
+    [/--stage [^\n]*data\/docs-pdf/.test(guard), /git checkout -- [^\n]*data\/docs-pdf/.test(guard), /git clean [^\n]*data\/docs-pdf/.test(guard),
+      /\[ -d data\/docs-pdf \] && git add -A data\/docs-pdf/.test(save), /\[ -f collector\/doc-pdf-report\.md \] && git add collector\/doc-pdf-report\.md/.test(save)],
+    [true, true, true, true, true]);
+  const jobCap = Number((/^ {4}timeout-minutes:\s*(\d+)/m.exec(yml) || [])[1] || 0);
+  const docMin = Number((/timeout-minutes:\s*(\d+)/.exec(doc) || [])[1] || 0);
+  const budget = Number((/DOC_PDF_BUDGET_SEC:\s*'?(\d+)/.exec(doc) || [])[1] || 0);
+  eq(`④ 시한 셈 — 단계 ${docMin}분 ≥ 예산 ${budget}초 + 받기 30초 + 변환 60초 + 설치 여유 180초 · 작업 상한 ${jobCap}분 ≥ 54 + 새 단계 시한`,
+    [docMin * 60 >= budget + 30 + 60 + 180, jobCap >= 54 + docMin], [true, true]);
+  const swjs = readText(new URL('../sw.js', import.meta.url));
+  const guardLine = 'if (/\\/data\\/docs-pdf\\//.test(url.pathname)) return;';
+  eq('⑤ 서비스워커는 공고문 PDF 사본을 가로채지 않는다 — 그 줄이 navigate 분기보다 위(아래면 새 탭에 앱이 뜬다)',
+    swjs.indexOf(guardLine) >= 0 && swjs.indexOf(guardLine) < swjs.indexOf("e.request.mode === 'navigate'"), true);
+}
+
 console.log('■ app.js 나누기 — 떼어 낸 화면이 제자리에 실린다 (2026-11-19 · 첫 화면 app-onboarding.js)');
 {
   const AS = createRequire(import.meta.url)('./app-source.cjs');
