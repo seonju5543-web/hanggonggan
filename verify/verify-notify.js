@@ -160,8 +160,8 @@ const SPY = () => {
        버튼이 아니라 **전달 정책**이다: 권한이 없으면 휴대폰 알림은 안 나가고 알림함에는 쌓인다.
        그래서 버튼이 부르던 것과 **같은 함수**를 직접 부른다. 버튼이 다시 생겨도 안 깨진다. */
     await page.evaluate(async () => {
-      const ev = { key: 'test:' + Date.now(), type: 'newMatch', title: '한대장 테스트 알림',
-        body: '알림 도착 예시', url: './?screen=notifications' };
+      const ev = { key: 'test:' + Date.now(), type: 'newMatch', title: '테스트 알림 — 잘 도착했어요',
+        body: '실제 알림에는 공고 이름과 마감일이 들어가요.', url: './?screen=notifications' };
       NOTIFY_RULES.pushToInbox(notifyLedger, [ev], Date.now());
       await notifyDeliver([ev]);
       await notifySaveLedger();
