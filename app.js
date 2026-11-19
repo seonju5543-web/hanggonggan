@@ -1693,6 +1693,7 @@ function renderHome() {
         다음 세션이 '왜 안 채우지'를 뒤진다. 그 칸이 주던 아래 여백은 style.css 파일 끝
         '히어로' 절에서 `.hero-amount` 가 물려받는다(실측 57px → 같은 자리 유지). */
   $('#hero-label').textContent = '지금 신청할 수 있는 장학금';
+  if (window.Mascot) Mascot.syncHome(state.profile && state.profile.school);   // 3D 마스코트(app-mascot.js) — 학교가 바뀌면 캐릭터도 바뀐다
   /* 🔴 히어로 2026-10-01 CTO 결정(시안 I4) — 금액 아래 한 줄 + 그림 4칸.
      9/17 에 걷었던 아랫줄 자리지만 CTO 가 이 시안을 골라 다시 둔다. 숫자는 **전부 위
      `applyable` 하나에서 센다** — 판정을 새로 만들면 히어로와 목록이 다른 말을 한다.

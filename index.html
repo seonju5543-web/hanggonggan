@@ -415,8 +415,13 @@
            🔴 금액과 버튼 사이의 '빨간 한 줄'(`#hero-sub`)은 2026-10-03 개발자 지시로 뺐다 —
               그림 4칸이 생긴 뒤로 그 줄이 말할 숫자가 전부 칸·버튼에 이미 있었다(app.js 주석). -->
       <div class="hero-card">
-        <p class="hero-label" id="hero-label">지금 신청할 수 있는 장학금</p>
-        <p class="hero-amount tappable" id="hero-amount" role="button" tabindex="0" aria-label="금액 상세 보기">0원</p>
+        <!-- 3D 마스코트(2026-11-19) — 준비되면 app-mascot.js 가 .hero-card 에 has-mascot 를 달아 아래 글자를 말풍선으로 바꾸고 캐릭터를 세운다.
+             3D 를 못 그리는 폰은 #mascot-home 이 감춰진 채 글자 화면 그대로다. 금액·이름표 글자는 예전처럼 app.js 가 쓴다 -->
+        <div class="hero-say">
+          <p class="hero-label" id="hero-label">지금 신청할 수 있는 장학금</p>
+          <p class="hero-amount tappable" id="hero-amount" role="button" tabindex="0" aria-label="금액 상세 보기">0원</p>
+        </div>
+        <div class="mascot-wrap" id="mascot-home" hidden><button type="button" class="mascot-stage" aria-label="마스코트 — 누르면 동전이 나와요"><canvas></canvas></button></div>
         <div class="hero-tiles" id="hero-tiles"></div>
       </div>
 
@@ -609,6 +614,7 @@
         </div>
       </header>
       <div id="apps-summary" class="apps-summary"></div>
+      <div class="mascot-wrap" id="mascot-apps" hidden><button type="button" class="mascot-stage" aria-label="대장님 — 누르면 동전이 나와요"><canvas></canvas></button></div>
       <!-- 선택 모드 막대 — 여러 건을 한 번에 정리할 때만 나온다 -->
       <div id="apps-bulkbar" class="bulkbar" hidden>
         <label class="bulk-all"><input type="checkbox" id="apps-check-all" /><span>전체 선택</span></label>
@@ -957,6 +963,7 @@
   <script src="app-prep.js"></script>   <!-- 신청 준비(일괄 준비·신청 준비 시트·제출처 안내) — app.js 보다 먼저 -->
   <script src="app-activities.js"></script>   <!-- 대외활동·공모전 탭(목록·관심 관문·분야 칩·상세) — app.js 보다 먼저 -->
   <script src="app-account.js"></script>   <!-- 로그인·이어쓰기(기기 사이 동기화·MY 계정 카드·로그인 시트) — app.js 보다 먼저 -->
+  <script src="app-mascot.js"></script>   <!-- 3D 마스코트 연결(엔진은 늦게 싣는다) — app.js 가 그릴 때 부른다 -->
   <script src="app.js"></script>
   <script src="formfill.js"></script>   <!-- 양식 채우기 — app.js 의 전역을 쓴다(뒤에 싣는다) -->
   <script src="essay-config.js"></script>

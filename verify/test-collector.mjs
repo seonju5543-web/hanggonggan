@@ -17007,5 +17007,26 @@ console.log('\n■ 지난 해 글 · 링크 안의 부서 줄 (2026-11-19 성신
     [['교외장학생 모집 안내'], ['국가근로장학금 2차 신청 안내']]);
 }
 
+console.log('\n■ 3D 마스코트 (2026-11-19 개발자 결정 — 홈·신청 내역을 마스코트 중심으로)');
+{
+  /* 글자(금액·건수)는 예전 요소가 그대로 쓰고 3D 는 그 위에 얹힐 뿐이다 — 못 그리는 폰은 글자 화면 그대로여야 한다.
+     학교가 빼 달라고 하면 MASCOT_OFF 한 줄로 끈다. 서비스 학교인데 캐릭터가 없으면 그 학교 학생만 대장님을 본다(알아채기 어렵다) */
+  const html = readText(new URL('../index.html', import.meta.url));
+  const am = readText(new URL('../app-mascot.js', import.meta.url));
+  const parts = fs.readdirSync(new URL('../mascot/', import.meta.url)).filter((f) => /^part-\d+\.js$/.test(f)).sort();
+  const reg = readText(new URL('../mascot/kit.js', import.meta.url)) + parts.map((f) => readText(new URL('../mascot/' + f, import.meta.url))).join('\n');
+  const served = createRequire(import.meta.url)('../match-engine.js').SERVED_SCHOOLS;
+  eq('서비스 학교마다 등록된 캐릭터가 있다', served.filter((n) => !reg.includes(`school: '${n}'`)), []);
+  eq('  앱이 싣는 캐릭터 파일 목록 = mascot/ 폴더의 파일', parts.filter((f) => !am.includes(`'mascot/${f}'`)).concat((am.match(/'mascot\/part-\d+\.js'/g) || []).map((x) => x.slice(8, -1)).filter((f) => !parts.includes(f))), []);
+  eq('  연결 코드는 app.js 보다 먼저 실리고 서비스워커가 담는다 · 엔진은 index.html 이 직접 싣지 않는다(늦게 싣는다)',
+    [html.indexOf('src="app-mascot.js"') > 0 && html.indexOf('src="app-mascot.js"') < html.indexOf('src="app.js"'), readText(new URL('../sw.js', import.meta.url)).includes("'app-mascot.js'"), /src="mascot\//.test(html)], [true, true, false]);
+  eq('  3D 자리는 처음에 감춰져 있고(hidden) 글자 요소는 그대로다 — 못 그리는 폰은 글자 화면',
+    [/id="mascot-home" hidden/.test(html), /id="mascot-apps" hidden/.test(html), /id="hero-label"/.test(html) && /id="hero-amount"/.test(html)], [true, true, true]);
+  eq('  학교별로 끄는 자리(MASCOT_OFF)가 있고 꺼 둔 학교는 대장님 · 금액 글자를 이 파일이 만들지 않는다',
+    [/const MASCOT_OFF = \[/.test(am), /MASCOT_OFF\.indexOf\(school\) >= 0/.test(am), /만원|toLocaleString/.test(am)], [true, true, false]);
+  eq('  화면이 그릴 때 부른다 — 홈(학교) · 신청 내역(요약이 보일 때만)',
+    [/Mascot\.syncHome\(state\.profile && state\.profile\.school\)/.test(appSource()), /Mascot\.syncApps\(apps\.length > 0 && !calMode\)/.test(appSource())], [true, true]);
+}
+
 console.log(fail ? `\n✕ 실패 ${fail}건 — 수집기 중복 제거 규칙이 깨졌습니다` : '\n✓ 수집기 규칙 전부 통과');
 process.exit(fail ? 1 : 0);

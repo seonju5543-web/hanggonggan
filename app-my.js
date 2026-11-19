@@ -171,6 +171,7 @@ function renderApplications() {
   const dataState = appsDataState();
   if (dataState !== 'ok' && state.applications.length) {
     $('#apps-summary').innerHTML = '';
+    if (window.Mascot) Mascot.syncApps(false);
     $('#apps-list').innerHTML = dataState === 'wait'
       ? (typeof skeletonRows === 'function' ? skeletonRows(3) : '')
       : '<p class="empty">공고 목록을 받아오지 못했어요<br /><span class="empty-sub">연결되면 신청 내역이 다시 보여요 · 기록은 그대로 있어요</span></p>';
@@ -262,6 +263,7 @@ function renderApplications() {
      달력은 '언제'를 보는 화면이라 금액이 화면 위쪽을 차지하면 정작 달을 못 본다.
      ⚠️ 지우는 게 아니라 숨기는 것이다 — 목록 보기에서는 그대로 나온다. */
   $('#apps-summary').hidden = calMode;
+  if (window.Mascot) Mascot.syncApps(apps.length > 0 && !calMode);   // 3D 대장님(app-mascot.js) — 요약이 보일 때만 선다
   if (tog) {
     tog.textContent = calMode ? '목록 보기' : '달력 보기';
     tog.setAttribute('aria-pressed', String(calMode));

@@ -5302,3 +5302,39 @@ input.guard-bad { border-color: var(--red) !important; background: var(--red-wea
 .auth-sheet .field-label { margin-bottom: var(--space-6); }
 .auth-sheet .auth-row { margin-bottom: var(--space-24); }
 .auth-sheet #btn-auth-go { margin-bottom: var(--space-12); }
+
+/* ── 3D 마스코트 (2026-11-19 개발자 결정 — 홈 총 장학금 · 신청 내역을 마스코트 중심으로 · app-mascot.js) ──────────────
+   🔴 has-mascot 는 3D 가 실제로 선 뒤에만 붙는다 — 그 전(엔진을 받는 중) · 못 그리는 폰에서는 아래 규칙이 하나도 안 걸려 글자 화면 그대로다.
+   글자(이름표·금액·요약)는 예전 요소 그대로이고, 여기서는 그것을 말풍선 모양으로 바꿔 캐릭터 위에 놓을 뿐이다 */
+.mascot-wrap[hidden] { display: none !important; }
+.mascot-stage {
+  display: block; width: 100%; height: 250px; border: 0; padding: 0; background: none;
+  touch-action: pan-y; -webkit-tap-highlight-color: transparent; cursor: pointer;
+}
+.mascot-stage canvas { width: 100%; height: 100%; display: block; }
+.mascot-stage:focus-visible { outline: none; box-shadow: var(--ring); border-radius: var(--radius); }
+.mascot-bump { animation: mascot-bump 0.32s var(--ease-spring); }
+@keyframes mascot-bump { 40% { transform: scale(1.06); } }
+@media (prefers-reduced-motion: reduce) { .mascot-bump { animation: none; } }
+/* 홈 — 이름표·금액이 말풍선이 되어 캐릭터 위에 */
+.hero-card.has-mascot .hero-say {
+  position: relative; width: max-content; max-width: 100%; margin: 0 auto;
+  padding: var(--space-12) var(--space-20); text-align: center;
+  background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius-lg);   /* 그림자 없음 — 떠 있는 것이 아니다(verify-interactions) */
+}
+.hero-card.has-mascot .hero-say::after,
+.has-mascot > .apps-summary .summary-card::after {
+  content: ''; position: absolute; left: 50%; bottom: -7px; width: 12px; height: 12px;
+  background: var(--surface); border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+  transform: translateX(-50%) rotate(45deg);
+}
+.hero-card.has-mascot .hero-amount { transform-origin: center; }
+/* 신청 내역 — 남색 카드 대신 대장님의 말풍선 */
+.has-mascot > .apps-summary { margin-bottom: 0; }
+.has-mascot > .apps-summary .summary-card {
+  position: relative; text-align: center;
+  background: var(--surface); color: var(--text-sub); border: 1px solid var(--rule); border-radius: var(--radius-lg); box-shadow: none;
+}
+.has-mascot > .apps-summary .summary-label { color: var(--text-sub); opacity: 1; }
+.has-mascot > .apps-summary .summary-amount { color: var(--text); }
+#mascot-apps .mascot-stage { height: 220px; }

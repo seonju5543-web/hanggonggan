@@ -43,7 +43,7 @@
     const wrap = $id('mascot-home'), card = wrap && wrap.closest('.hero-card');
     if (!wrap || !card) return;
     if (!st.home) {
-      st.home = K.Stage(wrap.querySelector('.mascot-stage'), { stack: [1.3, 0.3], coins: 12, jump: 0.45, camY: 1.6, lookY: 1.42, dist: 6.2,
+      st.home = K.Stage(wrap.querySelector('.mascot-stage'), { stack: [1.3, 0.3], coins: 12, jump: 0.42, camY: 1.5, lookY: 1.3, dist: 5.4,
         onTap() { bump($id('hero-amount')); } });
       if (!st.home) { st.failed = true; return; }
       wrap.hidden = false; card.classList.add('has-mascot');
@@ -61,7 +61,7 @@
     const wrap = $id('mascot-apps'), box = wrap && wrap.parentElement;
     if (!wrap || !box) return;
     if (st.appsOn && !st.apps) {
-      st.apps = K.Stage(wrap.querySelector('.mascot-stage'), { coins: 5, spread: 1.2, jump: 0.4, camY: 1.55, lookY: 1.42, dist: 6.8, coinY: 1.3,
+      st.apps = K.Stage(wrap.querySelector('.mascot-stage'), { coins: 5, spread: 1.2, jump: 0.36, camY: 1.35, lookY: 1.15, dist: 5.4, coinY: 1.3,
         onTap() { bump(document.querySelector('#apps-summary .summary-amount')); } });
       if (st.apps) st.apps.setChar(K.buildCaptain());
     }
