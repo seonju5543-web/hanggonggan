@@ -207,7 +207,7 @@ export default async function gate(eq, ctx) {
     const feedN = (r) => r.events.filter((e) => e.type === 'feed').map((e) => e.title);
     eq('⑨ 같은 공고의 주소가 고쳐져도 새 공고로 다시 울리지 않는다(제목 열쇠) · 열쇠 없던 옛 장부도(수집일이 지난 확인보다 이틀 앞) · 진짜 새 공고는 운다',
       [feedN(r1).length, feedN(r2), feedN(legacy), feedN(r3)],
-      [1, [], [], ['가천대학교 새 공고 1건']]);
+      [1, [], [], ['가천대학교 새 장학 공고 1건 보기']]);
   }
   /* ⑩ 확인 로봇 첫 실행(2026-10-04 02:55)의 오판 둘 — 정찰(run-probe 2026-10-03 · run 37142940191)이 연 진짜 화면 글자로 잰다.
      ⓐ 서울과기대 상세(do=commonview): 제목이 머리글이 아니라 표의 「제목」 칸에 있고 화면에 다른 글 제목이 여럿 → 'list' 로 오판했다.
