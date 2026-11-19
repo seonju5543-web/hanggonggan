@@ -38,7 +38,7 @@ const stripComments = (t) => t
   .replace(/<!--[\s\S]*?-->/g, '');
 
 /* 화면 코드 — 🔴 chat.js 는 넣지 않는다 (위 지시) */
-const UI_FILES = ['index.html', 'app.js', 'app-prep.js', 'app-events.js', 'app-live.js', 'app-sheet.js', 'app-my.js', 'app-applications.js', 'app-onboarding.js', 'essay.js', 'notify.js', 'notify-rules.js',
+const UI_FILES = ['index.html', 'app.js', 'app-activities.js', 'app-prep.js', 'app-events.js', 'app-live.js', 'app-sheet.js', 'app-my.js', 'app-applications.js', 'app-onboarding.js', 'essay.js', 'notify.js', 'notify-rules.js',
   'forms.js', 'form-plan.js', 'essay-ask.js', 'essay-submit-check.js', 'essay-quality.js'];
 
 /* ── ① 이모지 ───────────────────────────────────────────────────────────────

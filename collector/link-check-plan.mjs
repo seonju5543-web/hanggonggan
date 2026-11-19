@@ -46,11 +46,13 @@ export const DS_LABEL = { registered: '정식 등록', notices: '실시간 공�
    🔴 규칙을 베끼지 않는다: app.js 의 activitiesForMe(마감 다음 날까지 · CLOSED_KEEP_DAYS)를 **이름으로 떼어** 그대로 부른다
       (verify/what-shows.mjs 와 같은 길 — 열 0 의 `function 이름(` ~ 열 0 의 `}`). 학교 범위는 학생마다 달라 여기서는 묻지 않는다.
    '오늘'은 로봇의 기준일(한국 날짜)로 — 앱의 todayStart 가 부르는 new Date() 만 그날 낮으로 바꿔 넣는다. */
-const APP_JS = new URL('../app.js', import.meta.url);
+/* 🔴 app.js 는 떼어 낸 화면(app-*.js)을 제자리에 끼운 글자로 읽는다(verify/app-source.cjs · 2026-11-19 app.js 나누기) —
+      원본만 읽으면 activitiesForMe 가 app-activities.js 로 옮겨 간 뒤 이 로봇이 멈춘다 */
+const APP_ROOT = new URL('../', import.meta.url);
 let appActivitiesSrc = null;
 function appActivityRule() {
   if (appActivitiesSrc) return appActivitiesSrc;
-  const src = fs.readFileSync(APP_JS, 'utf8');
+  const src = createRequire(import.meta.url)('../verify/app-source.cjs').appSource(APP_ROOT);
   const fn = (name) => {
     const m = src.match(new RegExp(`^function ${name}\\([\\s\\S]*?^\\}`, 'm'));
     if (!m) throw new Error(`app.js 에서 ${name}() 을 못 찾았습니다 — 앱 규칙을 베끼지 않으므로 멈춥니다`);

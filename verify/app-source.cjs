@@ -11,6 +11,7 @@ const path = require('path');
 const { fileURLToPath } = require('url');
 
 const PARTS = [
+  { file: 'app-activities.js', mark: '/* @@ 대외활동·공모전 탭(목록·관심 관문·분야 칩·상세)은 app-activities.js 로 옮겼다 — 검사는 verify/app-source.cjs 가 이 자리에 다시 끼워 읽는다 @@ */' },
   { file: 'app-prep.js', mark: '/* @@ 신청 준비(일괄 준비·신청 준비 시트·제출처 안내)은 app-prep.js 로 옮겼다 — 검사는 verify/app-source.cjs 가 이 자리에 다시 끼워 읽는다 @@ */' },
   { file: 'app-events.js', mark: '/* @@ 이벤트 연결(버튼·화면 전환·입력 묶기)은 app-events.js 로 옮겼다 — 검사는 verify/app-source.cjs 가 이 자리에 다시 끼워 읽는다 @@ */' },
   { file: 'app-live.js', mark: '/* @@ 실시간 공고 구역(공고 파일 받기·학과·등록금·원문 링크·층2·학교 사진)은 app-live.js 로 옮겼다 — 검사는 verify/app-source.cjs 가 이 자리에 다시 끼워 읽는다 @@ */' },

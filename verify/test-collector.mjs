@@ -16994,6 +16994,14 @@ console.log('■ app.js 나누기 — 떼어 낸 화면이 제자리에 실린�
     .filter((f) => /\b(?:readFileSync|read\w*)\(\s*(?:[\w.]+,\s*)?(?:new URL\(\s*)?['"](?:\.\.?\/)*app\.js['"]/.test(readText(f)))
     .map((f) => path.relative(vdir, f)).filter((f) => f !== 'test-collector.mjs');
   eq('검사 파일이 app.js 를 원본 그대로 읽지 않는다(verify/app-source.cjs appSource 를 쓴다)', raw, []);
+  /* 🔴 로봇·도구도 — 2026-11-19 8단계에서 원문 링크 확인 로봇(collector/link-check-plan.mjs)이 new URL('../app.js') 로 원본을 읽다가
+     activitiesForMe 가 app-activities.js 로 옮겨 가자 멈췄다(관문이 먼저 잡았다). 로봇은 검사와 달리 조용히 덜 보는 게 아니라 넘어진다 */
+  const rdir = fileURLToPath(new URL('../', import.meta.url));
+  const robotRaw = ['collector', 'tools', 'server', 'insta'].flatMap((d) => fs.existsSync(path.join(rdir, d)) ? walk(path.join(rdir, d)) : [])
+    .filter((f) => /\.(m?js|cjs)$/.test(f) && !/node_modules/.test(f))
+    .filter((f) => { const t = readText(f); return /new URL\(\s*['"](?:\.\.?\/)*app\.js['"]/.test(t) || /\b(?:readFileSync|read\w*)\(\s*(?:[\w.]+,\s*)?['"](?:\.\.?\/)*app\.js['"]/.test(t) || /path\.join\([^)\n]*['"]app\.js['"]\)/.test(t); })
+    .map((f) => path.relative(rdir, f));
+  eq('  로봇·도구(collector·tools·server·insta)도 app.js 를 원본 그대로 읽지 않는다', robotRaw, []);
 }
 
 console.log('\n■ 지난 해 글 · 링크 안의 부서 줄 (2026-11-19 성신여대)');
