@@ -32,7 +32,11 @@ export function extractLinks(html, base) {
   const re = /<a\b[^>]*href\s*=\s*["']([^"'#][^"']*)["'][^>]*>([\s\S]*?)<\/a>/gi;
   let m;
   while ((m = re.exec(html)) !== null) {
-    const title = cleanTitle(m[2].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim());
+    /* 링크 안에 제목과 함께 든 목록(<ul> — 글쓴 부서·조회수 줄)은 제목이 아니다 (2026-11-19 성신여대: `<a><strong>제목</strong><div><ul><li>학생지원팀</li><li>조회수 …</li></ul></div></a>`
+       이라 제목 끝에 「… 학생지원팀」이 붙었다). 목록을 빼고 남는 글자가 제목이 못 되면(6자 미만 — 제목이 목록 안에 있는 게시판) 예전처럼 전부 읽는다. */
+    const flat = (h) => cleanTitle(h.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim());
+    let title = flat(m[2].replace(/<ul\b[\s\S]*?<\/ul>/gi, ' '));
+    if (title.length < 6) title = flat(m[2]);
     if (title.length < 6 || title.length > 140) continue;
     let url;
     try { url = new URL(hrefText(m[1]), base).href; } catch { continue; }   // `&#038;`·`&amp;` 를 **주소로 풀기 전에** 되돌린다

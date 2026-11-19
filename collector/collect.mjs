@@ -28,6 +28,7 @@ import { tidyExternal, dropReason as externalDropReason, fillDeadlineFromHint } 
 import { actKeepDate, capActivities } from './open-api-map.mjs';   // 활동 피드 60일·상한이 같은 날짜를 쓴다 (순수 모듈 — 불러도 아무것도 실행하지 않는다)
 import { canonUrl, activityId } from './canon-url.mjs';
 import { fetchBoard, netReason } from './fetch-board.mjs';
+import { pastYearTitle } from './register-timing.mjs';   // 지난 해 글 (순수 모듈)
 import { NEWS_BOARD_RULES } from './news-board-rules.mjs';
 import { updateSourceHealth, staleSourcesLine } from './source-health.mjs';
 import { makeBudget, rotateOrder, nextCursor, withDeadline, TIMED_OUT } from './harvest-budget.mjs';
@@ -439,7 +440,8 @@ async function harvestBoard(s, ctx = { dead: false }) {
       .filter((i) => KEYWORDS.test(i.title))
       .filter((i) => !isMenuEntry(i.title))     // 옆 메뉴 제외 (실공고 신호가 있으면 남긴다)
       // 첨부파일 내려받기 링크 제외 — 안 막으면 '…포스터.png' 같은 파일 이름이 공고로 뜬다
-      .filter((i) => !isAttachmentEntry(i));
+      .filter((i) => !isAttachmentEntry(i))
+      .filter((i) => !pastYearTitle(i.title, todayStr));   // 지난 해 글은 상세도 읽지 않는다 (2026-11-19)
     // 이미 본 글인지는 정규화한 주소로 판정 — 정렬 순번만 바뀐 같은 글을 '신규'로 담지 않기 위해
     /* 한 실행에 상세까지 읽는 새 글 상한 (2026-09-30 · 44개교 첫 실행 실측: 75개 게시판 중 21곳만 보고 예산 8분이 끝났다 —
        되살린 학교마다 한 달치 새 글이 쌓여 게시판 하나가 상세 40건을 읽느라 2~3분씩 걸렸다). 못 읽은 글은 seen 에 안 적히므로
@@ -530,6 +532,8 @@ const cutoff = new Date(Date.now() - 60 * 86400000).toISOString().slice(0, 10);
 notices.items = notices.items.filter((n) => (n.foundAt || '9999') >= cutoff);
 /* 예전에 담긴 첨부파일 링크도 매 실행 걷어낸다 (소급 적용 — 운영 원칙 7) */
 notices.items = notices.items.filter((n) => !isAttachmentEntry(n));
+/* 지난 해 글은 피드에 두지 않는다 (2026-11-19 · register-timing.mjs pastYearTitle — 제목의 해가 이미 끝난 해 · 소급) */
+notices.items = notices.items.filter((n) => !pastYearTitle(n.title, todayStr));
 notices.items = dedupeNotices(notices.items);
 /* 학교당 40건 · 전체는 학교 수에 비례 (학교 수 × 15건, 최소 200건).
    상한이 200건 고정이던 시절엔 학교를 더 붙이면 오래된 공고가 조용히 잘려 나갔다. */

@@ -15,6 +15,17 @@ export function titleYears(title) {
   return [...t.matchAll(/(?<!\d)(20\d{2})(?!\d)/g)].map((m) => Number(m[1]));
 }
 
+/** 지난 해 글 — 제목이 말하는 해(가장 큰 것)가 이미 끝난 해면 true. 학년도는 이듬해 2월까지라 `작년`은 3월부터 지난 해로 본다.
+ *  제목에 해가 없으면 false(모르는 것은 거르지 않는다). 피드에 새로 들이지 않는 데만 쓴다 — 게시판을 처음 읽을 때 몇 해 전 글이
+ *  '오늘 발견'으로 실리던 것(2026-11-19 성신여대 「장학생 모집공고」 2023~2025학년도 글 셋)을 막는다. */
+export function pastYearTitle(title, today) {
+  const Y = yearOf(today), M = Number(String(today || '').slice(5, 7)) || 0;
+  const ys = titleYears(title);
+  if (!Y || !ys.length) return false;
+  const top = Math.max(...ys);
+  return top <= Y - 2 || (top === Y - 1 && M >= 3);
+}
+
 /** 차년도 계획·신입학 — `<오늘의 다음 해 이후>학년도·년 … 유학·연수·입학·신입학` · `신입학` · `입학전형` (현 재학생 신청 대상이 아니다) ·
  *  `<다음 해 이후> … 신입생·입학 예정·예비 대학생` (예비 신입생 장학 — 예전엔 `>= 2027` 보류가 가려 주던 것 · 2026-10-11 리뷰) */
 export function futurePlan(title, today) {
