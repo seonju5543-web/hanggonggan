@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-19",
+ "updatedAt": "2026-11-20",
  "items": [
   {
    "title": "2026학년도 장학생 모집 공고",
@@ -8861,24 +8861,6 @@
    "bodyDeadlineText": "(단, 재학 중 2회에 한하여 구제신청 자동 적용) 1. 신청기간 : 2026. 2. 3.(화) 09:00 ~ 2026. 3. 17.(화) 18:00"
   },
   {
-   "title": "[서울]2025-2학기 국가장학금 1유형 지급(6차 지급실행) 일정 안내",
-   "url": "https://sc.hanyang.ac.kr/-12?p_p_id=kr_ac_hanyang_bbs_web_portlet_BbsPortlet&p_p_lifecycle=0&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_action=view_message&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_messageId=151805",
-   "attachments": [],
-   "deadlineHint": null,
-   "school": "한양대학교",
-   "campus": "서울",
-   "foundAt": "2026-10-14"
-  },
-  {
-   "title": "[서울]2025-2학기 국가장학금 1유형 지급(5차 지급실행) 일정 안내",
-   "url": "https://sc.hanyang.ac.kr/-12?p_p_id=kr_ac_hanyang_bbs_web_portlet_BbsPortlet&p_p_lifecycle=0&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_action=view_message&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_messageId=150207",
-   "attachments": [],
-   "deadlineHint": null,
-   "school": "한양대학교",
-   "campus": "서울",
-   "foundAt": "2026-10-14"
-  },
-  {
    "title": "[교내] 2026-1학기 학부 재학생 교내 가계곤란장학 신청(2025.11.20.(목) ~ 2026.01.30.(금))",
    "url": "https://sc.hanyang.ac.kr/-12?p_p_id=kr_ac_hanyang_bbs_web_portlet_BbsPortlet&p_p_lifecycle=0&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_action=view_message&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_messageId=149609",
    "attachments": [
@@ -8902,15 +8884,6 @@
    "foundAt": "2026-10-14",
    "bodyDeadline": "2025-12-26",
    "bodyDeadlineText": "※ 재학생은 1차 신청이 원칙이며 2차 신청 시 학생신청 및 소득산정 완료 후 학사재단정보 심사 단계에서 재단거절로 탈락됩니다. (단, 재학 중 2회에 한하여 구제신청 자동 적용) 1. 신청기간 : 2025. 11. 20.(목) 09:00 ~ 2025. 12. 26.(금) 18:00"
-  },
-  {
-   "title": "[서울]2025-2학기 국가장학금 1유형 지급(4차 지급실행) 일정 안내",
-   "url": "https://sc.hanyang.ac.kr/-12?p_p_id=kr_ac_hanyang_bbs_web_portlet_BbsPortlet&p_p_lifecycle=0&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_action=view_message&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_messageId=147701",
-   "attachments": [],
-   "deadlineHint": null,
-   "school": "한양대학교",
-   "campus": "서울",
-   "foundAt": "2026-10-14"
   },
   {
    "title": "2026년 외수한일교류장학회 장학생 선발 안내",
@@ -8991,6 +8964,33 @@
    "foundAt": "2026-10-14",
    "bodyDeadline": "2026-10-21",
    "bodyDeadlineText": "- 2026-2학기 주거안정장학금 선발자(한국장학재단 홈페이지 확인 가능) 2. 교육이수 및 장학생 서약서 제출기한: 2026. 10. 21.(수) 24시까지"
+  },
+  {
+   "title": "[서울]2025-2학기 국가장학금 1유형 지급(6차 지급실행) 일정 안내",
+   "url": "https://sc.hanyang.ac.kr/-12?p_p_id=kr_ac_hanyang_bbs_web_portlet_BbsPortlet&p_p_lifecycle=0&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_action=view_message&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_messageId=151805",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "한양대학교",
+   "campus": "서울",
+   "foundAt": "2026-10-14"
+  },
+  {
+   "title": "[서울]2025-2학기 국가장학금 1유형 지급(5차 지급실행) 일정 안내",
+   "url": "https://sc.hanyang.ac.kr/-12?p_p_id=kr_ac_hanyang_bbs_web_portlet_BbsPortlet&p_p_lifecycle=0&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_action=view_message&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_messageId=150207",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "한양대학교",
+   "campus": "서울",
+   "foundAt": "2026-10-14"
+  },
+  {
+   "title": "[서울]2025-2학기 국가장학금 1유형 지급(4차 지급실행) 일정 안내",
+   "url": "https://sc.hanyang.ac.kr/-12?p_p_id=kr_ac_hanyang_bbs_web_portlet_BbsPortlet&p_p_lifecycle=0&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_action=view_message&_kr_ac_hanyang_bbs_web_portlet_BbsPortlet_messageId=147701",
+   "attachments": [],
+   "deadlineHint": null,
+   "school": "한양대학교",
+   "campus": "서울",
+   "foundAt": "2026-10-14"
   },
   {
    "title": "2026-2학기 한국장학재단 국가근로장학금 추가신청기간(3차) 안내",
