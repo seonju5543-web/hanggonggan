@@ -1755,7 +1755,7 @@ console.log('\n■ 신청서 쪽 그림 · 빈칸 자리 — 이름표 옆·표 
       eq('  서식 쪽 — 로봇이 data/form-pages 색인(파일 있는 줄만)도 돈다 · 앱이 두 fields.json 을 합쳐 읽고 쪽 그림 주소를 폴더(base)로 고른다 · 서식 쪽 줄 밑에도 「양식 채우기」 자리',
         [/const sets = \[\[outDir, items\], \[pagesDir,/.test(ffSrc) && /filter\(\(f\) => f && f\.file\)/.test(ffSrc),
           /Promise\.all\(\[pdfs \? one\('forms-pdf'\) : \{\}, pages \? one\('form-pages'\) : \{\}\]\)/.test(fillSrc), /data\/\$\{esc\(F\.base \|\| 'forms-pdf'\)\}/.test(fillSrc),
-          /function formPageRowsHtml[\s\S]{0,900}?<li class="fill-slot" data-file="\$\{esc\(f\.file\)\}" hidden><\/li>/.test(appSrc2)],
+          /function formPageRowsHtml[\s\S]{0,600}?pdfRowHtml\(\{[\s\S]{0,200}?slot: f\.file \}\)/.test(appSrc2) && /function pdfRowHtml[\s\S]{0,1200}?<li class="fill-slot" data-file="\$\{esc\(slot\)\}" hidden><\/li>/.test(appSrc2)],
         [true, true, true, true]);
     }
     /* 2026-11-18 (인계 1 f) — 사람이 지정한 칸(fieldFix · fields-fix.json) — 로봇이 칸을 다시 만들어도 얹는다 · 쪽 밖은 버린다 · 모르는 key 는 null */
@@ -7027,15 +7027,16 @@ console.log('\n■ 적합도 — 0%를 내는 조건 (2026-08-24)');
   const appA = appSource();
   const sheet = appA.slice(appA.indexOf('function openActivityDetail('), appA.indexOf('/* ---------------- 재단·지자체 새 공고'));
   const sections = appA.slice(appA.indexOf('function applySectionHtml('), appA.indexOf('function sourceNoteHtml('));
-  eq('④ 활동 시트(승인 시안 11-02 · sheetSectionsHtml) — 서류는 「접수 · 서류」 줄(act.documents · 같은 자리표시 거름 · esc) · 신청서 원본 PDF 는 「첨부」 맨 위(장학과 같은 formPdfRowsHtml · 글 id) · 둘 다 없으면 줄·칸이 없다',
-    [/const act = \(opts && opts\.activity\) \|\| null;/.test(sections), /const pdfRows = activity && activity\.id \? formPdfRowsHtml\(activity\) : '';/.test(sections),
-      /<ul class="doc-list">\$\{pdfRows\}\$\{atts\.map/.test(sections), /: \(pdfRows \? `<h4>첨부<\/h4><ul class="doc-list">\$\{pdfRows\}<\/ul>` : ''\);/.test(sections)], [true, true, true, true]);
+  /* 2026-11-20 승인 시안(docs/designs/all-docs-pdf.md) — 「첨부」는 위 PDF 줄(attachPdfRowsHtml 한 곳 · 활동은 글 id) + 맨 밑 올린 목록 그대로 · 둘 다 없으면 칸이 없다 */
+  eq('④ 활동 시트(승인 시안 11-02 · sheetSectionsHtml) — 서류는 「접수 · 서류」 줄(act.documents · 같은 자리표시 거름 · esc) · 신청서 원본 PDF 는 「첨부」 위 PDF 줄(장학과 같은 attachPdfRowsHtml · 글 id) · 둘 다 없으면 줄·칸이 없다',
+    [/const act = \(opts && opts\.activity\) \|\| null;/.test(sections), /const pdfRows = attachPdfRowsHtml\(activity && activity\.id \? activity : sch, atts\);/.test(sections),
+      /\$\{pdfRows \? `<ul class="doc-list">\$\{pdfRows\}<\/ul>` : ''\}\$\{origRows \? `<ul class="doc-list">\$\{origRows\}<\/ul>` : ''\}/.test(sections), /const att = \(pdfRows \|\| origRows\)/.test(sections)], [true, true, true, true]);
   const ffSrc = readText(new URL('../formfill.js', import.meta.url));
   eq('  「양식 채우기」 — 활동 시트가 빈칸 단추를 붙이고(attachFormFillButtons · 글 id·이름만 든 activityFillTarget) · 단추는 fillTargetFor 로 장학 먼저, 없으면 활동 글을 찾는다 (2026-10-31)',
     [/if \(n\.id && typeof attachFormFillButtons === 'function'\) attachFormFillButtons\(activityFillTarget\(n\), \$\('#detail-sheet'\)\)/.test(sheet), /function fillTargetFor\(id\) \{[\s\S]*?allScholarships\(\)\.find[\s\S]*?activityFillTarget\(/.test(appA),
       /typeof fillTargetFor === 'function' \? fillTargetFor\(open\.dataset\.id\)/.test(ffSrc)], [true, true, true]);
   const drv = readText(new URL('./verify-activities.js', import.meta.url));
-  eq('  브라우저 드라이버가 두 자리를 잰다(가짜 색인 FORMS_PDF_FIXTURE · 글 id 열쇠)', [/FORMS_PDF_FIXTURE/.test(drv), /'act-fixture1'/.test(drv), /접수 · 서류 — 활동 글이/.test(drv), /첨부 맨 위 — 로봇이 바꿔 둔 원본 PDF/.test(drv)], [true, true, true, true]);
+  eq('  브라우저 드라이버가 두 자리를 잰다(가짜 색인 FORMS_PDF_FIXTURE · 글 id 열쇠)', [/FORMS_PDF_FIXTURE/.test(drv), /'act-fixture1'/.test(drv), /접수 · 서류 — 활동 글이/.test(drv), /첨부 위 — 로봇이 바꿔 둔 원본 PDF/.test(drv)], [true, true, true, true]);   // 2026-11-20 승인 시안 — 「첨부」 위 PDF 줄 · 맨 밑 올린 목록
 }
 
 console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08-25 개발자 지적으로 수리)');
@@ -15036,7 +15037,7 @@ console.log('\n■ 공고 카드 품질 — 틀린 미달 · 못 읽는 줄 · �
   eq('  ✕ 로 이미 보인 줄은 「내 정보로 확인한 항목」에 또 적지 않는다 (shownBad)', /shownBad\.has\(r\.slice\(FAIL_PREFIX\.length\)\)/.test(appSrc), true);
   eq('  주관·금액의 「원문 확인」 자리 표시는 큰 글씨·주관 줄에 안 나간다 · 본문 사진은 첨부 목록에 안 나간다',
     /* 2026-11-02 승인 시안 — 금액은 amountLine(모르면 줄 없음 · 재단 긴 금액은 옅게) · 주최는 cardProviderLine(모르면 빈 글자) · 본문 사진 거르기는 sheetSectionsHtml 의 첨부 절 */
-    [/const amt = amountLine\(sch\); const t = amt\.text\.replace/.test(appSrc), /function cardProviderLine[\s\S]*?if \(providerUnknown\(prov\)\) return '';/.test(appSrc), /filter\(\(a\) => a && !a\.bodyImage\)[^\n]*;\n  const att = atts\.length \?/.test(appSrc)], [true, true, true]);   // 11-17 — 같은 줄 뒤에 같은 파일 한 번만(attSeen) 거르기가 붙었다
+    [/const amt = amountLine\(sch\); const t = amt\.text\.replace/.test(appSrc), /function cardProviderLine[\s\S]*?if \(providerUnknown\(prov\)\) return '';/.test(appSrc), /function sheetAttachments\(list\) \{[\s\S]{0,200}?filter\(\(a\) => a && !a\.bodyImage\)/.test(appSrc) && /const atts = sheetAttachments\(activity \? activity\.attachments : sch\.attachments\);/.test(appSrc)], [true, true, true]);   // 2026-11-20 — 거르기는 sheetAttachments 한 곳(what-shows 도 부른다)   // 11-17 — 같은 줄 뒤에 같은 파일 한 번만(attSeen) 거르기가 붙었다
   eq('  단추 밑에는 아무 줄도 없다 — 「최종 제출 · 제출처」도 뺐다(2026-10-29 개발자 지시) · 「준비를 마치면 … 표시됩니다」 없음', [/준비를 마치면 최종 제출처/.test(appSrc), /최종 제출 · \$\{esc\(ch\.label\)\}/.test(appSrc)], [false, false]);
   /* ⑨ 리뷰(2026-10-15)가 실데이터 전수 비교(등록 226 + 활동 200 × 7 프로필)로 잡은 틀린 미달·틀린 안심·글자 회귀 — 되돌리면 그대로 재현된다 */
   eq('⑨ 「… 3.0/4.5점 또는」 — 이상이 분수 뒤에 없으면 성적 조건이 아니다 (춘곡장학회 · 평점 2.8 에게 ✕ 였다)', kinds('직전 정규학기에 12학점 이상 이수하였으며, 대학 전체학기 성적 평균 3.0/4.5점 또는').includes('grade'), false);
@@ -17103,6 +17104,19 @@ console.log('■ 공고문 PDF 사본 — 배선(deep-fetch 보강 단계 · 경
   const guardLine = 'if (/\\/data\\/docs-pdf\\//.test(url.pathname)) return;';
   eq('⑤ 서비스워커는 공고문 PDF 사본을 가로채지 않는다 — 그 줄이 navigate 분기보다 위(아래면 새 탭에 앱이 뜬다)',
     swjs.indexOf(guardLine) >= 0 && swjs.indexOf(guardLine) < swjs.indexOf("e.request.mode === 'navigate'"), true);
+  /* ⑥ 앱 — 승인 시안(2026-11-20) 글자 잠금. 화면 순서·꼴은 브라우저 드라이버(verify-kosaf · verify-apply-prep · verify-activities · verify-formfill)가 잰다 */
+  const appX = appSource();
+  const codeOf = (src) => String(src).replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  const fetchFiles = createRequire(import.meta.url)('../tools/app-fetch-files.cjs');
+  const appFiles = (fetchFiles.appFetchFiles || fetchFiles.default || fetchFiles)(fileURLToPath(new URL('..', import.meta.url)));
+  eq('⑥ 앱이 공고문 PDF 색인을 받는다 — 첫 실행·다시 받기 둘 다 · 라이브 점검 목록(check-live · app-fetch-files)에 저절로 든다',
+    [/fetch\('data\/docs-pdf\/index\.json'/.test(appX), /bootJobs\.push\(loadDocsPdfIndex\(\)\)/.test(appX), /jobs\.push\(loadDocsPdfIndex\(\)\)/.test(appX), Array.isArray(appFiles) && appFiles.includes('data/docs-pdf/index.json')],
+    [true, true, true, true]);
+  eq('  줄 꼴 잠금 — PDF 줄은 한 함수(pdfRowHtml)·이름 밑 작은 글씨 없음 · 「원본 양식 그대로 보기」 문구 없음 · 단추 작은 글씨(fill-open-m) 없음 · 목록 밑 안내 문단 없음',
+    [!/att-m/.test((/function pdfRowHtml[\s\S]*?\n\}/.exec(appX) || [''])[0]), !/원본 양식 그대로 보기/.test(codeOf(appX)),
+      !/fill-open-m/.test(readText(new URL('../formfill.js', import.meta.url)) + readText(new URL('../style.css', import.meta.url))),
+      !/dp-note/.test((/function prepOriginalsHtml[\s\S]*?\n\}/.exec(appX) || [''])[0])],
+    [true, true, true, true]);
 }
 
 console.log('■ app.js 나누기 — 떼어 낸 화면이 제자리에 실린다 (2026-11-19 · 첫 화면 app-onboarding.js)');

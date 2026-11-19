@@ -186,18 +186,20 @@ const cards = (page) => page.$$eval('#activities-list [data-activity]', (els) =>
       const li = [...e.querySelectorAll('.apply-rows li')].find((x) => (x.querySelector('.ns-k') || {}).textContent === '서류');
       return li ? li.textContent.replace(/^서류/, '').trim() : null;
     }), '참가신청서 1부 · 개인정보 수집·이용 동의서 1부');
-    eq('⑤ 첨부 맨 위 — 로봇이 바꿔 둔 원본 PDF 줄 「원본 양식 그대로 보기」 · 새 탭 · data/forms-pdf/ 주소 · 쪽 수 · 그 아래 원본 첨부 줄은 그대로', await page.$eval('#detail-sheet', (e) => {
+    /* 2026-11-20 승인 시안(docs/designs/all-docs-pdf.md) — 위: PDF 줄(첨부 이름 그대로 · 작은 글씨 없음) · 맨 밑: 올린 첨부 목록 그대로 */
+    eq('⑤ 첨부 위 — 로봇이 바꿔 둔 원본 PDF 줄(첨부 이름 그대로 · 새 탭 · data/forms-pdf/ 주소 · 작은 글씨 없음) · 맨 밑에 올린 원본 첨부 줄', await page.$eval('#detail-sheet', (e) => {
       const h = [...e.querySelectorAll('h4')].find((x) => /^첨부/.test(x.textContent.trim()));
       if (!h) return null;
       const ul = h.nextElementSibling; const a = ul.querySelector('li a');
-      return [a.textContent.trim(), a.target, a.getAttribute('href'), /2쪽/.test(ul.textContent), ul.querySelectorAll('li.att:not(.att-row)').length];
-    }), ['원본 양식 그대로 보기', '_blank', 'data/forms-pdf/act-fixture1/1-form.pdf', true, 1]);
+      const orig = ul.nextElementSibling && ul.nextElementSibling.matches('ul.doc-list') ? ul.nextElementSibling : null;
+      return [a.textContent.trim(), a.target, a.getAttribute('href'), ul.querySelectorAll('.att-m').length, orig ? orig.querySelectorAll('li.att:not(.att-row)').length : 0];
+    }), ['참가신청서.hwp', '_blank', 'data/forms-pdf/act-fixture1/1-form.pdf', 0, 1]);
     /* 「양식 채우기」(2026-10-31) — 빈칸 장부가 있는 활동 글 PDF 에도 장학과 같은 단추가 서고, 누르면 같은 화면(formfill.js)이 그 글 이름으로 열린다 */
     await page.waitForSelector('#detail-sheet .fill-open', { timeout: 4000 }).catch(() => {});
-    eq('⑤ 양식 채우기 — 빈칸을 찾은 활동 글 PDF 밑에 단추(빈칸 수 · 학적정보로 먼저 채울 수)', await page.$eval('#detail-sheet', (e) => {
+    eq('⑤ 양식 채우기 — 빈칸을 찾은 활동 글 PDF 밑에 단추 · 글자는 「양식 채우기」 한 마디(작은 글씨 없음 · 11-20 개발자 "ㅇㅇ 지워")', await page.$eval('#detail-sheet', (e) => {
       const b = e.querySelector('.fill-open');
-      return b ? [b.dataset.id, /빈칸 2개/.test(b.textContent), /학적정보로 1개/.test(b.textContent)] : null;
-    }), ['act-fixture1', true, true]);
+      return b ? [b.dataset.id, b.textContent.trim(), b.querySelectorAll('.fill-open-m').length] : null;
+    }), ['act-fixture1', '양식 채우기', 0]);
     await page.click('#detail-sheet .fill-open'); await page.waitForTimeout(600);
     eq('⑤ 누르면 양식 채우기 화면이 그 글 이름으로 열리고 · 학교 칸이 학적정보로 채워져 있고 · 남은 칸 1',
       await page.evaluate(() => [!document.querySelector('#screen-formfill').hidden, document.querySelector('#fill-title').textContent.trim(),
