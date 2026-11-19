@@ -1179,9 +1179,8 @@
    "name": "[빅데이터혁신융합대학사업단] 2026학년도 2학기 성과형 장학금(자격증) 신청 안내",
    "target": "2026학년도 2학기 성과형 장학금(자격증) 신청 안내",
    "added": "2026-11-18",
-   "fetched": false,
+   "fetched": true,
    "schematized": false,
-   "tries": 2,
    "lastTryAt": "2026-11-19"
   },
   {
@@ -1189,9 +1188,8 @@
    "name": "[교내/국가] (내국인) 2027-1 교내장학금(다산,지도교수) 신청 안내(11/30 마감)",
    "target": "(내국인) 2027-1 교내장학금(다산,지도교수) 신청",
    "added": "2026-11-18",
-   "fetched": false,
+   "fetched": true,
    "schematized": false,
-   "tries": 2,
    "lastTryAt": "2026-11-19"
   },
   {

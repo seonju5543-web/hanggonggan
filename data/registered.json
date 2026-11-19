@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-18",
+ "updatedAt": "2026-11-19",
  "items": [
   {
    "id": "reg-hi-jeju",
@@ -23181,6 +23181,11 @@
      "school": "고려대학교 세종캠퍼스",
      "url": "https://sejong.korea.ac.kr/bbs/koreaSejong/659/274547/artclView.do",
      "id": "notice:https://sejong.korea.ac.kr/bbs/koreaSejong/659/274547/artclView.do"
+    },
+    {
+     "school": "서울대학교",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=426",
+     "id": "notice:https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?category1=장학공지&mod=document&uid=426"
     }
    ],
    "scopeFrom": "같은 사업이 서강대학교 게시판에도 올라옴(자동) — 서강대학교 게시판 https://www.sogang.ac.kr/ko/detail/551805?bbsConfigFk=141&namepage=ScholarshipNotice",
@@ -25411,6 +25416,144 @@
     "min": 2500000,
     "max": 2500000,
     "raw": "나 . 장학금액 : 1 인당 2,500,000 원 ( 생활비성 장학 ) ※ 생활비성 장학은 등록금을 초과하여 수혜가능 2. 신청자격 ( 각 항목을 모두 충족해야 함 . ※ 2026 학년도 2 학기 기준 ) 가 . 서울캠퍼스 학부 재학생 ( 휴학생 , 초과학기생 불가 ) 나 . 직전학기 12 학점 이상 이수 , 직전학기 학점 3.7 이상 다 . 본교 3~4 "
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-2638viewdocurrentpageno1",
+   "name": "2026-2 인산장학회 장학생 선발 안내",
+   "boardTitle": "2026-2 인산장학회 장학생 선발 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "제목의 바깥 기관 낱말 「장학회」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-19",
+   "provider": "주관 기관 원문 확인",
+   "amount": "100만원",
+   "amountValue": 1000000,
+   "deadline": "2026-11-25",
+   "deadlineFrom": "공고 원문 · ◤ 5. 제출기간 2026년 11 월 19일(목 ) ~ 11월 25일(수) 22시 59분 까지",
+   "period": "접수 ~2026-11-25",
+   "summary": "국민대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "국민대학교"
+   },
+   "documents": [
+    "장학금 지원서 (소정양식, 사진부착) 1부",
+    "자기소개서 및 학업계획서 (자유양식) 1부",
+    "성적증명서(전 학년 성적) 1부 (2026-1학기까지)",
+    "한국장학재단 소득분위 확인서 (2026-2학기 기준)"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-19 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [],
+   "sourceUrl": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12638/view.do?currentPageNo=1",
+   "sourceKind": "auto",
+   "openDate": "2026-11-19",
+   "documentsFrom": "공고 원문",
+   "prepDoc": true,
+   "prepDocBasis": "나. 자기소개서 및 학업계획서 (자유양식) 1 부",
+   "prepDocFrom": "로봇 공고 원문",
+   "eligibilityLines": [
+    "◤ 1. 지원자격",
+    "현재 재학 중인 1,2,3학년 학생",
+    "전체학기 평점평균 3.5 이상",
+    "소득분위 5분위 이하 학생",
+    "징계 이력이 없는 학생",
+    "(중요) 타 생활비성 장학금 받지 않는 학생"
+   ],
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 1000000,
+    "ratio": 0,
+    "min": 1000000,
+    "max": 1000000,
+    "raw": "2. 장학금액 및 선발인원 1인당 100 만원씩 지급 (생활비성 장학금), 5 명 ​"
+   },
+   "amountFrom": "공고 원문"
+  },
+  {
+   "id": "auto-krbbskr846184artclviewdo",
+   "name": "[학부-교외장학] 2026학년도 (재)청로장학재단 제7기 장학생 선발 안내",
+   "boardTitle": "[학부-교외장학] 2026학년도 (재)청로장학재단 제7기 장학생 선발 안내",
+   "type": "교외",
+   "kindEvidence": [
+    "제목 표식 「교외장학」"
+   ],
+   "kindConfidence": "high",
+   "kindFrom": "로봇(원문) 2026-11-19",
+   "provider": "주관 기관 원문 확인",
+   "amount": "500만원",
+   "amountValue": 5000000,
+   "deadline": "2026-12-03",
+   "deadlineFrom": "공고 원문 · 7. 접수기한 : 2026년 11월 12일 (목) ~ 2026년 12월 3일 (목)",
+   "period": "접수 ~2026-12-03",
+   "summary": "인하대학교 게시판에서 수집돼 자동 등록된 공고예요(검수 전). 지원 자격·금액·마감·신청 방법은 반드시 원문 공고에서 확인하세요.",
+   "eligibility": {
+    "selective": true,
+    "schoolOnly": "인하대학교"
+   },
+   "documents": [
+    "장학금 지원서 1부 [붙임1]",
+    "자기소개서 1부 [붙임2]",
+    "개인정보 수집·이용 동의서 1부 [붙임3]",
+    "재학증명서 1부",
+    "2026년 1학기 성적증명서 1부 (참고용 성적표 불가)",
+    "교수 날인 추천서 1부(선택) [붙임4]",
+    "가족관계증명서 1부 (보호자 명의 발급 / 뒷자리 제외)",
+    "소득 관련 증빙서류",
+    "건강보험료 납부확인서(2026년 1월 ~ 현재)",
+    "기초생활수급자 증명서",
+    "차상위계층 증명서",
+    "장애인 증명서",
+    "한부모가족 증명서 등"
+   ],
+   "duplicable": true,
+   "note": "수집 로봇이 자동 등록한 공고예요(검수 전). 세부 내용이 실제와 다를 수 있으니 원문 공고를 꼭 확인하세요.",
+   "noForm": "자동 등록(검수 전) 2026-11-19 — 양식 스키마화는 검수 후 진행",
+   "auto": true,
+   "attachments": [
+    {
+     "name": "2026년 (재)청로장학재단 제7기 장학생 선발 안내.hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41840/download.do"
+    }
+   ],
+   "sourceUrl": "https://www.inha.ac.kr/bbs/kr/8/46184/artclView.do",
+   "sourceKind": "auto",
+   "applyEmail": "cheongro@cheongro.org",
+   "applyEmailSource": "8. 접수처 : 이메일 접수 (cheongro@cheongro.org)",
+   "applyEmailFrom": "공고 원문",
+   "openDate": "2026-11-12",
+   "announceDate": "2026-12-17",
+   "documentsFrom": "공고 원문",
+   "eligibilityLines": [
+    "3. 자격 기준",
+    "가. 선발대상",
+    "1) 이공계 전공 예비 3, 4학년 (휴학생 제외)",
+    "2) 취약계층 : 경제적 어려움을 겪고 있는 가정의 학생 (기초생활수급자, 차상위계층, 한부모가정, 다자녀가정 등)",
+    "3) 학업 성취 우수",
+    "가) 직전 학기 총 12학점 이상을 이수한 자",
+    "나) 직전 학기 평점 평균이 3.5 이상인 자 (4.5점 만점 기준)",
+    "4) 국내 학교 재학 : 대한민국 소재 학교에 재학 중인 학생",
+    "나. 평가 기준 : 취약계층 세부 기준, 직전 학기 성적 및 자기소개서를 종합적으로 평가하여 선발"
+   ],
+   "excerpts": [
+    "2. 장학금액 : 1인 5,000,000원",
+    "8. 접수처 : 이메일 접수 (cheongro@cheongro.org)",
+    "9. 문의처 : (재)청로장학재단 이메일 cheongro@cheongro.org"
+   ],
+   "excerptNote": "공고 원문에서 그대로 발췌 (자동)",
+   "amountSpec": {
+    "kind": "fixed",
+    "value": 5000000,
+    "ratio": 0,
+    "min": 5000000,
+    "max": 5000000,
+    "raw": "2. 장학금액 : 1인 5,000,000원"
    },
    "amountFrom": "공고 원문"
   }

@@ -1,8 +1,153 @@
 {
  "note": "검수 후보 전량 기록 (앱이 받지 않는 파일). data/notices.json은 폰이 받는 파일이라 상한이 있고, 여기에는 상한이 없다. 자세한 경위는 collector/candidates.mjs 첫머리 주석.",
  "updatedAt": "2026-11-19",
- "count": 1863,
+ "count": 1873,
  "items": [
+  {
+   "title": "[~2026. 12. 11.] 한국고등교육재단 문우림 제6기 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&pageNo=2&uid=426",
+   "attachments": [
+    {
+     "name": "문우림-제6기-장학생-선발-모집요강.pdf",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&pageNo=2&uid=426&action=kboard_file_download&kboard-file-download-nonce=2c375a9599&file=file1"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-11-19",
+   "bodyDeadline": "2026-12-11",
+   "bodyDeadlineText": "[~2026. 12. 11.] 한국고등교육재단 문우림 제6기 장학생 선발 안내 – 서울대학교 학생처"
+  },
+  {
+   "title": "[~ 2026.12.13.] 2027학년도 강남장학회 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&pageNo=2&uid=427",
+   "attachments": [
+    {
+     "name": "2027학년도-강남장학회-모집-공고19기.pdf",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&pageNo=2&uid=427&action=kboard_file_download&kboard-file-download-nonce=2c375a9599&file=file1"
+    }
+   ],
+   "deadlineHint": "모집기간 | 2026년 11월 23일(월) ~ 12월 13일(일) 22:00까지 21일간 모집대상 | 서울대학교(학부·대학원) 및 서울·경기 소",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-11-19",
+   "bodyDeadline": "2026-12-13",
+   "bodyDeadlineText": "[~ 2026.12.13.] 2027학년도 강남장학회 장학생 선발 안내 – 서울대학교 학생처"
+  },
+  {
+   "title": "[~2026. 12. 11.] 한국고등교육재단 문우림 제6기 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&pageNo=3&uid=426",
+   "attachments": [
+    {
+     "name": "문우림-제6기-장학생-선발-모집요강.pdf",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&pageNo=3&uid=426&action=kboard_file_download&kboard-file-download-nonce=2c375a9599&file=file1"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-11-19",
+   "bodyDeadline": "2026-12-11",
+   "bodyDeadlineText": "[~2026. 12. 11.] 한국고등교육재단 문우림 제6기 장학생 선발 안내 – 서울대학교 학생처"
+  },
+  {
+   "title": "[~ 2026.12.13.] 2027학년도 강남장학회 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&pageNo=3&uid=427",
+   "attachments": [
+    {
+     "name": "2027학년도-강남장학회-모집-공고19기.pdf",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&pageNo=3&uid=427&action=kboard_file_download&kboard-file-download-nonce=2c375a9599&file=file1"
+    }
+   ],
+   "deadlineHint": "모집기간 | 2026년 11월 23일(월) ~ 12월 13일(일) 22:00까지 21일간 모집대상 | 서울대학교(학부·대학원) 및 서울·경기 소",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-11-19",
+   "bodyDeadline": "2026-12-13",
+   "bodyDeadlineText": "[~ 2026.12.13.] 2027학년도 강남장학회 장학생 선발 안내 – 서울대학교 학생처"
+  },
+  {
+   "title": "[~2026. 12. 11.] 한국고등교육재단 문우림 제6기 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=426",
+   "attachments": [
+    {
+     "name": "문우림-제6기-장학생-선발-모집요강.pdf",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=426&action=kboard_file_download&kboard-file-download-nonce=2c375a9599&file=file1"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-11-19",
+   "bodyDeadline": "2026-12-11",
+   "bodyDeadlineText": "[~2026. 12. 11.] 한국고등교육재단 문우림 제6기 장학생 선발 안내 – 서울대학교 학생처"
+  },
+  {
+   "title": "[~ 2026.12.13.] 2027학년도 강남장학회 장학생 선발 안내",
+   "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=427",
+   "attachments": [
+    {
+     "name": "2027학년도-강남장학회-모집-공고19기.pdf",
+     "url": "https://student.snu.ac.kr/%ec%86%8c%ec%8b%9d%c2%b7%ec%95%8c%eb%a6%bc/%ea%b3%b5%ec%a7%80%ec%82%ac%ed%95%ad/?mod=document&category1=%EC%9E%A5%ED%95%99%EA%B3%B5%EC%A7%80&uid=427&action=kboard_file_download&kboard-file-download-nonce=2c375a9599&file=file1"
+    }
+   ],
+   "deadlineHint": "모집기간 | 2026년 11월 23일(월) ~ 12월 13일(일) 22:00까지 21일간 모집대상 | 서울대학교(학부·대학원) 및 서울·경기 소",
+   "school": "서울대학교",
+   "campus": "",
+   "foundAt": "2026-11-19",
+   "bodyDeadline": "2026-12-13",
+   "bodyDeadlineText": "[~ 2026.12.13.] 2027학년도 강남장학회 장학생 선발 안내 – 서울대학교 학생처"
+  },
+  {
+   "title": "[학부-교외장학] 2026학년도 (재)청로장학재단 제7기 장학생 선발 안내",
+   "url": "https://www.inha.ac.kr/bbs/kr/8/46184/artclView.do",
+   "attachments": [
+    {
+     "name": "2026년 (재)청로장학재단 제7기 장학생 선발 안내.hwp",
+     "url": "https://www.inha.ac.kr/bbs/kr/8/41840/download.do"
+    }
+   ],
+   "deadlineHint": "접수기한 : 2026년 11월 12일 (목) ~ 2026년 12월 3일 (목) 8. 접수처 : 이메일 접수 (cheongro@cheongro.o",
+   "school": "인하대학교",
+   "campus": "",
+   "foundAt": "2026-11-19",
+   "bodyDeadline": "2026-12-03",
+   "bodyDeadlineText": "7. 접수기한 : 2026년 11월 12일 (목) ~ 2026년 12월 3일 (목)"
+  },
+  {
+   "title": "2027학년도 1학기 국가장학금 1차 신청 안내 [※재학생은 반드시 1차 신청]",
+   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12637/view.do?currentPageNo=1",
+   "attachments": [],
+   "deadlineHint": "신청기간 : 2026.11.24.(화 ) 9 시 ~ 2027.01.07.(목 ) 18 시 [ 해당 신청기간만 고지감면이 가능하며 , 재학생은 1",
+   "school": "국민대학교",
+   "campus": "",
+   "foundAt": "2026-11-19",
+   "bodyDeadline": "2027-01-07",
+   "bodyDeadlineText": "* 정규학기 초과자인 경우에도 수혜가능횟수 (4 년제 8 번 , 5 년제 10 번 ) 가 남아 있으면 국가장학금 수혜가 가능함 2. 신청기간 : 2026.11.24.(화 ) 9 시 ~ 2027.01.07.(목 ) 18 시"
+  },
+  {
+   "title": "2026-2 인산장학회 장학생 선발 안내",
+   "url": "https://www.kookmin.ac.kr/user/kmuNews/notice/7/12638/view.do?currentPageNo=1",
+   "attachments": [],
+   "deadlineHint": "제출기간 2026년 11 월 19일(목 ) ~ 11월 25일(수) 22시 59분 까지 ◤6. 제 출 처 - 온국민 포털 – 학생서비스 – 장학정",
+   "school": "국민대학교",
+   "campus": "",
+   "foundAt": "2026-11-19",
+   "bodyDeadline": "2026-11-25",
+   "bodyDeadlineText": "◤ 5. 제출기간 2026년 11 월 19일(목 ) ~ 11월 25일(수) 22시 59분 까지"
+  },
+  {
+   "title": "★2027-1학기 국가장학금 1차 신청 안내(재학생은 반드시 1차 신청)",
+   "url": "https://www.yu.ac.kr/scholar/notice/notice.do?mode=view&articleNo=232585986&article.offset=0&articleLimit=10",
+   "attachments": [],
+   "deadlineHint": "신청 기간: 2026. 11. 24.(화) 09:00 ~ 2027. 1. 7.(목) 18:00 - 주말 및 공휴일 포함 24시간 신청 가능, 마",
+   "school": "영남대학교",
+   "campus": "",
+   "foundAt": "2026-11-19",
+   "bodyDeadline": "2027-01-07",
+   "bodyDeadlineText": "1. 신청 기간: 2026. 11. 24.(화) 09:00 ~ 2027. 1. 7.(목) 18:00"
+  },
   {
    "title": "[공통][국가] 2027년 1학기 국가장학금 신청",
    "url": "https://dep.hufs.ac.kr/bbs/student/2431/272011/artclView.do",
