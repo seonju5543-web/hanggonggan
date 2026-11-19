@@ -156,7 +156,7 @@ bash tools/robot-run.sh node collector/<로봇>.mjs   # 로봇을 로컬에서 �
 | 파일 | 역할 |
 |---|---|
 | `index.html` `style.css` `app.js` | 화면 · 서류보관함(기기 안) · 신청 플로우 · 진척도 · 실시간 공고 |
-| `app-onboarding.js` `app-applications.js` `app-my.js` `app-sheet.js` `app-live.js` `app-events.js` `app-prep.js` `app-activities.js` | app.js 에서 떼어 낸 화면(11-19 · 온보딩 · 신청 내역·달력 · MY·설정·휴지통 · 상세 시트 · 실시간 공고 · 이벤트 연결 · 신청 준비 · 대외활동) — app.js 보다 먼저 싣고 맨 윗단은 선언·리터럴만 · 🔴 app.js 를 글자로 읽는 검사는 `verify/app-source.cjs` `appSource`(떼어 낸 파일을 제자리에 끼운 글자) · 관문 「app.js 나누기 — 떼어 낸 화면이 제자리에 실린다」 |
+| `app-onboarding.js` `app-applications.js` `app-my.js` `app-sheet.js` `app-live.js` `app-events.js` `app-prep.js` `app-activities.js` `app-account.js` | app.js 에서 떼어 낸 화면(11-19 · 온보딩 · 신청 내역·달력 · MY·설정·휴지통 · 상세 시트 · 실시간 공고 · 이벤트 연결 · 신청 준비 · 대외활동 · 로그인·이어쓰기) — app.js 보다 먼저 싣고 맨 윗단은 선언·리터럴만 · 🔴 app.js 를 글자로 읽는 검사는 `verify/app-source.cjs` `appSource`(떼어 낸 파일을 제자리에 끼운 글자) · 관문 「app.js 나누기 — 떼어 낸 화면이 제자리에 실린다」 |
 | `boot.js` `resume.js` | 첫 실행 화면(다른 스크립트보다 먼저) · 다시 열면 어디로 가는가(`docs/designs/first-run-and-resume.md`) |
 | `match-engine.js` | 매칭·적합도·학교 범위(`scopedToProfile`)·교내 판정(`noticeKind`·`OWN_PROGRAMS`) — **화면과 알림이 같은 파일** |
 | `parse-requirements.js` `section-head.js` | 자격 줄 → 조건 · 절 경계(자격/제외/선발) |

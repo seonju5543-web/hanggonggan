@@ -3149,7 +3149,7 @@ console.log('\n■ 교내 소식 썸네일 (2026-10-03 개발자 지시 "실제 
   eq('  썸네일 이름은 줄인 그림 바이트의 해시 (같은 이름에 다른 그림을 쓰지 않는다 — 서비스워커가 그림을 캐시 우선으로 영영 든다)', [TH.thumbName(Buffer.from('a')) === TH.thumbName(Buffer.from('a')), TH.thumbName(Buffer.from('a')) !== TH.thumbName(Buffer.from('b')), TH.isThumbPath(TH.thumbName(Buffer.from('a')))], [true, true, true]);
   /* ⑧ 카드 — 소식만 opts.thumb 로 · 다른 카드(실시간 공고·재단)는 그림을 안 넘긴다 · 못 받으면 그림을 빼는 error 잡이(CSP 가 onerror= 를 막는다) */
   eq('  카드 — 로봇 꼴일 때만 그림 · 소식 카드만 넘긴다 · 못 받은 그림은 빼고 글자 카드로', /const thumb = o\.thumb && NEWS_THUMB_RE\.test\(o\.thumb\) \? o\.thumb : '';/.test(app) && (app.match(/thumb: n\.thumb/g) || []).length === 1
-    && /document\.addEventListener\('error', \(e\) => \{[\s\S]{0,600}?notice-thumb[\s\S]{0,600}?\}, true\);/.test(app) && /class="notice-thumb" src="\$\{esc\(thumb\)\}" alt="" loading="lazy"/.test(app), true);
+    && /document\.addEventListener\('error', \(e\) => \{[\s\S]{0,1200}?notice-thumb[\s\S]{0,600}?\}, true\);/.test(app) && /class="notice-thumb" src="\$\{esc\(thumb\)\}" alt="" loading="lazy"/.test(app), true);
   eq('    브라우저 드라이버가 썸네일을 잰다 (띠 사진·학교 사진으로 갈아 끼움·시트 72px·바깥 주소 안 부름)', /⑥ 사진 — 글의 사진/.test(readText(new URL('verify/verify-news.js', root))) && /⑦ 시트 카드 사진/.test(readText(new URL('verify/verify-news.js', root))) && /⑥ 바깥 주소로 그림을 부르지 않았다/.test(readText(new URL('verify/verify-news.js', root))), true);
   /* ⑨ 워크플로 — 수집 다음·감사 앞 보강 단계 · sharp 설치를 삼키지 않는다 · 장부 되돌리기를 따로 · 저장 */
   const wf = readText(new URL('.github/workflows/collect-news.yml', root));
@@ -3294,7 +3294,7 @@ console.log('\n■ 학교 대표 사진 (2026-10-03 개발자 지시 "썸네일�
   eq('    출처는 앱 권한 · 오픈소스 라이선스 화면 「사진 출처」 — 우리 학교 사진마다 작가·라이선스 · 공용 페이지 링크(공용 주소만)', [/<p class="perm-title">사진 출처<\/p>/.test(pc), /\$\{esc\(x\.credit\)\} · 위키미디어 공용/.test(pc), /commons\\\.wikimedia\\\.org/.test(pc), /<\/section>\$\{photoCreditsHtml\(\)\}`;/.test(app)], [true, true, true, true]);
   eq('    목록은 소식을 받을 때 같이 받는다(한 번) · 늦게 와도 다시 그린다', /get\('assets\/schools\/photos\.json'\)\.then\(\(d\) => \{ if \(d && d\.schools && !schoolPhotos\) \{ schoolPhotos = d; if \(liveNews\) rerenderVisible\(\); \} \}\);/.test(app), true);
   eq('    못 받은 그림(글의 사진·학교 사진 모두 img.notice-thumb)은 빼고 글자 카드로', /if \(!img \|\| !img\.classList \|\| !img\.classList\.contains\('notice-thumb'\)\) return;[\s\S]{0,200}?img\.remove\(\);\s*if \(card\) card\.classList\.remove\('has-thumb'\);/.test(app), true);
-  eq('    띠 카드 — 글의 사진을 못 받으면 학교 사진으로 한 번 갈아 끼우고, 그것도 못 받으면 사진만 뺀다(바탕색 칸)', /if \(img && img\.classList && img\.classList\.contains\('news-tile-img'\)\) \{\s*const fb = img\.getAttribute\('data-fallback'\);[\s\S]{0,160}?img\.removeAttribute\('data-fallback'\);[\s\S]{0,80}?if \(fb\) \{[^}]*img\.src = fb; \} else img\.remove\(\);/.test(app) && /const fallback = own && sp && SCHOOL_PHOTO_RE\.test\(sp\.src \|\| ''\) \? sp\.src : '';/.test(app), true);
+  eq('    띠 카드 — 글의 사진을 못 받으면 학교 사진으로 한 번 갈아 끼우고, 그것도 못 받으면 사진만 뺀다(바탕색 칸)', /if \(img && img\.classList && img\.classList\.contains\('news-tile-img'\)\) \{\s*const fb = img\.getAttribute\('data-fallback'\);[\s\S]{0,160}?img\.removeAttribute\('data-fallback'\);[\s\S]{0,400}?if \(fb && SCHOOL_PHOTO_RE\.test\(fb\)\) \{[^}]*img\.src = fb; \} else img\.remove\(\);/.test(app) && /const fallback = own && sp && SCHOOL_PHOTO_RE\.test\(sp\.src \|\| ''\) \? sp\.src : '';/.test(app), true);
   /* 리뷰(10-03) — 시작 화면 사진 셋에 번호판·택시·행인이 컸다. 72px 에선 안 보여도 640px 파일은 공개 주소 → 고른 기록의 crop 으로 파일에서 덜어 낸다 */
   eq('    잘라 낼 자리(crop 비율 → 픽셀 상자) · 틀린 값은 자르지 않음(null)', [SP.cropBox(1000, 750, [0, 0, 1, 0.78]), SP.cropBox(1000, 666, [0.23, 0, 0.77, 1]), SP.cropBox(1000, 750, [0.5, 0, 0.6, 1]), SP.cropBox(1000, 750, [0, 0, 1]), SP.cropBox(1000, 750, [0, 0, -1, 1])],
     [{ left: 0, top: 0, width: 1000, height: 585 }, { left: 230, top: 0, width: 770, height: 666 }, null, null, null]);
@@ -7943,7 +7943,7 @@ console.log('\n■ 금액 산정 — 부풀리지 않는가 (2026-08-27)');
     eq('서비스워커도 parse-amount.js 를 싣는다',
       /importScripts\([^)]*parse-amount\.js/.test(swSrc), true);
     eq('캐시 목록에 parse-amount.js 가 있다',
-      /ASSETS\s*=[\s\S]{0,600}parse-amount\.js/.test(swSrc), true);
+      /ASSETS\s*=\s*\[[^\]]*'parse-amount\.js'/.test(swSrc), true);   // 목록 괄호 안 어디든 — 글자 수로 재면 앞에 파일이 늘 때마다 헛돈다(2026-11-19 app.js 나누기)
   }
 
   /* ⑪ 등록금 비율형은 등록금을 알 때만 합계에 들어간다 */
