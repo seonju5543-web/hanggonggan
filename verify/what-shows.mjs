@@ -352,7 +352,7 @@ for (const sch of hits) {
 
   const listLines = ME.requirementLines(sch, null);                    // 목록 카드 — 5줄 상한
   const allLines = ME.requirementLines(sch, null, { all: true });      // 상세 시트 — 전부
-  /* 택1 묶음 머리 줄(이름표 · 2026-11-17) — 앱(eligibilityRowsHtml · bulkRowHtml)이 그 묶음 첫 줄 위에 작게 그리는 원문 글자. 요건 줄이 아니라 줄 수에 안 든다.
+  /* 택1 묶음 머리 줄(이름표 · 2026-11-17) — 앱(eligibilityRowsHtml)이 그 묶음 첫 줄 위에 작게 그리는 원문 글자. 요건 줄이 아니라 줄 수에 안 든다.
      표 공고(requirementStruct)는 시트가 「공통 요건 / 다음 중 하나」 로 따로 그려 이 이름표를 안 쓴다 */
   const headsOf = (items) => new Map(items.filter((x) => x.head).map((x) => [x.text, x.head]));
   const listHeads = headsOf(ME.requirementLines(sch, null, { withMeta: true }));

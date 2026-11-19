@@ -1531,8 +1531,6 @@ console.log('\n■ 공고별 지원문서 — 앱 양식이 없는 등록 공고
   eq('  서비스워커는 PDF 사본을 가로채지 않는다 (공고문 사본과 같은 이유)', /\\\/data\\\/forms-pdf\\\//.test(readText(new URL('../sw.js', import.meta.url))), true);
   eq('  준비 시트 확인 버튼은 \'완료\'라고 말하지 않는다 (학생이 아직 한 일이 없다)',
     /id="btn-prep-confirm">[^<]*완료/.test(appSrc), false);
-  const bnw = appSrc.slice(appSrc.indexOf('function bulkNeedsWork('), appSrc.indexOf('function bulkTargets('));
-  eq('🔴 일괄 준비도 앱 지원문서를 \'쓸 것\'으로 센다 (formId 만 보면 107건이 문서 없이 준비 완료로 담긴다 — 리뷰)', /formTplIdFor\(sch\)/.test(bnw), true);
 }
 
 /* 2026-10-13 — 등록 첨부 고르기. 실측: 마감 전 등록 109건 중 첨부 0건이 38건 — 자동 등록의 이름 허용 목록이 「붙임1」「선발요강」「안내문」을 버렸다. */
@@ -1896,7 +1894,7 @@ console.log('\n■ 신청 준비 체크리스트 — 준비 완료는 네 항목
   eq('  상태 낱말 — 작성 남음 > 준비 중 n/4 > 단계 이름 · 제출을 적은 건은 체크리스트와 상관없이 단계 이름',
     [P.prepStateLabel({ pending: true, prep: {} }, sch, '신청 준비 완료'), P.prepStateLabel({ pending: false, prep: {} }, sch, '신청 준비 완료'), P.prepStateLabel({ pending: false, prep: {}, submittedAt: '2026-10-01' }, sch, '공식 제출'), P.prepStateLabel({ pending: false, formAns: {}, prep: { docs: true, submit: true } }, sch, '신청 준비 완료')],
     ['서류 작성 필요', '준비 중 2/4', '공식 제출', '신청 준비 완료']);
-  eq('  새로 담는 자리 셋(양식 확인 · 준비 시트 확인 · 일괄)이 모두 prep: {} 을 적는다', (app.match(/pending: (false|bulkNeedsWork\(sch\)), prep: \{\}/g) || []).length, 3);
+  eq('  새로 담는 자리 둘(양식 확인 · 준비 시트 확인)이 모두 prep: {} 을 적는다 (일괄 신청 준비는 2026-11-19 에 없앴다)', (app.match(/pending: false, prep: \{\}/g) || []).length, 2);
   /* 화면 셋이 같은 함수를 쓴다 — 카드 배지 · 신청내역 막대 · 상세 버튼/체크리스트 · 요약 */
   eq('  카드 배지 · 신청내역 막대 · 상세 버튼 · 요약이 모두 prepStateLabel/prepChecklist 를 쓴다',
     [/prepStateLabel\(myApp, sch/.test(take('cardBadgeHtml')), /prepStateLabel\(app, sch, stepLabel\)/.test(take('appCard')), /prepStateLabel\(app, sch, '신청 준비 완료됨'\)/.test(take('openDetail')), /data-prep-toggle/.test(take('openDetail')), /inPrep/.test(take('renderApplications'))], [true, true, true, true, true]);
@@ -7242,19 +7240,6 @@ console.log('■ 마감 판정이 앱을 켠 시각에 굳지 않는다 (2026-08
   eq('마감 판정을 dday().cls 로 한다', cardSrc.includes("dday(sch.deadline).cls === 'closed'"), true);
   eq('마감 판정을 손으로 다시 쓰지 않는다', cardSrc.includes('.days < 0'), false);
 
-  /* 지원 자격을 '단어'로 옮기는 규칙 — 지어내지 않는지 본다(원칙 8-1) */
-  /* bulkTags 는 자기 파일의 상수(BULK_TAG_MAX)와 원문 파서(parseLine)를 함께 쓴다.
-     파서는 typeof 로 막혀 있어 없으면 건너뛴다 — 여기서는 구조화된 자격만 본다. */
-  const bulkTags = new Function('FLAG_LABELS', 'TRACKS', 'BULK_TAG_MAX',
-    `${grab('bulkTags')}\nreturn bulkTags;`)(
-    { basicLiving: '기초생활수급자' }, [{ id: 'eng', label: '공학계열' }], 5);
-  eq('구조로 저장된 자격만 단어로 옮긴다',
-    bulkTags({ eligibility: { minGpa: 3, maxBracket: 8, years: [2, 3], flagsAny: ['basicLiving'] } }),
-    ['기초생활수급자', '평점 3 이상', '소득 8구간 이하', '2·3학년']);
-  /* 2026-11-15 개발자 결정 11-02 — 못 읽은 자격은 칩을 안 그린다(예전 '자격 원문 확인') */
-  eq('자격을 모르면 지어내지 않는다 — 칩 없음', bulkTags({ eligibility: {} }), []);
-  eq('자격 칸이 아예 없어도 지어내지 않는다 — 칩 없음', bulkTags({}), []);
-
   /* ── 🔴 홈 차례 — 적합도와 마감일을 한 점수로 (2026-09-17 개발자 지시) ──
      "홈화면 장학금 적합도순으로 된것같은데 제목은 마감임박이야. 마감임박이라는 수치를 지우고
       앞으로 홈화면에는 적합도와 마감일을 모두 고려하여 내림차순으로 공고를 정렬하고 싶어."
@@ -8009,7 +7994,7 @@ console.log('\n■ 금액 상세 — 승인받은 화면 그대로인가 (2026-0
   const app = appSource();
   /* 줄 하나를 그리는 amountDetailRow 도 같은 화면이라 함께 본다 */
   /* estOpt(추정 표시)·amountDetailRow(줄 하나)도 같은 화면이라 함께 본다 */
-  const body = app.slice(app.indexOf('function estOpt'), app.indexOf('function renderBulkPrep'));
+  const body = app.slice(app.indexOf('function estOpt'), app.indexOf('function applyLock'));
   eq('renderAmountDetail 이 있다', body.length > 200, true);
 
   // ① 갈래 넷 — 이름은 개발자가 '명사형으로 조이기'로 정한 것이다
@@ -8981,14 +8966,12 @@ console.log('\n■ 신청 잠금 — 자격 판정으로는 막지 않는다 (20
       /const lock = applyLock\(result, app, d, sch, fd\)/.test(src)],
      ['unknown', true, '', '', true]);
   /* 🔴 원문이 「별도 신청 없이 학교가 선발」이라 적은 공고(noApply = 그 원문 문장 · 2026-11-02 세종대 학업수석총장장학금)는
-     자격이 맞아도 신청 버튼을 열지 않는다 — 열면 학생이 없는 절차를 준비한다. 같은 값이 홈 '바로 신청'·일괄 준비·앱 지원문서에서도 뺀다 */
+     자격이 맞아도 신청 버튼을 열지 않는다 — 열면 학생이 없는 절차를 준비한다. 같은 값이 홈 '바로 신청'·앱 지원문서에서도 뺀다 */
   const noApply = { noApply: '별도의 신청절차없이 매학기 성적 확정 후, 학생지원처에서 선발.' };
   eq('🔴 신청 절차가 없는 공고는 자격이 맞아도 잠긴다', applyLock(R('eligible'), null, open, noApply).canApply, false);
   eq('  잠긴 이유를 noApply 로 돌려준다 (버튼 문구가 이걸 본다)', applyLock(R('eligible'), null, open, noApply).noApply, true);
   eq('  noApply 없는 공고는 그대로 열린다 (sch 를 넘겨도)', applyLock(R('eligible'), null, open, { id: 'x' }).canApply, true);
   eq('  홈 「바로 신청」 목록이 noApply 를 뺀다', /const applyable = matches\.filter\([\s\S]{0,200}!m\.sch\.noApply/.test(src), true);
-  eq('🔴 일괄 신청 준비 목록(bulkTargets)도 noApply 를 뺀다 — 홈 버튼을 누르면 이 목록이 시트에 체크된 채 들어간다(리뷰가 잡은 구멍)',
-     /function bulkTargets\(\)[\s\S]{0,400}?!m\.sch\.noApply/.test(src), true);
   eq('  앱 지원문서를 붙이지 않는다', /if \(s\.formId \|\| s\.program \|\| s\.noApply\) return s;/.test(src), true);
   eq('  상세 시트가 applyLock 에 공고(와 자격 근거 fd)를 넘긴다', /applyLock\(result, app, d, sch, fd\)/.test(src), true);
 
@@ -9005,11 +8988,6 @@ console.log('\n■ 신청 잠금 — 자격 판정으로는 막지 않는다 (20
      /신청할 수 없음/.test(appCode), false);
   eq('자격이 못 미더우면 버튼 위에 안내를 그린다', /dp-caution/.test(appCode), true);
 
-  /* 🔴 **일괄 신청 준비는 일부러 안 열었다** — 여러 건을 한꺼번에 고르는 자리라 미달까지
-     섞으면 학생이 무엇을 고른 것인지 알 수 없게 된다. 누가 '일관성'을 이유로 여기까지
-     열어 버리는 것을 막는다(열려면 화면 설계부터 다시 해야 한다). */
-  eq('일괄 신청 준비는 자격 통과분만 담는다 (여기는 안 열었다)',
-     /function bulkTargets\(\)[\s\S]{0,400}?\['eligible', 'selective'\]/.test(appCode), true);
 }
 
 /* ── 🔴 적합도 상수와 감사가 갈라지지 않는가 (2026-08-29) ──
@@ -10011,11 +9989,8 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   /* 🔴 화면이 이름표를 못 찾았을 때 **빈칸을 내놓지 않는다** — 열쇠라도 보여 준다.
      빈칸은 '해당 없음'처럼 읽혀서, 학생이 자기가 입력한 것이 지워진 줄 안다.
      ⚠️ **MY 화면은 2026-09-12 개발자 지시로 특별자격 줄을 뺐다**("이거 삭제해"). 그래서
-        이 규칙이 사는 자리는 이제 일괄 신청 준비 목록(`bulkTags`) 하나다 — 거기서도
-        `L[f] || f` 로 열쇠를 내놓는다. MY 에 줄을 되살린다면 같은 꼴로 쓸 것. */
+        그 뒤 이 규칙이 살던 일괄 신청 준비 목록(`L[f] || f`)도 2026-11-19 개발자 결정으로 없어졌다 — MY 에 줄을 되살린다면 같은 꼴로 쓸 것. */
   const appJs = appSource();
-  eq('이름표 없는 자격을 빈칸으로 내놓지 않는다 (일괄 준비 목록)',
-    /L\[f\]\s*\|\|\s*f/.test(appJs), true);
   eq('MY 화면에 특별자격 줄이 되살아나지 않았다 (개발자가 뺀 줄)',
     /특별자격:\s*\$\{/.test(appJs), false);
 }
@@ -10158,7 +10133,7 @@ console.log('\n■ 이어보기 판정 (2026-09-09)');
   const appJs = strip(appSource());
 
   /* ① 목록 카드가 '담았다'와 '다 했다'를 가른다.
-     '한 번에 신청 준비'로 담은 건은 `pending: bulkNeedsWork(sch)` 로 **서류가 남은 채** 들어간다.
+     옛 '한 번에 신청 준비'(2026-11-19 삭제)로 담은 건은 `pending` 인 채 **서류가 남은 채** 들어 있다.
      그런데 카드는 `state.applications.some(...)` 로 있기만 하면 '신청 완료'라 적었다 —
      같은 공고를 신청내역은 '서류 작성 필요'라고 말하는데 카드는 다 끝났다고 말한 것이다. */
   /* ⚠️ 2026-09-11 페이스리프트로 배지가 **한 개**가 되면서 그 판정이 `cardBadgeHtml()`
@@ -10495,12 +10470,13 @@ console.log('\n■ 못 읽은 금액 어림잡기 (2026-09-17 개발자 지시)'
     /* 차례: 금액 → 버튼 → 그림 칸 (버튼을 그림 위로 — 2026-10-01 CTO 지시) */
     eq('  #hero-sub 요소 자체가 없다 (채우는 곳 없는 빈 칸을 남기지 않는다)',
       /id="hero-sub"/.test(h2), false);
-    eq('  금액 → 버튼 → 그림 칸(#hero-tiles) 차례다',
+    eq('  금액 → 그림 칸(#hero-tiles) 차례다',
       /id="hero-amount"/.test(h2) && /id="hero-tiles"/.test(h2)
-      && h2.indexOf('id="hero-amount"') < h2.indexOf('id="btn-apply-all"')
-      && h2.indexOf('id="btn-apply-all"') < h2.indexOf('id="hero-tiles"'), true);
-    eq('  금액과 버튼이 붙지 않는다 — 버튼이 위 여백을 갖는다 (파일 끝 블록에서)',
-      /#btn-apply-all \{[^}]*margin-top: var\(--sp-\d\)/.test(tail), true);
+      && h2.indexOf('id="hero-amount"') < h2.indexOf('id="hero-tiles"'), true);
+    /* 🔴 일괄 신청 준비(홈 「n건 신청 준비」 버튼 → '한 번에 신청 준비' 목록)는 2026-11-19 개발자 결정으로 없앴다("어차피 아무도 안씀") — 되살아나지 않았는가.
+       금액과 그림 칸 사이 간격은 바로 아래 `.hero-tiles` 의 세로 여백이 만든다 */
+    eq('  🔴 일괄 신청 준비가 되살아나지 않았다 — 홈에 버튼이 없고 앱에 목록·시작 함수가 없다',
+      [/btn-apply-all/.test(h2), /function (?:renderBulkPrep|applyAll|bulkStart|bulkTargets)\(/.test(appSource()), /btn-apply-all|\.bulk-row|\.bulk-reqs/.test(css)], [false, false, false]);
     eq('  .hero-tiles 가 세로 여백을 갖는다 (파일 끝 블록에서)',
       /\.hero-tiles \{[^}]*margin: var\(--sp-3\)/.test(tail), true);
     eq('  그림 칸 위아래에 구분선이 없다 (2026-10-01 CTO 지시)',
@@ -16419,13 +16395,7 @@ console.log('\n■ 못 읽던 자격 줄 — 2단계 (2026-10-31 · 적합도 �
     eq('🔴 상세 시트 — 이름표 하나(r-pick · r-elig 아님)가 택1 묶음 첫 줄(보호조치 종료) 바로 위 · 원문 글자 그대로 · 요건 줄(r-elig)은 그대로 5줄',
       [lis.filter(([c]) => c === 'r-pick').length, capAt >= 0 ? lis[capAt][1] : null, capAt >= 0 && lis[capAt + 1] ? /보호조치 종료가 5년/.test(lis[capAt + 1][1]) : false, lis.filter(([c]) => /\br-elig\b/.test(c)).length],
       [1, capTxt, true, 5]);
-    const bulkP = new Function('requirementLines', 'bulkPrep', 'dday', 'bulkNeedsWork', 'bulkTags', 'amountLine', 'ddayWords', 'submitChannelLabel',
-      `${fnP('esc')}\n${fnP('bulkRowHtml')}\nreturn bulkRowHtml;`)(MEx.requirementLines, { ids: new Set() }, () => ({}), () => false, () => [], () => ({ text: '' }), () => '', () => '');
-    const bulkH = String(bulkP({ id: 'cnu', name: '사회 재환원 장학금', type: '교외', eligibilityLines: cnu }));
-    const bl = [...(bulkH.match(/<ul class="bulk-reqs">([\s\S]*?)<\/ul>/) || ['', ''])[1].matchAll(/<li( class="[^"]*")?>([^<]*)<\/li>/g)].map((m) => [m[1] || '', m[2]]);
-    eq('  일괄 준비 목록 「지원자격 (공고 원문)」 도 같은 이름표를 묶음 첫 줄 위에(r-pick) · 요건 줄은 5줄 그대로',
-      [bl.findIndex(([c]) => /r-pick/.test(c)), (bl.find(([c]) => /r-pick/.test(c)) || [])[1], bl.filter(([c]) => !c).length], [2, capTxt, 5]);
-    eq('  이름표 모양은 토큰만(t-xs · text-sub · 점 없음) — style.css', /\.reason-list \.r-pick, \.bulk-reqs \.r-pick \{ font-size: var\(--t-xs\); color: var\(--text-sub\);/.test(readText(new URL('../style.css', import.meta.url))), true);
+    eq('  이름표 모양은 토큰만(t-xs · text-sub · 점 없음) — style.css', /\.reason-list \.r-pick \{ font-size: var\(--t-xs\); color: var\(--text-sub\);/.test(readText(new URL('../style.css', import.meta.url))), true);
   }
   /* 2026-11-16 · 리뷰 2차 — 묶음은 **원문의 개요**를 따른다(match-engine ANY_OF_HEAD 머리말 ④). 처음엔 '몇 줄 남았나'를 내보낸 줄로 세어,
      선택지 하나가 걸러지면(날짜 줄 · 중복) 묶음이 다음 필수 줄 `다. 직전학기 평점 3.5 이상인 자` 까지 삼켜 평점 2.0 학생이 95%(어긋난 요건 없음)가 됐다 */

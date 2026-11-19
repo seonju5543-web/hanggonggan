@@ -150,45 +150,16 @@ const SHOT = (n) => `${__dirname}/shot-${n}.png`;
   await page.mouse.click(195, 40);
   await page.waitForTimeout(400);
 
-  // ── 일괄 신청 준비: 목록에서 한 건을 빼고 나머지만 담긴다 (2026-08-25 재설계)
-  //    🔴 예전엔 브라우저 confirm 창이라 위 page.on('dialog') 가 대신 눌러 줬다.
-  //       목록 창으로 바뀐 지금 그 자동 수락은 아무 일도 안 한다 — 여기서 직접 눌러야 하고,
-  //       안 그러면 이 검사가 0건으로 조용히 통과한다.
+  // ── 일괄 신청 준비(홈 「n건 신청 준비」 버튼)는 2026-11-19 개발자 결정으로 없앴다 — 홈에 버튼이 없는지만 본다.
+  //    신청내역에 담기는 길은 위에서 지난 공고 상세의 「신청 준비」 하나다.
   await page.click('.nav-item[data-nav="home"]');
   await page.waitForTimeout(1100);
-  const heroLabel = (await page.textContent('#btn-apply-all')).trim();
-  const heroN = Number((heroLabel.match(/(\d+)건/) || [])[1] || 0);
-  await page.click('#btn-apply-all');
-  await page.waitForSelector('#btn-bulk-go');
-  await page.waitForTimeout(350);
-  const listN = await page.locator('#detail-sheet [data-bulk]').count();
-  console.log('STEP bulk list rows:', listN, '| 홈 버튼이 말한 건수:', heroN, listN === heroN ? '(일치)' : '(❌ 불일치)');
-  console.log('STEP bulk summary:', (await page.textContent('#bulk-sum')).trim());
-
-  // 더보기 — 배지·마감·제출처·자격 원문이 들어 있어야 한다
-  await page.locator('#detail-sheet .bulk-more > summary').first().click();
-  await page.waitForTimeout(200);
-  const firstMore = page.locator('#detail-sheet .bulk-more').first();
-  console.log('STEP bulk more badges:', await firstMore.locator('.bulk-badges .badge').count(),
-    '| meta 줄:', await firstMore.locator('.bulk-meta').count(),
-    '| 자격 원문 줄:', await firstMore.locator('.bulk-reqs li').count());
-  await page.screenshot({ path: SHOT('19a-bulk-sheet') });
-
-  // 한 건 빼기 — 버튼 문구가 N-1 로 줄고, 그 공고는 신청내역에 없어야 한다
-  const dropId = await page.locator('#detail-sheet [data-bulk]').first().getAttribute('data-bulk');
-  await page.locator('#detail-sheet [data-bulk]').first().uncheck();
-  await page.waitForTimeout(200);
-  console.log('STEP bulk after uncheck:', (await page.textContent('#btn-bulk-go')).trim(),
-    '| 뺀 줄 흐려짐:', await page.locator('#detail-sheet .bulk-row.off').count());
-  await page.click('#btn-bulk-go');
-  await page.waitForTimeout(500);
-  const droppedIn = await page.evaluate((id) => state.applications.some((a) => a.id === id), dropId);
-  console.log('STEP 뺀 공고가 신청내역에 담겼나 (false 여야 정상):', droppedIn);
+  console.log('STEP 홈에 일괄 신청 준비 버튼이 없다 (0 이어야 정상):', await page.locator('#btn-apply-all').count());
 
   await page.click('.nav-item[data-nav="applications"]');
   await page.waitForTimeout(300);
   /* 🔴 **신청내역의 '작성 중' 표시는 `.badge-pending` 이 아니다** (2026-09-03).
-     그 배지는 *일괄 준비 목록*(app.js `bulk-name`)에만 있다. 신청내역은 카드 안 진행 막대에
+     그 배지는 옛 *일괄 준비 목록*(2026-11-19 삭제)에만 있었다. 신청내역은 카드 안 진행 막대에
      `.app-step-wait` 를 붙인다(app.js:2368). 게다가 이 줄은 화면 **전체**에서 세고 있어
      일괄 준비 목록의 배지까지 함께 세었고, 그래서 `pendingCnt > 0` 인데 정작
      `#apps-list` 안에는 없어 30초를 기다리다 죽었다. 세는 곳과 누르는 곳을 맞춘다. */

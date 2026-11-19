@@ -1978,7 +1978,7 @@ function optionRun(lines, start, headLine, count) {
    엔진은 「나. 차등조건(1개 이상 충족 시 신청 가능, …)」 아래 셋을 한 요건(택1)으로 세는데, 화면은 머리 줄을 숨긴 채 셋을 평평하게 늘어놓아
    학생이 셋 다 갖춰야 하는 요건으로 읽었다(보호조치 종료자·연장자는 동시에 될 수 없다). 머리 줄을 **원문 그대로**(앞머리 번호·글머리만 떼고) 돌려준다.
    ⚠️ 이건 요건 줄이 아니다 — out(요건 줄)에 넣지 않고 withMeta 항목의 `head` 칸으로만 준다. 그래서 적합도(fitDetail)·✓✕·채점기(eligibility-report)·5줄 상한이 세지 않는다.
-   그리는 곳은 app.js eligibilityRowsHtml(상세 시트)·bulkRowHtml(일괄 준비 목록) · what-shows 도 같은 칸을 찍는다 */
+   그리는 곳은 app.js eligibilityRowsHtml(상세 시트) · what-shows 도 같은 칸을 찍는다 */
 function pickHeadCaption(line) {
   return decodeEntities(String(line || ''))
     .replace(/^\s*(?:(?:[\uE000-\uF8FF]|[\uDB80-\uDBFF][\uDC00-\uDFFF])+|[(（]\s*(?:\d{1,2}|[가-하])\s*[)）]|[①-⑳]|\d{1,2}(?:\.\d{1,2})+\.?(?=\s)|\d{1,2}\s*[.)）]|[가-하]\s*[.)）]|[oOㅇ](?=\s)|[\-–—•▪▶▷◆◇○●■□▣★♦⇒◦∙❍◎￭·ㆍ*◌◍]+)\s*/, '')

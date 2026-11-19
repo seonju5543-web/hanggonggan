@@ -1,4 +1,4 @@
-/* 3D 마스코트 시안 공용 부품 (2026-11-19 · 승인 전 레퍼런스) — index.html · preview.html · mascots/*.js 가 같이 쓴다.
+/* 3D 마스코트 공용 부품 (2026-11-19) — 앱(app-mascot.js 가 늦게 싣는다)과 시안(docs/designs/mockups/mascot-3d/)이 같이 쓴다.
    three.min.js 다음에 싣는다. 바깥에는 window.K 하나만 낸다. */
 (function () {
   'use strict';
@@ -275,7 +275,7 @@
     const canvas = btn.querySelector('canvas');
     let renderer;
     try { renderer = new T.WebGLRenderer({ canvas, antialias: true, alpha: true }); }
-    catch (e) { document.getElementById('nogl').style.display = 'block'; return null; }
+    catch (e) { { const ng = document.getElementById('nogl'); if (ng) ng.style.display = 'block'; } return null; }
     renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
     const scene = new T.Scene();
     const cam = new T.PerspectiveCamera(opt.fov || 34, 1, 0.1, 50);
@@ -336,8 +336,10 @@
     }
 
     let last = performance.now();
+    let skip = false;
     function frame(now) {
       requestAnimationFrame(frame);
+      if (S.tJump < 0 && !S.drag && appear >= 1 && (skip = !skip)) return;   // 쉬는 동안은 한 프레임 걸러 (전력)
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
       if (!S.visible || !ch) return;
       S.time += dt;

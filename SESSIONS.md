@@ -9,6 +9,13 @@
 > 로드되는 부담을 줄이려고 분리했다(claude-md-improver 검사 결과). **삭제가 아니라 이동**이다 —
 > 아래 세션 하나하나가 CLAUDE.md의 "중요한 기술 사실" 안에서 "(OO차 세션)"으로 계속 인용된다.
 
+## 2026-11-19 — 일괄 신청 준비(홈 「n건 신청 준비」) 삭제 (개발자 결정 *"어차피 아무도 안씀"*)
+
+- **없앤 것**: 홈 히어로의 `#btn-apply-all` 버튼 · '한 번에 신청 준비' 목록 시트(`renderBulkPrep`·`bulkRowHtml`·`bulkTags`) · 담기(`bulkStart`·`applyAll`·`bulkTargets`·`bulkNeedsWork`) · 그 이벤트 연결 · style.css 의 일괄 준비 목록 블록.
+- **남긴 것**: 공고 하나씩 여는 「신청 준비」 시트(`renderApplyPrep`) · 신청 내역의 선택 모드(`#apps-bulkbar`·`.bulk-all` — 이름만 비슷한 다른 기능) · `pending` 상태 처리(옛 일괄 준비로 담긴 건이 학생 기기에 남아 있다).
+- **검사**: 일괄 준비를 재던 줄(자격 단어 칩·noApply·자격 통과분만·목록의 택1 이름표·버튼 여백)은 지우고, 히어로 절에 「일괄 신청 준비가 되살아나지 않았다」 하나를 두었다. `drive.js` 는 홈에 버튼이 없는지만 보고, `verify-chat.js` 는 떠 있는 버튼이 히어로 금액을 가리지 않는지로 바꿨다.
+- 시작 화면 문구 「한 곳에서 찾고 / 한 번에 신청」은 승인 화면이라 그대로 두었다(일괄 준비 기능을 가리키는 말이 아니다).
+
 ## 2026-11-19 — 성신여자대학교를 45번째 수집 학교로 (개발자 지시) · 첫 수집에서 배운 것
 
 - **넣은 자리**: `collector/schools.json`(학사공지 + 장학생 모집공고) · `match-engine.js` `SERVED_SCHOOLS` · `collector/news-sources.json`(학사공지) · `data.js` 별칭. 배포는 `device-deploy.yml`.

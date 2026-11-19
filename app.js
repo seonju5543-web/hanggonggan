@@ -1484,8 +1484,8 @@ function cardBadgeHtml(fit, fd, myApp, sch) {
 function schCard(sch, result, { compact = false, fit = 0, fd = null } = {}) {
   const d = dday(sch.deadline);
   /* 🔴 **'담았다'와 '다 했다'를 가른다** (2026-09-10 코드 리뷰에서 잡았다).
-     예전에는 신청내역에 있기만 하면 '신청 완료' 배지를 달았다. 그런데 '한 번에 신청 준비'로
-     담은 건은 `pending: bulkNeedsWork(sch)` 로 **서류 작성이 남은 채** 들어간다(applyAll).
+     예전에는 신청내역에 있기만 하면 '신청 완료' 배지를 달았다. 그런데 담은 건 가운데에는
+     `pending: true` 로 **서류 작성이 남은 채** 들어 있는 것이 있다(옛 '한 번에 신청 준비'가 그렇게 담았다 — 기능은 2026-11-19 에 없앴지만 그때 담긴 건은 남아 있다).
      그래서 같은 공고를 **신청내역은 '서류 작성 필요', 목록 카드는 '신청 완료'** 라고
      서로 다르게 말했다 — 학생은 다 끝난 줄 알고 넘어가고 실제로는 아무것도 제출하지 못한다.
      ⚠️ 낱말은 신청내역(`stepNow`)이 쓰는 것과 **같은 것을 쓴다** — 여기서 새로 지어내면
@@ -1662,7 +1662,6 @@ function renderHome() {
      **이미 마감된 공고가 섞여** 실제보다 부풀려져 있었다. */
   const applyable = matches.filter((m) =>
     ['eligible', 'selective'].includes(m.result.status) && dday(m.sch.deadline).days >= 0 && notStale(m.sch) && !m.sch.noApply);
-  const notApplied = applyable.filter((m) => !state.applications.some((a) => a.id === m.sch.id));
 
   /* 🔴 합계는 **더하기가 아니라 고르기**다 (2026-08-27 · parse-amount.js).
      그냥 다 더하면 ① 같은 장학금이 여러 학교 접수분으로 등록된 것(가송재단 5건)을
@@ -1689,7 +1688,7 @@ function renderHome() {
   countUp($('#hero-amount'), total, (v) => `최대 ${won(v)}`);
   /* 🔴 히어로 아랫줄을 **통째로 없앴다** (2026-09-17 개발자 지시 2차: "금액 밑에 있는
      '그중 N건은 바로 신청할 수 있어요' 안내도 삭제해줘"). 앞서 같은 자리에서 금액 회계
-     두 줄을 걷어냈고, 이 줄이 마지막 하나였다. 이제 히어로는 **건수 · 금액 · 버튼** 셋뿐이다.
+     두 줄을 걷어냈고, 이 줄이 마지막 하나였다. 이제 히어로는 **금액과 그림 칸**뿐이다(버튼은 2026-11-19 에 없앴다 — 일괄 신청 준비 삭제).
      🔴 `#hero-count` 요소도 index.html 에서 뺐다 — 채우는 곳이 없는 빈 칸을 남겨 두면
         다음 세션이 '왜 안 채우지'를 뒤진다. 그 칸이 주던 아래 여백은 style.css 파일 끝
         '히어로' 절에서 `.hero-amount` 가 물려받는다(실측 57px → 같은 자리 유지). */
@@ -1722,13 +1721,6 @@ function renderHome() {
       <span class="hero-ico ${t.tone}">${t.svg}${tileN[t.go] == null ? '' : `<span class="hero-badge${tileN[t.go] ? '' : ' zero'}">${tileN[t.go]}</span>`}</span>
       <span class="hero-tile-name">${t.name}</span>
     </button>`).join('');
-
-  const btn = $('#btn-apply-all');
-  btn.disabled = notApplied.length === 0;
-  /* 버튼은 **누르면 무슨 일이 나는지**만 말한다 (2026-08-30 개발자 지시).
-     '⚡ 한 번에 모두 신청 준비하기'에서 이모지·'한 번에'·'모두'는 전부 앱의 감탄이지
-     학생이 얻는 정보가 아니었다. 남는 것은 건수와 동사뿐이다. */
-  btn.textContent = notApplied.length ? `${notApplied.length}건 신청 준비` : '준비할 장학금이 남아 있지 않아요';
 
   renderResumeCard();
 

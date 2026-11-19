@@ -461,27 +461,10 @@ function bindEvents() {
   $('#sheet-backdrop').addEventListener('click', dismissSheet);
   $('#detail-sheet').addEventListener('click', (e) => {
     if (e.target.classList.contains('sheet-handle')) dismissSheet();
-    if (e.target.id === 'btn-bulk-go' && bulkPrep) bulkStart();
-  });
-  /* 일괄 준비 목록의 체크 — 시트는 innerHTML 이 계속 갈리므로 줄마다 리스너를 걸지 않고
-     **시트 하나에 위임**한다. 걸어 두면 다시 그릴 때마다 리스너가 쌓여 새는 자리가 된다. */
-  $('#detail-sheet').addEventListener('change', (e) => {
-    if (!bulkPrep) return;
-    if (e.target.id === 'bulk-all') {
-      bulkPrep.ids.clear();
-      if (e.target.checked) bulkPrep.list.forEach((sch) => bulkPrep.ids.add(sch.id));
-      $$('#detail-sheet [data-bulk]').forEach((box) => { box.checked = e.target.checked; });
-      bulkRefresh();
-      return;
-    }
-    const id = e.target.dataset && e.target.dataset.bulk;
-    if (!id) return;
-    if (e.target.checked) bulkPrep.ids.add(id); else bulkPrep.ids.delete(id);
-    bulkRefresh();
   });
   /* 쓰던 신청서를 치는 동안 적어 둔다 (2026-09-09 · 이어보기 3겹).
      🔴 시트 **하나에 위임**한다 — 시트는 innerHTML 이 계속 갈리므로 그릴 때마다 걸면
-        리스너가 쌓인다(바로 위 일괄 준비 체크가 같은 이유로 위임이다). */
+        리스너가 쌓여 새는 자리가 된다. */
   ['input', 'change'].forEach((ev) => {
     $('#detail-sheet').addEventListener(ev, () => { if (formFill) formProgressSave(); });
   });
@@ -492,8 +475,6 @@ function bindEvents() {
     if (!$('#notify-sheet').hidden) closeNotifyPanel();
     else if (!$('#detail-sheet').hidden) dismissSheet();
   });
-
-  $('#btn-apply-all').addEventListener('click', applyAll);
 
   /* 우리 학교 게시판 공고 더보기 (2026-10-10) — 다시 그리지 않고 가려 둔 카드를 편다(홈 '나에게 맞는 장학금'과 같은 방식) */
   document.addEventListener('click', (e) => {

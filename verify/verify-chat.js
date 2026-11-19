@@ -66,11 +66,12 @@ async function ask(page, q) {
   /* 도우미로 들어가는 길은 마스코트 하나뿐이다 — 홈의 진입줄은 2026-08-17에 없앴다 */
   ok(await page.locator('#home-ask').count() === 0, '홈 진입줄은 없앴다(길은 마스코트 하나)');
 
-  /* 히어로의 '한 번에 신청' 버튼을 가리지 않는가 — 두 요소의 자리를 실제로 재서 확인 */
-  const applyBox = await page.locator('#btn-apply-all').boundingBox();
+  /* 히어로에서 누르는 자리(금액 — 금액 상세가 열린다)를 가리지 않는가 — 두 요소의 자리를 실제로 재서 확인.
+     예전엔 '한 번에 신청' 버튼(#btn-apply-all)을 쟀다 — 그 버튼은 2026-11-19 에 없앴다 */
+  const applyBox = await page.locator('#hero-amount').boundingBox();
   const fabBox = await page.locator('#btn-chat-fab').boundingBox();
   const overlaps = fabBox.y < applyBox.y + applyBox.height && fabBox.y + fabBox.height > applyBox.y;
-  ok(!overlaps, '떠 있는 버튼이 신청 버튼과 겹치지 않는다');
+  ok(!overlaps, '떠 있는 버튼이 히어로 금액과 겹치지 않는다');
   const navBox = await page.locator('#bottom-nav').boundingBox();
   ok(fabBox.y + fabBox.height <= navBox.y + 1, '떠 있는 버튼이 하단 탭을 가리지 않는다', { fab: fabBox.y + fabBox.height, nav: navBox.y });
 

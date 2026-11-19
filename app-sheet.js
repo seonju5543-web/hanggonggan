@@ -1074,7 +1074,6 @@ function closeSheet() {
   sheetBack = null;          // 흐름이 닫을 때는 돌아갈 곳도 지운다
   eligAsk = null;            // 자격 묻기 — 펼친 상태와 본 줄을 놓는다
   docPrep = null;
-  bulkPrep = null;
   /* 🔴 **쓰던 신청서 표시도 함께 내린다** (2026-09-09 코드 리뷰). 안 내리면 시트가 닫힌 뒤에도
      `formFill` 이 남아, ① 같은 시트를 쓰는 일괄 준비에서 체크만 해도 위임 리스너가
      `formProgressSave` 를 불러 **칸이 없는 화면에서 답을 모아 빈 값으로 덮어쓰고**

@@ -1358,10 +1358,9 @@ textarea:focus {
 /* ※ 예외 참고(`10학기 이하 후기 이중전공자는 … 신청 가능`) — 요건이 아니라 옅게 (2026-10-15 · app.js eligibilityRowsHtml ②) */
 .reason-list .r-aside { color: var(--text-weak); }
 /* 택1 묶음의 원문 머리 줄(`차등조건(1개 이상 충족 시 …)`) — 요건 줄이 아니라 그 아래 줄들의 이름표라 작고 옅게 · 점 없음 (2026-11-17 · app.js eligibilityRowsHtml · bulkRowHtml) */
-.reason-list .r-pick, .bulk-reqs .r-pick { font-size: var(--t-xs); color: var(--text-sub); margin-top: var(--space-4); }
+.reason-list .r-pick { font-size: var(--t-xs); color: var(--text-sub); margin-top: var(--space-4); }
 .reason-list .r-pick { padding-left: 0; }
-.bulk-reqs .r-pick { color: var(--text-weak); }   /* 일괄 준비 목록은 줄 자체가 t-xs·text-sub 라 한 단계 옅게 */
-.reason-list .r-pick::before, .bulk-reqs .r-pick::before { display: none; }
+.reason-list .r-pick::before { display: none; }
 /* 금액을 못 읽은 공고의 금액 자리 — 큰 파란 글씨가 아니라 옅은 한 줄 (2026-10-15 · openDetail) */
 .sheet-amount.sheet-amount-unknown { font-size: var(--t-sm); font-weight: 500; color: var(--text-sub); }
 /* 증명서류 체크리스트 — 줄마다 ✓·□·△ 가 있어 목록 점은 두 겹이다 (2026-10-15 · certStatusListHtml) */
@@ -1891,13 +1890,13 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
    그냥 두면 **동그란 빈 원**만 보이고 체크 표시가 안 뜬다(CLAUDE.md 기록).
    기존 .check-item과 같은 그림을 쓴다 — 앱 안에서 체크 모양이 두 가지면 안 된다. */
 .bulk-all { display: flex; align-items: center; gap: 10px; font-size: var(--t-md); min-height: 44px; cursor: pointer; }
-.bulk-all input, .swipe-row .row-check, .bulk-check {
+.bulk-all input, .swipe-row .row-check {
   width: 24px; height: 24px; padding: 0; flex-shrink: 0;
   border: 1.5px solid rgba(18, 22, 31, 0.22); border-radius: 50%;
   background: #fff center / 62% no-repeat;
   transition: border-color .15s, background-color .15s; cursor: pointer;
 }
-.bulk-all input:checked, .swipe-row .row-check:checked, .bulk-check:checked {
+.bulk-all input:checked, .swipe-row .row-check:checked {
   border-color: var(--primary); background-color: var(--primary);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-6.5' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 
@@ -1925,60 +1924,6 @@ mark.essay-add { background: #d7f5df; color: #166534; border-radius: var(--radiu
 @media (prefers-reduced-motion: reduce) {
   .swipe-row > .sch-card { transition: none; }
 }
-
-/* ============================================================
-   일괄 신청 준비 목록 (2026-08-25)
-   겉에 보이는 것은 넷 — 체크 · 제목 · 자격 단어 · 금액.
-   마감·배지·제출처·자격 원문은 <details> 안에 접는다(개발자 지시).
-   ⚠️ 새 색을 만들지 않는다 — 배지·D-day 는 기존 규칙을 그대로 쓴다.
-   ============================================================ */
-/* 🔴 .bulk-all 은 신청내역 전체선택이 이미 쓰는 이름이다(style.css 위쪽).
-   같은 물건이라 그림은 그대로 쓰고, 시트에서만 필요한 구분선만 **시트 안으로 한정**해
-   덧붙인다. 통째로 다시 선언하면 신청내역 쪽 모양이 함께 바뀐다. */
-#detail-sheet .bulk-all {
-  padding: 10px 0; margin-bottom: 6px;
-  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
-}
-.bulk-group-head {
-  font-size: var(--t-xs); font-weight: 700; color: var(--text-weak);
-  margin: 16px 0 8px;
-}
-.bulk-row {
-  display: flex; gap: 10px;
-  border: 1px solid var(--line); border-radius: var(--radius-sm);
-  padding: 12px; margin-bottom: 8px;
-  transition: opacity 0.15s;
-}
-/* 뺀 줄은 **지우지 않고 흐리게** 둔다 — 실수로 뺐을 때 되돌릴 수 있어야 한다 */
-.bulk-row.off { opacity: 0.42; }
-.bulk-row.off .bulk-name { text-decoration: line-through; }
-.bulk-check { margin: 1px 0 0; }   /* 크기·그림은 위 공용 규칙이 준다 */
-.bulk-main { flex: 1; min-width: 0; }
-.bulk-name {
-  font-size: var(--t-md); font-weight: 700; color: var(--text);
-  margin-bottom: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
-}
-.bulk-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
-.bulk-tags .chip-sm {
-  background: var(--primary-weak); color: var(--primary);
-  border-radius: var(--radius-pill); font-weight: 600; padding: 4px 9px; font-size: var(--t-2xs);
-}
-.bulk-amount { font-size: var(--t-sm); color: var(--text-sub); margin-bottom: 6px; }
-.bulk-more { border-top: 1px dashed var(--line); padding-top: 8px; }
-.bulk-more > summary {
-  font-size: var(--t-xs); color: var(--primary); font-weight: 600;
-  cursor: pointer; list-style: none; min-height: 24px;
-}
-.bulk-more > summary::-webkit-details-marker { display: none; }
-.bulk-more > summary::before { content: '▸ '; }
-.bulk-more[open] > summary::before { content: '▾ '; }
-.bulk-badges { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0 6px; }
-.bulk-meta { font-size: var(--t-xs); color: var(--text-sub); line-height: 1.6; margin-bottom: 3px; }
-.bulk-meta-head { font-size: var(--t-2xs); color: var(--text-weak); font-weight: 700; margin: 8px 0 4px; }
-.bulk-reqs { font-size: var(--t-xs); color: var(--text-sub); line-height: 1.65; padding-left: 2px; list-style: none; }
-.bulk-reqs li { margin-bottom: 2px; }
-.bulk-reqs li::before { content: '· '; color: var(--text-weak); }
-
 
 /* ============================================================
    회원가입·로그인 (2026-08-25) — MY 계정 카드 · 인증 시트 · 동의 줄
@@ -4912,7 +4857,6 @@ input:focus-visible:not(:user-invalid), select:focus-visible:not(:user-invalid),
   font-variant-numeric: tabular-nums;
 }
 .hero-badge.zero { background: var(--text-weak); }
-.hero-card #btn-apply-all { width: 100%; margin-top: var(--sp-3); }   /* 버튼이 그림 칸 위로 (2026-10-01 CTO) */
 
 /* 🔴 홈의 **구역 제목 위 가로선을 걷는다** (2026-10-03 개발자 지시 "불필요한 구분선 없애줘").
    홈에는 그 선이 넷 있었다 — 나에게 맞는 장학금 · 우리 학교 게시판 공고 · 우리 학교 소식 ·
