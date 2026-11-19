@@ -4,12 +4,76 @@
  "items": [
   {
    "title": "[재학생 필수] ★ 2027-1학기 국가장학금 1차 신청 기간 안내 ★",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=0&pageOrder=0&cmd=2&parm_bod_uid=271997&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=2&pagePrvNxt=1&pageRef=0&pageOrder=0&cmd=2&parm_bod_uid=271997&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
    "attachments": [],
    "deadlineHint": "신청 기간: 2026. 11. 24.(화) 9시 ~ 27. 01. 07.(목) 18시 (주말 및 공휴일 포함 24시간 신청 가능, 마지막날은 1",
    "school": "계명대학교",
    "campus": "",
-   "foundAt": "2026-11-18"
+   "foundAt": "2026-11-19"
+  },
+  {
+   "title": "[교외]2027년도 대산농촌재단 장학생 선발 안내",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=2&pagePrvNxt=1&pageRef=271944&pageOrder=0&cmd=2&parm_bod_uid=271152&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+   "attachments": [
+    {
+     "name": "[붙임1] 2027 대산장학생 선발 공지.jpg",
+     "url": "https://www.kmu.ac.kr/programs/common/com_download.jsp?parm_file_uid=129248"
+    },
+    {
+     "name": "[붙임2] 2027 대산장학생 선발요강.pdf",
+     "url": "https://www.kmu.ac.kr/programs/common/com_download.jsp?parm_file_uid=129247"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "계명대학교",
+   "campus": "",
+   "foundAt": "2026-11-19"
+  },
+  {
+   "title": "[교외]2026학년도 2학기 (재)대전청년내일재단 장학생 선발 연장 공고",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=2&pagePrvNxt=1&pageRef=271944&pageOrder=0&cmd=2&parm_bod_uid=271062&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+   "attachments": [
+    {
+     "name": "2026년 대전청년내일재단 성취(대학생) 장학생 선발계획 연장 공고.hwpx",
+     "url": "https://www.kmu.ac.kr/programs/common/com_download.jsp?parm_file_uid=129149"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "계명대학교",
+   "campus": "",
+   "foundAt": "2026-11-19"
+  },
+  {
+   "title": "[교외] 2026학년도 하반기 (재)논산시장학회 학업장려비 장학생 선발 공고",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=2&pagePrvNxt=1&pageRef=271944&pageOrder=0&cmd=2&parm_bod_uid=271061&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+   "attachments": [
+    {
+     "name": "2026년도 하반기 재단법인 논산시장학회 장학생 신청 서식.hwpx",
+     "url": "https://www.kmu.ac.kr/programs/common/com_download.jsp?parm_file_uid=129148"
+    }
+   ],
+   "deadlineHint": null,
+   "school": "계명대학교",
+   "campus": "",
+   "foundAt": "2026-11-19"
+  },
+  {
+   "title": "[교외] 2026학년도 2학기 (재)춘천시민장학재단 봄내장학생 선발 공고",
+   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=2&pagePrvNxt=1&pageRef=271944&pageOrder=0&cmd=2&parm_bod_uid=270851&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
+   "attachments": [
+    {
+     "name": "2026년도 하반기 봄내장학생 선발공고.hwp",
+     "url": "https://www.kmu.ac.kr/programs/common/com_download.jsp?parm_file_uid=128943"
+    },
+    {
+     "name": "자주 묻는 질문(26년 하반기)-봄내장학금.hwp",
+     "url": "https://www.kmu.ac.kr/programs/common/com_download.jsp?parm_file_uid=128942"
+    }
+   ],
+   "deadlineHint": "신청기간 : 2026. 9. 28.( 월 ) ~ 10. 7.( 수 ) [10 일간 ] ❍ 접 수 처 구분 접수처 비고 애향장학금 주소지 읍면 ‧",
+   "school": "계명대학교",
+   "campus": "",
+   "foundAt": "2026-11-19"
   },
   {
    "title": "[교외] 2026학년도 미래 건설교통기술인 장학사업 안내",
@@ -485,70 +549,6 @@
     }
    ],
    "deadlineHint": null,
-   "school": "계명대학교",
-   "campus": "",
-   "foundAt": "2026-10-07"
-  },
-  {
-   "title": "[교외]2027년도 대산농촌재단 장학생 선발 안내",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271236&pageOrder=0&cmd=2&parm_bod_uid=271152&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
-   "attachments": [
-    {
-     "name": "[붙임1] 2027 대산장학생 선발 공지.jpg",
-     "url": "https://www.kmu.ac.kr/programs/common/com_download.jsp?parm_file_uid=129248"
-    },
-    {
-     "name": "[붙임2] 2027 대산장학생 선발요강.pdf",
-     "url": "https://www.kmu.ac.kr/programs/common/com_download.jsp?parm_file_uid=129247"
-    }
-   ],
-   "deadlineHint": null,
-   "school": "계명대학교",
-   "campus": "",
-   "foundAt": "2026-10-07"
-  },
-  {
-   "title": "[교외]2026학년도 2학기 (재)대전청년내일재단 장학생 선발 연장 공고",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271236&pageOrder=0&cmd=2&parm_bod_uid=271062&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
-   "attachments": [
-    {
-     "name": "2026년 대전청년내일재단 성취(대학생) 장학생 선발계획 연장 공고.hwpx",
-     "url": "https://www.kmu.ac.kr/programs/common/com_download.jsp?parm_file_uid=129149"
-    }
-   ],
-   "deadlineHint": null,
-   "school": "계명대학교",
-   "campus": "",
-   "foundAt": "2026-10-07"
-  },
-  {
-   "title": "[교외] 2026학년도 하반기 (재)논산시장학회 학업장려비 장학생 선발 공고",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271236&pageOrder=0&cmd=2&parm_bod_uid=271061&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
-   "attachments": [
-    {
-     "name": "2026년도 하반기 재단법인 논산시장학회 장학생 신청 서식.hwpx",
-     "url": "https://www.kmu.ac.kr/programs/common/com_download.jsp?parm_file_uid=129148"
-    }
-   ],
-   "deadlineHint": null,
-   "school": "계명대학교",
-   "campus": "",
-   "foundAt": "2026-10-07"
-  },
-  {
-   "title": "[교외] 2026학년도 2학기 (재)춘천시민장학재단 봄내장학생 선발 공고",
-   "url": "https://www.kmu.ac.kr/uni/main/page.jsp?pageNo=1&pagePrvNxt=1&pageRef=271236&pageOrder=0&cmd=2&parm_bod_uid=270851&srchVoteType=-1&srchEnable=1&srchBgpUid=-1&srchKeyword=&srchSDate=&srchColumn=&srchEDate=&mnu_uid=145&",
-   "attachments": [
-    {
-     "name": "2026년도 하반기 봄내장학생 선발공고.hwp",
-     "url": "https://www.kmu.ac.kr/programs/common/com_download.jsp?parm_file_uid=128943"
-    },
-    {
-     "name": "자주 묻는 질문(26년 하반기)-봄내장학금.hwp",
-     "url": "https://www.kmu.ac.kr/programs/common/com_download.jsp?parm_file_uid=128942"
-    }
-   ],
-   "deadlineHint": "신청기간 : 2026. 9. 28.( 월 ) ~ 10. 7.( 수 ) [10 일간 ] ❍ 접 수 처 구분 접수처 비고 애향장학금 주소지 읍면 ‧",
    "school": "계명대학교",
    "campus": "",
    "foundAt": "2026-10-07"
