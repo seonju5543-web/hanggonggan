@@ -2403,13 +2403,6 @@ function essayDefsFor(sch) {
     })
     .filter(Boolean);
 }
-function otherManualDocs(sch) {
-  return sch.documents.filter((doc) => !/자동/.test(doc) && !ESSAY_DEFS.some((e) => e.match.test(doc)));
-}
-function autoDocs(sch) {
-  return sch.documents.filter((doc) => /자동/.test(doc));
-}
-
 /* '서류가 무엇인지는 원문에서 확인' 이라는 **안내 줄** — 서류 이름이 아니다.
    자동 등록분은 documents 에 `지원 자격·제출 서류는 원문 공고에서 확인` 한 줄만 들고 온다
    (층2는 `재단 공고문에서 확인`). 이걸 체크리스트에 올리면 "□ 지원 자격·제출 서류는 원문 공고에서

@@ -51,10 +51,6 @@ import { resolvedNoticeUrls } from './link-hunt-rules.mjs';
    줄어들지 않는다** — 학생은 자기 파일만 받으므로 옆 학교가 바쁘든 말든 상관없다. */
 export const PER_SCHOOL = Number(process.env.NOTICES_PER_SCHOOL || 60);
 
-export function schoolKeyOf(n) {
-  return `${n.school || ''}${n.campus ? ` ${n.campus}` : ''}`;
-}
-
 /* 학교별로 갈라 담는다. 입력 순서(최신 수집분이 앞)를 그대로 유지한다. */
 export function splitBySchool(items, perSchool = PER_SCHOOL) {
   const out = new Map();

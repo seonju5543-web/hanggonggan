@@ -77,9 +77,3 @@ export function saveCandidates(items, p = CANDIDATES_PATH, today = new Date()) {
   return doc;
 }
 
-/* 검수 도구가 볼 목록 — 후보 장부가 있으면 그것, 없으면 앱 파일로 물러난다.
-   (장부가 생기기 전에 만들어진 도구도 그대로 돌아가게 하려는 것) */
-export function reviewPool(noticesItems, p = CANDIDATES_PATH) {
-  const c = loadCandidates(p);
-  return c.items.length ? c.items : (noticesItems || []);
-}

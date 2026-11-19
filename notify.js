@@ -733,24 +733,6 @@ function pushRemember(res) {
   return res;
 }
 
-/* 원인을 사용자가 할 수 있는 행동으로 바꿔 준다 (전문 용어 금지 — 이 화면은 학생이 본다) */
-function pushReasonText(reason, iosNotInstalled) {
-  if (iosNotInstalled) return '이 기기에 아직 연결되지 않음.';
-  switch (reason) {
-    case 'permission':
-      return '휴대폰이 이 앱의 알림 차단 중. 폰 설정 → 알림에서 한대장을 허용해 주세요.';
-    case 'unsupported':
-      return '이 브라우저에서는 앱을 켜지 않아도 오는 알림 사용 불가. 크롬·사파리로 열기 필요(카카오톡 인앱 브라우저 불가).';
-    case 'network':
-    case 'server':
-      return '연결 일시 실패. 앱을 껐다 켜면 재시도.';
-    case 'subscribe-failed':
-      return '휴대폰이 알림 연결 거절. 폰 설정 → 알림에서 허용한 뒤 앱을 껐다 켜 주세요.';
-    default:
-      return '곧 자동 연결. 앱을 껐다 켜면 즉시 반영.';
-  }
-}
-
 /* 데이터 초기화와 함께 알림 설정·알림함도 지운다 (MY → 데이터 초기화) */
 async function notifyReset() {
   notifyLedger = NOTIFY_RULES.newLedger();

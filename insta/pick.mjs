@@ -29,8 +29,6 @@ export const readSeen = () => {
   const s = existsSync(SEEN) ? JSON.parse(readFileSync(SEEN, 'utf8')) : {};
   return { posted: s.posted || [], prepared: s.prepared || [] };
 };
-/** 준비 장부에서 이 공고의 줄. */
-export const preparedOf = (seen, code) => seen.prepared.find((p) => p.code === code) || null;
 /** 준비했다고 적는다(같은 공고는 덮어쓴다 — 다시 그리면 최신이 정답이다). */
 export function markPrepared(seen, rec) {
   const i = seen.prepared.findIndex((p) => p.code === rec.code);
