@@ -14842,9 +14842,13 @@ console.log('\n■ 자격을 찾는 곳 넓히기 — 「대상 :」 · 제목 �
   const c4 = FP.convertOne ? FP.convertOne(path.join(tmp, 'b.hwp'), path.join(tmp, 'out', 'b.pdf'), { soffice: path.join(tmp, 'no-such-soffice') }) : {};
   /* 🔴 전용 프로필 (2026-10-27) — root 소유 프로필 폴더 때문에 soffice 가 종료 77 로 못 뜨던 것. 두 변환 자리 모두 -env:UserInstallation 을 넘기고, 설치 스크립트도 임시 프로필 + 소유권 되돌림 */
   const fpdfSrc = readText(new URL('../collector/form-pdf.mjs', import.meta.url)); const fpgSrc = readText(new URL('../collector/form-pages.mjs', import.meta.url)); const h2o = readText(new URL('../collector/install-h2orestart.sh', import.meta.url));
-  eq('  변환기는 전용 프로필로 띄운다(form-pdf · form-pages 둘 다 loProfileArg) · 설치 스크립트는 임시 프로필로 깔고 root 소유 프로필을 되돌린다',
-    [/spawnSync\(soffice, \['--headless', '--norestore', loProfileArg\(\), '--convert-to'/.test(fpdfSrc), /spawnSync\(soffice, \['--headless', '--norestore', loProfileArg\(\), '--convert-to'/.test(fpgSrc),
-      /^-env:UserInstallation=/m.test(String(FP.loProfileArg ? FP.loProfileArg() : '')), /-env:UserInstallation=file:\/\/\$TMP\/unopkg-profile/.test(h2o) && /chown -R/.test(h2o)], [true, true, true, true]);
+  /* 2026-11-20 두 로봇의 변환 사본을 collector/soffice.mjs 한 곳으로 — 전용 프로필은 거기서 한 번 · 두 로봇은 그 함수만 부르고 제 손으로 soffice 를 띄우지 않는다 */
+  const soSrc = readText(new URL('../collector/soffice.mjs', import.meta.url));
+  const SO = await import('../collector/soffice.mjs');
+  const viaShared = (src) => /import \{[^}]*\bsofficeToPdf\b[^}]*\} from '\.\/soffice\.mjs'/.test(src) && /sofficeToPdf\(src, work, \{ soffice \}\)/.test(src) && !/spawnSync\(soffice\b/.test(src);
+  eq('  변환기는 전용 프로필로 띄운다(soffice.mjs 한 곳 · form-pdf · form-pages 둘 다 그것만 부른다) · 설치 스크립트는 임시 프로필로 깔고 root 소유 프로필을 되돌린다',
+    [/spawnSync\(soffice, \['--headless', '--norestore', loProfileArg\(\), '--convert-to'/.test(soSrc), viaShared(fpdfSrc), viaShared(fpgSrc),
+      /^-env:UserInstallation=/m.test(String(SO.loProfileArg())), /-env:UserInstallation=file:\/\/\$TMP\/unopkg-profile/.test(h2o) && /chown -R/.test(h2o)], [true, true, true, true, true]);
   eq('⑥ pdf 는 바이트 그대로 복사 · 가짜 pdf 와 없는 원본은 거절 · 변환기가 없으면 「변환기 없음」',
     [c1.ok, c1.pages, fs.existsSync(path.join(tmp, 'out', 'a.pdf')) && pdfBytes(path.join(tmp, 'out', 'a.pdf')).equals(pdf), c2.why, c3.why, /변환기 없음/.test(c4.why || '')],
     [true, 2, true, 'PDF 가 아님', '원본 파일 없음', true]);
@@ -17106,7 +17110,10 @@ console.log('■ 신청서 원본 → PDF — 단계 시한 안에 끝난다 (20
      숫자는 글자로 읽는다 */
   const src = readText(new URL('../collector/form-pdf.mjs', import.meta.url));
   const num = (name) => Number(eval((new RegExp('export const ' + name + '\\s*=\\s*([^;]+);').exec(src) || [, 'NaN'])[1].replace(/Number\(process\.env\.\w+\s*\|\|\s*(\d+)\)/, '$1')));
-  const FP = { BUDGET_SEC: num('BUDGET_SEC'), SOFFICE_TIMEOUT_MS: num('SOFFICE_TIMEOUT_MS') };
+  /* 파일 하나의 변환 시간은 변환 한 곳(collector/soffice.mjs · 2026-11-20)에서 읽고, form-pdf 가 그 숫자를 들여와 쓰는지 본다 */
+  const soSrcT = readText(new URL('../collector/soffice.mjs', import.meta.url));
+  const FP = { BUDGET_SEC: num('BUDGET_SEC'), SOFFICE_TIMEOUT_MS: Number((/export const SOFFICE_TIMEOUT_MS\s*=\s*(\d+);/.exec(soSrcT) || [, 'NaN'])[1]) };
+  eq('  (form-pdf 가 변환 시간을 soffice.mjs 에서 들여온다 — 따로 적은 숫자가 없다)', [/import \{[^}]*\bSOFFICE_TIMEOUT_MS\b[^}]*\} from '\.\/soffice\.mjs'/.test(src), /export const SOFFICE_TIMEOUT_MS/.test(src)], [true, false]);
   eq('  (숫자를 글자로 읽었다 — 예산·파일 하나 시간)', [FP.BUDGET_SEC > 0, FP.SOFFICE_TIMEOUT_MS > 0], [true, true]);
   eq('① 예산 검사가 파일 하나의 최대 변환 시간(SOFFICE_TIMEOUT_MS)을 셈에 넣는다',
     /const overBudget = \(\) => [^\n]*SOFFICE_TIMEOUT_MS/.test(src), true);
