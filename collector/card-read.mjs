@@ -413,6 +413,35 @@ export function gateStalled(items, data, today, waitDays = 3) {
   const paid = (data && data.items) || {}, held = (data && data.gateHeld) || {};
   return items.filter((it) => it.paidGate && !paid[it.id] && !held[it.id] && !closedNow(it, null, today) && daysSince(it.paidGate, today) > waitDays);
 }
+/* 유료 관문 기록 (2026-11-21 개발자 지시 「위의 두개도 켜서」 — 실제 비용·통과율 재기를 켠다) — 이미 저장되는 장부·결과 파일에서 센다(돈 0).
+   유료 로봇이 돌 때마다 실행 요약 칸에 적힌다(card-read.yml · final-review.yml 의 `--stats` 단계). 비용은 장부의 usd(실패한 시도까지 실제로 쓴 돈) */
+export function gateStats({ items = [], data = {}, ledger = {}, frLedger = {}, frResult = {}, today }) {
+  const paid = (data && data.items) || {}, held = (data && data.gateHeld) || {};
+  const gated = items.filter((it) => it.paidGate);
+  const open = gated.filter((it) => !closedNow(it, paid[it.id], today));
+  const passed = open.filter((it) => paid[it.id]).length, toPerson = open.filter((it) => !paid[it.id] && held[it.id]).length;
+  const fix = Object.entries(ledger || {}).filter(([, l]) => l && l.mode === 'fix' && l.done);
+  let kept = 0, dropped = 0;
+  for (const [id, l] of fix) { const e = paid[id]; if (e) for (const k of LIST_FIELDS) kept += Array.isArray(e[k]) ? e[k].length : 0; dropped += (l.dropped || []).length; }
+  const fr = Object.values(frLedger || {}).filter((l) => l && l.done);
+  const sum = (xs) => xs.reduce((a, l) => a + (Number(l.usd) || 0), 0);
+  return {
+    gated: gated.length, open: open.length, passed, toPerson, waiting: open.length - passed - toPerson,
+    stalled: gateStalled(items, data, today).length, manual: items.filter((it) => it.paidRead).length,
+    read: fix.length, usdPerNotice: fix.length ? sum(fix.map(([, l]) => l)) / fix.length : null,
+    linePass: kept + dropped ? kept / (kept + dropped) : null, droppedLines: dropped,
+    frRead: fr.length, frUsdPerNotice: fr.length ? sum(fr) / fr.length : null,
+    frProblems: Object.values((frResult && frResult.items) || {}).reduce((a, r) => a + ((r && r.problems) || []).length, 0),
+  };
+}
+export function gateStatsText(st, today) {
+  const usd = (v) => (v == null ? '—' : `$${v.toFixed(3)}`), pct = (v) => (v == null ? '—' : `${Math.round(v * 100)}%`);
+  return [`### 유료 관문 기록 (${today})`,
+    `- 숨김 등록 공고 ${st.gated}건(마감 전 ${st.open}건): 학생 화면에 오름 ${st.passed} · 사람에게 넘김 ${st.toPerson} · 기다리는 중 ${st.waiting}(그중 사흘 넘어 무료 값으로 오른 것 ${st.stalled})`,
+    `- 관리자가 직접 등록한 공고(숨기지 않고 읽기만) ${st.manual}건`,
+    `- 유료 확인 1(읽기→고치기→사실 검사): 읽은 공고 ${st.read}건 · 건당 평균 ${usd(st.usdPerNotice)} · 줄 통과율 ${pct(st.linePass)}(기계 검사가 뺀 줄 ${st.droppedLines}줄)`,
+    `- 최종 검토: 본 공고 ${st.frRead}건 · 건당 평균 ${usd(st.frUsdPerNotice)} · 사람이 볼 것 ${st.frProblems}건`].join('\n');
+}
 /* 관리자 「할 일」에 보일 말 (2026-11-20 개발자 지시 — *"이러이러한 부분이 기계검사에서 잡혔으니 뭐랑 뭐를 확인바란다는게 명확하게"*).
    🔴 로봇 말(held·verify·대조·「원문에 없는 글자」)을 쓰지 않는다 — 어느 칸 · 왜 잡혔는지 · 무엇을 확인하면 되는지를 한 문장씩 */
 export const FIELD_LABEL = { eligibility: '지원 자격', excludes: '받을 수 없는 경우', priority: '먼저 뽑는 기준', amount: '금액', apply: '접수 방법',
@@ -508,6 +537,10 @@ if (process.argv[1] && ranDirectly()) {
     process.exit(bad.length ? 1 : 0);
   }
   const reg = readJson('../data/registered.json', { items: [] });
+  if (process.argv.includes('--stats')) {   // 유료 관문 기록(돈 0) — 워크플로가 실행 요약 칸에 붙인다
+    console.log(gateStatsText(gateStats({ items: reg.items, data, ledger: readJson('card-read-ledger.json', {}), frLedger: readJson('final-review-ledger.json', {}), frResult: readJson('final-review.json', { items: {} }), today: TODAY }), TODAY));
+    process.exit(0);
+  }
   if (process.argv.includes('--gate-alarm')) {   // 경보 세기(GITHUB_OUTPUT 꼴 · 읽기만) — 값에 줄바꿈이 들어가지 않게 누른다
     const st = gateStalled(reg.items, data, TODAY), one = (x) => String(x || '').replace(/[\r\n]+/g, ' ').trim();
     console.log(`count=${st.length}`);

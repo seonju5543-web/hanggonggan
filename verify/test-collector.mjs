@@ -17266,13 +17266,22 @@ console.log('\n■ 자격 줄 전수 집계가 운영에 심겨 있다 (2026-10-
     { items: { b: {} }, gateHeld: { c: 'no-source' } }, plus(0));
   eq('③ 유료가 멈춘 숨김분 — 사흘 넘게 통과·사람 몫 없이 기다린 것만(통과한 것·사람에게 넘긴 것·하루 된 것·표식 없는 것·마감 지난 것은 아님)', stall.map((x) => x.id), ['a']);
   const wfc = readText(new URL('../.github/workflows/card-read.yml', import.meta.url)), wff = readText(new URL('../.github/workflows/final-review.yml', import.meta.url));
+  const st = CR.gateStats({ today: plus(0),
+    items: [it('s1', { paidGate: plus(-2) }), it('s2', { paidGate: plus(-2) }), it('s3', { paidGate: plus(-5) }), it('s4', { paidGate: plus(-1) }), it('s5', { paidRead: plus(-1) }), it('s6')],
+    data: { items: { s1: { eligibility: ['가', '나'], notes: ['다'] }, s5: { eligibility: ['라'] } }, gateHeld: { s2: 'unreadable' } },
+    ledger: { s1: { mode: 'fix', done: true, usd: 0.12, dropped: [{}] }, s5: { mode: 'fix', done: true, usd: 0.14, dropped: [] }, s6: { done: true, usd: 0.1 } },
+    frLedger: { s1: { done: true, usd: 0.09 } }, frResult: { items: { s1: { problems: [{}, {}] } } } });
+  eq('⑥ 유료 관문 기록(돈 0 · 11-21 「위의 두개도 켜서」) — 숨김 4건: 오름 1 · 사람에게 1 · 기다림 2(사흘 넘은 1) · 직접 등록 1 · 새 방식으로 읽은 2건 건당 0.13 · 줄 통과율 4/5 · 최종 검토 1건 · 볼 것 2 · 옛 방식(mode 없음)은 안 센다 · 실행 요약에 붙인다',
+    [st.gated, st.passed, st.toPerson, st.waiting, st.stalled, st.manual, st.read, Math.round(st.usdPerNotice * 1000), Math.round(st.linePass * 100), st.frRead, st.frProblems,
+      /건당 평균 \$0\.130/.test(CR.gateStatsText(st, plus(0))), (wfc.match(/card-read\.mjs --stats >> "\$GITHUB_STEP_SUMMARY"/g) || []).length + (wff.match(/card-read\.mjs --stats >> "\$GITHUB_STEP_SUMMARY"/g) || []).length],
+    [4, 1, 1, 2, 1, 1, 2, 130, 80, 1, 2, true, 2]);
   eq('  경보 짝 — 여는 것과 닫는 것이 같은 제목 · 세기는 --gate-alarm',
     [/card-read\.mjs --gate-alarm >> "\$GITHUB_OUTPUT"/.test(wfc), (wfc.match(/--title '🧾 유료 확인이 멈췄어요'/g) || []).length], [true, 2]);
   const robot = readText(new URL('../collector/final-review.mjs', import.meta.url));
-  eq('④ 최종 검토 로봇 — 스위치 둘 · 꺼진 채로 나간다(켜는 것은 개발자 지시) · registered.json·card-read.json 에 쓰지 않는다 · 건마다 저장 · 연달아 실패하면 멈춘다 · 워크플로가 유료 단계에 스위치를 준다',
-    [/cfg\.enabled === true && process\.env\.FINAL_REVIEW_ENABLE === '1'/.test(robot), JSON.parse(readText(new URL('../collector/final-review-config.json', import.meta.url))).enabled,
+  eq('④ 최종 검토 로봇 — 스위치 둘(설정 파일 enabled 는 참·거짓 하나 — 켜고 끄는 것은 개발자 지시 · 11-21 켬) · registered.json·card-read.json 에 쓰지 않는다 · 건마다 저장 · 연달아 실패하면 멈춘다 · 워크플로가 유료 단계에 스위치를 준다',
+    [/cfg\.enabled === true && process\.env\.FINAL_REVIEW_ENABLE === '1'/.test(robot), typeof JSON.parse(readText(new URL('../collector/final-review-config.json', import.meta.url))).enabled,
       /writeFileSync\([^)]*(registered|card-read)/.test(robot) || /writeAtomic\('\.\.\/data/.test(robot), /save\(\);   \/\/ 건마다 저장/.test(robot), /if \(streak >= 3\)/.test(robot),
-      /FINAL_REVIEW_ENABLE: '1'/.test(wff) && /set -o pipefail\n\s+node collector\/final-review\.mjs --write/.test(wff)], [true, false, false, true, true, true]);
+      /FINAL_REVIEW_ENABLE: '1'/.test(wff) && /set -o pipefail\n\s+node collector\/final-review\.mjs --write/.test(wff)], [true, 'boolean', false, true, true, true]);
   const sb = fSandbox(new URL('../', import.meta.url), 'hdj-final-review-');
   const NOENV = { FINAL_REVIEW_ENABLE: '', FINAL_REVIEW_FAKE: '', ANTHROPIC_API_KEY: '' };
   try {

@@ -95,6 +95,13 @@ jobs:
             fi
           fi
 
+      # 유료 관문 기록 (2026-11-21 개발자 지시) — 숨김 공고 몇 건 · 통과 · 사람에게 · 건당 비용 · 줄 통과율 · 최종 검토 비용을 실행 요약 칸에(장부에서 센다 · 돈 0)
+      - name: 유료 관문 기록 (비용·통과율)
+        if: always()
+        timeout-minutes: 1
+        continue-on-error: true
+        run: node collector/card-read.mjs --stats >> "$GITHUB_STEP_SUMMARY"
+
       - name: 저장하지 못했으면 장부를 남긴다 (돈을 쓴 응답 원본)
         if: failure() || cancelled()
         continue-on-error: true
